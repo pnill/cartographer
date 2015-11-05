@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xliveless", "xliveless.vcxproj", "{1ECD4CB8-DA2E-456A-8C56-D974EE90784B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libMinHook", "MinHook\build\libMinHook.vcxproj", "{65021938-D251-46FA-BC3D-85C385D4C06D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1ECD4CB8-DA2E-456A-8C56-D974EE90784B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1ECD4CB8-DA2E-456A-8C56-D974EE90784B}.Debug|Win32.Build.0 = Debug|Win32
+		{1ECD4CB8-DA2E-456A-8C56-D974EE90784B}.Release|Win32.ActiveCfg = Release|Win32
+		{1ECD4CB8-DA2E-456A-8C56-D974EE90784B}.Release|Win32.Build.0 = Release|Win32
+		{65021938-D251-46FA-BC3D-85C385D4C06D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{65021938-D251-46FA-BC3D-85C385D4C06D}.Debug|Win32.Build.0 = Debug|Win32
+		{65021938-D251-46FA-BC3D-85C385D4C06D}.Release|Win32.ActiveCfg = Release|Win32
+		{65021938-D251-46FA-BC3D-85C385D4C06D}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

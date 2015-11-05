@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{3e83253f-3671-49c0-ae8d-744a3a2d9c2b}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{26da70fa-61a4-4e90-bbc2-fb167b333db3}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{7df0e8d8-00ce-499a-8c23-c6816b38c73d}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Source Files\xlive">
+      <UniqueIdentifier>{cf71a59b-5460-4fe7-8953-30d0bd68357b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hooks">
+      <UniqueIdentifier>{6e3b665a-267b-4baf-9978-190c7753a4d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD">
+      <UniqueIdentifier>{2c24eac4-ffb8-4f03-b12f-4c8610683f02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Header Files">
+      <UniqueIdentifier>{9f856530-dcb3-4e2a-8786-00d436520d3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Source Files">
+      <UniqueIdentifier>{aed100e2-acf2-4d0b-9c87-6da40d3b88f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\xlive\User Handling">
+      <UniqueIdentifier>{6f64c45f-8032-4681-a961-0b27caef7bd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\GUI">
+      <UniqueIdentifier>{00a6b156-92cb-440a-aca4-40db453e82c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\GUI\Header Files">
+      <UniqueIdentifier>{c802d0b3-452a-4459-824a-62d80c0815a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\GUI\Source Files">
+      <UniqueIdentifier>{b245bfb5-9e14-482c-9568-9e01aaab83a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\GUI\Source Files\Direct3D9">
+      <UniqueIdentifier>{933eb738-ef3b-4896-a991-645018ac135b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Network.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xlive_network.cpp">
+      <Filter>Source Files\xlive</Filter>
+    </ClCompile>
+    <ClCompile Include="xliveless.cpp">
+      <Filter>Source Files\xlive</Filter>
+    </ClCompile>
+    <ClCompile Include="Detour.cpp">
+      <Filter>Source Files\hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Hook.cpp">
+      <Filter>Source Files\hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="CUser.cpp">
+      <Filter>Source Files\xlive\User Handling</Filter>
+    </ClCompile>
+    <ClCompile Include="packet.pb.cc">
+      <Filter>Source Files\xlive\User Handling</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI.cpp">
+      <Filter>Source Files\H2MOD\GUI\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\trunk.r580\trunk.r580\Drawing\Direct3D9\Direct3D9Renderer.cpp">
+      <Filter>Source Files\H2MOD\GUI\Source Files\Direct3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\trunk.r580\trunk.r580\Drawing\Direct3D9\Direct3D9GeometryBuffer.cpp">
+      <Filter>Source Files\H2MOD\GUI\Source Files\Direct3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\trunk.r580\trunk.r580\Drawing\Direct3D9\Direct3D9Texture.cpp">
+      <Filter>Source Files\H2MOD\GUI\Source Files\Direct3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\trunk.r580\trunk.r580\Drawing\Direct3D9\Direct3D9TextureTarget.cpp">
+      <Filter>Source Files\H2MOD\GUI\Source Files\Direct3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\trunk.r580\trunk.r580\Drawing\Direct3D9\Direct3D9ViewportTarget.cpp">
+      <Filter>Source Files\H2MOD\GUI\Source Files\Direct3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\trunk.r580\trunk.r580\Input\WindowsMessage.cpp">
+      <Filter>Source Files\H2MOD\GUI\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cartographer_main.cpp">
+      <Filter>Source Files\H2MOD\GUI\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Network.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xlivedefs.h">
+      <Filter>Source Files\xlive</Filter>
+    </ClInclude>
+    <ClInclude Include="xliveless.h">
+      <Filter>Source Files\xlive</Filter>
+    </ClInclude>
+    <ClInclude Include="Detour.h">
+      <Filter>Source Files\hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Hook.h">
+      <Filter>Source Files\hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="CUser.h">
+      <Filter>Source Files\xlive\User Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="packet.pb.h">
+      <Filter>Source Files\xlive\User Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI.h">
+      <Filter>Source Files\H2MOD\GUI\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cartographer_main.hpp">
+      <Filter>Source Files\H2MOD\GUI\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="xlive.def">
+      <Filter>Source Files\xlive</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="xliveless.rc">
+      <Filter>Source Files\xlive</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
