@@ -89,7 +89,7 @@ void protobuf_AssignDesc_packet_2eproto() {
       sizeof(local_confirm));
   secure_request_descriptor_ = file->message_type(2);
   static const int secure_request_offsets_[1] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(secure_request, xnaddr_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(secure_request, abenet_),
   };
   secure_request_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -211,7 +211,7 @@ void protobuf_AddDesc_packet_2eproto() {
     "t\020\005\022\020\n\014xnaddr_reply\020\006\"d\n\rlocal_confirm\022\023"
     "\n\013secure_addr\030\001 \002(\r\022\016\n\006xnaddr\030\002 \002(\r\022\014\n\004p"
     "ort\030\003 \002(\005\022\016\n\006abEnet\030\004 \002(\014\022\020\n\010abOnline\030\005 "
-    "\002(\014\" \n\016secure_request\022\016\n\006xnaddr\030\001 \002(\r\"\036\n"
+    "\002(\014\" \n\016secure_request\022\016\n\006abEnet\030\001 \002(\014\"\036\n"
     "\014secure_reply\022\016\n\006secure\030\001 \002(\r\" \n\016xnaddr_"
     "request\022\016\n\006secure\030\001 \002(\r\"N\n\014xnaddr_reply\022"
     "\016\n\006xnaddr\030\001 \002(\r\022\014\n\004port\030\002 \002(\r\022\016\n\006abEnet\030"
@@ -1149,7 +1149,7 @@ void local_confirm::Swap(local_confirm* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int secure_request::kXnaddrFieldNumber;
+const int secure_request::kAbEnetFieldNumber;
 #endif  // !_MSC_VER
 
 secure_request::secure_request()
@@ -1169,8 +1169,9 @@ secure_request::secure_request(const secure_request& from)
 }
 
 void secure_request::SharedCtor() {
+  ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
-  xnaddr_ = 0u;
+  abenet_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1180,6 +1181,9 @@ secure_request::~secure_request() {
 }
 
 void secure_request::SharedDtor() {
+  if (abenet_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete abenet_;
+  }
   if (this != default_instance_) {
   }
 }
@@ -1206,7 +1210,11 @@ secure_request* secure_request::New() const {
 }
 
 void secure_request::Clear() {
-  xnaddr_ = 0u;
+  if (has_abenet()) {
+    if (abenet_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+      abenet_->clear();
+    }
+  }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -1221,13 +1229,11 @@ bool secure_request::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required uint32 xnaddr = 1;
+      // required bytes abEnet = 1;
       case 1: {
-        if (tag == 8) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 input, &xnaddr_)));
-          set_has_xnaddr();
+        if (tag == 10) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_abenet()));
         } else {
           goto handle_unusual;
         }
@@ -1260,9 +1266,10 @@ failure:
 void secure_request::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:secure_request)
-  // required uint32 xnaddr = 1;
-  if (has_xnaddr()) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->xnaddr(), output);
+  // required bytes abEnet = 1;
+  if (has_abenet()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
+      1, this->abenet(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -1275,9 +1282,11 @@ void secure_request::SerializeWithCachedSizes(
 ::google::protobuf::uint8* secure_request::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:secure_request)
-  // required uint32 xnaddr = 1;
-  if (has_xnaddr()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->xnaddr(), target);
+  // required bytes abEnet = 1;
+  if (has_abenet()) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        1, this->abenet(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -1292,11 +1301,11 @@ int secure_request::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required uint32 xnaddr = 1;
-    if (has_xnaddr()) {
+    // required bytes abEnet = 1;
+    if (has_abenet()) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::UInt32Size(
-          this->xnaddr());
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->abenet());
     }
 
   }
@@ -1326,8 +1335,8 @@ void secure_request::MergeFrom(const ::google::protobuf::Message& from) {
 void secure_request::MergeFrom(const secure_request& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from.has_xnaddr()) {
-      set_xnaddr(from.xnaddr());
+    if (from.has_abenet()) {
+      set_abenet(from.abenet());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -1353,7 +1362,7 @@ bool secure_request::IsInitialized() const {
 
 void secure_request::Swap(secure_request* other) {
   if (other != this) {
-    std::swap(xnaddr_, other->xnaddr_);
+    std::swap(abenet_, other->abenet_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

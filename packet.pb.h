@@ -413,23 +413,28 @@ class secure_request : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // required uint32 xnaddr = 1;
-  inline bool has_xnaddr() const;
-  inline void clear_xnaddr();
-  static const int kXnaddrFieldNumber = 1;
-  inline ::google::protobuf::uint32 xnaddr() const;
-  inline void set_xnaddr(::google::protobuf::uint32 value);
+  // required bytes abEnet = 1;
+  inline bool has_abenet() const;
+  inline void clear_abenet();
+  static const int kAbEnetFieldNumber = 1;
+  inline const ::std::string& abenet() const;
+  inline void set_abenet(const ::std::string& value);
+  inline void set_abenet(const char* value);
+  inline void set_abenet(const void* value, size_t size);
+  inline ::std::string* mutable_abenet();
+  inline ::std::string* release_abenet();
+  inline void set_allocated_abenet(::std::string* abenet);
 
   // @@protoc_insertion_point(class_scope:secure_request)
  private:
-  inline void set_has_xnaddr();
-  inline void clear_has_xnaddr();
+  inline void set_has_abenet();
+  inline void clear_has_abenet();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  ::google::protobuf::uint32 xnaddr_;
+  ::std::string* abenet_;
   friend void  protobuf_AddDesc_packet_2eproto();
   friend void protobuf_AssignDesc_packet_2eproto();
   friend void protobuf_ShutdownFile_packet_2eproto();
@@ -1183,28 +1188,80 @@ inline void local_confirm::set_allocated_abonline(::std::string* abonline) {
 
 // secure_request
 
-// required uint32 xnaddr = 1;
-inline bool secure_request::has_xnaddr() const {
+// required bytes abEnet = 1;
+inline bool secure_request::has_abenet() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void secure_request::set_has_xnaddr() {
+inline void secure_request::set_has_abenet() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void secure_request::clear_has_xnaddr() {
+inline void secure_request::clear_has_abenet() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void secure_request::clear_xnaddr() {
-  xnaddr_ = 0u;
-  clear_has_xnaddr();
+inline void secure_request::clear_abenet() {
+  if (abenet_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abenet_->clear();
+  }
+  clear_has_abenet();
 }
-inline ::google::protobuf::uint32 secure_request::xnaddr() const {
-  // @@protoc_insertion_point(field_get:secure_request.xnaddr)
-  return xnaddr_;
+inline const ::std::string& secure_request::abenet() const {
+  // @@protoc_insertion_point(field_get:secure_request.abEnet)
+  return *abenet_;
 }
-inline void secure_request::set_xnaddr(::google::protobuf::uint32 value) {
-  set_has_xnaddr();
-  xnaddr_ = value;
-  // @@protoc_insertion_point(field_set:secure_request.xnaddr)
+inline void secure_request::set_abenet(const ::std::string& value) {
+  set_has_abenet();
+  if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abenet_ = new ::std::string;
+  }
+  abenet_->assign(value);
+  // @@protoc_insertion_point(field_set:secure_request.abEnet)
+}
+inline void secure_request::set_abenet(const char* value) {
+  set_has_abenet();
+  if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abenet_ = new ::std::string;
+  }
+  abenet_->assign(value);
+  // @@protoc_insertion_point(field_set_char:secure_request.abEnet)
+}
+inline void secure_request::set_abenet(const void* value, size_t size) {
+  set_has_abenet();
+  if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abenet_ = new ::std::string;
+  }
+  abenet_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:secure_request.abEnet)
+}
+inline ::std::string* secure_request::mutable_abenet() {
+  set_has_abenet();
+  if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abenet_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:secure_request.abEnet)
+  return abenet_;
+}
+inline ::std::string* secure_request::release_abenet() {
+  clear_has_abenet();
+  if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = abenet_;
+    abenet_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void secure_request::set_allocated_abenet(::std::string* abenet) {
+  if (abenet_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete abenet_;
+  }
+  if (abenet) {
+    set_has_abenet();
+    abenet_ = abenet;
+  } else {
+    clear_has_abenet();
+    abenet_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:secure_request.abEnet)
 }
 
 // -------------------------------------------------------------------

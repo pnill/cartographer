@@ -174,6 +174,7 @@ void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont)
 // #5002: XLiveRender
 int WINAPI XLiveRender()
 {
+	
 	if (pDevice)
 	{	
 		if (pDevice->TestCooperativeLevel() == D3D_OK)

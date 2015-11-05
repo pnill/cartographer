@@ -143,9 +143,15 @@ INT WINAPI XNetXnAddrToInAddr(XNADDR *pxna, XNKID *pnkid, IN_ADDR *pina)
 	pina->s_addr = 0xABABABAB;
 
 	TRACE("XnetXnAddrToInAddr: %08X", pxna->ina.s_addr);
-
-	User.GetSecureAddr(pxna, pina);
 	
+	std::string ab(reinterpret_cast<const char*>(pxna->abEnet), 6);
+	if (User.smap[ab] == 0)
+	{
+		User.GetSecureAddr(pxna, pina);
+	}
+	else{
+		pina->s_addr = User.smap[ab];
+	}
 
 
 	if (pina->s_addr == 0xABABABAB)
@@ -186,28 +192,36 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 	u_long iplong = (((struct sockaddr_in*)to)->sin_addr.s_addr);
 	ADDRESS_FAMILY af = (((struct sockaddr_in*)to)->sin_family);
 
-
-
-
-	char* nBuf = new char[len + 4 + sizeof(XNADDR)]; // Allocate new buffer 4 bytes larger then the original
-	memcpy(nBuf + 4 + sizeof(XNADDR), buf, len); // Copy original buffer into our new buffer 4 bytes in.
-
-	*(u_long*)nBuf = User.GetLocalSecLong(); // Store local Secure address in the first 4 bytes of the packet
-	XNADDR* p = new XNADDR; // Create new XNADDR struct
-	User.GetLocalXNAddr(p); // Get XNADDR data for local user
-
-	memcpy(nBuf + 4, p, sizeof(XNADDR)); // Copy XNADDR data into packet
-	
-	delete[] p;
-
-	len = len + 4 + sizeof(XNADDR); // Add 4+sizeof(XNADDR) bytes to len on send.
-	
 	
 
+	char* nBuf = (char*)buf;
+	if (iplong != INADDR_BROADCAST && iplong != 0x00 && iplong != broadcast_server)
+	{
+	
 
-	TRACE("nBuf: %08X", *(u_long*)nBuf);
-	TRACE("User.GetLocalSecLong(): %08X", User.GetLocalSecLong());
+		if ( (unsigned char)buf[0] == 0x11 || (unsigned char)buf[0] == 0x09 )
+		{
+	
+			nBuf = new char[len + 4 + sizeof(XNADDR)]; // Allocate new buffer 4 bytes larger then the original
+			memcpy(nBuf + 4 + sizeof(XNADDR), buf, len); // Copy original buffer into our new buffer 4 bytes in.
 
+			*(u_long*)nBuf = User.LocalSec; // Store local Secure address in the first 4 bytes of the packet
+
+			memcpy(nBuf + 4, User.LocalXN, sizeof(XNADDR)); // Copy XNADDR data into packet
+
+			len = len + 4 + sizeof(XNADDR); // Add 4+sizeof(XNADDR) bytes to len on send.
+		}
+		else
+		{
+			nBuf = new char[len + 4];
+			*(u_long*)nBuf = User.LocalSec;
+
+			memcpy(nBuf + 4, buf, len);
+			
+			len = len + 4;
+		}
+
+	}
 
 	if (iplong == INADDR_BROADCAST || iplong == 0x00 || iplong == broadcast_server)
 	{
@@ -297,11 +311,17 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 
 	int ret = sendto(s, nBuf, len, flags, to, tolen); // replace the buffer with our new buffer (nBuf)	
 
-	delete[] nBuf; // We need to cleanup our new buffer to prevent memory leaks.
 
 	if (iplong != INADDR_BROADCAST && iplong != 0x00)
 	{
-		TRACE("XSocketSendTo ret = %i, port =%d", ret, ntohs(port));
+		
+		if ( (unsigned char)buf[0] == 0x11 || (unsigned char)buf[0] == 0x09 )
+		{
+			delete[] nBuf; // We need to cleanup our new buffer to prevent memory leaks.
+		}
+
+
+		//TRACE("XSocketSendTo ret = %i, port =%d", ret, ntohs(port));
 	}
 
 	if (ret == SOCKET_ERROR)
@@ -325,7 +345,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 
 	if (print < 15)
 	{
-		TRACE("XSocketRecvFrom");
+		//TRACE("XSocketRecvFrom");
 		print++;
 	}
 
@@ -334,59 +354,82 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 	
 	if (ret > 0)
 	{
-	
-		
-		u_long saddr = *(u_long*)buf; // get the first 4 bytes of buf.
+		BOOL Executed = FALSE;
 		u_long iplong = (((struct sockaddr_in*)from)->sin_addr.s_addr);
-
-		XNADDR* xnrecv = new XNADDR; // Create new XNADDR struct
-		memcpy(xnrecv, buf + 4, sizeof(XNADDR)); // Copy XNADDR struct from packet into our new XNADDR struct
-		ret = ret - 4 - sizeof(XNADDR);  // reduce 4 from the returned length as we removed the secure addr from the packet.
-		memcpy(buf, buf + 4 + sizeof(XNADDR), ret); // replace all of buf with the original data now that we have the secure addr.
-		
-
-		
-
-		if (User.xnmap[saddr] == 0 && iplong != broadcast_server)
+		if (iplong != broadcast_server)
 		{
-			User.RegisterUser(xnrecv, saddr);
-			User.xnmap[saddr] = xnrecv->ina.s_addr;
-			delete[] xnrecv;
-		}
+			u_long saddr = *(u_long*)buf; // get the first 4 bytes of buf.
 
-		TRACE("XSocketRecvFrom(): %08X", saddr);
-		
-		if (saddr != 0)
-		{
-			(((struct sockaddr_in*)from)->sin_addr.s_addr) = saddr;
-
-			TRACE_GAME("XSocketRecvFrom() SockMap: %X, Port: %d", s, User.sockmap[s]);
-			TRACE_GAME("XSocketRecvFrom(): SecureAddr: %08X", saddr);
-			TRACE_GAME("XSocketRecvFrom(): XAddr: %08X", iplong);
-
-			if (User.sockmap[s] == 1000)
+			if (ret > 40)
 			{
-				TRACE_GAME("XSocketRecvFrom() XSocketMap: %X");
-				User.pmap_a[saddr] = (((struct sockaddr_in*)from)->sin_port);
-				TRACE_GAME("XSocketRecvFrom() Recv Port: %d", (((struct sockaddr_in*)from)->sin_port));
-				TRACE_GAME("XSocketRecvFrom() - (1000)New Port: %d ", User.pmap_a[saddr]);
+				if ((unsigned char)buf[40] == 0x11 || (unsigned char)buf[40] == 0x09)
+				{
+					Executed = TRUE;
+					XNADDR xnrecv = *(XNADDR*)(buf + 4);
+
+					ret = ret - 4 - sizeof(XNADDR);  // reduce 4 from the returned length as we removed the secure addr from the packet.
+					memcpy(buf, buf + 4 + sizeof(XNADDR), ret); // replace all of buf with the original data now that we have the secure addr.
+
+					if (User.xnmap[saddr] == 0 && iplong != broadcast_server)
+					{
+						User.RegisterUser(&xnrecv, saddr);
+						User.xnmap[saddr] = xnrecv.ina.s_addr;
+					}
+
+					std::string ab(reinterpret_cast<const char*>(xnrecv.abEnet), 6);
+
+					if (User.smap[ab] = 0 && iplong != broadcast_server)
+					{
+						//TRACE("User didn't have abenet mapped to secure address");
+						User.smap[ab] = saddr;
+						//TRACE("User abEnet mapped to: %08X", saddr);
+					}
+				}
 			}
 
-			if (User.sockmap[s] == 1001)
+			if (Executed == FALSE)
 			{
-				User.pmap_b[saddr] = (((struct sockaddr_in*)from)->sin_port);
-				TRACE_GAME("XSocketRecvFrom() Recv Port: %d", htons((((struct sockaddr_in*)from)->sin_port)));
-				TRACE_GAME("XSocketRecvFrom() - (1001)New Port: %d ", htons(User.pmap_b[saddr]));
+				ret = ret - 4;
+				memcpy(buf, buf + 4, ret);
+				
 			}
 
-			if (User.sockmap[s] == 1005)
-			{
-				User.pmap_c[saddr] = (((struct sockaddr_in*)from)->sin_port);
-			}
 
-			if (User.sockmap[s] == 1006)
+
+
+			if (saddr != 0)
 			{
-				User.pmap_d[saddr] = (((struct sockaddr_in*)from)->sin_port);
+				(((struct sockaddr_in*)from)->sin_addr.s_addr) = saddr;
+
+				TRACE_GAME("XSocketRecvFrom() SockMap: %X, Port: %d", s, User.sockmap[s]);
+				TRACE_GAME("XSocketRecvFrom(): SecureAddr: %08X", saddr);
+				TRACE_GAME("XSocketRecvFrom(): XAddr: %08X", iplong);
+
+				if (User.sockmap[s] == 1000)
+				{
+					TRACE_GAME("XSocketRecvFrom() XSocketMap: %X");
+					User.pmap_a[saddr] = (((struct sockaddr_in*)from)->sin_port);
+					TRACE_GAME("XSocketRecvFrom() Recv Port: %d", (((struct sockaddr_in*)from)->sin_port));
+					TRACE_GAME("XSocketRecvFrom() - (1000)New Port: %d ", User.pmap_a[saddr]);
+				}
+
+				if (User.sockmap[s] == 1001)
+				{
+					User.pmap_b[saddr] = (((struct sockaddr_in*)from)->sin_port);
+					TRACE_GAME("XSocketRecvFrom() Recv Port: %d", htons((((struct sockaddr_in*)from)->sin_port)));
+					TRACE_GAME("XSocketRecvFrom() - (1001)New Port: %d ", htons(User.pmap_b[saddr]));
+				}
+
+				if (User.sockmap[s] == 1005)
+				{
+					User.pmap_c[saddr] = (((struct sockaddr_in*)from)->sin_port);
+				}
+
+				if (User.sockmap[s] == 1006)
+				{
+					User.pmap_d[saddr] = (((struct sockaddr_in*)from)->sin_port);
+				}
+
 			}
 
 		}
@@ -416,7 +459,6 @@ int WINAPI XNetUnregisterKey(DWORD)
 INT   WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
 {
 	TRACE("XNetInAddrToXnAddr( pxna_addr: %08X, ina: %08X )", pxna->ina.s_addr, ina.s_addr);
-
 	User.GetXNAddr(pxna, ina);
 
 	TRACE("XNetInAddrToXnAddr( pxna_addr: %08X, ina: %08X ) - After User.GetXNADDR", pxna->ina.s_addr, ina.s_addr);

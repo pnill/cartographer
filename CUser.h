@@ -27,12 +27,14 @@ public:
 	ULONG GetXNLong(ULONG iplong);
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 	std::unordered_map<ULONG, ULONG> xnmap;
-	std::unordered_map<ULONG, ULONG> smap;
+	std::unordered_map<std::string, ULONG> smap;
 	std::unordered_map<ULONG, SHORT> pmap_a;
 	std::unordered_map<ULONG, SHORT> pmap_b;
 	std::unordered_map<ULONG, SHORT> pmap_c;
 	std::unordered_map<ULONG, SHORT> pmap_d;
 	std::unordered_map<SOCKET, SHORT> sockmap;
+	XNADDR *LocalXN;
+	ULONG LocalSec;
 
 	int LastUser = 1;
 };
