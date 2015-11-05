@@ -50,8 +50,8 @@
     <OutDir>.\Debug\</OutDir>
     <IntDir>.\Debug\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\PermaNulled\Desktop\trunk.r580\trunk.r580;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;C:\Users\PermaNulled\Desktop\h2bullshit\;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\PermaNulled\Desktop\h2bullshit\libs;C:\Users\PermaNulled\Desktop\trunk.r580\trunk.r580\Projects\VS2015\Debug\x86\Lib;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;C:\Users\PermaNulled\Desktop\protobuf-2.6.1\protobuf-2.6.1\vsprojects\Debug\;$(LibraryPath)</LibraryPath>
+    <IncludePath>.\OSHGui;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;.\protobuf-2.6.1;$(IncludePath)</IncludePath>
+    <LibraryPath>.\libs;.\OSHGui\Projects\VS2015\Debug\x86\Lib;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -155,12 +155,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\trunk.r580\trunk.r580\Drawing\Direct3D9\Direct3D9GeometryBuffer.cpp" />
-    <ClCompile Include="..\trunk.r580\trunk.r580\Drawing\Direct3D9\Direct3D9Renderer.cpp" />
-    <ClCompile Include="..\trunk.r580\trunk.r580\Drawing\Direct3D9\Direct3D9Texture.cpp" />
-    <ClCompile Include="..\trunk.r580\trunk.r580\Drawing\Direct3D9\Direct3D9TextureTarget.cpp" />
-    <ClCompile Include="..\trunk.r580\trunk.r580\Drawing\Direct3D9\Direct3D9ViewportTarget.cpp" />
-    <ClCompile Include="..\trunk.r580\trunk.r580\Input\WindowsMessage.cpp" />
+    <ClCompile Include=".\OSHGui\Drawing\Direct3D9\Direct3D9GeometryBuffer.cpp" />
+    <ClCompile Include=".\OSHGui\Drawing\Direct3D9\Direct3D9Renderer.cpp" />
+    <ClCompile Include=".\OSHGui\Drawing\Direct3D9\Direct3D9Texture.cpp" />
+    <ClCompile Include=".\OSHGui\Drawing\Direct3D9\Direct3D9TextureTarget.cpp" />
+    <ClCompile Include=".\OSHGui\Drawing\Direct3D9\Direct3D9ViewportTarget.cpp" />
+    <ClCompile Include=".\OSHGui\Input\WindowsMessage.cpp" />
     <ClCompile Include="cartographer_main.cpp" />
     <ClCompile Include="CUser.cpp" />
     <ClCompile Include="Detour.cpp">

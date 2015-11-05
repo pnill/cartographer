@@ -9,6 +9,8 @@
 
 #define XLIVELESS_VERSION   0x00020000  // 2.0.0
 
+#define NO_TRACE
+
 //useful macros
 #define SAFE_DELETE(p)  { if(p) { delete (p);     (p)=NULL; } }
 #define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
