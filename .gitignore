@@ -20,3 +20,4 @@ Debug/binkw32.pdb
 *.pdb
 Debug/binkw32.lib
 *.idb
+*.java
