@@ -11,14 +11,15 @@ namespace Network
 	namespace bitstreamptr
 	{
 	
-			DWORD read_int			= 0xCE49F;
-			DWORD read_uint			= 0xCE49F;
-			DWORD read_byte			= 0xCE501;
-			DWORD read_char			= 0xCE561;
-			DWORD read_ulonglong	= 0xCE5B7;
-			DWORD read_block		= 0xCE54F;
+			DWORD write_uint = 0xD17C6;
+			//DWORD read_int			= 0xCE49F;
+			//DWORD read_uint			= 0xCE49F;
+			//DWORD read_byte			= 0xCE501;
+			//DWORD read_char			= 0xCE561;
+			//DWORD read_ulonglong	= 0xCE5B7;
+			//DWORD read_block		= 0xCE54F;
 
-			DWORD write_uint		= 0xCDD80;
+			//DWORD write_uint		= 0xCDD80;
 
 
 	};
@@ -281,8 +282,8 @@ char* Network::GetPacketType(unsigned int typeval)
 typedef int(__stdcall *tWrite_uint)(DWORD *, char*, unsigned int, signed int);
 tWrite_uint pWrite_uint;
 
-typedef int(__stdcall *tRead_block)(DWORD*, char*, char*, signed int);
-tRead_block pRead_block;
+//typedef int(__stdcall *tRead_block)(DWORD*, char*, char*, signed int);
+//tRead_block pRead_block;
 
 
 
@@ -298,7 +299,7 @@ int __stdcall write_uint(DWORD *thisptr, char* valuestr, unsigned int value, sig
 
 	return pWrite_uint(thisptr, valuestr, value, maxval);
 }
-
+/**
 int __stdcall read_block(DWORD* thisptr, char* valuestr, char* blockptr, signed int bitsize)
 {
 		TRACE_GAME_N("bitstream::read_block - string: %s, ptr: %08X, bitsize: %i", valuestr, blockptr, bitsize);
@@ -324,7 +325,7 @@ int __stdcall read_block(DWORD* thisptr, char* valuestr, char* blockptr, signed 
 		free(blockhex);
 
 	return ret;
-}
+}*/
 
 /*
 	Sloppy CodeCave for write_uint until I can find a better way to hook.
@@ -389,29 +390,30 @@ __declspec(naked) void read_bitstream_uint(void)
 void Network::Initialize()
 {
 
-	if (h2mod->Server)
-	{
-		Network::bitstreamptr::read_uint += h2mod->GetBase();
-		Network::bitstreamptr::write_uint += h2mod->GetBase();
-		Network::bitstreamptr::read_block += h2mod->GetBase();
-
+	//if (h2mod->Server)
+//	{
+		//Network::bitstreamptr::read_uint += h2mod->GetBase();
+		//Network::bitstreamptr::write_uint += h2mod->GetBase();
+		//Network::bitstreamptr::read_block += h2mod->GetBase();
+	
 		subfunc += h2mod->GetBase();
 		DWORD dwBack;
 
 
 
 		/*TRACE_GAME("H2MOD::Network::bitstream - Writing uint(%08X) hook", Network::bitstreamptr::read_uint);
-		Codecave(Network::bitstreamptr::read_uint, read_bitstream_uint, 5);
+		Codecave(Network::bitstreamptr::read_uint, read_bitstream_uint, 5);*/
 
-		TRACE_GAME("H2MOD::Network::bistream - Writing write_uint(%08X) hook", Network::bitstreamptr::write_uint);
-		pWrite_uint = (tWrite_uint)DetourClassFunc((BYTE*)Network::bitstreamptr::write_uint, (BYTE*)write_uint, 11);
-		VirtualProtect(pWrite_uint, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		//TRACE_GAME("H2MOD::Network::bistream - Writing write_uint(%08X) hook", Network::bitstreamptr::write_uint);
+		//pWrite_uint = (tWrite_uint)DetourClassFunc((BYTE*)Network::bitstreamptr::write_uint, (BYTE*)write_uint, 11);
+		//VirtualProtect(pWrite_uint, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
+		/*
 		TRACE_GAME("H2MOD::Network::bitstream - Writing read_block(%08X) hook", Network::bitstreamptr::read_block);
 		pRead_block = (tRead_block)DetourClassFunc((BYTE*)Network::bitstreamptr::read_block, (BYTE*)read_block, 8);
 		VirtualProtect(pRead_block, 4, PAGE_EXECUTE_READWRITE, &dwBack);*/
 
 		TRACE_GAME("H2MOD::Network - Initialized\n");
-	}
+	//}
 
 }

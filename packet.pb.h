@@ -504,16 +504,66 @@ class secure_reply : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 secure() const;
   inline void set_secure(::google::protobuf::uint32 value);
 
+  // required uint32 xnaddr = 2;
+  inline bool has_xnaddr() const;
+  inline void clear_xnaddr();
+  static const int kXnaddrFieldNumber = 2;
+  inline ::google::protobuf::uint32 xnaddr() const;
+  inline void set_xnaddr(::google::protobuf::uint32 value);
+
+  // required uint32 port = 3;
+  inline bool has_port() const;
+  inline void clear_port();
+  static const int kPortFieldNumber = 3;
+  inline ::google::protobuf::uint32 port() const;
+  inline void set_port(::google::protobuf::uint32 value);
+
+  // required bytes abEnet = 4;
+  inline bool has_abenet() const;
+  inline void clear_abenet();
+  static const int kAbEnetFieldNumber = 4;
+  inline const ::std::string& abenet() const;
+  inline void set_abenet(const ::std::string& value);
+  inline void set_abenet(const char* value);
+  inline void set_abenet(const void* value, size_t size);
+  inline ::std::string* mutable_abenet();
+  inline ::std::string* release_abenet();
+  inline void set_allocated_abenet(::std::string* abenet);
+
+  // required bytes abOnline = 5;
+  inline bool has_abonline() const;
+  inline void clear_abonline();
+  static const int kAbOnlineFieldNumber = 5;
+  inline const ::std::string& abonline() const;
+  inline void set_abonline(const ::std::string& value);
+  inline void set_abonline(const char* value);
+  inline void set_abonline(const void* value, size_t size);
+  inline ::std::string* mutable_abonline();
+  inline ::std::string* release_abonline();
+  inline void set_allocated_abonline(::std::string* abonline);
+
   // @@protoc_insertion_point(class_scope:secure_reply)
  private:
   inline void set_has_secure();
   inline void clear_has_secure();
+  inline void set_has_xnaddr();
+  inline void clear_has_xnaddr();
+  inline void set_has_port();
+  inline void clear_has_port();
+  inline void set_has_abenet();
+  inline void clear_has_abenet();
+  inline void set_has_abonline();
+  inline void clear_has_abonline();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
   ::google::protobuf::uint32 secure_;
+  ::google::protobuf::uint32 xnaddr_;
+  ::std::string* abenet_;
+  ::std::string* abonline_;
+  ::google::protobuf::uint32 port_;
   friend void  protobuf_AddDesc_packet_2eproto();
   friend void protobuf_AssignDesc_packet_2eproto();
   friend void protobuf_ShutdownFile_packet_2eproto();
@@ -1290,6 +1340,206 @@ inline void secure_reply::set_secure(::google::protobuf::uint32 value) {
   set_has_secure();
   secure_ = value;
   // @@protoc_insertion_point(field_set:secure_reply.secure)
+}
+
+// required uint32 xnaddr = 2;
+inline bool secure_reply::has_xnaddr() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void secure_reply::set_has_xnaddr() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void secure_reply::clear_has_xnaddr() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void secure_reply::clear_xnaddr() {
+  xnaddr_ = 0u;
+  clear_has_xnaddr();
+}
+inline ::google::protobuf::uint32 secure_reply::xnaddr() const {
+  // @@protoc_insertion_point(field_get:secure_reply.xnaddr)
+  return xnaddr_;
+}
+inline void secure_reply::set_xnaddr(::google::protobuf::uint32 value) {
+  set_has_xnaddr();
+  xnaddr_ = value;
+  // @@protoc_insertion_point(field_set:secure_reply.xnaddr)
+}
+
+// required uint32 port = 3;
+inline bool secure_reply::has_port() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void secure_reply::set_has_port() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void secure_reply::clear_has_port() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void secure_reply::clear_port() {
+  port_ = 0u;
+  clear_has_port();
+}
+inline ::google::protobuf::uint32 secure_reply::port() const {
+  // @@protoc_insertion_point(field_get:secure_reply.port)
+  return port_;
+}
+inline void secure_reply::set_port(::google::protobuf::uint32 value) {
+  set_has_port();
+  port_ = value;
+  // @@protoc_insertion_point(field_set:secure_reply.port)
+}
+
+// required bytes abEnet = 4;
+inline bool secure_reply::has_abenet() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void secure_reply::set_has_abenet() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void secure_reply::clear_has_abenet() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void secure_reply::clear_abenet() {
+  if (abenet_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abenet_->clear();
+  }
+  clear_has_abenet();
+}
+inline const ::std::string& secure_reply::abenet() const {
+  // @@protoc_insertion_point(field_get:secure_reply.abEnet)
+  return *abenet_;
+}
+inline void secure_reply::set_abenet(const ::std::string& value) {
+  set_has_abenet();
+  if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abenet_ = new ::std::string;
+  }
+  abenet_->assign(value);
+  // @@protoc_insertion_point(field_set:secure_reply.abEnet)
+}
+inline void secure_reply::set_abenet(const char* value) {
+  set_has_abenet();
+  if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abenet_ = new ::std::string;
+  }
+  abenet_->assign(value);
+  // @@protoc_insertion_point(field_set_char:secure_reply.abEnet)
+}
+inline void secure_reply::set_abenet(const void* value, size_t size) {
+  set_has_abenet();
+  if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abenet_ = new ::std::string;
+  }
+  abenet_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:secure_reply.abEnet)
+}
+inline ::std::string* secure_reply::mutable_abenet() {
+  set_has_abenet();
+  if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abenet_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:secure_reply.abEnet)
+  return abenet_;
+}
+inline ::std::string* secure_reply::release_abenet() {
+  clear_has_abenet();
+  if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = abenet_;
+    abenet_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void secure_reply::set_allocated_abenet(::std::string* abenet) {
+  if (abenet_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete abenet_;
+  }
+  if (abenet) {
+    set_has_abenet();
+    abenet_ = abenet;
+  } else {
+    clear_has_abenet();
+    abenet_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:secure_reply.abEnet)
+}
+
+// required bytes abOnline = 5;
+inline bool secure_reply::has_abonline() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void secure_reply::set_has_abonline() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void secure_reply::clear_has_abonline() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void secure_reply::clear_abonline() {
+  if (abonline_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abonline_->clear();
+  }
+  clear_has_abonline();
+}
+inline const ::std::string& secure_reply::abonline() const {
+  // @@protoc_insertion_point(field_get:secure_reply.abOnline)
+  return *abonline_;
+}
+inline void secure_reply::set_abonline(const ::std::string& value) {
+  set_has_abonline();
+  if (abonline_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abonline_ = new ::std::string;
+  }
+  abonline_->assign(value);
+  // @@protoc_insertion_point(field_set:secure_reply.abOnline)
+}
+inline void secure_reply::set_abonline(const char* value) {
+  set_has_abonline();
+  if (abonline_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abonline_ = new ::std::string;
+  }
+  abonline_->assign(value);
+  // @@protoc_insertion_point(field_set_char:secure_reply.abOnline)
+}
+inline void secure_reply::set_abonline(const void* value, size_t size) {
+  set_has_abonline();
+  if (abonline_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abonline_ = new ::std::string;
+  }
+  abonline_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:secure_reply.abOnline)
+}
+inline ::std::string* secure_reply::mutable_abonline() {
+  set_has_abonline();
+  if (abonline_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    abonline_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:secure_reply.abOnline)
+  return abonline_;
+}
+inline ::std::string* secure_reply::release_abonline() {
+  clear_has_abonline();
+  if (abonline_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = abonline_;
+    abonline_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void secure_reply::set_allocated_abonline(::std::string* abonline) {
+  if (abonline_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete abonline_;
+  }
+  if (abonline) {
+    set_has_abonline();
+    abonline_ = abonline;
+  } else {
+    clear_has_abonline();
+    abonline_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:secure_reply.abOnline)
 }
 
 // -------------------------------------------------------------------

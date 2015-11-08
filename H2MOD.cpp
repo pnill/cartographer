@@ -24,9 +24,9 @@ void H2MOD::Initialize()
 		this->Server = FALSE;
 	}
 
-	//TRACE_GAME("H2MOD - Initialized v0.1a");
-	//TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
-	//TRACE_GAME("H2MOD - Initializing H2MOD Network handlers");
+	TRACE_GAME("H2MOD - Initialized v0.1a");
+	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
+	TRACE_GAME("H2MOD - Initializing H2MOD Network handlers");
 
 	Network::Initialize();
 }

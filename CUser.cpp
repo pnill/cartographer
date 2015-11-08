@@ -2,6 +2,8 @@
 #include "stdafx.h"
 #include "packet.pb.h"
 #include <time.h>
+#include <sstream>
+
 extern ULONG broadcast_server;
 extern SOCKET boundsock;
 
@@ -13,14 +15,212 @@ enum
 	_get_secureaddr
 };
 
+ULONG CUserManagement::GetSecureFromXN(XNADDR* pxna)
+{
+	TRACE("CUserManagement::GetSecureFromXN()");
+	ULONG secure;
+	sockaddr_in RecvAddr;
+
+	unsigned short port = 27019;
+
+	RecvAddr.sin_family = AF_INET;
+	RecvAddr.sin_port = htons(port);
+	RecvAddr.sin_addr.s_addr = broadcast_server;
+
+	char RecvBuf[2048];
+	int RecvResult;
+
+	DWORD dwTime = 20;
+
+
+	sockaddr_in SenderAddr;
+	int SenderAddrSize = sizeof(SenderAddr);
+
+	if (setsockopt(boundsock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&dwTime, sizeof(dwTime)) < 0)
+	{
+		TRACE("Socket Error on register request");
+	}
+		
+	Packet pak;
+	pak.set_type(Packet_Type_secure_request);
+	secure_request *secure_req = pak.mutable_srequest();
+
+	std::string ab(reinterpret_cast<const char*>(pxna->abEnet), 6);
+	secure_req->set_abenet(ab.c_str(),6);
+
+	char* SendBuf = new char[pak.ByteSize()];
+	pak.SerializeToArray(SendBuf, pak.ByteSize());
+
+	sendto(boundsock, SendBuf, pak.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
+
+	time_t start = time(0);
+
+	while (1)
+	{
+		TRACE("Trying recvfrom - GetSecureFromXN()");
+
+		double seconds_since_start = difftime(time(0), start);
+
+		if (seconds_since_start > 2)
+		{
+			sendto(boundsock, SendBuf, pak.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
+			start = time(0);
+		}
+
+		RecvResult = recvfrom(boundsock, RecvBuf, 2048, 0, (SOCKADDR*)&SenderAddr, &SenderAddrSize);
+
+		if (RecvResult > 0)
+		{
+			Packet RecvPak;
+			RecvPak.ParseFromArray(RecvBuf, RecvResult);
+
+			if (RecvPak.has_sreply())
+			{
+				TRACE("GetSecureFromXN() - Got Secure Reply");
+				secure = RecvPak.sreply().secure();
+			
+				pxna->inaOnline.s_addr = 0x00000000;
+				CUser *nUser = new CUser;
+				nUser->pxna.ina.s_addr = pxna->ina.s_addr;
+				nUser->pxna.wPortOnline = pxna->wPortOnline;
+				nUser->pxna.inaOnline = pxna->inaOnline;
+				memcpy(nUser->pxna.abEnet, pxna->abEnet, 6);
+				memcpy(nUser->pxna.abOnline, pxna->abOnline, 20);
+
+				TRACE("GetSecureFromXN() - secure: %08X", secure);
+				TRACE("GetSecureFromXN() - pxna->xnaddr: %08X", pxna->ina.s_addr);
+
+				nUser->pina.s_addr = secure;
+				nUser->bValid = true;
+
+				this->cusers[secure] = nUser;
+				this->xnmap[secure] = pxna->ina.s_addr;
+				this->xntosecure[ab] = secure;
+
+				RecvPak.Clear();
+				break;
+			
+			}
+
+			RecvPak.Clear();
+		}
+	}
+
+
+	delete[] SendBuf;
+	secure_req->Clear();
+	pak.Clear();
+
+	TRACE("CUserManagement::GetSecureFromXN() - END - secure: %08X",secure);
+	return secure;
+}
+
+ULONG CUserManagement::GetXNFromSecure(ULONG secure)
+{	
+	TRACE("CUserManagement::GetXNFromSecure(%08X)",secure);
+	u_long xnaddress;
+	sockaddr_in RecvAddr;
+
+	unsigned short port = 27019;
+
+	RecvAddr.sin_family = AF_INET;
+	RecvAddr.sin_port = htons(port);
+	RecvAddr.sin_addr.s_addr = broadcast_server;
+
+	char RecvBuf[2048];
+	int RecvResult;
+
+	DWORD dwTime = 20;
+
+
+	sockaddr_in SenderAddr;
+	int SenderAddrSize = sizeof(SenderAddr);
+
+	if (setsockopt(boundsock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&dwTime, sizeof(dwTime)) < 0)
+	{
+		TRACE("Socket Error on register request");
+	}
+
+	Packet xnrequest;
+	xnrequest.set_type(Packet_Type_xnaddr_request);
+
+	xnaddr_request *rdata = xnrequest.mutable_xrequest();
+	rdata->set_secure(secure);
+
+	char *secr = new char[xnrequest.ByteSize()];
+	xnrequest.SerializeToArray( secr, xnrequest.ByteSize() );
+	
+	sendto(boundsock, secr, xnrequest.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
+
+	time_t start = time(0);
+
+	while (1)
+	{
+		TRACE("Trying recvfrom - GetXNFromSecure()");
+
+		double seconds_since_start = difftime(time(0), start);
+
+		if (seconds_since_start > 2)
+		{
+			sendto(boundsock, secr, xnrequest.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
+			start = time(0);
+		}
+		
+		RecvResult = recvfrom(boundsock, RecvBuf, 2048, 0, (SOCKADDR*)&SenderAddr, &SenderAddrSize);
+
+		if (RecvResult > 0)
+		{
+			Packet RecvPak;
+			RecvPak.ParseFromArray(RecvBuf, RecvResult);
+			if (RecvPak.has_xreply())
+			{
+				TRACE("GetXNFromSecure() - Reading Xreply data");
+				xnaddress = RecvPak.xreply().xnaddr();
+				short port = RecvPak.xreply().port();
+				std::string abEnet = RecvPak.xreply().abenet();
+				std::string abOnline = RecvPak.xreply().abonline();
+
+				CUser *nUser = new CUser;
+				nUser->pxna.ina.s_addr = xnaddress;
+				nUser->pxna.wPortOnline = port;
+				nUser->pxna.inaOnline.s_addr = 0x00000000;
+				memcpy(nUser->pxna.abEnet, abEnet.c_str(), 6);
+				memcpy(nUser->pxna.abOnline, abOnline.c_str(), 20);
+				nUser->pina.s_addr = secure;
+				nUser->bValid = true;
+
+				TRACE("GetXNFromSecure() - secure: %08X", secure);
+				TRACE("GetXNFromSecure() - xnaddr: %08X", xnaddress);
+
+				this->cusers[secure] = nUser;
+				this->xnmap[secure] = xnaddress;
+				this->xntosecure[abEnet] = secure;
+
+				RecvPak.Clear();
+				break;
+			}
+			RecvPak.Clear();
+		}
+
+	}
+
+
+	rdata->Clear();
+	xnrequest.Clear();
+
+	delete[] secr;
+
+	return xnaddress;
+}
+
 void CUserManagement::UnregisterSecureAddr(const IN_ADDR ina)
 {
 	for (int i = 1; i < 15; i++)
 	{
 		if (Users[i].pina.s_addr == ina.s_addr)
 		{
-			std::string ab(reinterpret_cast<const char*>(&Users[i].pxna.abEnet), 6);
-			smap[ab] = 0;
+		//	std::string ab(reinterpret_cast<const char*>(&Users[i].pxna.abEnet), 6);
+		//	smap[ab] = 0;
 			Users[i].bValid = false;
 			Users[i].pina.s_addr = 0;
 			memset(&Users[i].pxna, 0x00, sizeof(XNADDR));
@@ -30,80 +230,8 @@ void CUserManagement::UnregisterSecureAddr(const IN_ADDR ina)
 	}
 }
 
-ULONG CUserManagement::GetLocalSecLong()
-{
-	return Users[0].pina.s_addr;
-}
-ULONG CUserManagement::GetXNLong(ULONG iplong)
-{
-	for (int i = 1; i < 15; i++)
-	{
-		if (Users[i].pina.s_addr == iplong && Users[i].bValid == true)
-		{
-			return Users[i].pxna.ina.s_addr;
-		}
-	}
-}
 
-void CUserManagement::RegisterSecureAddr(ULONG xnaddr, ULONG pina)
-{
-	BOOL UserExist = FALSE;
 
-}
-
-void CUserManagement::GetSecureAddr(XNADDR* pxna, IN_ADDR* pina)
-{
-	BOOL UserExist = FALSE;
-	for (int i = 1; i < 15; i++)
-	{
-		if (!memcmp(&Users[i].pxna.abEnet, &pxna->abEnet, 6) && Users[i].bValid)
-		{
-			pina->s_addr = Users[i].pina.s_addr;
-			
-			if (pina->s_addr != 0x00000000)
-			{
-				TRACE("GetSecureAddr: User Exists");
-				UserExist = TRUE;
-			}
-			TRACE("GetSecureAddr: pina: %08X", pina->s_addr);
-			TRACE("GetSecureAddr: pxna: %08X", pxna->ina.s_addr);
-			break;
-		}
-	}
-	if (UserExist == FALSE)
-	{
-		TRACE("GetSecureAddr: User does not exist calling Register() _get_secureaddr");
-		this->Register(pxna, pina, _get_secureaddr);
-	}
-}
-
-void CUserManagement::GetXNAddr(XNADDR* pxna, const IN_ADDR pina)
-{
-
-	BOOL UserExist = FALSE;
-	for (int i = 1; i < 15; i++)
-	{
-		if (Users[i].pina.s_addr == pina.s_addr && Users[i].bValid)
-		{
-			memcpy(pxna, &Users[i].pxna, sizeof(XNADDR));
-			TRACE("GetXNAddr: %08X", pxna->ina.s_addr);
-			TRACE("GetXNAddr: %08X", pina.s_addr);
-
-			if (pxna->ina.s_addr != 0x00000000)
-			{
-				UserExist = TRUE;
-				TRACE("GetXNAddr: User Exists");
-			}
-			break;
-		}
-	}
-	
-	if (UserExist == FALSE)
-	{
-		TRACE("GetXNAddr: User does not exist calling Register() _get_xnaddr");
-		this->Register(pxna, (IN_ADDR*)&pina, _get_xnaddr);
-	}
-}
 
 void CUserManagement::RegisterLocalRequest()
 {
@@ -171,9 +299,14 @@ void CUserManagement::RegisterLocalRequest()
 			
 		
 			memset(&Users[0].pxna, 0x00, sizeof(XNADDR));
+			this->SecurityPacket = new char[8];
+
+			(*(DWORD*)&this->SecurityPacket[0]) = 0x11223344;
+			(*(DWORD*)&this->SecurityPacket[4]) = secured_addr;
 
 			Users[0].pina.s_addr = secured_addr;
 			Users[0].pxna.ina.s_addr = _xnaddr;
+			Users[0].pxna.inaOnline.s_addr = 0x00000000;
 			memcpy(&Users[0].pxna.abEnet, RecvPak.lconfirm().abenet().c_str(), 6);
 			memcpy(&Users[0].pxna.abOnline, RecvPak.lconfirm().abonline().c_str(), 20);
 
@@ -193,8 +326,11 @@ void CUserManagement::RegisterLocalRequest()
 
 			sendto(boundsock, SendBuf, ConfirmPak.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
 
-			
+			ldata->Clear();
+			ConfirmPak.Clear();
 
+			delete[] SendBuf;
+			
 		}
 
 	}
@@ -207,220 +343,6 @@ void CUserManagement::RegisterLocalRequest()
 
 }
 
-void CUserManagement::RegisterUser(XNADDR* pxna, ULONG pina)
-{
-
-	BOOL UserExist = FALSE;
-	int CurrentUser = LastUser;
-	for(int i = 1; i < 15;i++)
-	{
-		if (!memcmp(&Users[i].pxna.abEnet, &pxna->abEnet, 6))
-		{
-			TRACE("RegisterUser(): User existed");
-			UserExist = TRUE;
-			CurrentUser = i;
-		}
-
-	}
-	
-	if (!UserExist)
-	{
-		TRACE("RegisterUser(): User did not exist");
-		memcpy(&Users[CurrentUser].pxna, pxna, sizeof(XNADDR));
-		Users[CurrentUser].pina.s_addr = pina;
-		Users[CurrentUser].bValid = TRUE;
-		LastUser++;
-	}
-}
-
-void CUserManagement::Register(XNADDR *pxna, IN_ADDR *pina, int type)
-{
-	sockaddr_in RecvAddr;
-
-	unsigned short port = 27019;
-
-	RecvAddr.sin_family = AF_INET;
-	RecvAddr.sin_port = htons(port);
-	RecvAddr.sin_addr.s_addr = broadcast_server;
-
-	char RecvBuf[2048];
-	int RecvResult;
-
-	DWORD dwTime = 20;
-
-
-	sockaddr_in SenderAddr;
-	int SenderAddrSize = sizeof(SenderAddr);
-
-	if (setsockopt(boundsock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&dwTime, sizeof(dwTime)) < 0)
-	{
-		TRACE("Socket Error on register request");
-	}
-
-	if (type == _get_xnaddr) // Get XNADDR from Secure Addr
-	{
-		Packet Pack;
-		Pack.set_type(Packet_Type_xnaddr_request);
-		xnaddr_request* xnreq = Pack.mutable_xrequest();
-		xnreq->set_secure(pina->s_addr);
-
-		char* SendBuf = new char[Pack.ByteSize()];
-		Pack.SerializeToArray(SendBuf, Pack.ByteSize());
-
-		sendto(boundsock, SendBuf, Pack.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
-
-	
-		time_t start = time(0);
-
-		while (1)
-		{
-			TRACE("Trying recvfrom - Register() _get_xnaddr");
-
-			double seconds_since_start = difftime(time(0), start);
-
-			if (seconds_since_start > 2)
-			{
-				sendto(boundsock, SendBuf, Pack.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
-				start = time(0);
-			}
-			RecvResult = recvfrom(boundsock, RecvBuf, 2048, 0, (SOCKADDR*)&SenderAddr, &SenderAddrSize);
-
-			if (RecvResult > 0)
-			{
-
-				Packet RecvPak;
-				RecvPak.ParseFromArray(RecvBuf, RecvResult);
-				if (RecvPak.has_xreply())
-				{
-					int CurrentUser = LastUser;
-					bool UserExist = FALSE;
-					TRACE("Register() _get_xnaddr - XNADDR Reply Size: %i", RecvPak.ByteSize());
-					u_long xnaddress = RecvPak.xreply().xnaddr();
-					int port = RecvPak.xreply().port();
-
-					TRACE("Register() _get_xnaddr - xnaddress: %08X", xnaddress);
-					TRACE("Register() _get_xnaddr - xnport: %08X", port);
-					TRACE_GAME_NETWORK("Register() _get_xnaddr - xnaddress: %08X", xnaddress);
-					
-					memset(pxna, 0x00, sizeof(XNADDR));
-
-					pxna->ina.s_addr = xnaddress;
-					memcpy(pxna->abOnline, RecvPak.xreply().abonline().c_str(), 20);
-					memcpy(pxna->abEnet,RecvPak.xreply().abenet().c_str(),6);
-					for (int i = 1; i < 15; i++)
-					{
-						if (Users[i].pina.s_addr == pina->s_addr && Users[i].bValid)
-						{
-							CurrentUser = i;
-							UserExist = TRUE;
-							TRACE("Register() _get_xnaddr - User exists, populating data");
-							break;
-						}
-					}
-
-					memcpy(&Users[CurrentUser].pxna, pxna, sizeof(XNADDR));
-					memcpy(&Users[CurrentUser].pina, pina, sizeof(IN_ADDR));
-
-					Users[CurrentUser].bValid = TRUE;
-					
-					if (UserExist == FALSE)
-					{
-						TRACE("Register() _get_xnaddr - User did not exist");
-						LastUser++;
-					}
-
-					break;
-				}
-			}
-
-		}
-
-		delete[] SendBuf;
-	}
-
-	if (type == _get_secureaddr)//Get Secure Addr from XNADDR
-	{
-		Packet Pack;
-		Pack.set_type(Packet_Type_secure_request);
-		secure_request* secreq = Pack.mutable_srequest();
-		std::string ab(reinterpret_cast<const char*>(&pxna->abEnet),6);
-
-		secreq->set_abenet(ab);
-
-		//secreq->set_xnaddr(pxna->ina.s_addr);
-
-		char* SendBuf = new char[Pack.ByteSize()];
-		Pack.SerializeToArray(SendBuf, Pack.ByteSize());
-
-		time_t start = time(0);
-
-		sendto(boundsock, SendBuf, Pack.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
-		
-
-		while (1)
-		{
-			TRACE("Trying recvfrom - Register() _get_secureaddr");
-
-			double seconds_since_start = difftime(time(0), start);
-
-			if (seconds_since_start > 2)
-			{
-				sendto(boundsock, SendBuf, Pack.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
-				start = time(0);
-			}
-
-			RecvResult = recvfrom(boundsock, RecvBuf, 2048, 0, (SOCKADDR*)&SenderAddr, &SenderAddrSize);
-
-			
-
-	
-
-			
-
-			if (RecvResult > 0)
-			{
-
-				Packet RecvPak;
-				RecvPak.ParseFromArray(RecvBuf, RecvResult);
-				if (RecvPak.has_sreply())
-				{
-					TRACE("Register() _get_secureaddr - Secure Reply Size: %i", RecvPak.ByteSize());
-					TRACE("Register() _get_secureaddr - Secure Address: %08X", RecvPak.sreply().secure());
-					TRACE_GAME_NETWORK("Register() _get_secureaddr - Secure Address: %08X", RecvPak.sreply().secure());
-
-					pina->s_addr = RecvPak.sreply().secure();
-					int CurrentUser = LastUser;
-					BOOL UserExists = FALSE;
-
-					for (int i = 1; i < 15; i++)
-					{
-						if (!memcmp(&Users[i].pxna.abEnet, &pxna->abEnet, 6) && Users[i].bValid)
-						{
-							CurrentUser = i;
-							UserExists = TRUE;
-							TRACE("Register() _get_secureaddr - User already exists");
-							break;
-						}
-					}
-					
-					memcpy(&Users[CurrentUser].pxna, pxna, sizeof(XNADDR));
-					Users[CurrentUser].pina.s_addr = pina->s_addr;
-					Users[CurrentUser].bValid = TRUE;
-
-					if (UserExists == FALSE)
-					{
-						TRACE("Register() _get_secureaddr - User did not exist");
-						LastUser++;
-					}
-
-					break;
-				}
-			}
-
-		}
-		delete[] SendBuf;
-	}
-}
 
 BOOL CUserManagement::GetLocalXNAddr(XNADDR* pxna)
 {

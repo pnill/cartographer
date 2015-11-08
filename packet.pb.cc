@@ -103,8 +103,12 @@ void protobuf_AssignDesc_packet_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(secure_request));
   secure_reply_descriptor_ = file->message_type(3);
-  static const int secure_reply_offsets_[1] = {
+  static const int secure_reply_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(secure_reply, secure_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(secure_reply, xnaddr_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(secure_reply, port_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(secure_reply, abenet_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(secure_reply, abonline_),
   };
   secure_reply_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -211,11 +215,13 @@ void protobuf_AddDesc_packet_2eproto() {
     "t\020\005\022\020\n\014xnaddr_reply\020\006\"d\n\rlocal_confirm\022\023"
     "\n\013secure_addr\030\001 \002(\r\022\016\n\006xnaddr\030\002 \002(\r\022\014\n\004p"
     "ort\030\003 \002(\005\022\016\n\006abEnet\030\004 \002(\014\022\020\n\010abOnline\030\005 "
-    "\002(\014\" \n\016secure_request\022\016\n\006abEnet\030\001 \002(\014\"\036\n"
-    "\014secure_reply\022\016\n\006secure\030\001 \002(\r\" \n\016xnaddr_"
-    "request\022\016\n\006secure\030\001 \002(\r\"N\n\014xnaddr_reply\022"
-    "\016\n\006xnaddr\030\001 \002(\r\022\014\n\004port\030\002 \002(\r\022\016\n\006abEnet\030"
-    "\003 \002(\014\022\020\n\010abOnline\030\004 \002(\014", 623);
+    "\002(\014\" \n\016secure_request\022\016\n\006abEnet\030\001 \002(\014\"^\n"
+    "\014secure_reply\022\016\n\006secure\030\001 \002(\r\022\016\n\006xnaddr\030"
+    "\002 \002(\r\022\014\n\004port\030\003 \002(\r\022\016\n\006abEnet\030\004 \002(\014\022\020\n\010a"
+    "bOnline\030\005 \002(\014\" \n\016xnaddr_request\022\016\n\006secur"
+    "e\030\001 \002(\r\"N\n\014xnaddr_reply\022\016\n\006xnaddr\030\001 \002(\r\022"
+    "\014\n\004port\030\002 \002(\r\022\016\n\006abEnet\030\003 \002(\014\022\020\n\010abOnlin"
+    "e\030\004 \002(\014", 687);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "packet.proto", &protobuf_RegisterTypes);
   Packet::default_instance_ = new Packet();
@@ -1382,6 +1388,10 @@ void secure_request::Swap(secure_request* other) {
 
 #ifndef _MSC_VER
 const int secure_reply::kSecureFieldNumber;
+const int secure_reply::kXnaddrFieldNumber;
+const int secure_reply::kPortFieldNumber;
+const int secure_reply::kAbEnetFieldNumber;
+const int secure_reply::kAbOnlineFieldNumber;
 #endif  // !_MSC_VER
 
 secure_reply::secure_reply()
@@ -1401,8 +1411,13 @@ secure_reply::secure_reply(const secure_reply& from)
 }
 
 void secure_reply::SharedCtor() {
+  ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
   secure_ = 0u;
+  xnaddr_ = 0u;
+  port_ = 0u;
+  abenet_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  abonline_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1412,6 +1427,12 @@ secure_reply::~secure_reply() {
 }
 
 void secure_reply::SharedDtor() {
+  if (abenet_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete abenet_;
+  }
+  if (abonline_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete abonline_;
+  }
   if (this != default_instance_) {
   }
 }
@@ -1438,7 +1459,34 @@ secure_reply* secure_reply::New() const {
 }
 
 void secure_reply::Clear() {
-  secure_ = 0u;
+#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
+  &reinterpret_cast<secure_reply*>(16)->f) - \
+   reinterpret_cast<char*>(16))
+
+#define ZR_(first, last) do {                              \
+    size_t f = OFFSET_OF_FIELD_(first);                    \
+    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
+    ::memset(&first, 0, n);                                \
+  } while (0)
+
+  if (_has_bits_[0 / 32] & 31) {
+    ZR_(secure_, xnaddr_);
+    port_ = 0u;
+    if (has_abenet()) {
+      if (abenet_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+        abenet_->clear();
+      }
+    }
+    if (has_abonline()) {
+      if (abonline_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+        abonline_->clear();
+      }
+    }
+  }
+
+#undef OFFSET_OF_FIELD_
+#undef ZR_
+
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -1460,6 +1508,62 @@ bool secure_reply::MergePartialFromCodedStream(
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
                  input, &secure_)));
           set_has_secure();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_xnaddr;
+        break;
+      }
+
+      // required uint32 xnaddr = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_xnaddr:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &xnaddr_)));
+          set_has_xnaddr();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(24)) goto parse_port;
+        break;
+      }
+
+      // required uint32 port = 3;
+      case 3: {
+        if (tag == 24) {
+         parse_port:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &port_)));
+          set_has_port();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(34)) goto parse_abEnet;
+        break;
+      }
+
+      // required bytes abEnet = 4;
+      case 4: {
+        if (tag == 34) {
+         parse_abEnet:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_abenet()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(42)) goto parse_abOnline;
+        break;
+      }
+
+      // required bytes abOnline = 5;
+      case 5: {
+        if (tag == 42) {
+         parse_abOnline:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_abonline()));
         } else {
           goto handle_unusual;
         }
@@ -1497,6 +1601,28 @@ void secure_reply::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->secure(), output);
   }
 
+  // required uint32 xnaddr = 2;
+  if (has_xnaddr()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->xnaddr(), output);
+  }
+
+  // required uint32 port = 3;
+  if (has_port()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->port(), output);
+  }
+
+  // required bytes abEnet = 4;
+  if (has_abenet()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
+      4, this->abenet(), output);
+  }
+
+  // required bytes abOnline = 5;
+  if (has_abonline()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
+      5, this->abonline(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -1510,6 +1636,30 @@ void secure_reply::SerializeWithCachedSizes(
   // required uint32 secure = 1;
   if (has_secure()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->secure(), target);
+  }
+
+  // required uint32 xnaddr = 2;
+  if (has_xnaddr()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->xnaddr(), target);
+  }
+
+  // required uint32 port = 3;
+  if (has_port()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->port(), target);
+  }
+
+  // required bytes abEnet = 4;
+  if (has_abenet()) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        4, this->abenet(), target);
+  }
+
+  // required bytes abOnline = 5;
+  if (has_abonline()) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        5, this->abonline(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -1529,6 +1679,34 @@ int secure_reply::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::UInt32Size(
           this->secure());
+    }
+
+    // required uint32 xnaddr = 2;
+    if (has_xnaddr()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->xnaddr());
+    }
+
+    // required uint32 port = 3;
+    if (has_port()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->port());
+    }
+
+    // required bytes abEnet = 4;
+    if (has_abenet()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->abenet());
+    }
+
+    // required bytes abOnline = 5;
+    if (has_abonline()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->abonline());
     }
 
   }
@@ -1561,6 +1739,18 @@ void secure_reply::MergeFrom(const secure_reply& from) {
     if (from.has_secure()) {
       set_secure(from.secure());
     }
+    if (from.has_xnaddr()) {
+      set_xnaddr(from.xnaddr());
+    }
+    if (from.has_port()) {
+      set_port(from.port());
+    }
+    if (from.has_abenet()) {
+      set_abenet(from.abenet());
+    }
+    if (from.has_abonline()) {
+      set_abonline(from.abonline());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -1578,7 +1768,7 @@ void secure_reply::CopyFrom(const secure_reply& from) {
 }
 
 bool secure_reply::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+  if ((_has_bits_[0] & 0x0000001f) != 0x0000001f) return false;
 
   return true;
 }
@@ -1586,6 +1776,10 @@ bool secure_reply::IsInitialized() const {
 void secure_reply::Swap(secure_reply* other) {
   if (other != this) {
     std::swap(secure_, other->secure_);
+    std::swap(xnaddr_, other->xnaddr_);
+    std::swap(port_, other->port_);
+    std::swap(abenet_, other->abenet_);
+    std::swap(abonline_, other->abonline_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

@@ -768,7 +768,7 @@ int WINAPI XSocketWSAEventSelect(SOCKET s, HANDLE hEventObject, __int32 lNetwork
 u_long WINAPI XSocketHTONL(u_long hostlong)
 {
 	u_long ret = htonl(hostlong);
-
+	
 	return ret;
 }
 
@@ -1678,16 +1678,16 @@ DWORD WINAPI XGetOverlappedExtendedError(PXOVERLAPPED pOverlapped)
 {
 	if( pOverlapped == 0 )
 	{
-		TRACE( "XGetOverlappedExtendedError  (pOverlapped = NULL)" );
+		//TRACE( "XGetOverlappedExtendedError  (pOverlapped = NULL)" );
 
 		return ERROR_INVALID_PARAMETER;
 	}
 
 
 
-  TRACE("XGetOverlappedExtendedError  (pOverlapped = %X) (internalLow = %X, internalHigh = %X, hEvent = %X, error = %X)",
-		pOverlapped,
-		pOverlapped->InternalLow, pOverlapped->InternalHigh, pOverlapped->hEvent, pOverlapped->dwExtendedError );
+//  TRACE("XGetOverlappedExtendedError  (pOverlapped = %X) (internalLow = %X, internalHigh = %X, hEvent = %X, error = %X)",
+//		pOverlapped,
+//		pOverlapped->InternalLow, pOverlapped->InternalHigh, pOverlapped->hEvent, pOverlapped->dwExtendedError );
 
 
 	//Check_Overlapped( pOverlapped );
@@ -1700,22 +1700,22 @@ DWORD WINAPI XGetOverlappedExtendedError(PXOVERLAPPED pOverlapped)
 // #1083: XGetOverlappedResult
 DWORD WINAPI XGetOverlappedResult(PXOVERLAPPED pOverlapped, DWORD * pResult, DWORD bWait)
 {
-	TRACE("XGetOverlappedResult  (pOverlapped = %X, pResult = %X, bWait = %d)  (internalLow = %X, internalHigh = %X)",
-		pOverlapped, pResult, bWait, pOverlapped->InternalLow, pOverlapped->InternalHigh );
+	//TRACE("XGetOverlappedResult  (pOverlapped = %X, pResult = %X, bWait = %d)  (internalLow = %X, internalHigh = %X)",
+	//	pOverlapped, pResult, bWait, pOverlapped->InternalLow, pOverlapped->InternalHigh );
 
 
 	if( pResult )
 	{
 		*pResult = pOverlapped->InternalHigh;
 
-		TRACE( "- result = %d", *pResult );
+		//TRACE( "- result = %d", *pResult );
 	}
 
 
 	//Check_Overlapped( pOverlapped );
 
 
-	TRACE( "- code = %X", pOverlapped->InternalLow );
+	//TRACE( "- code = %X", pOverlapped->InternalLow );
 	return pOverlapped->InternalLow;
 }
 
@@ -2739,26 +2739,26 @@ void WINAPI XUserSetProperty(DWORD dwUserIndex, DWORD dwPropertyId, DWORD cbValu
 // #5277: XUserSetContext
 DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwContextValue)
 {
-  TRACE("XUserSetContext  (userIndex = %d, contextId = %d, contextValue = %d)",
-		dwUserIndex, dwContextId, dwContextValue );
+//  TRACE("XUserSetContext  (userIndex = %d, contextId = %d, contextValue = %d)",
+//		dwUserIndex, dwContextId, dwContextValue );
 
 
 
 	if( dwContextId == X_CONTEXT_PRESENCE )
 	{
-		TRACE( "- X_CONTEXT_PRESENCE = %d", dwContextValue );
+		//TRACE( "- X_CONTEXT_PRESENCE = %d", dwContextValue );
 	}
 
 	else if( dwContextId == X_CONTEXT_GAME_TYPE )
 	{
-		TRACE( "- X_CONTEXT_GAME_TYPE = %d", dwContextValue );
+		//TRACE( "- X_CONTEXT_GAME_TYPE = %d", dwContextValue );
 
 		sessionDetails.dwGameType = dwContextValue;
 	}
 
 	else if( dwContextId == X_CONTEXT_GAME_MODE )
 	{
-		TRACE( "- X_CONTEXT_GAME_MODE = %X", dwContextValue );
+		//TRACE( "- X_CONTEXT_GAME_MODE = %X", dwContextValue );
 
 		sessionDetails.dwGameMode = dwContextValue;
 	}
@@ -5652,8 +5652,8 @@ HRESULT IXHV2ENGINE::GetLocalChatData( VOID *pThis, DWORD dwUserIndex, PBYTE pbD
 
 	if( print < 15 )
 	{
-		TRACE( "IXHV2Engine::GetLocalChatData  (dwUserIndex = %X, pbData = %X, pdwSize = %X, pdwPackets = %X)",
-			dwUserIndex, pbData, pdwSize, pdwPackets );
+		//TRACE( "IXHV2Engine::GetLocalChatData  (dwUserIndex = %X, pbData = %X, pdwSize = %X, pdwPackets = %X)",
+		//	dwUserIndex, pbData, pdwSize, pdwPackets );
 
 		print++;
 	}
@@ -5665,7 +5665,7 @@ HRESULT IXHV2ENGINE::GetLocalChatData( VOID *pThis, DWORD dwUserIndex, PBYTE pbD
 
 	if( print < 15 )
 	{
-		TRACE( "- No local chat data" );
+		//TRACE( "- No local chat data" );
 	}
 
 	//return E_PENDING;
