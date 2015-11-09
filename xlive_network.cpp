@@ -186,13 +186,10 @@ DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pAddr)
 // #24: XSocketSendTo
 int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr *to, int tolen)
 {
-	int port = (((struct sockaddr_in*)to)->sin_port);
+	short port = (((struct sockaddr_in*)to)->sin_port);
 	u_long iplong = (((struct sockaddr_in*)to)->sin_addr.s_addr);
 	ADDRESS_FAMILY af = (((struct sockaddr_in*)to)->sin_family);
-	SOCKADDR_IN SendStruct;
-	SendStruct.sin_addr.s_addr = iplong;
-	SendStruct.sin_port = port;
-	SendStruct.sin_family = AF_INET;
+
 
 	if (iplong == INADDR_BROADCAST || iplong == 0x00)
 	{
@@ -202,55 +199,74 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		return sendto(s, buf, len, flags, to, tolen);
 	}
 
-	//if ((iplong & 0xFF) == 0x00)
-	//{
 		
+
+
+		/*
+			Create new SOCKADDR_IN structure,
+			If we overwrite the original the game's security functions know it's not a secure address any longer.
+			Worst case if this is found to cause performance issues we can handle the send and re-update to secure before return.
+		*/
+		SOCKADDR_IN SendStruct;
+		SendStruct.sin_port = port;
+		SendStruct.sin_addr.s_addr = iplong;
+		SendStruct.sin_family = AF_INET;
+
+		/* 
+		 Handle NAT map socket to port
+		 Switch on port to determine which port we're intending to send to.
+		 1000-> User.pmap_a[secureaddress]
+		 1001-> User.pmap_b[secureaddress]
+		*/
+
+		switch (htons(port))
+		{
+			case 1000:
+				if (User.pmap_a[iplong] = 0)
+				{
+					SendStruct.sin_port = User.pmap_a[iplong];
+				}
+			break;
+
+			case 1001:
+				if (User.pmap_b[iplong] = 0)
+				{
+					SendStruct.sin_port = User.pmap_b[iplong];
+				}
+			break;
+		}
+
+		std::pair <ULONG, SHORT> hostpair = std::make_pair(iplong, SendStruct.sin_port);
+
 		u_long xn = User.xnmap[iplong];
 
 		if (xn != 0)
 		{
-			//TRACE("XSocketSendTo(%08X): Mapped secure address",iplong);
-			//(((struct sockaddr_in*)to)->sin_addr.s_addr) = xn;
 			SendStruct.sin_addr.s_addr = xn;
 		}
 		else
 		{
-			//TRACE("XSocketSendTo(User.xnmap[] returned null) - Call User.GetXNFromSecure(%08X)", iplong);
-			//(((struct sockaddr_in*)to)->sin_addr.s_addr) = User.GetXNFromSecure(iplong);
 			SendStruct.sin_addr.s_addr = User.GetXNFromSecure(iplong);
-			//TRACE("XSocketSendTo() - User.GetXNFromSecure Returned.");
-
 		}
 
-	//}
-	//else
-	//{
-		//TRACE("XSocketSendTo(%08X): Secure address was not found. sending via standard ip",iplong);
-	//}
-	
 
-		/* 
-			Only send on first connection to HOST+PORT COMBINATION! 
-			Flag the host after send so we don't ever re-send the same packet to the host. 
-		*/
-	
-	if ((unsigned char)buf[0] == 0x11 || (unsigned char)buf[0] == 0x09  )
-	{
-//		TRACE("XSocketSendTo() - Sending Join-Request or Connect-request: %08X",(unsigned char)buf[0]);
+		if (User.sentmap[hostpair] == 0)
+		{
+			int f = sendto(s, (char*)User.SecurityPacket, 8, flags, (SOCKADDR *) &SendStruct, sizeof(SendStruct));
 
-			int f = sendto(s, (char*)User.SecurityPacket, 8, flags, (SOCKADDR*)&SendStruct, sizeof(SendStruct));
+			User.sentmap[hostpair] = 1;
 
 			if (f == SOCKET_ERROR)
 			{
 				TRACE("XSocketSendTo - Socket Error True");
 				TRACE("XSocketSendTo - WSAGetLastError(): %08X", WSAGetLastError());
 			}
-	}
-//	}
+		}
+
 
 	
 
-	int ret = sendto(s, buf, len, flags, (SOCKADDR*) &SendStruct, sizeof(SendStruct)); // replace the buffer with our new buffer (nBuf)	
+	int ret = sendto(s, buf, len, flags, (SOCKADDR *) &SendStruct, sizeof(SendStruct));
 
 	if (ret == SOCKET_ERROR)
 	{
@@ -288,9 +304,25 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 				ret = 0;
 			}
 
+			ULONG secure = User.smap[hostpair];
+			(((struct sockaddr_in*)from)->sin_addr.s_addr) = secure;
 
-			(((struct sockaddr_in*)from)->sin_addr.s_addr) = User.smap[hostpair];
+			/* Store NAT data 
+			   First we look at our socket's intended port.
+			   port 1000 is mapped to the receiving port pmap_a via the secure address.
+			   port 1001 is mapped to the receiving port pma_b via the secure address.
+			  */
+			switch (User.sockmap[s])
+			{
+				case 1000:
+					User.pmap_a[secure] = port;
+				break;
 
+				case 1001:
+					User.pmap_b[secure] = port;
+				break;
+
+			}
 		}
 
 	}

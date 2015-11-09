@@ -50,6 +50,7 @@ public:
 	//Maps
 	std::unordered_map<ULONG, CUser*> cusers; // Map Key(SecureADDR)->CUser
 	std::unordered_map<std::pair<ULONG, SHORT>, ULONG> smap; // Map Key(XNHost,XnPort)->Secure
+	std::unordered_map<std::pair<ULONG, SHORT>, ULONG> sentmap; // Map of servers/clients+ports which have already been sent to.
 	std::unordered_map<ULONG, ULONG> stox;
 	std::unordered_map<ULONG, ULONG> xnmap; // Map Key(Secure)->XNHost;
 	std::unordered_map<std::string, ULONG> xntosecure; //Map Key(Xn->Abenet)->Secure Addr

@@ -41,6 +41,10 @@ using namespace OSHGui;
 using namespace OSHGui::Drawing;
 Input::WindowsMessage input;
 
+char* BuildText;
+const char CompileDate[] = __DATE__;
+const char CompileTime[] = __TIME__;
+
 void GUI::Initialize()
 {
 
@@ -110,7 +114,8 @@ int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 		//TRACE("XLiveInitialize  (pPii = %X)", pPii);
 		pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
 		pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
-
+		BuildText = new char[255];
+		sprintf(BuildText, "Project Cartographer (v0.1a) - Build Time: %s %s", CompileDate, CompileTime);
 		GUI::Initialize();
 	}
 		InitInstance();
@@ -185,7 +190,7 @@ int WINAPI XLiveRender()
 
 				D3DXCreateFont(pDevice, 10, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Lucida Console", &pFont);
 
-				drawText(0, 0, COLOR_WHITE, "Project Cartographer (v0.1a)", pFont);
+				drawText(0, 0, COLOR_WHITE, BuildText, pFont);
 		}
 			
 
