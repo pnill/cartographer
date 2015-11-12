@@ -182,7 +182,7 @@ ULONG CUserManagement::GetXNFromSecure(ULONG secure)
 
 				CUser *nUser = new CUser;
 				nUser->pxna.ina.s_addr = xnaddress;
-				nUser->pxna.wPortOnline = port;
+				nUser->pxna.wPortOnline = 0x0000;
 				nUser->pxna.inaOnline.s_addr = 0x00000000;
 				memcpy(nUser->pxna.abEnet, abEnet.c_str(), 6);
 				memcpy(nUser->pxna.abOnline, abOnline.c_str(), 20);
@@ -307,6 +307,8 @@ void CUserManagement::RegisterLocalRequest()
 			Users[0].pina.s_addr = secured_addr;
 			Users[0].pxna.ina.s_addr = _xnaddr;
 			Users[0].pxna.inaOnline.s_addr = 0x00000000;
+			Users[0].pxna.wPortOnline = 0x0000;
+
 			memcpy(&Users[0].pxna.abEnet, RecvPak.lconfirm().abenet().c_str(), 6);
 			memcpy(&Users[0].pxna.abOnline, RecvPak.lconfirm().abonline().c_str(), 20);
 

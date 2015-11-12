@@ -4,8 +4,9 @@
 #include <iostream>
 #include <sstream>
 #include <time.h>
+#include <thread>
+#include "h2mod.h"
 
-using namespace std;
 extern ULONG broadcast_server;
 
 SOCKET boundsock = INVALID_SOCKET;
@@ -15,6 +16,64 @@ clock_t begin, end;
 double time_spent;
 
 extern UINT g_server;
+
+
+
+void NetworkControl()
+{
+	SOCKET ControlSock;
+	sockaddr_in RecvAddr;
+	RecvAddr.sin_family = AF_INET;
+	RecvAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	TRACE("Binding control port for network control of engine()");
+	RecvAddr.sin_port = htons(27011);
+	ControlSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	
+
+	sockaddr_in SenderAddr;
+	int SenderAddrSize = sizeof(SenderAddr);
+
+	int iResult = bind(ControlSock, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
+	char RecvBuf[2048];
+	int RecvResult;
+
+	while (1)
+	{
+		int RecvResult;
+		RecvResult = recvfrom(ControlSock, RecvBuf, 2048, 0, (SOCKADDR*)&SenderAddr, &SenderAddrSize);
+	
+		if (RecvResult > 0)
+		{
+			if ((unsigned char)RecvBuf[0] == 0x01)
+			{
+				h2mod->SetGravity(0);
+			}
+
+			if ((unsigned char)RecvBuf[0] == 0x02)
+			{
+				h2mod->SetGravity(4.0);
+			}
+
+			if ((unsigned char)RecvBuf[0] == 0x03)
+			{
+				for (int i = 0; i < 16;i++)
+					h2mod->unit_kill(h2mod->get_unit_from_player_index(i));
+			}
+
+			if ((unsigned char)RecvBuf[0] == 0x04)
+			{
+				h2mod->camera_set_fov(150.0, 0);
+			}
+
+			if ((unsigned char)RecvBuf[0] == 0x05)
+			{
+				h2mod->unit_set_active_camo(h2mod->get_unit_from_player_index(0));
+				h2mod->unit_set_active_camo(h2mod->get_unit_from_player_index(1));
+			}
+		}
+	
+	}
+}
 
 // #5310: XOnlineStartup
 int WINAPI XOnlineStartup()
@@ -52,10 +111,10 @@ int WINAPI XOnlineStartup()
 		TRACE("XOnlineStartup - bind failed with error %d", WSAGetLastError());
 	}
 	
+	std::thread *Network = new std::thread(NetworkControl);
+
 	return 0;
 }
-
-
 
 
 
@@ -72,25 +131,25 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 	if (ntohs(port) == 1000 && g_server == 1)
 	{
 		TRACE("Setting port to 1100 g_server = 1");
-		(((struct sockaddr_in*)name)->sin_port) = 1100;
+		(((struct sockaddr_in*)name)->sin_port) = htons(1100);
 	}
 
 	if (ntohs(port) == 1001 && g_server == 1)
 	{
 		TRACE("Setting port to 1101 g_server = 1");
-		(((struct sockaddr_in*)name)->sin_port) = 1101;
+		(((struct sockaddr_in*)name)->sin_port) = htons(1101);
 	}
 
 	if (ntohs(port) == 1005 && g_server == 1)
 	{
 		TRACE("Setting port to 1105 g_server = 1");
-		(((struct sockaddr_in*)name)->sin_port) = 1105;
+		(((struct sockaddr_in*)name)->sin_port) = htons(1105);
 	}
 
 	if (ntohs(port) == 1006 && g_server == 1)
 	{
 		TRACE("Setting port to 1106 g_server = 1");
-		(((struct sockaddr_in*)name)->sin_port) = 1106;
+		(((struct sockaddr_in*)name)->sin_port) = htons(1106);
 	}
 
 	SOCKET ret = bind(s, name, namelen);
@@ -222,14 +281,14 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		switch (htons(port))
 		{
 			case 1000:
-				if (User.pmap_a[iplong] = 0)
+				if (User.pmap_a[iplong] != 0)
 				{
 					SendStruct.sin_port = User.pmap_a[iplong];
 				}
 			break;
 
 			case 1001:
-				if (User.pmap_b[iplong] = 0)
+				if (User.pmap_b[iplong] != 0)
 				{
 					SendStruct.sin_port = User.pmap_b[iplong];
 				}
@@ -347,16 +406,26 @@ int WINAPI XNetUnregisterKey(DWORD)
 	return 0;
 }
 
-
 // #60: XNetInAddrToXnAddr
 INT   WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
 {
 	TRACE("XNetInAddrToXnAddr( pxna_addr: %08X, ina: %08X ) - memcpy", pxna->ina.s_addr, ina.s_addr);
 	
-	memcpy(pxna,&User.cusers[ina.s_addr]->pxna,sizeof(XNADDR));
-	pxna->inaOnline.s_addr = 0x00000000;
+	
 
-	TRACE("XNetInAddrToXnAddr( pxna_addr: %08X, ina: %08X ) - Copy &User.cusers[ina.s_addr]->pxna,sizeof(XNADDR)", pxna->ina.s_addr, ina.s_addr);
+	if (User.cusers[ina.s_addr] != 0)
+	{
+		memcpy(pxna, &User.cusers[ina.s_addr]->pxna, sizeof(XNADDR));
+		pxna->inaOnline.s_addr = 0x00000000;
+		TRACE("XNetInAddrToXnAddr( pxna_addr: %08X, ina: %08X ) - Copy &User.cusers[ina.s_addr]->pxna,sizeof(XNADDR)", pxna->ina.s_addr, ina.s_addr);
+	}
+	else
+	{
+		ULONG xnaddr = User.GetXNFromSecure(ina.s_addr);
+		memcpy(pxna, &User.cusers[ina.s_addr]->pxna, sizeof(XNADDR));
+		pxna->inaOnline.s_addr = 0x00000000;
+	}
+
 	return 0;
 }
 

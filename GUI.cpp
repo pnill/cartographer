@@ -187,10 +187,10 @@ int WINAPI XLiveRender()
 				if (pFont)
 					pFont->Release();
 
-
 				D3DXCreateFont(pDevice, 10, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Lucida Console", &pFont);
 
 				drawText(0, 0, COLOR_WHITE, BuildText, pFont);
+
 		}
 			
 
