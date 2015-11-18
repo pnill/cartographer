@@ -17,7 +17,7 @@ public:
 		signed int object_new(int);
 		bool assign_equipment_to_unit(int unit, int weapon_id, short a3);
 		void give_player_weapon(int unit,int weapon_id);
-
+		void ApplyHooks();
 		DWORD GetBase();
 		
 		BOOL Server;

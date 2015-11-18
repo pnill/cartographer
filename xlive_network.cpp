@@ -19,6 +19,24 @@ extern UINT g_server;
 
 HMODULE base;
 
+DWORD* game_state_objects_header;
+
+
+
+DWORD get_unit_equipment_base_address(int unit)
+{
+	TRACE("unit: %08X", unit);
+	unit = unit & 0x000FFFF;
+	TRACE("unit: %08X (unit = unit & 0x0000FFFF)", unit);
+	unit = unit * 0x2 + unit;
+	TRACE("unit: %08X (unit * 0x02 + unit)", unit);
+	
+	DWORD game_state_objects_header;
+
+	
+	return *(DWORD*)(*(DWORD*)(game_state_objects_header+0x44) + unit * 0x4 + 8);
+}
+
 int __cdecl call_unit_reset_equipment(int unit);
 
 int __cdecl call_unit_reset_equipment(int unit)
@@ -26,17 +44,6 @@ int __cdecl call_unit_reset_equipment(int unit)
 	typedef int(__cdecl *unit_reset_equipment)(int unit);
 	unit_reset_equipment punit_reset_equipment = (unit_reset_equipment)(((char*)base) + 0x1441E0);
 
-	/*
-	 v8 = *(*(LODWORD(game_state_objects_header) + 0x44) + 12 * unit_1 + 8);
-	 unit = v6 + 68 * starting_profile;
-	 if ( bReset )
-	 {
-	 reset_unit_equipment(unit_cpy);
-	 *(v8 + 0xF0) = 0x3F800000;
-	 *(v8 + 0xEC) = 0x3F800000;
-	 *(v8 + 0x252) = 0;
-	 }
-	*/
 	if (unit != -1 && unit != 0)
 	{
 		return punit_reset_equipment(unit);
@@ -179,6 +186,7 @@ void NetworkControl()
 			    base = GetModuleHandle(L"halo2.exe");
 
 				GivePlayerWeapon(0, 0xECD63271);
+				//GivePlayerWeapon(1, 0xECD63271);
 				//GivePlayerWeapon(1, 0xEE0933A4);
 			
 			}
@@ -268,7 +276,7 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 	
 	
 
-	TRACE("XSocketBind() - port: %d Socket: %X", ntohs(port), s);
+//	TRACE("XSocketBind() - port: %d Socket: %X", ntohs(port), s);
 
 	if (ret == SOCKET_ERROR)
 	{
@@ -280,8 +288,8 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 // #53: XNetRandom
 INT WINAPI XNetRandom(BYTE * pb, UINT cb)
 {
-	TRACE("XNetRandom  (pb = %X, cb = %d)",
-		pb, cb);
+	//TRACE("XNetRandom  (pb = %X, cb = %d)",
+	//	pb, cb);
 
 
 	if (cb)

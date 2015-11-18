@@ -5005,8 +5005,8 @@ DWORD WINAPI XMarketplaceGetImageUrl( char *a1, DWORD a2, DWORD a3, DWORD a4, WC
 // 5028: ??
 DWORD WINAPI XLiveSecureLoadLibraryW( LPCWSTR libFileName, DWORD a2, DWORD dwFlags )
 {
-  TRACE("XLiveSecureLoadLibraryW  (?? - FIXME)  (libFileName = %s, a2 = %X, flags = %X)",
-		libFileName, a2, dwFlags );
+ // TRACE("XLiveSecureLoadLibraryW  (?? - FIXME)  (libFileName = %s, a2 = %X, flags = %X)",
+	//	libFileName, a2, dwFlags );
 
 
 	// not done - error now
