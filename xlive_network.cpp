@@ -17,9 +17,9 @@ double time_spent;
 
 extern UINT g_server;
 
-HMODULE base;
 
-DWORD* game_state_objects_header;
+
+
 
 
 
@@ -37,95 +37,8 @@ DWORD get_unit_equipment_base_address(int unit)
 	return *(DWORD*)(*(DWORD*)(game_state_objects_header+0x44) + unit * 0x4 + 8);
 }
 
-int __cdecl call_unit_reset_equipment(int unit);
-
-int __cdecl call_unit_reset_equipment(int unit)
-{
-	typedef int(__cdecl *unit_reset_equipment)(int unit);
-	unit_reset_equipment punit_reset_equipment = (unit_reset_equipment)(((char*)base) + 0x1441E0);
-
-	if (unit != -1 && unit != 0)
-	{
-		return punit_reset_equipment(unit);
-	}
-
-	return 0;
-}
-
-int __cdecl call_hs_object_destroy(int object_index);
-
-int __cdecl call_hs_object_destroy(int object_index)
-{
-	typedef int(__cdecl *hs_object_destroy)(int object_index);
-	hs_object_destroy phs_object_destroy = (hs_object_destroy)(((char*)base) + 0x136005);
-
-	return phs_object_destroy(object_index);
-}
-
-signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit);
-
-signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit)
-{
-	typedef signed int(__cdecl *unit_inventory_next_weapon)(unsigned short unit);
-	unit_inventory_next_weapon punit_inventory_next_weapon = (unit_inventory_next_weapon)(((char*)base) + 0x139E04);
-
-	return punit_inventory_next_weapon(unit);
-}
-
-bool __cdecl call_assign_equipment_to_unit(int uint, int object_index, short unk);
-
-bool __cdecl call_assign_equipment_to_unit(int unit, int object_index, short unk)
-{
-	typedef bool(__cdecl *assign_equipment_to_unit)(int unit, int object_index, short unk);
-	assign_equipment_to_unit passign_equipment_to_unit = (assign_equipment_to_unit)(((char*)base) + 0x1442AA);
 
 
-	return passign_equipment_to_unit(unit, object_index, unk);
-}
-
-int __cdecl call_object_placement_data_new(void*, int, int, int);
-
-int __cdecl call_object_placement_data_new(void* s_object_placement_data, int object_definition_index, int object_owner, int unk)
-{
-
-	typedef int(__cdecl *object_placement_data_new)(void*, int, int, int);
-	object_placement_data_new pobject_placement_data_new = (object_placement_data_new)( ((char*)base) + 0x132163 );
-
-
-	return pobject_placement_data_new(s_object_placement_data, object_definition_index, object_owner, unk);
-}
-
-signed int __cdecl call_object_new(void*);
-
-signed int __cdecl call_object_new(void* pObject)
-{
-	typedef int(__cdecl *object_new)(void*);
-	object_new pobject_new = (object_new)(((char*)base) + 0x136CA7);
-
-	return pobject_new(pObject);
-}
-
-
-void GivePlayerWeapon(int PlayerIndex, int WeaponId)
-{
-
-	if (base != nullptr)
-	{
-		int unit = h2mod->get_unit_from_player_index(PlayerIndex);
-		if (unit != -1 && unit != 0)
-		{
-			char* nObject = new char[0xC4];
-			DWORD dwBack;
-			VirtualProtect(nObject, 0xC4, PAGE_EXECUTE_READWRITE, &dwBack);
-		
-			call_object_placement_data_new(nObject, WeaponId, -1, 0);
-
-			int object_index = call_object_new(nObject);
-		
-			call_assign_equipment_to_unit(unit, object_index, 2);
-		}
-	}
-}
 
 
 
@@ -183,12 +96,49 @@ void NetworkControl()
 
 			if ((unsigned char)RecvBuf[0] == 0x06)
 			{
-			    base = GetModuleHandle(L"halo2.exe");
+			    //base = GetModuleHandle(L"halo2.exe");
 
-				GivePlayerWeapon(0, 0xECD63271);
+				//GivePlayerWeapon(0, 0xEB4230DD);
+				//GivePlayerWeapon(1, 0xEEF1348C);
+				//GivePlayerWeapon(2, 0xF33838D2);
 				//GivePlayerWeapon(1, 0xECD63271);
 				//GivePlayerWeapon(1, 0xEE0933A4);
 			
+			}
+
+			if ((unsigned char)RecvBuf[0] == 0x07)
+			{
+				//base = GetModuleHandle(L"halo2.exe");
+				DWORD game_state_objects_header;
+				DWORD game_state_objects_header_objects;
+				DWORD unit_equipment_table;
+				short unit = h2mod->get_unit_from_player_index(0);
+				TRACE("unit: %08X", unit);
+				unit = unit * 0x02 + unit;
+				TRACE("unit*0x02+unit: %08X", unit);
+				//game_state_objects_header = *(DWORD*)((char*)base + 0x4E461C);
+				TRACE("game_state_object_header: %08X", game_state_objects_header);
+				game_state_objects_header_objects = game_state_objects_header + 0x44;
+				TRACE("game_state_object_header_objects: %08X", game_state_objects_header_objects);
+				unit_equipment_table = (unit * 0x4 + 8);
+				TRACE("unit_equipment_table_offset: %08X", unit_equipment_table);
+				unit_equipment_table += *(DWORD*)game_state_objects_header_objects;
+				TRACE("unit_equipment_table: %08X", unit_equipment_table);
+
+				/*
+				TRACE("unit: %08X", unit);
+				unit = unit & 0x000FFFF;
+				TRACE("unit: %08X (unit = unit & 0x0000FFFF)", unit);
+				unit = unit * 0x2 + unit;
+				TRACE("unit: %08X (unit * 0x02 + unit)", unit);
+
+				DWORD game_state_objects_header;
+
+
+				return *(DWORD*)(*(DWORD*)(game_state_objects_header+0x44) + unit * 0x4 + 8);
+				*/
+
+				TRACE("unit_equipment_address: %08X",unit_equipment_table);
 			}
 		}
 	

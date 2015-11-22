@@ -2,7 +2,22 @@
 #ifndef H2MOD_H
 #define H2MOD_H
 #include "Hook.h"
+#include <unordered_map>
 
+class GunGame
+{
+public:
+	void Initialize();
+	void LevelUp(int PlayerIndex);
+	void SpawnPlayer(int PlayerIndex);
+	int GetCurrentWeapon(int PlayerIndex);
+	void LevelDown(int PlayerIndex);
+	//void GivePlayerWeapon(int PlayerIndex, int WeaponTagIndex);
+	//int GetWeapon(int PlayerIndex);
+
+	std::unordered_map<int, int> level_weapon;
+	std::unordered_map<int, int> player_level;
+};
 
 class H2MOD
 {
@@ -11,6 +26,7 @@ public:
 		int SetGravity(float);
 		int unit_kill(int);
 		int get_unit_from_player_index(int);
+		int get_unit_datum_from_player_index(int);
 		int unit_set_active_camo(int);
 		int camera_set_fov(float, short);
 		int object_placement_data_new(char*, int, signed int, int);

@@ -928,6 +928,8 @@ DWORD WINAPI XNetQosLookup (UINT cxna, XNADDR * apxna[], XNKID * apxnkid[],XNKEY
 	TRACE("XNetQoSLookup( apxna: %X, apxnkid: %X, apxnkey: %X, aina: %X, adwServiceId: %X, pxnqos: %X)",
 		apxna, apxnkid, apxnkey, aina, adwServiceId, pxnqos);
 
+
+	/* Memory Leak  - FIX ME! (Need to do some kind of garbage collection somewhere and store data like this in an array to be cleared later */
 	*pxnqos = new XNQOS;
 	XNQOS* pqos = *pxnqos;
 	pqos->cxnqos = 1;
