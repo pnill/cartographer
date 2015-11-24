@@ -1,0 +1,23 @@
+- Add latency tracking.
+
+- Fix map downloading.
+
+- Server is still in PoC mode it needs to be re-written completely
+
+- NAT should be checked via ping/pong events and if they're bad re-bind ports before even returning to the game saying a bind was successful, this would fix multiple clients/servers on the same network and or computer completely without any manual options being needed.
+
+- Change main ports client and server both use ( I've noticed xbox ones, 360s etc attempt to use the same ports on the network and can cause issues in situations where UPnP is enabled there's ways around this like my NAT testing), tl;dr... xbox one or xbox360 even with port forwarding setup can fuck up hosting.
+
+- Find a way for servers to advertise alternative ports to connect to for clients as currently the way things work only a single instance of a server can be ran.
+
+- Server still needs to connect to halo2vista.com and handle the API stuff for the user so the launcher can be released.
+
+- Connecting doesn't always work could solve it but sending additional data in packets and registering it, or finding other methods to encode IPs/data so XNADDRs/Secure addresses can be converted seamlessly or simply by patching a lot of this functionality in the game and relying on normal addresses.
+
+- Client doesn't clear sessions when it should (this is basically memory leaks the longer you play the more memory will grow, it's subtle for now).
+
+- Servers and clients need to establish a heart beat with the master server so both sides can not only do clean-up but re-establish connections in the event of a disconnection, restart of master server or etc.
+
+- Restore VOIP via teamspeak API similar to the way Halo Online handled it.
+
+- Come up with new D3D GUI and remove current one, or write new Input hooks which don't cause extreme latency/frame drops.

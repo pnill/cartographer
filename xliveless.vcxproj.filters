@@ -96,6 +96,12 @@
     <ClCompile Include="..\OSHGui\Input\WindowsMessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD_Sounds.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD_GunGame.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -130,6 +136,12 @@
     </ClInclude>
     <ClInclude Include="cartographer_main.hpp">
       <Filter>Source Files\H2MOD\GUI\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD_Sounds.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD_GunGame.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

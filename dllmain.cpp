@@ -24,6 +24,7 @@ UINT g_online = 0;
 UINT g_debug = 0;
 UINT g_server = 0;
 ULONG broadcast_server = inet_addr("167.114.128.187");
+BOOL isHost = FALSE;
 
 UINT g_signin[4] = { 1,0,0,0 };
 CHAR g_szUserName[4][16+1] = { "xLiveLess", "xLiveLess", "xLiveLess", "xLiveLess" };

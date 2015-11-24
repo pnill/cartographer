@@ -17,31 +17,6 @@ double time_spent;
 
 extern UINT g_server;
 
-
-
-
-
-
-
-DWORD get_unit_equipment_base_address(int unit)
-{
-	TRACE("unit: %08X", unit);
-	unit = unit & 0x000FFFF;
-	TRACE("unit: %08X (unit = unit & 0x0000FFFF)", unit);
-	unit = unit * 0x2 + unit;
-	TRACE("unit: %08X (unit * 0x02 + unit)", unit);
-	
-	DWORD game_state_objects_header;
-
-	
-	return *(DWORD*)(*(DWORD*)(game_state_objects_header+0x44) + unit * 0x4 + 8);
-}
-
-
-
-
-
-
 void NetworkControl()
 {
 	SOCKET ControlSock;
@@ -67,44 +42,6 @@ void NetworkControl()
 	
 		if (RecvResult > 0)
 		{
-			if ((unsigned char)RecvBuf[0] == 0x01)
-			{
-				h2mod->SetGravity(0);
-			}
-
-			if ((unsigned char)RecvBuf[0] == 0x02)
-			{
-				h2mod->SetGravity(4.0);
-			}
-
-			if ((unsigned char)RecvBuf[0] == 0x03)
-			{
-				for (int i = 0; i < 16;i++)
-					h2mod->unit_kill(h2mod->get_unit_from_player_index(i));
-			}
-
-			if ((unsigned char)RecvBuf[0] == 0x04)
-			{
-				h2mod->camera_set_fov(150.0, 0);
-			}
-
-			if ((unsigned char)RecvBuf[0] == 0x05)
-			{
-				h2mod->unit_set_active_camo(h2mod->get_unit_from_player_index(0));
-				h2mod->unit_set_active_camo(h2mod->get_unit_from_player_index(1));
-			}
-
-			if ((unsigned char)RecvBuf[0] == 0x06)
-			{
-			    //base = GetModuleHandle(L"halo2.exe");
-
-				//GivePlayerWeapon(0, 0xEB4230DD);
-				//GivePlayerWeapon(1, 0xEEF1348C);
-				//GivePlayerWeapon(2, 0xF33838D2);
-				//GivePlayerWeapon(1, 0xECD63271);
-				//GivePlayerWeapon(1, 0xEE0933A4);
-			
-			}
 
 			if ((unsigned char)RecvBuf[0] == 0x07)
 			{
@@ -125,19 +62,7 @@ void NetworkControl()
 				unit_equipment_table += *(DWORD*)game_state_objects_header_objects;
 				TRACE("unit_equipment_table: %08X", unit_equipment_table);
 
-				/*
-				TRACE("unit: %08X", unit);
-				unit = unit & 0x000FFFF;
-				TRACE("unit: %08X (unit = unit & 0x0000FFFF)", unit);
-				unit = unit * 0x2 + unit;
-				TRACE("unit: %08X (unit * 0x02 + unit)", unit);
-
-				DWORD game_state_objects_header;
-
-
-				return *(DWORD*)(*(DWORD*)(game_state_objects_header+0x44) + unit * 0x4 + 8);
-				*/
-
+		
 				TRACE("unit_equipment_address: %08X",unit_equipment_table);
 			}
 		}
@@ -224,10 +149,6 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 
 	SOCKET ret = bind(s, name, namelen);
 	
-	
-
-//	TRACE("XSocketBind() - port: %d Socket: %X", ntohs(port), s);
-
 	if (ret == SOCKET_ERROR)
 	{
 		TRACE("XSocketBind - SOCKET_ERROR");
@@ -238,10 +159,6 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 // #53: XNetRandom
 INT WINAPI XNetRandom(BYTE * pb, UINT cb)
 {
-	//TRACE("XNetRandom  (pb = %X, cb = %d)",
-	//	pb, cb);
-
-
 	if (cb)
 		for (DWORD i = 0; i < cb; i++)
 			pb[i] = static_cast<BYTE>(rand());

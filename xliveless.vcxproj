@@ -170,6 +170,8 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="GUI.cpp" />
     <ClCompile Include="H2MOD.cpp" />
+    <ClCompile Include="H2MOD_GunGame.cpp" />
+    <ClCompile Include="H2MOD_Sounds.cpp" />
     <ClCompile Include="Hook.cpp" />
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="packet.pb.cc" />
@@ -182,6 +184,8 @@
     <ClInclude Include="Detour.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="H2MOD.h" />
+    <ClInclude Include="H2MOD_GunGame.h" />
+    <ClInclude Include="H2MOD_Sounds.h" />
     <ClInclude Include="Hook.h" />
     <ClInclude Include="Network.h" />
     <ClInclude Include="packet.pb.h" />

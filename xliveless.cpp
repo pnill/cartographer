@@ -47,7 +47,7 @@ extern CHAR g_szUserName[4][16+1];
 extern UINT g_online;
 extern CHAR g_profileDirectory[];
 extern UINT g_server;
-
+extern BOOL isHost;
 
 extern void InitInstance();
 extern void ExitInstance();
@@ -3026,6 +3026,7 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 	if ((dwFlags & XSESSION_CREATE_HOST) > 0)
 	{
 		TRACE("XSessionCreate - XSESSION_CREATE_HOST");
+		isHost = TRUE;
 	}
 
 	if ((dwFlags & XSESSION_CREATE_USES_ARBITRATION) > 0)
