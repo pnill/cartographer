@@ -377,7 +377,7 @@
 #endif
 #ifndef uint32_t
 #if (ULONG_MAX == UINT32_MAX) || defined (S_SPLINT_S)
-  typedef unsigned long uint32_t;
+// typedef long uint32_t;
 # define UINT32_C(v) v ## UL
 # ifndef PRINTF_INT32_MODIFIER
 #  define PRINTF_INT32_MODIFIER "l"
@@ -407,7 +407,7 @@
 #endif
 #ifndef int32_t
 #if (LONG_MAX == INT32_MAX) || defined (S_SPLINT_S)
-  typedef signed long int32_t;
+//  typedef signed long int32_t;
 # define INT32_C(v) v ## L
 # ifndef PRINTF_INT32_MODIFIER
 #  define PRINTF_INT32_MODIFIER "l"
@@ -581,8 +581,8 @@
   typedef  uint8_t  uint_least8_t;
   typedef  int16_t  int_least16_t;
   typedef uint16_t uint_least16_t;
-  typedef  int32_t  int_least32_t;
-  typedef uint32_t uint_least32_t;
+//  typedef  long  int_least32_t;
+ // typedef unsigned long uint_least32_t;
 # define PRINTF_LEAST32_MODIFIER PRINTF_INT32_MODIFIER
 # define PRINTF_LEAST16_MODIFIER PRINTF_INT16_MODIFIER
 # define  UINT_LEAST8_MAX  UINT8_MAX
@@ -616,12 +616,12 @@
  *  stdint.h.
  */
 
-typedef   int_least8_t   int_fast8_t;
-typedef  uint_least8_t  uint_fast8_t;
-typedef  int_least16_t  int_fast16_t;
-typedef uint_least16_t uint_fast16_t;
-typedef  int_least32_t  int_fast32_t;
-typedef uint_least32_t uint_fast32_t;
+//typedef   int_least8_t   int_fast8_t;
+//typedef  uint_least8_t  uint_fast8_t;
+//typedef  int_least16_t  int_fast16_t;
+//typedef uint_least16_t uint_fast16_t;
+//typedef  int_least32_t  int_fast32_t;
+//typedef uint_least32_t uint_fast32_t;
 #define  UINT_FAST8_MAX  UINT_LEAST8_MAX
 #define   INT_FAST8_MAX   INT_LEAST8_MAX
 #define UINT_FAST16_MAX UINT_LEAST16_MAX

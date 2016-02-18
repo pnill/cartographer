@@ -1,9 +1,9 @@
 //#include <windows.h>
 #include <d3d9.h>
 #include <d3dx9.h>
-#include <OSHGui.hpp>
-#include <Drawing/Direct3D9/Direct3D9Renderer.hpp>
-#include <Input/WindowsMessage.hpp>
+//#include <OSHGui.hpp>
+//#include <Drawing/Direct3D9/Direct3D9Renderer.hpp>
+//#include <Input/WindowsMessage.hpp>
 #include "GUI.h"
 #include "H2MOD.h"
 #include "xliveless.h"
@@ -39,9 +39,9 @@ D3DPRESENT_PARAMETERS *pD3DPP;
 LPD3DXFONT pFont;
 IDirect3DTexture9* Primitive = NULL;
 
-using namespace OSHGui;
-using namespace OSHGui::Drawing;
-Input::WindowsMessage input;
+//using namespace OSHGui;
+//using namespace OSHGui::Drawing;
+//Input::WindowsMessage input;
 
 char* BuildText;
 const char CompileDate[] = __DATE__;

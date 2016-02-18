@@ -78,24 +78,6 @@
     <ClCompile Include="cartographer_main.cpp">
       <Filter>Source Files\H2MOD\GUI\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\OSHGui\Drawing\Direct3D9\Direct3D9GeometryBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\OSHGui\Drawing\Direct3D9\Direct3D9Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\OSHGui\Drawing\Direct3D9\Direct3D9Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\OSHGui\Drawing\Direct3D9\Direct3D9TextureTarget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\OSHGui\Drawing\Direct3D9\Direct3D9ViewportTarget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\OSHGui\Input\WindowsMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD_Sounds.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>

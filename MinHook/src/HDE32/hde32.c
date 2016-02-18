@@ -5,7 +5,7 @@
  *
  */
 
-/* #include <stdint.h> */
+#include <stdint.h>
 #include <string.h>
 
 #include "hde32.h"

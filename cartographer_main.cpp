@@ -1,9 +1,9 @@
 #include "cartographer_main.hpp"
-using namespace OSHGui;
+//using namespace OSHGui;
 
-cartographer_main::cartographer_main()
-{
-	InitializeComponent();
+//cartographer_main::cartographer_main()
+//{
+//	InitializeComponent();
 	
-}
+//}
 //---------------------------------------------------------------------------

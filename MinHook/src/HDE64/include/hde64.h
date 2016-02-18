@@ -19,8 +19,8 @@
  * and change next line to:
  *   #include "pstdint.h"
  */
-/* #include <stdint.h> */
-#include "../../pstdint.h"
+ #include <stdint.h> 
+//#include "../../pstdint.h"
 
 #define F_MODRM         0x00000001
 #define F_SIB           0x00000002
@@ -86,15 +86,15 @@ typedef struct {
     union {
         uint8_t imm8;
         uint16_t imm16;
-        uint32_t imm32;
+        unsigned long imm32;
         uint64_t imm64;
     } imm;
     union {
         uint8_t disp8;
         uint16_t disp16;
-        uint32_t disp32;
+        unsigned long disp32;
     } disp;
-    uint32_t flags;
+    unsigned long flags;
 } hde64s;
 
 #pragma pack(pop)

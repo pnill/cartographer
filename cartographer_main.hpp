@@ -1,6 +1,6 @@
 #pragma once
 
-#include <OSHGui.hpp>
+/*#include <OSHGui.hpp>
 
 class cartographer_main : public OSHGui::Form
 {
@@ -57,3 +57,4 @@ private:
 	OSHGui::TabPage *tabPage2;
 };
 
+*/
