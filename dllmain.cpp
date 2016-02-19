@@ -23,7 +23,8 @@ BOOL consoleEnabled = FALSE;
 UINT g_online = 0;
 UINT g_debug = 0;
 UINT g_server = 0;
-ULONG broadcast_server = inet_addr("167.114.128.187");
+
+ULONG broadcast_server = inet_addr("52.73.200.243");
 BOOL isHost = FALSE;
 
 UINT g_signin[4] = { 1,0,0,0 };
@@ -34,7 +35,25 @@ CHAR g_profileDirectory[512] = "Profiles";
 
 std::wstring dlcbasepath;
 
-
+#pragma region H2 GunGame Variables
+	bool b_GunGame = 0;
+	int weapon_one = 0;
+	int weapon_two = 0;
+	int weapon_three = 0;
+	int weapon_four = 0;
+	int weapon_five = 0;
+	int weapon_six = 0;
+	int weapon_seven = 0;
+	int weapon_eight = 0;
+	int weapon_nine = 0;
+	int weapon_ten = 0;
+	int weapon_eleven = 0;
+	int weapon_tweleve = 0;
+	int weapon_thirteen = 0;
+	int weapon_fourteen = 0;
+	int weapon_fiffteen = 0;
+	int weapon_sixteen = 0;
+#pragma endregion
 
 VOID Console()
 {
@@ -320,12 +339,61 @@ void InitInstance()
 				CHECK_ARG( "online profile =", g_online );
 				CHECK_ARG_STR( "save directory =", g_profileDirectory );
 				CHECK_ARG( "debug log =", g_debug );
-				CHECK_ARG( "server =" ,g_server)
+				CHECK_ARG("server =", g_server);
+				CHECK_ARG("gungame =", b_GunGame);
 			}
 
 			
 			fclose(fp);
 		}
+
+#pragma region GunGame Levels
+		if (b_GunGame == 1)
+		{
+			FILE* gfp;
+			gfp = fopen("gungame.ini", "r");
+			
+			if (gfp)
+			{
+				TRACE("[GunGame Enabled] - Opened GunGame.ini!");
+				while (!feof(gfp))
+				{
+					char gstr[256];
+
+
+					fgets(gstr, 256, gfp);
+
+#define gCHECK_ARG(x,y) \
+	if( strstr( gstr,x ) == gstr ) \
+	{ \
+		sscanf( gstr + strlen(x), "%d", &y ); \
+		continue; \
+	}
+
+					gCHECK_ARG("weapon_one =", weapon_one);
+					gCHECK_ARG("weapon_two =", weapon_two);
+					gCHECK_ARG("weapon_three =", weapon_three);
+					gCHECK_ARG("weapon_four =", weapon_four);
+					gCHECK_ARG("weapon_five =", weapon_five);
+					gCHECK_ARG("weapon_six =", weapon_six);
+					gCHECK_ARG("weapon_seven =", weapon_seven);
+					gCHECK_ARG("weapon_eight =", weapon_eight);
+					gCHECK_ARG("weapon_nine =", weapon_nine);
+					gCHECK_ARG("weapon_ten =", weapon_ten);
+					gCHECK_ARG("weapon_eleven =", weapon_eleven);
+					gCHECK_ARG("weapon_tweleve =", weapon_tweleve);
+					gCHECK_ARG("weapon_thirteen =", weapon_thirteen);
+					gCHECK_ARG("weapon_fourteen =", weapon_fourteen);
+					gCHECK_ARG("weapon_fifteen =", weapon_fiffteen);
+					gCHECK_ARG("weapon_sixteen =", weapon_sixteen);
+
+				}
+				
+				fclose(gfp);
+			}
+		}
+		
+#pragma endregion
 
 
 #ifndef NO_TRACE
@@ -346,6 +414,14 @@ void InitInstance()
 				TRACE("H2MOD Failed to intialize");
 
 			TRACE("g_server param = %i", g_server);
+			TRACE("[GunGame] : %i", b_GunGame);
+			if (b_GunGame == 1)
+			{
+				TRACE("[GunGame] - weapon_one: %i", weapon_one);
+				TRACE("[GunGame] - weapon_two: %i", weapon_two);
+				TRACE("[GunGame] - weapon_three: %i", weapon_three);
+			}
+
 			WCHAR gameName[256];
 			
 			GetModuleFileNameW( NULL, (LPWCH) &gameName, sizeof(gameName) );

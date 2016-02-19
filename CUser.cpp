@@ -256,6 +256,7 @@ void CUserManagement::RegisterLocalRequest()
 
 	Result = sendto(boundsock, SendBuf, pak.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
 	time_t start = time(0);
+
 	delete[] SendBuf;
 
 	char RecvBuf[2048];

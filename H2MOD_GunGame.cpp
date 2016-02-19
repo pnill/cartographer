@@ -3,27 +3,79 @@
 #include "H2MOD.h"
 #include "xliveless.h"
 
+extern int weapon_one;
+extern int weapon_two;
+extern int weapon_three;
+extern int weapon_four;
+extern int weapon_five;
+extern int weapon_six;
+extern int weapon_seven;
+extern int weapon_eight;
+extern int weapon_nine;
+extern int weapon_ten;
+extern int weapon_eleven;
+extern int weapon_tweleve;
+extern int weapon_thirteen;
+extern int weapon_fourteen;
+extern int weapon_fiffteen;
+extern int weapon_sixteen;
+
+int Weapon_ID[36] = { 0xE53D2AD8, 0xE5F02B8B, 0xE6322BCD, 0xE6AF2C4A,
+0xE79B2D36,0xE8172DB2,0xE8382DD3,0xE8742E0F,
+0xE8D32E6E,0xE9062EA1,0xE90C2EA7,0xE90C2EA7,
+0xE9732F0E,0xE9F62F91,0xEAD83073,0xEB4230DD,
+0xEB9E3139,0xEC3131CC,0xEC673202,0xEC9E3239,
+0xECD63271,0xED3F32DA,0xED753310,0xEDA2333D,
+0xEDD4336F,0xEE0933A4,0xEE3433CF,0xEE5233ED,
+0xEE5F33FA,0xEE7B3416,0xEE993434,0xEE9E3439,
+0xEED3346E,0xEEF1348C,0xEF1B34B6,0xF33838D2 };
 
 void GunGame::Initialize()
 {
 	TRACE("[GunGame] : Initialize()");
-
-	this->level_weapon[0] = Weapon::energy_blade_useless;
-	this->level_weapon[1] = Weapon::needler;
-	this->level_weapon[2] = Weapon::plasma_pistol;
-	this->level_weapon[3] = Weapon::magnum;
-	this->level_weapon[4] = Weapon::smg;
-	this->level_weapon[5] = Weapon::plasma_rifle;
-	this->level_weapon[6] = Weapon::brute_plasma_rifle;
-	this->level_weapon[7] = Weapon::juggernaut_powerup;
-	this->level_weapon[8] = Weapon::shotgun;
-	this->level_weapon[9] = Weapon::brute_shot;
-	this->level_weapon[10] = Weapon::covenant_carbine;
-	this->level_weapon[11] = Weapon::battle_rifle;
-	this->level_weapon[12] = Weapon::beam_rifle;
-	this->level_weapon[13] = Weapon::sniper_rifle;
-	this->level_weapon[14] = Weapon::rocket_launcher;
-	this->level_weapon[15] = Weapon::energy_blade;
+	
+	if (weapon_one != 0)
+	{
+		TRACE("[GunGame] : Intialize() - weapon_one: %i", weapon_one);
+		TRACE("[GunGame] : Intialize() - weapon_one enum:  %08X", Weapon_ID[weapon_one]);
+		TRACE("[GunGame] : Intialize() - weapon_two enum:  %08X", Weapon_ID[weapon_two]);
+		this->level_weapon[0] = Weapon_ID[weapon_one];
+		this->level_weapon[1] = Weapon_ID[weapon_two];
+		this->level_weapon[2] = Weapon_ID[weapon_three];
+		this->level_weapon[3] = Weapon_ID[weapon_four];
+		this->level_weapon[4] = Weapon_ID[weapon_five];
+		this->level_weapon[5] = Weapon_ID[weapon_six];
+		this->level_weapon[6] = Weapon_ID[weapon_seven];
+		this->level_weapon[7] = Weapon_ID[weapon_eight];
+		this->level_weapon[8] = Weapon_ID[weapon_nine];
+		this->level_weapon[9] = Weapon_ID[weapon_ten];
+		this->level_weapon[10] = Weapon_ID[weapon_eleven];
+		this->level_weapon[11] = Weapon_ID[weapon_tweleve];
+		this->level_weapon[12] = Weapon_ID[weapon_thirteen];
+		this->level_weapon[13] = Weapon_ID[weapon_fourteen];
+		this->level_weapon[14] = Weapon_ID[weapon_fiffteen];
+		this->level_weapon[15] = Weapon_ID[weapon_sixteen];
+	
+	}
+	else
+	{
+		this->level_weapon[0] = Weapon::energy_blade_useless;
+		this->level_weapon[1] = Weapon::needler;
+		this->level_weapon[2] = Weapon::plasma_pistol;
+		this->level_weapon[3] = Weapon::magnum;
+		this->level_weapon[4] = Weapon::smg;
+		this->level_weapon[5] = Weapon::plasma_rifle;
+		this->level_weapon[6] = Weapon::brute_plasma_rifle;
+		this->level_weapon[7] = Weapon::juggernaut_powerup;
+		this->level_weapon[8] = Weapon::shotgun;
+		this->level_weapon[9] = Weapon::brute_shot;
+		this->level_weapon[10] = Weapon::covenant_carbine;
+		this->level_weapon[11] = Weapon::battle_rifle;
+		this->level_weapon[12] = Weapon::beam_rifle;
+		this->level_weapon[13] = Weapon::sniper_rifle;
+		this->level_weapon[14] = Weapon::rocket_launcher;
+		this->level_weapon[15] = Weapon::energy_blade;
+	}
 
 	this->player_level[0] = 0;
 	this->player_level[1] = 0;
@@ -212,12 +264,20 @@ void GunGame::LevelUp(int PlayerIndex)
 			if (level == 16)
 			{
 				TRACE("[GunGame]: LevelUp level == 16, unit_object: %08X", unit_object);
+				
 				*(BYTE*)((BYTE*)unit_object + 0x252) = 50; // frag grenades
 			}
 			if (level == 17)
 			{
 				TRACE("[GunGame]: LevelUp level == 17");
 				*(BYTE*)((BYTE*)unit_object + 0x253) = 50; // plasma grenades
+			}
+			
+			if (level == 18)
+			{
+				TRACE("[GunGame]: LevelUp level == 18");
+				this->player_level[PlayerIndex] = 0;
+				GivePlayerWeapon(PlayerIndex, this->level_weapon[0]);
 			}
 
 			//*(BYTE*)((BYTE*)unit_object + 0x10A) = 0x40;

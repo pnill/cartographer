@@ -8,7 +8,9 @@
 
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
+extern bool b_GunGame;
 HMODULE base;
+
 
 #pragma region engine calls
 
@@ -152,7 +154,8 @@ char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 	TRACE("OnPlayerDeath(unit_datum_index: %08X)", unit_datum_index);
 
 #pragma region GunGame Handler
-	gg->PlayerDied(unit_datum_index);
+	if (b_GunGame == 1)
+		gg->PlayerDied(unit_datum_index);
 #pragma endregion
 
 	return pplayer_death(unit_datum_index, a2, a3, a4);
@@ -170,14 +173,15 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 	if (a5 == 7) //player got a kill?
 	{
 		int PlayerIndex = a2;
-		gg->LevelUp(PlayerIndex);
+		if (b_GunGame == 1)
+			gg->LevelUp(PlayerIndex);
 	}
 
 	if (a5 == -1 && a4 == -1)
 	{
 		int PlayerIndex = a2;
-
-		gg->LevelDown(PlayerIndex);
+		if (b_GunGame == 1)
+			gg->LevelDown(PlayerIndex);
 	}
 #pragma endregion
 
@@ -195,6 +199,7 @@ int __cdecl OnMapLoad(int a1)
 {
 
 #pragma region GunGame Handler
+ if(b_GunGame == 1)
 	gg->Initialize();
 #pragma endregion
 
@@ -294,7 +299,8 @@ bool __cdecl OnPlayerSpawn(int a1)
 	int PlayerIndex = a1 & 0x000FFFF;
 
 #pragma region GunGame Handler
-	gg->SpawnPlayer(PlayerIndex);
+	if (b_GunGame == 1)
+		gg->SpawnPlayer(PlayerIndex);
 #pragma endregion
 
 
@@ -376,7 +382,10 @@ void H2MOD::Initialize()
 	TRACE_GAME("H2MOD - Initializing H2MOD Network handlers");
 
 	Network::Initialize();
-	gg->Initialize();
+
+	if ( b_GunGame == 1 )
+		gg->Initialize();
+	
 	h2mod->ApplyHooks();
 	
 }
