@@ -8,6 +8,9 @@
 using namespace std;
 
 
+// Live connection state success codes
+#define XONLINE_S_LOGON_CONNECTION_ESTABLISHED          _HRESULT_TYPEDEF_(0x001510F0L)
+#define XONLINE_S_LOGON_DISCONNECTED                    _HRESULT_TYPEDEF_(0x001510F1L)
 
 
 
@@ -46,8 +49,6 @@ extern XUID xFakeXuid[4];
 extern CHAR g_szUserName[4][16+1];
 extern UINT g_online;
 extern CHAR g_profileDirectory[];
-extern UINT g_server;
-extern BOOL isHost;
 
 extern void InitInstance();
 extern void ExitInstance();
@@ -444,7 +445,7 @@ void Check_Overlapped( PXOVERLAPPED pOverlapped )
 // #1: XWSAStartup
 int WINAPI XWSAStartup (WORD wVersionRequested, LPWSADATA lpWsaData)
 {
-    TRACE("XWSAStartup(%u, %p)", wVersionRequested, lpWsaData);
+   // TRACE("XWSAStartup(%u, %p)", wVersionRequested, lpWsaData);
     return WSAStartup(wVersionRequested, lpWsaData);
 }
 
@@ -460,7 +461,7 @@ SOCKET WINAPI XCreateSocket (int af, int type, int protocol)
 {
 
 	
-    TRACE("XCreateSocket (%d, %d, %d)", af, type, protocol);
+  //  TRACE("XCreateSocket (%d, %d, %d)", af, type, protocol);
 	if (protocol == 254)
 	{
 		protocol = IPPROTO_UDP; // We can't support VDP (Voice / Data Protocol) it's some encrypted crap which isn't standard.
@@ -491,7 +492,7 @@ int WINAPI XSocketShutdown (SOCKET s, int how)
 // #6: XSocketIOCTLSocket
 int WINAPI XSocketIOCTLSocket (SOCKET s, __int32 cmd, u_long *argp)
 {
-    TRACE("XSocketIOCTLSocket");
+    //TRACE("XSocketIOCTLSocket");
     return ioctlsocket(s, cmd, argp);
 }
 
@@ -521,7 +522,7 @@ int WINAPI XSocketSetSockOpt (SOCKET s, int level, int optname, const char *optv
 // #8: XSocketGetSockOpt
 int WINAPI XSocketGetSockOpt(SOCKET s, int level, int optname, char *optval, int *optlen)
 {
-    TRACE("XSocketGetSockOpt");
+    //TRACE("XSocketGetSockOpt");
     return getsockopt(s, level, optname, optval, optlen);
 }
 
@@ -698,8 +699,8 @@ INT WINAPI XSocketWSAGetLastError ()
 
 	if( print < 15 )
 	{
-		TRACE("XSocketWSAGetLastError");
-		TRACE("XSocketWSAGetLastError Ret = %i", ret);
+		//("XSocketWSAGetLastError");
+		//TRACE("XSocketWSAGetLastError Ret = %i", ret);
 
 		print++;
 	}
@@ -804,7 +805,7 @@ u_short WINAPI XSocketHTONS (u_short a1)
 // #51: XNetStartup
 int WINAPI XNetStartup (void *a1)
 {
-    TRACE("XNetStartup  (a1 = %X)", a1);
+    //TRACE("XNetStartup  (a1 = %X)", a1);
     return 0;
 }
 
@@ -992,8 +993,8 @@ DWORD WINAPI XNetGetEthernetLinkStatus()
 
 	if( print < 15 )
 	{
-		TRACE("XNetGetEthernetLinkStatus");
-		TRACE("- active: 100 mbps, full duplex");
+		//("XNetGetEthernetLinkStatus");
+		//TRACE("- active: 100 mbps, full duplex");
 
 		print++;
 	}
@@ -1139,11 +1140,12 @@ DWORD WINAPI sysui_timer( LPVOID lpParam )
 	return 0;
 }
 
+int g_xlive = 0;
 
 BOOL XNotifyGetNext_Compat(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId, PULONG_PTR pParam)
 {
 	static int print = 0;
-	static int print_limit = 20;
+	static int print_limit = 90000;
 
 
 	// reset logger
@@ -1156,18 +1158,18 @@ BOOL XNotifyGetNext_Compat(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	if( print < print_limit )
 	{
-		//TRACE("XNotifyGetNext  (hNotification = %X, dwMsgFilter = %X, pdwId = %X, pParam = %X)",
-		//	hNotification, dwMsgFilter, pdwId, pParam );
+		TRACE("XNotifyGetNext  (hNotification = %X, dwMsgFilter = %X, pdwId = %X, pParam = %X)",
+			hNotification, dwMsgFilter, pdwId, pParam );
 
-		print++;
+		//print++;
 	}
 
 
 
 	if(dwMsgFilter != 0 && dwMsgFilter != XNOTIFY_SYSTEM)
 	{
-		if( print < print_limit )
-			TRACE( "- discard message" );
+		//if( print < print_limit )
+		//	TRACE( "- discard message" );
 
 		return FALSE;
 	}
@@ -1180,6 +1182,10 @@ BOOL XNotifyGetNext_Compat(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	static DWORD controller = 0x7FFFFFFF;
 	static DWORD controller_force = 0x7FFFFFFF;
 
+	//if (g_xlive == 0)
+	//{
+
+	//}
 
 	if(sys_ui == 0)
 	{
@@ -1347,8 +1353,8 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	if( curlist == g_dwListener ) 
 	{
-		//TRACE("XNotifyGetNext  (hNotification = %X, dwMsgFilter = %X, pdwId = %X, pParam = %X)",
-		//	hNotification, dwMsgFilter, pdwId, pParam );
+		TRACE("XNotifyGetNext  (hNotification = %X, dwMsgFilter = %X, pdwId = %X, pParam = %X)",
+			hNotification, dwMsgFilter, pdwId, pParam );
 
 		TRACE( "- unknown notifier" );
 
@@ -1359,8 +1365,8 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	if( ( g_listener[curlist].area & ((XNID_AREA(dwMsgFilter)<<1)|1) ) == 0 )
 	{
-		//TRACE("XNotifyGetNext  (hNotification = %X, dwMsgFilter = %X, pdwId = %X, pParam = %X)",
-		//	hNotification, dwMsgFilter, pdwId, pParam );
+		TRACE("XNotifyGetNext  (hNotification = %X, dwMsgFilter = %X, pdwId = %X, pParam = %X)",
+			hNotification, dwMsgFilter, pdwId, pParam );
 
 		TRACE( "- bad area: %X ~ %X", g_listener[curlist].area, (XNID_AREA(dwMsgFilter)<<1)|1 );
 
@@ -1380,8 +1386,8 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	if( g_listener[curlist].print < print_limit )
 	{
-		//TRACE("XNotifyGetNext  (hNotification = %X, dwMsgFilter = %X, pdwId = %X, pParam = %X)",
-		//	hNotification, dwMsgFilter, pdwId, pParam );
+		TRACE("XNotifyGetNext  (hNotification = %X, dwMsgFilter = %X, pdwId = %X, pParam = %X)",
+			hNotification, dwMsgFilter, pdwId, pParam );
 
 
 		g_listener[curlist].print++;
@@ -1437,6 +1443,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 		else if( live_membership == 0 )
 			dwMsgFilter = XN_LIVE_MEMBERSHIP_PURCHASED;
+		
 	}
 
 
@@ -1501,6 +1508,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	case XN_SYS_SIGNINCHANGED:
 		if( sys_signin == 0 )
 		{
+			*pdwId = XN_SYS_SIGNINCHANGED;
 			if( pParam )
 			{
 				*pParam = 0;
@@ -1517,7 +1525,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			sys_signin++;
 
 
-			TRACE( "- %X = XN_SYS_SIGNINCHANGED (1)", hNotification );
+			TRACE( "- %X = XN_SYS_SIGNINCHANGED (1) - %08X", hNotification, XN_SYS_SIGNINCHANGED );
 
 			exit_code = TRUE;
 		}
@@ -1606,13 +1614,13 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		if( live_connection == 0 )
 		{
 			live_connection++;
+			
+			*pdwId = XN_LIVE_CONNECTIONCHANGED;
+			
+			if( pParam ) *pParam = XONLINE_S_LOGON_CONNECTION_ESTABLISHED;
 
 
-			// okay
-			if( pParam ) *pParam = 0;
-
-
-			TRACE( "- %X = XN_LIVE_CONNECTIONCHANGED (0)", hNotification );
+			TRACE( "- %X = XN_LIVE_CONNECTIONCHANGED (0) - %08X", hNotification, XN_LIVE_CONNECTIONCHANGED );
 
 			exit_code = TRUE;
 		}
@@ -1769,20 +1777,23 @@ int WINAPI XHVCreateEngine( PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, PI
 }
 
 // #5010: XLiveLess_5010
-int WINAPI XLiveLess_5010(int a1, int a2, int a3)
+int WINAPI XLiveRegisterDataSection(int a1, int a2, int a3)
 {
+	TRACE("XLiveRegisterDataSection - a1: %08X,a2: %08X, a3: %08X", a1, a2, a3);
 	return 0;
 }
 
 // #5011 XLiveLess_5011
-int WINAPI XLiveLess_5011(int a1)
+int WINAPI XLiveUnregisterDataSection(int a1)
 {
+	TRACE("XLiveUnregisterDataSection - a1: %08X", a1);
 	return 0;
 }
 
 // #5012 XLiveLess_5012
-int WINAPI XLiveLess_5012(int a1, int a2)
+int WINAPI XLiveUpdateHashes(int a1, int a2)
 {
+	TRACE("XLiveUpdateHashes - a1: %08X,a2: %08x", a1, a2);
 	return 0;
 }
 
@@ -1808,8 +1819,8 @@ LONG WINAPI XLivePBufferAllocate (DWORD size, FakePBuffer **pBuffer)
 		print++;
 
 
-		TRACE("XLivePBufferAllocate  (XEncryptedAlloc) (size = %d, pBuffer = %X)",
-			size, pBuffer);
+		//TRACE("XLivePBufferAllocate  (XEncryptedAlloc) (size = %d, pBuffer = %X)",
+		//	size, pBuffer);
 	}
 
 
@@ -2097,7 +2108,7 @@ DWORD WINAPI XShowKeyboardUI (DWORD dwUserIndex, DWORD dwFlags, LPCWSTR wseDefau
 // #5251: XCloseHandle
 BOOL WINAPI XCloseHandle (HANDLE hObject)
 {
-	TRACE("XCloseHandle  (hObject = %X)", hObject );
+	//TRACE("XCloseHandle  (hObject = %X)", hObject );
 	BOOL ret = 0;
 	
 	if(hObject) ret = CloseHandle(hObject);
@@ -2147,14 +2158,6 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 
 	BOOL async;
-
-
-		// for breakpoint debugging
-#if 0
-		while(1)
-			Sleep(1);
-#endif
-
 
 	if( pOverlapped != 0 )
 	{
@@ -2357,8 +2360,8 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		{
 			if( print < 100 )
 				TRACE("- NO_MORE_FILES");
-	
-			return ERROR_NO_MORE_FILES;
+			*pcItemsReturned = 0;
+			return ERROR_SUCCESS;
 		}
 	}
 
@@ -2525,7 +2528,7 @@ DWORD WINAPI XUserGetName(DWORD dwUserIndex, LPSTR szUserName, DWORD cchUserName
 
 	if( print < 15 )
 	{
-    TRACE("XUserGetName  (userIndex = %d, userName = %X, cchUserName = %d)", dwUserIndex, szUserName, cchUserName);
+		TRACE("XUserGetName  (userIndex = %d, userName = %X, cchUserName = %d)", dwUserIndex, szUserName, cchUserName);
 		print++;
 	}
 
@@ -2560,22 +2563,23 @@ int WINAPI XUserAreUsersFriends(DWORD dwUserIndex, DWORD * pXuids, DWORD dwXuidC
 
 
 // #5265: XUserCheckPrivilege
-DWORD WINAPI XUserCheckPrivilege (DWORD dwUserIndex, DWORD privilegeType, PBOOL pfResult)
+DWORD WINAPI XUserCheckPrivilege (DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeType, PBOOL pfResult)
 {
 	static int print = 0;
 
 
 	if( print < 15 )
 	{
-		TRACE("XUserCheckPrivilege  (userIndex = %d, privilegeType = %d, pfResult = %X)",
-			dwUserIndex, privilegeType, pfResult);
+		
 
 
 		if( privilegeType == XPRIVILEGE_MULTIPLAYER_SESSIONS )
 			TRACE( "- MULTIPLAYER_SESSIONS" );
 
 		else if (privilegeType == XPRIVILEGE_COMMUNICATIONS)
-			TRACE("- COMMUNICATIONS");
+		{
+			TRACE(" - COMMUNICATIONS");
+		}
 
 		else if( privilegeType == XPRIVILEGE_PROFILE_VIEWING )
 			TRACE( "- PROFILE_VIEWING" );
@@ -2586,16 +2590,11 @@ DWORD WINAPI XUserCheckPrivilege (DWORD dwUserIndex, DWORD privilegeType, PBOOL 
 		else
 			TRACE( "- UNKNOWN" );
 
+		TRACE("XUserCheckPrivilege  (userIndex = %d, privilegeType = %d, pfResult = %X)",
+			dwUserIndex, privilegeType, pfResult);
 
 		print++;
 	}
-
-
-#if 0
-	while(1)
-		Sleep(1);
-#endif
-
 
 	if(dwUserIndex == 0)
 	{
@@ -2741,26 +2740,26 @@ void WINAPI XUserSetProperty(DWORD dwUserIndex, DWORD dwPropertyId, DWORD cbValu
 // #5277: XUserSetContext
 DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwContextValue)
 {
-//  TRACE("XUserSetContext  (userIndex = %d, contextId = %d, contextValue = %d)",
-//		dwUserIndex, dwContextId, dwContextValue );
+  TRACE("XUserSetContext  (userIndex = %d, contextId = %d, contextValue = %d)",
+		dwUserIndex, dwContextId, dwContextValue );
 
 
 
 	if( dwContextId == X_CONTEXT_PRESENCE )
 	{
-		//TRACE( "- X_CONTEXT_PRESENCE = %d", dwContextValue );
+		TRACE( "- X_CONTEXT_PRESENCE = %d", dwContextValue );
 	}
 
 	else if( dwContextId == X_CONTEXT_GAME_TYPE )
 	{
-		//TRACE( "- X_CONTEXT_GAME_TYPE = %d", dwContextValue );
+		TRACE( "- X_CONTEXT_GAME_TYPE = %d", dwContextValue );
 
 		sessionDetails.dwGameType = dwContextValue;
 	}
 
 	else if( dwContextId == X_CONTEXT_GAME_MODE )
 	{
-		//TRACE( "- X_CONTEXT_GAME_MODE = %X", dwContextValue );
+		TRACE( "- X_CONTEXT_GAME_MODE = %X", dwContextValue );
 
 		sessionDetails.dwGameMode = dwContextValue;
 	}
@@ -3026,7 +3025,7 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 	if ((dwFlags & XSESSION_CREATE_HOST) > 0)
 	{
 		TRACE("XSessionCreate - XSESSION_CREATE_HOST");
-		isHost = TRUE;
+
 	}
 
 	if ((dwFlags & XSESSION_CREATE_USES_ARBITRATION) > 0)
@@ -3190,7 +3189,7 @@ int WINAPI XOnlineCleanup ()
 // #5312: XFriendsCreateEnumerator
 DWORD WINAPI XFriendsCreateEnumerator (DWORD dwUserIndex, DWORD dwStartingIndex, DWORD dwFriendstoReturn, DWORD *pcbBuffer, HANDLE * phEnum)
 {
-    TRACE("XFriendsCreateEnumerator");
+		TRACE("XFriendsCreateEnumerator");
     
 		if(pcbBuffer) *pcbBuffer = dwFriendstoReturn * sizeof(XCONTENT_DATA);
 		if(phEnum)
@@ -3200,7 +3199,7 @@ DWORD WINAPI XFriendsCreateEnumerator (DWORD dwUserIndex, DWORD dwStartingIndex,
 			TRACE("- Handle = %X", *phEnum);
 		}
 
-		return 0;
+		return ERROR_SUCCESS;
 }
 
 
@@ -3837,6 +3836,7 @@ DWORD WINAPI XUserWriteProfileSettings( DWORD dwUserIndex, DWORD dwNumSettings, 
 // #5338: XPresenceSubscribe
 int WINAPI XPresenceSubscribe(int a1, int a2, int a3)
 {
+	TRACE("XPresenceSubscribe( a1: %08X, a2: %08X, a3: %08X", a1, a2, a3);
 	return 0;
 }
 
@@ -3864,10 +3864,11 @@ DWORD WINAPI XUserReadProfileSettingsByXuid(
 
 
 // #5340 XPresenceCreateEnumerator
-int WINAPI XPresenceCreateEnumerator(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
+int WINAPI XPresenceCreateEnumerator(DWORD dwUserIndex, DWORD cPeers, const XUID *pPeers, DWORD dwStartingIndex,DWORD dwPeersToReturn, DWORD *pcbBuffer, HANDLE *ph)
 {
-	if(a6)
-		*(DWORD *)a6 = 0;
+	TRACE("XPresenceCreateEnumerator(dwUserIndex: %08X, cPeers: %08X)", dwUserIndex, cPeers);
+	if(pcbBuffer)
+		*(DWORD *)pcbBuffer = 0;
 
 	return 1;
 }
@@ -3886,8 +3887,8 @@ DWORD WINAPI XStorageBuildServerPath( DWORD dwUserIndex, XSTORAGE_FACILITY Stora
                                       const void *pvStorageFacilityInfo, DWORD dwStorageFacilityInfoSize,
                                       LPCWSTR *pwszItemName, WCHAR *pwszServerPath, DWORD *pdwServerPathLength )
 {
-	TRACE("XStorageBuildServerPath  (dwUserIndex = %d, StorageFacility = %d, pvStorageFacilityInfo = %X, dwStorageFacilityInfoSize = %X, pwszItemName = %s, pwszServerPath = %X, pdwServerPathLength = %X )",
-		dwUserIndex, StorageFacility, pvStorageFacilityInfo, dwStorageFacilityInfoSize, pwszItemName, pwszServerPath, pdwServerPathLength );
+	//TRACE("XStorageBuildServerPath  (dwUserIndex = %d, StorageFacility = %d, pvStorageFacilityInfo = %X, dwStorageFacilityInfoSize = %X, pwszItemName = %s, pwszServerPath = %X, pdwServerPathLength = %X )",
+	//	dwUserIndex, StorageFacility, pvStorageFacilityInfo, dwStorageFacilityInfoSize, pwszItemName, pwszServerPath, pdwServerPathLength );
 
 
 	if( pwszServerPath )
@@ -3904,7 +3905,7 @@ DWORD WINAPI XStorageBuildServerPath( DWORD dwUserIndex, XSTORAGE_FACILITY Stora
 		*pdwServerPathLength = wcslen( strw ) + 1;
 
 
-		TRACE( "- %s", strw );
+		//TRACE( "- %s", strw );
 	}
 
 	return 0;
@@ -3978,9 +3979,9 @@ DWORD WINAPI XStorageDownloadToMemory( DWORD dwUserIndex, const WCHAR *wszServer
 
 
 // #5346: XLiveLess_5346
-DWORD WINAPI XLiveLess_5346(DWORD a1, LPDWORD pdwResult, DWORD a3, void* a4, PXOVERLAPPED pOverlapped)
+DWORD WINAPI TitleExport_XUserEstimateRankForRating(DWORD a1, LPDWORD pdwResult, DWORD a3, void* a4, PXOVERLAPPED pOverlapped)
 {
-	TRACE("XLiveLess_5346");
+	TRACE("TitleExport_XUserEstimateRankForRating");
 	return 0;
 }
 
@@ -4889,25 +4890,25 @@ DWORD WINAPI XUserAwardGamerPicture(int a1, int a2, int a3, int a4)
 
 
 // #5287
-DWORD WINAPI XLiveLess_5287(int a1, int a2, int a3)
+DWORD WINAPI XUserResetStatsView(int a1, int a2, int a3)
 {
-    TRACE("XLiveLess_5287");
+    TRACE("XUserResetStatsView");
     return 0;
 }
 
 
 // #5291
-DWORD WINAPI XLiveLess_5291(int a1, int a2)
+DWORD WINAPI XUserResetStatsViewAllUsers(int a1, int a2)
 {
-    TRACE("XLiveLess_5291");
+    TRACE("XUserResetStatsViewAllUsers");
     return 0;
 }
 
 
 // #5347
-DWORD WINAPI XLiveLess_5347(int a1, int a2, LPCWSTR lpLibFileName, DWORD dwFlags, HMODULE* a5)
+DWORD WINAPI XLiveProtectedLoadLibrary(int a1, int a2, LPCWSTR lpLibFileName, DWORD dwFlags, HMODULE* a5)
 {
-    TRACE("XLiveLess_5347");
+    TRACE("XLiveProtectedLoadLibrary");
     int result; // eax@2
     HMODULE v6; // eax@3
 
@@ -4927,23 +4928,23 @@ DWORD WINAPI XLiveLess_5347(int a1, int a2, LPCWSTR lpLibFileName, DWORD dwFlags
 
 
 // #5354
-DWORD WINAPI XLiveLess_5354(int a1, int a2)
+DWORD WINAPI XLiveContentVerifyInstalledPackage(int a1, int a2)
 {
-    TRACE("XLiveLess_5354");
+    TRACE(" XLiveContentVerifyInstalledPackage");
     return 0;
 }
 
 
-DWORD WINAPI XLiveLess_5377(int, int, int, int, int, int, int)
+DWORD WINAPI TitleExport_XUserFinderUsers(int a1, int a2, int a3, void* a4, unsigned int a5, unsigned __int8 *a6, PXOVERLAPPED *a7)
 {
-    TRACE("XLiveLess_5377");
+    TRACE("TitleExport_XUserFinderUsers");
     return 1;
 }
 
 
-DWORD WINAPI XLiveLess_5298(int a)
+DWORD WINAPI XLiveGetGuideKey(int pKeyStroke)
 {
-    TRACE("XLiveLess_5298");
+    TRACE("XLiveGetGuideKey(pKeyStroke: %08x)",pKeyStroke);
 
 		// a[0] = x[0]
 		// a[4] = x[4]
@@ -5008,8 +5009,8 @@ DWORD WINAPI XMarketplaceGetImageUrl( char *a1, DWORD a2, DWORD a3, DWORD a4, WC
 // 5028: ??
 DWORD WINAPI XLiveSecureLoadLibraryW( LPCWSTR libFileName, DWORD a2, DWORD dwFlags )
 {
- // TRACE("XLiveSecureLoadLibraryW  (?? - FIXME)  (libFileName = %s, a2 = %X, flags = %X)",
-	//	libFileName, a2, dwFlags );
+  TRACE("XLiveSecureLoadLibraryW  (?? - FIXME)  (libFileName = %s, a2 = %X, flags = %X)",
+		libFileName, a2, dwFlags );
 
 
 	// not done - error now
@@ -5018,13 +5019,13 @@ DWORD WINAPI XLiveSecureLoadLibraryW( LPCWSTR libFileName, DWORD a2, DWORD dwFla
 
 
 // 5230: ??
-DWORD WINAPI XLocatorServerAdvertise( DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6, DWORD a7, DWORD a8, DWORD a9, DWORD a10, DWORD a11, DWORD a12 )
+DWORD WINAPI XLocatorServerAdvertise( DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6, DWORD a7, DWORD a8, DWORD a9, DWORD a10, DWORD a11, DWORD a12, DWORD a13, DWORD a14, DWORD a15 )
 {
   TRACE("XLocatorServerAdvertise  (*** checkme ***)");
 
 
 	// not done - error now
-	return 0x80070057;
+	return S_OK;
 }
 
 
@@ -5040,21 +5041,25 @@ DWORD WINAPI XLocatorServerUnAdvertise( DWORD a1, DWORD a2 )
 
 
 // 5233: ??
-DWORD WINAPI XLocatorGetServiceProperty( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
+DWORD WINAPI XLocatorGetServiceProperty( DWORD dwUserIndex, DWORD cNumProperties, PXUSER_PROPERTY pProperties, DWORD pOverlapped )
 {
-  TRACE("XLocatorGetServiceProperty  (*** checkme ***) (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
-		a1, a2, a3, a4);
+  TRACE("XLocatorGetServiceProperty  (*** checkme ***) (dwUserIndex = %X, cNumProperties = %X, pProperties = %X, pOverlapped = %X)",
+		dwUserIndex, cNumProperties, pProperties, pOverlapped);
 
 
-	// not done - error now
-	return 0x80070057;
+  pProperties[0].value.nData = 1;
+  pProperties[1].value.nData = 3;
+  pProperties[2].value.nData = 3;
+  pProperties[3].value.nData = 7;
+
+	return S_OK;
 }
 
 
 // 5234: ??
 DWORD WINAPI XLocatorCreateServerEnumerator( DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6, DWORD a7, DWORD a8, DWORD a9, DWORD a10 )
 {
-  TRACE("XLocatorCreateServerEnumerator  (*** checkme ***)");
+  TRACE("XLocatorCreateServerEnumerator");
 
 
 	// not done - error now
@@ -5063,9 +5068,9 @@ DWORD WINAPI XLocatorCreateServerEnumerator( DWORD a1, DWORD a2, DWORD a3, DWORD
 
 
 // 5235: ??
-DWORD WINAPI XLiveLess_5235( DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6, DWORD a7, DWORD a8 )
+DWORD WINAPI XLocatorCreateServerEnumeratorByIDs( DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6, DWORD a7, DWORD a8 )
 {
-  TRACE("XLiveLess_5235  (*** checkme ***)");
+  TRACE("XLocatorCreateServerEnumeratorByIDs");
 
 
 	// not done - error now
@@ -5092,15 +5097,14 @@ DWORD WINAPI XLocatorServiceInitialize( DWORD a1, DWORD a2 )
 
 
 	// GFWL offline
-	return 0;
+	return 1;
 }
 
 
 // 5237: ??
-DWORD WINAPI XLiveLess_5237( DWORD a1 )
+DWORD WINAPI XLocatorServiceUnInitialize( DWORD a1 )
 {
-  TRACE("XLiveLess_5237  (*** checkme ***)  (a1 = %X)",
-		a1 );
+  TRACE("XLocatorServiceUnInitialize(a1 = %X)", a1 );
 
 
 	// not done - error now
@@ -5116,43 +5120,43 @@ DWORD WINAPI XLocatorCreateKey( DWORD a1, DWORD a2 )
 
 
 	// GFWL offline
-	return 0;
+	return S_OK;
 }
 
 
 // 5257: ??
-DWORD WINAPI XLiveLess_5257( DWORD a1, DWORD a2, DWORD a3, DWORD dwData )
+DWORD WINAPI XLiveManageCredentials( DWORD a1, DWORD a2, DWORD a3, DWORD dwData )
 {
-  TRACE("XLiveLess_5257  (*** checkme ***) (a1 = %X, a2 = %X, a3 = %X, dwData = %X)",
+  TRACE("XLiveManageCredentials  (*** checkme ***) (a1 = %X, a2 = %X, a3 = %X, dwData = %X)",
 		a1, a2, a3, dwData);
 
 
 	// not done - error now
-	return 0x80070057;
+	return S_OK;
 }
 
 
 // 5288: ??
-DWORD WINAPI XLiveLess_5288( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
+DWORD WINAPI XUserGetProperty( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
 {
-  TRACE("XLiveLess_5288  (*** checkme ***) (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
+  TRACE("XUserGetProperty  (*** checkme ***) (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
 		a1, a2, a3, a4);
 
 
 	// not done - error now
-	return 0x57;
+	return S_OK;
 }
 
 
 // 5289: ??
-DWORD WINAPI XLiveLess_5289( DWORD a1, DWORD a2, DWORD a3 )
+DWORD WINAPI XUserGetContext( DWORD a1, DWORD a2, DWORD a3 )
 {
-  TRACE("XLiveLess_5289  (*** checkme ***) (a1 = %X, a2 = %X, a3 = %X)",
+  TRACE("XUserGetContext  (*** checkme ***) (a1 = %X, a2 = %X, a3 = %X)",
 		a1, a2, a3);
 
 
 	// not done - error now
-	return 0x57;
+	return S_OK;
 }
 
 
@@ -5164,31 +5168,31 @@ DWORD WINAPI XUserGetReputationStars( DWORD a1 )
 
 
 	// not done - error now
-	return 0;
+	return S_OK;
 }
 
 
 // 5296: ??
-DWORD WINAPI XLiveLess_5296( DWORD a1 )
+DWORD WINAPI XLiveGetLocalOnlinePort( DWORD a1 )
 {
-  TRACE("XLiveLess_5296  (*** checkme ***) (a1 = %X)",
+  TRACE("XLiveGetLocalOnlinePort  (*** checkme ***) (a1 = %X)",
 		a1);
 
 
 	// not done - error now
-	return 0x80070057;
+	return S_OK;
 }
 
 
 // 5299: ??
-DWORD WINAPI XLiveLess_5299( DWORD a1 )
+DWORD WINAPI XShowGuideKeyRemapUI( DWORD a1 )
 {
-  TRACE("XLiveLess_5299  (*** checkme ***) (a1 = %X)",
+  TRACE("XShowGuideKeyRemapUI  (*** checkme ***) (a1 = %X)",
 		a1);
 
 
 	// not done - error now
-	return 0x80070057;
+	return S_OK;
 }
 
 
@@ -5243,9 +5247,9 @@ DWORD WINAPI MarketplaceDoesContentIdMatch( CHAR *a1, DWORD a2 )
 
 
 // 5363
-DWORD WINAPI XLiveLess_5363()
+DWORD WINAPI XLiveContentGetLicensePath()
 {
-  TRACE("XLiveLess_5363  (*** checkme ***)");
+  TRACE("XLiveContentGetLicensePath  (*** checkme ***)");
 
 
 	// not done - error now
@@ -5257,7 +5261,7 @@ DWORD WINAPI XLiveLess_5363()
 // 5366
 DWORD WINAPI XShowMarketplaceDownloadItemsUI( DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6 )
 {
-  TRACE("XShowMarketplaceDownloadItemsUI  (*** checkme ***)");
+  TRACE("XShowMarketplaceDownloadItemsUI");
 
 
 	// not done - error now
@@ -5266,9 +5270,9 @@ DWORD WINAPI XShowMarketplaceDownloadItemsUI( DWORD a1, DWORD a2, DWORD a3, DWOR
 
 
 // 5370: ??
-DWORD WINAPI XLiveLess_5370( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
+DWORD WINAPI TitleExport_XMarketplaceConsumeAssets( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
 {
-  TRACE("XLiveLess_5370  (*** checkme ***) (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
+  TRACE("TitleExport_XMarketplaceConsumeAssets (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
 		a1, a2, a3, a4);
 
 
@@ -5278,9 +5282,9 @@ DWORD WINAPI XLiveLess_5370( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
 
 
 // 5371: ??
-DWORD WINAPI XLiveLess_5371( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
+DWORD WINAPI XMarketplaceCreateAssetEnumerator( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
 {
-  TRACE("XLiveLess_5371  (*** checkme ***) (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
+  TRACE("XMarketplaceCreateAssetEnumerator (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
 		a1, a2, a3, a4);
 
 
@@ -5290,9 +5294,9 @@ DWORD WINAPI XLiveLess_5371( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
 
 
 
-DWORD WINAPI XLiveLess_5023( DWORD a1, DWORD a2 )
+DWORD WINAPI XNetGetCurrentAdapter( DWORD a1, DWORD a2 )
 {
-	TRACE( "XLiveLess_5023  (a1 = %X, a2 = %X)",
+	TRACE( "XNetGetCurrentAdapter  (a1 = %X, a2 = %X)",
 		a1, a2 );
 
 
@@ -5301,9 +5305,9 @@ DWORD WINAPI XLiveLess_5023( DWORD a1, DWORD a2 )
 
 
 
-DWORD WINAPI XLiveLess_5025( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
+DWORD WINAPI XLiveGetLiveIdError( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
 {
-	TRACE( "XLiveLess_5025  (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
+	TRACE( "XLiveGetLiveIdError  (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
 		a1, a2, a3, a4 );
 
 
@@ -5312,9 +5316,9 @@ DWORD WINAPI XLiveLess_5025( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
 
 
 
-DWORD WINAPI XLiveLess_5039( DWORD a1 )
+DWORD WINAPI XLiveVerifyDataFile( DWORD a1 )
 {
-	TRACE( "XLiveLess_5039  (a1 = %X)",
+	TRACE( "XLiveVerifyDataFile  (a1 = %X)",
 		a1 );
 
 
@@ -5323,9 +5327,9 @@ DWORD WINAPI XLiveLess_5039( DWORD a1 )
 
 
 
-DWORD WINAPI XLiveLess_5218( DWORD a1 )
+DWORD WINAPI XShowArcadeUI( DWORD a1 )
 {
-	TRACE( "XLiveLess_5218  (a1 = %X)",
+	TRACE( "XShowArcadeUI  (a1 = %X)",
 		a1 );
 
 
@@ -5333,9 +5337,9 @@ DWORD WINAPI XLiveLess_5218( DWORD a1 )
 }
 
 
-DWORD WINAPI XLiveLess_5255( DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5 )
+DWORD WINAPI XEnumerateBack( DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5 )
 {
-	TRACE( "XLiveLess_5255  (a1 = %X, a2 = %X, a3 = %X, a4 = %X, a5 = %X)",
+	TRACE( "XEnumerateBack  (a1 = %X, a2 = %X, a3 = %X, a4 = %X, a5 = %X)",
 		a1, a2, a3, a4, a5 );
 
 
@@ -5343,9 +5347,9 @@ DWORD WINAPI XLiveLess_5255( DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5 )
 }
 
 
-DWORD WINAPI XLiveLess_5341( DWORD a1, DWORD a2, DWORD a3 )
+DWORD WINAPI TitleExport_XPresenceUnsubscribe( DWORD a1, DWORD a2, DWORD a3 )
 {
-	TRACE( "XLiveLess_5341  (a1 = %X, a2 = %X, a3 = %X)",
+	TRACE( "TitleExport_XPresenceUnsubscribe  (a1 = %X, a2 = %X, a3 = %X)",
 		a1, a2, a3 );
 
 
@@ -5353,9 +5357,9 @@ DWORD WINAPI XLiveLess_5341( DWORD a1, DWORD a2, DWORD a3 )
 }
 
 
-DWORD WINAPI XLiveLess_5351( DWORD a1, DWORD a2, DWORD a3 )
+DWORD WINAPI XLiveContentInstallPackage( DWORD a1, DWORD a2, DWORD a3 )
 {
-	TRACE( "XLiveLess_5351  (a1 = %X, a2 = %X, a3 = %X)",
+	TRACE( "XLiveContentInstallPackage  (a1 = %X, a2 = %X, a3 = %X)",
 		a1, a2, a3 );
 
 
@@ -5363,9 +5367,9 @@ DWORD WINAPI XLiveLess_5351( DWORD a1, DWORD a2, DWORD a3 )
 }
 
 
-DWORD WINAPI XLiveLess_5357( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
+DWORD WINAPI XLiveContentGetThumbnail( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
 {
-	TRACE( "XLiveLess_5357  (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
+	TRACE( "XLiveContentGetThumbnail  (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
 		a1, a2, a3, a4);
 
 
@@ -5373,9 +5377,9 @@ DWORD WINAPI XLiveLess_5357( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
 }
 
 
-DWORD WINAPI XLiveLess_5358( DWORD a1, DWORD a2, DWORD a3 )
+DWORD WINAPI XLiveContentInstallLicense( DWORD a1, DWORD a2, DWORD a3 )
 {
-	TRACE( "XLiveLess_5358  (a1 = %X, a2 = %X, a3 = %X)",
+	TRACE( "XLiveContentInstallLicense  (a1 = %X, a2 = %X, a3 = %X)",
 		a1, a2, a3);
 
 
@@ -5383,14 +5387,19 @@ DWORD WINAPI XLiveLess_5358( DWORD a1, DWORD a2, DWORD a3 )
 }
 
 
-DWORD WINAPI XLiveLess_5359( DWORD a1 )
+DWORD WINAPI XLiveGetUPnPState( DWORD a1 )
 {
-	TRACE( "XLiveLess_5359  (a1 = %X)", a1 );
+	TRACE( "XLiveGetUPnPState  (a1 = %X)", a1 );
 
 
 	return 0;
 }
 
+DWORD WINAPI TitleExport_XUserFindUsers(int, int, int, int, int, int, int)
+{
+	TRACE("TitleExport_XUserFindUsers");
+	return 1;
+}
 
 
 // === end of xlive functions ===

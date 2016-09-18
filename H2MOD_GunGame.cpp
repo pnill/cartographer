@@ -116,11 +116,14 @@ void GunGame::SpawnPlayer(int PlayerIndex)
 	int unit_datum_index = h2mod->get_unit_datum_from_player_index(PlayerIndex);
 
 	int unit_object = call_get_object(unit_datum_index, 3);
+
+
+
 	TRACE("[GunGame]: SpawnPlayer - unit_object: %08X", unit_object);
 
 	if (unit_object)
 	{
-
+		*(BYTE*)((BYTE*)unit_object + 0x13C) = 0;
 		int level = this->player_level[PlayerIndex];
 		TRACE("[GunGame]: SpawnPlayer - Level: %i", level);
 

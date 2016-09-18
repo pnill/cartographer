@@ -23,3 +23,12 @@ Debug/binkw32.lib
 *.java
 Debug/RCa10868
 Debug/xliveless.res
+*.lib
+Debug/RCa22592
+Debug/Resource.res
+*.suo
+version.txt
+*.opendb
+xliveless.aps
+/Release
+/Debug

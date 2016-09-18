@@ -1,6 +1,9 @@
 //#include <windows.h>
 #include <d3d9.h>
 #include <d3dx9.h>
+#include <iostream>
+#include <memory>
+
 //#include <OSHGui.hpp>
 //#include <Drawing/Direct3D9/Direct3D9Renderer.hpp>
 //#include <Input/WindowsMessage.hpp>
@@ -9,7 +12,10 @@
 #include "xliveless.h"
 #include "cartographer_main.hpp"
 
+
+
 extern void InitInstance();
+
 
 
 typedef struct _XLIVE_INITIALIZE_INFO {
@@ -36,14 +42,13 @@ typedef struct XLIVE_INPUT_INFO  {
 
 LPDIRECT3DDEVICE9 pDevice;
 D3DPRESENT_PARAMETERS *pD3DPP;
-LPD3DXFONT pFont;
+
 IDirect3DTexture9* Primitive = NULL;
 
-//using namespace OSHGui;
-//using namespace OSHGui::Drawing;
-//Input::WindowsMessage input;
-
 char* BuildText;
+extern char* ServerStatus;
+extern int MasterState;
+
 const char CompileDate[] = __DATE__;
 const char CompileTime[] = __TIME__;
 
@@ -71,67 +76,65 @@ BOOL bIsCreated, bNeedsFlush;
 DWORD dwOldFVF;
 LPD3DXSPRITE pSprite;
 
+bool lowFPSmode;
+float lastPresentTime;
+float lastRenderTime;
+static LARGE_INTEGER timerFreq;
+static LARGE_INTEGER counterAtStart;
+
+float getElapsedTime(void) {
+	LARGE_INTEGER c;
+	QueryPerformanceCounter(&c);
+	return (float)((c.QuadPart - counterAtStart.QuadPart) * 1000.0f / (float)timerFreq.QuadPart);
+}
+
+
+void frameTimeManagement() {
+	float renderTime = getElapsedTime() - lastPresentTime;
+
+	// implement FPS threshold
+	//float thresholdRenderTime = (1000.0f / 28) + 0.2f;
+	//if (renderTime > thresholdRenderTime) lowFPSmode = true;
+	//else if (renderTime < thresholdRenderTime - 1.0f) lowFPSmode = false;
+
+	// implement FPS cap
+	
+		float desiredRenderTime = (1000.0f / 58) - 0.2f;
+		while (renderTime < desiredRenderTime) {
+			SwitchToThread();
+			renderTime = getElapsedTime() - lastPresentTime;
+		}
+		lastPresentTime = getElapsedTime();
+	
+}
+
+DWORD dwPresent;
+typedef HRESULT(WINAPI* tPresent)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion);
+tPresent pPresent;
+
+HRESULT hkPresent(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)
+{
+	//DSFix FPS Hax - https://github.com/PeterTh/dsfix/blob/d10fc7ad0a72da0585b5f5f71b03daddc37ef890/RenderstateManager.cpp
+	frameTimeManagement();
+
+	return pPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+}
 
 void GUI::Initialize()
 {
 	initFontsIfRequired();
-
-
-
-	/*auto renderer = std::unique_ptr<Direct3D9Renderer>(new Direct3D9Renderer(pDevice));
-	
-	Application::Initialize(std::move(renderer));
-
-	auto &app = Application::Instance();
-
-	auto font = FontManager::LoadFont("Arial", 8.0f, false);
-	app.SetDefaultFont(font);
-	
-	auto form = std::make_shared<cartographer_main>();
-
-	app.Run(form);
-
-	app.Disable();
-
-	app.RegisterHotkey(Hotkey(Key::Home, []
-	{
-		Application::Instance().Toggle();
-	}));
-	*/
-
-
 }
 
 // #5001
 
 int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 {
-	static int print = 0;
-	if (print < 15)
-	{
-		//	TRACE("XLiveInput  (a1 = %X) (00 = %X, 04 = %X, 08 = %X, 0C = %X, 10 = %X, 14 = %X, 18 = %X",
-		//		a1,
-		//		a1[0], a1[1], a1[2], a1[3], a1[4], a1[5], a1[6] );
-
-		print++;
-	}
-
-
-
-
-
 	return 1;
 }
 
 // #5030: XLivePreTranslateMessage
 int WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 {
-
-	//if (input.ProcessMessage(lpMsg))
-	//{
-	//	return true;
-	//}
-
 	return 0;
 }
 // #5000: XLiveInitialize
@@ -139,22 +142,24 @@ int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 {
 		InitInstance();
 		TRACE("XLiveInitialize()");
+		lastRenderTime = 0.0f;
+		QueryPerformanceFrequency(&timerFreq);
+		QueryPerformanceCounter(&counterAtStart);
 
 		if (!h2mod->Server)
 		{
 			//TRACE("XLiveInitialize  (pPii = %X)", pPii);
 			pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
 			pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
-			BuildText = new char[255];
-			sprintf(BuildText, "Project Cartographer (v0.1a) - Build Time: %s %s", CompileDate, CompileTime);
 
+			//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice + 17);
+			//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
 
-			D3DVIEWPORT9 pViewPort;
-			pDevice->GetViewport(&pViewPort);
+			//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
 
-			verticalRes = pViewPort.Height;
-			horizontalRes = pViewPort.Width;
-
+			BuildText = new char[250];
+			sprintf(BuildText, "Project Cartographer (v0.2a) - Build Time: %s %s", CompileDate, CompileTime);
+	
 			GUI::Initialize();
 		}
 		
@@ -171,6 +176,11 @@ int WINAPI XLiveOnCreateDevice(IDirect3DDevice9 *pD3D, VOID* vD3DPP)
 {
 	pDevice = pD3D;
 	pD3DPP = (D3DPRESENT_PARAMETERS*)vD3DPP;
+
+	//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice+17);
+	//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
+	//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
+
 	//TRACE("XLiveOnCreateDevice  (pD3D = %X, pD3DPP = %X)", pD3D, vD3DPP);
 	return 0;
 }
@@ -195,6 +205,10 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 // #5006 XLiveOnDestroyDevice
 HRESULT WINAPI XLiveOnDestroyDevice()
 {
+	largeSizeFont->Release();
+	normalSizeFont->Release();
+	smallFont->Release();
+
 	//TRACE("XLiveOnDestroyDevice");
 	return S_OK;
 }
@@ -309,12 +323,20 @@ int WINAPI XLiveRender()
 	
 	if (pDevice)
 	{	
-		if (pDevice->TestCooperativeLevel() == D3D_OK)
+		if (pDevice->TestCooperativeLevel() == D3D_OK && MasterState != 4)
 		{
 			drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
+			if (MasterState == 0)
+				drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
+			else if (MasterState == 1)
+				drawText(0, 15, COLOR_GREY, ServerStatus, smallFont);
+			else if (MasterState == 2)
+				drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
+			else if (MasterState == 3)
+				drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
 		}
 			
-
+		frameTimeManagement();
 	}
 
 	return 0;

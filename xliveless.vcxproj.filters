@@ -84,6 +84,9 @@
     <ClCompile Include="H2MOD_GunGame.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD_Infection.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -125,6 +128,12 @@
     <ClInclude Include="H2MOD_GunGame.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD_Infection.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def">
@@ -134,6 +143,9 @@
   <ItemGroup>
     <ResourceCompile Include="xliveless.rc">
       <Filter>Source Files\xlive</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Source Files</Filter>
     </ResourceCompile>
   </ItemGroup>
 </Project>

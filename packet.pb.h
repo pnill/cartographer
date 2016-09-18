@@ -33,22 +33,23 @@ void protobuf_AssignDesc_packet_2eproto();
 void protobuf_ShutdownFile_packet_2eproto();
 
 class Packet;
-class local_confirm;
+class login_request;
+class login_reply;
 class secure_request;
 class secure_reply;
 class xnaddr_request;
 class xnaddr_reply;
 
 enum Packet_Type {
-  Packet_Type_local_request = 1,
-  Packet_Type_local_confirm = 2,
-  Packet_Type_secure_request = 3,
-  Packet_Type_secure_reply = 4,
-  Packet_Type_xnaddr_request = 5,
-  Packet_Type_xnaddr_reply = 6
+  Packet_Type_login_request = 2,
+  Packet_Type_login_reply = 3,
+  Packet_Type_secure_request = 4,
+  Packet_Type_secure_reply = 5,
+  Packet_Type_xnaddr_request = 6,
+  Packet_Type_xnaddr_reply = 7
 };
 bool Packet_Type_IsValid(int value);
-const Packet_Type Packet_Type_Type_MIN = Packet_Type_local_request;
+const Packet_Type Packet_Type_Type_MIN = Packet_Type_login_request;
 const Packet_Type Packet_Type_Type_MAX = Packet_Type_xnaddr_reply;
 const int Packet_Type_Type_ARRAYSIZE = Packet_Type_Type_MAX + 1;
 
@@ -116,8 +117,8 @@ class Packet : public ::google::protobuf::Message {
   // nested types ----------------------------------------------------
 
   typedef Packet_Type Type;
-  static const Type local_request = Packet_Type_local_request;
-  static const Type local_confirm = Packet_Type_local_confirm;
+  static const Type login_request = Packet_Type_login_request;
+  static const Type login_reply = Packet_Type_login_reply;
   static const Type secure_request = Packet_Type_secure_request;
   static const Type secure_reply = Packet_Type_secure_reply;
   static const Type xnaddr_request = Packet_Type_xnaddr_request;
@@ -152,46 +153,55 @@ class Packet : public ::google::protobuf::Message {
   inline ::Packet_Type type() const;
   inline void set_type(::Packet_Type value);
 
-  // optional .local_confirm lconfirm = 2;
-  inline bool has_lconfirm() const;
-  inline void clear_lconfirm();
-  static const int kLconfirmFieldNumber = 2;
-  inline const ::local_confirm& lconfirm() const;
-  inline ::local_confirm* mutable_lconfirm();
-  inline ::local_confirm* release_lconfirm();
-  inline void set_allocated_lconfirm(::local_confirm* lconfirm);
+  // optional .login_request lrequest = 2;
+  inline bool has_lrequest() const;
+  inline void clear_lrequest();
+  static const int kLrequestFieldNumber = 2;
+  inline const ::login_request& lrequest() const;
+  inline ::login_request* mutable_lrequest();
+  inline ::login_request* release_lrequest();
+  inline void set_allocated_lrequest(::login_request* lrequest);
 
-  // optional .secure_request srequest = 3;
+  // optional .login_reply lreply = 3;
+  inline bool has_lreply() const;
+  inline void clear_lreply();
+  static const int kLreplyFieldNumber = 3;
+  inline const ::login_reply& lreply() const;
+  inline ::login_reply* mutable_lreply();
+  inline ::login_reply* release_lreply();
+  inline void set_allocated_lreply(::login_reply* lreply);
+
+  // optional .secure_request srequest = 4;
   inline bool has_srequest() const;
   inline void clear_srequest();
-  static const int kSrequestFieldNumber = 3;
+  static const int kSrequestFieldNumber = 4;
   inline const ::secure_request& srequest() const;
   inline ::secure_request* mutable_srequest();
   inline ::secure_request* release_srequest();
   inline void set_allocated_srequest(::secure_request* srequest);
 
-  // optional .secure_reply sreply = 4;
+  // optional .secure_reply sreply = 5;
   inline bool has_sreply() const;
   inline void clear_sreply();
-  static const int kSreplyFieldNumber = 4;
+  static const int kSreplyFieldNumber = 5;
   inline const ::secure_reply& sreply() const;
   inline ::secure_reply* mutable_sreply();
   inline ::secure_reply* release_sreply();
   inline void set_allocated_sreply(::secure_reply* sreply);
 
-  // optional .xnaddr_request xrequest = 5;
+  // optional .xnaddr_request xrequest = 6;
   inline bool has_xrequest() const;
   inline void clear_xrequest();
-  static const int kXrequestFieldNumber = 5;
+  static const int kXrequestFieldNumber = 6;
   inline const ::xnaddr_request& xrequest() const;
   inline ::xnaddr_request* mutable_xrequest();
   inline ::xnaddr_request* release_xrequest();
   inline void set_allocated_xrequest(::xnaddr_request* xrequest);
 
-  // optional .xnaddr_reply xreply = 6;
+  // optional .xnaddr_reply xreply = 7;
   inline bool has_xreply() const;
   inline void clear_xreply();
-  static const int kXreplyFieldNumber = 6;
+  static const int kXreplyFieldNumber = 7;
   inline const ::xnaddr_reply& xreply() const;
   inline ::xnaddr_reply* mutable_xreply();
   inline ::xnaddr_reply* release_xreply();
@@ -201,8 +211,10 @@ class Packet : public ::google::protobuf::Message {
  private:
   inline void set_has_type();
   inline void clear_has_type();
-  inline void set_has_lconfirm();
-  inline void clear_has_lconfirm();
+  inline void set_has_lrequest();
+  inline void clear_has_lrequest();
+  inline void set_has_lreply();
+  inline void clear_has_lreply();
   inline void set_has_srequest();
   inline void clear_has_srequest();
   inline void set_has_sreply();
@@ -216,7 +228,8 @@ class Packet : public ::google::protobuf::Message {
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  ::local_confirm* lconfirm_;
+  ::login_request* lrequest_;
+  ::login_reply* lreply_;
   ::secure_request* srequest_;
   ::secure_reply* sreply_;
   ::xnaddr_request* xrequest_;
@@ -231,14 +244,14 @@ class Packet : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class local_confirm : public ::google::protobuf::Message {
+class login_request : public ::google::protobuf::Message {
  public:
-  local_confirm();
-  virtual ~local_confirm();
+  login_request();
+  virtual ~login_request();
 
-  local_confirm(const local_confirm& from);
+  login_request(const login_request& from);
 
-  inline local_confirm& operator=(const local_confirm& from) {
+  inline login_request& operator=(const login_request& from) {
     CopyFrom(from);
     return *this;
   }
@@ -252,17 +265,111 @@ class local_confirm : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const local_confirm& default_instance();
+  static const login_request& default_instance();
 
-  void Swap(local_confirm* other);
+  void Swap(login_request* other);
 
   // implements Message ----------------------------------------------
 
-  local_confirm* New() const;
+  login_request* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const local_confirm& from);
-  void MergeFrom(const local_confirm& from);
+  void CopyFrom(const login_request& from);
+  void MergeFrom(const login_request& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required bytes login_token = 1;
+  inline bool has_login_token() const;
+  inline void clear_login_token();
+  static const int kLoginTokenFieldNumber = 1;
+  inline const ::std::string& login_token() const;
+  inline void set_login_token(const ::std::string& value);
+  inline void set_login_token(const char* value);
+  inline void set_login_token(const void* value, size_t size);
+  inline ::std::string* mutable_login_token();
+  inline ::std::string* release_login_token();
+  inline void set_allocated_login_token(::std::string* login_token);
+
+  // required uint32 port = 2;
+  inline bool has_port() const;
+  inline void clear_port();
+  static const int kPortFieldNumber = 2;
+  inline ::google::protobuf::uint32 port() const;
+  inline void set_port(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:login_request)
+ private:
+  inline void set_has_login_token();
+  inline void clear_has_login_token();
+  inline void set_has_port();
+  inline void clear_has_port();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::std::string* login_token_;
+  ::google::protobuf::uint32 port_;
+  friend void  protobuf_AddDesc_packet_2eproto();
+  friend void protobuf_AssignDesc_packet_2eproto();
+  friend void protobuf_ShutdownFile_packet_2eproto();
+
+  void InitAsDefaultInstance();
+  static login_request* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class login_reply : public ::google::protobuf::Message {
+ public:
+  login_reply();
+  virtual ~login_reply();
+
+  login_reply(const login_reply& from);
+
+  inline login_reply& operator=(const login_reply& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const login_reply& default_instance();
+
+  void Swap(login_reply* other);
+
+  // implements Message ----------------------------------------------
+
+  login_reply* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const login_reply& from);
+  void MergeFrom(const login_reply& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -329,7 +436,26 @@ class local_confirm : public ::google::protobuf::Message {
   inline ::std::string* release_abonline();
   inline void set_allocated_abonline(::std::string* abonline);
 
-  // @@protoc_insertion_point(class_scope:local_confirm)
+  // required int64 xuid = 6;
+  inline bool has_xuid() const;
+  inline void clear_xuid();
+  static const int kXuidFieldNumber = 6;
+  inline ::google::protobuf::int64 xuid() const;
+  inline void set_xuid(::google::protobuf::int64 value);
+
+  // required bytes username = 7;
+  inline bool has_username() const;
+  inline void clear_username();
+  static const int kUsernameFieldNumber = 7;
+  inline const ::std::string& username() const;
+  inline void set_username(const ::std::string& value);
+  inline void set_username(const char* value);
+  inline void set_username(const void* value, size_t size);
+  inline ::std::string* mutable_username();
+  inline ::std::string* release_username();
+  inline void set_allocated_username(::std::string* username);
+
+  // @@protoc_insertion_point(class_scope:login_reply)
  private:
   inline void set_has_secure_addr();
   inline void clear_has_secure_addr();
@@ -341,6 +467,10 @@ class local_confirm : public ::google::protobuf::Message {
   inline void clear_has_abenet();
   inline void set_has_abonline();
   inline void clear_has_abonline();
+  inline void set_has_xuid();
+  inline void clear_has_xuid();
+  inline void set_has_username();
+  inline void clear_has_username();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -350,13 +480,15 @@ class local_confirm : public ::google::protobuf::Message {
   ::google::protobuf::uint32 xnaddr_;
   ::std::string* abenet_;
   ::std::string* abonline_;
+  ::google::protobuf::int64 xuid_;
+  ::std::string* username_;
   ::google::protobuf::int32 port_;
   friend void  protobuf_AddDesc_packet_2eproto();
   friend void protobuf_AssignDesc_packet_2eproto();
   friend void protobuf_ShutdownFile_packet_2eproto();
 
   void InitAsDefaultInstance();
-  static local_confirm* default_instance_;
+  static login_reply* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -787,7 +919,7 @@ inline void Packet::clear_has_type() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void Packet::clear_type() {
-  type_ = 1;
+  type_ = 2;
   clear_has_type();
 }
 inline ::Packet_Type Packet::type() const {
@@ -801,56 +933,97 @@ inline void Packet::set_type(::Packet_Type value) {
   // @@protoc_insertion_point(field_set:Packet.type)
 }
 
-// optional .local_confirm lconfirm = 2;
-inline bool Packet::has_lconfirm() const {
+// optional .login_request lrequest = 2;
+inline bool Packet::has_lrequest() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void Packet::set_has_lconfirm() {
+inline void Packet::set_has_lrequest() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void Packet::clear_has_lconfirm() {
+inline void Packet::clear_has_lrequest() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void Packet::clear_lconfirm() {
-  if (lconfirm_ != NULL) lconfirm_->::local_confirm::Clear();
-  clear_has_lconfirm();
+inline void Packet::clear_lrequest() {
+  if (lrequest_ != NULL) lrequest_->::login_request::Clear();
+  clear_has_lrequest();
 }
-inline const ::local_confirm& Packet::lconfirm() const {
-  // @@protoc_insertion_point(field_get:Packet.lconfirm)
-  return lconfirm_ != NULL ? *lconfirm_ : *default_instance_->lconfirm_;
+inline const ::login_request& Packet::lrequest() const {
+  // @@protoc_insertion_point(field_get:Packet.lrequest)
+  return lrequest_ != NULL ? *lrequest_ : *default_instance_->lrequest_;
 }
-inline ::local_confirm* Packet::mutable_lconfirm() {
-  set_has_lconfirm();
-  if (lconfirm_ == NULL) lconfirm_ = new ::local_confirm;
-  // @@protoc_insertion_point(field_mutable:Packet.lconfirm)
-  return lconfirm_;
+inline ::login_request* Packet::mutable_lrequest() {
+  set_has_lrequest();
+  if (lrequest_ == NULL) lrequest_ = new ::login_request;
+  // @@protoc_insertion_point(field_mutable:Packet.lrequest)
+  return lrequest_;
 }
-inline ::local_confirm* Packet::release_lconfirm() {
-  clear_has_lconfirm();
-  ::local_confirm* temp = lconfirm_;
-  lconfirm_ = NULL;
+inline ::login_request* Packet::release_lrequest() {
+  clear_has_lrequest();
+  ::login_request* temp = lrequest_;
+  lrequest_ = NULL;
   return temp;
 }
-inline void Packet::set_allocated_lconfirm(::local_confirm* lconfirm) {
-  delete lconfirm_;
-  lconfirm_ = lconfirm;
-  if (lconfirm) {
-    set_has_lconfirm();
+inline void Packet::set_allocated_lrequest(::login_request* lrequest) {
+  delete lrequest_;
+  lrequest_ = lrequest;
+  if (lrequest) {
+    set_has_lrequest();
   } else {
-    clear_has_lconfirm();
+    clear_has_lrequest();
   }
-  // @@protoc_insertion_point(field_set_allocated:Packet.lconfirm)
+  // @@protoc_insertion_point(field_set_allocated:Packet.lrequest)
 }
 
-// optional .secure_request srequest = 3;
-inline bool Packet::has_srequest() const {
+// optional .login_reply lreply = 3;
+inline bool Packet::has_lreply() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void Packet::set_has_srequest() {
+inline void Packet::set_has_lreply() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void Packet::clear_has_srequest() {
+inline void Packet::clear_has_lreply() {
   _has_bits_[0] &= ~0x00000004u;
+}
+inline void Packet::clear_lreply() {
+  if (lreply_ != NULL) lreply_->::login_reply::Clear();
+  clear_has_lreply();
+}
+inline const ::login_reply& Packet::lreply() const {
+  // @@protoc_insertion_point(field_get:Packet.lreply)
+  return lreply_ != NULL ? *lreply_ : *default_instance_->lreply_;
+}
+inline ::login_reply* Packet::mutable_lreply() {
+  set_has_lreply();
+  if (lreply_ == NULL) lreply_ = new ::login_reply;
+  // @@protoc_insertion_point(field_mutable:Packet.lreply)
+  return lreply_;
+}
+inline ::login_reply* Packet::release_lreply() {
+  clear_has_lreply();
+  ::login_reply* temp = lreply_;
+  lreply_ = NULL;
+  return temp;
+}
+inline void Packet::set_allocated_lreply(::login_reply* lreply) {
+  delete lreply_;
+  lreply_ = lreply;
+  if (lreply) {
+    set_has_lreply();
+  } else {
+    clear_has_lreply();
+  }
+  // @@protoc_insertion_point(field_set_allocated:Packet.lreply)
+}
+
+// optional .secure_request srequest = 4;
+inline bool Packet::has_srequest() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void Packet::set_has_srequest() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void Packet::clear_has_srequest() {
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline void Packet::clear_srequest() {
   if (srequest_ != NULL) srequest_->::secure_request::Clear();
@@ -883,15 +1056,15 @@ inline void Packet::set_allocated_srequest(::secure_request* srequest) {
   // @@protoc_insertion_point(field_set_allocated:Packet.srequest)
 }
 
-// optional .secure_reply sreply = 4;
+// optional .secure_reply sreply = 5;
 inline bool Packet::has_sreply() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
+  return (_has_bits_[0] & 0x00000010u) != 0;
 }
 inline void Packet::set_has_sreply() {
-  _has_bits_[0] |= 0x00000008u;
+  _has_bits_[0] |= 0x00000010u;
 }
 inline void Packet::clear_has_sreply() {
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void Packet::clear_sreply() {
   if (sreply_ != NULL) sreply_->::secure_reply::Clear();
@@ -924,15 +1097,15 @@ inline void Packet::set_allocated_sreply(::secure_reply* sreply) {
   // @@protoc_insertion_point(field_set_allocated:Packet.sreply)
 }
 
-// optional .xnaddr_request xrequest = 5;
+// optional .xnaddr_request xrequest = 6;
 inline bool Packet::has_xrequest() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
+  return (_has_bits_[0] & 0x00000020u) != 0;
 }
 inline void Packet::set_has_xrequest() {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000020u;
 }
 inline void Packet::clear_has_xrequest() {
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline void Packet::clear_xrequest() {
   if (xrequest_ != NULL) xrequest_->::xnaddr_request::Clear();
@@ -965,15 +1138,15 @@ inline void Packet::set_allocated_xrequest(::xnaddr_request* xrequest) {
   // @@protoc_insertion_point(field_set_allocated:Packet.xrequest)
 }
 
-// optional .xnaddr_reply xreply = 6;
+// optional .xnaddr_reply xreply = 7;
 inline bool Packet::has_xreply() const {
-  return (_has_bits_[0] & 0x00000020u) != 0;
+  return (_has_bits_[0] & 0x00000040u) != 0;
 }
 inline void Packet::set_has_xreply() {
-  _has_bits_[0] |= 0x00000020u;
+  _has_bits_[0] |= 0x00000040u;
 }
 inline void Packet::clear_has_xreply() {
-  _has_bits_[0] &= ~0x00000020u;
+  _has_bits_[0] &= ~0x00000040u;
 }
 inline void Packet::clear_xreply() {
   if (xreply_ != NULL) xreply_->::xnaddr_reply::Clear();
@@ -1008,133 +1181,237 @@ inline void Packet::set_allocated_xreply(::xnaddr_reply* xreply) {
 
 // -------------------------------------------------------------------
 
-// local_confirm
+// login_request
 
-// required uint32 secure_addr = 1;
-inline bool local_confirm::has_secure_addr() const {
+// required bytes login_token = 1;
+inline bool login_request::has_login_token() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void local_confirm::set_has_secure_addr() {
+inline void login_request::set_has_login_token() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void local_confirm::clear_has_secure_addr() {
+inline void login_request::clear_has_login_token() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void local_confirm::clear_secure_addr() {
+inline void login_request::clear_login_token() {
+  if (login_token_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    login_token_->clear();
+  }
+  clear_has_login_token();
+}
+inline const ::std::string& login_request::login_token() const {
+  // @@protoc_insertion_point(field_get:login_request.login_token)
+  return *login_token_;
+}
+inline void login_request::set_login_token(const ::std::string& value) {
+  set_has_login_token();
+  if (login_token_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    login_token_ = new ::std::string;
+  }
+  login_token_->assign(value);
+  // @@protoc_insertion_point(field_set:login_request.login_token)
+}
+inline void login_request::set_login_token(const char* value) {
+  set_has_login_token();
+  if (login_token_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    login_token_ = new ::std::string;
+  }
+  login_token_->assign(value);
+  // @@protoc_insertion_point(field_set_char:login_request.login_token)
+}
+inline void login_request::set_login_token(const void* value, size_t size) {
+  set_has_login_token();
+  if (login_token_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    login_token_ = new ::std::string;
+  }
+  login_token_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:login_request.login_token)
+}
+inline ::std::string* login_request::mutable_login_token() {
+  set_has_login_token();
+  if (login_token_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    login_token_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:login_request.login_token)
+  return login_token_;
+}
+inline ::std::string* login_request::release_login_token() {
+  clear_has_login_token();
+  if (login_token_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = login_token_;
+    login_token_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void login_request::set_allocated_login_token(::std::string* login_token) {
+  if (login_token_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete login_token_;
+  }
+  if (login_token) {
+    set_has_login_token();
+    login_token_ = login_token;
+  } else {
+    clear_has_login_token();
+    login_token_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:login_request.login_token)
+}
+
+// required uint32 port = 2;
+inline bool login_request::has_port() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void login_request::set_has_port() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void login_request::clear_has_port() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void login_request::clear_port() {
+  port_ = 0u;
+  clear_has_port();
+}
+inline ::google::protobuf::uint32 login_request::port() const {
+  // @@protoc_insertion_point(field_get:login_request.port)
+  return port_;
+}
+inline void login_request::set_port(::google::protobuf::uint32 value) {
+  set_has_port();
+  port_ = value;
+  // @@protoc_insertion_point(field_set:login_request.port)
+}
+
+// -------------------------------------------------------------------
+
+// login_reply
+
+// required uint32 secure_addr = 1;
+inline bool login_reply::has_secure_addr() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void login_reply::set_has_secure_addr() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void login_reply::clear_has_secure_addr() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void login_reply::clear_secure_addr() {
   secure_addr_ = 0u;
   clear_has_secure_addr();
 }
-inline ::google::protobuf::uint32 local_confirm::secure_addr() const {
-  // @@protoc_insertion_point(field_get:local_confirm.secure_addr)
+inline ::google::protobuf::uint32 login_reply::secure_addr() const {
+  // @@protoc_insertion_point(field_get:login_reply.secure_addr)
   return secure_addr_;
 }
-inline void local_confirm::set_secure_addr(::google::protobuf::uint32 value) {
+inline void login_reply::set_secure_addr(::google::protobuf::uint32 value) {
   set_has_secure_addr();
   secure_addr_ = value;
-  // @@protoc_insertion_point(field_set:local_confirm.secure_addr)
+  // @@protoc_insertion_point(field_set:login_reply.secure_addr)
 }
 
 // required uint32 xnaddr = 2;
-inline bool local_confirm::has_xnaddr() const {
+inline bool login_reply::has_xnaddr() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void local_confirm::set_has_xnaddr() {
+inline void login_reply::set_has_xnaddr() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void local_confirm::clear_has_xnaddr() {
+inline void login_reply::clear_has_xnaddr() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void local_confirm::clear_xnaddr() {
+inline void login_reply::clear_xnaddr() {
   xnaddr_ = 0u;
   clear_has_xnaddr();
 }
-inline ::google::protobuf::uint32 local_confirm::xnaddr() const {
-  // @@protoc_insertion_point(field_get:local_confirm.xnaddr)
+inline ::google::protobuf::uint32 login_reply::xnaddr() const {
+  // @@protoc_insertion_point(field_get:login_reply.xnaddr)
   return xnaddr_;
 }
-inline void local_confirm::set_xnaddr(::google::protobuf::uint32 value) {
+inline void login_reply::set_xnaddr(::google::protobuf::uint32 value) {
   set_has_xnaddr();
   xnaddr_ = value;
-  // @@protoc_insertion_point(field_set:local_confirm.xnaddr)
+  // @@protoc_insertion_point(field_set:login_reply.xnaddr)
 }
 
 // required int32 port = 3;
-inline bool local_confirm::has_port() const {
+inline bool login_reply::has_port() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void local_confirm::set_has_port() {
+inline void login_reply::set_has_port() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void local_confirm::clear_has_port() {
+inline void login_reply::clear_has_port() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void local_confirm::clear_port() {
+inline void login_reply::clear_port() {
   port_ = 0;
   clear_has_port();
 }
-inline ::google::protobuf::int32 local_confirm::port() const {
-  // @@protoc_insertion_point(field_get:local_confirm.port)
+inline ::google::protobuf::int32 login_reply::port() const {
+  // @@protoc_insertion_point(field_get:login_reply.port)
   return port_;
 }
-inline void local_confirm::set_port(::google::protobuf::int32 value) {
+inline void login_reply::set_port(::google::protobuf::int32 value) {
   set_has_port();
   port_ = value;
-  // @@protoc_insertion_point(field_set:local_confirm.port)
+  // @@protoc_insertion_point(field_set:login_reply.port)
 }
 
 // required bytes abEnet = 4;
-inline bool local_confirm::has_abenet() const {
+inline bool login_reply::has_abenet() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void local_confirm::set_has_abenet() {
+inline void login_reply::set_has_abenet() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void local_confirm::clear_has_abenet() {
+inline void login_reply::clear_has_abenet() {
   _has_bits_[0] &= ~0x00000008u;
 }
-inline void local_confirm::clear_abenet() {
+inline void login_reply::clear_abenet() {
   if (abenet_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     abenet_->clear();
   }
   clear_has_abenet();
 }
-inline const ::std::string& local_confirm::abenet() const {
-  // @@protoc_insertion_point(field_get:local_confirm.abEnet)
+inline const ::std::string& login_reply::abenet() const {
+  // @@protoc_insertion_point(field_get:login_reply.abEnet)
   return *abenet_;
 }
-inline void local_confirm::set_abenet(const ::std::string& value) {
+inline void login_reply::set_abenet(const ::std::string& value) {
   set_has_abenet();
   if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     abenet_ = new ::std::string;
   }
   abenet_->assign(value);
-  // @@protoc_insertion_point(field_set:local_confirm.abEnet)
+  // @@protoc_insertion_point(field_set:login_reply.abEnet)
 }
-inline void local_confirm::set_abenet(const char* value) {
+inline void login_reply::set_abenet(const char* value) {
   set_has_abenet();
   if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     abenet_ = new ::std::string;
   }
   abenet_->assign(value);
-  // @@protoc_insertion_point(field_set_char:local_confirm.abEnet)
+  // @@protoc_insertion_point(field_set_char:login_reply.abEnet)
 }
-inline void local_confirm::set_abenet(const void* value, size_t size) {
+inline void login_reply::set_abenet(const void* value, size_t size) {
   set_has_abenet();
   if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     abenet_ = new ::std::string;
   }
   abenet_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:local_confirm.abEnet)
+  // @@protoc_insertion_point(field_set_pointer:login_reply.abEnet)
 }
-inline ::std::string* local_confirm::mutable_abenet() {
+inline ::std::string* login_reply::mutable_abenet() {
   set_has_abenet();
   if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     abenet_ = new ::std::string;
   }
-  // @@protoc_insertion_point(field_mutable:local_confirm.abEnet)
+  // @@protoc_insertion_point(field_mutable:login_reply.abEnet)
   return abenet_;
 }
-inline ::std::string* local_confirm::release_abenet() {
+inline ::std::string* login_reply::release_abenet() {
   clear_has_abenet();
   if (abenet_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     return NULL;
@@ -1144,7 +1421,7 @@ inline ::std::string* local_confirm::release_abenet() {
     return temp;
   }
 }
-inline void local_confirm::set_allocated_abenet(::std::string* abenet) {
+inline void login_reply::set_allocated_abenet(::std::string* abenet) {
   if (abenet_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     delete abenet_;
   }
@@ -1155,62 +1432,62 @@ inline void local_confirm::set_allocated_abenet(::std::string* abenet) {
     clear_has_abenet();
     abenet_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
-  // @@protoc_insertion_point(field_set_allocated:local_confirm.abEnet)
+  // @@protoc_insertion_point(field_set_allocated:login_reply.abEnet)
 }
 
 // required bytes abOnline = 5;
-inline bool local_confirm::has_abonline() const {
+inline bool login_reply::has_abonline() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
-inline void local_confirm::set_has_abonline() {
+inline void login_reply::set_has_abonline() {
   _has_bits_[0] |= 0x00000010u;
 }
-inline void local_confirm::clear_has_abonline() {
+inline void login_reply::clear_has_abonline() {
   _has_bits_[0] &= ~0x00000010u;
 }
-inline void local_confirm::clear_abonline() {
+inline void login_reply::clear_abonline() {
   if (abonline_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     abonline_->clear();
   }
   clear_has_abonline();
 }
-inline const ::std::string& local_confirm::abonline() const {
-  // @@protoc_insertion_point(field_get:local_confirm.abOnline)
+inline const ::std::string& login_reply::abonline() const {
+  // @@protoc_insertion_point(field_get:login_reply.abOnline)
   return *abonline_;
 }
-inline void local_confirm::set_abonline(const ::std::string& value) {
+inline void login_reply::set_abonline(const ::std::string& value) {
   set_has_abonline();
   if (abonline_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     abonline_ = new ::std::string;
   }
   abonline_->assign(value);
-  // @@protoc_insertion_point(field_set:local_confirm.abOnline)
+  // @@protoc_insertion_point(field_set:login_reply.abOnline)
 }
-inline void local_confirm::set_abonline(const char* value) {
+inline void login_reply::set_abonline(const char* value) {
   set_has_abonline();
   if (abonline_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     abonline_ = new ::std::string;
   }
   abonline_->assign(value);
-  // @@protoc_insertion_point(field_set_char:local_confirm.abOnline)
+  // @@protoc_insertion_point(field_set_char:login_reply.abOnline)
 }
-inline void local_confirm::set_abonline(const void* value, size_t size) {
+inline void login_reply::set_abonline(const void* value, size_t size) {
   set_has_abonline();
   if (abonline_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     abonline_ = new ::std::string;
   }
   abonline_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:local_confirm.abOnline)
+  // @@protoc_insertion_point(field_set_pointer:login_reply.abOnline)
 }
-inline ::std::string* local_confirm::mutable_abonline() {
+inline ::std::string* login_reply::mutable_abonline() {
   set_has_abonline();
   if (abonline_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     abonline_ = new ::std::string;
   }
-  // @@protoc_insertion_point(field_mutable:local_confirm.abOnline)
+  // @@protoc_insertion_point(field_mutable:login_reply.abOnline)
   return abonline_;
 }
-inline ::std::string* local_confirm::release_abonline() {
+inline ::std::string* login_reply::release_abonline() {
   clear_has_abonline();
   if (abonline_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     return NULL;
@@ -1220,7 +1497,7 @@ inline ::std::string* local_confirm::release_abonline() {
     return temp;
   }
 }
-inline void local_confirm::set_allocated_abonline(::std::string* abonline) {
+inline void login_reply::set_allocated_abonline(::std::string* abonline) {
   if (abonline_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     delete abonline_;
   }
@@ -1231,7 +1508,107 @@ inline void local_confirm::set_allocated_abonline(::std::string* abonline) {
     clear_has_abonline();
     abonline_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
-  // @@protoc_insertion_point(field_set_allocated:local_confirm.abOnline)
+  // @@protoc_insertion_point(field_set_allocated:login_reply.abOnline)
+}
+
+// required int64 xuid = 6;
+inline bool login_reply::has_xuid() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void login_reply::set_has_xuid() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void login_reply::clear_has_xuid() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void login_reply::clear_xuid() {
+  xuid_ = GOOGLE_LONGLONG(0);
+  clear_has_xuid();
+}
+inline ::google::protobuf::int64 login_reply::xuid() const {
+  // @@protoc_insertion_point(field_get:login_reply.xuid)
+  return xuid_;
+}
+inline void login_reply::set_xuid(::google::protobuf::int64 value) {
+  set_has_xuid();
+  xuid_ = value;
+  // @@protoc_insertion_point(field_set:login_reply.xuid)
+}
+
+// required bytes username = 7;
+inline bool login_reply::has_username() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void login_reply::set_has_username() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void login_reply::clear_has_username() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void login_reply::clear_username() {
+  if (username_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    username_->clear();
+  }
+  clear_has_username();
+}
+inline const ::std::string& login_reply::username() const {
+  // @@protoc_insertion_point(field_get:login_reply.username)
+  return *username_;
+}
+inline void login_reply::set_username(const ::std::string& value) {
+  set_has_username();
+  if (username_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    username_ = new ::std::string;
+  }
+  username_->assign(value);
+  // @@protoc_insertion_point(field_set:login_reply.username)
+}
+inline void login_reply::set_username(const char* value) {
+  set_has_username();
+  if (username_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    username_ = new ::std::string;
+  }
+  username_->assign(value);
+  // @@protoc_insertion_point(field_set_char:login_reply.username)
+}
+inline void login_reply::set_username(const void* value, size_t size) {
+  set_has_username();
+  if (username_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    username_ = new ::std::string;
+  }
+  username_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:login_reply.username)
+}
+inline ::std::string* login_reply::mutable_username() {
+  set_has_username();
+  if (username_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    username_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:login_reply.username)
+  return username_;
+}
+inline ::std::string* login_reply::release_username() {
+  clear_has_username();
+  if (username_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = username_;
+    username_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void login_reply::set_allocated_username(::std::string* username) {
+  if (username_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete username_;
+  }
+  if (username) {
+    set_has_username();
+    username_ = username;
+  } else {
+    clear_has_username();
+    username_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:login_reply.username)
 }
 
 // -------------------------------------------------------------------

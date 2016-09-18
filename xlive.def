@@ -92,9 +92,9 @@ EXPORTS
 	XLiveOnDestroyDevice					@5006	
 	XLiveOnResetDevice						@5007	
 	XHVCreateEngine							@5008	
-	XLiveLess_5010							@5010	
-	XLiveLess_5011							@5011	
-	XLiveLess_5012							@5012	
+	XLiveRegisterDataSection				@5010	
+	XLiveUnregisterDataSection				@5011	
+	XLiveUpdateHashes						@5012	
 	XLivePBufferAllocate					@5016	
 	XLivePBufferFree						@5017	
 	XLivePBufferGetByte						@5018	
@@ -102,9 +102,9 @@ EXPORTS
 	XLivePBufferGetDWORD					@5020	
 	XLivePBufferSetDWORD					@5021	
 	XLiveGetUpdateInformation				@5022
-	XLiveLess_5023							@5023
+	XNetGetCurrentAdapter					@5023
 	XLiveUpdateSystem						@5024	
-	XLiveLess_5025							@5025
+	XLiveGetLiveIdError						@5025
 	XLiveSetSponsorToken					@5026	
 	XLiveSecureLoadLibraryW					@5028	
 	XLiveSecureFreeLibrary					@5029	
@@ -115,7 +115,7 @@ EXPORTS
 	XLiveCreateProtectedDataContext			@5036	
 	XLiveQueryProtectedDataInformation		@5037	
 	XLiveCloseProtectedDataContext			@5038	
-	XLiveLess_5039							@5039
+	XLiveVerifyDataFile						@5039
 	XShowMessagesUI							@5206	
 	XShowGameInviteUI						@5208	
 	XShowMessageComposeUI					@5209	
@@ -124,22 +124,22 @@ EXPORTS
 	XShowPlayerReviewUI						@5214	
 	XShowGuideUI							@5215	
 	XShowKeyboardUI							@5216	
-	XLiveLess_5218							@5218
+	XShowArcadeUI							@5218
 	XLocatorServerAdvertise					@5230	
 	XLocatorServerUnAdvertise				@5231	
 	XLocatorGetServiceProperty				@5233	
 	XLocatorCreateServerEnumerator			@5234	
-	XLiveLess_5235							@5235	
+	XLocatorCreateServerEnumeratorByIDs		@5235	
 	XLocatorServiceInitialize				@5236	
-	XLiveLess_5237							@5237	
+	XLocatorServiceUnInitialize				@5237	
 	XLocatorCreateKey						@5238	
 	XShowAchievementsUI						@5250	
 	XCloseHandle							@5251	
 	XShowGamerCardUI						@5252	
 	XCancelOverlapped						@5254	
-	XLiveLess_5255							@5255
+	XEnumerateBack							@5255
 	XEnumerate								@5256	
-	XLiveLess_5257							@5257	
+	XLiveManageCredentials					@5257	
 	XLiveSignout							@5258	
 	XLiveSignin								@5259	
 	XShowSigninUI							@5260	
@@ -165,19 +165,19 @@ EXPORTS
 	XUserCreateStatsEnumeratorByRank		@5284	
 	XUserCreateStatsEnumeratorByRating		@5285	
 	XUserCreateStatsEnumeratorByXuid		@5286	
-	XLiveLess_5287							@5287	
-	XLiveLess_5288							@5288	
-	XLiveLess_5289							@5289	
+	XUserResetStatsView						@5287	
+	XUserGetProperty						@5288	
+	XUserGetContext						    @5289	
 	XUserGetReputationStars					@5290	
-	XLiveLess_5291							@5291	
+	XUserResetStatsViewAllUsers				@5291	
 	XUserSetContextEx						@5292	
 	XUserSetPropertyEx						@5293	
 	XLivePBufferGetByteArray				@5294	
 	XLivePBufferSetByteArray				@5295	
-	XLiveLess_5296							@5296	
+	XLiveGetLocalOnlinePort					@5296	
 	XLiveInitializeEx						@5297	
-	XLiveLess_5298							@5298	
-	XLiveLess_5299							@5299	
+	XLiveGetGuideKey						@5298	
+	XShowGuideKeyRemapUI					@5299	
 	XSessionCreate							@5300	
 	XStringVerify							@5303	
 	XStorageUploadFromMemoryGetProgress		@5304	
@@ -217,35 +217,35 @@ EXPORTS
 	XPresenceSubscribe						@5338	
 	XUserReadProfileSettingsByXuid			@5339	
 	XPresenceCreateEnumerator				@5340	
-	XLiveLess_5341							@5341
+	TitleExport_XPresenceUnsubscribe		@5341
 	XSessionModifySkill						@5342	
 	XSessionCalculateSkill					@5343	
 	XStorageBuildServerPath					@5344	
 	XStorageDownloadToMemory				@5345	
-	XLiveLess_5346							@5346	
-	XLiveLess_5347							@5347	
+	TitleExport_XUserEstimateRankForRating	@5346	
+	XLiveProtectedLoadLibrary				@5347	
 	XLiveProtectedCreateFile				@5348	
 	XLiveProtectedVerifyFile				@5349	
 	XLiveContentCreateAccessHandle			@5350	
-	XLiveLess_5351							@5351
+	XLiveContentInstallPackage				@5351
 	XLiveContentUninstall					@5352	
-	XLiveLess_5354							@5354	
+	XLiveContentVerifyInstalledPackage		@5354	
 	XLiveContentGetPath						@5355	
 	XContentCreatePackage					@5356
-	XLiveLess_5357							@5357
-	XLiveLess_5358							@5358
-	XLiveLess_5359							@5359
+	XLiveContentGetThumbnail				@5357
+	XLiveContentInstallLicense				@5358
+	XLiveGetUPnPState						@5359
 	XContentCreateEnumerator				@5360	
 	XContentRetrieveOffersByDate			@5361	
 	MarketplaceDoesContentIdMatch			@5362	
-	XLiveLess_5363							@5363	
+	XLiveContentGetLicensePath				@5363	
 	XShowMarketplaceUI						@5365	
 	XShowMarketplaceDownloadItemsUI			@5366	
 	XContentGetMarketplaceCounts			@5367	
-	XLiveLess_5370							@5370	
-	XLiveLess_5371							@5371	
+	TitleExport_XMarketplaceConsumeAssets   @5370	
+	XMarketplaceCreateAssetEnumerator	    @5371	
 	XMarketplaceCreateOfferEnumerator		@5372	
 	XMarketplaceGetDownloadStatus			@5374	
 	XMarketplaceGetImageUrl					@5375	
 	XMarketplaceCreateOfferEnumeratorByOffering		@5376	
-	XLiveLess_5377							@5377	
+	TitleExport_XUserFindUsers				@5377	

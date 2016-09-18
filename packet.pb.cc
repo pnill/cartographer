@@ -22,9 +22,12 @@ const ::google::protobuf::Descriptor* Packet_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Packet_reflection_ = NULL;
 const ::google::protobuf::EnumDescriptor* Packet_Type_descriptor_ = NULL;
-const ::google::protobuf::Descriptor* local_confirm_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* login_request_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  local_confirm_reflection_ = NULL;
+  login_request_reflection_ = NULL;
+const ::google::protobuf::Descriptor* login_reply_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  login_reply_reflection_ = NULL;
 const ::google::protobuf::Descriptor* secure_request_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   secure_request_reflection_ = NULL;
@@ -48,9 +51,10 @@ void protobuf_AssignDesc_packet_2eproto() {
       "packet.proto");
   GOOGLE_CHECK(file != NULL);
   Packet_descriptor_ = file->message_type(0);
-  static const int Packet_offsets_[6] = {
+  static const int Packet_offsets_[7] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Packet, type_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Packet, lconfirm_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Packet, lrequest_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Packet, lreply_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Packet, srequest_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Packet, sreply_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Packet, xrequest_),
@@ -68,26 +72,44 @@ void protobuf_AssignDesc_packet_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Packet));
   Packet_Type_descriptor_ = Packet_descriptor_->enum_type(0);
-  local_confirm_descriptor_ = file->message_type(1);
-  static const int local_confirm_offsets_[5] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(local_confirm, secure_addr_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(local_confirm, xnaddr_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(local_confirm, port_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(local_confirm, abenet_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(local_confirm, abonline_),
+  login_request_descriptor_ = file->message_type(1);
+  static const int login_request_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(login_request, login_token_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(login_request, port_),
   };
-  local_confirm_reflection_ =
+  login_request_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      local_confirm_descriptor_,
-      local_confirm::default_instance_,
-      local_confirm_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(local_confirm, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(local_confirm, _unknown_fields_),
+      login_request_descriptor_,
+      login_request::default_instance_,
+      login_request_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(login_request, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(login_request, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(local_confirm));
-  secure_request_descriptor_ = file->message_type(2);
+      sizeof(login_request));
+  login_reply_descriptor_ = file->message_type(2);
+  static const int login_reply_offsets_[7] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(login_reply, secure_addr_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(login_reply, xnaddr_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(login_reply, port_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(login_reply, abenet_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(login_reply, abonline_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(login_reply, xuid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(login_reply, username_),
+  };
+  login_reply_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      login_reply_descriptor_,
+      login_reply::default_instance_,
+      login_reply_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(login_reply, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(login_reply, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(login_reply));
+  secure_request_descriptor_ = file->message_type(3);
   static const int secure_request_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(secure_request, abenet_),
   };
@@ -102,7 +124,7 @@ void protobuf_AssignDesc_packet_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(secure_request));
-  secure_reply_descriptor_ = file->message_type(3);
+  secure_reply_descriptor_ = file->message_type(4);
   static const int secure_reply_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(secure_reply, secure_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(secure_reply, xnaddr_),
@@ -121,7 +143,7 @@ void protobuf_AssignDesc_packet_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(secure_reply));
-  xnaddr_request_descriptor_ = file->message_type(4);
+  xnaddr_request_descriptor_ = file->message_type(5);
   static const int xnaddr_request_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(xnaddr_request, secure_),
   };
@@ -136,7 +158,7 @@ void protobuf_AssignDesc_packet_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(xnaddr_request));
-  xnaddr_reply_descriptor_ = file->message_type(5);
+  xnaddr_reply_descriptor_ = file->message_type(6);
   static const int xnaddr_reply_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(xnaddr_reply, xnaddr_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(xnaddr_reply, port_),
@@ -169,7 +191,9 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Packet_descriptor_, &Packet::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    local_confirm_descriptor_, &local_confirm::default_instance());
+    login_request_descriptor_, &login_request::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    login_reply_descriptor_, &login_reply::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     secure_request_descriptor_, &secure_request::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
@@ -185,8 +209,10 @@ void protobuf_RegisterTypes(const ::std::string&) {
 void protobuf_ShutdownFile_packet_2eproto() {
   delete Packet::default_instance_;
   delete Packet_reflection_;
-  delete local_confirm::default_instance_;
-  delete local_confirm_reflection_;
+  delete login_request::default_instance_;
+  delete login_request_reflection_;
+  delete login_reply::default_instance_;
+  delete login_reply_reflection_;
   delete secure_request::default_instance_;
   delete secure_request_reflection_;
   delete secure_reply::default_instance_;
@@ -204,34 +230,38 @@ void protobuf_AddDesc_packet_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\014packet.proto\"\304\002\n\006Packet\022\032\n\004type\030\001 \002(\0162"
-    "\014.Packet.Type\022 \n\010lconfirm\030\002 \001(\0132\016.local_"
-    "confirm\022!\n\010srequest\030\003 \001(\0132\017.secure_reque"
-    "st\022\035\n\006sreply\030\004 \001(\0132\r.secure_reply\022!\n\010xre"
-    "quest\030\005 \001(\0132\017.xnaddr_request\022\035\n\006xreply\030\006"
-    " \001(\0132\r.xnaddr_reply\"x\n\004Type\022\021\n\rlocal_req"
-    "uest\020\001\022\021\n\rlocal_confirm\020\002\022\022\n\016secure_requ"
-    "est\020\003\022\020\n\014secure_reply\020\004\022\022\n\016xnaddr_reques"
-    "t\020\005\022\020\n\014xnaddr_reply\020\006\"d\n\rlocal_confirm\022\023"
-    "\n\013secure_addr\030\001 \002(\r\022\016\n\006xnaddr\030\002 \002(\r\022\014\n\004p"
-    "ort\030\003 \002(\005\022\016\n\006abEnet\030\004 \002(\014\022\020\n\010abOnline\030\005 "
-    "\002(\014\" \n\016secure_request\022\016\n\006abEnet\030\001 \002(\014\"^\n"
-    "\014secure_reply\022\016\n\006secure\030\001 \002(\r\022\016\n\006xnaddr\030"
-    "\002 \002(\r\022\014\n\004port\030\003 \002(\r\022\016\n\006abEnet\030\004 \002(\014\022\020\n\010a"
-    "bOnline\030\005 \002(\014\" \n\016xnaddr_request\022\016\n\006secur"
-    "e\030\001 \002(\r\"N\n\014xnaddr_reply\022\016\n\006xnaddr\030\001 \002(\r\022"
-    "\014\n\004port\030\002 \002(\r\022\016\n\006abEnet\030\003 \002(\014\022\020\n\010abOnlin"
-    "e\030\004 \002(\014", 687);
+    "\n\014packet.proto\"\340\002\n\006Packet\022\032\n\004type\030\001 \002(\0162"
+    "\014.Packet.Type\022 \n\010lrequest\030\002 \001(\0132\016.login_"
+    "request\022\034\n\006lreply\030\003 \001(\0132\014.login_reply\022!\n"
+    "\010srequest\030\004 \001(\0132\017.secure_request\022\035\n\006srep"
+    "ly\030\005 \001(\0132\r.secure_reply\022!\n\010xrequest\030\006 \001("
+    "\0132\017.xnaddr_request\022\035\n\006xreply\030\007 \001(\0132\r.xna"
+    "ddr_reply\"v\n\004Type\022\021\n\rlogin_request\020\002\022\017\n\013"
+    "login_reply\020\003\022\022\n\016secure_request\020\004\022\020\n\014sec"
+    "ure_reply\020\005\022\022\n\016xnaddr_request\020\006\022\020\n\014xnadd"
+    "r_reply\020\007\"2\n\rlogin_request\022\023\n\013login_toke"
+    "n\030\001 \002(\014\022\014\n\004port\030\002 \002(\r\"\202\001\n\013login_reply\022\023\n"
+    "\013secure_addr\030\001 \002(\r\022\016\n\006xnaddr\030\002 \002(\r\022\014\n\004po"
+    "rt\030\003 \002(\005\022\016\n\006abEnet\030\004 \002(\014\022\020\n\010abOnline\030\005 \002"
+    "(\014\022\014\n\004xuid\030\006 \002(\003\022\020\n\010username\030\007 \002(\014\" \n\016se"
+    "cure_request\022\016\n\006abEnet\030\001 \002(\014\"^\n\014secure_r"
+    "eply\022\016\n\006secure\030\001 \002(\r\022\016\n\006xnaddr\030\002 \002(\r\022\014\n\004"
+    "port\030\003 \002(\r\022\016\n\006abEnet\030\004 \002(\014\022\020\n\010abOnline\030\005"
+    " \002(\014\" \n\016xnaddr_request\022\016\n\006secure\030\001 \002(\r\"N"
+    "\n\014xnaddr_reply\022\016\n\006xnaddr\030\001 \002(\r\022\014\n\004port\030\002"
+    " \002(\r\022\016\n\006abEnet\030\003 \002(\014\022\020\n\010abOnline\030\004 \002(\014", 798);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "packet.proto", &protobuf_RegisterTypes);
   Packet::default_instance_ = new Packet();
-  local_confirm::default_instance_ = new local_confirm();
+  login_request::default_instance_ = new login_request();
+  login_reply::default_instance_ = new login_reply();
   secure_request::default_instance_ = new secure_request();
   secure_reply::default_instance_ = new secure_reply();
   xnaddr_request::default_instance_ = new xnaddr_request();
   xnaddr_reply::default_instance_ = new xnaddr_reply();
   Packet::default_instance_->InitAsDefaultInstance();
-  local_confirm::default_instance_->InitAsDefaultInstance();
+  login_request::default_instance_->InitAsDefaultInstance();
+  login_reply::default_instance_->InitAsDefaultInstance();
   secure_request::default_instance_->InitAsDefaultInstance();
   secure_reply::default_instance_->InitAsDefaultInstance();
   xnaddr_request::default_instance_->InitAsDefaultInstance();
@@ -254,12 +284,12 @@ const ::google::protobuf::EnumDescriptor* Packet_Type_descriptor() {
 }
 bool Packet_Type_IsValid(int value) {
   switch(value) {
-    case 1:
     case 2:
     case 3:
     case 4:
     case 5:
     case 6:
+    case 7:
       return true;
     default:
       return false;
@@ -267,8 +297,8 @@ bool Packet_Type_IsValid(int value) {
 }
 
 #ifndef _MSC_VER
-const Packet_Type Packet::local_request;
-const Packet_Type Packet::local_confirm;
+const Packet_Type Packet::login_request;
+const Packet_Type Packet::login_reply;
 const Packet_Type Packet::secure_request;
 const Packet_Type Packet::secure_reply;
 const Packet_Type Packet::xnaddr_request;
@@ -279,7 +309,8 @@ const int Packet::Type_ARRAYSIZE;
 #endif  // _MSC_VER
 #ifndef _MSC_VER
 const int Packet::kTypeFieldNumber;
-const int Packet::kLconfirmFieldNumber;
+const int Packet::kLrequestFieldNumber;
+const int Packet::kLreplyFieldNumber;
 const int Packet::kSrequestFieldNumber;
 const int Packet::kSreplyFieldNumber;
 const int Packet::kXrequestFieldNumber;
@@ -293,7 +324,8 @@ Packet::Packet()
 }
 
 void Packet::InitAsDefaultInstance() {
-  lconfirm_ = const_cast< ::local_confirm*>(&::local_confirm::default_instance());
+  lrequest_ = const_cast< ::login_request*>(&::login_request::default_instance());
+  lreply_ = const_cast< ::login_reply*>(&::login_reply::default_instance());
   srequest_ = const_cast< ::secure_request*>(&::secure_request::default_instance());
   sreply_ = const_cast< ::secure_reply*>(&::secure_reply::default_instance());
   xrequest_ = const_cast< ::xnaddr_request*>(&::xnaddr_request::default_instance());
@@ -309,8 +341,9 @@ Packet::Packet(const Packet& from)
 
 void Packet::SharedCtor() {
   _cached_size_ = 0;
-  type_ = 1;
-  lconfirm_ = NULL;
+  type_ = 2;
+  lrequest_ = NULL;
+  lreply_ = NULL;
   srequest_ = NULL;
   sreply_ = NULL;
   xrequest_ = NULL;
@@ -325,7 +358,8 @@ Packet::~Packet() {
 
 void Packet::SharedDtor() {
   if (this != default_instance_) {
-    delete lconfirm_;
+    delete lrequest_;
+    delete lreply_;
     delete srequest_;
     delete sreply_;
     delete xrequest_;
@@ -355,10 +389,13 @@ Packet* Packet::New() const {
 }
 
 void Packet::Clear() {
-  if (_has_bits_[0 / 32] & 63) {
-    type_ = 1;
-    if (has_lconfirm()) {
-      if (lconfirm_ != NULL) lconfirm_->::local_confirm::Clear();
+  if (_has_bits_[0 / 32] & 127) {
+    type_ = 2;
+    if (has_lrequest()) {
+      if (lrequest_ != NULL) lrequest_->::login_request::Clear();
+    }
+    if (has_lreply()) {
+      if (lreply_ != NULL) lreply_->::login_reply::Clear();
     }
     if (has_srequest()) {
       if (srequest_ != NULL) srequest_->::secure_request::Clear();
@@ -402,65 +439,78 @@ bool Packet::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(18)) goto parse_lconfirm;
+        if (input->ExpectTag(18)) goto parse_lrequest;
         break;
       }
 
-      // optional .local_confirm lconfirm = 2;
+      // optional .login_request lrequest = 2;
       case 2: {
         if (tag == 18) {
-         parse_lconfirm:
+         parse_lrequest:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-               input, mutable_lconfirm()));
+               input, mutable_lrequest()));
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(26)) goto parse_srequest;
+        if (input->ExpectTag(26)) goto parse_lreply;
         break;
       }
 
-      // optional .secure_request srequest = 3;
+      // optional .login_reply lreply = 3;
       case 3: {
         if (tag == 26) {
+         parse_lreply:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_lreply()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(34)) goto parse_srequest;
+        break;
+      }
+
+      // optional .secure_request srequest = 4;
+      case 4: {
+        if (tag == 34) {
          parse_srequest:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_srequest()));
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(34)) goto parse_sreply;
+        if (input->ExpectTag(42)) goto parse_sreply;
         break;
       }
 
-      // optional .secure_reply sreply = 4;
-      case 4: {
-        if (tag == 34) {
+      // optional .secure_reply sreply = 5;
+      case 5: {
+        if (tag == 42) {
          parse_sreply:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_sreply()));
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(42)) goto parse_xrequest;
+        if (input->ExpectTag(50)) goto parse_xrequest;
         break;
       }
 
-      // optional .xnaddr_request xrequest = 5;
-      case 5: {
-        if (tag == 42) {
+      // optional .xnaddr_request xrequest = 6;
+      case 6: {
+        if (tag == 50) {
          parse_xrequest:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_xrequest()));
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(50)) goto parse_xreply;
+        if (input->ExpectTag(58)) goto parse_xreply;
         break;
       }
 
-      // optional .xnaddr_reply xreply = 6;
-      case 6: {
-        if (tag == 50) {
+      // optional .xnaddr_reply xreply = 7;
+      case 7: {
+        if (tag == 58) {
          parse_xreply:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_xreply()));
@@ -502,34 +552,40 @@ void Packet::SerializeWithCachedSizes(
       1, this->type(), output);
   }
 
-  // optional .local_confirm lconfirm = 2;
-  if (has_lconfirm()) {
+  // optional .login_request lrequest = 2;
+  if (has_lrequest()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, this->lconfirm(), output);
+      2, this->lrequest(), output);
   }
 
-  // optional .secure_request srequest = 3;
+  // optional .login_reply lreply = 3;
+  if (has_lreply()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      3, this->lreply(), output);
+  }
+
+  // optional .secure_request srequest = 4;
   if (has_srequest()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, this->srequest(), output);
+      4, this->srequest(), output);
   }
 
-  // optional .secure_reply sreply = 4;
+  // optional .secure_reply sreply = 5;
   if (has_sreply()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      4, this->sreply(), output);
+      5, this->sreply(), output);
   }
 
-  // optional .xnaddr_request xrequest = 5;
+  // optional .xnaddr_request xrequest = 6;
   if (has_xrequest()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      5, this->xrequest(), output);
+      6, this->xrequest(), output);
   }
 
-  // optional .xnaddr_reply xreply = 6;
+  // optional .xnaddr_reply xreply = 7;
   if (has_xreply()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      6, this->xreply(), output);
+      7, this->xreply(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -548,39 +604,46 @@ void Packet::SerializeWithCachedSizes(
       1, this->type(), target);
   }
 
-  // optional .local_confirm lconfirm = 2;
-  if (has_lconfirm()) {
+  // optional .login_request lrequest = 2;
+  if (has_lrequest()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        2, this->lconfirm(), target);
+        2, this->lrequest(), target);
   }
 
-  // optional .secure_request srequest = 3;
+  // optional .login_reply lreply = 3;
+  if (has_lreply()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        3, this->lreply(), target);
+  }
+
+  // optional .secure_request srequest = 4;
   if (has_srequest()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        3, this->srequest(), target);
+        4, this->srequest(), target);
   }
 
-  // optional .secure_reply sreply = 4;
+  // optional .secure_reply sreply = 5;
   if (has_sreply()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        4, this->sreply(), target);
+        5, this->sreply(), target);
   }
 
-  // optional .xnaddr_request xrequest = 5;
+  // optional .xnaddr_request xrequest = 6;
   if (has_xrequest()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        5, this->xrequest(), target);
+        6, this->xrequest(), target);
   }
 
-  // optional .xnaddr_reply xreply = 6;
+  // optional .xnaddr_reply xreply = 7;
   if (has_xreply()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        6, this->xreply(), target);
+        7, this->xreply(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -601,35 +664,42 @@ int Packet::ByteSize() const {
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->type());
     }
 
-    // optional .local_confirm lconfirm = 2;
-    if (has_lconfirm()) {
+    // optional .login_request lrequest = 2;
+    if (has_lrequest()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->lconfirm());
+          this->lrequest());
     }
 
-    // optional .secure_request srequest = 3;
+    // optional .login_reply lreply = 3;
+    if (has_lreply()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->lreply());
+    }
+
+    // optional .secure_request srequest = 4;
     if (has_srequest()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->srequest());
     }
 
-    // optional .secure_reply sreply = 4;
+    // optional .secure_reply sreply = 5;
     if (has_sreply()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->sreply());
     }
 
-    // optional .xnaddr_request xrequest = 5;
+    // optional .xnaddr_request xrequest = 6;
     if (has_xrequest()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->xrequest());
     }
 
-    // optional .xnaddr_reply xreply = 6;
+    // optional .xnaddr_reply xreply = 7;
     if (has_xreply()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
@@ -666,8 +736,11 @@ void Packet::MergeFrom(const Packet& from) {
     if (from.has_type()) {
       set_type(from.type());
     }
-    if (from.has_lconfirm()) {
-      mutable_lconfirm()->::local_confirm::MergeFrom(from.lconfirm());
+    if (from.has_lrequest()) {
+      mutable_lrequest()->::login_request::MergeFrom(from.lrequest());
+    }
+    if (from.has_lreply()) {
+      mutable_lreply()->::login_reply::MergeFrom(from.lreply());
     }
     if (from.has_srequest()) {
       mutable_srequest()->::secure_request::MergeFrom(from.srequest());
@@ -700,8 +773,11 @@ void Packet::CopyFrom(const Packet& from) {
 bool Packet::IsInitialized() const {
   if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
 
-  if (has_lconfirm()) {
-    if (!this->lconfirm().IsInitialized()) return false;
+  if (has_lrequest()) {
+    if (!this->lrequest().IsInitialized()) return false;
+  }
+  if (has_lreply()) {
+    if (!this->lreply().IsInitialized()) return false;
   }
   if (has_srequest()) {
     if (!this->srequest().IsInitialized()) return false;
@@ -721,7 +797,8 @@ bool Packet::IsInitialized() const {
 void Packet::Swap(Packet* other) {
   if (other != this) {
     std::swap(type_, other->type_);
-    std::swap(lconfirm_, other->lconfirm_);
+    std::swap(lrequest_, other->lrequest_);
+    std::swap(lreply_, other->lreply_);
     std::swap(srequest_, other->srequest_);
     std::swap(sreply_, other->sreply_);
     std::swap(xrequest_, other->xrequest_);
@@ -744,30 +821,305 @@ void Packet::Swap(Packet* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int local_confirm::kSecureAddrFieldNumber;
-const int local_confirm::kXnaddrFieldNumber;
-const int local_confirm::kPortFieldNumber;
-const int local_confirm::kAbEnetFieldNumber;
-const int local_confirm::kAbOnlineFieldNumber;
+const int login_request::kLoginTokenFieldNumber;
+const int login_request::kPortFieldNumber;
 #endif  // !_MSC_VER
 
-local_confirm::local_confirm()
+login_request::login_request()
   : ::google::protobuf::Message() {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:local_confirm)
+  // @@protoc_insertion_point(constructor:login_request)
 }
 
-void local_confirm::InitAsDefaultInstance() {
+void login_request::InitAsDefaultInstance() {
 }
 
-local_confirm::local_confirm(const local_confirm& from)
+login_request::login_request(const login_request& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
-  // @@protoc_insertion_point(copy_constructor:local_confirm)
+  // @@protoc_insertion_point(copy_constructor:login_request)
 }
 
-void local_confirm::SharedCtor() {
+void login_request::SharedCtor() {
+  ::google::protobuf::internal::GetEmptyString();
+  _cached_size_ = 0;
+  login_token_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  port_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+login_request::~login_request() {
+  // @@protoc_insertion_point(destructor:login_request)
+  SharedDtor();
+}
+
+void login_request::SharedDtor() {
+  if (login_token_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete login_token_;
+  }
+  if (this != default_instance_) {
+  }
+}
+
+void login_request::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* login_request::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return login_request_descriptor_;
+}
+
+const login_request& login_request::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_packet_2eproto();
+  return *default_instance_;
+}
+
+login_request* login_request::default_instance_ = NULL;
+
+login_request* login_request::New() const {
+  return new login_request;
+}
+
+void login_request::Clear() {
+  if (_has_bits_[0 / 32] & 3) {
+    if (has_login_token()) {
+      if (login_token_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+        login_token_->clear();
+      }
+    }
+    port_ = 0u;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool login_request::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:login_request)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required bytes login_token = 1;
+      case 1: {
+        if (tag == 10) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_login_token()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_port;
+        break;
+      }
+
+      // required uint32 port = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_port:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &port_)));
+          set_has_port();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:login_request)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:login_request)
+  return false;
+#undef DO_
+}
+
+void login_request::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:login_request)
+  // required bytes login_token = 1;
+  if (has_login_token()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
+      1, this->login_token(), output);
+  }
+
+  // required uint32 port = 2;
+  if (has_port()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->port(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:login_request)
+}
+
+::google::protobuf::uint8* login_request::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:login_request)
+  // required bytes login_token = 1;
+  if (has_login_token()) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        1, this->login_token(), target);
+  }
+
+  // required uint32 port = 2;
+  if (has_port()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->port(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:login_request)
+  return target;
+}
+
+int login_request::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required bytes login_token = 1;
+    if (has_login_token()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->login_token());
+    }
+
+    // required uint32 port = 2;
+    if (has_port()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->port());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void login_request::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const login_request* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const login_request*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void login_request::MergeFrom(const login_request& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_login_token()) {
+      set_login_token(from.login_token());
+    }
+    if (from.has_port()) {
+      set_port(from.port());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void login_request::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void login_request::CopyFrom(const login_request& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool login_request::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+
+  return true;
+}
+
+void login_request::Swap(login_request* other) {
+  if (other != this) {
+    std::swap(login_token_, other->login_token_);
+    std::swap(port_, other->port_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata login_request::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = login_request_descriptor_;
+  metadata.reflection = login_request_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int login_reply::kSecureAddrFieldNumber;
+const int login_reply::kXnaddrFieldNumber;
+const int login_reply::kPortFieldNumber;
+const int login_reply::kAbEnetFieldNumber;
+const int login_reply::kAbOnlineFieldNumber;
+const int login_reply::kXuidFieldNumber;
+const int login_reply::kUsernameFieldNumber;
+#endif  // !_MSC_VER
+
+login_reply::login_reply()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:login_reply)
+}
+
+void login_reply::InitAsDefaultInstance() {
+}
+
+login_reply::login_reply(const login_reply& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:login_reply)
+}
+
+void login_reply::SharedCtor() {
   ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
   secure_addr_ = 0u;
@@ -775,49 +1127,54 @@ void local_confirm::SharedCtor() {
   port_ = 0;
   abenet_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   abonline_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  xuid_ = GOOGLE_LONGLONG(0);
+  username_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-local_confirm::~local_confirm() {
-  // @@protoc_insertion_point(destructor:local_confirm)
+login_reply::~login_reply() {
+  // @@protoc_insertion_point(destructor:login_reply)
   SharedDtor();
 }
 
-void local_confirm::SharedDtor() {
+void login_reply::SharedDtor() {
   if (abenet_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     delete abenet_;
   }
   if (abonline_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     delete abonline_;
   }
+  if (username_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete username_;
+  }
   if (this != default_instance_) {
   }
 }
 
-void local_confirm::SetCachedSize(int size) const {
+void login_reply::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* local_confirm::descriptor() {
+const ::google::protobuf::Descriptor* login_reply::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return local_confirm_descriptor_;
+  return login_reply_descriptor_;
 }
 
-const local_confirm& local_confirm::default_instance() {
+const login_reply& login_reply::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_packet_2eproto();
   return *default_instance_;
 }
 
-local_confirm* local_confirm::default_instance_ = NULL;
+login_reply* login_reply::default_instance_ = NULL;
 
-local_confirm* local_confirm::New() const {
-  return new local_confirm;
+login_reply* login_reply::New() const {
+  return new login_reply;
 }
 
-void local_confirm::Clear() {
+void login_reply::Clear() {
 #define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
-  &reinterpret_cast<local_confirm*>(16)->f) - \
+  &reinterpret_cast<login_reply*>(16)->f) - \
    reinterpret_cast<char*>(16))
 
 #define ZR_(first, last) do {                              \
@@ -826,7 +1183,7 @@ void local_confirm::Clear() {
     ::memset(&first, 0, n);                                \
   } while (0)
 
-  if (_has_bits_[0 / 32] & 31) {
+  if (_has_bits_[0 / 32] & 127) {
     ZR_(secure_addr_, xnaddr_);
     port_ = 0;
     if (has_abenet()) {
@@ -839,6 +1196,12 @@ void local_confirm::Clear() {
         abonline_->clear();
       }
     }
+    xuid_ = GOOGLE_LONGLONG(0);
+    if (has_username()) {
+      if (username_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+        username_->clear();
+      }
+    }
   }
 
 #undef OFFSET_OF_FIELD_
@@ -848,11 +1211,11 @@ void local_confirm::Clear() {
   mutable_unknown_fields()->Clear();
 }
 
-bool local_confirm::MergePartialFromCodedStream(
+bool login_reply::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:local_confirm)
+  // @@protoc_insertion_point(parse_start:login_reply)
   for (;;) {
     ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
     tag = p.first;
@@ -924,6 +1287,34 @@ bool local_confirm::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(48)) goto parse_xuid;
+        break;
+      }
+
+      // required int64 xuid = 6;
+      case 6: {
+        if (tag == 48) {
+         parse_xuid:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
+                 input, &xuid_)));
+          set_has_xuid();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(58)) goto parse_username;
+        break;
+      }
+
+      // required bytes username = 7;
+      case 7: {
+        if (tag == 58) {
+         parse_username:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_username()));
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -942,17 +1333,17 @@ bool local_confirm::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:local_confirm)
+  // @@protoc_insertion_point(parse_success:login_reply)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:local_confirm)
+  // @@protoc_insertion_point(parse_failure:login_reply)
   return false;
 #undef DO_
 }
 
-void local_confirm::SerializeWithCachedSizes(
+void login_reply::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:local_confirm)
+  // @@protoc_insertion_point(serialize_start:login_reply)
   // required uint32 secure_addr = 1;
   if (has_secure_addr()) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->secure_addr(), output);
@@ -980,16 +1371,27 @@ void local_confirm::SerializeWithCachedSizes(
       5, this->abonline(), output);
   }
 
+  // required int64 xuid = 6;
+  if (has_xuid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(6, this->xuid(), output);
+  }
+
+  // required bytes username = 7;
+  if (has_username()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
+      7, this->username(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:local_confirm)
+  // @@protoc_insertion_point(serialize_end:login_reply)
 }
 
-::google::protobuf::uint8* local_confirm::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* login_reply::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:local_confirm)
+  // @@protoc_insertion_point(serialize_to_array_start:login_reply)
   // required uint32 secure_addr = 1;
   if (has_secure_addr()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->secure_addr(), target);
@@ -1019,15 +1421,27 @@ void local_confirm::SerializeWithCachedSizes(
         5, this->abonline(), target);
   }
 
+  // required int64 xuid = 6;
+  if (has_xuid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(6, this->xuid(), target);
+  }
+
+  // required bytes username = 7;
+  if (has_username()) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        7, this->username(), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:local_confirm)
+  // @@protoc_insertion_point(serialize_to_array_end:login_reply)
   return target;
 }
 
-int local_confirm::ByteSize() const {
+int login_reply::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
@@ -1066,6 +1480,20 @@ int local_confirm::ByteSize() const {
           this->abonline());
     }
 
+    // required int64 xuid = 6;
+    if (has_xuid()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int64Size(
+          this->xuid());
+    }
+
+    // required bytes username = 7;
+    if (has_username()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->username());
+    }
+
   }
   if (!unknown_fields().empty()) {
     total_size +=
@@ -1078,10 +1506,10 @@ int local_confirm::ByteSize() const {
   return total_size;
 }
 
-void local_confirm::MergeFrom(const ::google::protobuf::Message& from) {
+void login_reply::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const local_confirm* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const local_confirm*>(
+  const login_reply* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const login_reply*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -1090,7 +1518,7 @@ void local_confirm::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void local_confirm::MergeFrom(const local_confirm& from) {
+void login_reply::MergeFrom(const login_reply& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_secure_addr()) {
@@ -1108,46 +1536,54 @@ void local_confirm::MergeFrom(const local_confirm& from) {
     if (from.has_abonline()) {
       set_abonline(from.abonline());
     }
+    if (from.has_xuid()) {
+      set_xuid(from.xuid());
+    }
+    if (from.has_username()) {
+      set_username(from.username());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void local_confirm::CopyFrom(const ::google::protobuf::Message& from) {
+void login_reply::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void local_confirm::CopyFrom(const local_confirm& from) {
+void login_reply::CopyFrom(const login_reply& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool local_confirm::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000001f) != 0x0000001f) return false;
+bool login_reply::IsInitialized() const {
+  if ((_has_bits_[0] & 0x0000007f) != 0x0000007f) return false;
 
   return true;
 }
 
-void local_confirm::Swap(local_confirm* other) {
+void login_reply::Swap(login_reply* other) {
   if (other != this) {
     std::swap(secure_addr_, other->secure_addr_);
     std::swap(xnaddr_, other->xnaddr_);
     std::swap(port_, other->port_);
     std::swap(abenet_, other->abenet_);
     std::swap(abonline_, other->abonline_);
+    std::swap(xuid_, other->xuid_);
+    std::swap(username_, other->username_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
   }
 }
 
-::google::protobuf::Metadata local_confirm::GetMetadata() const {
+::google::protobuf::Metadata login_reply::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = local_confirm_descriptor_;
-  metadata.reflection = local_confirm_reflection_;
+  metadata.descriptor = login_reply_descriptor_;
+  metadata.reflection = login_reply_reflection_;
   return metadata;
 }
 

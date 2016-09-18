@@ -11,15 +11,15 @@ namespace Network
 	namespace bitstreamptr
 	{
 	
-			DWORD write_uint = 0xD17C6;
-			//DWORD read_int			= 0xCE49F;
-			//DWORD read_uint			= 0xCE49F;
-			//DWORD read_byte			= 0xCE501;
-			//DWORD read_char			= 0xCE561;
-			//DWORD read_ulonglong	= 0xCE5B7;
-			//DWORD read_block		= 0xCE54F;
+			//DWORD write_uint = 0xD17C6;
+			DWORD read_int			= 0xCE49F;
+			DWORD read_uint			= 0xCE49F;
+			DWORD read_byte			= 0xCE501;
+			DWORD read_char			= 0xCE561;
+			DWORD read_ulonglong	= 0xCE5B7;
+			DWORD read_block		= 0xCE54F;
 
-			//DWORD write_uint		= 0xCDD80;
+			DWORD write_uint		= 0xCDD80;
 
 
 	};
@@ -390,23 +390,23 @@ __declspec(naked) void read_bitstream_uint(void)
 void Network::Initialize()
 {
 
-	//if (h2mod->Server)
-//	{
-		//Network::bitstreamptr::read_uint += h2mod->GetBase();
-		//Network::bitstreamptr::write_uint += h2mod->GetBase();
-		//Network::bitstreamptr::read_block += h2mod->GetBase();
+	if (h2mod->Server)
+	{
+		Network::bitstreamptr::read_uint += h2mod->GetBase();
+		Network::bitstreamptr::write_uint += h2mod->GetBase();
+		Network::bitstreamptr::read_block += h2mod->GetBase();
 	
 		subfunc += h2mod->GetBase();
 		DWORD dwBack;
 
 
 
-		/*TRACE_GAME("H2MOD::Network::bitstream - Writing uint(%08X) hook", Network::bitstreamptr::read_uint);
-		Codecave(Network::bitstreamptr::read_uint, read_bitstream_uint, 5);*/
+		TRACE_GAME("H2MOD::Network::bitstream - Writing uint(%08X) hook", Network::bitstreamptr::read_uint);
+		Codecave(Network::bitstreamptr::read_uint, read_bitstream_uint, 5);
 
-		//TRACE_GAME("H2MOD::Network::bistream - Writing write_uint(%08X) hook", Network::bitstreamptr::write_uint);
-		//pWrite_uint = (tWrite_uint)DetourClassFunc((BYTE*)Network::bitstreamptr::write_uint, (BYTE*)write_uint, 11);
-		//VirtualProtect(pWrite_uint, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		TRACE_GAME("H2MOD::Network::bistream - Writing write_uint(%08X) hook", Network::bitstreamptr::write_uint);
+		pWrite_uint = (tWrite_uint)DetourClassFunc((BYTE*)Network::bitstreamptr::write_uint, (BYTE*)write_uint, 11);
+		VirtualProtect(pWrite_uint, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		/*
 		TRACE_GAME("H2MOD::Network::bitstream - Writing read_block(%08X) hook", Network::bitstreamptr::read_block);
@@ -414,6 +414,6 @@ void Network::Initialize()
 		VirtualProtect(pRead_block, 4, PAGE_EXECUTE_READWRITE, &dwBack);*/
 
 		TRACE_GAME("H2MOD::Network - Initialized\n");
-	//}
+	}
 
 }

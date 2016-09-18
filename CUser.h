@@ -2,6 +2,8 @@
 #define CUSER_H
 #include "stdafx.h"
 #include <unordered_map>
+#include <mutex>
+
 class CUser
 {
 public:
@@ -40,7 +42,8 @@ public:
 	ULONG GetXNFromSecure(ULONG secure);
 	ULONG GetSecureFromXN(XNADDR *pxna);
 
-	void RegisterLocalRequest();
+	void CreateUser(XNADDR *pxna);
+	void RegisterLocalRequest(char* token);
 	void UnregisterSecureAddr(const IN_ADDR ina);
 
 	BOOL GetLocalXNAddr(XNADDR* pxna);
@@ -48,6 +51,16 @@ public:
 
 
 	//Maps
+	std::mutex xntosecure_mutex;
+	std::mutex cusers_mutex;
+	std::mutex smap_mutex;
+	std::mutex sentmap_mutex;
+	std::mutex stox_mutex;
+	std::mutex pmap_a_mutex;
+	std::mutex pmap_b_mutex;
+	std::mutex sockmap_mutex;
+	std::mutex xnmap_mutex;
+
 	std::unordered_map<ULONG, CUser*> cusers; // Map Key(SecureADDR)->CUser
 	std::unordered_map<std::pair<ULONG, SHORT>, ULONG> smap; // Map Key(XNHost,XnPort)->Secure
 	std::unordered_map<std::pair<ULONG, SHORT>, ULONG> sentmap; // Map of servers/clients+ports which have already been sent to.
