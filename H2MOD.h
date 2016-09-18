@@ -4,7 +4,13 @@
 #include "Hook.h"
 #include <unordered_map>
 
-
+enum BipedType
+{
+	MasterChief = 0,
+	Arbiter = 1,
+	Spartan = 2,
+	Elite = 3
+};
 
 enum Weapon
 {
@@ -67,7 +73,13 @@ public:
 		int get_unit_datum_from_player_index(int);
 		void ApplyHooks();
 		DWORD GetBase();
-		
+		wchar_t* get_local_player_name();
+		wchar_t* get_player_name_from_index(int pIndex);
+		int get_player_index_from_unit_datum(int unit_datum_index);
+		BYTE get_unit_team_index(int unit_datum_index);
+		void set_unit_team_index(int unit_datum_index, BYTE team);
+		void set_unit_biped(BYTE biped, int pIndex);
+		void set_local_team_index(BYTE team);
 		BOOL Server;
 private:
 		DWORD Base;
