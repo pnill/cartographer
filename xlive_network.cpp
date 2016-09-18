@@ -13,8 +13,9 @@ extern UINT g_port;
 extern ULONG g_lLANIP;
 extern ULONG g_lWANIP;
 bool isHost;
+bool Connected = false;
 bool ThreadCreated = false;
-
+bool NetworkActive = true;
 
 HANDLE H2MOD_Network = NULL;
 SOCKET boundsock = INVALID_SOCKET;
@@ -39,6 +40,7 @@ float getElapsedNetworkTime(void) {
 // #5310: XOnlineStartup
 int WINAPI XOnlineStartup()
 {
+	NetworkActive = true;
 	//TRACE("XOnlineStartup");
 	ServerStatus = new char[250];
 	QueryPerformanceFrequency(&timerFreq);
@@ -55,6 +57,15 @@ int WINAPI XOnlineStartup()
 
 	return 0;
 }
+
+// #52: XNetCleanup
+INT WINAPI XNetCleanup()
+{
+	NetworkActive = false;
+	TRACE("XNetCleanup");
+	return 0;
+}
+
 
 
 
@@ -135,9 +146,16 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 		pxnkid->ab[0] &= ~XNET_XNKID_MASK;
 		pxnkid->ab[0] |= XNET_XNKID_SYSTEM_LINK;
 
+		isHost = true;
+		if (H2MOD_Network == 0 && ThreadCreated == false)
+		{
+			ThreadCreated = true;
+			int Data_of_network_Thread = 1;
+			H2MOD_Network = CreateThread(NULL, 0, NetworkThread, &Data_of_network_Thread, 0, NULL);
+		}
 
 	}
-	isHost = true;
+	
 
 	/*if (H2MOD_Network == 0 && ThreadCreated == false)
 	{
@@ -429,6 +447,7 @@ int WINAPI XNetRegisterKey(DWORD, DWORD)
 int WINAPI XNetUnregisterKey(DWORD)
 {
 	isHost = false;
+	Connected = false;
 	TRACE("XNetUnregisterKey");
 	return 0;
 }
@@ -462,6 +481,11 @@ INT   WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid
 int WINAPI XNetUnregisterInAddr(const IN_ADDR ina)
 {
 	//User.UnregisterSecureAddr(ina);
+	for (auto it = h2mod->NetworkPlayers.begin(); it != h2mod->NetworkPlayers.end(); ++it)
+	{
+		if (it->first->secure == ina.s_addr) it->second = 0;
+	}
+
 	TRACE("XNetUnregisterInAddr: %08X",ina.s_addr);
 	return 0;
 }

@@ -10,8 +10,9 @@ public:
 	void PreSpawn(int);
 	void SpawnPlayer(int);
 	void Initialize();
+	void FindZombie();
 
-	std::unordered_map<bool, int> infected_players;
+	std::unordered_map<wchar_t*, bool> infected_players;
 
 
 };
