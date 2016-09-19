@@ -22,6 +22,9 @@ const ::google::protobuf::Descriptor* H2ModPacket_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   H2ModPacket_reflection_ = NULL;
 const ::google::protobuf::EnumDescriptor* H2ModPacket_Type_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* h2mod_set_grenade_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  h2mod_set_grenade_reflection_ = NULL;
 const ::google::protobuf::Descriptor* h2mod_auth_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   h2mod_auth_reflection_ = NULL;
@@ -39,10 +42,11 @@ void protobuf_AssignDesc_h2mod_2eproto() {
       "h2mod.proto");
   GOOGLE_CHECK(file != NULL);
   H2ModPacket_descriptor_ = file->message_type(0);
-  static const int H2ModPacket_offsets_[3] = {
+  static const int H2ModPacket_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, h2auth_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, h2_set_player_team_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, set_grenade_),
   };
   H2ModPacket_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -56,7 +60,24 @@ void protobuf_AssignDesc_h2mod_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(H2ModPacket));
   H2ModPacket_Type_descriptor_ = H2ModPacket_descriptor_->enum_type(0);
-  h2mod_auth_descriptor_ = file->message_type(1);
+  h2mod_set_grenade_descriptor_ = file->message_type(1);
+  static const int h2mod_set_grenade_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_set_grenade, type_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_set_grenade, count_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_set_grenade, pindex_),
+  };
+  h2mod_set_grenade_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      h2mod_set_grenade_descriptor_,
+      h2mod_set_grenade::default_instance_,
+      h2mod_set_grenade_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_set_grenade, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_set_grenade, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(h2mod_set_grenade));
+  h2mod_auth_descriptor_ = file->message_type(2);
   static const int h2mod_auth_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_auth, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_auth, secureaddr_),
@@ -72,7 +93,7 @@ void protobuf_AssignDesc_h2mod_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(h2mod_auth));
-  h2mod_set_team_descriptor_ = file->message_type(2);
+  h2mod_set_team_descriptor_ = file->message_type(3);
   static const int h2mod_set_team_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_set_team, team_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_set_team, name_),
@@ -103,6 +124,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     H2ModPacket_descriptor_, &H2ModPacket::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    h2mod_set_grenade_descriptor_, &h2mod_set_grenade::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     h2mod_auth_descriptor_, &h2mod_auth::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     h2mod_set_team_descriptor_, &h2mod_set_team::default_instance());
@@ -113,6 +136,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
 void protobuf_ShutdownFile_h2mod_2eproto() {
   delete H2ModPacket::default_instance_;
   delete H2ModPacket_reflection_;
+  delete h2mod_set_grenade::default_instance_;
+  delete h2mod_set_grenade_reflection_;
   delete h2mod_auth::default_instance_;
   delete h2mod_auth_reflection_;
   delete h2mod_set_team::default_instance_;
@@ -126,20 +151,26 @@ void protobuf_AddDesc_h2mod_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\013h2mod.proto\"\253\001\n\013H2ModPacket\022\037\n\004type\030\001 "
+    "\n\013h2mod.proto\"\213\002\n\013H2ModPacket\022\037\n\004type\030\001 "
     "\002(\0162\021.H2ModPacket.Type\022\033\n\006h2auth\030\002 \001(\0132\013"
     ".h2mod_auth\022+\n\022h2_set_player_team\030\003 \001(\0132"
-    "\017.h2mod_set_team\"1\n\004Type\022\024\n\020authorize_cl"
-    "ient\020\001\022\023\n\017set_player_team\020\002\".\n\nh2mod_aut"
-    "h\022\014\n\004name\030\001 \002(\014\022\022\n\nsecureaddr\030\002 \002(\r\",\n\016h"
-    "2mod_set_team\022\014\n\004team\030\001 \002(\r\022\014\n\004name\030\002 \002("
-    "\014", 281);
+    "\017.h2mod_set_team\022\'\n\013set_grenade\030\004 \001(\0132\022."
+    "h2mod_set_grenade\"h\n\004Type\022\024\n\020authorize_c"
+    "lient\020\001\022\023\n\017set_player_team\020\002\022\016\n\nh2mod_pi"
+    "ng\020\003\022\016\n\nh2mod_pong\020\004\022\025\n\021set_unit_grenade"
+    "s\020\005\"@\n\021h2mod_set_grenade\022\014\n\004type\030\001 \002(\r\022\r"
+    "\n\005count\030\002 \002(\r\022\016\n\006pIndex\030\003 \002(\r\".\n\nh2mod_a"
+    "uth\022\014\n\004name\030\001 \002(\014\022\022\n\nsecureaddr\030\002 \002(\r\",\n"
+    "\016h2mod_set_team\022\014\n\004team\030\001 \002(\r\022\014\n\004name\030\002 "
+    "\002(\014", 443);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "h2mod.proto", &protobuf_RegisterTypes);
   H2ModPacket::default_instance_ = new H2ModPacket();
+  h2mod_set_grenade::default_instance_ = new h2mod_set_grenade();
   h2mod_auth::default_instance_ = new h2mod_auth();
   h2mod_set_team::default_instance_ = new h2mod_set_team();
   H2ModPacket::default_instance_->InitAsDefaultInstance();
+  h2mod_set_grenade::default_instance_->InitAsDefaultInstance();
   h2mod_auth::default_instance_->InitAsDefaultInstance();
   h2mod_set_team::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_h2mod_2eproto);
@@ -162,6 +193,9 @@ bool H2ModPacket_Type_IsValid(int value) {
   switch(value) {
     case 1:
     case 2:
+    case 3:
+    case 4:
+    case 5:
       return true;
     default:
       return false;
@@ -171,6 +205,9 @@ bool H2ModPacket_Type_IsValid(int value) {
 #ifndef _MSC_VER
 const H2ModPacket_Type H2ModPacket::authorize_client;
 const H2ModPacket_Type H2ModPacket::set_player_team;
+const H2ModPacket_Type H2ModPacket::h2mod_ping;
+const H2ModPacket_Type H2ModPacket::h2mod_pong;
+const H2ModPacket_Type H2ModPacket::set_unit_grenades;
 const H2ModPacket_Type H2ModPacket::Type_MIN;
 const H2ModPacket_Type H2ModPacket::Type_MAX;
 const int H2ModPacket::Type_ARRAYSIZE;
@@ -179,6 +216,7 @@ const int H2ModPacket::Type_ARRAYSIZE;
 const int H2ModPacket::kTypeFieldNumber;
 const int H2ModPacket::kH2AuthFieldNumber;
 const int H2ModPacket::kH2SetPlayerTeamFieldNumber;
+const int H2ModPacket::kSetGrenadeFieldNumber;
 #endif  // !_MSC_VER
 
 H2ModPacket::H2ModPacket()
@@ -190,6 +228,7 @@ H2ModPacket::H2ModPacket()
 void H2ModPacket::InitAsDefaultInstance() {
   h2auth_ = const_cast< ::h2mod_auth*>(&::h2mod_auth::default_instance());
   h2_set_player_team_ = const_cast< ::h2mod_set_team*>(&::h2mod_set_team::default_instance());
+  set_grenade_ = const_cast< ::h2mod_set_grenade*>(&::h2mod_set_grenade::default_instance());
 }
 
 H2ModPacket::H2ModPacket(const H2ModPacket& from)
@@ -204,6 +243,7 @@ void H2ModPacket::SharedCtor() {
   type_ = 1;
   h2auth_ = NULL;
   h2_set_player_team_ = NULL;
+  set_grenade_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -216,6 +256,7 @@ void H2ModPacket::SharedDtor() {
   if (this != default_instance_) {
     delete h2auth_;
     delete h2_set_player_team_;
+    delete set_grenade_;
   }
 }
 
@@ -241,13 +282,16 @@ H2ModPacket* H2ModPacket::New() const {
 }
 
 void H2ModPacket::Clear() {
-  if (_has_bits_[0 / 32] & 7) {
+  if (_has_bits_[0 / 32] & 15) {
     type_ = 1;
     if (has_h2auth()) {
       if (h2auth_ != NULL) h2auth_->::h2mod_auth::Clear();
     }
     if (has_h2_set_player_team()) {
       if (h2_set_player_team_ != NULL) h2_set_player_team_->::h2mod_set_team::Clear();
+    }
+    if (has_set_grenade()) {
+      if (set_grenade_ != NULL) set_grenade_->::h2mod_set_grenade::Clear();
     }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -305,6 +349,19 @@ bool H2ModPacket::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(34)) goto parse_set_grenade;
+        break;
+      }
+
+      // optional .h2mod_set_grenade set_grenade = 4;
+      case 4: {
+        if (tag == 34) {
+         parse_set_grenade:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_set_grenade()));
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -352,6 +409,12 @@ void H2ModPacket::SerializeWithCachedSizes(
       3, this->h2_set_player_team(), output);
   }
 
+  // optional .h2mod_set_grenade set_grenade = 4;
+  if (has_set_grenade()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, this->set_grenade(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -380,6 +443,13 @@ void H2ModPacket::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         3, this->h2_set_player_team(), target);
+  }
+
+  // optional .h2mod_set_grenade set_grenade = 4;
+  if (has_set_grenade()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        4, this->set_grenade(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -412,6 +482,13 @@ int H2ModPacket::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->h2_set_player_team());
+    }
+
+    // optional .h2mod_set_grenade set_grenade = 4;
+    if (has_set_grenade()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->set_grenade());
     }
 
   }
@@ -450,6 +527,9 @@ void H2ModPacket::MergeFrom(const H2ModPacket& from) {
     if (from.has_h2_set_player_team()) {
       mutable_h2_set_player_team()->::h2mod_set_team::MergeFrom(from.h2_set_player_team());
     }
+    if (from.has_set_grenade()) {
+      mutable_set_grenade()->::h2mod_set_grenade::MergeFrom(from.set_grenade());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -475,6 +555,9 @@ bool H2ModPacket::IsInitialized() const {
   if (has_h2_set_player_team()) {
     if (!this->h2_set_player_team().IsInitialized()) return false;
   }
+  if (has_set_grenade()) {
+    if (!this->set_grenade().IsInitialized()) return false;
+  }
   return true;
 }
 
@@ -483,6 +566,7 @@ void H2ModPacket::Swap(H2ModPacket* other) {
     std::swap(type_, other->type_);
     std::swap(h2auth_, other->h2auth_);
     std::swap(h2_set_player_team_, other->h2_set_player_team_);
+    std::swap(set_grenade_, other->set_grenade_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -494,6 +578,319 @@ void H2ModPacket::Swap(H2ModPacket* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = H2ModPacket_descriptor_;
   metadata.reflection = H2ModPacket_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int h2mod_set_grenade::kTypeFieldNumber;
+const int h2mod_set_grenade::kCountFieldNumber;
+const int h2mod_set_grenade::kPIndexFieldNumber;
+#endif  // !_MSC_VER
+
+h2mod_set_grenade::h2mod_set_grenade()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:h2mod_set_grenade)
+}
+
+void h2mod_set_grenade::InitAsDefaultInstance() {
+}
+
+h2mod_set_grenade::h2mod_set_grenade(const h2mod_set_grenade& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:h2mod_set_grenade)
+}
+
+void h2mod_set_grenade::SharedCtor() {
+  _cached_size_ = 0;
+  type_ = 0u;
+  count_ = 0u;
+  pindex_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+h2mod_set_grenade::~h2mod_set_grenade() {
+  // @@protoc_insertion_point(destructor:h2mod_set_grenade)
+  SharedDtor();
+}
+
+void h2mod_set_grenade::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void h2mod_set_grenade::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* h2mod_set_grenade::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return h2mod_set_grenade_descriptor_;
+}
+
+const h2mod_set_grenade& h2mod_set_grenade::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_h2mod_2eproto();
+  return *default_instance_;
+}
+
+h2mod_set_grenade* h2mod_set_grenade::default_instance_ = NULL;
+
+h2mod_set_grenade* h2mod_set_grenade::New() const {
+  return new h2mod_set_grenade;
+}
+
+void h2mod_set_grenade::Clear() {
+#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
+  &reinterpret_cast<h2mod_set_grenade*>(16)->f) - \
+   reinterpret_cast<char*>(16))
+
+#define ZR_(first, last) do {                              \
+    size_t f = OFFSET_OF_FIELD_(first);                    \
+    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
+    ::memset(&first, 0, n);                                \
+  } while (0)
+
+  ZR_(type_, pindex_);
+
+#undef OFFSET_OF_FIELD_
+#undef ZR_
+
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool h2mod_set_grenade::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:h2mod_set_grenade)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required uint32 type = 1;
+      case 1: {
+        if (tag == 8) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &type_)));
+          set_has_type();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_count;
+        break;
+      }
+
+      // required uint32 count = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_count:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &count_)));
+          set_has_count();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(24)) goto parse_pIndex;
+        break;
+      }
+
+      // required uint32 pIndex = 3;
+      case 3: {
+        if (tag == 24) {
+         parse_pIndex:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &pindex_)));
+          set_has_pindex();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:h2mod_set_grenade)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:h2mod_set_grenade)
+  return false;
+#undef DO_
+}
+
+void h2mod_set_grenade::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:h2mod_set_grenade)
+  // required uint32 type = 1;
+  if (has_type()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->type(), output);
+  }
+
+  // required uint32 count = 2;
+  if (has_count()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->count(), output);
+  }
+
+  // required uint32 pIndex = 3;
+  if (has_pindex()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->pindex(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:h2mod_set_grenade)
+}
+
+::google::protobuf::uint8* h2mod_set_grenade::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:h2mod_set_grenade)
+  // required uint32 type = 1;
+  if (has_type()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->type(), target);
+  }
+
+  // required uint32 count = 2;
+  if (has_count()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->count(), target);
+  }
+
+  // required uint32 pIndex = 3;
+  if (has_pindex()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->pindex(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:h2mod_set_grenade)
+  return target;
+}
+
+int h2mod_set_grenade::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required uint32 type = 1;
+    if (has_type()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->type());
+    }
+
+    // required uint32 count = 2;
+    if (has_count()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->count());
+    }
+
+    // required uint32 pIndex = 3;
+    if (has_pindex()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->pindex());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void h2mod_set_grenade::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const h2mod_set_grenade* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const h2mod_set_grenade*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void h2mod_set_grenade::MergeFrom(const h2mod_set_grenade& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_type()) {
+      set_type(from.type());
+    }
+    if (from.has_count()) {
+      set_count(from.count());
+    }
+    if (from.has_pindex()) {
+      set_pindex(from.pindex());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void h2mod_set_grenade::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void h2mod_set_grenade::CopyFrom(const h2mod_set_grenade& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool h2mod_set_grenade::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
+
+  return true;
+}
+
+void h2mod_set_grenade::Swap(h2mod_set_grenade* other) {
+  if (other != this) {
+    std::swap(type_, other->type_);
+    std::swap(count_, other->count_);
+    std::swap(pindex_, other->pindex_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata h2mod_set_grenade::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = h2mod_set_grenade_descriptor_;
+  metadata.reflection = h2mod_set_grenade_reflection_;
   return metadata;
 }
 

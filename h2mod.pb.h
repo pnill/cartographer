@@ -33,16 +33,20 @@ void protobuf_AssignDesc_h2mod_2eproto();
 void protobuf_ShutdownFile_h2mod_2eproto();
 
 class H2ModPacket;
+class h2mod_set_grenade;
 class h2mod_auth;
 class h2mod_set_team;
 
 enum H2ModPacket_Type {
   H2ModPacket_Type_authorize_client = 1,
-  H2ModPacket_Type_set_player_team = 2
+  H2ModPacket_Type_set_player_team = 2,
+  H2ModPacket_Type_h2mod_ping = 3,
+  H2ModPacket_Type_h2mod_pong = 4,
+  H2ModPacket_Type_set_unit_grenades = 5
 };
 bool H2ModPacket_Type_IsValid(int value);
 const H2ModPacket_Type H2ModPacket_Type_Type_MIN = H2ModPacket_Type_authorize_client;
-const H2ModPacket_Type H2ModPacket_Type_Type_MAX = H2ModPacket_Type_set_player_team;
+const H2ModPacket_Type H2ModPacket_Type_Type_MAX = H2ModPacket_Type_set_unit_grenades;
 const int H2ModPacket_Type_Type_ARRAYSIZE = H2ModPacket_Type_Type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* H2ModPacket_Type_descriptor();
@@ -111,6 +115,9 @@ class H2ModPacket : public ::google::protobuf::Message {
   typedef H2ModPacket_Type Type;
   static const Type authorize_client = H2ModPacket_Type_authorize_client;
   static const Type set_player_team = H2ModPacket_Type_set_player_team;
+  static const Type h2mod_ping = H2ModPacket_Type_h2mod_ping;
+  static const Type h2mod_pong = H2ModPacket_Type_h2mod_pong;
+  static const Type set_unit_grenades = H2ModPacket_Type_set_unit_grenades;
   static inline bool Type_IsValid(int value) {
     return H2ModPacket_Type_IsValid(value);
   }
@@ -159,6 +166,15 @@ class H2ModPacket : public ::google::protobuf::Message {
   inline ::h2mod_set_team* release_h2_set_player_team();
   inline void set_allocated_h2_set_player_team(::h2mod_set_team* h2_set_player_team);
 
+  // optional .h2mod_set_grenade set_grenade = 4;
+  inline bool has_set_grenade() const;
+  inline void clear_set_grenade();
+  static const int kSetGrenadeFieldNumber = 4;
+  inline const ::h2mod_set_grenade& set_grenade() const;
+  inline ::h2mod_set_grenade* mutable_set_grenade();
+  inline ::h2mod_set_grenade* release_set_grenade();
+  inline void set_allocated_set_grenade(::h2mod_set_grenade* set_grenade);
+
   // @@protoc_insertion_point(class_scope:H2ModPacket)
  private:
   inline void set_has_type();
@@ -167,6 +183,8 @@ class H2ModPacket : public ::google::protobuf::Message {
   inline void clear_has_h2auth();
   inline void set_has_h2_set_player_team();
   inline void clear_has_h2_set_player_team();
+  inline void set_has_set_grenade();
+  inline void clear_has_set_grenade();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -174,6 +192,7 @@ class H2ModPacket : public ::google::protobuf::Message {
   mutable int _cached_size_;
   ::h2mod_auth* h2auth_;
   ::h2mod_set_team* h2_set_player_team_;
+  ::h2mod_set_grenade* set_grenade_;
   int type_;
   friend void  protobuf_AddDesc_h2mod_2eproto();
   friend void protobuf_AssignDesc_h2mod_2eproto();
@@ -181,6 +200,105 @@ class H2ModPacket : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static H2ModPacket* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class h2mod_set_grenade : public ::google::protobuf::Message {
+ public:
+  h2mod_set_grenade();
+  virtual ~h2mod_set_grenade();
+
+  h2mod_set_grenade(const h2mod_set_grenade& from);
+
+  inline h2mod_set_grenade& operator=(const h2mod_set_grenade& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const h2mod_set_grenade& default_instance();
+
+  void Swap(h2mod_set_grenade* other);
+
+  // implements Message ----------------------------------------------
+
+  h2mod_set_grenade* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const h2mod_set_grenade& from);
+  void MergeFrom(const h2mod_set_grenade& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required uint32 type = 1;
+  inline bool has_type() const;
+  inline void clear_type();
+  static const int kTypeFieldNumber = 1;
+  inline ::google::protobuf::uint32 type() const;
+  inline void set_type(::google::protobuf::uint32 value);
+
+  // required uint32 count = 2;
+  inline bool has_count() const;
+  inline void clear_count();
+  static const int kCountFieldNumber = 2;
+  inline ::google::protobuf::uint32 count() const;
+  inline void set_count(::google::protobuf::uint32 value);
+
+  // required uint32 pIndex = 3;
+  inline bool has_pindex() const;
+  inline void clear_pindex();
+  static const int kPIndexFieldNumber = 3;
+  inline ::google::protobuf::uint32 pindex() const;
+  inline void set_pindex(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:h2mod_set_grenade)
+ private:
+  inline void set_has_type();
+  inline void clear_has_type();
+  inline void set_has_count();
+  inline void clear_has_count();
+  inline void set_has_pindex();
+  inline void clear_has_pindex();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 type_;
+  ::google::protobuf::uint32 count_;
+  ::google::protobuf::uint32 pindex_;
+  friend void  protobuf_AddDesc_h2mod_2eproto();
+  friend void protobuf_AssignDesc_h2mod_2eproto();
+  friend void protobuf_ShutdownFile_h2mod_2eproto();
+
+  void InitAsDefaultInstance();
+  static h2mod_set_grenade* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -482,6 +600,123 @@ inline void H2ModPacket::set_allocated_h2_set_player_team(::h2mod_set_team* h2_s
     clear_has_h2_set_player_team();
   }
   // @@protoc_insertion_point(field_set_allocated:H2ModPacket.h2_set_player_team)
+}
+
+// optional .h2mod_set_grenade set_grenade = 4;
+inline bool H2ModPacket::has_set_grenade() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void H2ModPacket::set_has_set_grenade() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void H2ModPacket::clear_has_set_grenade() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void H2ModPacket::clear_set_grenade() {
+  if (set_grenade_ != NULL) set_grenade_->::h2mod_set_grenade::Clear();
+  clear_has_set_grenade();
+}
+inline const ::h2mod_set_grenade& H2ModPacket::set_grenade() const {
+  // @@protoc_insertion_point(field_get:H2ModPacket.set_grenade)
+  return set_grenade_ != NULL ? *set_grenade_ : *default_instance_->set_grenade_;
+}
+inline ::h2mod_set_grenade* H2ModPacket::mutable_set_grenade() {
+  set_has_set_grenade();
+  if (set_grenade_ == NULL) set_grenade_ = new ::h2mod_set_grenade;
+  // @@protoc_insertion_point(field_mutable:H2ModPacket.set_grenade)
+  return set_grenade_;
+}
+inline ::h2mod_set_grenade* H2ModPacket::release_set_grenade() {
+  clear_has_set_grenade();
+  ::h2mod_set_grenade* temp = set_grenade_;
+  set_grenade_ = NULL;
+  return temp;
+}
+inline void H2ModPacket::set_allocated_set_grenade(::h2mod_set_grenade* set_grenade) {
+  delete set_grenade_;
+  set_grenade_ = set_grenade;
+  if (set_grenade) {
+    set_has_set_grenade();
+  } else {
+    clear_has_set_grenade();
+  }
+  // @@protoc_insertion_point(field_set_allocated:H2ModPacket.set_grenade)
+}
+
+// -------------------------------------------------------------------
+
+// h2mod_set_grenade
+
+// required uint32 type = 1;
+inline bool h2mod_set_grenade::has_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void h2mod_set_grenade::set_has_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void h2mod_set_grenade::clear_has_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void h2mod_set_grenade::clear_type() {
+  type_ = 0u;
+  clear_has_type();
+}
+inline ::google::protobuf::uint32 h2mod_set_grenade::type() const {
+  // @@protoc_insertion_point(field_get:h2mod_set_grenade.type)
+  return type_;
+}
+inline void h2mod_set_grenade::set_type(::google::protobuf::uint32 value) {
+  set_has_type();
+  type_ = value;
+  // @@protoc_insertion_point(field_set:h2mod_set_grenade.type)
+}
+
+// required uint32 count = 2;
+inline bool h2mod_set_grenade::has_count() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void h2mod_set_grenade::set_has_count() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void h2mod_set_grenade::clear_has_count() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void h2mod_set_grenade::clear_count() {
+  count_ = 0u;
+  clear_has_count();
+}
+inline ::google::protobuf::uint32 h2mod_set_grenade::count() const {
+  // @@protoc_insertion_point(field_get:h2mod_set_grenade.count)
+  return count_;
+}
+inline void h2mod_set_grenade::set_count(::google::protobuf::uint32 value) {
+  set_has_count();
+  count_ = value;
+  // @@protoc_insertion_point(field_set:h2mod_set_grenade.count)
+}
+
+// required uint32 pIndex = 3;
+inline bool h2mod_set_grenade::has_pindex() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void h2mod_set_grenade::set_has_pindex() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void h2mod_set_grenade::clear_has_pindex() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void h2mod_set_grenade::clear_pindex() {
+  pindex_ = 0u;
+  clear_has_pindex();
+}
+inline ::google::protobuf::uint32 h2mod_set_grenade::pindex() const {
+  // @@protoc_insertion_point(field_get:h2mod_set_grenade.pIndex)
+  return pindex_;
+}
+inline void h2mod_set_grenade::set_pindex(::google::protobuf::uint32 value) {
+  set_has_pindex();
+  pindex_ = value;
+  // @@protoc_insertion_point(field_set:h2mod_set_grenade.pIndex)
 }
 
 // -------------------------------------------------------------------

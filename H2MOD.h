@@ -4,6 +4,12 @@
 #include "Hook.h"
 #include <unordered_map>
 
+enum GrenadeType
+{
+	Frag = 0,
+	Plasma = 1
+};
+
 enum BipedType
 {
 	MasterChief = 0,
@@ -61,32 +67,50 @@ signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit_datum_ind
 bool __cdecl call_assign_equipment_to_unit(int uint, int object_index, short unk);
 int __cdecl call_object_placement_data_new(void*, int, int, int);
 signed int __cdecl call_object_new(void*);
-void GivePlayerWeapon(int PlayerIndex, int WeaponId);
+void GivePlayerWeapon(int PlayerIndex, int WeaponId, bool bReset);
+DWORD WINAPI NetworkThread(LPVOID lParam);
 
+class NetworkPlayer
+{
+	public:
+		wchar_t* PlayerName;
+		SHORT port;
+		ULONG addr;
+		ULONG secure;
+		bool PacketsAvailable;
+		char* PacketData;
+		size_t PacketSize;
+};
 
 class H2MOD
 {
 public:
 		void Initialize();
-		void EstablishNetwork();
 		int get_unit_from_player_index(int);
 		int get_unit_datum_from_player_index(int);
 		void ApplyHooks();
 		DWORD GetBase();
 		wchar_t* get_local_player_name();
 		wchar_t* get_player_name_from_index(int pIndex);
+		int get_player_index_from_name(wchar_t* playername);
 		int get_player_index_from_unit_datum(int unit_datum_index);
 		BYTE get_unit_team_index(int unit_datum_index);
 		void set_unit_team_index(int unit_datum_index, BYTE team);
 		void set_unit_biped(BYTE biped, int pIndex);
 		void set_local_team_index(BYTE team);
+		BYTE get_local_team_index();
+		void set_unit_grenades(BYTE type, BYTE count, int pIndex, bool bReset);
+		void set_local_grenades(BYTE type, BYTE count, int pIndex);
+
 		BOOL Server;
+		std::unordered_map<NetworkPlayer*, bool> NetworkPlayers;
 private:
 		DWORD Base;
 };
 
 
 extern H2MOD* h2mod;
+
 
 
 #endif

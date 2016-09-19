@@ -14,6 +14,9 @@
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
 Infection *inf = new Infection();
+
+bool b_Infection = false;
+
 extern bool b_GunGame;
 extern CUserManagement User;
 extern ULONG g_lLANIP;
@@ -23,7 +26,10 @@ extern bool isHost;
 extern HANDLE H2MOD_Network;
 extern bool NetworkActive;
 extern bool Connected;
+extern bool ThreadCreated;
 
+
+SOCKET comm_socket = INVALID_SOCKET;
 char* NetworkData = new char[255];
 
 HMODULE base;
@@ -35,7 +41,7 @@ extern int MasterState;
 
 int __cdecl call_get_object(signed int object_datum_index, int object_type)
 {
-	TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
+	//TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
 
 	typedef int(__cdecl *get_object)(signed int object_datum_index, int object_type);
 	get_object pget_object = (get_object)((char*)h2mod->GetBase() + 0x1304E3);
@@ -45,7 +51,7 @@ int __cdecl call_get_object(signed int object_datum_index, int object_type)
 
 int __cdecl call_unit_reset_equipment(int unit_datum_index)
 {
-	TRACE_GAME("unit_reset_equipment(unit_datum_index: %08X)", unit_datum_index);
+	//TRACE_GAME("unit_reset_equipment(unit_datum_index: %08X)", unit_datum_index);
 
 	typedef int(__cdecl *unit_reset_equipment)(int unit_datum_index);
 	unit_reset_equipment punit_reset_equipment = (unit_reset_equipment)(((char*)h2mod->GetBase()) + 0x1441E0);
@@ -60,7 +66,7 @@ int __cdecl call_unit_reset_equipment(int unit_datum_index)
 
 int __cdecl call_hs_object_destroy(int object_datum_index)
 {
-	TRACE_GAME("hs_object_destory(object_datum_index: %08X)", object_datum_index);
+	//TRACE_GAME("hs_object_destory(object_datum_index: %08X)", object_datum_index);
 	typedef int(__cdecl *hs_object_destroy)(int object_datum_index);
 	hs_object_destroy phs_object_destroy = (hs_object_destroy)(((char*)h2mod->GetBase()) + 0x136005);
 
@@ -69,7 +75,7 @@ int __cdecl call_hs_object_destroy(int object_datum_index)
 
 signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit)
 {
-	TRACE_GAME("unit_inventory_next_weapon(unit: %08X)", unit);
+	//TRACE_GAME("unit_inventory_next_weapon(unit: %08X)", unit);
 	typedef signed int(__cdecl *unit_inventory_next_weapon)(unsigned short unit);
 	unit_inventory_next_weapon punit_inventory_next_weapon = (unit_inventory_next_weapon)(((char*)h2mod->GetBase()) + 0x139E04);
 
@@ -78,7 +84,7 @@ signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit)
 
 bool __cdecl call_assign_equipment_to_unit(int unit, int object_index, short unk)
 {
-	TRACE_GAME("assign_equipment_to_unit(unit: %08X,object_index: %08X,unk: %08X)", unit, object_index, unk);
+	//TRACE_GAME("assign_equipment_to_unit(unit: %08X,object_index: %08X,unk: %08X)", unit, object_index, unk);
 	typedef bool(__cdecl *assign_equipment_to_unit)(int unit, int object_index, short unk);
 	assign_equipment_to_unit passign_equipment_to_unit = (assign_equipment_to_unit)(((char*)h2mod->GetBase()) + 0x1442AA);
 
@@ -89,8 +95,8 @@ bool __cdecl call_assign_equipment_to_unit(int unit, int object_index, short unk
 int __cdecl call_object_placement_data_new(void* s_object_placement_data, int object_definition_index, int object_owner, int unk)
 {
 
-	TRACE_GAME("object_placement_data_new(s_object_placement_data: %08X,",s_object_placement_data);
-	TRACE_GAME("object_definition_index: %08X, object_owner: %08X, unk: %08X)", object_definition_index, object_owner, unk);
+	//TRACE_GAME("object_placement_data_new(s_object_placement_data: %08X,",s_object_placement_data);
+	//TRACE_GAME("object_definition_index: %08X, object_owner: %08X, unk: %08X)", object_definition_index, object_owner, unk);
 
 	typedef int(__cdecl *object_placement_data_new)(void*, int, int, int);
 	object_placement_data_new pobject_placement_data_new = (object_placement_data_new)(((char*)h2mod->GetBase()) + 0x132163);
@@ -101,7 +107,7 @@ int __cdecl call_object_placement_data_new(void* s_object_placement_data, int ob
 
 signed int __cdecl call_object_new(void* pObject)
 {
-	TRACE_GAME("object_new(pObject: %08X)", pObject);
+	//TRACE_GAME("object_new(pObject: %08X)", pObject);
 	typedef int(__cdecl *object_new)(void*);
 	object_new pobject_new = (object_new)(((char*)h2mod->GetBase()) + 0x136CA7);
 	
@@ -110,9 +116,9 @@ signed int __cdecl call_object_new(void* pObject)
 
 #pragma endregion
 
-void GivePlayerWeapon(int PlayerIndex, int WeaponId)
+void GivePlayerWeapon(int PlayerIndex, int WeaponId,bool bReset)
 {
-	TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
+	//TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
 	int unit_datum = h2mod->get_unit_datum_from_player_index(PlayerIndex);
 
@@ -125,8 +131,9 @@ void GivePlayerWeapon(int PlayerIndex, int WeaponId)
 		call_object_placement_data_new(nObject, WeaponId, unit_datum, 0);
 
 		int object_index = call_object_new(nObject);
-
-		call_unit_reset_equipment(unit_datum);
+		
+		if(bReset == true)
+			call_unit_reset_equipment(unit_datum);
 
 		call_assign_equipment_to_unit(unit_datum, object_index, 1);
 	}
@@ -136,6 +143,24 @@ void GivePlayerWeapon(int PlayerIndex, int WeaponId)
 wchar_t* H2MOD::get_local_player_name()
 {
 	return (wchar_t*)(((char*)h2mod->GetBase()) + 0x51A638);
+}
+
+int H2MOD::get_player_index_from_name(wchar_t* playername)
+{
+	DWORD player_table_ptr = *(DWORD*)(this->GetBase() + 0x004A8260);
+	player_table_ptr += 0x44;
+
+	for (int i = 0; i<=16; i++)
+	{
+		wchar_t* comparename = (wchar_t*)(*(DWORD*)player_table_ptr + (i * 0x204) + 0x40);
+		
+		TRACE_GAME("[H2MOD]::get_player_index_from_name( %ws : %ws )", playername, comparename);
+
+		if (wcscmp(comparename, playername))
+		{
+			return i;
+		}
+	}
 }
 
 wchar_t* H2MOD::get_player_name_from_index(int pIndex)
@@ -215,6 +240,73 @@ void H2MOD::set_local_team_index(BYTE team)
 	*(BYTE*)(((char*)h2mod->GetBase()) + 0x51A6B4) = team;
 }
 
+void H2MOD::set_local_grenades(BYTE type, BYTE count,int pIndex)
+{
+	int unit_datum_index = h2mod->get_unit_datum_from_player_index(pIndex);
+	
+	int unit_object = call_get_object(unit_datum_index, 3);
+
+	if (unit_object)
+	{
+		if(type == GrenadeType::Frag)
+			*(BYTE*)((BYTE*)unit_object + 0x252) = count;
+		if(type == GrenadeType::Plasma)
+			*(BYTE*)((BYTE*)unit_object + 0x253) = count;
+	}
+
+}
+
+void H2MOD::set_unit_grenades(BYTE type, BYTE count,int pIndex, bool bReset)
+{
+	int unit_datum_index = h2mod->get_unit_datum_from_player_index(pIndex);
+	wchar_t* pName = h2mod->get_player_name_from_index(pIndex);
+
+	int unit_object = call_get_object(unit_datum_index, 3);
+	if (unit_object)
+	{
+		if (bReset)
+			call_unit_reset_equipment(unit_datum_index);
+
+		if (type == GrenadeType::Frag)
+		{
+			*(BYTE*)((BYTE*)unit_object + 0x252) = count;
+			
+
+		}
+		if (type == GrenadeType::Plasma)
+		{
+			*(BYTE*)((BYTE*)unit_object + 0x253) = count;
+		}
+
+		H2ModPacket GrenadePak;
+		GrenadePak.set_type(H2ModPacket_Type_set_unit_grenades);
+		h2mod_set_grenade *gnade = GrenadePak.mutable_set_grenade();
+		gnade->set_count(count);
+		gnade->set_pindex(pIndex);
+		gnade->set_type(type);
+
+		char* GrenadeBuf = new char[GrenadePak.ByteSize()];
+		GrenadePak.SerializeToArray(GrenadeBuf, GrenadePak.ByteSize());
+		
+		for (auto it = NetworkPlayers.begin(); it != NetworkPlayers.end(); ++it)
+		{
+			if (wcscmp(it->first->PlayerName, pName) == 0)
+			{
+				it->first->PacketData = GrenadeBuf;
+				it->first->PacketSize = GrenadePak.ByteSize();
+				it->first->PacketsAvailable = true;
+			}
+		}
+
+
+	}
+}
+
+BYTE H2MOD::get_local_team_index()
+{
+	return *(BYTE*)(((char*)h2mod->GetBase() + 0x51A6B4));
+}
+
 typedef bool(__cdecl *spawn_player)(int a1);
 spawn_player pspawn_player;
 
@@ -235,16 +327,17 @@ player_death pplayer_death;
 char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 {
 	
-	TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
-	TRACE_GAME("Team: %i", h2mod->get_unit_team_index(unit_datum_index));
+	//TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
+	//TRACE_GAME("OnPlayerDeath() - Team: %i", h2mod->get_unit_team_index(unit_datum_index));
 
 #pragma region GunGame Handler
-	if (b_GunGame == 1)
+	if (b_GunGame && isHost)
 		gg->PlayerDied(unit_datum_index);
 #pragma endregion
 
 #pragma region Infection Handler
-	inf->PlayerInfected(unit_datum_index);
+	if(b_Infection)
+		inf->PlayerInfected(unit_datum_index);
 #pragma endregion
 
 	return pplayer_death(unit_datum_index, a2, a3, a4);
@@ -255,23 +348,17 @@ update_player_score pupdate_player_score;
 
 void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6)
 {
-	TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
+	//TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
 
 
 #pragma region GunGame Handler
 	if (a5 == 7) //player got a kill?
 	{
 		int PlayerIndex = a2;
-		if (b_GunGame == 1)
+		if (b_GunGame && isHost)
 			gg->LevelUp(PlayerIndex);
 	}
 
-	if (a5 == -1 && a4 == -1)
-	{
-		int PlayerIndex = a2;
-		if (b_GunGame == 1)
-			gg->LevelDown(PlayerIndex);
-	}
 #pragma endregion
 
 	return pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
@@ -287,9 +374,24 @@ bool bcoop = false;
 int __cdecl OnMapLoad(int a1)
 {
 
+	b_Infection = false;
+	b_GunGame = false;
+	
+	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase())+0x97777C);
 
+	TRACE_GAME("[h2mod] OnMapLoad variant name %ws", variant_name);
 
+	if (wcsstr(variant_name, L"zombies") > 0 || wcsstr(variant_name, L"Zombies") > 0 || wcsstr(variant_name, L"Infection") > 0 || wcsstr(variant_name, L"infection") > 0)
+	{
+		TRACE_GAME("[h2mod] Zombies Turned on!");
+		b_Infection = true;
+	}
 
+	if (wcsstr(variant_name, L"GunGame") > 0 || wcsstr(variant_name, L"gungame") > 0)
+	{
+		TRACE_GAME("[h2mod] GunGame Turned on!");
+		b_GunGame = true;
+	}
 
 #pragma region COOP FIXES
 	bcoop = false;
@@ -355,20 +457,18 @@ int __cdecl OnMapLoad(int a1)
 	}
 #pragma endregion
 
-	//TRACE("OnMapLoad(): %s", (wchar_t*)0x300017E0); // for sanity I'd love to use an offset here assigned to a variable this will break servers...
-
-
 	int ret = pmap_initialize(a1);
 
 
 	if (MasterState == 4)
 	{
 		#pragma region Infection
+		if(b_Infection)
 			inf->Initialize();
 		#pragma endregion
 
 		#pragma region GunGame Handler
-			if (b_GunGame == 1)
+			if (b_GunGame && isHost)
 				gg->Initialize();
 		#pragma endregion
 	}
@@ -380,12 +480,13 @@ int __cdecl OnMapLoad(int a1)
 
 bool __cdecl OnPlayerSpawn(int a1)
 {
-	TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
+	//TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
 
 	int PlayerIndex = a1 & 0x000FFFF;
 
 #pragma region Infection Prespawn Handler
-	inf->PreSpawn(PlayerIndex);
+	if(b_Infection)
+		inf->PreSpawn(PlayerIndex);
 #pragma endregion
 
 #pragma region COOP Fixes
@@ -412,11 +513,12 @@ bool __cdecl OnPlayerSpawn(int a1)
 #pragma endregion
 
 #pragma region Infection Handler
-	inf->SpawnPlayer(PlayerIndex);
+	if(b_Infection)
+		inf->SpawnPlayer(PlayerIndex);
 #pragma endregion
 
 #pragma region GunGame Handler
-	if (b_GunGame == 1)
+	if (b_GunGame && isHost)
 		gg->SpawnPlayer(PlayerIndex);
 #pragma endregion
 
@@ -424,15 +526,6 @@ bool __cdecl OnPlayerSpawn(int a1)
 	return ret;
 }
 
-/*
-	We'll play sounds and perform other actions from the server here.
-	We need to find a way to determine if the local client is host or not and either establish a connection to the server or..
-	Start listening for packets from clients.
-*/
-void H2MOD::EstablishNetwork()
-{
-
-}
 
 /* Really need some hooks here,
 	??_7c_simulation_game_engine_player_entity_definition@@6B@ dd offset sub_11D0018
@@ -464,7 +557,9 @@ XNADDR join_game_xn;
 
 void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
 {
-	
+	Connected = false;
+	NetworkActive = false;
+
 	XNADDR* host_xn = (XNADDR*)a6;
 	memcpy(&join_game_xn, host_xn, sizeof(XNADDR));
 
@@ -499,6 +594,9 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, int a6, 
 		TRACE("join_game Security Packet - WSAGetLastError(): %08X", WSAGetLastError());
 	}
 
+	int Data_of_network_Thread = 1;
+	H2MOD_Network = CreateThread(NULL, 0, NetworkThread, &Data_of_network_Thread, 0, NULL);
+
 	return pjoin_game(thisptr, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 
@@ -507,25 +605,24 @@ tconnect_establish_write pconnect_establish_write;
 
 int __cdecl connect_establish_write(void* a1, int a2, int a3)
 {
-	Connected = false;
 
-	sockaddr_in SendStruct;
+	TRACE("connect_establish_write(a1: %08X,a2 %08X, a3: %08X)", a1, a2, a3);
+
+	if (!isHost)
+	{
+		sockaddr_in SendStruct;
+
+		if (join_game_xn.ina.s_addr != g_lWANIP)
+			SendStruct.sin_addr.s_addr = join_game_xn.ina.s_addr;
+		else
+			SendStruct.sin_addr.s_addr = g_lLANIP;
+
+		SendStruct.sin_port = join_game_xn.wPortOnline;
+		SendStruct.sin_family = AF_INET;
+
+		int securitysend_1000 = sendto(game_sock_1000, (char*)User.SecurityPacket, 8, 0, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
+	}
 	
-	if (join_game_xn.ina.s_addr != g_lWANIP)
-		SendStruct.sin_addr.s_addr = join_game_xn.ina.s_addr;
-	else
-		SendStruct.sin_addr.s_addr = g_lLANIP;
-
-	SendStruct.sin_port = join_game_xn.wPortOnline; // base port is 1000 so we don't need to add or swap to ntohs then back to htons it should already be htons.
-	//SendStruct.sin_port = htons(1000); // Like said about these kinds of things need to be fixed... I have the XNADDR struct we just need to pull teh port.
-	SendStruct.sin_family = AF_INET;
-
-	int securitysend_1000 = sendto(game_sock_1000, (char*)User.SecurityPacket, 8, 0, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
-
-	int Data_of_network_Thread = 1;
-	
-	if(H2MOD_Network == NULL)
-		H2MOD_Network = CreateThread(NULL, 0, NetworkThread, &Data_of_network_Thread, 0, NULL);
 
 	return pconnect_establish_write(a1, a2, a3);
 }
@@ -568,49 +665,55 @@ void H2MOD::ApplyHooks()
 
 }
 
-SOCKET comm_socket = INVALID_SOCKET;
+
 
 DWORD WINAPI NetworkThread(LPVOID lParam)
 {
-	SOCKADDR_IN RecvStruct;
-	RecvStruct.sin_port = htons(((short)g_port) + 7);
-	RecvStruct.sin_addr.s_addr = htonl(INADDR_ANY);
-	RecvStruct.sin_family = AF_INET;
-
 	TRACE_GAME("[h2mod-network] NetworkThread Initializing");
-	TRACE_GAME("[h2mod-network] Listening on port: %i", ntohs(RecvStruct.sin_port));
 
 	if (comm_socket == INVALID_SOCKET)
 	{
 		comm_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+		if (comm_socket == INVALID_SOCKET)
+		{
+			TRACE_GAME("[h2mod-network] Socket is invalid even after socket()");
+		}
+
+		SOCKADDR_IN RecvStruct;
+		RecvStruct.sin_port = htons(((short)g_port) + 7);
+		RecvStruct.sin_addr.s_addr = htonl(INADDR_ANY);
+
+		RecvStruct.sin_family = AF_INET;
+
+		if (bind(comm_socket, (const sockaddr*)&RecvStruct, sizeof RecvStruct) == -1)
+		{
+			TRACE_GAME("[h2mod-network] Would not bind socket!");
+		}
+
+		DWORD dwTime = 20;
+
+		if (setsockopt(comm_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&dwTime, sizeof(dwTime)) < 0)
+		{
+			TRACE_GAME("[h2mod-network] Socket Error on register request");
+		}
+
+		TRACE_GAME("[h2mod-network] Listening on port: %i", ntohs(RecvStruct.sin_port));
 	}
-	else
+	else 
 	{
-		TRACE_GAME("[h2mod-network] For whatever reason, the socket was already valid?, Did the thread get spawned multiple times??");
-		return 0;
+		TRACE_GAME("[h2mod-network] socket already existed continuing without attempting bind...");
 	}
 
-	DWORD dwTime = 20;
+	
 
-	if (comm_socket == INVALID_SOCKET)
-	{
-		TRACE_GAME("[h2mod-network] Socket is invalid even after socket()");
-		return 0;
-	}
 
-	if (bind(comm_socket, (const sockaddr*)&RecvStruct, sizeof RecvStruct) == -1)
-	{
-		TRACE_GAME("[h2mod-network] Would not bind socket!");
-		return 0;
-	}
 
-	if (setsockopt(comm_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&dwTime, sizeof(dwTime)) < 0)
-	{
-		TRACE_GAME("[h2mod-network] Socket Error on register request");
-		return 0;
-	}
-
+	
 	TRACE_GAME("[h2mod-network] Are we host? %i", isHost);
+	
+	NetworkActive = true;
+
 	if(isHost)
 	{
 		TRACE_GAME("[h2mod-network] We're host waiting for a authorization packet from joining clients...");
@@ -619,6 +722,11 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 		{
 			if (NetworkActive == false)
 			{
+				isHost = false;
+				Connected = false;
+				ThreadCreated = false;
+				H2MOD_Network = 0;
+				TRACE_GAME("[h2mod-network] Killing host thread NetworkActive == false");
 				return 0;
 			}
 			sockaddr_in SenderAddr;
@@ -627,10 +735,7 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 			memset(NetworkData, 0x00, 255);
 			int recvresult = recvfrom(comm_socket, NetworkData, 255, 0, (sockaddr*)&SenderAddr, &SenderAddrSize);
 
-			//TRACE_GAME("[h2mod-network] Looping NetworkPlayers...");
-
 			auto it = h2mod->NetworkPlayers.begin();
-
 			while (it != h2mod->NetworkPlayers.end())
 			{
 				if (it->second == 0)
@@ -649,8 +754,6 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 				}
 				else 
 				{
-					//TRACE_GAME("[h2mod-network] Checking if there's any packets in queue...");
-
 					if (it->first->PacketsAvailable == true) // If there's a packet available we set this to true already.
 					{
 						TRACE_GAME("[h2mod-network] Sending player %ws data", it->first->PlayerName);
@@ -659,12 +762,9 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 						QueueSock.sin_port = it->first->port; // We can grab the port they connected from.
 						QueueSock.sin_addr.s_addr = it->first->addr; // Address they connected from.
 						QueueSock.sin_family = AF_INET; 
-
+						
 						sendto(comm_socket, it->first->PacketData, it->first->PacketSize, 0, (sockaddr*)&QueueSock, sizeof(QueueSock)); // Just send the already serialized data over the socket.
-						sendto(comm_socket, it->first->PacketData, it->first->PacketSize, 0, (sockaddr*)&QueueSock, sizeof(QueueSock)); // Just send the already serialized data over the socket.
-						sendto(comm_socket, it->first->PacketData, it->first->PacketSize, 0, (sockaddr*)&QueueSock, sizeof(QueueSock)); // Just send the already serialized data over the socket.
-						sendto(comm_socket, it->first->PacketData, it->first->PacketSize, 0, (sockaddr*)&QueueSock, sizeof(QueueSock)); // Just send the already serialized data over the socket.
-
+					
 						it->first->PacketsAvailable = false;
 						delete[] it->first->PacketData; // Delete packet data we've sent it already.
 					}
@@ -678,55 +778,74 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 				H2ModPacket recvpak;
 				recvpak.ParseFromArray(NetworkData, recvresult);
 
-				if (recvpak.has_h2auth())
+
+				if (recvpak.has_type())
 				{
-					TRACE_GAME("[h2mod-network] Player connected!");
-
-					if (recvpak.h2auth().has_name())
+					switch (recvpak.type())
 					{
-						wchar_t* PlayerName = new wchar_t[36];
-						memcpy(PlayerName, recvpak.h2auth().name().c_str(), 36);
-
-						for (auto it = h2mod->NetworkPlayers.begin(); it != h2mod->NetworkPlayers.end(); ++it)
-						{
-							if ( wcscmp(it->first->PlayerName, PlayerName) == 0 )
+						case H2ModPacket_Type_authorize_client:
+							TRACE_GAME("[h2mod-network] Player Connected!");
+							if (recvpak.has_h2auth())
 							{
+								if (recvpak.h2auth().has_name())
+								{
+									wchar_t* PlayerName = new wchar_t[36];
+									memcpy(PlayerName, recvpak.h2auth().name().c_str(), 36);
 
-								TRACE_GAME("[h2mod-network] This player was already connected, sending them another packet letting them know they're authed already.");
+									for (auto it = h2mod->NetworkPlayers.begin(); it != h2mod->NetworkPlayers.end(); ++it)
+									{
+										if (wcscmp(it->first->PlayerName, PlayerName) == 0)
+										{
 
-								char* SendBuf = new char[recvpak.ByteSize()];
-								recvpak.SerializeToArray(SendBuf, recvpak.ByteSize());
+											TRACE_GAME("[h2mod-network] This player was already connected, sending them another packet letting them know they're authed already.");
 
-								sendto(comm_socket, SendBuf, recvpak.ByteSize(), 0, (SOCKADDR*)&SenderAddr, sizeof(SenderAddr));
+											char* SendBuf = new char[recvpak.ByteSize()];
+											recvpak.SerializeToArray(SendBuf, recvpak.ByteSize());
 
-								
-								already_authed = true;
+											sendto(comm_socket, SendBuf, recvpak.ByteSize(), 0, (SOCKADDR*)&SenderAddr, sizeof(SenderAddr));
 
-								delete[] SendBuf;
+
+											already_authed = true;
+
+											delete[] SendBuf;
+										}
+									}
+
+									if (already_authed == false)
+									{
+										NetworkPlayer *nPlayer = new NetworkPlayer;
+
+
+										TRACE_GAME("[h2mod-network] PlayerName: %ws", PlayerName);
+										TRACE_GAME("[h2mod-network] IP:PORT: %08X:%i", SenderAddr.sin_addr.s_addr, ntohs(SenderAddr.sin_port));
+
+										nPlayer->addr = SenderAddr.sin_addr.s_addr;
+										nPlayer->port = SenderAddr.sin_port;
+										nPlayer->PlayerName = PlayerName;
+										nPlayer->secure = recvpak.h2auth().secureaddr();
+										h2mod->NetworkPlayers[nPlayer] = 1;
+
+										char* SendBuf = new char[recvpak.ByteSize()];
+										recvpak.SerializeToArray(SendBuf, recvpak.ByteSize());
+
+										sendto(comm_socket, SendBuf, recvpak.ByteSize(), 0, (SOCKADDR*)&SenderAddr, sizeof(SenderAddr));
+
+										delete[] SendBuf;
+									}
+								}
 							}
-						}
+						break;
 
-						if (already_authed == false)
-						{
-							NetworkPlayer *nPlayer = new NetworkPlayer;
+						case H2ModPacket_Type_h2mod_ping:
+							H2ModPacket pongpak;
+							pongpak.set_type(H2ModPacket_Type_h2mod_pong);
 
+							char* pongdata = new char[pongpak.ByteSize()];
+							pongpak.SerializeToArray(pongdata, pongpak.ByteSize());
+							sendto(comm_socket, pongdata, recvpak.ByteSize(), 0, (SOCKADDR*)&SenderAddr, sizeof(SenderAddr));
 
-							TRACE_GAME("[h2mod-network] PlayerName: %ws", PlayerName);
-							TRACE_GAME("[h2mod-network] IP:PORT: %08X:%i", SenderAddr.sin_addr.s_addr, ntohs(SenderAddr.sin_port));
-
-							nPlayer->addr = SenderAddr.sin_addr.s_addr;
-							nPlayer->port = SenderAddr.sin_port;
-							nPlayer->PlayerName = PlayerName;
-							nPlayer->secure = recvpak.h2auth().secureaddr();
-							h2mod->NetworkPlayers[nPlayer] = 1;
-
-							char* SendBuf = new char[recvpak.ByteSize()];
-							recvpak.SerializeToArray(SendBuf, recvpak.ByteSize());
-
-							sendto(comm_socket, SendBuf, recvpak.ByteSize(), 0, (SOCKADDR*)&SenderAddr, sizeof(SenderAddr));
-
-							delete[] SendBuf;
-						}
+							delete[] pongdata;
+						break;
 
 					}
 				}
@@ -737,7 +856,7 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 	}
 	else
 	{
-
+		Connected = false;
 		TRACE_GAME("[h2mod-network] We're a client connecting to server...");
 
 		
@@ -764,11 +883,17 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 		{
 			if (NetworkActive == false)
 			{
+				isHost = false;
+				Connected = false;
+				ThreadCreated = false;
+				H2MOD_Network = 0;
+				TRACE_GAME("[h2mod-network] Networkactive == false ending client thread.");
 				return 0;
 			}
 
 			if (Connected == false) 
 			{
+				TRACE_GAME("[h2mod-network] Client - we're not connected re-sending our auth..");
 				sendto(comm_socket, SendBuf, h2pak.ByteSize(), 0, (SOCKADDR*)&SendStruct, sizeof(SendStruct));
 			}
 
@@ -783,21 +908,61 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 				H2ModPacket recvpak;
 				recvpak.ParseFromArray(NetworkData, recvresult);
 
-				if (recvpak.has_h2auth() == true && Connected == false)
+				if (recvpak.has_type())
 				{
-					TRACE_GAME("[h2mod-network] Got the auth packet back!, We're connected!");
-					Connected = true;
+					switch (recvpak.type())
+					{
+						case H2ModPacket_Type_authorize_client:
+						
+							if (Connected == false)
+							{
+								TRACE("[h2mod-network] Got the auth packet back!, We're connected!");
+								Connected = true;
+							}
+					
+						break;
 
-					//delete[] SendBuf;
+						case H2ModPacket_Type_set_player_team:
+							
+							if (recvpak.has_h2_set_player_team())
+							{
+
+								BYTE TeamIndex = recvpak.h2_set_player_team().team();
+
+								TRACE_GAME("[h2mod-network] Got a set team request from server! TeamIndex: %i", TeamIndex);
+								h2mod->set_local_team_index(TeamIndex);
+							}
+
+						break;
+
+						case H2ModPacket_Type_set_unit_grenades:
+							if (recvpak.has_set_grenade())
+							{
+								BYTE type = recvpak.set_grenade().type();
+								BYTE count = recvpak.set_grenade().count();
+								BYTE pIndex = recvpak.set_grenade().pindex();
+
+								h2mod->set_local_grenades(type, count, pIndex);
+							}
+						break;
+					}
 				}
 
-				if (recvpak.has_h2_set_player_team())
-				{
-					BYTE TeamIndex = recvpak.h2_set_player_team().team();
-					TRACE_GAME("[h2mod-network] Got a set team request from server! TeamIndex: %i", TeamIndex);
-					h2mod->set_local_team_index(TeamIndex);
-				}
 			}
+
+			if (Connected == true)
+			{
+				H2ModPacket pack;
+				pack.set_type(H2ModPacket_Type_h2mod_ping);
+
+				char* SendBuf = new char[pack.ByteSize()];
+				pack.SerializeToArray(SendBuf, pack.ByteSize());
+
+				sendto(comm_socket, SendBuf, pack.ByteSize(), 0, (SOCKADDR*)&SendStruct, sizeof(SendStruct));
+
+				delete[] SendBuf;
+			}
+
 
 			Sleep(500);
 		}
@@ -857,8 +1022,7 @@ void H2MOD::Initialize()
 
 	//Network::Initialize();
 
-	if ( b_GunGame == 1 )
-		gg->Initialize();
+	
 	
 	h2mod->ApplyHooks();
 	
