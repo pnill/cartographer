@@ -158,7 +158,7 @@ int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 			//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
 
 			BuildText = new char[250];
-			sprintf(BuildText, "Project Cartographer (v0.2a) - Build Time: %s %s", CompileDate, CompileTime);
+			sprintf(BuildText, "Project Cartographer (v0.2.1.1a) - Build Time: %s %s", CompileDate, CompileTime);
 	
 			GUI::Initialize();
 		}
