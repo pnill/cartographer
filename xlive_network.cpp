@@ -58,10 +58,31 @@ int WINAPI XOnlineStartup()
 	return 0;
 }
 
+
+// #5332: XSessionEnd
+int WINAPI XSessionEnd(DWORD, DWORD)
+{
+	isHost = false;
+	NetworkActive = false;
+	Connected = false;
+	ThreadCreated = false;
+	H2MOD_Network = 0;
+
+	TRACE("XSessionEnd");
+	return 0;
+}
+
+
+
 // #52: XNetCleanup
 INT WINAPI XNetCleanup()
 {
 	NetworkActive = false;
+	ThreadCreated = false;
+	Connected = false;
+	isHost = false;
+	H2MOD_Network = 0;
+
 	TRACE("XNetCleanup");
 	return 0;
 }
@@ -146,6 +167,8 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 		pxnkid->ab[0] &= ~XNET_XNKID_MASK;
 		pxnkid->ab[0] |= XNET_XNKID_SYSTEM_LINK;
 
+		NetworkActive = false;
+		
 		isHost = true;
 		if (H2MOD_Network == 0 && ThreadCreated == false)
 		{
@@ -178,6 +201,7 @@ INT WINAPI XNetXnAddrToInAddr(XNADDR *pxna, XNKID *pnkid, IN_ADDR *pina)
 	TRACE("XNetXNAddrToInAddr - ina.s_addr: %08X", pxna->ina.s_addr);
 	TRACE("XNetXNAddrToInAddr - secure: %08X", pxna->inaOnline.s_addr);
 	ULONG secure = pxna->inaOnline.s_addr;
+	
 
 
 	if (secure !=0)
@@ -381,9 +405,16 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 	
 			if (*(ULONG*)buf == 0x11223344)
 			{
-				//TRACE("XSocketRecvFrom() Got security packet form iplong: %08X:%i", iplong,htons(port));
 				User.smap[hostpair] = *(ULONG*)(buf + 4);
-				//TRACE("XSocketRecvFrom() Security packet address: %08X", *(ULONG*)(buf + 4));
+				
+				CUser* user = User.cusers[*(ULONG*)(buf + 4)];
+				if (user)
+				{
+					if (user->pxna.ina.s_addr != iplong)
+					{
+						user->pxna.ina.s_addr = iplong;
+					}
+				}
 
 				ret = 0;
 			}
@@ -393,11 +424,9 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 
 			(((struct sockaddr_in*)from)->sin_addr.s_addr) = secure;
 
-			//TRACE("XScoketRecvFrom( %08X:%i )", iplong, htons(port));
-
 			if (secure == 0)
 			{
-				TRACE("This is probably the issue.... now the fucking recv address is 0 you numb nuts. iplong: %08X, port: %08X",iplong,htons(port));
+				//TRACE("This is probably the issue.... now the fucking recv address is 0 you numb nuts. iplong: %08X, port: %08X",iplong,htons(port));
 			}
 			else
 			{

@@ -78,9 +78,6 @@
     <ClCompile Include="cartographer_main.cpp">
       <Filter>Source Files\H2MOD\GUI\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="H2MOD_Sounds.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD_GunGame.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <Shellapi.h>
 
+
 using namespace std;
 
 #include "Detour.h"
@@ -430,8 +431,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 	{
 	case DLL_PROCESS_ATTACH:
 		hThis = hModule;
-		
-
+		//system("update.bat"); // fucking broken h2online.exe -_- This will update that...
 		Detour();
 		break;
 

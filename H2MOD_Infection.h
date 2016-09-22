@@ -3,6 +3,13 @@
 #define H2INFECTION_H
 #include <unordered_map>
 
+class InfectionPlayer
+{
+public:
+	wchar_t PlayerName[16];
+	bool infected;
+};
+
 class Infection
 {
 public:
@@ -12,7 +19,7 @@ public:
 	void Initialize();
 	void FindZombie();
 
-	std::unordered_map<wchar_t*, bool> infected_players;
+	std::unordered_map<InfectionPlayer*, bool> infected_players;
 
 
 };

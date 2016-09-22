@@ -9,7 +9,8 @@
 #include "xliveless.h"
 #include "CUser.h"
 #include <h2mod.pb.h>
-
+#include <Mmsystem.h>
+#include <thread>
 
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
@@ -27,6 +28,7 @@ extern HANDLE H2MOD_Network;
 extern bool NetworkActive;
 extern bool Connected;
 extern bool ThreadCreated;
+extern ULONG broadcast_server;
 
 
 SOCKET comm_socket = INVALID_SOCKET;
@@ -307,6 +309,59 @@ BYTE H2MOD::get_local_team_index()
 	return *(BYTE*)(((char*)h2mod->GetBase() + 0x51A6B4));
 }
 
+
+void H2MOD::DisableSound(int sound)
+{
+	DWORD AddressOffset = *(DWORD*)((char*)this->GetBase() + 0x47CD54);
+
+	TRACE_GAME("AddressOffset: %08X", AddressOffset);
+	switch (sound)
+	{
+		case SoundType::Slayer:
+			TRACE_GAME("AddressOffset+0xd7dfb4:", (DWORD*)(AddressOffset + 0xd7dfb4));
+			*(DWORD*)(AddressOffset + 0xd7e05c) = -1;
+			*(DWORD*)(AddressOffset + 0xd7dfb4) = -1;
+		break;
+
+		case SoundType::GainedTheLead:
+			*(DWORD*)(AddressOffset + 0xd7ab34) = -1;
+			*(DWORD*)(AddressOffset + 0xd7ac84) = -1;
+		break;
+
+		case SoundType::LostTheLead:
+			*(DWORD*)(AddressOffset + 0xd7ad2c) = -1;
+			*(DWORD*)(AddressOffset + 0xd7add4) = -1;
+		break;
+
+		case SoundType::TeamChange:
+			*(DWORD*)(AddressOffset + 0xd7b9a4) = -1;
+		break;
+	}
+}
+
+void SoundThread(void)
+{
+
+	while (1)
+	{	
+		if (h2mod->SoundMap.size() > 0)
+		{
+			auto it = h2mod->SoundMap.begin();
+			while (it != h2mod->SoundMap.end())
+			{
+				TRACE_GAME("[H2MOD-SoundQueue] - attempting to play sound %ws - delaying for %i miliseconds first", it->first, it->second);
+				Sleep(it->second);
+				PlaySound(it->first, NULL, SND_FILENAME);
+				it = h2mod->SoundMap.erase(it);
+			}
+		}
+
+		Sleep(100);
+	}
+
+}
+
+
 typedef bool(__cdecl *spawn_player)(int a1);
 spawn_player pspawn_player;
 
@@ -373,6 +428,16 @@ bool bcoop = false;
 
 int __cdecl OnMapLoad(int a1)
 {
+	
+	/*wchar_t mp3[15] = L"new_zombie.mp3";
+	h2mod->play_mp3((LPWSTR)&mp3);
+
+
+	wchar_t mp32[13] = L"infected.mp3";
+	h2mod->play_mp3((LPWSTR)&mp32);*/
+
+
+
 
 	b_Infection = false;
 	b_GunGame = false;
@@ -720,6 +785,7 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 
 		while (1)
 		{
+	
 			if (NetworkActive == false)
 			{
 				isHost = false;
@@ -735,42 +801,46 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 			memset(NetworkData, 0x00, 255);
 			int recvresult = recvfrom(comm_socket, NetworkData, 255, 0, (sockaddr*)&SenderAddr, &SenderAddrSize);
 
-			auto it = h2mod->NetworkPlayers.begin();
-			while (it != h2mod->NetworkPlayers.end())
+			if (h2mod->NetworkPlayers.size() > 0)
 			{
-				if (it->second == 0)
+				auto it = h2mod->NetworkPlayers.begin();
+				while (it != h2mod->NetworkPlayers.end())
 				{
-					TRACE_GAME("[h2mod-network] Deleting player %ws as their value was set to 0", it->first->PlayerName);
-
-					if (it->first->PacketsAvailable == true)
-						delete[] it->first->PacketData; // Delete packet data if there is any.
-
-	
-					delete[] it->first; // Clear NetworkPlayer object.
-					
-					it = h2mod->NetworkPlayers.erase(it);
-
-
-				}
-				else 
-				{
-					if (it->first->PacketsAvailable == true) // If there's a packet available we set this to true already.
+					if (it->second == 0)
 					{
-						TRACE_GAME("[h2mod-network] Sending player %ws data", it->first->PlayerName);
+						TRACE_GAME("[h2mod-network] Deleting player %ws as their value was set to 0", it->first->PlayerName);
 
-						SOCKADDR_IN QueueSock;
-						QueueSock.sin_port = it->first->port; // We can grab the port they connected from.
-						QueueSock.sin_addr.s_addr = it->first->addr; // Address they connected from.
-						QueueSock.sin_family = AF_INET; 
-						
-						sendto(comm_socket, it->first->PacketData, it->first->PacketSize, 0, (sockaddr*)&QueueSock, sizeof(QueueSock)); // Just send the already serialized data over the socket.
-					
-						it->first->PacketsAvailable = false;
-						delete[] it->first->PacketData; // Delete packet data we've sent it already.
+						if (it->first->PacketsAvailable == true)
+							delete[] it->first->PacketData; // Delete packet data if there is any.
+
+
+						delete[] it->first; // Clear NetworkPlayer object.
+
+						it = h2mod->NetworkPlayers.erase(it);
+
+
 					}
-					it++;
+					else
+					{
+						if (it->first->PacketsAvailable == true) // If there's a packet available we set this to true already.
+						{
+							TRACE_GAME("[h2mod-network] Sending player %ws data", it->first->PlayerName);
+
+							SOCKADDR_IN QueueSock;
+							QueueSock.sin_port = it->first->port; // We can grab the port they connected from.
+							QueueSock.sin_addr.s_addr = it->first->addr; // Address they connected from.
+							QueueSock.sin_family = AF_INET;
+
+							sendto(comm_socket, it->first->PacketData, it->first->PacketSize, 0, (sockaddr*)&QueueSock, sizeof(QueueSock)); // Just send the already serialized data over the socket.
+
+							it->first->PacketsAvailable = false;
+							delete[] it->first->PacketData; // Delete packet data we've sent it already.
+						}
+						it++;
+					}
 				}
 			}
+		
 
 			if (recvresult > 0)
 			{
@@ -1009,10 +1079,11 @@ void H2MOD::Initialize()
 	{
 		this->Base = (DWORD)GetModuleHandleA("halo2.exe");
 		this->Server = FALSE;
-		//HANDLE Handle_Of_Thread_1 = 0;
-		//int Data_Of_Thread_1 = 1;
-		//Handle_Of_Thread_1 = CreateThread(NULL, 0,
-		//	Thread1, &Data_Of_Thread_1, 0, NULL);
+		//HANDLE Handle_Of_Sound_Thread = 0;
+		//int Data_Of_Sound_Thread = 1;
+		std::thread SoundT(SoundThread);
+		SoundT.detach();
+		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 	}
 
 	TRACE_GAME("H2MOD - Initialized v0.1a");

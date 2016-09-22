@@ -3,11 +3,20 @@
 #define H2MOD_H
 #include "Hook.h"
 #include <unordered_map>
+#include <mutex>
 
 enum GrenadeType
 {
 	Frag = 0,
 	Plasma = 1
+};
+
+enum SoundType
+{
+	TeamChange = 1,
+	GainedTheLead = 2,
+	LostTheLead = 3,
+	Slayer = 4
 };
 
 enum BipedType
@@ -101,9 +110,12 @@ public:
 		BYTE get_local_team_index();
 		void set_unit_grenades(BYTE type, BYTE count, int pIndex, bool bReset);
 		void set_local_grenades(BYTE type, BYTE count, int pIndex);
-
+		void DisableSound(int sound);
 		BOOL Server;
 		std::unordered_map<NetworkPlayer*, bool> NetworkPlayers;
+		std::unordered_map<wchar_t*, int> SoundMap;
+		std::mutex sound_mutex;
+
 private:
 		DWORD Base;
 };

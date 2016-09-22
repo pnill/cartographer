@@ -809,12 +809,6 @@ int WINAPI XNetStartup (void *a1)
     return 0;
 }
 
-// #52: XNetCleanup
-INT WINAPI XNetCleanup ()
-{
-    TRACE("XNetCleanup");
-    return 0;
-}
 
 
 
@@ -3705,12 +3699,6 @@ DWORD WINAPI XUserReadProfileSettings (DWORD dwTitleId, DWORD dwUserIndex, DWORD
 }
 
 
-// #5332: XSessionEnd
-int WINAPI XSessionEnd (DWORD, DWORD)
-{
-    TRACE("XSessionEnd");
-    return 0;
-}
 
 
 // #5333: XSessionArbitrationRegister
