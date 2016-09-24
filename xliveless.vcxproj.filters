@@ -43,6 +43,9 @@
     <Filter Include="Source Files\H2MOD\GUI\Source Files\Direct3D9">
       <UniqueIdentifier>{933eb738-ef3b-4896-a991-645018ac135b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Team Speak">
+      <UniqueIdentifier>{db708c7b-a594-479d-9a86-9f7db3c0de55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -86,6 +89,27 @@
     </ClCompile>
     <ClCompile Include="h2mod.pb.cc">
       <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Globals.cpp">
+      <Filter>Source Files\xlive</Filter>
+    </ClCompile>
+    <ClCompile Include="TSClient.cpp">
+      <Filter>Source Files\Team Speak</Filter>
+    </ClCompile>
+    <ClCompile Include="TSServer.cpp">
+      <Filter>Source Files\Team Speak</Filter>
+    </ClCompile>
+    <ClCompile Include="TSUsers.cpp">
+      <Filter>Source Files\Team Speak</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Ban.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="H2ChatBoxCommands.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Players.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -136,6 +160,30 @@
     </ClInclude>
     <ClInclude Include="h2mod.pb.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals.h">
+      <Filter>Source Files\xlive</Filter>
+    </ClInclude>
+    <ClInclude Include="TSClient.h">
+      <Filter>Source Files\Team Speak</Filter>
+    </ClInclude>
+    <ClInclude Include="TSServer.h">
+      <Filter>Source Files\Team Speak</Filter>
+    </ClInclude>
+    <ClInclude Include="TSUsers.h">
+      <Filter>Source Files\Team Speak</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Ban.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2ChatBoxCommands.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Players.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xlive_network.h">
+      <Filter>Source Files\xlive</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

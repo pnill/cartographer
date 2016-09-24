@@ -336,7 +336,10 @@ int WINAPI XLiveRender()
 				drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
 		}
 			
-		frameTimeManagement();
+
+		if (fps_enable) {
+			frameTimeManagement();
+		} 
 	}
 
 	return 0;

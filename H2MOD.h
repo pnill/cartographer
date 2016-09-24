@@ -79,6 +79,8 @@ signed int __cdecl call_object_new(void*);
 void GivePlayerWeapon(int PlayerIndex, int WeaponId, bool bReset);
 DWORD WINAPI NetworkThread(LPVOID lParam);
 
+char __cdecl clientXboxLiveCheck4(int a1);
+
 class NetworkPlayer
 {
 	public:
@@ -97,7 +99,22 @@ public:
 		void Initialize();
 		int get_unit_from_player_index(int);
 		int get_unit_datum_from_player_index(int);
-		void ApplyHooks();
+
+		BOOL is_same_team(int p1, int p2);
+		void kick_player(int playerIndex);
+		IN_ADDR get_server_address();
+		int get_dynamic_player_base(int playerIndex, bool resetDynamicBase);
+		int get_player_count(); 
+		float get_player_x(int, bool);
+		float get_player_y(int, bool);
+		float get_player_z(int, bool);
+		float get_distance(int, int);
+		bool is_team_play();
+		IN_ADDR get_player_ip(int playerIndex);
+		void handle_command(std::string);
+		void write_inner_chat_dynamic(const wchar_t* data);
+		int write_chat_dynamic(const wchar_t* data);
+		int write_chat_literal(const wchar_t* data);		void ApplyHooks();
 		DWORD GetBase();
 		wchar_t* get_local_player_name();
 		wchar_t* get_player_name_from_index(int pIndex);
@@ -116,6 +133,7 @@ public:
 		std::unordered_map<wchar_t*, int> SoundMap;
 		std::mutex sound_mutex;
 
+		std::unordered_map<int, int> playerIndexToDynamicBase;
 private:
 		DWORD Base;
 };

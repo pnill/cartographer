@@ -4,6 +4,12 @@
 #include "resource.h"
 #include <iostream>
 #include <sstream>
+#include <stdlib.h>
+#include <string>
+#include <algorithm>
+#include "xlive_network.h"
+#include "CUser.h"
+#include "Globals.h"
 
 using namespace std;
 
@@ -48,7 +54,10 @@ extern UINT g_signin[4];
 extern XUID xFakeXuid[4];
 extern CHAR g_szUserName[4][16+1];
 extern UINT g_online;
+extern UINT g_debug;
 extern CHAR g_profileDirectory[];
+extern UINT voice_chat;
+extern BOOL isHost;
 
 extern void InitInstance();
 extern void ExitInstance();
@@ -3020,6 +3029,10 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 	{
 		TRACE("XSessionCreate - XSESSION_CREATE_HOST");
 
+		if (!h2mod->Server) {
+			//when joining a dedicated server, the flags are wrong, so we only set this when its peer hosted games
+			isHost = true;
+		}
 	}
 
 	if ((dwFlags & XSESSION_CREATE_USES_ARBITRATION) > 0)
@@ -3079,9 +3092,74 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 
 	Check_Overlapped( pOverlapped );
 
+	if (voice_chat) {
+		//can be true if XNetCreateKey sets the extern bool server to true, this is always called before session create
+		//TODo: xnetcreatekey is not called on reconnect
+		if (isServer) {
+			TRACE("You are hosting a game");
+			isHost = true;
+			startServer();
+			//TODO: start listening on 1008 for map download requests
+		} else {
+			TRACE("You are joining a game");
+			startClient(true);
+		}
+	}
 	return ERROR_IO_PENDING;
 }
+CHAR conversionFunc(WCHAR wchar) {
+	// simple typecast
+	// works because UNICODE incorporates ASCII into itself
+	return CHAR(wchar);
 
+}
+void startClient(bool startThread) {
+	//basically regardless if you are the host or not, you are always create a client to connect to "some" server
+	if (!client) {
+		client = new TSClient(g_debug);
+	}
+
+	IN_ADDR serverAddr;
+	if (isServer) {
+		serverAddr = clientMachineAddress;
+		//TODO: if we cannot get the current client machine address via GetLocalXNAddr which populates client Machine address
+		//there are a few offsets we can use (one reason this would happen if the master server isn't up)
+		/*
+		halo2.exe+507C18
+		halo2.exe+51C48B
+		xlive.dll+5A4434
+		xlive.dll+5A4434
+		*/
+		TRACE_GAME_N("Client is server and is trying to connect to address %s", inet_ntoa(serverAddr));
+	}	else {
+		serverAddr = h2mod->get_server_address();
+		TRACE_GAME_N("Client is NOT server and is trying to connect to address %s", inet_ntoa(serverAddr));
+	}
+	client->setServerAddress(serverAddr);
+	client->setServerPort(1007);
+
+	//only player 1 gets to use voice, guests don't
+	WCHAR strw[8192];
+	//needs to live on the heap for the duration of the entire process, cause we reuse ts clients to connect to different ts servers
+	char* strw3 = new char[4096];
+	wsprintf(strw, L"%I64x", xFakeXuid[0]);
+	wcstombs(strw3, strw, 8192);
+
+	client->setNickname(strw3);
+	if (startThread) {
+		client->startChatting();
+	}
+}
+
+void startServer() {
+	if (!server) {
+		//this should never happen, but if it does, we readyyy
+		server = new TSServer(g_debug);
+		TRACE_GAME_N("TSServer wasn't created for some reason, so we rebuilt it");
+	}
+	server->setPort(1007);
+	server->startListening();
+}
 
 // #5303: XStringVerify
 DWORD WINAPI XStringVerify( DWORD dwFlags, const CHAR *szLocale, DWORD dwNumStrings, const STRING_DATA *pStringData, DWORD cbResults, STRING_VERIFY_RESPONSE *pResults, PXOVERLAPPED pOverlapped )
@@ -3456,6 +3534,7 @@ int WINAPI XSessionFlushStats (DWORD, DWORD)
 DWORD WINAPI XSessionDelete (DWORD, DWORD)
 {
     TRACE("XSessionDelete");
+		cleanupClientAndServer();
     return 0;
 }
 
@@ -3698,7 +3777,31 @@ DWORD WINAPI XUserReadProfileSettings (DWORD dwTitleId, DWORD dwUserIndex, DWORD
 	return ERROR_SUCCESS;
 }
 
+//called by xsessionend, when you leave a session you are no longer a client or a server
+//so we reset these states
+//TODO: separate into cleanupclient and cleanupserver
+void cleanupClientAndServer() {
+	TRACE_GAME_N("Cleanup called");
+	if (client != NULL) {
+		client->disconnect();
+	}
 
+	if (server != NULL) {
+		server->destroyVirtualServer();
+	}
+
+	//the user may not host a game again, so we unset this
+	isServer = false;
+
+	//so the socket can be reopened
+	customMapSocketOpen = false;
+
+	//remove any cached team speak users
+	tsUsers->empty();
+
+	//empty player cache
+	players->clear();
+}
 
 
 // #5333: XSessionArbitrationRegister
@@ -5469,6 +5572,7 @@ HRESULT IXHV2ENGINE::Dummy7( VOID *pThis, int a1, int a2, int a3, int a4 )
 		a1, a2, a3, a4 );
 
 
+	//removes player from xlive session
 	return ERROR_SUCCESS;
 }
 
@@ -5481,7 +5585,36 @@ HRESULT IXHV2ENGINE::Dummy8( VOID *pThis, int a1 )
 
 	return ERROR_SUCCESS;
 }
+BOOL IXHV2ENGINE::IsHeadsetPresent(VOID *pThis, DWORD dwUserIndex) {
+	//TRACE("IXHV2Engine::IsHeadsetPresent");
 
+	//TODO: add logic that actually validates their audio device is connected
+	//TODO: handle it being connected and disconnected
+	return true;
+}
+
+BOOL IXHV2ENGINE::isRemoteTalking(VOID *pThis, XUID xuid) {
+	//TRACE("IXHV2Engine::isRemoteTalking");
+	//TODO: the xuid given here is the real xuid, the one we provide in xlive.ini is the hex of that the above value
+	//so we need to convert it...
+	WCHAR strw[8192];
+	char strw3[4096];
+	wsprintf(strw, L"%I64x", xuid);
+	wcstombs(strw3, strw, 8192);
+	XUID id = _atoi64(strw3);
+	return tsUsers->isUserTalking(id);
+}
+
+BOOL IXHV2ENGINE::IsLocalTalking(VOID *pThis, DWORD dwUserIndex) {
+	//TRACE("IXHV2Engine::isTalking(dwUserIndex = %d)", dwUserIndex);
+	//check the xuid map
+	WCHAR strw[8192];
+	char strw3[4096];
+	wsprintf(strw, L"%I64x", xFakeXuid[0]);
+	wcstombs(strw3, strw, 8192);
+	XUID id = _atoi64(strw3);
+	return microphoneEnabled ? tsUsers->isUserTalking(id) : false;
+}
 
 
 HRESULT IXHV2ENGINE::RegisterLocalTalker( VOID *pThis, DWORD dwUserIndex )
@@ -5507,21 +5640,25 @@ HRESULT IXHV2ENGINE::UnregisterLocalTalker( VOID *pThis, DWORD dwUserIndex )
 
 
 
-HRESULT IXHV2ENGINE::Dummy11( VOID *pThis, int a1, int a2, int a3, int a4, int a5 )
+HRESULT IXHV2ENGINE::Dummy11( VOID *pThis, XUID id, int a3, int a4, int a5 )
 {
-	TRACE( "IXHV2Engine::Dummy11  (a1 = %X, a2 = %X, a3 = %X, a4 = %X, a5 = %X)",
-		a1, a2, a3, a4, a5 );
+	//TRACE( "IXHV2Engine::Dummy11  (a1 = %X, a2 = %X, a3 = %X, a4 = %X, a5 = %X)", a1, a2, a3, a4, a5 );
 
 
 	return ERROR_SUCCESS;
 }
 
+HRESULT IXHV2ENGINE::RegisterRemoteTalker(VOID *pThis, XUID a1, LPVOID v1, LPVOID v2, LPVOID v3) {
+	TRACE("IXHV2Engine::RegisterRemoteTalker");
+	TRACE("- Voice started");
+
+	return S_OK;
+}
 
 
-HRESULT IXHV2ENGINE::UnregisterRemoteTalker( VOID *pThis, int a1, int a2 )
+HRESULT IXHV2ENGINE::UnregisterRemoteTalker( VOID *pThis, XUID  id )
 {
-	TRACE( "IXHV2Engine::UnregisterRemoteTalker  (a1 = %X, a2 = %X)",
-		a1, a2 );
+	TRACE("IXHV2Engine::UnregisterRemoteTalker ");
 
 
 	TRACE( "- Voice stopped" );
@@ -5838,9 +5975,9 @@ IXHV2ENGINE::IXHV2ENGINE()
 	funcPtr[11] = (HV2FUNCPTR) &IXHV2ENGINE::UnregisterRemoteTalker;
 
 	funcPtr[12] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy13;
-	funcPtr[13] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy14;
-	funcPtr[14] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy15;
-	funcPtr[15] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy16;
+	funcPtr[13] = (HV2FUNCPTR)&IXHV2ENGINE::IsHeadsetPresent;
+	funcPtr[14] = (HV2FUNCPTR)&IXHV2ENGINE::IsLocalTalking;
+	funcPtr[15] = (HV2FUNCPTR)&IXHV2ENGINE::isRemoteTalking;
 
 	funcPtr[16] = (HV2FUNCPTR) &IXHV2ENGINE::GetDataReadyFlags;
 	funcPtr[17] = (HV2FUNCPTR) &IXHV2ENGINE::GetLocalChatData;

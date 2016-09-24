@@ -623,8 +623,8 @@ INT    WINAPI XNetSetOpt(DWORD dwOptId, const BYTE * pbValue, DWORD dwValueSize)
 
 
 
-typedef ULONGLONG XUID;
-typedef XUID *PXUID;
+//typedef ULONGLONG XUID;
+//typedef XUID *PXUID;
 
 #define INVALID_XUID                    ((XUID) 0)
 
@@ -970,11 +970,17 @@ public:
 
 	HRESULT Dummy8( VOID *pThis, int a1 );	// 1C
 
+	BOOL IsLocalTalking(VOID *pThis, DWORD dwUserIndex);
+	BOOL isRemoteTalking(VOID *pThis, XUID xuid);
+	BOOL IsHeadsetPresent(VOID *pThis, DWORD dwUserIndex);
+
 	HRESULT RegisterLocalTalker( VOID *pThis, DWORD dwUserIndex );
 	HRESULT UnregisterLocalTalker( VOID *pThis, DWORD dwUserIndex );
 
-	HRESULT Dummy11( VOID *pThis, int a1, int a2, int a3, int a4, int a5 );	// 28
-	HRESULT UnregisterRemoteTalker( VOID *pThis, int a1, int a2 );
+	HRESULT Dummy11( VOID *pThis, XUID id, int a3, int a4, int a5 );	// 28
+	HRESULT RegisterRemoteTalker(VOID *pThis, XUID id, LPVOID v1, LPVOID v2, LPVOID v3);
+	HRESULT UnregisterRemoteTalker( VOID *pThis, XUID id);
+	DWORD XSessionLeaveRemote(HANDLE hSession, DWORD dxXuidCount, const XUID *pXuids, PXOVERLAPPED pXOverlapped);
 
 	HRESULT Dummy13( VOID *pThis, int a1, int a2 );	// 30
 	INT Dummy14( VOID *pThis, int a1 );	// 34

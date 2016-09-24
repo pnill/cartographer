@@ -6,6 +6,8 @@
 #include <time.h>
 #include <thread>
 #include "h2mod.h"
+#include "xlive_network.h"
+#include "Globals.h"
 #include <mutex>
 
 extern ULONG broadcast_server;
@@ -69,6 +71,7 @@ int WINAPI XSessionEnd(DWORD, DWORD)
 	H2MOD_Network = 0;
 
 	TRACE("XSessionEnd");
+	cleanupClientAndServer();
 	return 0;
 }
 
@@ -168,7 +171,8 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 		pxnkid->ab[0] |= XNET_XNKID_SYSTEM_LINK;
 
 		NetworkActive = false;
-		
+		//only the server ever creates the session key
+				isServer = true;
 		isHost = true;
 		if (H2MOD_Network == 0 && ThreadCreated == false)
 		{

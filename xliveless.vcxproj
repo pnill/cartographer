@@ -126,13 +126,14 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\soundbackends;$(MSBuildProjectDirectory)\security;$(MSBuildProjectDirectory)\lua;$(MSBuildProjectDirectory)\teamspeak;$(MSBuildProjectDirectory)\teamlog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;$(MSBuildProjectDirectory)\lib\ts3client_win32.lib;$(MSBuildProjectDirectory)\lib\ts3server_win32.lib;$(MSBuildProjectDirectory)\lib\libMinHook.x86.lib;shlwapi.lib;$(MSBuildProjectDirectory)\lib\security.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../Halo 2/xlive.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -164,14 +165,21 @@
       <InlineFunctionExpansion Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</InlineFunctionExpansion>
     </ClCompile>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Globals.cpp" />
     <ClCompile Include="GUI.cpp" />
+    <ClCompile Include="H2Ban.cpp" />
+    <ClCompile Include="H2ChatBoxCommands.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="h2mod.pb.cc" />
     <ClCompile Include="H2MOD_GunGame.cpp" />
+    <ClCompile Include="H2Players.cpp" />
     <ClCompile Include="Hook.cpp" />
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="packet.pb.cc" />
     <ClCompile Include="H2MOD_Infection.cpp" />
+    <ClCompile Include="TSClient.cpp" />
+    <ClCompile Include="TSServer.cpp" />
+    <ClCompile Include="TSUsers.cpp" />
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="xlive_network.cpp" />
   </ItemGroup>
@@ -179,19 +187,27 @@
     <ClInclude Include="cartographer_main.hpp" />
     <ClInclude Include="CUser.h" />
     <ClInclude Include="Detour.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="GUI.h" />
+    <ClInclude Include="H2Ban.h" />
+    <ClInclude Include="H2ChatBoxCommands.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="h2mod.pb.h" />
     <ClInclude Include="H2MOD_GunGame.h" />
     <ClInclude Include="H2MOD_Infection.h" />
     <ClInclude Include="H2MOD_Sounds.h" />
+    <ClInclude Include="H2Players.h" />
     <ClInclude Include="Hook.h" />
     <ClInclude Include="Network.h" />
     <ClInclude Include="packet.pb.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
+    <ClInclude Include="TSClient.h" />
+    <ClInclude Include="TSServer.h" />
+    <ClInclude Include="TSUsers.h" />
     <ClInclude Include="xlivedefs.h" />
     <ClInclude Include="xliveless.h" />
+    <ClInclude Include="xlive_network.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def" />
