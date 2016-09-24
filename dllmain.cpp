@@ -2,6 +2,7 @@
 #include <io.h>
 #include <fcntl.h>
 #include "H2MOD.h"
+#include "Globals.h"
 #include <iostream>
 #include <Shellapi.h>
 
@@ -18,6 +19,9 @@ CRITICAL_SECTION d_lock;
 UINT g_online = 1;
 UINT g_debug = 0;
 UINT g_port = 1000;
+UINT voice_chat = 0;
+UINT fps_enable = 1;
+BOOL isHost = FALSE;
 
 ULONG broadcast_server = inet_addr("149.56.81.89");
 
@@ -288,6 +292,8 @@ void InitInstance()
 				CHECK_ARG("debug_log =", g_debug);
 				CHECK_ARG("gungame =", b_GunGame);
 				CHECK_ARG("port =", g_port);
+				CHECK_ARG("voice_chat = ", voice_chat);
+				CHECK_ARG("fps_enable = ", fps_enable);
 			}
 
 			
@@ -344,6 +350,10 @@ void InitInstance()
 		g_lLANIP = inet_addr(g_szLANIP);
 		g_lWANIP = inet_addr(g_szWANIP);
 
+		if (h2mod)
+			h2mod->Initialize();
+		else
+			TRACE("H2MOD Failed to intialize");		
 		if (g_debug)
 		{
 			if (logfile = _wfopen(L"xlive_trace.log", L"wt"))
@@ -363,11 +373,6 @@ void InitInstance()
 				TRACE_GAME_NETWORK("Log started (H2MOD - Network 0.1a1)\n");
 		}
 
-			if (h2mod)
-				h2mod->Initialize();
-			else
-				TRACE("H2MOD Failed to intialize");
-
 			TRACE("[GunGame] : %i", b_GunGame);
 			if (b_GunGame == 1)
 			{
@@ -381,7 +386,19 @@ void InitInstance()
 			GetModuleFileNameW( NULL, (LPWCH) &gameName, sizeof(gameName) );
 			TRACE( "%s", gameName );
 
-		
+
+		if (voice_chat) {
+			server = new TSServer(g_debug);
+
+			if (h2mod->Server) {
+				//if this is the dedicated server, go ahead, and start the team speak server
+				server->setPort(1007);
+				server->setConnectClient(false);
+				server->startListening();
+			}
+		}
+
+		BanUtility::getInstance().buildBannedPlayerData();		
 
 
 		extern void LoadAchievements();
