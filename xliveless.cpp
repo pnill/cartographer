@@ -54,6 +54,7 @@ extern UINT g_signin[4];
 extern XUID xFakeXuid[4];
 extern CHAR g_szUserName[4][16+1];
 extern UINT g_online;
+extern UINT g_port;
 extern UINT g_debug;
 extern CHAR g_profileDirectory[];
 extern UINT voice_chat;
@@ -3136,7 +3137,7 @@ void startClient(bool startThread) {
 		TRACE_GAME_N("Client is NOT server and is trying to connect to address %s", inet_ntoa(serverAddr));
 	}
 	client->setServerAddress(serverAddr);
-	client->setServerPort(1007);
+	client->setServerPort(g_port + 8);
 
 	//only player 1 gets to use voice, guests don't
 	WCHAR strw[8192];
@@ -3157,7 +3158,7 @@ void startServer() {
 		server = new TSServer(g_debug);
 		TRACE_GAME_N("TSServer wasn't created for some reason, so we rebuilt it");
 	}
-	server->setPort(1007);
+	server->setPort(g_port + 8);
 	server->startListening();
 }
 
