@@ -5,6 +5,7 @@
 #include "H2MOD.h"
 #include "H2MOD_GunGame.h"
 #include "H2MOD_Infection.h"
+#include "H2MOD_Hitfix.h"
 #include "Network.h"
 #include "xliveless.h"
 #include "CUser.h"
@@ -15,8 +16,10 @@
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
 Infection *inf = new Infection();
+H2Hitfix *hitfix = new H2Hitfix();
 
 bool b_Infection = false;
+bool b_Hitfix = false;
 
 extern bool b_GunGame;
 extern CUserManagement User;
@@ -441,6 +444,7 @@ int __cdecl OnMapLoad(int a1)
 
 	b_Infection = false;
 	b_GunGame = false;
+	b_Hitfix = false;
 	
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase())+0x97777C);
 
@@ -456,6 +460,12 @@ int __cdecl OnMapLoad(int a1)
 	{
 		TRACE_GAME("[h2mod] GunGame Turned on!");
 		b_GunGame = true;
+	}
+
+	if (wcsstr(variant_name, L"hitfix") > 0 || wcsstr(variant_name, L"HITFIX") > 0 || wcsstr(variant_name, L"HitFix") > 0)
+	{
+		TRACE_GAME("[h2mod] Hitfix Turned on!");
+		b_Hitfix = true;
 	}
 
 #pragma region COOP FIXES
@@ -535,6 +545,11 @@ int __cdecl OnMapLoad(int a1)
 		#pragma region GunGame Handler
 			if (b_GunGame && isHost)
 				gg->Initialize();
+		#pragma endregion
+
+		#pragma region HitFix Handler
+			if (b_Hitfix)
+				hitfix->Initialize(h2mod->Server);
 		#pragma endregion
 	}
 
