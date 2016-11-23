@@ -32,3 +32,4 @@ version.txt
 xliveless.aps
 /Release
 /Debug
+*.db

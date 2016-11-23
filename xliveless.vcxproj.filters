@@ -87,6 +87,9 @@
     <ClCompile Include="h2mod.pb.cc">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD_Hitfix.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -135,6 +138,9 @@
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h2mod.pb.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD_Hitfix.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

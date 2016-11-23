@@ -49,3 +49,5 @@ extern void trace_game_network(LPSTR message, ...);
 #endif
 
 #endif
+
+extern UINT fps_enable;
