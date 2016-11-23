@@ -18,6 +18,7 @@ CRITICAL_SECTION d_lock;
 UINT g_online = 1;
 UINT g_debug = 0;
 UINT g_port = 1000;
+UINT fps_enable = 1;
 
 ULONG broadcast_server = inet_addr("149.56.81.89");
 
@@ -288,6 +289,7 @@ void InitInstance()
 				CHECK_ARG("debug_log =", g_debug);
 				CHECK_ARG("gungame =", b_GunGame);
 				CHECK_ARG("port =", g_port);
+				CHECK_ARG("fps_enable = ", fps_enable);
 			}
 
 			
