@@ -71,7 +71,6 @@ enum Weapon
 
 int __cdecl call_get_object(signed int object_datum_index, int object_type);
 int __cdecl call_unit_reset_equipment(int unit_datum_index);
-bool __cdecl call_add_object_to_sync(int gamestate_object_datum);
 int __cdecl call_hs_object_destroy(int object_datum_index);
 signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit_datum_index);
 bool __cdecl call_assign_equipment_to_unit(int uint, int object_index, short unk);
@@ -99,11 +98,7 @@ public:
 		int get_unit_from_player_index(int);
 		int get_unit_datum_from_player_index(int);
 		void ApplyHooks();
-		DWORD GetBase(); 
-		void handle_command(std::string);
-		void handle_command(std::wstring);
-		void logToDedicatedServerConsole(wchar_t* message);
-		void write_inner_chat_dynamic(const wchar_t* data);
+		DWORD GetBase();
 		wchar_t* get_local_player_name();
 		wchar_t* get_player_name_from_index(int pIndex);
 		int get_player_index_from_name(wchar_t* playername);
@@ -120,7 +115,6 @@ public:
 		std::unordered_map<NetworkPlayer*, bool> NetworkPlayers;
 		std::unordered_map<wchar_t*, int> SoundMap;
 		std::mutex sound_mutex;
-		std::string currentchatstr;
 
 private:
 		DWORD Base;
