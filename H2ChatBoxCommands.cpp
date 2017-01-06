@@ -63,6 +63,9 @@ void ChatBoxCommands::handle_command(std::string command) {
 			std::string secondArg = splitCommands[1];
 			std::string thirdArg = splitCommands[2];
 			int count = stoi(thirdArg);
+			int x = stoi(splitCommands[3]);
+			int y = stoi(splitCommands[4]);
+			int z = stoi(splitCommands[5]);
 			unsigned int object_datum;
 			if (object_ids.find(secondArg) == object_ids.end()) {
 				//read from chatbox line
