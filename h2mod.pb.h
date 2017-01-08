@@ -36,457 +36,573 @@ class H2ModPacket;
 class h2mod_set_grenade;
 class h2mod_auth;
 class h2mod_set_team;
+class h2mod_map_download_url;
 
 enum H2ModPacket_Type {
-  H2ModPacket_Type_authorize_client = 1,
-  H2ModPacket_Type_set_player_team = 2,
-  H2ModPacket_Type_h2mod_ping = 3,
-  H2ModPacket_Type_h2mod_pong = 4,
-  H2ModPacket_Type_set_unit_grenades = 5
+	H2ModPacket_Type_authorize_client = 2,
+	H2ModPacket_Type_set_player_team = 3,
+	H2ModPacket_Type_h2mod_ping = 4,
+	H2ModPacket_Type_h2mod_pong = 5,
+	H2ModPacket_Type_set_unit_grenades = 6,
+	H2ModPacket_Type_map_download_url = 7,
+	H2ModPacket_Type_get_map_download_url = 8
 };
 bool H2ModPacket_Type_IsValid(int value);
 const H2ModPacket_Type H2ModPacket_Type_Type_MIN = H2ModPacket_Type_authorize_client;
-const H2ModPacket_Type H2ModPacket_Type_Type_MAX = H2ModPacket_Type_set_unit_grenades;
+const H2ModPacket_Type H2ModPacket_Type_Type_MAX = H2ModPacket_Type_get_map_download_url;
 const int H2ModPacket_Type_Type_ARRAYSIZE = H2ModPacket_Type_Type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* H2ModPacket_Type_descriptor();
 inline const ::std::string& H2ModPacket_Type_Name(H2ModPacket_Type value) {
-  return ::google::protobuf::internal::NameOfEnum(
-    H2ModPacket_Type_descriptor(), value);
+	return ::google::protobuf::internal::NameOfEnum(
+		H2ModPacket_Type_descriptor(), value);
 }
 inline bool H2ModPacket_Type_Parse(
-    const ::std::string& name, H2ModPacket_Type* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<H2ModPacket_Type>(
-    H2ModPacket_Type_descriptor(), name, value);
+	const ::std::string& name, H2ModPacket_Type* value) {
+	return ::google::protobuf::internal::ParseNamedEnum<H2ModPacket_Type>(
+		H2ModPacket_Type_descriptor(), name, value);
 }
 // ===================================================================
 
 class H2ModPacket : public ::google::protobuf::Message {
- public:
-  H2ModPacket();
-  virtual ~H2ModPacket();
+public:
+	H2ModPacket();
+	virtual ~H2ModPacket();
 
-  H2ModPacket(const H2ModPacket& from);
+	H2ModPacket(const H2ModPacket& from);
 
-  inline H2ModPacket& operator=(const H2ModPacket& from) {
-    CopyFrom(from);
-    return *this;
-  }
+	inline H2ModPacket& operator=(const H2ModPacket& from) {
+		CopyFrom(from);
+		return *this;
+	}
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
+	inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+		return _unknown_fields_;
+	}
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
+	inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+		return &_unknown_fields_;
+	}
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const H2ModPacket& default_instance();
+	static const ::google::protobuf::Descriptor* descriptor();
+	static const H2ModPacket& default_instance();
 
-  void Swap(H2ModPacket* other);
+	void Swap(H2ModPacket* other);
 
-  // implements Message ----------------------------------------------
+	// implements Message ----------------------------------------------
 
-  H2ModPacket* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const H2ModPacket& from);
-  void MergeFrom(const H2ModPacket& from);
-  void Clear();
-  bool IsInitialized() const;
+	H2ModPacket* New() const;
+	void CopyFrom(const ::google::protobuf::Message& from);
+	void MergeFrom(const ::google::protobuf::Message& from);
+	void CopyFrom(const H2ModPacket& from);
+	void MergeFrom(const H2ModPacket& from);
+	void Clear();
+	bool IsInitialized() const;
 
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  ::google::protobuf::Metadata GetMetadata() const;
+	int ByteSize() const;
+	bool MergePartialFromCodedStream(
+		::google::protobuf::io::CodedInputStream* input);
+	void SerializeWithCachedSizes(
+		::google::protobuf::io::CodedOutputStream* output) const;
+	::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+	int GetCachedSize() const { return _cached_size_; }
+private:
+	void SharedCtor();
+	void SharedDtor();
+	void SetCachedSize(int size) const;
+public:
+	::google::protobuf::Metadata GetMetadata() const;
 
-  // nested types ----------------------------------------------------
+	// nested types ----------------------------------------------------
 
-  typedef H2ModPacket_Type Type;
-  static const Type authorize_client = H2ModPacket_Type_authorize_client;
-  static const Type set_player_team = H2ModPacket_Type_set_player_team;
-  static const Type h2mod_ping = H2ModPacket_Type_h2mod_ping;
-  static const Type h2mod_pong = H2ModPacket_Type_h2mod_pong;
-  static const Type set_unit_grenades = H2ModPacket_Type_set_unit_grenades;
-  static inline bool Type_IsValid(int value) {
-    return H2ModPacket_Type_IsValid(value);
-  }
-  static const Type Type_MIN =
-    H2ModPacket_Type_Type_MIN;
-  static const Type Type_MAX =
-    H2ModPacket_Type_Type_MAX;
-  static const int Type_ARRAYSIZE =
-    H2ModPacket_Type_Type_ARRAYSIZE;
-  static inline const ::google::protobuf::EnumDescriptor*
-  Type_descriptor() {
-    return H2ModPacket_Type_descriptor();
-  }
-  static inline const ::std::string& Type_Name(Type value) {
-    return H2ModPacket_Type_Name(value);
-  }
-  static inline bool Type_Parse(const ::std::string& name,
-      Type* value) {
-    return H2ModPacket_Type_Parse(name, value);
-  }
+	typedef H2ModPacket_Type Type;
+	static const Type authorize_client = H2ModPacket_Type_authorize_client;
+	static const Type set_player_team = H2ModPacket_Type_set_player_team;
+	static const Type h2mod_ping = H2ModPacket_Type_h2mod_ping;
+	static const Type h2mod_pong = H2ModPacket_Type_h2mod_pong;
+	static const Type set_unit_grenades = H2ModPacket_Type_set_unit_grenades;
+	static const Type map_download_url = H2ModPacket_Type_map_download_url;
+	static const Type get_map_download_url = H2ModPacket_Type_get_map_download_url;
+	static inline bool Type_IsValid(int value) {
+		return H2ModPacket_Type_IsValid(value);
+	}
+	static const Type Type_MIN =
+		H2ModPacket_Type_Type_MIN;
+	static const Type Type_MAX =
+		H2ModPacket_Type_Type_MAX;
+	static const int Type_ARRAYSIZE =
+		H2ModPacket_Type_Type_ARRAYSIZE;
+	static inline const ::google::protobuf::EnumDescriptor*
+		Type_descriptor() {
+		return H2ModPacket_Type_descriptor();
+	}
+	static inline const ::std::string& Type_Name(Type value) {
+		return H2ModPacket_Type_Name(value);
+	}
+	static inline bool Type_Parse(const ::std::string& name,
+		Type* value) {
+		return H2ModPacket_Type_Parse(name, value);
+	}
 
-  // accessors -------------------------------------------------------
+	// accessors -------------------------------------------------------
 
-  // required .H2ModPacket.Type type = 1;
-  inline bool has_type() const;
-  inline void clear_type();
-  static const int kTypeFieldNumber = 1;
-  inline ::H2ModPacket_Type type() const;
-  inline void set_type(::H2ModPacket_Type value);
+	// required .H2ModPacket.Type type = 1;
+	inline bool has_type() const;
+	inline void clear_type();
+	static const int kTypeFieldNumber = 1;
+	inline ::H2ModPacket_Type type() const;
+	inline void set_type(::H2ModPacket_Type value);
 
-  // optional .h2mod_auth h2auth = 2;
-  inline bool has_h2auth() const;
-  inline void clear_h2auth();
-  static const int kH2AuthFieldNumber = 2;
-  inline const ::h2mod_auth& h2auth() const;
-  inline ::h2mod_auth* mutable_h2auth();
-  inline ::h2mod_auth* release_h2auth();
-  inline void set_allocated_h2auth(::h2mod_auth* h2auth);
+	// optional .h2mod_auth h2auth = 2;
+	inline bool has_h2auth() const;
+	inline void clear_h2auth();
+	static const int kH2AuthFieldNumber = 2;
+	inline const ::h2mod_auth& h2auth() const;
+	inline ::h2mod_auth* mutable_h2auth();
+	inline ::h2mod_auth* release_h2auth();
+	inline void set_allocated_h2auth(::h2mod_auth* h2auth);
 
-  // optional .h2mod_set_team h2_set_player_team = 3;
-  inline bool has_h2_set_player_team() const;
-  inline void clear_h2_set_player_team();
-  static const int kH2SetPlayerTeamFieldNumber = 3;
-  inline const ::h2mod_set_team& h2_set_player_team() const;
-  inline ::h2mod_set_team* mutable_h2_set_player_team();
-  inline ::h2mod_set_team* release_h2_set_player_team();
-  inline void set_allocated_h2_set_player_team(::h2mod_set_team* h2_set_player_team);
+	// optional .h2mod_set_team h2_set_player_team = 3;
+	inline bool has_h2_set_player_team() const;
+	inline void clear_h2_set_player_team();
+	static const int kH2SetPlayerTeamFieldNumber = 3;
+	inline const ::h2mod_set_team& h2_set_player_team() const;
+	inline ::h2mod_set_team* mutable_h2_set_player_team();
+	inline ::h2mod_set_team* release_h2_set_player_team();
+	inline void set_allocated_h2_set_player_team(::h2mod_set_team* h2_set_player_team);
 
-  // optional .h2mod_set_grenade set_grenade = 4;
-  inline bool has_set_grenade() const;
-  inline void clear_set_grenade();
-  static const int kSetGrenadeFieldNumber = 4;
-  inline const ::h2mod_set_grenade& set_grenade() const;
-  inline ::h2mod_set_grenade* mutable_set_grenade();
-  inline ::h2mod_set_grenade* release_set_grenade();
-  inline void set_allocated_set_grenade(::h2mod_set_grenade* set_grenade);
+	// optional .h2mod_set_grenade set_grenade = 4;
+	inline bool has_set_grenade() const;
+	inline void clear_set_grenade();
+	static const int kSetGrenadeFieldNumber = 4;
+	inline const ::h2mod_set_grenade& set_grenade() const;
+	inline ::h2mod_set_grenade* mutable_set_grenade();
+	inline ::h2mod_set_grenade* release_set_grenade();
+	inline void set_allocated_set_grenade(::h2mod_set_grenade* set_grenade);
 
-  // @@protoc_insertion_point(class_scope:H2ModPacket)
- private:
-  inline void set_has_type();
-  inline void clear_has_type();
-  inline void set_has_h2auth();
-  inline void clear_has_h2auth();
-  inline void set_has_h2_set_player_team();
-  inline void clear_has_h2_set_player_team();
-  inline void set_has_set_grenade();
-  inline void clear_has_set_grenade();
+	// optional .h2mod_map_download_url map_url = 5;
+	inline bool has_map_url() const;
+	inline void clear_map_url();
+	static const int kMapUrlFieldNumber = 5;
+	inline const ::h2mod_map_download_url& map_url() const;
+	inline ::h2mod_map_download_url* mutable_map_url();
+	inline ::h2mod_map_download_url* release_map_url();
+	inline void set_allocated_map_url(::h2mod_map_download_url* map_url);
 
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+	// @@protoc_insertion_point(class_scope:H2ModPacket)
+private:
+	inline void set_has_type();
+	inline void clear_has_type();
+	inline void set_has_h2auth();
+	inline void clear_has_h2auth();
+	inline void set_has_h2_set_player_team();
+	inline void clear_has_h2_set_player_team();
+	inline void set_has_set_grenade();
+	inline void clear_has_set_grenade();
+	inline void set_has_map_url();
+	inline void clear_has_map_url();
 
-  ::google::protobuf::uint32 _has_bits_[1];
-  mutable int _cached_size_;
-  ::h2mod_auth* h2auth_;
-  ::h2mod_set_team* h2_set_player_team_;
-  ::h2mod_set_grenade* set_grenade_;
-  int type_;
-  friend void  protobuf_AddDesc_h2mod_2eproto();
-  friend void protobuf_AssignDesc_h2mod_2eproto();
-  friend void protobuf_ShutdownFile_h2mod_2eproto();
+	::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  void InitAsDefaultInstance();
-  static H2ModPacket* default_instance_;
+	::google::protobuf::uint32 _has_bits_[1];
+	mutable int _cached_size_;
+	::h2mod_auth* h2auth_;
+	::h2mod_set_team* h2_set_player_team_;
+	::h2mod_set_grenade* set_grenade_;
+	::h2mod_map_download_url* map_url_;
+	int type_;
+	friend void  protobuf_AddDesc_h2mod_2eproto();
+	friend void protobuf_AssignDesc_h2mod_2eproto();
+	friend void protobuf_ShutdownFile_h2mod_2eproto();
+
+	void InitAsDefaultInstance();
+	static H2ModPacket* default_instance_;
 };
 // -------------------------------------------------------------------
 
 class h2mod_set_grenade : public ::google::protobuf::Message {
- public:
-  h2mod_set_grenade();
-  virtual ~h2mod_set_grenade();
+public:
+	h2mod_set_grenade();
+	virtual ~h2mod_set_grenade();
 
-  h2mod_set_grenade(const h2mod_set_grenade& from);
+	h2mod_set_grenade(const h2mod_set_grenade& from);
 
-  inline h2mod_set_grenade& operator=(const h2mod_set_grenade& from) {
-    CopyFrom(from);
-    return *this;
-  }
+	inline h2mod_set_grenade& operator=(const h2mod_set_grenade& from) {
+		CopyFrom(from);
+		return *this;
+	}
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
+	inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+		return _unknown_fields_;
+	}
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
+	inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+		return &_unknown_fields_;
+	}
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const h2mod_set_grenade& default_instance();
+	static const ::google::protobuf::Descriptor* descriptor();
+	static const h2mod_set_grenade& default_instance();
 
-  void Swap(h2mod_set_grenade* other);
+	void Swap(h2mod_set_grenade* other);
 
-  // implements Message ----------------------------------------------
+	// implements Message ----------------------------------------------
 
-  h2mod_set_grenade* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const h2mod_set_grenade& from);
-  void MergeFrom(const h2mod_set_grenade& from);
-  void Clear();
-  bool IsInitialized() const;
+	h2mod_set_grenade* New() const;
+	void CopyFrom(const ::google::protobuf::Message& from);
+	void MergeFrom(const ::google::protobuf::Message& from);
+	void CopyFrom(const h2mod_set_grenade& from);
+	void MergeFrom(const h2mod_set_grenade& from);
+	void Clear();
+	bool IsInitialized() const;
 
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  ::google::protobuf::Metadata GetMetadata() const;
+	int ByteSize() const;
+	bool MergePartialFromCodedStream(
+		::google::protobuf::io::CodedInputStream* input);
+	void SerializeWithCachedSizes(
+		::google::protobuf::io::CodedOutputStream* output) const;
+	::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+	int GetCachedSize() const { return _cached_size_; }
+private:
+	void SharedCtor();
+	void SharedDtor();
+	void SetCachedSize(int size) const;
+public:
+	::google::protobuf::Metadata GetMetadata() const;
 
-  // nested types ----------------------------------------------------
+	// nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
+	// accessors -------------------------------------------------------
 
-  // required uint32 type = 1;
-  inline bool has_type() const;
-  inline void clear_type();
-  static const int kTypeFieldNumber = 1;
-  inline ::google::protobuf::uint32 type() const;
-  inline void set_type(::google::protobuf::uint32 value);
+	// required uint32 type = 1;
+	inline bool has_type() const;
+	inline void clear_type();
+	static const int kTypeFieldNumber = 1;
+	inline ::google::protobuf::uint32 type() const;
+	inline void set_type(::google::protobuf::uint32 value);
 
-  // required uint32 count = 2;
-  inline bool has_count() const;
-  inline void clear_count();
-  static const int kCountFieldNumber = 2;
-  inline ::google::protobuf::uint32 count() const;
-  inline void set_count(::google::protobuf::uint32 value);
+	// required uint32 count = 2;
+	inline bool has_count() const;
+	inline void clear_count();
+	static const int kCountFieldNumber = 2;
+	inline ::google::protobuf::uint32 count() const;
+	inline void set_count(::google::protobuf::uint32 value);
 
-  // required uint32 pIndex = 3;
-  inline bool has_pindex() const;
-  inline void clear_pindex();
-  static const int kPIndexFieldNumber = 3;
-  inline ::google::protobuf::uint32 pindex() const;
-  inline void set_pindex(::google::protobuf::uint32 value);
+	// required uint32 pIndex = 3;
+	inline bool has_pindex() const;
+	inline void clear_pindex();
+	static const int kPIndexFieldNumber = 3;
+	inline ::google::protobuf::uint32 pindex() const;
+	inline void set_pindex(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:h2mod_set_grenade)
- private:
-  inline void set_has_type();
-  inline void clear_has_type();
-  inline void set_has_count();
-  inline void clear_has_count();
-  inline void set_has_pindex();
-  inline void clear_has_pindex();
+	// @@protoc_insertion_point(class_scope:h2mod_set_grenade)
+private:
+	inline void set_has_type();
+	inline void clear_has_type();
+	inline void set_has_count();
+	inline void clear_has_count();
+	inline void set_has_pindex();
+	inline void clear_has_pindex();
 
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+	::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::google::protobuf::uint32 _has_bits_[1];
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 type_;
-  ::google::protobuf::uint32 count_;
-  ::google::protobuf::uint32 pindex_;
-  friend void  protobuf_AddDesc_h2mod_2eproto();
-  friend void protobuf_AssignDesc_h2mod_2eproto();
-  friend void protobuf_ShutdownFile_h2mod_2eproto();
+	::google::protobuf::uint32 _has_bits_[1];
+	mutable int _cached_size_;
+	::google::protobuf::uint32 type_;
+	::google::protobuf::uint32 count_;
+	::google::protobuf::uint32 pindex_;
+	friend void  protobuf_AddDesc_h2mod_2eproto();
+	friend void protobuf_AssignDesc_h2mod_2eproto();
+	friend void protobuf_ShutdownFile_h2mod_2eproto();
 
-  void InitAsDefaultInstance();
-  static h2mod_set_grenade* default_instance_;
+	void InitAsDefaultInstance();
+	static h2mod_set_grenade* default_instance_;
 };
 // -------------------------------------------------------------------
 
 class h2mod_auth : public ::google::protobuf::Message {
- public:
-  h2mod_auth();
-  virtual ~h2mod_auth();
+public:
+	h2mod_auth();
+	virtual ~h2mod_auth();
 
-  h2mod_auth(const h2mod_auth& from);
+	h2mod_auth(const h2mod_auth& from);
 
-  inline h2mod_auth& operator=(const h2mod_auth& from) {
-    CopyFrom(from);
-    return *this;
-  }
+	inline h2mod_auth& operator=(const h2mod_auth& from) {
+		CopyFrom(from);
+		return *this;
+	}
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
+	inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+		return _unknown_fields_;
+	}
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
+	inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+		return &_unknown_fields_;
+	}
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const h2mod_auth& default_instance();
+	static const ::google::protobuf::Descriptor* descriptor();
+	static const h2mod_auth& default_instance();
 
-  void Swap(h2mod_auth* other);
+	void Swap(h2mod_auth* other);
 
-  // implements Message ----------------------------------------------
+	// implements Message ----------------------------------------------
 
-  h2mod_auth* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const h2mod_auth& from);
-  void MergeFrom(const h2mod_auth& from);
-  void Clear();
-  bool IsInitialized() const;
+	h2mod_auth* New() const;
+	void CopyFrom(const ::google::protobuf::Message& from);
+	void MergeFrom(const ::google::protobuf::Message& from);
+	void CopyFrom(const h2mod_auth& from);
+	void MergeFrom(const h2mod_auth& from);
+	void Clear();
+	bool IsInitialized() const;
 
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  ::google::protobuf::Metadata GetMetadata() const;
+	int ByteSize() const;
+	bool MergePartialFromCodedStream(
+		::google::protobuf::io::CodedInputStream* input);
+	void SerializeWithCachedSizes(
+		::google::protobuf::io::CodedOutputStream* output) const;
+	::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+	int GetCachedSize() const { return _cached_size_; }
+private:
+	void SharedCtor();
+	void SharedDtor();
+	void SetCachedSize(int size) const;
+public:
+	::google::protobuf::Metadata GetMetadata() const;
 
-  // nested types ----------------------------------------------------
+	// nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
+	// accessors -------------------------------------------------------
 
-  // required bytes name = 1;
-  inline bool has_name() const;
-  inline void clear_name();
-  static const int kNameFieldNumber = 1;
-  inline const ::std::string& name() const;
-  inline void set_name(const ::std::string& value);
-  inline void set_name(const char* value);
-  inline void set_name(const void* value, size_t size);
-  inline ::std::string* mutable_name();
-  inline ::std::string* release_name();
-  inline void set_allocated_name(::std::string* name);
+	// required bytes name = 1;
+	inline bool has_name() const;
+	inline void clear_name();
+	static const int kNameFieldNumber = 1;
+	inline const ::std::string& name() const;
+	inline void set_name(const ::std::string& value);
+	inline void set_name(const char* value);
+	inline void set_name(const void* value, size_t size);
+	inline ::std::string* mutable_name();
+	inline ::std::string* release_name();
+	inline void set_allocated_name(::std::string* name);
 
-  // required uint32 secureaddr = 2;
-  inline bool has_secureaddr() const;
-  inline void clear_secureaddr();
-  static const int kSecureaddrFieldNumber = 2;
-  inline ::google::protobuf::uint32 secureaddr() const;
-  inline void set_secureaddr(::google::protobuf::uint32 value);
+	// required uint32 secureaddr = 2;
+	inline bool has_secureaddr() const;
+	inline void clear_secureaddr();
+	static const int kSecureaddrFieldNumber = 2;
+	inline ::google::protobuf::uint32 secureaddr() const;
+	inline void set_secureaddr(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:h2mod_auth)
- private:
-  inline void set_has_name();
-  inline void clear_has_name();
-  inline void set_has_secureaddr();
-  inline void clear_has_secureaddr();
+	// @@protoc_insertion_point(class_scope:h2mod_auth)
+private:
+	inline void set_has_name();
+	inline void clear_has_name();
+	inline void set_has_secureaddr();
+	inline void clear_has_secureaddr();
 
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+	::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::google::protobuf::uint32 _has_bits_[1];
-  mutable int _cached_size_;
-  ::std::string* name_;
-  ::google::protobuf::uint32 secureaddr_;
-  friend void  protobuf_AddDesc_h2mod_2eproto();
-  friend void protobuf_AssignDesc_h2mod_2eproto();
-  friend void protobuf_ShutdownFile_h2mod_2eproto();
+	::google::protobuf::uint32 _has_bits_[1];
+	mutable int _cached_size_;
+	::std::string* name_;
+	::google::protobuf::uint32 secureaddr_;
+	friend void  protobuf_AddDesc_h2mod_2eproto();
+	friend void protobuf_AssignDesc_h2mod_2eproto();
+	friend void protobuf_ShutdownFile_h2mod_2eproto();
 
-  void InitAsDefaultInstance();
-  static h2mod_auth* default_instance_;
+	void InitAsDefaultInstance();
+	static h2mod_auth* default_instance_;
 };
 // -------------------------------------------------------------------
 
 class h2mod_set_team : public ::google::protobuf::Message {
- public:
-  h2mod_set_team();
-  virtual ~h2mod_set_team();
+public:
+	h2mod_set_team();
+	virtual ~h2mod_set_team();
 
-  h2mod_set_team(const h2mod_set_team& from);
+	h2mod_set_team(const h2mod_set_team& from);
 
-  inline h2mod_set_team& operator=(const h2mod_set_team& from) {
-    CopyFrom(from);
-    return *this;
-  }
+	inline h2mod_set_team& operator=(const h2mod_set_team& from) {
+		CopyFrom(from);
+		return *this;
+	}
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
+	inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+		return _unknown_fields_;
+	}
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
+	inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+		return &_unknown_fields_;
+	}
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const h2mod_set_team& default_instance();
+	static const ::google::protobuf::Descriptor* descriptor();
+	static const h2mod_set_team& default_instance();
 
-  void Swap(h2mod_set_team* other);
+	void Swap(h2mod_set_team* other);
 
-  // implements Message ----------------------------------------------
+	// implements Message ----------------------------------------------
 
-  h2mod_set_team* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const h2mod_set_team& from);
-  void MergeFrom(const h2mod_set_team& from);
-  void Clear();
-  bool IsInitialized() const;
+	h2mod_set_team* New() const;
+	void CopyFrom(const ::google::protobuf::Message& from);
+	void MergeFrom(const ::google::protobuf::Message& from);
+	void CopyFrom(const h2mod_set_team& from);
+	void MergeFrom(const h2mod_set_team& from);
+	void Clear();
+	bool IsInitialized() const;
 
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  ::google::protobuf::Metadata GetMetadata() const;
+	int ByteSize() const;
+	bool MergePartialFromCodedStream(
+		::google::protobuf::io::CodedInputStream* input);
+	void SerializeWithCachedSizes(
+		::google::protobuf::io::CodedOutputStream* output) const;
+	::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+	int GetCachedSize() const { return _cached_size_; }
+private:
+	void SharedCtor();
+	void SharedDtor();
+	void SetCachedSize(int size) const;
+public:
+	::google::protobuf::Metadata GetMetadata() const;
 
-  // nested types ----------------------------------------------------
+	// nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
+	// accessors -------------------------------------------------------
 
-  // required uint32 team = 1;
-  inline bool has_team() const;
-  inline void clear_team();
-  static const int kTeamFieldNumber = 1;
-  inline ::google::protobuf::uint32 team() const;
-  inline void set_team(::google::protobuf::uint32 value);
+	// required uint32 team = 1;
+	inline bool has_team() const;
+	inline void clear_team();
+	static const int kTeamFieldNumber = 1;
+	inline ::google::protobuf::uint32 team() const;
+	inline void set_team(::google::protobuf::uint32 value);
 
-  // required bytes name = 2;
-  inline bool has_name() const;
-  inline void clear_name();
-  static const int kNameFieldNumber = 2;
-  inline const ::std::string& name() const;
-  inline void set_name(const ::std::string& value);
-  inline void set_name(const char* value);
-  inline void set_name(const void* value, size_t size);
-  inline ::std::string* mutable_name();
-  inline ::std::string* release_name();
-  inline void set_allocated_name(::std::string* name);
+	// required bytes name = 2;
+	inline bool has_name() const;
+	inline void clear_name();
+	static const int kNameFieldNumber = 2;
+	inline const ::std::string& name() const;
+	inline void set_name(const ::std::string& value);
+	inline void set_name(const char* value);
+	inline void set_name(const void* value, size_t size);
+	inline ::std::string* mutable_name();
+	inline ::std::string* release_name();
+	inline void set_allocated_name(::std::string* name);
 
-  // @@protoc_insertion_point(class_scope:h2mod_set_team)
- private:
-  inline void set_has_team();
-  inline void clear_has_team();
-  inline void set_has_name();
-  inline void clear_has_name();
+	// @@protoc_insertion_point(class_scope:h2mod_set_team)
+private:
+	inline void set_has_team();
+	inline void clear_has_team();
+	inline void set_has_name();
+	inline void clear_has_name();
 
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+	::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::google::protobuf::uint32 _has_bits_[1];
-  mutable int _cached_size_;
-  ::std::string* name_;
-  ::google::protobuf::uint32 team_;
-  friend void  protobuf_AddDesc_h2mod_2eproto();
-  friend void protobuf_AssignDesc_h2mod_2eproto();
-  friend void protobuf_ShutdownFile_h2mod_2eproto();
+	::google::protobuf::uint32 _has_bits_[1];
+	mutable int _cached_size_;
+	::std::string* name_;
+	::google::protobuf::uint32 team_;
+	friend void  protobuf_AddDesc_h2mod_2eproto();
+	friend void protobuf_AssignDesc_h2mod_2eproto();
+	friend void protobuf_ShutdownFile_h2mod_2eproto();
 
-  void InitAsDefaultInstance();
-  static h2mod_set_team* default_instance_;
+	void InitAsDefaultInstance();
+	static h2mod_set_team* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class h2mod_map_download_url : public ::google::protobuf::Message {
+public:
+	h2mod_map_download_url();
+	virtual ~h2mod_map_download_url();
+
+	h2mod_map_download_url(const h2mod_map_download_url& from);
+
+	inline h2mod_map_download_url& operator=(const h2mod_map_download_url& from) {
+		CopyFrom(from);
+		return *this;
+	}
+
+	inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+		return _unknown_fields_;
+	}
+
+	inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+		return &_unknown_fields_;
+	}
+
+	static const ::google::protobuf::Descriptor* descriptor();
+	static const h2mod_map_download_url& default_instance();
+
+	void Swap(h2mod_map_download_url* other);
+
+	// implements Message ----------------------------------------------
+
+	h2mod_map_download_url* New() const;
+	void CopyFrom(const ::google::protobuf::Message& from);
+	void MergeFrom(const ::google::protobuf::Message& from);
+	void CopyFrom(const h2mod_map_download_url& from);
+	void MergeFrom(const h2mod_map_download_url& from);
+	void Clear();
+	bool IsInitialized() const;
+
+	int ByteSize() const;
+	bool MergePartialFromCodedStream(
+		::google::protobuf::io::CodedInputStream* input);
+	void SerializeWithCachedSizes(
+		::google::protobuf::io::CodedOutputStream* output) const;
+	::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+	int GetCachedSize() const { return _cached_size_; }
+private:
+	void SharedCtor();
+	void SharedDtor();
+	void SetCachedSize(int size) const;
+public:
+	::google::protobuf::Metadata GetMetadata() const;
+
+	// nested types ----------------------------------------------------
+
+	// accessors -------------------------------------------------------
+
+	// optional string url = 1;
+	inline bool has_url() const;
+	inline void clear_url();
+	static const int kUrlFieldNumber = 1;
+	inline const ::std::string& url() const;
+	inline void set_url(const ::std::string& value);
+	inline void set_url(const char* value);
+	inline void set_url(const char* value, size_t size);
+	inline ::std::string* mutable_url();
+	inline ::std::string* release_url();
+	inline void set_allocated_url(::std::string* url);
+
+	// optional string type = 2;
+	inline bool has_type() const;
+	inline void clear_type();
+	static const int kTypeFieldNumber = 2;
+	inline const ::std::string& type() const;
+	inline void set_type(const ::std::string& value);
+	inline void set_type(const char* value);
+	inline void set_type(const char* value, size_t size);
+	inline ::std::string* mutable_type();
+	inline ::std::string* release_type();
+	inline void set_allocated_type(::std::string* type);
+
+	// @@protoc_insertion_point(class_scope:h2mod_map_download_url)
+private:
+	inline void set_has_url();
+	inline void clear_has_url();
+	inline void set_has_type();
+	inline void clear_has_type();
+
+	::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+	::google::protobuf::uint32 _has_bits_[1];
+	mutable int _cached_size_;
+	::std::string* url_;
+	::std::string* type_;
+	friend void  protobuf_AddDesc_h2mod_2eproto();
+	friend void protobuf_AssignDesc_h2mod_2eproto();
+	friend void protobuf_ShutdownFile_h2mod_2eproto();
+
+	void InitAsDefaultInstance();
+	static h2mod_map_download_url* default_instance_;
 };
 // ===================================================================
 
@@ -497,150 +613,195 @@ class h2mod_set_team : public ::google::protobuf::Message {
 
 // required .H2ModPacket.Type type = 1;
 inline bool H2ModPacket::has_type() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+	return (_has_bits_[0] & 0x00000001u) != 0;
 }
 inline void H2ModPacket::set_has_type() {
-  _has_bits_[0] |= 0x00000001u;
+	_has_bits_[0] |= 0x00000001u;
 }
 inline void H2ModPacket::clear_has_type() {
-  _has_bits_[0] &= ~0x00000001u;
+	_has_bits_[0] &= ~0x00000001u;
 }
 inline void H2ModPacket::clear_type() {
-  type_ = 1;
-  clear_has_type();
+	type_ = 2;
+	clear_has_type();
 }
 inline ::H2ModPacket_Type H2ModPacket::type() const {
-  // @@protoc_insertion_point(field_get:H2ModPacket.type)
-  return static_cast< ::H2ModPacket_Type >(type_);
+	// @@protoc_insertion_point(field_get:H2ModPacket.type)
+	return static_cast< ::H2ModPacket_Type >(type_);
 }
 inline void H2ModPacket::set_type(::H2ModPacket_Type value) {
-  assert(::H2ModPacket_Type_IsValid(value));
-  set_has_type();
-  type_ = value;
-  // @@protoc_insertion_point(field_set:H2ModPacket.type)
+	assert(::H2ModPacket_Type_IsValid(value));
+	set_has_type();
+	type_ = value;
+	// @@protoc_insertion_point(field_set:H2ModPacket.type)
 }
 
 // optional .h2mod_auth h2auth = 2;
 inline bool H2ModPacket::has_h2auth() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+	return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void H2ModPacket::set_has_h2auth() {
-  _has_bits_[0] |= 0x00000002u;
+	_has_bits_[0] |= 0x00000002u;
 }
 inline void H2ModPacket::clear_has_h2auth() {
-  _has_bits_[0] &= ~0x00000002u;
+	_has_bits_[0] &= ~0x00000002u;
 }
 inline void H2ModPacket::clear_h2auth() {
-  if (h2auth_ != NULL) h2auth_->::h2mod_auth::Clear();
-  clear_has_h2auth();
+	if (h2auth_ != NULL) h2auth_->::h2mod_auth::Clear();
+	clear_has_h2auth();
 }
 inline const ::h2mod_auth& H2ModPacket::h2auth() const {
-  // @@protoc_insertion_point(field_get:H2ModPacket.h2auth)
-  return h2auth_ != NULL ? *h2auth_ : *default_instance_->h2auth_;
+	// @@protoc_insertion_point(field_get:H2ModPacket.h2auth)
+	return h2auth_ != NULL ? *h2auth_ : *default_instance_->h2auth_;
 }
 inline ::h2mod_auth* H2ModPacket::mutable_h2auth() {
-  set_has_h2auth();
-  if (h2auth_ == NULL) h2auth_ = new ::h2mod_auth;
-  // @@protoc_insertion_point(field_mutable:H2ModPacket.h2auth)
-  return h2auth_;
+	set_has_h2auth();
+	if (h2auth_ == NULL) h2auth_ = new ::h2mod_auth;
+	// @@protoc_insertion_point(field_mutable:H2ModPacket.h2auth)
+	return h2auth_;
 }
 inline ::h2mod_auth* H2ModPacket::release_h2auth() {
-  clear_has_h2auth();
-  ::h2mod_auth* temp = h2auth_;
-  h2auth_ = NULL;
-  return temp;
+	clear_has_h2auth();
+	::h2mod_auth* temp = h2auth_;
+	h2auth_ = NULL;
+	return temp;
 }
 inline void H2ModPacket::set_allocated_h2auth(::h2mod_auth* h2auth) {
-  delete h2auth_;
-  h2auth_ = h2auth;
-  if (h2auth) {
-    set_has_h2auth();
-  } else {
-    clear_has_h2auth();
-  }
-  // @@protoc_insertion_point(field_set_allocated:H2ModPacket.h2auth)
+	delete h2auth_;
+	h2auth_ = h2auth;
+	if (h2auth) {
+		set_has_h2auth();
+	}
+	else {
+		clear_has_h2auth();
+	}
+	// @@protoc_insertion_point(field_set_allocated:H2ModPacket.h2auth)
 }
 
 // optional .h2mod_set_team h2_set_player_team = 3;
 inline bool H2ModPacket::has_h2_set_player_team() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+	return (_has_bits_[0] & 0x00000004u) != 0;
 }
 inline void H2ModPacket::set_has_h2_set_player_team() {
-  _has_bits_[0] |= 0x00000004u;
+	_has_bits_[0] |= 0x00000004u;
 }
 inline void H2ModPacket::clear_has_h2_set_player_team() {
-  _has_bits_[0] &= ~0x00000004u;
+	_has_bits_[0] &= ~0x00000004u;
 }
 inline void H2ModPacket::clear_h2_set_player_team() {
-  if (h2_set_player_team_ != NULL) h2_set_player_team_->::h2mod_set_team::Clear();
-  clear_has_h2_set_player_team();
+	if (h2_set_player_team_ != NULL) h2_set_player_team_->::h2mod_set_team::Clear();
+	clear_has_h2_set_player_team();
 }
 inline const ::h2mod_set_team& H2ModPacket::h2_set_player_team() const {
-  // @@protoc_insertion_point(field_get:H2ModPacket.h2_set_player_team)
-  return h2_set_player_team_ != NULL ? *h2_set_player_team_ : *default_instance_->h2_set_player_team_;
+	// @@protoc_insertion_point(field_get:H2ModPacket.h2_set_player_team)
+	return h2_set_player_team_ != NULL ? *h2_set_player_team_ : *default_instance_->h2_set_player_team_;
 }
 inline ::h2mod_set_team* H2ModPacket::mutable_h2_set_player_team() {
-  set_has_h2_set_player_team();
-  if (h2_set_player_team_ == NULL) h2_set_player_team_ = new ::h2mod_set_team;
-  // @@protoc_insertion_point(field_mutable:H2ModPacket.h2_set_player_team)
-  return h2_set_player_team_;
+	set_has_h2_set_player_team();
+	if (h2_set_player_team_ == NULL) h2_set_player_team_ = new ::h2mod_set_team;
+	// @@protoc_insertion_point(field_mutable:H2ModPacket.h2_set_player_team)
+	return h2_set_player_team_;
 }
 inline ::h2mod_set_team* H2ModPacket::release_h2_set_player_team() {
-  clear_has_h2_set_player_team();
-  ::h2mod_set_team* temp = h2_set_player_team_;
-  h2_set_player_team_ = NULL;
-  return temp;
+	clear_has_h2_set_player_team();
+	::h2mod_set_team* temp = h2_set_player_team_;
+	h2_set_player_team_ = NULL;
+	return temp;
 }
 inline void H2ModPacket::set_allocated_h2_set_player_team(::h2mod_set_team* h2_set_player_team) {
-  delete h2_set_player_team_;
-  h2_set_player_team_ = h2_set_player_team;
-  if (h2_set_player_team) {
-    set_has_h2_set_player_team();
-  } else {
-    clear_has_h2_set_player_team();
-  }
-  // @@protoc_insertion_point(field_set_allocated:H2ModPacket.h2_set_player_team)
+	delete h2_set_player_team_;
+	h2_set_player_team_ = h2_set_player_team;
+	if (h2_set_player_team) {
+		set_has_h2_set_player_team();
+	}
+	else {
+		clear_has_h2_set_player_team();
+	}
+	// @@protoc_insertion_point(field_set_allocated:H2ModPacket.h2_set_player_team)
 }
 
 // optional .h2mod_set_grenade set_grenade = 4;
 inline bool H2ModPacket::has_set_grenade() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
+	return (_has_bits_[0] & 0x00000008u) != 0;
 }
 inline void H2ModPacket::set_has_set_grenade() {
-  _has_bits_[0] |= 0x00000008u;
+	_has_bits_[0] |= 0x00000008u;
 }
 inline void H2ModPacket::clear_has_set_grenade() {
-  _has_bits_[0] &= ~0x00000008u;
+	_has_bits_[0] &= ~0x00000008u;
 }
 inline void H2ModPacket::clear_set_grenade() {
-  if (set_grenade_ != NULL) set_grenade_->::h2mod_set_grenade::Clear();
-  clear_has_set_grenade();
+	if (set_grenade_ != NULL) set_grenade_->::h2mod_set_grenade::Clear();
+	clear_has_set_grenade();
 }
 inline const ::h2mod_set_grenade& H2ModPacket::set_grenade() const {
-  // @@protoc_insertion_point(field_get:H2ModPacket.set_grenade)
-  return set_grenade_ != NULL ? *set_grenade_ : *default_instance_->set_grenade_;
+	// @@protoc_insertion_point(field_get:H2ModPacket.set_grenade)
+	return set_grenade_ != NULL ? *set_grenade_ : *default_instance_->set_grenade_;
 }
 inline ::h2mod_set_grenade* H2ModPacket::mutable_set_grenade() {
-  set_has_set_grenade();
-  if (set_grenade_ == NULL) set_grenade_ = new ::h2mod_set_grenade;
-  // @@protoc_insertion_point(field_mutable:H2ModPacket.set_grenade)
-  return set_grenade_;
+	set_has_set_grenade();
+	if (set_grenade_ == NULL) set_grenade_ = new ::h2mod_set_grenade;
+	// @@protoc_insertion_point(field_mutable:H2ModPacket.set_grenade)
+	return set_grenade_;
 }
 inline ::h2mod_set_grenade* H2ModPacket::release_set_grenade() {
-  clear_has_set_grenade();
-  ::h2mod_set_grenade* temp = set_grenade_;
-  set_grenade_ = NULL;
-  return temp;
+	clear_has_set_grenade();
+	::h2mod_set_grenade* temp = set_grenade_;
+	set_grenade_ = NULL;
+	return temp;
 }
 inline void H2ModPacket::set_allocated_set_grenade(::h2mod_set_grenade* set_grenade) {
-  delete set_grenade_;
-  set_grenade_ = set_grenade;
-  if (set_grenade) {
-    set_has_set_grenade();
-  } else {
-    clear_has_set_grenade();
-  }
-  // @@protoc_insertion_point(field_set_allocated:H2ModPacket.set_grenade)
+	delete set_grenade_;
+	set_grenade_ = set_grenade;
+	if (set_grenade) {
+		set_has_set_grenade();
+	}
+	else {
+		clear_has_set_grenade();
+	}
+	// @@protoc_insertion_point(field_set_allocated:H2ModPacket.set_grenade)
+}
+
+// optional .h2mod_map_download_url map_url = 5;
+inline bool H2ModPacket::has_map_url() const {
+	return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void H2ModPacket::set_has_map_url() {
+	_has_bits_[0] |= 0x00000010u;
+}
+inline void H2ModPacket::clear_has_map_url() {
+	_has_bits_[0] &= ~0x00000010u;
+}
+inline void H2ModPacket::clear_map_url() {
+	if (map_url_ != NULL) map_url_->::h2mod_map_download_url::Clear();
+	clear_has_map_url();
+}
+inline const ::h2mod_map_download_url& H2ModPacket::map_url() const {
+	// @@protoc_insertion_point(field_get:H2ModPacket.map_url)
+	return map_url_ != NULL ? *map_url_ : *default_instance_->map_url_;
+}
+inline ::h2mod_map_download_url* H2ModPacket::mutable_map_url() {
+	set_has_map_url();
+	if (map_url_ == NULL) map_url_ = new ::h2mod_map_download_url;
+	// @@protoc_insertion_point(field_mutable:H2ModPacket.map_url)
+	return map_url_;
+}
+inline ::h2mod_map_download_url* H2ModPacket::release_map_url() {
+	clear_has_map_url();
+	::h2mod_map_download_url* temp = map_url_;
+	map_url_ = NULL;
+	return temp;
+}
+inline void H2ModPacket::set_allocated_map_url(::h2mod_map_download_url* map_url) {
+	delete map_url_;
+	map_url_ = map_url;
+	if (map_url) {
+		set_has_map_url();
+	}
+	else {
+		clear_has_map_url();
+	}
+	// @@protoc_insertion_point(field_set_allocated:H2ModPacket.map_url)
 }
 
 // -------------------------------------------------------------------
@@ -649,74 +810,74 @@ inline void H2ModPacket::set_allocated_set_grenade(::h2mod_set_grenade* set_gren
 
 // required uint32 type = 1;
 inline bool h2mod_set_grenade::has_type() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+	return (_has_bits_[0] & 0x00000001u) != 0;
 }
 inline void h2mod_set_grenade::set_has_type() {
-  _has_bits_[0] |= 0x00000001u;
+	_has_bits_[0] |= 0x00000001u;
 }
 inline void h2mod_set_grenade::clear_has_type() {
-  _has_bits_[0] &= ~0x00000001u;
+	_has_bits_[0] &= ~0x00000001u;
 }
 inline void h2mod_set_grenade::clear_type() {
-  type_ = 0u;
-  clear_has_type();
+	type_ = 0u;
+	clear_has_type();
 }
 inline ::google::protobuf::uint32 h2mod_set_grenade::type() const {
-  // @@protoc_insertion_point(field_get:h2mod_set_grenade.type)
-  return type_;
+	// @@protoc_insertion_point(field_get:h2mod_set_grenade.type)
+	return type_;
 }
 inline void h2mod_set_grenade::set_type(::google::protobuf::uint32 value) {
-  set_has_type();
-  type_ = value;
-  // @@protoc_insertion_point(field_set:h2mod_set_grenade.type)
+	set_has_type();
+	type_ = value;
+	// @@protoc_insertion_point(field_set:h2mod_set_grenade.type)
 }
 
 // required uint32 count = 2;
 inline bool h2mod_set_grenade::has_count() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+	return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void h2mod_set_grenade::set_has_count() {
-  _has_bits_[0] |= 0x00000002u;
+	_has_bits_[0] |= 0x00000002u;
 }
 inline void h2mod_set_grenade::clear_has_count() {
-  _has_bits_[0] &= ~0x00000002u;
+	_has_bits_[0] &= ~0x00000002u;
 }
 inline void h2mod_set_grenade::clear_count() {
-  count_ = 0u;
-  clear_has_count();
+	count_ = 0u;
+	clear_has_count();
 }
 inline ::google::protobuf::uint32 h2mod_set_grenade::count() const {
-  // @@protoc_insertion_point(field_get:h2mod_set_grenade.count)
-  return count_;
+	// @@protoc_insertion_point(field_get:h2mod_set_grenade.count)
+	return count_;
 }
 inline void h2mod_set_grenade::set_count(::google::protobuf::uint32 value) {
-  set_has_count();
-  count_ = value;
-  // @@protoc_insertion_point(field_set:h2mod_set_grenade.count)
+	set_has_count();
+	count_ = value;
+	// @@protoc_insertion_point(field_set:h2mod_set_grenade.count)
 }
 
 // required uint32 pIndex = 3;
 inline bool h2mod_set_grenade::has_pindex() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+	return (_has_bits_[0] & 0x00000004u) != 0;
 }
 inline void h2mod_set_grenade::set_has_pindex() {
-  _has_bits_[0] |= 0x00000004u;
+	_has_bits_[0] |= 0x00000004u;
 }
 inline void h2mod_set_grenade::clear_has_pindex() {
-  _has_bits_[0] &= ~0x00000004u;
+	_has_bits_[0] &= ~0x00000004u;
 }
 inline void h2mod_set_grenade::clear_pindex() {
-  pindex_ = 0u;
-  clear_has_pindex();
+	pindex_ = 0u;
+	clear_has_pindex();
 }
 inline ::google::protobuf::uint32 h2mod_set_grenade::pindex() const {
-  // @@protoc_insertion_point(field_get:h2mod_set_grenade.pIndex)
-  return pindex_;
+	// @@protoc_insertion_point(field_get:h2mod_set_grenade.pIndex)
+	return pindex_;
 }
 inline void h2mod_set_grenade::set_pindex(::google::protobuf::uint32 value) {
-  set_has_pindex();
-  pindex_ = value;
-  // @@protoc_insertion_point(field_set:h2mod_set_grenade.pIndex)
+	set_has_pindex();
+	pindex_ = value;
+	// @@protoc_insertion_point(field_set:h2mod_set_grenade.pIndex)
 }
 
 // -------------------------------------------------------------------
@@ -725,102 +886,104 @@ inline void h2mod_set_grenade::set_pindex(::google::protobuf::uint32 value) {
 
 // required bytes name = 1;
 inline bool h2mod_auth::has_name() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+	return (_has_bits_[0] & 0x00000001u) != 0;
 }
 inline void h2mod_auth::set_has_name() {
-  _has_bits_[0] |= 0x00000001u;
+	_has_bits_[0] |= 0x00000001u;
 }
 inline void h2mod_auth::clear_has_name() {
-  _has_bits_[0] &= ~0x00000001u;
+	_has_bits_[0] &= ~0x00000001u;
 }
 inline void h2mod_auth::clear_name() {
-  if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    name_->clear();
-  }
-  clear_has_name();
+	if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		name_->clear();
+	}
+	clear_has_name();
 }
 inline const ::std::string& h2mod_auth::name() const {
-  // @@protoc_insertion_point(field_get:h2mod_auth.name)
-  return *name_;
+	// @@protoc_insertion_point(field_get:h2mod_auth.name)
+	return *name_;
 }
 inline void h2mod_auth::set_name(const ::std::string& value) {
-  set_has_name();
-  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    name_ = new ::std::string;
-  }
-  name_->assign(value);
-  // @@protoc_insertion_point(field_set:h2mod_auth.name)
+	set_has_name();
+	if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		name_ = new ::std::string;
+	}
+	name_->assign(value);
+	// @@protoc_insertion_point(field_set:h2mod_auth.name)
 }
 inline void h2mod_auth::set_name(const char* value) {
-  set_has_name();
-  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    name_ = new ::std::string;
-  }
-  name_->assign(value);
-  // @@protoc_insertion_point(field_set_char:h2mod_auth.name)
+	set_has_name();
+	if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		name_ = new ::std::string;
+	}
+	name_->assign(value);
+	// @@protoc_insertion_point(field_set_char:h2mod_auth.name)
 }
 inline void h2mod_auth::set_name(const void* value, size_t size) {
-  set_has_name();
-  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    name_ = new ::std::string;
-  }
-  name_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:h2mod_auth.name)
+	set_has_name();
+	if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		name_ = new ::std::string;
+	}
+	name_->assign(reinterpret_cast<const char*>(value), size);
+	// @@protoc_insertion_point(field_set_pointer:h2mod_auth.name)
 }
 inline ::std::string* h2mod_auth::mutable_name() {
-  set_has_name();
-  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    name_ = new ::std::string;
-  }
-  // @@protoc_insertion_point(field_mutable:h2mod_auth.name)
-  return name_;
+	set_has_name();
+	if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		name_ = new ::std::string;
+	}
+	// @@protoc_insertion_point(field_mutable:h2mod_auth.name)
+	return name_;
 }
 inline ::std::string* h2mod_auth::release_name() {
-  clear_has_name();
-  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    return NULL;
-  } else {
-    ::std::string* temp = name_;
-    name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-    return temp;
-  }
+	clear_has_name();
+	if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		return NULL;
+	}
+	else {
+		::std::string* temp = name_;
+		name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+		return temp;
+	}
 }
 inline void h2mod_auth::set_allocated_name(::std::string* name) {
-  if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    delete name_;
-  }
-  if (name) {
-    set_has_name();
-    name_ = name;
-  } else {
-    clear_has_name();
-    name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  // @@protoc_insertion_point(field_set_allocated:h2mod_auth.name)
+	if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		delete name_;
+	}
+	if (name) {
+		set_has_name();
+		name_ = name;
+	}
+	else {
+		clear_has_name();
+		name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+	}
+	// @@protoc_insertion_point(field_set_allocated:h2mod_auth.name)
 }
 
 // required uint32 secureaddr = 2;
 inline bool h2mod_auth::has_secureaddr() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+	return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void h2mod_auth::set_has_secureaddr() {
-  _has_bits_[0] |= 0x00000002u;
+	_has_bits_[0] |= 0x00000002u;
 }
 inline void h2mod_auth::clear_has_secureaddr() {
-  _has_bits_[0] &= ~0x00000002u;
+	_has_bits_[0] &= ~0x00000002u;
 }
 inline void h2mod_auth::clear_secureaddr() {
-  secureaddr_ = 0u;
-  clear_has_secureaddr();
+	secureaddr_ = 0u;
+	clear_has_secureaddr();
 }
 inline ::google::protobuf::uint32 h2mod_auth::secureaddr() const {
-  // @@protoc_insertion_point(field_get:h2mod_auth.secureaddr)
-  return secureaddr_;
+	// @@protoc_insertion_point(field_get:h2mod_auth.secureaddr)
+	return secureaddr_;
 }
 inline void h2mod_auth::set_secureaddr(::google::protobuf::uint32 value) {
-  set_has_secureaddr();
-  secureaddr_ = value;
-  // @@protoc_insertion_point(field_set:h2mod_auth.secureaddr)
+	set_has_secureaddr();
+	secureaddr_ = value;
+	// @@protoc_insertion_point(field_set:h2mod_auth.secureaddr)
 }
 
 // -------------------------------------------------------------------
@@ -829,102 +992,264 @@ inline void h2mod_auth::set_secureaddr(::google::protobuf::uint32 value) {
 
 // required uint32 team = 1;
 inline bool h2mod_set_team::has_team() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+	return (_has_bits_[0] & 0x00000001u) != 0;
 }
 inline void h2mod_set_team::set_has_team() {
-  _has_bits_[0] |= 0x00000001u;
+	_has_bits_[0] |= 0x00000001u;
 }
 inline void h2mod_set_team::clear_has_team() {
-  _has_bits_[0] &= ~0x00000001u;
+	_has_bits_[0] &= ~0x00000001u;
 }
 inline void h2mod_set_team::clear_team() {
-  team_ = 0u;
-  clear_has_team();
+	team_ = 0u;
+	clear_has_team();
 }
 inline ::google::protobuf::uint32 h2mod_set_team::team() const {
-  // @@protoc_insertion_point(field_get:h2mod_set_team.team)
-  return team_;
+	// @@protoc_insertion_point(field_get:h2mod_set_team.team)
+	return team_;
 }
 inline void h2mod_set_team::set_team(::google::protobuf::uint32 value) {
-  set_has_team();
-  team_ = value;
-  // @@protoc_insertion_point(field_set:h2mod_set_team.team)
+	set_has_team();
+	team_ = value;
+	// @@protoc_insertion_point(field_set:h2mod_set_team.team)
 }
 
 // required bytes name = 2;
 inline bool h2mod_set_team::has_name() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+	return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void h2mod_set_team::set_has_name() {
-  _has_bits_[0] |= 0x00000002u;
+	_has_bits_[0] |= 0x00000002u;
 }
 inline void h2mod_set_team::clear_has_name() {
-  _has_bits_[0] &= ~0x00000002u;
+	_has_bits_[0] &= ~0x00000002u;
 }
 inline void h2mod_set_team::clear_name() {
-  if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    name_->clear();
-  }
-  clear_has_name();
+	if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		name_->clear();
+	}
+	clear_has_name();
 }
 inline const ::std::string& h2mod_set_team::name() const {
-  // @@protoc_insertion_point(field_get:h2mod_set_team.name)
-  return *name_;
+	// @@protoc_insertion_point(field_get:h2mod_set_team.name)
+	return *name_;
 }
 inline void h2mod_set_team::set_name(const ::std::string& value) {
-  set_has_name();
-  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    name_ = new ::std::string;
-  }
-  name_->assign(value);
-  // @@protoc_insertion_point(field_set:h2mod_set_team.name)
+	set_has_name();
+	if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		name_ = new ::std::string;
+	}
+	name_->assign(value);
+	// @@protoc_insertion_point(field_set:h2mod_set_team.name)
 }
 inline void h2mod_set_team::set_name(const char* value) {
-  set_has_name();
-  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    name_ = new ::std::string;
-  }
-  name_->assign(value);
-  // @@protoc_insertion_point(field_set_char:h2mod_set_team.name)
+	set_has_name();
+	if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		name_ = new ::std::string;
+	}
+	name_->assign(value);
+	// @@protoc_insertion_point(field_set_char:h2mod_set_team.name)
 }
 inline void h2mod_set_team::set_name(const void* value, size_t size) {
-  set_has_name();
-  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    name_ = new ::std::string;
-  }
-  name_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:h2mod_set_team.name)
+	set_has_name();
+	if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		name_ = new ::std::string;
+	}
+	name_->assign(reinterpret_cast<const char*>(value), size);
+	// @@protoc_insertion_point(field_set_pointer:h2mod_set_team.name)
 }
 inline ::std::string* h2mod_set_team::mutable_name() {
-  set_has_name();
-  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    name_ = new ::std::string;
-  }
-  // @@protoc_insertion_point(field_mutable:h2mod_set_team.name)
-  return name_;
+	set_has_name();
+	if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		name_ = new ::std::string;
+	}
+	// @@protoc_insertion_point(field_mutable:h2mod_set_team.name)
+	return name_;
 }
 inline ::std::string* h2mod_set_team::release_name() {
-  clear_has_name();
-  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    return NULL;
-  } else {
-    ::std::string* temp = name_;
-    name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-    return temp;
-  }
+	clear_has_name();
+	if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		return NULL;
+	}
+	else {
+		::std::string* temp = name_;
+		name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+		return temp;
+	}
 }
 inline void h2mod_set_team::set_allocated_name(::std::string* name) {
-  if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    delete name_;
-  }
-  if (name) {
-    set_has_name();
-    name_ = name;
-  } else {
-    clear_has_name();
-    name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  // @@protoc_insertion_point(field_set_allocated:h2mod_set_team.name)
+	if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		delete name_;
+	}
+	if (name) {
+		set_has_name();
+		name_ = name;
+	}
+	else {
+		clear_has_name();
+		name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+	}
+	// @@protoc_insertion_point(field_set_allocated:h2mod_set_team.name)
+}
+
+// -------------------------------------------------------------------
+
+// h2mod_map_download_url
+
+// optional string url = 1;
+inline bool h2mod_map_download_url::has_url() const {
+	return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void h2mod_map_download_url::set_has_url() {
+	_has_bits_[0] |= 0x00000001u;
+}
+inline void h2mod_map_download_url::clear_has_url() {
+	_has_bits_[0] &= ~0x00000001u;
+}
+inline void h2mod_map_download_url::clear_url() {
+	if (url_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		url_->clear();
+	}
+	clear_has_url();
+}
+inline const ::std::string& h2mod_map_download_url::url() const {
+	// @@protoc_insertion_point(field_get:h2mod_map_download_url.url)
+	return *url_;
+}
+inline void h2mod_map_download_url::set_url(const ::std::string& value) {
+	set_has_url();
+	if (url_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		url_ = new ::std::string;
+	}
+	url_->assign(value);
+	// @@protoc_insertion_point(field_set:h2mod_map_download_url.url)
+}
+inline void h2mod_map_download_url::set_url(const char* value) {
+	set_has_url();
+	if (url_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		url_ = new ::std::string;
+	}
+	url_->assign(value);
+	// @@protoc_insertion_point(field_set_char:h2mod_map_download_url.url)
+}
+inline void h2mod_map_download_url::set_url(const char* value, size_t size) {
+	set_has_url();
+	if (url_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		url_ = new ::std::string;
+	}
+	url_->assign(reinterpret_cast<const char*>(value), size);
+	// @@protoc_insertion_point(field_set_pointer:h2mod_map_download_url.url)
+}
+inline ::std::string* h2mod_map_download_url::mutable_url() {
+	set_has_url();
+	if (url_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		url_ = new ::std::string;
+	}
+	// @@protoc_insertion_point(field_mutable:h2mod_map_download_url.url)
+	return url_;
+}
+inline ::std::string* h2mod_map_download_url::release_url() {
+	clear_has_url();
+	if (url_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		return NULL;
+	}
+	else {
+		::std::string* temp = url_;
+		url_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+		return temp;
+	}
+}
+inline void h2mod_map_download_url::set_allocated_url(::std::string* url) {
+	if (url_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		delete url_;
+	}
+	if (url) {
+		set_has_url();
+		url_ = url;
+	}
+	else {
+		clear_has_url();
+		url_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+	}
+	// @@protoc_insertion_point(field_set_allocated:h2mod_map_download_url.url)
+}
+
+// optional string type = 2;
+inline bool h2mod_map_download_url::has_type() const {
+	return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void h2mod_map_download_url::set_has_type() {
+	_has_bits_[0] |= 0x00000002u;
+}
+inline void h2mod_map_download_url::clear_has_type() {
+	_has_bits_[0] &= ~0x00000002u;
+}
+inline void h2mod_map_download_url::clear_type() {
+	if (type_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		type_->clear();
+	}
+	clear_has_type();
+}
+inline const ::std::string& h2mod_map_download_url::type() const {
+	// @@protoc_insertion_point(field_get:h2mod_map_download_url.type)
+	return *type_;
+}
+inline void h2mod_map_download_url::set_type(const ::std::string& value) {
+	set_has_type();
+	if (type_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		type_ = new ::std::string;
+	}
+	type_->assign(value);
+	// @@protoc_insertion_point(field_set:h2mod_map_download_url.type)
+}
+inline void h2mod_map_download_url::set_type(const char* value) {
+	set_has_type();
+	if (type_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		type_ = new ::std::string;
+	}
+	type_->assign(value);
+	// @@protoc_insertion_point(field_set_char:h2mod_map_download_url.type)
+}
+inline void h2mod_map_download_url::set_type(const char* value, size_t size) {
+	set_has_type();
+	if (type_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		type_ = new ::std::string;
+	}
+	type_->assign(reinterpret_cast<const char*>(value), size);
+	// @@protoc_insertion_point(field_set_pointer:h2mod_map_download_url.type)
+}
+inline ::std::string* h2mod_map_download_url::mutable_type() {
+	set_has_type();
+	if (type_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		type_ = new ::std::string;
+	}
+	// @@protoc_insertion_point(field_mutable:h2mod_map_download_url.type)
+	return type_;
+}
+inline ::std::string* h2mod_map_download_url::release_type() {
+	clear_has_type();
+	if (type_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		return NULL;
+	}
+	else {
+		::std::string* temp = type_;
+		type_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+		return temp;
+	}
+}
+inline void h2mod_map_download_url::set_allocated_type(::std::string* type) {
+	if (type_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+		delete type_;
+	}
+	if (type) {
+		set_has_type();
+		type_ = type;
+	}
+	else {
+		clear_has_type();
+		type_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+	}
+	// @@protoc_insertion_point(field_set_allocated:h2mod_map_download_url.type)
 }
 
 
@@ -932,18 +1257,18 @@ inline void h2mod_set_team::set_allocated_name(::std::string* name) {
 
 #ifndef SWIG
 namespace google {
-namespace protobuf {
+	namespace protobuf {
 
-template <> struct is_proto_enum< ::H2ModPacket_Type> : ::google::protobuf::internal::true_type {};
-template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::H2ModPacket_Type>() {
-  return ::H2ModPacket_Type_descriptor();
-}
+		template <> struct is_proto_enum< ::H2ModPacket_Type> : ::google::protobuf::internal::true_type {};
+		template <>
+		inline const EnumDescriptor* GetEnumDescriptor< ::H2ModPacket_Type>() {
+			return ::H2ModPacket_Type_descriptor();
+		}
 
-}  // namespace google
+	}  // namespace google
 }  // namespace protobuf
 #endif  // SWIG
 
-// @@protoc_insertion_point(global_scope)
+	 // @@protoc_insertion_point(global_scope)
 
 #endif  // PROTOBUF_h2mod_2eproto__INCLUDED

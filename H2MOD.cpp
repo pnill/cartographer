@@ -12,6 +12,7 @@
 #include <h2mod.pb.h>
 #include <Mmsystem.h>
 #include <thread>
+#include "Globals.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
@@ -103,20 +104,42 @@ int __cdecl call_object_placement_data_new(void* s_object_placement_data, int ob
 	//TRACE_GAME("object_placement_data_new(s_object_placement_data: %08X,",s_object_placement_data);
 	//TRACE_GAME("object_definition_index: %08X, object_owner: %08X, unk: %08X)", object_definition_index, object_owner, unk);
 
-	typedef int(__cdecl *object_placement_data_new)(void*, int, int, int);
-	object_placement_data_new pobject_placement_data_new = (object_placement_data_new)(((char*)h2mod->GetBase()) + 0x132163);
+	if (h2mod->Server)
+	{
+		typedef int(__cdecl *object_placement_data_new)(void*, int, int, int);
+		object_placement_data_new pobject_placement_data_new = (object_placement_data_new)(((char*)h2mod->GetBase()) + 0x121033);
 
+		return pobject_placement_data_new(s_object_placement_data, object_definition_index, object_owner, unk);
+	}
+	else
+	{
+		typedef int(__cdecl *object_placement_data_new)(void*, int, int, int);
+		object_placement_data_new pobject_placement_data_new = (object_placement_data_new)(((char*)h2mod->GetBase()) + 0x132163);
 
-	return pobject_placement_data_new(s_object_placement_data, object_definition_index, object_owner, unk);
+		return pobject_placement_data_new(s_object_placement_data, object_definition_index, object_owner, unk);
+	}
+
+	return 0;
 }
 
 signed int __cdecl call_object_new(void* pObject)
 {
 	//TRACE_GAME("object_new(pObject: %08X)", pObject);
-	typedef int(__cdecl *object_new)(void*);
-	object_new pobject_new = (object_new)(((char*)h2mod->GetBase()) + 0x136CA7);
-	
-	return pobject_new(pObject);
+	if (h2mod->Server)
+	{
+		typedef int(__cdecl *object_new)(void*);
+		object_new pobject_new = (object_new)(((char*)h2mod->GetBase()) + 0x125B77);
+
+		return pobject_new(pObject);
+	}
+	else
+	{
+		typedef int(__cdecl *object_new)(void*);
+		object_new pobject_new = (object_new)(((char*)h2mod->GetBase()) + 0x136CA7);
+
+		return pobject_new(pObject);
+	}
+	return 0;
 }
 
 #pragma endregion
@@ -143,6 +166,311 @@ void GivePlayerWeapon(int PlayerIndex, int WeaponId,bool bReset)
 		call_assign_equipment_to_unit(unit_datum, object_index, 1);
 	}
 
+}
+
+//sub_1458759
+typedef int(__stdcall *write_chat_text)(void*, int);
+write_chat_text write_chat_text_method;
+
+std::string empty("");
+
+int __stdcall write_chat_hook(void* pObject, int a2) {
+	/*
+	sub_14A7567((int)&v14, 0x79u, a2);            // this function def populates v14 with whatevers in the input component
+	sub_13D1855((int)&v7);
+	v5 = sub_142B37B(); //can use this to get the this* object we need to even utilize write_chat_text_method
+	return sub_1458759(v5, (int)&v7);             // this method that gets invoked here has logic in that that appends the GamerTag : or Server : to the chatbox line
+	*/
+
+	//to get the current clients name, call sub_11B57CA(*(_DWORD *)(v2 + 8)); replace v2 with a2
+	//which is at method offset 0x2157CA
+
+	wchar_t* chatStringWChar = (wchar_t*)(a2 + 20);
+	char chatStringChar[119];
+	wcstombs(chatStringChar, chatStringWChar, 119);
+	TRACE_GAME_N("chat_string=%s", chatStringChar);
+	std::string str(chatStringChar);
+
+	char c = str.c_str()[0];
+	if (c == '$') {
+		//this be a command, treat it differently
+		h2mod->currentchatstr = str;
+		h2mod->handle_command(str);
+		return 1;
+	}
+	else {
+		h2mod->currentchatstr = empty;
+		return write_chat_text_method(pObject, a2);
+	}
+}
+
+typedef int(__cdecl *write_inner_chat_text)(int a1, unsigned int a2, int a3);
+write_inner_chat_text write_inner_chat_text_method;
+
+int __cdecl write_inner_chat_hook(int a1, unsigned int a2, int a3) {
+	return write_inner_chat_text_method(a1, a2, a3);
+}
+
+//can write literal and dynamic wchar_t's
+//basically a function that calls all the correct functions to write text to the chatbox
+//if dedi, writes to the console stdout
+void H2MOD::write_inner_chat_dynamic(const wchar_t* data) {
+	if (this->Server) {
+		h2mod->logToDedicatedServerConsole((wchar_t*)data);
+		return;
+	}
+	//0x2096AE
+	typedef int(*sub_2196AE)();
+
+	//0x287BA9
+	typedef void(__cdecl *sub_297BA9)(void* a1, int a2, unsigned int a3);
+	sub_297BA9 sub_297BA9_method = (sub_297BA9)(h2mod->GetBase() + 0x287BA9);
+	sub_2196AE sub_2196AE_method = (sub_2196AE)(h2mod->GetBase() + 0x2096AE);
+	DWORD* ptr = (DWORD*)(((char*)h2mod->GetBase()) + 0x00973ac8);
+
+	int a3 = (int)&(*data);
+	void* v5 = ptr;
+	const unsigned __int16* v3 = (const unsigned __int16*)(a3 - 20);
+	int v8 = *(DWORD*)v5;
+	*((BYTE*)v5 + 7684) = 1;
+	*((DWORD*)v5 + 2) = v8;
+	int v10 = *(DWORD*)v5;
+	int v11 = (*(DWORD*)v5)++ % 30;
+	int v12 = v10 % 30;
+
+	if (*((DWORD *)v5 + v10 % 30 + 4)) {
+		//TODO: caused crash for tweek? f tweek
+		HeapFree(GetProcessHeap(), 0, ((LPVOID *)v5 + v11 + 4));
+	}
+	//size in bytes
+	unsigned int v13 = wcslen(data) + 256;
+	LPVOID v14 = HeapAlloc(GetProcessHeap(), 0, 2 * v13);
+	*((DWORD *)v5 + v12 + 4) = (DWORD)v14;
+	sub_297BA9_method(v14, 0, v13);
+
+	//write the string
+	write_inner_chat_text_method(*((DWORD *)v5 + v12 + 4), v13, a3);
+
+	*((DWORD*)v5 + 3) = sub_2196AE_method();
+}
+
+//0x1BA418
+typedef bool(*live_check)();
+live_check live_check_method;
+
+bool clientXboxLiveCheck() {
+	//lets you access live menu
+	return true;
+}
+
+//0x1B1643
+typedef signed int(*live_check2)();
+live_check2 live_check_method2;
+
+signed int clientXboxLiveCheck2() {
+	//1 = turns off live? 
+	//2 = either not live or can't download maps
+	return 2;
+}
+
+//0x24499F
+typedef void(*show_download_dialog)();
+show_download_dialog show_download_dialog_method;
+
+void showDownloadDialog() {
+	if (mapManager->canDownload()) {
+		mapManager->startMapDownload();
+	}
+
+	//don't call original function, so people don't get kicked from the game
+	//be careful using std wstring/strings in this hooked method, they don't get cleaned properly for some reason
+}
+
+typedef signed int(__cdecl *string_display_hook)(int a3, unsigned int a4, int a5, int a6);
+string_display_hook string_display_hook_method;
+
+std::wstring YOU_FAILED_TO_LOAD_MAP_ORG = L"You failed to load the map.";
+
+//lets you follow the call path of any string that is displayed (in a debugger)
+signed int __cdecl stringDisplayHook(int a3, unsigned int a4, int a5, int a6) {
+	if (overrideUnicodeMessage) {
+		wchar_t* temp = (wchar_t*)a5;
+		if (temp[0] != L' ') {
+			const wchar_t* lobbyMessage = mapManager->getCustomLobbyMessage();
+			if (wcscmp(temp, YOU_FAILED_TO_LOAD_MAP_ORG.c_str()) == 0 && lobbyMessage != NULL) {
+				//if we detect that we failed to load the map, we display different strings only for the duration of
+				//this specific string being displayed
+				return string_display_hook_method(a3, a4, (int)(lobbyMessage), a6);
+			}
+		}
+	}
+	return string_display_hook_method(a3, a4, a5, a6);
+}
+
+void H2MOD::handle_command(std::string command) {
+	commands->handle_command(command);
+}
+
+void H2MOD::handle_command(std::wstring command) {
+	commands->handle_command(std::string(command.begin(), command.end()));
+}
+
+typedef int(__cdecl *dedi_command_hook)(int a1, int a2, char a3);
+dedi_command_hook dedi_command_hook_method;
+
+typedef signed int(*dedi_print)(const char* a1, ...);
+
+void H2MOD::logToDedicatedServerConsole(wchar_t* message) {
+	dedi_print dedi_print_method = (dedi_print)(h2mod->GetBase() + 0x2354C8);
+	dedi_print_method((const char*)(message));
+}
+
+int __cdecl dediCommandHook(int a1, int a2, int a3) {
+	h2mod->logToDedicatedServerConsole(L"Dedicated command\n");
+	unsigned __int16* ptr = *(unsigned __int16 **)a1;
+	const wchar_t* text = (wchar_t*)ptr;
+	wchar_t c = text[0];
+	if (c == L'$') {
+		h2mod->logToDedicatedServerConsole(L"Running chatbox command\n");
+		//run the chatbox commands
+		h2mod->handle_command(std::wstring(text));
+	}
+
+	return dedi_command_hook_method(a1, a2, a3);
+}
+
+typedef char(__stdcall *send_text_chat)(char* thisx, int a2, int a3, char a4, char a5);
+send_text_chat send_text_chat_method;
+
+char __stdcall sendTextChat(char* thisx, int a2, int a3, char a4, char a5) {
+	const char* text = h2mod->currentchatstr.c_str();
+	char c = text[0];
+	if (c != '$') {
+		//don't send chatbox commands to anyone
+		return send_text_chat_method(thisx, a2, a3, a4, a5);
+	}
+	return ' ';
+}
+
+//0xD1FA7
+typedef void(__thiscall *data_decode_string)(void* thisx, int a2, int a3, int a4);
+data_decode_string getDataDecodeStringMethod() {
+	return (data_decode_string)(h2mod->GetBase() + 0xD1FA7);
+}
+
+//0xD1FFD
+typedef int(__thiscall *data_decode_address)(int thisx, int a1, int a2);
+data_decode_address getDataDecodeAddressMethod() {
+	return (data_decode_address)(h2mod->GetBase() + 0xD1FFD);
+}
+
+//0xD1F95
+typedef int(__thiscall *data_decode_id)(int thisx, int a1, int a2, int a3);
+data_decode_id getDataDecodeId() {
+	return (data_decode_id)(h2mod->GetBase() + 0xD1F95);
+}
+
+//0xD1EE5
+typedef unsigned int(__thiscall *data_decode_integer)(int thisx, int a1, int a2);
+data_decode_integer getDataDecodeIntegerMethod() {
+	return (data_decode_integer)(h2mod->GetBase() + 0xD1EE5);
+}
+
+//0xD1F47
+typedef bool(__thiscall *data_decode_bool)(int thisx, int a2);
+data_decode_bool getDataDecodeBoolMethod() {
+	return (data_decode_bool)(h2mod->GetBase() + 0xD1F47);
+}
+
+//0xD114C
+//this isn't can_join, its some other shit
+typedef bool(__thiscall *can_join)(int thisx);
+can_join getCanJoinMethod() {
+	return (can_join)(h2mod->GetBase() + 0xD114C);
+}
+
+//0x1ECEEB
+typedef bool(__cdecl *read_text_chat_packet)(int a1, int a2, int a3);
+read_text_chat_packet read_text_chat_packet_method;
+
+bool __cdecl readTextChat(int a1, int a2, int a3) {
+	//TODO: from this method you can determine if the server sent you the message
+	//could open up scripting
+
+	//TODO: any pieces of text with "$" in front, ignore, since this is the client trying to possibly
+	//send a malicious command
+	data_decode_integer dataDecodeInteger = getDataDecodeIntegerMethod();
+	data_decode_id dataDecodeId = getDataDecodeId();
+	data_decode_address dataDecodeAddress = getDataDecodeAddressMethod();
+	data_decode_string dataDecodeString = getDataDecodeStringMethod();
+	data_decode_bool dataDecodeBool = getDataDecodeBoolMethod();
+	can_join sub_45114C_method = getCanJoinMethod();
+
+	bool v3; // al@1
+	unsigned int v4; // eax@3
+	unsigned int v5; // ebx@4
+	int v6; // ebp@5
+	bool result; // al@7
+
+	dataDecodeId(a1, (int)"session-id", a3, 64);
+	*(DWORD*)(a3 + 8) = dataDecodeInteger(a1, (int)"routed-players", 32);
+	*(DWORD*)(a3 + 12) = dataDecodeInteger(a1, (int)"metadata", 8);
+	v3 = dataDecodeBool(a1, (int)"source-is-server");
+	*(BYTE *)(a3 + 16) = v3;
+	if (!v3)
+		dataDecodeId(a1, (int)"source-player", a3 + 17, 64);
+	v4 = dataDecodeInteger(a1, (int)"destination-player-count", 8);
+	*(DWORD*)(a3 + 156) = v4;
+	if (v4 > 0x10)
+	{
+		result = 0;
+	}
+	else
+	{
+		v5 = 0;
+		if (v4)
+		{
+			v6 = a3 + 25;
+			do
+			{
+				dataDecodeId(a1, (int)"destination-player", v6, 64);
+				++v5;
+				v6 += 8;
+			} while (v5 < *(DWORD*)(a3 + 156));
+		}
+		dataDecodeString((void *)a1, (int)"text", a3 + 160, 121);
+
+		char* text = (char*)(a3 + 160);
+		char c = text[0];
+
+		TRACE_GAME_N("text_chat_packet=%s", text);
+		if (c == '$') {
+			if (v3) {
+				//TODO: if came from server, run thru server->client command handler
+			}
+			else {
+				//TODO: run thru client->client command handler
+			}
+
+			text[0] = ' ';
+		}
+		//result = sub_45114C_method(a1) == 0;
+	}
+	return true;
+}
+bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
+{
+	typedef int(__cdecl  *add_object_to_sync)(int gamestate_object_datum);
+
+	add_object_to_sync p_add_object_to_sync;
+	if (h2mod->Server) {
+		p_add_object_to_sync = (add_object_to_sync)((char*)h2mod->GetBase() + 0x1B2C44);
+	}
+	else {
+		p_add_object_to_sync = (add_object_to_sync)((char*)h2mod->GetBase() + 0x1B8D14);
+	}
+
+	return p_add_object_to_sync(gamestate_object_datum);
 }
 
 wchar_t* H2MOD::get_local_player_name()
@@ -192,14 +520,19 @@ int H2MOD::get_player_index_from_unit_datum(int unit_datum_index)
 
 }
 
+
 int H2MOD::get_unit_datum_from_player_index(int pIndex)
 {
 	int unit = 0;
-	DWORD player_table_ptr = *(DWORD*)(this->GetBase() + 0x004A8260);
+	DWORD player_table_ptr;
+	if (!h2mod->Server)
+		player_table_ptr = *(DWORD*)(this->GetBase() + 0x004A8260);
+	else
+		player_table_ptr = *(DWORD*)(this->GetBase() + 0x004D64C4);
 	player_table_ptr += 0x44;
 
 	unit = (int)*(int*)(*(DWORD*)player_table_ptr + (pIndex * 0x204) + 0x28);
-	
+
 	return unit;
 }
 
@@ -489,6 +822,7 @@ int __cdecl OnMapLoad(int a1)
 						   0x00, 0x6E, 0x00, 0x75, 0x00, 0x5C, 0x00, 0x6D, 0x00, 0x61, 0x00, 0x69, 0x00, 
 						   0x6E, 0x00, 0x6D, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x75, 0x00 };
 
+	isLobby = true;
 	if (!memcmp(main_menu, (BYTE*)0x300017E0, 60))
 	{
 		DWORD game_globals = *(DWORD*)(((char*)h2mod->GetBase()) + 0x482D3C);
@@ -560,6 +894,8 @@ int __cdecl OnMapLoad(int a1)
 
 bool __cdecl OnPlayerSpawn(int a1)
 {
+	//once players spawn we aren't in lobby anymore ;)
+	isLobby = false;
 	//TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
 
 	int PlayerIndex = a1 & 0x000FFFF;
@@ -708,13 +1044,10 @@ int __cdecl connect_establish_write(void* a1, int a2, int a3)
 }
 
 
-void H2MOD::ApplyHooks()
-{
-
+void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
-	if (this->Server == false)
-	{
+	if (this->Server == false) {
 		TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
 		DWORD dwBack;
@@ -728,7 +1061,6 @@ void H2MOD::ApplyHooks()
 		pmap_initialize = (map_intialize)DetourFunc((BYTE*)this->GetBase() + 0x5912D, (BYTE*)OnMapLoad, 10);
 		VirtualProtect(pmap_initialize, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0xD03ED, (BYTE*)OnPlayerScore,12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
@@ -738,11 +1070,45 @@ void H2MOD::ApplyHooks()
 		pconnect_establish_write = (tconnect_establish_write)DetourFunc((BYTE*)this->GetBase() + 0x1F1A2D, (BYTE*)connect_establish_write, 5);
 		VirtualProtect(pconnect_establish_write, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
+		//chatbox command hooks below
+
+		//raw log line (without Server: or GAMER_TAG: prefix)
+		write_inner_chat_text_method = (write_inner_chat_text)DetourFunc((BYTE*)this->GetBase() + 0x287669, (BYTE*)write_inner_chat_hook, 8);
+		VirtualProtect(write_inner_chat_text_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		//read text packet
+		read_text_chat_packet_method = (read_text_chat_packet)DetourFunc((BYTE*)this->GetBase() + 0x1ECEEB, (BYTE*)readTextChat, 6);
+		VirtualProtect(read_text_chat_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		//0x1C7FE0
+		send_text_chat_method = (send_text_chat)DetourClassFunc((BYTE*)h2mod->GetBase() + 0x1C7FE0, (BYTE*)sendTextChat, 11);
+		VirtualProtect(send_text_chat_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		//lobby chatbox
+		write_chat_text_method = (write_chat_text)DetourClassFunc((BYTE*)this->GetBase() + 0x238759, (BYTE*)write_chat_hook, 8);
+		VirtualProtect(write_chat_text_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		if (map_downloading_enable) {
+			//live checks removed will make users exit to live menu instead of network browser :(
+			live_check_method = (live_check)DetourFunc((BYTE*)this->GetBase() + 0x1BA418, (BYTE*)clientXboxLiveCheck, 9);
+			VirtualProtect(live_check_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+			live_check_method2 = (live_check2)DetourFunc((BYTE*)this->GetBase() + 0x1B1643, (BYTE*)clientXboxLiveCheck2, 9);
+			VirtualProtect(live_check_method2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+			//0x24499F
+			show_download_dialog_method = (show_download_dialog)DetourFunc((BYTE*)h2mod->GetBase() + 0x24499F, (BYTE*)showDownloadDialog, 7);
+			VirtualProtect(show_download_dialog_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+			string_display_hook_method = (string_display_hook)DetourFunc((BYTE*)h2mod->GetBase() + 0x287AB5, (BYTE*)stringDisplayHook, 5);
+			VirtualProtect(string_display_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		}
+	} else {
+		DWORD dwBack;
+
+		dedi_command_hook_method = (dedi_command_hook)DetourFunc((BYTE*)this->GetBase() + 0x1CCFC, (BYTE*)dediCommandHook, 7);
+		VirtualProtect(dedi_command_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
-	
-
-
-
 }
 
 
@@ -920,7 +1286,37 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 								}
 							}
 						break;
+						case H2ModPacket_Type_get_map_download_url: {
+							//TODO: move into method
+							//TODO: if the download link isn't set, we should be able to tell the client this
+							//request from some client to get the map download url, send it
+							H2ModPacket pack;
+							pack.set_type(H2ModPacket_Type_map_download_url);
+							h2mod_map_download_url* mapDownloadUrl = pack.mutable_map_url();
+							if (strlen(customMapDownloadLink) != 0) {
+								mapDownloadUrl->set_url(customMapDownloadLink);
+								mapDownloadUrl->set_type("map");
+								mapManager->setMapDownloadType("map");
+							}
+							else if (strlen(customMapZipDownloadLink) != 0) {
+								mapDownloadUrl->set_url(customMapZipDownloadLink);
+								mapDownloadUrl->set_type("zip");
+								mapManager->setMapDownloadType("zip");
+							}
+							else {
+								TRACE_GAME_N("[h2mod-network] no custom map downloading urls set");
+							}
 
+							char* SendBuf = new char[pack.ByteSize()];
+							memset(SendBuf, 0x00, pack.ByteSize());
+							pack.SerializeToArray(SendBuf, pack.ByteSize());
+
+							sendto(comm_socket, SendBuf, pack.ByteSize(), 0, (SOCKADDR*)&SenderAddr, sizeof(SenderAddr));
+							TRACE_GAME_N("[h2mod-network] Sending map download url=%s", mapDownloadUrl->mutable_url()->c_str());
+
+							delete[] SendBuf;
+							break;
+						}
 						case H2ModPacket_Type_h2mod_ping:
 							H2ModPacket pongpak;
 							pongpak.set_type(H2ModPacket_Type_h2mod_pong);
@@ -931,7 +1327,7 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 
 							delete[] pongdata;
 						break;
-
+						
 					}
 				}
 
@@ -981,6 +1377,9 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 				TRACE_GAME("[h2mod-network] Client - we're not connected re-sending our auth..");
 				sendto(comm_socket, SendBuf, h2pak.ByteSize(), 0, (SOCKADDR*)&SendStruct, sizeof(SendStruct));
 			}
+
+			//request map download url if necessary from the server
+			mapManager->requestMapDownloadUrl(comm_socket, SendStruct);
 
 			sockaddr_in SenderAddr;
 			int SenderAddrSize = sizeof(SenderAddr);
