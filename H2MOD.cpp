@@ -191,15 +191,18 @@ int __stdcall write_chat_hook(void* pObject, int a2) {
 	TRACE_GAME_N("chat_string=%s", chatStringChar);
 	std::string str(chatStringChar);
 
-	char c = str.c_str()[0];
-	if (c == '$') {
+	if (chatStringWChar[0] == L'$') {
 		//this be a command, treat it differently
-		h2mod->currentchatstr = str;
+		h2mod->isChatBoxCommand = true;
+		char chatStringChar[119];
+		wcstombs(chatStringChar, chatStringWChar, 119);
+		std::string str(chatStringChar);
+		TRACE_GAME_N("chat_string=%s", chatStringChar);
 		h2mod->handle_command(str);
 		return 1;
 	}
 	else {
-		h2mod->currentchatstr = empty;
+		h2mod->isChatBoxCommand = false;
 		return write_chat_text_method(pObject, a2);
 	}
 }
@@ -343,12 +346,10 @@ typedef char(__stdcall *send_text_chat)(char* thisx, int a2, int a3, char a4, ch
 send_text_chat send_text_chat_method;
 
 char __stdcall sendTextChat(char* thisx, int a2, int a3, char a4, char a5) {
-	const char* text = h2mod->currentchatstr.c_str();
-	char c = text[0];
-	if (c != '$') {
-		//don't send chatbox commands to anyone
+	if (!h2mod->isChatBoxCommand) {
 		return send_text_chat_method(thisx, a2, a3, a4, a5);
 	}
+	//don't send chatbox commands to anyone
 	return ' ';
 }
 
@@ -1043,7 +1044,6 @@ int __cdecl connect_establish_write(void* a1, int a2, int a3)
 	return pconnect_establish_write(a1, a2, a3);
 }
 
-
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1071,22 +1071,23 @@ void H2MOD::ApplyHooks() {
 		VirtualProtect(pconnect_establish_write, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//chatbox command hooks below
+		if (chatbox_commands) {
+			//raw log line (without Server: or GAMER_TAG: prefix)
+			write_inner_chat_text_method = (write_inner_chat_text)DetourFunc((BYTE*)this->GetBase() + 0x287669, (BYTE*)write_inner_chat_hook, 8);
+			VirtualProtect(write_inner_chat_text_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		//raw log line (without Server: or GAMER_TAG: prefix)
-		write_inner_chat_text_method = (write_inner_chat_text)DetourFunc((BYTE*)this->GetBase() + 0x287669, (BYTE*)write_inner_chat_hook, 8);
-		VirtualProtect(write_inner_chat_text_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+			//read text packet
+			read_text_chat_packet_method = (read_text_chat_packet)DetourFunc((BYTE*)this->GetBase() + 0x1ECEEB, (BYTE*)readTextChat, 6);
+			VirtualProtect(read_text_chat_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		//read text packet
-		read_text_chat_packet_method = (read_text_chat_packet)DetourFunc((BYTE*)this->GetBase() + 0x1ECEEB, (BYTE*)readTextChat, 6);
-		VirtualProtect(read_text_chat_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+			//0x1C7FE0
+			send_text_chat_method = (send_text_chat)DetourClassFunc((BYTE*)h2mod->GetBase() + 0x1C7FE0, (BYTE*)sendTextChat, 11);
+			VirtualProtect(send_text_chat_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		//0x1C7FE0
-		send_text_chat_method = (send_text_chat)DetourClassFunc((BYTE*)h2mod->GetBase() + 0x1C7FE0, (BYTE*)sendTextChat, 11);
-		VirtualProtect(send_text_chat_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		//lobby chatbox
-		write_chat_text_method = (write_chat_text)DetourClassFunc((BYTE*)this->GetBase() + 0x238759, (BYTE*)write_chat_hook, 8);
-		VirtualProtect(write_chat_text_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+			//lobby chatbox
+			write_chat_text_method = (write_chat_text)DetourClassFunc((BYTE*)this->GetBase() + 0x238759, (BYTE*)write_chat_hook, 8);
+			VirtualProtect(write_chat_text_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		}
 
 		if (map_downloading_enable) {
 			//live checks removed will make users exit to live menu instead of network browser :(
@@ -1106,8 +1107,10 @@ void H2MOD::ApplyHooks() {
 	} else {
 		DWORD dwBack;
 
-		dedi_command_hook_method = (dedi_command_hook)DetourFunc((BYTE*)this->GetBase() + 0x1CCFC, (BYTE*)dediCommandHook, 7);
-		VirtualProtect(dedi_command_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		if (chatbox_commands) {
+			dedi_command_hook_method = (dedi_command_hook)DetourFunc((BYTE*)this->GetBase() + 0x1CCFC, (BYTE*)dediCommandHook, 7);
+			VirtualProtect(dedi_command_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		}
 	}
 }
 

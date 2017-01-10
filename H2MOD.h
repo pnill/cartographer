@@ -120,7 +120,7 @@ public:
 		std::unordered_map<NetworkPlayer*, bool> NetworkPlayers;
 		std::unordered_map<wchar_t*, int> SoundMap;
 		std::mutex sound_mutex;
-		std::string currentchatstr;
+		bool isChatBoxCommand = false;
 
 private:
 		DWORD Base;

@@ -89,9 +89,9 @@ void ChatBoxCommands::handle_command(std::string command) {
 					{
 						unsigned int player_datum = h2mod->get_unit_datum_from_player_index(0);
 						call_object_placement_data_new(nObject, object_datum, player_datum, 0);
-						*(float*)(nObject + 0x1C) = 5 * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-						*(float*)(nObject + 0x20) = 5 * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-						*(float*)(nObject + 0x24) = 5 * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+						*(float*)(nObject + 0x1C) = x + (5 * static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
+						*(float*)(nObject + 0x20) = y + (5 * static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
+						*(float*)(nObject + 0x24) = z + (5 * static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
 						unsigned int object_gamestate_datum = call_object_new(nObject);
 						call_add_object_to_sync(object_gamestate_datum);
 					}

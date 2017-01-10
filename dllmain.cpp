@@ -20,13 +20,15 @@ UINT g_debug = 0;
 UINT g_port = 1000;
 UINT fps_enable = 1;
 
-//off by default
+//map downloading is off by default
 UINT map_downloading_enable = 0;
 CHAR map_download_external_host[128];
 CHAR map_download_external_uri[128];
-
 CHAR customMapDownloadLink[128];
 CHAR customMapZipDownloadLink[128];
+
+//chatbox commands are off by default
+UINT chatbox_commands = 0;
 
 ULONG broadcast_server = inet_addr("149.56.81.89");
 
@@ -299,6 +301,7 @@ void InitInstance()
 				CHECK_ARG("port =", g_port);
 				CHECK_ARG("fps_enable = ", fps_enable);
 				CHECK_ARG("map_downloading_enable = ", map_downloading_enable);
+				CHECK_ARG("chatbox_commands = ", chatbox_commands);
 				CHECK_ARG_STR("custom_maps_link = ", customMapDownloadLink);
 				CHECK_ARG_STR("custom_maps_zip_link = ", customMapZipDownloadLink);
 				CHECK_ARG_STR("map_download_external_host = ", map_download_external_host);

@@ -38,6 +38,7 @@ extern bool isLobby;
 extern UINT map_downloading_enable;
 extern CHAR map_download_external_host[128];
 extern CHAR map_download_external_uri[128];
+extern UINT chatbox_commands;
 extern bool overrideUnicodeMessage;
 extern ChatBoxCommands* commands;
 
