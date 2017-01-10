@@ -186,11 +186,6 @@ int __stdcall write_chat_hook(void* pObject, int a2) {
 	//which is at method offset 0x2157CA
 
 	wchar_t* chatStringWChar = (wchar_t*)(a2 + 20);
-	char chatStringChar[119];
-	wcstombs(chatStringChar, chatStringWChar, 119);
-	TRACE_GAME_N("chat_string=%s", chatStringChar);
-	std::string str(chatStringChar);
-
 	if (chatStringWChar[0] == L'$') {
 		//this be a command, treat it differently
 		h2mod->isChatBoxCommand = true;
