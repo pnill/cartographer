@@ -186,15 +186,11 @@ void MapManager::reloadMaps() {
 	possible_map_reload map_reload_method = (possible_map_reload)(h2mod->GetBase() + 0x4D021);
 	DWORD* unk = (DWORD*)(h2mod->GetBase() + 0x482D70);
 
-	typedef struct RTL_CRITICAL_SECTION**(__thiscall *init_critical_section)(int thisx);
-	init_critical_section init_critical_section_method = (init_critical_section)(h2mod->GetBase() + 0xC18BD);
-
 	DWORD dwBack;
 	BOOL canprotect = VirtualProtect((WORD*)((int)unk + 148016), sizeof(WORD), PAGE_EXECUTE_READWRITE, &dwBack);
 	if (!canprotect && GetLastError()) {
 		TRACE("canprotect=%s, error=%d", canprotect, GetLastError());
 	}
-	init_critical_section_method((int)unk);
 	map_reload_method((int)unk);
 }
 
