@@ -19,6 +19,9 @@ UINT g_online = 1;
 UINT g_debug = 0;
 UINT g_port = 1000;
 UINT fps_enable = 1;
+UINT fps_limit = 58;
+UINT field_of_view = 57;
+float crosshair_offset = 0.165f;
 
 ULONG broadcast_server = inet_addr("149.56.81.89");
 
@@ -274,6 +277,12 @@ void InitInstance()
 		continue; \
 	}
 
+#define CHECK_ARG_FLOAT(x,y) \
+	if( strstr(str, x) == str) \
+	{ \
+		sscanf(str + strlen(x), "%f", &y ); \
+		continue; \
+	}
 
 #define CHECK_ARG_I64(x,y) \
 	if( strstr( str,x ) == str ) \
@@ -290,6 +299,9 @@ void InitInstance()
 				CHECK_ARG("gungame =", b_GunGame);
 				CHECK_ARG("port =", g_port);
 				CHECK_ARG("fps_enable = ", fps_enable);
+				CHECK_ARG("fps_limit = ", fps_limit);
+				CHECK_ARG("field_of_view = ", field_of_view);
+				CHECK_ARG_FLOAT("crosshair_offset = ", crosshair_offset);
 			}
 
 			

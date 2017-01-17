@@ -551,6 +551,10 @@ int __cdecl OnMapLoad(int a1)
 			*(float*)(AddressOffset + 0xB7F914) = 5000.0f; //sniper_bullet.proj Initial Velocity
 			*(float*)(AddressOffset + 0xB7F918) = 5000.0f; //sniper_bullet.proj Final Velocity
 		#pragma endregion
+
+		#pragma region Crosshair Offset
+			*(float*)(AddressOffset + 0x3DC00) = crosshair_offset;
+		#pragma endregion
 	}
 
 
@@ -1104,14 +1108,11 @@ void H2MOD::Initialize()
 	TRACE_GAME("H2MOD - Initialized v0.1a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
 
-	//TRACE_GAME("H2MOD - Initializing H2MOD Network handlers");
-
-	//Network::Initialize();
-
-	
+	float fovRadians = (float)((field_of_view * 3.14159265f) / 180);
+	*(float*)(this->GetBase() + 0x41D984) = fovRadians; //player
+	*(float*)(this->GetBase() + 0x413780) = fovRadians * 0.8435f; //vehicle
 	
 	h2mod->ApplyHooks();
-	
 }
 
 DWORD H2MOD::GetBase()
