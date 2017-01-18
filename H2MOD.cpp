@@ -5,6 +5,7 @@
 #include "H2MOD.h"
 #include "H2MOD_GunGame.h"
 #include "H2MOD_Infection.h"
+#include "H2MOD_Halo2Final.h"
 #include "Network.h"
 #include "xliveless.h"
 #include "CUser.h"
@@ -16,8 +17,10 @@
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
 Infection *inf = new Infection();
+Halo2Final *h2f = new Halo2Final();
 
 bool b_Infection = false;
+bool b_Halo2Final = false;
 
 extern bool b_GunGame;
 extern CUserManagement User;
@@ -757,19 +760,18 @@ bool bcoop = false;
 
 int __cdecl OnMapLoad(int a1)
 {
-	
-	/*wchar_t mp3[15] = L"new_zombie.mp3";
-	h2mod->play_mp3((LPWSTR)&mp3);
+	//OnMapLoad is called with 30888 when a game ends
+	if (a1 == 30888)
+	{
+		if (b_Halo2Final)
+			h2f->Dispose();
 
-
-	wchar_t mp32[13] = L"infected.mp3";
-	h2mod->play_mp3((LPWSTR)&mp32);*/
-
-
-
+		return pmap_initialize(a1);
+	}
 
 	b_Infection = false;
 	b_GunGame = false;
+	b_Halo2Final = false;
 	
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase())+0x97777C);
 
@@ -785,6 +787,12 @@ int __cdecl OnMapLoad(int a1)
 	{
 		TRACE_GAME("[h2mod] GunGame Turned on!");
 		b_GunGame = true;
+	}
+
+	if (wcsstr(variant_name, L"H2F") > 0 || wcsstr(variant_name, L"h2f") > 0 || wcsstr(variant_name, L"Halo2Final") > 0 || wcsstr(variant_name, L"halo2final") > 0)
+	{
+		TRACE_GAME("[h2mod] Halo2Final Turned on!");
+		b_Halo2Final = true;
 	}
 
 #pragma region COOP FIXES
@@ -885,11 +893,14 @@ int __cdecl OnMapLoad(int a1)
 		#pragma region Crosshair Offset
 			*(float*)(AddressOffset + 0x3DC00) = crosshair_offset;
 		#pragma endregion
+
+		#pragma region Halo2Final
+			if (b_Halo2Final)
+				h2f->Initialize();
+		#pragma endregion
 	}
 
-
 	return ret;
-
 }
 
 bool __cdecl OnPlayerSpawn(int a1)

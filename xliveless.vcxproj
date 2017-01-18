@@ -170,6 +170,7 @@
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="h2mod.pb.cc" />
     <ClCompile Include="H2MOD_GunGame.cpp" />
+    <ClCompile Include="H2MOD_Halo2Final.cpp" />
     <ClCompile Include="H2MOD_MapManager.cpp" />
     <ClCompile Include="Hook.cpp" />
     <ClCompile Include="miniz.c">
@@ -191,6 +192,7 @@
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="h2mod.pb.h" />
     <ClInclude Include="H2MOD_GunGame.h" />
+    <ClInclude Include="H2MOD_Halo2Final.h" />
     <ClInclude Include="H2MOD_Infection.h" />
     <ClInclude Include="H2MOD_MapManager.h" />
     <ClInclude Include="H2MOD_Sounds.h" />
