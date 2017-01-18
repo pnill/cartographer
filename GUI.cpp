@@ -88,24 +88,16 @@ float getElapsedTime(void) {
 	return (float)((c.QuadPart - counterAtStart.QuadPart) * 1000.0f / (float)timerFreq.QuadPart);
 }
 
-
+float desiredRenderTime = 17.041379f;
 void frameTimeManagement() {
 	float renderTime = getElapsedTime() - lastPresentTime;
 
-	// implement FPS threshold
-	//float thresholdRenderTime = (1000.0f / 28) + 0.2f;
-	//if (renderTime > thresholdRenderTime) lowFPSmode = true;
-	//else if (renderTime < thresholdRenderTime - 1.0f) lowFPSmode = false;
+	while (renderTime < desiredRenderTime) {
+		SwitchToThread();
+		renderTime = getElapsedTime() - lastPresentTime;
+	}
 
-	// implement FPS cap
-	
-		float desiredRenderTime = (1000.0f / 58) - 0.2f;
-		while (renderTime < desiredRenderTime) {
-			SwitchToThread();
-			renderTime = getElapsedTime() - lastPresentTime;
-		}
-		lastPresentTime = getElapsedTime();
-	
+	lastPresentTime = getElapsedTime();
 }
 
 DWORD dwPresent;
@@ -122,6 +114,7 @@ HRESULT hkPresent(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT
 
 void GUI::Initialize()
 {
+	desiredRenderTime = (1000.f / fps_limit);
 	initFontsIfRequired();
 }
 
