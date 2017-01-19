@@ -8,14 +8,15 @@
 Todo:
 - Does the QuickCamo stuff need to be ran on the server?
 - 2v2:
-- Start with 4 Frags
-- On Hold
-- Carbine (On hold until shot leading is consistent)
-- Should be 3 shot kill
-- Have the same ttk as H1 Magnum
+	- Start with 4 Frags
+		- On Hold
+	- Carbine (On hold until shot leading is consistent)
+		- Should be 3 shot kill
+		- Have the same ttk as H1 Magnum
 */
 
 bool isEnabled = false;
+bool isHosting = false;
 bool detoursHavePreviouslyBeenApplied = false;
 
 DWORD dwBack;
@@ -88,6 +89,26 @@ signed int __stdcall GetSecondsUntilEquipmentRespawn(int equipment_index)
 	return pget_spawn_time(equipment_index);
 }
 
+int64_t originalGetSecondsUntilEquipmentRespawnFunctionData;
+void EnableStaticWeaponSpawns()
+{
+	if (isHosting || h2mod->Server)
+	{
+		originalGetSecondsUntilEquipmentRespawnFunctionData = *(int64_t*)(base_address + 0x6A8C4);
+		pget_spawn_time = (get_spawn_time)DetourFunc((BYTE*)base_address + 0x6A8C4, (BYTE*)GetSecondsUntilEquipmentRespawn, 5);
+		VirtualProtect(pget_spawn_time, 8, PAGE_EXECUTE_READWRITE, &dwBack);
+	}
+}
+
+void DisableStaticWeaponSpawns()
+{
+	if (isHosting || h2mod->Server)
+	{
+		VirtualProtect((LPVOID)(base_address + 0x6A8C4), 8, PAGE_EXECUTE_READWRITE, &dwBack);
+		*(int64_t*)(base_address + 0x6A8C4) = originalGetSecondsUntilEquipmentRespawnFunctionData;
+	}
+}
+
 #pragma endregion
 
 #pragma region QuickCamo
@@ -109,15 +130,20 @@ int PlayerWeaponSwitched(int a1, int a2, int a3)
 	return pplayer_weapon_switched(a1, a2, a3);
 }
 
+int32_t originalSetDefaultRegrowthRateData;
+int16_t originalSetRegrowthRateToMaxOf25;
 void DisableCamoRegenerationDefaults()
 {
 	//Disable setting default regrowth rate
-	VirtualProtect((LPVOID)(base_address + 0x13FA13), 1, PAGE_EXECUTE_READWRITE, &dwBack);
+	VirtualProtect((LPVOID)(base_address + 0x13FA13), 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	originalSetDefaultRegrowthRateData = *(int32_t*)(base_address + 0x13FA13);
 	*(byte*)(base_address + 0x13FA13) = 0x90;
 	*(byte*)(base_address + 0x13FA14) = 0x90;
 	*(byte*)(base_address + 0x13FA15) = 0x90;
 
 	//Always set camo regrowth rate to the value passed in
+	VirtualProtect((LPVOID)(base_address + 0x13FA26), 2, PAGE_EXECUTE_READWRITE, &dwBack);
+	originalSetRegrowthRateToMaxOf25 = *(int16_t*)(base_address + 0x13FA26);
 	*(byte*)(base_address + 0x13FA26) = 0x90;
 	*(byte*)(base_address + 0x13FA27) = 0x90;
 }
@@ -125,19 +151,37 @@ void DisableCamoRegenerationDefaults()
 void EnableCamoRegenerationDefaults()
 {
 	//Disable setting default regrowth rate
-	*(byte*)(base_address + 0x13FA13) = 0xF3;
-	*(byte*)(base_address + 0x13FA14) = 0x0F;
-	*(byte*)(base_address + 0x13FA15) = 0x10;
+	*(int32_t*)(base_address + 0x13FA13) = originalSetDefaultRegrowthRateData;
 
 	//Only set regrowth rate to value passed in if it is less than 0.25f
-	*(byte*)(base_address + 0x13FA26) = 0x77;
-	*(byte*)(base_address + 0x13FA27) = 0x03;
+	*(int16_t*)(base_address + 0x13FA26) = originalSetRegrowthRateToMaxOf25;
 }
 
 #pragma endregion
 
-void Halo2Final::Initialize()
+#pragma region Melee Lunge
+
+int32_t originalMeleeLungeFunctionData;
+void DisableMeleeLunge()
 {
+	VirtualProtect((LPVOID)(base_address + 0x53ED5), 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	originalMeleeLungeFunctionData = *(int32_t*)(base_address + 0x53ED5);
+	*(byte*)(base_address + 0x53ED5) = 0x90;
+	*(byte*)(base_address + 0x53ED6) = 0x90;
+	*(byte*)(base_address + 0x53ED7) = 0x90;
+}
+
+void EnableMeleeLunge()
+{
+	VirtualProtect((LPVOID)(base_address + 0x53ED5), 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	*(int32_t*)(base_address + 0x53ED5) = originalMeleeLungeFunctionData;
+}
+
+#pragma endregion
+
+void Halo2Final::Initialize(bool isHost)
+{
+	isHosting = isHost;
 	TRACE_GAME("[H2MOD-H2F] : start Initialize()");
 	settings = new Halo2FinalSettings();
 
@@ -268,8 +312,7 @@ void Halo2Final::Initialize()
 
 	TRACE_GAME("[H2MOD-H2F] game_clock_initial_value: %i (0 for no time limit)", game_clock_initial_value);
 
-	pget_spawn_time = (get_spawn_time)DetourFunc((BYTE*)base_address + 0x6A8C4, (BYTE*)GetSecondsUntilEquipmentRespawn, 5);
-	VirtualProtect(pget_spawn_time, 5, PAGE_EXECUTE_READWRITE, &dwBack);
+	EnableStaticWeaponSpawns();
 
 	if (!detoursHavePreviouslyBeenApplied)
 	{
@@ -443,7 +486,7 @@ void Halo2Final::Initialize()
 
 #pragma endregion
 
-												//Spawn Protection
+	//Spawn Protection
 	if (settings->player_turn_off_spawn_protection)
 	{
 		VirtualProtect((LPVOID)(base_address + 0x55D01), 1, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -453,10 +496,7 @@ void Halo2Final::Initialize()
 	//Disable Melee Lunge
 	if (settings->player_turn_off_melee_lunge)
 	{
-		VirtualProtect((LPVOID)(base_address + 0x53ED5), 3, PAGE_EXECUTE_READWRITE, &dwBack);
-		*(byte*)(base_address + 0x53ED5) = 0x90;
-		*(byte*)(base_address + 0x53ED6) = 0x90;
-		*(byte*)(base_address + 0x53ED7) = 0x90;
+		DisableMeleeLunge();
 	}
 
 	SetAllWeaponsToStartSpawnTimerOnPickup();
@@ -470,8 +510,10 @@ void Halo2Final::Initialize()
 
 void Halo2Final::Dispose()
 {
-	EnableCamoRegenerationDefaults();
 	isEnabled = false;
+
+	EnableCamoRegenerationDefaults();
+	DisableStaticWeaponSpawns();
 
 	//Turn Spawn Protection back on
 	if (settings->player_turn_off_spawn_protection)
@@ -483,19 +525,8 @@ void Halo2Final::Dispose()
 	//Enable Melee Lunges
 	if (settings->player_turn_off_melee_lunge)
 	{
-		VirtualProtect((LPVOID)(base_address + 0x53ED5), 3, PAGE_EXECUTE_READWRITE, &dwBack);
-		*(byte*)(base_address + 0x53ED5) = 0x84;
-		*(byte*)(base_address + 0x53ED6) = 0x46;
-		*(byte*)(base_address + 0x53ED7) = 0x08;
+		EnableMeleeLunge();
 	}
-
-	//Revert Static Weapon Spwan Detour
-	VirtualProtect((LPVOID)(base_address + 0x6A8C4), 5, PAGE_EXECUTE_READWRITE, &dwBack);
-	*(byte*)(base_address + 0x6A8C4) = 0x51;
-	*(byte*)(base_address + 0x6A8C5) = 0xA1;
-	*(byte*)(base_address + 0x6A8C6) = 0x74;
-	*(byte*)(base_address + 0x6A8C7) = 0x9E;
-	*(byte*)(base_address + 0x6A8C8) = 0x19;
 
 	delete settings;
 	settings = NULL;

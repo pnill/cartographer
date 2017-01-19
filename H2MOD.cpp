@@ -896,7 +896,7 @@ int __cdecl OnMapLoad(int a1)
 
 		#pragma region Halo2Final
 			if (b_Halo2Final)
-				h2f->Initialize();
+				h2f->Initialize(isHost);
 		#pragma endregion
 	}
 
