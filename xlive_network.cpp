@@ -406,7 +406,8 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 			if (*(ULONG*)buf == 0x11223344)
 			{
 				User.smap[hostpair] = *(ULONG*)(buf + 4);
-				
+
+				/* Hacky fix, basically if someone swaps IPs we cached their data so we should check if the cached version is still correct. */
 				CUser* user = User.cusers[*(ULONG*)(buf + 4)];
 				if (user)
 				{
@@ -418,7 +419,6 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 
 				ret = 0;
 			}
-
 
 			ULONG secure = User.smap[hostpair];
 
@@ -456,11 +456,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 
 			}
 		}
-
 	}
-
-	
-
 	return ret;
 }
 
