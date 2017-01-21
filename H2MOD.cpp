@@ -1011,9 +1011,9 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, int a6, 
 	//SendStruct.sin_port = htons(1001); // These kinds of things need to be fixed too cause we would have the port in the XNADDR struct...
 	SendStruct.sin_family = AF_INET;
 
-	int securitysend_1001 = sendto(game_sock, (char*)User.SecurityPacket, 8, 0, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
+	int securitysend_1001 = sendto(game_sock, (char*)User.SecurityPacket, 8+sizeof(XNADDR), 0, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
 
-	User.CreateUser(host_xn);
+	User.CreateUser(host_xn, FALSE);
 
 	if (securitysend_1001 == SOCKET_ERROR )
 	{
@@ -1047,7 +1047,7 @@ int __cdecl connect_establish_write(void* a1, int a2, int a3)
 		SendStruct.sin_port = join_game_xn.wPortOnline;
 		SendStruct.sin_family = AF_INET;
 
-		int securitysend_1000 = sendto(game_sock_1000, (char*)User.SecurityPacket, 8, 0, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
+		int securitysend_1000 = sendto(game_sock_1000, (char*)User.SecurityPacket, 8+sizeof(XNADDR), 0, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
 	}
 	
 

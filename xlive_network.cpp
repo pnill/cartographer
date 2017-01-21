@@ -403,9 +403,11 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 		if (iplong != broadcast_server)
 		{
 	
-			if (*(ULONG*)buf == 0x11223344)
+			if (*(ULONG*)buf == 0x11223345)
 			{
 				User.smap[hostpair] = *(ULONG*)(buf + 4);
+				
+				User.CreateUser((XNADDR*)(buf + 8),TRUE);
 
 				/* Hacky fix, basically if someone swaps IPs we cached their data so we should check if the cached version is still correct. */
 				CUser* user = User.cusers[*(ULONG*)(buf + 4)];
