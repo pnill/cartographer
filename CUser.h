@@ -42,7 +42,7 @@ public:
 	ULONG GetXNFromSecure(ULONG secure);
 	ULONG GetSecureFromXN(XNADDR *pxna);
 
-	void CreateUser(XNADDR *pxna);
+	void CreateUser(XNADDR *pxna, BOOL user);
 	void RegisterLocalRequest(char* token);
 	void UnregisterSecureAddr(const IN_ADDR ina);
 

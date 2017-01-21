@@ -126,12 +126,16 @@ ULONG CUserManagement::GetSecureFromXN(XNADDR* pxna)
 	return secure;
 }
 
-void CUserManagement::CreateUser(XNADDR* pxna)
+void CUserManagement::CreateUser(XNADDR* pxna, BOOL user)
 {
 	/*
 		This only happens for servers because we have all their data from the get go :)...
+
+		- Update 1/20/2017 - 
+		This should now also be called when receiving the 'SecurityPacket' because we have the data on the first attempt to either establish a connection OR on the attempt to join a game,
+		That should eliminate the need to talk to the Master server in order to get the XNADDR information from the secure address.
 	*/
-	TRACE("CUserManagement::CreateUser() - Should only happen when joining servers really...");
+	TRACE("CUserManagement::CreateUser()");
 
 	ULONG secure = pxna->inaOnline.s_addr;
 	CUser *nUser = new CUser;
@@ -158,40 +162,57 @@ void CUserManagement::CreateUser(XNADDR* pxna)
 
 		This should allow us to handle servers listening on any port without much effort or engine modification.
 	*/
-
-	short nPort_base = pxna->wPortOnline;
-	short nPort_join = htons( ntohs(pxna->wPortOnline) + 1 );
-	
-	TRACE("CreateUser - nPort_base: %i", ntohs(nPort_base));
-	TRACE("CreateUser - nPort_join: %i", ntohs(nPort_join));
-
-	std::pair <ULONG, SHORT> hostpair = std::make_pair(pxna->ina.s_addr, nPort_join);
-	std::pair <ULONG, SHORT> hostpair_1000 = std::make_pair(pxna->ina.s_addr, nPort_base);
-
-	//std::pair <ULONG, SHORT> hostpair = std::make_pair(pxna->ina.s_addr, htons(1001)); // FIX ME ^, this is gonna get really fucked when servers listen on other ports...
-	//std::pair <ULONG, SHORT> hostpair_1000 = std::make_pair(pxna->ina.s_addr, htons(1000)); // FIX ME ^
-
-
-	if (g_lWANIP == pxna->ina.s_addr)
+	if (user == FALSE)
 	{
-		std::pair <ULONG, SHORT> hostpair_or = std::make_pair(g_lLANIP, nPort_join);
-		std::pair <ULONG, SHORT> hostpair_1000_or = std::make_pair(g_lLANIP, nPort_base);
+		/* This happens when joining a server, it's a fix to dynamic ports... */
 
-		this->smap[hostpair_or] = secure;
-		this->smap[hostpair_1000_or] = secure;
+		short nPort_base = pxna->wPortOnline;
+		short nPort_join = htons(ntohs(pxna->wPortOnline) + 1);
+
+		TRACE("CreateUser - nPort_base: %i", ntohs(nPort_base));
+		TRACE("CreateUser - nPort_join: %i", ntohs(nPort_join));
+
+		std::pair <ULONG, SHORT> hostpair = std::make_pair(pxna->ina.s_addr, nPort_join);
+		std::pair <ULONG, SHORT> hostpair_1000 = std::make_pair(pxna->ina.s_addr, nPort_base);
+
+		//std::pair <ULONG, SHORT> hostpair = std::make_pair(pxna->ina.s_addr, htons(1001)); // FIX ME ^, this is gonna get really fucked when servers listen on other ports...
+		//std::pair <ULONG, SHORT> hostpair_1000 = std::make_pair(pxna->ina.s_addr, htons(1000)); // FIX ME ^
+
+
+		if (g_lWANIP == pxna->ina.s_addr)
+		{
+			std::pair <ULONG, SHORT> hostpair_or = std::make_pair(g_lLANIP, nPort_join);
+			std::pair <ULONG, SHORT> hostpair_1000_or = std::make_pair(g_lLANIP, nPort_base);
+
+			this->smap[hostpair_or] = secure;
+			this->smap[hostpair_1000_or] = secure;
+
+		}
+
+		this->smap[hostpair] = secure;
+		this->smap[hostpair_1000] = secure;
+		this->cusers[secure] = nUser;
+		this->xnmap[secure] = pxna->ina.s_addr;
+		this->xntosecure[ab] = secure;
+
+		this->pmap_a[secure] = nPort_base;
+		this->pmap_b[secure] = nPort_join;
+		//this->pmap_a[secure] = htons(1000); // FIX ME, ^ SEE ABOVE 1000 STATIC DEF.
+		//this->pmap_b[secure] = htons(1001); // FIX ME, ^ SEE ABOVE 1001 STATIC DEF.
+	}
+	else 
+	{
+		/* 
+			If the user variable is true, we update cusers "array" to map the secure address to the newly created object...
+			Then map the secure address to the WAN IP (XN->ina) using xnmap, where secure address is the key to the array.
+			Then map the abenet to the secure address via xntosecure[ab], where AB is the key to the array. 
+		*/
+		this->cusers[secure] = nUser;
+		this->xnmap[secure] = pxna->ina.s_addr;
+		this->xntosecure[ab] = secure;
 
 	}
 
-	this->smap[hostpair] = secure;
-	this->smap[hostpair_1000] = secure;
-	this->cusers[secure] = nUser;
-	this->xnmap[secure] = pxna->ina.s_addr;
-	this->xntosecure[ab] = secure;
-	
-	this->pmap_a[secure] = nPort_base;
-	this->pmap_b[secure] = nPort_join;
-	//this->pmap_a[secure] = htons(1000); // FIX ME, ^ SEE ABOVE 1000 STATIC DEF.
-	//this->pmap_b[secure] = htons(1001); // FIX ME, ^ SEE ABOVE 1001 STATIC DEF.
 
 }
 
@@ -404,12 +425,12 @@ void CUserManagement::RegisterLocalRequest(char* token)
 			TRACE("GetLocalRegistration() - Reading lreply data");
 
 			memset(&Users[0].pxna, 0x00, sizeof(XNADDR));
-			this->SecurityPacket = new char[8];
+			this->SecurityPacket = new char[8+sizeof(XNADDR)];
 
 			ULONG secured_addr = RecvPak.lreply().secure_addr();
 			ULONG _xnaddr = RecvPak.lreply().xnaddr();
 
-			(*(DWORD*)&this->SecurityPacket[0]) = 0x11223344;
+			(*(DWORD*)&this->SecurityPacket[0]) = 0x11223345;
 			(*(DWORD*)&this->SecurityPacket[4]) = secured_addr;
 
 			SecurityPacket = this->SecurityPacket;
@@ -436,6 +457,7 @@ void CUserManagement::RegisterLocalRequest(char* token)
 			LocalXN = &Users[0].pxna;
 			LocalSec = secured_addr;
 
+			memcpy(&SecurityPacket[8], &Users[0].pxna, sizeof(XNADDR));
 			Users[0].bValid = true;
 
 			
