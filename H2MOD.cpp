@@ -763,7 +763,7 @@ int __cdecl OnMapLoad(int a1)
 	//OnMapLoad is called with 30888 when a game ends
 	if (a1 == 30888)
 	{
-		if (b_Halo2Final)
+		if (b_Halo2Final && !h2mod->Server)
 			h2f->Dispose();
 
 		return pmap_initialize(a1);
@@ -895,7 +895,7 @@ int __cdecl OnMapLoad(int a1)
 		#pragma endregion
 
 		#pragma region Halo2Final
-			if (b_Halo2Final)
+			if (b_Halo2Final && !h2mod->Server)
 				h2f->Initialize(isHost);
 		#pragma endregion
 	}
@@ -1511,15 +1511,16 @@ void H2MOD::Initialize()
 		std::thread SoundT(SoundThread);
 		SoundT.detach();
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
+
+		float fovRadians = (float)((field_of_view * 3.14159265f) / 180);
+		*(float*)(this->GetBase() + 0x41D984) = fovRadians; //player
+		*(float*)(this->GetBase() + 0x413780) = fovRadians * 0.8435f; //vehicle
 	}
 
 	TRACE_GAME("H2MOD - Initialized v0.1a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
 
-	float fovRadians = (float)((field_of_view * 3.14159265f) / 180);
-	*(float*)(this->GetBase() + 0x41D984) = fovRadians; //player
-	*(float*)(this->GetBase() + 0x413780) = fovRadians * 0.8435f; //vehicle
-	
+	//Network::Initialize();
 	h2mod->ApplyHooks();
 }
 
