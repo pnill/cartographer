@@ -10,16 +10,17 @@ namespace Network
 {
 	namespace bitstreamptr
 	{
-	
-			//DWORD write_uint = 0xD17C6;
-			DWORD read_int			= 0xCE49F;
-			DWORD read_uint			= 0xCE49F;
-			DWORD read_byte			= 0xCE501;
-			DWORD read_char			= 0xCE561;
-			DWORD read_ulonglong	= 0xCE5B7;
-			DWORD read_block		= 0xCE54F;
 
-			DWORD write_uint		= 0xCDD80;
+		//DWORD write_uint = 0xD17C6;
+		DWORD read_int = 0xCE49F;
+		DWORD read_uint = 0xCE49F;
+		DWORD read_byte = 0xCE501;
+		DWORD read_char = 0xCE561;
+		DWORD read_ulonglong = 0xCE5B7;
+		DWORD read_block = 0xCE54F;
+
+		DWORD write_uint = 0xCDD80;
+		DWORD write_address = 0xCDED2;
 
 
 	};
@@ -86,193 +87,193 @@ char* Network::GetPacketType(unsigned int typeval)
 
 	switch (typeval)
 	{
-		
-		case Network::packet_type::ping:
-			return "ping";
+
+	case Network::packet_type::ping:
+		return "ping";
 		break;
 
-		case Network::packet_type::pong:
-			return "pong";
+	case Network::packet_type::pong:
+		return "pong";
 		break;
 
-		case Network::packet_type::broadcast_reply:
-			return "broadcast-reply";
+	case Network::packet_type::broadcast_reply:
+		return "broadcast-reply";
 		break;
 
-		case Network::packet_type::broadcast_search:
-			return "broadcast-search";
-		break;	
-
-		case Network::packet_type::connect_request:
-			return "connect-request";
+	case Network::packet_type::broadcast_search:
+		return "broadcast-search";
 		break;
 
-		case Network::packet_type::connect_refuse:
-			return "connect-refuse";
+	case Network::packet_type::connect_request:
+		return "connect-request";
 		break;
 
-		case Network::packet_type::connect_closed:
-			return "connect-closed";
+	case Network::packet_type::connect_refuse:
+		return "connect-refuse";
 		break;
 
-		case Network::packet_type::join_request:
-			return "join-request";
+	case Network::packet_type::connect_closed:
+		return "connect-closed";
 		break;
 
-		case Network::packet_type::join_abort:
-			return "join-abort";
+	case Network::packet_type::join_request:
+		return "join-request";
 		break;
 
-		case Network::packet_type::join_refuse:
-			return "join-refuse";
+	case Network::packet_type::join_abort:
+		return "join-abort";
 		break;
 
-		case Network::packet_type::leave_session:
-			return "leave-session";
+	case Network::packet_type::join_refuse:
+		return "join-refuse";
 		break;
 
-		case Network::packet_type::leave_acknowledge:
-			return "leave-acknowledge";
+	case Network::packet_type::leave_session:
+		return "leave-session";
 		break;
 
-		case Network::packet_type::session_disband:
-			return "session-disband";
+	case Network::packet_type::leave_acknowledge:
+		return "leave-acknowledge";
 		break;
 
-		case Network::packet_type::session_boot:
-			return "session-boot";
+	case Network::packet_type::session_disband:
+		return "session-disband";
 		break;
 
-		case Network::packet_type::host_handoff:
-			return "host-handoff";
+	case Network::packet_type::session_boot:
+		return "session-boot";
 		break;
 
-		case Network::packet_type::peer_handoff:
-			return "peer-handoff";
+	case Network::packet_type::host_handoff:
+		return "host-handoff";
 		break;
 
-		case Network::packet_type::host_transition:
-			return "host-transition";
+	case Network::packet_type::peer_handoff:
+		return "peer-handoff";
 		break;
 
-		case Network::packet_type::host_reestablish:
-			return "host-restablish";
+	case Network::packet_type::host_transition:
+		return "host-transition";
 		break;
 
-		case Network::packet_type::host_decline:
-			return "host-decline";
+	case Network::packet_type::host_reestablish:
+		return "host-restablish";
 		break;
 
-		case Network::packet_type::peer_reestablish:
-			return "peer-reestablish";
+	case Network::packet_type::host_decline:
+		return "host-decline";
 		break;
 
-		case Network::packet_type::election:
-			return "election";
+	case Network::packet_type::peer_reestablish:
+		return "peer-reestablish";
 		break;
 
-		case Network::packet_type::election_refuse:
-			return "election-refuse";
+	case Network::packet_type::election:
+		return "election";
 		break;
 
-		case Network::packet_type::time_synchronize:
-			return "time-synchronize";
+	case Network::packet_type::election_refuse:
+		return "election-refuse";
 		break;
 
-		case Network::packet_type::membership_update:
-			return "membership-update";
+	case Network::packet_type::time_synchronize:
+		return "time-synchronize";
 		break;
 
-		case Network::packet_type::peer_properties:
-			return "peer-properties";
+	case Network::packet_type::membership_update:
+		return "membership-update";
 		break;
 
-		case Network::packet_type::delegate_leadership:
-			return "delegate-leadership";
+	case Network::packet_type::peer_properties:
+		return "peer-properties";
 		break;
 
-		case Network::packet_type::boot_machine:
-			return "boot-machine";
+	case Network::packet_type::delegate_leadership:
+		return "delegate-leadership";
 		break;
 
-		case Network::packet_type::player_add:
-			return "player-add";
+	case Network::packet_type::boot_machine:
+		return "boot-machine";
 		break;
 
-		case Network::packet_type::player_refuse:
-			return "player-refuse";
-		break;
-		
-		case Network::packet_type::player_remove:
-			return "player-remove";
+	case Network::packet_type::player_add:
+		return "player-add";
 		break;
 
-		case Network::packet_type::player_properties:
-			return "player-properties";
+	case Network::packet_type::player_refuse:
+		return "player-refuse";
 		break;
 
-		case Network::packet_type::parameters_update:
-			return "parameters-update";
+	case Network::packet_type::player_remove:
+		return "player-remove";
 		break;
 
-		case Network::packet_type::parameters_request:
-			return "parameters-request";
-		break;
-		
-		case Network::packet_type::countdown_timer:
-			return "countdown-timer";
+	case Network::packet_type::player_properties:
+		return "player-properties";
 		break;
 
-		case Network::packet_type::mode_acknowledge:
-			return "mode-acknowledge";
+	case Network::packet_type::parameters_update:
+		return "parameters-update";
 		break;
 
-		case Network::packet_type::virtual_couch_update:
-			return "virtual-couch-update";
+	case Network::packet_type::parameters_request:
+		return "parameters-request";
 		break;
 
-		case Network::packet_type::virtual_couch_request:
-			return "virtual-couch-request";
+	case Network::packet_type::countdown_timer:
+		return "countdown-timer";
 		break;
 
-		case Network::packet_type::vote_update:
-			return "vote-update";
+	case Network::packet_type::mode_acknowledge:
+		return "mode-acknowledge";
 		break;
 
-		case Network::packet_type::view_establishment:
-			return "view-establishment";
+	case Network::packet_type::virtual_couch_update:
+		return "virtual-couch-update";
 		break;
 
-		case Network::packet_type::player_acknowledge:
-			return "player-acknowledge";
+	case Network::packet_type::virtual_couch_request:
+		return "virtual-couch-request";
 		break;
 
-		case Network::packet_type::synchronous_update:
-			return "synchronous-update";
+	case Network::packet_type::vote_update:
+		return "vote-update";
 		break;
 
-		case Network::packet_type::synchronous_actions:
-			return "synchronous-actions";
-		break;
-		
-		case Network::packet_type::synchronous_join:
-			return "synchronous-join";
+	case Network::packet_type::view_establishment:
+		return "view-establishment";
 		break;
 
-		case Network::packet_type::synchronous_gamestate:
-			return "synchronous-gamestate";
+	case Network::packet_type::player_acknowledge:
+		return "player-acknowledge";
 		break;
 
-		case Network::packet_type::game_results:
-			return "game-results";
+	case Network::packet_type::synchronous_update:
+		return "synchronous-update";
 		break;
 
-		case Network::packet_type::text_chat:
-			return "text-chat";
+	case Network::packet_type::synchronous_actions:
+		return "synchronous-actions";
 		break;
 
-		case Network::packet_type::test:
-			return "test";
+	case Network::packet_type::synchronous_join:
+		return "synchronous-join";
+		break;
+
+	case Network::packet_type::synchronous_gamestate:
+		return "synchronous-gamestate";
+		break;
+
+	case Network::packet_type::game_results:
+		return "game-results";
+		break;
+
+	case Network::packet_type::text_chat:
+		return "text-chat";
+		break;
+
+	case Network::packet_type::test:
+		return "test";
 		break;
 	}
 
@@ -281,6 +282,9 @@ char* Network::GetPacketType(unsigned int typeval)
 
 typedef int(__stdcall *tWrite_uint)(DWORD *, char*, unsigned int, signed int);
 tWrite_uint pWrite_uint;
+
+typedef int(__stdcall *twrite_address)(DWORD *, char*, unsigned int);
+twrite_address pwrite_address;
 
 //typedef int(__stdcall *tRead_block)(DWORD*, char*, char*, signed int);
 //tRead_block pRead_block;
@@ -291,47 +295,54 @@ int __stdcall write_uint(DWORD *thisptr, char* valuestr, unsigned int value, sig
 {
 
 
-	if ( memcmp(valuestr, "type", strlen(valuestr)) )
+	if (memcmp(valuestr, "type", strlen(valuestr)))
 		TRACE_GAME_N("bitstream::write_uint - string: %s, value: %i", valuestr, value);
 	else
-		TRACE_GAME_NETWORK("bitstream::write_uint::packet - %s",Network::GetPacketType(value));
+		TRACE_GAME_NETWORK("bitstream::write_uint::packet - %s", Network::GetPacketType(value));
 
 
 	return pWrite_uint(thisptr, valuestr, value, maxval);
 }
+
+int __stdcall write_address(DWORD *thisptr, char* valuestr, unsigned int value)
+{
+	TRACE_GAME_N("bitstream::write_uint - string: %s, value: %08X", valuestr, value);
+
+	return pwrite_address(thisptr, valuestr, value);
+}
 /**
 int __stdcall read_block(DWORD* thisptr, char* valuestr, char* blockptr, signed int bitsize)
 {
-		TRACE_GAME_N("bitstream::read_block - string: %s, ptr: %08X, bitsize: %i", valuestr, blockptr, bitsize);
+TRACE_GAME_N("bitstream::read_block - string: %s, ptr: %08X, bitsize: %i", valuestr, blockptr, bitsize);
 
-		int ret = pRead_block(thisptr, valuestr, blockptr, bitsize);
+int ret = pRead_block(thisptr, valuestr, blockptr, bitsize);
 
-		char* blockhex = { 0 };
+char* blockhex = { 0 };
 
-		signed int bytesize = bitsize / 8;
+signed int bytesize = bitsize / 8;
 
-		blockhex = (char*)malloc(bytesize * 2 + 1);
+blockhex = (char*)malloc(bytesize * 2 + 1);
 
 
-		for (int i = 0; i < bytesize; i++)
-		{
-			_snprintf(&blockhex[i * 2], 2, "%02X", blockptr[i]);
-		}
+for (int i = 0; i < bytesize; i++)
+{
+_snprintf(&blockhex[i * 2], 2, "%02X", blockptr[i]);
+}
 
-		TRACE_GAME_N("bitstream::read_block - hex: %s", blockhex);
+TRACE_GAME_N("bitstream::read_block - hex: %s", blockhex);
 
-		blockhex[sizeof(blockhex)] = { 0 };
+blockhex[sizeof(blockhex)] = { 0 };
 
-		free(blockhex);
+free(blockhex);
 
-	return ret;
+return ret;
 }*/
 
 /*
-	Sloppy CodeCave for write_uint until I can find a better way to hook.
+Sloppy CodeCave for write_uint until I can find a better way to hook.
 */
 DWORD read_uint_retAddr = 0;
-char* read_uint_string  = 0;
+char* read_uint_string = 0;
 
 int read_uint_MaxValue = 0;
 int read_uint_value = 0;
@@ -355,33 +366,33 @@ void read_uint_display()
 /* The actual caved function */
 __declspec(naked) void read_bitstream_uint(void)
 {
-	
+
 	__asm
 	{
-			pop read_uint_retAddr;
-			mov thisptr, ecx
-			mov eax, dword ptr [esp+0x04]
-			mov read_uint_string,eax
-			mov eax, dword ptr[esp+0x08]
+		pop read_uint_retAddr;
+		mov thisptr, ecx
+			mov eax, dword ptr[esp + 0x04]
+			mov read_uint_string, eax
+			mov eax, dword ptr[esp + 0x08]
 			mov read_uint_MaxValue, eax
 
 			push eax
 			mov eax, subfunc
 			call eax
-			
+
 			mov read_uint_value, eax
 
 	}
 
-			read_uint_display();
+	read_uint_display();
 
 	__asm
 	{
-			mov ecx,thisptr
-			mov eax,read_uint_value
-			mov	[esp+0x08],eax
-			push read_uint_retAddr
-			ret 
+		mov ecx, thisptr
+		mov eax, read_uint_value
+		mov[esp + 0x08], eax
+		push read_uint_retAddr
+		ret
 	}
 
 }
@@ -392,10 +403,12 @@ void Network::Initialize()
 
 	if (h2mod->Server)
 	{
+		
 		Network::bitstreamptr::read_uint += h2mod->GetBase();
 		Network::bitstreamptr::write_uint += h2mod->GetBase();
 		Network::bitstreamptr::read_block += h2mod->GetBase();
-	
+		Network::bitstreamptr::write_address += h2mod->GetBase();
+
 		subfunc += h2mod->GetBase();
 		DWORD dwBack;
 
@@ -407,6 +420,10 @@ void Network::Initialize()
 		TRACE_GAME("H2MOD::Network::bistream - Writing write_uint(%08X) hook", Network::bitstreamptr::write_uint);
 		pWrite_uint = (tWrite_uint)DetourClassFunc((BYTE*)Network::bitstreamptr::write_uint, (BYTE*)write_uint, 11);
 		VirtualProtect(pWrite_uint, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		TRACE_GAME("H2MOD::Network::Bitstream - Writing unk_int(%08X) hook", Network::bitstreamptr::write_address);
+		pwrite_address = (twrite_address)DetourClassFunc((BYTE*)Network::bitstreamptr::write_address, (BYTE*)write_address, 9);
+		VirtualProtect(pwrite_address, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		/*
 		TRACE_GAME("H2MOD::Network::bitstream - Writing read_block(%08X) hook", Network::bitstreamptr::read_block);

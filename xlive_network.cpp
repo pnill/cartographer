@@ -202,7 +202,11 @@ INT WINAPI XNetXnAddrToInAddr(XNADDR *pxna, XNKID *pnkid, IN_ADDR *pina)
 	TRACE("XNetXNAddrToInAddr - secure: %08X", pxna->inaOnline.s_addr);
 	ULONG secure = pxna->inaOnline.s_addr;
 	
-
+	CUser* user = User.cusers[secure];
+	if (user == 0)
+	{
+		User.CreateUser(pxna, TRUE);
+	}
 
 	if (secure !=0)
     {
