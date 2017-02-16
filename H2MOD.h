@@ -3,6 +3,7 @@
 #define H2MOD_H
 #include "Hook.h"
 #include <unordered_map>
+#include <set>
 #include <mutex>
 
 enum GrenadeType
@@ -104,7 +105,11 @@ public:
 		void handle_command(std::wstring);
 		void logToDedicatedServerConsole(wchar_t* message);
 		void write_inner_chat_dynamic(const wchar_t* data);
-		wchar_t* get_local_player_name();
+		wchar_t* get_local_player_name();		
+		int get_dynamic_player_base(int playerIndex, bool resetDynamicBase);
+		float get_player_x(int, bool);
+		float get_player_y(int, bool);
+		float get_player_z(int, bool);
 		wchar_t* get_player_name_from_index(int pIndex);
 		int get_player_index_from_name(wchar_t* playername);
 		int get_player_index_from_unit_datum(int unit_datum_index);
@@ -120,10 +125,14 @@ public:
 		std::unordered_map<NetworkPlayer*, bool> NetworkPlayers;
 		std::unordered_map<wchar_t*, int> SoundMap;
 		std::mutex sound_mutex;
+
+		std::set<int> hookedObjectDefs;
 		bool isChatBoxCommand = false;
 
 private:
 		DWORD Base;
+		std::unordered_map<int, int> playerIndexToDynamicBase;
+
 };
 
 

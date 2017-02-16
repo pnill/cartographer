@@ -144,6 +144,62 @@ signed int __cdecl call_object_new(void* pObject)
 
 #pragma endregion
 
+float H2MOD::get_player_x(int playerIndex, bool resetDynamicBase) {
+	int base = get_dynamic_player_base(playerIndex, resetDynamicBase);
+	if (base != -1) {
+		float buffer;
+		ReadProcessMemory(GetCurrentProcess(), (LPVOID)(base + 0x64), &buffer, sizeof(buffer), NULL);
+		return buffer;
+	}
+	return 0.0f;
+}
+
+float H2MOD::get_player_y(int playerIndex, bool resetDynamicBase) {
+	int base = get_dynamic_player_base(playerIndex, resetDynamicBase);
+	if (base != -1) {
+		float buffer;
+		ReadProcessMemory(GetCurrentProcess(), (LPVOID)(base + 0x68), &buffer, sizeof(buffer), NULL);
+		return buffer;
+	}
+	return 0.0f;
+}
+
+float H2MOD::get_player_z(int playerIndex, bool resetDynamicBase) {
+	int base = get_dynamic_player_base(playerIndex, resetDynamicBase);
+	if (base != -1) {
+		float buffer;
+		ReadProcessMemory(GetCurrentProcess(), (LPVOID)(base + 0x6C), &buffer, sizeof(buffer), NULL);
+		return buffer;
+	}
+	return 0.0f;
+}
+
+int H2MOD::get_dynamic_player_base(int playerIndex, bool resetDynamicBase) {
+	int tempSight = get_unit_datum_from_player_index(playerIndex);
+	int cachedDynamicBase = playerIndexToDynamicBase[playerIndex];
+	if (tempSight != -1 && tempSight != 0 && (!cachedDynamicBase || resetDynamicBase)) {
+		//TODo: this is based on some weird implementation in HaloObjects.cs, need just to find real offsets to dynamic player pointer
+		//instead of this garbage
+		for (int i = 0; i < 2048; i++) {
+			int possiblyDynamicBase = *(DWORD*)(0x3003CF3C + (i * 12) + 8);
+			DWORD* possiblyDynamicBasePtr = (DWORD*)(possiblyDynamicBase + 0x3F8);
+			if (possiblyDynamicBasePtr) {
+				BYTE buffer[4];
+				//use readprocess memory since it will set the page memory and read/write
+				ReadProcessMemory(GetCurrentProcess(), (LPVOID)(possiblyDynamicBase + 0x3F8), &buffer, sizeof(buffer), NULL);
+				//little endian
+				int dynamicS2 = buffer[0] + (buffer[1] << 8) + (buffer[2] << 16) + (buffer[3] << 24);
+				if (tempSight == dynamicS2) {
+					playerIndexToDynamicBase[playerIndex] = possiblyDynamicBase;
+					return possiblyDynamicBase;
+				}
+			}
+		}
+	}
+	return cachedDynamicBase;
+}
+
+
 void GivePlayerWeapon(int PlayerIndex, int WeaponId,bool bReset)
 {
 	//TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
@@ -300,6 +356,10 @@ signed int __cdecl stringDisplayHook(int a3, unsigned int a4, int a5, int a6) {
 				//this specific string being displayed
 				return string_display_hook_method(a3, a4, (int)(lobbyMessage), a6);
 			}
+			/*
+			if (temp != NULL && temp[0] == L'T' && temp[1] == L'i' && temp[2] == L'e' && temp[3] == L'd') {
+				__debugbreak();
+			}*/
 		}
 	}
 	return string_display_hook_method(a3, a4, a5, a6);
@@ -761,6 +821,7 @@ bool bcoop = false;
 int __cdecl OnMapLoad(int a1)
 {
 	//OnMapLoad is called with 30888 when a game ends
+	isLobby = true;
 	if (a1 == 30888)
 	{
 		if (b_Halo2Final && !h2mod->Server)
@@ -816,7 +877,6 @@ int __cdecl OnMapLoad(int a1)
 						   0x00, 0x6E, 0x00, 0x75, 0x00, 0x5C, 0x00, 0x6D, 0x00, 0x61, 0x00, 0x69, 0x00, 
 						   0x6E, 0x00, 0x6D, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x75, 0x00 };
 
-	isLobby = true;
 	if (!memcmp(main_menu, (BYTE*)0x300017E0, 60))
 	{
 		DWORD game_globals = *(DWORD*)(((char*)h2mod->GetBase()) + 0x482D3C);
@@ -1054,6 +1114,19 @@ int __cdecl connect_establish_write(void* a1, int a2, int a3)
 	return pconnect_establish_write(a1, a2, a3);
 }
 
+typedef int(__cdecl *object_p_hook)(int s_object_placement_data, int a2, signed int a3, int a4);
+object_p_hook object_p_hook_method;
+
+int __cdecl objectPHook(int s_object_placement_data, int object_definition_index, int object_owner, int unk) {
+	if (h2mod->hookedObjectDefs.find(object_definition_index) == h2mod->hookedObjectDefs.end()) {
+		//ingame only
+		wchar_t* mapName = (wchar_t*)(h2mod->GetBase() + 0x97737C);
+		TRACE_GAME("MapName=%s, object_definition_index: %08X", mapName, object_definition_index);
+		h2mod->hookedObjectDefs.insert(object_definition_index);
+	}
+	return object_p_hook_method(s_object_placement_data, object_definition_index, object_owner, unk);
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1061,6 +1134,10 @@ void H2MOD::ApplyHooks() {
 		TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
 		DWORD dwBack;
+
+		//0x132163
+		//object_p_hook_method = (object_p_hook)DetourFunc((BYTE*)this->GetBase() + 0x132163, (BYTE*)objectPHook, 6);
+		//VirtualProtect(object_p_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)this->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1512,9 +1589,13 @@ void H2MOD::Initialize()
 		SoundT.detach();
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 
-		float fovRadians = (float)((field_of_view * 3.14159265f) / 180);
-		*(float*)(this->GetBase() + 0x41D984) = fovRadians; //player
-		*(float*)(this->GetBase() + 0x413780) = fovRadians * 0.8435f; //vehicle
+		if (b_Halo2Final) {
+			//if h2f is turned on, change fov for player and vehicle
+			//TODO: convert to methods
+			float fovRadians = (float)((field_of_view * 3.14159265f) / 180);
+			*(float*)(this->GetBase() + 0x41D984) = fovRadians; //player
+			*(float*)(this->GetBase() + 0x413780) = fovRadians * 0.8435f; //vehicle
+		}
 	}
 
 	TRACE_GAME("H2MOD - Initialized v0.1a");

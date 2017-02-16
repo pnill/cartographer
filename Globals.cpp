@@ -3,7 +3,7 @@
 //all these global variables live till the app closes
 MapManager* mapManager = new MapManager();
 
-bool isLobby = true;
+volatile bool isLobby = true;
 bool overrideUnicodeMessage = false;
 
 ChatBoxCommands* commands = new ChatBoxCommands();
