@@ -5,6 +5,9 @@ MapManager* mapManager = new MapManager();
 
 volatile bool isLobby = true;
 bool overrideUnicodeMessage = false;
+//always assume client is server unless they join a game which is called before xsessioncreate
+//which creates or connects to teh team speak server
+bool isServer = true;
 
 ChatBoxCommands* commands = new ChatBoxCommands();
 

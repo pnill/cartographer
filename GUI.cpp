@@ -11,10 +11,13 @@
 #include "H2MOD.h"
 #include "xliveless.h"
 #include "cartographer_main.hpp"
+#include "H2MOD_MapManager.h"
 
 
 
 extern void InitInstance();
+extern bool overrideUnicodeMessage;
+extern MapManager* mapManager;
 
 
 
@@ -316,17 +319,23 @@ int WINAPI XLiveRender()
 	
 	if (pDevice)
 	{	
-		if (pDevice->TestCooperativeLevel() == D3D_OK && MasterState != 4)
+		if (pDevice->TestCooperativeLevel() == D3D_OK)
 		{
-			drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
-			if (MasterState == 0)
-				drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
-			else if (MasterState == 1)
-				drawText(0, 15, COLOR_GREY, ServerStatus, smallFont);
-			else if (MasterState == 2)
-				drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
-			else if (MasterState == 3)
-				drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
+			if (MasterState != 4) {
+				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
+				if (MasterState == 0)
+					drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
+				else if (MasterState == 1)
+					drawText(0, 15, COLOR_GREY, ServerStatus, smallFont);
+				else if (MasterState == 2)
+					drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
+				else if (MasterState == 3)
+					drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
+			}
+
+			if (overrideUnicodeMessage) {
+				drawText(0, 30, COLOR_GOLD, mapManager->getCustomLobbyMessage(), smallFont);
+			}
 		}
 
 		if (fps_enable)

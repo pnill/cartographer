@@ -35,6 +35,9 @@ extern CHAR customMapZipDownloadLink[128];
 extern MapManager* mapManager;
 
 extern volatile bool isLobby;
+//xnetcreatekey sets this to true
+//xsessiondelete/end set this to false
+extern bool isServer;
 extern UINT map_downloading_enable;
 extern CHAR map_download_external_host[128];
 extern CHAR map_download_external_uri[128];

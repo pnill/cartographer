@@ -340,6 +340,19 @@ void showDownloadDialog() {
 	//be careful using std wstring/strings in this hooked method, they don't get cleaned properly for some reason
 }
 
+typedef int(__cdecl *show_error_screen)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6);
+show_error_screen show_error_screen_method;
+
+int __cdecl showErrorScreen(int a1, signed int a2, int a3, __int16 a4, int a5, int a6) {
+	if (a2 == 280) {
+		if (mapManager->canDownload()) {
+			mapManager->startMapDownload();
+		}
+		return 0;
+	}
+	return show_error_screen_method(a1, a2, a3, a4, a5, a6);
+}
+
 typedef signed int(__cdecl *string_display_hook)(int a3, unsigned int a4, int a5, int a6);
 string_display_hook string_display_hook_method;
 
@@ -347,21 +360,26 @@ std::wstring YOU_FAILED_TO_LOAD_MAP_ORG = L"You failed to load the map.";
 
 //lets you follow the call path of any string that is displayed (in a debugger)
 signed int __cdecl stringDisplayHook(int a3, unsigned int a4, int a5, int a6) {
+	/*
 	if (overrideUnicodeMessage) {
 		wchar_t* temp = (wchar_t*)a5;
 		if (temp[0] != L' ') {
-			const wchar_t* lobbyMessage = mapManager->getCustomLobbyMessage();
-			if (wcscmp(temp, YOU_FAILED_TO_LOAD_MAP_ORG.c_str()) == 0 && lobbyMessage != NULL) {
+			//const wchar_t* lobbyMessage = mapManager->getCustomLobbyMessage();
+			if (lobbyMessage != NULL && wcscmp(temp, yftlm) == 0) {
 				//if we detect that we failed to load the map, we display different strings only for the duration of
 				//this specific string being displayed
 				return string_display_hook_method(a3, a4, (int)(lobbyMessage), a6);
 			}
+
 			/*
+			if (wcscmp(OCTAGON.c_str(), temp) == 0) {
+				__debugbreak();
+			}
 			if (temp != NULL && temp[0] == L'T' && temp[1] == L'i' && temp[2] == L'e' && temp[3] == L'd') {
 				__debugbreak();
 			}*/
-		}
-	}
+		//}
+	//}*/
 	return string_display_hook_method(a3, a4, a5, a6);
 }
 
@@ -820,6 +838,7 @@ bool bcoop = false;
 
 int __cdecl OnMapLoad(int a1)
 {
+	overrideUnicodeMessage = false;
 	//OnMapLoad is called with 30888 when a game ends
 	isLobby = true;
 	if (a1 == 30888)
@@ -965,6 +984,7 @@ int __cdecl OnMapLoad(int a1)
 
 bool __cdecl OnPlayerSpawn(int a1)
 {
+	overrideUnicodeMessage = false;
 	//once players spawn we aren't in lobby anymore ;)
 	isLobby = false;
 	//TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
@@ -1044,6 +1064,7 @@ XNADDR join_game_xn;
 
 void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
 {
+	isServer = false;
 	Connected = false;
 	NetworkActive = false;
 
@@ -1080,6 +1101,7 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, int a6, 
 		TRACE("join_game Security Packet - Socket Error True");
 		TRACE("join_game Security Packet - WSAGetLastError(): %08X", WSAGetLastError());
 	}
+
 
 	int Data_of_network_Thread = 1;
 	H2MOD_Network = CreateThread(NULL, 0, NetworkThread, &Data_of_network_Thread, 0, NULL);
@@ -1127,6 +1149,57 @@ int __cdecl objectPHook(int s_object_placement_data, int object_definition_index
 	return object_p_hook_method(s_object_placement_data, object_definition_index, object_owner, unk);
 }
 
+typedef BOOL(__stdcall *is_debugger_present)();
+is_debugger_present is_debugger_present_method;
+
+BOOL __stdcall isDebuggerPresent() {
+	return false;
+}
+
+//0x644B2
+typedef int(__cdecl *custom_map_file_loaded)(int a1);
+custom_map_file_loaded custom_map_file_loaded_method;
+
+int __cdecl customMapFileLoaded(int a1) {
+	int result;
+	int customMapAddress;
+	typedef bool(__thiscall *h2_load_map)(LPCRITICAL_SECTION* thisx, int a1, int a2);
+	typedef int(__stdcall *h2_get_file_attributes)(int a1);
+	h2_load_map h2_load_map_method;
+	if (h2mod->Server) {
+		h2_load_map_method = (h2_load_map)(h2mod->GetBase() + 0x41819);
+	}	else {
+		h2_load_map_method = (h2_load_map)(h2mod->GetBase() + 0x4CF41);		
+	}
+
+	DWORD* mapsObject;
+	if (h2mod->Server) {
+		mapsObject = (DWORD*)(h2mod->GetBase() + 0x4A70D8);
+	}
+	else {
+		mapsObject = (DWORD*)(h2mod->GetBase() + 0x482D70);
+	}
+	customMapAddress = 0;
+	if (h2_load_map_method((LPCRITICAL_SECTION*)((int)mapsObject), a1, (int)&customMapAddress))
+		result = 4 - (GetFileAttributesW((wchar_t*)(customMapAddress + 2432)) != -1);
+	else
+		result = 4;
+
+	//TODO: need one for client host
+	if (h2mod->Server) {		
+		wchar_t* currentCustomMapFileName = (wchar_t*)(customMapAddress + 2432);
+		const wchar_t* existingCustomMapName = mapManager->customMapFileName.c_str();
+		if (currentCustomMapFileName != NULL && currentCustomMapFileName[0] != L'\0') {
+			if (wcscmp(currentCustomMapFileName, existingCustomMapName) != 0) {
+				mapManager->customMapFileName = std::wstring(currentCustomMapFileName);
+			}
+		}
+	}
+	//mapManager->customMapIndex = a1;
+	//return custom_map_file_loaded_method(a1);
+	return result;
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1134,6 +1207,10 @@ void H2MOD::ApplyHooks() {
 		TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
 		DWORD dwBack;
+
+		//TODO: turn on if you want to debug halo2.exe from start of process
+		//is_debugger_present_method = (is_debugger_present)DetourFunc((BYTE*)h2mod->GetBase() + 0x39B394, (BYTE*)isDebuggerPresent, 5);
+		//VirtualProtect(is_debugger_present_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//0x132163
 		//object_p_hook_method = (object_p_hook)DetourFunc((BYTE*)this->GetBase() + 0x132163, (BYTE*)objectPHook, 6);
@@ -1177,26 +1254,42 @@ void H2MOD::ApplyHooks() {
 		}
 
 		if (map_downloading_enable) {
-			//live checks removed will make users exit to live menu instead of network browser :(
-			live_check_method = (live_check)DetourFunc((BYTE*)this->GetBase() + 0x1BA418, (BYTE*)clientXboxLiveCheck, 9);
-			VirtualProtect(live_check_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+			//TODO: expensive, use for debugging/searching
+			//custom_map_file_loaded_method = (custom_map_file_loaded)DetourFunc((BYTE*)h2mod->GetBase() + 0x644B2, (BYTE*)customMapFileLoaded, 5);
+			//VirtualProtect(custom_map_file_loaded_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-			live_check_method2 = (live_check2)DetourFunc((BYTE*)this->GetBase() + 0x1B1643, (BYTE*)clientXboxLiveCheck2, 9);
-			VirtualProtect(live_check_method2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+			//0x20E15A
+			show_error_screen_method = (show_error_screen)DetourFunc((BYTE*)h2mod->GetBase() + 0x20E15A, (BYTE*)showErrorScreen, 8);
+			VirtualProtect(show_error_screen_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-			//0x24499F
-			show_download_dialog_method = (show_download_dialog)DetourFunc((BYTE*)h2mod->GetBase() + 0x24499F, (BYTE*)showDownloadDialog, 7);
-			VirtualProtect(show_download_dialog_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-			string_display_hook_method = (string_display_hook)DetourFunc((BYTE*)h2mod->GetBase() + 0x287AB5, (BYTE*)stringDisplayHook, 5);
-			VirtualProtect(string_display_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+			//TODO: expensive, use for debugging/searching
+			//string_display_hook_method = (string_display_hook)DetourFunc((BYTE*)h2mod->GetBase() + 0x287AB5, (BYTE*)stringDisplayHook, 5);
+			//VirtualProtect(string_display_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 		}
+
+		//TODO: for when live list is ready
+		//live checks removed will make users exit to live menu instead of network browser :(
+		//live_check_method = (live_check)DetourFunc((BYTE*)this->GetBase() + 0x1BA418, (BYTE*)clientXboxLiveCheck, 9);
+		//VirtualProtect(live_check_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		//live_check_method2 = (live_check2)DetourFunc((BYTE*)this->GetBase() + 0x1B1643, (BYTE*)clientXboxLiveCheck2, 9);
+		//VirtualProtect(live_check_method2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	} else {
 		DWORD dwBack;
 
 		if (chatbox_commands) {
 			dedi_command_hook_method = (dedi_command_hook)DetourFunc((BYTE*)this->GetBase() + 0x1CCFC, (BYTE*)dediCommandHook, 7);
 			VirtualProtect(dedi_command_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		}
+
+		if (map_downloading_enable) {
+			//TODO: expensive, use for debugging/searching
+			//custom_map_file_loaded_method = (custom_map_file_loaded)DetourFunc((BYTE*)h2mod->GetBase() + 0x4C509, (BYTE*)customMapFileLoaded, 5);
+			//VirtualProtect(custom_map_file_loaded_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+			//dedis have map downloading thread turned on by default
+			std::thread t1(&MapManager::startListening, mapManager);
+			t1.detach();
 		}
 	}
 }

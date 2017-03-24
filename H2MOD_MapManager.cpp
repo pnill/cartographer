@@ -1,26 +1,29 @@
 #include "Globals.h"
-#include <Windows.h>
 #include <WinInet.h>
 #include <h2mod.pb.h>
 #include <fstream>
 #include <Urlmon.h>
+#include <Mswsock.h>
+#include <WS2tcpip.h>
 
 #pragma comment (lib, "Wininet.lib")
 #pragma comment (lib, "urlmon.lib")
+#pragma comment (lib, "mswsock.lib")
 #define POST 1
 #define GET 0
 
 #include <miniz.c>
+extern UINT g_port;
 
-std::wstring DOWNLOADING_MAP(L"Downloading Map");
-std::wstring WAITING_FOR_MAP_DOWNLOAD_URL(L"Waiting for map url from server");
-std::wstring FOUND_MAP_DOWNLOAD_URL(L"Found map download url");
-std::wstring DOWNLOADING_COMPLETE(L"Downloading complete");
-std::wstring RELOADING_MAPS(L"Reloading maps in memory");
-std::wstring UNZIPPING_MAP_DOWNLOAD(L"Unzipping map download");
-std::wstring FAILED_TO_OPEN_ZIP_FILE(L"Failed to open the zip file");
-std::wstring STILL_SEARCHING_FOR_MAP(L"Could not find maps from server, still searching");
-std::wstring COULD_NOT_FIND_MAPS(L"Couldn't find the map");
+std::string DOWNLOADING_MAP("Downloading Map");
+std::string WAITING_FOR_MAP_DOWNLOAD_URL("Waiting for map url from server");
+std::string FOUND_MAP_DOWNLOAD_URL("Found map download url");
+std::string DOWNLOADING_COMPLETE("Downloading complete");
+std::string RELOADING_MAPS("Reloading maps in memory");
+std::string UNZIPPING_MAP_DOWNLOAD("Unzipping map download");
+std::string FAILED_TO_OPEN_ZIP_FILE("Failed to open the zip file");
+std::string STILL_SEARCHING_FOR_MAP("Could not find maps from server, still searching");
+std::string COULD_NOT_FIND_MAPS("Couldn't find the map");
 
 std::wstring CUSTOM_MAP = L"Custom Map";
 wchar_t empty2 = '\0';
@@ -132,17 +135,33 @@ char** Request(int Method, LPCSTR Host, LPCSTR url, LPCSTR header, LPSTR data)
 }
 
 MapManager::MapManager() {
+	//init the custom map file name string
+	this->customMapFileName = L"";
 	this->checkedMaps.insert(CUSTOM_MAP);
 }
 
-std::wstring MapManager::getCurrentMapName() {
-	wchar_t* currentMapName = (wchar_t*)(h2mod->GetBase() + 0x97737C);
+void MapManager::startListening() {
+	this->tcpServer = new MapManager::TcpServer();
+	this->tcpServer->startListening();
+}
+
+void MapManager::stopListening() {
+	this->tcpServer->stopListening();
+}
+
+void MapManager::TcpServer::stopListening() {
+	this->shutdownServerSocket(); 
+	listenerThreadRunning = false;
+}
+
+std::wstring MapManager::getEnglishMapName() {
+	wchar_t* englishMapName = (wchar_t*)(h2mod->GetBase() + 0x97737C);
 
 	DWORD dwBack;
-	VirtualProtect(currentMapName, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	VirtualProtect(englishMapName, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	//set access for copy of the string
-	std::wstring ucurrentMapName(currentMapName);
-	VirtualProtect(currentMapName, 4, dwBack, NULL);
+	std::wstring ucurrentMapName(englishMapName);
+	VirtualProtect(englishMapName, 4, dwBack, NULL);
 
 	return ucurrentMapName;
 }
@@ -184,28 +203,35 @@ void MapManager::requestMapDownloadUrl(SOCKET comm_socket, SOCKADDR_IN SenderAdd
 void MapManager::reloadMaps() {
 	typedef char(__thiscall *possible_map_reload)(int thisx);
 	possible_map_reload map_reload_method = (possible_map_reload)(h2mod->GetBase() + 0x4D021);
-	DWORD* unk = (DWORD*)(h2mod->GetBase() + 0x482D70);
+	DWORD* mapsObject = (DWORD*)(h2mod->GetBase() + 0x482D70);
 
 	DWORD dwBack;
-	BOOL canprotect = VirtualProtect((WORD*)((int)unk + 148016), sizeof(WORD), PAGE_EXECUTE_READWRITE, &dwBack);
+	BOOL canprotect = VirtualProtect((WORD*)((int)mapsObject + 148016), sizeof(WORD), PAGE_EXECUTE_READWRITE, &dwBack);
 	if (!canprotect && GetLastError()) {
 		TRACE("canprotect=%s, error=%d", canprotect, GetLastError());
 	}
-	map_reload_method((int)unk);
+	map_reload_method((int)mapsObject);
 }
 
 void MapManager::resetMapDownloadUrl() {
 	this->mapDownloadUrl = "";
 	this->requestMapUrl = false;
 	this->checkedMaps.clear();
+	this->threadRunning = false;
 }
 
-void MapManager::setCustomLobbyMessage(const wchar_t* newStatus) {
+void MapManager::setCustomLobbyMessage(const char* newStatus, BOOL sleep) {
 	this->customLobbyMessage = newStatus;
-	Sleep(1500);
+	if (sleep) {
+		Sleep(1500);
+	}
 }
 
-const wchar_t* MapManager::getCustomLobbyMessage()
+void MapManager::setCustomLobbyMessage(const char* newStatus) {
+	setCustomLobbyMessage(newStatus, true);
+}
+
+const char* MapManager::getCustomLobbyMessage()
 {
 	return this->customLobbyMessage;
 }
@@ -314,22 +340,23 @@ void MapManager::setMapDownloadType(std::string type) {
 }
 
 void MapManager::searchForMap() {
-	//run this thread once
-	overrideUnicodeMessage = true; //only run now
+	threadRunning = true;
+	overrideUnicodeMessage = true;
 
-	std::wstring currentMapName = this->getCurrentMapName();
+	std::wstring currentMapName = this->getEnglishMapName();
 	//regardless what happens during the search, we only check for a map once per game session
 	checkedMaps.insert(currentMapName);
 
 	if (hasMap(currentMapName)) {
 		//if somehow we have the map and made it here, something is wrong, exit
 		TRACE_GAME_N("Map already exists, should not be searching for it");
-		return;
+		goto cleanup;
 	}
 
 	if (isLobby) {
 		//only run map searches if in lobby
 
+		/*
 		if (this->downloadFromExternal()) {
 			return;
 		}
@@ -340,17 +367,22 @@ void MapManager::searchForMap() {
 		}
 
 		this->setCustomLobbyMessage(STILL_SEARCHING_FOR_MAP.c_str());
+		*/
 		//TODO: control via xlive property
 		if (this->downloadFromHost()) {
-			return;
+			goto cleanup;
 		}
 
 		this->setCustomLobbyMessage(COULD_NOT_FIND_MAPS.c_str());
 	}
+
+	cleanup:
+	threadRunning = false;
+	overrideUnicodeMessage = false;
 }
 
 bool MapManager::downloadFromUrl() {
-	std::wstring ucurrentMapName = this->getCurrentMapName();
+	std::wstring ucurrentMapName = this->getEnglishMapName();
 	//wait 2 minutes
 	int attempts = 120;
 	//this attempt logic exists soley because the hook that this triggers from could be called before
@@ -364,7 +396,7 @@ bool MapManager::downloadFromUrl() {
 			this->setCustomLobbyMessage(FOUND_MAP_DOWNLOAD_URL.c_str());
 			if (downloadMap(ucurrentMapName)) {
 				//TODO: use constants
-				this->setCustomLobbyMessage(L"Finished");
+				this->setCustomLobbyMessage("Finished");
 				this->setCustomLobbyMessage(NULL);
 				return true;
 			}
@@ -380,7 +412,7 @@ bool MapManager::downloadFromUrl() {
 
 
 bool MapManager::downloadFromExternal() {
-	std::wstring ucurrentMapName = this->getCurrentMapName();
+	std::wstring ucurrentMapName = this->getEnglishMapName();
 	std::string str(ucurrentMapName.begin(), ucurrentMapName.end());
 
 	std::replace(str.begin(), str.end(), ' ', '_');
@@ -403,7 +435,7 @@ bool MapManager::downloadFromExternal() {
 		return false;
 	}
 
-	this->setCustomLobbyMessage(L"Sending map dl request");
+	this->setCustomLobbyMessage("Sending map dl request");
 	char** message = Request(0, map_download_external_host, URL, NULL, NULL);
 	char* body = *message;
 	std::string meh = "http://" + std::string(map_download_external_host) + "/" + bb;
@@ -416,7 +448,7 @@ bool MapManager::downloadFromExternal() {
 			std::string sbody(body);
 			std::string error("error");
 			if (!sbody.compare(0, error.size(), error)) {
-				this->setCustomLobbyMessage(L"Error response from external");
+				this->setCustomLobbyMessage("Error response from external");
 			}
 			else {
 				//split on first character |
@@ -424,10 +456,10 @@ bool MapManager::downloadFromExternal() {
 				TRACE_GAME_N("PreParsedMapDownloadUrl = %s", sbody.c_str());
 
 				if (downloadUrl.empty()) {
-					this->setCustomLobbyMessage(L"No download url from external");
+					this->setCustomLobbyMessage("No download url from external");
 				}
 				else {
-					this->setCustomLobbyMessage(L"Got url from external, dl...");
+					this->setCustomLobbyMessage("Got url from external, dl...");
 					this->setMapDownloadUrl(downloadUrl);
 					this->setMapDownloadType("zip");
 
@@ -443,19 +475,230 @@ bool MapManager::downloadFromExternal() {
 		delete body;
 	}
 	else {
-		this->setCustomLobbyMessage(L"No valid response from external");
+		this->setCustomLobbyMessage("No valid response from external");
 	}
 	return returnn;
 }
 
+#define DEFAULT_BUFLEN 65536
+
+std::string startingDownloadString = ("Downloaded 0%");
+
 bool MapManager::downloadFromHost() {
-	//TODO: download directly from server
-	return false;
+	BOOL rr = false;
+	SOCKET ConnectSocket = INVALID_SOCKET;
+	try {
+		if (precalculatedDownloadPercentageStrings.empty()) {
+			for (int i = 0; i <= 100; i++) {
+				std::string downloadMsg;
+				downloadMsg = "Downloaded ";
+				downloadMsg += std::to_string(i);
+				downloadMsg += "%";
+				precalculatedDownloadPercentageStrings[i] = downloadMsg;
+			}
+		}
+		DWORD* mapsObject = (DWORD*)(h2mod->GetBase() + 0x482D70);
+
+		//mapsObject += 148028;
+		wchar_t* customMapsDirectory = (wchar_t*)((int)mapsObject + 148028);
+		std::wstring customMapsDirU(customMapsDirectory);
+		std::string customMapsDir(customMapsDirU.begin(), customMapsDirU.end());
+
+		WSADATA wsaData;
+		struct addrinfo *result = NULL,
+			*ptr = NULL,
+			hints;
+		int iResult;
+		int recvbuflen = DEFAULT_BUFLEN;
+
+		// Initialize Winsock
+		iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+		if (iResult != 0) {
+			printf("WSAStartup failed with error: %d\n", iResult);
+			return 1;
+		}
+
+		ZeroMemory(&hints, sizeof(hints));
+		hints.ai_family = AF_UNSPEC;
+		hints.ai_socktype = SOCK_STREAM;
+		hints.ai_protocol = IPPROTO_TCP;
+		std::string addr = inet_ntoa(join_game_xn.ina);
+		std::string prt = std::to_string(ntohs(join_game_xn.wPortOnline) + 9);
+		TRACE_GAME_N("Client map dl, addr=%s, port=%s", addr.c_str(), prt.c_str());
+		// Resolve the server address and port
+		iResult = getaddrinfo(addr.c_str(), prt.c_str(), &hints, &result);
+		if (iResult != 0) {
+			printf("getaddrinfo failed with error: %d\n", iResult);
+			//WSACleanup();
+			return 1;
+		}
+
+		// Attempt to connect to an address until one succeeds
+		for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
+
+			// Create a SOCKET for connecting to server
+			ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype,
+				ptr->ai_protocol);
+			if (ConnectSocket == INVALID_SOCKET) {
+				TRACE_GAME_N("socket failed with error: %ld", WSAGetLastError());
+				//WSACleanup();
+				return 1;
+			}
+
+			// Connect to server.
+			this->setCustomLobbyMessage("Connecting to host");
+			iResult = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+			if (iResult == SOCKET_ERROR) {
+				closesocket(ConnectSocket);
+				ConnectSocket = INVALID_SOCKET;
+				this->setCustomLobbyMessage("Socket error connecting to host");
+				continue;
+			}
+			break;
+		}
+
+		freeaddrinfo(result);
+
+		if (ConnectSocket == INVALID_SOCKET) {
+			TRACE_GAME_N("Unable to connect to server!");
+			this->setCustomLobbyMessage("Unable to connect to server");
+			//WSACleanup();
+			return 1;
+		}
+
+		BOOL receivedFilename = false;
+		BOOL receivedFileSize = false;
+
+		std::string mapName("");
+		int fileSize;
+
+		char* map = NULL;
+
+		int bytesRead = 0;
+
+		// Receive until the peer closes the connection
+		int prevDownloadPercentage = 0;
+		const char* downloadLobbyMessage = startingDownloadString.c_str();
+
+		do {
+
+			char recvbuf[DEFAULT_BUFLEN];
+
+			iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+			if (iResult > 0) {
+				this->setCustomLobbyMessage(downloadLobbyMessage, false);
+				//TRACE_GAME_N("Bytes received: %d", iResult);
+				if (receivedFilename && receivedFileSize) {
+					for (int i = 0; i < iResult; i++) {
+						map[bytesRead++] = recvbuf[i];
+						int downloadPercentage = ((double)bytesRead / (double)fileSize) * 100;
+						if (prevDownloadPercentage != downloadPercentage) {
+							downloadLobbyMessage = precalculatedDownloadPercentageStrings[downloadPercentage].c_str();
+							prevDownloadPercentage = downloadPercentage;
+						}
+					}
+				}
+				else {
+					//the first/second batch of bytes received should be the filename and the file size of the map
+					if (!receivedFilename) {
+						mapName = std::string(recvbuf);
+						std::size_t extOffset = mapName.find(".map");
+						mapName = mapName.substr(0, extOffset);
+						receivedFilename = true;
+						this->setCustomLobbyMessage("Got filename from host");
+						continue;
+					}
+
+					if (!receivedFileSize) {
+						std::string recv(recvbuf);
+						size_t index = recv.find("$");
+						std::string fileSizee = recv.substr(0, index);
+						bool has_only_digits = (fileSizee.find_first_not_of("0123456789") == std::string::npos);
+						if (!has_only_digits) {
+							TRACE_GAME_N("Encountered bad file size");
+							this->setCustomLobbyMessage("Got bad file size, rejoin");
+							goto end;
+						}
+						if (fileSizee.empty()) {
+							TRACE_GAME_N("Encountered bad file size");
+							this->setCustomLobbyMessage("No file size, rejoin");
+						}
+						fileSize = stoi(fileSizee);
+						receivedFileSize = true;
+						if (map == NULL) {
+							map = new char[fileSize];
+						}
+						for (int i = index + 1; i < iResult; i++) {
+							map[bytesRead++] = recvbuf[i];
+						}
+						this->setCustomLobbyMessage("Got filesize from host");
+						continue;
+					}
+				}
+			}
+			else if (iResult == 0) {
+				TRACE_GAME_N("Connection closed");
+				this->setCustomLobbyMessage("Connection to host closed");
+			}
+			else {
+				TRACE_GAME_N("recv failed with error: %d", WSAGetLastError());
+				this->setCustomLobbyMessage("Failure receiving, try rejoining");
+			}
+
+		} while (iResult > 0);
+
+
+		if (bytesRead >= fileSize) {
+			mapName += ".map";
+			std::string mapPath = customMapsDir;
+			mapPath += mapName;
+
+			FILE* file;
+			try {
+				file = fopen(mapPath.c_str(), "wb");
+				fwrite(map, sizeof(char), fileSize, file);
+				fclose(file);
+				delete[] map;
+				map = NULL;
+				this->setCustomLobbyMessage("Wrote downloaded map to disk");
+			}
+			catch (std::exception const& e) {
+				TRACE_GAME_N("std exception thrown when trying to write map file = %s", e.what());
+			}
+			catch (...) {
+				TRACE_GAME_N("unknown exception occurred occurred when trying to write to map file");
+			}
+			if (map != NULL) {
+				delete[] map;
+			}
+
+			this->setCustomLobbyMessage("Map download complete");
+			this->setCustomLobbyMessage("Reloading maps");
+			this->reloadMaps();
+			rr = true;
+			goto end;
+		}
+	}
+	catch (std::exception const& e) {
+		this->setCustomLobbyMessage("std exception thrown");
+		TRACE_GAME_N("std exception thrown = %s", e.what());
+	}
+	catch (...) {
+		this->setCustomLobbyMessage("Unknown error occurred");
+		TRACE_GAME_N("unknown exception occurred occurred");
+	}
+end:
+	// cleanup
+	closesocket(ConnectSocket);
+	//WSACleanup();
+	return rr;
 }
 
 void MapManager::startMapDownload() {
-	std::thread t1(&MapManager::searchForMap, this);
-	t1.detach();
+	if (!threadRunning) {
+		std::thread t1(&MapManager::searchForMap, this);
+		t1.detach();
+	}
 }
 
 bool MapManager::canDownload() {
@@ -489,4 +732,227 @@ bool MapManager::canDownload() {
 
 	//if we made it here, start downloading
 	return true;
+}
+
+void handleConnection(SOCKET socket, std::wstring customMapName) {
+	HANDLE file;
+	int result;
+	try {
+		//TODO: use TCP_CORK (might not need with TransmitFile)
+
+		file = CreateFile(customMapName.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0, OPEN_EXISTING, 0, 0);
+
+		if (file == INVALID_HANDLE_VALUE) {
+			TRACE_GAME("Unable to open file %s for read", customMapName.c_str());
+			return;
+		}
+
+		int fileSize = GetFileSize(file, NULL);
+		if (fileSize == INVALID_FILE_SIZE) {
+			TRACE_GAME_N("invalid file size, %d", GetLastError());
+			return;
+		}
+
+		std::string nonUnicodeCustomMapFilename(customMapName.begin(), customMapName.end());
+		std::size_t offset = nonUnicodeCustomMapFilename.find_last_of("\\");
+		std::size_t extOffset = nonUnicodeCustomMapFilename.find_last_not_of(".map");
+		std::string mapName = nonUnicodeCustomMapFilename.substr(offset + 1, extOffset);
+
+		std::string buf = mapName;
+		std::string buf2 = std::to_string(fileSize);
+		buf2 += "$";
+
+		result = send(socket, mapName.c_str(), (int)strlen(mapName.c_str()), 0);
+		if (result == SOCKET_ERROR) {
+			TRACE_GAME_N("filename send failed with error: %d", WSAGetLastError());
+			result = send(socket, mapName.c_str(), (int)strlen(mapName.c_str()), 0);
+			if (result == SOCKET_ERROR) {
+				TRACE_GAME_N("filename retry send failed with error: %d", WSAGetLastError());
+				return;
+			}
+		}
+
+		result = send(socket, buf2.c_str(), (int)strlen(buf2.c_str()), 0);
+		if (result == SOCKET_ERROR) {
+			TRACE_GAME_N("filesize send failed with error: %d", WSAGetLastError());
+			result = send(socket, buf2.c_str(), (int)strlen(buf2.c_str()), 0);
+			if (result == SOCKET_ERROR) {
+				TRACE_GAME_N("filesize retry send failed with error: %d", WSAGetLastError());
+				return;
+			}
+			else {
+				goto sendFile;
+			}
+		}
+		else {
+		sendFile:
+			try {
+				if (TransmitFile(socket, file, fileSize, DEFAULT_BUFLEN, NULL, NULL, TF_DISCONNECT)) {
+					TRACE_GAME_N("Transmit file succeeded");
+				}
+				else {
+					TRACE_GAME_N("Transmit file failed, errorCode=%d", WSAGetLastError());
+				}
+			}
+			catch (...) {
+				TRACE_GAME_N("c++ exception thrown");
+			}
+		}
+
+		goto cleanup;
+	}
+	catch (std::exception const& e) {
+		TRACE_GAME_N("std exception thrown = %s",e.what());
+	}
+	catch (...) {
+		TRACE_GAME_N("unknown exception occurred occurred");
+	}
+cleanup:
+	//close the file
+	if (CloseHandle(file)) {
+		TRACE_GAME_N("closed file handle");
+	}
+	else {
+		TRACE_GAME_N("unable to close file");
+	}
+	// shutdown the connection since we're done
+	result = shutdown(socket, SD_SEND);
+	if (result == SOCKET_ERROR) {
+		TRACE_GAME_N("shutdown failed with error: %d", WSAGetLastError());
+		closesocket(socket);
+		return;
+	}
+
+	if (closesocket(socket) == SOCKET_ERROR) {
+		TRACE_GAME_N("close of socket failed with error: %d", WSAGetLastError());
+	}
+}
+
+void MapManager::TcpServer::shutdownServerSocket() {
+	if (!serverSocketShutdown) {
+		closesocket(serverSocket);
+		//shut down once
+		serverSocketShutdown = true;
+	}
+}
+
+void MapManager::TcpServer::startListening()
+{
+	struct addrinfo *result = NULL;
+	struct addrinfo hints;
+	int iResult;
+	int port = g_port + 9;           /* port number to use */
+	int client;                  /* file descriptor for socket */
+	int fileDescriptorForFile;                    /* file descriptor for file to send */
+	struct sockaddr_in addr;   /* socket parameters for bind */
+	int    addrlen;            /* argument to accept */
+	struct stat stat_buf;      /* argument to fstat */
+	off_t offset = 0;          /* file offset */
+	char filename[128];   /* filename to send */
+
+	WSADATA wsaData;
+
+	// Initialize Winsock
+	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (iResult != 0) {
+		TRACE_GAME_N("WSAStartup failed with error: %d", iResult);
+		return ;
+	}
+
+	ZeroMemory(&hints, sizeof(hints));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_flags = AI_PASSIVE;
+
+	// Resolve the server address and port
+	iResult = getaddrinfo(NULL, std::to_string(port).c_str(), &hints, &result);
+	if (iResult != 0) {
+		TRACE_GAME_N("getaddrinfo failed with error: %d, port:", iResult, std::to_string(port).c_str());
+		//WSACleanup();
+		return;
+	}
+
+	// Create a SOCKET for connecting to server
+	serverSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+	if (serverSocket == INVALID_SOCKET) {
+		TRACE_GAME_N("socket failed with error: %ld", WSAGetLastError());
+		freeaddrinfo(result);
+		//WSACleanup();
+		return;
+	}
+
+	/* bind socket to the port */
+	iResult = bind(serverSocket, result->ai_addr, (int)result->ai_addrlen);
+	if (iResult == SOCKET_ERROR) {
+		TRACE_GAME_N("unable to bind to socket: %s", strerror(errno));
+		freeaddrinfo(result);
+		closesocket(serverSocket);
+		return;
+	}
+
+	freeaddrinfo(result);
+
+	/* listen for clients on the socket */
+	iResult = listen(serverSocket, SOMAXCONN);
+	if (iResult == SOCKET_ERROR) {
+		TRACE_GAME_N("Error trying to listen on port: %s", strerror(errno));
+		closesocket(serverSocket);
+		return;
+	}
+	TRACE_GAME_N("Listening on port: %d", port);
+	//server socket is up
+	serverSocketShutdown = false;
+
+	while (listenerThreadRunning) {
+		/* wait for a client to connect */
+		client = accept(serverSocket, 0, 0);
+		if (client == -1) {
+			TRACE_GAME_N("accept failed: %s", strerror(errno));
+			//try to accept again
+			//TODO: if it fails too many times, exit
+			continue;
+		}
+
+		//0x30 (difference from start of maps object to first custom map)
+		//0xB90 (difference between each custom map name)
+		//0x960 (difference between custom map name and its file path
+		DWORD offset;
+		if (h2mod->Server) {
+			offset = 0x4A70D8;
+		}
+		else {
+			offset = 0x482D70;
+		}
+		DWORD* mapsObject = (DWORD*)(h2mod->GetBase() + offset + 0x30);
+		//move to first map
+		DWORD currentMapNameOffset;
+		if (h2mod->Server) {
+			//H2Server.exe+5349B4
+			//H2Server.exe+535C64
+			currentMapNameOffset = 0x5349B4;
+		}
+		else {
+			currentMapNameOffset = 0x97737C;
+		}
+		const wchar_t* currentMapName = (wchar_t*)(h2mod->GetBase() + currentMapNameOffset);
+		for (int i = 1; i <= 51; i++) {
+			wchar_t* mapName = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + (i * 0xB90)));
+
+			if (wcscmp(currentMapName, mapName) == 0) {
+				wchar_t* mapPath = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + ((i * 0xB90) + 0x960)));
+				mapManager->customMapFileName = std::wstring(mapPath);
+				break;
+			}
+		}
+		std::wstring customMapName = mapManager->customMapFileName;
+
+		if (customMapName.empty()) {
+			TRACE_GAME_N("Could not determine custom map file name");
+			continue;
+		}
+
+		std::thread t1(&handleConnection, client, customMapName);
+		t1.detach();
+	}
 }

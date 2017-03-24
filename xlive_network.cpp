@@ -7,6 +7,7 @@
 #include <thread>
 #include "h2mod.h"
 #include <mutex>
+#include "Globals.h"
 
 extern ULONG broadcast_server;
 extern UINT g_port;
@@ -67,7 +68,9 @@ int WINAPI XSessionEnd(DWORD, DWORD)
 	Connected = false;
 	ThreadCreated = false;
 	H2MOD_Network = 0;
-
+	isServer = false;
+	mapManager->stopListening();
+	mapManager->resetMapDownloadUrl();
 	TRACE("XSessionEnd");
 	return 0;
 }
@@ -170,6 +173,8 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 		NetworkActive = false;
 		
 		isHost = true;
+		//only the peer host server ever creates the session key
+		isServer = true;
 		if (H2MOD_Network == 0 && ThreadCreated == false)
 		{
 			ThreadCreated = true;
