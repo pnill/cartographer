@@ -829,10 +829,10 @@ cleanup:
 }
 
 void MapManager::TcpServer::shutdownServerSocket() {
-	if (!serverSocketShutdown) {
+	if (serverSocket != NULL) {
 		closesocket(serverSocket);
 		//shut down once
-		serverSocketShutdown = true;
+		serverSocket = NULL;
 	}
 }
 
@@ -888,6 +888,7 @@ void MapManager::TcpServer::startListening()
 		TRACE_GAME_N("unable to bind to socket: %s", strerror(errno));
 		freeaddrinfo(result);
 		closesocket(serverSocket);
+		serverSocket = NULL;
 		return;
 	}
 
@@ -898,11 +899,10 @@ void MapManager::TcpServer::startListening()
 	if (iResult == SOCKET_ERROR) {
 		TRACE_GAME_N("Error trying to listen on port: %s", strerror(errno));
 		closesocket(serverSocket);
+		serverSocket = NULL;
 		return;
 	}
 	TRACE_GAME_N("Listening on port: %d", port);
-	//server socket is up
-	serverSocketShutdown = false;
 
 	while (listenerThreadRunning) {
 		/* wait for a client to connect */

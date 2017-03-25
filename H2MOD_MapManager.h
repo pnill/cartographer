@@ -35,7 +35,6 @@ private:
 		void stopListening();
 	private:
 		volatile BOOL listenerThreadRunning = true;
-		volatile BOOL serverSocketShutdown = true; //true is default until the server actually starts listening
 		void shutdownServerSocket();
 		SOCKET serverSocket;
 	};

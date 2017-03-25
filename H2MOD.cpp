@@ -327,19 +327,6 @@ signed int clientXboxLiveCheck2() {
 	return 2;
 }
 
-//0x24499F
-typedef void(*show_download_dialog)();
-show_download_dialog show_download_dialog_method;
-
-void showDownloadDialog() {
-	if (mapManager->canDownload()) {
-		mapManager->startMapDownload();
-	}
-
-	//don't call original function, so people don't get kicked from the game
-	//be careful using std wstring/strings in this hooked method, they don't get cleaned properly for some reason
-}
-
 typedef int(__cdecl *show_error_screen)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6);
 show_error_screen show_error_screen_method;
 
