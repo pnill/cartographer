@@ -334,12 +334,11 @@ int WINAPI XLiveRender()
 			}
 
 			if (overrideUnicodeMessage) {
-				drawText(0, 30, COLOR_GOLD, mapManager->getCustomLobbyMessage(), smallFont);
+				drawText(0, 30, COLOR_GOLD, mapManager->getCustomLobbyMessage(), normalSizeFont);
 			}
 		}
 
-		if (fps_enable)
-		{
+		if (fps_enable) {
 			frameTimeManagement();
 		}
 	}

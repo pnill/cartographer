@@ -3,57 +3,46 @@
 
 #include <set>
 
+/**
+ * Class used for downloading maps (for peers) and hosting map downloads (for peer host and dedi host)
+ * NOTE - there are g_debug conditions in front of every trace call, this is because I want to avoid any string creation (since its expensive)
+ * during game time, unless g_debug is on.
+ */
 class MapManager {
 public:
 	MapManager();
 	void reloadMaps();
-	void startListening(); 
-	void stopListening();
+	void startListeningForClients();
 	void startMapDownload();
 	void searchForMap();
-	void resetMapDownloadUrl();
-	void setCustomLobbyMessage(const char* newStatus); 
-	void setCustomLobbyMessage(const char* newStatus, BOOL sleep);
+	void cleanup();
 	const char* getCustomLobbyMessage();
-	std::wstring getEnglishMapName();
-	void setMapDownloadUrl(std::string url);
-	void setMapDownloadType(std::string type);
-	void requestMapDownloadUrl(SOCKET comm_socket, SOCKADDR_IN SenderAddr);
-	bool canDownload();
-
-	bool downloadFromUrl();
-	bool downloadFromExternal();
-	bool downloadFromHost();
-
-	std::wstring customMapFileName;
-	int customMapIndex;
 
 private:
 	class TcpServer {
 	public:
 		void startListening();
-		void stopListening();
+		void stop();
 	private:
 		volatile BOOL listenerThreadRunning = true;
 		void shutdownServerSocket();
 		SOCKET serverSocket = NULL;
 	};
 
+	bool downloadFromHost();
+	void stopListeningForClients();
+	void resetClient();
+	void setCustomLobbyMessage(const char* newStatus);
+	bool hasCustomMap(std::wstring mapName);
+	std::wstring getEnglishMapName();
+
+	std::wstring customMapFileName;
 	TcpServer* tcpServer = NULL;
 	bool requestMapUrl = false;
-	bool hasMap(std::wstring mapName);
-	void unzipArchive(std::wstring localPath, std::wstring mapsDir);
-	BOOL downloadMap(std::wstring mapName);
-
 	std::wstring currentMap;
-	std::string mapDownloadUrl;
-	std::string mapDownloadType;
-
 	const char* customLobbyMessage = NULL;
+	//we precalculate the strings when the MapManager class is loaded to avoid any expensive object creation during game/lobby time
 	std::unordered_map<int, std::string> precalculatedDownloadPercentageStrings;
-
-	std::set<std::wstring> checkedMaps;
-
 	volatile BOOL threadRunning = false;
 };
 

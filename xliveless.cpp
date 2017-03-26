@@ -3085,7 +3085,7 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 
 		if (map_downloading_enable) {
 			//if map downloading is turned, start the listener thread for map downloads
-			std::thread t1(&MapManager::startListening, mapManager);
+			std::thread t1(&MapManager::startListeningForClients, mapManager);
 			t1.detach();
 		}
 		//TODO: put any peer host code here
@@ -3473,8 +3473,7 @@ DWORD WINAPI XSessionDelete (DWORD, DWORD)
 {
     TRACE("XSessionDelete");
 		isServer = false;
-		mapManager->stopListening();
-		mapManager->resetMapDownloadUrl();
+		mapManager->cleanup();
     return 0;
 }
 

@@ -25,10 +25,6 @@ float crosshair_offset = 0.165f;
 
 //map downloading is off by default
 UINT map_downloading_enable = 0;
-CHAR map_download_external_host[128];
-CHAR map_download_external_uri[128];
-CHAR customMapDownloadLink[128];
-CHAR customMapZipDownloadLink[128];
 
 //chatbox commands are off by default
 UINT chatbox_commands = 0;
@@ -314,10 +310,6 @@ void InitInstance()
 				CHECK_ARG_FLOAT("crosshair_offset = ", crosshair_offset);
 				CHECK_ARG("map_downloading_enable = ", map_downloading_enable);
 				CHECK_ARG("chatbox_commands = ", chatbox_commands);
-				CHECK_ARG_STR("custom_maps_link = ", customMapDownloadLink);
-				CHECK_ARG_STR("custom_maps_zip_link = ", customMapZipDownloadLink);
-				CHECK_ARG_STR("map_download_external_host = ", map_download_external_host);
-				CHECK_ARG_STR("map_download_external_uri = ", map_download_external_uri);
 			}
 
 			

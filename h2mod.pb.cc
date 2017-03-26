@@ -31,9 +31,6 @@ namespace {
 	const ::google::protobuf::Descriptor* h2mod_set_team_descriptor_ = NULL;
 	const ::google::protobuf::internal::GeneratedMessageReflection*
 		h2mod_set_team_reflection_ = NULL;
-	const ::google::protobuf::Descriptor* h2mod_map_download_url_descriptor_ = NULL;
-	const ::google::protobuf::internal::GeneratedMessageReflection*
-		h2mod_map_download_url_reflection_ = NULL;
 
 }  // namespace
 
@@ -45,12 +42,11 @@ void protobuf_AssignDesc_h2mod_2eproto() {
 			"h2mod.proto");
 	GOOGLE_CHECK(file != NULL);
 	H2ModPacket_descriptor_ = file->message_type(0);
-	static const int H2ModPacket_offsets_[5] = {
+	static const int H2ModPacket_offsets_[4] = {
 		GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, type_),
 		GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, h2auth_),
 		GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, h2_set_player_team_),
 		GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, set_grenade_),
-		GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, map_url_),
 	};
 	H2ModPacket_reflection_ =
 		new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -113,22 +109,6 @@ void protobuf_AssignDesc_h2mod_2eproto() {
 			::google::protobuf::DescriptorPool::generated_pool(),
 			::google::protobuf::MessageFactory::generated_factory(),
 			sizeof(h2mod_set_team));
-	h2mod_map_download_url_descriptor_ = file->message_type(4);
-	static const int h2mod_map_download_url_offsets_[2] = {
-		GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_map_download_url, url_),
-		GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_map_download_url, type_),
-	};
-	h2mod_map_download_url_reflection_ =
-		new ::google::protobuf::internal::GeneratedMessageReflection(
-			h2mod_map_download_url_descriptor_,
-			h2mod_map_download_url::default_instance_,
-			h2mod_map_download_url_offsets_,
-			GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_map_download_url, _has_bits_[0]),
-			GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_map_download_url, _unknown_fields_),
-			-1,
-			::google::protobuf::DescriptorPool::generated_pool(),
-			::google::protobuf::MessageFactory::generated_factory(),
-			sizeof(h2mod_map_download_url));
 }
 
 namespace {
@@ -149,8 +129,6 @@ namespace {
 			h2mod_auth_descriptor_, &h2mod_auth::default_instance());
 		::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
 			h2mod_set_team_descriptor_, &h2mod_set_team::default_instance());
-		::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-			h2mod_map_download_url_descriptor_, &h2mod_map_download_url::default_instance());
 	}
 
 }  // namespace
@@ -164,8 +142,6 @@ void protobuf_ShutdownFile_h2mod_2eproto() {
 	delete h2mod_auth_reflection_;
 	delete h2mod_set_team::default_instance_;
 	delete h2mod_set_team_reflection_;
-	delete h2mod_map_download_url::default_instance_;
-	delete h2mod_map_download_url_reflection_;
 }
 
 void protobuf_AddDesc_h2mod_2eproto() {
@@ -175,33 +151,28 @@ void protobuf_AddDesc_h2mod_2eproto() {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 	::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-		"\n\013h2mod.proto\"\346\002\n\013H2ModPacket\022\037\n\004type\030\001 "
+		"\n\013h2mod.proto\"\213\002\n\013H2ModPacket\022\037\n\004type\030\001 "
 		"\002(\0162\021.H2ModPacket.Type\022\033\n\006h2auth\030\002 \001(\0132\013"
 		".h2mod_auth\022+\n\022h2_set_player_team\030\003 \001(\0132"
 		"\017.h2mod_set_team\022\'\n\013set_grenade\030\004 \001(\0132\022."
-		"h2mod_set_grenade\022(\n\007map_url\030\005 \001(\0132\027.h2m"
-		"od_map_download_url\"\230\001\n\004Type\022\024\n\020authoriz"
-		"e_client\020\002\022\023\n\017set_player_team\020\003\022\016\n\nh2mod"
-		"_ping\020\004\022\016\n\nh2mod_pong\020\005\022\025\n\021set_unit_gren"
-		"ades\020\006\022\024\n\020map_download_url\020\007\022\030\n\024get_map_"
-		"download_url\020\010\"@\n\021h2mod_set_grenade\022\014\n\004t"
-		"ype\030\001 \002(\r\022\r\n\005count\030\002 \002(\r\022\016\n\006pIndex\030\003 \002(\r"
-		"\".\n\nh2mod_auth\022\014\n\004name\030\001 \002(\014\022\022\n\nsecuread"
-		"dr\030\002 \002(\r\",\n\016h2mod_set_team\022\014\n\004team\030\001 \002(\r"
-		"\022\014\n\004name\030\002 \002(\014\"3\n\026h2mod_map_download_url"
-		"\022\013\n\003url\030\001 \001(\t\022\014\n\004type\030\002 \001(\t", 587);
+		"h2mod_set_grenade\"h\n\004Type\022\024\n\020authorize_c"
+		"lient\020\001\022\023\n\017set_player_team\020\002\022\016\n\nh2mod_pi"
+		"ng\020\003\022\016\n\nh2mod_pong\020\004\022\025\n\021set_unit_grenade"
+		"s\020\005\"@\n\021h2mod_set_grenade\022\014\n\004type\030\001 \002(\r\022\r"
+		"\n\005count\030\002 \002(\r\022\016\n\006pIndex\030\003 \002(\r\".\n\nh2mod_a"
+		"uth\022\014\n\004name\030\001 \002(\014\022\022\n\nsecureaddr\030\002 \002(\r\",\n"
+		"\016h2mod_set_team\022\014\n\004team\030\001 \002(\r\022\014\n\004name\030\002 "
+		"\002(\014", 443);
 	::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
 		"h2mod.proto", &protobuf_RegisterTypes);
 	H2ModPacket::default_instance_ = new H2ModPacket();
 	h2mod_set_grenade::default_instance_ = new h2mod_set_grenade();
 	h2mod_auth::default_instance_ = new h2mod_auth();
 	h2mod_set_team::default_instance_ = new h2mod_set_team();
-	h2mod_map_download_url::default_instance_ = new h2mod_map_download_url();
 	H2ModPacket::default_instance_->InitAsDefaultInstance();
 	h2mod_set_grenade::default_instance_->InitAsDefaultInstance();
 	h2mod_auth::default_instance_->InitAsDefaultInstance();
 	h2mod_set_team::default_instance_->InitAsDefaultInstance();
-	h2mod_map_download_url::default_instance_->InitAsDefaultInstance();
 	::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_h2mod_2eproto);
 }
 
@@ -220,13 +191,11 @@ const ::google::protobuf::EnumDescriptor* H2ModPacket_Type_descriptor() {
 }
 bool H2ModPacket_Type_IsValid(int value) {
 	switch (value) {
+	case 1:
 	case 2:
 	case 3:
 	case 4:
 	case 5:
-	case 6:
-	case 7:
-	case 8:
 		return true;
 	default:
 		return false;
@@ -239,8 +208,6 @@ const H2ModPacket_Type H2ModPacket::set_player_team;
 const H2ModPacket_Type H2ModPacket::h2mod_ping;
 const H2ModPacket_Type H2ModPacket::h2mod_pong;
 const H2ModPacket_Type H2ModPacket::set_unit_grenades;
-const H2ModPacket_Type H2ModPacket::map_download_url;
-const H2ModPacket_Type H2ModPacket::get_map_download_url;
 const H2ModPacket_Type H2ModPacket::Type_MIN;
 const H2ModPacket_Type H2ModPacket::Type_MAX;
 const int H2ModPacket::Type_ARRAYSIZE;
@@ -250,7 +217,6 @@ const int H2ModPacket::kTypeFieldNumber;
 const int H2ModPacket::kH2AuthFieldNumber;
 const int H2ModPacket::kH2SetPlayerTeamFieldNumber;
 const int H2ModPacket::kSetGrenadeFieldNumber;
-const int H2ModPacket::kMapUrlFieldNumber;
 #endif  // !_MSC_VER
 
 H2ModPacket::H2ModPacket()
@@ -263,7 +229,6 @@ void H2ModPacket::InitAsDefaultInstance() {
 	h2auth_ = const_cast< ::h2mod_auth*>(&::h2mod_auth::default_instance());
 	h2_set_player_team_ = const_cast< ::h2mod_set_team*>(&::h2mod_set_team::default_instance());
 	set_grenade_ = const_cast< ::h2mod_set_grenade*>(&::h2mod_set_grenade::default_instance());
-	map_url_ = const_cast< ::h2mod_map_download_url*>(&::h2mod_map_download_url::default_instance());
 }
 
 H2ModPacket::H2ModPacket(const H2ModPacket& from)
@@ -275,11 +240,10 @@ H2ModPacket::H2ModPacket(const H2ModPacket& from)
 
 void H2ModPacket::SharedCtor() {
 	_cached_size_ = 0;
-	type_ = 2;
+	type_ = 1;
 	h2auth_ = NULL;
 	h2_set_player_team_ = NULL;
 	set_grenade_ = NULL;
-	map_url_ = NULL;
 	::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -293,7 +257,6 @@ void H2ModPacket::SharedDtor() {
 		delete h2auth_;
 		delete h2_set_player_team_;
 		delete set_grenade_;
-		delete map_url_;
 	}
 }
 
@@ -319,8 +282,8 @@ H2ModPacket* H2ModPacket::New() const {
 }
 
 void H2ModPacket::Clear() {
-	if (_has_bits_[0 / 32] & 31) {
-		type_ = 2;
+	if (_has_bits_[0 / 32] & 15) {
+		type_ = 1;
 		if (has_h2auth()) {
 			if (h2auth_ != NULL) h2auth_->::h2mod_auth::Clear();
 		}
@@ -329,9 +292,6 @@ void H2ModPacket::Clear() {
 		}
 		if (has_set_grenade()) {
 			if (set_grenade_ != NULL) set_grenade_->::h2mod_set_grenade::Clear();
-		}
-		if (has_map_url()) {
-			if (map_url_ != NULL) map_url_->::h2mod_map_download_url::Clear();
 		}
 	}
 	::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -407,20 +367,6 @@ bool H2ModPacket::MergePartialFromCodedStream(
 			else {
 				goto handle_unusual;
 			}
-			if (input->ExpectTag(42)) goto parse_map_url;
-			break;
-		}
-
-						// optional .h2mod_map_download_url map_url = 5;
-		case 5: {
-			if (tag == 42) {
-			parse_map_url:
-				DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-					input, mutable_map_url()));
-			}
-			else {
-				goto handle_unusual;
-			}
 			if (input->ExpectAtEnd()) goto success;
 			break;
 		}
@@ -474,12 +420,6 @@ void H2ModPacket::SerializeWithCachedSizes(
 			4, this->set_grenade(), output);
 	}
 
-	// optional .h2mod_map_download_url map_url = 5;
-	if (has_map_url()) {
-		::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-			5, this->map_url(), output);
-	}
-
 	if (!unknown_fields().empty()) {
 		::google::protobuf::internal::WireFormat::SerializeUnknownFields(
 			unknown_fields(), output);
@@ -515,13 +455,6 @@ void H2ModPacket::SerializeWithCachedSizes(
 		target = ::google::protobuf::internal::WireFormatLite::
 			WriteMessageNoVirtualToArray(
 				4, this->set_grenade(), target);
-	}
-
-	// optional .h2mod_map_download_url map_url = 5;
-	if (has_map_url()) {
-		target = ::google::protobuf::internal::WireFormatLite::
-			WriteMessageNoVirtualToArray(
-				5, this->map_url(), target);
 	}
 
 	if (!unknown_fields().empty()) {
@@ -561,13 +494,6 @@ int H2ModPacket::ByteSize() const {
 			total_size += 1 +
 				::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
 					this->set_grenade());
-		}
-
-		// optional .h2mod_map_download_url map_url = 5;
-		if (has_map_url()) {
-			total_size += 1 +
-				::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-					this->map_url());
 		}
 
 	}
@@ -610,9 +536,6 @@ void H2ModPacket::MergeFrom(const H2ModPacket& from) {
 		if (from.has_set_grenade()) {
 			mutable_set_grenade()->::h2mod_set_grenade::MergeFrom(from.set_grenade());
 		}
-		if (from.has_map_url()) {
-			mutable_map_url()->::h2mod_map_download_url::MergeFrom(from.map_url());
-		}
 	}
 	mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -650,7 +573,6 @@ void H2ModPacket::Swap(H2ModPacket* other) {
 		std::swap(h2auth_, other->h2auth_);
 		std::swap(h2_set_player_team_, other->h2_set_player_team_);
 		std::swap(set_grenade_, other->set_grenade_);
-		std::swap(map_url_, other->map_url_);
 		std::swap(_has_bits_[0], other->_has_bits_[0]);
 		_unknown_fields_.Swap(&other->_unknown_fields_);
 		std::swap(_cached_size_, other->_cached_size_);
@@ -1531,313 +1453,6 @@ void h2mod_set_team::Swap(h2mod_set_team* other) {
 	::google::protobuf::Metadata metadata;
 	metadata.descriptor = h2mod_set_team_descriptor_;
 	metadata.reflection = h2mod_set_team_reflection_;
-	return metadata;
-}
-
-
-// ===================================================================
-
-#ifndef _MSC_VER
-const int h2mod_map_download_url::kUrlFieldNumber;
-const int h2mod_map_download_url::kTypeFieldNumber;
-#endif  // !_MSC_VER
-
-h2mod_map_download_url::h2mod_map_download_url()
-	: ::google::protobuf::Message() {
-	SharedCtor();
-	// @@protoc_insertion_point(constructor:h2mod_map_download_url)
-}
-
-void h2mod_map_download_url::InitAsDefaultInstance() {
-}
-
-h2mod_map_download_url::h2mod_map_download_url(const h2mod_map_download_url& from)
-	: ::google::protobuf::Message() {
-	SharedCtor();
-	MergeFrom(from);
-	// @@protoc_insertion_point(copy_constructor:h2mod_map_download_url)
-}
-
-void h2mod_map_download_url::SharedCtor() {
-	::google::protobuf::internal::GetEmptyString();
-	_cached_size_ = 0;
-	url_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-	type_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-	::memset(_has_bits_, 0, sizeof(_has_bits_));
-}
-
-h2mod_map_download_url::~h2mod_map_download_url() {
-	// @@protoc_insertion_point(destructor:h2mod_map_download_url)
-	SharedDtor();
-}
-
-void h2mod_map_download_url::SharedDtor() {
-	if (url_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-		delete url_;
-	}
-	if (type_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-		delete type_;
-	}
-	if (this != default_instance_) {
-	}
-}
-
-void h2mod_map_download_url::SetCachedSize(int size) const {
-	GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-	_cached_size_ = size;
-	GOOGLE_SAFE_CONCURRENT_WRITES_END();
-}
-const ::google::protobuf::Descriptor* h2mod_map_download_url::descriptor() {
-	protobuf_AssignDescriptorsOnce();
-	return h2mod_map_download_url_descriptor_;
-}
-
-const h2mod_map_download_url& h2mod_map_download_url::default_instance() {
-	if (default_instance_ == NULL) protobuf_AddDesc_h2mod_2eproto();
-	return *default_instance_;
-}
-
-h2mod_map_download_url* h2mod_map_download_url::default_instance_ = NULL;
-
-h2mod_map_download_url* h2mod_map_download_url::New() const {
-	return new h2mod_map_download_url;
-}
-
-void h2mod_map_download_url::Clear() {
-	if (_has_bits_[0 / 32] & 3) {
-		if (has_url()) {
-			if (url_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-				url_->clear();
-			}
-		}
-		if (has_type()) {
-			if (type_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-				type_->clear();
-			}
-		}
-	}
-	::memset(_has_bits_, 0, sizeof(_has_bits_));
-	mutable_unknown_fields()->Clear();
-}
-
-bool h2mod_map_download_url::MergePartialFromCodedStream(
-	::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
-	::google::protobuf::uint32 tag;
-	// @@protoc_insertion_point(parse_start:h2mod_map_download_url)
-	for (;;) {
-		::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
-		tag = p.first;
-		if (!p.second) goto handle_unusual;
-		switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-			// optional string url = 1;
-		case 1: {
-			if (tag == 10) {
-				DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-					input, this->mutable_url()));
-				::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-					this->url().data(), this->url().length(),
-					::google::protobuf::internal::WireFormat::PARSE,
-					"url");
-			}
-			else {
-				goto handle_unusual;
-			}
-			if (input->ExpectTag(18)) goto parse_type;
-			break;
-		}
-
-						// optional string type = 2;
-		case 2: {
-			if (tag == 18) {
-			parse_type:
-				DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-					input, this->mutable_type()));
-				::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-					this->type().data(), this->type().length(),
-					::google::protobuf::internal::WireFormat::PARSE,
-					"type");
-			}
-			else {
-				goto handle_unusual;
-			}
-			if (input->ExpectAtEnd()) goto success;
-			break;
-		}
-
-		default: {
-		handle_unusual:
-			if (tag == 0 ||
-				::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-				::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-				goto success;
-			}
-			DO_(::google::protobuf::internal::WireFormat::SkipField(
-				input, tag, mutable_unknown_fields()));
-			break;
-		}
-		}
-	}
-success:
-	// @@protoc_insertion_point(parse_success:h2mod_map_download_url)
-	return true;
-failure:
-	// @@protoc_insertion_point(parse_failure:h2mod_map_download_url)
-	return false;
-#undef DO_
-}
-
-void h2mod_map_download_url::SerializeWithCachedSizes(
-	::google::protobuf::io::CodedOutputStream* output) const {
-	// @@protoc_insertion_point(serialize_start:h2mod_map_download_url)
-	// optional string url = 1;
-	if (has_url()) {
-		::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-			this->url().data(), this->url().length(),
-			::google::protobuf::internal::WireFormat::SERIALIZE,
-			"url");
-		::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-			1, this->url(), output);
-	}
-
-	// optional string type = 2;
-	if (has_type()) {
-		::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-			this->type().data(), this->type().length(),
-			::google::protobuf::internal::WireFormat::SERIALIZE,
-			"type");
-		::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-			2, this->type(), output);
-	}
-
-	if (!unknown_fields().empty()) {
-		::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-			unknown_fields(), output);
-	}
-	// @@protoc_insertion_point(serialize_end:h2mod_map_download_url)
-}
-
-::google::protobuf::uint8* h2mod_map_download_url::SerializeWithCachedSizesToArray(
-	::google::protobuf::uint8* target) const {
-	// @@protoc_insertion_point(serialize_to_array_start:h2mod_map_download_url)
-	// optional string url = 1;
-	if (has_url()) {
-		::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-			this->url().data(), this->url().length(),
-			::google::protobuf::internal::WireFormat::SERIALIZE,
-			"url");
-		target =
-			::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-				1, this->url(), target);
-	}
-
-	// optional string type = 2;
-	if (has_type()) {
-		::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-			this->type().data(), this->type().length(),
-			::google::protobuf::internal::WireFormat::SERIALIZE,
-			"type");
-		target =
-			::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-				2, this->type(), target);
-	}
-
-	if (!unknown_fields().empty()) {
-		target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-			unknown_fields(), target);
-	}
-	// @@protoc_insertion_point(serialize_to_array_end:h2mod_map_download_url)
-	return target;
-}
-
-int h2mod_map_download_url::ByteSize() const {
-	int total_size = 0;
-
-	if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-		// optional string url = 1;
-		if (has_url()) {
-			total_size += 1 +
-				::google::protobuf::internal::WireFormatLite::StringSize(
-					this->url());
-		}
-
-		// optional string type = 2;
-		if (has_type()) {
-			total_size += 1 +
-				::google::protobuf::internal::WireFormatLite::StringSize(
-					this->type());
-		}
-
-	}
-	if (!unknown_fields().empty()) {
-		total_size +=
-			::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-				unknown_fields());
-	}
-	GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-	_cached_size_ = total_size;
-	GOOGLE_SAFE_CONCURRENT_WRITES_END();
-	return total_size;
-}
-
-void h2mod_map_download_url::MergeFrom(const ::google::protobuf::Message& from) {
-	GOOGLE_CHECK_NE(&from, this);
-	const h2mod_map_download_url* source =
-		::google::protobuf::internal::dynamic_cast_if_available<const h2mod_map_download_url*>(
-			&from);
-	if (source == NULL) {
-		::google::protobuf::internal::ReflectionOps::Merge(from, this);
-	}
-	else {
-		MergeFrom(*source);
-	}
-}
-
-void h2mod_map_download_url::MergeFrom(const h2mod_map_download_url& from) {
-	GOOGLE_CHECK_NE(&from, this);
-	if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-		if (from.has_url()) {
-			set_url(from.url());
-		}
-		if (from.has_type()) {
-			set_type(from.type());
-		}
-	}
-	mutable_unknown_fields()->MergeFrom(from.unknown_fields());
-}
-
-void h2mod_map_download_url::CopyFrom(const ::google::protobuf::Message& from) {
-	if (&from == this) return;
-	Clear();
-	MergeFrom(from);
-}
-
-void h2mod_map_download_url::CopyFrom(const h2mod_map_download_url& from) {
-	if (&from == this) return;
-	Clear();
-	MergeFrom(from);
-}
-
-bool h2mod_map_download_url::IsInitialized() const {
-
-	return true;
-}
-
-void h2mod_map_download_url::Swap(h2mod_map_download_url* other) {
-	if (other != this) {
-		std::swap(url_, other->url_);
-		std::swap(type_, other->type_);
-		std::swap(_has_bits_[0], other->_has_bits_[0]);
-		_unknown_fields_.Swap(&other->_unknown_fields_);
-		std::swap(_cached_size_, other->_cached_size_);
-	}
-}
-
-::google::protobuf::Metadata h2mod_map_download_url::GetMetadata() const {
-	protobuf_AssignDescriptorsOnce();
-	::google::protobuf::Metadata metadata;
-	metadata.descriptor = h2mod_map_download_url_descriptor_;
-	metadata.reflection = h2mod_map_download_url_reflection_;
 	return metadata;
 }
 

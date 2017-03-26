@@ -332,9 +332,8 @@ show_error_screen show_error_screen_method;
 
 int __cdecl showErrorScreen(int a1, signed int a2, int a3, __int16 a4, int a5, int a6) {
 	if (a2 == 280) {
-		if (mapManager->canDownload()) {
-			mapManager->startMapDownload();
-		}
+		//280 is special here, the constant is used when a custom map cannot be loaded for clients
+		mapManager->startMapDownload();
 		return 0;
 	}
 	return show_error_screen_method(a1, a2, a3, a4, a5, a6);
@@ -1143,50 +1142,6 @@ BOOL __stdcall isDebuggerPresent() {
 	return false;
 }
 
-//0x644B2
-typedef int(__cdecl *custom_map_file_loaded)(int a1);
-custom_map_file_loaded custom_map_file_loaded_method;
-
-int __cdecl customMapFileLoaded(int a1) {
-	int result;
-	int customMapAddress;
-	typedef bool(__thiscall *h2_load_map)(LPCRITICAL_SECTION* thisx, int a1, int a2);
-	typedef int(__stdcall *h2_get_file_attributes)(int a1);
-	h2_load_map h2_load_map_method;
-	if (h2mod->Server) {
-		h2_load_map_method = (h2_load_map)(h2mod->GetBase() + 0x41819);
-	}	else {
-		h2_load_map_method = (h2_load_map)(h2mod->GetBase() + 0x4CF41);		
-	}
-
-	DWORD* mapsObject;
-	if (h2mod->Server) {
-		mapsObject = (DWORD*)(h2mod->GetBase() + 0x4A70D8);
-	}
-	else {
-		mapsObject = (DWORD*)(h2mod->GetBase() + 0x482D70);
-	}
-	customMapAddress = 0;
-	if (h2_load_map_method((LPCRITICAL_SECTION*)((int)mapsObject), a1, (int)&customMapAddress))
-		result = 4 - (GetFileAttributesW((wchar_t*)(customMapAddress + 2432)) != -1);
-	else
-		result = 4;
-
-	//TODO: need one for client host
-	if (h2mod->Server) {		
-		wchar_t* currentCustomMapFileName = (wchar_t*)(customMapAddress + 2432);
-		const wchar_t* existingCustomMapName = mapManager->customMapFileName.c_str();
-		if (currentCustomMapFileName != NULL && currentCustomMapFileName[0] != L'\0') {
-			if (wcscmp(currentCustomMapFileName, existingCustomMapName) != 0) {
-				mapManager->customMapFileName = std::wstring(currentCustomMapFileName);
-			}
-		}
-	}
-	//mapManager->customMapIndex = a1;
-	//return custom_map_file_loaded_method(a1);
-	return result;
-}
-
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1194,14 +1149,6 @@ void H2MOD::ApplyHooks() {
 		TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
 		DWORD dwBack;
-
-		//TODO: turn on if you want to debug halo2.exe from start of process
-		//is_debugger_present_method = (is_debugger_present)DetourFunc((BYTE*)h2mod->GetBase() + 0x39B394, (BYTE*)isDebuggerPresent, 5);
-		//VirtualProtect(is_debugger_present_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		//0x132163
-		//object_p_hook_method = (object_p_hook)DetourFunc((BYTE*)this->GetBase() + 0x132163, (BYTE*)objectPHook, 6);
-		//VirtualProtect(object_p_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)this->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1241,18 +1188,23 @@ void H2MOD::ApplyHooks() {
 		}
 
 		if (map_downloading_enable) {
-			//TODO: expensive, use for debugging/searching
-			//custom_map_file_loaded_method = (custom_map_file_loaded)DetourFunc((BYTE*)h2mod->GetBase() + 0x644B2, (BYTE*)customMapFileLoaded, 5);
-			//VirtualProtect(custom_map_file_loaded_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
 			//0x20E15A
 			show_error_screen_method = (show_error_screen)DetourFunc((BYTE*)h2mod->GetBase() + 0x20E15A, (BYTE*)showErrorScreen, 8);
 			VirtualProtect(show_error_screen_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-			//TODO: expensive, use for debugging/searching
-			//string_display_hook_method = (string_display_hook)DetourFunc((BYTE*)h2mod->GetBase() + 0x287AB5, (BYTE*)stringDisplayHook, 5);
-			//VirtualProtect(string_display_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 		}
+
+		//TODO: turn on if you want to debug halo2.exe from start of process
+		//is_debugger_present_method = (is_debugger_present)DetourFunc((BYTE*)h2mod->GetBase() + 0x39B394, (BYTE*)isDebuggerPresent, 5);
+		//VirtualProtect(is_debugger_present_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		//TODO: use for object spawn hooking
+		//0x132163
+		//object_p_hook_method = (object_p_hook)DetourFunc((BYTE*)this->GetBase() + 0x132163, (BYTE*)objectPHook, 6);
+		//VirtualProtect(object_p_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		//TODO: expensive, use for debugging/searching
+		//string_display_hook_method = (string_display_hook)DetourFunc((BYTE*)h2mod->GetBase() + 0x287AB5, (BYTE*)stringDisplayHook, 5);
+		//VirtualProtect(string_display_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//TODO: for when live list is ready
 		//live checks removed will make users exit to live menu instead of network browser :(
@@ -1270,12 +1222,8 @@ void H2MOD::ApplyHooks() {
 		}
 
 		if (map_downloading_enable) {
-			//TODO: expensive, use for debugging/searching
-			//custom_map_file_loaded_method = (custom_map_file_loaded)DetourFunc((BYTE*)h2mod->GetBase() + 0x4C509, (BYTE*)customMapFileLoaded, 5);
-			//VirtualProtect(custom_map_file_loaded_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-			//dedis have map downloading thread turned on by default
-			std::thread t1(&MapManager::startListening, mapManager);
+			//dedis have map downloading thread turned on by default if configured to do so
+			std::thread t1(&MapManager::startListeningForClients, mapManager);
 			t1.detach();
 		}
 	}
@@ -1456,37 +1404,6 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 								}
 							}
 						break;
-						case H2ModPacket_Type_get_map_download_url: {
-							//TODO: move into method
-							//TODO: if the download link isn't set, we should be able to tell the client this
-							//request from some client to get the map download url, send it
-							H2ModPacket pack;
-							pack.set_type(H2ModPacket_Type_map_download_url);
-							h2mod_map_download_url* mapDownloadUrl = pack.mutable_map_url();
-							if (strlen(customMapDownloadLink) != 0) {
-								mapDownloadUrl->set_url(customMapDownloadLink);
-								mapDownloadUrl->set_type("map");
-								mapManager->setMapDownloadType("map");
-							}
-							else if (strlen(customMapZipDownloadLink) != 0) {
-								mapDownloadUrl->set_url(customMapZipDownloadLink);
-								mapDownloadUrl->set_type("zip");
-								mapManager->setMapDownloadType("zip");
-							}
-							else {
-								TRACE_GAME_N("[h2mod-network] no custom map downloading urls set");
-							}
-
-							char* SendBuf = new char[pack.ByteSize()];
-							memset(SendBuf, 0x00, pack.ByteSize());
-							pack.SerializeToArray(SendBuf, pack.ByteSize());
-
-							sendto(comm_socket, SendBuf, pack.ByteSize(), 0, (SOCKADDR*)&SenderAddr, sizeof(SenderAddr));
-							TRACE_GAME_N("[h2mod-network] Sending map download url=%s", mapDownloadUrl->mutable_url()->c_str());
-
-							delete[] SendBuf;
-							break;
-						}
 						case H2ModPacket_Type_h2mod_ping:
 							H2ModPacket pongpak;
 							pongpak.set_type(H2ModPacket_Type_h2mod_pong);
@@ -1547,9 +1464,6 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 				TRACE_GAME("[h2mod-network] Client - we're not connected re-sending our auth..");
 				sendto(comm_socket, SendBuf, h2pak.ByteSize(), 0, (SOCKADDR*)&SendStruct, sizeof(SendStruct));
 			}
-
-			//request map download url if necessary from the server
-			mapManager->requestMapDownloadUrl(comm_socket, SendStruct);
 
 			sockaddr_in SenderAddr;
 			int SenderAddrSize = sizeof(SenderAddr);

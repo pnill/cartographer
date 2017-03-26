@@ -69,8 +69,7 @@ int WINAPI XSessionEnd(DWORD, DWORD)
 	ThreadCreated = false;
 	H2MOD_Network = 0;
 	isServer = false;
-	mapManager->stopListening();
-	mapManager->resetMapDownloadUrl();
+	mapManager->cleanup();
 	TRACE("XSessionEnd");
 	return 0;
 }
