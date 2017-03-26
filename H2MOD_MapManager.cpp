@@ -146,7 +146,9 @@ void MapManager::startListening() {
 }
 
 void MapManager::stopListening() {
-	this->tcpServer->stopListening();
+	if (this->tcpServer != NULL) {
+		this->tcpServer->stopListening();
+	}
 }
 
 void MapManager::TcpServer::stopListening() {
@@ -878,6 +880,7 @@ void MapManager::TcpServer::startListening()
 	if (serverSocket == INVALID_SOCKET) {
 		TRACE_GAME_N("socket failed with error: %ld", WSAGetLastError());
 		freeaddrinfo(result);
+		serverSocket = NULL;
 		//WSACleanup();
 		return;
 	}

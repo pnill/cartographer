@@ -36,10 +36,10 @@ private:
 	private:
 		volatile BOOL listenerThreadRunning = true;
 		void shutdownServerSocket();
-		SOCKET serverSocket;
+		SOCKET serverSocket = NULL;
 	};
 
-	TcpServer* tcpServer;
+	TcpServer* tcpServer = NULL;
 	bool requestMapUrl = false;
 	bool hasMap(std::wstring mapName);
 	void unzipArchive(std::wstring localPath, std::wstring mapsDir);
