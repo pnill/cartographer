@@ -815,8 +815,8 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 	return pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
 
-bool first_load = true;
-bool bcoop = false;
+//bool first_load = true;
+//bool bcoop = false;
 
 // This whole hook is called every single time a map loads,
 // I've written a PHP script to compile the byte arrays due to the fact comparing unicode is a bitch.
@@ -860,7 +860,7 @@ int __cdecl OnMapLoad(int a1)
 		TRACE_GAME("[h2mod] Halo2Final Turned on!");
 		b_Halo2Final = true;
 	}
-
+/*
 #pragma region COOP FIXES
 	bcoop = false;
 	
@@ -926,7 +926,7 @@ int __cdecl OnMapLoad(int a1)
 
 	}
 #pragma endregion
-
+*/
 	int ret = pmap_initialize(a1);
 
 
@@ -981,9 +981,9 @@ bool __cdecl OnPlayerSpawn(int a1)
 	if(b_Infection)
 		inf->PreSpawn(PlayerIndex);
 #pragma endregion
-
+	/*
 #pragma region COOP Fixes
-	/* hacky coop fixes*/
+	// hacky coop fixes
 	
 	DWORD game_globals = *(DWORD*)(((char*)h2mod->GetBase()) + 0x482D3C);
 	BYTE* garbage_collect = (BYTE*)(game_globals + 0xC);
@@ -995,16 +995,16 @@ bool __cdecl OnPlayerSpawn(int a1)
 		*(coop_mode) = 1; // Turn coop mode on before spawning the player, maybe this fixes their weapon and biped or something idk?
 						  // Going to have to reverse the engine simulation function for weapon creation further.
 	}
-	
+	*/
 	int ret =  pspawn_player(a1); // This handles player spawning for both multiplayer and sinlgeplayer/coop careful with it.
-
-	/* More hacky coop fixes*/
+	/*
+	// More hacky coop fixes
 	if (bcoop == true)
 	{
 		*(coop_mode) = 0; // Turn it back off, sometimes it causes crashes if it's self on we only need it when we're spawning players.
 	}
 #pragma endregion
-
+*/
 #pragma region Infection Handler
 	if(b_Infection)
 		inf->SpawnPlayer(PlayerIndex);
