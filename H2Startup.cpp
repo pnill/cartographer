@@ -19,6 +19,7 @@ int getPlayerNumber() {
 const wchar_t* xinputdllPath = { L"xinput/p00/xinput9_1_0.dll" };
 
 void initPlayerNumber() {
+
 	HANDLE mutex;
 	DWORD lastErr;
 	do {
@@ -66,7 +67,17 @@ void initPlayerNumber() {
 				fclose(file);
 			}
 			else {
-				if (FILE* file1 = fopen("xinput9_1_0.dll", "rb")) {
+				char durazno_xinput_md5[] = "6140ae76b26a633ce2255f6fc88fbe34";
+				char available_xinput_md5[33];
+				int hasherr = ComputeFileMd5Hash(L"xinput9_1_0.dll", available_xinput_md5);
+				FILE* file1 = NULL;
+				if (hasherr == 0 && (file1 = fopen("xinput9_1_0.dll", "rb"))) {
+					if (strcmp(durazno_xinput_md5, available_xinput_md5)) {
+						char xinputError[] = "ERROR! xinput9_1_0.dll does not match the supported version required in the local game directory! For \'Split-screen\' play, the Durazno Xinput v0.6 DLL is required.";
+						addDebugText(xinputError);
+						MessageBoxA(NULL, xinputError, "Incorrect DLL Error", MB_OK);
+						exit(EXIT_FAILURE);
+					}
 					FILE* file2 = fopen(xinputName, "wb");
 					char buffer[BUFSIZ];
 					size_t n;
@@ -98,10 +109,17 @@ void initPlayerNumber() {
 					}
 					fclose(file3);
 				}
-				else {
-					char xinputError[] = "ERROR! xinput9_1_0.dll does not exist in the local game directory! For \'Split-screen\' play, the Durazno Xinput DLL is required.";
+				else if (hasherr == -1 || !file1) {
+					char xinputError[] = "ERROR! xinput9_1_0.dll does not exist in the local game directory! For \'Split-screen\' play, the Durazno Xinput v0.6 DLL is required.";
 					addDebugText(xinputError);
 					MessageBoxA(NULL, xinputError, "DLL Missing Error", MB_OK);
+					exit(EXIT_FAILURE);
+				}
+				else {
+					char xinputError[200];
+					snprintf(xinputError, 200, "Hash Error Num: %x - msg: %s", hasherr, available_xinput_md5);
+					addDebugText(xinputError);
+					MessageBoxA(NULL, xinputError, "MD5 Hash Error", MB_OK);
 					exit(EXIT_FAILURE);
 				}
 			}

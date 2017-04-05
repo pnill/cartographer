@@ -1,4 +1,7 @@
 #include "GSUtils.h"
+#include <stdio.h>
+#include <windows.h>
+#include <Wincrypt.h>
 
 void OverwriteAssembly(BYTE* srcAddr, BYTE* writeAssm, int lenAssm) {
 	DWORD dwBack;
@@ -63,4 +66,109 @@ void PadCStringWithChar(char* strToPad, int toFullLength, char c) {
 		memset(strToPad + i, c, sizeof(char));
 	}
 	memset(strToPad + toFullLength - 1, 0, sizeof(char));
+}
+
+int ComputeFileMd5Hash(wchar_t* filepath, char* rtnMd5) {
+	for (int i = 0; i < 33; i++) {
+		rtnMd5[i] = 0;
+	}
+
+	const int BUFSIZE = 1024;
+	const int MD5LEN = 16;
+	DWORD dwStatus = 0;
+	BOOL bResult = FALSE;
+	HCRYPTPROV hProv = 0;
+	HCRYPTHASH hHash = 0;
+	HANDLE hFile = NULL;
+	BYTE rgbFile[BUFSIZE];
+	DWORD cbRead = 0;
+	BYTE rgbHash[MD5LEN];
+	DWORD cbHash = 0;
+	CHAR rgbDigits[] = "0123456789abcdef";
+	//LPCWSTR filename = L"xinput9_1_0.dll";
+	// Logic to check usage goes here.
+
+	hFile = CreateFile(filepath,
+		GENERIC_READ,
+		FILE_SHARE_READ,
+		NULL,
+		OPEN_EXISTING,
+		FILE_FLAG_SEQUENTIAL_SCAN,
+		NULL);
+
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		return -1;
+	}
+
+	// Get handle to the crypto provider
+	if (!CryptAcquireContext(&hProv,
+		NULL,
+		NULL,
+		PROV_RSA_FULL,
+		CRYPT_VERIFYCONTEXT))
+	{
+		dwStatus = GetLastError();
+		strcpy(rtnMd5, "CryptAcquireContext");
+		CloseHandle(hFile);
+		return dwStatus;
+	}
+
+	if (!CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash))
+	{
+		dwStatus = GetLastError();
+		strcpy(rtnMd5, "CryptAcquireContext");
+		CloseHandle(hFile);
+		CryptReleaseContext(hProv, 0);
+		return dwStatus;
+	}
+
+	while (bResult = ReadFile(hFile, rgbFile, BUFSIZE, &cbRead, NULL))
+	{
+		if (0 == cbRead)
+		{
+			break;
+		}
+
+		if (!CryptHashData(hHash, rgbFile, cbRead, 0))
+		{
+			dwStatus = GetLastError();
+			strcpy(rtnMd5, "CryptHashData");
+			CryptReleaseContext(hProv, 0);
+			CryptDestroyHash(hHash);
+			CloseHandle(hFile);
+			return dwStatus;
+		}
+	}
+
+	if (!bResult)
+	{
+		dwStatus = GetLastError();
+		strcpy(rtnMd5, "ReadFile");
+		CryptReleaseContext(hProv, 0);
+		CryptDestroyHash(hHash);
+		CloseHandle(hFile);
+		return dwStatus;
+	}
+
+	cbHash = MD5LEN;
+	if (CryptGetHashParam(hHash, HP_HASHVAL, rgbHash, &cbHash, 0))
+	{
+		for (DWORD i = 0; i < cbHash; i++)
+		{
+			rtnMd5[i * 2] = rgbDigits[rgbHash[i] >> 4];
+			rtnMd5[(i * 2) + 1] = rgbDigits[rgbHash[i] & 0xf];
+		}
+	}
+	else
+	{
+		dwStatus = GetLastError();
+		strcpy(rtnMd5, "CryptGetHashParam");
+	}
+
+	CryptDestroyHash(hHash);
+	CryptReleaseContext(hProv, 0);
+	CloseHandle(hFile);
+
+	return dwStatus;
 }

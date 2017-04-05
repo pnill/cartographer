@@ -6,3 +6,4 @@ void HexToByteArray(BYTE* byteArray, char* pointerHex);
 int FindStartOfLine(FILE* fp, int lineStrLen);
 void GetVKeyCodeString(int vkey, char* rtnString, int strLen);
 void PadCStringWithChar(char* strToPad, int toFullLength, char c);
+int ComputeFileMd5Hash(wchar_t* filepath, char* rtnMd5);
