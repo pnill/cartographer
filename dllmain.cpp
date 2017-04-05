@@ -6,6 +6,7 @@
 #include <Shellapi.h>
 #include "H2Startup.h"
 #include "H2OnscreenDebugLog.h"
+#include "GSRunLoop.h"
 
 
 using namespace std;
@@ -507,6 +508,9 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 	case DLL_PROCESS_DETACH:
 		ExitInstance();
 		break;
+	}
+	if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
+		initGSRunLoop();
 	}
 	return TRUE;
 }

@@ -122,10 +122,17 @@ void GUI::Initialize()
 	initFontsIfRequired();
 }
 
+bool once1 = false;
 // #5001
-
 int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 {
+	if (!once1) {
+		extern HWND H2hWnd;
+		extern RECT rectScreenOriginal;
+		H2hWnd = pPii->hWnd;
+		GetWindowRect(H2hWnd, &rectScreenOriginal);
+		once1 = true;
+	}
 	return 1;
 }
 
