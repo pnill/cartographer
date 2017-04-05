@@ -13,6 +13,7 @@
 #include <Mmsystem.h>
 #include <thread>
 #include "Globals.h"
+#include "H2OnscreenDebugLog.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();

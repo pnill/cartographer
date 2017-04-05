@@ -12,6 +12,7 @@
 #include "xliveless.h"
 #include "cartographer_main.hpp"
 #include "H2MOD_MapManager.h"
+#include "H2OnscreenDebugLog.h"
 
 
 
@@ -335,6 +336,66 @@ int WINAPI XLiveRender()
 
 			if (overrideUnicodeMessage) {
 				drawText(0, 30, COLOR_GOLD, mapManager->getCustomLobbyMessage(), normalSizeFont);
+			}
+		}
+
+		D3DVIEWPORT9 pViewport;
+		pDevice->GetViewport(&pViewport);
+		//pViewport
+		//char textttt[255];
+		//sprintf(textttt, "x:%d, y:%d", pViewport.Width, pViewport.Height);
+		//drawText(100, 50, COLOR_WHITE, textttt, smallFont);
+
+		D3DDEVICE_CREATION_PARAMETERS cparams;
+		pDevice->GetCreationParameters(&cparams);
+		RECT gameWindowRect;
+		GetWindowRect(cparams.hFocusWindow, &gameWindowRect);
+
+		/*HMONITOR monitor = MonitorFromWindow(halo2hWnd, MONITOR_DEFAULTTONEAREST);
+		MONITORINFO info;
+		info.cbSize = sizeof(MONITORINFO);
+		GetMonitorInfo(monitor, &info);
+		int monitor_width = info.rcMonitor.right - info.rcMonitor.left;
+		int monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;*/
+
+		//char texttttt[255];
+		//sprintf(texttttt, "x:%ld, y:%ld, ox:%ld, oy:%ld", info.rcMonitor.left, info.rcMonitor.top, gameWindowRect.left, gameWindowRect.top);
+		//drawText(100, 65, COLOR_WHITE, texttttt, smallFont);
+
+		RECT gameWindowInnerRect;
+		GetClientRect(cparams.hFocusWindow, &gameWindowInnerRect);
+
+		int gameWindowWidth = gameWindowRect.right - gameWindowRect.left - GetSystemMetrics(SM_CXSIZEFRAME);
+		int gameWindowHeight = gameWindowRect.bottom - gameWindowRect.top;
+
+		/*POINT point;
+		GetCursorPos(&point);
+
+		//int windowX = ;
+		//int windowY = ;
+
+		//int casting bullshit is causing box to render too low... ?
+		int mousePosX = int(point.x) - int(gameWindowRect.left) - (GetSystemMetrics(SM_CXSIZEFRAME) / 2);
+		int mousePosY = int(point.y) - int(gameWindowRect.top) - GetSystemMetrics(SM_CYCAPTION) - (GetSystemMetrics(SM_CYSIZEFRAME) / 2);
+
+		int centerWidth = (gameWindowWidth / 2);
+		int centerHeight = (gameWindowHeight / 2);
+		drawRect(centerWidth - 2, centerHeight - 10, 4, 20, COLOR_GOLD);
+		drawRect(centerWidth - 10, centerHeight - 2, 20, 4, COLOR_GOLD);
+
+		drawRect(mousePosX + 1, mousePosY, 10, 10, COLOR_BLUE);*/
+
+		if (getDebugTextDisplay()) {
+			for (int i = 0; i < getDebugTextArrayMaxLen(); i++) {
+				const char* text = getDebugText(i);
+				//int yOffset = 40 + (i * 14);
+				int yOffset = gameWindowHeight - 55 - (i * 14);
+				if (yOffset < 35) {
+					break;
+				}
+				if (strlen(text) > 0) {
+					drawText(10, yOffset, COLOR_WHITE, text, smallFont);
+				}
 			}
 		}
 

@@ -4,6 +4,8 @@
 #include "H2MOD.h"
 #include <iostream>
 #include <Shellapi.h>
+#include "H2Startup.h"
+#include "H2OnscreenDebugLog.h"
 
 
 using namespace std;
@@ -233,7 +235,12 @@ void InitInstance()
 
 
 		LPWSTR iniFile = new WCHAR[256];
-		lstrcpyW(iniFile, L"xlive.ini");
+		if (getPlayerNumber() > 1) {
+			swprintf(iniFile, L"xlive%d.ini", getPlayerNumber());
+		}
+		else {
+			lstrcpyW(iniFile, L"xlive.ini");
+		}
 
 		int ArgCnt;
 		LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
@@ -252,10 +259,16 @@ void InitInstance()
 		FILE *fp;
 		fp = _wfopen( iniFile, L"r" );
 
-		if( !fp )
-			fp = fopen( "c:\\xlive.ini", "r" );
-
-
+		char iniabnorm[255];
+		sprintf(iniabnorm, "c:\\xlive%d.ini", getPlayerNumber());
+		if (getPlayerNumber() > 1) {
+			if (!fp)
+				fp = fopen(iniabnorm, "r");
+		}
+		else {
+			if (!fp)
+				fp = fopen("c:\\xlive.ini", "r");
+		}
 
 		if( fp )
 		{
@@ -366,6 +379,33 @@ void InitInstance()
 		g_lLANIP = inet_addr(g_szLANIP);
 		g_lWANIP = inet_addr(g_szWANIP);
 
+		wchar_t mutexName[255];
+		swprintf(mutexName, L"Halo2Login#%s", g_szToken);
+		HANDLE mutex = CreateMutex(0, TRUE, mutexName);
+		DWORD lastErr = GetLastError();
+		if (lastErr == ERROR_ALREADY_EXISTS) {
+			//CloseHandle(mutex);
+			char token_censored[33];
+			strncpy(token_censored, g_szToken, 32);
+			memset(token_censored + 32, 0, 1);
+			memset(token_censored + 4, '*', 24);
+			char NotificationPlayerText[120];
+			sprintf(NotificationPlayerText, "Player Login Session %s already exists!\nOld session has been invalidated!", token_censored);
+			addDebugText(NotificationPlayerText);
+			MessageBoxA(NULL, NotificationPlayerText, "LOGIN OVERRIDDEN WARNING!", MB_OK);
+		}
+		wchar_t mutexName2[255];
+		swprintf(mutexName2, L"Halo2BasePort#%d", g_port);
+		HANDLE mutex2 = CreateMutex(0, TRUE, mutexName2);
+		DWORD lastErr2 = GetLastError();
+		if (lastErr2 == ERROR_ALREADY_EXISTS) {
+			//CloseHandle(mutex);
+			char NotificationPlayerText[120];
+			sprintf(NotificationPlayerText, "Base port %d is already bound to!\nExpect MP to not work!", g_port);
+			addDebugText(NotificationPlayerText);
+			MessageBoxA(NULL, NotificationPlayerText, "BASE PORT BIND WARNING!", MB_OK);
+		}
+
 		if (g_debug)
 		{
 			if (logfile = _wfopen(L"xlive_trace.log", L"wt"))
@@ -453,6 +493,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 	{
 	case DLL_PROCESS_ATTACH:
 		hThis = hModule;
+		ProcessH2Startup();
 		//system("update.bat"); // fucking broken h2online.exe -_- This will update that...
 		Detour();
 		break;
