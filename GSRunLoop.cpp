@@ -287,17 +287,18 @@ void hotkeyFuncHelp() {
 	PadCStringWithChar(hotkeyname, 20, ' ');
 	snprintf(tempTextEntry, 255, "%s- Toggle Windowed/Borderless mode.", hotkeyname);
 	addDebugText(tempTextEntry);
-	addDebugText("F5      - Toggle online Coop mode.");
-	addDebugText("F10     - Fix in-game player camera from a white/black bad cutscene.");
-	addDebugText("Home    - Sight Possession Hack.");
-	addDebugText("Page Up - Set Lobby Privacy to OPEN.");
-	addDebugText("Page Dn - Set Lobby Privacy to INVITE ONLY.");
+	//addDebugText("F5      - Toggle online Coop mode.");
+	//addDebugText("F10     - Fix in-game player camera from a white/black bad cutscene.");
+	//addDebugText("Home    - Sight Possession Hack.");
+	//addDebugText("Page Up - Set Lobby Privacy to OPEN.");
+	//addDebugText("Page Dn - Set Lobby Privacy to INVITE ONLY.");
 	addDebugText("------------------------------");
 	setDebugTextDisplay(true);
 }
 
 
 const int hotkeyLen = 7;
+const int hotkeyListenLen = 4;
 int* hotkeyId[hotkeyLen] = { &hotkeyIdHelp, &hotkeyIdToggleDebug, &hotkeyIdAlignWindow, &hotkeyIdWindowMode, &hotkeyIdTest, &hotkeyIdEsc, &hotkeyIdTest2 };
 bool hotkeyPressed[hotkeyLen] = { false, false, false, false, false, false, false };
 void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotkeyFuncAlignWindow, hotkeyFuncWindowMode, hotkeyFuncTest, hotkeyFuncEsc, hotkeyFuncTest2 };
@@ -317,7 +318,7 @@ void GSMainLoop() {
 	}
 	if (GetFocus() == H2hWnd || GetForegroundWindow() == H2hWnd) {
 
-		for (int i = 0; i < hotkeyLen; i++) {
+		for (int i = 0; i < hotkeyListenLen; i++) {
 			//& 0x8000 is pressed
 			//& 0x1 Key just transitioned from released to pressed.
 			if (GetAsyncKeyState(*hotkeyId[i]) & 0x8000) {
