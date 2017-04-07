@@ -509,9 +509,6 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 		ExitInstance();
 		break;
 	}
-	if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
-		initGSRunLoop();
-	}
 	return TRUE;
 }
 

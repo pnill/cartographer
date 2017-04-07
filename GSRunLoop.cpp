@@ -32,8 +32,12 @@ void hotkeyFuncHideDebug() {
 
 int hotkeyIdAlignWindow = VK_F7;
 void hotkeyFuncAlignWindow() {
-	if (H2IsDediServer)
+	if (H2IsDediServer) {
 		return;
+	}
+	if (!pDevice || !H2hWnd) {
+		return;
+	}
 	HMONITOR monitor = MonitorFromWindow(H2hWnd, MONITOR_DEFAULTTONEAREST);
 	MONITORINFO info;
 	info.cbSize = sizeof(MONITORINFO);
@@ -60,8 +64,12 @@ void hotkeyFuncAlignWindow() {
 
 int hotkeyIdWindowMode = VK_F8;
 void hotkeyFuncWindowMode() {
-	if (H2IsDediServer)
+	if (H2IsDediServer) {
 		return;
+	}
+	if (!pDevice || !H2hWnd) {
+		return;
+	}
 	/*wchar_t title[255];
 	wsprintf(title, L"Confirm Window Mode for Player %d", getPlayerNumber());
 	int msgboxID = MessageBox(halo2hWnd,
@@ -158,8 +166,9 @@ int ui_priority = 3;
 //VK_ESCAPE
 int hotkeyIdEsc = VK_F4;
 void hotkeyFuncEsc() {
-	if (H2IsDediServer)
+	if (H2IsDediServer) {
 		return;
+	}
 	int GameGlobals = (int)*(int*)((char*)H2BaseAddr + 0x482D3C);
 	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
 	if (*GameEngine == 2) {
@@ -216,10 +225,10 @@ void hotkeyFuncTest() {
 
 int hotkeyIdTest2 = VK_F9;
 void hotkeyFuncTest2() {
-	int a3 = 0;
-	signed int(__cdecl* sub_603D0E)(signed int* a1);
-	sub_603D0E = (signed int(__cdecl*)(signed int*))((char*)H2BaseAddr + 0x263D0E);
-	sub_603D0E(&a3);
+	//int a3 = 0;
+	//signed int(__cdecl* sub_603D0E)(signed int* a1);
+	//sub_603D0E = (signed int(__cdecl*)(signed int*))((char*)H2BaseAddr + 0x263D0E);
+	//sub_603D0E(&a3);
 
 	//int WgitScreenfunctionPtr = (int)(MenuGameVolumeIngame);
 	//int WgitScreenfunctionPtr = (int)(MenuGameResolutionMM);
@@ -240,9 +249,9 @@ void hotkeyFuncTest2() {
 
 
 	//Zanzibar Wheel
-	//int bbase = (int)*(int*)((char*)H2BaseAddr + 0x479E70);
-	//*(float*)(bbase + 0x1479850) = 0.8;
-	//*(float*)(bbase + 0x149B4C4) = 0.8;
+	int bbase = (int)*(int*)((char*)H2BaseAddr + 0x479E70);
+	*(float*)(bbase + 0x1479850) = 0.8;
+	*(float*)(bbase + 0x149B4C4) = 0.8;
 
 
 	//Pimp Ma Hawg
@@ -298,7 +307,7 @@ void hotkeyFuncHelp() {
 
 
 const int hotkeyLen = 7;
-const int hotkeyListenLen = 4;
+const int hotkeyListenLen = 7;//4
 int* hotkeyId[hotkeyLen] = { &hotkeyIdHelp, &hotkeyIdToggleDebug, &hotkeyIdAlignWindow, &hotkeyIdWindowMode, &hotkeyIdTest, &hotkeyIdEsc, &hotkeyIdTest2 };
 bool hotkeyPressed[hotkeyLen] = { false, false, false, false, false, false, false };
 void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotkeyFuncAlignWindow, hotkeyFuncWindowMode, hotkeyFuncTest, hotkeyFuncEsc, hotkeyFuncTest2 };
@@ -307,6 +316,7 @@ bool halo2WindowExists = false;
 void GSMainLoop() {
 	if (!halo2WindowExists && !H2IsDediServer && H2hWnd != NULL) {
 		halo2WindowExists = true;
+		SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
 		if (getPlayerNumber() > 1) {
 			wchar_t titleOriginal[200];
 			wchar_t titleMod[200];
@@ -314,7 +324,6 @@ void GSMainLoop() {
 			wsprintf(titleMod, L"%ls (P%d)", titleOriginal, getPlayerNumber());
 			SetWindowText(H2hWnd, titleMod);
 		}
-		SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
 	}
 	if (GetFocus() == H2hWnd || GetForegroundWindow() == H2hWnd) {
 

@@ -7,6 +7,8 @@
 int language_code = -1;
 bool skip_intro = false;
 bool disable_ingame_keyboard = false;
+int custom_resolution_x = 0;
+int custom_resolution_y = 0;
 bool H2IsDediServer;
 DWORD H2BaseAddr;
 HWND H2hWnd = NULL;
@@ -14,6 +16,23 @@ HWND H2hWnd = NULL;
 int playerNumber = 0;
 int getPlayerNumber() {
 	return playerNumber;
+}
+
+void fileFail(FILE* fp) {
+	int fperrno = GetLastError();
+	if (fperrno == EACCES || fperrno == EIO || fperrno == EPERM) {
+		MessageBoxA(NULL, "Cannot write a file. Please restart Halo 2 in Administrator mode!", "Permission Error!", MB_OK);
+	}
+	else if (fperrno == ESRCH) {
+		MessageBoxA(NULL, "Probably a missing folder issue if file writing related. Please restart Halo 2 in Administrator mode!", "Permission Error!", MB_OK);
+	}
+	else if (!fp) {
+		char NotificationPlayerText[20];
+		sprintf(NotificationPlayerText, "Error #%x", fperrno);
+		addDebugText(NotificationPlayerText);
+		MessageBoxA(NULL, NotificationPlayerText, "Unknown File Failure!", MB_OK);
+	}
+	exit(1);
 }
 
 const wchar_t* xinputdllPath = { L"xinput/p00/xinput9_1_0.dll" };
@@ -62,6 +81,10 @@ void initPlayerNumber() {
 			wchar_t xinputdir2[30];
 			MultiByteToWideChar(CP_ACP, 0, xinputdir, -1, xinputdir2, strlen(xinputdir) + 1);
 			CreateDirectory(L"xinput", NULL);
+			int fperrno1 = GetLastError();
+			if (fperrno1) {
+				fileFail(NULL);
+			}
 			CreateDirectory(xinputdir2, NULL);
 			if (FILE *file = fopen(xinputName, "r")) {
 				fclose(file);
@@ -73,12 +96,15 @@ void initPlayerNumber() {
 				FILE* file1 = NULL;
 				if (hasherr == 0 && (file1 = fopen("xinput9_1_0.dll", "rb"))) {
 					if (strcmp(durazno_xinput_md5, available_xinput_md5)) {
-						char xinputError[] = "ERROR! xinput9_1_0.dll does not match the supported version required in the local game directory! For \'Split-screen\' play, the Durazno Xinput v0.6 DLL is required.";
+						char xinputError[] = "ERROR! xinput9_1_0.dll does not match the supported version required in the local game directory!\nFor \'Split-screen\' play, the Durazno Xinput v0.6 DLL is required.";
 						addDebugText(xinputError);
 						MessageBoxA(NULL, xinputError, "Incorrect DLL Error", MB_OK);
 						exit(EXIT_FAILURE);
 					}
 					FILE* file2 = fopen(xinputName, "wb");
+					if (!file2) {
+						fileFail(file2);
+					}
 					char buffer[BUFSIZ];
 					size_t n;
 					while ((n = fread(buffer, sizeof(char), sizeof(buffer), file1)) > 0) {
@@ -110,7 +136,7 @@ void initPlayerNumber() {
 					fclose(file3);
 				}
 				else if (hasherr == -1 || !file1) {
-					char xinputError[] = "ERROR! xinput9_1_0.dll does not exist in the local game directory! For \'Split-screen\' play, the Durazno Xinput v0.6 DLL is required.";
+					char xinputError[] = "ERROR! xinput9_1_0.dll does not exist in the local game directory!\nFor \'Split-screen\' play, the Durazno Xinput v0.6 DLL is required.";
 					addDebugText(xinputError);
 					MessageBoxA(NULL, xinputError, "DLL Missing Error", MB_OK);
 					exit(EXIT_FAILURE);
@@ -125,20 +151,6 @@ void initPlayerNumber() {
 			}
 		}
 	}
-}
-
-void fileFail(FILE* fp) {
-	int fperrno = GetLastError();
-	if (fperrno == EACCES || fperrno == EIO || fperrno == EPERM) {
-		MessageBoxA(NULL, "Cannot write a file. Please restart Halo 2 in Administrator mode!", "Permission Error!", MB_OK);
-	}
-	else if (!fp) {
-		char NotificationPlayerText[20];
-		sprintf(NotificationPlayerText, "Error #%x", fperrno);
-		addDebugText(NotificationPlayerText);
-		MessageBoxA(NULL, NotificationPlayerText, "Unknown File Failure!", MB_OK);
-	}
-	exit(1);
 }
 
 void ReadStartupOptions() {
@@ -162,6 +174,7 @@ void ReadStartupOptions() {
 	bool est_language_code = false;
 	bool est_skip_intro = false;
 	bool est_disable_ingame_keyboard = false;
+	bool est_custom_resolution = false;
 	//Hotkeys
 	bool est_hotkey_help = false;
 	bool est_hotkey_toggle_debug = false;
@@ -215,6 +228,19 @@ void ReadStartupOptions() {
 					est_disable_ingame_keyboard = true;
 				}
 			}
+			else if (strstr(string, "custom_resolution =")) {
+				int tempX;
+				int tempY;
+				sscanf(string + strlen("custom_resolution ="), "%dx%d", &tempX, &tempY);
+				if (est_custom_resolution || !(tempX >= 0 && tempY >= 0)) {
+					flagged[flagged_pos++] = FindStartOfLine(fp, strlen(string));
+				}
+				else {
+					custom_resolution_x = tempX;
+					custom_resolution_y = tempY;
+					est_custom_resolution = true;
+				}
+			}
 			else if (strstr(string, "hotkey_help =")) {
 				int temp;
 				sscanf(string + strlen("hotkey_help ="), "%d", &temp);
@@ -262,7 +288,7 @@ void ReadStartupOptions() {
 		}
 		fclose(fp);
 		fp = NULL;
-		if (!flagged_pos && !(est_language_code && est_skip_intro && est_disable_ingame_keyboard && est_hotkey_help && est_hotkey_toggle_debug && est_hotkey_align_window && est_hotkey_window_mode)) {
+		if (!flagged_pos && !(est_language_code && est_skip_intro && est_disable_ingame_keyboard && est_custom_resolution && est_hotkey_help && est_hotkey_toggle_debug && est_hotkey_align_window && est_hotkey_window_mode)) {
 			flagged_pos = -2;
 		}
 	}
@@ -296,6 +322,10 @@ void ReadStartupOptions() {
 				fputs("\n# 0 - Normal Game Controls", fp);
 				fputs("\n# 1 - Disables ONLY Keyboard when in-game & allows controllers when game is not in focus", fp);
 				fputs("\n\n", fp);
+				fputs("# custom_resolution Options (Client):", fp);
+				fputs("\n# <width>x<height> - Sets the resolution of the game via the Windows Registry.", fp);
+				fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fp);
+				fputs("\n\n", fp);
 				fputs("# hotkey_... Options (Client):", fp);
 				fputs("\n# The number used is the keyboard Virtual-Key (VK) Code in base-10 integer form.", fp);
 				fputs("\n# The codes in hexadecimal (base-16) form can be found here:", fp);
@@ -319,6 +349,9 @@ void ReadStartupOptions() {
 				char disable_ingame_keyboard_entry[40];
 				sprintf(disable_ingame_keyboard_entry, "\ndisable_ingame_keyboard = %d", (bool)(getPlayerNumber() - 1));
 				fputs(disable_ingame_keyboard_entry, fp);
+			}
+			if (!est_custom_resolution) {
+				fputs("\ncustom_resolution = 0x0", fp);
 			}
 			if (!est_hotkey_help) {
 				char hotkeyText[60];
@@ -365,6 +398,22 @@ void ReadStartupOptions() {
 	}
 }
 
+LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
+	DWORD dwBufferSize(sizeof(DWORD));
+	DWORD nResult(0);
+	LONG nError = ::RegQueryValueExW(hKey,
+		strValueName,
+		0,
+		NULL,
+		reinterpret_cast<LPBYTE>(&nResult),
+		&dwBufferSize);
+	if (ERROR_SUCCESS == nError)
+	{
+		*nValue = nResult;
+	}
+	return nError;
+}
+
 void ProcessH2Startup() {
 	initDebugText();
 	//halo2ThreadID = GetCurrentThreadId();
@@ -384,6 +433,34 @@ void ProcessH2Startup() {
 	ReadStartupOptions();
 
 	if (!H2IsDediServer) {
+		DWORD tempResX = 0;
+		DWORD tempResY = 0;
+
+		HKEY hKeyResolution = NULL;
+		if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_READ, &hKeyResolution) == ERROR_SUCCESS) {
+			GetDWORDRegKey(hKeyResolution, L"ScreenResX", &tempResX);
+			GetDWORDRegKey(hKeyResolution, L"ScreenResY", &tempResY);
+			RegCloseKey(hKeyResolution);
+		}
+
+		if (custom_resolution_x > 0 && custom_resolution_y > 0) {
+			if (custom_resolution_x != (int)tempResX || custom_resolution_y != (int)tempResY) {
+				LSTATUS err;
+				if (err = RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_ALL_ACCESS, &hKeyResolution) == ERROR_SUCCESS) {
+					RegSetValueEx(hKeyResolution, L"ScreenResX", NULL, REG_DWORD, (const BYTE*)&custom_resolution_x, sizeof(custom_resolution_x));
+					RegSetValueEx(hKeyResolution, L"ScreenResY", NULL, REG_DWORD, (const BYTE*)&custom_resolution_y, sizeof(custom_resolution_y));
+					RegCloseKey(hKeyResolution);
+				}
+				else {
+					char errorMsg[200];
+					sprintf(errorMsg, "Error: 0x%x. Unable to make Screen Resolution changes.\nPlease try restarting Halo 2 with Administrator Privileges.", err);
+					addDebugText(errorMsg);
+					MessageBoxA(NULL, errorMsg, "Registry Write Error", MB_OK);
+					exit(EXIT_FAILURE);
+				}
+			}
+		}
+
 		bool IntroHQ = true;//clients should set on halo2.exe -highquality
 
 		if (language_code >= 0 && language_code <= 7) {
