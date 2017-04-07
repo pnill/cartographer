@@ -841,26 +841,31 @@ int __cdecl OnMapLoad(int a1)
 	b_Halo2Final = false;
 	
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase())+0x97777C);
+	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + 0x482D3C);
+	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
 
-	TRACE_GAME("[h2mod] OnMapLoad variant name %ws", variant_name);
+	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", *GameEngine, variant_name);
 
-	if (wcsstr(variant_name, L"zombies") > 0 || wcsstr(variant_name, L"Zombies") > 0 || wcsstr(variant_name, L"Infection") > 0 || wcsstr(variant_name, L"infection") > 0)
-	{
-		TRACE_GAME("[h2mod] Zombies Turned on!");
-		b_Infection = true;
+	if (*GameEngine == 2) {
+		if (wcsstr(variant_name, L"zombies") > 0 || wcsstr(variant_name, L"Zombies") > 0 || wcsstr(variant_name, L"Infection") > 0 || wcsstr(variant_name, L"infection") > 0)
+		{
+			TRACE_GAME("[h2mod] Zombies Turned on!");
+			b_Infection = true;
+		}
+
+		if (wcsstr(variant_name, L"GunGame") > 0 || wcsstr(variant_name, L"gungame") > 0)
+		{
+			TRACE_GAME("[h2mod] GunGame Turned on!");
+			b_GunGame = true;
+		}
+
+		if (wcsstr(variant_name, L"H2F") > 0 || wcsstr(variant_name, L"h2f") > 0 || wcsstr(variant_name, L"Halo2Final") > 0 || wcsstr(variant_name, L"halo2final") > 0)
+		{
+			TRACE_GAME("[h2mod] Halo2Final Turned on!");
+			b_Halo2Final = true;
+		}
 	}
-
-	if (wcsstr(variant_name, L"GunGame") > 0 || wcsstr(variant_name, L"gungame") > 0)
-	{
-		TRACE_GAME("[h2mod] GunGame Turned on!");
-		b_GunGame = true;
-	}
-
-	if (wcsstr(variant_name, L"H2F") > 0 || wcsstr(variant_name, L"h2f") > 0 || wcsstr(variant_name, L"Halo2Final") > 0 || wcsstr(variant_name, L"halo2final") > 0)
-	{
-		TRACE_GAME("[h2mod] Halo2Final Turned on!");
-		b_Halo2Final = true;
-	}
+	
 /*
 #pragma region COOP FIXES
 	bcoop = false;
