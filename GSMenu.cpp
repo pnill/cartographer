@@ -2,6 +2,7 @@
 #include "H2Startup.h"
 #include "stdafx.h"
 #include <emmintrin.h>
+#include "Hook.h"
 
 extern bool IsCustomMenu;
 
@@ -14,31 +15,31 @@ int __cdecl MenuGameBrightnessIngame1(int a1) {
 
 /*int __cdecl sub_105D239(int a1, int a2, int a3)
 {
-int v3; // ecx@0
-int result; // eax@2
-int v5; // [sp+0h] [bp-4h]@1
+	int v3; // ecx@0
+	int result; // eax@2
+	int v5; // [sp+0h] [bp-4h]@1
 
-v5 = v3;
-if (sub_EDC08E(dword_17C58E4, (int)&v5, a1, a2, a3))
-{
-sub_EDBDBF(dword_17C58E4, &v5);
-result = v5;
-}
-else
-{
-sub_1059616();
-if (sub_EDC08E(dword_17C58E4, (int)&v5, a1, a2, a3))
-{
-sub_EDBDBF(dword_17C58E4, &v5);
-result = v5;
-}
-else
-{
-nullsub_15();
-result = 0;
-}
-}
-return result;
+	v5 = v3;
+	if (sub_EDC08E(dword_17C58E4, (int)&v5, a1, a2, a3))
+	{
+		sub_EDBDBF(dword_17C58E4, &v5);
+		result = v5;
+	}
+	else
+	{
+		sub_1059616();
+		if (sub_EDC08E(dword_17C58E4, (int)&v5, a1, a2, a3))
+		{
+			sub_EDBDBF(dword_17C58E4, &v5);
+			result = v5;
+		}
+		else
+		{
+			nullsub_15();
+			result = 0;
+		}
+	}
+	return result;
 }*/
 
 int __cdecl Allocator(int a1) {
@@ -150,10 +151,10 @@ void* __cdecl sub_10D7BA9(void *a1, int a2, unsigned int a3)
 
 signed int __cdecl sub_10DA189(int a3, char* a4, int a5, int a6) {//__usercall
 
-																  //int(__cdecl* sub_10DEE22)(void);
-																  //sub_10DEE22 = (int(__cdecl*)(void))((char*)H2BaseAddr + 0x28EE22);
+	//int(__cdecl* sub_10DEE22)(void);
+	//sub_10DEE22 = (int(__cdecl*)(void))((char*)H2BaseAddr + 0x28EE22);
 
-																  //int v6; // esi@8
+	//int v6; // esi@8
 
 	if (a6) {
 		if (!a3) {
@@ -227,8 +228,8 @@ signed int __cdecl sub_10DA189(int a3, char* a4, int a5, int a6) {//__usercall
 
 int __cdecl CopyStrToMaxLen(int a1, char* a2, int a3) {//__usercall
 
-													   //Something about this following call is very wrong.
-													   //the psudo-code in sub_10DA189 throws the same error as in the real function.
+	//Something about this following call is very wrong.
+	//the psudo-code in sub_10DA189 throws the same error as in the real function.
 	signed int(__cdecl* sub_10DA189)(int a1, int a2, int a3, int a4);
 	sub_10DA189 = (signed int(__cdecl*)(int, int, int, int))((char*)H2BaseAddr + 0x28A189);
 	sub_10DA189(a1, (int)a2, a3, -1);
@@ -275,8 +276,7 @@ int __cdecl sub_EB6AD5(char* a1, int a2, int a3, int a4, int a5)
 {
 	int result = (**(int(__thiscall***)(DWORD, DWORD))a5)(a5, a3 * a2 + 4 * ((a2 + 31) >> 5) + (1 << a4) + 75);
 	int v6 = result;
-	if (result)
-	{
+	if (result) {
 		//int(__cdecl* sub_EB65AD)(int a1, char* a2, int a3, int a4, char a5, int a6);
 		//sub_EB65AD = (int(__cdecl*)(int, char*, int, int, char, int))((char*)H2BaseAddr + 0x665AD);
 		sub_EB65AD(result, a1, a2, a3, a4, a5);
@@ -295,14 +295,23 @@ int __cdecl sub_105D1FD(char* a1, int a2, int a3)
 	return sub_EB6AD5(a1, a2, a3, 0, (int)off_12B37BC);
 }
 
+class GSMenu
+{
+public:
+	int __thiscall sub_5F0DD8(int thisptr, int a2, int a3);
+};
+
+GSMenu* gsmenu = new GSMenu();
+
+
 //assuming
 //a2 - previous value
 //a3 - new value
-int __cdecl sub_5F0DD8(int thisptr, int a2, int a3) {//__thiscall
-													 //int(__thiscall* sub_10A0DD8)(int thisptr, int a2, int a3);
-													 //sub_10A0DD8 = (int(__thiscall*)(int, int, int))((char*)H2BaseAddr + 0x250DD8);
-													 //int rtnval = sub_10A0DD8(thisptr, a2, a3);
-													 //return rtnval;
+int __thiscall GSMenu::sub_5F0DD8(int thisptr, int a2, int a3) {//__thiscall
+	//int(__thiscall* sub_10A0DD8)(int thisptr, int a2, int a3);
+	//sub_10A0DD8 = (int(__thiscall*)(int, int, int))((char*)H2BaseAddr + 0x250DD8);
+	//int rtnval = sub_10A0DD8(thisptr, a2, a3);
+	//return rtnval;
 
 	int v3 = thisptr;
 	a3 = *(DWORD*)a3 & 0xFFFF;
@@ -357,6 +366,9 @@ int __cdecl sub_10A0E22(int thisptr, int a2) {//__thiscall
 
 	int(__cdecl* sub_5F0DD8)(int thisptr, int a2, int a3);
 	sub_5F0DD8 = (int(__cdecl*)(int, int, int))((char*)H2BaseAddr + 0x250DD8);
+	//int(__thiscall GSMenu::* pFunc)(int, int, int) = &GSMenu::sub_5F0DD8;
+	//*((DWORD*)v2 + 182) = (DWORD)(void*&)pFunc;
+	//*((DWORD*)v2 + 182) = (BYTE*)gsmenu->sub_5F0DD8;//CUSTOMFUNC MODIFIED
 	*((DWORD*)v2 + 182) = (DWORD)sub_5F0DD8;//CUSTOMFUNC MODIFIED
 
 	char editliststr[] = "brightness level settings edit list";
@@ -541,21 +553,21 @@ int __cdecl MenuGameBrightnessIngame(int a1) {
 }
 
 int __cdecl sub_5EB75C(void* thisptr, int a2, int a3) {//__thiscall
-	return 1;/*
-			 __int16 v3 = *(WORD*)a3;
-			 void* v4 = thisptr;
-			 if (*(WORD*)a3 >= 0) {
-			 if (v3 > 10) {
-			 LOBYTE(v3) = 10;
-			 }
-			 }
-			 else {
-			 LOBYTE(v3) = 0;
-			 }
-			 sub_3E69CC(10 - v3);
-			 int v5 = (*(int(__thiscall**)(void*))(*(DWORD*)v4 + 56))(v4);
-			 int v6 = (*(int(__thiscall**)(void*))(*(DWORD*)v4 + 52))(v4);
-			 return sub_5A96DA(v6, v5);*/
+	return 1;
+	/*__int16 v3 = *(WORD*)a3;
+	void* v4 = thisptr;
+	if (*(WORD*)a3 >= 0) {
+		if (v3 > 10) {
+			LOBYTE(v3) = 10;
+		}
+	}
+	else {
+		LOBYTE(v3) = 0;
+	}
+	sub_3E69CC(10 - v3);
+	int v5 = (*(int(__thiscall**)(void*))(*(DWORD*)v4 + 56))(v4);
+	int v6 = (*(int(__thiscall**)(void*))(*(DWORD*)v4 + 52))(v4);
+	return sub_5A96DA(v6, v5);*/
 }
 
 void* __cdecl sub_5EB7D9(void* thisptr, int a2) {//__thiscall
@@ -593,16 +605,16 @@ void* __cdecl sub_5EB7D9(void* thisptr, int a2) {//__thiscall
 	//No Effect.
 	//*((DWORD*)v2 + 177) = &off_1229700;
 	*((DWORD*)v2 + 177) = (DWORD)((char*)H2BaseAddr + 0x3D9700);//BRIGHTNESS
-																 //*((DWORD*)v2 + 177) = &off_778418;
-																 //*((DWORD*)v2 + 177) = (DWORD)((char*)H2BaseAddr + 0x3D8418);//MODIFIED
+	//*((DWORD*)v2 + 177) = &off_778418;
+	//*((DWORD*)v2 + 177) = (DWORD)((char*)H2BaseAddr + 0x3D8418);//MODIFIED
 
 	*((DWORD*)v2 + 181) = (DWORD)v2;
 
 	//Button functionality.
 	int(__thiscall* sub_5F0DD8)(int thisptr, int a2, int a3);
 	sub_5F0DD8 = (int(__thiscall*)(int, int, int))((char*)H2BaseAddr + 0x250DD8);//BRIGHTNESS
-																				  //int(__thiscall* sub_5EB75C)(void* thisptr, int a2, int a3);
-																				  //sub_5EB75C = (int(__thiscall*)(void*, int, int))((char*)H2BaseAddr + 0x24B75C);
+	//int(__thiscall* sub_5EB75C)(void* thisptr, int a2, int a3);
+	//sub_5EB75C = (int(__thiscall*)(void*, int, int))((char*)H2BaseAddr + 0x24B75C);
 	*((DWORD*)v2 + 182) = (DWORD)((char*)sub_5F0DD8);//CUSTOMFUNC MODIFIED
 
 													 //
@@ -649,14 +661,14 @@ int __cdecl sub_5C7261(int thisptr, int a2, int a3, int a4) {//__thiscall
 	sub_1061159 = (void*(__thiscall*)(int, int, int, int, int, int))((char*)H2BaseAddr + 0x211159);
 	sub_1061159(thisptr, 263, a2, a3, a4, (int)((char*)thisptr + 2656));//MODIFIED
 
-																		//Relates to which option should be selected first. Doesn't affect functionality.
-																		//*(DWORD*)v4 = &off_1227ABC;
-																		//*(DWORD*)v4 = (DWORD)((char*)H2BaseAddr + 0x3D7ABC);//BRIGHTNESS
-																		//*(DWORD*)v4 = &off_770A14;
+	//Relates to which option should be selected first. Doesn't affect functionality.
+	//*(DWORD*)v4 = &off_1227ABC;
+	//*(DWORD*)v4 = (DWORD)((char*)H2BaseAddr + 0x3D7ABC);//BRIGHTNESS
+	//*(DWORD*)v4 = &off_770A14;
 	*(DWORD*)v4 = (DWORD)((char*)H2BaseAddr + 0x3D0A14);//MODIFIED
 
-														 //int(__thiscall* sub_5EB7D9)(int thisptr, int a1);
-														 //sub_5EB7D9 = (int(__thiscall*)(int, int))((char*)H2BaseAddr + 0x24B7D9);
+	//int(__thiscall* sub_5EB7D9)(int thisptr, int a1);
+	//sub_5EB7D9 = (int(__thiscall*)(int, int))((char*)H2BaseAddr + 0x24B7D9);
 	sub_5EB7D9((void*)v5, a4);//CUSTOMFUNC MODIFIED
 
 	return v4;
@@ -771,11 +783,11 @@ int __cdecl sub_5E90E1(int thisptr, int a2, int a3, int a4) {//__thiscall
 	sub_1061159 = (void*(__thiscall*)(int, int, int, int, int, int))((char*)H2BaseAddr + 0x211159);
 	sub_1061159(thisptr, 269, a2, a3, a4, (int)((char*)thisptr + 2656));//MODIFIED
 
-																		//*(DWORD*)v4 = &off_777EAC;
+	//*(DWORD*)v4 = &off_777EAC;
 	*(DWORD*)v4 = (DWORD)((char*)H2BaseAddr + 0x3D7EAC);//MODIFIED
 
-														 //int(__thiscall* sub_5F02B3)(int thisptr, int a1);
-														 //sub_5F02B3 = (int(__thiscall*)(int, int))((char*)H2BaseAddr + 0x2502B3);
+	//int(__thiscall* sub_5F02B3)(int thisptr, int a1);
+	//sub_5F02B3 = (int(__thiscall*)(int, int))((char*)H2BaseAddr + 0x2502B3);
 	sub_5F02B3((void*)v5, a4);//CUSTOMFUNC MODIFIED
 
 	return v4;
@@ -807,4 +819,109 @@ int __cdecl MenuGameResolutionMM(int a1) {
 	sub_105B8C3(v2, a1);
 
 	return v2;
+}
+
+
+//-----------------------------------------------------------------------------------------------------
+//Game Hooks
+
+
+typedef int(__stdcall *thook_menu_brightness_ui_setup)(int thisptr, int a2);
+thook_menu_brightness_ui_setup phook_menu_brightness_ui_setup;
+int __stdcall HookBrightnessMenuUISetup(int thisptr, int a2) {//__thiscall
+
+	IsCustomMenu = false;
+
+	int result = phook_menu_brightness_ui_setup(thisptr, a2);
+
+	//not even that works...
+	//int(__thiscall* sub_5F0DD8)(int thisptr, int a2, int a3);
+	//sub_5F0DD8 = (int(__thiscall*)(int, int, int))((char*)MemAddrBase + 0x250DD8);
+	//*((DWORD*)thisptr + 182) = (DWORD)sub_5F0DD8g;//CUSTOMFUNC MODIFIED
+
+	return result;
+}
+
+typedef int(__stdcall *thook_menu_brightness_submit)(int thisptr, int a2, int a3);
+thook_menu_brightness_submit phook_menu_brightness_submit;
+int __stdcall HookMenuBrightnessSubmitCall(int thisptr, int a2, int a3) {
+	//*(int*)a3 = 0;
+	void* p1 = (void*)thisptr;
+	void* p2 = (void*)a2;
+	void* p3 = (void*)a3;
+
+	//extern int sub_5F0DD8(int thisptr, int a2, int a3);
+	//return sub_5F0DD8(thisptr, a2, a3);
+
+	if (!IsCustomMenu) {
+		a3 = *(DWORD*)a3 & 0xFFFF;
+		signed int(__cdecl* sub_603D0E)(signed int* a1);
+		sub_603D0E = (signed int(__cdecl*)(signed int*))((char*)H2BaseAddr + 0x263D0E);
+		sub_603D0E(&a3);
+	}
+	else {
+		return -1;//makes button press do nothing. stays at menu.
+	}
+
+	int v3 = thisptr;
+
+	int v4 = (*(int(__cdecl**)(int))(*(DWORD*)v3 + 56))(v3);//__thiscall
+	int v5 = (*(int(__cdecl**)(int))(*(DWORD*)v3 + 52))(v3);//__thiscall
+
+	int(__cdecl* sub_5A96DA)(int a1, int a2);
+	sub_5A96DA = (int(__cdecl*)(int, int))((char*)H2BaseAddr + 0x2096DA);
+	return sub_5A96DA(v5, v4);
+
+	//int rtnval = phookmenu1(thisptr, a2, a3);
+	//return rtnval;*/
+}
+
+/*typedef void*(__stdcall *tload_main_menu_six_opt)(void* thisptr, int a2, int a3, int a4);
+tload_main_menu_six_opt pload_main_menu_six_opt;
+bool once3 = false;
+void* __stdcall LoadMainMenuSixOpt(void* thisptr, int a2, int a3, int a4) {
+	if (!once3) {
+		once3 = true;
+		extern void H2CodezInitialize();
+		H2CodezInitialize();
+	}
+	//void* thisptr = 
+	pload_main_menu_six_opt(thisptr, a2, a3, a4);
+	return thisptr;
+}*/
+
+typedef int (__stdcall *tinitialize_map)(int, int,int);
+tinitialize_map pinitialize_map;
+int __stdcall InitializeMap(int a1, int a2, int a3) {
+	int result = 
+	pinitialize_map(a1, a2,a3);
+	return result;
+}
+
+typedef char(__stdcall *thookc1)(char);
+thookc1 phookc1;
+char __stdcall hookc1(char a1) {
+	char result =
+		phookc1(a1);
+	return result;
+}
+
+void GSMenuSetupHooks() {
+	DWORD dwBack;
+
+	//pload_main_menu_six_opt = (tload_main_menu_six_opt)DetourClassFunc((BYTE*)this->GetBase() + 0xB6CA, (BYTE*)LoadMainMenuSixOpt, 13);
+	//VirtualProtect(pload_main_menu_six_opt, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	//pinitialize_map = (tinitialize_map)DetourClassFunc((BYTE*)this->GetBase() + 0x86AD, (BYTE*)InitializeMap, 11);
+	//VirtualProtect(pinitialize_map, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	//phookc1 = (thookc1)DetourClassFunc((BYTE*)this->GetBase() + 0x28287, (BYTE*)hookc1, 10);
+	//VirtualProtect(phookc1, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	phook_menu_brightness_ui_setup = (thook_menu_brightness_ui_setup)DetourClassFunc((BYTE*)H2BaseAddr + 0x250E22, (BYTE*)HookBrightnessMenuUISetup, 13);
+	VirtualProtect(phook_menu_brightness_ui_setup, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	phook_menu_brightness_submit = (thook_menu_brightness_submit)DetourClassFunc((BYTE*)H2BaseAddr + 0x250DD8, (BYTE*)HookMenuBrightnessSubmitCall, 9);
+	VirtualProtect(phook_menu_brightness_submit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
 }

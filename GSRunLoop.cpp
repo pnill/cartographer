@@ -9,6 +9,7 @@
 #include "H2MOD.h"
 extern LPDIRECT3DDEVICE9 pDevice;
 
+bool QuitGSMainLoop = false;
 RECT rectScreenOriginal;
 
 void setBorderless(int originX, int originY, int width, int height) {
@@ -239,19 +240,40 @@ void hotkeyFuncTest2() {
 	OverwriteAssembly((BYTE*)H2BaseAddr + 0x6AB7f, assmSpeedPatch, 8);
 	*/
 
-
+	/*
 	//Enable Skulls in MP
-	/*BYTE assmEnableMPSkulls[] = { 0x90, 0x90 };
+	BYTE assmEnableMPSkulls[] = { 0x90, 0x90 };
 	OverwriteAssembly((BYTE*)H2BaseAddr + 0xBD125, assmEnableMPSkulls, 2);
 
 	int* SkullGruntBDay = (int*)((char*)H2BaseAddr + 0x4D8321);
-	*SkullGruntBDay = 1;*/
+	*SkullGruntBDay = 1;
+
+
+	//Enable Grenade Chain Reactions in MP
+	BYTE assmEnableGrenadeChainReact[] = { 0x90, 0x90 };
+	OverwriteAssembly((BYTE*)H2BaseAddr + 0x182D74, assmEnableGrenadeChainReact, 2);
+
+	BYTE assmEnableMPBansheeBomb[] = { 0x09 };
+	OverwriteAssembly((BYTE*)H2BaseAddr + 0x92C06, assmEnableMPBansheeBomb, 1);
+	*/
+
+	//Change Language Without Restart (non-native characters will not display).
+	BYTE assmLang[15];
+	memset(assmLang, 1, 15);
+	OverwriteAssembly((BYTE*)H2BaseAddr + 0x38300, assmLang, 15);
+	BYTE* HasLoadedLanguage = (BYTE*)((char*)H2BaseAddr + 0x481908);
+	*HasLoadedLanguage = 0;
+	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + 0x482D3C);
+	BYTE* EngineMode = (BYTE*)(GameGlobals + 0x8);
+	*EngineMode = 1;
+	BYTE* QuitLevel = (BYTE*)((char*)H2BaseAddr + 0x482251);
+	*QuitLevel = 1;
 
 
 	//Zanzibar Wheel
-	int bbase = (int)*(int*)((char*)H2BaseAddr + 0x479E70);
-	*(float*)(bbase + 0x1479850) = 0.8;
-	*(float*)(bbase + 0x149B4C4) = 0.8;
+	//int bbase = (int)*(int*)((char*)H2BaseAddr + 0x479E70);
+	//*(float*)(bbase + 0x1479850) = 0.7;
+	//*(float*)(bbase + 0x149B4C4) = 0.7;
 
 
 	//Pimp Ma Hawg
@@ -307,14 +329,15 @@ void hotkeyFuncHelp() {
 
 
 const int hotkeyLen = 7;
-const int hotkeyListenLen = 7;//4
-int* hotkeyId[hotkeyLen] = { &hotkeyIdHelp, &hotkeyIdToggleDebug, &hotkeyIdAlignWindow, &hotkeyIdWindowMode, &hotkeyIdTest, &hotkeyIdEsc, &hotkeyIdTest2 };
+int hotkeyListenLen = 6;//4
+int* hotkeyId[hotkeyLen] = { &hotkeyIdHelp, &hotkeyIdToggleDebug, &hotkeyIdAlignWindow, &hotkeyIdWindowMode, &hotkeyIdTest, &hotkeyIdTest2, &hotkeyIdEsc };
 bool hotkeyPressed[hotkeyLen] = { false, false, false, false, false, false, false };
-void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotkeyFuncAlignWindow, hotkeyFuncWindowMode, hotkeyFuncTest, hotkeyFuncEsc, hotkeyFuncTest2 };
+void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotkeyFuncAlignWindow, hotkeyFuncWindowMode, hotkeyFuncTest, hotkeyFuncTest2, hotkeyFuncEsc };
 
 bool halo2WindowExists = false;
+bool halo2ServerFinishedLoading = false;
 void GSMainLoop() {
-	if (!halo2WindowExists && !H2IsDediServer && H2hWnd != NULL) {
+	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
 		SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
 		if (getPlayerNumber() > 1) {
@@ -323,6 +346,14 @@ void GSMainLoop() {
 			GetWindowText(H2hWnd, titleOriginal, 200);
 			wsprintf(titleMod, L"%ls (P%d)", titleOriginal, getPlayerNumber());
 			SetWindowText(H2hWnd, titleMod);
+		}
+	}
+	if (H2IsDediServer && !halo2ServerFinishedLoading) {
+		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
+		if (wcslen(LanServerName) > 0 && wcslen(dedi_server_name) > 0) {
+			halo2ServerFinishedLoading = true;
+			swprintf(LanServerName, 32, dedi_server_name);
+			QuitGSMainLoop = true;
 		}
 	}
 	if (GetFocus() == H2hWnd || GetForegroundWindow() == H2hWnd) {
@@ -367,7 +398,7 @@ public:
 
 DWORD WINAPI GSLoopMaker(LPVOID lpParam)
 {
-	while (1) {
+	while (!QuitGSMainLoop) {
 		//loop every 4 milliseconds
 		later later_test1(4, false, &GSMainLoop);
 	}

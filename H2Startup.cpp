@@ -3,12 +3,14 @@
 #include "GSUtils.h"
 #include "GSRunLoop.h"
 #include <Shellapi.h>
+#include "Hook.h"
 
 int language_code = -1;
 bool skip_intro = false;
 bool disable_ingame_keyboard = false;
 int custom_resolution_x = 0;
 int custom_resolution_y = 0;
+wchar_t dedi_server_name[32];
 bool H2IsDediServer;
 DWORD H2BaseAddr;
 HWND H2hWnd = NULL;
@@ -28,14 +30,15 @@ void fileFail(FILE* fp) {
 	}
 	else if (!fp) {
 		char NotificationPlayerText[20];
-		sprintf(NotificationPlayerText, "Error #%x", fperrno);
+		sprintf(NotificationPlayerText, "Error 0x%x", fperrno);
 		addDebugText(NotificationPlayerText);
 		MessageBoxA(NULL, NotificationPlayerText, "Unknown File Failure!", MB_OK);
 	}
-	exit(1);
 }
 
-const wchar_t* xinputdllPath = { L"xinput/p00/xinput9_1_0.dll" };
+const wchar_t* xinputdllPath = L"xinput/p00/xinput9_1_0.dll";
+wchar_t* instanceMutexClient = L"Halo2Player%d";
+wchar_t* instanceMutexServer = L"Halo2Server%d";
 
 void initPlayerNumber() {
 
@@ -44,7 +47,11 @@ void initPlayerNumber() {
 	do {
 		playerNumber++;
 		wchar_t mutexName[32];
-		swprintf(mutexName, L"Halo2Player%d", playerNumber);
+		wchar_t* instanceName = instanceMutexClient;
+		if (H2IsDediServer) {
+			instanceName = instanceMutexServer;
+		}
+		swprintf(mutexName, instanceName, playerNumber);
 		mutex = CreateMutex(0, TRUE, mutexName);
 		lastErr = GetLastError();
 		if (lastErr == ERROR_ALREADY_EXISTS) {
@@ -82,10 +89,18 @@ void initPlayerNumber() {
 			MultiByteToWideChar(CP_ACP, 0, xinputdir, -1, xinputdir2, strlen(xinputdir) + 1);
 			CreateDirectory(L"xinput", NULL);
 			int fperrno1 = GetLastError();
-			if (fperrno1) {
+			if (!(fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS)) {
 				fileFail(NULL);
+				MessageBoxA(NULL, "Error 7g546.", "Unknown Error", MB_OK);
+				exit(EXIT_FAILURE);
 			}
 			CreateDirectory(xinputdir2, NULL);
+			int fperrno2 = GetLastError();
+			if (!(fperrno2 == ERROR_ALREADY_EXISTS || fperrno2 == ERROR_SUCCESS)) {
+				fileFail(NULL);
+				MessageBoxA(NULL, "Error 7g547.", "Unknown Error", MB_OK);
+				exit(EXIT_FAILURE);
+			}
 			if (FILE *file = fopen(xinputName, "r")) {
 				fclose(file);
 			}
@@ -104,6 +119,8 @@ void initPlayerNumber() {
 					FILE* file2 = fopen(xinputName, "wb");
 					if (!file2) {
 						fileFail(file2);
+						MessageBoxA(NULL, "Error bf58i.", "Unknown Error", MB_OK);
+						exit(EXIT_FAILURE);
 					}
 					char buffer[BUFSIZ];
 					size_t n;
@@ -175,6 +192,8 @@ void ReadStartupOptions() {
 	bool est_skip_intro = false;
 	bool est_disable_ingame_keyboard = false;
 	bool est_custom_resolution = false;
+	bool est_server_name = false;
+	dedi_server_name[31] = dedi_server_name[0] = 0;
 	//Hotkeys
 	bool est_hotkey_help = false;
 	bool est_hotkey_toggle_debug = false;
@@ -190,7 +209,7 @@ void ReadStartupOptions() {
 		while (fgets(string, 255, fp)) {
 			if (flagged_pos > 256) {
 				MessageBoxA(NULL, "There are too many bad lines in SETUP config!", "File config overflow!", MB_OK);
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 			if (strlen(string) < 4 || string[0] == '#' || (string[0] == '/' && string[1] == '/')) {
 				continue;
@@ -199,7 +218,7 @@ void ReadStartupOptions() {
 				int temp;
 				sscanf(string + strlen("language_code ="), "%d", &temp);
 				if (est_language_code || temp < -1 || temp > 7) {
-					flagged[flagged_pos++] = FindStartOfLine(fp, strlen(string));
+					flagged[flagged_pos++] = FindLineStart(fp, strlen(string));
 				}
 				else {
 					language_code = temp;
@@ -210,7 +229,7 @@ void ReadStartupOptions() {
 				int temp;
 				sscanf(string + strlen("skip_intro ="), "%d", &temp);
 				if (est_skip_intro || !(temp == 0 || temp == 1)) {
-					flagged[flagged_pos++] = FindStartOfLine(fp, strlen(string));
+					flagged[flagged_pos++] = FindLineStart(fp, strlen(string));
 				}
 				else {
 					skip_intro = (bool)temp;
@@ -221,7 +240,7 @@ void ReadStartupOptions() {
 				int temp;
 				sscanf(string + strlen("disable_ingame_keyboard ="), "%d", &temp);
 				if (est_disable_ingame_keyboard || !(temp == 0 || temp == 1)) {
-					flagged[flagged_pos++] = FindStartOfLine(fp, strlen(string));
+					flagged[flagged_pos++] = FindLineStart(fp, strlen(string));
 				}
 				else {
 					disable_ingame_keyboard = (bool)temp;
@@ -233,7 +252,7 @@ void ReadStartupOptions() {
 				int tempY;
 				sscanf(string + strlen("custom_resolution ="), "%dx%d", &tempX, &tempY);
 				if (est_custom_resolution || !(tempX >= 0 && tempY >= 0)) {
-					flagged[flagged_pos++] = FindStartOfLine(fp, strlen(string));
+					flagged[flagged_pos++] = FindLineStart(fp, strlen(string));
 				}
 				else {
 					custom_resolution_x = tempX;
@@ -241,11 +260,24 @@ void ReadStartupOptions() {
 					est_custom_resolution = true;
 				}
 			}
+			else if (strstr(string, "server_name =")) {
+				if (est_server_name) {
+					flagged[flagged_pos++] = FindLineStart(fp, strlen(string));
+				}
+				else {
+					char* tempName = string + strlen("server_name =");
+					while (*tempName == ' ') {
+						tempName++;
+					}
+					swprintf(dedi_server_name, 32, L"%hs", tempName);
+					est_server_name = true;
+				}
+			}
 			else if (strstr(string, "hotkey_help =")) {
 				int temp;
 				sscanf(string + strlen("hotkey_help ="), "%d", &temp);
 				if (est_hotkey_help || !(temp >= 0)) {
-					flagged[flagged_pos++] = FindStartOfLine(fp, strlen(string));
+					flagged[flagged_pos++] = FindLineStart(fp, strlen(string));
 				}
 				else {
 					hotkeyIdHelp = temp;
@@ -256,7 +288,7 @@ void ReadStartupOptions() {
 				int temp;
 				sscanf(string + strlen("hotkey_toggle_debug ="), "%d", &temp);
 				if (est_hotkey_toggle_debug || !(temp >= 0)) {
-					flagged[flagged_pos++] = FindStartOfLine(fp, strlen(string));
+					flagged[flagged_pos++] = FindLineStart(fp, strlen(string));
 				}
 				else {
 					hotkeyIdToggleDebug = temp;
@@ -267,7 +299,7 @@ void ReadStartupOptions() {
 				int temp;
 				sscanf(string + strlen("hotkey_align_window ="), "%d", &temp);
 				if (est_hotkey_align_window || !(temp >= 0)) {
-					flagged[flagged_pos++] = FindStartOfLine(fp, strlen(string));
+					flagged[flagged_pos++] = FindLineStart(fp, strlen(string));
 				}
 				else {
 					hotkeyIdAlignWindow = temp;
@@ -278,7 +310,7 @@ void ReadStartupOptions() {
 				int temp;
 				sscanf(string + strlen("hotkey_window_mode ="), "%d", &temp);
 				if (est_hotkey_window_mode || !(temp >= 0)) {
-					flagged[flagged_pos++] = FindStartOfLine(fp, strlen(string));
+					flagged[flagged_pos++] = FindLineStart(fp, strlen(string));
 				}
 				else {
 					hotkeyIdWindowMode = temp;
@@ -288,7 +320,7 @@ void ReadStartupOptions() {
 		}
 		fclose(fp);
 		fp = NULL;
-		if (!flagged_pos && !(est_language_code && est_skip_intro && est_disable_ingame_keyboard && est_custom_resolution && est_hotkey_help && est_hotkey_toggle_debug && est_hotkey_align_window && est_hotkey_window_mode)) {
+		if (!flagged_pos && !(est_language_code && est_skip_intro && est_disable_ingame_keyboard && est_custom_resolution && est_server_name && est_hotkey_help && est_hotkey_toggle_debug && est_hotkey_align_window && est_hotkey_window_mode)) {
 			flagged_pos = -2;
 		}
 	}
@@ -299,6 +331,8 @@ void ReadStartupOptions() {
 			}
 			else {
 				fileFail(fp);
+				MessageBoxA(NULL, "Error 78t6.", "Unknown Error", MB_OK);
+				exit(EXIT_FAILURE);
 			}
 		}
 		if (fp = _wfopen(fileStartupini, L"r+")) {
@@ -326,6 +360,10 @@ void ReadStartupOptions() {
 				fputs("\n# <width>x<height> - Sets the resolution of the game via the Windows Registry.", fp);
 				fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fp);
 				fputs("\n\n", fp);
+				fputs("# server_name Options (Server):", fp);
+				fputs("\n# Sets the name of the server up to 31 characters long.", fp);
+				fputs("\n# Leave blank/empty for no effect.", fp);
+				fputs("\n\n", fp);
 				fputs("# hotkey_... Options (Client):", fp);
 				fputs("\n# The number used is the keyboard Virtual-Key (VK) Code in base-10 integer form.", fp);
 				fputs("\n# The codes in hexadecimal (base-16) form can be found here:", fp);
@@ -352,6 +390,9 @@ void ReadStartupOptions() {
 			}
 			if (!est_custom_resolution) {
 				fputs("\ncustom_resolution = 0x0", fp);
+			}
+			if (!est_server_name) {
+				fputs("\nserver_name = ", fp);
 			}
 			if (!est_hotkey_help) {
 				char hotkeyText[60];
@@ -381,6 +422,8 @@ void ReadStartupOptions() {
 		}
 		else {
 			fileFail(fp);
+			MessageBoxA(NULL, "Error bn689.", "Unknown Error", MB_OK);
+			exit(EXIT_FAILURE);
 		}
 	}
 	char NotificationPlayerText[255];
@@ -414,6 +457,42 @@ LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
 	return nError;
 }
 
+typedef int(__cdecl *thookServ1)(HKEY, LPCWSTR);
+thookServ1 phookServ1;
+int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
+	char result =
+		phookServ1(hKey, lpSubKey);
+	if (wcslen(dedi_server_name) > 0) {
+		wchar_t* PreLoadServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x3B49B4);
+		swprintf(PreLoadServerName, 15, dedi_server_name);
+		//char temp[27];
+		//snprintf(temp, 27, "%ws", dedi_server_name);
+		//MessageBoxA(NULL, temp, "Server Pre name thingy", MB_OK);
+		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
+		swprintf(LanServerName, 2, L"");
+	}
+	extern void initGSRunLoop();
+	initGSRunLoop();
+	return result;
+}
+
+typedef int(__stdcall *thookServ2)();
+thookServ2 phookServ2;
+int __stdcall PreReadyLoad() {
+	MessageBoxA(NULL, "aaaaaaas", "PreCrash", MB_OK);
+	int result =
+		phookServ2();
+	MessageBoxA(NULL, "aaaaaaasaaaaaa", "PostCrash", MB_OK);
+	if (wcslen(dedi_server_name) > 0) {
+		wchar_t* PreLoadServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
+		swprintf(PreLoadServerName, 32, dedi_server_name);
+		char temp[27];
+		snprintf(temp, 32, "%ws", dedi_server_name);
+		MessageBoxA(NULL, temp, "AAA Server Pre name thingy", MB_OK);
+	}
+	return result;
+}
+
 void ProcessH2Startup() {
 	initDebugText();
 	//halo2ThreadID = GetCurrentThreadId();
@@ -432,7 +511,22 @@ void ProcessH2Startup() {
 	initPlayerNumber();
 	ReadStartupOptions();
 
-	if (!H2IsDediServer) {
+	if (H2IsDediServer) {
+		DWORD dwBack;
+
+		phookServ1 = (thookServ1)DetourFunc((BYTE*)H2BaseAddr + 0x8EFA, (BYTE*)LoadRegistrySettings, 11);
+		VirtualProtect(phookServ1, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		//phookServ2 = (thookServ2)DetourFunc((BYTE*)H2BaseAddr + 0xBA3C, (BYTE*)PreReadyLoad, 11);
+		//VirtualProtect(phookServ2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	}
+	else {//is client
+
+		//TODO: WIP
+		extern void GSMenuSetupHooks();
+		GSMenuSetupHooks();
+
+
 		DWORD tempResX = 0;
 		DWORD tempResY = 0;
 
@@ -467,6 +561,8 @@ void ProcessH2Startup() {
 			BYTE assmLang[15];
 			memset(assmLang, language_code, 15);
 			OverwriteAssembly((BYTE*)H2BaseAddr + 0x38300, assmLang, 15);
+			BYTE* HasLoadedLanguage = (BYTE*)((char*)H2BaseAddr + 0x481908);
+			*HasLoadedLanguage = 0;
 		}
 
 		if (skip_intro) {

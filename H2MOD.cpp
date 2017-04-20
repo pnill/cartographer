@@ -1166,73 +1166,6 @@ void* __stdcall OnWgitLoad(void* thisptr, int a2, int a3, int a4, unsigned short
 	return thisptr;
 }
 
-extern DWORD H2BaseAddr;
-extern bool IsCustomMenu;
-
-typedef int(__stdcall *thook_menu_brightness_ui_setup)(int thisptr, int a2);
-thook_menu_brightness_ui_setup phook_menu_brightness_ui_setup;
-int __stdcall HookBrightnessMenuUISetup(int thisptr, int a2) {//__thiscall
-
-	IsCustomMenu = false;
-
-	int result = phook_menu_brightness_ui_setup(thisptr, a2);
-
-	//not even that works...
-	//int(__thiscall* sub_5F0DD8)(int thisptr, int a2, int a3);
-	//sub_5F0DD8 = (int(__thiscall*)(int, int, int))((char*)MemAddrBase + 0x250DD8);
-	//*((DWORD*)thisptr + 182) = (DWORD)sub_5F0DD8g;//CUSTOMFUNC MODIFIED
-
-	return result;
-}
-
-typedef int(__stdcall *thook_menu_brightness_submit)(int thisptr, int a2, int a3);
-thook_menu_brightness_submit phook_menu_brightness_submit;
-int __stdcall HookMenuBrightnessSubmitCall(int thisptr, int a2, int a3) {
-	//*(int*)a3 = 0;
-	void* p1 = (void*)thisptr;
-	void* p2 = (void*)a2;
-	void* p3 = (void*)a3;
-
-	//extern int sub_5F0DD8(int thisptr, int a2, int a3);
-	//return sub_5F0DD8(thisptr, a2, a3);
-
-	if (!IsCustomMenu) {
-		a3 = *(DWORD*)a3 & 0xFFFF;
-		signed int(__cdecl* sub_603D0E)(signed int* a1);
-		sub_603D0E = (signed int(__cdecl*)(signed int*))((char*)H2BaseAddr + 0x263D0E);
-		sub_603D0E(&a3);
-	}
-	else {
-		return -1;//makes button press do nothing. stays at menu.
-	}
-
-	int v3 = thisptr;
-
-	int v4 = (*(int(__cdecl**)(int))(*(DWORD*)v3 + 56))(v3);//__thiscall
-	int v5 = (*(int(__cdecl**)(int))(*(DWORD*)v3 + 52))(v3);//__thiscall
-
-	int(__cdecl* sub_5A96DA)(int a1, int a2);
-	sub_5A96DA = (int(__cdecl*)(int, int))((char*)H2BaseAddr + 0x2096DA);
-	return sub_5A96DA(v5, v4);
-
-	//int rtnval = phookmenu1(thisptr, a2, a3);
-	//return rtnval;*/
-}
-
-/*typedef void*(__stdcall *tload_main_menu_six_opt)(void* thisptr, int a2, int a3, int a4);
-tload_main_menu_six_opt pload_main_menu_six_opt;
-bool once3 = false;
-void* __stdcall LoadMainMenuSixOpt(void* thisptr, int a2, int a3, int a4) {
-	if (!once3) {
-		once3 = true;
-		extern void H2CodezInitialize();
-		H2CodezInitialize();
-	}
-	//void* thisptr = 
-	pload_main_menu_six_opt(thisptr, a2, a3, a4);
-	return thisptr;
-}*/
-
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1240,15 +1173,6 @@ void H2MOD::ApplyHooks() {
 		TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
 		DWORD dwBack;
-
-		//pload_main_menu_six_opt = (tload_main_menu_six_opt)DetourClassFunc((BYTE*)this->GetBase() + 0xB6CA, (BYTE*)LoadMainMenuSixOpt, 13);
-		//VirtualProtect(pload_main_menu_six_opt, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		phook_menu_brightness_ui_setup = (thook_menu_brightness_ui_setup)DetourClassFunc((BYTE*)this->GetBase() + 0x250E22, (BYTE*)HookBrightnessMenuUISetup, 13);
-		VirtualProtect(phook_menu_brightness_ui_setup, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		phook_menu_brightness_submit = (thook_menu_brightness_submit)DetourClassFunc((BYTE*)this->GetBase() + 0x250DD8, (BYTE*)HookMenuBrightnessSubmitCall, 9);
-		VirtualProtect(phook_menu_brightness_submit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
 		VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);

@@ -30,7 +30,7 @@ void HexToByteArray(BYTE* byteArray, char* pointerHex) {
 	}
 }
 
-int FindStartOfLine(FILE* fp, int lineStrLen) {
+int FindLineStart(FILE* fp, int lineStrLen) {
 	int fp_offset_orig = ftell(fp);
 	for (int i = lineStrLen; i < 255; i++) {
 		if (fp_offset_orig - i < 0) {
