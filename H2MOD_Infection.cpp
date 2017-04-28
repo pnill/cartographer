@@ -17,8 +17,9 @@ void Infection::FindZombie()
 
 	if (!h2mod->Server)
 	{
-		zombie = rand() % (h2mod->NetworkPlayers.size() + 1);
-		zombie = rand() % (h2mod->NetworkPlayers.size() + 1);
+		int genrand = rand();
+		int sizeofgroup = h2mod->NetworkPlayers.size();
+		zombie = genrand % (sizeofgroup + 1);
 
 		InfectionPlayer *Local = new InfectionPlayer;
 		wcscpy(&Local->PlayerName[0], h2mod->get_local_player_name());
@@ -40,19 +41,18 @@ void Infection::FindZombie()
 		{
 			TRACE_GAME("[H2Mod-Infection] - Local host is a human!");
 			Local->infected = false;
-			infected_players[Local] = true;
+			infected_players[Local] = false;
 
 			h2mod->set_local_team_index(0);
 		}
 
-
 	}
-
-	int i = 0;
+	
 	if (h2mod->NetworkPlayers.size() > 0)
 	{
-		zombie = rand() % (h2mod->NetworkPlayers.size());
-		zombie = rand() % (h2mod->NetworkPlayers.size());
+		zombie--;
+		//zombie = rand() % (h2mod->NetworkPlayers.size());
+		int i = 0;
 		for (auto it = h2mod->NetworkPlayers.begin(); it != h2mod->NetworkPlayers.end(); ++it)
 		{
 			InfectionPlayer *nPlayer = new InfectionPlayer;
@@ -87,7 +87,7 @@ void Infection::FindZombie()
 				TRACE_GAME("[H2Mod-Infection] %ws is a human!", it->first->PlayerName);
 
 				nPlayer->infected = false;
-				infected_players[nPlayer] = true;
+				infected_players[nPlayer] = false;
 			}
 
 			i++;
@@ -119,6 +119,8 @@ void Infection::Initialize()
 		TRACE_GAME("[H2Mod-Infection] - Initializing!");
 		TRACE_GAME("[H2Mod-Infection] - this->infected_players.size(): %i", this->infected_players.size());
 
+		h2mod->set_unit_speed_patch(true);
+
 		if (this->infected_players.size() > 0)
 		{
 			for (auto it = this->infected_players.begin(); it != this->infected_players.end(); ++it)
@@ -132,6 +134,16 @@ void Infection::Initialize()
 		this->FindZombie();
 	}
 
+}
+
+void Infection::Deinitialize()
+{
+	if (isHost)
+	{
+		TRACE_GAME("[H2Mod-Infection] - Deinitializing!");
+
+		h2mod->set_unit_speed_patch(false);
+	}
 }
 
 void Infection::PreSpawn(int PlayerIndex)
@@ -214,6 +226,7 @@ void Infection::SpawnPlayer(int PlayerIndex)
 			if (h2mod->get_unit_team_index(unit_datum_index) == 0)
 			{
 				h2mod->set_unit_biped(BipedType::MasterChief, PlayerIndex);
+				h2mod->set_unit_speed(1.0f, PlayerIndex);
 				GivePlayerWeapon(PlayerIndex, Weapon::shotgun, 1);
 				GivePlayerWeapon(PlayerIndex, Weapon::magnum, 0);
 			}
@@ -221,6 +234,7 @@ void Infection::SpawnPlayer(int PlayerIndex)
 			if (h2mod->get_unit_team_index(unit_datum_index) == 3)
 			{
 				h2mod->set_unit_biped(BipedType::Elite, PlayerIndex);
+				h2mod->set_unit_speed(1.3f, PlayerIndex);
 				GivePlayerWeapon(PlayerIndex, Weapon::energy_blade, 1);
 			}
 		}

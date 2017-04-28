@@ -331,17 +331,17 @@ int WINAPI XLiveRender()
 	{	
 		if (pDevice->TestCooperativeLevel() == D3D_OK)
 		{
-			if (MasterState != 4) {
+			if (MasterState != 11)
 				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
-				if (MasterState == 0)
-					drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
-				else if (MasterState == 1)
-					drawText(0, 15, COLOR_GREY, ServerStatus, smallFont);
-				else if (MasterState == 2)
-					drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
-				else if (MasterState == 3)
-					drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
-			}
+			if (MasterState == 0)
+				drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
+			else if (MasterState == 1)
+				drawText(0, 15, COLOR_GREY, ServerStatus, smallFont);
+			else if (MasterState == 2)
+				drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
+			else if (MasterState == 10)
+				drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
+			
 
 			if (overrideUnicodeMessage) {
 				drawText(0, 30, COLOR_GOLD, mapManager->getCustomLobbyMessage(), normalSizeFont);
@@ -351,9 +351,9 @@ int WINAPI XLiveRender()
 		D3DVIEWPORT9 pViewport;
 		pDevice->GetViewport(&pViewport);
 		//pViewport
-		//char textttt[255];
-		//sprintf(textttt, "x:%d, y:%d", pViewport.Width, pViewport.Height);
-		//drawText(100, 50, COLOR_WHITE, textttt, smallFont);
+		/*char textttt[255];
+		sprintf(textttt, "x:%d, y:%d", pViewport.Width, pViewport.Height);
+		drawText(100, 50, COLOR_WHITE, textttt, smallFont);*/
 
 		D3DDEVICE_CREATION_PARAMETERS cparams;
 		pDevice->GetCreationParameters(&cparams);
@@ -367,15 +367,15 @@ int WINAPI XLiveRender()
 		int monitor_width = info.rcMonitor.right - info.rcMonitor.left;
 		int monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;*/
 
-		//char texttttt[255];
-		//sprintf(texttttt, "x:%ld, y:%ld, ox:%ld, oy:%ld", info.rcMonitor.left, info.rcMonitor.top, gameWindowRect.left, gameWindowRect.top);
-		//drawText(100, 65, COLOR_WHITE, texttttt, smallFont);
-
 		RECT gameWindowInnerRect;
 		GetClientRect(cparams.hFocusWindow, &gameWindowInnerRect);
 
 		int gameWindowWidth = gameWindowRect.right - gameWindowRect.left - GetSystemMetrics(SM_CXSIZEFRAME);
 		int gameWindowHeight = gameWindowRect.bottom - gameWindowRect.top;
+
+		//char texttttt[255];
+		//sprintf(texttttt, "x:%ld, y:%ld, ox:%ld, oy:%ld", gameWindowWidth, gameWindowHeight, pViewport.Width, pViewport.Height);
+		//drawText(100, 65, COLOR_WHITE, texttttt, smallFont);
 
 		/*POINT point;
 		GetCursorPos(&point);

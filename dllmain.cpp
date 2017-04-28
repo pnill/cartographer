@@ -494,6 +494,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 	{
 	case DLL_PROCESS_ATTACH:
 		hThis = hModule;
+		srand((unsigned int)time(NULL));
 		ProcessH2Startup();
 		//system("update.bat"); // fucking broken h2online.exe -_- This will update that...
 		Detour();

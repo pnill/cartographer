@@ -14,6 +14,7 @@
 #include <thread>
 #include "Globals.h"
 #include "H2OnscreenDebugLog.h"
+#include "GSUtils.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
@@ -628,10 +629,26 @@ void H2MOD::set_unit_team_index(int unit_datum_index, BYTE team)
 	}
 }
 
-void H2MOD::set_unit_biped(BYTE biped,int pIndex)
+void H2MOD::set_unit_biped(BYTE biped, int pIndex)
 {
-	if (pIndex < 17)
+	if (pIndex >= 0 && pIndex < 16)
 		*(BYTE*)(((char*)0x30002BA0 + (pIndex * 0x204))) = biped;
+}
+
+void H2MOD::set_unit_speed_patch(bool hackit) {
+	//TODO: create a way to undo the patch in the case when more than just infection relies on this.
+	//Enable Speed Hacks
+	BYTE assmPatchSpeed[8];
+	memset(assmPatchSpeed, 0x90, 8);
+	OverwriteAssembly((BYTE*)h2mod->GetBase() + 0x6AB7f, assmPatchSpeed, 8);
+	//dedi server
+	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x6A3BA, assmPatchSpeed, 8);
+}
+
+void H2MOD::set_unit_speed(float speed, int pIndex)
+{
+	if (pIndex >= 0 && pIndex < 16)
+		*(float*)(((char*)0x30002C9C + (pIndex * 0x204))) = speed;
 }
 
 void H2MOD::set_local_team_index(BYTE team)
@@ -836,6 +853,15 @@ int __cdecl OnMapLoad(int a1)
 		return pmap_initialize(a1);
 	}
 
+	BYTE* GameState = (BYTE*)(((char*)h2mod->GetBase()) + 0x420FC4);
+
+	if (*GameState == 3) {//ingame
+		MasterState = 11;
+	}
+	else {
+		MasterState = 10;
+	}
+
 	b_Infection = false;
 	b_GunGame = false;
 	b_Halo2Final = false;
@@ -865,13 +891,19 @@ int __cdecl OnMapLoad(int a1)
 			b_Halo2Final = true;
 		}
 	}
-	
+
 /*
 #pragma region COOP FIXES
 	bcoop = false;
 	
 	DWORD game_globals = *(DWORD*)(((char*)h2mod->GetBase()) + 0x482D3C);
 	BYTE* engine_mode = (BYTE*)(game_globals + 8);
+
+	BYTE main_menu[60] = { 0x73, 0x00, 0x63, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x61, 0x00, 0x72,
+	0x00, 0x69, 0x00, 0x6F, 0x00, 0x73, 0x00, 0x5C, 0x00, 0x75, 0x00, 0x69, 0x00,
+	0x5C, 0x00, 0x6D, 0x00, 0x61, 0x00, 0x69, 0x00, 0x6E, 0x00, 0x6D, 0x00, 0x65,
+	0x00, 0x6E, 0x00, 0x75, 0x00, 0x5C, 0x00, 0x6D, 0x00, 0x61, 0x00, 0x69, 0x00,
+	0x6E, 0x00, 0x6D, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x75, 0x00 };
 
 	BYTE quarntine_zone[86] = { 0x73, 0x00, 0x63, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x61, 0x00, 0x72, 
 								0x00, 0x69, 0x00, 0x6F, 0x00, 0x73, 0x00, 0x5C, 0x00, 0x6D, 0x00, 
@@ -882,18 +914,11 @@ int __cdecl OnMapLoad(int a1)
 								0x5F, 0x00, 0x66, 0x00, 0x6C, 0x00, 0x6F, 0x00, 0x6F, 0x00, 0x64, 
 								0x00, 0x7A, 0x00, 0x6F, 0x00, 0x6E, 0x00, 0x65, 0x00 };
 
-	BYTE main_menu[60] = { 0x73, 0x00, 0x63, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x61, 0x00, 0x72, 
-						   0x00, 0x69, 0x00, 0x6F, 0x00, 0x73, 0x00, 0x5C, 0x00, 0x75, 0x00, 0x69, 0x00, 
-						   0x5C, 0x00, 0x6D, 0x00, 0x61, 0x00, 0x69, 0x00, 0x6E, 0x00, 0x6D, 0x00, 0x65, 
-						   0x00, 0x6E, 0x00, 0x75, 0x00, 0x5C, 0x00, 0x6D, 0x00, 0x61, 0x00, 0x69, 0x00, 
-						   0x6E, 0x00, 0x6D, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x75, 0x00 };
-
 	if (!memcmp(main_menu, (BYTE*)0x300017E0, 60))
 	{
 		DWORD game_globals = *(DWORD*)(((char*)h2mod->GetBase()) + 0x482D3C);
 		BYTE* garbage_collect = (BYTE*)(game_globals + 0xC);
 		*(garbage_collect) = 1;
-		MasterState = 5;
 
 		//Crashfix
 		*(int*)(h2mod->GetBase() + 0x464940) = 0;
@@ -903,7 +928,7 @@ int __cdecl OnMapLoad(int a1)
 	}
 	else 
 	{
-		MasterState = 4;
+		
 	}
 
 	if (!memcmp(quarntine_zone, (BYTE*)0x300017E0, 86) && *(engine_mode) == 2 ) // check the map and if we're loading a multiplayer game (We don't want to fuck up normal campaign)
@@ -936,7 +961,7 @@ int __cdecl OnMapLoad(int a1)
 	int ret = pmap_initialize(a1);
 
 
-	if (MasterState == 4)
+	if (MasterState == 11)
 	{
 		#pragma region Infection
 		if(b_Infection)
@@ -1624,6 +1649,10 @@ void H2MOD::Initialize()
 
 	//Network::Initialize();
 	h2mod->ApplyHooks();
+}
+
+void H2MOD::Deinitialize() {
+
 }
 
 DWORD H2MOD::GetBase()
