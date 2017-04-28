@@ -633,5 +633,6 @@ void ProcessH2Startup() {
 	}
 
 	addDebugText("ProcessStartup finished.");
+	extern void GSSecStartLoop();
 	GSSecStartLoop();
 }
