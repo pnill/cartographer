@@ -4,6 +4,7 @@
 #include "GSRunLoop.h"
 #include <Shellapi.h>
 #include "Hook.h"
+#include "GSSecurity.h"
 
 int language_code = -1;
 bool skip_intro = false;
@@ -632,6 +633,5 @@ void ProcessH2Startup() {
 	}
 
 	addDebugText("ProcessStartup finished.");
-	extern void GSSecStartLoop();
 	GSSecStartLoop();
 }

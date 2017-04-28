@@ -167,7 +167,6 @@
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="GSMenu.cpp" />
     <ClCompile Include="GSRunLoop.cpp" />
-    <ClCompile Include="GSSecurity.cpp" />
     <ClCompile Include="GSUtils.cpp" />
     <ClCompile Include="GUI.cpp" />
     <ClCompile Include="H2ChatBoxCommands.cpp" />
@@ -177,7 +176,6 @@
     <ClCompile Include="H2MOD_Halo2Final.cpp" />
     <ClCompile Include="H2MOD_MapManager.cpp" />
     <ClCompile Include="H2OnscreenDebugLog.cpp" />
-    <ClCompile Include="H2PlayerTable.cpp" />
     <ClCompile Include="H2Startup.cpp" />
     <ClCompile Include="Hook.cpp" />
     <ClCompile Include="Network.cpp" />
