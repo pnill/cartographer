@@ -165,6 +165,10 @@
     </ClCompile>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="GSMenu.cpp" />
+    <ClCompile Include="GSRunLoop.cpp" />
+    <ClCompile Include="GSSecurity.cpp" />
+    <ClCompile Include="GSUtils.cpp" />
     <ClCompile Include="GUI.cpp" />
     <ClCompile Include="H2ChatBoxCommands.cpp" />
     <ClCompile Include="H2MOD.cpp" />
@@ -172,6 +176,9 @@
     <ClCompile Include="H2MOD_GunGame.cpp" />
     <ClCompile Include="H2MOD_Halo2Final.cpp" />
     <ClCompile Include="H2MOD_MapManager.cpp" />
+    <ClCompile Include="H2OnscreenDebugLog.cpp" />
+    <ClCompile Include="H2PlayerTable.cpp" />
+    <ClCompile Include="H2Startup.cpp" />
     <ClCompile Include="Hook.cpp" />
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="packet.pb.cc" />
@@ -184,6 +191,10 @@
     <ClInclude Include="CUser.h" />
     <ClInclude Include="Detour.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="GSMenu.h" />
+    <ClInclude Include="GSRunLoop.h" />
+    <ClInclude Include="GSSecurity.h" />
+    <ClInclude Include="GSUtils.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="H2ChatBoxCommands.h" />
     <ClInclude Include="H2MOD.h" />
@@ -193,6 +204,8 @@
     <ClInclude Include="H2MOD_Infection.h" />
     <ClInclude Include="H2MOD_MapManager.h" />
     <ClInclude Include="H2MOD_Sounds.h" />
+    <ClInclude Include="H2OnscreenDebugLog.h" />
+    <ClInclude Include="H2Startup.h" />
     <ClInclude Include="Hook.h" />
     <ClInclude Include="Network.h" />
     <ClInclude Include="packet.pb.h" />
