@@ -371,13 +371,16 @@ bool MapManager::downloadFromHost() {
 
 			FILE* file;
 			try {
-				file = fopen(mapPath.c_str(), fileReadMode.c_str());
-				fwrite(map, sizeof(char), fileSize, file);
-				//should delete file pointer above
-				fclose(file);
-				delete[] map;
-				map = NULL;
-				this->setCustomLobbyMessage(MAP_WRITTEN_TO_DISK.c_str());
+				if (mapName != mapExt) {
+					//as long as mapName doesn't equal .map, we should be good
+					file = fopen(mapPath.c_str(), fileReadMode.c_str());
+					fwrite(map, sizeof(char), fileSize, file);
+					//should delete file pointer above
+					fclose(file);
+					delete[] map;
+					map = NULL;
+					this->setCustomLobbyMessage(MAP_WRITTEN_TO_DISK.c_str());
+				}
 			}
 			catch (std::exception const& e) {
 				if (g_debug)
@@ -659,6 +662,8 @@ void MapManager::TcpServer::startListening() {
 
 			if (wcscmp(currentMapName, mapName) == 0) {
 				wchar_t* mapPath = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + ((i * 0xB90) + 0x960)));
+				if (g_debug)
+					TRACE_GAME("CurrentMapPath = %s", mapPath);
 				mapManager->customMapFileName = std::wstring(mapPath);
 				break;
 			}
