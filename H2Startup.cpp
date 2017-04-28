@@ -75,7 +75,7 @@ void initPlayerNumber() {
 			HexToByteArray(byteArray, pointerHex);
 
 			char totext[255];
-			sprintf(totext, "injecting new xinputdll push instruction: %ls : %x : %x %x %x %x", (DWORD)xinputdllPath, (DWORD)xinputdllPath, byteArray[3], byteArray[2], byteArray[1], byteArray[0]);
+			sprintf(totext, "injecting new xinputdll path instruction: %ls : %x : %x %x %x %x", (DWORD)xinputdllPath, (DWORD)xinputdllPath, byteArray[3], byteArray[2], byteArray[1], byteArray[0]);
 			addDebugText(totext);
 
 			BYTE assmXinputPushIntructionPart[] = { byteArray[3], byteArray[2], byteArray[1], byteArray[0] };
@@ -105,13 +105,32 @@ void initPlayerNumber() {
 				fclose(file);
 			}
 			else {
-				char durazno_xinput_md5[] = "6140ae76b26a633ce2255f6fc88fbe34";
+				int xinput_index = -1;
+				char xinput_md5_durazno_0_6_0_0[] = "6140ae76b26a633ce2255f6fc88fbe34";
+				long xinput_offset_durazno_0_6_0_0 = 0x196de;
+				bool xinput_unicode_durazno_0_6_0_0 = true;
+				char xinput_md5_x360ce_3_3_1_444[] = "8f24e36d5f0a71c8a412cec6323cd781";
+				long xinput_offset_x360ce_3_3_1_444 = 0x1ea54;
+				bool xinput_unicode_x360ce_3_3_1_444 = true;
+				char xinput_md5_x360ce_3_4_1_1357[] = "5236623449893c0e1e98fc95f067fcff";
+				long xinput_offset_x360ce_3_4_1_1357 = 0x16110;
+				bool xinput_unicode_x360ce_3_4_1_1357 = false;
+				const int xinput_array_length = 3;
+				char* xinput_md5[xinput_array_length] = { xinput_md5_durazno_0_6_0_0, xinput_md5_x360ce_3_3_1_444, xinput_md5_x360ce_3_4_1_1357 };
+				long xinput_offset[xinput_array_length] = { xinput_offset_durazno_0_6_0_0, xinput_offset_x360ce_3_3_1_444, xinput_offset_x360ce_3_4_1_1357 };
+				bool xinput_unicode[xinput_array_length] = { xinput_unicode_durazno_0_6_0_0, xinput_unicode_x360ce_3_3_1_444, xinput_unicode_x360ce_3_4_1_1357 };
 				char available_xinput_md5[33];
 				int hasherr = ComputeFileMd5Hash(L"xinput9_1_0.dll", available_xinput_md5);
 				FILE* file1 = NULL;
 				if (hasherr == 0 && (file1 = fopen("xinput9_1_0.dll", "rb"))) {
-					if (strcmp(durazno_xinput_md5, available_xinput_md5)) {
-						char xinputError[] = "ERROR! xinput9_1_0.dll does not match the supported version required in the local game directory!\nFor \'Split-screen\' play, the Durazno Xinput v0.6 DLL is required.";
+					for (int i = 0; i < xinput_array_length; i++) {
+						if (strcmp(xinput_md5[i], available_xinput_md5) == 0) {
+							xinput_index = i;
+							break;
+						}
+					}
+					if (xinput_index < 0) {
+						char xinputError[] = "ERROR! For \'Split-screen\' play, a supported xinput9_1_0.dll is required to be installed in the local game directory!\nOr you may install a custom one manually in the xinput/p??/ folders.";
 						addDebugText(xinputError);
 						MessageBoxA(NULL, xinputError, "Incorrect DLL Error", MB_OK);
 						exit(EXIT_FAILURE);
@@ -137,8 +156,13 @@ void initPlayerNumber() {
 					fclose(file2);
 
 					FILE* file3 = fopen(xinputName, "r+b");
-					BYTE assmXinputDuraznoNameEdit[] = { 0x30 + (getPlayerNumber() / 10), 0x00, 0x30 + (getPlayerNumber() % 10) };
-					if (fseek(file3, 0x196DE, SEEK_SET) == 0 && fwrite(assmXinputDuraznoNameEdit, sizeof(BYTE), 3, file3) == 3) {
+					int len_to_write = 2;
+					BYTE assmXinputDuraznoNameEdit[] = { 0x30 + (getPlayerNumber() / 10), 0x30 + (getPlayerNumber() % 10), 0x30 + (getPlayerNumber() % 10) };
+					if (xinput_unicode[xinput_index]) {
+						assmXinputDuraznoNameEdit[1] = 0x00;
+						len_to_write = 3;
+					}
+					if (fseek(file3, xinput_offset[xinput_index], SEEK_SET) == 0 && fwrite(assmXinputDuraznoNameEdit, sizeof(BYTE), len_to_write, file3) == len_to_write) {
 						addDebugText("Successfully copied and patched original xinput9_1_0.dll");
 					}
 					else {
@@ -153,7 +177,7 @@ void initPlayerNumber() {
 					fclose(file3);
 				}
 				else if (hasherr == -1 || !file1) {
-					char xinputError[] = "ERROR! xinput9_1_0.dll does not exist in the local game directory!\nFor \'Split-screen\' play, the Durazno Xinput v0.6 DLL is required.";
+					char xinputError[] = "ERROR! An xinput9_1_0.dll does not exist in the local game directory!\nFor \'Split-screen\' play, any supported .dll is required.";
 					addDebugText(xinputError);
 					MessageBoxA(NULL, xinputError, "DLL Missing Error", MB_OK);
 					exit(EXIT_FAILURE);
@@ -320,7 +344,7 @@ void ReadStartupOptions() {
 		}
 		fclose(fp);
 		fp = NULL;
-		if (!flagged_pos && !(est_language_code && est_skip_intro && est_disable_ingame_keyboard && est_custom_resolution && est_server_name && est_hotkey_help && est_hotkey_toggle_debug && est_hotkey_align_window && est_hotkey_window_mode)) {
+		if (!flagged_pos && !(est_language_code && est_skip_intro && est_disable_ingame_keyboard /*&& est_custom_resolution*/ && est_server_name && est_hotkey_help && est_hotkey_toggle_debug && est_hotkey_align_window && est_hotkey_window_mode)) {
 			flagged_pos = -2;
 		}
 	}
@@ -356,10 +380,10 @@ void ReadStartupOptions() {
 				fputs("\n# 0 - Normal Game Controls", fp);
 				fputs("\n# 1 - Disables ONLY Keyboard when in-game & allows controllers when game is not in focus", fp);
 				fputs("\n\n", fp);
-				fputs("# custom_resolution Options (Client):", fp);
-				fputs("\n# <width>x<height> - Sets the resolution of the game via the Windows Registry.", fp);
-				fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fp);
-				fputs("\n\n", fp);
+				//fputs("# custom_resolution Options (Client):", fp);
+				//fputs("\n# <width>x<height> - Sets the resolution of the game via the Windows Registry.", fp);
+				//fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fp);
+				//fputs("\n\n", fp);
 				fputs("# server_name Options (Server):", fp);
 				fputs("\n# Sets the name of the server up to 31 characters long.", fp);
 				fputs("\n# Leave blank/empty for no effect.", fp);
@@ -388,9 +412,9 @@ void ReadStartupOptions() {
 				sprintf(disable_ingame_keyboard_entry, "\ndisable_ingame_keyboard = %d", (bool)(getPlayerNumber() - 1));
 				fputs(disable_ingame_keyboard_entry, fp);
 			}
-			if (!est_custom_resolution) {
-				fputs("\ncustom_resolution = 0x0", fp);
-			}
+			//if (!est_custom_resolution) {
+			//	fputs("\ncustom_resolution = 0x0", fp);
+			//}
 			if (!est_server_name) {
 				fputs("\nserver_name = ", fp);
 			}
@@ -522,11 +546,7 @@ void ProcessH2Startup() {
 	}
 	else {//is client
 
-		//TODO: WIP
-		extern void GSMenuSetupHooks();
-		GSMenuSetupHooks();
-
-
+		//Scrapped for now, maybe.
 		DWORD tempResX = 0;
 		DWORD tempResY = 0;
 
@@ -603,7 +623,15 @@ void ProcessH2Startup() {
 			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2FA67, disableKeyboard3, 6);
 		}
 
+		//Enable SP mode chat.
+		BYTE assmEnableSPModeChat1[] = { 0xE6, 0x31 };
+		OverwriteAssembly((BYTE*)H2BaseAddr + 0x226629, assmEnableSPModeChat1, 2);
+		BYTE assmEnableSPModeChat2[] = { 0x93 };
+		OverwriteAssembly((BYTE*)H2BaseAddr + 0x22667C, assmEnableSPModeChat2, 1);
+
 	}
 
 	addDebugText("ProcessStartup finished.");
+	extern void GSSecStartLoop();
+	GSSecStartLoop();
 }

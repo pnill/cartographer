@@ -33,3 +33,4 @@ xliveless.aps
 /Release
 /Debug
 *.db
+/GSSecurity.cpp

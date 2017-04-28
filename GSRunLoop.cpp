@@ -7,6 +7,7 @@
 #include <d3d9.h>
 #include <fstream>
 #include "H2MOD.h"
+#include <winsock.h>
 extern LPDIRECT3DDEVICE9 pDevice;
 
 bool QuitGSMainLoop = false;
@@ -213,14 +214,19 @@ void hotkeyFuncTest() {
 	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x24925C);//Game Brightness MM
 	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x258C8C);//Game Brightness ingame
 
-	int* MenuID = (int*)((char*)H2BaseAddr + 0x9758D8);
+	/*int* MenuID = (int*)((char*)H2BaseAddr + 0x9758D8);
 
 	if (*MenuID != 272) {
 		int WgitScreenfunctionPtr = (int)(MenuGameBrightnessIngame);
 		CallWgit(WgitScreenfunctionPtr);
-	}
+	}*/
 
 	//ui_priority += 1;
+
+
+	/*char(*PlayerEffects)();
+	PlayerEffects = (char(*)(void))((char*)H2BaseAddr + 0xA3E39);
+	PlayerEffects();*/
 
 }
 
@@ -235,64 +241,8 @@ void hotkeyFuncTest2() {
 	//int WgitScreenfunctionPtr = (int)(MenuGameResolutionMM);
 	//CallWgit(WgitScreenfunctionPtr);
 
-	/*BYTE assmSpeedPatch[8];
-	memset(assmSpeedPatch, 0, 8);
-	OverwriteAssembly((BYTE*)H2BaseAddr + 0x6AB7f, assmSpeedPatch, 8);
-	*/
-
-	/*
-	//Enable Skulls in MP
-	BYTE assmEnableMPSkulls[] = { 0x90, 0x90 };
-	OverwriteAssembly((BYTE*)H2BaseAddr + 0xBD125, assmEnableMPSkulls, 2);
-
-	int* SkullGruntBDay = (int*)((char*)H2BaseAddr + 0x4D8321);
-	*SkullGruntBDay = 1;
-
-
-	//Enable Grenade Chain Reactions in MP
-	BYTE assmEnableGrenadeChainReact[] = { 0x90, 0x90 };
-	OverwriteAssembly((BYTE*)H2BaseAddr + 0x182D74, assmEnableGrenadeChainReact, 2);
-
-	BYTE assmEnableMPBansheeBomb[] = { 0x09 };
-	OverwriteAssembly((BYTE*)H2BaseAddr + 0x92C06, assmEnableMPBansheeBomb, 1);
-	*/
-
-	//Change Language Without Restart (non-native characters will not display).
-	BYTE assmLang[15];
-	memset(assmLang, 1, 15);
-	OverwriteAssembly((BYTE*)H2BaseAddr + 0x38300, assmLang, 15);
-	BYTE* HasLoadedLanguage = (BYTE*)((char*)H2BaseAddr + 0x481908);
-	*HasLoadedLanguage = 0;
-	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + 0x482D3C);
-	BYTE* EngineMode = (BYTE*)(GameGlobals + 0x8);
-	*EngineMode = 1;
-	BYTE* QuitLevel = (BYTE*)((char*)H2BaseAddr + 0x482251);
-	*QuitLevel = 1;
-
-
-	//Zanzibar Wheel
-	//int bbase = (int)*(int*)((char*)H2BaseAddr + 0x479E70);
-	//*(float*)(bbase + 0x1479850) = 0.7;
-	//*(float*)(bbase + 0x149B4C4) = 0.7;
-
-
-	//Pimp Ma Hawg
-	//int bbase = (int)*(int*)((char*)H2BaseAddr + 0xA3DA3C);
-	/*(float*)(bbase + 0x75D5E8) = 8;
-	*(float*)(bbase + 0x75D5EC) = 0.2;
-	*(float*)(bbase + 0x75D5F0) = 0.05;
-	*(float*)(bbase + 0x75D5F4) = 0.01;
-	*(float*)(bbase + 0x75D59C) = 10;
-	*(float*)(bbase + 0x75D52C) = 20;
-	*(float*)(bbase + 0x75D534) = 10;*/
-
-	/*(float*)(bbase + 0x75D5E8) = 20;
-	*(float*)(bbase + 0x75D5EC) = 1;
-	*(float*)(bbase + 0x75D5F0) = 0.05;
-	*(float*)(bbase + 0x75D5F4) = 0.5;
-	*(float*)(bbase + 0x75D59C) = 30;
-	*(float*)(bbase + 0x75D52C) = 50;
-	*(float*)(bbase + 0x75D534) = 50;*/
+	extern void GSSecSweetLeetHaxA(int);
+	GSSecSweetLeetHaxA(0);
 
 }
 
@@ -329,10 +279,13 @@ void hotkeyFuncHelp() {
 
 
 const int hotkeyLen = 7;
-int hotkeyListenLen = 6;//4
+//GSFIXME: Set only completed 4
+int hotkeyListenLen = 4;
 int* hotkeyId[hotkeyLen] = { &hotkeyIdHelp, &hotkeyIdToggleDebug, &hotkeyIdAlignWindow, &hotkeyIdWindowMode, &hotkeyIdTest, &hotkeyIdTest2, &hotkeyIdEsc };
 bool hotkeyPressed[hotkeyLen] = { false, false, false, false, false, false, false };
 void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotkeyFuncAlignWindow, hotkeyFuncWindowMode, hotkeyFuncTest, hotkeyFuncTest2, hotkeyFuncEsc };
+
+int prevPartyPrivacy = 0;
 
 bool halo2WindowExists = false;
 bool halo2ServerFinishedLoading = false;
@@ -340,6 +293,10 @@ void GSMainLoop() {
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
 		SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+		//if (custom_resolution_x > 0 && custom_resolution_y > 0) {
+		//	SetWindowPos(H2hWnd, NULL, 0, 0, 500, 500, SWP_NOMOVE | SWP_FRAMECHANGED);
+		//	SetWindowPos(H2hWnd, NULL, 0, 0, custom_resolution_x, custom_resolution_y, SWP_NOMOVE | SWP_FRAMECHANGED);// SWP_FRAMECHANGED |  | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+		//}
 		if (getPlayerNumber() > 1) {
 			wchar_t titleOriginal[200];
 			wchar_t titleMod[200];
@@ -353,9 +310,42 @@ void GSMainLoop() {
 		if (wcslen(LanServerName) > 0 && wcslen(dedi_server_name) > 0) {
 			halo2ServerFinishedLoading = true;
 			swprintf(LanServerName, 32, dedi_server_name);
-			QuitGSMainLoop = true;
 		}
 	}
+
+	int partyPrivacy;
+	if (H2IsDediServer) {
+		partyPrivacy = *(int*)((BYTE*)H2BaseAddr + 0x534850);
+	}
+	else {
+		partyPrivacy = *(int*)((BYTE*)H2BaseAddr + 0x50A398);
+	}
+	extern bool isHost;
+	if (prevPartyPrivacy > 0 && partyPrivacy == 0 && isHost) {
+		char msg[100] = { 0x00, 0x43, 0x05 };
+		extern UINT g_port;
+		sprintf(msg+3, "push clientlobby %d", g_port+1);
+		unsigned short int serverPort = 1001;
+
+		addDebugText("Pushing open lobby.");
+
+		int socketDescriptor;
+		struct sockaddr_in serverAddress;
+		if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+			addDebugText("ERROR: Could not create socket.");
+		}
+		serverAddress.sin_family = AF_INET;
+		extern ULONG broadcast_server;
+		serverAddress.sin_addr.s_addr = broadcast_server;
+		serverAddress.sin_port = htons(serverPort);
+		
+		if (sendto(socketDescriptor, msg, strlen(msg+3)+3, 0, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
+			//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)
+			addDebugText("ERROR: Failed to push open lobby.");
+		}
+	}
+	prevPartyPrivacy = partyPrivacy;
+
 	if (GetFocus() == H2hWnd || GetForegroundWindow() == H2hWnd) {
 
 		for (int i = 0; i < hotkeyListenLen; i++) {
