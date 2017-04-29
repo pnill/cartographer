@@ -8,7 +8,7 @@ extern bool H2IsDediServer;
 
 
 void GSSecSweetLeetHaxA(int type) {
-	addDebugText("Leet Hax A");
+	//addDebugText("Leet Hax A");
 	//GSFIXME
 	
 }
