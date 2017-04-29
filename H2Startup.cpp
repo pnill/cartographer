@@ -623,16 +623,11 @@ void ProcessH2Startup() {
 			BYTE disableKeyboard3[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
 			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2FA67, disableKeyboard3, 6);
 		}
-
-		//Enable SP mode chat.
-		BYTE assmEnableSPModeChat1[] = { 0xE6, 0x31 };
-		OverwriteAssembly((BYTE*)H2BaseAddr + 0x226629, assmEnableSPModeChat1, 2);
-		BYTE assmEnableSPModeChat2[] = { 0x93 };
-		OverwriteAssembly((BYTE*)H2BaseAddr + 0x22667C, assmEnableSPModeChat2, 1);
-
 	}
 
 	addDebugText("ProcessStartup finished.");
 	extern void GSSecStartLoop();
 	GSSecStartLoop();
+	extern void GSSecSweetLeetHaxA(int);
+	GSSecSweetLeetHaxA(0);
 }

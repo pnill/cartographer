@@ -871,15 +871,6 @@ int __cdecl OnMapLoad(int a1)
 		return ret;
 	}
 
-	BYTE* GameState = (BYTE*)(((char*)h2mod->GetBase()) + 0x420FC4);
-
-	if (*GameState == 3) {//ingame
-		MasterState = 11;
-	}
-	else {
-		MasterState = 10;
-	}
-
 	b_Infection = false;
 	b_GunGame = false;
 	b_Halo2Final = false;
@@ -887,6 +878,30 @@ int __cdecl OnMapLoad(int a1)
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase())+0x97777C);
 	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + 0x482D3C);
 	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
+
+	BYTE* GameState = (BYTE*)(((char*)h2mod->GetBase()) + 0x420FC4);
+
+	if (*GameEngine == 3) {
+		MasterState = 10;
+	}
+	else {
+		MasterState = 11;
+	}
+
+	if (*GameEngine != 3 && *GameState == 3) {
+		//Enable SP mode chat.
+		BYTE assmEnableSPModeChat1[] = { 0xE6, 0x31 };
+		OverwriteAssembly((BYTE*)h2mod->GetBase() + 0x226629, assmEnableSPModeChat1, 2);
+		BYTE assmEnableSPModeChat2[] = { 0x93 };
+		OverwriteAssembly((BYTE*)h2mod->GetBase() + 0x22667C, assmEnableSPModeChat2, 1);
+	}
+	else {
+		//reset back to what it was.
+		BYTE assmEnableSPModeChat1[] = { 0x06, 0x32 };
+		OverwriteAssembly((BYTE*)h2mod->GetBase() + 0x226629, assmEnableSPModeChat1, 2);
+		BYTE assmEnableSPModeChat2[] = { 0xB3 };
+		OverwriteAssembly((BYTE*)h2mod->GetBase() + 0x22667C, assmEnableSPModeChat2, 1);
+	}
 
 	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", *GameEngine, variant_name);
 
@@ -979,7 +994,7 @@ int __cdecl OnMapLoad(int a1)
 	int ret = pmap_initialize(a1);
 
 
-	if (MasterState == 11)
+	if (*GameEngine != 3 && *GameState == 3)
 	{
 		#pragma region Infection
 		if(b_Infection)
