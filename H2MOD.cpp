@@ -833,12 +833,26 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 	return pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
 
-//bool first_load = true;
-//bool bcoop = false;
-
-// This whole hook is called every single time a map loads,
-// I've written a PHP script to compile the byte arrays due to the fact comparing unicode is a bitch.
-// Basically if we have a single player map we set bcoop = true so that the coop variables are setup.
+void PatchFixRankIcon() {
+	if (!h2mod->Server) {
+		int THINGY = (int)*(int*)((char*)h2mod->GetBase() + 0xA40564);
+		BYTE* assmOffset = (BYTE*)(THINGY + 0x800);
+		const int assmlen = 20;
+		BYTE assmOrigRankIcon[assmlen] = { 0x92,0x00,0x14,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x6D,0x74,0x69,0x62,0xCA,0x02,0xEC,0xE4 };
+		BYTE assmPatchFixRankIcon[assmlen] = { 0xCC,0x01,0x1C,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x6D,0x74,0x69,0x62,0xE6,0x02,0x08,0xE5 };
+		bool shouldPatch = true;
+		for (int i = 0; i < assmlen; i++) {
+			if (*(assmOffset + i) != assmOrigRankIcon[i]) {
+				shouldPatch = false;
+				break;
+			}
+		}
+		if (shouldPatch) {
+			OverwriteAssembly((BYTE*)assmOffset, assmPatchFixRankIcon, assmlen);
+			addDebugText("Patching Rank Icon Fix.");
+		}
+	}
+}
 
 int __cdecl OnMapLoad(int a1)
 {
@@ -850,7 +864,11 @@ int __cdecl OnMapLoad(int a1)
 		if (b_Halo2Final && !h2mod->Server)
 			h2f->Dispose();
 
-		return pmap_initialize(a1);
+		int ret = pmap_initialize(a1);
+
+		PatchFixRankIcon();
+
+		return ret;
 	}
 
 	BYTE* GameState = (BYTE*)(((char*)h2mod->GetBase()) + 0x420FC4);
