@@ -13,6 +13,8 @@
 #include <Mmsystem.h>
 #include <thread>
 #include "Globals.h"
+#include "H2OnscreenDebugLog.h"
+#include "GSUtils.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
@@ -627,10 +629,26 @@ void H2MOD::set_unit_team_index(int unit_datum_index, BYTE team)
 	}
 }
 
-void H2MOD::set_unit_biped(BYTE biped,int pIndex)
+void H2MOD::set_unit_biped(BYTE biped, int pIndex)
 {
-	if (pIndex < 17)
+	if (pIndex >= 0 && pIndex < 16)
 		*(BYTE*)(((char*)0x30002BA0 + (pIndex * 0x204))) = biped;
+}
+
+void H2MOD::set_unit_speed_patch(bool hackit) {
+	//TODO: create a way to undo the patch in the case when more than just infection relies on this.
+	//Enable Speed Hacks
+	BYTE assmPatchSpeed[8];
+	memset(assmPatchSpeed, 0x90, 8);
+	OverwriteAssembly((BYTE*)h2mod->GetBase() + 0x6AB7f, assmPatchSpeed, 8);
+	//dedi server
+	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x6A3BA, assmPatchSpeed, 8);
+}
+
+void H2MOD::set_unit_speed(float speed, int pIndex)
+{
+	if (pIndex >= 0 && pIndex < 16)
+		*(float*)(((char*)0x30002C9C + (pIndex * 0x204))) = speed;
 }
 
 void H2MOD::set_local_team_index(BYTE team)
@@ -815,12 +833,26 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 	return pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
 
-bool first_load = true;
-bool bcoop = false;
-
-// This whole hook is called every single time a map loads,
-// I've written a PHP script to compile the byte arrays due to the fact comparing unicode is a bitch.
-// Basically if we have a single player map we set bcoop = true so that the coop variables are setup.
+void PatchFixRankIcon() {
+	if (!h2mod->Server) {
+		int THINGY = (int)*(int*)((char*)h2mod->GetBase() + 0xA40564);
+		BYTE* assmOffset = (BYTE*)(THINGY + 0x800);
+		const int assmlen = 20;
+		BYTE assmOrigRankIcon[assmlen] = { 0x92,0x00,0x14,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x6D,0x74,0x69,0x62,0xCA,0x02,0xEC,0xE4 };
+		BYTE assmPatchFixRankIcon[assmlen] = { 0xCC,0x01,0x1C,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x6D,0x74,0x69,0x62,0xE6,0x02,0x08,0xE5 };
+		bool shouldPatch = true;
+		for (int i = 0; i < assmlen; i++) {
+			if (*(assmOffset + i) != assmOrigRankIcon[i]) {
+				shouldPatch = false;
+				break;
+			}
+		}
+		if (shouldPatch) {
+			OverwriteAssembly((BYTE*)assmOffset, assmPatchFixRankIcon, assmlen);
+			addDebugText("Patching Rank Icon Fix.");
+		}
+	}
+}
 
 int __cdecl OnMapLoad(int a1)
 {
@@ -832,7 +864,11 @@ int __cdecl OnMapLoad(int a1)
 		if (b_Halo2Final && !h2mod->Server)
 			h2f->Dispose();
 
-		return pmap_initialize(a1);
+		int ret = pmap_initialize(a1);
+
+		PatchFixRankIcon();
+
+		return ret;
 	}
 
 	b_Infection = false;
@@ -840,32 +876,52 @@ int __cdecl OnMapLoad(int a1)
 	b_Halo2Final = false;
 	
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase())+0x97777C);
+	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + 0x482D3C);
+	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
 
-	TRACE_GAME("[h2mod] OnMapLoad variant name %ws", variant_name);
+	BYTE* GameState = (BYTE*)(((char*)h2mod->GetBase()) + 0x420FC4);
 
-	if (wcsstr(variant_name, L"zombies") > 0 || wcsstr(variant_name, L"Zombies") > 0 || wcsstr(variant_name, L"Infection") > 0 || wcsstr(variant_name, L"infection") > 0)
-	{
-		TRACE_GAME("[h2mod] Zombies Turned on!");
-		b_Infection = true;
+	if (*GameEngine == 3) {
+		MasterState = 10;
+	}
+	else {
+		MasterState = 11;
 	}
 
-	if (wcsstr(variant_name, L"GunGame") > 0 || wcsstr(variant_name, L"gungame") > 0)
-	{
-		TRACE_GAME("[h2mod] GunGame Turned on!");
-		b_GunGame = true;
+	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", *GameEngine, variant_name);
+
+	if (*GameEngine == 2) {
+		if (wcsstr(variant_name, L"zombies") > 0 || wcsstr(variant_name, L"Zombies") > 0 || wcsstr(variant_name, L"Infection") > 0 || wcsstr(variant_name, L"infection") > 0)
+		{
+			TRACE_GAME("[h2mod] Zombies Turned on!");
+			b_Infection = true;
+		}
+
+		if (wcsstr(variant_name, L"GunGame") > 0 || wcsstr(variant_name, L"gungame") > 0)
+		{
+			TRACE_GAME("[h2mod] GunGame Turned on!");
+			b_GunGame = true;
+		}
+
+		if (wcsstr(variant_name, L"H2F") > 0 || wcsstr(variant_name, L"h2f") > 0 || wcsstr(variant_name, L"Halo2Final") > 0 || wcsstr(variant_name, L"halo2final") > 0)
+		{
+			TRACE_GAME("[h2mod] Halo2Final Turned on!");
+			b_Halo2Final = true;
+		}
 	}
 
-	if (wcsstr(variant_name, L"H2F") > 0 || wcsstr(variant_name, L"h2f") > 0 || wcsstr(variant_name, L"Halo2Final") > 0 || wcsstr(variant_name, L"halo2final") > 0)
-	{
-		TRACE_GAME("[h2mod] Halo2Final Turned on!");
-		b_Halo2Final = true;
-	}
-
+/*
 #pragma region COOP FIXES
 	bcoop = false;
 	
 	DWORD game_globals = *(DWORD*)(((char*)h2mod->GetBase()) + 0x482D3C);
 	BYTE* engine_mode = (BYTE*)(game_globals + 8);
+
+	BYTE main_menu[60] = { 0x73, 0x00, 0x63, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x61, 0x00, 0x72,
+	0x00, 0x69, 0x00, 0x6F, 0x00, 0x73, 0x00, 0x5C, 0x00, 0x75, 0x00, 0x69, 0x00,
+	0x5C, 0x00, 0x6D, 0x00, 0x61, 0x00, 0x69, 0x00, 0x6E, 0x00, 0x6D, 0x00, 0x65,
+	0x00, 0x6E, 0x00, 0x75, 0x00, 0x5C, 0x00, 0x6D, 0x00, 0x61, 0x00, 0x69, 0x00,
+	0x6E, 0x00, 0x6D, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x75, 0x00 };
 
 	BYTE quarntine_zone[86] = { 0x73, 0x00, 0x63, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x61, 0x00, 0x72, 
 								0x00, 0x69, 0x00, 0x6F, 0x00, 0x73, 0x00, 0x5C, 0x00, 0x6D, 0x00, 
@@ -876,18 +932,11 @@ int __cdecl OnMapLoad(int a1)
 								0x5F, 0x00, 0x66, 0x00, 0x6C, 0x00, 0x6F, 0x00, 0x6F, 0x00, 0x64, 
 								0x00, 0x7A, 0x00, 0x6F, 0x00, 0x6E, 0x00, 0x65, 0x00 };
 
-	BYTE main_menu[60] = { 0x73, 0x00, 0x63, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x61, 0x00, 0x72, 
-						   0x00, 0x69, 0x00, 0x6F, 0x00, 0x73, 0x00, 0x5C, 0x00, 0x75, 0x00, 0x69, 0x00, 
-						   0x5C, 0x00, 0x6D, 0x00, 0x61, 0x00, 0x69, 0x00, 0x6E, 0x00, 0x6D, 0x00, 0x65, 
-						   0x00, 0x6E, 0x00, 0x75, 0x00, 0x5C, 0x00, 0x6D, 0x00, 0x61, 0x00, 0x69, 0x00, 
-						   0x6E, 0x00, 0x6D, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x75, 0x00 };
-
 	if (!memcmp(main_menu, (BYTE*)0x300017E0, 60))
 	{
 		DWORD game_globals = *(DWORD*)(((char*)h2mod->GetBase()) + 0x482D3C);
 		BYTE* garbage_collect = (BYTE*)(game_globals + 0xC);
 		*(garbage_collect) = 1;
-		MasterState = 5;
 
 		//Crashfix
 		*(int*)(h2mod->GetBase() + 0x464940) = 0;
@@ -897,7 +946,7 @@ int __cdecl OnMapLoad(int a1)
 	}
 	else 
 	{
-		MasterState = 4;
+		
 	}
 
 	if (!memcmp(quarntine_zone, (BYTE*)0x300017E0, 86) && *(engine_mode) == 2 ) // check the map and if we're loading a multiplayer game (We don't want to fuck up normal campaign)
@@ -926,11 +975,11 @@ int __cdecl OnMapLoad(int a1)
 
 	}
 #pragma endregion
-
+*/
 	int ret = pmap_initialize(a1);
 
 
-	if (MasterState == 4)
+	if (*GameEngine != 3 && *GameState == 3)
 	{
 		#pragma region Infection
 		if(b_Infection)
@@ -981,9 +1030,9 @@ bool __cdecl OnPlayerSpawn(int a1)
 	if(b_Infection)
 		inf->PreSpawn(PlayerIndex);
 #pragma endregion
-
+	/*
 #pragma region COOP Fixes
-	/* hacky coop fixes*/
+	// hacky coop fixes
 	
 	DWORD game_globals = *(DWORD*)(((char*)h2mod->GetBase()) + 0x482D3C);
 	BYTE* garbage_collect = (BYTE*)(game_globals + 0xC);
@@ -995,16 +1044,16 @@ bool __cdecl OnPlayerSpawn(int a1)
 		*(coop_mode) = 1; // Turn coop mode on before spawning the player, maybe this fixes their weapon and biped or something idk?
 						  // Going to have to reverse the engine simulation function for weapon creation further.
 	}
-	
+	*/
 	int ret =  pspawn_player(a1); // This handles player spawning for both multiplayer and sinlgeplayer/coop careful with it.
-
-	/* More hacky coop fixes*/
+	/*
+	// More hacky coop fixes
 	if (bcoop == true)
 	{
 		*(coop_mode) = 0; // Turn it back off, sometimes it causes crashes if it's self on we only need it when we're spawning players.
 	}
 #pragma endregion
-
+*/
 #pragma region Infection Handler
 	if(b_Infection)
 		inf->SpawnPlayer(PlayerIndex);
@@ -1142,6 +1191,24 @@ BOOL __stdcall isDebuggerPresent() {
 	return false;
 }
 
+typedef void*(__stdcall *tload_wgit)(void* thisptr, int a2, int a3, int a4, unsigned short a5);
+tload_wgit pload_wgit;
+void* __stdcall OnWgitLoad(void* thisptr, int a2, int a3, int a4, unsigned short a5) {
+	int wgit = a2;
+
+	//char NotificationPlayerText[20];
+	//sprintf(NotificationPlayerText, "WGIT ID: %d", a2);
+	//MessageBoxA(NULL, NotificationPlayerText, "WGITness", MB_OK);
+
+	//Removed the ESRB warning after intro video (only occurs for English Lang).
+	if (wgit == 292) {
+		wgit = -1;
+	}
+	//void* thisptr = 
+	pload_wgit(thisptr, wgit, a3, a4, a5);
+	return thisptr;
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1149,6 +1216,9 @@ void H2MOD::ApplyHooks() {
 		TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
 		DWORD dwBack;
+
+		pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
+		VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)this->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1597,6 +1667,10 @@ void H2MOD::Initialize()
 
 	//Network::Initialize();
 	h2mod->ApplyHooks();
+}
+
+void H2MOD::Deinitialize() {
+
 }
 
 DWORD H2MOD::GetBase()

@@ -262,7 +262,7 @@ DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pAddr)
 	{
 		if (User.GetLocalXNAddr(pAddr))
 		{
-			MasterState = 2;
+			MasterState = 10;
 			sprintf(ServerStatus, "Master Connection: Connected!");
 			return XNET_GET_XNADDR_STATIC | XNET_GET_XNADDR_ETHERNET;
 		}
@@ -270,7 +270,7 @@ DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pAddr)
 	
 	if( ConnectionAttempts > 5)
 	{ 
-		MasterState = 3;
+		MasterState = 2;
 		sprintf(ServerStatus, "Master Connection: This is taking awhile... - Either your login is invalid or your firewall is blocking us.");
 
 		return XNET_GET_XNADDR_STATIC | XNET_GET_XNADDR_ETHERNET;
@@ -300,6 +300,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 	if (iplong == INADDR_BROADCAST || iplong == 0x00)
 	{
 		(((struct sockaddr_in*)to)->sin_addr.s_addr) = broadcast_server;
+		//((struct sockaddr_in*)to)->sin_port = ntohs(27027);
 		//TRACE("XSocketSendTo - Broadcast");
 
 		return sendto(s, buf, len, flags, to, tolen);

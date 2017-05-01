@@ -43,6 +43,9 @@
     <Filter Include="Source Files\H2MOD\GUI\Source Files\Direct3D9">
       <UniqueIdentifier>{933eb738-ef3b-4896-a991-645018ac135b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GlitchyScripts">
+      <UniqueIdentifier>{c50ed4e8-db51-43bf-bc48-a7d5abc06719}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -96,11 +99,23 @@
     <ClCompile Include="H2ChatBoxCommands.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="miniz.c">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD_Halo2Final.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GSRunLoop.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="GSUtils.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Startup.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="H2OnscreenDebugLog.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="GSMenu.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -163,6 +178,24 @@
     </ClInclude>
     <ClInclude Include="H2MOD_Halo2Final.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Startup.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="H2OnscreenDebugLog.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="GSUtils.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="GSRunLoop.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="GSMenu.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="GSSecurity.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -17,6 +17,7 @@ public:
 	void PreSpawn(int);
 	void SpawnPlayer(int);
 	void Initialize();
+	void Deinitialize();
 	void FindZombie();
 
 	std::unordered_map<InfectionPlayer*, bool> infected_players;
