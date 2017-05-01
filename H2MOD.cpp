@@ -888,21 +888,6 @@ int __cdecl OnMapLoad(int a1)
 		MasterState = 11;
 	}
 
-	if (*GameEngine != 3 && *GameState == 3) {
-		//Enable SP mode chat.
-		BYTE assmEnableSPModeChat1[] = { 0xE6, 0x31 };
-		OverwriteAssembly((BYTE*)h2mod->GetBase() + 0x226629, assmEnableSPModeChat1, 2);
-		BYTE assmEnableSPModeChat2[] = { 0x93 };
-		OverwriteAssembly((BYTE*)h2mod->GetBase() + 0x22667C, assmEnableSPModeChat2, 1);
-	}
-	else {
-		//reset back to what it was.
-		BYTE assmEnableSPModeChat1[] = { 0x06, 0x32 };
-		OverwriteAssembly((BYTE*)h2mod->GetBase() + 0x226629, assmEnableSPModeChat1, 2);
-		BYTE assmEnableSPModeChat2[] = { 0xB3 };
-		OverwriteAssembly((BYTE*)h2mod->GetBase() + 0x22667C, assmEnableSPModeChat2, 1);
-	}
-
 	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", *GameEngine, variant_name);
 
 	if (*GameEngine == 2) {

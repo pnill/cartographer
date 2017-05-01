@@ -11,6 +11,7 @@ bool skip_intro = false;
 bool disable_ingame_keyboard = false;
 int custom_resolution_x = 0;
 int custom_resolution_y = 0;
+bool hide_ingame_chat = false;
 wchar_t dedi_server_name[32];
 bool H2IsDediServer;
 DWORD H2BaseAddr;
@@ -224,6 +225,7 @@ void ReadStartupOptions() {
 	bool est_hotkey_toggle_debug = false;
 	bool est_hotkey_align_window = false;
 	bool est_hotkey_window_mode = false;
+	bool est_hotkey_hide_ingame_chat = false;
 
 	int flagged[256];
 	int flagged_pos = -1;
@@ -342,10 +344,21 @@ void ReadStartupOptions() {
 					est_hotkey_window_mode = true;
 				}
 			}
+			else if (strstr(string, "hotkey_hide_ingame_chat =")) {
+				int temp;
+				sscanf(string + strlen("hotkey_hide_ingame_chat ="), "%d", &temp);
+				if (est_hotkey_hide_ingame_chat || !(temp >= 0)) {
+					flagged[flagged_pos++] = FindLineStart(fp, strlen(string));
+				}
+				else {
+					hotkeyIdToggleHideIngameChat = temp;
+					est_hotkey_hide_ingame_chat = true;
+				}
+			}
 		}
 		fclose(fp);
 		fp = NULL;
-		if (!flagged_pos && !(est_language_code && est_skip_intro && est_disable_ingame_keyboard /*&& est_custom_resolution*/ && est_server_name && est_hotkey_help && est_hotkey_toggle_debug && est_hotkey_align_window && est_hotkey_window_mode)) {
+		if (!flagged_pos && !(est_language_code && est_skip_intro && est_disable_ingame_keyboard /*&& est_custom_resolution*/ && est_server_name && est_hotkey_help && est_hotkey_toggle_debug && est_hotkey_align_window && est_hotkey_window_mode && est_hotkey_hide_ingame_chat)) {
 			flagged_pos = -2;
 		}
 	}
@@ -443,6 +456,12 @@ void ReadStartupOptions() {
 				GetVKeyCodeString(hotkeyIdWindowMode, hotkeyText + strlen(hotkeyText), 20);
 				fputs(hotkeyText, fp);
 			}
+			if (!est_hotkey_hide_ingame_chat) {
+				char hotkeyText[60];
+				sprintf(hotkeyText, "\nhotkey_hide_ingame_chat = %d #", hotkeyIdToggleHideIngameChat);
+				GetVKeyCodeString(hotkeyIdToggleHideIngameChat, hotkeyText + strlen(hotkeyText), 20);
+				fputs(hotkeyText, fp);
+			}
 			fclose(fp);
 		}
 		else {
@@ -516,6 +535,33 @@ int __stdcall PreReadyLoad() {
 		MessageBoxA(NULL, temp, "AAA Server Pre name thingy", MB_OK);
 	}
 	return result;
+}
+
+static bool NotDisplayIngameChat() {
+	int GameGlobals = (int)*(int*)((DWORD)H2BaseAddr + 0x482D3C);
+	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
+	BYTE* GameState = (BYTE*)((DWORD)H2BaseAddr + 0x420FC4);
+
+	if (hide_ingame_chat) {
+		int GameTimeGlobals = (int)*(int*)((DWORD)H2BaseAddr + 0x4C06E4);
+		DWORD* ChatOpened = (DWORD*)(GameTimeGlobals + 0x354);//MP Only?
+		if (*ChatOpened == 2) {
+			extern void hotkeyFuncToggleHideIngameChat();
+			hotkeyFuncToggleHideIngameChat();
+		}
+	}
+
+	if (hide_ingame_chat) {
+		return true;
+	}
+	else if (*GameEngine != 3 && *GameState == 3) {
+		//Enable chat in engine mode and game state mp.
+		return false;
+	}
+	else {
+		//original test - if is campaign
+		return *GameEngine == 1;
+	}
 }
 
 void ProcessH2Startup() {
@@ -623,6 +669,21 @@ void ProcessH2Startup() {
 			BYTE disableKeyboard3[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
 			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2FA67, disableKeyboard3, 6);
 		}
+
+		//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
+		DWORD chatFunc = (DWORD)NotDisplayIngameChat;
+
+		DWORD instCallAddr2 = H2BaseAddr + 0x22667B;
+		DWORD callRelative2 = chatFunc - (instCallAddr2 + 5);
+		BYTE* pbyte2 = (BYTE*)&callRelative2;
+		BYTE assmFuncChatRel2[4] = { pbyte2[0], pbyte2[1], pbyte2[2], pbyte2[3] };
+		OverwriteAssembly((BYTE*)instCallAddr2 + 1, assmFuncChatRel2, 4);
+
+		DWORD instCallAddr1 = H2BaseAddr + 0x226628;
+		DWORD callRelative1 = chatFunc - (instCallAddr1 + 5);
+		BYTE* pbyte1 = (BYTE*)&callRelative1;
+		BYTE assmFuncChatRel1[4] = { pbyte1[0], pbyte1[1], pbyte1[2], pbyte1[3] };
+		OverwriteAssembly((BYTE*)instCallAddr1 + 1, assmFuncChatRel1, 4);
 	}
 
 	addDebugText("ProcessStartup finished.");

@@ -114,6 +114,21 @@ void hotkeyFuncWindowMode() {
 	}
 }
 
+int hotkeyIdToggleHideIngameChat = VK_F9;
+void hotkeyFuncToggleHideIngameChat() {
+	if (H2IsDediServer) {
+		return;
+	}
+	extern bool hide_ingame_chat;
+	hide_ingame_chat = !hide_ingame_chat;
+	if (hide_ingame_chat) {
+		addDebugText("Hiding In-game Chat Menu.");
+	}
+	else {
+		addDebugText("Showing In-game Chat Menu.");
+	}
+}
+
 VOID CallWgit(int WgitScreenfunctionPtr) {
 
 	//int __thiscall WgitScreenInitializer(int this)
@@ -199,7 +214,7 @@ void hotkeyFuncEsc() {
 
 bool IsCustomMenu = false;
 
-int hotkeyIdTest = VK_F6;
+int hotkeyIdTest = VK_F5;
 void hotkeyFuncTest() {
 	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x20E032);//H2BetaErrorOk
 	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0xE757);//PCR
@@ -228,9 +243,12 @@ void hotkeyFuncTest() {
 	PlayerEffects = (char(*)(void))((char*)H2BaseAddr + 0xA3E39);
 	PlayerEffects();*/
 
+	addDebugText("NOP'd");
+	BYTE HostClientCheckNOP[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+	OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckNOP, 6);
 }
 
-int hotkeyIdTest2 = VK_F9;
+int hotkeyIdTest2 = VK_F6;
 void hotkeyFuncTest2() {
 	//int a3 = 0;
 	//signed int(__cdecl* sub_603D0E)(signed int* a1);
@@ -241,8 +259,16 @@ void hotkeyFuncTest2() {
 	//int WgitScreenfunctionPtr = (int)(MenuGameResolutionMM);
 	//CallWgit(WgitScreenfunctionPtr);
 
-	extern void GSSecSweetLeetHaxA(int);
-	GSSecSweetLeetHaxA(0);
+	//addDebugText("Restored");
+	//BYTE HostClientCheckOrig[] = { 0x0F, 0x85, 0xBA, 0x01, 0x00, 0x00 };
+	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckOrig, 6);
+
+	addDebugText("Jumped");
+	BYTE HostClientCheckJMP[] = { 0xE9, 0xBB, 0x01, 0x00, 0x00, 0x90 };
+	OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckJMP, 6);
+
+	//extern void GSSecSweetLeetHaxA(int);
+	//GSSecSweetLeetHaxA(1);
 
 }
 
@@ -268,6 +294,10 @@ void hotkeyFuncHelp() {
 	PadCStringWithChar(hotkeyname, 20, ' ');
 	snprintf(tempTextEntry, 255, "%s- Toggle Windowed/Borderless mode.", hotkeyname);
 	addDebugText(tempTextEntry);
+	GetVKeyCodeString(hotkeyIdToggleHideIngameChat, hotkeyname, 20);
+	PadCStringWithChar(hotkeyname, 20, ' ');
+	snprintf(tempTextEntry, 255, "%s- Toggle Hide In-game Chat.", hotkeyname);
+	addDebugText(tempTextEntry);
 	//addDebugText("F5      - Toggle online Coop mode.");
 	//addDebugText("F10     - Fix in-game player camera from a white/black bad cutscene.");
 	//addDebugText("Home    - Sight Possession Hack.");
@@ -278,12 +308,12 @@ void hotkeyFuncHelp() {
 }
 
 
-const int hotkeyLen = 7;
-//GSFIXME: Set only completed 4
-int hotkeyListenLen = 4;
-int* hotkeyId[hotkeyLen] = { &hotkeyIdHelp, &hotkeyIdToggleDebug, &hotkeyIdAlignWindow, &hotkeyIdWindowMode, &hotkeyIdTest, &hotkeyIdTest2, &hotkeyIdEsc };
-bool hotkeyPressed[hotkeyLen] = { false, false, false, false, false, false, false };
-void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotkeyFuncAlignWindow, hotkeyFuncWindowMode, hotkeyFuncTest, hotkeyFuncTest2, hotkeyFuncEsc };
+const int hotkeyLen = 8;
+//GSFIXME: Set only completed 5
+int hotkeyListenLen = 5;
+int* hotkeyId[hotkeyLen] = { &hotkeyIdHelp, &hotkeyIdToggleDebug, &hotkeyIdAlignWindow, &hotkeyIdWindowMode, &hotkeyIdToggleHideIngameChat, &hotkeyIdTest, &hotkeyIdTest2, &hotkeyIdEsc };
+bool hotkeyPressed[hotkeyLen] = { false, false, false, false, false, false, false, false };
+void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotkeyFuncAlignWindow, hotkeyFuncWindowMode, hotkeyFuncToggleHideIngameChat, hotkeyFuncTest, hotkeyFuncTest2, hotkeyFuncEsc };
 
 int prevPartyPrivacy = 0;
 
