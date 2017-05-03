@@ -296,7 +296,7 @@ void hotkeyFuncHelp() {
 	addDebugText(tempTextEntry);
 	GetVKeyCodeString(hotkeyIdToggleHideIngameChat, hotkeyname, 20);
 	PadCStringWithChar(hotkeyname, 20, ' ');
-	snprintf(tempTextEntry, 255, "%s- Toggle Hide In-game Chat.", hotkeyname);
+	snprintf(tempTextEntry, 255, "%s- Toggles hiding the in-game chat menu.", hotkeyname);
 	addDebugText(tempTextEntry);
 	//addDebugText("F5      - Toggle online Coop mode.");
 	//addDebugText("F10     - Fix in-game player camera from a white/black bad cutscene.");

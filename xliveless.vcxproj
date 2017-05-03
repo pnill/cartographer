@@ -137,7 +137,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\Debug/binkw32.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>./Debug/xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <ImportLibrary>.\Debug/binkw32.lib</ImportLibrary>
@@ -165,7 +165,6 @@
     </ClCompile>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Globals.cpp" />
-    <ClCompile Include="GSMenu.cpp" />
     <ClCompile Include="GSRunLoop.cpp" />
     <ClCompile Include="GSUtils.cpp" />
     <ClCompile Include="GUI.cpp" />
