@@ -307,10 +307,18 @@ void ReadStartupOptions() {
 				}
 				else {
 					char* tempName = string + strlen("server_name =");
-					while (*tempName == ' ') {
+					while (isspace(*tempName)) {
 						tempName++;
 					}
 					swprintf(dedi_server_name, 32, L"%hs", tempName);
+					for (int j = wcslen(dedi_server_name) - 1; j > 0; j--) {
+						if (isspace(dedi_server_name[j])) {
+							dedi_server_name[j] = 0;
+						}
+						else {
+							break;
+						}
+					}
 					est_server_name = true;
 				}
 			}
@@ -320,10 +328,18 @@ void ReadStartupOptions() {
 				}
 				else {
 					char* tempName = string + strlen("server_playlist =");
-					while (*tempName == ' ') {
+					while (isspace(*tempName)) {
 						tempName++;
 					}
 					swprintf(dedi_server_playlist, 256, L"%hs", tempName);
+					for (int j = wcslen(dedi_server_playlist)-1; j > 0; j--) {
+						if (isspace(dedi_server_playlist[j])) {
+							dedi_server_playlist[j] = 0;
+						}
+						else {
+							break;
+						}
+					}
 					est_server_playlist = true;
 				}
 			}
@@ -544,6 +560,8 @@ thookServ1 phookServ1;
 int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 	char result =
 		phookServ1(hKey, lpSubKey);
+	addDebugText("Post Server Registry Read.");
+	MessageBoxA(NULL, "sfs", "sdf", MB_OK);
 	if (wcslen(dedi_server_name) > 0) {
 		wchar_t* PreLoadServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x3B49B4);
 		swprintf(PreLoadServerName, 15, dedi_server_name);
@@ -557,6 +575,7 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 		wchar_t* ServerPlaylist = (wchar_t*)((BYTE*)H2BaseAddr + 0x3B3704);
 		swprintf(ServerPlaylist, 256, dedi_server_playlist);
 	}
+	addDebugText("Initialising GSRunLoop.");
 	extern void initGSRunLoop();
 	initGSRunLoop();
 	return result;
