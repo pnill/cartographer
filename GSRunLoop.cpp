@@ -229,12 +229,12 @@ void hotkeyFuncTest() {
 	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x24925C);//Game Brightness MM
 	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x258C8C);//Game Brightness ingame
 
-	/*int* MenuID = (int*)((char*)H2BaseAddr + 0x9758D8);
+	int* MenuID = (int*)((char*)H2BaseAddr + 0x9758D8);
 
 	if (*MenuID != 272) {
 		int WgitScreenfunctionPtr = (int)(MenuGameBrightnessIngame);
 		CallWgit(WgitScreenfunctionPtr);
-	}*/
+	}
 
 	//ui_priority += 1;
 
@@ -243,9 +243,9 @@ void hotkeyFuncTest() {
 	PlayerEffects = (char(*)(void))((char*)H2BaseAddr + 0xA3E39);
 	PlayerEffects();*/
 
-	addDebugText("NOP'd");
-	BYTE HostClientCheckNOP[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-	OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckNOP, 6);
+	//addDebugText("NOP'd");
+	//BYTE HostClientCheckNOP[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckNOP, 6);
 }
 
 int hotkeyIdTest2 = VK_F6;
@@ -263,9 +263,9 @@ void hotkeyFuncTest2() {
 	//BYTE HostClientCheckOrig[] = { 0x0F, 0x85, 0xBA, 0x01, 0x00, 0x00 };
 	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckOrig, 6);
 
-	addDebugText("Jumped");
-	BYTE HostClientCheckJMP[] = { 0xE9, 0xBB, 0x01, 0x00, 0x00, 0x90 };
-	OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckJMP, 6);
+	//addDebugText("Jumped");
+	//BYTE HostClientCheckJMP[] = { 0xE9, 0xBB, 0x01, 0x00, 0x00, 0x90 };
+	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckJMP, 6);
 
 	//extern void GSSecSweetLeetHaxA(int);
 	//GSSecSweetLeetHaxA(1);
@@ -307,6 +307,29 @@ void hotkeyFuncHelp() {
 	setDebugTextDisplay(true);
 }
 
+void pushHostLobby() {
+	char msg[100] = { 0x00, 0x43, 0x05 };
+	extern UINT g_port;
+	sprintf(msg + 3, "push clientlobby %d", g_port + 1);
+	unsigned short int remoteServerPort = 1001;
+
+	addDebugText("Pushing open lobby.");
+
+	int socketDescriptor;
+	struct sockaddr_in serverAddress;
+	if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+		addDebugText("ERROR: Could not create socket.");
+	}
+	serverAddress.sin_family = AF_INET;
+	extern ULONG broadcast_server;
+	serverAddress.sin_addr.s_addr = broadcast_server;
+	serverAddress.sin_port = htons(remoteServerPort);
+
+	if (sendto(socketDescriptor, msg, strlen(msg + 3) + 3, 0, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
+		//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)
+		addDebugText("ERROR: Failed to push open lobby.");
+	}
+}
 
 const int hotkeyLen = 8;
 //GSFIXME: Set only completed 5
@@ -339,6 +362,7 @@ void GSMainLoop() {
 		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
 		if (wcslen(LanServerName) > 0 && wcslen(dedi_server_name) > 0) {
 			halo2ServerFinishedLoading = true;
+			pushHostLobby();
 			swprintf(LanServerName, 32, dedi_server_name);
 		}
 	}
@@ -352,27 +376,7 @@ void GSMainLoop() {
 	}
 	extern bool isHost;
 	if (prevPartyPrivacy > 0 && partyPrivacy == 0 && isHost) {
-		char msg[100] = { 0x00, 0x43, 0x05 };
-		extern UINT g_port;
-		sprintf(msg+3, "push clientlobby %d", g_port+1);
-		unsigned short int serverPort = 1001;
-
-		addDebugText("Pushing open lobby.");
-
-		int socketDescriptor;
-		struct sockaddr_in serverAddress;
-		if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-			addDebugText("ERROR: Could not create socket.");
-		}
-		serverAddress.sin_family = AF_INET;
-		extern ULONG broadcast_server;
-		serverAddress.sin_addr.s_addr = broadcast_server;
-		serverAddress.sin_port = htons(serverPort);
-		
-		if (sendto(socketDescriptor, msg, strlen(msg+3)+3, 0, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
-			//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)
-			addDebugText("ERROR: Failed to push open lobby.");
-		}
+		pushHostLobby();
 	}
 	prevPartyPrivacy = partyPrivacy;
 
@@ -416,8 +420,7 @@ public:
 
 };
 
-DWORD WINAPI GSLoopMaker(LPVOID lpParam)
-{
+DWORD WINAPI GSLoopMaker(LPVOID lpParam) {
 	while (!QuitGSMainLoop) {
 		//loop every 4 milliseconds
 		later later_test1(4, false, &GSMainLoop);
