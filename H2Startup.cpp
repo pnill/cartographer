@@ -561,7 +561,6 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 	char result =
 		phookServ1(hKey, lpSubKey);
 	addDebugText("Post Server Registry Read.");
-	MessageBoxA(NULL, "sfs", "sdf", MB_OK);
 	if (wcslen(dedi_server_name) > 0) {
 		wchar_t* PreLoadServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x3B49B4);
 		swprintf(PreLoadServerName, 15, dedi_server_name);
