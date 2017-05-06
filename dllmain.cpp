@@ -384,17 +384,21 @@ void InitInstance()
 		swprintf(mutexName, L"Halo2Login#%s", g_szToken);
 		HANDLE mutex = CreateMutex(0, TRUE, mutexName);
 		DWORD lastErr = GetLastError();
+		char token_censored[33];
+		strncpy(token_censored, g_szToken, 32);
+		memset(token_censored + 32, 0, 1);
+		memset(token_censored + 4, '*', 24);
 		if (lastErr == ERROR_ALREADY_EXISTS) {
 			//CloseHandle(mutex);
-			char token_censored[33];
-			strncpy(token_censored, g_szToken, 32);
-			memset(token_censored + 32, 0, 1);
-			memset(token_censored + 4, '*', 24);
 			char NotificationPlayerText[120];
 			sprintf(NotificationPlayerText, "Player Login Session %s already exists!\nOld session has been invalidated!", token_censored);
 			addDebugText(NotificationPlayerText);
 			MessageBoxA(NULL, NotificationPlayerText, "LOGIN OVERRIDDEN WARNING!", MB_OK);
 		}
+		char NotificationText4[120];
+		sprintf(NotificationText4, "Login Token: %s.", token_censored);
+		addDebugText(NotificationText4);
+
 		wchar_t mutexName2[255];
 		swprintf(mutexName2, L"Halo2BasePort#%d", g_port);
 		HANDLE mutex2 = CreateMutex(0, TRUE, mutexName2);
@@ -406,6 +410,9 @@ void InitInstance()
 			addDebugText(NotificationPlayerText);
 			MessageBoxA(NULL, NotificationPlayerText, "BASE PORT BIND WARNING!", MB_OK);
 		}
+		char NotificationText5[120];
+		sprintf(NotificationText5, "Base port: %d.", g_port);
+		addDebugText(NotificationText5);
 
 		if (g_debug)
 		{
