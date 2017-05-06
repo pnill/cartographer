@@ -13,6 +13,7 @@ int custom_resolution_x = 0;
 int custom_resolution_y = 0;
 bool hide_ingame_chat = false;
 wchar_t dedi_server_name[32];
+wchar_t dedi_server_playlist[256];
 bool H2IsDediServer;
 DWORD H2BaseAddr;
 wchar_t* processFilePath;
@@ -229,6 +230,8 @@ void ReadStartupOptions() {
 	bool est_custom_resolution = false;
 	bool est_server_name = false;
 	dedi_server_name[31] = dedi_server_name[0] = 0;
+	bool est_server_playlist = false;
+	dedi_server_playlist[255] = dedi_server_playlist[0] = 0;
 	//Hotkeys
 	bool est_hotkey_help = false;
 	bool est_hotkey_toggle_debug = false;
@@ -242,9 +245,9 @@ void ReadStartupOptions() {
 	if (fp = _wfopen(fileStartupini, L"r")) {
 		addDebugText("File found.");
 		flagged_pos = 0;
-		char string[256];
-		while (fgets(string, 255, fp)) {
-			if (flagged_pos > 256) {
+		char string[512];
+		while (fgets(string, 511, fp)) {
+			if (flagged_pos > 512) {
 				addDebugText("File config overflow! There are too many bad lines in SETUP config!");
 				MessageBoxA(NULL, "There are too many bad lines in SETUP config!", "File config overflow!", MB_OK);
 				exit(EXIT_FAILURE);
@@ -311,6 +314,19 @@ void ReadStartupOptions() {
 					est_server_name = true;
 				}
 			}
+			else if (strstr(string, "server_playlist =")) {
+				if (est_server_playlist) {
+					flagged[flagged_pos++] = FindLineStart(fp, strlen(string));
+				}
+				else {
+					char* tempName = string + strlen("server_playlist =");
+					while (*tempName == ' ') {
+						tempName++;
+					}
+					swprintf(dedi_server_playlist, 256, L"%hs", tempName);
+					est_server_playlist = true;
+				}
+			}
 			else if (strstr(string, "hotkey_help =")) {
 				int temp;
 				sscanf(string + strlen("hotkey_help ="), "%d", &temp);
@@ -369,7 +385,7 @@ void ReadStartupOptions() {
 		}
 		fclose(fp);
 		fp = NULL;
-		if (!flagged_pos && !(est_language_code && est_skip_intro && est_disable_ingame_keyboard /*&& est_custom_resolution*/ && est_server_name && est_hotkey_help && est_hotkey_toggle_debug && est_hotkey_align_window && est_hotkey_window_mode && est_hotkey_hide_ingame_chat)) {
+		if (!flagged_pos && !(est_language_code && est_skip_intro && est_disable_ingame_keyboard /*&& est_custom_resolution*/ && est_server_name && est_server_playlist && est_hotkey_help && est_hotkey_toggle_debug && est_hotkey_align_window && est_hotkey_window_mode && est_hotkey_hide_ingame_chat)) {
 			flagged_pos = -2;
 		}
 	}
@@ -415,6 +431,10 @@ void ReadStartupOptions() {
 				fputs("\n# Sets the name of the server up to 31 characters long.", fp);
 				fputs("\n# Leave blank/empty for no effect.", fp);
 				fputs("\n\n", fp);
+				fputs("# server_playlist Options (Server):", fp);
+				fputs("\n# Sets the playlist of the server up to 255 characters long.", fp);
+				fputs("\n# Leave blank/empty for no effect.", fp);
+				fputs("\n\n", fp);
 				fputs("# hotkey_... Options (Client):", fp);
 				fputs("\n# The number used is the keyboard Virtual-Key (VK) Code in base-10 integer form.", fp);
 				fputs("\n# The codes in hexadecimal (base-16) form can be found here:", fp);
@@ -444,6 +464,9 @@ void ReadStartupOptions() {
 			//}
 			if (!est_server_name) {
 				fputs("\nserver_name = ", fp);
+			}
+			if (!est_server_playlist) {
+				fputs("\nserver_playlist = ", fp);
 			}
 			if (!est_hotkey_help) {
 				char hotkeyText[60];
@@ -529,6 +552,10 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 		//MessageBoxA(NULL, temp, "Server Pre name thingy", MB_OK);
 		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
 		swprintf(LanServerName, 2, L"");
+	}
+	if (wcslen(dedi_server_playlist) > 0) {
+		wchar_t* ServerPlaylist = (wchar_t*)((BYTE*)H2BaseAddr + 0x3B3704);
+		swprintf(ServerPlaylist, 256, dedi_server_playlist);
 	}
 	extern void initGSRunLoop();
 	initGSRunLoop();
