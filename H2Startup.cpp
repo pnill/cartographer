@@ -15,6 +15,7 @@ bool hide_ingame_chat = false;
 wchar_t dedi_server_name[32];
 bool H2IsDediServer;
 DWORD H2BaseAddr;
+wchar_t* processFilePath;
 HWND H2hWnd = NULL;
 
 int playerNumber = 0;
@@ -43,7 +44,7 @@ wchar_t* instanceMutexClient = L"Halo2Player%d";
 wchar_t* instanceMutexServer = L"Halo2Server%d";
 
 void initPlayerNumber() {
-
+	addDebugText("Determining Process Instance Number.");
 	HANDLE mutex;
 	DWORD lastErr;
 	do {
@@ -194,11 +195,14 @@ void initPlayerNumber() {
 			}
 		}
 	}
+	addDebugText("Finished Processing Instance Number.");
 }
 
 void ReadStartupOptions() {
-	LPWSTR fileStartupini = new WCHAR[256];
-	swprintf(fileStartupini, L"h2startup%d.ini", getPlayerNumber());
+	addDebugText("Begin Read Startup Options.");
+
+	wchar_t fileStartupini[1024];
+	swprintf(fileStartupini, 1024, L"%wsh2startup%d.ini", processFilePath, getPlayerNumber());
 
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
@@ -213,6 +217,11 @@ void ReadStartupOptions() {
 			}
 		}
 	}
+
+	char awerg[1034];
+	sprintf(awerg, "PATH: %ws", fileStartupini);
+	addDebugText(awerg);
+
 	//Variables read check
 	bool est_language_code = false;
 	bool est_skip_intro = false;
@@ -231,10 +240,12 @@ void ReadStartupOptions() {
 	int flagged_pos = -1;
 	FILE *fp;
 	if (fp = _wfopen(fileStartupini, L"r")) {
+		addDebugText("File found.");
 		flagged_pos = 0;
 		char string[256];
 		while (fgets(string, 255, fp)) {
 			if (flagged_pos > 256) {
+				addDebugText("File config overflow! There are too many bad lines in SETUP config!");
 				MessageBoxA(NULL, "There are too many bad lines in SETUP config!", "File config overflow!", MB_OK);
 				exit(EXIT_FAILURE);
 			}
@@ -363,11 +374,13 @@ void ReadStartupOptions() {
 		}
 	}
 	if (flagged_pos) {
+		addDebugText("Edits to be made.");
 		if (flagged_pos == -1) {
 			if (fp = _wfopen(fileStartupini, L"w")) {
 				fclose(fp);
 			}
 			else {
+				addDebugText("Unknown Error: Error 78t6.");
 				fileFail(fp);
 				MessageBoxA(NULL, "Error 78t6.", "Unknown Error", MB_OK);
 				exit(EXIT_FAILURE);
@@ -465,6 +478,7 @@ void ReadStartupOptions() {
 			fclose(fp);
 		}
 		else {
+			addDebugText("Unknown Error: Error bn689.");
 			fileFail(fp);
 			MessageBoxA(NULL, "Error bn689.", "Unknown Error", MB_OK);
 			exit(EXIT_FAILURE);
@@ -483,6 +497,7 @@ void ReadStartupOptions() {
 		sprintf(NotificationPlayerText, "Successfully loaded config file: %ls", fileStartupini);
 		addDebugText(NotificationPlayerText);
 	}
+	addDebugText("End Read Startup Options.");
 }
 
 LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
@@ -565,22 +580,31 @@ static bool NotDisplayIngameChat() {
 }
 
 void ProcessH2Startup() {
+	int ArgCnt;
+	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
+	processFilePath = (wchar_t*)malloc(wcslen(ArgList[0]) * sizeof(wchar_t));
+	int rtncodepath = GetWidePathFromFullWideFilename(ArgList[0], processFilePath);
+	if (rtncodepath == -1) {
+		swprintf(processFilePath, L"");
+	}
+
 	initDebugText();
 	//halo2ThreadID = GetCurrentThreadId();
-	if (GetModuleHandle(L"H2Server.exe"))
-	{
+	if (GetModuleHandle(L"H2Server.exe")) {
 		H2BaseAddr = (DWORD)GetModuleHandle(L"H2Server.exe");
 		H2IsDediServer = true;
 		addDebugText("Process is Dedi-Server");
 	}
-	else
-	{
+	else {
 		H2BaseAddr = (DWORD)GetModuleHandle(L"halo2.exe");
 		H2IsDediServer = false;
 		addDebugText("Process is Client");
 	}
+	
 	initPlayerNumber();
 	ReadStartupOptions();
+
+	addDebugText("Begin Startup Tweaks.");
 
 	if (H2IsDediServer) {
 		DWORD dwBack;
@@ -670,6 +694,10 @@ void ProcessH2Startup() {
 			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2FA67, disableKeyboard3, 6);
 		}
 
+		//Disables the ESRB warning after the intro video (only occurs for English Language).
+		BYTE disableEsrbWarning[] = { 0xFF, 0xFF, 0xFF, 0xFF };
+		OverwriteAssembly((BYTE*)H2BaseAddr + 0x23EE8B, disableEsrbWarning, 4);
+
 		//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
 		DWORD chatFunc = (DWORD)NotDisplayIngameChat;
 
@@ -685,10 +713,10 @@ void ProcessH2Startup() {
 		BYTE assmFuncChatRel1[4] = { pbyte1[0], pbyte1[1], pbyte1[2], pbyte1[3] };
 		OverwriteAssembly((BYTE*)instCallAddr1 + 1, assmFuncChatRel1, 4);
 	}
-
-	addDebugText("ProcessStartup finished.");
+	addDebugText("End Startup Tweaks.");
 	extern void GSSecStartLoop();
 	GSSecStartLoop();
 	extern void GSSecSweetLeetHaxA(int);
 	GSSecSweetLeetHaxA(0);
+	addDebugText("ProcessStartup finished.");
 }

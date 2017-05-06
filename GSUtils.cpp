@@ -172,3 +172,14 @@ int ComputeFileMd5Hash(wchar_t* filepath, char* rtnMd5) {
 
 	return dwStatus;
 }
+
+int GetWidePathFromFullWideFilename(wchar_t* filepath, wchar_t* rtnpath) {
+	wchar_t* offset = wcsrchr(filepath, L'\\');
+	wchar_t* off2 = wcsrchr(filepath, L'/');
+	offset = offset == NULL ? off2 : ((off2 != NULL && offset < off2) ? off2 : offset);
+	if (offset == NULL) {
+		return -1;
+	}
+	swprintf(rtnpath, offset - filepath + 2, filepath);
+	return 0;
+}
