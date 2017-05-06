@@ -12,3 +12,4 @@ extern int custom_resolution_x;
 extern int custom_resolution_y;
 
 extern wchar_t dedi_server_name[];
+extern wchar_t dedi_server_playlist[];
