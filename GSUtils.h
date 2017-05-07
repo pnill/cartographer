@@ -8,3 +8,4 @@ void GetVKeyCodeString(int vkey, char* rtnString, int strLen);
 void PadCStringWithChar(char* strToPad, int toFullLength, char c);
 int ComputeFileMd5Hash(wchar_t* filepath, char* rtnMd5);
 int GetWidePathFromFullWideFilename(wchar_t* filepath, wchar_t* rtnpath);
+LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue);

@@ -183,3 +183,19 @@ int GetWidePathFromFullWideFilename(wchar_t* filepath, wchar_t* rtnpath) {
 	swprintf(rtnpath, offset - filepath + 2, filepath);
 	return 0;
 }
+
+LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
+	DWORD dwBufferSize(sizeof(DWORD));
+	DWORD nResult(0);
+	LONG nError = ::RegQueryValueExW(hKey,
+		strValueName,
+		0,
+		NULL,
+		reinterpret_cast<LPBYTE>(&nResult),
+		&dwBufferSize);
+	if (ERROR_SUCCESS == nError)
+	{
+		*nValue = nResult;
+	}
+	return nError;
+}
