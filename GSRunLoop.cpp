@@ -321,7 +321,17 @@ bool halo2ServerFinishedLoading = false;
 void GSMainLoop() {
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
-		SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+
+		DWORD Display_Mode = 1;
+		HKEY hKeyVideoSettings = NULL;
+		if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_READ, &hKeyVideoSettings) == ERROR_SUCCESS) {
+			GetDWORDRegKey(hKeyVideoSettings, L"DisplayMode", &Display_Mode);
+			RegCloseKey(hKeyVideoSettings);
+		}
+		if (Display_Mode) {
+			SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+		}
+
 		//if (custom_resolution_x > 0 && custom_resolution_y > 0) {
 		//	SetWindowPos(H2hWnd, NULL, 0, 0, 500, 500, SWP_NOMOVE | SWP_FRAMECHANGED);
 		//	SetWindowPos(H2hWnd, NULL, 0, 0, custom_resolution_x, custom_resolution_y, SWP_NOMOVE | SWP_FRAMECHANGED);// SWP_FRAMECHANGED |  | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);

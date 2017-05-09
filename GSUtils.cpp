@@ -185,6 +185,22 @@ int GetWidePathFromFullWideFilename(wchar_t* filepath, wchar_t* rtnpath) {
 	return 0;
 }
 
+LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
+	DWORD dwBufferSize(sizeof(DWORD));
+	DWORD nResult(0);
+	LONG nError = ::RegQueryValueExW(hKey,
+		strValueName,
+		0,
+		NULL,
+		reinterpret_cast<LPBYTE>(&nResult),
+		&dwBufferSize);
+	if (ERROR_SUCCESS == nError)
+	{
+		*nValue = nResult;
+	}
+	return nError;
+}
+
 void pushHostLobby() {
 	char msg[100] = { 0x00, 0x43, 0x05 };
 	extern UINT g_port;

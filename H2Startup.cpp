@@ -539,22 +539,6 @@ void ReadStartupOptions() {
 	addDebugText("End Read Startup Options.");
 }
 
-LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
-	DWORD dwBufferSize(sizeof(DWORD));
-	DWORD nResult(0);
-	LONG nError = ::RegQueryValueExW(hKey,
-		strValueName,
-		0,
-		NULL,
-		reinterpret_cast<LPBYTE>(&nResult),
-		&dwBufferSize);
-	if (ERROR_SUCCESS == nError)
-	{
-		*nValue = nResult;
-	}
-	return nError;
-}
-
 typedef int(__cdecl *thookServ1)(HKEY, LPCWSTR);
 thookServ1 phookServ1;
 int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
