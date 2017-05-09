@@ -307,30 +307,6 @@ void hotkeyFuncHelp() {
 	setDebugTextDisplay(true);
 }
 
-void pushHostLobby() {
-	char msg[100] = { 0x00, 0x43, 0x05 };
-	extern UINT g_port;
-	sprintf(msg + 3, "push clientlobby %d", g_port + 1);
-	unsigned short int remoteServerPort = 1001;
-
-	addDebugText("Pushing open lobby.");
-
-	int socketDescriptor;
-	struct sockaddr_in serverAddress;
-	if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-		addDebugText("ERROR: Could not create socket.");
-	}
-	serverAddress.sin_family = AF_INET;
-	extern ULONG broadcast_server;
-	serverAddress.sin_addr.s_addr = broadcast_server;
-	serverAddress.sin_port = htons(remoteServerPort);
-
-	if (sendto(socketDescriptor, msg, strlen(msg + 3) + 3, 0, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
-		//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)
-		addDebugText("ERROR: Failed to push open lobby.");
-	}
-}
-
 const int hotkeyLen = 8;
 //GSFIXME: Set only completed 5
 int hotkeyListenLen = 5;
@@ -428,7 +404,22 @@ DWORD WINAPI GSLoopMaker(LPVOID lpParam) {
 	return 0;
 }
 
+typedef char(*thookIsPauseAndBlackScreen)();
+thookIsPauseAndBlackScreen phookIsPauseAndBlackScreen;
+static char HookIsPauseAndBlackScreen() {
+	char result =
+		phookIsPauseAndBlackScreen();
+	if (!QuitGSMainLoop)
+		GSMainLoop();
+	return result;
+}
+
 void initGSRunLoop() {
-	DWORD  dwThreadIdGSLooper;
-	HANDLE hThread = CreateThread(NULL, 0, GSLoopMaker, NULL, 0, &dwThreadIdGSLooper);
+	DWORD dwBack;
+
+	phookIsPauseAndBlackScreen = (thookIsPauseAndBlackScreen)DetourFunc((BYTE*)H2BaseAddr + 0x497ea, (BYTE*)HookIsPauseAndBlackScreen, 12);
+	VirtualProtect(phookIsPauseAndBlackScreen, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	//DWORD  dwThreadIdGSLooper;
+	//HANDLE hThread = CreateThread(NULL, 0, GSLoopMaker, NULL, 0, &dwThreadIdGSLooper);
 }

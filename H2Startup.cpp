@@ -624,6 +624,17 @@ static bool NotDisplayIngameChat() {
 	}
 }
 
+typedef char(__cdecl *thookChangePrivacy)(int);
+thookChangePrivacy phookChangePrivacy;
+char __cdecl HookChangePrivacy(int privacy) {
+	char result =
+		phookChangePrivacy(privacy);
+	if (result == 1 && privacy == 0) {
+		pushHostLobby();
+	}
+	return result;
+}
+
 void ProcessH2Startup() {
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
@@ -661,6 +672,12 @@ void ProcessH2Startup() {
 		//VirtualProtect(phookServ2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 	else {//is client
+
+		DWORD dwBack;
+		//Hook a function which changes the party privacy to detect if the lobby becomes open.
+		//Problem is if you want to set it via mem poking, it won't push the lobby to the master automatically.
+		//phookChangePrivacy = (thookChangePrivacy)DetourFunc((BYTE*)H2BaseAddr + 0x2153ce, (BYTE*)HookChangePrivacy, 11);
+		//VirtualProtect(phookChangePrivacy, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//Scrapped for now, maybe.
 		DWORD tempResX = 0;
