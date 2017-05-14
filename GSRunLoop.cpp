@@ -366,7 +366,7 @@ void GSMainLoop() {
 	}
 	prevPartyPrivacy = partyPrivacy;
 
-	if (GetFocus() == H2hWnd || GetForegroundWindow() == H2hWnd) {
+	if (!H2IsDediServer && (GetFocus() == H2hWnd || GetForegroundWindow() == H2hWnd)) {
 
 		for (int i = 0; i < hotkeyListenLen; i++) {
 			//& 0x8000 is pressed
