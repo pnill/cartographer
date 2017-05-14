@@ -71,7 +71,7 @@ void initPlayerNumber() {
 	if (!H2IsDediServer) {
 		if (getPlayerNumber() > 1) {
 			BYTE xinputNumFix[] = { '0' + (getPlayerNumber() / 10), 0, '0' + (getPlayerNumber() % 10) };
-			OverwriteAssembly((BYTE*)xinputdllPath + 16, xinputNumFix, 3);
+			WriteBytesASM((DWORD)xinputdllPath + 16, xinputNumFix, 3);
 
 			char pointerHex[20];
 			sprintf(pointerHex, "%x", (DWORD)xinputdllPath);
@@ -83,7 +83,7 @@ void initPlayerNumber() {
 			addDebugText(totext);
 
 			BYTE assmXinputPushIntructionPart[] = { byteArray[3], byteArray[2], byteArray[1], byteArray[0] };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x8AD28, assmXinputPushIntructionPart, 4);
+			WriteBytesASM(H2BaseAddr + 0x8AD28, assmXinputPushIntructionPart, 4);
 
 			char xinputName[40];
 			char xinputdir[12];
@@ -558,9 +558,6 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 		wchar_t* ServerPlaylist = (wchar_t*)((BYTE*)H2BaseAddr + 0x3B3704);
 		swprintf(ServerPlaylist, 256, dedi_server_playlist);
 	}
-	addDebugText("Initialising GSRunLoop.");
-	extern void initGSRunLoop();
-	initGSRunLoop();
 	return result;
 }
 
@@ -697,52 +694,52 @@ void ProcessH2Startup() {
 		if (language_code >= 0 && language_code <= 7) {
 			BYTE assmLang[15];
 			memset(assmLang, language_code, 15);
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x38300, assmLang, 15);
+			WriteBytesASM(H2BaseAddr + 0x38300, assmLang, 15);
 			BYTE* HasLoadedLanguage = (BYTE*)((char*)H2BaseAddr + 0x481908);
 			*HasLoadedLanguage = 0;
 		}
 
 		if (skip_intro) {
 			BYTE assmIntroSkip[] = { 0x3F };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x221C0E, assmIntroSkip, 1);
+			WriteBytesASM(H2BaseAddr + 0x221C0E, assmIntroSkip, 1);
 		}
 
 		if (!skip_intro && IntroHQ) {
 			BYTE assmIntroHQ[] = { 0xEB };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x221C29, assmIntroHQ, 1);
+			WriteBytesASM(H2BaseAddr + 0x221C29, assmIntroHQ, 1);
 		}
 
 		//Allows unlimited clients
 		BYTE assmUnlimitedClients[41];
 		memset(assmUnlimitedClients, 0x00, 41);
-		OverwriteAssembly((BYTE*)H2BaseAddr + 0x39BCF0, assmUnlimitedClients, 41);
+		WriteBytesASM(H2BaseAddr + 0x39BCF0, assmUnlimitedClients, 41);
 
 		//Allows on a remote desktop connection
 		BYTE assmRemoteDesktop[] = { 0xEB };
-		OverwriteAssembly((BYTE*)H2BaseAddr + 0x7E54, assmRemoteDesktop, 1);
+		WriteBytesASM(H2BaseAddr + 0x7E54, assmRemoteDesktop, 1);
 
 		//multi-process splitscreen input hacks
 		if (disable_ingame_keyboard) {
 			//Allows to repeat last movement when lose focus in mp, unlocks METHOD E from point after intro vid
 			BYTE getFocusB[] = { 0x00 };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2E3C5, getFocusB, 1);
+			WriteBytesASM(H2BaseAddr + 0x2E3C5, getFocusB, 1);
 			//Allows input when not in focus.
 			BYTE getFocusE[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2F9EA, getFocusE, 6);
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2F9FC, getFocusE, 6);
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2FA09, getFocusE, 6);
+			WriteBytesASM(H2BaseAddr + 0x2F9EA, getFocusE, 6);
+			WriteBytesASM(H2BaseAddr + 0x2F9FC, getFocusE, 6);
+			WriteBytesASM(H2BaseAddr + 0x2FA09, getFocusE, 6);
 			//Disables the keyboard only when in-game and not in a menu.
 			BYTE disableKeyboard1[] = { 0x90, 0x90, 0x90 };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
+			WriteBytesASM(H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
 			BYTE disableKeyboard2[] = { 0x00 };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2FA92, disableKeyboard2, 1);
+			WriteBytesASM(H2BaseAddr + 0x2FA92, disableKeyboard2, 1);
 			BYTE disableKeyboard3[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2FA67, disableKeyboard3, 6);
+			WriteBytesASM(H2BaseAddr + 0x2FA67, disableKeyboard3, 6);
 		}
 
 		//Disables the ESRB warning after the intro video (only occurs for English Language).
 		BYTE disableEsrbWarning[] = { 0xFF, 0xFF, 0xFF, 0xFF };
-		OverwriteAssembly((BYTE*)H2BaseAddr + 0x23EE8B, disableEsrbWarning, 4);
+		WriteBytesASM(H2BaseAddr + 0x23EE8B, disableEsrbWarning, 4);
 
 		//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
 		DWORD chatFunc = (DWORD)NotDisplayIngameChat;
@@ -751,18 +748,20 @@ void ProcessH2Startup() {
 		DWORD callRelative2 = chatFunc - (instCallAddr2 + 5);
 		BYTE* pbyte2 = (BYTE*)&callRelative2;
 		BYTE assmFuncChatRel2[4] = { pbyte2[0], pbyte2[1], pbyte2[2], pbyte2[3] };
-		OverwriteAssembly((BYTE*)instCallAddr2 + 1, assmFuncChatRel2, 4);
+		WriteBytesASM(instCallAddr2 + 1, assmFuncChatRel2, 4);
 
 		DWORD instCallAddr1 = H2BaseAddr + 0x226628;
 		DWORD callRelative1 = chatFunc - (instCallAddr1 + 5);
 		BYTE* pbyte1 = (BYTE*)&callRelative1;
 		BYTE assmFuncChatRel1[4] = { pbyte1[0], pbyte1[1], pbyte1[2], pbyte1[3] };
-		OverwriteAssembly((BYTE*)instCallAddr1 + 1, assmFuncChatRel1, 4);
+		WriteBytesASM(instCallAddr1 + 1, assmFuncChatRel1, 4);
 	}
 	addDebugText("End Startup Tweaks.");
 	extern void GSSecStartLoop();
 	GSSecStartLoop();
 	extern void GSSecSweetLeetHaxA(int);
 	GSSecSweetLeetHaxA(0);
+	extern void initGSRunLoop();
+	initGSRunLoop();
 	addDebugText("ProcessStartup finished.");
 }

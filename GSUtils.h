@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
+///Use instead: WriteBytesASM(DWORD destAddress, LPVOID patch, DWORD numBytes);
 void OverwriteAssembly(BYTE* srcAddr, BYTE* writeAssm, int lenAssm);
 void HexToByteArray(BYTE* byteArray, char* pointerHex);
 int FindLineStart(FILE* fp, int lineStrLen);

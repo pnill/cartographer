@@ -640,9 +640,9 @@ void H2MOD::set_unit_speed_patch(bool hackit) {
 	//Enable Speed Hacks
 	BYTE assmPatchSpeed[8];
 	memset(assmPatchSpeed, 0x90, 8);
-	OverwriteAssembly((BYTE*)h2mod->GetBase() + 0x6AB7f, assmPatchSpeed, 8);
+	WriteBytesASM(h2mod->GetBase() + 0x6AB7f, assmPatchSpeed, 8);
 	//dedi server
-	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x6A3BA, assmPatchSpeed, 8);
+	//WriteBytesASM(H2BaseAddr + 0x6A3BA, assmPatchSpeed, 8);
 }
 
 void H2MOD::set_unit_speed(float speed, int pIndex)
@@ -848,7 +848,7 @@ void PatchFixRankIcon() {
 			}
 		}
 		if (shouldPatch) {
-			OverwriteAssembly((BYTE*)assmOffset, assmPatchFixRankIcon, assmlen);
+			WriteBytesASM((DWORD)assmOffset, assmPatchFixRankIcon, assmlen);
 			addDebugText("Patching Rank Icon Fix.");
 		}
 	}

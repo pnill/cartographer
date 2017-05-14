@@ -1,17 +1,19 @@
 #include "GSUtils.h"
 #include "H2OnscreenDebugLog.h"
+#include "Hook.h"
 #include <stdio.h>
 #include <windows.h>
 #include <Wincrypt.h>
 
 void OverwriteAssembly(BYTE* srcAddr, BYTE* writeAssm, int lenAssm) {
-	DWORD dwBack;
+	WriteBytesASM((DWORD)srcAddr, writeAssm, lenAssm);
+	/*DWORD dwBack;
 	VirtualProtect(srcAddr, lenAssm, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	for (int i = 0; i < lenAssm; i++)
 		srcAddr[i] = writeAssm[i];
 
-	VirtualProtect(srcAddr, lenAssm, dwBack, &dwBack);
+	VirtualProtect(srcAddr, lenAssm, dwBack, &dwBack);*/
 }
 
 void HexToByteArray(BYTE* byteArray, char* pointerHex) {

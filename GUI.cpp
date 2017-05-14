@@ -131,8 +131,6 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		extern RECT rectScreenOriginal;
 		H2hWnd = pPii->hWnd;
 		GetWindowRect(H2hWnd, &rectScreenOriginal);
-		extern void initGSRunLoop();
-		initGSRunLoop();
 		once1 = true;
 	}
 	return 1;

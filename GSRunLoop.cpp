@@ -317,7 +317,7 @@ void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotk
 int prevPartyPrivacy = 0;
 
 bool halo2WindowExists = false;
-bool halo2ServerFinishedLoading = false;
+bool halo2ServerOnce1 = false;
 void GSMainLoop() {
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
@@ -344,11 +344,11 @@ void GSMainLoop() {
 			SetWindowText(H2hWnd, titleMod);
 		}
 	}
-	if (H2IsDediServer && !halo2ServerFinishedLoading) {
+	if (H2IsDediServer && !halo2ServerOnce1) {
+		halo2ServerOnce1 = true;
+		pushHostLobby();
 		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
-		if (wcslen(LanServerName) > 0 && wcslen(dedi_server_name) > 0) {
-			halo2ServerFinishedLoading = true;
-			pushHostLobby();
+		if (wcslen(dedi_server_name) > 0) {
 			swprintf(LanServerName, 32, dedi_server_name);
 		}
 	}
@@ -382,54 +382,43 @@ void GSMainLoop() {
 	}
 }
 
-class later
-{
-public:
-	template <class callable, class... arguments>
-	later(int after, bool async, callable&& f, arguments&&... args)
-	{
-		std::function<typename std::result_of<callable(arguments...)>::type()> task(std::bind(std::forward<callable>(f), std::forward<arguments>(args)...));
+signed int(*sub_287a1)();
 
-		if (async)
-		{
-			std::thread([after, task]() {
-				std::this_thread::sleep_for(std::chrono::milliseconds(after));
-				task();
-			}).detach();
-		}
-		else
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(after));
-			task();
-		}
-	}
-
-};
-
-DWORD WINAPI GSLoopMaker(LPVOID lpParam) {
-	while (!QuitGSMainLoop) {
-		//loop every 4 milliseconds
-		later later_test1(4, false, &GSMainLoop);
-	}
-	return 0;
-}
-
-typedef char(*thookIsPauseAndBlackScreen)();
-thookIsPauseAndBlackScreen phookIsPauseAndBlackScreen;
-static char HookIsPauseAndBlackScreen() {
-	char result =
-		phookIsPauseAndBlackScreen();
+static signed int HookedClientRandFunc() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
+	
+	signed int result = sub_287a1();
 	return result;
 }
 
+static char HookedServerShutdownCheck() {
+	if (!QuitGSMainLoop)
+		GSMainLoop();
+	
+	BYTE* Quit_Exit_Game = (BYTE*)((char*)H2BaseAddr + 0x4a7083);
+	//original test - if game should shutdown
+	return *Quit_Exit_Game;
+}
+
 void initGSRunLoop() {
-	DWORD dwBack;
-
-	phookIsPauseAndBlackScreen = (thookIsPauseAndBlackScreen)DetourFunc((BYTE*)H2BaseAddr + 0x497ea, (BYTE*)HookIsPauseAndBlackScreen, 12);
-	VirtualProtect(phookIsPauseAndBlackScreen, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-	//DWORD  dwThreadIdGSLooper;
-	//HANDLE hThread = CreateThread(NULL, 0, GSLoopMaker, NULL, 0, &dwThreadIdGSLooper);
+	addDebugText("Pre GSRunLoop Hooking.");
+	if (H2IsDediServer) {
+		DWORD newFunc = (DWORD)HookedServerShutdownCheck;
+		DWORD instCallAddr2 = H2BaseAddr + 0xc6cb;
+		DWORD callRelative2 = newFunc - (instCallAddr2 + 5);
+		BYTE* pbyte2 = (BYTE*)&callRelative2;
+		BYTE assmFuncChatRel2[4] = { pbyte2[0], pbyte2[1], pbyte2[2], pbyte2[3] };
+		WriteBytesASM(instCallAddr2 + 1, assmFuncChatRel2, 4);
+	}
+	else {
+		sub_287a1 = (signed int(*)())((char*)H2BaseAddr + 0x287a1);
+		DWORD newFunc = (DWORD)HookedClientRandFunc;
+		DWORD instCallAddr2 = H2BaseAddr + 0x399f3;
+		DWORD callRelative2 = newFunc - (instCallAddr2 + 5);
+		BYTE* pbyte2 = (BYTE*)&callRelative2;
+		BYTE assmFuncChatRel2[4] = { pbyte2[0], pbyte2[1], pbyte2[2], pbyte2[3] };
+		WriteBytesASM(instCallAddr2 + 1, assmFuncChatRel2, 4);
+	}
+	addDebugText("Post GSRunLoop Hooking.");
 }
