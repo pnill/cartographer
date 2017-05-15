@@ -412,7 +412,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 		if (iplong != broadcast_server)
 		{
 	
-			if (*(ULONG*)buf == 0x11223346)
+			if (*(ULONG*)buf == 0x11223345)
 			{
 				User.smap[hostpair] = *(ULONG*)(buf + 4);
 				
