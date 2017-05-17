@@ -19,6 +19,7 @@ public:
 	void SpawnPlayer(int PlayerIndex);
 	int GetCurrentWeapon(int PlayerIndex);
 	void PlayerDied(int unit_datum_index); // We need to start using PlayerIndex here for sanity.
+	void NextRound();
 
 	std::unordered_map<int, int> level_weapon;
 	std::unordered_map<int, int> player_level;

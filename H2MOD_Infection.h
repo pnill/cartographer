@@ -19,6 +19,7 @@ public:
 	void Initialize();
 	void Deinitialize();
 	void FindZombie();
+	void NextRound();
 
 	std::unordered_map<InfectionPlayer*, bool> infected_players;
 
