@@ -929,6 +929,15 @@ int __cdecl OnMapLoad(int a1)
 #pragma region H2v Stuff
 	if (!h2mod->Server)
 	{
+#pragma region Crosshair Offset
+
+		//*(float*)(AddressOffset + 0x3DC00) = crosshair_offset;		
+		DWORD CrosshairY = *(DWORD*)((char*)h2mod->GetBase() + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C;
+		*(float*)CrosshairY = crosshair_offset;
+
+
+
+#pragma endregion
 
 		if (*GameEngine == 3) {
 			MasterState = 10;
@@ -1031,11 +1040,7 @@ int __cdecl OnMapLoad(int a1)
 			*(float*)(AddressOffset + 0xB7F914) = 5000.0f; //sniper_bullet.proj Initial Velocity
 			*(float*)(AddressOffset + 0xB7F918) = 5000.0f; //sniper_bullet.proj Final Velocity
 #pragma endregion
-
-#pragma region Crosshair Offset
-			*(float*)(AddressOffset + 0x3DC00) = crosshair_offset;
-#pragma endregion
-
+			
 #pragma region Halo2Final
 			if (b_Halo2Final && !h2mod->Server)
 				h2f->Initialize(isHost);

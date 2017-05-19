@@ -242,8 +242,7 @@ void Infection::SpawnPlayer(int PlayerIndex)
 
 		if (unit_object)//if Spawned(alive)
 		{
-			//call_unit_reset_equipment(unit_datum_index);
-
+			
 #pragma region HumansPowerUp
 			if (h2mod->get_unit_team_index(unit_datum_index) == 0)
 			{
@@ -273,6 +272,7 @@ void Infection::PlayerInfected(int unit_datum_index)
 
 #pragma region Host/Dedi Stuff
 	int pIndex = h2mod->get_player_index_from_unit_datum(unit_datum_index);
+	int unit_object = call_get_object(unit_datum_index, 3);
 	
 	if (isHost||h2mod->Server)
 	{
@@ -287,13 +287,14 @@ void Infection::PlayerInfected(int unit_datum_index)
 				it->first->infected = true;
 			}
 		}
+		if (unit_object)
 		call_unit_reset_equipment(unit_datum_index);//Take away Weapons.
 	}
 #pragma endregion
 #pragma region H2v Stuffs
 	if (!h2mod->Server)
 	{
-		int unit_object = call_get_object(unit_datum_index, 3);
+		
 
 		if (unit_object)
 		{
