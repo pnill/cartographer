@@ -133,11 +133,11 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>C:\Program Files (x86)\Microsoft Games\Halo 2\Tests\xlive.dll</OutputFile>
+      <OutputFile>C:\Program Files (x86)\Microsoft Games\Halo 2\xlive.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\Debug/binkw32.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>./Debug/xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <ImportLibrary>.\Debug/binkw32.lib</ImportLibrary>
@@ -165,7 +165,6 @@
     </ClCompile>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Globals.cpp" />
-    <ClCompile Include="GSMenu.cpp" />
     <ClCompile Include="GSRunLoop.cpp" />
     <ClCompile Include="GSUtils.cpp" />
     <ClCompile Include="GUI.cpp" />

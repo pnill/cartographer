@@ -1,10 +1,13 @@
 #include "H2OnscreenDebugLog.h"
+#include "H2Startup.h"
 #include "stdafx.h"
 
 char** DebugStr;
 int DebugTextArrayLenMax = 160;
 int DebugTextArrayPos = 0;
 bool DebugTextDisplay = false;
+FILE* debugFile = NULL;
+bool initialisedDebugText = false;
 
 
 int getDebugTextArrayMaxLen() {
@@ -12,6 +15,7 @@ int getDebugTextArrayMaxLen() {
 }
 
 void addDebugText(char* text) {
+	if (!initialisedDebugText) return;
 
 	int lenInput = strlen(text);
 
@@ -29,17 +33,35 @@ void addDebugText(char* text) {
 	DebugStr[DebugTextArrayPos] = (char*)malloc(sizeof(char) * lenInput + 1);
 	strncpy(DebugStr[DebugTextArrayPos], text, lenInput);
 	memset(DebugStr[DebugTextArrayPos] + lenInput, 0, 1);
+
+	if (debugFile != NULL) {
+		char* debug_text = (char*)malloc(sizeof(char) * lenInput + 2);
+		strncpy(debug_text, text, lenInput);
+		memset(debug_text + lenInput, '\n', 1);
+		memset(debug_text + lenInput + 1, 0, 1);
+		fputs(debug_text, debugFile);
+		free(debug_text);
+		fflush(debugFile);
+	}
+
 	if (endChar) {
 		addDebugText(endChar + 1);
 	}
 }
 
 void initDebugText() {
+	initialisedDebugText = true;
 	DebugStr = (char**)malloc(sizeof(char*) * DebugTextArrayLenMax);
 	for (int i = 0; i < DebugTextArrayLenMax; i++) {
 		DebugStr[i] = (char*)calloc(1, sizeof(char));
 	}
-	addDebugText("Initialised Debug Text");
+	wchar_t debug_file_path[1024];
+	swprintf(debug_file_path, 1024, L"%wsh2onscreendebug.log", processFilePath);
+	debugFile = _wfopen(debug_file_path, L"w");
+	char awerg[1034];
+	sprintf(awerg, "PATH: %ws", debug_file_path);
+	addDebugText(awerg);
+	addDebugText("Initialised On Screen Debug Text.");
 }
 
 char* getDebugText(int ordered_index) {
