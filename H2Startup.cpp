@@ -742,19 +742,8 @@ void ProcessH2Startup() {
 		WriteBytesASM(H2BaseAddr + 0x23EE8B, disableEsrbWarning, 4);
 
 		//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
-		DWORD chatFunc = (DWORD)NotDisplayIngameChat;
-
-		DWORD instCallAddr2 = H2BaseAddr + 0x22667B;
-		DWORD callRelative2 = chatFunc - (instCallAddr2 + 5);
-		BYTE* pbyte2 = (BYTE*)&callRelative2;
-		BYTE assmFuncChatRel2[4] = { pbyte2[0], pbyte2[1], pbyte2[2], pbyte2[3] };
-		WriteBytesASM(instCallAddr2 + 1, assmFuncChatRel2, 4);
-
-		DWORD instCallAddr1 = H2BaseAddr + 0x226628;
-		DWORD callRelative1 = chatFunc - (instCallAddr1 + 5);
-		BYTE* pbyte1 = (BYTE*)&callRelative1;
-		BYTE assmFuncChatRel1[4] = { pbyte1[0], pbyte1[1], pbyte1[2], pbyte1[3] };
-		WriteBytesASM(instCallAddr1 + 1, assmFuncChatRel1, 4);
+		PatchCall(H2BaseAddr + 0x22667B, (DWORD)NotDisplayIngameChat);
+		PatchCall(H2BaseAddr + 0x226628, (DWORD)NotDisplayIngameChat);
 	}
 	addDebugText("End Startup Tweaks.");
 	extern void GSSecStartLoop();

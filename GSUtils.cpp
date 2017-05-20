@@ -16,6 +16,13 @@ void OverwriteAssembly(BYTE* srcAddr, BYTE* writeAssm, int lenAssm) {
 	VirtualProtect(srcAddr, lenAssm, dwBack, &dwBack);*/
 }
 
+void PatchCall(DWORD call_addr, DWORD new_function_ptr) {
+	DWORD callRelative = new_function_ptr - (call_addr + 5);
+	BYTE* pbyte = (BYTE*)&callRelative;
+	BYTE assmNewFuncRel[4] = { pbyte[0], pbyte[1], pbyte[2], pbyte[3] };
+	WriteBytesASM(call_addr + 1, assmNewFuncRel, 4);
+}
+
 void HexToByteArray(BYTE* byteArray, char* pointerHex) {
 	char totext2[32];
 	memset(totext2, '0', 1);

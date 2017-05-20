@@ -404,21 +404,11 @@ static char HookedServerShutdownCheck() {
 void initGSRunLoop() {
 	addDebugText("Pre GSRunLoop Hooking.");
 	if (H2IsDediServer) {
-		DWORD newFunc = (DWORD)HookedServerShutdownCheck;
-		DWORD instCallAddr2 = H2BaseAddr + 0xc6cb;
-		DWORD callRelative2 = newFunc - (instCallAddr2 + 5);
-		BYTE* pbyte2 = (BYTE*)&callRelative2;
-		BYTE assmFuncChatRel2[4] = { pbyte2[0], pbyte2[1], pbyte2[2], pbyte2[3] };
-		WriteBytesASM(instCallAddr2 + 1, assmFuncChatRel2, 4);
+		PatchCall(H2BaseAddr + 0xc6cb, (DWORD)HookedServerShutdownCheck);
 	}
 	else {
 		sub_287a1 = (signed int(*)())((char*)H2BaseAddr + 0x287a1);
-		DWORD newFunc = (DWORD)HookedClientRandFunc;
-		DWORD instCallAddr2 = H2BaseAddr + 0x399f3;
-		DWORD callRelative2 = newFunc - (instCallAddr2 + 5);
-		BYTE* pbyte2 = (BYTE*)&callRelative2;
-		BYTE assmFuncChatRel2[4] = { pbyte2[0], pbyte2[1], pbyte2[2], pbyte2[3] };
-		WriteBytesASM(instCallAddr2 + 1, assmFuncChatRel2, 4);
+		PatchCall(H2BaseAddr + 0x399f3, (DWORD)HookedClientRandFunc);
 	}
 	addDebugText("Post GSRunLoop Hooking.");
 }
