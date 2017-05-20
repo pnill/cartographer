@@ -22,7 +22,7 @@ UINT g_online = 1;
 UINT g_debug = 0;
 UINT g_port = 1000;
 UINT fps_enable = 1;
-UINT fps_limit = 58;
+UINT fps_limit = 60;
 UINT field_of_view = 57;
 float crosshair_offset = 0.165f;
 
@@ -33,6 +33,7 @@ UINT map_downloading_enable = 0;
 UINT chatbox_commands = 0;
 
 ULONG broadcast_server = inet_addr("149.56.81.89");
+
 
 UINT g_signin[4] = { 1,0,0,0 };
 CHAR g_szUserName[4][16+1] = { "Cartographer", "Cartographer", "Cartographer", "Cartographer" };
