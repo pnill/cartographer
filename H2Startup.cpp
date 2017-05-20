@@ -13,8 +13,10 @@ int custom_resolution_x = 0;
 int custom_resolution_y = 0;
 bool hide_ingame_chat = false;
 wchar_t dedi_server_name[32];
+wchar_t dedi_server_playlist[256];
 bool H2IsDediServer;
 DWORD H2BaseAddr;
+wchar_t* processFilePath;
 HWND H2hWnd = NULL;
 
 int playerNumber = 0;
@@ -43,7 +45,7 @@ wchar_t* instanceMutexClient = L"Halo2Player%d";
 wchar_t* instanceMutexServer = L"Halo2Server%d";
 
 void initPlayerNumber() {
-
+	addDebugText("Determining Process Instance Number.");
 	HANDLE mutex;
 	DWORD lastErr;
 	do {
@@ -69,7 +71,7 @@ void initPlayerNumber() {
 	if (!H2IsDediServer) {
 		if (getPlayerNumber() > 1) {
 			BYTE xinputNumFix[] = { '0' + (getPlayerNumber() / 10), 0, '0' + (getPlayerNumber() % 10) };
-			OverwriteAssembly((BYTE*)xinputdllPath + 16, xinputNumFix, 3);
+			WriteBytesASM((DWORD)xinputdllPath + 16, xinputNumFix, 3);
 
 			char pointerHex[20];
 			sprintf(pointerHex, "%x", (DWORD)xinputdllPath);
@@ -81,7 +83,7 @@ void initPlayerNumber() {
 			addDebugText(totext);
 
 			BYTE assmXinputPushIntructionPart[] = { byteArray[3], byteArray[2], byteArray[1], byteArray[0] };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x8AD28, assmXinputPushIntructionPart, 4);
+			WriteBytesASM(H2BaseAddr + 0x8AD28, assmXinputPushIntructionPart, 4);
 
 			char xinputName[40];
 			char xinputdir[12];
@@ -194,11 +196,14 @@ void initPlayerNumber() {
 			}
 		}
 	}
+	addDebugText("Finished Processing Instance Number.");
 }
 
 void ReadStartupOptions() {
-	LPWSTR fileStartupini = new WCHAR[256];
-	swprintf(fileStartupini, L"h2startup%d.ini", getPlayerNumber());
+	addDebugText("Begin Read Startup Options.");
+
+	wchar_t fileStartupini[1024];
+	swprintf(fileStartupini, 1024, L"%wsh2startup%d.ini", processFilePath, getPlayerNumber());
 
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
@@ -213,6 +218,11 @@ void ReadStartupOptions() {
 			}
 		}
 	}
+
+	char awerg[1034];
+	sprintf(awerg, "PATH: %ws", fileStartupini);
+	addDebugText(awerg);
+
 	//Variables read check
 	bool est_language_code = false;
 	bool est_skip_intro = false;
@@ -220,6 +230,8 @@ void ReadStartupOptions() {
 	bool est_custom_resolution = false;
 	bool est_server_name = false;
 	dedi_server_name[31] = dedi_server_name[0] = 0;
+	bool est_server_playlist = false;
+	dedi_server_playlist[255] = dedi_server_playlist[0] = 0;
 	//Hotkeys
 	bool est_hotkey_help = false;
 	bool est_hotkey_toggle_debug = false;
@@ -231,10 +243,12 @@ void ReadStartupOptions() {
 	int flagged_pos = -1;
 	FILE *fp;
 	if (fp = _wfopen(fileStartupini, L"r")) {
+		addDebugText("File found.");
 		flagged_pos = 0;
-		char string[256];
-		while (fgets(string, 255, fp)) {
-			if (flagged_pos > 256) {
+		char string[512];
+		while (fgets(string, 511, fp)) {
+			if (flagged_pos > 512) {
+				addDebugText("File config overflow! There are too many bad lines in SETUP config!");
 				MessageBoxA(NULL, "There are too many bad lines in SETUP config!", "File config overflow!", MB_OK);
 				exit(EXIT_FAILURE);
 			}
@@ -293,11 +307,40 @@ void ReadStartupOptions() {
 				}
 				else {
 					char* tempName = string + strlen("server_name =");
-					while (*tempName == ' ') {
+					while (isspace(*tempName)) {
 						tempName++;
 					}
 					swprintf(dedi_server_name, 32, L"%hs", tempName);
+					for (int j = wcslen(dedi_server_name) - 1; j > 0; j--) {
+						if (isspace(dedi_server_name[j])) {
+							dedi_server_name[j] = 0;
+						}
+						else {
+							break;
+						}
+					}
 					est_server_name = true;
+				}
+			}
+			else if (strstr(string, "server_playlist =")) {
+				if (est_server_playlist) {
+					flagged[flagged_pos++] = FindLineStart(fp, strlen(string));
+				}
+				else {
+					char* tempName = string + strlen("server_playlist =");
+					while (isspace(*tempName)) {
+						tempName++;
+					}
+					swprintf(dedi_server_playlist, 256, L"%hs", tempName);
+					for (int j = wcslen(dedi_server_playlist)-1; j > 0; j--) {
+						if (isspace(dedi_server_playlist[j])) {
+							dedi_server_playlist[j] = 0;
+						}
+						else {
+							break;
+						}
+					}
+					est_server_playlist = true;
 				}
 			}
 			else if (strstr(string, "hotkey_help =")) {
@@ -358,16 +401,18 @@ void ReadStartupOptions() {
 		}
 		fclose(fp);
 		fp = NULL;
-		if (!flagged_pos && !(est_language_code && est_skip_intro && est_disable_ingame_keyboard /*&& est_custom_resolution*/ && est_server_name && est_hotkey_help && est_hotkey_toggle_debug && est_hotkey_align_window && est_hotkey_window_mode && est_hotkey_hide_ingame_chat)) {
+		if (!flagged_pos && !(est_language_code && est_skip_intro && est_disable_ingame_keyboard /*&& est_custom_resolution*/ && est_server_name && est_server_playlist && est_hotkey_help && est_hotkey_toggle_debug && est_hotkey_align_window && est_hotkey_window_mode && est_hotkey_hide_ingame_chat)) {
 			flagged_pos = -2;
 		}
 	}
 	if (flagged_pos) {
+		addDebugText("Edits to be made.");
 		if (flagged_pos == -1) {
 			if (fp = _wfopen(fileStartupini, L"w")) {
 				fclose(fp);
 			}
 			else {
+				addDebugText("Unknown Error: Error 78t6.");
 				fileFail(fp);
 				MessageBoxA(NULL, "Error 78t6.", "Unknown Error", MB_OK);
 				exit(EXIT_FAILURE);
@@ -402,6 +447,10 @@ void ReadStartupOptions() {
 				fputs("\n# Sets the name of the server up to 31 characters long.", fp);
 				fputs("\n# Leave blank/empty for no effect.", fp);
 				fputs("\n\n", fp);
+				fputs("# server_playlist Options (Server):", fp);
+				fputs("\n# Sets the playlist of the server up to 255 characters long.", fp);
+				fputs("\n# Leave blank/empty for no effect.", fp);
+				fputs("\n\n", fp);
 				fputs("# hotkey_... Options (Client):", fp);
 				fputs("\n# The number used is the keyboard Virtual-Key (VK) Code in base-10 integer form.", fp);
 				fputs("\n# The codes in hexadecimal (base-16) form can be found here:", fp);
@@ -431,6 +480,9 @@ void ReadStartupOptions() {
 			//}
 			if (!est_server_name) {
 				fputs("\nserver_name = ", fp);
+			}
+			if (!est_server_playlist) {
+				fputs("\nserver_playlist = ", fp);
 			}
 			if (!est_hotkey_help) {
 				char hotkeyText[60];
@@ -465,6 +517,7 @@ void ReadStartupOptions() {
 			fclose(fp);
 		}
 		else {
+			addDebugText("Unknown Error: Error bn689.");
 			fileFail(fp);
 			MessageBoxA(NULL, "Error bn689.", "Unknown Error", MB_OK);
 			exit(EXIT_FAILURE);
@@ -483,22 +536,7 @@ void ReadStartupOptions() {
 		sprintf(NotificationPlayerText, "Successfully loaded config file: %ls", fileStartupini);
 		addDebugText(NotificationPlayerText);
 	}
-}
-
-LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
-	DWORD dwBufferSize(sizeof(DWORD));
-	DWORD nResult(0);
-	LONG nError = ::RegQueryValueExW(hKey,
-		strValueName,
-		0,
-		NULL,
-		reinterpret_cast<LPBYTE>(&nResult),
-		&dwBufferSize);
-	if (ERROR_SUCCESS == nError)
-	{
-		*nValue = nResult;
-	}
-	return nError;
+	addDebugText("End Read Startup Options.");
 }
 
 typedef int(__cdecl *thookServ1)(HKEY, LPCWSTR);
@@ -506,6 +544,7 @@ thookServ1 phookServ1;
 int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 	char result =
 		phookServ1(hKey, lpSubKey);
+	addDebugText("Post Server Registry Read.");
 	if (wcslen(dedi_server_name) > 0) {
 		wchar_t* PreLoadServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x3B49B4);
 		swprintf(PreLoadServerName, 15, dedi_server_name);
@@ -515,8 +554,10 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
 		swprintf(LanServerName, 2, L"");
 	}
-	extern void initGSRunLoop();
-	initGSRunLoop();
+	if (wcslen(dedi_server_playlist) > 0) {
+		wchar_t* ServerPlaylist = (wchar_t*)((BYTE*)H2BaseAddr + 0x3B3704);
+		swprintf(ServerPlaylist, 256, dedi_server_playlist);
+	}
 	return result;
 }
 
@@ -564,23 +605,43 @@ static bool NotDisplayIngameChat() {
 	}
 }
 
+typedef char(__cdecl *thookChangePrivacy)(int);
+thookChangePrivacy phookChangePrivacy;
+char __cdecl HookChangePrivacy(int privacy) {
+	char result =
+		phookChangePrivacy(privacy);
+	if (result == 1 && privacy == 0) {
+		pushHostLobby();
+	}
+	return result;
+}
+
 void ProcessH2Startup() {
+	int ArgCnt;
+	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
+	processFilePath = (wchar_t*)malloc(wcslen(ArgList[0]) * sizeof(wchar_t));
+	int rtncodepath = GetWidePathFromFullWideFilename(ArgList[0], processFilePath);
+	if (rtncodepath == -1) {
+		swprintf(processFilePath, L"");
+	}
+
 	initDebugText();
 	//halo2ThreadID = GetCurrentThreadId();
-	if (GetModuleHandle(L"H2Server.exe"))
-	{
+	if (GetModuleHandle(L"H2Server.exe")) {
 		H2BaseAddr = (DWORD)GetModuleHandle(L"H2Server.exe");
 		H2IsDediServer = true;
 		addDebugText("Process is Dedi-Server");
 	}
-	else
-	{
+	else {
 		H2BaseAddr = (DWORD)GetModuleHandle(L"halo2.exe");
 		H2IsDediServer = false;
 		addDebugText("Process is Client");
 	}
+	
 	initPlayerNumber();
 	ReadStartupOptions();
+
+	addDebugText("Begin Startup Tweaks.");
 
 	if (H2IsDediServer) {
 		DWORD dwBack;
@@ -592,6 +653,12 @@ void ProcessH2Startup() {
 		//VirtualProtect(phookServ2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 	else {//is client
+
+		DWORD dwBack;
+		//Hook a function which changes the party privacy to detect if the lobby becomes open.
+		//Problem is if you want to set it via mem poking, it won't push the lobby to the master automatically.
+		//phookChangePrivacy = (thookChangePrivacy)DetourFunc((BYTE*)H2BaseAddr + 0x2153ce, (BYTE*)HookChangePrivacy, 11);
+		//VirtualProtect(phookChangePrivacy, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//Scrapped for now, maybe.
 		DWORD tempResX = 0;
@@ -627,68 +694,63 @@ void ProcessH2Startup() {
 		if (language_code >= 0 && language_code <= 7) {
 			BYTE assmLang[15];
 			memset(assmLang, language_code, 15);
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x38300, assmLang, 15);
+			WriteBytesASM(H2BaseAddr + 0x38300, assmLang, 15);
 			BYTE* HasLoadedLanguage = (BYTE*)((char*)H2BaseAddr + 0x481908);
 			*HasLoadedLanguage = 0;
 		}
 
 		if (skip_intro) {
 			BYTE assmIntroSkip[] = { 0x3F };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x221C0E, assmIntroSkip, 1);
+			WriteBytesASM(H2BaseAddr + 0x221C0E, assmIntroSkip, 1);
 		}
 
 		if (!skip_intro && IntroHQ) {
 			BYTE assmIntroHQ[] = { 0xEB };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x221C29, assmIntroHQ, 1);
+			WriteBytesASM(H2BaseAddr + 0x221C29, assmIntroHQ, 1);
 		}
 
 		//Allows unlimited clients
 		BYTE assmUnlimitedClients[41];
 		memset(assmUnlimitedClients, 0x00, 41);
-		OverwriteAssembly((BYTE*)H2BaseAddr + 0x39BCF0, assmUnlimitedClients, 41);
+		WriteBytesASM(H2BaseAddr + 0x39BCF0, assmUnlimitedClients, 41);
 
 		//Allows on a remote desktop connection
 		BYTE assmRemoteDesktop[] = { 0xEB };
-		OverwriteAssembly((BYTE*)H2BaseAddr + 0x7E54, assmRemoteDesktop, 1);
+		WriteBytesASM(H2BaseAddr + 0x7E54, assmRemoteDesktop, 1);
 
 		//multi-process splitscreen input hacks
 		if (disable_ingame_keyboard) {
 			//Allows to repeat last movement when lose focus in mp, unlocks METHOD E from point after intro vid
 			BYTE getFocusB[] = { 0x00 };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2E3C5, getFocusB, 1);
+			WriteBytesASM(H2BaseAddr + 0x2E3C5, getFocusB, 1);
 			//Allows input when not in focus.
 			BYTE getFocusE[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2F9EA, getFocusE, 6);
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2F9FC, getFocusE, 6);
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2FA09, getFocusE, 6);
+			WriteBytesASM(H2BaseAddr + 0x2F9EA, getFocusE, 6);
+			WriteBytesASM(H2BaseAddr + 0x2F9FC, getFocusE, 6);
+			WriteBytesASM(H2BaseAddr + 0x2FA09, getFocusE, 6);
 			//Disables the keyboard only when in-game and not in a menu.
 			BYTE disableKeyboard1[] = { 0x90, 0x90, 0x90 };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
+			WriteBytesASM(H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
 			BYTE disableKeyboard2[] = { 0x00 };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2FA92, disableKeyboard2, 1);
+			WriteBytesASM(H2BaseAddr + 0x2FA92, disableKeyboard2, 1);
 			BYTE disableKeyboard3[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-			OverwriteAssembly((BYTE*)H2BaseAddr + 0x2FA67, disableKeyboard3, 6);
+			WriteBytesASM(H2BaseAddr + 0x2FA67, disableKeyboard3, 6);
 		}
 
+		//Disables the ESRB warning after the intro video (only occurs for English Language).
+		BYTE disableEsrbWarning[] = { 0xFF, 0xFF, 0xFF, 0xFF };
+		WriteBytesASM(H2BaseAddr + 0x23EE8B, disableEsrbWarning, 4);
+
 		//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
-		DWORD chatFunc = (DWORD)NotDisplayIngameChat;
-
-		DWORD instCallAddr2 = H2BaseAddr + 0x22667B;
-		DWORD callRelative2 = chatFunc - (instCallAddr2 + 5);
-		BYTE* pbyte2 = (BYTE*)&callRelative2;
-		BYTE assmFuncChatRel2[4] = { pbyte2[0], pbyte2[1], pbyte2[2], pbyte2[3] };
-		OverwriteAssembly((BYTE*)instCallAddr2 + 1, assmFuncChatRel2, 4);
-
-		DWORD instCallAddr1 = H2BaseAddr + 0x226628;
-		DWORD callRelative1 = chatFunc - (instCallAddr1 + 5);
-		BYTE* pbyte1 = (BYTE*)&callRelative1;
-		BYTE assmFuncChatRel1[4] = { pbyte1[0], pbyte1[1], pbyte1[2], pbyte1[3] };
-		OverwriteAssembly((BYTE*)instCallAddr1 + 1, assmFuncChatRel1, 4);
+		PatchCall(H2BaseAddr + 0x22667B, (DWORD)NotDisplayIngameChat);
+		PatchCall(H2BaseAddr + 0x226628, (DWORD)NotDisplayIngameChat);
 	}
-
-	addDebugText("ProcessStartup finished.");
+	addDebugText("End Startup Tweaks.");
 	extern void GSSecStartLoop();
 	GSSecStartLoop();
 	extern void GSSecSweetLeetHaxA(int);
 	GSSecSweetLeetHaxA(0);
+	extern void initGSRunLoop();
+	initGSRunLoop();
+	addDebugText("ProcessStartup finished.");
 }

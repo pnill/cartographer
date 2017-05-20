@@ -639,10 +639,7 @@ void H2MOD::set_unit_speed_patch(bool hackit) {
 
 	BYTE assmPatchSpeed[8];
 	memset(assmPatchSpeed, 0x90, 8);
-	OverwriteAssembly((BYTE*)h2mod->GetBase() + ((!h2mod->Server) ? 0x6AB7f : 0x6A3BA), assmPatchSpeed, 8);
-
-	//dedi server
-	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x6A3BA, assmPatchSpeed, 8);
+	WriteBytesASM(h2mod->GetBase() + ((!h2mod->Server) ? 0x6AB7f : 0x6A3BA), assmPatchSpeed, 8);
 }
 
 void H2MOD::set_unit_speed(float speed, int pIndex)
@@ -863,7 +860,7 @@ void PatchFixRankIcon() {
 			}
 		}
 		if (shouldPatch) {
-			OverwriteAssembly((BYTE*)assmOffset, assmPatchFixRankIcon, assmlen);
+			WriteBytesASM((DWORD)assmOffset, assmPatchFixRankIcon, assmlen);
 			addDebugText("Patching Rank Icon Fix.");
 		}
 	}
@@ -871,7 +868,7 @@ void PatchFixRankIcon() {
 void PatchGameDetailsCheck()
 {
 	BYTE assmPatchGamedetails[2] = { 0x75,0x18};	
-	OverwriteAssembly((BYTE*)h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
+	WriteBytesASM(h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
 }
 
 static bool OnNewRound(int a1)
@@ -1308,8 +1305,8 @@ void H2MOD::ApplyHooks() {
 #pragma region H2V Hooks
 		DWORD dwBack;
 
-		pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
-		VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		//pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
+		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)this->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);

@@ -114,9 +114,6 @@
     <ClCompile Include="H2OnscreenDebugLog.cpp">
       <Filter>Source Files\GlitchyScripts</Filter>
     </ClCompile>
-    <ClCompile Include="GSMenu.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

@@ -1,16 +1,26 @@
 #include "GSUtils.h"
+#include "H2OnscreenDebugLog.h"
+#include "Hook.h"
 #include <stdio.h>
 #include <windows.h>
 #include <Wincrypt.h>
 
 void OverwriteAssembly(BYTE* srcAddr, BYTE* writeAssm, int lenAssm) {
-	DWORD dwBack;
+	WriteBytesASM((DWORD)srcAddr, writeAssm, lenAssm);
+	/*DWORD dwBack;
 	VirtualProtect(srcAddr, lenAssm, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	for (int i = 0; i < lenAssm; i++)
 		srcAddr[i] = writeAssm[i];
 
-	VirtualProtect(srcAddr, lenAssm, dwBack, &dwBack);
+	VirtualProtect(srcAddr, lenAssm, dwBack, &dwBack);*/
+}
+
+void PatchCall(DWORD call_addr, DWORD new_function_ptr) {
+	DWORD callRelative = new_function_ptr - (call_addr + 5);
+	BYTE* pbyte = (BYTE*)&callRelative;
+	BYTE assmNewFuncRel[4] = { pbyte[0], pbyte[1], pbyte[2], pbyte[3] };
+	WriteBytesASM(call_addr + 1, assmNewFuncRel, 4);
 }
 
 void HexToByteArray(BYTE* byteArray, char* pointerHex) {
@@ -173,9 +183,53 @@ int ComputeFileMd5Hash(wchar_t* filepath, char* rtnMd5) {
 	return dwStatus;
 }
 
-void PatchCall(DWORD call_addr, DWORD new_function_ptr) {
-	DWORD callRelative = new_function_ptr - (call_addr + 5);
-	BYTE* pbyte = (BYTE*)&callRelative;
-	BYTE assmNewFuncRel[4] = { pbyte[0], pbyte[1], pbyte[2], pbyte[3] };
-	OverwriteAssembly((BYTE*)(call_addr + 1), assmNewFuncRel, 4);
+int GetWidePathFromFullWideFilename(wchar_t* filepath, wchar_t* rtnpath) {
+	wchar_t* offset = wcsrchr(filepath, L'\\');
+	wchar_t* off2 = wcsrchr(filepath, L'/');
+	offset = offset == NULL ? off2 : ((off2 != NULL && offset < off2) ? off2 : offset);
+	if (offset == NULL) {
+		return -1;
+	}
+	swprintf(rtnpath, offset - filepath + 2, filepath);
+	return 0;
+}
+
+LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
+	DWORD dwBufferSize(sizeof(DWORD));
+	DWORD nResult(0);
+	LONG nError = ::RegQueryValueExW(hKey,
+		strValueName,
+		0,
+		NULL,
+		reinterpret_cast<LPBYTE>(&nResult),
+		&dwBufferSize);
+	if (ERROR_SUCCESS == nError)
+	{
+		*nValue = nResult;
+	}
+	return nError;
+}
+
+void pushHostLobby() {
+	char msg[100] = { 0x00, 0x43, 0x05 };
+	extern UINT g_port;
+	sprintf(msg + 3, "push clientlobby %d", g_port + 1);
+	unsigned short int remoteServerPort = 1001;
+
+	addDebugText("Pushing open lobby.");
+
+	int socketDescriptor;
+	struct sockaddr_in serverAddress;
+	if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+		addDebugText("ERROR: Could not create socket.");
+	}
+	serverAddress.sin_family = AF_INET;
+	extern ULONG broadcast_server;
+	serverAddress.sin_addr.s_addr = broadcast_server;
+	serverAddress.sin_port = htons(remoteServerPort);
+
+	if (sendto(socketDescriptor, msg, strlen(msg + 3) + 3, 0, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
+		//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)
+		addDebugText("ERROR: Failed to push open lobby.");
+	}
 }

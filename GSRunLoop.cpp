@@ -229,12 +229,12 @@ void hotkeyFuncTest() {
 	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x24925C);//Game Brightness MM
 	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x258C8C);//Game Brightness ingame
 
-	/*int* MenuID = (int*)((char*)H2BaseAddr + 0x9758D8);
+	int* MenuID = (int*)((char*)H2BaseAddr + 0x9758D8);
 
 	if (*MenuID != 272) {
 		int WgitScreenfunctionPtr = (int)(MenuGameBrightnessIngame);
 		CallWgit(WgitScreenfunctionPtr);
-	}*/
+	}
 
 	//ui_priority += 1;
 
@@ -243,9 +243,9 @@ void hotkeyFuncTest() {
 	PlayerEffects = (char(*)(void))((char*)H2BaseAddr + 0xA3E39);
 	PlayerEffects();*/
 
-	addDebugText("NOP'd");
-	BYTE HostClientCheckNOP[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-	OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckNOP, 6);
+	//addDebugText("NOP'd");
+	//BYTE HostClientCheckNOP[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckNOP, 6);
 }
 
 int hotkeyIdTest2 = VK_F6;
@@ -263,9 +263,9 @@ void hotkeyFuncTest2() {
 	//BYTE HostClientCheckOrig[] = { 0x0F, 0x85, 0xBA, 0x01, 0x00, 0x00 };
 	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckOrig, 6);
 
-	addDebugText("Jumped");
-	BYTE HostClientCheckJMP[] = { 0xE9, 0xBB, 0x01, 0x00, 0x00, 0x90 };
-	OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckJMP, 6);
+	//addDebugText("Jumped");
+	//BYTE HostClientCheckJMP[] = { 0xE9, 0xBB, 0x01, 0x00, 0x00, 0x90 };
+	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckJMP, 6);
 
 	//extern void GSSecSweetLeetHaxA(int);
 	//GSSecSweetLeetHaxA(1);
@@ -296,7 +296,7 @@ void hotkeyFuncHelp() {
 	addDebugText(tempTextEntry);
 	GetVKeyCodeString(hotkeyIdToggleHideIngameChat, hotkeyname, 20);
 	PadCStringWithChar(hotkeyname, 20, ' ');
-	snprintf(tempTextEntry, 255, "%s- Toggle Hide In-game Chat.", hotkeyname);
+	snprintf(tempTextEntry, 255, "%s- Toggles hiding the in-game chat menu.", hotkeyname);
 	addDebugText(tempTextEntry);
 	//addDebugText("F5      - Toggle online Coop mode.");
 	//addDebugText("F10     - Fix in-game player camera from a white/black bad cutscene.");
@@ -306,7 +306,6 @@ void hotkeyFuncHelp() {
 	addDebugText("------------------------------");
 	setDebugTextDisplay(true);
 }
-
 
 const int hotkeyLen = 8;
 //GSFIXME: Set only completed 5
@@ -318,11 +317,21 @@ void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotk
 int prevPartyPrivacy = 0;
 
 bool halo2WindowExists = false;
-bool halo2ServerFinishedLoading = false;
+bool halo2ServerOnce1 = false;
 void GSMainLoop() {
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
-		SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+
+		DWORD Display_Mode = 1;
+		HKEY hKeyVideoSettings = NULL;
+		if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_READ, &hKeyVideoSettings) == ERROR_SUCCESS) {
+			GetDWORDRegKey(hKeyVideoSettings, L"DisplayMode", &Display_Mode);
+			RegCloseKey(hKeyVideoSettings);
+		}
+		if (Display_Mode) {
+			SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+		}
+
 		//if (custom_resolution_x > 0 && custom_resolution_y > 0) {
 		//	SetWindowPos(H2hWnd, NULL, 0, 0, 500, 500, SWP_NOMOVE | SWP_FRAMECHANGED);
 		//	SetWindowPos(H2hWnd, NULL, 0, 0, custom_resolution_x, custom_resolution_y, SWP_NOMOVE | SWP_FRAMECHANGED);// SWP_FRAMECHANGED |  | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
@@ -335,10 +344,11 @@ void GSMainLoop() {
 			SetWindowText(H2hWnd, titleMod);
 		}
 	}
-	if (H2IsDediServer && !halo2ServerFinishedLoading) {
+	if (H2IsDediServer && !halo2ServerOnce1) {
+		halo2ServerOnce1 = true;
+		pushHostLobby();
 		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
-		if (wcslen(LanServerName) > 0 && wcslen(dedi_server_name) > 0) {
-			halo2ServerFinishedLoading = true;
+		if (wcslen(dedi_server_name) > 0) {
 			swprintf(LanServerName, 32, dedi_server_name);
 		}
 	}
@@ -352,31 +362,11 @@ void GSMainLoop() {
 	}
 	extern bool isHost;
 	if (prevPartyPrivacy > 0 && partyPrivacy == 0 && isHost) {
-		char msg[100] = { 0x00, 0x43, 0x05 };
-		extern UINT g_port;
-		sprintf(msg+3, "push clientlobby %d", g_port+1);
-		unsigned short int serverPort = 1001;
-
-		addDebugText("Pushing open lobby.");
-
-		int socketDescriptor;
-		struct sockaddr_in serverAddress;
-		if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-			addDebugText("ERROR: Could not create socket.");
-		}
-		serverAddress.sin_family = AF_INET;
-		extern ULONG broadcast_server;
-		serverAddress.sin_addr.s_addr = broadcast_server;
-		serverAddress.sin_port = htons(serverPort);
-		
-		if (sendto(socketDescriptor, msg, strlen(msg+3)+3, 0, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
-			//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)
-			addDebugText("ERROR: Failed to push open lobby.");
-		}
+		pushHostLobby();
 	}
 	prevPartyPrivacy = partyPrivacy;
 
-	if (GetFocus() == H2hWnd || GetForegroundWindow() == H2hWnd) {
+	if (!H2IsDediServer && (GetFocus() == H2hWnd || GetForegroundWindow() == H2hWnd)) {
 
 		for (int i = 0; i < hotkeyListenLen; i++) {
 			//& 0x8000 is pressed
@@ -392,40 +382,33 @@ void GSMainLoop() {
 	}
 }
 
-class later
-{
-public:
-	template <class callable, class... arguments>
-	later(int after, bool async, callable&& f, arguments&&... args)
-	{
-		std::function<typename std::result_of<callable(arguments...)>::type()> task(std::bind(std::forward<callable>(f), std::forward<arguments>(args)...));
+signed int(*sub_287a1)();
 
-		if (async)
-		{
-			std::thread([after, task]() {
-				std::this_thread::sleep_for(std::chrono::milliseconds(after));
-				task();
-			}).detach();
-		}
-		else
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(after));
-			task();
-		}
-	}
+static signed int HookedClientRandFunc() {
+	if (!QuitGSMainLoop)
+		GSMainLoop();
+	
+	signed int result = sub_287a1();
+	return result;
+}
 
-};
-
-DWORD WINAPI GSLoopMaker(LPVOID lpParam)
-{
-	while (!QuitGSMainLoop) {
-		//loop every 4 milliseconds
-		later later_test1(4, false, &GSMainLoop);
-	}
-	return 0;
+static char HookedServerShutdownCheck() {
+	if (!QuitGSMainLoop)
+		GSMainLoop();
+	
+	BYTE* Quit_Exit_Game = (BYTE*)((char*)H2BaseAddr + 0x4a7083);
+	//original test - if game should shutdown
+	return *Quit_Exit_Game;
 }
 
 void initGSRunLoop() {
-	DWORD  dwThreadIdGSLooper;
-	HANDLE hThread = CreateThread(NULL, 0, GSLoopMaker, NULL, 0, &dwThreadIdGSLooper);
+	addDebugText("Pre GSRunLoop Hooking.");
+	if (H2IsDediServer) {
+		PatchCall(H2BaseAddr + 0xc6cb, (DWORD)HookedServerShutdownCheck);
+	}
+	else {
+		sub_287a1 = (signed int(*)())((char*)H2BaseAddr + 0x287a1);
+		PatchCall(H2BaseAddr + 0x399f3, (DWORD)HookedClientRandFunc);
+	}
+	addDebugText("Post GSRunLoop Hooking.");
 }
