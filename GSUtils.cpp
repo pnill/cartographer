@@ -172,3 +172,10 @@ int ComputeFileMd5Hash(wchar_t* filepath, char* rtnMd5) {
 
 	return dwStatus;
 }
+
+void PatchCall(DWORD call_addr, DWORD new_function_ptr) {
+	DWORD callRelative = new_function_ptr - (call_addr + 5);
+	BYTE* pbyte = (BYTE*)&callRelative;
+	BYTE assmNewFuncRel[4] = { pbyte[0], pbyte[1], pbyte[2], pbyte[3] };
+	OverwriteAssembly((BYTE*)(call_addr + 1), assmNewFuncRel, 4);
+}

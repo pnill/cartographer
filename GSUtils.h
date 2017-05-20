@@ -7,3 +7,4 @@ int FindLineStart(FILE* fp, int lineStrLen);
 void GetVKeyCodeString(int vkey, char* rtnString, int strLen);
 void PadCStringWithChar(char* strToPad, int toFullLength, char c);
 int ComputeFileMd5Hash(wchar_t* filepath, char* rtnMd5);
+void PatchCall(DWORD call_addr, DWORD new_function_ptr);

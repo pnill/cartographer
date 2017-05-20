@@ -776,6 +776,8 @@ void SoundThread(void)
 }
 
 
+
+
 typedef bool(__cdecl *spawn_player)(int a1);
 spawn_player pspawn_player;
 
@@ -794,9 +796,6 @@ player_death pplayer_death;
 
 typedef void(__stdcall *update_player_score)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
 update_player_score pupdate_player_score;
-
-typedef bool(__cdecl *ResetRounds)(int);
-ResetRounds pResetRound;
 
 typedef void(__stdcall *tjoin_game)(void* thisptr, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14);
 tjoin_game pjoin_game;
@@ -849,7 +848,6 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 
 	return pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
-
 void PatchFixRankIcon() {
 	if (!h2mod->Server) {
 		int THINGY = (int)*(int*)((char*)h2mod->GetBase() + 0xA40564);
@@ -870,6 +868,43 @@ void PatchFixRankIcon() {
 		}
 	}
 }
+void PatchGameDetailsCheck()
+{
+	BYTE assmPatchGamedetails[2] = { 0x75,0x18};	
+	OverwriteAssembly((BYTE*)h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
+}
+
+static bool OnNewRound(int a1)
+{
+
+	bool(__cdecl* CallNewRound)(int a1);
+	CallNewRound = (bool(__cdecl*)(int))((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6A87C : 0x6B1C8));
+	//addDebugText("New Round Commencing");
+		if (b_Infection)
+		inf->NextRound();
+
+	if (b_GunGame)
+		gg->NextRound();
+
+	return CallNewRound(a1);
+
+
+}
+void H2MOD::PatchNewRound(bool hackit)//All thanks to Glitchy Scripts who wrote this <3
+{
+	//Replace the Function call  At Offset with OnNewRound
+	DWORD offset = 0;
+
+	if (h2mod->Server)
+		offset = 0x700EF;
+	else
+		offset = 0x715ee;
+	if(hackit)	
+		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)OnNewRound); 
+	else
+		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6A87C : 0x6B1C8)));
+}
+
 
 int __cdecl OnMapLoad(int a1)
 {
@@ -1750,6 +1785,7 @@ void H2MOD::Initialize()
 			*(float*)(h2mod->GetBase() + FOV_MULTIPLIER_OFFSET) = (targetRadians / defaultRadians);
 			*(float*)(h2mod->GetBase() + FOV_VEHICLE_MULTIPLIER_OFFSET) = (targetRadians / defaultRadians);
 		}
+		PatchGameDetailsCheck();
 	}
 
 	TRACE_GAME("H2MOD - Initialized v0.1a");
