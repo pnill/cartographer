@@ -773,6 +773,8 @@ void SoundThread(void)
 }
 
 
+
+
 typedef bool(__cdecl *spawn_player)(int a1);
 spawn_player pspawn_player;
 
@@ -791,9 +793,6 @@ player_death pplayer_death;
 
 typedef void(__stdcall *update_player_score)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
 update_player_score pupdate_player_score;
-
-typedef bool(__cdecl *ResetRounds)(int);
-ResetRounds pResetRound;
 
 typedef void(__stdcall *tjoin_game)(void* thisptr, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14);
 tjoin_game pjoin_game;
@@ -846,7 +845,6 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 
 	return pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
-
 void PatchFixRankIcon() {
 	if (!h2mod->Server) {
 		int THINGY = (int)*(int*)((char*)h2mod->GetBase() + 0xA40564);
@@ -867,6 +865,43 @@ void PatchFixRankIcon() {
 		}
 	}
 }
+void PatchGameDetailsCheck()
+{
+	BYTE assmPatchGamedetails[2] = { 0x75,0x18};	
+	WriteBytesASM(h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
+}
+
+static bool OnNewRound(int a1)
+{
+
+	bool(__cdecl* CallNewRound)(int a1);
+	CallNewRound = (bool(__cdecl*)(int))((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6A87C : 0x6B1C8));
+	//addDebugText("New Round Commencing");
+		if (b_Infection)
+		inf->NextRound();
+
+	if (b_GunGame)
+		gg->NextRound();
+
+	return CallNewRound(a1);
+
+
+}
+void H2MOD::PatchNewRound(bool hackit)//All thanks to Glitchy Scripts who wrote this <3
+{
+	//Replace the Function call  At Offset with OnNewRound
+	DWORD offset = 0;
+
+	if (h2mod->Server)
+		offset = 0x700EF;
+	else
+		offset = 0x715ee;
+	if(hackit)	
+		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)OnNewRound); 
+	else
+		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6A87C : 0x6B1C8)));
+}
+
 
 int __cdecl OnMapLoad(int a1)
 {
@@ -926,6 +961,15 @@ int __cdecl OnMapLoad(int a1)
 #pragma region H2v Stuff
 	if (!h2mod->Server)
 	{
+#pragma region Crosshair Offset
+
+		//*(float*)(AddressOffset + 0x3DC00) = crosshair_offset;		
+		DWORD CrosshairY = *(DWORD*)((char*)h2mod->GetBase() + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C;
+		*(float*)CrosshairY = crosshair_offset;
+
+
+
+#pragma endregion
 
 		if (*GameEngine == 3) {
 			MasterState = 10;
@@ -1028,11 +1072,7 @@ int __cdecl OnMapLoad(int a1)
 			*(float*)(AddressOffset + 0xB7F914) = 5000.0f; //sniper_bullet.proj Initial Velocity
 			*(float*)(AddressOffset + 0xB7F918) = 5000.0f; //sniper_bullet.proj Final Velocity
 #pragma endregion
-
-#pragma region Crosshair Offset
-			*(float*)(AddressOffset + 0x3DC00) = crosshair_offset;
-#pragma endregion
-
+			
 #pragma region Halo2Final
 			if (b_Halo2Final && !h2mod->Server)
 				h2f->Initialize(isHost);
@@ -1742,6 +1782,7 @@ void H2MOD::Initialize()
 			*(float*)(h2mod->GetBase() + FOV_MULTIPLIER_OFFSET) = (targetRadians / defaultRadians);
 			*(float*)(h2mod->GetBase() + FOV_VEHICLE_MULTIPLIER_OFFSET) = (targetRadians / defaultRadians);
 		}
+		PatchGameDetailsCheck();
 	}
 
 	TRACE_GAME("H2MOD - Initialized v0.1a");
