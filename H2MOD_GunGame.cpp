@@ -118,6 +118,10 @@ void GunGame::PlayerDied(int unit_datum_index) // we need to start passing playe
 
 }
 
+void GunGame::NextRound()
+{
+}
+
 void GunGame::SpawnPlayer(int PlayerIndex)
 {
 	wchar_t* pName = h2mod->get_player_name_from_index(PlayerIndex);
