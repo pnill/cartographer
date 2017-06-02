@@ -9,6 +9,7 @@
 extern bool isHost;
 bool infected_played = false;
 bool first_spawn = true;
+int PlayerCount = (h2mod->Server) ? 0x3000470C : 0x30004B60;
 
 void Infection::FindZombie()
 {
@@ -128,8 +129,8 @@ void Infection::Initialize()
 		TRACE_GAME("[H2Mod-Infection] - Initializing!");
 		TRACE_GAME("[H2Mod-Infection] - this->infected_players.size(): %i", this->infected_players.size());
 
-		h2mod->set_unit_speed_patch(true);//Applying SpeedCheck fix
-		//h2mod->PatchNewRound(true);	  //New OnRoundPatch
+		//h2mod->set_unit_speed_patch(true);//Applying SpeedCheck fix
+		
 		
 
 
@@ -147,6 +148,7 @@ void Infection::Initialize()
 		this->FindZombie();
 	}
 #pragma endregion 
+	h2mod->PatchNewRound(true);	  //OnNew_Round Patch
 
 
 }
@@ -262,7 +264,7 @@ void Infection::SpawnPlayer(int PlayerIndex)
 			if (h2mod->get_unit_team_index(unit_datum_index) == 3)
 			{
 				h2mod->set_unit_biped(BipedType::Elite, PlayerIndex);
-				h2mod->set_unit_speed(1.2f, PlayerIndex);
+				h2mod->set_unit_speed(1.0f, PlayerIndex);
 				GivePlayerWeapon(PlayerIndex, Weapon::energy_blade, 1);
 			}
 #pragma endregion
@@ -297,7 +299,9 @@ void Infection::PlayerInfected(int unit_datum_index)
 				}
 			}
 
-			call_unit_reset_equipment(unit_datum_index);//Take away Weapons.
+			call_unit_reset_equipment(unit_datum_index);//Take away Weapons.			
+
+		
 		}
 
 #pragma endregion
@@ -340,6 +344,7 @@ void Infection::PlayerInfected(int unit_datum_index)
 
 void Infection::NextRound()
 {
+	
 	if(!h2mod->Server)
 	h2mod->set_local_team_index(0);
 

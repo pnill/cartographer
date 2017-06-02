@@ -23,6 +23,7 @@ Halo2Final *h2f = new Halo2Final();
 
 bool b_Infection = false;
 bool b_Halo2Final = false;
+extern char b_Record;
 
 extern bool b_GunGame;
 extern CUserManagement User;
@@ -805,7 +806,137 @@ XNADDR join_game_xn;
 typedef int(__cdecl *tconnect_establish_write)(void* a1, int a2, int a3);
 tconnect_establish_write pconnect_establish_write;
 
+struct LIST
+{
+	LIST *pprev = nullptr;
+	char *pstuff;
+	LIST *pnext=nullptr;
+};
+LIST *pcurrent=nullptr;
+LIST *ptop = nullptr;
 
+
+
+void StartRecordingData(void* stuff)
+{
+	if (pcurrent == nullptr)
+	{
+		pcurrent = new LIST();
+		pcurrent->pstuff = new char[0x3BD8u];
+		memcpy(pcurrent->pstuff, stuff, 0x3BD8u);
+		
+
+		ptop = pcurrent;
+	}
+	else
+	{
+		LIST *temp = new LIST();
+		temp->pstuff = new char[0x3BD8u];		
+		memcpy(pcurrent->pstuff, stuff, 0x3BD8u);
+
+		temp->pprev = pcurrent;
+		pcurrent->pnext = temp;
+		pcurrent = temp;
+	}
+
+}
+void StopRecordingData()
+{
+	pcurrent = ptop;
+}
+void PlayFilm(void *stuffaddr)
+{
+	if (pcurrent == nullptr)
+	{
+		h2mod->write_inner_chat_dynamic(L"No Playlist Data found :P Rip");
+		b_Record = 0;
+	}
+	else
+	{
+		memcpy(stuffaddr, pcurrent->pstuff, 0x3BD8u);
+
+		if (pcurrent->pnext != nullptr)
+			pcurrent = pcurrent->pnext;
+		else pcurrent = ptop;
+	}
+
+
+}
+
+static int __cdecl GameDataManage(void *stuffaddr)
+{
+#pragma region GameCalls
+	//void *__cdecl WriteMem2(void *Address, int Value, unsigned int length)
+	void*(__cdecl *WriteMem2)(void*, int, unsigned int);
+	WriteMem2 = (void*(__cdecl*)(void*, int, unsigned int))((char*)h2mod->GetBase() + 0x287BA9);
+
+	//char __thiscall sub_51D1DF(int this, unsigned int stuffaddr);	
+	char(__thiscall *sub_51D1DF)(void*, void*);
+	sub_51D1DF = (char(__thiscall*)(void*, void*))((char*)h2mod->GetBase() + 0x1DD1DF);
+	
+
+	//double sub_3BBFE9()
+	double(*sub_3BBFE9)();
+	sub_3BBFE9 = (double(*)(void))((char*)h2mod->GetBase() + 0x7BFFB);
+
+	//int GetRandomMathVal()
+	int(*GetRandomMathVal)();
+	GetRandomMathVal = (int(*)(void))((char*)h2mod->GetBase() + 0x59087);
+
+	//int dword_8578DC;
+	int dword_8578DC = *(int*)((char*)h2mod->GetBase() + 0x5178DC);
+#pragma endregion
+	int v1; // ecx@1
+	int result; // eax@1
+
+	WriteMem2(stuffaddr, 0, 0x3BD8u);                   // resetting the stuff to zero
+
+	if(b_Record!=2)
+	sub_51D1DF((void*)dword_8578DC, stuffaddr);         // updating the stuff
+
+	if (b_Record ==1)
+	{
+		StartRecordingData(stuffaddr);                         //Save That Data in Memory
+	}
+	else if (b_Record == 2)
+	{
+		//WriteMem2(stuffaddr, 0x01, 0x3BD8u);
+		PlayFilm(stuffaddr);
+	}
+
+
+	v1 = dword_8578DC;
+	result = *(DWORD *)(dword_8578DC + 8);
+	if ((result == 3 || result == 5) && !*(BYTE *)(dword_8578DC + 0x2C))
+	{
+		result = *(DWORD *)stuffaddr;
+		if (*(DWORD *)stuffaddr != *(DWORD *)(dword_8578DC + 0x28))
+		{
+		LABEL_10:
+			*(BYTE *)(v1 + 0x2C) = 1;
+			return result;
+		}
+		result = sub_3BBFE9();
+		if (*((DWORD *)stuffaddr + 0xEF4) != result)
+		{
+			v1 = dword_8578DC;
+			goto LABEL_10;
+		}
+		result = GetRandomMathVal();
+		if (*((DWORD *)stuffaddr + 0xEF5) != result)
+		{
+			v1 = dword_8578DC;
+			goto LABEL_10;
+		}
+	}
+	return result;
+
+
+}
+void PatchRecordData()
+{
+	PatchCall(h2mod->GetBase() + 0x4A4D5, (DWORD)GameDataManage);
+}
 
 char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 {
@@ -871,35 +1002,94 @@ void PatchGameDetailsCheck()
 	WriteBytesASM(h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
 }
 
+
 static bool OnNewRound(int a1)
 {
+	DWORD offset;
 
-	bool(__cdecl* CallNewRound)(int a1);
-	CallNewRound = (bool(__cdecl*)(int))((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6A87C : 0x6B1C8));
+	if (h2mod->Server)
+		offset = 0x6A87C;
+	else if (isHost)
+		offset = 0x6B1C8;
+	else
+		offset = 0x6DCD9;
+
+	bool(__cdecl* CallNewRoundBegin)(int a1);
+	CallNewRoundBegin = (bool(__cdecl*)(int))((char*)h2mod->GetBase() + offset);	 
 	//addDebugText("New Round Commencing");
+	if (a1 == 3)
+	{
+		addDebugText("New Round Commencing");
 		if (b_Infection)
-		inf->NextRound();
+			inf->NextRound();
 
-	if (b_GunGame)
-		gg->NextRound();
+		if (b_GunGame)
+			gg->NextRound();
+	}
+	
 
-	return CallNewRound(a1);
+	return CallNewRoundBegin(a1); //Calling Orginal New Round Begins.
 
+	
 
 }
-void H2MOD::PatchNewRound(bool hackit)//All thanks to Glitchy Scripts who wrote this <3
-{
-	//Replace the Function call  At Offset with OnNewRound
-	DWORD offset = 0;
 
+void H2MOD::CallRoundManage(bool b_GameOver)
+{
+	//This logic Is supposed to end a round by default If Current Round is not Last Round
+	//Else it Automatically Ends the Game
+	//But Game can be manually Ended by b_gameOver :)
+
+
+	unsigned int(*sub_12E09E0)();
+	sub_12E09E0 = (unsigned int(*)(void))((char*)h2mod->GetBase() + 0x709E0);
+
+
+	DWORD* (__cdecl * sub_12E0A6F)(signed int, char);
+	sub_12E0A6F = (DWORD*(__cdecl*)(signed int, char))((char*)h2mod->GetBase() + 0x70A6F);
+	sub_12E0A6F(sub_12E09E0(), b_GameOver);
+}
+
+void H2MOD::PatchNewRound(bool hackit)//All thanks to Glitchy Scripts who helped me with this <3
+{
+	//Replace the Function call  At Offset with OnNewRound Else with AOffset function
+	DWORD offset = 0;
+	
 	if (h2mod->Server)
 		offset = 0x700EF;
 	else
-		offset = 0x715ee;
+		if (isHost)
+			offset = 0x715ee;
+		else
+			offset =0x111A13;
+
+	DWORD Aoffset;
+
+	if (h2mod->Server)
+		Aoffset = 0x6A87C;
+	else if (isHost)
+		Aoffset = 0x6B1C8;
+	else
+		Aoffset = 0x6DCD9;
+
+
 	if(hackit)	
 		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)OnNewRound); 
 	else
-		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6A87C : 0x6B1C8)));
+		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)((char*)h2mod->GetBase() + Aoffset));
+}
+void PatchPingMeterCheck(bool hackit)
+{
+	//halo2.exe+1D4E35 
+
+	BYTE assmOrgLine[2] = { 0x74,0x18 };
+	BYTE assmPatchPingCheck[2] = { 0x90,0x90};	
+
+	if (hackit)
+		WriteBytesASM(h2mod->GetBase() + 0x1D4E35, assmPatchPingCheck, 2);
+	else
+		WriteBytesASM(h2mod->GetBase() + 0x1D4E35, assmOrgLine, 2);
+		
 }
 
 
@@ -1777,12 +1967,14 @@ void H2MOD::Initialize()
 			const UINT FOV_VEHICLE_MULTIPLIER_OFFSET = 4274048;
 			const UINT CURRENT_FOV_OFFSET = 4883752;
 
-			float defaultRadians = (float)(70 * 3.14159265f / 180);
+			float defaultRadians = (float)(57 * 3.14159265f / 180);
 			float targetRadians = (float)((double)field_of_view * 3.14159265f / 180);
 			*(float*)(h2mod->GetBase() + FOV_MULTIPLIER_OFFSET) = (targetRadians / defaultRadians);
 			*(float*)(h2mod->GetBase() + FOV_VEHICLE_MULTIPLIER_OFFSET) = (targetRadians / defaultRadians);
 		}
 		PatchGameDetailsCheck();
+		//PatchPingMeterCheck(true);
+		//PatchRecordData();
 	}
 
 	TRACE_GAME("H2MOD - Initialized v0.1a");
