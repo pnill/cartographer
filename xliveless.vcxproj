@@ -164,8 +164,7 @@
       <InlineFunctionExpansion Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</InlineFunctionExpansion>
     </ClCompile>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Globals.cpp" />
-    <ClCompile Include="GSMenu.cpp" />
+    <ClCompile Include="Globals.cpp" />  
     <ClCompile Include="GSRunLoop.cpp" />
     <ClCompile Include="GSUtils.cpp" />
     <ClCompile Include="GUI.cpp" />
