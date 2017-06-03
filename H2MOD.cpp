@@ -618,7 +618,20 @@ BYTE H2MOD::get_unit_team_index(int unit_datum_index)
 	}
 	return tIndex;
 }
+BYTE H2MOD::get_Player_team_index(BYTE PlayerIndex)
+{
+	BYTE team = 0;
+	DWORD player_table_ptr;
+	if (!h2mod->Server)
+		player_table_ptr = *(DWORD*)(this->GetBase() + 0x004A8260);
+	else
+		player_table_ptr = *(DWORD*)(this->GetBase() + 0x004D64C4);
+	player_table_ptr += 0x44;
 
+	team = (BYTE)*(BYTE*)(*(DWORD*)player_table_ptr + (PlayerIndex * 0x204) + 0xBC);
+
+	return team;
+}
 void H2MOD::set_unit_team_index(int unit_datum_index, BYTE team)
 {
 	int unit_object = call_get_object(unit_datum_index, 3);
@@ -637,10 +650,17 @@ void H2MOD::set_unit_biped(BYTE biped, int pIndex)
 void H2MOD::set_unit_speed_patch(bool hackit) {
 	//TODO: create a way to undo the patch in the case when more than just infection relies on this.
 	//Enable Speed Hacks
-
-	BYTE assmPatchSpeed[8];
-	memset(assmPatchSpeed, 0x90, 8);
-	WriteBytesASM(h2mod->GetBase() + ((!h2mod->Server) ? 0x6AB7f : 0x6A3BA), assmPatchSpeed, 8);
+	if (hackit)
+	{
+		BYTE assmPatchSpeed[8];
+		memset(assmPatchSpeed, 0x90, 8);
+		WriteBytesASM(h2mod->GetBase() + ((!h2mod->Server) ? 0x6AB7f : 0x6A3BA), assmPatchSpeed, 8);
+	}
+	else
+	{
+		BYTE assmPatchOrg[8] = {0xF3,0x0F,0x11,0x87,0x80,0x01,0x0,0x0};
+		WriteBytesASM(h2mod->GetBase() + ((!h2mod->Server) ? 0x6AB7f : 0x6A3BA), assmPatchOrg, 8);
+	}
 }
 
 void H2MOD::set_unit_speed(float speed, int pIndex)
@@ -806,137 +826,7 @@ XNADDR join_game_xn;
 typedef int(__cdecl *tconnect_establish_write)(void* a1, int a2, int a3);
 tconnect_establish_write pconnect_establish_write;
 
-struct LIST
-{
-	LIST *pprev = nullptr;
-	char *pstuff;
-	LIST *pnext=nullptr;
-};
-LIST *pcurrent=nullptr;
-LIST *ptop = nullptr;
 
-
-
-void StartRecordingData(void* stuff)
-{
-	if (pcurrent == nullptr)
-	{
-		pcurrent = new LIST();
-		pcurrent->pstuff = new char[0x3BD8u];
-		memcpy(pcurrent->pstuff, stuff, 0x3BD8u);
-		
-
-		ptop = pcurrent;
-	}
-	else
-	{
-		LIST *temp = new LIST();
-		temp->pstuff = new char[0x3BD8u];		
-		memcpy(pcurrent->pstuff, stuff, 0x3BD8u);
-
-		temp->pprev = pcurrent;
-		pcurrent->pnext = temp;
-		pcurrent = temp;
-	}
-
-}
-void StopRecordingData()
-{
-	pcurrent = ptop;
-}
-void PlayFilm(void *stuffaddr)
-{
-	if (pcurrent == nullptr)
-	{
-		h2mod->write_inner_chat_dynamic(L"No Playlist Data found :P Rip");
-		b_Record = 0;
-	}
-	else
-	{
-		memcpy(stuffaddr, pcurrent->pstuff, 0x3BD8u);
-
-		if (pcurrent->pnext != nullptr)
-			pcurrent = pcurrent->pnext;
-		else pcurrent = ptop;
-	}
-
-
-}
-
-static int __cdecl GameDataManage(void *stuffaddr)
-{
-#pragma region GameCalls
-	//void *__cdecl WriteMem2(void *Address, int Value, unsigned int length)
-	void*(__cdecl *WriteMem2)(void*, int, unsigned int);
-	WriteMem2 = (void*(__cdecl*)(void*, int, unsigned int))((char*)h2mod->GetBase() + 0x287BA9);
-
-	//char __thiscall sub_51D1DF(int this, unsigned int stuffaddr);	
-	char(__thiscall *sub_51D1DF)(void*, void*);
-	sub_51D1DF = (char(__thiscall*)(void*, void*))((char*)h2mod->GetBase() + 0x1DD1DF);
-	
-
-	//double sub_3BBFE9()
-	double(*sub_3BBFE9)();
-	sub_3BBFE9 = (double(*)(void))((char*)h2mod->GetBase() + 0x7BFFB);
-
-	//int GetRandomMathVal()
-	int(*GetRandomMathVal)();
-	GetRandomMathVal = (int(*)(void))((char*)h2mod->GetBase() + 0x59087);
-
-	//int dword_8578DC;
-	int dword_8578DC = *(int*)((char*)h2mod->GetBase() + 0x5178DC);
-#pragma endregion
-	int v1; // ecx@1
-	int result; // eax@1
-
-	WriteMem2(stuffaddr, 0, 0x3BD8u);                   // resetting the stuff to zero
-
-	if(b_Record!=2)
-	sub_51D1DF((void*)dword_8578DC, stuffaddr);         // updating the stuff
-
-	if (b_Record ==1)
-	{
-		StartRecordingData(stuffaddr);                         //Save That Data in Memory
-	}
-	else if (b_Record == 2)
-	{
-		//WriteMem2(stuffaddr, 0x01, 0x3BD8u);
-		PlayFilm(stuffaddr);
-	}
-
-
-	v1 = dword_8578DC;
-	result = *(DWORD *)(dword_8578DC + 8);
-	if ((result == 3 || result == 5) && !*(BYTE *)(dword_8578DC + 0x2C))
-	{
-		result = *(DWORD *)stuffaddr;
-		if (*(DWORD *)stuffaddr != *(DWORD *)(dword_8578DC + 0x28))
-		{
-		LABEL_10:
-			*(BYTE *)(v1 + 0x2C) = 1;
-			return result;
-		}
-		result = sub_3BBFE9();
-		if (*((DWORD *)stuffaddr + 0xEF4) != result)
-		{
-			v1 = dword_8578DC;
-			goto LABEL_10;
-		}
-		result = GetRandomMathVal();
-		if (*((DWORD *)stuffaddr + 0xEF5) != result)
-		{
-			v1 = dword_8578DC;
-			goto LABEL_10;
-		}
-	}
-	return result;
-
-
-}
-void PatchRecordData()
-{
-	PatchCall(h2mod->GetBase() + 0x4A4D5, (DWORD)GameDataManage);
-}
 
 char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 {
@@ -976,6 +866,7 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 
 	return pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
+
 void PatchFixRankIcon() {
 	if (!h2mod->Server) {
 		int THINGY = (int)*(int*)((char*)h2mod->GetBase() + 0xA40564);
@@ -996,12 +887,79 @@ void PatchFixRankIcon() {
 		}
 	}
 }
+
 void PatchGameDetailsCheck()
 {
 	BYTE assmPatchGamedetails[2] = { 0x75,0x18};	
 	WriteBytesASM(h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
 }
 
+void H2MOD::PatchWeaponsInteraction(bool b_Enable)
+{//Client Sided Patch
+
+	DWORD offset = h2mod->GetBase() + 0x55EFA;	
+	BYTE assm[5] = { 0xE8, 0x18, 0xE0,0xFF, 0xFF };
+	if(!b_Enable)
+	{
+		memset(assm, 0x90, 5);
+	}
+	WriteBytesASM(offset, assm, 5);
+}
+void H2MOD::PatchVehicleInteraction(bool b_Enable)
+{	//Client Sided Patch
+	
+	DWORD offset = h2mod->GetBase() + 0x55F26;
+	BYTE assm[5] = { 0xE8,0xA0,0xDD,0xFF,0xFF };
+	if (!b_Enable)
+	{
+		memset(assm, 0x90, 5);
+	}
+	WriteBytesASM(offset, assm, 5);
+
+}
+void AutoPickUpHandler(int PlayerIndex, unsigned int ObjectDatum)
+{
+	char(_cdecl*AutoHandler)(int, unsigned int);
+	AutoHandler = (char(_cdecl*)(int, unsigned int))((char*)h2mod->GetBase() + ((!h2mod->Server) ? 0x57AA5 : 0x5FF9D));
+
+	if (h2mod->get_Player_team_index(PlayerIndex) == 3)
+	{
+		int DA = 0;
+		int DynamicObjBase = *(DWORD *)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x50C8EC : 0x4E461C));
+		if (ObjectDatum != -1)
+		{
+			DA = *(DWORD *)(*(DWORD *)(DynamicObjBase + 68) + 12 * (unsigned __int16)ObjectDatum + 8);		
+
+			if (*(BYTE*)(DA + 0xAA) == 3)
+			{
+				return;
+			}
+			else
+			{
+				AutoHandler(PlayerIndex, ObjectDatum);
+				return;
+			}
+		}
+	
+	}
+	else
+	{
+		AutoHandler(PlayerIndex, ObjectDatum);
+		return; 
+	}
+	
+}
+void H2MOD :: PatchAutoPickups(bool b_enable)
+{//Host Sided
+	DWORD offset = (!h2mod->Server) ? 0x58789: 0x60C81;
+	DWORD Foffset = (!h2mod->Server) ? 0x57AA5 : 0x5FF9D;
+
+	if (b_enable)
+		PatchCall(h2mod->GetBase() + offset, (DWORD)AutoPickUpHandler);
+	else
+		PatchCall(h2mod->GetBase() + offset, h2mod->GetBase() + Foffset);
+
+}
 
 static bool OnNewRound(int a1)
 {
@@ -1016,10 +974,10 @@ static bool OnNewRound(int a1)
 
 	bool(__cdecl* CallNewRoundBegin)(int a1);
 	CallNewRoundBegin = (bool(__cdecl*)(int))((char*)h2mod->GetBase() + offset);	 
-	//addDebugText("New Round Commencing");
+	
 	if (a1 == 3)
 	{
-		addDebugText("New Round Commencing");
+		
 		if (b_Infection)
 			inf->NextRound();
 
@@ -1034,6 +992,7 @@ static bool OnNewRound(int a1)
 
 }
 
+
 void H2MOD::CallRoundManage(bool b_GameOver)
 {
 	//This logic Is supposed to end a round by default If Current Round is not Last Round
@@ -1042,41 +1001,78 @@ void H2MOD::CallRoundManage(bool b_GameOver)
 
 
 	unsigned int(*sub_12E09E0)();
-	sub_12E09E0 = (unsigned int(*)(void))((char*)h2mod->GetBase() + 0x709E0);
+	sub_12E09E0 = (unsigned int(*)(void))((char*)h2mod->GetBase() + ((h2mod->Server)?0x6F4E1:0x709E0));
 
 
 	DWORD* (__cdecl * sub_12E0A6F)(signed int, char);
-	sub_12E0A6F = (DWORD*(__cdecl*)(signed int, char))((char*)h2mod->GetBase() + 0x70A6F);
+	sub_12E0A6F = (DWORD*(__cdecl*)(signed int, char))((char*)h2mod->GetBase() +((h2mod->Server)?0x6F570:0x70A6F));
 	sub_12E0A6F(sub_12E09E0(), b_GameOver);
+		
 }
 
 void H2MOD::PatchNewRound(bool hackit)//All thanks to Glitchy Scripts who helped me with this <3
 {
 	//Replace the Function call  At Offset with OnNewRound Else with AOffset function
-	DWORD offset = 0;
+
+	DWORD offset = 0; //Stores the offset of Call New Round Begin function.
+	DWORD Aoffset = 0; //Stores the Offset of Orignal NewRoundBegin Function.
+	DWORD BOffset = 0; //Stores the Offset of Line which sets b_GameOver true when all switch to One Team.
+	DWORD COffset = 0; //Stores the Offset of Call of RoundManage when All Switch to one Team.
 	
 	if (h2mod->Server)
+	{
 		offset = 0x700EF;
-	else
-		if (isHost)
-			offset = 0x715ee;
-		else
-			offset =0x111A13;
-
-	DWORD Aoffset;
-
-	if (h2mod->Server)
 		Aoffset = 0x6A87C;
-	else if (isHost)
-		Aoffset = 0x6B1C8;
+		BOffset = 0x6EC40;
+		COffset = 0x6FAA4;
+	}
+		
 	else
-		Aoffset = 0x6DCD9;
+	{
+		if (isHost)
+		{
+			offset = 0x715ee;
+			Aoffset = 0x6B1C8;
+			BOffset = 0x70048;
+			COffset = 0x70FA3;
+		}
 
+		else
+		{
+			offset = 0x111A13;
+			Aoffset = 0x6DCD9;
 
-	if(hackit)	
-		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)OnNewRound); 
+		}
+	}
+			
+		
+
+	BYTE AssmOrg[5] = {0x83,0x7C,0x24,0x10,0x2};   //Orignal Line//
+	BYTE AssmPatch[5] = {0x83,0x7C,0x24,0x10,0x1}; //Game Over Fix//
+
+	BYTE AssmOverOrg[5] = {0xE8,0xC7,0xFA,0xFF,0xFF};
+	BYTE AssmOverPatch[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
+
+	if (hackit)
+	{
+		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)OnNewRound);
+		if (isHost || h2mod->Server)
+		{
+			WriteBytesASM(h2mod->GetBase() + BOffset, AssmPatch, 5);
+			WriteBytesASM(h2mod->GetBase() + COffset, AssmOverPatch, 5);
+		}
+	}
 	else
+	{
 		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)((char*)h2mod->GetBase() + Aoffset));
+		if (isHost || h2mod->Server)
+		{
+			WriteBytesASM(h2mod->GetBase() + BOffset, AssmOrg, 5);
+			WriteBytesASM(h2mod->GetBase() + COffset, AssmOverOrg, 5);
+		}
+	}
+
+
 }
 void PatchPingMeterCheck(bool hackit)
 {
@@ -1105,6 +1101,8 @@ int __cdecl OnMapLoad(int a1)
 	{
 		if (b_Halo2Final && !h2mod->Server)
 			h2f->Dispose();
+		if (b_Infection)
+			inf->Deinitialize();
 
 		int ret = pmap_initialize(a1);
 
@@ -1336,6 +1334,7 @@ bool __cdecl OnPlayerSpawn(int a1)
 								 }
 								 #pragma endregion
 								 */
+
 #pragma region Infection Handler
 	if (b_Infection)
 		inf->SpawnPlayer(PlayerIndex);
@@ -1974,7 +1973,7 @@ void H2MOD::Initialize()
 		}
 		PatchGameDetailsCheck();
 		//PatchPingMeterCheck(true);
-		//PatchRecordData();
+		
 	}
 
 	TRACE_GAME("H2MOD - Initialized v0.1a");

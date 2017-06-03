@@ -22,6 +22,9 @@ public:
 	void NextRound();
 
 	std::unordered_map<InfectionPlayer*, bool> infected_players;
+private:
+	int ZombiesCount();
+	int GetLasManStandingIndex();
 
 
 };
