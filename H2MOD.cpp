@@ -826,46 +826,12 @@ XNADDR join_game_xn;
 typedef int(__cdecl *tconnect_establish_write)(void* a1, int a2, int a3);
 tconnect_establish_write pconnect_establish_write;
 
-
-
-char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
-{
-
-	//TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
-	//TRACE_GAME("OnPlayerDeath() - Team: %i", h2mod->get_unit_team_index(unit_datum_index));
-
-#pragma region GunGame Handler
-	if (b_GunGame && (h2mod->Server || isHost))
-		gg->PlayerDied(unit_datum_index);
-#pragma endregion
-
-#pragma region Infection Handler
-	if (b_Infection)
-		inf->PlayerInfected(unit_datum_index);
-#pragma endregion
-
-	return pplayer_death(unit_datum_index, a2, a3, a4);
-}
+typedef int( *GameThread)();
+GameThread pGameThread;
 
 
 
-void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6)
-{
-	//TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
 
-
-#pragma region GunGame Handler
-	if (a5 == 7) //player got a kill?
-	{
-		int PlayerIndex = a2;
-		if (b_GunGame && (isHost || h2mod->Server))
-			gg->LevelUp(PlayerIndex);
-	}
-
-#pragma endregion
-
-	return pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
-}
 
 void PatchFixRankIcon() {
 	if (!h2mod->Server) {
@@ -917,47 +883,49 @@ void H2MOD::PatchVehicleInteraction(bool b_Enable)
 	WriteBytesASM(offset, assm, 5);
 
 }
-void AutoPickUpHandler(int PlayerIndex, unsigned int ObjectDatum)
-{
-	char(_cdecl*AutoHandler)(int, unsigned int);
-	AutoHandler = (char(_cdecl*)(int, unsigned int))((char*)h2mod->GetBase() + ((!h2mod->Server) ? 0x57AA5 : 0x5FF9D));
 
-	if (h2mod->get_Player_team_index(PlayerIndex) == 3)
-	{
-		int DA = 0;
-		int DynamicObjBase = *(DWORD *)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x50C8EC : 0x4E461C));
-		if (ObjectDatum != -1)
-		{
-			DA = *(DWORD *)(*(DWORD *)(DynamicObjBase + 68) + 12 * (unsigned __int16)ObjectDatum + 8);		
+void OnAutoPickUpHandler(int PlayerIndex, unsigned int ObjectDatum);
 
-			if (*(BYTE*)(DA + 0xAA) == 3)
-			{
-				return;
-			}
-			else
-			{
-				AutoHandler(PlayerIndex, ObjectDatum);
-				return;
-			}
-		}
-	
-	}
-	else
-	{
-		AutoHandler(PlayerIndex, ObjectDatum);
-		return; 
-	}
-	
-}
 void H2MOD :: PatchAutoPickups(bool b_enable)
 {//Host Sided
 	DWORD offset = (!h2mod->Server) ? 0x58789: 0x60C81;
 	DWORD Foffset = (!h2mod->Server) ? 0x57AA5 : 0x5FF9D;
 
 	if (b_enable)
-		PatchCall(h2mod->GetBase() + offset, (DWORD)AutoPickUpHandler);
+		PatchCall(h2mod->GetBase() + offset, (DWORD)OnAutoPickUpHandler);
 	else
 		PatchCall(h2mod->GetBase() + offset, h2mod->GetBase() + Foffset);
+
+}
+
+void PatchPingMeterCheck(bool hackit)
+{
+	//halo2.exe+1D4E35 
+
+	BYTE assmOrgLine[2] = { 0x74,0x18 };
+	BYTE assmPatchPingCheck[2] = { 0x90,0x90 };
+
+	if (hackit)
+		WriteBytesASM(h2mod->GetBase() + 0x1D4E35, assmPatchPingCheck, 2);
+	else
+		WriteBytesASM(h2mod->GetBase() + 0x1D4E35, assmOrgLine, 2);
+
+}
+
+void H2MOD::CallRoundManage(bool b_GameOver)
+{
+	//This logic Is supposed to end a round by default If Current Round is not Last Round
+	//Else it Automatically Ends the Game
+	//But Game can be manually Ended by b_gameOver :)
+
+
+	unsigned int(*sub_12E09E0)();
+	sub_12E09E0 = (unsigned int(*)(void))((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6F4E1 : 0x709E0));
+
+
+	DWORD* (__cdecl * sub_12E0A6F)(signed int, char);
+	sub_12E0A6F = (DWORD*(__cdecl*)(signed int, char))((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6F570 : 0x70A6F));
+	sub_12E0A6F(sub_12E09E0(), b_GameOver);
 
 }
 
@@ -991,58 +959,82 @@ static bool OnNewRound(int a1)
 	
 
 }
-
-
-void H2MOD::CallRoundManage(bool b_GameOver)
+void OnAutoPickUpHandler(int PlayerIndex, unsigned int ObjectDatum)
 {
-	//This logic Is supposed to end a round by default If Current Round is not Last Round
-	//Else it Automatically Ends the Game
-	//But Game can be manually Ended by b_gameOver :)
+
+	char(_cdecl*AutoHandler)(int, unsigned int);
+	AutoHandler = (char(_cdecl*)(int, unsigned int))((char*)h2mod->GetBase() + ((!h2mod->Server) ? 0x57AA5 : 0x5FF9D));
+
+	if (b_Infection)
+	{
+		if (!inf->PickUpHander(PlayerIndex, ObjectDatum))
+			return;
 
 
-	unsigned int(*sub_12E09E0)();
-	sub_12E09E0 = (unsigned int(*)(void))((char*)h2mod->GetBase() + ((h2mod->Server)?0x6F4E1:0x709E0));
+	}
+	AutoHandler(PlayerIndex, ObjectDatum);
+	return;
 
 
-	DWORD* (__cdecl * sub_12E0A6F)(signed int, char);
-	sub_12E0A6F = (DWORD*(__cdecl*)(signed int, char))((char*)h2mod->GetBase() +((h2mod->Server)?0x6F570:0x70A6F));
-	sub_12E0A6F(sub_12E09E0(), b_GameOver);
-		
+}
+
+
+
+int GameContinous()
+{//This is  a GameTimeGlobals Update function which Executes 24x7 (Will work here like a thread)
+	int(*Loop)(void);
+	Loop = (int(*)(void))((char*)h2mod->GetBase() + ((!h2mod->Server) ? 0x7BFF2 : 0x4BCA2));
+	int a =Loop();
+
+	if (b_Infection)
+	{
+		inf->InfectionHandler();
+	}
+
+
+	return a;
 }
 
 void H2MOD::PatchNewRound(bool hackit)//All thanks to Glitchy Scripts who helped me with this <3
 {
 	//Replace the Function call  At Offset with OnNewRound Else with AOffset function
 
-	DWORD offset = 0; //Stores the offset of Call New Round Begin function.
-	DWORD Aoffset = 0; //Stores the Offset of Orignal NewRoundBegin Function.
-	DWORD BOffset = 0; //Stores the Offset of Line which sets b_GameOver true when all switch to One Team.
-	DWORD COffset = 0; //Stores the Offset of Call of RoundManage when All Switch to one Team.
+	DWORD cNewRound = 0; //Stores the offset of Call New Round Begin function.
+	DWORD NewRound = 0; //Stores the Offset of Orignal NewRoundBegin Function.
+	DWORD TeamPatch = 0; //Stores the Offset of Line which sets b_GameOver true when all switch to One Team.
+	DWORD cRoundManage = 0; //Stores the Offset of Call of RoundManage when All Switch to one Team.
+	DWORD Thread = 0;  //Stores the Offset of Orignal Continous function
+	DWORD cThread = 0;//Stores the Offset of call Continous function
+	
 	
 	if (h2mod->Server)
 	{
-		offset = 0x700EF;
-		Aoffset = 0x6A87C;
-		BOffset = 0x6EC40;
-		COffset = 0x6FAA4;
+		cNewRound = 0x700EF;
+		NewRound = 0x6A87C;
+		TeamPatch = 0x6EC40;
+		cRoundManage = 0x6FAA4;
+		Thread = 0x4BCA2;
+		cThread = 0x43834;
 	}
 		
 	else
 	{
 		if (isHost)
 		{
-			offset = 0x715ee;
-			Aoffset = 0x6B1C8;
-			BOffset = 0x70048;
-			COffset = 0x70FA3;
+			cNewRound = 0x715ee;
+			NewRound = 0x6B1C8;
+			TeamPatch = 0x70048;
+			cRoundManage = 0x70FA3;
 		}
 
 		else
 		{
-			offset = 0x111A13;
-			Aoffset = 0x6DCD9;
+			cNewRound = 0x111A13;
+			NewRound = 0x6DCD9;
 
 		}
+		Thread = 0x7BFF2;
+		cThread = 0x4A5B6;
 	}
 			
 		
@@ -1050,42 +1042,69 @@ void H2MOD::PatchNewRound(bool hackit)//All thanks to Glitchy Scripts who helped
 	BYTE AssmOrg[5] = {0x83,0x7C,0x24,0x10,0x2};   //Orignal Line//
 	BYTE AssmPatch[5] = {0x83,0x7C,0x24,0x10,0x1}; //Game Over Fix//
 
-	BYTE AssmOverOrg[5] = {0xE8,0xC7,0xFA,0xFF,0xFF};
-	BYTE AssmOverPatch[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
+	BYTE AssmOverOrg[5] = {0xE8,0xC7,0xFA,0xFF,0xFF};//Auto Round/GameOVer on SingleTeam
+	BYTE AssmOverPatch[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };//Removing it^^
 
 	if (hackit)
 	{
-		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)OnNewRound);
+		PatchCall((DWORD)((char*)h2mod->GetBase() + cNewRound), (DWORD)OnNewRound);//Go to Custom OnNewRound		
+		PatchCall((DWORD)((char*)h2mod->GetBase() + cThread), (DWORD)GameContinous);//Go to Custom GameContinous		
 		if (isHost || h2mod->Server)
 		{
-			WriteBytesASM(h2mod->GetBase() + BOffset, AssmPatch, 5);
-			WriteBytesASM(h2mod->GetBase() + COffset, AssmOverPatch, 5);
+			//WriteBytesASM(h2mod->GetBase() + TeamPatch, AssmPatch, 5);
+			//WriteBytesASM(h2mod->GetBase() + cRoundManage, AssmOverPatch, 5);
 		}
 	}
 	else
 	{
-		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)((char*)h2mod->GetBase() + Aoffset));
+		PatchCall((DWORD)((char*)h2mod->GetBase() + cNewRound), (DWORD)((char*)h2mod->GetBase() + NewRound));		
+		PatchCall((DWORD)((char*)h2mod->GetBase() + cThread), (DWORD)((char*)h2mod->GetBase() + Thread));
 		if (isHost || h2mod->Server)
 		{
-			WriteBytesASM(h2mod->GetBase() + BOffset, AssmOrg, 5);
-			WriteBytesASM(h2mod->GetBase() + COffset, AssmOverOrg, 5);
+			//WriteBytesASM(h2mod->GetBase() + TeamPatch, AssmOrg, 5);
+			//WriteBytesASM(h2mod->GetBase() + cRoundManage, AssmOverOrg, 5);
 		}
 	}
 
 
 }
-void PatchPingMeterCheck(bool hackit)
+char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 {
-	//halo2.exe+1D4E35 
 
-	BYTE assmOrgLine[2] = { 0x74,0x18 };
-	BYTE assmPatchPingCheck[2] = { 0x90,0x90};	
+	//TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
+	//TRACE_GAME("OnPlayerDeath() - Team: %i", h2mod->get_unit_team_index(unit_datum_index));
 
-	if (hackit)
-		WriteBytesASM(h2mod->GetBase() + 0x1D4E35, assmPatchPingCheck, 2);
-	else
-		WriteBytesASM(h2mod->GetBase() + 0x1D4E35, assmOrgLine, 2);
-		
+#pragma region GunGame Handler
+	if (b_GunGame && (h2mod->Server || isHost))
+		gg->PlayerDied(unit_datum_index);
+#pragma endregion
+
+#pragma region Infection Handler
+	if (b_Infection)
+		inf->PlayerInfected(unit_datum_index);
+#pragma endregion
+
+	return pplayer_death(unit_datum_index, a2, a3, a4);
+}
+
+
+
+void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6)
+{
+	//TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
+
+
+#pragma region GunGame Handler
+	if (a5 == 7) //player got a kill?
+	{
+		int PlayerIndex = a2;
+		if (b_GunGame && (isHost || h2mod->Server))
+			gg->LevelUp(PlayerIndex);
+	}
+
+#pragma endregion
+
+	return pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
 
 
@@ -1145,6 +1164,30 @@ int __cdecl OnMapLoad(int a1)
 		}
 	}
 	int ret = pmap_initialize(a1);
+#pragma region Apply Hitfix
+	int offset = 0x47CD54;
+	if (h2mod->Server)
+		offset = 0x4A29BC;
+
+	DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + offset);
+
+	*(float*)(AddressOffset + 0xA4EC88) = 2400.0f; // battle_rifle_bullet.proj Initial Velocity 
+	*(float*)(AddressOffset + 0xA4EC8C) = 2400.0f; //battle_rifle_bullet.proj Final Velocity
+	*(float*)(AddressOffset + 0xB7F914) = 5000.0f; //sniper_bullet.proj Initial Velocity
+	*(float*)(AddressOffset + 0xB7F918) = 5000.0f; //sniper_bullet.proj Final Velocity
+	*(float*)(AddressOffset + 0xCE4598) = 5000.0f; //beam_rifle_beam.proj Initial Velocity
+	*(float*)(AddressOffset + 0xCE459C) = 5000.0f; //beam_rifle_beam.proj Final Velocity
+	*(float*)(AddressOffset + 0x81113C) = 200.0f; //gauss_turret.proj Initial Velocity def 90
+	*(float*)(AddressOffset + 0x811140) = 200.0f; //gauss_turret.proj Final Velocity def 90
+	*(float*)(AddressOffset + 0x97A194) = 800.0f; //magnum_bullet.proj initial def 400
+	*(float*)(AddressOffset + 0x97A198) = 800.0f; //magnum_bullet.proj final def 400
+	*(float*)(AddressOffset + 0x7E7E20) = 2000.0f; //bullet.proj (chaingun) initial def 800
+	*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bulet.proj (chaingun) final def 800
+
+
+
+#pragma endregion
+
 
 #pragma region H2v Stuff
 	if (!h2mod->Server)
@@ -1248,18 +1291,6 @@ int __cdecl OnMapLoad(int a1)
 				gg->Initialize();
 #pragma endregion
 
-#pragma region Apply Hitfix
-			int offset = 0x47CD54;
-			if (h2mod->Server)
-				offset = 0x4A29BC;
-
-			DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + offset);
-
-			*(float*)(AddressOffset + 0xA4EC88) = 2400.0f; // battle_rifle_bullet.proj Initial Velocity 
-			*(float*)(AddressOffset + 0xA4EC8C) = 2400.0f; //battle_rifle_bullet.proj Final Velocity
-			*(float*)(AddressOffset + 0xB7F914) = 5000.0f; //sniper_bullet.proj Initial Velocity
-			*(float*)(AddressOffset + 0xB7F918) = 5000.0f; //sniper_bullet.proj Final Velocity
-#pragma endregion
 			
 #pragma region Halo2Final
 			if (b_Halo2Final && !h2mod->Server)
@@ -1562,8 +1593,6 @@ void H2MOD::ApplyHooks() {
 		//live_check_method2 = (live_check2)DetourFunc((BYTE*)this->GetBase() + 0x1B1643, (BYTE*)clientXboxLiveCheck2, 9);
 		//VirtualProtect(live_check_method2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		//pResetRound=(ResetRounds)DetourFunc((BYTE*)this->GetBase() + 0x6B1C8, (BYTE*)OnNextRound, 7);
-		//VirtualProtect(pResetRound, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	}
 #pragma endregion
@@ -1597,6 +1626,7 @@ void H2MOD::ApplyHooks() {
 
 		pplayer_death = (player_death)DetourFunc((BYTE*)this->GetBase() + 0x152ED4, (BYTE*)OnPlayerDeath, 9);
 		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
+
 	}
 #pragma endregion
 }
@@ -1955,7 +1985,7 @@ void H2MOD::Initialize()
 		SoundT.detach();
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 
-		if (field_of_view != 57) {
+		if (field_of_view != 57 && field_of_view != 0) {
 			//if h2f is turned on, change fov for player and vehicle
 			//TODO: convert to methods
 			/*float fovRadians = (float)((field_of_view * 3.14159265f) / 180);

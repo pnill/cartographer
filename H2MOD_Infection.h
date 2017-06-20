@@ -20,6 +20,8 @@ public:
 	void Deinitialize();
 	void FindZombie();
 	void NextRound();
+	bool PickUpHander(int PlayerIndex, unsigned int ObjectDatum);
+	void InfectionHandler();
 
 	std::unordered_map<InfectionPlayer*, bool> infected_players;
 private:
