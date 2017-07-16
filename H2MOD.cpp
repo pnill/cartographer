@@ -871,6 +871,18 @@ void PatchGameDetailsCheck()
 	WriteBytesASM(h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
 }
 
+void H2MOD::PatchWeaponsInteraction(bool b_Enable)
+{
+	//Client Sided Patch
+	DWORD offset = h2mod->GetBase() + 0x55EFA;
+	BYTE assm[5] = { 0xE8, 0x18, 0xE0,0xFF, 0xFF };
+	if (!b_Enable)
+	{
+		memset(assm, 0x90, 5);
+	}
+	WriteBytesASM(offset, assm, 5);
+}
+
 static bool OnNewRound(int a1)
 {
 
@@ -1156,6 +1168,9 @@ bool __cdecl OnPlayerSpawn(int a1)
 		gg->SpawnPlayer(PlayerIndex);
 #pragma endregion
 
+	if (!b_Infection) {
+		h2mod->PatchWeaponsInteraction(true);
+	}
 
 	return ret;
 }
@@ -1295,6 +1310,16 @@ void* __stdcall OnWgitLoad(void* thisptr, int a2, int a3, int a4, unsigned short
 	return thisptr;
 }
 
+typedef int(__cdecl *build_gui_list)(int a1, int a2, int a3);
+build_gui_list build_gui_list_method;
+
+int __cdecl buildGuiList(int a1, int a2, int a3) {
+	if (b_Infection && a1 == (DWORD)(h2mod->GetBase() + 0x3D8A54)) {
+		a2 = 0;
+	}
+	return build_gui_list_method(a1, a2, a3);
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1376,6 +1401,8 @@ void H2MOD::ApplyHooks() {
 		//pResetRound=(ResetRounds)DetourFunc((BYTE*)this->GetBase() + 0x6B1C8, (BYTE*)OnNextRound, 7);
 		//VirtualProtect(pResetRound, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
+		build_gui_list_method = (build_gui_list)DetourFunc((BYTE*)this->GetBase() + 0x20D1FD, (BYTE*)buildGuiList, 8);
+		VirtualProtect(build_gui_list_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 #pragma endregion
 

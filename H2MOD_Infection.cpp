@@ -237,6 +237,10 @@ void Infection::SpawnPlayer(int PlayerIndex)
 
 				infected_played = true;
 			}
+			if (h2mod->get_local_team_index() == 3)
+			{
+				h2mod->PatchWeaponsInteraction(false);
+			}
 		}
 	}
 #pragma endregion 
@@ -340,8 +344,11 @@ void Infection::PlayerInfected(int unit_datum_index)
 
 void Infection::NextRound()
 {
-	if(!h2mod->Server)
-	h2mod->set_local_team_index(0);
+	if (!h2mod->Server)
+	{
+		h2mod->set_local_team_index(0);
+		h2mod->PatchWeaponsInteraction(true);
+	}
 
 	if (isHost || h2mod->Server)
 	{
