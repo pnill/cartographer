@@ -347,9 +347,8 @@ void Infection::PlayerInfected(int unit_datum_index)
 						it->first->infected = true;
 					}
 				}
-
-				if (h2mod->get_local_team_index() == 3) {
-					call_unit_reset_equipment(unit_datum_index); //Take away Weapons.
+				if (h2mod->get_unit_team_index(unit_datum_index) == 3) {
+					call_unit_reset_equipment(unit_datum_index); //Take away Weapons for zombies.
 				}
 
 			}
@@ -384,10 +383,8 @@ void Infection::PlayerInfected(int unit_datum_index)
 						
 						}
 					}
-
 				}
 			}
-
 		}
 #pragma endregion
 
