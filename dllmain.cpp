@@ -23,7 +23,7 @@ UINT g_debug = 0;
 UINT g_port = 1000;
 UINT fps_enable = 1;
 UINT fps_limit = 60;
-UINT field_of_view = 57;
+UINT field_of_view = 70;
 float crosshair_offset = 0.165f;
 
 //map downloading is off by default
@@ -72,7 +72,6 @@ std::wstring dlcbasepath;
 	int weapon_fiffteen = 0;
 	int weapon_sixteen = 0;
 #pragma endregion
-
 
 
 std::string ModulePathA(HMODULE hModule = NULL)
@@ -244,7 +243,7 @@ void InitInstance()
 			lstrcpyW(iniFile, L"xlive.ini");
 		}
 
-		int ArgCnt;
+		/*int ArgCnt;
 		LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
 		if (ArgList != NULL)
 		{
@@ -256,7 +255,7 @@ void InitInstance()
 						lstrcpyW(iniFile, ArgList[i] + 10);
 				}
 			}
-		}
+		} */
 
 		FILE *fp;
 		fp = _wfopen( iniFile, L"r" );
@@ -317,7 +316,6 @@ void InitInstance()
 				CHECK_ARG_STR("WANIP =", g_szWANIP);
 				CHECK_ARG_STR("LANIP =", g_szLANIP);
 				CHECK_ARG("debug_log =", g_debug);
-				CHECK_ARG("gungame =", b_GunGame);
 				CHECK_ARG("port =", g_port);
 				CHECK_ARG("fps_enable = ", fps_enable);
 				CHECK_ARG("fps_limit = ", fps_limit);
@@ -330,7 +328,7 @@ void InitInstance()
 			
 			fclose(fp);
 		}
-
+/*
 #pragma region GunGame Levels
 		if (b_GunGame == 1)
 		{
@@ -377,7 +375,8 @@ void InitInstance()
 			}
 		}
 		
-#pragma endregion
+#pragma endregion */
+
 		g_lLANIP = inet_addr(g_szLANIP);
 		g_lWANIP = inet_addr(g_szWANIP);
 

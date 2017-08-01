@@ -23,7 +23,7 @@ Halo2Final *h2f = new Halo2Final();
 
 bool b_Infection = false;
 bool b_Halo2Final = false;
-bool b_GunGame = false;
+extern bool b_GunGame;
 
 extern CUserManagement User;
 extern ULONG g_lLANIP;
@@ -788,13 +788,12 @@ void SoundThread(void)
 
 }
 
-void Field_of_View (unsigned int field_of_view,bool x)
+void Field_of_View (unsigned int field_of_view, bool x)
 {
 	if (field_of_view > 0 && field_of_view <= 110) {
 
 		if (x) {
 			//save to xlive.ini the fov if $setfov command is used or anything else
-			//idk how 2 write to .ini XD 
 		}
 		
 		const UINT FOV_MULTIPLIER_OFFSET = 4315524;

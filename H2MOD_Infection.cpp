@@ -11,7 +11,6 @@ bool infected_played = false;
 bool first_spawn = true;
 int zombie = 0;
 int PlayerCount = (h2mod->Server) ? 0x3000470C : 0x30004B60;
-//int L_index = 0;
 bool L_flag = false;
 bool Thread = false;
 
@@ -349,8 +348,9 @@ void Infection::PlayerInfected(int unit_datum_index)
 					}
 				}
 
-				call_unit_reset_equipment(unit_datum_index); //Take away Weapons.
-
+				if (h2mod->get_local_team_index() == 3) {
+					call_unit_reset_equipment(unit_datum_index); //Take away Weapons.
+				}
 
 			}
 
