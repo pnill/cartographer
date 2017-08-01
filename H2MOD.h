@@ -80,6 +80,7 @@ int __cdecl call_object_placement_data_new(void*, int, int, int);
 signed int __cdecl call_object_new(void*);
 void GivePlayerWeapon(int PlayerIndex, int WeaponId, bool bReset);
 DWORD WINAPI NetworkThread(LPVOID lParam);
+void Field_of_View(unsigned int fov,bool write);
 
 class NetworkPlayer
 {

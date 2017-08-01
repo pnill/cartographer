@@ -23,9 +23,8 @@ Halo2Final *h2f = new Halo2Final();
 
 bool b_Infection = false;
 bool b_Halo2Final = false;
-extern char b_Record;
+bool b_GunGame = false;
 
-extern bool b_GunGame;
 extern CUserManagement User;
 extern ULONG g_lLANIP;
 extern ULONG g_lWANIP;
@@ -37,7 +36,6 @@ extern bool Connected;
 extern bool ThreadCreated;
 extern ULONG broadcast_server;
 
-
 SOCKET comm_socket = INVALID_SOCKET;
 char* NetworkData = new char[255];
 
@@ -45,8 +43,7 @@ HMODULE base;
 
 extern int MasterState;
 
-
-#pragma region engine calls
+#pragma region Engine Calls
 
 int __cdecl call_get_object(signed int object_datum_index, int object_type)
 {
@@ -132,8 +129,6 @@ bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 }
 
 #pragma endregion
-
-
 
 //sub_1458759
 typedef int(__stdcall *write_chat_text)(void*, int);
@@ -793,8 +788,25 @@ void SoundThread(void)
 
 }
 
+void Field_of_View (unsigned int field_of_view,bool x)
+{
+	if (field_of_view > 0 && field_of_view <= 110) {
 
+		if (x) {
+			//save to xlive.ini the fov if $setfov command is used or anything else
+			//idk how 2 write to .ini XD 
+		}
+		
+		const UINT FOV_MULTIPLIER_OFFSET = 4315524;
+		const UINT FOV_VEHICLE_MULTIPLIER_OFFSET = 4274048;
+		const UINT CURRENT_FOV_OFFSET = 4883752;
 
+		float defaultRadians = (float)(70 * 3.14159265f / 180);
+		float targetRadians = (float)((double)field_of_view * 3.14159265f / 180);
+		*(float*)(h2mod->GetBase() + FOV_MULTIPLIER_OFFSET) = (targetRadians / defaultRadians);
+		*(float*)(h2mod->GetBase() + FOV_VEHICLE_MULTIPLIER_OFFSET) = (targetRadians / defaultRadians);
+	}
+}
 
 typedef bool(__cdecl *spawn_player)(int a1);
 spawn_player pspawn_player;
@@ -829,10 +841,6 @@ tconnect_establish_write pconnect_establish_write;
 typedef int( *GameThread)();
 GameThread pGameThread;
 
-
-
-
-
 void PatchFixRankIcon() {
 	if (!h2mod->Server) {
 		int THINGY = (int)*(int*)((char*)h2mod->GetBase() + 0xA40564);
@@ -860,8 +868,8 @@ void PatchGameDetailsCheck()
 	WriteBytesASM(h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
 }
 
-void H2MOD::PatchWeaponsInteraction(bool b_Enable)
-{//Client Sided Patch
+void H2MOD::PatchWeaponsInteraction(bool b_Enable) // Client Sided Patch
+{
 
 	DWORD offset = h2mod->GetBase() + 0x55EFA;	
 	BYTE assm[5] = { 0xE8, 0x18, 0xE0,0xFF, 0xFF };
@@ -870,9 +878,10 @@ void H2MOD::PatchWeaponsInteraction(bool b_Enable)
 		memset(assm, 0x90, 5);
 	}
 	WriteBytesASM(offset, assm, 5);
+
 }
-void H2MOD::PatchVehicleInteraction(bool b_Enable)
-{	//Client Sided Patch
+void H2MOD::PatchVehicleInteraction(bool b_Enable) // Client Sided Patch
+{	
 	
 	DWORD offset = h2mod->GetBase() + 0x55F26;
 	BYTE assm[5] = { 0xE8,0xA0,0xDD,0xFF,0xFF };
@@ -886,8 +895,8 @@ void H2MOD::PatchVehicleInteraction(bool b_Enable)
 
 void OnAutoPickUpHandler(int PlayerIndex, unsigned int ObjectDatum);
 
-void H2MOD :: PatchAutoPickups(bool b_enable)
-{//Host Sided
+void H2MOD::PatchAutoPickups(bool b_enable) // Host Sided
+{
 	DWORD offset = (!h2mod->Server) ? 0x58789: 0x60C81;
 	DWORD Foffset = (!h2mod->Server) ? 0x57AA5 : 0x5FF9D;
 
@@ -895,20 +904,6 @@ void H2MOD :: PatchAutoPickups(bool b_enable)
 		PatchCall(h2mod->GetBase() + offset, (DWORD)OnAutoPickUpHandler);
 	else
 		PatchCall(h2mod->GetBase() + offset, h2mod->GetBase() + Foffset);
-
-}
-
-void PatchPingMeterCheck(bool hackit)
-{
-	//halo2.exe+1D4E35 
-
-	BYTE assmOrgLine[2] = { 0x74,0x18 };
-	BYTE assmPatchPingCheck[2] = { 0x90,0x90 };
-
-	if (hackit)
-		WriteBytesASM(h2mod->GetBase() + 0x1D4E35, assmPatchPingCheck, 2);
-	else
-		WriteBytesASM(h2mod->GetBase() + 0x1D4E35, assmOrgLine, 2);
 
 }
 
@@ -926,6 +921,20 @@ void H2MOD::CallRoundManage(bool b_GameOver)
 	DWORD* (__cdecl * sub_12E0A6F)(signed int, char);
 	sub_12E0A6F = (DWORD*(__cdecl*)(signed int, char))((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6F570 : 0x70A6F));
 	sub_12E0A6F(sub_12E09E0(), b_GameOver);
+
+}
+
+void PatchPingMeterCheck(bool hackit)
+{
+	//halo2.exe+1D4E35 
+
+	BYTE assmOrgLine[2] = { 0x74,0x18 };
+	BYTE assmPatchPingCheck[2] = { 0x90,0x90 };
+
+	if (hackit)
+		WriteBytesASM(h2mod->GetBase() + 0x1D4E35, assmPatchPingCheck, 2);
+	else
+		WriteBytesASM(h2mod->GetBase() + 0x1D4E35, assmOrgLine, 2);
 
 }
 
@@ -949,16 +958,15 @@ static bool OnNewRound(int a1)
 		if (b_Infection)
 			inf->NextRound();
 
-		if (b_GunGame)
-			gg->NextRound();
+		//if (b_GunGame)
+			//gg->NextRound();
 	}
 	
 
 	return CallNewRoundBegin(a1); //Calling Orginal New Round Begins.
 
-	
-
 }
+
 void OnAutoPickUpHandler(int PlayerIndex, unsigned int ObjectDatum)
 {
 
@@ -969,42 +977,36 @@ void OnAutoPickUpHandler(int PlayerIndex, unsigned int ObjectDatum)
 	{
 		if (!inf->PickUpHander(PlayerIndex, ObjectDatum))
 			return;
-
-
 	}
 	AutoHandler(PlayerIndex, ObjectDatum);
 	return;
 
-
 }
 
-
-
-int GameContinous()
-{//This is  a GameTimeGlobals Update function which Executes 24x7 (Will work here like a thread)
+int GameContinous() // This is a GameTimeGlobals Update function which Executes 24x7 (Will work here like a thread)
+{ 
 	int(*Loop)(void);
 	Loop = (int(*)(void))((char*)h2mod->GetBase() + ((!h2mod->Server) ? 0x7BFF2 : 0x4BCA2));
-	int a =Loop();
+	int a = Loop();
 
 	if (b_Infection)
 	{
 		inf->InfectionHandler();
 	}
 
-
 	return a;
 }
 
-void H2MOD::PatchNewRound(bool hackit)//All thanks to Glitchy Scripts who helped me with this <3
+void H2MOD::PatchNewRound(bool hackit) //All thanks to Glitchy Scripts who helped me with this <3
 {
 	//Replace the Function call  At Offset with OnNewRound Else with AOffset function
 
-	DWORD cNewRound = 0; //Stores the offset of Call New Round Begin function.
-	DWORD NewRound = 0; //Stores the Offset of Orignal NewRoundBegin Function.
-	DWORD TeamPatch = 0; //Stores the Offset of Line which sets b_GameOver true when all switch to One Team.
-	DWORD cRoundManage = 0; //Stores the Offset of Call of RoundManage when All Switch to one Team.
-	DWORD Thread = 0;  //Stores the Offset of Orignal Continous function
-	DWORD cThread = 0;//Stores the Offset of call Continous function
+	DWORD cNewRound = 0; // Stores the offset of Call New Round Begin function.
+	DWORD NewRound = 0; // Stores the Offset of Orignal NewRoundBegin Function.
+	DWORD TeamPatch = 0; // Stores the Offset of Line which sets b_GameOver true when all switch to One Team.
+	DWORD cRoundManage = 0; // Stores the Offset of Call of RoundManage when All Switch to one Team.
+	DWORD Thread = 0;  // Stores the Offset of Orignal Continous function
+	DWORD cThread = 0; // Stores the Offset of call Continous function
 	
 	
 	if (h2mod->Server)
@@ -1039,16 +1041,16 @@ void H2MOD::PatchNewRound(bool hackit)//All thanks to Glitchy Scripts who helped
 			
 		
 
-	BYTE AssmOrg[5] = {0x83,0x7C,0x24,0x10,0x2};   //Orignal Line//
-	BYTE AssmPatch[5] = {0x83,0x7C,0x24,0x10,0x1}; //Game Over Fix//
+	BYTE AssmOrg[5] = {0x83,0x7C,0x24,0x10,0x2}; // Orignal Line //
+	BYTE AssmPatch[5] = {0x83,0x7C,0x24,0x10,0x1}; // Game Over Fix //
 
-	BYTE AssmOverOrg[5] = {0xE8,0xC7,0xFA,0xFF,0xFF};//Auto Round/GameOVer on SingleTeam
-	BYTE AssmOverPatch[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };//Removing it^^
+	BYTE AssmOverOrg[5] = {0xE8,0xC7,0xFA,0xFF,0xFF}; // Auto Round/GameOver on SingleTeam
+	BYTE AssmOverPatch[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 }; // Removing it ^^
 
 	if (hackit)
 	{
-		PatchCall((DWORD)((char*)h2mod->GetBase() + cNewRound), (DWORD)OnNewRound);//Go to Custom OnNewRound		
-		PatchCall((DWORD)((char*)h2mod->GetBase() + cThread), (DWORD)GameContinous);//Go to Custom GameContinous		
+		PatchCall((DWORD)((char*)h2mod->GetBase() + cNewRound), (DWORD)OnNewRound); // Go to Custom OnNewRound		
+		PatchCall((DWORD)((char*)h2mod->GetBase() + cThread), (DWORD)GameContinous); // Go to Custom GameContinous		
 		if (isHost || h2mod->Server)
 		{
 			//WriteBytesASM(h2mod->GetBase() + TeamPatch, AssmPatch, 5);
@@ -1068,6 +1070,7 @@ void H2MOD::PatchNewRound(bool hackit)//All thanks to Glitchy Scripts who helped
 
 
 }
+
 char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 {
 
@@ -1087,8 +1090,6 @@ char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 	return pplayer_death(unit_datum_index, a2, a3, a4);
 }
 
-
-
 void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6)
 {
 	//TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
@@ -1107,13 +1108,11 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 	return pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
 
-
 int __cdecl OnMapLoad(int a1)
 {
 	overrideUnicodeMessage = false;
 
 	isLobby = true;
-
 
 	//OnMapLoad is called with 30888 when a game ends
 	if (a1 == 30888)
@@ -1164,6 +1163,7 @@ int __cdecl OnMapLoad(int a1)
 		}
 	}
 	int ret = pmap_initialize(a1);
+
 #pragma region Apply Hitfix
 	int offset = 0x47CD54;
 	if (h2mod->Server)
@@ -1182,23 +1182,19 @@ int __cdecl OnMapLoad(int a1)
 	*(float*)(AddressOffset + 0x97A194) = 800.0f; //magnum_bullet.proj initial def 400
 	*(float*)(AddressOffset + 0x97A198) = 800.0f; //magnum_bullet.proj final def 400
 	*(float*)(AddressOffset + 0x7E7E20) = 2000.0f; //bullet.proj (chaingun) initial def 800
-	*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bulet.proj (chaingun) final def 800
-
-
+	*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bullet.proj (chaingun) final def 800
 
 #pragma endregion
-
 
 #pragma region H2v Stuff
 	if (!h2mod->Server)
 	{
+
 #pragma region Crosshair Offset
 
 		//*(float*)(AddressOffset + 0x3DC00) = crosshair_offset;		
 		DWORD CrosshairY = *(DWORD*)((char*)h2mod->GetBase() + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C;
 		*(float*)CrosshairY = crosshair_offset;
-
-
 
 #pragma endregion
 
@@ -1208,76 +1204,6 @@ int __cdecl OnMapLoad(int a1)
 		else {
 			MasterState = 11;
 		}
-
-
-		/*
-		#pragma region COOP FIXES
-		bcoop = false;
-
-		DWORD game_globals = *(DWORD*)(((char*)h2mod->GetBase()) + 0x482D3C);
-		BYTE* engine_mode = (BYTE*)(game_globals + 8);
-
-		BYTE main_menu[60] = { 0x73, 0x00, 0x63, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x61, 0x00, 0x72,
-		0x00, 0x69, 0x00, 0x6F, 0x00, 0x73, 0x00, 0x5C, 0x00, 0x75, 0x00, 0x69, 0x00,
-		0x5C, 0x00, 0x6D, 0x00, 0x61, 0x00, 0x69, 0x00, 0x6E, 0x00, 0x6D, 0x00, 0x65,
-		0x00, 0x6E, 0x00, 0x75, 0x00, 0x5C, 0x00, 0x6D, 0x00, 0x61, 0x00, 0x69, 0x00,
-		0x6E, 0x00, 0x6D, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x75, 0x00 };
-
-		BYTE quarntine_zone[86] = { 0x73, 0x00, 0x63, 0x00, 0x65, 0x00, 0x6E, 0x00, 0x61, 0x00, 0x72,
-		0x00, 0x69, 0x00, 0x6F, 0x00, 0x73, 0x00, 0x5C, 0x00, 0x6D, 0x00,
-		0x75, 0x00, 0x6C, 0x00, 0x74, 0x00, 0x69, 0x00, 0x5C, 0x00, 0x30,
-		0x00, 0x36, 0x00, 0x62, 0x00, 0x5F, 0x00, 0x66, 0x00, 0x6C, 0x00,
-		0x6F, 0x00, 0x6F, 0x00, 0x64, 0x00, 0x7A, 0x00, 0x6F, 0x00, 0x6E,
-		0x00, 0x65, 0x00, 0x5C, 0x00, 0x30, 0x00, 0x36, 0x00, 0x62, 0x00,
-		0x5F, 0x00, 0x66, 0x00, 0x6C, 0x00, 0x6F, 0x00, 0x6F, 0x00, 0x64,
-		0x00, 0x7A, 0x00, 0x6F, 0x00, 0x6E, 0x00, 0x65, 0x00 };
-
-		if (!memcmp(main_menu, (BYTE*)0x300017E0, 60))
-		{
-		DWORD game_globals = *(DWORD*)(((char*)h2mod->GetBase()) + 0x482D3C);
-		BYTE* garbage_collect = (BYTE*)(game_globals + 0xC);
-		*(garbage_collect) = 1;
-
-		//Crashfix
-		*(int*)(h2mod->GetBase() + 0x464940) = 0;
-		*(int*)(h2mod->GetBase() + 0x46494C) = 0;
-		*(int*)(h2mod->GetBase() + 0x464958) = 0;
-		*(int*)(h2mod->GetBase() + 0x464964) = 0;
-		}
-		else
-		{
-
-		}
-
-		if (!memcmp(quarntine_zone, (BYTE*)0x300017E0, 86) && *(engine_mode) == 2 ) // check the map and if we're loading a multiplayer game (We don't want to fuck up normal campaign)
-		{
-		bcoop = true; // set coop mode to true because we're loading an SP map and we're trying to do so with the multiplayer engine mode set.
-		}
-
-		if (bcoop == true)
-		{
-		DWORD game_globals = *(DWORD*)(((char*)h2mod->GetBase()) + 0x482D3C);
-		BYTE* coop_mode = (BYTE*)(game_globals + 0x2a4);
-		BYTE* engine_mode = (BYTE*)(game_globals + 8);
-		BYTE* garbage_collect = (BYTE*)(game_globals + 0xC);
-		*(engine_mode) = 1;
-		bcoop = true;
-
-		if (first_load == true)
-		{
-		*(garbage_collect) = 4; // This is utterly broken and causes weird issues when other players start joining.
-		}
-		else
-		{
-		*(garbage_collect) = 1; // This has to be left at 5 for it to work, for some reason after the first time the host loads it seems to resolve some issues with weapons creation.
-		first_load = false;
-		}
-
-		}
-		#pragma endregion
-		*/
-
-
 
 		if (*GameEngine != 3 && *GameState == 3)
 		{
@@ -1290,14 +1216,12 @@ int __cdecl OnMapLoad(int a1)
 			if (b_GunGame && isHost)
 				gg->Initialize();
 #pragma endregion
-
 			
 #pragma region Halo2Final
 			if (b_Halo2Final && !h2mod->Server)
 				h2f->Initialize(isHost);
 #pragma endregion
 		}
-
 
 	}
 	else {
@@ -1311,16 +1235,13 @@ int __cdecl OnMapLoad(int a1)
 			if (b_Infection)
 				inf->Initialize();
 #pragma endregion
+
 #pragma region GunGame Handler
 			if (b_GunGame)
 				gg->Initialize();
 #pragma endregion
 
-
-
-
 		}
-
 
 	}
 	return ret;
@@ -1338,42 +1259,26 @@ bool __cdecl OnPlayerSpawn(int a1)
 	int PlayerIndex = a1 & 0x000FFFF;
 
 #pragma region Infection Prespawn Handler
+
 	if (b_Infection)
 		inf->PreSpawn(PlayerIndex);
+
 #pragma endregion
-	/*
-	#pragma region COOP Fixes
-	// hacky coop fixes
 
-	DWORD game_globals = *(DWORD*)(((char*)h2mod->GetBase()) + 0x482D3C);
-	BYTE* garbage_collect = (BYTE*)(game_globals + 0xC);
-	BYTE* coop_mode = (BYTE*)(game_globals + 0x2a4);
-	BYTE* engine_mode = (BYTE*)(game_globals + 8);
-
-	if (bcoop == true)
-	{
-	*(coop_mode) = 1; // Turn coop mode on before spawning the player, maybe this fixes their weapon and biped or something idk?
-	// Going to have to reverse the engine simulation function for weapon creation further.
-	}
-	*/
-	int ret = pspawn_player(a1); // This handles player spawning for both multiplayer and sinlgeplayer/coop careful with it.
-								 /*
-								 // More hacky coop fixes
-								 if (bcoop == true)
-								 {
-								 *(coop_mode) = 0; // Turn it back off, sometimes it causes crashes if it's self on we only need it when we're spawning players.
-								 }
-								 #pragma endregion
-								 */
+	int ret = pspawn_player(a1);
 
 #pragma region Infection Handler
+
 	if (b_Infection)
 		inf->SpawnPlayer(PlayerIndex);
+
 #pragma endregion
 
 #pragma region GunGame Handler
+
 	if (b_GunGame && (isHost || h2mod->Server))
 		gg->SpawnPlayer(PlayerIndex);
+
 #pragma endregion
 
 
@@ -1450,8 +1355,6 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, int a6, 
 
 	return pjoin_game(thisptr, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14);
 }
-
-
 
 int __cdecl connect_establish_write(void* a1, int a2, int a3)
 {
@@ -1671,11 +1574,6 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 		TRACE_GAME("[h2mod-network] socket already existed continuing without attempting bind...");
 	}
 
-
-
-
-
-
 	TRACE_GAME("[h2mod-network] Are we host? %i", isHost);
 
 	NetworkActive = true;
@@ -1719,7 +1617,6 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 
 						it = h2mod->NetworkPlayers.erase(it);
 
-
 					}
 					else
 					{
@@ -1741,7 +1638,6 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 					}
 				}
 			}
-
 
 			if (recvresult > 0)
 			{
@@ -1951,7 +1847,6 @@ DWORD WINAPI Thread1(LPVOID lParam)
 	while (1)
 	{
 
-
 		DWORD Base = (DWORD)GetModuleHandleA("halo2.exe");
 
 		DWORD *ServerList = (DWORD*)(*(DWORD*)(Base + 0x96743C));
@@ -1964,6 +1859,7 @@ DWORD WINAPI Thread1(LPVOID lParam)
 		//fread((ServerList + 0xAA8), 0xAA8, 1, BinaryDump);
 		//TRACE("ServerList: %08X\n", ServerList);
 		//fwrite(ServerList, 0xAA8, 1, BinaryDump);	
+
 	}
 }
 
@@ -1972,11 +1868,14 @@ void H2MOD::Initialize()
 
 	if (GetModuleHandleA("H2Server.exe"))
 	{
+
 		this->Base = (DWORD)GetModuleHandleA("H2Server.exe");
 		this->Server = TRUE;
+
 	}
 	else
 	{
+
 		this->Base = (DWORD)GetModuleHandleA("halo2.exe");
 		this->Server = FALSE;
 		//HANDLE Handle_Of_Sound_Thread = 0;
@@ -1984,22 +1883,8 @@ void H2MOD::Initialize()
 		std::thread SoundT(SoundThread);
 		SoundT.detach();
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
-
-		if (field_of_view != 57 && field_of_view != 0) {
-			//if h2f is turned on, change fov for player and vehicle
-			//TODO: convert to methods
-			/*float fovRadians = (float)((field_of_view * 3.14159265f) / 180);
-			*(float*)(this->GetBase() + 0x41D984) = fovRadians; //player
-			*(float*)(this->GetBase() + 0x413780) = fovRadians * 0.8435f; //vehicle
-			*/
-			const UINT FOV_MULTIPLIER_OFFSET = 4315524;
-			const UINT FOV_VEHICLE_MULTIPLIER_OFFSET = 4274048;
-			const UINT CURRENT_FOV_OFFSET = 4883752;
-
-			float defaultRadians = (float)(57 * 3.14159265f / 180);
-			float targetRadians = (float)((double)field_of_view * 3.14159265f / 180);
-			*(float*)(h2mod->GetBase() + FOV_MULTIPLIER_OFFSET) = (targetRadians / defaultRadians);
-			*(float*)(h2mod->GetBase() + FOV_VEHICLE_MULTIPLIER_OFFSET) = (targetRadians / defaultRadians);
+		if (field_of_view != 70) {
+			Field_of_View(field_of_view, 0);
 		}
 		PatchGameDetailsCheck();
 		//PatchPingMeterCheck(true);

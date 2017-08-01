@@ -11,11 +11,9 @@ bool infected_played = false;
 bool first_spawn = true;
 int zombie = 0;
 int PlayerCount = (h2mod->Server) ? 0x3000470C : 0x30004B60;
-int L_index =0;
+//int L_index = 0;
 bool L_flag = false;
 bool Thread = false;
-
-
 
 
 void Infection::FindZombie()
@@ -57,6 +55,7 @@ void Infection::FindZombie()
 
 	}
 #pragma endregion
+
 #pragma region NetworkPlayers	
 	if (h2mod->NetworkPlayers.size() > 0)
 	{
@@ -108,8 +107,6 @@ void Infection::FindZombie()
 
 }
 
-
-
 void Infection::Initialize()
 {
 	
@@ -124,19 +121,20 @@ void Infection::Initialize()
 		infected_played = false;
 		first_spawn = true;
 
-		//Change Local Player's Team to Human if Not in Green
-		//(In case player wants to start as Alpha Zombie leave him green)
+		// Change Local Player's Team to Human if Not in Green
+		// (In case player wants to start as Alpha Zombie leave him green)
 		if (h2mod->get_local_team_index() != 3)
 			h2mod->set_local_team_index(0);
 	}
 #pragma endregion
+
 #pragma region Host/Dedi Work
-	if (isHost||h2mod->Server)
+	if (isHost || h2mod->Server)
 	{
 		TRACE_GAME("[H2Mod-Infection] - Initializing!");
 		TRACE_GAME("[H2Mod-Infection] - this->infected_players.size(): %i", this->infected_players.size());
 
-		h2mod->set_unit_speed_patch(true);//Applying SpeedCheck fix
+		h2mod->set_unit_speed_patch(true); //Applying SpeedCheck fix
 		h2mod->PatchAutoPickups(true);    //Enable OnAutoPickupHandling
 		
 
@@ -156,8 +154,8 @@ void Infection::Initialize()
 		
 	}
 #pragma endregion 
-h2mod->PatchNewRound(true);	  //OnNew_Round Patch
 
+         h2mod->PatchNewRound(true); //OnNew_Round Patch
 
 }
 
@@ -170,7 +168,7 @@ void Infection::Deinitialize()
 	h2mod->PatchVehicleInteraction(true);
 	Thread = false;
 
-	if (isHost||h2mod->Server)
+	if (isHost || h2mod->Server)
 	{	
 
 		h2mod->set_unit_speed_patch(false);
@@ -187,7 +185,7 @@ void Infection::PreSpawn(int PlayerIndex)
 	wchar_t* playername = h2mod->get_player_name_from_index(PlayerIndex);
 
 #pragma region NetworkPlayers(Client)
-	if (!isHost&&!h2mod->Server)
+	if (!isHost && !h2mod->Server)
 	{
 		//If Player being spawned is LocalUser/Player
 		if (wcscmp(playername, h2mod->get_local_player_name()) == 0)
@@ -205,7 +203,7 @@ void Infection::PreSpawn(int PlayerIndex)
 
 #pragma region LocalHost/Dedi Work
 
-	if (isHost||h2mod->Server)
+	if (isHost || h2mod->Server)
 	{
 
 		for (auto it = this->infected_players.begin(); it != this->infected_players.end(); ++it)
@@ -236,14 +234,13 @@ void Infection::SpawnPlayer(int PlayerIndex)
 	TRACE_GAME("[H2Mod-Infection] - SpawnPlayer(%i)", PlayerIndex);
 	
 #pragma region InfectionHandling
-	if (isHost||h2mod->Server)
+	if (isHost || h2mod->Server)
 	{
 		int unit_datum_index = h2mod->get_unit_datum_from_player_index(PlayerIndex);
 		int unit_object = call_get_object(unit_datum_index, 3);
 
-		if (unit_object)//if Spawned(alive)
+		if (unit_object) //if Spawned(alive)
 		{
-			
 			
 #pragma region HumansPowerUp
 			if (h2mod->get_unit_team_index(unit_datum_index) == 0)
@@ -256,21 +253,23 @@ void Infection::SpawnPlayer(int PlayerIndex)
 				
 			}
 #pragma endregion
+
 #pragma region ZombiesPowerUp
 			if (h2mod->get_unit_team_index(unit_datum_index) == 3)
 			{
 #pragma region AlphaZombie
 
-				if (PlayerIndex == zombie)
+				if (PlayerIndex == zombie) 
 				{
 					h2mod->set_unit_biped(BipedType::Elite, PlayerIndex);
-					h2mod->set_unit_speed(1.25f, PlayerIndex);
+					h2mod->set_unit_speed(1.15f, PlayerIndex);
 					GivePlayerWeapon(PlayerIndex, Weapon::energy_blade, 1);
 					*(BYTE*)(unit_object + 0x252) = 0;
 					*(BYTE*)(unit_object + 0x253) = 0;
 					
 				}
 #pragma endregion 
+
 				else
 				{
 					h2mod->set_unit_biped(BipedType::Elite, PlayerIndex);
@@ -284,8 +283,8 @@ void Infection::SpawnPlayer(int PlayerIndex)
 #pragma endregion
 		}
 	}
-
 #pragma endregion
+
 #pragma region SoundHandling
 	if (!h2mod->Server)
 	{
@@ -337,7 +336,7 @@ void Infection::PlayerInfected(int unit_datum_index)
 			if (isHost || h2mod->Server)
 			{
 		
-				//Add the Dead Player to The List of Infected	
+				// Add the Dead Player to The List of Infected	
 
 				wchar_t* playername = h2mod->get_player_name_from_index(pIndex);
 				for (auto it = this->infected_players.begin(); it != this->infected_players.end(); ++it)
@@ -350,12 +349,13 @@ void Infection::PlayerInfected(int unit_datum_index)
 					}
 				}
 
-				//call_unit_reset_equipment(unit_datum_index);//Take away Weapons.
+				call_unit_reset_equipment(unit_datum_index); //Take away Weapons.
 
 
 			}
 
 #pragma endregion
+
 #pragma region H2v Stuffs
 			if (!h2mod->Server)
 			{ 
@@ -391,8 +391,6 @@ void Infection::PlayerInfected(int unit_datum_index)
 		}
 #pragma endregion
 
-	
-
 }
 
 void Infection::NextRound()
@@ -401,15 +399,13 @@ void Infection::NextRound()
 	infected_played = false;
 	Thread = false;
 	TRACE_GAME("[H2Mod-Infection] - Starting New Round!");
-
-
 }
 
 int Infection::ZombiesCount()
 {
 	int z = 0;
 	
-	for (int i = 0;i < *(BYTE*)PlayerCount;i++)
+	for (int i = 0; i < *(BYTE*)PlayerCount; i++)
 	{
 		if (h2mod->get_Player_team_index(i) == 3)
 			z++;
@@ -435,6 +431,7 @@ int Infection::GetLasManStandingIndex()
 
 	return r;
 }
+
 bool Infection::PickUpHander(int PlayerIndex, unsigned int ObjectDatum)
 {
 	bool ShouldInteract = true;
@@ -449,16 +446,16 @@ bool Infection::PickUpHander(int PlayerIndex, unsigned int ObjectDatum)
 			
 			if (*(BYTE*)(DA + 0xAA) == 3)  
 			{
-				ShouldInteract = false;  //Disable Equipments//
+				ShouldInteract = false;  // Disable Equipments //
 			}
 			
 		}
 
-	}
-	
+	}	
 	return ShouldInteract;
 
 }
+
 void Infection::InfectionHandler()
 {
 	
@@ -480,22 +477,25 @@ void Infection::InfectionHandler()
 				{
 
 					int index = this->GetLasManStandingIndex();		
-					if(index!=-1)
+
+					if (index != -1) 
 					{
 						TRACE_GAME("[H2Mod-Infection] - Last Man Standing Chosen %ws ", h2mod->get_player_name_from_index(index));
 
-						if (isHost || h2mod->Server)
+						/*if (isHost || h2mod->Server) // Crashes the game 
 						{
 
 							int unit_object = h2mod->get_dynamic_player_base(index, 0);
 							*(float*)(unit_object + 0xF0) = 5.0f;
 
-						}
+						} */
+
 						if (!h2mod->Server)
 						{
 							h2mod->SoundMap[L"sounds/last_man_standing.wav"] = 1000;
 						}
 						L_flag = true;
+
 					}
 				}
 			}
@@ -504,10 +504,8 @@ void Infection::InfectionHandler()
 				L_flag = false;
 			}
 			
-
 #pragma endregion
 
-			
 		}
 
 	}
