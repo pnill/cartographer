@@ -80,6 +80,7 @@ int __cdecl call_object_placement_data_new(void*, int, int, int);
 signed int __cdecl call_object_new(void*);
 void GivePlayerWeapon(int PlayerIndex, int WeaponId, bool bReset);
 DWORD WINAPI NetworkThread(LPVOID lParam);
+void Field_of_View(unsigned int fov,bool write);
 
 class NetworkPlayer
 {
@@ -115,6 +116,7 @@ public:
 		int get_player_index_from_name(wchar_t* playername);
 		int get_player_index_from_unit_datum(int unit_datum_index);
 		BYTE get_unit_team_index(int unit_datum_index);
+		BYTE get_Player_team_index(BYTE PlayerIndex);
 		void set_unit_team_index(int unit_datum_index, BYTE team);
 		void set_unit_biped(BYTE biped, int pIndex);
 		void set_unit_speed_patch(bool hackit);
@@ -124,8 +126,11 @@ public:
 		void set_unit_grenades(BYTE type, BYTE count, int pIndex, bool bReset);
 		void set_local_grenades(BYTE type, BYTE count, int pIndex);
 		void DisableSound(int sound);
-		void PatchNewRound(bool hackit); 
+		void PatchNewRound(bool hackit);
 		void PatchWeaponsInteraction(bool b_Enable);
+		void PatchVehicleInteraction(bool b_Enable);
+		void PatchAutoPickups(bool b_Enable);
+		void CallRoundManage(bool b_GameOver);	
 		BOOL Server;
 		std::unordered_map<NetworkPlayer*, bool> NetworkPlayers;
 		std::unordered_map<wchar_t*, int> SoundMap;
@@ -133,6 +138,7 @@ public:
 
 		std::set<int> hookedObjectDefs;
 		bool isChatBoxCommand = false;
+	
 
 private:
 		DWORD Base;
