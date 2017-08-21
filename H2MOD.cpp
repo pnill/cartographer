@@ -962,6 +962,9 @@ int __cdecl OnMapLoad(int a1)
 	{
 		if (b_Halo2Final && !h2mod->Server)
 			h2f->Dispose();
+		if (b_Infection) {
+			inf->Deinitialize();
+		}
 
 		int ret = pmap_initialize(a1);
 

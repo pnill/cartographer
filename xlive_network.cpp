@@ -90,8 +90,6 @@ INT WINAPI XNetCleanup()
 }
 
 
-
-
 // #11: XSocketBind
 SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 {
@@ -282,10 +280,6 @@ DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pAddr)
 		ConnectionAttempts++;
 	}
 
-	
-	
-	
-
 	return XNET_GET_XNADDR_PENDING;
 }
 
@@ -390,8 +384,6 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 	return ret;
 }
 
-
-
 int TimesWrittenTo=0;
 
 // #20
@@ -412,7 +404,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 		if (iplong != broadcast_server)
 		{
 	
-			if (*(ULONG*)buf == 0x11223345)
+			if (*(ULONG*)buf == 0x11223341)
 			{
 				User.smap[hostpair] = *(ULONG*)(buf + 4);
 				
