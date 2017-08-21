@@ -71,6 +71,54 @@ void ChatBoxCommands::handle_command(std::string command) {
 
 			mapManager->reloadMaps();
 		}
+		else if (firstCommand == "$maxplayers") {
+			if (splitCommands.size() != 2) {
+				h2mod->write_inner_chat_dynamic(L"Usage: $maxplayers value (betwen 1 and 16).");
+				return;
+			}
+			extern bool isHost;
+			if (!isHost) {
+				h2mod->write_inner_chat_dynamic(L"Can be only used while hosting.");
+				return;
+			}
+
+			std::string secondArg = splitCommands[1];
+			int maxPlayersSet = stoi(splitCommands[1]);
+
+			int baseAddr = (int)*(int*)((char*)h2mod->GetBase() + 0x420FE8);
+			BYTE& playerNumber = *(BYTE*)(baseAddr + 0x1254);
+			BYTE& maxPlayersNumber = *(BYTE*)(baseAddr + 0x4C80);
+
+			if (maxPlayersSet < 1 || maxPlayersSet > 16) {
+				h2mod->write_inner_chat_dynamic(L"The value needs to be between 1 and 16.");
+				return;
+			}
+
+			if (maxPlayersSet < playerNumber) {
+				h2mod->write_inner_chat_dynamic(L"You can't set a value of max players smaller than the actual number of players on the server.");
+				return;
+			}
+			else {
+				maxPlayersNumber = maxPlayersSet;
+				h2mod->write_inner_chat_dynamic(L"Maximum players set");
+			}
+
+		}
+		else if (firstCommand == "$setfov") {
+			if (splitCommands.size() != 2) {
+				h2mod->write_inner_chat_dynamic(L"Invalid input.Usage - $setfov value");
+				return;
+			}
+			else {
+				std::string secondArg = splitCommands[1];
+				unsigned int fov = stoi(splitCommands[1]);
+				Field_of_View(fov, 1);
+				h2mod->write_inner_chat_dynamic(L"Field of view set");
+			}
+		}
+		else if (chatbox_commands == false) {
+			return;
+		}
 		else if (firstCommand == "$resetspawncommandlist") {
 			//reset checked_for_ids, so you can reload new object_datums at runtime
 			this->checked_for_ids = false;

@@ -8,11 +8,9 @@
 #include "H2OnscreenDebugLog.h"
 #include "GSRunLoop.h"
 
-
 using namespace std;
 
 #include "Detour.h"
-
 
 HMODULE hThis = NULL;
 
@@ -23,7 +21,7 @@ UINT g_debug = 0;
 UINT g_port = 1000;
 UINT fps_enable = 1;
 UINT fps_limit = 60;
-UINT field_of_view = 57;
+UINT field_of_view = 70;
 float crosshair_offset = 0.165f;
 
 //map downloading is off by default
@@ -73,8 +71,6 @@ std::wstring dlcbasepath;
 	int weapon_sixteen = 0;
 #pragma endregion
 
-
-
 std::string ModulePathA(HMODULE hModule = NULL)
 {
 	static char strPath[MAX_PATH];
@@ -115,7 +111,6 @@ void trace(LPWSTR message, ...)
 	va_end (arg);
 	LeaveCriticalSection (&d_lock);
 }
-
 
 void trace2(LPWSTR message, ...)
 {
@@ -312,12 +307,10 @@ void InitInstance()
 		continue; \
 	}
 
-
 				CHECK_ARG_STR("login_token =", g_szToken);
 				CHECK_ARG_STR("WANIP =", g_szWANIP);
 				CHECK_ARG_STR("LANIP =", g_szLANIP);
 				CHECK_ARG("debug_log =", g_debug);
-				CHECK_ARG("gungame =", b_GunGame);
 				CHECK_ARG("port =", g_port);
 				CHECK_ARG("fps_enable = ", fps_enable);
 				CHECK_ARG("fps_limit = ", fps_limit);

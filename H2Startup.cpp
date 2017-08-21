@@ -746,10 +746,10 @@ void ProcessH2Startup() {
 		PatchCall(H2BaseAddr + 0x226628, (DWORD)NotDisplayIngameChat);
 	}
 	addDebugText("End Startup Tweaks.");
-	extern void GSSecStartLoop();
+	/*extern void GSSecStartLoop();
 	GSSecStartLoop();
 	extern void GSSecSweetLeetHaxA(int);
-	GSSecSweetLeetHaxA(0);
+	GSSecSweetLeetHaxA(0); */
 	extern void initGSRunLoop();
 	initGSRunLoop();
 	addDebugText("ProcessStartup finished.");
