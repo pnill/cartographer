@@ -1264,8 +1264,8 @@ typedef int(__cdecl *build_gui_list)(int a1, int a2, int a3);
 build_gui_list build_gui_list_method;
 
 int __cdecl buildGuiList(int a1, int a2, int a3) {
-	if (b_Infection && a1 == (DWORD)(h2mod->GetBase() + 0x3D8A54)) {
-		a2 = 0;
+	if (b_Infection && a1 == (DWORD)(h2mod->GetBase() + 0x3d3620) && !isHost) {
+		a2 = 1;
 	}
 	return build_gui_list_method(a1, a2, a3);
 }
