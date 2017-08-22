@@ -430,7 +430,7 @@ void CUserManagement::RegisterLocalRequest(char* token)
 			ULONG secured_addr = RecvPak.lreply().secure_addr();
 			ULONG _xnaddr = RecvPak.lreply().xnaddr();
 
-			(*(DWORD*)&this->SecurityPacket[0]) = 0x11223345;
+			(*(DWORD*)&this->SecurityPacket[0]) = 0x11223341;
 			(*(DWORD*)&this->SecurityPacket[4]) = secured_addr;
 
 			SecurityPacket = this->SecurityPacket;
