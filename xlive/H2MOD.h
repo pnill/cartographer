@@ -99,6 +99,7 @@ class H2MOD
 public:
 		void Initialize();
 		void Deinitialize();
+		void IndicatorVisibility(bool toggle);
 		int get_unit_from_player_index(int);
 		int get_unit_datum_from_player_index(int);
 		void ApplyHooks();

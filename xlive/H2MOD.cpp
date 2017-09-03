@@ -1759,3 +1759,17 @@ DWORD H2MOD::GetBase()
 {
 	return this->Base;
 }
+
+void H2MOD::IndicatorVisibility(bool toggle)
+{
+	BYTE* indicatorPointer = ((BYTE*)h2mod->GetBase() + 0x111197);
+	DWORD dwback;
+	VirtualProtect(indicatorPointer, 1, PAGE_EXECUTE_READWRITE, &dwback);
+
+	if (toggle)
+		*indicatorPointer = 0x74;
+	else
+		*indicatorPointer = 0xEB;
+
+	VirtualProtect(indicatorPointer, 1, dwback, NULL);
+}

@@ -222,9 +222,11 @@ void Infection::SpawnPlayer(int PlayerIndex)
 			if (h2mod->get_local_team_index() == 0)
 			{
 				h2mod->PatchWeaponsInteraction(true);
+				h2mod->IndicatorVisibility(false);
 			}
 			else if (h2mod->get_local_team_index() == 3){
 				h2mod->PatchWeaponsInteraction(false);
+				h2mod->IndicatorVisibility(true);
 			}
 		}
 	}
