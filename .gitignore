@@ -34,3 +34,5 @@ xliveless.aps
 /Debug
 *.db
 /GSSecurity.cpp
+/.vs/Project_Cartographer/v15
+/Directx SDK/include
