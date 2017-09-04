@@ -1355,6 +1355,12 @@ void H2MOD::ApplyHooks() {
 
 		build_gui_list_method = (build_gui_list)DetourFunc((BYTE*)this->GetBase() + 0x20D1FD, (BYTE*)buildGuiList, 8);
 		VirtualProtect(build_gui_list_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		// Patch out the code that displays the "Invalid Checkpoint" error
+		// Start
+		NopFill(this->GetBase() + 0x30857, 0x41);
+		// Respawn
+		NopFill(this->GetBase() + 0x8BB98, 0x2b);
 	}
 #pragma endregion
 
