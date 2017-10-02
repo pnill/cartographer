@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "..\MinHook\include\MinHook.h"
+#include "MinHook.h"
 
 #include "Detour.h"
 #include <stdio.h>
