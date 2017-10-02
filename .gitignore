@@ -13,6 +13,7 @@
 *.java
 *.lib
 !xlive/libprotobuf.lib
+!xlive/libMinHook.x86.lib
 *.suo
 *.opendb
 *.db
@@ -24,3 +25,4 @@ xliveless.opensdf
 version.txt
 xliveless.aps
 xlive/Debug/**
+xlive/Release/**

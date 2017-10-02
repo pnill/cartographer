@@ -211,11 +211,6 @@
     <ResourceCompile Include="Resource.rc" />
     <ResourceCompile Include="xliveless.rc" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MinHook\build\libMinHook.vcxproj">
-      <Project>{65021938-d251-46fa-bc3d-85c385d4c06d}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
