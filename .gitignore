@@ -23,7 +23,9 @@ Debug/binkw32.lib
 *.java
 Debug/RCa10868
 Debug/xliveless.res
+MinHook/build/lib/libMinHook.x86.lib
 *.lib
+!xlive/libprotobuf.lib
 Debug/RCa22592
 Debug/Resource.res
 *.suo
