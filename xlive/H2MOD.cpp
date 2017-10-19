@@ -1270,6 +1270,18 @@ int __cdecl buildGuiList(int a1, int a2, int a3) {
 	return build_gui_list_method(a1, a2, a3);
 }
 
+typedef int(__cdecl *change_team)(int a1, int a2);
+change_team change_team_method;
+
+int __cdecl changeTeam(int a1, int a2) {
+	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
+	if (wcsstr(variant_name, L"RvB") > 0 && a2 != 0 && a2 != 1) {
+		//rvb mode enabled, don't change teams
+		return 4732 * a1;
+	}
+	return change_team_method(a1, a2);
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1361,6 +1373,9 @@ void H2MOD::ApplyHooks() {
 		NopFill(this->GetBase() + 0x30857, 0x41);
 		// Respawn
 		NopFill(this->GetBase() + 0x8BB98, 0x2b);
+
+		change_team_method = (change_team)DetourFunc((BYTE*)this->GetBase() + 0x2068F2, (BYTE*)changeTeam, 8);
+		VirtualProtect(change_team_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 #pragma endregion
 
