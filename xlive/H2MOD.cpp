@@ -980,7 +980,6 @@ int __cdecl OnMapLoad(int a1)
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
 	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
 	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
-
 	BYTE* GameState = (BYTE*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
 
 
@@ -1275,11 +1274,22 @@ change_team change_team_method;
 
 int __cdecl changeTeam(int a1, int a2) {
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
-	if (wcsstr(variant_name, L"RvB") > 0 && a2 != 0 && a2 != 1) {
+	if (wcsstr(variant_name, L"RvB") > 0 && a2 > 1) {
 		//rvb mode enabled, don't change teams
 		return 4732 * a1;
 	}
 	return change_team_method(a1, a2);
+}
+
+typedef char(__cdecl *camera_pointer)();
+camera_pointer Cinematic_Pointer;
+char __cdecl if_cinematic() {
+	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
+	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
+	if (*GameEngine == 1) {
+		return 0;
+	}
+	return 0;
 }
 
 void H2MOD::ApplyHooks() {
@@ -1294,7 +1304,13 @@ void H2MOD::ApplyHooks() {
 
 		//pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
 		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+     
+		Cinematic_Pointer = (camera_pointer)DetourFunc((BYTE*)this->GetBase() + 0x3A938, (BYTE*)if_cinematic, 8);
+		VirtualProtect(Cinematic_Pointer, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
+		change_team_method = (change_team)DetourFunc((BYTE*)this->GetBase() + 0x2068F2, (BYTE*)changeTeam, 8);
+		VirtualProtect(change_team_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		
 		psub_4F17A = (tsub_4F17A)DetourFunc((BYTE*)this->GetBase() + 0x4F17A, (BYTE*)sub_4F17A, 13);
 		VirtualProtect(psub_4F17A, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
@@ -1374,11 +1390,11 @@ void H2MOD::ApplyHooks() {
 		// Respawn
 		NopFill(this->GetBase() + 0x8BB98, 0x2b);
 
-		change_team_method = (change_team)DetourFunc((BYTE*)this->GetBase() + 0x2068F2, (BYTE*)changeTeam, 8);
-		VirtualProtect(change_team_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		
 	}
 #pragma endregion
 
+	
 #pragma region H2ServerHooks
 	else {
 
