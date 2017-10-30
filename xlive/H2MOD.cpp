@@ -980,6 +980,7 @@ int __cdecl OnMapLoad(int a1)
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
 	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
 	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
+
 	BYTE* GameState = (BYTE*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
 
 
@@ -1007,31 +1008,33 @@ int __cdecl OnMapLoad(int a1)
 	}
 	int ret = pmap_initialize(a1);
 
+	if (*GameEngine == 2)
+	{
 #pragma region Apply Hitfix
 
-	int offset = 0x47CD54;
-	//TRACE_GAME("[h2mod] Hitfix is being run on Client!");
-	if (h2mod->Server)
-		offset = 0x4A29BC;
-	//TRACE_GAME("[h2mod] Hitfix is being run on the Dedicated Server!");
+		int offset = 0x47CD54;
+		//TRACE_GAME("[h2mod] Hitfix is being run on Client!");
+		if (h2mod->Server)
+			offset = 0x4A29BC;
+		//TRACE_GAME("[h2mod] Hitfix is being run on the Dedicated Server!");
 
-	DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + offset);
+		DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + offset);
 
-	*(float*)(AddressOffset + 0xA4EC88) = 2400.0f; // battle_rifle_bullet.proj Initial Velocity 
-	*(float*)(AddressOffset + 0xA4EC8C) = 2400.0f; //battle_rifle_bullet.proj Final Velocity
-	*(float*)(AddressOffset + 0xB7F914) = 5000.0f; //sniper_bullet.proj Initial Velocity
-	*(float*)(AddressOffset + 0xB7F918) = 5000.0f; //sniper_bullet.proj Final Velocity
-	*(float*)(AddressOffset + 0xCE4598) = 5000.0f; //beam_rifle_beam.proj Initial Velocity
-	*(float*)(AddressOffset + 0xCE459C) = 5000.0f; //beam_rifle_beam.proj Final Velocity
-	*(float*)(AddressOffset + 0x81113C) = 200.0f; //gauss_turret.proj Initial Velocity def 90
-	*(float*)(AddressOffset + 0x811140) = 200.0f; //gauss_turret.proj Final Velocity def 90
-	*(float*)(AddressOffset + 0x97A194) = 800.0f; //magnum_bullet.proj initial def 400
-	*(float*)(AddressOffset + 0x97A198) = 800.0f; //magnum_bullet.proj final def 400
-	*(float*)(AddressOffset + 0x7E7E20) = 2000.0f; //bullet.proj (chaingun) initial def 800
-	*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bullet.proj (chaingun) final def 800
+		*(float*)(AddressOffset + 0xA4EC88) = 2400.0f; // battle_rifle_bullet.proj Initial Velocity 
+		*(float*)(AddressOffset + 0xA4EC8C) = 2400.0f; //battle_rifle_bullet.proj Final Velocity
+		*(float*)(AddressOffset + 0xB7F914) = 5000.0f; //sniper_bullet.proj Initial Velocity
+		*(float*)(AddressOffset + 0xB7F918) = 5000.0f; //sniper_bullet.proj Final Velocity
+		*(float*)(AddressOffset + 0xCE4598) = 5000.0f; //beam_rifle_beam.proj Initial Velocity
+		*(float*)(AddressOffset + 0xCE459C) = 5000.0f; //beam_rifle_beam.proj Final Velocity
+		*(float*)(AddressOffset + 0x81113C) = 200.0f; //gauss_turret.proj Initial Velocity def 90
+		*(float*)(AddressOffset + 0x811140) = 200.0f; //gauss_turret.proj Final Velocity def 90
+		*(float*)(AddressOffset + 0x97A194) = 800.0f; //magnum_bullet.proj initial def 400
+		*(float*)(AddressOffset + 0x97A198) = 800.0f; //magnum_bullet.proj final def 400
+		*(float*)(AddressOffset + 0x7E7E20) = 2000.0f; //bullet.proj (chaingun) initial def 800
+		*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bullet.proj (chaingun) final def 800
 
 #pragma endregion
-
+	}
 #pragma region H2v Stuff
 	if (!h2mod->Server)
 	{
@@ -1274,7 +1277,7 @@ change_team change_team_method;
 
 int __cdecl changeTeam(int a1, int a2) {
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
-	if (wcsstr(variant_name, L"RvB") > 0 && a2 > 1) {
+	if (wcsstr(variant_name, L"RvB") > 0 && a2 != 0 && a2 != 1) {
 		//rvb mode enabled, don't change teams
 		return 4732 * a1;
 	}
@@ -1304,13 +1307,10 @@ void H2MOD::ApplyHooks() {
 
 		//pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
 		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-     
+
 		Cinematic_Pointer = (camera_pointer)DetourFunc((BYTE*)this->GetBase() + 0x3A938, (BYTE*)if_cinematic, 8);
 		VirtualProtect(Cinematic_Pointer, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		change_team_method = (change_team)DetourFunc((BYTE*)this->GetBase() + 0x2068F2, (BYTE*)changeTeam, 8);
-		VirtualProtect(change_team_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-		
 		psub_4F17A = (tsub_4F17A)DetourFunc((BYTE*)this->GetBase() + 0x4F17A, (BYTE*)sub_4F17A, 13);
 		VirtualProtect(psub_4F17A, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
@@ -1390,11 +1390,11 @@ void H2MOD::ApplyHooks() {
 		// Respawn
 		NopFill(this->GetBase() + 0x8BB98, 0x2b);
 
-		
+		change_team_method = (change_team)DetourFunc((BYTE*)this->GetBase() + 0x2068F2, (BYTE*)changeTeam, 8);
+		VirtualProtect(change_team_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 #pragma endregion
 
-	
 #pragma region H2ServerHooks
 	else {
 
