@@ -137,6 +137,7 @@ void Infection::Initialize()
 void Infection::Deinitialize()
 {
 	h2mod->PatchWeaponsInteraction(true);
+	h2mod->IndicatorVisibility(true);
 
 	if (isHost)
 	{
