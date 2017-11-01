@@ -1007,7 +1007,7 @@ int __cdecl OnMapLoad(int a1)
 		}
 	}
 	int ret = pmap_initialize(a1);
-
+	/*Forces the following Hit-Fix function to run within multiplayer. Thanks Killer Chief (Just re-added it so this is definitely merged.)*/
 	if (*GameEngine == 2)
 	{
 #pragma region Apply Hitfix
@@ -1284,15 +1284,19 @@ int __cdecl changeTeam(int a1, int a2) {
 	return change_team_method(a1, a2);
 }
 
+/*Initialise the variable camera_pointer*/
 typedef char(__cdecl *camera_pointer)();
 camera_pointer Cinematic_Pointer;
 char __cdecl if_cinematic() {
+	/*Had to re-define globals and GameEngine due to it being undefined.*/
 	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
 	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
+	/*Forces this to only run within the single player instance of halo 2. Game crashes without this line of code when quitting singleplayer levels.
+	This check also ensures that this function will not interfere with any multiplayer game instance in halo 2 as it will only "return 0" when the below conditions are met*/
 	if (*GameEngine == 1) {
+		/*Disables 30fps limit for cutscenes*/
 		return 0;
 	}
-	return 0;
 }
 
 void H2MOD::ApplyHooks() {
@@ -1308,6 +1312,7 @@ void H2MOD::ApplyHooks() {
 		//pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
 		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
+		/*"0x3A938" is the cinematic function. The above variables that have been initialised will return 0 if_cinematic is called in this function.*/
 		Cinematic_Pointer = (camera_pointer)DetourFunc((BYTE*)this->GetBase() + 0x3A938, (BYTE*)if_cinematic, 8);
 		VirtualProtect(Cinematic_Pointer, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
