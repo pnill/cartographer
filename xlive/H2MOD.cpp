@@ -1297,6 +1297,8 @@ char __cdecl if_cinematic() {
 		/*Disables 30fps limit for cutscenes*/
 		return 0;
 	}
+	/*Returns 0 after function, also fixes stuttering found in multiplayer games due to the function not being nulled/deinitialized properly.*/
+	return 0;
 }
 
 void H2MOD::ApplyHooks() {
