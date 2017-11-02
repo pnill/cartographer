@@ -1009,7 +1009,7 @@ int __cdecl OnMapLoad(int a1)
 			TRACE_GAME("[h2mod] Halo2Final Turned on!");
 			b_Halo2Final = true;
 		}
-		if (wcsstr(variant_name, L"H2XRB") > 0)
+		if (wcsstr(variant_name, L"H2X") > 0 || wcsstr(variant_name, L"h2x") > 0 || wcsstr(variant_name, L"Halo 2 RB") > 0)
 		{
 			TRACE_GAME("[h2mod] H2X Turned On!");
 			b_H2X = true;
