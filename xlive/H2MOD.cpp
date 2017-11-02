@@ -6,6 +6,7 @@
 #include "H2MOD_GunGame.h"
 #include "H2MOD_Infection.h"
 #include "H2MOD_Halo2Final.h"
+#include "H2MOD_H2X.h"
 #include "Network.h"
 #include "xliveless.h"
 #include "CUser.h"
@@ -20,9 +21,11 @@ H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
 Infection *inf = new Infection();
 Halo2Final *h2f = new Halo2Final();
+H2X *h2xrb = new H2X();
 
 bool b_Infection = false;
 bool b_Halo2Final = false;
+bool b_H2X = false;
 
 extern bool b_GunGame;
 extern CUserManagement User;
@@ -976,6 +979,7 @@ int __cdecl OnMapLoad(int a1)
 	b_Infection = false;
 	b_GunGame = false;
 	b_Halo2Final = false;
+	b_H2X = false;
 
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
 	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
@@ -1005,8 +1009,14 @@ int __cdecl OnMapLoad(int a1)
 			TRACE_GAME("[h2mod] Halo2Final Turned on!");
 			b_Halo2Final = true;
 		}
+		if (wcsstr(variant_name, L"H2XRB") > 0)
+		{
+			TRACE_GAME("[h2mod] H2X Turned On!");
+			b_H2X = true;
+		}
 	}
 	int ret = pmap_initialize(a1);
+
 	/*Forces the following Hit-Fix function to run within multiplayer. Thanks Killer Chief (Just re-added it so this is definitely merged.)*/
 	if (*GameEngine == 2)
 	{
@@ -1035,6 +1045,7 @@ int __cdecl OnMapLoad(int a1)
 
 #pragma endregion
 	}
+
 #pragma region H2v Stuff
 	if (!h2mod->Server)
 	{
@@ -1067,14 +1078,19 @@ int __cdecl OnMapLoad(int a1)
 				inf->Initialize();
 #pragma endregion
 
+#pragma region H2X Rebalance
+			if (b_H2X)
+				h2xrb->Initialize();
+#pragma endregion
+
 #pragma region GunGame Handler
 			if (b_GunGame && isHost)
 				gg->Initialize();
 #pragma endregion
 
 #pragma region Halo2Final
-			if (b_Halo2Final && !h2mod->Server)
-				h2f->Initialize(isHost);
+			if (b_Halo2Final)
+				h2f->Initialize(h2mod->Server);
 #pragma endregion
 		}
 
