@@ -19,5 +19,5 @@ void H2X::Initialize(void)
 	*(float*)(FloatOffsets + 0xAF1DA4) = 1.065f; /*H2X Shotgun fire recovery time*/
 	*(float*)(FloatOffsets + 0x96EC34) = 0.13f; /*H2X Magnum fire recovery time*/
 	*(float*)(FloatOffsets + 0xC0EABC) = 0.39f; /*H2X Brute Shot fire recovery time*/
-	*(float*)(FloatOffsets + 0xAF1DA4) = 0.11f; /*H2X Plasma Pistol fire recovery time*/
+	*(float*)(FloatOffsets + 0xA03250) = 0.11f; /*H2X Plasma Pistol fire recovery time*/
 }
