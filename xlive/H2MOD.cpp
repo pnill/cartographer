@@ -1304,16 +1304,7 @@ int __cdecl changeTeam(int a1, int a2) {
 typedef char(__cdecl *camera_pointer)();
 camera_pointer Cinematic_Pointer;
 char __cdecl if_cinematic() {
-	/*Had to re-define globals and GameEngine due to it being undefined.*/
-	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
-	/*Forces this to only run within the single player instance of halo 2. Game crashes without this line of code when quitting singleplayer levels.
-	This check also ensures that this function will not interfere with any multiplayer game instance in halo 2 as it will only "return 0" when the below conditions are met*/
-	if (*GameEngine == 1) {
-		/*Disables 30fps limit for cutscenes*/
-		return 0;
-	}
-	/*Returns 0 after function, also fixes stuttering found in multiplayer games due to the function not being nulled/deinitialized properly.*/
+	/*Disables 30fps limit for cutscenes*/
 	return 0;
 }
 
