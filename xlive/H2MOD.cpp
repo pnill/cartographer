@@ -892,7 +892,7 @@ void PatchFixRankIcon() {
 }
 void PatchGameDetailsCheck()
 {
-	BYTE assmPatchGamedetails[2] = { 0x75,0x18};	
+	BYTE assmPatchGamedetails[2] = { 0x75,0x18 };
 	WriteBytesASM(h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
 }
 
@@ -928,7 +928,7 @@ static bool OnNewRound(int a1)
 	bool(__cdecl* CallNewRound)(int a1);
 	CallNewRound = (bool(__cdecl*)(int))((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6A87C : 0x6B1C8));
 	//addDebugText("New Round Commencing");
-		if (b_Infection)
+	if (b_Infection)
 		inf->NextRound();
 
 	if (b_GunGame)
@@ -947,8 +947,8 @@ void H2MOD::PatchNewRound(bool hackit) //All thanks to Glitchy Scripts who wrote
 		offset = 0x700EF;
 	else
 		offset = 0x715ee;
-	if(hackit)	
-		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)OnNewRound); 
+	if (hackit)
+		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)OnNewRound);
 	else
 		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6A87C : 0x6B1C8)));
 }
@@ -1070,7 +1070,7 @@ int __cdecl OnMapLoad(int a1)
 		//*(int*)(h2mod->GetBase() + 0x46494C) = 0;
 		//*(int*)(h2mod->GetBase() + 0x464958) = 0;
 		//*(int*)(h2mod->GetBase() + 0x464964) = 0;
-		
+
 		if (*GameEngine != 3 && *GameState == 3)
 		{
 #pragma region Infection
@@ -1134,8 +1134,8 @@ bool __cdecl OnPlayerSpawn(int a1)
 	if (b_Infection)
 		inf->PreSpawn(PlayerIndex);
 #pragma endregion
-	
-	int ret = pspawn_player(a1); 
+
+	int ret = pspawn_player(a1);
 
 #pragma region Infection Handler
 	if (b_Infection)
@@ -1348,23 +1348,23 @@ void H2MOD::ApplyHooks() {
 		VirtualProtect(pconnect_establish_write, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//chatbox command hooks below
-		
+
 		//raw log line (without Server: or GAMER_TAG: prefix)	
-		write_inner_chat_text_method = (write_inner_chat_text)DetourFunc((BYTE*)this->GetBase() + 0x287669, (BYTE*)write_inner_chat_hook, 8);	
-		VirtualProtect(write_inner_chat_text_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);	
+		write_inner_chat_text_method = (write_inner_chat_text)DetourFunc((BYTE*)this->GetBase() + 0x287669, (BYTE*)write_inner_chat_hook, 8);
+		VirtualProtect(write_inner_chat_text_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//read text packet	
-		read_text_chat_packet_method = (read_text_chat_packet)DetourFunc((BYTE*)this->GetBase() + 0x1ECEEB, (BYTE*)readTextChat, 6);	
-		VirtualProtect(read_text_chat_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);	
+		read_text_chat_packet_method = (read_text_chat_packet)DetourFunc((BYTE*)this->GetBase() + 0x1ECEEB, (BYTE*)readTextChat, 6);
+		VirtualProtect(read_text_chat_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//0x1C7FE0	
-		send_text_chat_method = (send_text_chat)DetourClassFunc((BYTE*)h2mod->GetBase() + 0x1C7FE0, (BYTE*)sendTextChat, 11);	
-		VirtualProtect(send_text_chat_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);	
+		send_text_chat_method = (send_text_chat)DetourClassFunc((BYTE*)h2mod->GetBase() + 0x1C7FE0, (BYTE*)sendTextChat, 11);
+		VirtualProtect(send_text_chat_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//lobby chatbox	
-		write_chat_text_method = (write_chat_text)DetourClassFunc((BYTE*)this->GetBase() + 0x238759, (BYTE*)write_chat_hook, 8);	
-		VirtualProtect(write_chat_text_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);	
-		
+		write_chat_text_method = (write_chat_text)DetourClassFunc((BYTE*)this->GetBase() + 0x238759, (BYTE*)write_chat_hook, 8);
+		VirtualProtect(write_chat_text_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
 		if (map_downloading_enable) {
 			//0x20E15A
 			show_error_screen_method = (show_error_screen)DetourFunc((BYTE*)h2mod->GetBase() + 0x20E15A, (BYTE*)showErrorScreen, 8);
@@ -1794,7 +1794,7 @@ void H2MOD::Initialize()
 		PatchGameDetailsCheck();
 		//PatchPingMeterCheck(true);
 	}
-	
+
 	TRACE_GAME("H2MOD - Initialized v0.1a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
 
