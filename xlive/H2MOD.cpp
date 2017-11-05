@@ -1070,8 +1070,8 @@ int __cdecl OnMapLoad(int a1)
 #pragma endregion
 
 #pragma region Halo2Final
-			if (b_Halo2Final && !h2mod->Server)
-				h2f->Initialize(isHost);
+			if (b_Halo2Final)
+				h2f->Initialize(h2mod->Server);
 #pragma endregion
 		}
 
