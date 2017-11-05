@@ -1007,6 +1007,9 @@ int __cdecl OnMapLoad(int a1)
 			TRACE_GAME("[h2mod] Halo2Final Turned on!");
 			b_Halo2Final = true;
 		}
+		if (wcsstr(variant_name, L"H2X") > 0 || wcsstr(variant_name, L"h2x") > 0)
+			TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance turned on!");
+			b_H2X = true;
 	}
 	int ret = pmap_initialize(a1);
 
