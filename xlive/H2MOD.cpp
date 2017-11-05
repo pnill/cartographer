@@ -6,6 +6,7 @@
 #include "H2MOD_GunGame.h"
 #include "H2MOD_Infection.h"
 #include "H2MOD_Halo2Final.h"
+#include "H2MOD_H2X.h"
 #include "Network.h"
 #include "xliveless.h"
 #include "CUser.h"
@@ -20,9 +21,11 @@ H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
 Infection *inf = new Infection();
 Halo2Final *h2f = new Halo2Final();
+H2X *h2xrb = new H2X();
 
 bool b_Infection = false;
 bool b_Halo2Final = false;
+bool b_H2X = false;
 
 extern bool b_GunGame;
 extern CUserManagement User;
@@ -1072,12 +1075,16 @@ int __cdecl OnMapLoad(int a1)
 				gg->Initialize();
 #pragma endregion
 
+#pragma region H2X Rebalance
+			if (b_H2X)
+				h2xrb->Initialize();
+#pragma endregion
+
 #pragma region Halo2Final
 			if (b_Halo2Final)
 				h2f->Initialize(h2mod->Server);
 #pragma endregion
 		}
-
 
 	}
 	else {
