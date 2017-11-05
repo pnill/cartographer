@@ -1294,14 +1294,11 @@ int __cdecl changeTeam(int a1, int a2) {
 	return change_team_method(a1, a2);
 }
 
+/*Initialise the variable camera_pointer*/
 typedef char(__cdecl *camera_pointer)();
 camera_pointer Cinematic_Pointer;
 char __cdecl if_cinematic() {
-	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
-	if (*GameEngine == 1) {
-		return 0;
-	}
+	/*Disables 30fps limit for cutscenes*/
 	return 0;
 }
 
@@ -1318,6 +1315,7 @@ void H2MOD::ApplyHooks() {
 		//pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
 		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
      
+		/*"0x3A938" is the cinematic function. The above variables that have been initialised will return 0 if_cinematic is called in this function.*/
 		Cinematic_Pointer = (camera_pointer)DetourFunc((BYTE*)this->GetBase() + 0x3A938, (BYTE*)if_cinematic, 8);
 		VirtualProtect(Cinematic_Pointer, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
