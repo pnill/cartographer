@@ -96,9 +96,6 @@
     <ClCompile Include="H2MOD_MapManager.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="H2ChatBoxCommands.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD_Halo2Final.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
@@ -113,6 +110,9 @@
     </ClCompile>
     <ClCompile Include="H2OnscreenDebugLog.cpp">
       <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="H2ConsoleCommands.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -170,9 +170,6 @@
     <ClInclude Include="H2MOD_MapManager.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="H2ChatBoxCommands.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD_Halo2Final.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
@@ -193,6 +190,9 @@
     </ClInclude>
     <ClInclude Include="GSSecurity.h">
       <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="H2ConsoleCommands.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

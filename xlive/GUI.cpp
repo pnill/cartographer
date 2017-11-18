@@ -13,7 +13,9 @@
 #include "cartographer_main.hpp"
 #include "H2MOD_MapManager.h"
 #include "H2OnscreenDebugLog.h"
+#include "H2ConsoleCommands.h"
 
+extern ConsoleCommands* commands;
 
 
 extern void InitInstance();
@@ -34,7 +36,7 @@ typedef struct _XLIVE_INITIALIZE_INFO {
 	WORD wReserved2;
 } XLIVE_INITIALIZE_INFO;
 
-typedef struct XLIVE_INPUT_INFO  {
+typedef struct XLIVE_INPUT_INFO {
 	UINT cbSize;
 	HWND hWnd;
 	UINT uMSG;
@@ -68,12 +70,23 @@ LPD3DXFONT normalSizeFont = 0;
 LPD3DXFONT largeSizeFont = 0;
 LPD3DXFONT smallFont = 0;
 
-class CVertexList
+struct vertex
 {
-public:
-	FLOAT X, Y, Z;
+	FLOAT x, y, z, rhw;
+	DWORD color;
+};
+
+struct CVertexList
+{
+	D3DXVECTOR4 xyzrhw;
 	DWORD dColor;
 };
+
+inline void BuildVertex(D3DXVECTOR4 xyzrhw, D3DCOLOR color, CVertexList* vertexList, int index)
+{
+	vertexList[index].xyzrhw = xyzrhw;
+	vertexList[index].dColor = color;
+}
 
 BOOL bIsCreated, bNeedsFlush;
 
@@ -144,34 +157,34 @@ int WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 // #5000: XLiveInitialize
 int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 {
-		InitInstance();
-		TRACE("XLiveInitialize()");
-		lastRenderTime = 0.0f;
-		QueryPerformanceFrequency(&timerFreq);
-		QueryPerformanceCounter(&counterAtStart);
+	InitInstance();
+	TRACE("XLiveInitialize()");
+	lastRenderTime = 0.0f;
+	QueryPerformanceFrequency(&timerFreq);
+	QueryPerformanceCounter(&counterAtStart);
 
-		if (!h2mod->Server)
-		{
-			//TRACE("XLiveInitialize  (pPii = %X)", pPii);
-			pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
-			pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
+	if (!h2mod->Server)
+	{
+		//TRACE("XLiveInitialize  (pPii = %X)", pPii);
+		pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
+		pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
 
-			//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice + 17);
-			//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
+		//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice + 17);
+		//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
 
-			//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
+		//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
 
-			BuildText = new char[250];
-			sprintf(BuildText, "Project Cartographer (v0.2.3.1) - Build Time: %s %s", CompileDate, CompileTime);
-	
-			GUI::Initialize();
-		}
-		
+		BuildText = new char[250];
+		sprintf(BuildText, "Project Cartographer (v0.2.3.1) - Build Time: %s %s", CompileDate, CompileTime);
+
+		GUI::Initialize();
+	}
+
 #if 0
 	while (1)
 		Sleep(1);
 #endif
-	
+
 	return 0;
 }
 
@@ -276,6 +289,88 @@ void drawRect(int x, int y, int width, int height, DWORD Color)
 	pDevice->Clear(1, &rec, D3DCLEAR_TARGET, Color, 0, 0);
 }
 
+void drawPrimitiveRect(int x, int y, int w, int h, D3DCOLOR color) {
+	CVertexList vertexList[4];
+
+	BuildVertex(D3DXVECTOR4(x, y + h, 0, 1), color, vertexList, 0);
+	BuildVertex(D3DXVECTOR4(x, y, 0, 1), color, vertexList, 1);
+	BuildVertex(D3DXVECTOR4(x + w, y + h, 0, 1), color, vertexList, 2);
+	BuildVertex(D3DXVECTOR4(x + w, y, 0, 1), color, vertexList, 3);
+
+	LPDIRECT3DSTATEBLOCK9 pStateBlock = NULL;
+	pDevice->CreateStateBlock(D3DSBT_ALL, &pStateBlock);
+	DWORD oldxvf = NULL;
+	pStateBlock->Capture();
+	pDevice->GetFVF(&oldxvf);
+	pDevice->SetTexture(0, NULL);
+	pDevice->SetPixelShader(NULL);
+	pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+
+	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+	//pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertexList, sizeof(CVertexList));  	
+
+	pStateBlock->Apply();
+	pStateBlock->Release();
+
+	if (oldxvf != NULL) {
+		pDevice->SetFVF(oldxvf);
+	}
+}
+
+IDirect3DVertexBuffer9* g_pVB = NULL;
+IDirect3DIndexBuffer9* g_pIB = NULL;
+void drawFilledBox(float x, float y, float w, float h, DWORD color)
+{
+	vertex V[4];
+
+	V[0].color = V[1].color = V[2].color = V[3].color = color;
+
+	V[0].z = V[1].z = V[2].z = V[3].z = 0;
+	V[0].rhw = V[1].rhw = V[2].rhw = V[3].rhw = 0;
+
+	V[0].x = x;
+	V[0].y = y;
+	V[1].x = x + w;
+	V[1].y = y;
+	V[2].x = x + w;
+	V[2].y = y + h;
+	V[3].x = x;
+	V[3].y = y + h;
+
+	unsigned short indexes[] = { 0, 1, 3, 1, 2, 3 };
+
+	pDevice->CreateVertexBuffer(4 * sizeof(vertex), D3DUSAGE_WRITEONLY, D3DFVF_XYZRHW | D3DFVF_DIFFUSE, D3DPOOL_DEFAULT, &g_pVB, NULL);
+	pDevice->CreateIndexBuffer(2 * sizeof(short), D3DUSAGE_WRITEONLY, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &g_pIB, NULL);
+
+	VOID* pVertices;
+	g_pVB->Lock(0, sizeof(V), (void**)&pVertices, 0);
+	memcpy(pVertices, V, sizeof(V));
+	g_pVB->Unlock();
+
+	VOID* pIndex;
+	g_pIB->Lock(0, sizeof(indexes), (void**)&pIndex, 0);
+	memcpy(pIndex, indexes, sizeof(indexes));
+	g_pIB->Unlock();
+
+	pDevice->SetTexture(0, NULL);
+	pDevice->SetPixelShader(NULL);
+	pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+
+	pDevice->SetStreamSource(0, g_pVB, 0, sizeof(vertex));
+	pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+	pDevice->SetIndices(g_pIB);
+
+	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4, 0, 2);
+
+	g_pVB->Release();
+	g_pIB->Release();
+}
+
 void drawHorizontalLine(int x, int y, int width, D3DCOLOR Color)
 {
 	drawRect(x, y, width, 1, Color);
@@ -320,15 +415,48 @@ void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont)
 	pFont->DrawTextA(NULL, text, -1, &rect, DT_LEFT | DT_NOCLIP, color);
 }
 
-
 // #5002: XLiveRender
 int WINAPI XLiveRender()
 {
-	
+
 	if (pDevice)
-	{	
+	{
 		if (pDevice->TestCooperativeLevel() == D3D_OK)
 		{
+			D3DVIEWPORT9 pViewport;
+			pDevice->GetViewport(&pViewport);
+			//pViewport
+			/*char textttt[255];
+			sprintf(textttt, "x:%d, y:%d", pViewport.Width, pViewport.Height);
+			drawText(100, 50, COLOR_WHITE, textttt, smallFont);*/
+
+			D3DDEVICE_CREATION_PARAMETERS cparams;
+			pDevice->GetCreationParameters(&cparams);
+			RECT gameWindowRect;
+			GetWindowRect(cparams.hFocusWindow, &gameWindowRect);
+			RECT gameWindowInnerRect;
+			GetClientRect(cparams.hFocusWindow, &gameWindowInnerRect);
+
+			int gameWindowWidth = gameWindowRect.right - gameWindowRect.left - GetSystemMetrics(SM_CXSIZEFRAME);
+			int gameWindowHeight = gameWindowRect.bottom - gameWindowRect.top;
+			//TODO: move into chatbox commands
+			//drawPrimitiveRect(0, 0, gameWindowWidth, 200, D3DCOLOR_ARGB(255, 000, 000, 0));
+			if (commands->console) {
+				int x = 0, y = 0;
+				int height = 400;
+				int startingPosY = height - 15;
+				drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
+				drawText(0, startingPosY, COLOR_WHITE, ">>>>", normalSizeFont);
+				drawText(55, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
+
+				startingPosY -= 12;
+				std::vector<std::string>::iterator it;
+				int i = 0;
+				for (it = commands->prevCommands.begin(); it < commands->prevCommands.end(); it++, i++) {
+					startingPosY -= 15.0;
+					drawText(0, startingPosY, COLOR_WHITE, (*it).c_str(), normalSizeFont);
+				}
+			}
 			if (MasterState != 11)
 				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
 			if (MasterState == 0)
@@ -339,69 +467,22 @@ int WINAPI XLiveRender()
 				drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
 			else if (MasterState == 10)
 				drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
-			
 
-			if (overrideUnicodeMessage) {
-				drawText(0, 30, COLOR_GOLD, mapManager->getCustomLobbyMessage(), normalSizeFont);
-			}
-		}
-
-		D3DVIEWPORT9 pViewport;
-		pDevice->GetViewport(&pViewport);
-		//pViewport
-		/*char textttt[255];
-		sprintf(textttt, "x:%d, y:%d", pViewport.Width, pViewport.Height);
-		drawText(100, 50, COLOR_WHITE, textttt, smallFont);*/
-
-		D3DDEVICE_CREATION_PARAMETERS cparams;
-		pDevice->GetCreationParameters(&cparams);
-		RECT gameWindowRect;
-		GetWindowRect(cparams.hFocusWindow, &gameWindowRect);
-
-		/*HMONITOR monitor = MonitorFromWindow(halo2hWnd, MONITOR_DEFAULTTONEAREST);
-		MONITORINFO info;
-		info.cbSize = sizeof(MONITORINFO);
-		GetMonitorInfo(monitor, &info);
-		int monitor_width = info.rcMonitor.right - info.rcMonitor.left;
-		int monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;*/
-
-		RECT gameWindowInnerRect;
-		GetClientRect(cparams.hFocusWindow, &gameWindowInnerRect);
-
-		int gameWindowWidth = gameWindowRect.right - gameWindowRect.left - GetSystemMetrics(SM_CXSIZEFRAME);
-		int gameWindowHeight = gameWindowRect.bottom - gameWindowRect.top;
-
-		//char texttttt[255];
-		//sprintf(texttttt, "x:%ld, y:%ld, ox:%ld, oy:%ld", gameWindowWidth, gameWindowHeight, pViewport.Width, pViewport.Height);
-		//drawText(100, 65, COLOR_WHITE, texttttt, smallFont);
-
-		/*POINT point;
-		GetCursorPos(&point);
-
-		//int windowX = ;
-		//int windowY = ;
-
-		//int casting bullshit is causing box to render too low... ?
-		int mousePosX = int(point.x) - int(gameWindowRect.left) - (GetSystemMetrics(SM_CXSIZEFRAME) / 2);
-		int mousePosY = int(point.y) - int(gameWindowRect.top) - GetSystemMetrics(SM_CYCAPTION) - (GetSystemMetrics(SM_CYSIZEFRAME) / 2);
-
-		int centerWidth = (gameWindowWidth / 2);
-		int centerHeight = (gameWindowHeight / 2);
-		drawRect(centerWidth - 2, centerHeight - 10, 4, 20, COLOR_GOLD);
-		drawRect(centerWidth - 10, centerHeight - 2, 20, 4, COLOR_GOLD);
-
-		drawRect(mousePosX + 1, mousePosY, 10, 10, COLOR_BLUE);*/
-
-		if (getDebugTextDisplay()) {
-			for (int i = 0; i < getDebugTextArrayMaxLen(); i++) {
-				const char* text = getDebugText(i);
-				//int yOffset = 40 + (i * 14);
-				int yOffset = gameWindowHeight - 55 - (i * 14);
-				if (yOffset < 35) {
-					break;
-				}
-				if (strlen(text) > 0) {
-					drawText(10, yOffset, COLOR_WHITE, text, smallFont);
+			/* TODO: turn on again after converting map downloading to use lib curl
+			if (overrideUnicodeMessage && getCustomLobbyMessage() != NULL) {
+				drawText(0, 30, COLOR_GOLD, getCustomLobbyMessage(), normalSizeFont);
+			}*/
+			if (getDebugTextDisplay()) {
+				for (int i = 0; i < getDebugTextArrayMaxLen(); i++) {
+					const char* text = getDebugText(i);
+					//int yOffset = 40 + (i * 14);
+					int yOffset = gameWindowHeight - 55 - (i * 14);
+					if (yOffset < 35) {
+						break;
+					}
+					if (strlen(text) > 0) {
+						drawText(10, yOffset, COLOR_WHITE, text, smallFont);
+					}
 				}
 			}
 		}

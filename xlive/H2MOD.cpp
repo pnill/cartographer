@@ -44,6 +44,21 @@ HMODULE base;
 
 extern int MasterState;
 
+const char* customLobbyMessage = NULL;
+
+/**
+* Sets the custom lobby message
+*/
+void setCustomLobbyMessage(const char* newStatus) {
+	customLobbyMessage = newStatus;
+}
+
+/**
+* Gets pointer to the custom lobby message
+*/
+const char* getCustomLobbyMessage() {
+	return customLobbyMessage;
+}
 
 #pragma region engine calls
 
@@ -132,90 +147,19 @@ bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 
 #pragma endregion
 
+//sub_1cce9b
+typedef int(__stdcall *calls_session_boot)(void*, int, char);
+calls_session_boot calls_session_boot_method;
 
-
-//sub_1458759
-typedef int(__stdcall *write_chat_text)(void*, int);
-write_chat_text write_chat_text_method;
-
-std::string empty("");
-
-int __stdcall write_chat_hook(void* pObject, int a2) {
-	/*
-	sub_14A7567((int)&v14, 0x79u, a2);            // this function def populates v14 with whatevers in the input component
-	sub_13D1855((int)&v7);
-	v5 = sub_142B37B(); //can use this to get the this* object we need to even utilize write_chat_text_method
-	return sub_1458759(v5, (int)&v7);             // this method that gets invoked here has logic in that that appends the GamerTag : or Server : to the chatbox line
-	*/
-
-	//to get the current clients name, call sub_11B57CA(*(_DWORD *)(v2 + 8)); replace v2 with a2
-	//which is at method offset 0x2157CA
-
-	wchar_t* chatStringWChar = (wchar_t*)(a2 + 20);
-	if (chatStringWChar[0] == L'$') {
-		//this be a command, treat it differently
-		h2mod->isChatBoxCommand = true;
-		char chatStringChar[119];
-		wcstombs(chatStringChar, chatStringWChar, 119);
-		std::string str(chatStringChar);
-		TRACE_GAME_N("chat_string=%s", chatStringChar);
-		h2mod->handle_command(str);
-		return 1;
-	}
-	else {
-		h2mod->isChatBoxCommand = false;
-		return write_chat_text_method(pObject, a2);
-	}
+int __stdcall calls_session_boot_sub_1cce9b(void* thisx, int a2, char a3) {
+	TRACE_GAME_N("session boot - this=%d,a2=%d,a3=%d", thisx, a2, a3);
+	return calls_session_boot_method(thisx, a2, a3);
 }
 
-typedef int(__cdecl *write_inner_chat_text)(int a1, unsigned int a2, int a3);
-write_inner_chat_text write_inner_chat_text_method;
-
-int __cdecl write_inner_chat_hook(int a1, unsigned int a2, int a3) {
-	return write_inner_chat_text_method(a1, a2, a3);
-}
-
-//can write literal and dynamic wchar_t's
-//basically a function that calls all the correct functions to write text to the chatbox
-//if dedi, writes to the console stdout
-void H2MOD::write_inner_chat_dynamic(const wchar_t* data) {
-	if (this->Server) {
-		h2mod->logToDedicatedServerConsole((wchar_t*)data);
-		return;
-	}
-	//0x2096AE
-	typedef int(*sub_2196AE)();
-
-	//0x287BA9
-	typedef void(__cdecl *sub_297BA9)(void* a1, int a2, unsigned int a3);
-	sub_297BA9 sub_297BA9_method = (sub_297BA9)(h2mod->GetBase() + 0x287BA9);
-	sub_2196AE sub_2196AE_method = (sub_2196AE)(h2mod->GetBase() + 0x2096AE);
-	DWORD* ptr = (DWORD*)(((char*)h2mod->GetBase()) + 0x00973ac8);
-
-	int a3 = (int)&(*data);
-	void* v5 = ptr;
-	const unsigned __int16* v3 = (const unsigned __int16*)(a3 - 20);
-	int v8 = *(DWORD*)v5;
-	*((BYTE*)v5 + 7684) = 1;
-	*((DWORD*)v5 + 2) = v8;
-	int v10 = *(DWORD*)v5;
-	int v11 = (*(DWORD*)v5)++ % 30;
-	int v12 = v10 % 30;
-
-	if (*((DWORD *)v5 + v10 % 30 + 4)) {
-		//TODO: caused crash for tweek? f tweek
-		HeapFree(GetProcessHeap(), 0, ((LPVOID *)v5 + v11 + 4));
-	}
-	//size in bytes
-	unsigned int v13 = wcslen(data) + 256;
-	LPVOID v14 = HeapAlloc(GetProcessHeap(), 0, 2 * v13);
-	*((DWORD *)v5 + v12 + 4) = (DWORD)v14;
-	sub_297BA9_method(v14, 0, v13);
-
-	//write the string
-	write_inner_chat_text_method(*((DWORD *)v5 + v12 + 4), v13, a3);
-
-	*((DWORD*)v5 + 3) = sub_2196AE_method();
+void H2MOD::kick_player(int peerIndex) {
+	DWORD* ptr = (DWORD*)(((char*)h2mod->GetBase()) + 0x420FE8);
+	TRACE_GAME_N("about to kick player index=%d", peerIndex);
+	calls_session_boot_method((DWORD*)(*ptr), peerIndex, (char)0x01);
 }
 
 //0x1BA418
@@ -311,17 +255,6 @@ int __cdecl dediCommandHook(int a1, int a2, int a3) {
 	return dedi_command_hook_method(a1, a2, a3);
 }
 
-typedef char(__stdcall *send_text_chat)(char* thisx, int a2, int a3, char a4, char a5);
-send_text_chat send_text_chat_method;
-
-char __stdcall sendTextChat(char* thisx, int a2, int a3, char a4, char a5) {
-	if (!h2mod->isChatBoxCommand) {
-		return send_text_chat_method(thisx, a2, a3, a4, a5);
-	}
-	//don't send chatbox commands to anyone
-	return ' ';
-}
-
 //0xD1FA7
 typedef void(__thiscall *data_decode_string)(void* thisx, int a2, int a3, int a4);
 data_decode_string getDataDecodeStringMethod() {
@@ -357,76 +290,6 @@ data_decode_bool getDataDecodeBoolMethod() {
 typedef bool(__thiscall *can_join)(int thisx);
 can_join getCanJoinMethod() {
 	return (can_join)(h2mod->GetBase() + 0xD114C);
-}
-
-//0x1ECEEB
-typedef bool(__cdecl *read_text_chat_packet)(int a1, int a2, int a3);
-read_text_chat_packet read_text_chat_packet_method;
-
-bool __cdecl readTextChat(int a1, int a2, int a3) {
-	//TODO: from this method you can determine if the server sent you the message
-	//could open up scripting
-
-	//TODO: any pieces of text with "$" in front, ignore, since this is the client trying to possibly
-	//send a malicious command
-	data_decode_integer dataDecodeInteger = getDataDecodeIntegerMethod();
-	data_decode_id dataDecodeId = getDataDecodeId();
-	data_decode_address dataDecodeAddress = getDataDecodeAddressMethod();
-	data_decode_string dataDecodeString = getDataDecodeStringMethod();
-	data_decode_bool dataDecodeBool = getDataDecodeBoolMethod();
-	can_join sub_45114C_method = getCanJoinMethod();
-
-	bool v3; // al@1
-	unsigned int v4; // eax@3
-	unsigned int v5; // ebx@4
-	int v6; // ebp@5
-	bool result; // al@7
-
-	dataDecodeId(a1, (int)"session-id", a3, 64);
-	*(DWORD*)(a3 + 8) = dataDecodeInteger(a1, (int)"routed-players", 32);
-	*(DWORD*)(a3 + 12) = dataDecodeInteger(a1, (int)"metadata", 8);
-	v3 = dataDecodeBool(a1, (int)"source-is-server");
-	*(BYTE *)(a3 + 16) = v3;
-	if (!v3)
-		dataDecodeId(a1, (int)"source-player", a3 + 17, 64);
-	v4 = dataDecodeInteger(a1, (int)"destination-player-count", 8);
-	*(DWORD*)(a3 + 156) = v4;
-	if (v4 > 0x10)
-	{
-		result = 0;
-	}
-	else
-	{
-		v5 = 0;
-		if (v4)
-		{
-			v6 = a3 + 25;
-			do
-			{
-				dataDecodeId(a1, (int)"destination-player", v6, 64);
-				++v5;
-				v6 += 8;
-			} while (v5 < *(DWORD*)(a3 + 156));
-		}
-		dataDecodeString((void *)a1, (int)"text", a3 + 160, 121);
-
-		char* text = (char*)(a3 + 160);
-		char c = text[0];
-
-		TRACE_GAME_N("text_chat_packet=%s", text);
-		if (c == '$') {
-			if (v3) {
-				//TODO: if came from server, run thru server->client command handler
-			}
-			else {
-				//TODO: run thru client->client command handler
-			}
-
-			text[0] = ' ';
-		}
-		//result = sub_45114C_method(a1) == 0;
-	}
-	return true;
 }
 
 #pragma region PlayerFunctions
@@ -1333,29 +1196,10 @@ void H2MOD::ApplyHooks() {
 		pconnect_establish_write = (tconnect_establish_write)DetourFunc((BYTE*)this->GetBase() + 0x1F1A2D, (BYTE*)connect_establish_write, 5);
 		VirtualProtect(pconnect_establish_write, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		//chatbox command hooks below
-		
-		//raw log line (without Server: or GAMER_TAG: prefix)	
-		write_inner_chat_text_method = (write_inner_chat_text)DetourFunc((BYTE*)this->GetBase() + 0x287669, (BYTE*)write_inner_chat_hook, 8);	
-		VirtualProtect(write_inner_chat_text_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);	
-
-		//read text packet	
-		read_text_chat_packet_method = (read_text_chat_packet)DetourFunc((BYTE*)this->GetBase() + 0x1ECEEB, (BYTE*)readTextChat, 6);	
-		VirtualProtect(read_text_chat_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);	
-
-		//0x1C7FE0	
-		send_text_chat_method = (send_text_chat)DetourClassFunc((BYTE*)h2mod->GetBase() + 0x1C7FE0, (BYTE*)sendTextChat, 11);	
-		VirtualProtect(send_text_chat_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);	
-
-		//lobby chatbox	
-		write_chat_text_method = (write_chat_text)DetourClassFunc((BYTE*)this->GetBase() + 0x238759, (BYTE*)write_chat_hook, 8);	
-		VirtualProtect(write_chat_text_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);	
-		
-		if (map_downloading_enable) {
-			//0x20E15A
-			show_error_screen_method = (show_error_screen)DetourFunc((BYTE*)h2mod->GetBase() + 0x20E15A, (BYTE*)showErrorScreen, 8);
-			VirtualProtect(show_error_screen_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-		}
+		//0x20E15A
+		//TODO: convert to use lib curl
+		//show_error_screen_method = (show_error_screen)DetourFunc((BYTE*)h2mod->GetBase() + 0x20E15A, (BYTE*)showErrorScreen, 8);
+		//VirtualProtect(show_error_screen_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//TODO: turn on if you want to debug halo2.exe from start of process
 		//is_debugger_present_method = (is_debugger_present)DetourFunc((BYTE*)h2mod->GetBase() + 0x39B394, (BYTE*)isDebuggerPresent, 5);
@@ -1400,16 +1244,13 @@ void H2MOD::ApplyHooks() {
 
 		DWORD dwBack;
 
-		if (chatbox_commands) {
-			dedi_command_hook_method = (dedi_command_hook)DetourFunc((BYTE*)this->GetBase() + 0x1CCFC, (BYTE*)dediCommandHook, 7);
-			VirtualProtect(dedi_command_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-		}
+		dedi_command_hook_method = (dedi_command_hook)DetourFunc((BYTE*)this->GetBase() + 0x1CCFC, (BYTE*)dediCommandHook, 7);
+		VirtualProtect(dedi_command_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		if (map_downloading_enable) {
-			//dedis have map downloading thread turned on by default if configured to do so
-			std::thread t1(&MapManager::startListeningForClients, mapManager);
-			t1.detach();
-		}
+		//TODO: convert to use lib curl
+		//dedis have map downloading thread turned on by default if configured to do so
+		//std::thread t1(&MapManager::startListeningForClients, mapManager);
+		//t1.detach();
 
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x5DE4A, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);//

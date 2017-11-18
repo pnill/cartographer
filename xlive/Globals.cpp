@@ -9,7 +9,7 @@ bool overrideUnicodeMessage = false;
 //which creates or connects to teh team speak server
 bool isServer = true;
 
-ChatBoxCommands* commands = new ChatBoxCommands();
+ConsoleCommands* commands = new ConsoleCommands();
 
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
 	std::stringstream ss(s);

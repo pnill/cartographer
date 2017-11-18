@@ -120,6 +120,7 @@ public:
 		void set_unit_team_index(int unit_datum_index, BYTE team);
 		void set_unit_biped(BYTE biped, int pIndex);
 		void set_unit_speed_patch(bool hackit);
+		void kick_player(int peerIndex);
 		void set_unit_speed(float speed, int pIndex);
 		void set_local_team_index(BYTE team);
 		BYTE get_local_team_index();

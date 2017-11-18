@@ -7,6 +7,9 @@
 #include "H2Startup.h"
 #include "H2OnscreenDebugLog.h"
 #include "GSRunLoop.h"
+#include "H2ConsoleCommands.h"
+
+extern ConsoleCommands* commands;
 
 using namespace std;
 
@@ -23,12 +26,6 @@ UINT fps_enable = 1;
 UINT fps_limit = 60;
 UINT field_of_view = 70;
 float crosshair_offset = 0.165f;
-
-//map downloading is off by default
-UINT map_downloading_enable = 0;
-
-//chatbox commands are off by default
-UINT chatbox_commands = 0;
 
 ULONG broadcast_server = inet_addr("149.56.81.89");
 
@@ -316,8 +313,6 @@ void InitInstance()
 				CHECK_ARG("fps_limit = ", fps_limit);
 				CHECK_ARG("field_of_view = ", field_of_view);
 				CHECK_ARG_FLOAT("crosshair_offset = ", crosshair_offset);
-				CHECK_ARG("map_downloading_enable = ", map_downloading_enable);
-				CHECK_ARG("chatbox_commands = ", chatbox_commands);
 			}
 
 			
@@ -487,6 +482,30 @@ void ExitInstance()
 	ExitProcess(0);
 }
 
+HHOOK currentHook;
+LRESULT CALLBACK HookProc(int nCode, WPARAM wp, LPARAM lp)
+{
+	BOOL eatKey = false;
+	WPARAM wParam;
+	if (nCode == HC_ACTION)
+	{
+		switch (wp)
+		{
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+			PKBDLLHOOKSTRUCT p = (PKBDLLHOOKSTRUCT)lp;
+			wParam = p->vkCode;
+			eatKey = commands->handleInput(wParam);
+			//TRACE_GAME_N("Key pressed %d, eatKey=%d", wParam, eatKey);
+			break;
+		}
+	}
+	if (eatKey) {
+		return 1;
+	}
+	return CallNextHookEx(currentHook, nCode, wp, lp);
+}
+
 //=============================================================================
 // Entry Point
 BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
@@ -495,6 +514,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 	{
 	case DLL_PROCESS_ATTACH:
 		hThis = hModule;
+		currentHook = SetWindowsHookEx(WH_KEYBOARD_LL, HookProc, 0, 0);
 		srand((unsigned int)time(NULL));
 		ProcessH2Startup();
 		//system("update.bat"); // fucking broken h2online.exe -_- This will update that...

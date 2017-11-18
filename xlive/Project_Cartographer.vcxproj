@@ -164,7 +164,7 @@
     <ClCompile Include="GSRunLoop.cpp" />
     <ClCompile Include="GSUtils.cpp" />
     <ClCompile Include="GUI.cpp" />
-    <ClCompile Include="H2ChatBoxCommands.cpp" />
+    <ClCompile Include="H2ConsoleCommands.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="h2mod.pb.cc" />
     <ClCompile Include="H2MOD_GunGame.cpp" />
@@ -189,7 +189,7 @@
     <ClInclude Include="GSSecurity.h" />
     <ClInclude Include="GSUtils.h" />
     <ClInclude Include="GUI.h" />
-    <ClInclude Include="H2ChatBoxCommands.h" />
+    <ClInclude Include="H2ConsoleCommands.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="h2mod.pb.h" />
     <ClInclude Include="H2MOD_GunGame.h" />

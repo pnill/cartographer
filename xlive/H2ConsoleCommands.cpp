@@ -4,10 +4,88 @@
 #include <sstream>
 #include <string>
 
-ChatBoxCommands::ChatBoxCommands() {
+ConsoleCommands::ConsoleCommands() {
+	command = "";
+	caretPos = 0;
 }
 
-void ChatBoxCommands::checkForIds() {
+void ConsoleCommands::writePreviousCommand(std::string msg) {
+	std::vector<std::string>::iterator it;
+	it = this->prevCommands.begin();
+	this->prevCommands.insert(it, msg);
+
+	if (this->prevCommands.size() > 18) {
+		this->prevCommands.pop_back();
+	}
+}
+
+time_t start = time(0);
+BOOL ConsoleCommands::handleInput(WPARAM wp) {
+	double seconds_since_start = difftime(time(0), start);
+	switch (wp) {
+	case 0xC0: //~
+		if (seconds_since_start > 0.5) {
+			this->console = !this->console;
+			start = time(0);
+		}
+		return true;
+	case '\b':   // backspace
+	{
+		if (this->console) {
+			if (this->caretPos > 0)
+			{
+				this->command.erase(this->caretPos - 1, 1);
+				this->caretPos -= 1;
+			}
+			return true;
+		}
+	}
+	break;
+
+	case '\r':    // return/enter
+	{
+		if (console) {
+			this->writePreviousCommand(this->command);
+
+			std::string fullCommand("$");
+			fullCommand += this->command;
+			this->handle_command(fullCommand);
+
+			command = "";
+			caretPos = 0;
+			return true;
+		}
+	}
+	break;
+
+	default:
+		if (this->console) {
+			if (((wp >= 0x30 && wp <= 0x5A) || wp == 0x20 || wp == VK_OEM_MINUS)) {
+				if (wp == VK_OEM_MINUS) {
+					wp = '-';
+				}
+				if (GetAsyncKeyState(0x10) & 0x8000 || GetAsyncKeyState(0xA0) & 0x8000 || GetAsyncKeyState(0xA1) & 0x8000) {
+					if (wp == '-') {
+						wp = '_';
+					}
+					else {
+						wp = toupper(wp);
+					}
+				}
+				else {
+					wp = tolower(wp);
+				}
+				this->command.insert(this->caretPos, 1, (char)wp);
+				this->caretPos += 1;
+				return true;
+			}
+		}
+		break;
+	}
+	return false;
+}
+
+void ConsoleCommands::checkForIds() {
 	if (!checked_for_ids) {
 		//only check once per game
 		checked_for_ids = true;
@@ -27,7 +105,7 @@ void ChatBoxCommands::checkForIds() {
 	}
 }
 
-void ChatBoxCommands::spawn(unsigned int object_datum, int count, float x, float y, float z, float randomMultiplier) {
+void ConsoleCommands::spawn(unsigned int object_datum, int count, float x, float y, float z, float randomMultiplier) {
 
 	for (int i = 0; i < count; i++) {
 		try {
@@ -53,32 +131,81 @@ void ChatBoxCommands::spawn(unsigned int object_datum, int count, float x, float
 	}
 }
 
+void ConsoleCommands::output(std::wstring result) {
+	if (h2mod->Server) {
+		h2mod->logToDedicatedServerConsole((wchar_t*)result.c_str());
+	}
+	else {
+		std::string str(result.begin(), result.end());
+		writePreviousCommand(str);
+	}
+}
+
+bool ConsoleCommands::isNum(const char *s) {
+	int i = 0;
+	while (s[i]) {
+		//if there is a letter in a string then string is not a number
+		if (isalpha(s[i])) {
+			return false;
+		}
+		i++;
+	}
+	return true;
+}
+
 /*
 * Handles the given string command
 * Returns a bool indicating whether the command is a valid command or not
 */
-void ChatBoxCommands::handle_command(std::string command) {
+void ConsoleCommands::handle_command(std::string command) {
 	//split by a space
 	std::vector<std::string> splitCommands = split(command, ' ');
+
 	if (splitCommands.size() != 0) {
 		std::string firstCommand = splitCommands[0];
 		std::transform(firstCommand.begin(), firstCommand.end(), firstCommand.begin(), ::tolower);
 		if (firstCommand == "$reloadmaps") {
 			if (splitCommands.size() != 1) {
-				h2mod->write_inner_chat_dynamic(L"Invalid command, usage - $reloadMaps");
+				output(L"Invalid command, usage - $reloadMaps");
 				return;
 			}
 
 			mapManager->reloadMaps();
 		}
-		else if (firstCommand == "$maxplayers") {
+		else if (firstCommand == "$kick") {
 			if (splitCommands.size() != 2) {
-				h2mod->write_inner_chat_dynamic(L"Usage: $maxplayers value (betwen 1 and 16).");
+				output(L"Invalid kick command, usage - $kick PLAYER_INDEX");
 				return;
 			}
-			extern bool isHost;
-			if (!isHost) {
-				h2mod->write_inner_chat_dynamic(L"Can be only used while hosting.");
+			std::string firstArg = splitCommands[1];
+			char *cstr = new char[firstArg.length() + 1];
+			strcpy(cstr, firstArg.c_str());
+
+			if (!isServer) {
+				output(L"Only the server can kick players");
+			}
+			else {
+				if (isNum(cstr)) {
+					h2mod->kick_player(atoi(cstr));
+				}
+			}
+			delete cstr;
+		}
+		else if (firstCommand == "$lognetworkplayers") {
+			//TODO: use mutex here
+			if (h2mod->NetworkPlayers.size() > 0) {
+				for (auto it = h2mod->NetworkPlayers.begin(); it != h2mod->NetworkPlayers.end(); ++it) {
+					//TODO: 
+				}
+			}
+		}
+		else if (firstCommand == "$maxplayers") {
+			if (splitCommands.size() != 2) {
+				output(L"Usage: $maxplayers value (betwen 1 and 16).");
+				return;
+			}
+			if (!isServer) {
+				output(L"Can be only used while hosting.");
 				return;
 			}
 
@@ -90,34 +217,31 @@ void ChatBoxCommands::handle_command(std::string command) {
 			BYTE& maxPlayersNumber = *(BYTE*)(baseAddr + 0x4C80);
 
 			if (maxPlayersSet < 1 || maxPlayersSet > 16) {
-				h2mod->write_inner_chat_dynamic(L"The value needs to be between 1 and 16.");
+				output(L"The value needs to be between 1 and 16.");
 				return;
 			}
 
 			if (maxPlayersSet < playerNumber) {
-				h2mod->write_inner_chat_dynamic(L"You can't set a value of max players smaller than the actual number of players on the server.");
+				output(L"You can't set a value of max players smaller than the actual number of players on the server.");
 				return;
 			}
 			else {
 				maxPlayersNumber = maxPlayersSet;
-				h2mod->write_inner_chat_dynamic(L"Maximum players set");
+				output(L"Maximum players set");
 			}
 
 		}
 		else if (firstCommand == "$setfov") {
 			if (splitCommands.size() != 2) {
-				h2mod->write_inner_chat_dynamic(L"Invalid input.Usage - $setfov value");
+				output(L"Invalid input.Usage - $setfov value");
 				return;
 			}
 			else {
 				std::string secondArg = splitCommands[1];
 				unsigned int fov = stoi(splitCommands[1]);
 				Field_of_View(fov, 1);
-				h2mod->write_inner_chat_dynamic(L"Field of view set");
+				output(L"Field of view set");
 			}
-		}
-		else if (chatbox_commands == false) {
-			return;
 		}
 		else if (firstCommand == "$resetspawncommandlist") {
 			//reset checked_for_ids, so you can reload new object_datums at runtime
@@ -125,13 +249,13 @@ void ChatBoxCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$spawnnear") {
 			if (splitCommands.size() < 3 || splitCommands.size() > 4) {
-				h2mod->write_inner_chat_dynamic(L"Invalid command, usage $spawn command_name count");
+				output(L"Invalid command, usage $spawn command_name count");
 				return;
 			}
 
 			if (isLobby && !h2mod->Server) {
 				//TODO: need a nicer way to detect this for dedis
-				h2mod->write_inner_chat_dynamic(L"Can only be used ingame");
+				output(L"Can only be used ingame");
 				return;
 			}
 
@@ -169,17 +293,18 @@ void ChatBoxCommands::handle_command(std::string command) {
 			float x = *(float*)(h2mod->GetBase() + 0x4C072C);
 			float y = *(float*)(h2mod->GetBase() + 0x4C0728);
 			float z = *(float*)(h2mod->GetBase() + 0x4C0730);
-			this->spawn(object_datum, count, x+=0.5f, y+=0.5f, z+=0.5f, randomMultiplier);
+
+			this->spawn(object_datum, count, x += 0.5f, y += 0.5f, z += 0.5f, randomMultiplier);
 		}
 		else if (firstCommand == "$spawn") {
 			if (splitCommands.size() != 6) {
-				h2mod->write_inner_chat_dynamic(L"Invalid command, usage $spawn command_name count x y z");
+				output(L"Invalid command, usage $spawn command_name count x y z");
 				return;
 			}
 
 			if (isLobby && !h2mod->Server) {
 				//TODO: need a nicer way to detect this for dedis
-				h2mod->write_inner_chat_dynamic(L"Can only be used ingame");
+				output(L"Can only be used ingame");
 				return;
 			}
 
