@@ -211,10 +211,6 @@
 		</Configuration>
 	</Configurations>
 	<References>
-		<ProjectReference
-			ReferencedProjectIdentifier="{65021938-D251-46FA-BC3D-85C385D4C06D}"
-			RelativePathToProject=".\MinHook\build\libMinHook.vcproj"
-		/>
 	</References>
 	<Files>
 		<Filter
