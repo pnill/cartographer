@@ -1,12 +1,10 @@
 #include <windows.h>
-#include "MinHook.h"
 
 #include "Detour.h"
 #include <stdio.h>
 #include <Softpub.h>
 
 
-#pragma comment(lib, "libMinHook.x86.lib")
 #pragma comment(lib, "Wintrust.lib")
 
 
@@ -129,12 +127,6 @@ void Detour()
 	Debug_Log_W( L"DetourCreateFileW" );
 #endif
 
-
-
-
-	MH_Initialize();
-
-
 	// kernel32 = already known
 	//MH_CreateHook( &CreateFileW, &DetourCreateFileW, reinterpret_cast<void**>(&pCreateFileW) );
 	//MH_QueueEnableHook( &CreateFileW );
@@ -148,10 +140,4 @@ void Detour()
 	addr = (DWORD *) ( (BYTE *) addr + 2 );
 	addr = (DWORD *) ( *addr );
 
-	MH_CreateHook( (VOID *) ( *addr ), DetourWinVerifyTrust, reinterpret_cast<void**>(&pWinVerifyTrust) );
-	MH_QueueEnableHook( (VOID *) ( *addr ) );
-
-
-
-	MH_ApplyQueued();
 }

@@ -15,6 +15,7 @@
 #include "Globals.h"
 #include "H2OnscreenDebugLog.h"
 #include "GSUtils.h"
+#include <Mmsystem.h>
 
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
@@ -642,15 +643,13 @@ void Field_of_View(unsigned int field_of_view, bool save)
 		if (save) {
 			//save to xlive.ini the fov if $setfov command is used or anything else
 		}
-
-		const UINT FOV_MULTIPLIER_OFFSET = 4315524;
-		const UINT FOV_VEHICLE_MULTIPLIER_OFFSET = 4274048;
 		const UINT CURRENT_FOV_OFFSET = 4883752;
 
 		float defaultRadians = (float)(70 * 3.14159265f / 180);
 		float targetRadians = (float)((double)field_of_view * 3.14159265f / 180);
-		*(float*)(h2mod->GetBase() + FOV_MULTIPLIER_OFFSET) = (targetRadians / defaultRadians);
-		*(float*)(h2mod->GetBase() + FOV_VEHICLE_MULTIPLIER_OFFSET) = (targetRadians / defaultRadians);
+		float targetRadiansVehicle = (float)((double)(field_of_view + 10) * 3.14159265f / 180);
+		*(float*)(h2mod->GetBase() + 0x41D984) = (targetRadians / defaultRadians); //FIrst Person
+		*(float*)(h2mod->GetBase() + 0x413780) = (targetRadians / defaultRadians); //Vehicle
 	}
 }
 
@@ -819,6 +818,7 @@ int __cdecl OnMapLoad(int a1)
 	overrideUnicodeMessage = false;
 
 	isLobby = true;
+	int ret = pmap_initialize(a1);
 
 	//OnMapLoad is called with 30888 when a game ends
 	if (a1 == 30888)
@@ -828,8 +828,6 @@ int __cdecl OnMapLoad(int a1)
 		if (b_Infection) {
 			inf->Deinitialize();
 		}
-
-		int ret = pmap_initialize(a1);
 
 		PatchFixRankIcon();
 
@@ -868,11 +866,7 @@ int __cdecl OnMapLoad(int a1)
 			TRACE_GAME("[h2mod] Halo2Final Turned on!");
 			b_Halo2Final = true;
 		}
-	}
-	int ret = pmap_initialize(a1);
-
-	if (*GameEngine == 2)
-	{
+	
 #pragma region Apply Hitfix
 
 		int offset = 0x47CD54;
@@ -883,12 +877,12 @@ int __cdecl OnMapLoad(int a1)
 
 		DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + offset);
 
-		*(float*)(AddressOffset + 0xA4EC88) = 2400.0f; // battle_rifle_bullet.proj Initial Velocity 
-		*(float*)(AddressOffset + 0xA4EC8C) = 2400.0f; //battle_rifle_bullet.proj Final Velocity
-		*(float*)(AddressOffset + 0xB7F914) = 5000.0f; //sniper_bullet.proj Initial Velocity
-		*(float*)(AddressOffset + 0xB7F918) = 5000.0f; //sniper_bullet.proj Final Velocity
-		*(float*)(AddressOffset + 0xCE4598) = 5000.0f; //beam_rifle_beam.proj Initial Velocity
-		*(float*)(AddressOffset + 0xCE459C) = 5000.0f; //beam_rifle_beam.proj Final Velocity
+		*(float*)(AddressOffset + 0xA4EC88) = 800.0f; // battle_rifle_bullet.proj Initial Velocity 
+		*(float*)(AddressOffset + 0xA4EC8C) = 800.0f; //battle_rifle_bullet.proj Final Velocity
+		*(float*)(AddressOffset + 0xB7F914) = 4000.0f; //sniper_bullet.proj Initial Velocity
+		*(float*)(AddressOffset + 0xB7F918) = 4000.0f; //sniper_bullet.proj Final Velocity
+		*(float*)(AddressOffset + 0xCE4598) = 4000.0f; //beam_rifle_beam.proj Initial Velocity
+		*(float*)(AddressOffset + 0xCE459C) = 4000.0f; //beam_rifle_beam.proj Final Velocity
 		*(float*)(AddressOffset + 0x81113C) = 200.0f; //gauss_turret.proj Initial Velocity def 90
 		*(float*)(AddressOffset + 0x811140) = 200.0f; //gauss_turret.proj Final Velocity def 90
 		*(float*)(AddressOffset + 0x97A194) = 800.0f; //magnum_bullet.proj initial def 400
@@ -898,17 +892,17 @@ int __cdecl OnMapLoad(int a1)
 
 #pragma endregion
 	}
-#pragma region H2v Stuff
+#pragma region H2V Stuff
 	if (!h2mod->Server)
 	{
-
-#pragma region Crosshair Offset
-
-		//*(float*)(AddressOffset + 0x3DC00) = crosshair_offset;		
-		DWORD CrosshairY = *(DWORD*)((char*)h2mod->GetBase() + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C;
-		*(float*)CrosshairY = crosshair_offset;
-
-#pragma endregion
+		if (*GameEngine == 2) {
+			DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + 0x47CD54); //this method of changing crosshair position is better
+			*(float*)(AddressOffset + 0x3DC00) = crosshair_offset; //in MP it feels better that the next one, but this doesn't change position in SP
+		}
+		else if (*GameEngine == 1) {
+			DWORD CrosshairY = *(DWORD*)((char*)h2mod->GetBase() + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C; //change only in SP, feels off in MP
+			*(float*)CrosshairY = crosshair_offset;
+		}
 
 		if (*GameEngine == 3) {
 			MasterState = 10;
@@ -925,20 +919,14 @@ int __cdecl OnMapLoad(int a1)
 		
 		if (*GameEngine != 3 && *GameState == 3)
 		{
-#pragma region Infection
 			if (b_Infection)
 				inf->Initialize();
-#pragma endregion
 
-#pragma region GunGame Handler
 			if (b_GunGame && isHost)
 				gg->Initialize();
-#pragma endregion
 
-#pragma region Halo2Final
 			if (b_Halo2Final && !h2mod->Server)
 				h2f->Initialize(isHost);
-#pragma endregion
 		}
 
 
@@ -946,20 +934,14 @@ int __cdecl OnMapLoad(int a1)
 	else {
 #pragma endregion
 
-#pragma region H2S Stuff
+#pragma region H2Server Stuff
 		if (*GameEngine != 3 && *GameState == 3)
 		{
-
-#pragma region Infection
 			if (b_Infection)
 				inf->Initialize();
-#pragma endregion
 
-#pragma region GunGame Handler
 			if (b_GunGame)
 				gg->Initialize();
-#pragma endregion
-
 		}
 
 	}
@@ -976,23 +958,16 @@ bool __cdecl OnPlayerSpawn(int a1)
 	//TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
 
 	int PlayerIndex = a1 & 0x000FFFF;
+	int ret = pspawn_player(a1);
 
-#pragma region Infection Prespawn Handler
 	if (b_Infection)
 		inf->PreSpawn(PlayerIndex);
-#pragma endregion
-	
-	int ret = pspawn_player(a1); 
 
-#pragma region Infection Handler
 	if (b_Infection)
 		inf->SpawnPlayer(PlayerIndex);
-#pragma endregion
 
-#pragma region GunGame Handler
 	if (b_GunGame && (isHost || h2mod->Server))
 		gg->SpawnPlayer(PlayerIndex);
-#pragma endregion
 
 	return ret;
 }
@@ -1617,6 +1592,7 @@ void H2MOD::Initialize()
 		SoundT.detach();
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 		Field_of_View(field_of_view, 0);
+		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
 
 		PatchGameDetailsCheck();
 		//PatchPingMeterCheck(true);
