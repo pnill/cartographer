@@ -1626,15 +1626,15 @@ void H2MOD::Initialize()
 
 		PatchGameDetailsCheck();
 		//PatchPingMeterCheck(true);
+
+		// Discord init
+		DiscordInterface::SetDetails("Startup");
+		DiscordInterface::Init();
+		SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
 	}
 	
 	TRACE_GAME("H2MOD - Initialized v0.1a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
-
-	// Discord init
-	DiscordInterface::SetDetails("Startup");
-	DiscordInterface::Init();
-	SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
 
 	//Network::Initialize();
 	h2mod->ApplyHooks();

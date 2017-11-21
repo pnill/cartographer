@@ -2824,14 +2824,17 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
   TRACE("XUserSetContext  (userIndex = %d, contextId = %d, contextValue = %d)",
 		dwUserIndex, dwContextId, dwContextValue );
 
+  if (h2mod->Server)
+	  return ERROR_SUCCESS;
+
   if (dwContextId == 0x00000003)
 	  diff_level = dwContextValue;
 
 	if( dwContextId == X_CONTEXT_PRESENCE )
 	{
 		TRACE( "- X_CONTEXT_PRESENCE = %d", dwContextValue );
-		int GameGlobals = *(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-		int GameEngineGlobals = *(int*)((char*)h2mod->GetBase() + 0x4BF8F8);
+		int GameGlobals = *reinterpret_cast<int*>(h2mod->GetBase() + 0x482D3C);
+		int GameEngineGlobals = *reinterpret_cast<int*>(h2mod->GetBase() + 0x4BF8F8);
 
 		std::wstring map_name_wide = (wchar_t*)(h2mod->GetBase() + 0x46DAE8);
 		map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L"\\") + 1);
