@@ -479,9 +479,8 @@ void ExitInstance()
 
 	extern void SaveAchievements();
 	SaveAchievements();
-	Discord_Shutdown();
 
-	ExitProcess(0);
+	TerminateProcess(GetCurrentProcess(), 0);
 }
 
 HHOOK currentHook;
