@@ -4,6 +4,7 @@
 #include "H2MOD.h"
 #include <iostream>
 #include <Shellapi.h>
+#include "discord-rpc.h"
 #include "H2Startup.h"
 #include "H2OnscreenDebugLog.h"
 #include "GSRunLoop.h"
@@ -478,6 +479,7 @@ void ExitInstance()
 
 	extern void SaveAchievements();
 	SaveAchievements();
+	Discord_Shutdown();
 
 	ExitProcess(0);
 }

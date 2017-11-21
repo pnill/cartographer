@@ -245,7 +245,7 @@ void hotkeyFuncTest() {
 
 	//addDebugText("NOP'd");
 	//BYTE HostClientCheckNOP[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckNOP, 6);
+	//WriteBytesASM(H2BaseAddr + 0x96C32, HostClientCheckNOP, 6);
 }
 
 int hotkeyIdTest2 = VK_F6;
@@ -261,11 +261,11 @@ void hotkeyFuncTest2() {
 
 	//addDebugText("Restored");
 	//BYTE HostClientCheckOrig[] = { 0x0F, 0x85, 0xBA, 0x01, 0x00, 0x00 };
-	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckOrig, 6);
+	//WriteBytesASM(H2BaseAddr + 0x96C32, HostClientCheckOrig, 6);
 
 	//addDebugText("Jumped");
 	//BYTE HostClientCheckJMP[] = { 0xE9, 0xBB, 0x01, 0x00, 0x00, 0x90 };
-	//OverwriteAssembly((BYTE*)H2BaseAddr + 0x96C32, HostClientCheckJMP, 6);
+	//WriteBytesASM(H2BaseAddr + 0x96C32, HostClientCheckJMP, 6);
 
 	//extern void GSSecSweetLeetHaxA(int);
 	//GSSecSweetLeetHaxA(1);

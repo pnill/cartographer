@@ -139,5 +139,4 @@ void Detour()
 	DWORD *addr = (DWORD *) (&WinVerifyTrust);
 	addr = (DWORD *) ( (BYTE *) addr + 2 );
 	addr = (DWORD *) ( *addr );
-
 }
