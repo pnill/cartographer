@@ -11,5 +11,6 @@ extern HWND H2hWnd;
 extern int custom_resolution_x;
 extern int custom_resolution_y;
 
+extern HWND H2hWnd;
 extern wchar_t dedi_server_name[];
 extern wchar_t dedi_server_playlist[];

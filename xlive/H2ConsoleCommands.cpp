@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include "H2Startup.h"
 
 ConsoleCommands::ConsoleCommands() {
 	command = "";
@@ -20,7 +21,11 @@ void ConsoleCommands::writePreviousCommand(std::string msg) {
 }
 
 time_t start = time(0);
-BOOL ConsoleCommands::handleInput(WPARAM wp) {
+void ConsoleCommands::handleInput(WPARAM wp) {
+	if (H2hWnd != GetForegroundWindow()) {
+		//halo2 is not in focus
+		return;
+	}
 	double seconds_since_start = difftime(time(0), start);
 	switch (wp) {
 	case 0xC0: //~
@@ -28,7 +33,6 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 			this->console = !this->console;
 			start = time(0);
 		}
-		return true;
 	case '\b':   // backspace
 	{
 		if (this->console) {
@@ -37,7 +41,6 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 				this->command.erase(this->caretPos - 1, 1);
 				this->caretPos -= 1;
 			}
-			return true;
 		}
 	}
 	break;
@@ -53,7 +56,6 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 
 			command = "";
 			caretPos = 0;
-			return true;
 		}
 	}
 	break;
@@ -77,12 +79,10 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 				}
 				this->command.insert(this->caretPos, 1, (char)wp);
 				this->caretPos += 1;
-				return true;
 			}
 		}
 		break;
 	}
-	return false;
 }
 
 void ConsoleCommands::checkForIds() {
