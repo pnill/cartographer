@@ -30,6 +30,7 @@ bool b_Infection = false;
 bool b_Halo2Final = false;
 bool b_H2X = false;
 
+extern bool rawMouse;
 extern bool b_GunGame;
 extern CUserManagement User;
 extern ULONG g_lLANIP;
@@ -824,7 +825,6 @@ int __cdecl OnMapLoad(int a1)
 
 	isLobby = true;
 	int ret = pmap_initialize(a1);
-	h2RawM->Initialize();
 
 	//OnMapLoad is called with 30888 when a game ends
 	if (a1 == 30888)
@@ -843,6 +843,7 @@ int __cdecl OnMapLoad(int a1)
 	b_Infection = false;
 	b_GunGame = false;
 	b_Halo2Final = false;
+	b_H2X = false;
 
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
 	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
@@ -1142,11 +1143,6 @@ int __cdecl changeTeam(int a1, int a2) {
 typedef char(__cdecl *camera_pointer)();
 camera_pointer Cinematic_Pointer;
 char __cdecl if_cinematic() {
-	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
-	if (*GameEngine == 1) {
-		return 0;
-	}
 	return 0;
 }
 
@@ -1610,9 +1606,11 @@ void H2MOD::Initialize()
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 		Field_of_View(field_of_view, 0);
 		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
-
 		PatchGameDetailsCheck();
 		//PatchPingMeterCheck(true);
+		
+		if (rawMouse)
+		h2RawM->Initialize();	
 	}
 	
 	TRACE_GAME("H2MOD - Initialized v0.1a");
