@@ -47,6 +47,7 @@ void Mouseinput::Initialize()
 {
 	base = h2mod->GetBase();
 	ms = (DIMOUSESTATE*)(base + 0x47A570);
+	BYTE assmNop[8] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
 
 	DWORD dwBack;
 
@@ -58,15 +59,15 @@ void Mouseinput::Initialize()
 
 	auto setDx = (base + 0x627CC);
 	VirtualProtect((LPVOID)setDx, 8, PAGE_EXECUTE_READWRITE, &dwBack);
-	*(unsigned long long*)(base + 0x627CC) = 0x9090909090909090;
+	WriteBytesASM(base + 0x627CC, assmNop, 8);
 
 	auto setDy = (base + 0x62802);
 	VirtualProtect((LPVOID)setDy, 8, PAGE_EXECUTE_READWRITE, &dwBack);
-	*(unsigned long long*)(base + 0x62802) = 0x9090909090909090;
+	WriteBytesASM(base + 0x62802, assmNop, 8);
 
 	auto setDx2 = (base + 0x627E7);
 	VirtualProtect((LPVOID)setDx2, 8, PAGE_EXECUTE_READWRITE, &dwBack);
-	*(unsigned long long*)(base + 0x627E7) = 0x9090909090909090;
+	WriteBytesASM(base + 0x627E7, assmNop, 8);
 
 	Codecave(base + 0x622AA, CC_Fug, 0x8);
 }
