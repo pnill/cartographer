@@ -502,9 +502,6 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wp, LPARAM lp)
 			break;
 		}
 	}
-	if (eatKey) {
-		return 1;
-	}
 	return CallNextHookEx(currentHook, nCode, wp, lp);
 }
 
