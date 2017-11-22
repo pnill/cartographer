@@ -7,6 +7,7 @@
 #include "H2MOD_Infection.h"
 #include "H2MOD_Halo2Final.h"
 #include "H2MOD_H2X.h"
+#include "H2MOD_Mouseinput.h"
 #include "Network.h"
 #include "xliveless.h"
 #include "CUser.h"
@@ -23,6 +24,7 @@ GunGame *gg = new GunGame();
 Infection *inf = new Infection();
 Halo2Final *h2f = new Halo2Final();
 H2X *h2xrb = new H2X();
+Mouseinput *h2RawM = new Mouseinput();
 
 bool b_Infection = false;
 bool b_Halo2Final = false;
@@ -822,6 +824,7 @@ int __cdecl OnMapLoad(int a1)
 
 	isLobby = true;
 	int ret = pmap_initialize(a1);
+	h2RawM->Initialize();
 
 	//OnMapLoad is called with 30888 when a game ends
 	if (a1 == 30888)
