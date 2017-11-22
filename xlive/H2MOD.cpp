@@ -885,7 +885,7 @@ int __cdecl OnMapLoad(int a1)
 		int offset = 0x47CD54;
 		//TRACE_GAME("[h2mod] Hitfix is being run on Client!");
 		if (h2mod->Server)
-				offset = 0x4A29BC;
+			offset = 0x4A29BC;
 		//TRACE_GAME("[h2mod] Hitfix is being run on the Dedicated Server!");
 
 		DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + offset);
