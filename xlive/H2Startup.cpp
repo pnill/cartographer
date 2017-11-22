@@ -55,7 +55,7 @@ void initPlayerNumber() {
 		if (H2IsDediServer) {
 			instanceName = instanceMutexServer;
 		}
-		swprintf(mutexName, instanceName, playerNumber);
+		swprintf(mutexName, sizeof(mutexName), instanceName, playerNumber);
 		mutex = CreateMutex(0, TRUE, mutexName);
 		lastErr = GetLastError();
 		if (lastErr == ERROR_ALREADY_EXISTS) {
@@ -622,7 +622,7 @@ void ProcessH2Startup() {
 	processFilePath = (wchar_t*)malloc(wcslen(ArgList[0]) * sizeof(wchar_t));
 	int rtncodepath = GetWidePathFromFullWideFilename(ArgList[0], processFilePath);
 	if (rtncodepath == -1) {
-		swprintf(processFilePath, L"");
+		swprintf(processFilePath, 2, L"");
 	}
 
 	initDebugText();

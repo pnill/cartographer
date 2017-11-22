@@ -196,7 +196,7 @@ void MapManager::cleanup() {
 * socket call.
 */
 bool MapManager::downloadFromHost() {
-	BOOL downloadResult = false;
+	bool downloadResult = false;
 	SOCKET connectSocket = INVALID_SOCKET;
 	try {
 		if (precalculatedDownloadPercentageStrings.empty()) {

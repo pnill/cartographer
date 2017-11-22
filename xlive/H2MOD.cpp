@@ -439,7 +439,7 @@ int H2MOD::get_player_index_from_unit_datum(int unit_datum_index)
 			return pIndex;
 		}
 	}
-
+	return -1;
 }
 
 

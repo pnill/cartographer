@@ -508,7 +508,7 @@ int WINAPI XSocketSetSockOpt (SOCKET s, int level, int optname, const char *optv
     TRACE("XSocketSetSockOpt  (socket = %X, level = %d, optname = %d, optval = %s, optlen = %d)",
 			s, level, optname, optval ? optval : "", optlen );
 
-		if (level & SO_BROADCAST > 0)
+		if ((level & SO_BROADCAST) > 0)
 		{
 
 			TRACE("XSocketSetSockOpt - SO_BROADCAST");
