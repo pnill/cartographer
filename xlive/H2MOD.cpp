@@ -30,7 +30,7 @@ bool b_Infection = false;
 bool b_Halo2Final = false;
 bool b_H2X = false;
 
-extern bool rawMouse;
+extern bool RawMouse;
 extern bool b_GunGame;
 extern CUserManagement User;
 extern ULONG g_lLANIP;
@@ -843,7 +843,6 @@ int __cdecl OnMapLoad(int a1)
 	b_Infection = false;
 	b_GunGame = false;
 	b_Halo2Final = false;
-	b_H2X = false;
 
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
 	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
@@ -881,31 +880,31 @@ int __cdecl OnMapLoad(int a1)
 		}
 
 #pragma region Apply Hitfix
-		
+		if (*GameEngine == 2) {
 
-		int offset = 0x47CD54;
-		//TRACE_GAME("[h2mod] Hitfix is being run on Client!");
-		if (h2mod->Server)
-			offset = 0x4A29BC;
-		//TRACE_GAME("[h2mod] Hitfix is being run on the Dedicated Server!");
+			int offset = 0x47CD54;
+			//TRACE_GAME("[h2mod] Hitfix is being run on Client!");
+			if (h2mod->Server)
+				offset = 0x4A29BC;
+			//TRACE_GAME("[h2mod] Hitfix is being run on the Dedicated Server!");
 
-		DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + offset);
+			DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + offset);
 
-		*(float*)(AddressOffset + 0xA4EC88) = 800.0f; // battle_rifle_bullet.proj Initial Velocity 
-		*(float*)(AddressOffset + 0xA4EC8C) = 800.0f; //battle_rifle_bullet.proj Final Velocity
-		*(float*)(AddressOffset + 0xB7F914) = 4000.0f; //sniper_bullet.proj Initial Velocity
-		*(float*)(AddressOffset + 0xB7F918) = 4000.0f; //sniper_bullet.proj Final Velocity
-		*(float*)(AddressOffset + 0xCE4598) = 4000.0f; //beam_rifle_beam.proj Initial Velocity
-		*(float*)(AddressOffset + 0xCE459C) = 4000.0f; //beam_rifle_beam.proj Final Velocity
-		*(float*)(AddressOffset + 0x81113C) = 200.0f; //gauss_turret.proj Initial Velocity def 90
-		*(float*)(AddressOffset + 0x811140) = 200.0f; //gauss_turret.proj Final Velocity def 90
-		*(float*)(AddressOffset + 0x97A194) = 800.0f; //magnum_bullet.proj initial def 400
-		*(float*)(AddressOffset + 0x97A198) = 800.0f; //magnum_bullet.proj final def 400
-		*(float*)(AddressOffset + 0x7E7E20) = 2000.0f; //bullet.proj (chaingun) initial def 800
-		*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bullet.proj (chaingun) final def 800
+			*(float*)(AddressOffset + 0xA4EC88) = 800.0f; // battle_rifle_bullet.proj Initial Velocity 
+			*(float*)(AddressOffset + 0xA4EC8C) = 800.0f; //battle_rifle_bullet.proj Final Velocity
+			*(float*)(AddressOffset + 0xB7F914) = 4000.0f; //sniper_bullet.proj Initial Velocity
+			*(float*)(AddressOffset + 0xB7F918) = 4000.0f; //sniper_bullet.proj Final Velocity
+			*(float*)(AddressOffset + 0xCE4598) = 4000.0f; //beam_rifle_beam.proj Initial Velocity
+			*(float*)(AddressOffset + 0xCE459C) = 4000.0f; //beam_rifle_beam.proj Final Velocity
+			*(float*)(AddressOffset + 0x81113C) = 200.0f; //gauss_turret.proj Initial Velocity def 90
+			*(float*)(AddressOffset + 0x811140) = 200.0f; //gauss_turret.proj Final Velocity def 90
+			*(float*)(AddressOffset + 0x97A194) = 800.0f; //magnum_bullet.proj initial def 400
+			*(float*)(AddressOffset + 0x97A198) = 800.0f; //magnum_bullet.proj final def 400
+			*(float*)(AddressOffset + 0x7E7E20) = 2000.0f; //bullet.proj (chaingun) initial def 800
+			*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bullet.proj (chaingun) final def 800
 
 #pragma endregion
-	
+		}
 	}
 #pragma region H2V Stuff
 	if (!h2mod->Server)
@@ -1143,6 +1142,11 @@ int __cdecl changeTeam(int a1, int a2) {
 typedef char(__cdecl *camera_pointer)();
 camera_pointer Cinematic_Pointer;
 char __cdecl if_cinematic() {
+	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
+	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
+	if (*GameEngine == 1) {
+		return 0;
+	}
 	return 0;
 }
 
@@ -1606,11 +1610,11 @@ void H2MOD::Initialize()
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 		Field_of_View(field_of_view, 0);
 		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
+
 		PatchGameDetailsCheck();
 		//PatchPingMeterCheck(true);
-		
-		if (rawMouse)
-		h2RawM->Initialize();	
+		if (RawMouse)
+			h2RawM->Initialize();
 	}
 	
 	TRACE_GAME("H2MOD - Initialized v0.1a");
