@@ -107,7 +107,6 @@ public:
 		void handle_command(std::string);
 		void handle_command(std::wstring);
 		void logToDedicatedServerConsole(wchar_t* message);
-		void write_inner_chat_dynamic(const wchar_t* data);
 		wchar_t* get_local_player_name();		
 		int get_dynamic_player_base(int playerIndex, bool resetDynamicBase);
 		float get_player_x(int, bool);
