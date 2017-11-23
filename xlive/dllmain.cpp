@@ -27,6 +27,7 @@ UINT fps_enable = 1;
 UINT fps_limit = 60;
 UINT field_of_view = 70;
 float crosshair_offset = 0.165f;
+bool RawMouse;
 
 ULONG broadcast_server = inet_addr("149.56.81.89");
 
@@ -314,6 +315,7 @@ void InitInstance()
 				CHECK_ARG("fps_limit = ", fps_limit);
 				CHECK_ARG("field_of_view = ", field_of_view);
 				CHECK_ARG_FLOAT("crosshair_offset = ", crosshair_offset);
+				CHECK_ARG("raw_input =", RawMouse);
 			}
 
 			
