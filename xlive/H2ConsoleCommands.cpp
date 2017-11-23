@@ -21,10 +21,10 @@ void ConsoleCommands::writePreviousCommand(std::string msg) {
 }
 
 time_t start = time(0);
-void ConsoleCommands::handleInput(WPARAM wp) {
+BOOL ConsoleCommands::handleInput(WPARAM wp) {
 	if (H2hWnd != GetForegroundWindow()) {
 		//halo2 is not in focus
-		return;
+		return false;
 	}
 	double seconds_since_start = difftime(time(0), start);
 	switch (wp) {
@@ -33,6 +33,7 @@ void ConsoleCommands::handleInput(WPARAM wp) {
 			this->console = !this->console;
 			start = time(0);
 		}
+		return true;
 	case '\b':   // backspace
 	{
 		if (this->console) {
@@ -41,6 +42,7 @@ void ConsoleCommands::handleInput(WPARAM wp) {
 				this->command.erase(this->caretPos - 1, 1);
 				this->caretPos -= 1;
 			}
+			return true;
 		}
 	}
 	break;
@@ -56,6 +58,7 @@ void ConsoleCommands::handleInput(WPARAM wp) {
 
 			command = "";
 			caretPos = 0;
+			return true;
 		}
 	}
 	break;
@@ -79,10 +82,12 @@ void ConsoleCommands::handleInput(WPARAM wp) {
 				}
 				this->command.insert(this->caretPos, 1, (char)wp);
 				this->caretPos += 1;
+				return true;
 			}
 		}
 		break;
 	}
+	return false;
 }
 
 void ConsoleCommands::checkForIds() {
@@ -246,7 +251,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		else if (firstCommand == "$resetspawncommandlist") {
 			//reset checked_for_ids, so you can reload new object_datums at runtime
 			this->checked_for_ids = false;
-		}
+		}	
 		else if (firstCommand == "$spawnnear") {
 			if (splitCommands.size() < 3 || splitCommands.size() > 4) {
 				output(L"Invalid command, usage $spawn command_name count");

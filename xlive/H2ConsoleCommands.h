@@ -8,7 +8,7 @@ public:
 	void spawn(unsigned int object_datum, int count, float x, float y, float z, float randomMultiplier);
 	void output(std::wstring result);
 	std::vector<std::string> prevCommands;
-	void handleInput(WPARAM wp);
+	BOOL handleInput(WPARAM wp);
 
 	std::string command;
 	int caretPos;
