@@ -958,8 +958,8 @@ int __cdecl OnMapLoad(int a1)
 			if (b_GunGame && isHost)
 				gg->Initialize();
 
-			if (b_Halo2Final && !h2mod->Server)
-				h2f->Initialize(isHost);
+			if (b_Halo2Final)
+				h2f->Initialize(h2mod->Server);
 
 			if (b_H2X)
 				h2xrb->Initialize();
