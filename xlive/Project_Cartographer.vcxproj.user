@@ -2,13 +2,14 @@
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>
-    <LocalDebuggerCommand>$(SolutionDir)Halo2\halo2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)Halo2\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommand>$(OutDir)halo2.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerCommand>$(SolutionDir)Halo2\halo2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)Halo2\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommand>$(OutDir)halo2.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>
   </PropertyGroup>
 </Project>

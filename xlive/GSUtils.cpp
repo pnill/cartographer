@@ -6,22 +6,15 @@
 #include <Wincrypt.h>
 //#include "H2Config.h"
 
-void OverwriteAssembly(BYTE* srcAddr, BYTE* writeAssm, int lenAssm) {
-	WriteBytesASM((DWORD)srcAddr, writeAssm, lenAssm);
-	/*DWORD dwBack;
-	VirtualProtect(srcAddr, lenAssm, PAGE_EXECUTE_READWRITE, &dwBack);
-
-	for (int i = 0; i < lenAssm; i++)
-		srcAddr[i] = writeAssm[i];
-
-	VirtualProtect(srcAddr, lenAssm, dwBack, &dwBack);*/
-}
-
 void PatchCall(DWORD call_addr, DWORD new_function_ptr) {
 	DWORD callRelative = new_function_ptr - (call_addr + 5);
-	BYTE* pbyte = (BYTE*)&callRelative;
-	BYTE assmNewFuncRel[4] = { pbyte[0], pbyte[1], pbyte[2], pbyte[3] };
-	WriteBytesASM(call_addr + 1, assmNewFuncRel, 4);
+	WritePointer(call_addr + 1, reinterpret_cast<void*>(callRelative));
+}
+
+void WritePointer(DWORD offset, void *ptr) {
+	BYTE* pbyte = (BYTE*)&ptr;
+	BYTE assmNewFuncRel[0x4] = { pbyte[0], pbyte[1], pbyte[2], pbyte[3] };
+	WriteBytesASM(offset, assmNewFuncRel, 0x4);
 }
 
 void HexToByteArray(BYTE* byteArray, char* pointerHex) {

@@ -114,6 +114,9 @@
     <ClCompile Include="H2ConsoleCommands.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DiscordInterface.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -191,7 +194,13 @@
     <ClInclude Include="GSSecurity.h">
       <Filter>Source Files\GlitchyScripts</Filter>
     </ClInclude>
-    <ClInclude Include="H2ConsoleCommands.h">
+    <ClInclude Include="discord-rpc.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiscordInterface.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+     <ClInclude Include="H2ConsoleCommands.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

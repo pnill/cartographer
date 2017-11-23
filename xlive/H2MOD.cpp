@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <iostream>
 #include <sstream>
+#include <codecvt>
 #include "H2MOD.h"
 #include "H2MOD_GunGame.h"
 #include "H2MOD_Infection.h"
@@ -16,6 +17,7 @@
 #include "H2OnscreenDebugLog.h"
 #include "GSUtils.h"
 #include <Mmsystem.h>
+#include "DiscordInterface.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
@@ -437,7 +439,7 @@ int H2MOD::get_player_index_from_unit_datum(int unit_datum_index)
 			return pIndex;
 		}
 	}
-
+	return -1;
 }
 
 
@@ -680,7 +682,7 @@ player_death pplayer_death;
 typedef void(__stdcall *update_player_score)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
 update_player_score pupdate_player_score;
 
-typedef void(__stdcall *tjoin_game)(void* thisptr, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14);
+typedef void(__stdcall *tjoin_game)(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14);
 tjoin_game pjoin_game;
 
 extern SOCKET game_sock;
@@ -812,6 +814,25 @@ void H2MOD::PatchNewRound(bool hackit) //All thanks to Glitchy Scripts who wrote
 		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6A87C : 0x6B1C8)));
 }
 
+
+/*
+TODO: might be useful for updating player count while in-lobby
+typedef bool(__cdecl *PacketHandler)(void *packet, int size, void *data);
+
+int __cdecl player_add_packet_handler(void *packet, int size, void *data)
+{
+	update_player_count();
+	PacketHandler game_player_add_handler = reinterpret_cast<PacketHandler>(h2mod->GetBase() + 0x1F06B6);
+	return game_player_add_handler(packet, size, data);
+}
+
+bool __cdecl player_remove_packet_handler(void *packet, int size, void *data)
+{
+	update_player_count();
+	PacketHandler game_player_remove_handler = reinterpret_cast<PacketHandler>(h2mod->GetBase() + 0x1F08BC);
+	return game_player_remove_handler(packet, size, data);
+}
+*/
 
 int __cdecl OnMapLoad(int a1)
 {
@@ -992,13 +1013,12 @@ Should take a look here for extended functions on scoring chances are we're alre
 
 */
 
-void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
+void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
 {
 	isServer = false;
 	Connected = false;
 	NetworkActive = false;
 
-	XNADDR* host_xn = (XNADDR*)a6;
 	memcpy(&join_game_xn, host_xn, sizeof(XNADDR));
 
 	trace(L"join_game host_xn->ina.s_addr: %08X ", host_xn->ina.s_addr);
@@ -1036,7 +1056,7 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, int a6, 
 	int Data_of_network_Thread = 1;
 	H2MOD_Network = CreateThread(NULL, 0, NetworkThread, &Data_of_network_Thread, 0, NULL);
 
-	return pjoin_game(thisptr, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14);
+	return pjoin_game(thisptr, a2, a3, a4, a5, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 
 int __cdecl connect_establish_write(void* a1, int a2, int a3)
@@ -1202,6 +1222,11 @@ void H2MOD::ApplyHooks() {
 
 		build_gui_list_method = (build_gui_list)DetourFunc((BYTE*)this->GetBase() + 0x20D1FD, (BYTE*)buildGuiList, 8);
 		VirtualProtect(build_gui_list_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		/*
+		WritePointer(GetBase() + 0x1F0B3A, player_add_packet_handler);
+		WritePointer(GetBase() + 0x1F0B80, player_remove_packet_handler);
+		*/
 
 		// Patch out the code that displays the "Invalid Checkpoint" error
 		// Start
@@ -1574,6 +1599,11 @@ DWORD WINAPI Thread1(LPVOID lParam)
 	}
 }
 
+VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+{
+	update_player_count();
+}
+
 void H2MOD::Initialize()
 {
 
@@ -1603,6 +1633,14 @@ void H2MOD::Initialize()
 
 	//Network::Initialize();
 	h2mod->ApplyHooks();
+
+	if (!Server)
+	{
+		// Discord init
+		DiscordInterface::SetDetails("Startup");
+		DiscordInterface::Init();
+		SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
+	}
 }
 
 void H2MOD::Deinitialize() {
