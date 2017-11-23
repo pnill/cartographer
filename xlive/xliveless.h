@@ -54,3 +54,4 @@ extern UINT fps_enable;
 extern UINT fps_limit;
 extern UINT field_of_view;
 extern float crosshair_offset;
+void update_player_count();

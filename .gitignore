@@ -1,5 +1,26 @@
 Project_Cartographer.VC.db
 Project_Cartographer.VC.VC.opendb
+*.exp
+*.obj
+*.tlog
+*.ilk
+*.log
+*.pdb
+*.sdf
+*.rar
+*.dll
+*.log
+*.pdb
+*.idb
+*.java
+!xlive/libprotobuf.lib
+!xlive/libMinHook.x86.lib
+*.suo
+*.opendb
+*.db
+/GSSecurity.cpp
+/.vs/Project_Cartographer/v15
+/Directx SDK/include
 UpgradeLog.htm
 version.txt
 xlive.ilk
@@ -9,8 +30,5 @@ xliveless.v12.suo
 /.vs
 /Directx SDK/include
 /Halo2
-/MinHook/build/Debug
-/MinHook/build/lib
-/MinHook/build/x64/Debug
 /xlive/Debug
 /xlive/Release

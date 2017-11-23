@@ -27,7 +27,7 @@ std::vector<std::string> split(const std::string &s, char delim) {
 }
 
 int stripWhitespace(wchar_t *inputStr) {
-	wchar_t *start, *end;
+	wchar_t *start;
 	start = inputStr;
 	while (*start && *start == ' ') start++;
 	printf("It is %i and %i\n", inputStr, start);

@@ -377,7 +377,6 @@ void CUserManagement::RegisterLocalRequest(char* token)
 {
 	//TRACE("CUserManagement::RegisterLocalRequest(%ws)", token);
 	//TRACE("CUserManagement::RegisterLocalRequest(%s,%s)", email,password);
-	u_long xnaddress;
 	sockaddr_in RecvAddr;
 
 	unsigned short port = 27020;
