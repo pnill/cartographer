@@ -4,7 +4,6 @@
 #include "H2MOD.h"
 #include <iostream>
 #include <Shellapi.h>
-#include "discord-rpc.h"
 #include "H2Startup.h"
 #include "H2OnscreenDebugLog.h"
 #include "GSRunLoop.h"
@@ -232,7 +231,7 @@ void InitInstance()
 
 		LPWSTR iniFile = new WCHAR[256];
 		if (getPlayerNumber() > 1) {
-			swprintf(iniFile, 256, L"xlive%d.ini", getPlayerNumber());
+			swprintf(iniFile, L"xlive%d.ini", getPlayerNumber());
 		}
 		else {
 			lstrcpyW(iniFile, L"xlive.ini");
@@ -373,7 +372,7 @@ void InitInstance()
 		g_lWANIP = inet_addr(g_szWANIP);
 
 		wchar_t mutexName[255];
-		swprintf(mutexName, sizeof(mutexName), L"Halo2Login#%ws", g_szToken);
+		swprintf(mutexName, L"Halo2Login#%s", g_szToken);
 		HANDLE mutex = CreateMutex(0, TRUE, mutexName);
 		DWORD lastErr = GetLastError();
 		char token_censored[33];
@@ -392,7 +391,7 @@ void InitInstance()
 		addDebugText(NotificationText4);
 
 		wchar_t mutexName2[255];
-		swprintf(mutexName2, sizeof(mutexName2), L"Halo2BasePort#%d", g_port);
+		swprintf(mutexName2, L"Halo2BasePort#%d", g_port);
 		HANDLE mutex2 = CreateMutex(0, TRUE, mutexName2);
 		DWORD lastErr2 = GetLastError();
 		if (lastErr2 == ERROR_ALREADY_EXISTS) {
@@ -482,12 +481,14 @@ void ExitInstance()
 	extern void SaveAchievements();
 	SaveAchievements();
 
-	TerminateProcess(GetCurrentProcess(), 0);
+	ExitProcess(0);
 }
 
 HHOOK currentHook;
 LRESULT CALLBACK HookProc(int nCode, WPARAM wp, LPARAM lp)
 {
+	BOOL eatKey = false;
+	WPARAM wParam;
 	if (nCode == HC_ACTION)
 	{
 		switch (wp)
@@ -495,9 +496,14 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wp, LPARAM lp)
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 			PKBDLLHOOKSTRUCT p = (PKBDLLHOOKSTRUCT)lp;
-			commands->handleInput(p->vkCode);
+			wParam = p->vkCode;
+			eatKey = commands->handleInput(wParam);
+			//TRACE_GAME_N("Key pressed %d, eatKey=%d", wParam, eatKey);
 			break;
 		}
+	}
+	if (eatKey) {
+		return 1;
 	}
 	return CallNextHookEx(currentHook, nCode, wp, lp);
 }
