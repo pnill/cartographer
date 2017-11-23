@@ -5,12 +5,10 @@ Project_Cartographer.VC.VC.opendb
 *.tlog
 *.ilk
 *.log
-*.pdb
 *.sdf
 *.rar
 *.dll
 *.log
-*.pdb
 *.idb
 *.java
 !xlive/libprotobuf.lib
