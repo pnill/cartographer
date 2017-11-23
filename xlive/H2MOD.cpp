@@ -899,9 +899,8 @@ int __cdecl OnMapLoad(int a1)
 			TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
 			b_H2X = true;
 		}
-
+	
 #pragma region Apply Hitfix
-		
 
 		int offset = 0x47CD54;
 		//TRACE_GAME("[h2mod] Hitfix is being run on Client!");
@@ -925,8 +924,7 @@ int __cdecl OnMapLoad(int a1)
 		*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bullet.proj (chaingun) final def 800
 
 #pragma endregion
-		}
-	
+	}
 #pragma region H2V Stuff
 	if (!h2mod->Server)
 	{
@@ -960,9 +958,8 @@ int __cdecl OnMapLoad(int a1)
 			if (b_GunGame && isHost)
 				gg->Initialize();
 
-			if (b_Halo2Final)
-				h2f->Initialize(h2mod->Server);
-			
+			if (b_Halo2Final && !h2mod->Server)
+				h2f->Initialize(isHost);
 			if (b_H2X)
 				h2xrb->Initialize();
 		}

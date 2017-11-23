@@ -488,15 +488,22 @@ void ExitInstance()
 HHOOK currentHook;
 LRESULT CALLBACK HookProc(int nCode, WPARAM wp, LPARAM lp)
 {
+	WPARAM wParam;
 	if (nCode == HC_ACTION)
 	{
+		BOOL eatKey = false;
 		switch (wp)
 		{
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 			PKBDLLHOOKSTRUCT p = (PKBDLLHOOKSTRUCT)lp;
-			commands->handleInput(p->vkCode);
+			wParam = p->vkCode;
+			eatKey = commands->handleInput(wParam);
+			//TRACE_GAME_N("Key pressed %d, eatKey=%d", wParam, eatKey);
 			break;
+		}
+		if (eatKey) {
+			return 1;
 		}
 	}
 	return CallNextHookEx(currentHook, nCode, wp, lp);
