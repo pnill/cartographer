@@ -117,6 +117,12 @@
     <ClCompile Include="DiscordInterface.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD_H2X.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD_Mouseinput.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -200,7 +206,13 @@
     <ClInclude Include="DiscordInterface.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
-     <ClInclude Include="H2ConsoleCommands.h">
+    <ClInclude Include="H2ConsoleCommands.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD_H2X.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD_Mouseinput.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

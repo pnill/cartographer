@@ -181,8 +181,10 @@
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="h2mod.pb.cc" />
     <ClCompile Include="H2MOD_GunGame.cpp" />
+    <ClCompile Include="H2MOD_H2X.cpp" />
     <ClCompile Include="H2MOD_Halo2Final.cpp" />
     <ClCompile Include="H2MOD_MapManager.cpp" />
+    <ClCompile Include="H2MOD_Mouseinput.cpp" />
     <ClCompile Include="H2OnscreenDebugLog.cpp" />
     <ClCompile Include="H2Startup.cpp" />
     <ClCompile Include="Hook.cpp" />
@@ -208,9 +210,11 @@
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="h2mod.pb.h" />
     <ClInclude Include="H2MOD_GunGame.h" />
+    <ClInclude Include="H2MOD_H2X.h" />
     <ClInclude Include="H2MOD_Halo2Final.h" />
     <ClInclude Include="H2MOD_Infection.h" />
     <ClInclude Include="H2MOD_MapManager.h" />
+    <ClInclude Include="H2MOD_Mouseinput.h" />
     <ClInclude Include="H2MOD_Sounds.h" />
     <ClInclude Include="H2OnscreenDebugLog.h" />
     <ClInclude Include="H2Startup.h" />
