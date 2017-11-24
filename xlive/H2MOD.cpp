@@ -4,6 +4,8 @@
 #include <sstream>
 #include <codecvt>
 #include "H2MOD.h"
+#include "H2MOD_Mouseinput.h"
+#include "H2MOD_H2X.h"
 #include "H2MOD_GunGame.h"
 #include "H2MOD_Infection.h"
 #include "H2MOD_Halo2Final.h"
@@ -19,13 +21,16 @@
 #include <Mmsystem.h>
 #include "DiscordInterface.h"
 
+
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
 Infection *inf = new Infection();
 Halo2Final *h2f = new Halo2Final();
+Mouseinput *mouse = new Mouseinput();
 
 bool b_Infection = false;
 bool b_Halo2Final = false;
+bool b_H2X = false;
 
 extern bool b_GunGame;
 extern CUserManagement User;
@@ -858,6 +863,7 @@ int __cdecl OnMapLoad(int a1)
 	b_Infection = false;
 	b_GunGame = false;
 	b_Halo2Final = false;
+	b_H2X = false;
 
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
 	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
@@ -886,6 +892,12 @@ int __cdecl OnMapLoad(int a1)
 		{
 			TRACE_GAME("[h2mod] Halo2Final Turned on!");
 			b_Halo2Final = true;
+		}
+		
+		if (wcsstr(variant_name, L"H2X") > 0 || wcsstr(variant_name, L"h2x") > 0)
+		{
+			TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
+			b_H2X = true;
 		}
 	
 #pragma region Apply Hitfix
@@ -946,8 +958,12 @@ int __cdecl OnMapLoad(int a1)
 			if (b_GunGame && isHost)
 				gg->Initialize();
 
-			if (b_Halo2Final && !h2mod->Server)
+			if (b_H2X)
+				H2X_Initialize();
+
+			if (b_Halo2Final)
 				h2f->Initialize(isHost);
+			
 		}
 
 
@@ -963,6 +979,9 @@ int __cdecl OnMapLoad(int a1)
 
 			if (b_GunGame)
 				gg->Initialize();
+
+			if (b_H2X)
+				H2X_Initialize();
 		}
 
 	}
@@ -1144,12 +1163,8 @@ int __cdecl changeTeam(int a1, int a2) {
 
 typedef char(__cdecl *camera_pointer)();
 camera_pointer Cinematic_Pointer;
+
 char __cdecl if_cinematic() {
-	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
-	if (*GameEngine == 1) {
-		return 0;
-	}
 	return 0;
 }
 
@@ -1623,9 +1638,13 @@ void H2MOD::Initialize()
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 		Field_of_View(field_of_view, 0);
 		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
+		extern UINT raw_input;
 
 		PatchGameDetailsCheck();
 		//PatchPingMeterCheck(true);
+		if (raw_input)
+			mouse->Initialize();
+
 	}
 	
 	TRACE_GAME("H2MOD - Initialized v0.1a");
@@ -1634,12 +1653,15 @@ void H2MOD::Initialize()
 	//Network::Initialize();
 	h2mod->ApplyHooks();
 
-	if (!Server)
+	extern UINT discord_enable;
+	if (!h2mod->Server)
 	{
-		// Discord init
-		DiscordInterface::SetDetails("Startup");
-		DiscordInterface::Init();
-		SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
+		if (discord_enable) {
+			// Discord init
+			DiscordInterface::SetDetails("Startup");
+			DiscordInterface::Init();
+			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
+		}
 	}
 }
 
