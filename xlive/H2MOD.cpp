@@ -1654,12 +1654,14 @@ void H2MOD::Initialize()
 	h2mod->ApplyHooks();
 
 	extern UINT discord_enable;
-	if (!h2mod->Server || discord_enable)
+	if (!h2mod->Server)
 	{
+		if (discord_enable) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");
 			DiscordInterface::Init();
 			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
+		}
 	}
 }
 
