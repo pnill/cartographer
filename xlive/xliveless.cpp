@@ -28,6 +28,7 @@ HANDLE g_dwMarketplaceContent = (HANDLE) -2;
 INT num_players;
 XSESSION_LOCAL_DETAILS sessionDetails;
 IXHV2ENGINE hv2Engine;
+extern UINT discord_enable;
 
 WSADATA wsaData;
 
@@ -2825,6 +2826,8 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 		dwUserIndex, dwContextId, dwContextValue );
 
   if (h2mod->Server)
+	  return ERROR_SUCCESS;
+  if (!discord_enable)
 	  return ERROR_SUCCESS;
 
   if (dwContextId == 0x00000003)
