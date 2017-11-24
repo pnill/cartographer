@@ -2825,8 +2825,8 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 		dwUserIndex, dwContextId, dwContextValue );
 
   extern UINT discord_enable;
-  if (h2mod->Server && !discord_enable)
-	  return ERROR_SUCCESS;
+  if (h2mod->Server || !discord_enable) 
+	      return ERROR_SUCCESS;
 
   if (dwContextId == 0x00000003)
 	  diff_level = dwContextValue;
