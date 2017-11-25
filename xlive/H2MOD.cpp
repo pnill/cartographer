@@ -988,6 +988,8 @@ int __cdecl OnMapLoad(int a1)
 
 			if (b_H2X)
 				h2xrb->H2X_Initialize();
+			else
+				h2xrb->H2X_Deinitialize();
 		}
 
 	}
