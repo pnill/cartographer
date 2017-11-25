@@ -27,6 +27,7 @@ GunGame *gg = new GunGame();
 Infection *inf = new Infection();
 Halo2Final *h2f = new Halo2Final();
 Mouseinput *mouse = new Mouseinput();
+H2X *h2xrb = new H2X();
 
 bool b_Infection = false;
 bool b_Halo2Final = false;
@@ -853,11 +854,10 @@ int __cdecl OnMapLoad(int a1)
 	{
 		if (b_Halo2Final && !h2mod->Server)
 			h2f->Dispose();
-		if (b_Infection) {
+		if (b_Infection) 
+		{
 			inf->Deinitialize();
 		}
-		if (b_H2X)
-			H2X_Deinitialize();
 
 		PatchFixRankIcon();
 
@@ -963,7 +963,9 @@ int __cdecl OnMapLoad(int a1)
 				gg->Initialize();
 
 			if (b_H2X)
-				H2X_Initialize();
+				h2xrb->H2X_Initialize();
+			else
+				h2xrb->H2X_Deinitialize();
 
 			if (b_Halo2Final)
 				h2f->Initialize(h2mod->Server);
@@ -985,7 +987,9 @@ int __cdecl OnMapLoad(int a1)
 				gg->Initialize();
 
 			if (b_H2X)
-				H2X_Initialize();
+				h2xrb->H2X_Initialize();
+			else
+				h2xrb->H2X_Deinitialize();
 		}
 
 	}

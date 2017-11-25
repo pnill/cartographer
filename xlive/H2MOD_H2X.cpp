@@ -5,7 +5,7 @@
 
 bool H2X_Disable = false;
 
-void H2X_Initialize()
+void H2X::H2X_Initialize()
 {
 	int offset = 0x47CD54;
 	if (h2mod->Server)
@@ -23,7 +23,7 @@ void H2X_Initialize()
 	*(float*)(FloatOffsets + 0xA03250) = 0.11f; /*H2X Plasma Pistol fire recovery time*/
 }
 
-void H2X_Deinitialize()
+void H2X::H2X_Deinitialize()
 {
 	int offset = 0x47CD54;
 	if (h2mod->Server)
