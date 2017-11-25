@@ -316,7 +316,7 @@ void InitInstance()
 				CHECK_ARG("fps_limit = ", fps_limit);
 				CHECK_ARG("field_of_view = ", field_of_view);
 				CHECK_ARG_FLOAT("crosshair_offset = ", crosshair_offset);
-				CHECK_ARG("raw_input =", raw_input);
+				CHECK_ARG("raw_input = ", raw_input);
 				CHECK_ARG("discord_enable =", discord_enable);
 			}
 
