@@ -4,11 +4,11 @@
 #include <sstream>
 #include <codecvt>
 #include "H2MOD.h"
+#include "H2MOD_Mouseinput.h"
+#include "H2MOD_H2X.h"
 #include "H2MOD_GunGame.h"
 #include "H2MOD_Infection.h"
 #include "H2MOD_Halo2Final.h"
-#include "H2MOD_H2X.h"
-#include "H2MOD_Mouseinput.h"
 #include "Network.h"
 #include "xliveless.h"
 #include "CUser.h"
@@ -21,18 +21,19 @@
 #include <Mmsystem.h>
 #include "DiscordInterface.h"
 
+
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
 Infection *inf = new Infection();
 Halo2Final *h2f = new Halo2Final();
-H2X *h2xrb = new H2X();
-Mouseinput *h2RawM = new Mouseinput();
+Mouseinput *mouse = new Mouseinput();
 
 bool b_Infection = false;
 bool b_Halo2Final = false;
 bool b_H2X = false;
 
-extern bool RawMouse;
+extern UINT raw_input;
+extern UINT discord_enable;
 extern bool b_GunGame;
 extern CUserManagement User;
 extern ULONG g_lLANIP;
@@ -864,6 +865,7 @@ int __cdecl OnMapLoad(int a1)
 	b_Infection = false;
 	b_GunGame = false;
 	b_Halo2Final = false;
+	b_H2X = false;
 
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
 	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
@@ -893,7 +895,7 @@ int __cdecl OnMapLoad(int a1)
 			TRACE_GAME("[h2mod] Halo2Final Turned on!");
 			b_Halo2Final = true;
 		}
-
+		
 		if (wcsstr(variant_name, L"H2X") > 0 || wcsstr(variant_name, L"h2x") > 0)
 		{
 			TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
@@ -958,11 +960,12 @@ int __cdecl OnMapLoad(int a1)
 			if (b_GunGame && isHost)
 				gg->Initialize();
 
-			if (b_Halo2Final)
-				h2f->Initialize(h2mod->Server);
-
 			if (b_H2X)
-				h2xrb->Initialize();
+				H2X_Initialize();
+
+			if (b_Halo2Final)
+				h2f->Initialize(isHost);
+			
 		}
 
 
@@ -978,6 +981,9 @@ int __cdecl OnMapLoad(int a1)
 
 			if (b_GunGame)
 				gg->Initialize();
+
+			if (b_H2X)
+				H2X_Initialize();
 		}
 
 	}
@@ -1159,12 +1165,8 @@ int __cdecl changeTeam(int a1, int a2) {
 
 typedef char(__cdecl *camera_pointer)();
 camera_pointer Cinematic_Pointer;
+
 char __cdecl if_cinematic() {
-	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
-	if (*GameEngine == 1) {
-		return 0;
-	}
 	return 0;
 }
 
@@ -1641,8 +1643,9 @@ void H2MOD::Initialize()
 
 		PatchGameDetailsCheck();
 		//PatchPingMeterCheck(true);
-		if (RawMouse)
-			h2RawM->Initialize();
+		if (raw_input)
+			mouse->Initialize();
+
 	}
 	
 	TRACE_GAME("H2MOD - Initialized v0.1a");
@@ -1651,12 +1654,14 @@ void H2MOD::Initialize()
 	//Network::Initialize();
 	h2mod->ApplyHooks();
 
-	if (!Server)
+	if (!h2mod->Server)
 	{
-		// Discord init
-		DiscordInterface::SetDetails("Startup");
-		DiscordInterface::Init();
-		SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
+		if (discord_enable) {
+			// Discord init
+			DiscordInterface::SetDetails("Startup");
+			DiscordInterface::Init();
+			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
+		}
 	}
 }
 

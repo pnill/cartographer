@@ -3,8 +3,7 @@
 #include "xliveless.h"
 #include "H2MOD.h"
 
-void H2X::Initialize()
-
+void H2X_Initialize()
 {
 	int offset = 0x47CD54;
 	if (h2mod->Server)
