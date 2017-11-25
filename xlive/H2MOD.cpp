@@ -856,6 +856,8 @@ int __cdecl OnMapLoad(int a1)
 		if (b_Infection) {
 			inf->Deinitialize();
 		}
+		if (b_H2X)
+			H2X_Deinitialize();
 
 		PatchFixRankIcon();
 
