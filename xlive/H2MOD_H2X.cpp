@@ -3,6 +3,8 @@
 #include "xliveless.h"
 #include "H2MOD.h"
 
+bool H2X_Disable = false;
+
 void H2X_Initialize()
 {
 	int offset = 0x47CD54;
@@ -19,4 +21,23 @@ void H2X_Initialize()
 	*(float*)(FloatOffsets + 0x96EC34) = 0.13f; /*H2X Magnum fire recovery time*/
 	*(float*)(FloatOffsets + 0xC0EABC) = 0.39f; /*H2X Brute Shot fire recovery time*/
 	*(float*)(FloatOffsets + 0xA03250) = 0.11f; /*H2X Plasma Pistol fire recovery time*/
+}
+
+void H2X_Deinitialize()
+{
+	int offset = 0x47CD54;
+	if (h2mod->Server)
+		offset = 0x4A29BC;
+	TRACE_GAME("[h2mod] H2X is not running on client game");
+	DWORD FloatOffsets = *(DWORD*)((char*)h2mod->GetBase() + offset);
+	
+	*(float*)(FloatOffsets + 0xA49A7C) = 0.26f; /*H2V BR fire recovery time*/
+	*(float*)(FloatOffsets + 0xB7A330) = 0.5f; /*H2V Sniper Rifle fire recovery time*/
+	*(float*)(FloatOffsets + 0xCE049C) = 0.25f; /*H2V Beam Rifle fire recovery time*/
+	*(float*)(FloatOffsets + 0xA7C3D4) = 0.14f; /*H2V Carbine fire recovery time*/
+	*(float*)(FloatOffsets + 0xAF1DA4) = 1.0f; /*H2V Shotgun fire recovery time*/
+	*(float*)(FloatOffsets + 0x96EC34) = 0.1f; /*H2V Magnum fire recovery time*/
+	*(float*)(FloatOffsets + 0xC0EABC) = 0.3f; /*H2V Brute Shot fire recovery time*/
+	*(float*)(FloatOffsets + 0xA03250) = 0.05f; /*H2V Plasma Pistol fire recovery time*/
+
 }

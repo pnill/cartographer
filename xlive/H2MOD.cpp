@@ -856,6 +856,8 @@ int __cdecl OnMapLoad(int a1)
 		if (b_Infection) {
 			inf->Deinitialize();
 		}
+		if (b_H2X)
+			H2X_Deinitialize();
 
 		PatchFixRankIcon();
 
@@ -964,7 +966,7 @@ int __cdecl OnMapLoad(int a1)
 				H2X_Initialize();
 
 			if (b_Halo2Final)
-				h2f->Initialize(isHost);
+				h2f->Initialize(h2mod->Server);
 			
 		}
 
