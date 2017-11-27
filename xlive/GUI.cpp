@@ -322,6 +322,50 @@ void drawPrimitiveRect(int x, int y, int w, int h, D3DCOLOR color) {
 
 IDirect3DVertexBuffer9* g_pVB = NULL;
 IDirect3DIndexBuffer9* g_pIB = NULL;
+
+HRESULT GenerateTexture(IDirect3DDevice9 *pD3Ddev, IDirect3DTexture9 **ppD3Dtex, DWORD colour32)
+{
+	if (FAILED(pD3Ddev->CreateTexture(8, 8, 1, 0, D3DFMT_A4R4G4B4, D3DPOOL_MANAGED, ppD3Dtex, NULL)))
+		return E_FAIL;
+
+	WORD colour16 = ((WORD)((colour32 >> 28) & 0xF) << 12)
+		| (WORD)(((colour32 >> 20) & 0xF) << 8)
+		| (WORD)(((colour32 >> 12) & 0xF) << 4)
+		| (WORD)(((colour32 >> 4) & 0xF) << 0);
+
+	D3DLOCKED_RECT d3dlr;
+	(*ppD3Dtex)->LockRect(0, &d3dlr, 0, 0);
+	WORD *pDst16 = (WORD*)d3dlr.pBits;
+
+	for (int xy = 0; xy < 8 * 8; xy++)
+		*pDst16++ = colour16;
+
+	(*ppD3Dtex)->UnlockRect(0);
+
+	return S_OK;
+}
+
+void DrawRect(IDirect3DDevice9* pDevice, float x, float y, float w, float h, D3DCOLOR Color)
+{
+	struct vertex
+	{
+		float x, y, z, rhw;
+		DWORD color;
+	};
+
+	vertex qV[4] = {
+		{ (float)x , (float)(y + h), 0.0f, 1.0f, Color },
+		{ (float)x , (float)y , 0.0f, 1.0f, Color },
+		{ (float)(x + w), (float)(y + h), 0.0f, 1.0f, Color },
+		{ (float)(x + w), (float)y , 0.0f, 1.0f, Color }
+	};
+	const DWORD D3DFVF_TL = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1;
+	GenerateTexture(pDevice, &Primitive, D3DCOLOR_ARGB(125, 000, 000, 000));
+	pDevice->SetFVF(D3DFVF_TL);
+	pDevice->SetTexture(0, Primitive);
+	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, qV, sizeof(vertex));
+}
+
 void drawFilledBox(float x, float y, float w, float h, DWORD color)
 {
 	vertex V[4];
@@ -445,7 +489,8 @@ int WINAPI XLiveRender()
 				int x = 0, y = 0;
 				int height = 400;
 				int startingPosY = height - 15;
-				drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
+				DrawRect(pDevice, x, y, gameWindowWidth, height, D3DCOLOR_ARGB(125, 000, 000, 000));
+				//drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				drawText(0, startingPosY, COLOR_WHITE, ">>>>", normalSizeFont);
 				drawText(55, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
 
