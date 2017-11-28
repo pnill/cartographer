@@ -289,40 +289,6 @@ void drawRect(int x, int y, int width, int height, DWORD Color)
 	pDevice->Clear(1, &rec, D3DCLEAR_TARGET, Color, 0, 0);
 }
 
-void drawPrimitiveRect(int x, int y, int w, int h, D3DCOLOR color) {
-	CVertexList vertexList[4];
-
-	BuildVertex(D3DXVECTOR4(x, y + h, 0, 1), color, vertexList, 0);
-	BuildVertex(D3DXVECTOR4(x, y, 0, 1), color, vertexList, 1);
-	BuildVertex(D3DXVECTOR4(x + w, y + h, 0, 1), color, vertexList, 2);
-	BuildVertex(D3DXVECTOR4(x + w, y, 0, 1), color, vertexList, 3);
-
-	LPDIRECT3DSTATEBLOCK9 pStateBlock = NULL;
-	pDevice->CreateStateBlock(D3DSBT_ALL, &pStateBlock);
-	DWORD oldxvf = NULL;
-	pStateBlock->Capture();
-	pDevice->GetFVF(&oldxvf);
-	pDevice->SetTexture(0, NULL);
-	pDevice->SetPixelShader(NULL);
-	pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-	pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
-
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
-	//pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertexList, sizeof(CVertexList));  	
-
-	pStateBlock->Apply();
-	pStateBlock->Release();
-
-	if (oldxvf != NULL) {
-		pDevice->SetFVF(oldxvf);
-	}
-}
-
-IDirect3DVertexBuffer9* g_pVB = NULL;
-IDirect3DIndexBuffer9* g_pIB = NULL;
-
 HRESULT GenerateTexture(IDirect3DDevice9 *pD3Ddev, IDirect3DTexture9 **ppD3Dtex, DWORD colour32)
 {
 	if (FAILED(pD3Ddev->CreateTexture(8, 8, 1, 0, D3DFMT_A4R4G4B4, D3DPOOL_MANAGED, ppD3Dtex, NULL)))
@@ -344,6 +310,42 @@ HRESULT GenerateTexture(IDirect3DDevice9 *pD3Ddev, IDirect3DTexture9 **ppD3Dtex,
 
 	return S_OK;
 }
+
+void drawPrimitiveRect(int x, int y, int w, int h, D3DCOLOR color) {
+	CVertexList vertexList[4];
+
+	BuildVertex(D3DXVECTOR4(x, y + h, 0, 1), color, vertexList, 0);
+	BuildVertex(D3DXVECTOR4(x, y, 0, 1), color, vertexList, 1);
+	BuildVertex(D3DXVECTOR4(x + w, y + h, 0, 1), color, vertexList, 2);
+	BuildVertex(D3DXVECTOR4(x + w, y, 0, 1), color, vertexList, 3);
+
+	LPDIRECT3DSTATEBLOCK9 pStateBlock = NULL;
+	pDevice->CreateStateBlock(D3DSBT_ALL, &pStateBlock);
+	DWORD oldxvf = NULL;
+	pStateBlock->Capture();
+	pDevice->GetFVF(&oldxvf);
+	pDevice->SetTexture(0, NULL);
+	pDevice->SetPixelShader(NULL);
+	pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+	GenerateTexture(pDevice, &Primitive, D3DCOLOR_ARGB(155, 000, 000, 000));
+	pDevice->SetTexture(0, Primitive);
+	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertexList, sizeof(CVertexList));
+	//pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+	//pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertexList, sizeof(CVertexList));  	
+
+	pStateBlock->Apply();
+	pStateBlock->Release();
+
+	if (oldxvf != NULL) {
+		pDevice->SetFVF(oldxvf);
+	}
+}
+
+IDirect3DVertexBuffer9* g_pVB = NULL;
+IDirect3DIndexBuffer9* g_pIB = NULL;
 
 void DrawRect(IDirect3DDevice9* pDevice, float x, float y, float w, float h, D3DCOLOR Color)
 {
@@ -489,7 +491,7 @@ int WINAPI XLiveRender()
 				int x = 0, y = 0;
 				int height = 400;
 				int startingPosY = height - 15;
-				DrawRect(pDevice, x, y, gameWindowWidth, height, D3DCOLOR_ARGB(125, 000, 000, 000));
+				drawPrimitiveRect(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				//drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				drawText(0, startingPosY, COLOR_WHITE, ">>>>", normalSizeFont);
 				drawText(55, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
