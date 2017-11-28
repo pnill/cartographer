@@ -2735,7 +2735,8 @@ void WINAPI XUserSetProperty(DWORD dwUserIndex, DWORD dwPropertyId, DWORD cbValu
     return;
 }
 
-static const std::unordered_map <std::string, std::string> singleplayer_maps{
+static const std::unordered_map <std::string, std::string> singleplayer_maps
+{
 	{ "00a_introduction", "The Heretic" },
 	{ "01a_tutorial", "The Armory" },
 	{ "01b_spacestation", "Cairo Station" },
@@ -2748,19 +2749,21 @@ static const std::unordered_map <std::string, std::string> singleplayer_maps{
 	{ "06a_sentinelwalls", "Sacred Icon" },
 	{ "06b_floodzone", "Quarantine Zone" },
 	{ "07a_highcharity", "Gravemind" },
-	{ "07b_forerunnership", "Uprising" },
-	{ "08a_deltacliffs", "High Charity" },
+	{ "07b_forerunnership", "High Charity" },
+	{ "08a_deltacliffs", "Uprising" },
 	{ "08b_deltacontrol", "The Great Journey" }
 };
 
-static const std::unordered_map <int, std::pair<std::string, std::string>> campaign_difficulty_list = {
+static const std::unordered_map <int, std::pair<std::string, std::string>> campaign_difficulty_list
+{
 	{ 0,{ "campaign_easy", "Easy" } },
 	{ 1,{ "campaign_normal", "Normal" } },
 	{ 2,{ "campaign_medium", "Heroic" } },
 	{ 3,{ "campaign_hard", "Legendary" } }
 };
 
-static const std::unordered_map <int, std::string> game_mode_list = {
+static const std::unordered_map <int, std::string> game_mode_list
+{
 	{ 1,"gamemode_ctf" },
 	{ 2,"gamemode_slayer" },
 	{ 3,"gamemode_oddball" },
