@@ -8,11 +8,8 @@
 #include "h2mod.h"
 #include <mutex>
 #include "Globals.h"
+#include "H2Config.h"
 
-extern ULONG broadcast_server;
-extern UINT g_port;
-extern ULONG g_lLANIP;
-extern ULONG g_lWANIP;
 bool isHost;
 bool Connected = false;
 bool ThreadCreated = false;
@@ -26,7 +23,7 @@ SOCKET game_sock_1000 = INVALID_SOCKET;
 CUserManagement User;
 clock_t begin, end;
 double time_spent;
-char* ServerStatus;
+char* ServerStatus = 0;
 int MasterState = 0;
 
 static LARGE_INTEGER timerFreq;
@@ -47,7 +44,7 @@ int WINAPI XOnlineStartup()
 	QueryPerformanceFrequency(&timerFreq);
 	QueryPerformanceCounter(&counterAtStart);
 
-	sprintf(ServerStatus, "Master Connection: Initializing....");
+	snprintf(ServerStatus, 250, "Status: Initializing....");
 	
 	boundsock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -97,35 +94,35 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 
 	if (ntohs(port) == 1001)
 	{
-		((struct sockaddr_in*)name)->sin_port = htons(((short)g_port)+1);
+		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 1);
 		game_sock = s;
 		int nport = (((struct sockaddr_in*)name)->sin_port);
 		TRACE("game_sock set for port %i", ntohs(port));
 		TRACE("connect_port set to %i instead of %i", ntohs(nport), ntohs(port));
-		TRACE("g_port was set to %i", g_port);
+		TRACE("g_port was set to %i", H2Config_base_port);
 	}
 
 	if (ntohs(port) == 1000)
 	{
-		((struct sockaddr_in*)name)->sin_port = htons((short)g_port);
+		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port);
 		game_sock_1000 = s;
 		int nport = (((struct sockaddr_in*)name)->sin_port);
 
 		TRACE("game_sock set for port %i", ntohs(port));
 		TRACE("base_port set to %i instead of %i", ntohs(nport), ntohs(port));
-		TRACE("g_port was set to %i", g_port);
+		TRACE("g_port was set to %i", H2Config_base_port);
 	}
 
 	if (ntohs(port) == 1002)
-		((struct sockaddr_in*)name)->sin_port = htons(((short)g_port) + 2);
+		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 2);
 	if (ntohs(port) == 1003)
-		((struct sockaddr_in*)name)->sin_port = htons(((short)g_port) + 3);
+		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 3);
 	if (ntohs(port) == 1004)
-		((struct sockaddr_in*)name)->sin_port = htons(((short)g_port) + 4);
+		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 4);
 	if (ntohs(port) == 1005)
-		((struct sockaddr_in*)name)->sin_port = htons(((short)g_port) + 5);
+		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 5);
 	if(ntohs(port) == 1006)
-		((struct sockaddr_in*)name)->sin_port = htons(((short)g_port) + 6);
+		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 6);
 
 
 
@@ -249,52 +246,30 @@ INT WINAPI XNetXnAddrToInAddr(XNADDR *pxna, XNKID *pnkid, IN_ADDR *pina)
 	return 0;
 }
 
-int ConnectionAttempts = 0;
-
 // #73: XNetGetTitleXnAddr
 DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pAddr)
 {
-	static int print = 0;
-
 	if (pAddr)
 	{
-		if (User.GetLocalXNAddr(pAddr))
-		{
-			MasterState = 10;
-			sprintf(ServerStatus, "Master Connection: Connected!");
-			return XNET_GET_XNADDR_STATIC | XNET_GET_XNADDR_ETHERNET;
-		}
+		User.GetLocalXNAddr(pAddr);
 	}
-	
-	if( ConnectionAttempts > 5)
-	{ 
-		MasterState = 2;
-		sprintf(ServerStatus, "Master Connection: This is taking awhile... - Either your login is invalid or your firewall is blocking us.");
-
-		return XNET_GET_XNADDR_STATIC | XNET_GET_XNADDR_ETHERNET;
-	}
-	else 
-	{
-		MasterState = 1;
-		sprintf(ServerStatus, "Master Connection: Connecting... - You will notice an FPS decrease during this.");
-		ConnectionAttempts++;
-	}
-
-	return XNET_GET_XNADDR_PENDING;
+	return XNET_GET_XNADDR_STATIC | XNET_GET_XNADDR_ETHERNET;
+	//return XNET_GET_XNADDR_PENDING;
 }
 
 // #24: XSocketSendTo
 int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr *to, int tolen)
 {
 	short port = (((struct sockaddr_in*)to)->sin_port);
+	//unsigned short normport = ntohs(port);
 	u_long iplong = (((struct sockaddr_in*)to)->sin_addr.s_addr);
 	ADDRESS_FAMILY af = (((struct sockaddr_in*)to)->sin_family);
 
 
 	if (iplong == INADDR_BROADCAST || iplong == 0x00)
 	{
-		(((struct sockaddr_in*)to)->sin_addr.s_addr) = broadcast_server;
-		//((struct sockaddr_in*)to)->sin_port = ntohs(27027);
+		(((struct sockaddr_in*)to)->sin_addr.s_addr) = H2Config_master_ip;
+		((struct sockaddr_in*)to)->sin_port = ntohs(H2Config_master_port_relay);
 		//TRACE("XSocketSendTo - Broadcast");
 
 		return sendto(s, buf, len, flags, to, tolen);
@@ -364,11 +339,11 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 
 		//TRACE("SendStruct.sin_addr.s_addr == %08X", SendStruct.sin_addr.s_addr);
 		
-		if (SendStruct.sin_addr.s_addr == g_lWANIP) 
+		if (SendStruct.sin_addr.s_addr == H2Config_ip_wan)
 		{
-			//TRACE("Matched g_lWANIP:%08X", g_lWANIP);
-			SendStruct.sin_addr.s_addr = g_lLANIP;
-			//TRACE("Replaced send struct s_addr with g_lLANIP: %08X", g_lLANIP);
+			//TRACE("Matched g_lWANIP:%08X", H2Config_ip_wan);
+			SendStruct.sin_addr.s_addr = H2Config_ip_lan;
+			//TRACE("Replaced send struct s_addr with g_lLANIP: %08X", H2Config_ip_lan);
 		}
 
 	int ret = sendto(s, buf, len, flags, (SOCKADDR *) &SendStruct, sizeof(SendStruct));
@@ -398,13 +373,14 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 
 		u_long iplong = (((struct sockaddr_in*)from)->sin_addr.s_addr);
 		short port    =	(((struct sockaddr_in*)from)->sin_port);
+		//unsigned short normport = ntohs(port);
 		
 		std::pair <ULONG, SHORT> hostpair = std::make_pair(iplong,port); 
 
-		if (iplong != broadcast_server)
+		if (iplong != H2Config_master_ip)
 		{
 	
-			if (*(ULONG*)buf == 0x11223341)
+			if (*(ULONG*)buf == annoyance_factor)
 			{
 				User.smap[hostpair] = *(ULONG*)(buf + 4);
 				

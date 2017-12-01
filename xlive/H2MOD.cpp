@@ -20,6 +20,7 @@
 #include "GSUtils.h"
 #include <Mmsystem.h>
 #include "DiscordInterface.h"
+#include "H2Config.h"
 
 
 H2MOD *h2mod = new H2MOD();
@@ -33,27 +34,19 @@ bool b_Infection = false;
 bool b_Halo2Final = false;
 bool b_H2X = false;
 
-extern UINT raw_input;
-extern UINT discord_enable;
 extern bool b_GunGame;
 extern CUserManagement User;
-extern ULONG g_lLANIP;
-extern ULONG g_lWANIP;
-extern UINT g_port;
 extern bool isHost;
 extern HANDLE H2MOD_Network;
 extern bool NetworkActive;
 extern bool Connected;
 extern bool ThreadCreated;
-extern ULONG broadcast_server;
 
 
 SOCKET comm_socket = INVALID_SOCKET;
 char* NetworkData = new char[255];
 
 HMODULE base;
-
-extern int MasterState;
 
 const char* customLobbyMessage = NULL;
 
@@ -646,13 +639,10 @@ void SoundThread(void)
 
 }
 
-void Field_of_View(unsigned int field_of_view, bool save)
+void Field_of_View(int field_of_view, bool save)
 {
 	if (field_of_view > 0 && field_of_view <= 110) {
 
-		if (save) {
-			//save to xlive.ini the fov if $setfov command is used or anything else
-		}
 		const UINT CURRENT_FOV_OFFSET = 4883752;
 
 		float defaultRadians = (float)(70 * 3.14159265f / 180);
@@ -870,15 +860,15 @@ int __cdecl OnMapLoad(int a1)
 	b_H2X = false;
 
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
-	int GameGlobals = (int)*(int*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
+	DWORD GameGlobals = *(DWORD*)((BYTE*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
+	DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
 
-	BYTE* GameState = (BYTE*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
+	BYTE& GameState = *(BYTE*)(((BYTE*)h2mod->GetBase()) + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
 
 
-	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", *GameEngine, variant_name);
+	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", GameEngine, variant_name);
 
-	if (*GameEngine == 2) {
+	if (GameEngine == 2) {
 		if (wcsstr(variant_name, L"zombies") > 0 || wcsstr(variant_name, L"Zombies") > 0 || wcsstr(variant_name, L"Infection") > 0 || wcsstr(variant_name, L"infection") > 0)
 		{
 			TRACE_GAME("[h2mod] Zombies Turned on!");
@@ -908,9 +898,10 @@ int __cdecl OnMapLoad(int a1)
 
 		int offset = 0x47CD54;
 		//TRACE_GAME("[h2mod] Hitfix is being run on Client!");
-		if (h2mod->Server)
+		if (h2mod->Server) {
 			offset = 0x4A29BC;
-		//TRACE_GAME("[h2mod] Hitfix is being run on the Dedicated Server!");
+			//TRACE_GAME("[h2mod] Hitfix is actually being run on the Dedicated Server!");
+		}
 
 		DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + offset);
 
@@ -918,6 +909,7 @@ int __cdecl OnMapLoad(int a1)
 		*(float*)(AddressOffset + 0xA4EC8C) = 800.0f; //battle_rifle_bullet.proj Final Velocity
 		*(float*)(AddressOffset + 0xB7F914) = 4000.0f; //sniper_bullet.proj Initial Velocity
 		*(float*)(AddressOffset + 0xB7F918) = 4000.0f; //sniper_bullet.proj Final Velocity
+		//FIXME COOP will break because of one of these tags not existing.
 		*(float*)(AddressOffset + 0xCE4598) = 4000.0f; //beam_rifle_beam.proj Initial Velocity
 		*(float*)(AddressOffset + 0xCE459C) = 4000.0f; //beam_rifle_beam.proj Final Velocity
 		*(float*)(AddressOffset + 0x81113C) = 200.0f; //gauss_turret.proj Initial Velocity def 90
@@ -932,20 +924,15 @@ int __cdecl OnMapLoad(int a1)
 #pragma region H2V Stuff
 	if (!h2mod->Server)
 	{
-		if (*GameEngine == 2) {
-			DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + 0x47CD54); //this method of changing crosshair position is better
-			*(float*)(AddressOffset + 0x3DC00) = crosshair_offset; //in MP it feels better that the next one, but this doesn't change position in SP
-		}
-		else if (*GameEngine == 1) {
-			DWORD CrosshairY = *(DWORD*)((char*)h2mod->GetBase() + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C; //change only in SP, feels off in MP
-			*(float*)CrosshairY = crosshair_offset;
-		}
-
-		if (*GameEngine == 3) {
-			MasterState = 10;
-		}
-		else {
-			MasterState = 11;
+		if (!FloatIsNaN(H2Config_crosshair_offset)) {
+			if (GameEngine == 2) {
+				DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + 0x47CD54); //this method of changing crosshair position is better
+				*(float*)(AddressOffset + 0x3DC00) = H2Config_crosshair_offset; //in MP it feels better that the next one, but this doesn't change position in SP
+			}
+			else if (GameEngine == 1) {
+				DWORD CrosshairY = *(DWORD*)((char*)h2mod->GetBase() + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C; //change only in SP, feels off in MP
+				*(float*)CrosshairY = H2Config_crosshair_offset;
+			}
 		}
 
 		//Crashfix
@@ -954,7 +941,7 @@ int __cdecl OnMapLoad(int a1)
 		//*(int*)(h2mod->GetBase() + 0x464958) = 0;
 		//*(int*)(h2mod->GetBase() + 0x464964) = 0;
 		
-		if (*GameEngine != 3 && *GameState == 3)
+		if (GameEngine != 3 && GameState == 3)
 		{
 			if (b_Infection)
 				inf->Initialize();
@@ -978,7 +965,7 @@ int __cdecl OnMapLoad(int a1)
 #pragma endregion
 
 #pragma region H2Server Stuff
-		if (*GameEngine != 3 && *GameState == 3)
+		if (GameEngine != 3 && GameState == 3)
 		{
 			if (b_Infection)
 				inf->Initialize();
@@ -1052,10 +1039,10 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 
 	sockaddr_in SendStruct;
 
-	if (host_xn->ina.s_addr != g_lWANIP)
+	if (host_xn->ina.s_addr != H2Config_ip_wan)
 		SendStruct.sin_addr.s_addr = host_xn->ina.s_addr;
 	else
-		SendStruct.sin_addr.s_addr = g_lLANIP;
+		SendStruct.sin_addr.s_addr = H2Config_ip_lan;
 
 	short nPort = (ntohs(host_xn->wPortOnline) + 1);
 
@@ -1095,10 +1082,10 @@ int __cdecl connect_establish_write(void* a1, int a2, int a3)
 	{
 		sockaddr_in SendStruct;
 
-		if (join_game_xn.ina.s_addr != g_lWANIP)
+		if (join_game_xn.ina.s_addr != H2Config_ip_wan)
 			SendStruct.sin_addr.s_addr = join_game_xn.ina.s_addr;
 		else
-			SendStruct.sin_addr.s_addr = g_lLANIP;
+			SendStruct.sin_addr.s_addr = H2Config_ip_lan;
 
 		SendStruct.sin_port = join_game_xn.wPortOnline;
 		SendStruct.sin_family = AF_INET;
@@ -1136,12 +1123,9 @@ void* __stdcall OnWgitLoad(void* thisptr, int a2, int a3, int a4, unsigned short
 
 	//char NotificationPlayerText[20];
 	//sprintf(NotificationPlayerText, "WGIT ID: %d", a2);
+	//addDebugText(NotificationPlayerText);
 	//MessageBoxA(NULL, NotificationPlayerText, "WGITness", MB_OK);
 
-	//Removed the ESRB warning after intro video (only occurs for English Lang).
-	if (wgit == 292) {
-		wgit = -1;
-	}
 	//void* thisptr = 
 	pload_wgit(thisptr, wgit, a3, a4, a5);
 	return thisptr;
@@ -1308,7 +1292,7 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 		}
 
 		SOCKADDR_IN RecvStruct;
-		RecvStruct.sin_port = htons(((short)g_port) + 7);
+		RecvStruct.sin_port = htons(H2Config_base_port + 7);
 		RecvStruct.sin_addr.s_addr = htonl(INADDR_ANY);
 
 		RecvStruct.sin_family = AF_INET;
@@ -1644,12 +1628,12 @@ void H2MOD::Initialize()
 		std::thread SoundT(SoundThread);
 		SoundT.detach();
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
-		Field_of_View(field_of_view, 0);
+		Field_of_View(H2Config_field_of_view, 0);
 		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
 
 		PatchGameDetailsCheck();
 		//PatchPingMeterCheck(true);
-		if (raw_input)
+		if (H2Config_raw_input)
 			mouse->Initialize();
 
 	}
@@ -1662,7 +1646,7 @@ void H2MOD::Initialize()
 
 	if (!h2mod->Server)
 	{
-		if (discord_enable) {
+		if (H2Config_discord_enable) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");
 			DiscordInterface::Init();

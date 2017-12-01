@@ -35,6 +35,7 @@ namespace std
 	};
 }
 
+extern const DWORD annoyance_factor;
 
 class CUserManagement
 {
@@ -43,8 +44,13 @@ public:
 	ULONG GetSecureFromXN(XNADDR *pxna);
 
 	void CreateUser(XNADDR *pxna, BOOL user);
-	void RegisterLocalRequest(char* token);
+	void RegisterLocalRequest(char* token, int a2);
 	void UnregisterSecureAddr(const IN_ADDR ina);
+
+	void UpdateConnectionStatus();
+	BOOL LocalUserLoggedIn();
+	void UnregisterLocal();
+	void ConfigureUser(XNADDR* pxna, ULONGLONG xuid, char* username);
 
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 
