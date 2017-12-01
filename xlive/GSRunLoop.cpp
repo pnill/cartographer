@@ -1,13 +1,14 @@
 #include "GSRunLoop.h"
 #include "H2Startup.h"
+#include "H2Config.h"
 #include "H2OnscreenDebugLog.h"
 #include "GSUtils.h"
-#include "GSMenu.h"
 #include "stdafx.h"
 #include <d3d9.h>
 #include <fstream>
 #include "H2MOD.h"
 #include <winsock.h>
+#include "GSCustomMenu.h"
 extern LPDIRECT3DDEVICE9 pDevice;
 
 bool QuitGSMainLoop = false;
@@ -27,12 +28,10 @@ void setWindowed(int originX, int originY, int width, int height) {
 }
 
 
-int hotkeyIdToggleDebug = VK_F2;
 void hotkeyFuncHideDebug() {
 	setDebugTextDisplay(!getDebugTextDisplay());
 }
 
-int hotkeyIdAlignWindow = VK_F7;
 void hotkeyFuncAlignWindow() {
 	if (H2IsDediServer) {
 		return;
@@ -64,7 +63,6 @@ void hotkeyFuncAlignWindow() {
 	setBorderless(posX, posY, width, height);
 }
 
-int hotkeyIdWindowMode = VK_F8;
 void hotkeyFuncWindowMode() {
 	if (H2IsDediServer) {
 		return;
@@ -114,14 +112,12 @@ void hotkeyFuncWindowMode() {
 	}
 }
 
-int hotkeyIdToggleHideIngameChat = VK_F9;
 void hotkeyFuncToggleHideIngameChat() {
 	if (H2IsDediServer) {
 		return;
 	}
-	extern bool hide_ingame_chat;
-	hide_ingame_chat = !hide_ingame_chat;
-	if (hide_ingame_chat) {
+	H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat;
+	if (H2Config_hide_ingame_chat) {
 		addDebugText("Hiding In-game Chat Menu.");
 	}
 	else {
@@ -129,57 +125,13 @@ void hotkeyFuncToggleHideIngameChat() {
 	}
 }
 
-VOID CallWgit(int WgitScreenfunctionPtr) {
-
-	//int __thiscall WgitScreenInitializer(int this)
-	//signed int __thiscall Load_WgitScreen2(int this, __int16 a2, __int16 a3, int a4, int a5, int a6, signed int a7)
-	//signed int __thiscall Load_WgitScreens(int tempmemaddrPtr, __int16 a2, int a3, int a4, int WgitScreenFuncPtr)
-	//int __thiscall WgitScreenFinaliser(int tempmemaddrPtr)
-	//---------------------------------------- -
-	//	(Ida Function Prototypes)
-	//-------------------------------------- -
-	char* tmp = (char*)malloc(sizeof(char) * 0x20);
-
-	int(__thiscall*WgitInitialize)(void*);
-	WgitInitialize = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B0BC);
-	signed int(__thiscall*WgitLoad)(void*, __int16, int, int, int);
-	WgitLoad = (signed int(__thiscall*)(void*, __int16, int, int, int))((char*)H2BaseAddr + 0x20C226);
-	void*(__thiscall*WgitFinalize)(void*);
-	WgitFinalize = (void*(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B11E);
-	//Now Calling Menus.
-
-	WgitInitialize(tmp);
-	//int ui_type = 3;
-	int ui_type = 1;
-	WgitLoad(tmp, 1, 5, 4, WgitScreenfunctionPtr);
-	void* rtnfnl = WgitFinalize(tmp);
-	/*int a2 = 0x32;
-	char* v9 = (char*)malloc(sizeof(char) * 100);
-	int a5;
-	int a6;
-	int v10;
-	if (rtnfnl)
-	{
-	//int __cdecl sub_132DFB3(signed int a1, int a2, int a3)
-	typedef int(__stdcall *pFuncA)(int a1, int a2, char* a3);
-	pFuncA sub_132DFB3 = (pFuncA)((char*)H2BaseAddr + 0x21DFB3);
-	sub_132DFB3(a2, 0, v9);
-	MessageBoxA(NULL, "fail", "Unknown Failure!", MB_OK);
-	//char __thiscall sub_131D958(void *this, signed int a2, int a3)
-	typedef char(__thiscall *pFuncB)(void* thisptr, int a2, int a3);
-	pFuncB sub_131D958 = (pFuncB)((char*)H2BaseAddr + 0x20D958);
-	sub_131D958(rtnfnl, a2, 0);
-
-	//*(DWORD*)((char*)rtnfnl + 7040) = a5;
-	//*(DWORD*)((char*)rtnfnl + 6756) = a6;
-	//*(BYTE*)((char*)rtnfnl + 6752) = v10;
+void hotkeyFuncGuide() {
+	if (H2IsDediServer) {
+		return;
 	}
-
-	free(v9);*/
-
-	free(tmp);
+	GSCustomMenuCall_Guide();
 }
-int ui_priority = 3;
+
 //VK_ESCAPE
 int hotkeyIdEsc = VK_F4;
 void hotkeyFuncEsc() {
@@ -189,112 +141,107 @@ void hotkeyFuncEsc() {
 	int GameGlobals = (int)*(int*)((char*)H2BaseAddr + 0x482D3C);
 	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
 	if (*GameEngine == 2) {
-		int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x20CDE7);
-
-		char* tmp = (char*)malloc(sizeof(char) * 0x20);
-
-		int(__thiscall*WgitInitialize)(void*);
-		WgitInitialize = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B0BC);
-		signed int(__thiscall*WgitLoad)(void*, __int16, int, int, int);
-		WgitLoad = (signed int(__thiscall*)(void*, __int16, int, int, int))((char*)H2BaseAddr + 0x20C226);
-		void*(__thiscall*WgitFinalize)(void*);
-		WgitFinalize = (void*(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B11E);
-		//Now Calling Menus.
-
-		WgitInitialize(tmp);
-		//int ui_priority = 3;//quit halo 2 level
-		//int ui_priority = 7;//6 >= broken
-		//int ui_priority = 1;
-		WgitLoad(tmp, 1, 1, 4, WgitScreenfunctionPtr);
-		void* rtnfnl = WgitFinalize(tmp);
-
-		free(tmp);
+		//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x20e0c0);//Alt+F4 ingame
 	}
 }
 
-bool IsCustomMenu = false;
+DWORD* get_scenario_global_address() {
+	return (DWORD*)(H2BaseAddr + 0x479e74);
+}
 
+int get_scenario_volume_count() {
+	int volume_count = *(int*)(*get_scenario_global_address() + 0x108);
+	return volume_count;
+}
+
+void kill_volume_disable(int volume_id) {
+	void(__cdecl* kill_volume_disable)(int volume_id);
+	kill_volume_disable = (void(__cdecl*)(int))((char*)H2BaseAddr + 0xb3ab8);
+	kill_volume_disable(volume_id);
+}
+
+void kill_volume_enable(int volume_id) {
+	void(__cdecl* kill_volume_enable)(int volume_id);
+	kill_volume_enable = (void(__cdecl*)(int))((char*)H2BaseAddr + 0xb3a64);
+	kill_volume_enable(volume_id);
+}
+
+
+#include "CUser.h"
 int hotkeyIdTest = VK_F5;
 void hotkeyFuncTest() {
-	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x20E032);//H2BetaErrorOk
-	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0xE757);//PCR
-	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x20E0C0);//ok cancel?
-	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x24F819);
 
-	//Works the same way.
-	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x2593CB);//Game Volume Ingame
-	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x2274EE);//Game Volume MM
-
-	//Works the same way.
-	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x24925C);//Game Brightness MM
-	//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x258C8C);//Game Brightness ingame
-
-	int* MenuID = (int*)((char*)H2BaseAddr + 0x9758D8);
-
-	if (*MenuID != 272) {
-		int WgitScreenfunctionPtr = (int)(MenuGameBrightnessIngame);
-		CallWgit(WgitScreenfunctionPtr);
+	for (int i = 0; i < get_scenario_volume_count(); i++) {
+		kill_volume_disable(i);
 	}
+	char moaartexxt[300];
+	sprintf(moaartexxt, "Number of Volumes Disabled: %d", get_scenario_volume_count());
+	addDebugText(moaartexxt);
+	
+	return;
 
-	//ui_priority += 1;
-
-
-	/*char(*PlayerEffects)();
-	PlayerEffects = (char(*)(void))((char*)H2BaseAddr + 0xA3E39);
-	PlayerEffects();*/
-
-	//addDebugText("NOP'd");
-	//BYTE HostClientCheckNOP[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-	//WriteBytesASM(H2BaseAddr + 0x96C32, HostClientCheckNOP, 6);
+	extern CUserManagement User;
+	if (User.LocalUserLoggedIn()) {
+		User.UnregisterLocal();
+	}
+	else {
+		char H2Config_login_token[33] = { "" };
+		addDebugText("keypress send");
+		User.RegisterLocalRequest(H2Config_login_token, 0);
+		Sleep(2000);
+		addDebugText("get");
+		User.RegisterLocalRequest(H2Config_login_token, 1);
+	}
 }
+
 
 int hotkeyIdTest2 = VK_F6;
 void hotkeyFuncTest2() {
-	//int a3 = 0;
-	//signed int(__cdecl* sub_603D0E)(signed int* a1);
-	//sub_603D0E = (signed int(__cdecl*)(signed int*))((char*)H2BaseAddr + 0x263D0E);
-	//sub_603D0E(&a3);
+	addDebugText("unconfused");
 
-	//int WgitScreenfunctionPtr = (int)(MenuGameVolumeIngame);
-	//int WgitScreenfunctionPtr = (int)(MenuGameResolutionMM);
-	//CallWgit(WgitScreenfunctionPtr);
+	//0 - Go to main menu root.
+	//1 - Activate Product to continue playing diag.
+	//2 - opens main menu wgit (6) - (doesn't render when ingame).
+	//3 - Post Game Carnage Report (crashes when ingame)
+	//5 - Post Game Carnage Report (crashes when ingame)
+	//6 - Post Game Carnage Report (crashes when ingame)
+	//7 - Post Game Carnage Report (crashes when ingame)
+	//8 - Log User Out (crashes when ingame)
+	//9 - ESRB Warning
+	//  - 0x9100
+	void(__cdecl* sub_20CE70)(signed int) = (void(__cdecl*)(int))((char*)H2BaseAddr + 0x20CE70);
+	sub_20CE70(1);
+	return;
 
-	//addDebugText("Restored");
-	//BYTE HostClientCheckOrig[] = { 0x0F, 0x85, 0xBA, 0x01, 0x00, 0x00 };
-	//WriteBytesASM(H2BaseAddr + 0x96C32, HostClientCheckOrig, 6);
-
-	//addDebugText("Jumped");
-	//BYTE HostClientCheckJMP[] = { 0xE9, 0xBB, 0x01, 0x00, 0x00, 0x90 };
-	//WriteBytesASM(H2BaseAddr + 0x96C32, HostClientCheckJMP, 6);
-
-	//extern void GSSecSweetLeetHaxA(int);
-	//GSSecSweetLeetHaxA(1);
-
+	extern int keyHandler_itr;
+	keyHandler_itr++;
+	char NotificationPlayerText2[30];
+	snprintf(NotificationPlayerText2, 30, "keyHandler_itr: %d", keyHandler_itr);
+	addDebugText(NotificationPlayerText2);
 }
 
-int hotkeyIdHelp = VK_F3;
 void hotkeyFuncHelp() {
 	addDebugText("------------------------------");
 	addDebugText("Options:");
 	char tempTextEntry[255];
 	char hotkeyname[20];
-	GetVKeyCodeString(hotkeyIdToggleDebug, hotkeyname, 20);
+	GetVKeyCodeString(H2Config_hotkeyIdToggleDebug, hotkeyname, 20);
 	PadCStringWithChar(hotkeyname, 20, ' ');
 	snprintf(tempTextEntry, 255, "%s- Toggle hiding this text display.", hotkeyname);
 	addDebugText(tempTextEntry);
-	GetVKeyCodeString(hotkeyIdHelp, hotkeyname, 20);
+	GetVKeyCodeString(H2Config_hotkeyIdHelp, hotkeyname, 20);
 	PadCStringWithChar(hotkeyname, 20, ' ');
 	snprintf(tempTextEntry, 255, "%s- Print and show this help text.", hotkeyname);
 	addDebugText(tempTextEntry);
-	GetVKeyCodeString(hotkeyIdAlignWindow, hotkeyname, 20);
+	GetVKeyCodeString(H2Config_hotkeyIdAlignWindow, hotkeyname, 20);
 	PadCStringWithChar(hotkeyname, 20, ' ');
 	snprintf(tempTextEntry, 255, "%s- Align/Correct window positioning (into Borderless).", hotkeyname);
 	addDebugText(tempTextEntry);
-	GetVKeyCodeString(hotkeyIdWindowMode, hotkeyname, 20);
+	GetVKeyCodeString(H2Config_hotkeyIdWindowMode, hotkeyname, 20);
 	PadCStringWithChar(hotkeyname, 20, ' ');
 	snprintf(tempTextEntry, 255, "%s- Toggle Windowed/Borderless mode.", hotkeyname);
 	addDebugText(tempTextEntry);
-	GetVKeyCodeString(hotkeyIdToggleHideIngameChat, hotkeyname, 20);
+	GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat, hotkeyname, 20);
 	PadCStringWithChar(hotkeyname, 20, ' ');
 	snprintf(tempTextEntry, 255, "%s- Toggles hiding the in-game chat menu.", hotkeyname);
 	addDebugText(tempTextEntry);
@@ -307,12 +254,12 @@ void hotkeyFuncHelp() {
 	setDebugTextDisplay(true);
 }
 
-const int hotkeyLen = 8;
-//GSFIXME: Set only completed 5
-int hotkeyListenLen = 5;
-int* hotkeyId[hotkeyLen] = { &hotkeyIdHelp, &hotkeyIdToggleDebug, &hotkeyIdAlignWindow, &hotkeyIdWindowMode, &hotkeyIdToggleHideIngameChat, &hotkeyIdTest, &hotkeyIdTest2, &hotkeyIdEsc };
-bool hotkeyPressed[hotkeyLen] = { false, false, false, false, false, false, false, false };
-void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotkeyFuncAlignWindow, hotkeyFuncWindowMode, hotkeyFuncToggleHideIngameChat, hotkeyFuncTest, hotkeyFuncTest2, hotkeyFuncEsc };
+const int hotkeyLen = 9;
+//GSFIXME: Set only completed 5/6
+int hotkeyListenLen = 7;
+int* hotkeyId[hotkeyLen] = { &H2Config_hotkeyIdHelp, &H2Config_hotkeyIdToggleDebug, &H2Config_hotkeyIdAlignWindow, &H2Config_hotkeyIdWindowMode, &H2Config_hotkeyIdToggleHideIngameChat, &H2Config_hotkeyIdGuide, &hotkeyIdTest, &hotkeyIdTest2, &hotkeyIdEsc };
+bool hotkeyPressed[hotkeyLen] = { false, false, false, false, false, false, false, false, false };
+void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotkeyFuncAlignWindow, hotkeyFuncWindowMode, hotkeyFuncToggleHideIngameChat, hotkeyFuncGuide, hotkeyFuncTest, hotkeyFuncTest2, hotkeyFuncEsc };
 
 int prevPartyPrivacy = 0;
 
@@ -336,11 +283,11 @@ void GSMainLoop() {
 		//	SetWindowPos(H2hWnd, NULL, 0, 0, 500, 500, SWP_NOMOVE | SWP_FRAMECHANGED);
 		//	SetWindowPos(H2hWnd, NULL, 0, 0, custom_resolution_x, custom_resolution_y, SWP_NOMOVE | SWP_FRAMECHANGED);// SWP_FRAMECHANGED |  | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
 		//}
-		if (getPlayerNumber() > 1) {
+		if (H2GetInstanceId() > 1) {
 			wchar_t titleOriginal[200];
 			wchar_t titleMod[200];
 			GetWindowText(H2hWnd, titleOriginal, 200);
-			wsprintf(titleMod, L"%ls (P%d)", titleOriginal, getPlayerNumber());
+			wsprintf(titleMod, L"%ls (P%d)", titleOriginal, H2GetInstanceId());
 			SetWindowText(H2hWnd, titleMod);
 		}
 	}
@@ -348,8 +295,8 @@ void GSMainLoop() {
 		halo2ServerOnce1 = true;
 		pushHostLobby();
 		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
-		if (wcslen(dedi_server_name) > 0) {
-			swprintf(LanServerName, 32, dedi_server_name);
+		if (strlen(H2Config_dedi_server_name) > 0) {
+			swprintf(LanServerName, 32, L"%hs", H2Config_dedi_server_name);
 		}
 	}
 
@@ -396,19 +343,30 @@ static char HookedServerShutdownCheck() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 	
-	BYTE* Quit_Exit_Game = (BYTE*)((char*)H2BaseAddr + 0x4a7083);
+	BYTE& Quit_Exit_Game = *(BYTE*)((char*)H2BaseAddr + 0x4a7083);
+
+	if (Quit_Exit_Game) {
+		DeinitH2Startup();
+	}
+
 	//original test - if game should shutdown
-	return *Quit_Exit_Game;
+	return Quit_Exit_Game;
 }
 
 void initGSRunLoop() {
 	addDebugText("Pre GSRunLoop Hooking.");
 	if (H2IsDediServer) {
+		addDebugText("Hooking Loop & Shutdown Function");
 		PatchCall(H2BaseAddr + 0xc6cb, (DWORD)HookedServerShutdownCheck);
 	}
 	else {
+		addDebugText("Hooking Loop Function");
 		sub_287a1 = (signed int(*)())((char*)H2BaseAddr + 0x287a1);
 		PatchCall(H2BaseAddr + 0x399f3, (DWORD)HookedClientRandFunc);
 	}
 	addDebugText("Post GSRunLoop Hooking.");
+}
+
+void deinitGSRunLoop() {
+
 }

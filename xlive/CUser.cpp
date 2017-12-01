@@ -3,15 +3,13 @@
 #include "packet.pb.h"
 #include <time.h>
 #include <sstream>
+#include "H2Config.h"
+#include "H2OnscreenDebugLog.h"
+#include "H2Startup.h"
 
-extern ULONG broadcast_server;
 extern SOCKET boundsock;
-extern char g_szToken[32];
 extern CHAR g_szUserName[4][16 + 1];
 extern XUID xFakeXuid[4];
-extern UINT g_port;
-extern ULONG g_lWANIP;
-extern ULONG g_lLANIP;
 
 
 CUser Users[16];
@@ -28,11 +26,9 @@ ULONG CUserManagement::GetSecureFromXN(XNADDR* pxna)
 	ULONG secure;
 	sockaddr_in RecvAddr;
 
-	unsigned short port = 27020;
-
 	RecvAddr.sin_family = AF_INET;
-	RecvAddr.sin_port = htons(port);
-	RecvAddr.sin_addr.s_addr = broadcast_server;
+	RecvAddr.sin_port = htons(H2Config_master_port_login);
+	RecvAddr.sin_addr.s_addr = H2Config_master_ip;
 
 	char RecvBuf[2048];
 	int RecvResult;
@@ -179,10 +175,10 @@ void CUserManagement::CreateUser(XNADDR* pxna, BOOL user)
 		//std::pair <ULONG, SHORT> hostpair_1000 = std::make_pair(pxna->ina.s_addr, htons(1000)); // FIX ME ^
 
 
-		if (g_lWANIP == pxna->ina.s_addr)
+		if (H2Config_ip_wan == pxna->ina.s_addr)
 		{
-			std::pair <ULONG, SHORT> hostpair_or = std::make_pair(g_lLANIP, nPort_join);
-			std::pair <ULONG, SHORT> hostpair_1000_or = std::make_pair(g_lLANIP, nPort_base);
+			std::pair <ULONG, SHORT> hostpair_or = std::make_pair(H2Config_ip_lan, nPort_join);
+			std::pair <ULONG, SHORT> hostpair_1000_or = std::make_pair(H2Config_ip_lan, nPort_base);
 
 			this->smap[hostpair_or] = secure;
 			this->smap[hostpair_1000_or] = secure;
@@ -222,11 +218,9 @@ ULONG CUserManagement::GetXNFromSecure(ULONG secure)
 	u_long xnaddress;
 	sockaddr_in RecvAddr;
 
-	unsigned short port = 27020;
-
 	RecvAddr.sin_family = AF_INET;
-	RecvAddr.sin_port = htons(port);
-	RecvAddr.sin_addr.s_addr = broadcast_server;
+	RecvAddr.sin_port = htons(H2Config_master_port_login);
+	RecvAddr.sin_addr.s_addr = H2Config_master_ip;
 
 	char RecvBuf[2048];
 	int RecvResult;
@@ -373,107 +367,73 @@ void CUserManagement::UnregisterSecureAddr(const IN_ADDR ina)
 }
 
 
-void CUserManagement::RegisterLocalRequest(char* token)
-{
-	//TRACE("CUserManagement::RegisterLocalRequest(%ws)", token);
-	//TRACE("CUserManagement::RegisterLocalRequest(%s,%s)", email,password);
-	sockaddr_in RecvAddr;
-
-	unsigned short port = 27020;
-
-	RecvAddr.sin_family = AF_INET;
-	RecvAddr.sin_port = htons(port);
-	RecvAddr.sin_addr.s_addr = broadcast_server;
-
-	char RecvBuf[2048];
-	int RecvResult;
-
-	DWORD dwTime = 20;
-
-
-	sockaddr_in SenderAddr;
-	int SenderAddrSize = sizeof(SenderAddr);
-
-	if (setsockopt(boundsock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&dwTime, sizeof(dwTime)) < 0)
-	{
-		TRACE("Socket Error on register request");
+void CUserManagement::UpdateConnectionStatus() {
+	extern int MasterState;
+	extern char* ServerStatus;
+	if (this->LocalUserLoggedIn()) {
+		MasterState = 10;
+		if (!H2IsDediServer)
+			snprintf(ServerStatus, 250, "Status: Online");
 	}
-
-	Packet lrequest;
-	lrequest.set_type(Packet_Type_login_request);
-
-	login_request *ldata = lrequest.mutable_lrequest();
-	ldata->set_login_token(token);
-	ldata->set_port(g_port);
-
-	char *lreq = new char[lrequest.ByteSize()];
-
-	lrequest.SerializeToArray(lreq, lrequest.ByteSize());
-
-	sendto(boundsock, lreq, lrequest.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
-
-	RecvResult = recvfrom(boundsock, RecvBuf, 2048, 0, (SOCKADDR*)&SenderAddr, &SenderAddrSize);
-
-	if (RecvResult > 0)
+	else
 	{
-		Packet RecvPak;
-		RecvPak.ParseFromArray(RecvBuf, RecvResult);
-
-		if (RecvPak.has_lreply())
-		{
-			TRACE("GetLocalRegistration() - Reading lreply data");
-
-			memset(&Users[0].pxna, 0x00, sizeof(XNADDR));
-			this->SecurityPacket = new char[8+sizeof(XNADDR)];
-
-			ULONG secured_addr = RecvPak.lreply().secure_addr();
-			ULONG _xnaddr = RecvPak.lreply().xnaddr();
-
-			(*(DWORD*)&this->SecurityPacket[0]) = 0x11223341;
-			(*(DWORD*)&this->SecurityPacket[4]) = secured_addr;
-
-			SecurityPacket = this->SecurityPacket;
-
-			Users[0].pina.s_addr = secured_addr;
-			Users[0].pxna.ina.s_addr = _xnaddr;
-			Users[0].pxna.inaOnline.s_addr = secured_addr;
-			Users[0].pxna.wPortOnline = htons((short)RecvPak.lreply().port());
-
-			TRACE("Users[0].pxna.wPortOnline: %i",ntohs(Users[0].pxna.wPortOnline));
-
-			//Users[0].pxna.wPortOnline = 0x0000;
-
-			xFakeXuid[0] = RecvPak.lreply().xuid();
-
-			memcpy(&Users[0].pxna.abEnet, RecvPak.lreply().abenet().c_str(), 6);
-			memcpy(&Users[0].pxna.abOnline, RecvPak.lreply().abonline().c_str(), 20);
-			memset(g_szUserName[0], 0x00, sizeof(g_szUserName[0]));
-
-			memcpy(g_szUserName[0], RecvPak.lreply().username().c_str(), RecvPak.lreply().username().size());
-			
-			g_szUserName[0][RecvPak.lreply().username().size()] = 0x00;
-
-			LocalXN = &Users[0].pxna;
-			LocalSec = secured_addr;
-
-			memcpy(&SecurityPacket[8], &Users[0].pxna, sizeof(XNADDR));
-			Users[0].bValid = true;
-
-			
-		}
-
-		RecvPak.Clear();
+		MasterState = 2;
+		if (!H2IsDediServer)
+			snprintf(ServerStatus, 250, "Status: Offline");
 	}
-
-	ldata->Clear();
-	lrequest.Clear();
-
-	delete[] lreq;
-	
-	Sleep(2000);
-
 }
 
+BOOL CUserManagement::LocalUserLoggedIn() {
+	return Users[0].bValid;
+}
+
+void CUserManagement::UnregisterLocal()
+{
+	if (!Users[0].bValid)
+		return;
+
+	delete[] this->SecurityPacket;
+	Users[0].bValid = false;
+	this->UpdateConnectionStatus();
+}
+
+const DWORD annoyance_factor = 0x11223341;
+
+void CUserManagement::ConfigureUser(XNADDR* pxna, ULONGLONG xuid, char* username) {
+	if (Users[0].bValid) {
+		delete[] this->SecurityPacket;
+		Users[0].bValid = false;
+	}
+
+	memcpy(&Users[0].pxna, pxna, sizeof(XNADDR));
+
+	this->SecurityPacket = new char[8 + sizeof(XNADDR)];
+	(*(DWORD*)&this->SecurityPacket[0]) = annoyance_factor;
+	(*(DWORD*)&this->SecurityPacket[4]) = pxna->inaOnline.s_addr;
+
+	SecurityPacket = this->SecurityPacket;
+
+	Users[0].pina.s_addr = pxna->inaOnline.s_addr;
+
+	xFakeXuid[0] = xuid;
+
+	memcpy(&SecurityPacket[8], &Users[0].pxna, sizeof(XNADDR));
+
+
+	LocalXN = &Users[0].pxna;
+	LocalSec = pxna->inaOnline.s_addr;
+
+	snprintf(g_szUserName[0], 17, username);
+	if (!H2IsDediServer) {
+		snprintf((char*)((BYTE*)H2BaseAddr + 0x971316), 17, username);
+		swprintf((wchar_t*)((BYTE*)H2BaseAddr + 0x96DA94), 17, L"%s", username);
+		swprintf((wchar_t*)((BYTE*)H2BaseAddr + 0x51A638), 17, L"%s", username);
+	}
+
+	Users[0].bValid = true;
+
+	this->UpdateConnectionStatus();
+}
 
 BOOL CUserManagement::GetLocalXNAddr(XNADDR* pxna)
 {
@@ -483,9 +443,113 @@ BOOL CUserManagement::GetLocalXNAddr(XNADDR* pxna)
 		TRACE("GetLocalXNAddr: Returned");
 		return TRUE;
 	}
-
-	TRACE("GetLocalXNADDR: User data not populated yet calling LocalRegister()");
-	this->RegisterLocalRequest(g_szToken);
+	TRACE("GetLocalXNADDR: User data not populated yet.");
+	//TRACE("GetLocalXNADDR: User data not populated yet calling LocalRegister()");
+	//this->RegisterLocalRequest(H2Config_login_token);
+	//Sleep(3000);
 
 	return FALSE;
+}
+
+
+
+
+void CUserManagement::RegisterLocalRequest(char* token, int a2)
+{
+	if (Users[0].bValid)
+		return;
+
+	addDebugText("next0");
+
+	u_long xnaddress;
+	sockaddr_in RecvAddr;
+
+	RecvAddr.sin_family = AF_INET;
+	RecvAddr.sin_port = htons(H2Config_master_port_login);
+	RecvAddr.sin_addr.s_addr = H2Config_master_ip;
+
+	char RecvBuf[2048];
+	int RecvResult;
+
+	sockaddr_in SenderAddr;
+	int SenderAddrSize = sizeof(SenderAddr);
+
+	//DWORD dwTime = 20;
+
+	struct timeval tv;
+	tv.tv_sec = 2;
+	tv.tv_usec = 0;
+	if (setsockopt(boundsock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv)) < 0) {
+	//if (setsockopt(boundsock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&dwTime, sizeof(dwTime)) < 0) {
+		TRACE("Socket Error on register request");
+	}
+
+	Packet lrequest;
+	lrequest.set_type(Packet_Type_login_request);
+
+	login_request *ldata = lrequest.mutable_lrequest();
+	ldata->set_login_token(token);
+	ldata->set_port(H2Config_base_port);
+
+	char *lreq = new char[lrequest.ByteSize()];
+
+	lrequest.SerializeToArray(lreq, lrequest.ByteSize());
+
+	if (!a2)
+		sendto(boundsock, lreq, lrequest.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
+	else {
+		RecvResult = recvfrom(boundsock, RecvBuf, 2048, 0, (SOCKADDR*)&SenderAddr, &SenderAddrSize);
+
+		if (RecvResult > 0)
+		{
+			addDebugText("network reply");
+
+			Packet RecvPak;
+			RecvPak.ParseFromArray(RecvBuf, RecvResult);
+
+			if (RecvPak.has_lreply())
+			{
+				TRACE("GetLocalRegistration() - Reading lreply data");
+
+				char* login_token;
+				ULONGLONG xuid = RecvPak.lreply().xuid();
+				unsigned long saddr = RecvPak.lreply().secure_addr();
+				unsigned long xnaddr = RecvPak.lreply().xnaddr();
+				char abEnet[13] = { "" };
+				char abOnline[41] = { "" };
+				snprintf(abEnet, 13, RecvPak.lreply().abenet().c_str());
+				snprintf(abOnline, 41, RecvPak.lreply().abonline().c_str());
+
+				XNADDR pxna;
+
+				pxna.inaOnline.s_addr = saddr;
+				pxna.ina.s_addr = xnaddr;
+				pxna.wPortOnline = htons((short)H2Config_base_port);
+				memcpy(&pxna.abEnet, abEnet, 6);
+				memcpy(&pxna.abOnline, abOnline, 20);
+
+				extern CUserManagement User;
+				User.ConfigureUser(&pxna, xuid, g_szUserName[0]);
+
+
+				//*(__int64*)((BYTE*)H2BaseAddr + 0x96C860) = RecvPak.lreply().xuid();
+
+				int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
+				sub_209236(0);
+
+
+				Users[0].bValid = true;
+
+				this->UpdateConnectionStatus();
+			}
+
+			RecvPak.Clear();
+		}
+	}
+
+	ldata->Clear();
+	lrequest.Clear();
+
+	delete[] lreq;
+
 }

@@ -1,16 +1,14 @@
 #pragma once
 #include "stdafx.h"
 
-void ProcessH2Startup();
-int getPlayerNumber();
+void InitH2Startup();
+void InitH2Startup2();
+void DeinitH2Startup();
+int H2GetInstanceId();
 
 extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;
-extern wchar_t* processFilePath;
+extern wchar_t* H2ProcessFilePath;
+extern wchar_t* H2AppDataLocal;
+extern wchar_t* FlagFilePathConfig;
 extern HWND H2hWnd;
-extern int custom_resolution_x;
-extern int custom_resolution_y;
-
-extern HWND H2hWnd;
-extern wchar_t dedi_server_name[];
-extern wchar_t dedi_server_playlist[];

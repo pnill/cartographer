@@ -14,6 +14,7 @@
 #include "H2MOD_MapManager.h"
 #include "H2OnscreenDebugLog.h"
 #include "H2ConsoleCommands.h"
+#include "H2Config.h"
 
 extern ConsoleCommands* commands;
 
@@ -131,7 +132,7 @@ HRESULT hkPresent(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT
 
 void GUI::Initialize()
 {
-	desiredRenderTime = (1000.f / fps_limit);
+	desiredRenderTime = (1000.f / H2Config_fps_limit);
 	initFontsIfRequired();
 }
 
@@ -157,34 +158,34 @@ int WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 // #5000: XLiveInitialize
 int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 {
-	InitInstance();
-	TRACE("XLiveInitialize()");
-	lastRenderTime = 0.0f;
-	QueryPerformanceFrequency(&timerFreq);
-	QueryPerformanceCounter(&counterAtStart);
+		InitInstance();
+		TRACE("XLiveInitialize()");
+		lastRenderTime = 0.0f;
+		QueryPerformanceFrequency(&timerFreq);
+		QueryPerformanceCounter(&counterAtStart);
 
-	if (!h2mod->Server)
-	{
-		//TRACE("XLiveInitialize  (pPii = %X)", pPii);
-		pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
-		pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
+		if (!h2mod->Server)
+		{
+			//TRACE("XLiveInitialize  (pPii = %X)", pPii);
+			pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
+			pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
 
-		//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice + 17);
-		//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
+			//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice + 17);
+			//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
 
-		//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
+			//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
 
-		BuildText = new char[250];
-		sprintf(BuildText, "Project Cartographer (v0.2.3.1) - Build Time: %s %s", CompileDate, CompileTime);
-
-		GUI::Initialize();
-	}
-
+			BuildText = new char[250];
+			snprintf(BuildText, 250, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
+	
+			GUI::Initialize();
+		}
+		
 #if 0
 	while (1)
 		Sleep(1);
 #endif
-
+	
 	return 0;
 }
 
@@ -299,51 +300,24 @@ void drawPrimitiveRect(int x, int y, int w, int h, D3DCOLOR color) {
 
 	LPDIRECT3DSTATEBLOCK9 pStateBlock = NULL;
 	pDevice->CreateStateBlock(D3DSBT_ALL, &pStateBlock);
-	DWORD oldxvf = NULL;
 	pStateBlock->Capture();
-	pDevice->GetFVF(&oldxvf);
-	pDevice->SetTexture(0, NULL);
+	pDevice->SetTexture(0, Primitive);
 	pDevice->SetPixelShader(NULL);
 	pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+	//pDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
-	//pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertexList, sizeof(CVertexList));  	
+	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertexList, sizeof(CVertexList));
 
 	pStateBlock->Apply();
 	pStateBlock->Release();
 
-	if (oldxvf != NULL) {
-		pDevice->SetFVF(oldxvf);
-	}
 }
 
 IDirect3DVertexBuffer9* g_pVB = NULL;
 IDirect3DIndexBuffer9* g_pIB = NULL;
-
-HRESULT GenerateTexture(IDirect3DDevice9 *pD3Ddev, IDirect3DTexture9 **ppD3Dtex, DWORD colour32)
-{
-	if (FAILED(pD3Ddev->CreateTexture(8, 8, 1, 0, D3DFMT_A4R4G4B4, D3DPOOL_MANAGED, ppD3Dtex, NULL)))
-		return E_FAIL;
-
-	WORD colour16 = ((WORD)((colour32 >> 28) & 0xF) << 12)
-		| (WORD)(((colour32 >> 20) & 0xF) << 8)
-		| (WORD)(((colour32 >> 12) & 0xF) << 4)
-		| (WORD)(((colour32 >> 4) & 0xF) << 0);
-
-	D3DLOCKED_RECT d3dlr;
-	(*ppD3Dtex)->LockRect(0, &d3dlr, 0, 0);
-	WORD *pDst16 = (WORD*)d3dlr.pBits;
-
-	for (int xy = 0; xy < 8 * 8; xy++)
-		*pDst16++ = colour16;
-
-	(*ppD3Dtex)->UnlockRect(0);
-
-	return S_OK;
-}
 
 void DrawRect(IDirect3DDevice9* pDevice, float x, float y, float w, float h, D3DCOLOR Color)
 {
@@ -360,7 +334,6 @@ void DrawRect(IDirect3DDevice9* pDevice, float x, float y, float w, float h, D3D
 		{ (float)(x + w), (float)y , 0.0f, 1.0f, Color }
 	};
 	const DWORD D3DFVF_TL = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1;
-	GenerateTexture(pDevice, &Primitive, D3DCOLOR_ARGB(125, 000, 000, 000));
 	pDevice->SetFVF(D3DFVF_TL);
 	pDevice->SetTexture(0, Primitive);
 	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, qV, sizeof(vertex));
@@ -459,6 +432,7 @@ void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont)
 	pFont->DrawTextA(NULL, text, -1, &rect, DT_LEFT | DT_NOCLIP, color);
 }
 
+
 // #5002: XLiveRender
 int WINAPI XLiveRender()
 {
@@ -489,7 +463,7 @@ int WINAPI XLiveRender()
 				int x = 0, y = 0;
 				int height = 400;
 				int startingPosY = height - 15;
-				DrawRect(pDevice, x, y, gameWindowWidth, height, D3DCOLOR_ARGB(125, 000, 000, 000));
+				drawPrimitiveRect(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				//drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				drawText(0, startingPosY, COLOR_WHITE, ">>>>", normalSizeFont);
 				drawText(55, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
@@ -502,16 +476,20 @@ int WINAPI XLiveRender()
 					drawText(0, startingPosY, COLOR_WHITE, (*it).c_str(), normalSizeFont);
 				}
 			}
-			if (MasterState != 11)
+			DWORD GameGlobals = *(DWORD*)((BYTE*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
+			DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
+			if (GameEngine == 3) {
 				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
-			if (MasterState == 0)
-				drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
-			else if (MasterState == 1)
-				drawText(0, 15, COLOR_GREY, ServerStatus, smallFont);
-			else if (MasterState == 2)
-				drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
-			else if (MasterState == 10)
-				drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
+				if (MasterState == 0)
+					drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
+				else if (MasterState == 1)
+					drawText(0, 15, COLOR_GREY, ServerStatus, smallFont);
+				else if (MasterState == 2)
+					drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
+				else if (MasterState == 10)
+					drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
+			}
+
 
 			/* TODO: turn on again after converting map downloading to use lib curl
 			if (overrideUnicodeMessage && getCustomLobbyMessage() != NULL) {
@@ -532,7 +510,7 @@ int WINAPI XLiveRender()
 			}
 		}
 
-		if (fps_enable) {
+		if (H2Config_fps_limit > 0) {
 			frameTimeManagement();
 		}
 	}
