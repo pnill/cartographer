@@ -14,6 +14,7 @@
 #include "H2MOD_MapManager.h"
 #include "H2OnscreenDebugLog.h"
 #include "H2ConsoleCommands.h"
+#include "H2Config.h"
 
 extern ConsoleCommands* commands;
 
@@ -131,7 +132,7 @@ HRESULT hkPresent(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT
 
 void GUI::Initialize()
 {
-	desiredRenderTime = (1000.f / fps_limit);
+	desiredRenderTime = (1000.f / H2Config_fps_limit);
 	initFontsIfRequired();
 }
 
@@ -157,34 +158,34 @@ int WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 // #5000: XLiveInitialize
 int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 {
-	InitInstance();
-	TRACE("XLiveInitialize()");
-	lastRenderTime = 0.0f;
-	QueryPerformanceFrequency(&timerFreq);
-	QueryPerformanceCounter(&counterAtStart);
+		InitInstance();
+		TRACE("XLiveInitialize()");
+		lastRenderTime = 0.0f;
+		QueryPerformanceFrequency(&timerFreq);
+		QueryPerformanceCounter(&counterAtStart);
 
-	if (!h2mod->Server)
-	{
-		//TRACE("XLiveInitialize  (pPii = %X)", pPii);
-		pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
-		pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
+		if (!h2mod->Server)
+		{
+			//TRACE("XLiveInitialize  (pPii = %X)", pPii);
+			pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
+			pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
 
-		//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice + 17);
-		//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
+			//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice + 17);
+			//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
 
-		//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
+			//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
 
-		BuildText = new char[250];
-		sprintf(BuildText, "Project Cartographer (v0.2.3.1) - Build Time: %s %s", CompileDate, CompileTime);
-
-		GUI::Initialize();
-	}
-
+			BuildText = new char[250];
+			snprintf(BuildText, 250, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
+	
+			GUI::Initialize();
+		}
+		
 #if 0
 	while (1)
 		Sleep(1);
 #endif
-
+	
 	return 0;
 }
 
@@ -459,6 +460,7 @@ void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont)
 	pFont->DrawTextA(NULL, text, -1, &rect, DT_LEFT | DT_NOCLIP, color);
 }
 
+
 // #5002: XLiveRender
 int WINAPI XLiveRender()
 {
@@ -502,16 +504,20 @@ int WINAPI XLiveRender()
 					drawText(0, startingPosY, COLOR_WHITE, (*it).c_str(), normalSizeFont);
 				}
 			}
-			if (MasterState != 11)
+			DWORD GameGlobals = *(DWORD*)((BYTE*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
+			DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
+			if (GameEngine == 3) {
 				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
-			if (MasterState == 0)
-				drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
-			else if (MasterState == 1)
-				drawText(0, 15, COLOR_GREY, ServerStatus, smallFont);
-			else if (MasterState == 2)
-				drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
-			else if (MasterState == 10)
-				drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
+				if (MasterState == 0)
+					drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
+				else if (MasterState == 1)
+					drawText(0, 15, COLOR_GREY, ServerStatus, smallFont);
+				else if (MasterState == 2)
+					drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
+				else if (MasterState == 10)
+					drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
+			}
+
 
 			/* TODO: turn on again after converting map downloading to use lib curl
 			if (overrideUnicodeMessage && getCustomLobbyMessage() != NULL) {
@@ -532,7 +538,7 @@ int WINAPI XLiveRender()
 			}
 		}
 
-		if (fps_enable) {
+		if (H2Config_fps_limit > 0) {
 			frameTimeManagement();
 		}
 	}

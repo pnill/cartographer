@@ -99,18 +99,6 @@
     <ClCompile Include="H2MOD_Halo2Final.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GSRunLoop.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="GSUtils.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="H2Startup.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="H2OnscreenDebugLog.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
     <ClCompile Include="H2ConsoleCommands.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
@@ -122,6 +110,39 @@
     </ClCompile>
     <ClCompile Include="H2MOD_Mouseinput.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GSAccountCreate.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="GSAccountLogin.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="GSCustomLanguage.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="GSCustomMenu.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="GSRunLoop.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="GSUtils.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="H2OnscreenDebugLog.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Startup.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Tweaks.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Accounts.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Config.cpp">
+      <Filter>Source Files\GlitchyScripts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -182,24 +203,6 @@
     <ClInclude Include="H2MOD_Halo2Final.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="H2Startup.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="H2OnscreenDebugLog.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="GSUtils.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="GSRunLoop.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="GSMenu.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="GSSecurity.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
     <ClInclude Include="discord-rpc.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
@@ -214,6 +217,39 @@
     </ClInclude>
     <ClInclude Include="H2MOD_Mouseinput.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GSAccountCreate.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="GSAccountLogin.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="GSCustomLanguage.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="GSCustomMenu.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="GSRunLoop.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="GSUtils.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="H2OnscreenDebugLog.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Startup.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Tweaks.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Accounts.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Config.h">
+      <Filter>Source Files\GlitchyScripts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
