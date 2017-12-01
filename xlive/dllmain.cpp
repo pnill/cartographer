@@ -9,6 +9,7 @@
 #include "H2OnscreenDebugLog.h"
 #include "GSRunLoop.h"
 #include "H2ConsoleCommands.h"
+#include "H2Config.h"
 
 extern ConsoleCommands* commands;
 
@@ -21,32 +22,11 @@ HMODULE hThis = NULL;
 CRITICAL_SECTION d_lock;
 
 UINT g_online = 1;
-UINT g_debug = 0;
-UINT g_port = 1000;
-UINT fps_enable = 1;
-UINT fps_limit = 60;
-UINT field_of_view = 70;
-float crosshair_offset = 0.165f;
-UINT raw_input = 0;
-UINT discord_enable = 1;
-
-ULONG broadcast_server = inet_addr("149.56.81.89");
-
 
 UINT g_signin[4] = { 1,0,0,0 };
-CHAR g_szUserName[4][16+1] = { "Cartographer", "Cartographer", "Cartographer", "Cartographer" };
-CHAR g_szToken[32+1] = { "" };
+CHAR g_szUserName[4][16 + 1] = { "Cartographer1", "Cartographer2", "Cartographer3", "Cartographer4" };
 
-
-CHAR g_szWANIP[16+1] = { "127.0.0.1" };
-CHAR g_szLANIP[16+1] = { "127.0.0.1" };
-ULONG g_lWANIP = inet_addr("127.0.0.1");
-ULONG g_lLANIP = inet_addr("127.0.0.1");
-
-WORD g_szWANPORT = 1000;
-WORD g_szLANPORT = 1000;
-
-XUID xFakeXuid[4] = { 0xEE000000DEADC0DE, 0xEE000000DEADC0DE, 0xEE000000DEADC0DE, 0xEE000000DEADC0DE };
+XUID xFakeXuid[4] = { 0xEE100000DEADC0DE, 0xEE200000DEADC0DE, 0xEE300000DEADC0DE, 0xEE400000DEADC0DE };
 CHAR g_profileDirectory[512] = "Profiles";
 
 std::wstring dlcbasepath;
@@ -207,9 +187,11 @@ void InitInstance()
 {
 	static bool init = true;
 
-	if(init)
+	if (init)
 	{
 		init = false;
+
+		InitH2Startup2();
 
 #ifdef _DEBUG
 		int CurrentFlags;
@@ -219,63 +201,9 @@ void InitInstance()
 		CurrentFlags |= _CRTDBG_CHECK_ALWAYS_DF;
 		_CrtSetDbgFlag(CurrentFlags);
 #endif
-		InitializeCriticalSection (&d_lock);
+		InitializeCriticalSection(&d_lock);
 
 		dlcbasepath = L"DLC";
-
-
-		strcpy( g_szUserName[0], "Player1" );
-		strcpy( g_szUserName[1], "Player2" );
-		strcpy( g_szUserName[2], "Player3" );
-		strcpy( g_szUserName[3], "Player4" );
-
-
-
-		LPWSTR iniFile = new WCHAR[256];
-		if (getPlayerNumber() > 1) {
-			swprintf(iniFile, 256, L"xlive%d.ini", getPlayerNumber());
-		}
-		else {
-			lstrcpyW(iniFile, L"xlive.ini");
-		}
-
-		int ArgCnt;
-		LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
-		if (ArgList != NULL)
-		{
-			for (int i = 0; i < ArgCnt; i++)
-			{
-				if (wcsstr(ArgList[i], L"-h2online=") != NULL)
-				{
-					if (wcslen(ArgList[i]) < 255)
-						lstrcpyW(iniFile, ArgList[i] + 10);
-				}
-			}
-		}
-
-		FILE *fp;
-		fp = _wfopen( iniFile, L"r" );
-
-		char iniabnorm[255];
-		sprintf(iniabnorm, "c:\\xlive%d.ini", getPlayerNumber());
-		if (getPlayerNumber() > 1) {
-			if (!fp)
-				fp = fopen(iniabnorm, "r");
-		}
-		else {
-			if (!fp)
-				fp = fopen("c:\\xlive.ini", "r");
-		}
-
-		if( fp )
-		{
-			while( !feof(fp) )
-			{
-				char str[256];
-
-
-				fgets( str, 256, fp );
-
 
 
 #define CHECK_ARG_STR(x,y) \
@@ -284,7 +212,6 @@ void InitInstance()
 		sscanf( str + strlen(x), "%s", &y ); \
 		continue; \
 	}
-
 
 #define CHECK_ARG(x,y) \
 	if( strstr( str,x ) == str ) \
@@ -307,29 +234,19 @@ void InitInstance()
 		continue; \
 	}
 
-				CHECK_ARG_STR("login_token =", g_szToken);
-				CHECK_ARG_STR("WANIP =", g_szWANIP);
-				CHECK_ARG_STR("LANIP =", g_szLANIP);
-				CHECK_ARG("debug_log =", g_debug);
-				CHECK_ARG("port =", g_port);
-				CHECK_ARG("fps_enable = ", fps_enable);
-				CHECK_ARG("fps_limit = ", fps_limit);
-				CHECK_ARG("field_of_view = ", field_of_view);
-				CHECK_ARG_FLOAT("crosshair_offset = ", crosshair_offset);
-				CHECK_ARG("raw_input = ", raw_input);
-				CHECK_ARG("discord_enable =", discord_enable);
-			}
-
-			
-			fclose(fp);
-		}
+#define gCHECK_ARG(x,y) \
+	if( strstr( gstr,x ) == gstr ) \
+	{ \
+		sscanf( gstr + strlen(x), "%d", &y ); \
+		continue; \
+	}
 
 #pragma region GunGame Levels
 		if (b_GunGame == 1)
 		{
 			FILE* gfp;
 			gfp = fopen("gungame.ini", "r");
-			
+
 			if (gfp)
 			{
 				TRACE("[GunGame Enabled] - Opened GunGame.ini!");
@@ -337,15 +254,7 @@ void InitInstance()
 				{
 					char gstr[256];
 
-
 					fgets(gstr, 256, gfp);
-
-#define gCHECK_ARG(x,y) \
-	if( strstr( gstr,x ) == gstr ) \
-	{ \
-		sscanf( gstr + strlen(x), "%d", &y ); \
-		continue; \
-	}
 
 					gCHECK_ARG("weapon_one =", weapon_one);
 					gCHECK_ARG("weapon_two =", weapon_two);
@@ -365,59 +274,18 @@ void InitInstance()
 					gCHECK_ARG("weapon_sixteen =", weapon_sixteen);
 
 				}
-				
+
 				fclose(gfp);
 			}
 		}
-		
+
 #pragma endregion
-		g_lLANIP = inet_addr(g_szLANIP);
-		g_lWANIP = inet_addr(g_szWANIP);
 
-		wchar_t mutexName[255];
-		swprintf(mutexName, sizeof(mutexName), L"Halo2Login#%ws", g_szToken);
-		HANDLE mutex = CreateMutex(0, TRUE, mutexName);
-		DWORD lastErr = GetLastError();
-		char token_censored[33];
-		strncpy(token_censored, g_szToken, 32);
-		memset(token_censored + 32, 0, 1);
-		memset(token_censored + 4, '*', 24);
-		if (lastErr == ERROR_ALREADY_EXISTS) {
-			//CloseHandle(mutex);
-			char NotificationPlayerText[120];
-			sprintf(NotificationPlayerText, "Player Login Session %s already exists!\nOld session has been invalidated!", token_censored);
-			addDebugText(NotificationPlayerText);
-			MessageBoxA(NULL, NotificationPlayerText, "LOGIN OVERRIDDEN WARNING!", MB_OK);
-		}
-		char NotificationText4[120];
-		sprintf(NotificationText4, "Login Token: %s.", token_censored);
-		addDebugText(NotificationText4);
-
-		wchar_t mutexName2[255];
-		swprintf(mutexName2, sizeof(mutexName2), L"Halo2BasePort#%d", g_port);
-		HANDLE mutex2 = CreateMutex(0, TRUE, mutexName2);
-		DWORD lastErr2 = GetLastError();
-		if (lastErr2 == ERROR_ALREADY_EXISTS) {
-			//CloseHandle(mutex);
-			char NotificationPlayerText[120];
-			sprintf(NotificationPlayerText, "Base port %d is already bound to!\nExpect MP to not work!", g_port);
-			addDebugText(NotificationPlayerText);
-			MessageBoxA(NULL, NotificationPlayerText, "BASE PORT BIND WARNING!", MB_OK);
-		}
-		char NotificationText5[120];
-		sprintf(NotificationText5, "Base port: %d.", g_port);
-		addDebugText(NotificationText5);
-
-		if (g_debug)
+		if (H2Config_debug_log)
 		{
 			if (logfile = _wfopen(L"xlive_trace.log", L"wt"))
 			{
 				TRACE("Log started (xLiveLess 2.0a4)\n");
-				TRACE("g_port: %i", g_port);
-				TRACE("inifile: %ws", iniFile);
-				TRACE("g_lWANIP: %08X", g_lWANIP);
-				TRACE("g_lLANIP: %08X", g_lLANIP);
-
 			}
 
 			if (loggame = _wfopen(L"h2mod.log", L"wt"))
@@ -427,26 +295,23 @@ void InitInstance()
 				TRACE_GAME_NETWORK("Log started (H2MOD - Network 0.1a1)\n");
 		}
 
-			if (h2mod)
-				h2mod->Initialize();
-			else
-				TRACE("H2MOD Failed to intialize");
+		if (h2mod)
+			h2mod->Initialize();
+		else
+			TRACE("H2MOD Failed to intialize");
 
-			TRACE("[GunGame] : %i", b_GunGame);
-			if (b_GunGame == 1)
-			{
-				TRACE("[GunGame] - weapon_one: %i", weapon_one);
-				TRACE("[GunGame] - weapon_two: %i", weapon_two);
-				TRACE("[GunGame] - weapon_three: %i", weapon_three);
-			}
+		TRACE("[GunGame] : %i", b_GunGame);
+		if (b_GunGame == 1)
+		{
+			TRACE("[GunGame] - weapon_one: %i", weapon_one);
+			TRACE("[GunGame] - weapon_two: %i", weapon_two);
+			TRACE("[GunGame] - weapon_three: %i", weapon_three);
+		}
 
-			WCHAR gameName[256];
-			
-			GetModuleFileNameW( NULL, (LPWCH) &gameName, sizeof(gameName) );
-			TRACE( "%s", gameName );
+		WCHAR gameName[256];
 
-		
-
+		GetModuleFileNameW(NULL, (LPWCH)&gameName, sizeof(gameName));
+		TRACE("%s", gameName);
 
 		extern void LoadAchievements();
 		LoadAchievements();
@@ -459,7 +324,6 @@ void ExitInstance()
 
 	if (logfile)
 	{
-	
 		TRACE("Shutting down");
 
 		fflush (logfile);
@@ -521,8 +385,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 		hThis = hModule;
 		currentHook = SetWindowsHookEx(WH_KEYBOARD_LL, HookProc, 0, 0);
 		srand((unsigned int)time(NULL));
-		ProcessH2Startup();
-		//system("update.bat"); // fucking broken h2online.exe -_- This will update that...
+		InitH2Startup();
 		Detour();
 		break;
 
