@@ -300,51 +300,24 @@ void drawPrimitiveRect(int x, int y, int w, int h, D3DCOLOR color) {
 
 	LPDIRECT3DSTATEBLOCK9 pStateBlock = NULL;
 	pDevice->CreateStateBlock(D3DSBT_ALL, &pStateBlock);
-	DWORD oldxvf = NULL;
 	pStateBlock->Capture();
-	pDevice->GetFVF(&oldxvf);
-	pDevice->SetTexture(0, NULL);
+	pDevice->SetTexture(0, Primitive);
 	pDevice->SetPixelShader(NULL);
 	pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+	//pDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
-	//pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertexList, sizeof(CVertexList));  	
+	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertexList, sizeof(CVertexList));
 
 	pStateBlock->Apply();
 	pStateBlock->Release();
 
-	if (oldxvf != NULL) {
-		pDevice->SetFVF(oldxvf);
-	}
 }
 
 IDirect3DVertexBuffer9* g_pVB = NULL;
 IDirect3DIndexBuffer9* g_pIB = NULL;
-
-HRESULT GenerateTexture(IDirect3DDevice9 *pD3Ddev, IDirect3DTexture9 **ppD3Dtex, DWORD colour32)
-{
-	if (FAILED(pD3Ddev->CreateTexture(8, 8, 1, 0, D3DFMT_A4R4G4B4, D3DPOOL_MANAGED, ppD3Dtex, NULL)))
-		return E_FAIL;
-
-	WORD colour16 = ((WORD)((colour32 >> 28) & 0xF) << 12)
-		| (WORD)(((colour32 >> 20) & 0xF) << 8)
-		| (WORD)(((colour32 >> 12) & 0xF) << 4)
-		| (WORD)(((colour32 >> 4) & 0xF) << 0);
-
-	D3DLOCKED_RECT d3dlr;
-	(*ppD3Dtex)->LockRect(0, &d3dlr, 0, 0);
-	WORD *pDst16 = (WORD*)d3dlr.pBits;
-
-	for (int xy = 0; xy < 8 * 8; xy++)
-		*pDst16++ = colour16;
-
-	(*ppD3Dtex)->UnlockRect(0);
-
-	return S_OK;
-}
 
 void DrawRect(IDirect3DDevice9* pDevice, float x, float y, float w, float h, D3DCOLOR Color)
 {
@@ -361,7 +334,6 @@ void DrawRect(IDirect3DDevice9* pDevice, float x, float y, float w, float h, D3D
 		{ (float)(x + w), (float)y , 0.0f, 1.0f, Color }
 	};
 	const DWORD D3DFVF_TL = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1;
-	GenerateTexture(pDevice, &Primitive, D3DCOLOR_ARGB(125, 000, 000, 000));
 	pDevice->SetFVF(D3DFVF_TL);
 	pDevice->SetTexture(0, Primitive);
 	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, qV, sizeof(vertex));
@@ -491,7 +463,7 @@ int WINAPI XLiveRender()
 				int x = 0, y = 0;
 				int height = 400;
 				int startingPosY = height - 15;
-				DrawRect(pDevice, x, y, gameWindowWidth, height, D3DCOLOR_ARGB(125, 000, 000, 000));
+				drawPrimitiveRect(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				//drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				drawText(0, startingPosY, COLOR_WHITE, ">>>>", normalSizeFont);
 				drawText(55, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
