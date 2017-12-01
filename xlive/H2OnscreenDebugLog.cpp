@@ -14,6 +14,14 @@ int getDebugTextArrayMaxLen() {
 	return DebugTextArrayLenMax;
 }
 
+void addDebugText(wchar_t* wtext) {
+	int lenInput = wcslen(wtext);
+	char* text = (char*)malloc(sizeof(char) * lenInput + 1);
+	snprintf(text, lenInput + 1, "%ls", wtext);
+	addDebugText(text);
+	free(text);
+}
+
 void addDebugText(char* text) {
 	if (!initialisedDebugText) return;
 
@@ -40,8 +48,8 @@ void addDebugText(char* text) {
 		memset(debug_text + lenInput, '\n', 1);
 		memset(debug_text + lenInput + 1, 0, 1);
 		fputs(debug_text, debugFile);
-		free(debug_text);
 		fflush(debugFile);
+		free(debug_text);
 	}
 
 	if (endChar) {
@@ -56,7 +64,7 @@ void initDebugText() {
 		DebugStr[i] = (char*)calloc(1, sizeof(char));
 	}
 	wchar_t debug_file_path[1024];
-	swprintf(debug_file_path, 1024, L"%wsh2onscreendebug.log", processFilePath);
+	swprintf(debug_file_path, 1024, L"%wsh2onscreendebug.log", H2ProcessFilePath);
 	debugFile = _wfopen(debug_file_path, L"w");
 	char awerg[1034];
 	sprintf(awerg, "PATH: %ws", debug_file_path);

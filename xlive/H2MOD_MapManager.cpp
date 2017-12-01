@@ -3,13 +3,11 @@
 #include <fstream>
 #include <Mswsock.h>
 #include <WS2tcpip.h>
+#include "H2Config.h"
 
 #pragma comment (lib, "mswsock.lib")
 
 #define DEFAULT_BUFLEN 65536
-
-extern UINT g_port;
-extern UINT g_debug;
 
 /* String constants below for client/server messages */
 std::string DOWNLOADING_MAP("Downloading Map");
@@ -122,7 +120,7 @@ void MapManager::reloadMaps() {
 	DWORD dwBack;
 	BOOL canprotect = VirtualProtect((WORD*)((int)mapsObject + 148016), sizeof(WORD), PAGE_EXECUTE_READWRITE, &dwBack);
 	if (!canprotect && GetLastError()) {
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("reloadMaps - canprotect=%d, error=%d", canprotect, GetLastError());
 	}
 	map_reload_method((int)mapsObject);
@@ -162,7 +160,7 @@ void MapManager::searchForMap() {
 
 	if (hasCustomMap(currentMapName)) {
 		//if somehow we have the map and made it here, something is wrong, exit
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("Map already exists, should not be searching for it");
 		goto cleanup;
 	}
@@ -223,7 +221,7 @@ bool MapManager::downloadFromHost() {
 		// Initialize Winsock
 		iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 		if (iResult != 0) {
-			if (g_debug)
+			if (H2Config_debug_log)
 				TRACE_GAME_N("WSAStartup failed with error: %d\n", iResult);
 			return 1;
 		}
@@ -234,12 +232,12 @@ bool MapManager::downloadFromHost() {
 		hints.ai_protocol = IPPROTO_TCP;
 		std::string addr = inet_ntoa(join_game_xn.ina);
 		std::string prt = std::to_string(ntohs(join_game_xn.wPortOnline) + 9);
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("Client map dl, addr=%s, port=%s", addr.c_str(), prt.c_str());
 		// Resolve the server address and port
 		iResult = getaddrinfo(addr.c_str(), prt.c_str(), &hints, &result);
 		if (iResult != 0) {
-			if (g_debug)
+			if (H2Config_debug_log)
 				TRACE_GAME_N("getaddrinfo failed with error: %d\n", iResult);
 			//WSACleanup();
 			return 1;
@@ -252,7 +250,7 @@ bool MapManager::downloadFromHost() {
 			connectSocket = socket(ptr->ai_family, ptr->ai_socktype,
 				ptr->ai_protocol);
 			if (connectSocket == INVALID_SOCKET) {
-				if (g_debug)
+				if (H2Config_debug_log)
 					TRACE_GAME_N("socket failed with error: %d", WSAGetLastError());
 				//WSACleanup();
 				return 1;
@@ -273,7 +271,7 @@ bool MapManager::downloadFromHost() {
 		freeaddrinfo(result);
 
 		if (connectSocket == INVALID_SOCKET) {
-			if (g_debug)
+			if (H2Config_debug_log)
 				TRACE_GAME_N("%s", UNABLE_TO_CONNECT_TO_SERVER.c_str());
 			this->setCustomLobbyMessage(UNABLE_TO_CONNECT_TO_SERVER.c_str());
 			//WSACleanup();
@@ -334,13 +332,13 @@ bool MapManager::downloadFromHost() {
 						std::string fileSizee = recv.substr(0, index);
 						bool has_only_digits = (fileSizee.find_first_not_of(validDigits.c_str()) == std::string::npos);
 						if (!has_only_digits) {
-							if (g_debug)
+							if (H2Config_debug_log)
 								TRACE_GAME_N("%s", BAD_FILE_SIZE.c_str());
 							this->setCustomLobbyMessage(BAD_FILE_SIZE.c_str());
 							goto end;
 						}
 						if (fileSizee.empty()) {
-							if (g_debug)
+							if (H2Config_debug_log)
 								TRACE_GAME_N("%s", BAD_FILE_SIZE.c_str());
 							this->setCustomLobbyMessage(BAD_FILE_SIZE.c_str());
 						}
@@ -356,12 +354,12 @@ bool MapManager::downloadFromHost() {
 				}
 			}
 			else if (iResult == 0) {
-				if (g_debug)
+				if (H2Config_debug_log)
 					TRACE_GAME_N("%s", CONNECTION_TO_HOST_CLOSED.c_str());
 				this->setCustomLobbyMessage(CONNECTION_TO_HOST_CLOSED.c_str());
 			}
 			else {
-				if (g_debug)
+				if (H2Config_debug_log)
 					TRACE_GAME_N("recv failed with error: %d", WSAGetLastError());
 				this->setCustomLobbyMessage("Failure receiving, try rejoining");
 			}
@@ -376,13 +374,13 @@ bool MapManager::downloadFromHost() {
 		goto end;
 	}
 	catch (std::exception const& e) {
-		if (g_debug) {
+		if (H2Config_debug_log) {
 			this->setCustomLobbyMessage("std exception thrown");
 			TRACE_GAME_N("std exception thrown = %s", e.what());
 		}
 	}
 	catch (...) {
-		if (g_debug) {
+		if (H2Config_debug_log) {
 			this->setCustomLobbyMessage("Unknown error occurred");
 			TRACE_GAME_N("unknown exception occurred occurred");
 		}
@@ -408,14 +406,14 @@ void handleClientConnection(SOCKET socket, std::wstring customMapName) {
 		file = CreateFile(customMapName.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0, OPEN_EXISTING, 0, 0);
 
 		if (file == INVALID_HANDLE_VALUE) {
-			if (g_debug)
+			if (H2Config_debug_log)
 				TRACE_GAME("Unable to open file %s for read", customMapName.c_str());
 			return;
 		}
 
 		int fileSize = GetFileSize(file, NULL);
 		if (fileSize == INVALID_FILE_SIZE) {
-			if (g_debug)
+			if (H2Config_debug_log)
 				TRACE_GAME_N("invalid file size, %d", GetLastError());
 			return;
 		}
@@ -431,11 +429,11 @@ void handleClientConnection(SOCKET socket, std::wstring customMapName) {
 
 		result = send(socket, mapName.c_str(), (int)strlen(mapName.c_str()), 0);
 		if (result == SOCKET_ERROR) {
-			if (g_debug)
+			if (H2Config_debug_log)
 				TRACE_GAME_N("filename send failed with error: %d", WSAGetLastError());
 			result = send(socket, mapName.c_str(), (int)strlen(mapName.c_str()), 0);
 			if (result == SOCKET_ERROR) {
-				if (g_debug)
+				if (H2Config_debug_log)
 					TRACE_GAME_N("filename retry send failed with error: %d", WSAGetLastError());
 				return;
 			}
@@ -443,11 +441,11 @@ void handleClientConnection(SOCKET socket, std::wstring customMapName) {
 
 		result = send(socket, buf2.c_str(), (int)strlen(buf2.c_str()), 0);
 		if (result == SOCKET_ERROR) {
-			if (g_debug)
+			if (H2Config_debug_log)
 				TRACE_GAME_N("filesize send failed with error: %d", WSAGetLastError());
 			result = send(socket, buf2.c_str(), (int)strlen(buf2.c_str()), 0);
 			if (result == SOCKET_ERROR) {
-				if (g_debug)
+				if (H2Config_debug_log)
 					TRACE_GAME_N("filesize retry send failed with error: %d", WSAGetLastError());
 				return;
 			}
@@ -459,16 +457,16 @@ void handleClientConnection(SOCKET socket, std::wstring customMapName) {
 		sendFile:
 			try {
 				if (TransmitFile(socket, file, fileSize, DEFAULT_BUFLEN, NULL, NULL, TF_DISCONNECT)) {
-					if (g_debug)
+					if (H2Config_debug_log)
 						TRACE_GAME_N("Transmit file succeeded");
 				}
 				else {
-					if (g_debug)
+					if (H2Config_debug_log)
 						TRACE_GAME_N("Transmit file failed, errorCode=%d", WSAGetLastError());
 				}
 			}
 			catch (...) {
-				if (g_debug)
+				if (H2Config_debug_log)
 					TRACE_GAME_N("c++ exception thrown");
 			}
 		}
@@ -476,34 +474,34 @@ void handleClientConnection(SOCKET socket, std::wstring customMapName) {
 		goto cleanup;
 	}
 	catch (std::exception const& e) {
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("std exception thrown = %s", e.what());
 	}
 	catch (...) {
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("unknown exception occurred occurred");
 	}
 cleanup:
 	//close the file
 	if (CloseHandle(file)) {
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("closed file handle");
 	}
 	else {
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("unable to close file");
 	}
 	// shutdown the connection since we're done
 	result = shutdown(socket, SD_SEND);
 	if (result == SOCKET_ERROR) {
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("shutdown failed with error: %d", WSAGetLastError());
 		closesocket(socket);
 		return;
 	}
 
 	if (closesocket(socket) == SOCKET_ERROR) {
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("close of socket failed with error: %d", WSAGetLastError());
 	}
 }
@@ -526,7 +524,7 @@ void MapManager::TcpServer::startListening() {
 	struct addrinfo *result = NULL;
 	struct addrinfo hints;
 	int iResult;
-	int port = g_port + 9;           /* port number to use */
+	int port = H2Config_base_port + 9;           /* port number to use */
 	int client;                  /* file descriptor for socket */
 	int fileDescriptorForFile;                    /* file descriptor for file to send */
 	struct sockaddr_in addr;   /* socket parameters for bind */
@@ -540,7 +538,7 @@ void MapManager::TcpServer::startListening() {
 	// Initialize Winsock
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0) {
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("WSAStartup failed with error: %d", iResult);
 		return;
 	}
@@ -554,7 +552,7 @@ void MapManager::TcpServer::startListening() {
 	// Resolve the server address and port
 	iResult = getaddrinfo(NULL, std::to_string(port).c_str(), &hints, &result);
 	if (iResult != 0) {
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("getaddrinfo failed with error: %d, port:", iResult, std::to_string(port).c_str());
 		//WSACleanup();
 		return;
@@ -563,7 +561,7 @@ void MapManager::TcpServer::startListening() {
 	// Create a SOCKET for connecting to server
 	serverSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 	if (serverSocket == INVALID_SOCKET) {
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("socket failed with error: %ld", WSAGetLastError());
 		freeaddrinfo(result);
 		serverSocket = NULL;
@@ -574,7 +572,7 @@ void MapManager::TcpServer::startListening() {
 	/* bind socket to the port */
 	iResult = bind(serverSocket, result->ai_addr, (int)result->ai_addrlen);
 	if (iResult == SOCKET_ERROR) {
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("unable to bind to socket: %s", strerror(errno));
 		freeaddrinfo(result);
 		closesocket(serverSocket);
@@ -587,21 +585,21 @@ void MapManager::TcpServer::startListening() {
 	/* listen for clients on the socket */
 	iResult = listen(serverSocket, SOMAXCONN);
 	if (iResult == SOCKET_ERROR) {
-		if (g_debug)
+		if (H2Config_debug_log)
 			TRACE_GAME_N("Error trying to listen on port: %s", strerror(errno));
 		closesocket(serverSocket);
 		serverSocket = NULL;
 		return;
 	}
 
-	if (g_debug)
+	if (H2Config_debug_log)
 		TRACE_GAME_N("Listening on port: %d", port);
 
 	while (listenerThreadRunning) {
 		/* wait for a client to connect */
 		client = accept(serverSocket, 0, 0);
 		if (client == -1) {
-			if (g_debug)
+			if (H2Config_debug_log)
 				TRACE_GAME_N("accept failed: %s", strerror(errno));
 			//try to accept again
 			//TODO: if it fails too many times, exit
@@ -635,7 +633,7 @@ void MapManager::TcpServer::startListening() {
 
 			if (wcscmp(currentMapName, mapName) == 0) {
 				wchar_t* mapPath = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + ((i * 0xB90) + 0x960)));
-				if (g_debug)
+				if (H2Config_debug_log)
 					TRACE_GAME("CurrentMapPath = %s", mapPath);
 				mapManager->customMapFileName = std::wstring(mapPath);
 				break;
@@ -644,7 +642,7 @@ void MapManager::TcpServer::startListening() {
 		std::wstring customMapName = mapManager->customMapFileName;
 
 		if (customMapName.empty()) {
-			if (g_debug)
+			if (H2Config_debug_log)
 				TRACE_GAME_N("Could not determine custom map file name");
 			continue;
 		}

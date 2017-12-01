@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include "Globals.h"
 #include "DiscordInterface.h"
+#include "H2Config.h"
 
 using namespace std;
 
@@ -28,7 +29,6 @@ HANDLE g_dwMarketplaceContent = (HANDLE) -2;
 INT num_players;
 XSESSION_LOCAL_DETAILS sessionDetails;
 IXHV2ENGINE hv2Engine;
-extern UINT discord_enable;
 
 WSADATA wsaData;
 
@@ -1968,6 +1968,10 @@ int WINAPI XShowGuideUI (DWORD)
 	sys_ui = -1;
 
 
+	extern void GSCustomMenuCall_Guide();
+	GSCustomMenuCall_Guide();
+
+
 	return 0;
 }
 
@@ -2830,7 +2834,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 
   if (h2mod->Server)
 	  return ERROR_SUCCESS;
-  if (!discord_enable)
+  if (!H2Config_discord_enable)
 	  return ERROR_SUCCESS;
 
   if (dwContextId == 0x00000003)
