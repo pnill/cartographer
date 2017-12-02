@@ -27,6 +27,20 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 		return false;
 	}
 	double seconds_since_start = difftime(time(0), start);
+	if (GetAsyncKeyState(VK_LCONTROL) & 0x8000) //left-CTRL pressed down
+	{
+		if (console)
+		{
+			char* buffer;
+			if (OpenClipboard(NULL))
+			{
+				char* tmpBuffer = (char*)GetClipboardData(CF_TEXT);
+				this->command.append(tmpBuffer);
+				this->caretPos += 1;
+			}
+			CloseClipboard();
+		}
+	}
 	switch (wp) {
 	case 0xC0: //~
 		if (seconds_since_start > 0.5) {
@@ -62,6 +76,9 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 		}
 	}
 	break;
+	
+	case 0x56: //V key
+		break;
 
 	default:
 		if (this->console) {
