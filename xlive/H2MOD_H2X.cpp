@@ -24,10 +24,10 @@ void H2X::H2X_Initialize()
 	*(float*)(FloatOffsets + 0xBDBF50) = 0.85f; /*H2X Rocket Launcher fire recovery time*/
 	*(float*)(FloatOffsets + 0xAAE544) = 8.5f; /*H2X Plasma Rifle rounds per second max*/
 	*(float*)(FloatOffsets + 0xD0F960) = 10.0f; /*H2X Brute Plasma Rifle rounds per second max*/
-	
-	
 
-{
+
+
+}
 	
 void H2X::H2X_Deinitialize()
 {
