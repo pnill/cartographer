@@ -63,27 +63,6 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 	}
 	break;
 
-	if (GetAsyncKeyState(VK_LCONTROL) & 0x8000)
-	{
-	case 0x56:
-	{
-		if (console)
-		{
-			char* buffer;
-			if (OpenClipboard(NULL))
-			{
-				char* tmpBuffer = (char*)GetClipboardData(CF_TEXT);
-				this->command.append(tmpBuffer);
-				this->caretPos += 1;
-			}
-			CloseClipboard();
-		}
-
-
-	}
-	break;
-	}
-
 	default:
 		if (this->console) {
 			if (((wp >= 0x30 && wp <= 0x5A) || wp == 0x20 || wp == VK_OEM_MINUS)) {
