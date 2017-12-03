@@ -86,7 +86,7 @@ int marketplaceDlcCount = 0;
 int marketplaceEnumerate = 0;
 
 
-
+/*
 VOID Local_Storage_W( int player, WCHAR *str )
 {
 	WCHAR temp2[512];
@@ -119,7 +119,7 @@ VOID Local_Storage_A( int player, CHAR *strA )
 	strcat( strA, g_szUserName[player] );
 	CreateDirectoryA( strA, NULL );
 }
-
+*/
 
 
 VOID ReadLine( FILE *fp, char *str )
@@ -179,7 +179,7 @@ BOOL SkipText( FILE *fp, char *str )
 }
 
 
-
+/*
 void SaveAchievements()
 {
 	FILE *fp;
@@ -205,16 +205,16 @@ void SaveAchievements()
 
 	fclose(fp);
 }
+*/
 
-
-
+/*
 void LoadAchievements()
 {
 	char str[256];
 	FILE *fp;
 
 
-	Local_Storage_A( 0, str );
+	//Local_Storage_A( 0, str );
 	strcat( str, "\\Achievements" );
 	CreateDirectoryA( str, NULL );
 
@@ -245,7 +245,7 @@ void LoadAchievements()
 
 	fclose(fp);
 }
-
+*/
 
 
 WCHAR dlcpath[256][512];
@@ -2955,7 +2955,7 @@ DWORD WINAPI XUserWriteAchievements (DWORD count, PXUSER_ACHIEVEMENT pAchievemen
 		}
 
 		// crash-protect progress
-		SaveAchievements();
+		//SaveAchievements();
 	}
 	
 	return 997;
@@ -3781,10 +3781,10 @@ DWORD WINAPI XUserReadProfileSettings (DWORD dwTitleId, DWORD dwUserIndex, DWORD
 			settingId = ( pdwSettingIds[lcv] >> 0 ) & 0x3FFF;
 
 
-			Local_Storage_W( dwUserIndex, strw );
+			//Local_Storage_W( dwUserIndex, strw );
 
 			wcscat( strw, L"\\Offline\\" );
-			CreateDirectory( strw, NULL );
+			//CreateDirectory( strw, NULL );
 
 
 			switch( settingId )
@@ -3936,10 +3936,10 @@ DWORD WINAPI XUserWriteProfileSettings( DWORD dwUserIndex, DWORD dwNumSettings, 
 
 
 
-		Local_Storage_W( dwUserIndex, strw );
+		//Local_Storage_W( dwUserIndex, strw );
 
 		wcscat( strw, L"\\Offline\\" );
-		CreateDirectory( strw, NULL );
+		//CreateDirectory( strw, NULL );
 
 
 
@@ -4062,11 +4062,11 @@ DWORD WINAPI XStorageBuildServerPath( DWORD dwUserIndex, XSTORAGE_FACILITY Stora
 
 	if( pwszServerPath )
 	{
-		Local_Storage_W( 0, strw );
+		//Local_Storage_W( 0, strw );
 
 
 		wcscat( strw, L"\\Online\\" );
-		CreateDirectory( strw, NULL );
+		//CreateDirectory( strw, NULL );
 
 
 		wcscat( strw, (WCHAR *) pwszItemName );

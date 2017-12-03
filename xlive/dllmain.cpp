@@ -27,7 +27,7 @@ UINT g_signin[4] = { 1,0,0,0 };
 CHAR g_szUserName[4][16 + 1] = { "Cartographer1", "Cartographer2", "Cartographer3", "Cartographer4" };
 
 XUID xFakeXuid[4] = { 0xEE100000DEADC0DE, 0xEE200000DEADC0DE, 0xEE300000DEADC0DE, 0xEE400000DEADC0DE };
-CHAR g_profileDirectory[512] = "Profiles";
+//CHAR g_profileDirectory[512] = "Profiles";
 
 std::wstring dlcbasepath;
 
@@ -313,8 +313,8 @@ void InitInstance()
 		GetModuleFileNameW(NULL, (LPWCH)&gameName, sizeof(gameName));
 		TRACE("%s", gameName);
 
-		extern void LoadAchievements();
-		LoadAchievements();
+		//extern void LoadAchievements();
+		//LoadAchievements();
 	}
 }
 
@@ -345,8 +345,8 @@ void ExitInstance()
 
 
 
-	extern void SaveAchievements();
-	SaveAchievements();
+	//extern void SaveAchievements();
+	//SaveAchievements();
 
 	TerminateProcess(GetCurrentProcess(), 0);
 }
