@@ -1,7 +1,6 @@
 #include "GSCustomMenu.h"
 #include "stdafx.h"
 #include "Hook.h"
-
 #include "H2OnscreenDebugLog.h"
 #include "GSCustomLanguage.h"
 #include "GSUtils.h"
@@ -11,6 +10,7 @@
 #include "GSAccountLogin.h"
 #include "GSAccountCreate.h"
 #include "CUser.h"
+#include "H2MOD.h"
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
@@ -1227,6 +1227,423 @@ void GSCustomMenuCall_Language() {
 #pragma endregion
 
 
+const int CMLabelMenuId_EditCrosshair = 0xFF000010;
+#pragma region CM_EditCrosshair
+
+static void loadLabelCrosshairOffset() {
+	if (H2Config_crosshair_offset) {
+		char* lblFpsLimitNum = H2CustomLanguageGetLabel(CMLabelMenuId_EditCrosshair, 0xFFFF0003);
+		if (!lblFpsLimitNum)
+			return;
+		int buildLimitLabelLen = strlen(lblFpsLimitNum) + 20;
+		char* buildLimitLabel = (char*)malloc(sizeof(char) * buildLimitLabelLen);
+		snprintf(buildLimitLabel, buildLimitLabelLen, lblFpsLimitNum, H2Config_crosshair_offset);
+		add_cartographer_label(CMLabelMenuId_EditCrosshair, 3, buildLimitLabel);
+		free(buildLimitLabel);
+	}
+	else {
+		char* lblFpsLimitDisabled = H2CustomLanguageGetLabel(CMLabelMenuId_EditCrosshair, 0xFFFF0013);
+		add_cartographer_label(CMLabelMenuId_EditCrosshair, 3, lblFpsLimitDisabled);
+	}
+}
+
+void __stdcall CMLabelButtons_EditCrosshair(int a1, int a2)
+{
+	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+
+	__int16 button_id = *(WORD*)(a1 + 112);
+	int v3 = sub_211909(a1, 6, 0, 0);
+	if (v3)
+	{
+		sub_21bf85_CMLTD(v3, button_id + 1, CMLabelMenuId_EditCrosshair);
+	}
+}
+
+__declspec(naked) void sub_2111ab_CMLTD_nak_EditCrosshair() {//__thiscall
+	__asm {
+		mov eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0xFFFFFFF1//label_id_description
+		push 0xFFFFFFF0//label_id_title
+		push CMLabelMenuId_EditCrosshair
+		push eax
+		push ecx
+		call sub_2111ab_CMLTD//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+static bool CMButtonHandler_EditCrosshair(int button_id) {
+	const int upper_limit = 110.0f;
+	if (button_id == 0) {
+		if (H2Config_crosshair_offset <= upper_limit - 1.0f)
+			H2Config_crosshair_offset += 1.0f;
+		else
+			H2Config_crosshair_offset = upper_limit;
+	}
+	else if (button_id == 1) {
+		if (H2Config_crosshair_offset < upper_limit)
+			H2Config_crosshair_offset += 0.01f;
+	}
+	else if (button_id == 3) {
+		//if (H2Config_crosshair_offset > 0.0f)
+			H2Config_crosshair_offset -= 0.01f;
+	}
+	else if (button_id == 4) {
+		//if (H2Config_crosshair_offset > 1.0f)
+			H2Config_crosshair_offset -= 1.0f;
+		//else
+		//	H2Config_crosshair_offset = NAN;
+	}
+	else if (button_id == 2) {
+		if (H2Config_crosshair_offset == 0.0f)
+			H2Config_crosshair_offset = NAN;
+		else
+			H2Config_crosshair_offset = 0.0f;
+	}
+	loadLabelCrosshairOffset();
+	AlterCrosshairOffset();
+	return false;
+}
+
+__declspec(naked) void sub_20F790_CM_nak_EditCrosshair() {//__thiscall
+	__asm {
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0//selected button id
+		push ecx
+		call sub_20F790_CM//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn
+	}
+}
+
+int CustomMenu_EditCrosshair(int);
+
+int(__cdecl *CustomMenuFuncPtrHelp_EditCrosshair())(int) {
+	return CustomMenu_EditCrosshair;
+}
+
+DWORD* menu_vftable_1_EditCrosshair = 0;
+DWORD* menu_vftable_2_EditCrosshair = 0;
+
+void CMSetupVFTables_EditCrosshair() {
+	CMSetupVFTables(&menu_vftable_1_EditCrosshair, &menu_vftable_2_EditCrosshair, (DWORD)CMLabelButtons_EditCrosshair, (DWORD)sub_2111ab_CMLTD_nak_EditCrosshair, (DWORD)CustomMenuFuncPtrHelp_EditCrosshair, (DWORD)sub_20F790_CM_nak_EditCrosshair, true);
+}
+
+int CustomMenu_EditCrosshair(int a1) {
+	loadLabelCrosshairOffset();
+	return CustomMenu_CallHead(a1, menu_vftable_1_EditCrosshair, menu_vftable_2_EditCrosshair, (DWORD)&CMButtonHandler_EditCrosshair, 5, 272);
+}
+
+void GSCustomMenuCall_EditCrosshair() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_EditCrosshair);
+	CallWgit(WgitScreenfunctionPtr);
+}
+
+#pragma endregion
+
+
+const int CMLabelMenuId_EditFOV = 0xFF00000F;
+#pragma region CM_EditFOV
+
+static void loadLabelFOVNum() {
+	if (H2Config_field_of_view) {
+		char* lblFpsLimitNum = H2CustomLanguageGetLabel(CMLabelMenuId_EditFOV, 0xFFFF0003);
+		if (!lblFpsLimitNum)
+			return;
+		int buildLimitLabelLen = strlen(lblFpsLimitNum) + 20;
+		char* buildLimitLabel = (char*)malloc(sizeof(char) * buildLimitLabelLen);
+		snprintf(buildLimitLabel, buildLimitLabelLen, lblFpsLimitNum, H2Config_field_of_view);
+		add_cartographer_label(CMLabelMenuId_EditFOV, 3, buildLimitLabel);
+		free(buildLimitLabel);
+	}
+	else {
+		char* lblFpsLimitDisabled = H2CustomLanguageGetLabel(CMLabelMenuId_EditFOV, 0xFFFF0013);
+		add_cartographer_label(CMLabelMenuId_EditFOV, 3, lblFpsLimitDisabled);
+	}
+}
+
+void __stdcall CMLabelButtons_EditFOV(int a1, int a2)
+{
+	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+
+	__int16 button_id = *(WORD*)(a1 + 112);
+	int v3 = sub_211909(a1, 6, 0, 0);
+	if (v3)
+	{
+		sub_21bf85_CMLTD(v3, button_id + 1, CMLabelMenuId_EditFOV);
+	}
+}
+
+__declspec(naked) void sub_2111ab_CMLTD_nak_EditFOV() {//__thiscall
+	__asm {
+		mov eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0xFFFFFFF1//label_id_description
+		push 0xFFFFFFF0//label_id_title
+		push CMLabelMenuId_EditFOV
+		push eax
+		push ecx
+		call sub_2111ab_CMLTD//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+static bool CMButtonHandler_EditFOV(int button_id) {
+	const int upper_limit = 110;
+	if (button_id == 0) {
+		if (H2Config_field_of_view <= upper_limit - 10)
+			H2Config_field_of_view += 10;
+		else
+			H2Config_field_of_view = upper_limit;
+	}
+	else if (button_id == 1) {
+		if (H2Config_field_of_view < upper_limit)
+			H2Config_field_of_view += 1;
+	}
+	else if (button_id == 3) {
+		if (H2Config_field_of_view > 0)
+			H2Config_field_of_view -= 1;
+	}
+	else if (button_id == 4) {
+		if (H2Config_field_of_view > 10)
+			H2Config_field_of_view -= 10;
+		else
+			H2Config_field_of_view = 0;
+	}
+	else if (button_id == 2) {
+		if (H2Config_field_of_view)
+			H2Config_field_of_view = 0;
+		else
+			H2Config_field_of_view = 100;
+	}
+	loadLabelFOVNum();
+	Field_of_View(H2Config_field_of_view);
+	return false;
+}
+
+__declspec(naked) void sub_20F790_CM_nak_EditFOV() {//__thiscall
+	__asm {
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0//selected button id
+		push ecx
+		call sub_20F790_CM//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn
+	}
+}
+
+int CustomMenu_EditFOV(int);
+
+int(__cdecl *CustomMenuFuncPtrHelp_EditFOV())(int) {
+	return CustomMenu_EditFOV;
+}
+
+DWORD* menu_vftable_1_EditFOV = 0;
+DWORD* menu_vftable_2_EditFOV = 0;
+
+void CMSetupVFTables_EditFOV() {
+	CMSetupVFTables(&menu_vftable_1_EditFOV, &menu_vftable_2_EditFOV, (DWORD)CMLabelButtons_EditFOV, (DWORD)sub_2111ab_CMLTD_nak_EditFOV, (DWORD)CustomMenuFuncPtrHelp_EditFOV, (DWORD)sub_20F790_CM_nak_EditFOV, true);
+}
+
+int CustomMenu_EditFOV(int a1) {
+	loadLabelFOVNum();
+	return CustomMenu_CallHead(a1, menu_vftable_1_EditFOV, menu_vftable_2_EditFOV, (DWORD)&CMButtonHandler_EditFOV, 5, 272);
+}
+
+void GSCustomMenuCall_EditFOV() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_EditFOV);
+	CallWgit(WgitScreenfunctionPtr);
+}
+
+#pragma endregion
+
+
+const int CMLabelMenuId_EditFPS = 0xFF00000E;
+#pragma region CM_EditFPS
+
+static void loadLabelFPSLimit() {
+	if (H2Config_fps_limit) {
+		char* lblFpsLimitNum = H2CustomLanguageGetLabel(CMLabelMenuId_EditFPS, 0xFFFF0003);
+		if (!lblFpsLimitNum)
+			return;
+		int buildLimitLabelLen = strlen(lblFpsLimitNum) + 20;
+		char* buildLimitLabel = (char*)malloc(sizeof(char) * buildLimitLabelLen);
+		snprintf(buildLimitLabel, buildLimitLabelLen, lblFpsLimitNum, H2Config_fps_limit);
+		add_cartographer_label(CMLabelMenuId_EditFPS, 3, buildLimitLabel);
+		free(buildLimitLabel);
+	}
+	else {
+		char* lblFpsLimitDisabled = H2CustomLanguageGetLabel(CMLabelMenuId_EditFPS, 0xFFFF0013);
+		add_cartographer_label(CMLabelMenuId_EditFPS, 3, lblFpsLimitDisabled);
+	}
+}
+
+void __stdcall CMLabelButtons_EditFPS(int a1, int a2)
+{
+	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+
+	__int16 button_id = *(WORD*)(a1 + 112);
+	int v3 = sub_211909(a1, 6, 0, 0);
+	if (v3)
+	{
+		sub_21bf85_CMLTD(v3, button_id + 1, CMLabelMenuId_EditFPS);
+	}
+}
+
+__declspec(naked) void sub_2111ab_CMLTD_nak_EditFPS() {//__thiscall
+	__asm {
+		mov eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0xFFFFFFF1//label_id_description
+		push 0xFFFFFFF0//label_id_title
+		push CMLabelMenuId_EditFPS
+		push eax
+		push ecx
+		call sub_2111ab_CMLTD//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+static bool CMButtonHandler_EditFPS(int button_id) {
+	if (button_id == 0) {
+		H2Config_fps_limit += 10;
+	}
+	else if (button_id == 1) {
+		H2Config_fps_limit += 1;
+	}
+	else if (button_id == 3) {
+		if (H2Config_fps_limit > 0)
+			H2Config_fps_limit -= 1;
+	}
+	else if (button_id == 4) {
+		if (H2Config_fps_limit > 10)
+			H2Config_fps_limit -= 10;
+		else
+			H2Config_fps_limit = 0;
+	}
+	else if (button_id == 2) {
+		if (H2Config_fps_limit)
+			H2Config_fps_limit = 0;
+		else
+			H2Config_fps_limit = 60;
+	}
+	loadLabelFPSLimit();
+	return false;
+}
+
+__declspec(naked) void sub_20F790_CM_nak_EditFPS() {//__thiscall
+	__asm {
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0//selected button id
+		push ecx
+		call sub_20F790_CM//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn
+	}
+}
+
+int CustomMenu_EditFPS(int);
+
+int(__cdecl *CustomMenuFuncPtrHelp_EditFPS())(int) {
+	return CustomMenu_EditFPS;
+}
+
+DWORD* menu_vftable_1_EditFPS = 0;
+DWORD* menu_vftable_2_EditFPS = 0;
+
+void CMSetupVFTables_EditFPS() {
+	CMSetupVFTables(&menu_vftable_1_EditFPS, &menu_vftable_2_EditFPS, (DWORD)CMLabelButtons_EditFPS, (DWORD)sub_2111ab_CMLTD_nak_EditFPS, (DWORD)CustomMenuFuncPtrHelp_EditFPS, (DWORD)sub_20F790_CM_nak_EditFPS, true);
+}
+
+int CustomMenu_EditFPS(int a1) {
+	loadLabelFPSLimit();
+	return CustomMenu_CallHead(a1, menu_vftable_1_EditFPS, menu_vftable_2_EditFPS, (DWORD)&CMButtonHandler_EditFPS, 5, 272);
+}
+
+void GSCustomMenuCall_EditFPS() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_EditFPS);
+	CallWgit(WgitScreenfunctionPtr);
+}
+
+#pragma endregion
+
+
 
 #pragma region Setting_Modifications
 
@@ -1431,10 +1848,11 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditHudGui() {//__thiscall
 
 static bool CMButtonHandler_EditHudGui(int button_id) {
 	if (button_id == 0) {
-
+		GSCustomMenuCall_EditFOV();
 	}
 	else if (button_id == 1) {
-
+		//GSCustomMenuCall_EditCrosshair();
+		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
 	}
 	else if (button_id == 2) {
 		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF4, !(H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat));
@@ -1708,7 +2126,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_OtherSettings() {//__thiscall
 
 static bool CMButtonHandler_OtherSettings(int button_id) {
 	if (button_id == 0) {
-
+		GSCustomMenuCall_EditFPS();
 	}
 	else if (button_id == 1) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_controller_aim_assist = !H2Config_controller_aim_assist));
@@ -1719,6 +2137,7 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 	}
 	else if (button_id == 3) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (xDelay = !xDelay));
+		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
 	}
 	else if (button_id == 4) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF6, !(H2Config_skip_intro = !H2Config_skip_intro));
@@ -2503,12 +2922,9 @@ static bool CMButtonHandler_Guide(int button_id) {
 		GSCustomMenuCall_AdvSettings();
 	}
 	else if (button_id == 1) {
-		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 2, 3);
-	}
-	else if (button_id == 2) {
 		system("start http://cartographer.online/");
 	}
-	else if (button_id == 3) {
+	else if (button_id == 2) {
 		GSCustomMenuCall_Credits();
 	}
 	return false;
@@ -2557,7 +2973,7 @@ int CustomMenu_Guide(int a1) {
 	sprintf(guide_description, guide_desc_base, hotkeyname);//TODO
 	add_cartographer_label(CMLabelMenuId_Guide, 0xFFFFFFF1, guide_description);
 	free(guide_description);
-	return CustomMenu_CallHead(a1, menu_vftable_1_Guide, menu_vftable_2_Guide, (DWORD)&CMButtonHandler_Guide, 4, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_Guide, menu_vftable_2_Guide, (DWORD)&CMButtonHandler_Guide, 3, 272);
 }
 
 void GSCustomMenuCall_Guide() {
@@ -2977,6 +3393,8 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Error, 5, "There are no custom languages catergorised as Other.");
 	add_cartographer_label(CMLabelMenuId_Error, 6, "Error");
 	add_cartographer_label(CMLabelMenuId_Error, 7, "An error occured when trying to read the custom language file.\r\nNo Changes have been made.\r\nReview the on screen debug log for more details.");
+	add_cartographer_label(CMLabelMenuId_Error, 0x8, "Incomplete Feature");
+	add_cartographer_label(CMLabelMenuId_Error, 0x9, "This feature is incomplete.");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFFF02, "Glitchy Scripts");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFFF03, "Created/reversed custom GUIs.\r\nCoded the entire account creation/login system.\r\nCreated Custom Languages.\r\nIs the Halo 2 Master Server overlord!");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF004, "Outdated Version!");
@@ -3038,6 +3456,36 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Language, 0xFFFFFFF2, "--- Base %s Variant ---");
 	add_cartographer_label(CMLabelMenuId_Language, 0xFFFFFFF3, "Select Language Variant");
 	add_cartographer_label(CMLabelMenuId_Language, 0xFFFFFFF4, "Select the variant of the language you would like to play the game in.");
+
+
+	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFFFFF0, "Edit Crosshair Offset");
+	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFFFFF1, "Use the buttons below to modify the in-game Crosshair Offset.");
+	add_cartographer_label(CMLabelMenuId_EditCrosshair, 1, "+10");
+	add_cartographer_label(CMLabelMenuId_EditCrosshair, 2, "+1");
+	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFF0003, "Offset: %f");
+	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFF0013, "Offset Alteration Disabled");
+	add_cartographer_label(CMLabelMenuId_EditCrosshair, 4, "-1");
+	add_cartographer_label(CMLabelMenuId_EditCrosshair, 5, "-10");
+
+
+	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFFFFF0, "Edit Field of View");
+	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFFFFF1, "Use the buttons below to modify the in-game Field of View (FoV).");
+	add_cartographer_label(CMLabelMenuId_EditFOV, 1, "+10");
+	add_cartographer_label(CMLabelMenuId_EditFOV, 2, "+1");
+	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFF0003, "FoV: %d");
+	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFF0013, "FoV Alteration Disabled");
+	add_cartographer_label(CMLabelMenuId_EditFOV, 4, "-1");
+	add_cartographer_label(CMLabelMenuId_EditFOV, 5, "-10");
+
+
+	add_cartographer_label(CMLabelMenuId_EditFPS, 0xFFFFFFF0, "Edit FPS Limit");
+	add_cartographer_label(CMLabelMenuId_EditFPS, 0xFFFFFFF1, "Use the buttons below to modify the FPS limit of Halo 2.");
+	add_cartographer_label(CMLabelMenuId_EditFPS, 1, "+10");
+	add_cartographer_label(CMLabelMenuId_EditFPS, 2, "+1");
+	add_cartographer_label(CMLabelMenuId_EditFPS, 0xFFFF0003, "FPS Limit: %d");
+	add_cartographer_label(CMLabelMenuId_EditFPS, 0xFFFF0013, "Xlive FPS Limiter Disabled");
+	add_cartographer_label(CMLabelMenuId_EditFPS, 4, "-1");
+	add_cartographer_label(CMLabelMenuId_EditFPS, 5, "-10");
 
 
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF0, "Customise HUD / GUI");
@@ -3160,9 +3608,8 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Guide, 0xFFFFFFF0, "Project Cartographer Guide");
 	add_cartographer_label(CMLabelMenuId_Guide, 0xFFFFFFF2, "Press the %s Key to open this guide from anywhere.");
 	add_cartographer_label(CMLabelMenuId_Guide, 1, "Advanced Settings");
-	add_cartographer_label(CMLabelMenuId_Guide, 2, "DO NOT PRESS?");
-	add_cartographer_label(CMLabelMenuId_Guide, 3, "Website");
-	add_cartographer_label(CMLabelMenuId_Guide, 4, "Credits");
+	add_cartographer_label(CMLabelMenuId_Guide, 2, "Website");
+	add_cartographer_label(CMLabelMenuId_Guide, 3, "Credits");
 
 
 #pragma endregion
@@ -3201,6 +3648,12 @@ void initGSCustomMenu() {
 	
 	CMSetupVFTables_Language_Sub();
 	CMSetupVFTables_Language();
+
+	CMSetupVFTables_EditCrosshair();
+
+	CMSetupVFTables_EditFOV();
+
+	CMSetupVFTables_EditFPS();
 
 	CMSetupVFTables_EditHudGui();
 

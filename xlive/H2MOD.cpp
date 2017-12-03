@@ -639,10 +639,10 @@ void SoundThread(void)
 
 }
 
-void Field_of_View(int field_of_view, bool save)
+void Field_of_View(int field_of_view)
 {
-	if (field_of_view > 0 && field_of_view <= 110) {
-
+	if (field_of_view > 0 && field_of_view <= 110)
+	{
 		const UINT CURRENT_FOV_OFFSET = 4883752;
 
 		float defaultRadians = (float)(70 * 3.14159265f / 180);
@@ -832,6 +832,23 @@ bool __cdecl player_remove_packet_handler(void *packet, int size, void *data)
 }
 */
 
+void AlterCrosshairOffset() {
+	DWORD GameGlobals = *(DWORD*)((BYTE*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
+	DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
+	if (!h2mod->Server && GameEngine != 3) {
+		if (!FloatIsNaN(H2Config_crosshair_offset)) {
+			if (GameEngine == 2) {
+				DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + 0x47CD54); //this method of changing crosshair position is better
+				*(float*)(AddressOffset + 0x3DC00) = H2Config_crosshair_offset; //in MP it feels better that the next one, but this doesn't change position in SP
+			}
+			else if (GameEngine == 1) {
+				DWORD CrosshairY = *(DWORD*)((char*)h2mod->GetBase() + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C; //change only in SP, feels off in MP
+				*(float*)CrosshairY = H2Config_crosshair_offset;
+			}
+		}
+	}
+}
+
 int __cdecl OnMapLoad(int a1)
 {
 	overrideUnicodeMessage = false;
@@ -927,16 +944,7 @@ int __cdecl OnMapLoad(int a1)
 #pragma region H2V Stuff
 	if (!h2mod->Server)
 	{
-		if (!FloatIsNaN(H2Config_crosshair_offset)) {
-			if (GameEngine == 2) {
-				DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + 0x47CD54); //this method of changing crosshair position is better
-				*(float*)(AddressOffset + 0x3DC00) = H2Config_crosshair_offset; //in MP it feels better that the next one, but this doesn't change position in SP
-			}
-			else if (GameEngine == 1) {
-				DWORD CrosshairY = *(DWORD*)((char*)h2mod->GetBase() + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C; //change only in SP, feels off in MP
-				*(float*)CrosshairY = H2Config_crosshair_offset;
-			}
-		}
+		AlterCrosshairOffset();
 
 		//Crashfix
 		//*(int*)(h2mod->GetBase() + 0x464940) = 0;
@@ -1631,7 +1639,7 @@ void H2MOD::Initialize()
 		std::thread SoundT(SoundThread);
 		SoundT.detach();
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
-		Field_of_View(H2Config_field_of_view, 0);
+		Field_of_View(H2Config_field_of_view);
 		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
 
 		PatchGameDetailsCheck();
