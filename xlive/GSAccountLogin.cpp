@@ -32,6 +32,9 @@ bool ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 		return false;
 	}
 
+	extern bool StatusCheater;
+	StatusCheater = false;
+
 	XNADDR pxna;
 
 	pxna.inaOnline.s_addr = saddr;
@@ -306,6 +309,8 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 				else if (result == 3) {
 					snprintf(ServerStatus, 250, "Status: CHEATER");
+					extern bool StatusCheater;
+					StatusCheater = true;
 				}
 			}
 		}
@@ -322,7 +327,7 @@ bool HandleGuiLogin(char* token, char* identifier, char* password) {
 	int result = false;
 	char* rtn_result = 0;
 
-	char http_request_body[] = "request_type=%d&request_version=%d&machine_serial=%s&user_identifier=%s&password=%s&login_token=%s";
+	char http_request_body[] = "request_type=%d&request_version=%s&machine_serial=%s&user_identifier=%s&password=%s&login_token=%s";
 	char http_request_body_build[400];
 
 	char* escaped_user_login_token = escape_rfc3986(token == 0 ? "" : token);

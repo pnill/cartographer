@@ -432,6 +432,7 @@ void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont)
 	pFont->DrawTextA(NULL, text, -1, &rect, DT_LEFT | DT_NOCLIP, color);
 }
 
+bool StatusCheater = false;
 
 // #5002: XLiveRender
 int WINAPI XLiveRender()
@@ -478,7 +479,7 @@ int WINAPI XLiveRender()
 			}
 			DWORD GameGlobals = *(DWORD*)((BYTE*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
 			DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
-			if (GameEngine == 3) {
+			if (GameEngine == 3 || StatusCheater) {
 				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
 				if (MasterState == 0)
 					drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
@@ -487,7 +488,7 @@ int WINAPI XLiveRender()
 				else if (MasterState == 2)
 					drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
 				else if (MasterState == 10)
-					drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
+					drawText(0, 15, StatusCheater ? COLOR_YELLOW : COLOR_GREEN, ServerStatus, smallFont);
 			}
 
 

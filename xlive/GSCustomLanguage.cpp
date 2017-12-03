@@ -462,9 +462,9 @@ char* H2CustomLanguageGetLabel(int label_menu_id, int label_id) {
 void combineCartographerLabels(int menuId, int lbl1, int lbl2, int lblCmb) {
 	char* label_1 = H2CustomLanguageGetLabel(menuId, lbl1);
 	char* label_2 = H2CustomLanguageGetLabel(menuId, lbl2);
-	int label_len = strlen(label_1) + strlen(label_2) + 1;
+	int label_len = (label_1 ? strlen(label_1) : 0) + (label_2 ? strlen(label_2) : 0) + 1;
 	char* label_combined = (char*)malloc(label_len);
-	snprintf(label_combined, label_len, label_1, label_2);
+	snprintf(label_combined, label_len, label_1 ? label_1 : "", label_2 ? label_2 : "");
 	add_cartographer_label(menuId, lblCmb, label_combined, true);
 	free(label_combined);
 }
@@ -576,11 +576,45 @@ void setCustomLanguage(int main) {
 	setCustomLanguage(main, 0);
 }
 
+static void overrideCoreH2Labels() {
+	custom_language* lang_english = get_custom_language(0, 0);
+	add_custom_label(lang_english, 0x000003fd, 0x0a000285, "MULTIPLAYER");
+
+	custom_language* lang_japanese = get_custom_language(1, 0);
+	add_custom_label(lang_japanese, 0x000003fd, 0x0a000285, "MULTIPLAYER");
+
+	custom_language* lang_german = get_custom_language(2, 0);
+	add_custom_label(lang_german, 0x000003fd, 0x0a000285, "MEHRSPIELER");
+
+	custom_language* lang_french = get_custom_language(3, 0);
+	add_custom_label(lang_french, 0x000003fd, 0x0a000285, "MULTIJOUEUR");
+
+	custom_language* lang_spanish = get_custom_language(4, 0);
+	add_custom_label(lang_spanish, 0x000003fd, 0x0a000285, "MULTIJUGADOR");
+
+	custom_language* lang_italian = get_custom_language(5, 0);
+	add_custom_label(lang_italian, 0x000003fd, 0x0a000285, "MULTIPLAYER");
+
+	custom_language* lang_korean = get_custom_language(6, 0);
+	add_custom_label(lang_korean, 0x000003fd, 0x0a000285, "MULTIPLAYER");
+
+	custom_language* lang_chinese = get_custom_language(7, 0);
+	add_custom_label(lang_chinese, 0x000003fd, 0x0a000285, "MULTIPLAYER");
+
+
+	for (int i = 0; i <= 7; i++) {
+		custom_language* lang = get_custom_language(i, 0);
+		add_custom_label(lang, 0x000003fd, 0x09000284, "");
+		add_custom_label(lang, 0x000003fd, 0x05000986, "CARTOGRAPHER");
+	}
+}
+
 void initGSCustomLanguage() {
 	if (!H2IsDediServer) {
 		setGameLanguage();
 
 		initialise_core_languages();
+		overrideCoreH2Labels();
 		read_custom_labels();
 
 		DWORD dwBack;

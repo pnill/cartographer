@@ -243,8 +243,8 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 			else {
 				std::string secondArg = splitCommands[1];
-				unsigned int fov = stoi(splitCommands[1]);
-				Field_of_View(fov, 1);
+				int fov = stoi(splitCommands[1]);
+				Field_of_View(fov);
 				output(L"Field of view set");
 			}
 		}
