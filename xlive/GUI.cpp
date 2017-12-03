@@ -130,20 +130,10 @@ HRESULT hkPresent(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT
 	return pPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 }
 
-LPDIRECT3DTEXTURE9 Texture_Interface;
-LPD3DXSPRITE Sprite_Interface;
-
 void GUI::Initialize()
 {
 	desiredRenderTime = (1000.f / H2Config_fps_limit);
 	initFontsIfRequired();
-	if (FAILED(D3DXCreateTextureFromFile(pDevice, "sounds/h2pc_logo.png", &Texture_Interface) ) )
-	{
-		MessageBoxA(NULL, "Failed to create texture", "failure", MB_OK);
-	}
-
-	D3DXCreateSprite(pDevice, &Sprite_Interface);
-
 }
 
 bool once1 = false;
@@ -224,8 +214,6 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 	normalSizeFont->OnResetDevice();
 	smallFont->OnLostDevice();
 	smallFont->OnResetDevice();
-	Sprite_Interface->OnLostDevice();
-	Sprite_Interface->OnResetDevice();
 
 	pD3DPP = vD3DPP;
 	//TRACE("XLiveOnResetDevice");
@@ -238,7 +226,6 @@ HRESULT WINAPI XLiveOnDestroyDevice()
 	largeSizeFont->Release();
 	normalSizeFont->Release();
 	smallFont->Release();
-	Sprite_Interface->Release();
 
 	//TRACE("XLiveOnDestroyDevice");
 	return S_OK;
@@ -445,9 +432,7 @@ void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont)
 	pFont->DrawTextA(NULL, text, -1, &rect, DT_LEFT | DT_NOCLIP, color);
 }
 
-int achievement_height = 0;
-bool achievement_freeze = false;
-int achievement_timer = 0;
+bool StatusCheater = false;
 
 // #5002: XLiveRender
 int WINAPI XLiveRender()
@@ -476,12 +461,9 @@ int WINAPI XLiveRender()
 			//TODO: move into chatbox commands
 			//drawPrimitiveRect(0, 0, gameWindowWidth, 200, D3DCOLOR_ARGB(255, 000, 000, 0));
 			if (commands->console) {
-				
-
 				int x = 0, y = 0;
 				int height = 400;
 				int startingPosY = height - 15;
-
 				drawPrimitiveRect(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				//drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				drawText(0, startingPosY, COLOR_WHITE, ">>>>", normalSizeFont);
@@ -497,7 +479,7 @@ int WINAPI XLiveRender()
 			}
 			DWORD GameGlobals = *(DWORD*)((BYTE*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
 			DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
-			if (GameEngine == 3) {
+			if (GameEngine == 3 || StatusCheater) {
 				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
 				if (MasterState == 0)
 					drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
@@ -506,86 +488,15 @@ int WINAPI XLiveRender()
 				else if (MasterState == 2)
 					drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
 				else if (MasterState == 10)
-					drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
+					drawText(0, 15, StatusCheater ? COLOR_YELLOW : COLOR_GREEN, ServerStatus, smallFont);
 			}
 
-
-#pragma region Achievement Rendering		
-			if (h2mod->AchievementMap.size() > 0)
-			{
-				auto it = h2mod->AchievementMap.begin();
-				
-				if (it->second == false)
-				{
-					h2mod->SoundMap[L"sounds/AchievementUnlocked.wav"] = 0;
-					it->second = true;
-				}
-				
-				if (achievement_height >= 150)
-				{
-					achievement_freeze = true;
-				}
-				else
-					achievement_height = achievement_height + 2;
-
-		
-
-				float scalar = 11.0f;
-				D3DXVECTOR3 Position;
-				Position.x = (gameWindowWidth / 2 - 250 + 3) * scalar;
-				Position.y = (gameWindowHeight - achievement_height + 3) * scalar;
-
-
-				Sprite_Interface->Begin(D3DXSPRITE_ALPHABLEND);
-				D3DXVECTOR2 vCenter(0.0f, 0.0f);
-				D3DXVECTOR2 vScale((1 / scalar), (1 / scalar));
-				D3DXVECTOR2 vPosition(150.0f, 200.0f);
-				D3DXVECTOR2 vRotationCenter(0.0f, 0.0f);
-
-				D3DXMATRIX mat;
-
-
-
-				drawPrimitiveRect(gameWindowWidth / 2 - 250, gameWindowHeight - achievement_height, 500, 100, D3DCOLOR_ARGB(155, 000, 000, 000));
-
-				size_t delim = it->first.find("|");
-				std::string achievement_title = it->first.substr(0, delim);
-				std::string achievement_desc = it->first.substr(delim+1, it->first.size() - delim);
-
-				drawText(gameWindowWidth / 2 - 100, gameWindowHeight - (achievement_height - 25), COLOR_WHITE, achievement_title.c_str(), normalSizeFont);
-				drawText(gameWindowWidth / 2 - 100, gameWindowHeight - (achievement_height - 50), COLOR_WHITE, achievement_desc.c_str(), normalSizeFont);
-
-				D3DXMatrixTransformation2D(&mat, &vCenter, NULL, &vScale, NULL, NULL, NULL);
-				Sprite_Interface->SetTransform(&mat);
-
-				Sprite_Interface->Draw(Texture_Interface, NULL, NULL, &Position, 0xFFFFFFFF);
-				Sprite_Interface->End();
-
-				if (achievement_freeze == true)
-				{
-
-					if (achievement_timer >= 200)
-					{
-						achievement_freeze = false;
-						achievement_timer = 0;
-						achievement_height = 0;
-						h2mod->AchievementMap.erase(it);
-					}
-
-					achievement_timer++;
-				}
-
-			}
-#pragma endregion achievement rendering
 
 			/* TODO: turn on again after converting map downloading to use lib curl
 			if (overrideUnicodeMessage && getCustomLobbyMessage() != NULL) {
 				drawText(0, 30, COLOR_GOLD, getCustomLobbyMessage(), normalSizeFont);
 			}*/
 			if (getDebugTextDisplay()) {
-
-			
-				
 				for (int i = 0; i < getDebugTextArrayMaxLen(); i++) {
 					const char* text = getDebugText(i);
 					//int yOffset = 40 + (i * 14);

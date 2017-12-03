@@ -80,7 +80,8 @@ int __cdecl call_object_placement_data_new(void*, int, int, int);
 signed int __cdecl call_object_new(void*);
 void GivePlayerWeapon(int PlayerIndex, int WeaponId, bool bReset);
 DWORD WINAPI NetworkThread(LPVOID lParam);
-void Field_of_View(int field_of_view, bool save);
+void Field_of_View(int field_of_view);
+void AlterCrosshairOffset();
 
 class NetworkPlayer
 {
@@ -131,8 +132,6 @@ public:
 		BOOL Server;
 		std::unordered_map<NetworkPlayer*, bool> NetworkPlayers;
 		std::unordered_map<wchar_t*, int> SoundMap;
-		std::unordered_map<std::string, bool> AchievementMap;
-
 		std::mutex sound_mutex;
 
 		std::set<int> hookedObjectDefs;
