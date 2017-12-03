@@ -76,6 +76,7 @@ bool H2Config_custom_labels_capture_missing = false;
 bool H2Config_skip_intro = false;
 bool H2Config_raw_input = false;
 bool H2Config_discord_enable = true;
+bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
 int H2Config_field_of_view = 0;
 float H2Config_crosshair_offset = NAN;
@@ -221,6 +222,8 @@ void SaveH2Config() {
 
 			fputs("\ndiscord_enable = ", fileConfig); fputs(H2Config_discord_enable ? "1" : "0", fileConfig);
 
+			fputs("\ncontroller_aim_assist = ", fileConfig); fputs(H2Config_controller_aim_assist ? "1" : "0", fileConfig);
+
 			sprintf(settingOutBuffer, "\nfps_limit = %d", H2Config_fps_limit);
 			fputs(settingOutBuffer, fileConfig);
 
@@ -248,9 +251,10 @@ void SaveH2Config() {
 			fputs("\nserver_playlist = ", fileConfig); fputs(H2Config_dedi_server_playlist, fileConfig);
 		}
 
-		fputs("\nmap_downloading_enable = ", fileConfig); fputs(H2Config_map_downloading_enable ? "1" : "0", fileConfig);
+		//fputs("\nmap_downloading_enable = ", fileConfig); fputs(H2Config_map_downloading_enable ? "1" : "0", fileConfig);
+
 		if (!H2IsDediServer) {
-			fputs("\nchatbox_commands = ", fileConfig); fputs(H2Config_chatbox_commands ? "1" : "0", fileConfig);
+			//fputs("\nchatbox_commands = ", fileConfig); fputs(H2Config_chatbox_commands ? "1" : "0", fileConfig);
 		}
 		fputs("\ndebug_log = ", fileConfig); fputs(H2Config_debug_log ? "1" : "0", fileConfig);
 
@@ -332,6 +336,7 @@ bool est_language_label_capture = false;
 bool est_skip_intro = false;
 bool est_raw_input = false;
 bool est_discord_enable = false;
+bool est_controller_aim_assist = false;
 bool est_fps_limit = false;
 bool est_field_of_view = false;
 bool est_crosshair_offset = false;
@@ -363,6 +368,7 @@ static void est_reset_vars() {
 	est_skip_intro = false;
 	est_raw_input = false;
 	est_discord_enable = false;
+	est_controller_aim_assist = false;
 	est_fps_limit = false;
 	est_field_of_view = false;
 	est_crosshair_offset = false;
@@ -561,6 +567,18 @@ static int interpretConfigSetting(char* fileLine, int version, int lineNumber) {
 			else {
 				H2Config_discord_enable = (bool)tempint1;
 				est_discord_enable = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "controller_aim_assist =%d", &tempint1) == 1) {
+			if (est_controller_aim_assist) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_controller_aim_assist = (bool)tempint1;
+				est_controller_aim_assist = true;
 			}
 		}
 		else if (!H2IsDediServer && sscanf(fileLine, "fps_limit =%d", &tempint1) == 1) {

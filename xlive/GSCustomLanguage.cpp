@@ -462,9 +462,9 @@ char* H2CustomLanguageGetLabel(int label_menu_id, int label_id) {
 void combineCartographerLabels(int menuId, int lbl1, int lbl2, int lblCmb) {
 	char* label_1 = H2CustomLanguageGetLabel(menuId, lbl1);
 	char* label_2 = H2CustomLanguageGetLabel(menuId, lbl2);
-	int label_len = strlen(label_1) + strlen(label_2) + 1;
+	int label_len = (label_1 ? strlen(label_1) : 0) + (label_2 ? strlen(label_2) : 0) + 1;
 	char* label_combined = (char*)malloc(label_len);
-	snprintf(label_combined, label_len, label_1, label_2);
+	snprintf(label_combined, label_len, label_1 ? label_1 : "", label_2 ? label_2 : "");
 	add_cartographer_label(menuId, lblCmb, label_combined, true);
 	free(label_combined);
 }

@@ -854,6 +854,9 @@ int __cdecl OnMapLoad(int a1)
 		return ret;
 	}
 
+	extern void RefreshToggleDisableControllerAimAssist();
+	RefreshToggleDisableControllerAimAssist();
+
 	b_Infection = false;
 	b_GunGame = false;
 	b_Halo2Final = false;

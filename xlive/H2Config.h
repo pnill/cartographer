@@ -31,6 +31,7 @@ extern bool H2Config_custom_labels_capture_missing;
 extern bool H2Config_skip_intro;
 extern bool H2Config_raw_input;
 extern bool H2Config_discord_enable;
+extern bool H2Config_controller_aim_assist;
 extern int H2Config_fps_limit;
 extern int H2Config_field_of_view;
 extern float H2Config_crosshair_offset;

@@ -5,6 +5,7 @@
 #include "Hook.h"
 #include "H2OnscreenDebugLog.h"
 
+#pragma region Done_Tweaks
 
 typedef int(__cdecl *thookServ1)(HKEY, LPCWSTR);
 thookServ1 phookServ1;
@@ -124,6 +125,8 @@ void postConfig() {
 
 }
 
+#pragma endregion
+
 void InitH2Tweaks() {
 	postConfig();
 
@@ -195,25 +198,6 @@ void InitH2Tweaks() {
 		//Allows on a remote desktop connection
 		BYTE assmRemoteDesktop[] = { 0xEB };
 		WriteBytesASM(H2BaseAddr + 0x7E54, assmRemoteDesktop, 1);
-
-		//multi-process splitscreen input hacks
-		if (H2Config_disable_ingame_keyboard) {
-			//Allows to repeat last movement when lose focus in mp, unlocks METHOD E from point after intro vid
-			BYTE getFocusB[] = { 0x00 };
-			WriteBytesASM(H2BaseAddr + 0x2E3C5, getFocusB, 1);
-			//Allows input when not in focus.
-			BYTE getFocusE[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-			WriteBytesASM(H2BaseAddr + 0x2F9EA, getFocusE, 6);
-			WriteBytesASM(H2BaseAddr + 0x2F9FC, getFocusE, 6);
-			WriteBytesASM(H2BaseAddr + 0x2FA09, getFocusE, 6);
-			//Disables the keyboard only when in-game and not in a menu.
-			BYTE disableKeyboard1[] = { 0x90, 0x90, 0x90 };
-			WriteBytesASM(H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
-			BYTE disableKeyboard2[] = { 0x00 };
-			WriteBytesASM(H2BaseAddr + 0x2FA92, disableKeyboard2, 1);
-			BYTE disableKeyboard3[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-			WriteBytesASM(H2BaseAddr + 0x2FA67, disableKeyboard3, 6);
-		}
 
 		//Disables the ESRB warning (only occurs for English Language).
 		//disables the one if no intro vid occurs.

@@ -1227,8 +1227,167 @@ void GSCustomMenuCall_Language() {
 #pragma endregion
 
 
+
+#pragma region Setting_Modifications
+
+static bool blind_fp = false;
+static bool blind_hud = false;
+
+char __cdecl sub_BD114_blind_fp(unsigned int a1)//render first person model
+{
+	char result = blind_fp ? 1 : 0;
+	return result;
+}
+
+char __cdecl sub_BD114_blind_hud(unsigned int a1)//render hud
+{
+	DWORD PlayerGlobalBase = (DWORD)0x30004B60;
+	bool& IsPlayerDead = (bool&)*(BYTE*)(PlayerGlobalBase + 4);
+	if (!blind_fp && IsPlayerDead) {//fixes game notification text from glitching out
+		return 0;
+	}
+	char result = blind_hud ? 1 : 0;
+	return result;
+}
+
+static BYTE enableKeyboard3[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+void RefreshToggleIngameKeyboardControls() {
+	if (!enableKeyboard3[0]) {
+		for (int i = 0; i < 6; i++) {
+			enableKeyboard3[i] = *((BYTE*)H2BaseAddr + 0x2FA67 + i);
+		}
+	}
+
+	//multi-process splitscreen input hacks
+	if (H2Config_disable_ingame_keyboard) {
+		//Allows to repeat last movement when lose focus in mp, unlocks METHOD E from point after intro vid
+		BYTE getFocusB[] = { 0x00 };
+		WriteBytesASM(H2BaseAddr + 0x2E3C5, getFocusB, 1);
+		//Allows input when not in focus.
+		BYTE getFocusE[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+		WriteBytesASM(H2BaseAddr + 0x2F9EA, getFocusE, 6);
+		WriteBytesASM(H2BaseAddr + 0x2F9FC, getFocusE, 6);
+		WriteBytesASM(H2BaseAddr + 0x2FA09, getFocusE, 6);
+		//Disables the keyboard only when in-game and not in a menu.
+		BYTE disableKeyboard1[] = { 0x90, 0x90, 0x90 };
+		WriteBytesASM(H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
+		BYTE disableKeyboard2[] = { 0x00 };
+		WriteBytesASM(H2BaseAddr + 0x2FA92, disableKeyboard2, 1);
+		BYTE disableKeyboard3[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+		WriteBytesASM(H2BaseAddr + 0x2FA67, disableKeyboard3, 6);
+	}
+	else {
+		//Reset them all back.
+		BYTE getFocusB[] = { 0x01 };
+		WriteBytesASM(H2BaseAddr + 0x2E3C5, getFocusB, 1);
+		
+		BYTE getFocusE[] = { 0x0F, 0x85, 0x02, 0x02, 0x00, 0x00 };
+		WriteBytesASM(H2BaseAddr + 0x2F9EA, getFocusE, 6);
+		getFocusE[2] = 0xF0;
+		getFocusE[3] = 0x01;
+		WriteBytesASM(H2BaseAddr + 0x2F9FC, getFocusE, 6);
+		getFocusE[2] = 0xE3;
+		WriteBytesASM(H2BaseAddr + 0x2FA09, getFocusE, 6);
+		
+		BYTE disableKeyboard1[] = { 0x56, 0xFF, 0xD3 };
+		WriteBytesASM(H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
+		BYTE disableKeyboard2[] = { 0x01 };
+		WriteBytesASM(H2BaseAddr + 0x2FA92, disableKeyboard2, 1);
+		WriteBytesASM(H2BaseAddr + 0x2FA67, enableKeyboard3, 6);
+	}
+}
+
+//Reversed from Rainman/Cloud's tool (Credit to him for original hack).
+void RefreshToggleDisableControllerAimAssist() {
+
+	if (H2IsDediServer)
+		return;
+
+	DWORD GameGlobals = *(DWORD*)((BYTE*)H2BaseAddr + ((H2IsDediServer) ? 0x4CB520 : 0x482D3C));
+	DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
+
+	if (GameEngine == 3)
+		return;
+
+	DWORD AddressOffset = *(DWORD*)((BYTE*)H2BaseAddr + 0x479E70);//0x2E10D000
+
+	if (H2Config_controller_aim_assist) {
+
+		*(DWORD*)(AddressOffset + 0x7D4C1C) = 0x3DB2B8C2;//0.08726646006f
+		*(DWORD*)(AddressOffset + 0xB3E094) = 0x3D8EFA35;//0.06981316954f
+		*(DWORD*)(AddressOffset + 0xAB5AD8) = 0x3E8EFA35;//0.2792526782f
+		*(DWORD*)(AddressOffset + 0xB9FC5C) = 0x3E32B8C2;//0.1745329201f
+		*(DWORD*)(AddressOffset + 0xCA421C) = 0x41600000;//14f
+
+		DWORD val6 = 0x3DD67750;//0.104719758f
+		*(DWORD*)(AddressOffset + 0x804120) = val6;
+		*(DWORD*)(AddressOffset + 0x932988) = val6;
+		*(DWORD*)(AddressOffset + 0xA0D758) = val6;
+		*(DWORD*)(AddressOffset + 0xA40028) = val6;
+		*(DWORD*)(AddressOffset + 0xBD284C) = val6;
+
+		DWORD val11 = 0x3E567750;//0.2094395161f
+		*(DWORD*)(AddressOffset + 0x7A8AEC) = val11;
+		*(DWORD*)(AddressOffset + 0x8317C8) = val11;
+		*(DWORD*)(AddressOffset + 0x87B6E0) = val11;
+		*(DWORD*)(AddressOffset + 0x8DA2F0) = val11;
+		*(DWORD*)(AddressOffset + 0x900FF4) = val11;
+		*(DWORD*)(AddressOffset + 0xC89B74) = val11;
+		*(DWORD*)(AddressOffset + 0xAE239C) = val11;
+
+		DWORD val18 = 0x3E20D97C;//0.1570796371f
+		*(DWORD*)(AddressOffset + 0x984C10) = val18;
+		*(DWORD*)(AddressOffset + 0x9C6F44) = val18;
+		*(DWORD*)(AddressOffset + 0xA722A4) = val18;
+		*(DWORD*)(AddressOffset + 0xCD36FC) = val18;
+		*(DWORD*)(AddressOffset + 0xCD877C) = val18;
+
+	}
+	else {
+
+		*(DWORD*)(AddressOffset + 0x7D4C1C) = 0x0;
+		*(DWORD*)(AddressOffset + 0xB3E094) = 0x0;
+		*(DWORD*)(AddressOffset + 0xAB5AD8) = 0x0;
+		*(DWORD*)(AddressOffset + 0xB9FC5C) = 0x0;
+		*(DWORD*)(AddressOffset + 0xCA421C) = 0x0;
+
+		DWORD val6 = 0x0;
+		*(DWORD*)(AddressOffset + 0x804120) = val6;
+		*(DWORD*)(AddressOffset + 0x932988) = val6;
+		*(DWORD*)(AddressOffset + 0xA0D758) = val6;
+		*(DWORD*)(AddressOffset + 0xA40028) = val6;
+		*(DWORD*)(AddressOffset + 0xBD284C) = val6;
+
+		DWORD val11 = 0x0;
+		*(DWORD*)(AddressOffset + 0x7A8AEC) = val11;
+		*(DWORD*)(AddressOffset + 0x8317C8) = val11;
+		*(DWORD*)(AddressOffset + 0x87B6E0) = val11;
+		*(DWORD*)(AddressOffset + 0x8DA2F0) = val11;
+		*(DWORD*)(AddressOffset + 0x900FF4) = val11;
+		*(DWORD*)(AddressOffset + 0xC89B74) = val11;
+		*(DWORD*)(AddressOffset + 0xAE239C) = val11;
+
+		DWORD val18 = 0x0;
+		*(DWORD*)(AddressOffset + 0x984C10) = val18;
+		*(DWORD*)(AddressOffset + 0x9C6F44) = val18;
+		*(DWORD*)(AddressOffset + 0xA722A4) = val18;
+		*(DWORD*)(AddressOffset + 0xCD36FC) = val18;
+		*(DWORD*)(AddressOffset + 0xCD877C) = val18;
+
+	}
+}
+
+#pragma endregion
+
+
+
 const int CMLabelMenuId_EditHudGui = 0xFF000007;
 #pragma region CM_EditHudGui
+
+static void loadLabelToggle_EditHudGui(int lblIndex, int lblTogglePrefix, bool isEnabled) {
+	combineCartographerLabels(CMLabelMenuId_EditHudGui, lblTogglePrefix + (isEnabled ? 1 : 0), 0xFFFF0000 + lblIndex, lblIndex);
+}
 
 void __stdcall CMLabelButtons_EditHudGui(int a1, int a2)
 {
@@ -1274,7 +1433,17 @@ static bool CMButtonHandler_EditHudGui(int button_id) {
 	if (button_id == 0) {
 
 	}
-	else if (button_id == 7) {
+	else if (button_id == 1) {
+
+	}
+	else if (button_id == 2) {
+		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF4, !(H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat));
+	}
+	else if (button_id == 3) {
+		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF2, !(blind_hud = !blind_hud));
+	}
+	else if (button_id == 4) {
+		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF2, !(blind_fp = !blind_fp));
 	}
 	return false;
 }
@@ -1315,7 +1484,10 @@ void CMSetupVFTables_EditHudGui() {
 }
 
 int CustomMenu_EditHudGui(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_EditHudGui, menu_vftable_2_EditHudGui, (DWORD)&CMButtonHandler_EditHudGui, 10, 272);
+	loadLabelToggle_EditHudGui(3, 0xFFFFFFF4, !H2Config_hide_ingame_chat);
+	loadLabelToggle_EditHudGui(4, 0xFFFFFFF2, !blind_hud);
+	loadLabelToggle_EditHudGui(5, 0xFFFFFFF2, !blind_fp);
+	return CustomMenu_CallHead(a1, menu_vftable_1_EditHudGui, menu_vftable_2_EditHudGui, (DWORD)&CMButtonHandler_EditHudGui, 5, 272);
 }
 
 void GSCustomMenuCall_EditHudGui() {
@@ -1329,41 +1501,48 @@ void GSCustomMenuCall_EditHudGui() {
 const int CMLabelMenuId_ToggleSkulls = 0xFF000008;
 #pragma region CM_ToggleSkulls
 
-void loadSkullLabel(int lblIndex, bool isEnabled) {
+static void loadSkullLabel(int lblIndex, bool isEnabled) {
+	if (lblIndex == 3) {
+		if (isEnabled) {
+			blind_hud = !blind_hud;
+			blind_fp = blind_hud;
+		}
+		isEnabled = blind_hud;
+	}
 	combineCartographerLabels(CMLabelMenuId_ToggleSkulls, 0xFFFFFFF2 + (isEnabled ? 1 : 0), 0xFFFF0000 + lblIndex, lblIndex + 1);
 }
 
 int getSkullIndexOffset(int lblIndex) {
 	if (lblIndex == 0)
-		return 0x4D832D;
+		return 0x4D832D;//Anger
 	else if (lblIndex == 1)
-		return 0x4D8322;
+		return 0x4D8322;//Assassins
 	else if (lblIndex == 2)
-		return 0x4D8328;
+		return 0x4D8328;//Black Eye
 	else if (lblIndex == 3)
-		return 0x4D8326;
+		return 0x4D8326;//Blind
 	else if (lblIndex == 4)
-		return 0x4D8329;
+		return 0x4D8329;//Catch
 	else if (lblIndex == 5)
-		return 0x4D8320;
+		return 0x4D8320;//Envy
 	else if (lblIndex == 6)
-		return 0x4D8324;
+		return 0x4D8324;//Famine
 	else if (lblIndex == 7)
-		return 0x4D8327;
+		return 0x4D8327;//Ghost
 	else if (lblIndex == 8)
-		return 0x4D8321;
+		return 0x4D8321;//Grunt Birthday Party
 	else if (lblIndex == 9)
-		return 0x4D832B;
+		return 0x4D832B;//Iron
 	else if (lblIndex == 0xA)
-		return 0x4D8325;
+		return 0x4D8325;//IWHBYD
 	else if (lblIndex == 0xB)
-		return 0x4D832C;
+		return 0x4D832C;//Mythic
 	else if (lblIndex == 0xC)
-		return 0x4D832A;
+		return 0x4D832A;//Sputnik
 	else if (lblIndex == 0xD)
-		return 0x4D8323;
+		return 0x4D8323;//Thunderstorm
 	else if (lblIndex == 0xE)
-		return 0x4D832E;
+		return 0x4D832E;//Whuppopotamus
 	return 0;
 }
 
@@ -1408,14 +1587,15 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_ToggleSkulls() {//__thiscall
 }
 
 static bool CMButtonHandler_ToggleSkulls(int button_id) {
-	if (button_id >= 0 && button_id < 15) {
+	if (button_id == 3) {
+		loadSkullLabel(button_id, true);
+	}
+	else if (button_id >= 0 && button_id < 15) {
 		BYTE& skull = *(BYTE*)((char*)H2BaseAddr + getSkullIndexOffset(button_id));
 		skull = !skull;
 		loadSkullLabel(button_id, skull == 1);
 	}
-	else if (button_id == 15) {
-
-	}
+	
 	return false;
 }
 
@@ -1451,19 +1631,165 @@ DWORD* menu_vftable_1_ToggleSkulls = 0;
 DWORD* menu_vftable_2_ToggleSkulls = 0;
 
 void CMSetupVFTables_ToggleSkulls() {
+	PatchCall(H2BaseAddr + 0x228579, (DWORD)sub_BD114_blind_fp);
+	PatchCall(H2BaseAddr + 0x223955, (DWORD)sub_BD114_blind_hud);
+
 	CMSetupVFTables(&menu_vftable_1_ToggleSkulls, &menu_vftable_2_ToggleSkulls, (DWORD)CMLabelButtons_ToggleSkulls, (DWORD)sub_2111ab_CMLTD_nak_ToggleSkulls, (DWORD)CustomMenuFuncPtrHelp_ToggleSkulls, (DWORD)sub_20F790_CM_nak_ToggleSkulls, true);
 }
 
 int CustomMenu_ToggleSkulls(int a1) {
 	for (int i = 0; i < 15; i++) {
 		BYTE& skull = *(BYTE*)((char*)H2BaseAddr + getSkullIndexOffset(i));
-		loadSkullLabel(i, skull == 1);
+		if (i == 3)
+			loadSkullLabel(i, false);
+		else
+			loadSkullLabel(i, skull == 1);
 	}
 	return CustomMenu_CallHead(a1, menu_vftable_1_ToggleSkulls, menu_vftable_2_ToggleSkulls, (DWORD)&CMButtonHandler_ToggleSkulls, 15, 272);
 }
 
 void GSCustomMenuCall_ToggleSkulls() {
 	int WgitScreenfunctionPtr = (int)(CustomMenu_ToggleSkulls);
+	CallWgit(WgitScreenfunctionPtr);
+}
+
+#pragma endregion
+
+
+const int CMLabelMenuId_OtherSettings = 0xFF00000D;
+#pragma region CM_OtherSettings
+
+static bool xDelay = false;
+static bool vehicleFlipoverEject = true;
+
+static void loadLabelToggle_OtherSettings(int lblIndex, int lblTogglePrefix, bool isEnabled) {
+	combineCartographerLabels(CMLabelMenuId_OtherSettings, lblTogglePrefix + (isEnabled ? 1 : 0), 0xFFFF0000 + lblIndex, lblIndex);
+}
+
+void __stdcall CMLabelButtons_OtherSettings(int a1, int a2)
+{
+	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+
+	__int16 button_id = *(WORD*)(a1 + 112);
+	int v3 = sub_211909(a1, 6, 0, 0);
+	if (v3)
+	{
+		sub_21bf85_CMLTD(v3, button_id + 1, CMLabelMenuId_OtherSettings);
+	}
+}
+
+__declspec(naked) void sub_2111ab_CMLTD_nak_OtherSettings() {//__thiscall
+	__asm {
+		mov eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0xFFFFFFF1//label_id_description
+		push 0xFFFFFFF0//label_id_title
+		push CMLabelMenuId_OtherSettings
+		push eax
+		push ecx
+		call sub_2111ab_CMLTD//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+static bool CMButtonHandler_OtherSettings(int button_id) {
+	if (button_id == 0) {
+
+	}
+	else if (button_id == 1) {
+		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_controller_aim_assist = !H2Config_controller_aim_assist));
+		RefreshToggleDisableControllerAimAssist();
+	}
+	else if (button_id == 2) {
+		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_discord_enable = !H2Config_discord_enable));
+	}
+	else if (button_id == 3) {
+		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (xDelay = !xDelay));
+	}
+	else if (button_id == 4) {
+		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF6, !(H2Config_skip_intro = !H2Config_skip_intro));
+	}
+	else if (button_id == 5) {
+		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, !(H2Config_disable_ingame_keyboard = !H2Config_disable_ingame_keyboard));
+		RefreshToggleIngameKeyboardControls();
+	}
+	else if (button_id == 6) {
+		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_raw_input = !H2Config_raw_input));
+	}
+	else if (button_id == 7) {
+		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (vehicleFlipoverEject = !vehicleFlipoverEject));
+
+		//Disables Vehicle Eject on Flipover (host required)
+		BYTE assmDisableVehicleFlipEject[] = { 0xEB };
+		if (vehicleFlipoverEject)
+			assmDisableVehicleFlipEject[0] = 0x7E;
+		WriteBytesASM(H2BaseAddr + 0x159e5d, assmDisableVehicleFlipEject, 1);
+	}
+	return false;
+}
+
+__declspec(naked) void sub_20F790_CM_nak_OtherSettings() {//__thiscall
+	__asm {
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0//selected button id
+		push ecx
+		call sub_20F790_CM//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn
+	}
+}
+
+int CustomMenu_OtherSettings(int);
+
+int(__cdecl *CustomMenuFuncPtrHelp_OtherSettings())(int) {
+	return CustomMenu_OtherSettings;
+}
+
+DWORD* menu_vftable_1_OtherSettings = 0;
+DWORD* menu_vftable_2_OtherSettings = 0;
+
+void CMSetupVFTables_OtherSettings() {
+	CMSetupVFTables(&menu_vftable_1_OtherSettings, &menu_vftable_2_OtherSettings, (DWORD)CMLabelButtons_OtherSettings, (DWORD)sub_2111ab_CMLTD_nak_OtherSettings, (DWORD)CustomMenuFuncPtrHelp_OtherSettings, (DWORD)sub_20F790_CM_nak_OtherSettings, true);
+}
+
+int CustomMenu_OtherSettings(int a1) {
+	loadLabelToggle_OtherSettings(2, 0xFFFFFFF2, H2Config_controller_aim_assist);
+	loadLabelToggle_OtherSettings(3, 0xFFFFFFF2, H2Config_discord_enable);
+	loadLabelToggle_OtherSettings(4, 0xFFFFFFF2, xDelay);
+	loadLabelToggle_OtherSettings(5, 0xFFFFFFF6, !H2Config_skip_intro);
+	loadLabelToggle_OtherSettings(6, 0xFFFFFFF2, !H2Config_disable_ingame_keyboard);
+	loadLabelToggle_OtherSettings(7, 0xFFFFFFF2, H2Config_raw_input);
+	loadLabelToggle_OtherSettings(8, 0xFFFFFFF2, vehicleFlipoverEject);
+	return CustomMenu_CallHead(a1, menu_vftable_1_OtherSettings, menu_vftable_2_OtherSettings, (DWORD)&CMButtonHandler_OtherSettings, 8, 272);
+}
+
+void GSCustomMenuCall_OtherSettings() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_OtherSettings);
 	CallWgit(WgitScreenfunctionPtr);
 }
 
@@ -1513,7 +1839,6 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AdvSettings() {//__thiscall
 	}
 }
 
-bool hsfewrg = true;
 static bool CMButtonHandler_AdvSettings(int button_id) {
 	if (button_id == 0) {
 		GSCustomMenuCall_Language();
@@ -1522,15 +1847,10 @@ static bool CMButtonHandler_AdvSettings(int button_id) {
 		GSCustomMenuCall_EditHudGui();
 	}
 	else if (button_id == 2) {
-		GSCustomMenuCall_ToggleSkulls();
+		GSCustomMenuCall_OtherSettings();
 	}
-	else if (button_id == 7) {
-		if (hsfewrg = !hsfewrg) {
-			add_cartographer_label(CMLabelMenuId_AdvSettings, 8, "true", true);
-		}
-		else {
-			add_cartographer_label(CMLabelMenuId_AdvSettings, 8, "false", true);
-		}
+	else if (button_id == 3) {
+		GSCustomMenuCall_ToggleSkulls();
 	}
 	return false;
 }
@@ -1571,7 +1891,7 @@ void CMSetupVFTables_AdvSettings() {
 }
 
 int CustomMenu_AdvSettings(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, 10, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, 4, 272);
 }
 
 void GSCustomMenuCall_AdvSettings() {
@@ -2186,7 +2506,7 @@ static bool CMButtonHandler_Guide(int button_id) {
 		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 2, 3);
 	}
 	else if (button_id == 2) {
-		system("start http://cartographer.online/h2pc_api/submit_create.php");
+		system("start http://cartographer.online/");
 	}
 	else if (button_id == 3) {
 		GSCustomMenuCall_Credits();
@@ -2722,9 +3042,15 @@ void initGSCustomMenu() {
 
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF0, "Customise HUD / GUI");
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF1, "");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 1, "Field of View (FOV)");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 2, "Hide Ingame Chat");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 3, "Enable Blind");//use labels as below.
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF2, "Enable %s");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF3, "Disable %s");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF4, "Show %s");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF5, "Hide %s");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 1, "> Field of View (FOV)");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 2, "> Crosshair Offset");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0003, "Ingame Chat");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0004, "HUD");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0005, "First Person Model");
 
 
 	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFFFFF0, "Toggle Skulls");
@@ -2749,18 +3075,33 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF000E, "Whuppopotamus");
 
 
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF0, "Other Settings");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF1, "");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF2, "Enable %s");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF3, "Disable %s");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF4, "Show %s");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF5, "Hide %s");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF6, "Play %s");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF7, "Skip %s");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 1, "> FPS Limit");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0002, "Controller Aim-Assist");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0003, "Discord Rich Presence");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0004, "Force Lobby Countdown");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0005, "Game Intro Video");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0006, "In-game Keyb. CTRLs");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0007, "Raw Mouse Input");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0008, "Vehicle Flip Eject");
+	//Lobby Options
+	//add_cartographer_label(CMLabelMenuId_OtherSettings, 6, "Change Server Name");
+	//add_cartographer_label(CMLabelMenuId_OtherSettings, 7, "Zombie Movement Speed");
+
+
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF0, "Advanced Settings");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF1, "");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 1, "Change Language");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 2, "Customise HUD/GUI");
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 3, "Toggle Skulls");
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 4, "Disable Aim-Assist");
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 5, "Skip Open Game Intro Video");
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 8, "true", true);
-	//Lobby Options
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 20, "Change Server Name");
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 30, "Zombie Movement Speed");
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 30, "Force countdown (xDelay)");
+	add_cartographer_label(CMLabelMenuId_AdvSettings, 3, "Other Settings");
+	add_cartographer_label(CMLabelMenuId_AdvSettings, 4, "Toggle Skulls");
 
 
 	add_cartographer_label(CMLabelMenuId_Credits, 0xFFFFFFF0, "Credits");
@@ -2820,7 +3161,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Guide, 0xFFFFFFF2, "Press the %s Key to open this guide from anywhere.");
 	add_cartographer_label(CMLabelMenuId_Guide, 1, "Advanced Settings");
 	add_cartographer_label(CMLabelMenuId_Guide, 2, "DO NOT PRESS?");
-	add_cartographer_label(CMLabelMenuId_Guide, 3, "Update");
+	add_cartographer_label(CMLabelMenuId_Guide, 3, "Website");
 	add_cartographer_label(CMLabelMenuId_Guide, 4, "Credits");
 
 
@@ -2848,6 +3189,9 @@ void initGSCustomMenu() {
 	VirtualProtect(psub_23f6b7, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 
+	RefreshToggleIngameKeyboardControls();
+
+
 	CMSetupVFTables_EscSettings();
 	
 	CMSetupVFTablesVKb_VKeyTest();
@@ -2861,6 +3205,8 @@ void initGSCustomMenu() {
 	CMSetupVFTables_EditHudGui();
 
 	CMSetupVFTables_ToggleSkulls();
+
+	CMSetupVFTables_OtherSettings();
 
 	CMSetupVFTables_AdvSettings();
 
