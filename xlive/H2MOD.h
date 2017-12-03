@@ -132,6 +132,7 @@ public:
 		BOOL Server;
 		std::unordered_map<NetworkPlayer*, bool> NetworkPlayers;
 		std::unordered_map<wchar_t*, int> SoundMap;
+		std::unordered_map<std::string, bool> AchievementMap;
 		std::mutex sound_mutex;
 
 		std::set<int> hookedObjectDefs;
