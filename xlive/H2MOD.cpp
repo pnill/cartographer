@@ -837,14 +837,14 @@ void AlterCrosshairOffset() {
 	DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
 	if (!h2mod->Server && GameEngine != 3) {
 		if (!FloatIsNaN(H2Config_crosshair_offset)) {
-			if (GameEngine == 2) {
-				DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + 0x47CD54); //this method of changing crosshair position is better
-				*(float*)(AddressOffset + 0x3DC00) = H2Config_crosshair_offset; //in MP it feels better that the next one, but this doesn't change position in SP
-			}
-			else if (GameEngine == 1) {
-				DWORD CrosshairY = *(DWORD*)((char*)h2mod->GetBase() + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C; //change only in SP, feels off in MP
+			/*if (GameEngine == 2) {
+				DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + 0x47CD54); //seems to fuck aim assist on controller
+				*(float*)(AddressOffset + 0x3DC00) = H2Config_crosshair_offset; //I tested only with mouse and keyboard
+			} */
+			//else if (GameEngine == 1) {
+				DWORD CrosshairY = *(DWORD*)((char*)h2mod->GetBase() + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C; 
 				*(float*)CrosshairY = H2Config_crosshair_offset;
-			}
+			//}
 		}
 	}
 }
