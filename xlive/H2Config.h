@@ -44,7 +44,6 @@ extern char H2Config_dedi_server_playlist[256];
 extern bool H2Config_map_downloading_enable;
 extern bool H2Config_chatbox_commands;
 extern bool H2Config_debug_log;
-//extern char H2Config_login_token[33];
 extern char H2Config_login_identifier[255];
 extern char H2Config_login_password[255];
 extern int H2Config_hotkeyIdHelp;

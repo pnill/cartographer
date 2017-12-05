@@ -60,6 +60,31 @@ bool ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	H2CurrentAccountLoginToken = (char*)malloc(sizeof(char) * 33);
 	snprintf(H2CurrentAccountLoginToken, 33, login_token);
 
+
+	//FIXME - remove the handle again after they sign out. display an error - yes no window when it's taken when you click on it.
+	/*
+	if (H2CurrentAccountLoginToken) {
+		addDebugText("Post Config Port & Login Mutex.");
+		wchar_t mutexName[255];
+		swprintf(mutexName, L"Halo2Login#%s", H2CurrentAccountLoginToken);
+		HANDLE mutex = CreateMutex(0, TRUE, mutexName);
+		DWORD lastErr = GetLastError();
+		char token_censored[33];
+		strncpy(token_censored, H2CurrentAccountLoginToken, 32);
+		token_censored[32] = 0;
+		memset(token_censored + 4, '*', 24);
+		if (lastErr == ERROR_ALREADY_EXISTS) {
+			char NotificationPlayerText[120];
+			sprintf(NotificationPlayerText, "Player Login Session %s already exists!\nOld session has been invalidated!", token_censored);
+			addDebugText(NotificationPlayerText);
+			MessageBoxA(NULL, NotificationPlayerText, "LOGIN OVERRIDDEN WARNING!", MB_OK);
+		}
+		char NotificationText4[120];
+		sprintf(NotificationText4, "Login Token: %s.", token_censored);
+		addDebugText(NotificationText4);
+	}
+	*/
+
 	return true;
 }
 
@@ -139,7 +164,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			addDebugText(NotificationPlayerText);
 			unsigned long resolvedAddr;
 			if ((resolvedAddr = inet_addr(tempstr1)) != INADDR_NONE) {
-				if (strlen(H2Config_str_wan) > 0) {
+				if (strlen(H2Config_str_wan) <= 0) {
 					H2Config_ip_wan = resolvedAddr;
 				}
 				xnaddr = resolvedAddr;

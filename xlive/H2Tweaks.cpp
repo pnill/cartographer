@@ -86,28 +86,6 @@ char __cdecl HookChangePrivacy(int privacy) {
 
 
 void postConfig() {
-	//FIXME
-	/*
-	addDebugText("Post Config Port & Login Mutex.");
-	char H2Config_login_token[33] = { "" };
-	wchar_t mutexName[255];
-	swprintf(mutexName, L"Halo2Login#%s", H2Config_login_token);
-	HANDLE mutex = CreateMutex(0, TRUE, mutexName);
-	DWORD lastErr = GetLastError();
-	char token_censored[33];
-	strncpy(token_censored, H2Config_login_token, 32);
-	memset(token_censored + 32, 0, 1);
-	memset(token_censored + 4, '*', 24);
-	if (lastErr == ERROR_ALREADY_EXISTS) {
-		char NotificationPlayerText[120];
-		sprintf(NotificationPlayerText, "Player Login Session %s already exists!\nOld session has been invalidated!", token_censored);
-		addDebugText(NotificationPlayerText);
-		MessageBoxA(NULL, NotificationPlayerText, "LOGIN OVERRIDDEN WARNING!", MB_OK);
-	}
-	char NotificationText4[120];
-	sprintf(NotificationText4, "Login Token: %s.", token_censored);
-	addDebugText(NotificationText4);
-	*/
 
 	wchar_t mutexName2[255];
 	swprintf(mutexName2, L"Halo2BasePort#%d", H2Config_base_port);
