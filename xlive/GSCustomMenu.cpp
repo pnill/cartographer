@@ -18,7 +18,7 @@ extern bool H2IsDediServer;
 void CallWgit(int WgitScreenfunctionPtr);
 void CallWgit(int WgitScreenfunctionPtr, int open_method);
 void CallWgit(int WgitScreenfunctionPtr, int open_method, int menu_wgit_type);
-void CMSetupVFTables(DWORD** menu_vftable_1, DWORD** menu_vftable_2, DWORD CM_LabelButtons, DWORD sub_2111ab_CMLTD_nak, DWORD CM_FuncPtrHelper, DWORD CM_ButtonPreselection, bool isInternalMenuWindow);
+void CMSetupVFTables(DWORD** menu_vftable_1, DWORD** menu_vftable_2, DWORD CM_LabelButtons, DWORD sub_2111ab_CMLTD_nak, DWORD CM_FuncPtrHelper, DWORD CM_ButtonPreselection, bool isInternalMenuWindow, DWORD sub_248beb_nak_deconstructor);
 int __stdcall BtnHandlerCaller(void* thisptr, int a2, int a3);
 int __stdcall sub_20F790_CM(int thisptr, __int16 selected_button_id);
 int __stdcall sub_2111ab_CMLTD(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description);
@@ -27,6 +27,8 @@ int CustomMenu_CallHead2(int a1, DWORD* menu_vftable_1, DWORD* menu_vftable_2, D
 int CustomMenu_CallHead(int a1, DWORD* menu_vftable_1, DWORD* menu_vftable_2, DWORD menu_button_handler, int number_of_buttons, int menu_wgit_type);
 void __stdcall sub_21bf85_CMLTD(int thisptr, int label_id, int label_menu_id);
 void __stdcall sub_28870B_CM(int a1, int a2, int a3, void*(__stdcall* a4)(int), int a5);
+
+void GSCustomMenuCall_AccountList();
 
 
 const int CMLabelMenuId_EscSettings = 0xFF000004;
@@ -170,7 +172,7 @@ void CMSetupVFTables3(DWORD** menu_vftable_1, DWORD** menu_vftable_2, DWORD CM_L
 }
 
 void CMSetupVFTables_EscSettings() {
-	CMSetupVFTables(&menu_vftable_1_EscSettings, &menu_vftable_2_EscSettings, (DWORD)CMLabelButtons_EscSettings, (DWORD)sub_2111ab_CMLTD_nak_EscSettings, (DWORD)CustomMenuFuncPtrHelp_EscSettings, (DWORD)sub_20F790_CM_nak_EscSettings, true);
+	CMSetupVFTables(&menu_vftable_1_EscSettings, &menu_vftable_2_EscSettings, (DWORD)CMLabelButtons_EscSettings, (DWORD)sub_2111ab_CMLTD_nak_EscSettings, (DWORD)CustomMenuFuncPtrHelp_EscSettings, (DWORD)sub_20F790_CM_nak_EscSettings, true, 0);
 }
 
 void GSCustomMenuCall_EscSettingsFailLocalEditToVftable() {
@@ -847,7 +849,7 @@ DWORD* menu_vftable_1_Error_Inner = 0;
 DWORD* menu_vftable_2_Error_Inner = 0;
 
 void CMSetupVFTables_Error_Inner() {
-	CMSetupVFTables(&menu_vftable_1_Error_Inner, &menu_vftable_2_Error_Inner, (DWORD)CMLabelButtons_Error, (DWORD)sub_2111ab_CMLTD_nak_Error, (DWORD)CustomMenuFuncPtrHelp_Error_Inner, (DWORD)sub_20F790_CM_nak_Error, true);
+	CMSetupVFTables(&menu_vftable_1_Error_Inner, &menu_vftable_2_Error_Inner, (DWORD)CMLabelButtons_Error, (DWORD)sub_2111ab_CMLTD_nak_Error, (DWORD)CustomMenuFuncPtrHelp_Error_Inner, (DWORD)sub_20F790_CM_nak_Error, true, 0);
 }
 
 int CustomMenu_Error_Inner(int a1) {
@@ -904,7 +906,7 @@ DWORD* menu_vftable_1_Error_Outer = 0;
 DWORD* menu_vftable_2_Error_Outer = 0;
 
 void CMSetupVFTables_Error_Outer() {
-	CMSetupVFTables(&menu_vftable_1_Error_Outer, &menu_vftable_2_Error_Outer, (DWORD)CMLabelButtons_Error, (DWORD)sub_2111ab_CMLTD_nak_Error, (DWORD)CustomMenuFuncPtrHelp_Error_Outer, (DWORD)sub_20F790_CM_nak_Error, false);
+	CMSetupVFTables(&menu_vftable_1_Error_Outer, &menu_vftable_2_Error_Outer, (DWORD)CMLabelButtons_Error, (DWORD)sub_2111ab_CMLTD_nak_Error, (DWORD)CustomMenuFuncPtrHelp_Error_Outer, (DWORD)sub_20F790_CM_nak_Error, false, 0);
 }
 
 int CustomMenu_Error_Outer(int a1) {
@@ -1069,7 +1071,7 @@ DWORD* menu_vftable_1_Language_Sub = 0;
 DWORD* menu_vftable_2_Language_Sub = 0;
 
 void CMSetupVFTables_Language_Sub() {
-	CMSetupVFTables(&menu_vftable_1_Language_Sub, &menu_vftable_2_Language_Sub, (DWORD)CMLabelButtons_Language_Sub, (DWORD)sub_2111ab_CMLTD_nak_Language_Sub, (DWORD)CustomMenuFuncPtrHelp_Language_Sub, (DWORD)sub_20F790_CM_nak_Language_Sub, true);
+	CMSetupVFTables(&menu_vftable_1_Language_Sub, &menu_vftable_2_Language_Sub, (DWORD)CMLabelButtons_Language_Sub, (DWORD)sub_2111ab_CMLTD_nak_Language_Sub, (DWORD)CustomMenuFuncPtrHelp_Language_Sub, (DWORD)sub_20F790_CM_nak_Language_Sub, true, 0);
 }
 
 int CustomMenu_Language_Sub(int a1) {
@@ -1209,7 +1211,7 @@ DWORD* menu_vftable_1_Language = 0;
 DWORD* menu_vftable_2_Language = 0;
 
 void CMSetupVFTables_Language() {
-	CMSetupVFTables(&menu_vftable_1_Language, &menu_vftable_2_Language, (DWORD)CMLabelButtons_Language, (DWORD)sub_2111ab_CMLTD_nak_Language, (DWORD)CustomMenuFuncPtrHelp_Language, (DWORD)sub_20F790_CM_nak_Language, true);
+	CMSetupVFTables(&menu_vftable_1_Language, &menu_vftable_2_Language, (DWORD)CMLabelButtons_Language, (DWORD)sub_2111ab_CMLTD_nak_Language, (DWORD)CustomMenuFuncPtrHelp_Language, (DWORD)sub_20F790_CM_nak_Language, true, 0);
 }
 
 int CustomMenu_Language(int a1) {
@@ -1352,7 +1354,7 @@ DWORD* menu_vftable_1_EditCrosshair = 0;
 DWORD* menu_vftable_2_EditCrosshair = 0;
 
 void CMSetupVFTables_EditCrosshair() {
-	CMSetupVFTables(&menu_vftable_1_EditCrosshair, &menu_vftable_2_EditCrosshair, (DWORD)CMLabelButtons_EditCrosshair, (DWORD)sub_2111ab_CMLTD_nak_EditCrosshair, (DWORD)CustomMenuFuncPtrHelp_EditCrosshair, (DWORD)sub_20F790_CM_nak_EditCrosshair, true);
+	CMSetupVFTables(&menu_vftable_1_EditCrosshair, &menu_vftable_2_EditCrosshair, (DWORD)CMLabelButtons_EditCrosshair, (DWORD)sub_2111ab_CMLTD_nak_EditCrosshair, (DWORD)CustomMenuFuncPtrHelp_EditCrosshair, (DWORD)sub_20F790_CM_nak_EditCrosshair, true, 0);
 }
 
 int CustomMenu_EditCrosshair(int a1) {
@@ -1493,7 +1495,7 @@ DWORD* menu_vftable_1_EditFOV = 0;
 DWORD* menu_vftable_2_EditFOV = 0;
 
 void CMSetupVFTables_EditFOV() {
-	CMSetupVFTables(&menu_vftable_1_EditFOV, &menu_vftable_2_EditFOV, (DWORD)CMLabelButtons_EditFOV, (DWORD)sub_2111ab_CMLTD_nak_EditFOV, (DWORD)CustomMenuFuncPtrHelp_EditFOV, (DWORD)sub_20F790_CM_nak_EditFOV, true);
+	CMSetupVFTables(&menu_vftable_1_EditFOV, &menu_vftable_2_EditFOV, (DWORD)CMLabelButtons_EditFOV, (DWORD)sub_2111ab_CMLTD_nak_EditFOV, (DWORD)CustomMenuFuncPtrHelp_EditFOV, (DWORD)sub_20F790_CM_nak_EditFOV, true, 0);
 }
 
 int CustomMenu_EditFOV(int a1) {
@@ -1628,7 +1630,7 @@ DWORD* menu_vftable_1_EditFPS = 0;
 DWORD* menu_vftable_2_EditFPS = 0;
 
 void CMSetupVFTables_EditFPS() {
-	CMSetupVFTables(&menu_vftable_1_EditFPS, &menu_vftable_2_EditFPS, (DWORD)CMLabelButtons_EditFPS, (DWORD)sub_2111ab_CMLTD_nak_EditFPS, (DWORD)CustomMenuFuncPtrHelp_EditFPS, (DWORD)sub_20F790_CM_nak_EditFPS, true);
+	CMSetupVFTables(&menu_vftable_1_EditFPS, &menu_vftable_2_EditFPS, (DWORD)CMLabelButtons_EditFPS, (DWORD)sub_2111ab_CMLTD_nak_EditFPS, (DWORD)CustomMenuFuncPtrHelp_EditFPS, (DWORD)sub_20F790_CM_nak_EditFPS, true, 0);
 }
 
 int CustomMenu_EditFPS(int a1) {
@@ -1898,7 +1900,7 @@ DWORD* menu_vftable_1_EditHudGui = 0;
 DWORD* menu_vftable_2_EditHudGui = 0;
 
 void CMSetupVFTables_EditHudGui() {
-	CMSetupVFTables(&menu_vftable_1_EditHudGui, &menu_vftable_2_EditHudGui, (DWORD)CMLabelButtons_EditHudGui, (DWORD)sub_2111ab_CMLTD_nak_EditHudGui, (DWORD)CustomMenuFuncPtrHelp_EditHudGui, (DWORD)sub_20F790_CM_nak_EditHudGui, true);
+	CMSetupVFTables(&menu_vftable_1_EditHudGui, &menu_vftable_2_EditHudGui, (DWORD)CMLabelButtons_EditHudGui, (DWORD)sub_2111ab_CMLTD_nak_EditHudGui, (DWORD)CustomMenuFuncPtrHelp_EditHudGui, (DWORD)sub_20F790_CM_nak_EditHudGui, true, 0);
 }
 
 int CustomMenu_EditHudGui(int a1) {
@@ -2052,7 +2054,7 @@ void CMSetupVFTables_ToggleSkulls() {
 	PatchCall(H2BaseAddr + 0x228579, (DWORD)sub_BD114_blind_fp);
 	PatchCall(H2BaseAddr + 0x223955, (DWORD)sub_BD114_blind_hud);
 
-	CMSetupVFTables(&menu_vftable_1_ToggleSkulls, &menu_vftable_2_ToggleSkulls, (DWORD)CMLabelButtons_ToggleSkulls, (DWORD)sub_2111ab_CMLTD_nak_ToggleSkulls, (DWORD)CustomMenuFuncPtrHelp_ToggleSkulls, (DWORD)sub_20F790_CM_nak_ToggleSkulls, true);
+	CMSetupVFTables(&menu_vftable_1_ToggleSkulls, &menu_vftable_2_ToggleSkulls, (DWORD)CMLabelButtons_ToggleSkulls, (DWORD)sub_2111ab_CMLTD_nak_ToggleSkulls, (DWORD)CustomMenuFuncPtrHelp_ToggleSkulls, (DWORD)sub_20F790_CM_nak_ToggleSkulls, true, 0);
 }
 
 int CustomMenu_ToggleSkulls(int a1) {
@@ -2193,7 +2195,7 @@ DWORD* menu_vftable_1_OtherSettings = 0;
 DWORD* menu_vftable_2_OtherSettings = 0;
 
 void CMSetupVFTables_OtherSettings() {
-	CMSetupVFTables(&menu_vftable_1_OtherSettings, &menu_vftable_2_OtherSettings, (DWORD)CMLabelButtons_OtherSettings, (DWORD)sub_2111ab_CMLTD_nak_OtherSettings, (DWORD)CustomMenuFuncPtrHelp_OtherSettings, (DWORD)sub_20F790_CM_nak_OtherSettings, true);
+	CMSetupVFTables(&menu_vftable_1_OtherSettings, &menu_vftable_2_OtherSettings, (DWORD)CMLabelButtons_OtherSettings, (DWORD)sub_2111ab_CMLTD_nak_OtherSettings, (DWORD)CustomMenuFuncPtrHelp_OtherSettings, (DWORD)sub_20F790_CM_nak_OtherSettings, true, 0);
 }
 
 int CustomMenu_OtherSettings(int a1) {
@@ -2306,7 +2308,7 @@ DWORD* menu_vftable_1_AdvSettings = 0;
 DWORD* menu_vftable_2_AdvSettings = 0;
 
 void CMSetupVFTables_AdvSettings() {
-	CMSetupVFTables(&menu_vftable_1_AdvSettings, &menu_vftable_2_AdvSettings, (DWORD)CMLabelButtons_AdvSettings, (DWORD)sub_2111ab_CMLTD_nak_AdvSettings, (DWORD)CustomMenuFuncPtrHelp_AdvSettings, (DWORD)sub_20F790_CM_nak_AdvSettings, true);
+	CMSetupVFTables(&menu_vftable_1_AdvSettings, &menu_vftable_2_AdvSettings, (DWORD)CMLabelButtons_AdvSettings, (DWORD)sub_2111ab_CMLTD_nak_AdvSettings, (DWORD)CustomMenuFuncPtrHelp_AdvSettings, (DWORD)sub_20F790_CM_nak_AdvSettings, true, 0);
 }
 
 int CustomMenu_AdvSettings(int a1) {
@@ -2406,7 +2408,7 @@ DWORD* menu_vftable_1_Credits = 0;
 DWORD* menu_vftable_2_Credits = 0;
 
 void CMSetupVFTables_Credits() {
-	CMSetupVFTables(&menu_vftable_1_Credits, &menu_vftable_2_Credits, (DWORD)CMLabelButtons_Credits, (DWORD)sub_2111ab_CMLTD_nak_Credits, (DWORD)CustomMenuFuncPtrHelp_Credits, (DWORD)sub_20F790_CM_nak_Credits, true);
+	CMSetupVFTables(&menu_vftable_1_Credits, &menu_vftable_2_Credits, (DWORD)CMLabelButtons_Credits, (DWORD)sub_2111ab_CMLTD_nak_Credits, (DWORD)CustomMenuFuncPtrHelp_Credits, (DWORD)sub_20F790_CM_nak_Credits, true, 0);
 }
 
 int CustomMenu_Credits(int a1) {
@@ -2420,6 +2422,24 @@ void GSCustomMenuCall_Credits() {
 
 #pragma endregion
 
+
+static int accountingActiveHandleCount = 0;
+
+static bool isAccountingActiveHandle() {
+	return accountingActiveHandleCount > 0;
+}
+
+static void updateAccountingActiveHandle(bool active) {
+	accountingActiveHandleCount += active ? 1 : -1;
+	char handleCountString[40];
+	snprintf(handleCountString, 40, "Accounting Active: %d", accountingActiveHandleCount);
+	addDebugText(handleCountString);
+	if (accountingActiveHandleCount <= 0) {
+		SaveH2Accounts();
+	}
+}
+
+static bool accountingGoBackToList = false;
 
 const int CMLabelMenuId_AccountCreate = 0xFF00000C;
 #pragma region CM_AccountCreate
@@ -2514,6 +2534,9 @@ static bool CMButtonHandler_AccountCreate(int button_id) {
 			memset(email, 0, strlen(email));
 			memset(pass, 0, strlen(pass));
 		}
+		else {
+			accountingGoBackToList = false;
+		}
 	}
 	return false;
 }
@@ -2540,6 +2563,49 @@ __declspec(naked) void sub_20F790_CM_nak_AccountCreate() {//__thiscall
 	}
 }
 
+void* __stdcall sub_248beb_deconstructor_AccountCreate(LPVOID lpMem, char a2)//__thiscall
+{
+	if (accountingGoBackToList && isAccountingActiveHandle()) {
+		GSCustomMenuCall_AccountList();
+		accountingGoBackToList = false;
+	}
+
+	updateAccountingActiveHandle(false);
+
+	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
+	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
+
+	sub_248b90((void*)lpMem);
+	if (a2 & 1) {
+		sub_287c23((void*)lpMem);
+	}
+	return (void*)lpMem;
+}
+
+__declspec(naked) void sub_248beb_nak_deconstructor_AccountCreate() {//__thiscall
+	__asm {
+		mov  eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push eax
+		push ecx
+		call sub_248beb_deconstructor_AccountCreate//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
 int CustomMenu_AccountCreate(int);
 
 int(__cdecl *CustomMenuFuncPtrHelp_AccountCreate())(int) {
@@ -2550,10 +2616,12 @@ DWORD* menu_vftable_1_AccountCreate = 0;
 DWORD* menu_vftable_2_AccountCreate = 0;
 
 void CMSetupVFTables_AccountCreate() {
-	CMSetupVFTables(&menu_vftable_1_AccountCreate, &menu_vftable_2_AccountCreate, (DWORD)CMLabelButtons_AccountCreate, (DWORD)sub_2111ab_CMLTD_nak_AccountCreate, (DWORD)CustomMenuFuncPtrHelp_AccountCreate, (DWORD)sub_20F790_CM_nak_AccountCreate, true);
+	CMSetupVFTables(&menu_vftable_1_AccountCreate, &menu_vftable_2_AccountCreate, (DWORD)CMLabelButtons_AccountCreate, (DWORD)sub_2111ab_CMLTD_nak_AccountCreate, (DWORD)CustomMenuFuncPtrHelp_AccountCreate, (DWORD)sub_20F790_CM_nak_AccountCreate, true, (DWORD)sub_248beb_nak_deconstructor_AccountCreate);
 }
 
 int CustomMenu_AccountCreate(int a1) {
+	accountingGoBackToList = true;
+	updateAccountingActiveHandle(true);
 	setupAccountCreateLabels();
 	return CustomMenu_CallHead(a1, menu_vftable_1_AccountCreate, menu_vftable_2_AccountCreate, (DWORD)&CMButtonHandler_AccountCreate, 4, 272);
 }
@@ -2645,7 +2713,10 @@ static bool CMButtonHandler_AccountEdit(int button_id) {
 			//show select profile gui
 			int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
 			sub_209236(0);
-			SaveH2Accounts();
+			//SaveH2Accounts();
+		}
+		else {
+			accountingGoBackToList = false;
 		}
 		memset(identifier_pass, 0, strlen(identifier_pass));
 	}
@@ -2674,6 +2745,49 @@ __declspec(naked) void sub_20F790_CM_nak_AccountEdit() {//__thiscall
 	}
 }
 
+void* __stdcall sub_248beb_deconstructor_AccountEdit(LPVOID lpMem, char a2)//__thiscall
+{
+	if (accountingGoBackToList && isAccountingActiveHandle()) {
+		GSCustomMenuCall_AccountList();
+		accountingGoBackToList = false;
+	}
+
+	updateAccountingActiveHandle(false);
+
+	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
+	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
+
+	sub_248b90((void*)lpMem);
+	if (a2 & 1) {
+		sub_287c23((void*)lpMem);
+	}
+	return (void*)lpMem;
+}
+
+__declspec(naked) void sub_248beb_nak_deconstructor_AccountEdit() {//__thiscall
+	__asm {
+		mov  eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push eax
+		push ecx
+		call sub_248beb_deconstructor_AccountEdit//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
 int CustomMenu_AccountEdit(int);
 
 int(__cdecl *CustomMenuFuncPtrHelp_AccountEdit())(int) {
@@ -2684,10 +2798,12 @@ DWORD* menu_vftable_1_AccountEdit = 0;
 DWORD* menu_vftable_2_AccountEdit = 0;
 
 void CMSetupVFTables_AccountEdit() {
-	CMSetupVFTables(&menu_vftable_1_AccountEdit, &menu_vftable_2_AccountEdit, (DWORD)CMLabelButtons_AccountEdit, (DWORD)sub_2111ab_CMLTD_nak_AccountEdit, (DWORD)CustomMenuFuncPtrHelp_AccountEdit, (DWORD)sub_20F790_CM_nak_AccountEdit, true);
+	CMSetupVFTables(&menu_vftable_1_AccountEdit, &menu_vftable_2_AccountEdit, (DWORD)CMLabelButtons_AccountEdit, (DWORD)sub_2111ab_CMLTD_nak_AccountEdit, (DWORD)CustomMenuFuncPtrHelp_AccountEdit, (DWORD)sub_20F790_CM_nak_AccountEdit, true, (DWORD)sub_248beb_nak_deconstructor_AccountEdit);
 }
 
 int CustomMenu_AccountEdit(int a1) {
+	accountingGoBackToList = true;
+	updateAccountingActiveHandle(true);
 	setupAccountEditLabels();
 	return CustomMenu_CallHead(a1, menu_vftable_1_AccountEdit, menu_vftable_2_AccountEdit, (DWORD)&CMButtonHandler_AccountEdit, 4, 272);
 }
@@ -2794,6 +2910,7 @@ static bool CMButtonHandler_AccountList(int button_id) {
 				H2AccountBufferI--;
 			}
 			GSCustomMenuCall_AccountList();
+			H2AccountLastUsed = 0;
 			return true;
 		}
 		else {
@@ -2802,7 +2919,8 @@ static bool CMButtonHandler_AccountList(int button_id) {
 				//show select profile gui
 				int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
 				sub_209236(0);
-				SaveH2Accounts();
+				H2AccountLastUsed = button_id;
+				//SaveH2Accounts();
 			}
 		}
 	}
@@ -2813,7 +2931,7 @@ static bool CMButtonHandler_AccountList(int button_id) {
 				//show select profile gui
 				int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
 				sub_209236(0);
-				SaveH2Accounts();
+				//SaveH2Accounts();
 				H2Config_master_ip = inet_addr("127.0.0.1");
 				H2Config_master_port_relay = 1001;
 				extern int MasterState;
@@ -2834,7 +2952,7 @@ __declspec(naked) void sub_20F790_CM_nak_AccountList() {//__thiscall
 		push ecx
 		push ebx
 
-		push 0//selected button id
+		push H2AccountLastUsed//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
@@ -2848,6 +2966,44 @@ __declspec(naked) void sub_20F790_CM_nak_AccountList() {//__thiscall
 	}
 }
 
+void* __stdcall sub_248beb_deconstructor_AccountList(LPVOID lpMem, char a2)//__thiscall
+{
+	updateAccountingActiveHandle(false);
+
+	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
+	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
+
+	sub_248b90((void*)lpMem);
+	if (a2 & 1) {
+		sub_287c23((void*)lpMem);
+	}
+	return (void*)lpMem;
+}
+
+__declspec(naked) void sub_248beb_nak_deconstructor_AccountList() {//__thiscall
+	__asm {
+		mov  eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push eax
+		push ecx
+		call sub_248beb_deconstructor_AccountList//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
 int CustomMenu_AccountList(int);
 
 int(__cdecl *CustomMenuFuncPtrHelp_AccountList())(int) {
@@ -2858,10 +3014,11 @@ DWORD* menu_vftable_1_AccountList = 0;
 DWORD* menu_vftable_2_AccountList = 0;
 
 void CMSetupVFTables_AccountList() {
-	CMSetupVFTables(&menu_vftable_1_AccountList, &menu_vftable_2_AccountList, (DWORD)CMLabelButtons_AccountList, (DWORD)sub_2111ab_CMLTD_nak_AccountList, (DWORD)CustomMenuFuncPtrHelp_AccountList, (DWORD)sub_20F790_CM_nak_AccountList, false);
+	CMSetupVFTables(&menu_vftable_1_AccountList, &menu_vftable_2_AccountList, (DWORD)CMLabelButtons_AccountList, (DWORD)sub_2111ab_CMLTD_nak_AccountList, (DWORD)CustomMenuFuncPtrHelp_AccountList, (DWORD)sub_20F790_CM_nak_AccountList, false, (DWORD)sub_248beb_nak_deconstructor_AccountList);
 }
 
 int CustomMenu_AccountList(int a1) {
+	updateAccountingActiveHandle(true);
 	CM_AccountList_Setup_Buttons();
 	return CustomMenu_CallHead(a1, menu_vftable_1_AccountList, menu_vftable_2_AccountList, (DWORD)&CMButtonHandler_AccountList, 4 + H2AccountCount + (H2AccountCount <= 0 ? -1 : 0), 272);
 }
@@ -2962,7 +3119,7 @@ DWORD* menu_vftable_1_Guide = 0;
 DWORD* menu_vftable_2_Guide = 0;
 
 void CMSetupVFTables_Guide() {
-	CMSetupVFTables(&menu_vftable_1_Guide, &menu_vftable_2_Guide, (DWORD)CMLabelButtons_Guide, (DWORD)sub_2111ab_CMLTD_nak_Guide, (DWORD)CustomMenuFuncPtrHelp_Guide, (DWORD)sub_20F790_CM_nak_Guide, false);
+	CMSetupVFTables(&menu_vftable_1_Guide, &menu_vftable_2_Guide, (DWORD)CMLabelButtons_Guide, (DWORD)sub_2111ab_CMLTD_nak_Guide, (DWORD)CustomMenuFuncPtrHelp_Guide, (DWORD)sub_20F790_CM_nak_Guide, false, 0);
 }
 
 int CustomMenu_Guide(int a1) {
@@ -3416,7 +3573,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF014, "Something's Broken!");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF015, "An internal error has occured. We've probably noticed this already but contact an admin if this persists.");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF016, "Accounts in Use");
-	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF017, "Another instance of Halo 2 / H2Server are currently signing in, please try again after it finishes.");
+	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF017, "Another instance of Halo 2 / H2Server is currently signing in, please try again after it finishes.");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF018, "Insufficient PC Identification!");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF019, "Your PC does not have sufficient unique identifiers available. Please contact an admin about linking this PC with another that you own that does have sufficient info. This is to ensure fair online play.");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF01A, "Invalid Email!");
@@ -3635,6 +3792,9 @@ void initGSCustomMenu() {
 	psub_23f6b7 = (tsub_23f6b7)DetourFunc((BYTE*)H2BaseAddr + 0x23f6b7, (BYTE*)sub_23f6b7, 7);
 	VirtualProtect(psub_23f6b7, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
+	//psub_248beb = (tsub_248beb)DetourClassFunc((BYTE*)H2BaseAddr + 0x248beb, (BYTE*)sub_248beb, 8);
+	//VirtualProtect(psub_248beb, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
 
 	RefreshToggleIngameKeyboardControls();
 
@@ -3755,7 +3915,7 @@ void CallWgit(int WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) {
 	free(tmp);
 }
 
-void CMSetupVFTables(DWORD** menu_vftable_1, DWORD** menu_vftable_2, DWORD CM_LabelButtons, DWORD sub_2111ab_CMLTD_nak, DWORD CM_FuncPtrHelper, DWORD CM_ButtonPreselection, bool isInternalMenuWindow) {
+void CMSetupVFTables(DWORD** menu_vftable_1, DWORD** menu_vftable_2, DWORD CM_LabelButtons, DWORD sub_2111ab_CMLTD_nak, DWORD CM_FuncPtrHelper, DWORD CM_ButtonPreselection, bool isInternalMenuWindow, DWORD sub_248beb_nak_deconstructor) {
 
 	//clone a brightness menu_vftable_1
 	*menu_vftable_1 = (DWORD*)malloc(0x98);
@@ -3768,6 +3928,9 @@ void CMSetupVFTables(DWORD** menu_vftable_1, DWORD** menu_vftable_2, DWORD CM_La
 	//clone a brightness menu_vftable_2
 	*menu_vftable_2 = (DWORD*)malloc(0xA8);
 	memcpy(*menu_vftable_2, (BYTE*)H2BaseAddr + 0x3D7ABC, 0xA8);//Brightness
+
+	if (sub_248beb_nak_deconstructor)
+		*(DWORD*)((DWORD)*menu_vftable_2 + 0x0) = (DWORD)sub_248beb_nak_deconstructor;
 
 	if (isInternalMenuWindow) {
 		//*(DWORD*)((DWORD)*menu_vftable_2 + 0x30) = (DWORD)H2BaseAddr + 0x24DC0D;//inner ingame
@@ -4979,7 +5142,7 @@ char __stdcall sub_23CF88_CM(int thisptr, int* a2) //__thiscall
 			wchar_t* returnString = (wchar_t*)*(DWORD*)((BYTE*)v4 + 0xC64);
 			int returnStrLen = wcslen(returnString) + 1;
 			char* end = (char*)malloc(sizeof(char) * returnStrLen);
-			wcstombs(end, returnString, returnStrLen);
+			wcstombs2(end, returnString, returnStrLen);
 			strcpy((char*)returnString, end);
 			free(end);
 		}

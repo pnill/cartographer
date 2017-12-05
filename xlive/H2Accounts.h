@@ -9,6 +9,7 @@ void H2AccountBufferAdd(char* token, char* username);
 
 extern int H2AccountCount;
 extern int H2AccountBufferI;
+extern int H2AccountLastUsed;
 extern char** H2AccountBufferUsername;
 extern char** H2AccountBufferLoginToken;
 

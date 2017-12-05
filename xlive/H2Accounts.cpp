@@ -38,8 +38,10 @@ int H2AccountBufferI = -1;
 static int H2AccountBufferLen = 0;
 char** H2AccountBufferUsername = 0;
 char** H2AccountBufferLoginToken = 0;
+int H2AccountLastUsed = 0;
 static bool H2AccountBufferUsername_est = false;
 static bool H2AccountBufferLoginToken_est = false;
+static bool H2AccountLastUsed_est = false;
 
 char* H2CurrentAccountLoginToken = 0;
 
@@ -160,6 +162,10 @@ void SaveH2Accounts() {
 			free(fputbuffer);
 
 			fputs("\n", fileConfig);
+
+			char last_used_buff[30];
+			snprintf(last_used_buff, 30, "\nlast_used = %d\n", H2AccountLastUsed);
+			fputs(last_used_buff, fileConfig);
 
 			if (H2AccountBufferLoginToken && H2AccountBufferUsername && H2AccountCount > 0) {
 				for (int i = 0; i < H2AccountCount; i++) {
@@ -349,6 +355,18 @@ static int interpretConfigSetting(char* fileLine, int version, int lineNumber) {
 				}
 			}
 		}
+		else if (sscanf(fileLine, "last_used =%d", &tempint1) == 1) {
+			if (H2AccountLastUsed_est) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0)) {
+				incorrect = true;
+			}
+			else {
+				H2AccountLastUsed = (bool)tempint1;
+				H2AccountLastUsed_est = true;
+			}
+		}
 		else {
 			unrecognised = true;
 		}
@@ -409,6 +427,9 @@ bool ReadH2Accounts() {
 			oldConfigBufferFree();
 			badConfigBufferFree();
 			H2AccountBufferFree();
+
+			H2AccountLastUsed_est = false;
+
 			ReadIniFile(fileConfig, true, H2ConfigVersionStr, H2ConfigVersion, interpretConfigSetting);
 
 			if (H2AccountBufferLoginToken[H2AccountBufferI]) {
