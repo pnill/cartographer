@@ -236,18 +236,6 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 
 		}
-		else if (firstCommand == "$setfov") {
-			if (splitCommands.size() != 2) {
-				output(L"Invalid input.Usage - $setfov value");
-				return;
-			}
-			else {
-				std::string secondArg = splitCommands[1];
-				int fov = stoi(splitCommands[1]);
-				Field_of_View(fov);
-				output(L"Field of view set");
-			}
-		}
 		else if (firstCommand == "$resetspawncommandlist") {
 			//reset checked_for_ids, so you can reload new object_datums at runtime
 			this->checked_for_ids = false;
