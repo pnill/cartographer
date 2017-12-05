@@ -576,8 +576,9 @@ void setCustomLanguage(int main) {
 	setCustomLanguage(main, 0);
 }
 
+
 static void overrideCoreH2Labels() {
-	custom_language* lang_english = get_custom_language(0, 0);
+	/*custom_language* lang_english = get_custom_language(0, 0);
 	add_custom_label(lang_english, 0x000003fd, 0x0a000285, "MULTIPLAYER");
 
 	custom_language* lang_japanese = get_custom_language(1, 0);
@@ -600,14 +601,14 @@ static void overrideCoreH2Labels() {
 
 	custom_language* lang_chinese = get_custom_language(7, 0);
 	add_custom_label(lang_chinese, 0x000003fd, 0x0a000285, "MULTIPLAYER");
-
+	*/
 
 	for (int i = 0; i <= 7; i++) {
 		custom_language* lang = get_custom_language(i, 0);
-		add_custom_label(lang, 0x000003fd, 0x09000284, "");
+		//add_custom_label(lang, 0x000003fd, 0x09000284, "");
 		add_custom_label(lang, 0x000003fd, 0x05000986, "CARTOGRAPHER");
 	}
-}
+} 
 
 void initGSCustomLanguage() {
 	if (!H2IsDediServer) {

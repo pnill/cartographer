@@ -485,8 +485,8 @@ int WINAPI XLiveRender()
 				int startingPosY = height - 15;
 				drawPrimitiveRect(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				//drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
-				drawText(0, startingPosY, COLOR_WHITE, ">>>>", normalSizeFont);
-				drawText(55, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
+				drawText(0, startingPosY, COLOR_WHITE, ">>", normalSizeFont);
+				drawText(35, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
 
 				startingPosY -= 12;
 				std::vector<std::string>::iterator it;
