@@ -21,8 +21,11 @@ void H2X::H2X_Initialize()
 	*(float*)(FloatOffsets + 0x96EC34) = 0.13f; /*H2X Magnum fire recovery time*/
 	*(float*)(FloatOffsets + 0xC0EABC) = 0.39f; /*H2X Brute Shot fire recovery time*/
 	*(float*)(FloatOffsets + 0xA03250) = 0.11f; /*H2X Plasma Pistol fire recovery time*/
+	*(float*)(FloatOffsets + 0xBDBF50) = 0.85f; /*H2X Rocket Launcher fire recovery time*/
+	*(float*)(FloatOffsets + 0xAAE544) = 8.5f; /*H2X Plasma Rifle rounds per second max*/
+	*(float*)(FloatOffsets + 0xD0F960) = 10.0f; /*H2X Brute Plasma Rifle rounds per second max*/
 }
-
+	
 void H2X::H2X_Deinitialize()
 {
 	int offset = 0x47CD54;
@@ -39,5 +42,7 @@ void H2X::H2X_Deinitialize()
 	*(float*)(FloatOffsets + 0x96EC34) = 0.1f; /*H2V Magnum fire recovery time*/
 	*(float*)(FloatOffsets + 0xC0EABC) = 0.3f; /*H2V Brute Shot fire recovery time*/
 	*(float*)(FloatOffsets + 0xA03250) = 0.05f; /*H2V Plasma Pistol fire recovery time*/
-
+	*(float*)(FloatOffsets + 0xBDBF50) = 0.8f; /*H2X Rocket Launcher fire recovery time*/
+	*(float*)(FloatOffsets + 0xAAE544) = 9.0f; /*H2X Plasma Rifle rounds per second max*/
+	*(float*)(FloatOffsets + 0xD0F960) = 11.0f; /*H2X Brute Plasma Rifle rounds per second max*/
 }

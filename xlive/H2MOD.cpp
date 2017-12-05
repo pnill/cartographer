@@ -925,8 +925,8 @@ int __cdecl OnMapLoad(int a1)
 
 		DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + offset);
 
-		*(float*)(AddressOffset + 0xA4EC88) = 800.0f; // battle_rifle_bullet.proj Initial Velocity 
-		*(float*)(AddressOffset + 0xA4EC8C) = 800.0f; //battle_rifle_bullet.proj Final Velocity
+		*(float*)(AddressOffset + 0xA4EC88) = 1200.0f; // battle_rifle_bullet.proj Initial Velocity 
+		*(float*)(AddressOffset + 0xA4EC8C) = 1200.0f; //battle_rifle_bullet.proj Final Velocity
 		*(float*)(AddressOffset + 0xB7F914) = 4000.0f; //sniper_bullet.proj Initial Velocity
 		*(float*)(AddressOffset + 0xB7F918) = 4000.0f; //sniper_bullet.proj Final Velocity
 		//FIXME COOP will break because of one of these tags not existing.
