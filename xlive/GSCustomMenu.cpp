@@ -2367,11 +2367,13 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Credits() {//__thiscall
 }
 
 static bool CMButtonHandler_Credits(int button_id) {
-	if (button_id == 1) {
-		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFFF02, 0xFFFFFF03);
-	}
-	else if (button_id > 0) {
+	return false;
 
+	if (button_id == 1) {
+		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFFF04, 0xFFFFFF05);
+	}
+	else if (button_id == 2) {
+		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFFF02, 0xFFFFFF03);
 	}
 	return false;
 }
@@ -2412,7 +2414,7 @@ void CMSetupVFTables_Credits() {
 }
 
 int CustomMenu_Credits(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_Credits, menu_vftable_2_Credits, (DWORD)&CMButtonHandler_Credits, 10, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_Credits, menu_vftable_2_Credits, (DWORD)&CMButtonHandler_Credits, 14, 272);
 }
 
 void GSCustomMenuCall_Credits() {
@@ -2927,13 +2929,13 @@ static bool CMButtonHandler_AccountList(int button_id) {
 	else if (button_id == H2AccountCount) {
 		if (!mode_remove_account) {
 			//play offline
-			if (ConfigureUserDetails("PCarto Offline", "12345678901234567890123456789012", 1234571000000000 + H2GetInstanceId(), 0x100 + H2GetInstanceId(), 0x100 * H2GetInstanceId(), "000000101300", "0000000000000000000000000000000000101300")) {
+			if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", 1234571000000000 + H2GetInstanceId(), 0x100 + H2GetInstanceId(), 0x100 * H2GetInstanceId(), "000000101300", "0000000000000000000000000000000000101300")) {
 				//show select profile gui
 				int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
 				sub_209236(0);
 				//SaveH2Accounts();
 				H2Config_master_ip = inet_addr("127.0.0.1");
-				H2Config_master_port_relay = 1001;
+				H2Config_master_port_relay = 2001;
 				extern int MasterState;
 				MasterState = 2;
 				extern char* ServerStatus;
@@ -3528,6 +3530,22 @@ int __cdecl sub_23f6b7(int a1)
 	return psub_23f6b7(a1);
 }
 
+typedef char(__cdecl *tsub_209129)(int, int, int, int);
+tsub_209129 psub_209129;
+char __cdecl sub_209129(int a1, int a2, int a3, int a4)//player configuration profile signin
+{
+	char result =
+		psub_209129(a1, a2, a3, a4);
+	extern CHAR g_szUserName[4][16 + 1];
+	if (strcmp(g_szUserName[0], "[Username]") == 0) {//change username to player configuration profile name if offline.
+		wchar_t* wideprofileName = (wchar_t*)((BYTE*)H2BaseAddr + 0x96C874);
+		char profileName[32];
+		wcstombs2(profileName, wideprofileName, 32);
+		SetUserUsername(profileName);
+	}
+	return result;
+}
+
 void initGSCustomMenu() {
 
 #pragma region Init_Cartographer_Labels
@@ -3554,6 +3572,8 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Error, 0x9, "This feature is incomplete.");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFFF02, "Glitchy Scripts");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFFF03, "Created/reversed custom GUIs.\r\nCoded the entire account creation/login system.\r\nCreated Custom Languages.\r\nIs the Halo 2 Master Server overlord!");
+	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFFF04, "PermaNull");
+	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFFF05, "Wrote/reversed all the functionality for online play! And created GunGame & Zombies.\r\nNow that's no easy feat!");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF004, "Outdated Version!");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF005, "You are using an outdated version of Project Cartographer! Please install the latest version.");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF006, "Invalid Login Token!");
@@ -3646,7 +3666,7 @@ void initGSCustomMenu() {
 
 
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF0, "Customise HUD / GUI");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF1, "");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF1, "Customise your heads up display and user interface with the following settings.");
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF2, "Enable %s");
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF3, "Disable %s");
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF4, "Show %s");
@@ -3681,7 +3701,7 @@ void initGSCustomMenu() {
 
 
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF0, "Other Settings");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF1, "");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF1, "Customise other settings and features of Halo 2 / Project Cartographer.");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF2, "Enable %s");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF3, "Disable %s");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF4, "Show %s");
@@ -3702,7 +3722,7 @@ void initGSCustomMenu() {
 
 
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF0, "Advanced Settings");
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF1, "");
+	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF1, "Alter additional settings for the game.");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 1, "Change Language");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 2, "Customise HUD/GUI");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 3, "Other Settings");
@@ -3712,12 +3732,19 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Credits, 0xFFFFFFF0, "Credits");
 	add_cartographer_label(CMLabelMenuId_Credits, 0xFFFFFFF1, "Praise the Following.");
 	add_cartographer_label(CMLabelMenuId_Credits, 1, "--- The Devs ---");
-	add_cartographer_label(CMLabelMenuId_Credits, 2, "Glitchy Scripts");
-	add_cartographer_label(CMLabelMenuId_Credits, 3, "Himanshu01");
-	add_cartographer_label(CMLabelMenuId_Credits, 4, "PermaNull");
-	add_cartographer_label(CMLabelMenuId_Credits, 5, "Rude Yoshi");
-	add_cartographer_label(CMLabelMenuId_Credits, 6, "Supersniper");
-	add_cartographer_label(CMLabelMenuId_Credits, 7, "--- Additional 7hanks ---");
+	add_cartographer_label(CMLabelMenuId_Credits, 2, "PermaNull");
+	add_cartographer_label(CMLabelMenuId_Credits, 3, "Glitchy Scripts");
+	add_cartographer_label(CMLabelMenuId_Credits, 4, "Himanshu01");
+	add_cartographer_label(CMLabelMenuId_Credits, 5, "Hootspa");
+	add_cartographer_label(CMLabelMenuId_Credits, 6, "NukeULater");
+	add_cartographer_label(CMLabelMenuId_Credits, 7, "Num005");
+	add_cartographer_label(CMLabelMenuId_Credits, 8, "Rude Yoshi");
+	add_cartographer_label(CMLabelMenuId_Credits, 9, "Supersniper");
+	add_cartographer_label(CMLabelMenuId_Credits, 10, "--- Additional 7hanks ---");
+	add_cartographer_label(CMLabelMenuId_Credits, 11, "Project Cartographer Staff");
+	add_cartographer_label(CMLabelMenuId_Credits, 12, "H2MT (Past and Present)");
+	add_cartographer_label(CMLabelMenuId_Credits, 13, "Dev Preview Members");
+	add_cartographer_label(CMLabelMenuId_Credits, 14, "And the many many more from the Halo 2 Community!");
 
 
 	add_cartographer_label(CMLabelMenuId_AccountCreate, 0xFFFFFFF0, "Create Account");
@@ -3794,6 +3821,9 @@ void initGSCustomMenu() {
 
 	//psub_248beb = (tsub_248beb)DetourClassFunc((BYTE*)H2BaseAddr + 0x248beb, (BYTE*)sub_248beb, 8);
 	//VirtualProtect(psub_248beb, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	psub_209129 = (tsub_209129)DetourFunc((BYTE*)H2BaseAddr + 0x209129, (BYTE*)sub_209129, 5);
+	VirtualProtect(psub_209129, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 
 	RefreshToggleIngameKeyboardControls();

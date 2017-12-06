@@ -397,6 +397,15 @@ void CUserManagement::UnregisterLocal()
 	this->UpdateConnectionStatus();
 }
 
+void SetUserUsername(char* username) {
+	snprintf(g_szUserName[0], 17, username);
+	if (!H2IsDediServer) {
+		snprintf((char*)((BYTE*)H2BaseAddr + 0x971316), 17, username);
+		swprintf((wchar_t*)((BYTE*)H2BaseAddr + 0x96DA94), 17, L"%hs", username);
+		swprintf((wchar_t*)((BYTE*)H2BaseAddr + 0x51A638), 17, L"%hs", username);
+	}
+}
+
 const DWORD annoyance_factor = 0x11223341;
 
 void CUserManagement::ConfigureUser(XNADDR* pxna, ULONGLONG xuid, char* username) {
@@ -423,12 +432,7 @@ void CUserManagement::ConfigureUser(XNADDR* pxna, ULONGLONG xuid, char* username
 	LocalXN = &Users[0].pxna;
 	LocalSec = pxna->inaOnline.s_addr;
 
-	snprintf(g_szUserName[0], 17, username);
-	if (!H2IsDediServer) {
-		snprintf((char*)((BYTE*)H2BaseAddr + 0x971316), 17, username);
-		swprintf((wchar_t*)((BYTE*)H2BaseAddr + 0x96DA94), 17, L"%s", username);
-		swprintf((wchar_t*)((BYTE*)H2BaseAddr + 0x51A638), 17, L"%s", username);
-	}
+	SetUserUsername(username);
 
 	Users[0].bValid = true;
 

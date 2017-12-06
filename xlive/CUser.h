@@ -35,6 +35,7 @@ namespace std
 	};
 }
 
+void SetUserUsername(char* username);
 extern const DWORD annoyance_factor;
 
 class CUserManagement
