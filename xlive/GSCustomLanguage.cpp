@@ -517,12 +517,12 @@ __declspec(naked) void getSystemLanguageMethodJmp() {
 }
 
 
-typedef char*(__cdecl *tsub_31b97)(int, char*);
+typedef char*(__cdecl *tsub_31b97)(int, int);
 tsub_31b97 psub_31b97;
-char* __cdecl sub_31b97(int buflen, char* a2)//Font Table Filename Override
+char* __cdecl sub_31b97(int buff_len, int a2)//Font Table Filename Override
 {
-	char* result = psub_31b97(buflen, a2);
-	strcpy_s(result, buflen, current_language->font_table_filename);
+	char* result = psub_31b97(buff_len, a2);
+	strcpy_s(result, buff_len, current_language->font_table_filename);
 	return result;
 }
 
