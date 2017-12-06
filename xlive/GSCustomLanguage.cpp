@@ -508,25 +508,22 @@ void setGameLanguage() {
 	}
 }
 
-char* cavetemp_fontFilename;
-__declspec(naked) void fontTableFilenameMethodJmp() {
-	__asm {
-		add     esp, 314h
-		mov     cavetemp_fontFilename, edi
-	}
-	strcpy(cavetemp_fontFilename, current_language->font_table_filename);
-	__asm {
-		retn
-	}
-}
-
 DWORD langAfterJmpAddr;
 __declspec(naked) void getSystemLanguageMethodJmp() {
 	setGameLanguage();
-	langAfterJmpAddr = (DWORD)(H2BaseAddr + 0x3828c);
 	__asm {
 		jmp langAfterJmpAddr
 	}
+}
+
+
+typedef char*(__cdecl *tsub_31b97)(int, int);
+tsub_31b97 psub_31b97;
+char* __cdecl sub_31b97(int a1, int a2)//Font Table Filename Override
+{
+	char* result = psub_31b97(a1, a2);
+	strcpy_s(result, 256, current_language->font_table_filename);
+	return result;
 }
 
 #pragma endregion
@@ -623,16 +620,12 @@ void initGSCustomLanguage() {
 		pH2GetLabel = (tH2GetLabel)DetourClassFunc((BYTE*)H2BaseAddr + 0x3defd, (BYTE*)H2GetLabel, 8);
 		VirtualProtect(pH2GetLabel, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		//Kill many much logic
-		BYTE asmNopArray[0xe9];
-		memset(asmNopArray, 0x90, 0xe9);
-		WriteBytesASM(H2BaseAddr + 0x31b9d, asmNopArray, 14);
-		WriteBytesASM(H2BaseAddr + 0x31bb1, asmNopArray, 0xe9);
-		WriteBytesASM(H2BaseAddr + 0x31ce7, asmNopArray, 5);
+		//Hook the function that sets the font table filename.
+		psub_31b97 = (tsub_31b97)DetourFunc((BYTE*)H2BaseAddr + 0x31b97, (BYTE*)sub_31b97, 6);
+		VirtualProtect(psub_31b97, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		//Hook the end of the function and modify the returned string.
-		DetourFunc((BYTE*)H2BaseAddr + 0x31cec, (BYTE*)fontTableFilenameMethodJmp, 6);
 		//Hook the part where it sets the global language id.
+		langAfterJmpAddr = (DWORD)(H2BaseAddr + 0x3828c);
 		DetourFunc((BYTE*)H2BaseAddr + 0x3820d, (BYTE*)getSystemLanguageMethodJmp, 6);
 
 		bool redoCapture = H2Config_custom_labels_capture_missing;
