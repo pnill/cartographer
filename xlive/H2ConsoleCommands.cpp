@@ -146,6 +146,11 @@ void ConsoleCommands::output(std::wstring result) {
 	}
 }
 
+void ConsoleCommands::display(std::string output)
+{
+	writePreviousCommand(output);
+}
+
 bool ConsoleCommands::isNum(const char *s) {
 	int i = 0;
 	while (s[i]) {

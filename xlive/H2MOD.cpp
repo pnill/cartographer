@@ -1171,6 +1171,12 @@ char __cdecl if_cinematic() {
 	return 0;
 }
 
+void __cdecl print_to_console(char *output)
+{
+	const static std::string prefix = "[HSC Print] ";
+	commands->display(prefix + output);
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1254,6 +1260,9 @@ void H2MOD::ApplyHooks() {
 
 		change_team_method = (change_team)DetourFunc((BYTE*)this->GetBase() + 0x2068F2, (BYTE*)changeTeam, 8);
 		VirtualProtect(change_team_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		// hook the print command to redirect the output to our console
+		PatchCall(Base + 0xE9E50, reinterpret_cast<DWORD>(print_to_console));
 	}
 #pragma endregion
 
