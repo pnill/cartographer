@@ -960,9 +960,9 @@ int __cdecl OnMapLoad(int a1)
 				gg->Initialize();
 
 			if (b_H2X)
-				H2X_Initialize(1);
+				H2X_Initialize();
 			else
-				H2X_Initialize(0);
+				H2X_Deinitialize();
 
 			if (b_Halo2Final)
 				h2f->Initialize(h2mod->Server);
@@ -984,9 +984,9 @@ int __cdecl OnMapLoad(int a1)
 				gg->Initialize();
 
 			if (b_H2X)
-				H2X_Initialize(1);
+				H2X_Initialize();
 			else
-				H2X_Initialize(0);
+				H2X_Deinitialize();
 		}
 
 	}

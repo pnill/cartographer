@@ -194,7 +194,7 @@ void ConsoleCommands::handle_command(std::string command) {
 					h2mod->kick_player(atoi(cstr));
 				}
 			}
-			delete cstr;
+			delete[] cstr;
 		}
 		else if (firstCommand == "$lognetworkplayers") {
 			//TODO: use mutex here
@@ -238,7 +238,7 @@ void ConsoleCommands::handle_command(std::string command) {
 					output(L"Maximum players set");
 				}
 			}
-			delete cstr;
+			delete[] cstr;
 		}
 		else if (firstCommand == "$resetspawncommandlist") {
 			//reset checked_for_ids, so you can reload new object_datums at runtime
