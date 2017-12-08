@@ -14,7 +14,7 @@ DWORD getOffset() {
 }
 
 
-void H2X_Initialize()
+void H2X::Initialize()
 {
 	
 	DWORD FloatOffsets = getOffset();
@@ -32,7 +32,7 @@ void H2X_Initialize()
 	*(float*)(FloatOffsets + 0xD0F960) = 10.0f; /*H2X Brute Plasma Rifle rounds per second max*/
 }
 
-void H2X_Deinitialize()
+void H2X::Deinitialize()
 {
 
 	DWORD FloatOffsets = getOffset();

@@ -1,4 +1,9 @@
 #pragma once
 
-	void H2X_Initialize();
-	void H2X_Deinitialize();
+class H2X
+{
+public:
+	static void Initialize();
+	static void Deinitialize();
+
+};
