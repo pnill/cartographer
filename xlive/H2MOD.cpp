@@ -1359,9 +1359,11 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 					{
 						TRACE_GAME("[h2mod-network] Deleting player %ws as their value was set to 0", it->first->PlayerName);
 
+						//TODO: create delete method for deleting network player
 						if (it->first->PacketsAvailable == true)
 							delete[] it->first->PacketData; // Delete packet data if there is any.
 
+						delete[] it->first->PlayerName; // Delete Player name
 
 						delete[] it->first; // Clear NetworkPlayer object.
 
