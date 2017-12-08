@@ -199,7 +199,7 @@ void ConsoleCommands::handle_command(std::string command) {
 					h2mod->kick_player(atoi(cstr));
 				}
 			}
-			delete cstr;
+			delete[] cstr;
 		}
 		else if (firstCommand == "$lognetworkplayers") {
 			//TODO: use mutex here
@@ -219,27 +219,31 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			std::string secondArg = splitCommands[1];
-			int maxPlayersSet = stoi(splitCommands[1]);
+			std::string firstArg = splitCommands[1];
+			char *cstr = new char[firstArg.length() + 1];
+			strcpy(cstr, firstArg.c_str());
 
 			int baseAddr = (int)*(int*)((char*)h2mod->GetBase() + 0x420FE8);
 			BYTE& playerNumber = *(BYTE*)(baseAddr + 0x1254);
 			BYTE& maxPlayersNumber = *(BYTE*)(baseAddr + 0x4C80);
 
-			if (maxPlayersSet < 1 || maxPlayersSet > 16) {
-				output(L"The value needs to be between 1 and 16.");
-				return;
-			}
+			if (isNum(cstr)) {
+				int maxPlayersSet = atoi(cstr);
+				if (maxPlayersSet < 1 || maxPlayersSet > 16) {
+					output(L"The value needs to be between 1 and 16.");
+					return;
+				}
 
-			if (maxPlayersSet < playerNumber) {
-				output(L"You can't set a value of max players smaller than the actual number of players on the server.");
-				return;
+				if (maxPlayersSet < playerNumber) {
+					output(L"You can't set a value of max players smaller than the actual number of players on the server.");
+					return;
+				}
+				else {
+					maxPlayersNumber = maxPlayersSet;
+					output(L"Maximum players set");
+				}
 			}
-			else {
-				maxPlayersNumber = maxPlayersSet;
-				output(L"Maximum players set");
-			}
-
+			delete[] cstr;
 		}
 		else if (firstCommand == "$resetspawncommandlist") {
 			//reset checked_for_ids, so you can reload new object_datums at runtime

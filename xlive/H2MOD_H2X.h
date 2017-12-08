@@ -1,12 +1,9 @@
-#ifndef H2MOD_H2X
-#define H2MOD_H2X
+#pragma once
 
 class H2X
 {
 public:
+	static void Initialize();
+	static void Deinitialize();
 
-	void H2X_Initialize();
-	void H2X_Deinitialize();
 };
-
-#endif

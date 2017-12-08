@@ -28,7 +28,6 @@ GunGame *gg = new GunGame();
 Infection *inf = new Infection();
 Halo2Final *h2f = new Halo2Final();
 Mouseinput *mouse = new Mouseinput();
-H2X *h2xrb = new H2X();
 
 bool b_Infection = false;
 bool b_Halo2Final = false;
@@ -961,9 +960,9 @@ int __cdecl OnMapLoad(int a1)
 				gg->Initialize();
 
 			if (b_H2X)
-				h2xrb->H2X_Initialize();
+				H2X::Initialize();
 			else
-				h2xrb->H2X_Deinitialize();
+				H2X::Deinitialize();
 
 			if (b_Halo2Final)
 				h2f->Initialize(h2mod->Server);
@@ -985,9 +984,9 @@ int __cdecl OnMapLoad(int a1)
 				gg->Initialize();
 
 			if (b_H2X)
-				h2xrb->H2X_Initialize();
+				H2X::Initialize();
 			else
-				h2xrb->H2X_Deinitialize();
+				H2X::Deinitialize();
 		}
 
 	}
