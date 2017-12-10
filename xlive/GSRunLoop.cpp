@@ -198,6 +198,10 @@ void hotkeyFuncTest() {
 int hotkeyIdTest2 = VK_F6;
 void hotkeyFuncTest2() {
 	addDebugText("unconfused");
+
+	GSCustomMenuCall_Obscure();
+
+	return;
 	//0 - Go to main menu root.
 	//1 - Activate Product to continue playing diag.
 	//2 - opens main menu wgit (6) - (doesn't render when ingame).

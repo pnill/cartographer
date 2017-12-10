@@ -1662,7 +1662,7 @@ char __cdecl sub_BD114_blind_hud(unsigned int a1)//render hud
 {
 	DWORD PlayerGlobalBase = (DWORD)0x30004B60;
 	bool& IsPlayerDead = (bool&)*(BYTE*)(PlayerGlobalBase + 4);
-	if (!blind_fp && IsPlayerDead) {//fixes game notification text from glitching out
+	if (IsPlayerDead) {//fixes game notification text from glitching out
 		return 0;
 	}
 	char result = blind_hud ? 1 : 0;
@@ -2716,9 +2716,8 @@ static bool CMButtonHandler_AccountEdit(int button_id) {
 			int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
 			sub_209236(0);
 			//SaveH2Accounts();
-		}
-		else {
 			accountingGoBackToList = false;
+			H2AccountLastUsed = 0;
 		}
 		memset(identifier_pass, 0, strlen(identifier_pass));
 	}
@@ -3472,14 +3471,18 @@ void* __stdcall sub_23BC45(void* thisptr)//__thiscall
 }
 
 int __cdecl sub_209236(int a1) {
-	//char NotificationPlayerText[40];
-	//sprintf(NotificationPlayerText, "sub_209236: %d", a1);
-	//addDebugText(NotificationPlayerText);
-	if (ReadH2Accounts()) {
-		GSCustomMenuCall_AccountList();
+	extern CUserManagement User;
+	if (User.LocalUserLoggedIn()) {
+		int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
+		sub_209236(0);
 	}
 	else {
-		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF016, 0xFFFFF017);
+		if (ReadH2Accounts()) {
+			GSCustomMenuCall_AccountList();
+		}
+		else {
+			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF016, 0xFFFFF017);
+		}
 	}
 	return 0;
 }
@@ -3545,6 +3548,37 @@ char __cdecl sub_209129(int a1, int a2, int a3, int a4)//player configuration pr
 	}
 	return result;
 }
+
+
+#pragma region Obscure_Menus
+
+static bool CMButtonHandler_Obscure(int button_id) {
+	return false;
+}
+
+DWORD* menu_vftable_1_Obscure = 0;
+DWORD* menu_vftable_2_Obscure = 0;
+
+void CMSetupVFTables_Obscure() {
+	CMSetupVFTables(&menu_vftable_1_Obscure, &menu_vftable_2_Obscure, 0, 0, 0, 0, false, 0);
+}
+
+int Obscure_wgit_id = 30;
+
+int CustomMenu_Obscure(int a1) {
+	return CustomMenu_CallHead(a1, menu_vftable_1_Obscure, menu_vftable_2_Obscure, (DWORD)&CMButtonHandler_Obscure, 14, Obscure_wgit_id);
+}
+
+void GSCustomMenuCall_Obscure() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_Obscure);
+	CallWgit(WgitScreenfunctionPtr);
+}
+
+
+#pragma endregion
+
+
+
 
 void initGSCustomMenu() {
 
@@ -3801,6 +3835,8 @@ void initGSCustomMenu() {
 	if (H2IsDediServer)
 		return;
 
+	CMSetupVFTables_Obscure();
+
 	setupSomeTests();
 
 	//"PRESS ANY KEY TO CONTINUE" mainmenu redirect.
@@ -3952,7 +3988,8 @@ void CMSetupVFTables(DWORD** menu_vftable_1, DWORD** menu_vftable_2, DWORD CM_La
 	memcpy(*menu_vftable_1, (BYTE*)H2BaseAddr + 0x3d96fc, 0x98);//Brightness
 
 	//Button Labels
-	*(DWORD*)((DWORD)*menu_vftable_1 + 0x90) = (DWORD)CM_LabelButtons;
+	if (CM_LabelButtons)
+		*(DWORD*)((DWORD)*menu_vftable_1 + 0x90) = (DWORD)CM_LabelButtons;
 
 
 	//clone a brightness menu_vftable_2
@@ -4004,11 +4041,14 @@ void CMSetupVFTables(DWORD** menu_vftable_1, DWORD** menu_vftable_2, DWORD CM_La
 	//*(DWORD*)((DWORD)*menu_vftable_2 + 0xC) = (DWORD)H2BaseAddr + 0x24f0eb;//gameoptions breaks text
 
 	//CALL for Title & Description
-	*(DWORD*)((DWORD)*menu_vftable_2 + 0x58) = (DWORD)sub_2111ab_CMLTD_nak;
+	if (sub_2111ab_CMLTD_nak)
+		*(DWORD*)((DWORD)*menu_vftable_2 + 0x58) = (DWORD)sub_2111ab_CMLTD_nak;
 	//Menu Button Preselected Option
-	*(DWORD*)((DWORD)*menu_vftable_2 + 0x5C) = (DWORD)CM_ButtonPreselection;
+	if (CM_ButtonPreselection)
+		*(DWORD*)((DWORD)*menu_vftable_2 + 0x5C) = (DWORD)CM_ButtonPreselection;
 	//Menu function pointer helper
-	*(DWORD*)((DWORD)*menu_vftable_2 + 0x98) = (DWORD)CM_FuncPtrHelper;
+	if (CM_FuncPtrHelper)
+		*(DWORD*)((DWORD)*menu_vftable_2 + 0x98) = (DWORD)CM_FuncPtrHelper;
 }
 
 int __stdcall BtnHandlerCaller(void* thisptr, int a2, int a3) {

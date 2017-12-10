@@ -82,6 +82,8 @@ extern const int ERROR_CODE_CURL_HANDLE;
 extern const int ERROR_CODE_CURL_EASY_PERF;
 int MasterHttpResponse(char* url, char* http_request, char* &rtn_response);
 
+bool StrnCaseInsensEqu(char* str1, char* str2, unsigned int chk_len);
+
 #define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
 #define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2
 #define NopFill(Address, len)                       \

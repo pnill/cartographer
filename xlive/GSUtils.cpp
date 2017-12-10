@@ -515,10 +515,6 @@ int MasterHttpResponse(char* url, char* http_request, char* &rtn_response) {
 		data. */
 		curl_easy_setopt(curl, CURLOPT_URL, url);
 
-		//https://curl.haxx.se/libcurl/c/CURLOPT_PINNEDPUBLICKEY.html
-		//not working correctly afaik
-		//curl_easy_setopt(curl, CURLOPT_PINNEDPUBLICKEY, "");
-
 		struct stringMe s;
 		init_string(&s);
 
@@ -533,8 +529,8 @@ int MasterHttpResponse(char* url, char* http_request, char* &rtn_response) {
 		/* Check for errors */
 		if (res != CURLE_OK) {
 			result = ERROR_CODE_CURL_EASY_PERF;//curl_easy_perform() issue
-			char NotificationPlayerText[50];
-			snprintf(NotificationPlayerText, 50, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+			char NotificationPlayerText[500];
+			snprintf(NotificationPlayerText, 500, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
 			addDebugText(NotificationPlayerText);
 			free(s.ptr);
 		}
@@ -552,4 +548,33 @@ int MasterHttpResponse(char* url, char* http_request, char* &rtn_response) {
 	curl_global_cleanup();
 
 	return result;
+}
+
+bool StrnCaseInsensEqu(char* str1, char* str2, unsigned int chk_len) {
+	int chk_len2 = strlen(str1);
+	if (chk_len2 < chk_len) {
+		chk_len = chk_len2;
+	}
+	chk_len2 = strlen(str2);
+	if (chk_len2 < chk_len) {
+		return false;
+	}
+	const int case_diff = 'A' - 'a';
+	for (int i = 0; i < chk_len; i++) {
+		if (str1[i] != str2[i]) {
+			int sa = str1[i];
+			if (sa >= 'a' && sa <= 'z') {
+				sa += case_diff;
+			}
+			else if (sa >= 'A' && sa <= 'Z') {
+				sa -= case_diff;
+			}
+			if (sa == str2[i]) {
+				continue;
+			}
+			return false;
+		}
+	}
+
+	return true;
 }

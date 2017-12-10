@@ -253,7 +253,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 		else if (sscanf(fileLine, "login_secure_addr=%x", &tempulong) == 1) {
 			if (tempulong > 0) {
 				//char NotificationPlayerText[60];
-				//snprintf(NotificationPlayerText, 60, "User saddr is: %zu", tempuint1);
+				//snprintf(NotificationPlayerText, 60, "User saddr is: %08zx", tempulong);
 				//addDebugText(NotificationPlayerText);
 				saddr = tempulong;
 			}
@@ -318,6 +318,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 							H2AccountBufferUsername[i] = (char*)malloc(sizeof(char) * 17);
 							snprintf(H2AccountBufferUsername[i], 17, username);
 							snprintf(H2AccountBufferLoginToken[i], 33, login_token);
+							break;
 						}
 					}
 				}
@@ -384,6 +385,20 @@ bool HandleGuiLogin(char* token, char* identifier, char* password) {
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF004, 0xFFFFF005);
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_LOGIN_TOKEN) {
+
+			char* username = 0;
+			for (int i = 0; i < H2AccountCount; i++) {
+				if (H2AccountBufferLoginToken[i] && strcmp(H2AccountBufferLoginToken[i], token) == 0) {
+					username = H2AccountBufferUsername[i];
+					break;
+				}
+			}
+
+			if (username) {
+				char* username2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
+				snprintf(username2, strlen(username) + 1, username);
+			}
+
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF006, 0xFFFFF007);
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_LOGIN_ID) {

@@ -239,6 +239,28 @@ void H2AccountBufferAdd(char* token, char* username) {
 	int bufflen;
 	H2AccountBufferCheck();
 
+	for (int existing_profile = 0; existing_profile < H2AccountCount; existing_profile++) {
+		if (StrnCaseInsensEqu(H2AccountBufferUsername[existing_profile], username, 31)) {
+			
+			if (H2AccountBufferLoginToken[existing_profile]) {
+				free(H2AccountBufferLoginToken[existing_profile]);
+			}
+			if (H2AccountBufferUsername[existing_profile]) {
+				free(H2AccountBufferUsername[existing_profile]);
+			}
+
+			bufflen = strlen(token) + 1;
+			H2AccountBufferLoginToken[existing_profile] = (char*)malloc(sizeof(char) * bufflen);
+			snprintf(H2AccountBufferLoginToken[existing_profile], bufflen, token);
+
+			bufflen = strlen(username) + 1;
+			H2AccountBufferUsername[existing_profile] = (char*)malloc(sizeof(char) * bufflen);
+			snprintf(H2AccountBufferUsername[existing_profile], bufflen, username);
+
+			return;
+		}
+	}
+
 	bufflen = strlen(token) + 1;
 	H2AccountBufferLoginToken[H2AccountBufferI] = (char*)malloc(sizeof(char) * bufflen);
 	snprintf(H2AccountBufferLoginToken[H2AccountBufferI], bufflen, token);

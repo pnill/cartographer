@@ -16,3 +16,5 @@ extern const int CMLabelMenuId_AccountEdit;
 extern const int CMLabelMenuId_AccountCreate;
 
 void RefreshToggleDisableControllerAimAssist();
+
+void GSCustomMenuCall_Obscure();
