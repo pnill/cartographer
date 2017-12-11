@@ -1176,6 +1176,13 @@ void __cdecl print_to_console(char *output)
 	commands->display(prefix + output);
 }
 
+void patchBYTEs(BYTE* orig, BYTE* values, int size) {
+	DWORD dwBack;
+	VirtualProtect(orig, size, PAGE_EXECUTE_READWRITE, &dwBack);
+	memcpy(orig, (BYTE*)values, size);
+	VirtualProtect(orig, size, dwBack, NULL);
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1261,6 +1268,10 @@ void H2MOD::ApplyHooks() {
 
 		// hook the print command to redirect the output to our console
 		PatchCall(Base + 0xE9E50, reinterpret_cast<DWORD>(print_to_console));
+
+		//allow AI in MP
+		BYTE bytes[20] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+		patchBYTEs((BYTE*)(h2mod->GetBase() + 0x30E67C), bytes, 20);
 	}
 #pragma endregion
 
