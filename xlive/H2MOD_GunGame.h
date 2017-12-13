@@ -1,6 +1,5 @@
 #pragma once
-#ifndef H2GUNGAME_H
-#define H2GUNGAME_H
+
 #include "Hook.h"
 #include <unordered_map>
 
@@ -26,4 +25,3 @@ public:
 	std::unordered_map<GunGamePlayer*, bool> GunGamePlayers;
 
 };
-#endif

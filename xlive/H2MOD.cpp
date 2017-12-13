@@ -505,7 +505,7 @@ void H2MOD::set_unit_speed_patch(bool hackit) {
 
 	BYTE assmPatchSpeed[8];
 	memset(assmPatchSpeed, 0x90, 8);
-	WriteBytesASM(h2mod->GetBase() + ((!h2mod->Server) ? 0x6AB7f : 0x6A3BA), assmPatchSpeed, 8);
+	WriteBytes(h2mod->GetBase() + ((!h2mod->Server) ? 0x6AB7f : 0x6A3BA), assmPatchSpeed, 8);
 }
 
 void H2MOD::set_unit_speed(float speed, int pIndex)
@@ -743,7 +743,7 @@ void PatchFixRankIcon() {
 			}
 		}
 		if (shouldPatch) {
-			WriteBytesASM((DWORD)assmOffset, assmPatchFixRankIcon, assmlen);
+			WriteBytes((DWORD)assmOffset, assmPatchFixRankIcon, assmlen);
 			addDebugText("Patching Rank Icon Fix.");
 		}
 	}
@@ -751,7 +751,7 @@ void PatchFixRankIcon() {
 void PatchGameDetailsCheck()
 {
 	BYTE assmPatchGamedetails[2] = { 0x75,0x18};	
-	WriteBytesASM(h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
+	WriteBytes(h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
 }
 
 void H2MOD::PatchWeaponsInteraction(bool b_Enable)
@@ -763,7 +763,7 @@ void H2MOD::PatchWeaponsInteraction(bool b_Enable)
 	{
 		memset(assm, 0x90, 5);
 	}
-	WriteBytesASM(offset, assm, 5);
+	WriteBytes(offset, assm, 5);
 }
 
 void PatchPingMeterCheck(bool hackit)
@@ -774,9 +774,9 @@ void PatchPingMeterCheck(bool hackit)
 	BYTE assmPatchPingCheck[2] = { 0x90,0x90 };
 
 	if (hackit)
-		WriteBytesASM(h2mod->GetBase() + 0x1D4E35, assmPatchPingCheck, 2);
+		WriteBytes(h2mod->GetBase() + 0x1D4E35, assmPatchPingCheck, 2);
 	else
-		WriteBytesASM(h2mod->GetBase() + 0x1D4E35, assmOrgLine, 2);
+		WriteBytes(h2mod->GetBase() + 0x1D4E35, assmOrgLine, 2);
 
 }
 

@@ -1,5 +1,5 @@
-#ifndef CUSER_H
-#define CUSER_H
+#pragma once 
+
 #include "stdafx.h"
 #include <unordered_map>
 #include <mutex>
@@ -91,4 +91,3 @@ public:
 
 	int LastUser = 1;
 };
-#endif

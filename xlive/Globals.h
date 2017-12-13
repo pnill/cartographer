@@ -1,5 +1,5 @@
-#ifndef GLOBALS_H
-#define GLOBALS_H
+#pragma once
+
 #include <string>
 #include <sstream>
 #include <vector>
@@ -26,4 +26,3 @@ extern ConsoleCommands* commands;
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
 std::vector<std::string> split(const std::string &s, char delim);
 int stripWhitespace(wchar_t *inputStr);
-#endif

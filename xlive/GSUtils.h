@@ -89,4 +89,4 @@ bool StrnCaseInsensEqu(char* str1, char* str2, unsigned int chk_len);
 #define NopFill(Address, len)                       \
 	BYTE J(NopFIll_, __LINE__ )[len];               \
 	std::fill_n(J(NopFIll_, __LINE__ ), len, 0x90); \
-	WriteBytesASM(Address, J(NopFIll_, __LINE__ ), len)
+	WriteBytes(Address, J(NopFIll_, __LINE__ ), len)
