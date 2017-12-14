@@ -1,5 +1,4 @@
-#ifndef CHATBOX_COMMANDS_H
-#define CHATBOX_COMMANDS_H
+#pragma once
 
 class ConsoleCommands {
 public:
@@ -23,5 +22,3 @@ private:
 	std::unordered_map<std::string, unsigned int> object_ids;
 	DWORD sleepTime;
 };
-
-#endif

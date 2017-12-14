@@ -1,5 +1,4 @@
-#ifndef MAP_DOWNLOAD_H
-#define MAP_DOWNLOAD_H
+#pragma once
 
 #include <set>
 
@@ -45,5 +44,3 @@ private:
 	std::unordered_map<int, std::string> precalculatedDownloadPercentageStrings;
 	volatile BOOL threadRunning = false;
 };
-
-#endif

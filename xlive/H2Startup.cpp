@@ -67,7 +67,7 @@ void configureXinput() {
 	if (!H2IsDediServer) {
 		if (H2GetInstanceId() > 1) {
 			BYTE xinputNumFix[] = { '0' + (H2GetInstanceId() / 10), 0, '0' + (H2GetInstanceId() % 10) };
-			WriteBytesASM((DWORD)xinputdllPath + 16, xinputNumFix, 3);
+			WriteBytes((DWORD)xinputdllPath + 16, xinputNumFix, 3);
 
 			char pointerHex[20];
 			sprintf(pointerHex, "%x", (DWORD)xinputdllPath);
@@ -79,7 +79,7 @@ void configureXinput() {
 			addDebugText(totext);
 
 			BYTE assmXinputPushIntructionPart[] = { byteArray[3], byteArray[2], byteArray[1], byteArray[0] };
-			WriteBytesASM(H2BaseAddr + 0x8AD28, assmXinputPushIntructionPart, 4);
+			WriteBytes(H2BaseAddr + 0x8AD28, assmXinputPushIntructionPart, 4);
 
 			char xinputName[40];
 			char xinputdir[12];

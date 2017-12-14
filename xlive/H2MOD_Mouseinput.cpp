@@ -59,15 +59,15 @@ void Mouseinput::Initialize()
 
 	auto setDx = (base + 0x627CC);
 	VirtualProtect((LPVOID)setDx, 8, PAGE_EXECUTE_READWRITE, &dwBack);
-	WriteBytesASM(base + 0x627CC, assmNop, 8);
+	WriteBytes(base + 0x627CC, assmNop, 8);
 
 	auto setDy = (base + 0x62802);
 	VirtualProtect((LPVOID)setDy, 8, PAGE_EXECUTE_READWRITE, &dwBack);
-	WriteBytesASM(base + 0x62802, assmNop, 8);
+	WriteBytes(base + 0x62802, assmNop, 8);
 
 	auto setDx2 = (base + 0x627E7);
 	VirtualProtect((LPVOID)setDx2, 8, PAGE_EXECUTE_READWRITE, &dwBack);
-	WriteBytesASM(base + 0x627E7, assmNop, 8);
+	WriteBytes(base + 0x627E7, assmNop, 8);
 
 	Codecave(base + 0x622AA, CC_Fug, 0x8);
 }

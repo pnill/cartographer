@@ -1,7 +1,4 @@
 #pragma once
-#ifndef GUI_H
-#define GUI_H
-
 
 static void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont);
 static void drawRect(FLOAT X, FLOAT Y, FLOAT Width, FLOAT Height, D3DCOLOR dColor);
@@ -31,12 +28,9 @@ static CONST D3DCOLOR COLOR_GREY_TRANSPARENT = D3DCOLOR_ARGB(150, 112, 112, 112)
 static CONST D3DCOLOR COLOR_BLACK_TRANSPARENT = D3DCOLOR_ARGB(150, 0, 0, 0);
 
 
-
 namespace GUI
 {
 	extern void Initialize();
 
 };
 
-
-#endif

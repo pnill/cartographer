@@ -1,6 +1,5 @@
 #pragma once
-#ifndef H2MOD_H
-#define H2MOD_H
+
 #include "Hook.h"
 #include <unordered_map>
 #include <set>
@@ -147,6 +146,3 @@ private:
 
 extern H2MOD* h2mod;
 
-
-
-#endif

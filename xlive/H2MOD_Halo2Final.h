@@ -1,6 +1,4 @@
 #pragma once
-#ifndef H2MOD_H2FINAL
-#define H2MOD_H2FINAL
 
 class Halo2FinalSettings
 {
@@ -121,4 +119,3 @@ public:
 private:
 	Halo2FinalSettings *settings;
 };
-#endif
