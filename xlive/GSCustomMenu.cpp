@@ -3819,7 +3819,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0001, ">Remove Account");
 	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0002, ">Cancel Remove");
 	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0003, ">Create Account");
-	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0004, "| Play Offline |");
+	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0004, ">Play Offline");
 	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0005, "<Unnamed>");
 
 
