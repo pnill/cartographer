@@ -14,6 +14,7 @@ void GSCustomMenuCall_Error_Outer(int menuIdTitle, int title, int menuIdDesc, in
 extern const int CMLabelMenuId_Error;
 extern const int CMLabelMenuId_AccountEdit;
 extern const int CMLabelMenuId_AccountCreate;
+extern const int CMLabelMenuId_Update;
 
 void RefreshToggleDisableControllerAimAssist();
 

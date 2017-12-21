@@ -23,8 +23,9 @@ static void HandleFileError(int fpErrNo) {//TODO
 #pragma region Config IO
 const wchar_t H2ConfigFilenames[2][24] = { L"%wshalo2config%d.ini", L"%wsh2serverconfig%d.ini" };
 
-const char H2ConfigVersionStr[] = "[H2ConfigurationVersion:%d]";
-const int H2ConfigVersion = 1;
+const char H2ConfigVersionStr[] = "[H2ConfigurationVersion:%hs]";
+const char H2ConfigVersionReadStr[] = "[H2ConfigurationVersion:%[^]]]";
+char H2ConfigVersion[] = "1";
 
 static const int bufferIncSize = 10;
 static int oldConfigBufferI = 0;
@@ -440,8 +441,11 @@ static void est_reset_vars() {
 }
 #pragma endregion
 
-static int interpretConfigSetting(char* fileLine, int version, int lineNumber) {
-	if (version != H2ConfigVersion) {
+static int interpretConfigSetting(char* fileLine, char* version, int lineNumber) {
+	if (!version) {
+		return 0;
+	}
+	else if (CmpVersions(H2ConfigVersion, version) != 0) {
 		if (ownsConfigFile) {
 			if (oldConfigBufferI >= oldConfigBufferLen) {
 				if (!oldConfigBuffer) {
@@ -980,7 +984,7 @@ void ReadH2Config() {
 		est_reset_vars();
 		oldConfigBufferFree();
 		badConfigBufferFree();
-		ReadIniFile(fileConfig, true, H2ConfigVersionStr, H2ConfigVersion, interpretConfigSetting);
+		ReadIniFile(fileConfig, true, H2ConfigVersionReadStr, H2ConfigVersion, interpretConfigSetting);
 
 		fclose(fileConfig);
 

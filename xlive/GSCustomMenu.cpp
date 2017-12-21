@@ -11,6 +11,7 @@
 #include "GSAccountCreate.h"
 #include "CUser.h"
 #include "H2MOD.h"
+#include "GSDownload.h"
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
@@ -1646,6 +1647,161 @@ void GSCustomMenuCall_EditFPS() {
 #pragma endregion
 
 
+const int CMLabelMenuId_Update = 0xFF000011;
+#pragma region CM_Update
+
+static bool force_keep_open_Update = false;
+
+void __stdcall CMLabelButtons_Update(int a1, int a2)
+{
+	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+
+	__int16 button_id = *(WORD*)(a1 + 112);
+	int v3 = sub_211909(a1, 6, 0, 0);
+	if (v3)
+	{
+		sub_21bf85_CMLTD(v3, button_id + 1, CMLabelMenuId_Update);
+	}
+}
+
+__declspec(naked) void sub_2111ab_CMLTD_nak_Update() {//__thiscall
+	__asm {
+		mov eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0xFFFFFFF1//label_id_description
+		push 0xFFFFFFF0//label_id_title
+		push CMLabelMenuId_Update
+		push eax
+		push ecx
+		call sub_2111ab_CMLTD//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+static bool CMButtonHandler_Update(int button_id) {
+
+	if (button_id == 0) {
+		GSDownloadCheck();
+	}
+	else if (button_id == 1 && GSDownload_files_to_download) {
+		GSDownloadDL();
+	}
+	else if (button_id == 2 && GSDownload_files_to_install) {
+		GSDownloadInstall();
+	}
+	else if (button_id == 3) {
+		GSDownloadCancel();
+		force_keep_open_Update = false;
+		return true;
+	}
+	return false;
+}
+
+__declspec(naked) void sub_20F790_CM_nak_Update() {//__thiscall
+	__asm {
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0//selected button id
+		push ecx
+		call sub_20F790_CM//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn
+	}
+}
+
+void GSCustomMenuCall_Update();
+
+void* __stdcall sub_248beb_deconstructor_Update(LPVOID lpMem, char a2)//__thiscall
+{
+	if (force_keep_open_Update) {
+		GSCustomMenuCall_Update();
+	}
+
+	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
+	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
+
+	sub_248b90((void*)lpMem);
+	if (a2 & 1) {
+		sub_287c23((void*)lpMem);
+	}
+	return (void*)lpMem;
+}
+
+__declspec(naked) void sub_248beb_nak_deconstructor_Update() {//__thiscall
+	__asm {
+		mov  eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push eax
+		push ecx
+		call sub_248beb_deconstructor_Update//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+int CustomMenu_Update(int);
+
+int(__cdecl *CustomMenuFuncPtrHelp_Update())(int) {
+	return CustomMenu_Update;
+}
+
+DWORD* menu_vftable_1_Update = 0;
+DWORD* menu_vftable_2_Update = 0;
+
+void CMSetupVFTables_Update() {
+	CMSetupVFTables(&menu_vftable_1_Update, &menu_vftable_2_Update, (DWORD)CMLabelButtons_Update, (DWORD)sub_2111ab_CMLTD_nak_Update, (DWORD)CustomMenuFuncPtrHelp_Update, (DWORD)sub_20F790_CM_nak_Update, true, (DWORD)sub_248beb_nak_deconstructor_Update);
+}
+
+int CustomMenu_Update(int a1) {
+	force_keep_open_Update = true;
+	return CustomMenu_CallHead(a1, menu_vftable_1_Update, menu_vftable_2_Update, (DWORD)&CMButtonHandler_Update, 4, 272);
+}
+
+void GSCustomMenuCall_Update() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_Update);
+	CallWgit(WgitScreenfunctionPtr);
+}
+
+#pragma endregion
+
+
+
 
 #pragma region Setting_Modifications
 
@@ -3085,6 +3241,9 @@ static bool CMButtonHandler_Guide(int button_id) {
 	else if (button_id == 2) {
 		GSCustomMenuCall_Credits();
 	}
+	else if (button_id == 3) {
+		GSCustomMenuCall_Update();
+	}
 	return false;
 }
 
@@ -3131,7 +3290,7 @@ int CustomMenu_Guide(int a1) {
 	sprintf(guide_description, guide_desc_base, hotkeyname);//TODO
 	add_cartographer_label(CMLabelMenuId_Guide, 0xFFFFFFF1, guide_description);
 	free(guide_description);
-	return CustomMenu_CallHead(a1, menu_vftable_1_Guide, menu_vftable_2_Guide, (DWORD)&CMButtonHandler_Guide, 3, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_Guide, menu_vftable_2_Guide, (DWORD)&CMButtonHandler_Guide, 4, 272);
 }
 
 void GSCustomMenuCall_Guide() {
@@ -3577,6 +3736,47 @@ void GSCustomMenuCall_Obscure() {
 
 #pragma endregion
 
+unsigned int sound_id = 0xF44739E1;
+
+typedef void(__cdecl *tsub_bd137)(unsigned int);
+tsub_bd137 psub_bd137;
+void __cdecl sub_bd137(unsigned int skull_id) {
+	//psub_bd137(skull_id);
+
+	BYTE*(*sub_22CE83)() = (BYTE*(*)())((BYTE*)H2BaseAddr + 0x22CE83);
+	signed int(*sub_5343F)() = (signed int(*)())((BYTE*)H2BaseAddr + 0x5343F);
+	int(__cdecl* sub_22DEA4)(int, int) = (int(__cdecl*)(int, int))((BYTE*)H2BaseAddr + 0x22DEA4);
+	DWORD(__cdecl* sub_A402C)(float, float, float, __int16) = (DWORD(__cdecl*)(float, float, float, __int16))((BYTE*)H2BaseAddr + 0xA402C);
+	DWORD(__cdecl* sub_8836C)(DWORD, float) = (DWORD(__cdecl*)(DWORD, float))((BYTE*)H2BaseAddr + 0x8836C);
+
+	BYTE* byte_4D8320 = (BYTE*)((char*)H2BaseAddr + 0x4D8320);
+	DWORD* dword_3BCAF8 = (DWORD*)((char*)H2BaseAddr + 0x3BCAF8);
+	DWORD& dword_479E70 = *(DWORD*)((char*)H2BaseAddr + 0x479E70);
+	DWORD& dword_482290 = *(DWORD*)((char*)H2BaseAddr + 0x482290);
+
+	int v1; // ST0C_4
+	int v2; // eax
+	int v3; // eax
+	int v4; // ecx
+	unsigned int v5; // ecx
+
+	if (skull_id <= 0xE && !byte_4D8320[skull_id])
+	{
+		byte_4D8320[skull_id] = 1;
+		sub_22CE83();
+		v1 = dword_3BCAF8[skull_id];
+		v2 = sub_5343F();
+		sub_22DEA4(v2, v1);
+		sub_A402C(1.0f, 1.0f, 1.0f, 20);//r, g, b, flash length
+		v3 = *(DWORD*)(dword_479E70 + 308);
+		if (v3 != -1) {
+			v4 = v3 + dword_482290;
+			v5 = *(DWORD*)(v4 + 280);
+			if (v5 != -1)
+				sub_8836C(v5, 1.0f);//sound_id?, volume 1.0-2.9?
+		}
+	}
+}
 
 
 
@@ -3699,6 +3899,16 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditFPS, 5, "-10");
 
 
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF0, "Update");
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF1, "Update Project Cartographer.");
+	add_cartographer_label(CMLabelMenuId_Update, 1, "Check for Updates");
+	add_cartographer_label(CMLabelMenuId_Update, 2, (char*)0, true);
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFF0002, "Download Updates");
+	add_cartographer_label(CMLabelMenuId_Update, 3, (char*)0, true);
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFF0003, "Install Updates");
+	add_cartographer_label(CMLabelMenuId_Update, 4, "Cancel");
+
+
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF0, "Customise HUD / GUI");
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF1, "Customise your heads up display and user interface with the following settings.");
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF2, "Enable %s");
@@ -3816,10 +4026,10 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFFFFF0, "Online Accounts");
 	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFFFFF1, "Select an Account to Sign in to or use options to create/add/remove them.");
 	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0000, ">Add Account");
-	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0001, ">Remove Account");
-	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0002, ">Cancel Remove");
+	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0001, "-Remove Account");
+	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0002, "-Cancel Remove");
 	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0003, ">Create Account");
-	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0004, "| Play Offline |");
+	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0004, ">Play Offline");
 	add_cartographer_label(CMLabelMenuId_AccountList, 0xFFFF0005, "<Unnamed>");
 
 
@@ -3828,6 +4038,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Guide, 1, "Advanced Settings");
 	add_cartographer_label(CMLabelMenuId_Guide, 2, "Website");
 	add_cartographer_label(CMLabelMenuId_Guide, 3, "Credits");
+	add_cartographer_label(CMLabelMenuId_Guide, 4, "Update");
 
 
 #pragma endregion
@@ -3861,6 +4072,9 @@ void initGSCustomMenu() {
 	psub_209129 = (tsub_209129)DetourFunc((BYTE*)H2BaseAddr + 0x209129, (BYTE*)sub_209129, 5);
 	VirtualProtect(psub_209129, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
+	psub_bd137 = (tsub_bd137)DetourFunc((BYTE*)H2BaseAddr + 0xbd137, (BYTE*)sub_bd137, 5);
+	VirtualProtect(psub_bd137, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
 
 	RefreshToggleIngameKeyboardControls();
 
@@ -3880,6 +4094,8 @@ void initGSCustomMenu() {
 	CMSetupVFTables_EditFOV();
 
 	CMSetupVFTables_EditFPS();
+
+	CMSetupVFTables_Update();
 
 	CMSetupVFTables_EditHudGui();
 

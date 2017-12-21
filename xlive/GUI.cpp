@@ -453,6 +453,8 @@ int achievement_height = 0;
 bool achievement_freeze = false;
 int achievement_timer = 0;
 
+char* Auto_Update_Text = 0;
+
 // #5002: XLiveRender
 int WINAPI XLiveRender()
 {
@@ -595,6 +597,10 @@ int WINAPI XLiveRender()
 					}
 				}
 			}
+
+			if (Auto_Update_Text)
+				drawText(10, 60, COLOR_WHITE, Auto_Update_Text, normalSizeFont);
+
 		}
 
 		if (H2Config_fps_limit > 0) {

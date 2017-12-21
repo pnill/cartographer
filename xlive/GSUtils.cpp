@@ -93,21 +93,101 @@ bool GetFileLine(FILE* fp, char* &fileLine) {
 	return moretogo || fileLine != 0;
 }
 
-void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, const int headerVersion, int(interpretSettingFunc)(char* fileLine, int version, int lineNumber)) {
+bool GetNTStringLine(char* text, int lineNum, char* &line) {
+	int inc_line_num = 0;
+	char* line_begin = text;
+
+	while (inc_line_num++ < lineNum) {
+		line_begin = strchr(line_begin, '\n');
+		if (line_begin++ == 0) {
+			return false;
+		}
+	}
+
+	int line_len = 0;
+	char* line_next = strchr(line_begin, '\n');
+	if (line_next == 0) {
+		line_len = strlen(line_begin);
+	}
+	else {
+		if (*(line_next - 1) == '\r') {
+			line_next--;
+		}
+		line_len = line_next - line_begin;
+	}
+
+	if (line_len <= 0) {
+		line = 0;
+		return true;
+	}
+
+	line = (char*)malloc(sizeof(char) * (line_len + 1));
+
+	memcpy(line, line_begin, line_len);
+	line[line_len] = 0;
+
+	return true;
+}
+
+//if missing versioning parameters, major will always be on leftmost side.
+char CmpVersions(char* version_base, char* version_alt) {
+
+	if (strcmp(version_base, version_alt) == 0)
+		return 0b00000;//same
+
+	int versions[2][4];
+	for (int j = 0; j < 2; j++) {
+		for (int i = 0; i < 4; i++) {
+			versions[j][i] = 0;
+		}
+	}
+
+	if (sscanf_s(version_base, "%d.%d.%d.%d", &versions[0][0], &versions[0][1], &versions[0][2], &versions[0][3]) <= 0) {
+		return 0b10000;//invalid
+	}
+
+	if (sscanf_s(version_alt, "%d.%d.%d.%d", &versions[1][0], &versions[1][1], &versions[1][2], &versions[1][3]) <= 0) {
+		return 0b10000;//invalid
+	}
+
+	for (int i = 0; i < 4; i++) {
+		if (versions[0][i] == versions[1][i]) {
+			continue;
+		}
+		else if (versions[0][i] > versions[1][i]) {//alt is old
+			return 0b10000 | (0b1000 >> i);
+		}
+		else {//alt is new
+			return 0b00000 | (0b1000 >> i);
+		}
+	}
+
+	return 0b00000;//same
+	//return 0b01000;//new major
+	//return 0b00100;//new minor
+	//return 0b00010;//new revision
+	//return 0b00001;//new build
+	//return 0b11000;//old major
+	//return 0b10100;//old minor
+	//return 0b10010;//old revision
+	//return 0b10001;//old build
+}
+
+void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* headerVersion, int(interpretSettingFunc)(char* fileLine, char* version, int lineNumber)) {
 	bool foundFirstHeader = false;
-	int version = -1;
+	char version[30] = "0";
 	bool keepReading = true;
 	int lineNumber = 0;
 	char* fileLine;
-	while (keepReading && ((configIsFILE && GetFileLine((FILE*)fileConfig, fileLine)) || (!configIsFILE && false))) {//TODO
+	while (keepReading && ((configIsFILE && GetFileLine((FILE*)fileConfig, fileLine)) || (!configIsFILE && GetNTStringLine((char*)fileConfig, lineNumber, fileLine)))) {
 		lineNumber++;
 		if (fileLine) {
-			if (fileLine[0] == header[0] && sscanf(fileLine, header, &version)) {
+			if (fileLine[0] == header[0] && sscanf_s(fileLine, header, &version, 30)) {
 				foundFirstHeader = true;
 				char debugTextBuffer[50];
-				snprintf(debugTextBuffer, 50, "Found header on line %d asseting version: %d", lineNumber, version);
+				snprintf(debugTextBuffer, 50, "Found header on line %d asserting version: %s", lineNumber, version);
 				addDebugText(debugTextBuffer);
-				if (version == headerVersion) {
+				if (CmpVersions(headerVersion, version) == 0) {//does not send this line to interpreter.
 					free(fileLine);
 					continue;
 				}
@@ -115,10 +195,7 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, const 
 					addDebugText("Incorrect Version! Continue searching!");
 				}
 			}
-			int rtnCode = 0;
-			if (foundFirstHeader) {
-				rtnCode = interpretSettingFunc(fileLine, version, lineNumber);
-			}
+			int rtnCode = interpretSettingFunc(fileLine, foundFirstHeader ? version : 0, lineNumber);
 			if (!(rtnCode & 0b10)) {
 				free(fileLine);
 				if (rtnCode & 0b1)
@@ -410,6 +487,53 @@ DWORD crc32buf(char* buf, size_t len)
 	}
 
 	return ~oldcrc32;
+}
+
+bool ComputeFileCrc32Hash(wchar_t* filepath, DWORD &rtncrc32) {
+
+	register DWORD oldcrc32;
+
+	oldcrc32 = 0xFFFFFFFF;
+
+	const int BUFSIZE = 1024;
+	BOOL bResult = FALSE;
+	HANDLE hFile = NULL;
+	BYTE rgbFile[BUFSIZE];
+	DWORD cbRead = 0;
+
+	hFile = CreateFile(filepath,
+		GENERIC_READ,
+		FILE_SHARE_READ,
+		NULL,
+		OPEN_EXISTING,
+		FILE_FLAG_SEQUENTIAL_SCAN,
+		NULL);
+
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		return false;
+	}
+
+	while (bResult = ReadFile(hFile, rgbFile, BUFSIZE, &cbRead, NULL))
+	{
+		if (cbRead == 0) {
+			break;
+		}
+
+		for (int i = 0; i < cbRead; i++) {
+			oldcrc32 = UPDC32(rgbFile[i], oldcrc32);
+		}
+	}
+
+	if (!bResult) {
+		return false;
+	}
+
+	CloseHandle(hFile);
+
+	rtncrc32 = ~oldcrc32;
+
+	return true;
 }
 
 static bool rfc3986_allow(char i) {

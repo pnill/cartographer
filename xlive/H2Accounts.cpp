@@ -22,11 +22,12 @@ static void HandleFileError(int fpErrNo) {//TODO
 #pragma region Config IO
 const wchar_t H2AccountsFilename[] = L"%wshalo2accounts.ini";
 
-const char H2ConfigVersionStr[] = "[H2AccountsVersion:%d]";
-const int H2ConfigVersion = 1;
-const char H2ConfigAccountStr[] = "[Account]";
+static const char H2AccConfigVersionStr[] = "[H2AccountsVersion:%hs]";
+static const char H2AccConfigVersionReadStr[] = "[H2AccountsVersion:%[^]]]";
+static char H2AccConfigVersion[] = "1";
+static const char H2ConfigAccountStr[] = "[Account]";
 
-const int bufferIncSize = 10;
+static const int bufferIncSize = 10;
 static int oldConfigBufferI = 0;
 static int oldConfigBufferLen = 0;
 static char** oldConfigBuffer = 0;
@@ -155,9 +156,9 @@ void SaveH2Accounts() {
 			fputs("# DO NOT SHARE THE CONTENTS OF THIS FILE.", fileConfig);
 			fputs("\n\n", fileConfig);
 
-			int fputbufferlen = strlen(H2ConfigVersionStr) + 1;
+			int fputbufferlen = strlen(H2AccConfigVersionStr) + 1;
 			char* fputbuffer = (char*)malloc(sizeof(char) * fputbufferlen);
-			snprintf(fputbuffer, fputbufferlen, H2ConfigVersionStr, H2ConfigVersion);
+			snprintf(fputbuffer, fputbufferlen, H2AccConfigVersionStr, H2AccConfigVersion);
 			fputs(fputbuffer, fileConfig);
 			free(fputbuffer);
 
@@ -273,8 +274,11 @@ void H2AccountBufferAdd(char* token, char* username) {
 	H2AccountCount++;
 }
 
-static int interpretConfigSetting(char* fileLine, int version, int lineNumber) {
-	if (version != H2ConfigVersion) {
+static int interpretConfigSetting(char* fileLine, char* version, int lineNumber) {
+	if (!version) {
+		return 0;
+	}
+	else if (CmpVersions(H2AccConfigVersion, version) != 0) {
 		if (oldConfigBufferI >= oldConfigBufferLen) {
 			if (!oldConfigBuffer) {
 				oldConfigBuffer = (char**)malloc(sizeof(char*) * (oldConfigBufferLen += bufferIncSize));
@@ -452,9 +456,9 @@ bool ReadH2Accounts() {
 
 			H2AccountLastUsed_est = false;
 
-			ReadIniFile(fileConfig, true, H2ConfigVersionStr, H2ConfigVersion, interpretConfigSetting);
+			ReadIniFile(fileConfig, true, H2AccConfigVersionReadStr, H2AccConfigVersion, interpretConfigSetting);
 
-			if (H2AccountBufferLoginToken[H2AccountBufferI]) {
+			if (H2AccountBufferLoginToken && H2AccountBufferLoginToken[H2AccountBufferI]) {
 				H2AccountBufferI++;
 			}
 

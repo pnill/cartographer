@@ -325,8 +325,11 @@ void InitH2Startup() {
 	addDebugText("ProcessStartup finished.");
 }
 
+#include "GSDownload.h"
+
 ///After the game window appears
 void InitH2Startup2() {
+	InitGSDownload();
 
 	if (H2IsDediServer) {
 		addDebugText("Logging the Dedi Server in...");

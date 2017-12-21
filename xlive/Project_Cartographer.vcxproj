@@ -178,6 +178,7 @@
     <ClCompile Include="GSAccountLogin.cpp" />
     <ClCompile Include="GSCustomLanguage.cpp" />
     <ClCompile Include="GSCustomMenu.cpp" />
+    <ClCompile Include="GSDownload.cpp" />
     <ClCompile Include="GSRunLoop.cpp" />
     <ClCompile Include="GSUtils.cpp" />
     <ClCompile Include="GUI.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="GSAccountLogin.h" />
     <ClInclude Include="GSCustomLanguage.h" />
     <ClInclude Include="GSCustomMenu.h" />
+    <ClInclude Include="GSDownload.h" />
     <ClInclude Include="GSRunLoop.h" />
     <ClInclude Include="GSUtils.h" />
     <ClInclude Include="GUI.h" />

@@ -1631,6 +1631,7 @@ VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DW
 
 void H2MOD::Initialize()
 {
+	//HANDLE hThread = CreateThread(NULL, 0, Thread1, NULL, 0, NULL);
 
 	if (GetModuleHandleA("H2Server.exe"))
 	{

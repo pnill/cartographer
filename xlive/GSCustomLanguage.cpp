@@ -23,17 +23,20 @@ int current_language_sub = 0;
 char* add_label(std::map<int, std::map<int, char*>> &label_map, int label_menu_id, int label_id, char* label) {
 	if (label_map.count(label_menu_id) && label_map[label_menu_id].count(label_id))
 		free(label_map[label_menu_id][label_id]);
-	char* new_label = (char*)malloc(strlen(label) + 1);
-	strcpy(new_label, label);
+	int label_buflen = (label ? strlen(label) : 0) + 1;
+	char* new_label = (char*)malloc(sizeof(char) * label_buflen);
+	if (label)
+		memcpy(new_label, label, sizeof(char) * label_buflen);
+	new_label[label_buflen - 1] = 0;
 	return label_map[label_menu_id][label_id] = new_label;
 }
 
 char* add_cartographer_label(int label_menu_id, int label_id, char* label, bool is_dynamic) {
-	if (!label)
-		return 0;
 	if (is_dynamic) {
 		return add_label(cartographer_label_map_dyn, label_menu_id, label_id, label);
 	}
+	if (!label)
+		return 0;
 	return add_label(cartographer_label_map, label_menu_id, label_id, label);
 }
 
