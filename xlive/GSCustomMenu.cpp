@@ -1838,38 +1838,38 @@ void RefreshToggleIngameKeyboardControls() {
 	if (H2Config_disable_ingame_keyboard) {
 		//Allows to repeat last movement when lose focus in mp, unlocks METHOD E from point after intro vid
 		BYTE getFocusB[] = { 0x00 };
-		WriteBytesASM(H2BaseAddr + 0x2E3C5, getFocusB, 1);
+		WriteBytes(H2BaseAddr + 0x2E3C5, getFocusB, 1);
 		//Allows input when not in focus.
 		BYTE getFocusE[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-		WriteBytesASM(H2BaseAddr + 0x2F9EA, getFocusE, 6);
-		WriteBytesASM(H2BaseAddr + 0x2F9FC, getFocusE, 6);
-		WriteBytesASM(H2BaseAddr + 0x2FA09, getFocusE, 6);
+		WriteBytes(H2BaseAddr + 0x2F9EA, getFocusE, 6);
+		WriteBytes(H2BaseAddr + 0x2F9FC, getFocusE, 6);
+		WriteBytes(H2BaseAddr + 0x2FA09, getFocusE, 6);
 		//Disables the keyboard only when in-game and not in a menu.
 		BYTE disableKeyboard1[] = { 0x90, 0x90, 0x90 };
-		WriteBytesASM(H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
+		WriteBytes(H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
 		BYTE disableKeyboard2[] = { 0x00 };
-		WriteBytesASM(H2BaseAddr + 0x2FA92, disableKeyboard2, 1);
+		WriteBytes(H2BaseAddr + 0x2FA92, disableKeyboard2, 1);
 		BYTE disableKeyboard3[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-		WriteBytesASM(H2BaseAddr + 0x2FA67, disableKeyboard3, 6);
+		WriteBytes(H2BaseAddr + 0x2FA67, disableKeyboard3, 6);
 	}
 	else {
 		//Reset them all back.
 		BYTE getFocusB[] = { 0x01 };
-		WriteBytesASM(H2BaseAddr + 0x2E3C5, getFocusB, 1);
+		WriteBytes(H2BaseAddr + 0x2E3C5, getFocusB, 1);
 		
 		BYTE getFocusE[] = { 0x0F, 0x85, 0x02, 0x02, 0x00, 0x00 };
-		WriteBytesASM(H2BaseAddr + 0x2F9EA, getFocusE, 6);
+		WriteBytes(H2BaseAddr + 0x2F9EA, getFocusE, 6);
 		getFocusE[2] = 0xF0;
 		getFocusE[3] = 0x01;
-		WriteBytesASM(H2BaseAddr + 0x2F9FC, getFocusE, 6);
+		WriteBytes(H2BaseAddr + 0x2F9FC, getFocusE, 6);
 		getFocusE[2] = 0xE3;
-		WriteBytesASM(H2BaseAddr + 0x2FA09, getFocusE, 6);
+		WriteBytes(H2BaseAddr + 0x2FA09, getFocusE, 6);
 		
 		BYTE disableKeyboard1[] = { 0x56, 0xFF, 0xD3 };
-		WriteBytesASM(H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
+		WriteBytes(H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
 		BYTE disableKeyboard2[] = { 0x01 };
-		WriteBytesASM(H2BaseAddr + 0x2FA92, disableKeyboard2, 1);
-		WriteBytesASM(H2BaseAddr + 0x2FA67, enableKeyboard3, 6);
+		WriteBytes(H2BaseAddr + 0x2FA92, disableKeyboard2, 1);
+		WriteBytes(H2BaseAddr + 0x2FA67, enableKeyboard3, 6);
 	}
 }
 
@@ -2314,7 +2314,7 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 		BYTE assmDisableVehicleFlipEject[] = { 0xEB };
 		if (vehicleFlipoverEject)
 			assmDisableVehicleFlipEject[0] = 0x7E;
-		WriteBytesASM(H2BaseAddr + 0x159e5d, assmDisableVehicleFlipEject, 1);
+		WriteBytes(H2BaseAddr + 0x159e5d, assmDisableVehicleFlipEject, 1);
 	}
 	return false;
 }

@@ -22,7 +22,7 @@ void PatchCall(DWORD call_addr, DWORD new_function_ptr) {
 void WritePointer(DWORD offset, void *ptr) {
 	BYTE* pbyte = (BYTE*)&ptr;
 	BYTE assmNewFuncRel[0x4] = { pbyte[0], pbyte[1], pbyte[2], pbyte[3] };
-	WriteBytesASM(offset, assmNewFuncRel, 0x4);
+	WriteBytes(offset, assmNewFuncRel, 0x4);
 }
 
 void HexToByteArray(BYTE* byteArray, char* pointerHex) {

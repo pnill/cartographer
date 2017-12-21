@@ -1,6 +1,5 @@
 #pragma once
-#ifndef H2INFECTION_H
-#define H2INFECTION_H
+
 #include <unordered_map>
 
 class InfectionPlayer
@@ -25,4 +24,4 @@ public:
 
 
 };
-#endif
+

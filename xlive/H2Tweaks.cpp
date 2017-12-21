@@ -160,22 +160,22 @@ void InitH2Tweaks() {
 
 		if (H2Config_skip_intro) {
 			BYTE assmIntroSkip[] = { 0x3F };
-			WriteBytesASM(H2BaseAddr + 0x221C0E, assmIntroSkip, 1);
+			WriteBytes(H2BaseAddr + 0x221C0E, assmIntroSkip, 1);
 		}
 
 		if (!H2Config_skip_intro && IntroHQ) {
 			BYTE assmIntroHQ[] = { 0xEB };
-			WriteBytesASM(H2BaseAddr + 0x221C29, assmIntroHQ, 1);
+			WriteBytes(H2BaseAddr + 0x221C29, assmIntroHQ, 1);
 		}
 
 		//Allows unlimited clients
 		BYTE assmUnlimitedClients[41];
 		memset(assmUnlimitedClients, 0x00, 41);
-		WriteBytesASM(H2BaseAddr + 0x39BCF0, assmUnlimitedClients, 41);
+		WriteBytes(H2BaseAddr + 0x39BCF0, assmUnlimitedClients, 41);
 
 		//Allows on a remote desktop connection
 		BYTE assmRemoteDesktop[] = { 0xEB };
-		WriteBytesASM(H2BaseAddr + 0x7E54, assmRemoteDesktop, 1);
+		WriteBytes(H2BaseAddr + 0x7E54, assmRemoteDesktop, 1);
 
 		//Disables the ESRB warning (only occurs for English Language).
 		//disables the one if no intro vid occurs.
@@ -183,8 +183,8 @@ void InitH2Tweaks() {
 		ESRB = 0;
 		//disables the one after the intro video.
 		BYTE assmIntroESRBSkip[] = { 0x00 };
-		WriteBytesASM(H2BaseAddr + 0x3a0fa, assmIntroESRBSkip, 1);
-		WriteBytesASM(H2BaseAddr + 0x3a1ce, assmIntroESRBSkip, 1);
+		WriteBytes(H2BaseAddr + 0x3a0fa, assmIntroESRBSkip, 1);
+		WriteBytes(H2BaseAddr + 0x3a1ce, assmIntroESRBSkip, 1);
 
 		//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
 		PatchCall(H2BaseAddr + 0x22667B, (DWORD)NotDisplayIngameChat);

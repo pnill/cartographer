@@ -91,40 +91,15 @@ void *VTableFunction(void *ClassPtr, DWORD index)
 	return pVtable[index];
 }
 
-VOID WriteBytesASM(DWORD destAddress, LPVOID patch, DWORD numBytes)
+void WriteBytes(uintptr_t destAddress, LPVOID bytesToWrite, int numBytes)
 {
-	DWORD oldProtect = 0;
-	DWORD srcAddress = PtrToUlong(patch);
+	DWORD OldProtection;
 
-	VirtualProtect((void*)(destAddress), numBytes, PAGE_EXECUTE_READWRITE, &oldProtect);
-
-	__asm
-	{
-		nop
-			nop
-			nop
-
-			mov esi, srcAddress
-			mov edi, destAddress
-			mov ecx, numBytes
-		Start :
-		cmp ecx, 0
-			jz Exit
-
-			mov al, [esi]
-			mov[edi], al
-			dec ecx
-			inc esi
-			inc edi
-			jmp Start
-		Exit :
-		nop
-			nop
-			nop
-	}
-
-	VirtualProtect((void*)(destAddress), numBytes, oldProtect, &oldProtect);
+	VirtualProtect((LPVOID)destAddress, numBytes, PAGE_EXECUTE_READWRITE, &OldProtection);
+	memcpy((LPVOID)destAddress, bytesToWrite, numBytes);
+	VirtualProtect((LPVOID)destAddress, numBytes, OldProtection, NULL);
 }
+
 
 VOID Codecave(DWORD destAddress, VOID(*func)(VOID), BYTE nopCount)
 {
@@ -136,7 +111,7 @@ VOID Codecave(DWORD destAddress, VOID(*func)(VOID), BYTE nopCount)
 
 	BYTE patch[5] = { 0xE8, 0x00, 0x00, 0x00, 0x00 };
 	memcpy(patch + 1, &offset, sizeof(DWORD));
-	WriteBytesASM(destAddress, patch, 5);
+	WriteBytes(destAddress, patch, 5);
 
 	if (nopCount == 0)
 		return;
@@ -145,5 +120,5 @@ VOID Codecave(DWORD destAddress, VOID(*func)(VOID), BYTE nopCount)
 	memset(nopPatch, 0x90, nopCount);
 
 
-	WriteBytesASM(destAddress + 5, nopPatch, nopCount);
+	WriteBytes(destAddress + 5, nopPatch, nopCount);
 }
