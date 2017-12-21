@@ -10,6 +10,7 @@
 #include "GSRunLoop.h"
 #include "H2ConsoleCommands.h"
 #include "H2Config.h"
+#include <sstream>
 
 extern ConsoleCommands* commands;
 
@@ -183,6 +184,20 @@ void trace_game_narrow(LPSTR message, ...)
 }
 #endif
 
+std::wstring prepareLogFileName(std::wstring logFileName) {
+	std::wstring instanceNumber(L"");
+	if (H2Config_instance_number != 1) {
+		std::wstringstream stream;
+		stream << H2Config_instance_number;
+		instanceNumber = L".";
+		instanceNumber += stream.str();
+	}
+	std::wstring filename = logFileName;
+	filename += instanceNumber;
+	filename += L".log";
+	return filename;
+}
+
 void InitInstance()
 {
 	static bool init = true;
@@ -280,18 +295,15 @@ void InitInstance()
 		}
 
 #pragma endregion
-
 		if (H2Config_debug_log)
 		{
-			if (logfile = _wfopen(L"xlive_trace.log", L"wt"))
-			{
+			if (logfile = _wfopen(prepareLogFileName(L"xlive_trace").c_str(), L"wt"))
 				TRACE("Log started (xLiveLess 2.0a4)\n");
-			}
 
-			if (loggame = _wfopen(L"h2mod.log", L"wt"))
+			if (loggame = _wfopen(prepareLogFileName(L"h2mod").c_str(), L"wt"))
 				TRACE_GAME("Log started (H2MOD 0.1a1)\n");
 
-			if (loggamen = _wfopen(L"h2network.log", L"wt"))
+			if (loggamen = _wfopen(prepareLogFileName(L"h2network").c_str(), L"wt"))
 				TRACE_GAME_NETWORK("Log started (H2MOD - Network 0.1a1)\n");
 		}
 
