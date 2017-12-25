@@ -58,7 +58,6 @@ void initInstanceNumber() {
 
 	char NotificationPlayerText[30];
 	sprintf(NotificationPlayerText, "You are Instance #%d.", instanceNumber);
-	H2Config_instance_number = instanceNumber;
 	addDebugText(NotificationPlayerText);
 }
 

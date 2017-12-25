@@ -251,6 +251,9 @@
     <ClInclude Include="H2Config.h">
       <Filter>Source Files\GlitchyScripts</Filter>
     </ClInclude>
+    <ClInclude Include="Read.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def">

@@ -89,7 +89,6 @@ char H2Config_dedi_server_playlist[256] = { "" };
 bool H2Config_map_downloading_enable = false;
 bool H2Config_chatbox_commands = false;
 bool H2Config_debug_log = false;
-int H2Config_instance_number = 1; //1 is default
 char H2Config_login_identifier[255] = { "" };
 char H2Config_login_password[255] = { "" };
 
