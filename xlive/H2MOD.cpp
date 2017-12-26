@@ -1624,6 +1624,9 @@ void H2MOD::Initialize()
 		SoundT.detach();
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 		setFOV(H2Config_field_of_view);
+		setSens(0, H2Config_sens_mouse);
+		setSens(1, H2Config_sens_controller);
+
 		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
 
 		PatchGameDetailsCheck();
