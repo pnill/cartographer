@@ -197,7 +197,10 @@ void DeinitH2Tweaks() {
 
 }
 
-void setSens(short input_type, float sens) {
+void setSens(short input_type, int sens) {
+	if (sens == 0) 
+		return;
+
 	if (input_type == 1) { //controller
 		H2Config_sens_controller = sens;
 		*(float*)(H2BaseAddr + 0x4A89BC) = (float)(40.0 + 10.0 * (double)sens); //y-axis
