@@ -337,7 +337,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$controller_sens") {
 			if (splitCommands.size() != 2) {
-				output(L"Invalid usage, usage $sens_controller value");
+				output(L"Invalid command, usage: $sens_controller value");
 				return;
 			}
 			std::string sensVal = splitCommands[1];
@@ -345,7 +345,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			strcpy(cstr, sensVal.c_str());
 
 			if (isNum(cstr)) {
-				setSens(1, stof(sensVal));
+				setSens(1, stoi(sensVal));
 			}
 			else {
 				output(L"Wrong input! Use a number.");
@@ -354,7 +354,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$mouse_sens") {
 			if (splitCommands.size() != 2) {
-				output(L"Invalid usage, usage $sens_mouse value");
+				output(L"Invalid command, usage: $sens_mouse value");
 				return;
 			}
 			std::string sensVal = splitCommands[1];
@@ -362,7 +362,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			strcpy(cstr, sensVal.c_str());
 
 			if (isNum(cstr)) {
-				setSens(0, stof(sensVal));
+				setSens(0, stoi(sensVal));
 			}
 			else {
 				output(L"Wrong input! Use a number.");

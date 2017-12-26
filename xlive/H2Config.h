@@ -52,4 +52,6 @@ extern int H2Config_hotkeyIdAlignWindow;
 extern int H2Config_hotkeyIdWindowMode;
 extern int H2Config_hotkeyIdToggleHideIngameChat;
 extern int H2Config_hotkeyIdGuide;
+extern int H2Config_sens_controller;
+extern int H2Config_sens_mouse;
 
