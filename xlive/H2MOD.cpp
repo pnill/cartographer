@@ -644,6 +644,7 @@ tsub_4F17A psub_4F17A;
 
 char __cdecl sub_4F17A(void* thisptr, int a2, int a3) //allows people to load custom maps with custom tags/huds 
 {
+	int result = psub_4F17A(thisptr, a2, a3);
 	return 1;
 }
 
