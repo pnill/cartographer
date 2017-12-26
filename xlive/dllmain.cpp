@@ -11,7 +11,7 @@
 #include "H2ConsoleCommands.h"
 #include "H2Config.h"
 #include <sstream>
-#include "ReadArgumets_INI.h"
+#include "ReadIniArguments.h"
 
 extern ConsoleCommands* commands;
 

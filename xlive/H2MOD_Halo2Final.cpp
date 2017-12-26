@@ -3,7 +3,7 @@
 #include "H2MOD.h"
 #include "xliveless.h"
 #include "Hook.h"
-#include "ReadArgumets_INI.h"
+#include "ReadIniArguments.h"
 
 /*
 Todo:

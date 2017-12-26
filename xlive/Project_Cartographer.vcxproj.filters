@@ -251,7 +251,7 @@
     <ClInclude Include="H2Config.h">
       <Filter>Source Files\GlitchyScripts</Filter>
     </ClInclude>
-    <ClInclude Include="ReadArgumets_INI.h">
+    <ClInclude Include="ReadIniArguments.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

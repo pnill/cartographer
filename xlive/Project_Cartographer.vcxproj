@@ -233,7 +233,7 @@
     <ClInclude Include="Hook.h" />
     <ClInclude Include="Network.h" />
     <ClInclude Include="packet.pb.h" />
-    <ClInclude Include="ReadArgumets_INI.h" />
+    <ClInclude Include="ReadIniArguments.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
     <ClInclude Include="xlivedefs.h" />
