@@ -74,7 +74,7 @@ static int InterpretMasterCreate(char* response_content) {
 
 
 bool HandleGuiAccountCreate(char* username, char* email, char* password) {
-	int result = false;
+	bool result = false;
 	char* rtn_result = 0;
 
 	char http_request_body[] = "username=%s&email=%s&password=%s";

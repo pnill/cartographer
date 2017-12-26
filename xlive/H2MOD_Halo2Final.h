@@ -114,7 +114,7 @@ public:
 class Halo2Final
 {
 public:
-	void Initialize(bool isHost);
+	void Initialize();
 	void Dispose();
 private:
 	Halo2FinalSettings *settings;

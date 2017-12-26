@@ -11,6 +11,7 @@
 #include "H2ConsoleCommands.h"
 #include "H2Config.h"
 #include <sstream>
+#include "ReadIniArguments.h"
 
 extern ConsoleCommands* commands;
 
@@ -77,7 +78,7 @@ void trace(LPWSTR message, ...)
 		return;
 
 	EnterCriticalSection (&d_lock);
-	SYSTEMTIME	t;
+	SYSTEMTIME t;
 	GetLocalTime (&t);
 
 	fwprintf (logfile, L"%02d/%02d/%04d %02d:%02d:%02d.%03d ", t.wDay, t.wMonth, t.wYear, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds);
@@ -99,7 +100,7 @@ void trace2(LPWSTR message, ...)
 		return;
 
 	EnterCriticalSection (&d_lock);
-	SYSTEMTIME	t;
+	SYSTEMTIME t;
 	GetLocalTime (&t);
 
 	fwprintf (logfile, L"%02d/%02d/%04d %02d:%02d:%02d.%03d ", t.wDay, t.wMonth, t.wYear, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds);
@@ -121,7 +122,7 @@ void trace_game(LPWSTR message, ...)
 		return;
 
 	EnterCriticalSection(&d_lock);
-	SYSTEMTIME	t;
+	SYSTEMTIME t;
 	GetLocalTime(&t);
 
 	fwprintf(loggame, L"%02d/%02d/%04d %02d:%02d:%02d.%03d ", t.wDay, t.wMonth, t.wYear, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds);
@@ -144,7 +145,7 @@ void trace_game_network(LPSTR message, ...)
 		return;
 
 	EnterCriticalSection(&d_lock);
-	SYSTEMTIME	t;
+	SYSTEMTIME t;
 	GetLocalTime(&t);
 
 	fprintf(loggamen, "%02d/%02d/%04d %02d:%02d:%02d.%03d ", t.wDay, t.wMonth, t.wYear, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds);
@@ -186,9 +187,9 @@ void trace_game_narrow(LPSTR message, ...)
 
 std::wstring prepareLogFileName(std::wstring logFileName) {
 	std::wstring instanceNumber(L"");
-	if (H2Config_instance_number != 1) {
+	if (H2GetInstanceId() > 1) {
 		std::wstringstream stream;
-		stream << H2Config_instance_number;
+		stream << H2GetInstanceId();
 		instanceNumber = L".";
 		instanceNumber += stream.str();
 	}
@@ -219,42 +220,6 @@ void InitInstance()
 		InitializeCriticalSection(&d_lock);
 
 		dlcbasepath = L"DLC";
-
-
-#define CHECK_ARG_STR(x,y) \
-	if( strstr( str,x ) == str ) \
-	{ \
-		sscanf( str + strlen(x), "%s", &y ); \
-		continue; \
-	}
-
-#define CHECK_ARG(x,y) \
-	if( strstr( str,x ) == str ) \
-	{ \
-		sscanf( str + strlen(x), "%d", &y ); \
-		continue; \
-	}
-
-#define CHECK_ARG_FLOAT(x,y) \
-	if( strstr(str, x) == str) \
-	{ \
-		sscanf(str + strlen(x), "%f", &y ); \
-		continue; \
-	}
-
-#define CHECK_ARG_I64(x,y) \
-	if( strstr( str,x ) == str ) \
-	{ \
-		sscanf( str + strlen(x), "%I64x", &y ); \
-		continue; \
-	}
-
-#define gCHECK_ARG(x,y) \
-	if( strstr( gstr,x ) == gstr ) \
-	{ \
-		sscanf( gstr + strlen(x), "%d", &y ); \
-		continue; \
-	}
 
 #pragma region GunGame Levels
 		if (b_GunGame == 1)
@@ -342,8 +307,8 @@ void ExitInstance()
 		fclose (logfile);
 		fflush (loggame);
 		fclose (loggame);
-		fclose (loggamen);
 		fflush (loggamen);
+		fclose (loggamen);
 		
 		logfile = NULL;
 		loggame = NULL;
