@@ -973,9 +973,10 @@ bool __cdecl OnPlayerSpawn(int a1)
 
 	int PlayerIndex = a1 & 0x000FFFF; 
 
-	if (b_Infection)
+	if (b_Infection) {
 		inf->PreSpawn(PlayerIndex);
 		inf->SpawnPlayer(PlayerIndex);
+	}
 
 	if (b_GunGame && (isHost || h2mod->Server))
 		gg->SpawnPlayer(PlayerIndex);
