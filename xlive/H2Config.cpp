@@ -80,6 +80,8 @@ bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
 int H2Config_field_of_view = 0;
 float H2Config_crosshair_offset = NAN;
+int H2Config_sens_controller = 0;
+int H2Config_sens_mouse = 0;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
 int H2Config_custom_resolution_x = 0;
@@ -205,6 +207,12 @@ void SaveH2Config() {
 			fputs("\n# 0 - In-game chat is displayed normally.", fileConfig);
 			fputs("\n# 1 - In-game chat is hidden.", fileConfig);
 			fputs("\n\n", fileConfig);
+			fputs("# controller_sensitivity Option (Client):", fileConfig);
+			fputs("\n# <value> Change controller sesitivity to your preference.", fileConfig);
+			fputs("\n\n", fileConfig);
+			fputs("# mouse_sensitivity Option (Client):", fileConfig);
+			fputs("\n# <value> Change mouse sesitivity to your preference.", fileConfig);
+			fputs("\n\n", fileConfig);
 			//fputs("# custom_resolution Options (Client):", fileConfig);
 			//fputs("\n# <width>x<height> - Sets the resolution of the game via the Windows Registry.", fileConfig);
 			//fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fileConfig);
@@ -290,6 +298,12 @@ void SaveH2Config() {
 			fputs("\ndisable_ingame_keyboard = ", fileConfig); fputs(H2Config_disable_ingame_keyboard ? "1" : "0", fileConfig);
 
 			fputs("\nhide_ingame_chat = ", fileConfig); fputs(H2Config_hide_ingame_chat ? "1" : "0", fileConfig);
+
+			sprintf(settingOutBuffer, "\ncontroller_sensitivity = %d", H2Config_sens_controller);
+			fputs(settingOutBuffer, fileConfig);
+
+			sprintf(settingOutBuffer, "\nmouse_sensitivity = %d", H2Config_sens_mouse);
+			fputs(settingOutBuffer, fileConfig);
 
 			//TODO
 			//fputs("\ncustom_resolution = 0x0", fileConfig);
@@ -405,6 +419,9 @@ bool est_hotkey_align_window = false;
 bool est_hotkey_window_mode = false;
 bool est_hotkey_hide_ingame_chat = false;
 bool est_hotkey_guide = false;
+bool est_sens_controller = false;
+bool est_sens_mouse = false;
+
 static void est_reset_vars() {
 	est_h2portable = false;
 	est_base_port = false;
@@ -437,6 +454,8 @@ static void est_reset_vars() {
 	est_hotkey_window_mode = false;
 	est_hotkey_hide_ingame_chat = false;
 	est_hotkey_guide = false;
+	est_sens_controller = false;
+	est_sens_mouse = false;
 }
 #pragma endregion
 
@@ -684,6 +703,30 @@ static int interpretConfigSetting(char* fileLine, int version, int lineNumber) {
 			else {
 				H2Config_hide_ingame_chat = (bool)tempint1;
 				est_hide_ingame_chat = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "controller_sensitivity =%d", &tempint1) == 1) {
+			if (est_sens_controller) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_sens_controller = tempint1;
+				est_sens_controller = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "mouse_sensitivity =%d", &tempint1) == 1) {
+			if (est_sens_mouse) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_sens_mouse = tempint1;
+				est_sens_mouse = true;
 			}
 		}
 		else if (!H2IsDediServer && sscanf(fileLine, "custom_resolution =%dx%d", &tempint1, &tempint2) == 2) {
