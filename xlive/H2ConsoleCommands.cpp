@@ -230,7 +230,9 @@ void ConsoleCommands::handle_command(std::string command) {
 			BYTE maxPlayersNumber = *(BYTE*)(lobby_globals + 0x4C80);
 
 			if (isNum(cstr)) {
-				int maxPlayersSet = atoi(cstr);
+				delete[] cstr;
+
+				int maxPlayersSet = stoi(firstArg);
 				if (maxPlayersSet < 1 || maxPlayersSet > 16) {
 					output(L"The value needs to be between 1 and 16.");
 					return;
@@ -243,6 +245,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				else {
 					*(BYTE*)maxPlayersNumber = maxPlayersSet;
 					output(L"Maximum players set");
+					return;
 				}
 			}
 			delete[] cstr;
