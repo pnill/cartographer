@@ -241,7 +241,7 @@ void ConsoleCommands::handle_command(std::string command) {
 					return;
 				}
 				else {
-					maxPlayersNumber = maxPlayersSet;
+					*(BYTE*)maxPlayersNumber = maxPlayersSet;
 					output(L"Maximum players set");
 				}
 			}
