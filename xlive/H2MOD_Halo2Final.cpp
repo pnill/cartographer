@@ -3,6 +3,7 @@
 #include "H2MOD.h"
 #include "xliveless.h"
 #include "Hook.h"
+#include "ReadIniArguments.h"
 
 /*
 Todo:
@@ -16,7 +17,7 @@ Todo:
 */
 
 bool isEnabled = false;
-bool isHosting = false;
+extern bool isHost;
 bool detoursHavePreviouslyBeenApplied = false;
 
 DWORD dwBack;
@@ -92,7 +93,7 @@ signed int __stdcall GetSecondsUntilEquipmentRespawn(int equipment_index)
 int64_t originalGetSecondsUntilEquipmentRespawnFunctionData;
 void EnableStaticWeaponSpawns()
 {
-	if (isHosting || h2mod->Server)
+	if (isHost || h2mod->Server)
 	{
 		originalGetSecondsUntilEquipmentRespawnFunctionData = *(int64_t*)(base_address + 0x6A8C4);
 		pget_spawn_time = (get_spawn_time)DetourFunc((BYTE*)base_address + 0x6A8C4, (BYTE*)GetSecondsUntilEquipmentRespawn, 5);
@@ -102,7 +103,7 @@ void EnableStaticWeaponSpawns()
 
 void DisableStaticWeaponSpawns()
 {
-	if (isHosting || h2mod->Server)
+	if (isHost || h2mod->Server)
 	{
 		VirtualProtect((LPVOID)(base_address + 0x6A8C4), 8, PAGE_EXECUTE_READWRITE, &dwBack);
 		*(int64_t*)(base_address + 0x6A8C4) = originalGetSecondsUntilEquipmentRespawnFunctionData;
@@ -179,9 +180,8 @@ void EnableMeleeLunge()
 
 #pragma endregion
 
-void Halo2Final::Initialize(bool isHost)
+void Halo2Final::Initialize()
 {
-	isHosting = isHost;
 	TRACE_GAME("[H2MOD-H2F] : start Initialize()");
 	settings = new Halo2FinalSettings();
 
@@ -197,20 +197,6 @@ void Halo2Final::Initialize(bool isHost)
 		{
 			char str[256];
 			fgets(str, 256, h2f);
-
-#define CHECK_ARG_FLOAT(x, y) \
-				if(strstr(str, x) == str) \
-				{ \
-					sscanf(str + strlen(x), "%f", &y); \
-					continue; \
-				}
-
-#define CHECK_ARG(x, y) \
-				if(strstr(str, x) == str) \
-				{ \
-					sscanf(str + strlen(x), "%d", &y); \
-					continue; \
-				}
 
 			CHECK_ARG_FLOAT("hitscan_projectile_velocity = ", settings->hitscan_projectile_velocity);
 			CHECK_ARG_FLOAT("magnetism_friction = ", settings->magnetism_friction);

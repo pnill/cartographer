@@ -62,10 +62,10 @@ const char CompileTime[] = __TIME__;
 int verticalRes = 0;
 int horizontalRes = 0;
 
-int normalSizeCurrentFontHeight = 0;
-int largeSizeCurrentFontHeight = 0;
-int largeSizeFontHeight = 0;
-int normalSizeFontHeight = 0;
+double normalSizeCurrentFontHeight = 0;
+double largeSizeCurrentFontHeight = 0;
+double largeSizeFontHeight = 0;
+double normalSizeFontHeight = 0;
 
 LPD3DXFONT normalSizeFont = 0;
 LPD3DXFONT largeSizeFont = 0;
@@ -306,7 +306,7 @@ void drawRect(int x, int y, int width, int height, DWORD Color)
 	pDevice->Clear(1, &rec, D3DCLEAR_TARGET, Color, 0, 0);
 }
 
-void drawPrimitiveRect(int x, int y, int w, int h, D3DCOLOR color) {
+void drawPrimitiveRect(FLOAT x, FLOAT y, FLOAT w, FLOAT h, D3DCOLOR color) {
 	CVertexList vertexList[4];
 
 	BuildVertex(D3DXVECTOR4(x, y + h, 0, 1), color, vertexList, 0);
@@ -484,13 +484,13 @@ int WINAPI XLiveRender()
 			if (commands->console) {
 				int x = 0, y = 0;
 				int height = 400;
-				int startingPosY = height - 15;
+				float startingPosY = height - 15.0f;
 				drawPrimitiveRect(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				//drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				drawText(0, startingPosY, COLOR_WHITE, ">>", normalSizeFont);
 				drawText(35, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
 
-				startingPosY -= 12;
+				startingPosY -= 12.0;
 				std::vector<std::string>::iterator it;
 				int i = 0;
 				for (it = commands->prevCommands.begin(); it < commands->prevCommands.end(); it++, i++) {

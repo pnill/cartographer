@@ -10,7 +10,7 @@
 #include "GSAccountLogin.h"
 #include "GSAccountCreate.h"
 #include "CUser.h"
-#include "H2MOD.h"
+#include "H2Tweaks.h"
 #include "GSDownload.h"
 
 extern DWORD H2BaseAddr;
@@ -1291,7 +1291,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditCrosshair() {//__thiscall
 }
 
 static bool CMButtonHandler_EditCrosshair(int button_id) {
-	const int upper_limit = 110.0f;
+	const float upper_limit = 110.0f;
 	if (button_id == 0) {
 		if (H2Config_crosshair_offset <= upper_limit - 1.0f)
 			H2Config_crosshair_offset += 1.0f;
@@ -1319,7 +1319,7 @@ static bool CMButtonHandler_EditCrosshair(int button_id) {
 			H2Config_crosshair_offset = 0.0f;
 	}
 	loadLabelCrosshairOffset();
-	AlterCrosshairOffset();
+	setCrosshairPos(H2Config_crosshair_offset);
 	return false;
 }
 
@@ -1460,7 +1460,7 @@ static bool CMButtonHandler_EditFOV(int button_id) {
 			H2Config_field_of_view = 100;
 	}
 	loadLabelFOVNum();
-	Field_of_View(H2Config_field_of_view);
+	setFOV(H2Config_field_of_view);
 	return false;
 }
 
@@ -3651,7 +3651,7 @@ void setupSomeTests() {
 
 	memcpy(func_array, func_array2, 16 * sizeof(int*));
 
-	DWORD dwBack;
+	//DWORD dwBack;
 
 	//psub_20C226 = (tsub_20C226)DetourClassFunc((BYTE*)H2BaseAddr + 0x20C226, (BYTE*)sub_20C226, 9);
 	//VirtualProtect(psub_20C226, 4, PAGE_EXECUTE_READWRITE, &dwBack);

@@ -196,3 +196,37 @@ void InitH2Tweaks() {
 void DeinitH2Tweaks() {
 
 }
+
+void setSens(short input_type, float sens) {
+	if (input_type == 1) { //controller
+		*(float*)(H2BaseAddr + 0x4A89BC) = (float)(40.0 + 10.0 * (double)sens); //y-axis
+		*(float*)(H2BaseAddr + 0x4A89B8) = (float)(80.0 + 20.0 * (double)sens); //x-axis
+	}
+	else if (input_type == 0) { //mouse 
+		*(float*)(H2BaseAddr + 0x4A89B4) = (float)(25.0 + 10.0 * (double)sens); //y-axis
+		*(float*)(H2BaseAddr + 0x4A89B0) = (float)(50.0 + 20.0 * (double)sens); //x-axis
+	}
+}
+
+void setFOV(int field_of_view)
+{
+	if (field_of_view > 0 && field_of_view <= 110)
+	{
+		const UINT CURRENT_FOV_OFFSET = 4883752;
+
+		float defaultRadians = (float)(70 * 3.14159265f / 180);
+		float targetRadians = (float)((double)field_of_view * 3.14159265f / 180);
+		float targetRadiansVehicle = (float)((double)(field_of_view + 10) * 3.14159265f / 180);
+		*(float*)(H2BaseAddr + 0x41D984) = (targetRadians / defaultRadians); //First Person
+		*(float*)(H2BaseAddr + 0x413780) = (targetRadians / defaultRadians); //Vehicle
+	}
+}
+
+void setCrosshairPos(float crosshair_offset) {
+
+	if (!FloatIsNaN(crosshair_offset)) {
+	DWORD CrosshairY = *(DWORD*)((char*)H2BaseAddr + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C;
+	*(float*)CrosshairY = crosshair_offset;
+	}
+	
+}

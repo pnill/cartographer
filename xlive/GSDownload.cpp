@@ -515,6 +515,11 @@ void GSDownloadInstall() {
 			BYTE& Quit_Exit_Game = *(BYTE*)((char*)H2BaseAddr + (H2IsDediServer ? 0x4a7083 : 0x48220b));
 			Quit_Exit_Game = 1;
 		}
+		else {
+			addDebugText("Failed to fork updater!");
+			addDebugText(existingfilepathupdater);
+			add_cartographer_label(CMLabelMenuId_Update, 3, H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFFF003), true);
+		}
 		free(updater_params_flags);
 	}
 	else {

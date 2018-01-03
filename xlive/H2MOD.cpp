@@ -21,6 +21,7 @@
 #include <Mmsystem.h>
 #include "DiscordInterface.h"
 #include "H2Config.h"
+#include "H2Tweaks.h"
 
 
 H2MOD *h2mod = new H2MOD();
@@ -638,20 +639,6 @@ void SoundThread(void)
 
 }
 
-void Field_of_View(int field_of_view)
-{
-	if (field_of_view > 0 && field_of_view <= 110)
-	{
-		const UINT CURRENT_FOV_OFFSET = 4883752;
-
-		float defaultRadians = (float)(70 * 3.14159265f / 180);
-		float targetRadians = (float)((double)field_of_view * 3.14159265f / 180);
-		float targetRadiansVehicle = (float)((double)(field_of_view + 10) * 3.14159265f / 180);
-		*(float*)(h2mod->GetBase() + 0x41D984) = (targetRadians / defaultRadians); //FIrst Person
-		*(float*)(h2mod->GetBase() + 0x413780) = (targetRadians / defaultRadians); //Vehicle
-	}
-}
-
 typedef char(__cdecl *tsub_4F17A)(void*, int, int);
 tsub_4F17A psub_4F17A;
 
@@ -726,7 +713,7 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 
 #pragma endregion
 
-	return pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
+	pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
 void PatchFixRankIcon() {
 	if (!h2mod->Server) {
@@ -750,7 +737,7 @@ void PatchFixRankIcon() {
 }
 void PatchGameDetailsCheck()
 {
-	BYTE assmPatchGamedetails[2] = { 0x75,0x18};	
+	BYTE assmPatchGamedetails[2] = { 0x75,0x18 };	
 	WriteBytes(h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
 }
 
@@ -831,23 +818,6 @@ bool __cdecl player_remove_packet_handler(void *packet, int size, void *data)
 }
 */
 
-void AlterCrosshairOffset() {
-	DWORD GameGlobals = *(DWORD*)((BYTE*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-	DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
-	if (!h2mod->Server && GameEngine != 3) {
-		if (!FloatIsNaN(H2Config_crosshair_offset)) {
-			/*if (GameEngine == 2) {
-				DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + 0x47CD54); //seems to fuck aim assist on controller
-				*(float*)(AddressOffset + 0x3DC00) = H2Config_crosshair_offset; //I tested only with mouse and keyboard
-			} */
-			//else if (GameEngine == 1) {
-				DWORD CrosshairY = *(DWORD*)((char*)h2mod->GetBase() + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C; 
-				*(float*)CrosshairY = H2Config_crosshair_offset;
-			//}
-		}
-	}
-}
-
 int __cdecl OnMapLoad(int a1)
 {
 	overrideUnicodeMessage = false;
@@ -860,6 +830,7 @@ int __cdecl OnMapLoad(int a1)
 	{
 		if (b_Halo2Final && !h2mod->Server)
 			h2f->Dispose();
+
 		if (b_Infection) 
 		{
 			inf->Deinitialize();
@@ -879,12 +850,11 @@ int __cdecl OnMapLoad(int a1)
 	b_H2X = false;
 
 	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
-	DWORD GameGlobals = *(DWORD*)((BYTE*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-	DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
+	DWORD GameGlobals = *(DWORD*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
+	BYTE GameState = *(BYTE*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
 
-	BYTE& GameState = *(BYTE*)(((BYTE*)h2mod->GetBase()) + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
-
-
+	BYTE GameEngine = *(BYTE*)(GameGlobals + 0x8);
+	
 	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", GameEngine, variant_name);
 
 	if (GameEngine == 2) {
@@ -943,8 +913,6 @@ int __cdecl OnMapLoad(int a1)
 #pragma region H2V Stuff
 	if (!h2mod->Server)
 	{
-		AlterCrosshairOffset();
-
 		//Crashfix
 		//*(int*)(h2mod->GetBase() + 0x464940) = 0;
 		//*(int*)(h2mod->GetBase() + 0x46494C) = 0;
@@ -953,6 +921,8 @@ int __cdecl OnMapLoad(int a1)
 		
 		if (GameEngine != 3 && GameState == 3)
 		{
+			setCrosshairPos(H2Config_crosshair_offset);
+
 			if (b_Infection)
 				inf->Initialize();
 
@@ -965,10 +935,9 @@ int __cdecl OnMapLoad(int a1)
 				H2X::Deinitialize();
 
 			if (b_Halo2Final)
-				h2f->Initialize(h2mod->Server);
+				h2f->Initialize();
 			
 		}
-
 
 	}
 	else {
@@ -1002,19 +971,16 @@ bool __cdecl OnPlayerSpawn(int a1)
 	isLobby = false;
 	//TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
 
-	int PlayerIndex = a1 & 0x000FFFF;
-	int ret = pspawn_player(a1);
+	int PlayerIndex = a1 & 0x000FFFF; 
 
 	if (b_Infection)
 		inf->PreSpawn(PlayerIndex);
-
-	if (b_Infection)
 		inf->SpawnPlayer(PlayerIndex);
 
 	if (b_GunGame && (isHost || h2mod->Server))
 		gg->SpawnPlayer(PlayerIndex);
 
-	return ret;
+	return pspawn_player(a1);
 }
 
 /* Really need some hooks here,
@@ -1128,6 +1094,7 @@ BOOL __stdcall isDebuggerPresent() {
 
 typedef void*(__stdcall *tload_wgit)(void* thisptr, int a2, int a3, int a4, unsigned short a5);
 tload_wgit pload_wgit;
+
 void* __stdcall OnWgitLoad(void* thisptr, int a2, int a3, int a4, unsigned short a5) {
 	int wgit = a2;
 
@@ -1213,7 +1180,6 @@ void H2MOD::ApplyHooks() {
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0xD03ED, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
 
 		pplayer_death = (player_death)DetourFunc((BYTE*)this->GetBase() + 0x17B674, (BYTE*)OnPlayerDeath, 9);
 		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1657,7 +1623,7 @@ void H2MOD::Initialize()
 		std::thread SoundT(SoundThread);
 		SoundT.detach();
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
-		Field_of_View(H2Config_field_of_view);
+		setFOV(H2Config_field_of_view);
 		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
 
 		PatchGameDetailsCheck();

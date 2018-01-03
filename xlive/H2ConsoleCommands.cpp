@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include "H2Startup.h"
+#include "H2Tweaks.h"
 
 ConsoleCommands::ConsoleCommands() {
 	command = "";
@@ -223,9 +224,10 @@ void ConsoleCommands::handle_command(std::string command) {
 			char *cstr = new char[firstArg.length() + 1];
 			strcpy(cstr, firstArg.c_str());
 
-			int baseAddr = (int)*(int*)((char*)h2mod->GetBase() + 0x420FE8);
-			BYTE& playerNumber = *(BYTE*)(baseAddr + 0x1254);
-			BYTE& maxPlayersNumber = *(BYTE*)(baseAddr + 0x4C80);
+			DWORD lobby_globals = *(DWORD*)((char*)h2mod->GetBase() + 0x420FE8);
+
+			BYTE playerNumber = *(BYTE*)(lobby_globals + 0x1254);
+			BYTE maxPlayersNumber = *(BYTE*)(lobby_globals + 0x4C80);
 
 			if (isNum(cstr)) {
 				int maxPlayersSet = atoi(cstr);
@@ -281,7 +283,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			if (splitCommands.size() == 4) {
 				//optional multiplier provided
 				std::string fourthArg = splitCommands[3];
-				randomMultiplier = stoi(fourthArg);
+				randomMultiplier = stof(fourthArg);
 			}
 
 			int count = 1;
@@ -327,11 +329,45 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 
 			int count = stoi(thirdArg);
-			int x = stoi(splitCommands[3]);
-			int y = stoi(splitCommands[4]);
-			int z = stoi(splitCommands[5]);
+			float x = stof(splitCommands[3]);
+			float y = stof(splitCommands[4]);
+			float z = stof(splitCommands[5]);
 
 			this->spawn(object_datum, count, x, y, z, 1.0f);
+		}
+		else if (firstCommand == "$controller_sens") {
+			if (splitCommands.size() != 2) {
+				output(L"Invalid usage, usage $sens_controller value");
+				return;
+			}
+			std::string sensVal = splitCommands[1];
+			char *cstr = new char[sensVal.length() + 1];
+			strcpy(cstr, sensVal.c_str());
+
+			if (isNum(cstr)) {
+				setSens(1, stof(sensVal));
+			}
+			else {
+				output(L"Wrong input! Use a number.");
+			}
+			delete[] cstr;
+		}
+		else if (firstCommand == "$mouse_sens") {
+			if (splitCommands.size() != 2) {
+				output(L"Invalid usage, usage $sens_mouse value");
+				return;
+			}
+			std::string sensVal = splitCommands[1];
+			char *cstr = new char[sensVal.length() + 1];
+			strcpy(cstr, sensVal.c_str());
+
+			if (isNum(cstr)) {
+				setSens(0, stof(sensVal));
+			}
+			else {
+				output(L"Wrong input! Use a number.");
+			}
+			delete[] cstr;
 		}
 	}
 }
