@@ -88,6 +88,8 @@ int DownloadFile(const char* url, wchar_t* local_full_path) {
 	curl = curl_easy_init();
 	if (curl) {
 		fp = _wfopen(local_full_path, L"wb");
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 		curl_easy_setopt(curl, CURLOPT_URL, url);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
