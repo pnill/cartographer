@@ -4,6 +4,7 @@ void initGSCustomMenu();
 void deinitGSCustomMenu();
 
 void GSCustomMenuCall_Language();
+void GSCustomMenuCall_Update_Note();
 void GSCustomMenuCall_Guide();
 void GSCustomMenuCall_Esc();
 void GSCustomMenuCall_Error_Inner(int menuId, int title, int description);

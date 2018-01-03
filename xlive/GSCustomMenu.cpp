@@ -1790,6 +1790,7 @@ void CMSetupVFTables_Update() {
 
 int CustomMenu_Update(int a1) {
 	force_keep_open_Update = true;
+	GSDownloadInit();
 	return CustomMenu_CallHead(a1, menu_vftable_1_Update, menu_vftable_2_Update, (DWORD)&CMButtonHandler_Update, 4, 272);
 }
 
@@ -1800,6 +1801,103 @@ void GSCustomMenuCall_Update() {
 
 #pragma endregion
 
+
+const int CMLabelMenuId_Update_Note = 0xFF000012;
+#pragma region CM_Update_Note
+
+void __stdcall CMLabelButtons_Update_Note(int a1, int a2)
+{
+	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+
+	__int16 button_id = *(WORD*)(a1 + 112);
+	int v3 = sub_211909(a1, 6, 0, 0);
+	if (v3)
+	{
+		sub_21bf85_CMLTD(v3, button_id + 1, CMLabelMenuId_Update_Note);
+	}
+}
+
+__declspec(naked) void sub_2111ab_CMLTD_nak_Update_Note() {//__thiscall
+	__asm {
+		mov eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0xFFFFFFF1//label_id_description
+		push 0xFFFFFFF0//label_id_title
+		push CMLabelMenuId_Update_Note
+		push eax
+		push ecx
+		call sub_2111ab_CMLTD//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+static bool CMButtonHandler_Update_Note(int button_id) {
+
+	if (button_id == 0) {
+		GSCustomMenuCall_Update();
+	}
+	return true;
+}
+
+__declspec(naked) void sub_20F790_CM_nak_Update_Note() {//__thiscall
+	__asm {
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0//selected button id
+		push ecx
+		call sub_20F790_CM//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn
+	}
+}
+
+int CustomMenu_Update_Note(int);
+
+int(__cdecl *CustomMenuFuncPtrHelp_Update_Note())(int) {
+	return CustomMenu_Update_Note;
+}
+
+DWORD* menu_vftable_1_Update_Note = 0;
+DWORD* menu_vftable_2_Update_Note = 0;
+
+void CMSetupVFTables_Update_Note() {
+	CMSetupVFTables(&menu_vftable_1_Update_Note, &menu_vftable_2_Update_Note, (DWORD)CMLabelButtons_Update_Note, (DWORD)sub_2111ab_CMLTD_nak_Update_Note, (DWORD)CustomMenuFuncPtrHelp_Update_Note, (DWORD)sub_20F790_CM_nak_Update_Note, true, 0);
+}
+
+int CustomMenu_Update_Note(int a1) {
+	return CustomMenu_CallHead(a1, menu_vftable_1_Update_Note, menu_vftable_2_Update_Note, (DWORD)&CMButtonHandler_Update_Note, 2, 272);
+}
+
+void GSCustomMenuCall_Update_Note() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_Update_Note);
+	CallWgit(WgitScreenfunctionPtr);
+}
+
+#pragma endregion
 
 
 
@@ -3901,12 +3999,22 @@ void initGSCustomMenu() {
 
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF0, "Update");
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF1, "Update Project Cartographer.");
-	add_cartographer_label(CMLabelMenuId_Update, 1, "Check for Updates");
+	add_cartographer_label(CMLabelMenuId_Update, 1, (char*)0, true);
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFF0001, "Check for Updates");
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFF01, "Checking For Updates...");
 	add_cartographer_label(CMLabelMenuId_Update, 2, (char*)0, true);
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFF0002, "Download Updates");
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFF02, "Downloading Updates...");
 	add_cartographer_label(CMLabelMenuId_Update, 3, (char*)0, true);
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFF0003, "Install Updates");
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFF03, "Installing Updates...");
 	add_cartographer_label(CMLabelMenuId_Update, 4, "Cancel");
+
+
+	add_cartographer_label(CMLabelMenuId_Update_Note, 0xFFFFFFF0, "Outdated Version!");
+	add_cartographer_label(CMLabelMenuId_Update_Note, 0xFFFFFFF1, "You are using an outdated version of Project Cartographer! Would you like to go install the latest version?");
+	add_cartographer_label(CMLabelMenuId_Update_Note, 1, "Yes");
+	add_cartographer_label(CMLabelMenuId_Update_Note, 2, "No");
 
 
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF0, "Customise HUD / GUI");
@@ -4096,6 +4204,8 @@ void initGSCustomMenu() {
 	CMSetupVFTables_EditFPS();
 
 	CMSetupVFTables_Update();
+
+	CMSetupVFTables_Update_Note();
 
 	CMSetupVFTables_EditHudGui();
 

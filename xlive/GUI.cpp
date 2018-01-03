@@ -598,8 +598,15 @@ int WINAPI XLiveRender()
 				}
 			}
 
-			if (Auto_Update_Text)
+			if (Auto_Update_Text) {
 				drawText(10, 60, COLOR_WHITE, Auto_Update_Text, normalSizeFont);
+			}
+			extern long long Size_Of_Download;
+			extern long long Size_Of_Downloaded;
+			if (Size_Of_Download > 0) {
+				drawBox(10, 52, 200, 6, COLOR_RED, COLOR_RED);
+				drawBox(10, 52, ((Size_Of_Downloaded * 100) / Size_Of_Download) * 2, 6, COLOR_GREEN, COLOR_GREEN);
+			}
 
 		}
 

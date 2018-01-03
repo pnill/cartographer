@@ -382,7 +382,7 @@ bool HandleGuiLogin(char* token, char* identifier, char* password) {
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF014, 0xFFFFF015);
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_VERSION) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF004, 0xFFFFF005);
+			GSCustomMenuCall_Update_Note();
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_LOGIN_TOKEN) {
 

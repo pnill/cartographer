@@ -9,7 +9,7 @@
 #include "GSCustomLanguage.h"
 #include "GSCustomMenu.h"
 
-bool fork_cmd_elevate(const char* cmd, const char* flags = 0) {
+bool fork_cmd_elevate(const char* cmd, char* flags = 0) {
 	SHELLEXECUTEINFO shExInfo = { 0 };
 	shExInfo.cbSize = sizeof(shExInfo);
 	shExInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
@@ -62,12 +62,26 @@ bool fork_cmd(LPSTR cmd) {
 	return bSuccess;
 }
 
+long long Size_Of_Download = 0;
+long long Size_Of_Downloaded = 0;
+
 static size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 	size_t written = fwrite(ptr, size, nmemb, stream);
+	Size_Of_Downloaded += nmemb;
 	return written;
 }
 
+
+static size_t header_callback(char* buffer, size_t size, size_t nitems, void* userdata) {
+	/* received header is nitems * size long in 'buffer' NOT ZERO TERMINATED */
+	/* 'userdata' is set with CURLOPT_HEADERDATA */
+
+	sscanf(buffer, "Content-Length:%lld", &Size_Of_Download);
+	return nitems * size;
+}
+
 int DownloadFile(const char* url, wchar_t* local_full_path) {
+	Size_Of_Download = Size_Of_Downloaded = 0;
 	CURL *curl;
 	FILE *fp;
 	CURLcode res;
@@ -77,10 +91,12 @@ int DownloadFile(const char* url, wchar_t* local_full_path) {
 		curl_easy_setopt(curl, CURLOPT_URL, url);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+		curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
 		res = curl_easy_perform(curl);
 		/* always cleanup */
 		curl_easy_cleanup(curl);
 		fclose(fp);
+		Size_Of_Download = Size_Of_Downloaded = 0;
 		return 0;
 	}
 	return 1;
@@ -110,6 +126,15 @@ static char current_location_id = 0;
 
 bool GSDownload_files_to_download = false;
 bool GSDownload_files_to_install = false;
+
+static void setButtonState(unsigned int btn_ID, char button_state) {
+	if (button_state == 0)
+		add_cartographer_label(CMLabelMenuId_Update, btn_ID, (char*)0, true);
+	else if (button_state == 1)
+		add_cartographer_label(CMLabelMenuId_Update, btn_ID, H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFF0000 + btn_ID), true);
+	else if (button_state == 2)
+		add_cartographer_label(CMLabelMenuId_Update, btn_ID, H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFFFF00 + btn_ID), true);
+}
 
 
 static int interpretUpdateEntry(char* fileLine, char* version, int lineNumber) {
@@ -326,13 +351,6 @@ static void FetchUpdateDetails() {
 			break;
 	}
 
-	if (GSDownload_files_to_download) {
-		add_cartographer_label(CMLabelMenuId_Update, 2, H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFF0002), true);
-	}
-	if (GSDownload_files_to_install) {
-		add_cartographer_label(CMLabelMenuId_Update, 3, H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFF0003), true);
-	}
-
 	std::string im_lazy = "Download the Following:\n";
 
 	for (int i = 0; i < entry_count; i++) {
@@ -354,13 +372,14 @@ static void FetchUpdateDetails() {
 	}
 
 	extern char* Auto_Update_Text;
-	if (Auto_Update_Text) {
-		free(Auto_Update_Text);
-		Auto_Update_Text = 0;
+	char* Auto_Update_Text_alt = Auto_Update_Text;
+	Auto_Update_Text = 0;
+	if (Auto_Update_Text_alt) {
+		free(Auto_Update_Text_alt);
 	}
-	Auto_Update_Text = (char*)malloc(im_lazy.size() + 1);
-	strcpy_s(Auto_Update_Text, im_lazy.size() + 1, im_lazy.c_str());
-
+	Auto_Update_Text_alt = (char*)malloc(im_lazy.size() + 1);
+	strcpy_s(Auto_Update_Text_alt, im_lazy.size() + 1, im_lazy.c_str());
+	Auto_Update_Text = Auto_Update_Text_alt;
 }
 
 bool DownloadUpdatedFiles() {
@@ -394,16 +413,57 @@ bool DownloadUpdatedFiles() {
 	return files_downloaded;
 }
 
+static HANDLE hThreadDownloader = 0;
+
+static DWORD WINAPI DownloadThread(LPVOID lParam)
+{
+	int operation_id = (int)lParam;
+
+	setButtonState(1, 0);
+	setButtonState(2, 0);
+	setButtonState(3, 0);
+
+	if (operation_id == 0) {
+		setButtonState(1, 2);
+		FetchUpdateDetails();
+	}
+	else if (operation_id == 1) {
+		setButtonState(2, 2);
+		if (DownloadUpdatedFiles())
+			FetchUpdateDetails();
+	}
+
+	setButtonState(1, 1);
+	if (GSDownload_files_to_download)
+		setButtonState(2, 1);
+	else
+		setButtonState(2, 0);
+	if (GSDownload_files_to_install)
+		setButtonState(3, 1);
+	else
+		setButtonState(3, 0);
+	
+	hThreadDownloader = 0;
+	return 0;
+}
+
+void GSDownloadInit() {
+	setButtonState(1, 1);
+}
+
 void GSDownloadCheck() {
-	FetchUpdateDetails();
+	if (!hThreadDownloader)
+		hThreadDownloader = CreateThread(NULL, 0, DownloadThread, (LPVOID)0, 0, NULL);
 }
 
 void GSDownloadDL() {
-	if (DownloadUpdatedFiles())
-		FetchUpdateDetails();
+	if (!hThreadDownloader)
+		hThreadDownloader = CreateThread(NULL, 0, DownloadThread, (LPVOID)1, 0, NULL);
 }
 
 void GSDownloadInstall() {
+
+	setButtonState(3, 2);
 
 	wchar_t* dir_temp = _wgetenv(L"TEMP");
 
@@ -447,11 +507,15 @@ void GSDownloadInstall() {
 	snprintf(existingfilepathupdater, 1024 + 260, "%wsh2pc-update.exe", dir_update);
 
 	if (updater_params.size() > 0) {
-		if (fork_cmd_elevate(existingfilepathupdater, updater_params.c_str())) {
+		int updater_params_buflen = 20 + updater_params.size();
+		char* updater_params_flags = (char*)malloc(sizeof(char) * updater_params_buflen);
+		snprintf(updater_params_flags, updater_params_buflen, "-p %d %s", GetCurrentProcessId(), updater_params.c_str());
+		if (fork_cmd_elevate(existingfilepathupdater, updater_params_flags)) {
 			addDebugText("Shutting down to update!");
 			BYTE& Quit_Exit_Game = *(BYTE*)((char*)H2BaseAddr + (H2IsDediServer ? 0x4a7083 : 0x48220b));
 			Quit_Exit_Game = 1;
 		}
+		free(updater_params_flags);
 	}
 	else {
 		addDebugText("No Files to Update!");
@@ -460,6 +524,19 @@ void GSDownloadInstall() {
 }
 
 void GSDownloadCancel() {
+	//DWORD result = WaitForSingleObject(hThreadDownloader, 0);
+	//if (result == WAIT_OBJECT_0) {
+		// the thread handle is signaled - the thread has terminated
+	//}
+	//else {
+		// the thread handle is not signaled - the thread is still alive
+	//}
+	if (hThreadDownloader) {
+		TerminateThread(hThreadDownloader, 1);
+		hThreadDownloader = 0;
+		Size_Of_Download = Size_Of_Downloaded = 0;
+	}
+
 	extern char* Auto_Update_Text;
 	if (Auto_Update_Text) {
 		free(Auto_Update_Text);
@@ -469,8 +546,9 @@ void GSDownloadCancel() {
 	GSDownload_files_to_download = false;
 	GSDownload_files_to_install = false;
 
-	add_cartographer_label(CMLabelMenuId_Update, 2, (char*)0, true);
-	add_cartographer_label(CMLabelMenuId_Update, 3, (char*)0, true);
+	setButtonState(1, 0);
+	setButtonState(2, 0);
+	setButtonState(3, 0);
 }
 
 
