@@ -3838,7 +3838,6 @@ void GSCustomMenuCall_Obscure() {
 
 #pragma endregion
 
-unsigned int sound_id = 0xF44739E1;
 
 typedef void(__cdecl *tsub_bd137)(unsigned int);
 tsub_bd137 psub_bd137;
@@ -3862,9 +3861,17 @@ void __cdecl sub_bd137(unsigned int skull_id) {
 	int v4; // ecx
 	unsigned int v5; // ecx
 
-	if (skull_id <= 0xE && !byte_4D8320[skull_id])
-	{
+	bool skull_activated = false;
+
+	if (skull_id == 0x6) {
+		skull_activated = blind_fp = blind_hud = true;
+	}
+	else if (skull_id <= 0xE && !byte_4D8320[skull_id]) {
 		byte_4D8320[skull_id] = 1;
+		skull_activated = true;
+	}
+
+	if (skull_activated) {
 		sub_22CE83();
 		v1 = dword_3BCAF8[skull_id];
 		v2 = sub_5343F();
