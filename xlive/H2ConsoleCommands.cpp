@@ -225,12 +225,12 @@ void ConsoleCommands::handle_command(std::string command) {
 			strcpy(cstr, firstArg.c_str());
 
 			DWORD lobby_globals = *(DWORD*)((char*)h2mod->GetBase() + 0x420FE8);
-
 			BYTE playerNumber = *(BYTE*)(lobby_globals + 0x1254);
-			BYTE maxPlayersNumber = *(BYTE*)(lobby_globals + 0x4C80);
 
 			if (isNum(cstr)) {
-				int maxPlayersSet = atoi(cstr);
+				delete[] cstr;
+
+ 				int maxPlayersSet = stoi(firstArg);
 				if (maxPlayersSet < 1 || maxPlayersSet > 16) {
 					output(L"The value needs to be between 1 and 16.");
 					return;
@@ -241,8 +241,9 @@ void ConsoleCommands::handle_command(std::string command) {
 					return;
 				}
 				else {
-					maxPlayersNumber = maxPlayersSet;
+					*(BYTE*)(lobby_globals + 0x4C80) = maxPlayersSet;
 					output(L"Maximum players set");
+					return;
 				}
 			}
 			delete[] cstr;
@@ -345,7 +346,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			strcpy(cstr, sensVal.c_str());
 
 			if (isNum(cstr)) {
-				setSens(1, stof(sensVal));
+				setSens(CONTROLLER, stoi(sensVal));
 			}
 			else {
 				output(L"Wrong input! Use a number.");
@@ -362,7 +363,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			strcpy(cstr, sensVal.c_str());
 
 			if (isNum(cstr)) {
-				setSens(0, stof(sensVal));
+				setSens(MOUSE, stoi(sensVal));
 			}
 			else {
 				output(L"Wrong input! Use a number.");

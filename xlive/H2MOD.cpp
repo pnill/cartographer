@@ -973,9 +973,10 @@ bool __cdecl OnPlayerSpawn(int a1)
 
 	int PlayerIndex = a1 & 0x000FFFF; 
 
-	if (b_Infection)
+	if (b_Infection) {
 		inf->PreSpawn(PlayerIndex);
 		inf->SpawnPlayer(PlayerIndex);
+	}
 
 	if (b_GunGame && (isHost || h2mod->Server))
 		gg->SpawnPlayer(PlayerIndex);
@@ -1631,6 +1632,10 @@ void H2MOD::Initialize()
 		if (H2Config_raw_input)
 			mouse->Initialize();
 
+	}
+
+	if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS)) {
+		addDebugText("Error setting the process priority");
 	}
 	
 	TRACE_GAME("H2MOD - Initialized v0.1a");

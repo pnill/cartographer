@@ -7,5 +7,5 @@ void RetourClassFunc(BYTE *src, BYTE *restore, const int len);
 
 void *VTableFunction(void *ClassPtr, DWORD index);
 void Codecave(DWORD destAddress, VOID(*func)(VOID), BYTE nopCount);
-void WriteBytes(uintptr_t destAddress, LPVOID bytesToWrite, int numBytes);
+void WriteBytes(DWORD destAddress, LPVOID bytesToWrite, int numBytes);
 
