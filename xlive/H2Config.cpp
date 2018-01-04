@@ -83,6 +83,7 @@ int H2Config_field_of_view = 0;
 float H2Config_crosshair_offset = NAN;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
+bool H2Config_xDelay = true;
 int H2Config_custom_resolution_x = 0;
 int H2Config_custom_resolution_y = 0;
 char H2Config_dedi_server_name[32] = { "" };
@@ -211,6 +212,10 @@ void SaveH2Config() {
 			//fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fileConfig);
 			//fputs("\n\n", fileConfig);
 		}
+		fputs("# enable_xdelay Options:", fileConfig);
+		fputs("\n# 0 - Non-host players cannot delay the game start countdown timer.", fileConfig);
+		fputs("\n# 1 - Non-host players can delay the game start countdown timer (native default).", fileConfig);
+		fputs("\n\n", fileConfig);
 		fputs("# debug_log Options:", fileConfig);
 		fputs("\n# 0 - Disables excess logging.", fileConfig);
 		fputs("\n# 1 - Enables excess logging.", fileConfig);
@@ -295,6 +300,8 @@ void SaveH2Config() {
 			//TODO
 			//fputs("\ncustom_resolution = 0x0", fileConfig);
 		}
+		fputs("\nenable_xdelay = ", fileConfig); fputs(H2Config_xDelay ? "1" : "0", fileConfig);
+
 		if (H2IsDediServer) {
 			fputs("\nserver_name = ", fileConfig); fputs(H2Config_dedi_server_name, fileConfig);
 
@@ -375,37 +382,38 @@ void SaveH2Config() {
 
 #pragma region Established Config Variables
 //if these variables read already
-bool est_h2portable = false;
-bool est_base_port = false;
-bool est_str_wan = false;
-bool est_str_lan = false;
-bool est_ip_master = false;
-bool est_language_code = false;
-bool est_language_label_capture = false;
-bool est_skip_intro = false;
-bool est_raw_input = false;
-bool est_discord_enable = false;
-bool est_controller_aim_assist = false;
-bool est_fps_limit = false;
-bool est_field_of_view = false;
-bool est_crosshair_offset = false;
-bool est_disable_ingame_keyboard = false;
-bool est_hide_ingame_chat = false;
-bool est_custom_resolution = false;
-bool est_server_name = false;
-bool est_server_playlist = false;
-bool est_map_downloading_enable = false;
-bool est_chatbox_commands = false;
-bool est_debug_log = false;
-bool est_login_token = false;
-bool est_login_identifier = false;
-bool est_login_password = false;
-bool est_hotkey_help = false;
-bool est_hotkey_toggle_debug = false;
-bool est_hotkey_align_window = false;
-bool est_hotkey_window_mode = false;
-bool est_hotkey_hide_ingame_chat = false;
-bool est_hotkey_guide = false;
+static bool est_h2portable = false;
+static bool est_base_port = false;
+static bool est_str_wan = false;
+static bool est_str_lan = false;
+static bool est_ip_master = false;
+static bool est_language_code = false;
+static bool est_language_label_capture = false;
+static bool est_skip_intro = false;
+static bool est_raw_input = false;
+static bool est_discord_enable = false;
+static bool est_controller_aim_assist = false;
+static bool est_fps_limit = false;
+static bool est_field_of_view = false;
+static bool est_crosshair_offset = false;
+static bool est_disable_ingame_keyboard = false;
+static bool est_hide_ingame_chat = false;
+static bool est_xdelay = false;
+static bool est_custom_resolution = false;
+static bool est_server_name = false;
+static bool est_server_playlist = false;
+static bool est_map_downloading_enable = false;
+static bool est_chatbox_commands = false;
+static bool est_debug_log = false;
+static bool est_login_token = false;
+static bool est_login_identifier = false;
+static bool est_login_password = false;
+static bool est_hotkey_help = false;
+static bool est_hotkey_toggle_debug = false;
+static bool est_hotkey_align_window = false;
+static bool est_hotkey_window_mode = false;
+static bool est_hotkey_hide_ingame_chat = false;
+static bool est_hotkey_guide = false;
 static void est_reset_vars() {
 	est_h2portable = false;
 	est_base_port = false;
@@ -423,6 +431,7 @@ static void est_reset_vars() {
 	est_crosshair_offset = false;
 	est_disable_ingame_keyboard = false;
 	est_hide_ingame_chat = false;
+	est_xdelay = false;
 	est_custom_resolution = false;
 	est_server_name = false;
 	est_server_playlist = false;
@@ -690,6 +699,18 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			else {
 				H2Config_hide_ingame_chat = (bool)tempint1;
 				est_hide_ingame_chat = true;
+			}
+		}
+		else if (sscanf(fileLine, "enable_xdelay =%d", &tempint1) == 1) {
+			if (est_xdelay) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_xDelay = (bool)tempint1;
+				est_xdelay = true;
 			}
 		}
 		else if (!H2IsDediServer && sscanf(fileLine, "custom_resolution =%dx%d", &tempint1, &tempint2) == 2) {

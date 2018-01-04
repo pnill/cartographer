@@ -37,6 +37,7 @@ extern int H2Config_field_of_view;
 extern float H2Config_crosshair_offset;
 extern bool H2Config_disable_ingame_keyboard;
 extern bool H2Config_hide_ingame_chat;
+extern bool H2Config_xDelay;
 extern int H2Config_custom_resolution_x;
 extern int H2Config_custom_resolution_y;
 extern char H2Config_dedi_server_name[32];

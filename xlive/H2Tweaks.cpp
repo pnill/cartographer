@@ -4,6 +4,7 @@
 #include "GSUtils.h"
 #include "Hook.h"
 #include "H2OnscreenDebugLog.h"
+#include "GSCustomMenu.h"
 
 #pragma region Done_Tweaks
 
@@ -101,6 +102,7 @@ void postConfig() {
 	sprintf(NotificationText5, "Base port: %d.", H2Config_base_port);
 	addDebugText(NotificationText5);
 
+	RefreshTogglexDelay();
 }
 
 #pragma endregion

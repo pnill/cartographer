@@ -2053,6 +2053,13 @@ void RefreshToggleDisableControllerAimAssist() {
 	}
 }
 
+void RefreshTogglexDelay() {
+	BYTE xDelayJMP[] = { 0x74 };
+	if (!H2Config_xDelay)
+		xDelayJMP[0] = 0xEB;
+	WriteBytes(H2BaseAddr + (H2IsDediServer ? 0x1a1316 : 0x1c9d8e), xDelayJMP, 1);
+}
+
 #pragma endregion
 
 
@@ -2335,7 +2342,6 @@ void GSCustomMenuCall_ToggleSkulls() {
 const int CMLabelMenuId_OtherSettings = 0xFF00000D;
 #pragma region CM_OtherSettings
 
-static bool xDelay = false;
 static bool vehicleFlipoverEject = true;
 
 static void loadLabelToggle_OtherSettings(int lblIndex, int lblTogglePrefix, bool isEnabled) {
@@ -2395,8 +2401,8 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
 	}
 	else if (button_id == 3) {
-		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (xDelay = !xDelay));
-		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
+		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_xDelay = !H2Config_xDelay));
+		RefreshTogglexDelay();
 	}
 	else if (button_id == 4) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF6, !(H2Config_skip_intro = !H2Config_skip_intro));
@@ -2459,7 +2465,7 @@ void CMSetupVFTables_OtherSettings() {
 int CustomMenu_OtherSettings(int a1) {
 	loadLabelToggle_OtherSettings(2, 0xFFFFFFF2, H2Config_controller_aim_assist);
 	loadLabelToggle_OtherSettings(3, 0xFFFFFFF2, H2Config_discord_enable);
-	loadLabelToggle_OtherSettings(4, 0xFFFFFFF2, xDelay);
+	loadLabelToggle_OtherSettings(4, 0xFFFFFFF2, H2Config_xDelay);
 	loadLabelToggle_OtherSettings(5, 0xFFFFFFF6, !H2Config_skip_intro);
 	loadLabelToggle_OtherSettings(6, 0xFFFFFFF2, !H2Config_disable_ingame_keyboard);
 	loadLabelToggle_OtherSettings(7, 0xFFFFFFF2, H2Config_raw_input);
@@ -4077,7 +4083,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 1, "> FPS Limit");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0002, "Controller Aim-Assist");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0003, "Discord Rich Presence");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0004, "Force Lobby Countdown");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0004, "xDelay");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0005, "Game Intro Video");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0006, "In-game Keyb. CTRLs");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0007, "Raw Mouse Input");
