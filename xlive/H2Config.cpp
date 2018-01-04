@@ -81,6 +81,8 @@ bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
 int H2Config_field_of_view = 0;
 float H2Config_crosshair_offset = NAN;
+int H2Config_sens_controller = 0;
+int H2Config_sens_mouse = 0;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
@@ -144,9 +146,11 @@ void SaveH2Config() {
 		fputs("\n# 0 - Config files are read from executable's launch directory then AppDataLocal if missing. Will write to AppDataLocal if not read from exec dir.", fileConfig);
 		fputs("\n# 1 - All config files are read and written to the executable's launch directory (however will still scan and read from AppDataLocal if missing).", fileConfig);
 		fputs("\n\n", fileConfig);
+
 		fputs("# base_port Options:", fileConfig);
 		fputs("\n# <1 - 65526> - The port the game binds to including any of the nine (9) afterward: UDP and/or TCP (Upper limit: 65535 - 9 = 65526).", fileConfig);
 		fputs("\n\n", fileConfig);
+
 		fputs("# wan_ip Options:", fileConfig);
 		fputs("\n# lan_ip Options:", fileConfig);
 		fputs("\n# This option is used for when you cannot join games hosted on the same local network due to NAT issues.", fileConfig);
@@ -154,6 +158,7 @@ void SaveH2Config() {
 		fputs("\n# <IPv4> - External IP Address of the local / internal network user you are trying to connect to. If blank, the External IP returned from the Master Login is used.", fileConfig);
 		fputs("\n# <IPv4> - Internal IP Address of the local / internal network user you are trying to connect to.", fileConfig);
 		fputs("\n\n", fileConfig);
+
 		if (!H2IsDediServer) {
 			fputs("# language_code Options (Client):", fileConfig);
 			fputs("\n# <main>x<variant> - Sets the main/custom language for the game.", fileConfig);
@@ -170,43 +175,59 @@ void SaveH2Config() {
 			fputs("\n# --- <variant> ---", fileConfig);
 			fputs("\n# 0  - Default", fileConfig);
 			fputs("\n\n", fileConfig);
+
 			fputs("# language_label_capture Options (Client):", fileConfig);
 			fputs("\n# Capture new labels not in the custom language file under the language currently in use.", fileConfig);
 			fputs("\n# 0 - Ignore listening for unrecorded labels.", fileConfig);
 			fputs("\n# 1 - Listen for and record any labels/strings not seen before.", fileConfig);
 			fputs("\n\n", fileConfig);
+
 			fputs("# skip_intro Options (Client):", fileConfig);
 			fputs("\n# 0 - Normal Intro.", fileConfig);
 			fputs("\n# 1 - No Intro.", fileConfig);
 			fputs("\n\n", fileConfig);
+
 			fputs("# raw_mouse_input Options (Client):", fileConfig);
 			fputs("\n# 0 - Default mouse input handling (includes mouse acceleration).", fileConfig);
 			fputs("\n# 1 - Mouse input does not have input acceleration.", fileConfig);
 			fputs("\n\n", fileConfig);
-		}
-		fputs("# discord_enable Options:", fileConfig);
-		fputs("\n# 0 - Disables Discord Rich Presence.", fileConfig);
-		fputs("\n# 1 - Enables Discord Rich Presence.", fileConfig);
-		fputs("\n\n", fileConfig);
-		if (!H2IsDediServer) {
+
+			fputs("# discord_enable Options:", fileConfig);
+			fputs("\n# 0 - Disables Discord Rich Presence.", fileConfig);
+			fputs("\n# 1 - Enables Discord Rich Presence.", fileConfig);
+			fputs("\n\n", fileConfig);
+
 			fputs("# controller_aim_assist Options (Client):", fileConfig);
 			fputs("\n# 0 - Disables aim assist for controllers.", fileConfig);
 			fputs("\n# 1 - Enables aim assist for controllers.", fileConfig);
 			fputs("\n\n", fileConfig);
+
 			fputs("# fps_limit Options (Client):", fileConfig);
 			fputs("\n# <uint> - 0 disables the built in frame limiter. >0 is the fps limit of the game.", fileConfig);
 			fputs("\n\n", fileConfig);
+
 			fputs("# field_of_view Options (Client):", fileConfig);
 			fputs("\n# <uint 0-110> - 0 disables the built in FoV adjustment. >0 is the FoV set value.", fileConfig);
 			fputs("\n\n", fileConfig);
+
 			fputs("# disable_ingame_keyboard Options (Client):", fileConfig);
 			fputs("\n# 0 - Normal Game Controls.", fileConfig);
 			fputs("\n# 1 - Disables ONLY Keyboard when in-game & allows controllers when game is not in focus.", fileConfig);
 			fputs("\n\n", fileConfig);
+
 			fputs("# hide_ingame_chat Options (Client):", fileConfig);
 			fputs("\n# 0 - In-game chat is displayed normally.", fileConfig);
 			fputs("\n# 1 - In-game chat is hidden.", fileConfig);
 			fputs("\n\n", fileConfig);
+
+			fputs("# controller_sensitivity Option (Client):", fileConfig);
+			fputs("\n# <value> Change controller sesitivity to your preference.", fileConfig);
+			fputs("\n\n", fileConfig);
+
+			fputs("# mouse_sensitivity Option (Client):", fileConfig);
+			fputs("\n# <value> Change mouse sesitivity to your preference.", fileConfig);
+			fputs("\n\n", fileConfig);
+
 			//fputs("# custom_resolution Options (Client):", fileConfig);
 			//fputs("\n# <width>x<height> - Sets the resolution of the game via the Windows Registry.", fileConfig);
 			//fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fileConfig);
@@ -216,23 +237,28 @@ void SaveH2Config() {
 		fputs("\n# 0 - Non-host players cannot delay the game start countdown timer.", fileConfig);
 		fputs("\n# 1 - Non-host players can delay the game start countdown timer (native default).", fileConfig);
 		fputs("\n\n", fileConfig);
+
 		fputs("# debug_log Options:", fileConfig);
 		fputs("\n# 0 - Disables excess logging.", fileConfig);
 		fputs("\n# 1 - Enables excess logging.", fileConfig);
 		fputs("\n\n", fileConfig);
+
 		if (H2IsDediServer) {
 			fputs("# server_name Options (Server):", fileConfig);
 			fputs("\n# Sets the name of the server up to 31 characters long.", fileConfig);
 			fputs("\n# Leave blank/empty for no effect.", fileConfig);
 			fputs("\n\n", fileConfig);
+
 			fputs("# server_playlist Options (Server):", fileConfig);
 			fputs("\n# Sets the playlist of the server up to 255 characters long.", fileConfig);
 			fputs("\n# Leave blank/empty for no effect.", fileConfig);
 			fputs("\n\n", fileConfig);
+
 			fputs("# login_identifier Options (Server):", fileConfig);
 			fputs("\n# The email or username used to login to an account.", fileConfig);
 			fputs("\n# Note: Server accounts *should not* be signed into multiple times concurrently *unless* it is all on the same computer (i.e. only exempt when running multiple server instances).", fileConfig);
 			fputs("\n\n", fileConfig);
+
 			fputs("# login_password Options (Server):", fileConfig);
 			fputs("\n# The password used to login to the defined account.", fileConfig);
 			fputs("\n\n", fileConfig);
@@ -292,6 +318,12 @@ void SaveH2Config() {
 				sprintf(settingOutBuffer, "\ncrosshair_offset = %f", H2Config_crosshair_offset);
 				fputs(settingOutBuffer, fileConfig);
 			}
+
+			sprintf(settingOutBuffer, "\ncontroller_sensitivity = %d", H2Config_sens_controller);
+			fputs(settingOutBuffer, fileConfig);
+
+			sprintf(settingOutBuffer, "\nmouse_sensitivity = %d", H2Config_sens_mouse);
+			fputs(settingOutBuffer, fileConfig);
 
 			fputs("\ndisable_ingame_keyboard = ", fileConfig); fputs(H2Config_disable_ingame_keyboard ? "1" : "0", fileConfig);
 
@@ -396,6 +428,8 @@ static bool est_controller_aim_assist = false;
 static bool est_fps_limit = false;
 static bool est_field_of_view = false;
 static bool est_crosshair_offset = false;
+static bool est_sens_controller = false;
+static bool est_sens_mouse = false;
 static bool est_disable_ingame_keyboard = false;
 static bool est_hide_ingame_chat = false;
 static bool est_xdelay = false;
@@ -414,6 +448,7 @@ static bool est_hotkey_align_window = false;
 static bool est_hotkey_window_mode = false;
 static bool est_hotkey_hide_ingame_chat = false;
 static bool est_hotkey_guide = false;
+
 static void est_reset_vars() {
 	est_h2portable = false;
 	est_base_port = false;
@@ -429,6 +464,8 @@ static void est_reset_vars() {
 	est_fps_limit = false;
 	est_field_of_view = false;
 	est_crosshair_offset = false;
+	est_sens_controller = false;
+	est_sens_mouse = false;
 	est_disable_ingame_keyboard = false;
 	est_hide_ingame_chat = false;
 	est_xdelay = false;
@@ -675,6 +712,30 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			else {
 				H2Config_crosshair_offset = tempfloat1;
 				est_crosshair_offset = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "controller_sensitivity =%d", &tempint1) == 1) {
+			if (est_sens_controller) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_sens_controller = tempint1;
+				est_sens_controller = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "mouse_sensitivity =%d", &tempint1) == 1) {
+			if (est_sens_mouse) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_sens_mouse = tempint1;
+				est_sens_mouse = true;
 			}
 		}
 		else if (!H2IsDediServer && ownsConfigFile && sscanf(fileLine, "disable_ingame_keyboard =%d", &tempint1) == 1) {

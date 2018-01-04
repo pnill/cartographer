@@ -1625,12 +1625,14 @@ void H2MOD::Initialize()
 		SoundT.detach();
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 		setFOV(H2Config_field_of_view);
-		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
+		setSens(CONTROLLER, H2Config_sens_controller);
+		setSens(MOUSE, H2Config_sens_mouse);
+		if (H2Config_raw_input)
+			mouse->Initialize();
 
 		PatchGameDetailsCheck();
 		//PatchPingMeterCheck(true);
-		if (H2Config_raw_input)
-			mouse->Initialize();
+		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
 
 	}
 
@@ -1638,7 +1640,7 @@ void H2MOD::Initialize()
 		addDebugText("Error setting the process priority");
 	}
 	
-	TRACE_GAME("H2MOD - Initialized v0.1a");
+	TRACE_GAME("H2MOD - Initialized v0.4a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
 
 	//Network::Initialize();
