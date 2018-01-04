@@ -189,6 +189,7 @@ bool read_custom_labels() {
 
 	if (labelsFile == NULL) {
 		addDebugText("Language file does not exist!");
+		custom_labels_updated = true;
 	}
 	else {
 		bool readingVersion = true;
@@ -333,8 +334,8 @@ bool read_custom_labels() {
 		}
 
 		fclose(labelsFile);
+		custom_labels_updated = false;
 	}
-	custom_labels_updated = false;
 	H2Config_custom_labels_capture_missing = prev_capture;
 	addDebugText("Finished Reading Custom Languages File.");
 	return read_file_success;

@@ -1595,6 +1595,8 @@ static bool CMButtonHandler_EditFPS(int button_id) {
 		else
 			H2Config_fps_limit = 60;
 	}
+	extern float desiredRenderTime;
+	desiredRenderTime = (1000.f / H2Config_fps_limit);
 	loadLabelFPSLimit();
 	return false;
 }
@@ -2390,6 +2392,7 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 	}
 	else if (button_id == 2) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_discord_enable = !H2Config_discord_enable));
+		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
 	}
 	else if (button_id == 3) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (xDelay = !xDelay));
@@ -2404,6 +2407,7 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 	}
 	else if (button_id == 6) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_raw_input = !H2Config_raw_input));
+		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
 	}
 	else if (button_id == 7) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (vehicleFlipoverEject = !vehicleFlipoverEject));
@@ -2668,7 +2672,7 @@ void CMSetupVFTables_Credits() {
 }
 
 int CustomMenu_Credits(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_Credits, menu_vftable_2_Credits, (DWORD)&CMButtonHandler_Credits, 14, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_Credits, menu_vftable_2_Credits, (DWORD)&CMButtonHandler_Credits, 16, 272);
 }
 
 void GSCustomMenuCall_Credits() {
@@ -2964,13 +2968,13 @@ static bool CMButtonHandler_AccountEdit(int button_id) {
 	else if (button_id == 3) {
 		char* identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
 		char* identifier_pass = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
+		accountingGoBackToList = false;
 		//login to account
 		if (HandleGuiLogin(0, identifier, identifier_pass)) {
 			//show select profile gui
 			int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
 			sub_209236(0);
 			//SaveH2Accounts();
-			accountingGoBackToList = false;
 			H2AccountLastUsed = 0;
 		}
 		memset(identifier_pass, 0, strlen(identifier_pass));
@@ -3384,8 +3388,8 @@ int CustomMenu_Guide(int a1) {
 	char* guide_desc_base = H2CustomLanguageGetLabel(CMLabelMenuId_Guide, 0xFFFFFFF2);
 	char* guide_description = (char*)malloc(strlen(guide_desc_base) + 50);
 	char hotkeyname[20];
-	GetVKeyCodeString(0x24, hotkeyname, 20);
-	sprintf(guide_description, guide_desc_base, hotkeyname);//TODO
+	GetVKeyCodeString(H2Config_hotkeyIdGuide, hotkeyname, 20);
+	sprintf(guide_description, guide_desc_base, hotkeyname);
 	add_cartographer_label(CMLabelMenuId_Guide, 0xFFFFFFF1, guide_description);
 	free(guide_description);
 	return CustomMenu_CallHead(a1, menu_vftable_1_Guide, menu_vftable_2_Guide, (DWORD)&CMButtonHandler_Guide, 4, 272);
@@ -3944,6 +3948,8 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF027, "The account you just entered has been successfully created! You may now use those details to login.");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF028, "Verification Email Sent!");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF029, "An email has been sent to the email address submitted. Please follow the instuctions in the email to activate your account.");
+	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF02A, "Restart Required");
+	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF02B, "The setting you have just changed requires that you restart your game for it to take effect.");
 
 
 	add_cartographer_label(CMLabelMenuId_Language, 0xFFFFFFF0, "Select Language");
@@ -4095,9 +4101,11 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Credits, 9, "Supersniper");
 	add_cartographer_label(CMLabelMenuId_Credits, 10, "--- Additional 7hanks ---");
 	add_cartographer_label(CMLabelMenuId_Credits, 11, "Project Cartographer Staff");
-	add_cartographer_label(CMLabelMenuId_Credits, 12, "H2MT (Past and Present)");
-	add_cartographer_label(CMLabelMenuId_Credits, 13, "Dev Preview Members");
-	add_cartographer_label(CMLabelMenuId_Credits, 14, "And the many many more from the Halo 2 Community!");
+	add_cartographer_label(CMLabelMenuId_Credits, 12, "PCMT (Mapping Team)");
+	add_cartographer_label(CMLabelMenuId_Credits, 13, "H2MT (Those past and present)");
+	add_cartographer_label(CMLabelMenuId_Credits, 14, "Dev Preview Members");
+	add_cartographer_label(CMLabelMenuId_Credits, 15, "And the many many more");
+	add_cartographer_label(CMLabelMenuId_Credits, 16, "from the Halo 2 Community!");
 
 
 	add_cartographer_label(CMLabelMenuId_AccountCreate, 0xFFFFFFF0, "Create Account");

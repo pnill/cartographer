@@ -141,12 +141,11 @@ void GUI::Initialize()
 	
 	if (FAILED(D3DXCreateTextureFromFile(pDevice, "sounds/h2pc_logo.png", &Texture_Interface) ) )
 	{
-		MessageBoxA(NULL, "Failed to create texture", "failure", MB_OK);
+		addDebugText("ERROR: Failed to create logo texture (for achievements).");
 	}
 
 	D3DXCreateSprite(pDevice, &Sprite_Interface);
 
-	
 }
 
 bool once1 = false;

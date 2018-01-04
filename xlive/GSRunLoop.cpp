@@ -258,8 +258,8 @@ void hotkeyFuncHelp() {
 }
 
 const int hotkeyLen = 9;
-//GSFIXME: Set only completed 5/6
-int hotkeyListenLen = 8;
+//GSFIXME: Set only completed 6
+int hotkeyListenLen = 6;
 int* hotkeyId[hotkeyLen] = { &H2Config_hotkeyIdHelp, &H2Config_hotkeyIdToggleDebug, &H2Config_hotkeyIdAlignWindow, &H2Config_hotkeyIdWindowMode, &H2Config_hotkeyIdToggleHideIngameChat, &H2Config_hotkeyIdGuide, &hotkeyIdTest, &hotkeyIdTest2, &hotkeyIdEsc };
 bool hotkeyPressed[hotkeyLen] = { false, false, false, false, false, false, false, false, false };
 void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotkeyFuncAlignWindow, hotkeyFuncWindowMode, hotkeyFuncToggleHideIngameChat, hotkeyFuncGuide, hotkeyFuncTest, hotkeyFuncTest2, hotkeyFuncEsc };
