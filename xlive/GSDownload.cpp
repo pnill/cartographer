@@ -87,9 +87,17 @@ int DownloadFile(const char* url, wchar_t* local_full_path) {
 	CURLcode res;
 	curl = curl_easy_init();
 	if (curl) {
+		EnsureDirectoryExists(local_full_path);
 		fp = _wfopen(local_full_path, L"wb");
+		if (!fp) {
+			addDebugText("Failed to obtain FILE* for DL from: to: ");
+			addDebugText(url);
+			addDebugText(local_full_path);
+			return 2;
+		}
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+		//FIXME: <Insert Pinned Public Key Here>
 		curl_easy_setopt(curl, CURLOPT_URL, url);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);

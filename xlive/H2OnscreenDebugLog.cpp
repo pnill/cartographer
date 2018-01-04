@@ -22,6 +22,14 @@ void addDebugText(wchar_t* wtext) {
 	free(text);
 }
 
+void addDebugText(const char* text) {
+	int buflen = strlen(text) + 1;
+	char* text2 = (char*)malloc(sizeof(char) * buflen);
+	memcpy(text2, text, sizeof(char) * buflen);
+	addDebugText(text2);
+	free(text2);
+}
+
 void addDebugText(char* text) {
 	if (!initialisedDebugText) return;
 

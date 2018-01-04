@@ -642,6 +642,10 @@ int MasterHttpResponse(char* url, char* http_request, char* &rtn_response) {
 		struct stringMe s;
 		init_string(&s);
 
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+		//FIXME: <Insert Pinned Public Key Here>
+
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
 
@@ -701,4 +705,26 @@ bool StrnCaseInsensEqu(char* str1, char* str2, unsigned int chk_len) {
 	}
 
 	return true;
+}
+
+void EnsureDirectoryExists(wchar_t* path) {
+	int buflen = wcslen(path) + 1;
+	wchar_t* path2 = (wchar_t*)malloc(sizeof(wchar_t) * buflen);
+	memcpy(path2, path, sizeof(wchar_t) * buflen);
+
+	for (int i = 1; i < buflen; i++) {
+		if (path2[i] == L'/' || path2[i] == L'\\') {
+			wchar_t temp_cut = 0;
+			if (path2[i + 1] != 0) {
+				temp_cut = path2[i + 1];
+				path2[i + 1] = 0;
+			}
+			CreateDirectoryW(path2, NULL);
+			if (temp_cut) {
+				path2[i + 1] = temp_cut;
+			}
+		}
+	}
+
+	free(path2);
 }
