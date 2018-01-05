@@ -143,7 +143,7 @@ void SaveH2Config() {
 		fputs("\n\n", fileConfig);
 		
 		fputs("# h2portable Options:", fileConfig);
-		fputs("\n# 0 - Config files are read from executable's launch directory then AppDataLocal if missing. Will write to AppDataLocal if not read from exec dir.", fileConfig);
+		fputs("\n# 0 - Config files are read from executable's launch directory then AppDataLocal if missing. Will write to AppDataLocal if not read from the execution directory.", fileConfig);
 		fputs("\n# 1 - All config files are read and written to the executable's launch directory (however will still scan and read from AppDataLocal if missing).", fileConfig);
 		fputs("\n\n", fileConfig);
 
@@ -207,7 +207,11 @@ void SaveH2Config() {
 			fputs("\n\n", fileConfig);
 
 			fputs("# field_of_view Options (Client):", fileConfig);
-			fputs("\n# <uint 0-110> - 0 disables the built in FoV adjustment. >0 is the FoV set value.", fileConfig);
+			fputs("\n# <uint 0 to 110> - 0 disables the built in FoV adjustment. >0 is the FoV set value.", fileConfig);
+			fputs("\n\n", fileConfig);
+
+			fputs("# crosshair_offset Options (Client):", fileConfig);
+			fputs("\n# <0 to 0.53> - NaN disables the built in Crosshair adjustment.", fileConfig);
 			fputs("\n\n", fileConfig);
 
 			fputs("# controller_sensitivity Option (Client):", fileConfig);
@@ -708,6 +712,9 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_offset =%f", &tempfloat1) == 1) {
 			if (est_crosshair_offset) {
 				duplicated = true;
+			}
+			else if (!(FloatIsNaN(tempfloat1) || tempfloat1 >= 0.0f || tempfloat1 <= 0.53f)) {
+				incorrect = true;
 			}
 			else {
 				H2Config_crosshair_offset = tempfloat1;

@@ -519,7 +519,7 @@ void GSDownloadInstall() {
 	if (updater_params.size() > 0) {
 		int updater_params_buflen = 20 + updater_params.size();
 		char* updater_params_flags = (char*)malloc(sizeof(char) * updater_params_buflen);
-		snprintf(updater_params_flags, updater_params_buflen, "-p %d -t 3000 %s", GetCurrentProcessId(), updater_params.c_str());
+		snprintf(updater_params_flags, updater_params_buflen, "-p %d -t 5000 %s", GetCurrentProcessId(), updater_params.c_str());
 		if (fork_cmd_elevate(existingfilepathupdater, updater_params_flags)) {
 			addDebugText("Shutting down to update!");
 			BYTE& Quit_Exit_Game = *(BYTE*)((char*)H2BaseAddr + (H2IsDediServer ? 0x4a7083 : 0x48220b));

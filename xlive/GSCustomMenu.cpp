@@ -1234,7 +1234,7 @@ const int CMLabelMenuId_EditCrosshair = 0xFF000010;
 #pragma region CM_EditCrosshair
 
 static void loadLabelCrosshairOffset() {
-	if (H2Config_crosshair_offset) {
+	if (!FloatIsNaN(H2Config_crosshair_offset)) {
 		char* lblFpsLimitNum = H2CustomLanguageGetLabel(CMLabelMenuId_EditCrosshair, 0xFFFF0003);
 		if (!lblFpsLimitNum)
 			return;
@@ -1291,32 +1291,40 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditCrosshair() {//__thiscall
 }
 
 static bool CMButtonHandler_EditCrosshair(int button_id) {
-	const float upper_limit = 110.0f;
+	const float upper_limit = 0.53f;
+	const float major_inc = 0.02f;
+	const float minor_inc = 0.001f;
 	if (button_id == 0) {
-		if (H2Config_crosshair_offset <= upper_limit - 1.0f)
-			H2Config_crosshair_offset += 1.0f;
+		if (H2Config_crosshair_offset <= upper_limit - major_inc)
+			H2Config_crosshair_offset += major_inc;
 		else
 			H2Config_crosshair_offset = upper_limit;
 	}
 	else if (button_id == 1) {
-		if (H2Config_crosshair_offset < upper_limit)
-			H2Config_crosshair_offset += 0.01f;
+		if (H2Config_crosshair_offset <= upper_limit - minor_inc)
+			H2Config_crosshair_offset += minor_inc;
+		else
+			H2Config_crosshair_offset = upper_limit;
 	}
 	else if (button_id == 3) {
-		//if (H2Config_crosshair_offset > 0.0f)
-			H2Config_crosshair_offset -= 0.01f;
-	}
-	else if (button_id == 4) {
-		//if (H2Config_crosshair_offset > 1.0f)
-			H2Config_crosshair_offset -= 1.0f;
-		//else
-		//	H2Config_crosshair_offset = NAN;
-	}
-	else if (button_id == 2) {
-		if (H2Config_crosshair_offset == 0.0f)
-			H2Config_crosshair_offset = NAN;
+		if (H2Config_crosshair_offset > 0.0f + minor_inc)
+			H2Config_crosshair_offset -= minor_inc;
 		else
 			H2Config_crosshair_offset = 0.0f;
+	}
+	else if (button_id == 4) {
+		if (H2Config_crosshair_offset > 0.0f + major_inc)
+			H2Config_crosshair_offset -= major_inc;
+		else
+			H2Config_crosshair_offset = 0.0f;
+	}
+	else if (button_id == 2) {
+		if (FloatIsNaN(H2Config_crosshair_offset))
+			H2Config_crosshair_offset = 0.165f;
+		else {
+			H2Config_crosshair_offset = NAN;
+			setCrosshairPos(0.165f);
+		}
 	}
 	loadLabelCrosshairOffset();
 	setCrosshairPos(H2Config_crosshair_offset);
@@ -2116,8 +2124,7 @@ static bool CMButtonHandler_EditHudGui(int button_id) {
 		GSCustomMenuCall_EditFOV();
 	}
 	else if (button_id == 1) {
-		//GSCustomMenuCall_EditCrosshair();
-		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
+		GSCustomMenuCall_EditCrosshair();
 	}
 	else if (button_id == 2) {
 		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF4, !(H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat));
@@ -3988,12 +3995,12 @@ void initGSCustomMenu() {
 
 	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFFFFF0, "Edit Crosshair Offset");
 	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFFFFF1, "Use the buttons below to modify the in-game Crosshair Offset.");
-	add_cartographer_label(CMLabelMenuId_EditCrosshair, 1, "+10");
-	add_cartographer_label(CMLabelMenuId_EditCrosshair, 2, "+1");
+	add_cartographer_label(CMLabelMenuId_EditCrosshair, 1, "+0.02");
+	add_cartographer_label(CMLabelMenuId_EditCrosshair, 2, "+0.001");
 	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFF0003, "Offset: %f");
 	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFF0013, "Offset Alteration Disabled");
-	add_cartographer_label(CMLabelMenuId_EditCrosshair, 4, "-1");
-	add_cartographer_label(CMLabelMenuId_EditCrosshair, 5, "-10");
+	add_cartographer_label(CMLabelMenuId_EditCrosshair, 4, "-0.001");
+	add_cartographer_label(CMLabelMenuId_EditCrosshair, 5, "-0.02");
 
 
 	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFFFFF0, "Edit Field of View");
