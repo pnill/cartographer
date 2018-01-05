@@ -973,9 +973,10 @@ bool __cdecl OnPlayerSpawn(int a1)
 
 	int PlayerIndex = a1 & 0x000FFFF; 
 
-	if (b_Infection)
+	if (b_Infection) {
 		inf->PreSpawn(PlayerIndex);
 		inf->SpawnPlayer(PlayerIndex);
+	}
 
 	if (b_GunGame && (isHost || h2mod->Server))
 		gg->SpawnPlayer(PlayerIndex);
@@ -1624,16 +1625,22 @@ void H2MOD::Initialize()
 		SoundT.detach();
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 		setFOV(H2Config_field_of_view);
-		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
-
-		PatchGameDetailsCheck();
-		//PatchPingMeterCheck(true);
+		setSens(CONTROLLER, H2Config_sens_controller);
+		setSens(MOUSE, H2Config_sens_mouse);
 		if (H2Config_raw_input)
 			mouse->Initialize();
 
+		PatchGameDetailsCheck();
+		//PatchPingMeterCheck(true);
+		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
+
+	}
+
+	if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS)) {
+		addDebugText("Error setting the process priority");
 	}
 	
-	TRACE_GAME("H2MOD - Initialized v0.1a");
+	TRACE_GAME("H2MOD - Initialized v0.4a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
 
 	//Network::Initialize();

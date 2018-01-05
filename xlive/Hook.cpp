@@ -91,13 +91,14 @@ void *VTableFunction(void *ClassPtr, DWORD index)
 	return pVtable[index];
 }
 
-void WriteBytes(uintptr_t destAddress, LPVOID bytesToWrite, int numBytes)
+void WriteBytes(DWORD destAddress, LPVOID bytesToWrite, int numBytes)
 {
 	DWORD OldProtection;
+	DWORD temp;
 
 	VirtualProtect((LPVOID)destAddress, numBytes, PAGE_EXECUTE_READWRITE, &OldProtection);
 	memcpy((LPVOID)destAddress, bytesToWrite, numBytes);
-	VirtualProtect((LPVOID)destAddress, numBytes, OldProtection, NULL);
+	VirtualProtect((LPVOID)destAddress, numBytes, OldProtection, &temp); //quick fix for exception that happens here
 }
 
 

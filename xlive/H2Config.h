@@ -35,6 +35,8 @@ extern bool H2Config_controller_aim_assist;
 extern int H2Config_fps_limit;
 extern int H2Config_field_of_view;
 extern float H2Config_crosshair_offset;
+extern int H2Config_sens_controller;
+extern int H2Config_sens_mouse;
 extern bool H2Config_disable_ingame_keyboard;
 extern bool H2Config_hide_ingame_chat;
 extern bool H2Config_xDelay;
