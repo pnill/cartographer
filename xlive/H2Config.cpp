@@ -95,6 +95,7 @@ bool H2Config_chatbox_commands = false;
 bool H2Config_debug_log = false;
 char H2Config_login_identifier[255] = { "" };
 char H2Config_login_password[255] = { "" };
+bool H2Config_30tick = false;
 
 int H2Config_hotkeyIdHelp = VK_F3;
 int H2Config_hotkeyIdToggleDebug = VK_F2;
@@ -266,6 +267,11 @@ void SaveH2Config() {
 			fputs("# login_password Options (Server):", fileConfig);
 			fputs("\n# The password used to login to the defined account.", fileConfig);
 			fputs("\n\n", fileConfig);
+
+			fputs("# tick_30 Options (Server):", fileConfig);
+			fputs("\n# *EXPERIMENTAL*", fileConfig);
+			fputs("\n# Enable xbox tickrate. *May* improve hit-reg.", fileConfig);
+			fputs("\n\n", fileConfig);
 		}
 		if (!H2IsDediServer) {
 			fputs("# hotkey_... Options (Client):", fileConfig);
@@ -344,6 +350,8 @@ void SaveH2Config() {
 			fputs("\nserver_name = ", fileConfig); fputs(H2Config_dedi_server_name, fileConfig);
 
 			fputs("\nserver_playlist = ", fileConfig); fputs(H2Config_dedi_server_playlist, fileConfig);
+
+			fputs("\ntick_30 = ", fileConfig); fputs(H2Config_30tick ? "1" : "0", fileConfig);
 		}
 
 		//fputs("\nmap_downloading_enable = ", fileConfig); fputs(H2Config_map_downloading_enable ? "1" : "0", fileConfig);
@@ -441,6 +449,7 @@ static bool est_debug_log = false;
 static bool est_custom_resolution = false;
 static bool est_server_name = false;
 static bool est_server_playlist = false;
+static bool est_30tick = false;
 static bool est_map_downloading_enable = false;
 static bool est_chatbox_commands = false;
 static bool est_login_token = false;
@@ -452,6 +461,7 @@ static bool est_hotkey_align_window = false;
 static bool est_hotkey_window_mode = false;
 static bool est_hotkey_hide_ingame_chat = false;
 static bool est_hotkey_guide = false;
+
 
 static void est_reset_vars() {
 	est_h2portable = false;
@@ -477,6 +487,7 @@ static void est_reset_vars() {
 	est_custom_resolution = false;
 	est_server_name = false;
 	est_server_playlist = false;
+	est_30tick = false;
 	est_map_downloading_enable = false;
 	est_chatbox_commands = false;
 	est_login_token = false;
@@ -846,6 +857,18 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 					}
 				}
 				est_server_playlist = true;
+			}
+		}
+		else if (H2IsDediServer && sscanf(fileLine, "tick_30 =%d", &tempint1) == 1) {
+			if (est_30tick) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_30tick = (bool)tempint1;
+				est_30tick = true;
 			}
 		}
 		else if (sscanf(fileLine, "map_downloading_enable =%d", &tempint1) == 1) {
