@@ -374,7 +374,7 @@ static void FetchUpdateDetails() {
 	im_lazy += im_lazy1;
 
 	for (int i = 0; i < entry_count; i++) {
-		if (UpdateFileEntries[i]->need_to_update && UpdateFileEntries[i]->location_id > 0) {
+		if (UpdateFileEntries[i]->need_to_update == 1 && UpdateFileEntries[i]->location_id > 0) {
 			std::string im_lazy2 = UpdateFileEntries[i]->local_name;
 			std::string im_lazy3 = H2UpdateLocationsStr[UpdateFileEntries[i]->location_id];
 			im_lazy += im_lazy3 + "\\" + im_lazy2 + "\n";
@@ -519,7 +519,7 @@ void GSDownloadInstall() {
 	if (updater_params.size() > 0) {
 		int updater_params_buflen = 20 + updater_params.size();
 		char* updater_params_flags = (char*)malloc(sizeof(char) * updater_params_buflen);
-		snprintf(updater_params_flags, updater_params_buflen, "-p %d %s", GetCurrentProcessId(), updater_params.c_str());
+		snprintf(updater_params_flags, updater_params_buflen, "-p %d -t 3000 %s", GetCurrentProcessId(), updater_params.c_str());
 		if (fork_cmd_elevate(existingfilepathupdater, updater_params_flags)) {
 			addDebugText("Shutting down to update!");
 			BYTE& Quit_Exit_Game = *(BYTE*)((char*)H2BaseAddr + (H2IsDediServer ? 0x4a7083 : 0x48220b));

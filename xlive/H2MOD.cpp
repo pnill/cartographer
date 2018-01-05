@@ -1636,9 +1636,12 @@ void H2MOD::Initialize()
 
 	}
 
-	if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS)) {
-		addDebugText("Error setting the process priority");
-	}
+	//effects can vary (good or bad) depending on different software configurations.
+	//if someone wants it they should set it manually or if it's really sought after make it a config setting.
+	//and it should have been set Above_Normal not High imo -Glitchy Scripts.
+	//if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS)) {
+	//	addDebugText("Error setting the process priority");
+	//}
 	
 	TRACE_GAME("H2MOD - Initialized v0.4a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
