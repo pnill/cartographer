@@ -919,23 +919,26 @@ int __cdecl OnMapLoad(int a1)
 		//*(int*)(h2mod->GetBase() + 0x464958) = 0;
 		//*(int*)(h2mod->GetBase() + 0x464964) = 0;
 		
-		if (GameEngine != 3 && GameState == 3)
+		if (GameEngine != 3)
 		{
 			setCrosshairPos(H2Config_crosshair_offset);
 
-			if (b_Infection)
-				inf->Initialize();
+			if (GameState == 3) {
+				if (b_Infection)
+					inf->Initialize();
 
-			if (b_GunGame && isHost)
-				gg->Initialize();
+				if (b_GunGame && isHost)
+					gg->Initialize();
 
-			if (b_H2X)
-				H2X::Initialize();
-			else
-				H2X::Deinitialize();
+				if (b_H2X)
+					H2X::Initialize();
+				else
+					H2X::Deinitialize();
 
-			if (b_Halo2Final)
-				h2f->Initialize();
+				if (b_Halo2Final)
+					h2f->Initialize();
+			}
+
 			
 		}
 
