@@ -2775,6 +2775,36 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountCreate() {//__thiscall
 	}
 }
 
+static HANDLE hThreadCreate = 0;
+
+static DWORD WINAPI ThreadCreate(LPVOID lParam)
+{
+	//gotta delay it a little to make sure the menu's decide to render correctly.
+	Sleep(200L);
+
+	char* username = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
+	char* email = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 2);
+	char* pass = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 3);
+	//submit account creation.
+	if (HandleGuiAccountCreate(username, email, pass)) {
+		//account created.
+		//GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF026, 0xFFFFF027);
+		//verification email.
+		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF028, 0xFFFFF029);
+
+		char* username2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
+		snprintf(username2, strlen(username) + 1, username);
+		char* pass2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
+		snprintf(pass2, strlen(pass) + 1, pass);
+		memset(username, 0, strlen(username));
+		memset(email, 0, strlen(email));
+		memset(pass, 0, strlen(pass));
+	}
+
+	hThreadCreate = 0;
+	return 0;
+}
+
 static bool CMButtonHandler_AccountCreate(int button_id) {
 	if (button_id == 0) {
 		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
@@ -2789,26 +2819,10 @@ static bool CMButtonHandler_AccountCreate(int button_id) {
 		GSCustomMenuCall_VKeyboard_Inner((wchar_t*)textBuffer, 255, 0b10000, CMLabelMenuId_AccountCreate, 0xFFFFF006, CMLabelMenuId_AccountCreate, 0xFFFFF007);
 	}
 	else if (button_id == 3) {
-		char* username = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
-		char* email = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 2);
-		char* pass = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 3);
-		//submit account creation.
-		if (HandleGuiAccountCreate(username, email, pass)) {
-			//account created.
-			//GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF026, 0xFFFFF027);
-			//verification email.
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF028, 0xFFFFF029);
-
-			char* username2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
-			snprintf(username2, strlen(username) + 1, username);
-			char* pass2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
-			snprintf(pass2, strlen(pass) + 1, pass);
-			memset(username, 0, strlen(username));
-			memset(email, 0, strlen(email));
-			memset(pass, 0, strlen(pass));
-		}
-		else {
+		if (!hThreadCreate) {
 			accountingGoBackToList = false;
+			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02C, 0xFFFFF02D);
+			hThreadCreate = CreateThread(NULL, 0, ThreadCreate, (LPVOID)0, 0, NULL);
 		}
 	}
 	return false;
@@ -3970,6 +3984,8 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF029, "An email has been sent to the email address submitted. Please follow the instuctions in the email to activate your account.");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF02A, "Restart Required");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF02B, "The setting you have just changed requires that you restart your game for it to take effect.");
+	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF02C, "Creating Account...");
+	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF02D, "Processing your new account...\r\nPlease wait.");
 
 
 	add_cartographer_label(CMLabelMenuId_Language, 0xFFFFFFF0, "Select Language");
