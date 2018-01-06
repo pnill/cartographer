@@ -286,7 +286,7 @@ static void FetchUpdateDetails() {
 
 	addDebugText("Fetching Update Details.");
 	char* rtn_result = 0;
-	int rtn_code = MasterHttpResponse("https://cartographer.online/h2pc-api/update.ini", "", rtn_result);
+	int rtn_code = MasterHttpResponse("https://cartographer.online/update1.ini", "", rtn_result);
 	if (rtn_code == 0) {
 		addDebugText("Got Update Details.");
 
