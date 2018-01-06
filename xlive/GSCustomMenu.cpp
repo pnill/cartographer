@@ -2792,6 +2792,7 @@ static bool CMButtonHandler_AccountCreate(int button_id) {
 		char* username = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
 		char* email = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 2);
 		char* pass = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 3);
+		accountingGoBackToList = false;
 		//submit account creation.
 		if (HandleGuiAccountCreate(username, email, pass)) {
 			//account created.
@@ -2806,9 +2807,6 @@ static bool CMButtonHandler_AccountCreate(int button_id) {
 			memset(username, 0, strlen(username));
 			memset(email, 0, strlen(email));
 			memset(pass, 0, strlen(pass));
-		}
-		else {
-			accountingGoBackToList = false;
 		}
 	}
 	return false;
