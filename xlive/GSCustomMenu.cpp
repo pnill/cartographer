@@ -1983,6 +1983,9 @@ void RefreshToggleIngameKeyboardControls() {
 
 //Reversed from Rainman/Cloud's tool (Credit to him for original hack).
 void RefreshToggleDisableControllerAimAssist() {
+	//FIXME: Causes the vertical lift on The Armory to kill you and launch Sergeant Johnson.
+	//Probably other weird glitches too.
+	return;
 
 	if (H2IsDediServer)
 		return;
@@ -2400,7 +2403,8 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 		GSCustomMenuCall_EditFPS();
 	}
 	else if (button_id == 1) {
-		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_controller_aim_assist = !H2Config_controller_aim_assist));
+		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
+		//loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_controller_aim_assist = !H2Config_controller_aim_assist));
 		RefreshToggleDisableControllerAimAssist();
 	}
 	else if (button_id == 2) {

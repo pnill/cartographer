@@ -1236,8 +1236,9 @@ void H2MOD::ApplyHooks() {
 		// hook the print command to redirect the output to our console
 		PatchCall(Base + 0xE9E50, reinterpret_cast<DWORD>(print_to_console));
 
+		//FIXME: This causes SP to crash after cutscenes.
 		//allow AI in MP
-		NopFill(h2mod->GetBase() + 0x30E67C, 0x14);
+		//NopFill(h2mod->GetBase() + 0x30E67C, 0x14);
 	}
 #pragma endregion
 
