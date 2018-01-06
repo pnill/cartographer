@@ -1618,6 +1618,8 @@ void H2MOD::Initialize()
 	{
 		this->Base = (DWORD)GetModuleHandleA("H2Server.exe");
 		this->Server = TRUE;
+		if (H2Config_30tick)
+			init30Tick();
 	}
 	else
 	{

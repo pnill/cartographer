@@ -50,3 +50,29 @@ void H2X::Deinitialize()
 	*(float*)(FloatOffsets + 0xD0F960) = 11.0f; /*H2V Brute Plasma Rifle rounds per second max*/
 }
 	
+/*EXPERIMENTAL*/
+/*Xbox tickrate for Dedis*/
+/*May improve hit-registration*/
+
+DWORD retnAddress;
+static const float xboxVal = 0.03333333333;
+
+__declspec(naked) void set30Tick() {
+
+	__asm
+	{
+		pop retnAddress
+
+		mov byte ptr[eax+2],30
+		movss xmm3,[xboxVal]
+		movss [eax+4],xmm3
+
+		push retnAddress
+		ret
+	}
+
+}
+
+void init30Tick() {
+	Codecave(h2mod->GetBase() + 0x4BE25, set30Tick, 0x12);
+}

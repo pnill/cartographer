@@ -7,3 +7,5 @@ public:
 	static void Deinitialize();
 
 };
+
+void init30Tick();
