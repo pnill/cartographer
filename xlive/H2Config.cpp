@@ -102,6 +102,7 @@ int H2Config_hotkeyIdAlignWindow = VK_F7;
 int H2Config_hotkeyIdWindowMode = VK_F8;
 int H2Config_hotkeyIdToggleHideIngameChat = VK_F9;
 int H2Config_hotkeyIdGuide = VK_HOME;
+int H2Config_hotkeyIdConsole = VK_F10;
 
 
 bool ownsConfigFile = false;
@@ -384,6 +385,10 @@ void SaveH2Config() {
 			GetVKeyCodeString(H2Config_hotkeyIdGuide, hotkeyText + strlen(hotkeyText), 20);
 			fputs(hotkeyText, fileConfig);
 
+			sprintf(hotkeyText, "\nhotkey_console = %d #", H2Config_hotkeyIdConsole);
+			GetVKeyCodeString(H2Config_hotkeyIdConsole, hotkeyText + strlen(hotkeyText), 20);
+			fputs(hotkeyText, fileConfig);
+
 		}
 
 		fputs("\n", fileConfig);
@@ -452,6 +457,7 @@ static bool est_hotkey_align_window = false;
 static bool est_hotkey_window_mode = false;
 static bool est_hotkey_hide_ingame_chat = false;
 static bool est_hotkey_guide = false;
+static bool est_hotkey_console = false;
 
 static void est_reset_vars() {
 	est_h2portable = false;
@@ -488,6 +494,7 @@ static void est_reset_vars() {
 	est_hotkey_window_mode = false;
 	est_hotkey_hide_ingame_chat = false;
 	est_hotkey_guide = false;
+	est_hotkey_console = false;
 }
 #pragma endregion
 
@@ -984,6 +991,18 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			else {
 				H2Config_hotkeyIdGuide = tempint1;
 				est_hotkey_guide = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "hotkey_console =%d", &tempint1) == 1) {
+			if (est_hotkey_console) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_hotkeyIdConsole = tempint1;
+				est_hotkey_console = true;
 			}
 		}
 		else {
