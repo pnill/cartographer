@@ -5,6 +5,7 @@
 #include <string>
 #include "H2Startup.h"
 #include "H2Tweaks.h"
+#include "H2Config.h"
 
 ConsoleCommands::ConsoleCommands() {
 	command = "";
@@ -347,6 +348,7 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			if (isNum(cstr)) {
 				setSens(CONTROLLER, stoi(sensVal));
+				H2Config_sens_controller = stoi(sensVal);
 			}
 			else {
 				output(L"Wrong input! Use a number.");
@@ -364,11 +366,15 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			if (isNum(cstr)) {
 				setSens(MOUSE, stoi(sensVal));
+				H2Config_sens_mouse = stoi(sensVal);
 			}
 			else {
 				output(L"Wrong input! Use a number.");
 			}
 			delete[] cstr;
+		}
+		else {
+			output(L"Unknown command.");
 		}
 	}
 }
