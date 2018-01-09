@@ -974,17 +974,19 @@ bool __cdecl OnPlayerSpawn(int a1)
 	isLobby = false;
 	//TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
 
-	int PlayerIndex = a1 & 0x000FFFF; 
+	int PlayerIndex = a1 & 0x000FFFF;
+	bool ret = pspawn_player(a1);
 
-	if (b_Infection) {
+	if (b_Infection)
 		inf->PreSpawn(PlayerIndex);
+
+	if (b_Infection)
 		inf->SpawnPlayer(PlayerIndex);
-	}
 
 	if (b_GunGame && (isHost || h2mod->Server))
 		gg->SpawnPlayer(PlayerIndex);
 
-	return pspawn_player(a1);
+	return ret;
 }
 
 /* Really need some hooks here,
