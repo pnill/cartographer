@@ -973,12 +973,12 @@ bool __cdecl OnPlayerSpawn(int a1)
 	//once players spawn we aren't in lobby anymore ;)
 	isLobby = false;
 	//TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
-
 	int PlayerIndex = a1 & 0x000FFFF;
-	bool ret = pspawn_player(a1);
 
 	if (b_Infection)
 		inf->PreSpawn(PlayerIndex);
+	
+	bool ret = pspawn_player(a1);	
 
 	if (b_Infection)
 		inf->SpawnPlayer(PlayerIndex);
