@@ -3922,9 +3922,6 @@ void __cdecl sub_bd137(unsigned int skull_id) {
 
 void initGSCustomMenu() {
 	
-	if (H2IsDediServer)
-		return;
-
 #pragma region Init_Cartographer_Labels
 
 	add_cartographer_label(CMLabelMenuId_EscSettings, 0xFFFFFFF0, "Esc Settings");
@@ -4202,6 +4199,9 @@ void initGSCustomMenu() {
 
 
 #pragma endregion
+	
+	if (H2IsDediServer)
+		return;
 
 	CMSetupVFTables_Obscure();
 
