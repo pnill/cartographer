@@ -3921,6 +3921,9 @@ void __cdecl sub_bd137(unsigned int skull_id) {
 
 
 void initGSCustomMenu() {
+	
+	if (H2IsDediServer)
+		return;
 
 #pragma region Init_Cartographer_Labels
 
@@ -4199,9 +4202,6 @@ void initGSCustomMenu() {
 
 
 #pragma endregion
-
-	if (H2IsDediServer)
-		return;
 
 	CMSetupVFTables_Obscure();
 
