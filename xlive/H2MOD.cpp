@@ -1631,8 +1631,8 @@ void H2MOD::Initialize()
 		SoundT.detach();
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 		setFOV(H2Config_field_of_view);
-		setSens(CONTROLLER, H2Config_sens_controller);
-		setSens(MOUSE, H2Config_sens_mouse);
+		//setSens(CONTROLLER, H2Config_sens_controller);
+		//setSens(MOUSE, H2Config_sens_mouse);
 		if (H2Config_raw_input)
 			mouse->Initialize();
 
