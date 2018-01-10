@@ -825,7 +825,7 @@ int __cdecl OnMapLoad(int a1)
 	isLobby = true;
 	int ret = pmap_initialize(a1);
 
-	//OnMapLoad is called with 30888 when a game ends
+	//OnMapLoad is called with 30888 when the mainmenu is loaded.
 	if (a1 == 30888)
 	{
 		if (b_Halo2Final && !h2mod->Server)
