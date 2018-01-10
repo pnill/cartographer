@@ -8,7 +8,7 @@ DWORD getOffset() {
 	int offset = 0x47CD54;
 	if (h2mod->Server)
 		offset = 0x4A29BC;
-	TRACE_GAME("[h2mod] H2X is being run on client game");
+	//TRACE_GAME("[h2mod] H2X is being run on client game");
 	DWORD FloatOffsets = *(DWORD*)((char*)h2mod->GetBase() + offset);
 	return FloatOffsets;
 }

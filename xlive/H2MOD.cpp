@@ -973,18 +973,20 @@ bool __cdecl OnPlayerSpawn(int a1)
 	//once players spawn we aren't in lobby anymore ;)
 	isLobby = false;
 	//TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
+	int PlayerIndex = a1 & 0x000FFFF;
 
-	int PlayerIndex = a1 & 0x000FFFF; 
-
-	if (b_Infection) {
+	if (b_Infection)
 		inf->PreSpawn(PlayerIndex);
+	
+	bool ret = pspawn_player(a1);	
+
+	if (b_Infection)
 		inf->SpawnPlayer(PlayerIndex);
-	}
 
 	if (b_GunGame && (isHost || h2mod->Server))
 		gg->SpawnPlayer(PlayerIndex);
 
-	return pspawn_player(a1);
+	return ret;
 }
 
 /* Really need some hooks here,
