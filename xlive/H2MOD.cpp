@@ -1172,7 +1172,7 @@ void H2MOD::ApplyHooks() {
 		Cinematic_Pointer = (camera_pointer)DetourFunc((BYTE*)this->GetBase() + 0x3A938, (BYTE*)if_cinematic, 8);
 		VirtualProtect(Cinematic_Pointer, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		psub_4F17A = (tsub_4F17A)DetourFunc((BYTE*)this->GetBase() + 0x4F17A, (BYTE*)sub_4F17A, 13);
+		psub_4F17A = (tsub_4F17A)DetourFunc((BYTE*)this->GetBase() + 0x4F17A, (BYTE*)sub_4F17A, 7);
 		VirtualProtect(psub_4F17A, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)this->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
@@ -1267,7 +1267,9 @@ void H2MOD::ApplyHooks() {
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0x8C84C, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
-
+		
+		psub_4F17A = (tsub_4F17A)DetourFunc((BYTE*)this->GetBase() + 0x5637A, (BYTE*)sub_4F17A, 7);
+		VirtualProtect(psub_4F17A, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		pplayer_death = (player_death)DetourFunc((BYTE*)this->GetBase() + 0x152ED4, (BYTE*)OnPlayerDeath, 9);
 		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
@@ -1631,8 +1633,8 @@ void H2MOD::Initialize()
 		SoundT.detach();
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 		setFOV(H2Config_field_of_view);
-		setSens(CONTROLLER, H2Config_sens_controller);
-		setSens(MOUSE, H2Config_sens_mouse);
+		//setSens(CONTROLLER, H2Config_sens_controller);
+		//setSens(MOUSE, H2Config_sens_mouse);
 		if (H2Config_raw_input)
 			mouse->Initialize();
 
