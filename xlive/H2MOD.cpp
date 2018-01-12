@@ -1445,6 +1445,9 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 									sendto(comm_socket, SendBuf, recvpak.ByteSize(), 0, (SOCKADDR*)&SenderAddr, sizeof(SenderAddr));
 
 									delete[] SendBuf;
+									
+									if (b_GunGame)
+										gg->AddPlayer(nPlayer);
 								}
 							}
 						}
