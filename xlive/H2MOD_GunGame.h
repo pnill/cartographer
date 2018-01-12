@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Hook.h"
-#include "H2mod.h"
 #include <unordered_map>
 
 class GunGamePlayer
@@ -20,7 +19,6 @@ public:
 	int GetCurrentWeapon(int PlayerIndex);
 	void PlayerDied(int unit_datum_index); // We need to start using PlayerIndex here for sanity.
 	void NextRound();
-	void AddPlayer(NetworkPlayer* netPlayer);
 
 	std::unordered_map<int, int> level_weapon;
 	std::unordered_map<int, int> player_level;

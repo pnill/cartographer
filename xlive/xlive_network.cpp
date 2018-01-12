@@ -177,7 +177,20 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 		}
 
 	}
-		
+	
+
+	/*if (H2MOD_Network == 0 && ThreadCreated == false)
+	{
+		ThreadCreated = true;
+		int Data_of_network_Thread = 1;
+		H2MOD_Network = CreateThread(NULL, 0, NetworkThread, &Data_of_network_Thread, 0, NULL);
+	}*/
+	//HANDLE Handle_Of_Thread_1 = 0;
+	//int Data_Of_Thread_1 = 1;
+	//Handle_Of_Thread_1 = CreateThread(NULL, 0,
+	//	Thread1, &Data_Of_Thread_1, 0, NULL);
+
+	
 	return 0;
 }
 
@@ -197,6 +210,30 @@ INT WINAPI XNetXnAddrToInAddr(XNADDR *pxna, XNKID *pnkid, IN_ADDR *pina)
 	if (secure !=0)
     {
 		pina->s_addr = secure;
+
+	/*	User.cusers_mutex.lock();
+			CUser* user = User.cusers[secure];
+		User.cusers_mutex.unlock();
+
+		if (user == 0) 
+		{
+			CUser *nUser = new CUser;
+			memset(&nUser->pxna, 0x00, sizeof(XNADDR));
+			memcpy(&nUser->pxna, pxna, sizeof(XNADDR));
+			std::string ab(reinterpret_cast<const char*>(pxna->abEnet), 6);
+
+			User.cusers_mutex.lock();
+			User.xnmap_mutex.lock();
+			User.xntosecure_mutex.lock();
+
+			User.cusers[secure] = nUser;
+			User.xnmap[secure] = pxna->ina.s_addr;
+			User.xntosecure[ab] = secure;
+
+			User.cusers_mutex.unlock();
+			User.xnmap_mutex.unlock();
+			User.xntosecure_mutex.unlock();
+		}*/
 	}
 	else
 	{
@@ -366,7 +403,11 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 
 			(((struct sockaddr_in*)from)->sin_addr.s_addr) = secure;
 
-			if (secure != 0)
+			if (secure == 0)
+			{
+				//TRACE("This is probably the issue.... now the fucking recv address is 0 you numb nuts. iplong: %08X, port: %08X",iplong,htons(port));
+			}
+			else
 			{
 				User.xnmap[secure] = iplong;
 			}
@@ -379,10 +420,12 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 			switch (User.sockmap[s])
 			{
 				case 1000:
+					//TRACE("XSocketRecvFrom() User.sockmap mapping port 1000 - port: %i, secure: %08X", htons(port), secure);
 						User.pmap_a[secure] = port;
 				break;
 
 				case 1001:
+					//TRACE("XSocketRecvFrom() User.sockmap mapping port 1001 - port: %i, secure: %08X", htons(port), secure);
 						User.pmap_b[secure] = port;
 				break;
 
