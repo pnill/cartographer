@@ -104,6 +104,14 @@ void GunGame::Initialize()
 
 }
 
+void GunGame::AddPlayer(NetworkPlayer* netPlayer)
+{
+	GunGamePlayer *nPlayer = new GunGamePlayer;
+	wcscpy(&nPlayer->PlayerName[0], netPlayer->PlayerName);
+	nPlayer->level = 0;
+	this->GunGamePlayers[nPlayer] = true;
+}
+
 void GunGame::PlayerDied(int unit_datum_index) // we need to start passing player index her for sanity.
 {
 	int unit_object = call_get_object(unit_datum_index, 3);
