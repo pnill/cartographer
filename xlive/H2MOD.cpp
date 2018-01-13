@@ -24,6 +24,7 @@
 #include "H2Tweaks.h"
 
 
+
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
 Infection *inf = new Infection();
@@ -622,6 +623,9 @@ void SoundThread(void)
 
 	while (1)
 	{
+		std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+		h2mod->sound_cv.wait(lck);
+
 		if (h2mod->SoundMap.size() > 0)
 		{
 			auto it = h2mod->SoundMap.begin();
@@ -633,8 +637,8 @@ void SoundThread(void)
 				it = h2mod->SoundMap.erase(it);
 			}
 		}
-
-		Sleep(100);
+		
+		//Sleep(100);
 	}
 
 }
@@ -1048,6 +1052,15 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 		TRACE("join_game Security Packet - WSAGetLastError(): %08X", WSAGetLastError());
 	}
 
+
+	/*
+		If the network thread doesn't complete it's loop before we reach create thread there's a race condition here, 
+		We'll end up creating an additional thread.
+
+		To account for this we'll check if H2MOD_Network is still valid instead of completely relying on NetworkActive bool.
+	*/
+	if (H2MOD_Network)
+		TerminateThread(H2MOD_Network, 0);
 
 	int Data_of_network_Thread = 1;
 	H2MOD_Network = CreateThread(NULL, 0, NetworkThread, &Data_of_network_Thread, 0, NULL);
@@ -1632,8 +1645,10 @@ void H2MOD::Initialize()
 		this->Server = FALSE;
 		//HANDLE Handle_Of_Sound_Thread = 0;
 		//int Data_Of_Sound_Thread = 1;
+		
 		std::thread SoundT(SoundThread);
 		SoundT.detach();
+		
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 		setFOV(H2Config_field_of_view);
 		//setSens(CONTROLLER, H2Config_sens_controller);

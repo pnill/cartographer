@@ -130,7 +130,10 @@ public:
 		std::unordered_map<NetworkPlayer*, bool> NetworkPlayers;
 		std::unordered_map<wchar_t*, int> SoundMap;
 		std::unordered_map<std::string, bool> AchievementMap;
+	
+
 		std::mutex sound_mutex;
+		std::condition_variable sound_cv;
 
 		std::set<int> hookedObjectDefs;
 		bool isChatBoxCommand = false;

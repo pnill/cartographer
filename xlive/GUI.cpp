@@ -518,7 +518,12 @@ int WINAPI XLiveRender()
 				
 				if (it->second == false)
 				{
+					std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+
 					h2mod->SoundMap[L"sounds/AchievementUnlocked.wav"] = 0;
+
+					h2mod->sound_cv.notify_one();
+
 					it->second = true;
 				}
 				

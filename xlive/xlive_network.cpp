@@ -169,6 +169,7 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 		isHost = true;
 		//only the peer host server ever creates the session key
 		isServer = true;
+
 		if (H2MOD_Network == 0 && ThreadCreated == false)
 		{
 			ThreadCreated = true;
@@ -177,20 +178,7 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 		}
 
 	}
-	
 
-	/*if (H2MOD_Network == 0 && ThreadCreated == false)
-	{
-		ThreadCreated = true;
-		int Data_of_network_Thread = 1;
-		H2MOD_Network = CreateThread(NULL, 0, NetworkThread, &Data_of_network_Thread, 0, NULL);
-	}*/
-	//HANDLE Handle_Of_Thread_1 = 0;
-	//int Data_Of_Thread_1 = 1;
-	//Handle_Of_Thread_1 = CreateThread(NULL, 0,
-	//	Thread1, &Data_Of_Thread_1, 0, NULL);
-
-	
 	return 0;
 }
 

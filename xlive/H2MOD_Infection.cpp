@@ -209,15 +209,24 @@ void Infection::SpawnPlayer(int PlayerIndex)
 		{
 			if (first_spawn == true)
 			{
+				std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+
 				h2mod->SoundMap[L"sounds/infection.wav"] = 1000;
 				
+				h2mod->sound_cv.notify_one();
+
+
 				first_spawn = false;
 			}
 
 			if (h2mod->get_local_team_index() == 3 && infected_played == false)
 			{
+				std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+
 				h2mod->SoundMap[L"sounds/infected.wav"] = 500;
-				
+
+				h2mod->sound_cv.notify_one();
+
 				infected_played = true;
 			}
 			if (h2mod->get_local_team_index() == 0)
@@ -322,7 +331,13 @@ void Infection::PlayerInfected(int unit_datum_index)
 					//If Any other NetworkPlayer has Died.Play Sound.
 					else
 					{
+
+						std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+
 						h2mod->SoundMap[L"sounds/new_zombie.wav"] = 1000;
+
+						h2mod->sound_cv.notify_one();
+
 					}
 				}
 			}
