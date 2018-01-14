@@ -125,7 +125,8 @@ public:
 		void set_local_grenades(BYTE type, BYTE count, int pIndex);
 		void DisableSound(int sound);
 		void PatchNewRound(bool hackit); 
-		void PatchWeaponsInteraction(bool b_Enable);
+		void PatchWeaponsInteraction(bool b_Enable);		
+		void securityPacketProcessing();
 		BOOL Server;
 		std::unordered_map<NetworkPlayer*, bool> NetworkPlayers;
 		std::unordered_map<wchar_t*, int> SoundMap;

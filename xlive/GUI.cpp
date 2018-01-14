@@ -24,7 +24,6 @@ extern bool overrideUnicodeMessage;
 extern MapManager* mapManager;
 
 
-
 typedef struct _XLIVE_INITIALIZE_INFO {
 	UINT cbSize;
 	DWORD dwFlags;
@@ -584,10 +583,9 @@ int WINAPI XLiveRender()
 			}
 #pragma endregion achievement rendering
 
-			/* TODO: turn on again after converting map downloading to use lib curl
-			if (overrideUnicodeMessage && getCustomLobbyMessage() != NULL) {
-				drawText(0, 30, COLOR_GOLD, getCustomLobbyMessage(), normalSizeFont);
-			}*/
+			if (GameEngine == 3 && mapManager->getCustomLobbyMessage() != NULL) {
+				drawText(0, 30, COLOR_GOLD, mapManager->getCustomLobbyMessage(), normalSizeFont);
+			}
 			if (getDebugTextDisplay()) {
 				for (int i = 0; i < getDebugTextArrayMaxLen(); i++) {
 					const char* text = getDebugText(i);

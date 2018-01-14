@@ -158,6 +158,7 @@
       <ImportLibrary>./Debug/xlive.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <OutputFile>C:\Program Files (x86)\Microsoft Games\Halo 2 Dedicated Server\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -187,11 +188,13 @@
     <ClCompile Include="H2ConsoleCommands.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="h2mod.pb.cc" />
+    <ClCompile Include="H2MOD_GameManager.cpp" />
     <ClCompile Include="H2MOD_GunGame.cpp" />
     <ClCompile Include="H2MOD_H2X.cpp" />
     <ClCompile Include="H2MOD_Halo2Final.cpp" />
     <ClCompile Include="H2MOD_MapManager.cpp" />
     <ClCompile Include="H2MOD_Mouseinput.cpp" />
+    <ClCompile Include="H2MOD_Network.cpp" />
     <ClCompile Include="H2OnscreenDebugLog.cpp" />
     <ClCompile Include="H2Startup.cpp" />
     <ClCompile Include="H2Tweaks.cpp" />
@@ -222,12 +225,14 @@
     <ClInclude Include="H2ConsoleCommands.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="h2mod.pb.h" />
+    <ClInclude Include="H2MOD_GameManager.h" />
     <ClInclude Include="H2MOD_GunGame.h" />
     <ClInclude Include="H2MOD_H2X.h" />
     <ClInclude Include="H2MOD_Halo2Final.h" />
     <ClInclude Include="H2MOD_Infection.h" />
     <ClInclude Include="H2MOD_MapManager.h" />
     <ClInclude Include="H2MOD_Mouseinput.h" />
+    <ClInclude Include="H2MOD_Network.h" />
     <ClInclude Include="H2MOD_Sounds.h" />
     <ClInclude Include="H2OnscreenDebugLog.h" />
     <ClInclude Include="H2Startup.h" />

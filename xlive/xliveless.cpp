@@ -3246,19 +3246,6 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 
 	Check_Overlapped( pOverlapped );
 
-	if (isServer) {
-		TRACE("You are hosting a game");
-
-		//if map downloading is turned, start the listener thread for map downloads
-		//std::thread t1(&MapManager::startListeningForClients, mapManager);
-		//t1.detach();
-		//TODO: put any peer host code here
-	}
-	else {
-		TRACE("You are joining a game");
-		//TODO: put any peer client code here
-	}
-
 	return ERROR_IO_PENDING;
 }
 
