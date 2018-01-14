@@ -132,6 +132,34 @@ void afterMapsLoadedCave() {
 	gameManager->start();
 }
 
+__declspec(naked) void afterMapsLoadDedi(void) {
+
+	__asm {
+		// The first thing we must do in our codecave is save 
+		// the return address from the top of the stack
+		pop retAddr
+
+		// Remember that we need to preserve registers and the stack!
+		PUSHAD
+		PUSHFD
+	}
+	afterMapsLoadedCave();
+	__asm {
+		// Restore everything to how it was before
+		POPFD
+		POPAD
+
+		//rewrite overwritten bytes
+		sub esp, 0x10
+		mov ecx, [esp + 0x14]
+
+		// The last thing we must do in our codecave is push 
+		// the return address back onto the stack and then RET back
+		push retAddr
+		ret
+	}
+}
+
 __declspec(naked) void afterMapsLoaded(void) {
 
 	__asm {
@@ -541,14 +569,6 @@ void patchBYTEs(BYTE* orig, BYTE* values, int size) {
 	VirtualProtect(orig, size, dwBack, NULL);
 }
 
-typedef int(*display_command_prompt_function_type)();
-display_command_prompt_function_type display_command_prompt_function_type_method;
-
-int displayCommandPromptFunction() {
-	afterMapsLoadedCave();
-	return display_command_prompt_function_type_method();
-}
-
 void CustomNetwork::applyNetworkHooks() {
 	DWORD dwBack;
 	DWORD triggerMembershipPacketOffset = 0x1CA3E0;
@@ -586,8 +606,7 @@ void CustomNetwork::applyNetworkHooks() {
 
 	//we hook the spot in dedi and peers where the main game data is loaded so we can do stuff with it after
 	if (h2mod->Server) {
-		display_command_prompt_function_type_method = (display_command_prompt_function_type)DetourFunc((BYTE*)h2mod->GetBase() + 0x1A2F9, (BYTE*)displayCommandPromptFunction, 7);
-		VirtualProtect(display_command_prompt_function_type_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		Codecave(h2mod->GetBase() + 0x1A2F9, afterMapsLoadDedi, 2);
 	} else {
 		Codecave(h2mod->GetBase() + 0x4D311, afterMapsLoaded, 0);
 	}
