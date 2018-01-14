@@ -620,9 +620,9 @@ void CustomNetwork::applyNetworkHooks() {
 	/////////////////////////////////////////////////////////////////////
 	//send/recv packet functions below (for troubleshooting and research)
 	/////////////////////////////////////////////////////////////////////
-	send_packet_method = (send_packet)DetourClassFunc((BYTE*)h2mod->GetBase() + serializePacketsOffset, (BYTE*)sendPacket, 8);
-	VirtualProtect(send_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	//send_packet_method = (send_packet)DetourClassFunc((BYTE*)h2mod->GetBase() + serializePacketsOffset, (BYTE*)sendPacket, 8);
+	//VirtualProtect(send_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	receive_packet_method = (receive_packet)DetourClassFunc((BYTE*)h2mod->GetBase() + deserializePacketsOffset, (BYTE*)receivePacket, 11);
-	VirtualProtect(receive_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	//receive_packet_method = (receive_packet)DetourClassFunc((BYTE*)h2mod->GetBase() + deserializePacketsOffset, (BYTE*)receivePacket, 11);
+	//VirtualProtect(receive_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }
