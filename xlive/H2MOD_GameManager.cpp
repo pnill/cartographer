@@ -1,13 +1,8 @@
 #include "Globals.h"
+using namespace std;
 
 void startGameThread() {
 	while (1) {
-		if (gameManager->isHost()) {
-			//the server stores a map of unicode map names to actual filenames so when the server
-			//sends over filenames we don't slow down the serializing the membership packets
-			mapManager->reloadMapFilenames();
-		}
-
 		if (!gameManager->isHost()) {
 			if (!mapManager->hasCustomMap(mapManager->clientMapFilename)) {
 				bool success = mapManager->downloadFromRepo(mapManager->clientMapFilename);
@@ -16,7 +11,7 @@ void startGameThread() {
 				//TODO: direct downloads happen once per map name
 			}
 		}
-		Sleep(1000);
+		std::this_thread::sleep_for(1s);
 	}
 }
 

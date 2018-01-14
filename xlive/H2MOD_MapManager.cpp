@@ -134,9 +134,9 @@ bool MapManager::hasCustomMap(std::wstring mapName) {
 */
 void MapManager::reloadMaps() {
 	typedef char(__thiscall *map_reload_function_type)(int thisx);
-	map_reload_function_type reloadMaps = (map_reload_function_type)(h2mod->GetBase() + 0x4D021);
-	map_reload_function_type reloadMapsSet = (map_reload_function_type)(h2mod->GetBase() + 0x4CC30);
-	DWORD* mapsObject = (DWORD*)(h2mod->GetBase() + 0x482D70);	
+	map_reload_function_type reloadMaps = (map_reload_function_type)(h2mod->GetBase() + (h2mod->Server ? 0x419B5 : 0x4D021));
+	map_reload_function_type reloadMapsSet = (map_reload_function_type)(h2mod->GetBase() + (h2mod->Server ? 0x41501 : 0x4CC30));
+	DWORD* mapsObject = (DWORD*)(h2mod->GetBase() + (h2mod->Server ? 0x4A70D8 : 0x482D70));
 	DWORD dwBack;
 	BOOL canprotect = VirtualProtect((WORD*)((int)mapsObject + 148016), sizeof(WORD), PAGE_EXECUTE_READWRITE, &dwBack);
 	if (!canprotect && GetLastError()) {
@@ -145,6 +145,7 @@ void MapManager::reloadMaps() {
 	}
 	//reloadMapsSet((int)mapsObject);
 	reloadMaps((int)mapsObject);
+	reloadMapFilenames();
 }
 
 /**
@@ -191,6 +192,10 @@ void MapManager::reloadMapFilenames() {
 	for (int i = 1; i <= 51; i++) {
 		wchar_t* mapName = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + (i * 0xB90)));
 		wchar_t* mapPath = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + ((i * 0xB90) + 0x960)));
+		if (mapName == NULL || *mapName == L'\0') {
+			//skip empty map names
+			continue;
+		}
 		std::wstring unicodeMapFilename(mapPath);
 		std::string nonUnicodeCustomMapFilename(unicodeMapFilename.begin(), unicodeMapFilename.end());
 		std::size_t offset = nonUnicodeCustomMapFilename.find_last_of("\\");

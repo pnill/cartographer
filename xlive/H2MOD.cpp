@@ -773,9 +773,6 @@ int __cdecl OnMapLoad(int a1)
 {
 	overrideUnicodeMessage = false;
 
-	//we start game manager on map load since some of the data is not loaded early enough
-	gameManager->start();
-
 	isLobby = true;
 	int ret = pmap_initialize(a1);
 
@@ -1233,10 +1230,7 @@ void H2MOD::ApplyHooks() {
 		VirtualProtect(psub_4F17A, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		pplayer_death = (player_death)DetourFunc((BYTE*)this->GetBase() + 0x152ED4, (BYTE*)OnPlayerDeath, 9);
-		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
-
-		//start game manager immediately for dedis
-		gameManager->start();
+		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 
 	//apply any network hooks
