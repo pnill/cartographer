@@ -143,7 +143,7 @@ void MapManager::reloadMaps() {
 		if (H2Config_debug_log)
 			TRACE_GAME_N("reloadMaps - canprotect=%d, error=%d", canprotect, GetLastError());
 	}
-	//reloadMapsSet((int)mapsObject);
+	reloadMapsSet((int)mapsObject);
 	reloadMaps((int)mapsObject);
 	reloadMapFilenames();
 }
@@ -170,6 +170,9 @@ const char* MapManager::getCustomLobbyMessage() {
 }
 
 void MapManager::reloadMapFilenames() {
+	if (!gameManager->isHost()) {
+		return;
+	}
 	//0x30 (difference from start of maps object to first custom map)
 	//0xB90 (difference between each custom map name)
 	//0x960 (difference between custom map name and its file path
