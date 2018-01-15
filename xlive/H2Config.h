@@ -15,6 +15,19 @@ void ReadH2Config();
 #define STRINGIZE(s) STRINGIZE2(s)
 #define DLL_VERSION_STR        STRINGIZE(DLL_VERSION_MAJOR) "." STRINGIZE(DLL_VERSION_MINOR) "." STRINGIZE(DLL_VERSION_REVISION) "." STRINGIZE(DLL_VERSION_BUILD)
 
+///
+/// NEWLINE Preprocessor Check
+///
+#ifdef _WIN32					//Windows OS 32bit & 64bit
+#define NEWLINE "\r\n"			//CRLF [EOL] (0x0D 0x0A)
+
+#elif defined Macintosh			//Pre Mac OS X 
+#define NEWLINE "\r"			//CR (0x0D)
+
+#else							//Post Mac OS X & Linux OS
+#define NEWLINE "\n"			//LF (0x0A)
+#endif
+
 extern unsigned long H2Config_master_ip;
 extern unsigned short H2Config_master_port_login;
 extern unsigned short H2Config_master_port_relay;

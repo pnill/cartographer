@@ -152,9 +152,9 @@ void SaveH2Accounts() {
 		else {
 #pragma region Put Data To File
 			fputs("#--- Halo 2 Project Cartographer Accounts File ---", fileConfig);
-			fputs("\r\n\r\n", fileConfig);
+			fputs(NEWLINE NEWLINE, fileConfig);
 			fputs("# DO NOT SHARE THE CONTENTS OF THIS FILE.", fileConfig);
-			fputs("\r\n\r\n", fileConfig);
+			fputs(NEWLINE NEWLINE, fileConfig);
 
 			int fputbufferlen = strlen(H2AccConfigVersionStr) + 1;
 			char* fputbuffer = (char*)malloc(sizeof(char) * fputbufferlen);
@@ -162,32 +162,32 @@ void SaveH2Accounts() {
 			fputs(fputbuffer, fileConfig);
 			free(fputbuffer);
 
-			fputs("\r\n", fileConfig);
+			fputs(NEWLINE, fileConfig);
 
 			char last_used_buff[30];
-			snprintf(last_used_buff, 30, "\r\nlast_used = %d\r\n", H2AccountLastUsed);
+			snprintf(last_used_buff, 30, NEWLINE"last_used = %d\n", H2AccountLastUsed);
 			fputs(last_used_buff, fileConfig);
 
 			if (H2AccountBufferLoginToken && H2AccountBufferUsername && H2AccountCount > 0) {
 				for (int i = 0; i < H2AccountCount; i++) {
-					fputs("\r\n", fileConfig); fputs(H2ConfigAccountStr, fileConfig);
+					fputs(NEWLINE, fileConfig); fputs(H2ConfigAccountStr, fileConfig);
 					if (H2AccountBufferUsername[i]) {
-						fputs("\r\nusername = ", fileConfig); fputs(H2AccountBufferUsername[i], fileConfig);
+						fputs(NEWLINE"username = ", fileConfig); fputs(H2AccountBufferUsername[i], fileConfig);
 					}
-					fputs("\r\nlogin_token = ", fileConfig); fputs(H2AccountBufferLoginToken[i] ? H2AccountBufferLoginToken[i] : "", fileConfig);
-					fputs("\r\n", fileConfig);
+					fputs(NEWLINE"login_token = ", fileConfig); fputs(H2AccountBufferLoginToken[i] ? H2AccountBufferLoginToken[i] : "", fileConfig);
+					fputs(NEWLINE, fileConfig);
 				}
 			}
 			else {
-				fputs("\r\n", fileConfig); fputs(H2ConfigAccountStr, fileConfig);
-				fputs("\r\nlogin_token = ", fileConfig);
+				fputs(NEWLINE, fileConfig); fputs(H2ConfigAccountStr, fileConfig);
+				fputs(NEWLINE"login_token = ", fileConfig);
 			}
 
-			fputs("\r\n", fileConfig);
+			fputs(NEWLINE, fileConfig);
 
 			if (badConfigBuffer && badConfigBufferI > 0) {
 				for (int i = 0; i < badConfigBufferI; i++) {
-					fputs("\r\n", fileConfig);
+					fputs(NEWLINE, fileConfig);
 					if (badConfigBuffer[i][0] != '#' && badConfigBuffer[i][0] != ';')
 						fputs("#", fileConfig);
 					fputs(badConfigBuffer[i], fileConfig);
@@ -195,17 +195,17 @@ void SaveH2Accounts() {
 			}
 			badConfigBufferFree();
 
-			fputs("\r\n\r\n", fileConfig);
+			fputs(NEWLINE NEWLINE, fileConfig);
 
 			if (oldConfigBuffer && oldConfigBufferI > 0) {
 				for (int i = 0; i < oldConfigBufferI; i++) {
-					fputs("\r\n", fileConfig);
+					fputs(NEWLINE, fileConfig);
 					fputs(oldConfigBuffer[i], fileConfig);
 				}
 			}
 			oldConfigBufferFree();
 
-			fputs("\r\n", fileConfig);
+			fputs(NEWLINE, fileConfig);
 #pragma endregion
 			fclose(fileConfig);
 		}
