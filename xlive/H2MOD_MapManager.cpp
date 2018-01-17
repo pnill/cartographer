@@ -170,9 +170,6 @@ const char* MapManager::getCustomLobbyMessage() {
 }
 
 void MapManager::reloadMapFilenames() {
-	if (!gameManager->isHost()) {
-		return;
-	}
 	//0x30 (difference from start of maps object to first custom map)
 	//0xB90 (difference between each custom map name)
 	//0x960 (difference between custom map name and its file path
@@ -189,7 +186,6 @@ void MapManager::reloadMapFilenames() {
 		offset = 0x482D70;
 		currentMapNameOffset = 0x97737C;
 	}
-	const wchar_t* currentMapName = (wchar_t*)(h2mod->GetBase() + currentMapNameOffset);
 
 	//TODO: one day increase map limit (somehow)
 	for (int i = 0; i <= 50; i++) {
