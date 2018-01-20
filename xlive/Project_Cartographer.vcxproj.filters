@@ -153,6 +153,9 @@
     <ClCompile Include="H2MOD_Network.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MKAA.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -270,6 +273,9 @@
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD_Network.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MKAA.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

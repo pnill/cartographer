@@ -9,6 +9,7 @@
 #include "H2MOD.h"
 #include <winsock.h>
 #include "GSCustomMenu.h"
+#include "MKAA.h"
 extern LPDIRECT3DDEVICE9 pDevice;
 
 bool QuitGSMainLoop = false;
@@ -341,6 +342,8 @@ signed int(*sub_287a1)();
 static signed int HookedClientRandFunc() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
+	Xinput();
+	DisableKeyboard();
 	
 	signed int result = sub_287a1();
 	return result;
