@@ -79,6 +79,9 @@
     <Filter Include="Source Files\Blam\Shared">
       <UniqueIdentifier>{b66746a4-d12d-44e8-9b07-93611bdb2c72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Blam\Enums\Objects">
+      <UniqueIdentifier>{b6472f0a-f04e-45d0-adb0-c2835f526b6c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -185,6 +188,9 @@
     </ClCompile>
     <ClCompile Include="H2MOD_Network.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Test.cpp">
+      <Filter>Source Files\Blam</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -367,6 +373,21 @@
     </ClInclude>
     <ClInclude Include="Blam\Engine\Extras\Skulls.h">
       <Filter>Source Files\Blam\Engine\Extras</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Shared\DatumIndex.h">
+      <Filter>Source Files\Blam\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Shared\Globals.h">
+      <Filter>Source Files\Blam\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\RealMovement.h">
+      <Filter>Source Files\Blam\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Objects\Objects.h">
+      <Filter>Source Files\Blam\Enums\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Objects\Unit.h">
+      <Filter>Source Files\Blam\Enums\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

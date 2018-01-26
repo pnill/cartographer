@@ -278,6 +278,7 @@
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="packet.pb.cc" />
     <ClCompile Include="H2MOD_Infection.cpp" />
+    <ClCompile Include="Test.cpp" />
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="xlive_network.cpp" />
   </ItemGroup>
@@ -294,14 +295,19 @@
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="Blam\Enums\Enums.h" />
     <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h" />
+    <ClInclude Include="Blam\Enums\Objects\Objects.h" />
+    <ClInclude Include="Blam\Enums\Objects\Unit.h" />
     <ClInclude Include="Blam\Enums\Players\Players.h" />
     <ClInclude Include="Blam\Maths\Angle.h" />
     <ClInclude Include="Blam\Maths\Maths.h" />
     <ClInclude Include="Blam\Maths\RealColorRGB.h" />
+    <ClInclude Include="Blam\Maths\RealMovement.h" />
     <ClInclude Include="Blam\Maths\RealPoint2D.h" />
     <ClInclude Include="Blam\Maths\RealPoint3D.h" />
     <ClInclude Include="Blam\Maths\RealVector2D.h" />
     <ClInclude Include="Blam\Maths\RealVector3D.h" />
+    <ClInclude Include="Blam\Shared\DatumIndex.h" />
+    <ClInclude Include="Blam\Shared\Globals.h" />
     <ClInclude Include="Blam\Shared\SharedDefinitions.h" />
     <ClInclude Include="cartographer_main.hpp" />
     <ClInclude Include="CUser.h" />
