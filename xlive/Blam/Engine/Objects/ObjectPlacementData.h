@@ -24,7 +24,7 @@ namespace Blam
 				DWORD unk_18;//0x18
 				Blam::Maths::RealPoint3D Placement;//0x1C
 				Blam::Maths::RealVector3D Orientation;//0x28
-				Blam::Maths::RealVector3D unk_1;//0x34
+				Blam::Maths::RealVector3D Up;//0x34
 				Blam::Maths::RealPoint3D TranslationalVelocity;//0x40
 				Blam::Maths::RealVector3D AngularVelocity;//0x4C
 				FLOAT Scale;//0x58
