@@ -189,9 +189,6 @@
     <ClCompile Include="H2MOD_Network.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Test.cpp">
-      <Filter>Source Files\Blam</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
