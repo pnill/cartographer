@@ -278,7 +278,6 @@
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="packet.pb.cc" />
     <ClCompile Include="H2MOD_Infection.cpp" />
-    <ClCompile Include="Test.cpp" />
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="xlive_network.cpp" />
   </ItemGroup>
