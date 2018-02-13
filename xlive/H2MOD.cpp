@@ -24,7 +24,6 @@
 #include "H2Tweaks.h"
 
 
-
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
 Infection *inf = new Infection();
@@ -133,6 +132,14 @@ bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 	add_object_to_sync p_add_object_to_sync = (add_object_to_sync)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x1B2C44 : 0x1B8D14));
 
 	return p_add_object_to_sync(gamestate_object_datum);
+}
+
+int _cdecl call_assignObjDatumToPlayer(int pIndex, int unitDatum)
+{
+	typedef int(__cdecl *assign_ObjToPlayer)(int pIndex, int unitDatum);
+	assign_ObjToPlayer p_assign = (assign_ObjToPlayer)(h2mod->GetBase() + 0x556BE);
+
+	return p_assign(pIndex, unitDatum);
 }
 
 #pragma endregion
@@ -870,27 +877,23 @@ int __cdecl OnMapLoad(int a1)
 		//*(int*)(h2mod->GetBase() + 0x464958) = 0;
 		//*(int*)(h2mod->GetBase() + 0x464964) = 0;
 		
-		if (GameEngine != 3)
+		if (GameEngine != 3 && GameState == 3)
 		{
 			setCrosshairPos(H2Config_crosshair_offset);
+		
+			if (b_Infection)
+				inf->Initialize();
 
-			if (GameState == 3) {
-				if (b_Infection)
-					inf->Initialize();
+			if (b_GunGame && isHost)
+				gg->Initialize();
 
-				if (b_GunGame && isHost)
-					gg->Initialize();
+			if (b_Halo2Final)
+				h2f->Initialize();
 
-				if (b_H2X)
-					H2X::Initialize();
-				else
-					H2X::Deinitialize();
-
-				if (b_Halo2Final)
-					h2f->Initialize();
-			}
-
-			
+			if (b_H2X)
+				H2X::Initialize();
+			else
+				H2X::Deinitialize();		
 		}
 
 	}
@@ -905,11 +908,6 @@ int __cdecl OnMapLoad(int a1)
 
 			if (b_GunGame)
 				gg->Initialize();
-
-			if (b_H2X)
-				H2X::Initialize();
-			else
-				H2X::Deinitialize();
 		}
 
 	}
@@ -1294,6 +1292,7 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 				isHost = false;
 				Connected = false;
 				ThreadCreated = false;
+				TerminateThread(H2MOD_Network, 0); //properly end thread
 				H2MOD_Network = 0;
 				TRACE_GAME("[h2mod-network] Killing host thread NetworkActive == false");
 				return 0;
@@ -1463,6 +1462,7 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 				isHost = false;
 				Connected = false;
 				ThreadCreated = false;
+				TerminateThread(H2MOD_Network, 0); //properly end thread
 				H2MOD_Network = 0;
 				TRACE_GAME("[h2mod-network] Networkactive == false ending client thread.");
 				return 0;
@@ -1578,6 +1578,8 @@ VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DW
 	update_player_count();
 }
 
+
+
 void H2MOD::Initialize()
 {
 	//HANDLE hThread = CreateThread(NULL, 0, Thread1, NULL, 0, NULL);
@@ -1608,6 +1610,17 @@ void H2MOD::Initialize()
 		//PatchPingMeterCheck(true);
 		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
 
+		extern int H2GetInstanceId();
+
+		if (H2GetInstanceId() == 1)
+		{
+			if (H2Config_discord_enable) {
+				// Discord init
+				DiscordInterface::SetDetails("Startup");
+				DiscordInterface::Init();
+				SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
+			}
+		}
 	}
 
 	//effects can vary (good or bad) depending on different software configurations.
@@ -1622,16 +1635,6 @@ void H2MOD::Initialize()
 
 	//Network::Initialize();
 	h2mod->ApplyHooks();
-
-	if (!h2mod->Server)
-	{
-		if (H2Config_discord_enable) {
-			// Discord init
-			DiscordInterface::SetDetails("Startup");
-			DiscordInterface::Init();
-			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
-		}
-	}
 }
 
 void H2MOD::Deinitialize() {

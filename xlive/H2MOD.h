@@ -77,6 +77,7 @@ signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit_datum_ind
 bool __cdecl call_assign_equipment_to_unit(int uint, int object_index, short unk);
 int __cdecl call_object_placement_data_new(void*, int, int, int);
 signed int __cdecl call_object_new(void*);
+int call_assignObjDatumToPlayer(int pIndex, int unitDatum);
 void GivePlayerWeapon(int PlayerIndex, int WeaponId, bool bReset);
 DWORD WINAPI NetworkThread(LPVOID lParam);
 
