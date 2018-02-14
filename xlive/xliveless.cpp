@@ -2832,9 +2832,9 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
   TRACE("XUserSetContext  (userIndex = %d, contextId = %d, contextValue = %d)",
 		dwUserIndex, dwContextId, dwContextValue );
 
-  if (h2mod->Server)
-	  return ERROR_SUCCESS;
-  if (!H2Config_discord_enable)
+  extern int H2GetInstanceId();
+
+  if (h2mod->Server || H2GetInstanceId() > 1 || !H2Config_discord_enable)
 	  return ERROR_SUCCESS;
 
   if (dwContextId == 0x00000003)

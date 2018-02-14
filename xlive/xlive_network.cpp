@@ -64,6 +64,9 @@ int WINAPI XSessionEnd(DWORD, DWORD)
 	NetworkActive = false;
 	Connected = false;
 	ThreadCreated = false;
+	if (H2MOD_Network) {
+		TerminateThread(H2MOD_Network, 0);
+	}
 	H2MOD_Network = 0;
 	isServer = false;
 	mapManager->cleanup();
@@ -80,8 +83,10 @@ INT WINAPI XNetCleanup()
 	ThreadCreated = false;
 	Connected = false;
 	isHost = false;
+	if (H2MOD_Network) {
+		TerminateThread(H2MOD_Network, 0);
+	}
 	H2MOD_Network = 0;
-
 	TRACE("XNetCleanup");
 	return 0;
 }

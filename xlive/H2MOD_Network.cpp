@@ -564,9 +564,10 @@ char __stdcall receivePacket(void *thisx, int a2, int packetType, unsigned int *
 
 void patchBYTEs(BYTE* orig, BYTE* values, int size) {
 	DWORD dwBack;
+	DWORD temp; //same as WriteBytes, exception fix
 	VirtualProtect(orig, size, PAGE_EXECUTE_READWRITE, &dwBack);
 	memcpy(orig, (BYTE*)values, size);
-	VirtualProtect(orig, size, dwBack, NULL);
+	VirtualProtect(orig, size, dwBack, &temp);
 }
 
 void CustomNetwork::applyNetworkHooks() {
