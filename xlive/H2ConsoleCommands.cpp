@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <h2mod.pb.h>
 #include "H2Startup.h"
 #include "H2Tweaks.h"
 #include "H2Config.h"
@@ -188,6 +189,18 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			mapManager->reloadMaps();
 		}
+		else if (firstCommand == "$help") {
+			output(L"reloadMaps");
+			output(L"kick");
+			output(L"logPlayers");
+			output(L"maxPlayers");
+			output(L"resetSpawnCommandList");
+			output(L"isHost");
+			output(L"downloadMap");
+			output(L"spawn");
+			output(L"controller_sens");
+			output(L"mouse_sens");
+		}
 		else if (firstCommand == "$kick") {
 			if (splitCommands.size() != 2) {
 				output(L"Invalid kick command, usage - $kick PLAYER_INDEX");
@@ -197,7 +210,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			char *cstr = new char[firstArg.length() + 1];
 			strcpy(cstr, firstArg.c_str());
 
-			if (!isServer) {
+			if (!gameManager->isHost()) {
 				output(L"Only the server can kick players");
 			}
 			else {
@@ -207,20 +220,39 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 			delete[] cstr;
 		}
-		else if (firstCommand == "$lognetworkplayers") {
-			//TODO: use mutex here
-			if (h2mod->NetworkPlayers.size() > 0) {
-				for (auto it = h2mod->NetworkPlayers.begin(); it != h2mod->NetworkPlayers.end(); ++it) {
-					//TODO: 
-				}
+		else if (firstCommand == "$logplayers") {
+			players->logAllPlayersToConsole();
+		}
+		else if (firstCommand == "$sendteamchange") {
+			if (splitCommands.size() != 3) {
+				output(L"Usage: $sendTeamChange peerIndex newTeam");
+				return;
 			}
+			std::string firstArg = splitCommands[1];
+			std::string secondArg = splitCommands[2];
+
+			H2ModPacket teampak;
+			teampak.set_type(H2ModPacket_Type_set_player_team);
+
+			h2mod_set_team *set_team = teampak.mutable_h2_set_player_team();
+			set_team->set_team(atoi(secondArg.c_str()));
+			set_team->set_peerindex(atoi(firstArg.c_str()));
+
+			char* SendBuf = new char[teampak.ByteSize()];
+			teampak.SerializeToArray(SendBuf, teampak.ByteSize());
+
+			network->networkCommand = SendBuf;
+			network->sendCustomPacket(atoi(firstArg.c_str()));
+
+			network->networkCommand = NULL;
+			delete[] SendBuf;
 		}
 		else if (firstCommand == "$maxplayers") {
 			if (splitCommands.size() != 2) {
 				output(L"Usage: $maxplayers value (betwen 1 and 16).");
 				return;
 			}
-			if (!isServer) {
+			if (!gameManager->isHost()) {
 				output(L"Can be only used while hosting.");
 				return;
 			}

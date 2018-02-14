@@ -1,14 +1,5 @@
 #pragma once
 
-#include <unordered_map>
-
-class InfectionPlayer
-{
-public:
-	wchar_t PlayerName[16];
-	bool infected;
-};
-
 class Infection
 {
 public:
@@ -19,9 +10,10 @@ public:
 	void Deinitialize();
 	void FindZombie();
 	void NextRound();
-
-	std::unordered_map<InfectionPlayer*, bool> infected_players;
-
-
+private:
+	void resetInfectedPlayers();
+	void handleLocalHostZombieDetection(int zombiePeerIndex);
+	void handlePeerZombieDetection(int zombiePeerIndex);
+	int calculateZombieIndex();
 };
 

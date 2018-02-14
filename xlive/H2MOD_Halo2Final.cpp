@@ -1,9 +1,4 @@
-#include <Windows.h>
-#include "H2MOD_Halo2Final.h"
-#include "H2MOD.h"
-#include "xliveless.h"
-#include "Hook.h"
-#include "ReadIniArguments.h"
+#include "Globals.h"
 
 /*
 Todo:
@@ -17,7 +12,6 @@ Todo:
 */
 
 bool isEnabled = false;
-extern bool isHost;
 bool detoursHavePreviouslyBeenApplied = false;
 
 DWORD dwBack;
@@ -93,7 +87,7 @@ signed int __stdcall GetSecondsUntilEquipmentRespawn(int equipment_index)
 int64_t originalGetSecondsUntilEquipmentRespawnFunctionData;
 void EnableStaticWeaponSpawns()
 {
-	if (isHost || h2mod->Server)
+	if (gameManager->isHost() || h2mod->Server)
 	{
 		originalGetSecondsUntilEquipmentRespawnFunctionData = *(int64_t*)(base_address + 0x6A8C4);
 		pget_spawn_time = (get_spawn_time)DetourFunc((BYTE*)base_address + 0x6A8C4, (BYTE*)GetSecondsUntilEquipmentRespawn, 5);
@@ -103,7 +97,7 @@ void EnableStaticWeaponSpawns()
 
 void DisableStaticWeaponSpawns()
 {
-	if (isHost || h2mod->Server)
+	if (gameManager->isHost() || h2mod->Server)
 	{
 		VirtualProtect((LPVOID)(base_address + 0x6A8C4), 8, PAGE_EXECUTE_READWRITE, &dwBack);
 		*(int64_t*)(base_address + 0x6A8C4) = originalGetSecondsUntilEquipmentRespawnFunctionData;
@@ -138,15 +132,15 @@ void DisableCamoRegenerationDefaults()
 	//Disable setting default regrowth rate
 	VirtualProtect((LPVOID)(base_address + 0x13FA13), 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	originalSetDefaultRegrowthRateData = *(int32_t*)(base_address + 0x13FA13);
-	*(byte*)(base_address + 0x13FA13) = 0x90;
-	*(byte*)(base_address + 0x13FA14) = 0x90;
-	*(byte*)(base_address + 0x13FA15) = 0x90;
+	*(BYTE*)(base_address + 0x13FA13) = 0x90;
+	*(BYTE*)(base_address + 0x13FA14) = 0x90;
+	*(BYTE*)(base_address + 0x13FA15) = 0x90;
 
 	//Always set camo regrowth rate to the value passed in
 	VirtualProtect((LPVOID)(base_address + 0x13FA26), 2, PAGE_EXECUTE_READWRITE, &dwBack);
 	originalSetRegrowthRateToMaxOf25 = *(int16_t*)(base_address + 0x13FA26);
-	*(byte*)(base_address + 0x13FA26) = 0x90;
-	*(byte*)(base_address + 0x13FA27) = 0x90;
+	*(BYTE*)(base_address + 0x13FA26) = 0x90;
+	*(BYTE*)(base_address + 0x13FA27) = 0x90;
 }
 
 void EnableCamoRegenerationDefaults()
@@ -167,9 +161,9 @@ void DisableMeleeLunge()
 {
 	VirtualProtect((LPVOID)(base_address + 0x53ED5), 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	originalMeleeLungeFunctionData = *(int32_t*)(base_address + 0x53ED5);
-	*(byte*)(base_address + 0x53ED5) = 0x90;
-	*(byte*)(base_address + 0x53ED6) = 0x90;
-	*(byte*)(base_address + 0x53ED7) = 0x90;
+	*(BYTE*)(base_address + 0x53ED5) = 0x90;
+	*(BYTE*)(base_address + 0x53ED6) = 0x90;
+	*(BYTE*)(base_address + 0x53ED7) = 0x90;
 }
 
 void EnableMeleeLunge()
@@ -328,11 +322,11 @@ void Halo2Final::Initialize()
 	*(float*)(address_offset + 0xA497C8) = settings->br_camo_regrowth_rate;
 
 	if (settings->br_turn_off_crosshair_dot)
-		*(byte*)(address_offset + 0xA4DE32) = 0;
+		*(BYTE*)(address_offset + 0xA4DE32) = 0;
 
 	if (settings->br_turn_off_contrail)
 		for (int i = 0; i < 8; i++)
-			*(byte*)(address_offset + 0xA4ECB0 + i) = 255;
+			*(BYTE*)(address_offset + 0xA4ECB0 + i) = 255;
 
 	//Sniper
 	*(float*)(address_offset + 0xB7A08C) = settings->snipe_autoaim_angle;
@@ -352,7 +346,7 @@ void Halo2Final::Initialize()
 	*(float*)(address_offset + 0x9C0BB8) = settings->melee_depth;
 	*(float*)(address_offset + 0x9C0C7C) = settings->n_camo_ding;
 	*(float*)(address_offset + 0x9C0C80) = settings->n_camo_regrowth_rate;
-	*(byte*)(address_offset + 0x9C0B2E) = 0; // No dual Wielding
+	*(BYTE*)(address_offset + 0x9C0B2E) = 0; // No dual Wielding
 
 											 //PR
 	*(float*)(address_offset + 0xAB3D98) = settings->pr_stun;
@@ -366,7 +360,7 @@ void Halo2Final::Initialize()
 	*(float*)(address_offset + 0xAAE5B4) = settings->pr_max_error_angle;
 	*(float*)(address_offset + 0xAAE310) = settings->pr_camo_ding;
 	*(float*)(address_offset + 0xAAE314) = settings->pr_camo_regrowth_rate;
-	*(byte*)(address_offset + 0xAAE1C2) = 2; // No dual Wielding
+	*(BYTE*)(address_offset + 0xAAE1C2) = 2; // No dual Wielding
 
 											 //Rocket
 	*(float*)(address_offset + 0xBE0CF4) = settings->r_initial_velocity;
@@ -392,7 +386,7 @@ void Halo2Final::Initialize()
 	*(float*)(address_offset + 0xB228B4) = settings->hitscan_projectile_velocity;
 	*(float*)(address_offset + 0xB1E408) = settings->smg_camo_ding;
 	*(float*)(address_offset + 0xB1E40C) = settings->smg_camo_regrowth_rate;
-	*(byte*)(address_offset + 0xB1E2BA) = 2; // No dual Wielding
+	*(BYTE*)(address_offset + 0xB1E2BA) = 2; // No dual Wielding
 
 											 //Magnum
 	*(float*)(address_offset + 0x96EC88) = settings->mag_error_angle_min;
@@ -405,7 +399,7 @@ void Halo2Final::Initialize()
 	*(float*)(address_offset + 0x96E930) = settings->melee_depth;
 	*(float*)(address_offset + 0x96E9F4) = settings->mag_camo_ding;
 	*(float*)(address_offset + 0x96E9F8) = settings->mag_camo_regrowth_rate;
-	*(byte*)(address_offset + 0x96E8A6) = 0; // No dual Wielding
+	*(BYTE*)(address_offset + 0x96E8A6) = 0; // No dual Wielding
 
 											 //PP
 	*(float*)(address_offset + 0xA0D27C) = settings->pp_initial_velocity;
@@ -418,7 +412,7 @@ void Halo2Final::Initialize()
 	*(float*)(address_offset + 0xA033C4) = settings->pp_heat_per_charged_shot;
 	*(float*)(address_offset + 0xA02FB0) = settings->pp_camo_ding;
 	*(float*)(address_offset + 0xA02FB4) = settings->pp_camo_regrowth_rate;
-	*(byte*)(address_offset + 0xA02E62) = 0; // No dual Wielding
+	*(BYTE*)(address_offset + 0xA02E62) = 0; // No dual Wielding
 
 											 //Carbine
 	*(float*)(address_offset + 0xA7C428) = settings->car_error_angle;
@@ -459,8 +453,8 @@ void Halo2Final::Initialize()
 	//Frag
 	*(float*)(address_offset + 0xD82A28) = settings->f_arming_time;
 	*(float*)(address_offset + 0xD83120) = settings->f_radius_to;
-	*(byte*)(address_offset + 0xD82A1C) = 2; // When at rest
-	*(byte*)(address_offset + 0xD83038 + 2) = 0; // Force Unattached Effects
+	*(BYTE*)(address_offset + 0xD82A1C) = 2; // When at rest
+	*(BYTE*)(address_offset + 0xD83038 + 2) = 0; // Force Unattached Effects
 
 												 //Plasma Grenade
 	*(float*)(address_offset + 0xD834E8) = settings->pg_arming_time;
@@ -476,7 +470,7 @@ void Halo2Final::Initialize()
 	if (settings->player_turn_off_spawn_protection)
 	{
 		VirtualProtect((LPVOID)(base_address + 0x55D01), 1, PAGE_EXECUTE_READWRITE, &dwBack);
-		*(byte*)(base_address + 0x55D01) = 0;
+		*(BYTE*)(base_address + 0x55D01) = 0;
 	}
 
 	//Disable Melee Lunge
@@ -505,7 +499,7 @@ void Halo2Final::Dispose()
 	if (settings->player_turn_off_spawn_protection)
 	{
 		VirtualProtect((LPVOID)(base_address + 0x55D01), 1, PAGE_EXECUTE_READWRITE, &dwBack);
-		*(byte*)(base_address + 0x55D01) = 1;
+		*(BYTE*)(base_address + 0x55D01) = 1;
 	}
 
 	//Enable Melee Lunges

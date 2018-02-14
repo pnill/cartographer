@@ -10,7 +10,6 @@
 #include "Globals.h"
 #include "H2Config.h"
 
-bool isHost;
 bool Connected = false;
 bool ThreadCreated = false;
 bool NetworkActive = true;
@@ -60,12 +59,10 @@ int WINAPI XOnlineStartup()
 // #5332: XSessionEnd
 int WINAPI XSessionEnd(DWORD, DWORD)
 {
-	isHost = false;
 	NetworkActive = false;
 	Connected = false;
 	ThreadCreated = false;
 	H2MOD_Network = 0;
-	isServer = false;
 	mapManager->cleanup();
 	TRACE("XSessionEnd");
 	return 0;
@@ -79,7 +76,6 @@ INT WINAPI XNetCleanup()
 	NetworkActive = false;
 	ThreadCreated = false;
 	Connected = false;
-	isHost = false;
 	H2MOD_Network = 0;
 
 	TRACE("XNetCleanup");
@@ -165,18 +161,6 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 		pxnkid->ab[0] |= XNET_XNKID_SYSTEM_LINK;
 
 		NetworkActive = false;
-		
-		isHost = true;
-		//only the peer host server ever creates the session key
-		isServer = true;
-
-		if (H2MOD_Network == 0 && ThreadCreated == false)
-		{
-			ThreadCreated = true;
-			int Data_of_network_Thread = 1;
-			H2MOD_Network = CreateThread(NULL, 0, NetworkThread, &Data_of_network_Thread, 0, NULL);
-		}
-
 	}
 
 	return 0;
@@ -354,10 +338,9 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 {
 	int ret = recvfrom(s, buf, len, flags, from, fromlen);
 
-	
-	
 	if (ret > 0)
 	{
+		//TRACE_GAME_N("[h2mod-network] received socket data %s", buf);
 
 		u_long iplong = (((struct sockaddr_in*)from)->sin_addr.s_addr);
 		short port    =	(((struct sockaddr_in*)from)->sin_port);
@@ -438,7 +421,6 @@ int WINAPI XNetRegisterKey(DWORD, DWORD)
 // #56: XNetUnregisterKey // need #51
 int WINAPI XNetUnregisterKey(DWORD)
 {
-	isHost = false;
 	Connected = false;
 	TRACE("XNetUnregisterKey");
 	return 0;
@@ -473,11 +455,6 @@ INT   WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid
 int WINAPI XNetUnregisterInAddr(const IN_ADDR ina)
 {
 	//User.UnregisterSecureAddr(ina);
-	for (auto it = h2mod->NetworkPlayers.begin(); it != h2mod->NetworkPlayers.end(); ++it)
-	{
-		if (it->first->secure == ina.s_addr) it->second = 0;
-	}
-
 	TRACE("XNetUnregisterInAddr: %08X",ina.s_addr);
 	return 0;
 }

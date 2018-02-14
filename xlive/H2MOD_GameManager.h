@@ -3,7 +3,8 @@
 class GameManager {
 public:
 	bool isHost(); 
-	bool start();
+	bool start(); 
 private:
 	bool started = false;
+
 };
