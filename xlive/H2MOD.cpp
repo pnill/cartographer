@@ -1172,9 +1172,6 @@ void H2MOD::ApplyHooks() {
 
 	//apply any network hooks
 	network->applyNetworkHooks();
-
-	//increase the map limit for clients and dedis
-	//mapManager->increaseMapLimit();
 #pragma endregion
 }
 
