@@ -8,9 +8,11 @@ int Players::getPlayerOffset() {
 	int playerDataOffsetTmp = *(DWORD *)(playerDataOffset + 29600);
 	if (playerDataOffsetTmp == 5 || playerDataOffsetTmp == 6 || playerDataOffsetTmp == 7 || playerDataOffsetTmp == 8) {
 		//valid memory offset
+		return playerDataOffset + 112;
 	}
 
 	playerDataOffset = (*(int*)(h2mod->GetBase() + 0x51C474)) + 31624; 
+	return playerDataOffset + 112;// there can't be any other place for the data
 }
 
 int Players::getPlayerCount() {
