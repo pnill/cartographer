@@ -152,58 +152,37 @@ private:
 
 class ZombieInfectionHandler : public PlayerIterableHandler {
 public:
-	ZombieInfectionHandler(int unit_datum_index) {
+	ZombieInfectionHandler(int unit_datum_index, int unit_object, int pIndex) {
 		this->unit_datum_index = unit_datum_index;
-		this->unit_object = call_get_object(unit_datum_index, 3);
-		this->pIndex = h2mod->get_player_index_from_unit_datum(unit_datum_index);
+		this->unit_object = unit_object;
+		this->pIndex = pIndex;
 	}
 
 	void onPlayerIterated(Player* player) {
-
 		if (pIndex != player->getPlayerIndex()) {
 			return;
+		}
+		TRACE_GAME("[H2Mod-Infection] PlayerInfected() player died: %ws", player->getPlayerName().c_str());
+		if (!h2mod->Server) {
+			//if we aren't the dedi, change biped and team
+			h2mod->set_unit_biped(BipedType::Elite, pIndex);
+			if (h2mod->get_unit_team_index(unit_datum_index) != 3)
+			{
+				if (h2mod->get_unit_team_index(unit_datum_index) != 3)
+				{
+					h2mod->set_local_team_index(3);
+				}
+			}
 		}
 		if (gameManager->isHost() || h2mod->Server)
 		{
 			//Add the Dead Player* to The List of Infected	
-			TRACE_GAME("[H2Mod-Infection] PlayerInfected() Made %ws infected!", player->getPlayerName().c_str());
+			TRACE_GAME("[H2Mod-Infection] PlayerInfected() is %ws infected!", player->getPlayerName().c_str());
 			player->setIsZombie(true);
 			if (h2mod->get_unit_team_index(unit_datum_index) == 3)
 			{
-				call_unit_reset_equipment(unit_datum_index); //Take away zombie's weapons
-			}
-		}
-		if (!h2mod->Server)
-		{
-			if (unit_object)
-			{
-				if (h2mod->get_unit_team_index(unit_datum_index) != 3)
-				{
-					if (gameManager->isHost())
-						h2mod->set_unit_biped(BipedType::Elite, pIndex);
-
-					TRACE_GAME("[H2Mod-Infection] PlayerInfected() player died: %ws", player->getPlayerName().c_str());
-					TRACE_GAME("[H2Mod-Infection] PlayerInfected() Local Player*: %ws", h2mod->get_local_player_name());
-					TRACE_GAME("[H2Mod-Infection] PlayerInfected() pIndex: %08X", unit_datum_index, pIndex);
-
-
-					//If LocalUser/Player* has Died.Change Teams to Green(Zombie)
-					if (wcscmp(player->getPlayerName().c_str(), h2mod->get_local_player_name()) == 0)
-					{
-						h2mod->set_local_team_index(3);
-					}
-					//If Any other NetworkPlayer has Died.Play Sound.
-					else
-					{
-
-						std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
-
-						h2mod->SoundMap[L"sounds/new_zombie.wav"] = 1000;
-
-						h2mod->sound_cv.notify_one();
-
-					}
-				}
+				//TODO: shouldn't we do this for every player, not just host?
+				call_unit_reset_equipment(unit_datum_index); //Take away local players weapons
 			}
 		}
 	}
@@ -340,7 +319,7 @@ void Infection::PlayerInfected(int unit_datum_index)
 	if (unit_object)
 	{
 		int pIndex = h2mod->get_player_index_from_unit_datum(unit_datum_index);
-		ZombieInfectionHandler* zombieHandler = new ZombieInfectionHandler(unit_datum_index);
+		ZombieInfectionHandler* zombieHandler = new ZombieInfectionHandler(unit_datum_index, unit_object, pIndex);
 		players->iteratePlayers(zombieHandler);
 		delete zombieHandler;
 	}

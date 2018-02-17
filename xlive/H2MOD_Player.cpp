@@ -1,13 +1,9 @@
 #include "Globals.h"
 
-Player::Player(std::string playerIp, std::wstring playerName, int peerIndex, int playerTeam, int playerIndex, long long identifier)
+Player::Player()
 {
-	this->playerIp = playerIp;
-	this->playerName = playerName;
-	this->peerIndex = peerIndex;
-	this->playerTeam = playerTeam;
-	this->playerIndex = playerIndex;
-	this->identifier = identifier;
+	this->peerIndex = -1;
+	this->playerIndex = -1;
 }
 
 void Player::setIsZombie(bool isZombie) {
@@ -24,9 +20,19 @@ std::wstring Player::getPlayerName()
 	return this->playerName;
 }
 
+void Player::setPlayerName(std::wstring playerName)
+{
+	this->playerName = playerName;
+}
+
 int Player::getPlayerTeam()
 {
 	return this->playerTeam;
+}
+
+void Player::setPlayerTeam(int playerTeam)
+{
+	this->playerTeam = playerTeam;
 }
 
 int Player::getPeerIndex()
@@ -34,9 +40,19 @@ int Player::getPeerIndex()
 	return this->peerIndex;
 }
 
+void Player::setPeerIndex(int peerIndex)
+{
+	this->peerIndex = peerIndex;
+}
+
 std::string Player::getIp()
 {
 	return this->playerIp;
+}
+
+void Player::setIp(std::string ip)
+{
+	this->playerIp = ip;
 }
 
 int Player::getPlayerIndex()
@@ -44,9 +60,19 @@ int Player::getPlayerIndex()
 	return this->playerIndex;
 }
 
+void Player::setPlayerIndex(int playerIndex)
+{
+	this->playerIndex = playerIndex;
+}
+
 long long Player::getPlayerIdentifier()
 {
 	return this->identifier;
+}
+
+void Player::setPlayerIdentifier(long long playerIdentifier)
+{
+	this->identifier = playerIdentifier;
 }
 
 int Player::getGunGameLevel()

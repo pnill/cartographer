@@ -25,6 +25,14 @@ int Players::getPlayerCount() {
 void Players::reload() {
 	playerLock.lock();
 
+	if (this->players.empty()) {
+		for (int i = 0; i < 16; i++) {
+
+			Player* player = new Player();
+			this->players.push_back(player);
+		}
+	}
+
 	std::unordered_map<unsigned long long, int> identifierToGunGameLevel;
 	std::unordered_map<unsigned long long, BOOL> identifierToIsZombie;
 	std::vector<Player*>::iterator it;
@@ -34,13 +42,6 @@ void Players::reload() {
 		identifierToGunGameLevel[player->getPlayerIdentifier()] = player->getGunGameLevel();
 		identifierToIsZombie[player->getPlayerIdentifier()] = player->getIsZombie();
 	}
-
-	//wipe out the existing players off the heap
-	i = 0;
-	for (it = this->players.begin(); it != this->players.end(); it++, i++) {
-		delete *it;
-	}
-	players.clear();
 
 	int playerDataOffset = this->getPlayerOffset();
 	int peerStart = playerDataOffset + 160;
@@ -83,10 +84,15 @@ void Players::reload() {
 
 		peerStart += 268;
 		playerStart += 296;
-		Player* player = new Player(peerAddress, peerName, peerIndex, playerTeam, playerIndex, identifier);
+		Player* player = this->players.at(playerCounter);
+		player->setIp(peerAddress);
+		player->setPeerIndex(peerIndex);
+		player->setPlayerIndex(playerIndex);
+		player->setPlayerIdentifier(identifier);
+		player->setPlayerTeam(playerTeam);
+		player->setPlayerName(playerName);
 		player->setGunGameLevel(identifierToGunGameLevel[identifier]);
 		player->setIsZombie(identifierToIsZombie[identifier]);
-		this->players.push_back(player);
 		playerCounter++;
 	} while (playerCounter < this->getPlayerCount());
 
@@ -102,9 +108,9 @@ void Players::logAllPlayersToConsole() {
 
 		playerLock.lock();
 		std::vector<Player*>::iterator it;
-		int i = 0;
-		for (it = this->players.begin(); it != this->players.end(); it++, i++) {
-			Player* player = *it;
+		int playerCounter = 0;
+		do {
+			Player* player = this->players.at(playerCounter);
 
 			std::wstring outStr = L"Name=";
 			outStr += player->getPlayerName();
@@ -140,7 +146,8 @@ void Players::logAllPlayersToConsole() {
 			//outStr += ws4.str();
 
 			commands->output(outStr);
-		}
+			playerCounter++;
+		} while (playerCounter < this->getPlayerCount());
 		playerLock.unlock();
 	}
 }

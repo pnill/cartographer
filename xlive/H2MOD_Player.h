@@ -2,15 +2,21 @@
 
 class Player {
 public:
-	Player(std::string playerIp, std::wstring playerName, int peerIndex, int playerTeam, int playerIndex, long long identifier);
+	Player();
 	void setIsZombie(bool isZombie);
 	void setGunGameLevel(int level);
 	std::wstring getPlayerName();
+	void setPlayerName(std::wstring playerName);
 	int getPlayerTeam();
+	void setPlayerTeam(int playerTeam);
 	int getPeerIndex();
+	void setPeerIndex(int peerIndex);
 	std::string getIp();
+	void setIp(std::string ip);
 	int getPlayerIndex();
+	void setPlayerIndex(int playerIndex);
 	long long getPlayerIdentifier();
+	void setPlayerIdentifier(long long playerIdentifier);
 	int getGunGameLevel();
 	BOOL getIsZombie();
 
