@@ -2,9 +2,20 @@
 #include <mutex>
 #include <h2mod.pb.h>
 
+int Players::getPlayerOffset() {
+	//TODO: add support for dedis
+	int playerDataOffset = (*(int*)(h2mod->GetBase() + 0x51C474));
+	int playerDataOffsetTmp = *(DWORD *)(playerDataOffset + 29600);
+	if (playerDataOffsetTmp == 5 || playerDataOffsetTmp == 6 || playerDataOffsetTmp == 7 || playerDataOffsetTmp == 8) {
+		//valid memory offset
+	}
+
+	playerDataOffset = (*(int*)(h2mod->GetBase() + 0x51C474)) + 31624; 
+}
+
 int Players::getPlayerCount() {
 	//TODO: add support for dedis
-	int playerDataOffset = (*(int*)(h2mod->GetBase() + 0x51C474)) + 112;
+	int playerDataOffset = this->getPlayerOffset();
 	int playerOrPeerCount = *(DWORD *)(playerDataOffset + 0x14);
 	return playerOrPeerCount;
 }
@@ -13,7 +24,7 @@ void Players::reload() {
 	playerLock.lock();
 
 	std::unordered_map<unsigned long long, int> identifierToGunGameLevel;
-	std::unordered_map<long, BOOL> identifierToIsZombie;
+	std::unordered_map<unsigned long long, BOOL> identifierToIsZombie;
 	std::vector<Player*>::iterator it;
 	int i = 0;
 	for (it = this->players.begin(); it != this->players.end(); it++, i++) {
@@ -29,8 +40,7 @@ void Players::reload() {
 	}
 	players.clear();
 
-	//TODO: add support for dedis
-	int playerDataOffset = (*(int*)(h2mod->GetBase() + 0x51C474)) + 112;
+	int playerDataOffset = this->getPlayerOffset();
 	int peerStart = playerDataOffset + 160;
 	int playerStart = playerDataOffset + 4608;
 	int playerCounter = 0;

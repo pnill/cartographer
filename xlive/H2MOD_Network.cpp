@@ -739,10 +739,21 @@ __declspec(naked) void deserializeChatPacket(void) {
 	}
 }
 
-void CustomNetwork::sendCustomPacket(int peerIndex) {
+int CustomNetwork::getPacketOffset() {
+	//TODO: add support for dedis
+	int packetOffset = (*(int*)(h2mod->GetBase() + 0x51C474));
+	int packetOffsetTmp = *(DWORD *)(packetOffset + 29600);
+	if (packetOffsetTmp == 5 || packetOffsetTmp == 6 || packetOffsetTmp == 7 || packetOffsetTmp == 8) {
+		//valid memory offset
+		return packetOffset;
+	}
 
-	//TODO: support for dedi
-	int packetDataObj = (*(int*)(h2mod->GetBase() + 0x51C474));
+	packetOffset = (*(int*)(h2mod->GetBase() + 0x51C474)) + 31624;
+	return packetOffset;// there can't be any other place for the data
+}
+
+void CustomNetwork::sendCustomPacket(int peerIndex) {
+	int packetDataObj = this->getPacketOffset();
 	typedef int(__thiscall* sub_12320C8_type)(int thisx, DWORD* a2, DWORD* a3);
 	//TODO: support for dedi
 	sub_12320C8_type sub_12320C8 = (sub_12320C8_type)(h2mod->GetBase() + 0x1C20C8);
@@ -774,8 +785,7 @@ void CustomNetwork::sendCustomPacket(int peerIndex) {
 }
 
 void CustomNetwork::sendCustomPacketToAllPlayers() {
-	//TODO: support for dedi
-	int packetDataObj = (*(int*)(h2mod->GetBase() + 0x51C474));
+	int packetDataObj = this->getPacketOffset();
 	typedef int(__thiscall* sub_12320C8_type)(int thisx, DWORD* a2, DWORD* a3);
 	//TODO: support for dedi
 	sub_12320C8_type sub_12320C8 = (sub_12320C8_type)(h2mod->GetBase() + 0x1C20C8);

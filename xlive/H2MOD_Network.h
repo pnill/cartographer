@@ -111,6 +111,7 @@ public:
 	void applyNetworkHooks();
 	void sendCustomPacketToAllPlayers();
 	void sendCustomPacket(int peerIndex);
+	int getPacketOffset();
 	std::string currentMapFilename;
 
 	//command sent from server

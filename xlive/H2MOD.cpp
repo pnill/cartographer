@@ -1207,7 +1207,7 @@ void H2MOD::Initialize()
 			mouse->Initialize();
 
 		PatchGameDetailsCheck();
-		PatchPingMeterCheck(true);
+		//PatchPingMeterCheck(true);
 		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
 
 	}

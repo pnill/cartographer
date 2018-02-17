@@ -221,9 +221,15 @@ void ConsoleCommands::handle_command(std::string command) {
 			delete[] cstr;
 		}
 		else if (firstCommand == "$logplayers") {
+			if (!gameManager->isHost()) {
+				output(L"Only host can log out information about players");
+			}
 			players->logAllPlayersToConsole();
 		}
 		else if (firstCommand == "$sendteamchange") {
+			if (!gameManager->isHost()) {
+				output(L"Only host can issue a team change");
+			}
 			if (splitCommands.size() != 3) {
 				output(L"Usage: $sendTeamChange peerIndex newTeam");
 				return;
