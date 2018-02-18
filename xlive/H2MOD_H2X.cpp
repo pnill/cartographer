@@ -3,21 +3,10 @@
 #include "xliveless.h"
 #include "H2MOD.h"
 
-DWORD getOffset() {
-
-	int offset = 0x47CD54;
-	if (h2mod->Server)
-		offset = 0x4A29BC;
-	//TRACE_GAME("[h2mod] H2X is being run on client game");
-	DWORD FloatOffsets = *(DWORD*)((char*)h2mod->GetBase() + offset);
-	return FloatOffsets;
-}
-
-
-void H2X::Initialize()
+void H2X::Initialize() //doesnt need to run on dedi 
 {
 	
-	DWORD FloatOffsets = getOffset();
+	DWORD FloatOffsets = *(DWORD*)(h2mod->GetBase() + 0x47CD54);
 
 	*(float*)(FloatOffsets + 0xA49A7C) = 0.295f; /*H2X BR fire recovery time*/
 	*(float*)(FloatOffsets + 0xB7A330) = 0.535f; /*H2X Sniper Rifle fire recovery time*/
@@ -35,7 +24,7 @@ void H2X::Initialize()
 void H2X::Deinitialize()
 {
 
-	DWORD FloatOffsets = getOffset();
+	DWORD FloatOffsets = *(DWORD*)(h2mod->GetBase() + 0x47CD54);
 
 	*(float*)(FloatOffsets + 0xA49A7C) = 0.26f; /*H2V BR fire recovery time*/
 	*(float*)(FloatOffsets + 0xB7A330) = 0.5f; /*H2V Sniper Rifle fire recovery time*/

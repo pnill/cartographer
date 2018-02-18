@@ -57,6 +57,7 @@ extern CHAR g_profileDirectory[];
 
 extern void InitInstance();
 extern void ExitInstance();
+extern int H2GetInstanceId();
 
 extern std::wstring dlcbasepath;
 
@@ -2834,7 +2835,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 
   if (h2mod->Server)
 	  return ERROR_SUCCESS;
-  if (!H2Config_discord_enable)
+  if (!H2Config_discord_enable || H2GetInstanceId() > 1)
 	  return ERROR_SUCCESS;
 
   if (dwContextId == 0x00000003)

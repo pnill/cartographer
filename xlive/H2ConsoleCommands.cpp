@@ -200,6 +200,30 @@ void ConsoleCommands::handle_command(std::string command) {
 			output(L"spawn");
 			output(L"controller_sens");
 			output(L"mouse_sens");
+			output(L"showfps");
+		}
+		else if (firstCommand == "$showfps") {
+			if (h2mod->Server) {
+				output(L"Don't use this on dedis");
+				return;
+			}
+			if (splitCommands.size() != 2) {
+				output(L"Invalid showfps command, usage - $showfps 1/0");
+				return;
+			}
+			std::string arg1 = splitCommands[1];
+
+			char *cstr = new char[arg1.length() + 1];
+			strcpy(cstr, arg1.c_str());
+
+			if (isNum(cstr))
+			{
+				if (stoi(arg1) != 0)
+					H2Config_show_fps = 1;
+				else
+					H2Config_show_fps = 0;
+			}
+			delete[] cstr;	
 		}
 		else if (firstCommand == "$kick") {
 			if (h2mod->Server) {
@@ -414,7 +438,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$controller_sens") {
 			if (splitCommands.size() != 2) {
-				output(L"Invalid usage, usage $sens_controller value");
+				output(L"Invalid usage, usage $controller_sens value");
 				return;
 			}
 			std::string sensVal = splitCommands[1];
@@ -432,7 +456,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$mouse_sens") {
 			if (splitCommands.size() != 2) {
-				output(L"Invalid usage, usage $sens_mouse value");
+				output(L"Invalid usage, usage $mouse_sens value");
 				return;
 			}
 			std::string sensVal = splitCommands[1];

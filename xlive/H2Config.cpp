@@ -79,6 +79,7 @@ bool H2Config_raw_input = false;
 bool H2Config_discord_enable = true;
 bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
+int H2Config_show_fps = 0;
 int H2Config_field_of_view = 0;
 float H2Config_crosshair_offset = NAN;
 int H2Config_sens_controller = 0;

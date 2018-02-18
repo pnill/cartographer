@@ -23,7 +23,6 @@
 #include "H2Tweaks.h"
 
 
-
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
 Infection *inf = new Infection();
@@ -36,11 +35,7 @@ bool b_H2X = false;
 
 extern bool b_GunGame;
 extern CUserManagement User;
-extern HANDLE H2MOD_Network;
-extern bool NetworkActive;
-extern bool Connected;
-extern bool ThreadCreated;
-
+extern int H2GetInstanceId();
 
 SOCKET comm_socket = INVALID_SOCKET;
 char* NetworkData = new char[255];
@@ -856,11 +851,6 @@ int __cdecl OnMapLoad(int a1)
 
 			if (b_GunGame)
 				gg->Initialize();
-
-			if (b_H2X)
-				H2X::Initialize();
-			else
-				H2X::Deinitialize();
 		}
 
 	}
@@ -913,8 +903,6 @@ Should take a look here for extended functions on scoring chances are we're alre
 
 void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
 {
-	Connected = false;
-	NetworkActive = false;
 
 	memcpy(&join_game_xn, host_xn, sizeof(XNADDR));
 
@@ -1211,6 +1199,13 @@ void H2MOD::Initialize()
 		//PatchPingMeterCheck(true);
 		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
 
+		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
+			// Discord init
+			DiscordInterface::SetDetails("Startup");
+			DiscordInterface::Init();
+			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
+		}
+
 	}
 
 	//effects can vary (good or bad) depending on different software configurations.
@@ -1226,15 +1221,7 @@ void H2MOD::Initialize()
 	//Network::Initialize();
 	h2mod->ApplyHooks();
 
-	if (!h2mod->Server)
-	{
-		if (H2Config_discord_enable) {
-			// Discord init
-			DiscordInterface::SetDetails("Startup");
-			DiscordInterface::Init();
-			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
-		}
-	}
+	
 }
 
 void H2MOD::Deinitialize() {

@@ -24,6 +24,15 @@ extern bool overrideUnicodeMessage;
 extern MapManager* mapManager;
 
 
+#pragma Framerate counter
+int fps = 0;
+float LastTickCount;
+float CurrentTickCount;
+char Framerate[255];
+D3DCOLOR FPScolor;
+#pragma endregion
+
+
 typedef struct _XLIVE_INITIALIZE_INFO {
 	UINT cbSize;
 	DWORD dwFlags;
@@ -95,7 +104,6 @@ LPD3DXSPRITE pSprite;
 
 bool lowFPSmode;
 float lastPresentTime;
-float lastRenderTime;
 static LARGE_INTEGER timerFreq;
 static LARGE_INTEGER counterAtStart;
 
@@ -115,6 +123,27 @@ void frameTimeManagement() {
 	}
 
 	lastPresentTime = getElapsedTime();
+}
+
+void displayFrameRate() {
+
+	CurrentTickCount = clock() * 0.001f;
+	fps++;
+	
+	if ((CurrentTickCount - LastTickCount) > 1.0f)
+	{
+		LastTickCount = CurrentTickCount;
+		sprintf(Framerate, "[ FPS: %d ]", fps);
+
+		if (fps < 30)
+			FPScolor = COLOR_RED;
+		else FPScolor = COLOR_GREEN;
+
+		fps = 0;
+	}
+
+	drawText(30, 30, FPScolor, Framerate, normalSizeFont);
+
 }
 
 DWORD dwPresent;
@@ -171,7 +200,6 @@ int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 {
 		InitInstance();
 		TRACE("XLiveInitialize()");
-		lastRenderTime = 0.0f;
 		QueryPerformanceFrequency(&timerFreq);
 		QueryPerformanceCounter(&counterAtStart);
 
@@ -615,6 +643,12 @@ int WINAPI XLiveRender()
 		if (H2Config_fps_limit > 0) {
 			frameTimeManagement();
 		}
+
+		if (H2Config_show_fps > 0) {
+			displayFrameRate();
+		}
+
+		
 	}
 
 	return 0;
