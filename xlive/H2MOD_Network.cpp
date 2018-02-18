@@ -421,6 +421,9 @@ bool __cdecl closed_read(int a1, int a2, int a3) {
 	return result;
 }
 
+typedef char*(__cdecl *register_connection_packets)(void* a1);
+register_connection_packets register_connection_packets_method;
+
 char* __cdecl registerConnectionPackets(void* packetObject) {
 	typedef char*(__thiscall *register_packet_type)(void *packetObject, int type, int name, int a4, int size1, int size2, int write_packet_method, int read_packet_method, int a9);
 	register_packet_type register_packet = (register_packet_type)(h2mod->GetBase() + (h2mod->Server ? 0x1CA199 : 0x1E81D6));
@@ -870,6 +873,9 @@ void CustomNetwork::applyNetworkHooks() {
 	} else {
 		Codecave(h2mod->GetBase() + 0x4D311, afterMapsLoaded, 0);
 	}
+
+	register_connection_packets_method = (register_connection_packets)DetourFunc((BYTE*)h2mod->GetBase() + registerConnectionPacketsOffset, (BYTE*)registerConnectionPackets, 5);
+	VirtualProtect(register_connection_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	register_player_packets_method = (register_player_packets)DetourFunc((BYTE*)h2mod->GetBase() + registerPlayerPacketsOffset, (BYTE*)registerPlayerPackets, 5);
 	VirtualProtect(register_player_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);

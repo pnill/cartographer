@@ -165,9 +165,11 @@ public:
 		TRACE_GAME("[H2Mod-Infection] PlayerInfected() player died: %ws", player->getPlayerName().c_str());
 		if (!h2mod->Server) {
 			//if we aren't the dedi, change biped and team
+			TRACE_GAME("Setting biped to elite");
 			h2mod->set_unit_biped(BipedType::Elite, pIndex);
 			if (h2mod->get_unit_team_index(unit_datum_index) != 3)
 			{
+				TRACE_GAME("Setting team to zombie team (green team)");
 				h2mod->set_local_team_index(3);
 			}
 		}
@@ -178,6 +180,7 @@ public:
 			player->setIsZombie(true);
 			if (h2mod->get_unit_team_index(unit_datum_index) == 3)
 			{
+				TRACE_GAME("Recording zombie status on host only");
 				//TODO: shouldn't we do this for every player, not just host?
 				call_unit_reset_equipment(unit_datum_index); //Take away local players weapons
 			}
