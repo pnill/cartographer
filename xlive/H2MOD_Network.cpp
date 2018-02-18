@@ -69,7 +69,7 @@ membership_update_write membership_update_write_method;
 
 DWORD lengthOfMapName = 0x80;
 std::string mapName("map-name");
-//TODO: 
+//TODO: implement
 std::string isP2pSupported("p2p-supported");
 
 void __cdecl membershipUpdateWrite(void* a1, int a2, int a3) {
@@ -421,20 +421,6 @@ bool __cdecl closed_read(int a1, int a2, int a3) {
 	return result;
 }
 
-typedef char*(__cdecl *register_connection_packets)(void* a1);
-register_connection_packets register_connection_packets_method;
-
-std::string customPacketType = "customPacket";
-std::string customPacketField = "specialint";
-int __cdecl custom_packet_write(void* a1, int a2, int a3) {
-	return getDataEncodeIntegerMethod()(a1, (int)customPacketField.c_str(), 67, 32);
-}
-
-bool __cdecl custom_packet_read(int a1, int a2, int a3) {
-	int specialInt = getDataDecodeIntegerMethod()(a1, (int)customPacketField.c_str(), 32);
-	bool isValid = getIsValidPacketMethod()(a1);
-	return isValid;
-}
 char* __cdecl registerConnectionPackets(void* packetObject) {
 	typedef char*(__thiscall *register_packet_type)(void *packetObject, int type, int name, int a4, int size1, int size2, int write_packet_method, int read_packet_method, int a9);
 	register_packet_type register_packet = (register_packet_type)(h2mod->GetBase() + (h2mod->Server ? 0x1CA199 : 0x1E81D6));
@@ -448,11 +434,6 @@ char* __cdecl registerConnectionPackets(void* packetObject) {
 	register_packet(packetObject, 4, (int)"connect-request", 0, 8, 8, (int)request_write, (int)request_read, 0); //request
 	register_packet(packetObject, 5, (int)"connect-refuse", 0, 8, 8, (int)refuse_write, (int)refuse_read, 0); //refuse
 	register_packet(packetObject, 6, (int)"connect-establish", 0, 8, 8, (int)establish_write, (int)establish_read, 0); //establish
-
-	//TODO: make work
-	//registers custom packet type
-	register_packet(packetObject, 66, (int)customPacketType.c_str(), 0, 8, 8, (int)custom_packet_write, (int)custom_packet_read, 0);
-
 
 	return register_packet(packetObject, 7, (int)"connect_closed", 0, 12, 12, (int)closed_write, (int)closed_read, 0); //closed
 }
@@ -740,23 +721,21 @@ __declspec(naked) void deserializeChatPacket(void) {
 }
 
 int CustomNetwork::getPacketOffset() {
-	//TODO: add support for dedis
-	int packetOffset = (*(int*)(h2mod->GetBase() + 0x51C474));
+	int packetOffset = (*(int*)(h2mod->GetBase() + (h2mod->Server ? 0x520B94 : 0x51C474)));
 	int packetOffsetTmp = *(DWORD *)(packetOffset + 29600);
 	if (packetOffsetTmp == 5 || packetOffsetTmp == 6 || packetOffsetTmp == 7 || packetOffsetTmp == 8) {
 		//valid memory offset
 		return packetOffset;
 	}
 
-	packetOffset = (*(int*)(h2mod->GetBase() + 0x51C474)) + 31624;
+	packetOffset = (*(int*)(h2mod->GetBase() + (h2mod->Server ? 0x520B94 : 0x51C474))) + 31624;
 	return packetOffset;// there can't be any other place for the data
 }
 
 void CustomNetwork::sendCustomPacket(int peerIndex) {
 	int packetDataObj = this->getPacketOffset();
 	typedef int(__thiscall* sub_12320C8_type)(int thisx, DWORD* a2, DWORD* a3);
-	//TODO: support for dedi
-	sub_12320C8_type sub_12320C8 = (sub_12320C8_type)(h2mod->GetBase() + 0x1C20C8);
+	sub_12320C8_type sub_12320C8 = (sub_12320C8_type)(h2mod->GetBase() + (h2mod->Server ? 0x1997DB : 0x1C20C8));
 
 	typedef char(__thiscall *dynamic_packet_check_method)(void *thisx, int a2, int a3, char a4, unsigned int type, unsigned int size, int a7);
 	dynamic_packet_check_method dynamic_packet_check = (dynamic_packet_check_method)(h2mod->GetBase() + (h2mod->Server ? 0x1B8C1A : 0x1BED40));
@@ -787,8 +766,7 @@ void CustomNetwork::sendCustomPacket(int peerIndex) {
 void CustomNetwork::sendCustomPacketToAllPlayers() {
 	int packetDataObj = this->getPacketOffset();
 	typedef int(__thiscall* sub_12320C8_type)(int thisx, DWORD* a2, DWORD* a3);
-	//TODO: support for dedi
-	sub_12320C8_type sub_12320C8 = (sub_12320C8_type)(h2mod->GetBase() + 0x1C20C8);
+	sub_12320C8_type sub_12320C8 = (sub_12320C8_type)(h2mod->GetBase() + (h2mod->Server ? 0x1997DB : 0x1C20C8));
 
 	typedef char(__thiscall *dynamic_packet_check_method)(void *thisx, int a2, int a3, char a4, unsigned int type, unsigned int size, int a7);
 	dynamic_packet_check_method dynamic_packet_check = (dynamic_packet_check_method)(h2mod->GetBase() + (h2mod->Server ? 0x1B8C1A : 0x1BED40));
@@ -828,7 +806,6 @@ char* __cdecl registerChatPackets(void* packetObject) {
 	typedef char*(__thiscall *register_packet_type)(void *packetObject, int type, int name, int a4, int size1, int size2, int write_packet_method, int read_packet_method, int a9);
 	register_packet_type register_packet = (register_packet_type)(h2mod->GetBase() + (h2mod->Server ? 0x1CA199 : 0x1E81D6));
 
-	//TODO: add support for dedi
 	return register_packet(
 		packetObject,
 		0x2F,
@@ -851,8 +828,6 @@ void CustomNetwork::applyNetworkHooks() {
 	DWORD registerPlayerPacketsOffset = 0x1F0A55;
 	DWORD serializePacketsOffset = 0x1E8296;
 	DWORD deserializePacketsOffset = 0x1E82E0;
-
-	//TODO: add support for dedi
 	DWORD serializeTextChatPacketsOffset = 0x1ECE28;
 	DWORD deserializeTextChatPacketsOffset = 0x1ECFAC;
 	DWORD registerChatPacketsOffset = 0x1ECFB7;
@@ -868,6 +843,11 @@ void CustomNetwork::applyNetworkHooks() {
 		registerPlayerPacketsOffset = 0x1D140E;
 		serializePacketsOffset = 0x1CA259;
 		deserializePacketsOffset = 0x1CA2A3;
+		serializeTextChatPacketsOffset = 0x1CD7E1; 
+		deserializeTextChatPacketsOffset = 0x1CD965;
+		registerChatPacketsOffset = 0x1CD970;
+		sendChatPacketOffset = 0x19F9DC;
+		sendChatPacketOffset2 = 0x1A237F;
 	}
 
 	////////////////////////////////////
@@ -890,9 +870,6 @@ void CustomNetwork::applyNetworkHooks() {
 	} else {
 		Codecave(h2mod->GetBase() + 0x4D311, afterMapsLoaded, 0);
 	}
-	
-	register_connection_packets_method = (register_connection_packets)DetourFunc((BYTE*)h2mod->GetBase() + registerConnectionPacketsOffset, (BYTE*)registerConnectionPackets, 5);
-	VirtualProtect(register_connection_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	register_player_packets_method = (register_player_packets)DetourFunc((BYTE*)h2mod->GetBase() + registerPlayerPacketsOffset, (BYTE*)registerPlayerPackets, 5);
 	VirtualProtect(register_player_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);

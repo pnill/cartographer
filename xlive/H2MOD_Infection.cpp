@@ -168,10 +168,7 @@ public:
 			h2mod->set_unit_biped(BipedType::Elite, pIndex);
 			if (h2mod->get_unit_team_index(unit_datum_index) != 3)
 			{
-				if (h2mod->get_unit_team_index(unit_datum_index) != 3)
-				{
-					h2mod->set_local_team_index(3);
-				}
+				h2mod->set_local_team_index(3);
 			}
 		}
 		if (gameManager->isHost() || h2mod->Server)

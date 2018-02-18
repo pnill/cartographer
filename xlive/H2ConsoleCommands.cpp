@@ -202,6 +202,10 @@ void ConsoleCommands::handle_command(std::string command) {
 			output(L"mouse_sens");
 		}
 		else if (firstCommand == "$kick") {
+			if (h2mod->Server) {
+				output(L"Don't use this on dedis");
+				return;
+			}
 			if (splitCommands.size() != 2) {
 				output(L"Invalid kick command, usage - $kick PLAYER_INDEX");
 				return;
@@ -215,7 +219,12 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 			else {
 				if (isNum(cstr)) {
-					h2mod->kick_player(atoi(cstr));
+					int peerIndex = atoi(cstr);
+					if (peerIndex == 1) {
+						output(L"Don't kick yourself");
+						return;
+					}
+					h2mod->kick_player(peerIndex);
 				}
 			}
 			delete[] cstr;

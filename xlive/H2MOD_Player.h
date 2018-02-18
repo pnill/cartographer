@@ -33,7 +33,6 @@ private:
 	//TODO: xuid (is identifier the xuid?)
 	//TODO: ping value
 	//TODO: last ping time
-	//TODO: is zombie
 };
 
 /*

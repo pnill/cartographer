@@ -3,20 +3,18 @@
 #include <h2mod.pb.h>
 
 int Players::getPlayerOffset() {
-	//TODO: add support for dedis
-	int playerDataOffset = (*(int*)(h2mod->GetBase() + 0x51C474));
+	int playerDataOffset = (*(int*)(h2mod->GetBase() + (h2mod->Server ? 0x520B94 : 0x51C474)));
 	int playerDataOffsetTmp = *(DWORD *)(playerDataOffset + 29600);
 	if (playerDataOffsetTmp == 5 || playerDataOffsetTmp == 6 || playerDataOffsetTmp == 7 || playerDataOffsetTmp == 8) {
 		//valid memory offset
 		return playerDataOffset + 112;
 	}
 
-	playerDataOffset = (*(int*)(h2mod->GetBase() + 0x51C474)) + 31624; 
+	playerDataOffset = (*(int*)(h2mod->GetBase() + (h2mod->Server ? 0x520B94 : 0x51C474))) + 31624;
 	return playerDataOffset + 112;// there can't be any other place for the data
 }
 
 int Players::getPlayerCount() {
-	//TODO: add support for dedis
 	int playerDataOffset = this->getPlayerOffset();
 	int playerOrPeerCount = *(DWORD *)(playerDataOffset + 0x14);
 	return playerOrPeerCount;
