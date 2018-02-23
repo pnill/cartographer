@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <h2mod.pb.h>
 #include "H2Startup.h"
 #include "H2Tweaks.h"
 #include "H2Config.h"
@@ -67,10 +68,17 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 
 	default:
 		if (this->console) {
+			//0x30 = 0
+			//0x5A = z
+			//0x20 = spacebar
+
 			if (((wp >= 0x30 && wp <= 0x5A) || wp == 0x20 || wp == VK_OEM_MINUS)) {
 				if (wp == VK_OEM_MINUS) {
 					wp = '-';
 				}
+				//0x10 = shift
+				//0xA0 = left shift
+				//0xA1 = right shift
 				if (GetAsyncKeyState(0x10) & 0x8000 || GetAsyncKeyState(0xA0) & 0x8000 || GetAsyncKeyState(0xA1) & 0x8000) {
 					if (wp == '-') {
 						wp = '_';
@@ -188,7 +196,31 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			mapManager->reloadMaps();
 		}
+		else if (firstCommand == "$help") {
+			output(L"reloadMaps");
+			output(L"kick");
+			output(L"logPlayers");
+			output(L"maxPlayers");
+			output(L"resetSpawnCommandList");
+			output(L"isHost");
+			output(L"downloadMap");
+			output(L"spawn");
+			output(L"controller_sens");
+			output(L"mouse_sens");
+		}
+		else if (firstCommand == "$downloadmap") {
+			if (splitCommands.size() != 2) {
+				output(L"Invalid download map command, usage - $downloadMap MAP_NAME");
+				return;
+			}
+			std::string firstArg = splitCommands[1];
+			mapManager->downloadFromRepo(firstArg);
+		}
 		else if (firstCommand == "$kick") {
+			if (h2mod->Server) {
+				output(L"Don't use this on dedis");
+				return;
+			}
 			if (splitCommands.size() != 2) {
 				output(L"Invalid kick command, usage - $kick PLAYER_INDEX");
 				return;
@@ -197,30 +229,62 @@ void ConsoleCommands::handle_command(std::string command) {
 			char *cstr = new char[firstArg.length() + 1];
 			strcpy(cstr, firstArg.c_str());
 
-			if (!isServer) {
+			if (!gameManager->isHost()) {
 				output(L"Only the server can kick players");
 			}
 			else {
 				if (isNum(cstr)) {
-					h2mod->kick_player(atoi(cstr));
+					int peerIndex = atoi(cstr);
+					if (peerIndex == 0) {
+						output(L"Don't kick yourself");
+						return;
+					}
+					h2mod->kick_player(peerIndex);
 				}
 			}
 			delete[] cstr;
 		}
-		else if (firstCommand == "$lognetworkplayers") {
-			//TODO: use mutex here
-			if (h2mod->NetworkPlayers.size() > 0) {
-				for (auto it = h2mod->NetworkPlayers.begin(); it != h2mod->NetworkPlayers.end(); ++it) {
-					//TODO: 
-				}
+		else if (firstCommand == "$logplayers") {
+			if (!gameManager->isHost()) {
+				output(L"Only host can log out information about players");
+				return;
 			}
+			players->logAllPlayersToConsole();
+		}
+		else if (firstCommand == "$sendteamchange") {
+			if (!gameManager->isHost()) {
+				output(L"Only host can issue a team change");
+				return;
+			}
+			if (splitCommands.size() != 3) {
+				output(L"Usage: $sendTeamChange peerIndex newTeam");
+				return;
+			}
+			std::string firstArg = splitCommands[1];
+			std::string secondArg = splitCommands[2];
+
+			H2ModPacket teampak;
+			teampak.set_type(H2ModPacket_Type_set_player_team);
+
+			h2mod_set_team *set_team = teampak.mutable_h2_set_player_team();
+			set_team->set_team(atoi(secondArg.c_str()));
+			set_team->set_peerindex(atoi(firstArg.c_str()));
+
+			char* SendBuf = new char[teampak.ByteSize()];
+			teampak.SerializeToArray(SendBuf, teampak.ByteSize());
+
+			network->networkCommand = SendBuf;
+			network->sendCustomPacket(atoi(firstArg.c_str()));
+
+			network->networkCommand = NULL;
+			delete[] SendBuf;
 		}
 		else if (firstCommand == "$maxplayers") {
 			if (splitCommands.size() != 2) {
 				output(L"Usage: $maxplayers value (betwen 1 and 16).");
 				return;
 			}
-			if (!isServer) {
+			if (!gameManager->isHost()) {
 				output(L"Can be only used while hosting.");
 				return;
 			}

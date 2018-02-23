@@ -1,5 +1,6 @@
 #ifndef H2MOD_NETWORK
 #define H2MOD_NETWORK
+#include <queue>
 
 static const char* packet_type_strings[] = {
 	"ping",
@@ -108,8 +109,16 @@ enum packet_type
 class CustomNetwork {
 public:
 	void applyNetworkHooks();
-
+	void sendCustomPacketToAllPlayers();
+	void sendCustomPacket(int peerIndex);
+	int getPacketOffset();
 	std::string currentMapFilename;
+
+	//command sent from server
+	char* networkCommand;
+
+	//command queue on the client
+	std::deque<std::string> queuedNetworkCommands;
 };
 
 #endif 

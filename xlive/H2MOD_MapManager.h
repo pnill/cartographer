@@ -58,4 +58,5 @@ private:
 	std::wstring currentMap;
 	const char* customLobbyMessage = NULL;
 	volatile BOOL threadRunning = false;
+	std::set<std::string> downloadedMaps;
 };

@@ -1,0 +1,24 @@
+syntax = 'proto2';
+
+message H2ModPacket {
+
+	enum Type {
+		set_player_team = 2;
+		set_unit_grenades = 3;
+	}
+
+	required H2ModPacket.Type type = 1;
+	optional h2mod_set_team h2_set_player_team = 2;
+	optional h2mod_set_grenade set_grenade = 3;
+}
+
+message h2mod_set_grenade {
+	required uint32 type = 1;
+	required uint32 count = 2;
+	required uint32 pIndex = 3;
+}
+
+message h2mod_set_team {
+	required uint32 peerIndex = 1;	
+	required uint32 team = 2;
+}

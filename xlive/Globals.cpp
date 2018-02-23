@@ -5,12 +5,12 @@ MapManager* mapManager = new MapManager();
 
 volatile bool isLobby = true;
 bool overrideUnicodeMessage = false;
-//always assume client is server unless they join a game which is called before xsessioncreate
-//which creates or connects to teh team speak server
-bool isServer = true;
 
 ConsoleCommands* commands = new ConsoleCommands();
 GameManager* gameManager = new GameManager();
+CustomNetwork *network = new CustomNetwork();
+
+Players* players = new Players();
 
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
 	std::stringstream ss(s);
@@ -35,4 +35,11 @@ int stripWhitespace(wchar_t *inputStr) {
 	printf("Strlen + 1 is: %i\n", wcslen(start) + 1);
 	memmove(inputStr, start, wcslen(start) + 1);
 	return 0;
+}
+
+void patchBYTEs(BYTE* orig, BYTE* values, int size) {
+	DWORD dwBack;
+	VirtualProtect(orig, size, PAGE_EXECUTE_READWRITE, &dwBack);
+	memcpy(orig, (BYTE*)values, size);
+	VirtualProtect(orig, size, dwBack, NULL);
 }

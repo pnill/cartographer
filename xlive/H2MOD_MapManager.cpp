@@ -129,6 +129,15 @@ bool MapManager::hasCustomMap(std::wstring mapName) {
 	return file.good();
 }
 
+void swap(DWORD*& a, DWORD*& b)
+{
+	DWORD* c = a;
+	a = b;
+	b = c;
+}
+
+DWORD *customMapBuffer = new DWORD[6000];
+
 /**
 * Actually calls the real map reload function in halo2.exe
 */
@@ -138,6 +147,8 @@ void MapManager::reloadMaps() {
 	map_reload_function_type reloadMapsSet = (map_reload_function_type)(h2mod->GetBase() + (h2mod->Server ? 0x41501 : 0x4CC30));
 	DWORD* mapsObject = (DWORD*)(h2mod->GetBase() + (h2mod->Server ? 0x4A70D8 : 0x482D70));
 	DWORD dwBack;
+
+
 	BOOL canprotect = VirtualProtect((WORD*)((int)mapsObject + 148016), sizeof(WORD), PAGE_EXECUTE_READWRITE, &dwBack);
 	if (!canprotect && GetLastError()) {
 		if (H2Config_debug_log)
@@ -249,6 +260,8 @@ void MapManager::setClientMapFilename(std::string filename) {
 void MapManager::cleanup() {
 	this->stopListeningForClients();
 	this->resetClient();
+	//clear any attempted map downloads on game end
+	this->downloadedMaps.clear();
 }
 
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
@@ -271,6 +284,10 @@ static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ul
 }
 
 bool MapManager::downloadFromRepo(std::string mapFilename) {
+	if (downloadedMaps.find(mapFilename) != downloadedMaps.end()) {
+		return true;
+	}
+	downloadedMaps.insert(mapFilename);
 	std::string url("http://www.h2pcmt.com/Cartographer/CustomMaps/");
 	url += mapFilename;
 

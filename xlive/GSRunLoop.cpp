@@ -6,9 +6,9 @@
 #include "stdafx.h"
 #include <d3d9.h>
 #include <fstream>
-#include "H2MOD.h"
 #include <winsock.h>
 #include "GSCustomMenu.h"
+#include "Globals.h"
 extern LPDIRECT3DDEVICE9 pDevice;
 
 bool QuitGSMainLoop = false;
@@ -314,8 +314,7 @@ void GSMainLoop() {
 	else {
 		partyPrivacy = *(int*)((BYTE*)H2BaseAddr + 0x50A398);
 	}
-	extern bool isHost;
-	if (prevPartyPrivacy > 0 && partyPrivacy == 0 && isHost) {
+	if (prevPartyPrivacy > 0 && partyPrivacy == 0 && gameManager->isHost()) {
 		pushHostLobby();
 	}
 	prevPartyPrivacy = partyPrivacy;

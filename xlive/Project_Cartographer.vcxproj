@@ -265,12 +265,15 @@
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="h2mod.pb.cc" />
     <ClCompile Include="H2MOD_GameManager.cpp" />
+    <ClCompile Include="H2MOD_GameType.cpp" />
     <ClCompile Include="H2MOD_GunGame.cpp" />
     <ClCompile Include="H2MOD_H2X.cpp" />
     <ClCompile Include="H2MOD_Halo2Final.cpp" />
     <ClCompile Include="H2MOD_MapManager.cpp" />
     <ClCompile Include="H2MOD_Mouseinput.cpp" />
     <ClCompile Include="H2MOD_Network.cpp" />
+    <ClCompile Include="H2MOD_Player.cpp" />
+    <ClCompile Include="H2MOD_Players.cpp" />
     <ClCompile Include="H2OnscreenDebugLog.cpp" />
     <ClCompile Include="H2Startup.cpp" />
     <ClCompile Include="H2Tweaks.cpp" />
@@ -282,32 +285,6 @@
     <ClCompile Include="xlive_network.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Blam\BlamLibrary.h" />
-    <ClInclude Include="Blam\Engine\EngineDefinitions.h" />
-    <ClInclude Include="Blam\Engine\Extras\Skulls.h" />
-    <ClInclude Include="Blam\Engine\Game\GameManager.h" />
-    <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
-    <ClInclude Include="Blam\Engine\Objects\Objects.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectsHeader.h" />
-    <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
-    <ClInclude Include="Blam\Engine\Players\Players.h" />
-    <ClInclude Include="Blam\Enums\Enums.h" />
-    <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h" />
-    <ClInclude Include="Blam\Enums\Objects\Objects.h" />
-    <ClInclude Include="Blam\Enums\Objects\Unit.h" />
-    <ClInclude Include="Blam\Enums\Players\Players.h" />
-    <ClInclude Include="Blam\Maths\Angle.h" />
-    <ClInclude Include="Blam\Maths\Maths.h" />
-    <ClInclude Include="Blam\Maths\RealColorRGB.h" />
-    <ClInclude Include="Blam\Maths\RealMovement.h" />
-    <ClInclude Include="Blam\Maths\RealPoint2D.h" />
-    <ClInclude Include="Blam\Maths\RealPoint3D.h" />
-    <ClInclude Include="Blam\Maths\RealVector2D.h" />
-    <ClInclude Include="Blam\Maths\RealVector3D.h" />
-    <ClInclude Include="Blam\Shared\DatumIndex.h" />
-    <ClInclude Include="Blam\Shared\Globals.h" />
-    <ClInclude Include="Blam\Shared\SharedDefinitions.h" />
     <ClInclude Include="cartographer_main.hpp" />
     <ClInclude Include="CUser.h" />
     <ClInclude Include="Detour.h" />
@@ -328,6 +305,7 @@
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="h2mod.pb.h" />
     <ClInclude Include="H2MOD_GameManager.h" />
+    <ClInclude Include="H2MOD_GameType.h" />
     <ClInclude Include="H2MOD_GunGame.h" />
     <ClInclude Include="H2MOD_H2X.h" />
     <ClInclude Include="H2MOD_Halo2Final.h" />
@@ -335,6 +313,8 @@
     <ClInclude Include="H2MOD_MapManager.h" />
     <ClInclude Include="H2MOD_Mouseinput.h" />
     <ClInclude Include="H2MOD_Network.h" />
+    <ClInclude Include="H2MOD_Player.h" />
+    <ClInclude Include="H2MOD_Players.h" />
     <ClInclude Include="H2MOD_Sounds.h" />
     <ClInclude Include="H2OnscreenDebugLog.h" />
     <ClInclude Include="H2Startup.h" />

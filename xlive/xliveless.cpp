@@ -3623,8 +3623,7 @@ int WINAPI XSessionFlushStats (DWORD, DWORD)
 DWORD WINAPI XSessionDelete (DWORD, DWORD)
 {
     TRACE("XSessionDelete");
-		isServer = false;
-		mapManager->cleanup();
+	mapManager->cleanup();
     return 0;
 }
 
