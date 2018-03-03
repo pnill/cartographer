@@ -317,11 +317,11 @@ void GunGameKillHandler::onClient() {
 }
 
 void GunGameKillHandler::onDedi() {
-
+	GunGame::levelUpServer(this->getPlayerIndex());
 }
 
 void GunGameKillHandler::onPeerHost() {
-
+	GunGame::levelUpServer(this->getPlayerIndex());
 }
 
 GunGameHandler::GunGameHandler() {}
