@@ -20,6 +20,7 @@ int Players::getPlayerOffset() {
 int Players::getPlayerCount() {
 	int playerDataOffset = this->getPlayerOffset();
 	int playerOrPeerCount = *(DWORD *)(playerDataOffset + 0x14);
+	//the player structure we use contains the dedicated server for whatever reason, so we always subtract player count by 1 when we are the dedi
 	return playerOrPeerCount;
 }
 
@@ -27,7 +28,8 @@ void Players::reload() {
 	playerLock.lock();
 
 	if (this->players.empty()) {
-		for (int i = 0; i < 16; i++) {
+		//the dedi has a extra peer slot for the dedi itself for whatever reason
+		for (int i = 0; i < (h2mod->Server ? 17 : 16); i++) {
 
 			Player* player = new Player();
 			this->players.push_back(player);
@@ -48,11 +50,15 @@ void Players::reload() {
 	int peerStart = playerDataOffset + 160;
 	int playerStart = playerDataOffset + 4608;
 	int playerCounter = 0;
+	if (h2mod->Server) {
+		peerStart += 268;
+		playerCounter++;
+	}
 	do {
 		//from everything I can tell in h2_set_membership_packet_data(), peer and player index don't actually ever
 		//change, the people who join occupy spots and the other info is stored in those spots, but there is no shifting
 		//of these indexes for in game players
-		int peerIndex = playerCounter;
+		int peerIndex = playerCounter + (h2mod->Server ? 1 : 0);
 		int playerIndex = playerCounter;
 
 		wchar_t* peerName = (wchar_t*)(peerStart - 96);

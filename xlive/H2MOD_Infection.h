@@ -42,6 +42,12 @@ class ZombieDeathHandler : public ZombieHandler {
 	virtual void onDedi() override;
 	virtual void onClient() override;
 };
+class KillZombieHandler : public ZombieHandler {
+	// Inherited via GameClientServerHandler
+	virtual void onPeerHost() override;
+	virtual void onDedi() override;
+	virtual void onClient() override;
+};
 
 class Infection : public GameType<ZombieHandler>
 {

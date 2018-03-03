@@ -48,7 +48,7 @@ private:
 
 int Infection::calculateZombieIndexBasedOnPlayerData() {
 	int max = players->getPlayerCount() - 1;
-	int min = 0;
+	int min = (h2mod->Server ? 1 : 0);//on a dedi, the dedi itself obtains a player slot for whatever reason
 	int randNum = rand() % (max - min + 1) + min;
 	return randNum; //Random Alpha Zombie Index
 }
@@ -80,6 +80,7 @@ Infection::Infection()
 	this->preSpawnPlayer = new ZombiePreSpawnHandler();
 	this->spawnPlayer = new ZombieSpawnHandler();
 	this->playerDeath = new ZombieDeathHandler();
+	this->playerKill = new KillZombieHandler();
 }
 
 void Infection::triggerSound(const wchar_t* name, int sleep) {
@@ -224,7 +225,7 @@ void Infection::infectPlayers(int unitDatumIndex, int playerIndex) {
 	if (unit_object) {
 		Infection::setZombiePlayerStatus(playerIndex);
 		if (h2mod->get_unit_team_index(unitDatumIndex) == ZOMBIE_TEAM) {
-			//TODO: why exactly do we do this?
+			//don't drop swords after zombie death
 			call_unit_reset_equipment(unitDatumIndex); //Take away zombie's weapons
 		}
 	}
@@ -350,6 +351,18 @@ void InfectionInitializer::onClient()
 {
 	TRACE_GAME("[h2mod-infection] Client init");
 	Infection::initClient();
+}
+
+void KillZombieHandler::onClient() {
+	//implement on kill zombie
+}
+
+void KillZombieHandler::onDedi() {
+	//implement on kill zombie
+}
+
+void KillZombieHandler::onPeerHost() {
+	//implement on kill zombie
 }
 
 void ZombieHandler::setPlayerIndex(int playerIndex)

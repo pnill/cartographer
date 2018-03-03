@@ -18,6 +18,8 @@ extern int weapon_fourteen;
 extern int weapon_fiffteen;
 extern int weapon_sixteen;
 
+std::unordered_map<int, int> GunGame::level_weapon;
+
 unsigned int Weapon_ID[36] = { 
 	0xE53D2AD8, 0xE5F02B8B, 0xE6322BCD, 0xE6AF2C4A,
 	0xE79B2D36,0xE8172DB2,0xE8382DD3,0xE8742E0F,
@@ -30,19 +32,316 @@ unsigned int Weapon_ID[36] = {
 	0xEED3346E,0xEEF1348C,0xEF1B34B6,0xF33838D2 
 };
 
-void GunGame::Initialize()
+class ResetGunGameLevelsIterator : public PlayerIterator {
+	virtual void onIteratePlayer(Player* player) override {
+		player->setGunGameLevel(0);
+	}
+};
+
+class GetGunGameLevel : public PlayerLookup {
+public:
+	GetGunGameLevel(int* levelRef, int playerIndex) {
+		this->levelRef = levelRef;
+		this->playerIndex = playerIndex;
+	}
+	virtual void lookup(Player* player) override {
+		if (this->playerIndex == player->getPlayerIndex()) {
+			*this->levelRef = player->getGunGameLevel();
+			foundPlayer = true;
+		}
+	}
+private:
+	int playerIndex;
+	int* levelRef;
+};
+
+class IncrementGunGameLevel : public PlayerLookup {
+public:
+	IncrementGunGameLevel(int* levelRef, int playerIndex) {
+		this->playerIndex = playerIndex;
+		this->levelRef = levelRef;
+	}
+	virtual void lookup(Player* player) override {
+		if (this->playerIndex == player->getPlayerIndex()) {
+			player->setGunGameLevel(player->getGunGameLevel() + 1);
+			*this->levelRef = player->getGunGameLevel();
+			foundPlayer = true;
+		}
+	}
+private:
+	int playerIndex;
+	int* levelRef;
+};
+
+class InitGunGameLevel : public PlayerLookup {
+public:
+	InitGunGameLevel(int playerIndex) {
+		this->playerIndex = playerIndex;
+	}
+	virtual void lookup(Player* player) override {
+		if (this->playerIndex == player->getPlayerIndex()) {
+			player->setGunGameLevel(0);
+			foundPlayer = true;
+		}
+	}
+private:
+	int playerIndex;
+};
+
+GunGame::GunGame()
 {
-	TRACE_GAME("[H2Mod-GunGame] : Initialize");
+	this->deinitializer = new GunGameDeinitializer();
+	this->initializer = new GunGameInitializer();
+	this->preSpawnPlayer = new GunGamePreSpawnHandler();
+	this->spawnPlayer = new GunGameSpawnHandler();
+	this->playerDeath = new GunGameDeathHandler();
+	this->playerKill = new GunGameKillHandler();
 }
 
-void GunGame::PlayerDied(int unit_datum_index) // we need to start passing player index her for sanity.
-{
+void GunGame::initWeaponLevels() {
+	if (weapon_one != 0) {
+		TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_one: %i", weapon_one);
+		TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_one enum:  %08X", Weapon_ID[weapon_one]);
+		TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_two enum:  %08X", Weapon_ID[weapon_two]);
+		GunGame::level_weapon[0] = Weapon_ID[weapon_one];
+		GunGame::level_weapon[1] = Weapon_ID[weapon_two];
+		GunGame::level_weapon[2] = Weapon_ID[weapon_three];
+		GunGame::level_weapon[3] = Weapon_ID[weapon_four];
+		GunGame::level_weapon[4] = Weapon_ID[weapon_five];
+		GunGame::level_weapon[5] = Weapon_ID[weapon_six];
+		GunGame::level_weapon[6] = Weapon_ID[weapon_seven];
+		GunGame::level_weapon[7] = Weapon_ID[weapon_eight];
+		GunGame::level_weapon[8] = Weapon_ID[weapon_nine];
+		GunGame::level_weapon[9] = Weapon_ID[weapon_ten];
+		GunGame::level_weapon[10] = Weapon_ID[weapon_eleven];
+		GunGame::level_weapon[11] = Weapon_ID[weapon_tweleve];
+		GunGame::level_weapon[12] = Weapon_ID[weapon_thirteen];
+		GunGame::level_weapon[13] = Weapon_ID[weapon_fourteen];
+		GunGame::level_weapon[14] = Weapon_ID[weapon_fiffteen];
+	} else {
+		GunGame::level_weapon[0] = Weapon::energy_blade_useless;
+		GunGame::level_weapon[1] = Weapon::needler;
+		GunGame::level_weapon[2] = Weapon::plasma_pistol;
+		GunGame::level_weapon[3] = Weapon::magnum;
+		GunGame::level_weapon[4] = Weapon::smg;
+		GunGame::level_weapon[5] = Weapon::plasma_rifle;
+		GunGame::level_weapon[6] = Weapon::brute_plasma_rifle;
+		GunGame::level_weapon[7] = Weapon::juggernaut_powerup;
+		GunGame::level_weapon[8] = Weapon::shotgun;
+		GunGame::level_weapon[9] = Weapon::brute_shot;
+		GunGame::level_weapon[10] = Weapon::covenant_carbine;
+		GunGame::level_weapon[11] = Weapon::battle_rifle;
+		GunGame::level_weapon[12] = Weapon::beam_rifle;
+		GunGame::level_weapon[13] = Weapon::sniper_rifle;
+		GunGame::level_weapon[14] = Weapon::rocket_launcher;
+	}
 }
 
-void GunGame::SpawnPlayer(int PlayerIndex)
-{
+void GunGame::resetPlayerLevels() {
+	ResetGunGameLevelsIterator* resetGunGameLevels = new ResetGunGameLevelsIterator();
+	players->iteratePlayers(resetGunGameLevels);
+	delete resetGunGameLevels;
 }
 
-void GunGame::LevelUp(int PlayerIndex)
+void GunGame::spawnPlayerServer(int playerIndex) {
+	wchar_t* pName = h2mod->get_player_name_from_index(playerIndex);
+	TRACE_GAME("[H2Mod-GunGame]: SpawnPlayer(%i) : %ws ", playerIndex, pName);
+
+	int unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
+	int unit_object = call_get_object(unit_datum_index, 3);
+
+	if (unit_object) {
+		int level = 0;
+		GetGunGameLevel* getGunGameLevel = new GetGunGameLevel(&level, playerIndex);
+		players->lookupPlayer(getGunGameLevel);
+		delete getGunGameLevel;
+
+		TRACE_GAME("[H2Mod-GunGame]: SpawnPlayer(%i) %ws - Level: %i", playerIndex, pName, level);
+
+		int CurrentWeapon = GunGame::level_weapon[level];
+
+		if (level == 15) {
+			TRACE_GAME("[H2Mod-GunGame]: %ws on frag grenade level!", pName);
+			sendGrenadePacket(GrenadeType::Frag, 99, playerIndex, 1);
+		}
+
+		if (level == 16) {
+			TRACE_GAME("[H2Mod-GunGame]: %ws on plasma grenade level!", pName);
+			sendGrenadePacket(GrenadeType::Plasma, 99, playerIndex, 1);
+		}
+
+		if (level < 15)	{
+			GivePlayerWeapon(playerIndex, CurrentWeapon, 1);
+		}
+	}
+}
+
+void GunGame::playerDiedServer(int unit_datum_index)
 {
+	int unit_object = call_get_object(unit_datum_index, 3);
+	if (unit_object) {
+		call_unit_reset_equipment(unit_datum_index);
+
+		int pIndex = h2mod->get_player_index_from_unit_datum(unit_datum_index);
+		sendGrenadePacket(GrenadeType::Frag, 0, pIndex, 1);
+		sendGrenadePacket(GrenadeType::Plasma, 0, pIndex, 1);
+	}
+}
+
+void GunGame::levelUpServer(int PlayerIndex)
+{
+
+	wchar_t* PlayerName = h2mod->get_player_name_from_index(PlayerIndex);
+	TRACE_GAME("[H2Mod-GunGame]: LevelUp(%i) : %ws", PlayerIndex, PlayerName);
+
+	int level = 0;
+
+	IncrementGunGameLevel* setGunGameLevel = new IncrementGunGameLevel(&level, PlayerIndex);
+	players->lookupPlayer(setGunGameLevel);
+	delete setGunGameLevel;
+
+
+	TRACE_GAME("[H2Mod-GunGame]: LevelUp(%i) - new level: %i ", PlayerIndex, level);
+
+	if (level == 15) {
+		TRACE_GAME("[H2Mod-GunGame]: %ws Level 15 - Frag Grenades!", PlayerName);
+		sendGrenadePacket(GrenadeType::Frag, 99, PlayerIndex, 1);
+	}
+
+	if (level == 16) {
+		TRACE_GAME("[H2Mod-GunGame]: %ws Level 16 - Plasma Grenades!", PlayerName);
+		sendGrenadePacket(GrenadeType::Plasma, 99, PlayerIndex, 1);
+	}
+
+	if (level < 15)	{
+		TRACE_GAME("[H2Mod-GunGame]: %ws on level %i giving them weapon...", PlayerName, level);
+
+		int LevelWeapon = GunGame::level_weapon[level];
+		sendGrenadePacket(GrenadeType::Frag, 0, PlayerIndex, 1);
+		sendGrenadePacket(GrenadeType::Plasma, 0, PlayerIndex, 1);
+		GivePlayerWeapon(PlayerIndex, LevelWeapon, 1);
+	}
+}
+
+void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
+{
+	TRACE_GAME("[H2Mod-Infection] Sending grenade packet, index=%d", pIndex);
+
+	H2ModPacket teampak;
+	teampak.set_type(H2ModPacket_Type_set_unit_grenades);
+
+	h2mod_set_grenade *set_grenade = teampak.mutable_set_grenade();
+	set_grenade->set_count(count);
+	set_grenade->set_type(type);
+	set_grenade->set_pindex(pIndex);
+
+	char* SendBuf = new char[teampak.ByteSize()];
+	teampak.SerializeToArray(SendBuf, teampak.ByteSize());
+
+	network->networkCommand = SendBuf;
+	network->sendCustomPacket(pIndex);
+	network->networkCommand = NULL;
+
+	delete[] SendBuf;
+}
+
+void GunGameDeinitializer::onClient() {
+	//gun game does nothing for client on deinit
+}
+
+void GunGameDeinitializer::onDedi() {
+	//gun game does nothing for dedi on deinit
+}
+
+void GunGameDeinitializer::onPeerHost() {
+	//gun game does nothing for peer host on deinit
+}
+
+void GunGameInitializer::onClient() {
+	GunGame::initWeaponLevels();
+}
+
+void GunGameInitializer::onDedi() {
+	GunGame::initWeaponLevels();
+	GunGame::resetPlayerLevels();
+}
+
+void GunGameInitializer::onPeerHost() {
+	GunGame::initWeaponLevels();
+	GunGame::resetPlayerLevels();
+	//TODO: is this really necessary (from old code)?
+	//init peer host gun game level 
+	InitGunGameLevel* initGunGameLevel = new InitGunGameLevel(0);
+	players->lookupPlayer(initGunGameLevel);
+	delete initGunGameLevel;
+}
+
+void GunGamePreSpawnHandler::onClient() {
+	//gungame does nothing during pre spawn
+}
+
+void GunGamePreSpawnHandler::onDedi() {
+	//gungame does nothing during pre spawn
+}
+
+void GunGamePreSpawnHandler::onPeerHost() {
+	//gungame does nothing during pre spawn
+}
+
+void GunGameSpawnHandler::onClient() {
+	//gungame does nothing for the client on spawn
+}
+
+void GunGameSpawnHandler::onDedi() {
+	GunGame::spawnPlayerServer(this->getPlayerIndex());
+}
+
+void GunGameSpawnHandler::onPeerHost() {
+	GunGame::spawnPlayerServer(this->getPlayerIndex());
+}
+
+void GunGameDeathHandler::onClient() {
+	//gun game does nothing for clients on death
+}
+
+void GunGameDeathHandler::onDedi() {
+	GunGame::playerDiedServer(this->getUnitDatumIndex());
+}
+
+void GunGameDeathHandler::onPeerHost() {
+	GunGame::playerDiedServer(this->getUnitDatumIndex());
+}
+
+void GunGameKillHandler::onClient() {
+	//gun game does nothing for clients on score/kills
+}
+
+void GunGameKillHandler::onDedi() {
+
+}
+
+void GunGameKillHandler::onPeerHost() {
+
+}
+
+GunGameHandler::GunGameHandler() {}
+
+void GunGameHandler::setPlayerIndex(int playerIndex)
+{
+	this->playerIndex = playerIndex;
+}
+
+void GunGameHandler::setUnitDatumIndex(int unitDatumIndex)
+{
+	this->unitDatumIndex = unitDatumIndex;
+}
+
+int GunGameHandler::getPlayerIndex()
+{
+	return this->playerIndex;
+}
+
+int GunGameHandler::getUnitDatumIndex()
+{
+	return this->unitDatumIndex;
 }

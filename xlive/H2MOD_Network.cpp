@@ -814,8 +814,8 @@ char* __cdecl registerChatPackets(void* packetObject) {
 		0,
 		CHAT_PACKET_SIZE,
 		CHAT_PACKET_SIZE,
-		(int)(h2mod->GetBase() + 0x1ECE28),
-		(int)(h2mod->GetBase() + 0x1ECEEB),
+		(int)(h2mod->GetBase() + (h2mod->Server ? 0x1CD7E1 : 0x1ECE28)),
+		(int)(h2mod->GetBase() + (h2mod->Server ? 0x1CD965 : 0x1ECEEB)),
 		0);
 }
 

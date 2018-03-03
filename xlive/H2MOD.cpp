@@ -25,8 +25,8 @@
 
 
 H2MOD *h2mod = new H2MOD();
-GunGame *gg = new GunGame();
-Infection *infectionHandler = new Infection();
+GunGame* gunGame = new GunGame();
+Infection* infectionHandler = new Infection();
 Halo2Final *h2f = new Halo2Final();
 Mouseinput *mouse = new Mouseinput();
 
@@ -588,8 +588,10 @@ char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 	//TRACE_GAME("OnPlayerDeath() - Team: %i", h2mod->get_unit_team_index(unit_datum_index));
 
 #pragma region GunGame Handler
-	if (b_GunGame)
-		gg->PlayerDied(unit_datum_index);
+	if (b_GunGame) {
+		gunGame->playerDeath->setUnitDatumIndex(unit_datum_index);
+		gunGame->playerDeath->execute();
+	}
 #pragma endregion
 
 	if (b_Infection) {
@@ -610,8 +612,10 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 	if (a5 == 7) //player got a kill?
 	{
 		int PlayerIndex = a2;
-		if (b_GunGame && (gameManager->isHost() || h2mod->Server))
-			gg->LevelUp(PlayerIndex);
+		if (b_GunGame) {
+			gunGame->playerKill->setPlayerIndex(PlayerIndex);
+			gunGame->playerKill->execute();
+		}
 	}
 
 #pragma endregion
@@ -702,9 +706,12 @@ int __cdecl OnMapLoad(int a1)
 		if (b_Halo2Final && !h2mod->Server)
 			h2f->Dispose();
 
-		if (b_Infection) 
-		{
+		if (b_Infection) {
 			infectionHandler->deinitializer->execute();
+		}
+
+		if (b_GunGame) {
+			gunGame->deinitializer->execute();
 		}
 
 		PatchFixRankIcon();
@@ -781,6 +788,17 @@ int __cdecl OnMapLoad(int a1)
 
 #pragma endregion
 	}
+
+	if (GameEngine != 3 && GameState == 3)
+	{
+		if (b_Infection) {
+			infectionHandler->initializer->execute();
+		}
+
+		if (b_GunGame) {
+			gunGame->initializer->execute();
+		}
+	}
 #pragma region H2V Stuff
 	if (!h2mod->Server)
 	{
@@ -795,11 +813,6 @@ int __cdecl OnMapLoad(int a1)
 			setCrosshairPos(H2Config_crosshair_offset);
 
 			if (GameState == 3) {
-				if (b_Infection)
-					infectionHandler->initializer->execute();
-
-				if (b_GunGame && gameManager->isHost())
-					gg->Initialize();
 
 				if (b_H2X)
 					H2X::Initialize();
@@ -820,12 +833,6 @@ int __cdecl OnMapLoad(int a1)
 #pragma region H2Server Stuff
 		if (GameEngine != 3 && GameState == 3)
 		{
-			if (b_Infection)
-				infectionHandler->initializer->execute();
-
-			if (b_GunGame)
-				gg->Initialize();
-
 			if (b_H2X)
 				H2X::Initialize();
 			else
@@ -850,7 +857,11 @@ bool __cdecl OnPlayerSpawn(int a1)
 		infectionHandler->preSpawnPlayer->setPlayerIndex(PlayerIndex);
 		infectionHandler->preSpawnPlayer->execute();
 	}
-	
+
+	if (b_GunGame) {
+		gunGame->preSpawnPlayer->setPlayerIndex(PlayerIndex);
+		gunGame->preSpawnPlayer->execute();
+	}
 	bool ret = pspawn_player(a1);	
 
 	if (b_Infection) {
@@ -858,8 +869,10 @@ bool __cdecl OnPlayerSpawn(int a1)
 		infectionHandler->spawnPlayer->execute();
 	}
 
-	if (b_GunGame)
-		gg->SpawnPlayer(PlayerIndex);
+	if (b_GunGame) {
+		gunGame->spawnPlayer->setPlayerIndex(PlayerIndex);
+		gunGame->spawnPlayer->execute();
+	}
 
 	return ret;
 }
