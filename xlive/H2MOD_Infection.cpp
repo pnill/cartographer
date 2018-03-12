@@ -15,6 +15,7 @@ BOOL firstSpawn;
 
 class ZombiePreSpawnPlayerIterator : public PlayerIterator {
 	virtual void onIteratePlayer(Player* player) override {
+		TRACE_GAME("[h2mod-infection] Zombie pre spawn, iterating player %s, index=%d, isZombie=%d", player->getPlayerName().c_str(), player->getPlayerIndex(), player->getIsZombie());
 		if (player->getIsZombie()) {
 			h2mod->set_unit_biped(BipedType::Elite, player->getPlayerIndex());
 		} else {
@@ -187,11 +188,14 @@ void Infection::spawnPlayerClientSetup(int index) {
 }
 
 void Infection::spawnServerPlayerSetup(int index) {
+	TRACE_GAME("[h2mod-infection] Spawn player server index=%", index);
 	int unit_datum_index = h2mod->get_unit_datum_from_player_index(index);
 	int unit_object = call_get_object(unit_datum_index, 3);
 
 	if (unit_object) {
 		//if the unit_object is not 0, the spawned object is "alive"
+
+		TRACE_GAME("[h2mod-infection] Spawn player server index=%, unit team index=%d", index, h2mod->get_unit_team_index(unit_datum_index));
 		if (h2mod->get_unit_team_index(unit_datum_index) == HUMAN_TEAM)	{
 			Infection::setPlayerAsHuman(index);
 		}
@@ -212,6 +216,7 @@ void Infection::infectPlayer(int unitDatumIndex, int playerIndex) {
 		if (wcscmp(playername, h2mod->get_local_player_name()) == 0) {
 			TRACE_GAME("[h2mod-infection] Infected player, setting player as zombie");
 			h2mod->set_local_team_index(ZOMBIE_TEAM);
+			h2mod->set_unit_biped(BipedType::Elite, playerIndex);
 		}
 		else {
 			//if not, then this is a new zombie
@@ -253,6 +258,7 @@ void ZombieDeathHandler::onClient()
 
 void ZombiePreSpawnHandler::onPeerHost()
 {
+	this->onClient();
 	Infection::preSpawnServerSetup();
 }
 
@@ -268,6 +274,7 @@ void ZombiePreSpawnHandler::onClient()
 	//If player being spawned is LocalUser/Player
 	if (wcscmp(playername, h2mod->get_local_player_name()) == 0)
 	{
+		TRACE_GAME("[h2mod-infection] Client pre spawn, found local player, current team = %d", h2mod->get_local_team_index());
 		//Change biped if LocalUser is in GreenTeam
 		if (h2mod->get_local_team_index() == ZOMBIE_TEAM)
 		{

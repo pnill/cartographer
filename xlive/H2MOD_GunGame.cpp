@@ -211,6 +211,7 @@ void GunGame::levelUpServer(int PlayerIndex)
 	if (level == 16) {
 		TRACE_GAME("[H2Mod-GunGame]: %ws Level 16 - Plasma Grenades!", PlayerName);
 		sendGrenadePacket(GrenadeType::Plasma, 99, PlayerIndex, 1);
+		//TODO: end game
 	}
 
 	if (level < 15)	{
