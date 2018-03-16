@@ -386,6 +386,12 @@
     <ClInclude Include="Blam\Enums\Objects\Unit.h">
       <Filter>Source Files\Blam\Enums\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h">
+      <Filter>Source Files\Blam\Enums\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Game\HaloScript.h">
+      <Filter>Source Files\Blam\Engine\Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def">

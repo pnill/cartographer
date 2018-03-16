@@ -287,6 +287,7 @@
     <ClInclude Include="Blam\Engine\Extras\Skulls.h" />
     <ClInclude Include="Blam\Engine\Game\GameManager.h" />
     <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
+    <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
     <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
     <ClInclude Include="Blam\Engine\Objects\Objects.h" />
     <ClInclude Include="Blam\Engine\Objects\ObjectsHeader.h" />
@@ -294,6 +295,7 @@
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="Blam\Enums\Enums.h" />
     <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h" />
+    <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h" />
     <ClInclude Include="Blam\Enums\Objects\Objects.h" />
     <ClInclude Include="Blam\Enums\Objects\Unit.h" />
     <ClInclude Include="Blam\Enums\Players\Players.h" />
