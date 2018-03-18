@@ -1910,6 +1910,141 @@ void GSCustomMenuCall_Update_Note() {
 #pragma endregion
 
 
+const int CMLabelMenuId_Login_Warn = 0xFF000013;
+#pragma region CM_Login_Warn
+
+void __stdcall CMLabelButtons_Login_Warn(int a1, int a2)
+{
+	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+
+	__int16 button_id = *(WORD*)(a1 + 112);
+	int v3 = sub_211909(a1, 6, 0, 0);
+	if (v3)
+	{
+		sub_21bf85_CMLTD(v3, button_id + 1, CMLabelMenuId_Login_Warn);
+	}
+}
+
+__declspec(naked) void sub_2111ab_CMLTD_nak_Login_Warn() {//__thiscall
+	__asm {
+		mov eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0xFFFFFFF1//label_id_description
+		push 0xFFFFFFF0//label_id_title
+		push CMLabelMenuId_Login_Warn
+		push eax
+		push ecx
+		call sub_2111ab_CMLTD//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+static bool CMButtonHandler_Login_Warn(int button_id) {
+	return true;
+}
+
+__declspec(naked) void sub_20F790_CM_nak_Login_Warn() {//__thiscall
+	__asm {
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0//selected button id
+		push ecx
+		call sub_20F790_CM//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn
+	}
+}
+
+
+void* __stdcall sub_248beb_deconstructor_Login_Warn(LPVOID lpMem, char a2)//__thiscall
+{
+	//show select profile gui
+	int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
+	sub_209236(0);
+
+	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
+	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
+
+	sub_248b90((void*)lpMem);
+	if (a2 & 1) {
+		sub_287c23((void*)lpMem);
+	}
+	return (void*)lpMem;
+}
+
+__declspec(naked) void sub_248beb_nak_deconstructor_Login_Warn() {//__thiscall
+	__asm {
+		mov  eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push eax
+		push ecx
+		call sub_248beb_deconstructor_Login_Warn//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+int CustomMenu_Login_Warn(int);
+
+int(__cdecl *CustomMenuFuncPtrHelp_Login_Warn())(int) {
+	return CustomMenu_Login_Warn;
+}
+
+DWORD* menu_vftable_1_Login_Warn = 0;
+DWORD* menu_vftable_2_Login_Warn = 0;
+
+void CMSetupVFTables_Login_Warn() {
+	CMSetupVFTables(&menu_vftable_1_Login_Warn, &menu_vftable_2_Login_Warn, (DWORD)CMLabelButtons_Login_Warn, (DWORD)sub_2111ab_CMLTD_nak_Login_Warn, (DWORD)CustomMenuFuncPtrHelp_Login_Warn, (DWORD)sub_20F790_CM_nak_Login_Warn, true, (DWORD)sub_248beb_nak_deconstructor_Login_Warn);
+}
+
+int CustomMenu_Login_Warn(int a1) {
+	return CustomMenu_CallHead(a1, menu_vftable_1_Login_Warn, menu_vftable_2_Login_Warn, (DWORD)&CMButtonHandler_Login_Warn, 0, 272);
+}
+
+void GSCustomMenuCall_Login_Warn() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_Login_Warn);
+	CallWgit(WgitScreenfunctionPtr);
+}
+
+#pragma endregion
+
+
 
 #pragma region Setting_Modifications
 
@@ -2805,6 +2940,8 @@ static DWORD WINAPI ThreadCreate(LPVOID lParam)
 		memset(pass, 0, strlen(pass));
 	}
 
+	updateAccountingActiveHandle(false);
+
 	hThreadCreate = 0;
 	return 0;
 }
@@ -2825,6 +2962,7 @@ static bool CMButtonHandler_AccountCreate(int button_id) {
 	else if (button_id == 3) {
 		if (!hThreadCreate) {
 			accountingGoBackToList = false;
+			updateAccountingActiveHandle(true);
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02C, 0xFFFFF02D);
 			hThreadCreate = CreateThread(NULL, 0, ThreadCreate, (LPVOID)0, 0, NULL);
 		}
@@ -2983,6 +3121,39 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountEdit() {//__thiscall
 	}
 }
 
+static HANDLE hThreadLogin = 0;
+
+static DWORD WINAPI ThreadLogin(LPVOID lParam)
+{
+	int button_id = (int)lParam;
+
+	//gotta delay it a little to make sure the menu's decide to render correctly.
+	Sleep(200L);
+
+	if (button_id == -1) {
+		char* identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
+		char* identifier_pass = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
+		//login to account
+		if (HandleGuiLogin(0, identifier, identifier_pass)) {
+			GSCustomMenuCall_Login_Warn();
+			H2AccountLastUsed = 0;
+		}
+		memset(identifier_pass, 0, strlen(identifier_pass));
+	}
+	else {
+		//login to account
+		if (HandleGuiLogin(H2AccountBufferLoginToken[button_id], 0, 0)) {
+			GSCustomMenuCall_Login_Warn();
+			H2AccountLastUsed = button_id;
+		}
+	}
+
+	updateAccountingActiveHandle(false);
+
+	hThreadLogin = 0;
+	return 0;
+}
+
 static bool CMButtonHandler_AccountEdit(int button_id) {
 	if (button_id == 0) {
 		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
@@ -2997,18 +3168,12 @@ static bool CMButtonHandler_AccountEdit(int button_id) {
 		add_cartographer_label(CMLabelMenuId_AccountEdit, 3, H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 0xFFFFFFF2 + (AccountEdit_remember ? 1 : 0)), true);
 	}
 	else if (button_id == 3) {
-		char* identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
-		char* identifier_pass = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
-		accountingGoBackToList = false;
-		//login to account
-		if (HandleGuiLogin(0, identifier, identifier_pass)) {
-			//show select profile gui
-			int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
-			sub_209236(0);
-			//SaveH2Accounts();
-			H2AccountLastUsed = 0;
+		if (!hThreadLogin) {
+			accountingGoBackToList = false;
+			updateAccountingActiveHandle(true);
+			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02E, 0xFFFFF02F);
+			hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)-1, 0, NULL);
 		}
-		memset(identifier_pass, 0, strlen(identifier_pass));
 	}
 	return false;
 }
@@ -3204,13 +3369,11 @@ static bool CMButtonHandler_AccountList(int button_id) {
 			return true;
 		}
 		else {
-			//login to account
-			if (HandleGuiLogin(H2AccountBufferLoginToken[button_id], 0, 0)) {
-				//show select profile gui
-				int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
-				sub_209236(0);
-				H2AccountLastUsed = button_id;
-				//SaveH2Accounts();
+			if (!hThreadLogin) {
+				accountingGoBackToList = false;
+				updateAccountingActiveHandle(true);
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02E, 0xFFFFF02F);
+				hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)button_id, 0, NULL);
 			}
 		}
 	}
@@ -3221,7 +3384,6 @@ static bool CMButtonHandler_AccountList(int button_id) {
 				//show select profile gui
 				int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
 				sub_209236(0);
-				//SaveH2Accounts();
 				H2Config_master_ip = inet_addr("127.0.0.1");
 				H2Config_master_port_relay = 2001;
 				extern int MasterState;
@@ -3769,7 +3931,7 @@ int __cdecl sub_209236(int a1) {
 		sub_209236(0);
 	}
 	else {
-		if (ReadH2Accounts()) {
+		if (!isAccountingActiveHandle() && ReadH2Accounts()) {
 			GSCustomMenuCall_AccountList();
 		}
 		else {
@@ -3777,41 +3939,6 @@ int __cdecl sub_209236(int a1) {
 		}
 	}
 	return 0;
-}
-
-typedef void(__cdecl *tsub_20CE70)(int);
-tsub_20CE70 psub_20CE70;
-void __cdecl sub_20CE70(int option)
-{
-	//char NotificationPlayerText[40];
-	//sprintf(NotificationPlayerText, "sub_20CE70: %d", option);
-	//addDebugText(NotificationPlayerText);
-	if (option == 2 || option == 8)//doesn't work well
-	{
-		extern CUserManagement User;
-		if (User.LocalUserLoggedIn()) {
-			User.UnregisterLocal();
-		}
-	}
-	return psub_20CE70(option);
-}
-
-typedef int(__stdcall *tsub_20d68e)(void*, int, WORD*);
-tsub_20d68e psub_20d68e;
-int __stdcall sub_20d68e(void* thisptr, int a2, WORD* btnId)
-{
-	if (*btnId == 0) {
-		DWORD GameGlobals = *(DWORD*)((BYTE*)H2BaseAddr + (H2IsDediServer ? 0x4CB520 : 0x482D3C));
-		DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
-		if (GameEngine == 3)
-		{
-			extern CUserManagement User;
-			if (User.LocalUserLoggedIn()) {
-				User.UnregisterLocal();
-			}
-		}
-	}
-	return psub_20d68e(thisptr, a2, btnId);
 }
 
 typedef int(__cdecl *tsub_23f6b7)(int);
@@ -3990,6 +4117,10 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF02B, "The setting you have just changed requires that you restart your game for it to take effect.");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF02C, "Creating Account...");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF02D, "Processing your new account...\r\nPlease wait.");
+	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF02E, "Logging in...");
+	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF02F, "Please wait while you are being logged in.");
+	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF030, "Connection Failed!");
+	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF031, "Please check your connection to:\r\nhttps://cartographer.online/\r\nthen try again.");
 
 
 	add_cartographer_label(CMLabelMenuId_Language, 0xFFFFFFF0, "Select Language");
@@ -4062,6 +4193,10 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Update_Note, 0xFFFFFFF1, "You are using an outdated version of Project Cartographer! Would you like to go install the latest version?");
 	add_cartographer_label(CMLabelMenuId_Update_Note, 1, "Yes");
 	add_cartographer_label(CMLabelMenuId_Update_Note, 2, "No");
+
+
+	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF0, "NO CHEATING!");
+	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF1, "DO NOT CHEAT/HACK ONLINE.\r\nWe have a complex system made to keep you banned if you do. Don't risk it. We will catch you otherwise!");
 
 
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF0, "Customise HUD / GUI");
@@ -4167,8 +4302,8 @@ void initGSCustomMenu() {
 
 	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFFFF0, "Add Account");
 	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFFFF1, "Enter your account's Username\r\n[or Email] and Password to Login.");
-	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFFFF2, "Remember me");
-	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFFFF3, "Don't remember me");
+	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFFFF2, "-Remember me");
+	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFFFF3, "-Don't remember me");
 	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFFFF4, "[Username]");
 	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFFFF5, "[Password]");
 	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFF002, "Enter Account Username or Email Address");
@@ -4214,12 +4349,6 @@ void initGSCustomMenu() {
 	pbtnHandler = (tbtnhandler)DetourClassFunc((BYTE*)H2BaseAddr + 0x213af2, (BYTE*)BtnHandlerCaller, 8);
 	VirtualProtect(pbtnHandler, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	//psub_20CE70 = (tsub_20CE70)DetourFunc((BYTE*)H2BaseAddr + 0x20CE70, (BYTE*)sub_20CE70, 6);
-	//VirtualProtect(psub_20CE70, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-	//psub_20d68e = (tsub_20d68e)DetourClassFunc((BYTE*)H2BaseAddr + 0x20d68e, (BYTE*)sub_20d68e, 10);
-	//VirtualProtect(psub_20d68e, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
 	psub_23f6b7 = (tsub_23f6b7)DetourFunc((BYTE*)H2BaseAddr + 0x23f6b7, (BYTE*)sub_23f6b7, 7);
 	VirtualProtect(psub_23f6b7, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
@@ -4255,6 +4384,8 @@ void initGSCustomMenu() {
 	CMSetupVFTables_Update();
 
 	CMSetupVFTables_Update_Note();
+
+	CMSetupVFTables_Login_Warn();
 
 	CMSetupVFTables_EditHudGui();
 

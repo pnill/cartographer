@@ -23,14 +23,17 @@ const int ERROR_CODE_MACHINE_BANNED = -10;
 const int ERROR_CODE_ACCOUNT_BANNED = -11;
 const int ERROR_CODE_ACCOUNT_DISABLED = -12;
 const int ERROR_CODE_MACHINE_SERIAL_INSUFFICIENT = -13;
+const int SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT = 7;
 
 #include "CUser.h"
 
-bool ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long saddr, unsigned long xnaddr, char* abEnet, char* abOnline) {
+char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long saddr, unsigned long xnaddr, char* abEnet, char* abOnline) {
 
-	if (strlen(username) <= 0 || strlen(login_token) != 32 || xuid == 0 || saddr == 0 || strlen(abEnet) != 12 || strlen(abOnline) != 40) {
-		return false;
+	if (strlen(username) <= 0 || xuid == 0 || saddr == 0 || strlen(abEnet) != 12 || strlen(abOnline) != 40) {
+		return 0;
 	}
+
+	char result = strlen(login_token) == 32 ? 1 : 2;
 
 	extern bool StatusCheater;
 	StatusCheater = false;
@@ -57,9 +60,13 @@ bool ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	if (H2CurrentAccountLoginToken) {
 		free(H2CurrentAccountLoginToken);
 	}
-	H2CurrentAccountLoginToken = (char*)malloc(sizeof(char) * 33);
-	snprintf(H2CurrentAccountLoginToken, 33, login_token);
-
+	if (result == 1) {
+		H2CurrentAccountLoginToken = (char*)malloc(sizeof(char) * 33);
+		snprintf(H2CurrentAccountLoginToken, 33, login_token);
+	}
+	else {
+		H2CurrentAccountLoginToken = 0;
+	}
 
 	//FIXME - remove the handle again after they sign out. display an error - yes no window when it's taken when you click on it.
 	/*
@@ -85,7 +92,7 @@ bool ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	}
 	*/
 
-	return true;
+	return result;
 }
 
 static int InterpretMasterLogin(char* response_content, char* prev_login_token) {
@@ -186,17 +193,17 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			}
 			unsigned long resolvedAddr;
 			if ((resolvedAddr = inet_addr(tempstr1)) != INADDR_NONE || strcmp(tempstr1, "255.255.255.255") == 0) {
-				char NotificationPlayerText[60];
-				snprintf(NotificationPlayerText, 60, "H2Master Relay IP is: %s", tempstr1);
-				addDebugText(NotificationPlayerText);
+				//char NotificationPlayerText[60];
+				//snprintf(NotificationPlayerText, 60, "H2Master Relay IP is: %s", tempstr1);
+				//addDebugText(NotificationPlayerText);
 				H2Config_master_ip = resolvedAddr;
 			}
 		}
 		else if (sscanf(fileLine, "login_master_relay_port=%d", &tempint1) == 1) {
 			if (tempint1 >= 0) {
-				char NotificationPlayerText[60];
-				snprintf(NotificationPlayerText, 60, "H2Master Relay Port is: %d", tempint1);
-				addDebugText(NotificationPlayerText);
+				//char NotificationPlayerText[60];
+				//snprintf(NotificationPlayerText, 60, "H2Master Relay Port is: %d", tempint1);
+				//addDebugText(NotificationPlayerText);
 				H2Config_master_port_relay = tempint1;
 			}
 		}
@@ -307,25 +314,29 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 
 
 	if (result > 0) {
-		if (ConfigureUserDetails(username, login_token, xuid, saddr, xnaddr, abEnet, abOnline)) {
-			if (prev_login_token) {
-				if (H2AccountBufferLoginToken && H2AccountCount > 0) {
-					for (int i = 0; i < H2AccountCount; i++) {
-						if (H2AccountBufferLoginToken[i] && strcmp(H2AccountBufferLoginToken[i], prev_login_token) == 0) {
-							if (H2AccountBufferUsername[i]) {
-								free(H2AccountBufferUsername[i]);
+		int result_details;
+		if (result_details = ConfigureUserDetails(username, login_token, xuid, saddr, xnaddr, abEnet, abOnline)) {
+			//allow no login_token from backend in DB emergencies / random logins.
+			if (result_details == 1) {
+				if (prev_login_token) {
+					if (H2AccountBufferLoginToken && H2AccountCount > 0) {
+						for (int i = 0; i < H2AccountCount; i++) {
+							if (H2AccountBufferLoginToken[i] && strcmp(H2AccountBufferLoginToken[i], prev_login_token) == 0) {
+								if (H2AccountBufferUsername[i]) {
+									free(H2AccountBufferUsername[i]);
+								}
+								H2AccountBufferUsername[i] = (char*)malloc(sizeof(char) * 17);
+								snprintf(H2AccountBufferUsername[i], 17, username);
+								snprintf(H2AccountBufferLoginToken[i], 33, login_token);
+								break;
 							}
-							H2AccountBufferUsername[i] = (char*)malloc(sizeof(char) * 17);
-							snprintf(H2AccountBufferUsername[i], 17, username);
-							snprintf(H2AccountBufferLoginToken[i], 33, login_token);
-							break;
 						}
 					}
 				}
-			}
-			else {
-				if (AccountEdit_remember) {
-					H2AccountBufferAdd(login_token, username);
+				else {
+					if (AccountEdit_remember) {
+						H2AccountBufferAdd(login_token, username);
+					}
 				}
 			}
 			if (!H2IsDediServer) {
@@ -333,8 +344,16 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				if (result == 4) {
 					snprintf(ServerStatus, 250, "Status: Developer");
 				}
-				else if (result == 3) {
+				else if (result == 3 || result == 7) {
 					snprintf(ServerStatus, 250, "Status: CHEATER");
+					if (result == 3) {
+						time_t ltime;
+						time(&ltime);//seconds since epoch.
+						unsigned long time = (unsigned long)ltime;
+						extern unsigned long time_end;
+						if (time_end == 0)
+							time_end = time + (60 * 30);
+					}
 					extern bool StatusCheater;
 					StatusCheater = true;
 				}
@@ -349,24 +368,57 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 }
 
 
-bool HandleGuiLogin(char* token, char* identifier, char* password) {
+bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
 	int result = false;
 	char* rtn_result = 0;
 
-	char http_request_body[] = "request_type=%d&request_version=%s&machine_serial=%s&user_identifier=%s&password=%s&login_token=%s";
-	char http_request_body_build[400];
+	char* os_string = 0;
+	int os_string_buflen = 0;
+	static const char* (__cdecl* pwine_get_version)(void);
+	HMODULE hntdll = GetModuleHandle(L"ntdll.dll");
+	if (hntdll && (pwine_get_version = (const char* (__cdecl*)(void))GetProcAddress(hntdll, "wine_get_version"))) {
+		os_string_buflen = strlen(pwine_get_version()) + 10;
+		os_string = (char*)malloc(sizeof(char) * os_string_buflen);
+		snprintf(os_string, os_string_buflen, "Wine: %s", pwine_get_version());
+	}
+	else {
+		OSVERSIONINFO osvi;
+		ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+		GetVersionEx(&osvi);
 
-	char* escaped_user_login_token = escape_rfc3986(token == 0 ? "" : token);
-	char* escaped_user_identifier = escape_rfc3986(identifier == 0 ? "" : identifier);
-	char* escaped_user_password = escape_rfc3986(password == 0 ? "" : password);
-	sprintf_s(http_request_body_build, http_request_body, token == 0 ? 1 : 2, DLL_VERSION_STR, "00000000000000000000000000000000", escaped_user_identifier, escaped_user_password, escaped_user_login_token);
+		os_string_buflen = 30;
+		os_string = (char*)malloc(sizeof(char) * os_string_buflen);
+		snprintf(os_string, os_string_buflen, "Windows: %u.%u", osvi.dwMajorVersion, osvi.dwMinorVersion);
+	}
+	addDebugText(os_string);
+
+	char http_request_body[] = "request_type=%08x&request_version=%s&user_identifier=%s&user_pass=%s&user_token=%s&op_sys=%s";
+
+	char* escaped_user_login_token = encode_rfc3986(ltoken == 0 ? "" : ltoken);
+	char* escaped_user_identifier = encode_rfc3986(identifier == 0 ? "" : identifier);
+	char* escaped_user_password = encode_rfc3986(password == 0 ? "" : password);
+	
+	int http_request_body_build_len = (89 + 8 + strlen(DLL_VERSION_STR) + strlen(escaped_user_identifier) + strlen(escaped_user_password) + strlen(escaped_user_login_token) + strlen(os_string));
+	char* http_request_body_build = (char*)malloc(sizeof(char) * http_request_body_build_len + 1);
+
+	char* http_request_body_build2 = http_request_body_build + snprintf(http_request_body_build, http_request_body_build_len, http_request_body, ltoken == 0 ? 1 : 2, DLL_VERSION_STR, escaped_user_identifier, escaped_user_password, escaped_user_login_token, os_string);
+
+	free(os_string);
+
 	free(escaped_user_login_token);
 	free(escaped_user_identifier);
 	free(escaped_user_password);
 
-	int rtn_code = MasterHttpResponse("https://cartographer.online/h2pc-api/login1.php", http_request_body_build, rtn_result);
+	int rtn_code = MasterHttpResponse("https://cartographer.online/login2", http_request_body_build, rtn_result);
+
+	for (int i = strlen(http_request_body_build) - 1; i >= 0; i--) {
+		http_request_body_build[i] = 0;
+	}
+	free(http_request_body_build);
+
 	if (rtn_code == 0) {
-		rtn_code = InterpretMasterLogin(rtn_result, token);
+		rtn_code = InterpretMasterLogin(rtn_result, ltoken);
 		if (rtn_code > 0) {
 			result = true;
 		}
@@ -376,10 +428,13 @@ bool HandleGuiLogin(char* token, char* identifier, char* password) {
 		char NotificationPlayerText[40];
 		sprintf(NotificationPlayerText, "ERROR Account Login: %d", rtn_code);
 		addDebugText(NotificationPlayerText);
-		if (rtn_code == 0 || rtn_code == ERROR_CODE_CURL_SOCKET_FAILED || rtn_code == ERROR_CODE_CURL_HANDLE || rtn_code == ERROR_CODE_CURL_EASY_PERF || rtn_code == ERROR_CODE_ACCOUNT_DATA
+		if (rtn_code == 0 || rtn_code == ERROR_CODE_CURL_SOCKET_FAILED || rtn_code == ERROR_CODE_CURL_HANDLE || rtn_code == ERROR_CODE_ACCOUNT_DATA
 			|| rtn_code == ERROR_CODE_INVALID_PARAM) {
 			//internal error
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF014, 0xFFFFF015);
+		}
+		else if (rtn_code == ERROR_CODE_CURL_EASY_PERF) {
+			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF030, 0xFFFFF031);
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_VERSION) {
 			GSCustomMenuCall_Update_Note();
@@ -388,7 +443,7 @@ bool HandleGuiLogin(char* token, char* identifier, char* password) {
 
 			char* username = 0;
 			for (int i = 0; i < H2AccountCount; i++) {
-				if (H2AccountBufferLoginToken[i] && strcmp(H2AccountBufferLoginToken[i], token) == 0) {
+				if (H2AccountBufferLoginToken[i] && strcmp(H2AccountBufferLoginToken[i], ltoken) == 0) {
 					username = H2AccountBufferUsername[i];
 					break;
 				}
@@ -428,6 +483,10 @@ bool HandleGuiLogin(char* token, char* identifier, char* password) {
 		if (!H2IsDediServer) {
 			char* login_identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
 			memset(login_identifier, 0, strlen(login_identifier));
+		}
+		if (rtn_code == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) {
+			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF018, 0xFFFFF019);
+			result = false;
 		}
 	}
 	return result;

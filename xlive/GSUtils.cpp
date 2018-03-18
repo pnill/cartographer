@@ -333,6 +333,72 @@ int ComputeFileMd5Hash(wchar_t* filepath, char* rtnMd5) {
 	return dwStatus;
 }
 
+int ComputeMd5Hash(const BYTE* buffer, int buflen, char* rtnMd5) {
+	for (int i = 0; i < 33; i++) {
+		rtnMd5[i] = 0;
+	}
+
+	const int MD5LEN = 16;
+	DWORD dwStatus = 0;
+	HCRYPTPROV hProv = 0;
+	HCRYPTHASH hHash = 0;
+	BYTE rgbHash[MD5LEN];
+	DWORD cbHash = 0;
+	CHAR rgbDigits[] = "0123456789abcdef";
+	//LPCWSTR filename = L"xinput9_1_0.dll";
+	// Logic to check usage goes here.
+
+
+	// Get handle to the crypto provider
+	if (!CryptAcquireContext(&hProv,
+		NULL,
+		NULL,
+		PROV_RSA_FULL,
+		CRYPT_VERIFYCONTEXT))
+	{
+		dwStatus = GetLastError();
+		strcpy(rtnMd5, "CryptAcquireContext");
+		return dwStatus;
+	}
+
+	if (!CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash))
+	{
+		dwStatus = GetLastError();
+		strcpy(rtnMd5, "CryptAcquireContext");
+		CryptReleaseContext(hProv, 0);
+		return dwStatus;
+	}
+
+	if (!CryptHashData(hHash, buffer, buflen, 0))
+	{
+		dwStatus = GetLastError();
+		strcpy(rtnMd5, "CryptHashData");
+		CryptReleaseContext(hProv, 0);
+		CryptDestroyHash(hHash);
+		return dwStatus;
+	}
+
+	cbHash = MD5LEN;
+	if (CryptGetHashParam(hHash, HP_HASHVAL, rgbHash, &cbHash, 0))
+	{
+		for (DWORD i = 0; i < cbHash; i++)
+		{
+			rtnMd5[i * 2] = rgbDigits[rgbHash[i] >> 4];
+			rtnMd5[(i * 2) + 1] = rgbDigits[rgbHash[i] & 0xf];
+		}
+	}
+	else
+	{
+		dwStatus = GetLastError();
+		strcpy(rtnMd5, "CryptGetHashParam");
+	}
+
+	CryptDestroyHash(hHash);
+	CryptReleaseContext(hProv, 0);
+
+	return dwStatus;
+}
+
 int GetWidePathFromFullWideFilename(wchar_t* filepath, wchar_t* rtnpath) {
 	wchar_t* offset = wcsrchr(filepath, L'\\');
 	wchar_t* off2 = wcsrchr(filepath, L'/');
@@ -546,18 +612,17 @@ static bool rfc3986_allow(char i) {
 	return false;
 }
 
-char* escape_rfc3986(char* label_literal) {
-	int label_literal_length = strlen(label_literal);
+char* encode_rfc3986(char* label_literal, int label_literal_length) {
+	if (label_literal_length < 0)
+		label_literal_length = strlen(label_literal);
 	int escaped_buflen = (label_literal_length * 3) + 1;
 	char* label_escaped = (char*)malloc(escaped_buflen * sizeof(char));
 	int escaped_buff_i = 0;
 
 	for (int i = 0; i < label_literal_length; i++) {
-		if (label_literal[i] < 0 || label_literal[i] > 0xFF) {//fuckin negative assholes.
-
-		}
-		else if (!rfc3986_allow(label_literal[i])) {
-			sprintf_s(label_escaped + escaped_buff_i, 4, "%%%02X", label_literal[i]);
+		unsigned char uletter = label_literal[i];
+		if (!rfc3986_allow(uletter)) {
+			sprintf_s(label_escaped + escaped_buff_i, 4, "%%%02X", uletter);
 			escaped_buff_i += 2;
 		}
 		else {
@@ -627,7 +692,7 @@ int MasterHttpResponse(char* url, char* http_request, char* &rtn_response) {
 	CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
 	if (global_init != CURLE_OK) {
 		char NotificationPlayerText[100];
-		snprintf(NotificationPlayerText, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s\n", curl_easy_strerror(global_init));
+		snprintf(NotificationPlayerText, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
 		addDebugText(NotificationPlayerText);
 	}
 
@@ -658,7 +723,7 @@ int MasterHttpResponse(char* url, char* http_request, char* &rtn_response) {
 		if (res != CURLE_OK) {
 			result = ERROR_CODE_CURL_EASY_PERF;//curl_easy_perform() issue
 			char NotificationPlayerText[500];
-			snprintf(NotificationPlayerText, 500, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+			snprintf(NotificationPlayerText, 500, "curl_easy_perform() failed: %s", curl_easy_strerror(res));
 			addDebugText(NotificationPlayerText);
 			free(s.ptr);
 		}
@@ -684,7 +749,7 @@ bool StrnCaseInsensEqu(char* str1, char* str2, unsigned int chk_len) {
 		chk_len = chk_len2;
 	}
 	chk_len2 = strlen(str2);
-	if (chk_len2 < chk_len) {
+	if (chk_len2 != chk_len) {
 		return false;
 	}
 	const int case_diff = 'A' - 'a';
@@ -728,3 +793,22 @@ void EnsureDirectoryExists(wchar_t* path) {
 
 	free(path2);
 }
+
+int TrimRemoveConsecutiveSpaces(char* text) {
+	int text_len = strlen(text);
+	int text_pos = 0;
+	for (int j = 0; j < text_len; j++) {
+		if (text_pos == 0) {
+			if (text[j] != ' ')
+				text[text_pos++] = text[j];
+			continue;
+		}
+		if (!(text[j] == ' ' && text[text_pos - 1] == ' '))
+			text[text_pos++] = text[j];
+	}
+	text[text_pos] = 0;
+	if (text[text_pos - 1] == ' ')
+		text[--text_pos] = 0;
+	return text_pos;//new length
+}
+

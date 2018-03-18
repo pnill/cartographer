@@ -80,15 +80,15 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password) {
 	char http_request_body[] = "username=%s&email=%s&password=%s";
 	char http_request_body_build[400];
 
-	char* escaped_user_username = escape_rfc3986(username);
-	char* escaped_user_email = escape_rfc3986(email);
-	char* escaped_user_password = escape_rfc3986(password);
+	char* escaped_user_username = encode_rfc3986(username);
+	char* escaped_user_email = encode_rfc3986(email);
+	char* escaped_user_password = encode_rfc3986(password);
 	sprintf_s(http_request_body_build, http_request_body, escaped_user_username, escaped_user_email, escaped_user_password);
 	free(escaped_user_username);
 	free(escaped_user_email);
 	free(escaped_user_password);
 
-	int rtn_code = MasterHttpResponse("https://cartographer.online/h2pc-api/create1.php", http_request_body_build, rtn_result);
+	int rtn_code = MasterHttpResponse("https://cartographer.online/create1", http_request_body_build, rtn_result);
 	if (rtn_code == 0) {
 		rtn_code = InterpretMasterCreate(rtn_result);
 		if (rtn_code > 0) {
