@@ -24,11 +24,13 @@
 #include "H2Tweaks.h"
 
 
+
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
 Infection *inf = new Infection();
 Halo2Final *h2f = new Halo2Final();
 Mouseinput *mouse = new Mouseinput();
+CustomNetwork *network = new CustomNetwork();
 
 bool b_Infection = false;
 bool b_Halo2Final = false;
@@ -47,22 +49,6 @@ SOCKET comm_socket = INVALID_SOCKET;
 char* NetworkData = new char[255];
 
 HMODULE base;
-
-const char* customLobbyMessage = NULL;
-
-/**
-* Sets the custom lobby message
-*/
-void setCustomLobbyMessage(const char* newStatus) {
-	customLobbyMessage = newStatus;
-}
-
-/**
-* Gets pointer to the custom lobby message
-*/
-const char* getCustomLobbyMessage() {
-	return customLobbyMessage;
-}
 
 #pragma region engine calls
 
@@ -191,7 +177,6 @@ show_error_screen show_error_screen_method;
 int __cdecl showErrorScreen(int a1, signed int a2, int a3, __int16 a4, int a5, int a6) {
 	if (a2 == 280) {
 		//280 is special here, the constant is used when a custom map cannot be loaded for clients
-		mapManager->startMapDownload();
 		return 0;
 	}
 	return show_error_screen_method(a1, a2, a3, a4, a5, a6);
@@ -257,43 +242,6 @@ int __cdecl dediCommandHook(int a1, int a2, int a3) {
 	}
 
 	return dedi_command_hook_method(a1, a2, a3);
-}
-
-//0xD1FA7
-typedef void(__thiscall *data_decode_string)(void* thisx, int a2, int a3, int a4);
-data_decode_string getDataDecodeStringMethod() {
-	return (data_decode_string)(h2mod->GetBase() + 0xD1FA7);
-}
-
-//0xD1FFD
-typedef int(__thiscall *data_decode_address)(int thisx, int a1, int a2);
-data_decode_address getDataDecodeAddressMethod() {
-	return (data_decode_address)(h2mod->GetBase() + 0xD1FFD);
-}
-
-//0xD1F95
-typedef int(__thiscall *data_decode_id)(int thisx, int a1, int a2, int a3);
-data_decode_id getDataDecodeId() {
-	return (data_decode_id)(h2mod->GetBase() + 0xD1F95);
-}
-
-//0xD1EE5
-typedef unsigned int(__thiscall *data_decode_integer)(int thisx, int a1, int a2);
-data_decode_integer getDataDecodeIntegerMethod() {
-	return (data_decode_integer)(h2mod->GetBase() + 0xD1EE5);
-}
-
-//0xD1F47
-typedef bool(__thiscall *data_decode_bool)(int thisx, int a2);
-data_decode_bool getDataDecodeBoolMethod() {
-	return (data_decode_bool)(h2mod->GetBase() + 0xD1F47);
-}
-
-//0xD114C
-//this isn't can_join, its some other shit
-typedef bool(__thiscall *can_join)(int thisx);
-can_join getCanJoinMethod() {
-	return (can_join)(h2mod->GetBase() + 0xD114C);
 }
 
 #pragma region PlayerFunctions
@@ -622,6 +570,9 @@ void SoundThread(void)
 
 	while (1)
 	{
+		std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+		h2mod->sound_cv.wait(lck);
+
 		if (h2mod->SoundMap.size() > 0)
 		{
 			auto it = h2mod->SoundMap.begin();
@@ -633,8 +584,8 @@ void SoundThread(void)
 				it = h2mod->SoundMap.erase(it);
 			}
 		}
-
-		Sleep(100);
+		
+		//Sleep(100);
 	}
 
 }
@@ -825,7 +776,7 @@ int __cdecl OnMapLoad(int a1)
 	isLobby = true;
 	int ret = pmap_initialize(a1);
 
-	//OnMapLoad is called with 30888 when the mainmenu is loaded.
+	//OnMapLoad is called with 30888 when a game ends
 	if (a1 == 30888)
 	{
 		if (b_Halo2Final && !h2mod->Server)
@@ -1049,6 +1000,15 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 	}
 
 
+	/*
+		If the network thread doesn't complete it's loop before we reach create thread there's a race condition here, 
+		We'll end up creating an additional thread.
+
+		To account for this we'll check if H2MOD_Network is still valid instead of completely relying on NetworkActive bool.
+	*/
+	if (H2MOD_Network)
+		TerminateThread(H2MOD_Network, 0);
+
 	int Data_of_network_Thread = 1;
 	H2MOD_Network = CreateThread(NULL, 0, NetworkThread, &Data_of_network_Thread, 0, NULL);
 
@@ -1057,23 +1017,8 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 
 int __cdecl connect_establish_write(void* a1, int a2, int a3)
 {
-
 	TRACE("connect_establish_write(a1: %08X,a2 %08X, a3: %08X)", a1, a2, a3);
-
-	if (!isHost)
-	{
-		sockaddr_in SendStruct;
-
-		if (join_game_xn.ina.s_addr != H2Config_ip_wan)
-			SendStruct.sin_addr.s_addr = join_game_xn.ina.s_addr;
-		else
-			SendStruct.sin_addr.s_addr = H2Config_ip_lan;
-
-		SendStruct.sin_port = join_game_xn.wPortOnline;
-		SendStruct.sin_family = AF_INET;
-
-		int securitysend_1000 = sendto(game_sock_1000, (char*)User.SecurityPacket, 8 + sizeof(XNADDR), 0, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
-	}
+	h2mod->securityPacketProcessing();
 
 	return pconnect_establish_write(a1, a2, a3);
 }
@@ -1149,11 +1094,23 @@ void __cdecl print_to_console(char *output)
 	commands->display(prefix + output);
 }
 
-void patchBYTEs(BYTE* orig, BYTE* values, int size) {
-	DWORD dwBack;
-	VirtualProtect(orig, size, PAGE_EXECUTE_READWRITE, &dwBack);
-	memcpy(orig, (BYTE*)values, size);
-	VirtualProtect(orig, size, dwBack, NULL);
+void H2MOD::securityPacketProcessing()
+{
+
+	if (!isHost)
+	{
+		sockaddr_in SendStruct;
+
+		if (join_game_xn.ina.s_addr != H2Config_ip_wan)
+			SendStruct.sin_addr.s_addr = join_game_xn.ina.s_addr;
+		else
+			SendStruct.sin_addr.s_addr = H2Config_ip_lan;
+
+		SendStruct.sin_port = join_game_xn.wPortOnline;
+		SendStruct.sin_family = AF_INET;
+
+		int securitysend_1000 = sendto(game_sock_1000, (char*)User.SecurityPacket, 8 + sizeof(XNADDR), 0, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
+	}
 }
 
 void H2MOD::ApplyHooks() {
@@ -1190,8 +1147,8 @@ void H2MOD::ApplyHooks() {
 		pplayer_death = (player_death)DetourFunc((BYTE*)this->GetBase() + 0x17B674, (BYTE*)OnPlayerDeath, 9);
 		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		pconnect_establish_write = (tconnect_establish_write)DetourFunc((BYTE*)this->GetBase() + 0x1F1A2D, (BYTE*)connect_establish_write, 5);
-		VirtualProtect(pconnect_establish_write, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		//pconnect_establish_write = (tconnect_establish_write)DetourFunc((BYTE*)this->GetBase() + 0x1F1A2D, (BYTE*)connect_establish_write, 5);
+		//VirtualProtect(pconnect_establish_write, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//0x20E15A
 		show_error_screen_method = (show_error_screen)DetourFunc((BYTE*)h2mod->GetBase() + 0x20E15A, (BYTE*)showErrorScreen, 8);
@@ -1255,8 +1212,9 @@ void H2MOD::ApplyHooks() {
 		dedi_command_hook_method = (dedi_command_hook)DetourFunc((BYTE*)this->GetBase() + 0x1CCFC, (BYTE*)dediCommandHook, 7);
 		VirtualProtect(dedi_command_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		std::thread t1(&MapManager::startListeningForClients, mapManager);
-		t1.detach();
+		//TODO: turn on later
+		//std::thread t1(&MapManager::startListeningForClients, mapManager);
+		//t1.detach();
 
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x5DE4A, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
@@ -1272,8 +1230,11 @@ void H2MOD::ApplyHooks() {
 		VirtualProtect(psub_4F17A, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		pplayer_death = (player_death)DetourFunc((BYTE*)this->GetBase() + 0x152ED4, (BYTE*)OnPlayerDeath, 9);
-		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
+		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
+
+	//apply any network hooks
+	network->applyNetworkHooks();
 #pragma endregion
 }
 
@@ -1445,6 +1406,9 @@ DWORD WINAPI NetworkThread(LPVOID lParam)
 									sendto(comm_socket, SendBuf, recvpak.ByteSize(), 0, (SOCKADDR*)&SenderAddr, sizeof(SenderAddr));
 
 									delete[] SendBuf;
+									
+									if (b_GunGame)
+										gg->AddPlayer(nPlayer);
 								}
 							}
 						}
@@ -1629,8 +1593,10 @@ void H2MOD::Initialize()
 		this->Server = FALSE;
 		//HANDLE Handle_Of_Sound_Thread = 0;
 		//int Data_Of_Sound_Thread = 1;
+		
 		std::thread SoundT(SoundThread);
 		SoundT.detach();
+		
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 		setFOV(H2Config_field_of_view);
 		//setSens(CONTROLLER, H2Config_sens_controller);

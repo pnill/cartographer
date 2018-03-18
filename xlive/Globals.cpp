@@ -10,6 +10,7 @@ bool overrideUnicodeMessage = false;
 bool isServer = true;
 
 ConsoleCommands* commands = new ConsoleCommands();
+GameManager* gameManager = new GameManager();
 
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
 	std::stringstream ss(s);

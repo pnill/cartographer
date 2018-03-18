@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugDedicatedServer|Win32">
+      <Configuration>DebugDedicatedServer</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -23,6 +27,13 @@
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
@@ -34,6 +45,10 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
@@ -53,6 +68,15 @@
     <LibraryPath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;.\libs;..\Directx SDK\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)Halo2\</OutDir>
+    <IntDir>.\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;D:\Users\Magic\Documents\Visual Studio 2017\Projects\cartographer\Directx SDK\lib;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Users\Magic\Documents\Visual Studio 2017\Projects\cartographer\Directx SDK\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
     <IntDir>.\Debug\</IntDir>
     <LinkIncremental>true</LinkIncremental>
@@ -158,6 +182,59 @@
       <ImportLibrary>./Debug/xlive.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Debug/xliveless.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Debug/xliveless.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>.\Debug/xliveless.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(SolutionDir)xlive\libcurl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>./Debug/xlive.pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>./Debug/xlive.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <OutputFile>C:\Program Files (x86)\Microsoft Games\Halo 2 Dedicated Server\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -187,11 +264,13 @@
     <ClCompile Include="H2ConsoleCommands.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="h2mod.pb.cc" />
+    <ClCompile Include="H2MOD_GameManager.cpp" />
     <ClCompile Include="H2MOD_GunGame.cpp" />
     <ClCompile Include="H2MOD_H2X.cpp" />
     <ClCompile Include="H2MOD_Halo2Final.cpp" />
     <ClCompile Include="H2MOD_MapManager.cpp" />
     <ClCompile Include="H2MOD_Mouseinput.cpp" />
+    <ClCompile Include="H2MOD_Network.cpp" />
     <ClCompile Include="H2OnscreenDebugLog.cpp" />
     <ClCompile Include="H2Startup.cpp" />
     <ClCompile Include="H2Tweaks.cpp" />
@@ -203,6 +282,34 @@
     <ClCompile Include="xlive_network.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Blam\BlamLibrary.h" />
+    <ClInclude Include="Blam\Engine\EngineDefinitions.h" />
+    <ClInclude Include="Blam\Engine\Extras\Skulls.h" />
+    <ClInclude Include="Blam\Engine\Game\GameManager.h" />
+    <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
+    <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
+    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
+    <ClInclude Include="Blam\Engine\Objects\Objects.h" />
+    <ClInclude Include="Blam\Engine\Objects\ObjectsHeader.h" />
+    <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
+    <ClInclude Include="Blam\Engine\Players\Players.h" />
+    <ClInclude Include="Blam\Enums\Enums.h" />
+    <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h" />
+    <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h" />
+    <ClInclude Include="Blam\Enums\Objects\Objects.h" />
+    <ClInclude Include="Blam\Enums\Objects\Unit.h" />
+    <ClInclude Include="Blam\Enums\Players\Players.h" />
+    <ClInclude Include="Blam\Maths\Angle.h" />
+    <ClInclude Include="Blam\Maths\Maths.h" />
+    <ClInclude Include="Blam\Maths\RealColorRGB.h" />
+    <ClInclude Include="Blam\Maths\RealMovement.h" />
+    <ClInclude Include="Blam\Maths\RealPoint2D.h" />
+    <ClInclude Include="Blam\Maths\RealPoint3D.h" />
+    <ClInclude Include="Blam\Maths\RealVector2D.h" />
+    <ClInclude Include="Blam\Maths\RealVector3D.h" />
+    <ClInclude Include="Blam\Shared\DatumIndex.h" />
+    <ClInclude Include="Blam\Shared\Globals.h" />
+    <ClInclude Include="Blam\Shared\SharedDefinitions.h" />
     <ClInclude Include="cartographer_main.hpp" />
     <ClInclude Include="CUser.h" />
     <ClInclude Include="Detour.h" />
@@ -222,12 +329,14 @@
     <ClInclude Include="H2ConsoleCommands.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="h2mod.pb.h" />
+    <ClInclude Include="H2MOD_GameManager.h" />
     <ClInclude Include="H2MOD_GunGame.h" />
     <ClInclude Include="H2MOD_H2X.h" />
     <ClInclude Include="H2MOD_Halo2Final.h" />
     <ClInclude Include="H2MOD_Infection.h" />
     <ClInclude Include="H2MOD_MapManager.h" />
     <ClInclude Include="H2MOD_Mouseinput.h" />
+    <ClInclude Include="H2MOD_Network.h" />
     <ClInclude Include="H2MOD_Sounds.h" />
     <ClInclude Include="H2OnscreenDebugLog.h" />
     <ClInclude Include="H2Startup.h" />

@@ -25,7 +25,6 @@ extern bool overrideUnicodeMessage;
 extern MapManager* mapManager;
 
 
-
 typedef struct _XLIVE_INITIALIZE_INFO {
 	UINT cbSize;
 	DWORD dwFlags;
@@ -549,7 +548,12 @@ int WINAPI XLiveRender()
 				
 				if (it->second == false)
 				{
+					std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+
 					h2mod->SoundMap[L"sounds/AchievementUnlocked.wav"] = 0;
+
+					h2mod->sound_cv.notify_one();
+
 					it->second = true;
 				}
 				
@@ -610,10 +614,9 @@ int WINAPI XLiveRender()
 			}
 #pragma endregion achievement rendering
 
-			/* TODO: turn on again after converting map downloading to use lib curl
-			if (overrideUnicodeMessage && getCustomLobbyMessage() != NULL) {
-				drawText(0, 30, COLOR_GOLD, getCustomLobbyMessage(), normalSizeFont);
-			}*/
+			if (GameEngine == 3 && mapManager->getCustomLobbyMessage() != NULL) {
+				drawText(0, 30, COLOR_GOLD, mapManager->getCustomLobbyMessage(), normalSizeFont);
+			}
 
 			time_t ltime;
 			time(&ltime);//seconds since epoch.
@@ -654,7 +657,7 @@ int WINAPI XLiveRender()
 				}
 				drawText(ent1->x - 25, ent1->y - 10, COLOR_WHITE, exit_countdown_timer_label, normalSizeFont);
 			}
-
+			
 			if (getDebugTextDisplay()) {
 				for (int i = 0; i < getDebugTextArrayMaxLen(); i++) {
 					const char* text = getDebugText(i);

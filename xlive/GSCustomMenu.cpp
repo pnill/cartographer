@@ -1903,8 +1903,25 @@ int CustomMenu_Update_Note(int a1) {
 }
 
 void GSCustomMenuCall_Update_Note() {
-	int WgitScreenfunctionPtr = (int)(CustomMenu_Update_Note);
-	CallWgit(WgitScreenfunctionPtr);
+	if (!H2IsDediServer) {
+		int WgitScreenfunctionPtr = (int)(CustomMenu_Update_Note);
+		CallWgit(WgitScreenfunctionPtr);
+	}
+	char* lblTitle = H2CustomLanguageGetLabel(CMLabelMenuId_Error, 0xFFFFF004);
+	char* lblDesc = H2CustomLanguageGetLabel(CMLabelMenuId_Error, 0xFFFFF005);
+	if (!lblTitle || !lblDesc) {
+		if (lblTitle)
+			addDebugText(lblTitle);
+		if (lblDesc)
+			addDebugText(lblDesc);
+	}
+	else {
+		int debugTextBuflen = (strlen(lblTitle) + strlen(lblDesc) + 6) * sizeof(char);
+		char* debugText = (char*)malloc(debugTextBuflen);
+		snprintf(debugText, debugTextBuflen, "%s - %s", lblTitle, lblDesc);
+		addDebugText(debugText);
+		free(debugText);
+	}
 }
 
 #pragma endregion

@@ -29,14 +29,13 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 		return false;
 	}
 	double seconds_since_start = difftime(time(0), start);
-	if (wp == H2Config_hotkeyIdConsole) {
+	switch (wp) {
+	case 0xC0: //~
 		if (seconds_since_start > 0.5) {
 			this->console = !this->console;
 			start = time(0);
 		}
 		return true;
-	}
-	switch (wp) {
 	case '\b':   // backspace
 	{
 		if (this->console) {
@@ -166,6 +165,10 @@ bool ConsoleCommands::isNum(const char *s) {
 	return true;
 }
 
+void downloadFromRepoThruConsole(std::string mapFilename) {
+	mapManager->downloadFromRepo(mapFilename);
+}
+
 /*
 * Handles the given string command
 * Returns a bool indicating whether the command is a valid command or not
@@ -232,7 +235,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			if (isNum(cstr)) {
 				delete[] cstr;
 
- 				int maxPlayersSet = stoi(firstArg);
+				int maxPlayersSet = stoi(firstArg);
 				if (maxPlayersSet < 1 || maxPlayersSet > 16) {
 					output(L"The value needs to be between 1 and 16.");
 					return;
@@ -253,7 +256,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		else if (firstCommand == "$resetspawncommandlist") {
 			//reset checked_for_ids, so you can reload new object_datums at runtime
 			this->checked_for_ids = false;
-		}	
+		}
 		else if (firstCommand == "$spawnnear") {
 			if (splitCommands.size() < 3 || splitCommands.size() > 4) {
 				output(L"Invalid command, usage $spawn command_name count");
@@ -303,6 +306,28 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			this->spawn(object_datum, count, x += 0.5f, y += 0.5f, z += 0.5f, randomMultiplier);
 		}
+		else if (firstCommand == "$ishost") {
+			int packetDataObj = (*(int*)(h2mod->GetBase() + 0x420FE8));
+			std::wstring isHostStr = L"isHost=";
+			DWORD isHostByteValue = *(DWORD*)(packetDataObj + 29600);
+			std::wostringstream ws;
+			ws << isHostByteValue;
+			const std::wstring s(ws.str());
+			isHostStr += (gameManager->isHost() ? L"yes" : L"no");
+			isHostStr += L",value=";
+			isHostStr += s;
+			output(isHostStr);
+		}
+		else if (firstCommand == "$downloadmap") {
+			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
+				output(L"Invalid command, usage downloadMap filename");
+				return;
+			}
+			std::string secondArg = splitCommands[1];
+			secondArg += ".map";
+			std::thread t1(downloadFromRepoThruConsole, secondArg);
+			t1.detach();
+		}
 		else if (firstCommand == "$spawn") {
 			if (splitCommands.size() != 6) {
 				output(L"Invalid command, usage $spawn command_name count x y z");
@@ -348,7 +373,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			strcpy(cstr, sensVal.c_str());
 
 			if (isNum(cstr)) {
-				setSens(CONTROLLER, stoi(sensVal));
+				setSens(CONTROLLER, stoi(sensVal)); 
 				H2Config_sens_controller = stoi(sensVal);
 			}
 			else {

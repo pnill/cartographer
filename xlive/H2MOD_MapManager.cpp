@@ -4,6 +4,7 @@
 #include <Mswsock.h>
 #include <WS2tcpip.h>
 #include "H2Config.h"
+#include <curl/curl.h>
 
 #pragma comment (lib, "mswsock.lib")
 
@@ -30,6 +31,7 @@ std::string MAP_WRITTEN_TO_DISK("Wrote downloaded map to disk");
 std::string CONNECTING_TO_HOST("Connecting to host");
 std::string ERROR_CONNECTING_TO_HOST("Socket error connecting to host");
 std::string CHECKING_IF_MAP_EXISTS("Checking if the following map exists, %s");
+std::string MAP_DOESNT_EXIST_IN_REPO("Download failed, map doesn't exist in repo");
 
 std::string startingDownloadString = ("Downloaded 0%");
 std::string validDigits("0123456789");
@@ -80,16 +82,34 @@ void MapManager::TcpServer::stop() {
 * Gets a copy of the english map name as a wstring
 * NOTE - this only works on peers (not dedis)
 */
-std::wstring MapManager::getEnglishMapName() {
-	wchar_t* englishMapName = (wchar_t*)(h2mod->GetBase() + 0x97737C);
+std::wstring MapManager::getMapName() {
+	DWORD currentMapNameOffset;
+	if (h2mod->Server) {
+		//H2Server.exe+5349B4
+		//H2Server.exe+535C64 (another offset to use if the above fails for whatever reason)
+		currentMapNameOffset = 0x5349B4;
+	}
+	else {
+		currentMapNameOffset = 0x97737C;
+	}
+	const wchar_t* currentMapName = (wchar_t*)(h2mod->GetBase() + currentMapNameOffset);
 
 	DWORD dwBack;
 	//set r/w access on string so we don't have any issues when we do the implicit copy below
-	VirtualProtect(englishMapName, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-	std::wstring ucurrentMapName(englishMapName);
-	VirtualProtect(englishMapName, 4, dwBack, NULL);
+	VirtualProtect((LPVOID)currentMapName, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	std::wstring ucurrentMapName(currentMapName);
+	VirtualProtect((LPVOID)currentMapName, 4, dwBack, NULL);
 
 	return ucurrentMapName;
+}
+
+bool MapManager::hasCustomMap(std::string mapName) {
+	if (mapName.empty()) {
+		return true;
+	}
+	std::wstring unicodeMapName(mapName.length(), L' ');
+	std::copy(mapName.begin(), mapName.end(), unicodeMapName.begin());
+	return this->hasCustomMap(unicodeMapName);
 }
 
 /**
@@ -104,26 +124,28 @@ bool MapManager::hasCustomMap(std::wstring mapName) {
 	std::wstring mapFileName(mapsDirectory);
 	VirtualProtect(mapsDirectory, 4, dwBack, NULL);
 
-	mapFileName += mapName + mapExtUnicode;
+	mapFileName += mapName;
 	std::ifstream file(mapFileName.c_str());
-	return (bool)file;
+	return file.good();
 }
 
 /**
 * Actually calls the real map reload function in halo2.exe
 */
 void MapManager::reloadMaps() {
-	typedef char(__thiscall *possible_map_reload)(int thisx);
-	possible_map_reload map_reload_method = (possible_map_reload)(h2mod->GetBase() + 0x4D021);
-	DWORD* mapsObject = (DWORD*)(h2mod->GetBase() + 0x482D70);
-
+	typedef char(__thiscall *map_reload_function_type)(int thisx);
+	map_reload_function_type reloadMaps = (map_reload_function_type)(h2mod->GetBase() + (h2mod->Server ? 0x419B5 : 0x4D021));
+	map_reload_function_type reloadMapsSet = (map_reload_function_type)(h2mod->GetBase() + (h2mod->Server ? 0x41501 : 0x4CC30));
+	DWORD* mapsObject = (DWORD*)(h2mod->GetBase() + (h2mod->Server ? 0x4A70D8 : 0x482D70));
 	DWORD dwBack;
 	BOOL canprotect = VirtualProtect((WORD*)((int)mapsObject + 148016), sizeof(WORD), PAGE_EXECUTE_READWRITE, &dwBack);
 	if (!canprotect && GetLastError()) {
 		if (H2Config_debug_log)
 			TRACE_GAME_N("reloadMaps - canprotect=%d, error=%d", canprotect, GetLastError());
 	}
-	map_reload_method((int)mapsObject);
+	reloadMapsSet((int)mapsObject);
+	reloadMaps((int)mapsObject);
+	reloadMapFilenames();
 }
 
 /**
@@ -147,6 +169,46 @@ const char* MapManager::getCustomLobbyMessage() {
 	return this->customLobbyMessage;
 }
 
+void MapManager::reloadMapFilenames() {
+	//0x30 (difference from start of maps object to first custom map)
+	//0xB90 (difference between each custom map name)
+	//0x960 (difference between custom map name and its file path
+	DWORD offset;
+	//move to first map
+	DWORD currentMapNameOffset;
+	if (h2mod->Server) {
+		offset = 0x4A70D8;
+		//H2Server.exe+5349B4
+		//H2Server.exe+535C64 (another offset to use if the above fails for whatever reason)
+		currentMapNameOffset = 0x5349B4;
+	}
+	else {
+		offset = 0x482D70;
+		currentMapNameOffset = 0x97737C;
+	}
+
+	//TODO: one day increase map limit (somehow)
+	for (int i = 0; i <= 50; i++) {
+		wchar_t* mapName = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + (i * 0xB90)));
+		wchar_t* mapPath = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + ((i * 0xB90) + 0x960)));
+ 		if (mapName == NULL || *mapName == L'\0' || (wcscmp(mapName, L"\\") != NULL && wcscmp(mapName, L"\\") > 0)) {
+			//skip empty map names
+			continue;
+		}
+		std::wstring unicodeMapFilename(mapPath);
+		std::string nonUnicodeCustomMapFilename(unicodeMapFilename.begin(), unicodeMapFilename.end());
+		std::size_t offset = nonUnicodeCustomMapFilename.find_last_of("\\");
+		std::size_t extOffset = nonUnicodeCustomMapFilename.find_last_not_of(mapExt);
+		std::string nonUnicodeMapName = nonUnicodeCustomMapFilename.substr(offset + 1, extOffset);
+		if (!nonUnicodeMapName.empty())
+			this->mapNameToFileName[std::wstring(mapName)] = nonUnicodeMapName;
+	}
+}
+
+std::string MapManager::getCachedMapFilename() {
+	return this->mapNameToFileName[this->getMapName()];
+}
+
 /**
 * Searches for a map to download based on the english map name and the actual filename
 * NOTE - only tries to download from host if we haven't downloaded it before in current game session AND
@@ -154,9 +216,8 @@ const char* MapManager::getCustomLobbyMessage() {
 */
 void MapManager::searchForMap() {
 	threadRunning = true;
-	overrideUnicodeMessage = true;
 
-	std::wstring currentMapName = this->getEnglishMapName();
+	std::wstring currentMapName = this->getMapName();
 
 	if (hasCustomMap(currentMapName)) {
 		//if somehow we have the map and made it here, something is wrong, exit
@@ -176,7 +237,10 @@ void MapManager::searchForMap() {
 
 cleanup:
 	threadRunning = false;
-	overrideUnicodeMessage = false;
+}
+
+void MapManager::setClientMapFilename(std::string filename) {
+	this->clientMapFilename = filename;
 }
 
 /**
@@ -185,6 +249,73 @@ cleanup:
 void MapManager::cleanup() {
 	this->stopListeningForClients();
 	this->resetClient();
+}
+
+size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+	return fwrite(ptr, size, nmemb, stream);
+}
+
+static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
+	if (mapManager->precalculatedDownloadPercentageStrings.empty()) {
+		for (int i = 0; i <= 100; i++) {
+			std::string downloadMsg;
+			downloadMsg = DOWNLOAD_MAP_PERCENTAGE_PREFIX;
+			downloadMsg += std::to_string(i);
+			downloadMsg += DOWNLOAD_MAP_PERCENTAGE_CHAR;
+			mapManager->precalculatedDownloadPercentageStrings[i] = downloadMsg;
+		}
+	}
+	int downloadPercentage = ((double)dlnow / (double)dltotal) * 100;
+	mapManager->setCustomLobbyMessage(mapManager->precalculatedDownloadPercentageStrings[downloadPercentage].c_str());
+	return 0;
+}
+
+bool MapManager::downloadFromRepo(std::string mapFilename) {
+	std::string url("http://www.h2pcmt.com/Cartographer/CustomMaps/");
+	url += mapFilename;
+
+	CURL *curl;
+	FILE *fp;
+	CURLcode res;
+
+	DWORD dwBack;
+	wchar_t* mapsDirectory = (wchar_t*)(h2mod->GetBase() + 0x482D70 + 0x2423C);
+	VirtualProtect(mapsDirectory, 4, PAGE_EXECUTE_READ, &dwBack);
+
+	std::wstring mapFileName(mapsDirectory);
+	VirtualProtect(mapsDirectory, 4, dwBack, NULL);
+	std::string nonUnicodeMapFilePath(mapFileName.begin(), mapFileName.end());
+	nonUnicodeMapFilePath += mapFilename;
+
+	curl = curl_easy_init();
+	if (curl) {
+		fp = fopen(nonUnicodeMapFilePath.c_str(), "wb");
+		//fail if 404 or any other type of http error
+		curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+		curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, xferinfo);
+		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+		res = curl_easy_perform(curl);
+		long http_code = 0;
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+		/* always cleanup */
+		curl_easy_cleanup(curl);
+		fclose(fp);
+		if (http_code != 404) {
+			//if we succesfully downloaded the map, reload the maps and return out
+			setCustomLobbyMessage(NULL);
+			this->reloadMaps();
+			return true;
+		}
+		else {
+			//if we failed, remove the file we created and exit
+			setCustomLobbyMessage(MAP_DOESNT_EXIST_IN_REPO.c_str());
+			remove(nonUnicodeMapFilePath.c_str());
+		}
+	}
+	return false;
 }
 
 /**
@@ -606,48 +737,7 @@ void MapManager::TcpServer::startListening() {
 			continue;
 		}
 
-		//0x30 (difference from start of maps object to first custom map)
-		//0xB90 (difference between each custom map name)
-		//0x960 (difference between custom map name and its file path
-		DWORD offset;
-		if (h2mod->Server) {
-			offset = 0x4A70D8;
-		}
-		else {
-			offset = 0x482D70;
-		}
-		DWORD* mapsObject = (DWORD*)(h2mod->GetBase() + offset + 0x30);
-		//move to first map
-		DWORD currentMapNameOffset;
-		if (h2mod->Server) {
-			//H2Server.exe+5349B4
-			//H2Server.exe+535C64 (another offset to use if the above fails for whatever reason)
-			currentMapNameOffset = 0x5349B4;
-		}
-		else {
-			currentMapNameOffset = 0x97737C;
-		}
-		const wchar_t* currentMapName = (wchar_t*)(h2mod->GetBase() + currentMapNameOffset);
-		for (int i = 1; i <= 51; i++) {
-			wchar_t* mapName = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + (i * 0xB90)));
-
-			if (wcscmp(currentMapName, mapName) == 0) {
-				wchar_t* mapPath = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + ((i * 0xB90) + 0x960)));
-				if (H2Config_debug_log)
-					TRACE_GAME("CurrentMapPath = %s", mapPath);
-				mapManager->customMapFileName = std::wstring(mapPath);
-				break;
-			}
-		}
-		std::wstring customMapName = mapManager->customMapFileName;
-
-		if (customMapName.empty()) {
-			if (H2Config_debug_log)
-				TRACE_GAME_N("Could not determine custom map file name");
-			continue;
-		}
-
-		std::thread t1(&handleClientConnection, client, customMapName);
-		t1.detach();
+		//std::thread t1(&handleClientConnection, client, customMapName);
+		//t1.detach();
 	}
 }
