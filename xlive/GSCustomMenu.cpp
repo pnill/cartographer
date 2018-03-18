@@ -1241,12 +1241,12 @@ static void loadLabelCrosshairOffset() {
 		int buildLimitLabelLen = strlen(lblFpsLimitNum) + 20;
 		char* buildLimitLabel = (char*)malloc(sizeof(char) * buildLimitLabelLen);
 		snprintf(buildLimitLabel, buildLimitLabelLen, lblFpsLimitNum, H2Config_crosshair_offset);
-		add_cartographer_label(CMLabelMenuId_EditCrosshair, 3, buildLimitLabel);
+		add_cartographer_label(CMLabelMenuId_EditCrosshair, 3, buildLimitLabel, true);
 		free(buildLimitLabel);
 	}
 	else {
 		char* lblFpsLimitDisabled = H2CustomLanguageGetLabel(CMLabelMenuId_EditCrosshair, 0xFFFF0013);
-		add_cartographer_label(CMLabelMenuId_EditCrosshair, 3, lblFpsLimitDisabled);
+		add_cartographer_label(CMLabelMenuId_EditCrosshair, 3, lblFpsLimitDisabled, true);
 	}
 }
 
@@ -1390,12 +1390,12 @@ static void loadLabelFOVNum() {
 		int buildLimitLabelLen = strlen(lblFpsLimitNum) + 20;
 		char* buildLimitLabel = (char*)malloc(sizeof(char) * buildLimitLabelLen);
 		snprintf(buildLimitLabel, buildLimitLabelLen, lblFpsLimitNum, H2Config_field_of_view);
-		add_cartographer_label(CMLabelMenuId_EditFOV, 3, buildLimitLabel);
+		add_cartographer_label(CMLabelMenuId_EditFOV, 3, buildLimitLabel, true);
 		free(buildLimitLabel);
 	}
 	else {
 		char* lblFpsLimitDisabled = H2CustomLanguageGetLabel(CMLabelMenuId_EditFOV, 0xFFFF0013);
-		add_cartographer_label(CMLabelMenuId_EditFOV, 3, lblFpsLimitDisabled);
+		add_cartographer_label(CMLabelMenuId_EditFOV, 3, lblFpsLimitDisabled, true);
 	}
 }
 
@@ -1531,12 +1531,12 @@ static void loadLabelFPSLimit() {
 		int buildLimitLabelLen = strlen(lblFpsLimitNum) + 20;
 		char* buildLimitLabel = (char*)malloc(sizeof(char) * buildLimitLabelLen);
 		snprintf(buildLimitLabel, buildLimitLabelLen, lblFpsLimitNum, H2Config_fps_limit);
-		add_cartographer_label(CMLabelMenuId_EditFPS, 3, buildLimitLabel);
+		add_cartographer_label(CMLabelMenuId_EditFPS, 3, buildLimitLabel, true);
 		free(buildLimitLabel);
 	}
 	else {
 		char* lblFpsLimitDisabled = H2CustomLanguageGetLabel(CMLabelMenuId_EditFPS, 0xFFFF0013);
-		add_cartographer_label(CMLabelMenuId_EditFPS, 3, lblFpsLimitDisabled);
+		add_cartographer_label(CMLabelMenuId_EditFPS, 3, lblFpsLimitDisabled, true);
 	}
 }
 
@@ -3600,7 +3600,7 @@ int CustomMenu_Guide(int a1) {
 	char hotkeyname[20];
 	GetVKeyCodeString(H2Config_hotkeyIdGuide, hotkeyname, 20);
 	sprintf(guide_description, guide_desc_base, hotkeyname);
-	add_cartographer_label(CMLabelMenuId_Guide, 0xFFFFFFF1, guide_description);
+	add_cartographer_label(CMLabelMenuId_Guide, 0xFFFFFFF1, guide_description, true);
 	free(guide_description);
 	return CustomMenu_CallHead(a1, menu_vftable_1_Guide, menu_vftable_2_Guide, (DWORD)&CMButtonHandler_Guide, 4, 272);
 }
