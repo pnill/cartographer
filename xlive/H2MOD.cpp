@@ -688,9 +688,10 @@ void PatchFixRankIcon() {
 		}
 	}
 }
+
 void PatchGameDetailsCheck()
 {
-	BYTE assmPatchGamedetails[2] = { 0x75,0x18 };	
+	BYTE assmPatchGamedetails[2] = { 0x90, 0x90 };
 	WriteBytes(h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
 }
 
@@ -706,18 +707,12 @@ void H2MOD::PatchWeaponsInteraction(bool b_Enable)
 	WriteBytes(offset, assm, 5);
 }
 
-void PatchPingMeterCheck(bool hackit)
+void PatchPingMeterCheck()
 {
 	//halo2.exe+1D4E35 
 
-	BYTE assmOrgLine[2] = { 0x74,0x18 };
-	BYTE assmPatchPingCheck[2] = { 0x90,0x90 };
-
-	if (hackit)
-		WriteBytes(h2mod->GetBase() + 0x1D4E35, assmPatchPingCheck, 2);
-	else
-		WriteBytes(h2mod->GetBase() + 0x1D4E35, assmOrgLine, 2);
-
+	BYTE assmPatchPingCheck[2] = { 0x75, 0x18 };
+	WriteBytes(h2mod->GetBase() + 0x1D4E35, assmPatchPingCheck, 2);
 }
 
 static bool OnNewRound(int a1)
@@ -1083,13 +1078,6 @@ int __cdecl changeTeam(int a1, int a2) {
 	return change_team_method(a1, a2);
 }
 
-typedef char(__cdecl *camera_pointer)();
-camera_pointer Cinematic_Pointer;
-
-char __cdecl if_cinematic() {
-	return 0;
-}
-
 void __cdecl print_to_console(char *output)
 {
 	const static std::string prefix = "[HSC Print] ";
@@ -1163,6 +1151,10 @@ void H2MOD::securityPacketProcessing()
 	}
 }
 
+char ret_0() {
+	return 0; //for 60 fps cinematics
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1175,9 +1167,6 @@ void H2MOD::ApplyHooks() {
 
 		//pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
 		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		Cinematic_Pointer = (camera_pointer)DetourFunc((BYTE*)this->GetBase() + 0x3A938, (BYTE*)if_cinematic, 8);
-		VirtualProtect(Cinematic_Pointer, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		psub_4F17A = (tsub_4F17A)DetourFunc((BYTE*)this->GetBase() + 0x4F17A, (BYTE*)sub_4F17A, 7);
 		VirtualProtect(psub_4F17A, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1253,6 +1242,10 @@ void H2MOD::ApplyHooks() {
 		PatchWinAPICall(GetBase() + 0x9AF9E, CryptUnprotectDataHook);
 
 		PatchCall(GetBase() + 0x9B09F, filo_write__encrypted_data_hook);
+
+		//60 fps cinematics
+		PatchCall(Base + 0x97774, reinterpret_cast<DWORD>(ret_0));
+		PatchCall(Base + 0x7C378, reinterpret_cast<DWORD>(ret_0));
 
 		//FIXME: This causes SP to crash after cutscenes.
 		//allow AI in MP
