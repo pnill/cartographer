@@ -3,5 +3,5 @@
 class Mouseinput
 {
 public:
-	void Initialize();
+	static void Initialize();
 };

@@ -25,13 +25,10 @@
 #include "H2Tweaks.h"
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 
-
-
 H2MOD *h2mod = new H2MOD();
 GunGame *gg = new GunGame();
 Infection *inf = new Infection();
 Halo2Final *h2f = new Halo2Final();
-Mouseinput *mouse = new Mouseinput();
 CustomNetwork *network = new CustomNetwork();
 
 bool b_Infection = false;
@@ -45,12 +42,13 @@ extern HANDLE H2MOD_Network;
 extern bool NetworkActive;
 extern bool Connected;
 extern bool ThreadCreated;
-
+extern int H2GetInstanceId();
 
 SOCKET comm_socket = INVALID_SOCKET;
 char* NetworkData = new char[255];
 
 HMODULE base;
+
 
 #pragma region engine calls
 
@@ -1658,12 +1656,18 @@ void H2MOD::Initialize()
 		//setSens(CONTROLLER, H2Config_sens_controller);
 		//setSens(MOUSE, H2Config_sens_mouse);
 		if (H2Config_raw_input)
-			mouse->Initialize();
+			Mouseinput::Initialize();
 
 		PatchGameDetailsCheck();
-		//PatchPingMeterCheck(true);
+		//PatchPingMeterCheck();
 		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
 
+		if (H2Config_discord_enable || H2GetInstanceId() == 1) {
+			// Discord init
+			DiscordInterface::SetDetails("Startup");
+			DiscordInterface::Init();
+			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
+		}
 	}
 
 	//effects can vary (good or bad) depending on different software configurations.
@@ -1678,16 +1682,6 @@ void H2MOD::Initialize()
 
 	//Network::Initialize();
 	h2mod->ApplyHooks();
-
-	if (!h2mod->Server)
-	{
-		if (H2Config_discord_enable) {
-			// Discord init
-			DiscordInterface::SetDetails("Startup");
-			DiscordInterface::Init();
-			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
-		}
-	}
 }
 
 void H2MOD::Deinitialize() {
