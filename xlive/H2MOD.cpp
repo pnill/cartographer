@@ -498,9 +498,8 @@ void H2MOD::set_unit_grenades(BYTE type, BYTE count, int pIndex, bool bReset)
 		if (type == GrenadeType::Frag)
 		{
 			*(BYTE*)((BYTE*)unit_object + 0x252) = count;
-
-
 		}
+
 		if (type == GrenadeType::Plasma)
 		{
 			*(BYTE*)((BYTE*)unit_object + 0x253) = count;
@@ -689,8 +688,7 @@ void PatchFixRankIcon() {
 
 void PatchGameDetailsCheck()
 {
-	BYTE assmPatchGamedetails[2] = { 0x90, 0x90 };
-	WriteBytes(h2mod->GetBase() + 0x219D6D, assmPatchGamedetails, 2);
+	NopFill(h2mod->GetBase() + 0x219D6D, 2);
 }
 
 void H2MOD::PatchWeaponsInteraction(bool b_Enable)
