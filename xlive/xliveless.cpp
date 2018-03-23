@@ -2868,7 +2868,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 			auto diff = campaign_difficulty_list.at(diff_level);
 			DiscordInterface::SetGameState(
 				map_name,
-				"Playing campaign",
+				"Campaign",
 				level_name,
 				diff.first,
 				diff.second
@@ -2883,7 +2883,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 
 			DiscordInterface::SetGameState(
 				map_name,
-				"Playing multiplayer",
+				"Multiplayer",
 				getEnglishMapName(),
 				gamemode_id_to_string(game_engine_type),
 				getVariantName()

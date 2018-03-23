@@ -12,6 +12,7 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* 
 void GetVKeyCodeString(int vkey, char* rtnString, int strLen);
 void PadCStringWithChar(char* strToPad, int toFullLength, char c);
 int ComputeFileMd5Hash(wchar_t* filepath, char* rtnMd5);
+int ComputeMd5Hash(const BYTE* buffer, int buflen, char* rtnMd5);
 int GetWidePathFromFullWideFilename(wchar_t* filepath, wchar_t* rtnpath);
 LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue);
 void pushHostLobby();
@@ -76,7 +77,7 @@ static UNS_32_BITS crc_32_tab[] = { /* CRC polynomial 0xedb88320 */
 DWORD crc32buf(char* buf, size_t len);
 bool ComputeFileCrc32Hash(wchar_t* filepath, DWORD &rtncrc32);
 
-char* escape_rfc3986(char* label_literal);
+char* encode_rfc3986(char* label_literal, int label_literal_length = -1);
 void wcstombs2(char* buffer, wchar_t* text, int buf_len);
 
 extern const int ERROR_CODE_CURL_SOCKET_FAILED;
@@ -88,6 +89,8 @@ int MasterHttpResponse(char* url, char* http_request, char* &rtn_response);
 bool StrnCaseInsensEqu(char* str1, char* str2, unsigned int chk_len);
 
 void EnsureDirectoryExists(wchar_t* path);
+
+int TrimRemoveConsecutiveSpaces(char* text);
 
 #define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
 #define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2

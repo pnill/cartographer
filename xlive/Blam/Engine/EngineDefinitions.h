@@ -6,6 +6,7 @@
 
 #include "Game\GameManager.h"
 #include "Game\GameTimeGlobals.h"
+#include "Game\HaloScript.h"
 
 #include "Objects\Objects.h"
 #include "Objects\ObjectsHeader.h"

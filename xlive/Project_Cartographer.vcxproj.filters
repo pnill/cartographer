@@ -290,6 +290,12 @@
     <ClInclude Include="H2MOD_GameType.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h">
+      <Filter>Source Files\Blam\Enums\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Game\HaloScript.h">
+      <Filter>Source Files\Blam\Engine\Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def">

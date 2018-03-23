@@ -107,6 +107,23 @@ void postConfig() {
 
 #pragma endregion
 
+int(__cdecl* sub_20E1D8)(int, int, int, int, int, int);
+
+int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
+	//a2 == 0x5 - system link lost connection
+	if (a2 == 0xb9) {
+		//boot them offline.
+		H2Config_master_ip = inet_addr("127.0.0.1");
+		H2Config_master_port_relay = 2001;
+		extern int MasterState;
+		MasterState = 2;
+		extern char* ServerStatus;
+		snprintf(ServerStatus, 250, "Status: Offline");
+	}
+	int result = sub_20E1D8(a1, a2, a3, a4, a5, a6);
+	return result;
+}
+
 void InitH2Tweaks() {
 	postConfig();
 
@@ -191,6 +208,10 @@ void InitH2Tweaks() {
 		//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
 		PatchCall(H2BaseAddr + 0x22667B, (DWORD)NotDisplayIngameChat);
 		PatchCall(H2BaseAddr + 0x226628, (DWORD)NotDisplayIngameChat);
+
+		//hook the gui popup for when the player is booted.
+		sub_20E1D8 = (int(__cdecl*)(int, int, int, int, int, int))((char*)H2BaseAddr + 0x20E1D8);
+		PatchCall(H2BaseAddr + 0x21754C, (DWORD)&sub_20E1D8_boot);
 	}
 	addDebugText("End Startup Tweaks.");
 }

@@ -389,7 +389,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				incorrect = true;
 			}
 			else {
-				H2AccountLastUsed = (bool)tempint1;
+				H2AccountLastUsed = tempint1;
 				H2AccountLastUsed_est = true;
 			}
 		}
@@ -483,9 +483,9 @@ bool ReadH2Accounts() {
 
 #pragma region Config Init/Deinit
 void InitH2Accounts() {
-	//ReadH2Accounts();
+
 }
 void DeinitH2Accounts() {
-	//SaveH2Accounts();
+
 }
 #pragma endregion

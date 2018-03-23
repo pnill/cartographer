@@ -285,6 +285,34 @@
     <ClCompile Include="xlive_network.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Blam\BlamLibrary.h" />
+    <ClInclude Include="Blam\Engine\EngineDefinitions.h" />
+    <ClInclude Include="Blam\Engine\Extras\Skulls.h" />
+    <ClInclude Include="Blam\Engine\Game\GameManager.h" />
+    <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
+    <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
+    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
+    <ClInclude Include="Blam\Engine\Objects\Objects.h" />
+    <ClInclude Include="Blam\Engine\Objects\ObjectsHeader.h" />
+    <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
+    <ClInclude Include="Blam\Engine\Players\Players.h" />
+    <ClInclude Include="Blam\Enums\Enums.h" />
+    <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h" />
+    <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h" />
+    <ClInclude Include="Blam\Enums\Objects\Objects.h" />
+    <ClInclude Include="Blam\Enums\Objects\Unit.h" />
+    <ClInclude Include="Blam\Enums\Players\Players.h" />
+    <ClInclude Include="Blam\Maths\Angle.h" />
+    <ClInclude Include="Blam\Maths\Maths.h" />
+    <ClInclude Include="Blam\Maths\RealColorRGB.h" />
+    <ClInclude Include="Blam\Maths\RealMovement.h" />
+    <ClInclude Include="Blam\Maths\RealPoint2D.h" />
+    <ClInclude Include="Blam\Maths\RealPoint3D.h" />
+    <ClInclude Include="Blam\Maths\RealVector2D.h" />
+    <ClInclude Include="Blam\Maths\RealVector3D.h" />
+    <ClInclude Include="Blam\Shared\DatumIndex.h" />
+    <ClInclude Include="Blam\Shared\Globals.h" />
+    <ClInclude Include="Blam\Shared\SharedDefinitions.h" />
     <ClInclude Include="cartographer_main.hpp" />
     <ClInclude Include="CUser.h" />
     <ClInclude Include="Detour.h" />
