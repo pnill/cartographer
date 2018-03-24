@@ -87,6 +87,7 @@ void GunGame::resetPlayerLevels() {
 	do {
 		std::wstring playerName = players->getPlayerName(playerCounter);
 		GunGame::gungamePlayers[playerName] = 0;
+		playerCounter++;
 	} while (playerCounter < players->getPlayerCount());
 }
 

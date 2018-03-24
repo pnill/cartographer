@@ -115,6 +115,7 @@ void Infection::preSpawnServerSetup() {
 		} else {
 			h2mod->set_unit_biped(BipedType::MasterChief, playerCounter);
 		}
+		playerCounter++;
 	} while (playerCounter < players->getPlayerCount());
 }
 
