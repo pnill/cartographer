@@ -717,7 +717,8 @@ static bool OnNewRound(int a1)
 	bool(__cdecl* CallNewRound)(int a1);
 	CallNewRound = (bool(__cdecl*)(int))((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6A87C : 0x6B1C8));
 	//addDebugText("New Round Commencing");
-		if (b_Infection)
+	
+	if (b_Infection)
 		inf->NextRound();
 
 	if (b_GunGame)
@@ -826,9 +827,8 @@ int __cdecl OnMapLoad(int a1)
 			TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
 			b_H2X = true;
 		}
-	
-#pragma region Apply Hitfix
 
+		//HITFIX
 		int offset = 0x47CD54;
 		//TRACE_GAME("[h2mod] Hitfix is being run on Client!");
 		if (h2mod->Server) {
@@ -852,7 +852,12 @@ int __cdecl OnMapLoad(int a1)
 		*(float*)(AddressOffset + 0x7E7E20) = 2000.0f; //bullet.proj (chaingun) initial def 800
 		*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bullet.proj (chaingun) final def 800
 
-#pragma endregion
+		//H2x Firerates
+		if (b_H2X)
+			H2X::Initialize();
+		else
+			H2X::Deinitialize();
+
 	}
 #pragma region H2V Stuff
 	if (!h2mod->Server)
@@ -874,16 +879,10 @@ int __cdecl OnMapLoad(int a1)
 				if (b_GunGame && isHost)
 					gg->Initialize();
 
-				if (b_H2X)
-					H2X::Initialize();
-				else
-					H2X::Deinitialize();
-
 				if (b_Halo2Final)
 					h2f->Initialize();
 			}
 
-			
 		}
 
 	}
@@ -898,11 +897,6 @@ int __cdecl OnMapLoad(int a1)
 
 			if (b_GunGame)
 				gg->Initialize();
-
-			if (b_H2X)
-				H2X::Initialize();
-			else
-				H2X::Deinitialize();
 		}
 
 	}
