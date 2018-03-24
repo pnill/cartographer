@@ -264,6 +264,26 @@ void MapManager::cleanup() {
 	this->downloadedMaps.clear();
 }
 
+void MapManager::sendMapInfoPacket()
+{
+	H2ModPacket teampak;
+	teampak.set_type(H2ModPacket_Type_map_info_request);
+
+	h2mod_map_info* map_info = teampak.mutable_map_info();
+	map_info->set_mapfilename(this->getCachedMapFilename());
+	//TODO: send over size so p2p can work
+	map_info->set_mapsize(0);
+
+	char* SendBuf = new char[teampak.ByteSize()];
+	teampak.SerializeToArray(SendBuf, teampak.ByteSize());
+
+	network->networkCommand = SendBuf;
+	network->sendCustomPacketToAllPlayers();
+
+	network->networkCommand = NULL;
+	delete[] SendBuf;
+}
+
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 	return fwrite(ptr, size, nmemb, stream);
 }

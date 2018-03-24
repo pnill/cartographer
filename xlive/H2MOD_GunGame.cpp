@@ -19,6 +19,7 @@ extern int weapon_fiffteen;
 extern int weapon_sixteen;
 
 std::unordered_map<int, int> GunGame::level_weapon;
+std::unordered_map<std::wstring, int> GunGame::gungamePlayers;
 
 unsigned int Weapon_ID[36] = { 
 	0xE53D2AD8, 0xE5F02B8B, 0xE6322BCD, 0xE6AF2C4A,
@@ -30,62 +31,6 @@ unsigned int Weapon_ID[36] = {
 	0xEDD4336F,0xEE0933A4,0xEE3433CF,0xEE5233ED,
 	0xEE5F33FA,0xEE7B3416,0xEE993434,0xEE9E3439,
 	0xEED3346E,0xEEF1348C,0xEF1B34B6,0xF33838D2 
-};
-
-class ResetGunGameLevelsIterator : public PlayerIterator {
-	virtual void onIteratePlayer(Player* player) override {
-		player->setGunGameLevel(0);
-	}
-};
-
-class GetGunGameLevel : public PlayerLookup {
-public:
-	GetGunGameLevel(int* levelRef, int playerIndex) {
-		this->levelRef = levelRef;
-		this->playerIndex = playerIndex;
-	}
-	virtual void lookup(Player* player) override {
-		if (this->playerIndex == player->getPlayerIndex()) {
-			*this->levelRef = player->getGunGameLevel();
-			foundPlayer = true;
-		}
-	}
-private:
-	int playerIndex;
-	int* levelRef;
-};
-
-class IncrementGunGameLevel : public PlayerLookup {
-public:
-	IncrementGunGameLevel(int* levelRef, int playerIndex) {
-		this->playerIndex = playerIndex;
-		this->levelRef = levelRef;
-	}
-	virtual void lookup(Player* player) override {
-		if (this->playerIndex == player->getPlayerIndex()) {
-			player->setGunGameLevel(player->getGunGameLevel() + 1);
-			*this->levelRef = player->getGunGameLevel();
-			foundPlayer = true;
-		}
-	}
-private:
-	int playerIndex;
-	int* levelRef;
-};
-
-class InitGunGameLevel : public PlayerLookup {
-public:
-	InitGunGameLevel(int playerIndex) {
-		this->playerIndex = playerIndex;
-	}
-	virtual void lookup(Player* player) override {
-		if (this->playerIndex == player->getPlayerIndex()) {
-			player->setGunGameLevel(0);
-			foundPlayer = true;
-		}
-	}
-private:
-	int playerIndex;
 };
 
 GunGame::GunGame()
@@ -138,9 +83,11 @@ void GunGame::initWeaponLevels() {
 }
 
 void GunGame::resetPlayerLevels() {
-	ResetGunGameLevelsIterator* resetGunGameLevels = new ResetGunGameLevelsIterator();
-	players->iteratePlayers(resetGunGameLevels);
-	delete resetGunGameLevels;
+	int playerCounter = 0;
+	do {
+		std::wstring playerName = players->getPlayerName(playerCounter);
+		GunGame::gungamePlayers[playerName] = 0;
+	} while (playerCounter < players->getPlayerCount());
 }
 
 void GunGame::spawnPlayerServer(int playerIndex) {
@@ -151,10 +98,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 	int unit_object = call_get_object(unit_datum_index, 3);
 
 	if (unit_object) {
-		int level = 0;
-		GetGunGameLevel* getGunGameLevel = new GetGunGameLevel(&level, playerIndex);
-		players->lookupPlayer(getGunGameLevel);
-		delete getGunGameLevel;
+		int level = GunGame::gungamePlayers[players->getPlayerName(playerIndex)];
 
 		TRACE_GAME("[H2Mod-GunGame]: SpawnPlayer(%i) %ws - Level: %i", playerIndex, pName, level);
 
@@ -190,16 +134,12 @@ void GunGame::playerDiedServer(int unit_datum_index)
 
 void GunGame::levelUpServer(int PlayerIndex)
 {
-
 	wchar_t* PlayerName = h2mod->get_player_name_from_index(PlayerIndex);
 	TRACE_GAME("[H2Mod-GunGame]: LevelUp(%i) : %ws", PlayerIndex, PlayerName);
 
-	int level = 0;
-
-	IncrementGunGameLevel* setGunGameLevel = new IncrementGunGameLevel(&level, PlayerIndex);
-	players->lookupPlayer(setGunGameLevel);
-	delete setGunGameLevel;
-
+	int level = GunGame::gungamePlayers[players->getPlayerName(PlayerIndex)];
+	level++;
+	GunGame::gungamePlayers[players->getPlayerName(PlayerIndex)] = level;
 
 	TRACE_GAME("[H2Mod-GunGame]: LevelUp(%i) - new level: %i ", PlayerIndex, level);
 
@@ -226,7 +166,7 @@ void GunGame::levelUpServer(int PlayerIndex)
 
 void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
 {
-	TRACE_GAME("[H2Mod-Infection] Sending grenade packet, index=%d", pIndex);
+	TRACE_GAME("[H2Mod-Infection] Sending grenade packet, playerIndex=%d, peerIndex=%d", pIndex, players->getPeerIndex(pIndex));
 
 	H2ModPacket teampak;
 	teampak.set_type(H2ModPacket_Type_set_unit_grenades);
@@ -234,13 +174,14 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
 	h2mod_set_grenade *set_grenade = teampak.mutable_set_grenade();
 	set_grenade->set_count(count);
 	set_grenade->set_type(type);
+	//send over player index
 	set_grenade->set_pindex(pIndex);
 
 	char* SendBuf = new char[teampak.ByteSize()];
 	teampak.SerializeToArray(SendBuf, teampak.ByteSize());
 
 	network->networkCommand = SendBuf;
-	network->sendCustomPacket(pIndex);
+	network->sendCustomPacket(players->getPeerIndex(pIndex));
 	network->networkCommand = NULL;
 
 	delete[] SendBuf;
@@ -272,9 +213,7 @@ void GunGameInitializer::onPeerHost() {
 	GunGame::resetPlayerLevels();
 	//TODO: is this really necessary (from old code)?
 	//init peer host gun game level 
-	InitGunGameLevel* initGunGameLevel = new InitGunGameLevel(0);
-	players->lookupPlayer(initGunGameLevel);
-	delete initGunGameLevel;
+	GunGame::gungamePlayers[players->getPlayerName(0)] = 0;
 }
 
 void GunGamePreSpawnHandler::onClient() {

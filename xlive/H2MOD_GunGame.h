@@ -70,4 +70,5 @@ public:
 	static void resetPlayerLevels();
 
 	static std::unordered_map<int, int> level_weapon;
+	static std::unordered_map<std::wstring, int> gungamePlayers;
 };

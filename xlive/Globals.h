@@ -14,7 +14,6 @@
 #include "Hook.h"
 #include "ReadIniArguments.h"
 
-#include "H2MOD_Player.h"
 #include "H2MOD_Players.h"
 #include "H2MOD_GameType.h"
 #include "H2MOD_Halo2Final.h"

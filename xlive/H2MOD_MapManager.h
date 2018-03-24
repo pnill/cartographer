@@ -13,6 +13,7 @@ public:
 	//client and server functions below
 	void reloadMaps();
 	void cleanup();
+	void sendMapInfoPacket();
 	const char* getCustomLobbyMessage();
 	std::wstring getMapName();
 	bool hasCustomMap(std::string mapName);

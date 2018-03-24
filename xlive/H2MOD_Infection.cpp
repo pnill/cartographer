@@ -1,6 +1,8 @@
 #include "Globals.h"
 #include <h2mod.pb.h>
 
+std::vector<std::wstring> Infection::zombieNames;
+
 const int ZOMBIE_TEAM = 3;
 const int HUMAN_TEAM = 0;
 std::wstring NEW_ZOMBIE_SOUND1(L"sounds/new_zombie.wav");
@@ -13,40 +15,6 @@ const wchar_t* INFECTED_SOUND = INFECTED_SOUND1.c_str();
 BOOL infectedPlayed;
 BOOL firstSpawn;
 
-class ZombiePreSpawnPlayerIterator : public PlayerIterator {
-	virtual void onIteratePlayer(Player* player) override {
-		TRACE_GAME("[h2mod-infection] Zombie pre spawn, iterating player %s, index=%d, isZombie=%d", player->getPlayerName().c_str(), player->getPlayerIndex(), player->getIsZombie());
-		if (player->getIsZombie()) {
-			h2mod->set_unit_biped(BipedType::Elite, player->getPlayerIndex());
-		} else {
-			h2mod->set_unit_biped(BipedType::MasterChief, player->getPlayerIndex());
-		}
-	}
-};
-
-class ZombieResetStatusPlayerIterator : public PlayerIterator {
-	virtual void onIteratePlayer(Player* player) override {
-		player->setIsZombie(false);
-	}
-};
-
-class InfectPlayerSettor : public PlayerLookup {
-public:
-	InfectPlayerSettor(int playerIndex) {
-		this->playerIndex = playerIndex;
-	}
-	// Inherited via PlayerLookup
-	virtual void lookup(Player * player) override
-	{
-		if (player->getPlayerIndex() == this->playerIndex) {
-			player->setIsZombie(true);
-			foundPlayer = true;
-		}
-	}
-private:
-	int playerIndex;
-};
-
 int Infection::calculateZombieIndexBasedOnPlayerData() {
 	int max = players->getPlayerCount() - 1;
 	int min = (h2mod->Server ? 1 : 0);//on a dedi, the dedi itself obtains a player slot for whatever reason
@@ -54,21 +22,20 @@ int Infection::calculateZombieIndexBasedOnPlayerData() {
 	return randNum; //Random Alpha Zombie Index
 }
 
-void Infection::sendTeamChange(int peerIndex) {
-	TRACE_GAME("[H2Mod-Infection] Sending zombie team change packet, index=%d", peerIndex);
+void Infection::sendTeamChange(int playerIndex) {
+	TRACE_GAME("[H2Mod-Infection] Sending zombie team change packet, playerIndex=%d, peerIndex=%d", playerIndex, players->getPeerIndex(playerIndex));
 
 	H2ModPacket teampak;
 	teampak.set_type(H2ModPacket_Type_set_player_team);
 
 	h2mod_set_team *set_team = teampak.mutable_h2_set_player_team();
 	set_team->set_team(ZOMBIE_TEAM);
-	set_team->set_peerindex(peerIndex);
 
 	char* SendBuf = new char[teampak.ByteSize()];
 	teampak.SerializeToArray(SendBuf, teampak.ByteSize());
 
 	network->networkCommand = SendBuf;
-	network->sendCustomPacket(peerIndex);
+	network->sendCustomPacket(players->getPeerIndex(playerIndex));
 	network->networkCommand = NULL;
 
 	delete[] SendBuf;
@@ -105,16 +72,12 @@ void Infection::initClient()
 }
 
 void Infection::resetZombiePlayerStatus() {
-	ZombieResetStatusPlayerIterator* zombieStatusHandler = new ZombieResetStatusPlayerIterator();
-	players->iteratePlayers(zombieStatusHandler);
-	delete zombieStatusHandler;
+	Infection::zombieNames.clear();
 }
 
 void Infection::setZombiePlayerStatus(int index)
 {
-	InfectPlayerSettor* infectPlayer = new InfectPlayerSettor(index);
-	players->lookupPlayer(infectPlayer);
-	delete infectPlayer;
+	Infection::zombieNames.push_back(players->getPlayerName(index));
 }
 
 void Infection::initHost() {
@@ -142,9 +105,17 @@ void Infection::resetWeaponInteractionAndEmblems() {
 }
 
 void Infection::preSpawnServerSetup() {
-	ZombiePreSpawnPlayerIterator* preSpawnHandler = new ZombiePreSpawnPlayerIterator();
-	players->iteratePlayers(preSpawnHandler);
-	delete preSpawnHandler;
+	int playerCounter = 0;
+	do {
+		std::wstring playerName = players->getPlayerName(playerCounter);
+		BOOL isZombie = std::find(Infection::zombieNames.begin(), Infection::zombieNames.end(), playerName) != Infection::zombieNames.end();
+		TRACE_GAME("[h2mod-infection] Zombie pre spawn index=%d, isZombie=%d, playerName=%s", playerCounter, isZombie, playerName);
+		if (isZombie) {
+			h2mod->set_unit_biped(BipedType::Elite, playerCounter);
+		} else {
+			h2mod->set_unit_biped(BipedType::MasterChief, playerCounter);
+		}
+	} while (playerCounter < players->getPlayerCount());
 }
 
 void Infection::setPlayerAsHuman(int index) {
@@ -324,9 +295,9 @@ void InfectionInitializer::onPeerHost()
 	TRACE_GAME("[h2mod-infection] Peer host init");
 	Infection::initClient();
 	Infection::initHost();
-	int zombieIndex = Infection::calculateZombieIndexBasedOnPlayerData();
-	TRACE_GAME("[h2mod-infection] Peer host calculated zombie index %d", zombieIndex);
-	if (zombieIndex == 0) {
+	int zombiePlayerIndex = Infection::calculateZombieIndexBasedOnPlayerData();
+	TRACE_GAME("[h2mod-infection] Peer host calculated zombie index %d", zombiePlayerIndex);
+	if (zombiePlayerIndex == 0) {
 		TRACE_GAME("[h2mod-infection] Peer host setting player as zombie");
 		//the peer host is the zombie, change their team to zombies
 		h2mod->set_local_team_index(ZOMBIE_TEAM);
@@ -335,9 +306,9 @@ void InfectionInitializer::onPeerHost()
 		//the peer host is not the zombie, change their team humans
 		h2mod->set_local_team_index(HUMAN_TEAM);
 		//send out the team change packet to the affected zombie
-		Infection::sendTeamChange(zombieIndex);
+		Infection::sendTeamChange(zombiePlayerIndex);
 		//mark this player as the zombie in the internal players structure
-		Infection::setZombiePlayerStatus(zombieIndex);
+		Infection::setZombiePlayerStatus(zombiePlayerIndex);
 	}
 }
 
@@ -346,12 +317,12 @@ void InfectionInitializer::onDedi()
 	TRACE_GAME("[h2mod-infection] Dedicated server init");
 	Infection::initHost();
 	//figure out who the zombie is
-	int zombieIndex = Infection::calculateZombieIndexBasedOnPlayerData();
-	TRACE_GAME("[h2mod-infection] Dedicated server calculated zombie index %d", zombieIndex);
+	int zombiePlayerIndex = Infection::calculateZombieIndexBasedOnPlayerData();
+	TRACE_GAME("[h2mod-infection] Dedicated server calculated zombie index %d", zombiePlayerIndex);
 	//send out the team change packet to the affected zombie
-	Infection::sendTeamChange(zombieIndex);
+	Infection::sendTeamChange(zombiePlayerIndex);
 	//mark this player as the zombie in the internal players structure
-	Infection::setZombiePlayerStatus(zombieIndex);
+	Infection::setZombiePlayerStatus(zombiePlayerIndex);
 }
 
 void InfectionInitializer::onClient()

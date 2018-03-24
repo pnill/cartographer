@@ -5,11 +5,13 @@ message H2ModPacket {
 	enum Type {
 		set_player_team = 2;
 		set_unit_grenades = 3;
+		map_info_request = 4;
 	}
 
 	required H2ModPacket.Type type = 1;
 	optional h2mod_set_team h2_set_player_team = 2;
 	optional h2mod_set_grenade set_grenade = 3;
+	optional h2mod_map_info map_info = 4;
 }
 
 message h2mod_set_grenade {
@@ -21,4 +23,9 @@ message h2mod_set_grenade {
 message h2mod_set_team {
 	required uint32 peerIndex = 1;	
 	required uint32 team = 2;
+}
+
+message h2mod_map_info {
+	required string mapFileName = 1;
+	required uint32 mapSize = 2;
 }

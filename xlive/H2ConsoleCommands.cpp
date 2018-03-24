@@ -268,7 +268,6 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			h2mod_set_team *set_team = teampak.mutable_h2_set_player_team();
 			set_team->set_team(atoi(secondArg.c_str()));
-			set_team->set_peerindex(atoi(firstArg.c_str()));
 
 			char* SendBuf = new char[teampak.ByteSize()];
 			teampak.SerializeToArray(SendBuf, teampak.ByteSize());

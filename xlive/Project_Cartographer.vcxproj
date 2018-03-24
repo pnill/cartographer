@@ -272,7 +272,6 @@
     <ClCompile Include="H2MOD_MapManager.cpp" />
     <ClCompile Include="H2MOD_Mouseinput.cpp" />
     <ClCompile Include="H2MOD_Network.cpp" />
-    <ClCompile Include="H2MOD_Player.cpp" />
     <ClCompile Include="H2MOD_Players.cpp" />
     <ClCompile Include="H2OnscreenDebugLog.cpp" />
     <ClCompile Include="H2Startup.cpp" />
@@ -341,7 +340,6 @@
     <ClInclude Include="H2MOD_MapManager.h" />
     <ClInclude Include="H2MOD_Mouseinput.h" />
     <ClInclude Include="H2MOD_Network.h" />
-    <ClInclude Include="H2MOD_Player.h" />
     <ClInclude Include="H2MOD_Players.h" />
     <ClInclude Include="H2MOD_Sounds.h" />
     <ClInclude Include="H2OnscreenDebugLog.h" />

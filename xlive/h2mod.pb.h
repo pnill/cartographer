@@ -35,14 +35,16 @@ void protobuf_ShutdownFile_h2mod_2eproto();
 class H2ModPacket;
 class h2mod_set_grenade;
 class h2mod_set_team;
+class h2mod_map_info;
 
 enum H2ModPacket_Type {
   H2ModPacket_Type_set_player_team = 2,
-  H2ModPacket_Type_set_unit_grenades = 3
+  H2ModPacket_Type_set_unit_grenades = 3,
+  H2ModPacket_Type_map_info_request = 4
 };
 bool H2ModPacket_Type_IsValid(int value);
 const H2ModPacket_Type H2ModPacket_Type_Type_MIN = H2ModPacket_Type_set_player_team;
-const H2ModPacket_Type H2ModPacket_Type_Type_MAX = H2ModPacket_Type_set_unit_grenades;
+const H2ModPacket_Type H2ModPacket_Type_Type_MAX = H2ModPacket_Type_map_info_request;
 const int H2ModPacket_Type_Type_ARRAYSIZE = H2ModPacket_Type_Type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* H2ModPacket_Type_descriptor();
@@ -111,6 +113,7 @@ class H2ModPacket : public ::google::protobuf::Message {
   typedef H2ModPacket_Type Type;
   static const Type set_player_team = H2ModPacket_Type_set_player_team;
   static const Type set_unit_grenades = H2ModPacket_Type_set_unit_grenades;
+  static const Type map_info_request = H2ModPacket_Type_map_info_request;
   static inline bool Type_IsValid(int value) {
     return H2ModPacket_Type_IsValid(value);
   }
@@ -159,6 +162,15 @@ class H2ModPacket : public ::google::protobuf::Message {
   inline ::h2mod_set_grenade* release_set_grenade();
   inline void set_allocated_set_grenade(::h2mod_set_grenade* set_grenade);
 
+  // optional .h2mod_map_info map_info = 4;
+  inline bool has_map_info() const;
+  inline void clear_map_info();
+  static const int kMapInfoFieldNumber = 4;
+  inline const ::h2mod_map_info& map_info() const;
+  inline ::h2mod_map_info* mutable_map_info();
+  inline ::h2mod_map_info* release_map_info();
+  inline void set_allocated_map_info(::h2mod_map_info* map_info);
+
   // @@protoc_insertion_point(class_scope:H2ModPacket)
  private:
   inline void set_has_type();
@@ -167,6 +179,8 @@ class H2ModPacket : public ::google::protobuf::Message {
   inline void clear_has_h2_set_player_team();
   inline void set_has_set_grenade();
   inline void clear_has_set_grenade();
+  inline void set_has_map_info();
+  inline void clear_has_map_info();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -174,6 +188,7 @@ class H2ModPacket : public ::google::protobuf::Message {
   mutable int _cached_size_;
   ::h2mod_set_team* h2_set_player_team_;
   ::h2mod_set_grenade* set_grenade_;
+  ::h2mod_map_info* map_info_;
   int type_;
   friend void  protobuf_AddDesc_h2mod_2eproto();
   friend void protobuf_AssignDesc_h2mod_2eproto();
@@ -370,6 +385,100 @@ class h2mod_set_team : public ::google::protobuf::Message {
   void InitAsDefaultInstance();
   static h2mod_set_team* default_instance_;
 };
+// -------------------------------------------------------------------
+
+class h2mod_map_info : public ::google::protobuf::Message {
+ public:
+  h2mod_map_info();
+  virtual ~h2mod_map_info();
+
+  h2mod_map_info(const h2mod_map_info& from);
+
+  inline h2mod_map_info& operator=(const h2mod_map_info& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const h2mod_map_info& default_instance();
+
+  void Swap(h2mod_map_info* other);
+
+  // implements Message ----------------------------------------------
+
+  h2mod_map_info* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const h2mod_map_info& from);
+  void MergeFrom(const h2mod_map_info& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required string mapFileName = 1;
+  inline bool has_mapfilename() const;
+  inline void clear_mapfilename();
+  static const int kMapFileNameFieldNumber = 1;
+  inline const ::std::string& mapfilename() const;
+  inline void set_mapfilename(const ::std::string& value);
+  inline void set_mapfilename(const char* value);
+  inline void set_mapfilename(const char* value, size_t size);
+  inline ::std::string* mutable_mapfilename();
+  inline ::std::string* release_mapfilename();
+  inline void set_allocated_mapfilename(::std::string* mapfilename);
+
+  // required uint32 mapSize = 2;
+  inline bool has_mapsize() const;
+  inline void clear_mapsize();
+  static const int kMapSizeFieldNumber = 2;
+  inline ::google::protobuf::uint32 mapsize() const;
+  inline void set_mapsize(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:h2mod_map_info)
+ private:
+  inline void set_has_mapfilename();
+  inline void clear_has_mapfilename();
+  inline void set_has_mapsize();
+  inline void clear_has_mapsize();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::std::string* mapfilename_;
+  ::google::protobuf::uint32 mapsize_;
+  friend void  protobuf_AddDesc_h2mod_2eproto();
+  friend void protobuf_AssignDesc_h2mod_2eproto();
+  friend void protobuf_ShutdownFile_h2mod_2eproto();
+
+  void InitAsDefaultInstance();
+  static h2mod_map_info* default_instance_;
+};
 // ===================================================================
 
 
@@ -482,6 +591,47 @@ inline void H2ModPacket::set_allocated_set_grenade(::h2mod_set_grenade* set_gren
     clear_has_set_grenade();
   }
   // @@protoc_insertion_point(field_set_allocated:H2ModPacket.set_grenade)
+}
+
+// optional .h2mod_map_info map_info = 4;
+inline bool H2ModPacket::has_map_info() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void H2ModPacket::set_has_map_info() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void H2ModPacket::clear_has_map_info() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void H2ModPacket::clear_map_info() {
+  if (map_info_ != NULL) map_info_->::h2mod_map_info::Clear();
+  clear_has_map_info();
+}
+inline const ::h2mod_map_info& H2ModPacket::map_info() const {
+  // @@protoc_insertion_point(field_get:H2ModPacket.map_info)
+  return map_info_ != NULL ? *map_info_ : *default_instance_->map_info_;
+}
+inline ::h2mod_map_info* H2ModPacket::mutable_map_info() {
+  set_has_map_info();
+  if (map_info_ == NULL) map_info_ = new ::h2mod_map_info;
+  // @@protoc_insertion_point(field_mutable:H2ModPacket.map_info)
+  return map_info_;
+}
+inline ::h2mod_map_info* H2ModPacket::release_map_info() {
+  clear_has_map_info();
+  ::h2mod_map_info* temp = map_info_;
+  map_info_ = NULL;
+  return temp;
+}
+inline void H2ModPacket::set_allocated_map_info(::h2mod_map_info* map_info) {
+  delete map_info_;
+  map_info_ = map_info;
+  if (map_info) {
+    set_has_map_info();
+  } else {
+    clear_has_map_info();
+  }
+  // @@protoc_insertion_point(field_set_allocated:H2ModPacket.map_info)
 }
 
 // -------------------------------------------------------------------
@@ -610,6 +760,110 @@ inline void h2mod_set_team::set_team(::google::protobuf::uint32 value) {
   set_has_team();
   team_ = value;
   // @@protoc_insertion_point(field_set:h2mod_set_team.team)
+}
+
+// -------------------------------------------------------------------
+
+// h2mod_map_info
+
+// required string mapFileName = 1;
+inline bool h2mod_map_info::has_mapfilename() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void h2mod_map_info::set_has_mapfilename() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void h2mod_map_info::clear_has_mapfilename() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void h2mod_map_info::clear_mapfilename() {
+  if (mapfilename_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    mapfilename_->clear();
+  }
+  clear_has_mapfilename();
+}
+inline const ::std::string& h2mod_map_info::mapfilename() const {
+  // @@protoc_insertion_point(field_get:h2mod_map_info.mapFileName)
+  return *mapfilename_;
+}
+inline void h2mod_map_info::set_mapfilename(const ::std::string& value) {
+  set_has_mapfilename();
+  if (mapfilename_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    mapfilename_ = new ::std::string;
+  }
+  mapfilename_->assign(value);
+  // @@protoc_insertion_point(field_set:h2mod_map_info.mapFileName)
+}
+inline void h2mod_map_info::set_mapfilename(const char* value) {
+  set_has_mapfilename();
+  if (mapfilename_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    mapfilename_ = new ::std::string;
+  }
+  mapfilename_->assign(value);
+  // @@protoc_insertion_point(field_set_char:h2mod_map_info.mapFileName)
+}
+inline void h2mod_map_info::set_mapfilename(const char* value, size_t size) {
+  set_has_mapfilename();
+  if (mapfilename_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    mapfilename_ = new ::std::string;
+  }
+  mapfilename_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:h2mod_map_info.mapFileName)
+}
+inline ::std::string* h2mod_map_info::mutable_mapfilename() {
+  set_has_mapfilename();
+  if (mapfilename_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    mapfilename_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:h2mod_map_info.mapFileName)
+  return mapfilename_;
+}
+inline ::std::string* h2mod_map_info::release_mapfilename() {
+  clear_has_mapfilename();
+  if (mapfilename_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = mapfilename_;
+    mapfilename_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void h2mod_map_info::set_allocated_mapfilename(::std::string* mapfilename) {
+  if (mapfilename_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete mapfilename_;
+  }
+  if (mapfilename) {
+    set_has_mapfilename();
+    mapfilename_ = mapfilename;
+  } else {
+    clear_has_mapfilename();
+    mapfilename_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:h2mod_map_info.mapFileName)
+}
+
+// required uint32 mapSize = 2;
+inline bool h2mod_map_info::has_mapsize() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void h2mod_map_info::set_has_mapsize() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void h2mod_map_info::clear_has_mapsize() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void h2mod_map_info::clear_mapsize() {
+  mapsize_ = 0u;
+  clear_has_mapsize();
+}
+inline ::google::protobuf::uint32 h2mod_map_info::mapsize() const {
+  // @@protoc_insertion_point(field_get:h2mod_map_info.mapSize)
+  return mapsize_;
+}
+inline void h2mod_map_info::set_mapsize(::google::protobuf::uint32 value) {
+  set_has_mapsize();
+  mapsize_ = value;
+  // @@protoc_insertion_point(field_set:h2mod_map_info.mapSize)
 }
 
 

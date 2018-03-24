@@ -28,6 +28,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* h2mod_set_team_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   h2mod_set_team_reflection_ = NULL;
+const ::google::protobuf::Descriptor* h2mod_map_info_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  h2mod_map_info_reflection_ = NULL;
 
 }  // namespace
 
@@ -39,10 +42,11 @@ void protobuf_AssignDesc_h2mod_2eproto() {
       "h2mod.proto");
   GOOGLE_CHECK(file != NULL);
   H2ModPacket_descriptor_ = file->message_type(0);
-  static const int H2ModPacket_offsets_[3] = {
+  static const int H2ModPacket_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, h2_set_player_team_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, set_grenade_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, map_info_),
   };
   H2ModPacket_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -89,6 +93,22 @@ void protobuf_AssignDesc_h2mod_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(h2mod_set_team));
+  h2mod_map_info_descriptor_ = file->message_type(3);
+  static const int h2mod_map_info_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_map_info, mapfilename_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_map_info, mapsize_),
+  };
+  h2mod_map_info_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      h2mod_map_info_descriptor_,
+      h2mod_map_info::default_instance_,
+      h2mod_map_info_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_map_info, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_map_info, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(h2mod_map_info));
 }
 
 namespace {
@@ -107,6 +127,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
     h2mod_set_grenade_descriptor_, &h2mod_set_grenade::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     h2mod_set_team_descriptor_, &h2mod_set_team::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    h2mod_map_info_descriptor_, &h2mod_map_info::default_instance());
 }
 
 }  // namespace
@@ -118,6 +140,8 @@ void protobuf_ShutdownFile_h2mod_2eproto() {
   delete h2mod_set_grenade_reflection_;
   delete h2mod_set_team::default_instance_;
   delete h2mod_set_team_reflection_;
+  delete h2mod_map_info::default_instance_;
+  delete h2mod_map_info_reflection_;
 }
 
 void protobuf_AddDesc_h2mod_2eproto() {
@@ -127,22 +151,27 @@ void protobuf_AddDesc_h2mod_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\013h2mod.proto\"\270\001\n\013H2ModPacket\022\037\n\004type\030\001 "
+    "\n\013h2mod.proto\"\361\001\n\013H2ModPacket\022\037\n\004type\030\001 "
     "\002(\0162\021.H2ModPacket.Type\022+\n\022h2_set_player_"
     "team\030\002 \001(\0132\017.h2mod_set_team\022\'\n\013set_grena"
-    "de\030\003 \001(\0132\022.h2mod_set_grenade\"2\n\004Type\022\023\n\017"
-    "set_player_team\020\002\022\025\n\021set_unit_grenades\020\003"
-    "\"@\n\021h2mod_set_grenade\022\014\n\004type\030\001 \002(\r\022\r\n\005c"
-    "ount\030\002 \002(\r\022\016\n\006pIndex\030\003 \002(\r\"1\n\016h2mod_set_"
-    "team\022\021\n\tpeerIndex\030\001 \002(\r\022\014\n\004team\030\002 \002(\r", 317);
+    "de\030\003 \001(\0132\022.h2mod_set_grenade\022!\n\010map_info"
+    "\030\004 \001(\0132\017.h2mod_map_info\"H\n\004Type\022\023\n\017set_p"
+    "layer_team\020\002\022\025\n\021set_unit_grenades\020\003\022\024\n\020m"
+    "ap_info_request\020\004\"@\n\021h2mod_set_grenade\022\014"
+    "\n\004type\030\001 \002(\r\022\r\n\005count\030\002 \002(\r\022\016\n\006pIndex\030\003 "
+    "\002(\r\"1\n\016h2mod_set_team\022\021\n\tpeerIndex\030\001 \002(\r"
+    "\022\014\n\004team\030\002 \002(\r\"6\n\016h2mod_map_info\022\023\n\013mapF"
+    "ileName\030\001 \002(\t\022\017\n\007mapSize\030\002 \002(\r", 430);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "h2mod.proto", &protobuf_RegisterTypes);
   H2ModPacket::default_instance_ = new H2ModPacket();
   h2mod_set_grenade::default_instance_ = new h2mod_set_grenade();
   h2mod_set_team::default_instance_ = new h2mod_set_team();
+  h2mod_map_info::default_instance_ = new h2mod_map_info();
   H2ModPacket::default_instance_->InitAsDefaultInstance();
   h2mod_set_grenade::default_instance_->InitAsDefaultInstance();
   h2mod_set_team::default_instance_->InitAsDefaultInstance();
+  h2mod_map_info::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_h2mod_2eproto);
 }
 
@@ -163,6 +192,7 @@ bool H2ModPacket_Type_IsValid(int value) {
   switch(value) {
     case 2:
     case 3:
+    case 4:
       return true;
     default:
       return false;
@@ -172,6 +202,7 @@ bool H2ModPacket_Type_IsValid(int value) {
 #ifndef _MSC_VER
 const H2ModPacket_Type H2ModPacket::set_player_team;
 const H2ModPacket_Type H2ModPacket::set_unit_grenades;
+const H2ModPacket_Type H2ModPacket::map_info_request;
 const H2ModPacket_Type H2ModPacket::Type_MIN;
 const H2ModPacket_Type H2ModPacket::Type_MAX;
 const int H2ModPacket::Type_ARRAYSIZE;
@@ -180,6 +211,7 @@ const int H2ModPacket::Type_ARRAYSIZE;
 const int H2ModPacket::kTypeFieldNumber;
 const int H2ModPacket::kH2SetPlayerTeamFieldNumber;
 const int H2ModPacket::kSetGrenadeFieldNumber;
+const int H2ModPacket::kMapInfoFieldNumber;
 #endif  // !_MSC_VER
 
 H2ModPacket::H2ModPacket()
@@ -191,6 +223,7 @@ H2ModPacket::H2ModPacket()
 void H2ModPacket::InitAsDefaultInstance() {
   h2_set_player_team_ = const_cast< ::h2mod_set_team*>(&::h2mod_set_team::default_instance());
   set_grenade_ = const_cast< ::h2mod_set_grenade*>(&::h2mod_set_grenade::default_instance());
+  map_info_ = const_cast< ::h2mod_map_info*>(&::h2mod_map_info::default_instance());
 }
 
 H2ModPacket::H2ModPacket(const H2ModPacket& from)
@@ -205,6 +238,7 @@ void H2ModPacket::SharedCtor() {
   type_ = 2;
   h2_set_player_team_ = NULL;
   set_grenade_ = NULL;
+  map_info_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -217,6 +251,7 @@ void H2ModPacket::SharedDtor() {
   if (this != default_instance_) {
     delete h2_set_player_team_;
     delete set_grenade_;
+    delete map_info_;
   }
 }
 
@@ -242,13 +277,16 @@ H2ModPacket* H2ModPacket::New() const {
 }
 
 void H2ModPacket::Clear() {
-  if (_has_bits_[0 / 32] & 7) {
+  if (_has_bits_[0 / 32] & 15) {
     type_ = 2;
     if (has_h2_set_player_team()) {
       if (h2_set_player_team_ != NULL) h2_set_player_team_->::h2mod_set_team::Clear();
     }
     if (has_set_grenade()) {
       if (set_grenade_ != NULL) set_grenade_->::h2mod_set_grenade::Clear();
+    }
+    if (has_map_info()) {
+      if (map_info_ != NULL) map_info_->::h2mod_map_info::Clear();
     }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -306,6 +344,19 @@ bool H2ModPacket::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(34)) goto parse_map_info;
+        break;
+      }
+
+      // optional .h2mod_map_info map_info = 4;
+      case 4: {
+        if (tag == 34) {
+         parse_map_info:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_map_info()));
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -353,6 +404,12 @@ void H2ModPacket::SerializeWithCachedSizes(
       3, this->set_grenade(), output);
   }
 
+  // optional .h2mod_map_info map_info = 4;
+  if (has_map_info()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, this->map_info(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -381,6 +438,13 @@ void H2ModPacket::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         3, this->set_grenade(), target);
+  }
+
+  // optional .h2mod_map_info map_info = 4;
+  if (has_map_info()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        4, this->map_info(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -413,6 +477,13 @@ int H2ModPacket::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->set_grenade());
+    }
+
+    // optional .h2mod_map_info map_info = 4;
+    if (has_map_info()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->map_info());
     }
 
   }
@@ -451,6 +522,9 @@ void H2ModPacket::MergeFrom(const H2ModPacket& from) {
     if (from.has_set_grenade()) {
       mutable_set_grenade()->::h2mod_set_grenade::MergeFrom(from.set_grenade());
     }
+    if (from.has_map_info()) {
+      mutable_map_info()->::h2mod_map_info::MergeFrom(from.map_info());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -476,6 +550,9 @@ bool H2ModPacket::IsInitialized() const {
   if (has_set_grenade()) {
     if (!this->set_grenade().IsInitialized()) return false;
   }
+  if (has_map_info()) {
+    if (!this->map_info().IsInitialized()) return false;
+  }
   return true;
 }
 
@@ -484,6 +561,7 @@ void H2ModPacket::Swap(H2ModPacket* other) {
     std::swap(type_, other->type_);
     std::swap(h2_set_player_team_, other->h2_set_player_team_);
     std::swap(set_grenade_, other->set_grenade_);
+    std::swap(map_info_, other->map_info_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -1083,6 +1161,291 @@ void h2mod_set_team::Swap(h2mod_set_team* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = h2mod_set_team_descriptor_;
   metadata.reflection = h2mod_set_team_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int h2mod_map_info::kMapFileNameFieldNumber;
+const int h2mod_map_info::kMapSizeFieldNumber;
+#endif  // !_MSC_VER
+
+h2mod_map_info::h2mod_map_info()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:h2mod_map_info)
+}
+
+void h2mod_map_info::InitAsDefaultInstance() {
+}
+
+h2mod_map_info::h2mod_map_info(const h2mod_map_info& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:h2mod_map_info)
+}
+
+void h2mod_map_info::SharedCtor() {
+  ::google::protobuf::internal::GetEmptyString();
+  _cached_size_ = 0;
+  mapfilename_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  mapsize_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+h2mod_map_info::~h2mod_map_info() {
+  // @@protoc_insertion_point(destructor:h2mod_map_info)
+  SharedDtor();
+}
+
+void h2mod_map_info::SharedDtor() {
+  if (mapfilename_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete mapfilename_;
+  }
+  if (this != default_instance_) {
+  }
+}
+
+void h2mod_map_info::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* h2mod_map_info::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return h2mod_map_info_descriptor_;
+}
+
+const h2mod_map_info& h2mod_map_info::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_h2mod_2eproto();
+  return *default_instance_;
+}
+
+h2mod_map_info* h2mod_map_info::default_instance_ = NULL;
+
+h2mod_map_info* h2mod_map_info::New() const {
+  return new h2mod_map_info;
+}
+
+void h2mod_map_info::Clear() {
+  if (_has_bits_[0 / 32] & 3) {
+    if (has_mapfilename()) {
+      if (mapfilename_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+        mapfilename_->clear();
+      }
+    }
+    mapsize_ = 0u;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool h2mod_map_info::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:h2mod_map_info)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required string mapFileName = 1;
+      case 1: {
+        if (tag == 10) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_mapfilename()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->mapfilename().data(), this->mapfilename().length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "mapfilename");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_mapSize;
+        break;
+      }
+
+      // required uint32 mapSize = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_mapSize:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &mapsize_)));
+          set_has_mapsize();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:h2mod_map_info)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:h2mod_map_info)
+  return false;
+#undef DO_
+}
+
+void h2mod_map_info::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:h2mod_map_info)
+  // required string mapFileName = 1;
+  if (has_mapfilename()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->mapfilename().data(), this->mapfilename().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "mapfilename");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->mapfilename(), output);
+  }
+
+  // required uint32 mapSize = 2;
+  if (has_mapsize()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->mapsize(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:h2mod_map_info)
+}
+
+::google::protobuf::uint8* h2mod_map_info::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:h2mod_map_info)
+  // required string mapFileName = 1;
+  if (has_mapfilename()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->mapfilename().data(), this->mapfilename().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "mapfilename");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->mapfilename(), target);
+  }
+
+  // required uint32 mapSize = 2;
+  if (has_mapsize()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->mapsize(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:h2mod_map_info)
+  return target;
+}
+
+int h2mod_map_info::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required string mapFileName = 1;
+    if (has_mapfilename()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->mapfilename());
+    }
+
+    // required uint32 mapSize = 2;
+    if (has_mapsize()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->mapsize());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void h2mod_map_info::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const h2mod_map_info* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const h2mod_map_info*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void h2mod_map_info::MergeFrom(const h2mod_map_info& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_mapfilename()) {
+      set_mapfilename(from.mapfilename());
+    }
+    if (from.has_mapsize()) {
+      set_mapsize(from.mapsize());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void h2mod_map_info::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void h2mod_map_info::CopyFrom(const h2mod_map_info& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool h2mod_map_info::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+
+  return true;
+}
+
+void h2mod_map_info::Swap(h2mod_map_info* other) {
+  if (other != this) {
+    std::swap(mapfilename_, other->mapfilename_);
+    std::swap(mapsize_, other->mapsize_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata h2mod_map_info::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = h2mod_map_info_descriptor_;
+  metadata.reflection = h2mod_map_info_reflection_;
   return metadata;
 }
 

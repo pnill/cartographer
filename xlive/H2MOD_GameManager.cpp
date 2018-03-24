@@ -2,17 +2,11 @@
 #include <h2mod.pb.h>
 
 using namespace std;
+time_t startTime = time(0);
 
 void startGameThread() {
 	while (1) {
 		if (!gameManager->isHost()) {
-			if (!mapManager->hasCustomMap(mapManager->clientMapFilename)) {
-				bool success = mapManager->downloadFromRepo(mapManager->clientMapFilename);
-				//TODO: if downloading from repo fails, try to download directly from host
-				//if its supported for this host
-				//TODO: direct downloads happen once per map name, we should only download repo maps once per joined game so we don't hammer
-				//the repo server
-			}
 			if (!network->queuedNetworkCommands.empty()) {
 				std::deque<std::string>::iterator it = network->queuedNetworkCommands.begin();
 				std::string command = *it;
@@ -37,10 +31,19 @@ void startGameThread() {
 								BYTE type = recvpak.set_grenade().type();
 								BYTE count = recvpak.set_grenade().count();
 								BYTE pIndex = recvpak.set_grenade().pindex();
-
 								h2mod->set_local_grenades(type, count, pIndex);
 							}
 							break;
+						case H2ModPacket_Type_map_info_request:
+							TRACE_GAME("[h2mod-network] Received map info packet");
+							if (recvpak.has_map_info()) {
+								std::string mapFilename = recvpak.map_info().mapfilename();
+								if (!mapFilename.empty() && !mapManager->hasCustomMap(mapManager->clientMapFilename)) {
+									//TODO: set map filesize
+									//TODO: if downloading from repo files, try p2p
+									mapManager->downloadFromRepo(mapFilename);
+								}
+							}
 						default:
 							//TODO: log error
 							break;
@@ -50,8 +53,12 @@ void startGameThread() {
 			}
 		}
 		else {
-			//reload player data if host
-			players->reload();
+			double seconds_since_start = difftime(time(0), startTime);
+			if (players->getPlayerCount() > 0 && seconds_since_start > 10) {
+				//every 10 seconds send the map info packet
+				mapManager->sendMapInfoPacket();
+				startTime = time(0);
+			}
 		}
 		std::this_thread::sleep_for(1s);
 	}
