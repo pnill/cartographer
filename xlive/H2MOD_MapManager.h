@@ -23,7 +23,6 @@ public:
 	void startListeningForClients();
 	void startMapDownload();
 	void searchForMap();
-	void setClientMapFilename(std::string filename);
 	bool downloadFromRepo(std::string mapFilename);
 	std::string clientMapFilename;
 	void setCustomLobbyMessage(const char* newStatus);
@@ -53,7 +52,6 @@ private:
 	//server functions below
 	void stopListeningForClients();
 
-	std::wstring customMapFileName;
 	TcpServer* tcpServer = NULL;
 	bool requestMapUrl = false;
 	std::wstring currentMap;

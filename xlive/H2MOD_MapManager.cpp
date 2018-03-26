@@ -43,15 +43,11 @@ std::string fileSizeDelim("$");
 
 std::wstring CUSTOM_MAP = L"Custom Map";
 wchar_t EMPTY_UNICODE_STR = '\0';
-std::wstring EMPTY_WSTRING(L"");
 
 /**
 * Constructs the map manager for client/servers
 */
-MapManager::MapManager() {
-	//init the custom map file name string
-	this->customMapFileName = EMPTY_WSTRING;
-}
+MapManager::MapManager() {}
 
 /**
 * Start listening for tcp clients
@@ -250,10 +246,6 @@ cleanup:
 	threadRunning = false;
 }
 
-void MapManager::setClientMapFilename(std::string filename) {
-	this->clientMapFilename = filename;
-}
-
 /**
 * Cleanups client and server download states
 */
@@ -270,6 +262,7 @@ void MapManager::sendMapInfoPacket()
 	teampak.set_type(H2ModPacket_Type_map_info_request);
 
 	h2mod_map_info* map_info = teampak.mutable_map_info();
+	TRACE_GAME_N("[h2mod-network] map name being sent %s", this->getCachedMapFilename().c_str());
 	map_info->set_mapfilename(this->getCachedMapFilename());
 	//TODO: send over size so p2p can work
 	map_info->set_mapsize(0);

@@ -566,17 +566,18 @@ void CustomNetwork::sendCustomPacketToAllPlayers() {
 		{
 			if (playerCounter != *(DWORD *)(packetDataObj + 29120))
 			{
+				int peerIndex = players->getPeerIndex(playerCounter);
+				TRACE_GAME("[h2mod-network] sending packet to all players, playerIndex=%d, peerIndex=%d", playerCounter, peerIndex);
 				//only send the command packet to the given peer index
 				char* newPacketObject = (char*)(packetDataObj);
 				dynamic_packet_check(
 					*((void **)newPacketObject + 2),
 					*((DWORD *)newPacketObject + 5),
-					*(DWORD *)&newPacketObject[28 * playerCounter + 29128],
+					*(DWORD *)&newPacketObject[28 * peerIndex + 29128],
 					0,
 					0x2F,
 					CHAT_PACKET_SIZE,
 					(int)&packetdata);
-				break;
 			}
 			++playerCounter;
 		} while (playerCounter < *(DWORD *)(playerCountAddr + 20));

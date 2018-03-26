@@ -38,10 +38,13 @@ void startGameThread() {
 							TRACE_GAME("[h2mod-network] Received map info packet");
 							if (recvpak.has_map_info()) {
 								std::string mapFilename = recvpak.map_info().mapfilename();
-								if (!mapFilename.empty() && !mapManager->hasCustomMap(mapManager->clientMapFilename)) {
-									//TODO: set map filesize
-									//TODO: if downloading from repo files, try p2p
-									mapManager->downloadFromRepo(mapFilename);
+								if (!mapFilename.empty()) {
+									TRACE_GAME_N("[h2mod-network] map file name from packet %s", mapFilename.c_str());
+									if (!mapManager->hasCustomMap(mapFilename)) {
+										//TODO: set map filesize
+										//TODO: if downloading from repo files, try p2p
+										mapManager->downloadFromRepo(mapFilename);
+									}
 								}
 							}
 						default:
@@ -55,6 +58,7 @@ void startGameThread() {
 		else {
 			double seconds_since_start = difftime(time(0), startTime);
 			if (players->getPlayerCount() > 0 && seconds_since_start > 10) {
+				TRACE_GAME("[h2mod-network] sending map info packet");
 				//every 10 seconds send the map info packet
 				mapManager->sendMapInfoPacket();
 				startTime = time(0);
