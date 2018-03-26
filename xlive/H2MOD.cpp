@@ -527,13 +527,18 @@ void SoundThread(void)
 
 		if (h2mod->SoundMap.size() > 0)
 		{
-			auto it = h2mod->SoundMap.begin();
-			while (it != h2mod->SoundMap.end())
+			std::unordered_map<wchar_t*, int> tempSoundMap;
+			tempSoundMap.insert(h2mod->SoundMap.begin(), h2mod->SoundMap.end());
+			//unlock immediately after reading everything from sound map
+			lck.unlock();
+
+			auto it = tempSoundMap.begin();
+			while (it != tempSoundMap.end())
 			{
 				TRACE_GAME("[H2MOD-SoundQueue] - attempting to play sound %ws - delaying for %i miliseconds first", it->first, it->second);
 				Sleep(it->second);
 				PlaySound(it->first, NULL, SND_FILENAME);
-				it = h2mod->SoundMap.erase(it);
+				it = tempSoundMap.erase(it);
 			}
 		}
 		

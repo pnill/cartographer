@@ -56,6 +56,8 @@ void Infection::triggerSound(const wchar_t* name, int sleep) {
 	TRACE_GAME("[h2mod-infection] Triggering sound %s", name);
 	std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
 	h2mod->SoundMap[(wchar_t*)name] = sleep;
+	//unlock immediately after modifying sound map
+	lck.unlock();
 	h2mod->sound_cv.notify_one();
 }
 
