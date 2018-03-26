@@ -1,6 +1,7 @@
 #include <unordered_set>
 #include "stdafx.h"
-#include "discord-rpc.h"
+#include "discord_rpc.h"
+#include "discord_register.h"
 #include "DiscordInterface.h"
 
 const static char api_key[] = "379371722685808641";

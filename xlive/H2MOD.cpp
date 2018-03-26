@@ -19,7 +19,7 @@
 #include "H2OnscreenDebugLog.h"
 #include "GSUtils.h"
 #include <Mmsystem.h>
-#include "DiscordInterface.h"
+#include "discord/DiscordInterface.h"
 #include "H2Config.h"
 #include "H2Tweaks.h"
 

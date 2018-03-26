@@ -82,6 +82,9 @@
     <Filter Include="Source Files\Blam\Enums\Objects">
       <UniqueIdentifier>{b6472f0a-f04e-45d0-adb0-c2835f526b6c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Discord">
+      <UniqueIdentifier>{878d46ad-b9ab-4fd7-b625-bdd1b7774c85}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -138,9 +141,6 @@
     <ClCompile Include="H2ConsoleCommands.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DiscordInterface.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD_H2X.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
@@ -188,6 +188,9 @@
     </ClCompile>
     <ClCompile Include="H2MOD_Network.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="discord\DiscordInterface.cpp">
+      <Filter>Source Files\Discord</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -391,6 +394,9 @@
     </ClInclude>
     <ClInclude Include="Blam\Engine\Game\HaloScript.h">
       <Filter>Source Files\Blam\Engine\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="discord\DiscordInterface.h">
+      <Filter>Source Files\Discord</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
