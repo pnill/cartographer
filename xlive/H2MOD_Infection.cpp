@@ -30,6 +30,7 @@ void Infection::sendTeamChange(int playerIndex) {
 
 	h2mod_set_team *set_team = teampak.mutable_h2_set_player_team();
 	set_team->set_team(ZOMBIE_TEAM);
+	set_team->set_peerindex(players->getPeerIndex(playerIndex));
 
 	char* SendBuf = new char[teampak.ByteSize()];
 	teampak.SerializeToArray(SendBuf, teampak.ByteSize());
