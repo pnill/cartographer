@@ -43,6 +43,7 @@ std::string fileSizeDelim("$");
 
 std::wstring CUSTOM_MAP = L"Custom Map";
 wchar_t EMPTY_UNICODE_STR = '\0';
+std::string EMPTY_STR("");
 
 /**
 * Constructs the map manager for client/servers
@@ -152,7 +153,6 @@ void MapManager::reloadMaps() {
 	}
 	reloadMapsSet((int)mapsObject);
 	reloadMaps((int)mapsObject);
-	reloadMapFilenames();
 }
 
 /**
@@ -176,7 +176,7 @@ const char* MapManager::getCustomLobbyMessage() {
 	return this->customLobbyMessage;
 }
 
-void MapManager::reloadMapFilenames() {
+std::string MapManager::getMapFilename() {
 	//0x30 (difference from start of maps object to first custom map)
 	//0xB90 (difference between each custom map name)
 	//0x960 (difference between custom map name and its file path
@@ -198,7 +198,7 @@ void MapManager::reloadMapFilenames() {
 	for (int i = 0; i <= 50; i++) {
 		wchar_t* mapName = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + (i * 0xB90)));
 		wchar_t* mapPath = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + ((i * 0xB90) + 0x960)));
- 		if (mapName == NULL || *mapName == L'\0' || (wcscmp(mapName, L"\\") != NULL && wcscmp(mapName, L"\\") > 0)) {
+		if (mapName == NULL || *mapName == L'\0' || (wcscmp(mapName, L"\\") != NULL && wcscmp(mapName, L"\\") > 0)) {
 			//skip empty map names
 			continue;
 		}
@@ -206,14 +206,14 @@ void MapManager::reloadMapFilenames() {
 		std::string nonUnicodeCustomMapFilename(unicodeMapFilename.begin(), unicodeMapFilename.end());
 		std::size_t offset = nonUnicodeCustomMapFilename.find_last_of("\\");
 		std::size_t extOffset = nonUnicodeCustomMapFilename.find_last_not_of(mapExt);
-		std::string nonUnicodeMapName = nonUnicodeCustomMapFilename.substr(offset + 1, extOffset);
-		if (!nonUnicodeMapName.empty())
-			this->mapNameToFileName[std::wstring(mapName)] = nonUnicodeMapName;
+		std::string nonUnicodeMapFileName = nonUnicodeCustomMapFilename.substr(offset + 1, extOffset);
+		if (!nonUnicodeMapFileName.empty() && wcscmp(this->getMapName().c_str(), mapName) == 0) {
+			//if the filename exists and the current map english name is equal to the iterated map name
+			std::wstring currentMapName(mapName);
+			return nonUnicodeMapFileName;
+		}
 	}
-}
-
-std::string MapManager::getCachedMapFilename() {
-	return this->mapNameToFileName[this->getMapName()];
+	return "";
 }
 
 /**
@@ -262,8 +262,8 @@ void MapManager::sendMapInfoPacket()
 	teampak.set_type(H2ModPacket_Type_map_info_request);
 
 	h2mod_map_info* map_info = teampak.mutable_map_info();
-	TRACE_GAME_N("[h2mod-network] map name being sent %s", this->getCachedMapFilename().c_str());
-	map_info->set_mapfilename(this->getCachedMapFilename());
+	TRACE_GAME_N("[h2mod-network] map name being sent %s", this->getMapFilename().c_str());
+	map_info->set_mapfilename(this->getMapFilename());
 	//TODO: send over size so p2p can work
 	map_info->set_mapsize(0);
 

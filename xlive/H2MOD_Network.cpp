@@ -65,7 +65,6 @@ data_encode_boolean getDataEncodeBooleanMethod() {
 }
 
 void afterMapsLoadedCave() {
-	mapManager->reloadMapFilenames();
 	gameManager->start();
 }
 DWORD retAddr = 0;

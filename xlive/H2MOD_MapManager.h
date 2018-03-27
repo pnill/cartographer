@@ -31,8 +31,7 @@ public:
 	std::unordered_map<std::wstring, std::string> mapNameToFileName;
 
 	//server functions below
-	void reloadMapFilenames();
-	std::string getCachedMapFilename();
+	std::string getMapFilename();
 
 private:
 	class TcpServer {
