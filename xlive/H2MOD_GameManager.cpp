@@ -2,7 +2,6 @@
 #include <h2mod.pb.h>
 
 using namespace std;
-time_t startTime = time(0);
 
 void startGameThread() {
 	while (1) {
@@ -53,15 +52,6 @@ void startGameThread() {
 						}
 					}
 				}
-			}
-		}
-		else {
-			double seconds_since_start = difftime(time(0), startTime);
-			if (players->getPlayerCount() > 0 && seconds_since_start > 10) {
-				TRACE_GAME("[h2mod-network] sending map info packet");
-				//every 10 seconds send the map info packet
-				mapManager->sendMapInfoPacket();
-				startTime = time(0);
 			}
 		}
 		std::this_thread::sleep_for(1s);

@@ -1041,6 +1041,15 @@ void H2MOD::securityPacketProcessing()
 	}
 }
 
+typedef void(__cdecl *on_custom_map_change)(const void* a1);
+on_custom_map_change on_custom_map_change_method;
+
+void __cdecl onCustomMapChange(const void* a1) {
+	on_custom_map_change_method(a1);
+	//map changed, send update
+	mapManager->sendMapInfoPacket();
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1053,6 +1062,9 @@ void H2MOD::ApplyHooks() {
 
 		//pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
 		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		on_custom_map_change_method = (on_custom_map_change)DetourFunc((BYTE*)this->GetBase() + 0x32176, (BYTE*)onCustomMapChange, 5);
+		VirtualProtect(on_custom_map_change_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//boot method
 		calls_session_boot_method = (calls_session_boot)DetourClassFunc((BYTE*)this->GetBase() + 0x1CCE9B, (BYTE*)calls_session_boot_sub_1cce9b, 8);
@@ -1137,6 +1149,9 @@ void H2MOD::ApplyHooks() {
 	else {
 
 		DWORD dwBack;
+
+		on_custom_map_change_method = (on_custom_map_change)DetourFunc((BYTE*)this->GetBase() + 0x25738, (BYTE*)onCustomMapChange, 5);
+		VirtualProtect(on_custom_map_change_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		dedi_command_hook_method = (dedi_command_hook)DetourFunc((BYTE*)this->GetBase() + 0x1CCFC, (BYTE*)dediCommandHook, 7);
 		VirtualProtect(dedi_command_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
