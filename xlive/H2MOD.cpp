@@ -23,6 +23,7 @@
 #include "discord/DiscordInterface.h"
 #include "H2Config.h"
 #include "H2Tweaks.h"
+#include "Blam\Engine\FileSystem\FiloInterface.h"
 
 
 
@@ -1128,10 +1129,19 @@ BOOL WINAPI CryptUnprotectDataHook(
 )
 {
 	if (CryptUnprotectData(pDataIn, ppszDataDescr, pOptionalEntropy, pvReserved, pPromptStruct, dwFlags, pDataOut) == FALSE) {
-		DuplicateDataBlob(pDataIn, pDataOut);
+		DuplicateDataBlob(pDataIn, pDataOut); // if decrypting the data fails just assume it's unencrypted
 	}
 
 	return TRUE;
+}
+
+char filo_write__encrypted_data_hook(filo *file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
+{
+	DWORD file_size = GetFileSize(file_ptr->handle, NULL);
+
+	if (file_size > nNumberOfBytesToWrite) // clear the file as unencrypted data is shorter then encrypted data.
+		FiloInterface::change_size(file_ptr, 0);
+	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
 }
 
 void H2MOD::securityPacketProcessing()
@@ -1242,6 +1252,8 @@ void H2MOD::ApplyHooks() {
 
 		PatchWinAPICall(GetBase() + 0x9AF9E, CryptUnprotectDataHook);
 
+		PatchCall(GetBase() + 0x9B09F, filo_write__encrypted_data_hook);
+
 		//FIXME: This causes SP to crash after cutscenes.
 		//allow AI in MP
 		//NopFill(h2mod->GetBase() + 0x30E67C, 0x14);
@@ -1280,6 +1292,8 @@ void H2MOD::ApplyHooks() {
 		PatchWinAPICall(GetBase() + 0x85F5E, CryptProtectDataHook);
 
 		PatchWinAPICall(GetBase() + 0x352538, CryptUnprotectDataHook);
+
+		PatchCall(GetBase() + 0x85F73, filo_write__encrypted_data_hook);
 	}
 
 	//apply any network hooks
