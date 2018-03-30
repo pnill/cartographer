@@ -206,12 +206,12 @@ void InitH2Tweaks() {
 		WriteBytes(H2BaseAddr + 0x3a1ce, assmIntroESRBSkip, 1);
 
 		//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
-		PatchCall(H2BaseAddr + 0x22667B, (DWORD)NotDisplayIngameChat);
-		PatchCall(H2BaseAddr + 0x226628, (DWORD)NotDisplayIngameChat);
+		PatchCall(H2BaseAddr + 0x22667B, NotDisplayIngameChat);
+		PatchCall(H2BaseAddr + 0x226628, NotDisplayIngameChat);
 
 		//hook the gui popup for when the player is booted.
 		sub_20E1D8 = (int(__cdecl*)(int, int, int, int, int, int))((char*)H2BaseAddr + 0x20E1D8);
-		PatchCall(H2BaseAddr + 0x21754C, (DWORD)&sub_20E1D8_boot);
+		PatchCall(H2BaseAddr + 0x21754C, &sub_20E1D8_boot);
 	}
 	addDebugText("End Startup Tweaks.");
 }
