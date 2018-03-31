@@ -207,7 +207,7 @@ std::string MapManager::getMapFilename() {
 	for (int i = 0; i <= 50; i++) {
 		wchar_t* mapName = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + (i * 0xB90)));
 		wchar_t* mapPath = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + ((i * 0xB90) + 0x960)));
-		if (mapName == NULL || *mapName == L'\0' || (wcscmp(mapName, L"\\") != NULL && wcscmp(mapName, L"\\") > 0)) {
+		if (mapName == NULL || *mapName == L'\0') {
 			//skip empty map names
 			continue;
 		}
