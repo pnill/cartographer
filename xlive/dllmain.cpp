@@ -328,6 +328,30 @@ void ExitInstance()
 	TerminateProcess(GetCurrentProcess(), 0);
 }
 
+HHOOK currentHook;
+LRESULT CALLBACK HookProc(int nCode, WPARAM wp, LPARAM lp)
+{
+	WPARAM wParam;
+	if (nCode == HC_ACTION)
+	{
+		BOOL eatKey = false;
+		switch (wp)
+		{
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+			PKBDLLHOOKSTRUCT p = (PKBDLLHOOKSTRUCT)lp;
+			wParam = p->vkCode;
+			eatKey = commands->handleInput(wParam);
+			//TRACE_GAME_N("Key pressed %d, eatKey=%d", wParam, eatKey);
+			break;
+		}
+		if (eatKey) {
+			return 1;
+		}
+	}
+	return CallNextHookEx(currentHook, nCode, wp, lp);
+}
+
 //=============================================================================
 // Entry Point
 BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
@@ -336,6 +360,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 	{
 	case DLL_PROCESS_ATTACH:
 		hThis = hModule;
+		currentHook = SetWindowsHookEx(WH_KEYBOARD_LL, HookProc, 0, 0);
 		srand((unsigned int)time(NULL));
 		InitH2Startup();
 		Detour();
