@@ -46,6 +46,9 @@ void startGameThread() {
 										//TODO: if downloading from repo files, try p2p
 										mapManager->downloadFromRepo(mapFilename);
 									}
+									else {
+										TRACE_GAME_N("[h2mod-network] already has map %s", mapFilename.c_str());
+									}
 								}
 							}
 						default:
@@ -63,6 +66,9 @@ void startGameThread() {
 					//TODO: set map filesize
 					//TODO: if downloading from repo files, try p2p
 					mapManager->downloadFromRepo(mapFilenameToDownload);
+				}
+				else {
+					TRACE_GAME_N("[h2mod-network] already has map %s", mapFilenameToDownload.c_str());
 				}
 				mapManager->setMapFileNameToDownload(EMPTY_STR2);
 			}
