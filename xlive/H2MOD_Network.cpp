@@ -602,6 +602,15 @@ char* __cdecl registerChatPackets(void* packetObject) {
 		0);
 }
 
+typedef void(__cdecl *membership_update_write)(void* a1, int a2, int a3);
+membership_update_write membership_update_write_method;
+
+void __cdecl membershipUpdateWrite(void* a1, int a2, int a3) {
+	membership_update_write_method(a1, a2, a3);
+
+	mapManager->sendMapInfoPacket();
+}
+
 void CustomNetwork::applyNetworkHooks() {
 	DWORD dwBack;
 	DWORD registerConnectionPacketsOffset = 0x1F1B36;
@@ -613,6 +622,7 @@ void CustomNetwork::applyNetworkHooks() {
 	DWORD registerChatPacketsOffset = 0x1ECFB7;
 	DWORD sendChatPacketOffset = 0x1CADF7;
 	DWORD sendChatPacketOffset2 = 0x1C81EC;
+	DWORD serializeMembershipDataPacketOffset = 0x1EF6B9;
 
 	if (h2mod->Server) {
 		registerConnectionPacketsOffset = 0x1D24EF;
@@ -624,6 +634,7 @@ void CustomNetwork::applyNetworkHooks() {
 		registerChatPacketsOffset = 0x1CD970;
 		sendChatPacketOffset = 0x19F9DC;
 		sendChatPacketOffset2 = 0x1A237F;
+		serializeMembershipDataPacketOffset = 0x1D0072;
 	}
 
 	//TODO: should be somewhere else
@@ -633,6 +644,12 @@ void CustomNetwork::applyNetworkHooks() {
 	} else {
 		Codecave(h2mod->GetBase() + 0x4D311, afterMapsLoaded, 0);
 	}
+	////////////////////////////////////
+	//member packet customizations below
+	////////////////////////////////////
+
+	membership_update_write_method = (membership_update_write)DetourFunc((BYTE*)h2mod->GetBase() + serializeMembershipDataPacketOffset, (BYTE*)membershipUpdateWrite, 5);
+	VirtualProtect(membership_update_write_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	///////////////////////////////////////////////
 	//connection/player packet customizations below
