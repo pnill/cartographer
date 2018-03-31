@@ -1,7 +1,9 @@
 #include "Globals.h"
 #include <h2mod.pb.h>
 
-using namespace std;
+using namespace std; 
+
+std::string EMPTY_STR2("");
 
 void startGameThread() {
 	while (1) {
@@ -52,6 +54,17 @@ void startGameThread() {
 						}
 					}
 				}
+			}
+
+			std::string mapFilenameToDownload = mapManager->getMapFilenameToDownload();
+			if (!mapFilenameToDownload.empty()) {
+				TRACE_GAME_N("[h2mod-network] map file name from membership packet %s", mapFilenameToDownload.c_str());
+				if (!mapManager->hasCustomMap(mapFilenameToDownload)) {
+					//TODO: set map filesize
+					//TODO: if downloading from repo files, try p2p
+					mapManager->downloadFromRepo(mapFilenameToDownload);
+				}
+				mapManager->setMapFileNameToDownload(EMPTY_STR2);
 			}
 		}
 		std::this_thread::sleep_for(1s);

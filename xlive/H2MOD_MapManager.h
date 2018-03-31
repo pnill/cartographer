@@ -20,6 +20,8 @@ public:
 	bool hasCustomMap(std::wstring mapName);
 
 	//client functions/data below
+	std::string getMapFilenameToDownload();
+	void setMapFileNameToDownload(std::string mapFilenameToDownload);
 	void startListeningForClients();
 	void startMapDownload();
 	void searchForMap();
@@ -57,4 +59,5 @@ private:
 	const char* customLobbyMessage = NULL;
 	volatile BOOL threadRunning = false;
 	std::set<std::string> downloadedMaps;
+	std::string mapFilenameToDownload;
 };
