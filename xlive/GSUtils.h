@@ -1,8 +1,6 @@
 #pragma once
 #include "stdafx.h"
 
-void PatchCall(DWORD call_addr, DWORD new_function_ptr);
-void WritePointer(DWORD offset, void *ptr);
 void HexToByteArray(BYTE* byteArray, char* pointerHex);
 int FindLineStart(FILE* fp, int lineStrLen);
 ///FREE MEMOERY in fileLine

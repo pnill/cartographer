@@ -85,6 +85,9 @@
     <Filter Include="Source Files\Discord">
       <UniqueIdentifier>{878d46ad-b9ab-4fd7-b625-bdd1b7774c85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Blam\Engine\FileSystem">
+      <UniqueIdentifier>{aa2f6652-3038-44a5-9f37-1fc5c8f2319c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -191,6 +194,9 @@
     </ClCompile>
     <ClCompile Include="discord\DiscordInterface.cpp">
       <Filter>Source Files\Discord</Filter>
+    </ClCompile>
+    <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp">
+      <Filter>Source Files\Blam\Engine\FileSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -397,6 +403,9 @@
     </ClInclude>
     <ClInclude Include="discord\DiscordInterface.h">
       <Filter>Source Files\Discord</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\FileSystem\FiloInterface.h">
+      <Filter>Source Files\Blam\Engine\FileSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

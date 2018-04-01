@@ -1,5 +1,6 @@
 #include <stdafx.h>
 #include <windows.h>
+#include <Wincrypt.h>
 #include <iostream>
 #include <sstream>
 #include <codecvt>
@@ -22,6 +23,7 @@
 #include "discord/DiscordInterface.h"
 #include "H2Config.h"
 #include "H2Tweaks.h"
+#include "Blam\Engine\FileSystem\FiloInterface.h"
 
 
 
@@ -744,9 +746,9 @@ void H2MOD::PatchNewRound(bool hackit) //All thanks to Glitchy Scripts who wrote
 	else
 		offset = 0x715ee;
 	if(hackit)	
-		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)OnNewRound); 
+		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), OnNewRound); 
 	else
-		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (DWORD)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x6A87C : 0x6B1C8)));
+		PatchCall((DWORD)((char*)h2mod->GetBase() + offset), (h2mod->GetBase() + ((h2mod->Server) ? 0x6A87C : 0x6B1C8)));
 }
 
 
@@ -1094,6 +1096,54 @@ void __cdecl print_to_console(char *output)
 	commands->display(prefix + output);
 }
 
+void DuplicateDataBlob(DATA_BLOB  *pDataIn, DATA_BLOB  *pDataOut)
+{
+	pDataOut->cbData = pDataIn->cbData;
+	pDataOut->pbData = static_cast<BYTE*>(LocalAlloc(LMEM_FIXED, pDataIn->cbData));
+	CopyMemory(pDataOut->pbData, pDataIn->pbData, pDataIn->cbData);
+}
+
+BOOL WINAPI CryptProtectDataHook(
+	_In_       DATA_BLOB                 *pDataIn,
+	_In_opt_   LPCWSTR                   szDataDescr,
+	_In_opt_   DATA_BLOB                 *pOptionalEntropy,
+	_Reserved_ PVOID                     pvReserved,
+	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT *pPromptStruct,
+	_In_       DWORD                     dwFlags,
+	_Out_      DATA_BLOB                 *pDataOut
+)
+{
+	DuplicateDataBlob(pDataIn, pDataOut);
+
+	return TRUE;
+}
+
+BOOL WINAPI CryptUnprotectDataHook(
+	_In_       DATA_BLOB                 *pDataIn,
+	_Out_opt_  LPWSTR                    *ppszDataDescr,
+	_In_opt_   DATA_BLOB                 *pOptionalEntropy,
+	_Reserved_ PVOID                     pvReserved,
+	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT *pPromptStruct,
+	_In_       DWORD                     dwFlags,
+	_Out_      DATA_BLOB                 *pDataOut
+)
+{
+	if (CryptUnprotectData(pDataIn, ppszDataDescr, pOptionalEntropy, pvReserved, pPromptStruct, dwFlags, pDataOut) == FALSE) {
+		DuplicateDataBlob(pDataIn, pDataOut); // if decrypting the data fails just assume it's unencrypted
+	}
+
+	return TRUE;
+}
+
+char filo_write__encrypted_data_hook(filo *file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
+{
+	DWORD file_size = GetFileSize(file_ptr->handle, NULL);
+
+	if (file_size > nNumberOfBytesToWrite) // clear the file as unencrypted data is shorter then encrypted data.
+		FiloInterface::change_size(file_ptr, 0);
+	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
+}
+
 void H2MOD::securityPacketProcessing()
 {
 
@@ -1188,19 +1238,26 @@ void H2MOD::ApplyHooks() {
 
 		// Patch out the code that displays the "Invalid Checkpoint" error
 		// Start
-		NopFill(this->GetBase() + 0x30857, 0x41);
+		NopFill(GetBase() + 0x30857, 0x41);
 		// Respawn
-		NopFill(this->GetBase() + 0x8BB98, 0x2b);
+		NopFill(GetBase() + 0x8BB98, 0x2b);
 
 		change_team_method = (change_team)DetourFunc((BYTE*)this->GetBase() + 0x2068F2, (BYTE*)changeTeam, 8);
 		VirtualProtect(change_team_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		// hook the print command to redirect the output to our console
-		PatchCall(Base + 0xE9E50, reinterpret_cast<DWORD>(print_to_console));
+		PatchCall(Base + 0xE9E50, print_to_console);
+
+		PatchWinAPICall(GetBase() + 0x9B08A, CryptProtectDataHook);
+
+		PatchWinAPICall(GetBase() + 0x9AF9E, CryptUnprotectDataHook);
+
+		PatchCall(GetBase() + 0x9B09F, filo_write__encrypted_data_hook);
 
 		//FIXME: This causes SP to crash after cutscenes.
 		//allow AI in MP
 		//NopFill(h2mod->GetBase() + 0x30E67C, 0x14);
+
 	}
 #pragma endregion
 
@@ -1231,6 +1288,12 @@ void H2MOD::ApplyHooks() {
 
 		pplayer_death = (player_death)DetourFunc((BYTE*)this->GetBase() + 0x152ED4, (BYTE*)OnPlayerDeath, 9);
 		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		PatchWinAPICall(GetBase() + 0x85F5E, CryptProtectDataHook);
+
+		PatchWinAPICall(GetBase() + 0x352538, CryptUnprotectDataHook);
+
+		PatchCall(GetBase() + 0x85F73, filo_write__encrypted_data_hook);
 	}
 
 	//apply any network hooks

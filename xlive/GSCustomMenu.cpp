@@ -2476,8 +2476,8 @@ DWORD* menu_vftable_1_ToggleSkulls = 0;
 DWORD* menu_vftable_2_ToggleSkulls = 0;
 
 void CMSetupVFTables_ToggleSkulls() {
-	PatchCall(H2BaseAddr + 0x228579, (DWORD)sub_BD114_blind_fp);
-	PatchCall(H2BaseAddr + 0x223955, (DWORD)sub_BD114_blind_hud);
+	PatchCall(H2BaseAddr + 0x228579, sub_BD114_blind_fp);
+	PatchCall(H2BaseAddr + 0x223955, sub_BD114_blind_hud);
 
 	CMSetupVFTables(&menu_vftable_1_ToggleSkulls, &menu_vftable_2_ToggleSkulls, (DWORD)CMLabelButtons_ToggleSkulls, (DWORD)sub_2111ab_CMLTD_nak_ToggleSkulls, (DWORD)CustomMenuFuncPtrHelp_ToggleSkulls, (DWORD)sub_20F790_CM_nak_ToggleSkulls, true, 0);
 }
@@ -4360,7 +4360,7 @@ void initGSCustomMenu() {
 	setupSomeTests();
 
 	//"PRESS ANY KEY TO CONTINUE" mainmenu redirect.
-	PatchCall((DWORD)((BYTE*)H2BaseAddr + 0x23EF0A), (DWORD)&sub_209236);
+	PatchCall((DWORD)((BYTE*)H2BaseAddr + 0x23EF0A), &sub_209236);
 
 	DWORD dwBack;
 	pbtnHandler = (tbtnhandler)DetourClassFunc((BYTE*)H2BaseAddr + 0x213af2, (BYTE*)BtnHandlerCaller, 8);
