@@ -1626,7 +1626,7 @@ void H2MOD::Initialize()
 		//PatchPingMeterCheck();
 		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
 
-		if (H2Config_discord_enable || H2GetInstanceId() == 1) {
+		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");
 			DiscordInterface::Init();
