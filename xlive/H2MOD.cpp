@@ -607,9 +607,6 @@ membership_update_network_decode pmembership_update_network_decode;
 typedef int(__cdecl *game_difficulty_get_real_evaluate)(int a1, int a2);
 game_difficulty_get_real_evaluate pgame_difficulty_get_real_evaluate;
 
-typedef int(__cdecl *map_intialize)(int a1);
-map_intialize pmap_initialize;
-
 typedef char(__cdecl *player_death)(int unit_datum_index, int a2, char a3, char a4);
 player_death pplayer_death;
 
@@ -763,46 +760,50 @@ bool __cdecl player_remove_packet_handler(void *packet, int size, void *data)
 }
 */
 
-int __cdecl OnMapLoad(int a1)
+typedef int(__cdecl *onGameEngineChange)(int a1);
+onGameEngineChange ponGameEngineChange;
+
+typedef void(__cdecl *sub_1112D88)();
+sub_1112D88 psub_1112D88;
+
+void __cdecl onGameEngineChange_hook(int a1)
 {
+	psub_1112D88(); //this gets called at the beginning of pmap_initialize, and breaks after detour, so this is a fix
+	ponGameEngineChange(a1); //function that changes game engine type
+
 	overrideUnicodeMessage = false;
-
 	isLobby = true;
-	int ret = pmap_initialize(a1);
 
-	//OnMapLoad is called with 30888 when a game ends
-	if (a1 == 30888)
+	DWORD GameGlobals = *(DWORD*)(h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
+	BYTE GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
+	BYTE GameEngine = *(BYTE*)(GameGlobals + 0x8);
+
+	//based on what gameEngineChange has changed
+	//we do our stuff bellow
+
+	if (GameEngine == MAIN_MENU_ENGINE)
 	{
 		if (b_Halo2Final && !h2mod->Server)
 			h2f->Dispose();
 
-		if (b_Infection) 
-		{
+		if (b_Infection)
 			inf->Deinitialize();
-		}
 
 		PatchFixRankIcon();
-
-		return ret;
+		
+		return;
 	}
-
-	extern void RefreshToggleDisableControllerAimAssist();
-	RefreshToggleDisableControllerAimAssist();
 
 	b_Infection = false;
 	b_GunGame = false;
 	b_Halo2Final = false;
 	b_H2X = false;
 
-	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
-	DWORD GameGlobals = *(DWORD*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-	BYTE GameState = *(BYTE*)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
-
-	BYTE GameEngine = *(BYTE*)(GameGlobals + 0x8);
-	
+	wchar_t* variant_name = (wchar_t*)(h2mod->GetBase() + ((h2mod->Server) ? 0x534A18 : 0x97777C));
 	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", GameEngine, variant_name);
 
-	if (GameEngine == 2) {
+	if (GameEngine == MULTIPLAYER_ENGINE)
+	{
 		if (wcsstr(variant_name, L"zombies") > 0 || wcsstr(variant_name, L"Zombies") > 0 || wcsstr(variant_name, L"Infection") > 0 || wcsstr(variant_name, L"infection") > 0)
 		{
 			TRACE_GAME("[h2mod] Zombies Turned on!");
@@ -810,7 +811,6 @@ int __cdecl OnMapLoad(int a1)
 		}
 
 		if (wcsstr(variant_name, L"GunGame") > 0 || wcsstr(variant_name, L"gungame") > 0 || wcsstr(variant_name, L"Gungame") > 0)
-
 		{
 			TRACE_GAME("[h2mod] GunGame Turned on!");
 			b_GunGame = true;
@@ -821,55 +821,23 @@ int __cdecl OnMapLoad(int a1)
 			TRACE_GAME("[h2mod] Halo2Final Turned on!");
 			b_Halo2Final = true;
 		}
-		
+
 		if (wcsstr(variant_name, L"H2X") > 0 || wcsstr(variant_name, L"h2x") > 0)
 		{
 			TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
 			b_H2X = true;
 		}
 
-		//HITFIX
-		int offset = 0x47CD54;
-		//TRACE_GAME("[h2mod] Hitfix is being run on Client!");
-		if (h2mod->Server) {
-			offset = 0x4A29BC;
-			//TRACE_GAME("[h2mod] Hitfix is actually being run on the Dedicated Server!");
-		}
+		applyHitfix(); // "fix hit registration"
 
-		DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + offset);
-
-		*(float*)(AddressOffset + 0xA4EC88) = 1200.0f; // battle_rifle_bullet.proj Initial Velocity 
-		*(float*)(AddressOffset + 0xA4EC8C) = 1200.0f; //battle_rifle_bullet.proj Final Velocity
-		*(float*)(AddressOffset + 0xB7F914) = 4000.0f; //sniper_bullet.proj Initial Velocity
-		*(float*)(AddressOffset + 0xB7F918) = 4000.0f; //sniper_bullet.proj Final Velocity
-		//FIXME COOP will break because of one of these tags not existing.
-		*(float*)(AddressOffset + 0xCE4598) = 4000.0f; //beam_rifle_beam.proj Initial Velocity
-		*(float*)(AddressOffset + 0xCE459C) = 4000.0f; //beam_rifle_beam.proj Final Velocity
-		*(float*)(AddressOffset + 0x81113C) = 200.0f; //gauss_turret.proj Initial Velocity def 90
-		*(float*)(AddressOffset + 0x811140) = 200.0f; //gauss_turret.proj Final Velocity def 90
-		*(float*)(AddressOffset + 0x97A194) = 800.0f; //magnum_bullet.proj initial def 400
-		*(float*)(AddressOffset + 0x97A198) = 800.0f; //magnum_bullet.proj final def 400
-		*(float*)(AddressOffset + 0x7E7E20) = 2000.0f; //bullet.proj (chaingun) initial def 800
-		*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bullet.proj (chaingun) final def 800
-
-		//H2x Firerates
-		if (b_H2X)
-			H2X::Initialize();
-		else
-			H2X::Deinitialize();
-
-	}
-#pragma region H2V Stuff
-	if (!h2mod->Server)
-	{
-		//Crashfix
-		//*(int*)(h2mod->GetBase() + 0x464940) = 0;
-		//*(int*)(h2mod->GetBase() + 0x46494C) = 0;
-		//*(int*)(h2mod->GetBase() + 0x464958) = 0;
-		//*(int*)(h2mod->GetBase() + 0x464964) = 0;
-		
-		if (GameEngine != 3)
+		if (!h2mod->Server) //h2v stuff
 		{
+			//Crashfix
+			//*(int*)(h2mod->GetBase() + 0x464940) = 0;
+			//*(int*)(h2mod->GetBase() + 0x46494C) = 0;
+			//*(int*)(h2mod->GetBase() + 0x464958) = 0;
+			//*(int*)(h2mod->GetBase() + 0x464964) = 0;
+			
 			setCrosshairPos(H2Config_crosshair_offset);
 
 			if (GameState == 3) {
@@ -881,28 +849,29 @@ int __cdecl OnMapLoad(int a1)
 
 				if (b_Halo2Final)
 					h2f->Initialize();
-			}
 
+				if (b_H2X)
+					H2X::Initialize();
+				else
+					H2X::Deinitialize();
+			}	
 		}
-
-	}
-	else {
-#pragma endregion
-
-#pragma region H2Server Stuff
-		if (GameEngine != 3 && GameState == 3)
+		else //h2server
 		{
-			if (b_Infection)
-				inf->Initialize();
+			if (GameState == 3) {
+				if (b_Infection)
+					inf->Initialize();
 
-			if (b_GunGame)
-				gg->Initialize();
+				if (b_GunGame)
+					gg->Initialize();
+			}
 		}
 
 	}
-	return ret;
+	else if (GameEngine == SINGLE_PLAYER_ENGINE) {
+		//if anyone wants to run code on map load single player
+	}
 
-#pragma endregion 
 }
 
 bool __cdecl OnPlayerSpawn(int a1)
@@ -1167,8 +1136,10 @@ void H2MOD::ApplyHooks() {
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x55952, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		pmap_initialize = (map_intialize)DetourFunc((BYTE*)this->GetBase() + 0x5912D, (BYTE*)OnMapLoad, 10);
-		VirtualProtect(pmap_initialize, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		NopFill(Base + 0x4A46F, 0x5);
+		ponGameEngineChange = (onGameEngineChange)DetourFunc((BYTE*)this->GetBase() + 0x4A46E, (BYTE*)onGameEngineChange_hook, 6);
+		VirtualProtect(ponGameEngineChange, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		psub_1112D88 = (sub_1112D88)(GetBase() + 0x32D88);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0xD03ED, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1259,9 +1230,10 @@ void H2MOD::ApplyHooks() {
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x5DE4A, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
 
-		pmap_initialize = (map_intialize)DetourFunc((BYTE*)this->GetBase() + 0x4E43C, (BYTE*)OnMapLoad, 10);
-		VirtualProtect(pmap_initialize, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
-
+		NopFill(Base + 0x436ED, 0x5);
+		ponGameEngineChange = (onGameEngineChange)DetourFunc((BYTE*)this->GetBase() + 0x436EC, (BYTE*)onGameEngineChange_hook, 6);
+		VirtualProtect(ponGameEngineChange, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		psub_1112D88 = (sub_1112D88)(GetBase() + 0x26327);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0x8C84C, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
@@ -1696,5 +1668,5 @@ void H2MOD::IndicatorVisibility(bool toggle)
 	else
 		*indicatorPointer = 0xEB;
 
-	VirtualProtect(indicatorPointer, 1, dwback, NULL);
+	VirtualProtect(indicatorPointer, 1, dwback, &dwback);
 }
