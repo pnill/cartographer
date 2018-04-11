@@ -29,9 +29,13 @@ void startGameThread() {
 							TRACE_GAME("[h2mod-network] Received change player grenades packet");
 							if (recvpak.has_set_grenade())
 							{
-								BYTE type = recvpak.set_grenade().type();
-								BYTE count = recvpak.set_grenade().count();
-								BYTE pIndex = recvpak.set_grenade().pindex();
+								//protobuf has some weird bug where passing 0 has type in the current set_grenade packet definition
+								//completely breaks on the serialization side, https://groups.google.com/forum/#!topic/protobuf/JsougkaRcw4
+								//no idea why, so we always subtract 1 here (since we added 1 before save)
+								int type = recvpak.set_grenade().type() - 1;
+								int count = recvpak.set_grenade().count();
+								int pIndex = recvpak.set_grenade().pindex();
+								TRACE_GAME("[h2mod-network] grenades packet info type=%d, count=%d, pIndex=%d", type, count, pIndex);
 								h2mod->set_local_grenades(type, count, pIndex);
 							}
 							break;

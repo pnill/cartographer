@@ -93,6 +93,7 @@ void GunGame::resetPlayerLevels() {
 
 void GunGame::spawnPlayerServer(int playerIndex) {
 	wchar_t* pName = h2mod->get_player_name_from_index(playerIndex);
+	wchar_t* localName = h2mod->get_local_player_name();
 	TRACE_GAME("[H2Mod-GunGame]: SpawnPlayer(%i) : %ws ", playerIndex, pName);
 
 	int unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
@@ -107,12 +108,21 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 
 		if (level == 15) {
 			TRACE_GAME("[H2Mod-GunGame]: %ws on frag grenade level!", pName);
-			sendGrenadePacket(GrenadeType::Frag, 99, playerIndex, 1);
+			if (wcscmp(pName, localName) == 0) {
+				h2mod->set_local_grenades(GrenadeType::Frag, 99, playerIndex);
+			} else {
+				sendGrenadePacket(GrenadeType::Frag, 99, playerIndex, 1);
+			}
 		}
 
 		if (level == 16) {
 			TRACE_GAME("[H2Mod-GunGame]: %ws on plasma grenade level!", pName);
-			sendGrenadePacket(GrenadeType::Plasma, 99, playerIndex, 1);
+
+			if (wcscmp(pName, localName) == 0) {
+				h2mod->set_local_grenades(GrenadeType::Plasma, 99, playerIndex);
+			} else {
+				sendGrenadePacket(GrenadeType::Plasma, 99, playerIndex, 1);
+			}
 		}
 
 		if (level < 15)	{
@@ -136,6 +146,7 @@ void GunGame::playerDiedServer(int unit_datum_index)
 void GunGame::levelUpServer(int PlayerIndex)
 {
 	wchar_t* PlayerName = h2mod->get_player_name_from_index(PlayerIndex);
+	wchar_t* localName = h2mod->get_local_player_name();
 	TRACE_GAME("[H2Mod-GunGame]: LevelUp(%i) : %ws", PlayerIndex, PlayerName);
 
 	int level = GunGame::gungamePlayers[players->getPlayerName(PlayerIndex)];
@@ -146,12 +157,21 @@ void GunGame::levelUpServer(int PlayerIndex)
 
 	if (level == 15) {
 		TRACE_GAME("[H2Mod-GunGame]: %ws Level 15 - Frag Grenades!", PlayerName);
-		sendGrenadePacket(GrenadeType::Frag, 99, PlayerIndex, 1);
+
+		if (wcscmp(PlayerName, localName) == 0) {
+			h2mod->set_local_grenades(GrenadeType::Frag, 99, PlayerIndex);
+		} else {
+			sendGrenadePacket(GrenadeType::Frag, 99, PlayerIndex, 1);
+		}
 	}
 
 	if (level == 16) {
 		TRACE_GAME("[H2Mod-GunGame]: %ws Level 16 - Plasma Grenades!", PlayerName);
-		sendGrenadePacket(GrenadeType::Plasma, 99, PlayerIndex, 1);
+		if (wcscmp(PlayerName, localName) == 0) {
+			h2mod->set_local_grenades(GrenadeType::Plasma, 99, PlayerIndex);
+		} else {
+			sendGrenadePacket(GrenadeType::Plasma, 99, PlayerIndex, 1);
+		}
 		//TODO: end game
 	}
 
@@ -167,25 +187,49 @@ void GunGame::levelUpServer(int PlayerIndex)
 
 void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
 {
-	TRACE_GAME("[H2Mod-Infection] Sending grenade packet, playerIndex=%d, peerIndex=%d", pIndex, players->getPeerIndex(pIndex));
+	int unit_datum_index = h2mod->get_unit_datum_from_player_index(pIndex);
+	wchar_t* pName = h2mod->get_player_name_from_index(pIndex);
 
-	H2ModPacket teampak;
-	teampak.set_type(H2ModPacket_Type_set_unit_grenades);
+	int unit_object = call_get_object(unit_datum_index, 3);
+	if (unit_object)
+	{
+		if (bReset)
+			call_unit_reset_equipment(unit_datum_index);
 
-	h2mod_set_grenade *set_grenade = teampak.mutable_set_grenade();
-	set_grenade->set_count(count);
-	set_grenade->set_type(type);
-	//send over player index
-	set_grenade->set_pindex(pIndex);
+		if (type == GrenadeType::Frag)
+		{
+			*(BYTE*)((BYTE*)unit_object + 0x252) = count;
 
-	char* SendBuf = new char[teampak.ByteSize()];
-	teampak.SerializeToArray(SendBuf, teampak.ByteSize());
 
-	network->networkCommand = SendBuf;
-	network->sendCustomPacket(players->getPeerIndex(pIndex));
-	network->networkCommand = NULL;
+		}
+		if (type == GrenadeType::Plasma)
+		{
+			*(BYTE*)((BYTE*)unit_object + 0x253) = count;
+		}
+		TRACE_GAME("[H2Mod-Infection] Sending grenade packet, playerIndex=%d, peerIndex=%d", pIndex, players->getPeerIndex(pIndex));
 
-	delete[] SendBuf;
+		H2ModPacket teampak;
+		teampak.set_type(H2ModPacket_Type_set_unit_grenades);
+
+		h2mod_set_grenade *set_grenade = teampak.mutable_set_grenade();
+		set_grenade->set_count(count);
+
+		//protobuf has some weird bug where passing 0 has type in the current packet definition for set_grenade
+		//completely breaks on the serialization side, https://groups.google.com/forum/#!topic/protobuf/JsougkaRcw4
+		//no idea why, so we always add 1 to value till I can work with protobuf developers and figure out why
+		set_grenade->set_type(type + 1);
+		//send over player index
+		set_grenade->set_pindex(pIndex);
+
+		char* SendBuf = new char[teampak.ByteSize()];
+		teampak.SerializeToArray(SendBuf, teampak.ByteSize());
+
+		network->networkCommand = SendBuf;
+		network->sendCustomPacket(players->getPeerIndex(pIndex));
+		network->networkCommand = NULL;
+
+		delete[] SendBuf;
+	}
 }
 
 void GunGameDeinitializer::onClient() {
