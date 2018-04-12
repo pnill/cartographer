@@ -46,6 +46,48 @@
     <Filter Include="Source Files\GlitchyScripts">
       <UniqueIdentifier>{c50ed4e8-db51-43bf-bc48-a7d5abc06719}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Blam">
+      <UniqueIdentifier>{cc2c99fc-365a-4378-8c80-48e7fc3c5e79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Engine">
+      <UniqueIdentifier>{1756db8f-ba07-4777-b4ef-1b6de3bf674f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Engine\Extras">
+      <UniqueIdentifier>{ee386d18-ee75-4f64-ab14-4ef7bedf702c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Engine\Game">
+      <UniqueIdentifier>{08197ffa-f27b-417e-8a0f-8e0c7f1e36b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Engine\Objects">
+      <UniqueIdentifier>{20a09ede-d2c0-4755-8abf-e84f4d8efca9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Engine\Players">
+      <UniqueIdentifier>{4d7ace68-c64c-4829-907a-04ea9f259105}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Enums">
+      <UniqueIdentifier>{f9c50c86-269f-48c1-b6db-37bd6ca68e06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Enums\Players">
+      <UniqueIdentifier>{06078d05-7eda-4844-b030-d46c92832dfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Enums\Game">
+      <UniqueIdentifier>{0f6b82bd-b3fa-4887-baec-fd8d60b66c1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Maths">
+      <UniqueIdentifier>{c4fb9ac0-3d6c-4137-8a24-eac1146f5614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Shared">
+      <UniqueIdentifier>{b66746a4-d12d-44e8-9b07-93611bdb2c72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Enums\Objects">
+      <UniqueIdentifier>{b6472f0a-f04e-45d0-adb0-c2835f526b6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Discord">
+      <UniqueIdentifier>{878d46ad-b9ab-4fd7-b625-bdd1b7774c85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Engine\FileSystem">
+      <UniqueIdentifier>{aa2f6652-3038-44a5-9f37-1fc5c8f2319c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -102,9 +144,6 @@
     <ClCompile Include="H2ConsoleCommands.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DiscordInterface.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD_H2X.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
@@ -158,6 +197,11 @@
     </ClCompile>
     <ClCompile Include="H2MOD_GameType.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
+    <ClCompile Include="discord\DiscordInterface.cpp">
+      <Filter>Source Files\Discord</Filter>
+    </ClCompile>
+    <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp">
+      <Filter>Source Files\Blam\Engine\FileSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -367,6 +411,12 @@
     </ClInclude>
     <ClInclude Include="Blam\Shared\SharedDefinitions.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="discord\DiscordInterface.h">
+      <Filter>Source Files\Discord</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\FileSystem\FiloInterface.h">
+      <Filter>Source Files\Blam\Engine\FileSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

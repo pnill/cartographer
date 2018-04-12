@@ -123,7 +123,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;odbc32.lib;odbccp32.lib;libprotobuf_release.lib;d3d9.lib;d3dx9.lib;discord-rpc.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Crypt32.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;libprotobuf_release.lib;d3d9.lib;d3dx9.lib;discord/discord-rpc.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -172,7 +172,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Crypt32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;discord/discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -223,7 +223,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Crypt32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;discord/discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -242,13 +242,14 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
     <ClCompile Include="cartographer_main.cpp" />
     <ClCompile Include="CUser.cpp" />
     <ClCompile Include="Detour.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
       <InlineFunctionExpansion Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</InlineFunctionExpansion>
     </ClCompile>
-    <ClCompile Include="DiscordInterface.cpp" />
+    <ClCompile Include="discord\DiscordInterface.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="GSAccountCreate.cpp" />
@@ -287,6 +288,7 @@
     <ClInclude Include="Blam\BlamLibrary.h" />
     <ClInclude Include="Blam\Engine\EngineDefinitions.h" />
     <ClInclude Include="Blam\Engine\Extras\Skulls.h" />
+    <ClInclude Include="Blam\Engine\FileSystem\FiloInterface.h" />
     <ClInclude Include="Blam\Engine\Game\GameManager.h" />
     <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
@@ -317,6 +319,7 @@
     <ClInclude Include="Detour.h" />
     <ClInclude Include="discord-rpc.h" />
     <ClInclude Include="DiscordInterface.h" />
+    <ClInclude Include="discord\DiscordInterface.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="GSAccountCreate.h" />
     <ClInclude Include="GSAccountLogin.h" />

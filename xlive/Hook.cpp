@@ -101,6 +101,28 @@ void WriteBytes(DWORD destAddress, LPVOID bytesToWrite, int numBytes)
 	VirtualProtect((LPVOID)destAddress, numBytes, OldProtection, &temp); //quick fix for exception that happens here
 }
 
+void PatchCall(DWORD call_addr, DWORD new_function_ptr) {
+	DWORD callRelative = new_function_ptr - (call_addr + 5);
+	WritePointer(call_addr + 1, reinterpret_cast<void*>(callRelative));
+}
+
+void WritePointer(DWORD offset, void *ptr) {
+	BYTE* pbyte = (BYTE*)&ptr;
+	BYTE assmNewFuncRel[0x4] = { pbyte[0], pbyte[1], pbyte[2], pbyte[3] };
+	WriteBytes(offset, assmNewFuncRel, 0x4);
+}
+
+void PatchWinAPICall(DWORD call_addr, DWORD new_function_ptr)
+{
+	BYTE call = 0xE8;
+	WriteValue(call_addr, call);
+
+	PatchCall(call_addr, new_function_ptr);
+
+	// pad the extra unused byte
+	BYTE padding = 0x90;
+	WriteValue(call_addr + 5, padding);
+}
 
 VOID Codecave(DWORD destAddress, VOID(*func)(VOID), BYTE nopCount)
 {

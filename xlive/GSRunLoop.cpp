@@ -363,12 +363,12 @@ void initGSRunLoop() {
 	addDebugText("Pre GSRunLoop Hooking.");
 	if (H2IsDediServer) {
 		addDebugText("Hooking Loop & Shutdown Function");
-		PatchCall(H2BaseAddr + 0xc6cb, (DWORD)HookedServerShutdownCheck);
+		PatchCall(H2BaseAddr + 0xc6cb, HookedServerShutdownCheck);
 	}
 	else {
 		addDebugText("Hooking Loop Function");
 		sub_287a1 = (signed int(*)())((char*)H2BaseAddr + 0x287a1);
-		PatchCall(H2BaseAddr + 0x399f3, (DWORD)HookedClientRandFunc);
+		PatchCall(H2BaseAddr + 0x399f3, HookedClientRandFunc);
 	}
 	addDebugText("Post GSRunLoop Hooking.");
 }
