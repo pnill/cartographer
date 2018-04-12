@@ -6,6 +6,9 @@
 #include "H2OnscreenDebugLog.h"
 #include "GSCustomMenu.h"
 
+#define _USE_MATH_DEFINES
+#include "math.h"
+
 #pragma region Done_Tweaks
 
 typedef int(__cdecl *thookServ1)(HKEY, LPCWSTR);
@@ -221,6 +224,10 @@ void DeinitH2Tweaks() {
 }
 
 void setSens(short input_type, int sens) {
+
+	if (H2IsDediServer)
+		return;
+
 	if (sens == 0)
 		return; //return if sensitivity is 0
 
@@ -234,30 +241,39 @@ void setSens(short input_type, int sens) {
 	}
 }
 
-void setFOV(int field_of_view)
-{
-	if (field_of_view > 0 && field_of_view <= 110)
-	{
-		const UINT CURRENT_FOV_OFFSET = 4883752;
+void H2Tweaks::setFOV(int field_of_view_degrees) {
 
-		float defaultRadians = (float)(70 * 3.14159265f / 180);
-		float targetRadians = (float)((double)field_of_view * 3.14159265f / 180);
-		float targetRadiansVehicle = (float)((double)(field_of_view + 10) * 3.14159265f / 180);
-		*(float*)(H2BaseAddr + 0x41D984) = (targetRadians / defaultRadians); //First Person
-		*(float*)(H2BaseAddr + 0x413780) = (targetRadians / defaultRadians); //Vehicle
+	if (H2IsDediServer)
+		return;
+
+	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
+	{
+		float current_FOV = *(float*)(H2BaseAddr + 0x41D984);
+
+		//int res_width = *(int*)(H2BaseAddr + 0xA3DA00); //wip
+		//int res_height = *(int*)(H2BaseAddr + 0xA3DA04);
+
+		const float default_radians_FOV = 70.0f * M_PI / 180.0;
+
+		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0) / default_radians_FOV;
+		*(float*)(H2BaseAddr + 0x41D984) = calculated_radians_FOV; //First Person
+		*(float*)(H2BaseAddr + 0x413780) = calculated_radians_FOV * 1.24f; //Vehicle
 	}
 }
 
-void setCrosshairPos(float crosshair_offset) {
+void H2Tweaks::setCrosshairPos(float crosshair_offset) {
+
+	if (H2IsDediServer)
+		return;
 
 	if (!FloatIsNaN(crosshair_offset)) {
-	DWORD CrosshairY = *(DWORD*)((char*)H2BaseAddr + 0x479E70) + 0x1AF4 + 0xf0 + 0x1C;
-	*(float*)CrosshairY = crosshair_offset;
+		DWORD CrosshairY = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x1AF4 + 0xF0 + 0x1C;
+		*(float*)CrosshairY = crosshair_offset;
 	}
-	
 }
 
-void applyHitfix() {
+void H2Tweaks::applyHitfix() {
+	//at some point we need to find a better way to fix this crap
 
 	int offset = 0x47CD54;
 	//TRACE_GAME("[h2mod] Hitfix is being run on Client!");
@@ -283,3 +299,118 @@ void applyHitfix() {
 	*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bullet.proj (chaingun) final def 800
 
 }
+
+void H2Tweaks::applyShaderTweaks() {
+	//patches in order to get elite glowing lights back on
+	//thanks Himanshu for help
+
+	if (H2IsDediServer)
+		return;
+
+	int materialIndex = 0;
+	DWORD currentMaterial;
+	DWORD shader;
+	DWORD sharedMapAddr = *(DWORD*)(H2BaseAddr + 0x482290);
+	DWORD tagMemOffset = 0xE67D7C;
+
+	DWORD tagMem = sharedMapAddr + tagMemOffset;
+	DWORD MaterialsMem = *(DWORD*)(tagMem + 0x60 + 4) + sharedMapAddr; // reflexive materials block
+	//int count = *(int*)(tagMem + 0x60);
+
+	for (materialIndex = 0; materialIndex < 19; materialIndex++) { // loop through materials
+		currentMaterial = MaterialsMem + (0x20 * materialIndex);
+		shader = currentMaterial + 0x8;
+
+		if (materialIndex == 3 || materialIndex == 7) { // arms/hands shaders 
+			*(DWORD*)(shader + 4) = 0xE3652900;
+		}
+
+		else if (materialIndex == 5 || materialIndex == 8) { //legs shaders
+			*(DWORD*)(shader + 4) = 0xE371290C;
+		}
+
+		else if (materialIndex == 15) { // inset_lights_mp shader
+			*(DWORD*)(shader + 4) = 0xE38E2929;
+		}
+	 }
+}
+
+char ret_0() {
+	return 0; //for 60 fps cinematics
+}
+
+void H2Tweaks::enable60FPSCutscenes() {
+
+	if (H2IsDediServer)
+		return;
+
+	//60 fps cinematics enable
+	PatchCall(H2BaseAddr + 0x97774, ret_0);
+	PatchCall(H2BaseAddr + 0x7C378, ret_0);
+
+}
+
+void H2Tweaks::disable60FPSCutscenes() {
+
+	if (H2IsDediServer)
+		return;
+
+	typedef char(__cdecl *is_cutscene_fps_cap)(); //restore orig func
+	is_cutscene_fps_cap pIs_cutscene_fps_cap = (is_cutscene_fps_cap)(H2BaseAddr + 0x3A938);
+
+	//60 fps cinematics disable
+	PatchCall(H2BaseAddr + 0x97774, pIs_cutscene_fps_cap);
+	PatchCall(H2BaseAddr + 0x7C378, pIs_cutscene_fps_cap);
+}
+
+void H2Tweaks::enableAI_MP() {
+
+	if (H2IsDediServer) //TODO: get server offset
+		return;
+
+	BYTE jmp[1] = { 0xEB };
+	WriteBytes(H2BaseAddr + 0x30E684, jmp, 0x1); //AI_MP enable patch
+}
+
+void H2Tweaks::disableAI_MP() {
+
+	if (H2IsDediServer) 
+		return;
+
+	BYTE jnz[1] = { 0x75 };
+	WriteBytes(H2BaseAddr + 0x30E684, jnz, 0x1); //AI_MP disable patch
+}
+
+void H2Tweaks::PatchPingMeterCheck() {
+	//halo2.exe+1D4E35 
+
+	if (H2IsDediServer)
+		return;
+
+	BYTE assmPatchPingCheck[2] = { 0x75, 0x18 };
+	WriteBytes(H2BaseAddr + 0x1D4E35, assmPatchPingCheck, 2);
+}
+
+void H2Tweaks::FixRanksIcons() {
+
+	if (H2IsDediServer)
+		return;
+
+	int THINGY = *(int*)(H2BaseAddr + 0xA40564);
+	BYTE* assmOffset = (BYTE*)(THINGY + 0x800);
+	const int assmlen = 20;
+	BYTE assmOrigRankIcon[assmlen] = { 0x92,0x00,0x14,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x6D,0x74,0x69,0x62,0xCA,0x02,0xEC,0xE4 };
+	BYTE assmPatchFixRankIcon[assmlen] = { 0xCC,0x01,0x1C,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x6D,0x74,0x69,0x62,0xE6,0x02,0x08,0xE5 };
+	bool shouldPatch = true;
+	for (int i = 0; i < assmlen; i++) {
+		if (*(assmOffset + i) != assmOrigRankIcon[i]) {
+			shouldPatch = false;
+			break;
+		}
+	}
+	if (shouldPatch) {
+		WriteBytes((DWORD)assmOffset, assmPatchFixRankIcon, assmlen);
+		addDebugText("Patching Rank Icon Fix.");
+	}
+}
+

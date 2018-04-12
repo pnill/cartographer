@@ -631,15 +631,11 @@ char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 	//TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
 	//TRACE_GAME("OnPlayerDeath() - Team: %i", h2mod->get_unit_team_index(unit_datum_index));
 
-#pragma region GunGame Handler
 	if (b_GunGame && (h2mod->Server || isHost))
 		gg->PlayerDied(unit_datum_index);
-#pragma endregion
 
-#pragma region Infection Handler
 	if (b_Infection)
 		inf->PlayerInfected(unit_datum_index);
-#pragma endregion
 
 	return pplayer_death(unit_datum_index, a2, a3, a4);
 }
@@ -662,26 +658,6 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 
 	pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
-void PatchFixRankIcon() {
-	if (!h2mod->Server) {
-		int THINGY = (int)*(int*)((char*)h2mod->GetBase() + 0xA40564);
-		BYTE* assmOffset = (BYTE*)(THINGY + 0x800);
-		const int assmlen = 20;
-		BYTE assmOrigRankIcon[assmlen] = { 0x92,0x00,0x14,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x6D,0x74,0x69,0x62,0xCA,0x02,0xEC,0xE4 };
-		BYTE assmPatchFixRankIcon[assmlen] = { 0xCC,0x01,0x1C,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x6D,0x74,0x69,0x62,0xE6,0x02,0x08,0xE5 };
-		bool shouldPatch = true;
-		for (int i = 0; i < assmlen; i++) {
-			if (*(assmOffset + i) != assmOrigRankIcon[i]) {
-				shouldPatch = false;
-				break;
-			}
-		}
-		if (shouldPatch) {
-			WriteBytes((DWORD)assmOffset, assmPatchFixRankIcon, assmlen);
-			addDebugText("Patching Rank Icon Fix.");
-		}
-	}
-}
 
 void PatchGameDetailsCheck()
 {
@@ -698,14 +674,6 @@ void H2MOD::PatchWeaponsInteraction(bool b_Enable)
 		memset(assm, 0x90, 5);
 	}
 	WriteBytes(offset, assm, 5);
-}
-
-void PatchPingMeterCheck()
-{
-	//halo2.exe+1D4E35 
-
-	BYTE assmPatchPingCheck[2] = { 0x75, 0x18 };
-	WriteBytes(h2mod->GetBase() + 0x1D4E35, assmPatchPingCheck, 2);
 }
 
 static bool OnNewRound(int a1)
@@ -760,16 +728,13 @@ bool __cdecl player_remove_packet_handler(void *packet, int size, void *data)
 }
 */
 
-typedef int(__cdecl *onGameEngineChange)(int a1);
+typedef void(__cdecl *onGameEngineChange)(int a1);
 onGameEngineChange ponGameEngineChange;
-
-typedef void(__cdecl *sub_1112D88)();
-sub_1112D88 psub_1112D88;
 
 void __cdecl onGameEngineChange_hook(int a1)
 {
-	psub_1112D88(); //this gets called at the beginning of pmap_initialize, and breaks after detour, so this is a fix
-	ponGameEngineChange(a1); //function that changes game engine type
+	ponGameEngineChange(a1); //sets game engine
+    //NOTE: the AI globals initializers get called after this method returns
 
 	overrideUnicodeMessage = false;
 	isLobby = true;
@@ -778,19 +743,23 @@ void __cdecl onGameEngineChange_hook(int a1)
 	BYTE GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
 	BYTE GameEngine = *(BYTE*)(GameGlobals + 0x8);
 
-	//based on what gameEngineChange has changed
+	//based on what onGameEngineChange has changed
 	//we do our stuff bellow
 
 	if (GameEngine == MAIN_MENU_ENGINE)
 	{
+		addDebugText("GameEngine: Main-Menu, apply patches");
+
 		if (b_Halo2Final && !h2mod->Server)
 			h2f->Dispose();
 
 		if (b_Infection)
 			inf->Deinitialize();
 
-		PatchFixRankIcon();
-		
+		H2Tweaks::disableAI_MP(); //TODO: get dedi offset
+		H2Tweaks::FixRanksIcons();
+		H2Tweaks::disable60FPSCutscenes();
+
 		return;
 	}
 
@@ -804,6 +773,8 @@ void __cdecl onGameEngineChange_hook(int a1)
 
 	if (GameEngine == MULTIPLAYER_ENGINE)
 	{
+		addDebugText("GameEngine: Multi-player, apply patches");
+
 		if (wcsstr(variant_name, L"zombies") > 0 || wcsstr(variant_name, L"Zombies") > 0 || wcsstr(variant_name, L"Infection") > 0 || wcsstr(variant_name, L"infection") > 0)
 		{
 			TRACE_GAME("[h2mod] Zombies Turned on!");
@@ -828,7 +799,10 @@ void __cdecl onGameEngineChange_hook(int a1)
 			b_H2X = true;
 		}
 
-		applyHitfix(); // "fix hit registration"
+		H2Tweaks::enableAI_MP(); //TODO: get dedi offset
+		H2Tweaks::applyHitfix(); // "fix hit registration"
+		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
+		//H2Tweaks::applyShaderTweaks(); 
 
 		if (!h2mod->Server) //h2v stuff
 		{
@@ -837,10 +811,9 @@ void __cdecl onGameEngineChange_hook(int a1)
 			//*(int*)(h2mod->GetBase() + 0x46494C) = 0;
 			//*(int*)(h2mod->GetBase() + 0x464958) = 0;
 			//*(int*)(h2mod->GetBase() + 0x464964) = 0;
-			
-			setCrosshairPos(H2Config_crosshair_offset);
 
-			if (GameState == 3) {
+			if (GameState == 3) 
+			{
 				if (b_Infection)
 					inf->Initialize();
 
@@ -868,10 +841,13 @@ void __cdecl onGameEngineChange_hook(int a1)
 		}
 
 	}
-	else if (GameEngine == SINGLE_PLAYER_ENGINE) {
-		//if anyone wants to run code on map load single player
-	}
 
+	else if (GameEngine == SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
+		addDebugText("GameEngine: Single-player, apply patches");
+
+		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
+		H2Tweaks::enable60FPSCutscenes();	
+	}
 }
 
 bool __cdecl OnPlayerSpawn(int a1)
@@ -1110,10 +1086,6 @@ void H2MOD::securityPacketProcessing()
 	}
 }
 
-char ret_0() {
-	return 0; //for 60 fps cinematics
-}
-
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1136,10 +1108,8 @@ void H2MOD::ApplyHooks() {
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x55952, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		NopFill(Base + 0x4A46F, 0x5);
-		ponGameEngineChange = (onGameEngineChange)DetourFunc((BYTE*)this->GetBase() + 0x4A46E, (BYTE*)onGameEngineChange_hook, 6);
+		ponGameEngineChange = (onGameEngineChange)DetourFunc((BYTE*)this->GetBase() + 0x49E4C, (BYTE*)onGameEngineChange_hook, 8);
 		VirtualProtect(ponGameEngineChange, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-		psub_1112D88 = (sub_1112D88)(GetBase() + 0x32D88);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0xD03ED, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1198,20 +1168,9 @@ void H2MOD::ApplyHooks() {
 		// hook the print command to redirect the output to our console
 		PatchCall(Base + 0xE9E50, print_to_console);
 
-		PatchWinAPICall(GetBase() + 0x9B08A, CryptProtectDataHook);
-
-		PatchWinAPICall(GetBase() + 0x9AF9E, CryptUnprotectDataHook);
-
 		PatchCall(GetBase() + 0x9B09F, filo_write__encrypted_data_hook);
-
-		//60 fps cinematics
-		PatchCall(Base + 0x97774, reinterpret_cast<DWORD>(ret_0));
-		PatchCall(Base + 0x7C378, reinterpret_cast<DWORD>(ret_0));
-
-		//FIXME: This causes SP to crash after cutscenes.
-		//allow AI in MP
-		//NopFill(h2mod->GetBase() + 0x30E67C, 0x14);
-
+		PatchWinAPICall(GetBase() + 0x9AF9E, CryptUnprotectDataHook);
+		PatchWinAPICall(GetBase() + 0x9B08A, CryptProtectDataHook);
 	}
 #pragma endregion
 
@@ -1230,10 +1189,8 @@ void H2MOD::ApplyHooks() {
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x5DE4A, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
 
-		NopFill(Base + 0x436ED, 0x5);
-		ponGameEngineChange = (onGameEngineChange)DetourFunc((BYTE*)this->GetBase() + 0x436EC, (BYTE*)onGameEngineChange_hook, 6);
+		ponGameEngineChange = (onGameEngineChange)DetourFunc((BYTE*)this->GetBase() + 0x430CA, (BYTE*)onGameEngineChange_hook, 8);
 		VirtualProtect(ponGameEngineChange, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-		psub_1112D88 = (sub_1112D88)(GetBase() + 0x26327);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0x8C84C, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
@@ -1616,14 +1573,14 @@ void H2MOD::Initialize()
 		SoundT.detach();
 		
 		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
-		setFOV(H2Config_field_of_view);
+		H2Tweaks::setFOV(H2Config_field_of_view);
 		//setSens(CONTROLLER, H2Config_sens_controller);
 		//setSens(MOUSE, H2Config_sens_mouse);
 		if (H2Config_raw_input)
 			Mouseinput::Initialize();
 
 		PatchGameDetailsCheck();
-		//PatchPingMeterCheck();
+		//H2Tweaks::PatchPingMeterCheck();
 		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
 
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
