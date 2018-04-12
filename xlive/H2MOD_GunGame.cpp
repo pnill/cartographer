@@ -109,6 +109,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 		if (level == 15) {
 			TRACE_GAME("[H2Mod-GunGame]: %ws on frag grenade level!", pName);
 			if (wcscmp(pName, localName) == 0) {
+				call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
 				h2mod->set_local_grenades(GrenadeType::Frag, 99, playerIndex);
 			} else {
 				sendGrenadePacket(GrenadeType::Frag, 99, playerIndex, 1);
@@ -119,6 +120,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 			TRACE_GAME("[H2Mod-GunGame]: %ws on plasma grenade level!", pName);
 
 			if (wcscmp(pName, localName) == 0) {
+				call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
 				h2mod->set_local_grenades(GrenadeType::Plasma, 99, playerIndex);
 			} else {
 				sendGrenadePacket(GrenadeType::Plasma, 99, playerIndex, 1);
@@ -159,6 +161,7 @@ void GunGame::levelUpServer(int PlayerIndex)
 		TRACE_GAME("[H2Mod-GunGame]: %ws Level 15 - Frag Grenades!", PlayerName);
 
 		if (wcscmp(PlayerName, localName) == 0) {
+			call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(PlayerIndex));
 			h2mod->set_local_grenades(GrenadeType::Frag, 99, PlayerIndex);
 		} else {
 			sendGrenadePacket(GrenadeType::Frag, 99, PlayerIndex, 1);
@@ -168,6 +171,7 @@ void GunGame::levelUpServer(int PlayerIndex)
 	if (level == 16) {
 		TRACE_GAME("[H2Mod-GunGame]: %ws Level 16 - Plasma Grenades!", PlayerName);
 		if (wcscmp(PlayerName, localName) == 0) {
+			call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(PlayerIndex));
 			h2mod->set_local_grenades(GrenadeType::Plasma, 99, PlayerIndex);
 		} else {
 			sendGrenadePacket(GrenadeType::Plasma, 99, PlayerIndex, 1);
