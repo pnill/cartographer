@@ -5,6 +5,10 @@
 #include <set>
 #include <mutex>
 
+#define SINGLE_PLAYER_ENGINE 1
+#define MULTIPLAYER_ENGINE 2
+#define MAIN_MENU_ENGINE 3
+
 enum GrenadeType
 {
 	Frag = 0,
