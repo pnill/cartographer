@@ -330,94 +330,100 @@
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Blam\BlamLibrary.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\EngineDefinitions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Extras\Skulls.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Game\GameManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Game\HaloScript.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Objects\Objects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Objects\ObjectsHeader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Players\PlayerControls.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Players\Players.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Enums.h">
-      <Filter>Header Files</Filter>
+	  <Filter>Source Files\Blam</Filter>
+	</ClInclude>
+	<ClInclude Include="Blam\Enums\Enums.h">
+	  <Filter>Source Files\Blam\Enums</Filter>
+	</ClInclude>
+	<ClInclude Include="Blam\Enums\Players\Players.h">
+      <Filter>Source Files\Blam\Enums\Players</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Objects\Objects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Objects\Unit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Players\Players.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Blam\Enums\Game</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Maths\Angle.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Blam\Maths</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Maths\Maths.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Blam\Maths</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Maths\RealColorRGB.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Blam\Maths</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Maths\RealMovement.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Blam\Maths</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Maths\RealPoint2D.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Blam\Maths</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Maths\RealPoint3D.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Blam\Maths</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Maths\RealVector2D.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Blam\Maths</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Maths\RealVector3D.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Blam\Maths</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Shared\DatumIndex.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Blam\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Shared\Globals.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Blam\Shared</Filter>
+     </ClInclude>
+	<ClInclude Include="Blam\Shared\SharedDefinitions.h">
+      <Filter>Source Files\Blam\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Shared\SharedDefinitions.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Blam\Engine\EngineDefinitions.h">
+      <Filter>Source Files\Blam\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h">
+      <Filter>Source Files\Blam\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Objects\Objects.h">
+      <Filter>Source Files\Blam\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Objects\ObjectsHeader.h">
+      <Filter>Source Files\Blam\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Players\PlayerControls.h">
+      <Filter>Source Files\Blam\Engine\Players</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Players\Players.h">
+      <Filter>Source Files\Blam\Engine\Players</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h">
+      <Filter>Source Files\Blam\Engine\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Game\GameManager.h">
+      <Filter>Source Files\Blam\Engine\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Extras\Skulls.h">
+      <Filter>Source Files\Blam\Engine\Extras</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Shared\DatumIndex.h">
+      <Filter>Source Files\Blam\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Shared\Globals.h">
+      <Filter>Source Files\Blam\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\RealMovement.h">
+      <Filter>Source Files\Blam\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Objects\Objects.h">
+      <Filter>Source Files\Blam\Enums\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Objects\Unit.h">
+      <Filter>Source Files\Blam\Enums\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h">
+      <Filter>Source Files\Blam\Enums\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Game\HaloScript.h">
+      <Filter>Source Files\Blam\Engine\Game</Filter>
     </ClInclude>
     <ClInclude Include="discord\DiscordInterface.h">
       <Filter>Source Files\Discord</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\FileSystem\FiloInterface.h">
-      <Filter>Source Files\Blam\Engine\FileSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
