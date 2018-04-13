@@ -57,6 +57,7 @@ extern CHAR g_profileDirectory[];
 
 extern void InitInstance();
 extern void ExitInstance();
+extern int H2GetInstanceId();
 
 extern std::wstring dlcbasepath;
 
@@ -2832,9 +2833,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
   TRACE("XUserSetContext  (userIndex = %d, contextId = %d, contextValue = %d)",
 		dwUserIndex, dwContextId, dwContextValue );
 
-  if (h2mod->Server)
-	  return ERROR_SUCCESS;
-  if (!H2Config_discord_enable)
+  if (h2mod->Server || !H2Config_discord_enable || H2GetInstanceId() > 1)
 	  return ERROR_SUCCESS;
 
   if (dwContextId == 0x00000003)
@@ -4487,8 +4486,11 @@ DWORD WINAPI XLivePBufferSetByte (FakePBuffer * pBuffer, DWORD offset, BYTE valu
 		return 0;
 	}
 
-
 	pBuffer->pbData[offset] = value;
+
+	if (offset == 0)
+		pBuffer->pbData[offset] = 0; //no need of MF.dll anymore
+
 	return 0;
 }
 

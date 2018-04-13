@@ -1323,11 +1323,11 @@ static bool CMButtonHandler_EditCrosshair(int button_id) {
 			H2Config_crosshair_offset = 0.165f;
 		else {
 			H2Config_crosshair_offset = NAN;
-			setCrosshairPos(0.165f);
+			H2Tweaks::setCrosshairPos(0.165f);
 		}
 	}
 	loadLabelCrosshairOffset();
-	setCrosshairPos(H2Config_crosshair_offset);
+	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	return false;
 }
 
@@ -1468,7 +1468,7 @@ static bool CMButtonHandler_EditFOV(int button_id) {
 			H2Config_field_of_view = 100;
 	}
 	loadLabelFOVNum();
-	setFOV(H2Config_field_of_view);
+	H2Tweaks::setFOV(H2Config_field_of_view);
 	return false;
 }
 

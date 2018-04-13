@@ -428,7 +428,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$controller_sens") {
 			if (splitCommands.size() != 2) {
-				output(L"Invalid usage, usage $sens_controller value");
+				output(L"Invalid usage, usage $controller_sens value");
 				return;
 			}
 			std::string sensVal = splitCommands[1];
@@ -446,7 +446,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$mouse_sens") {
 			if (splitCommands.size() != 2) {
-				output(L"Invalid usage, usage $sens_mouse value");
+				output(L"Invalid usage, usage $mouse_sens value");
 				return;
 			}
 			std::string sensVal = splitCommands[1];
