@@ -29,7 +29,6 @@ GunGame* gunGame = new GunGame();
 Infection* infectionHandler = new Infection();
 Halo2Final *h2f = new Halo2Final();
 Mouseinput *mouse = new Mouseinput();
-CustomNetwork *network = new CustomNetwork();
 
 bool b_Infection = false;
 bool b_Halo2Final = false;
