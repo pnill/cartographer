@@ -775,7 +775,9 @@ void CustomNetwork::sendCustomPacketToAllPlayers() {
 
 	int playerCountAddr = sub_12320C8((int)packetDataObj, 0, 0);
 	int playerCounter = 0;
-	if (*(DWORD *)(playerCountAddr + 20) > 0)
+	//if we are the dedi, always subtract 1, since the dedi occupies a peer slot
+	int peerCount = *(DWORD *)(playerCountAddr + 20) - (h2mod->Server ? 1 : 0);
+	if (peerCount > 0)
 	{
 		do
 		{
@@ -795,7 +797,7 @@ void CustomNetwork::sendCustomPacketToAllPlayers() {
 					(int)&packetdata);
 			}
 			++playerCounter;
-		} while (playerCounter < *(DWORD *)(playerCountAddr + 20));
+		} while (playerCounter < peerCount);
 	}
 }
 
