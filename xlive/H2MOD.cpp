@@ -1226,7 +1226,6 @@ void H2MOD::Initialize()
 	
 	TRACE_GAME("H2MOD - Initialized v0.4a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
-	TRACE_GAME_INFO("H2MOD - BASE ADDR %08X", this->Base);
 
 	//Network::Initialize();
 	h2mod->ApplyHooks();
