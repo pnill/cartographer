@@ -1036,7 +1036,6 @@ on_custom_map_change on_custom_map_change_method;
 
 void __cdecl onCustomMapChange(const void* a1) {
 	on_custom_map_change_method(a1);
-	mapManager->setCachedMapFilename();
 	//map changed, send update
 	mapManager->sendMapInfoPacket();
 }

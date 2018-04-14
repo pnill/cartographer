@@ -82,8 +82,6 @@ void startGameThread() {
 		else {
 			double secondsPassed = difftime(time(0), start2);
 			if (secondsPassed > 5) {
-				//reset cached map filename every 5 seconds
-				mapManager->setCachedMapFilename();
 				mapManager->sendMapInfoPacket();
 				start2 = time(0);
 			}

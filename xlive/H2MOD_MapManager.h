@@ -30,12 +30,11 @@ public:
 	void setCustomLobbyMessage(const char* newStatus);
 	//we precalculate the strings when the MapManager class is loaded to avoid any expensive object creation during game/lobby time
 	std::unordered_map<int, std::string> precalculatedDownloadPercentageStrings;
-	std::unordered_map<std::wstring, std::string> mapNameToFileName;
 
 	//server functions below
 	std::string getMapFilename();
 	std::string getCachedMapFilename();
-	void setCachedMapFilename();
+	void reloadMapFilenames();
 
 private:
 	class TcpServer {
@@ -63,4 +62,5 @@ private:
 	std::set<std::string> downloadedMaps;
 	std::string mapFilenameToDownload;
 	std::string cachedMapFilename;
+	std::unordered_map<std::wstring, std::string> mapNameToFileName;
 };

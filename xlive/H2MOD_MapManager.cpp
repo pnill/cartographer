@@ -162,6 +162,7 @@ void MapManager::reloadMaps() {
 	}
 	reloadMapsSet((int)mapsObject);
 	reloadMaps((int)mapsObject);
+	reloadMapFilenames();
 }
 
 /**
@@ -183,6 +184,45 @@ void MapManager::setCustomLobbyMessage(const char* newStatus) {
 */
 const char* MapManager::getCustomLobbyMessage() {
 	return this->customLobbyMessage;
+}
+
+void MapManager::reloadMapFilenames() {
+	//0x30 (difference from start of maps object to first custom map)
+	//0xB90 (difference between each custom map name)
+	//0x960 (difference between custom map name and its file path
+	DWORD offset;
+	//move to first map
+	DWORD currentMapNameOffset;
+	if (h2mod->Server) {
+		offset = 0x4A70D8;
+		//H2Server.exe+5349B4
+		//H2Server.exe+535C64 (another offset to use if the above fails for whatever reason)
+		currentMapNameOffset = 0x5349B4;
+	}
+	else {
+		offset = 0x482D70;
+		currentMapNameOffset = 0x97737C;
+	}
+
+	//TODO: one day increase map limit (somehow)
+	for (int i = 0; i <= 50; i++) {
+		wchar_t* mapName = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + (i * 0xB90)));
+		wchar_t* mapPath = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + ((i * 0xB90) + 0x960)));
+		if (mapName == NULL || *mapName == L'\0') {
+			//skip empty map names
+			continue;
+		}
+		std::wstring unicodeMapFilename(mapPath);
+		std::string nonUnicodeCustomMapFilename(unicodeMapFilename.begin(), unicodeMapFilename.end());
+		std::size_t offset = nonUnicodeCustomMapFilename.find_last_of("\\");
+		std::size_t extOffset = nonUnicodeCustomMapFilename.find_last_not_of(mapExt);
+		std::string nonUnicodeMapFileName = nonUnicodeCustomMapFilename.substr(offset + 1, extOffset);
+		if (!nonUnicodeMapFileName.empty() && wcscmp(this->getMapName().c_str(), mapName) == 0) {
+			//if the filename exists and the current map english name is equal to the iterated map name
+			std::wstring currentMapName(mapName);
+			this->mapNameToFileName[std::wstring(mapName)] = nonUnicodeMapFileName;
+		}
+	}
 }
 
 std::string MapManager::getMapFilename() {
@@ -226,13 +266,9 @@ std::string MapManager::getMapFilename() {
 }
 
 std::string MapManager::getCachedMapFilename() {
-	return this->cachedMapFilename;
+	return this->mapNameToFileName[this->getMapName()];
 }
 
-void MapManager::setCachedMapFilename()
-{
-	this->cachedMapFilename = getMapFilename();
-}
 
 /**
 * Searches for a map to download based on the english map name and the actual filename
@@ -276,6 +312,9 @@ void MapManager::cleanup() {
 
 void MapManager::sendMapInfoPacket()
 {
+	//always reload map filenames before sending map info
+	mapManager->reloadMapFilenames();
+
 	H2ModPacket teampak;
 	teampak.set_type(H2ModPacket_Type_map_info_request);
 
