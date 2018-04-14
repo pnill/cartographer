@@ -9,6 +9,7 @@
 #include "H2Tweaks.h"
 #include <sys/stat.h>
 #include "GSAccountLogin.h"
+#include "Util\Debug.h"
 
 
 bool H2IsDediServer;
@@ -263,6 +264,7 @@ int __cdecl sub_48BBF() {
 
 ///Before the game window appears
 void InitH2Startup() {
+	Debug::init();
 
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
