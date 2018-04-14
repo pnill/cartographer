@@ -70,7 +70,6 @@ std::wstring ModulePathW(HMODULE hModule = NULL)
 FILE * logfile = NULL;
 FILE * loggame = NULL;
 FILE * loggamen = NULL;
-FILE* logInfo = NULL;
 
 void trace(LPWSTR message, ...)
 {
@@ -157,29 +156,6 @@ void trace_game_network(LPSTR message, ...)
 	fprintf(loggamen, "\n");
 
 	fflush(loggamen);
-	va_end(arg);
-	LeaveCriticalSection(&d_lock);
-}
-
-void trace_game_info(LPSTR message, ...)
-{
-	if (!logInfo)
-		return;
-
-
-	EnterCriticalSection(&d_lock);
-	SYSTEMTIME	t;
-	GetLocalTime(&t);
-
-	fprintf(logInfo, "%02d/%02d/%04d %02d:%02d:%02d.%03d ", t.wDay, t.wMonth, t.wYear, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds);
-
-	va_list	arg;
-	va_start(arg, message);
-
-	vfprintf(logInfo, message, arg);
-	fprintf(logInfo, "\n");
-
-	fflush(logInfo);
 	va_end(arg);
 	LeaveCriticalSection(&d_lock);
 }
@@ -294,9 +270,6 @@ void InitInstance()
 			if (loggamen = _wfopen(prepareLogFileName(L"h2network").c_str(), L"wt"))
 				TRACE_GAME_NETWORK("Log started (H2MOD - Network 0.1a1)\n");
 		}
-
-		//open the h2info log
-		if (logInfo = _wfopen(prepareLogFileName(L"h2info").c_str(), L"wt"))
 
 		if (h2mod)
 			h2mod->Initialize();
