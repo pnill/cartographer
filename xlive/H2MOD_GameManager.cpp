@@ -3,6 +3,8 @@
 
 using namespace std; 
 
+time_t start2 = time(0);
+
 std::string EMPTY_STR2("");
 
 void startGameThread() {
@@ -75,6 +77,14 @@ void startGameThread() {
 					TRACE_GAME_N("[h2mod-network] already has map %s", mapFilenameToDownload.c_str());
 				}
 				mapManager->setMapFileNameToDownload(EMPTY_STR2);
+			}
+		}
+		else {
+			double secondsPassed = difftime(time(0), start2);
+			if (secondsPassed > 5) {
+				//reset cached map filename every 5 seconds
+				mapManager->setCachedMapFilename();
+				start2 = time(0);
 			}
 		}
 		std::this_thread::sleep_for(1s);

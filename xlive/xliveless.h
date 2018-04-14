@@ -31,6 +31,7 @@ extern void trace(LPWSTR message, ...);
 extern void trace2(LPWSTR message, ...);
 extern void trace_game(LPWSTR message, ...);
 extern void trace_game_narrow(LPSTR message, ...);
+extern void trace_game_info(LPSTR message, ...);
 extern void trace_game_network(LPSTR message, ...);
 
 #define TRACE_GAME(msg, ...) trace_game (L ## msg, __VA_ARGS__)
@@ -38,6 +39,8 @@ extern void trace_game_network(LPSTR message, ...);
 #define TRACE_GAME_NETWORK(msg, ...) trace_game_network( ## msg, __VA_ARGS__ )
 #define TRACE(msg, ...) trace (L ## msg, __VA_ARGS__)
 #define TRACE2(msg, ...) trace2 (L ## msg, __VA_ARGS__)
+#define TRACE_GAME_INFO(msg, ...) trace_game_info( ## msg, __VA_ARGS__ )
+
 
 //#define trace()
 #else

@@ -1036,6 +1036,7 @@ on_custom_map_change on_custom_map_change_method;
 
 void __cdecl onCustomMapChange(const void* a1) {
 	on_custom_map_change_method(a1);
+	mapManager->setCachedMapFilename();
 	//map changed, send update
 	mapManager->sendMapInfoPacket();
 }
@@ -1226,6 +1227,7 @@ void H2MOD::Initialize()
 	
 	TRACE_GAME("H2MOD - Initialized v0.4a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
+	TRACE_GAME_INFO("H2MOD - BASE ADDR %08X", this->Base);
 
 	//Network::Initialize();
 	h2mod->ApplyHooks();

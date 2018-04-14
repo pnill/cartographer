@@ -76,7 +76,7 @@ void __cdecl membershipUpdateWrite(void* a1, int a2, int a3) {
 	membership_update_write_method(a1, a2, a3);
 
 	//write additional packet information below
-	std::string mapFileName = mapManager->getMapFilename();
+	std::string mapFileName = mapManager->getCachedMapFilename();
 	char* mapNameToWrite = (char*)(a3 + (MEMBERSHIP_PACKET_SIZE - lengthOfMapName));
 	memcpy(mapNameToWrite, mapFileName.c_str(), lengthOfMapName);
 	getDataEncodeStringMethod()(a1, (int)mapName.c_str(), (int)mapNameToWrite, lengthOfMapName);

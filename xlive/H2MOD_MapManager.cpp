@@ -225,6 +225,15 @@ std::string MapManager::getMapFilename() {
 	return "";
 }
 
+std::string MapManager::getCachedMapFilename() {
+	return this->cachedMapFilename;
+}
+
+void MapManager::setCachedMapFilename()
+{
+	this->cachedMapFilename = getMapFilename();
+}
+
 /**
 * Searches for a map to download based on the english map name and the actual filename
 * NOTE - only tries to download from host if we haven't downloaded it before in current game session AND
