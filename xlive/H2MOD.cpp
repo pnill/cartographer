@@ -530,6 +530,7 @@ void SoundThread(void)
 		{
 			std::unordered_map<wchar_t*, int> tempSoundMap;
 			tempSoundMap.insert(h2mod->SoundMap.begin(), h2mod->SoundMap.end());
+			h2mod->SoundMap.clear();
 			//unlock immediately after reading everything from sound map
 			lck.unlock();
 
@@ -542,8 +543,6 @@ void SoundThread(void)
 				it = tempSoundMap.erase(it);
 			}
 		}
-		
-		//Sleep(100);
 	}
 
 }
