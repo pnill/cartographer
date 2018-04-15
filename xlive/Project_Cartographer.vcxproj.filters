@@ -16,9 +16,6 @@
     <Filter Include="Source Files\xlive">
       <UniqueIdentifier>{cf71a59b-5460-4fe7-8953-30d0bd68357b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\hooks">
-      <UniqueIdentifier>{6e3b665a-267b-4baf-9978-190c7753a4d1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\H2MOD">
       <UniqueIdentifier>{2c24eac4-ffb8-4f03-b12f-4c8610683f02}</UniqueIdentifier>
     </Filter>
@@ -88,6 +85,15 @@
     <Filter Include="Source Files\Blam\Engine\FileSystem">
       <UniqueIdentifier>{aa2f6652-3038-44a5-9f37-1fc5c8f2319c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{c81074c8-4b7e-407c-abfd-8bad3f8cc1e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util\Debug">
+      <UniqueIdentifier>{079caff9-f35c-4474-a5d8-24eea25005d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util\hooks">
+      <UniqueIdentifier>{6e3b665a-267b-4baf-9978-190c7753a4d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -106,10 +112,10 @@
       <Filter>Source Files\xlive</Filter>
     </ClCompile>
     <ClCompile Include="Detour.cpp">
-      <Filter>Source Files\hooks</Filter>
+      <Filter>Source Files\Util\hooks</Filter>
     </ClCompile>
     <ClCompile Include="Hook.cpp">
-      <Filter>Source Files\hooks</Filter>
+      <Filter>Source Files\Util\hooks</Filter>
     </ClCompile>
     <ClCompile Include="CUser.cpp">
       <Filter>Source Files\xlive\User Handling</Filter>
@@ -201,8 +207,8 @@
     <ClCompile Include="discord\DiscordInterface.cpp">
       <Filter>Source Files\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp">
-      <Filter>Source Files\Blam\Engine\FileSystem</Filter>
+    <ClCompile Include="Util\Debug.cpp">
+      <Filter>Source Files\Util\Debug</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -222,10 +228,10 @@
       <Filter>Source Files\xlive</Filter>
     </ClInclude>
     <ClInclude Include="Detour.h">
-      <Filter>Source Files\hooks</Filter>
+      <Filter>Source Files\Util\hooks</Filter>
     </ClInclude>
     <ClInclude Include="Hook.h">
-      <Filter>Source Files\hooks</Filter>
+      <Filter>Source Files\Util\hooks</Filter>
     </ClInclude>
     <ClInclude Include="CUser.h">
       <Filter>Source Files\xlive\User Handling</Filter>
@@ -424,6 +430,12 @@
     </ClInclude>
     <ClInclude Include="discord\DiscordInterface.h">
       <Filter>Source Files\Discord</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\FileSystem\FiloInterface.h">
+      <Filter>Source Files\Blam\Engine\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Debug.h">
+      <Filter>Source Files\Util\Debug</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
