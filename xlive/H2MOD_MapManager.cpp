@@ -219,7 +219,8 @@ void MapManager::reloadMapFilenames() {
 		std::string nonUnicodeMapFileName = nonUnicodeCustomMapFilename.substr(offset + 1, extOffset);
 		if (!nonUnicodeMapFileName.empty() && wcscmp(this->getMapName().c_str(), mapName) == 0) {
 			//if the filename exists and the current map english name is equal to the iterated map name
-			std::wstring currentMapName(mapName);
+			TRACE_GAME("[h2mod-mapmanager] cached map name %s", std::wstring(mapName).c_str());
+			TRACE_GAME_N("[h2mod-mapmanager] cached map file name %s", nonUnicodeMapFileName.c_str());
 			this->mapNameToFileName[std::wstring(mapName)] = nonUnicodeMapFileName;
 		}
 	}
@@ -258,7 +259,6 @@ std::string MapManager::getMapFilename() {
 		std::string nonUnicodeMapFileName = nonUnicodeCustomMapFilename.substr(offset + 1, extOffset);
 		if (!nonUnicodeMapFileName.empty() && wcscmp(this->getMapName().c_str(), mapName) == 0) {
 			//if the filename exists and the current map english name is equal to the iterated map name
-			std::wstring currentMapName(mapName);
 			return nonUnicodeMapFileName;
 		}
 	}
@@ -266,6 +266,7 @@ std::string MapManager::getMapFilename() {
 }
 
 std::string MapManager::getCachedMapFilename() {
+	TRACE_GAME("[h2mod-mapmanager] get cached map filename %s", this->getMapName().c_str());
 	return this->mapNameToFileName[this->getMapName()];
 }
 

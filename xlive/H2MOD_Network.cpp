@@ -131,6 +131,8 @@ __declspec(naked) void membershipUpdateReadCave(void) {
 }
 
 void afterMapsLoadedCave() {
+	TRACE_GAME("[h2mod-network] after maps loaded");
+	mapManager->reloadMapFilenames();
 	gameManager->start();
 }
 
@@ -775,26 +777,33 @@ void CustomNetwork::sendCustomPacketToAllPlayers() {
 
 	int playerCountAddr = sub_12320C8((int)packetDataObj, 0, 0);
 	int playerCounter = 0;
-	//if we are the dedi, always subtract 1, since the dedi occupies a peer slot
-	int peerCount = *(DWORD *)(playerCountAddr + 20) - (h2mod->Server ? 1 : 0);
+	int peerCount = *(DWORD *)(playerCountAddr + 20);
+	TRACE_GAME("[h2mod-network] Peer count %d", peerCount);
 	if (peerCount > 0)
 	{
 		do
 		{
-			if (playerCounter != *(DWORD *)(packetDataObj + 29120))
-			{
-				int peerIndex = players->getPeerIndex(playerCounter);
-				TRACE_GAME("[h2mod-network] sending packet to all players, playerIndex=%d, peerIndex=%d", playerCounter, peerIndex);
-				//only send the command packet to the given peer index
-				char* newPacketObject = (char*)(packetDataObj);
-				dynamic_packet_check(
-					*((void **)newPacketObject + 2),
-					*((DWORD *)newPacketObject + 5),
-					*(DWORD *)&newPacketObject[28 * peerIndex + 29128],
-					0,
-					0x2F,
-					CHAT_PACKET_SIZE,
-					(int)&packetdata);
+			if (h2mod->Server && playerCounter == 0) {
+				++playerCounter;
+				continue;
+			}
+			else {
+				if (playerCounter != *(DWORD *)(packetDataObj + 29120))
+				{
+					int shiftCounter = h2mod->Server ? 1 : 0;
+					int peerIndex = players->getPeerIndex(playerCounter - shiftCounter);
+					TRACE_GAME("[h2mod-network] sending packet to all players, playerIndex=%d, peerIndex=%d, peerName=%s", playerCounter, peerIndex, players->getPlayerName(playerCounter - shiftCounter));
+					//only send the command packet to the given peer index
+					char* newPacketObject = (char*)(packetDataObj);
+					dynamic_packet_check(
+						*((void **)newPacketObject + 2),
+						*((DWORD *)newPacketObject + 5),
+						*(DWORD *)&newPacketObject[28 * peerIndex + 29128],
+						0,
+						0x2F,
+						CHAT_PACKET_SIZE,
+						(int)&packetdata);
+				}
 			}
 			++playerCounter;
 		} while (playerCounter < peerCount);

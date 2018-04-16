@@ -16,14 +16,29 @@ BOOL infectedPlayed;
 BOOL firstSpawn;
 
 int Infection::calculateZombieIndexBasedOnPlayerData() {
+	//we subtract 1 here cause the player counters are 0 based
 	int max = players->getPlayerCount() - 1;
-	int min = (h2mod->Server ? 1 : 0);//on a dedi, the dedi itself obtains a player slot for whatever reason
-	int randNum = rand() % (max - min + 1) + min;
+	//on a dedi, the dedi itself occupies a peer slot, so we want to avoid selecting 0
+	int min = (h2mod->Server ? 1 : 0);
+	int val = (max - min + 1) + min;
+	if (val == 0) {
+		return 0;
+	}
+	int randNum = rand() % val;
 	return randNum; //Random Alpha Zombie Index
 }
 
 void Infection::sendTeamChange(int playerIndex) {
 	TRACE_GAME("[H2Mod-Infection] Sending zombie team change packet, playerIndex=%d, peerIndex=%d", playerIndex, players->getPeerIndex(playerIndex));
+	if (h2mod->Server) {
+		if (playerIndex != 0) {
+			//when sending a packet we use the players data structure to get peer index
+			//the player structure does not have a slot for dedis, this player index was calculated based on that assumption
+			//so we always subtract by 1 (since 0 here is not the slot for dedi anymore and can be a player)
+			playerIndex -= 1;
+			TRACE_GAME("[h2mod-infection] altering player index from %d to %d", playerIndex - 1, playerIndex);
+		}
+	}
 
 	H2ModPacket teampak;
 	teampak.set_type(H2ModPacket_Type_set_player_team);

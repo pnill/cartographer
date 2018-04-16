@@ -210,6 +210,15 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
 		{
 			*(BYTE*)((BYTE*)unit_object + 0x253) = count;
 		}
+		if (h2mod->Server) {
+			if (pIndex != 0) {
+				//when sending a packet we use the players data structure to get peer index
+				//the player structure does not have a slot for dedis, this player index was calculated based on that assumption
+				//so we always subtract by 1 (since 0 here is not the slot for dedi anymore and can be a player)
+				pIndex -= 1;
+				TRACE_GAME("[h2mod-infection] altering player index from %d to %d", pIndex - 1, pIndex);
+			}
+		}
 		TRACE_GAME("[H2Mod-Infection] Sending grenade packet, playerIndex=%d, peerIndex=%d", pIndex, players->getPeerIndex(pIndex));
 
 		H2ModPacket teampak;
