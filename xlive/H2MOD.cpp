@@ -1040,6 +1040,61 @@ void __cdecl onCustomMapChange(const void* a1) {
 	mapManager->sendMapInfoPacket();
 }
 
+typedef char(__stdcall *intercept_map_load)(LPCRITICAL_SECTION* thisx, const void *a2);
+intercept_map_load intercept_map_load_method;
+
+char __stdcall interceptMapLoad(LPCRITICAL_SECTION* thisx, const void *a2) {
+	LPCRITICAL_SECTION *v2; // ebx@1
+	struct _RTL_CRITICAL_SECTION *v3; // ebp@1
+	char result; // al@2
+
+	TRACE_GAME("[h2mod] Intercepted map load - crash function");
+
+	typedef char(__thiscall *map_filetime_check)(LPCRITICAL_SECTION* thisx, int a2, unsigned int a3);
+	map_filetime_check map_filetime_check_method = (map_filetime_check)(h2mod->GetBase() + 0xC1E01);
+
+	typedef char(__thiscall *map_touch)(LPCRITICAL_SECTION* thisx, int a2);
+	map_touch map_touch_method = (map_touch)(h2mod->GetBase() + 0xC2541);
+
+	typedef char(*unknown_function)();
+	unknown_function unknown_function_method = (unknown_function)(h2mod->GetBase() + 0x4541);
+
+	typedef char(__stdcall *unknown_function2)(int a1);
+	unknown_function2 unknown_function_method2 = (unknown_function2)(h2mod->GetBase() + 0xC2069);
+
+	typedef int(__thiscall *map_limit_touch)(int thisx, int a2);
+	map_limit_touch map_limit_touch_method = (map_limit_touch)(h2mod->GetBase() + 0xC1FA6);
+
+	v2 = thisx;
+	v3 = *thisx;
+
+	TRACE_GAME("[h2mod] Intercepted map load - about to enter critical section");
+	EnterCriticalSection(*thisx);
+	TRACE_GAME("[h2mod] Intercepted map load - in critical section");
+	if (a2
+		&& *((WORD *)v2 + 74008) < 0x32u
+		&& map_filetime_check_method(v2, (int)a2, 0xB90u)
+		&& !map_touch_method(v2, (int)a2))
+	{
+		if (!unknown_function_method())
+			unknown_function_method2((int)a2);
+
+		map_limit_touch_method((int)v2, (int)a2);
+		TRACE_GAME("[h2mod] Intercepted map load - memcpy");
+		memcpy(&v2[740 * (*((WORD *)v2 + 0x12118))++ + 4], a2, 0xB90u);
+		LeaveCriticalSection(v3);
+		TRACE_GAME("[h2mod] Intercepted map load - left critical section");
+		result = 1;
+	}
+	else
+	{
+		LeaveCriticalSection(v3);
+		TRACE_GAME("[h2mod] Intercepted map load - left critical section");
+		result = 0;
+	}
+	return result;
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1053,8 +1108,11 @@ void H2MOD::ApplyHooks() {
 		//pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
 		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		on_custom_map_change_method = (on_custom_map_change)DetourFunc((BYTE*)this->GetBase() + 0x32176, (BYTE*)onCustomMapChange, 5);
-		VirtualProtect(on_custom_map_change_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		intercept_map_load_method = (intercept_map_load)DetourClassFunc((BYTE*)this->GetBase() + 0xC259B, (BYTE*)interceptMapLoad, 13);
+		VirtualProtect(intercept_map_load_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		//on_custom_map_change_method = (on_custom_map_change)DetourFunc((BYTE*)this->GetBase() + 0x32176, (BYTE*)onCustomMapChange, 5);
+		//VirtualProtect(on_custom_map_change_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//boot method
 		calls_session_boot_method = (calls_session_boot)DetourClassFunc((BYTE*)this->GetBase() + 0x1CCE9B, (BYTE*)calls_session_boot_sub_1cce9b, 8);

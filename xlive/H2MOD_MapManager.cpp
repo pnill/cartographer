@@ -153,15 +153,26 @@ void MapManager::reloadMaps() {
 	map_reload_function_type reloadMapsSet = (map_reload_function_type)(h2mod->GetBase() + (h2mod->Server ? 0x41501 : 0x4CC30));
 	DWORD* mapsObject = (DWORD*)(h2mod->GetBase() + (h2mod->Server ? 0x4A70D8 : 0x482D70));
 	DWORD dwBack;
-
-
+	TRACE_GAME("[h2mod-mapmanager] before virtual protect");
 	BOOL canprotect = VirtualProtect((WORD*)((int)mapsObject + 148016), sizeof(WORD), PAGE_EXECUTE_READWRITE, &dwBack);
 	if (!canprotect && GetLastError()) {
 		if (H2Config_debug_log)
 			TRACE_GAME_N("[h2mod-mapmanager] reloadMaps - canprotect=%d, error=%d", canprotect, GetLastError());
 	}
+	TRACE_GAME("[h2mod-mapmanager] after virtual protect");
+
+	TRACE_GAME("[h2mod-mapmanager] before reload map sets");
+	EnterCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
 	reloadMapsSet((int)mapsObject);
+	LeaveCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
+	TRACE_GAME("[h2mod-mapmanager] after reload maps");
+
+	TRACE_GAME("[h2mod-mapmanager] before reload map");
+	EnterCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
 	reloadMaps((int)mapsObject);
+	LeaveCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
+	TRACE_GAME("[h2mod-mapmanager] after reload maps");
+
 	reloadMapFilenames();
 }
 
