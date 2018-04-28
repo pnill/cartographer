@@ -3242,6 +3242,7 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 	pOverlapped->InternalLow = ERROR_SUCCESS;
 	pOverlapped->dwExtendedError = ERROR_SUCCESS;
 
+	gameManager->start();
 
 	Check_Overlapped( pOverlapped );
 

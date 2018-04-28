@@ -2,8 +2,8 @@
 #include <CUser.h>
 
 //original = 0x3DA8
-#define MEMBERSHIP_PACKET_SIZE 0x3e28
-#define MEMBERSHIP_PACKET_SIZE_RAW_BYTES 0x28, 0x3E
+#define MEMBERSHIP_PACKET_SIZE 0x3DA8
+#define MEMBERSHIP_PACKET_SIZE_RAW_BYTES 0xA8, 0x3D
 //original = 0x194
 #define CHAT_PACKET_SIZE 0x2B5
 #define CHAT_PACKET_SIZE_RAW_BYTES 0xB5, 0x02
@@ -792,6 +792,11 @@ void CustomNetwork::sendCustomPacketToAllPlayers() {
 				{
 					int shiftCounter = h2mod->Server ? 1 : 0;
 					int peerIndex = players->getPeerIndex(playerCounter - shiftCounter);
+					if (wcslen(players->getPlayerName(playerCounter - shiftCounter)) == 0) {
+						//if we can't find a player name, either member data is not available or something terrible has gone wrong
+						++playerCounter;
+						continue;
+					}
 					TRACE_GAME("[h2mod-network] sending packet to all players, playerIndex=%d, peerIndex=%d, peerName=%s", playerCounter, peerIndex, players->getPlayerName(playerCounter - shiftCounter));
 					//only send the command packet to the given peer index
 					char* newPacketObject = (char*)(packetDataObj);
@@ -831,10 +836,6 @@ char* __cdecl registerChatPackets(void* packetObject) {
 
 void CustomNetwork::applyNetworkHooks() {
 	DWORD dwBack;
-	DWORD triggerMembershipPacketOffset = 0x1CA3E0;
-	DWORD generateMembershipDataPacketOffset = 0x1C3811;
-	DWORD serializeMembershipDataPacketOffset = 0x1EF6B9;
-	DWORD deserializeMembershipDataPacketCaveOffset = 0x1F0032;
 	DWORD registerConnectionPacketsOffset = 0x1F1B36;
 	DWORD registerPlayerPacketsOffset = 0x1F0A55;
 	DWORD serializePacketsOffset = 0x1E8296;
@@ -846,10 +847,6 @@ void CustomNetwork::applyNetworkHooks() {
 	DWORD sendChatPacketOffset2 = 0x1C81EC;
 
 	if (h2mod->Server) {
-		triggerMembershipPacketOffset = 0x1A1968;
-		generateMembershipDataPacketOffset = 0x19AEC9;
-		serializeMembershipDataPacketOffset = 0x1D0072;
-		deserializeMembershipDataPacketCaveOffset = 0x1D09EB;
 		registerConnectionPacketsOffset = 0x1D24EF;
 		registerPlayerPacketsOffset = 0x1D140E;
 		serializePacketsOffset = 0x1CA259;
@@ -861,22 +858,6 @@ void CustomNetwork::applyNetworkHooks() {
 		sendChatPacketOffset2 = 0x1A237F;
 	}
 
-	////////////////////////////////////
-	//member packet customizations below
-	////////////////////////////////////
-
-	BYTE bytes[5] = { 0x68, MEMBERSHIP_PACKET_SIZE_RAW_BYTES, 0x00, 0x00 };
-	patchBYTEs((BYTE*)h2mod->GetBase() + generateMembershipDataPacketOffset, bytes, 5);
-
-	trigger_membership_packet_method = (trigger_membership_packet)DetourClassFunc((BYTE*)h2mod->GetBase() + triggerMembershipPacketOffset, (BYTE*)triggerMembershipPacketData, 10);
-	VirtualProtect(trigger_membership_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-	membership_update_write_method = (membership_update_write)DetourFunc((BYTE*)h2mod->GetBase() + serializeMembershipDataPacketOffset, (BYTE*)membershipUpdateWrite, 5);
-	VirtualProtect(membership_update_write_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-	Codecave(h2mod->GetBase() + deserializeMembershipDataPacketCaveOffset, membershipUpdateReadCave, 0);
-
-	//TODO: should probably move into map manager
 	///////////////////////////////////////////////
 	//map loading customizations below
 	///////////////////////////////////////////////
@@ -884,9 +865,6 @@ void CustomNetwork::applyNetworkHooks() {
 	//we hook the spot in dedi and peers where the main game data is loaded so we can do stuff with it after
 	if (h2mod->Server) {
 		Codecave(h2mod->GetBase() + 0x1A2F9, afterMapsLoadDedi, 2);
-	}
-	else {
-		Codecave(h2mod->GetBase() + 0x4D311, afterMapsLoaded, 0);
 	}
 
 	///////////////////////////////////////////////

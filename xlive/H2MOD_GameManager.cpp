@@ -80,8 +80,8 @@ void startGameThread() {
 			}
 		} else {
 			double secondsPassed = difftime(time(0), start2);
-			if (secondsPassed > 10) {
-				//send map info every 10 seconds if somehow membership packets don't send the map filename
+			if (secondsPassed > 5) {
+				//send map info every 5 seconds if somehow membership packets don't send the map filename
 				mapManager->sendMapInfoPacket();
 				start2 = time(0);
 			}
