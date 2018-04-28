@@ -1,5 +1,8 @@
 #pragma once
 
+#define JMP_RAW_BYTE 0xEB
+#define JNZ_RAW_BYTE 0x75 
+
 void *DetourFunc(BYTE *src, const BYTE *dst, const int len);
 void RetourFunc(BYTE *src, BYTE *restore, const int len);
 void *DetourClassFunc(BYTE *src, const BYTE *dst, const int len);
@@ -31,3 +34,10 @@ inline void WriteValue(DWORD offset, value_type data)
 {
 	WriteBytes(offset, &data, sizeof(data));
 }
+
+#define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
+#define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2
+#define NopFill(Address, len)                       \
+	BYTE J(NopFIll_, __LINE__ )[len];               \
+	std::fill_n(J(NopFIll_, __LINE__ ), len, 0x90); \
+	WriteBytes(Address, J(NopFIll_, __LINE__ ), len)
