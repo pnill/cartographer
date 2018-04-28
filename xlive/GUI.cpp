@@ -17,6 +17,7 @@
 #include "H2Config.h"
 #include <time.h>
 
+
 extern ConsoleCommands* commands;
 
 
@@ -167,9 +168,12 @@ int WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 {
 	return 0;
 }
+
+
 // #5000: XLiveInitialize
 int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 {
+		
 		InitInstance();
 		TRACE("XLiveInitialize()");
 		lastRenderTime = 0.0f;

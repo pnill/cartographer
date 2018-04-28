@@ -161,8 +161,9 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 		memset(pxnkid, 0xAB, sizeof(XNKID));
 		memset(pxnkey, 0XAA, sizeof(XNKEY));
 
-		pxnkid->ab[0] &= ~XNET_XNKID_MASK;
-		pxnkid->ab[0] |= XNET_XNKID_SYSTEM_LINK;
+		/* These are un-necessary. */
+		//pxnkid->ab[0] &= ~XNET_XNKID_MASK;
+		//pxnkid->ab[0] |= XNET_XNKID_SYSTEM_LINK;
 
 		NetworkActive = false;
 		
@@ -428,19 +429,19 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 }
 
 // #55: XNetRegisterKey //need #51
-int WINAPI XNetRegisterKey(DWORD, DWORD)
+int WINAPI XNetRegisterKey(XNKID *pxnkid, XNKEY *pxnkey)
 {
-	TRACE("XNetRegisterKey");
+	TRACE("XNetRegisterKey( %08X, %08X )",pxnkid,pxnkey);
 	return 0;
 }
 
 
 // #56: XNetUnregisterKey // need #51
-int WINAPI XNetUnregisterKey(DWORD)
+int WINAPI XNetUnregisterKey(const XNKID* pxnkid)
 {
 	isHost = false;
 	Connected = false;
-	TRACE("XNetUnregisterKey");
+	TRACE("XNetUnregisterKey(%08X)",pxnkid);
 	return 0;
 }
 

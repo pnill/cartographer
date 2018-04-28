@@ -6,6 +6,7 @@
 #include "H2Startup.h"
 #include "GSCustomMenu.h"
 #include "GSUtils.h"
+#include <string>
 
 bool AccountEdit_remember = true;
 

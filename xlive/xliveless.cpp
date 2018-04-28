@@ -9,6 +9,11 @@
 #include "Globals.h"
 #include "discord/DiscordInterface.h"
 #include "H2Config.h"
+#include "H2MOD_ServerList.h"
+#include "xlivedefs.h"
+#include "CUser.h"
+#include <winsock2.h>
+#include <ws2tcpip.h>
 
 using namespace std;
 
@@ -909,15 +914,63 @@ int WINAPI XNetDnsRelease (void * pxndns)
     return 0;
 }
 
+PBYTE pb_data;
+UINT cb_data;
+
+//if (comm_socket == INVALID_SOCKET)
+//{
+//	comm_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+SOCKET QoSListenSocket = INVALID_SOCKET;
+SOCKET QoSClientSocket = INVALID_SOCKET;
 // #69: XNetQosListen
 DWORD WINAPI XNetQosListen( XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec, DWORD dwFlags )
 {
     TRACE("XNetQosListen  (pxnkid = %X, pb = %X, cb = %d, bitsPerSec = %d, flags = %X)",
 			pxnkid, pb, cb, dwBitsPerSec, dwFlags );
+	WSADATA wsaData;
+	int iResult;
 
-	
-    return -1;
+	struct addrinfo *result = NULL;
+	struct addrinfo hints;
+
+	int iSendResult;
+	char recvbuf[512];
+	int recvbuflen = 512;
+
+	ZeroMemory(&hints, sizeof(hints));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_flags = AI_PASSIVE;
+
+	iResult = getaddrinfo(NULL, to_string(H2Config_base_port+9).c_str(), &hints, &result);
+
+
+	QoSListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+
+	iResult = ::bind(QoSListenSocket, result->ai_addr, (int)result->ai_addrlen);
+
+	freeaddrinfo(result);
+
+	iResult = listen(QoSListenSocket, SOMAXCONN);
+
+	/*if (cb > 0)
+	{
+		FILE* fh = fopen("pb_dump.bin", "w");
+		fwrite(fh, cb, 1, fh);
+		fclose(fh);
+		/*pb_data = new BYTE[cb + 1];
+		ZeroMemory(pb_data, cb + 1);
+		memcpy(pb_data, pb, cb);
+
+		TRACE("pb_data: %08X", &pb_data);*/
+	/*}*/
+
+    return 0;
 }
+
+
 
 // #70: XNetQosLookup
 DWORD WINAPI XNetQosLookup (UINT cxna, XNADDR * apxna[], XNKID * apxnkid[],XNKEY * apxnkey[], UINT cina, IN_ADDR aina[], DWORD adwServiceId[], UINT cProbes, DWORD dwBitsPerSec, DWORD dwFlags, WSAEVENT hEvent, XNQOS** pxnqos)
@@ -939,9 +992,7 @@ DWORD WINAPI XNetQosLookup (UINT cxna, XNADDR * apxna[], XNKID * apxnkid[],XNKEY
 	pqos->axnqosinfo->bReserved = 0;
 	pqos->axnqosinfo->cProbesXmit = cProbes;
 	pqos->axnqosinfo->cProbesRecv = cProbes;
-	pqos->axnqosinfo->cbData = 0;
-	pqos->axnqosinfo->pbData = NULL;
-
+	
 	if (cProbes > 0)
 	{
 		pqos->axnqosinfo->wRttMedInMsecs = 5;
@@ -1042,9 +1093,9 @@ int WINAPI XNetStartupEx(int a1, int a2, int a3)
 }
 
 // #81
-int WINAPI XNetReplaceKey(int a1, int a2)
+int WINAPI XNetReplaceKey(const XNKID *pxnkidUnregister, const XNKID *pxnkidReplace)
 {
-	TRACE("XNetReplaceKey");
+	TRACE("XNetReplaceKey( pxnkidUnregister: %08X, pxnkidreplace: %08X)",pxnkidUnregister, pxnkidReplace);
 	return 0;
 }
 
@@ -2145,6 +2196,9 @@ int WINAPI XCancelOverlapped (DWORD a1)
 }
 
 
+HANDLE ServerEnum = NULL;
+bool ServerEnumRan = false;
+ServerList LiveManager;
 // #5256: XEnumerate
 int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcItemsReturned, PXOVERLAPPED pOverlapped)
 {
@@ -2348,7 +2402,38 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		marketplaceEnumerate += marketplaceCount;
 	}
 
+	if (hEnum == ServerEnum)
+	{
 
+		while (LiveManager.GetRunning() == true && LiveManager.GetTotalServers() == 0 || LiveManager.servers_left > 0)
+		{
+			
+		}
+
+		if (LiveManager.GetRunning() == false && LiveManager.GetTotalServers() == 0)
+		{
+			LiveManager.GetServers();
+
+		}
+		
+		if (LiveManager.GetRunning() == false && LiveManager.GetTotalServers() > 0 && LiveManager.servers_left == 0)
+		{
+			for (int i = 0; i < LiveManager.GetTotalServers(); i++)
+			{
+				memcpy(pvBuffer + (sizeof(_XLOCATOR_SEARCHRESULT) * i), &LiveManager.servers[i], sizeof(_XLOCATOR_SEARCHRESULT));
+			}
+
+			if (async == FALSE)
+				*pcItemsReturned = LiveManager.GetTotalServers();
+			else
+				pOverlapped->InternalHigh = LiveManager.GetTotalServers();
+
+				LiveManager.total_servers = 0;
+
+			
+		}
+	
+	}
 
 	if( async == FALSE )
 	{
@@ -5177,14 +5262,7 @@ DWORD WINAPI XLiveSecureLoadLibraryW( LPCWSTR libFileName, DWORD a2, DWORD dwFla
 
 
 // 5230: ??
-DWORD WINAPI XLocatorServerAdvertise( DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6, DWORD a7, DWORD a8, DWORD a9, DWORD a10, DWORD a11, DWORD a12, DWORD a13, DWORD a14, DWORD a15 )
-{
-  TRACE("XLocatorServerAdvertise  (*** checkme ***)");
 
-
-	// not done - error now
-	return S_OK;
-}
 
 
 // 5231: ??
@@ -5215,13 +5293,24 @@ DWORD WINAPI XLocatorGetServiceProperty( DWORD dwUserIndex, DWORD cNumProperties
 
 
 // 5234: ??
-DWORD WINAPI XLocatorCreateServerEnumerator( DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6, DWORD a7, DWORD a8, DWORD a9, DWORD a10 )
+DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, DWORD* pcbBuffer, PHANDLE phEnum)
 {
   TRACE("XLocatorCreateServerEnumerator");
+ 
+  *pcbBuffer = (DWORD)sizeof(XLOCATOR_SEARCHRESULT);
 
+  if (phEnum)
+  {
+	  *phEnum = CreateMutex(NULL, NULL, NULL);
 
+	  TRACE("- Handle = %X", *phEnum);
+	  ServerEnum = *phEnum;
+  }
+
+	//PopulateList();
+	
 	// not done - error now
-	return 0x57;
+	return ERROR_SUCCESS;
 }
 
 
@@ -5255,7 +5344,7 @@ DWORD WINAPI XLocatorServiceInitialize( DWORD a1, DWORD a2 )
 
 
 	// GFWL offline
-	return 1;
+	return 0;
 }
 
 
@@ -5271,12 +5360,12 @@ DWORD WINAPI XLocatorServiceUnInitialize( DWORD a1 )
 
 
 // 5238: ??
-DWORD WINAPI XLocatorCreateKey( DWORD a1, DWORD a2 )
+DWORD WINAPI XLocatorCreateKey( XNKID* pxnkid, XNKEY* xnkey )
 {
   TRACE("XLocatorCreateKey  (a1 = %X, a2 = %X)",
-		a1, a2 );
+		pxnkid, xnkey );
 
-
+	XNetCreateKey(pxnkid, xnkey);
 	// GFWL offline
 	return S_OK;
 }

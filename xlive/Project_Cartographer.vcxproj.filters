@@ -207,6 +207,9 @@
     <ClCompile Include="Util\Debug.cpp">
       <Filter>Source Files\Util\Debug</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD_ServerList.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -418,6 +421,9 @@
     </ClInclude>
     <ClInclude Include="Util\Debug.h">
       <Filter>Source Files\Util\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD_ServerList.h">
+      <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
