@@ -398,7 +398,9 @@ void CUserManagement::UnregisterLocal()
 }
 
 void SetUserUsername(char* username) {
-	snprintf(g_szUserName[0], 17, username);
+
+	ZeroMemory(g_szUserName[0], 17);
+	snprintf(g_szUserName[0], 16, username);
 	if (!H2IsDediServer) {
 		snprintf((char*)((BYTE*)H2BaseAddr + 0x971316), 17, username);
 		swprintf((wchar_t*)((BYTE*)H2BaseAddr + 0x96DA94), 17, L"%hs", username);
@@ -445,6 +447,7 @@ BOOL CUserManagement::GetLocalXNAddr(XNADDR* pxna)
 	{
 		memcpy(pxna, &Users[0].pxna, sizeof(XNADDR));
 		TRACE("GetLocalXNAddr: Returned");
+		TRACE("XNADDR: %08X", pxna->ina.s_addr);
 		return TRUE;
 	}
 	TRACE("GetLocalXNADDR: User data not populated yet.");

@@ -863,10 +863,14 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 	sockaddr_in SendStruct;
 
 	if (host_xn->ina.s_addr != H2Config_ip_wan)
+	{
+		TRACE("XN is not equal to the WAN address, assigning external XN");
 		SendStruct.sin_addr.s_addr = host_xn->ina.s_addr;
+	}
 	else
+	{ 
 		SendStruct.sin_addr.s_addr = H2Config_ip_lan;
-
+	}
 	short nPort = (ntohs(host_xn->wPortOnline) + 1);
 
 	TRACE("join_game nPort: %i", nPort);
@@ -881,9 +885,13 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 
 	int securitysend_1001 = sendto(game_sock, (char*)User.SecurityPacket, 8 + sizeof(XNADDR), 0, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
 
+	if (securitysend_1001 != (8 + sizeof(XNADDR)))
+		TRACE("join_game Security Packet Send had return different than len: %i", securitysend_1001);
+
 	User.CreateUser(host_xn, FALSE);
 
-	if (securitysend_1001 == SOCKET_ERROR)
+
+	if (securitysend_1001 == SOCKET_ERROR )
 	{
 		TRACE("join_game Security Packet - Socket Error True");
 		TRACE("join_game Security Packet - WSAGetLastError(): %08X", WSAGetLastError());

@@ -64,8 +64,8 @@
     <OutDir>$(SolutionDir)Halo2\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;.\;..\protobuf-2.6.1;..\Directx SDK\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;.\libs;..\Directx SDK\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;.\;..\protobuf-2.6.1;..\Directx SDK\include;C:\Development\chilkat-9.5.0-x86-vc2015\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;.\libs;..\Directx SDK\lib;C:\Development\chilkat-9.5.0-x86-vc2015\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -277,6 +277,7 @@
     <ClCompile Include="H2MOD_Mouseinput.cpp" />
     <ClCompile Include="H2MOD_Network.cpp" />
     <ClCompile Include="H2MOD_Players.cpp" />
+    <ClCompile Include="H2MOD_ServerList.cpp" />
     <ClCompile Include="H2OnscreenDebugLog.cpp" />
     <ClCompile Include="H2Startup.cpp" />
     <ClCompile Include="H2Tweaks.cpp" />
@@ -348,6 +349,7 @@
     <ClInclude Include="H2MOD_Mouseinput.h" />
     <ClInclude Include="H2MOD_Network.h" />
     <ClInclude Include="H2MOD_Players.h" />
+    <ClInclude Include="H2MOD_ServerList.h" />
     <ClInclude Include="H2MOD_Sounds.h" />
     <ClInclude Include="H2OnscreenDebugLog.h" />
     <ClInclude Include="H2Startup.h" />
