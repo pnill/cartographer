@@ -225,7 +225,7 @@ void H2MOD::logToDedicatedServerConsole(wchar_t* message) {
 }
 
 int __cdecl dediCommandHook(int a1, int a2, int a3) {
-	h2mod->logToDedicatedServerConsole(L"Dedicated command\n");
+	//h2mod->logToDedicatedServerConsole(L"Dedicated command\n");
 	unsigned __int16* ptr = *(unsigned __int16 **)a1;
 	const wchar_t* text = (wchar_t*)ptr;
 	wchar_t c = text[0];
