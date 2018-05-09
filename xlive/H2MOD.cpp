@@ -1020,6 +1020,27 @@ char filo_write__encrypted_data_hook(filo *file_ptr, DWORD nNumberOfBytesToWrite
 	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
 }
 
+int static_lod_state = static_lod::cinematic;
+DWORD calculate_model_lod;
+DWORD calculate_model_lod_detour_end;
+__declspec(naked) void calculate_model_lod_detour()
+{
+	__asm
+	{
+		// replaced code
+		// todo check if this is needed when using a static LOD, might save on some processor time
+		call calculate_model_lod
+
+		cmp static_lod_state, 0
+		jz END_DETOUR
+
+		mov eax, static_lod_state
+		add eax, 2 // convert setting to in-game model LOD value (0 - 5, L1 - L6)
+
+		END_DETOUR:
+		jmp calculate_model_lod_detour_end
+	}
+}
 void H2MOD::securityPacketProcessing()
 {
 
@@ -1195,6 +1216,13 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetBase() + 0x9B09F, filo_write__encrypted_data_hook);
 		PatchWinAPICall(GetBase() + 0x9AF9E, CryptUnprotectDataHook);
 		PatchWinAPICall(GetBase() + 0x9B08A, CryptProtectDataHook);
+
+		calculate_model_lod = GetBase() + 0x19CA3E;
+		calculate_model_lod_detour_end = GetBase() + 0x19CDA3 + 5;
+		WriteJmpTo(GetBase() + 0x19CDA3, calculate_model_lod_detour);
+
+		// set max model qaulity to L6
+		WriteValue(GetBase() + 0x190B38 + 1, 5);
 	}
 #pragma endregion
 

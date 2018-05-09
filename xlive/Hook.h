@@ -31,3 +31,20 @@ inline void WriteValue(DWORD offset, value_type data)
 {
 	WriteBytes(offset, &data, sizeof(data));
 }
+
+inline void WriteJmpTo(DWORD call_addr, DWORD new_function_ptr)
+{
+	BYTE call_patch[1] = { 0xE9 };
+	WriteBytes(call_addr, call_patch, 1);
+	PatchCall(call_addr, new_function_ptr);
+}
+
+inline void WriteJmpTo(DWORD call_addr, void *new_function_ptr)
+{
+	WriteJmpTo(call_addr, reinterpret_cast<DWORD>(new_function_ptr));
+}
+
+inline void WriteJmpTo(void *call_addr, void *new_function_ptr)
+{
+	WriteJmpTo(reinterpret_cast<DWORD>(call_addr), reinterpret_cast<DWORD>(new_function_ptr));
+}

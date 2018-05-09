@@ -12,6 +12,7 @@
 #include "CUser.h"
 #include "H2Tweaks.h"
 #include "GSDownload.h"
+#include <Shellapi.h>
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
@@ -2587,6 +2588,9 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 			assmDisableVehicleFlipEject[0] = 0x7E;
 		WriteBytes(H2BaseAddr + 0x159e5d, assmDisableVehicleFlipEject, 1);
 	}
+	else if (button_id == 8) {
+
+	}
 	return false;
 }
 
@@ -3548,7 +3552,7 @@ static bool CMButtonHandler_Guide(int button_id) {
 		GSCustomMenuCall_AdvSettings();
 	}
 	else if (button_id == 1) {
-		system("start http://cartographer.online/");
+		ShellExecuteA(NULL, "open", "https://cartographer.online/", NULL, NULL, SW_SHOWDEFAULT);
 	}
 	else if (button_id == 2) {
 		GSCustomMenuCall_Credits();

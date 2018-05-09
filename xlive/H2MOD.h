@@ -73,6 +73,14 @@ enum Weapon
 	juggernaut_powerup = 0xF33838D2 //35
 };
 
+enum static_lod : DWORD
+{
+	disable = 0,
+	low = 1,
+	high = 2,
+	cinematic = 3
+};
+
 int __cdecl call_get_object(signed int object_datum_index, int object_type);
 int __cdecl call_unit_reset_equipment(int unit_datum_index);
 bool __cdecl call_add_object_to_sync(int gamestate_object_datum);
