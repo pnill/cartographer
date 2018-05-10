@@ -733,7 +733,7 @@ int __cdecl onGameEngineChange()
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 		//H2Tweaks::applyShaderTweaks(); 
 
-		if (GameEngine != 3 && GameState == 3)
+		if (GameState == 3)
 		{
 			if (b_Infection) {
 				infectionHandler->initializer->execute();
@@ -751,7 +751,6 @@ int __cdecl onGameEngineChange()
 			if (b_Halo2Final)
 				h2f->Initialize();
 		}
-
 	}
 
 	else if (GameEngine == SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
