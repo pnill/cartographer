@@ -76,9 +76,12 @@ enum Weapon
 enum static_lod : DWORD
 {
 	disable = 0,
-	low = 1,
-	high = 2,
-	cinematic = 3
+	super_low,
+	low,
+	medium,
+	high,
+	super_high,
+	cinematic
 };
 
 int __cdecl call_get_object(signed int object_datum_index, int object_type);

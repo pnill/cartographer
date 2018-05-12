@@ -4,6 +4,7 @@
 #include "H2OnscreenDebugLog.h"
 #include <math.h>
 #include "H2Startup.h"
+#include "H2MOD.h"
 
 static void HandleFileError(int fpErrNo) {//TODO
 	if (fpErrNo == EACCES || fpErrNo == EIO || fpErrNo == EPERM) {
@@ -79,6 +80,7 @@ bool H2Config_raw_input = false;
 bool H2Config_discord_enable = true;
 bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
+int H2Config_static_lod_state = static_lod::cinematic;
 int H2Config_field_of_view = 0;
 float H2Config_crosshair_offset = NAN;
 int H2Config_sens_controller = 0;
@@ -207,6 +209,17 @@ void SaveH2Config() {
 			fputs("\n# <uint> - 0 disables the built in frame limiter. >0 is the fps limit of the game.", fileConfig);
 			fputs("\n\n", fileConfig);
 
+			fputs("# static_lod_state Options (Client):", fileConfig);
+			fputs("\n# 0 - Disables the Level of Detail level enforcement for models.", fileConfig);
+			fputs("\n# The following describes each Level of Detail setting:", fileConfig);
+			fputs("\n# 1 - L1 - Very Low", fileConfig);
+			fputs("\n# 2 - L2 - Low", fileConfig);
+			fputs("\n# 3 - L3 - Medium", fileConfig);
+			fputs("\n# 4 - L4 - High", fileConfig);
+			fputs("\n# 5 - L5 - Very High", fileConfig);
+			fputs("\n# 6 - L6 - Cinematic", fileConfig);
+			fputs("\n\n", fileConfig);
+
 			fputs("# field_of_view Options (Client):", fileConfig);
 			fputs("\n# <uint 0 to 110> - 0 disables the built in FoV adjustment. >0 is the FoV set value.", fileConfig);
 			fputs("\n\n", fileConfig);
@@ -311,6 +324,9 @@ void SaveH2Config() {
 			fputs("\ncontroller_aim_assist = ", fileConfig); fputs(H2Config_controller_aim_assist ? "1" : "0", fileConfig);
 
 			sprintf(settingOutBuffer, "\nfps_limit = %d", H2Config_fps_limit);
+			fputs(settingOutBuffer, fileConfig);
+
+			sprintf(settingOutBuffer, "\nstatic_lod_state = %d", H2Config_static_lod_state);
 			fputs(settingOutBuffer, fileConfig);
 
 			sprintf(settingOutBuffer, "\nfield_of_view = %d", H2Config_field_of_view);
@@ -435,6 +451,7 @@ static bool est_raw_input = false;
 static bool est_discord_enable = false;
 static bool est_controller_aim_assist = false;
 static bool est_fps_limit = false;
+static bool est_static_lod_state = false;
 static bool est_field_of_view = false;
 static bool est_crosshair_offset = false;
 static bool est_sens_controller = false;
@@ -472,6 +489,7 @@ static void est_reset_vars() {
 	est_discord_enable = false;
 	est_controller_aim_assist = false;
 	est_fps_limit = false;
+	est_static_lod_state = false;
 	est_field_of_view = false;
 	est_crosshair_offset = false;
 	est_sens_controller = false;
@@ -702,6 +720,18 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				extern float desiredRenderTime;
 				desiredRenderTime = (1000.f / H2Config_fps_limit);
 				est_fps_limit = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "static_lod_state =%d", &tempint1) == 1) {
+			if (est_static_lod_state) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 6)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_static_lod_state = tempint1;
+				est_static_lod_state = true;
 			}
 		}
 		else if (!H2IsDediServer && sscanf(fileLine, "field_of_view =%d", &tempint1) == 1) {

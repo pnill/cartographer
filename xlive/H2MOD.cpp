@@ -1020,7 +1020,7 @@ char filo_write__encrypted_data_hook(filo *file_ptr, DWORD nNumberOfBytesToWrite
 	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
 }
 
-int static_lod_state = static_lod::cinematic;
+//int static_lod_state = static_lod::cinematic;
 DWORD calculate_model_lod;
 DWORD calculate_model_lod_detour_end;
 __declspec(naked) void calculate_model_lod_detour()
@@ -1031,11 +1031,11 @@ __declspec(naked) void calculate_model_lod_detour()
 		// todo check if this is needed when using a static LOD, might save on some processor time
 		call calculate_model_lod
 
-		cmp static_lod_state, 0
+		cmp H2Config_static_lod_state, 0
 		jz END_DETOUR
 
-		mov eax, static_lod_state
-		add eax, 2 // convert setting to in-game model LOD value (0 - 5, L1 - L6)
+		mov eax, H2Config_static_lod_state
+		sub eax, 1 // convert setting to in-game model LOD value (0 - 5, L1 - L6)
 
 		END_DETOUR:
 		jmp calculate_model_lod_detour_end
