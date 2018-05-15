@@ -160,7 +160,7 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		GetWindowRect(H2hWnd, &rectScreenOriginal);
 		once1 = true;
 	}
-	if ((GetKeyState(pPii->wParam) & 0x8000) && pPii->uMSG == WM_KEYDOWN) {
+	if ((GetKeyState(pPii->wParam) & 0x8000) && (pPii->uMSG == WM_KEYDOWN || pPii->uMSG == WM_SYSKEYDOWN)) {
 		pPii->fHandled = commands->handleInput(pPii->wParam);
 	}
 	return 1;
