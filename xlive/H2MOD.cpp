@@ -1259,7 +1259,7 @@ void H2MOD::Initialize()
 
 		PatchGameDetailsCheck();
 		//H2Tweaks::PatchPingMeterCheck();
-		*(bool*)(h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
+		*(int*)(h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
 
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init

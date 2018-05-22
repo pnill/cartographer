@@ -414,13 +414,3 @@ void H2Tweaks::FixRanksIcons() {
 	}
 }
 
-void applyCrashFix() {
-
-	//Crashfix
-	//*(int*)(h2mod->GetBase() + 0x464940) = 0;
-	//*(int*)(h2mod->GetBase() + 0x46494C) = 0;
-	//*(int*)(h2mod->GetBase() + 0x464958) = 0;
-	//*(int*)(h2mod->GetBase() + 0x464964) = 0;
-
-}
-
