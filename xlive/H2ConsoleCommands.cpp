@@ -30,13 +30,14 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 		return false;
 	}
 	double seconds_since_start = difftime(time(0), start);
-	switch (wp) {
-	case 0xC0: //~
+	if (wp == H2Config_hotkeyIdConsole) {
 		if (seconds_since_start > 0.5) {
 			this->console = !this->console;
 			start = time(0);
 		}
 		return true;
+	}
+	switch (wp) {
 	case '\b':   // backspace
 	{
 		if (this->console) {
