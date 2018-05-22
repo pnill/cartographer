@@ -24,7 +24,6 @@
 #include "H2Tweaks.h"
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 
-
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
 Infection* infectionHandler = new Infection();
@@ -36,14 +35,7 @@ bool b_H2X = false;
 
 extern bool b_GunGame;
 extern CUserManagement User;
-extern HANDLE H2MOD_Network;
-extern bool NetworkActive;
-extern bool Connected;
-extern bool ThreadCreated;
 extern int H2GetInstanceId();
-
-SOCKET comm_socket = INVALID_SOCKET;
-char* NetworkData = new char[255];
 
 #pragma region engine calls
 
@@ -838,9 +830,6 @@ Should take a look here for extended functions on scoring chances are we're alre
 
 void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
 {
-	Connected = false;
-	NetworkActive = false;
-
 	memcpy(&join_game_xn, host_xn, sizeof(XNADDR));
 
 	trace(L"join_game host_xn->ina.s_addr: %08X ", host_xn->ina.s_addr);

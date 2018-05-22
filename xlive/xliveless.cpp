@@ -15,13 +15,10 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-using namespace std;
-
 
 // Live connection state success codes
 #define XONLINE_S_LOGON_CONNECTION_ESTABLISHED          _HRESULT_TYPEDEF_(0x001510F0L)
 #define XONLINE_S_LOGON_DISCONNECTED                    _HRESULT_TYPEDEF_(0x001510F1L)
-
 
 
 HANDLE g_dwFakeListener = (HANDLE) -2;
@@ -293,7 +290,7 @@ BOOL SetDlcBasepath( int num )
 
 
 					// check valid folder
-					wstring wnum;
+					std::wstring wnum;
 					wnum = L"DLC\\";
 					wnum += ffd.cFileName;
 					wnum += L"\\content.xbx";
@@ -944,7 +941,7 @@ DWORD WINAPI XNetQosListen( XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
 
-	iResult = getaddrinfo(NULL, to_string(H2Config_base_port+9).c_str(), &hints, &result);
+	iResult = getaddrinfo(NULL, std::to_string(H2Config_base_port+9).c_str(), &hints, &result);
 
 
 	QoSListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);

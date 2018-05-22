@@ -10,11 +10,6 @@
 #include "Globals.h"
 #include "H2Config.h"
 
-bool Connected = false;
-bool ThreadCreated = false;
-bool NetworkActive = true;
-
-HANDLE H2MOD_Network = NULL;
 SOCKET boundsock = INVALID_SOCKET;
 SOCKET game_sock = INVALID_SOCKET;
 SOCKET game_sock_1000 = INVALID_SOCKET;
@@ -37,7 +32,6 @@ float getElapsedNetworkTime(void) {
 // #5310: XOnlineStartup
 int WINAPI XOnlineStartup()
 {
-	NetworkActive = true;
 	//TRACE("XOnlineStartup");
 	ServerStatus = new char[250];
 	QueryPerformanceFrequency(&timerFreq);
@@ -59,10 +53,6 @@ int WINAPI XOnlineStartup()
 // #5332: XSessionEnd
 int WINAPI XSessionEnd(DWORD, DWORD)
 {
-	NetworkActive = false;
-	Connected = false;
-	ThreadCreated = false;
-	H2MOD_Network = 0;
 	mapManager->cleanup();
 	TRACE("XSessionEnd");
 	return 0;
@@ -73,11 +63,6 @@ int WINAPI XSessionEnd(DWORD, DWORD)
 // #52: XNetCleanup
 INT WINAPI XNetCleanup()
 {
-	NetworkActive = false;
-	ThreadCreated = false;
-	Connected = false;
-	H2MOD_Network = 0;
-
 	TRACE("XNetCleanup");
 	return 0;
 }
@@ -120,9 +105,6 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 	if(ntohs(port) == 1006)
 		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 6);
 
-
-
-	
 	
 	User.sockmap[s] = ntohs(port);
 
@@ -160,8 +142,6 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 		/* These are un-necessary. */
 		//pxnkid->ab[0] &= ~XNET_XNKID_MASK;
 		//pxnkid->ab[0] |= XNET_XNKID_SYSTEM_LINK;
-
-		NetworkActive = false;
 	}
 
 	return 0;
@@ -422,7 +402,6 @@ int WINAPI XNetRegisterKey(XNKID *pxnkid, XNKEY *pxnkey)
 // #56: XNetUnregisterKey // need #51
 int WINAPI XNetUnregisterKey(const XNKID* pxnkid)
 {
-	Connected = false;
 	TRACE("XNetUnregisterKey(%08X)",pxnkid);
 	return 0;
 }
