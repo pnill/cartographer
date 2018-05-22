@@ -1,6 +1,7 @@
 #pragma once
 
-enum InputType {
+enum InputType 
+{
 	CONTROLLER = 1,
 	MOUSE = 0
 };

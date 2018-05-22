@@ -5,7 +5,8 @@
 #include <set>
 #include <mutex>
 
-enum EngineType{
+enum EngineType
+{
 	SINGLE_PLAYER_ENGINE = 1,
 	MULTIPLAYER_ENGINE = 2,
 	MAIN_MENU_ENGINE = 3
