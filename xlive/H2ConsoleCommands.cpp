@@ -465,6 +465,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else {
 			output(L"Unknown command.");
+			h2mod->logToDedicatedServerConsole(L"No such custom command.");
 		}
 	}
 }

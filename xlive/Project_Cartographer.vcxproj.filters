@@ -213,6 +213,9 @@
     <ClCompile Include="H2MOD_ServerList.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -339,12 +342,12 @@
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Blam\BlamLibrary.h">
-	  <Filter>Source Files\Blam</Filter>
-	</ClInclude>
-	<ClInclude Include="Blam\Enums\Enums.h">
-	  <Filter>Source Files\Blam\Enums</Filter>
-	</ClInclude>
-	<ClInclude Include="Blam\Enums\Players\Players.h">
+      <Filter>Source Files\Blam</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Enums.h">
+      <Filter>Source Files\Blam\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Players\Players.h">
       <Filter>Source Files\Blam\Enums\Players</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h">
@@ -379,8 +382,8 @@
     </ClInclude>
     <ClInclude Include="Blam\Shared\Globals.h">
       <Filter>Source Files\Blam\Shared</Filter>
-     </ClInclude>
-	<ClInclude Include="Blam\Shared\SharedDefinitions.h">
+    </ClInclude>
+    <ClInclude Include="Blam\Shared\SharedDefinitions.h">
       <Filter>Source Files\Blam\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Engine\EngineDefinitions.h">
@@ -442,6 +445,9 @@
     </ClInclude>
     <ClInclude Include="H2MOD_ServerList.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Game\GameEngine.h">
+      <Filter>Source Files\Blam\Engine\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -24,6 +24,7 @@
 #include "H2Tweaks.h"
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 
+
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
 Infection* infectionHandler = new Infection();
@@ -129,10 +130,21 @@ bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 	return p_add_object_to_sync(gamestate_object_datum);
 }
 
-BYTE H2MOD::get_engine_type()
+EngineType H2MOD::get_engine_type()
 {
 	DWORD GameGlobals = *(DWORD*)(h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-	return *(BYTE*)(GameGlobals + 0x8);
+
+	switch (*(BYTE*)(GameGlobals + 0x8))
+	{
+	case 1:
+		return EngineType::SINGLE_PLAYER_ENGINE;
+	case 2:
+		return EngineType::MULTIPLAYER_ENGINE;
+	case 3:
+		return EngineType::MAIN_MENU_ENGINE;
+	default:
+		return EngineType::INVALID_ENGINE_TYPE; // if everything ok shouldn't ever get here
+	} 
 }
 
 #pragma endregion
@@ -226,6 +238,10 @@ dedi_command_hook dedi_command_hook_method;
 typedef signed int(*dedi_print)(const char* a1, ...);
 
 void H2MOD::logToDedicatedServerConsole(wchar_t* message) {
+
+	if (!h2mod->Server)
+		return;
+
 	dedi_print dedi_print_method = (dedi_print)(h2mod->GetBase() + 0x2354C8);
 	dedi_print_method((const char*)(message));
 }
@@ -705,7 +721,7 @@ int __cdecl onGameEngineChange()
 
 	if (h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE)
 	{
-		addDebugText("GameEngine: Multi-player, apply patches");
+		addDebugText("GameEngine: Multiplayer, apply patches");
 
 		if (wcsstr(variant_name, L"zombies") > 0 || wcsstr(variant_name, L"Zombies") > 0 || wcsstr(variant_name, L"Infection") > 0 || wcsstr(variant_name, L"infection") > 0)
 		{
@@ -757,7 +773,7 @@ int __cdecl onGameEngineChange()
 	}
 
 	else if (h2mod->get_engine_type() == EngineType::SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
-		addDebugText("GameEngine: Single-player, apply patches");
+		addDebugText("GameEngine: Singleplayer, apply patches");
 
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 		H2Tweaks::enable60FPSCutscenes();

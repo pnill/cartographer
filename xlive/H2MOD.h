@@ -4,14 +4,7 @@
 #include <unordered_map>
 #include <set>
 #include <mutex>
-
-enum EngineType
-{
-	SINGLE_PLAYER_ENGINE = 1,
-	MULTIPLAYER_ENGINE = 2,
-	MAIN_MENU_ENGINE = 3
-};
-
+#include "Blam\Engine\Game\GameEngine.h"
 
 enum GrenadeType
 {
@@ -130,7 +123,7 @@ public:
 		void DisableSound(int sound);
 		void PatchWeaponsInteraction(bool b_Enable);		
 		void securityPacketProcessing();
-		BYTE get_engine_type();
+		EngineType get_engine_type();
 		BOOL Server;
 		std::unordered_map<wchar_t*, int> SoundMap;
 		std::unordered_map<std::string, bool> AchievementMap;
