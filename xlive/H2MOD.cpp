@@ -129,6 +129,12 @@ bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 	return p_add_object_to_sync(gamestate_object_datum);
 }
 
+BYTE H2MOD::get_engine_type()
+{
+	DWORD GameGlobals = *(DWORD*)(h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
+	return *(BYTE*)(GameGlobals + 0x8);
+}
+
 #pragma endregion
 
 //sub_1cce9b
@@ -663,14 +669,10 @@ int __cdecl onGameEngineChange()
 	overrideUnicodeMessage = false;
 	isLobby = true;
 
-	DWORD GameGlobals = *(DWORD*)(h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-	BYTE GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
-	BYTE GameEngine = *(BYTE*)(GameGlobals + 0x8);
-
 	//based on what onGameEngineChange has changed
 	//we do our stuff bellow
 
-	if (GameEngine == MAIN_MENU_ENGINE)
+	if (h2mod->get_engine_type() == EngineType::MAIN_MENU_ENGINE)
 	{
 		addDebugText("GameEngine: Main-Menu, apply patches");
 
@@ -698,9 +700,10 @@ int __cdecl onGameEngineChange()
 	b_H2X = false;
 
 	wchar_t* variant_name = (wchar_t*)(h2mod->GetBase() + ((h2mod->Server) ? 0x534A18 : 0x97777C));
-	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", GameEngine, variant_name);
+	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", h2mod->get_engine_type(), variant_name);
+	BYTE GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
 
-	if (GameEngine == MULTIPLAYER_ENGINE)
+	if (h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE)
 	{
 		addDebugText("GameEngine: Multi-player, apply patches");
 
@@ -753,7 +756,7 @@ int __cdecl onGameEngineChange()
 		}
 	}
 
-	else if (GameEngine == SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
+	else if (h2mod->get_engine_type() == EngineType::SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
 		addDebugText("GameEngine: Single-player, apply patches");
 
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
@@ -1282,11 +1285,6 @@ void H2MOD::Initialize()
 
 void H2MOD::Deinitialize() {
 
-}
-
-DWORD H2MOD::GetBase()
-{
-	return this->Base;
 }
 
 void H2MOD::IndicatorVisibility(bool toggle)
