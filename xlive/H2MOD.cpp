@@ -224,22 +224,21 @@ void H2MOD::handle_command(std::wstring command) {
 	commands->handle_command(std::string(command.begin(), command.end()));
 }
 
-typedef int(__cdecl *dedi_command_hook)(int a1, int a2, char a3);
-dedi_command_hook dedi_command_hook_method;
-
-typedef signed int(*dedi_print)(const char* a1, ...);
-
 void H2MOD::logToDedicatedServerConsole(wchar_t* message) {
 
 	if (!h2mod->Server)
 		return;
 
+	typedef signed int(*dedi_print)(const char* a1, ...);
 	dedi_print dedi_print_method = (dedi_print)(h2mod->GetBase() + 0x2354C8);
+
 	dedi_print_method((const char*)(message));
 }
 
+typedef int(__cdecl *dedi_command_hook)(int a1, int a2, char a3);
+dedi_command_hook dedi_command_hook_method;
+
 int __cdecl dediCommandHook(int a1, int a2, int a3) {
-	//h2mod->logToDedicatedServerConsole(L"Dedicated command\n");
 	unsigned __int16* ptr = *(unsigned __int16 **)a1;
 	const wchar_t* text = (wchar_t*)ptr;
 	wchar_t c = text[0];
@@ -569,12 +568,6 @@ char __cdecl sub_4F17A(void* thisptr, int a2, int a3) //allows people to load cu
 typedef bool(__cdecl *spawn_player)(int a1);
 spawn_player pspawn_player;
 
-typedef bool(__cdecl *membership_update_network_decode)(int a1, int a2, int a3);
-membership_update_network_decode pmembership_update_network_decode;
-
-typedef int(__cdecl *game_difficulty_get_real_evaluate)(int a1, int a2);
-game_difficulty_get_real_evaluate pgame_difficulty_get_real_evaluate;
-
 typedef char(__cdecl *player_death)(int unit_datum_index, int a2, char a3, char a4);
 player_death pplayer_death;
 
@@ -617,18 +610,15 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 {
 	//TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
 
-
-#pragma region GunGame Handler
 	if (a5 == 7) //player got a kill?
 	{
 		int PlayerIndex = a2;
+
 		if (b_GunGame) {
 			gunGame->playerKill->setPlayerIndex(PlayerIndex);
 			gunGame->playerKill->execute();
 		}
 	}
-
-#pragma endregion
 
 	pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
@@ -1017,7 +1007,6 @@ __declspec(naked) void calculate_model_lod_detour()
 }
 void H2MOD::securityPacketProcessing()
 {
-
 	if (!gameManager->isHost())
 	{
 		sockaddr_in SendStruct;
