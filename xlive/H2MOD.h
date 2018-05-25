@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <set>
 #include <mutex>
-#include "Blam\Engine\Game\GameEngine.h"
+#include "Blam\Enums\Game\GameEngine.h"
 
 enum GrenadeType
 {
@@ -141,7 +141,6 @@ private:
 		std::unordered_map<int, int> playerIndexToDynamicBase;
 
 };
-
 
 extern H2MOD* h2mod;
 

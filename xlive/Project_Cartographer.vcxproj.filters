@@ -446,8 +446,8 @@
     <ClInclude Include="H2MOD_ServerList.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Engine\Game\GameEngine.h">
-      <Filter>Source Files\Blam\Engine\Game</Filter>
+    <ClInclude Include="Blam\Enums\Game\GameEngine.h">
+      <Filter>Source Files\Blam\Enums\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
