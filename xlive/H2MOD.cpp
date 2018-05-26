@@ -23,6 +23,7 @@
 #include "H2Config.h"
 #include "H2Tweaks.h"
 #include "Blam\Engine\FileSystem\FiloInterface.h"
+#include "H2Startup.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -1232,14 +1233,14 @@ void H2MOD::Initialize()
 {
 	//HANDLE hThread = CreateThread(NULL, 0, Thread1, NULL, 0, NULL);
 
-	if (GetModuleHandleA("H2Server.exe"))
+	this->Base = (DWORD)game_info.base;
+
+	if (game_info.process_type == H2Types::H2Server)
 	{
-		this->Base = (DWORD)GetModuleHandleA("H2Server.exe");
 		this->Server = TRUE;
 	}
-	else
+	else if (game_info.process_type == H2Types::H2Game)
 	{
-		this->Base = (DWORD)GetModuleHandleA("halo2.exe");
 		this->Server = FALSE;
 		
 		std::thread SoundT(SoundThread);
