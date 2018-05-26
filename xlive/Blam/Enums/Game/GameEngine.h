@@ -1,0 +1,9 @@
+#pragma once
+
+enum EngineType
+{
+	INVALID_ENGINE_TYPE = 0,
+	SINGLE_PLAYER_ENGINE = 1,
+	MULTIPLAYER_ENGINE = 2,
+	MAIN_MENU_ENGINE = 3
+};

@@ -303,6 +303,7 @@
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="Blam\Enums\Enums.h" />
+    <ClInclude Include="Blam\Enums\Game\GameEngine.h" />
     <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h" />
     <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h" />
     <ClInclude Include="Blam\Enums\Objects\Objects.h" />

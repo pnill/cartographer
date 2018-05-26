@@ -368,7 +368,7 @@ void H2Tweaks::enableAI_MP() {
 	if (H2IsDediServer) //TODO: get server offset
 		return;
 
-	BYTE jmp[1] = { 0xEB };
+	BYTE jmp[1] = { JMP_RAW_BYTE };
 	WriteBytes(H2BaseAddr + 0x30E684, jmp, 0x1); //AI_MP enable patch
 }
 
@@ -377,7 +377,7 @@ void H2Tweaks::disableAI_MP() {
 	if (H2IsDediServer) 
 		return;
 
-	BYTE jnz[1] = { 0x75 };
+	BYTE jnz[1] = { JNZ_RAW_BYTE };
 	WriteBytes(H2BaseAddr + 0x30E684, jnz, 0x1); //AI_MP disable patch
 }
 
