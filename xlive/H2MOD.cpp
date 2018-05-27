@@ -660,10 +660,10 @@ bool __cdecl player_remove_packet_handler(void *packet, int size, void *data)
 }
 */
 
-typedef int(__cdecl *originalFunc)();
+typedef void(__cdecl *originalFunc)(int a1);
 originalFunc p_originalFunc;
 
-int __cdecl onGameEngineChange()
+void __cdecl onGameEngineChange(int a1)
 {
 	overrideUnicodeMessage = false;
 	isLobby = true;
@@ -690,7 +690,8 @@ int __cdecl onGameEngineChange()
 		H2Tweaks::FixRanksIcons();
 		H2Tweaks::disable60FPSCutscenes();
 
-		return p_originalFunc();
+		p_originalFunc(a1);
+		return; 
 	}
 
 	b_Infection = false;
@@ -762,7 +763,7 @@ int __cdecl onGameEngineChange()
 		H2Tweaks::enable60FPSCutscenes();
 	}
 
-	return p_originalFunc();
+	p_originalFunc(a1);
 }
 
 
@@ -1118,8 +1119,8 @@ void H2MOD::ApplyHooks() {
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x55952, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		PatchCall(GetBase() + 0x86C3, onGameEngineChange);
-		p_originalFunc = (originalFunc)(GetBase() + 0x48CA5);
+		PatchCall(GetBase() + 0x49E95, onGameEngineChange);
+		p_originalFunc = (originalFunc)(GetBase() + 0x5912D);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0xD03ED, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1203,8 +1204,8 @@ void H2MOD::ApplyHooks() {
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x5DE4A, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
 
-		PatchCall(GetBase() + 0x1EB8B, onGameEngineChange);
-		p_originalFunc = (originalFunc)(GetBase() + 0x41F46);
+		PatchCall(GetBase() + 0x43113, onGameEngineChange);
+		p_originalFunc = (originalFunc)(GetBase() + 0x4E43C);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0x8C84C, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
