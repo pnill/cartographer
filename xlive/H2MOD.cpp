@@ -140,6 +140,14 @@ EngineType H2MOD::get_engine_type()
 	} 
 }
 
+void enableLiveMenus() {
+	*(int*)(h2mod->GetBase() + 0x422450) = 1; 
+}
+
+void disableLiveMenus() {
+	*(int*)(h2mod->GetBase() + 0x422450) = -1;
+}
+
 #pragma endregion
 
 //sub_1cce9b
@@ -1255,7 +1263,7 @@ void H2MOD::Initialize()
 
 		PatchGameDetailsCheck();
 		//H2Tweaks::PatchPingMeterCheck();
-		*(int*)(h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
+		void disableLiveMenus(); //until ready
 
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
