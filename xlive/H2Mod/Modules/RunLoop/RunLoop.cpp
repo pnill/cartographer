@@ -272,6 +272,10 @@ int prevPartyPrivacy = 0;
 
 bool halo2WindowExists = false;
 bool halo2ServerOnce1 = false;
+
+std::string replacementText = "Create a new network game.\r\nActive Players: %d\r\nActive Games: %d\r\nTotal Games: %d";
+std::string replacementText2 = "Join a game of Halo 2.\r\nActive Players: %d\r\nActive Games: %d\r\nTotal Games: %d";
+
 void GSMainLoop() {
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
@@ -333,6 +337,36 @@ void GSMainLoop() {
 				hotkeyFunc[i]();
 			}
 		}
+
+		if (replacedNetworkNormalTextWidget == NULL) {
+			replacedNetworkNormalTextWidget = new char[128];
+		}
+		if (replacedNetworkNormalTextWidget2 == NULL) {
+			replacedNetworkNormalTextWidget2 = new char[128];
+		}
+
+		int allPlayersCount = 0;
+		int allGamesCount = 0;
+		int allActiveGamesCount = 0;
+		//if the data is set
+		if (*(DWORD*)(h2mod->GetBase() + 0x96743C) + (0xAA8 * 0)) {
+			for (int i = 0; i < 200; i++) {
+				DWORD networkListGameDataPointer = *(DWORD*)(h2mod->GetBase() + 0x96743C) + (0xAA8 * i);
+				wchar_t* gameName = (wchar_t*)(networkListGameDataPointer + 0x88);
+				if (gameName != NULL && wcslen(gameName) > 0) {
+					BYTE playerCount = *(BYTE*)(networkListGameDataPointer + 0x88 + 0xD4);
+					if (playerCount > 0) {
+						allActiveGamesCount += 1;
+					}
+					allPlayersCount += playerCount;
+					allGamesCount += 1;
+					//TRACE_GAME("Network List Game %s, Player Count %d", gameName, playerCount);
+				}
+			}
+		}
+		sprintf(replacedNetworkNormalTextWidget, replacementText.c_str(), allPlayersCount, allActiveGamesCount, allGamesCount);
+		sprintf(replacedNetworkNormalTextWidget2, replacementText2.c_str(), allPlayersCount, allActiveGamesCount, allGamesCount);
+
 	}
 }
 

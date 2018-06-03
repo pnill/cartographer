@@ -9,6 +9,9 @@ bool overrideUnicodeMessage = false;
 //which creates or connects to teh team speak server
 bool isServer = true;
 
+char* replacedNetworkNormalTextWidget;
+char* replacedNetworkNormalTextWidget2;
+
 ConsoleCommands* commands = new ConsoleCommands();
 GameManager* gameManager = new GameManager();
 
