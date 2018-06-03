@@ -183,7 +183,6 @@ int __cdecl showErrorScreen(int a1, signed int a2, int a3, __int16 a4, int a5, i
 typedef signed int(__cdecl *string_display_hook)(int a3, unsigned int a4, int a5, int a6);
 string_display_hook string_display_hook_method;
 
-std::wstring YOU_FAILED_TO_LOAD_MAP_ORG = L"You failed to load the map.";
 
 //lets you follow the call path of any string that is displayed (in a debugger)
 signed int __cdecl stringDisplayHook(int a3, unsigned int a4, int a5, int a6) {
@@ -1124,6 +1123,23 @@ char __stdcall interceptMapLoad(LPCRITICAL_SECTION* thisx, const void *a2) {
 	return result;
 }
 
+typedef BYTE*(__cdecl *unicode_string_conversion)(BYTE* nonUnicodeStr, BYTE* unicodeStr, int size);
+unicode_string_conversion unicode_string_conversion_method;
+
+std::string CREATE_NEW_NETWORK_GAME_STR("Create a new network game.");
+std::string JOIN_GAME_OF_HALO2 = "Join a game of Halo 2.";
+
+BYTE* __cdecl unicodeStringConversion(BYTE* nonUnicodeStr, BYTE* unicodeStr, int size) {
+	char* str = (char*)(nonUnicodeStr);
+	if (strcmp(str, CREATE_NEW_NETWORK_GAME_STR.c_str()) == 0 && replacedNetworkNormalTextWidget != NULL) {
+		return unicode_string_conversion_method((BYTE*)replacedNetworkNormalTextWidget, unicodeStr, size);
+	}
+	if (strcmp(str, JOIN_GAME_OF_HALO2.c_str()) == 0 && replacedNetworkNormalTextWidget2 != NULL) {
+		return unicode_string_conversion_method((BYTE*)replacedNetworkNormalTextWidget2, unicodeStr, size);
+	}
+	return unicode_string_conversion_method(nonUnicodeStr, unicodeStr, size);
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1181,6 +1197,9 @@ void H2MOD::ApplyHooks() {
 		//TODO: expensive, use for debugging/searching
 		//string_display_hook_method = (string_display_hook)DetourFunc((BYTE*)h2mod->GetBase() + 0x287AB5, (BYTE*)stringDisplayHook, 5);
 		//VirtualProtect(string_display_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		unicode_string_conversion_method = (unicode_string_conversion)DetourFunc((BYTE*)h2mod->GetBase() + 0x4C801, (BYTE*)unicodeStringConversion, 7);
+		VirtualProtect(unicode_string_conversion_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//TODO: for when live list is ready
 		//live checks removed will make users exit to live menu instead of network browser :(

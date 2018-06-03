@@ -6,6 +6,9 @@ MapManager* mapManager = new MapManager();
 volatile bool isLobby = true;
 bool overrideUnicodeMessage = false;
 
+char* replacedNetworkNormalTextWidget;
+char* replacedNetworkNormalTextWidget2;
+
 ConsoleCommands* commands = new ConsoleCommands();
 GameManager* gameManager = new GameManager();
 CustomNetwork *network = new CustomNetwork();
