@@ -90,9 +90,3 @@ void EnsureDirectoryExists(wchar_t* path);
 
 int TrimRemoveConsecutiveSpaces(char* text);
 
-#define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
-#define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2
-#define NopFill(Address, len)                       \
-	BYTE J(NopFIll_, __LINE__ )[len];               \
-	std::fill_n(J(NopFIll_, __LINE__ ), len, 0x90); \
-	WriteBytes(Address, J(NopFIll_, __LINE__ ), len)

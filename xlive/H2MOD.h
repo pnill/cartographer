@@ -4,10 +4,7 @@
 #include <unordered_map>
 #include <set>
 #include <mutex>
-
-#define SINGLE_PLAYER_ENGINE 1
-#define MULTIPLAYER_ENGINE 2
-#define MAIN_MENU_ENGINE 3
+#include "Blam\Enums\Game\GameEngine.h"
 
 enum GrenadeType
 {
@@ -93,6 +90,8 @@ bool __cdecl call_assign_equipment_to_unit(int uint, int object_index, short unk
 int __cdecl call_object_placement_data_new(void*, int, int, int);
 signed int __cdecl call_object_new(void*);
 void GivePlayerWeapon(int PlayerIndex, int WeaponId, bool bReset);
+void enableLiveMenus();
+void disableLiveMenus();
 
 class H2MOD
 {
@@ -102,8 +101,7 @@ public:
 		void IndicatorVisibility(bool toggle);
 		int get_unit_from_player_index(int);
 		int get_unit_datum_from_player_index(int);
-		void ApplyHooks();
-		DWORD GetBase(); 
+		void ApplyHooks(); 
 		void handle_command(std::string);
 		void handle_command(std::wstring);
 		void logToDedicatedServerConsole(wchar_t* message);
@@ -127,23 +125,24 @@ public:
 		void DisableSound(int sound);
 		void PatchWeaponsInteraction(bool b_Enable);		
 		void securityPacketProcessing();
+		EngineType get_engine_type();
 		BOOL Server;
 		std::unordered_map<wchar_t*, int> SoundMap;
 		std::unordered_map<std::string, bool> AchievementMap;
 	
-
 		std::mutex sound_mutex;
 		std::condition_variable sound_cv;
 
 		std::set<int> hookedObjectDefs;
 		bool isChatBoxCommand = false;
 
+		DWORD GetBase() { return this->Base; }
+
 private:
 		DWORD Base;
 		std::unordered_map<int, int> playerIndexToDynamicBase;
 
 };
-
 
 extern H2MOD* h2mod;
 

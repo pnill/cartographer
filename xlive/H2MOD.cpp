@@ -23,12 +23,12 @@
 #include "H2Config.h"
 #include "H2Tweaks.h"
 #include "Blam\Engine\FileSystem\FiloInterface.h"
+#include "H2Startup.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
 Infection* infectionHandler = new Infection();
 Halo2Final *h2f = new Halo2Final();
-Mouseinput *mouse = new Mouseinput();
 
 bool b_Infection = false;
 bool b_Halo2Final = false;
@@ -36,17 +36,7 @@ bool b_H2X = false;
 
 extern bool b_GunGame;
 extern CUserManagement User;
-extern HANDLE H2MOD_Network;
-extern bool NetworkActive;
-extern bool Connected;
-extern bool ThreadCreated;
 extern int H2GetInstanceId();
-
-SOCKET comm_socket = INVALID_SOCKET;
-char* NetworkData = new char[255];
-
-HMODULE base;
-
 
 #pragma region engine calls
 
@@ -133,6 +123,31 @@ bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 	return p_add_object_to_sync(gamestate_object_datum);
 }
 
+EngineType H2MOD::get_engine_type()
+{
+	DWORD GameGlobals = *(DWORD*)(h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
+
+	switch (*(BYTE*)(GameGlobals + 0x8))
+	{
+	case 1:
+		return EngineType::SINGLE_PLAYER_ENGINE;
+	case 2:
+		return EngineType::MULTIPLAYER_ENGINE;
+	case 3:
+		return EngineType::MAIN_MENU_ENGINE;
+	default:
+		return EngineType::INVALID_ENGINE_TYPE; // if everything ok shouldn't ever get here
+	} 
+}
+
+void enableLiveMenus() {
+	*(int*)(h2mod->GetBase() + 0x422450) = 1; 
+}
+
+void disableLiveMenus() {
+	*(int*)(h2mod->GetBase() + 0x422450) = -1;
+}
+
 #pragma endregion
 
 //sub_1cce9b
@@ -217,18 +232,21 @@ void H2MOD::handle_command(std::wstring command) {
 	commands->handle_command(std::string(command.begin(), command.end()));
 }
 
-typedef int(__cdecl *dedi_command_hook)(int a1, int a2, char a3);
-dedi_command_hook dedi_command_hook_method;
-
-typedef signed int(*dedi_print)(const char* a1, ...);
-
 void H2MOD::logToDedicatedServerConsole(wchar_t* message) {
+
+	if (!h2mod->Server)
+		return;
+
+	typedef signed int(*dedi_print)(const char* a1, ...);
 	dedi_print dedi_print_method = (dedi_print)(h2mod->GetBase() + 0x2354C8);
+
 	dedi_print_method((const char*)(message));
 }
 
+typedef int(__cdecl *dedi_command_hook)(int a1, int a2, char a3);
+dedi_command_hook dedi_command_hook_method;
+
 int __cdecl dediCommandHook(int a1, int a2, int a3) {
-	h2mod->logToDedicatedServerConsole(L"Dedicated command\n");
 	unsigned __int16* ptr = *(unsigned __int16 **)a1;
 	const wchar_t* text = (wchar_t*)ptr;
 	wchar_t c = text[0];
@@ -558,12 +576,6 @@ char __cdecl sub_4F17A(void* thisptr, int a2, int a3) //allows people to load cu
 typedef bool(__cdecl *spawn_player)(int a1);
 spawn_player pspawn_player;
 
-typedef bool(__cdecl *membership_update_network_decode)(int a1, int a2, int a3);
-membership_update_network_decode pmembership_update_network_decode;
-
-typedef int(__cdecl *game_difficulty_get_real_evaluate)(int a1, int a2);
-game_difficulty_get_real_evaluate pgame_difficulty_get_real_evaluate;
-
 typedef char(__cdecl *player_death)(int unit_datum_index, int a2, char a3, char a4);
 player_death pplayer_death;
 
@@ -606,18 +618,15 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 {
 	//TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
 
-
-#pragma region GunGame Handler
 	if (a5 == 7) //player got a kill?
 	{
 		int PlayerIndex = a2;
+
 		if (b_GunGame) {
 			gunGame->playerKill->setPlayerIndex(PlayerIndex);
 			gunGame->playerKill->execute();
 		}
 	}
-
-#pragma endregion
 
 	pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
@@ -658,25 +667,18 @@ bool __cdecl player_remove_packet_handler(void *packet, int size, void *data)
 }
 */
 
-typedef void(__cdecl *onGameEngineChange)(int a1);
-onGameEngineChange ponGameEngineChange;
+typedef void(__cdecl *originalFunc)(int a1);
+originalFunc p_originalFunc;
 
-void __cdecl onGameEngineChange_hook(int a1)
+void __cdecl onGameEngineChange(int a1)
 {
-	ponGameEngineChange(a1); //sets game engine
-    //NOTE: the AI globals initializers get called after this method returns
-
 	overrideUnicodeMessage = false;
 	isLobby = true;
-
-	DWORD GameGlobals = *(DWORD*)(h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-	BYTE GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
-	BYTE GameEngine = *(BYTE*)(GameGlobals + 0x8);
 
 	//based on what onGameEngineChange has changed
 	//we do our stuff bellow
 
-	if (GameEngine == MAIN_MENU_ENGINE)
+	if (h2mod->get_engine_type() == EngineType::MAIN_MENU_ENGINE)
 	{
 		addDebugText("GameEngine: Main-Menu, apply patches");
 
@@ -695,7 +697,8 @@ void __cdecl onGameEngineChange_hook(int a1)
 		H2Tweaks::FixRanksIcons();
 		H2Tweaks::disable60FPSCutscenes();
 
-		return;
+		p_originalFunc(a1);
+		return; 
 	}
 
 	b_Infection = false;
@@ -704,11 +707,12 @@ void __cdecl onGameEngineChange_hook(int a1)
 	b_H2X = false;
 
 	wchar_t* variant_name = (wchar_t*)(h2mod->GetBase() + ((h2mod->Server) ? 0x534A18 : 0x97777C));
-	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", GameEngine, variant_name);
+	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", h2mod->get_engine_type(), variant_name);
+	BYTE GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
 
-	if (GameEngine == MULTIPLAYER_ENGINE)
+	if (h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE)
 	{
-		addDebugText("GameEngine: Multi-player, apply patches");
+		addDebugText("GameEngine: Multiplayer, apply patches");
 
 		if (wcsstr(variant_name, L"zombies") > 0 || wcsstr(variant_name, L"Zombies") > 0 || wcsstr(variant_name, L"Infection") > 0 || wcsstr(variant_name, L"infection") > 0)
 		{
@@ -739,64 +743,36 @@ void __cdecl onGameEngineChange_hook(int a1)
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 		//H2Tweaks::applyShaderTweaks(); 
 
-	}
-
-	if (GameEngine != 3 && GameState == 3)
-	{
-		if (b_Infection) {
-			infectionHandler->initializer->execute();
-		}
-
-		if (b_GunGame) {
-			gunGame->initializer->execute();
-		}
-	}
-#pragma region H2V Stuff
-	if (!h2mod->Server)
-	{
-		//Crashfix
-		//*(int*)(h2mod->GetBase() + 0x464940) = 0;
-		//*(int*)(h2mod->GetBase() + 0x46494C) = 0;
-		//*(int*)(h2mod->GetBase() + 0x464958) = 0;
-		//*(int*)(h2mod->GetBase() + 0x464964) = 0;
-		
-		if (!h2mod->Server) //h2v stuff
+		if (GameState == 3)
 		{
-			//Crashfix
-			//*(int*)(h2mod->GetBase() + 0x464940) = 0;
-			//*(int*)(h2mod->GetBase() + 0x46494C) = 0;
-			//*(int*)(h2mod->GetBase() + 0x464958) = 0;
-			//*(int*)(h2mod->GetBase() + 0x464964) = 0;
+			if (b_Infection) {
+				infectionHandler->initializer->execute();
+			}
 
-			if (GameState == 3) {
-				if (b_H2X)
-					H2X::Initialize();
-				else
-					H2X::Deinitialize();
-			}	
-		}
+			if (b_GunGame) {
+				gunGame->initializer->execute();
+			}
 
-	}
-	else {
-#pragma endregion
-
-#pragma region H2Server Stuff
-		if (GameEngine != 3 && GameState == 3)
-		{
 			if (b_H2X)
 				H2X::Initialize();
 			else
 				H2X::Deinitialize();
-		}
 
-		else if (GameEngine == SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
-			addDebugText("GameEngine: Single-player, apply patches");
-
-			H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
-			H2Tweaks::enable60FPSCutscenes();
+			if (b_Halo2Final)
+				h2f->Initialize();
 		}
 	}
+
+	else if (h2mod->get_engine_type() == EngineType::SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
+		addDebugText("GameEngine: Singleplayer, apply patches");
+
+		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
+		H2Tweaks::enable60FPSCutscenes();
+	}
+
+	p_originalFunc(a1);
 }
+
 
 bool __cdecl OnPlayerSpawn(int a1)
 {
@@ -815,6 +791,7 @@ bool __cdecl OnPlayerSpawn(int a1)
 		gunGame->preSpawnPlayer->setPlayerIndex(PlayerIndex);
 		gunGame->preSpawnPlayer->execute();
 	}
+
 	bool ret = pspawn_player(a1);	
 
 	if (b_Infection) {
@@ -852,9 +829,6 @@ Should take a look here for extended functions on scoring chances are we're alre
 
 void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
 {
-	Connected = false;
-	NetworkActive = false;
-
 	memcpy(&join_game_xn, host_xn, sizeof(XNADDR));
 
 	trace(L"join_game host_xn->ina.s_addr: %08X ", host_xn->ina.s_addr);
@@ -1042,7 +1016,6 @@ __declspec(naked) void calculate_model_lod_detour()
 }
 void H2MOD::securityPacketProcessing()
 {
-
 	if (!gameManager->isHost())
 	{
 		sockaddr_in SendStruct;
@@ -1146,8 +1119,6 @@ void H2MOD::ApplyHooks() {
 	if (this->Server == false) {
 		TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
-
-#pragma region H2V Hooks
 		DWORD dwBack;
 
 		//pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
@@ -1172,8 +1143,8 @@ void H2MOD::ApplyHooks() {
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x55952, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		ponGameEngineChange = (onGameEngineChange)DetourFunc((BYTE*)this->GetBase() + 0x49E4C, (BYTE*)onGameEngineChange_hook, 8);
-		VirtualProtect(ponGameEngineChange, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		PatchCall(GetBase() + 0x49E95, onGameEngineChange);
+		p_originalFunc = (originalFunc)(GetBase() + 0x5912D);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0xD03ED, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1243,9 +1214,6 @@ void H2MOD::ApplyHooks() {
 		// set max model qaulity to L6
 		WriteValue(GetBase() + 0x190B38 + 1, 5);
 	}
-#pragma endregion
-
-#pragma region H2ServerHooks
 	else {
 
 		DWORD dwBack;
@@ -1263,8 +1231,8 @@ void H2MOD::ApplyHooks() {
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x5DE4A, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
 
-		ponGameEngineChange = (onGameEngineChange)DetourFunc((BYTE*)this->GetBase() + 0x430CA, (BYTE*)onGameEngineChange_hook, 8);
-		VirtualProtect(ponGameEngineChange, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		PatchCall(GetBase() + 0x43113, onGameEngineChange);
+		p_originalFunc = (originalFunc)(GetBase() + 0x4E43C);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0x8C84C, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
@@ -1276,15 +1244,12 @@ void H2MOD::ApplyHooks() {
 		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		PatchWinAPICall(GetBase() + 0x85F5E, CryptProtectDataHook);
-
 		PatchWinAPICall(GetBase() + 0x352538, CryptUnprotectDataHook);
-
 		PatchCall(GetBase() + 0x85F73, filo_write__encrypted_data_hook);
 	}
 
 	//apply any network hooks
 	network->applyNetworkHooks();
-#pragma endregion
 }
 
 VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
@@ -1296,22 +1261,19 @@ void H2MOD::Initialize()
 {
 	//HANDLE hThread = CreateThread(NULL, 0, Thread1, NULL, 0, NULL);
 
-	if (GetModuleHandleA("H2Server.exe"))
+	this->Base = (DWORD)game_info.base;
+
+	if (game_info.process_type == H2Types::H2Server)
 	{
-		this->Base = (DWORD)GetModuleHandleA("H2Server.exe");
 		this->Server = TRUE;
 	}
-	else
+	else if (game_info.process_type == H2Types::H2Game)
 	{
-		this->Base = (DWORD)GetModuleHandleA("halo2.exe");
 		this->Server = FALSE;
-		//HANDLE Handle_Of_Sound_Thread = 0;
-		//int Data_Of_Sound_Thread = 1;
 		
 		std::thread SoundT(SoundThread);
 		SoundT.detach();
 		
-		//Handle_Of_Sound_Thread = CreateThread(NULL, 0, SoundQueue, &Data_Of_Sound_Thread, 0, NULL);
 		H2Tweaks::setFOV(H2Config_field_of_view);
 		//setSens(CONTROLLER, H2Config_sens_controller);
 		//setSens(MOUSE, H2Config_sens_mouse);
@@ -1320,7 +1282,7 @@ void H2MOD::Initialize()
 
 		PatchGameDetailsCheck();
 		//H2Tweaks::PatchPingMeterCheck();
-		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
+		void disableLiveMenus(); //until ready
 
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
@@ -1346,11 +1308,6 @@ void H2MOD::Initialize()
 
 void H2MOD::Deinitialize() {
 
-}
-
-DWORD H2MOD::GetBase()
-{
-	return this->Base;
 }
 
 void H2MOD::IndicatorVisibility(bool toggle)

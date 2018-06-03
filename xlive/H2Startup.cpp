@@ -10,7 +10,10 @@
 #include <sys/stat.h>
 #include "GSAccountLogin.h"
 #include "Util\Debug.h"
+#include <string>
 
+
+ProcessInfo game_info;
 
 bool H2IsDediServer;
 DWORD H2BaseAddr;
@@ -262,9 +265,55 @@ int __cdecl sub_48BBF() {
 	return result;
 }
 
+H2Types detect_process_type()
+{
+	// try and detect type based on module name.
+	if (GetModuleHandleW(L"h2server.exe"))
+		return H2Types::H2Server;
+	else if (GetModuleHandleW(L"Halo2.exe"))
+		return H2Types::H2Game;
+
+	// fallback to checking file information in case the file was renamed.
+	wchar_t exe_file_path[_MAX_PATH + 1];
+	int result = GetModuleFileNameW(NULL, exe_file_path, ARRAYSIZE(exe_file_path));
+	if (0 < result <= _MAX_PATH) {
+		DWORD version_info_size = GetFileVersionInfoSizeW(exe_file_path, NULL);
+		if (version_info_size != 0) {
+
+			void *version_info = new BYTE[version_info_size];
+			 if (GetFileVersionInfoW(exe_file_path, NULL, version_info_size, version_info)) {
+				wchar_t *orginal_filename;
+				size_t filename_len;
+				// shouldn't be hardcoded but who cares
+				VerQueryValueW(version_info, L"\\StringFileInfo\\040904b0\\OriginalFilename", (LPVOID*)&orginal_filename, &filename_len);
+
+				std::wstring exe_orginal_filename = orginal_filename;
+				delete[] version_info;
+
+				if (exe_orginal_filename == L"h2server.exe")
+					return H2Types::H2Server;
+				else if (exe_orginal_filename == L"Halo2.exe")
+					return H2Types::H2Game;
+			}
+		}
+	}
+	return H2Types::Invalid;
+}
+
 ///Before the game window appears
 void InitH2Startup() {
 	Debug::init();
+
+	game_info.base = GetModuleHandle(NULL);
+	game_info.process_type = detect_process_type();
+
+	if (game_info.process_type == H2Types::Invalid)
+	{
+		MessageBoxA(NULL, "Project Cartographer loaded into unsupported process, will now exit!", "ERROR!", MB_OK);
+		TerminateProcess(GetCurrentProcess(), 1);
+	}
+
+	H2BaseAddr = (DWORD)game_info.base;
 
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
@@ -278,13 +327,11 @@ void InitH2Startup() {
 
 	initDebugText();
 	//halo2ThreadID = GetCurrentThreadId();
-	if (GetModuleHandle(L"H2Server.exe")) {
-		H2BaseAddr = (DWORD)GetModuleHandle(L"H2Server.exe");
+	if (game_info.process_type == H2Types::H2Server) {
 		H2IsDediServer = true;
 		addDebugText("Process is Dedi-Server");
 	}
 	else {
-		H2BaseAddr = (DWORD)GetModuleHandle(L"halo2.exe");
 		H2IsDediServer = false;
 		addDebugText("Process is Client");
 

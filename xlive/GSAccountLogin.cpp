@@ -344,6 +344,8 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				extern char* ServerStatus;
 				if (result == 4) {
 					snprintf(ServerStatus, 250, "Status: Developer");
+					extern void enableLiveMenus();
+					enableLiveMenus();
 				}
 				else if (result == 3 || result == 7) {
 					snprintf(ServerStatus, 250, "Status: CHEATER");

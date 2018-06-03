@@ -1,7 +1,6 @@
 #pragma once
 
-class Mouseinput
+namespace Mouseinput
 {
-public:
-	static void Initialize();
+	void Initialize();
 };
