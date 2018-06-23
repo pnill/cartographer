@@ -784,6 +784,7 @@ void CustomNetwork::sendCustomPacketToAllPlayers() {
 		do
 		{
 			if (h2mod->Server && playerCounter == 0) {
+				//this player is the dedi, so we don't send stuff to ourselves
 				++playerCounter;
 				continue;
 			}
@@ -874,8 +875,9 @@ void CustomNetwork::applyNetworkHooks() {
 	register_connection_packets_method = (register_connection_packets)DetourFunc((BYTE*)h2mod->GetBase() + registerConnectionPacketsOffset, (BYTE*)registerConnectionPackets, 5);
 	VirtualProtect(register_connection_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	register_player_packets_method = (register_player_packets)DetourFunc((BYTE*)h2mod->GetBase() + registerPlayerPacketsOffset, (BYTE*)registerPlayerPackets, 5);
-	VirtualProtect(register_player_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	//use for debugging
+	//register_player_packets_method = (register_player_packets)DetourFunc((BYTE*)h2mod->GetBase() + registerPlayerPacketsOffset, (BYTE*)registerPlayerPackets, 5);
+	//VirtualProtect(register_player_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	///////////////////////////////////////
 	//text chat packet customizations below

@@ -382,6 +382,11 @@ void ConsoleCommands::handle_command(std::string command) {
 			isHostStr += s;
 			output(isHostStr);
 		}
+		else if (firstCommand == "$leavegame") {
+			typedef int(__cdecl *leave_game_type)(int a1);
+			leave_game_type leave_game = (leave_game_type)(h2mod->GetBase() + 0x216388);
+			leave_game(0);
+		}
 		else if (firstCommand == "$downloadmap") {
 			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
 				output(L"Invalid command, usage downloadMap filename");
