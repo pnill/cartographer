@@ -28,6 +28,11 @@ const int SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT = 7;
 
 #include "CUser.h"
 
+typedef LONG NTSTATUS, *PNTSTATUS;
+#define STATUS_SUCCESS (0x00000000)
+
+typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
+
 char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long saddr, unsigned long xnaddr, char* abEnet, char* abOnline) {
 
 	if (strlen(username) <= 0 || xuid == 0 || saddr == 0 || strlen(abEnet) != 12 || strlen(abOnline) != 40) {
@@ -370,7 +375,6 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 	return result;
 }
 
-
 bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
 	int result = false;
 	char* rtn_result = 0;
@@ -388,7 +392,15 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
 		OSVERSIONINFO osvi;
 		ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
 		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-		GetVersionEx(&osvi);
+		if (hntdll && (RtlGetVersionPtr)::GetProcAddress(hntdll, "RtlGetVersion") != nullptr) {
+			//we don't have a manifest in place, so using GetVersionEx will be capped at 6.2
+			//and versions will not be reflected properly in the backend, so we need to use the 
+			//api method to get the real os version
+			RtlGetVersionPtr rtlGetVersionPtr = (RtlGetVersionPtr)::GetProcAddress(hntdll, "RtlGetVersion");
+			rtlGetVersionPtr(&osvi);
+		} else {
+			GetVersionEx(&osvi);
+		}
 
 		os_string_buflen = 30;
 		os_string = (char*)malloc(sizeof(char) * os_string_buflen);
