@@ -11,6 +11,7 @@ int Players::getPlayerStart(int index) {
 
 int Players::getPlayerOffset() {
 	int playerDataOffset = (*(int*)(h2mod->GetBase() + (h2mod->Server ? 0x520B94 : 0x51C474)));
+	//TODO: can cause crash if u exit game abruptly
 	int playerDataOffsetTmp = *(DWORD *)(playerDataOffset + 29600);
 	if (playerDataOffsetTmp == 5 || playerDataOffsetTmp == 6 || playerDataOffsetTmp == 7 || playerDataOffsetTmp == 8) {
 		//valid memory offset
@@ -26,16 +27,31 @@ int Players::getPeerIndex(int playerIndex)
 	return *(DWORD*)(this->getPlayerStart(playerIndex) - 12);
 }
 
+int Players::getPeerIndex(long long xuid) {
+	if (this->getPlayerCount() > 0) {
+
+		int playerCounter = 0;
+		do {
+			long long tempXuid = this->getPlayerXuid(playerCounter);
+			if (xuid == tempXuid) {
+				return this->getPeerIndex(playerCounter);
+			}
+			playerCounter++;
+		} while (playerCounter < this->getPlayerCount());
+	}
+	return -1;
+}
+
 wchar_t * Players::getPlayerName(int playerIndex)
 {
 	int newPlayerStart2 = this->getPlayerStart(playerIndex) + 136;
 	return (wchar_t*)(newPlayerStart2);
 }
 
-long long Players::getPlayerIdentifier(int playerIndex)
+long long Players::getPlayerXuid(int playerIndex)
 {
-	DWORD ident1 = *(DWORD *)(this->getPlayerStart(playerIndex) - 20);
-	DWORD ident2 = *(DWORD *)(this->getPlayerStart(playerIndex) - 16);
+	DWORD ident1 = *(DWORD *)(this->getPlayerStart(playerIndex) - 16);
+	DWORD ident2 = *(DWORD *)(this->getPlayerStart(playerIndex) - 20);
 	//the ident appears to made up of 8 bytes
 	return (long long)ident1 << 32 | ident2;
 }
@@ -45,6 +61,21 @@ int Players::getPlayerTeam(int playerIndex)
 	int newPlayerStart2 = this->getPlayerStart(playerIndex) + 136;
 	int playerTeam = *(BYTE *)(newPlayerStart2 + 124);
 	return playerTeam;
+}
+
+int Players::getPlayerTeam(long long xuid) {
+	if (this->getPlayerCount() > 0) {
+
+		int playerCounter = 0;
+		do {
+			long long tempXuid = this->getPlayerXuid(playerCounter);
+			if (xuid == tempXuid) {
+				return this->getPlayerTeam(playerCounter);
+			}
+			playerCounter++;
+		} while (playerCounter < this->getPlayerCount());
+	}
+	return -1;
 }
 
 int Players::getPlayerCount() {
@@ -83,10 +114,10 @@ void Players::logAllPlayersToConsole() {
 			//ws4 << player->getGunGameLevel();
 			//outStr += ws4.str();
 
-			//outStr += L", identifier=";
-			//std::wostringstream ws4;
-			//ws4 << player.getPlayerIdentifier();
-			//outStr += ws4.str();
+			outStr += L", identifier=";
+			std::wostringstream ws4;
+			ws4 << this->getPlayerXuid(playerCounter);
+			outStr += ws4.str();
 
 			commands->output(outStr);
 			playerCounter++;

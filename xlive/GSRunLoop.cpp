@@ -363,6 +363,7 @@ void GSMainLoop() {
 				}
 			}
 		}
+		//TODO: when debug mode is on, gets laggy?
 		sprintf(replacedNetworkNormalTextWidget, replacementText.c_str(), allPlayersCount, allActiveGamesCount, allGamesCount);
 		sprintf(replacedNetworkNormalTextWidget2, replacementText2.c_str(), allPlayersCount, allActiveGamesCount, allGamesCount);
 

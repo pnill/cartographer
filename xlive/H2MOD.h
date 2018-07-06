@@ -110,6 +110,8 @@ public:
 		float get_player_x(int, bool);
 		float get_player_y(int, bool);
 		float get_player_z(int, bool);
+		float get_distance(int, int);
+		bool is_team_play();
 		wchar_t* get_player_name_from_index(int pIndex);
 		int get_player_index_from_name(wchar_t* playername);
 		int get_player_index_from_unit_datum(int unit_datum_index);

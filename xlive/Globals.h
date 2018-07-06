@@ -14,6 +14,8 @@
 #include "Hook.h"
 #include "ReadIniArguments.h"
 
+#include "TSClient.h"
+#include "TSServer.h"
 #include "H2MOD_Players.h"
 #include "H2MOD_GameType.h"
 #include "H2MOD_Halo2Final.h"
@@ -34,6 +36,12 @@ extern Players* players;
 extern CustomNetwork *network;
 extern char* replacedNetworkNormalTextWidget;
 extern char* replacedNetworkNormalTextWidget2;
+
+extern std::unordered_map<XUID, BOOL> xuidIsTalkingMap;
+extern bool microphoneEnabled;
+extern IN_ADDR clientMachineAddress;
+extern TSClient* client;
+extern TSServer* server;
 
 //some utility functions below
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);

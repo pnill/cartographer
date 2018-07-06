@@ -15,10 +15,13 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
+using namespace std;
+
 
 // Live connection state success codes
 #define XONLINE_S_LOGON_CONNECTION_ESTABLISHED          _HRESULT_TYPEDEF_(0x001510F0L)
 #define XONLINE_S_LOGON_DISCONNECTED                    _HRESULT_TYPEDEF_(0x001510F1L)
+
 
 
 HANDLE g_dwFakeListener = (HANDLE) -2;
@@ -290,7 +293,7 @@ BOOL SetDlcBasepath( int num )
 
 
 					// check valid folder
-					std::wstring wnum;
+					wstring wnum;
 					wnum = L"DLC\\";
 					wnum += ffd.cFileName;
 					wnum += L"\\content.xbx";
@@ -3239,6 +3242,29 @@ int WINAPI XUserSetPropertyEx (DWORD dwUserIndex, DWORD dwPropertyId, DWORD cbVa
 }
 
 
+BOOL IXHV2ENGINE::IsHeadsetPresent(VOID *pThis, DWORD dwUserIndex) {
+	//TRACE("IXHV2Engine::IsHeadsetPresent");
+
+	//TODO: add logic that actually validates their audio device is connected
+	//TODO: handle it being connected and disconnected
+	return true;
+}
+
+BOOL IXHV2ENGINE::isRemoteTalking(VOID *pThis, XUID xuid) {
+	//TRACE("IXHV2Engine::isRemoteTalking");
+	//TODO: the xuid given here is the real xuid, the one we provide in xlive.ini is the hex of that the above value
+	//so we need to convert it...
+	return xuidIsTalkingMap[xuid];
+}
+
+BOOL IXHV2ENGINE::IsLocalTalking(VOID *pThis, DWORD dwUserIndex) {
+	//TRACE("IXHV2Engine::isTalking(dwUserIndex = %d)", dwUserIndex);
+	//check the xuid map
+	XUID id = xFakeXuid[0];
+	BOOL isTalking = xuidIsTalkingMap[id];
+	return microphoneEnabled ? xuidIsTalkingMap[id] : false;
+}
+
 // #5297: XLiveInitializeEx
 int WINAPI XLiveInitializeEx (void * pXii, DWORD dwVersion)
 {
@@ -3323,6 +3349,49 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 
 	pOverlapped->InternalLow = ERROR_SUCCESS;
 	pOverlapped->dwExtendedError = ERROR_SUCCESS;
+
+	if (gameManager->isHost()) {
+		if (server == NULL) {
+			//TODO: move into method
+			server = new TSServer(true);
+			server->setPort(H2Config_base_port + 7);
+			//startup the teamspeak client
+			client = new TSClient(true);
+
+			//only player 1 gets to use voice, guests don't
+			WCHAR strw[32];
+			//needs to live on the heap for the duration of the entire process, cause we reuse ts clients to connect to different ts servers
+			char* strw3 = new char[16];
+			wsprintf(strw, L"%I64x", xFakeXuid[0]);
+			wcstombs(strw3, strw, 32);
+			client->setNickname(strw3);
+
+		}
+		server->startListening();
+
+		client->setServerAddress(clientMachineAddress);
+		client->setServerPort(H2Config_base_port + 7);
+		client->startChatting();
+	}
+	else {
+		if (client == NULL) {
+			//TODO: move into method
+			//startup the teamspeak client
+			client = new TSClient(true);
+
+			//only player 1 gets to use voice, guests don't
+			WCHAR strw[8192];
+			//needs to live on the heap for the duration of the entire process, cause we reuse ts clients to connect to different ts servers
+			char* strw3 = new char[4096];
+			wsprintf(strw, L"%I64x", xFakeXuid[0]);
+			wcstombs(strw3, strw, 8192);
+			client->setNickname(strw3);
+
+		}
+		client->setServerAddress(join_game_xn.ina);
+		client->setServerPort(ntohs(join_game_xn.wPortOnline) + 7);
+		client->startChatting();
+	}
 
 	gameManager->start();
 
@@ -3705,6 +3774,12 @@ int WINAPI XSessionFlushStats (DWORD, DWORD)
 DWORD WINAPI XSessionDelete (DWORD, DWORD)
 {
     TRACE("XSessionDelete");
+	if (client != NULL) {
+		client->disconnect();
+	}
+	if (server != NULL) {
+		server->destroyVirtualServer();
+	}
 	mapManager->cleanup();
     return 0;
 }
@@ -5818,56 +5893,6 @@ HRESULT IXHV2ENGINE::Dummy13( VOID *pThis, int a1, int a2 )
 
 
 
-INT IXHV2ENGINE::Dummy14( VOID *pThis, int a1 )
-{
-	static int print = 0;
-
-
-	if( print < 15 )
-	{
-	//	TRACE( "IXHV2Engine::Dummy14  (a1 = %X)",
-	//		a1 );
-
-
-		print++;
-	}
-
-
-	return 0;
-}
-
-
-
-INT IXHV2ENGINE::Dummy15( VOID *pThis, int a1 )
-{
-	static int print = 0;
-
-
-	if( print < 15 )
-	{
-		//TRACE( "IXHV2Engine::Dummy15  (a1 = %X)",
-		//	a1 );
-		
-		print++;
-	}
-
-
-	return 0;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy16( VOID *pThis, int a1, int a2 )
-{
-	TRACE( "IXHV2Engine::Dummy16  (a1 = %X, a2 = %X)",
-		a1, a2 );
-
-
-	return ERROR_SUCCESS;
-}
-
-
-
 DWORD IXHV2ENGINE::GetDataReadyFlags( VOID *pThis )
 {
 	static int print = 0;
@@ -6094,9 +6119,9 @@ IXHV2ENGINE::IXHV2ENGINE()
 	funcPtr[11] = (HV2FUNCPTR) &IXHV2ENGINE::UnregisterRemoteTalker;
 
 	funcPtr[12] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy13;
-	funcPtr[13] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy14;
-	funcPtr[14] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy15;
-	funcPtr[15] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy16;
+	funcPtr[13] = (HV2FUNCPTR)&IXHV2ENGINE::IsHeadsetPresent;
+	funcPtr[14] = (HV2FUNCPTR)&IXHV2ENGINE::IsLocalTalking;
+	funcPtr[15] = (HV2FUNCPTR)&IXHV2ENGINE::isRemoteTalking;
 
 	funcPtr[16] = (HV2FUNCPTR) &IXHV2ENGINE::GetDataReadyFlags;
 	funcPtr[17] = (HV2FUNCPTR) &IXHV2ENGINE::GetLocalChatData;

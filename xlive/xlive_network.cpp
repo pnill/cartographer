@@ -53,6 +53,12 @@ int WINAPI XOnlineStartup()
 // #5332: XSessionEnd
 int WINAPI XSessionEnd(DWORD, DWORD)
 {
+	if (client != NULL) {
+		client->disconnect();
+	}
+	if (server != NULL) {
+		server->destroyVirtualServer();
+	}
 	mapManager->cleanup();
 	TRACE("XSessionEnd");
 	return 0;

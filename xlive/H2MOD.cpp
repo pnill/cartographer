@@ -37,6 +37,7 @@ bool b_H2X = false;
 extern bool b_GunGame;
 extern CUserManagement User;
 extern int H2GetInstanceId();
+extern XUID xFakeXuid[4];
 
 #pragma region engine calls
 
@@ -259,7 +260,34 @@ int __cdecl dediCommandHook(int a1, int a2, int a3) {
 	return dedi_command_hook_method(a1, a2, a3);
 }
 
+bool H2MOD::is_team_play() {
+	//0x971A90 only works in lobby (not in game)
+	//0x978CB4 works in both 
+	DWORD ptr = *((DWORD*)(this->GetBase() + 0x978CB4));
+	ptr += 0x1C68;
+	return *(BYTE*)ptr;
+}
+
 #pragma region PlayerFunctions
+
+float H2MOD::get_distance(int playerIndex1, int playerIndex2) {
+	float player1X, player1Y, player1Z;
+	float player2X, player2Y, player2Z;
+
+	player1X = h2mod->get_player_x(playerIndex1, false);
+	player1Y = h2mod->get_player_y(playerIndex1, false);
+	player1Z = h2mod->get_player_z(playerIndex1, false);
+
+	player2X = h2mod->get_player_x(playerIndex2, false);
+	player2Y = h2mod->get_player_y(playerIndex2, false);
+	player2Z = h2mod->get_player_z(playerIndex2, false);
+
+	float dx = abs(player1X - player2X);
+	float dy = abs(player1Y - player2Y);
+	float dz = abs(player1Z - player2Z);
+
+	return sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
+}
 
 float H2MOD::get_player_x(int playerIndex, bool resetDynamicBase) {
 	int base = get_dynamic_player_base(playerIndex, resetDynamicBase);
@@ -1246,6 +1274,27 @@ void H2MOD::ApplyHooks() {
 		PatchWinAPICall(GetBase() + 0x85F5E, CryptProtectDataHook);
 		PatchWinAPICall(GetBase() + 0x352538, CryptUnprotectDataHook);
 		PatchCall(GetBase() + 0x85F73, filo_write__encrypted_data_hook);
+
+		if (server == NULL) {
+			//TODO: move into method
+			server = new TSServer(true);
+			server->setPort(H2Config_base_port + 7);
+			server->startListening();
+			//startup the teamspeak client
+			client = new TSClient(true);
+
+			//only player 1 gets to use voice, guests don't
+			WCHAR strw[32];
+			//needs to live on the heap for the duration of the entire process, cause we reuse ts clients to connect to different ts servers
+			char* strw3 = new char[16];
+			wsprintf(strw, L"%I64x", xFakeXuid[0]);
+			wcstombs(strw3, strw, 32);
+			client->setNickname(strw3);
+
+			client->setServerAddress(clientMachineAddress);
+			client->setServerPort(H2Config_base_port + 7);
+			client->startChatting();
+		}
 	}
 
 	//apply any network hooks

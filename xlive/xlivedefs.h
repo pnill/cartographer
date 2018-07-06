@@ -1037,10 +1037,10 @@ public:
 	HRESULT Dummy11( VOID *pThis, int a1, int a2, int a3, int a4, int a5 );	// 28
 	HRESULT UnregisterRemoteTalker( VOID *pThis, int a1, int a2 );
 
-	HRESULT Dummy13( VOID *pThis, int a1, int a2 );	// 30
-	INT Dummy14( VOID *pThis, int a1 );	// 34
-	INT Dummy15( VOID *pThis, int a1 );	// 38
-	HRESULT Dummy16( VOID *pThis, int a1, int a2 );	// 3C
+	HRESULT Dummy13( VOID *pThis, int a1, int a2 );	// 30	
+	BOOL IsLocalTalking(VOID *pThis, DWORD dwUserIndex);
+	BOOL isRemoteTalking(VOID *pThis, XUID xuid);
+	BOOL IsHeadsetPresent(VOID *pThis, DWORD dwUserIndex);
 
 	DWORD GetDataReadyFlags( VOID *pThis );
 
