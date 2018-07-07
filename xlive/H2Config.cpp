@@ -88,6 +88,7 @@ int H2Config_sens_mouse = 0;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
+bool H2Config_voice_chat = true;
 int H2Config_custom_resolution_x = 0;
 int H2Config_custom_resolution_y = 0;
 char H2Config_dedi_server_name[32] = { "" };
@@ -256,6 +257,11 @@ void SaveH2Config() {
 		fputs("\n# 1 - Non-host players can delay the game start countdown timer (native default).", fileConfig);
 		fputs("\n\n", fileConfig);
 
+		fputs("# voice_chat Options:", fileConfig);
+		fputs("\n# 0 - Voice chat is not enabled, you cannot host voice servers or connect to them.", fileConfig);
+		fputs("\n# 1 - Voice chat is enabled, you can host voice servers or connect to them (default).", fileConfig);
+		fputs("\n\n", fileConfig);
+
 		fputs("# debug_log Options:", fileConfig);
 		fputs("\n# 0 - Disables excess logging.", fileConfig);
 		fputs("\n# 1 - Enables excess logging.", fileConfig);
@@ -354,6 +360,7 @@ void SaveH2Config() {
 			//fputs("\ncustom_resolution = 0x0", fileConfig);
 		}
 		fputs("\nenable_xdelay = ", fileConfig); fputs(H2Config_xDelay ? "1" : "0", fileConfig);
+		fputs("\nvoice_chat = ", fileConfig); fputs(H2Config_voice_chat ? "1" : "0", fileConfig);
 
 		fputs("\ndebug_log = ", fileConfig); fputs(H2Config_debug_log ? "1" : "0", fileConfig);
 
@@ -460,6 +467,7 @@ static bool est_disable_ingame_keyboard = false;
 static bool est_hide_ingame_chat = false;
 static bool est_xdelay = false;
 static bool est_debug_log = false;
+static bool est_voice_chat = false;
 static bool est_custom_resolution = false;
 static bool est_server_name = false;
 static bool est_server_playlist = false;
@@ -816,6 +824,18 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			else {
 				H2Config_xDelay = (bool)tempint1;
 				est_xdelay = true;
+			}
+		}
+		else if (sscanf(fileLine, "voice_chat =%d", &tempint1) == 1) {
+			if (est_voice_chat) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_voice_chat = (bool)tempint1;
+				est_voice_chat = true;
 			}
 		}
 		else if (sscanf(fileLine, "debug_log =%d", &tempint1) == 1) {

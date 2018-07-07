@@ -64,136 +64,6 @@ data_encode_boolean getDataEncodeBooleanMethod() {
 	return (data_encode_boolean)(h2mod->GetBase() + (h2mod->Server ? 0xCDE40 : 0xD1886));
 }
 
-typedef void(__cdecl *membership_update_write)(void* a1, int a2, int a3);
-membership_update_write membership_update_write_method;
-
-DWORD lengthOfMapName = 0x80;
-std::string mapName("map-name");
-//TODO: implement
-std::string isP2pSupported("p2p-supported");
-
-void __cdecl membershipUpdateWrite(void* a1, int a2, int a3) {
-	membership_update_write_method(a1, a2, a3);
-
-	//write additional packet information below
-	std::string mapFileName = mapManager->getCachedMapFilename();
-	char* mapNameToWrite = (char*)(a3 + (MEMBERSHIP_PACKET_SIZE - lengthOfMapName));
-	memcpy(mapNameToWrite, mapFileName.c_str(), lengthOfMapName);
-	getDataEncodeStringMethod()(a1, (int)mapName.c_str(), (int)mapNameToWrite, lengthOfMapName);
-	TRACE_GAME_N("[H2MOD-network] mapNameWritten=%s", mapNameToWrite);
-}
-
-// This variable holds the return address, it must be global!
-DWORD retAddr = 0;
-DWORD packet = 0;
-DWORD targetData = 0;
-
-void memberUpdateReadCave() {
-	char* mapNameToRead = (char*)(targetData + (MEMBERSHIP_PACKET_SIZE - lengthOfMapName));
-	getDataDecodeStringMethod()((void*)packet, (int)mapName.c_str(), (int)mapNameToRead, lengthOfMapName);
-	mapManager->setMapFileNameToDownload(std::string(mapNameToRead));
-	TRACE_GAME_N("[H2MOD-network] mapNameRead=%s", mapNameToRead);
-	TRACE_GAME("[h2mod-network] memberupdate code cave");
-}
-
-__declspec(naked) void membershipUpdateReadCave(void) {
-	__asm {
-		// The first thing we must do in our codecave is save 
-		// the return address from the top of the stack
-		pop retAddr
-
-		// Remember that we need to preserve registers and the stack!
-		PUSHAD
-		PUSHFD
-
-		//ecx gets reset after every data decode/encode call
-		mov packet, esi
-		mov targetData, edi
-	}
-	memberUpdateReadCave();
-	__asm {
-		// Restore everything to how it was before
-		POPFD
-		POPAD
-
-		//rewrite overwritten bytes
-		//mov[edi + 0x3DA0], eax
-		pop edi
-		pop esi
-		pop ebp
-		mov al, 1
-
-		// The last thing we must do in our codecave is push 
-		// the return address back onto the stack and then RET back
-		push retAddr
-		ret
-	}
-}
-
-void afterMapsLoadedCave() {
-	TRACE_GAME("[h2mod-network] after maps loaded");
-	mapManager->reloadMapFilenames();
-	gameManager->start();
-}
-
-__declspec(naked) void afterMapsLoadDedi(void) {
-
-	__asm {
-		// The first thing we must do in our codecave is save 
-		// the return address from the top of the stack
-		pop retAddr
-
-		// Remember that we need to preserve registers and the stack!
-		PUSHAD
-		PUSHFD
-	}
-	afterMapsLoadedCave();
-	__asm {
-		// Restore everything to how it was before
-		POPFD
-		POPAD
-
-		//rewrite overwritten bytes
-		sub esp, 0x10
-		mov ecx, [esp + 0x14]
-
-		// The last thing we must do in our codecave is push 
-		// the return address back onto the stack and then RET back
-		push retAddr
-		ret
-	}
-}
-
-__declspec(naked) void afterMapsLoaded(void) {
-
-	__asm {
-		// The first thing we must do in our codecave is save 
-		// the return address from the top of the stack
-		pop retAddr
-
-		// Remember that we need to preserve registers and the stack!
-		PUSHAD
-		PUSHFD
-	}
-	afterMapsLoadedCave();
-	__asm {
-		// Restore everything to how it was before
-		POPFD
-		POPAD
-
-		//rewrite overwritten bytes
-		pop edi
-		pop esi
-		pop ebx
-		xor ecx, esp
-
-		// The last thing we must do in our codecave is push 
-		// the return address back onto the stack and then RET back
-		push retAddr
-		ret
-	}
-}
-
 // sign flag
 int8_t __SETS__(int x)
 {
@@ -722,6 +592,40 @@ __declspec(naked) void deserializeChatPacket(void) {
 	}
 }
 
+
+void deserializePlayerAddCave() {
+	//inform new players of the current map info
+	mapManager->sendMapInfoPacket();
+}
+
+DWORD retAddr4 = 0;
+__declspec(naked) void deserializePlayerAdd(void) {
+	__asm {
+		// The first thing we must do in our codecave is save 
+		// the return address from the top of the stack
+		pop retAddr4
+
+		// Remember that we need to preserve registers and the stack!
+		PUSHAD
+		PUSHFD
+	}
+	deserializePlayerAddCave();
+	__asm {
+		// Restore everything to how it was before
+		POPFD
+		POPAD
+
+		//rewrite overwritten bytes
+		push esi
+		mov esi, [esp+0x14]
+
+		// The last thing we must do in our codecave is push 
+		// the return address back onto the stack and then RET back
+		push retAddr4
+		ret
+	}
+}
+
 int CustomNetwork::getPacketOffset() {
 	int packetOffset = (*(int*)(h2mod->GetBase() + (h2mod->Server ? 0x520B94 : 0x51C474)));
 	int packetOffsetTmp = *(DWORD *)(packetOffset + 29600);
@@ -835,6 +739,22 @@ char* __cdecl registerChatPackets(void* packetObject) {
 		0);
 }
 
+typedef int(__cdecl *serialize_membership_packet)(void* a1, int a2, int a3);
+serialize_membership_packet serialize_membership_packet_method;
+
+int __cdecl serializeMembershipPacket(void* a1, int a2, int a3) {
+	mapManager->sendMapInfoPacket();
+	return serialize_membership_packet_method(a1, a2, a3);
+}
+
+typedef int(__cdecl *serialize_parameters_update_packet)(void* a1, int a2, int a3);
+serialize_parameters_update_packet serialize_parameters_update_packet_method;
+
+int __cdecl serializeParametersUpdatePacket(void* a1, int a2, int a3) {
+	mapManager->sendMapInfoPacket();
+	return serialize_parameters_update_packet_method(a1, a2, a3);
+}
+
 void CustomNetwork::applyNetworkHooks() {
 	DWORD dwBack;
 	DWORD registerConnectionPacketsOffset = 0x1F1B36;
@@ -846,6 +766,9 @@ void CustomNetwork::applyNetworkHooks() {
 	DWORD registerChatPacketsOffset = 0x1ECFB7;
 	DWORD sendChatPacketOffset = 0x1CADF7;
 	DWORD sendChatPacketOffset2 = 0x1C81EC;
+	DWORD deserializePlayerAddOffset = 0x1F0753;
+	DWORD serializeMembershipPacketOffset = 0x1EF6B9;
+	DWORD serializeParametersUpdatePacketOffset = 0x1EDC41;
 
 	if (h2mod->Server) {
 		registerConnectionPacketsOffset = 0x1D24EF;
@@ -857,15 +780,9 @@ void CustomNetwork::applyNetworkHooks() {
 		registerChatPacketsOffset = 0x1CD970;
 		sendChatPacketOffset = 0x19F9DC;
 		sendChatPacketOffset2 = 0x1A237F;
-	}
-
-	///////////////////////////////////////////////
-	//map loading customizations below
-	///////////////////////////////////////////////
-
-	//we hook the spot in dedi and peers where the main game data is loaded so we can do stuff with it after
-	if (h2mod->Server) {
-		Codecave(h2mod->GetBase() + 0x1A2F9, afterMapsLoadDedi, 2);
+		deserializePlayerAddOffset = 0x1D110C;
+		serializeMembershipPacketOffset = 0x1D0072;
+		serializeParametersUpdatePacketOffset = 0x1CE5FA;
 	}
 
 	///////////////////////////////////////////////
@@ -878,6 +795,14 @@ void CustomNetwork::applyNetworkHooks() {
 	//use for debugging
 	//register_player_packets_method = (register_player_packets)DetourFunc((BYTE*)h2mod->GetBase() + registerPlayerPacketsOffset, (BYTE*)registerPlayerPackets, 5);
 	//VirtualProtect(register_player_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	Codecave(h2mod->GetBase() + deserializePlayerAddOffset, deserializePlayerAdd, 0);
+
+	serialize_membership_packet_method = (serialize_membership_packet)DetourFunc((BYTE*)h2mod->GetBase() + serializeMembershipPacketOffset, (BYTE*)serializeMembershipPacket, 5);
+	VirtualProtect(serialize_membership_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	serialize_parameters_update_packet_method = (serialize_parameters_update_packet)DetourFunc((BYTE*)h2mod->GetBase() + serializeParametersUpdatePacketOffset, (BYTE*)serializeParametersUpdatePacket, 5);
+	VirtualProtect(serialize_parameters_update_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	///////////////////////////////////////
 	//text chat packet customizations below

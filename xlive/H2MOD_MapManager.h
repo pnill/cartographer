@@ -33,8 +33,6 @@ public:
 
 	//server functions below
 	std::string getMapFilename();
-	std::string getCachedMapFilename();
-	void reloadMapFilenames();
 
 private:
 	class TcpServer {
@@ -61,6 +59,4 @@ private:
 	volatile BOOL threadRunning = false;
 	std::set<std::string> downloadedMaps;
 	std::string mapFilenameToDownload;
-	std::string cachedMapFilename;
-	std::unordered_map<std::wstring, std::string> mapNameToFileName;
 };

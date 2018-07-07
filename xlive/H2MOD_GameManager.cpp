@@ -78,13 +78,6 @@ void startGameThread() {
 				}
 				mapManager->setMapFileNameToDownload(EMPTY_STR2);
 			}
-		} else {
-			double secondsPassed = difftime(time(0), start2);
-			if (secondsPassed > 5) {
-				//send map info every 5 seconds if somehow membership packets don't send the map filename
-				mapManager->sendMapInfoPacket();
-				start2 = time(0);
-			}
 		}
 		std::this_thread::sleep_for(1s);
 	}

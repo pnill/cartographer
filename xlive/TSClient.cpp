@@ -9,9 +9,9 @@ const float TSClient::MAX_CLIENT_VOLUME_MODIFIER = -15.0f;
 const float TSClient::MIN_CLIENT_VOLUME_MODIFIER = -31.0f;
 
 TSClient::TSClient(bool log) {
-	TRACE_GAME_N("Client started");
+	TRACE_GAME_N("[h2mod-voice] Client started");
 	initializeCallbacks(log);
-	TRACE_GAME_N("Client lib initialized");
+	TRACE_GAME_N("[h2mod-voice] Client lib initialized");
 }
 
 char* TSClient::programPath(char* programInvocation) {
@@ -74,20 +74,20 @@ void TSClient::initializeCallbacks(bool log) {
 
 	/* Create a new client identity */
 	if ((error = ts3client_createIdentity(&identity)) != ERROR_ok) {
-		TRACE_GAME_N("Error creating identity: %d\n", error);
+		TRACE_GAME_N("[h2mod-voice] Error creating identity: %d\n", error);
 		return;
 	}
 }
 
 void TSClient::onUserLoggingMessageEvent(const char* logMessage, int logLevel, const char* logChannel, uint64 logID, const char* logTime, const char* completeLogString) {
 	//TODO: what to do during critical errors? nothing?
-	TRACE_GAME_N("[%d]User log message: %s", logLevel, logMessage);
+	TRACE_GAME_N("[h2mod-voice] [%d]User log message: %s", logLevel, logMessage);
 }
 
 void TSClient::connect() {
 	/* Spawn a new server connection handler using the default port and store the server ID */
 	if ((error = ts3client_spawnNewServerConnectionHandler(0, &scHandlerID)) != ERROR_ok) {
-		TRACE("Error spawning server connection handler: %d\n", error);
+		TRACE("[h2mod-voice] Error spawning server connection handler: %d\n", error);
 	}
 
 	this->openMicrophone();
@@ -96,21 +96,21 @@ void TSClient::connect() {
 
 	char *version;
 	const char* hostnameOrIP = inet_ntoa(serverAddress);
-	TRACE_GAME_N("TeamSpeak::hostname: %s", hostnameOrIP);
-	TRACE_GAME_N("TeamSpeak::port: %d", port);
-	TRACE_GAME_N("TeamSpeak::nickname: %s", nickname);
+	TRACE_GAME_N("[h2mod-voice] TeamSpeak::hostname: %s", hostnameOrIP);
+	TRACE_GAME_N("[h2mod-voice] TeamSpeak::port: %d", port);
+	TRACE_GAME_N("[h2mod-voice] TeamSpeak::nickname: %s", nickname);
 	//TODO: do we need a secret per session?
 	if ((error = ts3client_startConnection(scHandlerID, identity, hostnameOrIP, port, nickname, NULL, "", "secret")) != ERROR_ok) {
-		TRACE_GAME_N("Error connecting to server: %d\n", error);
+		TRACE_GAME_N("[h2mod-voice] Error connecting to server: %d\n", error);
 		return;
 	}
 
 	/* Query and print client lib version */
 	if ((error = ts3client_getClientLibVersion(&version)) != ERROR_ok) {
-		TRACE_GAME_N("Failed to get clientlib version: %d\n", error);
+		TRACE_GAME_N("[h2mod-voice] Failed to get clientlib version: %d\n", error);
 		return;
 	}
-	TRACE_GAME_N("Client lib version: %s", version);
+	TRACE_GAME_N("[h2mod-voice] Client lib version: %s", version);
 	ts3client_freeMemory(version);  /* Release dynamically allocated memory */
 	version = NULL;
 }
@@ -119,10 +119,10 @@ void TSClient::openPlayback() {
 	/* Open default playback device */
 	/* Passing empty string for mode and NULL or empty string for device will open the default device */
 	if ((error = ts3client_openPlaybackDevice(scHandlerID, "", NULL)) != ERROR_ok) {
-		TRACE_GAME_N("Error opening playback device: %d\n", error);
+		TRACE_GAME_N("[h2mod-voice] Error opening playback device: %d\n", error);
 	}
 	if ((error = ts3client_setPlaybackConfigValue(scHandlerID, "volume_modifier", "20.0")) != ERROR_ok) { 
-		TRACE_GAME_N("Error setting playback config value: %d\n", error);
+		TRACE_GAME_N("[h2mod-voice] Error setting playback config value: %d\n", error);
 	}
 }
 
@@ -131,16 +131,16 @@ void TSClient::openMicrophone() {
 	/* Passing empty string for mode and NULL or empty string for device will open the default device */
 	if ((error = ts3client_openCaptureDevice(scHandlerID, "", NULL)) != ERROR_ok) {
 		microphoneEnabled = false;
-		TRACE_GAME_N("Error opening capture device: %d\n", error);
+		TRACE_GAME_N("[h2mod-voice] Error opening capture device: %d\n", error);
 	}
 }
 
 void TSClient::disconnect() {
 	/* Disconnect from server */
 	if ((error = ts3client_stopConnection(scHandlerID, "leaving")) != ERROR_ok) {
-		TRACE_GAME_N("Error stopping connection: %d\n", error);
+		TRACE_GAME_N("[h2mod-voice] Error stopping connection: %d\n", error);
 	}	else {
-		TRACE_GAME_N("Client disconnecting from the server %s", inet_ntoa(serverAddress));
+		TRACE_GAME_N("[h2mod-voice] Client disconnecting from the server %s", inet_ntoa(serverAddress));
 	}
 
 	//TODO: guess we need to wait a lil fro the connection to stop, why?
@@ -148,7 +148,7 @@ void TSClient::disconnect() {
 
 	/* Destroy server connection handler */
 	if ((error = ts3client_destroyServerConnectionHandler(scHandlerID)) != ERROR_ok) {
-		TRACE("Error destroying clientlib: %d\n", error);
+		TRACE("[h2mod-voice] Error destroying clientlib: %d\n", error);
 	}
 }
 
@@ -163,10 +163,10 @@ void TSClient::disconnect() {
 *                               Contains error state when losing connection.
 */
 void TSClient::onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber) {
-	TRACE_GAME_N("Connect status changed: %llu %d %u", (unsigned long long)serverConnectionHandlerID, newStatus, errorNumber);
+	TRACE_GAME_N("[h2mod-voice] Connect status changed: %llu %d %u", (unsigned long long)serverConnectionHandlerID, newStatus, errorNumber);
 	/* Failed to connect ? */
 	if (newStatus == STATUS_DISCONNECTED && errorNumber == ERROR_failed_connection_initialisation) {
-		TRACE_GAME_N("Looks like there is no server running.");
+		TRACE_GAME_N("[h2mod-voice] Looks like there is no server running.");
 		client->connected = false;
 	}
 	if (newStatus == STATUS_CONNECTED) {
@@ -186,7 +186,7 @@ void TSClient::onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int 
 *                               Values: ENTER_VISIBILITY, RETAIN_VISIBILITY, LEAVE_VISIBILITY
 */
 void TSClient::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* moveMessage) {
-	TRACE_GAME_N("ClientID %u moves from channel %llu to %llu with message %s", clientID, (unsigned long long)oldChannelID, (unsigned long long)newChannelID, moveMessage);
+	TRACE_GAME_N("[h2mod-voice] ClientID %u moves from channel %llu to %llu with message %s", clientID, (unsigned long long)oldChannelID, (unsigned long long)newChannelID, moveMessage);
 }
 
 /*
@@ -201,7 +201,7 @@ void TSClient::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientI
 *   timeoutMessage            - Optional message giving the reason for the timeout
 */
 void TSClient::onClientMoveTimeoutEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* timeoutMessage) {
-	TRACE_GAME_N("ClientID %u timeouts with message %s", clientID, timeoutMessage);
+	TRACE_GAME_N("[h2mod-voice] ClientID %u timeouts with message %s", clientID, timeoutMessage);
 }
 
 /* 
@@ -210,16 +210,16 @@ void TSClient::onClientMoveTimeoutEvent(uint64 serverConnectionHandlerID, anyID 
 void TSClient::printCurrentClientVolume(anyID teamspeakClientID) {
 	int volume;
 	if (ts3client_getClientVariableAsInt(scHandlerID, teamspeakClientID, CLIENT_VOLUME_MODIFICATOR, &volume)) {
-		TRACE("error getting client volume");
+		TRACE("[h2mod-voice] error getting client volume");
 	}	else {
-		TRACE("current client=%d volume=%d", teamspeakClientID, volume);
+		TRACE("[h2mod-voice] current client=%d volume=%d", teamspeakClientID, volume);
 	}
 }
 
 int TSClient::getClientVolume(anyID teamspeakClientID) {
 	int volume;
 	if (ts3client_getClientVariableAsInt(scHandlerID, teamspeakClientID, CLIENT_VOLUME_MODIFICATOR, &volume)) {
-		TRACE("error getting client volume");
+		TRACE("[h2mod-voice] error getting client volume");
 	}
 	return volume;
 }
@@ -230,7 +230,7 @@ int TSClient::getClientVolume(anyID teamspeakClientID) {
 void TSClient::setClientVolume(anyID teamspeakClientID, float volume) {
 	int error;
 	if ((error = ts3client_setClientVolumeModifier(scHandlerID, teamspeakClientID, volume)) != ERROR_ok) {
-		TRACE("error modifying client volume: %d\n", error);
+		TRACE("[h2mod-voice] error modifying client volume: %d\n", error);
 	}
 }
 
@@ -245,7 +245,7 @@ void TSClient::setVoiceActivationLevel(float activationLevel) {
 	std::string s(ss.str());
 
 	if (error = ts3client_setPreProcessorConfigValue(scHandlerID, "voiceactivation_level", s.c_str()) != ERROR_ok) {
-		TRACE("Error setting voice activation level: %d\n", error);
+		TRACE("[h2mod-voice] Error setting voice activation level: %d\n", error);
 	}
 }
 
@@ -260,7 +260,7 @@ anyID TSClient::getClientId(char* name) {
 				/* Query client nickname from ID */
 				int result = ts3client_getClientVariableAsString(scHandlerID, clientID, CLIENT_NICKNAME, &clientName);
 				if (result != ERROR_ok) {
-					TRACE("error trying to get client name for mute/unmute information, code=%d", result);
+					TRACE("[h2mod-voice] error trying to get client name for mute/unmute information, code=%d", result);
 				}	else {
 					if (strcmp(name, clientName) == 0) {
 						clientId = clientID;
@@ -271,7 +271,7 @@ anyID TSClient::getClientId(char* name) {
 				}
 			}
 		}	catch (...) {
-			TRACE("Exception thrown getting client id, default exception");
+			TRACE("[h2mod-voice] Exception thrown getting client id, default exception");
 		}
 		ts3client_freeMemory(currentClients);
 	}
@@ -284,7 +284,7 @@ void TSClient::mute(anyID clientToMute) {
 	clientsToMute[0] = clientToMute; 
 	clientsToMute[1] = 0;    // Terminating zero
 	if ((error = ts3client_requestMuteClients(scHandlerID, clientsToMute, NULL)) != ERROR_ok) {
-		TRACE("error turning muting clients: %d\n", error);
+		TRACE("[h2mod-voice] error turning muting clients: %d\n", error);
 	}
 	ts3client_freeMemory(clientsToMute);
 }
@@ -295,7 +295,7 @@ void TSClient::unmute(anyID clientToUnmute) {
 	clientsToUnmute[0] = clientToUnmute;
 	clientsToUnmute[1] = 0;    // Terminating zero
 	if ((error = ts3client_requestUnmuteClients(scHandlerID, clientsToUnmute, NULL)) != ERROR_ok) {
-		TRACE("error turning unmuting clients: %d\n", error);
+		TRACE("[h2mod-voice] error turning unmuting clients: %d\n", error);
 	}
 	ts3client_freeMemory(clientsToUnmute);
 }
@@ -303,7 +303,7 @@ void TSClient::unmute(anyID clientToUnmute) {
 bool TSClient::isMuted(anyID clientId) {
 	int clientIsMuted;
 	if (ts3client_getClientVariableAsInt(scHandlerID, clientId, CLIENT_IS_MUTED, &clientIsMuted) != ERROR_ok) {
-		TRACE("Error querying client muted state");
+		TRACE("[h2mod-voice] Error querying client muted state");
 	}
 	//returns 1 if muted, 0 if not
 	return clientIsMuted;
@@ -399,7 +399,7 @@ void TSClient::onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 	
 	if (status == STATUS_TALKING) {
 		xuidIsTalkingMap[remoteId] = true;
-		TRACE_GAME_N("Client \"%s\" starts talking.", remoteXuidStr);
+		TRACE_GAME_N("[h2mod-voice] Client \"%s\" starts talking.", remoteXuidStr);
 
 		if (isLobby) {
 			//in the lobby everyone can hear anyone
@@ -421,12 +421,12 @@ void TSClient::onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 			int clientPlayerIndex = players->getPeerIndex((long long)clientId);
 			int clientPlayerTeamIndex = players->getPlayerTeam((long long)clientId);
 
-			TRACE_GAME_N("Client-%d remotePlayerTeamIndex:%u, xuid:%s", remotePlayerIndex, remotePlayerTeamIndex, remoteXuidStr);
-			TRACE_GAME_N("Client-%d clientPlayerTeamIndex:%u, xuid:%s", clientPlayerIndex, clientPlayerTeamIndex, client->nickname);
+			TRACE_GAME_N("[h2mod-voice] Client-%d remotePlayerTeamIndex:%u, xuid:%s", remotePlayerIndex, remotePlayerTeamIndex, remoteXuidStr);
+			TRACE_GAME_N("[h2mod-voice] Client-%d clientPlayerTeamIndex:%u, xuid:%s", clientPlayerIndex, clientPlayerTeamIndex, client->nickname);
 			bool sameTeam = remotePlayerTeamIndex == clientPlayerTeamIndex;
 			//TODO: make team voice work
 			bool teamPlayOn = false;//h2mod->is_team_play();
-			TRACE_GAME_N("IsSameTeam=%d,IsTeamPlay=%d", sameTeam, teamPlayOn);
+			TRACE_GAME_N("[h2mod-voice] IsSameTeam=%d,IsTeamPlay=%d", sameTeam, teamPlayOn);
 
 			//TODO: once proximity is done, it would default to proximity chat
 			if (!teamPlayOn) {
@@ -438,7 +438,7 @@ void TSClient::onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 			}
 		}
 	}	else {
-		TRACE_GAME_N("Client \"%s\" stops talking.", remoteXuidStr);
+		TRACE_GAME_N("[h2mod-voice] Client \"%s\" stops talking.", remoteXuidStr);
 		xuidIsTalkingMap[remoteId] = false;
 	}
 	// Release dynamically allocated memory only if function succeeded
@@ -446,7 +446,7 @@ void TSClient::onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 }
 
 void TSClient::onServerErrorEvent(uint64 serverConnectionHandlerID, const char* errorMessage, unsigned int error, const char* returnCode, const char* extraMessage) {
-	TRACE_GAME_N("Error for server %llu: %s %s", (unsigned long long)serverConnectionHandlerID, errorMessage, extraMessage);
+	TRACE_GAME_N("[h2mod-voice] Error for server %llu: %s %s", (unsigned long long)serverConnectionHandlerID, errorMessage, extraMessage);
 }
 
 void TSClient::setServerAddress(IN_ADDR address) {

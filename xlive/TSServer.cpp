@@ -26,7 +26,7 @@ TSServer::TSServer(bool log) {
 	if (error = ts3server_setLogVerbosity(LogLevel_DEBUG)) {
 		char* errormsg;
 		if (ts3server_getGlobalErrorMessage(error, &errormsg) == ERROR_ok) {
-			TRACE_GAME_N("Error setting log verbosity: %s (%d)", errormsg, error);
+			TRACE_GAME_N("[h2mod-voice] Error setting log verbosity: %s (%d)", errormsg, error);
 			ts3server_freeMemory(errormsg);
 		}
 
@@ -42,7 +42,7 @@ TSServer::TSServer(bool log) {
 	if ((error = ts3server_initServerLib(&funcs, logTypes, NULL)) != ERROR_ok) {
 		char* errormsg;
 		if (ts3server_getGlobalErrorMessage(error, &errormsg) == ERROR_ok) {
-			TRACE_GAME_N("Error initialzing serverlib: %s", errormsg);
+			TRACE_GAME_N("[h2mod-voice] Error initialzing serverlib: %s", errormsg);
 			ts3server_freeMemory(errormsg);
 		}
 	}
@@ -50,9 +50,9 @@ TSServer::TSServer(bool log) {
 	/* Query and print server lib version */
 	
 	if ((error = ts3server_getServerLibVersion(&version)) != ERROR_ok) {
-		TRACE_GAME_N("Error querying server lib version: %d", error);
+		TRACE_GAME_N("[h2mod-voice] Error querying server lib version: %d", error);
 	}
-	TRACE_GAME_N("Server lib version: %s", version);
+	TRACE_GAME_N("[h2mod-voice] Server lib version: %s", version);
 	ts3server_freeMemory(version);
 }
 
@@ -88,7 +88,7 @@ void TSServer::createVirtualServer() {
 	if ((error = ts3server_createVirtualServer(port, "0.0.0.0", "tss", keyPair, 16, &serverID)) != ERROR_ok) {
 		char* errormsg;
 		if (ts3server_getGlobalErrorMessage(error, &errormsg) == ERROR_ok) {
-			TRACE_GAME_N("Error creating virtual server: %s (%d)", errormsg, error);
+			TRACE_GAME_N("[h2mod-voice] Error creating virtual server: %s (%d)", errormsg, error);
 			ts3server_freeMemory(errormsg);
 			return;
 		}
@@ -98,12 +98,12 @@ void TSServer::createVirtualServer() {
 
 	/* Set welcome message */
 	if ((error = ts3server_setVirtualServerVariableAsString(serverID, VIRTUALSERVER_WELCOMEMESSAGE, "Hello TeamSpeak 3")) != ERROR_ok) {
-		TRACE_GAME_N("Error setting server welcomemessage: %d", error);
+		TRACE_GAME_N("[h2mod-voice] Error setting server welcomemessage: %d", error);
 	}
 
 	/* Set server password */
 	if ((error = ts3server_setVirtualServerVariableAsString(serverID, VIRTUALSERVER_PASSWORD, "secret")) != ERROR_ok) {
-		TRACE_GAME_N("Error setting server password: %d", error);
+		TRACE_GAME_N("[h2mod-voice] Error setting server password: %d", error);
 	}
 	/* Set the chanell codec */
 	int channelid = 1;
@@ -116,19 +116,19 @@ void TSServer::createVirtualServer() {
 	//5 - opus music
 	//TODO: make configurable
 	if ((error = ts3server_setChannelVariableAsInt(serverID, channelid, CHANNEL_CODEC, 5)) != ERROR_ok) {
-		TRACE_GAME_N("Error setting codec: %d", error);
+		TRACE_GAME_N("[h2mod-voice] Error setting codec: %d", error);
 	}
 
 	/* Lower codec quality */
 	//0-10 (default is 7) 10 is best quality
 	//TODO: make configurable
 	if ((error = ts3server_setChannelVariableAsInt(serverID, channelid, CHANNEL_CODEC_QUALITY, 10)) != ERROR_ok) {
-		TRACE_GAME_N("Error changing codec quality: %d", error);
+		TRACE_GAME_N("[h2mod-voice] Error changing codec quality: %d", error);
 	}
 
 	/* Flush above two changes to server */
 	if ((error = ts3server_flushVirtualServerVariable(serverID)) != ERROR_ok) {
-		TRACE("Error flushing server variables");
+		TRACE("[h2mod-voice] Error flushing server variables");
 	}
 }
 
@@ -137,9 +137,9 @@ void TSServer::destroyVirtualServer() {
 
 	/* Stop virtual server */
 	if ((error = ts3server_stopVirtualServer(serverID)) != ERROR_ok) {
-		TRACE_GAME_N("Error stopping virtual server: %d", error);
+		TRACE_GAME_N("[h2mod-voice] Error stopping virtual server: %d", error);
 	}	else {
-		TRACE_GAME_N("Destroyed virtual server");
+		TRACE_GAME_N("[h2mod-voice] Destroyed virtual server");
 	}
 }
 
@@ -154,7 +154,7 @@ void TSServer::firstTimeValidateLicense(const char *keyPair) {
 		if ((error = ts3server_getVirtualServerKeyPair(serverID, &newKeyPair)) != ERROR_ok) {
 			char* errormsg;
 			if (ts3server_getGlobalErrorMessage(error, &errormsg) == ERROR_ok) {
-				TRACE_GAME_N("Error querying keyPair: %s\n\n", errormsg);
+				TRACE_GAME_N("[h2mod-voice] Error querying keyPair: %s\n\n", errormsg);
 				ts3server_freeMemory(errormsg);
 			}
 		}
@@ -175,19 +175,19 @@ int TSServer::writeKeyPairToFile(const char *fileName, const char* keyPair) {
 
 	file = fopen(fileName, "w");
 	if (file == NULL) {
-		TRACE_GAME_N("Could not open file '%s' for writing keypair\n", fileName);
+		TRACE_GAME_N("[h2mod-voice] Could not open file '%s' for writing keypair\n", fileName);
 		return -1;
 	}
 
 	fputs(keyPair, file);
 	if (ferror(file) != 0) {
 		fclose(file);
-		TRACE_GAME_N("Error writing keypair to file '%s'.\n", fileName);
+		TRACE_GAME_N("[h2mod-voice] Error writing keypair to file '%s'.\n", fileName);
 		return -1;
 	}
 	fclose(file);
 
-	TRACE_GAME_N("Wrote keypair '%s' to file '%s'.", keyPair, fileName);
+	TRACE_GAME_N("[h2mod-voice] Wrote keypair '%s' to file '%s'.", keyPair, fileName);
 	return 0;
 }
 
@@ -200,46 +200,46 @@ int TSServer::readKeyPairFromFile(const char *fileName, char *keyPair) {
 
 	file = fopen(fileName, "r");
 	if (file == NULL) {
-		TRACE_GAME_N("Could not open file '%s' for reading keypair\n", fileName);
+		TRACE_GAME_N("[h2mod-voice] Could not open file '%s' for reading keypair\n", fileName);
 		return -1;
 	}
 
 	fgets(keyPair, BUFSIZ, file);
 	if (ferror(file) != 0) {
 		fclose(file);
-		TRACE_GAME_N("Error reading keypair from file '%s'.\n", fileName);
+		TRACE_GAME_N("[h2mod-voice] Error reading keypair from file '%s'.\n", fileName);
 		return -1;
 	}
 	fclose(file);
 
-	TRACE_GAME_N("Read keypair '%s' from file '%s'.", keyPair, fileName);
+	TRACE_GAME_N("[h2mod-voice] Read keypair '%s' from file '%s'.", keyPair, fileName);
 	return 0;
 }
 
 void TSServer::onAccountingErrorEvent(uint64 serverID, unsigned int errorCode) {
 	char* errorMessage;
 	if (ts3server_getGlobalErrorMessage(errorCode, &errorMessage) == ERROR_ok) {
-		TRACE_GAME_N("onAccountingErrorEvent serverID=%llu, errorCode=%u: %s", (unsigned long long)serverID, errorCode, errorMessage);
+		TRACE_GAME_N("[h2mod-voice] onAccountingErrorEvent serverID=%llu, errorCode=%u: %s", (unsigned long long)serverID, errorCode, errorMessage);
 		ts3server_freeMemory(errorMessage);
 	}
 }
 
 void TSServer::onUserLoggingMessageEvent(const char* logMessage, int logLevel, const char* logChannel, uint64 logID, const char* logTime, const char* completeLogString) {
 	//TODO: what to do during critical errors? nothing?
-	TRACE_GAME_N("[%d]Server log message: %s", logLevel, logMessage);
+	TRACE_GAME_N("[h2mod-voice] [%d]Server log message: %s", logLevel, logMessage);
 }
 void TSServer::onClientStopTalkingEvent(uint64 serverID, anyID clientID) {
-	TRACE_GAME_N("onClientStopTalkingEvent serverID=%llu, clientID=%u", (unsigned long long)serverID, clientID);
+	TRACE_GAME_N("[h2mod-voice] onClientStopTalkingEvent serverID=%llu, clientID=%u", (unsigned long long)serverID, clientID);
 }
 void TSServer::onClientStartTalkingEvent(uint64 serverID, anyID clientID) {
-	TRACE_GAME_N("onClientStartTalkingEvent serverID=%llu, clientID=%d", (unsigned long long)serverID, clientID);
+	TRACE_GAME_N("[h2mod-voice] onClientStartTalkingEvent serverID=%llu, clientID=%d", (unsigned long long)serverID, clientID);
 }
 void TSServer::onClientMoved(uint64 serverID, anyID clientID, uint64 oldChannelID, uint64 newChannelID) {
-	TRACE_GAME_N("Client %u moved from channel %llu to channel %llu on virtual server %llu",
+	TRACE_GAME_N("[h2mod-voice] Client %u moved from channel %llu to channel %llu on virtual server %llu",
 		clientID, (unsigned long long)oldChannelID, (unsigned long long)newChannelID, (unsigned long long)serverID);
 }
 void TSServer::onClientDisconnected(uint64 serverID, anyID clientID, uint64 channelID) {
-	TRACE_GAME_N("Client %u left channel %llu on virtual server %llu", clientID, (unsigned long long)channelID, (unsigned long long)serverID);
+	TRACE_GAME_N("[h2mod-voice] Client %u left channel %llu on virtual server %llu", clientID, (unsigned long long)channelID, (unsigned long long)serverID);
 }
 void TSServer::onClientConnected(uint64 serverID, anyID clientID, uint64 channelID, unsigned int* removeClientError) {
 	//TODO: if the client has no business in this channel (for team chat), *removeClientError = ERROR_client_insufficient_permissions;
@@ -252,7 +252,7 @@ void TSServer::onClientConnected(uint64 serverID, anyID clientID, uint64 channel
 
 		//TODO: ts server can move clients from channel to channel
 	}*/
-	TRACE_GAME_N("Client %u joined channel %llu on virtual server %llu", clientID, (unsigned long long)channelID, (unsigned long long)serverID);
+	TRACE_GAME_N("[h2mod-voice] Client %u joined channel %llu on virtual server %llu", clientID, (unsigned long long)channelID, (unsigned long long)serverID);
 }
 
 void TSServer::setPort(unsigned int port) {

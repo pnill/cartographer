@@ -3247,14 +3247,14 @@ BOOL IXHV2ENGINE::IsHeadsetPresent(VOID *pThis, DWORD dwUserIndex) {
 
 	//TODO: add logic that actually validates their audio device is connected
 	//TODO: handle it being connected and disconnected
-	return true;
+	return  H2Config_voice_chat;
 }
 
 BOOL IXHV2ENGINE::isRemoteTalking(VOID *pThis, XUID xuid) {
 	//TRACE("IXHV2Engine::isRemoteTalking");
 	//TODO: the xuid given here is the real xuid, the one we provide in xlive.ini is the hex of that the above value
 	//so we need to convert it...
-	return xuidIsTalkingMap[xuid];
+	return H2Config_voice_chat && xuidIsTalkingMap[xuid];
 }
 
 BOOL IXHV2ENGINE::IsLocalTalking(VOID *pThis, DWORD dwUserIndex) {
@@ -3262,7 +3262,7 @@ BOOL IXHV2ENGINE::IsLocalTalking(VOID *pThis, DWORD dwUserIndex) {
 	//check the xuid map
 	XUID id = xFakeXuid[0];
 	BOOL isTalking = xuidIsTalkingMap[id];
-	return microphoneEnabled ? xuidIsTalkingMap[id] : false;
+	return H2Config_voice_chat && microphoneEnabled ? xuidIsTalkingMap[id] : false;
 }
 
 // #5297: XLiveInitializeEx
@@ -3350,47 +3350,49 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 	pOverlapped->InternalLow = ERROR_SUCCESS;
 	pOverlapped->dwExtendedError = ERROR_SUCCESS;
 
-	if (gameManager->isHost()) {
-		if (server == NULL) {
-			//TODO: move into method
-			server = new TSServer(true);
-			server->setPort(H2Config_base_port + 7);
-			//startup the teamspeak client
-			client = new TSClient(true);
+	if (H2Config_voice_chat) {
+		if (gameManager->isHost()) {
+			if (server == NULL) {
+				//TODO: move into method
+				server = new TSServer(true);
+				server->setPort(H2Config_base_port + 7);
+				//startup the teamspeak client
+				client = new TSClient(true);
 
-			//only player 1 gets to use voice, guests don't
-			WCHAR strw[32];
-			//needs to live on the heap for the duration of the entire process, cause we reuse ts clients to connect to different ts servers
-			char* strw3 = new char[16];
-			wsprintf(strw, L"%I64x", xFakeXuid[0]);
-			wcstombs(strw3, strw, 32);
-			client->setNickname(strw3);
+				//only player 1 gets to use voice, guests don't
+				WCHAR strw[32];
+				//needs to live on the heap for the duration of the entire process, cause we reuse ts clients to connect to different ts servers
+				char* strw3 = new char[16];
+				wsprintf(strw, L"%I64x", xFakeXuid[0]);
+				wcstombs(strw3, strw, 32);
+				client->setNickname(strw3);
 
+			}
+			server->startListening();
+
+			client->setServerAddress(clientMachineAddress);
+			client->setServerPort(H2Config_base_port + 7);
+			client->startChatting();
 		}
-		server->startListening();
+		else {
+			if (client == NULL) {
+				//TODO: move into method
+				//startup the teamspeak client
+				client = new TSClient(true);
 
-		client->setServerAddress(clientMachineAddress);
-		client->setServerPort(H2Config_base_port + 7);
-		client->startChatting();
-	}
-	else {
-		if (client == NULL) {
-			//TODO: move into method
-			//startup the teamspeak client
-			client = new TSClient(true);
+				//only player 1 gets to use voice, guests don't
+				WCHAR strw[8192];
+				//needs to live on the heap for the duration of the entire process, cause we reuse ts clients to connect to different ts servers
+				char* strw3 = new char[4096];
+				wsprintf(strw, L"%I64x", xFakeXuid[0]);
+				wcstombs(strw3, strw, 8192);
+				client->setNickname(strw3);
 
-			//only player 1 gets to use voice, guests don't
-			WCHAR strw[8192];
-			//needs to live on the heap for the duration of the entire process, cause we reuse ts clients to connect to different ts servers
-			char* strw3 = new char[4096];
-			wsprintf(strw, L"%I64x", xFakeXuid[0]);
-			wcstombs(strw3, strw, 8192);
-			client->setNickname(strw3);
-
+			}
+			client->setServerAddress(join_game_xn.ina);
+			client->setServerPort(ntohs(join_game_xn.wPortOnline) + 7);
+			client->startChatting();
 		}
-		client->setServerAddress(join_game_xn.ina);
-		client->setServerPort(ntohs(join_game_xn.wPortOnline) + 7);
-		client->startChatting();
 	}
 
 	gameManager->start();

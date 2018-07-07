@@ -172,8 +172,6 @@ void MapManager::reloadMaps() {
 	reloadMaps((int)mapsObject);
 	LeaveCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
 	TRACE_GAME("[h2mod-mapmanager] after reload maps");
-
-	reloadMapFilenames();
 }
 
 /**
@@ -195,46 +193,6 @@ void MapManager::setCustomLobbyMessage(const char* newStatus) {
 */
 const char* MapManager::getCustomLobbyMessage() {
 	return this->customLobbyMessage;
-}
-
-void MapManager::reloadMapFilenames() {
-	//0x30 (difference from start of maps object to first custom map)
-	//0xB90 (difference between each custom map name)
-	//0x960 (difference between custom map name and its file path
-	DWORD offset;
-	//move to first map
-	DWORD currentMapNameOffset;
-	if (h2mod->Server) {
-		offset = 0x4A70D8;
-		//H2Server.exe+5349B4
-		//H2Server.exe+535C64 (another offset to use if the above fails for whatever reason)
-		currentMapNameOffset = 0x5349B4;
-	}
-	else {
-		offset = 0x482D70;
-		currentMapNameOffset = 0x97737C;
-	}
-
-	//TODO: one day increase map limit (somehow)
-	for (int i = 0; i <= 50; i++) {
-		wchar_t* mapName = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + (i * 0xB90)));
-		wchar_t* mapPath = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + ((i * 0xB90) + 0x960)));
-		if (mapName == NULL || *mapName == L'\0') {
-			//skip empty map names
-			continue;
-		}
-		std::wstring unicodeMapFilename(mapPath);
-		std::string nonUnicodeCustomMapFilename(unicodeMapFilename.begin(), unicodeMapFilename.end());
-		std::size_t offset = nonUnicodeCustomMapFilename.find_last_of("\\");
-		std::size_t extOffset = nonUnicodeCustomMapFilename.find_last_not_of(mapExt);
-		std::string nonUnicodeMapFileName = nonUnicodeCustomMapFilename.substr(offset + 1, extOffset);
-		if (!nonUnicodeMapFileName.empty() && wcscmp(this->getMapName().c_str(), mapName) == 0) {
-			//if the filename exists and the current map english name is equal to the iterated map name
-			TRACE_GAME("[h2mod-mapmanager] cached map name %s", std::wstring(mapName).c_str());
-			TRACE_GAME_N("[h2mod-mapmanager] cached map file name %s", nonUnicodeMapFileName.c_str());
-			this->mapNameToFileName[std::wstring(mapName)] = nonUnicodeMapFileName;
-		}
-	}
 }
 
 std::string MapManager::getMapFilename() {
@@ -275,12 +233,6 @@ std::string MapManager::getMapFilename() {
 	}
 	return "";
 }
-
-std::string MapManager::getCachedMapFilename() {
-	TRACE_GAME("[h2mod-mapmanager] get cached map filename %s", this->getMapName().c_str());
-	return this->mapNameToFileName[this->getMapName()];
-}
-
 
 /**
 * Searches for a map to download based on the english map name and the actual filename
@@ -324,16 +276,20 @@ void MapManager::cleanup() {
 
 void MapManager::sendMapInfoPacket()
 {
-	//always reload map filenames before sending map info
-	mapManager->reloadMapFilenames();
-
 	H2ModPacket teampak;
 	teampak.set_type(H2ModPacket_Type_map_info_request);
 
 	h2mod_map_info* map_info = teampak.mutable_map_info();
-	TRACE_GAME_N("[h2mod-mapmanager] map name being sent %s", this->getMapFilename().c_str());
-	map_info->set_mapfilename(this->getMapFilename());
-	//TODO: send over size so p2p can work
+	//TODO: check if its empty before sending
+	std::string mapFilenameStr = this->getMapFilename();
+	if (mapFilenameStr.empty()) {
+		TRACE_GAME_N("[h2mod-mapmanager] custom map filename missing");
+		return;
+	}
+	const char* mapFilename = mapFilenameStr.c_str();
+	TRACE_GAME_N("[h2mod-mapmanager] custom map name being sent %s", mapFilename);
+	map_info->set_mapfilename(mapFilenameStr);
+	//TODO: send over size so p2p can work easier
 	map_info->set_mapsize(0);
 
 	char* SendBuf = new char[teampak.ByteSize()];
