@@ -83,6 +83,7 @@ int H2Config_fps_limit = 60;
 int H2Config_static_lod_state = static_lod::cinematic;
 int H2Config_field_of_view = 0;
 float H2Config_crosshair_offset = NAN;
+int H2Config_crosshair_size = 0;
 int H2Config_sens_controller = 0;
 int H2Config_sens_mouse = 0;
 bool H2Config_disable_ingame_keyboard = false;
@@ -229,6 +230,14 @@ void SaveH2Config() {
 			fputs("\n# <0 to 0.53> - NaN disables the built in Crosshair adjustment.", fileConfig);
 			fputs("\n\n", fileConfig);
 
+			fputs("# crosshair_size Options (Client):", fileConfig);
+			fputs("\n# 0 - Disables the crosshair from being displayed.", fileConfig);
+			fputs("\n# 1 - Very small", fileConfig);
+			fputs("\n# 2 - Small", fileConfig);
+			fputs("\n# 3 - Default ", fileConfig);
+			fputs("\n# 4 - Large", fileConfig);
+			fputs("\n\n", fileConfig);
+
 			fputs("# controller_sensitivity Option (Client):", fileConfig);
 			fputs("\n# <value> Change controller sensitivity to your preference.", fileConfig);
 			fputs("\n\n", fileConfig);
@@ -346,6 +355,9 @@ void SaveH2Config() {
 				fputs(settingOutBuffer, fileConfig);
 			}
 
+			sprintf(settingOutBuffer, "\ncrosshair_size = %d", H2Config_crosshair_size);
+			fputs(settingOutBuffer, fileConfig);
+
 			sprintf(settingOutBuffer, "\ncontroller_sensitivity = %d", H2Config_sens_controller);
 			fputs(settingOutBuffer, fileConfig);
 
@@ -461,6 +473,7 @@ static bool est_fps_limit = false;
 static bool est_static_lod_state = false;
 static bool est_field_of_view = false;
 static bool est_crosshair_offset = false;
+static bool est_crosshair_size = false;
 static bool est_sens_controller = false;
 static bool est_sens_mouse = false;
 static bool est_disable_ingame_keyboard = false;
@@ -752,6 +765,18 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			else {
 				H2Config_field_of_view = tempint1;
 				est_field_of_view = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_size =%d", &tempint1) == 1) {
+			if (est_crosshair_size) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 4)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_crosshair_size = tempint1;
+				est_crosshair_size = true;
 			}
 		}
 		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_offset =%f", &tempfloat1) == 1) {

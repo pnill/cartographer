@@ -769,6 +769,7 @@ void __cdecl onGameEngineChange(int a1)
 		H2Tweaks::enableAI_MP(); //TODO: get dedi offset
 		H2Tweaks::applyHitfix(); // "fix hit registration"
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
+		H2Tweaks::setCrosshairSize(H2Config_crosshair_size);
 		//H2Tweaks::applyShaderTweaks(); 
 
 		if (GameState == 3)
