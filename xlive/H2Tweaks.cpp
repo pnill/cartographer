@@ -317,14 +317,15 @@ void H2Tweaks::setCrosshairSize(int size) {
 	int* tempArray;
 
 	switch (size) {
-	case 0:
+
+	case 1:
 		tempArray = disabled;
 		break;
-	case 1:
+	case 2:
 		tempArray = verySmall;
 		break;
-	case 2:
-		 tempArray = small;
+	case 3:
+		tempArray = small;
 		break;
 	case 4:
 		 tempArray = large;

@@ -4410,10 +4410,10 @@ void initGSCustomMenu() {
 
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 0xFFFFFFF0, "Crosshair Settings");
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 0xFFFFFFF1, "Use the buttons below to set a preset crosshair size.");
-	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 1, "Disabled");
-	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 2, "Very Small");
-	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 3, "Small");
-	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 4, "Default");
+	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 1, "Default");
+	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 2, "Disabled");
+	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 3, "Very Small");
+	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 4, "Small");
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 5, "Large");
 	
 

@@ -231,10 +231,10 @@ void SaveH2Config() {
 			fputs("\n\n", fileConfig);
 
 			fputs("# crosshair_size Options (Client):", fileConfig);
-			fputs("\n# 0 - Disables the crosshair from being displayed.", fileConfig);
-			fputs("\n# 1 - Very small", fileConfig);
-			fputs("\n# 2 - Small", fileConfig);
-			fputs("\n# 3 - Default ", fileConfig);
+			fputs("\n# 0 - Default size ", fileConfig);
+			fputs("\n# 1 - Disables the crosshair from being displayed.", fileConfig);
+			fputs("\n# 2 - Very small", fileConfig);
+			fputs("\n# 3 - Small", fileConfig);
 			fputs("\n# 4 - Large", fileConfig);
 			fputs("\n\n", fileConfig);
 
