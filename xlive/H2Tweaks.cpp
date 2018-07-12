@@ -5,6 +5,7 @@
 #include "Hook.h"
 #include "H2OnscreenDebugLog.h"
 #include "GSCustomMenu.h"
+#include "H2MOD.h";
 
 #define _USE_MATH_DEFINES
 #include "math.h"
@@ -315,28 +316,29 @@ void H2Tweaks::setCrosshairSize(int size) {
 	int small[] = { 40, 40, 65, 65, 57, 38, 26, 10, 35, 35, 55, 55, 80, 80, 15, 15, 82, 79, 90, 90, 79, 68, 76, 93, 84, 25, 52, 27};
 	int large[] = { 80, 80, 130, 130, 114, 76, 52, 20, 70, 70, 110, 110, 160, 160, 30, 30, 164, 158, 180, 180, 158, 136, 152, 186, 168, 50, 104, 57 };
 	int* tempArray;
-
-	switch (size) {
-	case 1:
-		tempArray = disabled;
-		break;
-	case 2:
-		tempArray = verySmall;
-		break;
-	case 3:
-		tempArray = small;
-		break;
-	case 4:
-		 tempArray = large;
-		break;
-	default:
-		tempArray = default;
-		break;
+	if (h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE) {
+		switch (size) {
+		case 1:
+			tempArray = disabled;
+			break;
+		case 2:
+			tempArray = verySmall;
+			break;
+		case 3:
+			tempArray = small;
+			break;
+		case 4:
+			tempArray = large;
+			break;
+		default:
+			tempArray = default;
+			break;
+		}
+		for (int i = 0; i < 28; i++) {
+			*(int*)WEAPONS[i] = tempArray[i];
+		}
 	}
 
-	for (int i = 0; i < 28; i++) {
-		*(int*)WEAPONS[i] = tempArray[i];
-	}
 }
 
 void H2Tweaks::applyHitfix() {
