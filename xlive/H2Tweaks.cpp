@@ -317,7 +317,6 @@ void H2Tweaks::setCrosshairSize(int size) {
 	int* tempArray;
 
 	switch (size) {
-
 	case 1:
 		tempArray = disabled;
 		break;
