@@ -1658,7 +1658,7 @@ void GSCustomMenuCall_EditFPS() {
 #pragma endregion
 
 
-const int CMLabelMenuId_EditStaticLoD = 0xFF0000014;
+const int CMLabelMenuId_EditStaticLoD = 0xFF000014;
 #pragma region CM_EditStaticLoD
 
 void __stdcall CMLabelButtons_EditStaticLoD(int a1, int a2)
@@ -1752,7 +1752,7 @@ void GSCustomMenuCall_EditStaticLoD() {
 
 #pragma endregion
 
- const int CMLabelMenuId_EditCrosshairSize = 0xFF0000015;
+ const int CMLabelMenuId_EditCrosshairSize = 0xFF000015;
 #pragma region CM_EditCrosshairSize
 
 void __stdcall CMLabelButtons_EditCrosshairSize(int a1, int a2)
