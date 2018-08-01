@@ -128,6 +128,280 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 	return result;
 }
 
+
+#pragma region SLDL_Hack
+//Taken from another project by Glitchy Scripts.
+#define GA_H2C 0x10
+#define GA_H2D 0x20
+#define GA_FN 0x2
+#define GA_VAR 0x4
+BYTE* GetAddress(DWORD type, DWORD offset) {
+	if (!(type & (GA_FN | GA_VAR) && type & GA_H2C)) {
+		//Oops, bad offset.
+		__debugbreak();
+	}
+	offset += (DWORD)H2BaseAddr;
+	return (BYTE*)offset;
+}
+
+typedef bool(*tfn_c00004a6b)();
+tfn_c00004a6b pfn_c00004a6b;
+bool fn_c00004a6b()
+{
+	// Since fn_c00004567 has been reversed and the anti-hack voided, this function (which appears to be the game's weird anti-hack initializer) is no longer required.
+	bool result = true;//pfn_c00004a6b();
+	return result;
+}
+
+typedef void(__stdcall *tfn_c00030aa6)(void*);
+tfn_c00030aa6 pfn_c00030aa6;
+void __stdcall fn_c00030aa6_game_state_initialize(void* thisptr) //__thiscall
+{
+	//pfn_c00030aa6(thisptr);
+	//return;
+
+	BYTE& var_c0047a728 = *(BYTE*)(GetAddress(GA_VAR | GA_H2C, 0x0047a728));
+	DWORD& var_c0047cd34 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0047cd34));
+	DWORD& var_c0047cd28 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0047cd28));
+	DWORD& var_c0047cd2c = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0047cd2c));
+	DWORD& var_c0047cd3c = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0047cd3c));
+	DWORD& var_c0047cd48 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0047cd48));
+	DWORD& var_c0039dfd8 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0039dfd8));//FN ptr
+
+	DWORD*(__cdecl* fn_c0008bc27)(DWORD*) = (DWORD*(__cdecl*)(DWORD*))(GetAddress(GA_FN | GA_H2C, 0x0008bc27));
+	DWORD*(__cdecl* fn_c0008b703)(int, int) = (DWORD*(__cdecl*)(int, int))(GetAddress(GA_FN | GA_H2C, 0x0008b703));
+	int(__cdecl* fn_c00287ba9)(signed int, int, unsigned int) = (int(__cdecl*)(signed int, int, unsigned int))(GetAddress(GA_FN | GA_H2C, 0x00287ba9));
+	//0x0008b897 is gonna be a challenge to reverse. The rest look simple.
+	char(*fn_c0008b897)() = (char(*)())(GetAddress(GA_FN | GA_H2C, 0x0008b897));
+	unsigned int(__cdecl* fn_c0008bc69)(unsigned int*, BYTE*, int) = (unsigned int(__cdecl*)(unsigned int*, BYTE*, int))(GetAddress(GA_FN | GA_H2C, 0x0008bc69));
+
+	if (!var_c0047a728)
+	{
+		fn_c0008bc27(&var_c0047cd34);
+		var_c0047cd28 = (DWORD)fn_c0008b703(0x3BE000, 0x40000);
+		fn_c00287ba9((signed int)var_c0047cd28, 0, 0x3FE000u);
+		fn_c0008b897();
+		char* v1 = (char*)var_c0047cd28 + var_c0047cd2c;
+		thisptr = (void*)0x12F8;
+		var_c0047cd2c += 0x12F8;
+		fn_c0008bc69((unsigned int*)&var_c0047cd34, (BYTE*)&thisptr, 4);
+		var_c0047cd3c = (int)v1;
+		DWORD* v2 = (DWORD*)(var_c0047cd28 + var_c0047cd2c);
+		var_c0047a728 = 1;
+		thisptr = (void*)4;
+		var_c0047cd2c += 4;
+		fn_c0008bc69((unsigned int*)&var_c0047cd34, (BYTE*)&thisptr, 4);
+		var_c0047cd48 = (int)v2;
+		if (v2)
+			*v2 = (DWORD)&var_c0039dfd8;
+	}
+}
+
+typedef bool(*tfn_c00004567)();
+tfn_c00004567 pfn_c00004567;
+bool fn_c00004567()
+{
+	//bool result = pfn_c00004567();
+	//return result;
+
+	DWORD& var_c0046d820_flag_windowed = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d820));
+	DWORD& var_c0046d824 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d824));
+	DWORD& var_c0046d828_flag_nosound = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d828));
+	DWORD& var_c0046d82c = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d82c));
+	DWORD& var_c0046d830 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d830));
+	DWORD& var_c0046d834_flag_novsync = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d834));
+	DWORD& var_c0046d838 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d838));
+	DWORD& var_c0046d83c = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d83c));
+	DWORD& var_c0046d840 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d840));
+	DWORD& var_c0046d844 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d844));
+	DWORD& var_c0046d848 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d848));
+	DWORD& var_c0046d84c = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d84c));
+	DWORD& var_c0046d850 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d850));
+	DWORD& var_c0046d854 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d854));
+	DWORD& var_c0046d858 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d858));
+	DWORD& var_c0046d85c = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d85c));
+	DWORD& var_c0046d860 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d860));
+	DWORD& var_c0046d864 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d864));
+	DWORD& var_c0046d868 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d868));
+	DWORD& var_c0046d86c = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d86c));
+	DWORD& var_c0046d870 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d870));
+	DWORD& var_c0046d874 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d874));
+	DWORD& var_c0046d878_flag_monitor = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d878));
+	DWORD& var_c0046d87c = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d87c));
+	DWORD& var_c0046d880 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d880));
+	DWORD& var_c0046d884 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d884));
+	DWORD& var_c0046d888 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d888));
+	DWORD& var_c0046d88c = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d88c));
+	DWORD& var_c0046d890_flag_highquality = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0046d890));
+	DWORD& var_c004ae8e0 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x004ae8e0));
+
+	wchar_t* var_c0039bc34_windowed = (wchar_t*)(GetAddress(GA_VAR | GA_H2C, 0x0039bc34));//L"-windowed"
+	wchar_t* var_c0039bbf8_nosound = (wchar_t*)(GetAddress(GA_VAR | GA_H2C, 0x0039bbf8));//L"-nosound"
+	wchar_t* var_c0039bc20_novsync = (wchar_t*)(GetAddress(GA_VAR | GA_H2C, 0x0039bc20));//L"-novsync"
+	wchar_t* var_c0039bc0c_monitor = (wchar_t*)(GetAddress(GA_VAR | GA_H2C, 0x0039bc0c));//L"-monitor:"
+	wchar_t* var_c0039bbdc_highquality = (wchar_t*)(GetAddress(GA_VAR | GA_H2C, 0x0039bbdc));//L"-highquality"
+
+	bool(*fn_c00202f3e)() = (bool(*)())(GetAddress(GA_FN | GA_H2C, 0x00202f3e));
+	HANDLE(*fn_c000388d3)() = (HANDLE(*)())(GetAddress(GA_FN | GA_H2C, 0x000388d3));
+	int(*fn_c0003844e)() = (int(*)())(GetAddress(GA_FN | GA_H2C, 0x0003844e));
+	void*(*fn_c00037ed5_runtime_state_initialize_cseries_initialize)() = (void*(*)())(GetAddress(GA_FN | GA_H2C, 0x00037ed5));
+	errno_t(__cdecl* fn_c00287ab5_wcsncpy_s)(wchar_t*, rsize_t, wchar_t const*, rsize_t) = (errno_t(__cdecl*)(wchar_t*, rsize_t, wchar_t const*, rsize_t))(GetAddress(GA_FN | GA_H2C, 0x00287ab5));
+	void*(__cdecl* fn_c00287ba9_memset)(void*, int, size_t) = (void*(__cdecl*)(void*, int, size_t))(GetAddress(GA_FN | GA_H2C, 0x00287ba9));
+	wchar_t*(__cdecl* fn_c00001014_CommandLineToArgvW)(wchar_t**, int, int*) = (wchar_t*(__cdecl*)(wchar_t**, int, int*))(GetAddress(GA_FN | GA_H2C, 0x00001014));
+	int(__cdecl* fn_c00287a24_wcsicmp)(wchar_t const*, wchar_t const*) = (int(__cdecl*)(wchar_t const*, wchar_t const*))(GetAddress(GA_FN | GA_H2C, 0x00287a24));
+	int(__cdecl* fn_c00287871_wcsnicmp)(wchar_t const*, wchar_t const*, size_t) = (int(__cdecl*)(wchar_t const*, wchar_t const*, size_t))(GetAddress(GA_FN | GA_H2C, 0x00287871));
+	DWORD(__cdecl* fn_c00037e39_init_timing)(int) = (DWORD(__cdecl*)(int))(GetAddress(GA_FN | GA_H2C, 0x00037e39));
+	bool(*fn_c00004994_shell_platform_initialize)() = (bool(*)())(GetAddress(GA_FN | GA_H2C, 0x00004994));
+	int(*fn_c000340d7_real_math_initialize)() = (int(*)())(GetAddress(GA_FN | GA_H2C, 0x000340d7));
+	bool(*fn_c00032ce5_async_initialize)() = (bool(*)())(GetAddress(GA_FN | GA_H2C, 0x00032ce5));
+	void(*fn_c0003285c_global_preferences_initialize)() = (void(*)())(GetAddress(GA_FN | GA_H2C, 0x0003285c));
+	int(*fn_c00031dff_font_initialize)() = (int(*)())(GetAddress(GA_FN | GA_H2C, 0x00031dff));
+	bool(*fn_c00030d58_tag_files_open)() = (bool(*)())(GetAddress(GA_FN | GA_H2C, 0x00030d58));
+	//void(__stdcall* fn_c00030aa6_game_state_initialize)(void*) = (void(__stdcall*)(void*))(GetAddress(GA_FN | GA_H2C, 0x00030aa6));
+	char(*fn_c001a9de6)() = (char(*)())(GetAddress(GA_FN | GA_H2C, 0x001a9de6));
+	char(*fn_c00263359_rasterizer_initialize)() = (char(*)())(GetAddress(GA_FN | GA_H2C, 0x00263359));
+	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(GetAddress(GA_FN | GA_H2C, 0x000285fd));
+	char(*fn_c0002fd23_input_initialize)() = (char(*)())(GetAddress(GA_FN | GA_H2C, 0x0002fd23));
+	HANDLE(*fn_c0002979e_sound_initialize)() = (HANDLE(*)())(GetAddress(GA_FN | GA_H2C, 0x0002979e));
+
+	bool result_c00202f3e = fn_c00202f3e();
+	HANDLE result_c000388d3 = fn_c000388d3();
+	int result_c0003844e = fn_c0003844e();
+	void* result_c00037ed5 = fn_c00037ed5_runtime_state_initialize_cseries_initialize();
+	var_c0046d820_flag_windowed = 0;//L"-windowed"
+	var_c0046d824 = 0;
+	var_c0046d828_flag_nosound = 0;//L"-nosound"
+	var_c0046d82c = 0;
+	var_c0046d830 = 0;
+	var_c0046d834_flag_novsync = 0;//L"-novsync"
+	var_c0046d838 = 0;
+	var_c0046d83c = 0;
+	var_c0046d840 = 0;
+	var_c0046d844 = 0;
+	var_c0046d848 = 0;
+	var_c0046d84c = 0;
+	var_c0046d850 = 0;
+	var_c0046d854 = 0;
+	var_c0046d858 = 0;
+	var_c0046d85c = 0;
+	var_c0046d860 = 0;
+	var_c0046d864 = 0;
+	var_c0046d868 = 0;
+	var_c0046d86c = 0;
+	var_c0046d870 = 0;
+	var_c0046d874 = 0;
+	var_c0046d878_flag_monitor = 0;//L"-monitor:"
+	var_c0046d87c = 0;
+	var_c0046d880 = 0;
+	var_c0046d884 = 0;
+	var_c0046d888 = 0;
+	var_c0046d88c = 0;
+	var_c0046d890_flag_highquality = 0;//L"-highquality"
+
+	wchar_t* cmd_line_args = GetCommandLineW();
+	if (cmd_line_args) {
+		wchar_t cmd_line_args_split[0x2000] = L"";
+		fn_c00287ab5_wcsncpy_s(cmd_line_args_split, 0x2000 * sizeof(wchar_t*), cmd_line_args, 0xFFFFFFFF);
+
+		wchar_t* cmd_line_args_ptr[1024] = { 0 };
+		fn_c00287ba9_memset(cmd_line_args_ptr, 0, 1024 * sizeof(wchar_t**));
+
+		int args_str_length = 0;
+		DWORD arg_c00001014_eax = (DWORD)cmd_line_args_split;
+		DWORD arg_c00001014_1 = (DWORD)cmd_line_args_ptr;
+		DWORD arg_c00001014_3 = (DWORD)&args_str_length;
+		__asm {
+			push arg_c00001014_3
+			push 1024
+			push arg_c00001014_1
+			mov eax, arg_c00001014_eax
+			call fn_c00001014_CommandLineToArgvW
+			add esp, 0xC
+		}
+
+		for (int i = 0; i < args_str_length; i++) {
+			wchar_t* cmd_line_arg = cmd_line_args_ptr[i];
+
+			if (fn_c00287a24_wcsicmp(cmd_line_arg, var_c0039bc34_windowed) == 0) {
+				var_c0046d820_flag_windowed = 1;
+			}
+			else if (fn_c00287a24_wcsicmp(cmd_line_arg, var_c0039bbf8_nosound) == 0) {
+				var_c0046d828_flag_nosound = 1;
+			}
+			else if (fn_c00287a24_wcsicmp(cmd_line_arg, var_c0039bc20_novsync) == 0) {
+				var_c0046d834_flag_novsync = 1;
+			}
+			else if (fn_c00287871_wcsnicmp(cmd_line_arg, var_c0039bc0c_monitor, 9) == 0) {
+				long(__cdecl* fn_c002876f4_wtol)(wchar_t const*) = (long(__cdecl*)(wchar_t const*))(GetAddress(GA_FN | GA_H2C, 0x002876f4));
+				int monitor_num_char = fn_c002876f4_wtol(&cmd_line_arg[9]);
+				if (monitor_num_char < 0)
+					monitor_num_char = 0;
+				if (monitor_num_char > 9)
+					monitor_num_char = 9;
+				var_c0046d878_flag_monitor = monitor_num_char;
+			}
+			else if (fn_c00287a24_wcsicmp(cmd_line_arg, var_c0039bbdc_highquality) == 0) {
+				var_c0046d890_flag_highquality = 1;
+			}
+		}
+	}
+
+	if (var_c0046d828_flag_nosound) {
+		void(*fn_c00028b83)() = (void(*)())(GetAddress(GA_FN | GA_H2C, 0x00028b83));
+		fn_c00028b83();
+	}
+
+	bool result_c00004994 = fn_c00004994_shell_platform_initialize();
+	if (!result_c00004994)
+		return false;
+	if (var_c0046d888)
+		fn_c00037e39_init_timing(var_c0046d888);
+	int result_c000340d7 = fn_c000340d7_real_math_initialize();
+	bool result_c00032ce5 = fn_c00032ce5_async_initialize();
+	fn_c0003285c_global_preferences_initialize();
+	int result_c00031dff = fn_c00031dff_font_initialize();
+	bool result_c00030d58 = fn_c00030d58_tag_files_open();
+	if (!result_c00030d58)
+		return result_c00030d58;
+	fn_c00030aa6_game_state_initialize((void*)var_c004ae8e0);//A Windows Media Center exit corruption is due to this somehow. If using my reversed version the problem goes away.
+	char result_c001a9de6 = fn_c001a9de6();
+	char result_c00263359 = fn_c00263359_rasterizer_initialize();
+	if (!result_c00263359)
+		return result_c00263359;
+
+	struct FakePBuffer {
+		HANDLE id;
+		DWORD dwSize;
+		DWORD magic;
+		LPBYTE pbData;
+	};
+	//extern LONG WINAPI XLivePBufferAllocate(DWORD size, FakePBuffer **pBuffer);
+	//extern DWORD WINAPI XLivePBufferSetByte(FakePBuffer * pBuffer, DWORD offset, BYTE value);
+	LONG(__stdcall* XLivePBufferAllocate)(DWORD size, FakePBuffer **pBuffer) = (LONG(__stdcall*)(DWORD, FakePBuffer**))(GetAddress(GA_FN | GA_H2C, 0x0000e886));
+	DWORD(__stdcall* XLivePBufferSetByte)(FakePBuffer * pBuffer, DWORD offset, BYTE value) = (DWORD(__stdcall*)(FakePBuffer*, DWORD, BYTE))(GetAddress(GA_FN | GA_H2C, 0x0000e880));
+	DWORD& var_c00479e78 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x00479e78));
+	XLivePBufferAllocate(2, (FakePBuffer**)&var_c00479e78);
+	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 0);
+	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 1, 0);
+
+	//SLDLInitialize
+
+	HANDLE result_c000285fd = fn_c000285fd();
+
+	//SLDLOpen
+	//SLDLConsumeRight
+	//SLDLClose
+	// This call would disable the multiplayer buttons in the mainmenu. Likely setup this way from SLDL.
+	//XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 1);
+
+	char result_c0002fd23 = fn_c0002fd23_input_initialize();
+	HANDLE result_c0002979e = fn_c0002979e_sound_initialize();
+
+	return true;
+}
+#pragma endregion
+
+
 void InitH2Tweaks() {
 	postConfig();
 
@@ -216,6 +490,13 @@ void InitH2Tweaks() {
 		//hook the gui popup for when the player is booted.
 		sub_20E1D8 = (int(__cdecl*)(int, int, int, int, int, int))((char*)H2BaseAddr + 0x20E1D8);
 		PatchCall(H2BaseAddr + 0x21754C, &sub_20E1D8_boot);
+
+		//SLDL anti-hack removed and code is now accessible.
+		//Side effect is that the multiplayer buttons at the mainmenu will never be greyed out due to a bad 'key'.
+		pfn_c00004a6b = (tfn_c00004a6b)DetourFunc((BYTE*)H2BaseAddr + 0x00004a6b, (BYTE*)fn_c00004a6b, 5);
+		VirtualProtect(pfn_c00004a6b, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		pfn_c00004567 = (tfn_c00004567)DetourFunc((BYTE*)H2BaseAddr + 0x00004567, (BYTE*)fn_c00004567, 7);
+		VirtualProtect(pfn_c00004567, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 	addDebugText("End Startup Tweaks.");
 }
@@ -482,4 +763,3 @@ void H2Tweaks::FixRanksIcons() {
 		addDebugText("Patching Rank Icon Fix.");
 	}
 }
-
