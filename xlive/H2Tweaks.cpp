@@ -539,7 +539,7 @@ void H2Tweaks::setFOV(int field_of_view_degrees) {
 
 		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0f) / default_radians_FOV;
 		*(float*)(H2BaseAddr + 0x41D984) = calculated_radians_FOV; // First Person
-		*(float*)(H2BaseAddr + 0x413780) = calculated_radians_FOV + 0.24f; // Third Person
+		*(float*)(H2BaseAddr + 0x413780) = calculated_radians_FOV + 0.22f; // Third Person
 	}
 }
 
