@@ -83,12 +83,7 @@ void GunGame::initWeaponLevels() {
 }
 
 void GunGame::resetPlayerLevels() {
-	int playerCounter = 0;
-	do {
-		std::wstring playerName = players->getPlayerName(playerCounter);
-		GunGame::gungamePlayers[playerName] = 0;
-		playerCounter++;
-	} while (playerCounter < players->getPlayerCount());
+	gungamePlayers.clear();
 }
 
 void GunGame::spawnPlayerServer(int playerIndex) {

@@ -1280,20 +1280,6 @@ void H2MOD::ApplyHooks() {
 			server = new TSServer(true);
 			server->setPort(H2Config_base_port + 7);
 			server->startListening();
-			//startup the teamspeak client
-			client = new TSClient(true);
-
-			//only player 1 gets to use voice, guests don't
-			WCHAR strw[32];
-			//needs to live on the heap for the duration of the entire process, cause we reuse ts clients to connect to different ts servers
-			char* strw3 = new char[16];
-			wsprintf(strw, L"%I64x", xFakeXuid[0]);
-			wcstombs(strw3, strw, 32);
-			client->setNickname(strw3);
-
-			client->setServerAddress(clientMachineAddress);
-			client->setServerPort(H2Config_base_port + 7);
-			client->startChatting();
 		}
 	}
 
