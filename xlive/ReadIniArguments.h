@@ -14,10 +14,24 @@
 		continue; \
 	}
 
+#define CHECK_ARG_BOOL(x,y) \
+	if( strstr( str,x ) == str ) \
+	{ \
+		sscanf( str + strlen(x), "%d", &y ); \
+		continue; \
+	}
+
 #define CHECK_ARG_FLOAT(x,y) \
 	if( strstr(str, x) == str) \
 	{ \
 		sscanf(str + strlen(x), "%f", &y ); \
+		continue; \
+	}
+
+#define CHECK_ARG_INT(x,y) \
+	if( strstr(str, x) == str) \
+	{ \
+		sscanf(str + strlen(x), "%i", &y ); \
 		continue; \
 	}
 
