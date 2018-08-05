@@ -266,7 +266,7 @@ enum flags : int
 	unk13,
 	unk14, // maybe UI?
 	unk15, // fuzzer/automated testing? (sapien)
-	unk16,
+	ui_fast_test_no_start, // same as below but doesn't start a game
 	ui_fast_test, // auto navigates the UI selecting the default option
 	unk18, // player controls related (sapien)
 	monitor_count,
