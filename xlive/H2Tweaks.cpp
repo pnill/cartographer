@@ -286,7 +286,7 @@ const static int max_mointor_count = 9;
 bool engine_basic_init()
 {
 	DWORD* flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
-	memset(flags_array, 0x00, sizeof(flags::count)); // should be zero initalized anyways but the game does it
+	memset(flags_array, 0x00, flags::count); // should be zero initalized anyways but the game does it
 
 	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(GetAddress( 0x000285fd));
 
