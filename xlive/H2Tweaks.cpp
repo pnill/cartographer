@@ -281,6 +281,7 @@ bool fn_c00004567()
 			}
 			else if (wcsicmp(cmd_line_arg, L"-nosound") == 0) {
 				flags_array[flags::nosound] = 1;
+				WriteValue(H2BaseAddr + 0x479EDC, 1);
 			}
 			else if (wcsicmp(cmd_line_arg, L"-novsync") == 0) {
 				flags_array[flags::novsync] = 1;
@@ -297,11 +298,6 @@ bool fn_c00004567()
 		TRACE_GAME("Failed to get commandline args. LAST_ERROR: %X", GetLastError());
 	}
 	LocalFree(cmd_line_args);
-
-	if (flags_array[flags::nosound]) {
-		void(*fn_c00028b83)() = (void(*)())(GetAddress(GA_FN | GA_H2C, 0x00028b83));
-		fn_c00028b83();
-	}
 
 	bool result_c00004994 = fn_c00004994_shell_platform_initialize();
 	if (!result_c00004994)
