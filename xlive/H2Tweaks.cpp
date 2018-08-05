@@ -142,7 +142,7 @@ typedef bool(*tfn_c00004a6b)();
 tfn_c00004a6b pfn_c00004a6b;
 bool fn_c00004a6b()
 {
-	// Since fn_c00004567 has been reversed and the anti-hack voided, this function (which appears to be the game's weird anti-hack initializer) is no longer required.
+	// Since engine_basic_init has been reversed and the anti-hack voided, this function (which appears to be the game's weird anti-hack initializer) is no longer required.
 	bool result = true;//pfn_c00004a6b();
 	return result;
 }
@@ -236,6 +236,13 @@ bool input_initialize()
 	return input_initialize_impl();
 }
 
+void sound_initialize()
+{
+	typedef void sound_initialize();
+	auto sound_initialize_impl = GetAddress<sound_initialize>(0x2979E);
+	return sound_initialize_impl();
+}
+
 #pragma endregion
 
 enum flags : int
@@ -276,7 +283,7 @@ enum flags : int
 static_assert(flags::count == 30, "Bad flags count");
 
 const static int max_mointor_count = 9;
-bool fn_c00004567()
+bool engine_basic_init()
 {
 	DWORD* flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
 	memset(flags_array, 0x00, sizeof(flags::count)); // should be zero initalized anyways but the game does it
@@ -326,6 +333,7 @@ bool fn_c00004567()
 		return false;
 	void *var_c004ae8e0 = GetAddress(0x004ae8e0);
 	game_state_initialize(var_c004ae8e0);
+
 	// modifies esi need to check what the caller sets that too
 	//char(*fn_c001a9de6)() = (char(*)())(GetAddress(0x001a9de6));
 	//char result_c001a9de6 = fn_c001a9de6();
@@ -333,6 +341,8 @@ bool fn_c00004567()
 		return false;
 
 	input_initialize();
+	// not needed but bungie did it so there might be some reason
+	sound_initialize();
 
 	struct FakePBuffer {
 		HANDLE id;
@@ -351,6 +361,7 @@ bool fn_c00004567()
 
 	//SLDLInitialize
 
+	// does some weird stuff with sound, might setup volume
 	HANDLE result_c000285fd = fn_c000285fd();
 
 	//SLDLOpen
@@ -457,7 +468,7 @@ void InitH2Tweaks() {
 		//Side effect is that the multiplayer buttons at the mainmenu will never be greyed out due to a bad 'key'.
 		pfn_c00004a6b = (tfn_c00004a6b)DetourFunc((BYTE*)H2BaseAddr + 0x00004a6b, (BYTE*)fn_c00004a6b, 5);
 		VirtualProtect(pfn_c00004a6b, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-		pfn_c00004567 = (tfn_c00004567)DetourFunc((BYTE*)H2BaseAddr + 0x00004567, (BYTE*)fn_c00004567, 7);
+		pfn_c00004567 = (tfn_c00004567)DetourFunc((BYTE*)H2BaseAddr + 0x00004567, (BYTE*)engine_basic_init, 7);
 		VirtualProtect(pfn_c00004567, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 	addDebugText("End Startup Tweaks.");
