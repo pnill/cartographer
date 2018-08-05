@@ -320,6 +320,12 @@ bool engine_basic_init()
 			else if (wcsicmp(cmd_line_arg, L"-highquality") == 0) {
 				flags_array[flags::high_quality] = 1;
 			}
+#ifdef _DEBUG
+			else if (wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
+				int flag_id = _wtol(&cmd_line_arg[10]);
+				flags_array[min(max(0, flag_id), flags::count - 1)] = 1;
+			}
+#endif
 		}
 	} else {
 		TRACE_GAME("Failed to get commandline args. LAST_ERROR: %X", GetLastError());
