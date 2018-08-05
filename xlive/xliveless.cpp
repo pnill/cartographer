@@ -3370,6 +3370,9 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 			}
 			server->startListening();
 
+			DWORD ip = inet_addr(strAddr);
+			clientMachineAddress.S_un.S_addr = ip;
+
 			client->setServerAddress(clientMachineAddress);
 			client->setServerPort(H2Config_base_port + 7);
 			client->startChatting();
