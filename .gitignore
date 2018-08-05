@@ -32,3 +32,4 @@ xliveless.v12.suo
 /xlive/Debug
 /xlive/Release
 *.opensdf
+*.vcxproj.user
