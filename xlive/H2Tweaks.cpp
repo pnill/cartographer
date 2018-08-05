@@ -254,7 +254,7 @@ enum flags : int
 	unk2, // force hardware vertex processing off (sapien)
 	novsync,
 	unk3,
-	unk4,
+	nointro, // disables intro movie
 	unk5,
 	unk6,
 	unk7,
@@ -309,6 +309,9 @@ bool engine_basic_init()
 			}
 			else if (wcsicmp(cmd_line_arg, L"-novsync") == 0) {
 				flags_array[flags::novsync] = 1;
+			}
+			else if (wcsicmp(cmd_line_arg, L"-nointro") == 0) {
+				flags_array[flags::nointro] = 1;
 			}
 			else if (wcsnicmp(cmd_line_arg, L"-monitor:", 9) == 0) {
 				int monitor_id = _wtol(&cmd_line_arg[9]);
