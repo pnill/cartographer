@@ -267,7 +267,7 @@ enum flags : int
 	unk14, // maybe UI?
 	unk15, // fuzzer/automated testing? (sapien)
 	unk16,
-	unk17, // maybe UI?
+	ui_fast_test, // auto navigates the UI selecting the default option
 	unk18, // player controls related (sapien)
 	monitor_count,
 	unk19,
@@ -281,6 +281,20 @@ enum flags : int
 	count
 };
 static_assert(flags::count == 30, "Bad flags count");
+
+int flag_log_count[flags::count];
+BOOL __cdecl is_init_flag_set(flags id)
+{
+	if (flag_log_count[id] < 10)
+	{
+		TRACE_GAME("is_init_flag_set() : flag %i", id);
+		flag_log_count[id]++;
+		if (flag_log_count[id] == 10)
+			TRACE_GAME("is_init_flag_set() : flag %i logged to many times ignoring", id);
+	}
+	DWORD* init_flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
+	return init_flags_array[id] != 0;
+}
 
 const static int max_mointor_count = 9;
 bool engine_basic_init()
@@ -479,6 +493,8 @@ void InitH2Tweaks() {
 		VirtualProtect(pfn_c00004a6b, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 		pfn_c00004567 = (tfn_c00004567)DetourFunc((BYTE*)H2BaseAddr + 0x00004567, (BYTE*)engine_basic_init, 7);
 		VirtualProtect(pfn_c00004567, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		WriteJmpTo(H2BaseAddr + 0x4544, is_init_flag_set);
 	}
 	addDebugText("End Startup Tweaks.");
 }
