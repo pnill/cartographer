@@ -207,8 +207,8 @@ enum flags : int
 	windowed,
 	unk,
 	nosound,
-	unk1,
-	unk2,
+	unk1, // disable vista needed version check? (sapien)
+	unk2, // force hardware vertex processing off (sapien)
 	novsync,
 	unk3,
 	unk4,
@@ -222,17 +222,17 @@ enum flags : int
 	unk12,
 	unk13,
 	unk14,
-	unk15,
+	unk15, // fuzzer/automated testing? (sapien)
 	unk16,
 	unk17,
-	unk18,
+	unk18, // player controls related (sapien)
 	monitor,
 	unk19,
 	unk20,
-	unk21,
+	unk21, // something to do with game time? (sapien)
 	unk22,
 	unk23,
-	high_quality,
+	high_quality, // forced sound reverb ignoring CPU score and disable forcing low graphical settings (sapien)
 	unk24,
 
 	count
@@ -243,7 +243,7 @@ const static int max_mointor_count = 9;
 bool fn_c00004567()
 {
 	DWORD* flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
-	memset(flags_array, 0x00, sizeof(flags::count));
+	memset(flags_array, 0x00, sizeof(flags::count)); // should be zero initalized anyways but the game does it
 
 	DWORD& var_c004ae8e0 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x004ae8e0));
 	bool(*fn_c00202f3e)() = (bool(*)())(GetAddress(GA_FN | GA_H2C, 0x00202f3e));
@@ -296,6 +296,7 @@ bool fn_c00004567()
 	} else {
 		TRACE_GAME("Failed to get commandline args. LAST_ERROR: %X", GetLastError());
 	}
+	LocalFree(cmd_line_args);
 
 	if (flags_array[flags::nosound]) {
 		void(*fn_c00028b83)() = (void(*)())(GetAddress(GA_FN | GA_H2C, 0x00028b83));
@@ -306,7 +307,7 @@ bool fn_c00004567()
 	if (!result_c00004994)
 		return false;
 	if (flags_array[flags::unk22])
-		fn_c00037e39_init_timing(flags_array[flags::unk22]);
+		fn_c00037e39_init_timing(1000 * flags_array[flags::unk22]);
 	int result_c000340d7 = fn_c000340d7_real_math_initialize();
 	bool result_c00032ce5 = fn_c00032ce5_async_initialize();
 	fn_c0003285c_global_preferences_initialize();
