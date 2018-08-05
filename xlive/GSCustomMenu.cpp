@@ -1658,7 +1658,7 @@ void GSCustomMenuCall_EditFPS() {
 #pragma endregion
 
 
-const int CMLabelMenuId_EditStaticLoD = 0xFF0000014;
+const int CMLabelMenuId_EditStaticLoD = 0xFF000014;
 #pragma region CM_EditStaticLoD
 
 void __stdcall CMLabelButtons_EditStaticLoD(int a1, int a2)
@@ -1748,6 +1748,108 @@ int __cdecl CustomMenu_EditStaticLoD(int a1) {
 void GSCustomMenuCall_EditStaticLoD() {
 	int WgitScreenfunctionPtr = (int)(CustomMenu_EditStaticLoD);
 	CallWgit(WgitScreenfunctionPtr);
+}
+
+#pragma endregion
+
+ const int CMLabelMenuId_EditCrosshairSize = 0xFF000015;
+#pragma region CM_EditCrosshairSize
+
+void __stdcall CMLabelButtons_EditCrosshairSize(int a1, int a2)
+ {
+	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+	
+		__int16 button_id = *(WORD*)(a1 + 112);
+	int v3 = sub_211909(a1, 6, 0, 0);
+	if (v3)
+		{
+		sub_21bf85_CMLTD(v3, button_id + 1, CMLabelMenuId_EditCrosshairSize);
+		}
+	}
+
+__declspec(naked) void sub_2111ab_CMLTD_nak_EditCrosshairSize() {//__thiscall
+	__asm {
+		mov eax, [esp + 4h]
+		
+		push ebp
+		 push edi
+		 push esi
+		 push ecx
+		 push ebx
+		
+		push 0xFFFFFFF1//label_id_description
+		 push 0xFFFFFFF0//label_id_title
+		 push CMLabelMenuId_EditCrosshairSize
+		 push eax
+		 push ecx
+		 call sub_2111ab_CMLTD//__stdcall
+		
+		pop ebx
+		 pop ecx
+		 pop esi
+		 pop edi
+		 pop ebp
+		
+		retn 4
+		 }
+	
+}
+
+static bool CMButtonHandler_EditCrosshairSize(int button_id) {
+	H2Config_crosshair_size = button_id;
+	H2Tweaks::setCrosshairSize(H2Config_crosshair_size);
+	return true;
+	
+}
+
+__declspec(naked) void sub_20F790_CM_nak_EditCrosshairSize() {//__thiscall
+	__asm {
+		push ebp
+		 push edi
+		 push esi
+		 push ecx
+		 push ebx
+		
+		push H2Config_crosshair_size//selected button id
+		 push ecx
+		 call sub_20F790_CM//__stdcall
+		
+		pop ebx
+		 pop ecx
+		 pop esi
+		 pop edi
+		 pop ebp
+		
+		retn
+		 }
+	
+}
+
+int CustomMenu_EditCrosshairSize(int);
+
+int(__cdecl *CustomMenuFuncPtrHelp_EditCrosshairSize())(int) {
+	return CustomMenu_EditCrosshairSize;
+	
+}
+
+DWORD * menu_vftable_1_EditCrosshairSize = 0;
+DWORD * menu_vftable_2_EditCrosshairSize= 0;
+
+void CMSetupVFTables_EditCrosshairSize() {
+	CMSetupVFTables(&menu_vftable_1_EditCrosshairSize, &menu_vftable_2_EditCrosshairSize, (DWORD)CMLabelButtons_EditCrosshairSize, (DWORD)sub_2111ab_CMLTD_nak_EditCrosshairSize, (DWORD)CustomMenuFuncPtrHelp_EditCrosshairSize, (DWORD)sub_20F790_CM_nak_EditCrosshairSize, true, 0);
+	
+}
+
+int CustomMenu_EditCrosshairSize(int a1) {
+	return CustomMenu_CallHead(a1, menu_vftable_1_EditCrosshairSize, menu_vftable_2_EditCrosshairSize, (DWORD)&CMButtonHandler_EditCrosshairSize, 5, 272);
+	
+}
+
+void GSCustomMenuCall_EditCrosshairSize() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_EditCrosshairSize);
+	CallWgit(WgitScreenfunctionPtr);
+	
 }
 
 #pragma endregion
@@ -2378,12 +2480,15 @@ static bool CMButtonHandler_EditHudGui(int button_id) {
 		GSCustomMenuCall_EditCrosshair();
 	}
 	else if (button_id == 2) {
-		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF4, !(H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat));
+		GSCustomMenuCall_EditCrosshairSize();
 	}
 	else if (button_id == 3) {
-		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF2, !(blind_hud = !blind_hud));
+		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF4, !(H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat));
 	}
 	else if (button_id == 4) {
+		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF2, !(blind_hud = !blind_hud));
+	}
+	else if (button_id == 5) {
 		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF2, !(blind_fp = !blind_fp));
 	}
 	return false;
@@ -2425,10 +2530,10 @@ void CMSetupVFTables_EditHudGui() {
 }
 
 int __cdecl CustomMenu_EditHudGui(int a1) {
-	loadLabelToggle_EditHudGui(3, 0xFFFFFFF4, !H2Config_hide_ingame_chat);
-	loadLabelToggle_EditHudGui(4, 0xFFFFFFF2, !blind_hud);
-	loadLabelToggle_EditHudGui(5, 0xFFFFFFF2, !blind_fp);
-	return CustomMenu_CallHead(a1, menu_vftable_1_EditHudGui, menu_vftable_2_EditHudGui, (DWORD)&CMButtonHandler_EditHudGui, 5, 272);
+	loadLabelToggle_EditHudGui(4, 0xFFFFFFF4, !H2Config_hide_ingame_chat);
+	loadLabelToggle_EditHudGui(5, 0xFFFFFFF2, !blind_hud);
+	loadLabelToggle_EditHudGui(6, 0xFFFFFFF2, !blind_fp);
+	return CustomMenu_CallHead(a1, menu_vftable_1_EditHudGui, menu_vftable_2_EditHudGui, (DWORD)&CMButtonHandler_EditHudGui, 6, 272);
 }
 
 void GSCustomMenuCall_EditHudGui() {
@@ -4303,6 +4408,15 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 6, "L5 - Very High");
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 7, "L6 - Cinematic");
 
+	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 0xFFFFFFF0, "Crosshair Settings");
+	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 0xFFFFFFF1, "Use the buttons below to set a preset crosshair size.");
+	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 1, "Default");
+	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 2, "Disabled");
+	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 3, "Very Small");
+	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 4, "Small");
+	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 5, "Large");
+	
+
 
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF0, "Update");
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF1, "Update Project Cartographer.");
@@ -4337,9 +4451,10 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF5, "Hide %s");
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 1, "> Field of View (FOV)");
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 2, "> Crosshair Offset");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0003, "Ingame Chat");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0004, "HUD");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0005, "First Person Model");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 3, "> Crosshair Size");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0004, "Ingame Chat");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0005, "HUD");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0006, "First Person Model");
 
 
 	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFFFFF0, "Toggle Skulls");
@@ -4513,6 +4628,8 @@ void initGSCustomMenu() {
 	CMSetupVFTables_EditFPS();
 
 	CMSetupVFTables_EditStaticLoD();
+
+	CMSetupVFTables_EditCrosshairSize();
 
 	CMSetupVFTables_Update();
 

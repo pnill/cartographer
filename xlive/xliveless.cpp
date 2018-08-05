@@ -4648,9 +4648,6 @@ DWORD WINAPI XLivePBufferSetByte (FakePBuffer * pBuffer, DWORD offset, BYTE valu
 
 	pBuffer->pbData[offset] = value;
 
-	if (offset == 0)
-		pBuffer->pbData[offset] = 0; //no need of MF.dll anymore
-
 	return 0;
 }
 

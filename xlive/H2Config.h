@@ -36,6 +36,7 @@ extern int H2Config_fps_limit;
 extern int H2Config_static_lod_state;
 extern int H2Config_field_of_view;
 extern float H2Config_crosshair_offset;
+extern int H2Config_crosshair_size;
 extern int H2Config_sens_controller;
 extern int H2Config_sens_mouse;
 extern bool H2Config_disable_ingame_keyboard;
