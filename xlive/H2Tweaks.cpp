@@ -132,18 +132,10 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 
 
 #pragma region SLDL_Hack
-//Taken from another project by Glitchy Scripts.
-#define GA_H2C 0x10
-#define GA_H2D 0x20
-#define GA_FN 0x2
-#define GA_VAR 0x4
-BYTE* GetAddress(DWORD type, DWORD offset) {
-	if (!(type & (GA_FN | GA_VAR) && type & GA_H2C)) {
-		//Oops, bad offset.
-		__debugbreak();
-	}
-	offset += (DWORD)H2BaseAddr;
-	return (BYTE*)offset;
+template <typename T = void>
+static inline T *GetAddress(DWORD client, DWORD server = 0)
+{
+	return reinterpret_cast<T*>(H2BaseAddr + (H2IsDediServer ? server : client));
 }
 
 typedef bool(*tfn_c00004a6b)();
@@ -162,38 +154,38 @@ void __stdcall fn_c00030aa6_game_state_initialize(void* thisptr) //__thiscall
 	//pfn_c00030aa6(thisptr);
 	//return;
 
-	BYTE& var_c0047a728 = *(BYTE*)(GetAddress(GA_VAR | GA_H2C, 0x0047a728));
-	DWORD& var_c0047cd34 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0047cd34));
-	DWORD& var_c0047cd28 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0047cd28));
-	DWORD& var_c0047cd2c = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0047cd2c));
-	DWORD& var_c0047cd3c = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0047cd3c));
-	DWORD& var_c0047cd48 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0047cd48));
-	DWORD& var_c0039dfd8 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x0039dfd8));//FN ptr
+	BYTE *var_c0047a728 = GetAddress<BYTE>(0x0047a728);
+	DWORD *var_c0047cd34 = GetAddress<DWORD>(0x0047cd34);
+	DWORD *var_c0047cd28 = GetAddress<DWORD>(0x0047cd28);
+	DWORD *var_c0047cd2c = GetAddress<DWORD>(0x0047cd2c);
+	DWORD *var_c0047cd3c = GetAddress<DWORD>(0x0047cd3c);
+	DWORD *var_c0047cd48 = GetAddress<DWORD>(0x0047cd48);
+	DWORD *var_c0039dfd8 = GetAddress<DWORD>(0x0039dfd8);//FN ptr
 
-	DWORD*(__cdecl* fn_c0008bc27)(DWORD*) = (DWORD*(__cdecl*)(DWORD*))(GetAddress(GA_FN | GA_H2C, 0x0008bc27));
-	DWORD*(__cdecl* fn_c0008b703)(int, int) = (DWORD*(__cdecl*)(int, int))(GetAddress(GA_FN | GA_H2C, 0x0008b703));
-	int(__cdecl* fn_c00287ba9)(signed int, int, unsigned int) = (int(__cdecl*)(signed int, int, unsigned int))(GetAddress(GA_FN | GA_H2C, 0x00287ba9));
+	DWORD*(__cdecl* fn_c0008bc27)(DWORD*) = (DWORD*(__cdecl*)(DWORD*))(GetAddress(0x0008bc27));
+	DWORD*(__cdecl* fn_c0008b703)(int, int) = (DWORD*(__cdecl*)(int, int))(GetAddress(0x0008b703));
+	int(__cdecl* fn_c00287ba9)(signed int, int, unsigned int) = (int(__cdecl*)(signed int, int, unsigned int))(GetAddress(0x00287ba9));
 	//0x0008b897 is gonna be a challenge to reverse. The rest look simple.
-	char(*fn_c0008b897)() = (char(*)())(GetAddress(GA_FN | GA_H2C, 0x0008b897));
-	unsigned int(__cdecl* fn_c0008bc69)(unsigned int*, BYTE*, int) = (unsigned int(__cdecl*)(unsigned int*, BYTE*, int))(GetAddress(GA_FN | GA_H2C, 0x0008bc69));
+	char(*fn_c0008b897)() = (char(*)())(GetAddress( 0x0008b897));
+	unsigned int(__cdecl* fn_c0008bc69)(unsigned int*, BYTE*, int) = (unsigned int(__cdecl*)(unsigned int*, BYTE*, int))(GetAddress(0x0008bc69));
 
 	if (!var_c0047a728)
 	{
-		fn_c0008bc27(&var_c0047cd34);
-		var_c0047cd28 = (DWORD)fn_c0008b703(0x3BE000, 0x40000);
+		fn_c0008bc27(var_c0047cd34);
+		*var_c0047cd28 = (DWORD)fn_c0008b703(0x3BE000, 0x40000);
 		fn_c00287ba9((signed int)var_c0047cd28, 0, 0x3FE000u);
 		fn_c0008b897();
-		char* v1 = (char*)var_c0047cd28 + var_c0047cd2c;
+		char* v1 = (char*)var_c0047cd28 + *var_c0047cd2c;
 		thisptr = (void*)0x12F8;
 		var_c0047cd2c += 0x12F8;
 		fn_c0008bc69((unsigned int*)&var_c0047cd34, (BYTE*)&thisptr, 4);
-		var_c0047cd3c = (int)v1;
-		DWORD* v2 = (DWORD*)(var_c0047cd28 + var_c0047cd2c);
-		var_c0047a728 = 1;
+		*var_c0047cd3c = (int)v1;
+		DWORD* v2 = (DWORD*)(var_c0047cd28 + *var_c0047cd2c);
+		*var_c0047a728 = 1;
 		thisptr = (void*)4;
 		var_c0047cd2c += 4;
 		fn_c0008bc69((unsigned int*)&var_c0047cd34, (BYTE*)&thisptr, 4);
-		var_c0047cd48 = (int)v2;
+		*var_c0047cd48 = (int)v2;
 		if (v2)
 			*v2 = (DWORD)&var_c0039dfd8;
 	}
@@ -201,6 +193,13 @@ void __stdcall fn_c00030aa6_game_state_initialize(void* thisptr) //__thiscall
 
 typedef bool(*tfn_c00004567)();
 tfn_c00004567 pfn_c00004567;
+
+void real_math_initialize()
+{
+	typedef int (real_math_initialize)();
+	auto real_math_initialize_impl = GetAddress<real_math_initialize>(0x000340d7);
+	real_math_initialize_impl();
+}
 
 enum flags : int
 {
@@ -245,25 +244,24 @@ bool fn_c00004567()
 	DWORD* flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
 	memset(flags_array, 0x00, sizeof(flags::count)); // should be zero initalized anyways but the game does it
 
-	DWORD& var_c004ae8e0 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x004ae8e0));
-	bool(*fn_c00202f3e)() = (bool(*)())(GetAddress(GA_FN | GA_H2C, 0x00202f3e));
-	HANDLE(*fn_c000388d3)() = (HANDLE(*)())(GetAddress(GA_FN | GA_H2C, 0x000388d3));
-	int(*fn_c0003844e)() = (int(*)())(GetAddress(GA_FN | GA_H2C, 0x0003844e));
-	void*(*fn_c00037ed5_runtime_state_initialize_cseries_initialize)() = (void*(*)())(GetAddress(GA_FN | GA_H2C, 0x00037ed5));
-	wchar_t*(__cdecl* fn_c00001014_CommandLineToArgvW)(wchar_t**, int, int*) = (wchar_t*(__cdecl*)(wchar_t**, int, int*))(GetAddress(GA_FN | GA_H2C, 0x00001014));
-	DWORD(__cdecl* fn_c00037e39_init_timing)(int) = (DWORD(__cdecl*)(int))(GetAddress(GA_FN | GA_H2C, 0x00037e39));
-	bool(*fn_c00004994_shell_platform_initialize)() = (bool(*)())(GetAddress(GA_FN | GA_H2C, 0x00004994));
-	int(*fn_c000340d7_real_math_initialize)() = (int(*)())(GetAddress(GA_FN | GA_H2C, 0x000340d7));
-	bool(*fn_c00032ce5_async_initialize)() = (bool(*)())(GetAddress(GA_FN | GA_H2C, 0x00032ce5));
-	void(*fn_c0003285c_global_preferences_initialize)() = (void(*)())(GetAddress(GA_FN | GA_H2C, 0x0003285c));
-	int(*fn_c00031dff_font_initialize)() = (int(*)())(GetAddress(GA_FN | GA_H2C, 0x00031dff));
-	bool(*fn_c00030d58_tag_files_open)() = (bool(*)())(GetAddress(GA_FN | GA_H2C, 0x00030d58));
-	//void(__stdcall* fn_c00030aa6_game_state_initialize)(void*) = (void(__stdcall*)(void*))(GetAddress(GA_FN | GA_H2C, 0x00030aa6));
-	char(*fn_c001a9de6)() = (char(*)())(GetAddress(GA_FN | GA_H2C, 0x001a9de6));
-	char(*fn_c00263359_rasterizer_initialize)() = (char(*)())(GetAddress(GA_FN | GA_H2C, 0x00263359));
-	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(GetAddress(GA_FN | GA_H2C, 0x000285fd));
-	char(*fn_c0002fd23_input_initialize)() = (char(*)())(GetAddress(GA_FN | GA_H2C, 0x0002fd23));
-	HANDLE(*fn_c0002979e_sound_initialize)() = (HANDLE(*)())(GetAddress(GA_FN | GA_H2C, 0x0002979e));
+	DWORD& var_c004ae8e0 = *(DWORD*)(GetAddress(0x004ae8e0));
+	bool(*fn_c00202f3e)() = (bool(*)())(GetAddress( 0x00202f3e));
+	HANDLE(*fn_c000388d3)() = (HANDLE(*)())(GetAddress( 0x000388d3));
+	int(*fn_c0003844e)() = (int(*)())(GetAddress( 0x0003844e));
+	void*(*fn_c00037ed5_runtime_state_initialize_cseries_initialize)() = (void*(*)())(GetAddress( 0x00037ed5));
+	wchar_t*(__cdecl* fn_c00001014_CommandLineToArgvW)(wchar_t**, int, int*) = (wchar_t*(__cdecl*)(wchar_t**, int, int*))(GetAddress( 0x00001014));
+	DWORD(__cdecl* fn_c00037e39_init_timing)(int) = (DWORD(__cdecl*)(int))(GetAddress( 0x00037e39));
+	bool(*fn_c00004994_shell_platform_initialize)() = (bool(*)())(GetAddress( 0x00004994));
+	bool(*fn_c00032ce5_async_initialize)() = (bool(*)())(GetAddress( 0x00032ce5));
+	void(*fn_c0003285c_global_preferences_initialize)() = (void(*)())(GetAddress( 0x0003285c));
+	int(*fn_c00031dff_font_initialize)() = (int(*)())(GetAddress( 0x00031dff));
+	bool(*fn_c00030d58_tag_files_open)() = (bool(*)())(GetAddress( 0x00030d58));
+	//void(__stdcall* fn_c00030aa6_game_state_initialize)(void*) = (void(__stdcall*)(void*))(GetAddress( 0x00030aa6));
+	char(*fn_c001a9de6)() = (char(*)())(GetAddress( 0x001a9de6));
+	char(*fn_c00263359_rasterizer_initialize)() = (char(*)())(GetAddress( 0x00263359));
+	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(GetAddress( 0x000285fd));
+	char(*fn_c0002fd23_input_initialize)() = (char(*)())(GetAddress( 0x0002fd23));
+	HANDLE(*fn_c0002979e_sound_initialize)() = (HANDLE(*)())(GetAddress( 0x0002979e));
 
 	bool result_c00202f3e = fn_c00202f3e();
 	HANDLE result_c000388d3 = fn_c000388d3();
@@ -301,13 +299,12 @@ bool fn_c00004567()
 
 	if (flags_array[flags::unk22])
 		fn_c00037e39_init_timing(1000 * flags_array[flags::unk22]);
-	int result_c000340d7 = fn_c000340d7_real_math_initialize();
-	bool result_c00032ce5 = fn_c00032ce5_async_initialize();
+	real_math_initialize();
+	fn_c00032ce5_async_initialize();
 	fn_c0003285c_global_preferences_initialize();
-	int result_c00031dff = fn_c00031dff_font_initialize();
-	bool result_c00030d58 = fn_c00030d58_tag_files_open();
-	if (!result_c00030d58)
-		return result_c00030d58;
+	fn_c00031dff_font_initialize();
+	if (!fn_c00030d58_tag_files_open())
+		return false;
 	fn_c00030aa6_game_state_initialize((void*)var_c004ae8e0);//A Windows Media Center exit corruption is due to this somehow. If using my reversed version the problem goes away.
 	char result_c001a9de6 = fn_c001a9de6();
 	char result_c00263359 = fn_c00263359_rasterizer_initialize();
@@ -322,9 +319,9 @@ bool fn_c00004567()
 	};
 	//extern LONG WINAPI XLivePBufferAllocate(DWORD size, FakePBuffer **pBuffer);
 	//extern DWORD WINAPI XLivePBufferSetByte(FakePBuffer * pBuffer, DWORD offset, BYTE value);
-	LONG(__stdcall* XLivePBufferAllocate)(DWORD size, FakePBuffer **pBuffer) = (LONG(__stdcall*)(DWORD, FakePBuffer**))(GetAddress(GA_FN | GA_H2C, 0x0000e886));
-	DWORD(__stdcall* XLivePBufferSetByte)(FakePBuffer * pBuffer, DWORD offset, BYTE value) = (DWORD(__stdcall*)(FakePBuffer*, DWORD, BYTE))(GetAddress(GA_FN | GA_H2C, 0x0000e880));
-	DWORD& var_c00479e78 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x00479e78));
+	LONG(__stdcall* XLivePBufferAllocate)(DWORD size, FakePBuffer **pBuffer) = (LONG(__stdcall*)(DWORD, FakePBuffer**))(GetAddress( 0x0000e886));
+	DWORD(__stdcall* XLivePBufferSetByte)(FakePBuffer * pBuffer, DWORD offset, BYTE value) = (DWORD(__stdcall*)(FakePBuffer*, DWORD, BYTE))(GetAddress( 0x0000e880));
+	DWORD& var_c00479e78 = *(DWORD*)(GetAddress(0x00479e78));
 	XLivePBufferAllocate(2, (FakePBuffer**)&var_c00479e78);
 	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 0);
 	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 1, 0);
