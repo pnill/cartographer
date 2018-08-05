@@ -147,59 +147,96 @@ bool fn_c00004a6b()
 	return result;
 }
 
-typedef void(__stdcall *tfn_c00030aa6)(void*);
-tfn_c00030aa6 pfn_c00030aa6;
-void __stdcall fn_c00030aa6_game_state_initialize(void* thisptr) //__thiscall
-{
-	//pfn_c00030aa6(thisptr);
-	//return;
-
-	BYTE *var_c0047a728 = GetAddress<BYTE>(0x0047a728);
-	DWORD *var_c0047cd34 = GetAddress<DWORD>(0x0047cd34);
-	DWORD *var_c0047cd28 = GetAddress<DWORD>(0x0047cd28);
-	DWORD *var_c0047cd2c = GetAddress<DWORD>(0x0047cd2c);
-	DWORD *var_c0047cd3c = GetAddress<DWORD>(0x0047cd3c);
-	DWORD *var_c0047cd48 = GetAddress<DWORD>(0x0047cd48);
-	DWORD *var_c0039dfd8 = GetAddress<DWORD>(0x0039dfd8);//FN ptr
-
-	DWORD*(__cdecl* fn_c0008bc27)(DWORD*) = (DWORD*(__cdecl*)(DWORD*))(GetAddress(0x0008bc27));
-	DWORD*(__cdecl* fn_c0008b703)(int, int) = (DWORD*(__cdecl*)(int, int))(GetAddress(0x0008b703));
-	int(__cdecl* fn_c00287ba9)(signed int, int, unsigned int) = (int(__cdecl*)(signed int, int, unsigned int))(GetAddress(0x00287ba9));
-	//0x0008b897 is gonna be a challenge to reverse. The rest look simple.
-	char(*fn_c0008b897)() = (char(*)())(GetAddress( 0x0008b897));
-	unsigned int(__cdecl* fn_c0008bc69)(unsigned int*, BYTE*, int) = (unsigned int(__cdecl*)(unsigned int*, BYTE*, int))(GetAddress(0x0008bc69));
-
-	if (!var_c0047a728)
-	{
-		fn_c0008bc27(var_c0047cd34);
-		*var_c0047cd28 = (DWORD)fn_c0008b703(0x3BE000, 0x40000);
-		fn_c00287ba9((signed int)var_c0047cd28, 0, 0x3FE000u);
-		fn_c0008b897();
-		char* v1 = (char*)var_c0047cd28 + *var_c0047cd2c;
-		thisptr = (void*)0x12F8;
-		var_c0047cd2c += 0x12F8;
-		fn_c0008bc69((unsigned int*)&var_c0047cd34, (BYTE*)&thisptr, 4);
-		*var_c0047cd3c = (int)v1;
-		DWORD* v2 = (DWORD*)(var_c0047cd28 + *var_c0047cd2c);
-		*var_c0047a728 = 1;
-		thisptr = (void*)4;
-		var_c0047cd2c += 4;
-		fn_c0008bc69((unsigned int*)&var_c0047cd34, (BYTE*)&thisptr, 4);
-		*var_c0047cd48 = (int)v2;
-		if (v2)
-			*v2 = (DWORD)&var_c0039dfd8;
-	}
-}
-
 typedef bool(*tfn_c00004567)();
 tfn_c00004567 pfn_c00004567;
 
+#pragma region func_wrappers
 void real_math_initialize()
 {
 	typedef int (real_math_initialize)();
 	auto real_math_initialize_impl = GetAddress<real_math_initialize>(0x000340d7);
 	real_math_initialize_impl();
 }
+
+void async_initialize()
+{
+	typedef int (async_initialize)();
+	auto async_initialize_impl = GetAddress<async_initialize>(0x00032ce5);
+	async_initialize_impl();
+}
+
+bool init_gfwl_gamestore()
+{
+	typedef char (init_gfwl_gamestore)();
+	auto init_gfwl_gamestore_impl = GetAddress<init_gfwl_gamestore>(0x00202f3e);
+	return init_gfwl_gamestore_impl();
+}
+// not sure if this is all it does
+HANDLE init_data_checksum_info()
+{
+	typedef HANDLE init_data_checksum_info();
+	auto init_data_checksum_info_impl = GetAddress<init_data_checksum_info>(0x000388d3);
+	return init_data_checksum_info_impl();
+}
+
+// returns memory
+void *runtime_state_init()
+{
+	typedef void *runtime_state_init();
+	auto runtime_state_init_impl = GetAddress<runtime_state_init>(0x00037ed5);
+	return runtime_state_init_impl();
+}
+
+void global_preferences_initialize()
+{
+	typedef void global_preferences_initialize();
+	auto global_preferences_initialize_impl = GetAddress<global_preferences_initialize>(0x325FD);
+	global_preferences_initialize_impl();
+}
+
+void font_initialize()
+{
+	typedef void __cdecl font_initialize();
+	auto font_initialize_impl = GetAddress<font_initialize>(0x00031dff);
+	font_initialize_impl();
+}
+
+bool tag_files_open()
+{
+	typedef bool tag_files_open();
+	auto tag_files_open_impl = GetAddress<tag_files_open>(0x30D58);
+	return tag_files_open_impl();
+}
+
+void init_timing(int a1)
+{
+	typedef DWORD (__cdecl init_timing)(int a1);
+	auto init_timing_impl = GetAddress<init_timing>(0x37E39);
+	init_timing_impl(a1);
+}
+
+void game_state_initialize(void *data)
+{
+	typedef void __fastcall game_state_initialize(void *data);
+	auto game_state_initialize_impl = GetAddress<game_state_initialize>(0x00030aa6);
+	game_state_initialize_impl(data);
+}
+
+bool rasterizer_initialize()
+{
+	typedef char rasterizer_initialize();
+	auto rasterizer_initialize_impl = GetAddress<rasterizer_initialize>(0x00263359);
+	return rasterizer_initialize_impl();
+}
+
+bool input_initialize()
+{
+	typedef char input_initialize();
+	auto input_initialize_impl = GetAddress<input_initialize>(0x2FD23);
+	return input_initialize_impl();
+}
+
+#pragma endregion
 
 enum flags : int
 {
@@ -244,29 +281,11 @@ bool fn_c00004567()
 	DWORD* flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
 	memset(flags_array, 0x00, sizeof(flags::count)); // should be zero initalized anyways but the game does it
 
-	DWORD& var_c004ae8e0 = *(DWORD*)(GetAddress(0x004ae8e0));
-	bool(*fn_c00202f3e)() = (bool(*)())(GetAddress( 0x00202f3e));
-	HANDLE(*fn_c000388d3)() = (HANDLE(*)())(GetAddress( 0x000388d3));
-	int(*fn_c0003844e)() = (int(*)())(GetAddress( 0x0003844e));
-	void*(*fn_c00037ed5_runtime_state_initialize_cseries_initialize)() = (void*(*)())(GetAddress( 0x00037ed5));
-	wchar_t*(__cdecl* fn_c00001014_CommandLineToArgvW)(wchar_t**, int, int*) = (wchar_t*(__cdecl*)(wchar_t**, int, int*))(GetAddress( 0x00001014));
-	DWORD(__cdecl* fn_c00037e39_init_timing)(int) = (DWORD(__cdecl*)(int))(GetAddress( 0x00037e39));
-	bool(*fn_c00004994_shell_platform_initialize)() = (bool(*)())(GetAddress( 0x00004994));
-	bool(*fn_c00032ce5_async_initialize)() = (bool(*)())(GetAddress( 0x00032ce5));
-	void(*fn_c0003285c_global_preferences_initialize)() = (void(*)())(GetAddress( 0x0003285c));
-	int(*fn_c00031dff_font_initialize)() = (int(*)())(GetAddress( 0x00031dff));
-	bool(*fn_c00030d58_tag_files_open)() = (bool(*)())(GetAddress( 0x00030d58));
-	//void(__stdcall* fn_c00030aa6_game_state_initialize)(void*) = (void(__stdcall*)(void*))(GetAddress( 0x00030aa6));
-	char(*fn_c001a9de6)() = (char(*)())(GetAddress( 0x001a9de6));
-	char(*fn_c00263359_rasterizer_initialize)() = (char(*)())(GetAddress( 0x00263359));
 	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(GetAddress( 0x000285fd));
-	char(*fn_c0002fd23_input_initialize)() = (char(*)())(GetAddress( 0x0002fd23));
-	HANDLE(*fn_c0002979e_sound_initialize)() = (HANDLE(*)())(GetAddress( 0x0002979e));
 
-	bool result_c00202f3e = fn_c00202f3e();
-	HANDLE result_c000388d3 = fn_c000388d3();
-	int result_c0003844e = fn_c0003844e();
-	void* result_c00037ed5 = fn_c00037ed5_runtime_state_initialize_cseries_initialize();
+	init_gfwl_gamestore();
+	init_data_checksum_info();
+	runtime_state_init();
 
 	int arg_count;
 	wchar_t **cmd_line_args = CommandLineToArgvW(GetCommandLineW(), &arg_count);
@@ -298,18 +317,22 @@ bool fn_c00004567()
 	LocalFree(cmd_line_args);
 
 	if (flags_array[flags::unk22])
-		fn_c00037e39_init_timing(1000 * flags_array[flags::unk22]);
+		init_timing(1000 * flags_array[flags::unk22]);
 	real_math_initialize();
-	fn_c00032ce5_async_initialize();
-	fn_c0003285c_global_preferences_initialize();
-	fn_c00031dff_font_initialize();
-	if (!fn_c00030d58_tag_files_open())
+	async_initialize();
+	global_preferences_initialize();
+	font_initialize();
+	if (!tag_files_open())
 		return false;
-	fn_c00030aa6_game_state_initialize((void*)var_c004ae8e0);//A Windows Media Center exit corruption is due to this somehow. If using my reversed version the problem goes away.
-	char result_c001a9de6 = fn_c001a9de6();
-	char result_c00263359 = fn_c00263359_rasterizer_initialize();
-	if (!result_c00263359)
-		return result_c00263359;
+	void *var_c004ae8e0 = GetAddress(0x004ae8e0);
+	game_state_initialize(var_c004ae8e0);
+	// modifies esi need to check what the caller sets that too
+	//char(*fn_c001a9de6)() = (char(*)())(GetAddress(0x001a9de6));
+	//char result_c001a9de6 = fn_c001a9de6();
+	if (!rasterizer_initialize())
+		return false;
+
+	input_initialize();
 
 	struct FakePBuffer {
 		HANDLE id;
@@ -321,7 +344,7 @@ bool fn_c00004567()
 	//extern DWORD WINAPI XLivePBufferSetByte(FakePBuffer * pBuffer, DWORD offset, BYTE value);
 	LONG(__stdcall* XLivePBufferAllocate)(DWORD size, FakePBuffer **pBuffer) = (LONG(__stdcall*)(DWORD, FakePBuffer**))(GetAddress( 0x0000e886));
 	DWORD(__stdcall* XLivePBufferSetByte)(FakePBuffer * pBuffer, DWORD offset, BYTE value) = (DWORD(__stdcall*)(FakePBuffer*, DWORD, BYTE))(GetAddress( 0x0000e880));
-	DWORD& var_c00479e78 = *(DWORD*)(GetAddress(0x00479e78));
+	DWORD* var_c00479e78 = GetAddress<DWORD>(0x00479e78);
 	XLivePBufferAllocate(2, (FakePBuffer**)&var_c00479e78);
 	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 0);
 	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 1, 0);
@@ -335,9 +358,6 @@ bool fn_c00004567()
 	//SLDLClose
 	// This call would disable the multiplayer buttons in the mainmenu. Likely setup this way from SLDL.
 	//XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 1);
-
-	char result_c0002fd23 = fn_c0002fd23_input_initialize();
-	HANDLE result_c0002979e = fn_c0002979e_sound_initialize();
 
 	return true;
 }
