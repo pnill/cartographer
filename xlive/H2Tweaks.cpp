@@ -1,3 +1,5 @@
+#include "stdafx.h"
+#include <ShellAPI.h>
 #include "H2Tweaks.h"
 #include "H2Startup.h"
 #include "H2Config.h"
@@ -237,10 +239,10 @@ enum flags : int
 };
 static_assert(flags::count == 30, "Bad flags count");
 
+const static int max_mointor_count = 9;
 bool fn_c00004567()
 {
-	typedef DWORD(*t_flags_array)[flags::count];
-	auto flags_array = reinterpret_cast<t_flags_array>(H2BaseAddr + 0x0046d820);
+	DWORD* flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
 	memset(flags_array, 0x00, sizeof(flags::count));
 
 	DWORD& var_c004ae8e0 = *(DWORD*)(GetAddress(GA_VAR | GA_H2C, 0x004ae8e0));
@@ -268,55 +270,34 @@ bool fn_c00004567()
 	int result_c0003844e = fn_c0003844e();
 	void* result_c00037ed5 = fn_c00037ed5_runtime_state_initialize_cseries_initialize();
 
-	wchar_t* cmd_line_args = GetCommandLineW();
-	if (cmd_line_args) {
-		wchar_t cmd_line_args_split[0x8000] = L"";
-		wcsncpy_s(cmd_line_args_split, 0x8000, cmd_line_args, 0xFFFFFFFF);
-
-		wchar_t* cmd_line_args_ptr[1024] = { 0 };
-		memset(cmd_line_args_ptr, 0, 1024 * sizeof(wchar_t*));
-
-		int args_str_length = 0;
-		DWORD arg_c00001014_eax = (DWORD)cmd_line_args_split;
-		DWORD arg_c00001014_1 = (DWORD)cmd_line_args_ptr;
-		DWORD arg_c00001014_3 = (DWORD)&args_str_length;
-		__asm {
-			push arg_c00001014_3
-			push 1024
-			push arg_c00001014_1
-			mov eax, arg_c00001014_eax
-			call fn_c00001014_CommandLineToArgvW
-			add esp, 0xC
-		}
-
-		for (int i = 0; i < args_str_length; i++) {
-			wchar_t* cmd_line_arg = cmd_line_args_ptr[i];
+	int arg_count;
+	wchar_t **cmd_line_args = CommandLineToArgvW(GetCommandLineW(), &arg_count);
+	if (cmd_line_args && arg_count > 1) {
+		for (int i = 1; i < arg_count; i++) {
+			wchar_t* cmd_line_arg = cmd_line_args[i];
 
 			if (wcsicmp(cmd_line_arg, L"-windowed") == 0) {
-				*flags_array[flags::windowed] = 1;
+				flags_array[flags::windowed] = 1;
 			}
 			else if (wcsicmp(cmd_line_arg, L"-nosound") == 0) {
-				*flags_array[flags::nosound] = 1;
+				flags_array[flags::nosound] = 1;
 			}
 			else if (wcsicmp(cmd_line_arg, L"-novsync") == 0) {
-				*flags_array[flags::novsync] = 1;
+				flags_array[flags::novsync] = 1;
 			}
 			else if (wcsnicmp(cmd_line_arg, L"-monitor:", 9) == 0) {
-				long(__cdecl* fn_c002876f4_wtol)(wchar_t const*) = (long(__cdecl*)(wchar_t const*))(GetAddress(GA_FN | GA_H2C, 0x002876f4));
-				int monitor_num_char = fn_c002876f4_wtol(&cmd_line_arg[9]);
-				if (monitor_num_char < 0)
-					monitor_num_char = 0;
-				if (monitor_num_char > 9)
-					monitor_num_char = 9;
-				*flags_array[flags::monitor] = monitor_num_char;
+				int monitor_id = _wtol(&cmd_line_arg[9]);
+				flags_array[flags::monitor] = min(max(0, monitor_id), max_mointor_count);
 			}
 			else if (wcsicmp(cmd_line_arg, L"-highquality") == 0) {
-				*flags_array[flags::high_quality] = 1;
+				flags_array[flags::high_quality] = 1;
 			}
 		}
+	} else {
+		TRACE_GAME("Failed to get commandline args. LAST_ERROR: %X", GetLastError());
 	}
 
-	if (*flags_array[flags::nosound]) {
+	if (flags_array[flags::nosound]) {
 		void(*fn_c00028b83)() = (void(*)())(GetAddress(GA_FN | GA_H2C, 0x00028b83));
 		fn_c00028b83();
 	}
@@ -324,8 +305,8 @@ bool fn_c00004567()
 	bool result_c00004994 = fn_c00004994_shell_platform_initialize();
 	if (!result_c00004994)
 		return false;
-	if (*flags_array[flags::unk22])
-		fn_c00037e39_init_timing(*flags_array[flags::unk22]);
+	if (flags_array[flags::unk22])
+		fn_c00037e39_init_timing(flags_array[flags::unk22]);
 	int result_c000340d7 = fn_c000340d7_real_math_initialize();
 	bool result_c00032ce5 = fn_c00032ce5_async_initialize();
 	fn_c0003285c_global_preferences_initialize();
