@@ -300,11 +300,11 @@ bool fn_c00004567()
 
 	wchar_t* cmd_line_args = GetCommandLineW();
 	if (cmd_line_args) {
-		wchar_t cmd_line_args_split[0x2000] = L"";
-		fn_c00287ab5_wcsncpy_s(cmd_line_args_split, 0x2000 * sizeof(wchar_t*), cmd_line_args, 0xFFFFFFFF);
+		wchar_t cmd_line_args_split[0x8000] = L"";
+		fn_c00287ab5_wcsncpy_s(cmd_line_args_split, 0x8000, cmd_line_args, 0xFFFFFFFF);
 
 		wchar_t* cmd_line_args_ptr[1024] = { 0 };
-		fn_c00287ba9_memset(cmd_line_args_ptr, 0, 1024 * sizeof(wchar_t**));
+		fn_c00287ba9_memset(cmd_line_args_ptr, 0, 1024 * sizeof(wchar_t*));
 
 		int args_str_length = 0;
 		DWORD arg_c00001014_eax = (DWORD)cmd_line_args_split;
