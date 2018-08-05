@@ -224,9 +224,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Network.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
@@ -262,9 +259,6 @@
     </ClInclude>
     <ClInclude Include="H2MOD_GunGame.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource1.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD_Infection.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
@@ -461,6 +455,9 @@
     <ClInclude Include="TSServer.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def">
@@ -468,9 +465,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="xliveless.rc">
-      <Filter>Source Files\xlive</Filter>
-    </ResourceCompile>
     <ResourceCompile Include="Resource.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
