@@ -3370,6 +3370,8 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 			}
 			server->startListening();
 
+			//set the local loopback address
+			char strAddr[] = "127.0.0.1";
 			DWORD ip = inet_addr(strAddr);
 			clientMachineAddress.S_un.S_addr = ip;
 
