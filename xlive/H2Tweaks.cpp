@@ -299,9 +299,6 @@ bool fn_c00004567()
 	}
 	LocalFree(cmd_line_args);
 
-	bool result_c00004994 = fn_c00004994_shell_platform_initialize();
-	if (!result_c00004994)
-		return false;
 	if (flags_array[flags::unk22])
 		fn_c00037e39_init_timing(1000 * flags_array[flags::unk22]);
 	int result_c000340d7 = fn_c000340d7_real_math_initialize();
