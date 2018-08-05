@@ -248,33 +248,33 @@ void sound_initialize()
 enum flags : int
 {
 	windowed,
-	unk,
+	unk, // some network thing
 	nosound,
-	unk1, // disable vista needed version check? (sapien)
-	unk2, // force hardware vertex processing off (sapien)
+	unk1, // disable vista needed version check?
+	disable_hardware_vertex_processing, // force hardware vertex processing off
 	novsync,
-	unk3,
+	unk3, // squad browser/xlive/ui?
 	nointro, // disables intro movie
-	unk5,
-	unk6,
-	unk7,
-	unk8,
-	unk9,
-	unk10,
-	unk11,
-	unk12,
+	unk5, // some tag thing?
+	unk6, // some tag thing?
+	unk7, // some tag thing?
+	unk8, // some tag thing?
+	unk9, // some tag thing?
+	unk10, // some tag thing?
+	unk11, // some tag thing?
+	unk12, // seen near xlive init code
 	unk13,
-	unk14,
+	unk14, // maybe UI?
 	unk15, // fuzzer/automated testing? (sapien)
 	unk16,
-	unk17,
+	unk17, // maybe UI?
 	unk18, // player controls related (sapien)
-	monitor,
+	monitor_count,
 	unk19,
 	unk20,
-	unk21, // something to do with game time? (sapien)
+	unk21, // something to do with game time?
 	unk22,
-	unk23,
+	unk23, // network? value seems unused?
 	high_quality, // forced sound reverb ignoring CPU score and disable forcing low graphical settings (sapien)
 	unk24,
 
@@ -315,7 +315,7 @@ bool engine_basic_init()
 			}
 			else if (wcsnicmp(cmd_line_arg, L"-monitor:", 9) == 0) {
 				int monitor_id = _wtol(&cmd_line_arg[9]);
-				flags_array[flags::monitor] = min(max(0, monitor_id), max_mointor_count);
+				flags_array[flags::monitor_count] = min(max(0, monitor_id), max_mointor_count);
 			}
 			else if (wcsicmp(cmd_line_arg, L"-highquality") == 0) {
 				flags_array[flags::high_quality] = 1;
