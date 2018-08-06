@@ -116,7 +116,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>4005</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4800;4244</DisableSpecificWarnings>
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <ResourceCompile>
@@ -168,6 +168,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ExceptionHandling>Async</ExceptionHandling>
+      <DisableSpecificWarnings>4800;4244</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -220,6 +221,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ExceptionHandling>Async</ExceptionHandling>
+      <DisableSpecificWarnings>4800;4244</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -362,7 +364,6 @@
     <ClInclude Include="packet.pb.h" />
     <ClInclude Include="ReadIniArguments.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="resource1.h" />
     <ClInclude Include="TSClient.h" />
     <ClInclude Include="TSServer.h" />
     <ClInclude Include="Util\Debug.h" />
@@ -374,7 +375,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
-    <ResourceCompile Include="xliveless.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

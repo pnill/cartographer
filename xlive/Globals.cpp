@@ -42,7 +42,7 @@ int stripWhitespace(wchar_t *inputStr) {
 	wchar_t *start;
 	start = inputStr;
 	while (*start && *start == ' ') start++;
-	printf("It is %i and %i\n", inputStr, start);
+	printf("It is %p and %p\n", inputStr, start);
 	printf("Strlen + 1 is: %i\n", wcslen(start) + 1);
 	memmove(inputStr, start, wcslen(start) + 1);
 	return 0;

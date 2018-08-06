@@ -12,8 +12,8 @@ const wchar_t* NEW_ZOMBIE_SOUND = NEW_ZOMBIE_SOUND1.c_str();
 const wchar_t* INFECTION_SOUND = INFECTION_SOUND1.c_str();
 const wchar_t* INFECTED_SOUND = INFECTED_SOUND1.c_str();
 
-BOOL infectedPlayed;
-BOOL firstSpawn;
+bool infectedPlayed;
+bool firstSpawn;
 
 int Infection::calculateZombieIndexBasedOnPlayerData() {
 	//we subtract 1 here cause the player counters are 0 based

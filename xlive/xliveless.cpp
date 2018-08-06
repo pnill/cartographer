@@ -5002,7 +5002,7 @@ DWORD WINAPI XMarketplaceCreateOfferEnumerator( DWORD dwUserIndex, DWORD dwOffer
 
 			strw[0] = 0;
 			for( int lcv2 = 0; lcv2 < 20; lcv2++ )
-				swprintf( strw, L"%s%02X", strw, marketplace[lcv].contentId[lcv2] );
+				swprintf( strw, 40, L"%s%02X", strw, marketplace[lcv].contentId[lcv2] );
 			strw[40] = 0;
 
 			TRACE( "- [%d] ContentId = %s", lcv, strw );
