@@ -508,16 +508,16 @@ void setSens(short input_type, int sens) {
 	if (H2IsDediServer)
 		return;
 
-	if (sens == 0)
-		return; //return if sensitivity is 0
+	if (sens < 0)
+		return; 
 
 	if (input_type == 1) { //controller
-		*(float*)(H2BaseAddr + 0x4A89BC) = (float)(40.0 + 10.0 * (double)sens); //y-axis
-		*(float*)(H2BaseAddr + 0x4A89B8) = (float)(80.0 + 20.0 * (double)sens); //x-axis
+		*(float*)(H2BaseAddr + 0x4A89BC) = (float)(40.0f + 10.0f * sens); //y-axis
+		*(float*)(H2BaseAddr + 0x4A89B8) = (float)(80.0f + 20.0f * sens); //x-axis
 	}
 	else if (input_type == 0) { //mouse 
-		*(float*)(H2BaseAddr + 0x4A89B4) = (float)(25.0 + 10.0 * (double)sens); //y-axis
-		*(float*)(H2BaseAddr + 0x4A89B0) = (float)(50.0 + 20.0 * (double)sens); //x-axis
+		*(float*)(H2BaseAddr + 0x4A89B4) = (float)(25.0f + 10.0f * sens); //y-axis
+		*(float*)(H2BaseAddr + 0x4A89B0) = (float)(50.0f + 20.0f * sens); //x-axis
 	}
 }
 
@@ -533,11 +533,11 @@ void H2Tweaks::setFOV(int field_of_view_degrees) {
 		//int res_width = *(int*)(H2BaseAddr + 0xA3DA00); //wip
 		//int res_height = *(int*)(H2BaseAddr + 0xA3DA04);
 
-		const float default_radians_FOV = 70.0f * M_PI / 180.0;
+		const float default_radians_FOV = 70.0f * M_PI / 180.0f;
 
-		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0) / default_radians_FOV;
-		*(float*)(H2BaseAddr + 0x41D984) = calculated_radians_FOV; //First Person
-		*(float*)(H2BaseAddr + 0x413780) = calculated_radians_FOV * 1.24f; //Vehicle
+		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0f) / default_radians_FOV;
+		*(float*)(H2BaseAddr + 0x41D984) = calculated_radians_FOV; // First Person
+		*(float*)(H2BaseAddr + 0x413780) = calculated_radians_FOV + 0.22f; // Third Person
 	}
 }
 
@@ -555,9 +555,10 @@ void H2Tweaks::setCrosshairPos(float crosshair_offset) {
 
 void H2Tweaks::setCrosshairSize(int size) {
 
-	
+
 	if (H2IsDediServer)
 		return;
+	
 	DWORD BATRIF1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7aa750;
 	DWORD BATRIF2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7aa752;
 	DWORD SMG1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7A9F9C;
