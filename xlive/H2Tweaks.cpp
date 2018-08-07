@@ -507,6 +507,11 @@ int __cdecl validate_custom_map(BYTE *a1)
 	return true;
 }
 
+bool __cdecl is_supported_build(char *build)
+{
+	return true;
+}
+
 #pragma endregion
 
 void InitH2Tweaks() {
@@ -607,6 +612,7 @@ void InitH2Tweaks() {
 
 		WriteJmpTo(H2BaseAddr + 0x4544, is_init_flag_set);
 		WriteJmpTo(H2BaseAddr + 0x4F690, validate_custom_map);
+		WriteJmpTo(H2BaseAddr + 0x1467, is_supported_build);
 	}
 	addDebugText("End Startup Tweaks.");
 }
