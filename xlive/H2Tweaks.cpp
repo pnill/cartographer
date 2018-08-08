@@ -8,6 +8,7 @@
 #include "H2OnscreenDebugLog.h"
 #include "GSCustomMenu.h"
 #include "H2MOD.h";
+#include <string>
 
 #define _USE_MATH_DEFINES
 #include "math.h"
@@ -397,6 +398,121 @@ bool engine_basic_init()
 }
 #pragma endregion
 
+#pragma region custom map checks
+
+struct cache_header
+{
+	int magic;
+	int engine_gen;
+	int file_size;
+	int field_C;
+	int tag_offset;
+	int data_offset;
+	int data_size;
+	int tag_size;
+	int tag_offset_mask;
+	int field_24;
+	BYTE padding[260];
+	char version[32];
+	enum scnr_type : int
+	{
+		SinglePlayer = 0,
+		Multiplayer = 1,
+		MainMenu = 2,
+		MultiplayerShared = 3,
+		SinglePlayerShared = 4
+	};
+	scnr_type type;
+	int shared_type;
+	int crc_uiid;
+	char field_158;
+	char tracked__maybe;
+	char field_15A;
+	char field_15B;
+	int field_15C;
+	int field_160;
+	int field_164;
+	int field_168;
+	int string_block_offset;
+	int string_table_count;
+	int string_table_size;
+	int string_idx_offset;
+	int string_table_offset;
+	int extern_deps;
+	int time_low;
+	int time_high;
+	int main_menu_time_low;
+	int main_menu_time_high;
+	int shared_time_low;
+	int shared_time_high;
+	int campaign_time_low;
+	int campaign_time_high;
+	char name[32];
+	int field_1C4;
+	char tag_name[256];
+	int minor_version;
+	int TagNamesCount;
+	int TagNamesBufferOffset;
+	int TagNamesBufferSize;
+	int TagNamesIndicesOffset;
+	int LanguagePacksOffset;
+	int LanguagePacksSize;
+	int SecondarySoundGestaltDatumIndex;
+	int FastLoadGeometryBlockOffset;
+	int FastLoadGeometryBlockSize;
+	int Checksum;
+	int MoppCodesChecksum;
+	BYTE field_2F8[1284];
+	int foot;
+};
+
+static_assert(sizeof(cache_header) == 0x800, "Bad cache header size");
+
+bool open_cache_header(const wchar_t *lpFileName, cache_header *cache_header_ptr, HANDLE *map_handle)
+{
+	typedef char __cdecl open_cache_header(const wchar_t *lpFileName, cache_header *lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
+	auto open_cache_header_impl = GetAddress<open_cache_header>(0x642D0);
+	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
+}
+
+int __cdecl validate_custom_map(BYTE *a1)
+{
+	cache_header header;
+	HANDLE map_cache_handle;
+	const wchar_t *file_name = (wchar_t*)a1 + 1216;
+	if (!open_cache_header(file_name, &header, &map_cache_handle))
+		return false;
+	if (header.magic != 'head' || header.foot != 'foot' || header.file_size <= 0 || header.engine_gen != 8)
+	{
+		TRACE_GAME("validate_custom_map(): \"%s\" has invalid header", file_name);
+		return false;
+	}
+	if (header.type > 5 || header.type < 0)
+	{
+		TRACE_GAME("validate_custom_map(): \"%s\" has bad scenario type", file_name);
+		return false;
+	}
+	if (strnlen_s(header.name, 0x20u) >= 0x20 || strnlen_s(header.version, 0x20) >= 0x20)
+	{
+		TRACE_GAME("validate_custom_map(): \"%s\" has invalid version or name string", file_name);
+		return false;
+	}
+	if (header.type != cache_header::scnr_type::Multiplayer)
+	{
+		TRACE_GAME("validate_custom_map(): \"%s\" is not multiplayer", file_name);
+		return false;
+	}
+	// todo more checks?
+	// todo check if we need to do anything here like load bitmaps for menu or something
+	return true;
+}
+
+bool __cdecl is_supported_build(char *build)
+{
+	return true;
+}
+
+#pragma endregion
 
 void InitH2Tweaks() {
 	postConfig();
@@ -495,6 +611,8 @@ void InitH2Tweaks() {
 		VirtualProtect(pfn_c00004567, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		WriteJmpTo(H2BaseAddr + 0x4544, is_init_flag_set);
+		WriteJmpTo(H2BaseAddr + 0x4F690, validate_custom_map);
+		WriteJmpTo(H2BaseAddr + 0x1467, is_supported_build);
 	}
 	addDebugText("End Startup Tweaks.");
 }
