@@ -36,6 +36,8 @@ extern void trace_game_network(LPSTR message, ...);
 
 #define TRACE_GAME(msg, ...) trace_game (L ## msg, __VA_ARGS__)
 #define TRACE_GAME_N(msg, ...) trace_game_narrow( ## msg, __VA_ARGS__ )
+#define TRACE_FUNC(msg, ...) trace_game (__FUNCTIONW__  L"(): " L ## msg, __VA_ARGS__)
+#define TRACE_FUNC_N(msg, ...) trace_game_narrow( __FUNCTION__ "(): "  ## msg, __VA_ARGS__ )
 #define TRACE_GAME_NETWORK(msg, ...) trace_game_network( ## msg, __VA_ARGS__ )
 #define TRACE(msg, ...) trace (L ## msg, __VA_ARGS__)
 #define TRACE2(msg, ...) trace2 (L ## msg, __VA_ARGS__)
