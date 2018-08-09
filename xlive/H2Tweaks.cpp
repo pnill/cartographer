@@ -475,7 +475,7 @@ bool open_cache_header(const wchar_t *lpFileName, cache_header *cache_header_ptr
 	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
 }
 
-int __cdecl validate_custom_map(BYTE *a1)
+int __cdecl validate_and_add_custom_map(BYTE *a1)
 {
 	cache_header header;
 	HANDLE map_cache_handle;
@@ -484,26 +484,35 @@ int __cdecl validate_custom_map(BYTE *a1)
 		return false;
 	if (header.magic != 'head' || header.foot != 'foot' || header.file_size <= 0 || header.engine_gen != 8)
 	{
-		TRACE_GAME("validate_custom_map(): \"%s\" has invalid header", file_name);
+		TRACE_FUNC("\"%s\" has invalid header", file_name);
 		return false;
 	}
 	if (header.type > 5 || header.type < 0)
 	{
-		TRACE_GAME("validate_custom_map(): \"%s\" has bad scenario type", file_name);
+		TRACE_FUNC("\"%s\" has bad scenario type", file_name);
 		return false;
 	}
 	if (strnlen_s(header.name, 0x20u) >= 0x20 || strnlen_s(header.version, 0x20) >= 0x20)
 	{
-		TRACE_GAME("validate_custom_map(): \"%s\" has invalid version or name string", file_name);
+		TRACE_FUNC("\"%s\" has invalid version or name string", file_name);
 		return false;
 	}
-	if (header.type != cache_header::scnr_type::Multiplayer)
+	if (header.type != cache_header::scnr_type::Multiplayer && header.type != cache_header::scnr_type::SinglePlayer)
 	{
-		TRACE_GAME("validate_custom_map(): \"%s\" is not multiplayer", file_name);
+		TRACE_FUNC("\"%s\" is not playable", file_name);
 		return false;
 	}
-	// todo more checks?
-	// todo check if we need to do anything here like load bitmaps for menu or something
+	// needed because the game loads the human readable map name and description from scenario after checks
+	// without this the map is just called by it's file name
+
+	// todo move the code for loading the descriptions to our code and get rid of this
+	typedef int __cdecl validate_and_add_custom_map_interal(BYTE *a1);
+	auto validate_and_add_custom_map_interal_impl = GetAddress<validate_and_add_custom_map_interal>(0x4F690);
+	if (!validate_and_add_custom_map_interal_impl(a1))
+	{
+		TRACE_FUNC("warning \"%s\" has bad checksums or is blacklisted, map may not work correctly", file_name);
+	}
+	// load the map even if some of the checks failed, will still mostly work
 	return true;
 }
 
@@ -611,8 +620,11 @@ void InitH2Tweaks() {
 		VirtualProtect(pfn_c00004567, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		WriteJmpTo(H2BaseAddr + 0x4544, is_init_flag_set);
-		WriteJmpTo(H2BaseAddr + 0x4F690, validate_custom_map);
 		WriteJmpTo(H2BaseAddr + 0x1467, is_supported_build);
+		PatchCall(H2BaseAddr + 0x1E49A2, validate_and_add_custom_map);
+		PatchCall(H2BaseAddr + 0x4D3BA, validate_and_add_custom_map);
+		PatchCall(H2BaseAddr + 0x4CF26, validate_and_add_custom_map);
+		PatchCall(H2BaseAddr + 0x8928, validate_and_add_custom_map);
 	}
 	addDebugText("End Startup Tweaks.");
 }
