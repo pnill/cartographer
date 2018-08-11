@@ -259,14 +259,6 @@ void SaveH2Config() {
 			fputs("\n# <0 to 0.53> - NaN disables the built in Crosshair adjustment.", fileConfig);
 			fputs("\n\n", fileConfig);
 
-			fputs("# crosshair_size Options (Client):", fileConfig);
-			fputs("\n# 0 - Default size ", fileConfig);
-			fputs("\n# 1 - Disables the crosshair from being displayed.", fileConfig);
-			fputs("\n# 2 - Very small", fileConfig);
-			fputs("\n# 3 - Small", fileConfig);
-			fputs("\n# 4 - Large", fileConfig);
-			fputs("\n\n", fileConfig);
-
 			fputs("# controller_sensitivity Option (Client):", fileConfig);
 			fputs("\n# <value> Change controller sensitivity to your preference.", fileConfig);
 			fputs("\n\n", fileConfig);
