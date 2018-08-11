@@ -83,7 +83,6 @@ int H2Config_fps_limit = 60;
 int H2Config_static_lod_state = static_lod::cinematic;
 int H2Config_field_of_view = 0;
 float H2Config_crosshair_offset = NAN;
-int H2Config_crosshair_size = 0;
 int H2Config_sens_controller = 0;
 int H2Config_sens_mouse = 0;
 bool H2Config_disable_ingame_keyboard = false;
@@ -99,6 +98,36 @@ bool H2Config_chatbox_commands = false;
 bool H2Config_debug_log = false;
 char H2Config_login_identifier[255] = { "" };
 char H2Config_login_password[255] = { "" };
+//weapon crosshair sizes
+
+int H2Config_BATRIF_WIDTH = 1;
+int H2Config_BATRIF_HEIGHT = 1;
+int H2Config_SMG_WIDTH = 1;
+int H2Config_SMG_HEIGHT = 1;
+int H2Config_CRBN_WIDTH = 1;
+int H2Config_CRBN_HEIGHT = 1;
+int H2Config_BEAMRIF_WIDTH = 1;
+int H2Config_BEAMRIF_HEIGHT = 1;
+int H2Config_MAG_WIDTH = 1;
+int H2Config_MAG_HEIGHT = 1;
+int H2Config_PLASRIF_WIDTH = 1;
+int H2Config_PLASRIF_HEIGHT = 1;
+int H2Config_SHTGN_WIDTH = 1;
+int H2Config_SHTGN_HEIGHT = 1;
+int H2Config_SNIP_WIDTH = 1;
+int H2Config_SNIP_HEIGHT = 1;
+int H2Config_SWRD_WIDTH = 1;
+int H2Config_SWRD_HEIGHT = 1;
+int H2Config_ROCKLAUN_WIDTH = 1;
+int H2Config_ROCKLAUN_HEIGHT = 1;
+int H2Config_PLASPI_WIDTH = 1;
+int H2Config_PLASPI_HEIGHT = 1;
+int H2Config_BRUTESHOT_WIDTH = 1;
+int H2Config_BRUTESHOT_HEIGHT = 1;
+int H2Config_NEED_WIDTH = 1;
+int H2Config_NEED_HEIGHT = 1;
+int H2Config_SENTBEAM_WIDTH = 1;
+int H2Config_SENTBEAM_HEIGHT = 1;
 
 int H2Config_hotkeyIdHelp = VK_F3;
 int H2Config_hotkeyIdToggleDebug = VK_F2;
@@ -260,6 +289,7 @@ void SaveH2Config() {
 			//fputs("\n# <width>x<height> - Sets the resolution of the game via the Windows Registry.", fileConfig);
 			//fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fileConfig);
 			//fputs("\n\n", fileConfig);
+
 		}
 		fputs("# enable_xdelay Options:", fileConfig);
 		fputs("\n# 0 - Non-host players cannot delay the game start countdown timer.", fileConfig);
@@ -302,6 +332,14 @@ void SaveH2Config() {
 			fputs("\n# The codes in hexadecimal (base-16) form can be found here:", fileConfig);
 			fputs("\n# https://msdn.microsoft.com/en-us/library/windows/desktop/dd375731(v=vs.85).aspx", fileConfig);
 			fputs("\n\n", fileConfig);
+
+			fputs("# crosshair_... size Options (Client):", fileConfig);
+			fputs("\n# 0 - Disables the crosshair width/height from being displayed.", fileConfig);
+			fputs("\n# 1 - Default width/height size ", fileConfig);
+			fputs("\n# Anything above 1 will change the width/height to the indicated size", fileConfig);
+			fputs("\n# The size can range from a minimum of 0 to a maximum of 32767", fileConfig);
+			fputs("\n\n", fileConfig);
+
 		}
 
 		int fputbufferlen = strlen(H2ConfigVersionStr) + 1;
@@ -354,10 +392,6 @@ void SaveH2Config() {
 				sprintf(settingOutBuffer, "\ncrosshair_offset = %f", H2Config_crosshair_offset);
 				fputs(settingOutBuffer, fileConfig);
 			}
-
-			sprintf(settingOutBuffer, "\ncrosshair_size = %d", H2Config_crosshair_size);
-			fputs(settingOutBuffer, fileConfig);
-
 			sprintf(settingOutBuffer, "\ncontroller_sensitivity = %d", H2Config_sens_controller);
 			fputs(settingOutBuffer, fileConfig);
 
@@ -367,6 +401,8 @@ void SaveH2Config() {
 			fputs("\ndisable_ingame_keyboard = ", fileConfig); fputs(H2Config_disable_ingame_keyboard ? "1" : "0", fileConfig);
 
 			fputs("\nhide_ingame_chat = ", fileConfig); fputs(H2Config_hide_ingame_chat ? "1" : "0", fileConfig);
+
+
 
 			//TODO
 			//fputs("\ncustom_resolution = 0x0", fileConfig);
@@ -423,7 +459,68 @@ void SaveH2Config() {
 			sprintf(hotkeyText, "\nhotkey_console = %d #", H2Config_hotkeyIdConsole);
 			GetVKeyCodeString(H2Config_hotkeyIdConsole, hotkeyText + strlen(hotkeyText), 20);
 			fputs(hotkeyText, fileConfig);
+ 			fputs("\n\n", fileConfig);
 
+		}
+
+		if (!H2IsDediServer) {
+
+			sprintf(settingOutBuffer, "\ncrosshair_battle_rifle_width = %d", H2Config_BATRIF_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_battle_rifle_height = %d", H2Config_BATRIF_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_smg_width = %d", H2Config_SMG_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_smg_height = %d", H2Config_SMG_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_carbine_width = %d", H2Config_CRBN_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_carbine_height = %d", H2Config_CRBN_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_beam_rifle_width = %d", H2Config_BEAMRIF_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_beam_rifle_height = %d", H2Config_BEAMRIF_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_magnum_width = %d", H2Config_MAG_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_magnum_height = %d", H2Config_MAG_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_plasma_rifle_width = %d", H2Config_PLASRIF_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_plasma_rifle_height = %d", H2Config_PLASRIF_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_shotgun_width = %d", H2Config_SHTGN_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_shotgun_height = %d", H2Config_SHTGN_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_sniper_width = %d", H2Config_SNIP_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_sniper_height = %d", H2Config_SNIP_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_sword_width = %d", H2Config_SWRD_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_sword_height = %d", H2Config_SWRD_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_rocket_launcher_width = %d", H2Config_ROCKLAUN_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_rocket_launcher_height = %d", H2Config_ROCKLAUN_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_plasma_pistol_width = %d", H2Config_PLASPI_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_plasma_pistol_height = %d", H2Config_PLASPI_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_bruteshot_width = %d", H2Config_BRUTESHOT_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_bruteshot_height = %d", H2Config_BRUTESHOT_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_needler_width = %d", H2Config_NEED_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_needler_height = %d", H2Config_NEED_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_sentinal_beam_width = %d", H2Config_SENTBEAM_WIDTH);
+			fputs(settingOutBuffer, fileConfig);
+			sprintf(settingOutBuffer, "\ncrosshair_sentinal_beam_height = %d", H2Config_SENTBEAM_HEIGHT);
+			fputs(settingOutBuffer, fileConfig);
 		}
 
 		fputs("\n", fileConfig);
@@ -473,7 +570,6 @@ static bool est_fps_limit = false;
 static bool est_static_lod_state = false;
 static bool est_field_of_view = false;
 static bool est_crosshair_offset = false;
-static bool est_crosshair_size = false;
 static bool est_sens_controller = false;
 static bool est_sens_mouse = false;
 static bool est_disable_ingame_keyboard = false;
@@ -496,6 +592,34 @@ static bool est_hotkey_window_mode = false;
 static bool est_hotkey_hide_ingame_chat = false;
 static bool est_hotkey_guide = false;
 static bool est_hotkey_console = false;
+static bool est_BATRIF_WIDTH = false;
+static bool est_BATRIF_HEIGHT = false;
+static bool est_SMG_WIDTH = false;
+static bool est_SMG_HEIGHT = false;
+static bool est_CRBN_WIDTH = false;
+static bool est_CRBN_HEIGHT = false;
+static bool est_BEAMRIF_WIDTH = false;
+static bool est_BEAMRIF_HEIGHT = false;
+static bool est_MAG_WIDTH = false;
+static bool est_MAG_HEIGHT = false;
+static bool est_PLASRIF_WIDTH = false;
+static bool est_PLASRIF_HEIGHT = false;
+static bool est_SHTGN_WIDTH = false;
+static bool est_SHTGN_HEIGHT = false;
+static bool est_SNIP_WIDTH = false;
+static bool est_SNIP_HEIGHT = false;
+static bool est_SWRD_WIDTH = false;
+static bool est_SWRD_HEIGHT = false;
+static bool est_ROCKLAUN_WIDTH = false;
+static bool est_ROCKLAUN_HEIGHT = false;
+static bool est_PLASPI_WIDTH = false;
+static bool est_PLASPI_HEIGHT = false;
+static bool est_BRUTESHOT_WIDTH = false;
+static bool est_BRUTESHOT_HEIGHT = false;
+static bool est_NEED_WIDTH = false;
+static bool est_NEED_HEIGHT = false;
+static bool est_SENTBEAM_WIDTH = false;
+static bool est_SENTBEAM_HEIGHT = false;
 
 static void est_reset_vars() {
 	est_h2portable = false;
@@ -534,6 +658,34 @@ static void est_reset_vars() {
 	est_hotkey_hide_ingame_chat = false;
 	est_hotkey_guide = false;
 	est_hotkey_console = false;
+	est_BATRIF_WIDTH = false;
+	est_BATRIF_HEIGHT = false;
+	est_SMG_WIDTH = false;
+	est_SMG_HEIGHT = false;
+	est_CRBN_WIDTH = false;
+	est_CRBN_HEIGHT = false;
+	est_BEAMRIF_WIDTH = false;
+	est_BEAMRIF_HEIGHT = false;
+	est_MAG_WIDTH = false;
+	est_MAG_HEIGHT = false;
+	est_PLASRIF_WIDTH = false;
+	est_PLASRIF_HEIGHT = false;
+	est_SHTGN_WIDTH = false;
+	est_SHTGN_HEIGHT = false;
+	est_SNIP_WIDTH = false;
+	est_SNIP_HEIGHT = false;
+	est_SWRD_WIDTH = false;
+	est_SWRD_HEIGHT = false;
+	est_ROCKLAUN_WIDTH = false;
+	est_ROCKLAUN_HEIGHT = false;
+	est_PLASPI_WIDTH = false;
+	est_PLASPI_HEIGHT = false;
+	est_BRUTESHOT_WIDTH = false;
+	est_BRUTESHOT_HEIGHT = false;
+	est_NEED_WIDTH = false;
+	est_NEED_HEIGHT = false;
+	est_SENTBEAM_WIDTH = false;
+	est_SENTBEAM_HEIGHT = false;
 }
 #pragma endregion
 
@@ -767,18 +919,6 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_field_of_view = true;
 			}
 		}
-		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_size =%d", &tempint1) == 1) {
-			if (est_crosshair_size) {
-				duplicated = true;
-			}
-			else if (!(tempint1 >= 0 && tempint1 <= 4)) {
-				incorrect = true;
-			}
-			else {
-				H2Config_crosshair_size = tempint1;
-				est_crosshair_size = true;
-			}
-		}
 		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_offset =%f", &tempfloat1) == 1) {
 			if (est_crosshair_offset) {
 				duplicated = true;
@@ -837,6 +977,342 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			else {
 				H2Config_hide_ingame_chat = (bool)tempint1;
 				est_hide_ingame_chat = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_battle_rifle_width =%d", &tempint1) == 1) {
+			if (est_BATRIF_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_BATRIF_WIDTH = tempint1;
+				est_BATRIF_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_battle_rifle_height =%d", &tempint1) == 1) {
+			if (est_BATRIF_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_BATRIF_HEIGHT = tempint1;
+				est_BATRIF_HEIGHT = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_smg_width =%d", &tempint1) == 1) {
+			if (est_SMG_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_SMG_WIDTH = tempint1;
+				est_SMG_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_smg_height =%d", &tempint1) == 1) {
+			if (est_SMG_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_SMG_HEIGHT = tempint1;
+				est_SMG_HEIGHT = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_carbine_width =%d", &tempint1) == 1) {
+			if (est_CRBN_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_CRBN_WIDTH = tempint1;
+				est_CRBN_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_carbine_height =%d", &tempint1) == 1) {
+			if (est_CRBN_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_CRBN_HEIGHT = tempint1;
+				est_CRBN_HEIGHT = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_beam_rifle_width =%d", &tempint1) == 1) {
+			if (est_BEAMRIF_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_BEAMRIF_WIDTH = tempint1;
+				est_BEAMRIF_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_beam_rifle_height =%d", &tempint1) == 1) {
+			if (est_BEAMRIF_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_BEAMRIF_HEIGHT = tempint1;
+				est_BEAMRIF_HEIGHT = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_magnum_width =%d", &tempint1) == 1) {
+			if (est_MAG_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_MAG_WIDTH = tempint1;
+				est_MAG_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_magnum_height =%d", &tempint1) == 1) {
+			if (est_MAG_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_MAG_HEIGHT = tempint1;
+				est_MAG_HEIGHT = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_plasma_rifle_width =%d", &tempint1) == 1) {
+			if (est_PLASRIF_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_PLASRIF_WIDTH = tempint1;
+				est_PLASRIF_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_plasma_rifle_height =%d", &tempint1) == 1) {
+			if (est_PLASRIF_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_PLASRIF_HEIGHT = tempint1;
+				est_PLASRIF_HEIGHT = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_shotgun_width =%d", &tempint1) == 1) {
+			if (est_SHTGN_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_SHTGN_WIDTH = tempint1;
+				est_SHTGN_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_shotgun_height =%d", &tempint1) == 1) {
+			if (est_SHTGN_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_SHTGN_HEIGHT = tempint1;
+				est_SHTGN_HEIGHT = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_sniper_width =%d", &tempint1) == 1) {
+			if (est_SNIP_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_SNIP_WIDTH = tempint1;
+				est_SNIP_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_sniper_height =%d", &tempint1) == 1) {
+			if (est_SNIP_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_SNIP_HEIGHT = tempint1;
+				est_SNIP_HEIGHT = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_sword_width =%d", &tempint1) == 1) {
+			if (est_SWRD_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_SWRD_WIDTH = tempint1;
+				est_SWRD_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_sword_height =%d", &tempint1) == 1) {
+			if (est_SWRD_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_SWRD_HEIGHT = tempint1;
+				est_SWRD_HEIGHT = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_rocket_launcher_width =%d", &tempint1) == 1) {
+			if (est_ROCKLAUN_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_ROCKLAUN_WIDTH = tempint1;
+				est_ROCKLAUN_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_rocket_launcher_height =%d", &tempint1) == 1) {
+			if (est_ROCKLAUN_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_ROCKLAUN_HEIGHT = tempint1;
+				est_ROCKLAUN_HEIGHT = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_plasma_pistol_width =%d", &tempint1) == 1) {
+			if (est_PLASPI_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_PLASPI_WIDTH = tempint1;
+				est_PLASPI_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_plasma_pistol_height =%d", &tempint1) == 1) {
+			if (est_PLASPI_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_PLASPI_HEIGHT = tempint1;
+				est_PLASPI_HEIGHT = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_bruteshot_width =%d", &tempint1) == 1) {
+			if (est_BRUTESHOT_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_BRUTESHOT_WIDTH = tempint1;
+				est_BRUTESHOT_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_bruteshot_height =%d", &tempint1) == 1) {
+			if (est_BRUTESHOT_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_BRUTESHOT_HEIGHT = tempint1;
+				est_BRUTESHOT_HEIGHT = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_needler_width =%d", &tempint1) == 1) {
+			if (est_NEED_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_NEED_WIDTH = tempint1;
+				est_NEED_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_needler_height =%d", &tempint1) == 1) {
+			if (est_NEED_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_NEED_HEIGHT = tempint1;
+				est_NEED_HEIGHT = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_sentinal_beam_width =%d", &tempint1) == 1) {
+			if (est_SENTBEAM_WIDTH) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_SENTBEAM_WIDTH = tempint1;
+				est_SENTBEAM_WIDTH = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_sentinal_beam_height =%d", &tempint1) == 1) {
+			if (est_SENTBEAM_HEIGHT) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_SENTBEAM_HEIGHT = tempint1;
+				est_SENTBEAM_HEIGHT = true;
 			}
 		}
 		else if (sscanf(fileLine, "enable_xdelay =%d", &tempint1) == 1) {

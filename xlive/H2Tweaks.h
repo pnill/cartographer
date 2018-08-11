@@ -22,5 +22,5 @@ namespace H2Tweaks {
 	void disable60FPSCutscenes();
 	void setFOV(int field_of_view_degrees);
 	void setCrosshairPos(float crosshair_offset);
-	void setCrosshairSize(int size);
+	void setCrosshairSize(int size, bool preset);
 }

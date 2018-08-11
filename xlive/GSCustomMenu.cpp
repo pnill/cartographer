@@ -1797,8 +1797,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditCrosshairSize() {//__thiscall
 }
 
 static bool CMButtonHandler_EditCrosshairSize(int button_id) {
-	H2Config_crosshair_size = button_id;
-	H2Tweaks::setCrosshairSize(H2Config_crosshair_size);
+	H2Tweaks::setCrosshairSize(button_id, true);
 	return true;
 	
 }
@@ -1811,7 +1810,7 @@ __declspec(naked) void sub_20F790_CM_nak_EditCrosshairSize() {//__thiscall
 		 push ecx
 		 push ebx
 		
-		push H2Config_crosshair_size//selected button id
+		push 0//selected button id
 		 push ecx
 		 call sub_20F790_CM//__stdcall
 		
@@ -4409,7 +4408,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 7, "L6 - Cinematic");
 
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 0xFFFFFFF0, "Crosshair Settings");
-	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 0xFFFFFFF1, "Use the buttons below to set a preset crosshair size.");
+	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 0xFFFFFFF1, "Use the buttons below to set a preset crosshair size. Use the config file to modify crosshairs in more detail.");
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 1, "Default");
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 2, "Disabled");
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 3, "Very Small");
