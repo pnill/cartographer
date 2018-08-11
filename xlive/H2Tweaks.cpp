@@ -760,7 +760,7 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 			if (configArray[i] == 0) {
 				*(int*)WEAPONS[i] = disabled[i];
 			}
-			else if (*configArray[i] == 1 || *configArray[i] < 0 || *configArray[i] > 32767) {
+			else if (*configArray[i] == 1 || *configArray[i] < 0 || *configArray[i] > 65535) {
 				*(int*)WEAPONS[i] = defaultSize[i];
 			}
 			else {
