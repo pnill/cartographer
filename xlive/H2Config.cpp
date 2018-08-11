@@ -337,7 +337,7 @@ void SaveH2Config() {
 			fputs("\n# 0 - Disables the crosshair width/height from being displayed.", fileConfig);
 			fputs("\n# 1 - Default width/height size ", fileConfig);
 			fputs("\n# Anything above 1 will change the width/height to the indicated size", fileConfig);
-			fputs("\n# The size can range from a minimum of 0 to a maximum of 32767", fileConfig);
+			fputs("\n# The size can range from a minimum of 0 to a maximum of 65535", fileConfig);
 			fputs("\n\n", fileConfig);
 
 		}
@@ -983,7 +983,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_BATRIF_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -995,7 +995,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_BATRIF_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1007,7 +1007,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_SMG_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1019,7 +1019,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_SMG_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1031,7 +1031,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_CRBN_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1043,7 +1043,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_CRBN_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1055,7 +1055,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_BEAMRIF_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1067,7 +1067,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_BEAMRIF_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1079,7 +1079,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_MAG_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1091,7 +1091,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_MAG_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1103,7 +1103,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_PLASRIF_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1115,7 +1115,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_PLASRIF_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1127,7 +1127,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_SHTGN_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1139,7 +1139,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_SHTGN_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1151,7 +1151,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_SNIP_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1163,7 +1163,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_SNIP_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1175,7 +1175,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_SWRD_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1187,7 +1187,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_SWRD_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1199,7 +1199,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_ROCKLAUN_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1211,7 +1211,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_ROCKLAUN_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1223,7 +1223,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_PLASPI_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1235,7 +1235,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_PLASPI_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1247,7 +1247,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_BRUTESHOT_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1259,7 +1259,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_BRUTESHOT_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1271,7 +1271,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_NEED_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1283,7 +1283,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_NEED_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1295,7 +1295,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_SENTBEAM_WIDTH) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
@@ -1307,7 +1307,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			if (est_SENTBEAM_HEIGHT) {
 				duplicated = true;
 			}
-			else if (!(tempint1 >= 0 && tempint1 <= 32767)) {
+			else if (!(tempint1 >= 0 && tempint1 <= 65535)) {
 				incorrect = true;
 			}
 			else {
