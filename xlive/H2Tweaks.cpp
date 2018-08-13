@@ -604,6 +604,11 @@ void InitH2Tweaks() {
 		WriteBytes(H2BaseAddr + 0x3a0fa, assmIntroESRBSkip, 1);
 		WriteBytes(H2BaseAddr + 0x3a1ce, assmIntroESRBSkip, 1);
 
+		//Set the LAN Server List Ping Frequency (milliseconds).
+		WriteValue(H2BaseAddr + 0x001e9a89, 3000);
+		//Set the LAN Server List Delete Entry After (milliseconds).
+		WriteValue(H2BaseAddr + 0x001e9b0a, 9000);
+
 		//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
 		PatchCall(H2BaseAddr + 0x22667B, NotDisplayIngameChat);
 		PatchCall(H2BaseAddr + 0x226628, NotDisplayIngameChat);
