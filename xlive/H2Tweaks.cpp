@@ -9,6 +9,7 @@
 #include "GSCustomMenu.h"
 #include "H2MOD.h";
 #include <string>
+#include "Globals.h"
 
 #define _USE_MATH_DEFINES
 #include "math.h"
@@ -523,6 +524,217 @@ bool __cdecl is_supported_build(char *build)
 
 #pragma endregion
 
+typedef int(__cdecl *tfn_c0017a25d)(DWORD, DWORD*);
+tfn_c0017a25d pfn_c0017a25d;
+int __cdecl fn_c0017a25d(DWORD a1, DWORD* a2)
+{
+	if (H2Config_hitmarker_sound) {
+		typedef unsigned long long QWORD;
+		QWORD xuid_p1 = *(QWORD*)((BYTE*)H2BaseAddr + 0x51A629);
+
+		int i = 0;
+		for (; i < 16; i++) {
+			QWORD xuid_list_ele = *(QWORD*)((BYTE*)H2BaseAddr + 0x968F68 + (8 * i));
+			if (xuid_list_ele == xuid_p1) {
+				break;
+			}
+		}
+
+		int local_player_datum = i < 16 ? h2mod->get_unit_datum_from_player_index(i) : -1;
+
+		//if (local_player_datum != -1 && a1 == local_player_datum && a2[4] != -1) {
+		if (local_player_datum != -1 && a2[4] == local_player_datum && a1 != -1 && a1 != local_player_datum) {
+			for (i = 0; i < 16; i++) {
+				int other_datum = h2mod->get_unit_datum_from_player_index(i);
+				if (a1 == other_datum) {
+					if (h2mod->get_unit_team_index(local_player_datum) != h2mod->get_unit_team_index(other_datum)) {
+						std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+						h2mod->SoundMap[L"sounds/Halo1PCHitSound.wav"] = 0;
+						//unlock immediately after modifying sound map
+						lck.unlock();
+						h2mod->sound_cv.notify_one();
+					}
+					break;
+				}
+			}
+		}
+	}
+	int result = pfn_c0017a25d(a1, a2);
+	return result;
+}
+
+
+typedef char(__stdcall *tfn_c0024eeef)(DWORD*, int, int);
+tfn_c0024eeef pfn_c0024eeef;
+char __stdcall fn_c0024eeef(DWORD* thisptr, int a2, int a3)//__thiscall
+{
+	//char result = pfn_c0024eeef(thisptr, a2, a3);
+	//return result;
+
+	char(__thiscall* fn_c002139f8)(DWORD*, int, int, int, int*, int) = (char(__thiscall*)(DWORD*, int, int, int, int*, int))(GetAddress(0x002139f8));
+
+	int label_list[16];
+	label_list[0] = 0;
+	label_list[1] = 0xA0005D1;//"Change Map..."
+	label_list[2] = 1;
+	label_list[3] = 0xE0005D2;//"Change Rules..."
+	label_list[4] = 2;
+	label_list[5] = 0xD000428;//"Quick Options..."
+	label_list[6] = 3;
+	label_list[7] = 0x1000095D;//"Party Management..."
+	label_list[8] = 4;
+	label_list[9] = 0x0E0005D9;//"Switch To: Co-Op Game"
+	label_list[10] = 5;
+	label_list[11] = 0x150005D8;//"Switch To: Custom Game"
+	label_list[12] = 6;
+	label_list[13] = 0x130005DA;//"Switch To: Matchmaking"
+	label_list[14] = 7;
+	label_list[15] = 0xD0005D6;//"Change Match Settings..."
+
+	//label_list[8] = ?;
+	//label_list[9] = 0x120005D7;//"Switch To: Playlist"
+	//label_list[10] = ?;
+	//label_list[11] = 0x150005d8;//"Switch To: Custom Game"
+
+	return fn_c002139f8(thisptr, a2, a3, 0, label_list, 8);
+}
+
+typedef int(__stdcall *tfn_c0024fa19)(DWORD*, int, int*);
+tfn_c0024fa19 pfn_c0024fa19;
+int __stdcall fn_c0024fa19(DWORD* thisptr, int a2, int* a3)//__thiscall
+{
+	//int result = pfn_c0024fa19(thisptr, a2, a3);
+	//return result;
+
+	int(__stdcall* fn_c0024f9a1)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f9a1));
+	int(__stdcall* fn_c0024f9dd)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f9dd));
+	int(__stdcall* fn_c0024ef79)(int) = (int(__stdcall*)(int))(GetAddress(0x0024ef79));
+	int(__stdcall* fn_c0024f5fd)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f5fd));
+	int(__thiscall* fn_c0024f015)(DWORD* thisptr, int) = (int(__thiscall*)(DWORD*, int))(GetAddress(0x0024f015));
+	int(__thiscall* fn_c0024f676)(DWORD* thisptr, int) = (int(__thiscall*)(DWORD*, int))(GetAddress(0x0024f676));
+	int(__thiscall* fn_c0024f68a)(DWORD* thisptr, int) = (int(__thiscall*)(DWORD*, int))(GetAddress(0x0024f68a));
+
+	int result = *a3;
+	if (*a3 != -1)
+	{
+		result = *(signed __int16 *)(*(DWORD *)(thisptr[28] + 68) + 4 * (unsigned __int16)result + 2);
+		switch (result)
+		{
+		case 0:
+			result = fn_c0024f9a1(a2);
+			break;
+		case 1:
+			result = fn_c0024f9dd(a2);
+			break;
+		case 2:
+			result = fn_c0024ef79(a2);
+			break;
+		case 3:
+			result = fn_c0024f5fd(a2);
+			break;
+		case 4:
+			GSCustomMenuCall_AdvLobbySettings3();
+			break;
+		case 5:
+			result = fn_c0024f015(thisptr, a2);
+			break;
+		case 6:
+			result = fn_c0024f676(thisptr, a2);
+			break;
+		case 7:
+			result = fn_c0024f68a(thisptr, a2);
+			break;
+		default:
+			return result;
+		}
+	}
+	return result;
+}
+
+typedef DWORD*(__stdcall *tfn_c0024fabc)(DWORD*, int);
+tfn_c0024fabc pfn_c0024fabc;
+DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
+{
+	//DWORD* result = pfn_c0024fabc(thisptr, a2);
+	//return result;
+
+	DWORD* var_c003d9254 = (DWORD*)(GetAddress(0x003d9254));
+	DWORD* var_c003d9188 = (DWORD*)(GetAddress(0x003d9188));
+
+	DWORD*(__thiscall* fn_c00213b1c)(DWORD* thisptr, int) = (DWORD*(__thiscall*)(DWORD*, int))(GetAddress(0x00213b1c));
+	int(__thiscall* fn_c0000a551)(DWORD* thisptr) = (int(__thiscall*)(DWORD*))(GetAddress(0x0000a551));
+	DWORD*(__thiscall* fn_c0021ffc9)(DWORD* thisptr) = (DWORD*(__thiscall*)(DWORD*))(GetAddress(0x0021ffc9));
+	void(__stdcall* fn_c0028870b)(int, int, int, DWORD*(__thiscall*)(DWORD*), int(__thiscall*)(DWORD*)) = (void(__stdcall*)(int, int, int, DWORD*(__thiscall*)(DWORD*), int(__thiscall*)(DWORD*)))(GetAddress(0x0028870b));
+	DWORD*(__thiscall* fn_c002113c6)(DWORD* thisptr) = (DWORD*(__thiscall*)(DWORD*))(GetAddress(0x002113c6));
+	int(__thiscall* fn_c0024fa19)(DWORD* thisptr, int, int*) = (int(__thiscall*)(DWORD*, int, int*))(GetAddress(0x0024fa19));
+	int(*fn_c00215ea9)() = (int(*)())(GetAddress(0x00215ea9));
+	int(__cdecl* fn_c0020d1fd)(char*, int numberOfButtons, int) = (int(__cdecl*)(char*, int, int))(GetAddress(0x0020d1fd));
+	int(__cdecl* fn_c00066b33)(int) = (int(__cdecl*)(int))(GetAddress(0x00066b33));
+	int(__cdecl* fn_c000667a0)(int) = (int(__cdecl*)(int))(GetAddress(0x000667a0));
+	int(*fn_c002152b0)() = (int(*)())(GetAddress(0x002152b0));
+	int(*fn_c0021525a)() = (int(*)())(GetAddress(0x0021525a));
+	int(__thiscall* fn_c002113d3)(DWORD* thisptr, DWORD*) = (int(__thiscall*)(DWORD*, DWORD*))(GetAddress(0x002113d3));
+
+	DWORD* v2 = thisptr;
+	fn_c00213b1c(thisptr, a2);
+	//*v2 = &c_squad_settings_list::`vftable';
+	v2[0] = (DWORD)var_c003d9254;
+	//*v2 = (DWORD)((BYTE*)H2BaseAddr + 0x003d9254);
+	fn_c0028870b((int)(v2 + 44), 132, 7, fn_c0021ffc9, fn_c0000a551);
+	fn_c002113c6(v2 + 276);
+	//v2[275] = &c_slot2<c_squad_settings_list, s_event_record *, long>::`vftable';
+	v2[275] = (DWORD)var_c003d9188;
+	//v2[275] = (DWORD)((BYTE*)H2BaseAddr + 0x003d9188);
+	v2[279] = (DWORD)v2;
+	v2[280] = (DWORD)fn_c0024fa19;
+	int v3 = fn_c00215ea9();
+	int v4 = fn_c0020d1fd("squad setting list", 8, 4);
+	v2[28] = v4;
+	fn_c00066b33(v4);
+	*((BYTE *)v2 + 1124) = 1;
+	switch (v3)
+	{
+	case 1:
+	case 3:
+		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 0;
+		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 1;
+		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 2;
+		//*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 3;
+		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 4;
+		/*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 5;
+		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 6;
+		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 7;*/
+		break;
+	case 5:
+		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 0;
+		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 1;
+		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 2;
+		if ((unsigned __int8)fn_c002152b0() && fn_c0021525a() > 1)
+		{
+			*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 3;
+			*((BYTE *)v2 + 1124) = 0;
+		}
+		else
+		{
+			*((BYTE *)v2 + 1124) = 1;
+		}
+		break;
+	case 6:
+		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 7;
+		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 5;
+		break;
+	default:
+		break;
+	}
+	DWORD* v6;
+	if (v2 == (DWORD *)-1100)
+		v6 = 0;
+	else
+		v6 = v2 + 276;
+	fn_c002113d3(v2 + 43, v6);
+	return v2;
+}
+
 void InitH2Tweaks() {
 	postConfig();
 
@@ -617,6 +829,14 @@ void InitH2Tweaks() {
 		sub_20E1D8 = (int(__cdecl*)(int, int, int, int, int, int))((char*)H2BaseAddr + 0x20E1D8);
 		PatchCall(H2BaseAddr + 0x21754C, &sub_20E1D8_boot);
 
+		//Hook for Hitmarker sound effect.
+		pfn_c0017a25d = (tfn_c0017a25d)DetourFunc((BYTE*)H2BaseAddr + 0x0017a25d, (BYTE*)fn_c0017a25d, 10);
+
+		//Hook for advanced lobby options.
+		pfn_c0024eeef = (tfn_c0024eeef)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024eeef, (BYTE*)fn_c0024eeef, 9);
+		pfn_c0024fa19 = (tfn_c0024fa19)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fa19, (BYTE*)fn_c0024fa19, 9);
+		pfn_c0024fabc = (tfn_c0024fabc)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fabc, (BYTE*)fn_c0024fabc, 13);
+
 		//SLDL anti-hack removed and code is now accessible.
 		//Side effect is that the multiplayer buttons at the mainmenu will never be greyed out due to a bad 'key'.
 		pfn_c00004a6b = (tfn_c00004a6b)DetourFunc((BYTE*)H2BaseAddr + 0x00004a6b, (BYTE*)fn_c00004a6b, 5);
@@ -636,6 +856,32 @@ void InitH2Tweaks() {
 
 void DeinitH2Tweaks() {
 
+}
+
+static DWORD* get_scenario_global_address() {
+	return (DWORD*)(H2BaseAddr + 0x479e74);
+}
+
+static int get_scenario_volume_count() {
+	int volume_count = *(int*)(*get_scenario_global_address() + 0x108);
+	return volume_count;
+}
+
+static void kill_volume_disable(int volume_id) {
+	void(__cdecl* kill_volume_disable)(int volume_id);
+	kill_volume_disable = (void(__cdecl*)(int))((char*)H2BaseAddr + 0xb3ab8);
+	kill_volume_disable(volume_id);
+}
+
+void H2Tweaks::toggleKillVolumes(bool enable) {
+	if (enable)
+		return;
+	//TODO 'bool enable'
+	if (!h2mod->Server && gameManager->isHost()) {
+		for (int i = 0; i < get_scenario_volume_count(); i++) {
+			kill_volume_disable(i);
+		}
+	}
 }
 
 void setSens(short input_type, int sens) {

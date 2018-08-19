@@ -637,6 +637,7 @@ static void overrideCoreH2Labels() {
 		custom_language* lang = get_custom_language(i, 0);
 		//add_custom_label(lang, 0x000003fd, 0x09000284, "");
 		add_custom_label(lang, 0x000003fd, 0x05000986, "CARTOGRAPHER");
+		add_custom_label(lang, 0x00000718, 0x0E0005D9, "Extra Game Settings...");
 	}
 } 
 

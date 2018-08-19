@@ -596,6 +596,8 @@ __declspec(naked) void deserializeChatPacket(void) {
 void deserializePlayerAddCave() {
 	//inform new players of the current map info
 	mapManager->sendMapInfoPacket();
+	//inform new players of the current advanced lobby settings
+	advLobbySettings->sendLobbySettingsPacket();
 }
 
 DWORD retAddr4 = 0;
@@ -744,6 +746,7 @@ serialize_membership_packet serialize_membership_packet_method;
 
 int __cdecl serializeMembershipPacket(void* a1, int a2, int a3) {
 	mapManager->sendMapInfoPacket();
+	advLobbySettings->sendLobbySettingsPacket();
 	return serialize_membership_packet_method(a1, a2, a3);
 }
 
@@ -752,6 +755,7 @@ serialize_parameters_update_packet serialize_parameters_update_packet_method;
 
 int __cdecl serializeParametersUpdatePacket(void* a1, int a2, int a3) {
 	mapManager->sendMapInfoPacket();
+	advLobbySettings->sendLobbySettingsPacket();
 	return serialize_parameters_update_packet_method(a1, a2, a3);
 }
 

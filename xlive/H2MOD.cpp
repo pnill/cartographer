@@ -24,6 +24,7 @@
 #include "H2Tweaks.h"
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 #include "H2Startup.h"
+#include "GSCustomMenu.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -710,6 +711,10 @@ void __cdecl onGameEngineChange(int a1)
 	{
 		addDebugText("GameEngine: Main-Menu, apply patches");
 
+		if (!gameManager->isHost()) {
+			advLobbySettings->resetLobbySettings();
+		}
+
 		if (b_Halo2Final && !h2mod->Server)
 			h2f->Dispose();
 
@@ -736,7 +741,7 @@ void __cdecl onGameEngineChange(int a1)
 
 	wchar_t* variant_name = (wchar_t*)(h2mod->GetBase() + ((h2mod->Server) ? 0x534A18 : 0x97777C));
 	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", h2mod->get_engine_type(), variant_name);
-	BYTE GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
+	BYTE& GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
 
 	if (h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE)
 	{
@@ -776,6 +781,9 @@ void __cdecl onGameEngineChange(int a1)
 
 		if (GameState == 3)
 		{
+			//inform players of the current advanced lobby settings
+			advLobbySettings->sendLobbySettingsPacket();
+
 			if (b_Infection) {
 				infectionHandler->initializer->execute();
 			}
@@ -807,6 +815,9 @@ void __cdecl onGameEngineChange(int a1)
 
 bool __cdecl OnPlayerSpawn(int a1)
 {
+	//I cant find somewhere to put this where it actually works (only needs to be done once on map load). It's only a few instructions so it shouldn't take long to execute.
+	H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
+
 	overrideUnicodeMessage = false;
 	//once players spawn we aren't in lobby anymore ;)
 	isLobby = false;
@@ -1144,6 +1155,46 @@ BYTE* __cdecl unicodeStringConversion(BYTE* nonUnicodeStr, BYTE* unicodeStr, int
 	return unicode_string_conversion_method(nonUnicodeStr, unicodeStr, size);
 }
 
+typedef bool(__cdecl *tfn_c000bd114)(int);
+tfn_c000bd114 pfn_c000bd114;
+bool __cdecl fn_c000bd114_IsSkullEnabled(int skull_index)
+{
+	//bool result = pfn_c000bd114(skull_index);
+	//return result;
+
+	bool* var_c004d8320 = (bool*)(H2BaseAddr + 0x004d8320);
+	bool(*fn_c00049833_IsEngineModeCampaign)() = (bool(*)())(H2BaseAddr + 0x00049833);
+
+	bool result = false;
+	if (skull_index <= 0xE && fn_c00049833_IsEngineModeCampaign())
+		result = var_c004d8320[skull_index];
+	if (skull_index == 0xA && AdvLobbySettings_mp_sputnik)
+		result = true;
+	else if (skull_index == 0x1 && AdvLobbySettings_mp_grunt_bday_party)
+		result = true;
+	else if (skull_index == 0x6 && AdvLobbySettings_mp_blind)
+		result = true;
+	return result;
+}
+
+bool GrenadeChainReactIsEngineMPCheck() {
+	if (AdvLobbySettings_grenade_chain_react)
+		return false;
+	return h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE;
+}
+
+bool BansheeBombIsEngineMPCheck() {
+	if (AdvLobbySettings_banshee_bomb)
+		return false;
+	return h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE;
+}
+
+bool FlashlightIsEngineSPCheck() {
+	if (AdvLobbySettings_flashlight)
+		return true;
+	return h2mod->get_engine_type() == EngineType::SINGLE_PLAYER_ENGINE;
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1244,6 +1295,11 @@ void H2MOD::ApplyHooks() {
 
 		// set max model qaulity to L6
 		WriteValue(GetBase() + 0x190B38 + 1, 5);
+
+		pfn_c000bd114 = (tfn_c000bd114)DetourFunc((BYTE*)H2BaseAddr + 0x000bd114, (BYTE*)fn_c000bd114_IsSkullEnabled, 5);
+		PatchCall(Base + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
+		PatchCall(Base + 0x00092C05, BansheeBombIsEngineMPCheck);
+		PatchCall(Base + 0x0013ff75, FlashlightIsEngineSPCheck);
 	}
 	else {
 

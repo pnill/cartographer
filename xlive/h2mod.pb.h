@@ -36,15 +36,17 @@ class H2ModPacket;
 class h2mod_set_grenade;
 class h2mod_set_team;
 class h2mod_map_info;
+class h2mod_lobby_settings;
 
 enum H2ModPacket_Type {
   H2ModPacket_Type_set_player_team = 2,
   H2ModPacket_Type_set_unit_grenades = 3,
-  H2ModPacket_Type_map_info_request = 4
+  H2ModPacket_Type_map_info_request = 4,
+  H2ModPacket_Type_set_lobby_settings = 5
 };
 bool H2ModPacket_Type_IsValid(int value);
 const H2ModPacket_Type H2ModPacket_Type_Type_MIN = H2ModPacket_Type_set_player_team;
-const H2ModPacket_Type H2ModPacket_Type_Type_MAX = H2ModPacket_Type_map_info_request;
+const H2ModPacket_Type H2ModPacket_Type_Type_MAX = H2ModPacket_Type_set_lobby_settings;
 const int H2ModPacket_Type_Type_ARRAYSIZE = H2ModPacket_Type_Type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* H2ModPacket_Type_descriptor();
@@ -114,6 +116,7 @@ class H2ModPacket : public ::google::protobuf::Message {
   static const Type set_player_team = H2ModPacket_Type_set_player_team;
   static const Type set_unit_grenades = H2ModPacket_Type_set_unit_grenades;
   static const Type map_info_request = H2ModPacket_Type_map_info_request;
+  static const Type set_lobby_settings = H2ModPacket_Type_set_lobby_settings;
   static inline bool Type_IsValid(int value) {
     return H2ModPacket_Type_IsValid(value);
   }
@@ -171,6 +174,15 @@ class H2ModPacket : public ::google::protobuf::Message {
   inline ::h2mod_map_info* release_map_info();
   inline void set_allocated_map_info(::h2mod_map_info* map_info);
 
+  // optional .h2mod_lobby_settings lobby_settings = 5;
+  inline bool has_lobby_settings() const;
+  inline void clear_lobby_settings();
+  static const int kLobbySettingsFieldNumber = 5;
+  inline const ::h2mod_lobby_settings& lobby_settings() const;
+  inline ::h2mod_lobby_settings* mutable_lobby_settings();
+  inline ::h2mod_lobby_settings* release_lobby_settings();
+  inline void set_allocated_lobby_settings(::h2mod_lobby_settings* lobby_settings);
+
   // @@protoc_insertion_point(class_scope:H2ModPacket)
  private:
   inline void set_has_type();
@@ -181,6 +193,8 @@ class H2ModPacket : public ::google::protobuf::Message {
   inline void clear_has_set_grenade();
   inline void set_has_map_info();
   inline void clear_has_map_info();
+  inline void set_has_lobby_settings();
+  inline void clear_has_lobby_settings();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -189,6 +203,7 @@ class H2ModPacket : public ::google::protobuf::Message {
   ::h2mod_set_team* h2_set_player_team_;
   ::h2mod_set_grenade* set_grenade_;
   ::h2mod_map_info* map_info_;
+  ::h2mod_lobby_settings* lobby_settings_;
   int type_;
   friend void  protobuf_AddDesc_h2mod_2eproto();
   friend void protobuf_AssignDesc_h2mod_2eproto();
@@ -479,6 +494,145 @@ class h2mod_map_info : public ::google::protobuf::Message {
   void InitAsDefaultInstance();
   static h2mod_map_info* default_instance_;
 };
+// -------------------------------------------------------------------
+
+class h2mod_lobby_settings : public ::google::protobuf::Message {
+ public:
+  h2mod_lobby_settings();
+  virtual ~h2mod_lobby_settings();
+
+  h2mod_lobby_settings(const h2mod_lobby_settings& from);
+
+  inline h2mod_lobby_settings& operator=(const h2mod_lobby_settings& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const h2mod_lobby_settings& default_instance();
+
+  void Swap(h2mod_lobby_settings* other);
+
+  // implements Message ----------------------------------------------
+
+  h2mod_lobby_settings* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const h2mod_lobby_settings& from);
+  void MergeFrom(const h2mod_lobby_settings& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required uint32 mp_explosion_physics = 1;
+  inline bool has_mp_explosion_physics() const;
+  inline void clear_mp_explosion_physics();
+  static const int kMpExplosionPhysicsFieldNumber = 1;
+  inline ::google::protobuf::uint32 mp_explosion_physics() const;
+  inline void set_mp_explosion_physics(::google::protobuf::uint32 value);
+
+  // required uint32 mp_sputnik = 2;
+  inline bool has_mp_sputnik() const;
+  inline void clear_mp_sputnik();
+  static const int kMpSputnikFieldNumber = 2;
+  inline ::google::protobuf::uint32 mp_sputnik() const;
+  inline void set_mp_sputnik(::google::protobuf::uint32 value);
+
+  // required uint32 mp_grunt_bday_party = 3;
+  inline bool has_mp_grunt_bday_party() const;
+  inline void clear_mp_grunt_bday_party();
+  static const int kMpGruntBdayPartyFieldNumber = 3;
+  inline ::google::protobuf::uint32 mp_grunt_bday_party() const;
+  inline void set_mp_grunt_bday_party(::google::protobuf::uint32 value);
+
+  // required uint32 grenade_chain_react = 4;
+  inline bool has_grenade_chain_react() const;
+  inline void clear_grenade_chain_react();
+  static const int kGrenadeChainReactFieldNumber = 4;
+  inline ::google::protobuf::uint32 grenade_chain_react() const;
+  inline void set_grenade_chain_react(::google::protobuf::uint32 value);
+
+  // required uint32 banshee_bomb = 5;
+  inline bool has_banshee_bomb() const;
+  inline void clear_banshee_bomb();
+  static const int kBansheeBombFieldNumber = 5;
+  inline ::google::protobuf::uint32 banshee_bomb() const;
+  inline void set_banshee_bomb(::google::protobuf::uint32 value);
+
+  // required uint32 mp_blind = 6;
+  inline bool has_mp_blind() const;
+  inline void clear_mp_blind();
+  static const int kMpBlindFieldNumber = 6;
+  inline ::google::protobuf::uint32 mp_blind() const;
+  inline void set_mp_blind(::google::protobuf::uint32 value);
+
+  // required uint32 flashlight = 7;
+  inline bool has_flashlight() const;
+  inline void clear_flashlight();
+  static const int kFlashlightFieldNumber = 7;
+  inline ::google::protobuf::uint32 flashlight() const;
+  inline void set_flashlight(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:h2mod_lobby_settings)
+ private:
+  inline void set_has_mp_explosion_physics();
+  inline void clear_has_mp_explosion_physics();
+  inline void set_has_mp_sputnik();
+  inline void clear_has_mp_sputnik();
+  inline void set_has_mp_grunt_bday_party();
+  inline void clear_has_mp_grunt_bday_party();
+  inline void set_has_grenade_chain_react();
+  inline void clear_has_grenade_chain_react();
+  inline void set_has_banshee_bomb();
+  inline void clear_has_banshee_bomb();
+  inline void set_has_mp_blind();
+  inline void clear_has_mp_blind();
+  inline void set_has_flashlight();
+  inline void clear_has_flashlight();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 mp_explosion_physics_;
+  ::google::protobuf::uint32 mp_sputnik_;
+  ::google::protobuf::uint32 mp_grunt_bday_party_;
+  ::google::protobuf::uint32 grenade_chain_react_;
+  ::google::protobuf::uint32 banshee_bomb_;
+  ::google::protobuf::uint32 mp_blind_;
+  ::google::protobuf::uint32 flashlight_;
+  friend void  protobuf_AddDesc_h2mod_2eproto();
+  friend void protobuf_AssignDesc_h2mod_2eproto();
+  friend void protobuf_ShutdownFile_h2mod_2eproto();
+
+  void InitAsDefaultInstance();
+  static h2mod_lobby_settings* default_instance_;
+};
 // ===================================================================
 
 
@@ -632,6 +786,47 @@ inline void H2ModPacket::set_allocated_map_info(::h2mod_map_info* map_info) {
     clear_has_map_info();
   }
   // @@protoc_insertion_point(field_set_allocated:H2ModPacket.map_info)
+}
+
+// optional .h2mod_lobby_settings lobby_settings = 5;
+inline bool H2ModPacket::has_lobby_settings() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void H2ModPacket::set_has_lobby_settings() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void H2ModPacket::clear_has_lobby_settings() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void H2ModPacket::clear_lobby_settings() {
+  if (lobby_settings_ != NULL) lobby_settings_->::h2mod_lobby_settings::Clear();
+  clear_has_lobby_settings();
+}
+inline const ::h2mod_lobby_settings& H2ModPacket::lobby_settings() const {
+  // @@protoc_insertion_point(field_get:H2ModPacket.lobby_settings)
+  return lobby_settings_ != NULL ? *lobby_settings_ : *default_instance_->lobby_settings_;
+}
+inline ::h2mod_lobby_settings* H2ModPacket::mutable_lobby_settings() {
+  set_has_lobby_settings();
+  if (lobby_settings_ == NULL) lobby_settings_ = new ::h2mod_lobby_settings;
+  // @@protoc_insertion_point(field_mutable:H2ModPacket.lobby_settings)
+  return lobby_settings_;
+}
+inline ::h2mod_lobby_settings* H2ModPacket::release_lobby_settings() {
+  clear_has_lobby_settings();
+  ::h2mod_lobby_settings* temp = lobby_settings_;
+  lobby_settings_ = NULL;
+  return temp;
+}
+inline void H2ModPacket::set_allocated_lobby_settings(::h2mod_lobby_settings* lobby_settings) {
+  delete lobby_settings_;
+  lobby_settings_ = lobby_settings;
+  if (lobby_settings) {
+    set_has_lobby_settings();
+  } else {
+    clear_has_lobby_settings();
+  }
+  // @@protoc_insertion_point(field_set_allocated:H2ModPacket.lobby_settings)
 }
 
 // -------------------------------------------------------------------
@@ -864,6 +1059,178 @@ inline void h2mod_map_info::set_mapsize(::google::protobuf::uint32 value) {
   set_has_mapsize();
   mapsize_ = value;
   // @@protoc_insertion_point(field_set:h2mod_map_info.mapSize)
+}
+
+// -------------------------------------------------------------------
+
+// h2mod_lobby_settings
+
+// required uint32 mp_explosion_physics = 1;
+inline bool h2mod_lobby_settings::has_mp_explosion_physics() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void h2mod_lobby_settings::set_has_mp_explosion_physics() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void h2mod_lobby_settings::clear_has_mp_explosion_physics() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void h2mod_lobby_settings::clear_mp_explosion_physics() {
+  mp_explosion_physics_ = 0u;
+  clear_has_mp_explosion_physics();
+}
+inline ::google::protobuf::uint32 h2mod_lobby_settings::mp_explosion_physics() const {
+  // @@protoc_insertion_point(field_get:h2mod_lobby_settings.mp_explosion_physics)
+  return mp_explosion_physics_;
+}
+inline void h2mod_lobby_settings::set_mp_explosion_physics(::google::protobuf::uint32 value) {
+  set_has_mp_explosion_physics();
+  mp_explosion_physics_ = value;
+  // @@protoc_insertion_point(field_set:h2mod_lobby_settings.mp_explosion_physics)
+}
+
+// required uint32 mp_sputnik = 2;
+inline bool h2mod_lobby_settings::has_mp_sputnik() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void h2mod_lobby_settings::set_has_mp_sputnik() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void h2mod_lobby_settings::clear_has_mp_sputnik() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void h2mod_lobby_settings::clear_mp_sputnik() {
+  mp_sputnik_ = 0u;
+  clear_has_mp_sputnik();
+}
+inline ::google::protobuf::uint32 h2mod_lobby_settings::mp_sputnik() const {
+  // @@protoc_insertion_point(field_get:h2mod_lobby_settings.mp_sputnik)
+  return mp_sputnik_;
+}
+inline void h2mod_lobby_settings::set_mp_sputnik(::google::protobuf::uint32 value) {
+  set_has_mp_sputnik();
+  mp_sputnik_ = value;
+  // @@protoc_insertion_point(field_set:h2mod_lobby_settings.mp_sputnik)
+}
+
+// required uint32 mp_grunt_bday_party = 3;
+inline bool h2mod_lobby_settings::has_mp_grunt_bday_party() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void h2mod_lobby_settings::set_has_mp_grunt_bday_party() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void h2mod_lobby_settings::clear_has_mp_grunt_bday_party() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void h2mod_lobby_settings::clear_mp_grunt_bday_party() {
+  mp_grunt_bday_party_ = 0u;
+  clear_has_mp_grunt_bday_party();
+}
+inline ::google::protobuf::uint32 h2mod_lobby_settings::mp_grunt_bday_party() const {
+  // @@protoc_insertion_point(field_get:h2mod_lobby_settings.mp_grunt_bday_party)
+  return mp_grunt_bday_party_;
+}
+inline void h2mod_lobby_settings::set_mp_grunt_bday_party(::google::protobuf::uint32 value) {
+  set_has_mp_grunt_bday_party();
+  mp_grunt_bday_party_ = value;
+  // @@protoc_insertion_point(field_set:h2mod_lobby_settings.mp_grunt_bday_party)
+}
+
+// required uint32 grenade_chain_react = 4;
+inline bool h2mod_lobby_settings::has_grenade_chain_react() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void h2mod_lobby_settings::set_has_grenade_chain_react() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void h2mod_lobby_settings::clear_has_grenade_chain_react() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void h2mod_lobby_settings::clear_grenade_chain_react() {
+  grenade_chain_react_ = 0u;
+  clear_has_grenade_chain_react();
+}
+inline ::google::protobuf::uint32 h2mod_lobby_settings::grenade_chain_react() const {
+  // @@protoc_insertion_point(field_get:h2mod_lobby_settings.grenade_chain_react)
+  return grenade_chain_react_;
+}
+inline void h2mod_lobby_settings::set_grenade_chain_react(::google::protobuf::uint32 value) {
+  set_has_grenade_chain_react();
+  grenade_chain_react_ = value;
+  // @@protoc_insertion_point(field_set:h2mod_lobby_settings.grenade_chain_react)
+}
+
+// required uint32 banshee_bomb = 5;
+inline bool h2mod_lobby_settings::has_banshee_bomb() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void h2mod_lobby_settings::set_has_banshee_bomb() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void h2mod_lobby_settings::clear_has_banshee_bomb() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void h2mod_lobby_settings::clear_banshee_bomb() {
+  banshee_bomb_ = 0u;
+  clear_has_banshee_bomb();
+}
+inline ::google::protobuf::uint32 h2mod_lobby_settings::banshee_bomb() const {
+  // @@protoc_insertion_point(field_get:h2mod_lobby_settings.banshee_bomb)
+  return banshee_bomb_;
+}
+inline void h2mod_lobby_settings::set_banshee_bomb(::google::protobuf::uint32 value) {
+  set_has_banshee_bomb();
+  banshee_bomb_ = value;
+  // @@protoc_insertion_point(field_set:h2mod_lobby_settings.banshee_bomb)
+}
+
+// required uint32 mp_blind = 6;
+inline bool h2mod_lobby_settings::has_mp_blind() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void h2mod_lobby_settings::set_has_mp_blind() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void h2mod_lobby_settings::clear_has_mp_blind() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void h2mod_lobby_settings::clear_mp_blind() {
+  mp_blind_ = 0u;
+  clear_has_mp_blind();
+}
+inline ::google::protobuf::uint32 h2mod_lobby_settings::mp_blind() const {
+  // @@protoc_insertion_point(field_get:h2mod_lobby_settings.mp_blind)
+  return mp_blind_;
+}
+inline void h2mod_lobby_settings::set_mp_blind(::google::protobuf::uint32 value) {
+  set_has_mp_blind();
+  mp_blind_ = value;
+  // @@protoc_insertion_point(field_set:h2mod_lobby_settings.mp_blind)
+}
+
+// required uint32 flashlight = 7;
+inline bool h2mod_lobby_settings::has_flashlight() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void h2mod_lobby_settings::set_has_flashlight() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void h2mod_lobby_settings::clear_has_flashlight() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void h2mod_lobby_settings::clear_flashlight() {
+  flashlight_ = 0u;
+  clear_has_flashlight();
+}
+inline ::google::protobuf::uint32 h2mod_lobby_settings::flashlight() const {
+  // @@protoc_insertion_point(field_get:h2mod_lobby_settings.flashlight)
+  return flashlight_;
+}
+inline void h2mod_lobby_settings::set_flashlight(::google::protobuf::uint32 value) {
+  set_has_flashlight();
+  flashlight_ = value;
+  // @@protoc_insertion_point(field_set:h2mod_lobby_settings.flashlight)
 }
 
 

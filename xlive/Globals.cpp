@@ -2,6 +2,7 @@
 
 //all these global variables live till the app closes
 MapManager* mapManager = new MapManager();
+AdvLobbySettings* advLobbySettings = new AdvLobbySettings();
 
 volatile bool isLobby = true;
 bool overrideUnicodeMessage = false;

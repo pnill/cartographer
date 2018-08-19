@@ -57,6 +57,11 @@ void startGameThread() {
 									}
 								}
 							}
+						case H2ModPacket_Type_set_lobby_settings:
+							TRACE_GAME("[h2mod-network] Received lobby settings packet");
+							if (recvpak.has_lobby_settings()) {
+								advLobbySettings->parseLobbySettings(recvpak.lobby_settings());
+							}
 						default:
 							//TODO: log error
 							break;

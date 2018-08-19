@@ -31,6 +31,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* h2mod_map_info_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   h2mod_map_info_reflection_ = NULL;
+const ::google::protobuf::Descriptor* h2mod_lobby_settings_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  h2mod_lobby_settings_reflection_ = NULL;
 
 }  // namespace
 
@@ -42,11 +45,12 @@ void protobuf_AssignDesc_h2mod_2eproto() {
       "h2mod.proto");
   GOOGLE_CHECK(file != NULL);
   H2ModPacket_descriptor_ = file->message_type(0);
-  static const int H2ModPacket_offsets_[4] = {
+  static const int H2ModPacket_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, h2_set_player_team_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, set_grenade_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, map_info_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(H2ModPacket, lobby_settings_),
   };
   H2ModPacket_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -109,6 +113,27 @@ void protobuf_AssignDesc_h2mod_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(h2mod_map_info));
+  h2mod_lobby_settings_descriptor_ = file->message_type(4);
+  static const int h2mod_lobby_settings_offsets_[7] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_lobby_settings, mp_explosion_physics_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_lobby_settings, mp_sputnik_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_lobby_settings, mp_grunt_bday_party_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_lobby_settings, grenade_chain_react_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_lobby_settings, banshee_bomb_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_lobby_settings, mp_blind_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_lobby_settings, flashlight_),
+  };
+  h2mod_lobby_settings_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      h2mod_lobby_settings_descriptor_,
+      h2mod_lobby_settings::default_instance_,
+      h2mod_lobby_settings_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_lobby_settings, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(h2mod_lobby_settings, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(h2mod_lobby_settings));
 }
 
 namespace {
@@ -129,6 +154,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
     h2mod_set_team_descriptor_, &h2mod_set_team::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     h2mod_map_info_descriptor_, &h2mod_map_info::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    h2mod_lobby_settings_descriptor_, &h2mod_lobby_settings::default_instance());
 }
 
 }  // namespace
@@ -142,6 +169,8 @@ void protobuf_ShutdownFile_h2mod_2eproto() {
   delete h2mod_set_team_reflection_;
   delete h2mod_map_info::default_instance_;
   delete h2mod_map_info_reflection_;
+  delete h2mod_lobby_settings::default_instance_;
+  delete h2mod_lobby_settings_reflection_;
 }
 
 void protobuf_AddDesc_h2mod_2eproto() {
@@ -151,27 +180,36 @@ void protobuf_AddDesc_h2mod_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\013h2mod.proto\"\361\001\n\013H2ModPacket\022\037\n\004type\030\001 "
+    "\n\013h2mod.proto\"\270\002\n\013H2ModPacket\022\037\n\004type\030\001 "
     "\002(\0162\021.H2ModPacket.Type\022+\n\022h2_set_player_"
     "team\030\002 \001(\0132\017.h2mod_set_team\022\'\n\013set_grena"
     "de\030\003 \001(\0132\022.h2mod_set_grenade\022!\n\010map_info"
-    "\030\004 \001(\0132\017.h2mod_map_info\"H\n\004Type\022\023\n\017set_p"
-    "layer_team\020\002\022\025\n\021set_unit_grenades\020\003\022\024\n\020m"
-    "ap_info_request\020\004\"@\n\021h2mod_set_grenade\022\014"
-    "\n\004type\030\001 \002(\r\022\r\n\005count\030\002 \002(\r\022\016\n\006pIndex\030\003 "
-    "\002(\r\"1\n\016h2mod_set_team\022\021\n\tpeerIndex\030\001 \002(\r"
-    "\022\014\n\004team\030\002 \002(\r\"6\n\016h2mod_map_info\022\023\n\013mapF"
-    "ileName\030\001 \002(\t\022\017\n\007mapSize\030\002 \002(\r", 430);
+    "\030\004 \001(\0132\017.h2mod_map_info\022-\n\016lobby_setting"
+    "s\030\005 \001(\0132\025.h2mod_lobby_settings\"`\n\004Type\022\023"
+    "\n\017set_player_team\020\002\022\025\n\021set_unit_grenades"
+    "\020\003\022\024\n\020map_info_request\020\004\022\026\n\022set_lobby_se"
+    "ttings\020\005\"@\n\021h2mod_set_grenade\022\014\n\004type\030\001 "
+    "\002(\r\022\r\n\005count\030\002 \002(\r\022\016\n\006pIndex\030\003 \002(\r\"1\n\016h2"
+    "mod_set_team\022\021\n\tpeerIndex\030\001 \002(\r\022\014\n\004team\030"
+    "\002 \002(\r\"6\n\016h2mod_map_info\022\023\n\013mapFileName\030\001"
+    " \002(\t\022\017\n\007mapSize\030\002 \002(\r\"\276\001\n\024h2mod_lobby_se"
+    "ttings\022\034\n\024mp_explosion_physics\030\001 \002(\r\022\022\n\n"
+    "mp_sputnik\030\002 \002(\r\022\033\n\023mp_grunt_bday_party\030"
+    "\003 \002(\r\022\033\n\023grenade_chain_react\030\004 \002(\r\022\024\n\014ba"
+    "nshee_bomb\030\005 \002(\r\022\020\n\010mp_blind\030\006 \002(\r\022\022\n\nfl"
+    "ashlight\030\007 \002(\r", 694);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "h2mod.proto", &protobuf_RegisterTypes);
   H2ModPacket::default_instance_ = new H2ModPacket();
   h2mod_set_grenade::default_instance_ = new h2mod_set_grenade();
   h2mod_set_team::default_instance_ = new h2mod_set_team();
   h2mod_map_info::default_instance_ = new h2mod_map_info();
+  h2mod_lobby_settings::default_instance_ = new h2mod_lobby_settings();
   H2ModPacket::default_instance_->InitAsDefaultInstance();
   h2mod_set_grenade::default_instance_->InitAsDefaultInstance();
   h2mod_set_team::default_instance_->InitAsDefaultInstance();
   h2mod_map_info::default_instance_->InitAsDefaultInstance();
+  h2mod_lobby_settings::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_h2mod_2eproto);
 }
 
@@ -193,6 +231,7 @@ bool H2ModPacket_Type_IsValid(int value) {
     case 2:
     case 3:
     case 4:
+    case 5:
       return true;
     default:
       return false;
@@ -203,6 +242,7 @@ bool H2ModPacket_Type_IsValid(int value) {
 const H2ModPacket_Type H2ModPacket::set_player_team;
 const H2ModPacket_Type H2ModPacket::set_unit_grenades;
 const H2ModPacket_Type H2ModPacket::map_info_request;
+const H2ModPacket_Type H2ModPacket::set_lobby_settings;
 const H2ModPacket_Type H2ModPacket::Type_MIN;
 const H2ModPacket_Type H2ModPacket::Type_MAX;
 const int H2ModPacket::Type_ARRAYSIZE;
@@ -212,6 +252,7 @@ const int H2ModPacket::kTypeFieldNumber;
 const int H2ModPacket::kH2SetPlayerTeamFieldNumber;
 const int H2ModPacket::kSetGrenadeFieldNumber;
 const int H2ModPacket::kMapInfoFieldNumber;
+const int H2ModPacket::kLobbySettingsFieldNumber;
 #endif  // !_MSC_VER
 
 H2ModPacket::H2ModPacket()
@@ -224,6 +265,7 @@ void H2ModPacket::InitAsDefaultInstance() {
   h2_set_player_team_ = const_cast< ::h2mod_set_team*>(&::h2mod_set_team::default_instance());
   set_grenade_ = const_cast< ::h2mod_set_grenade*>(&::h2mod_set_grenade::default_instance());
   map_info_ = const_cast< ::h2mod_map_info*>(&::h2mod_map_info::default_instance());
+  lobby_settings_ = const_cast< ::h2mod_lobby_settings*>(&::h2mod_lobby_settings::default_instance());
 }
 
 H2ModPacket::H2ModPacket(const H2ModPacket& from)
@@ -239,6 +281,7 @@ void H2ModPacket::SharedCtor() {
   h2_set_player_team_ = NULL;
   set_grenade_ = NULL;
   map_info_ = NULL;
+  lobby_settings_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -252,6 +295,7 @@ void H2ModPacket::SharedDtor() {
     delete h2_set_player_team_;
     delete set_grenade_;
     delete map_info_;
+    delete lobby_settings_;
   }
 }
 
@@ -277,7 +321,7 @@ H2ModPacket* H2ModPacket::New() const {
 }
 
 void H2ModPacket::Clear() {
-  if (_has_bits_[0 / 32] & 15) {
+  if (_has_bits_[0 / 32] & 31) {
     type_ = 2;
     if (has_h2_set_player_team()) {
       if (h2_set_player_team_ != NULL) h2_set_player_team_->::h2mod_set_team::Clear();
@@ -287,6 +331,9 @@ void H2ModPacket::Clear() {
     }
     if (has_map_info()) {
       if (map_info_ != NULL) map_info_->::h2mod_map_info::Clear();
+    }
+    if (has_lobby_settings()) {
+      if (lobby_settings_ != NULL) lobby_settings_->::h2mod_lobby_settings::Clear();
     }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -357,6 +404,19 @@ bool H2ModPacket::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(42)) goto parse_lobby_settings;
+        break;
+      }
+
+      // optional .h2mod_lobby_settings lobby_settings = 5;
+      case 5: {
+        if (tag == 42) {
+         parse_lobby_settings:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_lobby_settings()));
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -410,6 +470,12 @@ void H2ModPacket::SerializeWithCachedSizes(
       4, this->map_info(), output);
   }
 
+  // optional .h2mod_lobby_settings lobby_settings = 5;
+  if (has_lobby_settings()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      5, this->lobby_settings(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -445,6 +511,13 @@ void H2ModPacket::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         4, this->map_info(), target);
+  }
+
+  // optional .h2mod_lobby_settings lobby_settings = 5;
+  if (has_lobby_settings()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        5, this->lobby_settings(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -486,6 +559,13 @@ int H2ModPacket::ByteSize() const {
           this->map_info());
     }
 
+    // optional .h2mod_lobby_settings lobby_settings = 5;
+    if (has_lobby_settings()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->lobby_settings());
+    }
+
   }
   if (!unknown_fields().empty()) {
     total_size +=
@@ -525,6 +605,9 @@ void H2ModPacket::MergeFrom(const H2ModPacket& from) {
     if (from.has_map_info()) {
       mutable_map_info()->::h2mod_map_info::MergeFrom(from.map_info());
     }
+    if (from.has_lobby_settings()) {
+      mutable_lobby_settings()->::h2mod_lobby_settings::MergeFrom(from.lobby_settings());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -553,6 +636,9 @@ bool H2ModPacket::IsInitialized() const {
   if (has_map_info()) {
     if (!this->map_info().IsInitialized()) return false;
   }
+  if (has_lobby_settings()) {
+    if (!this->lobby_settings().IsInitialized()) return false;
+  }
   return true;
 }
 
@@ -562,6 +648,7 @@ void H2ModPacket::Swap(H2ModPacket* other) {
     std::swap(h2_set_player_team_, other->h2_set_player_team_);
     std::swap(set_grenade_, other->set_grenade_);
     std::swap(map_info_, other->map_info_);
+    std::swap(lobby_settings_, other->lobby_settings_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -1446,6 +1533,473 @@ void h2mod_map_info::Swap(h2mod_map_info* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = h2mod_map_info_descriptor_;
   metadata.reflection = h2mod_map_info_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int h2mod_lobby_settings::kMpExplosionPhysicsFieldNumber;
+const int h2mod_lobby_settings::kMpSputnikFieldNumber;
+const int h2mod_lobby_settings::kMpGruntBdayPartyFieldNumber;
+const int h2mod_lobby_settings::kGrenadeChainReactFieldNumber;
+const int h2mod_lobby_settings::kBansheeBombFieldNumber;
+const int h2mod_lobby_settings::kMpBlindFieldNumber;
+const int h2mod_lobby_settings::kFlashlightFieldNumber;
+#endif  // !_MSC_VER
+
+h2mod_lobby_settings::h2mod_lobby_settings()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:h2mod_lobby_settings)
+}
+
+void h2mod_lobby_settings::InitAsDefaultInstance() {
+}
+
+h2mod_lobby_settings::h2mod_lobby_settings(const h2mod_lobby_settings& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:h2mod_lobby_settings)
+}
+
+void h2mod_lobby_settings::SharedCtor() {
+  _cached_size_ = 0;
+  mp_explosion_physics_ = 0u;
+  mp_sputnik_ = 0u;
+  mp_grunt_bday_party_ = 0u;
+  grenade_chain_react_ = 0u;
+  banshee_bomb_ = 0u;
+  mp_blind_ = 0u;
+  flashlight_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+h2mod_lobby_settings::~h2mod_lobby_settings() {
+  // @@protoc_insertion_point(destructor:h2mod_lobby_settings)
+  SharedDtor();
+}
+
+void h2mod_lobby_settings::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void h2mod_lobby_settings::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* h2mod_lobby_settings::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return h2mod_lobby_settings_descriptor_;
+}
+
+const h2mod_lobby_settings& h2mod_lobby_settings::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_h2mod_2eproto();
+  return *default_instance_;
+}
+
+h2mod_lobby_settings* h2mod_lobby_settings::default_instance_ = NULL;
+
+h2mod_lobby_settings* h2mod_lobby_settings::New() const {
+  return new h2mod_lobby_settings;
+}
+
+void h2mod_lobby_settings::Clear() {
+#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
+  &reinterpret_cast<h2mod_lobby_settings*>(16)->f) - \
+   reinterpret_cast<char*>(16))
+
+#define ZR_(first, last) do {                              \
+    size_t f = OFFSET_OF_FIELD_(first);                    \
+    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
+    ::memset(&first, 0, n);                                \
+  } while (0)
+
+  if (_has_bits_[0 / 32] & 127) {
+    ZR_(mp_explosion_physics_, flashlight_);
+  }
+
+#undef OFFSET_OF_FIELD_
+#undef ZR_
+
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool h2mod_lobby_settings::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:h2mod_lobby_settings)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required uint32 mp_explosion_physics = 1;
+      case 1: {
+        if (tag == 8) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &mp_explosion_physics_)));
+          set_has_mp_explosion_physics();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_mp_sputnik;
+        break;
+      }
+
+      // required uint32 mp_sputnik = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_mp_sputnik:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &mp_sputnik_)));
+          set_has_mp_sputnik();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(24)) goto parse_mp_grunt_bday_party;
+        break;
+      }
+
+      // required uint32 mp_grunt_bday_party = 3;
+      case 3: {
+        if (tag == 24) {
+         parse_mp_grunt_bday_party:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &mp_grunt_bday_party_)));
+          set_has_mp_grunt_bday_party();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(32)) goto parse_grenade_chain_react;
+        break;
+      }
+
+      // required uint32 grenade_chain_react = 4;
+      case 4: {
+        if (tag == 32) {
+         parse_grenade_chain_react:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &grenade_chain_react_)));
+          set_has_grenade_chain_react();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(40)) goto parse_banshee_bomb;
+        break;
+      }
+
+      // required uint32 banshee_bomb = 5;
+      case 5: {
+        if (tag == 40) {
+         parse_banshee_bomb:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &banshee_bomb_)));
+          set_has_banshee_bomb();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(48)) goto parse_mp_blind;
+        break;
+      }
+
+      // required uint32 mp_blind = 6;
+      case 6: {
+        if (tag == 48) {
+         parse_mp_blind:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &mp_blind_)));
+          set_has_mp_blind();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(56)) goto parse_flashlight;
+        break;
+      }
+
+      // required uint32 flashlight = 7;
+      case 7: {
+        if (tag == 56) {
+         parse_flashlight:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &flashlight_)));
+          set_has_flashlight();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:h2mod_lobby_settings)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:h2mod_lobby_settings)
+  return false;
+#undef DO_
+}
+
+void h2mod_lobby_settings::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:h2mod_lobby_settings)
+  // required uint32 mp_explosion_physics = 1;
+  if (has_mp_explosion_physics()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->mp_explosion_physics(), output);
+  }
+
+  // required uint32 mp_sputnik = 2;
+  if (has_mp_sputnik()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->mp_sputnik(), output);
+  }
+
+  // required uint32 mp_grunt_bday_party = 3;
+  if (has_mp_grunt_bday_party()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->mp_grunt_bday_party(), output);
+  }
+
+  // required uint32 grenade_chain_react = 4;
+  if (has_grenade_chain_react()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(4, this->grenade_chain_react(), output);
+  }
+
+  // required uint32 banshee_bomb = 5;
+  if (has_banshee_bomb()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(5, this->banshee_bomb(), output);
+  }
+
+  // required uint32 mp_blind = 6;
+  if (has_mp_blind()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(6, this->mp_blind(), output);
+  }
+
+  // required uint32 flashlight = 7;
+  if (has_flashlight()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(7, this->flashlight(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:h2mod_lobby_settings)
+}
+
+::google::protobuf::uint8* h2mod_lobby_settings::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:h2mod_lobby_settings)
+  // required uint32 mp_explosion_physics = 1;
+  if (has_mp_explosion_physics()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->mp_explosion_physics(), target);
+  }
+
+  // required uint32 mp_sputnik = 2;
+  if (has_mp_sputnik()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->mp_sputnik(), target);
+  }
+
+  // required uint32 mp_grunt_bday_party = 3;
+  if (has_mp_grunt_bday_party()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->mp_grunt_bday_party(), target);
+  }
+
+  // required uint32 grenade_chain_react = 4;
+  if (has_grenade_chain_react()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(4, this->grenade_chain_react(), target);
+  }
+
+  // required uint32 banshee_bomb = 5;
+  if (has_banshee_bomb()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(5, this->banshee_bomb(), target);
+  }
+
+  // required uint32 mp_blind = 6;
+  if (has_mp_blind()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(6, this->mp_blind(), target);
+  }
+
+  // required uint32 flashlight = 7;
+  if (has_flashlight()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(7, this->flashlight(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:h2mod_lobby_settings)
+  return target;
+}
+
+int h2mod_lobby_settings::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required uint32 mp_explosion_physics = 1;
+    if (has_mp_explosion_physics()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->mp_explosion_physics());
+    }
+
+    // required uint32 mp_sputnik = 2;
+    if (has_mp_sputnik()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->mp_sputnik());
+    }
+
+    // required uint32 mp_grunt_bday_party = 3;
+    if (has_mp_grunt_bday_party()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->mp_grunt_bday_party());
+    }
+
+    // required uint32 grenade_chain_react = 4;
+    if (has_grenade_chain_react()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->grenade_chain_react());
+    }
+
+    // required uint32 banshee_bomb = 5;
+    if (has_banshee_bomb()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->banshee_bomb());
+    }
+
+    // required uint32 mp_blind = 6;
+    if (has_mp_blind()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->mp_blind());
+    }
+
+    // required uint32 flashlight = 7;
+    if (has_flashlight()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->flashlight());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void h2mod_lobby_settings::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const h2mod_lobby_settings* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const h2mod_lobby_settings*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void h2mod_lobby_settings::MergeFrom(const h2mod_lobby_settings& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_mp_explosion_physics()) {
+      set_mp_explosion_physics(from.mp_explosion_physics());
+    }
+    if (from.has_mp_sputnik()) {
+      set_mp_sputnik(from.mp_sputnik());
+    }
+    if (from.has_mp_grunt_bday_party()) {
+      set_mp_grunt_bday_party(from.mp_grunt_bday_party());
+    }
+    if (from.has_grenade_chain_react()) {
+      set_grenade_chain_react(from.grenade_chain_react());
+    }
+    if (from.has_banshee_bomb()) {
+      set_banshee_bomb(from.banshee_bomb());
+    }
+    if (from.has_mp_blind()) {
+      set_mp_blind(from.mp_blind());
+    }
+    if (from.has_flashlight()) {
+      set_flashlight(from.flashlight());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void h2mod_lobby_settings::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void h2mod_lobby_settings::CopyFrom(const h2mod_lobby_settings& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool h2mod_lobby_settings::IsInitialized() const {
+  if ((_has_bits_[0] & 0x0000007f) != 0x0000007f) return false;
+
+  return true;
+}
+
+void h2mod_lobby_settings::Swap(h2mod_lobby_settings* other) {
+  if (other != this) {
+    std::swap(mp_explosion_physics_, other->mp_explosion_physics_);
+    std::swap(mp_sputnik_, other->mp_sputnik_);
+    std::swap(mp_grunt_bday_party_, other->mp_grunt_bday_party_);
+    std::swap(grenade_chain_react_, other->grenade_chain_react_);
+    std::swap(banshee_bomb_, other->banshee_bomb_);
+    std::swap(mp_blind_, other->mp_blind_);
+    std::swap(flashlight_, other->flashlight_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata h2mod_lobby_settings::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = h2mod_lobby_settings_descriptor_;
+  metadata.reflection = h2mod_lobby_settings_reflection_;
   return metadata;
 }
 

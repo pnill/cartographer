@@ -276,6 +276,13 @@ void MapManager::cleanup() {
 
 void MapManager::sendMapInfoPacket()
 {
+#ifdef _DEBUG
+	int tmpFlagOrig = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+	int tmpFlag = tmpFlagOrig;
+	tmpFlag &= 0xFFFFFFFF ^ (_CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetDbgFlag(tmpFlag);
+#endif
+
 	H2ModPacket teampak;
 	teampak.set_type(H2ModPacket_Type_map_info_request);
 
@@ -300,6 +307,10 @@ void MapManager::sendMapInfoPacket()
 
 	network->networkCommand = NULL;
 	delete[] SendBuf;
+
+#ifdef _DEBUG
+	_CrtSetDbgFlag(tmpFlagOrig);
+#endif
 }
 
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {

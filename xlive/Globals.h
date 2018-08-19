@@ -25,9 +25,11 @@
 #include "H2MOD_MapManager.h"
 #include "H2MOD_Network.h"
 #include "H2MOD_GameManager.h"
+#include "H2MOD_AdvLobbySettings.h"
 
 extern XNADDR join_game_xn;
 extern MapManager* mapManager;
+extern AdvLobbySettings* advLobbySettings;
 extern volatile bool isLobby;
 extern bool overrideUnicodeMessage;
 extern ConsoleCommands* commands; 

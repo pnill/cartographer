@@ -11,7 +11,7 @@ void DeinitH2Tweaks();
 void setSens(short input_type, int sens);
 
 namespace H2Tweaks {
-
+	void toggleKillVolumes(bool enable);
 	void enableAI_MP();
 	void disableAI_MP();
 	void PatchPingMeterCheck();

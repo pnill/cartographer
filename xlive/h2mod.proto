@@ -6,12 +6,14 @@ message H2ModPacket {
 		set_player_team = 2;
 		set_unit_grenades = 3;
 		map_info_request = 4;
+		set_lobby_settings = 5;
 	}
 
 	required H2ModPacket.Type type = 1;
 	optional h2mod_set_team h2_set_player_team = 2;
 	optional h2mod_set_grenade set_grenade = 3;
 	optional h2mod_map_info map_info = 4;
+	optional h2mod_lobby_settings lobby_settings = 5;
 }
 
 message h2mod_set_grenade {
@@ -28,4 +30,14 @@ message h2mod_set_team {
 message h2mod_map_info {
 	required string mapFileName = 1;
 	required uint32 mapSize = 2;
+}
+
+message h2mod_lobby_settings {
+	required uint32 mp_explosion_physics = 1;
+	required uint32 mp_sputnik = 2;
+	required uint32 mp_grunt_bday_party = 3;
+	required uint32 grenade_chain_react = 4;
+	required uint32 banshee_bomb = 5;
+	required uint32 mp_blind = 6;
+	required uint32 flashlight = 7;
 }

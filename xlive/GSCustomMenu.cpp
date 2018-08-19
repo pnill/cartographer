@@ -13,6 +13,8 @@
 #include "H2Tweaks.h"
 #include "GSDownload.h"
 #include <Shellapi.h>
+#include "H2MOD_AdvLobbySettings.h"
+#include "Globals.h"
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
@@ -1752,103 +1754,97 @@ void GSCustomMenuCall_EditStaticLoD() {
 
 #pragma endregion
 
- const int CMLabelMenuId_EditCrosshairSize = 0xFF000015;
+
+const int CMLabelMenuId_EditCrosshairSize = 0xFF000015;
 #pragma region CM_EditCrosshairSize
 
 void __stdcall CMLabelButtons_EditCrosshairSize(int a1, int a2)
- {
+{
 	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
 	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
-	
-		__int16 button_id = *(WORD*)(a1 + 112);
+
+	__int16 button_id = *(WORD*)(a1 + 112);
 	int v3 = sub_211909(a1, 6, 0, 0);
 	if (v3)
-		{
+	{
 		sub_21bf85_CMLTD(v3, button_id + 1, CMLabelMenuId_EditCrosshairSize);
-		}
 	}
+}
 
 __declspec(naked) void sub_2111ab_CMLTD_nak_EditCrosshairSize() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
-		
+
 		push ebp
-		 push edi
-		 push esi
-		 push ecx
-		 push ebx
-		
+		push edi
+		push esi
+		push ecx
+		push ebx
+
 		push 0xFFFFFFF1//label_id_description
-		 push 0xFFFFFFF0//label_id_title
-		 push CMLabelMenuId_EditCrosshairSize
-		 push eax
-		 push ecx
-		 call sub_2111ab_CMLTD//__stdcall
-		
+		push 0xFFFFFFF0//label_id_title
+		push CMLabelMenuId_EditCrosshairSize
+		push eax
+		push ecx
+		call sub_2111ab_CMLTD//__stdcall
+
 		pop ebx
-		 pop ecx
-		 pop esi
-		 pop edi
-		 pop ebp
-		
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
 		retn 4
-		 }
-	
+	}
 }
 
 static bool CMButtonHandler_EditCrosshairSize(int button_id) {
 	H2Tweaks::setCrosshairSize(button_id, true);
 	return true;
-	
 }
 
 __declspec(naked) void sub_20F790_CM_nak_EditCrosshairSize() {//__thiscall
 	__asm {
 		push ebp
-		 push edi
-		 push esi
-		 push ecx
-		 push ebx
-		
+		push edi
+		push esi
+		push ecx
+		push ebx
+
 		push 0//selected button id
-		 push ecx
-		 call sub_20F790_CM//__stdcall
-		
+		push ecx
+		call sub_20F790_CM//__stdcall
+
 		pop ebx
-		 pop ecx
-		 pop esi
-		 pop edi
-		 pop ebp
-		
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
 		retn
-		 }
-	
+	}
 }
 
 int CustomMenu_EditCrosshairSize(int);
 
 int(__cdecl *CustomMenuFuncPtrHelp_EditCrosshairSize())(int) {
 	return CustomMenu_EditCrosshairSize;
-	
 }
 
 DWORD * menu_vftable_1_EditCrosshairSize = 0;
-DWORD * menu_vftable_2_EditCrosshairSize= 0;
+DWORD * menu_vftable_2_EditCrosshairSize = 0;
 
 void CMSetupVFTables_EditCrosshairSize() {
 	CMSetupVFTables(&menu_vftable_1_EditCrosshairSize, &menu_vftable_2_EditCrosshairSize, (DWORD)CMLabelButtons_EditCrosshairSize, (DWORD)sub_2111ab_CMLTD_nak_EditCrosshairSize, (DWORD)CustomMenuFuncPtrHelp_EditCrosshairSize, (DWORD)sub_20F790_CM_nak_EditCrosshairSize, true, 0);
-	
 }
 
 int CustomMenu_EditCrosshairSize(int a1) {
 	return CustomMenu_CallHead(a1, menu_vftable_1_EditCrosshairSize, menu_vftable_2_EditCrosshairSize, (DWORD)&CMButtonHandler_EditCrosshairSize, 5, 272);
-	
 }
 
 void GSCustomMenuCall_EditCrosshairSize() {
 	int WgitScreenfunctionPtr = (int)(CustomMenu_EditCrosshairSize);
 	CallWgit(WgitScreenfunctionPtr);
-	
 }
 
 #pragma endregion
@@ -2268,6 +2264,8 @@ static bool blind_hud = false;
 char __cdecl sub_BD114_blind_fp(unsigned int a1)//render first person model
 {
 	char result = blind_fp ? 1 : 0;
+	if (AdvLobbySettings_mp_blind & 0b10)
+		result = 1;
 	return result;
 }
 
@@ -2279,6 +2277,8 @@ char __cdecl sub_BD114_blind_hud(unsigned int a1)//render hud
 		return 0;
 	}
 	char result = blind_hud ? 1 : 0;
+	if (AdvLobbySettings_mp_blind & 0b01)
+		result = 1;
 	return result;
 }
 
@@ -2705,6 +2705,13 @@ const int CMLabelMenuId_OtherSettings = 0xFF00000D;
 #pragma region CM_OtherSettings
 
 static bool vehicleFlipoverEject = true;
+void refreshVehicleFlipoverEject() {
+	//Disables Vehicle Eject on Flipover (host required)
+	BYTE assmDisableVehicleFlipEject[] = { 0xEB };
+	if (vehicleFlipoverEject)
+		assmDisableVehicleFlipEject[0] = 0x7E;
+	WriteBytes(H2BaseAddr + 0x159e5d, assmDisableVehicleFlipEject, 1);
+}
 
 static void loadLabelToggle_OtherSettings(int lblIndex, int lblTogglePrefix, bool isEnabled) {
 	combineCartographerLabels(CMLabelMenuId_OtherSettings, lblTogglePrefix + (isEnabled ? 1 : 0), 0xFFFF0000 + lblIndex, lblIndex);
@@ -2782,16 +2789,7 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
 	}
 	else if (button_id == 8) {
-		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (vehicleFlipoverEject = !vehicleFlipoverEject));
-
-		//Disables Vehicle Eject on Flipover (host required)
-		BYTE assmDisableVehicleFlipEject[] = { 0xEB };
-		if (vehicleFlipoverEject)
-			assmDisableVehicleFlipEject[0] = 0x7E;
-		WriteBytes(H2BaseAddr + 0x159e5d, assmDisableVehicleFlipEject, 1);
-	}
-	else if (button_id == 8) {
-
+		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_hitmarker_sound = !H2Config_hitmarker_sound));
 	}
 	return false;
 }
@@ -2838,7 +2836,7 @@ int __cdecl CustomMenu_OtherSettings(int a1) {
 	loadLabelToggle_OtherSettings(6, 0xFFFFFFF6, !H2Config_skip_intro);
 	loadLabelToggle_OtherSettings(7, 0xFFFFFFF2, !H2Config_disable_ingame_keyboard);
 	loadLabelToggle_OtherSettings(8, 0xFFFFFFF2, H2Config_raw_input);
-	loadLabelToggle_OtherSettings(9, 0xFFFFFFF2, vehicleFlipoverEject);
+	loadLabelToggle_OtherSettings(9, 0xFFFFFFF2, H2Config_hitmarker_sound);
 	return CustomMenu_CallHead(a1, menu_vftable_1_OtherSettings, menu_vftable_2_OtherSettings, (DWORD)&CMButtonHandler_OtherSettings, 9, 272);
 }
 
@@ -2906,6 +2904,9 @@ static bool CMButtonHandler_AdvSettings(int button_id) {
 	else if (button_id == 3) {
 		GSCustomMenuCall_ToggleSkulls();
 	}
+	else if (button_id == 4) {
+		GSCustomMenuCall_AdvLobbySettings();
+	}
 	return false;
 }
 
@@ -2945,12 +2946,221 @@ void CMSetupVFTables_AdvSettings() {
 }
 
 int __cdecl CustomMenu_AdvSettings(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, 4, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, gameManager->isHost() && h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE ? 5 : 4, 272);
 }
 
 void GSCustomMenuCall_AdvSettings() {
 	int WgitScreenfunctionPtr = (int)(CustomMenu_AdvSettings);
 	CallWgit(WgitScreenfunctionPtr);
+}
+
+#pragma endregion
+
+
+const int CMLabelMenuId_AdvLobbySettings = 0xFF000016;
+#pragma region CM_AdvLobbySettings
+
+static void loadLabelToggle_AdvLobbySettings(int lblIndex, int lblTogglePrefix, bool isEnabled) {
+	combineCartographerLabels(CMLabelMenuId_AdvLobbySettings, lblTogglePrefix + (isEnabled ? 1 : 0), 0xFFFF0000 + lblIndex, lblIndex);
+}
+
+void __stdcall CMLabelButtons_AdvLobbySettings(int a1, int a2)
+{
+	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+
+	__int16 button_id = *(WORD*)(a1 + 112);
+	int v3 = sub_211909(a1, 6, 0, 0);
+	if (v3)
+	{
+		sub_21bf85_CMLTD(v3, button_id + 1, CMLabelMenuId_AdvLobbySettings);
+	}
+}
+
+__declspec(naked) void sub_2111ab_CMLTD_nak_AdvLobbySettings() {//__thiscall
+	__asm {
+		mov eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0xFFFFFFF1//label_id_description
+		push 0xFFFFFFF0//label_id_title
+		push CMLabelMenuId_AdvLobbySettings
+		push eax
+		push ecx
+		call sub_2111ab_CMLTD//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+static bool CMButtonHandler_AdvLobbySettings(int button_id) {
+	if (button_id == 0) {
+		wchar_t* bufferLobbyName = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AdvLobbySettings, 0xFFFFF001);
+		GSCustomMenuCall_VKeyboard_Inner(bufferLobbyName, 32, 0b11, CMLabelMenuId_AdvLobbySettings, 0xFFFFFF02, CMLabelMenuId_AdvLobbySettings, 0xFFFFFF03);
+	}
+	else if (button_id == 1) {
+		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (vehicleFlipoverEject = !vehicleFlipoverEject));
+		refreshVehicleFlipoverEject();
+	}
+	else if (button_id == 2) {
+		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_disable_kill_volumes = !AdvLobbySettings_disable_kill_volumes));
+		if (gameManager->isHost() && h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE && !AdvLobbySettings_disable_kill_volumes) {
+			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
+		}
+		H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
+	}
+	else if (button_id == 3) {
+		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_mp_explosion_physics = !AdvLobbySettings_mp_explosion_physics));
+	}
+	else if (button_id == 4) {
+		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_mp_sputnik = !AdvLobbySettings_mp_sputnik));
+	}
+	else if (button_id == 5) {
+		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_mp_grunt_bday_party = !AdvLobbySettings_mp_grunt_bday_party));
+	}
+	else if (button_id == 6) {
+		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_grenade_chain_react = !AdvLobbySettings_grenade_chain_react));
+	}
+	else if (button_id == 7) {
+		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_banshee_bomb = !AdvLobbySettings_banshee_bomb));
+	}
+	else if (button_id == 8) {
+		AdvLobbySettings_mp_blind = (AdvLobbySettings_mp_blind & ~0b01) | (~AdvLobbySettings_mp_blind & 0b01);
+		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b01));
+	}
+	else if (button_id == 9) {
+		AdvLobbySettings_mp_blind = (AdvLobbySettings_mp_blind & ~0b10) | (~AdvLobbySettings_mp_blind & 0b10);
+		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b10));
+	}
+	else if (button_id == 10) {
+		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_flashlight = !AdvLobbySettings_flashlight));
+	}
+	return false;
+}
+
+__declspec(naked) void sub_20F790_CM_nak_AdvLobbySettings() {//__thiscall
+	__asm {
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0//selected button id
+		push ecx
+		call sub_20F790_CM//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn
+	}
+}
+
+void* __stdcall sub_248beb_deconstructor_AdvLobbySettings(LPVOID lpMem, char a2)//__thiscall
+{
+	wchar_t* bufferLobbyName = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AdvLobbySettings, 0xFFFFF001);
+	if (wcslen(bufferLobbyName) == 0) {
+		wchar_t* ClientName = (wchar_t*)((BYTE*)H2BaseAddr + 0x0051a638);
+		wcsncpy(bufferLobbyName, ClientName, 16);
+	}
+	wchar_t* ServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x0096da94);
+	wchar_t* ServerNameActive = (wchar_t*)((BYTE*)H2BaseAddr + 0x0051a5b2);
+	wcsncpy(ServerName, bufferLobbyName, 32);
+	wcsncpy(ServerNameActive, bufferLobbyName, 32);
+
+	if (gameManager->isHost() && h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE) {
+		advLobbySettings->sendLobbySettingsPacket();
+	}
+	
+	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
+	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
+
+	sub_248b90((void*)lpMem);
+	if (a2 & 1) {
+		sub_287c23((void*)lpMem);
+	}
+	return (void*)lpMem;
+}
+
+__declspec(naked) void sub_248beb_nak_deconstructor_AdvLobbySettings() {//__thiscall
+	__asm {
+		mov  eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push eax
+		push ecx
+		call sub_248beb_deconstructor_AdvLobbySettings//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+int __cdecl CustomMenu_AdvLobbySettings(int);
+
+int(__cdecl *CustomMenuFuncPtrHelp_AdvLobbySettings())(int) {
+	return CustomMenu_AdvLobbySettings;
+}
+
+DWORD* menu_vftable_1_AdvLobbySettings = 0;
+DWORD* menu_vftable_2_AdvLobbySettings = 0;
+
+void CMSetupVFTables_AdvLobbySettings() {
+	CMSetupVFTables(&menu_vftable_1_AdvLobbySettings, &menu_vftable_2_AdvLobbySettings, (DWORD)CMLabelButtons_AdvLobbySettings, (DWORD)sub_2111ab_CMLTD_nak_AdvLobbySettings, (DWORD)CustomMenuFuncPtrHelp_AdvLobbySettings, (DWORD)sub_20F790_CM_nak_AdvLobbySettings, true, (DWORD)sub_248beb_nak_deconstructor_AdvLobbySettings);
+}
+
+int __cdecl CustomMenu_AdvLobbySettings(int a1) {
+	wchar_t* bufferLobbyName = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AdvLobbySettings, 0xFFFFF001);
+	if (wcslen(bufferLobbyName) == 0) {
+		wchar_t* ClientName = (wchar_t*)((BYTE*)H2BaseAddr + 0x0051a638);
+		wcsncpy(bufferLobbyName, ClientName, 16);
+	}
+	loadLabelToggle_AdvLobbySettings(2, 0xFFFFFFF2, vehicleFlipoverEject);
+	loadLabelToggle_AdvLobbySettings(3, 0xFFFFFFF2, !AdvLobbySettings_disable_kill_volumes);
+	loadLabelToggle_AdvLobbySettings(4, 0xFFFFFFF2, AdvLobbySettings_mp_explosion_physics);
+	loadLabelToggle_AdvLobbySettings(5, 0xFFFFFFF2, AdvLobbySettings_mp_sputnik);
+	loadLabelToggle_AdvLobbySettings(6, 0xFFFFFFF2, AdvLobbySettings_mp_grunt_bday_party);
+	loadLabelToggle_AdvLobbySettings(7, 0xFFFFFFF2, AdvLobbySettings_grenade_chain_react);
+	loadLabelToggle_AdvLobbySettings(8, 0xFFFFFFF2, AdvLobbySettings_banshee_bomb);
+	loadLabelToggle_AdvLobbySettings(9, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b01));
+	loadLabelToggle_AdvLobbySettings(10, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b10));
+	loadLabelToggle_AdvLobbySettings(11, 0xFFFFFFF2, AdvLobbySettings_flashlight);
+	return CustomMenu_CallHead(a1, menu_vftable_1_AdvLobbySettings, menu_vftable_2_AdvLobbySettings, (DWORD)&CMButtonHandler_AdvLobbySettings, 11, 272);
+}
+
+void GSCustomMenuCall_AdvLobbySettings() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_AdvLobbySettings);
+	CallWgit(WgitScreenfunctionPtr);
+}
+
+void GSCustomMenuCall_AdvLobbySettings3() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_AdvLobbySettings);
+	CallWgit(WgitScreenfunctionPtr, 3);
 }
 
 #pragma endregion
@@ -4406,6 +4616,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 5, "L4 - High");
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 6, "L5 - Very High");
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 7, "L6 - Cinematic");
+	
 
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 0xFFFFFFF0, "Crosshair Settings");
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 0xFFFFFFF1, "Use the buttons below to set a preset crosshair size. Use the config file to modify crosshairs in more detail.");
@@ -4415,7 +4626,6 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 4, "Small");
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 5, "Large");
 	
-
 
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF0, "Update");
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF1, "Update Project Cartographer.");
@@ -4494,10 +4704,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0006, "Game Intro Video");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0007, "In-game Keyb. CTRLs");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0008, "Raw Mouse Input");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0009, "Vehicle Flip Eject");
-	//Lobby Options
-	//add_cartographer_label(CMLabelMenuId_OtherSettings, 6, "Change Server Name");
-	//add_cartographer_label(CMLabelMenuId_OtherSettings, 7, "Zombie Movement Speed");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0009, "Hitmarker Sound Effect");
 
 
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF0, "Advanced Settings");
@@ -4506,6 +4713,32 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 2, "Customise HUD/GUI");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 3, "Other Settings");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 4, "Toggle Skulls");
+	add_cartographer_label(CMLabelMenuId_AdvSettings, 5, "Extra Game Settings");
+
+
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF0, "Extra Game Settings");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF1, "Customise the game with some extra features / hacks.");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF2, "Enable %s");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF3, "Disable %s");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF4, "Show %s");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF5, "Hide %s");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF6, "Play %s");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF7, "Skip %s");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFF02, "Change Server Name");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFF03, "Enter the new name for your lobby.");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFF001, 32 * sizeof(wchar_t), true);
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 1, ">Change Server Name");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0002, "Vehicle Flip Eject");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0003, "Kill Volumes");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0004, "MP Explosion Physics");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0005, "MP Sputnik");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0006, "MP Grunt B-Day Party");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0007, "Grenade Chain React");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0008, "Banshee Bomb");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0009, "HUD");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF000A, "First Person Model");
+	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF000B, "Flashlight");
+	//add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 7, "Zombie Movement Speed");
 
 
 	add_cartographer_label(CMLabelMenuId_Credits, 0xFFFFFFF0, "Credits");
@@ -4643,6 +4876,8 @@ void initGSCustomMenu() {
 	CMSetupVFTables_OtherSettings();
 
 	CMSetupVFTables_AdvSettings();
+
+	CMSetupVFTables_AdvLobbySettings();
 
 	CMSetupVFTables_Credits();
 

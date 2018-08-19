@@ -368,6 +368,8 @@ void GSMainLoop() {
 		sprintf(replacedNetworkNormalTextWidget2, replacementText2.c_str(), allPlayersCount, allActiveGamesCount, allGamesCount);
 
 	}
+
+	advLobbySettings->loop();
 }
 
 signed int(*sub_287a1)();
