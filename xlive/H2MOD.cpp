@@ -1300,6 +1300,11 @@ void H2MOD::ApplyHooks() {
 		PatchCall(Base + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
 		PatchCall(Base + 0x00092C05, BansheeBombIsEngineMPCheck);
 		PatchCall(Base + 0x0013ff75, FlashlightIsEngineSPCheck);
+		
+		// Fixes issue #118
+		/* g_depth_value always NULL rather than taking any value from 
+		   shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_value); */
+		NopFill(GetBase() + 0x269FD5, 0x8);
 	}
 	else {
 
