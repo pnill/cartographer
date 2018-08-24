@@ -23,4 +23,5 @@ namespace H2Tweaks {
 	void setFOV(int field_of_view_degrees);
 	void setCrosshairPos(float crosshair_offset);
 	void setCrosshairSize(int size, bool preset);
+	void RadarPatch();
 }

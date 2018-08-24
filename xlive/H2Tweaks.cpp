@@ -1165,3 +1165,20 @@ void H2Tweaks::FixRanksIcons() {
 		addDebugText("Patching Rank Icon Fix.");
 	}
 }
+void H2Tweaks::RadarPatch() {
+
+	if (H2IsDediServer)
+		return;
+
+	if (h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE) {
+
+		DWORD shared_Meta_Data_ptr = *(DWORD*)(H2BaseAddr + 0x47CD64);
+
+		//Tag : ui\hud\bitmaps\hud_sweeper.bitm
+		const DWORD tag_offset = 0x00D93BA8;    //Property : Bitmap
+		const BYTE format_offset = 0x0C;      //Definition : Format Offset
+		const WORD format_type = 0x0010;      //Definition : Format Enum
+
+		WriteValue(shared_Meta_Data_ptr + tag_offset + format_offset, format_type);
+	}
+}
