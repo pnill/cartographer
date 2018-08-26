@@ -8,6 +8,8 @@
 #include "H2Tweaks.h"
 #include "H2Config.h"
 
+std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
+
 ConsoleCommands::ConsoleCommands() {
 	command = "";
 	caretPos = 0;
@@ -38,34 +40,60 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 		return true;
 	}
 	switch (wp) {
-	case '\b':   // backspace
-	{
-		if (this->console) {
-			if (this->caretPos > 0)
-			{
-				this->command.erase(this->caretPos - 1, 1);
-				this->caretPos -= 1;
+		case '\b':   // backspace
+		{
+			if (this->console) {
+				if (this->caretPos > 0)
+				{
+					this->command.erase(this->caretPos - 1, 1);
+					this->caretPos -= 1;
+				}
+				return true;
 			}
-			return true;
 		}
-	}
-	break;
+		break;
 
 	case '\r':    // return/enter
-	{
-		if (console) {
-			this->writePreviousCommand(this->command);
+		{
+			if (console) {
+				this->writePreviousCommand(this->command);
 
-			std::string fullCommand("$");
-			fullCommand += this->command;
-			this->handle_command(fullCommand);
+				std::string fullCommand("$");
+				fullCommand += this->command;
+				this->handle_command(fullCommand);
 
-			command = "";
-			caretPos = 0;
-			return true;
+				command = "";
+				caretPos = 0;
+				return true;
+			}
 		}
-	}
-	break;
+		break;
+
+	//copy/paste functionality
+	case 0x56:
+		{
+			//read 'V' before 'CTRL'
+			if (console && (GetAsyncKeyState(VK_CONTROL) & 0x8000)) {
+				//erase the current characters (if any)
+				this->command.erase();
+				this->caretPos = 0;
+
+				if (!OpenClipboard(NULL)) {
+					output(ERROR_OPENING_CLIPBOARD);
+					return false;
+				}
+
+				HANDLE clipboardHandle = GetClipboardData(CF_TEXT);
+				//lock the clipboard
+				std::string clipboardContent = (LPSTR)GlobalLock(clipboardHandle);
+				//unlock  the clipboard
+				GlobalUnlock(clipboardHandle);
+				CloseClipboard();
+				this->command = clipboardContent;
+				this->caretPos = clipboardContent.length();
+			}
+		}
+		break;
 
 	default:
 		if (this->console) {

@@ -161,6 +161,7 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		once1 = true;
 	}
 	if ((GetKeyState(pPii->wParam) & 0x8000) && (pPii->uMSG == WM_KEYDOWN || pPii->uMSG == WM_SYSKEYDOWN)) {
+		//TODO: fHandled doesn't actually work..need to look into how halo2.exe uses the XLIVE_INPUT_INFO struct after calling xliveinput
 		pPii->fHandled = commands->handleInput(pPii->wParam);
 	}
 	return 1;
