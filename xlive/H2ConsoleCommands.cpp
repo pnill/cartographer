@@ -74,10 +74,6 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 		{
 			//read 'V' before 'CTRL'
 			if (console && (GetAsyncKeyState(VK_CONTROL) & 0x8000)) {
-				//erase the current characters (if any)
-				this->command.erase();
-				this->caretPos = 0;
-
 				if (!OpenClipboard(NULL)) {
 					output(ERROR_OPENING_CLIPBOARD);
 					return false;
@@ -89,8 +85,8 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 				//unlock  the clipboard
 				GlobalUnlock(clipboardHandle);
 				CloseClipboard();
-				this->command = clipboardContent;
-				this->caretPos = clipboardContent.length();
+				this->command += clipboardContent;
+				this->caretPos = this->command.length();
 			}
 		}
 		break;
