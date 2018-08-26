@@ -57,13 +57,15 @@ void startGameThread() {
 									}
 								}
 							}
+							break;
 						case H2ModPacket_Type_set_lobby_settings:
 							TRACE_GAME("[h2mod-network] Received lobby settings packet");
 							if (recvpak.has_lobby_settings()) {
 								advLobbySettings->parseLobbySettings(recvpak.lobby_settings());
 							}
+							break;
 						default:
-							//TODO: log error
+							TRACE_GAME("[h2mod-network] Unknown packet type %d", recvpak.type());
 							break;
 						}
 					}
