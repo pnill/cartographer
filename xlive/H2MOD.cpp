@@ -774,11 +774,10 @@ void __cdecl onGameEngineChange(int a1)
 		H2Tweaks::enableAI_MP(); //TODO: get dedi offset
 		H2Tweaks::applyHitfix(); // "fix hit registration"
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
-		H2Tweaks::RadarPatch();	//PATCHES RADAR IN MULTIPLAYER  DOCUMENTATION FOR YOSHI  #HPV
 	 
 		H2Tweaks::setCrosshairSize(0, false);
 		
-		H2Tweaks::applyShaderTweaks(); 
+		//H2Tweaks::applyShaderTweaks(); 
 
 		if (GameState == 3)
 		{

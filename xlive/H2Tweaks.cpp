@@ -735,6 +735,18 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 	return v2;
 }
 
+//Patch Call to modify tags just after map load
+char _cdecl LoadTagsandMapBases(int a)
+{
+	char(__cdecl* LoadTagsandMapBases_Orig)(int) = (char(__cdecl*)(int))(GetAddress(0x00031348));
+
+	char result = LoadTagsandMapBases_Orig(a);
+
+	H2Tweaks::RadarPatch();  //PATCHES RADAR IN MULTIPLAYER  DOCUMENTATION FOR YOSHI  #HPV
+
+	return result;
+}
+
 void InitH2Tweaks() {
 	postConfig();
 
@@ -850,6 +862,8 @@ void InitH2Tweaks() {
 		PatchCall(H2BaseAddr + 0x4D3BA, validate_and_add_custom_map);
 		PatchCall(H2BaseAddr + 0x4CF26, validate_and_add_custom_map);
 		PatchCall(H2BaseAddr + 0x8928, validate_and_add_custom_map);
+
+		PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);	//default maps meta loading
 	}
 	addDebugText("End Startup Tweaks.");
 }
@@ -1148,37 +1162,92 @@ void H2Tweaks::FixRanksIcons() {
 	if (H2IsDediServer)
 		return;
 
-	int THINGY = *(int*)(H2BaseAddr + 0xA40564);
-	BYTE* assmOffset = (BYTE*)(THINGY + 0x800);
-	const int assmlen = 20;
-	BYTE assmOrigRankIcon[assmlen] = { 0x92,0x00,0x14,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x6D,0x74,0x69,0x62,0xCA,0x02,0xEC,0xE4 };
-	BYTE assmPatchFixRankIcon[assmlen] = { 0xCC,0x01,0x1C,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x6D,0x74,0x69,0x62,0xE6,0x02,0x08,0xE5 };
-	bool shouldPatch = true;
-	for (int i = 0; i < assmlen; i++) {
-		if (*(assmOffset + i) != assmOrigRankIcon[i]) {
-			shouldPatch = false;
-			break;
+	DWORD shared_Meta_Data_ptr = *(DWORD*)(H2BaseAddr + 0x47CD64);
+
+	//Tag : ui\player_skins\player_skin_lobby.skin
+	const DWORD tag_offset_pre = 0x0049DE90;	//Property : Bitmap Buttons
+
+	//Tag : ui\player_skins\pcr_1.skin
+	const DWORD tag_offset_pcr1 = 0x00485C70;	//Property : Bitmap Buttons
+
+	//Tag : ui\player_skins\pcr_2.skin
+	const DWORD tag_offset_pcr2 = 0x00485F50;	//Property : Bitmap Buttons
+
+
+	const BYTE index_offset_p = 0x38;			//Property size per chunk
+	const int index_number = 2;					//Property chunk index number (2 represents rank field)
+	const BYTE x_pos_off = 0x0C;				//Definition : Horizontal position on mainmenu
+	const WORD x_pos_pre = 0x01C4;				//Value : 452 (decimal)
+	const WORD x_pos_pcr = 0x0131;				//Value : 305 (decimal)
+	const BYTE y_pos_off = 0x0E;				//Definition : Vertical position on mainmenu
+	const WORD y_pos_pre = 0x001A;				//Value : 26 (decimal)
+	const WORD y_pos_pcr = 0x0017;				//Value : 23 (decimal)
+	const BYTE bitm_offset = 0x18;				//Definition : Bitm (bitmap loaded based on datum index)
+	DWORD bitm_type;							//Value : Datum index value for Bitm definition
+
+	//Tag : ui\global_bitmaps\rank_icons.bitm
+	const DWORD rank_icons = 0xE50802E6;		//Bitmap Datum Index
+	const DWORD tag_offset_r = 0x0047E9A8;		//Property : Bitmap
+
+	//Tag : ui\global_bitmaps\rank_icons.bitm
+	const DWORD rank_icons_sm = 0xE4EC02CA;		//Bitmap Datum Index
+	const DWORD tag_offset_sm = 0x00476D3C;		//Property : Bitmap
+
+
+	const BYTE index_offset_rank = 0x74;		//Property size per chunk
+	int index_number_rank;						//Property chunk index number (0-49)
+	const BYTE width_offset = 0x04;				//Definition : Width
+	const WORD width_value = 0x0020;			//Value : 32 (decimal)
+	const BYTE height_offset = 0x06;			//Definition : Height
+	const WORD height_value = 0x0020;			//Value : 32 (decimal)
+
+
+	if (h2mod->get_engine_type() == EngineType::MAIN_MENU_ENGINE) {
+		//Sets Pregame Lobby 
+		WriteValue(shared_Meta_Data_ptr + tag_offset_pre + (index_number * index_offset_p) + x_pos_off, x_pos_pre);
+		WriteValue(shared_Meta_Data_ptr + tag_offset_pre + (index_number * index_offset_p) + y_pos_off, y_pos_pre);
+		WriteValue(shared_Meta_Data_ptr + tag_offset_pre + (index_number * index_offset_p) + bitm_offset, rank_icons_sm);
+
+		//Sets Postgame Carnage Report 1
+		WriteValue(shared_Meta_Data_ptr + tag_offset_pcr1 + (index_number * index_offset_p) + x_pos_off, x_pos_pcr);
+		WriteValue(shared_Meta_Data_ptr + tag_offset_pcr1 + (index_number * index_offset_p) + y_pos_off, y_pos_pcr);
+		WriteValue(shared_Meta_Data_ptr + tag_offset_pcr1 + (index_number * index_offset_p) + bitm_offset, rank_icons_sm);
+
+		//Sets Postgame Carnage Report 2
+		WriteValue(shared_Meta_Data_ptr + tag_offset_pcr2 + (index_number * index_offset_p) + x_pos_off, x_pos_pcr);
+		WriteValue(shared_Meta_Data_ptr + tag_offset_pcr2 + (index_number * index_offset_p) + y_pos_off, y_pos_pcr);
+		WriteValue(shared_Meta_Data_ptr + tag_offset_pcr2 + (index_number * index_offset_p) + bitm_offset, rank_icons_sm);
+
+		//Sets Ranks 
+		for (index_number_rank = 0; index_number_rank < 49; index_number_rank++)
+		{
+			//Setting Rank bitmap size
+			WriteValue(shared_Meta_Data_ptr + tag_offset_r + (index_number_rank * index_offset_rank) + width_offset, width_value);
+			WriteValue(shared_Meta_Data_ptr + tag_offset_r + (index_number_rank * index_offset_rank) + height_offset, height_value);
+
+			//Setting Small Rank bitmap size
+			WriteValue(shared_Meta_Data_ptr + tag_offset_sm + (index_number_rank * index_offset_rank) + width_offset, width_value);
+			WriteValue(shared_Meta_Data_ptr + tag_offset_sm + (index_number_rank * index_offset_rank) + height_offset, height_value);
 		}
 	}
-	if (shouldPatch) {
-		WriteBytes((DWORD)assmOffset, assmPatchFixRankIcon, assmlen);
-		addDebugText("Patching Rank Icon Fix.");
-	}
 }
+
 void H2Tweaks::RadarPatch() {
 
 	if (H2IsDediServer)
 		return;
 
-	if (h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE) {
+	DWORD& MapHeaderType = *(DWORD*)(H2BaseAddr + 0x47CD68 + 0x14C);
 
-		DWORD shared_Meta_Data_ptr = *(DWORD*)(H2BaseAddr + 0x47CD64);
+	if (MapHeaderType != 1)
+		return;
 
-		//Tag : ui\hud\bitmaps\hud_sweeper.bitm
-		const DWORD tag_offset = 0x00D93BA8;    //Property : Bitmap
-		const BYTE format_offset = 0x0C;      //Definition : Format Offset
-		const WORD format_type = 0x0010;      //Definition : Format Enum
+	DWORD shared_Meta_Data_ptr = *(DWORD*)(H2BaseAddr + 0x47CD64);
 
-		WriteValue(shared_Meta_Data_ptr + tag_offset + format_offset, format_type);
-	}
+	//Tag : ui\hud\bitmaps\hud_sweeper.bitm
+	const DWORD tag_offset = 0x00D93BA8;	//Property : Bitmap
+	const BYTE format_offset = 0x0C;		//Definition : Format Offset
+	const WORD format_type = 0x000A;		//Definition : Format Enum
+
+	WriteValue(shared_Meta_Data_ptr + tag_offset + format_offset, format_type);
 }
