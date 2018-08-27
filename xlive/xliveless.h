@@ -43,6 +43,31 @@ extern void trace_game_network(LPSTR message, ...);
 #define TRACE2(msg, ...) trace2 (L ## msg, __VA_ARGS__)
 #define TRACE_GAME_INFO(msg, ...) trace_game_info( ## msg, __VA_ARGS__ )
 
+template <typename T>
+inline T verify_output(T output, const char *expression, const char *func_name, const char* file, const int line)
+{
+	if (!output) {
+		TRACE_GAME_N("'%s' failed in '%s' at '%s:%d'!", func_name, expression, file, line);
+		DWORD last_error = GetLastError();
+		if (last_error)
+		{
+			LPWSTR messageBuffer = NULL;
+			size_t size = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+				NULL, last_error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&messageBuffer, 0, NULL);
+			if (size) {
+				TRACE_GAME_N("Last error: '%ws'", messageBuffer);
+				LocalFree(messageBuffer);
+			}
+			else {
+				TRACE_GAME_N("Converting error %d to string failed!", last_error);
+			}
+			SetLastError(0);
+}
+	}
+	return output;
+}
+#define LOG_CHECK(expression) \
+	verify_output(expression, #expression, __FUNCTION__, __FILE__, __LINE__)
 
 //#define trace()
 #else
@@ -51,6 +76,9 @@ extern void trace_game_network(LPSTR message, ...);
 #define TRACE_GAME_N()
 #define TRACE_GAME()
 #define TRACE_GAME_NETWORK()
+#define TRACE_FUNC()
+#define TRACE_FUNC_N()
+#define LOG_CHECK()
 #endif
 
 #endif

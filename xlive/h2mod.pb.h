@@ -37,6 +37,8 @@ class h2mod_set_grenade;
 class h2mod_set_team;
 class h2mod_map_info;
 class h2mod_lobby_settings;
+class StringMap_FieldEntry;
+class h2mod_map_checksum_state;
 
 enum H2ModPacket_Type {
   H2ModPacket_Type_set_player_team = 2,
@@ -632,6 +634,197 @@ class h2mod_lobby_settings : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static h2mod_lobby_settings* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class StringMap_FieldEntry : public ::google::protobuf::Message {
+ public:
+  StringMap_FieldEntry();
+  virtual ~StringMap_FieldEntry();
+
+  StringMap_FieldEntry(const StringMap_FieldEntry& from);
+
+  inline StringMap_FieldEntry& operator=(const StringMap_FieldEntry& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const StringMap_FieldEntry& default_instance();
+
+  void Swap(StringMap_FieldEntry* other);
+
+  // implements Message ----------------------------------------------
+
+  StringMap_FieldEntry* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const StringMap_FieldEntry& from);
+  void MergeFrom(const StringMap_FieldEntry& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional string key = 1;
+  inline bool has_key() const;
+  inline void clear_key();
+  static const int kKeyFieldNumber = 1;
+  inline const ::std::string& key() const;
+  inline void set_key(const ::std::string& value);
+  inline void set_key(const char* value);
+  inline void set_key(const char* value, size_t size);
+  inline ::std::string* mutable_key();
+  inline ::std::string* release_key();
+  inline void set_allocated_key(::std::string* key);
+
+  // optional string value = 2;
+  inline bool has_value() const;
+  inline void clear_value();
+  static const int kValueFieldNumber = 2;
+  inline const ::std::string& value() const;
+  inline void set_value(const ::std::string& value);
+  inline void set_value(const char* value);
+  inline void set_value(const char* value, size_t size);
+  inline ::std::string* mutable_value();
+  inline ::std::string* release_value();
+  inline void set_allocated_value(::std::string* value);
+
+  // @@protoc_insertion_point(class_scope:StringMap_FieldEntry)
+ private:
+  inline void set_has_key();
+  inline void clear_has_key();
+  inline void set_has_value();
+  inline void clear_has_value();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::std::string* key_;
+  ::std::string* value_;
+  friend void  protobuf_AddDesc_h2mod_2eproto();
+  friend void protobuf_AssignDesc_h2mod_2eproto();
+  friend void protobuf_ShutdownFile_h2mod_2eproto();
+
+  void InitAsDefaultInstance();
+  static StringMap_FieldEntry* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class h2mod_map_checksum_state : public ::google::protobuf::Message {
+ public:
+  h2mod_map_checksum_state();
+  virtual ~h2mod_map_checksum_state();
+
+  h2mod_map_checksum_state(const h2mod_map_checksum_state& from);
+
+  inline h2mod_map_checksum_state& operator=(const h2mod_map_checksum_state& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const h2mod_map_checksum_state& default_instance();
+
+  void Swap(h2mod_map_checksum_state* other);
+
+  // implements Message ----------------------------------------------
+
+  h2mod_map_checksum_state* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const h2mod_map_checksum_state& from);
+  void MergeFrom(const h2mod_map_checksum_state& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required bool is_offical = 1;
+  inline bool has_is_offical() const;
+  inline void clear_is_offical();
+  static const int kIsOfficalFieldNumber = 1;
+  inline bool is_offical() const;
+  inline void set_is_offical(bool value);
+
+  // repeated .StringMap_FieldEntry map_checksum_list = 2;
+  inline int map_checksum_list_size() const;
+  inline void clear_map_checksum_list();
+  static const int kMapChecksumListFieldNumber = 2;
+  inline const ::StringMap_FieldEntry& map_checksum_list(int index) const;
+  inline ::StringMap_FieldEntry* mutable_map_checksum_list(int index);
+  inline ::StringMap_FieldEntry* add_map_checksum_list();
+  inline const ::google::protobuf::RepeatedPtrField< ::StringMap_FieldEntry >&
+      map_checksum_list() const;
+  inline ::google::protobuf::RepeatedPtrField< ::StringMap_FieldEntry >*
+      mutable_map_checksum_list();
+
+  // @@protoc_insertion_point(class_scope:h2mod_map_checksum_state)
+ private:
+  inline void set_has_is_offical();
+  inline void clear_has_is_offical();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::google::protobuf::RepeatedPtrField< ::StringMap_FieldEntry > map_checksum_list_;
+  bool is_offical_;
+  friend void  protobuf_AddDesc_h2mod_2eproto();
+  friend void protobuf_AssignDesc_h2mod_2eproto();
+  friend void protobuf_ShutdownFile_h2mod_2eproto();
+
+  void InitAsDefaultInstance();
+  static h2mod_map_checksum_state* default_instance_;
 };
 // ===================================================================
 
@@ -1231,6 +1424,220 @@ inline void h2mod_lobby_settings::set_flashlight(::google::protobuf::uint32 valu
   set_has_flashlight();
   flashlight_ = value;
   // @@protoc_insertion_point(field_set:h2mod_lobby_settings.flashlight)
+}
+
+// -------------------------------------------------------------------
+
+// StringMap_FieldEntry
+
+// optional string key = 1;
+inline bool StringMap_FieldEntry::has_key() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void StringMap_FieldEntry::set_has_key() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void StringMap_FieldEntry::clear_has_key() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void StringMap_FieldEntry::clear_key() {
+  if (key_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    key_->clear();
+  }
+  clear_has_key();
+}
+inline const ::std::string& StringMap_FieldEntry::key() const {
+  // @@protoc_insertion_point(field_get:StringMap_FieldEntry.key)
+  return *key_;
+}
+inline void StringMap_FieldEntry::set_key(const ::std::string& value) {
+  set_has_key();
+  if (key_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    key_ = new ::std::string;
+  }
+  key_->assign(value);
+  // @@protoc_insertion_point(field_set:StringMap_FieldEntry.key)
+}
+inline void StringMap_FieldEntry::set_key(const char* value) {
+  set_has_key();
+  if (key_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    key_ = new ::std::string;
+  }
+  key_->assign(value);
+  // @@protoc_insertion_point(field_set_char:StringMap_FieldEntry.key)
+}
+inline void StringMap_FieldEntry::set_key(const char* value, size_t size) {
+  set_has_key();
+  if (key_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    key_ = new ::std::string;
+  }
+  key_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:StringMap_FieldEntry.key)
+}
+inline ::std::string* StringMap_FieldEntry::mutable_key() {
+  set_has_key();
+  if (key_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    key_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:StringMap_FieldEntry.key)
+  return key_;
+}
+inline ::std::string* StringMap_FieldEntry::release_key() {
+  clear_has_key();
+  if (key_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = key_;
+    key_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void StringMap_FieldEntry::set_allocated_key(::std::string* key) {
+  if (key_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete key_;
+  }
+  if (key) {
+    set_has_key();
+    key_ = key;
+  } else {
+    clear_has_key();
+    key_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:StringMap_FieldEntry.key)
+}
+
+// optional string value = 2;
+inline bool StringMap_FieldEntry::has_value() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void StringMap_FieldEntry::set_has_value() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void StringMap_FieldEntry::clear_has_value() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void StringMap_FieldEntry::clear_value() {
+  if (value_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    value_->clear();
+  }
+  clear_has_value();
+}
+inline const ::std::string& StringMap_FieldEntry::value() const {
+  // @@protoc_insertion_point(field_get:StringMap_FieldEntry.value)
+  return *value_;
+}
+inline void StringMap_FieldEntry::set_value(const ::std::string& value) {
+  set_has_value();
+  if (value_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    value_ = new ::std::string;
+  }
+  value_->assign(value);
+  // @@protoc_insertion_point(field_set:StringMap_FieldEntry.value)
+}
+inline void StringMap_FieldEntry::set_value(const char* value) {
+  set_has_value();
+  if (value_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    value_ = new ::std::string;
+  }
+  value_->assign(value);
+  // @@protoc_insertion_point(field_set_char:StringMap_FieldEntry.value)
+}
+inline void StringMap_FieldEntry::set_value(const char* value, size_t size) {
+  set_has_value();
+  if (value_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    value_ = new ::std::string;
+  }
+  value_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:StringMap_FieldEntry.value)
+}
+inline ::std::string* StringMap_FieldEntry::mutable_value() {
+  set_has_value();
+  if (value_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    value_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:StringMap_FieldEntry.value)
+  return value_;
+}
+inline ::std::string* StringMap_FieldEntry::release_value() {
+  clear_has_value();
+  if (value_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = value_;
+    value_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void StringMap_FieldEntry::set_allocated_value(::std::string* value) {
+  if (value_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete value_;
+  }
+  if (value) {
+    set_has_value();
+    value_ = value;
+  } else {
+    clear_has_value();
+    value_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:StringMap_FieldEntry.value)
+}
+
+// -------------------------------------------------------------------
+
+// h2mod_map_checksum_state
+
+// required bool is_offical = 1;
+inline bool h2mod_map_checksum_state::has_is_offical() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void h2mod_map_checksum_state::set_has_is_offical() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void h2mod_map_checksum_state::clear_has_is_offical() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void h2mod_map_checksum_state::clear_is_offical() {
+  is_offical_ = false;
+  clear_has_is_offical();
+}
+inline bool h2mod_map_checksum_state::is_offical() const {
+  // @@protoc_insertion_point(field_get:h2mod_map_checksum_state.is_offical)
+  return is_offical_;
+}
+inline void h2mod_map_checksum_state::set_is_offical(bool value) {
+  set_has_is_offical();
+  is_offical_ = value;
+  // @@protoc_insertion_point(field_set:h2mod_map_checksum_state.is_offical)
+}
+
+// repeated .StringMap_FieldEntry map_checksum_list = 2;
+inline int h2mod_map_checksum_state::map_checksum_list_size() const {
+  return map_checksum_list_.size();
+}
+inline void h2mod_map_checksum_state::clear_map_checksum_list() {
+  map_checksum_list_.Clear();
+}
+inline const ::StringMap_FieldEntry& h2mod_map_checksum_state::map_checksum_list(int index) const {
+  // @@protoc_insertion_point(field_get:h2mod_map_checksum_state.map_checksum_list)
+  return map_checksum_list_.Get(index);
+}
+inline ::StringMap_FieldEntry* h2mod_map_checksum_state::mutable_map_checksum_list(int index) {
+  // @@protoc_insertion_point(field_mutable:h2mod_map_checksum_state.map_checksum_list)
+  return map_checksum_list_.Mutable(index);
+}
+inline ::StringMap_FieldEntry* h2mod_map_checksum_state::add_map_checksum_list() {
+  // @@protoc_insertion_point(field_add:h2mod_map_checksum_state.map_checksum_list)
+  return map_checksum_list_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::StringMap_FieldEntry >&
+h2mod_map_checksum_state::map_checksum_list() const {
+  // @@protoc_insertion_point(field_list:h2mod_map_checksum_state.map_checksum_list)
+  return map_checksum_list_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::StringMap_FieldEntry >*
+h2mod_map_checksum_state::mutable_map_checksum_list() {
+  // @@protoc_insertion_point(field_mutable_list:h2mod_map_checksum_state.map_checksum_list)
+  return &map_checksum_list_;
 }
 
 

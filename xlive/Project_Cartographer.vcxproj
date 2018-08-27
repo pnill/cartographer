@@ -285,12 +285,14 @@
     <ClCompile Include="H2Startup.cpp" />
     <ClCompile Include="H2Tweaks.cpp" />
     <ClCompile Include="Hook.cpp" />
+    <ClCompile Include="MapChecksumSync.cpp" />
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="packet.pb.cc" />
     <ClCompile Include="H2MOD_Infection.cpp" />
     <ClCompile Include="TSClient.cpp" />
     <ClCompile Include="TSServer.cpp" />
     <ClCompile Include="Util\Debug.cpp" />
+    <ClCompile Include="Util\hash.cpp" />
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="xlive_network.cpp" />
   </ItemGroup>
@@ -362,6 +364,7 @@
     <ClInclude Include="H2Startup.h" />
     <ClInclude Include="H2Tweaks.h" />
     <ClInclude Include="Hook.h" />
+    <ClInclude Include="MapChecksumSync.h" />
     <ClInclude Include="Network.h" />
     <ClInclude Include="packet.pb.h" />
     <ClInclude Include="ReadIniArguments.h" />
@@ -369,6 +372,7 @@
     <ClInclude Include="TSClient.h" />
     <ClInclude Include="TSServer.h" />
     <ClInclude Include="Util\Debug.h" />
+    <ClInclude Include="Util\hash.h" />
     <ClInclude Include="xlivedefs.h" />
     <ClInclude Include="xliveless.h" />
   </ItemGroup>

@@ -41,3 +41,15 @@ message h2mod_lobby_settings {
 	required uint32 mp_blind = 6;
 	required uint32 flashlight = 7;
 }
+
+message StringMap_FieldEntry {
+  optional string key = 1;
+  optional string value = 2;
+}
+
+message h2mod_map_checksum_state {
+	required bool is_offical = 1;
+	// switch to this if we update to version 3
+	//map<string, string> map_checksum_list = 2;
+	repeated StringMap_FieldEntry map_checksum_list = 2;
+}

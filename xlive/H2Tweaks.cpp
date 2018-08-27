@@ -7,9 +7,10 @@
 #include "Hook.h"
 #include "H2OnscreenDebugLog.h"
 #include "GSCustomMenu.h"
-#include "H2MOD.h";
+#include "H2MOD.h"
 #include <string>
 #include "Globals.h"
+#include "MapChecksumSync.h"
 
 #define _USE_MATH_DEFINES
 #include "math.h"
@@ -303,6 +304,8 @@ bool engine_basic_init()
 {
 	DWORD* flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
 	memset(flags_array, 0x00, flags::count); // should be zero initalized anyways but the game does it
+
+	flags_array[flags::nointro] = H2Config_skip_intro;
 
 	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(GetAddress( 0x000285fd));
 
@@ -752,6 +755,8 @@ void InitH2Tweaks() {
 
 	addDebugText("Begin Startup Tweaks.");
 
+	MapChecksumSync::Init();
+	
 	if (H2IsDediServer) {
 		DWORD dwBack;
 
@@ -799,11 +804,6 @@ void InitH2Tweaks() {
 		}
 
 		bool IntroHQ = true;//clients should set on halo2.exe -highquality
-
-		if (H2Config_skip_intro) {
-			BYTE assmIntroSkip[] = { 0x3F };
-			WriteBytes(H2BaseAddr + 0x221C0E, assmIntroSkip, 1);
-		}
 
 		if (!H2Config_skip_intro && IntroHQ) {
 			BYTE assmIntroHQ[] = { 0xEB };
