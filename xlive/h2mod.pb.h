@@ -44,11 +44,12 @@ enum H2ModPacket_Type {
   H2ModPacket_Type_set_player_team = 2,
   H2ModPacket_Type_set_unit_grenades = 3,
   H2ModPacket_Type_map_info_request = 4,
-  H2ModPacket_Type_set_lobby_settings = 5
+  H2ModPacket_Type_set_lobby_settings = 5,
+  H2ModPacket_Type_map_checksum_state_sync = 6
 };
 bool H2ModPacket_Type_IsValid(int value);
 const H2ModPacket_Type H2ModPacket_Type_Type_MIN = H2ModPacket_Type_set_player_team;
-const H2ModPacket_Type H2ModPacket_Type_Type_MAX = H2ModPacket_Type_set_lobby_settings;
+const H2ModPacket_Type H2ModPacket_Type_Type_MAX = H2ModPacket_Type_map_checksum_state_sync;
 const int H2ModPacket_Type_Type_ARRAYSIZE = H2ModPacket_Type_Type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* H2ModPacket_Type_descriptor();
@@ -119,6 +120,7 @@ class H2ModPacket : public ::google::protobuf::Message {
   static const Type set_unit_grenades = H2ModPacket_Type_set_unit_grenades;
   static const Type map_info_request = H2ModPacket_Type_map_info_request;
   static const Type set_lobby_settings = H2ModPacket_Type_set_lobby_settings;
+  static const Type map_checksum_state_sync = H2ModPacket_Type_map_checksum_state_sync;
   static inline bool Type_IsValid(int value) {
     return H2ModPacket_Type_IsValid(value);
   }
@@ -185,6 +187,15 @@ class H2ModPacket : public ::google::protobuf::Message {
   inline ::h2mod_lobby_settings* release_lobby_settings();
   inline void set_allocated_lobby_settings(::h2mod_lobby_settings* lobby_settings);
 
+  // optional .h2mod_map_checksum_state checksum = 6;
+  inline bool has_checksum() const;
+  inline void clear_checksum();
+  static const int kChecksumFieldNumber = 6;
+  inline const ::h2mod_map_checksum_state& checksum() const;
+  inline ::h2mod_map_checksum_state* mutable_checksum();
+  inline ::h2mod_map_checksum_state* release_checksum();
+  inline void set_allocated_checksum(::h2mod_map_checksum_state* checksum);
+
   // @@protoc_insertion_point(class_scope:H2ModPacket)
  private:
   inline void set_has_type();
@@ -197,6 +208,8 @@ class H2ModPacket : public ::google::protobuf::Message {
   inline void clear_has_map_info();
   inline void set_has_lobby_settings();
   inline void clear_has_lobby_settings();
+  inline void set_has_checksum();
+  inline void clear_has_checksum();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -206,6 +219,7 @@ class H2ModPacket : public ::google::protobuf::Message {
   ::h2mod_set_grenade* set_grenade_;
   ::h2mod_map_info* map_info_;
   ::h2mod_lobby_settings* lobby_settings_;
+  ::h2mod_map_checksum_state* checksum_;
   int type_;
   friend void  protobuf_AddDesc_h2mod_2eproto();
   friend void protobuf_AssignDesc_h2mod_2eproto();
@@ -1020,6 +1034,47 @@ inline void H2ModPacket::set_allocated_lobby_settings(::h2mod_lobby_settings* lo
     clear_has_lobby_settings();
   }
   // @@protoc_insertion_point(field_set_allocated:H2ModPacket.lobby_settings)
+}
+
+// optional .h2mod_map_checksum_state checksum = 6;
+inline bool H2ModPacket::has_checksum() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void H2ModPacket::set_has_checksum() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void H2ModPacket::clear_has_checksum() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void H2ModPacket::clear_checksum() {
+  if (checksum_ != NULL) checksum_->::h2mod_map_checksum_state::Clear();
+  clear_has_checksum();
+}
+inline const ::h2mod_map_checksum_state& H2ModPacket::checksum() const {
+  // @@protoc_insertion_point(field_get:H2ModPacket.checksum)
+  return checksum_ != NULL ? *checksum_ : *default_instance_->checksum_;
+}
+inline ::h2mod_map_checksum_state* H2ModPacket::mutable_checksum() {
+  set_has_checksum();
+  if (checksum_ == NULL) checksum_ = new ::h2mod_map_checksum_state;
+  // @@protoc_insertion_point(field_mutable:H2ModPacket.checksum)
+  return checksum_;
+}
+inline ::h2mod_map_checksum_state* H2ModPacket::release_checksum() {
+  clear_has_checksum();
+  ::h2mod_map_checksum_state* temp = checksum_;
+  checksum_ = NULL;
+  return temp;
+}
+inline void H2ModPacket::set_allocated_checksum(::h2mod_map_checksum_state* checksum) {
+  delete checksum_;
+  checksum_ = checksum;
+  if (checksum) {
+    set_has_checksum();
+  } else {
+    clear_has_checksum();
+  }
+  // @@protoc_insertion_point(field_set_allocated:H2ModPacket.checksum)
 }
 
 // -------------------------------------------------------------------

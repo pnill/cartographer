@@ -7,6 +7,7 @@ message H2ModPacket {
 		set_unit_grenades = 3;
 		map_info_request = 4;
 		set_lobby_settings = 5;
+		map_checksum_state_sync = 6;
 	}
 
 	required H2ModPacket.Type type = 1;
@@ -14,6 +15,7 @@ message H2ModPacket {
 	optional h2mod_set_grenade set_grenade = 3;
 	optional h2mod_map_info map_info = 4;
 	optional h2mod_lobby_settings lobby_settings = 5;
+	optional h2mod_map_checksum_state checksum = 6;
 }
 
 message h2mod_set_grenade {

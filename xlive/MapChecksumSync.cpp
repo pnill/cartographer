@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <mutex>
+#include "Globals.h"
+#include <iomanip>
 
 extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;
@@ -94,6 +96,19 @@ void MapChecksumSync::StartupError(const std::string &error)
 	MessageBoxA(NULL, error_message.c_str() , "Map checksumming failed!", S_OK);
 	std::exit(-1);
 }
+
+void MapChecksumSync::RuntimeError(const std::string &error)
+{
+	// maybe someone will make a nicer dialog
+	MessageBoxA(NULL, error.c_str(), "Map checksum error!", S_OK);
+	// exit lobby here
+}
+
+void internal_error()
+{
+	MapChecksumSync::RuntimeError("An internal error occured see logs and contact support.");
+}
+
 void MapChecksumSync::Calculate()
 {
 	std::atexit(unlock_all_maps);
@@ -135,7 +150,7 @@ void MapChecksumSync::Calculate()
 		lock_file_write(map_name); // lock map so no-one tries to edit it after we get the checksums
 		if (hashes::calc_file_md5(map_name, map_hash))
 		{
-			maps_status.map_checksum_names[ilter.first] = map_hash;
+			maps_status.map_checksum_list[ilter.first] = map_hash;
 			if (!set_contains_element(ilter.second, map_hash))
 			{
 				TRACE_FUNC_N("Map '%s' checksum doesn't match any offical checksum", ilter.first.c_str());
@@ -146,14 +161,95 @@ void MapChecksumSync::Calculate()
 				maps_status.is_offical = false;
 			}
 		} else {
-			StartupError("See logs for details and contact support");
+			MapChecksumSync::StartupError("See logs for details and contact support");
 		}
 	}
-	for (auto ilter : maps_status.map_checksum_names)
+	for (auto ilter : maps_status.map_checksum_list)
 	{
 		TRACE_FUNC_N("%s : %s", ilter.first.c_str(), ilter.second.c_str());
 	}
 	TRACE_FUNC_N("is_offical = %s", maps_status.is_offical ? "true" : "false");
+}
+
+void MapChecksumSync::SendState()
+{
+	if (!gameManager->isHost() || h2mod->get_engine_type() != EngineType::MULTIPLAYER_ENGINE)
+		return;
+	H2ModPacket packet;
+	packet.set_type(H2ModPacket::Type::H2ModPacket_Type_map_checksum_state_sync);
+
+	h2mod_map_checksum_state *checksum_state = packet.mutable_checksum();
+	checksum_state->set_is_offical(maps_status.is_offical);
+	if (!maps_status.is_offical)
+	{
+		auto checksum_list = checksum_state->mutable_map_checksum_list();
+		for (auto elem : maps_status.map_checksum_list)
+		{
+			StringMap_FieldEntry *proto_elem = checksum_list->Add();;
+
+			*(proto_elem->mutable_key()) = elem.first;
+			*(proto_elem->mutable_value()) = elem.second;
+		}
+	}
+	network->send_h2mod_packet(packet);
+}
+
+void MapChecksumSync::HandlePacket(const H2ModPacket &packet)
+{
+	if (LOG_CHECK(packet.type() == H2ModPacket::Type::H2ModPacket_Type_map_checksum_state_sync && !gameManager->isHost() && packet.has_checksum()))
+	{
+		auto checksum_packet = packet.checksum();
+		if (checksum_packet.is_offical() != maps_status.is_offical)
+		{
+			TRACE_FUNC_N("Server client is_offical mismatch client=%d, server=%d", maps_status.is_offical, checksum_packet.is_offical());
+			MapChecksumSync::RuntimeError(std::string("You need ") + (maps_status.is_offical ? "unoffical" : "offical") + "maps to join this server");
+		}
+
+		if (!checksum_packet.is_offical())
+		{
+			TRACE_FUNC_N("Not offical comparing map checksums");
+			if (checksum_packet.map_checksum_list_size() == 0)
+			{
+				TRACE_FUNC_N("Internal error checksum list is empty");
+				internal_error();
+			}
+			if (checksum_packet.map_checksum_list_size() != maps_status.map_checksum_list.size())
+			{
+				TRACE_FUNC_N("Internal error server checksum list length doesn't match client");
+				internal_error();
+			}
+			bool is_valid = true;
+			auto server_list = checksum_packet.map_checksum_list();
+			std::map<std::string, std::pair<std::string, std::string>> bad_maps_list;
+			for (auto server_elem : server_list)
+			{
+				auto ilter = maps_status.map_checksum_list.find(server_elem.key());
+				if (ilter == maps_status.map_checksum_list.end())
+				{
+					TRACE_FUNC_N("Internal error server has map client doesn't");
+					internal_error();
+				}
+				if (ilter->second != server_elem.value())
+				{
+					TRACE_FUNC_N("sever client mismatch for map: %s, client: %s, server: %s", ilter->first.c_str(), ilter->second.c_str(), server_elem.value().c_str());
+					bad_maps_list[ilter->first.c_str()] = { ilter->second, server_elem.value() };
+					is_valid = false;
+				}
+			}
+			if (is_valid) {
+				TRACE_FUNC_N("Server checksums compared, all is good");
+			} else {
+				std::stringstream error_message;
+				error_message << std::setfill(' ') << "Client-server checksum mismatch" << std::endl
+					<< std::setw(20) << "MAP" << std::setw(18) << "CLIENT" << std::setw(18) << "SERVER";
+				for (auto ilter : bad_maps_list)
+				{
+					error_message << std::setw(20) << " " << ilter.first << " " << ilter.second.first << " " << ilter.second.second << std::endl;;
+				}
+				MapChecksumSync::RuntimeError(error_message.str());
+			}
+		}
+	}
 }
 
 void MapChecksumSync::Init()

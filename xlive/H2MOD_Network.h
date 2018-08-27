@@ -1,6 +1,7 @@
 #ifndef H2MOD_NETWORK
 #define H2MOD_NETWORK
 #include <queue>
+#include <h2mod.pb.h>
 
 static const char* packet_type_strings[] = {
 	"ping",
@@ -116,6 +117,18 @@ public:
 
 	//command sent from server
 	char* networkCommand;
+
+	inline void send_h2mod_packet(const H2ModPacket &packet)
+	{
+		char* SendBuf = new char[packet.ByteSize()];
+		packet.SerializeToArray(SendBuf, packet.ByteSize());
+		this->networkCommand = SendBuf;
+
+		sendCustomPacketToAllPlayers();
+
+		this->networkCommand = nullptr;
+		delete[] SendBuf;
+	}
 
 	//command queue on the client
 	std::deque<std::string> queuedNetworkCommands;
