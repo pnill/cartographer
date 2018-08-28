@@ -14,11 +14,10 @@ void startGameThread() {
 			if (!network->queuedNetworkCommands.empty()) {
 				std::deque<std::string>::iterator it = network->queuedNetworkCommands.begin();
 				std::string command = *it;
-				INT32 len = *reinterpret_cast<const INT32*>(command.c_str());
 				network->queuedNetworkCommands.pop_front();
-				if (len > 0) {
+				if (!command.empty()) {
 					H2ModPacket recvpak;
-					recvpak.ParseFromArray(command.c_str(), len);
+					recvpak.ParseFromArray(command.c_str(), command.size());
 					if (recvpak.has_type()) {
 						switch (recvpak.type()) {
 						case H2ModPacket_Type_set_player_team:

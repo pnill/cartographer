@@ -1,12 +1,15 @@
 #include "Globals.h"
 #include <CUser.h>
+#include "MapChecksumSync.h"
+#include "Util/base64.h"
 
 //original = 0x3DA8
 #define MEMBERSHIP_PACKET_SIZE 0x3DA8
 #define MEMBERSHIP_PACKET_SIZE_RAW_BYTES 0xA8, 0x3D
 //original = 0x194
-#define CHAT_PACKET_SIZE 0x2B5
-#define CHAT_PACKET_SIZE_RAW_BYTES 0xB5, 0x02
+#define CHAT_PACKET_ORG_SIZE 0x194
+#define CHAT_PACKET_EXTEND_SIZE 0x2000
+#define CHAT_PACKET_SIZE CHAT_PACKET_ORG_SIZE + CHAT_PACKET_EXTEND_SIZE
 
 const char* getTextForEnum(int enumVal) {
 	return packet_type_strings[enumVal];
@@ -529,12 +532,19 @@ int __cdecl serializeChatPacket(void* a1, int a2, int a3) {
 	}
 	int result = getDataEncodeStringMethod()(a1, (int)"text", a3 + 160, 121);
 
+
 	if (network->networkCommand != NULL && network->networkCommand[0] != '\0') {
-		char* commandToWrite = (char*)(a3 + (CHAT_PACKET_SIZE - 121));
-		memset(commandToWrite, 0, 121);
-		memcpy(commandToWrite, network->networkCommand, strlen(network->networkCommand));
+		std::string encoded_message = base64_encode(network->networkCommand, network->command_size);
+		INT32 packet_size = encoded_message.size();
+		if (LOG_CHECK(packet_size <= CHAT_PACKET_EXTEND_SIZE))
+		{
+			TRACE_FUNC("Can't send data larger than chat extend size. data_size=%d, extend_size=%d", packet_size, CHAT_PACKET_EXTEND_SIZE);
+		}
+		char* commandToWrite = (char*)(a3 + (CHAT_PACKET_ORG_SIZE));
+		memset(commandToWrite, 0, CHAT_PACKET_EXTEND_SIZE);
+		memcpy(commandToWrite, encoded_message.c_str(), packet_size);
 		//TODO: if text is precense, don't send over the command, as this call stack is from someone sending text
-		result = getDataEncodeStringMethod()(a1, (int)"command", (int)commandToWrite, 121);
+		result = getDataEncodeStringMethod()(a1, (int)"command", (int)commandToWrite, CHAT_PACKET_EXTEND_SIZE);
 	}
 
 	return result;
@@ -549,13 +559,14 @@ void deserializeChatPacketCave() {
 	BYTE isServer = *(BYTE*)(originalESIRegisterAddr + 0x10);
 	wchar_t* text = (wchar_t*)(targetData2);
 
-	char* command = (char*)(targetData2 + (CHAT_PACKET_SIZE - 121));
-	getDataDecodeStringMethod()((void*)packet2, (int)"command", (int)command, 121);
+	char* command = (char*)(targetData2 + (CHAT_PACKET_ORG_SIZE));
+	getDataDecodeStringMethod()((void*)packet2, (int)"command", (int)command, CHAT_PACKET_EXTEND_SIZE);
 	TRACE_GAME_N("[h2mod-network] chat packet deserialize code cave, commandText=%s", command);
 	TRACE_GAME("[h2mod-network] chat packet deserialize code cave, isFromServer=%d, text=%s", isServer, text);
 
 	if (command != NULL && command[0] != '\0') {
-		network->queuedNetworkCommands.push_front(command);
+		std::string command_decoded = base64_decode(command);
+		network->queuedNetworkCommands.push_front(command_decoded);
 	}
 }
 
@@ -598,6 +609,8 @@ void deserializePlayerAddCave() {
 	mapManager->sendMapInfoPacket();
 	//inform new players of the current advanced lobby settings
 	advLobbySettings->sendLobbySettingsPacket();
+	// send sever map checksums to client
+	MapChecksumSync::SendState();
 }
 
 DWORD retAddr4 = 0;
@@ -747,6 +760,8 @@ serialize_membership_packet serialize_membership_packet_method;
 int __cdecl serializeMembershipPacket(void* a1, int a2, int a3) {
 	mapManager->sendMapInfoPacket();
 	advLobbySettings->sendLobbySettingsPacket();
+	// send sever map checksums to client
+	MapChecksumSync::SendState();
 	return serialize_membership_packet_method(a1, a2, a3);
 }
 
@@ -756,6 +771,8 @@ serialize_parameters_update_packet serialize_parameters_update_packet_method;
 int __cdecl serializeParametersUpdatePacket(void* a1, int a2, int a3) {
 	mapManager->sendMapInfoPacket();
 	advLobbySettings->sendLobbySettingsPacket();
+	// send sever map checksums to client
+	MapChecksumSync::SendState();
 	return serialize_parameters_update_packet_method(a1, a2, a3);
 }
 
@@ -820,9 +837,8 @@ void CustomNetwork::applyNetworkHooks() {
 	register_chat_packets_method = (register_chat_packets)DetourFunc((BYTE*)h2mod->GetBase() + registerChatPacketsOffset, (BYTE*)registerChatPackets, 6);
 	VirtualProtect(register_chat_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	BYTE bytes2[5] = { 0x68, CHAT_PACKET_SIZE_RAW_BYTES, 0x00, 0x00 };
-	patchBYTEs((BYTE*)h2mod->GetBase() + sendChatPacketOffset, bytes2, 5);
-	patchBYTEs((BYTE*)h2mod->GetBase() + sendChatPacketOffset2, bytes2, 5);
+	WriteValue<DWORD>(h2mod->GetBase() + sendChatPacketOffset + 1, CHAT_PACKET_SIZE);
+	WriteValue<DWORD>(h2mod->GetBase() + sendChatPacketOffset2 + 1, CHAT_PACKET_SIZE);
 
 	/////////////////////////////////////////////////////////////////////
 	//send/recv packet functions below (for troubleshooting and research)
