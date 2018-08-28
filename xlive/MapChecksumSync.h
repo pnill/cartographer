@@ -11,8 +11,12 @@ namespace MapChecksumSync
 	};
 	void StartupError(const std::string &error);
 	void RuntimeError(const std::string &message);
+
 	void SendState();
 	void HandlePacket(const H2ModPacket &packet);
+
 	void Calculate();
 	void Init();
+
+	bool startup_failed();
 };

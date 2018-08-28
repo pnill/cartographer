@@ -25,6 +25,7 @@
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 #include "H2Startup.h"
 #include "GSCustomMenu.h"
+#include "MapChecksumSync.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -781,6 +782,8 @@ void __cdecl onGameEngineChange(int a1)
 
 		if (GameState == 3)
 		{
+			// send server map checksums to client
+			MapChecksumSync::SendState();
 			//inform players of the current advanced lobby settings
 			advLobbySettings->sendLobbySettingsPacket();
 

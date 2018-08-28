@@ -1,5 +1,6 @@
 #include "Globals.h"
 #include <h2mod.pb.h>
+#include "MapChecksumSync.h"
 
 using namespace std; 
 
@@ -13,10 +14,11 @@ void startGameThread() {
 			if (!network->queuedNetworkCommands.empty()) {
 				std::deque<std::string>::iterator it = network->queuedNetworkCommands.begin();
 				std::string command = *it;
+				INT32 len = *reinterpret_cast<const INT32*>(command.c_str());
 				network->queuedNetworkCommands.pop_front();
-				if (!command.empty()) {
+				if (len > 0) {
 					H2ModPacket recvpak;
-					recvpak.ParseFromArray(command.c_str(), strlen(command.c_str()));
+					recvpak.ParseFromArray(command.c_str(), len);
 					if (recvpak.has_type()) {
 						switch (recvpak.type()) {
 						case H2ModPacket_Type_set_player_team:
@@ -62,6 +64,11 @@ void startGameThread() {
 							TRACE_GAME("[h2mod-network] Received lobby settings packet");
 							if (recvpak.has_lobby_settings()) {
 								advLobbySettings->parseLobbySettings(recvpak.lobby_settings());
+							}
+							break;
+						case H2ModPacket_Type_map_checksum_state_sync:
+							if (recvpak.has_checksum()) {
+								MapChecksumSync::HandlePacket(recvpak);
 							}
 							break;
 						default:

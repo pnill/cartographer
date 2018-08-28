@@ -55,14 +55,7 @@ static void actuallySendPacket() {
 	lobby_settings->set_mp_blind((int)AdvLobbySettings_mp_blind + 1);
 	lobby_settings->set_flashlight((int)AdvLobbySettings_flashlight + 1);
 
-	char* SendBuf = new char[teampak.ByteSize()];
-	teampak.SerializeToArray(SendBuf, teampak.ByteSize());
-
-	network->networkCommand = SendBuf;
-	network->sendCustomPacketToAllPlayers();
-
-	network->networkCommand = NULL;
-	delete[] SendBuf;
+	network->send_h2mod_packet(teampak);
 
 #ifdef _DEBUG
 	_CrtSetDbgFlag(tmpFlagOrig);

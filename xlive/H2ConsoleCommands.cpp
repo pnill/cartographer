@@ -294,14 +294,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			h2mod_set_team *set_team = teampak.mutable_h2_set_player_team();
 			set_team->set_team(atoi(secondArg.c_str()));
 
-			char* SendBuf = new char[teampak.ByteSize()];
-			teampak.SerializeToArray(SendBuf, teampak.ByteSize());
-
-			network->networkCommand = SendBuf;
-			network->sendCustomPacket(atoi(firstArg.c_str()));
-
-			network->networkCommand = NULL;
-			delete[] SendBuf;
+			network->send_h2mod_packet_player(atoi(firstArg.c_str()), teampak);
 		}
 		else if (firstCommand == "$maxplayers") {
 			if (splitCommands.size() != 2) {
