@@ -10,7 +10,14 @@ namespace MapChecksumSync
 		std::map<std::string, std::string> map_checksum_list;
 	};
 	void StartupError(const std::string &error);
-	void RuntimeError(const std::string &message);
+	enum error_id
+	{
+		official_needed,
+		unofficial_needed,
+		diff_checksums,
+		internal
+	};
+	void RuntimeError(error_id type);
 
 	void SendState();
 	void HandlePacket(const H2ModPacket &packet);

@@ -291,6 +291,7 @@
     <ClCompile Include="H2MOD_Infection.cpp" />
     <ClCompile Include="TSClient.cpp" />
     <ClCompile Include="TSServer.cpp" />
+    <ClCompile Include="Util\Base64.cpp" />
     <ClCompile Include="Util\Debug.cpp" />
     <ClCompile Include="Util\hash.cpp" />
     <ClCompile Include="xliveless.cpp" />
@@ -371,6 +372,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="TSClient.h" />
     <ClInclude Include="TSServer.h" />
+    <ClInclude Include="Util\Base64.h" />
     <ClInclude Include="Util\Debug.h" />
     <ClInclude Include="Util\hash.h" />
     <ClInclude Include="xlivedefs.h" />

@@ -538,13 +538,14 @@ int __cdecl serializeChatPacket(void* a1, int a2, int a3) {
 		INT32 packet_size = encoded_message.size();
 		if (LOG_CHECK(packet_size <= CHAT_PACKET_EXTEND_SIZE))
 		{
+			char* commandToWrite = (char*)(a3 + (CHAT_PACKET_ORG_SIZE));
+			memset(commandToWrite, 0, CHAT_PACKET_EXTEND_SIZE);
+			memcpy(commandToWrite, encoded_message.c_str(), packet_size);
+			//TODO: if text is precense, don't send over the command, as this call stack is from someone sending text
+			result = getDataEncodeStringMethod()(a1, (int)"command", (int)commandToWrite, CHAT_PACKET_EXTEND_SIZE);
+		} else {
 			TRACE_FUNC("Can't send data larger than chat extend size. data_size=%d, extend_size=%d", packet_size, CHAT_PACKET_EXTEND_SIZE);
 		}
-		char* commandToWrite = (char*)(a3 + (CHAT_PACKET_ORG_SIZE));
-		memset(commandToWrite, 0, CHAT_PACKET_EXTEND_SIZE);
-		memcpy(commandToWrite, encoded_message.c_str(), packet_size);
-		//TODO: if text is precense, don't send over the command, as this call stack is from someone sending text
-		result = getDataEncodeStringMethod()(a1, (int)"command", (int)commandToWrite, CHAT_PACKET_EXTEND_SIZE);
 	}
 
 	return result;

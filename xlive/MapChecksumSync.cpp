@@ -11,6 +11,7 @@
 
 extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;
+using namespace MapChecksumSync;
 
 bool __cdecl compare_map_checksum(BYTE *checksum_data_a, BYTE *checksum_data_b)
 {
@@ -32,6 +33,15 @@ int __cdecl calc_map_checksum(HANDLE *file, int checksum_out)
 	}
 	call_count++;
 	return true;
+}
+
+void load_main_menu_with_context(int context)
+{
+	if (H2IsDediServer)
+		return;
+	typedef void (__cdecl *load_main_menu_with_context)(int a1);
+	auto load_main_menu_with_context_impl = reinterpret_cast<load_main_menu_with_context>(H2BaseAddr + 0x08EAF);
+	load_main_menu_with_context_impl(context);
 }
 
 static inline DWORD get_address(DWORD client, DWORD server = NULL)
@@ -110,18 +120,20 @@ bool MapChecksumSync::startup_failed()
 	return startup_failure;
 }
 
-void MapChecksumSync::RuntimeError(const std::string &error)
+std::map<error_id, std::string> temp_type_mapping{
+	{ error_id::diff_checksums, "Different checksums" },
+	{ error_id::internal, "internal error" },
+	{ error_id::official_needed, "official needed" },
+	{ error_id::unofficial_needed, "unofficial needed" },
+};
+
+void MapChecksumSync::RuntimeError(error_id type)
 {
+	load_main_menu_with_context(0);
 	// maybe someone will make a nicer dialog
 	run_async(
-		MessageBoxA(NULL, error.c_str(), "Map checksum error!", S_OK);
-		// exit lobby here
+		MessageBoxA(NULL, temp_type_mapping[type].c_str(), "Map checksum error!", S_OK);
 	)
-}
-
-void internal_error()
-{
-	MapChecksumSync::RuntimeError("An internal error occured see logs and contact support.");
 }
 
 void MapChecksumSync::Calculate()
@@ -184,13 +196,14 @@ void MapChecksumSync::Calculate()
 		TRACE_FUNC_N("%s : %s", ilter.first.c_str(), ilter.second.c_str());
 	}
 	TRACE_FUNC_N("is_offical = %s", maps_status.is_offical ? "true" : "false");
-	MapChecksumSync::SendState();
 }
 
 void MapChecksumSync::SendState()
 {
-//	if (!gameManager->isHost() || h2mod->get_engine_type() != EngineType::MULTIPLAYER_ENGINE)
-	//	return;
+	TRACE_FUNC_N("gameManager->isHost() %d", gameManager->isHost());
+	TRACE_FUNC_N("h2mod->get_engine_type() %d", h2mod->get_engine_type());
+	if (!gameManager->isHost() || h2mod->get_engine_type() != EngineType::MULTIPLAYER_ENGINE)
+		return;
 	H2ModPacket packet;
 	packet.set_type(H2ModPacket::Type::H2ModPacket_Type_map_checksum_state_sync);
 
@@ -218,7 +231,7 @@ void MapChecksumSync::HandlePacket(const H2ModPacket &packet)
 		if (checksum_packet.is_offical() != maps_status.is_offical)
 		{
 			TRACE_FUNC_N("Server client is_offical mismatch client=%d, server=%d", maps_status.is_offical, checksum_packet.is_offical());
-			MapChecksumSync::RuntimeError(std::string("You need ") + (maps_status.is_offical ? "unoffical" : "offical") + "maps to join this server");
+			MapChecksumSync::RuntimeError(maps_status.is_offical ? error_id::unofficial_needed : error_id::unofficial_needed);
 			return;
 		}
 
@@ -228,13 +241,13 @@ void MapChecksumSync::HandlePacket(const H2ModPacket &packet)
 			if (checksum_packet.map_checksum_list_size() == 0)
 			{
 				TRACE_FUNC_N("Internal error checksum list is empty");
-				internal_error();
+				RuntimeError(error_id::internal);
 				return;
 			}
 			if (checksum_packet.map_checksum_list_size() != maps_status.map_checksum_list.size())
 			{
 				TRACE_FUNC_N("Internal error server checksum list length doesn't match client");
-				internal_error();
+				RuntimeError(error_id::internal);
 				return;
 			}
 			bool is_valid = true;
@@ -246,7 +259,7 @@ void MapChecksumSync::HandlePacket(const H2ModPacket &packet)
 				if (ilter == maps_status.map_checksum_list.end())
 				{
 					TRACE_FUNC_N("Internal error server has map client doesn't");
-					internal_error();
+					RuntimeError(error_id::internal);
 					return;
 				}
 				if (ilter->second != server_elem.value())
@@ -257,14 +270,7 @@ void MapChecksumSync::HandlePacket(const H2ModPacket &packet)
 				}
 			}
 			if (!is_valid) {
-				std::stringstream error_message;
-				error_message << std::setfill(' ') << "Client-server checksum mismatch" << std::endl
-					<< std::setw(20) << "MAP" << std::setw(18) << "CLIENT" << std::setw(18) << "SERVER";
-				for (auto ilter : bad_maps_list)
-				{
-					error_message << std::setw(20) << " " << ilter.first << " " << ilter.second.first << " " << ilter.second.second << std::endl;;
-				}
-				MapChecksumSync::RuntimeError(error_message.str());
+				RuntimeError(error_id::diff_checksums);
 				return;
 			}
 		}
