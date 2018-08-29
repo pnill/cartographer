@@ -39,16 +39,19 @@ static inline DWORD get_address(DWORD client, DWORD server = NULL)
 {
 	return H2BaseAddr + (H2IsDediServer ? server : client);
 }
-
+#pragma endregion
 
 void MapChecksumSync::Init()
 {
 	TRACE_FUNC("Disabling map checksum");
 	WriteJmpTo(get_address(0x8F914, 0x81EBB), compare_map_checksum);
 	WriteJmpTo(get_address(0x8F664, 0x82171), calc_map_checksum);
+	
+	// hang on startup matters less and those functions seem to be called latter
+	if (H2IsDediServer)
+		MapChecksumSync::Calculate();
 }
 
-#pragma endregion
 
 MapChecksumSync::state maps_status;
 std::vector<HANDLE> locked_maps;
