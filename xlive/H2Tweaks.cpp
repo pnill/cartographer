@@ -475,7 +475,7 @@ static_assert(sizeof(cache_header) == 0x800, "Bad cache header size");
 bool open_cache_header(const wchar_t *lpFileName, cache_header *cache_header_ptr, HANDLE *map_handle)
 {
 	typedef char __cdecl open_cache_header(const wchar_t *lpFileName, cache_header *lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
-	auto open_cache_header_impl = GetAddress<open_cache_header>(0x642D0);
+	auto open_cache_header_impl = GetAddress<open_cache_header>(0x642D0, 0x5691F);
 	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
 }
 
@@ -511,7 +511,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 
 	// todo move the code for loading the descriptions to our code and get rid of this
 	typedef int __cdecl validate_and_add_custom_map_interal(BYTE *a1);
-	auto validate_and_add_custom_map_interal_impl = GetAddress<validate_and_add_custom_map_interal>(0x4F690);
+	auto validate_and_add_custom_map_interal_impl = GetAddress<validate_and_add_custom_map_interal>(0x4F690, 0x56890);
 	if (!validate_and_add_custom_map_interal_impl(a1))
 	{
 		TRACE_FUNC("warning \"%s\" has bad checksums or is blacklisted, map may not work correctly", file_name);
@@ -857,14 +857,14 @@ void InitH2Tweaks() {
 		VirtualProtect(pfn_c00004567, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		WriteJmpTo(H2BaseAddr + 0x4544, is_init_flag_set);
-		WriteJmpTo(H2BaseAddr + 0x1467, is_supported_build);
-		PatchCall(H2BaseAddr + 0x1E49A2, validate_and_add_custom_map);
-		PatchCall(H2BaseAddr + 0x4D3BA, validate_and_add_custom_map);
-		PatchCall(H2BaseAddr + 0x4CF26, validate_and_add_custom_map);
-		PatchCall(H2BaseAddr + 0x8928, validate_and_add_custom_map);
+		PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);
+	}	
+	WriteJmpTo(GetAddress(0x1467, 0x12E2), is_supported_build);
+	PatchCall(GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
+	PatchCall(GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
+	PatchCall(GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
+	PatchCall(GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 
-		PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);	//default maps meta loading
-	}
 	addDebugText("End Startup Tweaks.");
 }
 
