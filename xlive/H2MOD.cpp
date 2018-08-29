@@ -895,7 +895,7 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 {
 	memcpy(&join_game_xn, host_xn, sizeof(XNADDR));
 
-	trace(L"join_game host_xn->ina.s_addr: %08X ", host_xn->ina.s_addr);
+	TRACE("join_game host_xn->ina.s_addr: %08X ", host_xn->ina.s_addr);
 
 	sockaddr_in SendStruct;
 

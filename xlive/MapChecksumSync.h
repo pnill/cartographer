@@ -28,6 +28,7 @@ namespace MapChecksumSync
 
 	enum startup_state {
 		not_done,
+		in_progress,
 		failed,
 		done
 	};

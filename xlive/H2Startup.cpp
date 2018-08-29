@@ -11,7 +11,13 @@
 #include "GSAccountLogin.h"
 #include "Util\Debug.h"
 #include <string>
+#include <sstream>
 
+#ifndef NO_TRACE
+logger *xlive_trace_log = nullptr;
+logger *h2mod_log = nullptr;
+logger *network_log = nullptr;
+#endif
 
 ProcessInfo game_info;
 
@@ -300,6 +306,20 @@ H2Types detect_process_type()
 	return H2Types::Invalid;
 }
 
+inline std::string prepareLogFileName(std::string logFileName) {
+	std::string instanceNumber("");
+	if (H2GetInstanceId() > 1) {
+		std::stringstream stream;
+		stream << H2GetInstanceId();
+		instanceNumber = ".";
+		instanceNumber += stream.str();
+	}
+	std::string filename = logFileName;
+	filename += instanceNumber;
+	filename += ".log";
+	return filename;
+}
+
 ///Before the game window appears
 void InitH2Startup() {
 	Debug::init();
@@ -360,6 +380,14 @@ void InitH2Startup() {
 	}
 
 	InitH2Config();
+#ifndef NO_TRACE
+	xlive_trace_log = new logger(prepareLogFileName("xlive_trace"));
+	TRACE("Log started (xLiveLess " DLL_VERSION_STR ")\n");
+	h2mod_log = new logger(prepareLogFileName("h2mod"));
+	TRACE_GAME("Log started (H2MOD " DLL_VERSION_STR ")\n");
+	network_log = new logger(prepareLogFileName("h2network"));
+	TRACE_GAME("Log started (H2MOD - Network" DLL_VERSION_STR ")\n");
+#endif
 	InitH2Accounts();
 
 	configureXinput();
@@ -400,4 +428,8 @@ void DeinitH2Startup() {
 	DeinitH2Tweaks();
 	DeinitH2Accounts();
 	DeinitH2Config();
+
+	delete xlive_trace_log;
+	delete h2mod_log;
+	delete network_log;
 }

@@ -375,6 +375,7 @@
     <ClInclude Include="Util\Base64.h" />
     <ClInclude Include="Util\Debug.h" />
     <ClInclude Include="Util\hash.h" />
+    <ClInclude Include="Util\log.h" />
     <ClInclude Include="xlivedefs.h" />
     <ClInclude Include="xliveless.h" />
   </ItemGroup>

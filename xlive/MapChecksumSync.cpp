@@ -15,13 +15,23 @@ extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;
 using namespace MapChecksumSync;
 
+bool checksum_init_started = false;
+
 bool __cdecl compare_map_checksum(BYTE *checksum_data_a, BYTE *checksum_data_b)
 {
+	if (!checksum_init_started)
+	{
+		MapChecksumSync::Calculate();
+	}
 	return true; // patch out check
 }
 
 bool __cdecl calc_map_checksum(HANDLE *file, int checksum_out)
 {
+	if (!checksum_init_started)
+	{
+		MapChecksumSync::Calculate();
+	}
 	return true; // patch out check
 }
 
@@ -36,8 +46,6 @@ void MapChecksumSync::Init()
 	TRACE_FUNC("Disabling map checksum");
 	WriteJmpTo(get_address(0x8F914, 0x81EBB), compare_map_checksum);
 	WriteJmpTo(get_address(0x8F664, 0x82171), calc_map_checksum);
-
-	run_async(MapChecksumSync::Calculate();)
 }
 
 #pragma endregion
@@ -114,11 +122,16 @@ startup_state MapChecksumSync::get_startup_info()
 {
 	if (startup_failure)
 		return startup_state::failed;
-	return maps_status.is_done ? startup_state::done : startup_state::not_done;
+	if (maps_status.is_done)
+		return startup_state::done;
+	if (checksum_init_started)
+		return startup_state::in_progress;
+	return startup_state::not_done;
 }
 
 void MapChecksumSync::Calculate()
 {
+	checksum_init_started = true;
 	std::atexit(unlock_all_maps);
 	std::at_quick_exit(unlock_all_maps);
 	std::unordered_map<std::string, std::unordered_set<std::string>> builtin_maps

@@ -25,23 +25,22 @@ extern HMODULE hThis;
 extern CRITICAL_SECTION d_lock;
 
 #ifndef NO_TRACE
+#include "Util/log.h"
 
-// Print message to the log
-extern void trace(LPWSTR message, ...);
-extern void trace2(LPWSTR message, ...);
-extern void trace_game(LPWSTR message, ...);
-extern void trace_game_narrow(LPSTR message, ...);
-extern void trace_game_info(LPSTR message, ...);
-extern void trace_game_network(LPSTR message, ...);
+extern logger *xlive_trace_log;
+extern logger *h2mod_log;
+extern logger *network_log;
 
-#define TRACE_GAME(msg, ...) trace_game (L ## msg, __VA_ARGS__)
-#define TRACE_GAME_N(msg, ...) trace_game_narrow( ## msg, __VA_ARGS__ )
-#define TRACE_FUNC(msg, ...) trace_game (__FUNCTIONW__  L"(): " L ## msg, __VA_ARGS__)
-#define TRACE_FUNC_N(msg, ...) trace_game_narrow( __FUNCTION__ "(): "  ## msg, __VA_ARGS__ )
-#define TRACE_GAME_NETWORK(msg, ...) trace_game_network( ## msg, __VA_ARGS__ )
-#define TRACE(msg, ...) trace (L ## msg, __VA_ARGS__)
-#define TRACE2(msg, ...) trace2 (L ## msg, __VA_ARGS__)
-#define TRACE_GAME_INFO(msg, ...) trace_game_info( ## msg, __VA_ARGS__ )
+#define CHECK_PTR(check, expression) \
+	if (check) \
+		expression
+
+#define TRACE_GAME(msg, ...) CHECK_PTR(h2mod_log, h2mod_log->write(L ## msg, __VA_ARGS__))
+#define TRACE_GAME_N(msg, ...) CHECK_PTR(h2mod_log, h2mod_log->write( ## msg, __VA_ARGS__ ))
+#define TRACE_FUNC(msg, ...)  CHECK_PTR(h2mod_log, h2mod_log->write(__FUNCTIONW__  L"(): " L ## msg, __VA_ARGS__))
+#define TRACE_FUNC_N(msg, ...)  CHECK_PTR(h2mod_log, h2mod_log->write( __FUNCTION__ "(): "  ## msg, __VA_ARGS__ ))
+#define TRACE_GAME_NETWORK(msg, ...) CHECK_PTR(network_log, network_log->write( ## msg, __VA_ARGS__ ))
+#define TRACE(msg, ...) CHECK_PTR(xlive_trace_log, xlive_trace_log->write(L ## msg, __VA_ARGS__))
 
 template <typename T>
 inline T verify_output(T output, const char *expression, const char *func_name, const char* file, const int line)
@@ -72,7 +71,6 @@ inline T verify_output(T output, const char *expression, const char *func_name, 
 //#define trace()
 #else
 #define TRACE()
-#define TRACE2()
 #define TRACE_GAME_N()
 #define TRACE_GAME()
 #define TRACE_GAME_NETWORK()

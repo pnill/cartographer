@@ -3764,11 +3764,17 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountList() {//__thiscall
 }
 
 void GSCustomMenuCall_AccountList();
-
+using namespace MapChecksumSync;
 static bool CMButtonHandler_AccountList(int button_id) {
 	// todo: better error here
-	if (MapChecksumSync::get_startup_info() != MapChecksumSync::startup_state::done)
+	if (MapChecksumSync::get_startup_info() != startup_state::done)
 	{
+		switch (MapChecksumSync::get_startup_info())
+		{
+		case not_done:
+			MapChecksumSync::Calculate();
+			break;
+		}
 		return true;
 	}
 	if (button_id == H2AccountCount + 1) {

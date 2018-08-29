@@ -3032,7 +3032,7 @@ DWORD WINAPI XUserWriteAchievements (DWORD count, PXUSER_ACHIEVEMENT pAchievemen
 		{
 			achievementList[ pAchievement->dwAchievementId ] = 1;
 
-			TRACE2("Achievement %d unlocked by Player %d", pAchievement->dwAchievementId, pAchievement->dwUserIndex);
+			TRACE("Achievement %d unlocked by Player %d", pAchievement->dwAchievementId, pAchievement->dwUserIndex);
 			pAchievement++;
 
 			count--;
