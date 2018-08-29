@@ -17,7 +17,9 @@
 logger *xlive_trace_log = nullptr;
 logger *h2mod_log = nullptr;
 logger *network_log = nullptr;
+logger *checksum_log = nullptr;
 #endif
+
 
 ProcessInfo game_info;
 
@@ -381,12 +383,15 @@ void InitH2Startup() {
 
 	InitH2Config();
 #ifndef NO_TRACE
-	xlive_trace_log = new logger(prepareLogFileName("xlive_trace"));
-	TRACE("Log started (xLiveLess " DLL_VERSION_STR ")\n");
-	h2mod_log = new logger(prepareLogFileName("h2mod"));
-	TRACE_GAME("Log started (H2MOD " DLL_VERSION_STR ")\n");
-	network_log = new logger(prepareLogFileName("h2network"));
-	TRACE_GAME("Log started (H2MOD - Network" DLL_VERSION_STR ")\n");
+	if (H2Config_debug_log) {
+		xlive_trace_log = logger::create(prepareLogFileName("xlive_trace"));
+		TRACE("Log started (xLiveLess " DLL_VERSION_STR ")\n");
+		h2mod_log = logger::create(prepareLogFileName("h2mod"));
+		TRACE_GAME("Log started (H2MOD " DLL_VERSION_STR ")\n");
+		network_log = logger::create(prepareLogFileName("h2network"));
+		TRACE_GAME_NETWORK("Log started (H2MOD - Network " DLL_VERSION_STR ")\n");
+	}
+	checksum_log = logger::create(prepareLogFileName("checksum"), true);
 #endif
 	InitH2Accounts();
 

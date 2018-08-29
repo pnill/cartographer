@@ -9,12 +9,19 @@
 #include "Globals.h"
 #include <iomanip>
 
-#pragma region patches
-
 extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;
 using namespace MapChecksumSync;
+extern logger *checksum_log;
 
+#define CHECKSUM_LOG(msg, ...) \
+	CHECK_PTR(h2mod_log, h2mod_log->write(__FUNCTION__  "(): " msg, __VA_ARGS__)); \
+	CHECK_PTR(checksum_log, checksum_log->write(msg, __VA_ARGS__)); \
+	if (H2IsDediServer)\
+		printf(msg "\n", __VA_ARGS__)
+
+
+#pragma region patches
 bool checksum_init_started = false;
 
 bool __cdecl compare_map_checksum(BYTE *checksum_data_a, BYTE *checksum_data_b)
@@ -95,7 +102,7 @@ void lock_file_write(const std::string &filename)
 		NULL);
 	if (!LOG_CHECK(hfile != INVALID_HANDLE_VALUE))
 	{
-		TRACE_FUNC_N("Map '%s' couldn't be locked", filename.c_str());
+		CHECKSUM_LOG("Map '%s' couldn't be locked", filename.c_str());
 		MapChecksumSync::StartupError("Failed to lock map file, close all map editing programs");
 	}
 }
@@ -110,7 +117,7 @@ void MapChecksumSync::StartupError(const std::string &error)
 #endif
 	if (H2IsDediServer)
 	{
-		TRACE_FUNC_N("%s", error.c_str());
+		CHECKSUM_LOG("%s", error.c_str());
 		std::exit(-1);
 	}
 	startup_failure = true;
@@ -134,6 +141,7 @@ startup_state MapChecksumSync::get_startup_info()
 
 void MapChecksumSync::Calculate()
 {
+	CHECKSUM_LOG("Starting builtin map checksumming");
 	checksum_init_started = true;
 	std::atexit(unlock_all_maps);
 	std::at_quick_exit(unlock_all_maps);
@@ -178,10 +186,10 @@ void MapChecksumSync::Calculate()
 			maps_status.map_checksum_list[ilter.first] = map_hash;
 			if (!set_contains_element(ilter.second, map_hash))
 			{
-				TRACE_FUNC_N("Map '%s' checksum doesn't match any offical checksum", ilter.first.c_str());
+				CHECKSUM_LOG("Map '%s' checksum doesn't match any offical checksum", ilter.first.c_str());
 				if (ilter.first != "shared")
 				{
-					TRACE_FUNC_N("Consider moving modded map to custom maps folder and restoring default");
+					CHECKSUM_LOG("Consider moving modded map to custom maps folder and restoring default");
 				}
 				maps_status.is_offical = false;
 			}
@@ -191,9 +199,9 @@ void MapChecksumSync::Calculate()
 	}
 	for (auto ilter : maps_status.map_checksum_list)
 	{
-		TRACE_FUNC_N("%s : %s", ilter.first.c_str(), ilter.second.c_str());
+		CHECKSUM_LOG("%s : %s", ilter.first.c_str(), ilter.second.c_str());
 	}
-	TRACE_FUNC_N("is_offical = %s", maps_status.is_offical ? "true" : "false");
+	CHECKSUM_LOG("is_offical = %s", maps_status.is_offical ? "true" : "false");
 	maps_status.is_done = true;
 }
 
@@ -247,27 +255,27 @@ void MapChecksumSync::HandlePacket(const H2ModPacket &packet)
 {
 	if (LOG_CHECK(packet.type() == H2ModPacket::Type::H2ModPacket_Type_map_checksum_state_sync && !gameManager->isHost() && packet.has_checksum()))
 	{
-		TRACE_FUNC("Processing packet");
+		CHECKSUM_LOG("Processing packet");
 		auto checksum_packet = packet.checksum();
 		if (checksum_packet.is_offical() != maps_status.is_offical)
 		{
-			TRACE_FUNC_N("Server client is_offical mismatch client=%d, server=%d", maps_status.is_offical, checksum_packet.is_offical());
+			CHECKSUM_LOG("Server client is_offical mismatch client=%d, server=%d", maps_status.is_offical, checksum_packet.is_offical());
 			MapChecksumSync::RuntimeError(maps_status.is_offical ? error_id::unofficial_needed : error_id::unofficial_needed);
 			return;
 		}
 
 		if (!checksum_packet.is_offical())
 		{
-			TRACE_FUNC_N("Not offical comparing map checksums");
+			CHECKSUM_LOG("Not offical comparing map checksums");
 			if (checksum_packet.map_checksum_list_size() == 0)
 			{
-				TRACE_FUNC_N("Internal error checksum list is empty");
+				CHECKSUM_LOG("Internal error checksum list is empty");
 				RuntimeError(error_id::internal);
 				return;
 			}
 			if (checksum_packet.map_checksum_list_size() != maps_status.map_checksum_list.size())
 			{
-				TRACE_FUNC_N("Internal error server checksum list length doesn't match client");
+				CHECKSUM_LOG("Internal error server checksum list length doesn't match client");
 				RuntimeError(error_id::internal);
 				return;
 			}
@@ -279,13 +287,13 @@ void MapChecksumSync::HandlePacket(const H2ModPacket &packet)
 				auto ilter = maps_status.map_checksum_list.find(server_elem.key());
 				if (ilter == maps_status.map_checksum_list.end())
 				{
-					TRACE_FUNC_N("Internal error server has map client doesn't");
+					CHECKSUM_LOG("Internal error server has map client doesn't");
 					RuntimeError(error_id::internal);
 					return;
 				}
 				if (ilter->second != server_elem.value())
 				{
-					TRACE_FUNC_N("sever client mismatch for map: %s, client: %s, server: %s", ilter->first.c_str(), ilter->second.c_str(), server_elem.value().c_str());
+					CHECKSUM_LOG("sever client mismatch for map: %s, client: %s, server: %s", ilter->first.c_str(), ilter->second.c_str(), server_elem.value().c_str());
 					bad_maps_list[ilter->first.c_str()] = { ilter->second, server_elem.value() };
 					is_valid = false;
 				}
