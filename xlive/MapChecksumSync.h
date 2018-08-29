@@ -6,7 +6,8 @@ namespace MapChecksumSync
 {
 	struct state
 	{
-		bool is_offical;
+		bool is_done = false;
+		bool is_offical = true;
 		std::map<std::string, std::string> map_checksum_list;
 	};
 	void StartupError(const std::string &error);
@@ -25,5 +26,11 @@ namespace MapChecksumSync
 	void Calculate();
 	void Init();
 
-	bool startup_failed();
+	enum startup_state {
+		not_done,
+		failed,
+		done
+	};
+
+	startup_state get_startup_info();
 };

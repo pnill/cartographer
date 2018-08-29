@@ -9,39 +9,20 @@
 #include "Globals.h"
 #include <iomanip>
 
+#pragma region patches
+
 extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;
 using namespace MapChecksumSync;
 
 bool __cdecl compare_map_checksum(BYTE *checksum_data_a, BYTE *checksum_data_b)
 {
-	TRACE_FUNC(" Returning true");
-	return true;
+	return true; // patch out check
 }
 
-int __cdecl calc_map_checksum(HANDLE *file, int checksum_out)
+bool __cdecl calc_map_checksum(HANDLE *file, int checksum_out)
 {
-	static int call_count = 0;
-	if (call_count == 1) // logging ins't initialized yet on the first call for reasons
-	{
-		TRACE_FUNC("Calculating our checksums");
-		MapChecksumSync::Calculate();
-		TRACE_FUNC("Done checksumming");
-	}
-	else {
-		TRACE_FUNC("Nop");
-	}
-	call_count++;
-	return true;
-}
-
-void load_main_menu_with_context(int context)
-{
-	if (H2IsDediServer)
-		return;
-	typedef void (__cdecl *load_main_menu_with_context)(int a1);
-	auto load_main_menu_with_context_impl = reinterpret_cast<load_main_menu_with_context>(H2BaseAddr + 0x08EAF);
-	load_main_menu_with_context_impl(context);
+	return true; // patch out check
 }
 
 static inline DWORD get_address(DWORD client, DWORD server = NULL)
@@ -49,9 +30,23 @@ static inline DWORD get_address(DWORD client, DWORD server = NULL)
 	return H2BaseAddr + (H2IsDediServer ? server : client);
 }
 
+
+void MapChecksumSync::Init()
+{
+	TRACE_FUNC("Disabling map checksum");
+	WriteJmpTo(get_address(0x8F914, 0x81EBB), compare_map_checksum);
+	WriteJmpTo(get_address(0x8F664, 0x82171), calc_map_checksum);
+
+	run_async(MapChecksumSync::Calculate();)
+}
+
+#pragma endregion
+
 MapChecksumSync::state maps_status;
 std::vector<HANDLE> locked_maps;
 std::mutex map_mutex;
+
+#pragma region startup
 
 void unlock_all_maps()
 {
@@ -115,25 +110,11 @@ void MapChecksumSync::StartupError(const std::string &error)
 	)
 }
 
-bool MapChecksumSync::startup_failed()
+startup_state MapChecksumSync::get_startup_info()
 {
-	return startup_failure;
-}
-
-std::map<error_id, std::string> temp_type_mapping{
-	{ error_id::diff_checksums, "Different checksums" },
-	{ error_id::internal, "internal error" },
-	{ error_id::official_needed, "official needed" },
-	{ error_id::unofficial_needed, "unofficial needed" },
-};
-
-void MapChecksumSync::RuntimeError(error_id type)
-{
-	load_main_menu_with_context(0);
-	// maybe someone will make a nicer dialog
-	run_async(
-		MessageBoxA(NULL, temp_type_mapping[type].c_str(), "Map checksum error!", S_OK);
-	)
+	if (startup_failure)
+		return startup_state::failed;
+	return maps_status.is_done ? startup_state::done : startup_state::not_done;
 }
 
 void MapChecksumSync::Calculate()
@@ -167,9 +148,10 @@ void MapChecksumSync::Calculate()
 		{ "waterworks", {"bb0f5ab6bd17a7eb0e4f74f6e64a1b42"} },
 		{ "zanzibar", {"286a7ae11e011a1d4a533f23a45ae494"} },
 
+		// shared
 		{ "shared", {"64df15c07f2b1f28545774de18b7fee2"} },
 	};
-	maps_status.is_offical = true;
+	maps_status.is_offical;
 	for (auto ilter : builtin_maps)
 	{
 		std::string map_hash;
@@ -196,13 +178,35 @@ void MapChecksumSync::Calculate()
 		TRACE_FUNC_N("%s : %s", ilter.first.c_str(), ilter.second.c_str());
 	}
 	TRACE_FUNC_N("is_offical = %s", maps_status.is_offical ? "true" : "false");
+	maps_status.is_done = true;
 }
+
+#pragma endregion
+
+std::map<error_id, std::string> temp_type_mapping{
+	{ error_id::diff_checksums, "Different checksums" },
+	{ error_id::internal, "internal error" },
+	{ error_id::official_needed, "official needed" },
+	{ error_id::unofficial_needed, "unofficial needed" },
+};
+
+
+void MapChecksumSync::RuntimeError(error_id type)
+{
+	h2mod->exit_game();
+	// maybe someone will make a nicer dialog
+	run_async(
+		MessageBoxA(NULL, temp_type_mapping[type].c_str(), "Map checksum error!", S_OK);
+	)
+}
+
+#pragma region sync
 
 void MapChecksumSync::SendState()
 {
 	TRACE_FUNC_N("gameManager->isHost() %d", gameManager->isHost());
 	TRACE_FUNC_N("h2mod->get_engine_type() %d", h2mod->get_engine_type());
-	if (!gameManager->isHost() || h2mod->get_engine_type() != EngineType::MULTIPLAYER_ENGINE)
+	if (!gameManager->isHost())
 		return;
 	H2ModPacket packet;
 	packet.set_type(H2ModPacket::Type::H2ModPacket_Type_map_checksum_state_sync);
@@ -220,11 +224,12 @@ void MapChecksumSync::SendState()
 		}
 	}
 	network->send_h2mod_packet(packet);
+	MapChecksumSync::HandlePacket(packet);
 }
 
 void MapChecksumSync::HandlePacket(const H2ModPacket &packet)
 {
-	if (LOG_CHECK(packet.type() == H2ModPacket::Type::H2ModPacket_Type_map_checksum_state_sync)) //&& !gameManager->isHost() && packet.has_checksum()))
+	if (LOG_CHECK(packet.type() == H2ModPacket::Type::H2ModPacket_Type_map_checksum_state_sync && !gameManager->isHost() && packet.has_checksum()))
 	{
 		TRACE_FUNC("Processing packet");
 		auto checksum_packet = packet.checksum();
@@ -276,10 +281,4 @@ void MapChecksumSync::HandlePacket(const H2ModPacket &packet)
 		}
 	}
 }
-
-void MapChecksumSync::Init()
-{
-	TRACE_FUNC("Disabling map checksum");
-	WriteJmpTo(get_address(0x8F914), compare_map_checksum);
-	WriteJmpTo(get_address(0x8F664), calc_map_checksum);
-}
+#pragma endregion

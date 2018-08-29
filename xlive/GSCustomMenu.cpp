@@ -3766,7 +3766,8 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountList() {//__thiscall
 void GSCustomMenuCall_AccountList();
 
 static bool CMButtonHandler_AccountList(int button_id) {
-	if (MapChecksumSync::startup_failed())
+	// todo: better error here
+	if (MapChecksumSync::get_startup_info() != MapChecksumSync::startup_state::done)
 	{
 		return true;
 	}

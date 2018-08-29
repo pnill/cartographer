@@ -128,6 +128,7 @@ public:
 		void PatchWeaponsInteraction(bool b_Enable);		
 		void securityPacketProcessing();
 		EngineType get_engine_type();
+		void exit_game();
 		BOOL Server;
 		std::unordered_map<wchar_t*, int> SoundMap;
 		std::unordered_map<std::string, bool> AchievementMap;

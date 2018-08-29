@@ -143,6 +143,25 @@ EngineType H2MOD::get_engine_type()
 	} 
 }
 
+void H2MOD::exit_game()
+{
+	if (H2IsDediServer)
+		return;
+	if (get_engine_type() != EngineType::MAIN_MENU_ENGINE)
+	{
+		// request_squad_browser
+		WriteValue<BYTE>(H2BaseAddr + 0x978BAC, 1);
+
+		typedef void(__cdecl *load_main_menu_with_context)(int context);
+		auto load_main_menu_with_context_impl = reinterpret_cast<load_main_menu_with_context>(H2BaseAddr + 0x08EAF);
+		load_main_menu_with_context_impl(0);
+	}
+
+	typedef int(__cdecl *leave_game_type)(int a1);
+	leave_game_type leave_game = (leave_game_type)(h2mod->GetBase() + 0x216388);
+	leave_game(0);
+}
+
 void enableLiveMenus() {
 	*(int*)(h2mod->GetBase() + 0x422450) = 1; 
 }
