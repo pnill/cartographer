@@ -613,15 +613,6 @@ void SoundThread(void)
 
 }
 
-typedef char(__cdecl *tsub_4F17A)(void*, int, int);
-tsub_4F17A psub_4F17A;
-
-char __cdecl sub_4F17A(void* thisptr, int a2, int a3) //allows people to load custom maps with custom tags/huds 
-{
-	int result = psub_4F17A(thisptr, a2, a3);
-	return 1;
-}
-
 typedef bool(__cdecl *spawn_player)(int a1);
 spawn_player pspawn_player;
 
@@ -1238,8 +1229,8 @@ void H2MOD::ApplyHooks() {
 		calls_session_boot_method = (calls_session_boot)DetourClassFunc((BYTE*)this->GetBase() + 0x1CCE9B, (BYTE*)calls_session_boot_sub_1cce9b, 8);
 		VirtualProtect(calls_session_boot_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		psub_4F17A = (tsub_4F17A)DetourFunc((BYTE*)this->GetBase() + 0x4F17A, (BYTE*)sub_4F17A, 7);
-		VirtualProtect(psub_4F17A, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		// disable part of custom map tag verification
+		NopFill(GetBase() + 0x4FA0A, 6);
 
 		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)this->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1351,8 +1342,8 @@ void H2MOD::ApplyHooks() {
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0x8C84C, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
 		
-		psub_4F17A = (tsub_4F17A)DetourFunc((BYTE*)this->GetBase() + 0x5637A, (BYTE*)sub_4F17A, 7);
-		VirtualProtect(psub_4F17A, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		// disable part of custom map tag verification
+		NopFill(GetBase() + 0x56C0A, 6);
 
 		pplayer_death = (player_death)DetourFunc((BYTE*)this->GetBase() + 0x152ED4, (BYTE*)OnPlayerDeath, 9);
 		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);
