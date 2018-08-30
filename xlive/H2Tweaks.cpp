@@ -475,7 +475,7 @@ static_assert(sizeof(cache_header) == 0x800, "Bad cache header size");
 bool open_cache_header(const wchar_t *lpFileName, cache_header *cache_header_ptr, HANDLE *map_handle)
 {
 	typedef char __cdecl open_cache_header(const wchar_t *lpFileName, cache_header *lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
-	auto open_cache_header_impl = GetAddress<open_cache_header>(0x642D0, 0x5691F);
+	auto open_cache_header_impl = GetAddress<open_cache_header>(0x642D0, 0x4C327);
 	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
 }
 
@@ -483,7 +483,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 {
 	cache_header header;
 	HANDLE map_cache_handle;
-	const wchar_t *file_name = (wchar_t*)a1 + 1216;
+	wchar_t *file_name = (wchar_t*)a1 + 1216;
 	if (!open_cache_header(file_name, &header, &map_cache_handle))
 		return false;
 	if (header.magic != 'head' || header.foot != 'foot' || header.file_size <= 0 || header.engine_gen != 8)
