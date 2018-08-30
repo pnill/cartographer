@@ -717,12 +717,7 @@ void MapManager::TcpServer::startListening() {
 	int iResult;
 	int port = H2Config_base_port + 9;           /* port number to use */
 	int client;                  /* file descriptor for socket */
-	int fileDescriptorForFile;                    /* file descriptor for file to send */
-	struct sockaddr_in addr;   /* socket parameters for bind */
-	int    addrlen;            /* argument to accept */
-	struct stat stat_buf;      /* argument to fstat */
 	off_t offset = 0;          /* file offset */
-	char filename[128];   /* filename to send */
 
 	WSADATA wsaData;
 

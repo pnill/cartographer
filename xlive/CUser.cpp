@@ -468,7 +468,6 @@ void CUserManagement::RegisterLocalRequest(char* token, int a2)
 
 	addDebugText("next0");
 
-	u_long xnaddress;
 	sockaddr_in RecvAddr;
 
 	RecvAddr.sin_family = AF_INET;
@@ -518,7 +517,6 @@ void CUserManagement::RegisterLocalRequest(char* token, int a2)
 			{
 				TRACE("GetLocalRegistration() - Reading lreply data");
 
-				char* login_token;
 				ULONGLONG xuid = RecvPak.lreply().xuid();
 				unsigned long saddr = RecvPak.lreply().secure_addr();
 				unsigned long xnaddr = RecvPak.lreply().xnaddr();

@@ -155,7 +155,7 @@ void ExitInstance()
 {
 	//extern void SaveAchievements();
 	//SaveAchievements();
-
+	DeleteCriticalSection(&d_lock);
 	TerminateProcess(GetCurrentProcess(), 0);
 }
 
