@@ -248,7 +248,6 @@ void MapChecksumSync::SendState()
 		}
 	}
 	network->send_h2mod_packet(packet);
-	MapChecksumSync::HandlePacket(packet);
 }
 
 void MapChecksumSync::HandlePacket(const H2ModPacket &packet)
