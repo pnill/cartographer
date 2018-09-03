@@ -536,8 +536,7 @@ int __cdecl serializeChatPacket(void* a1, int a2, int a3) {
 	if (network->networkCommand != NULL && network->networkCommand[0] != '\0') {
 		std::string encoded_message = base64_encode(network->networkCommand, network->command_size);
 		INT32 packet_size = encoded_message.size();
-		if (LOG_CHECK(packet_size <= CHAT_PACKET_EXTEND_SIZE))
-		{
+		if (LOG_CHECK(packet_size <= CHAT_PACKET_EXTEND_SIZE)) {
 			char* commandToWrite = (char*)(a3 + (CHAT_PACKET_ORG_SIZE));
 			memset(commandToWrite, 0, CHAT_PACKET_EXTEND_SIZE);
 			memcpy(commandToWrite, encoded_message.c_str(), packet_size);
@@ -610,7 +609,7 @@ void deserializePlayerAddCave() {
 	mapManager->sendMapInfoPacket();
 	//inform new players of the current advanced lobby settings
 	advLobbySettings->sendLobbySettingsPacket();
-	// send sever map checksums to client
+	// send server map checksums to client
 	MapChecksumSync::SendState();
 }
 
@@ -761,7 +760,7 @@ serialize_membership_packet serialize_membership_packet_method;
 int __cdecl serializeMembershipPacket(void* a1, int a2, int a3) {
 	mapManager->sendMapInfoPacket();
 	advLobbySettings->sendLobbySettingsPacket();
-	// send sever map checksums to client
+	// send server map checksums to client
 	MapChecksumSync::SendState();
 	return serialize_membership_packet_method(a1, a2, a3);
 }
@@ -772,7 +771,7 @@ serialize_parameters_update_packet serialize_parameters_update_packet_method;
 int __cdecl serializeParametersUpdatePacket(void* a1, int a2, int a3) {
 	mapManager->sendMapInfoPacket();
 	advLobbySettings->sendLobbySettingsPacket();
-	// send sever map checksums to client
+	// send server map checksums to client
 	MapChecksumSync::SendState();
 	return serialize_parameters_update_packet_method(a1, a2, a3);
 }

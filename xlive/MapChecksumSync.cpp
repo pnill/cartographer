@@ -292,7 +292,7 @@ void MapChecksumSync::HandlePacket(const H2ModPacket &packet)
 				}
 				if (ilter->second != server_elem.value())
 				{
-					CHECKSUM_LOG("sever client mismatch for map: %s, client: %s, server: %s", ilter->first.c_str(), ilter->second.c_str(), server_elem.value().c_str());
+					CHECKSUM_LOG("server client mismatch for map: %s, client: %s, server: %s", ilter->first.c_str(), ilter->second.c_str(), server_elem.value().c_str());
 					bad_maps_list[ilter->first.c_str()] = { ilter->second, server_elem.value() };
 					is_valid = false;
 				}
