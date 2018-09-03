@@ -25,6 +25,7 @@
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 #include "H2Startup.h"
 #include "GSCustomMenu.h"
+#include "MapChecksumSync.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -140,6 +141,25 @@ EngineType H2MOD::get_engine_type()
 	default:
 		return EngineType::INVALID_ENGINE_TYPE; // if everything ok shouldn't ever get here
 	} 
+}
+
+void H2MOD::exit_game()
+{
+	if (H2IsDediServer)
+		return;
+	if (get_engine_type() != EngineType::MAIN_MENU_ENGINE)
+	{
+		// request_squad_browser
+		WriteValue<BYTE>(H2BaseAddr + 0x978BAC, 1);
+
+		typedef void(__cdecl *load_main_menu_with_context)(int context);
+		auto load_main_menu_with_context_impl = reinterpret_cast<load_main_menu_with_context>(H2BaseAddr + 0x08EAF);
+		load_main_menu_with_context_impl(0);
+	}
+
+	typedef int(__cdecl *leave_game_type)(int a1);
+	leave_game_type leave_game = (leave_game_type)(h2mod->GetBase() + 0x216388);
+	leave_game(0);
 }
 
 void enableLiveMenus() {
@@ -593,15 +613,6 @@ void SoundThread(void)
 
 }
 
-typedef char(__cdecl *tsub_4F17A)(void*, int, int);
-tsub_4F17A psub_4F17A;
-
-char __cdecl sub_4F17A(void* thisptr, int a2, int a3) //allows people to load custom maps with custom tags/huds 
-{
-	int result = psub_4F17A(thisptr, a2, a3);
-	return 1;
-}
-
 typedef bool(__cdecl *spawn_player)(int a1);
 spawn_player pspawn_player;
 
@@ -781,6 +792,8 @@ void __cdecl onGameEngineChange(int a1)
 
 		if (GameState == 3)
 		{
+			// send server map checksums to client
+			MapChecksumSync::SendState();
 			//inform players of the current advanced lobby settings
 			advLobbySettings->sendLobbySettingsPacket();
 
@@ -873,7 +886,7 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 {
 	memcpy(&join_game_xn, host_xn, sizeof(XNADDR));
 
-	trace(L"join_game host_xn->ina.s_addr: %08X ", host_xn->ina.s_addr);
+	TRACE("join_game host_xn->ina.s_addr: %08X ", host_xn->ina.s_addr);
 
 	sockaddr_in SendStruct;
 
@@ -1216,8 +1229,8 @@ void H2MOD::ApplyHooks() {
 		calls_session_boot_method = (calls_session_boot)DetourClassFunc((BYTE*)this->GetBase() + 0x1CCE9B, (BYTE*)calls_session_boot_sub_1cce9b, 8);
 		VirtualProtect(calls_session_boot_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		psub_4F17A = (tsub_4F17A)DetourFunc((BYTE*)this->GetBase() + 0x4F17A, (BYTE*)sub_4F17A, 7);
-		VirtualProtect(psub_4F17A, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		// disable part of custom map tag verification
+		NopFill(GetBase() + 0x4FA0A, 6);
 
 		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)this->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1329,8 +1342,8 @@ void H2MOD::ApplyHooks() {
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0x8C84C, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
 		
-		psub_4F17A = (tsub_4F17A)DetourFunc((BYTE*)this->GetBase() + 0x5637A, (BYTE*)sub_4F17A, 7);
-		VirtualProtect(psub_4F17A, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		// disable part of custom map tag verification
+		NopFill(GetBase() + 0x56C0A, 6);
 
 		pplayer_death = (player_death)DetourFunc((BYTE*)this->GetBase() + 0x152ED4, (BYTE*)OnPlayerDeath, 9);
 		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);

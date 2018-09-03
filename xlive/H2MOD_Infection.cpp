@@ -47,14 +47,7 @@ void Infection::sendTeamChange(int playerIndex) {
 	set_team->set_team(ZOMBIE_TEAM);
 	set_team->set_peerindex(players->getPeerIndex(playerIndex));
 
-	char* SendBuf = new char[teampak.ByteSize()];
-	teampak.SerializeToArray(SendBuf, teampak.ByteSize());
-
-	network->networkCommand = SendBuf;
-	network->sendCustomPacket(players->getPeerIndex(playerIndex));
-	network->networkCommand = NULL;
-
-	delete[] SendBuf;
+	network->send_h2mod_packet_player(players->getPeerIndex(playerIndex), teampak);
 }
 
 Infection::Infection()

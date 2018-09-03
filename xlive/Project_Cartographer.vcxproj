@@ -95,7 +95,7 @@
       <HeaderFileName />
     </Midl>
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -103,7 +103,7 @@
       <PreprocessorDefinitions>WIN32;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeaderOutputFile>.\Release/xliveless.pch</PrecompiledHeaderOutputFile>
@@ -285,12 +285,15 @@
     <ClCompile Include="H2Startup.cpp" />
     <ClCompile Include="H2Tweaks.cpp" />
     <ClCompile Include="Hook.cpp" />
+    <ClCompile Include="MapChecksumSync.cpp" />
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="packet.pb.cc" />
     <ClCompile Include="H2MOD_Infection.cpp" />
     <ClCompile Include="TSClient.cpp" />
     <ClCompile Include="TSServer.cpp" />
+    <ClCompile Include="Util\Base64.cpp" />
     <ClCompile Include="Util\Debug.cpp" />
+    <ClCompile Include="Util\hash.cpp" />
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="xlive_network.cpp" />
   </ItemGroup>
@@ -362,13 +365,17 @@
     <ClInclude Include="H2Startup.h" />
     <ClInclude Include="H2Tweaks.h" />
     <ClInclude Include="Hook.h" />
+    <ClInclude Include="MapChecksumSync.h" />
     <ClInclude Include="Network.h" />
     <ClInclude Include="packet.pb.h" />
     <ClInclude Include="ReadIniArguments.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TSClient.h" />
     <ClInclude Include="TSServer.h" />
+    <ClInclude Include="Util\Base64.h" />
     <ClInclude Include="Util\Debug.h" />
+    <ClInclude Include="Util\hash.h" />
+    <ClInclude Include="Util\log.h" />
     <ClInclude Include="xlivedefs.h" />
     <ClInclude Include="xliveless.h" />
   </ItemGroup>

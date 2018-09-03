@@ -11,6 +11,15 @@
 #include "GSAccountLogin.h"
 #include "Util\Debug.h"
 #include <string>
+#include <sstream>
+#include "Util/hash.h"
+
+#ifndef NO_TRACE
+logger *xlive_trace_log = nullptr;
+logger *h2mod_log = nullptr;
+logger *network_log = nullptr;
+logger *checksum_log = nullptr;
+#endif
 
 
 ProcessInfo game_info;
@@ -43,8 +52,6 @@ void fileFail(FILE* fp) {
 	}
 }
 
-wchar_t instanceMutexNames[2][14] = { L"Halo2Player%d", L"Halo2Server%d" };
-
 void initInstanceNumber() {
 	addDebugText("Determining Process Instance Number.");
 	HANDLE mutex;
@@ -52,7 +59,7 @@ void initInstanceNumber() {
 	do {
 		instanceNumber++;
 		wchar_t mutexName[32];
-		swprintf(mutexName, sizeof(mutexName), instanceMutexNames[H2IsDediServer], instanceNumber);
+		swprintf(mutexName, sizeof(mutexName), (H2IsDediServer ? L"Halo2Server%d" : L"Halo2Player%d"), instanceNumber);
 		mutex = CreateMutex(0, TRUE, mutexName);
 		lastErr = GetLastError();
 		if (lastErr == ERROR_ALREADY_EXISTS) {
@@ -65,40 +72,28 @@ void initInstanceNumber() {
 	addDebugText(NotificationPlayerText);
 }
 
-const wchar_t* xinputdllPath = L"xinput/p00/xinput9_1_0.dll";
+wchar_t xinput_path[_MAX_PATH];
 
 void configureXinput() {
 	if (!H2IsDediServer) {
 		if (H2GetInstanceId() > 1) {
-			BYTE xinputNumFix[] = { '0' + (H2GetInstanceId() / 10), 0, '0' + (H2GetInstanceId() % 10) };
-			WriteBytes((DWORD)xinputdllPath + 16, xinputNumFix, 3);
+			swprintf(xinput_path, ARRAYSIZE(xinput_path), L"xinput/p%02d/xinput9_1_0.dll", H2GetInstanceId());
+			TRACE_FUNC("Changing xinput path to '%s' : '%x'", xinput_path, xinput_path);
 
-			char pointerHex[20];
-			sprintf(pointerHex, "%x", (DWORD)xinputdllPath);
-			BYTE byteArray[4] = { 0,0,0,0 };
-			HexToByteArray(byteArray, pointerHex);
+			WriteValue(H2BaseAddr + 0x8AD28, xinput_path);
 
-			char totext[255];
-			sprintf(totext, "injecting new xinputdll path instruction: %ls : %x : %x %x %x %x", (DWORD)xinputdllPath, (DWORD)xinputdllPath, byteArray[3], byteArray[2], byteArray[1], byteArray[0]);
-			addDebugText(totext);
-
-			BYTE assmXinputPushIntructionPart[] = { byteArray[3], byteArray[2], byteArray[1], byteArray[0] };
-			WriteBytes(H2BaseAddr + 0x8AD28, assmXinputPushIntructionPart, 4);
-
-			char xinputName[40];
-			char xinputdir[12];
-			sprintf(xinputdir, "xinput/p%d%d", H2GetInstanceId() / 10, H2GetInstanceId() % 10);
+			char xinputName[_MAX_PATH];
+			char xinputdir[_MAX_PATH];
+			sprintf(xinputdir, "xinput/p%02d", H2GetInstanceId());
 			sprintf(xinputName, "%s/xinput9_1_0.dll", xinputdir);
-			wchar_t xinputdir2[30];
-			MultiByteToWideChar(CP_ACP, 0, xinputdir, -1, xinputdir2, strlen(xinputdir) + 1);
-			CreateDirectory(L"xinput", NULL);
+			CreateDirectoryA("xinput", NULL);
 			int fperrno1 = GetLastError();
 			if (!(fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS)) {
 				fileFail(NULL);
 				MessageBoxA(NULL, "Error 7g546.", "Unknown Error", MB_OK);
 				exit(EXIT_FAILURE);
 			}
-			CreateDirectory(xinputdir2, NULL);
+			CreateDirectoryA(xinputdir, NULL);
 			int fperrno2 = GetLastError();
 			if (!(fperrno2 == ERROR_ALREADY_EXISTS || fperrno2 == ERROR_SUCCESS)) {
 				fileFail(NULL);
@@ -123,12 +118,12 @@ void configureXinput() {
 				char* xinput_md5[xinput_array_length] = { xinput_md5_durazno_0_6_0_0, xinput_md5_x360ce_3_3_1_444, xinput_md5_x360ce_3_4_1_1357 };
 				long xinput_offset[xinput_array_length] = { xinput_offset_durazno_0_6_0_0, xinput_offset_x360ce_3_3_1_444, xinput_offset_x360ce_3_4_1_1357 };
 				bool xinput_unicode[xinput_array_length] = { xinput_unicode_durazno_0_6_0_0, xinput_unicode_x360ce_3_3_1_444, xinput_unicode_x360ce_3_4_1_1357 };
-				char available_xinput_md5[33];
-				int hasherr = ComputeFileMd5Hash(L"xinput9_1_0.dll", available_xinput_md5);
+				std::string available_xinput_md5;
+				int hasherr = hashes::calc_file_md5("xinput9_1_0.dll", available_xinput_md5);
 				FILE* file1 = NULL;
 				if (hasherr == 0 && (file1 = fopen("xinput9_1_0.dll", "rb"))) {
 					for (int i = 0; i < xinput_array_length; i++) {
-						if (strcmp(xinput_md5[i], available_xinput_md5) == 0) {
+						if (strcmp(xinput_md5[i], available_xinput_md5.c_str()) == 0) {
 							xinput_index = i;
 							break;
 						}
@@ -188,7 +183,7 @@ void configureXinput() {
 				}
 				else {
 					char xinputError[200];
-					snprintf(xinputError, 200, "Hash Error Num: %x - msg: %s", hasherr, available_xinput_md5);
+					snprintf(xinputError, 200, "Hash Error Num: %x - msg: %s", hasherr, available_xinput_md5.c_str());
 					addDebugText(xinputError);
 					MessageBoxA(NULL, xinputError, "MD5 Hash Error", MB_OK);
 					exit(EXIT_FAILURE);
@@ -300,6 +295,20 @@ H2Types detect_process_type()
 	return H2Types::Invalid;
 }
 
+inline std::string prepareLogFileName(std::string logFileName) {
+	std::string instanceNumber("");
+	if (H2GetInstanceId() > 1) {
+		std::stringstream stream;
+		stream << H2GetInstanceId();
+		instanceNumber = ".";
+		instanceNumber += stream.str();
+	}
+	std::string filename = logFileName;
+	filename += instanceNumber;
+	filename += ".log";
+	return filename;
+}
+
 ///Before the game window appears
 void InitH2Startup() {
 	Debug::init();
@@ -360,6 +369,17 @@ void InitH2Startup() {
 	}
 
 	InitH2Config();
+#ifndef NO_TRACE
+	if (H2Config_debug_log) {
+		xlive_trace_log = logger::create(prepareLogFileName("xlive_trace"));
+		TRACE("Log started (xLiveLess " DLL_VERSION_STR ")\n");
+		h2mod_log = logger::create(prepareLogFileName("h2mod"));
+		TRACE_GAME("Log started (H2MOD " DLL_VERSION_STR ")\n");
+		network_log = logger::create(prepareLogFileName("h2network"));
+		TRACE_GAME_NETWORK("Log started (H2MOD - Network " DLL_VERSION_STR ")\n");
+	}
+	checksum_log = logger::create(prepareLogFileName("checksum"), true);
+#endif
 	InitH2Accounts();
 
 	configureXinput();
@@ -400,4 +420,8 @@ void DeinitH2Startup() {
 	DeinitH2Tweaks();
 	DeinitH2Accounts();
 	DeinitH2Config();
+
+	delete xlive_trace_log;
+	delete h2mod_log;
+	delete network_log;
 }

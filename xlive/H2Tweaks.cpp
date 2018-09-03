@@ -7,9 +7,10 @@
 #include "Hook.h"
 #include "H2OnscreenDebugLog.h"
 #include "GSCustomMenu.h"
-#include "H2MOD.h";
+#include "H2MOD.h"
 #include <string>
 #include "Globals.h"
+#include "MapChecksumSync.h"
 
 #define _USE_MATH_DEFINES
 #include "math.h"
@@ -304,6 +305,8 @@ bool engine_basic_init()
 	DWORD* flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
 	memset(flags_array, 0x00, flags::count); // should be zero initalized anyways but the game does it
 
+	flags_array[flags::nointro] = H2Config_skip_intro;
+
 	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(GetAddress( 0x000285fd));
 
 	init_gfwl_gamestore();
@@ -472,7 +475,7 @@ static_assert(sizeof(cache_header) == 0x800, "Bad cache header size");
 bool open_cache_header(const wchar_t *lpFileName, cache_header *cache_header_ptr, HANDLE *map_handle)
 {
 	typedef char __cdecl open_cache_header(const wchar_t *lpFileName, cache_header *lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
-	auto open_cache_header_impl = GetAddress<open_cache_header>(0x642D0);
+	auto open_cache_header_impl = GetAddress<open_cache_header>(0x642D0, 0x4C327);
 	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
 }
 
@@ -480,7 +483,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 {
 	cache_header header;
 	HANDLE map_cache_handle;
-	const wchar_t *file_name = (wchar_t*)a1 + 1216;
+	wchar_t *file_name = (wchar_t*)a1 + 1216;
 	if (!open_cache_header(file_name, &header, &map_cache_handle))
 		return false;
 	if (header.magic != 'head' || header.foot != 'foot' || header.file_size <= 0 || header.engine_gen != 8)
@@ -508,7 +511,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 
 	// todo move the code for loading the descriptions to our code and get rid of this
 	typedef int __cdecl validate_and_add_custom_map_interal(BYTE *a1);
-	auto validate_and_add_custom_map_interal_impl = GetAddress<validate_and_add_custom_map_interal>(0x4F690);
+	auto validate_and_add_custom_map_interal_impl = GetAddress<validate_and_add_custom_map_interal>(0x4F690, 0x56890);
 	if (!validate_and_add_custom_map_interal_impl(a1))
 	{
 		TRACE_FUNC("warning \"%s\" has bad checksums or is blacklisted, map may not work correctly", file_name);
@@ -752,6 +755,8 @@ void InitH2Tweaks() {
 
 	addDebugText("Begin Startup Tweaks.");
 
+	MapChecksumSync::Init();
+	
 	if (H2IsDediServer) {
 		DWORD dwBack;
 
@@ -799,11 +804,6 @@ void InitH2Tweaks() {
 		}
 
 		bool IntroHQ = true;//clients should set on halo2.exe -highquality
-
-		if (H2Config_skip_intro) {
-			BYTE assmIntroSkip[] = { 0x3F };
-			WriteBytes(H2BaseAddr + 0x221C0E, assmIntroSkip, 1);
-		}
 
 		if (!H2Config_skip_intro && IntroHQ) {
 			BYTE assmIntroHQ[] = { 0xEB };
@@ -857,14 +857,14 @@ void InitH2Tweaks() {
 		VirtualProtect(pfn_c00004567, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		WriteJmpTo(H2BaseAddr + 0x4544, is_init_flag_set);
-		WriteJmpTo(H2BaseAddr + 0x1467, is_supported_build);
-		PatchCall(H2BaseAddr + 0x1E49A2, validate_and_add_custom_map);
-		PatchCall(H2BaseAddr + 0x4D3BA, validate_and_add_custom_map);
-		PatchCall(H2BaseAddr + 0x4CF26, validate_and_add_custom_map);
-		PatchCall(H2BaseAddr + 0x8928, validate_and_add_custom_map);
+		PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);
+	}	
+	WriteJmpTo(GetAddress(0x1467, 0x12E2), is_supported_build);
+	PatchCall(GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
+	PatchCall(GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
+	PatchCall(GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
+	PatchCall(GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 
-		PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);	//default maps meta loading
-	}
 	addDebugText("End Startup Tweaks.");
 }
 

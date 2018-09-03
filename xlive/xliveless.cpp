@@ -934,10 +934,6 @@ DWORD WINAPI XNetQosListen( XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec
 	struct addrinfo *result = NULL;
 	struct addrinfo hints;
 
-	int iSendResult;
-	char recvbuf[512];
-	int recvbuflen = 512;
-
 	ZeroMemory(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
@@ -1375,7 +1371,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 		
 
-	static int print_limit = 30;
+	static DWORD print_limit = 30;
 
 	static DWORD sys_signin = 0x7FFFFFFF;
 	static DWORD sys_storage = 0x7FFFFFFF;
@@ -2245,7 +2241,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 	if( hEnum == g_dwFakeContent && dlcinit != 0x7FFFFFFF )
 	{
-		int total;
+		DWORD total;
 
 
 		total = 0;
@@ -3032,7 +3028,7 @@ DWORD WINAPI XUserWriteAchievements (DWORD count, PXUSER_ACHIEVEMENT pAchievemen
 		{
 			achievementList[ pAchievement->dwAchievementId ] = 1;
 
-			TRACE2("Achievement %d unlocked by Player %d", pAchievement->dwAchievementId, pAchievement->dwUserIndex);
+			TRACE("Achievement %d unlocked by Player %d", pAchievement->dwAchievementId, pAchievement->dwUserIndex);
 			pAchievement++;
 
 			count--;

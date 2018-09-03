@@ -229,14 +229,7 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
 		//send over player index
 		set_grenade->set_pindex(pIndex);
 
-		char* SendBuf = new char[teampak.ByteSize()];
-		teampak.SerializeToArray(SendBuf, teampak.ByteSize());
-
-		network->networkCommand = SendBuf;
-		network->sendCustomPacket(players->getPeerIndex(pIndex));
-		network->networkCommand = NULL;
-
-		delete[] SendBuf;
+		network->send_h2mod_packet_player(players->getPeerIndex(pIndex), teampak);
 	}
 }
 

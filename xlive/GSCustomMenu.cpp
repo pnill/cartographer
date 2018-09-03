@@ -15,6 +15,7 @@
 #include <Shellapi.h>
 #include "H2MOD_AdvLobbySettings.h"
 #include "Globals.h"
+#include "MapChecksumSync.h"
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
@@ -3763,8 +3764,19 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountList() {//__thiscall
 }
 
 void GSCustomMenuCall_AccountList();
-
+using namespace MapChecksumSync;
 static bool CMButtonHandler_AccountList(int button_id) {
+	// todo: better error here
+	if (MapChecksumSync::get_startup_info() != startup_state::done)
+	{
+		switch (MapChecksumSync::get_startup_info())
+		{
+		case not_done:
+			MapChecksumSync::Calculate();
+			break;
+		}
+		return true;
+	}
 	if (button_id == H2AccountCount + 1) {
 		if (!mode_remove_account) {
 			GSCustomMenuCall_AccountCreate();

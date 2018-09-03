@@ -66,138 +66,6 @@ std::wstring ModulePathW(HMODULE hModule = NULL)
 	return strPath;
 }
 
-#ifndef NO_TRACE
-FILE * logfile = NULL;
-FILE * loggame = NULL;
-FILE * loggamen = NULL;
-
-void trace(LPWSTR message, ...)
-{
-	if (!logfile)
-		return;
-
-	EnterCriticalSection (&d_lock);
-	SYSTEMTIME t;
-	GetLocalTime (&t);
-
-	fwprintf (logfile, L"%02d/%02d/%04d %02d:%02d:%02d.%03d ", t.wDay, t.wMonth, t.wYear, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds);
-	
-	va_list	arg;
-	va_start (arg, message);
-
-	vfwprintf (logfile, message, arg);
-	fwprintf(logfile, L"\n");
-
-	fflush (logfile);
-	va_end (arg);
-	LeaveCriticalSection (&d_lock);
-}
-
-void trace2(LPWSTR message, ...)
-{
-	if (!logfile)
-		return;
-
-	EnterCriticalSection (&d_lock);
-	SYSTEMTIME t;
-	GetLocalTime (&t);
-
-	fwprintf (logfile, L"%02d/%02d/%04d %02d:%02d:%02d.%03d ", t.wDay, t.wMonth, t.wYear, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds);
-
-	va_list	arg;
-	va_start (arg, message);
-
-	vfwprintf (logfile, message, arg);
-	fwprintf(logfile, L"\n");
-
-	fflush(logfile);
-	va_end (arg);
-	LeaveCriticalSection (&d_lock);
-}
-
-void trace_game(LPWSTR message, ...)
-{
-	if (!loggame)
-		return;
-
-	EnterCriticalSection(&d_lock);
-	SYSTEMTIME t;
-	GetLocalTime(&t);
-
-	fwprintf(loggame, L"%02d/%02d/%04d %02d:%02d:%02d.%03d ", t.wDay, t.wMonth, t.wYear, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds);
-
-	va_list	arg;
-	va_start(arg, message);
-
-	vfwprintf(loggame, message, arg);
-	fwprintf(loggame, L"\n");
-
-
-	fflush(loggame);
-	va_end(arg);
-	LeaveCriticalSection(&d_lock);
-}
-
-void trace_game_network(LPSTR message, ...)
-{
-	if (!loggamen)
-		return;
-
-	EnterCriticalSection(&d_lock);
-	SYSTEMTIME t;
-	GetLocalTime(&t);
-
-	fprintf(loggamen, "%02d/%02d/%04d %02d:%02d:%02d.%03d ", t.wDay, t.wMonth, t.wYear, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds);
-
-	va_list	arg;
-	va_start(arg, message);
-
-	vfprintf(loggamen, message, arg);
-	fprintf(loggamen, "\n");
-
-	fflush(loggamen);
-	va_end(arg);
-	LeaveCriticalSection(&d_lock);
-}
-
-void trace_game_narrow(LPSTR message, ...)
-{
-	if (!loggame)
-		return;
-
-
-	EnterCriticalSection(&d_lock);
-	SYSTEMTIME	t;
-	GetLocalTime(&t);
-
-	fprintf(loggame, "%02d/%02d/%04d %02d:%02d:%02d.%03d ", t.wDay, t.wMonth, t.wYear, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds);
-
-	va_list	arg;
-	va_start(arg, message);
-
-	vfprintf(loggame, message, arg);
-	fprintf(loggame, "\n");
-
-	fflush(loggame);
-	va_end(arg);
-	LeaveCriticalSection(&d_lock);
-}
-#endif
-
-std::wstring prepareLogFileName(std::wstring logFileName) {
-	std::wstring instanceNumber(L"");
-	if (H2GetInstanceId() > 1) {
-		std::wstringstream stream;
-		stream << H2GetInstanceId();
-		instanceNumber = L".";
-		instanceNumber += stream.str();
-	}
-	std::wstring filename = logFileName;
-	filename += instanceNumber;
-	filename += L".log";
-	return filename;
-}
-
 void InitInstance()
 {
 	static bool init = true;
@@ -259,17 +127,6 @@ void InitInstance()
 		}
 
 #pragma endregion
-		if (H2Config_debug_log)
-		{
-			if (logfile = _wfopen(prepareLogFileName(L"xlive_trace").c_str(), L"wt"))
-				TRACE("Log started (xLiveLess 2.0a4)\n");
-
-			if (loggame = _wfopen(prepareLogFileName(L"h2mod").c_str(), L"wt"))
-				TRACE_GAME("Log started (H2MOD 0.1a1)\n");
-
-			if (loggamen = _wfopen(prepareLogFileName(L"h2network").c_str(), L"wt"))
-				TRACE_GAME_NETWORK("Log started (H2MOD - Network 0.1a1)\n");
-		}
 
 		if (h2mod)
 			h2mod->Initialize();
@@ -296,34 +153,9 @@ void InitInstance()
 
 void ExitInstance()
 {
-	EnterCriticalSection (&d_lock);
-
-	if (logfile)
-	{
-		TRACE("Shutting down");
-
-		fflush (logfile);
-		fclose (logfile);
-		fflush (loggame);
-		fclose (loggame);
-		fflush (loggamen);
-		fclose (loggamen);
-		
-		logfile = NULL;
-		loggame = NULL;
-		loggamen = NULL;
-	}
-
-
-
-	LeaveCriticalSection (&d_lock);
-	DeleteCriticalSection (&d_lock);
-
-
-
 	//extern void SaveAchievements();
 	//SaveAchievements();
-
+	DeleteCriticalSection(&d_lock);
 	TerminateProcess(GetCurrentProcess(), 0);
 }
 

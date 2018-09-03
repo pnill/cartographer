@@ -230,7 +230,7 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 		document.AddMember("cProperties", Value().SetInt(cProperties+3), document.GetAllocator());
 		document.AddMember("pProperties", Value().SetArray(), document.GetAllocator());
 		
-		for (int i = 0; i < cProperties; i++)
+		for (DWORD i = 0; i < cProperties; i++)
 		{
 			Value property(kObjectType);
 			property.AddMember("dwPropertyId", Value().SetInt(pProperties[i].dwPropertyId), document.GetAllocator());
