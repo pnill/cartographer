@@ -483,6 +483,11 @@ bool open_cache_header(const wchar_t *lpFileName, cache_header *cache_header_ptr
 
 void close_cache_header(HANDLE *map_handle)
 {
+	if (H2IsDediServer) // this is like probably fine
+	{
+		CloseHandle(map_handle);
+		return;
+	}
 	typedef void __cdecl close_cache_header(HANDLE *a1);
 	auto close_cache_header_impl = GetAddress<close_cache_header>(0x64C03);
 	close_cache_header_impl(map_handle);
