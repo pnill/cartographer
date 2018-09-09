@@ -2872,7 +2872,7 @@ void update_player_count()
 	);
 }
 
-std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
+static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
 std::string getEnglishMapName()
 {
 	wchar_t* englishMapName = (wchar_t*)(h2mod->GetBase() + 0x97737C);

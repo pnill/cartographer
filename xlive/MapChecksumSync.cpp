@@ -8,6 +8,7 @@
 #include <mutex>
 #include "Globals.h"
 #include <iomanip>
+#include "Util/filesys.h"
 
 extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;
@@ -27,19 +28,28 @@ bool checksum_init_started = false;
 bool __cdecl compare_map_checksum(BYTE *checksum_data_a, BYTE *checksum_data_b)
 {
 	if (!checksum_init_started)
-	{
 		MapChecksumSync::Calculate();
-	}
 	return true; // patch out check
 }
 
-bool __cdecl calc_map_checksum(HANDLE *file, int checksum_out)
+bool __cdecl calc_map_checksum(HANDLE *file, BYTE *checksum_out)
 {
 	if (!checksum_init_started)
-	{
 		MapChecksumSync::Calculate();
+	if (file != nullptr) {
+		// needed because the customs maps list uses the checksum to deduplicate the maps
+		wchar_t buf[MAX_PATH];
+		LOG_CHECK(GetFinalPathNameByHandleW(*file, buf, ARRAYSIZE(buf), VOLUME_NAME_DOS) != 0);
+		TRACE_FUNC("map name: %s  handle: %x", buf, *file);
+		size_t len = 0x20; // will only use 16 bytes
+		memset(checksum_out, 0, len);
+		if (!LOG_CHECK(hashes::calc_file_md5(buf, checksum_out, len, 0x2000))) { // only checksums header
+			// generate some random data if we can't get an actual checksum
+			XNetRandom(checksum_out, 0x20);
+		}
+		TRACE_FUNC_N("uuid %s", hashes::as_hex_string(checksum_out, 0x20).c_str());
 	}
-	return true; // patch out check
+	return true;
 }
 
 static inline DWORD get_address(DWORD client, DWORD server = NULL)
