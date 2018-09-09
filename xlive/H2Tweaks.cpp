@@ -529,8 +529,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 	{
 		TRACE_FUNC("warning \"%s\" has bad checksums or is blacklisted, map may not work correctly", file_name);
 		std::wstring fallback_name;
-		if (strnlen_s(header.name, sizeof(header.name)) > 0)
-		{
+		if (strnlen_s(header.name, sizeof(header.name)) > 0) {
 			fallback_name = wstring_to_string.from_bytes(header.name, &header.name[sizeof(header.name) - 1]);
 		} else {
 			std::wstring full_file_name = file_name;
