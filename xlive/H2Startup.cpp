@@ -13,6 +13,7 @@
 #include <string>
 #include <sstream>
 #include "Util/hash.h"
+#include "util/filesys.h"
 
 #ifndef NO_TRACE
 logger *xlive_trace_log = nullptr;
@@ -331,6 +332,9 @@ void InitH2Startup() {
 	if (rtncodepath == -1) {
 		swprintf(H2ProcessFilePath, 2, L"");
 	}
+
+	// fix the game not finding the files it needs if the current directory is not the install directory
+	SetCurrentDirectoryW(GetExeDirectoryWide().c_str());
 
 	initLocalAppData();
 
