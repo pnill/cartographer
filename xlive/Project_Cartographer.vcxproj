@@ -293,6 +293,7 @@
     <ClCompile Include="TSServer.cpp" />
     <ClCompile Include="Util\Base64.cpp" />
     <ClCompile Include="Util\Debug.cpp" />
+    <ClCompile Include="util\filesys.cpp" />
     <ClCompile Include="Util\hash.cpp" />
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="xlive_network.cpp" />
@@ -374,6 +375,7 @@
     <ClInclude Include="TSServer.h" />
     <ClInclude Include="Util\Base64.h" />
     <ClInclude Include="Util\Debug.h" />
+    <ClInclude Include="util\filesys.h" />
     <ClInclude Include="Util\hash.h" />
     <ClInclude Include="Util\log.h" />
     <ClInclude Include="xlivedefs.h" />

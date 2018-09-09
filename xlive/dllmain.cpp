@@ -151,10 +151,19 @@ void InitInstance()
 	}
 }
 
+extern CRITICAL_SECTION log_section;
 void ExitInstance()
 {
 	//extern void SaveAchievements();
 	//SaveAchievements();
+#ifndef NO_TRACE
+	EnterCriticalSection(&log_section);
+	delete xlive_trace_log;
+	delete h2mod_log;
+	delete network_log;
+	LeaveCriticalSection(&log_section);
+	DeleteCriticalSection(&log_section);
+#endif
 	DeleteCriticalSection(&d_lock);
 	TerminateProcess(GetCurrentProcess(), 0);
 }
