@@ -421,6 +421,7 @@ int H2MOD::get_player_index_from_name(wchar_t* playername)
 			return i;
 		}
 	}
+	return 0xFFFFFFFF;
 }
 
 wchar_t* H2MOD::get_player_name_from_index(int pIndex)
