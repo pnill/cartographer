@@ -261,6 +261,8 @@ int __cdecl sub_48BBF() {
 	return result;
 }
 
+CRITICAL_SECTION log_section;
+
 H2Types detect_process_type()
 {
 	// try and detect type based on module name.
@@ -312,6 +314,7 @@ inline std::string prepareLogFileName(std::string logFileName) {
 
 ///Before the game window appears
 void InitH2Startup() {
+	InitializeCriticalSection(&log_section);
 	Debug::init();
 
 	game_info.base = GetModuleHandle(NULL);
@@ -374,6 +377,7 @@ void InitH2Startup() {
 
 	InitH2Config();
 #ifndef NO_TRACE
+	EnterCriticalSection(&log_section);
 	if (H2Config_debug_log) {
 		xlive_trace_log = logger::create(prepareLogFileName("xlive_trace"));
 		TRACE("Log started (xLiveLess " DLL_VERSION_STR ")\n");
@@ -383,6 +387,7 @@ void InitH2Startup() {
 		TRACE_GAME_NETWORK("Log started (H2MOD - Network " DLL_VERSION_STR ")\n");
 	}
 	checksum_log = logger::create(prepareLogFileName("checksum"), true);
+	LeaveCriticalSection(&log_section);
 #endif
 	InitH2Accounts();
 
@@ -424,8 +429,4 @@ void DeinitH2Startup() {
 	DeinitH2Tweaks();
 	DeinitH2Accounts();
 	DeinitH2Config();
-
-	delete xlive_trace_log;
-	delete h2mod_log;
-	delete network_log;
 }

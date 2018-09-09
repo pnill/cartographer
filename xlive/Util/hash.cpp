@@ -93,7 +93,7 @@ bool hashes::calc_file_md5(const std::wstring &filename, BYTE *checksum, size_t 
 		}
 		CloseHandle(file);
 	}
-	TRACE_FUNC_N("Failed to calculate md5 hash for %s", filename.c_str());
+	TRACE_FUNC("Failed to calculate md5 hash for %s", filename.c_str());
 	return false;
 }
 
