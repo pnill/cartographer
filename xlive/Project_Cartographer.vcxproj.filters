@@ -234,6 +234,9 @@
     <ClCompile Include="Util\Base64.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
+    <ClCompile Include="util\filesys.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Network.h">
@@ -483,6 +486,9 @@
       <Filter>Source Files\Util</Filter>
     </ClInclude>
     <ClInclude Include="Util\log.h">
+      <Filter>Source Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\filesys.h">
       <Filter>Source Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
