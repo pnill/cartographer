@@ -11,6 +11,9 @@
 #include <string>
 #include "Globals.h"
 #include "MapChecksumSync.h"
+#include <unordered_set>
+#include <codecvt>
+#include "Util/filesys.h"
 
 #define _USE_MATH_DEFINES
 #include "math.h"
@@ -314,7 +317,7 @@ bool engine_basic_init()
 	runtime_state_init();
 
 	int arg_count;
-	wchar_t **cmd_line_args = CommandLineToArgvW(GetCommandLineW(), &arg_count);
+	wchar_t **cmd_line_args = LOG_CHECK(CommandLineToArgvW(GetCommandLineW(), &arg_count));
 	if (cmd_line_args && arg_count > 1) {
 		for (int i = 1; i < arg_count; i++) {
 			wchar_t* cmd_line_arg = cmd_line_args[i];
@@ -346,8 +349,6 @@ bool engine_basic_init()
 			}
 #endif
 		}
-	} else {
-		TRACE_GAME("Failed to get commandline args. LAST_ERROR: %X", GetLastError());
 	}
 	LocalFree(cmd_line_args);
 
@@ -357,7 +358,8 @@ bool engine_basic_init()
 	async_initialize();
 	global_preferences_initialize();
 	font_initialize();
-	if (!tag_files_open())
+
+	if (!LOG_CHECK(tag_files_open()))
 		return false;
 	void *var_c004ae8e0 = GetAddress(0x004ae8e0);
 	game_state_initialize(var_c004ae8e0);
@@ -365,7 +367,7 @@ bool engine_basic_init()
 	// modifies esi need to check what the caller sets that too
 	//char(*fn_c001a9de6)() = (char(*)())(GetAddress(0x001a9de6));
 	//char result_c001a9de6 = fn_c001a9de6();
-	if (!rasterizer_initialize())
+	if (!LOG_CHECK(rasterizer_initialize()))
 		return false;
 
 	input_initialize();
@@ -479,6 +481,15 @@ bool open_cache_header(const wchar_t *lpFileName, cache_header *cache_header_ptr
 	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
 }
 
+void close_cache_header(HANDLE *map_handle)
+{
+	typedef void __cdecl close_cache_header(HANDLE *a1);
+	auto close_cache_header_impl = GetAddress<close_cache_header>(0x64C03);
+	close_cache_header_impl(map_handle);
+}
+
+static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
+
 int __cdecl validate_and_add_custom_map(BYTE *a1)
 {
 	cache_header header;
@@ -506,6 +517,8 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 		TRACE_FUNC("\"%s\" is not playable", file_name);
 		return false;
 	}
+
+	close_cache_header(&map_cache_handle);
 	// needed because the game loads the human readable map name and description from scenario after checks
 	// without this the map is just called by it's file name
 
@@ -515,6 +528,16 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 	if (!validate_and_add_custom_map_interal_impl(a1))
 	{
 		TRACE_FUNC("warning \"%s\" has bad checksums or is blacklisted, map may not work correctly", file_name);
+		std::wstring fallback_name;
+		if (strnlen_s(header.name, sizeof(header.name)) > 0)
+		{
+			fallback_name = wstring_to_string.from_bytes(header.name, &header.name[sizeof(header.name) - 1]);
+		} else {
+			std::wstring full_file_name = file_name;
+			auto start = full_file_name.find_last_of('\\');
+			fallback_name = full_file_name.substr(start != std::wstring::npos ? start : 0, full_file_name.find_last_not_of('.'));
+		}
+		wcsncpy_s(reinterpret_cast<wchar_t*>(a1 + 32), 0x20, fallback_name.c_str(), fallback_name.size());
 	}
 	// load the map even if some of the checks failed, will still mostly work
 	return true;
@@ -522,6 +545,11 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 
 bool __cdecl is_supported_build(char *build)
 {
+	const static std::unordered_set<std::string> offically_supported_builds{ "11122.07.08.24.1808.main", "11081.07.04.30.0934.main" };
+	if (offically_supported_builds.count(build) == 0)
+	{
+		TRACE_FUNC_N("Build '%s' is not offically supported consider repacking and updating map with supported tools", build);
+	}
 	return true;
 }
 
