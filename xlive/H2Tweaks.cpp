@@ -459,9 +459,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		// todo: load some default values here?
 	}
 	// mouse cursor setup
-	HCURSOR cursor = LoadCursorFromFileA("halo2"); // load modded cursor from filesystem if available 
-	if (!cursor)
-		cursor = LOG_CHECK(LoadCursor(NULL, MAKEINTRESOURCE(0x7F00)));
+	HCURSOR cursor = LOG_CHECK(LoadCursor(NULL, MAKEINTRESOURCE(0x7F00)));
 	WriteValue(H2BaseAddr + 0x46D9B8, cursor); // g_hCursor
 
 	// mess around with xlive (not calling XLiveInitialize etc)
@@ -472,7 +470,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	{
 		run_main_loop(); // actually run game
 		main_engine_dispose(); // cleanup
-	} else {
+	} else
+	{
 		TRACE_FUNC("Engine startup failed!");
 		show_fatal_error(108);
 		return 1;
