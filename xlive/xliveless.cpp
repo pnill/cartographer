@@ -4671,8 +4671,8 @@ DWORD WINAPI XLivePBufferGetByte (FakePBuffer * pBuffer, DWORD offset, BYTE * va
 
   if (!pBuffer || !value || offset < 0 || offset+1 > pBuffer->dwSize)
 	{
-		TRACE("- Invalid parameter");
-    return -1;
+		//TRACE("- Invalid parameter");
+		return -1;
 	}
 
 
