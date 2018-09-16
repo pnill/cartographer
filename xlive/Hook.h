@@ -25,9 +25,14 @@ inline void PatchCall(void *call_addr, void *new_function_ptr)
 	PatchCall(reinterpret_cast<DWORD>(call_addr), reinterpret_cast<DWORD>(new_function_ptr));
 }
 
-inline void PatchWinAPICall(DWORD call_addr, void * new_function_ptr)
+inline void PatchWinAPICall(DWORD call_addr, void *new_function_ptr)
 {
 	PatchWinAPICall(call_addr, reinterpret_cast<DWORD>(new_function_ptr));
+}
+
+inline void PatchWinAPICall(void *call_addr, void *new_function_ptr)
+{
+	PatchWinAPICall(reinterpret_cast<DWORD>(call_addr), reinterpret_cast<DWORD>(new_function_ptr));
 }
 
 inline void WritePointer(DWORD offset, const void *ptr) {
