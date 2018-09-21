@@ -1165,11 +1165,13 @@ std::string JOIN_GAME_OF_HALO2 = "Join a game of Halo 2.";
 
 BYTE* __cdecl unicodeStringConversion(BYTE* nonUnicodeStr, BYTE* unicodeStr, int size) {
 	char* str = (char*)(nonUnicodeStr);
-	if (strcmp(str, CREATE_NEW_NETWORK_GAME_STR.c_str()) == 0 && replacedNetworkNormalTextWidget != NULL) {
-		return unicode_string_conversion_method((BYTE*)replacedNetworkNormalTextWidget, unicodeStr, size);
-	}
-	if (strcmp(str, JOIN_GAME_OF_HALO2.c_str()) == 0 && replacedNetworkNormalTextWidget2 != NULL) {
-		return unicode_string_conversion_method((BYTE*)replacedNetworkNormalTextWidget2, unicodeStr, size);
+	if (*(DWORD*)(h2mod->GetBase() + 0x96743C) + (0xAA8 * 0)) {
+		if (strcmp(str, CREATE_NEW_NETWORK_GAME_STR.c_str()) == 0 && replacedNetworkNormalTextWidget != NULL) {
+			return unicode_string_conversion_method((BYTE*)replacedNetworkNormalTextWidget, unicodeStr, size);
+		}
+		if (strcmp(str, JOIN_GAME_OF_HALO2.c_str()) == 0 && replacedNetworkNormalTextWidget2 != NULL) {
+			return unicode_string_conversion_method((BYTE*)replacedNetworkNormalTextWidget2, unicodeStr, size);
+		}
 	}
 	return unicode_string_conversion_method(nonUnicodeStr, unicodeStr, size);
 }
