@@ -679,7 +679,7 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 
 void PatchGameDetailsCheck()
 {
-	NopFill(h2mod->GetBase() + 0x219D6D, 2);
+	NopFill<2>(h2mod->GetBase() + 0x219D6D);
 }
 
 void H2MOD::PatchWeaponsInteraction(bool b_Enable)
@@ -1236,7 +1236,7 @@ void H2MOD::ApplyHooks() {
 		VirtualProtect(calls_session_boot_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		// disable part of custom map tag verification
-		NopFill(GetBase() + 0x4FA0A, 6);
+		NopFill<6>(GetBase() + 0x4FA0A);
 
 		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)this->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1294,9 +1294,9 @@ void H2MOD::ApplyHooks() {
 
 		// Patch out the code that displays the "Invalid Checkpoint" error
 		// Start
-		NopFill(GetBase() + 0x30857, 0x41);
+		NopFill<0x41>(GetBase() + 0x30857);
 		// Respawn
-		NopFill(GetBase() + 0x8BB98, 0x2b);
+		NopFill<0x2b>(GetBase() + 0x8BB98);
 
 		change_team_method = (change_team)DetourFunc((BYTE*)this->GetBase() + 0x2068F2, (BYTE*)changeTeam, 8);
 		VirtualProtect(change_team_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1319,11 +1319,6 @@ void H2MOD::ApplyHooks() {
 		PatchCall(Base + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
 		PatchCall(Base + 0x00092C05, BansheeBombIsEngineMPCheck);
 		PatchCall(Base + 0x0013ff75, FlashlightIsEngineSPCheck);
-		
-		// Fixes issue #118
-		/* g_depth_bias always NULL rather than taking any value from 
-		   shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
-		NopFill(GetBase() + 0x269FD5, 0x8);
 	}
 	else {
 
@@ -1349,7 +1344,7 @@ void H2MOD::ApplyHooks() {
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
 		
 		// disable part of custom map tag verification
-		NopFill(GetBase() + 0x56C0A, 6);
+		NopFill<6>(GetBase() + 0x56C0A);
 
 		pplayer_death = (player_death)DetourFunc((BYTE*)this->GetBase() + 0x152ED4, (BYTE*)OnPlayerDeath, 9);
 		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);

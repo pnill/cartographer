@@ -457,7 +457,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			strcpy(cstr, sensVal.c_str());
 
 			if (isNum(cstr)) {
-				setSens(CONTROLLER, stoi(sensVal)); 
+				H2Tweaks::setSens(CONTROLLER, stoi(sensVal));
 				H2Config_sens_controller = stoi(sensVal);
 			}
 			else {
@@ -475,7 +475,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			strcpy(cstr, sensVal.c_str());
 
 			if (isNum(cstr)) {
-				setSens(MOUSE, stoi(sensVal));
+				H2Tweaks::setSens(MOUSE, stoi(sensVal));
 				H2Config_sens_mouse = stoi(sensVal);
 			}
 			else {
