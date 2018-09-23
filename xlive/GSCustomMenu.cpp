@@ -1607,8 +1607,10 @@ static bool CMButtonHandler_EditFPS(int button_id) {
 		else
 			H2Config_fps_limit = 60;
 	}
-	extern float desiredRenderTime;
-	desiredRenderTime = (1000.f / H2Config_fps_limit);
+	
+	extern std::chrono::system_clock::duration desiredRenderTime;
+	desiredRenderTime = std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
+
 	loadLabelFPSLimit();
 	return false;
 }
