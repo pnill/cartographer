@@ -975,7 +975,6 @@ void InitH2Tweaks() {
 	}	
   
 	// Both server and client
-	}
 	WriteJmpTo(GetAddress(0x1467, 0x12E2), is_supported_build);
 	PatchCall(GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
