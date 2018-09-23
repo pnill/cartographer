@@ -10,6 +10,7 @@
 #include "H2MOD.h"
 #include <string>
 #include "Globals.h"
+#include "CUser.h"
 #include "MapChecksumSync.h"
 #include <unordered_set>
 #include <codecvt>
@@ -962,13 +963,16 @@ void InitH2Tweaks() {
 
 		WriteJmpTo(GetAddress(0x7E43), WinMain);
 		WriteJmpTo(GetAddress(0x39EA2), is_remote_desktop);
-	}	
+	}
 	WriteJmpTo(GetAddress(0x1467, 0x12E2), is_supported_build);
 	PatchCall(GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
-
+	
+	//Redirect the variable for the server name to ours.
+	WriteValue(H2BaseAddr + 0x001b2ce8, (DWORD)ServerLobbyName);
+	
 	addDebugText("End Startup Tweaks.");
 }
 

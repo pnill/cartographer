@@ -15,7 +15,7 @@
 #include "xliveless.h"
 using namespace rapidjson;
 
-extern CHAR g_szUserName[4][16 + 1];
+extern CHAR g_szUserName[4][16];
 extern unsigned short H2Config_base_port;
 
 using namespace std;
