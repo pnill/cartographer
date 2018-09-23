@@ -97,7 +97,7 @@ LPD3DXSPRITE pSprite;
 
 std::chrono::system_clock::time_point nextFrame = std::chrono::system_clock::now();
 std::chrono::system_clock::duration desiredRenderTime = std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
-void frameTimeManagement()
+inline void frameTimeManagement()
 {
 	std::this_thread::sleep_until(nextFrame);
 	do {
@@ -134,10 +134,10 @@ void GUI::Initialize()
 
 }
 
-static bool has_initialised_input = false;
 // #5001
 int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 {
+	static bool has_initialised_input = false;
 	if (!has_initialised_input) {
 		extern HWND H2hWnd;
 		extern RECT rectScreenOriginal;
@@ -145,6 +145,7 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		GetWindowRect(H2hWnd, &rectScreenOriginal);
 		has_initialised_input = true;
 	}
+
 	if ((GetKeyState(pPii->wParam) & 0x8000) && (pPii->uMSG == WM_KEYDOWN || pPii->uMSG == WM_SYSKEYDOWN)) {
 		//TODO: fHandled doesn't actually work..need to look into how halo2.exe uses the XLIVE_INPUT_INFO struct after calling xliveinput
 		pPii->fHandled = commands->handleInput(pPii->wParam);
