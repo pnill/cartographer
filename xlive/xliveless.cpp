@@ -56,7 +56,7 @@ static int g_dwListener = 0;
 
 extern UINT g_signin[4];
 extern XUID xFakeXuid[4];
-extern CHAR g_szUserName[4][16+1];
+extern CHAR g_szUserName[4][16];
 extern UINT g_online;
 extern CHAR g_profileDirectory[];
 

@@ -8,7 +8,7 @@
 #include "H2Startup.h"
 
 extern SOCKET boundsock;
-extern CHAR g_szUserName[4][16 + 1];
+extern CHAR g_szUserName[4][16];
 extern XUID xFakeXuid[4];
 
 
@@ -397,14 +397,17 @@ void CUserManagement::UnregisterLocal()
 	this->UpdateConnectionStatus();
 }
 
+wchar_t ServerLobbyName[32] = { L"Cartographer" };
+
 void SetUserUsername(char* username) {
 
-	ZeroMemory(g_szUserName[0], 17);
+	ZeroMemory(g_szUserName[0], 16);
 	snprintf(g_szUserName[0], 16, username);
 	if (!H2IsDediServer) {
-		snprintf((char*)((BYTE*)H2BaseAddr + 0x971316), 17, username);
-		swprintf((wchar_t*)((BYTE*)H2BaseAddr + 0x96DA94), 17, L"%hs", username);
-		swprintf((wchar_t*)((BYTE*)H2BaseAddr + 0x51A638), 17, L"%hs", username);
+		snprintf((char*)((BYTE*)H2BaseAddr + 0x971316), 16, username);
+		swprintf((wchar_t*)((BYTE*)H2BaseAddr + 0x96DA94), 16, L"%hs", username);
+		swprintf((wchar_t*)((BYTE*)H2BaseAddr + 0x51A638), 16, L"%hs", username);
+		swprintf(ServerLobbyName, 16, L"%hs", username);
 	}
 }
 

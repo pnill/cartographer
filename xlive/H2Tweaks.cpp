@@ -10,6 +10,7 @@
 #include "H2MOD.h"
 #include <string>
 #include "Globals.h"
+#include "CUser.h"
 #include "MapChecksumSync.h"
 #include <unordered_set>
 #include <codecvt>
@@ -831,6 +832,7 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 0;
 		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 1;
 		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 2;
+		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 4;
 		if ((unsigned __int8)fn_c002152b0() && fn_c0021525a() > 1)
 		{
 			*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 3;
@@ -957,7 +959,8 @@ void InitH2Tweaks() {
 		PatchCall(H2BaseAddr + 0x21754C, &sub_20E1D8_boot);
 
 		//Hook for Hitmarker sound effect.
-		pfn_c0017a25d = (tfn_c0017a25d)DetourFunc((BYTE*)H2BaseAddr + 0x0017a25d, (BYTE*)fn_c0017a25d, 10);
+		//Bad hook crashes when a player punches an object/wall in splitscreen.
+		//pfn_c0017a25d = (tfn_c0017a25d)DetourFunc((BYTE*)H2BaseAddr + 0x0017a25d, (BYTE*)fn_c0017a25d, 10);
 
 		//Hook for advanced lobby options.
 		pfn_c0024eeef = (tfn_c0024eeef)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024eeef, (BYTE*)fn_c0024eeef, 9);
@@ -970,14 +973,20 @@ void InitH2Tweaks() {
 		WriteJmpTo(GetAddress(0x7E43), WinMain);
 		WriteJmpTo(GetAddress(0x39EA2), is_remote_desktop);
 	}	
+  
 	// Both server and client
+	}
 	WriteJmpTo(GetAddress(0x1467, 0x12E2), is_supported_build);
 	PatchCall(GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
-	H2Tweaks::applyPlayersActionsUpdateRatePatch();
 
+	H2Tweaks::applyPlayersActionsUpdateRatePatch();
+	
+	//Redirect the variable for the server name to ours.
+	WriteValue(H2BaseAddr + 0x001b2ce8, (DWORD)ServerLobbyName);
+	
 	addDebugText("End Startup Tweaks.");
 }
 
