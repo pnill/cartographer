@@ -5322,20 +5322,19 @@ DWORD WINAPI XMarketplaceGetImageUrl( char *a1, DWORD a2, DWORD a3, DWORD a4, WC
 
 
 // 5028: ??
-DWORD WINAPI XLiveSecureLoadLibraryW( LPCWSTR libFileName, DWORD a2, DWORD dwFlags )
+DWORD WINAPI XLiveLoadLibraryEx(LPCWSTR libFileName, HINSTANCE *a2, DWORD dwFlags)
 {
-  TRACE("XLiveSecureLoadLibraryW  (?? - FIXME)  (libFileName = %s, a2 = %X, flags = %X)",
-		libFileName, a2, dwFlags );
+	TRACE("XLiveSecureLoadLibraryEx (?? - FIXME)  (libFileName = %s, a2 = %X, flags = %X)",
+		libFileName, a2, dwFlags);
 
+	HINSTANCE hInstance = LoadLibraryExW(libFileName, NULL, dwFlags);
 
-	// not done - error now
-  return 0x80070032;
+	if (!hInstance)
+		return 0x80070057;
+
+	*a2 = hInstance;
+	return 0;
 }
-
-
-// 5230: ??
-
-
 
 // 5231: ??
 DWORD WINAPI XLocatorServerUnAdvertise( DWORD a1, DWORD a2 )
