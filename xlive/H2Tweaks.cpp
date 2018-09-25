@@ -259,7 +259,7 @@ enum flags : int
 	unk11, // some tag thing?
 	unk12, // seen near xlive init code
 	unk13,
-	xbox_live_silver_account, // if true, disables 'gold-only' features, like quickmath etc
+	xbox_live_silver_account, // if true, disables 'gold-only' features, like quickmatch etc
 	unk15, // fuzzer/automated testing? (sapien)
 	ui_fast_test_no_start, // same as below but doesn't start a game
 	ui_fast_test, // auto navigates the UI selecting the default option
