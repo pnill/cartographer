@@ -5324,7 +5324,7 @@ DWORD WINAPI XMarketplaceGetImageUrl( char *a1, DWORD a2, DWORD a3, DWORD a4, WC
 // 5028: ??
 DWORD WINAPI XLiveLoadLibraryEx(LPCWSTR libFileName, HINSTANCE *a2, DWORD dwFlags)
 {
-	TRACE("XLiveSecureLoadLibraryEx (?? - FIXME)  (libFileName = %s, a2 = %X, flags = %X)",
+	TRACE("XLiveLoadLibraryEx (?? - FIXME)  (libFileName = %s, a2 = %X, flags = %X)",
 		libFileName, a2, dwFlags);
 
 	HINSTANCE hInstance = LoadLibraryExW(libFileName, NULL, dwFlags);
