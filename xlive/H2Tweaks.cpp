@@ -259,7 +259,7 @@ enum flags : int
 	unk11, // some tag thing?
 	unk12, // seen near xlive init code
 	unk13,
-	unk14, // maybe UI?
+	xbox_live_silver_account, // if true, disables 'gold-only' features, like quickmath etc
 	unk15, // fuzzer/automated testing? (sapien)
 	ui_fast_test_no_start, // same as below but doesn't start a game
 	ui_fast_test, // auto navigates the UI selecting the default option
@@ -1388,6 +1388,5 @@ __declspec(naked) void calculate_delta_time(void)
 void H2Tweaks::applyPlayersActionsUpdateRatePatch()
 {
 	xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
-
 	PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
 }
