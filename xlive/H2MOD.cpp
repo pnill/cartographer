@@ -1215,6 +1215,32 @@ bool FlashlightIsEngineSPCheck() {
 	return h2mod->get_engine_type() == EngineType::SINGLE_PLAYER_ENGINE;
 }
 
+typedef bool(__cdecl* verify_game_version_on_join)(int xlive_version, int build_version, int build_version2);
+verify_game_version_on_join p_verify_game_version_on_join;
+
+bool __cdecl VerifyGameVersionOnJoin(int xlive_version, int build_version, int build_version2)
+{
+	return xlive_version == XLIVE_VERSION && build_version >= GAME_BUILD && build_version2 <= GAME_BUILD;
+}
+
+typedef bool(__cdecl* verify_xlive_version)(int xlive_version);
+verify_xlive_version p_verify_xlive_version;
+
+bool __cdecl VerifyXliveVersion(int xlive_version)
+{
+	return xlive_version == XLIVE_VERSION; // will not display servers that don't match this in server list
+}
+
+typedef void(__cdecl *get_game_version)(DWORD *xlive_version, DWORD *build_version, DWORD *build_version2);
+get_game_version p_get_game_version;
+
+void __cdecl GetGameVersion(DWORD *xlive_version, DWORD *build_version, DWORD *build_version2)
+{
+	*xlive_version = XLIVE_VERSION;
+	*build_version = GAME_BUILD;
+	*build_version2 = GAME_BUILD;
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1222,6 +1248,15 @@ void H2MOD::ApplyHooks() {
 		TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
 		DWORD dwBack;
+
+		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc((BYTE*)this->GetBase() + 0x1B4C14, (BYTE*)VerifyGameVersionOnJoin, 5);
+		VirtualProtect(p_verify_game_version_on_join, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		p_get_game_version = (get_game_version)DetourFunc((BYTE*)this->GetBase() + 0x1B4BF5, (BYTE*)GetGameVersion, 8);
+		VirtualProtect(p_get_game_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		p_verify_xlive_version = (verify_xlive_version)DetourFunc((BYTE*)this->GetBase() + 0x1B4C32, (BYTE*)VerifyXliveVersion, 8);
+		VirtualProtect(p_verify_xlive_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
 		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1324,6 +1359,9 @@ void H2MOD::ApplyHooks() {
 	else {
 
 		DWORD dwBack;
+
+		p_get_game_version = (get_game_version)DetourFunc((BYTE*)this->GetBase() + 0x1B0043, (BYTE*)GetGameVersion, 8);
+		VirtualProtect(p_get_game_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		on_custom_map_change_method = (on_custom_map_change)DetourFunc((BYTE*)this->GetBase() + 0x25738, (BYTE*)onCustomMapChange, 5);
 		VirtualProtect(on_custom_map_change_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);

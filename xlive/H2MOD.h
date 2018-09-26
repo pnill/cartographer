@@ -6,6 +6,9 @@
 #include <mutex>
 #include "Blam\Enums\Game\GameEngine.h"
 
+constexpr int XLIVE_VERSION = 4; // I don't recommend changing this
+constexpr int GAME_BUILD = 11122;
+
 enum GrenadeType
 {
 	Frag = 0,
