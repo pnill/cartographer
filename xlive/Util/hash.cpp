@@ -20,7 +20,7 @@ bool hash_get_crypto_provider(DWORD type, HCRYPTPROV *provider)
 		CRYPT_VERIFYCONTEXT));
 }
 
-#define file_chunk_size 1024
+#define file_chunk_size 1024 * 32
 
 bool hash_do_file_hashing(HANDLE file, HCRYPTHASH hash, DWORD flags, long long len)
 {
