@@ -1,30 +1,17 @@
 #include <stdafx.h>
-#include <windows.h>
 #include <Wincrypt.h>
-#include <iostream>
-#include <sstream>
-#include <codecvt>
 #include "H2MOD.h"
 #include "H2MOD_Mouseinput.h"
 #include "H2MOD_H2X.h"
 #include "H2MOD_GunGame.h"
-#include "H2MOD_Infection.h"
-#include "H2MOD_Halo2Final.h"
-#include "Network.h"
-#include "xliveless.h"
 #include "CUser.h"
 #include <Mmsystem.h>
-#include <thread>
-#include "Globals.h"
 #include "H2OnscreenDebugLog.h"
-#include "GSUtils.h"
-#include <Mmsystem.h>
 #include "discord/DiscordInterface.h"
 #include "H2Config.h"
 #include "H2Tweaks.h"
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 #include "H2Startup.h"
-#include "GSCustomMenu.h"
 #include "MapChecksumSync.h"
 
 H2MOD *h2mod = new H2MOD();

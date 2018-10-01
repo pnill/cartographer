@@ -1,8 +1,6 @@
 //#include <windows.h>
 #include <d3d9.h>
 #include <d3dx9.h>
-#include <iostream>
-#include <memory>
 
 //#include <OSHGui.hpp>
 //#include <Drawing/Direct3D9/Direct3D9Renderer.hpp>
@@ -10,12 +8,10 @@
 #include "GUI.h"
 #include "H2MOD.h"
 #include "xliveless.h"
-#include "cartographer_main.hpp"
 #include "H2MOD_MapManager.h"
 #include "H2OnscreenDebugLog.h"
 #include "H2ConsoleCommands.h"
 #include "H2Config.h"
-#include <time.h>
 
 
 extern ConsoleCommands* commands;

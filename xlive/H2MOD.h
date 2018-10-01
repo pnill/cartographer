@@ -9,6 +9,8 @@
 constexpr int XLIVE_VERSION = 4; // I don't recommend changing this
 constexpr int GAME_BUILD = 11122;
 
+constexpr signed int NONE = -1;
+
 enum GrenadeType
 {
 	Frag = 0,

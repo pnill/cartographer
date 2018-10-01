@@ -1,14 +1,6 @@
 #include "MapChecksumSync.h"
-#include "stdafx.h"
-#include "Hook.h"
-#include "Util/hash.h"
-#include <string>
-#include <unordered_map>
 #include <unordered_set>
-#include <mutex>
 #include "Globals.h"
-#include <iomanip>
-#include "Util/filesys.h"
 
 extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;

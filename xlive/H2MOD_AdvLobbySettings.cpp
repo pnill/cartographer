@@ -1,9 +1,6 @@
 #include "H2MOD_AdvLobbySettings.h"
-#include <h2mod.pb.h>
 #include "Globals.h"
 #include "H2OnscreenDebugLog.h"
-#include "GSCustomMenu.h"
-#include "H2Tweaks.h"
 
 bool AdvLobbySettings_mp_explosion_physics = false;
 bool AdvLobbySettings_mp_sputnik = false;

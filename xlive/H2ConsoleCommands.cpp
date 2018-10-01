@@ -1,9 +1,5 @@
 #include "Globals.h"
-#include <Shlwapi.h>
 #include <fstream>
-#include <sstream>
-#include <string>
-#include <h2mod.pb.h>
 #include "H2Startup.h"
 #include "H2Tweaks.h"
 #include "H2Config.h"

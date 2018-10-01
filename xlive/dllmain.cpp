@@ -1,22 +1,11 @@
 #include "stdafx.h"
-#include <io.h>
-#include <fcntl.h>
 #include "H2MOD.h"
-#include <iostream>
-#include <Shellapi.h>
 #include "H2Startup.h"
-#include "H2OnscreenDebugLog.h"
-#include "GSRunLoop.h"
 #include "H2ConsoleCommands.h"
-#include "H2Config.h"
-#include <sstream>
 #include "ReadIniArguments.h"
+#include "Detour.h"
 
 extern ConsoleCommands* commands;
-
-using namespace std;
-
-#include "Detour.h"
 
 HMODULE hThis = NULL;
 
