@@ -4,6 +4,7 @@
 #include "H2ConsoleCommands.h"
 #include "ReadIniArguments.h"
 #include "Detour.h"
+#include "H2MOD_GunGame.h"
 
 extern ConsoleCommands* commands;
 
@@ -20,26 +21,6 @@ XUID xFakeXuid[4] = { 0xEE100000DEADC0DE, 0xEE200000DEADC0DE, 0xEE300000DEADC0DE
 //CHAR g_profileDirectory[512] = "Profiles";
 
 std::wstring dlcbasepath;
-
-#pragma region H2 GunGame Variables
-	bool b_GunGame = 0;
-	int weapon_one = 0;
-	int weapon_two = 0;
-	int weapon_three = 0;
-	int weapon_four = 0;
-	int weapon_five = 0;
-	int weapon_six = 0;
-	int weapon_seven = 0;
-	int weapon_eight = 0;
-	int weapon_nine = 0;
-	int weapon_ten = 0;
-	int weapon_eleven = 0;
-	int weapon_tweleve = 0;
-	int weapon_thirteen = 0;
-	int weapon_fourteen = 0;
-	int weapon_fiffteen = 0;
-	int weapon_sixteen = 0;
-#pragma endregion
 
 std::string ModulePathA(HMODULE hModule = NULL)
 {
@@ -77,63 +58,13 @@ void InitInstance()
 
 		dlcbasepath = L"DLC";
 
-#pragma region GunGame Levels
-		if (b_GunGame == 1)
-		{
-			FILE* gfp;
-			gfp = fopen("gungame.ini", "r");
-
-			if (gfp)
-			{
-				TRACE("[GunGame Enabled] - Opened GunGame.ini!");
-				while (!feof(gfp))
-				{
-					char gstr[256];
-
-					fgets(gstr, 256, gfp);
-
-					gCHECK_ARG("weapon_one =", weapon_one);
-					gCHECK_ARG("weapon_two =", weapon_two);
-					gCHECK_ARG("weapon_three =", weapon_three);
-					gCHECK_ARG("weapon_four =", weapon_four);
-					gCHECK_ARG("weapon_five =", weapon_five);
-					gCHECK_ARG("weapon_six =", weapon_six);
-					gCHECK_ARG("weapon_seven =", weapon_seven);
-					gCHECK_ARG("weapon_eight =", weapon_eight);
-					gCHECK_ARG("weapon_nine =", weapon_nine);
-					gCHECK_ARG("weapon_ten =", weapon_ten);
-					gCHECK_ARG("weapon_eleven =", weapon_eleven);
-					gCHECK_ARG("weapon_tweleve =", weapon_tweleve);
-					gCHECK_ARG("weapon_thirteen =", weapon_thirteen);
-					gCHECK_ARG("weapon_fourteen =", weapon_fourteen);
-					gCHECK_ARG("weapon_fifteen =", weapon_fiffteen);
-					gCHECK_ARG("weapon_sixteen =", weapon_sixteen);
-
-				}
-
-				fclose(gfp);
-			}
-		}
-
-#pragma endregion
-
 		if (h2mod)
 			h2mod->Initialize();
 		else
 			TRACE("H2MOD Failed to intialize");
 
-		TRACE("[GunGame] : %i", b_GunGame);
-		if (b_GunGame == 1)
-		{
-			TRACE("[GunGame] - weapon_one: %i", weapon_one);
-			TRACE("[GunGame] - weapon_two: %i", weapon_two);
-			TRACE("[GunGame] - weapon_three: %i", weapon_three);
-		}
-
-		WCHAR gameName[256];
-
-		GetModuleFileNameW(NULL, (LPWCH)&gameName, sizeof(gameName));
-		TRACE("%s", gameName);
+		extern GunGame* gunGame;
+		gunGame->readWeaponLevels();
 
 		//extern void LoadAchievements();
 		//LoadAchievements();

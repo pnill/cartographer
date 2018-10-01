@@ -26,7 +26,7 @@ static std::chrono::time_point<std::chrono::system_clock> lastReq;
 static std::chrono::time_point<std::chrono::system_clock> firstReq;
 
 static void actuallySendPacket() {
-	if (!gameManager->isHost() || h2mod->get_engine_type() != EngineType::MULTIPLAYER_ENGINE)
+	if (!gameManager->isHost() || h2mod->GetEngineType() != EngineType::MULTIPLAYER_ENGINE)
 		return;
 
 	TRACE_GAME("[h2mod] Sending AdvLobbySettings.");
@@ -63,7 +63,7 @@ static void actuallySendPacket() {
 
 void AdvLobbySettings::sendLobbySettingsPacket()
 {
-	if (!gameManager->isHost() || h2mod->get_engine_type() != EngineType::MULTIPLAYER_ENGINE)
+	if (!gameManager->isHost() || h2mod->GetEngineType() != EngineType::MULTIPLAYER_ENGINE)
 		return;
 	
 	lastReq = std::chrono::system_clock::now() + std::chrono::milliseconds(4000);

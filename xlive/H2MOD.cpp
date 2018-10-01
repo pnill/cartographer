@@ -16,14 +16,14 @@
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
-Infection* infectionHandler = new Infection();
 Halo2Final *h2f = new Halo2Final();
+Infection* infectionHandler = new Infection();
 
+bool b_H2X = false;
+bool b_GunGame = false;
 bool b_Infection = false;
 bool b_Halo2Final = false;
-bool b_H2X = false;
 
-extern bool b_GunGame;
 extern CUserManagement User;
 extern int H2GetInstanceId();
 extern XUID xFakeXuid[4];
@@ -113,7 +113,7 @@ bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 	return p_add_object_to_sync(gamestate_object_datum);
 }
 
-EngineType H2MOD::get_engine_type()
+EngineType H2MOD::GetEngineType()
 {
 	DWORD GameGlobals = *(DWORD*)(h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
 
@@ -130,11 +130,16 @@ EngineType H2MOD::get_engine_type()
 	} 
 }
 
+inline wchar_t* H2MOD::GetLobbyGameVariantName()
+{
+	return (wchar_t*)(h2mod->GetBase() + ((h2mod->Server) ? 0x534A18 : 0x97777C));
+}
+
 void H2MOD::exit_game()
 {
 	if (H2IsDediServer)
 		return;
-	if (get_engine_type() != EngineType::MAIN_MENU_ENGINE)
+	if (GetEngineType() != EngineType::MAIN_MENU_ENGINE)
 	{
 		// request_squad_browser
 		WriteValue<BYTE>(H2BaseAddr + 0x978BAC, 1);
@@ -172,25 +177,6 @@ void H2MOD::kick_player(int peerIndex) {
 	DWORD* ptr = (DWORD*)(((char*)h2mod->GetBase()) + 0x420FE8);
 	TRACE_GAME_N("about to kick player index=%d", peerIndex);
 	calls_session_boot_method((DWORD*)(*ptr), peerIndex, (char)0x01);
-}
-
-//0x1BA418
-typedef bool(*live_check)();
-live_check live_check_method;
-
-bool clientXboxLiveCheck() {
-	//lets you access live menu
-	return true;
-}
-
-//0x1B1643
-typedef signed int(*live_check2)();
-live_check2 live_check_method2;
-
-signed int clientXboxLiveCheck2() {
-	//1 = turns off live? 
-	//2 = either not live or can't download maps
-	return 2;
 }
 
 typedef int(__cdecl *show_error_screen)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6);
@@ -711,7 +697,7 @@ void __cdecl onGameEngineChange(int a1)
 	//based on what onGameEngineChange has changed
 	//we do our stuff bellow
 
-	if (h2mod->get_engine_type() == EngineType::MAIN_MENU_ENGINE)
+	if (h2mod->GetEngineType() == EngineType::MAIN_MENU_ENGINE)
 	{
 		addDebugText("GameEngine: Main-Menu, apply patches");
 
@@ -743,11 +729,11 @@ void __cdecl onGameEngineChange(int a1)
 	b_Halo2Final = false;
 	b_H2X = false;
 
-	wchar_t* variant_name = (wchar_t*)(h2mod->GetBase() + ((h2mod->Server) ? 0x534A18 : 0x97777C));
-	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", h2mod->get_engine_type(), variant_name);
+	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
+	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", h2mod->GetEngineType(), variant_name);
 	BYTE& GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
 
-	if (h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE)
+	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE)
 	{
 		addDebugText("GameEngine: Multiplayer, apply patches");
 
@@ -809,7 +795,7 @@ void __cdecl onGameEngineChange(int a1)
 		}
 	}
 
-	else if (h2mod->get_engine_type() == EngineType::SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
+	else if (h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
 		addDebugText("GameEngine: Singleplayer, apply patches");
 
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
@@ -980,7 +966,7 @@ typedef int(__cdecl *change_team)(int a1, int a2);
 change_team change_team_method;
 
 int __cdecl changeTeam(int a1, int a2) {
-	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
+	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
 	if (wcsstr(variant_name, L"RvB") > 0 && a2 != 0 && a2 != 1) {
 		//rvb mode enabled, don't change teams
 		return 4732 * a1;
@@ -1187,19 +1173,19 @@ bool __cdecl fn_c000bd114_IsSkullEnabled(int skull_index)
 bool GrenadeChainReactIsEngineMPCheck() {
 	if (AdvLobbySettings_grenade_chain_react)
 		return false;
-	return h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE;
+	return h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE;
 }
 
 bool BansheeBombIsEngineMPCheck() {
 	if (AdvLobbySettings_banshee_bomb)
 		return false;
-	return h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE;
+	return h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE;
 }
 
 bool FlashlightIsEngineSPCheck() {
 	if (AdvLobbySettings_flashlight)
 		return true;
-	return h2mod->get_engine_type() == EngineType::SINGLE_PLAYER_ENGINE;
+	return h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE;
 }
 
 typedef bool(__cdecl* verify_game_version_on_join)(int xlive_version, int build_version, int build_version2);
@@ -1295,14 +1281,6 @@ void H2MOD::ApplyHooks() {
 
 		unicode_string_conversion_method = (unicode_string_conversion)DetourFunc((BYTE*)h2mod->GetBase() + 0x4C801, (BYTE*)unicodeStringConversion, 7);
 		VirtualProtect(unicode_string_conversion_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		//TODO: for when live list is ready
-		//live checks removed will make users exit to live menu instead of network browser :(
-		//live_check_method = (live_check)DetourFunc((BYTE*)this->GetBase() + 0x1BA418, (BYTE*)clientXboxLiveCheck, 9);
-		//VirtualProtect(live_check_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		//live_check_method2 = (live_check2)DetourFunc((BYTE*)this->GetBase() + 0x1B1643, (BYTE*)clientXboxLiveCheck2, 9);
-		//VirtualProtect(live_check_method2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//pResetRound=(ResetRounds)DetourFunc((BYTE*)this->GetBase() + 0x6B1C8, (BYTE*)OnNextRound, 7);
 		//VirtualProtect(pResetRound, 4, PAGE_EXECUTE_READWRITE, &dwBack);

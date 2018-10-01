@@ -231,7 +231,7 @@ void MapChecksumSync::RuntimeError(error_id type)
 void MapChecksumSync::SendState()
 {
 	TRACE_FUNC_N("gameManager->isHost() %d", gameManager->isHost());
-	TRACE_FUNC_N("h2mod->get_engine_type() %d", h2mod->get_engine_type());
+	TRACE_FUNC_N("h2mod->GetEngineType() %d", h2mod->GetEngineType());
 	if (!gameManager->isHost())
 		return;
 	H2ModPacket packet;

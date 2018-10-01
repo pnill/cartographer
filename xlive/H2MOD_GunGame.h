@@ -62,6 +62,7 @@ class GunGame : public GameType<GunGameHandler>
 {
 public:
 	GunGame();
+	static void readWeaponLevels();
 	static void initWeaponLevels();
 	static void spawnPlayerServer(int playerIndex);
 	static void playerDiedServer(int unit_datum_index); // We need to start using PlayerIndex here for sanity.
@@ -71,4 +72,6 @@ public:
 
 	static std::unordered_map<int, int> level_weapon;
 	static std::unordered_map<std::wstring, int> gungamePlayers;
+
+	~GunGame() {  };
 };

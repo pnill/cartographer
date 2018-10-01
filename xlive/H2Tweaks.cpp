@@ -1138,7 +1138,7 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 	}
 
 
-	if (h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE) {
+	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) {
 
 		
 		for (int i = 0; i < 28; i++) {
@@ -1322,7 +1322,7 @@ void H2Tweaks::FixRanksIcons() {
 	const WORD height_value = 0x0020;			//Value : 32 (decimal)
 
 
-	if (h2mod->get_engine_type() == EngineType::MAIN_MENU_ENGINE) {
+	if (h2mod->GetEngineType() == EngineType::MAIN_MENU_ENGINE) {
 		//Sets Pregame Lobby 
 		WriteValue(shared_Meta_Data_ptr + tag_offset_pre + (index_number * index_offset_p) + x_pos_off, x_pos_pre);
 		WriteValue(shared_Meta_Data_ptr + tag_offset_pre + (index_number * index_offset_p) + y_pos_off, y_pos_pre);

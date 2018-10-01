@@ -132,7 +132,8 @@ public:
 		void DisableSound(int sound);
 		void PatchWeaponsInteraction(bool b_Enable);		
 		void securityPacketProcessing();
-		EngineType get_engine_type();
+		EngineType GetEngineType();
+		wchar_t* GetLobbyGameVariantName();
 		void exit_game();
 		BOOL Server;
 		std::unordered_map<wchar_t*, int> SoundMap;
