@@ -918,10 +918,6 @@ int WINAPI XNetDnsRelease (void * pxndns)
 PBYTE pb_data;
 UINT cb_data;
 
-//if (comm_socket == INVALID_SOCKET)
-//{
-//	comm_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-
 // #69: XNetQosListen
 DWORD WINAPI XNetQosListen( XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec, DWORD dwFlags )
 {
@@ -4687,9 +4683,6 @@ DWORD WINAPI XLivePBufferSetByte (FakePBuffer * pBuffer, DWORD offset, BYTE valu
 	}
 
 	pBuffer->pbData[offset] = value;
-
-	if (offset == 0)
-		pBuffer->pbData[offset] = 0; //no need of MF.dll anymore
 
 	return 0;
 }
