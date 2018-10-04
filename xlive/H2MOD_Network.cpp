@@ -610,7 +610,7 @@ void deserializePlayerAddCave() {
 	//inform new players of the current advanced lobby settings
 	advLobbySettings->sendLobbySettingsPacket();
 	// send server map checksums to client
-	MapChecksumSync::SendState();
+	//MapChecksumSync::SendState();
 }
 
 DWORD retAddr4 = 0;
@@ -761,7 +761,7 @@ int __cdecl serializeMembershipPacket(void* a1, int a2, int a3) {
 	mapManager->sendMapInfoPacket();
 	advLobbySettings->sendLobbySettingsPacket();
 	// send server map checksums to client
-	MapChecksumSync::SendState();
+	//MapChecksumSync::SendState();
 	return serialize_membership_packet_method(a1, a2, a3);
 }
 
@@ -772,7 +772,7 @@ int __cdecl serializeParametersUpdatePacket(void* a1, int a2, int a3) {
 	mapManager->sendMapInfoPacket();
 	advLobbySettings->sendLobbySettingsPacket();
 	// send server map checksums to client
-	MapChecksumSync::SendState();
+	//MapChecksumSync::SendState();
 	return serialize_parameters_update_packet_method(a1, a2, a3);
 }
 

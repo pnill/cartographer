@@ -11,8 +11,11 @@
 #include "rapidjson/prettywriter.h"
 #include <sstream>
 #include <algorithm>
-
+#include "Globals.h"
+#include "H2Config.h"
+#include "H2Accounts.h"
 #include "xliveless.h"
+
 using namespace rapidjson;
 
 extern CHAR g_szUserName[4][16 + 1];
@@ -28,6 +31,13 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 	return size * nmemb;
 }
 
+void BadServer(ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult,const char* log_catch)
+{
+	if (H2Config_debug_log)
+		TRACE_GAME_N("BadServer - XUID: %llu - Log Catch: %s", xuid,log_catch);
+
+	ZeroMemory(nResult, sizeof(_XLOCATOR_SEARCHRESULT));
+}
 void QueryServerData(ULONGLONG xuid,_XLOCATOR_SEARCHRESULT* nResult)
 {	
 	CURL *curl;
@@ -37,7 +47,7 @@ void QueryServerData(ULONGLONG xuid,_XLOCATOR_SEARCHRESULT* nResult)
 	curl = curl_easy_init();
 	if (curl) {
 
-		std::string server_url = std::string("http://home.thedefaced.org/servers/");
+		std::string server_url = std::string("http://cartographer.online/live/servers/");
 		server_url.append(std::to_string(xuid).c_str());
 
 		curl_easy_setopt(curl, CURLOPT_URL, server_url.c_str());
@@ -49,31 +59,117 @@ void QueryServerData(ULONGLONG xuid,_XLOCATOR_SEARCHRESULT* nResult)
 		rapidjson::Document doc;
 		doc.Parse(readBuffer.c_str());
 
-		nResult->dwMaxPublicSlots = doc["dwMaxPublicSlots"].GetInt();
-		nResult->dwFilledPublicSlots = doc["dwFilledPublicSlots"].GetInt();
-		nResult->dwMaxPrivateSlots = doc["dwMaxPrivateSlots"].GetInt();
-		nResult->dwFilledPrivateSlots = doc["dwMaxFilledPrivateSlots"].GetInt();
-		nResult->dwServerType = doc["dwServerType"].GetInt();
-		
-		nResult->serverAddress.inaOnline.s_addr = doc["saddr"].GetInt();
-		nResult->serverAddress.ina.s_addr = htonl(doc["xnaddr"].GetInt());
+		if (!doc.HasMember("dwMaxPublicSlots")) {
+			BadServer(xuid, nResult, "Missing Member: dwMaxPublicSlots");
+			return;
+		}
 
-		nResult->serverAddress.wPortOnline = htons(doc["dwPort"].GetInt());
+		nResult->dwMaxPublicSlots = doc["dwMaxPublicSlots"].GetUint();
+
+		if (!doc.HasMember("dwFilledPublicSlots"))
+		{
+			BadServer(xuid, nResult, "Missing Member: dwFilledPublicSlots");
+			return;
+		}
+
+		nResult->dwFilledPublicSlots = doc["dwFilledPublicSlots"].GetUint();
+
+		if (!doc.HasMember("dwMaxPrivateSlots"))
+		{
+			BadServer(xuid, nResult, "Missing Member: dwFilledPublicSlots");
+			return;
+		}
+
+		nResult->dwMaxPrivateSlots = doc["dwMaxPrivateSlots"].GetUint();
+
+
+		if (!doc.HasMember("dwMaxFilledPrivateSlots"))
+		{
+			BadServer(xuid, nResult, "Missing Member: dwMaxFilledPrivateSlots");
+			return;
+		}
+		nResult->dwFilledPrivateSlots = doc["dwMaxFilledPrivateSlots"].GetUint();
+
+		if (!doc.HasMember("dwServerType"))
+		{
+			BadServer(xuid, nResult, "Missing Member: dwServerType");
+			return;
+		}
+		nResult->dwServerType = doc["dwServerType"].GetUint();
+
+
+		if (!doc.HasMember("saddr") || !doc["saddr"].IsUint())
+		{
+			BadServer(xuid, nResult, "Missing Member: saddr");
+			return;
+		}
+		nResult->serverAddress.inaOnline.s_addr = doc["saddr"].GetUint();
+
+		if (!doc.HasMember("xnaddr") || !doc["xnaddr"].IsUint())
+		{
+			BadServer(xuid, nResult, "Missing Member: xnaddr");
+			return;
+		}
+		nResult->serverAddress.ina.s_addr = htonl(doc["xnaddr"].GetUint());
+
+		if (!doc.HasMember("dwPort"))
+		{
+			BadServer(xuid, nResult, "Missing Member: dwPort");
+			return;
+		}
+		nResult->serverAddress.wPortOnline = htons(doc["dwPort"].GetUint());
+
+
+		if (!doc.HasMember("abenet"))
+		{
+			BadServer(xuid, nResult, "Missing Member: abenet");
+			return;
+		}
 
 		const char* abEnet = doc["abenet"].GetString();
+		if (abEnet == NULL)
+		{
+			BadServer(xuid, nResult, "abEnet = NULL");
+			return;
+		}
+
 		for (int i = 0; i < 6; i++) {
 			sscanf(&abEnet[i * 2], "%2hhx", &nResult->serverAddress.abEnet[i]);
 		}
 		
+
+		if (!doc.HasMember("abonline"))
+		{
+			BadServer(xuid, nResult, "Missing Member: abOnline");
+				return;
+		}
+
 		const char* abOnline = doc["abonline"].GetString();
+		if (abOnline == NULL)
+		{
+			BadServer(xuid, nResult, "abonline == NULL");
+			return;
+		}
+
 		for (int i = 0; i < 20; i++) {
 			sscanf(&abOnline[i * 2], "%2hhx", &nResult->serverAddress.abOnline[i]);
 		}
 	
-		nResult->serverID = doc["xuid"].GetInt64();
+		if (!doc.HasMember("xuid"))
+		{
+			BadServer(xuid, nResult, "Missing Member: xuid");
+			return;
+		}
+		nResult->serverID = doc["xuid"].GetUint64();
 
 		memset(&nResult->xnkid, 0xAB, sizeof(XNKID));
 		memset(&nResult->xnkey, 0xAA, sizeof(XNKEY));
+
+		if (!doc.HasMember("pProperties") || !doc.HasMember("cProperties"))
+		{
+			BadServer(xuid, nResult, "Missing Member: cProperties or pProperties");
+			return;
+		}
 
 		nResult->cProperties = doc["pProperties"].GetArray().Size();
 		nResult->pProperties = new XUSER_PROPERTY[doc["pProperties"].GetArray().Size()];
@@ -145,7 +241,7 @@ void GetServersFromHttp(ServerList* servptr)
 
 	curl = curl_easy_init();
 	if (curl) {
-		curl_easy_setopt(curl, CURLOPT_URL, "http://home.thedefaced.org/server_list.php");
+		curl_easy_setopt(curl, CURLOPT_URL, "http://cartographer.online/live/server_list.php");
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
@@ -178,6 +274,43 @@ void GetServersFromHttp(ServerList* servptr)
 	
 }
 
+
+bool ServerList::GetServerCounts()
+{
+
+	CURL *curl;
+	CURLcode res;
+	std::string readBuffer;
+
+	curl = curl_easy_init();
+	if (curl) {
+		curl_easy_setopt(curl, CURLOPT_URL, "http://cartographer.online/live/dedicount.php");
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+		res = curl_easy_perform(curl);
+		curl_easy_cleanup(curl);
+
+		rapidjson::Document document;
+		document.Parse(readBuffer.c_str());
+
+
+		if (document.HasMember("public_count"))
+		{
+			total_count = document["total"].GetInt();
+			total_peer = document["peer_count"].GetInt();
+			total_peer_gold = document["peer_gold"].GetInt();
+			total_public = document["public_count"].GetInt();
+			total_public_gold = document["public_gold"].GetInt();
+
+			return true;
+		}
+
+		return false;
+	}
+
+	return false;
+}
+
 int ServerList::GetServersLeft()
 {
 	return servers_left;
@@ -203,11 +336,54 @@ void ServerList::GetServers()
 	}
 }
 
-DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKID *xnid, DWORD a4, DWORD a5, DWORD a6, DWORD xnaddr1, DWORD xnaddr2, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
-{
-	//TRACE("XLocatorServerAdvertise  (*** checkme ***)");
-	
 
+void RemoveServer()
+{
+	CURL *curl;
+	CURLcode res;
+	std::string readBuffer;
+
+	curl = curl_easy_init();
+	if (curl)
+	{
+		rapidjson::Document document;
+		document.SetObject();
+		document.AddMember("xuid", Value().SetUint64(xFakeXuid[0]), document.GetAllocator());
+
+		Value token(kStringType);
+		token.SetString(H2CurrentAccountLoginToken, document.GetAllocator());
+		document.AddMember("token", token, document.GetAllocator());
+
+
+		StringBuffer buffer;
+		Writer<StringBuffer> writer(buffer);
+		document.Accept(writer);
+
+		curl_easy_setopt(curl, CURLOPT_URL, "http://cartographer.online/live/del_server.php");
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+		curl_easy_setopt(curl, CURLOPT_POST, 1L);
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, buffer.GetString());
+		res = curl_easy_perform(curl);
+		curl_easy_cleanup(curl);
+
+	}
+}
+
+DWORD WINAPI XLocatorServerUnAdvertise(DWORD a1, DWORD a2)
+{
+	std::thread(RemoveServer).detach();
+
+	return S_OK;
+}
+
+void ServerList::RemoveServer()
+{
+	XLocatorServerUnAdvertise(1, 1);
+}
+
+void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID *xnid, DWORD a4, DWORD a5, DWORD a6, DWORD xnaddr1, DWORD xnaddr2, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
+{
 	CURL *curl;
 	CURLcode res;
 	std::string readBuffer;
@@ -215,11 +391,16 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 
 	curl = curl_easy_init();
 	if (curl) {
-	
+
 
 		rapidjson::Document document;
 		document.SetObject();
-	
+
+
+		Value token(kStringType);
+		token.SetString(H2CurrentAccountLoginToken, document.GetAllocator());
+
+		document.AddMember("token", token, document.GetAllocator());
 		document.AddMember("xuid", Value().SetUint64(xFakeXuid[0]), document.GetAllocator());
 		document.AddMember("dwServerType", Value().SetInt(dwServerType), document.GetAllocator());
 		document.AddMember("dwMaxPublicSlots", Value().SetInt(dwMaxPublicSlots), document.GetAllocator());
@@ -227,10 +408,10 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 		document.AddMember("dwMaxPrivateSlots", Value().SetInt(dwMaxPrivateSlots), document.GetAllocator());
 		document.AddMember("dwMaxFilledPrivateSlots", Value().SetInt(dwFilledPrivateSlots), document.GetAllocator());
 		document.AddMember("dwPort", Value().SetInt(H2Config_base_port), document.GetAllocator());
-		document.AddMember("cProperties", Value().SetInt(cProperties+3), document.GetAllocator());
+		document.AddMember("cProperties", Value().SetInt(cProperties + 3), document.GetAllocator());
 		document.AddMember("pProperties", Value().SetArray(), document.GetAllocator());
-		
-		for (DWORD i = 0; i < cProperties; i++)
+
+		for (int i = 0; i < cProperties; i++)
 		{
 			Value property(kObjectType);
 			property.AddMember("dwPropertyId", Value().SetInt(pProperties[i].dwPropertyId), document.GetAllocator());
@@ -238,26 +419,26 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 
 			switch (pProperties[i].value.type)
 			{
-				case XUSER_DATA_TYPE_INT32:
-					property.AddMember("value", Value().SetInt(pProperties[i].value.nData), document.GetAllocator());
+			case XUSER_DATA_TYPE_INT32:
+				property.AddMember("value", Value().SetInt(pProperties[i].value.nData), document.GetAllocator());
 				break;
 
-				case XUSER_DATA_TYPE_INT64:
-					property.AddMember("value", Value().SetInt64(pProperties[i].value.i64Data), document.GetAllocator());
+			case XUSER_DATA_TYPE_INT64:
+				property.AddMember("value", Value().SetInt64(pProperties[i].value.i64Data), document.GetAllocator());
 				break;
-				
 
-				case XUSER_DATA_TYPE_UNICODE:
-					StringBuffer uni_input;
-					Writer< StringBuffer, UTF16<> > writerUTF16(uni_input); // UTF-16 input
-					writerUTF16.String(pProperties[i].value.string.pwszData);
 
-					property.AddMember("value", Value().SetString(uni_input.GetString(),document.GetAllocator()), document.GetAllocator());
+			case XUSER_DATA_TYPE_UNICODE:
+				StringBuffer uni_input;
+				Writer< StringBuffer, UTF16<> > writerUTF16(uni_input); // UTF-16 input
+				writerUTF16.String(pProperties[i].value.string.pwszData);
+
+				property.AddMember("value", Value().SetString(uni_input.GetString(), document.GetAllocator()), document.GetAllocator());
 				break;
 
 			}
 			document["pProperties"].PushBack(property, document.GetAllocator());
-			
+
 
 		}
 
@@ -265,14 +446,14 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 		Value serv_name(kObjectType);
 		serv_name.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_SERVER_NAME), document.GetAllocator());
 		serv_name.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_UNICODE), document.GetAllocator());
-		serv_name.AddMember("value", Value().SetString(g_szUserName[0],strlen(g_szUserName[0]),document.GetAllocator()), document.GetAllocator());
+		serv_name.AddMember("value", Value().SetString(g_szUserName[0], strlen(g_szUserName[0]), document.GetAllocator()), document.GetAllocator());
 
 		document["pProperties"].PushBack(serv_name, document.GetAllocator());
 
 		Value user_name(kObjectType);
 		user_name.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_USERNAME_2), document.GetAllocator());
 		user_name.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_UNICODE), document.GetAllocator());
-		user_name.AddMember("value", Value().SetString(g_szUserName[0],strlen(g_szUserName[0]),document.GetAllocator()), document.GetAllocator());
+		user_name.AddMember("value", Value().SetString(g_szUserName[0], strlen(g_szUserName[0]), document.GetAllocator()), document.GetAllocator());
 
 		document["pProperties"].PushBack(user_name, document.GetAllocator());
 
@@ -286,18 +467,23 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 		StringBuffer buffer;
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
-		addDebugText(buffer.GetString());
 
-		
-		curl_easy_setopt(curl, CURLOPT_URL, "http://home.thedefaced.org/add_server.php");
+		curl_easy_setopt(curl, CURLOPT_URL, "http://cartographer.online/live/add_server.php");
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, buffer.GetString());
 		res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
-		
+
 	}
+}
+
+DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKID *xnid, DWORD a4, DWORD a5, DWORD a6, DWORD xnaddr1, DWORD xnaddr2, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
+{
+	std::thread(AddServer, dwUserIndex, dwServerType, xnid, a4, a5, a6, xnaddr1, xnaddr2, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
+
+	
 	// not done - error now
 	return S_OK;
 }

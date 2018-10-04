@@ -124,6 +124,18 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 
 		if (level < 15)	{
 			GivePlayerWeapon(playerIndex, CurrentWeapon, 1);
+			GivePlayerWeapon2(playerIndex, Weapon::plasma_pistol, 7);
+			//GivePlayerWeapon2(playerIndex, Weapon::plasma_pistol, 3);
+			//GivePlayerWeapon2(playerIndex, Weapon::plasma_pistol, 4);
+			//GivePlayerWeapon2(playerIndex, Weapon::plasma_pistol, 5);
+			//GivePlayerWeapon2(playerIndex, Weapon::plasma_pistol, 6);
+			//GivePlayerWeapon2(playerIndex, Weapon::plasma_pistol, 7);
+
+
+		
+			//GivePlayerWeapon(playerIndex, Weapon::magnum, 3);
+			//GivePlayerWeapon(playerIndex, Weapon::plasma_pistol, 4);
+			//GivePlayerWeapon(playerIndex, CurrentWeapon, 1);
 		}
 	}
 }
@@ -181,6 +193,8 @@ void GunGame::levelUpServer(int PlayerIndex)
 		sendGrenadePacket(GrenadeType::Frag, 0, PlayerIndex, 1);
 		sendGrenadePacket(GrenadeType::Plasma, 0, PlayerIndex, 1);
 		GivePlayerWeapon(PlayerIndex, LevelWeapon, 1);
+		GivePlayerWeapon2(PlayerIndex, Weapon::plasma_pistol, 7);
+
 	}
 }
 

@@ -14,6 +14,7 @@
 #include "CUser.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <H2MOD_XLiveQoS.h>
 
 using namespace std;
 
@@ -422,12 +423,12 @@ void Check_Overlapped( PXOVERLAPPED pOverlapped )
 	if( !pOverlapped ) return;
 
 
-	TRACE( "- async routine" );
+//	TRACE( "- async routine" );
 
 
 	if( pOverlapped->hEvent )
 	{
-		TRACE( "- hEvent = %X", pOverlapped->hEvent );
+		//TRACE( "- hEvent = %X", pOverlapped->hEvent );
 
 		SetEvent( pOverlapped->hEvent );
 	}
@@ -435,7 +436,7 @@ void Check_Overlapped( PXOVERLAPPED pOverlapped )
 
 	if( pOverlapped->pCompletionRoutine )
 	{
-		TRACE( "- pCompletionRoutine = %X", pOverlapped->pCompletionRoutine );
+		//TRACE( "- pCompletionRoutine = %X", pOverlapped->pCompletionRoutine );
 
 
 		pOverlapped->pCompletionRoutine( pOverlapped->InternalLow, pOverlapped->InternalHigh, pOverlapped->dwCompletionContext );
@@ -921,47 +922,38 @@ UINT cb_data;
 //{
 //	comm_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
-SOCKET QoSListenSocket = INVALID_SOCKET;
-SOCKET QoSClientSocket = INVALID_SOCKET;
 // #69: XNetQosListen
 DWORD WINAPI XNetQosListen( XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec, DWORD dwFlags )
 {
     TRACE("XNetQosListen  (pxnkid = %X, pb = %X, cb = %d, bitsPerSec = %d, flags = %X)",
 			pxnkid, pb, cb, dwBitsPerSec, dwFlags );
-	WSADATA wsaData;
-	int iResult;
-
-	struct addrinfo *result = NULL;
-	struct addrinfo hints;
-
-	ZeroMemory(&hints, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-	hints.ai_flags = AI_PASSIVE;
-
-	iResult = getaddrinfo(NULL, std::to_string(H2Config_base_port+9).c_str(), &hints, &result);
-
-
-	QoSListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-
-	iResult = ::bind(QoSListenSocket, result->ai_addr, (int)result->ai_addrlen);
-
-	freeaddrinfo(result);
-
-	iResult = listen(QoSListenSocket, SOMAXCONN);
-
-	/*if (cb > 0)
+	
+	if ( (dwFlags & XNET_QOS_LISTEN_ENABLE) && (dwFlags & XNET_QOS_LISTEN_SET_DATA) )
 	{
-		FILE* fh = fopen("pb_dump.bin", "w");
-		fwrite(fh, cb, 1, fh);
-		fclose(fh);
-		/*pb_data = new BYTE[cb + 1];
-		ZeroMemory(pb_data, cb + 1);
-		memcpy(pb_data, pb, cb);
+		TRACE("XnetQoSListen == XNET_QOS_LISTEN_ENABLE && XNetQoSListen == XNET_QOS_LISTEN_SET_DATA");
+		StartListenerThread(pb, cb);
+	}
 
-		TRACE("pb_data: %08X", &pb_data);*/
-	/*}*/
+	if (dwFlags & XNET_QOS_LISTEN_DISABLE)
+	{
+		TRACE("XnetQoSListen == XNET_QOS_LISTEN_DISABLE");
+	}
+
+	if (dwFlags & XNET_QOS_LISTEN_RELEASE)
+	{
+		TRACE("XnetQosListen == XNET_QOS_LISTEN_RELEASE");
+		
+	}
+
+	if ((dwFlags & XNET_QOS_LISTEN_ENABLE) && !(dwFlags & XNET_QOS_LISTEN_SET_DATA))
+	{
+		StartListenerThread(pb, cb);
+	}
+
+		//std::thread(StartQoSThread,pb,cb).detach();
+		
+//	if(dwFlags == XNET_QOS_LISTEN_ENABLE)
+//		std::thread(StartQoSThread).detach();
 
     return 0;
 }
@@ -977,9 +969,44 @@ DWORD WINAPI XNetQosLookup (UINT cxna, XNADDR * apxna[], XNKID * apxnkid[],XNKEY
 		cxna, cina, cProbes, dwBitsPerSec, hEvent);
 	TRACE("XNetQoSLookup( apxna: %X, apxnkid: %X, apxnkey: %X, aina: %X, adwServiceId: %X, pxnqos: %X)",
 		apxna, apxnkid, apxnkey, aina, adwServiceId, pxnqos);
+	//void ClientQoSLookUp(UINT cxna, XNADDR* apxna[],UINT cProbes,IN_ADDR  aina[], XNQOS** pxnqos,DWORD dwBitsPerSec)
+	
+	//XNADDR **axpna_copy = (XNADDR**)malloc(cxna * sizeof(XNADDR*));
+	XNADDR** axpna_copy = (XNADDR**)malloc(cxna * sizeof(XNADDR*));
 
+	for (int i = 0; i < cxna; i++)
+	{
+		XNADDR* xn = apxna[i];
+		axpna_copy[i] = new XNADDR;
+		memcpy(axpna_copy[i], xn, sizeof(XNADDR));
+	}
+
+
+	*pxnqos = (XNQOS*)malloc(sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna-1)));
+
+	XNQOS* pqos = &**pxnqos;
+	ZeroMemory(pqos, sizeof(XNQOS) + (sizeof(XNQOSINFO)*(cxna-1)));
+
+	pqos->cxnqosPending = cxna;
+	pqos->cxnqos = cxna;
+	pqos->axnqosinfo[0].wRttMedInMsecs = 500;
+	pqos->axnqosinfo[0].wRttMinInMsecs = 100;
+	pqos->axnqosinfo[0].dwDnBitsPerSec = dwBitsPerSec;
+	pqos->axnqosinfo[0].dwUpBitsPerSec = dwBitsPerSec;
+	pqos->axnqosinfo[0].bFlags = XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE;
+
+
+
+	/* 
+		This is gonna hit some CPUs hard when there's a lot of servers on the list, we'll probably want to queue this a bit and only allow X number of threads to run at a time. 
+		We want to abuse the CPU where possible considering more modern systems will have decent CPUs so we'll be able to force things to happen faster but still want to keep compatibility with older setups.
+	*/
+
+	std::thread(ClientQoSLookUp, cxna, axpna_copy, cProbes, aina, pxnqos, dwBitsPerSec, pqos).detach();
+	
 
 	/* Memory Leak  - FIX ME! (Need to do some kind of garbage collection somewhere and store data like this in an array to be cleared later */
+/*	
 	*pxnqos = new XNQOS;
 	XNQOS* pqos = *pxnqos;
 	pqos->cxnqos = 1;
@@ -1005,7 +1032,7 @@ DWORD WINAPI XNetQosLookup (UINT cxna, XNADDR * apxna[], XNKID * apxnkid[],XNKEY
 		pqos->axnqosinfo->dwDnBitsPerSec = dwBitsPerSec;
 		pqos->axnqosinfo->bFlags = XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE;
 
-	}
+	}*/
 
     return 0;
 }
@@ -1024,8 +1051,19 @@ DWORD WINAPI XNetQosServiceLookup (DWORD a1, DWORD a2, DWORD a3)
 }
 
 // #72: XNetQosRelease
-DWORD WINAPI XNetQosRelease (DWORD)
+INT WINAPI XNetQosRelease(XNQOS* pxnqos)
 {
+	
+	for (int i = 0; i == pxnqos->cxnqos; i++)
+	{
+		if (pxnqos->axnqosinfo[i].cbData > 0)
+			delete[] pxnqos->axnqosinfo[i].pbData;
+
+		delete[] &pxnqos->axnqosinfo[i];
+		//XNQOSINFO *xnqos = &pqos->axnqosinfo[ ( pqos->cxnqosPending - 1) ];
+
+	}
+	/* We need to clean-up all XNetQoSLookup data here, listener data should be cleaned up inside the Listen function Only. */
     TRACE("XNetQosRelease");
     return 0;
 }
@@ -1371,7 +1409,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 		
 
-	static DWORD print_limit = 30;
+	static int print_limit = 30;
 
 	static DWORD sys_signin = 0x7FFFFFFF;
 	static DWORD sys_storage = 0x7FFFFFFF;
@@ -2198,16 +2236,16 @@ ServerList LiveManager;
 // #5256: XEnumerate
 int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcItemsReturned, PXOVERLAPPED pOverlapped)
 {
-	static int print = 0;
+	//static int print = 0;
 
 
-	if( print < 100 )
-	{
-		TRACE("XEnumerate  (hEnum = %X, pvBuffer = %X, cbBuffer = %X, pcItemsReturned = %X, pOverlapped = %X)",
-			hEnum, pvBuffer, cbBuffer, pcItemsReturned, pOverlapped);
+	//if( print < 100 )
+	//{
+		//TRACE("XEnumerate  (hEnum = %X, pvBuffer = %X, cbBuffer = %X, pcItemsReturned = %X, pOverlapped = %X)",
+		//	hEnum, pvBuffer, cbBuffer, pcItemsReturned, pOverlapped);
 
-		print++;
-	}
+		//print++;
+	//}
 
 
 
@@ -2241,7 +2279,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 	if( hEnum == g_dwFakeContent && dlcinit != 0x7FFFFFFF )
 	{
-		DWORD total;
+		int total;
 
 
 		total = 0;
@@ -2253,8 +2291,8 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 			// check max
 			if( total >= cbBuffer )
 			{
-				if( print < 100 )
-					TRACE( "- Full enumerate" );
+			//	if( print < 100 )
+			//		TRACE( "- Full enumerate" );
 				break;
 			}
 
@@ -2435,16 +2473,16 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 	{
 		if( *pcItemsReturned )
 		{
-			if( print < 100 )
-				TRACE("- ItemsReturned = %d", *pcItemsReturned);
+			//if( print < 100 )
+			//	TRACE("- ItemsReturned = %d", *pcItemsReturned);
 	
 			return ERROR_SUCCESS;
 		}
 
 		else
 		{
-			if( print < 100 )
-				TRACE("- NO_MORE_FILES");
+			//if( print < 100 )
+			//	TRACE("- NO_MORE_FILES");
 			*pcItemsReturned = 0;
 			return ERROR_SUCCESS;
 		}
@@ -2454,8 +2492,8 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 	{
 		if( pOverlapped->InternalHigh )
 		{
-			if( print < 100 )
-				TRACE( "- async items = %d", pOverlapped->InternalHigh );
+			//if( print < 100 )
+				//TRACE( "- async items = %d", pOverlapped->InternalHigh );
 
 
 			pOverlapped->InternalLow = ERROR_SUCCESS;
@@ -2470,8 +2508,8 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 		else
 		{
-			if( print < 100 )
-				TRACE( "- async = NO_MORE_FILES" );
+			//if( print < 100 )
+			//	TRACE( "- async = NO_MORE_FILES" );
 
 
 			pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
@@ -2872,7 +2910,7 @@ void update_player_count()
 	);
 }
 
-static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
+std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
 std::string getEnglishMapName()
 {
 	wchar_t* englishMapName = (wchar_t*)(h2mod->GetBase() + 0x97737C);
@@ -3237,7 +3275,6 @@ int WINAPI XUserSetPropertyEx (DWORD dwUserIndex, DWORD dwPropertyId, DWORD cbVa
 	}
 }
 
-
 BOOL IXHV2ENGINE::IsHeadsetPresent(VOID *pThis, DWORD dwUserIndex) {
 	//TRACE("IXHV2Engine::IsHeadsetPresent");
 
@@ -3530,7 +3567,7 @@ int WINAPI XPresenceInitialize(int a1)
 // #5314: XUserMuteListQuery
 int WINAPI XUserMuteListQuery (DWORD, DWORD, DWORD, DWORD)
 {
-    TRACE("XUserMuteListQuery");
+    //TRACE("XUserMuteListQuery");
     return 0;
 }
 
@@ -3777,13 +3814,13 @@ int WINAPI XSessionFlushStats (DWORD, DWORD)
 DWORD WINAPI XSessionDelete (DWORD, DWORD)
 {
     TRACE("XSessionDelete");
-	if (client != NULL) {
-		client->disconnect();
-	}
-	if (server != NULL) {
-		server->destroyVirtualServer();
-	}
-	mapManager->cleanup();
+		if (client != NULL) {
+			client->disconnect();
+		}
+		if (server != NULL) {
+			server->destroyVirtualServer();
+		}
+		mapManager->cleanup();
     return 0;
 }
 
@@ -4649,6 +4686,9 @@ DWORD WINAPI XLivePBufferSetByte (FakePBuffer * pBuffer, DWORD offset, BYTE valu
 
 	pBuffer->pbData[offset] = value;
 
+	if (offset == 0)
+		pBuffer->pbData[offset] = 0; //no need of MF.dll anymore
+
 	return 0;
 }
 
@@ -4998,7 +5038,7 @@ DWORD WINAPI XMarketplaceCreateOfferEnumerator( DWORD dwUserIndex, DWORD dwOffer
 
 			strw[0] = 0;
 			for( int lcv2 = 0; lcv2 < 20; lcv2++ )
-				swprintf( strw, 40, L"%s%02X", strw, marketplace[lcv].contentId[lcv2] );
+				swprintf( strw, L"%s%02X", strw, marketplace[lcv].contentId[lcv2] );
 			strw[40] = 0;
 
 			TRACE( "- [%d] ContentId = %s", lcv, strw );
@@ -5338,22 +5378,23 @@ DWORD WINAPI XLiveSecureLoadLibraryW( LPCWSTR libFileName, DWORD a2, DWORD dwFla
 
 
 // 5231: ??
-DWORD WINAPI XLocatorServerUnAdvertise( DWORD a1, DWORD a2 )
-{
-  TRACE("XLocatorServerUnAdvertise  (*** checkme ***)");
-
-
-	// not done - error now
-	return 0x80070057;
-}
 
 
 // 5233: ??
 DWORD WINAPI XLocatorGetServiceProperty( DWORD dwUserIndex, DWORD cNumProperties, PXUSER_PROPERTY pProperties, DWORD pOverlapped )
 {
-  TRACE("XLocatorGetServiceProperty  (*** checkme ***) (dwUserIndex = %X, cNumProperties = %X, pProperties = %X, pOverlapped = %X)",
-		dwUserIndex, cNumProperties, pProperties, pOverlapped);
+ // TRACE("XLocatorGetServiceProperty  (*** checkme ***) (dwUserIndex = %X, cNumProperties = %X, pProperties = %X, pOverlapped = %X)",
+//		dwUserIndex, cNumProperties, pProperties, pOverlapped);
 
+  if (LiveManager.GetServerCounts())
+  {
+	  pProperties[0].value.nData = LiveManager.total_count;
+	  pProperties[1].value.nData = LiveManager.total_public;
+	  pProperties[2].value.nData = LiveManager.total_peer_gold + LiveManager.total_public_gold;
+	  pProperties[3].value.nData = LiveManager.total_peer;
+
+	  return S_OK;
+  }
 
   pProperties[0].value.nData = 1;
   pProperties[1].value.nData = 3;
@@ -5369,7 +5410,8 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int 
 {
   TRACE("XLocatorCreateServerEnumerator");
  
-  *pcbBuffer = (DWORD)sizeof(XLOCATOR_SEARCHRESULT);
+
+  *pcbBuffer = (DWORD)( sizeof(_XLOCATOR_SEARCHRESULT) * (LiveManager.total_count + 10)) ;
 
   if (phEnum)
   {
@@ -5890,8 +5932,6 @@ HRESULT IXHV2ENGINE::Dummy13( VOID *pThis, int a1, int a2 )
 
 	//return ERROR_SUCCESS;
 }
-
-
 
 DWORD IXHV2ENGINE::GetDataReadyFlags( VOID *pThis )
 {

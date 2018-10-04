@@ -369,7 +369,7 @@ void GSMainLoop() {
 
 	}
 
-	advLobbySettings->loop();
+	//advLobbySettings->loop();
 }
 
 signed int(*sub_287a1)();

@@ -281,6 +281,7 @@
     <ClCompile Include="H2MOD_Network.cpp" />
     <ClCompile Include="H2MOD_Players.cpp" />
     <ClCompile Include="H2MOD_ServerList.cpp" />
+    <ClCompile Include="H2MOD_XLiveQoS.cpp" />
     <ClCompile Include="H2OnscreenDebugLog.cpp" />
     <ClCompile Include="H2Startup.cpp" />
     <ClCompile Include="H2Tweaks.cpp" />
@@ -362,6 +363,7 @@
     <ClInclude Include="H2MOD_Players.h" />
     <ClInclude Include="H2MOD_ServerList.h" />
     <ClInclude Include="H2MOD_Sounds.h" />
+    <ClInclude Include="H2MOD_XLiveQoS.h" />
     <ClInclude Include="H2OnscreenDebugLog.h" />
     <ClInclude Include="H2Startup.h" />
     <ClInclude Include="H2Tweaks.h" />
