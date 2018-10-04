@@ -2994,6 +2994,8 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 			);
 			break;
 		}
+		case ContextPresence::public_game:
+		case ContextPresence::invite_only_game:
 		case ContextPresence::network_in_game:
 		{
 			int game_engine_type = *reinterpret_cast<BYTE*>(GameEngineGlobals + 0xC54);
@@ -3041,14 +3043,6 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 		case ContextPresence::results:
 		{
 			DiscordInterface::SetGameState("default", "Reading carnage report", true);
-			break;
-		}
-		case ContextPresence::public_game:
-		{
-			break;
-		}
-		case ContextPresence::invite_only_game:
-		{
 			break;
 		}
 	}
