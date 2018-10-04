@@ -2997,26 +2997,13 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 		case ContextPresence::public_game:
 		case ContextPresence::invite_only_game:
 		case ContextPresence::network_in_game:
-		{
-			int game_engine_type = *reinterpret_cast<BYTE*>(GameEngineGlobals + 0xC54);
-
-			DiscordInterface::SetGameState(
-				map_name,
-				"Multiplayer - LAN",
-				getEnglishMapName(),
-				gamemode_id_to_string(game_engine_type),
-				getVariantName()
-			);
-			update_player_count();
-			break;
-		}
 		case ContextPresence::live_in_game:
 		{
 			int game_engine_type = *reinterpret_cast<BYTE*>(GameEngineGlobals + 0xC54);
 
 			DiscordInterface::SetGameState(
 				map_name,
-				"Multiplayer - LIVE",
+				"Multiplayer",
 				getEnglishMapName(),
 				gamemode_id_to_string(game_engine_type),
 				getVariantName()
