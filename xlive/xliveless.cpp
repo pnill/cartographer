@@ -2940,9 +2940,10 @@ enum class ContextPresence {
 	singleplayer,
 	lobby,
 	results,
-	public_game = 7,
-	invite_only_game,
-	closed_game
+	live_in_game,
+	public_game, /* Not sure about this.. */
+	invite_only_game, /* and this one. */
+	network_in_game
 };
 
 DWORD diff_level;
@@ -2993,15 +2994,27 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 			);
 			break;
 		}
-		case ContextPresence::public_game:
-		case ContextPresence::invite_only_game:
-		case ContextPresence::closed_game:
+		case ContextPresence::network_in_game:
 		{
 			int game_engine_type = *reinterpret_cast<BYTE*>(GameEngineGlobals + 0xC54);
 
 			DiscordInterface::SetGameState(
 				map_name,
-				"Multiplayer",
+				"Multiplayer - LAN",
+				getEnglishMapName(),
+				gamemode_id_to_string(game_engine_type),
+				getVariantName()
+			);
+			update_player_count();
+			break;
+		}
+		case ContextPresence::live_in_game:
+		{
+			int game_engine_type = *reinterpret_cast<BYTE*>(GameEngineGlobals + 0xC54);
+
+			DiscordInterface::SetGameState(
+				map_name,
+				"Multiplayer - LIVE",
 				getEnglishMapName(),
 				gamemode_id_to_string(game_engine_type),
 				getVariantName()
@@ -3028,6 +3041,14 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 		case ContextPresence::results:
 		{
 			DiscordInterface::SetGameState("default", "Reading carnage report", true);
+			break;
+		}
+		case ContextPresence::public_game:
+		{
+			break;
+		}
+		case ContextPresence::invite_only_game:
+		{
 			break;
 		}
 	}
