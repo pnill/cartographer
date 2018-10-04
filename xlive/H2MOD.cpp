@@ -215,7 +215,7 @@ bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObje
 	return pcreate_unit_hook(pCreationData, a2, a3, pObject);
 }
 
-EngineType H2MOD::get_engine_type()
+EngineType H2MOD::GetEngineType()
 {
 	DWORD GameGlobals = *(DWORD*)(h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
 
