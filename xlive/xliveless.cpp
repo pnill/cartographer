@@ -2941,8 +2941,8 @@ enum class ContextPresence {
 	lobby,
 	results,
 	live_in_game,
-	public_game, /* Not sure about this.. */
-	invite_only_game, /* and this one. */
+	public_game, 
+	invite_only_game, 
 	network_in_game
 };
 
