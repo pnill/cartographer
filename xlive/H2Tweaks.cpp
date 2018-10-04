@@ -10,6 +10,7 @@
 #include "H2MOD.h"
 #include <string>
 #include "Globals.h"
+#include "CUser.h"
 #include "MapChecksumSync.h"
 #include <unordered_set>
 #include <codecvt>
@@ -137,24 +138,12 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 }
 
 
-#pragma region SLDL_Hack
+#pragma region init hook
 template <typename T = void>
 static inline T *GetAddress(DWORD client, DWORD server = 0)
 {
 	return reinterpret_cast<T*>(H2BaseAddr + (H2IsDediServer ? server : client));
 }
-
-typedef bool(*tfn_c00004a6b)();
-tfn_c00004a6b pfn_c00004a6b;
-bool fn_c00004a6b()
-{
-	// Since engine_basic_init has been reversed and the anti-hack voided, this function (which appears to be the game's weird anti-hack initializer) is no longer required.
-	bool result = true;//pfn_c00004a6b();
-	return result;
-}
-
-typedef bool(*tfn_c00004567)();
-tfn_c00004567 pfn_c00004567;
 
 #pragma region func_wrappers
 void real_math_initialize()
@@ -401,6 +390,103 @@ bool engine_basic_init()
 	//XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 1);
 
 	return true;
+}
+
+#pragma region func_wrappers
+bool InitPCCInfo()
+{
+	typedef bool __cdecl InitPCCInfo();
+	auto InitPCCInfoImpl = GetAddress<InitPCCInfo>(0x260DDD);
+	return InitPCCInfoImpl();
+}
+
+void run_main_loop()
+{
+	typedef int __cdecl run_main_loop();
+	auto run_main_loop_impl = GetAddress<run_main_loop>(0x39E2C);
+	run_main_loop_impl();
+}
+
+void main_engine_dispose()
+{
+	typedef int main_engine_dispose();
+	auto main_engine_dispose_impl = GetAddress<main_engine_dispose>(0x48A9);
+	main_engine_dispose_impl();
+}
+
+void show_error_message_by_id(int id)
+{
+	typedef void __cdecl show_error_message_by_id(int id);
+	auto show_error_message_by_id_impl = GetAddress<show_error_message_by_id>(0x4A2E);
+	show_error_message_by_id_impl(id);
+}
+#pragma endregion
+
+void show_fatal_error(int error_id)
+{
+	TRACE_FUNC("error_id : %d", error_id);
+
+	auto destory_window = [](HWND handle) {
+		if (handle)
+			DestroyWindow(handle);
+	};
+
+	HWND hWnd = *GetAddress<HWND>(0x46D9C4);
+	HWND d3d_window = *GetAddress<HWND>(0x46D9C8); // not sure what this window is actual for, used in IDirect3DDevice9::Present
+	destory_window(hWnd);
+	destory_window(d3d_window);
+	show_error_message_by_id(error_id);
+}
+
+int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+{
+	// set args
+	WriteValue(H2BaseAddr + 0x46D9BC, lpCmdLine); // command_line_args
+	WriteValue(H2BaseAddr + 0x46D9C0, hInstance); // g_instance
+	WriteValue(H2BaseAddr + 0x46D9CC, nShowCmd); // g_CmdShow
+
+	// window setup
+	wcscpy_s(reinterpret_cast<wchar_t*>(H2BaseAddr + 0x46D9D4), 0x40, L"halo"); // ClassName
+	wcscpy_s(reinterpret_cast<wchar_t*>(H2BaseAddr + 0x46DA54), 0x40, L"Halo 2 - Project Cartographer"); // WindowName
+	WNDPROC g_WndProc = reinterpret_cast<WNDPROC>(H2BaseAddr + 0x790E);
+	WriteValue(H2BaseAddr + 0x46D9D0, g_WndProc); // g_WndProc_ptr
+	if (!LOG_CHECK(InitPCCInfo()))
+	{
+		TRACE_FUNC("Failed to get PCC info / insufficient system resources");
+		run_async(
+			MessageBoxA(NULL, "Failed to get compatibility info.", "PCC Error", S_OK);
+		)
+		show_error_message_by_id(108);
+		// todo: load some default values here?
+	}
+	// mouse cursor setup
+	HCURSOR cursor = LOG_CHECK(LoadCursor(NULL, MAKEINTRESOURCE(0x7F00)));
+	WriteValue(H2BaseAddr + 0x46D9B8, cursor); // g_hCursor
+
+	// mess around with xlive (not calling XLiveInitialize etc)
+	WriteValue<BYTE>(H2BaseAddr + 0x4FAD98, 1);
+
+	// intialize some basic game subsystems
+	if (LOG_CHECK(engine_basic_init()))
+	{
+		run_main_loop(); // actually run game
+		main_engine_dispose(); // cleanup
+	} else
+	{
+		TRACE_FUNC("Engine startup failed!");
+		show_fatal_error(108);
+		return 1;
+	}
+
+	int g_fatal_error_id = *reinterpret_cast<int*>(H2BaseAddr + 0x46DAD4);
+	if (g_fatal_error_id) // check if the game exited cleanly
+	{
+		show_fatal_error(g_fatal_error_id);
+		return 1;
+	} else
+	{
+		return 0;
+	}
 }
 #pragma endregion
 
@@ -739,6 +825,7 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 0;
 		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 1;
 		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 2;
+		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 4;
 		if ((unsigned __int8)fn_c002152b0() && fn_c0021525a() > 1)
 		{
 			*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 3;
@@ -775,6 +862,12 @@ char _cdecl LoadTagsandMapBases(int a)
 	H2Tweaks::RadarPatch();  //PATCHES RADAR IN MULTIPLAYER  DOCUMENTATION FOR YOSHI  #HPV
 
 	return result;
+}
+
+char is_remote_desktop()
+{
+	TRACE_FUNC("check disabled");
+	return 0;
 }
 
 void InitH2Tweaks() {
@@ -837,19 +930,9 @@ void InitH2Tweaks() {
 			WriteBytes(H2BaseAddr + 0x221C29, assmIntroHQ, 1);
 		}
 
-		//Allows unlimited clients
-		BYTE assmUnlimitedClients[41];
-		memset(assmUnlimitedClients, 0x00, 41);
-		WriteBytes(H2BaseAddr + 0x39BCF0, assmUnlimitedClients, 41);
-
-		//Allows on a remote desktop connection
-		BYTE assmRemoteDesktop[] = { 0xEB };
-		WriteBytes(H2BaseAddr + 0x7E54, assmRemoteDesktop, 1);
-
 		//Disables the ESRB warning (only occurs for English Language).
 		//disables the one if no intro vid occurs.
-		BYTE& ESRB = *((BYTE*)H2BaseAddr + 0x411030);
-		ESRB = 0;
+		WriteValue<BYTE>(H2BaseAddr + 0x411030, 0);
 		//disables the one after the intro video.
 		BYTE assmIntroESRBSkip[] = { 0x00 };
 		WriteBytes(H2BaseAddr + 0x3a0fa, assmIntroESRBSkip, 1);
@@ -869,6 +952,7 @@ void InitH2Tweaks() {
 		PatchCall(H2BaseAddr + 0x21754C, &sub_20E1D8_boot);
 
 		//Hook for Hitmarker sound effect.
+		//Bad hook crashes when a player punches an object/wall in splitscreen.
 		//pfn_c0017a25d = (tfn_c0017a25d)DetourFunc((BYTE*)H2BaseAddr + 0x0017a25d, (BYTE*)fn_c0017a25d, 10);
 
 		//Hook for advanced lobby options.
@@ -876,22 +960,21 @@ void InitH2Tweaks() {
 		pfn_c0024fa19 = (tfn_c0024fa19)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fa19, (BYTE*)fn_c0024fa19, 9);
 		pfn_c0024fabc = (tfn_c0024fabc)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fabc, (BYTE*)fn_c0024fabc, 13);
 
-		//SLDL anti-hack removed and code is now accessible.
-		//Side effect is that the multiplayer buttons at the mainmenu will never be greyed out due to a bad 'key'.
-		pfn_c00004a6b = (tfn_c00004a6b)DetourFunc((BYTE*)H2BaseAddr + 0x00004a6b, (BYTE*)fn_c00004a6b, 5);
-		VirtualProtect(pfn_c00004a6b, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-		pfn_c00004567 = (tfn_c00004567)DetourFunc((BYTE*)H2BaseAddr + 0x00004567, (BYTE*)engine_basic_init, 7);
-		VirtualProtect(pfn_c00004567, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
 		WriteJmpTo(H2BaseAddr + 0x4544, is_init_flag_set);
 		PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);
-	}	
+
+		WriteJmpTo(GetAddress(0x7E43), WinMain);
+		WriteJmpTo(GetAddress(0x39EA2), is_remote_desktop);
+	}
 	WriteJmpTo(GetAddress(0x1467, 0x12E2), is_supported_build);
 	PatchCall(GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
-
+	
+	//Redirect the variable for the server name to ours.
+	WriteValue(H2BaseAddr + 0x001b2ce8, (DWORD)ServerLobbyName);
+	
 	addDebugText("End Startup Tweaks.");
 }
 

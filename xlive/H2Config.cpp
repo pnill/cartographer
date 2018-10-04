@@ -963,8 +963,8 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			}
 			else {
 				H2Config_fps_limit = tempint1;
-				extern float desiredRenderTime;
-				desiredRenderTime = (1000.f / H2Config_fps_limit);
+				extern std::chrono::system_clock::duration desiredRenderTime;
+				desiredRenderTime = std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
 				est_fps_limit = true;
 			}
 		}

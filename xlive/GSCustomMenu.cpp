@@ -1607,8 +1607,10 @@ static bool CMButtonHandler_EditFPS(int button_id) {
 		else
 			H2Config_fps_limit = 60;
 	}
-	extern float desiredRenderTime;
-	desiredRenderTime = (1000.f / H2Config_fps_limit);
+	
+	extern std::chrono::system_clock::duration desiredRenderTime;
+	desiredRenderTime = std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
+
 	loadLabelFPSLimit();
 	return false;
 }
@@ -3079,10 +3081,7 @@ void* __stdcall sub_248beb_deconstructor_AdvLobbySettings(LPVOID lpMem, char a2)
 		wchar_t* ClientName = (wchar_t*)((BYTE*)H2BaseAddr + 0x0051a638);
 		wcsncpy(bufferLobbyName, ClientName, 16);
 	}
-	wchar_t* ServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x0096da94);
-	wchar_t* ServerNameActive = (wchar_t*)((BYTE*)H2BaseAddr + 0x0051a5b2);
-	wcsncpy(ServerName, bufferLobbyName, 32);
-	wcsncpy(ServerNameActive, bufferLobbyName, 32);
+	wcsncpy(ServerLobbyName, bufferLobbyName, 32);
 
 	if (gameManager->isHost() && h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE) {
 		advLobbySettings->sendLobbySettingsPacket();
@@ -4403,8 +4402,8 @@ char __cdecl sub_209129(int a1, int a2, int a3, int a4)//player configuration pr
 {
 	char result =
 		psub_209129(a1, a2, a3, a4);
-	extern CHAR g_szUserName[4][16 + 1];
-	if (strcmp(g_szUserName[0], "[Username]") == 0) {//change username to player configuration profile name if offline.
+	extern CHAR g_szUserName[4][16];
+	if (strncmp(g_szUserName[0], "[Username]", 16) == 0) {//change username to player configuration profile name if offline.
 		wchar_t* wideprofileName = (wchar_t*)((BYTE*)H2BaseAddr + 0x96C874);
 		char profileName[32];
 		wcstombs2(profileName, wideprofileName, 32);

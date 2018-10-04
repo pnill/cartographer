@@ -316,6 +316,11 @@ int __cdecl showErrorScreen(int a1, signed int a2, int a3, __int16 a4, int a5, i
 		//280 is special here, the constant is used when a custom map cannot be loaded for clients
 		return 0;
 	}
+	if (a2 == 0x117)
+	{
+		TRACE_FUNC("Ignoring need to reinstall maps");
+		return 0;
+	}
 	return show_error_screen_method(a1, a2, a3, a4, a5, a6);
 }
 

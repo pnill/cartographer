@@ -35,6 +35,7 @@ namespace std
 	};
 }
 
+extern wchar_t ServerLobbyName[32];
 void SetUserUsername(char* username);
 extern const DWORD annoyance_factor;
 

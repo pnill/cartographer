@@ -95,28 +95,14 @@ BOOL bIsCreated, bNeedsFlush;
 DWORD dwOldFVF;
 LPD3DXSPRITE pSprite;
 
-bool lowFPSmode;
-float lastPresentTime;
-float lastRenderTime;
-static LARGE_INTEGER timerFreq;
-static LARGE_INTEGER counterAtStart;
-
-float getElapsedTime(void) {
-	LARGE_INTEGER c;
-	QueryPerformanceCounter(&c);
-	return (float)((c.QuadPart - counterAtStart.QuadPart) * 1000.0f / (float)timerFreq.QuadPart);
-}
-
-float desiredRenderTime = 17.041379f;
-void frameTimeManagement() {
-	float renderTime = getElapsedTime() - lastPresentTime;
-
-	while (renderTime < desiredRenderTime) {
-		SwitchToThread();
-		renderTime = getElapsedTime() - lastPresentTime;
-	}
-
-	lastPresentTime = getElapsedTime();
+std::chrono::system_clock::time_point nextFrame = std::chrono::system_clock::now();
+std::chrono::system_clock::duration desiredRenderTime = std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
+void frameTimeManagement()
+{
+	std::this_thread::sleep_until(nextFrame);
+	do {
+		nextFrame += desiredRenderTime;
+	} while (std::chrono::system_clock::now() > nextFrame);
 }
 
 DWORD dwPresent;
@@ -137,7 +123,6 @@ LPD3DXSPRITE Sprite_Interface;
 
 void GUI::Initialize()
 {
-	desiredRenderTime = (1000.f / H2Config_fps_limit);
 	initFontsIfRequired();
 	
 	if (FAILED(D3DXCreateTextureFromFile(pDevice, "sounds/h2pc_logo.png", &Texture_Interface) ) )
@@ -149,16 +134,16 @@ void GUI::Initialize()
 
 }
 
-bool once1 = false;
+static bool has_initialised_input = false;
 // #5001
 int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 {
-	if (!once1) {
+	if (!has_initialised_input) {
 		extern HWND H2hWnd;
 		extern RECT rectScreenOriginal;
 		H2hWnd = pPii->hWnd;
 		GetWindowRect(H2hWnd, &rectScreenOriginal);
-		once1 = true;
+		has_initialised_input = true;
 	}
 	if ((GetKeyState(pPii->wParam) & 0x8000) && (pPii->uMSG == WM_KEYDOWN || pPii->uMSG == WM_SYSKEYDOWN)) {
 		//TODO: fHandled doesn't actually work..need to look into how halo2.exe uses the XLIVE_INPUT_INFO struct after calling xliveinput
@@ -177,12 +162,8 @@ int WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 // #5000: XLiveInitialize
 int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 {
-		
 		InitInstance();
 		TRACE("XLiveInitialize()");
-		lastRenderTime = 0.0f;
-		QueryPerformanceFrequency(&timerFreq);
-		QueryPerformanceCounter(&counterAtStart);
 
 		if (!h2mod->Server)
 		{
