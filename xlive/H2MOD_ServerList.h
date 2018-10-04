@@ -1,5 +1,7 @@
 #pragma once
 #include "xlivedefs.h"
+#include <atomic>
+
 typedef struct _XLOCATOR_SEARCHRESULT {
 	ULONGLONG serverID;                     // the ID of dedicated server
 	DWORD dwServerType;                     // see XLOCATOR_SERVERTYPE_PUBLIC, etc
@@ -22,14 +24,24 @@ class ServerList
 public:
 	_XLOCATOR_SEARCHRESULT *servers;
 
-	bool running = false;
+	std::atomic<bool> running = false;
 	bool completed = false;
 	int servers_left = 0;
 	int total_servers = 0;
+
+	int total_count = 0;
+	int total_public = 0;
+	int total_public_gold = 0;
+	int total_peer = 0;
+	int total_peer_gold = 0;
+
 	bool GetRunning();
 	void GetServers();
 	int GetServersLeft();
 	int GetTotalServers();
+	void RemoveServer();
+	bool GetServerCounts();
+
 
 };
 

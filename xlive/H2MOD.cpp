@@ -27,9 +27,21 @@ bool b_Halo2Final = false;
 extern CUserManagement User;
 extern int H2GetInstanceId();
 extern XUID xFakeXuid[4];
+std::unordered_map<int, int> object_to_variant;
+
+int character_datum_from_index(BYTE index)
+{
+	DWORD global_scnr = *(DWORD*)((*(DWORD*)(char*)(h2mod->GetBase() + 0x479E74)) + 0x17C);
+	DWORD var2 = *(DWORD*)((char*)h2mod->GetBase() + 0x482290);
+	DWORD var3 = var2 + global_scnr;
+	DWORD var4 = var3 + (8 * index) + 4;
+	DWORD char_tag_datum = *(DWORD*)var4;
+
+	return char_tag_datum;
+}
+
 
 #pragma region engine calls
-
 int __cdecl call_get_object(signed int object_datum_index, int object_type)
 {
 	//TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
@@ -113,7 +125,97 @@ bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 	return p_add_object_to_sync(gamestate_object_datum);
 }
 
-EngineType H2MOD::GetEngineType()
+int __cdecl call_get_character_sid_from_datum(int char_datum)
+{
+	typedef int(__cdecl *get_character_sid_from_datum)(int datum);
+	get_character_sid_from_datum pget_character_sid_from_datum = (get_character_sid_from_datum)((char*)h2mod->GetBase() + 0x31796C);
+
+	return pget_character_sid_from_datum(char_datum);
+}
+
+signed int __cdecl object_new_hook(void *pObject)
+{
+	int variant_index = *(int*)((char*)pObject + 0xC);
+	signed int result = call_object_new(pObject);
+
+	
+	unsigned __int16 object_index = result & 0x000FFFF;
+	object_to_variant[object_index] = variant_index;
+
+
+	wchar_t DebugText[255] = { 0 };
+	ZeroMemory(DebugText, 255);
+	wsprintf(DebugText, L"AI object_new hook - object_index: %i - variant_index: %08X", object_index,variant_index);
+
+	addDebugText(DebugText);
+	
+	return result;
+}
+
+
+typedef int(__stdcall *tset_unit_creation_data)(unsigned __int16 object_index, void* object_creation_data);
+tset_unit_creation_data pset_unit_creation_data;
+
+int __stdcall set_unit_creation_data_hook(unsigned __int16 object_index, void* object_creation_data)
+{
+	int result = pset_unit_creation_data(object_index, object_creation_data);
+
+	if (object_to_variant[object_index] != 0)
+	{
+		*(int*)((char*)object_creation_data) = object_to_variant[object_index];
+		
+
+
+		wchar_t DebugText[255] = { 0 };
+		ZeroMemory(DebugText, 255);
+		wsprintf(DebugText, L"AI unit_creation_data_setup hook - object_index: %i - variant_index: %08X", object_index, object_to_variant[object_index]);
+
+		addDebugText(DebugText);
+	}
+
+
+	return result;
+}
+
+typedef bool(__stdcall *tcreate_unit_hook)(void*, int, int, void* );
+tcreate_unit_hook pcreate_unit_hook;
+
+
+
+typedef bool(__cdecl *tset_unit_color_data)(int, unsigned __int16, int a3);
+tset_unit_color_data pset_unit_color_data;
+
+bool __cdecl set_unit_color_data_hook(int a1, unsigned __int16 a2, int a3)
+{
+	int object_creation_data = a1 - 0x10;
+
+	if (*(int*)object_creation_data == -1)
+		return pset_unit_color_data(a1, a2, a3);
+
+	return 0;
+}
+
+bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObject)
+{
+	if (*(int*)pCreationData != -1)
+	{	
+		wchar_t DebugText[255] = { 0 };
+		ZeroMemory(DebugText, 255);
+		wsprintf(DebugText, L"create_unit_hook - variant type: %08X - ", *(int*)(pCreationData));
+	
+		addDebugText(DebugText);
+
+		*(int*)((char*)pObject + 0xC) = *(int*)(pCreationData);
+		*(int*)pCreationData = -1;
+
+	
+
+	}
+
+	return pcreate_unit_hook(pCreationData, a2, a3, pObject);
+}
+
+EngineType H2MOD::get_engine_type()
 {
 	DWORD GameGlobals = *(DWORD*)(h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
 
@@ -349,6 +451,29 @@ int H2MOD::get_dynamic_player_base(int playerIndex, bool resetDynamicBase) {
 	return dyanamic;
 }
 
+void GivePlayerWeapon2(int PlayerIndex, int WeaponId, short Unk)
+{
+	//TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
+
+	int unit_datum = h2mod->get_unit_datum_from_player_index(PlayerIndex);
+
+	if (unit_datum != -1 && unit_datum != 0)
+	{
+		char* nObject = new char[0xC4];
+		DWORD dwBack;
+		VirtualProtect(nObject, 0xC4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		call_object_placement_data_new(nObject, WeaponId, unit_datum, 0);
+
+		int object_index = call_object_new(nObject);
+
+		//if (bReset == true)
+		//	call_unit_reset_equipment(unit_datum);
+
+		call_assign_equipment_to_unit(unit_datum, object_index, Unk);
+	}
+
+}
 
 void GivePlayerWeapon(int PlayerIndex, int WeaponId, bool bReset)
 {
@@ -426,7 +551,10 @@ int H2MOD::get_player_index_from_unit_datum(int unit_datum_index)
 
 	for (pIndex = 0; pIndex <= 16; pIndex++)
 	{
-		if (unit_datum_index == (int)*(int*)(*(DWORD*)player_table_ptr + (pIndex * 0x204) + 0x28))
+		int unit_datum_index_check = (int)*(int*)(*(DWORD*)player_table_ptr + (pIndex * 0x204) + 0x28);
+		TRACE("[H2MOD::get_player_index_from_unit_datum] Checking datum: %08X - index: %i against datum: %08X", unit_datum_index_check, pIndex, unit_datum_index);
+
+		if (unit_datum_index == unit_datum_index_check)
 		{
 			return pIndex;
 		}
@@ -489,7 +617,13 @@ void H2MOD::set_unit_team_index(int unit_datum_index, BYTE team)
 void H2MOD::set_unit_biped(BYTE biped, int pIndex)
 {
 	if (pIndex >= 0 && pIndex < 16)
+	{
+		BYTE orig_val = *(BYTE*)(((char*)((h2mod->Server) ? 0x3000274C : 0x30002BA0) + (pIndex * 0x204)));
+		BYTE *orig_addr = (BYTE*)(((char*)((h2mod->Server) ? 0x3000274C : 0x30002BA0) + (pIndex * 0x204)));
+
+		TRACE_GAME("set_unit_biped(biped: %i, index: %i), orig_val: %i, address: %08X", biped, pIndex, orig_val, orig_addr);
 		*(BYTE*)(((char*)((h2mod->Server) ? 0x3000274C : 0x30002BA0) + (pIndex * 0x204))) = biped;
+	}
 }
 
 void H2MOD::set_unit_speed_patch(bool hackit) {
@@ -604,6 +738,8 @@ update_player_score pupdate_player_score;
 typedef void(__stdcall *tjoin_game)(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14);
 tjoin_game pjoin_game;
 
+
+
 extern SOCKET game_sock;
 extern SOCKET game_sock_1000;
 extern CUserManagement User;
@@ -616,8 +752,8 @@ tconnect_establish_write pconnect_establish_write;
 char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 {
 
-	//TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
-	//TRACE_GAME("OnPlayerDeath() - Team: %i", h2mod->get_unit_team_index(unit_datum_index));
+	TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
+	TRACE_GAME("OnPlayerDeath() - Team: %i", h2mod->get_unit_team_index(unit_datum_index));
 
 	if (b_GunGame) {
 		gunGame->playerDeath->setUnitDatumIndex(unit_datum_index);
@@ -700,6 +836,7 @@ void __cdecl onGameEngineChange(int a1)
 	if (h2mod->GetEngineType() == EngineType::MAIN_MENU_ENGINE)
 	{
 		addDebugText("GameEngine: Main-Menu, apply patches");
+		object_to_variant.clear();
 
 		if (!gameManager->isHost()) {
 			advLobbySettings->resetLobbySettings();
@@ -773,7 +910,7 @@ void __cdecl onGameEngineChange(int a1)
 		if (GameState == 3)
 		{
 			// send server map checksums to client
-			MapChecksumSync::SendState();
+			//MapChecksumSync::SendState();
 			//inform players of the current advanced lobby settings
 			advLobbySettings->sendLobbySettingsPacket();
 
@@ -817,6 +954,7 @@ bool __cdecl OnPlayerSpawn(int a1)
 	//TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
 	int PlayerIndex = a1 & 0x000FFFF;
 
+
 	if (b_Infection) {
 		infectionHandler->preSpawnPlayer->setPlayerIndex(PlayerIndex);
 		infectionHandler->preSpawnPlayer->execute();
@@ -828,6 +966,7 @@ bool __cdecl OnPlayerSpawn(int a1)
 	}
 
 	bool ret = pspawn_player(a1);	
+
 
 	if (b_Infection) {
 		infectionHandler->spawnPlayer->setPlayerIndex(PlayerIndex);
@@ -1247,6 +1386,9 @@ void H2MOD::ApplyHooks() {
 		// disable part of custom map tag verification
 		NopFill<6>(GetBase() + 0x4FA0A);
 
+
+
+
 		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)this->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
@@ -1255,6 +1397,27 @@ void H2MOD::ApplyHooks() {
 
 		PatchCall(GetBase() + 0x49E95, onGameEngineChange);
 		p_originalFunc = (originalFunc)(GetBase() + 0x5912D);
+
+
+
+	/*
+		TODO(PermaNull): AI - Permutation Sync - Breaks otherstuff has to be modified a bit.
+
+		PatchCall(GetBase() + 0x318DEC, object_new_hook);
+		PatchCall(GetBase() + 0x1F807A, set_unit_creation_data_hook);
+		pset_unit_creation_data = (tset_unit_creation_data)(GetBase() + 0x1F24ED);
+
+		VirtualProtect(((char*)h2mod->GetBase() + 0x1F3B48), 1, PAGE_EXECUTE_READWRITE, &dwBack);
+		VirtualProtect(((char*)h2mod->GetBase() + 0x1F3C09), 1, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		memset(((char*)h2mod->GetBase() + 0x1F3B48), 0x20, 1);
+		memset(((char*)h2mod->GetBase() + 0x1F3C09), 0x20, 1);
+
+		PatchCall(GetBase() + 0x1F9E6C, create_unit_hook);
+		pcreate_unit_hook = (tcreate_unit_hook)(GetBase() + 0x001F32DB);
+
+		PatchCall(GetBase() + 0x1F9E34, set_unit_color_data_hook);
+		pset_unit_color_data = (tset_unit_color_data)(GetBase() + 0x006E5C3);*/
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0xD03ED, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1339,7 +1502,7 @@ void H2MOD::ApplyHooks() {
 		//t1.detach();
 
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x5DE4A, (BYTE*)OnPlayerSpawn, 6);
-		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
+		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		PatchCall(GetBase() + 0x43113, onGameEngineChange);
 		p_originalFunc = (originalFunc)(GetBase() + 0x4E43C);
@@ -1356,6 +1519,8 @@ void H2MOD::ApplyHooks() {
 		PatchWinAPICall(GetBase() + 0x85F5E, CryptProtectDataHook);
 		PatchWinAPICall(GetBase() + 0x352538, CryptUnprotectDataHook);
 		PatchCall(GetBase() + 0x85F73, filo_write__encrypted_data_hook);
+
+
 
 		if (server == NULL) {
 			//TODO: move into method

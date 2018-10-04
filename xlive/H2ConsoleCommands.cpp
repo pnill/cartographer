@@ -292,6 +292,32 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			network->send_h2mod_packet_player(atoi(firstArg.c_str()), teampak);
 		}
+		else if (firstCommand == "$testscnr") {
+			wchar_t buf[2048];
+
+			char* nObject = new char[0xC4];
+			DWORD dwBack;
+			VirtualProtect(nObject, 0xC4, PAGE_EXECUTE_READWRITE, &dwBack);
+			UINT32 object_datum = 0xECAD00E4; //elite_run
+
+			if (object_datum) {
+				unsigned int player_datum = h2mod->get_unit_datum_from_player_index(0);
+				call_object_placement_data_new(nObject, object_datum, player_datum, 0);
+				*(float*)(nObject + 0x1C) = h2mod->get_player_x(0, true) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				*(float*)(nObject + 0x20) = h2mod->get_player_y(0, true) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				*(float*)(nObject + 0x24) = (h2mod->get_player_z(0, true) + 5.0f) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				TRACE_GAME("object_datum = %08X, x=%d, y=%d, z=%d", object_datum, *(float*)(nObject + 0x1C), *(float*)(nObject + 0x20), *(float*)(nObject + 0x24));
+
+
+				swprintf(buf, sizeof(buf), L"spawning current permutation %0X", *(UINT32*)(nObject + 0xC));
+				unsigned int object_gamestate_datum = call_object_new(nObject);
+				call_add_object_to_sync(object_gamestate_datum);
+			}
+			delete[] nObject;
+
+			output(buf);
+			
+		}
 		else if (firstCommand == "$maxplayers") {
 			if (splitCommands.size() != 2) {
 				output(L"Usage: $maxplayers value (betwen 1 and 16).");

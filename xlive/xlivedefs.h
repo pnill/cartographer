@@ -423,7 +423,7 @@ INT   WINAPI XNetQosLookup(UINT cxna,
                            const DWORD adwServiceId[],
                            UINT cProbes, DWORD dwBitsPerSec, DWORD dwFlags, WSAEVENT hEvent, XNQOS ** ppxnqos);
 INT   WINAPI XNetQosServiceLookup(DWORD dwFlags, WSAEVENT hEvent, XNQOS ** ppxnqos);
-INT   WINAPI XNetQosRelease(XNQOS * pxnqos);
+INT   WINAPI XNetQosRelease(XNQOS* pxnqos);
 INT   WINAPI XNetQosGetListenStats(const XNKID * pxnkid, XNQOSLISTENSTATS * pQosListenStats);
 
 
