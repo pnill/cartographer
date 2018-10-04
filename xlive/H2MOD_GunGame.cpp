@@ -18,6 +18,9 @@ extern int weapon_fourteen;
 extern int weapon_fiffteen;
 extern int weapon_sixteen;
 
+
+//TODO(PermaNull): Add additional levels with dual weilding
+
 std::unordered_map<int, int> GunGame::level_weapon;
 std::unordered_map<std::wstring, int> GunGame::gungamePlayers;
 
@@ -124,18 +127,6 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 
 		if (level < 15)	{
 			GivePlayerWeapon(playerIndex, CurrentWeapon, 1);
-			GivePlayerWeapon2(playerIndex, Weapon::plasma_pistol, 7);
-			//GivePlayerWeapon2(playerIndex, Weapon::plasma_pistol, 3);
-			//GivePlayerWeapon2(playerIndex, Weapon::plasma_pistol, 4);
-			//GivePlayerWeapon2(playerIndex, Weapon::plasma_pistol, 5);
-			//GivePlayerWeapon2(playerIndex, Weapon::plasma_pistol, 6);
-			//GivePlayerWeapon2(playerIndex, Weapon::plasma_pistol, 7);
-
-
-		
-			//GivePlayerWeapon(playerIndex, Weapon::magnum, 3);
-			//GivePlayerWeapon(playerIndex, Weapon::plasma_pistol, 4);
-			//GivePlayerWeapon(playerIndex, CurrentWeapon, 1);
 		}
 	}
 }
@@ -225,10 +216,10 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
 				//the player structure does not have a slot for dedis, this player index was calculated based on that assumption
 				//so we always subtract by 1 (since 0 here is not the slot for dedi anymore and can be a player)
 				pIndex -= 1;
-				TRACE_GAME("[h2mod-infection] altering player index from %d to %d", pIndex - 1, pIndex);
+				TRACE_GAME("[h2mod-GunGame] altering player index from %d to %d", pIndex - 1, pIndex);
 			}
 		}
-		TRACE_GAME("[H2Mod-Infection] Sending grenade packet, playerIndex=%d, peerIndex=%d", pIndex, players->getPeerIndex(pIndex));
+		TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex=%d, peerIndex=%d", pIndex, players->getPeerIndex(pIndex));
 
 		H2ModPacket teampak;
 		teampak.set_type(H2ModPacket_Type_set_unit_grenades);

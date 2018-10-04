@@ -176,7 +176,7 @@ int __stdcall set_unit_creation_data_hook(unsigned __int16 object_index, void* o
 	if (object_to_variant[object_index] != 0)
 	{
 		*(int*)((char*)object_creation_data) = object_to_variant[object_index];
-		*(int*)((char*))
+		
 
 
 		wchar_t DebugText[255] = { 0 };
@@ -1388,7 +1388,12 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetBase() + 0x49E95, onGameEngineChange);
 		p_originalFunc = (originalFunc)(GetBase() + 0x5912D);
 
-	/*	PatchCall(GetBase() + 0x318DEC, object_new_hook);
+
+
+	/*
+		TODO(PermaNull): AI - Permutation Sync - Breaks otherstuff has to be modified a bit.
+
+		PatchCall(GetBase() + 0x318DEC, object_new_hook);
 		PatchCall(GetBase() + 0x1F807A, set_unit_creation_data_hook);
 		pset_unit_creation_data = (tset_unit_creation_data)(GetBase() + 0x1F24ED);
 
@@ -1399,10 +1404,10 @@ void H2MOD::ApplyHooks() {
 		memset(((char*)h2mod->GetBase() + 0x1F3C09), 0x20, 1);
 
 		PatchCall(GetBase() + 0x1F9E6C, create_unit_hook);
-		pcreate_unit_hook = (tcreate_unit_hook)(GetBase() + 0x001F32DB);*/
+		pcreate_unit_hook = (tcreate_unit_hook)(GetBase() + 0x001F32DB);
 
 		PatchCall(GetBase() + 0x1F9E34, set_unit_color_data_hook);
-		pset_unit_color_data = (tset_unit_color_data)(GetBase() + 0x006E5C3);
+		pset_unit_color_data = (tset_unit_color_data)(GetBase() + 0x006E5C3);*/
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0xD03ED, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1496,8 +1501,8 @@ void H2MOD::ApplyHooks() {
 		//std::thread t1(&MapManager::startListeningForClients, mapManager);
 		//t1.detach();
 
-		//pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x5DE4A, (BYTE*)OnPlayerSpawn, 6);
-		//VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
+		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x5DE4A, (BYTE*)OnPlayerSpawn, 6);
+		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		PatchCall(GetBase() + 0x43113, onGameEngineChange);
 		p_originalFunc = (originalFunc)(GetBase() + 0x4E43C);
