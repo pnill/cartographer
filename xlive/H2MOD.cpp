@@ -146,83 +146,182 @@ int __cdecl call_get_character_sid_from_datum(int char_datum)
 	return pget_character_sid_from_datum(char_datum);
 }
 
+int __cdecl call_fill_creation_data_from_object_index(int object_index, void* creation_data)
+{
+	typedef int(__cdecl *fill_creation_data_from_object_index)(int datum,void* creation_data);
+	fill_creation_data_from_object_index pfill_creation_data_from_object_index = (fill_creation_data_from_object_index)((char*)h2mod->GetBase() + 0x1F24ED);
+
+
+	return pfill_creation_data_from_object_index(object_index, creation_data);
+}
+
 signed int __cdecl object_new_hook(void *pObject)
 {
 	int variant_index = *(int*)((char*)pObject + 0xC);
 	signed int result = call_object_new(pObject);
 
-	
-	unsigned __int16 object_index = result & 0x000FFFF;
-	object_to_variant[object_index] = variant_index;
+	//unsigned __int16 object_index = result & 0xFFFF;
 
+	object_to_variant[result] = variant_index;
 
 	wchar_t DebugText[255] = { 0 };
 	ZeroMemory(DebugText, 255);
-	wsprintf(DebugText, L"AI object_new hook - object_index: %i - variant_index: %08X", object_index,variant_index);
+	wsprintf(DebugText, L"AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result,variant_index);
+
+	TRACE_GAME_N("AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result, variant_index);
 
 	addDebugText(DebugText);
 	
 	return result;
 }
 
+bool bitstream_write_bool(void *packet, char* string_data, bool value)
+{
+	typedef bool(__thiscall *tbitstream_write_bool)(void* packet, char* string_data, bool value);
+	tbitstream_write_bool ptbitstream_write_bool = (tbitstream_write_bool)((char*)h2mod->GetBase() + 0xD1886);
 
-typedef int(__stdcall *tset_unit_creation_data)(unsigned __int16 object_index, void* object_creation_data);
+	return ptbitstream_write_bool(packet, string_data, value);
+}
+
+int bitstream_write_uint(void* packet, char* string_data, unsigned int value, signed int bit_size)
+{
+
+	typedef int(__thiscall *tbitstream_write_uint)(void* packet, char* string_data, unsigned int value, signed int bit_size);
+	tbitstream_write_uint pbitstream_write_uint = (tbitstream_write_uint)((char*)h2mod->GetBase() + 0xD17C6);
+
+	return pbitstream_write_uint(packet, string_data, value, bit_size);
+}
+
+
+bool bitstream_read_bool(void *packet, char* string_data)
+{
+	typedef bool(__thiscall *tbitstream_read_bool)(void* packet, char* string_data);
+	tbitstream_read_bool ptbitstream_read_bool = (tbitstream_read_bool)((char*)h2mod->GetBase() + 0xD1F47);
+
+	return ptbitstream_read_bool(packet, string_data);
+}
+
+int bitstream_read_uint(void* packet, char* string_data, signed int bit_size)
+{
+
+	typedef int(__thiscall *tbitstream_read_uint)(void* packet, char* string_data, signed int bit_size);
+	tbitstream_read_uint pbitstream_read_uint = (tbitstream_read_uint)((char*)h2mod->GetBase() + 0xD1EE5);
+
+	return pbitstream_read_uint(packet, string_data,bit_size);
+}
+
+typedef int(__stdcall *tc_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, void* packet);
+tc_simulation_unit_entity_definition_creation_encode pc_simulation_unit_entity_definition_encode;
+
+int __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr, int creation_data_size, void* creation_data, int a3, void* packet)
+{
+	TRACE_GAME_N("c_simulation_unit_entity_definition_creation_encode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, a3: %i, packet: %08X", thisptr, creation_data_size, creation_data, a3, packet);
+
+
+	int object_permutation_index = *(int*)((char*)creation_data + 0x24);
+	if( object_permutation_index != -1)
+	{
+		TRACE_GAME_N("creation_data+0x24: %08X", object_permutation_index);
+
+		bitstream_write_bool(packet, "object-permutation-exists", 1);
+		bitstream_write_uint(packet, "object-permutation-index", object_permutation_index, 32);
+		TRACE_GAME_N("c_simulation_unit_entity_encode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
+
+	}
+	else
+		bitstream_write_bool(packet, "object-permutation-exists", 0);
+
+	int ret = pc_simulation_unit_entity_definition_encode(thisptr, creation_data_size, creation_data, a3, packet);
+
+
+	return ret;
+}
+
+
+typedef int(__stdcall *tc_simulation_unit_entity_definition_creation_decode)(void* thisptr, int creation_data_size, void* creation_data,void* packet);
+tc_simulation_unit_entity_definition_creation_decode pc_simulation_unit_entity_definition_decode;
+
+int __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, int creation_data_size, void* creation_data,void* packet)
+{
+	TRACE_GAME_N("c_simulation_unit_entity_definition_creation_decode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, packet: %08X", thisptr, creation_data_size, creation_data, packet);
+
+
+	if (bitstream_read_bool(packet, "object-permutation-exists"))
+	{
+
+		TRACE_GAME_N("c_simulation_unit_entity_decode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
+		int object_permutation_index = bitstream_read_uint(packet, "object-permutation-index", 32);
+		*(int*)((char*)creation_data + 0x24) = object_permutation_index;
+
+		TRACE_GAME_N("object_permutation_index: %08X", object_permutation_index);
+	}
+	else
+		*(int*)((char*)creation_data + 0x24) = -1;
+	
+	int ret = pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, packet);
+
+
+	return ret;
+}
+
+typedef int(__stdcall *tset_unit_creation_data)(unsigned int object_index, void* object_creation_data);
 tset_unit_creation_data pset_unit_creation_data;
 
-int __stdcall set_unit_creation_data_hook(unsigned __int16 object_index, void* object_creation_data)
+int __stdcall set_unit_creation_data_hook(unsigned int object_index, void* object_creation_data)
 {
 	int result = pset_unit_creation_data(object_index, object_creation_data);
 
 	if (object_to_variant[object_index] != 0)
 	{
-		*(int*)((char*)object_creation_data) = object_to_variant[object_index];
+		//We should have allocated an additional 4 bytes above 0x24 so we'll write our in between 0x24 and 0x28
+		*(int*)((char*)object_creation_data + 0x24) = object_to_variant[object_index];
 		
-
-
 		wchar_t DebugText[255] = { 0 };
 		ZeroMemory(DebugText, 255);
-		wsprintf(DebugText, L"AI unit_creation_data_setup hook - object_index: %i - variant_index: %08X", object_index, object_to_variant[object_index]);
+		wsprintf(DebugText, L"AI unit_creation_data_setup hook - object_index: %08X - variant_index: %08X", object_index, object_to_variant[object_index]);
 
+		TRACE_GAME_N("set_unit_creation_data_hook - object_index: %08X, variant_index: %08X", object_index, object_to_variant[object_index]);
 		addDebugText(DebugText);
 	}
+	else
+		*(int*)((char*)object_creation_data + 0x24) = -1;
+	
 
 
 	return result;
 }
-
-typedef bool(__stdcall *tcreate_unit_hook)(void*, int, int, void* );
-tcreate_unit_hook pcreate_unit_hook;
-
-
 
 typedef bool(__cdecl *tset_unit_color_data)(int, unsigned __int16, int a3);
 tset_unit_color_data pset_unit_color_data;
 
 bool __cdecl set_unit_color_data_hook(int a1, unsigned __int16 a2, int a3)
 {
-	int object_creation_data = a1 - 0x10;
 
-	if (*(int*)object_creation_data == -1)
+	int object_creation_data = a1 - 0x10;
+	int object_permutation_index = *(int*)((char*)object_creation_data + 0x24);
+
+	TRACE_GAME_N("set_unit_color_data_hook - %08X", object_permutation_index);
+
+	if ( object_permutation_index == -1)
 		return pset_unit_color_data(a1, a2, a3);
 
 	return 0;
 }
 
+typedef bool(__stdcall *tcreate_unit_hook)(void*, int, int, void*);
+tcreate_unit_hook pcreate_unit_hook;
+
 bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObject)
 {
-	if (*(int*)pCreationData != -1)
+	if (*(int*)((char*)pCreationData+0x24) != -1)
 	{	
 		wchar_t DebugText[255] = { 0 };
 		ZeroMemory(DebugText, 255);
-		wsprintf(DebugText, L"create_unit_hook - variant type: %08X - ", *(int*)(pCreationData));
+		wsprintf(DebugText, L"create_unit_hook - variant type: %08X - ", *(int*)((char*)pCreationData + 0x24));
 	
 		addDebugText(DebugText);
 
-		*(int*)((char*)pObject + 0xC) = *(int*)(pCreationData);
-		*(int*)pCreationData = -1;
-
-	
-
+		*(int*)((char*)pObject + 0xC) = *(int*)((char*)pCreationData+0x24);
 	}
 
 	return pcreate_unit_hook(pCreationData, a2, a3, pObject);
@@ -1376,9 +1475,6 @@ void H2MOD::ApplyHooks() {
 		// disable part of custom map tag verification
 		NopFill(GetBase() + 0x4FA0A, 6);
 
-
-
-
 		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)this->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
@@ -1389,25 +1485,31 @@ void H2MOD::ApplyHooks() {
 		p_originalFunc = (originalFunc)(GetBase() + 0x5912D);
 
 
+		//This encodes the unit creation packet, only gets executed on host.
+		pc_simulation_unit_entity_definition_encode = (tc_simulation_unit_entity_definition_creation_encode)DetourClassFunc((BYTE*)this->GetBase() + 0x1F8503, (BYTE*)c_simulation_unit_entity_definition_creation_encode, 10);
+		VirtualProtect(pc_simulation_unit_entity_definition_encode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	/*
-		TODO(PermaNull): AI - Permutation Sync - Breaks otherstuff has to be modified a bit.
+		//This decodes the unit creation packet, only gets executed on client.
+		pc_simulation_unit_entity_definition_decode = (tc_simulation_unit_entity_definition_creation_decode)DetourClassFunc((BYTE*)this->GetBase() + 0x1F8557, (BYTE*)c_simulation_unit_entity_definition_creation_decode, 11);
+		VirtualProtect(pc_simulation_unit_entity_definition_decode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
+		//Only patch the object_new call on host during AI_Place function, no reason to hook all object_new calls.
 		PatchCall(GetBase() + 0x318DEC, object_new_hook);
+
+		//We update creation data here which is used later on to add data to the packet
 		PatchCall(GetBase() + 0x1F807A, set_unit_creation_data_hook);
 		pset_unit_creation_data = (tset_unit_creation_data)(GetBase() + 0x1F24ED);
 
-		VirtualProtect(((char*)h2mod->GetBase() + 0x1F3B48), 1, PAGE_EXECUTE_READWRITE, &dwBack);
-		VirtualProtect(((char*)h2mod->GetBase() + 0x1F3C09), 1, PAGE_EXECUTE_READWRITE, &dwBack);
+		VirtualProtect(((char*)h2mod->GetBase() + 0x1F8029), 1, PAGE_EXECUTE_READWRITE, &dwBack); // we have to update privileges on the memory so we can write to it since it's part of the actual game code.
+		memset(((char*)h2mod->GetBase() + 0x1F8029), 0x28, 1); // updates the size of creation_data allocated for the c_unit_simulation_entity_definition
 
-		memset(((char*)h2mod->GetBase() + 0x1F3B48), 0x20, 1);
-		memset(((char*)h2mod->GetBase() + 0x1F3C09), 0x20, 1);
-
+		// Hooks a call within the creat_unit property on the client side in order to set their permutation index before spawn.
 		PatchCall(GetBase() + 0x1F9E6C, create_unit_hook);
 		pcreate_unit_hook = (tcreate_unit_hook)(GetBase() + 0x001F32DB);
 
+		// Hooks the part of the unit spawn from simulation that handles setting their color data in order to ensure AI do not have their color overridden
 		PatchCall(GetBase() + 0x1F9E34, set_unit_color_data_hook);
-		pset_unit_color_data = (tset_unit_color_data)(GetBase() + 0x006E5C3);*/
+		pset_unit_color_data = (tset_unit_color_data)(GetBase() + 0x006E5C3);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0xD03ED, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);

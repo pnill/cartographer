@@ -184,8 +184,7 @@ void GunGame::levelUpServer(int PlayerIndex)
 		sendGrenadePacket(GrenadeType::Frag, 0, PlayerIndex, 1);
 		sendGrenadePacket(GrenadeType::Plasma, 0, PlayerIndex, 1);
 		GivePlayerWeapon(PlayerIndex, LevelWeapon, 1);
-		GivePlayerWeapon2(PlayerIndex, Weapon::plasma_pistol, 7);
-
+		
 	}
 }
 

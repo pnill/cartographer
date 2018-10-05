@@ -6,6 +6,7 @@
 #include "H2Config.h"
 #include "H2OnscreenDebugLog.h"
 #include "H2Startup.h"
+#include "H2Mod_Achievement.h"
 
 extern SOCKET boundsock;
 
@@ -445,6 +446,11 @@ void CUserManagement::ConfigureUser(XNADDR* pxna, ULONGLONG xuid, char* username
 	Users[0].bValid = true;
 
 	this->UpdateConnectionStatus();
+
+	//We want achievements loaded as early as possible, but we can't do it until after we have the XUID.
+	std::thread(Achievement_GetAll).detach();
+
+
 }
 
 BOOL CUserManagement::GetLocalXNAddr(XNADDR* pxna)
