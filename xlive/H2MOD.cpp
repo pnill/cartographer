@@ -165,7 +165,7 @@ signed int __cdecl object_new_hook(void *pObject)
 bool bitstream_write_bool(void *packet, char* string_data, bool value)
 {
 	typedef bool(__thiscall *tbitstream_write_bool)(void* packet, char* string_data, bool value);
-	tbitstream_write_bool ptbitstream_write_bool = (tbitstream_write_bool)((char*)h2mod->GetBase() + 0xD1886);
+	tbitstream_write_bool ptbitstream_write_bool = (tbitstream_write_bool)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCDE40 : 0xD1886));
 
 	return ptbitstream_write_bool(packet, string_data, value);
 }
@@ -174,7 +174,7 @@ int bitstream_write_uint(void* packet, char* string_data, unsigned int value, si
 {
 
 	typedef int(__thiscall *tbitstream_write_uint)(void* packet, char* string_data, unsigned int value, signed int bit_size);
-	tbitstream_write_uint pbitstream_write_uint = (tbitstream_write_uint)((char*)h2mod->GetBase() + 0xD17C6);
+	tbitstream_write_uint pbitstream_write_uint = (tbitstream_write_uint)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCDD80 : 0xD17C6));
 
 	return pbitstream_write_uint(packet, string_data, value, bit_size);
 }
@@ -183,7 +183,7 @@ int bitstream_write_uint(void* packet, char* string_data, unsigned int value, si
 bool bitstream_read_bool(void *packet, char* string_data)
 {
 	typedef bool(__thiscall *tbitstream_read_bool)(void* packet, char* string_data);
-	tbitstream_read_bool ptbitstream_read_bool = (tbitstream_read_bool)((char*)h2mod->GetBase() + 0xD1F47);
+	tbitstream_read_bool ptbitstream_read_bool = (tbitstream_read_bool)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCE501 : 0xD1F47));
 
 	return ptbitstream_read_bool(packet, string_data);
 }
@@ -192,7 +192,7 @@ int bitstream_read_uint(void* packet, char* string_data, signed int bit_size)
 {
 
 	typedef int(__thiscall *tbitstream_read_uint)(void* packet, char* string_data, signed int bit_size);
-	tbitstream_read_uint pbitstream_read_uint = (tbitstream_read_uint)((char*)h2mod->GetBase() + 0xD1EE5);
+	tbitstream_read_uint pbitstream_read_uint = (tbitstream_read_uint)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCE49F : 0xD1EE5));
 
 	return pbitstream_read_uint(packet, string_data,bit_size);
 }
@@ -1452,6 +1452,37 @@ void __cdecl GetGameVersion(DWORD *xlive_version, DWORD *build_version, DWORD *b
 	*build_version2 = GAME_BUILD;
 }
 
+void H2MOD::ApplyUnitHooks()
+{
+	DWORD dwBack;
+
+	//This encodes the unit creation packet, only gets executed on host.
+	pc_simulation_unit_entity_definition_encode = (tc_simulation_unit_entity_definition_creation_encode)DetourClassFunc((BYTE*)this->GetBase() + (h2mod->Server ? 0x1E2269 : 0x1F8503), (BYTE*)c_simulation_unit_entity_definition_creation_encode, 10);
+	VirtualProtect(pc_simulation_unit_entity_definition_encode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	//This decodes the unit creation packet, only gets executed on client.
+	pc_simulation_unit_entity_definition_decode = (tc_simulation_unit_entity_definition_creation_decode)DetourClassFunc((BYTE*)this->GetBase() + (h2mod->Server ? 0x1E22BD : 0x1F8557), (BYTE*)c_simulation_unit_entity_definition_creation_decode, 11);
+	VirtualProtect(pc_simulation_unit_entity_definition_decode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	//Only patch the object_new call on host during AI_Place function, no reason to hook all object_new calls.
+	PatchCall(GetBase() + (h2mod->Server ? 0x2C3B56 : 0x318DEC), object_new_hook);
+
+	//We update creation data here which is used later on to add data to the packet
+	PatchCall(GetBase() + (h2mod->Server ? 0x1E1DE0 : 0x1F807A), set_unit_creation_data_hook);
+	pset_unit_creation_data = (tset_unit_creation_data)(GetBase() + (h2mod->Server ? 0x1DD586 : 0x1F24ED));
+
+	VirtualProtect((char*)h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029), 1, PAGE_EXECUTE_READWRITE, &dwBack); // we have to update privileges on the memory so we can write to it since it's part of the actual game code.
+	memset(((char*)h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029)), 0x28, 1); // updates the size of creation_data allocated for the c_unit_simulation_entity_definition
+
+	// Hooks a call within the creat_unit property on the client side in order to set their permutation index before spawn.
+	PatchCall(GetBase() + (h2mod->Server ? 0x1E3BD4 : 0x1F9E6C), create_unit_hook);
+	pcreate_unit_hook = (tcreate_unit_hook)(GetBase() + (h2mod->Server ? 0x1DE374 : 0x1F32DB));
+
+	// Hooks the part of the unit spawn from simulation that handles setting their color data in order to ensure AI do not have their color overridden
+	PatchCall(GetBase() + (h2mod->Server ? 0x1E3B9C : 0x1F9E34), set_unit_color_data_hook);
+	pset_unit_color_data = (tset_unit_color_data)(GetBase() + (h2mod->Server ? 0x6D1BF : 0x6E5C3));
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1493,33 +1524,6 @@ void H2MOD::ApplyHooks() {
 
 		PatchCall(GetBase() + 0x49E95, onGameEngineChange);
 		p_originalFunc = (originalFunc)(GetBase() + 0x5912D);
-
-
-		//This encodes the unit creation packet, only gets executed on host.
-		pc_simulation_unit_entity_definition_encode = (tc_simulation_unit_entity_definition_creation_encode)DetourClassFunc((BYTE*)this->GetBase() + 0x1F8503, (BYTE*)c_simulation_unit_entity_definition_creation_encode, 10);
-		VirtualProtect(pc_simulation_unit_entity_definition_encode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		//This decodes the unit creation packet, only gets executed on client.
-		pc_simulation_unit_entity_definition_decode = (tc_simulation_unit_entity_definition_creation_decode)DetourClassFunc((BYTE*)this->GetBase() + 0x1F8557, (BYTE*)c_simulation_unit_entity_definition_creation_decode, 11);
-		VirtualProtect(pc_simulation_unit_entity_definition_decode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		//Only patch the object_new call on host during AI_Place function, no reason to hook all object_new calls.
-		PatchCall(GetBase() + 0x318DEC, object_new_hook);
-
-		//We update creation data here which is used later on to add data to the packet
-		PatchCall(GetBase() + 0x1F807A, set_unit_creation_data_hook);
-		pset_unit_creation_data = (tset_unit_creation_data)(GetBase() + 0x1F24ED);
-
-		VirtualProtect(((char*)h2mod->GetBase() + 0x1F8029), 1, PAGE_EXECUTE_READWRITE, &dwBack); // we have to update privileges on the memory so we can write to it since it's part of the actual game code.
-		memset(((char*)h2mod->GetBase() + 0x1F8029), 0x28, 1); // updates the size of creation_data allocated for the c_unit_simulation_entity_definition
-
-		// Hooks a call within the creat_unit property on the client side in order to set their permutation index before spawn.
-		PatchCall(GetBase() + 0x1F9E6C, create_unit_hook);
-		pcreate_unit_hook = (tcreate_unit_hook)(GetBase() + 0x001F32DB);
-
-		// Hooks the part of the unit spawn from simulation that handles setting their color data in order to ensure AI do not have their color overridden
-		PatchCall(GetBase() + 0x1F9E34, set_unit_color_data_hook);
-		pset_unit_color_data = (tset_unit_color_data)(GetBase() + 0x006E5C3);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0xD03ED, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1634,6 +1638,7 @@ void H2MOD::ApplyHooks() {
 
 	//apply any network hooks
 	network->applyNetworkHooks();
+	ApplyUnitHooks();
 }
 
 VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)

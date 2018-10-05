@@ -135,6 +135,7 @@ public:
 		void DisableSound(int sound);
 		void PatchWeaponsInteraction(bool b_Enable);		
 		void securityPacketProcessing();
+		void ApplyUnitHooks();
 		EngineType GetEngineType();
 		wchar_t* GetLobbyGameVariantName();
 		void exit_game();
