@@ -4651,6 +4651,9 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFF03, "Installing Updates...");
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFF003, "Failed to run updater app!");
 	add_cartographer_label(CMLabelMenuId_Update, 4, "Cancel");
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF2, "Download the following:\n");
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF3, "Install the following:\n");
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF4, "Up to date!");
 
 
 	add_cartographer_label(CMLabelMenuId_Update_Note, 0xFFFFFFF0, "Outdated Version!");

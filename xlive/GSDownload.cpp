@@ -361,7 +361,7 @@ static void FetchUpdateDetails() {
 			break;
 	}
 
-	std::string im_lazy = "Download the Following:\n";
+	std::string im_lazy = "";
 
 	for (int i = 0; i < entry_count; i++) {
 		if (UpdateFileEntries[i]->need_to_update == 2) {
@@ -370,16 +370,27 @@ static void FetchUpdateDetails() {
 		}
 	}
 
-	std::string im_lazy1 = "Install the Following:\n";
-	im_lazy += im_lazy1;
+	//Download the following:
+	if (im_lazy.length() > 0)
+		im_lazy = H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFFFFF2) + im_lazy;
+
+	std::string im_lazy1 = "";
 
 	for (int i = 0; i < entry_count; i++) {
 		if (UpdateFileEntries[i]->need_to_update == 1 && UpdateFileEntries[i]->location_id > 0) {
 			std::string im_lazy2 = UpdateFileEntries[i]->local_name;
 			std::string im_lazy3 = H2UpdateLocationsStr[UpdateFileEntries[i]->location_id];
-			im_lazy += im_lazy3 + "\\" + im_lazy2 + "\n";
+			im_lazy1 += im_lazy3 + "\\" + im_lazy2 + "\n";
 		}
 	}
+
+	//Install the following:
+	if (im_lazy1.length() > 0)
+		im_lazy += H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFFFFF3) + im_lazy1;
+
+	//Up to date.
+	if (im_lazy.length() <= 0)
+		im_lazy = H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFFFFF4);
 
 	extern char* Auto_Update_Text;
 	char* Auto_Update_Text_alt = Auto_Update_Text;
