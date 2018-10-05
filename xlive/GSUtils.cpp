@@ -233,7 +233,7 @@ void pushHostLobby() {
 
 	addDebugText("Pushing open lobby.");
 
-	int socketDescriptor;
+	SOCKET socketDescriptor;
 	struct sockaddr_in serverAddress;
 	if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		addDebugText("ERROR: Could not create socket.");
@@ -246,6 +246,8 @@ void pushHostLobby() {
 		//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)
 		addDebugText("ERROR: Failed to push open lobby.");
 	}
+
+	closesocket(socketDescriptor);
 }
 
 char* custom_label_literal(char* label_escaped) {

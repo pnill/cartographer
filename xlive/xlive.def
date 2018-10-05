@@ -106,7 +106,7 @@ EXPORTS
 	XLiveUpdateSystem						@5024	
 	XLiveGetLiveIdError						@5025
 	XLiveSetSponsorToken					@5026	
-	XLiveSecureLoadLibraryW					@5028	
+	XLiveLoadLibraryEx					    @5028	
 	XLiveSecureFreeLibrary					@5029	
 	XLivePreTranslateMessage				@5030	
 	XLiveSetDebugLevel						@5031	

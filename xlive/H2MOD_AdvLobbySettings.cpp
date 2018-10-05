@@ -1,9 +1,6 @@
 #include "H2MOD_AdvLobbySettings.h"
-#include <h2mod.pb.h>
 #include "Globals.h"
 #include "H2OnscreenDebugLog.h"
-#include "GSCustomMenu.h"
-#include "H2Tweaks.h"
 
 bool AdvLobbySettings_mp_explosion_physics = false;
 bool AdvLobbySettings_mp_sputnik = false;
@@ -29,7 +26,7 @@ static std::chrono::time_point<std::chrono::system_clock> lastReq;
 static std::chrono::time_point<std::chrono::system_clock> firstReq;
 
 static void actuallySendPacket() {
-	if (!gameManager->isHost() || h2mod->get_engine_type() != EngineType::MULTIPLAYER_ENGINE)
+	if (!gameManager->isHost() || h2mod->GetEngineType() != EngineType::MULTIPLAYER_ENGINE)
 		return;
 
 	TRACE_GAME("[h2mod] Sending AdvLobbySettings.");
@@ -66,7 +63,7 @@ static void actuallySendPacket() {
 
 void AdvLobbySettings::sendLobbySettingsPacket()
 {
-	if (!gameManager->isHost() || h2mod->get_engine_type() != EngineType::MULTIPLAYER_ENGINE)
+	if (!gameManager->isHost() || h2mod->GetEngineType() != EngineType::MULTIPLAYER_ENGINE)
 		return;
 	
 	lastReq = std::chrono::system_clock::now() + std::chrono::milliseconds(4000);

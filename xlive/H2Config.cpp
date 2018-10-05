@@ -84,8 +84,6 @@ int H2Config_fps_limit = 60;
 int H2Config_static_lod_state = static_lod::cinematic;
 int H2Config_field_of_view = 0;
 float H2Config_crosshair_offset = NAN;
-int H2Config_sens_controller = 0;
-int H2Config_sens_mouse = 0;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
@@ -261,14 +259,6 @@ void SaveH2Config() {
 			fputs("\n# <0 to 0.53> - NaN disables the built in Crosshair adjustment.", fileConfig);
 			fputs("\n\n", fileConfig);
 
-			fputs("# controller_sensitivity Option (Client):", fileConfig);
-			fputs("\n# <value> Change controller sensitivity to your preference.", fileConfig);
-			fputs("\n\n", fileConfig);
-
-			fputs("# mouse_sensitivity Option (Client):", fileConfig);
-			fputs("\n# <value> Change mouse sensitivity to your preference.", fileConfig);
-			fputs("\n\n", fileConfig);
-
 			fputs("# disable_ingame_keyboard Options (Client):", fileConfig);
 			fputs("\n# 0 - Normal Game Controls.", fileConfig);
 			fputs("\n# 1 - Disables ONLY Keyboard when in-game & allows controllers when game is not in focus.", fileConfig);
@@ -430,12 +420,6 @@ void SaveH2Config() {
 				sprintf(settingOutBuffer, "\ncrosshair_offset = %f", H2Config_crosshair_offset);
 				fputs(settingOutBuffer, fileConfig);
 			}
-			sprintf(settingOutBuffer, "\ncontroller_sensitivity = %d", H2Config_sens_controller);
-			fputs(settingOutBuffer, fileConfig);
-
-			sprintf(settingOutBuffer, "\nmouse_sensitivity = %d", H2Config_sens_mouse);
-			fputs(settingOutBuffer, fileConfig);
-
 			fputs("\ndisable_ingame_keyboard = ", fileConfig); fputs(H2Config_disable_ingame_keyboard ? "1" : "0", fileConfig);
 
 			fputs("\nhide_ingame_chat = ", fileConfig); fputs(H2Config_hide_ingame_chat ? "1" : "0", fileConfig);
@@ -1002,30 +986,6 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			else {
 				H2Config_crosshair_offset = tempfloat1;
 				est_crosshair_offset = true;
-			}
-		}
-		else if (!H2IsDediServer && sscanf(fileLine, "controller_sensitivity =%d", &tempint1) == 1) {
-			if (est_sens_controller) {
-				duplicated = true;
-			}
-			else if (!(tempint1 >= 0)) {
-				incorrect = true;
-			}
-			else {
-				H2Config_sens_controller = tempint1;
-				est_sens_controller = true;
-			}
-		}
-		else if (!H2IsDediServer && sscanf(fileLine, "mouse_sensitivity =%d", &tempint1) == 1) {
-			if (est_sens_mouse) {
-				duplicated = true;
-			}
-			else if (!(tempint1 >= 0)) {
-				incorrect = true;
-			}
-			else {
-				H2Config_sens_mouse = tempint1;
-				est_sens_mouse = true;
 			}
 		}
 		else if (!H2IsDediServer && ownsConfigFile && sscanf(fileLine, "disable_ingame_keyboard =%d", &tempint1) == 1) {

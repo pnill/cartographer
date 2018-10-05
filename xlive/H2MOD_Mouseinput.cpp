@@ -1,8 +1,6 @@
 #include "H2MOD_Mouseinput.h"
 #include <Windows.h>
 #include "H2MOD.h"
-#include "xliveless.h"
-#include "Hook.h"
 
 typedef struct DIMOUSESTATE {
 	LONG lX;

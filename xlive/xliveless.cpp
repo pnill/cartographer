@@ -918,10 +918,6 @@ int WINAPI XNetDnsRelease (void * pxndns)
 PBYTE pb_data;
 UINT cb_data;
 
-//if (comm_socket == INVALID_SOCKET)
-//{
-//	comm_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-
 // #69: XNetQosListen
 DWORD WINAPI XNetQosListen( XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec, DWORD dwFlags )
 {
@@ -2940,9 +2936,10 @@ enum class ContextPresence {
 	singleplayer,
 	lobby,
 	results,
-	public_game = 7,
-	invite_only_game,
-	closed_game
+	live_in_game,
+	public_game, 
+	invite_only_game, 
+	network_in_game
 };
 
 DWORD diff_level;
@@ -2995,7 +2992,8 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 		}
 		case ContextPresence::public_game:
 		case ContextPresence::invite_only_game:
-		case ContextPresence::closed_game:
+		case ContextPresence::network_in_game:
+		case ContextPresence::live_in_game:
 		{
 			int game_engine_type = *reinterpret_cast<BYTE*>(GameEngineGlobals + 0xC54);
 
@@ -4873,9 +4871,6 @@ DWORD WINAPI XLivePBufferSetByte (FakePBuffer * pBuffer, DWORD offset, BYTE valu
 
 	pBuffer->pbData[offset] = value;
 
-	if (offset == 0)
-		pBuffer->pbData[offset] = 0; //no need of MF.dll anymore
-
 	return 0;
 }
 
@@ -5549,20 +5544,19 @@ DWORD WINAPI XMarketplaceGetImageUrl( char *a1, DWORD a2, DWORD a3, DWORD a4, WC
 
 
 // 5028: ??
-DWORD WINAPI XLiveSecureLoadLibraryW( LPCWSTR libFileName, DWORD a2, DWORD dwFlags )
+DWORD WINAPI XLiveLoadLibraryEx(LPCWSTR libFileName, HINSTANCE *a2, DWORD dwFlags)
 {
-  TRACE("XLiveSecureLoadLibraryW  (?? - FIXME)  (libFileName = %s, a2 = %X, flags = %X)",
-		libFileName, a2, dwFlags );
+	TRACE("XLiveLoadLibraryEx (?? - FIXME)  (libFileName = %s, a2 = %X, flags = %X)",
+		libFileName, a2, dwFlags);
 
+	HINSTANCE hInstance = LoadLibraryExW(libFileName, NULL, dwFlags);
 
-	// not done - error now
-  return 0x80070032;
+	if (!hInstance)
+		return 0x80070057;
+
+	*a2 = hInstance;
+	return 0;
 }
-
-
-// 5230: ??
-
-
 
 // 5231: ??
 

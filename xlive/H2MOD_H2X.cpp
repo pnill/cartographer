@@ -1,6 +1,5 @@
 #include <Windows.h>
 #include "H2MOD_H2X.h"
-#include "xliveless.h"
 #include "H2MOD.h"
 
 void H2X::Initialize()
