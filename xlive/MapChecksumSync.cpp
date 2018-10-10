@@ -257,7 +257,7 @@ void MapChecksumSync::SendState()
 			proto_elem->set_value(elem.second);
 		}
 	}
-	network->send_h2mod_packet(packet);
+//	network->send_h2mod_packet(packet);
 }
 
 void MapChecksumSync::HandlePacket(const H2ModPacket &packet)

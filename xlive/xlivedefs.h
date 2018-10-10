@@ -1007,76 +1007,60 @@ typedef enum
     XMARKETPLACE_OFFERING_TYPE_AVATARITEM = 0x00100000
 } XMARKETPLACE_OFFERING_TYPE;
  
+typedef DWORD                                   XHV_LOCK_TYPE;
+
+#define XHV_LOCK_TYPE_LOCK                      0
+#define XHV_LOCK_TYPE_TRYLOCK                   1
+#define XHV_LOCK_TYPE_UNLOCK                    2
+#define XHV_LOCK_TYPE_COUNT                     3
 
 
-// fixme
 class IXHV2ENGINE
 {
 public:
 	IXHV2ENGINE::IXHV2ENGINE();
-
-
 	// 2F0 bytes = actual size
 	// - note: check all INT return values - may not be true
 
-	INT Dummy1( VOID *pThis );	// 00
-	INT Dummy2( VOID *pThis );	// 04
-	HRESULT Dummy3( VOID *pThis, int a );	// 08
+	LONG AddRef( VOID *pThis );	// 00
+	LONG Release( VOID *pThis );	// 04
+	HRESULT Lock( VOID *pThis, XHV_LOCK_TYPE lockType );	// 08
 
-	HRESULT StartLocalProcessingModes( VOID *pThis, DWORD dwUserIndex, /* CONST PXHV_PROCESSING_MODE*/ VOID *processingModes, DWORD dwNumProcessingModes );
+	HRESULT StartLocalProcessingModes( VOID *pThis, DWORD dwUserIndex, /* CONST PXHV_PROCESSING_MODE*/ VOID *processingModes, DWORD dwNumProcessingModes);
 	HRESULT StopLocalProcessingModes( VOID *pThis, DWORD dwUserIndex, /*CONST PXHV_PROCESSING_MODE*/ VOID *processingModes, DWORD dwNumProcessingModes );
 
-	HRESULT StartRemoteProcessingModes( VOID *pThis, int a1, int a2, int a3, int a4 );
-	HRESULT Dummy7( VOID *pThis, int a1, int a2, int a3, int a4 );	// 18
+	HRESULT StartRemoteProcessingModes( VOID *pThis, XUID xuidRemoteTalker, int a2, int a3);
+	HRESULT StopRemoteProcessingModes( VOID *pThis, XUID xuidRemoteTalker, /*CONST PXHV_PROCESSING_MODE*/ VOID* a2, int a3);	// 18
 
-	HRESULT Dummy8( VOID *pThis, int a1 );	// 1C
+	HRESULT NullSub( VOID *pThis, int a1 );	// 1C
 
 	HRESULT RegisterLocalTalker( VOID *pThis, DWORD dwUserIndex );
 	HRESULT UnregisterLocalTalker( VOID *pThis, DWORD dwUserIndex );
 
-	HRESULT Dummy11( VOID *pThis, int a1, int a2, int a3, int a4, int a5 );	// 28
-	HRESULT UnregisterRemoteTalker( VOID *pThis, int a1, int a2 );
+	HRESULT RegisterRemoteTalker( VOID *pThis, XUID a1, LPVOID reserved,LPVOID reserved2, LPVOID reserved3 );	// 28
+	HRESULT UnregisterRemoteTalker( VOID *pThis, XUID a1);
 
-	HRESULT Dummy13( VOID *pThis, int a1, int a2 );	// 30	
+	HRESULT GetRemoteTalkers( VOID *pThis, PDWORD pdwRemoteTalkersCount, PXUID pxuidRemoteTalkers);	// 30	
 	BOOL IsLocalTalking(VOID *pThis, DWORD dwUserIndex);
-	BOOL isRemoteTalking(VOID *pThis, XUID xuid);
+	BOOL isRemoteTalking(VOID *pThis, XUID xuidRemoteTalker);
 	BOOL IsHeadsetPresent(VOID *pThis, DWORD dwUserIndex);
 
 	DWORD GetDataReadyFlags( VOID *pThis );
 
 	HRESULT GetLocalChatData( VOID *pThis, DWORD dwUserIndex, PBYTE pbData, PDWORD pdwSize, PDWORD pdwPackets );
-	HRESULT SetPlaybackPriority( VOID *pThis, int a1, int a2, int a3, int a4 );
+	HRESULT SetPlaybackPriority( VOID *pThis, XUID xuidRemoteTalker, DWORD dwUserIndex, int a3);
 
-	HRESULT Dummy20( VOID *pThis, int a1, int a2, int a3, int a4 );	// 4C
-
-
-
-	// possible does not exist
-	HRESULT Dummy21( VOID *pThis );	// 54
-	HRESULT Dummy22( VOID *pThis );	// 58
-	HRESULT Dummy23( VOID *pThis );	// 5C
-	HRESULT Dummy24( VOID *pThis );	// 60
-
-	HRESULT Dummy25( VOID *pThis );	// 64
-	HRESULT Dummy26( VOID *pThis );	// 68
-	HRESULT Dummy27( VOID *pThis );	// 6C
-	HRESULT Dummy28( VOID *pThis );	// 70
-
-	HRESULT Dummy29( VOID *pThis );	// 74
-	HRESULT Dummy30( VOID *pThis );	// 78
-	HRESULT Dummy31( VOID *pThis );	// 7C
-	HRESULT Dummy32( VOID *pThis );	// 80
-
-
-
-
-
+	HRESULT SubmitIncomingChatData( VOID *pThis, XUID xuidRemoteTalker, const BYTE* pbData, PDWORD pdwSize);	// 4C
+	
 	typedef void (IXHV2ENGINE::*HV2FUNCPTR)(void);
+
 
 	// ugly, low-skilled hackaround
 	HV2FUNCPTR *funcTablePtr;
 	HV2FUNCPTR funcPtr[100];
 	HV2FUNCPTR func2;
+
+	bool locked = false;
 };
 
 typedef IXHV2ENGINE *PIXHV2ENGINE;
@@ -1155,6 +1139,32 @@ typedef struct {
     DWORD dwPointsPrice;
 } XMARKETPLACE_CONTENTOFFER_INFO, *PXMARKETPLACE_CONTENTOFFER_INFO;
 
+
+
+typedef DWORD                                   XHV_PROCESSING_MODE, *PXHV_PROCESSING_MODE;
+typedef DWORD                                   XHV_PLAYBACK_PRIORITY;
+typedef VOID(*PFNMICRAWDATAREADY)(
+	IN  DWORD                                   dwUserIndex,
+	IN  PVOID                                   pvData,
+	IN  DWORD                                   dwSize,
+	IN  PBOOL                                   pVoiceDetected
+	);
+
+typedef DWORD                                   XHV_LOCK_TYPE;
+
+typedef struct XHV_INIT_PARAMS
+{
+	DWORD                                       dwMaxRemoteTalkers;
+	DWORD                                       dwMaxLocalTalkers;
+	PXHV_PROCESSING_MODE                        localTalkerEnabledModes;
+	DWORD                                       dwNumLocalTalkerEnabledModes;
+	PXHV_PROCESSING_MODE                        remoteTalkerEnabledModes;
+	DWORD                                       dwNumRemoteTalkerEnabledModes;
+	BOOL                                        bCustomVADProvided;
+	BOOL                                        bRelaxPrivileges;
+	PFNMICRAWDATAREADY                          pfnMicrophoneRawDataReady;
+	HWND                                        hwndFocus;
+} XHV_INIT_PARAMS, *PXHV_INIT_PARAMS;
 
 typedef struct _STRING_DATA {
     WORD wStringSize;

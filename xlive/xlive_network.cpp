@@ -9,7 +9,7 @@
 #include <mutex>
 #include "Globals.h"
 #include "H2Config.h"
-
+#include "H2MOD_UPNP.h"
 SOCKET boundsock = INVALID_SOCKET;
 SOCKET game_sock = INVALID_SOCKET;
 SOCKET game_sock_1000 = INVALID_SOCKET;
@@ -29,9 +29,21 @@ float getElapsedNetworkTime(void) {
 	return (float)((c.QuadPart - counterAtStart.QuadPart) * 1000.0f / (float)timerFreq.QuadPart);
 }
 
+ModuleUPnP *upnp = NULL;
+
+
+void ForwardPorts()
+{
+	upnp->UPnPForwardPort(true, H2Config_base_port + 10, H2Config_base_port + 10, "Halo2_QoS");
+	upnp->UPnPForwardPort(true, H2Config_base_port + 7, H2Config_base_port + 7, "Halo2_voice");
+	upnp->UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2");
+	upnp->UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2_2");
+
+}
 // #5310: XOnlineStartup
 int WINAPI XOnlineStartup()
 {
+	upnp = new ModuleUPnP;
 	//TRACE("XOnlineStartup");
 	ServerStatus = new char[250];
 	QueryPerformanceFrequency(&timerFreq);
@@ -39,6 +51,7 @@ int WINAPI XOnlineStartup()
 
 	snprintf(ServerStatus, 250, "Status: Initializing....");
 	
+
 	boundsock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
 	if (boundsock == INVALID_SOCKET)
@@ -46,9 +59,44 @@ int WINAPI XOnlineStartup()
 		TRACE("XOnlineStartup - We couldn't intialize our socket");
 	}
 
+	std::thread(ForwardPorts).detach();
+
 	return 0;
 }
 
+
+
+SOCKET voice_sock = NULL;
+// #3: XCreateSocket
+SOCKET WINAPI XCreateSocket(int af, int type, int protocol)
+{
+
+
+	//  TRACE("XCreateSocket (%d, %d, %d)", af, type, protocol);
+
+	TRACE_GAME("XCreateSocket af = %i, type = %i, protocol = %i", af, type, protocol);
+	bool vdp = false;
+	if (protocol == 254)
+	{
+		vdp = true;
+		protocol = IPPROTO_UDP; // We can't support VDP (Voice / Data Protocol) it's some encrypted crap which isn't standard.
+	}
+
+	SOCKET ret = socket(af, type, protocol);
+
+	if (vdp)
+	{
+		TRACE_GAME_N("Socket: %08X was VDP", ret);
+		voice_sock = ret;
+	}
+
+	if (ret == INVALID_SOCKET)
+	{
+		TRACE("XCreateSocket - INVALID_SOCKET");
+	}
+
+	return ret;
+}
 
 // #5332: XSessionEnd
 int WINAPI XSessionEnd(DWORD, DWORD)
@@ -77,7 +125,14 @@ INT WINAPI XNetCleanup()
 // #11: XSocketBind
 SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 {
+
+
 	int port = (((struct sockaddr_in*)name)->sin_port);
+
+	if (s == voice_sock)
+	{
+		TRACE_GAME_N("[h2mod-voice] Game bound potential voice socket to : %i", ntohs(port));
+	}
 
 	if (ntohs(port) == 1001)
 	{
@@ -98,6 +153,8 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 		TRACE("game_sock set for port %i", ntohs(port));
 		TRACE("base_port set to %i instead of %i", ntohs(nport), ntohs(port));
 		TRACE("g_port was set to %i", H2Config_base_port);
+
+
 	}
 
 	if (ntohs(port) == 1002)
@@ -233,9 +290,6 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 
 		return sendto(s, buf, len, flags, to, tolen);
 	}
-
-	//TRACE("XSocketSendTo: ( %08X:%i )", iplong, htons(port));
-
 		
 		/*
 			Create new SOCKADDR_IN structure,
@@ -255,7 +309,6 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		 1001-> User.pmap_b[secureaddress]
 		*/
 		int nPort = 0;
-
 		switch (htons(port))
 		{
 			case 1000:
@@ -265,6 +318,9 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 				{
 					//TRACE("XSocketSendTo() port 1000 nPort: %i secure: %08X", htons(nPort), iplong);
 					SendStruct.sin_port = nPort;
+				}
+				else {
+					SendStruct.sin_port = ntohs(2000);
 				}
 
 			break;
@@ -277,6 +333,9 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 					//TRACE("XSocketSendTo() port 1001 nPort: %i secure: %08X", htons(nPort), iplong);
 					SendStruct.sin_port = nPort;
 				}
+				else {
+					SendStruct.sin_port = ntohs(2001);
+				}
 
 			break;
 
@@ -286,6 +345,17 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		}
 
 		u_long xn = User.xnmap[iplong];
+		
+		if (xn != join_game_xn.ina.s_addr)
+		{
+			std::pair <ULONG, SHORT> hostpair = std::make_pair(xn, ntohs(2001));
+			std::pair <ULONG, SHORT> hostpair2 = std::make_pair(xn, htons(2000));
+			User.smap[hostpair] = iplong;
+			User.smap[hostpair2] = iplong;
+
+			TRACE_GAME_N("[h2mod-socket] XSocketSendTo: ( secureAddr: %08X xn: %08X  - %i ) nPort: %i", iplong, xn, htons(port), htons(nPort));
+			//xn = join_game_xn.ina.s_addr;
+		}
 
 		if (xn != 0)
 		{
@@ -360,6 +430,11 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 			ULONG secure = User.smap[hostpair];
 
 			(((struct sockaddr_in*)from)->sin_addr.s_addr) = secure;
+
+			if (iplong != join_game_xn.ina.s_addr)
+			{
+				TRACE_GAME_N("[h2mod-socket] Got data from non-host IP xn: %08X, secure: %08X, port: %i", iplong, secure, htons(port));
+			}
 
 			if (secure == 0)
 			{
