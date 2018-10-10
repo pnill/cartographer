@@ -3286,6 +3286,148 @@ static void updateAccountingActiveHandle(bool active) {
 
 static bool accountingGoBackToList = false;
 
+void GSCustomMenuCall_AccountEdit();
+
+const int CMLabelMenuId_Invalid_Login_Token = 0xFF000017;
+#pragma region CM_Invalid_Login_Token
+
+void __stdcall CMLabelButtons_Invalid_Login_Token(int a1, int a2)
+{
+	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+
+	__int16 button_id = *(WORD*)(a1 + 112);
+	int v3 = sub_211909(a1, 6, 0, 0);
+	if (v3)
+	{
+		sub_21bf85_CMLTD(v3, button_id + 1, CMLabelMenuId_Invalid_Login_Token);
+	}
+}
+
+__declspec(naked) void sub_2111ab_CMLTD_nak_Invalid_Login_Token() {//__thiscall
+	__asm {
+		mov eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0xFFFFFFF1//label_id_description
+		push 0xFFFFFFF0//label_id_title
+		push CMLabelMenuId_Invalid_Login_Token
+		push eax
+		push ecx
+		call sub_2111ab_CMLTD//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+static bool CMButtonHandler_Invalid_Login_Token(int button_id) {
+	return true;
+}
+
+__declspec(naked) void sub_20F790_CM_nak_Invalid_Login_Token() {//__thiscall
+	__asm {
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0//selected button id
+		push ecx
+		call sub_20F790_CM//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn
+	}
+}
+
+int __cdecl CustomMenu_Invalid_Login_Token(int);
+
+int(__cdecl *CustomMenuFuncPtrHelp_Invalid_Login_Token())(int) {
+	return CustomMenu_Invalid_Login_Token;
+}
+
+
+void* __stdcall sub_248beb_deconstructor_Login_Token(LPVOID lpMem, char a2)//__thiscall
+{
+	if (accountingGoBackToList && isAccountingActiveHandle()) {
+		GSCustomMenuCall_AccountEdit();
+		accountingGoBackToList = true;
+	}
+
+	updateAccountingActiveHandle(false);
+
+	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
+	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
+
+	sub_248b90((void*)lpMem);
+	if (a2 & 1) {
+		sub_287c23((void*)lpMem);
+	}
+	return (void*)lpMem;
+}
+
+__declspec(naked) void sub_248beb_nak_deconstructor_Login_Token() {//__thiscall
+	__asm {
+		mov  eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push eax
+		push ecx
+		call sub_248beb_deconstructor_Login_Token//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+DWORD* menu_vftable_1_Invalid_Login_Token = 0;
+DWORD* menu_vftable_2_Invalid_Login_Token = 0;
+
+void CMSetupVFTables_Invalid_Login_Token() {
+	CMSetupVFTables(&menu_vftable_1_Invalid_Login_Token, &menu_vftable_2_Invalid_Login_Token, (DWORD)CMLabelButtons_Invalid_Login_Token, (DWORD)sub_2111ab_CMLTD_nak_Invalid_Login_Token, (DWORD)CustomMenuFuncPtrHelp_Invalid_Login_Token, (DWORD)sub_20F790_CM_nak_Invalid_Login_Token, true, (DWORD)sub_248beb_nak_deconstructor_Login_Token);
+}
+
+int __cdecl CustomMenu_Invalid_Login_Token(int a1) {
+	accountingGoBackToList = true;
+	updateAccountingActiveHandle(true);
+	return CustomMenu_CallHead(a1, menu_vftable_1_Invalid_Login_Token, menu_vftable_2_Invalid_Login_Token, (DWORD)&CMButtonHandler_Invalid_Login_Token, 0, 272);
+}
+
+void GSCustomMenuCall_Invalid_Login_Token() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_Invalid_Login_Token);
+	CallWgit(WgitScreenfunctionPtr);
+}
+
+#pragma endregion
+
+
 const int CMLabelMenuId_AccountCreate = 0xFF00000C;
 #pragma region CM_AccountCreate
 
@@ -3382,7 +3524,7 @@ static DWORD WINAPI ThreadCreate(LPVOID lParam)
 static bool CMButtonHandler_AccountCreate(int button_id) {
 	if (button_id == 0) {
 		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
-		GSCustomMenuCall_VKeyboard_Inner((wchar_t*)textBuffer, 32, 0b10010, CMLabelMenuId_AccountCreate, 0xFFFFF002, CMLabelMenuId_AccountCreate, 0xFFFFF003);
+		GSCustomMenuCall_VKeyboard_Inner((wchar_t*)textBuffer, 16, 0b10010, CMLabelMenuId_AccountCreate, 0xFFFFF002, CMLabelMenuId_AccountCreate, 0xFFFFF003);
 	}
 	else if (button_id == 1) {
 		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 2);
@@ -4379,7 +4521,8 @@ int __cdecl sub_209236(int a1) {
 			GSCustomMenuCall_AccountList();
 		}
 		else {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF016, 0xFFFFF017);
+			if (!isAccountingActiveHandle())
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF016, 0xFFFFF017);
 		}
 	}
 	return 0;
@@ -4513,7 +4656,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFFFF0, "Error!", true);
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFFFF1, "Generic Error.", true);
 	add_cartographer_label(CMLabelMenuId_Error, 2, "You... didn't listen didn't you!?");
-	add_cartographer_label(CMLabelMenuId_Error, 3, "Good! You are part of the #dev_preview group (or you got this from the asshole who leaked it). I want you to try and break things and find bugs; since that's what your fucking job is. Now say in the chat that you found #52.");
+	add_cartographer_label(CMLabelMenuId_Error, 3, "Good! You are part of the #dev_preview group (or you got this from the asshole who leaked it). I want you to try and break things and find bugs; since that's what your damn job is.");
 	add_cartographer_label(CMLabelMenuId_Error, 4, "None");
 	add_cartographer_label(CMLabelMenuId_Error, 5, "There are no custom languages catergorised as Other.");
 	add_cartographer_label(CMLabelMenuId_Error, 6, "Error");
@@ -4780,6 +4923,10 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Credits, 16, "from the Halo 2 Community!");
 
 
+	add_cartographer_label(CMLabelMenuId_Invalid_Login_Token, 0xFFFFFFF0, "Invalid Login Token!");
+	add_cartographer_label(CMLabelMenuId_Invalid_Login_Token, 0xFFFFFFF1, "Login Again.");
+
+
 	add_cartographer_label(CMLabelMenuId_AccountCreate, 0xFFFFFFF0, "Create Account");
 	add_cartographer_label(CMLabelMenuId_AccountCreate, 0xFFFFFFF1, "Enter a username, email and password for your new account.");
 	add_cartographer_label(CMLabelMenuId_AccountCreate, 0xFFFFFFF2, "[Username]");
@@ -4899,6 +5046,8 @@ void initGSCustomMenu() {
 	CMSetupVFTables_AdvLobbySettings();
 
 	CMSetupVFTables_Credits();
+
+	CMSetupVFTables_Invalid_Login_Token();
 
 	CMSetupVFTables_AccountCreate();
 
