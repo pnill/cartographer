@@ -4426,7 +4426,7 @@ void CMSetupVFTables_Obscure() {
 	CMSetupVFTables(&menu_vftable_1_Obscure, &menu_vftable_2_Obscure, 0, 0, 0, 0, false, 0);
 }
 
-int Obscure_wgit_id = 30;
+int Obscure_wgit_id = 296;
 
 int __cdecl CustomMenu_Obscure(int a1) {
 	return CustomMenu_CallHead(a1, menu_vftable_1_Obscure, menu_vftable_2_Obscure, (DWORD)&CMButtonHandler_Obscure, 14, Obscure_wgit_id);
@@ -4434,6 +4434,11 @@ int __cdecl CustomMenu_Obscure(int a1) {
 
 void GSCustomMenuCall_Obscure() {
 	int WgitScreenfunctionPtr = (int)(CustomMenu_Obscure);
+	//int WgitScreenfunctionPtr = (int)(H2BaseAddr + 0x0021f5f8);//Network Adapter list.
+	//int WgitScreenfunctionPtr = (int)(H2BaseAddr + 0x0021f681);//About dialog
+	//int WgitScreenfunctionPtr = (int)(H2BaseAddr + 0x0025692c);//keyboard layout
+	//int WgitScreenfunctionPtr = (int)(H2BaseAddr + 0x00259d05);//thumbstick layout
+	//int WgitScreenfunctionPtr = (int)(H2BaseAddr + 0x00259dc0);//button layout
 	CallWgit(WgitScreenfunctionPtr);
 }
 
@@ -4938,7 +4943,7 @@ int prevOpenMethod = 3;
 void CallWgit(int WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) {
 	//int(__thiscall*WgitInitialize)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B0BC);
 	signed int(__thiscall*WgitLoad)(void*, __int16, int, int, int) = (signed int(__thiscall*)(void*, __int16, int, int, int))((char*)H2BaseAddr + 0x20C226);
-	//0x20C258 is another one.
+	//0x0020C258 is another one.
 	//void*(__thiscall*WgitFinalize)(void*) = (void*(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B11E);
 
 	int open_method = open_method2;
@@ -4983,9 +4988,9 @@ void CallWgit(int WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) {
 	}
 
 	void*(__cdecl *MenuHeadSetup)(DWORD*) = (void*(__cdecl*)(DWORD*))menu_setup[7];
-	void* rtnfnl = MenuHeadSetup(menu_setup);
+	void* menu_struct = MenuHeadSetup(menu_setup);
 
-	//void* rtnfnl = WgitFinalize(menu_setup);
+	//void* menu_struct = WgitFinalize(menu_setup);
 
 	//free(menu_setup);
 }
@@ -5176,16 +5181,16 @@ int __cdecl CustomMenu_CallHead(int a1, DWORD* menu_vftable_1, DWORD* menu_vftab
 	int(__cdecl* Allocator)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20D2D8);
 	int(__cdecl* sub_20B8C3)(int, int) = (int(__cdecl*)(int, int))((char*)H2BaseAddr + 0x20B8C3);
 
-	int v2 = 0;
-	int v3 = Allocator(3388);
-	if (v3) {
-		v2 = sub_248B17_CM(v3, *(DWORD*)(a1 + 4), *(DWORD*)(a1 + 8), *(WORD*)(a1 + 2), menu_vftable_1, menu_vftable_2, menu_button_handler, number_of_buttons, menu_wgit_type);
+	int menu_struct = Allocator(3388);
+	int& menu_id = ((int*)menu_struct)[28];
+	if (menu_struct) {
+		menu_struct = sub_248B17_CM(menu_struct, *(DWORD*)(a1 + 4), *(DWORD*)(a1 + 8), *(WORD*)(a1 + 2), menu_vftable_1, menu_vftable_2, menu_button_handler, number_of_buttons, menu_wgit_type);
 	}
-	*(BYTE *)(v2 + 0x6C) = 1;
-	//*(BYTE *)(v2 + 0xd20) = 1;
-	sub_20B8C3(v2, a1);
+	*(BYTE *)(menu_struct + 0x6C) = 1;
+	//*(BYTE *)(menu_struct + 0xd20) = 1;
+	sub_20B8C3(menu_struct, a1);
 
-	return v2;
+	return menu_struct;
 }
 
 #pragma region CM_TestHead_EscSettings
@@ -5308,7 +5313,8 @@ void __stdcall sub_2101a4_CMLTD(int thisptr, int label_id, wchar_t* rtn_label, i
 
 	*rtn_label = 0;
 	if (label_id != -1) {
-		int v3 = sub_20c701(*(DWORD*)(thisptr + 112));
+		int menu_id = *(DWORD*)(thisptr + 112);
+		int v3 = sub_20c701(menu_id);
 		if (v3 != -1) {
 			int v4 = sub_15C9623(v3);
 			if (v4) {
