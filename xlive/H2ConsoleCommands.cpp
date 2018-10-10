@@ -1,9 +1,5 @@
 #include "Globals.h"
-#include <Shlwapi.h>
 #include <fstream>
-#include <sstream>
-#include <string>
-#include <h2mod.pb.h>
 #include "H2Startup.h"
 #include "H2Tweaks.h"
 #include "H2Config.h"
@@ -483,8 +479,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			strcpy(cstr, sensVal.c_str());
 
 			if (isNum(cstr)) {
-				setSens(CONTROLLER, stoi(sensVal)); 
-				H2Config_sens_controller = stoi(sensVal);
+				H2Tweaks::setSens(CONTROLLER, stoi(sensVal));
 			}
 			else {
 				output(L"Wrong input! Use a number.");
@@ -501,8 +496,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			strcpy(cstr, sensVal.c_str());
 
 			if (isNum(cstr)) {
-				setSens(MOUSE, stoi(sensVal));
-				H2Config_sens_mouse = stoi(sensVal);
+				H2Tweaks::setSens(MOUSE, stoi(sensVal));
 			}
 			else {
 				output(L"Wrong input! Use a number.");

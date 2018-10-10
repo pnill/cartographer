@@ -8,7 +8,7 @@ enum InputType
 
 void InitH2Tweaks();
 void DeinitH2Tweaks();
-void setSens(short input_type, int sens);
+
 
 namespace H2Tweaks {
 	void toggleKillVolumes(bool enable);
@@ -24,4 +24,6 @@ namespace H2Tweaks {
 	void setCrosshairPos(float crosshair_offset);
 	void setCrosshairSize(int size, bool preset);
 	void RadarPatch();
+	void applyPlayersActionsUpdateRatePatch();
+	void setSens(InputType input_type, int sens);
 }

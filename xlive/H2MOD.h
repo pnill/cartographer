@@ -6,6 +6,11 @@
 #include <mutex>
 #include "Blam\Enums\Game\GameEngine.h"
 
+constexpr int XLIVE_VERSION = 4; // I don't recommend changing this
+constexpr int GAME_BUILD = 11122;
+
+constexpr signed int NONE = -1;
+
 enum GrenadeType
 {
 	Frag = 0,
@@ -130,7 +135,9 @@ public:
 		void DisableSound(int sound);
 		void PatchWeaponsInteraction(bool b_Enable);		
 		void securityPacketProcessing();
-		EngineType get_engine_type();
+		void ApplyUnitHooks();
+		EngineType GetEngineType();
+		wchar_t* GetLobbyGameVariantName();
 		void exit_game();
 		BOOL Server;
 		std::unordered_map<wchar_t*, int> SoundMap;

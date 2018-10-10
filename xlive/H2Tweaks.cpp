@@ -259,7 +259,7 @@ enum flags : int
 	unk11, // some tag thing?
 	unk12, // seen near xlive init code
 	unk13,
-	unk14, // maybe UI?
+	xbox_live_silver_account, // if true, disables 'gold-only' features, like quickmatch etc
 	unk15, // fuzzer/automated testing? (sapien)
 	ui_fast_test_no_start, // same as below but doesn't start a game
 	ui_fast_test, // auto navigates the UI selecting the default option
@@ -299,7 +299,7 @@ bool engine_basic_init()
 
 	flags_array[flags::nointro] = H2Config_skip_intro;
 
-	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(GetAddress( 0x000285fd));
+	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(GetAddress(0x000285fd));
 
 	init_gfwl_gamestore();
 	init_data_checksum_info();
@@ -330,6 +330,13 @@ bool engine_basic_init()
 			}
 			else if (wcsicmp(cmd_line_arg, L"-highquality") == 0) {
 				flags_array[flags::high_quality] = 1;
+			}
+			else if (wcsicmp(cmd_line_arg, L"-depthbiasfix") == 0)
+			{
+				// Fixes issue #118
+			    /* g_depth_bias always NULL rather than taking any value from
+			    shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
+				NopFill<8>(reinterpret_cast<DWORD>(GetAddress(0x269FD5)));
 			}
 #ifdef _DEBUG
 			else if (wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
@@ -965,12 +972,16 @@ void InitH2Tweaks() {
 
 		WriteJmpTo(GetAddress(0x7E43), WinMain);
 		WriteJmpTo(GetAddress(0x39EA2), is_remote_desktop);
-	}
+	}	
+  
+	// Both server and client
 	WriteJmpTo(GetAddress(0x1467, 0x12E2), is_supported_build);
 	PatchCall(GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
+
+	H2Tweaks::applyPlayersActionsUpdateRatePatch();
 	
 	//Redirect the variable for the server name to ours.
 	WriteValue(H2BaseAddr + 0x001b2ce8, (DWORD)ServerLobbyName);
@@ -1008,7 +1019,7 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 	}
 }
 
-void setSens(short input_type, int sens) {
+void H2Tweaks::setSens(InputType input_type, int sens) {
 
 	if (H2IsDediServer)
 		return;
@@ -1016,13 +1027,15 @@ void setSens(short input_type, int sens) {
 	if (sens < 0)
 		return; 
 
-	if (input_type == 1) { //controller
-		*(float*)(H2BaseAddr + 0x4A89BC) = (float)(40.0f + 10.0f * sens); //y-axis
-		*(float*)(H2BaseAddr + 0x4A89B8) = (float)(80.0f + 20.0f * sens); //x-axis
+	int absSensIndex = sens - 1;
+
+	if (input_type == CONTROLLER) { 
+		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89BC) = 40.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
+		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B8) = 80.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
 	}
-	else if (input_type == 0) { //mouse 
-		*(float*)(H2BaseAddr + 0x4A89B4) = (float)(25.0f + 10.0f * sens); //y-axis
-		*(float*)(H2BaseAddr + 0x4A89B0) = (float)(50.0f + 20.0f * sens); //x-axis
+	else if (input_type == MOUSE) { 
+		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B4) = 25.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
+		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B0) = 50.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
 	}
 }
 
@@ -1033,7 +1046,7 @@ void H2Tweaks::setFOV(int field_of_view_degrees) {
 
 	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
 	{
-		float current_FOV = *(float*)(H2BaseAddr + 0x41D984);
+		float current_FOV = *reinterpret_cast<float*>(H2BaseAddr + 0x41D984);
 
 		//int res_width = *(int*)(H2BaseAddr + 0xA3DA00); //wip
 		//int res_height = *(int*)(H2BaseAddr + 0xA3DA04);
@@ -1041,8 +1054,8 @@ void H2Tweaks::setFOV(int field_of_view_degrees) {
 		const float default_radians_FOV = 70.0f * M_PI / 180.0f;
 
 		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0f) / default_radians_FOV;
-		*(float*)(H2BaseAddr + 0x41D984) = calculated_radians_FOV; // First Person
-		*(float*)(H2BaseAddr + 0x413780) = calculated_radians_FOV + 0.22f; // Third Person
+		*reinterpret_cast<float*>(H2BaseAddr + 0x41D984) = calculated_radians_FOV; // First Person
+		*reinterpret_cast<float*>(H2BaseAddr + 0x413780) = calculated_radians_FOV + 0.22f; // Third Person
 	}
 }
 
@@ -1053,12 +1066,9 @@ void H2Tweaks::setCrosshairPos(float crosshair_offset) {
 
 	if (!FloatIsNaN(crosshair_offset)) {
 		DWORD CrosshairY = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x1AF4 + 0xF0 + 0x1C;
-		*(float*)CrosshairY = crosshair_offset;
+		*reinterpret_cast<float*>(CrosshairY) = crosshair_offset;
 	}
 }
-
-
-
 
 void H2Tweaks::setCrosshairSize(int size, bool preset) {
 	if (H2IsDediServer)
@@ -1128,18 +1138,18 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 	}
 
 
-	if (h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE) {
+	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) {
 
 		
 		for (int i = 0; i < 28; i++) {
 			if (configArray[i] == 0) {
-				*(int*)WEAPONS[i] = disabled[i];
+				*reinterpret_cast<short*>(WEAPONS[i]) = disabled[i];
 			}
 			else if (*configArray[i] == 1 || *configArray[i] < 0 || *configArray[i] > 65535) {
-				*(int*)WEAPONS[i] = defaultSize[i];
+				*reinterpret_cast<short*>(WEAPONS[i]) = defaultSize[i];
 			}
 			else {
-				*(int*)WEAPONS[i] = *configArray[i];
+				*reinterpret_cast<short*>(WEAPONS[i]) = *configArray[i];
 			}
 
 		}
@@ -1312,7 +1322,7 @@ void H2Tweaks::FixRanksIcons() {
 	const WORD height_value = 0x0020;			//Value : 32 (decimal)
 
 
-	if (h2mod->get_engine_type() == EngineType::MAIN_MENU_ENGINE) {
+	if (h2mod->GetEngineType() == EngineType::MAIN_MENU_ENGINE) {
 		//Sets Pregame Lobby 
 		WriteValue(shared_Meta_Data_ptr + tag_offset_pre + (index_number * index_offset_p) + x_pos_off, x_pos_pre);
 		WriteValue(shared_Meta_Data_ptr + tag_offset_pre + (index_number * index_offset_p) + y_pos_off, y_pos_pre);
@@ -1359,5 +1369,24 @@ void H2Tweaks::RadarPatch() {
 	const BYTE format_offset = 0x0C;		//Definition : Format Offset
 	const WORD format_type = 0x000A;		//Definition : Format Enum
 
-	WriteValue(shared_Meta_Data_ptr + tag_offset + format_offset, format_type);
+	WriteValue<WORD>(shared_Meta_Data_ptr + tag_offset + format_offset, format_type);
+}
+
+float* xb_tickrate_flt;
+__declspec(naked) void calculate_delta_time(void)
+{
+	__asm
+	{
+		mov eax, xb_tickrate_flt
+		fld dword ptr[eax]
+		fmul dword ptr[esp + 4]
+		retn
+	}
+}
+
+
+void H2Tweaks::applyPlayersActionsUpdateRatePatch()
+{
+	xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
+	PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
 }

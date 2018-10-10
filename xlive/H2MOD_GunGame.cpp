@@ -1,22 +1,22 @@
 #include "Globals.h"
 #include <h2mod.pb.h>
 
-extern int weapon_one;
-extern int weapon_two;
-extern int weapon_three;
-extern int weapon_four;
-extern int weapon_five;
-extern int weapon_six;
-extern int weapon_seven;
-extern int weapon_eight;
-extern int weapon_nine;
-extern int weapon_ten;
-extern int weapon_eleven;
-extern int weapon_tweleve;
-extern int weapon_thirteen;
-extern int weapon_fourteen;
-extern int weapon_fiffteen;
-extern int weapon_sixteen;
+static int weapon_one = 0;
+static int weapon_two = 0;
+static int weapon_three = 0;
+static int weapon_four = 0;
+static int weapon_five = 0;
+static int weapon_six = 0;
+static int weapon_seven = 0;
+static int weapon_eight = 0;
+static int weapon_nine = 0;
+static int weapon_ten = 0;
+static int weapon_eleven = 0;
+static int weapon_tweleve = 0;
+static int weapon_thirteen = 0;
+static int weapon_fourteen = 0;
+static int weapon_fiffteen = 0;
+static int weapon_sixteen = 0;
 
 
 //TODO(PermaNull): Add additional levels with dual weilding
@@ -44,6 +44,51 @@ GunGame::GunGame()
 	this->spawnPlayer = new GunGameSpawnHandler();
 	this->playerDeath = new GunGameDeathHandler();
 	this->playerKill = new GunGameKillHandler();
+}
+
+void GunGame::readWeaponLevels()
+{
+	FILE* gfp;
+	gfp = fopen("gungame.ini", "r");
+
+	if (gfp)
+	{
+		TRACE("[GunGame Enabled] - Opened GunGame.ini!");
+		while (!feof(gfp))
+		{
+			char gstr[256];
+
+			fgets(gstr, 256, gfp);
+
+			gCHECK_ARG("weapon_one =", weapon_one);
+			gCHECK_ARG("weapon_two =", weapon_two);
+			gCHECK_ARG("weapon_three =", weapon_three);
+			gCHECK_ARG("weapon_four =", weapon_four);
+			gCHECK_ARG("weapon_five =", weapon_five);
+			gCHECK_ARG("weapon_six =", weapon_six);
+			gCHECK_ARG("weapon_seven =", weapon_seven);
+			gCHECK_ARG("weapon_eight =", weapon_eight);
+			gCHECK_ARG("weapon_nine =", weapon_nine);
+			gCHECK_ARG("weapon_ten =", weapon_ten);
+			gCHECK_ARG("weapon_eleven =", weapon_eleven);
+			gCHECK_ARG("weapon_tweleve =", weapon_tweleve);
+			gCHECK_ARG("weapon_thirteen =", weapon_thirteen);
+			gCHECK_ARG("weapon_fourteen =", weapon_fourteen);
+			gCHECK_ARG("weapon_fifteen =", weapon_fiffteen);
+			gCHECK_ARG("weapon_sixteen =", weapon_sixteen);
+
+		}
+
+#ifdef __DEBUG
+		TRACE("[GunGame] : %i", b_GunGame);
+
+		TRACE("[GunGame] - weapon_one: %i", weapon_one);
+		TRACE("[GunGame] - weapon_two: %i", weapon_two);
+		TRACE("[GunGame] - weapon_three: %i", weapon_three);
+#endif
+
+		fclose(gfp);
+	}
 }
 
 void GunGame::initWeaponLevels() {
@@ -202,8 +247,6 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
 		if (type == GrenadeType::Frag)
 		{
 			*(BYTE*)((BYTE*)unit_object + 0x252) = count;
-
-
 		}
 		if (type == GrenadeType::Plasma)
 		{

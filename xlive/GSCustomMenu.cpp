@@ -2949,7 +2949,7 @@ void CMSetupVFTables_AdvSettings() {
 }
 
 int __cdecl CustomMenu_AdvSettings(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, gameManager->isHost() && h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE ? 5 : 4, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, gameManager->isHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE ? 5 : 4, 272);
 }
 
 void GSCustomMenuCall_AdvSettings() {
@@ -3018,7 +3018,7 @@ static bool CMButtonHandler_AdvLobbySettings(int button_id) {
 	}
 	else if (button_id == 2) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_disable_kill_volumes = !AdvLobbySettings_disable_kill_volumes));
-		if (gameManager->isHost() && h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE && !AdvLobbySettings_disable_kill_volumes) {
+		if (gameManager->isHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE && !AdvLobbySettings_disable_kill_volumes) {
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
 		}
 		H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
@@ -3083,7 +3083,7 @@ void* __stdcall sub_248beb_deconstructor_AdvLobbySettings(LPVOID lpMem, char a2)
 	}
 	wcsncpy(ServerLobbyName, bufferLobbyName, 32);
 
-	if (gameManager->isHost() && h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE) {
+	if (gameManager->isHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) {
 		advLobbySettings->sendLobbySettingsPacket();
 	}
 	
@@ -4651,6 +4651,9 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFF03, "Installing Updates...");
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFF003, "Failed to run updater app!");
 	add_cartographer_label(CMLabelMenuId_Update, 4, "Cancel");
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF2, "Download the following:\n");
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF3, "Install the following:\n");
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF4, "Up to date!");
 
 
 	add_cartographer_label(CMLabelMenuId_Update_Note, 0xFFFFFFF0, "Outdated Version!");

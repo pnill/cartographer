@@ -1,14 +1,6 @@
 #include "MapChecksumSync.h"
-#include "stdafx.h"
-#include "Hook.h"
-#include "Util/hash.h"
-#include <string>
-#include <unordered_map>
 #include <unordered_set>
-#include <mutex>
 #include "Globals.h"
-#include <iomanip>
-#include "Util/filesys.h"
 
 extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;
@@ -239,7 +231,7 @@ void MapChecksumSync::RuntimeError(error_id type)
 void MapChecksumSync::SendState()
 {
 	TRACE_FUNC_N("gameManager->isHost() %d", gameManager->isHost());
-	TRACE_FUNC_N("h2mod->get_engine_type() %d", h2mod->get_engine_type());
+	TRACE_FUNC_N("h2mod->GetEngineType() %d", h2mod->GetEngineType());
 	if (!gameManager->isHost())
 		return;
 	H2ModPacket packet;

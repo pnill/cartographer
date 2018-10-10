@@ -1,42 +1,29 @@
 #include <stdafx.h>
-#include <windows.h>
 #include <Wincrypt.h>
-#include <iostream>
-#include <sstream>
-#include <codecvt>
 #include "H2MOD.h"
 #include "H2MOD_Mouseinput.h"
 #include "H2MOD_H2X.h"
 #include "H2MOD_GunGame.h"
-#include "H2MOD_Infection.h"
-#include "H2MOD_Halo2Final.h"
-#include "Network.h"
-#include "xliveless.h"
 #include "CUser.h"
 #include <Mmsystem.h>
-#include <thread>
-#include "Globals.h"
 #include "H2OnscreenDebugLog.h"
-#include "GSUtils.h"
-#include <Mmsystem.h>
 #include "discord/DiscordInterface.h"
 #include "H2Config.h"
 #include "H2Tweaks.h"
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 #include "H2Startup.h"
-#include "GSCustomMenu.h"
 #include "MapChecksumSync.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
-Infection* infectionHandler = new Infection();
 Halo2Final *h2f = new Halo2Final();
+Infection* infectionHandler = new Infection();
 
+bool b_H2X = false;
+bool b_GunGame = false;
 bool b_Infection = false;
 bool b_Halo2Final = false;
-bool b_H2X = false;
 
-extern bool b_GunGame;
 extern CUserManagement User;
 extern int H2GetInstanceId();
 extern XUID xFakeXuid[4];
@@ -178,7 +165,7 @@ signed int __cdecl object_new_hook(void *pObject)
 bool bitstream_write_bool(void *packet, char* string_data, bool value)
 {
 	typedef bool(__thiscall *tbitstream_write_bool)(void* packet, char* string_data, bool value);
-	tbitstream_write_bool ptbitstream_write_bool = (tbitstream_write_bool)((char*)h2mod->GetBase() + 0xD1886);
+	tbitstream_write_bool ptbitstream_write_bool = (tbitstream_write_bool)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCDE40 : 0xD1886));
 
 	return ptbitstream_write_bool(packet, string_data, value);
 }
@@ -187,7 +174,7 @@ int bitstream_write_uint(void* packet, char* string_data, unsigned int value, si
 {
 
 	typedef int(__thiscall *tbitstream_write_uint)(void* packet, char* string_data, unsigned int value, signed int bit_size);
-	tbitstream_write_uint pbitstream_write_uint = (tbitstream_write_uint)((char*)h2mod->GetBase() + 0xD17C6);
+	tbitstream_write_uint pbitstream_write_uint = (tbitstream_write_uint)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCDD80 : 0xD17C6));
 
 	return pbitstream_write_uint(packet, string_data, value, bit_size);
 }
@@ -196,7 +183,7 @@ int bitstream_write_uint(void* packet, char* string_data, unsigned int value, si
 bool bitstream_read_bool(void *packet, char* string_data)
 {
 	typedef bool(__thiscall *tbitstream_read_bool)(void* packet, char* string_data);
-	tbitstream_read_bool ptbitstream_read_bool = (tbitstream_read_bool)((char*)h2mod->GetBase() + 0xD1F47);
+	tbitstream_read_bool ptbitstream_read_bool = (tbitstream_read_bool)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCE501 : 0xD1F47));
 
 	return ptbitstream_read_bool(packet, string_data);
 }
@@ -205,7 +192,7 @@ int bitstream_read_uint(void* packet, char* string_data, signed int bit_size)
 {
 
 	typedef int(__thiscall *tbitstream_read_uint)(void* packet, char* string_data, signed int bit_size);
-	tbitstream_read_uint pbitstream_read_uint = (tbitstream_read_uint)((char*)h2mod->GetBase() + 0xD1EE5);
+	tbitstream_read_uint pbitstream_read_uint = (tbitstream_read_uint)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCE49F : 0xD1EE5));
 
 	return pbitstream_read_uint(packet, string_data,bit_size);
 }
@@ -327,7 +314,7 @@ bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObje
 	return pcreate_unit_hook(pCreationData, a2, a3, pObject);
 }
 
-EngineType H2MOD::get_engine_type()
+EngineType H2MOD::GetEngineType()
 {
 	DWORD GameGlobals = *(DWORD*)(h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
 
@@ -344,11 +331,16 @@ EngineType H2MOD::get_engine_type()
 	} 
 }
 
+inline wchar_t* H2MOD::GetLobbyGameVariantName()
+{
+	return (wchar_t*)(h2mod->GetBase() + ((h2mod->Server) ? 0x534A18 : 0x97777C));
+}
+
 void H2MOD::exit_game()
 {
 	if (H2IsDediServer)
 		return;
-	if (get_engine_type() != EngineType::MAIN_MENU_ENGINE)
+	if (GetEngineType() != EngineType::MAIN_MENU_ENGINE)
 	{
 		// request_squad_browser
 		WriteValue<BYTE>(H2BaseAddr + 0x978BAC, 1);
@@ -386,25 +378,6 @@ void H2MOD::kick_player(int peerIndex) {
 	DWORD* ptr = (DWORD*)(((char*)h2mod->GetBase()) + 0x420FE8);
 	TRACE_GAME_N("about to kick player index=%d", peerIndex);
 	calls_session_boot_method((DWORD*)(*ptr), peerIndex, (char)0x01);
-}
-
-//0x1BA418
-typedef bool(*live_check)();
-live_check live_check_method;
-
-bool clientXboxLiveCheck() {
-	//lets you access live menu
-	return true;
-}
-
-//0x1B1643
-typedef signed int(*live_check2)();
-live_check2 live_check_method2;
-
-signed int clientXboxLiveCheck2() {
-	//1 = turns off live? 
-	//2 = either not live or can't download maps
-	return 2;
 }
 
 typedef int(__cdecl *show_error_screen)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6);
@@ -914,7 +887,7 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 
 void PatchGameDetailsCheck()
 {
-	NopFill(h2mod->GetBase() + 0x219D6D, 2);
+	NopFill<2>(h2mod->GetBase() + 0x219D6D);
 }
 
 void H2MOD::PatchWeaponsInteraction(bool b_Enable)
@@ -958,7 +931,8 @@ void __cdecl onGameEngineChange(int a1)
 
 	//based on what onGameEngineChange has changed
 	//we do our stuff bellow
-	if (h2mod->get_engine_type() == EngineType::MAIN_MENU_ENGINE)
+
+	if (h2mod->GetEngineType() == EngineType::MAIN_MENU_ENGINE)
 	{
 		addDebugText("GameEngine: Main-Menu, apply patches");
 		object_to_variant.clear();
@@ -991,11 +965,11 @@ void __cdecl onGameEngineChange(int a1)
 	b_Halo2Final = false;
 	b_H2X = false;
 
-	wchar_t* variant_name = (wchar_t*)(h2mod->GetBase() + ((h2mod->Server) ? 0x534A18 : 0x97777C));
-	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", h2mod->get_engine_type(), variant_name);
+	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
+	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", h2mod->GetEngineType(), variant_name);
 	BYTE& GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
 
-	if (h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE)
+	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE)
 	{
 		addDebugText("GameEngine: Multiplayer, apply patches");
 
@@ -1028,6 +1002,7 @@ void __cdecl onGameEngineChange(int a1)
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	 
 		H2Tweaks::setCrosshairSize(0, false);
+		H2Tweaks::disable60FPSCutscenes(); 
 		
 		//H2Tweaks::applyShaderTweaks(); 
 
@@ -1056,7 +1031,7 @@ void __cdecl onGameEngineChange(int a1)
 		}
 	}
 
-	else if (h2mod->get_engine_type() == EngineType::SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
+	else if (h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
 		addDebugText("GameEngine: Singleplayer, apply patches");
 
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
@@ -1229,7 +1204,7 @@ typedef int(__cdecl *change_team)(int a1, int a2);
 change_team change_team_method;
 
 int __cdecl changeTeam(int a1, int a2) {
-	wchar_t* variant_name = (wchar_t*)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x534A18 : 0x97777C));
+	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
 	if (wcsstr(variant_name, L"RvB") > 0 && a2 != 0 && a2 != 1) {
 		//rvb mode enabled, don't change teams
 		return 4732 * a1;
@@ -1436,19 +1411,76 @@ bool __cdecl fn_c000bd114_IsSkullEnabled(int skull_index)
 bool GrenadeChainReactIsEngineMPCheck() {
 	if (AdvLobbySettings_grenade_chain_react)
 		return false;
-	return h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE;
+	return h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE;
 }
 
 bool BansheeBombIsEngineMPCheck() {
 	if (AdvLobbySettings_banshee_bomb)
 		return false;
-	return h2mod->get_engine_type() == EngineType::MULTIPLAYER_ENGINE;
+	return h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE;
 }
 
 bool FlashlightIsEngineSPCheck() {
 	if (AdvLobbySettings_flashlight)
 		return true;
-	return h2mod->get_engine_type() == EngineType::SINGLE_PLAYER_ENGINE;
+	return h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE;
+}
+
+typedef bool(__cdecl* verify_game_version_on_join)(int xlive_version, int build_version, int build_version2);
+verify_game_version_on_join p_verify_game_version_on_join;
+
+bool __cdecl VerifyGameVersionOnJoin(int xlive_version, int build_version, int build_version2)
+{
+	return xlive_version == XLIVE_VERSION && build_version >= GAME_BUILD && build_version2 <= GAME_BUILD;
+}
+
+typedef bool(__cdecl* verify_xlive_version)(int xlive_version);
+verify_xlive_version p_verify_xlive_version;
+
+bool __cdecl VerifyXliveVersion(int xlive_version)
+{
+	return xlive_version == XLIVE_VERSION; // will not display servers that don't match this in server list
+}
+
+typedef void(__cdecl *get_game_version)(DWORD *xlive_version, DWORD *build_version, DWORD *build_version2);
+get_game_version p_get_game_version;
+
+void __cdecl GetGameVersion(DWORD *xlive_version, DWORD *build_version, DWORD *build_version2)
+{
+	*xlive_version = XLIVE_VERSION;
+	*build_version = GAME_BUILD;
+	*build_version2 = GAME_BUILD;
+}
+
+void H2MOD::ApplyUnitHooks()
+{
+	DWORD dwBack;
+
+	//This encodes the unit creation packet, only gets executed on host.
+	pc_simulation_unit_entity_definition_encode = (tc_simulation_unit_entity_definition_creation_encode)DetourClassFunc((BYTE*)this->GetBase() + (h2mod->Server ? 0x1E2269 : 0x1F8503), (BYTE*)c_simulation_unit_entity_definition_creation_encode, 10);
+	VirtualProtect(pc_simulation_unit_entity_definition_encode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	//This decodes the unit creation packet, only gets executed on client.
+	pc_simulation_unit_entity_definition_decode = (tc_simulation_unit_entity_definition_creation_decode)DetourClassFunc((BYTE*)this->GetBase() + (h2mod->Server ? 0x1E22BD : 0x1F8557), (BYTE*)c_simulation_unit_entity_definition_creation_decode, 11);
+	VirtualProtect(pc_simulation_unit_entity_definition_decode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	//Only patch the object_new call on host during AI_Place function, no reason to hook all object_new calls.
+	PatchCall(GetBase() + (h2mod->Server ? 0x2C3B56 : 0x318DEC), object_new_hook);
+
+	//We update creation data here which is used later on to add data to the packet
+	PatchCall(GetBase() + (h2mod->Server ? 0x1E1DE0 : 0x1F807A), set_unit_creation_data_hook);
+	pset_unit_creation_data = (tset_unit_creation_data)(GetBase() + (h2mod->Server ? 0x1DD586 : 0x1F24ED));
+
+	VirtualProtect((char*)h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029), 1, PAGE_EXECUTE_READWRITE, &dwBack); // we have to update privileges on the memory so we can write to it since it's part of the actual game code.
+	memset(((char*)h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029)), 0x28, 1); // updates the size of creation_data allocated for the c_unit_simulation_entity_definition
+
+	// Hooks a call within the creat_unit property on the client side in order to set their permutation index before spawn.
+	PatchCall(GetBase() + (h2mod->Server ? 0x1E3BD4 : 0x1F9E6C), create_unit_hook);
+	pcreate_unit_hook = (tcreate_unit_hook)(GetBase() + (h2mod->Server ? 0x1DE374 : 0x1F32DB));
+
+	// Hooks the part of the unit spawn from simulation that handles setting their color data in order to ensure AI do not have their color overridden
+	PatchCall(GetBase() + (h2mod->Server ? 0x1E3B9C : 0x1F9E34), set_unit_color_data_hook);
+	pset_unit_color_data = (tset_unit_color_data)(GetBase() + (h2mod->Server ? 0x6D1BF : 0x6E5C3));
 }
 
 void H2MOD::ApplyHooks() {
@@ -1458,6 +1490,15 @@ void H2MOD::ApplyHooks() {
 		TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
 		DWORD dwBack;
+
+		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc((BYTE*)this->GetBase() + 0x1B4C14, (BYTE*)VerifyGameVersionOnJoin, 5);
+		VirtualProtect(p_verify_game_version_on_join, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		p_get_game_version = (get_game_version)DetourFunc((BYTE*)this->GetBase() + 0x1B4BF5, (BYTE*)GetGameVersion, 8);
+		VirtualProtect(p_get_game_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		p_verify_xlive_version = (verify_xlive_version)DetourFunc((BYTE*)this->GetBase() + 0x1B4C32, (BYTE*)VerifyXliveVersion, 8);
+		VirtualProtect(p_verify_xlive_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
 		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1473,7 +1514,7 @@ void H2MOD::ApplyHooks() {
 		VirtualProtect(calls_session_boot_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		// disable part of custom map tag verification
-		NopFill(GetBase() + 0x4FA0A, 6);
+		NopFill<6>(GetBase() + 0x4FA0A);
 
 		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)this->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1483,33 +1524,6 @@ void H2MOD::ApplyHooks() {
 
 		PatchCall(GetBase() + 0x49E95, onGameEngineChange);
 		p_originalFunc = (originalFunc)(GetBase() + 0x5912D);
-
-
-		//This encodes the unit creation packet, only gets executed on host.
-		pc_simulation_unit_entity_definition_encode = (tc_simulation_unit_entity_definition_creation_encode)DetourClassFunc((BYTE*)this->GetBase() + 0x1F8503, (BYTE*)c_simulation_unit_entity_definition_creation_encode, 10);
-		VirtualProtect(pc_simulation_unit_entity_definition_encode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		//This decodes the unit creation packet, only gets executed on client.
-		pc_simulation_unit_entity_definition_decode = (tc_simulation_unit_entity_definition_creation_decode)DetourClassFunc((BYTE*)this->GetBase() + 0x1F8557, (BYTE*)c_simulation_unit_entity_definition_creation_decode, 11);
-		VirtualProtect(pc_simulation_unit_entity_definition_decode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		//Only patch the object_new call on host during AI_Place function, no reason to hook all object_new calls.
-		PatchCall(GetBase() + 0x318DEC, object_new_hook);
-
-		//We update creation data here which is used later on to add data to the packet
-		PatchCall(GetBase() + 0x1F807A, set_unit_creation_data_hook);
-		pset_unit_creation_data = (tset_unit_creation_data)(GetBase() + 0x1F24ED);
-
-		VirtualProtect(((char*)h2mod->GetBase() + 0x1F8029), 1, PAGE_EXECUTE_READWRITE, &dwBack); // we have to update privileges on the memory so we can write to it since it's part of the actual game code.
-		memset(((char*)h2mod->GetBase() + 0x1F8029), 0x28, 1); // updates the size of creation_data allocated for the c_unit_simulation_entity_definition
-
-		// Hooks a call within the creat_unit property on the client side in order to set their permutation index before spawn.
-		PatchCall(GetBase() + 0x1F9E6C, create_unit_hook);
-		pcreate_unit_hook = (tcreate_unit_hook)(GetBase() + 0x001F32DB);
-
-		// Hooks the part of the unit spawn from simulation that handles setting their color data in order to ensure AI do not have their color overridden
-		PatchCall(GetBase() + 0x1F9E34, set_unit_color_data_hook);
-		pset_unit_color_data = (tset_unit_color_data)(GetBase() + 0x006E5C3);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0xD03ED, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1537,14 +1551,6 @@ void H2MOD::ApplyHooks() {
 		unicode_string_conversion_method = (unicode_string_conversion)DetourFunc((BYTE*)h2mod->GetBase() + 0x4C801, (BYTE*)unicodeStringConversion, 7);
 		VirtualProtect(unicode_string_conversion_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		//TODO: for when live list is ready
-		//live checks removed will make users exit to live menu instead of network browser :(
-		//live_check_method = (live_check)DetourFunc((BYTE*)this->GetBase() + 0x1BA418, (BYTE*)clientXboxLiveCheck, 9);
-		//VirtualProtect(live_check_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		//live_check_method2 = (live_check2)DetourFunc((BYTE*)this->GetBase() + 0x1B1643, (BYTE*)clientXboxLiveCheck2, 9);
-		//VirtualProtect(live_check_method2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
 		//pResetRound=(ResetRounds)DetourFunc((BYTE*)this->GetBase() + 0x6B1C8, (BYTE*)OnNextRound, 7);
 		//VirtualProtect(pResetRound, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
@@ -1558,9 +1564,9 @@ void H2MOD::ApplyHooks() {
 
 		// Patch out the code that displays the "Invalid Checkpoint" error
 		// Start
-		NopFill(GetBase() + 0x30857, 0x41);
+		NopFill<0x41>(GetBase() + 0x30857);
 		// Respawn
-		NopFill(GetBase() + 0x8BB98, 0x2b);
+		NopFill<0x2b>(GetBase() + 0x8BB98);
 
 		change_team_method = (change_team)DetourFunc((BYTE*)this->GetBase() + 0x2068F2, (BYTE*)changeTeam, 8);
 		VirtualProtect(change_team_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1583,15 +1589,13 @@ void H2MOD::ApplyHooks() {
 		PatchCall(Base + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
 		PatchCall(Base + 0x00092C05, BansheeBombIsEngineMPCheck);
 		PatchCall(Base + 0x0013ff75, FlashlightIsEngineSPCheck);
-		
-		// Fixes issue #118
-		/* g_depth_bias always NULL rather than taking any value from 
-		   shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
-		NopFill(GetBase() + 0x269FD5, 0x8);
 	}
 	else {
 
 		DWORD dwBack;
+
+		p_get_game_version = (get_game_version)DetourFunc((BYTE*)this->GetBase() + 0x1B0043, (BYTE*)GetGameVersion, 8);
+		VirtualProtect(p_get_game_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		on_custom_map_change_method = (on_custom_map_change)DetourFunc((BYTE*)this->GetBase() + 0x25738, (BYTE*)onCustomMapChange, 5);
 		VirtualProtect(on_custom_map_change_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1613,7 +1617,7 @@ void H2MOD::ApplyHooks() {
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
 		
 		// disable part of custom map tag verification
-		NopFill(GetBase() + 0x56C0A, 6);
+		NopFill<6>(GetBase() + 0x56C0A);
 
 		pplayer_death = (player_death)DetourFunc((BYTE*)this->GetBase() + 0x152ED4, (BYTE*)OnPlayerDeath, 9);
 		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1634,6 +1638,7 @@ void H2MOD::ApplyHooks() {
 
 	//apply any network hooks
 	network->applyNetworkHooks();
+	ApplyUnitHooks();
 }
 
 VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
