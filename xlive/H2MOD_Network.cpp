@@ -3,6 +3,7 @@
 #include "MapChecksumSync.h"
 #include "Util/base64.h"
 
+extern CUserManagement User;
 //original = 0x3DA8
 #define MEMBERSHIP_PACKET_SIZE 0x3DA8
 #define MEMBERSHIP_PACKET_SIZE_RAW_BYTES 0xA8, 0x3D
@@ -109,7 +110,7 @@ unsigned int __stdcall triggerMembershipPacketData(int thisx) {
 
 	typedef bool(__thiscall *sub_13FD95D_method)(char *thisx, int a2, int a3, unsigned __int8 a4);
 	sub_13FD95D_method sub_13FD95D = (sub_13FD95D_method)(h2mod->GetBase() + (h2mod->Server ? 0x1B7837 : 0x1BD95D));
-
+	
 	typedef int(__thiscall *sub_13FD9FA_method)(void *thisx, int a2, int a3, unsigned __int8 a4);
 	sub_13FD9FA_method sub_13FD9FA = (sub_13FD9FA_method)(h2mod->GetBase() + (h2mod->Server ? 0x1B78D4 : 0x1BD9FA));
 
@@ -542,7 +543,8 @@ int __cdecl serializeChatPacket(void* a1, int a2, int a3) {
 			memcpy(commandToWrite, encoded_message.c_str(), packet_size);
 			//TODO: if text is precense, don't send over the command, as this call stack is from someone sending text
 			result = getDataEncodeStringMethod()(a1, (int)"command", (int)commandToWrite, CHAT_PACKET_EXTEND_SIZE);
-		} else {
+		}
+		else {
 			TRACE_FUNC("Can't send data larger than chat extend size. data_size=%d, extend_size=%d", packet_size, CHAT_PACKET_EXTEND_SIZE);
 		}
 	}
@@ -632,7 +634,7 @@ __declspec(naked) void deserializePlayerAdd(void) {
 
 		//rewrite overwritten bytes
 		push esi
-		mov esi, [esp+0x14]
+		mov esi, [esp + 0x14]
 
 		// The last thing we must do in our codecave is push 
 		// the return address back onto the stack and then RET back
@@ -765,6 +767,29 @@ int __cdecl serializeMembershipPacket(void* a1, int a2, int a3) {
 	return serialize_membership_packet_method(a1, a2, a3);
 }
 
+
+typedef int(__cdecl *deserialize_membership_packet)(void* a1, int a2, int a3);
+deserialize_membership_packet deserialize_membership_packet_method;
+
+int __cdecl deserializeMembershipPacket(void* a1, int a2, int a3) {
+
+	int ret = deserialize_membership_packet_method(a1, a2, a3);
+	WORD player_count = *(WORD*)((BYTE*)a3 + 0x22);
+	
+	TRACE_GAME_N("[h2mod-network] deserializeMemberShipPacket player count: %i", player_count);
+	BYTE *PlayerArray = (BYTE*)((BYTE*)a3 + 0x26);
+
+	for (int i = 0; i < player_count; i++)
+	{
+		XNADDR *nXN = (XNADDR*)((BYTE*)PlayerArray + 0x02);
+		User.CreateUser(nXN, FALSE);
+		
+		PlayerArray += 0xB8;
+	}
+
+	return ret;
+}
+
 typedef int(__cdecl *serialize_parameters_update_packet)(void* a1, int a2, int a3);
 serialize_parameters_update_packet serialize_parameters_update_packet_method;
 
@@ -789,6 +814,7 @@ void CustomNetwork::applyNetworkHooks() {
 	DWORD sendChatPacketOffset2 = 0x1C81EC;
 	DWORD deserializePlayerAddOffset = 0x1F0753;
 	DWORD serializeMembershipPacketOffset = 0x1EF6B9;
+	DWORD deserializeMembershipPacketOffset = 0x1EFADD;
 	DWORD serializeParametersUpdatePacketOffset = 0x1EDC41;
 
 	if (h2mod->Server) {
@@ -812,7 +838,7 @@ void CustomNetwork::applyNetworkHooks() {
 
 	register_connection_packets_method = (register_connection_packets)DetourFunc((BYTE*)h2mod->GetBase() + registerConnectionPacketsOffset, (BYTE*)registerConnectionPackets, 5);
 	VirtualProtect(register_connection_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
+	
 	//use for debugging
 	//register_player_packets_method = (register_player_packets)DetourFunc((BYTE*)h2mod->GetBase() + registerPlayerPacketsOffset, (BYTE*)registerPlayerPackets, 5);
 	//VirtualProtect(register_player_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -821,6 +847,9 @@ void CustomNetwork::applyNetworkHooks() {
 
 	serialize_membership_packet_method = (serialize_membership_packet)DetourFunc((BYTE*)h2mod->GetBase() + serializeMembershipPacketOffset, (BYTE*)serializeMembershipPacket, 5);
 	VirtualProtect(serialize_membership_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	deserialize_membership_packet_method = (deserialize_membership_packet)DetourFunc((BYTE*)h2mod->GetBase() + deserializeMembershipPacketOffset, (BYTE*)deserializeMembershipPacket, 12);
+	VirtualProtect(deserialize_membership_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	serialize_parameters_update_packet_method = (serialize_parameters_update_packet)DetourFunc((BYTE*)h2mod->GetBase() + serializeParametersUpdatePacketOffset, (BYTE*)serializeParametersUpdatePacket, 5);
 	VirtualProtect(serialize_parameters_update_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -851,4 +880,5 @@ void CustomNetwork::applyNetworkHooks() {
 
 	//receive_data_from_socket_method = (receive_data_from_socket)DetourClassFunc((BYTE*)h2mod->GetBase() + 0x1BAFB5, (BYTE*)receiveDataFromSocket, 10);
 	//VirtualProtect(receive_data_from_socket_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
 }

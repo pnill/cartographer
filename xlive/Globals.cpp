@@ -19,7 +19,7 @@ Players* players = new Players();
 //TODO: actually check if they have a microphone or check some settings
 bool microphoneEnabled = true;
 std::unordered_map<XUID, BOOL> xuidIsTalkingMap;
-
+std::unordered_map<XUID, anyID> xuidToTSid;
 IN_ADDR clientMachineAddress = {};
 TSClient* client = NULL;
 TSServer* server = NULL;

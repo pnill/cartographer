@@ -177,6 +177,8 @@ int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 			snprintf(BuildText, 250, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
 	
 			GUI::Initialize();
+
+			
 		}
 		
 #if 0

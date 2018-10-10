@@ -40,6 +40,8 @@ extern char* replacedNetworkNormalTextWidget;
 extern char* replacedNetworkNormalTextWidget2;
 
 extern std::unordered_map<XUID, BOOL> xuidIsTalkingMap;
+extern std::unordered_map<XUID, anyID> xuidToTSid;
+
 extern bool microphoneEnabled;
 extern IN_ADDR clientMachineAddress;
 extern TSClient* client;

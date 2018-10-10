@@ -299,7 +299,7 @@ void MapManager::sendMapInfoPacket()
 	//TODO: send over size so p2p can work easier
 	map_info->set_mapsize(0);
 
-	network->send_h2mod_packet(teampak);
+//	network->send_h2mod_packet(teampak);
 
 #ifdef _DEBUG
 	_CrtSetDbgFlag(tmpFlagOrig);

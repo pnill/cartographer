@@ -187,6 +187,14 @@ void TSClient::onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int 
 */
 void TSClient::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* moveMessage) {
 	TRACE_GAME_N("[h2mod-voice] ClientID %u moves from channel %llu to %llu with message %s", clientID, (unsigned long long)oldChannelID, (unsigned long long)newChannelID, moveMessage);
+
+	char* remoteXuidStr;
+	/* Query remote nickname from ID */
+	if (ts3client_getClientVariableAsString(serverConnectionHandlerID, clientID, CLIENT_NICKNAME, &remoteXuidStr) != ERROR_ok)
+		return;
+
+	XUID remoteId = _strtoui64(remoteXuidStr, NULL, 16);
+	xuidToTSid[remoteId] = clientID;
 }
 
 /*
@@ -286,7 +294,7 @@ void TSClient::mute(anyID clientToMute) {
 	if ((error = ts3client_requestMuteClients(scHandlerID, clientsToMute, NULL)) != ERROR_ok) {
 		TRACE("[h2mod-voice] error turning muting clients: %d\n", error);
 	}
-	ts3client_freeMemory(clientsToMute);
+	//ts3client_freeMemory(clientsToMute);
 }
 
 void TSClient::unmute(anyID clientToUnmute) {
@@ -297,7 +305,7 @@ void TSClient::unmute(anyID clientToUnmute) {
 	if ((error = ts3client_requestUnmuteClients(scHandlerID, clientsToUnmute, NULL)) != ERROR_ok) {
 		TRACE("[h2mod-voice] error turning unmuting clients: %d\n", error);
 	}
-	ts3client_freeMemory(clientsToUnmute);
+	//ts3client_freeMemory(clientsToUnmute);
 }
 
 bool TSClient::isMuted(anyID clientId) {
@@ -309,67 +317,19 @@ bool TSClient::isMuted(anyID clientId) {
 	return clientIsMuted;
 }
 
-//TODO: turn on when ready
-void TSClient::handleProximityTalk(anyID teamspeakClientID, XUID remoteId, int remotePlayerIndex, int clientPlayerIndex, bool sameTeam) {
-	if (!sameTeam) {
-		float distance = h2mod->get_distance(remotePlayerIndex, clientPlayerIndex);
+void TSClient::handleStopTalking(anyID teamspeakClientID,XUID remoteId,XUID clientId, char* remoteXuidStr)
+{
+	if (xuidToTSid[remoteId] == 0)
+		xuidToTSid[remoteId] = teamspeakClientID;
 
-		float MAX = 10.0f;
-		if (distance >= MAX) {
-			//if the distance is greater than 50 units, mute
-			client->mute(teamspeakClientID);
-		}
-		else {
-			//if they are within 10 units, apply ghetto distance to volume calculation
-			client->unmute(teamspeakClientID);
-			//start with faintest client volume modifier
-			float volume = MIN_CLIENT_VOLUME_MODIFIER;
-			if (distance >= 9.0f && distance < MAX) {
-				volume = -25.0f;
-			}
-			else if (distance >= 7.0f && distance < 8.0f) {
-				volume = -20.0f;
-			}
-			else if (distance >= 5.0f && distance < 6.0f) {
-				volume = -15.0f;
-			}
-			else if (distance >= 3.0f && distance < 4.0f) {
-				volume = -10.0f;
-			}
-			else if (distance >= 2.0f && distance < 3.0f) {
-				volume = -5.0f;
-			}
-			else if (distance < 1.0f) {
-				volume = 0.0f;
-			}
 
-			client->setClientVolume(teamspeakClientID, volume);
-			client->printCurrentClientVolume(teamspeakClientID);
-		}
-	}
-	else {
-		//same team hears each other all the time
-		client->setClientVolume(teamspeakClientID, MAX_CLIENT_VOLUME_MODIFIER);
-	}
-}
+	xuidIsTalkingMap[remoteId] = false;
 
-void TSClient::handleTeamTalk(anyID teamspeakClientID, XUID remoteId, bool sameTeam) {
-	if (!sameTeam) {
-		//mute ppl on different team
-		client->setClientVolume(teamspeakClientID, MIN_CLIENT_VOLUME_MODIFIER);
-		client->printCurrentClientVolume(teamspeakClientID);
-	} else {
-		xuidIsTalkingMap[remoteId] = true;
-		//unmute ppl on same team that aren't explicitly muted
-		client->setClientVolume(teamspeakClientID, MAX_CLIENT_VOLUME_MODIFIER); 
-		client->printCurrentClientVolume(teamspeakClientID);
-	}
-}
+	if(clientId != remoteId)
+		client->mute(teamspeakClientID);
 
-void TSClient::handleNoTeamsTalk(anyID teamspeakClientID, XUID remoteId) {
-	xuidIsTalkingMap[remoteId] = true;
-	client->setClientVolume(teamspeakClientID, MAX_CLIENT_VOLUME_MODIFIER);
-	client->printCurrentClientVolume(teamspeakClientID);
+	TRACE_GAME_N("[h2mod-voice] Client \"%s\" stops talking.", remoteXuidStr);
+
 }
 
 void TSClient::handleLobbyTalk(anyID teamspeakClientID, XUID remoteId) {
@@ -400,46 +360,9 @@ void TSClient::onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 	if (status == STATUS_TALKING) {
 		xuidIsTalkingMap[remoteId] = true;
 		TRACE_GAME_N("[h2mod-voice] Client \"%s\" starts talking.", remoteXuidStr);
-
-		if (isLobby) {
-			//in the lobby everyone can hear anyone
-			handleLobbyTalk(teamspeakClientID, remoteId);
-		} 
-		//TODO: turn on later maybe
-		/*else if (clientChatMode == OFF) {
-			//if client wants to turn of voice completely in game or in lobby, just set the chat mod to off
-			//and every client gets muted
-			if (!client->isMuted(remoteId)) {
-				client->mute(remoteId);
-			}
-		} */
-		else {
-			//in game only chat modes below (otherwise these maps won't have the right values)
-			int remotePlayerIndex = players->getPeerIndex((long long)remoteId);
-			int remotePlayerTeamIndex = players->getPlayerTeam((long long)remoteId);
-
-			int clientPlayerIndex = players->getPeerIndex((long long)clientId);
-			int clientPlayerTeamIndex = players->getPlayerTeam((long long)clientId);
-
-			TRACE_GAME_N("[h2mod-voice] Client-%d remotePlayerTeamIndex:%u, xuid:%s", remotePlayerIndex, remotePlayerTeamIndex, remoteXuidStr);
-			TRACE_GAME_N("[h2mod-voice] Client-%d clientPlayerTeamIndex:%u, xuid:%s", clientPlayerIndex, clientPlayerTeamIndex, client->nickname);
-			bool sameTeam = remotePlayerTeamIndex == clientPlayerTeamIndex;
-			//TODO: make team voice work
-			bool teamPlayOn = false;//h2mod->is_team_play();
-			TRACE_GAME_N("[h2mod-voice] IsSameTeam=%d,IsTeamPlay=%d", sameTeam, teamPlayOn);
-
-			//TODO: once proximity is done, it would default to proximity chat
-			if (!teamPlayOn) {
-				//if team play is off, just treat lobby chat
-				handleNoTeamsTalk(teamspeakClientID, remoteId);
-			} else {
-				//if team play on
-				handleTeamTalk(teamspeakClientID, remoteId, sameTeam);
-			}
-		}
-	}	else {
-		TRACE_GAME_N("[h2mod-voice] Client \"%s\" stops talking.", remoteXuidStr);
-		xuidIsTalkingMap[remoteId] = false;
+		handleLobbyTalk(teamspeakClientID, remoteId);		
+	} else {
+		handleStopTalking(teamspeakClientID, remoteId, clientId, remoteXuidStr);
 	}
 	// Release dynamically allocated memory only if function succeeded
 	ts3client_freeMemory(remoteXuidStr);  

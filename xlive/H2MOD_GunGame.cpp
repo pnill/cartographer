@@ -276,7 +276,7 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
 		//send over player index
 		set_grenade->set_pindex(pIndex);
 
-		network->send_h2mod_packet_player(players->getPeerIndex(pIndex), teampak);
+		//network->send_h2mod_packet_player(players->getPeerIndex(pIndex), teampak);
 	}
 }
 

@@ -468,24 +468,7 @@ int WINAPI XWSACleanup ()  	// XWSACleanup
     return WSACleanup();
 }
 
-// #3: XCreateSocket
-SOCKET WINAPI XCreateSocket (int af, int type, int protocol)
-{
 
-	
-  //  TRACE("XCreateSocket (%d, %d, %d)", af, type, protocol);
-	if (protocol == 254)
-	{
-		protocol = IPPROTO_UDP; // We can't support VDP (Voice / Data Protocol) it's some encrypted crap which isn't standard.
-	}
-
-	SOCKET ret = socket(af, type, protocol);
-	if (ret == INVALID_SOCKET)
-	{
-		TRACE("XCreateSocket - INVALID_SOCKET");
-	}
-	return ret;
-}
 
 // #4
 int WINAPI XSocketClose (SOCKET s)
@@ -1827,8 +1810,8 @@ int WINAPI XShowMessagesUI (DWORD dwUserIndex)
 
 
 // TODO: add correct structures
-typedef void XHV_INIT_PARAMS;
-typedef XHV_INIT_PARAMS* PXHV_INIT_PARAMS;
+//typedef void XHV_INIT_PARAMS;
+//typedef XHV_INIT_PARAMS* PXHV_INIT_PARAMS;
 
 
 // #5008
@@ -1837,7 +1820,10 @@ int WINAPI XHVCreateEngine( PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, PI
     TRACE("XHVCreateEngine  (pParams = %X, phWorkerThread = %X, pEngine = %X)",
 			pParams, phWorkerThread, ppEngine );
 
-
+	if (pParams->bCustomVADProvided)
+	{
+		TRACE_GAME_N("XHV Engine - bCustomVADProvided set");
+	}
 		if( phWorkerThread )
 		{
 			*phWorkerThread = CreateMutex(0,0,0);
@@ -3750,8 +3736,9 @@ int WINAPI XPresenceInitialize(int a1)
 
 
 // #5314: XUserMuteListQuery
-int WINAPI XUserMuteListQuery (DWORD, DWORD, DWORD, DWORD)
+int WINAPI XUserMuteListQuery (DWORD dwUserIndex, XUID XuidRemoteTalker, BOOL *pfOnMuteList)
 {
+	*pfOnMuteList = FALSE;
     //TRACE("XUserMuteListQuery");
     return 0;
 }
@@ -5947,9 +5934,9 @@ DWORD WINAPI TitleExport_XUserFindUsers(int, int, int, int, int, int, int)
 // === end of xlive functions ===
 
 
-INT IXHV2ENGINE::Dummy1( VOID *pThis )
+LONG IXHV2ENGINE::AddRef(/*CXHVEngine*/ VOID *pThis )
 {
-	TRACE( "IXHV2Engine::Dummy1" );
+	TRACE( "IXHV2Engine::AddRef" );
 
 
 	return 0;
@@ -5957,9 +5944,9 @@ INT IXHV2ENGINE::Dummy1( VOID *pThis )
 
 
 
-INT IXHV2ENGINE::Dummy2( VOID *pThis )
+LONG IXHV2ENGINE::Release(/*CXHVEngine*/ VOID *pThis )
 {
-	TRACE( "IXHV2Engine::Dummy2" );
+	TRACE( "IXHV2Engine::Release" );
 
 
 	return 0;
@@ -5967,25 +5954,32 @@ INT IXHV2ENGINE::Dummy2( VOID *pThis )
 
 
 
-HRESULT IXHV2ENGINE::Dummy3( VOID *pThis, int a )
+
+HRESULT IXHV2ENGINE::Lock(/*CXHVEngine*/ VOID *pThis, XHV_LOCK_TYPE lockType)
 {
-	//TRACE( "IXHV2Engine::Dummy3  (a = %X)", a );
 
-	// something about a == 1, a== 2
+	if (lockType == XHV_LOCK_TYPE_LOCK)
+	{
+		locked = true;
+	}
 
+	if (lockType == XHV_LOCK_TYPE_TRYLOCK && locked == false)
+	{
+		locked = true;
+	}
 
-	return ERROR_SUCCESS;
+	if (lockType == XHV_LOCK_TYPE_UNLOCK)
+	{
+		locked = false;
+	}
+
+	return S_OK;
 }
 
 
 
-HRESULT IXHV2ENGINE::StartLocalProcessingModes( VOID *pThis, DWORD dwUserIndex, /* CONST PXHV_PROCESSING_MODE*/ VOID *processingModes, DWORD dwNumProcessingModes )
+HRESULT IXHV2ENGINE::StartLocalProcessingModes(VOID *pThis, DWORD dwUserIndex, /* CONST PXHV_PROCESSING_MODE*/ VOID *processingModes, DWORD dwNumProcessingModes)
 {
-//	TRACE( "IXHV2Engine::StartLocalProcessingModes  (dwUserIndex = %X, processingModes = %X, dwNumProcessingModes = %d)",
-//		dwUserIndex, processingModes, dwNumProcessingModes );
-
-
-//	TRACE( "- Voice chat on" );
 	return S_OK;
 }
 
@@ -5993,11 +5987,26 @@ HRESULT IXHV2ENGINE::StartLocalProcessingModes( VOID *pThis, DWORD dwUserIndex, 
 
 HRESULT IXHV2ENGINE::StopLocalProcessingModes( VOID *pThis, DWORD dwUserIndex, /*CONST PXHV_PROCESSING_MODE*/ VOID *processingModes, DWORD dwNumProcessingModes )
 {
-//	TRACE( "IXHV2Engine::StopLocalProcessingModes  (dwUserIndex = %X, processingModes = %X, dwNumProcessingModes = %X)",
-//		dwUserIndex, processingModes, dwNumProcessingModes );
+	return S_OK;
+}
 
 
-//	TRACE( "- Stopping voice" );
+
+HRESULT IXHV2ENGINE::StartRemoteProcessingModes(VOID *pThis, XUID a1, int a2, int a3)
+{
+
+	TRACE_GAME_N("[h2mod-voice] StartRemoteProcessingModes XUID: %lld", a1);
+	return S_OK;
+}
+
+
+
+HRESULT IXHV2ENGINE::StopRemoteProcessingModes(VOID *pThis, XUID xuidRemoteTalker, /*CONST PXHV_PROCESSING_MODE*/ VOID* a2, int a3)
+{
+
+	TRACE_GAME_N("[h2mod-voice] StopRemoteProcessingModes xuidRemoteTalker: %lld", xuidRemoteTalker);
+	//TRACE( "IXHV2Engine::Dummy7  (xuid = %X, a2 = %X, a3 = %X, a4 = %X)",
+	//	xuidRemoteTalker, a2, a3);
 
 
 	return S_OK;
@@ -6005,32 +6014,9 @@ HRESULT IXHV2ENGINE::StopLocalProcessingModes( VOID *pThis, DWORD dwUserIndex, /
 
 
 
-HRESULT IXHV2ENGINE::StartRemoteProcessingModes( VOID *pThis, int a1, int a2, int a3, int a4 )
+HRESULT IXHV2ENGINE::NullSub( VOID *pThis, int a1 )
 {
-	TRACE( "IXHV2Engine::StartRemoteProcessingModes  (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
-		a1, a2, a3, a4 );
-
-
-	TRACE( "- Voice chat on" );
-	return S_OK;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy7( VOID *pThis, int a1, int a2, int a3, int a4 )
-{
-	TRACE( "IXHV2Engine::Dummy7  (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
-		a1, a2, a3, a4 );
-
-
-	return ERROR_SUCCESS;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy8( VOID *pThis, int a1 )
-{
-	TRACE( "IXHV2Engine::Dummy8  (a1 = %X)", a1 );
+	TRACE( "IXHV2Engine::NullSub  (a1 = %X)", a1 );
 
 
 	return ERROR_SUCCESS;
@@ -6040,11 +6026,6 @@ HRESULT IXHV2ENGINE::Dummy8( VOID *pThis, int a1 )
 
 HRESULT IXHV2ENGINE::RegisterLocalTalker( VOID *pThis, DWORD dwUserIndex )
 {
-	//TRACE( "IXHV2Engine::RegisterLocalTalker  (dwUserIndex = %d)",
-	///	dwUserIndex );
-
-
-	//TRACE( "- user added" );
 	return S_OK;
 }
 
@@ -6060,264 +6041,102 @@ HRESULT IXHV2ENGINE::UnregisterLocalTalker( VOID *pThis, DWORD dwUserIndex )
 }
 
 
-
-HRESULT IXHV2ENGINE::Dummy11( VOID *pThis, int a1, int a2, int a3, int a4, int a5 )
+std::vector<XUID> remotetalkers;
+HRESULT IXHV2ENGINE::RegisterRemoteTalker(VOID *pThis, XUID a1, LPVOID reserved, LPVOID reserved2, LPVOID reserved3)
 {
-	TRACE( "IXHV2Engine::Dummy11  (a1 = %X, a2 = %X, a3 = %X, a4 = %X, a5 = %X)",
-		a1, a2, a3, a4, a5 );
 
-
-	return ERROR_SUCCESS;
+	TRACE_GAME_N("[h2mod-voice] IXHV2Engine::RegisterRemoteTalker XUID: %lld", a1);
+	remotetalkers.push_back(a1);
+	return S_OK;
 }
 
 
 
-HRESULT IXHV2ENGINE::UnregisterRemoteTalker( VOID *pThis, int a1, int a2 )
+HRESULT IXHV2ENGINE::UnregisterRemoteTalker(VOID *pThis, XUID a1)
 {
-	TRACE( "IXHV2Engine::UnregisterRemoteTalker  (a1 = %X, a2 = %X)",
-		a1, a2 );
-
-
-	TRACE( "- Voice stopped" );
-
+	TRACE_GAME_N( "[h2mod-voice] IXHV2Engine::UnregisterRemoteTalker  (a1 = %X, a2 = %X)",
+		a1);
 
 	return S_OK;
 }
 
 
-HRESULT IXHV2ENGINE::Dummy13( VOID *pThis, int a1, int a2 )
+HRESULT IXHV2ENGINE::GetRemoteTalkers( VOID *pThis, PDWORD pdwRemoteTalkersCount, PXUID pxuidRemoteTalkers )
 {
-	static int print = 0;
 
+	TRACE_GAME_N("[h2mod-voice] - GetRemoteTalkers");
+	*pdwRemoteTalkersCount = remotetalkers.size();
+	int i = 0;
+	for (std::vector<XUID>::iterator it = remotetalkers.begin(); it != remotetalkers.end(); ++it) {
+		pxuidRemoteTalkers[i] = *it;
+		i++;
 
-	if( print < 15 )
-	{
-		TRACE( "IXHV2Engine::Dummy13  (a1 = %X, a2 = %X)",
-			a1, a2 );
-
-
-		print++;
 	}
 
-
-
-#if 0
-	while(1)
-		Sleep(1);
-#endif
-
-
-	// no data in??
-	return -1;
-
-
-	//return ERROR_SUCCESS;
+	return S_OK;
 }
 
 DWORD IXHV2ENGINE::GetDataReadyFlags( VOID *pThis )
 {
-	static int print = 0;
+	int ret = 0x00;
 
-
-	if( print < 15 )
+	if (xuidIsTalkingMap[xFakeXuid[0]])
 	{
-		TRACE( "IXHV2Engine::GetDataReadyFlags" );
-
-		print++;
+		TRACE_GAME_N("[h2mod-voice] GetDataReadyFlags - called");
+		ret = 0x1;
 	}
-
-
-#if 0
-	while(1)
-		Sleep(1);
-#endif
-
-
-	if( print < 15 )
-	{
-		TRACE( "- No user ready" );
-	}
-
-
 	// 0x1 = user 0
 	// 0xF = user 0-3
 	// 0xFF = user 0-7
-	return 0;
+	return ret;
 }
-
 
 
 HRESULT IXHV2ENGINE::GetLocalChatData( VOID *pThis, DWORD dwUserIndex, PBYTE pbData, PDWORD pdwSize, PDWORD pdwPackets )
 {
-	static int print = 0;
-
-
-	if( print < 15 )
+	if (pdwSize && pdwPackets && xuidIsTalkingMap[xFakeXuid[0]])
 	{
-		//TRACE( "IXHV2Engine::GetLocalChatData  (dwUserIndex = %X, pbData = %X, pdwSize = %X, pdwPackets = %X)",
-		//	dwUserIndex, pbData, pdwSize, pdwPackets );
-
-		print++;
+		char dummy_data[0xC];
+		memset(dummy_data, 0x00, 0xC);
+		*(XUID*)&dummy_data = xFakeXuid[0];
+		*(int*)(&dummy_data+4) = rand();
+		memcpy(pbData, dummy_data, 0x0C);
+		*pdwSize = 0xC;
+		*pdwPackets = 1;
+	}
+	else 
+	{
+		if (pdwSize) *pdwSize = 0;
+		if (pdwPackets) *pdwPackets = 0;
 	}
 
-
-	if( pdwSize ) *pdwSize = 0;
-	if( pdwPackets ) *pdwPackets = 0;
-
-
-	if( print < 15 )
-	{
-		//TRACE( "- No local chat data" );
-	}
-
-	//return E_PENDING;
-
-
-	return ERROR_SUCCESS;
+	return S_OK;
 }
 
 
 
-HRESULT IXHV2ENGINE::SetPlaybackPriority( VOID *pThis, int a1, int a2, int a3, int a4 )
+HRESULT IXHV2ENGINE::SetPlaybackPriority(VOID *pThis, XUID xuidRemoteTalker, DWORD dwUserIndex, int a3)
 {
-	TRACE( "IXHV2Engine::SetPlaybackPriority  (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
-		a1, a2, a3, a4 );
-
-
-	return ERROR_SUCCESS;
+	return S_OK;
 }
 
 
-
-HRESULT IXHV2ENGINE::Dummy20( VOID *pThis, int a1, int a2, int a3, int a4 )
+HRESULT IXHV2ENGINE::SubmitIncomingChatData(VOID *pThis, XUID xuidRemoteTalker, const BYTE* pbData, PDWORD pdwSize)
 {
-	TRACE( "IXHV2Engine::Dummy20  (a1 = %X, a2 = %X, a3 = %X, a4 = %X)",
-		a1, a2, a3, a4 );
+	anyID tsID = xuidToTSid[xuidRemoteTalker];
+
+	if(tsID !=0)
+		client->unmute(tsID);
+
+	XUID test = *(XUID*)pbData;
+	TRACE_GAME_N("[h2mod-voice][SubmitIncomingChatData] - XUID in packet: %lld", test);
+	TRACE_GAME_N("[h2mod-voice][SubmitIncomingChatData] - Trying to unmute tsID: %i  xuid: %lld", tsID, xuidRemoteTalker);
+
+	*pdwSize = *pdwSize;
 
 
-	return ERROR_SUCCESS;
+	return S_OK;
 }
-
-
-
-HRESULT IXHV2ENGINE::Dummy21( VOID *pThis )
-{
-	TRACE( "IXHV2Engine::Dummy21" );
-
-
-	return ERROR_SUCCESS;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy22( VOID *pThis )
-{
-	TRACE( "IXHV2Engine::Dummy22" );
-
-
-	return ERROR_SUCCESS;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy23( VOID *pThis )
-{
-	TRACE( "IXHV2Engine::Dummy23" );
-
-
-	return ERROR_SUCCESS;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy24( VOID *pThis )
-{
-	TRACE( "IXHV2Engine::Dummy24" );
-
-
-	return ERROR_SUCCESS;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy25( VOID *pThis )
-{
-	TRACE( "IXHV2Engine::Dummy25" );
-
-
-	return ERROR_SUCCESS;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy26( VOID *pThis )
-{
-	TRACE( "IXHV2Engine::Dummy26" );
-
-
-	return ERROR_SUCCESS;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy27( VOID *pThis )
-{
-	TRACE( "IXHV2Engine::Dummy27" );
-
-
-	return ERROR_SUCCESS;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy28( VOID *pThis )
-{
-	TRACE( "IXHV2Engine::Dummy28" );
-
-
-	return ERROR_SUCCESS;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy29( VOID *pThis )
-{
-	TRACE( "IXHV2Engine::Dummy29" );
-
-
-	return ERROR_SUCCESS;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy30( VOID *pThis )
-{
-	TRACE( "IXHV2Engine::Dummy30" );
-
-
-	return ERROR_SUCCESS;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy31( VOID *pThis )
-{
-	TRACE( "IXHV2Engine::Dummy31" );
-
-
-	return ERROR_SUCCESS;
-}
-
-
-
-HRESULT IXHV2ENGINE::Dummy32( VOID *pThis )
-{
-	TRACE( "IXHV2Engine::Dummy32" );
-
-
-	return ERROR_SUCCESS;
-}
-
 
 
 IXHV2ENGINE::IXHV2ENGINE()
@@ -6325,21 +6144,21 @@ IXHV2ENGINE::IXHV2ENGINE()
 	funcTablePtr = &(funcPtr[0]);
 
 
-	funcPtr[0] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy1;
-	funcPtr[1] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy2;
-	funcPtr[2] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy3;
+	funcPtr[0] = (HV2FUNCPTR) &IXHV2ENGINE::AddRef;
+	funcPtr[1] = (HV2FUNCPTR) &IXHV2ENGINE::Release;
+	funcPtr[2] = (HV2FUNCPTR) &IXHV2ENGINE::Lock;
 	funcPtr[3] = (HV2FUNCPTR) &IXHV2ENGINE::StartLocalProcessingModes;
 	funcPtr[4] = (HV2FUNCPTR) &IXHV2ENGINE::StopLocalProcessingModes;
 	funcPtr[5] = (HV2FUNCPTR) &IXHV2ENGINE::StartRemoteProcessingModes;
-	funcPtr[6] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy7;
-	funcPtr[7] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy8;
+	funcPtr[6] = (HV2FUNCPTR) &IXHV2ENGINE::StopRemoteProcessingModes;
+	funcPtr[7] = (HV2FUNCPTR) &IXHV2ENGINE::NullSub;
 
 	funcPtr[8] = (HV2FUNCPTR) &IXHV2ENGINE::RegisterLocalTalker;
 	funcPtr[9] = (HV2FUNCPTR) &IXHV2ENGINE::UnregisterLocalTalker;
-	funcPtr[10] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy11;
+	funcPtr[10] = (HV2FUNCPTR) &IXHV2ENGINE::RegisterRemoteTalker;
 	funcPtr[11] = (HV2FUNCPTR) &IXHV2ENGINE::UnregisterRemoteTalker;
 
-	funcPtr[12] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy13;
+	funcPtr[12] = (HV2FUNCPTR) &IXHV2ENGINE::GetRemoteTalkers;
 	funcPtr[13] = (HV2FUNCPTR)&IXHV2ENGINE::IsHeadsetPresent;
 	funcPtr[14] = (HV2FUNCPTR)&IXHV2ENGINE::IsLocalTalking;
 	funcPtr[15] = (HV2FUNCPTR)&IXHV2ENGINE::isRemoteTalking;
@@ -6347,20 +6166,6 @@ IXHV2ENGINE::IXHV2ENGINE()
 	funcPtr[16] = (HV2FUNCPTR) &IXHV2ENGINE::GetDataReadyFlags;
 	funcPtr[17] = (HV2FUNCPTR) &IXHV2ENGINE::GetLocalChatData;
 	funcPtr[18] = (HV2FUNCPTR) &IXHV2ENGINE::SetPlaybackPriority;
-	funcPtr[19] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy20;
+	funcPtr[19] = (HV2FUNCPTR) &IXHV2ENGINE::SubmitIncomingChatData;
 
-	funcPtr[20] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy21;
-	funcPtr[21] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy22;
-	funcPtr[22] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy23;
-	funcPtr[23] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy24;
-
-	funcPtr[24] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy25;
-	funcPtr[25] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy26;
-	funcPtr[26] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy27;
-	funcPtr[27] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy28;
-
-	funcPtr[28] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy29;
-	funcPtr[29] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy30;
-	funcPtr[30] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy31;
-	funcPtr[31] = (HV2FUNCPTR) &IXHV2ENGINE::Dummy32;
 }

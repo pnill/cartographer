@@ -39,9 +39,7 @@ private:
 
 	anyID getClientId(char* name);
 	static void handleLobbyTalk(anyID teamspeakClientID, XUID remoteId);
-	static void handleTeamTalk(anyID teamspeakClientID, XUID remoteId, bool sameTeam);
-	static void handleProximityTalk(anyID teamspeakClientID, XUID remoteId, int remotePlayerIndex, int clientPlayerIndex, bool sameTeam);
-	static void handleNoTeamsTalk(anyID teamspeakClientID, XUID remoteId);
+	static void handleStopTalking(anyID teamspeakClientID, XUID remoteId, XUID clientId, char* remoteXuidStr);
 	void connect();
 	void openPlayback();
 	void openMicrophone();
