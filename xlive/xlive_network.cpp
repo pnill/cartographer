@@ -207,9 +207,11 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 	TRACE("XNetCreateKey");
 	if (pxnkid && pxnkey)
 	{
+		XNetRandom((BYTE*)pxnkid, sizeof(XNKID));
+		//XNetRandom((BYTE*)pxnkey, sizeof(XNKEY));
 
-		memset(pxnkid, 0xAB, sizeof(XNKID));
-		memset(pxnkey, 0XAA, sizeof(XNKEY));
+		//memset(pxnkid, 0xAB, sizeof(XNKID)); 
+		memset(pxnkey, 0xAA, sizeof(XNKEY)); 
 
 		/* These are un-necessary. */
 		//pxnkid->ab[0] &= ~XNET_XNKID_MASK;
@@ -354,7 +356,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 
 		u_long xn = User.xnmap[iplong];
 		
-		if (xn != join_game_xn.ina.s_addr && join_game_xn.ina.s_addr != 0);
+		if (xn != join_game_xn.ina.s_addr && join_game_xn.ina.s_addr != 0)
 		{
 			std::pair <ULONG, SHORT> hostpair = std::make_pair(xn, ntohs(2001));
 			std::pair <ULONG, SHORT> hostpair2 = std::make_pair(xn, htons(2000));
@@ -487,7 +489,7 @@ int WINAPI XNetRegisterKey(XNKID *pxnkid, XNKEY *pxnkey)
 // #56: XNetUnregisterKey // need #51
 int WINAPI XNetUnregisterKey(const XNKID* pxnkid)
 {
-	TRACE("XNetUnregisterKey(%08X)",pxnkid);
+	TRACE("XNetUnregisterKey(%08X)", pxnkid);
 	return 0;
 }
 
@@ -500,7 +502,6 @@ INT   WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid
 	{
 		memset(pxna, 0x00, sizeof(XNADDR)); // Zero memory of the current buffer passed to us by the game.
 		memcpy(pxna, &user->pxna, sizeof(XNADDR));
-
 	}
 	else
 	{

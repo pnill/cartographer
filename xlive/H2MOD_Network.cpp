@@ -843,7 +843,6 @@ void CustomNetwork::applyNetworkHooks() {
 		serializeMembershipPacketOffset = 0x1D0072;
 		deserializeMembershipPacketOffset = 0x1D0496;
 		serializeParametersUpdatePacketOffset = 0x1CE5FA;
-		deserializeMembershipPacketOffset = 0x1D0496;
 	}
 
 	///////////////////////////////////////////////
