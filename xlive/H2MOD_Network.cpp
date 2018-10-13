@@ -756,6 +756,8 @@ char* __cdecl registerChatPackets(void* packetObject) {
 		0);
 }
 
+
+/* This should happen whenever someone quits or joins a game. */
 typedef int(__cdecl *serialize_membership_packet)(void* a1, int a2, int a3);
 serialize_membership_packet serialize_membership_packet_method;
 
@@ -768,22 +770,32 @@ int __cdecl serializeMembershipPacket(void* a1, int a2, int a3) {
 }
 
 
+/* This happens when someone joins or quits a game, the membership packet contains various data about the person. */
 typedef int(__cdecl *deserialize_membership_packet)(void* a1, int a2, int a3);
 deserialize_membership_packet deserialize_membership_packet_method;
 
 int __cdecl deserializeMembershipPacket(void* a1, int a2, int a3) {
 
+	/* Call the original first so the packet is de-serialized into the provided address. */
 	int ret = deserialize_membership_packet_method(a1, a2, a3);
+
+	/* The data that gets de-serialized is stored in a3 */
 	WORD player_count = *(WORD*)((BYTE*)a3 + 0x22);
 	
 	TRACE_GAME_N("[h2mod-network] deserializeMemberShipPacket player count: %i", player_count);
+	
+	/*There's an array of players in +0x26 */
 	BYTE *PlayerArray = (BYTE*)((BYTE*)a3 + 0x26);
 
+	/* Loop the array */
 	for (int i = 0; i < player_count; i++)
 	{
+		/*Each player object in the array +0x02 contains 'peer-address' which is XNADDR */
 		XNADDR *nXN = (XNADDR*)((BYTE*)PlayerArray + 0x02);
-		User.CreateUser(nXN, FALSE);
-		
+
+		if (User.cusers[nXN->inaOnline.s_addr] == 0) // Only create them if we don't already have them in the map.
+			User.CreateUser(nXN, FALSE); // Adds all the necessary information about the user so we don't have to request it from master.
+
 		PlayerArray += 0xB8;
 	}
 
@@ -831,6 +843,7 @@ void CustomNetwork::applyNetworkHooks() {
 		serializeMembershipPacketOffset = 0x1D0072;
 		deserializeMembershipPacketOffset = 0x1D0496;
 		serializeParametersUpdatePacketOffset = 0x1CE5FA;
+		deserializeMembershipPacketOffset = 0x1D0496;
 	}
 
 	///////////////////////////////////////////////

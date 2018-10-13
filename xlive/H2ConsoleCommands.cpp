@@ -292,8 +292,19 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			//network->send_h2mod_packet_player(atoi(firstArg.c_str()), teampak);
 		}
-		else if (firstCommand == "$testscnr") {
+		else if (firstCommand == "$test_player_ptr") {
+
 			wchar_t buf[2048];
+			int player_datum = h2mod->get_unit_datum_from_player_index(1);
+			int player_ptr = call_get_object(player_datum,3);
+
+			int local_player_datum = h2mod->get_unit_datum_from_player_index(0);
+			int local_player_ptr = call_get_object(player_datum, 3);
+			swprintf(buf, sizeof(buf), L"player ptr: %08X local player ptr: %08X local player unit_datum: %08X", player_ptr,local_player_ptr,local_player_datum);
+
+			output(buf);
+
+/*			wchar_t buf[2048];
 
 			char* nObject = new char[0xC4];
 			DWORD dwBack;
@@ -315,7 +326,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 			delete[] nObject;
 
-			output(buf);
+			output(buf);*/
 			
 		}
 		else if (firstCommand == "$maxplayers") {

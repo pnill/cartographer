@@ -106,6 +106,14 @@ int __cdecl call_object_placement_data_new(void* s_object_placement_data, int ob
 
 }
 
+int __cdecl call_entity_datum_to_gamestate_datum(int entity_datum)
+{
+	typedef int(__cdecl *entity_datum_to_gamestate_datum)(int entity_datum);
+	entity_datum_to_gamestate_datum pentity_datum_to_gamestate_datum = (entity_datum_to_gamestate_datum)((BYTE*)h2mod->GetBase() + 0x1F2211);
+
+	return pentity_datum_to_gamestate_datum(entity_datum);
+}
+
 signed int __cdecl call_object_new(void* pObject)
 {
 	//TRACE_GAME("object_new(pObject: %08X)", pObject);
@@ -123,6 +131,18 @@ bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 	add_object_to_sync p_add_object_to_sync = (add_object_to_sync)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x1B2C44 : 0x1B8D14));
 
 	return p_add_object_to_sync(gamestate_object_datum);
+}
+
+/* We should really make this stuff into a struct/class, and access it that way it'd be much cleaner... */
+int get_damage_owner(int damaged_unit_index)
+{
+	int damaged_player_ptr = call_get_object(damaged_unit_index, 3);
+	if (damaged_player_ptr)
+	{
+		return *(int*)((BYTE*)damaged_player_ptr + 0xC8); // player_ptr/unit_ptr + 0xC8 = damaging player this works on vehicles/AI and such too.
+	}
+
+	return -1;
 }
 
 int __cdecl call_get_character_sid_from_datum(int char_datum)
@@ -550,6 +570,8 @@ int H2MOD::get_dynamic_player_base(int playerIndex, bool resetDynamicBase) {
 	return dyanamic;
 }
 
+
+
 void GivePlayerWeapon2(int PlayerIndex, int WeaponId, short Unk)
 {
 	//TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
@@ -847,12 +869,18 @@ XNADDR join_game_xn;
 typedef int(__cdecl *tconnect_establish_write)(void* a1, int a2, int a3);
 tconnect_establish_write pconnect_establish_write;
 
+/* This is technically closer to object death than player-death as it impacts anything with health at all. */
 
 char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 {
-
 	TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
 	TRACE_GAME("OnPlayerDeath() - Team: %i", h2mod->get_unit_team_index(unit_datum_index));
+
+	/* Just testing to see if this was possible this way. */
+	int damaging_player = get_damage_owner(unit_datum_index);
+	TRACE_GAME_N("OnPlayerDeath(): Damaging player: %08X", damaging_player);
+		
+	
 
 	if (b_GunGame) {
 		gunGame->playerDeath->setUnitDatumIndex(unit_datum_index);
@@ -1452,6 +1480,66 @@ void __cdecl GetGameVersion(DWORD *xlive_version, DWORD *build_version, DWORD *b
 	*build_version2 = GAME_BUILD;
 }
 
+
+void GivePlayerWeaponTest(int unit_datum)
+{
+	if (unit_datum != -1 && unit_datum != 0)
+	{
+		char* nObject = new char[0xC4];
+		DWORD dwBack;
+		VirtualProtect(nObject, 0xC4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		call_object_placement_data_new(nObject, Weapon::shotgun, unit_datum, 0);
+
+		int object_index = call_object_new(nObject);
+
+		if (object_index != -1)
+		{
+			call_unit_reset_equipment(unit_datum);
+			call_assign_equipment_to_unit(unit_datum, object_index, 1);
+		}
+		else
+			delete[] nObject;
+	}
+}
+
+
+
+/* 
+   If enabled this will make all devices not work, and will give the player who touched the device control a shotgun! 
+   This is basic testing for a shop/point system.
+ 
+ */
+typedef int(__stdcall *tc_simulation_device_touch_event_definition_touch)(void *thisptr, int a2, int a3, int a4, int a5);
+tc_simulation_device_touch_event_definition_touch pc_simulation_device_touch_event_definition_touch;
+
+int __stdcall c_simulation_device_touch_event_definition_touch(void* thisptr, int a2, int a3, int a4, int a5)
+{
+	int unit_datum = call_entity_datum_to_gamestate_datum(*(int*)((BYTE*)a3 + 4));
+	GivePlayerWeaponTest(unit_datum);
+	return 0;
+	//return pc_simulation_device_touch_event_definition_touch(thisptr,a2,a3,a4,a5);
+}
+
+
+typedef int(__cdecl *tdevice_touch)(int device_datum, int unit_datum);
+tdevice_touch pdevice_touch;
+
+
+//Used for firefight, we'll detect some data from the device and then give a weapon instead of activating the normal action
+//We'll need to reduce points from their firefight points here as well.
+int __cdecl device_touch(int device_datum, int unit_datum)
+{
+	//GivePlayerWeaponTest(unit_datum);
+	//return 0;
+	return pdevice_touch(device_datum, unit_datum);
+}
+
+
+
+
+
+
 void H2MOD::ApplyUnitHooks()
 {
 	DWORD dwBack;
@@ -1463,6 +1551,14 @@ void H2MOD::ApplyUnitHooks()
 	//This decodes the unit creation packet, only gets executed on client.
 	pc_simulation_unit_entity_definition_decode = (tc_simulation_unit_entity_definition_creation_decode)DetourClassFunc((BYTE*)this->GetBase() + (h2mod->Server ? 0x1E22BD : 0x1F8557), (BYTE*)c_simulation_unit_entity_definition_creation_decode, 11);
 	VirtualProtect(pc_simulation_unit_entity_definition_decode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	pdevice_touch = (tdevice_touch)DetourFunc((BYTE*)this->GetBase() + 0x163420, (BYTE*)device_touch, 10);
+	VirtualProtect(pdevice_touch, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	//Commented out as it will only work for clients, hooking one step lower should also work for host.
+	//pc_simulation_device_touch_event_definition_touch = (tc_simulation_device_touch_event_definition_touch)DetourClassFunc((BYTE*)this->GetBase() + 0x1FB25B, (BYTE*)c_simulation_device_touch_event_definition_touch, 8);
+	//VirtualProtect(pc_simulation_device_touch_event_definition_touch, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+
 
 	//Only patch the object_new call on host during AI_Place function, no reason to hook all object_new calls.
 	PatchCall(GetBase() + (h2mod->Server ? 0x2C3B56 : 0x318DEC), object_new_hook);
@@ -1490,6 +1586,8 @@ void H2MOD::ApplyHooks() {
 		TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
 		DWORD dwBack;
+
+	
 
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc((BYTE*)this->GetBase() + 0x1B4C14, (BYTE*)VerifyGameVersionOnJoin, 5);
 		VirtualProtect(p_verify_game_version_on_join, 4, PAGE_EXECUTE_READWRITE, &dwBack);

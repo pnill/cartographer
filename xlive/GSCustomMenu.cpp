@@ -3905,10 +3905,10 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountList() {//__thiscall
 }
 
 void GSCustomMenuCall_AccountList();
-using namespace MapChecksumSync;
+//using namespace MapChecksumSync;
 static bool CMButtonHandler_AccountList(int button_id) {
 	// todo: better error here
-	if (MapChecksumSync::get_startup_info() != startup_state::done)
+	/*if (MapChecksumSync::get_startup_info() != startup_state::done)
 	{
 		switch (MapChecksumSync::get_startup_info())
 		{
@@ -3917,7 +3917,8 @@ static bool CMButtonHandler_AccountList(int button_id) {
 			break;
 		}
 		return true;
-	}
+	}*/
+
 	if (button_id == H2AccountCount + 1) {
 		if (!mode_remove_account) {
 			GSCustomMenuCall_AccountCreate();
@@ -4914,10 +4915,10 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Credits, 7, "Num005");
 	add_cartographer_label(CMLabelMenuId_Credits, 8, "Rude Yoshi");
 	add_cartographer_label(CMLabelMenuId_Credits, 9, "Supersniper");
-	add_cartographer_label(CMLabelMenuId_Credits, 10, "--- Additional 7hanks ---");
-	add_cartographer_label(CMLabelMenuId_Credits, 11, "Project Cartographer Staff");
-	add_cartographer_label(CMLabelMenuId_Credits, 12, "PCMT (Mapping Team)");
-	add_cartographer_label(CMLabelMenuId_Credits, 13, "H2MT (Those past and present)");
+	add_cartographer_label(CMLabelMenuId_Credits, 10, "--- Content Creators ---");
+	add_cartographer_label(CMLabelMenuId_Credits, 11, "General_101");
+	add_cartographer_label(CMLabelMenuId_Credits, 12, "--- Additional 7hanks ---");
+	add_cartographer_label(CMLabelMenuId_Credits, 13, "Project Cartographer Staff");
 	add_cartographer_label(CMLabelMenuId_Credits, 14, "Dev Preview Members");
 	add_cartographer_label(CMLabelMenuId_Credits, 15, "And the many many more");
 	add_cartographer_label(CMLabelMenuId_Credits, 16, "from the Halo 2 Community!");

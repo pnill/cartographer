@@ -229,7 +229,7 @@ void QueryServerData(ULONGLONG xuid,_XLOCATOR_SEARCHRESULT* nResult)
 
 
 
-void GetServersFromHttp(ServerList* servptr)
+void GetServersFromHttp(ServerList* servptr,PXOVERLAPPED pOverlapped, char* pvBuffer)
 {
 	servptr->running = true;
 	
@@ -269,6 +269,17 @@ void GetServersFromHttp(ServerList* servptr)
 	}
 	addDebugText("Server Count:");
 	addDebugText(std::to_string(servptr->total_servers).c_str());
+
+	/* Copy all the servers into the buffer originally passed in XEnumerate */
+	for (int i = 0; i < servptr->total_servers; i++)
+	{
+		memcpy(pvBuffer + (sizeof(_XLOCATOR_SEARCHRESULT) * i), &servptr->servers[i], sizeof(_XLOCATOR_SEARCHRESULT));
+	}
+
+	delete[] servptr->servers;
+
+	pOverlapped->InternalHigh = servptr->total_servers;
+	pOverlapped->InternalLow = ERROR_SUCCESS;
 
 	servptr->running = false;
 	
@@ -326,12 +337,17 @@ bool ServerList::GetRunning()
 	return running;
 }
 
-void ServerList::GetServers()
+void ServerList::GetServers(PXOVERLAPPED pOverlapped, char* pvBuffer)
 {
 	if (!running)
 	{
+
+		/* Set the overlapped routing to ERROR_IO_COMPLETE while we start the operation. */
+		pOverlapped->InternalHigh = ERROR_IO_INCOMPLETE;
+		pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
+
 		total_servers = 0;
-		this->serv_thread = std::thread(GetServersFromHttp, this);
+		this->serv_thread = std::thread(GetServersFromHttp, this,pOverlapped,pvBuffer);
 		this->serv_thread.detach();
 	}
 }

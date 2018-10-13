@@ -1772,11 +1772,17 @@ DWORD WINAPI XGetOverlappedExtendedError(PXOVERLAPPED pOverlapped)
 
 
 // #1083: XGetOverlappedResult
-DWORD WINAPI XGetOverlappedResult(PXOVERLAPPED pOverlapped, DWORD * pResult, DWORD bWait)
+DWORD WINAPI XGetOverlappedResult(PXOVERLAPPED pOverlapped, LPDWORD pResult, BOOL bWait)
 {
 	//TRACE("XGetOverlappedResult  (pOverlapped = %X, pResult = %X, bWait = %d)  (internalLow = %X, internalHigh = %X)",
 	//	pOverlapped, pResult, bWait, pOverlapped->InternalLow, pOverlapped->InternalHigh );
 
+	if (bWait)
+	{
+		while (pOverlapped->InternalLow == ERROR_IO_INCOMPLETE)
+		{
+		}
+	}
 
 	if( pResult )
 	{
@@ -2420,7 +2426,16 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 	if (hEnum == ServerEnum)
 	{
+		pOverlapped->InternalHigh = ERROR_IO_INCOMPLETE;
+		pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
 
+		if (!LiveManager.GetRunning() && LiveManager.servers_left == 0)
+			LiveManager.GetServers(pOverlapped, pvBuffer);
+
+
+		return ERROR_IO_PENDING;
+
+		/*
 		while (LiveManager.GetRunning() == true && LiveManager.GetTotalServers() == 0 || LiveManager.servers_left > 0)
 		{
 			
@@ -2428,7 +2443,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 		if (LiveManager.GetRunning() == false && LiveManager.GetTotalServers() == 0)
 		{
-			LiveManager.GetServers();
+			LiveManager.GetServers(pOverlapped,pvBuffer);
 
 		}
 		
@@ -2447,7 +2462,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 				LiveManager.total_servers = 0;
 
 			
-		}
+		}*/
 	
 	}
 
@@ -3130,7 +3145,7 @@ DWORD WINAPI XUserWriteAchievements (DWORD count, PXUSER_ACHIEVEMENT pAchievemen
 						break;
 
 					case 18:
-						AchievementData.append("Silent But Deadly|Kill 7 opponents from behind in a row without being spotted.");
+						AchievementData.append("Silent But Deadly|Kill 7 opponents from behind.");
 						break;
 
 					case 19:
@@ -3174,11 +3189,11 @@ DWORD WINAPI XUserWriteAchievements (DWORD count, PXUSER_ACHIEVEMENT pAchievemen
 						break;
 
 					case 29:
-						AchievementData.append("Killing Spree|Kill 5 opponents in a row in the same game, without dying.");
+						AchievementData.append("Killing Spree|Kill 5 opponents in a row.");
 						break;
 
 					case 30:
-						AchievementData.append("Running Riot|Kill 10 opponents in a row in the same game, without dying.");
+						AchievementData.append("Running Riot|Kill 10 opponents in a row.");
 						break;
 
 					case 31:
@@ -3186,11 +3201,11 @@ DWORD WINAPI XUserWriteAchievements (DWORD count, PXUSER_ACHIEVEMENT pAchievemen
 						break;
 
 					case 32:
-						AchievementData.append("Roadkill|Run over and kill an opponent with a vehicle.");
+						AchievementData.append("Roadkill|Run over and kill an opponent.");
 						break;
 
 					case 33:
-						AchievementData.append("Bonecracker|Hit and kill an opponent with a melee attack.");
+						AchievementData.append("Bonecracker|Kill an opponent with a melee.");
 						break;
 
 					case 34:
@@ -3198,7 +3213,7 @@ DWORD WINAPI XUserWriteAchievements (DWORD count, PXUSER_ACHIEVEMENT pAchievemen
 						break;
 
 					case 35:
-						AchievementData.append("Skewer Stopper|Kill the sword carrier after they kill 5 or more times in a row with the sword.");
+						AchievementData.append("Skewer Stopper|Kill sword carrier on Spree.");
 						break;
 
 					case 36:
@@ -3206,11 +3221,11 @@ DWORD WINAPI XUserWriteAchievements (DWORD count, PXUSER_ACHIEVEMENT pAchievemen
 						break;
 
 					case 37:
-						AchievementData.append("Air Traffic Controller|Blow up a Banshee in flight while manned, with grenades or a rocket launcher.");
+						AchievementData.append("Air Traffic Controller|Blow up a Banshee.");
 						break;
 
 					case 38:
-						AchievementData.append("Decorated Soldier|Get awarded at least 8 different medals in one non-team game.");
+						AchievementData.append("Decorated Soldier|Get awarded at least 8 medals in non-team game.");
 						break;
 
 					case 39:
@@ -6129,8 +6144,8 @@ HRESULT IXHV2ENGINE::SubmitIncomingChatData(VOID *pThis, XUID xuidRemoteTalker, 
 		client->unmute(tsID);
 
 	XUID test = *(XUID*)pbData;
-	TRACE_GAME_N("[h2mod-voice][SubmitIncomingChatData] - XUID in packet: %lld", test);
-	TRACE_GAME_N("[h2mod-voice][SubmitIncomingChatData] - Trying to unmute tsID: %i  xuid: %lld", tsID, xuidRemoteTalker);
+	//TRACE_GAME_N("[h2mod-voice][SubmitIncomingChatData] - XUID in packet: %lld", test);
+	//TRACE_GAME_N("[h2mod-voice][SubmitIncomingChatData] - Trying to unmute tsID: %i  xuid: %lld", tsID, xuidRemoteTalker);
 
 	*pdwSize = *pdwSize;
 

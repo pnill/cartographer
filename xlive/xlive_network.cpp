@@ -10,6 +10,8 @@
 #include "Globals.h"
 #include "H2Config.h"
 #include "H2MOD_UPNP.h"
+#include "H2OnscreenDebugLog.h"
+
 SOCKET boundsock = INVALID_SOCKET;
 SOCKET game_sock = INVALID_SOCKET;
 SOCKET game_sock_1000 = INVALID_SOCKET;
@@ -34,16 +36,22 @@ ModuleUPnP *upnp = NULL;
 
 void ForwardPorts()
 {
-	upnp->UPnPForwardPort(true, H2Config_base_port + 10, H2Config_base_port + 10, "Halo2_QoS");
-	upnp->UPnPForwardPort(true, H2Config_base_port + 7, H2Config_base_port + 7, "Halo2_voice");
-	upnp->UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2");
-	upnp->UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2_2");
+
+	upnp = new ModuleUPnP;
+	if (upnp == NULL)
+	{
+		upnp->UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
+		upnp->UPnPForwardPort(false, (H2Config_base_port + 7), (H2Config_base_port + 7), "Halo2_voice");
+		upnp->UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2");
+		upnp->UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2_2");
+	}
 
 }
 // #5310: XOnlineStartup
 int WINAPI XOnlineStartup()
 {
-	upnp = new ModuleUPnP;
+
+	memset(&join_game_xn, 0x00, sizeof(XNADDR));
 	//TRACE("XOnlineStartup");
 	ServerStatus = new char[250];
 	QueryPerformanceFrequency(&timerFreq);
@@ -58,8 +66,8 @@ int WINAPI XOnlineStartup()
 	{
 		TRACE("XOnlineStartup - We couldn't intialize our socket");
 	}
-
-	std::thread(ForwardPorts).detach();
+	//ForwardPorts();
+	//std::thread(ForwardPorts).detach();
 
 	return 0;
 }
@@ -142,6 +150,7 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 		TRACE("game_sock set for port %i", ntohs(port));
 		TRACE("connect_port set to %i instead of %i", ntohs(nport), ntohs(port));
 		TRACE("g_port was set to %i", H2Config_base_port);
+		std::thread(ForwardPorts).detach();
 	}
 
 	if (ntohs(port) == 1000)
@@ -254,7 +263,6 @@ INT WINAPI XNetXnAddrToInAddr(XNADDR *pxna, XNKID *pnkid, IN_ADDR *pina)
 	else
 	{
 		TRACE("XNetXnAddrToInAddr() - Could not find user with the AbEnet Specified calling User.GetSecureFromXN()");
-
 		TRACE("XNetXNAddrToInAddr: pina->s_addr: %08X - User.GetSecureFromXN(pxna)", pina->s_addr);
 		pina->s_addr = User.GetSecureFromXN(pxna);
 	}
@@ -346,14 +354,14 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 
 		u_long xn = User.xnmap[iplong];
 		
-		if (xn != join_game_xn.ina.s_addr)
+		if (xn != join_game_xn.ina.s_addr && join_game_xn.ina.s_addr != 0);
 		{
 			std::pair <ULONG, SHORT> hostpair = std::make_pair(xn, ntohs(2001));
 			std::pair <ULONG, SHORT> hostpair2 = std::make_pair(xn, htons(2000));
 			User.smap[hostpair] = iplong;
 			User.smap[hostpair2] = iplong;
 
-			TRACE_GAME_N("[h2mod-socket] XSocketSendTo: ( secureAddr: %08X xn: %08X  - %i ) nPort: %i", iplong, xn, htons(port), htons(nPort));
+			//TRACE_GAME_N("[h2mod-socket] XSocketSendTo: ( secureAddr: %08X xn: %08X  - %i ) nPort: %i", iplong, xn, htons(port), htons(nPort));
 			//xn = join_game_xn.ina.s_addr;
 		}
 
@@ -410,12 +418,11 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 	
 			if (*(ULONG*)buf == annoyance_factor)
 			{
-				User.smap[hostpair] = *(ULONG*)(buf + 4);
-				
-				User.CreateUser((XNADDR*)(buf + 8),TRUE);
+				u_long secure = *(ULONG*)(buf + 4);
 
-				/* Hacky fix, basically if someone swaps IPs we cached their data so we should check if the cached version is still correct. */
-				CUser* user = User.cusers[*(ULONG*)(buf + 4)];
+				User.smap[hostpair] = secure;
+				
+				CUser* user = User.cusers[secure]; // Try to get the user by the secure address they've sent.
 				if (user)
 				{
 					if (user->pxna.ina.s_addr != iplong)
@@ -423,18 +430,15 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 						user->pxna.ina.s_addr = iplong;
 					}
 				}
-
+				else // only create the user if they're not already in the system.
+					User.CreateUser((XNADDR*)(buf + 8), TRUE); 
+				
 				ret = 0;
 			}
 
 			ULONG secure = User.smap[hostpair];
 
 			(((struct sockaddr_in*)from)->sin_addr.s_addr) = secure;
-
-			if (iplong != join_game_xn.ina.s_addr)
-			{
-				TRACE_GAME_N("[h2mod-socket] Got data from non-host IP xn: %08X, secure: %08X, port: %i", iplong, secure, htons(port));
-			}
 
 			if (secure == 0)
 			{
