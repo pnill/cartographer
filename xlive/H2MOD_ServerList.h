@@ -36,7 +36,7 @@ public:
 	int total_peer_gold = 0;
 
 	bool GetRunning();
-	void GetServers();
+	void GetServers(PXOVERLAPPED,char*);
 	int GetServersLeft();
 	int GetTotalServers();
 	void RemoveServer();

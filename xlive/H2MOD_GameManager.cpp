@@ -65,11 +65,6 @@ void startGameThread() {
 								advLobbySettings->parseLobbySettings(recvpak.lobby_settings());
 							}
 							break;
-						case H2ModPacket_Type_map_checksum_state_sync:
-							if (recvpak.has_checksum()) {
-								MapChecksumSync::HandlePacket(recvpak);
-							}
-							break;
 						default:
 							TRACE_GAME("[h2mod-network] Unknown packet type %d", recvpak.type());
 							break;

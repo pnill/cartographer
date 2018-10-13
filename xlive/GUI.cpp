@@ -12,6 +12,7 @@
 #include "H2OnscreenDebugLog.h"
 #include "H2ConsoleCommands.h"
 #include "H2Config.h"
+#include <tchar.h>
 
 
 extern ConsoleCommands* commands;
@@ -67,6 +68,7 @@ double normalSizeFontHeight = 0;
 LPD3DXFONT normalSizeFont = 0;
 LPD3DXFONT largeSizeFont = 0;
 LPD3DXFONT smallFont = 0;
+LPD3DXFONT haloFont = 0;
 
 struct vertex
 {
@@ -79,6 +81,22 @@ struct CVertexList
 	D3DXVECTOR4 xyzrhw;
 	DWORD dColor;
 };
+
+extern HMODULE hThis;
+extern std::string ModulePathA(HMODULE);
+
+char dlldir[256];
+
+char* GetDirectoryFile(char *filename)
+{
+	static char path[256];
+	strcpy_s(dlldir, ModulePathA(hThis).c_str());
+	for (int i = strlen(dlldir); i > 0; i--) { if (dlldir[i] == '\\') { dlldir[i + 1] = 0; break; } }
+
+	strcpy_s(path, dlldir);
+	strcat_s(path, filename);
+	return path;
+}
 
 inline void BuildVertex(D3DXVECTOR4 xyzrhw, D3DCOLOR color, CVertexList* vertexList, int index)
 {
@@ -234,11 +252,43 @@ HRESULT WINAPI XLiveOnDestroyDevice()
 	return S_OK;
 }
 
+TCHAR m_strFontName[80];
+TCHAR m_strFontPath[260];
+
+void InitalizeFont(char *strFontName, char *strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
+{
+	_tcscpy(m_strFontName, strFontName);
+	if (OnOff)
+	{
+		_tcscpy(m_strFontPath, strFontPath);
+		addDebugText("Adding font: ");
+		addDebugText(m_strFontPath);
+		if(AddFontResource(m_strFontPath) > 0)
+		{
+			addDebugText("Font successfully added.");
+		}
+		else
+		{
+			addDebugText("Adding font failed.");
+		}
+	}
+
+	D3DXCreateFont(pD3Ddev, size, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, m_strFontName, &haloFont);
+}
+
 
 void initFontsIfRequired()
 {
+
+
+
+
 	normalSizeFontHeight = 0.017 * verticalRes;
 	largeSizeFontHeight = 0.034 * verticalRes;
+
+	InitalizeFont("Conduit ITC Medium", GetDirectoryFile("maps\\fonts\\conduit_itc_medium1.ttf"), largeSizeFontHeight, pDevice, true);
+
+
 	D3DXCreateFont(pDevice, 10, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Lucida Console", &smallFont);
 
 	if (!normalSizeFont || normalSizeFontHeight != normalSizeCurrentFontHeight) {
@@ -529,6 +579,9 @@ int WINAPI XLiveRender()
 					drawText(0, 15, StatusCheater ? COLOR_YELLOW : COLOR_GREEN, ServerStatus, smallFont);
 			}
 
+			//drawPrimitiveRect(gameWindowWidth / 1.15, gameWindowHeight - 150, 250, 100, D3DCOLOR_ARGB(155, 41, 65, 129));
+			//drawText(gameWindowWidth / 1.13, gameWindowHeight - 145, COLOR_WHITE, "Points: 10,000", haloFont);
+	
 #pragma region Achievement Rendering		
 			if (h2mod->AchievementMap.size() > 0)
 			{
@@ -551,9 +604,7 @@ int WINAPI XLiveRender()
 					achievement_freeze = true;
 				}
 				else
-					achievement_height = achievement_height + 2;
-
-		
+					achievement_height = achievement_height + 2;		
 
 				float scalar = 11.0f;
 				D3DXVECTOR3 Position;
@@ -588,8 +639,7 @@ int WINAPI XLiveRender()
 
 				if (achievement_freeze == true)
 				{
-
-					if (achievement_timer >= 200)
+					if (achievement_timer >= 400)
 					{
 						achievement_freeze = false;
 						achievement_timer = 0;

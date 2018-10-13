@@ -972,6 +972,10 @@ void InitH2Tweaks() {
 
 		WriteJmpTo(GetAddress(0x7E43), WinMain);
 		WriteJmpTo(GetAddress(0x39EA2), is_remote_desktop);
+
+		//Redirect the variable for the server name to ours.
+		WriteValue(H2BaseAddr + 0x001b2ce8, (DWORD)ServerLobbyName);
+
 	}	
   
 	// Both server and client
@@ -983,8 +987,6 @@ void InitH2Tweaks() {
 
 	H2Tweaks::applyPlayersActionsUpdateRatePatch();
 	
-	//Redirect the variable for the server name to ours.
-	WriteValue(H2BaseAddr + 0x001b2ce8, (DWORD)ServerLobbyName);
 	
 	addDebugText("End Startup Tweaks.");
 }
