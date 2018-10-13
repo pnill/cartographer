@@ -3,6 +3,8 @@
 #include "H2Startup.h"
 #include "H2Tweaks.h"
 #include "H2Config.h"
+#include "Blam/BlamLibrary.h"
+
 
 std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
 
@@ -295,12 +297,20 @@ void ConsoleCommands::handle_command(std::string command) {
 		else if (firstCommand == "$test_player_ptr") {
 
 			wchar_t buf[2048];
-			int player_datum = h2mod->get_unit_datum_from_player_index(1);
-			int player_ptr = call_get_object(player_datum,3);
-
 			int local_player_datum = h2mod->get_unit_datum_from_player_index(0);
-			int local_player_ptr = call_get_object(player_datum, 3);
-			swprintf(buf, sizeof(buf), L"player ptr: %08X local player ptr: %08X local player unit_datum: %08X", player_ptr,local_player_ptr,local_player_datum);
+			int local_player_ptr = call_get_object(local_player_datum, 3);
+
+			using namespace Blam::EngineDefinitions::Objects;
+
+			ObjectEntityDefinition* obj = (ObjectEntityDefinition*)(local_player_ptr);
+		
+			swprintf(buf, sizeof(buf), L"Player PTR: %08X, player datum: %08X,player_datum: %08X", local_player_ptr, local_player_datum,obj->PlayerDatum);
+			//int player_datum = h2mod->get_unit_datum_from_player_index(1);
+			//int player_ptr = call_get_object(player_datum,3);
+
+			//int local_player_datum = h2mod->get_unit_datum_from_player_index(0);
+			//int local_player_ptr = call_get_object(player_datum, 3);
+			//swprintf(buf, sizeof(buf), L"player ptr: %08X local player ptr: %08X local player unit_datum: %08X", player_ptr,local_player_ptr,local_player_datum);
 
 			output(buf);
 

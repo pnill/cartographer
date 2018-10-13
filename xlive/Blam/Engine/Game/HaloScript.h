@@ -1,6 +1,7 @@
 #pragma once
 #include "../../Enums/Game/HaloScriptTypes.h"
 
+using namespace Blam::Enums::Game;
 namespace Blam
 {
 	namespace EngineDefinitions
@@ -10,7 +11,7 @@ namespace Blam
 			struct HaloScriptGlobal
 			{
 				hs_type type;
-				byte padding[2];
+				BYTE padding[2];
 				void *data;
 			};
 
