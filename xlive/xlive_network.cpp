@@ -207,11 +207,9 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 	TRACE("XNetCreateKey");
 	if (pxnkid && pxnkey)
 	{
-		XNetRandom((BYTE*)pxnkid, sizeof(XNKID));
-		//XNetRandom((BYTE*)pxnkey, sizeof(XNKEY));
-
-		//memset(pxnkid, 0xAB, sizeof(XNKID)); 
-		memset(pxnkey, 0xAA, sizeof(XNKEY)); 
+		//XNetRandom((BYTE*)pxnkid, sizeof(XNKID)); 
+		memset(pxnkid, 0xAB, sizeof(XNKID));
+		memset(pxnkey, 0xAA, sizeof(XNKEY));
 
 		/* These are un-necessary. */
 		//pxnkid->ab[0] &= ~XNET_XNKID_MASK;
