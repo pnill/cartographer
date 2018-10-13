@@ -732,7 +732,7 @@ int __stdcall fn_c0024fa19(DWORD* thisptr, int a2, int* a3)//__thiscall
 	int(__stdcall* fn_c0024f9a1)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f9a1));
 	int(__stdcall* fn_c0024f9dd)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f9dd));
 	int(__stdcall* fn_c0024ef79)(int) = (int(__stdcall*)(int))(GetAddress(0x0024ef79));
-	int(__stdcall* fn_c0024f5fd)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f5fd));
+	int(__stdcall* fn_c0024f5fd)(DWORD* thisptr, int) = (int(__stdcall*)(DWORD*, int))(GetAddress(0x0024f5fd));
 	int(__thiscall* fn_c0024f015)(DWORD* thisptr, int) = (int(__thiscall*)(DWORD*, int))(GetAddress(0x0024f015));
 	int(__thiscall* fn_c0024f676)(DWORD* thisptr, int) = (int(__thiscall*)(DWORD*, int))(GetAddress(0x0024f676));
 	int(__thiscall* fn_c0024f68a)(DWORD* thisptr, int) = (int(__thiscall*)(DWORD*, int))(GetAddress(0x0024f68a));
@@ -753,7 +753,7 @@ int __stdcall fn_c0024fa19(DWORD* thisptr, int a2, int* a3)//__thiscall
 			result = fn_c0024ef79(a2);
 			break;
 		case 3:
-			result = fn_c0024f5fd(a2);
+			result = fn_c0024f5fd(thisptr, a2);//party management
 			break;
 		case 4:
 			GSCustomMenuCall_AdvLobbySettings3();
@@ -959,13 +959,16 @@ void InitH2Tweaks() {
 		PatchCall(H2BaseAddr + 0x21754C, &sub_20E1D8_boot);
 
 		//Hook for Hitmarker sound effect.
-		//Bad hook crashes when a player punches an object/wall in splitscreen.
-		//pfn_c0017a25d = (tfn_c0017a25d)DetourFunc((BYTE*)H2BaseAddr + 0x0017a25d, (BYTE*)fn_c0017a25d, 10);
+		pfn_c0017a25d = (tfn_c0017a25d)DetourFunc((BYTE*)H2BaseAddr + 0x0017a25d, (BYTE*)fn_c0017a25d, 10);
+		VirtualProtect(pfn_c0017a25d, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//Hook for advanced lobby options.
 		pfn_c0024eeef = (tfn_c0024eeef)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024eeef, (BYTE*)fn_c0024eeef, 9);
+		VirtualProtect(pfn_c0024eeef, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 		pfn_c0024fa19 = (tfn_c0024fa19)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fa19, (BYTE*)fn_c0024fa19, 9);
+		VirtualProtect(pfn_c0024fa19, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 		pfn_c0024fabc = (tfn_c0024fabc)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fabc, (BYTE*)fn_c0024fabc, 13);
+		VirtualProtect(pfn_c0024fabc, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		WriteJmpTo(H2BaseAddr + 0x4544, is_init_flag_set);
 		PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);
@@ -975,7 +978,6 @@ void InitH2Tweaks() {
 
 		//Redirect the variable for the server name to ours.
 		WriteValue(H2BaseAddr + 0x001b2ce8, (DWORD)ServerLobbyName);
-
 	}	
   
 	// Both server and client
@@ -986,7 +988,6 @@ void InitH2Tweaks() {
 	PatchCall(GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 
 	H2Tweaks::applyPlayersActionsUpdateRatePatch();
-	
 	
 	addDebugText("End Startup Tweaks.");
 }

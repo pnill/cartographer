@@ -402,8 +402,6 @@ void CUserManagement::UnregisterLocal()
 wchar_t ServerLobbyName[32] = { L"Cartographer" };
 
 void SetUserUsername(char* username) {
-
-	
 	ZeroMemory(g_szUserName[0], 16);
 	snprintf(g_szUserName[0], 16, username);
 	if (!H2IsDediServer) {
