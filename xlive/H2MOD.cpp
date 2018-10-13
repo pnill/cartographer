@@ -1454,30 +1454,30 @@ bool FlashlightIsEngineSPCheck() {
 	return h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE;
 }
 
-typedef bool(__cdecl* verify_game_version_on_join)(int xlive_version, int build_version, int build_version2);
+typedef bool(__cdecl* verify_game_version_on_join)(int executable_type, int executable_version, int compatible_version);
 verify_game_version_on_join p_verify_game_version_on_join;
 
-bool __cdecl VerifyGameVersionOnJoin(int xlive_version, int build_version, int build_version2)
+bool __cdecl VerifyGameVersionOnJoin(int executable_type, int executable_version, int compatible_version)
 {
-	return xlive_version == XLIVE_VERSION && build_version >= GAME_BUILD && build_version2 <= GAME_BUILD;
+	return executable_type == EXECUTABLE_TYPE && executable_version >= EXECUTABLE_VERSION && compatible_version <= COMPATIBLE_VERSION;
 }
 
-typedef bool(__cdecl* verify_xlive_version)(int xlive_version);
-verify_xlive_version p_verify_xlive_version;
+typedef bool(__cdecl* verify_executable_type)(int executable_type);
+verify_executable_type p_verify_executable_type;
 
-bool __cdecl VerifyXliveVersion(int xlive_version)
+bool __cdecl VerifyExecutableType(int executable_type)
 {
-	return xlive_version == XLIVE_VERSION; // will not display servers that don't match this in server list
+	return executable_type == EXECUTABLE_TYPE; // will not display servers that don't match this in server list
 }
 
-typedef void(__cdecl *get_game_version)(DWORD *xlive_version, DWORD *build_version, DWORD *build_version2);
+typedef void(__cdecl *get_game_version)(DWORD *executable_type, DWORD *executable_version, DWORD *compatible_version);
 get_game_version p_get_game_version;
 
-void __cdecl GetGameVersion(DWORD *xlive_version, DWORD *build_version, DWORD *build_version2)
+void __cdecl GetGameVersion(DWORD *executable_type, DWORD *executable_version, DWORD *compatible_version)
 {
-	*xlive_version = XLIVE_VERSION;
-	*build_version = GAME_BUILD;
-	*build_version2 = GAME_BUILD;
+	*executable_type = EXECUTABLE_TYPE;
+	*executable_version = EXECUTABLE_VERSION;
+	*compatible_version = COMPATIBLE_VERSION;
 }
 
 
@@ -1595,8 +1595,8 @@ void H2MOD::ApplyHooks() {
 		p_get_game_version = (get_game_version)DetourFunc((BYTE*)this->GetBase() + 0x1B4BF5, (BYTE*)GetGameVersion, 8);
 		VirtualProtect(p_get_game_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		p_verify_xlive_version = (verify_xlive_version)DetourFunc((BYTE*)this->GetBase() + 0x1B4C32, (BYTE*)VerifyXliveVersion, 8);
-		VirtualProtect(p_verify_xlive_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		p_verify_executable_type = (verify_executable_type)DetourFunc((BYTE*)this->GetBase() + 0x1B4C32, (BYTE*)VerifyExecutableType, 8);
+		VirtualProtect(p_verify_executable_type, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
 		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
