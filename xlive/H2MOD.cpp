@@ -1532,7 +1532,7 @@ int __cdecl device_touch(int device_datum, int unit_datum)
 {
 	//GivePlayerWeaponTest(unit_datum);
 	//return 0;
-	return pdevice_touch(device_datum, unit_datum)
+	return pdevice_touch(device_datum, unit_datum);
 }
 
 
