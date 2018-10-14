@@ -841,8 +841,8 @@ void CustomNetwork::applyNetworkHooks() {
 		sendChatPacketOffset2 = 0x1A237F;
 		deserializePlayerAddOffset = 0x1D110C;
 		serializeMembershipPacketOffset = 0x1D0072;
-		serializeParametersUpdatePacketOffset = 0x1CE5FA;
 		deserializeMembershipPacketOffset = 0x1D0496;
+		serializeParametersUpdatePacketOffset = 0x1CE5FA;
 	}
 
 	///////////////////////////////////////////////
