@@ -102,6 +102,29 @@ namespace Blam
 		
 				
 			};
+
+			struct GameStateObjectHeader {
+
+			};
+
+			struct GameStateObjectHeaderTable {
+				char tag_string[0x20];
+				int max_count;
+				int datum_size;
+				BYTE alignment_bit;
+				bool is_valid;
+				WORD flags;
+				char data_signature[4];
+				void **allocator;
+				struct {
+					int next_index;
+					int length;
+				}active_indices;
+				int actual_count;
+				DatumIndex next_datum;
+				GameStateObjectHeader* object_header;
+
+			};
 		}
 	}
 }

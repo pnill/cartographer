@@ -927,8 +927,6 @@ tconnect_establish_write pconnect_establish_write;
 char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 {
 
-
-
 	TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
 	TRACE_GAME("OnPlayerDeath() - Team: %i", h2mod->get_unit_team_index(unit_datum_index));
 

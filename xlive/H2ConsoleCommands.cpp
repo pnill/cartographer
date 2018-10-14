@@ -200,6 +200,7 @@ void downloadFromRepoThruConsole(std::string mapFilename) {
 	mapManager->downloadFromRepo(mapFilename);
 }
 
+
 /*
 * Handles the given string command
 * Returns a bool indicating whether the command is a valid command or not
@@ -297,47 +298,20 @@ void ConsoleCommands::handle_command(std::string command) {
 		else if (firstCommand == "$test_player_ptr") {
 
 			wchar_t buf[2048];
+
 			int local_player_datum = h2mod->get_unit_datum_from_player_index(0);
 			int local_player_ptr = call_get_object(local_player_datum, 3);
-
-			using namespace Blam::EngineDefinitions::Objects;
-
-			ObjectEntityDefinition* obj = (ObjectEntityDefinition*)(local_player_ptr);
-		
-			swprintf(buf, sizeof(buf), L"Player PTR: %08X, player datum: %08X,player_datum: %08X", local_player_ptr, local_player_datum,obj->PlayerDatum);
-			//int player_datum = h2mod->get_unit_datum_from_player_index(1);
-			//int player_ptr = call_get_object(player_datum,3);
-
-			//int local_player_datum = h2mod->get_unit_datum_from_player_index(0);
-			//int local_player_ptr = call_get_object(player_datum, 3);
-			//swprintf(buf, sizeof(buf), L"player ptr: %08X local player ptr: %08X local player unit_datum: %08X", player_ptr,local_player_ptr,local_player_datum);
-
+			
+			using namespace Blam::EngineDefinitions::Players;
+			GameStatePlayerTable *test = (GameStatePlayerTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase()+0x4A8260)));
+				
+			GameStatePlayer *player1 = &test->players[0];
+			GameStatePlayer *player2 = &test->players[1];
+			
+			
+			wsprintf(buf, L"player1->team: %i, player2->team: %i, player1->is_chatting: %i, player2->is_chatting: %i", player1->team_index,player2->team_index,player1->is_chatting,player2->is_chatting);
 			output(buf);
 
-/*			wchar_t buf[2048];
-
-			char* nObject = new char[0xC4];
-			DWORD dwBack;
-			VirtualProtect(nObject, 0xC4, PAGE_EXECUTE_READWRITE, &dwBack);
-			UINT32 object_datum = 0xECAD00E4; //elite_run
-
-			if (object_datum) {
-				unsigned int player_datum = h2mod->get_unit_datum_from_player_index(0);
-				call_object_placement_data_new(nObject, object_datum, player_datum, 0);
-				*(float*)(nObject + 0x1C) = h2mod->get_player_x(0, true) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				*(float*)(nObject + 0x20) = h2mod->get_player_y(0, true) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				*(float*)(nObject + 0x24) = (h2mod->get_player_z(0, true) + 5.0f) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				TRACE_GAME("object_datum = %08X, x=%d, y=%d, z=%d", object_datum, *(float*)(nObject + 0x1C), *(float*)(nObject + 0x20), *(float*)(nObject + 0x24));
-
-
-				swprintf(buf, sizeof(buf), L"spawning current permutation %0X", *(UINT32*)(nObject + 0xC));
-				unsigned int object_gamestate_datum = call_object_new(nObject);
-				call_add_object_to_sync(object_gamestate_datum);
-			}
-			delete[] nObject;
-
-			output(buf);*/
-			
 		}
 		else if (firstCommand == "$maxplayers") {
 			if (splitCommands.size() != 2) {
