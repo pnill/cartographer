@@ -42,6 +42,7 @@ int character_datum_from_index(BYTE index)
 
 
 #pragma region engine calls
+
 int __cdecl call_get_object(signed int object_datum_index, int object_type)
 {
 	//TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
@@ -134,6 +135,58 @@ bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 }
 
 /* We should really make this stuff into a struct/class, and access it that way it'd be much cleaner... */
+int get_actor_datum_from_unit_datum(int unit_datum)
+{
+	int unit_ptr = call_get_object(unit_datum, 3);
+	if (unit_ptr)
+	{
+		return *(int*)((BYTE*)unit_ptr + 0x130);
+	}
+
+	return -1;
+}
+
+/* We're going to use this to determine how many points to give a player in firefight for a kill. */
+int get_swarm_scatter_killed_count(int character_datum)
+{
+	__int16 character_index = character_datum & 0xFFFF; // get the upper bits.
+	character_index = character_index << 4; //shift left 4
+
+	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD54);
+	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50);
+	
+	DWORD character_offset = *(DWORD*)((BYTE*)global_tag_instances + character_index + 8);
+	DWORD character_tag = (DWORD)((BYTE*)character_offset + tag_header);
+
+
+	int swarm_count = *(int*)((BYTE*)character_tag + 0x64);
+
+	if (swarm_count > 0)
+	{
+		DWORD swarm_offset = *(DWORD*)((BYTE*)character_tag + 0x68);
+		DWORD tag_instance_pointer = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x482290);
+		DWORD swarm_pointer = (DWORD)((BYTE*)tag_instance_pointer + swarm_offset);
+		DWORD swarm_scatter_killed_count = *(DWORD*)((BYTE*)swarm_pointer);
+	}
+
+
+	return 0;
+}
+
+/* This looks at the actors table to get the character datum which is assigned to the specific actor. */
+int get_char_datum_from_actor(int actor_datum)
+{
+
+	__int16 actor_index = actor_datum & 0xFFFF;
+	DWORD actor_table_ptr = *(DWORD*)((BYTE*)h2mod->GetBase() + 0xA965DC);
+	DWORD actor_table = *(DWORD*)((BYTE*)actor_table_ptr + 0x44);
+	DWORD actor = (DWORD)((BYTE*)actor_table + (actor_index * 0x898));
+	int character_datum = *(int*)((BYTE*)actor+0x54);
+	
+	return character_datum;
+}
+
+/*This is to get the datum of the last player who damaged the datum/unit provided */
 int get_damage_owner(int damaged_unit_index)
 {
 	int damaged_player_ptr = call_get_object(damaged_unit_index, 3);
@@ -873,14 +926,26 @@ tconnect_establish_write pconnect_establish_write;
 
 char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 {
+
 	TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
 	TRACE_GAME("OnPlayerDeath() - Team: %i", h2mod->get_unit_team_index(unit_datum_index));
 
-	/* Just testing to see if this was possible this way. */
-	int damaging_player = get_damage_owner(unit_datum_index);
-	TRACE_GAME_N("OnPlayerDeath(): Damaging player: %08X", damaging_player);
-		
+	/* Just testing to see if this was possible this way. - Firefight testing */
+	int damaging_player_unit = get_damage_owner(unit_datum_index);
+
+	/* More firefight testing... */
+	int actor_datum = get_actor_datum_from_unit_datum(unit_datum_index);
+	if (actor_datum != -1)
+	{
 	
+		signed int char_datum = get_char_datum_from_actor(actor_datum);
+
+		if (char_datum)
+		{
+			get_swarm_scatter_killed_count(char_datum); // this would be points to grant the player who last damaged the AI.
+		}
+
+	}
 
 	if (b_GunGame) {
 		gunGame->playerDeath->setUnitDatumIndex(unit_datum_index);
@@ -1481,7 +1546,7 @@ void __cdecl GetGameVersion(DWORD *executable_type, DWORD *executable_version, D
 }
 
 
-void GivePlayerWeaponTest(int unit_datum)
+void GivePlayerWeaponDatum(int unit_datum,int weapon_datum)
 {
 	if (unit_datum != -1 && unit_datum != 0)
 	{
@@ -1489,7 +1554,7 @@ void GivePlayerWeaponTest(int unit_datum)
 		DWORD dwBack;
 		VirtualProtect(nObject, 0xC4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		call_object_placement_data_new(nObject, Weapon::shotgun, unit_datum, 0);
+		call_object_placement_data_new(nObject, weapon_datum, unit_datum, 0);
 
 		int object_index = call_object_new(nObject);
 
@@ -1516,11 +1581,59 @@ tc_simulation_device_touch_event_definition_touch pc_simulation_device_touch_eve
 int __stdcall c_simulation_device_touch_event_definition_touch(void* thisptr, int a2, int a3, int a4, int a5)
 {
 	int unit_datum = call_entity_datum_to_gamestate_datum(*(int*)((BYTE*)a3 + 4));
-	GivePlayerWeaponTest(unit_datum);
+	//GivePlayerWeaponTest(unit_datum);
 	return 0;
 	//return pc_simulation_device_touch_event_definition_touch(thisptr,a2,a3,a4,a5);
 }
 
+
+
+int get_device_open_up_weapon_datum(int device_datum)
+{
+	__int16 device_gamestate_index = device_datum & 0xFFFF;
+
+	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD54);
+	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50);
+	DWORD game_state_objects_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x4E461C);
+	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
+
+	int device_gamestate_offset = device_gamestate_index + device_gamestate_index * 2;
+	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)game_state_objects_header_table + device_gamestate_offset * 4 + 8);
+	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
+
+	__int16 device_control_index = device_control_datum & 0xFFFF;
+	device_control_index = device_control_index << 4;
+
+	DWORD device_control_tag_offset = *(DWORD*)((BYTE*)device_control_index + global_tag_instances + 8);
+	int weapon_datum = *(int*)((BYTE*)device_control_tag_offset + tag_header + 0xE0);
+
+	return weapon_datum;
+}
+
+/* Use this for firefight, we detect if the device acceleration scale is set to a specific high amount which tells us this is a 'shop' related control device.*/
+float get_device_acceleration_scale(int device_datum)
+{
+
+	__int16 device_gamestate_index = device_datum & 0xFFFF;
+
+	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD54);
+	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50);
+	DWORD game_state_objects_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x4E461C);
+	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
+	
+	int device_gamestate_offset = device_gamestate_index + device_gamestate_index * 2;
+	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)game_state_objects_header_table + device_gamestate_offset * 4 + 8);
+	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
+
+	__int16 device_control_index = device_control_datum & 0xFFFF;
+	device_control_index = device_control_index << 4;
+	
+	DWORD device_control_tag_offset = *(DWORD*)((BYTE*)device_control_index + global_tag_instances + 8);
+	float acceleration_scale = *(float*)((BYTE*)device_control_tag_offset + tag_header + 0x14);
+		
+	return acceleration_scale;
+
+}
 
 typedef int(__cdecl *tdevice_touch)(int device_datum, int unit_datum);
 tdevice_touch pdevice_touch;
@@ -1530,8 +1643,16 @@ tdevice_touch pdevice_touch;
 //We'll need to reduce points from their firefight points here as well.
 int __cdecl device_touch(int device_datum, int unit_datum)
 {
-	//GivePlayerWeaponTest(unit_datum);
-	//return 0;
+
+	// Firefight maps will set this to 999.0f to indicate it's not a real device control.
+	if (get_device_acceleration_scale(device_datum) == 999.0f)
+	{
+		int weapon_datum = get_device_open_up_weapon_datum(device_datum);
+		GivePlayerWeaponDatum(unit_datum, weapon_datum);
+		
+		return 0;
+	}
+
 	return pdevice_touch(device_datum, unit_datum);
 }
 

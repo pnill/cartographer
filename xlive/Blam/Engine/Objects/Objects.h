@@ -2,6 +2,8 @@
 #include "stdafx.h"
 #include "..\Blam\Shared\SharedDefinitions.h"
 #include "..\Blam\Enums\Enums.h"
+
+using namespace Blam::SharedDefinitions;
 namespace Blam
 {
 	namespace EngineDefinitions
@@ -57,12 +59,14 @@ namespace Blam
 				BYTE unk_10[14];//0x11C
 				WORD AnimationUnk;//0x12A
 				BYTE ObjectsAttach;//0x12C
-				BYTE unk_11[11];//0x12D
+				BYTE unk_11[3];//0x12D
+				DatumIndex ActorDatum; // 0x130
+				BYTE unk_17[4]; //0x138
 				DWORD Flags;//0x138
 				Blam::Enums::Player::Team Team;//0x13C
 				WORD unk_12;//0x13D
-				BYTE PlayerIndex;//0x140
-				BYTE unk_13[12];//0x144
+				DatumIndex PlayerDatum;//0x140
+				BYTE unk_13[9];//0x144
 				WORD CrouchJumpRelated;//0x150
 				FLOAT UnitShoot;//0x152
 				BYTE unk_14[102];//0x156
@@ -71,13 +75,24 @@ namespace Blam
 				Blam::SharedDefinitions::c_object_index TargetObject;//0x1D4
 				BYTE unk_16[82];//0x1D8
 				Blam::Enums::Objects::Unit::WeaponIndex UnitSwitchWeapon;//0x22A
-				Blam::SharedDefinitions::c_object_index Blam::Enums::Objects::Unit::UnitWeapons::PrimaryWeapon;//0x22C
-				Blam::SharedDefinitions::c_object_index Blam::Enums::Objects::Unit::UnitWeapons::SecondaryWeapon;//0x230
-				Blam::SharedDefinitions::c_object_index Blam::Enums::Objects::Unit::UnitWeapons::DualWeildWeapon;//0x234
-				Blam::Enums::Objects::Unit::Grenades CurrentGrenadesIndex;//0x250
-				Blam::Enums::Objects::Unit::Grenades CurrentGrenadesIndex2;//0x251
-				Blam::Enums::Objects::Unit::Grenades Blam::Enums::Objects::Unit::Grenades::Fragmentation;//0x252
-				Blam::Enums::Objects::Unit::Grenades Blam::Enums::Objects::Unit::Grenades::Plasma;//0x253
+				DatumIndex PrimaryWeapon;
+				DatumIndex SecondaryWeapon;
+				DatumIndex DualWieldWeapon;
+
+
+				/* Wtf was trying to be done here?? */
+				//Blam::SharedDefinitions::c_object_index Blam::Enums::Objects::Unit::UnitWeapons::PrimaryWeapon;//0x22C 
+				//Blam::SharedDefinitions::c_object_index Blam::Enums::Objects::Unit::UnitWeapons::SecondaryWeapon;//0x230
+				//Blam::SharedDefinitions::c_object_index Blam::Enums::Objects::Unit::UnitWeapons::DualWeildWeapon;//0x234
+				//Blam::Enums::Objects::Unit::Grenades CurrentGrenadesIndex;//0x250
+				//Blam::Enums::Objects::Unit::Grenades CurrentGrenadesIndex2;//0x251
+				//Blam::Enums::Objects::Unit::Grenades Blam::Enums::Objects::Unit::Grenades::Fragmentation;//0x252
+				//Blam::Enums::Objects::Unit::Grenades Blam::Enums::Objects::Unit::Grenades::Plasma;//0x253
+
+				BYTE Grenade1;
+				BYTE Grenade2;
+				BYTE Grenade3;
+				BYTE Grenade4;
 
 				FLOAT ActiveCamoFlagePower;//0x2C4
 				FLOAT ActiveCamoFlageTimer;//0x2C8
@@ -86,6 +101,29 @@ namespace Blam
 				Blam::Enums::Objects::Unit::UnitState UnitState;//0x3F4
 		
 				
+			};
+
+			struct GameStateObjectHeader {
+
+			};
+
+			struct GameStateObjectHeaderTable {
+				char tag_string[0x20];
+				int max_count;
+				int datum_size;
+				BYTE alignment_bit;
+				bool is_valid;
+				WORD flags;
+				char data_signature[4];
+				void **allocator;
+				struct {
+					int next_index;
+					int length;
+				}active_indices;
+				int actual_count;
+				DatumIndex next_datum;
+				GameStateObjectHeader* object_header;
+
 			};
 		}
 	}

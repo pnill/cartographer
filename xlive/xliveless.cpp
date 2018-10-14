@@ -1137,7 +1137,7 @@ DWORD WINAPI XNetSetSystemLinkPort( DWORD a1 )
 }
 
 // #472
-int WINAPI XCustomSetAction(int a1, int a2, int a3)
+int WINAPI XCustomSetAction(DWORD dwActionIndex, LPCWSTR szActionText, DWORD dwFlags)
 {
 	TRACE("XCustomSetAction");
 	return 0;
@@ -2015,9 +2015,24 @@ int WINAPI XShowFriendRequestUI (DWORD dwUserIndex, XUID xuidUser)
     return 1;
 }
 
+typedef struct {
+	DWORD dwType;
+	WCHAR wszCustomText[2000];
+} XPLAYERLIST_BUTTON;
+
+typedef struct {
+	XUID xuidSelected;
+	DWORD dwKeyCode;
+} XPLAYERLIST_RESULT;
+
+typedef struct {
+	XUID xuid;
+	WCHAR wszCustomText[2000];
+} XPLAYERLIST_USER;
+
 
 // #5212: XShowCustomPlayerListUI
-DWORD WINAPI XShowCustomPlayerListUI(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12)
+DWORD WINAPI XShowCustomPlayerListUI(DWORD dwUserIndex, DWORD dwFlags, LPCWSTR pzsTitle, LPCWSTR pszDescription, CONST BYTE *pbImage, DWORD cbImage, CONST XPLAYERLIST_USER *rgPlayers, DWORD cPlayers, CONST XPLAYERLIST_BUTTON *pXButton, CONST XPLAYERLIST_BUTTON *pYButton, XPLAYERLIST_RESULT *pResult, XOVERLAPPED *pOverlapped)
 {
 	TRACE("XShowCustomPlayerListUI");
 	return 1;
