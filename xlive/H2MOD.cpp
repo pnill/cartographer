@@ -386,7 +386,7 @@ bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObje
 	if (*(int*)((char*)pCreationData+0x24) != -1)
 	{	
 		wchar_t DebugText[255] = { 0 };
-		ZeroMemory(DebugText, 255);
+		ZeroMemory(DebugText, sizeof(DebugText));
 		wsprintf(DebugText, L"create_unit_hook - variant type: %08X - ", *(int*)((char*)pCreationData + 0x24));
 	
 		addDebugText(DebugText);

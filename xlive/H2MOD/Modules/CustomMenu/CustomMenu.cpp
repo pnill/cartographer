@@ -2196,8 +2196,8 @@ __declspec(naked) void sub_20F790_CM_nak_Login_Warn() {//__thiscall
 void* __stdcall sub_248beb_deconstructor_Login_Warn(LPVOID lpMem, char a2)//__thiscall
 {
 	//show select profile gui
-	int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
-	sub_209236(0);
+	int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
+	sub_209236(0,0);
 
 	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
 	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
@@ -3969,8 +3969,8 @@ static bool CMButtonHandler_AccountList(int button_id) {
 			//play offline
 			if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", 1234571000000000 + H2GetInstanceId(), 0x100 + H2GetInstanceId(), 0x100 * H2GetInstanceId(), "000000101300", "0000000000000000000000000000000000101300")) {
 				//show select profile gui
-				int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
-				sub_209236(0);
+				int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
+				sub_209236(0,0);
 				H2Config_master_ip = inet_addr("127.0.0.1");
 				H2Config_master_port_relay = 2001;
 				extern int MasterState;
@@ -4511,7 +4511,7 @@ void* __stdcall sub_23BC45(void* thisptr)//__thiscall
 	return v1;
 }
 
-int __cdecl sub_209236(int a1) {
+int __cdecl sub_209236(int a1,int a2) {
 	extern CUserManagement User;
 	if (User.LocalUserLoggedIn()) {
 		int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);

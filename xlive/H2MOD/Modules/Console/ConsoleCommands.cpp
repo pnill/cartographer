@@ -133,7 +133,7 @@ void ConsoleCommands::checkForIds() {
 			while (std::getline(infile, line)) {
 				std::vector<std::string> command = split(line, ',');
 				if (command.size() != 2) {
-					TRACE_GAME("Found line not comma separated right, %s", line);
+					TRACE_GAME("Found line not comma separated right, %s", line.c_str());
 				}
 				else {
 					object_ids[command[0]] = strtoul(command[1].c_str(), NULL, 0);
@@ -332,7 +332,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			ObjectEntityDefinition *player1_object = player1_object_header->object;
 
 
-			memset(buf, 0x00, 2048);
+			memset(buf, 0x00, sizeof(buf));
 			
 			output(buf);
 
