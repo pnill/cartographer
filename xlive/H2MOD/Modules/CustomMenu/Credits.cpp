@@ -9,7 +9,7 @@ static bool CMButtonHandler_Credits(int button_id) {
 }
 
 int __cdecl CustomMenu_Credits_(int a1) {
-	return CustomMenu_CallHead_(a1, (DWORD*)credits_list_widget, (DWORD*)credits_screen_with_menu, (DWORD)CMButtonHandler_Credits, 16, 13);
+	return CustomMenu_CallHead_(a1, (DWORD*)credits_list_widget, (DWORD*)credits_screen_with_menu, (DWORD)CMButtonHandler_Credits, 16, 272);
 }
 
 void GSCustomMenuCall_Credits_() {
