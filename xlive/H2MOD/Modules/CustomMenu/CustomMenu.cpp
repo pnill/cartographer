@@ -4514,8 +4514,8 @@ void* __stdcall sub_23BC45(void* thisptr)//__thiscall
 int __cdecl sub_209236(int a1) {
 	extern CUserManagement User;
 	if (User.LocalUserLoggedIn()) {
-		int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
-		sub_209236(0);
+		int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
+		sub_209236(0,0);
 	}
 	else {
 		if (!isAccountingActiveHandle() && ReadH2Accounts()) {
