@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "H2MOD.h"
-#include "H2Startup.h"
-#include "H2ConsoleCommands.h"
-#include "ReadIniArguments.h"
-#include "Detour.h"
-#include "H2MOD_GunGame.h"
+#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
+#include "H2MOD\Variants\GunGame\GunGame.h"
+#include "Util\ReadIniArguments.h"
+#include "Util\Hooks\Detour.h"
 
 extern ConsoleCommands* commands;
 

@@ -1,26 +1,29 @@
 #include <stdafx.h>
 #include <Wincrypt.h>
-#include "H2MOD.h"
-#include "H2MOD_Mouseinput.h"
-#include "H2MOD_H2X.h"
-#include "H2MOD_GunGame.h"
-#include "CUser.h"
 #include <Mmsystem.h>
-#include "H2OnscreenDebugLog.h"
-#include "discord/DiscordInterface.h"
-#include "H2Config.h"
-#include "H2Tweaks.h"
+#include "H2MOD.h"
 #include "Blam\Engine\FileSystem\FiloInterface.h"
-#include "H2Startup.h"
-#include "MapChecksumSync.h"
+#include "H2MOD\Discord\DiscordInterface.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
+#include "H2MOD\Modules\Input\Mouseinput.h"
+#include "H2MOD\Modules\Tweaks\Tweaks.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Variants\H2X\H2X.h"
+#include "H2MOD\Variants\GunGame\GunGame.h"
+#include "XLive\UserManagement\CUser.h"
+
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
 Halo2Final *h2f = new Halo2Final();
 Infection* infectionHandler = new Infection();
+FireFight* fireFightHandler = new FireFight();
 
 bool b_H2X = false;
 bool b_GunGame = false;
+bool b_FireFight = false;
 bool b_Infection = false;
 bool b_Halo2Final = false;
 
@@ -40,8 +43,15 @@ int character_datum_from_index(BYTE index)
 	return char_tag_datum;
 }
 
+int get_player_index_from_datum(DatumIndex unit_datum)
+{
+	ObjectEntityDefinition *unit_object = (&game_state_objects_header->object_header[unit_datum.Index])->object;
+	return unit_object->PlayerDatum.Index;
+}
 
 #pragma region engine calls
+
+
 
 int __cdecl call_get_object(signed int object_datum_index, int object_type)
 {
@@ -107,13 +117,13 @@ int __cdecl call_object_placement_data_new(void* s_object_placement_data, int ob
 
 }
 
-int __cdecl call_entity_datum_to_gamestate_datum(int entity_datum)
+/*int __cdecl call_entity_datum_to_gamestate_datum(int entity_datum)
 {
 	typedef int(__cdecl *entity_datum_to_gamestate_datum)(int entity_datum);
 	entity_datum_to_gamestate_datum pentity_datum_to_gamestate_datum = (entity_datum_to_gamestate_datum)((BYTE*)h2mod->GetBase() + 0x1F2211);
 
 	return pentity_datum_to_gamestate_datum(entity_datum);
-}
+}*/
 
 signed int __cdecl call_object_new(void* pObject)
 {
@@ -928,24 +938,28 @@ char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 {
 
 	TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
-	TRACE_GAME("OnPlayerDeath() - Team: %i", h2mod->get_unit_team_index(unit_datum_index));
 
-	/* Just testing to see if this was possible this way. - Firefight testing */
+	/* The first value within a2 ( *(DWORD*)(a2) ) appears to be the datum_index of a player from the gamestate_player_table */
+
+	/* This is the unit of the player who last damaged the object*/
 	int damaging_player_unit = get_damage_owner(unit_datum_index);
 
-	/* More firefight testing... */
-	int actor_datum = get_actor_datum_from_unit_datum(unit_datum_index);
-	if (actor_datum != -1)
-	{
-	
-		signed int char_datum = get_char_datum_from_actor(actor_datum);
+	if(b_FireFight) {
 
-		if (char_datum)
-		{
-			get_swarm_scatter_killed_count(char_datum); // this would be points to grant the player who last damaged the AI.
-		}
+		/* Hack until rest of code is changed to support DatumIndex vs int*/
+		DatumIndex ai_datum;
+		ai_datum.Index = unit_datum_index & 0xFFFF0000;
+		ai_datum.Salt = unit_datum_index & 0x0000FFFF;
 
+
+		/*
+			In firefight we want to track AI deaths and execute on them to grant points.
+		*/
+		fireFightHandler->playerDeath->SetPlayerIndex(*(DatumIndex*)(a2));
+		fireFightHandler->playerDeath->SetKilledDatum(ai_datum);
+		fireFightHandler->playerDeath->execute();
 	}
+
 
 	if (b_GunGame) {
 		gunGame->playerDeath->setUnitDatumIndex(unit_datum_index);
@@ -1027,6 +1041,16 @@ void __cdecl onGameEngineChange(int a1)
 
 	if (h2mod->GetEngineType() == EngineType::MAIN_MENU_ENGINE)
 	{
+
+		/* Setup the players table and objects_header table so they can be referenced directly */
+		/* TODO: Update offsets for dedis. */
+		if(game_state_players == NULL)
+			game_state_players = (GameStatePlayerTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + 0x4A8260)));
+		if(game_state_objects_header == NULL)
+			game_state_objects_header = (GameStateObjectHeaderTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + 0x4E461C)));
+		if(game_state_actors == NULL)
+			game_state_actors = (GameStateActorTable*)((*(DWORD*)((BYTE*)h2mod->GetBase() + 0xA965DC)));
+
 		addDebugText("GameEngine: Main-Menu, apply patches");
 		object_to_variant.clear();
 
@@ -1091,7 +1115,6 @@ void __cdecl onGameEngineChange(int a1)
 		}
 
 		H2Tweaks::enableAI_MP(); //TODO: get dedi offset
-		H2Tweaks::applyHitfix(); // "fix hit registration"
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	 
 		H2Tweaks::setCrosshairSize(0, false);
@@ -1569,25 +1592,6 @@ void GivePlayerWeaponDatum(int unit_datum,int weapon_datum)
 }
 
 
-
-/* 
-   If enabled this will make all devices not work, and will give the player who touched the device control a shotgun! 
-   This is basic testing for a shop/point system.
- 
- */
-typedef int(__stdcall *tc_simulation_device_touch_event_definition_touch)(void *thisptr, int a2, int a3, int a4, int a5);
-tc_simulation_device_touch_event_definition_touch pc_simulation_device_touch_event_definition_touch;
-
-int __stdcall c_simulation_device_touch_event_definition_touch(void* thisptr, int a2, int a3, int a4, int a5)
-{
-	int unit_datum = call_entity_datum_to_gamestate_datum(*(int*)((BYTE*)a3 + 4));
-	//GivePlayerWeaponTest(unit_datum);
-	return 0;
-	//return pc_simulation_device_touch_event_definition_touch(thisptr,a2,a3,a4,a5);
-}
-
-
-
 int get_device_open_up_weapon_datum(int device_datum)
 {
 	__int16 device_gamestate_index = device_datum & 0xFFFF;
@@ -1675,12 +1679,7 @@ void H2MOD::ApplyUnitHooks()
 
 	pdevice_touch = (tdevice_touch)DetourFunc((BYTE*)this->GetBase() + 0x163420, (BYTE*)device_touch, 10);
 	VirtualProtect(pdevice_touch, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-	//Commented out as it will only work for clients, hooking one step lower should also work for host.
-	//pc_simulation_device_touch_event_definition_touch = (tc_simulation_device_touch_event_definition_touch)DetourClassFunc((BYTE*)this->GetBase() + 0x1FB25B, (BYTE*)c_simulation_device_touch_event_definition_touch, 8);
-	//VirtualProtect(pc_simulation_device_touch_event_definition_touch, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-
-
+	
 	//Only patch the object_new call on host during AI_Place function, no reason to hook all object_new calls.
 	PatchCall(GetBase() + (h2mod->Server ? 0x2C3B56 : 0x318DEC), object_new_hook);
 
@@ -1867,6 +1866,9 @@ VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DW
 
 void H2MOD::Initialize()
 {
+
+
+	
 	//HANDLE hThread = CreateThread(NULL, 0, Thread1, NULL, 0, NULL);
 
 	this->Base = (DWORD)game_info.base;

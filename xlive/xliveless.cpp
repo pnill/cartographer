@@ -7,15 +7,15 @@
 #include <codecvt>
 #include <unordered_map>
 #include "Globals.h"
-#include "discord/DiscordInterface.h"
-#include "H2Config.h"
-#include "H2MOD_ServerList.h"
-#include "H2Mod_Achievement.h"
+#include "H2MOD/discord/DiscordInterface.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "XLive\Networking\ServerList.h"
+#include "H2MOD\Modules\Achievements\Achievements.h"
 #include "xlivedefs.h"
-#include "CUser.h"
+#include "XLive\UserManagement\CUser.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include <H2MOD_XLiveQoS.h>
+#include "Xlive\Networking\XLiveQoS.h"
 
 using namespace std;
 
@@ -1144,7 +1144,7 @@ int WINAPI XCustomSetAction(DWORD dwActionIndex, LPCWSTR szActionText, DWORD dwF
 }
 
 // #473
-int WINAPI XCustomGetLastActionPress (DWORD, DWORD, DWORD)
+int WINAPI XCustomGetLastActionPress (DWORD* pdwUserIndex, DWORD* pdwActionIndex, XUID *pXUID)
 {
     TRACE("XCustomGetLastActionPress");
     return 0;
@@ -1367,27 +1367,6 @@ BOOL XNotifyGetNext_Compat(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 // #651: XNotifyGetNext
 BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId, PULONG_PTR pParam)
 {
-	char gameName[256];
-
-
-	/*
-	hack - timing issue?? setevent problem??
-	- Dawn of War II  (login)
-	- Resident Evil: Operation Raccoon City  (gamepad)
-	- Battlestations: Pacific  (login)
-	*/
-
-#if 1
-	GetModuleFileNameA( NULL, (LPCH) &gameName, sizeof(gameName) );
-	if( ( strstr( gameName, "DOW2.exe" ) != 0 ) ||
-			( strstr( gameName, "RaccoonCity.exe" ) != 0 ) ||
-			( strstr( gameName, "bsp.exe" ) != 0 ) )
-		return XNotifyGetNext_Compat( hNotification, dwMsgFilter, pdwId, pParam );
-#endif
-
-
-		
-
 	static int print_limit = 30;
 
 	static DWORD sys_signin = 0x7FFFFFFF;
@@ -1510,6 +1489,12 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		
 	}
 
+	if ((g_listener[curlist].area & XNOTIFY_CUSTOM) && 
+		dwMsgFilter == 0)
+	{
+		dwMsgFilter = XN_CUSTOM_ACTIONPRESSED;
+	}
+
 
 	if( dwMsgFilter == 0 )
 	{
@@ -1522,6 +1507,14 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	switch( dwMsgFilter )
 	{
+
+	case XN_CUSTOM_ACTIONPRESSED:
+		//if(kick_player_exists?)
+		*pdwId = XN_CUSTOM_ACTIONPRESSED;
+		*pParam = 0x00000000; // replace the high-bits with action_id
+		exit_code = TRUE;
+	break;
+
 	case XN_SYS_UI:
 		if( sys_ui == 0 )
 		{
@@ -6126,11 +6119,11 @@ HRESULT IXHV2ENGINE::GetLocalChatData( VOID *pThis, DWORD dwUserIndex, PBYTE pbD
 {
 	if (pdwSize && pdwPackets && xuidIsTalkingMap[xFakeXuid[0]])
 	{
-		char dummy_data[0xC];
-		memset(dummy_data, 0x00, 0xC);
-		*(XUID*)&dummy_data = xFakeXuid[0];
-		*(int*)(&dummy_data+4) = rand();
-		memcpy(pbData, dummy_data, 0x0C);
+		char dummy_data[0xC] = { 0x01 };
+		//memset(dummy_data, 0x00, 0xC);
+		//*(XUID*)&dummy_data = xFakeXuid[0];
+		//*(int*)(&dummy_data+4) = rand();
+		//memcpy(pbData, dummy_data, 0x0C);
 		*pdwSize = 0xC;
 		*pdwPackets = 1;
 	}

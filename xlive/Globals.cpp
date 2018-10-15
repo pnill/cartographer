@@ -4,6 +4,10 @@
 MapManager* mapManager = new MapManager();
 AdvLobbySettings* advLobbySettings = new AdvLobbySettings();
 
+GameStatePlayerTable *game_state_players = NULL;
+GameStateObjectHeaderTable* game_state_objects_header = NULL;
+GameStateActorTable* game_state_actors = NULL;
+
 volatile bool isLobby = true;
 bool overrideUnicodeMessage = false;
 

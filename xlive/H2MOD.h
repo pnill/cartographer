@@ -1,10 +1,9 @@
 #pragma once
-
-#include "Hook.h"
 #include <unordered_map>
 #include <set>
 #include <mutex>
 #include "Blam\Enums\Game\GameEngine.h"
+#include "Util\Hooks\Hook.h"
 
 constexpr int XLIVE_VERSION = 4; // I don't recommend changing this
 constexpr int GAME_BUILD = 11122;

@@ -10,6 +10,7 @@ namespace Blam
 	{
 		namespace Objects
 		{
+
 			//size : unknown
 			struct ObjectEntityDefinition//To Do
 			{
@@ -51,7 +52,7 @@ namespace Blam
 				DWORD unk_8;//0x100
 				FLOAT ShieldsRechargeTimer;//0x104
 				WORD ShieldStun2;//0x108
-				BYTE CollisionFlags;//0x10A
+				BYTE CollisionFlags;//0x10A - flags in general not just collision, it's how the player is killed for instance.
 				BYTE HealthFlags;//0x10B
 				DWORD unk_9[3];//0x10C
 				WORD UnkFlags;//0x118
@@ -75,10 +76,10 @@ namespace Blam
 				Blam::SharedDefinitions::c_object_index TargetObject;//0x1D4
 				BYTE unk_16[82];//0x1D8
 				Blam::Enums::Objects::Unit::WeaponIndex UnitSwitchWeapon;//0x22A
-				DatumIndex PrimaryWeapon;
-				DatumIndex SecondaryWeapon;
-				DatumIndex DualWieldWeapon;
-
+				DatumIndex PrimaryWeapon; // 0x22C
+				DatumIndex SecondaryWeapon; // 0x230
+				DatumIndex DualWieldWeapon; // 0x234
+				BYTE pad[0x18]; //  0x238 
 
 				/* Wtf was trying to be done here?? */
 				//Blam::SharedDefinitions::c_object_index Blam::Enums::Objects::Unit::UnitWeapons::PrimaryWeapon;//0x22C 
@@ -88,11 +89,16 @@ namespace Blam
 				//Blam::Enums::Objects::Unit::Grenades CurrentGrenadesIndex2;//0x251
 				//Blam::Enums::Objects::Unit::Grenades Blam::Enums::Objects::Unit::Grenades::Fragmentation;//0x252
 				//Blam::Enums::Objects::Unit::Grenades Blam::Enums::Objects::Unit::Grenades::Plasma;//0x253
-
-				BYTE Grenade1;
-				BYTE Grenade2;
-				BYTE Grenade3;
-				BYTE Grenade4;
+				/*
+				if (type == GrenadeType::Frag)
+					*(BYTE*)((BYTE*)unit_object + 0x252) = count;
+				if (type == GrenadeType::Plasma)
+					*(BYTE*)((BYTE*)unit_object + 0x253) = count;*/
+				
+				BYTE CurrentGrenadesIndex; //0x250
+				BYTE CurrentGrenadesIndex2; //0x251
+				BYTE Frag_Grenades; //0x252
+				BYTE Plasma_Grenades; //0x253
 
 				FLOAT ActiveCamoFlagePower;//0x2C4
 				FLOAT ActiveCamoFlageTimer;//0x2C8
@@ -104,8 +110,14 @@ namespace Blam
 			};
 
 			struct GameStateObjectHeader {
-
+				__int16 datum_salt; //0x02
+				BYTE flags; //0x03
+				Blam::Enums::Objects::ObjectType type; //0x04
+				__int16 unk__; //0x06
+				__int16 unk_size; //0x08
+				ObjectEntityDefinition* object; //0x0C
 			};
+			static_assert(sizeof(GameStateObjectHeader) == 0xC, "Invalid GameStateObjectHeader size");
 
 			struct GameStateObjectHeaderTable {
 				char tag_string[0x20];
@@ -125,6 +137,8 @@ namespace Blam
 				GameStateObjectHeader* object_header;
 
 			};
+
+	
 		}
 	}
 }

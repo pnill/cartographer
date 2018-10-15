@@ -11,21 +11,30 @@
 #include "h2mod.h"
 #include <windows.h>
 #include "xliveless.h"
-#include "Hook.h"
-#include "ReadIniArguments.h"
+#include "Util\Hooks\Hook.h"
+#include "Util\ReadIniArguments.h"
 
-#include "TSClient.h"
-#include "TSServer.h"
-#include "H2MOD_Players.h"
-#include "H2MOD_GameType.h"
-#include "H2MOD_Halo2Final.h"
-#include "H2MOD_Infection.h"
-#include "H2MOD_GunGame.h"
-#include "H2ConsoleCommands.h"
-#include "H2MOD_MapManager.h"
-#include "H2MOD_Network.h"
-#include "H2MOD_GameManager.h"
-#include "H2MOD_AdvLobbySettings.h"
+#include "Blam\BlamLibrary.h"
+#include "H2MOD\TeamSpeak\TSClient.h"
+#include "H2MOD\TeamSpeak\TSServer.h"
+#include "H2MOD\Modules\Players\Players.h"
+#include "H2MOD\Variants\VariantSystem.h"
+#include "H2MOD\Variants\H2Final\H2Final.h"
+#include "H2MOD\Variants\Infection\Infection.h"
+#include "H2MOD\Variants\FireFight\FireFight.h"
+#include "H2MOD\Variants\GunGame\GunGame.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\GameManager\GameManager.h"
+#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
+
+using namespace Blam::EngineDefinitions::Players;
+using namespace Blam::EngineDefinitions::Objects;
+using namespace Blam::EngineDefinitions::Actors;
+extern GameStatePlayerTable *game_state_players;
+extern GameStateObjectHeaderTable* game_state_objects_header;
+extern GameStateActorTable* game_state_actors;
 
 extern XNADDR join_game_xn;
 extern MapManager* mapManager;

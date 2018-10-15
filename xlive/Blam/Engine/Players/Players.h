@@ -1,5 +1,4 @@
 #pragma once
-#include "..\stdafx.h"
 #include "..\Blam\Enums\Enums.h"
 #include "..\Blam\Shared\SharedDefinitions.h"
 
@@ -9,30 +8,14 @@ namespace Blam
 {
 	namespace EngineDefinitions
 	{
-
-		/* DWORD player_table_ptr;
-		player_table_ptr += 0x44;
-
-		for (int i = 0; i <= 16; i++)
-		{
-			wchar_t* comparename = (wchar_t*)(*(DWORD*)player_table_ptr + (i * 0x204) + 0x40);
-
-			TRACE_GAME("[H2MOD]::get_player_index_from_name( %ws : %ws )", playername, comparename);
-
-			if (wcscmp(comparename, playername))
-			{
-				return i;
-			}
-		*/
 		namespace Players
-		{
-			#pragma pack(push, 1) 
+		{	
+#pragma pack(push, 1) 
 			struct GameStatePlayer //size:0x204
-
 			{
 				DWORD UnkPlayerDatum; //0x00
 				XUID xuid;
-				/* This looks very similar to IDs seen previously when reversing entity simulation, can test by resolving a datum using it.*/
+				/* Trying to convert the peer_user_index to a datum via the entity one used in voice does not work... */
 				int peer_index; //0x0C
 				int peer_user_index; // 0x10
 				/* These are based on the beta and can be wrong/off. */
@@ -86,7 +69,8 @@ namespace Blam
 				BYTE unk_pad4[0x68]; //0x1FC
 				int is_chatting; // 0x200
 			};
-			#pragma pack(pop)
+#pragma pack(pop)
+			static_assert(sizeof(GameStatePlayer) == 0x204, "Invalid GameStatePlayer size");
 
 			struct GameStatePlayerTable
 			{
@@ -108,6 +92,7 @@ namespace Blam
 				GameStatePlayer *players; //0x48
 
 			};
+			
 		}
 	}
 }
