@@ -333,6 +333,18 @@
     <ClCompile Include="H2MOD\Modules\RunLoop\RunLoop.cpp">
       <Filter>Source Files\H2MOD\Modules\RunLoop</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD\Modules\CustomMenu\Credits.cpp">
+      <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp">
+      <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\CustomMenu\c_list_widget.cpp">
+      <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp">
+      <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">
@@ -592,6 +604,18 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\RunLoop\RunLoop.h">
       <Filter>Source Files\H2MOD\Modules\RunLoop</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\CustomMenu\Credits.h">
+      <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.h">
+      <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h">
+      <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h">
+      <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

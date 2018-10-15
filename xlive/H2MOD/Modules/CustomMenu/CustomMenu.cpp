@@ -3249,10 +3249,17 @@ int(__cdecl *CustomMenuFuncPtrHelp_Credits())(int) {
 	return CustomMenu_Credits;
 }
 
+
 DWORD* menu_vftable_1_Credits = 0;
 DWORD* menu_vftable_2_Credits = 0;
 
+int __fastcall test_credits_construct(void* a1,DWORD _EDX, char a2)
+{
+	return sub_2111ab_CMLTD((int)a1, a2, CMLabelMenuId_Credits, 0xFFFFFFF0, 0xFFFFFFF1);
+}
+
 void CMSetupVFTables_Credits() {
+	//CMSetupVFTables(&menu_vftable_1_Credits, &menu_vftable_2_Credits, (DWORD)CMLabelButtons_Credits, (DWORD)test_credits_construct, (DWORD)CustomMenuFuncPtrHelp_Credits, (DWORD)sub_20F790_CM_nak_Credits, true, 0);
 	CMSetupVFTables(&menu_vftable_1_Credits, &menu_vftable_2_Credits, (DWORD)CMLabelButtons_Credits, (DWORD)sub_2111ab_CMLTD_nak_Credits, (DWORD)CustomMenuFuncPtrHelp_Credits, (DWORD)sub_20F790_CM_nak_Credits, true, 0);
 }
 
@@ -3260,9 +3267,12 @@ int __cdecl CustomMenu_Credits(int a1) {
 	return CustomMenu_CallHead(a1, menu_vftable_1_Credits, menu_vftable_2_Credits, (DWORD)&CMButtonHandler_Credits, 16, 272);
 }
 
+extern void GSCustomMenuCall_Credits_();
+
 void GSCustomMenuCall_Credits() {
-	int WgitScreenfunctionPtr = (int)(CustomMenu_Credits);
-	CallWgit(WgitScreenfunctionPtr);
+	GSCustomMenuCall_Credits_();
+	//int WgitScreenfunctionPtr = (int)(CustomMenu_Credits);
+	//CallWgit(WgitScreenfunctionPtr);
 }
 
 #pragma endregion

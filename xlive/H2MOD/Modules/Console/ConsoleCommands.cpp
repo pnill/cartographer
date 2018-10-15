@@ -4,6 +4,7 @@
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "Blam/BlamLibrary.h"
+#include "H2MOD\Modules\CustomMenu\Credits.h"
 
 
 std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
@@ -312,6 +313,10 @@ void ConsoleCommands::handle_command(std::string command) {
 			set_team->set_team(atoi(secondArg.c_str()));
 
 			//network->send_h2mod_packet_player(atoi(firstArg.c_str()), teampak);
+		}
+		else if (firstCommand == "$menu_test") {
+			//CreditsMenu_list *menu_test = new CreditsMenu_list(0xFF000006);
+		
 		}
 		else if (firstCommand == "$test_player_ptr") {
 
