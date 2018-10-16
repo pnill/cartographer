@@ -309,12 +309,22 @@
     <ClCompile Include="Util\Hooks\Detour.cpp" />
     <ClCompile Include="Util\Hooks\Hook.cpp" />
     <ClCompile Include="xliveless.cpp" />
+    <ClCompile Include="XLive\achievements\XAchievements.cpp" />
     <ClCompile Include="XLive\Networking\ServerList.cpp" />
     <ClCompile Include="XLive\Networking\upnp.cpp" />
     <ClCompile Include="XLive\Networking\XLiveQoS.cpp" />
     <ClCompile Include="XLive\Networking\xlive_network.cpp" />
+    <ClCompile Include="XLive\Networking\xnet.cpp" />
+    <ClCompile Include="XLive\Networking\XSocket.cpp" />
     <ClCompile Include="XLive\UserManagement\CUser.cpp" />
     <ClCompile Include="XLive\UserManagement\protobuf\packet.pb.cc" />
+    <ClCompile Include="XLive\Voice\Voice.cpp" />
+    <ClCompile Include="XLive\XAM\xam.cpp" />
+    <ClCompile Include="XLive\xbox\xbox.cpp" />
+    <ClCompile Include="XLive\XUser\XCustomAction.cpp" />
+    <ClCompile Include="XLive\XUser\XUser.cpp" />
+    <ClCompile Include="XLive\XUser\XUserContext.cpp" />
+    <ClCompile Include="XLive\XUser\XUserProperty.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -399,11 +409,21 @@
     <ClInclude Include="Util\ReadIniArguments.h" />
     <ClInclude Include="xlivedefs.h" />
     <ClInclude Include="xliveless.h" />
+    <ClInclude Include="XLive\achievements\XAchievements.h" />
     <ClInclude Include="XLive\Networking\ServerList.h" />
     <ClInclude Include="XLive\Networking\upnp.h" />
     <ClInclude Include="XLive\Networking\XLiveQoS.h" />
+    <ClInclude Include="XLive\Networking\xnet.h" />
+    <ClInclude Include="XLive\Networking\XSocket.h" />
     <ClInclude Include="XLive\UserManagement\CUser.h" />
     <ClInclude Include="XLive\UserManagement\protobuf\packet.pb.h" />
+    <ClInclude Include="XLive\Voice\Voice.h" />
+    <ClInclude Include="XLive\XAM\xam.h" />
+    <ClInclude Include="XLive\xbox\xbox.h" />
+    <ClInclude Include="XLive\XUser\XCustomAction.h" />
+    <ClInclude Include="XLive\XUser\XUser.h" />
+    <ClInclude Include="XLive\XUser\XUserContext.h" />
+    <ClInclude Include="XLive\XUser\XUserProperty.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def" />

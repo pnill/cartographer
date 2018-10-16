@@ -14,6 +14,9 @@
 #include "Globals.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
+#include "XLive\XUser\XUserContext.h"
+#include "XLive\XUSer\XUserProperty.h"
+#include "XLive\XUser\XUser.h"
 #include "xliveless.h"
 
 using namespace rapidjson;
@@ -23,7 +26,9 @@ extern unsigned short H2Config_base_port;
 
 using namespace std;
 
-extern XUID xFakeXuid[4];
+HANDLE ServerEnum = NULL;
+bool ServerEnumRan = false;
+ServerList LiveManager;
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
@@ -502,4 +507,101 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 	
 	// not done - error now
 	return S_OK;
+}
+
+// 5233: ??
+DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties, PXUSER_PROPERTY pProperties, DWORD pOverlapped)
+{
+	// TRACE("XLocatorGetServiceProperty  (*** checkme ***) (dwUserIndex = %X, cNumProperties = %X, pProperties = %X, pOverlapped = %X)",
+	//		dwUserIndex, cNumProperties, pProperties, pOverlapped);
+
+	if (LiveManager.GetServerCounts())
+	{
+		pProperties[0].value.nData = LiveManager.total_count;
+		pProperties[1].value.nData = LiveManager.total_public;
+		pProperties[2].value.nData = LiveManager.total_peer_gold + LiveManager.total_public_gold;
+		pProperties[3].value.nData = LiveManager.total_peer;
+
+		return S_OK;
+	}
+
+	pProperties[0].value.nData = 1;
+	pProperties[1].value.nData = 3;
+	pProperties[2].value.nData = 3;
+	pProperties[3].value.nData = 7;
+
+	return S_OK;
+}
+
+
+// 5234: ??
+DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, DWORD* pcbBuffer, PHANDLE phEnum)
+{
+	TRACE("XLocatorCreateServerEnumerator");
+
+
+	*pcbBuffer = (DWORD)(sizeof(_XLOCATOR_SEARCHRESULT) * (LiveManager.total_count + 10));
+
+	if (phEnum)
+	{
+		*phEnum = CreateMutex(NULL, NULL, NULL);
+
+		TRACE("- Handle = %X", *phEnum);
+		ServerEnum = *phEnum;
+	}
+
+	//PopulateList();
+
+	// not done - error now
+	return ERROR_SUCCESS;
+}
+
+
+// 5231: ??
+
+
+
+
+// 5235: ??
+DWORD WINAPI XLocatorCreateServerEnumeratorByIDs(DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6, DWORD a7, DWORD a8)
+{
+	TRACE("XLocatorCreateServerEnumeratorByIDs");
+
+
+	// not done - error now
+	return 0x57;
+}
+
+
+// 5236: ??
+DWORD WINAPI XLocatorServiceInitialize(DWORD a1, DWORD a2)
+{
+	TRACE("XLocatorServiceInitialize  (a1 = %X, a2 = %X)",
+		a1, a2);
+
+
+	/*
+	Lost Planet, Gears of War
+	- LocatorV1.434307DE.RTP.
+	*/
+
+#if 0
+	while (1)
+		Sleep(1);
+#endif
+
+
+	// GFWL offline
+	return 0;
+}
+
+
+// 5237: ??
+DWORD WINAPI XLocatorServiceUnInitialize(DWORD a1)
+{
+	TRACE("XLocatorServiceUnInitialize(a1 = %X)", a1);
+
+
+	// not done - error now
+	return 0x80004001;
 }

@@ -109,9 +109,6 @@
     <Filter Include="Source Files\H2MOD\TeamSpeak">
       <UniqueIdentifier>{0cc52107-bf23-4ffa-8f69-d153a943b89d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\XLive\Networking">
-      <UniqueIdentifier>{e7babc00-c5c7-47f1-a0bf-4c4534faab07}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\H2MOD\Variants\H2Final">
       <UniqueIdentifier>{8ae2946e-1bb2-4bd1-8e7c-1dd9790a829e}</UniqueIdentifier>
     </Filter>
@@ -181,6 +178,24 @@
     <Filter Include="Source Files\H2MOD\Modules\RunLoop">
       <UniqueIdentifier>{5e8b033a-c15e-416a-b337-ee88c600391e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\XLive\xbox">
+      <UniqueIdentifier>{decbdb97-8b35-4bac-9f62-0d53483efb1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\XLive\xam">
+      <UniqueIdentifier>{09d5917d-08b0-4161-9503-eec5e8bfb645}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\XLive\xnet">
+      <UniqueIdentifier>{e7babc00-c5c7-47f1-a0bf-4c4534faab07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\XLive\voice">
+      <UniqueIdentifier>{2f8a9d94-6188-4ab1-ad77-da4dba03ddbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\XLive\achievements">
+      <UniqueIdentifier>{37ab291b-fcec-408d-b4be-de88e2a0c818}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\XLive\XUser">
+      <UniqueIdentifier>{03222414-2233-499e-9443-3a1a5e4d9030}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -244,19 +259,19 @@
       <Filter>Source Files\H2MOD\TeamSpeak</Filter>
     </ClCompile>
     <ClCompile Include="XLive\Networking\xlive_network.cpp">
-      <Filter>Source Files\XLive\Networking</Filter>
+      <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Variants\H2Final\H2Final.cpp">
       <Filter>Source Files\H2MOD\Variants\H2Final</Filter>
     </ClCompile>
     <ClCompile Include="XLive\Networking\ServerList.cpp">
-      <Filter>Source Files\XLive\Networking</Filter>
+      <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
     <ClCompile Include="XLive\Networking\XLiveQoS.cpp">
-      <Filter>Source Files\XLive\Networking</Filter>
+      <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
     <ClCompile Include="XLive\Networking\upnp.cpp">
-      <Filter>Source Files\XLive\Networking</Filter>
+      <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Variants\H2X\H2X.cpp">
       <Filter>Source Files\H2MOD\Variants\H2X</Filter>
@@ -344,6 +359,36 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp">
       <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Voice\Voice.cpp">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XAM\xam.cpp">
+      <Filter>Source Files\XLive\xam</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\xbox\xbox.cpp">
+      <Filter>Source Files\XLive\xbox</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\achievements\XAchievements.cpp">
+      <Filter>Source Files\XLive\achievements</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XUser\XUser.cpp">
+      <Filter>Source Files\XLive\XUser</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XUser\XUserContext.cpp">
+      <Filter>Source Files\XLive\XUser</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XUser\XUserProperty.cpp">
+      <Filter>Source Files\XLive\XUser</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XUser\XCustomAction.cpp">
+      <Filter>Source Files\XLive\xbox</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Networking\xnet.cpp">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Networking\XSocket.cpp">
+      <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -522,13 +567,13 @@
       <Filter>Source Files\H2MOD\Variants\H2Final</Filter>
     </ClInclude>
     <ClInclude Include="XLive\Networking\ServerList.h">
-      <Filter>Source Files\XLive\Networking</Filter>
+      <Filter>Source Files\XLive\xnet</Filter>
     </ClInclude>
     <ClInclude Include="XLive\Networking\XLiveQoS.h">
-      <Filter>Source Files\XLive\Networking</Filter>
+      <Filter>Source Files\XLive\xnet</Filter>
     </ClInclude>
     <ClInclude Include="XLive\Networking\upnp.h">
-      <Filter>Source Files\XLive\Networking</Filter>
+      <Filter>Source Files\XLive\xnet</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\H2X\H2X.h">
       <Filter>Source Files\H2MOD\Variants\H2X</Filter>
@@ -616,6 +661,36 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h">
       <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Voice\Voice.h">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XAM\xam.h">
+      <Filter>Source Files\XLive\xam</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\xbox\xbox.h">
+      <Filter>Source Files\XLive\xbox</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\achievements\XAchievements.h">
+      <Filter>Source Files\XLive\achievements</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XUser\XUser.h">
+      <Filter>Source Files\XLive\XUser</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XUser\XUserContext.h">
+      <Filter>Source Files\XLive\XUser</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XUser\XUserProperty.h">
+      <Filter>Source Files\XLive\XUser</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XUser\XCustomAction.h">
+      <Filter>Source Files\XLive\xbox</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Networking\xnet.h">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Networking\XSocket.h">
+      <Filter>Source Files\XLive\xnet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -28,6 +28,7 @@
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\GameManager\GameManager.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
+#include "H2MOD\Modules\Achievements\Achievements.h"
 
 using namespace Blam::EngineDefinitions::Players;
 using namespace Blam::EngineDefinitions::Objects;
@@ -50,6 +51,7 @@ extern char* replacedNetworkNormalTextWidget2;
 
 extern std::unordered_map<XUID, BOOL> xuidIsTalkingMap;
 extern std::unordered_map<XUID, anyID> xuidToTSid;
+extern std::map<DWORD, bool> achievementList;
 
 extern bool microphoneEnabled;
 extern IN_ADDR clientMachineAddress;
@@ -62,3 +64,9 @@ std::vector<std::string> split(const std::string &s, char delim);
 int stripWhitespace(wchar_t *inputStr);
 
 void patchBYTEs(BYTE* orig, BYTE* values, int size);
+
+extern int H2GetInstanceId();
+
+/* XLive Globals*/
+extern UINT g_online;
+extern XUID xFakeXuid[4];

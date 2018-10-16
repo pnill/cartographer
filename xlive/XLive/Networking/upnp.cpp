@@ -1,6 +1,7 @@
 #include "XLive\Networking\upnp.h"
 #include <miniupnpc/upnpcommands.h>
 #include <string>
+#include "Globals.h"
 
 /* Ripped from ED thanks guys - PermaNull*/
 ModuleUPnP::ModuleUPnP()
@@ -32,4 +33,13 @@ Utils::UPnPResult ModuleUPnP::UPnPForwardPort(bool tcp, int externalport, int in
 			type = Utils::UPnPErrorType::PortMapError;
 
 		return Utils::UPnPResult(type, ret);
+}
+
+
+DWORD WINAPI XLiveGetUPnPState(DWORD a1)
+{
+	TRACE("XLiveGetUPnPState  (a1 = %X)", a1);
+
+
+	return 0;
 }

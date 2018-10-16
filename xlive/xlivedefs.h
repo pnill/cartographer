@@ -1,6 +1,7 @@
 #ifndef XLIVEDEFS_H
 #define XLIVEDEFS_H
-
+#include "XLive\XUser\XUserProperty.h"
+#include "XLive\XUser\XUserContext.h"
 
 //typedef unsigned __int64 ULONG_PTR, *PULONG_PTR;
 //typedef unsigned long DWORD_PTR;
@@ -74,57 +75,9 @@
 //
 #define XNET_STARTUP_DISABLE_PEER_ENCRYPTION        0x08
 
-#define XUSER_PROPERTY_GAMETYPE_NAME		0x40008228
-#define XUSER_PROPERTY_GAMETYPE_NAME_2		0x4000822B
-#define XUSER_PROPERTY_SERVER_NAME			0x40008230
-#define XUSER_PROPERTY_SERVER_DESC			0x40008225
-#define XUSER_PROPERTY_MAP_ID				0x10008207
-#define XUSER_PROPERTY_MAP_ID_2				0x1000820A
-#define XUSER_PROPERTY_MAP_NAME				0x40008226
-#define XUSER_PROPERTY_MAP_NAME_2			0x40008229
-#define XUSER_PROPERTY_GAMETYPE_ID			0x10008209
-#define XUSER_PROPERTY_GAME_STATUS			0x10008211
-#define XUSER_PROPERTY_VERSION_1			0x1000820E
-#define XUSER_PROPERTY_VERSION_2			0x1000820F
-#define XUSER_PROPERTY_UNKNOWN_INT64		0x2000821B
-#define XUSER_PROPERTY_MAP_HASH_1			0x40008227
-#define XUSER_PROPERTY_MAP_HASH_2			0x4000822A
-#define XUSER_PROPERTY_USER_INT				0x10008202
-#define XUSER_PROPERTY_UNKNOWN_INT32_1		0x10008208
-#define XUSER_PROPERTY_UNKNOWN_INT32_2		0x1000820B
-#define XUSER_PROPERTY_UNKNOWN_INT32_3		0x1000820C
-#define XUSER_PROPERTY_UNKNOWN_INT32_4		0x1000820D
-#define XUSER_PROPERTY_PARTY_PRIVACY		0x10008210
-#define XUSER_PROPERTY_UNKNOWN_INT32_6		0x10008212
-#define XUSER_PROPERTY_UNKNOWN_INT32_7		0x10008213
-#define XUSER_PROPERTY_USERNAME_2			0x4000822C
-
-#define XLOCATOR_DEDICATEDSERVER_PROPERTY_START     0x200
-
-// These properties are used for search only.
-// The search result header should already contains the information, and the query should not request these properties again.
-#define X_PROPERTY_DEDICATEDSERVER_IDENTITY             XPROPERTYID(1, XUSER_DATA_TYPE_INT64,  XLOCATOR_DEDICATEDSERVER_PROPERTY_START + XTS_SEARCH_FIELD_ServerIdentity)   // server id. supports '=' operator onl$
-#define X_PROPERTY_DEDICATEDSERVER_TYPE                 XPROPERTYID(1, XUSER_DATA_TYPE_INT32,  XLOCATOR_DEDICATEDSERVER_PROPERTY_START + XTS_SEARCH_FIELD_ServerType)
-#define X_PROPERTY_DEDICATEDSERVER_MAX_PUBLIC_SLOTS     XPROPERTYID(1, XUSER_DATA_TYPE_INT32,  XLOCATOR_DEDICATEDSERVER_PROPERTY_START + XTS_SEARCH_FIELD_MaxPublicSlots)
-#define X_PROPERTY_DEDICATEDSERVER_MAX_PRIVATE_SLOTS    XPROPERTYID(1, XUSER_DATA_TYPE_INT32,  XLOCATOR_DEDICATEDSERVER_PROPERTY_START + XTS_SEARCH_FIELD_MaxPrivateSlots)
-#define X_PROPERTY_DEDICATEDSERVER_AVAILABLE_PUBLIC_SLOTS   XPROPERTYID(1, XUSER_DATA_TYPE_INT32,  XLOCATOR_DEDICATEDSERVER_PROPERTY_START + XTS_SEARCH_FIELD_AvailablePublicSlots)
-#define X_PROPERTY_DEDICATEDSERVER_AVAILABLE_PRIVATE_SLOTS  XPROPERTYID(1, XUSER_DATA_TYPE_INT32,  XLOCATOR_DEDICATEDSERVER_PROPERTY_START + XTS_SEARCH_FIELD_AvailablePrivateSlots)
-#define X_PROPERTY_DEDICATEDSERVER_FILLED_PUBLIC_SLOTS      XPROPERTYID(1, XUSER_DATA_TYPE_INT32,   XLOCATOR_DEDICATEDSERVER_PROPERTY_START + XTS_SEARCH_FIELD_FilledPublicSlots)
-#define X_PROPERTY_DEDICATEDSERVER_FILLED_PRIVATE_SLOTS     XPROPERTYID(1, XUSER_DATA_TYPE_INT32,   XLOCATOR_DEDICATEDSERVER_PROPERTY_START + XTS_SEARCH_FIELD_FilledPrivateSlots)
 
 
-// the following properties only support XTS_FILTER_COMPARE_OPERATOR_Equals operator
-#define X_PROPERTY_DEDICATEDSERVER_OWNER_XUID           XPROPERTYID(1, XUSER_DATA_TYPE_INT64,   XLOCATOR_DEDICATEDSERVER_PROPERTY_START + XTS_SEARCH_FIELD_OwnerXuid)
-#define X_PROPERTY_DEDICATEDSERVER_OWNER_GAMERTAG       XPROPERTYID(1, XUSER_DATA_TYPE_UNICODE,   XLOCATOR_DEDICATEDSERVER_PROPERTY_START + XTS_SEARCH_FIELD_OwnerGamerTag)
-#define X_PROPERTY_DEDICATEDSERVER_REGIONID             XPROPERTYID(1, XUSER_DATA_TYPE_INT32,   XLOCATOR_DEDICATEDSERVER_PROPERTY_START + XTS_SEARCH_FIELD_RegionID)
-#define X_PROPERTY_DEDICATEDSERVER_LANGUAGEID           XPROPERTYID(1, XUSER_DATA_TYPE_INT32,   XLOCATOR_DEDICATEDSERVER_PROPERTY_START + XTS_SEARCH_FIELD_LanguageID)
 
-// Predefined dedicated server types
-#define XLOCATOR_SERVERTYPE_PUBLIC          0   // dedicated server is for all players.
-#define XLOCATOR_SERVERTYPE_GOLD_ONLY       1   // dedicated server is for Gold players only.
-#define XLOCATOR_SERVERTYPE_PEER_HOSTED     2   // dedicated server is a peer-hosted game server.
-#define XLOCATOR_SERVERTYPE_PEER_HOSTED_GOLD_ONLY   3   // dedicated server is a peer-hosted game server (gold only).
-#define XLOCATOR_SERVICESTATUS_PROPERTY_START     0x100
 
 
 #define XUSER_DATA_TYPE_CONTEXT     ((BYTE)0)
@@ -291,6 +244,8 @@ typedef struct
 
 typedef XNADDR TSADDR;
 
+#define XONLINE_S_LOGON_CONNECTION_ESTABLISHED          _HRESULT_TYPEDEF_(0x001510F0L)
+#define XONLINE_S_LOGON_DISCONNECTED                    _HRESULT_TYPEDEF_(0x001510F1L)
 
 #define XNET_XNKID_MASK                 0xF0    // Mask of flag bits in first byte of XNKID
 #define XNET_XNKID_SYSTEM_LINK          0x00    // Peer to peer system link session
@@ -319,12 +274,6 @@ typedef struct
     IN_ADDR     aina[8];                        // Vector of IP addresses for the given host
 } XNDNS;
 
-#define XNET_XNQOSINFO_COMPLETE         0x01    // Qos has finished processing this entry
-#define XNET_XNQOSINFO_TARGET_CONTACTED 0x02    // Target host was successfully contacted
-#define XNET_XNQOSINFO_TARGET_DISABLED  0x04    // Target host has disabled its Qos listener
-#define XNET_XNQOSINFO_DATA_RECEIVED    0x08    // Target host supplied Qos data
-#define XNET_XNQOSINFO_PARTIAL_COMPLETE 0x10    // Qos has unfinished estimates for this entry
-#define XNET_XNQOSINFO_UNK	0x11
 
 typedef struct
 {
@@ -398,34 +347,6 @@ INT WINAPI XNetGetConnectStatus(const IN_ADDR ina);
 
 INT   WINAPI XNetDnsLookup(const char * pszHost, WSAEVENT hEvent, XNDNS ** ppxndns);
 INT   WINAPI XNetDnsRelease(XNDNS * pxndns);
-
-
-#define XNET_QOS_LISTEN_ENABLE              0x00000001 // Responds to queries on the given XNKID
-#define XNET_QOS_LISTEN_DISABLE             0x00000002 // Rejects queries on the given XNKID
-#define XNET_QOS_LISTEN_SET_DATA            0x00000004 // Sets the block of data to send back to queriers
-#define XNET_QOS_LISTEN_SET_BITSPERSEC      0x00000008 // Sets max bandwidth that query reponses may consume
-#define XNET_QOS_LISTEN_RELEASE             0x00000010 // Stops listening on given XNKID and releases memory
-
-#define XNET_QOS_LOOKUP_RESERVED            0x00000000 // No flags defined yet for XNetQosLookup
-
-#define XNET_QOS_SERVICE_LOOKUP_RESERVED    0x00000000 // No flags defined yet for XNetQosServiceLookup
-
-INT   WINAPI XNetQosListen(const XNKID * pxnkid,
-                           const BYTE * pb,
-                           UINT cb,
-                           DWORD dwBitsPerSec, DWORD dwFlags);
-INT   WINAPI XNetQosLookup(UINT cxna,
-                           const XNADDR * apxna[],
-                           const XNKID * apxnkid[],
-                           const XNKEY * apxnkey[],
-                           UINT cina,
-                           const IN_ADDR aina[],
-                           const DWORD adwServiceId[],
-                           UINT cProbes, DWORD dwBitsPerSec, DWORD dwFlags, WSAEVENT hEvent, XNQOS ** ppxnqos);
-INT   WINAPI XNetQosServiceLookup(DWORD dwFlags, WSAEVENT hEvent, XNQOS ** ppxnqos);
-INT   WINAPI XNetQosRelease(XNQOS* pxnqos);
-INT   WINAPI XNetQosGetListenStats(const XNKID * pxnkid, XNQOSLISTENSTATS * pQosListenStats);
-
 
 #define XNET_GET_XNADDR_PENDING             0x00000000 // Address acquisition is not yet complete
 #define XNET_GET_XNADDR_NONE                0x00000001 // XNet is uninitialized or no debugger found
@@ -547,143 +468,6 @@ INT    WINAPI XNetSetOpt(DWORD dwOptId, const BYTE * pbValue, DWORD dwValueSize)
 // outstanding overlapped I/O requests. Apps must call WSACancelOverlappedIO function instead.
 //
 
-
-//------------------------------------------------------------------------------
-// Notification apis
-//------------------------------------------------------------------------------
-
-//  Notification ids are 32 bit values layed out as follows:
-//
-//   3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
-//   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-//  +-+-----------+-----------------+-------------------------------+
-//  |R|    Area   |    Version      |            Index              |
-//  +-+-----+-----+-----------------+-------------------------------+
-//
-//  where
-//
-//      R - is a reserved bit (internal)
-//
-//      Area - is the area ranging from 0 - 63 (6 bits)
-//
-//      Version - is used to ensure that new notifications are not sent to
-//          titles built to previous XDKs
-//
-//      Index - is the id of the notification within the area.  Each area can
-//           have up to 65535 notifications starting at 1 (zero being invalid).
-//
-
-#define XNID(Version, Area, Index)      (DWORD)( (WORD)(Area) << 25 | (WORD)(Version) << 16 | (WORD)(Index))
-#define XNID_VERSION(msgid)             (((msgid) >> 16) & 0x1FF)
-#define XNID_AREA(msgid)                (((msgid) >> 25) & 0x3F)
-#define XNID_INDEX(msgid)               ((msgid) & 0xFFFF)
-
-
-//
-// Notification Areas
-//
-
-#define XNOTIFY_SYSTEM                  (0x00000001)
-#define XNOTIFY_LIVE                    (0x00000002)
-#define XNOTIFY_FRIENDS                 (0x00000004)
-#define XNOTIFY_CUSTOM                  (0x00000008)
-#define XNOTIFY_XMP                     (0x00000020)
-#define XNOTIFY_MSGR                    (0x00000040)
-#define XNOTIFY_PARTY                   (0x00000080)
-#define XNOTIFY_ALL                     (XNOTIFY_SYSTEM | XNOTIFY_LIVE | XNOTIFY_FRIENDS | XNOTIFY_CUSTOM | XNOTIFY_XMP | XNOTIFY_MSGR | XNOTIFY_PARTY)
-
-//
-// Bit numbers of each area (bit 0 is the least significant bit)
-//
-
-#define _XNAREA_SYSTEM                  (0)
-#define _XNAREA_LIVE                    (1)
-#define _XNAREA_FRIENDS                 (2)
-#define _XNAREA_CUSTOM                  (3)
-#define _XNAREA_XMP                     (5)
-#define _XNAREA_MSGR                    (6)
-#define _XNAREA_PARTY                   (7)
-
-//
-// System notifications
-//
-
-#define XN_SYS_FIRST                    XNID(0, _XNAREA_SYSTEM, 0x0001)
-#define XN_SYS_UI                       XNID(0, _XNAREA_SYSTEM, 0x0009)
-#define XN_SYS_SIGNINCHANGED            XNID(0, _XNAREA_SYSTEM, 0x000a)
-#define XN_SYS_STORAGEDEVICESCHANGED    XNID(0, _XNAREA_SYSTEM, 0x000b)
-#define XN_SYS_PROFILESETTINGCHANGED    XNID(0, _XNAREA_SYSTEM, 0x000e)
-#define XN_SYS_MUTELISTCHANGED          XNID(0, _XNAREA_SYSTEM, 0x0011)
-#define XN_SYS_INPUTDEVICESCHANGED      XNID(0, _XNAREA_SYSTEM, 0x0012)
-#define XN_SYS_INPUTDEVICECONFIGCHANGED XNID(1, _XNAREA_SYSTEM, 0x0013)
-#define XN_SYS_PLAYTIMERNOTICE          XNID(3, _XNAREA_SYSTEM, 0x0015)
-#define XN_SYS_AVATARCHANGED            XNID(4, _XNAREA_SYSTEM, 0x0017)
-#define XN_SYS_NUIHARDWARESTATUSCHANGED XNID(6, _XNAREA_SYSTEM, 0x0019)
-#define XN_SYS_NUIPAUSE                 XNID(6, _XNAREA_SYSTEM, 0x001a)
-#define XN_SYS_NUIUIAPPROACH            XNID(6, _XNAREA_SYSTEM, 0x001b)
-#define XN_SYS_DEVICEREMAP              XNID(6, _XNAREA_SYSTEM, 0x001c)
-#define XN_SYS_NUIBINDINGCHANGED        XNID(6, _XNAREA_SYSTEM, 0x001d)
-#define XN_SYS_AUDIOLATENCYCHANGED      XNID(8, _XNAREA_SYSTEM, 0x001e)
-#define XN_SYS_NUICHATBINDINGCHANGED    XNID(8, _XNAREA_SYSTEM, 0x001f)
-#define XN_SYS_INPUTACTIVITYCHANGED     XNID(9, _XNAREA_SYSTEM, 0x0020)
-#define XN_SYS_LAST                     XNID(0, _XNAREA_SYSTEM, 0x0023)
-
-//
-// Live notifications
-//
-
-#define XN_LIVE_FIRST                   XNID(0, _XNAREA_LIVE, 0x0001)
-#define XN_LIVE_CONNECTIONCHANGED       XNID(0, _XNAREA_LIVE, 0x0001)
-#define XN_LIVE_INVITE_ACCEPTED         XNID(0, _XNAREA_LIVE, 0x0002)
-#define XN_LIVE_LINK_STATE_CHANGED      XNID(0, _XNAREA_LIVE, 0x0003)
-#define XN_LIVE_CONTENT_INSTALLED       XNID(0, _XNAREA_LIVE, 0x0007)
-#define XN_LIVE_MEMBERSHIP_PURCHASED    XNID(0, _XNAREA_LIVE, 0x0008)
-#define XN_LIVE_VOICECHAT_AWAY          XNID(0, _XNAREA_LIVE, 0x0009)
-#define XN_LIVE_PRESENCE_CHANGED        XNID(0, _XNAREA_LIVE, 0x000A)
-#define XN_LIVE_LAST                    XNID(XNID_CURRENTVERSION+1, _XNAREA_LIVE, 0x0014)
-
-//
-// Friends notifications
-//
-
-#define XN_FRIENDS_FIRST                XNID(0, _XNAREA_FRIENDS, 0x0001)
-#define XN_FRIENDS_PRESENCE_CHANGED     XNID(0, _XNAREA_FRIENDS, 0x0001)
-#define XN_FRIENDS_FRIEND_ADDED         XNID(0, _XNAREA_FRIENDS, 0x0002)
-#define XN_FRIENDS_FRIEND_REMOVED       XNID(0, _XNAREA_FRIENDS, 0x0003)
-#define XN_FRIENDS_LAST                 XNID(XNID_CURRENTVERSION+1, _XNAREA_FRIENDS, 0x0009)
-
-//
-// Custom notifications
-//
-
-#define XN_CUSTOM_FIRST                 XNID(0, _XNAREA_CUSTOM, 0x0001)
-#define XN_CUSTOM_ACTIONPRESSED         XNID(0, _XNAREA_CUSTOM, 0x0003)
-#define XN_CUSTOM_GAMERCARD             XNID(1, _XNAREA_CUSTOM, 0x0004)
-#define XN_CUSTOM_LAST                  XNID(XNID_CURRENTVERSION+1, _XNAREA_CUSTOM, 0x0005)
-
-
-//
-// XMP notifications
-//
-
-#define XN_XMP_FIRST                                     XNID(0, _XNAREA_XMP, 0x0001)
-#define XN_XMP_STATECHANGED                              XNID(0, _XNAREA_XMP, 0x0001)
-#define XN_XMP_PLAYBACKBEHAVIORCHANGED                   XNID(0, _XNAREA_XMP, 0x0002)
-#define XN_XMP_PLAYBACKCONTROLLERCHANGED                 XNID(0, _XNAREA_XMP, 0x0003)
-#define XN_XMP_LAST                                      XNID(XNID_CURRENTVERSION+1, _XNAREA_XMP, 0x000D)
-
-
-//
-// Party notifications
-//
-
-#define XN_PARTY_FIRST                                   XNID(0, _XNAREA_PARTY, 0x0001)
-#define XN_PARTY_MEMBERS_CHANGED                         XNID(4, _XNAREA_PARTY, 0x0002)
-#define XN_PARTY_LAST                                    XNID(XNID_CURRENTVERSION+1, _XNAREA_PARTY, 0x0006)
-
-
-
-
 typedef ULONGLONG XUID;
 typedef XUID *PXUID;
 
@@ -745,27 +529,6 @@ typedef enum _XUSER_PROFILE_SOURCE
 	XSOURCE_TITLE,
 	XSOURCE_PERMISSION_DENIED
 } XUSER_PROFILE_SOURCE;
-
-typedef struct  {
-	BYTE type;
-
-	union {
-		LONG nData;
-		LONGLONG i64Data;
-		double dblData;
-		struct {
-			DWORD cbData;
-			LPWSTR pwszData;
-		}string;
-		float fData;
-		struct {
-			DWORD cbData;
-			LPBYTE pbData;
-		}binary;
-		FILETIME ftData;
-	};
-} XUSER_DATA, *PXUSER_DATA;
-
 
 typedef struct _XUSER_PROFILE_SETTING {
 	XUSER_PROFILE_SOURCE source;
@@ -890,40 +653,6 @@ typedef enum
 } XONLINE_NAT_TYPE;
  
 
-
-/*
-typedef struct _XHV_INIT_PARAMS {
-    DWORD dwMaxRemoteTalkers;
-    DWORD dwMaxLocalTalkers;
-    PXHV_PROCESSING_MODE localTalkerEnabledModes;
-    DWORD dwNumLocalTalkerEnabledModes;
-    PXHV_PROCESSING_MODE remoteTalkerEnabledModes;
-    DWORD dwNumRemoteTalkerEnabledModes;
-    BOOL bCustomVADProvided;
-    BOOL bRelaxPrivileges;
-    PFNMICRAWDATAREADY pfnMicrophoneRawDataReady;
-    XAUDIO2_EFFECT_CHAIN **ppfxDefaultRemoteTalkerFX;
-    XAUDIO2_EFFECT_CHAIN **ppfxDefaultTalkerPairFX;
-    XAUDIO2_EFFECT_CHAIN *pfxOutputFX;
-    IXAudio2 *pXAudio2;
-} XHV_INIT_PARAMS, *PXHV_INIT_PARAMS;
-*/
-
-
-typedef struct _XUSER_PROPERTY
-{
-	DWORD                               dwPropertyId;
-	XUSER_DATA                          value;
-} XUSER_PROPERTY, *PXUSER_PROPERTY;
-
-
-typedef struct _XUSER_CONTEXT
-{
-	DWORD                               dwContextId;
-	DWORD                               dwValue;
-} XUSER_CONTEXT, *PXUSER_CONTEXT;
-
-
 typedef struct _XSESSION_SEARCHRESULT
 {
 	XSESSION_INFO   info;
@@ -972,28 +701,6 @@ typedef struct _XSESSION_REGISTRATION_RESULTS
 #define X_CONTEXT_GAME_TYPE_RANKED      0
 #define X_CONTEXT_GAME_TYPE_STANDARD    1
 
-
-typedef enum _XPRIVILEGE_TYPE
-{
-    XPRIVILEGE_MULTIPLAYER_SESSIONS = 254,
-    XPRIVILEGE_COMMUNICATIONS = 252,
-    XPRIVILEGE_COMMUNICATIONS_FRIENDS_ONLY = 251,
-    XPRIVILEGE_PROFILE_VIEWING = 249,
-    XPRIVILEGE_PROFILE_VIEWING_FRIENDS_ONLY = 248,
-    XPRIVILEGE_USER_CREATED_CONTENT = 247,
-    XPRIVILEGE_USER_CREATED_CONTENT_FRIENDS_ONLY = 246,
-    XPRIVILEGE_PURCHASE_CONTENT = 245,
-    XPRIVILEGE_PRESENCE = 244,
-    XPRIVILEGE_PRESENCE_FRIENDS_ONLY = 243,
-    XPRIVILEGE_SHARE_CONTENT_OUTSIDE_LIVE = 211,
-    XPRIVILEGE_TRADE_CONTENT = 238,
-    XPRIVILEGE_VIDEO_COMMUNICATIONS = 235,
-    XPRIVILEGE_VIDEO_COMMUNICATIONS_FRIENDS_ONLY = 234,
-    XPRIVILEGE_CONTENT_AUTHOR = 222
-} XPRIVILEGE_TYPE;
-
-
-
 typedef enum 
 {
     XMARKETPLACE_OFFERING_TYPE_CONTENT = 0x00000002,
@@ -1007,82 +714,6 @@ typedef enum
     XMARKETPLACE_OFFERING_TYPE_AVATARITEM = 0x00100000
 } XMARKETPLACE_OFFERING_TYPE;
  
-typedef DWORD                                   XHV_LOCK_TYPE;
-
-#define XHV_LOCK_TYPE_LOCK                      0
-#define XHV_LOCK_TYPE_TRYLOCK                   1
-#define XHV_LOCK_TYPE_UNLOCK                    2
-#define XHV_LOCK_TYPE_COUNT                     3
-
-
-class IXHV2ENGINE
-{
-public:
-	IXHV2ENGINE::IXHV2ENGINE();
-	// 2F0 bytes = actual size
-	// - note: check all INT return values - may not be true
-
-	LONG AddRef( VOID *pThis );	// 00
-	LONG Release( VOID *pThis );	// 04
-	HRESULT Lock( VOID *pThis, XHV_LOCK_TYPE lockType );	// 08
-
-	HRESULT StartLocalProcessingModes( VOID *pThis, DWORD dwUserIndex, /* CONST PXHV_PROCESSING_MODE*/ VOID *processingModes, DWORD dwNumProcessingModes);
-	HRESULT StopLocalProcessingModes( VOID *pThis, DWORD dwUserIndex, /*CONST PXHV_PROCESSING_MODE*/ VOID *processingModes, DWORD dwNumProcessingModes );
-
-	HRESULT StartRemoteProcessingModes( VOID *pThis, XUID xuidRemoteTalker, int a2, int a3);
-	HRESULT StopRemoteProcessingModes( VOID *pThis, XUID xuidRemoteTalker, /*CONST PXHV_PROCESSING_MODE*/ VOID* a2, int a3);	// 18
-
-	HRESULT NullSub( VOID *pThis, int a1 );	// 1C
-
-	HRESULT RegisterLocalTalker( VOID *pThis, DWORD dwUserIndex );
-	HRESULT UnregisterLocalTalker( VOID *pThis, DWORD dwUserIndex );
-
-	HRESULT RegisterRemoteTalker( VOID *pThis, XUID a1, LPVOID reserved,LPVOID reserved2, LPVOID reserved3 );	// 28
-	HRESULT UnregisterRemoteTalker( VOID *pThis, XUID a1);
-
-	HRESULT GetRemoteTalkers( VOID *pThis, PDWORD pdwRemoteTalkersCount, PXUID pxuidRemoteTalkers);	// 30	
-	BOOL IsLocalTalking(VOID *pThis, DWORD dwUserIndex);
-	BOOL isRemoteTalking(VOID *pThis, XUID xuidRemoteTalker);
-	BOOL IsHeadsetPresent(VOID *pThis, DWORD dwUserIndex);
-
-	DWORD GetDataReadyFlags( VOID *pThis );
-
-	HRESULT GetLocalChatData( VOID *pThis, DWORD dwUserIndex, PBYTE pbData, PDWORD pdwSize, PDWORD pdwPackets );
-	HRESULT SetPlaybackPriority( VOID *pThis, XUID xuidRemoteTalker, DWORD dwUserIndex, int a3);
-
-	HRESULT SubmitIncomingChatData( VOID *pThis, XUID xuidRemoteTalker, const BYTE* pbData, PDWORD pdwSize);	// 4C
-	
-	typedef void (IXHV2ENGINE::*HV2FUNCPTR)(void);
-
-
-	// ugly, low-skilled hackaround
-	HV2FUNCPTR *funcTablePtr;
-	HV2FUNCPTR funcPtr[100];
-	HV2FUNCPTR func2;
-
-	bool locked = false;
-};
-
-typedef IXHV2ENGINE *PIXHV2ENGINE;
-
-
-typedef struct {
-    DWORD dwId;
-    LPWSTR pwszLabel;
-    LPWSTR pwszDescription;
-    LPWSTR pwszUnachieved;
-    DWORD dwImageId;
-    DWORD dwCred;
-    FILETIME ftAchieved;
-    DWORD dwFlags;
-} XACHIEVEMENT_DETAILS, *PXACHIEVEMENT_DETAILS;
- 
-
-#define XACHIEVEMENT_DETAILS_ACHIEVED_ONLINE 0x10000
-#define XACHIEVEMENT_DETAILS_ACHIEVED 0x20000
-
-
-
  
 typedef struct _MESSAGEBOX_RESULT {
 	union {
@@ -1140,31 +771,6 @@ typedef struct {
 } XMARKETPLACE_CONTENTOFFER_INFO, *PXMARKETPLACE_CONTENTOFFER_INFO;
 
 
-
-typedef DWORD                                   XHV_PROCESSING_MODE, *PXHV_PROCESSING_MODE;
-typedef DWORD                                   XHV_PLAYBACK_PRIORITY;
-typedef VOID(*PFNMICRAWDATAREADY)(
-	IN  DWORD                                   dwUserIndex,
-	IN  PVOID                                   pvData,
-	IN  DWORD                                   dwSize,
-	IN  PBOOL                                   pVoiceDetected
-	);
-
-typedef DWORD                                   XHV_LOCK_TYPE;
-
-typedef struct XHV_INIT_PARAMS
-{
-	DWORD                                       dwMaxRemoteTalkers;
-	DWORD                                       dwMaxLocalTalkers;
-	PXHV_PROCESSING_MODE                        localTalkerEnabledModes;
-	DWORD                                       dwNumLocalTalkerEnabledModes;
-	PXHV_PROCESSING_MODE                        remoteTalkerEnabledModes;
-	DWORD                                       dwNumRemoteTalkerEnabledModes;
-	BOOL                                        bCustomVADProvided;
-	BOOL                                        bRelaxPrivileges;
-	PFNMICRAWDATAREADY                          pfnMicrophoneRawDataReady;
-	HWND                                        hwndFocus;
-} XHV_INIT_PARAMS, *PXHV_INIT_PARAMS;
 
 typedef struct _STRING_DATA {
     WORD wStringSize;
