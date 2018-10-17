@@ -2,7 +2,31 @@
 #include "Globals.h"
 #include "DeviceShop.h"
 
+//power transition time
+//TODO: Convert to TagGroup/Block
+float get_device_power_transition_time(DatumIndex device_datum)
+{
+	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD54);
+	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50);
+	DWORD game_state_objects_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x4E461C);
+	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
 
+	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
+	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)game_state_objects_header_table + device_gamestate_offset * 4 + 8);
+	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
+
+	__int16 device_control_index = device_control_datum & 0xFFFF;
+	device_control_index = device_control_index << 4;
+
+	DWORD device_control_tag_offset = *(DWORD*)((BYTE*)device_control_index + global_tag_instances + 8);
+	float acceleration_scale = *(float*)((BYTE*)device_control_tag_offset + tag_header + 0xC0);
+
+	return acceleration_scale;
+
+}
+
+//this is actually the open up sound tag.
+//TODO: Convert to TagGroup/Block
 DatumIndex get_device_open_up_weapon_datum(DatumIndex device_datum)
 {
 
@@ -23,9 +47,11 @@ DatumIndex get_device_open_up_weapon_datum(DatumIndex device_datum)
 	return weapon_datum;
 }
 
+
+
 int DeviceShop::GetCost(DatumIndex device_datum)
 {
-	return 0;
+	return (int)get_device_power_transition_time(device_datum);
 }
 
 item_type DeviceShop::GetType(DatumIndex device_datum)
