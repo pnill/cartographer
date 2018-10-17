@@ -6,3 +6,8 @@
 #include "RealVector2D.h"
 #include "RealVector3D.h"
 #include "RealMovement.h"
+#include "ColorRGB.h"
+#include "Point2D.h"
+#include "Point3D.h"
+#include "ColorARGB.h"
+#include "RealColorARGB.h"

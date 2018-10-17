@@ -1,12 +1,14 @@
 #pragma once
-#include "stdafx.h"
 namespace Blam
 {
 	namespace Maths
 	{
-		struct Angle
+		namespace Real
 		{
-			FLOAT Value;
-		};
+			struct Angle
+			{
+				FLOAT Value;
+			};
+		}
 	}
 }

@@ -1,9 +1,11 @@
 #pragma once
-#include "..\Blam\Enums\Enums.h"
-#include "..\Blam\Shared\SharedDefinitions.h"
+#include "Blam\Enums\Enums.h"
+#include "Blam\Shared\SharedDefinitions.h"
+#include "Blam\Cache\DataTypes\DataTypes.h"
 
-using namespace Blam::SharedDefinitions;
 using namespace Blam::Enums;
+using namespace Blam::Cache::DataTypes;
+
 namespace Blam 
 {
 	namespace EngineDefinitions

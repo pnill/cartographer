@@ -5,3 +5,4 @@
 #include "Game\HaloScriptTypes.h"
 #include "Objects\Objects.h"
 #include "Objects\Unit.h"
+#include "Tags\TagGroups.h"

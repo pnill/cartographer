@@ -14,7 +14,7 @@ namespace Blam
 			//size : unknown
 			struct ObjectEntityDefinition//To Do
 			{
-				Blam::SharedDefinitions::DatumIndex DefinitionIndex;//0
+				DatumIndex DefinitionIndex;//0
 				DWORD ObjectFlags;//4
 				DWORD unk_0;//8
 				Blam::SharedDefinitions::c_object_index NextIndex;//0xC
@@ -24,14 +24,14 @@ namespace Blam
 				INT16 PlacementIndex ;//0x1A
 				DWORD unk_2[3];//0x1C
 				DWORD Location[2];//0x28
-				Blam::Maths::RealPoint3D Center;//0x30
+				Blam::Maths::Real::Point3D Center;//0x30
 				FLOAT Radius;//0x3C
 				DWORD unk_3[9];//0x40
-				Blam::Maths::RealPoint3D Placement;//0x64
-				Blam::Maths::RealVector3D Orientation;//0x70
-				Blam::Maths::RealVector3D Up;//0x7C
-				Blam::Maths::RealPoint3D TranslationalVelocity;//0x88
-				Blam::Maths::RealVector3D AngularVelocity;//0x94
+				Blam::Maths::Real::Point3D Placement;//0x64
+				Blam::Maths::Real::Vector3D Orientation;//0x70
+				Blam::Maths::Real::Vector3D Up;//0x7C
+				Blam::Maths::Real::Point3D TranslationalVelocity;//0x88
+				Blam::Maths::Real::Vector3D AngularVelocity;//0x94
 				FLOAT Scale;//0xA0
 				BYTE unk_4[6];//0xA4
 				Blam::Enums::Objects::ObjectType ObjectType;//0xAA;
@@ -110,12 +110,12 @@ namespace Blam
 			};
 
 			struct GameStateObjectHeader {
-				__int16 datum_salt; //0x02
-				BYTE flags; //0x03
-				Blam::Enums::Objects::ObjectType type; //0x04
-				__int16 unk__; //0x06
-				__int16 unk_size; //0x08
-				ObjectEntityDefinition* object; //0x0C
+				__int16 datum_salt; //0x00
+				BYTE flags; // 0x02
+				Blam::Enums::Objects::ObjectType type; // 0x03
+				__int16 unk__;  // 0x04
+				__int16 unk_size;  //0x06
+				ObjectEntityDefinition* object; //0x08 - 
 			};
 			static_assert(sizeof(GameStateObjectHeader) == 0xC, "Invalid GameStateObjectHeader size");
 

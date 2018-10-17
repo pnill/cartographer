@@ -746,10 +746,6 @@ INT   WINAPI XNetInAddrToString(const IN_ADDR ina, char * pchBuf, INT cchBuf)
 	return 0;
 }
 
-
-
-
-
 // #64
 INT WINAPI XNetXnAddrToMachineId(const XNADDR * pxnaddr, ULONGLONG * pqwMachineId)
 {
@@ -765,10 +761,6 @@ INT WINAPI XNetXnAddrToMachineId(const XNADDR * pxnaddr, ULONGLONG * pqwMachineI
 
     return 0;
 }
-
-
-
-
 
 // #66: XNetGetConnectStatus
 int WINAPI XNetGetConnectStatus (const IN_ADDR ina)
@@ -876,20 +868,8 @@ DWORD WINAPI XGetOverlappedExtendedError(PXOVERLAPPED pOverlapped)
 {
 	if( pOverlapped == 0 )
 	{
-		//TRACE( "XGetOverlappedExtendedError  (pOverlapped = NULL)" );
-
 		return ERROR_INVALID_PARAMETER;
 	}
-
-
-
-//  TRACE("XGetOverlappedExtendedError  (pOverlapped = %X) (internalLow = %X, internalHigh = %X, hEvent = %X, error = %X)",
-//		pOverlapped,
-//		pOverlapped->InternalLow, pOverlapped->InternalHigh, pOverlapped->hEvent, pOverlapped->dwExtendedError );
-
-
-	//Check_Overlapped( pOverlapped );
-
 
 	return pOverlapped->dwExtendedError;
 }
@@ -1419,13 +1399,6 @@ HRESULT WINAPI XLiveSignin (PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD 
 
 	return S_OK;
 }
-
-
-
-
-
-
-
 
 
 // #5297: XLiveInitializeEx

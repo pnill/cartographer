@@ -1,14 +1,16 @@
 #pragma once
-#include "stdafx.h"
 namespace Blam
 {
 	namespace Maths
 	{
-		struct RealPoint3D
+		namespace Real
 		{
-			FLOAT X;
-			FLOAT Y;
-			FLOAT Z;
-		};
+			struct Point3D
+			{
+				FLOAT X;
+				FLOAT Y;
+				FLOAT Z;
+			};
+		}
 	}
 }

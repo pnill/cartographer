@@ -18,7 +18,9 @@
 #include "H2MOD\TeamSpeak\TSClient.h"
 #include "H2MOD\TeamSpeak\TSServer.h"
 #include "H2MOD\Modules\Players\Players.h"
+#include "H2MOD\Variants\VariantPlayer.h"
 #include "H2MOD\Variants\VariantSystem.h"
+#include "H2MOD\Variants\DeviceShop\DeviceShop.h"
 #include "H2MOD\Variants\H2Final\H2Final.h"
 #include "H2MOD\Variants\Infection\Infection.h"
 #include "H2MOD\Variants\FireFight\FireFight.h"
@@ -30,12 +32,19 @@
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
 
+
 using namespace Blam::EngineDefinitions::Players;
 using namespace Blam::EngineDefinitions::Objects;
 using namespace Blam::EngineDefinitions::Actors;
+using namespace Blam::EngineDefinitions::Tag;
+
 extern GameStatePlayerTable *game_state_players;
 extern GameStateObjectHeaderTable* game_state_objects_header;
 extern GameStateActorTable* game_state_actors;
+extern global_tag_instance* tag_instances;
+
+extern DeviceShop* device_shop;
+extern VariantPlayer* variant_player;
 
 extern XNADDR join_game_xn;
 extern MapManager* mapManager;

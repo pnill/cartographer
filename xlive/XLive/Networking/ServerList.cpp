@@ -525,10 +525,10 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 		return S_OK;
 	}
 
-	pProperties[0].value.nData = 1;
-	pProperties[1].value.nData = 3;
-	pProperties[2].value.nData = 3;
-	pProperties[3].value.nData = 7;
+	pProperties[0].value.nData = 0;
+	pProperties[1].value.nData = 0;
+	pProperties[2].value.nData = 0;
+	pProperties[3].value.nData = 0;
 
 	return S_OK;
 }

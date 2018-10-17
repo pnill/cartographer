@@ -20,6 +20,8 @@ GunGame* gunGame = new GunGame();
 Halo2Final *h2f = new Halo2Final();
 Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
+DeviceShop* device_shop = new DeviceShop();
+VariantPlayer* variant_player = new VariantPlayer();
 
 bool b_H2X = false;
 bool b_GunGame = false;
@@ -31,6 +33,8 @@ extern CUserManagement User;
 extern int H2GetInstanceId();
 extern XUID xFakeXuid[4];
 std::unordered_map<int, int> object_to_variant;
+
+using namespace Blam::Cache::DataTypes;
 
 int character_datum_from_index(BYTE index)
 {
@@ -45,8 +49,8 @@ int character_datum_from_index(BYTE index)
 
 int get_player_index_from_datum(DatumIndex unit_datum)
 {
-	ObjectEntityDefinition *unit_object = (&game_state_objects_header->object_header[unit_datum.Index])->object;
-	return unit_object->PlayerDatum.Index;
+	ObjectEntityDefinition *unit_object = (&game_state_objects_header->object_header[unit_datum.ToAbsoluteIndex()])->object;
+	return unit_object->PlayerDatum.ToAbsoluteIndex();
 }
 
 #pragma region engine calls
@@ -156,32 +160,7 @@ int get_actor_datum_from_unit_datum(int unit_datum)
 	return -1;
 }
 
-/* We're going to use this to determine how many points to give a player in firefight for a kill. */
-int get_swarm_scatter_killed_count(int character_datum)
-{
-	__int16 character_index = character_datum & 0xFFFF; // get the upper bits.
-	character_index = character_index << 4; //shift left 4
 
-	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD54);
-	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50);
-	
-	DWORD character_offset = *(DWORD*)((BYTE*)global_tag_instances + character_index + 8);
-	DWORD character_tag = (DWORD)((BYTE*)character_offset + tag_header);
-
-
-	int swarm_count = *(int*)((BYTE*)character_tag + 0x64);
-
-	if (swarm_count > 0)
-	{
-		DWORD swarm_offset = *(DWORD*)((BYTE*)character_tag + 0x68);
-		DWORD tag_instance_pointer = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x482290);
-		DWORD swarm_pointer = (DWORD)((BYTE*)tag_instance_pointer + swarm_offset);
-		DWORD swarm_scatter_killed_count = *(DWORD*)((BYTE*)swarm_pointer);
-	}
-
-
-	return 0;
-}
 
 /* This looks at the actors table to get the character datum which is assigned to the specific actor. */
 int get_char_datum_from_actor(int actor_datum)
@@ -944,21 +923,16 @@ char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 	/* This is the unit of the player who last damaged the object*/
 	int damaging_player_unit = get_damage_owner(unit_datum_index);
 
-	if(b_FireFight) {
 
 		/* Hack until rest of code is changed to support DatumIndex vs int*/
-		DatumIndex ai_datum;
-		ai_datum.Index = unit_datum_index & 0xFFFF0000;
-		ai_datum.Salt = unit_datum_index & 0x0000FFFF;
-
-
+		DatumIndex ai_datum = DatumIndex(unit_datum_index);
+	
 		/*
 			In firefight we want to track AI deaths and execute on them to grant points.
 		*/
 		fireFightHandler->playerDeath->SetPlayerIndex(*(DatumIndex*)(a2));
 		fireFightHandler->playerDeath->SetKilledDatum(ai_datum);
 		fireFightHandler->playerDeath->execute();
-	}
 
 
 	if (b_GunGame) {
@@ -1113,6 +1087,9 @@ void __cdecl onGameEngineChange(int a1)
 			TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
 			b_H2X = true;
 		}
+
+		if (tag_instances == NULL)
+			tag_instances = (global_tag_instance*)((*(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50)));
 
 		H2Tweaks::enableAI_MP(); //TODO: get dedi offset
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
@@ -1592,40 +1569,16 @@ void GivePlayerWeaponDatum(int unit_datum,int weapon_datum)
 }
 
 
-int get_device_open_up_weapon_datum(int device_datum)
+
+//This is used for maps with 'shops' where the device_acceleration_scale is an indicator that they're using the control device as a 'shop'
+float get_device_acceleration_scale(DatumIndex device_datum)
 {
-	__int16 device_gamestate_index = device_datum & 0xFFFF;
-
-	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD54);
-	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50);
-	DWORD game_state_objects_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x4E461C);
-	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
-
-	int device_gamestate_offset = device_gamestate_index + device_gamestate_index * 2;
-	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)game_state_objects_header_table + device_gamestate_offset * 4 + 8);
-	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
-
-	__int16 device_control_index = device_control_datum & 0xFFFF;
-	device_control_index = device_control_index << 4;
-
-	DWORD device_control_tag_offset = *(DWORD*)((BYTE*)device_control_index + global_tag_instances + 8);
-	int weapon_datum = *(int*)((BYTE*)device_control_tag_offset + tag_header + 0xE0);
-
-	return weapon_datum;
-}
-
-/* Use this for firefight, we detect if the device acceleration scale is set to a specific high amount which tells us this is a 'shop' related control device.*/
-float get_device_acceleration_scale(int device_datum)
-{
-
-	__int16 device_gamestate_index = device_datum & 0xFFFF;
-
 	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD54);
 	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50);
 	DWORD game_state_objects_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x4E461C);
 	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
 	
-	int device_gamestate_offset = device_gamestate_index + device_gamestate_index * 2;
+	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
 	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)game_state_objects_header_table + device_gamestate_offset * 4 + 8);
 	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 
@@ -1639,24 +1592,22 @@ float get_device_acceleration_scale(int device_datum)
 
 }
 
-typedef int(__cdecl *tdevice_touch)(int device_datum, int unit_datum);
+typedef int(__cdecl *tdevice_touch)(DatumIndex device_datum, DatumIndex unit_datum);
 tdevice_touch pdevice_touch;
 
-
-//Used for firefight, we'll detect some data from the device and then give a weapon instead of activating the normal action
-//We'll need to reduce points from their firefight points here as well.
-int __cdecl device_touch(int device_datum, int unit_datum)
+//This happens whenever a player activates a device control.
+int __cdecl device_touch(DatumIndex device_datum, DatumIndex unit_datum)
 {
 
-	// Firefight maps will set this to 999.0f to indicate it's not a real device control.
+	//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 	if (get_device_acceleration_scale(device_datum) == 999.0f)
 	{
-		int weapon_datum = get_device_open_up_weapon_datum(device_datum);
-		GivePlayerWeaponDatum(unit_datum, weapon_datum);
-		
-		return 0;
+			if(device_shop->BuyItem(device_datum,unit_datum)) // If the purchase was successful we won't execute the original device control action.
+				return 0;
 	}
 
+	// If the purchase fails (they don't have enough points), or the device is not a shopping device return normally.
+	// In general's map returning normally will turn the point display red indicating the user has no points, we do not indicate that the purchase failed in any other way.
 	return pdevice_touch(device_datum, unit_datum);
 }
 

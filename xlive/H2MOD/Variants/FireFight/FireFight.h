@@ -7,7 +7,6 @@ public:
 	void SetPlayerIndex(DatumIndex player_datum);
 	void SetUnitDatum(DatumIndex unit_datum);
 	void SetKilledDatum(DatumIndex unit_datum);
-	bool BuyWeapon(DatumIndex device_datum);
 	XUID GetXUID();
 	DatumIndex GetKilledDatum();
 private:
@@ -57,10 +56,7 @@ class FireFight : public GameType<FireFightHandler>
 {
 public:
 	FireFight();
-	static void KilledAI(DatumIndex ai_datum);
-	static bool BuyWeapon(int cost, DatumIndex Weapon, XUID xuid);
+	static void KilledAI(DatumIndex ai_datum,XUID killer);
 	static void initClient();
 	static void initHost();
-private:
-	static std::unordered_map<XUID, int> player_points;
 };

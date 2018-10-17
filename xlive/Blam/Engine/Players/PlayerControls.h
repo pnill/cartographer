@@ -1,5 +1,4 @@
 #pragma once
-#include "..\stdafx.h"
 #include "..\Blam\Enums\Enums.h"
 
 typedef DWORD c_object_entity;

@@ -333,7 +333,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			GameStatePlayer *player1 = &test->players[0];
 			GameStatePlayer *player2 = &test->players[1];
 			
-			GameStateObjectHeader *player1_object_header = &test2->object_header[player1->unit_index.Index];
+			GameStateObjectHeader *player1_object_header = &test2->object_header[player1->unit_index.ToAbsoluteIndex()];
 			ObjectEntityDefinition *player1_object = player1_object_header->object;
 
 

@@ -196,6 +196,42 @@
     <Filter Include="Source Files\XLive\XUser">
       <UniqueIdentifier>{03222414-2233-499e-9443-3a1a5e4d9030}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Blam\Engine\Tags">
+      <UniqueIdentifier>{9f36ad0a-6f5c-49e2-8c53-502b886c4970}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Enums\Tags">
+      <UniqueIdentifier>{71764f30-e8b7-4ab1-87ff-a11c3a18f047}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Cache">
+      <UniqueIdentifier>{1fb797ed-045d-46ad-9043-af40d6d37fbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Cache\DataTypes">
+      <UniqueIdentifier>{76d91287-f96d-4f69-87b4-e9fdf50f2406}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Cache\TagBlocks">
+      <UniqueIdentifier>{eaef3410-8a93-4a75-9da0-3d35f5db6d4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Cache\TagBlocks\Globals">
+      <UniqueIdentifier>{1726633f-726e-41b0-908d-1f78806b3e06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Cache\TagBlocks\Interface">
+      <UniqueIdentifier>{cb283a92-c683-4cf3-8755-a4d3a784d9f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Cache\TagGroups">
+      <UniqueIdentifier>{be702785-a2d1-4808-be70-7360906e4941}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Cache\TagGroups\Globals">
+      <UniqueIdentifier>{a33f4642-1337-418e-8d05-23bc455f7147}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Cache\TagGroups\Interface">
+      <UniqueIdentifier>{a68b1322-fb32-4c1d-9e47-658ddf5422fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Enums\Tags\TagGroups">
+      <UniqueIdentifier>{a0f03676-ade5-468f-ada2-854238dcac94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Cache\TagBlocks\AI">
+      <UniqueIdentifier>{8ed4f5f1-2e41-4c8c-bf9d-9503ae31a097}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -381,14 +417,17 @@
     <ClCompile Include="XLive\XUser\XUserProperty.cpp">
       <Filter>Source Files\XLive\XUser</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\XUser\XCustomAction.cpp">
-      <Filter>Source Files\XLive\xbox</Filter>
-    </ClCompile>
     <ClCompile Include="XLive\Networking\xnet.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
     <ClCompile Include="XLive\Networking\XSocket.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XUser\XCustomAction.cpp">
+      <Filter>Source Files\XLive\XUser</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Variants\VariantPlayer.cpp">
+      <Filter>Source Files\H2MOD\Variants</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -683,14 +722,104 @@
     <ClInclude Include="XLive\XUser\XUserProperty.h">
       <Filter>Source Files\XLive\XUser</Filter>
     </ClInclude>
-    <ClInclude Include="XLive\XUser\XCustomAction.h">
-      <Filter>Source Files\XLive\xbox</Filter>
-    </ClInclude>
     <ClInclude Include="XLive\Networking\xnet.h">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClInclude>
     <ClInclude Include="XLive\Networking\XSocket.h">
       <Filter>Source Files\XLive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XUser\XCustomAction.h">
+      <Filter>Source Files\XLive\XUser</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Variants\DeviceShop\DeviceShop.h">
+      <Filter>Source Files\H2MOD\Variants\DeviceShop</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Variants\VariantPlayer.h">
+      <Filter>Source Files\H2MOD\Variants</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Tags\TagInstance.h">
+      <Filter>Source Files\Blam\Engine\Tags</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Tags\TagGroups.h">
+      <Filter>Source Files\Blam\Enums\Tags</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\Cache.h">
+      <Filter>Source Files\Blam\Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagBlocks.hpp">
+      <Filter>Source Files\Blam\Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups.hpp">
+      <Filter>Source Files\Blam\Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes\Bitfield.h">
+      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes\DataRef.h">
+      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes\DataTypes.h">
+      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h">
+      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes\Pad.h">
+      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes\Reflexive.h">
+      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes\StringID.h">
+      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes\Strings.h">
+      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes\TagRef.h">
+      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagBlocks\TagBlocks.h">
+      <Filter>Source Files\Blam\Cache\TagBlocks</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagBlocks\Globals\hudg.hpp">
+      <Filter>Source Files\Blam\Cache\TagBlocks\Globals</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagBlocks\Globals\matg.hpp">
+      <Filter>Source Files\Blam\Cache\TagBlocks\Globals</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagBlocks\Interface\nhdt.hpp">
+      <Filter>Source Files\Blam\Cache\TagBlocks\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\TagGroups.h">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\Globals\hudg.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups\Globals</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\Globals\matg.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups\Globals</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\Interface\nhdt.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Tags\TagGroups\hudg.hpp">
+      <Filter>Source Files\Blam\Enums\Tags\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Tags\TagGroups\matg.hpp">
+      <Filter>Source Files\Blam\Enums\Tags\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Tags\TagGroups\nhdt.hpp">
+      <Filter>Source Files\Blam\Enums\Tags\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagBlocks\TagBlock.h">
+      <Filter>Source Files\Blam\Cache\TagBlocks</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\char.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagBlocks\char.h">
+      <Filter>Source Files\Blam\Cache\TagBlocks\AI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,14 +1,16 @@
 #pragma once
-#include "stdafx.h"
 namespace Blam
 {
 	namespace Maths
 	{
-		struct RealVector3D
+		namespace Real
 		{
-			FLOAT I;
-			FLOAT J;
-			FLOAT K;
-		};
+			struct Vector3D
+			{
+				FLOAT I;
+				FLOAT J;
+				FLOAT K;
+			};
+		}
 	}
 }

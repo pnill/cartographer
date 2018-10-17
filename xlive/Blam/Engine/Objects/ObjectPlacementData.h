@@ -1,7 +1,7 @@
 #pragma once
-#include "stdafx.h"
-#include "..\Blam\Shared\SharedDefinitions.h"
-#include "..\Blam\Maths\Maths.h"
+#include "Blam\Shared\SharedDefinitions.h"
+#include "Blam\Maths\Maths.h"
+
 namespace Blam
 {
 	namespace EngineDefinitions
@@ -11,7 +11,7 @@ namespace Blam
 			//0xC4
 			struct ObjectPlacementData //To Do
 			{
-				Blam::SharedDefinitions::DatumIndex DatumIndex;//0
+				DatumIndex object_datum;//0
 				DWORD unk_0;//0x4
 				WORD unk_10;//0x8;
 				BYTE unk_11;//0xA
@@ -22,11 +22,11 @@ namespace Blam
 				BYTE unk_16;//0x15
 				WORD unk_17;//0x16
 				DWORD unk_18;//0x18
-				Blam::Maths::RealPoint3D Placement;//0x1C
-				Blam::Maths::RealVector3D Orientation;//0x28
-				Blam::Maths::RealVector3D Up;//0x34
-				Blam::Maths::RealPoint3D TranslationalVelocity;//0x40
-				Blam::Maths::RealVector3D AngularVelocity;//0x4C
+				Blam::Maths::Real::Point3D Placement;//0x1C
+				Blam::Maths::Real::Vector3D Orientation;//0x28
+				Blam::Maths::Real::Vector3D Up;//0x34
+				Blam::Maths::Real::Point3D TranslationalVelocity;//0x40
+				Blam::Maths::Real::Vector3D AngularVelocity;//0x4C
 				FLOAT Scale;//0x58
 				DWORD unk_2[5];//0x5C
 				WORD unk_3;//0x70
