@@ -1,6 +1,8 @@
 #include <unordered_map>
 #include "Globals.h"
 #include "DeviceShop.h"
+extern void __cdecl print_to_console(char *output);
+extern void GivePlayerWeaponDatum(DatumIndex unit_datum, DatumIndex weapon_datum);
 
 //power transition time
 //TODO: Convert to TagGroup/Block
@@ -68,25 +70,49 @@ bool DeviceShop::BuyItem(DatumIndex device_datum, DatumIndex unit_datum)
 {
 
 	XUID player = variant_player->GetXUID(unit_datum, false);
+	
+	int cost = GetCost(device_datum);
+	int points = player_points[player];
 
-	if (GetCost(device_datum) > player_points[player])
+	if (cost > points)
 	{
+		print_to_console("Player did not have enough points to buy item");
+		std::string debug_points;
+		debug_points.append("Points: ");
+		debug_points.append(std::to_string(points));
+		debug_points.append(" player: ");
+		debug_points.append(std::to_string(player));
+		print_to_console((char*)debug_points.c_str());
 		return false;
 	}
 	else
 	{
-		switch (GetType(device_datum))
+		player_points[player] -= cost;
+
+		DatumIndex item_datum = GetItemDatum(device_datum);
+
+		switch (GetType(item_datum))
 		{
 		case ai_item:
-			SpawnAI(device_datum);
+			SpawnAI(item_datum);
 			break;
 
 		case vehicle_item:
-			SpawnVehicle(device_datum);
+			SpawnVehicle(item_datum);
 			break;
 
 		case weapon_item:
-			GiveWeapon(device_datum, unit_datum);
+			print_to_console("Player purchased a weapon!");
+			std::string debug_text;
+			debug_text.append("Player: ");
+			debug_text.append(std::to_string(player));
+			debug_text.append(" Points left: ");
+			debug_text.append(std::to_string(player_points[player]));
+			debug_text.append(" Cost: ");
+			debug_text.append(std::to_string(GetCost(device_datum)));
+
+			print_to_console((char*)debug_text.c_str());
+			GiveWeapon(item_datum, unit_datum);
 			break;
 		}
 	}
@@ -106,12 +132,20 @@ void DeviceShop::SpawnVehicle(DatumIndex vehicle_datum)
 
 void DeviceShop::GiveWeapon(DatumIndex weapon_datum, DatumIndex unit_datum)
 {
-	
+	GivePlayerWeaponDatum(unit_datum,weapon_datum);
 }
 
 void DeviceShop::AddPoints(XUID xuid, int points)
 {
-	player_points[xuid] = points;
+	std::string debug_txt;
+	debug_txt.append("Adding points: ");
+	debug_txt.append(std::to_string(points));
+	debug_txt.append(" to player: ");
+	debug_txt.append(std::to_string(xuid));
+
+	print_to_console((char*)debug_txt.c_str());
+
+	player_points[xuid] += points;
 }
 
 void DeviceShop::deinitialize()

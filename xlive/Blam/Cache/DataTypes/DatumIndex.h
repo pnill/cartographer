@@ -35,6 +35,7 @@ namespace Blam
 				bool IsNull();
 				//Return in StringFormat
 				std::string ToString();
+				int ToInt();
 
 				void operator = (const INT32 &Value);
 				void operator = (const DatumIndex &DatumIndex);
@@ -57,6 +58,12 @@ namespace Blam
 }
 			
 #pragma region DatumIndex
+inline int Blam::Cache::DataTypes::DatumIndex::ToInt()
+{
+	int datum = ((this->Salt << 16) | ((this->Index) & 0xffff));
+	return datum;
+}
+
 inline INT16 Blam::Cache::DataTypes::DatumIndex::ToAbsoluteIndex()
 {
 	return this->Index;

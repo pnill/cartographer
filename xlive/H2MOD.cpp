@@ -67,6 +67,19 @@ int __cdecl call_get_object(signed int object_datum_index, int object_type)
 	return pget_object(object_datum_index, object_type);
 }
 
+int __cdecl call_unit_reset_equipment_datum(DatumIndex unit_datum_index)
+{
+	//TRACE_GAME("unit_reset_equipment(unit_datum_index: %08X)", unit_datum_index);
+	typedef int(__cdecl *unit_reset_equipment)(DatumIndex unit_datum_index);
+	unit_reset_equipment punit_reset_equipment = (unit_reset_equipment)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x133030 : 0x1441E0));
+	if (unit_datum_index != -1 && unit_datum_index != 0)
+	{
+		return punit_reset_equipment(unit_datum_index);
+	}
+
+	return 0;
+}
+
 int __cdecl call_unit_reset_equipment(int unit_datum_index)
 {
 	//TRACE_GAME("unit_reset_equipment(unit_datum_index: %08X)", unit_datum_index);
@@ -98,6 +111,16 @@ signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit)
 	return punit_inventory_next_weapon(unit);
 }
 
+bool __cdecl call_assign_equipment_to_unit_datum(DatumIndex unit, int object_index, short unk)
+{
+	//TRACE_GAME("assign_equipment_to_unit(unit: %08X,object_index: %08X,unk: %08X)", unit, object_index, unk);
+	typedef bool(__cdecl *assign_equipment_to_unit)(DatumIndex unit, int object_index, short unk);
+	assign_equipment_to_unit passign_equipment_to_unit = (assign_equipment_to_unit)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x1330FA : 0x1442AA));
+
+	return passign_equipment_to_unit(unit, object_index, unk);
+}
+
+
 bool __cdecl call_assign_equipment_to_unit(int unit, int object_index, short unk)
 {
 	//TRACE_GAME("assign_equipment_to_unit(unit: %08X,object_index: %08X,unk: %08X)", unit, object_index, unk);
@@ -107,6 +130,19 @@ bool __cdecl call_assign_equipment_to_unit(int unit, int object_index, short unk
 	return passign_equipment_to_unit(unit, object_index, unk);
 }
 
+int __cdecl call_object_placement_data_new_datum(void* s_object_placement_data, DatumIndex object_definition_index, DatumIndex object_owner, int unk)
+{
+
+	//TRACE_GAME("object_placement_data_new(s_object_placement_data: %08X,",s_object_placement_data);
+	//TRACE_GAME("object_definition_index: %08X, object_owner: %08X, unk: %08X)", object_definition_index, object_owner, unk);
+
+	typedef int(__cdecl *object_placement_data_new)(void*, DatumIndex, DatumIndex, int);
+	object_placement_data_new pobject_placement_data_new = (object_placement_data_new)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x121033 : 0x132163));
+
+	return pobject_placement_data_new(s_object_placement_data, object_definition_index, object_owner, unk);
+
+
+}
 int __cdecl call_object_placement_data_new(void* s_object_placement_data, int object_definition_index, int object_owner, int unk)
 {
 
@@ -1546,7 +1582,7 @@ void __cdecl GetGameVersion(DWORD *xlive_version, DWORD *build_version, DWORD *b
 }
 
 
-void GivePlayerWeaponDatum(int unit_datum,int weapon_datum)
+void GivePlayerWeaponDatum(DatumIndex unit_datum,DatumIndex weapon_datum)
 {
 	if (unit_datum != -1 && unit_datum != 0)
 	{
@@ -1554,14 +1590,14 @@ void GivePlayerWeaponDatum(int unit_datum,int weapon_datum)
 		DWORD dwBack;
 		VirtualProtect(nObject, 0xC4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		call_object_placement_data_new(nObject, weapon_datum, unit_datum, 0);
+		call_object_placement_data_new_datum(nObject, weapon_datum, unit_datum, 0);
 
 		int object_index = call_object_new(nObject);
 
 		if (object_index != -1)
 		{
-			call_unit_reset_equipment(unit_datum);
-			call_assign_equipment_to_unit(unit_datum, object_index, 1);
+			call_unit_reset_equipment_datum(unit_datum);
+			call_assign_equipment_to_unit_datum(unit_datum, object_index, 1);
 		}
 		else
 			delete[] nObject;
@@ -1595,6 +1631,7 @@ float get_device_acceleration_scale(DatumIndex device_datum)
 typedef int(__cdecl *tdevice_touch)(DatumIndex device_datum, DatumIndex unit_datum);
 tdevice_touch pdevice_touch;
 
+bool device_active = true;
 //This happens whenever a player activates a device control.
 int __cdecl device_touch(DatumIndex device_datum, DatumIndex unit_datum)
 {
@@ -1602,12 +1639,23 @@ int __cdecl device_touch(DatumIndex device_datum, DatumIndex unit_datum)
 	//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 	if (get_device_acceleration_scale(device_datum) == 999.0f)
 	{
-			if(device_shop->BuyItem(device_datum,unit_datum)) // If the purchase was successful we won't execute the original device control action.
-				return 0;
+		if (device_shop->BuyItem(device_datum, unit_datum)) // If the purchase was successful we won't execute the original device control action.
+		{
+			if (device_active == false)
+				return pdevice_touch(device_datum, unit_datum);
+
+			device_active = true;
+			return 0;
+		}
 	}
 
 	// If the purchase fails (they don't have enough points), or the device is not a shopping device return normally.
 	// In general's map returning normally will turn the point display red indicating the user has no points, we do not indicate that the purchase failed in any other way.
+	if (device_active == false)
+		return 0;
+
+	device_active = false;
+
 	return pdevice_touch(device_datum, unit_datum);
 }
 
