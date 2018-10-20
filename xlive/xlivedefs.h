@@ -692,14 +692,14 @@ typedef struct _XSESSION_REGISTRATION_RESULTS
 
 
 
-#define X_CONTEXT_PRESENCE              0x00008001	// ??
-#define X_CONTEXT_GAME_TYPE             0x0000800A	// DR2
-#define X_CONTEXT_GAME_MODE             0x0000800B
+//#define X_CONTEXT_PRESENCE              0x00008001	// ??
+//#define X_CONTEXT_GAME_TYPE             0x0000800A	// DR2
+//#define X_CONTEXT_GAME_MODE             0x0000800B
 
 
 // Values for X_CONTEXT_GAME_TYPE
-#define X_CONTEXT_GAME_TYPE_RANKED      0
-#define X_CONTEXT_GAME_TYPE_STANDARD    1
+//#define X_CONTEXT_GAME_TYPE_RANKED      0
+//#define X_CONTEXT_GAME_TYPE_STANDARD    1
 
 typedef enum 
 {

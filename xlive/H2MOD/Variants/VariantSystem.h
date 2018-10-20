@@ -17,4 +17,5 @@ public:
 	GameClientServerHandler* spawnPlayer;
 	GameClientServerHandler* playerDeath;
 	GameClientServerHandler* playerKill;
+	GameClientServerHandler* itemInteraction;
 };

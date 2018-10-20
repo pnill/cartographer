@@ -94,12 +94,12 @@ trigger_membership_packet trigger_membership_packet_method;
 unsigned int __stdcall triggerMembershipPacketData(int thisx) {
 	//return trigger_membership_packet_method(thisx);
 
-	int v1; // ebx@1
+	unsigned int v1; // ebx@1
 	int v2; // esi@1
 	int v3; // edi@2
 	char *v4; // ecx@5
 	int v5; // eax@10
-	int v6; // ebx@19
+	unsigned int v6; // ebx@19
 	int v7; // edi@20
 	int *v8; // eax@22
 	int v10; // [sp+Ch] [bp-7B5Ch]@1
@@ -437,16 +437,16 @@ void __stdcall receiveDataFromSocket(DWORD* thisx) {
 	unsigned int a1; // [sp+14h] [bp-1E48h]@0
 	int v8; // [sp+18h] [bp-1E44h]@0
 	int v9; // [sp+1Ch] [bp-1E40h]@6
-	int v10; // [sp+20h] [bp-1E3Ch]@11
-	int v11; // [sp+24h] [bp-1E38h]@11
-	int v12; // [sp+28h] [bp-1E34h]@11
-	int v13; // [sp+2Ch] [bp-1E30h]@11
+//	int v10; // [sp+20h] [bp-1E3Ch]@11
+//	int v11; // [sp+24h] [bp-1E38h]@11
+//	int v12; // [sp+28h] [bp-1E34h]@11
+//	int v13; // [sp+2Ch] [bp-1E30h]@11
 	int a3; // [sp+30h] [bp-1E2Ch]@11
 	int v15; // [sp+38h] [bp-1E24h]@11
-	int v16; // [sp+3Ch] [bp-1E20h]@11
-	int v17; // [sp+40h] [bp-1E1Ch]@11
-	int v18; // [sp+44h] [bp-1E18h]@11
-	int v19; // [sp+48h] [bp-1E14h]@11
+//	int v16; // [sp+3Ch] [bp-1E20h]@11
+//	int v17; // [sp+40h] [bp-1E1Ch]@11
+//	int v18; // [sp+44h] [bp-1E18h]@11
+//	int v19; // [sp+48h] [bp-1E14h]@11
 	char buf[4096]; // [sp+E58h] [bp-1004h]@5
 	char *ptr = buf;
 
@@ -494,10 +494,10 @@ void __stdcall receiveDataFromSocket(DWORD* thisx) {
 		v1 = v6;
 		a3 = v8;
 		v15 = v9;
-		v16 = v10;
-		v17 = v11;
-		v18 = v12;
-		v19 = v13;
+		//v16 = v10; // avoid warnings.
+		//v17 = v11;
+		//v18 = v12;
+		//v19 = v13;
 		if (sub_122A93B(a1, ptr, (int)&a3))
 			h2_calls_packet_dispatcher(v6, (int)&a3);
 	} while (v2);

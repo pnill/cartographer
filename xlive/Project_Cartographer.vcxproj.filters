@@ -232,6 +232,9 @@
     <Filter Include="Source Files\Blam\Cache\TagBlocks\AI">
       <UniqueIdentifier>{8ed4f5f1-2e41-4c8c-bf9d-9503ae31a097}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Variants\HeadHunter">
+      <UniqueIdentifier>{49f37534-5966-4498-8e32-3fe96744053d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -428,6 +431,9 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Variants\VariantPlayer.cpp">
       <Filter>Source Files\H2MOD\Variants</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Variants\HeadHunter\HeadHunter.cpp">
+      <Filter>Source Files\H2MOD\Variants\HeadHunter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -820,6 +826,9 @@
     </ClInclude>
     <ClInclude Include="Blam\Cache\TagBlocks\char.h">
       <Filter>Source Files\Blam\Cache\TagBlocks\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Variants\HeadHunter\HeadHunter.h">
+      <Filter>Source Files\H2MOD\Variants\HeadHunter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

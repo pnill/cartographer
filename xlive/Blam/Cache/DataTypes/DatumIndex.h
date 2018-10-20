@@ -16,40 +16,40 @@ namespace Blam
 				//Default Constructor
 				DatumIndex()
 				{
-					this->Index = 0xFFFF;
-					this->Salt = 0xFFFF;
+					this->Index = 0xFFFFu;
+					this->Salt = 0xFFFFu;
 				}
 				//Copy Constructor
 				DatumIndex(INT32 Identifier)
 				{
-					this->Index = Identifier & 0x0000FFFF;
-					this->Salt = Identifier & 0xFFFF0000;
+					this->Index = (Identifier & 0x0000FFFF);
+					this->Salt = (Identifier & 0xFFFF0000);
 				}
 				static const INT32 Null = 0xFFFFFFFF;
 			public:
 				//Returns Absolute Index
-				INT16 ToAbsoluteIndex();
+				short ToAbsoluteIndex();
 				//Returns Datum Salt
-				INT16 ToIdentifier();
+				short ToIdentifier();
 				//Returns true is DatumIndex is not Invalid
 				bool IsNull();
 				//Return in StringFormat
 				std::string ToString();
-				int ToInt();
+				INT ToInt();
 
-				void operator = (const INT32 &Value);
+				void operator = (const short &Value);
 				void operator = (const DatumIndex &DatumIndex);
-				bool operator == (const INT32 &Value);
+				bool operator == (const short &Value);
 				bool operator == (const DatumIndex &DatumIndex);
-				bool operator != (const INT32 &Value);
+				bool operator != (const short &Value);
 				bool operator != (const DatumIndex &DatumIndex);
 
-				INT16 Index;
+				signed short Index;
 			private:
 				//Absolute Index 
 
 				//Salt for Unique Identification
-				INT16 Salt;
+				signed short Salt;
 
 			};
 			static_assert(sizeof(DatumIndex) == 4, "Invalid Size for struct (DatumIndex)");
@@ -58,17 +58,17 @@ namespace Blam
 }
 			
 #pragma region DatumIndex
-inline int Blam::Cache::DataTypes::DatumIndex::ToInt()
+inline INT Blam::Cache::DataTypes::DatumIndex::ToInt()
 {
 	int datum = ((this->Salt << 16) | ((this->Index) & 0xffff));
 	return datum;
 }
 
-inline INT16 Blam::Cache::DataTypes::DatumIndex::ToAbsoluteIndex()
+inline short Blam::Cache::DataTypes::DatumIndex::ToAbsoluteIndex()
 {
 	return this->Index;
 }
-inline INT16 Blam::Cache::DataTypes::DatumIndex::ToIdentifier()
+inline short Blam::Cache::DataTypes::DatumIndex::ToIdentifier()
 {
 	return this->Salt;
 }
@@ -78,27 +78,27 @@ inline bool Blam::Cache::DataTypes::DatumIndex::IsNull()
 	return this->Salt = 0xFFFF && this->Index == 0xFFFF;
 
 }
-inline void Blam::Cache::DataTypes::DatumIndex::operator = (const INT32 &Value)
+inline void Blam::Cache::DataTypes::DatumIndex::operator = (const short &Value)
 {
-	this->Index = Value & 0x0000FFFF;
-	this->Salt = Value & 0xFFFF0000;
+	this->Index = (Value & 0x0000FFFF);
+	this->Salt = (Value & 0xFFFF0000);
 }
 inline void Blam::Cache::DataTypes::DatumIndex::operator = (const DatumIndex &DatumIndex)
 {
 	this->Index = DatumIndex.Index;
 	this->Salt = DatumIndex.Salt;
 }
-inline bool Blam::Cache::DataTypes::DatumIndex::operator== (const INT32 &Value)
+inline bool Blam::Cache::DataTypes::DatumIndex::operator== (const short &Value)
 {
-	return (this->Index == Value & 0x0000FFFF) && (this->Salt == Value & 0xFFFF0000);
+	return (this->Index == (Value & 0x0000FFFF)) && (this->Salt == (Value & 0xFFFF0000));
 }
 inline bool Blam::Cache::DataTypes::DatumIndex::operator== (const DatumIndex &DatumIndex)
 {
 	return (this->Index == DatumIndex.Index) && (this->Salt == DatumIndex.Salt);
 }
-inline bool Blam::Cache::DataTypes::DatumIndex::operator!= (const INT32 &Value)
+inline bool Blam::Cache::DataTypes::DatumIndex::operator!= (const short &Value)
 {
-	return (this->Index != Value & 0x0000FFFF) || (this->Salt != Value & 0xFFFF0000);
+	return (this->Index != (Value & 0x0000FFFF)) || (this->Salt != (Value & 0xFFFF0000));
 }
 inline bool Blam::Cache::DataTypes::DatumIndex::operator!= (const DatumIndex &DatumIndex)
 {
@@ -107,7 +107,7 @@ inline bool Blam::Cache::DataTypes::DatumIndex::operator!= (const DatumIndex &Da
 inline std::string Blam::Cache::DataTypes::DatumIndex::ToString()
 {
 	std::string val;
-	val = (UINT32)((this->Salt << 16) | this->Index);
+	val = (INT32)((this->Salt << 16) | this->Index);
 	return val;
 }
 

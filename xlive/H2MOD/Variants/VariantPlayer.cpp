@@ -42,6 +42,8 @@ DatumIndex VariantPlayer::GetPlayerDatum(XUID xuid)
 	else
 		return xuid_to_player_datum[xuid];
 
+
+	return -1;
 }
 
 DatumIndex VariantPlayer::GetUnitDatum(DatumIndex player_datum)
@@ -51,6 +53,7 @@ DatumIndex VariantPlayer::GetUnitDatum(DatumIndex player_datum)
 
 DatumIndex VariantPlayer::GetUnitDatum(XUID xuid)
 {
+
 	if (xuid_to_unit_datum.find(xuid) == xuid_to_unit_datum.end())
 	{
 		for (auto i = 0; i < 15; i++)
@@ -69,6 +72,11 @@ DatumIndex VariantPlayer::GetUnitDatum(XUID xuid)
 			}
 		}
 	}
+	else
+		return xuid_to_unit_datum[xuid];
+
+
+	return -1; // avoid warning.
 }
 
 void VariantPlayer::SetPlayerDatum(XUID xuid, DatumIndex player_datum)

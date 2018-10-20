@@ -20,6 +20,7 @@ GunGame* gunGame = new GunGame();
 Halo2Final *h2f = new Halo2Final();
 Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
+HeadHunter* headHunterHandler = new HeadHunter();
 DeviceShop* device_shop = new DeviceShop();
 VariantPlayer* variant_player = new VariantPlayer();
 
@@ -28,6 +29,7 @@ bool b_GunGame = false;
 bool b_FireFight = false;
 bool b_Infection = false;
 bool b_Halo2Final = false;
+bool b_HeadHunter = false;
 
 extern CUserManagement User;
 extern int H2GetInstanceId();
@@ -93,11 +95,21 @@ int __cdecl call_unit_reset_equipment(int unit_datum_index)
 	return 0;
 }
 
-int __cdecl call_hs_object_destroy(int object_datum_index)
+void __cdecl call_hs_object_destroy_datum(DatumIndex object_datum_index)
 {
 	//TRACE_GAME("hs_object_destory(object_datum_index: %08X)", object_datum_index);
-	typedef int(__cdecl *hs_object_destroy)(int object_datum_index);
-	hs_object_destroy phs_object_destroy = (hs_object_destroy)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x124ED5 : 0x136005));
+	typedef void(__cdecl *hs_object_destroy)(DatumIndex object_datum_index);
+	hs_object_destroy phs_object_destroy = (hs_object_destroy)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x124ED5 : 0xFDCFD)); // update on dedis
+
+	return phs_object_destroy(object_datum_index);
+}
+
+
+void __cdecl call_hs_object_destroy(int object_datum_index)
+{
+	//TRACE_GAME("hs_object_destory(object_datum_index: %08X)", object_datum_index);
+	typedef void(__cdecl *hs_object_destroy)(int object_datum_index);
+	hs_object_destroy phs_object_destroy = (hs_object_destroy)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x124ED5 : 0xFDCFD)); // update dedi
 
 	return phs_object_destroy(object_datum_index);
 }
@@ -959,17 +971,25 @@ char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 	/* This is the unit of the player who last damaged the object*/
 	int damaging_player_unit = get_damage_owner(unit_datum_index);
 
+	if (b_HeadHunter)
+	{
+		DatumIndex dead_player = DatumIndex(unit_datum_index);
+		headHunterHandler->playerDeath->SetDeadPlayer(dead_player); // set this so we can spawn a skull on their position.
+		headHunterHandler->playerDeath->execute();
+	}
 
+	if (b_FireFight)
+	{
 		/* Hack until rest of code is changed to support DatumIndex vs int*/
 		DatumIndex ai_datum = DatumIndex(unit_datum_index);
-	
+
 		/*
 			In firefight we want to track AI deaths and execute on them to grant points.
 		*/
-		fireFightHandler->playerDeath->SetPlayerIndex(*(DatumIndex*)(a2));
+		fireFightHandler->playerDeath->SetPlayerIndex(*(DatumIndex*)(a2)); // this is the player datum of player who killed the datum.
 		fireFightHandler->playerDeath->SetKilledDatum(ai_datum);
 		fireFightHandler->playerDeath->execute();
-
+	}
 
 	if (b_GunGame) {
 		gunGame->playerDeath->setUnitDatumIndex(unit_datum_index);
@@ -1018,6 +1038,25 @@ void H2MOD::PatchWeaponsInteraction(bool b_Enable)
 	}
 	WriteBytes(offset, assm, 5);
 }
+
+int OnAutoPickUpHandler(DatumIndex player_datum, DatumIndex object_datum)
+{
+	int(_cdecl*AutoHandler)(DatumIndex, DatumIndex);
+	AutoHandler = (int(_cdecl*)(DatumIndex, DatumIndex))((char*)h2mod->GetBase() + ((!h2mod->Server) ? 0x57AA5 : 0x5FF9D));
+	
+	if (b_HeadHunter)
+	{
+		headHunterHandler->itemInteraction->SetPlayerIndex(player_datum);
+		bool handled = headHunterHandler->itemInteraction->SetInteractedObject(object_datum);
+		headHunterHandler->itemInteraction->execute();
+
+		if (handled)
+			return 0;
+	}
+
+	return AutoHandler(player_datum, object_datum);
+}
+
 
 /*
 TODO: might be useful for updating player count while in-lobby
@@ -1209,26 +1248,6 @@ bool __cdecl OnPlayerSpawn(int a1)
 	return ret;
 }
 
-/* Really need some hooks here,
-??_7c_simulation_game_engine_player_entity_definition@@6B@ dd offset sub_11D0018
-
-This area will give us tons of info on the game_engine player, including object index and such linked to secure-address, xnaddr, and wether or not they're host.
-
-
-; class c_simulation_game_statborg_entity_definition: c_simulation_entity_definition;   (#classinformer)
-We'll want to hook this for infection, it handles updating teams it seems we could possibly call it after updating a team to push it to all people.
-
-; class c_simulation_damage_section_response_event_definition: c_simulation_event_definition;   (#classinformer)
-Damage handlers... could help for quake sounds and other things like detecting assisnations (We'll probably find this when we track medals in-game as well)
-
-; class c_simulation_unit_entity_definition: c_simulation_object_entity_definition, c_simulation_entity_definition;   (#classinformer)
-Ofc we want unit handling.
-
-; class c_simulation_slayer_engine_globals_definition: c_simulation_game_engine_globals_definition, c_simulation_entity_definition;   (#classinformer)
-Should take a look here for extended functions on scoring chances are we're already hooking one of these.
-
-*/
-
 void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
 {
 	memcpy(&join_game_xn, host_xn, sizeof(XNADDR));
@@ -1416,6 +1435,9 @@ __declspec(naked) void calculate_model_lod_detour()
 		jmp calculate_model_lod_detour_end
 	}
 }
+
+
+
 void H2MOD::securityPacketProcessing()
 {
 	if (!gameManager->isHost())
@@ -1806,6 +1828,8 @@ void H2MOD::ApplyHooks() {
 		PatchCall(Base + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
 		PatchCall(Base + 0x00092C05, BansheeBombIsEngineMPCheck);
 		PatchCall(Base + 0x0013ff75, FlashlightIsEngineSPCheck);
+
+
 	}
 	else {
 
@@ -1852,6 +1876,9 @@ void H2MOD::ApplyHooks() {
 			server->startListening();
 		}
 	}
+
+	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
+	PatchCall(h2mod->GetBase() + ((!h2mod->Server) ? 0x58789 : 0x60C81), (DWORD)OnAutoPickUpHandler);
 
 	//apply any network hooks
 	network->applyNetworkHooks();

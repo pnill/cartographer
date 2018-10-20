@@ -498,23 +498,23 @@ void H2MOD_QoS::startListening()
 // #69: XNetQosListen
 DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec, DWORD dwFlags)
 {
-	TRACE("XNetQosListen  (pxnkid = %X, pb = %X, cb = %d, bitsPerSec = %d, flags = %X)",
-		pxnkid, pb, cb, dwBitsPerSec, dwFlags);
+	//TRACE("XNetQosListen  (pxnkid = %X, pb = %X, cb = %d, bitsPerSec = %d, flags = %X)",
+	//	pxnkid, pb, cb, dwBitsPerSec, dwFlags);
 
 	if ((dwFlags & XNET_QOS_LISTEN_ENABLE) && (dwFlags & XNET_QOS_LISTEN_SET_DATA))
 	{
-		TRACE("XnetQoSListen == XNET_QOS_LISTEN_ENABLE && XNetQoSListen == XNET_QOS_LISTEN_SET_DATA");
+		//TRACE("XnetQoSListen == XNET_QOS_LISTEN_ENABLE && XNetQoSListen == XNET_QOS_LISTEN_SET_DATA");
 		StartListenerThread(pb, cb);
 	}
 
 	if (dwFlags & XNET_QOS_LISTEN_DISABLE)
 	{
-		TRACE("XnetQoSListen == XNET_QOS_LISTEN_DISABLE");
+		//TRACE("XnetQoSListen == XNET_QOS_LISTEN_DISABLE");
 	}
 
 	if (dwFlags & XNET_QOS_LISTEN_RELEASE)
 	{
-		TRACE("XnetQosListen == XNET_QOS_LISTEN_RELEASE");
+		//TRACE("XnetQosListen == XNET_QOS_LISTEN_RELEASE");
 
 	}
 

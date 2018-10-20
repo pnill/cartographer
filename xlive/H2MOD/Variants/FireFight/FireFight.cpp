@@ -11,58 +11,23 @@ FireFight::FireFight()
 	this->playerKill = new FireFightKillHandler();
 }
 
-/*
-DEPRECATED - Use tag_instances, tag_group method.
-int get_swarm_scatter_killed_count(DatumIndex character_datum)
-{
-	__int16 character_index = character_datum.Index;
-	character_index = character_index << 4; //shift left 4
-
-	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD54);
-	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50);
-
-
-	printf("global_tag_instances: %08X", global_tag_instances);
-	DWORD character_offset = *(DWORD*)((BYTE*)global_tag_instances + character_index + 8);
-	DWORD character_tag = (DWORD)((BYTE*)character_offset + tag_header);
-
-	printf("character_offset: %08X", character_offset);
-	printf("character_tag: %08X", character_tag);
-
-	int swarm_count = *(int*)((BYTE*)character_tag + 0x64);
-
-	if (swarm_count > 0)
-	{
-		DWORD swarm_offset = *(DWORD*)((BYTE*)character_tag + 0x68);
-		DWORD tag_instance_pointer = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x482290);
-		DWORD swarm_pointer = (DWORD)((BYTE*)tag_instance_pointer + swarm_offset);
-		DWORD swarm_scatter_killed_count = *(DWORD*)((BYTE*)swarm_pointer);
-		return swarm_scatter_killed_count;
-	}
-
-
-	return 0;
-}*/
-
 void FireFight::KilledAI(DatumIndex ai_datum,XUID killer)
 {
 	int points = 0;
-
-	DatumIndex actor_datum = (&game_state_objects_header->object_header[ai_datum.Index])->object->ActorDatum; // Grab the actor from the killed AI
-	if (actor_datum.Index != -1) // Ensure that it was valid
+	if ((&game_state_objects_header->object_header[ai_datum.Index])->object->ObjectType == Objects::ObjectType::biped)
 	{
-		DatumIndex char_datum = (&game_state_actors->actors[actor_datum.Index])->character_datum; // get the character tag datum assigned to the actor.
+		DatumIndex actor_datum = (&game_state_objects_header->object_header[ai_datum.Index])->object->ActorDatum; // Grab the actor from the killed AI
+		if (actor_datum.Index != -1) // Ensure that it was valid
+		{
+			DatumIndex char_datum = (&game_state_actors->actors[actor_datum.Index])->character_datum; // get the character tag datum assigned to the actor.
+			character_tag_group *char_tag = (character_tag_group*)tag_instances[char_datum.Index].GetTag(); // get the character tag.
 
-		void* character_tag_offset = tag_instances[char_datum.Index].offset;
+			if (char_tag->SwarmProperties.size > 0)
+				points = char_tag->SwarmProperties[0]->scatterKilledCount;
 
-		DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD54);
-		character_tag_group *char_tag = (character_tag_group*)((BYTE*)character_tag_offset + tag_header);
 
-		if(char_tag->SwarmProperties.size > 0)
-			points = char_tag->SwarmProperties[0]->scatterKilledCount;
-	
-
-		device_shop->AddPoints(killer, points);
+			device_shop->AddPoints(killer, points);
+		}
 	}
 
 }

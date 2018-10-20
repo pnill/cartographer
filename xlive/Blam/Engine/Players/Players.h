@@ -3,6 +3,72 @@
 #include "Blam\Shared\SharedDefinitions.h"
 #include "Blam\Cache\DataTypes\DataTypes.h"
 
+struct Item
+{
+	short item_id;
+	char pad[0x12];
+}; static_assert(sizeof(Item) == 0x14, "Item size != 0x0A");
+
+struct PlayerInventory {
+	Item items[0x50];
+	char pad_char[0x1380];
+}; static_assert(sizeof(PlayerInventory) == 0x19C0, "PlayerInventory != 0x19C0");
+/*
+.text:00611CF4                 mov     ecx, [ebp+UserGSIDX]
+.text:00611CF7                 imul    ecx, 19C0h
+.text:00611CFD                 mov     edx, [ebp+InventorySlot]
+.text:00611D00                 imul    edx, 14h
+.text:00611D03                 mov     ax, PlayersPointer[ecx+edx]
+.text:00611D0B                 mov     [ebp+ItemID], ax
+.text:00611D0F                 movsx   ecx, [ebp+ItemID]
+.text:00611D13                 test    ecx, ecx
+.text:00611D15                 jle     short loc_611D23
+.text:00611D17                 movsx   edx, [ebp+ItemID]
+.text:00611D1B                 cmp     edx, 6590h
+.text:00611D21                 jl      short loc_611D28
+
+
+// Location
+int X = (int)*(DWORD *)(PlayerInfo + 6592 * UID + 8);
+int Y = (int)*(DWORD *)(PlayerInfo + 6592 * UID + 12);
+// Basic Info
+int PID = (int)*(DWORD *)(PlayerInfo + 6592 * UID + 800);
+memcpy(Name, (char *)(PlayerInfo + 6592 * UID + 804), 16);
+Name[16] = 0x00;
+memcpy(PinNumber, (char *)(PlayerInfo + 6592 * UID + 4316), 4);
+PinNumber[4] = 0x00;
+memcpy(UserName, (void *)(PlayerData + 15880 * UID + 1748), 24);
+int Level = (int)*(DWORD *)(PlayerInfo + 6592 * UID + 976);
+// Inventory
+__int64 Gold = (__int64)*(DWORD64 *)(PlayerInfo + 6592 * UID + 3136);
+// Stats
+byte Nation = (byte)*(byte *)(PlayerInfo + 6592 * UID + 820);
+byte Class = (byte)*(byte *)(PlayerInfo + 6592 * UID + 821);
+short STR = (__int16)*(__int16 *)(PlayerInfo + 6592 * UID + 824);
+short DEX = (__int16)*(__int16 *)(PlayerInfo + 6592 * UID + 826);
+short INT = (__int16)*(__int16 *)(PlayerInfo + 6592 * UID + 828);
+short CON = (__int16)*(__int16 *)(PlayerInfo + 6592 * UID + 830);
+short SPI = (__int16)*(__int16 *)(PlayerInfo + 6592 * UID + 832);
+// PVP
+int Honor = (int)*(DWORD *)(PlayerInfo + 6592 * UID + 860);
+int Kills = (int)*(DWORD *)(PlayerInfo + 6592 * UID + 864);
+int Infamy = (int)*(DWORD *)(PlayerInfo + 6592 * UID + 868);
+
+
+memcpy(PinNumber, (char *)(PlayerInfo + 6592 * UID + 4316), 4);
+
+
+*/
+
+
+/*
+struct player_info
+{
+	
+
+}; static_assert(sizeof(player_info) == 0x19C0, "Size of character_data is bad!");
+*/
+
 using namespace Blam::Enums;
 using namespace Blam::Cache::DataTypes;
 

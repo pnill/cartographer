@@ -389,7 +389,7 @@ bool ComputeFileCrc32Hash(wchar_t* filepath, DWORD &rtncrc32) {
 			break;
 		}
 
-		for (int i = 0; i < cbRead; i++) {
+		for (unsigned int i = 0; i < cbRead; i++) {
 			oldcrc32 = UPDC32(rgbFile[i], oldcrc32);
 		}
 	}
@@ -451,7 +451,7 @@ void wcstombs2(char* buffer, wchar_t* text, int buf_len) {
 }
 
 
-static struct stringMe {
+struct stringMe {
 	char *ptr;
 	size_t len;
 };
@@ -547,7 +547,7 @@ int MasterHttpResponse(char* url, char* http_request, char* &rtn_response) {
 }
 
 bool StrnCaseInsensEqu(char* str1, char* str2, unsigned int chk_len) {
-	int chk_len2 = strlen(str1);
+	unsigned int chk_len2 = strlen(str1);
 	if (chk_len2 < chk_len) {
 		chk_len = chk_len2;
 	}
@@ -556,7 +556,7 @@ bool StrnCaseInsensEqu(char* str1, char* str2, unsigned int chk_len) {
 		return false;
 	}
 	const int case_diff = 'A' - 'a';
-	for (int i = 0; i < chk_len; i++) {
+	for (unsigned int i = 0; i < chk_len; i++) {
 		if (str1[i] != str2[i]) {
 			int sa = str1[i];
 			if (sa >= 'a' && sa <= 'z') {

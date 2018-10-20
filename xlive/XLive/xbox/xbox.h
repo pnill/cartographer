@@ -1,4 +1,7 @@
 #pragma once
+#ifndef XBOX_H
+#define XBOX_H
+
 extern XSESSION_LOCAL_DETAILS sessionDetails;
 #define CUSTOMACTION_FLAG_CLOSESUI      1
 
@@ -176,7 +179,7 @@ typedef struct _XUSER_STATS_SPEC
 
 
 
-
+#endif // !XBOX_H
 
 
 

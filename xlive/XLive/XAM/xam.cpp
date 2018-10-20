@@ -188,7 +188,10 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	if ((g_listener[curlist].area & XNOTIFY_CUSTOM) &&
 		dwMsgFilter == 0)
 	{
-		dwMsgFilter = XN_CUSTOM_ACTIONPRESSED;
+		if (0) // change this to if player kicked...
+		{
+			dwMsgFilter = XN_CUSTOM_ACTIONPRESSED;
+		}
 	}
 
 
@@ -205,7 +208,6 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	{
 
 	case XN_CUSTOM_ACTIONPRESSED:
-		//if(kick_player_exists?)
 		*pdwId = XN_CUSTOM_ACTIONPRESSED;
 		*pParam = 0x00000000; // replace the high-bits with action_id
 		exit_code = TRUE;

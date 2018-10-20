@@ -118,7 +118,7 @@ int __cdecl sub_250E22_CM_(int thisptr, int a2, DWORD* menu_vftable_1, DWORD men
 
 	sub_66B33(v3);
 
-	for (int i = 0; i < *(DWORD*)(*((DWORD*)v2 + 28) + 32); ++i) {
+	for (unsigned int i = 0; i < *(DWORD*)(*((DWORD*)v2 + 28) + 32); ++i) {
 		sub_667A0(*((DWORD*)v2 + 28));
 	}
 	if (v2 == -708) {
@@ -306,13 +306,13 @@ int __stdcall sub_20fb1b_CMLTD_(void* thisptr, int label_menu_id, int label_id_d
 
 	BYTE* v1; // esi@1
 	int v2; // ebx@1
-	int v3; // edi@5
+	unsigned int v3; // edi@5
 	int v4; // ebp@6
 	int v5; // ecx@7
 	int v6; // eax@7
 	int v7; // eax@9
 	int v8; // esi@9
-	int v9; // edi@14
+	unsigned int v9; // edi@14
 	int v10; // ebp@15
 	int v11; // ecx@17
 	int v12; // eax@17
@@ -325,12 +325,12 @@ int __stdcall sub_20fb1b_CMLTD_(void* thisptr, int label_menu_id, int label_id_d
 	int v19; // esi@29
 	bool v20; // sf@34
 			  //unsigned __int8 v21; // of@34
-	int v22; // esi@35
+	unsigned int v22; // esi@35
 	int v23; // edi@36
 	int v24; // ecx@37
 	int v25; // eax@37
 	void* v26; // eax@39
-	int v27; // edi@43
+	unsigned int v27; // edi@43
 	int v28; // ecx@45
 	int v29; // eax@45
 	int v30; // eax@47
@@ -400,7 +400,7 @@ int __stdcall sub_20fb1b_CMLTD_(void* thisptr, int label_menu_id, int label_id_d
 		if (*(DWORD*)(v2 + 68) > 0)
 		{
 			v37 = 0;
-			int varesult = 0;
+			bool varesult = 0;
 			do
 			{
 				v15 = *(DWORD*)(v2 + 72);
@@ -434,8 +434,8 @@ int __stdcall sub_20fb1b_CMLTD_(void* thisptr, int label_menu_id, int label_id_d
 					cmp eax, va2
 					//jump if Overflow Flag is not set.
 					JNO toEnd
-					mov eax, 1
-					mov varesult, eax
+					mov al, 1
+					mov varesult, al
 
 					toEnd :
 					//restore original register
@@ -511,7 +511,7 @@ int __stdcall sub_2107df_CMLTD_(int thisptr, int* a2, char a3, int label_menu_id
 	int v6; // ebp@4
 	int v7; // eax@4
 	int v8; // ebx@6
-	int v9; // ebp@9
+	unsigned int v9; // ebp@9
 	int v10; // eax@10
 	bool v11; // zf@10
 	int *v12; // eax@10
@@ -831,7 +831,7 @@ char __stdcall sub_210a44_CMLTD_(int thisptr, int a2, int* a3, int label_menu_id
 							sub_2107df_CMLTD_(v12, a3, v13, label_menu_id, label_id_description);
 							v12 = *(DWORD*)(v12 + 0x18);
 							++v4;
-						} while ((signed int)v4 < *(DWORD*)(v5 + 0x20));
+						} while ((unsigned int)v4 < *(DWORD*)(v5 + 0x20));
 					}
 					return sub_20f975(v3, *(WORD*)(v5 + 0x28) - 1);
 				}

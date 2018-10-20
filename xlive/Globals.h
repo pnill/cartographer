@@ -25,6 +25,7 @@
 #include "H2MOD\Variants\Infection\Infection.h"
 #include "H2MOD\Variants\FireFight\FireFight.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
+#include "H2MOD\Variants\HeadHunter\HeadHunter.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\Networking\Networking.h"

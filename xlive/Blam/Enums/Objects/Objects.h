@@ -6,9 +6,10 @@ namespace Blam
 	{
 		namespace Objects
 		{
-			enum class ObjectType : BYTE
+			enum class ObjectType : signed char
 			{
-				_object_type_object = -4,
+				/* Because these are unsigned, they can only be positive.*/
+				_object_type_object = -4, 
 				_object_type_device = -3,
 				_object_type_item = -2,
 				_object_type_unit = -1,
