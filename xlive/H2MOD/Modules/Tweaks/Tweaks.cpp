@@ -15,6 +15,7 @@
 #include "XLive\UserManagement\CUser.h"
 #include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
+#include "H2MOD\Variants\VariantMPGameEngine.h"
 
 
 #define _USE_MATH_DEFINES
@@ -878,12 +879,30 @@ char is_remote_desktop()
 	return 0;
 }
 
+class test_engine : public c_game_engine_base
+{
+	c_game_engine_types get_type() { return c_game_engine_types::unknown5; }
+
+	bool is_team_enemy(int team_a, int team_b)
+	{
+		return true;
+	}
+
+	void unk_function_render(size_t arg1)
+	{
+	}
+
+};
+test_engine g_test_engine;
+
 void InitH2Tweaks() {
 	postConfig();
 
 	addDebugText("Begin Startup Tweaks.");
 
 	MapChecksumSync::Init();
+	custom_game_engines::init();
+	custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 	
 	if (H2IsDediServer) {
 		DWORD dwBack;
@@ -1348,21 +1367,13 @@ void H2Tweaks::RadarPatch() {
 	WriteValue<WORD>(shared_Meta_Data_ptr + tag_offset + format_offset, format_type);
 }
 
-float* xb_tickrate_flt;
-__declspec(naked) void calculate_delta_time(void)
+float calculate_delta_time(int ticks)
 {
-	__asm
-	{
-		mov eax, xb_tickrate_flt
-		fld dword ptr[eax]
-		fmul dword ptr[esp + 4]
-		retn
-	}
+	return 1.0;
 }
 
 
 void H2Tweaks::applyPlayersActionsUpdateRatePatch()
 {
-	xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
-	PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
+	//PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
 }
