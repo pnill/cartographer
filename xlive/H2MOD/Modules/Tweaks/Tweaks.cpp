@@ -15,6 +15,7 @@
 #include "XLive\UserManagement\CUser.h"
 #include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
+#include "H2MOD\Variants\VariantMPGameEngine.h"
 
 
 #define _USE_MATH_DEFINES
@@ -878,12 +879,33 @@ char is_remote_desktop()
 	return 0;
 }
 
+class test_engine : public c_game_engine_base
+{
+	bool is_team_enemy(int team_a, int team_b)
+	{
+		return false;
+	}
+
+	void render_in_world(size_t arg1)
+	{
+	}
+
+	float player_speed_multiplier(int arg1)
+	{
+		return 0.2f;
+	}
+
+};
+test_engine g_test_engine;
+
 void InitH2Tweaks() {
 	postConfig();
 
 	addDebugText("Begin Startup Tweaks.");
 
 	MapChecksumSync::Init();
+	custom_game_engines::init();
+	custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 	
 	if (H2IsDediServer) {
 		DWORD dwBack;
@@ -1043,7 +1065,7 @@ void H2Tweaks::setSens(InputType input_type, int sens) {
 	}
 }
 
-void H2Tweaks::setFOV(int field_of_view_degrees) {
+void H2Tweaks::setFOV(double field_of_view_degrees) {
 
 	if (H2IsDediServer)
 		return;
@@ -1055,11 +1077,11 @@ void H2Tweaks::setFOV(int field_of_view_degrees) {
 		//int res_width = *(int*)(H2BaseAddr + 0xA3DA00); //wip
 		//int res_height = *(int*)(H2BaseAddr + 0xA3DA04);
 
-		const float default_radians_FOV = 70.0f * M_PI / 180.0f;
+		const double default_radians_FOV = 70.0f * M_PI / 180.0f;
 
 		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0f) / default_radians_FOV;
-		*reinterpret_cast<float*>(H2BaseAddr + 0x41D984) = calculated_radians_FOV; // First Person
-		*reinterpret_cast<float*>(H2BaseAddr + 0x413780) = calculated_radians_FOV + 0.22f; // Third Person
+		WriteValue(H2BaseAddr + 0x41D984, calculated_radians_FOV); // First Person
+		WriteValue(H2BaseAddr + 0x413780, calculated_radians_FOV + 0.22f); // Third Person
 	}
 }
 
@@ -1279,7 +1301,6 @@ void H2Tweaks::FixRanksIcons() {
 	const WORD y_pos_pre = 0x001A;				//Value : 26 (decimal)
 	const WORD y_pos_pcr = 0x0017;				//Value : 23 (decimal)
 	const BYTE bitm_offset = 0x18;				//Definition : Bitm (bitmap loaded based on datum index)
-	DWORD bitm_type;							//Value : Datum index value for Bitm definition
 
 	//Tag : ui\global_bitmaps\rank_icons.bitm
 	const DWORD rank_icons = 0xE50802E6;		//Bitmap Datum Index
@@ -1348,21 +1369,13 @@ void H2Tweaks::RadarPatch() {
 	WriteValue<WORD>(shared_Meta_Data_ptr + tag_offset + format_offset, format_type);
 }
 
-float* xb_tickrate_flt;
-__declspec(naked) void calculate_delta_time(void)
+float calculate_delta_time(int ticks)
 {
-	__asm
-	{
-		mov eax, xb_tickrate_flt
-		fld dword ptr[eax]
-		fmul dword ptr[esp + 4]
-		retn
-	}
+	return 1.0;
 }
 
 
 void H2Tweaks::applyPlayersActionsUpdateRatePatch()
 {
-	xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
-	PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
+	//PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
 }
