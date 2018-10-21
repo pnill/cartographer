@@ -52,13 +52,13 @@ struct c_game_engine_vtable
 	c_engine_func_proto_ptr(unk_function_11, void, int arg1);
 	c_engine_func_proto_ptr(unk_function_12, void);
 	c_engine_func_proto_ptr(unk_function_13, void);
-	c_engine_func_proto_ptr(unk_function_render, void, size_t arg1);
+	c_engine_func_proto_ptr(render_in_world, void, size_t arg1);
 	c_engine_func_proto_ptr(update_hud, void, int hud_owner);
 	c_engine_func_proto_ptr(unk_function_16, void, int arg1);
 	c_engine_func_proto_ptr(unk_function_17, int, int arg1, int arg2);
 	c_engine_func_proto_ptr(unk_function_18, int, int arg1, int arg2);
 	c_engine_func_proto_ptr(unk_function_19, void);
-	c_engine_func_proto_ptr(update, float, int arg1);
+	c_engine_func_proto_ptr(player_speed_multiplier, float, int arg1);
 	c_engine_func_proto_ptr(unk_function_21, int, int arg1);
 	c_engine_func_proto_ptr(unk_function_22, void, int arg1);
 	c_engine_func_proto_ptr(unk_function_23, void, int arg1);
@@ -199,7 +199,7 @@ c_engine_func_proto(unk_function_13_wrapper, void)
 }
 c_engine_func_proto(unk_function_render_wrapper, void, size_t arg1)
 {
-	GET_ENGINE()->unk_function_render(arg1);
+	GET_ENGINE()->render_in_world(arg1);
 }
 c_engine_func_proto(update_hud_wrapper, void, int hud_owner)
 {
@@ -223,7 +223,7 @@ c_engine_func_proto(unk_function_19_wrapper, void)
 }
 c_engine_func_proto(update_wrapper, float, int arg1)
 {
-	return GET_ENGINE()->update(arg1);
+	return GET_ENGINE()->player_speed_multiplier(arg1);
 }
 c_engine_func_proto(unk_function_21_wrapper, int, int arg1)
 {
@@ -408,9 +408,9 @@ void c_game_engine_base::unk_function_13()
 {
 	return call_c_base_func(unk_function_13);
 }
-void c_game_engine_base::unk_function_render(size_t arg1)
+void c_game_engine_base::render_in_world(size_t arg1)
 {
-	return call_c_base_func(unk_function_render, arg1);
+	return call_c_base_func(render_in_world, arg1);
 }
 void c_game_engine_base::update_hud(int hud_owner)
 {
@@ -432,9 +432,9 @@ void c_game_engine_base::unk_function_19()
 {
 	return call_c_base_func(unk_function_19);
 }
-float c_game_engine_base::update(int arg1)
+float c_game_engine_base::player_speed_multiplier(int arg1)
 {
-	return call_c_base_func(update, arg1);
+	return call_c_base_func(player_speed_multiplier, arg1);
 }
 int c_game_engine_base::unk_function_21(int arg1)
 {
@@ -515,7 +515,7 @@ bool c_game_engine_base::should_garbage_collect(int arg1)
 }
 void c_game_engine_base::unk_function_40()
 {
-	return call_c_base_func(unk_function_40,);
+	return call_c_base_func(unk_function_40);
 }
 void c_game_engine_base::unk_function_41()
 {
@@ -581,13 +581,13 @@ void custom_game_engines::init()
 	custom_engine_wrapper_vtble.unk_function_11 = unk_function_11_wrapper;
 	custom_engine_wrapper_vtble.unk_function_12 = unk_function_12_wrapper;
 	custom_engine_wrapper_vtble.unk_function_13 = unk_function_13_wrapper;
-	custom_engine_wrapper_vtble.unk_function_render = unk_function_render_wrapper;
+	custom_engine_wrapper_vtble.render_in_world = unk_function_render_wrapper;
 	custom_engine_wrapper_vtble.update_hud = update_hud_wrapper;
 	custom_engine_wrapper_vtble.unk_function_16 = unk_function_16_wrapper;
 	custom_engine_wrapper_vtble.unk_function_17 = unk_function_17_wrapper;
 	custom_engine_wrapper_vtble.unk_function_18 = unk_function_18_wrapper;
 	custom_engine_wrapper_vtble.unk_function_19 = unk_function_19_wrapper;
-	custom_engine_wrapper_vtble.update = update_wrapper;
+	custom_engine_wrapper_vtble.player_speed_multiplier = update_wrapper;
 	custom_engine_wrapper_vtble.unk_function_21 = unk_function_21_wrapper;
 	custom_engine_wrapper_vtble.unk_function_22 = unk_function_22_wrapper;
 	custom_engine_wrapper_vtble.unk_function_23 = unk_function_23_wrapper;

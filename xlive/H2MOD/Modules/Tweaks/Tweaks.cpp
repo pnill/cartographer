@@ -881,15 +881,18 @@ char is_remote_desktop()
 
 class test_engine : public c_game_engine_base
 {
-	c_game_engine_types get_type() { return c_game_engine_types::unknown5; }
-
 	bool is_team_enemy(int team_a, int team_b)
 	{
-		return true;
+		return false;
 	}
 
-	void unk_function_render(size_t arg1)
+	void render_in_world(size_t arg1)
 	{
+	}
+
+	float player_speed_multiplier(int arg1)
+	{
+		return 0.2f;
 	}
 
 };
@@ -1062,7 +1065,7 @@ void H2Tweaks::setSens(InputType input_type, int sens) {
 	}
 }
 
-void H2Tweaks::setFOV(int field_of_view_degrees) {
+void H2Tweaks::setFOV(double field_of_view_degrees) {
 
 	if (H2IsDediServer)
 		return;
@@ -1074,11 +1077,11 @@ void H2Tweaks::setFOV(int field_of_view_degrees) {
 		//int res_width = *(int*)(H2BaseAddr + 0xA3DA00); //wip
 		//int res_height = *(int*)(H2BaseAddr + 0xA3DA04);
 
-		const float default_radians_FOV = 70.0f * M_PI / 180.0f;
+		const double default_radians_FOV = 70.0f * M_PI / 180.0f;
 
 		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0f) / default_radians_FOV;
-		*reinterpret_cast<float*>(H2BaseAddr + 0x41D984) = calculated_radians_FOV; // First Person
-		*reinterpret_cast<float*>(H2BaseAddr + 0x413780) = calculated_radians_FOV + 0.22f; // Third Person
+		WriteValue(H2BaseAddr + 0x41D984, calculated_radians_FOV); // First Person
+		WriteValue(H2BaseAddr + 0x413780, calculated_radians_FOV + 0.22f); // Third Person
 	}
 }
 
@@ -1298,7 +1301,6 @@ void H2Tweaks::FixRanksIcons() {
 	const WORD y_pos_pre = 0x001A;				//Value : 26 (decimal)
 	const WORD y_pos_pcr = 0x0017;				//Value : 23 (decimal)
 	const BYTE bitm_offset = 0x18;				//Definition : Bitm (bitmap loaded based on datum index)
-	DWORD bitm_type;							//Value : Datum index value for Bitm definition
 
 	//Tag : ui\global_bitmaps\rank_icons.bitm
 	const DWORD rank_icons = 0xE50802E6;		//Bitmap Datum Index

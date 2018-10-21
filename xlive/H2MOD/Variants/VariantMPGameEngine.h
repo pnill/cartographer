@@ -25,8 +25,13 @@ public:
 	virtual c_game_engine_types get_type() const { return type; }
 	virtual c_game_engine_types get_base_type() const { return base_type; }
 	virtual c_engine_internal *get_base_engine() const;
-	/* Called on scenario load, returns success */
+	/* 
+		Called on scenario load, returns success
+		game engine will be disabled on failure
+	*/
 	virtual bool setup();
+
+	/* Called on scenario cleanup/exit */
 	virtual void cleanup();
 	virtual int unk_function_4();
 	virtual int unk_function_5(signed int arg1);
@@ -38,13 +43,15 @@ public:
 	virtual void unk_function_11(int arg1);
 	virtual void unk_function_12();
 	virtual void unk_function_13();
-	virtual void unk_function_render(size_t arg1);
+
+	/* Render 3d objects (e.g hologram around hill in KotH) */
+	virtual void render_in_world(size_t arg1);
 	virtual void update_hud(int hud_owner);
 	virtual void unk_function_16(int arg1);
 	virtual int unk_function_17(int arg1, int arg2);
 	virtual int unk_function_18(int arg1, int arg2);
 	virtual void unk_function_19();
-	virtual float update(int arg1);
+	virtual float player_speed_multiplier(int arg1);
 	virtual int unk_function_21(int arg1);
 	virtual void unk_function_22(int arg1);
 	virtual void unk_function_23(int arg1);
