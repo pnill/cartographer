@@ -91,31 +91,211 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 		break;
 
 	default:
-		if (this->console) {
-			//0x30 = 0
-			//0x5A = z
-			//0x20 = spacebar
+		if (console) {
 
-			if (((wp >= 0x30 && wp <= 0x5A) || wp == 0x20 || wp == VK_OEM_MINUS)) {
-				if (wp == VK_OEM_MINUS) {
-					wp = '-';
+			if (wp == VK_UP)
+			{
+				command = "";
+				caretPos = 0;
+				if (prevCommands.size() > 0 && previous_command_index <= prevCommands.size() - 1)
+				{
+					command = prevCommands[previous_command_index];
+					caretPos = command.length();
+					previous_command_index++;
 				}
-				//0x10 = shift
-				//0xA0 = left shift
-				//0xA1 = right shift
+				return true;
+			}
+
+			if (wp == VK_DOWN)
+			{
+				command = "";
+				caretPos = 0;
+
+				if (prevCommands.size() > 0 && previous_command_index > 0)
+				{
+					previous_command_index--;
+					command = prevCommands[previous_command_index];
+					caretPos = command.length();
+				}
+				return true;
+			}
+
+			if (wp == VK_END)
+			{
+				caretPos = command.length();
+				return true;
+			}
+
+			if (wp == VK_HOME)
+			{
+				caretPos = 0;
+				return true;
+			}
+
+			if (wp == VK_LEFT)
+			{
+				if (caretPos)
+					caretPos--;
+
+				return true;
+			}
+
+			if (wp == VK_RIGHT)
+			{
+				if (caretPos != command.length())
+					caretPos++;
+
+				return true;
+			}
+
+
+			if (((wp >= 0x30 && wp <= 0x5A) || wp == 0x20 || wp == VK_OEM_MINUS || wp == VK_OEM_COMMA || wp == VK_OEM_PERIOD || wp == VK_OEM_MINUS || wp == VK_OEM_PLUS ||
+				wp == VK_OEM_1 || wp == VK_OEM_2 || wp == VK_OEM_3 || wp == VK_OEM_4 || wp == VK_OEM_5 || wp == VK_OEM_6 || wp == VK_OEM_7)) {
+
+
+
+				switch (wp)
+				{
+				case VK_OEM_COMMA:
+					wp = ',';
+					break;
+
+				case VK_OEM_PERIOD:
+					wp = '.';
+					break;
+
+				case VK_OEM_MINUS:
+					wp = '-';
+					break;
+
+				case VK_OEM_1:
+					wp = ';';
+					break;
+
+				case VK_OEM_2:
+					wp = '/';
+					break;
+
+				case VK_OEM_4:
+					wp = '[';
+					break;
+
+				case VK_OEM_5:
+					wp = '\\';
+					break;
+
+				case VK_OEM_6:
+					wp = ']';
+					break;
+
+				case VK_OEM_7:
+					wp = '\'';
+					break;
+
+				case VK_OEM_PLUS:
+					wp = '=';
+					break;
+				}
+
+
+
 				if (GetAsyncKeyState(0x10) & 0x8000 || GetAsyncKeyState(0xA0) & 0x8000 || GetAsyncKeyState(0xA1) & 0x8000) {
-					if (wp == '-') {
+
+					switch (wp)
+					{
+					case '1':
+						wp = '!';
+						break;
+
+					case '-':
 						wp = '_';
-					}
-					else {
+						break;
+
+					case '2':
+						wp = '@';
+						break;
+
+					case '3':
+						wp = '#';
+						break;
+
+					case '4':
+						wp = '$';
+						break;
+
+					case '5':
+						wp = '%';
+						break;
+
+					case '6':
+						wp = '^';
+						break;
+
+					case '7':
+						wp = '&';
+						break;
+
+					case '8':
+						wp = '*';
+						break;
+
+					case '9':
+						wp = '(';
+						break;
+
+					case '0':
+						wp = ')';
+						break;
+
+					case '=':
+						wp = '+';
+						break;
+
+					case '[':
+						wp = '{';
+						break;
+
+					case ']':
+						wp = '}';
+						break;
+
+					case '\'':
+						wp = '"';
+						break;
+
+					case ';':
+						wp = ':';
+						break;
+
+					case ',':
+						wp = '<';
+						break;
+
+					case '.':
+						wp = '>';
+						break;
+
+					case '/':
+						wp = '?';
+						break;
+
+					case '\\':
+						wp = '|';
+						break;
+
+
+
+					default:
 						wp = toupper(wp);
+						break;
 					}
+
 				}
 				else {
 					wp = tolower(wp);
 				}
-				this->command.insert(this->caretPos, 1, (char)wp);
-				this->caretPos += 1;
+				command.insert(caretPos, 1, (char)wp);
+				caretPos += 1;
 				return true;
 			}
 		}

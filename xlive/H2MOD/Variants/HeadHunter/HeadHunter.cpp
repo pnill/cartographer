@@ -41,11 +41,20 @@ void HeadHunter::SpawnSkull(DatumIndex unit_datum)
 
 extern void addDebugText(const char* text);
 
+typedef void(__stdcall *update_player_score)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
+extern update_player_score pupdate_player_score;
+
 void HeadHunter::PickupSkull(XUID player, DatumIndex SkullDatum)
 {
 	if (SkullDatum != NULL)
 	{
+		//typedef void(__stdcall *update_player_score)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
+		//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
+
+			DatumIndex PlayerDatum = variant_player->GetPlayerDatum(player);
+			pupdate_player_score((void*)0x3000595C, PlayerDatum.Index, 0, 1, -1, 0);
 			call_hs_object_destroy_datum(SkullDatum); 
+			//pupdate_player_score()
 	}
 }
 

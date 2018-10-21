@@ -14,6 +14,7 @@ public:
 	int caretPos;
 	bool handled;
 	bool console = false;
+	int previous_command_index = 0;
 private:
 	void writePreviousCommand(std::string msg);
 	bool isNum(const char *s);
