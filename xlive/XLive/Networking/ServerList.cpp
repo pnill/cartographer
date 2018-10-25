@@ -525,10 +525,11 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 		return S_OK;
 	}
 
-	pProperties[0].value.nData = 0;
-	pProperties[1].value.nData = 0;
-	pProperties[2].value.nData = 0;
-	pProperties[3].value.nData = 0;
+	//Sets Not Available to display if pProperties fails to get server count.
+	pProperties[0].value.nData = -1;
+	pProperties[1].value.nData = -1;
+	pProperties[2].value.nData = -1;
+	pProperties[3].value.nData = -1;
 
 	return S_OK;
 }
