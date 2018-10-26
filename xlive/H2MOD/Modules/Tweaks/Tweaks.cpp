@@ -3,19 +3,21 @@
 #include <string>
 #include <unordered_set>
 #include <codecvt>
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD.h"
+
 #include "Globals.h"
-#include "Util\Hooks\Hook.h"
-#include "Util/filesys.h"
-#include "XLive\UserManagement\CUser.h"
+#include "H2MOD.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
+#include "H2MOD\Modules\HudElements\RadarPatch.h"
+#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
+#include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
+#include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Variants\VariantMPGameEngine.h"
+#include "Util\Hooks\Hook.h"
+#include "Util\filesys.h"
+#include "XLive\UserManagement\CUser.h"
 
 
 #define _USE_MATH_DEFINES
@@ -868,7 +870,7 @@ char _cdecl LoadTagsandMapBases(int a)
 
 	char result = LoadTagsandMapBases_Orig(a);
 
-	H2Tweaks::RadarPatch();  //PATCHES RADAR IN MULTIPLAYER  DOCUMENTATION FOR YOSHI  #HPV
+	RadarPatch();  //PATCHES RADAR IN MULTIPLAYER  DOCUMENTATION FOR YOSHI  #HPV
 
 	return result;
 }
@@ -1273,100 +1275,6 @@ void H2Tweaks::PatchPingMeterCheck() {
 
 	BYTE assmPatchPingCheck[2] = { 0x75, 0x18 };
 	WriteBytes(H2BaseAddr + 0x1D4E35, assmPatchPingCheck, 2);
-}
-
-void H2Tweaks::FixRanksIcons() {
-
-	if (H2IsDediServer)
-		return;
-
-	DWORD shared_Meta_Data_ptr = *(DWORD*)(H2BaseAddr + 0x47CD64);
-
-	//Tag : ui\player_skins\player_skin_lobby.skin
-	const DWORD tag_offset_pre = 0x0049DE90;	//Property : Bitmap Buttons
-
-	//Tag : ui\player_skins\pcr_1.skin
-	const DWORD tag_offset_pcr1 = 0x00485C70;	//Property : Bitmap Buttons
-
-	//Tag : ui\player_skins\pcr_2.skin
-	const DWORD tag_offset_pcr2 = 0x00485F50;	//Property : Bitmap Buttons
-
-
-	const BYTE index_offset_p = 0x38;			//Property size per chunk
-	const int index_number = 2;					//Property chunk index number (2 represents rank field)
-	const BYTE x_pos_off = 0x0C;				//Definition : Horizontal position on mainmenu
-	const WORD x_pos_pre = 0x01C4;				//Value : 452 (decimal)
-	const WORD x_pos_pcr = 0x0131;				//Value : 305 (decimal)
-	const BYTE y_pos_off = 0x0E;				//Definition : Vertical position on mainmenu
-	const WORD y_pos_pre = 0x001A;				//Value : 26 (decimal)
-	const WORD y_pos_pcr = 0x0017;				//Value : 23 (decimal)
-	const BYTE bitm_offset = 0x18;				//Definition : Bitm (bitmap loaded based on datum index)
-
-	//Tag : ui\global_bitmaps\rank_icons.bitm
-	const DWORD rank_icons = 0xE50802E6;		//Bitmap Datum Index
-	const DWORD tag_offset_r = 0x0047E9A8;		//Property : Bitmap
-
-	//Tag : ui\global_bitmaps\rank_icons.bitm
-	const DWORD rank_icons_sm = 0xE4EC02CA;		//Bitmap Datum Index
-	const DWORD tag_offset_sm = 0x00476D3C;		//Property : Bitmap
-
-
-	const BYTE index_offset_rank = 0x74;		//Property size per chunk
-	int index_number_rank;						//Property chunk index number (0-49)
-	const BYTE width_offset = 0x04;				//Definition : Width
-	const WORD width_value = 0x0020;			//Value : 32 (decimal)
-	const BYTE height_offset = 0x06;			//Definition : Height
-	const WORD height_value = 0x0020;			//Value : 32 (decimal)
-
-
-	if (h2mod->GetEngineType() == EngineType::MAIN_MENU_ENGINE) {
-		//Sets Pregame Lobby 
-		WriteValue(shared_Meta_Data_ptr + tag_offset_pre + (index_number * index_offset_p) + x_pos_off, x_pos_pre);
-		WriteValue(shared_Meta_Data_ptr + tag_offset_pre + (index_number * index_offset_p) + y_pos_off, y_pos_pre);
-		WriteValue(shared_Meta_Data_ptr + tag_offset_pre + (index_number * index_offset_p) + bitm_offset, rank_icons_sm);
-
-		//Sets Postgame Carnage Report 1
-		WriteValue(shared_Meta_Data_ptr + tag_offset_pcr1 + (index_number * index_offset_p) + x_pos_off, x_pos_pcr);
-		WriteValue(shared_Meta_Data_ptr + tag_offset_pcr1 + (index_number * index_offset_p) + y_pos_off, y_pos_pcr);
-		WriteValue(shared_Meta_Data_ptr + tag_offset_pcr1 + (index_number * index_offset_p) + bitm_offset, rank_icons_sm);
-
-		//Sets Postgame Carnage Report 2
-		WriteValue(shared_Meta_Data_ptr + tag_offset_pcr2 + (index_number * index_offset_p) + x_pos_off, x_pos_pcr);
-		WriteValue(shared_Meta_Data_ptr + tag_offset_pcr2 + (index_number * index_offset_p) + y_pos_off, y_pos_pcr);
-		WriteValue(shared_Meta_Data_ptr + tag_offset_pcr2 + (index_number * index_offset_p) + bitm_offset, rank_icons_sm);
-
-		//Sets Ranks 
-		for (index_number_rank = 0; index_number_rank < 49; index_number_rank++)
-		{
-			//Setting Rank bitmap size
-			WriteValue(shared_Meta_Data_ptr + tag_offset_r + (index_number_rank * index_offset_rank) + width_offset, width_value);
-			WriteValue(shared_Meta_Data_ptr + tag_offset_r + (index_number_rank * index_offset_rank) + height_offset, height_value);
-
-			//Setting Small Rank bitmap size
-			WriteValue(shared_Meta_Data_ptr + tag_offset_sm + (index_number_rank * index_offset_rank) + width_offset, width_value);
-			WriteValue(shared_Meta_Data_ptr + tag_offset_sm + (index_number_rank * index_offset_rank) + height_offset, height_value);
-		}
-	}
-}
-
-void H2Tweaks::RadarPatch() {
-
-	if (H2IsDediServer)
-		return;
-
-	DWORD& MapHeaderType = *(DWORD*)(H2BaseAddr + 0x47CD68 + 0x14C);
-
-	if (MapHeaderType != 1)
-		return;
-
-	DWORD shared_Meta_Data_ptr = *(DWORD*)(H2BaseAddr + 0x47CD64);
-
-	//Tag : ui\hud\bitmaps\hud_sweeper.bitm
-	const DWORD tag_offset = 0x00D93BA8;	//Property : Bitmap
-	const BYTE format_offset = 0x0C;		//Definition : Format Offset
-	const WORD format_type = 0x000A;		//Definition : Format Enum
-
-	WriteValue<WORD>(shared_Meta_Data_ptr + tag_offset + format_offset, format_type);
 }
 
 float calculate_delta_time(int ticks)

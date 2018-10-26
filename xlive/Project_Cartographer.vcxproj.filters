@@ -235,6 +235,12 @@
     <Filter Include="Source Files\H2MOD\Variants\HeadHunter">
       <UniqueIdentifier>{49f37534-5966-4498-8e32-3fe96744053d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\HudElements">
+      <UniqueIdentifier>{2f46e892-40e4-4887-8cfc-b37a2ae48d7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\MainMenu">
+      <UniqueIdentifier>{81d68132-d9e7-4e7c-9500-7aef66a37553}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -437,6 +443,12 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Variants\VariantMPGameEngine.cpp">
       <Filter>Source Files\H2MOD\Variants</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\HudElements\RadarPatch.cpp">
+      <Filter>Source Files\H2MOD\Modules\HudElements</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp">
+      <Filter>Source Files\H2MOD\Modules\MainMenu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -835,6 +847,12 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\VariantMPGameEngine.h">
       <Filter>Source Files\H2MOD\Variants</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\HudElements\RadarPatch.h">
+      <Filter>Source Files\H2MOD\Modules\HudElements</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h">
+      <Filter>Source Files\H2MOD\Modules\MainMenu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
