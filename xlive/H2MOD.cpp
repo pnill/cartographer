@@ -1876,15 +1876,6 @@ void H2MOD::ApplyHooks() {
 		PatchWinAPICall(GetBase() + 0x85F5E, CryptProtectDataHook);
 		PatchWinAPICall(GetBase() + 0x352538, CryptUnprotectDataHook);
 		PatchCall(GetBase() + 0x85F73, filo_write__encrypted_data_hook);
-
-
-
-		if (server == NULL) {
-			//TODO: move into method
-			server = new TSServer(true);
-			server->setPort(H2Config_base_port + 7);
-			server->startListening();
-		}
 	}
 
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
@@ -1892,7 +1883,7 @@ void H2MOD::ApplyHooks() {
 
 	//apply any network hooks
 	network->applyNetworkHooks();
-	ApplyUnitHooks();
+	this->ApplyUnitHooks();
 }
 
 VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
@@ -1907,6 +1898,15 @@ void H2MOD::Initialize()
 	if (game_info.process_type == H2Types::H2Server)
 	{
 		this->Server = TRUE;
+
+		// Initialize teamspeak server
+		if (TS_server == NULL) 
+		{
+			//TODO: move into method
+			TS_server = new TSServer(true);
+			TS_server->setPort(H2Config_base_port + 7);
+			TS_server->startListening();
+		}
 	}
 	else if (game_info.process_type == H2Types::H2Game)
 	{

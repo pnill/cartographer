@@ -249,7 +249,7 @@ HRESULT IXHV2ENGINE::SubmitIncomingChatData(VOID *pThis, XUID xuidRemoteTalker, 
 	anyID tsID = xuidToTSid[xuidRemoteTalker];
 
 	if (tsID != 0)
-		client->unmute(tsID);
+		TS_client->unmute(tsID);
 
 	XUID test = *(XUID*)pbData;
 	//TRACE_GAME_N("[h2mod-voice][SubmitIncomingChatData] - XUID in packet: %lld", test);

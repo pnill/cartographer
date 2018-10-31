@@ -109,11 +109,11 @@ SOCKET WINAPI XCreateSocket(int af, int type, int protocol)
 // #5332: XSessionEnd
 int WINAPI XSessionEnd(DWORD, DWORD)
 {
-	if (client != NULL) {
-		client->disconnect();
+	if (TS_client != NULL) {
+		TS_client->disconnect();
 	}
-	if (server != NULL) {
-		server->destroyVirtualServer();
+	if (TS_server != NULL) {
+		TS_server->destroyVirtualServer();
 	}
 	mapManager->cleanup();
 	TRACE("XSessionEnd");
