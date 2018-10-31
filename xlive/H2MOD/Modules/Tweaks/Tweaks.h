@@ -14,7 +14,6 @@ namespace H2Tweaks {
 	void toggleKillVolumes(bool enable);
 	void enableAI_MP();
 	void disableAI_MP();
-	void PatchPingMeterCheck();
 	void applyShaderTweaks();
 	void enable60FPSCutscenes();
 	void disable60FPSCutscenes();
