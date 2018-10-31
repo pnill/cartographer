@@ -141,365 +141,11 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 	return result;
 }
 
-
-#pragma region init hook
 template <typename T = void>
 static inline T *GetAddress(DWORD client, DWORD server = 0)
 {
 	return reinterpret_cast<T*>(H2BaseAddr + (H2IsDediServer ? server : client));
 }
-
-#pragma region func_wrappers
-void real_math_initialize()
-{
-	typedef int (real_math_initialize)();
-	auto real_math_initialize_impl = GetAddress<real_math_initialize>(0x000340d7);
-	real_math_initialize_impl();
-}
-
-void async_initialize()
-{
-	typedef int (async_initialize)();
-	auto async_initialize_impl = GetAddress<async_initialize>(0x00032ce5);
-	async_initialize_impl();
-}
-
-bool init_gfwl_gamestore()
-{
-	typedef char (init_gfwl_gamestore)();
-	auto init_gfwl_gamestore_impl = GetAddress<init_gfwl_gamestore>(0x00202f3e);
-	return init_gfwl_gamestore_impl();
-}
-// not sure if this is all it does
-HANDLE init_data_checksum_info()
-{
-	typedef HANDLE init_data_checksum_info();
-	auto init_data_checksum_info_impl = GetAddress<init_data_checksum_info>(0x000388d3);
-	return init_data_checksum_info_impl();
-}
-
-// returns memory
-void *runtime_state_init()
-{
-	typedef void *runtime_state_init();
-	auto runtime_state_init_impl = GetAddress<runtime_state_init>(0x00037ed5);
-	return runtime_state_init_impl();
-}
-
-void global_preferences_initialize()
-{
-	typedef void global_preferences_initialize();
-	auto global_preferences_initialize_impl = GetAddress<global_preferences_initialize>(0x325FD);
-	global_preferences_initialize_impl();
-}
-
-void font_initialize()
-{
-	typedef void __cdecl font_initialize();
-	auto font_initialize_impl = GetAddress<font_initialize>(0x00031dff);
-	font_initialize_impl();
-}
-
-bool tag_files_open()
-{
-	typedef bool tag_files_open();
-	auto tag_files_open_impl = GetAddress<tag_files_open>(0x30D58);
-	return tag_files_open_impl();
-}
-
-void init_timing(int a1)
-{
-	typedef DWORD (__cdecl init_timing)(int a1);
-	auto init_timing_impl = GetAddress<init_timing>(0x37E39);
-	init_timing_impl(a1);
-}
-
-void game_state_initialize(void *data)
-{
-	typedef void __fastcall game_state_initialize(void *data);
-	auto game_state_initialize_impl = GetAddress<game_state_initialize>(0x00030aa6);
-	game_state_initialize_impl(data);
-}
-
-bool rasterizer_initialize()
-{
-	typedef char rasterizer_initialize();
-	auto rasterizer_initialize_impl = GetAddress<rasterizer_initialize>(0x00263359);
-	return rasterizer_initialize_impl();
-}
-
-bool input_initialize()
-{
-	typedef char input_initialize();
-	auto input_initialize_impl = GetAddress<input_initialize>(0x2FD23);
-	return input_initialize_impl();
-}
-
-void sound_initialize()
-{
-	typedef void sound_initialize();
-	auto sound_initialize_impl = GetAddress<sound_initialize>(0x2979E);
-	return sound_initialize_impl();
-}
-
-#pragma endregion
-
-enum flags : int
-{
-	windowed,
-	unk, // some network thing
-	nosound,
-	unk1, // disable vista needed version check?
-	disable_hardware_vertex_processing, // force hardware vertex processing off
-	novsync,
-	unk3, // squad browser/xlive/ui?
-	nointro, // disables intro movie
-	unk5, // some tag thing?
-	unk6, // some tag thing?
-	unk7, // some tag thing?
-	unk8, // some tag thing?
-	unk9, // some tag thing?
-	unk10, // some tag thing?
-	unk11, // some tag thing?
-	unk12, // seen near xlive init code
-	unk13,
-	xbox_live_silver_account, // if true, disables 'gold-only' features, like quickmatch etc
-	unk15, // fuzzer/automated testing? (sapien)
-	ui_fast_test_no_start, // same as below but doesn't start a game
-	ui_fast_test, // auto navigates the UI selecting the default option
-	unk18, // player controls related (sapien)
-	monitor_count,
-	unk19,
-	unk20,
-	unk21, // something to do with game time?
-	unk22,
-	unk23, // network? value seems unused?
-	high_quality, // forced sound reverb ignoring CPU score and disable forcing low graphical settings (sapien)
-	unk24,
-
-	count
-};
-static_assert(flags::count == 30, "Bad flags count");
-
-int flag_log_count[flags::count];
-BOOL __cdecl is_init_flag_set(flags id)
-{
-	if (flag_log_count[id] < 10)
-	{
-		TRACE_GAME("is_init_flag_set() : flag %i", id);
-		flag_log_count[id]++;
-		if (flag_log_count[id] == 10)
-			TRACE_GAME("is_init_flag_set() : flag %i logged to many times ignoring", id);
-	}
-	DWORD* init_flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
-	return init_flags_array[id] != 0;
-}
-
-const static int max_mointor_count = 9;
-bool engine_basic_init()
-{
-	DWORD* flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
-	memset(flags_array, 0x00, flags::count); // should be zero initalized anyways but the game does it
-
-	flags_array[flags::nointro] = H2Config_skip_intro;
-
-	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(GetAddress(0x000285fd));
-
-	init_gfwl_gamestore();
-	init_data_checksum_info();
-	runtime_state_init();
-
-	int arg_count;
-	wchar_t **cmd_line_args = LOG_CHECK(CommandLineToArgvW(GetCommandLineW(), &arg_count));
-	if (cmd_line_args && arg_count > 1) {
-		for (int i = 1; i < arg_count; i++) {
-			wchar_t* cmd_line_arg = cmd_line_args[i];
-
-			if (wcsicmp(cmd_line_arg, L"-windowed") == 0) {
-				flags_array[flags::windowed] = 1;
-			}
-			else if (wcsicmp(cmd_line_arg, L"-nosound") == 0) {
-				flags_array[flags::nosound] = 1;
-				WriteValue(H2BaseAddr + 0x479EDC, 1);
-			}
-			else if (wcsicmp(cmd_line_arg, L"-novsync") == 0) {
-				flags_array[flags::novsync] = 1;
-			}
-			else if (wcsicmp(cmd_line_arg, L"-nointro") == 0) {
-				flags_array[flags::nointro] = 1;
-			}
-			else if (wcsnicmp(cmd_line_arg, L"-monitor:", 9) == 0) {
-				int monitor_id = _wtol(&cmd_line_arg[9]);
-				flags_array[flags::monitor_count] = min(max(0, monitor_id), max_mointor_count);
-			}
-			else if (wcsicmp(cmd_line_arg, L"-highquality") == 0) {
-				flags_array[flags::high_quality] = 1;
-			}
-			else if (wcsicmp(cmd_line_arg, L"-depthbiasfix") == 0)
-			{
-				// Fixes issue #118
-			    /* g_depth_bias always NULL rather than taking any value from
-			    shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
-				NopFill<8>(reinterpret_cast<DWORD>(GetAddress(0x269FD5)));
-			}
-#ifdef _DEBUG
-			else if (wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
-				int flag_id = _wtol(&cmd_line_arg[10]);
-				flags_array[min(max(0, flag_id), flags::count - 1)] = 1;
-			}
-#endif
-		}
-	}
-	LocalFree(cmd_line_args);
-
-	if (flags_array[flags::unk22])
-		init_timing(1000 * flags_array[flags::unk22]);
-	real_math_initialize();
-	async_initialize();
-	global_preferences_initialize();
-	font_initialize();
-
-	if (!LOG_CHECK(tag_files_open()))
-		return false;
-	void *var_c004ae8e0 = GetAddress(0x004ae8e0);
-	game_state_initialize(var_c004ae8e0);
-
-	// modifies esi need to check what the caller sets that too
-	//char(*fn_c001a9de6)() = (char(*)())(GetAddress(0x001a9de6));
-	//char result_c001a9de6 = fn_c001a9de6();
-	if (!LOG_CHECK(rasterizer_initialize()))
-		return false;
-
-	input_initialize();
-	// not needed but bungie did it so there might be some reason
-	sound_initialize();
-
-	struct FakePBuffer {
-		HANDLE id;
-		DWORD dwSize;
-		DWORD magic;
-		LPBYTE pbData;
-	};
-	//extern LONG WINAPI XLivePBufferAllocate(DWORD size, FakePBuffer **pBuffer);
-	//extern DWORD WINAPI XLivePBufferSetByte(FakePBuffer * pBuffer, DWORD offset, BYTE value);
-	LONG(__stdcall* XLivePBufferAllocate)(DWORD size, FakePBuffer **pBuffer) = (LONG(__stdcall*)(DWORD, FakePBuffer**))(GetAddress( 0x0000e886));
-	DWORD(__stdcall* XLivePBufferSetByte)(FakePBuffer * pBuffer, DWORD offset, BYTE value) = (DWORD(__stdcall*)(FakePBuffer*, DWORD, BYTE))(GetAddress( 0x0000e880));
-	DWORD* var_c00479e78 = GetAddress<DWORD>(0x00479e78);
-	XLivePBufferAllocate(2, (FakePBuffer**)&var_c00479e78);
-	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 0);
-	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 1, 0);
-
-	//SLDLInitialize
-
-	// does some weird stuff with sound, might setup volume
-	HANDLE result_c000285fd = fn_c000285fd();
-
-	//SLDLOpen
-	//SLDLConsumeRight
-	//SLDLClose
-	// This call would disable the multiplayer buttons in the mainmenu. Likely setup this way from SLDL.
-	//XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 1);
-
-	return true;
-}
-
-#pragma region func_wrappers
-bool InitPCCInfo()
-{
-	typedef bool __cdecl InitPCCInfo();
-	auto InitPCCInfoImpl = GetAddress<InitPCCInfo>(0x260DDD);
-	return InitPCCInfoImpl();
-}
-
-void run_main_loop()
-{
-	typedef int __cdecl run_main_loop();
-	auto run_main_loop_impl = GetAddress<run_main_loop>(0x39E2C);
-	run_main_loop_impl();
-}
-
-void main_engine_dispose()
-{
-	typedef int main_engine_dispose();
-	auto main_engine_dispose_impl = GetAddress<main_engine_dispose>(0x48A9);
-	main_engine_dispose_impl();
-}
-
-void show_error_message_by_id(int id)
-{
-	typedef void __cdecl show_error_message_by_id(int id);
-	auto show_error_message_by_id_impl = GetAddress<show_error_message_by_id>(0x4A2E);
-	show_error_message_by_id_impl(id);
-}
-#pragma endregion
-
-void show_fatal_error(int error_id)
-{
-	TRACE_FUNC("error_id : %d", error_id);
-
-	auto destory_window = [](HWND handle) {
-		if (handle)
-			DestroyWindow(handle);
-	};
-
-	HWND hWnd = *GetAddress<HWND>(0x46D9C4);
-	HWND d3d_window = *GetAddress<HWND>(0x46D9C8); // not sure what this window is actual for, used in IDirect3DDevice9::Present
-	destory_window(hWnd);
-	destory_window(d3d_window);
-	show_error_message_by_id(error_id);
-}
-
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
-{
-	// set args
-	WriteValue(H2BaseAddr + 0x46D9BC, lpCmdLine); // command_line_args
-	WriteValue(H2BaseAddr + 0x46D9C0, hInstance); // g_instance
-	WriteValue(H2BaseAddr + 0x46D9CC, nShowCmd); // g_CmdShow
-
-	// window setup
-	wcscpy_s(reinterpret_cast<wchar_t*>(H2BaseAddr + 0x46D9D4), 0x40, L"halo"); // ClassName
-	wcscpy_s(reinterpret_cast<wchar_t*>(H2BaseAddr + 0x46DA54), 0x40, L"Halo 2 - Project Cartographer"); // WindowName
-	WNDPROC g_WndProc = reinterpret_cast<WNDPROC>(H2BaseAddr + 0x790E);
-	WriteValue(H2BaseAddr + 0x46D9D0, g_WndProc); // g_WndProc_ptr
-	if (!LOG_CHECK(InitPCCInfo()))
-	{
-		TRACE_FUNC("Failed to get PCC info / insufficient system resources");
-		run_async(
-			MessageBoxA(NULL, "Failed to get compatibility info.", "PCC Error", S_OK);
-		)
-		show_error_message_by_id(108);
-		// todo: load some default values here?
-	}
-	// mouse cursor setup
-	HCURSOR cursor = LOG_CHECK(LoadCursor(NULL, MAKEINTRESOURCE(0x7F00)));
-	WriteValue(H2BaseAddr + 0x46D9B8, cursor); // g_hCursor
-
-	// mess around with xlive (not calling XLiveInitialize etc)
-	WriteValue<BYTE>(H2BaseAddr + 0x4FAD98, 1);
-
-	// intialize some basic game subsystems
-	if (LOG_CHECK(engine_basic_init()))
-	{
-		run_main_loop(); // actually run game
-		main_engine_dispose(); // cleanup
-	} else
-	{
-		TRACE_FUNC("Engine startup failed!");
-		show_fatal_error(108);
-		return 1;
-	}
-
-	int g_fatal_error_id = *reinterpret_cast<int*>(H2BaseAddr + 0x46DAD4);
-	if (g_fatal_error_id) // check if the game exited cleanly
-	{
-		show_fatal_error(g_fatal_error_id);
-		return 1;
-	} else
-	{
-		return 0;
-	}
-}
-#pragma endregion
 
 #pragma region custom map checks
 
@@ -864,22 +510,17 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 }
 
 //Patch Call to modify tags just after map load
-char _cdecl LoadTagsandMapBases(int a)
+char _cdecl LoadTagsandMapBases(int a1)
 {
 	char(__cdecl* LoadTagsandMapBases_Orig)(int) = (char(__cdecl*)(int))(GetAddress(0x00031348));
 
-	char result = LoadTagsandMapBases_Orig(a);
+	char result = LoadTagsandMapBases_Orig(a1);
 
 	RadarPatch();  //PATCHES RADAR IN MULTIPLAYER  DOCUMENTATION FOR YOSHI  #HPV
 
 	return result;
 }
 
-char is_remote_desktop()
-{
-	TRACE_FUNC("check disabled");
-	return 0;
-}
 
 class test_engine : public c_game_engine_base
 {
@@ -995,11 +636,7 @@ void InitH2Tweaks() {
 		pfn_c0024fabc = (tfn_c0024fabc)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fabc, (BYTE*)fn_c0024fabc, 13);
 		VirtualProtect(pfn_c0024fabc, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		WriteJmpTo(H2BaseAddr + 0x4544, is_init_flag_set);
 		PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);
-
-		WriteJmpTo(GetAddress(0x7E43), WinMain);
-		WriteJmpTo(GetAddress(0x39EA2), is_remote_desktop);
 
 		//Redirect the variable for the server name to ours.
 		WriteValue(H2BaseAddr + 0x001b2ce8, (DWORD)ServerLobbyName);
@@ -1012,7 +649,7 @@ void InitH2Tweaks() {
 	PatchCall(GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 
-	H2Tweaks::applyPlayersActionsUpdateRatePatch();
+	//H2Tweraks::applyPlayersActionsUpdateRatePatch();
 	
 	addDebugText("End Startup Tweaks.");
 }
@@ -1277,13 +914,71 @@ void H2Tweaks::PatchPingMeterCheck() {
 	WriteBytes(H2BaseAddr + 0x1D4E35, assmPatchPingCheck, 2);
 }
 
-float calculate_delta_time(int ticks)
+void setBulletSpeeds()
 {
-	return 1.0;
+	int offset = 0x47CD54;
+	//TRACE_GAME("[h2mod] Hitfix is being run on Client!");
+	if (H2IsDediServer) {
+		offset = 0x4A29BC;
+		//TRACE_GAME("[h2mod] Hitfix is actually being run on the Dedicated Server!");
+	}
+
+	DWORD AddressOffset = *(DWORD*)(H2BaseAddr + offset);
+
+	*(float*)(AddressOffset + 0xA4EC88) = 1200.0f; // battle_rifle_bullet.proj Initial Velocity 
+	*(float*)(AddressOffset + 0xA4EC8C) = 1200.0f; //battle_rifle_bullet.proj Final Velocity
+	*(float*)(AddressOffset + 0xB7F914) = 4000.0f; //sniper_bullet.proj Initial Velocity
+	*(float*)(AddressOffset + 0xB7F918) = 4000.0f; //sniper_bullet.proj Final Velocity
+	//FIXME COOP will break because of one of these tags not existing.
+	*(float*)(AddressOffset + 0xCE4598) = 4000.0f; //beam_rifle_beam.proj Initial Velocity
+	*(float*)(AddressOffset + 0xCE459C) = 4000.0f; //beam_rifle_beam.proj Final Velocity
+	*(float*)(AddressOffset + 0x81113C) = 200.0f; //gauss_turret.proj Initial Velocity def 90
+	*(float*)(AddressOffset + 0x811140) = 200.0f; //gauss_turret.proj Final Velocity def 90
+	*(float*)(AddressOffset + 0x97A194) = 800.0f; //magnum_bullet.proj initial def 400
+	*(float*)(AddressOffset + 0x97A198) = 800.0f; //magnum_bullet.proj final def 400
+	*(float*)(AddressOffset + 0x7E7E20) = 2000.0f; //bullet.proj (chaingun) initial def 800
+	*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bullet.proj (chaingun) final def 800
 }
 
-
-void H2Tweaks::applyPlayersActionsUpdateRatePatch()
+float* xb_tickrate_flt;
+__declspec(naked) void calculate_delta_time(void)
 {
-	//PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
+	__asm
+	{
+		mov eax, xb_tickrate_flt
+		fld dword ptr[eax]
+		fmul dword ptr[esp + 4]
+		retn
+	}
+}
+
+int sub_1082C2(unsigned __int8 *thisx)
+{
+	return *thisx;
+}
+
+bool __cdecl get_unk_details_about_obj(unsigned __int16 object_index)
+{
+	typedef signed int(__cdecl *sub_CEC0DB)(float a1);
+	sub_CEC0DB p_sub_CEC0DB = reinterpret_cast<sub_CEC0DB>(H2BaseAddr + 0x7C0DB);
+
+	DWORD g_game_objects_header = *reinterpret_cast<DWORD*>(H2BaseAddr + 0x4E461C);
+	DWORD v1 = *(DWORD*)(*(DWORD *)(g_game_objects_header + 68) + 12 * object_index + 8);
+
+	return !(*(BYTE*)(v1 + 193) & 1)
+		&& *(BYTE*)(v1 + 864) & 1
+		&& *(char*)(v1 + 945) >= p_sub_CEC0DB(0.18000001 / 2.0) //secs_to_ticks(0.18000001)
+		&& (sub_1082C2((BYTE*)(v1 + 1012)) == 1 || sub_1082C2((BYTE*)(v1 + 1012)) == 3)
+		&& *(DWORD*)(v1 + 20) == -1;
+}
+
+void applyPlayersActionsUpdateRatePatch()
+{
+	xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
+	PatchCall((DWORD)GetAddress(0x1E12FB, 0x1C8327), (DWORD)calculate_delta_time); // inside update_player_actions()
+	if (!H2IsDediServer) {
+		PatchCall((DWORD)GetAddress(0xC5E2E), (DWORD)get_unk_details_about_obj); // aim assist related
+		PatchCall((DWORD)GetAddress(0x1F4386), (DWORD)get_unk_details_about_obj); // object update related
+		PatchCall((DWORD)GetAddress(0x167AA7), (DWORD)get_unk_details_about_obj); // melee related 
+	}	
 }

@@ -251,7 +251,7 @@ HRESULT IXHV2ENGINE::SubmitIncomingChatData(VOID *pThis, XUID xuidRemoteTalker, 
 	if (tsID != 0)
 		TS_client->unmute(tsID);
 
-	XUID test = *(XUID*)pbData;
+	//XUID test = *(XUID*)pbData;
 	//TRACE_GAME_N("[h2mod-voice][SubmitIncomingChatData] - XUID in packet: %lld", test);
 	//TRACE_GAME_N("[h2mod-voice][SubmitIncomingChatData] - Trying to unmute tsID: %i  xuid: %lld", tsID, xuidRemoteTalker);
 
