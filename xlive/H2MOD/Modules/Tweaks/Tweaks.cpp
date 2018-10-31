@@ -904,42 +904,6 @@ void H2Tweaks::disableAI_MP() {
 	WriteBytes(H2BaseAddr + 0x30E684, jnz, 0x1); //AI_MP disable patch
 }
 
-void H2Tweaks::PatchPingMeterCheck() {
-	//halo2.exe+1D4E35 
-
-	if (H2IsDediServer)
-		return;
-
-	BYTE assmPatchPingCheck[2] = { 0x75, 0x18 };
-	WriteBytes(H2BaseAddr + 0x1D4E35, assmPatchPingCheck, 2);
-}
-
-void setBulletSpeeds()
-{
-	int offset = 0x47CD54;
-	//TRACE_GAME("[h2mod] Hitfix is being run on Client!");
-	if (H2IsDediServer) {
-		offset = 0x4A29BC;
-		//TRACE_GAME("[h2mod] Hitfix is actually being run on the Dedicated Server!");
-	}
-
-	DWORD AddressOffset = *(DWORD*)(H2BaseAddr + offset);
-
-	*(float*)(AddressOffset + 0xA4EC88) = 1200.0f; // battle_rifle_bullet.proj Initial Velocity 
-	*(float*)(AddressOffset + 0xA4EC8C) = 1200.0f; //battle_rifle_bullet.proj Final Velocity
-	*(float*)(AddressOffset + 0xB7F914) = 4000.0f; //sniper_bullet.proj Initial Velocity
-	*(float*)(AddressOffset + 0xB7F918) = 4000.0f; //sniper_bullet.proj Final Velocity
-	//FIXME COOP will break because of one of these tags not existing.
-	*(float*)(AddressOffset + 0xCE4598) = 4000.0f; //beam_rifle_beam.proj Initial Velocity
-	*(float*)(AddressOffset + 0xCE459C) = 4000.0f; //beam_rifle_beam.proj Final Velocity
-	*(float*)(AddressOffset + 0x81113C) = 200.0f; //gauss_turret.proj Initial Velocity def 90
-	*(float*)(AddressOffset + 0x811140) = 200.0f; //gauss_turret.proj Final Velocity def 90
-	*(float*)(AddressOffset + 0x97A194) = 800.0f; //magnum_bullet.proj initial def 400
-	*(float*)(AddressOffset + 0x97A198) = 800.0f; //magnum_bullet.proj final def 400
-	*(float*)(AddressOffset + 0x7E7E20) = 2000.0f; //bullet.proj (chaingun) initial def 800
-	*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bullet.proj (chaingun) final def 800
-}
-
 float* xb_tickrate_flt;
 __declspec(naked) void calculate_delta_time(void)
 {
@@ -952,33 +916,8 @@ __declspec(naked) void calculate_delta_time(void)
 	}
 }
 
-int sub_1082C2(unsigned __int8 *thisx)
-{
-	return *thisx;
-}
-
-bool __cdecl get_unk_details_about_obj(unsigned __int16 object_index)
-{
-	typedef signed int(__cdecl *sub_CEC0DB)(float a1);
-	sub_CEC0DB p_sub_CEC0DB = reinterpret_cast<sub_CEC0DB>(H2BaseAddr + 0x7C0DB);
-
-	DWORD g_game_objects_header = *reinterpret_cast<DWORD*>(H2BaseAddr + 0x4E461C);
-	DWORD v1 = *(DWORD*)(*(DWORD *)(g_game_objects_header + 68) + 12 * object_index + 8);
-
-	return !(*(BYTE*)(v1 + 193) & 1)
-		&& *(BYTE*)(v1 + 864) & 1
-		&& *(char*)(v1 + 945) >= p_sub_CEC0DB(0.18000001 / 2.0) //secs_to_ticks(0.18000001)
-		&& (sub_1082C2((BYTE*)(v1 + 1012)) == 1 || sub_1082C2((BYTE*)(v1 + 1012)) == 3)
-		&& *(DWORD*)(v1 + 20) == -1;
-}
-
 void applyPlayersActionsUpdateRatePatch()
 {
 	xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
 	PatchCall((DWORD)GetAddress(0x1E12FB, 0x1C8327), (DWORD)calculate_delta_time); // inside update_player_actions()
-	if (!H2IsDediServer) {
-		PatchCall((DWORD)GetAddress(0xC5E2E), (DWORD)get_unk_details_about_obj); // aim assist related
-		PatchCall((DWORD)GetAddress(0x1F4386), (DWORD)get_unk_details_about_obj); // object update related
-		PatchCall((DWORD)GetAddress(0x167AA7), (DWORD)get_unk_details_about_obj); // melee related 
-	}	
 }
