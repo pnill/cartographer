@@ -427,8 +427,6 @@ void CUserManagement::ConfigureUser(XNADDR* pxna, ULONGLONG xuid, char* username
 	(*(DWORD*)&this->SecurityPacket[0]) = annoyance_factor;
 	(*(DWORD*)&this->SecurityPacket[4]) = pxna->inaOnline.s_addr;
 
-	SecurityPacket = this->SecurityPacket;
-
 	Users[0].pina.s_addr = pxna->inaOnline.s_addr;
 
 	xFakeXuid[0] = xuid;

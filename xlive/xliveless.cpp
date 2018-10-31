@@ -904,7 +904,7 @@ DWORD WINAPI XGetOverlappedResult(PXOVERLAPPED pOverlapped, LPDWORD pResult, BOO
 }
 
 // #5003: XLiveUninitialize
-int WINAPI XLiveUninitialize ()
+int WINAPI XLiveUninitialize()
 {
     TRACE("XLiveUninitialize");
     return 0;
@@ -1067,16 +1067,15 @@ BOOL WINAPI XCloseHandle (HANDLE hObject)
 }
 
 
-
-
-
 // #5254: XCancelOverlapped
-int WINAPI XCancelOverlapped (DWORD a1)
+int WINAPI XCancelOverlapped (PXOVERLAPPED pOverlapped)
 {
-    TRACE("XCancelOverlapped  (a1 = %X)", a1);
+    TRACE("XCancelOverlapped  (pOverlapped = %X)", pOverlapped);
 
+	if (pOverlapped == NULL)
+		return ERROR_INVALID_PARAMETER;
 
-    return 0;
+    return ERROR_SUCCESS;
 }
  
 // #5256: XEnumerate
@@ -1402,18 +1401,13 @@ HRESULT WINAPI XLiveSignin (PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD 
 
 
 // #5297: XLiveInitializeEx
-int WINAPI XLiveInitializeEx (void * pXii, DWORD dwVersion)
+int WINAPI XLiveInitializeEx(void * pXii, DWORD dwVersion)
 {
 	InitInstance();
 
-#if 0
-		while(1)
-		Sleep(1);
-#endif
 
-
-  TRACE("XLiveInitializeEx  (a1 = %X, a2 = %X)", pXii, dwVersion);
-  return 0;
+	TRACE("XLiveInitializeEx  (a1 = %X, a2 = %X)", pXii, dwVersion);
+	return 0;
 }
 
 //TODO: Move XSession* to XSession.cpp
