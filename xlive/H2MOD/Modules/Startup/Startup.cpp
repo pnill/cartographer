@@ -650,9 +650,12 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
 void applyGameInitializationHooks()
 {
-	WriteJmpTo(GetAddress(0x7E43), WinMain);
-	WriteJmpTo(GetAddress(0x39EA2), is_remote_desktop);
-	WriteJmpTo(GetAddress(0x4544), is_init_flag_set);
+	if (H2IsDediServer == false) 
+	{
+		WriteJmpTo(GetAddress(0x7E43), WinMain);
+		WriteJmpTo(GetAddress(0x39EA2), is_remote_desktop);
+		WriteJmpTo(GetAddress(0x4544), is_init_flag_set);
+	}
 }
 #pragma endregion
 
