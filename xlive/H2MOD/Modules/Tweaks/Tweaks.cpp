@@ -1,27 +1,22 @@
 #include "stdafx.h"
-#include <ShellAPI.h>
-#include <string>
 #include <unordered_set>
-#include <codecvt>
 
 #include "Globals.h"
-#include "H2MOD.h"
-#include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\UI\UI.h"
+#include "H2MOD\Modules\Utils\Utils.h"
+#include "XLive\UserManagement\CUser.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Tweaks\Tweaks.h"
+#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Tweaks\Tweaks.h"
-#include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Variants\VariantMPGameEngine.h"
-#include "Util\Hooks\Hook.h"
-#include "Util\filesys.h"
-#include "XLive\UserManagement\CUser.h"
-
 
 #define _USE_MATH_DEFINES
 #include "math.h"
+
+#include "Blam/Maths/Point2D.h"
 
 #pragma region Done_Tweaks
 
@@ -735,54 +730,40 @@ void H2Tweaks::setCrosshairPos(float crosshair_offset) {
 	}
 }
 
-void H2Tweaks::setCrosshairSize(int size, bool preset) {
+void H2Tweaks::setCrosshairSize(int size, bool preset) 
+{
 	if (H2IsDediServer)
 		return;
 
-	DWORD BATRIF1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7aa750;
-	DWORD BATRIF2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7aa752;
-	DWORD SMG1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7A9F9C;
-	DWORD SMG2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7A9F9E;
-	DWORD CRBN1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7ab970;
-	DWORD CRBN2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7ab972;
-	DWORD BEAMRIF1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA838;
-	DWORD BEAMRIF2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA83A;
-	DWORD MAG1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA33C;
-	DWORD MAG2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA33E;
-	DWORD PLASRIF1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA16C;
-	DWORD PLASRIF2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA16E;
-	DWORD SHTGN1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA424;
-	DWORD SHTGN2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA426;
-	DWORD SNIP1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA994;
-	DWORD SNIP2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA996;
-	DWORD SWRD1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA8AC;
-	DWORD SWRD2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA8AE;
-	DWORD ROCKLAUN1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA3B0;
-	DWORD ROCKLAUN2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA3B2;
-	DWORD PLASPI1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA0F8;
-	DWORD PLASPI2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA0FA;
-	DWORD BRUTESHOT1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA7C4;
-	DWORD BRUTESHOT2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA7C6;
-	DWORD NEED1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA254;
-	DWORD NEED2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AA256;
-	DWORD SENTBEAM1 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AB5D0;
-	DWORD SENTBEAM2 = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x7AB5D2;
+	DWORD offset = *(DWORD*)(H2BaseAddr + 0x479E70);
 
-	DWORD WEAPONS[] = { BATRIF1, BATRIF2, SMG1, SMG2, CRBN1, CRBN2, BEAMRIF1, BEAMRIF2, MAG1, MAG2, PLASRIF1, PLASRIF2, SHTGN1, SHTGN2, SNIP1, SNIP2, SWRD1, SWRD2, ROCKLAUN1, ROCKLAUN2, PLASPI1, PLASPI2, BRUTESHOT1, BRUTESHOT2, NEED1, NEED2, SENTBEAM1, SENTBEAM2 };
+	DWORD BATRIF = offset + 0x7aa750;
+	DWORD SMG = offset + 0x7A9F9C;
+	DWORD CRBN = offset + 0x7ab970;
+	DWORD BEAMRIF = offset + 0x7AA838;
+	DWORD MAG = offset + 0x7AA33C;
+	DWORD PLASRIF = offset + 0x7AA16C;
+	DWORD SHTGN = offset + 0x7AA424;
+	DWORD SNIP = offset + 0x7AA994;
+	DWORD SWRD = offset + 0x7AA8AC;
+	DWORD ROCKLAUN = offset + 0x7AA3B0;
+	DWORD PLASPI = offset + 0x7AA0F8;
+	DWORD BRUTESHOT = offset + 0x7AA7C4;
+	DWORD NEED = offset + 0x7AA254;
+	DWORD SENTBEAM = offset + 0x7AB5D0;
 
-	int disabled[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	int defaultSize[] = { 70, 70, 110, 110, 78, 52, 26, 10, 50, 50, 90, 90,110, 110, 20, 20, 110, 106, 126, 126, 106, 91, 102, 124, 112, 34, 70, 38 };
-	int verySmall[] = { 30, 30, 40, 40, 39, 26, 26, 10, 25, 25, 45, 45, 65, 65, 12, 12, 55, 53, 63, 63, 53, 45, 51, 62, 56, 17, 35, 19 };
-	int small[] = { 40, 40, 65, 65, 57, 38, 26, 10, 35, 35, 55, 55, 80, 80, 15, 15, 82, 79, 90, 90, 79, 68, 76, 93, 84, 25, 52, 27};
-	int large[] = { 80, 80, 130, 130, 114, 76, 52, 20, 70, 70, 110, 110, 160, 160, 30, 30, 164, 158, 180, 180, 158, 136, 152, 186, 168, 50, 104, 57 };
+	DWORD WEAPONS[] = { BATRIF, SMG, CRBN, BEAMRIF, MAG, PLASRIF, SHTGN, SNIP, SWRD, ROCKLAUN, PLASPI, BRUTESHOT, NEED, SENTBEAM };
+
+	short defaultSize[] = { 70, 70, 110, 110, 78, 52, 26, 10, 50, 50, 90, 90,110, 110, 20, 20, 110, 106, 126, 126, 106, 91, 102, 124, 112, 34, 70, 38 };
+	short verySmall[] = { 30, 30, 40, 40, 39, 26, 26, 10, 25, 25, 45, 45, 65, 65, 12, 12, 55, 53, 63, 63, 53, 45, 51, 62, 56, 17, 35, 19 };
+	short small[] = { 40, 40, 65, 65, 57, 38, 26, 10, 35, 35, 55, 55, 80, 80, 15, 15, 82, 79, 90, 90, 79, 68, 76, 93, 84, 25, 52, 27};
+	short large[] = { 80, 80, 130, 130, 114, 76, 52, 20, 70, 70, 110, 110, 160, 160, 30, 30, 164, 158, 180, 180, 158, 136, 152, 186, 168, 50, 104, 57 };
 	int* configArray[] = { &H2Config_BATRIF_WIDTH, &H2Config_BATRIF_HEIGHT, &H2Config_SMG_WIDTH, &H2Config_SMG_HEIGHT, &H2Config_CRBN_WIDTH, &H2Config_CRBN_HEIGHT, &H2Config_BEAMRIF_WIDTH, &H2Config_BEAMRIF_HEIGHT, &H2Config_MAG_WIDTH, &H2Config_MAG_HEIGHT, &H2Config_PLASRIF_WIDTH, &H2Config_PLASRIF_HEIGHT, &H2Config_SHTGN_WIDTH, &H2Config_SHTGN_HEIGHT, &H2Config_SNIP_WIDTH, &H2Config_SNIP_HEIGHT, &H2Config_SWRD_WIDTH, &H2Config_SWRD_HEIGHT, &H2Config_ROCKLAUN_WIDTH, &H2Config_ROCKLAUN_HEIGHT, &H2Config_PLASPI_WIDTH, &H2Config_PLASPI_HEIGHT, &H2Config_BRUTESHOT_WIDTH, &H2Config_BRUTESHOT_HEIGHT, &H2Config_NEED_WIDTH, &H2Config_NEED_HEIGHT, &H2Config_SENTBEAM_WIDTH, &H2Config_SENTBEAM_HEIGHT};
-	int* tempArray;
+	short* tempArray;
 
-	if (preset) {
+	if (preset) 
+	{
 		switch (size) {
-		case 1:
-			tempArray = disabled;
-			break;
 		case 2:
 			tempArray = verySmall;
 			break;
@@ -802,24 +783,27 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 		}
 	}
 
-
-	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) {
-
-		
-		for (int i = 0; i < 28; i++) {
-			if (configArray[i] == 0) {
-				*reinterpret_cast<short*>(WEAPONS[i]) = disabled[i];
+	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE)
+	{
+		int k = 0;
+		for (int i = 0; i < 14; i++) {
+			if (size == 1)
+			{
+				reinterpret_cast<Blam::Maths::Integer::Short::Point2D*>(WEAPONS[i])->X = 0;
+				reinterpret_cast<Blam::Maths::Integer::Short::Point2D*>(WEAPONS[i])->Y = 0;
 			}
-			else if (*configArray[i] == 1 || *configArray[i] < 0 || *configArray[i] > 65535) {
-				*reinterpret_cast<short*>(WEAPONS[i]) = defaultSize[i];
+			else if (*configArray[k] == 1 || *configArray[k] < 0 || *configArray[k] > 65535)
+			{
+				reinterpret_cast<Blam::Maths::Integer::Short::Point2D*>(WEAPONS[i])->X = defaultSize[k];
+				reinterpret_cast<Blam::Maths::Integer::Short::Point2D*>(WEAPONS[i])->Y = defaultSize[++k];
 			}
-			else {
-				*reinterpret_cast<short*>(WEAPONS[i]) = *configArray[i];
+			else
+			{
+				reinterpret_cast<Blam::Maths::Integer::Short::Point2D*>(WEAPONS[i])->X = *configArray[k];
+				reinterpret_cast<Blam::Maths::Integer::Short::Point2D*>(WEAPONS[i])->Y = *configArray[++k];
 			}
-
+			k++;
 		}
-		
-
 	}
 }
 
