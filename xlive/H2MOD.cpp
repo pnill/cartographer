@@ -1095,7 +1095,7 @@ bool __cdecl player_remove_packet_handler(void *packet, int size, void *data)
 }
 */
 
-// this gets called after game engine data gets updated fyi (which includes game engine type)
+// this gets called after game globals are updated fyi (which includes game engine type)
 typedef void(__cdecl *set_random_number)(int a1);
 set_random_number p_set_random_number;
 
