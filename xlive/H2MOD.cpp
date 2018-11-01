@@ -5,7 +5,6 @@
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -1586,7 +1585,7 @@ bool FlashlightIsEngineSPCheck() {
 	return h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE;
 }
 
-typedef bool(__cdecl* verify_game_version_on_join)(int xlive_version, int build_version, int build_version2);
+typedef bool(__cdecl* verify_game_version_on_join)(int executable_version, int build_version, int build_version2);
 verify_game_version_on_join p_verify_game_version_on_join;
 
 bool __cdecl VerifyGameVersionOnJoin(int executable_version, int build_version, int build_version2)
@@ -1594,7 +1593,7 @@ bool __cdecl VerifyGameVersionOnJoin(int executable_version, int build_version, 
 	return executable_version == EXECUTABLE_VERSION && build_version >= GAME_BUILD && build_version2 <= GAME_BUILD;
 }
 
-typedef bool(__cdecl* verify_executable_version)(int xlive_version);
+typedef bool(__cdecl* verify_executable_version)(int executable_version);
 verify_executable_version p_verify_executable_version;
 
 bool __cdecl VerifyExecutableVersion(int executable_version)
@@ -1602,12 +1601,12 @@ bool __cdecl VerifyExecutableVersion(int executable_version)
 	return executable_version == EXECUTABLE_VERSION; // will not display servers that don't match this in server list
 }
 
-typedef void(__cdecl *get_game_version)(DWORD *xlive_version, DWORD *build_version, DWORD *build_version2);
+typedef void(__cdecl *get_game_version)(DWORD *executable_version, DWORD *build_version, DWORD *build_version2);
 get_game_version p_get_game_version;
 
-void __cdecl GetGameVersion(DWORD *xlive_version, DWORD *build_version, DWORD *build_version2)
+void __cdecl GetGameVersion(DWORD *executable_version, DWORD *build_version, DWORD *build_version2)
 {
-	*xlive_version = EXECUTABLE_VERSION;
+	*executable_version = EXECUTABLE_VERSION;
 	*build_version = GAME_BUILD;
 	*build_version2 = GAME_BUILD;
 }
@@ -1635,14 +1634,12 @@ void GivePlayerWeaponDatum(DatumIndex unit_datum,DatumIndex weapon_datum)
 	}
 }
 
-
-
 //This is used for maps with 'shops' where the device_acceleration_scale is an indicator that they're using the control device as a 'shop'
 float get_device_acceleration_scale(DatumIndex device_datum)
 {
-	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD54);
-	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50);
-	DWORD game_state_objects_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x4E461C);
+	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29BC : 0x47CD54));
+	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50));
+	DWORD game_state_objects_header = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x50C8EC : 0x4E461C));
 	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
 	
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
