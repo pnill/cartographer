@@ -10,7 +10,7 @@
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\MainMenu\Ranks.h"
+#include "H2MOD\Modules\UI\UI.h"
 #include "H2MOD\Variants\H2X\H2X.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
 #include "XLive\UserManagement\CUser.h"
@@ -1138,7 +1138,7 @@ void __cdecl onGameEngineChange(int a1)
 		}
 
 		H2Tweaks::disableAI_MP(); //TODO: get dedi offset
-		UIRankPatch();
+		UI::Patch::Ranks();
 		H2Tweaks::disable60FPSCutscenes();
 
 		p_set_random_number(a1);

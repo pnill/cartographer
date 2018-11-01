@@ -282,9 +282,7 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_list_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\GameManager\GameManager.cpp" />
-    <ClCompile Include="H2MOD\Modules\HudElements\RadarPatch.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\Mouseinput.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\MapChecksum\MapChecksumSync.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Networking.cpp" />
@@ -293,6 +291,8 @@
     <ClCompile Include="H2MOD\Modules\RunLoop\RunLoop.cpp" />
     <ClCompile Include="H2MOD\Modules\Startup\Startup.cpp" />
     <ClCompile Include="H2MOD\Modules\Tweaks\Tweaks.cpp" />
+    <ClCompile Include="H2MOD\Modules\UI\HudElements\Radar.cpp" />
+    <ClCompile Include="H2MOD\Modules\UI\Ranks\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
     <ClCompile Include="H2MOD\Modules\Utils\Utils.cpp" />
     <ClCompile Include="H2MOD\protobuf\h2mod.pb.cc" />
@@ -412,9 +412,7 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.h" />
     <ClInclude Include="H2MOD\Modules\GameManager\GameManager.h" />
-    <ClInclude Include="H2MOD\Modules\HudElements\RadarPatch.h" />
     <ClInclude Include="H2MOD\Modules\Input\Mouseinput.h" />
-    <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\MapChecksum\MapChecksumSync.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Networking.h" />
@@ -438,6 +436,7 @@
     <ClInclude Include="H2MOD\Variants\VariantMPGameEngine.h" />
     <ClInclude Include="H2MOD\Variants\VariantPlayer.h" />
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
+    <ClInclude Include="UI.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Util\Base64.h" />
     <ClInclude Include="Util\Debug\Debug.h" />

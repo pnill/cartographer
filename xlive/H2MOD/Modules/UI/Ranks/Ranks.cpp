@@ -1,17 +1,12 @@
-#include "stdafx.h"
-#include <ShellAPI.h>
-#include <string>
-#include <unordered_set>
-#include <codecvt>
+#include "Globals.h"
 
-#include "H2MOD.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "Util\Hooks\Hook.h"
+#include "H2MOD\Modules\UI\UI.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
-void UIRankPatch() {
 
-	if (H2IsDediServer)
+void UI::Patch::Ranks() {
+
+	if (h2mod->Server)
 		return;
 
 	DWORD& MapHeaderType = *(DWORD*)(H2BaseAddr + 0x47CD68 + 0x14C);

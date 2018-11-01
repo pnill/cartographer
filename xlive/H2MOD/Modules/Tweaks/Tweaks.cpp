@@ -8,7 +8,7 @@
 #include "H2MOD.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\HudElements\RadarPatch.h"
+#include "H2MOD\Modules\UI\UI.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
 #include "H2MOD\Modules\Startup\Startup.h"
@@ -516,7 +516,7 @@ char _cdecl LoadTagsandMapBases(int a1)
 
 	char result = LoadTagsandMapBases_Orig(a1);
 
-	RadarPatch();  //PATCHES RADAR IN MULTIPLAYER  DOCUMENTATION FOR YOSHI  #HPV
+	UI::Patch::RadarPulse();  //PATCHES RADAR IN MULTIPLAYER  DOCUMENTATION FOR YOSHI  #HPV
 
 	return result;
 }
