@@ -469,14 +469,6 @@ void H2MOD::exit_game()
 	leave_game(0);
 }
 
-void enableLiveMenus() {
-	*(int*)(h2mod->GetBase() + 0x422450) = 1; 
-}
-
-void disableLiveMenus() {
-	*(int*)(h2mod->GetBase() + 0x422450) = -1;
-}
-
 #pragma endregion
 
 //sub_1cce9b
