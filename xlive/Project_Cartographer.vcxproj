@@ -273,6 +273,8 @@
     <ClCompile Include="H2MOD\Modules\Accounts\Accounts.cpp" />
     <ClCompile Include="H2MOD\Modules\Achievements\Achievements.cpp" />
     <ClCompile Include="H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.cpp" />
+    <ClCompile Include="H2MOD\Modules\Camera\Camera.h" />
+    <ClCompile Include="H2MOD\Modules\Camera\FOV\FOV.cpp" />
     <ClCompile Include="H2MOD\Modules\Config\Config.cpp" />
     <ClCompile Include="H2MOD\Modules\Console\ConsoleCommands.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\Credits.cpp" />
@@ -291,6 +293,7 @@
     <ClCompile Include="H2MOD\Modules\RunLoop\RunLoop.cpp" />
     <ClCompile Include="H2MOD\Modules\Startup\Startup.cpp" />
     <ClCompile Include="H2MOD\Modules\Tweaks\Tweaks.cpp" />
+    <ClCompile Include="H2MOD\Modules\UI\HudElements\Crosshair.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\HudElements\Radar.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\Ranks\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
@@ -421,6 +424,7 @@
     <ClInclude Include="H2MOD\Modules\RunLoop\RunLoop.h" />
     <ClInclude Include="H2MOD\Modules\Startup\Startup.h" />
     <ClInclude Include="H2MOD\Modules\Tweaks\Tweaks.h" />
+    <ClInclude Include="H2MOD\Modules\UI\UI.h" />
     <ClInclude Include="H2MOD\Modules\Updater\Updater.h" />
     <ClInclude Include="H2MOD\Modules\Utils\Utils.h" />
     <ClInclude Include="H2MOD\protobuf\h2mod.pb.h" />
@@ -436,7 +440,6 @@
     <ClInclude Include="H2MOD\Variants\VariantMPGameEngine.h" />
     <ClInclude Include="H2MOD\Variants\VariantPlayer.h" />
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
-    <ClInclude Include="UI.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Util\Base64.h" />
     <ClInclude Include="Util\Debug\Debug.h" />

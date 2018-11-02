@@ -1,13 +1,16 @@
 #include <d3d9.h>
 #include <d3dx9.h>
+#include <tchar.h>
+
 #include "GUI.h"
 #include "H2MOD.h"
 #include "xliveless.h"
+
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\MOdules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include <tchar.h>
+
 
 
 extern ConsoleCommands* commands;

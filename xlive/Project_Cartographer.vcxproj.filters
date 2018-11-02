@@ -244,6 +244,12 @@
     <Filter Include="Source Files\H2MOD\Modules\UI\Ranks">
       <UniqueIdentifier>{80a75a32-0fa1-4cf0-af8c-a782dcca108c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Camera">
+      <UniqueIdentifier>{2c0ede0c-734d-4bb9-9832-e3494b159535}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Camera\FOV">
+      <UniqueIdentifier>{70eaacc0-198f-45d6-9a04-0efa4ed8a71b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -452,6 +458,15 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\UI\Ranks\Ranks.cpp">
       <Filter>Source Files\H2MOD\Modules\UI\Ranks</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Camera\Camera.h">
+      <Filter>Source Files\H2MOD\Modules\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\UI\HudElements\Crosshair.cpp">
+      <Filter>Source Files\H2MOD\Modules\UI\HudElements</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Camera\FOV\FOV.cpp">
+      <Filter>Source Files\H2MOD\Modules\Camera\FOV</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -851,7 +866,7 @@
     <ClInclude Include="H2MOD\Variants\VariantMPGameEngine.h">
       <Filter>Source Files\H2MOD\Variants</Filter>
     </ClInclude>
-    <ClInclude Include="UI.h">
+    <ClInclude Include="H2MOD\Modules\UI\UI.h">
       <Filter>Source Files\H2MOD\Modules\UI</Filter>
     </ClInclude>
   </ItemGroup>

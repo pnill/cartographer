@@ -1,21 +1,21 @@
-#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "stdafx.h"
-#include "Util\Hooks\Hook.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
+
+#include "H2MOD/Modules/UI/UI.h"
 #include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD\Modules\Accounts\Accounts.h"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Accounts\AccountLogin.h"
-#include "H2MOD\Modules\Accounts\AccountCreate.h"
-#include "XLive\UserManagement\CUser.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD/Modules/Camera/Camera.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Updater\Updater.h"
-#include <Shellapi.h>
+#include "H2MOD\Modules\Accounts\Accounts.h"
+#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
+#include "H2MOD\Modules\Accounts\AccountLogin.h"
+#include "H2MOD\Modules\Accounts\AccountCreate.h"
+#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
+#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
+
 #include "Globals.h"
-#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
-#include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "XLive\UserManagement\CUser.h"
+
+#include <Shellapi.h>
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
@@ -1327,11 +1327,11 @@ static bool CMButtonHandler_EditCrosshair(int button_id) {
 			H2Config_crosshair_offset = 0.165f;
 		else {
 			H2Config_crosshair_offset = NAN;
-			H2Tweaks::setCrosshairPos(0.165f);
+			UI::Tweaks::SetCrosshairPos(0.165f);
 		}
 	}
 	loadLabelCrosshairOffset();
-	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
+	UI::Tweaks::SetCrosshairPos(H2Config_crosshair_offset);
 	return false;
 }
 
@@ -1472,7 +1472,7 @@ static bool CMButtonHandler_EditFOV(int button_id) {
 			H2Config_field_of_view = 100;
 	}
 	loadLabelFOVNum();
-	H2Tweaks::setFOV(H2Config_field_of_view);
+	Camera::Tweaks::SetFOV(H2Config_field_of_view);
 	return false;
 }
 
@@ -1802,7 +1802,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditCrosshairSize() {//__thiscall
 }
 
 static bool CMButtonHandler_EditCrosshairSize(int button_id) {
-	H2Tweaks::setCrosshairSize(button_id, true);
+	UI::Tweaks::SetCrosshairsSize(button_id, true);
 	return true;
 }
 
@@ -5088,7 +5088,6 @@ int aab3 = 3;//this value works for some other menu positions in mainmenu
 int aab4 = 4;
 */
 
-#include <chrono>
 
 void CallWgit(int WgitScreenfunctionPtr) {
 	CallWgit(WgitScreenfunctionPtr, 1, 0);

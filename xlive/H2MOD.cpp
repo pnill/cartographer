@@ -1,8 +1,8 @@
 #include <stdafx.h>
 #include <Wincrypt.h>
 #include <Mmsystem.h>
+
 #include "H2MOD.h"
-#include "Blam\Engine\FileSystem\FiloInterface.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
@@ -10,9 +10,13 @@
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\UI\UI.h"
+#include "H2MOD\Modules\Camera\Camera.h"
 #include "H2MOD\Variants\H2X\H2X.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
+
 #include "XLive\UserManagement\CUser.h"
+
+#include "Blam\Engine\FileSystem\FiloInterface.h"
 
 
 H2MOD *h2mod = new H2MOD();
@@ -1185,12 +1189,10 @@ void __cdecl onGameEngineChange(int a1)
 			tag_instances = (global_tag_instance*)((*(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50)));
 
 		H2Tweaks::enableAI_MP(); //TODO: get dedi offset
-		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
-	 
-		H2Tweaks::setCrosshairSize(0, false);
+		UI::Tweaks::SetCrosshairPos(H2Config_crosshair_offset);
+		UI::Tweaks::SetCrosshairsSize(0, false);
+
 		H2Tweaks::disable60FPSCutscenes(); 
-		
-		//H2Tweaks::applyShaderTweaks(); 
 
 		if (GameState == 3)
 		{
@@ -1220,7 +1222,7 @@ void __cdecl onGameEngineChange(int a1)
 	else if (h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
 		addDebugText("GameEngine: Singleplayer");
 
-		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
+		UI::Tweaks::SetCrosshairPos(H2Config_crosshair_offset);
 		H2Tweaks::enable60FPSCutscenes();
 	}
 
@@ -1835,8 +1837,6 @@ void H2MOD::ApplyHooks() {
 		PatchCall(Base + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
 		PatchCall(Base + 0x00092C05, BansheeBombIsEngineMPCheck);
 		PatchCall(Base + 0x0013ff75, FlashlightIsEngineSPCheck);
-
-
 	}
 	else {
 
@@ -1912,14 +1912,11 @@ void H2MOD::Initialize()
 		std::thread SoundT(SoundThread);
 		SoundT.detach();
 		
-		H2Tweaks::setFOV(H2Config_field_of_view);
-		//setSens(CONTROLLER, H2Config_sens_controller);
-		//setSens(MOUSE, H2Config_sens_mouse);
+		Camera::Tweaks::SetFOV(H2Config_field_of_view);
 		if (H2Config_raw_input)
 			Mouseinput::Initialize();
 
 		PatchGameDetailsCheck();
-		//H2Tweaks::PatchPingMeterCheck();
 		void disableLiveMenus(); //until ready
 
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
@@ -1929,13 +1926,6 @@ void H2MOD::Initialize()
 			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
 		}
 	}
-
-	//effects can vary (good or bad) depending on different software configurations.
-	//if someone wants it they should set it manually or if it's really sought after make it a config setting.
-	//and it should have been set Above_Normal not High imo -Glitchy Scripts.
-	//if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS)) {
-	//	addDebugText("Error setting the process priority");
-	//}
 	
 	TRACE_GAME("H2MOD - Initialized v0.4a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);

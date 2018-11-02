@@ -354,7 +354,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 
 		u_long xn = User.xnmap[iplong];
 		
-		if (xn != join_game_xn.ina.s_addr && join_game_xn.ina.s_addr != 0);
+		if (xn != join_game_xn.ina.s_addr && join_game_xn.ina.s_addr != NULL)
 		{
 			std::pair <ULONG, SHORT> hostpair = std::make_pair(xn, ntohs(2001));
 			std::pair <ULONG, SHORT> hostpair2 = std::make_pair(xn, htons(2000));
@@ -492,7 +492,7 @@ int WINAPI XNetUnregisterKey(const XNKID* pxnkid)
 }
 
 // #60: XNetInAddrToXnAddr
-INT   WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
+INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
 {
 	CUser* user = User.cusers[ina.s_addr];
 
