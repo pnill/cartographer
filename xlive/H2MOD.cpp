@@ -1099,9 +1099,6 @@ void __cdecl on_map_load(int a1)
 	overrideUnicodeMessage = false;
 	isLobby = true;
 
-	//based on what onGameEngineChange has changed
-	//we do our stuff bellow
-
 	if (h2mod->GetEngineType() == EngineType::MAIN_MENU_ENGINE)
 	{
 
