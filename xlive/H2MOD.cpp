@@ -1094,7 +1094,7 @@ bool __cdecl player_remove_packet_handler(void *packet, int size, void *data)
 typedef void(__cdecl *set_random_number)(int a1);
 set_random_number p_set_random_number;
 
-void __cdecl onGameEngineChange(int a1)
+void __cdecl on_map_load(int a1)
 {
 	overrideUnicodeMessage = false;
 	isLobby = true;
@@ -1762,7 +1762,7 @@ void H2MOD::ApplyHooks() {
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x55952, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		PatchCall(GetBase() + 0x49E95, onGameEngineChange);
+		PatchCall(GetBase() + 0x49E95, on_map_load);
 		p_set_random_number = (set_random_number)(GetBase() + 0x5912D);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0xD03ED, (BYTE*)OnPlayerScore, 12);
@@ -1850,7 +1850,7 @@ void H2MOD::ApplyHooks() {
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x5DE4A, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		PatchCall(GetBase() + 0x43113, onGameEngineChange);
+		PatchCall(GetBase() + 0x43113, on_map_load);
 		p_set_random_number = (set_random_number)(GetBase() + 0x4E43C);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0x8C84C, (BYTE*)OnPlayerScore, 12);
