@@ -674,26 +674,6 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 	}
 }
 
-void H2Tweaks::setSens(InputType input_type, int sens) {
-
-	if (H2IsDediServer)
-		return;
-
-	if (sens < 0)
-		return; 
-
-	int absSensIndex = sens - 1;
-
-	if (input_type == CONTROLLER) { 
-		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89BC) = 40.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
-		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B8) = 80.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
-	}
-	else if (input_type == MOUSE) { 
-		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B4) = 25.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
-		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B0) = 50.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
-	}
-}
-
 void H2Tweaks::applyShaderTweaks() {
 	//patches in order to get elite glowing lights back on
 	//thanks Himanshu for help

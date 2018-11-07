@@ -2,17 +2,12 @@
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD\Modules\RunLoop\RunLoop.h"
 
 #include <Shellapi.h>
-#include <sys/stat.h>
-#include <string>
 #include <sstream>
 #include "Util\Hooks\Hook.h"
 #include "Util\Debug\Debug.h"
-#include "Util\hash.h"
 #include "Util\filesys.h"
-#include "Util\Hooks\Hook.h"
 
 #include "H2MOD\Modules\Updater\Updater.h"
 #include "H2MOD\Modules\Config\Config.h"

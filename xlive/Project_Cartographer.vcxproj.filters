@@ -250,6 +250,9 @@
     <Filter Include="Source Files\H2MOD\Modules\Camera\FOV">
       <UniqueIdentifier>{70eaacc0-198f-45d6-9a04-0efa4ed8a71b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Input\RawInput">
+      <UniqueIdentifier>{2259b62f-9dfe-4869-a073-4bb4a23cfb3a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -338,9 +341,6 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\MapChecksum\MapChecksumSync.cpp">
       <Filter>Source Files\H2MOD\Modules\MapCheckSum</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\Modules\Input\Mouseinput.cpp">
-      <Filter>Source Files\H2MOD\Modules\Input</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Console\ConsoleCommands.cpp">
       <Filter>Source Files\H2MOD\Modules\Console</Filter>
@@ -467,6 +467,9 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Camera\FOV\FOV.cpp">
       <Filter>Source Files\H2MOD\Modules\Camera\FOV</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Input\RawInput\Mouseinput.cpp">
+      <Filter>Source Files\H2MOD\Modules\Input\RawInput</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -668,9 +671,6 @@
     <ClInclude Include="H2MOD\Modules\MapChecksum\MapChecksumSync.h">
       <Filter>Source Files\H2MOD\Modules\MapCheckSum</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\Input\Mouseinput.h">
-      <Filter>Source Files\H2MOD\Modules\Input</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Modules\Console\ConsoleCommands.h">
       <Filter>Source Files\H2MOD\Modules\Console</Filter>
     </ClInclude>
@@ -868,6 +868,9 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\UI\UI.h">
       <Filter>Source Files\H2MOD\Modules\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Input\Input.h">
+      <Filter>Source Files\H2MOD\Modules\Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

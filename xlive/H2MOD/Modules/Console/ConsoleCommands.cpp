@@ -1,7 +1,7 @@
 #include "Globals.h"
 #include <fstream>
 #include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Tweaks\Tweaks.h"
+#include "H2MOD\Modules\Input\Input.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "Blam/BlamLibrary.h"
 #include "H2MOD\Modules\CustomMenu\Credits.h"
@@ -683,7 +683,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			strcpy(cstr, sensVal.c_str());
 
 			if (isNum(cstr)) {
-				H2Tweaks::setSens(CONTROLLER, stoi(sensVal));
+				Input::Tweaks::SetSens(Input::Type::CONTROLLER, stoi(sensVal));
 			}
 			else {
 				output(L"Wrong input! Use a number.");
@@ -700,7 +700,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			strcpy(cstr, sensVal.c_str());
 
 			if (isNum(cstr)) {
-				H2Tweaks::setSens(MOUSE, stoi(sensVal));
+				Input::Tweaks::SetSens(Input::Type::MOUSE, stoi(sensVal));
 			}
 			else {
 				output(L"Wrong input! Use a number.");

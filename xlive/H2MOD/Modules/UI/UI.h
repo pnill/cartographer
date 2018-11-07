@@ -10,7 +10,7 @@ namespace UI
 
 	namespace Tweaks
 	{
-		void SetCrosshairsSize(int size, bool preset);
 		void SetCrosshairPos(float crosshair_offset);
+		void SetCrosshairsSize(int size, bool preset);
 	}
 }

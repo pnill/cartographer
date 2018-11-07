@@ -5,7 +5,7 @@
 #include "H2MOD.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Input\Mouseinput.h"
+#include "H2MOD\Modules\Input\Input.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Startup\Startup.h"
@@ -1902,11 +1902,11 @@ void H2MOD::Initialize()
 		SoundT.detach();
 		
 		Camera::Tweaks::SetFOV(H2Config_field_of_view);
+
 		if (H2Config_raw_input)
-			Mouseinput::Initialize();
+			Input::Tweaks::Init::RawMouseInput();
 
 		PatchGameDetailsCheck();
-		void disableLiveMenus(); //until ready
 
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
