@@ -8,3 +8,6 @@ Pull requests are the best way to submit any additions or fixes. Small changes o
 ## Discord - Online Social Hangout
 All Developers/Staff/Associates of this project hang out and work on this project via its official Discord server.
 Invitation link: https://cartographer.online/discord
+
+### Development Build Status
+[![Build status](https://ci.appveyor.com/api/projects/status/jduukxfn4s14nvgq/branch/development?svg=true)](https://ci.appveyor.com/project/PermaNulled/cartographer/branch/development)
