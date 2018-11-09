@@ -1988,7 +1988,7 @@ DWORD WINAPI XStorageBuildServerPath( DWORD dwUserIndex, XSTORAGE_FACILITY Stora
 	{
 		//Local_Storage_W( 0, strw );
 
-
+		ZeroMemory(strw, sizeof(strw));
 		wcscat( strw, L"\\Online\\" );
 		//CreateDirectory( strw, NULL );
 

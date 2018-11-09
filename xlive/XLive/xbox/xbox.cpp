@@ -20,7 +20,7 @@ XSESSION_LOCAL_DETAILS sessionDetails;
 int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags) // TODO: If this is called, pop cartographer account system UI.
 {
 	sys_ui = -1;
-	return 0;
+	return ERROR_SUCCESS;
 }
 
 

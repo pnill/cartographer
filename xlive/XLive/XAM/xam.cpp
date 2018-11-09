@@ -148,9 +148,8 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	if ((g_listener[curlist].area & XNOTIFY_SYSTEM) &&
 		dwMsgFilter == 0)
 	{
-		if (0) {}
 
-		else if (sys_ui == 0 || sys_ui == 2)
+		if (sys_ui == 0 || sys_ui == 2)
 			dwMsgFilter = XN_SYS_UI;
 
 		else if (sys_signin == 0)
@@ -185,14 +184,14 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	}
 
-	if ((g_listener[curlist].area & XNOTIFY_CUSTOM) &&
+/*	if ((g_listener[curlist].area & XNOTIFY_CUSTOM) &&
 		dwMsgFilter == 0)
 	{
 		if (0) // change this to if player kicked...
 		{
 			dwMsgFilter = XN_CUSTOM_ACTIONPRESSED;
 		}
-	}
+	}*/
 
 
 	if (dwMsgFilter == 0)
@@ -207,11 +206,11 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	switch (dwMsgFilter)
 	{
 
-	case XN_CUSTOM_ACTIONPRESSED:
+	/*case XN_CUSTOM_ACTIONPRESSED:
 		*pdwId = XN_CUSTOM_ACTIONPRESSED;
 		*pParam = 0x00000000; // replace the high-bits with action_id
 		exit_code = TRUE;
-		break;
+		break;*/
 
 	case XN_SYS_UI:
 		if (sys_ui == 0)
@@ -275,7 +274,6 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 				if (g_signin[2]) *pParam |= 4;
 				if (g_signin[3]) *pParam |= 8;
 			}
-
 
 			sys_signin++;
 
