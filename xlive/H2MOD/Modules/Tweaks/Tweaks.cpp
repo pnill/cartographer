@@ -639,7 +639,7 @@ void InitH2Tweaks() {
 	PatchCall(GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 
-	//H2Tweraks::applyPlayersActionsUpdateRatePatch();
+	H2Tweaks::applyPlayersActionsUpdateRatePatch();
 	
 	addDebugText("End Startup Tweaks.");
 }
@@ -767,7 +767,7 @@ __declspec(naked) void calculate_delta_time(void)
 	}
 }
 
-void applyPlayersActionsUpdateRatePatch()
+void H2Tweaks::applyPlayersActionsUpdateRatePatch()
 {
 	xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
 	PatchCall((DWORD)GetAddress(0x1E12FB, 0x1C8327), (DWORD)calculate_delta_time); // inside update_player_actions()
