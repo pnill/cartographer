@@ -2,6 +2,8 @@
 #include "H2MOD\Modules\Startup\Startup.h"
 #include <unordered_map>
 
+using namespace Blam::Enums::Player;
+
 // should really move this function into some header
 // helper function for getting a pointer to some game data
 template <typename T = void>
@@ -66,7 +68,7 @@ struct c_game_engine_vtable
 	c_engine_func_proto_ptr(unk_function_25, int, int arg1, int arg2);
 	c_engine_func_proto_ptr(unk_function_26, int, signed int arg1, int arg2, signed int arg3);
 	c_engine_func_proto_ptr(unk_function_27, int);
-	c_engine_func_proto_ptr(is_team_enemy, int, int team_a, int team_b);
+	c_engine_func_proto_ptr(is_team_enemy, int, BYTE team_a, BYTE team_b);
 	c_engine_func_proto_ptr(unk_function_29, void, int arg1);
 	c_engine_func_proto_ptr(unk_function_30, void, signed int arg1, int arg2, signed int arg3);
 	c_engine_func_proto_ptr(unk_function_31, void, int arg1, int arg2, char arg3, signed int arg4);
@@ -253,9 +255,9 @@ c_engine_func_proto(unk_function_27_wrapper, int)
 {
 	return GET_ENGINE()->unk_function_27();
 }
-c_engine_func_proto(is_team_enemy_wrapper, int, int team_a, int team_b)
+c_engine_func_proto(is_team_enemy_wrapper, int, BYTE team_a, BYTE team_b)
 {
-	return GET_ENGINE()->is_team_enemy(team_a, team_b);
+	return GET_ENGINE()->is_team_enemy(static_cast<Team>(team_a), static_cast<Team>(team_b));
 }
 c_engine_func_proto(unk_function_29_wrapper, void, int arg1)
 {
@@ -465,7 +467,7 @@ int c_game_engine_base::unk_function_27()
 {
 	return call_c_base_func(unk_function_27);
 }
-bool c_game_engine_base::is_team_enemy(int team_a, int team_b)
+bool c_game_engine_base::is_team_enemy(Team team_a, Team team_b)
 {
 	return call_c_base_func(is_team_enemy, team_a, team_b);
 }
