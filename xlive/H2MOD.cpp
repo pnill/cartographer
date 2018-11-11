@@ -1662,26 +1662,28 @@ bool device_active = true;
 //This happens whenever a player activates a device control.
 int __cdecl device_touch(DatumIndex device_datum, DatumIndex unit_datum)
 {
-
-	//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
-	if (get_device_acceleration_scale(device_datum) == 999.0f)
+	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) 
 	{
-		if (device_shop->BuyItem(device_datum, unit_datum)) // If the purchase was successful we won't execute the original device control action.
+		//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
+		if (get_device_acceleration_scale(device_datum) == 999.0f)
 		{
-			if (device_active == false)
-				return pdevice_touch(device_datum, unit_datum);
+			if (device_shop->BuyItem(device_datum, unit_datum)) // If the purchase was successful we won't execute the original device control action.
+			{
+				if (device_active == false)
+					return pdevice_touch(device_datum, unit_datum);
 
-			device_active = true;
-			return 0;
+				device_active = true;
+				return 0;
+			}
 		}
+
+		// If the purchase fails (they don't have enough points), or the device is not a shopping device return normally.
+		// In general's map returning normally will turn the point display red indicating the user has no points, we do not indicate that the purchase failed in any other way.
+		if (device_active == false)
+			return 0;
+
+		device_active = false;
 	}
-
-	// If the purchase fails (they don't have enough points), or the device is not a shopping device return normally.
-	// In general's map returning normally will turn the point display red indicating the user has no points, we do not indicate that the purchase failed in any other way.
-	if (device_active == false)
-		return 0;
-
-	device_active = false;
 
 	return pdevice_touch(device_datum, unit_datum);
 }
