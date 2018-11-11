@@ -286,8 +286,13 @@ void GetServersFromHttp(ServerList* servptr,PXOVERLAPPED pOverlapped, char* pvBu
 	pOverlapped->InternalHigh = servptr->total_servers;
 	pOverlapped->InternalLow = ERROR_SUCCESS;
 
+	// Give game some time to copy all server info
+	std::this_thread::sleep_for(2s);
+
+	// No more servers to get, set no more files flag
+	pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
+
 	servptr->running = false;
-	
 }
 
 
