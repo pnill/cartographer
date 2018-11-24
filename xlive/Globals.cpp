@@ -9,6 +9,7 @@ GameStateObjectHeaderTable* game_state_objects_header = NULL;
 GameStateActorTable* game_state_actors = NULL;
 global_tag_instance* tag_instances = NULL;
 
+bool displayXyz = false;
 volatile bool isLobby = true;
 bool overrideUnicodeMessage = false;
 
