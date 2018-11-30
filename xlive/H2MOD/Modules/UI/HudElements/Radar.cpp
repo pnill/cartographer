@@ -1,14 +1,10 @@
 #include "stdafx.h"
-#include <string>
-#include <unordered_set>
-#include <codecvt>
 
 #include "Util\Hooks\Hook.h"
 
 #include "H2MOD\Modules\UI\UI.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
-
 
 // Fixes pulse resetting the radar
 void UI::Patch::RadarPulse() 

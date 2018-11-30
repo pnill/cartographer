@@ -623,7 +623,7 @@ void InitH2Tweaks() {
 		pfn_c0024fabc = (tfn_c0024fabc)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fabc, (BYTE*)fn_c0024fabc, 13);
 		VirtualProtect(pfn_c0024fabc, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);
+		//PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);
 
 		//PATCHES RADAR IN MULTIPLAYER  DOCUMENTATION FOR YOSHI  #HPV
 		UI::Patch::RadarPulse(); 
