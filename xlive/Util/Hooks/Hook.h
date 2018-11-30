@@ -43,7 +43,7 @@ inline void WritePointer(DWORD offset, const void *ptr) {
 template <typename value_type>
 inline void WriteValue(DWORD offset, value_type data)
 {
-	WriteBytes(offset, &data, sizeof(data));
+	WriteBytes(offset, &data, sizeof(value_type));
 }
 
 inline void WriteJmpTo(DWORD call_addr, DWORD new_function_ptr)
