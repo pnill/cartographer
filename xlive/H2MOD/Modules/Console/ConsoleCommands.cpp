@@ -628,6 +628,13 @@ void ConsoleCommands::handle_command(std::string command) {
 		else if (firstCommand == "$leavegame") {
 			h2mod->exit_game();
 		}
+		else if (firstCommand == "$xyz") {
+			if (!gameManager->isHost()) {
+				output(L"Only host can see xyz for now...");
+				return;
+			}
+			displayXyz = !displayXyz;
+		}
 		else if (firstCommand == "$downloadmap") {
 			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
 				output(L"Invalid command, usage downloadMap filename");

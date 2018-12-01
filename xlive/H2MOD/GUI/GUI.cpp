@@ -6,17 +6,23 @@
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\MOdules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
+#include "H2MOD\Modules\GameManager\GameManager.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include <tchar.h>
 
 
 extern ConsoleCommands* commands;
+extern GameManager* gameManager;
 
 
 extern void InitInstance();
 extern bool overrideUnicodeMessage;
 extern MapManager* mapManager;
 
+extern bool displayXyz;
+extern volatile bool isLobby;
+char* xyzTextWidget;
+std::string xyzTextWidgetTemplate = "x=%.2f, y=%.2f, z=%.2f";
 
 typedef struct _XLIVE_INITIALIZE_INFO {
 	UINT cbSize;
@@ -650,6 +656,19 @@ int WINAPI XLiveRender()
 
 			if (GameEngine == 3 && mapManager->getCustomLobbyMessage() != NULL) {
 				drawText(0, 30, COLOR_GOLD, mapManager->getCustomLobbyMessage(), normalSizeFont);
+			}
+
+			if (displayXyz && !isLobby && gameManager->isHost()) {
+				//only display xyz for host
+				if (xyzTextWidget == NULL) {
+					xyzTextWidget = new char[128];
+				}
+				float x = *(float*)(h2mod->GetBase() + 0x4C072C);
+				float y = *(float*)(h2mod->GetBase() + 0x4C0728);
+				float z = *(float*)(h2mod->GetBase() + 0x4C0730);
+				sprintf(xyzTextWidget, xyzTextWidgetTemplate.c_str(), x, y, z);
+
+				drawText(0, 60, COLOR_GOLD, xyzTextWidget, normalSizeFont);
 			}
 
 			time_t ltime;

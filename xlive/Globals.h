@@ -50,6 +50,7 @@ extern VariantPlayer* variant_player;
 extern XNADDR join_game_xn;
 extern MapManager* mapManager;
 extern AdvLobbySettings* advLobbySettings;
+extern bool displayXyz;
 extern volatile bool isLobby;
 extern bool overrideUnicodeMessage;
 extern ConsoleCommands* commands; 
