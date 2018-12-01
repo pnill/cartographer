@@ -575,25 +575,21 @@ DWORD WINAPI XLocatorCreateServerEnumeratorByIDs(DWORD a1, DWORD a2, DWORD a3, D
 
 
 // 5236: ??
-DWORD WINAPI XLocatorServiceInitialize(DWORD a1, DWORD a2)
+DWORD WINAPI XLocatorServiceInitialize(DWORD a1, PHANDLE phLocatorService)
 {
-	TRACE("XLocatorServiceInitialize  (a1 = %X, a2 = %X)",
-		a1, a2);
+	TRACE("XLocatorServiceInitialize  (a1 = %X, phLocatorService = %X)",
+		a1, phLocatorService);
 
+	if (phLocatorService)
+		*phLocatorService = CreateMutex(NULL, NULL, NULL);
 
 	/*
 	Lost Planet, Gears of War
 	- LocatorV1.434307DE.RTP.
 	*/
 
-#if 0
-	while (1)
-		Sleep(1);
-#endif
-
-
 	// GFWL offline
-	return 0;
+	return ERROR_SUCCESS;
 }
 
 

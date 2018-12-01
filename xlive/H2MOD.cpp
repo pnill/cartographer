@@ -5,7 +5,6 @@
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -464,14 +463,6 @@ void H2MOD::exit_game()
 	typedef int(__cdecl *leave_game_type)(int a1);
 	leave_game_type leave_game = (leave_game_type)(h2mod->GetBase() + 0x216388);
 	leave_game(0);
-}
-
-void enableLiveMenus() {
-	*(int*)(h2mod->GetBase() + 0x422450) = 1; 
-}
-
-void disableLiveMenus() {
-	*(int*)(h2mod->GetBase() + 0x422450) = -1;
 }
 
 #pragma endregion
@@ -950,8 +941,6 @@ update_player_score pupdate_player_score;
 typedef void(__stdcall *tjoin_game)(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14);
 tjoin_game pjoin_game;
 
-
-
 extern SOCKET game_sock;
 extern SOCKET game_sock_1000;
 extern CUserManagement User;
@@ -1097,10 +1086,11 @@ bool __cdecl player_remove_packet_handler(void *packet, int size, void *data)
 }
 */
 
-typedef void(__cdecl *originalFunc)(int a1);
-originalFunc p_originalFunc;
+// this gets called after game globals are updated fyi (which includes game engine type)
+typedef void(__cdecl *set_random_number)(int a1);
+set_random_number p_set_random_number;
 
-void __cdecl onGameEngineChange(int a1)
+void __cdecl OnMapLoad(int a1)
 {
 	overrideUnicodeMessage = false;
 	isLobby = true;
@@ -1114,13 +1104,13 @@ void __cdecl onGameEngineChange(int a1)
 		/* Setup the players table and objects_header table so they can be referenced directly */
 		/* TODO: Update offsets for dedis. */
 		if(game_state_players == NULL)
-			game_state_players = (GameStatePlayerTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + 0x4A8260)));
+			game_state_players = (GameStatePlayerTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4D64C4 : 0x4A8260))));
 		if(game_state_objects_header == NULL)
-			game_state_objects_header = (GameStateObjectHeaderTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + 0x4E461C)));
+			game_state_objects_header = (GameStateObjectHeaderTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x50C8EC : 0x4E461C))));
 		if(game_state_actors == NULL)
-			game_state_actors = (GameStateActorTable*)((*(DWORD*)((BYTE*)h2mod->GetBase() + 0xA965DC)));
+			game_state_actors = (GameStateActorTable*)((*(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x9A1C5C : 0xA965DC))));
 
-		addDebugText("GameEngine: Main-Menu, apply patches");
+		addDebugText("GameEngine: Main-Menu");
 		object_to_variant.clear();
 
 		if (!gameManager->isHost()) {
@@ -1139,10 +1129,10 @@ void __cdecl onGameEngineChange(int a1)
 		}
 
 		H2Tweaks::disableAI_MP(); //TODO: get dedi offset
-		RankPatch();
+		UIRankPatch();
 		H2Tweaks::disable60FPSCutscenes();
 
-		p_originalFunc(a1);
+		p_set_random_number(a1);
 		return; 
 	}
 
@@ -1157,7 +1147,7 @@ void __cdecl onGameEngineChange(int a1)
 
 	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE)
 	{
-		addDebugText("GameEngine: Multiplayer, apply patches");
+		addDebugText("GameEngine: Multiplayer");
 
 		if (wcsstr(variant_name, L"zombies") > 0 || wcsstr(variant_name, L"Zombies") > 0 || wcsstr(variant_name, L"Infection") > 0 || wcsstr(variant_name, L"infection") > 0)
 		{
@@ -1220,13 +1210,13 @@ void __cdecl onGameEngineChange(int a1)
 	}
 
 	else if (h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
-		addDebugText("GameEngine: Singleplayer, apply patches");
+		addDebugText("GameEngine: Singleplayer");
 
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 		H2Tweaks::enable60FPSCutscenes();
 	}
 
-	p_originalFunc(a1);
+	p_set_random_number(a1);
 }
 
 
@@ -1456,8 +1446,6 @@ __declspec(naked) void calculate_model_lod_detour()
 	}
 }
 
-
-
 void H2MOD::securityPacketProcessing()
 {
 	if (!gameManager->isHost())
@@ -1597,28 +1585,28 @@ bool FlashlightIsEngineSPCheck() {
 	return h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE;
 }
 
-typedef bool(__cdecl* verify_game_version_on_join)(int xlive_version, int build_version, int build_version2);
+typedef bool(__cdecl* verify_game_version_on_join)(int executable_version, int build_version, int build_version2);
 verify_game_version_on_join p_verify_game_version_on_join;
 
-bool __cdecl VerifyGameVersionOnJoin(int xlive_version, int build_version, int build_version2)
+bool __cdecl VerifyGameVersionOnJoin(int executable_version, int build_version, int build_version2)
 {
-	return xlive_version == XLIVE_VERSION && build_version >= GAME_BUILD && build_version2 <= GAME_BUILD;
+	return executable_version == EXECUTABLE_VERSION && build_version >= GAME_BUILD && build_version2 <= GAME_BUILD;
 }
 
-typedef bool(__cdecl* verify_xlive_version)(int xlive_version);
-verify_xlive_version p_verify_xlive_version;
+typedef bool(__cdecl* verify_executable_version)(int executable_version);
+verify_executable_version p_verify_executable_version;
 
-bool __cdecl VerifyXliveVersion(int xlive_version)
+bool __cdecl VerifyExecutableVersion(int executable_version)
 {
-	return xlive_version == XLIVE_VERSION; // will not display servers that don't match this in server list
+	return executable_version == EXECUTABLE_VERSION; // will not display servers that don't match this in server list
 }
 
-typedef void(__cdecl *get_game_version)(DWORD *xlive_version, DWORD *build_version, DWORD *build_version2);
+typedef void(__cdecl *get_game_version)(DWORD *executable_version, DWORD *build_version, DWORD *build_version2);
 get_game_version p_get_game_version;
 
-void __cdecl GetGameVersion(DWORD *xlive_version, DWORD *build_version, DWORD *build_version2)
+void __cdecl GetGameVersion(DWORD *executable_version, DWORD *build_version, DWORD *build_version2)
 {
-	*xlive_version = XLIVE_VERSION;
+	*executable_version = EXECUTABLE_VERSION;
 	*build_version = GAME_BUILD;
 	*build_version2 = GAME_BUILD;
 }
@@ -1646,14 +1634,12 @@ void GivePlayerWeaponDatum(DatumIndex unit_datum,DatumIndex weapon_datum)
 	}
 }
 
-
-
 //This is used for maps with 'shops' where the device_acceleration_scale is an indicator that they're using the control device as a 'shop'
 float get_device_acceleration_scale(DatumIndex device_datum)
 {
-	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD54);
-	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50);
-	DWORD game_state_objects_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x4E461C);
+	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29BC : 0x47CD54));
+	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50));
+	DWORD game_state_objects_header = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x50C8EC : 0x4E461C));
 	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
 	
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
@@ -1677,34 +1663,31 @@ bool device_active = true;
 //This happens whenever a player activates a device control.
 int __cdecl device_touch(DatumIndex device_datum, DatumIndex unit_datum)
 {
-
-	//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
-	if (get_device_acceleration_scale(device_datum) == 999.0f)
+	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) 
 	{
-		if (device_shop->BuyItem(device_datum, unit_datum)) // If the purchase was successful we won't execute the original device control action.
+		//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
+		if (get_device_acceleration_scale(device_datum) == 999.0f)
 		{
-			if (device_active == false)
-				return pdevice_touch(device_datum, unit_datum);
+			if (device_shop->BuyItem(device_datum, unit_datum)) // If the purchase was successful we won't execute the original device control action.
+			{
+				if (device_active == false)
+					return pdevice_touch(device_datum, unit_datum);
 
-			device_active = true;
-			return 0;
+				device_active = true;
+				return 0;
+			}
 		}
+
+		// If the purchase fails (they don't have enough points), or the device is not a shopping device return normally.
+		// In general's map returning normally will turn the point display red indicating the user has no points, we do not indicate that the purchase failed in any other way.
+		if (device_active == false)
+			return 0;
+
+		device_active = false;
 	}
-
-	// If the purchase fails (they don't have enough points), or the device is not a shopping device return normally.
-	// In general's map returning normally will turn the point display red indicating the user has no points, we do not indicate that the purchase failed in any other way.
-	if (device_active == false)
-		return 0;
-
-	device_active = false;
 
 	return pdevice_touch(device_datum, unit_datum);
 }
-
-
-
-
-
 
 void H2MOD::ApplyUnitHooks()
 {
@@ -1718,7 +1701,7 @@ void H2MOD::ApplyUnitHooks()
 	pc_simulation_unit_entity_definition_decode = (tc_simulation_unit_entity_definition_creation_decode)DetourClassFunc((BYTE*)this->GetBase() + (h2mod->Server ? 0x1E22BD : 0x1F8557), (BYTE*)c_simulation_unit_entity_definition_creation_decode, 11);
 	VirtualProtect(pc_simulation_unit_entity_definition_decode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	pdevice_touch = (tdevice_touch)DetourFunc((BYTE*)this->GetBase() + 0x163420, (BYTE*)device_touch, 10);
+	pdevice_touch = (tdevice_touch)DetourFunc((BYTE*)this->GetBase() + (h2mod->Server ? 0x158EE3 : 0x163420), (BYTE*)device_touch, 10);
 	VirtualProtect(pdevice_touch, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	
 	//Only patch the object_new call on host during AI_Place function, no reason to hook all object_new calls.
@@ -1748,16 +1731,14 @@ void H2MOD::ApplyHooks() {
 		/* These hooks are only built for the client, don't enable them on the server! */
 		DWORD dwBack;
 
-	
-
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc((BYTE*)this->GetBase() + 0x1B4C14, (BYTE*)VerifyGameVersionOnJoin, 5);
 		VirtualProtect(p_verify_game_version_on_join, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		p_get_game_version = (get_game_version)DetourFunc((BYTE*)this->GetBase() + 0x1B4BF5, (BYTE*)GetGameVersion, 8);
 		VirtualProtect(p_get_game_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		p_verify_xlive_version = (verify_xlive_version)DetourFunc((BYTE*)this->GetBase() + 0x1B4C32, (BYTE*)VerifyXliveVersion, 8);
-		VirtualProtect(p_verify_xlive_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		p_verify_executable_version = (verify_executable_version)DetourFunc((BYTE*)this->GetBase() + 0x1B4C32, (BYTE*)VerifyExecutableVersion, 8);
+		VirtualProtect(p_verify_executable_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//pload_wgit = (tload_wgit)DetourClassFunc((BYTE*)this->GetBase() + 0x2106A2, (BYTE*)OnWgitLoad, 13);
 		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1781,8 +1762,8 @@ void H2MOD::ApplyHooks() {
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x55952, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		PatchCall(GetBase() + 0x49E95, onGameEngineChange);
-		p_originalFunc = (originalFunc)(GetBase() + 0x5912D);
+		PatchCall(GetBase() + 0x49E95, OnMapLoad);
+		p_set_random_number = (set_random_number)(GetBase() + 0x5912D);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0xD03ED, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1871,8 +1852,8 @@ void H2MOD::ApplyHooks() {
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x5DE4A, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		PatchCall(GetBase() + 0x43113, onGameEngineChange);
-		p_originalFunc = (originalFunc)(GetBase() + 0x4E43C);
+		PatchCall(GetBase() + 0x43113, OnMapLoad);
+		p_set_random_number = (set_random_number)(GetBase() + 0x4E43C);
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0x8C84C, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
@@ -1912,11 +1893,6 @@ VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DW
 
 void H2MOD::Initialize()
 {
-
-
-	
-	//HANDLE hThread = CreateThread(NULL, 0, Thread1, NULL, 0, NULL);
-
 	this->Base = (DWORD)game_info.base;
 
 	if (game_info.process_type == H2Types::H2Server)

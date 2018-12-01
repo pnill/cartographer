@@ -5,7 +5,7 @@
 #include "Blam\Enums\Game\GameEngine.h"
 #include "Util\Hooks\Hook.h"
 
-constexpr int XLIVE_VERSION = 4; // I don't recommend changing this
+constexpr int EXECUTABLE_VERSION = 4; // I don't recommend changing this
 constexpr int GAME_BUILD = 11122;
 
 constexpr signed int NONE = -1;

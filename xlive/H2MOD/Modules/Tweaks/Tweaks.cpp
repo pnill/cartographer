@@ -906,8 +906,10 @@ void InitH2Tweaks() {
 	addDebugText("Begin Startup Tweaks.");
 
 	MapChecksumSync::Init();
-	custom_game_engines::init();
-	custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
+
+	//TODO(Num005) crashes dedis
+	//custom_game_engines::init();
+	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 	
 	if (H2IsDediServer) {
 		DWORD dwBack;

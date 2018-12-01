@@ -9,7 +9,7 @@
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "Util\Hooks\Hook.h"
 
-void RankPatch() {
+void UIRankPatch() {
 
 	if (H2IsDediServer)
 		return;
