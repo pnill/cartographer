@@ -66,8 +66,8 @@ extern std::map<DWORD, bool> achievementList;
 
 extern bool microphoneEnabled;
 extern IN_ADDR clientMachineAddress;
-extern TSClient* client;
-extern TSServer* server;
+extern TSClient* tsClient;
+extern TSServer* tsServer;
 
 //some utility functions below
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);

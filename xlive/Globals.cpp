@@ -27,8 +27,8 @@ bool microphoneEnabled = true;
 std::unordered_map<XUID, BOOL> xuidIsTalkingMap;
 std::unordered_map<XUID, anyID> xuidToTSid;
 IN_ADDR clientMachineAddress = {};
-TSClient* client = NULL;
-TSServer* server = NULL;
+TSClient* tsClient = NULL;
+TSServer* tsServer = NULL;
 
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
 	std::stringstream ss(s);
