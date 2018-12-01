@@ -1889,11 +1889,11 @@ void H2MOD::ApplyHooks() {
 
 
 
-		if (server == NULL) {
+		if (tsServer == NULL) {
 			//TODO: move into method
-			server = new TSServer(true);
-			server->setPort(H2Config_base_port + 7);
-			server->startListening();
+			tsServer = new TSServer(true);
+			tsServer->setPort(H2Config_base_port + 7);
+			tsServer->startListening();
 		}
 	}
 

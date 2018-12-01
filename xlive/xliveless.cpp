@@ -1488,12 +1488,12 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 
 	if (H2Config_voice_chat) {
 		if (gameManager->isHost()) {
-			if (server == NULL) {
+			if (tsServer == NULL) {
 				//TODO: move into method
-				server = new TSServer(true);
-				server->setPort(H2Config_base_port + 7);
+				tsServer = new TSServer(true);
+				tsServer->setPort(H2Config_base_port + 7);
 				//startup the teamspeak client
-				client = new TSClient(true);
+				tsClient = new TSClient(true);
 
 				//only player 1 gets to use voice, guests don't
 				WCHAR strw[32];
@@ -1501,25 +1501,25 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 				char* strw3 = new char[16];
 				wsprintf(strw, L"%I64x", xFakeXuid[0]);
 				wcstombs(strw3, strw, 32);
-				client->setNickname(strw3);
+				tsClient->setNickname(strw3);
 
 			}
-			server->startListening();
+			tsServer->startListening();
 
 			//set the local loopback address
 			char strAddr[] = "127.0.0.1";
 			DWORD ip = inet_addr(strAddr);
 			clientMachineAddress.S_un.S_addr = ip;
 
-			client->setServerAddress(clientMachineAddress);
-			client->setServerPort(H2Config_base_port + 7);
-			client->startChatting();
+			tsClient->setServerAddress(clientMachineAddress);
+			tsClient->setServerPort(H2Config_base_port + 7);
+			tsClient->startChatting();
 		}
 		else {
-			if (client == NULL) {
+			if (tsClient == NULL) {
 				//TODO: move into method
 				//startup the teamspeak client
-				client = new TSClient(true);
+				tsClient = new TSClient(true);
 
 				//only player 1 gets to use voice, guests don't
 				WCHAR strw[8192];
@@ -1527,12 +1527,12 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 				char* strw3 = new char[4096];
 				wsprintf(strw, L"%I64x", xFakeXuid[0]);
 				wcstombs(strw3, strw, 8192);
-				client->setNickname(strw3);
+				tsClient->setNickname(strw3);
 
 			}
-			client->setServerAddress(join_game_xn.ina);
-			client->setServerPort(ntohs(join_game_xn.wPortOnline) + 7);
-			client->startChatting();
+			tsClient->setServerAddress(join_game_xn.ina);
+			tsClient->setServerPort(ntohs(join_game_xn.wPortOnline) + 7);
+			tsClient->startChatting();
 		}
 	}
 
@@ -1918,11 +1918,11 @@ int WINAPI XSessionFlushStats (DWORD, DWORD)
 DWORD WINAPI XSessionDelete (DWORD, DWORD)
 {
     TRACE("XSessionDelete");
-		if (client != NULL) {
-			client->disconnect();
+		if (tsClient != NULL) {
+			tsClient->disconnect();
 		}
-		if (server != NULL) {
-			server->destroyVirtualServer();
+		if (tsServer != NULL) {
+			tsServer->destroyVirtualServer();
 		}
 		mapManager->cleanup();
     return 0;

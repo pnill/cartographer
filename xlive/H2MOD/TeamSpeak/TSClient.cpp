@@ -167,10 +167,10 @@ void TSClient::onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int 
 	/* Failed to connect ? */
 	if (newStatus == STATUS_DISCONNECTED && errorNumber == ERROR_failed_connection_initialisation) {
 		TRACE_GAME_N("[h2mod-voice] Looks like there is no server running.");
-		client->connected = false;
+		tsClient->connected = false;
 	}
 	if (newStatus == STATUS_CONNECTED) {
-		client->connected = true;
+		tsClient->connected = true;
 	}
 }
 
@@ -326,7 +326,7 @@ void TSClient::handleStopTalking(anyID teamspeakClientID,XUID remoteId,XUID clie
 	xuidIsTalkingMap[remoteId] = false;
 
 	if(clientId != remoteId)
-		client->mute(teamspeakClientID);
+		tsClient->mute(teamspeakClientID);
 
 	TRACE_GAME_N("[h2mod-voice] Client \"%s\" stops talking.", remoteXuidStr);
 
@@ -334,8 +334,8 @@ void TSClient::handleStopTalking(anyID teamspeakClientID,XUID remoteId,XUID clie
 
 void TSClient::handleLobbyTalk(anyID teamspeakClientID, XUID remoteId) {
 	xuidIsTalkingMap[remoteId] = true;
-	client->setClientVolume(teamspeakClientID, MAX_CLIENT_VOLUME_MODIFIER);
-	client->printCurrentClientVolume(teamspeakClientID);
+	tsClient->setClientVolume(teamspeakClientID, MAX_CLIENT_VOLUME_MODIFIER);
+	tsClient->printCurrentClientVolume(teamspeakClientID);
 }
 
 /*
@@ -354,7 +354,7 @@ void TSClient::onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 		return;
 
 	XUID remoteId = _strtoui64(remoteXuidStr, NULL, 16);
-	XUID clientId = _strtoui64(client->nickname, NULL, 16);
+	XUID clientId = _strtoui64(tsClient->nickname, NULL, 16);
 
 	
 	if (status == STATUS_TALKING) {
