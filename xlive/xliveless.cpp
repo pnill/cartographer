@@ -1124,10 +1124,8 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 	if( hEnum == g_dwFakeContent && dlcinit != 0x7FFFFFFF )
 	{
-		int total;
+		DWORD total = 0;
 
-
-		total = 0;
 		while( dlcinit < 256 && dlcinit < marketplaceDlcCount )
 		{
 			XCONTENT_DATA aaa;
@@ -1194,10 +1192,8 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 	if( hEnum == g_dwFakeAchievementContent && achieveinit != 0x7FFFFFFF )
 	{
-		int total;
+		DWORD total = 0;
 
-
-		total = 0;
 		for( 0; achieveinit < 42; achieveinit++ )
 		{
 			XACHIEVEMENT_DETAILS aaa;
@@ -1552,7 +1548,7 @@ DWORD WINAPI XStringVerify( DWORD dwFlags, const CHAR *szLocale, DWORD dwNumStri
 		pResults->pStringResult = (HRESULT *) ((BYTE *) pResults + sizeof(STRING_VERIFY_RESPONSE));
 
 
-		for( int lcv = 0; lcv < dwNumStrings; lcv++ )
+		for( DWORD lcv = 0; lcv < dwNumStrings; lcv++ )
 			pResults->pStringResult[lcv] = (HRESULT) S_OK;
 	}
 
@@ -1810,7 +1806,7 @@ DWORD WINAPI XSessionJoinLocal( HANDLE hSession, DWORD dwUserCount, const DWORD 
 		hSession, dwUserCount, pdwUserIndexes, pfPrivateSlots, pOverlapped );
 
 
-	for( int lcv = 0; lcv < dwUserCount; lcv++ )
+	for( DWORD lcv = 0; lcv < dwUserCount; lcv++ )
 	{
 		TRACE( "- user %d = %d  (%s)", lcv+1, pdwUserIndexes[lcv], pfPrivateSlots[lcv] ? L"Private" : L"Public" );
 	}
@@ -1836,7 +1832,7 @@ DWORD WINAPI XSessionJoinLocal( HANDLE hSession, DWORD dwUserCount, const DWORD 
 // #5328: XSessionGetDetails
 DWORD WINAPI XSessionGetDetails( HANDLE hSession, PDWORD pcbResultsBuffer, PXSESSION_LOCAL_DETAILS pSessionDetails, PXOVERLAPPED pOverlapped )
 {
-	INT max_size;
+	DWORD max_size;
 
 
 	TRACE("XSessionGetDetails  (hSession = %X, pcbResultsBuffer = %X (%X), pSessionDetails = %X, pOverlapped = %X)",
@@ -2026,7 +2022,7 @@ DWORD WINAPI XStorageDownloadToMemory( DWORD dwUserIndex, const WCHAR *wszServer
 	}
 
 
-	int size;
+	DWORD size;
 
 
 	fseek( fp, 0, SEEK_END );
@@ -2771,7 +2767,7 @@ DWORD WINAPI XMarketplaceCreateOfferEnumerator( DWORD dwUserIndex, DWORD dwOffer
 
 			strw[0] = 0;
 			for( int lcv2 = 0; lcv2 < 20; lcv2++ )
-				swprintf( strw, L"%s%02X", strw, marketplace[lcv].contentId[lcv2] );
+				_swprintf( strw, L"%s%02X", strw, marketplace[lcv].contentId[lcv2] );
 			strw[40] = 0;
 
 			TRACE( "- [%d] ContentId = %s", lcv, strw );

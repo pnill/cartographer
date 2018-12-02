@@ -63,7 +63,7 @@ HANDLE WINAPI XNotifyCreateListener(ULONGLONG qwAreas)
 // #651: XNotifyGetNext
 BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId, PULONG_PTR pParam)
 {
-	static int print_limit = 30;
+	static DWORD print_limit = 30;
 
 	static DWORD sys_signin = 0x7FFFFFFF;
 	static DWORD sys_storage = 0x7FFFFFFF;

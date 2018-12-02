@@ -20,7 +20,7 @@ char* TSClient::programPath(char* programInvocation) {
 	int length;
 	char pathsep;
 
-	if (programInvocation == NULL) return strdup("");
+	if (programInvocation == NULL) return _strdup("");
 
 #ifdef _WIN32
 	pathsep = '\\';
@@ -29,7 +29,7 @@ char* TSClient::programPath(char* programInvocation) {
 #endif
 
 	end = strrchr(programInvocation, pathsep);
-	if (!end) return strdup("");
+	if (!end) return _strdup("");
 
 	length = (end - programInvocation) + 2;
 	path = (char*)malloc(length);

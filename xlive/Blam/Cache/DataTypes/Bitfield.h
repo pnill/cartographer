@@ -99,7 +99,7 @@ inline  void Blam::Cache::DataTypes::BitField<FieldType, FieldList>::SetBit(int 
 	if (state)
 		this->Value = this->Value | (1 << index); //Shift 1 to index bits then OR
 	else
-		this->Value = this - Value & ~(1 << index); //Shift 1 to index bits then Flip the bits then AND
+		this->Value = this->Value & ~(1 << index); //Shift 1 to index bits then Flip the bits then AND
 }
 template<typename FieldType, typename FieldList>
 inline  void Blam::Cache::DataTypes::BitField<FieldType, FieldList>::ToggleBit(int index)

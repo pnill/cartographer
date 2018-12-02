@@ -315,27 +315,27 @@ bool engine_basic_init()
 		for (int i = 1; i < arg_count; i++) {
 			wchar_t* cmd_line_arg = cmd_line_args[i];
 
-			if (wcsicmp(cmd_line_arg, L"-windowed") == 0) {
+			if (_wcsicmp(cmd_line_arg, L"-windowed") == 0) {
 				flags_array[flags::windowed] = 1;
 			}
-			else if (wcsicmp(cmd_line_arg, L"-nosound") == 0) {
+			else if (_wcsicmp(cmd_line_arg, L"-nosound") == 0) {
 				flags_array[flags::nosound] = 1;
 				WriteValue(H2BaseAddr + 0x479EDC, 1);
 			}
-			else if (wcsicmp(cmd_line_arg, L"-novsync") == 0) {
+			else if (_wcsicmp(cmd_line_arg, L"-novsync") == 0) {
 				flags_array[flags::novsync] = 1;
 			}
-			else if (wcsicmp(cmd_line_arg, L"-nointro") == 0) {
+			else if (_wcsicmp(cmd_line_arg, L"-nointro") == 0) {
 				flags_array[flags::nointro] = 1;
 			}
-			else if (wcsnicmp(cmd_line_arg, L"-monitor:", 9) == 0) {
+			else if (_wcsnicmp(cmd_line_arg, L"-monitor:", 9) == 0) {
 				int monitor_id = _wtol(&cmd_line_arg[9]);
 				flags_array[flags::monitor_count] = min(max(0, monitor_id), max_mointor_count);
 			}
-			else if (wcsicmp(cmd_line_arg, L"-highquality") == 0) {
+			else if (_wcsicmp(cmd_line_arg, L"-highquality") == 0) {
 				flags_array[flags::high_quality] = 1;
 			}
-			else if (wcsicmp(cmd_line_arg, L"-depthbiasfix") == 0)
+			else if (_wcsicmp(cmd_line_arg, L"-depthbiasfix") == 0)
 			{
 				// Fixes issue #118
 			    /* g_depth_bias always NULL rather than taking any value from
@@ -343,7 +343,7 @@ bool engine_basic_init()
 				NopFill<8>(reinterpret_cast<DWORD>(GetAddress(0x269FD5)));
 			}
 #ifdef _DEBUG
-			else if (wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
+			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
 				int flag_id = _wtol(&cmd_line_arg[10]);
 				flags_array[min(max(0, flag_id), flags::count - 1)] = 1;
 			}
