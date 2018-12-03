@@ -459,6 +459,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				if (isNum(cstr)) {
 					int peerIndex = atoi(cstr);
 					if (peerIndex == 0) {
+						delete[] cstr;
 						output(L"Don't kick yourself");
 						return;
 					}

@@ -252,7 +252,7 @@ void TSClient::setVoiceActivationLevel(float activationLevel) {
 	ss << activationLevel;
 	std::string s(ss.str());
 
-	if (error = ts3client_setPreProcessorConfigValue(scHandlerID, "voiceactivation_level", s.c_str()) != ERROR_ok) {
+	if ((error = ts3client_setPreProcessorConfigValue(scHandlerID, "voiceactivation_level", s.c_str())) != ERROR_ok) {
 		TRACE("[h2mod-voice] Error setting voice activation level: %d\n", error);
 	}
 }

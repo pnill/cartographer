@@ -57,7 +57,7 @@ int __stdcall PreReadyLoad() {
 	if (strlen(H2Config_dedi_server_name) > 0) {
 		wchar_t* PreLoadServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
 		swprintf(PreLoadServerName, 32, L"%hs", H2Config_dedi_server_name);
-		char temp[27];
+		char temp[32];
 		snprintf(temp, 32, H2Config_dedi_server_name);
 		MessageBoxA(NULL, temp, "AAA Server Pre name thingy", MB_OK);
 	}
@@ -942,7 +942,7 @@ void InitH2Tweaks() {
 		if (H2Config_custom_resolution_x > 0 && H2Config_custom_resolution_y > 0) {
 			if (H2Config_custom_resolution_x != (int)tempResX || H2Config_custom_resolution_y != (int)tempResY) {
 				LSTATUS err;
-				if (err = RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_ALL_ACCESS, &hKeyResolution) == ERROR_SUCCESS) {
+				if ((err = RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_ALL_ACCESS, &hKeyResolution)) == ERROR_SUCCESS) {
 					RegSetValueEx(hKeyResolution, L"ScreenResX", NULL, REG_DWORD, (const BYTE*)&H2Config_custom_resolution_x, sizeof(H2Config_custom_resolution_x));
 					RegSetValueEx(hKeyResolution, L"ScreenResY", NULL, REG_DWORD, (const BYTE*)&H2Config_custom_resolution_y, sizeof(H2Config_custom_resolution_y));
 					RegCloseKey(hKeyResolution);

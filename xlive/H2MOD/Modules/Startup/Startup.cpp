@@ -283,7 +283,7 @@ H2Types detect_process_type()
 		DWORD version_info_size = GetFileVersionInfoSizeW(exe_file_path, NULL);
 		if (version_info_size != 0) {
 
-			void *version_info = new BYTE[version_info_size];
+			BYTE *version_info = new BYTE[version_info_size];
 			 if (GetFileVersionInfoW(exe_file_path, NULL, version_info_size, version_info)) {
 				wchar_t *orginal_filename;
 				size_t filename_len;
