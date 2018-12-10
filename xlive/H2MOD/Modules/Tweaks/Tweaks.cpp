@@ -867,11 +867,7 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 char _cdecl LoadTagsandMapBases(int a)
 {
 	char(__cdecl* LoadTagsandMapBases_Orig)(int) = (char(__cdecl*)(int))(GetAddress(0x00031348));
-
 	char result = LoadTagsandMapBases_Orig(a);
-
-	RadarPatch();  //PATCHES RADAR IN MULTIPLAYER  DOCUMENTATION FOR YOSHI  #HPV
-
 	return result;
 }
 
@@ -998,7 +994,9 @@ void InitH2Tweaks() {
 		VirtualProtect(pfn_c0024fabc, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		WriteJmpTo(H2BaseAddr + 0x4544, is_init_flag_set);
-		PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);
+		//PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);
+
+		RadarPatch();
 
 		WriteJmpTo(GetAddress(0x7E43), WinMain);
 		WriteJmpTo(GetAddress(0x39EA2), is_remote_desktop);
