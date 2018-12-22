@@ -1277,13 +1277,21 @@ void H2Tweaks::PatchPingMeterCheck() {
 	WriteBytes(H2BaseAddr + 0x1D4E35, assmPatchPingCheck, 2);
 }
 
-float calculate_delta_time(int ticks)
-{
-	return 1.0;
-}
 
+float* xb_tickrate_flt;
+__declspec(naked) void calculate_delta_time(void)
+{
+	__asm
+	{
+		mov eax, xb_tickrate_flt
+		fld dword ptr[eax]
+		fmul dword ptr[esp + 4]
+		retn
+	}
+}
 
 void H2Tweaks::applyPlayersActionsUpdateRatePatch()
 {
-	//PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
+	xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
+	PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
 }

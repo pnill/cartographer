@@ -96,10 +96,6 @@ signed int __cdecl call_object_new(void*);
 void GivePlayerWeapon(int PlayerIndex, int WeaponId, bool bReset);
 void GivePlayerWeapon2(int PlayerIndex, int WeaponId, short Unk);
 
-
-void enableLiveMenus();
-void disableLiveMenus();
-
 class H2MOD
 {
 public:
