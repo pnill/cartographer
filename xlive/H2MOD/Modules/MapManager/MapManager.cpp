@@ -104,7 +104,7 @@ std::wstring MapManager::getMapName() {
 	//set r/w access on string so we don't have any issues when we do the implicit copy below
 	VirtualProtect((LPVOID)currentMapName, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	std::wstring ucurrentMapName(currentMapName);
-	VirtualProtect((LPVOID)currentMapName, 4, dwBack, NULL);
+	VirtualProtect((LPVOID)currentMapName, 4, dwBack, &dwBack);
 
 	return ucurrentMapName;
 }
@@ -128,7 +128,7 @@ bool MapManager::hasCustomMap(std::wstring mapName) {
 	VirtualProtect(mapsDirectory, 4, PAGE_EXECUTE_READ, &dwBack);
 
 	std::wstring mapFileName(mapsDirectory);
-	VirtualProtect(mapsDirectory, 4, dwBack, NULL);
+	VirtualProtect(mapsDirectory, 4, dwBack, &dwBack);
 
 	mapFileName += mapName;
 	std::ifstream file(mapFileName.c_str());
@@ -141,8 +141,6 @@ void swap(DWORD*& a, DWORD*& b)
 	a = b;
 	b = c;
 }
-
-DWORD *customMapBuffer = new DWORD[6000];
 
 /**
 * Actually calls the real map reload function in halo2.exe
@@ -195,42 +193,41 @@ const char* MapManager::getCustomLobbyMessage() {
 	return this->customLobbyMessage;
 }
 
-std::string MapManager::getMapFilename() {
-	//0x30 (difference from start of maps object to first custom map)
-	//0xB90 (difference between each custom map name)
-	//0x960 (difference between custom map name and its file path
-	DWORD offset;
-	//move to first map
-	DWORD currentMapNameOffset;
-	if (h2mod->Server) {
-		offset = 0x4A70D8;
-		//H2Server.exe+5349B4
-		//H2Server.exe+535C64 (another offset to use if the above fails for whatever reason)
-		currentMapNameOffset = 0x5349B4;
-	}
-	else {
-		offset = 0x482D70;
-		currentMapNameOffset = 0x97737C;
-	}
+enum game_lobby_states : int
+{
+	not_in_lobby = 0,
+	in_lobby,
+	unk1,
+	in_game,
+	unk2,
+	joining_lobby
+};
 
-	//TODO: one day increase map limit (somehow)
-	for (int i = 0; i <= 50; i++) {
-		wchar_t* mapName = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + (i * 0xB90)));
-		wchar_t* mapPath = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + ((i * 0xB90) + 0x960)));
-		if (mapName == NULL || *mapName == L'\0') {
-			//skip empty map names
-			continue;
-		}
-		std::wstring unicodeMapFilename(mapPath);
-		std::string nonUnicodeCustomMapFilename(unicodeMapFilename.begin(), unicodeMapFilename.end());
-		std::size_t offset = nonUnicodeCustomMapFilename.find_last_of("\\");
-		std::size_t extOffset = nonUnicodeCustomMapFilename.find_last_not_of(mapExt);
-		std::string nonUnicodeMapFileName = nonUnicodeCustomMapFilename.substr(offset + 1, extOffset);
-		if (!nonUnicodeMapFileName.empty() && wcscmp(this->getMapName().c_str(), mapName) == 0) {
+std::string MapManager::getMapFilename() {
+
+	//typedef int(__cdecl* get_lobby_state)();
+	//auto p_get_lobby_state = reinterpret_cast<get_lobby_state>(h2mod->GetBase() + 0x1AD660);
+
+	int lobby_ptr = 0;
+	wchar_t map_file_location[256];
+
+	// we want this to work in-game too
+	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ get_lobby_globals_ptr(&lobby_ptr))
+	{
+		memset(map_file_location, NULL, sizeof(map_file_location));
+		get_current_lobby_map_file_location(lobby_ptr, map_file_location, sizeof(map_file_location));
+
+		std::wstring unicodeMapFileLocation(map_file_location);
+		std::string nonUnicodeMapFileLocation(unicodeMapFileLocation.begin(), unicodeMapFileLocation.end());
+		std::size_t mapNameOffset = nonUnicodeMapFileLocation.find_last_of("\\");
+		std::size_t mapNameOffsetEnd = nonUnicodeMapFileLocation.find_last_not_of('.');
+		std::string nonUnicodeMapFileName = nonUnicodeMapFileLocation.substr(mapNameOffset + 1, mapNameOffsetEnd);
+		if (!nonUnicodeMapFileName.empty()) {
 			//if the filename exists and the current map english name is equal to the iterated map name
 			return nonUnicodeMapFileName;
 		}
 	}
+	
 	return "";
 }
 
@@ -343,7 +340,7 @@ bool MapManager::downloadFromRepo(std::string mapFilename) {
 	VirtualProtect(mapsDirectory, 4, PAGE_EXECUTE_READ, &dwBack);
 
 	std::wstring mapFileName(mapsDirectory);
-	VirtualProtect(mapsDirectory, 4, dwBack, NULL);
+	VirtualProtect(mapsDirectory, 4, dwBack, &dwBack);
 	std::string nonUnicodeMapFilePath(mapFileName.begin(), mapFileName.end());
 	nonUnicodeMapFilePath += mapFilename;
 

@@ -352,6 +352,7 @@ void ConsoleCommands::spawn(unsigned int object_datum, int count, float x, float
 
 void ConsoleCommands::output(std::wstring result) {
 	if (h2mod->Server) {
+		result = result + L"\n";
 		h2mod->logToDedicatedServerConsole((wchar_t*)result.c_str());
 	}
 	else {
@@ -430,6 +431,14 @@ void ConsoleCommands::handle_command(std::string command) {
 			output(L"spawn");
 			output(L"controller_sens");
 			output(L"mouse_sens");
+		}
+		else if (firstCommand == "$mapfilename")
+		{
+			std::string map_name_str = mapManager->getMapFilename();
+			std::wstring mapname(map_name_str.begin(), map_name_str.end());
+			std::wstring mapinternalname = mapManager->getMapName();
+			output(mapname);
+			output(mapinternalname);
 		}
 		else if (firstCommand == "$downloadmap") {
 			if (splitCommands.size() != 2) {

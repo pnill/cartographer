@@ -59,5 +59,5 @@ void patchBYTEs(BYTE* orig, BYTE* values, int size) {
 	DWORD dwBack;
 	VirtualProtect(orig, size, PAGE_EXECUTE_READWRITE, &dwBack);
 	memcpy(orig, (BYTE*)values, size);
-	VirtualProtect(orig, size, dwBack, NULL);
+	VirtualProtect(orig, size, dwBack, &dwBack);
 }
