@@ -331,7 +331,7 @@ bool MapManager::downloadFromRepo(std::string mapFilename) {
 		return true;
 	}
 	downloadedMaps.insert(mapFilename);
-	std::string url("http://www.h2pcmt.com/Cartographer/CustomMaps/");
+	std::string url("http://www.h2maps.net/Cartographer/CustomMaps/");
 	url += mapFilename;
 
 	CURL *curl;
