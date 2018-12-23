@@ -262,8 +262,8 @@ signed int __cdecl object_new_hook(void *pObject)
 	object_to_variant[result] = variant_index;
 
 	wchar_t DebugText[255] = { 0 };
-	ZeroMemory(DebugText, 255);
-	wsprintf(DebugText, L"AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result,variant_index);
+	ZeroMemory(DebugText, sizeof(DebugText));
+	wsprintf(DebugText, L"AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result, variant_index);
 
 	TRACE_GAME_N("AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result, variant_index);
 
@@ -374,7 +374,7 @@ int __stdcall set_unit_creation_data_hook(unsigned int object_index, void* objec
 		*(int*)((char*)object_creation_data + 0x24) = object_to_variant[object_index];
 		
 		wchar_t DebugText[255] = { 0 };
-		ZeroMemory(DebugText, 255);
+		ZeroMemory(DebugText, sizeof(DebugText));
 		wsprintf(DebugText, L"AI unit_creation_data_setup hook - object_index: %08X - variant_index: %08X", object_index, object_to_variant[object_index]);
 
 		TRACE_GAME_N("set_unit_creation_data_hook - object_index: %08X, variant_index: %08X", object_index, object_to_variant[object_index]);

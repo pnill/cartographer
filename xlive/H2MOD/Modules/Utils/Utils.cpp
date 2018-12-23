@@ -180,7 +180,7 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* 
 void GetVKeyCodeString(int vkey, char* rtnString, int strLen) {
 	snprintf(rtnString, 5, "0x%x", vkey);
 	char key_name[20];
-	memset(key_name, 0, 1);
+	memset(key_name, 0, sizeof(key_name));
 	if (vkey >= 0x70 && vkey <= 0x87) {
 		int func_num = vkey - 0x70 + 1;
 		snprintf(key_name, 20, "VK_F%d", func_num);
@@ -235,7 +235,7 @@ void pushHostLobby() {
 
 	SOCKET socketDescriptor;
 	struct sockaddr_in serverAddress;
-	if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+	if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET) {
 		addDebugText("ERROR: Could not create socket.");
 	}
 	serverAddress.sin_family = AF_INET;

@@ -34,7 +34,7 @@ void HeadHunter::SpawnSkull(DatumIndex unit_datum)
 			call_add_object_to_sync(GameStateObject);
 		}
 		else
-			delete[] nObject;
+			delete nObject;
 
 	}
 }

@@ -177,7 +177,7 @@ void MapChecksumSync::Calculate()
 		// shared
 		{ "shared", {"64df15c07f2b1f28545774de18b7fee2"} },
 	};
-	maps_status.is_offical;
+	
 	for (auto ilter : builtin_maps)
 	{
 		std::string map_hash;

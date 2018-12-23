@@ -20,7 +20,7 @@ char* TSClient::programPath(char* programInvocation) {
 	int length;
 	char pathsep;
 
-	if (programInvocation == NULL) return strdup("");
+	if (programInvocation == NULL) return _strdup("");
 
 #ifdef _WIN32
 	pathsep = '\\';
@@ -29,7 +29,7 @@ char* TSClient::programPath(char* programInvocation) {
 #endif
 
 	end = strrchr(programInvocation, pathsep);
-	if (!end) return strdup("");
+	if (!end) return _strdup("");
 
 	length = (end - programInvocation) + 2;
 	path = (char*)malloc(length);
@@ -252,7 +252,7 @@ void TSClient::setVoiceActivationLevel(float activationLevel) {
 	ss << activationLevel;
 	std::string s(ss.str());
 
-	if (error = ts3client_setPreProcessorConfigValue(scHandlerID, "voiceactivation_level", s.c_str()) != ERROR_ok) {
+	if ((error = ts3client_setPreProcessorConfigValue(scHandlerID, "voiceactivation_level", s.c_str())) != ERROR_ok) {
 		TRACE("[h2mod-voice] Error setting voice activation level: %d\n", error);
 	}
 }

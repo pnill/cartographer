@@ -414,7 +414,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 
 
 			size = 0;
-			for (int lcv = 0; lcv < dwNumSettingIds; lcv++)
+			for (DWORD lcv = 0; lcv < dwNumSettingIds; lcv++)
 			{
 				int settingType, settingSize, settingId;
 
@@ -517,7 +517,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 
 
 		// read data values
-		for (int lcv = 0; lcv < dwNumSettingIds; lcv++)
+		for (DWORD lcv = 0; lcv < dwNumSettingIds; lcv++)
 		{
 			int settingType, settingSize, settingId;
 
@@ -655,7 +655,7 @@ DWORD WINAPI XUserWriteProfileSettings(DWORD dwUserIndex, DWORD dwNumSettings, c
 		dwUserIndex, dwNumSettings, pSettings, pOverlapped);
 
 
-	for (int lcv = 0; lcv < dwNumSettings; lcv++)
+	for (DWORD lcv = 0; lcv < dwNumSettings; lcv++)
 	{
 		int type, size, id;
 

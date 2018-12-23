@@ -355,7 +355,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 
 		u_long xn = User.xnmap[iplong];
 		
-		if (xn != join_game_xn.ina.s_addr && join_game_xn.ina.s_addr != 0);
+		if (xn != join_game_xn.ina.s_addr && join_game_xn.ina.s_addr != 0)
 		{
 			std::pair <ULONG, SHORT> hostpair = std::make_pair(xn, ntohs(2001));
 			std::pair <ULONG, SHORT> hostpair2 = std::make_pair(xn, htons(2000));

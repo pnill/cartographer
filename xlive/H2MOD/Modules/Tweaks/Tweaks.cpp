@@ -57,7 +57,7 @@ int __stdcall PreReadyLoad() {
 	if (strlen(H2Config_dedi_server_name) > 0) {
 		wchar_t* PreLoadServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
 		swprintf(PreLoadServerName, 32, L"%hs", H2Config_dedi_server_name);
-		char temp[27];
+		char temp[32];
 		snprintf(temp, 32, H2Config_dedi_server_name);
 		MessageBoxA(NULL, temp, "AAA Server Pre name thingy", MB_OK);
 	}
@@ -315,27 +315,27 @@ bool engine_basic_init()
 		for (int i = 1; i < arg_count; i++) {
 			wchar_t* cmd_line_arg = cmd_line_args[i];
 
-			if (wcsicmp(cmd_line_arg, L"-windowed") == 0) {
+			if (_wcsicmp(cmd_line_arg, L"-windowed") == 0) {
 				flags_array[flags::windowed] = 1;
 			}
-			else if (wcsicmp(cmd_line_arg, L"-nosound") == 0) {
+			else if (_wcsicmp(cmd_line_arg, L"-nosound") == 0) {
 				flags_array[flags::nosound] = 1;
 				WriteValue(H2BaseAddr + 0x479EDC, 1);
 			}
-			else if (wcsicmp(cmd_line_arg, L"-novsync") == 0) {
+			else if (_wcsicmp(cmd_line_arg, L"-novsync") == 0) {
 				flags_array[flags::novsync] = 1;
 			}
-			else if (wcsicmp(cmd_line_arg, L"-nointro") == 0) {
+			else if (_wcsicmp(cmd_line_arg, L"-nointro") == 0) {
 				flags_array[flags::nointro] = 1;
 			}
-			else if (wcsnicmp(cmd_line_arg, L"-monitor:", 9) == 0) {
+			else if (_wcsnicmp(cmd_line_arg, L"-monitor:", 9) == 0) {
 				int monitor_id = _wtol(&cmd_line_arg[9]);
 				flags_array[flags::monitor_count] = min(max(0, monitor_id), max_mointor_count);
 			}
-			else if (wcsicmp(cmd_line_arg, L"-highquality") == 0) {
+			else if (_wcsicmp(cmd_line_arg, L"-highquality") == 0) {
 				flags_array[flags::high_quality] = 1;
 			}
-			else if (wcsicmp(cmd_line_arg, L"-depthbiasfix") == 0)
+			else if (_wcsicmp(cmd_line_arg, L"-depthbiasfix") == 0)
 			{
 				// Fixes issue #118
 			    /* g_depth_bias always NULL rather than taking any value from
@@ -343,7 +343,7 @@ bool engine_basic_init()
 				NopFill<8>(reinterpret_cast<DWORD>(GetAddress(0x269FD5)));
 			}
 #ifdef _DEBUG
-			else if (wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
+			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
 				int flag_id = _wtol(&cmd_line_arg[10]);
 				flags_array[min(max(0, flag_id), flags::count - 1)] = 1;
 			}
@@ -867,11 +867,7 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 char _cdecl LoadTagsandMapBases(int a)
 {
 	char(__cdecl* LoadTagsandMapBases_Orig)(int) = (char(__cdecl*)(int))(GetAddress(0x00031348));
-
 	char result = LoadTagsandMapBases_Orig(a);
-
-	RadarPatch();  //PATCHES RADAR IN MULTIPLAYER  DOCUMENTATION FOR YOSHI  #HPV
-
 	return result;
 }
 
@@ -942,7 +938,7 @@ void InitH2Tweaks() {
 		if (H2Config_custom_resolution_x > 0 && H2Config_custom_resolution_y > 0) {
 			if (H2Config_custom_resolution_x != (int)tempResX || H2Config_custom_resolution_y != (int)tempResY) {
 				LSTATUS err;
-				if (err = RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_ALL_ACCESS, &hKeyResolution) == ERROR_SUCCESS) {
+				if ((err = RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_ALL_ACCESS, &hKeyResolution)) == ERROR_SUCCESS) {
 					RegSetValueEx(hKeyResolution, L"ScreenResX", NULL, REG_DWORD, (const BYTE*)&H2Config_custom_resolution_x, sizeof(H2Config_custom_resolution_x));
 					RegSetValueEx(hKeyResolution, L"ScreenResY", NULL, REG_DWORD, (const BYTE*)&H2Config_custom_resolution_y, sizeof(H2Config_custom_resolution_y));
 					RegCloseKey(hKeyResolution);
@@ -998,7 +994,9 @@ void InitH2Tweaks() {
 		VirtualProtect(pfn_c0024fabc, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		WriteJmpTo(H2BaseAddr + 0x4544, is_init_flag_set);
-		PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);
+		//PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);
+
+		RadarPatch();
 
 		WriteJmpTo(GetAddress(0x7E43), WinMain);
 		WriteJmpTo(GetAddress(0x39EA2), is_remote_desktop);
@@ -1279,13 +1277,21 @@ void H2Tweaks::PatchPingMeterCheck() {
 	WriteBytes(H2BaseAddr + 0x1D4E35, assmPatchPingCheck, 2);
 }
 
-float calculate_delta_time(int ticks)
-{
-	return 1.0;
-}
 
+float* xb_tickrate_flt;
+__declspec(naked) void calculate_delta_time(void)
+{
+	__asm
+	{
+		mov eax, xb_tickrate_flt
+		fld dword ptr[eax]
+		fmul dword ptr[esp + 4]
+		retn
+	}
+}
 
 void H2Tweaks::applyPlayersActionsUpdateRatePatch()
 {
-	//PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
+	xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
+	PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
 }
