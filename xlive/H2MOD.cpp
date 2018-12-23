@@ -1140,6 +1140,7 @@ void __cdecl OnMapLoad(int a1)
 	b_GunGame = false;
 	b_Halo2Final = false;
 	b_H2X = false;
+	b_HeadHunter = false;
 
 	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
 	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", h2mod->GetEngineType(), variant_name);
@@ -1171,6 +1172,12 @@ void __cdecl OnMapLoad(int a1)
 		{
 			TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
 			b_H2X = true;
+		}
+
+		if (wcsstr(variant_name, L"GraveRobber") > 0 || wcsstr(variant_name, L"graverobber") > 0)
+		{
+			TRACE_GAME("[h2mod] Head Hunter Turned on!");
+			b_HeadHunter = true;
 		}
 
 		if (tag_instances == NULL)
