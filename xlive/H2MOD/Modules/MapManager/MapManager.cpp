@@ -45,6 +45,8 @@ std::wstring CUSTOM_MAP = L"Custom Map";
 wchar_t EMPTY_UNICODE_STR = '\0';
 std::string EMPTY_STR("");
 
+int downloadPercentage = 0;
+
 /**
 * Constructs the map manager for client/servers
 */
@@ -55,6 +57,8 @@ MapManager::MapManager() {}
 */
 char __cdecl handle_map_download_callback()
 {
+	downloadPercentage = 0;
+
 	auto mapDownload = []()
 	{
 		DWORD* mapDownloadStatus = reinterpret_cast<DWORD*>(h2mod->GetBase() + 0x422570);
@@ -98,6 +102,11 @@ void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16
 	p_map_downloading_menu_constructor(a1, a2, a3, a4, reinterpret_cast<int>(handle_map_download_callback), leave_game_callback, a7, a8, a9, a10);
 }
 
+int __cdecl get_total_map_downloading_percentage()
+{
+	return downloadPercentage;
+}
+
 /**
 * Makes changes to game functionality
 */
@@ -108,6 +117,10 @@ void MapManager::gamePatches()
 	WriteBytes(h2mod->GetBase() + 0x215A9E, jmp, 1); /* Allow map download in network */
 	WriteBytes(h2mod->GetBase() + 0x215AC9, jmp, 1); /* Disable "Match has begun" bullshit */
 	PatchCall(h2mod->GetBase() + 0x244A4A, display_map_downloading_menu); /* Redirect the menu constructor to our code to replace the game's map downloading code callback */
+
+	// code below is for percentage display
+	PatchCall(h2mod->GetBase() + 0x244B77, get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
+
 }
 
 std::string MapManager::getMapFilenameToDownload()
@@ -377,7 +390,7 @@ static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ul
 			mapManager->precalculatedDownloadPercentageStrings[i] = downloadMsg;
 		}
 	}
-	int downloadPercentage = ((double)dlnow / (double)dltotal) * 100;
+	downloadPercentage = ((double)dlnow / (double)dltotal) * 100;
 	mapManager->setCustomLobbyMessage(mapManager->precalculatedDownloadPercentageStrings[downloadPercentage].c_str());
 	return 0;
 }

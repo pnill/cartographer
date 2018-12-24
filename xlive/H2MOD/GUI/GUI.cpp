@@ -654,9 +654,9 @@ int WINAPI XLiveRender()
 			}
 #pragma endregion achievement rendering
 
-			if (GameEngine == 3 && mapManager->getCustomLobbyMessage() != NULL) {
-				drawText(0, 30, COLOR_GOLD, mapManager->getCustomLobbyMessage(), normalSizeFont);
-			}
+			/*if (GameEngine == 3 && mapManager->getCustomLobbyMessage() != NULL) {
+				DrawText(0, 30, COLOR_GOLD, mapManager->getCustomLobbyMessage(), normalSizeFont);
+			}*/
 
 			if (displayXyz && !isLobby && gameManager->isHost()) {
 				//only display xyz for host
