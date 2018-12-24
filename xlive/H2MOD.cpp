@@ -55,6 +55,24 @@ int get_player_index_from_datum(DatumIndex unit_datum)
 	return unit_object->PlayerDatum.ToAbsoluteIndex();
 }
 
+enum game_lobby_states : int
+{
+	not_in_lobby,
+	in_lobby,
+	unk1,
+	in_game,
+	unk2,
+	joining_lobby
+};
+
+game_lobby_states call_get_lobby_state()
+{
+	typedef game_lobby_states(__cdecl* get_lobby_state)();
+	auto p_get_lobby_state = reinterpret_cast<get_lobby_state>(h2mod->GetBase() + 0x1AD660);
+
+	return p_get_lobby_state();
+}
+
 #pragma region engine calls
 
 
@@ -441,6 +459,32 @@ EngineType H2MOD::GetEngineType()
 	} 
 }
 
+char get_lobby_globals_ptr(int* a1)
+{
+	typedef char(__cdecl* get_lobby_globals_ptr)(int *ptr);
+	auto p_get_lobby_globals_ptr = reinterpret_cast<get_lobby_globals_ptr>(h2mod->GetBase() + ((h2mod->Server) ? 0x1A66B3 : 0x1AD736));
+
+	return p_get_lobby_globals_ptr(a1);
+}
+
+char get_current_lobby_map_file_location(int thisx, wchar_t* buffer, size_t szBuffer)
+{
+	// host-only
+	typedef char(__thiscall* get_map_file_location_impl)(int thisx, wchar_t* buffer, size_t szBuffer);
+	auto p_get_map_file_location_impl = reinterpret_cast<get_map_file_location_impl>(h2mod->GetBase() + ((h2mod->Server) ? 0x19CD4A : 0x1C5678));
+
+	return p_get_map_file_location_impl(thisx, buffer, szBuffer);
+}
+
+void get_map_internal_name(int a1, wchar_t* buffer)
+{
+	// doesn't work on dedicated servers
+	typedef void(__cdecl* get_map_internal_name_impl)(int a1, wchar_t* buffer);
+	auto p_map_internal_name_impl = reinterpret_cast<get_map_internal_name_impl>(h2mod->GetBase() + ((h2mod->Server) ? 0x2094E2 : 0x22E58A));
+
+	p_map_internal_name_impl(a1, buffer); 
+}
+
 inline wchar_t* H2MOD::GetLobbyGameVariantName()
 {
 	return (wchar_t*)(h2mod->GetBase() + ((h2mod->Server) ? 0x534A18 : 0x97777C));
@@ -486,10 +530,6 @@ typedef int(__cdecl *show_error_screen)(int a1, signed int a2, int a3, __int16 a
 show_error_screen show_error_screen_method;
 
 int __cdecl showErrorScreen(int a1, signed int a2, int a3, __int16 a4, int a5, int a6) {
-	if (a2 == 280) {
-		//280 is special here, the constant is used when a custom map cannot be loaded for clients
-		return 0;
-	}
 	if (a2 == 0x117)
 	{
 		TRACE_FUNC("Ignoring need to reinstall maps");
@@ -546,20 +586,20 @@ void H2MOD::logToDedicatedServerConsole(wchar_t* message) {
 	dedi_print_method((const char*)(message));
 }
 
-typedef int(__cdecl *dedi_command_hook)(int a1, int a2, char a3);
+typedef int(__cdecl *dedi_command_hook)(wchar_t** a1, int a2, char a3);
 dedi_command_hook dedi_command_hook_method;
 
-int __cdecl dediCommandHook(int a1, int a2, int a3) {
-	unsigned __int16* ptr = *(unsigned __int16 **)a1;
-	const wchar_t* text = (wchar_t*)ptr;
-	wchar_t c = text[0];
-	if (c == L'$') {
-		h2mod->logToDedicatedServerConsole(L"Running chatbox command\n");
+int __cdecl dediCommandHook(wchar_t** command_line_args, int a2, int a3) {
+	
+	wchar_t* command = command_line_args[0];
+	std::wstring wsCommand(command);
+	if (command[0] == L'$') {
+		h2mod->logToDedicatedServerConsole(L"Running custom command\n");
 		//run the chatbox commands
-		h2mod->handle_command(std::wstring(text));
+		h2mod->handle_command(wsCommand);
 	}
 
-	return dedi_command_hook_method(a1, a2, a3);
+	return dedi_command_hook_method(command_line_args, a2, a3);
 }
 
 bool H2MOD::is_team_play() {
@@ -1876,7 +1916,6 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetBase() + 0x85F73, filo_write__encrypted_data_hook);
 
 
-
 		if (tsServer == NULL) {
 			//TODO: move into method
 			tsServer = new TSServer(true);
@@ -1887,6 +1926,8 @@ void H2MOD::ApplyHooks() {
 
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(h2mod->GetBase() + ((!h2mod->Server) ? 0x58789 : 0x60C81), (DWORD)OnAutoPickUpHandler);
+
+	mapManager->applyGamePatches();
 
 	//apply any network hooks
 	network->applyNetworkHooks();
@@ -1920,8 +1961,6 @@ void H2MOD::Initialize()
 			Mouseinput::Initialize();
 
 		PatchGameDetailsCheck();
-		//H2Tweaks::PatchPingMeterCheck();
-		void disableLiveMenus(); //until ready
 
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
@@ -1941,7 +1980,6 @@ void H2MOD::Initialize()
 	TRACE_GAME("H2MOD - Initialized v0.4a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
 
-	//Network::Initialize();
 	h2mod->ApplyHooks();
 }
 
