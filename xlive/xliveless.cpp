@@ -1279,12 +1279,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 	if (hEnum == ServerEnum)
 	{
-		pOverlapped->InternalHigh = ERROR_IO_INCOMPLETE;
-		pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
-
-		if (!LiveManager.GetRunning() && LiveManager.servers_left == 0)
-			LiveManager.GetServers(pOverlapped, pvBuffer);
-
+		LiveManager.GetServers(pOverlapped, pvBuffer);
 
 		return ERROR_IO_PENDING;
 

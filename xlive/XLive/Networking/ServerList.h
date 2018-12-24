@@ -74,8 +74,6 @@ class ServerList
 	std::thread serv_thread;
 
 public:
-	_XLOCATOR_SEARCHRESULT *servers;
-
 	std::atomic<bool> running = false;
 	bool completed = false;
 	int servers_left = 0;

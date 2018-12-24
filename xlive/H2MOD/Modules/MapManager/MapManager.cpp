@@ -111,7 +111,7 @@ wchar_t receiving_map_wstr[] = L"You are receiving the map from %s. \r\nPlease w
 wchar_t* get_receiving_map_string()
 { 
 	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x381fd);
-	wchar_t** str_array = (wchar_t**)(h2mod->GetBase() + 0x4657C5);
+	wchar_t** str_array = (wchar_t**)(h2mod->GetBase() + 0x46575C);
 
 	if (get_default_game_language() == 0) // check if english
 		return receiving_map_wstr;
