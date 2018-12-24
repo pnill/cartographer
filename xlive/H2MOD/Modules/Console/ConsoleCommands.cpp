@@ -498,7 +498,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			h2mod_set_team *set_team = teampak.mutable_h2_set_player_team();
 			set_team->set_team(atoi(secondArg.c_str()));
 
-			//network->send_h2mod_packet_player(atoi(firstArg.c_str()), teampak);
+			network->send_h2mod_packet_player(atoi(firstArg.c_str()), teampak);
 		}
 		else if (firstCommand == "$menu_test") {
 			//CreditsMenu_list *menu_test = new CreditsMenu_list(0xFF000006);

@@ -2,7 +2,7 @@
 #include <H2MOD\protobuf\h2mod.pb.h>
 #include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
 
-using namespace std; 
+using namespace std::chrono_literals;
 
 time_t start2 = time(0);
 
@@ -50,8 +50,7 @@ void startGameThread() {
 									TRACE_GAME_N("[h2mod-network] map file name from packet %s", mapFilename.c_str());
 									if (!mapManager->hasCustomMap(mapFilename)) {
 										//TODO: set map filesize
-										//TODO: if downloading from repo files, try p2p
-										mapManager->downloadFromRepo(mapFilename);
+										mapManager->setMapFileNameToDownload(mapFilename);
 									}
 									else {
 										TRACE_GAME_N("[h2mod-network] already has map %s", mapFilename.c_str());
@@ -73,19 +72,8 @@ void startGameThread() {
 				}
 			}
 
-			std::string mapFilenameToDownload = mapManager->getMapFilenameToDownload();
-			if (!mapFilenameToDownload.empty()) {
-				TRACE_GAME_N("[h2mod-network] map file name from membership packet %s", mapFilenameToDownload.c_str());
-				if (!mapManager->hasCustomMap(mapFilenameToDownload)) {
-					//TODO: set map filesize
-					//TODO: if downloading from repo files, try p2p
-					mapManager->downloadFromRepo(mapFilenameToDownload);
-				}
-				else {
-					TRACE_GAME_N("[h2mod-network] already has map %s", mapFilenameToDownload.c_str());
-				}
-				mapManager->setMapFileNameToDownload(EMPTY_STR2);
-			}
+			
+			
 		}
 		std::this_thread::sleep_for(1s);
 	}

@@ -50,6 +50,58 @@ std::string EMPTY_STR("");
 */
 MapManager::MapManager() {}
 
+/**
+* Download map callback
+*/
+char __cdecl handle_map_download_callback()
+{
+	auto mapDownload = []()
+	{
+		if (!mapManager->getMapFilenameToDownload().empty())
+		{
+			TRACE_GAME_N("[h2mod-network] map file name from membership packet %s", mapManager->getMapFilenameToDownload().c_str());
+			if (!mapManager->hasCustomMap(mapManager->getMapFilenameToDownload())) {
+				//TODO: set map filesize
+				//TODO: if downloading from repo files, try p2p
+				mapManager->downloadFromRepo(mapManager->getMapFilenameToDownload());
+			}
+			else {
+				TRACE_GAME_N("[h2mod-network] already has map %s", mapManager->getMapFilenameToDownload().c_str());
+			}
+			mapManager->setMapFileNameToDownload("");
+		}
+	};
+
+	std::thread(mapDownload).detach();
+
+	return 1;
+}
+
+/**
+* Menu constructor hook
+*/
+void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16 a4, int map_download_callback, int leave_game_callback, int a7, int a8, int a9, int a10)
+{
+	typedef void(__cdecl* map_downloading_menu_constructor)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6, int a7, int a8, int a9, int a10);
+	auto p_map_downloading_menu_constructor = (map_downloading_menu_constructor)(h2mod->GetBase() + 0x20E2E0);
+
+	// TODO: place a timer so if the player doesn't choose any option from the menu they get kicked out in order to stop afks or trolls
+
+	p_map_downloading_menu_constructor(a1, a2, a3, a4, reinterpret_cast<int>(handle_map_download_callback), leave_game_callback, a7, a8, a9, a10);
+}
+
+/**
+* Makes changes to game functionality
+*/
+void MapManager::gamePatches()
+{
+	BYTE jmp[1] = { 0xEB };
+
+	WriteBytes(h2mod->GetBase() + 0x215A9E, jmp, 1); /* Allow map download in network */
+	WriteBytes(h2mod->GetBase() + 0x215AC9, jmp, 1); /* Disable "Match has begun" bullshit */
+	PatchCall(h2mod->GetBase() + 0x244A4A, display_map_downloading_menu); /* Redirect the menu constructor to our code to replace the game's map downloading code callback */
+}
+
 std::string MapManager::getMapFilenameToDownload()
 {
 	return this->mapFilenameToDownload;
@@ -102,7 +154,7 @@ std::wstring MapManager::getMapName() {
 
 	DWORD dwBack;
 	//set r/w access on string so we don't have any issues when we do the implicit copy below
-	VirtualProtect((LPVOID)currentMapName, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	VirtualProtect((LPVOID)currentMapName, 4, PAGE_READWRITE, &dwBack);
 	std::wstring ucurrentMapName(currentMapName);
 	VirtualProtect((LPVOID)currentMapName, 4, dwBack, &dwBack);
 
@@ -125,8 +177,8 @@ bool MapManager::hasCustomMap(std::string mapName) {
 bool MapManager::hasCustomMap(std::wstring mapName) {
 	DWORD dwBack;
 	wchar_t* mapsDirectory = (wchar_t*)(h2mod->GetBase() + 0x482D70 + 0x2423C);
-	VirtualProtect(mapsDirectory, 4, PAGE_EXECUTE_READ, &dwBack);
 
+	VirtualProtect(mapsDirectory, 4, PAGE_READWRITE, &dwBack);
 	std::wstring mapFileName(mapsDirectory);
 	VirtualProtect(mapsDirectory, 4, dwBack, &dwBack);
 
@@ -296,7 +348,7 @@ void MapManager::sendMapInfoPacket()
 	//TODO: send over size so p2p can work easier
 	map_info->set_mapsize(0);
 
-//	network->send_h2mod_packet(teampak);
+	network->send_h2mod_packet(teampak);
 
 #ifdef _DEBUG
 	_CrtSetDbgFlag(tmpFlagOrig);

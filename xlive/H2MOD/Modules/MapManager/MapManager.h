@@ -20,6 +20,7 @@ public:
 	bool hasCustomMap(std::wstring mapName);
 
 	//client functions/data below
+	void gamePatches();
 	std::string getMapFilenameToDownload();
 	void setMapFileNameToDownload(std::string mapFilenameToDownload);
 	void startListeningForClients();

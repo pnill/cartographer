@@ -512,10 +512,6 @@ typedef int(__cdecl *show_error_screen)(int a1, signed int a2, int a3, __int16 a
 show_error_screen show_error_screen_method;
 
 int __cdecl showErrorScreen(int a1, signed int a2, int a3, __int16 a4, int a5, int a6) {
-	if (a2 == 280) {
-		//280 is special here, the constant is used when a custom map cannot be loaded for clients
-		return 0;
-	}
 	if (a2 == 0x117)
 	{
 		TRACE_FUNC("Ignoring need to reinstall maps");
@@ -1764,6 +1760,8 @@ void H2MOD::ApplyHooks() {
 		/* These hooks are only built for the client, don't enable them on the server! */
 		DWORD dwBack;
 
+		mapManager->gamePatches();
+
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc((BYTE*)this->GetBase() + 0x1B4C14, (BYTE*)VerifyGameVersionOnJoin, 5);
 		VirtualProtect(p_verify_game_version_on_join, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
@@ -1902,7 +1900,6 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetBase() + 0x85F73, filo_write__encrypted_data_hook);
 
 
-
 		if (tsServer == NULL) {
 			//TODO: move into method
 			tsServer = new TSServer(true);
@@ -1946,8 +1943,6 @@ void H2MOD::Initialize()
 			Mouseinput::Initialize();
 
 		PatchGameDetailsCheck();
-		//H2Tweaks::PatchPingMeterCheck();
-		void disableLiveMenus(); //until ready
 
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
@@ -1967,7 +1962,6 @@ void H2MOD::Initialize()
 	TRACE_GAME("H2MOD - Initialized v0.4a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
 
-	//Network::Initialize();
 	h2mod->ApplyHooks();
 }
 
