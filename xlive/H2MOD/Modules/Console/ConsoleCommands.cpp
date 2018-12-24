@@ -686,16 +686,14 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 			std::string sensVal = splitCommands[1];
-			char *cstr = new char[sensVal.length() + 1];
-			strcpy(cstr, sensVal.c_str());
 
-			if (isNum(cstr)) {
+			if (isNum(sensVal.c_str())) {
 				H2Tweaks::setSens(CONTROLLER, stoi(sensVal));
 			}
 			else {
 				output(L"Wrong input! Use a number.");
 			}
-			delete[] cstr;
+
 		}
 		else if (firstCommand == "$mouse_sens") {
 			if (splitCommands.size() != 2) {
@@ -703,16 +701,14 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 			std::string sensVal = splitCommands[1];
-			char *cstr = new char[sensVal.length() + 1];
-			strcpy(cstr, sensVal.c_str());
 
-			if (isNum(cstr)) {
+			if (isNum(sensVal.c_str())) {
 				H2Tweaks::setSens(MOUSE, stoi(sensVal));
 			}
 			else {
 				output(L"Wrong input! Use a number.");
 			}
-			delete[] cstr;
+
 		}
 		else {
 			output(L"Unknown command.");
