@@ -55,6 +55,24 @@ int get_player_index_from_datum(DatumIndex unit_datum)
 	return unit_object->PlayerDatum.ToAbsoluteIndex();
 }
 
+enum game_lobby_states : int
+{
+	not_in_lobby,
+	in_lobby,
+	unk1,
+	in_game,
+	unk2,
+	joining_lobby
+};
+
+game_lobby_states call_get_lobby_state()
+{
+	typedef game_lobby_states(__cdecl* get_lobby_state)();
+	auto p_get_lobby_state = reinterpret_cast<get_lobby_state>(h2mod->GetBase() + 0x1AD660);
+
+	return p_get_lobby_state();
+}
+
 #pragma region engine calls
 
 
@@ -1909,7 +1927,7 @@ void H2MOD::ApplyHooks() {
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(h2mod->GetBase() + ((!h2mod->Server) ? 0x58789 : 0x60C81), (DWORD)OnAutoPickUpHandler);
 
-	mapManager->gamePatches();
+	mapManager->applyGamePatches();
 
 	//apply any network hooks
 	network->applyNetworkHooks();

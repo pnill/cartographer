@@ -107,13 +107,33 @@ int __cdecl get_total_map_downloading_percentage()
 	return downloadPercentage;
 }
 
+wchar_t receiving_map_wstr[] = L"You are receiving the map from %s. \r\nPlease wait...%i%%";
+wchar_t* get_receiving_map_string()
+{ 
+	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x381fd);
+	wchar_t** str_array = (wchar_t**)(h2mod->GetBase() + 0x4657C5);
+
+	if (get_default_game_language() == 0) // check if english
+		return receiving_map_wstr;
+
+	return str_array[get_default_game_language()];
+}
+
+wchar_t repo_wstr[] = L"repository";
+void get_map_download_source_str(int a1, wchar_t* buffer)
+{	
+	if (buffer == NULL)
+		return;
+
+	wcsncpy_s(buffer, 512, repo_wstr, -1);
+}
+
 /**
 * Makes changes to game functionality
 */
-void MapManager::gamePatches() {
+void MapManager::applyGamePatches() {
 
 	if (!h2mod->Server) {
-		// CLIENT
 
 		BYTE jmp[1] = { 0xEB };
 
@@ -124,9 +144,8 @@ void MapManager::gamePatches() {
 		// code below is for percentage display
 		PatchCall(h2mod->GetBase() + 0x244B77, get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
 		PatchCall(h2mod->GetBase() + 0x22EE41, get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
-	}
-	else {
-		// DEDICATED SERVER
+		PatchCall(h2mod->GetBase() + 0x244B8F, get_map_download_source_str);
+		PatchCall(h2mod->GetBase() + 0x244B9D, get_receiving_map_string);
 	}
 
 	// disables game's map downloading implementation
@@ -276,20 +295,8 @@ const char* MapManager::getCustomLobbyMessage() {
 	return this->customLobbyMessage;
 }
 
-enum game_lobby_states : int
-{
-	not_in_lobby = 0,
-	in_lobby,
-	unk1,
-	in_game,
-	unk2,
-	joining_lobby
-};
 
 std::string MapManager::getMapFilename() {
-
-	//typedef int(__cdecl* get_lobby_state)();
-	//auto p_get_lobby_state = reinterpret_cast<get_lobby_state>(h2mod->GetBase() + 0x1AD660);
 
 	int lobby_ptr = 0;
 	wchar_t map_file_location[256];
