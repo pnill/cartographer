@@ -57,6 +57,11 @@ char __cdecl handle_map_download_callback()
 {
 	auto mapDownload = []()
 	{
+		DWORD* mapDownloadStatus = reinterpret_cast<DWORD*>(h2mod->GetBase() + 0x422570);
+
+		// set the game to downloading map state
+		*mapDownloadStatus = -1;
+
 		if (!mapManager->getMapFilenameToDownload().empty())
 		{
 			TRACE_GAME_N("[h2mod-network] map file name from membership packet %s", mapManager->getMapFilenameToDownload().c_str());
@@ -70,6 +75,9 @@ char __cdecl handle_map_download_callback()
 			}
 			mapManager->setMapFileNameToDownload("");
 		}
+
+		// set the game to map is loaded state
+		*mapDownloadStatus = 0;
 	};
 
 	std::thread(mapDownload).detach();
