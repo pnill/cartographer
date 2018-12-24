@@ -1760,8 +1760,6 @@ void H2MOD::ApplyHooks() {
 		/* These hooks are only built for the client, don't enable them on the server! */
 		DWORD dwBack;
 
-		mapManager->gamePatches();
-
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc((BYTE*)this->GetBase() + 0x1B4C14, (BYTE*)VerifyGameVersionOnJoin, 5);
 		VirtualProtect(p_verify_game_version_on_join, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
@@ -1910,6 +1908,8 @@ void H2MOD::ApplyHooks() {
 
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(h2mod->GetBase() + ((!h2mod->Server) ? 0x58789 : 0x60C81), (DWORD)OnAutoPickUpHandler);
+
+	mapManager->gamePatches();
 
 	//apply any network hooks
 	network->applyNetworkHooks();

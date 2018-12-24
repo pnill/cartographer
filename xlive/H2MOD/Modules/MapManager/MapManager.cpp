@@ -110,17 +110,27 @@ int __cdecl get_total_map_downloading_percentage()
 /**
 * Makes changes to game functionality
 */
-void MapManager::gamePatches()
-{
-	BYTE jmp[1] = { 0xEB };
+void MapManager::gamePatches() {
 
-	WriteBytes(h2mod->GetBase() + 0x215A9E, jmp, 1); /* Allow map download in network */
-	WriteBytes(h2mod->GetBase() + 0x215AC9, jmp, 1); /* Disable "Match has begun" bullshit */
-	PatchCall(h2mod->GetBase() + 0x244A4A, display_map_downloading_menu); /* Redirect the menu constructor to our code to replace the game's map downloading code callback */
+	if (!h2mod->Server) {
+		// CLIENT
 
-	// code below is for percentage display
-	PatchCall(h2mod->GetBase() + 0x244B77, get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
+		BYTE jmp[1] = { 0xEB };
 
+		WriteBytes(h2mod->GetBase() + 0x215A9E, jmp, 1); /* Allow map download in network */
+		WriteBytes(h2mod->GetBase() + 0x215AC9, jmp, 1); /* Disable "Match has begun" bullshit */
+		PatchCall(h2mod->GetBase() + 0x244A4A, display_map_downloading_menu); /* Redirect the menu constructor to our code to replace the game's map downloading code callback */
+
+		// code below is for percentage display
+		PatchCall(h2mod->GetBase() + 0x244B77, get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
+		PatchCall(h2mod->GetBase() + 0x22EE41, get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
+	}
+	else {
+		// DEDICATED SERVER
+	}
+
+	// disables game's map downloading implementation
+	NopFill<5>(h2mod->GetBase() + (h2mod->Server ? 0x1A917F : 0x1B5421));
 }
 
 std::string MapManager::getMapFilenameToDownload()
