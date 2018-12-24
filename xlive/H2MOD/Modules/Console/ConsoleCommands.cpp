@@ -457,25 +457,21 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid kick command, usage - $kick PLAYER_INDEX");
 				return;
 			}
-			std::string firstArg = splitCommands[1];
-			char *cstr = new char[firstArg.length() + 1];
-			strcpy(cstr, firstArg.c_str());
-
 			if (!gameManager->isHost()) {
 				output(L"Only the server can kick players");
+				return;
 			}
-			else {
-				if (isNum(cstr)) {
-					int peerIndex = atoi(cstr);
-					if (peerIndex == 0) {
-						delete[] cstr;
-						output(L"Don't kick yourself");
-						return;
-					}
-					h2mod->kick_player(peerIndex);
+
+			std::string firstArg = splitCommands[1];
+
+			if (isNum(firstArg.c_str())) {
+				int peerIndex = atoi(firstArg.c_str());
+				if (peerIndex == 0) {
+					output(L"Don't kick yourself");
+					return;
 				}
+				h2mod->kick_player(peerIndex);
 			}
-			delete[] cstr;
 		}
 		else if (firstCommand == "$logplayers") {
 			if (!gameManager->isHost()) {
@@ -542,33 +538,27 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			std::string firstArg = splitCommands[1];
-			char *cstr = new char[firstArg.length() + 1];
-			strcpy(cstr, firstArg.c_str());
-
+			std::string secondArg = splitCommands[1];
 			DWORD lobby_globals = *(DWORD*)((char*)h2mod->GetBase() + 0x420FE8);
 			BYTE playerNumber = *(BYTE*)(lobby_globals + 0x1254);
 
-			if (isNum(cstr)) {
-				delete[] cstr;
+			if (isNum(secondArg.c_str())) {
 
-				int maxPlayersSet = stoi(firstArg);
-				if (maxPlayersSet < 1 || maxPlayersSet > 16) {
+				int maxPlayersToSet = atoi(secondArg.c_str());
+				if (maxPlayersToSet < 1 || maxPlayersToSet > 16) {
 					output(L"The value needs to be between 1 and 16.");
 					return;
 				}
-
-				if (maxPlayersSet < playerNumber) {
+				if (maxPlayersToSet < playerNumber) {
 					output(L"You can't set a value of max players smaller than the actual number of players on the server.");
 					return;
 				}
 				else {
-					*(BYTE*)(lobby_globals + 0x4C80) = maxPlayersSet;
+					*(BYTE*)(lobby_globals + 0x4C80) = static_cast<BYTE>(maxPlayersToSet);
 					output(L"Maximum players set");
 					return;
 				}
 			}
-			delete[] cstr;
 		}
 		else if (firstCommand == "$resetspawncommandlist") {
 			//reset checked_for_ids, so you can reload new object_datums at runtime
