@@ -4,6 +4,11 @@
 
 extern void __cdecl call_hs_object_destroy_datum(DatumIndex object_datum_index); // need to fix some shit so I don't have to do this.
 
+std::wstring SKULL_SCORED_SOUND1(L"sounds/skull_scored.wav");
+std::wstring HEADHUNTER_SOUND1(L"sounds/headhunter.wav");
+const wchar_t* SKULL_SCORED_SOUND = SKULL_SCORED_SOUND1.c_str();
+const wchar_t* HEADHUNTER_SOUND = HEADHUNTER_SOUND1.c_str();
+
 HeadHunter::HeadHunter()
 {
 	this->deinitializer = new HeadHunterDeinitializer();
@@ -15,6 +20,14 @@ HeadHunter::HeadHunter()
 	this->itemInteraction = new HeadHunterItmInteraction();
 }
 
+void HeadHunter::triggerSound(const wchar_t* name, int sleep) {
+	TRACE_GAME("[h2mod-headhunter] Triggering sound %s", name);
+	std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+	h2mod->SoundMap[(wchar_t*)name] = sleep;
+	//unlock immediately after modifying sound map
+	lck.unlock();
+	h2mod->sound_cv.notify_one();
+}
 
 void HeadHunter::SpawnSkull(DatumIndex unit_datum)
 {
@@ -73,12 +86,20 @@ void HeadHunterHandler::SetDeadPlayer(DatumIndex dead_datum)
 	this->DeadPlayer = dead_datum;
 }
 
-bool HeadHunterHandler::SetInteractedObject(DatumIndex object_datum)
+bool HeadHunterHandler::SetInteractedObject(DatumIndex object_datum, int playerIndex)
 {
+	wchar_t* playername = h2mod->get_player_name_from_index(playerIndex);
 	if ((&game_state_objects_header->object_header[object_datum.Index])->object->DefinitionIndex.Index == (Weapon::ball & 0xFFFF))
 	{
 		this->object_interaction = object_datum;
-		return true;
+		if (wcscmp(playername, h2mod->get_local_player_name()) == 0) {
+			HeadHunter::triggerSound(SKULL_SCORED_SOUND, 100);
+			return true;
+		}
+		else
+		{
+			return true;
+		}
 	}
 	else
 	{ 
