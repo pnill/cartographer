@@ -1279,8 +1279,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 	if (hEnum == ServerEnum)
 	{
-		LiveManager.GetServers(pOverlapped, pvBuffer);
-
+		LiveManager.GetServers(pOverlapped, cbBuffer, pvBuffer);
 		return ERROR_IO_PENDING;
 
 		/*

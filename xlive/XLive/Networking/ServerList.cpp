@@ -232,7 +232,7 @@ void QueryServerData(ULONGLONG xuid,_XLOCATOR_SEARCHRESULT* nResult)
 	++LiveManager.total_servers;
 }
 
-void GetServersFromHttp(ServerList* servptr,PXOVERLAPPED pOverlapped, char* pvBuffer)
+void GetServersFromHttp(ServerList* servptr,PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBuffer)
 {
 	servptr->running = true;
 	
@@ -255,6 +255,17 @@ void GetServersFromHttp(ServerList* servptr,PXOVERLAPPED pOverlapped, char* pvBu
 		
 		int server_count = document["servers"].Size();
 		servptr->servers_left = server_count;
+
+		if (server_count * sizeof(_XLOCATOR_SEARCHRESULT) > cbBuffer) {
+			
+			servptr->running = false;
+			servptr->servers_left = -1;
+			
+			pOverlapped->InternalLow = ERROR_INSUFFICIENT_BUFFER;
+			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
+
+			return;
+		}
 
 		_XLOCATOR_SEARCHRESULT* server_buffer = reinterpret_cast<XLOCATOR_SEARCHRESULT*>(pvBuffer);
 
@@ -327,7 +338,7 @@ bool ServerList::GetRunning()
 	return running;
 }
 
-void ServerList::GetServers(PXOVERLAPPED pOverlapped, char* pvBuffer)
+void ServerList::GetServers(PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBuffer)
 {
 	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
 	pOverlapped->InternalHigh = ERROR_IO_INCOMPLETE;
@@ -336,11 +347,10 @@ void ServerList::GetServers(PXOVERLAPPED pOverlapped, char* pvBuffer)
 	if (!this->running && this->servers_left == -1)
 	{
 		this->total_servers = 0;
-		this->serv_thread = std::thread(GetServersFromHttp, this, pOverlapped, pvBuffer);
+		this->serv_thread = std::thread(GetServersFromHttp, this, pOverlapped, cbBuffer, pvBuffer);
 		this->serv_thread.detach();
 	}
 
-	// If no more servers to get, set no more files flag
 	if (this->servers_left == 0)
 	{
 		// reset servers_left to "unitialized state"
@@ -350,6 +360,7 @@ void ServerList::GetServers(PXOVERLAPPED pOverlapped, char* pvBuffer)
 		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
 		pOverlapped->InternalHigh = this->GetTotalServers();
 	}
+
 }
 
 
@@ -534,7 +545,6 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, DWORD* pcbBuffer, PHANDLE phEnum)
 {
 	TRACE("XLocatorCreateServerEnumerator");
-
 
 	*pcbBuffer = (DWORD)(sizeof(_XLOCATOR_SEARCHRESULT) * (LiveManager.total_count + 10));
 
