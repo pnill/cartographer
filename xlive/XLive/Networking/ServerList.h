@@ -74,11 +74,9 @@ class ServerList
 	std::thread serv_thread;
 
 public:
-	_XLOCATOR_SEARCHRESULT *servers;
-
 	std::atomic<bool> running = false;
 	bool completed = false;
-	int servers_left = 0;
+	int servers_left = -1;
 	int total_servers = 0;
 
 	int total_count = 0;
@@ -88,7 +86,7 @@ public:
 	int total_peer_gold = 0;
 
 	bool GetRunning();
-	void GetServers(PXOVERLAPPED,char*);
+	void GetServers(PXOVERLAPPED, DWORD, char*);
 	int GetServersLeft();
 	int GetTotalServers();
 	void RemoveServer();

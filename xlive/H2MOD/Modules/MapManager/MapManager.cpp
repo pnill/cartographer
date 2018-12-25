@@ -72,12 +72,18 @@ char __cdecl handle_map_download_callback()
 			if (!mapManager->hasCustomMap(mapManager->getMapFilenameToDownload())) {
 				//TODO: set map filesize
 				//TODO: if downloading from repo files, try p2p
-				mapManager->downloadFromRepo(mapManager->getMapFilenameToDownload());
+				if (!mapManager->downloadFromRepo(mapManager->getMapFilenameToDownload()))
+					h2mod->exit_game(); // download has failed
 			}
 			else {
 				TRACE_GAME_N("[h2mod-network] already has map %s", mapManager->getMapFilenameToDownload().c_str());
 			}
 			mapManager->setMapFileNameToDownload("");
+		}
+		else 
+		{
+			// no map filename (probably packet hasn't been received)
+			h2mod->exit_game();
 		}
 
 		// set the game to map is loaded state
@@ -111,7 +117,7 @@ wchar_t receiving_map_wstr[] = L"You are receiving the map from %s. \r\nPlease w
 wchar_t* get_receiving_map_string()
 { 
 	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x381fd);
-	wchar_t** str_array = (wchar_t**)(h2mod->GetBase() + 0x4657C5);
+	wchar_t** str_array = (wchar_t**)(h2mod->GetBase() + 0x46575C);
 
 	if (get_default_game_language() == 0) // check if english
 		return receiving_map_wstr;

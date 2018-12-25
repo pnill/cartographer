@@ -227,14 +227,12 @@ void QueryServerData(ULONGLONG xuid,_XLOCATOR_SEARCHRESULT* nResult)
 			
 			current_property++;
 		}
-		
 	}
+
+	++LiveManager.total_servers;
 }
 
-
-
-
-void GetServersFromHttp(ServerList* servptr,PXOVERLAPPED pOverlapped, char* pvBuffer)
+void GetServersFromHttp(ServerList* servptr,PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBuffer)
 {
 	servptr->running = true;
 	
@@ -258,36 +256,34 @@ void GetServersFromHttp(ServerList* servptr,PXOVERLAPPED pOverlapped, char* pvBu
 		int server_count = document["servers"].Size();
 		servptr->servers_left = server_count;
 
-		servptr->servers = new _XLOCATOR_SEARCHRESULT[server_count];
+		if (server_count * sizeof(_XLOCATOR_SEARCHRESULT) > cbBuffer) {
+			
+			servptr->running = false;
+			servptr->servers_left = -1;
+			
+			pOverlapped->InternalLow = ERROR_INSUFFICIENT_BUFFER;
+			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
+
+			return;
+		}
+
+		_XLOCATOR_SEARCHRESULT* server_buffer = reinterpret_cast<XLOCATOR_SEARCHRESULT*>(pvBuffer);
 
 		for (auto& server : document["servers"].GetArray())
 		{
 			ULONGLONG xuid = std::stoll(server.GetString());
-			QueryServerData(xuid, &servptr->servers[servptr->servers_left - 1]);
+			QueryServerData(xuid, &server_buffer[servptr->GetTotalServers()]);
 			
 			servptr->servers_left--;
+			pOverlapped->InternalLow = ERROR_SUCCESS;			
+			pOverlapped->InternalHigh = servptr->GetTotalServers();
 		}
-
-		servptr->total_servers = server_count;
-
 
 	}
 	addDebugText("Server Count:");
 	addDebugText(std::to_string(servptr->total_servers).c_str());
 
-	/* Copy all the servers into the buffer originally passed in XEnumerate */
-	for (int i = 0; i < servptr->total_servers; i++)
-	{
-		memcpy(pvBuffer + (sizeof(_XLOCATOR_SEARCHRESULT) * i), &servptr->servers[i], sizeof(_XLOCATOR_SEARCHRESULT));
-	}
-
-	delete[] servptr->servers;
-
-	pOverlapped->InternalHigh = servptr->total_servers;
-	pOverlapped->InternalLow = ERROR_SUCCESS;
-
 	servptr->running = false;
-	
 }
 
 
@@ -342,19 +338,29 @@ bool ServerList::GetRunning()
 	return running;
 }
 
-void ServerList::GetServers(PXOVERLAPPED pOverlapped, char* pvBuffer)
+void ServerList::GetServers(PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBuffer)
 {
-	if (!running)
+	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
+	pOverlapped->InternalHigh = ERROR_IO_INCOMPLETE;
+
+	// check if another thread isn't running and servers_left is in "unitialized state"
+	if (!this->running && this->servers_left == -1)
 	{
-
-		/* Set the overlapped routing to ERROR_IO_COMPLETE while we start the operation. */
-		pOverlapped->InternalHigh = ERROR_IO_INCOMPLETE;
-		pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
-
-		total_servers = 0;
-		this->serv_thread = std::thread(GetServersFromHttp, this,pOverlapped,pvBuffer);
+		this->total_servers = 0;
+		this->serv_thread = std::thread(GetServersFromHttp, this, pOverlapped, cbBuffer, pvBuffer);
 		this->serv_thread.detach();
 	}
+
+	if (this->servers_left == 0)
+	{
+		// reset servers_left to "unitialized state"
+		this->servers_left = -1;
+
+		// set the ERROR_NO_MORE_FILES flag to tell the game XEnumerate is done searching
+		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
+		pOverlapped->InternalHigh = this->GetTotalServers();
+	}
+
 }
 
 
@@ -539,7 +545,6 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, DWORD* pcbBuffer, PHANDLE phEnum)
 {
 	TRACE("XLocatorCreateServerEnumerator");
-
 
 	*pcbBuffer = (DWORD)(sizeof(_XLOCATOR_SEARCHRESULT) * (LiveManager.total_count + 10));
 

@@ -1168,7 +1168,7 @@ void __cdecl OnMapLoad(int a1)
 			gunGame->deinitializer->execute();
 		}
 
-		H2Tweaks::disableAI_MP(); //TODO: get dedi offset
+		H2Tweaks::disableAI_MP(); 
 		UIRankPatch();
 		H2Tweaks::disable60FPSCutscenes();
 
@@ -1223,7 +1223,7 @@ void __cdecl OnMapLoad(int a1)
 		if (tag_instances == NULL)
 			tag_instances = (global_tag_instance*)((*(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50)));
 
-		H2Tweaks::enableAI_MP(); //TODO: get dedi offset
+		H2Tweaks::enableAI_MP(); 
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	 
 		H2Tweaks::setCrosshairSize(0, false);
