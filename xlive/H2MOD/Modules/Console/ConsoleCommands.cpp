@@ -87,10 +87,15 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 				this->command += clipboardContent;
 				this->caretPos = this->command.length();
 			}
+			else {
+				goto handleKey;
+			}
 		}
 		break;
 
 	default:
+
+		handleKey:
 		if (console) {
 
 			if (wp == VK_UP)

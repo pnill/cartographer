@@ -302,8 +302,11 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 
 	for (int i = 0; i < cxna; i++)
 	{
+		// XNADDR
 		delete apxna[i];
 	}
+
+	// XNADDR** 
 	delete[] apxna;
 
 
@@ -540,16 +543,11 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 // #70: XNetQosLookup
 DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY * apxnkey[], UINT cina, IN_ADDR aina[], DWORD adwServiceId[], UINT cProbes, DWORD dwBitsPerSec, DWORD dwFlags, WSAEVENT hEvent, XNQOS** pxnqos)
 {
-
-
 	TRACE("XNetQosLookup ( cxna: %i, cina: %i, cProbes: %i, dwBitsPerSec: %i, hEvent: %X)",
 		cxna, cina, cProbes, dwBitsPerSec, hEvent);
 	TRACE("XNetQoSLookup( apxna: %X, apxnkid: %X, apxnkey: %X, aina: %X, adwServiceId: %X, pxnqos: %X)",
 		apxna, apxnkid, apxnkey, aina, adwServiceId, pxnqos);
 	//void ClientQoSLookUp(UINT cxna, XNADDR* apxna[],UINT cProbes,IN_ADDR  aina[], XNQOS** pxnqos,DWORD dwBitsPerSec)
-
-	//XNADDR **axpna_copy = (XNADDR**)malloc(cxna * sizeof(XNADDR*));
-	//XNADDR** axpna_copy = (XNADDR**)malloc(cxna * sizeof(XNADDR*));
 
 	XNADDR** apxna_copy = new XNADDR*[cxna];
 	for (DWORD i = 0; i < cxna; i++)
@@ -571,7 +569,6 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 	pqos->axnqosinfo[0].dwDnBitsPerSec = dwBitsPerSec;
 	pqos->axnqosinfo[0].dwUpBitsPerSec = dwBitsPerSec;
 	pqos->axnqosinfo[0].bFlags = XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE;
-
 
 
 	/*
