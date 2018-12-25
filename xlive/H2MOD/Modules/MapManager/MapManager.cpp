@@ -72,12 +72,18 @@ char __cdecl handle_map_download_callback()
 			if (!mapManager->hasCustomMap(mapManager->getMapFilenameToDownload())) {
 				//TODO: set map filesize
 				//TODO: if downloading from repo files, try p2p
-				mapManager->downloadFromRepo(mapManager->getMapFilenameToDownload());
+				if (!mapManager->downloadFromRepo(mapManager->getMapFilenameToDownload()))
+					h2mod->exit_game(); // download has failed
 			}
 			else {
 				TRACE_GAME_N("[h2mod-network] already has map %s", mapManager->getMapFilenameToDownload().c_str());
 			}
 			mapManager->setMapFileNameToDownload("");
+		}
+		else 
+		{
+			// no map filename (probably packet hasn't been received)
+			h2mod->exit_game();
 		}
 
 		// set the game to map is loaded state
