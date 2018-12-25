@@ -1250,19 +1250,11 @@ void H2Tweaks::disable60FPSCutscenes() {
 }
 
 void H2Tweaks::enableAI_MP() {
-
-	if (H2IsDediServer) 
-		return;
-
 	BYTE jmp[1] = { JMP_RAW_BYTE };
 	WriteBytes(H2BaseAddr + (H2IsDediServer ? 0x2B93F4 : 0x30E684), jmp, 1);
 }
 
 void H2Tweaks::disableAI_MP() {
-
-	if (H2IsDediServer) 
-		return;
-
 	BYTE jnz[1] = { JNZ_RAW_BYTE };
 	WriteBytes(H2BaseAddr + (H2IsDediServer ? 0x2B93F4 : 0x30E684), jnz, 1);
 }
