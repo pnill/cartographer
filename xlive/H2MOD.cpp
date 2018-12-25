@@ -1168,7 +1168,7 @@ void __cdecl OnMapLoad(int a1)
 			gunGame->deinitializer->execute();
 		}
 
-		H2Tweaks::disableAI_MP(); //TODO: get dedi offset
+		H2Tweaks::disableAI_MP();
 		UIRankPatch();
 		H2Tweaks::disable60FPSCutscenes();
 
