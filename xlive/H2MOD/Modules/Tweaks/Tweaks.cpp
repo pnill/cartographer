@@ -1251,11 +1251,11 @@ void H2Tweaks::disable60FPSCutscenes() {
 
 void H2Tweaks::enableAI_MP() {
 
-	if (H2IsDediServer) //TODO: get server offset
+	if (H2IsDediServer) 
 		return;
 
 	BYTE jmp[1] = { JMP_RAW_BYTE };
-	WriteBytes(H2BaseAddr + 0x30E684, jmp, 0x1); //AI_MP enable patch
+	WriteBytes(H2BaseAddr + (H2IsDediServer ? 0x2B93F4 : 0x30E684), jmp, 1);
 }
 
 void H2Tweaks::disableAI_MP() {
@@ -1264,19 +1264,8 @@ void H2Tweaks::disableAI_MP() {
 		return;
 
 	BYTE jnz[1] = { JNZ_RAW_BYTE };
-	WriteBytes(H2BaseAddr + 0x30E684, jnz, 0x1); //AI_MP disable patch
+	WriteBytes(H2BaseAddr + (H2IsDediServer ? 0x2B93F4 : 0x30E684), jnz, 1);
 }
-
-void H2Tweaks::PatchPingMeterCheck() {
-	//halo2.exe+1D4E35 
-
-	if (H2IsDediServer)
-		return;
-
-	BYTE assmPatchPingCheck[2] = { 0x75, 0x18 };
-	WriteBytes(H2BaseAddr + 0x1D4E35, assmPatchPingCheck, 2);
-}
-
 
 float* xb_tickrate_flt;
 __declspec(naked) void calculate_delta_time(void)
