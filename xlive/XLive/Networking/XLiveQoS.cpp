@@ -300,7 +300,13 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 
 	}
 
-	
+	for (int i = 0; i < cxna; i++)
+	{
+		delete apxna[i];
+	}
+	delete[] apxna;
+
+
 	//pqos->cxnqosPending = cProbes;
 
 	/**pxnqos = new XNQOS;
@@ -543,15 +549,15 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 	//void ClientQoSLookUp(UINT cxna, XNADDR* apxna[],UINT cProbes,IN_ADDR  aina[], XNQOS** pxnqos,DWORD dwBitsPerSec)
 
 	//XNADDR **axpna_copy = (XNADDR**)malloc(cxna * sizeof(XNADDR*));
-	XNADDR** axpna_copy = (XNADDR**)malloc(cxna * sizeof(XNADDR*));
+	//XNADDR** axpna_copy = (XNADDR**)malloc(cxna * sizeof(XNADDR*));
 
+	XNADDR** apxna_copy = new XNADDR*[cxna];
 	for (DWORD i = 0; i < cxna; i++)
 	{
 		XNADDR* xn = apxna[i];
-		axpna_copy[i] = new XNADDR;
-		memcpy(axpna_copy[i], xn, sizeof(XNADDR));
+		apxna_copy[i] = new XNADDR;
+		memcpy(apxna_copy[i], xn, sizeof(XNADDR));
 	}
-
 
 	*pxnqos = (XNQOS*)malloc(sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna - 1)));
 
@@ -573,7 +579,7 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 	We want to abuse the CPU where possible considering more modern systems will have decent CPUs so we'll be able to force things to happen faster but still want to keep compatibility with older setups.
 	*/
 
-	std::thread(ClientQoSLookUp, cxna, axpna_copy, cProbes, aina, pxnqos, dwBitsPerSec, pqos).detach();
+	std::thread(ClientQoSLookUp, cxna, apxna_copy, cProbes, aina, pxnqos, dwBitsPerSec, pqos).detach();
 
 
 	/* Memory Leak  - FIX ME! (Need to do some kind of garbage collection somewhere and store data like this in an array to be cleared later */
@@ -625,7 +631,7 @@ DWORD WINAPI XNetQosServiceLookup(DWORD a1, DWORD a2, DWORD a3)
 INT WINAPI XNetQosRelease(XNQOS* pxnqos)
 {
 
-	for (int i = 0; i == pxnqos->cxnqos; i++)
+	for (int i = 0; i < pxnqos->cxnqos; i++)
 	{
 		if (pxnqos->axnqosinfo[i].cbData > 0)
 			delete[] pxnqos->axnqosinfo[i].pbData;
