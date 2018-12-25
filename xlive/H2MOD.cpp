@@ -1088,7 +1088,7 @@ void H2MOD::PatchWeaponsInteraction(bool b_Enable)
 	WriteBytes(offset, assm, 5);
 }
 
-int OnAutoPickUpHandler(DatumIndex player_datum, DatumIndex object_datum)
+int OnAutoPickUpHandler(DatumIndex player_datum, DatumIndex object_datum, int playerIndex)
 {
 	int(_cdecl*AutoHandler)(DatumIndex, DatumIndex);
 	AutoHandler = (int(_cdecl*)(DatumIndex, DatumIndex))((char*)h2mod->GetBase() + ((!h2mod->Server) ? 0x57AA5 : 0x5FF9D));
@@ -1096,7 +1096,7 @@ int OnAutoPickUpHandler(DatumIndex player_datum, DatumIndex object_datum)
 	if (b_HeadHunter)
 	{
 		headHunterHandler->itemInteraction->SetPlayerIndex(player_datum);
-		bool handled = headHunterHandler->itemInteraction->SetInteractedObject(object_datum);
+		bool handled = headHunterHandler->itemInteraction->SetInteractedObject(object_datum, playerIndex);
 		headHunterHandler->itemInteraction->execute();
 
 		if (handled)
@@ -1168,7 +1168,7 @@ void __cdecl OnMapLoad(int a1)
 			gunGame->deinitializer->execute();
 		}
 
-		H2Tweaks::disableAI_MP(); 
+		H2Tweaks::disableAI_MP();
 		UIRankPatch();
 		H2Tweaks::disable60FPSCutscenes();
 
@@ -1181,6 +1181,7 @@ void __cdecl OnMapLoad(int a1)
 	b_Halo2Final = false;
 	b_H2X = false;
 	b_HeadHunter = false;
+	b_FireFight = false;
 
 	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
 	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", h2mod->GetEngineType(), variant_name);
@@ -1220,10 +1221,22 @@ void __cdecl OnMapLoad(int a1)
 			b_HeadHunter = true;
 		}
 
+		if (wcsstr(variant_name, L"GraveRobber") > 0 || wcsstr(variant_name, L"graverobber") > 0)
+		{
+			TRACE_GAME("[h2mod] Head Hunter Turned on!");
+			b_HeadHunter = true;
+		}
+
+		if (wcsstr(variant_name, L"WarEconomy") > 0 || wcsstr(variant_name, L"wareconomy") > 0)
+		{
+			TRACE_GAME("[h2mod] Fire Fight Turned on!");
+			b_FireFight = true;
+		}
+
 		if (tag_instances == NULL)
 			tag_instances = (global_tag_instance*)((*(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50)));
 
-		H2Tweaks::enableAI_MP(); 
+		H2Tweaks::enableAI_MP();
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	 
 		H2Tweaks::setCrosshairSize(0, false);

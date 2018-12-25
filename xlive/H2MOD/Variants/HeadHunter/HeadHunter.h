@@ -7,7 +7,7 @@ public:
 	void SetPlayerIndex(DatumIndex player_datum);
 	void SetUnitDatum(DatumIndex unit_datum);
 	void SetDeadPlayer(DatumIndex dead_datum);
-	bool SetInteractedObject(DatumIndex object_datum);
+	bool SetInteractedObject(DatumIndex object_datum, int playerIndex);
 	DatumIndex GetDeadPlayer();
 	DatumIndex GetInteractedObject();
 	XUID GetXUID();
@@ -16,6 +16,7 @@ private:
 	DatumIndex object_interaction;
 	DatumIndex DeadPlayer;
 	std::vector<DatumIndex> skulls_spawned;
+	int playerIndex;
 };
 
 
@@ -70,4 +71,5 @@ public:
 	static void PickupSkull(XUID player, DatumIndex SkullDatum);
 	static void initClient();
 	static void initHost();
+	static void triggerSound(const wchar_t* name, int);
 };
