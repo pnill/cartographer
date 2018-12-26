@@ -1670,62 +1670,6 @@ void __cdecl GetGameVersion(DWORD *executable_version, DWORD *build_version, DWO
 	*build_version2 = GAME_BUILD;
 }
 
-typedef int(*Video_HUDSizeUpdate_ptr)(int hudSize, int safeArea);
-Video_HUDSizeUpdate_ptr Video_HUDSizeUpdate_orig;
-
-const float maxHUDTextScale = 1080 * 0.0010416667f; // you'd think we could use 1200 since that's the games normal max resolution, but seems 1200 still hides some text :(
-const float maxUiScaleFonts = 1.249f; // >= 1.25 will make text disappear
-
-int Video_HUDSizeUpdate_hook(int hudSize, int safeArea)
-{
-	int retVal = Video_HUDSizeUpdate_orig(hudSize, safeArea);
-
-	float* HUD_TextScale = (float*)(h2mod->GetBase() + 0x464028); // gets set by the Video_HUDSizeUpdate_orig call above, affects HUD text and crosshair size
-	if (*HUD_TextScale > maxHUDTextScale)
-	{
-		// textScale = resolution_height * 0.0010416667
-		// but if it's too large the game won't render it some reason (max seems to be around 1.4, 1.3 when sword icon is in the text?)
-		// lets just set it to the largest known good value for now, until the cause of large text sizes being hidden is figured out
-		*HUD_TextScale = maxHUDTextScale;
-	}
-
-	// UI_Scale was updated just before we were called, so lets fix it real quick...
-	float* UI_Scale = (float*)(h2mod->GetBase() + 0xA3E424);
-	if (*UI_Scale > maxUiScaleFonts)
-	{
-		// uiScale = resolution_height * 0.00083333335f
-		// at higher resolutions text starts being cut off (retty much any UI_Scale above 1 will result in text cut-off)
-		// the sub_671B02_hook below fixes that by scaling the width of the element by UI_Scale (which the game doesn't do for some reason...)
-		// however fonts will stop being rendered if the UI_Scale is too large (>= ~1.25)
-		// so this'll make sure UI_Scale doesn't go above 1.249, but will result in the UI being drawn smaller
-		*UI_Scale = maxUiScaleFonts;
-	}
-
-	return retVal;
-}
-
-struct ui_text_bounds
-{
-	short top;
-	short left;
-	short bottom;
-	short right;
-};
-
-typedef int(__cdecl *sub_671B02_ptr)(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int a4, int a5, float a6, int a7, int a8);
-sub_671B02_ptr sub_671B02_orig;
-
-int __cdecl sub_671B02_hook(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int a4, int a5, float a6, int a7, int a8)
-{
-	float UI_Scale = *(float*)(h2mod->GetBase() + 0xA3E424);
-	if (a2 && a2 != a1) // if a2 == a1 then this is a chapter name which scaling seems to break, so skip those ones
-	{
-		short width = a2->right - a2->left;
-		a2->right = a2->left + (short)((float)width * UI_Scale); // scale width by UI_Scale, stops text elements from being cut-off when UI_Scale > 1
-	}
-	return sub_671B02_orig(a1, a2, a3, a4, a5, a6, a7, a8);
-}
-
 void GivePlayerWeaponDatum(DatumIndex unit_datum,DatumIndex weapon_datum)
 {
 	if (unit_datum != -1 && unit_datum != 0)
@@ -1910,14 +1854,6 @@ void H2MOD::ApplyHooks() {
 
 		build_gui_list_method = (build_gui_list)DetourFunc((BYTE*)this->GetBase() + 0x20D1FD, (BYTE*)buildGuiList, 8);
 		VirtualProtect(build_gui_list_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		// HUD text size fix for higher resolutions
-		Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_ptr)DetourFunc((BYTE*)this->GetBase() + 0x264A18, (BYTE*)Video_HUDSizeUpdate_hook, 7);
-		VirtualProtect(Video_HUDSizeUpdate_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		// menu text fix for higher resolutions
-		sub_671B02_orig = (sub_671B02_ptr)DetourFunc((BYTE*)this->GetBase() + 0x271B02, (BYTE*)sub_671B02_hook, 5);
-		VirtualProtect(sub_671B02_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		/*
 		WritePointer(GetBase() + 0x1F0B3A, player_add_packet_handler);
