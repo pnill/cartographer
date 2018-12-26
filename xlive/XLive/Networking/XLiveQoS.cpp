@@ -630,10 +630,10 @@ INT WINAPI XNetQosRelease(XNQOS* pxnqos)
 
 	for (int i = 0; i < pxnqos->cxnqos; i++)
 	{
-		if (pxnqos->axnqosinfo[i].cbData > 0)
+		if (pxnqos->axnqosinfo[i].cbData > 0 && pxnqos->axnqosinfo[i].pbData)
 			delete[] pxnqos->axnqosinfo[i].pbData;
 
-		delete[] & pxnqos->axnqosinfo[i];
+		//delete[] & pxnqos->axnqosinfo[i];
 		//XNQOSINFO *xnqos = &pqos->axnqosinfo[ ( pqos->cxnqosPending - 1) ];
 
 	}

@@ -2041,8 +2041,6 @@ DWORD WINAPI XStorageDownloadToMemory( DWORD dwUserIndex, const WCHAR *wszServer
 	//pResults->ftCreated;
 
 
-
-
 	if( pOverlapped )
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
