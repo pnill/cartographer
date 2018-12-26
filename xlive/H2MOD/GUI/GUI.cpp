@@ -165,7 +165,7 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		//TODO: fHandled doesn't actually work..need to look into how halo2.exe uses the XLIVE_INPUT_INFO struct after calling xliveinput
 		pPii->fHandled = commands->handleInput(pPii->wParam);
 	}
-	return 1;
+	return S_OK;
 }
 
 // #5030: XLivePreTranslateMessage

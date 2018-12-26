@@ -5,6 +5,7 @@
 #include "H2MOD\Modules\Config\Config.h"
 #include "Blam/BlamLibrary.h"
 #include "H2MOD\Modules\CustomMenu\Credits.h"
+#include "Util\ClipboardAPI.h"
 
 
 std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
@@ -73,17 +74,12 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 		{
 			//read 'V' before 'CTRL'
 			if (console && (GetAsyncKeyState(VK_CONTROL) & 0x8000)) {
-				if (!OpenClipboard(NULL)) {
+
+				std::string clipboardContent;
+				if (!ClipboardAPI::read(clipboardContent)) {
 					output(ERROR_OPENING_CLIPBOARD);
 					return false;
 				}
-
-				HANDLE clipboardHandle = GetClipboardData(CF_TEXT);
-				//lock the clipboard
-				std::string clipboardContent = (LPSTR)GlobalLock(clipboardHandle);
-				//unlock  the clipboard
-				GlobalUnlock(clipboardHandle);
-				CloseClipboard();
 				this->command += clipboardContent;
 				this->caretPos = this->command.length();
 			}
