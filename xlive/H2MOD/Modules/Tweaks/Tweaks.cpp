@@ -398,7 +398,7 @@ bool engine_basic_init()
 			    shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
 				NopFill<8>(reinterpret_cast<DWORD>(GetAddress(0x269FD5)));
 			}
-			else if (_wcsicmp(cmd_line_arg, L"-4kfix") == 0)
+			else if (_wcsicmp(cmd_line_arg, L"-hiresfix") == 0)
 			{
 				DWORD dwBack;
 
