@@ -309,6 +309,7 @@
     <ClCompile Include="H2MOD\Variants\VariantPlayer.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="Util\Base64.cpp" />
+    <ClCompile Include="Util\ClipboardAPI.cpp" />
     <ClCompile Include="Util\Debug\Debug.cpp" />
     <ClCompile Include="util\filesys.cpp" />
     <ClCompile Include="Util\hash.cpp" />
@@ -440,6 +441,7 @@
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Util\Base64.h" />
+    <ClInclude Include="Util\ClipboardAPI.h" />
     <ClInclude Include="Util\Debug\Debug.h" />
     <ClInclude Include="util\filesys.h" />
     <ClInclude Include="Util\hash.h" />
