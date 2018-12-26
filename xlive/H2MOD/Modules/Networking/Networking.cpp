@@ -708,7 +708,7 @@ void CustomNetwork::sendCustomPacketToAllPlayers() {
 			TRACE_GAME("[h2mod-network] sending packet to all players, peerIndex=%d,", peerIndex);
 			//only send the command packet to valid peers
 			char* newPacketObject = (char*)(packetDataObj);
-			if (peerIndex != *(DWORD *)(this + 29120)) {
+			if (peerIndex != *(DWORD *)((int)newPacketObject + 29120)) {
 				signed int peerIndexPacketStatus = sub_13C31B2(newPacketObject, peerIndex);
 				if (peerIndexPacketStatus != -1) {
 					if (peerIndex != *((DWORD *)newPacketObject + 7280)) {
