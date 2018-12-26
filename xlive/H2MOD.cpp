@@ -1054,7 +1054,6 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 
 	if (a5 == 7) //player got a kill?
 	{
-		return;
 		int PlayerIndex = a2;
 
 		if (b_GunGame) {
@@ -1670,7 +1669,6 @@ void __cdecl GetGameVersion(DWORD *executable_version, DWORD *build_version, DWO
 	*build_version = GAME_BUILD;
 	*build_version2 = GAME_BUILD;
 }
-
 
 void GivePlayerWeaponDatum(DatumIndex unit_datum,DatumIndex weapon_datum)
 {
