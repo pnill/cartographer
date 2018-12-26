@@ -690,6 +690,9 @@ void CustomNetwork::sendCustomPacketToAllPlayers() {
 	typedef int(__thiscall* sub_12320C8_type)(int thisx, DWORD* a2, DWORD* a3);
 	sub_12320C8_type sub_12320C8 = (sub_12320C8_type)(h2mod->GetBase() + (h2mod->Server ? 0x1997DB : 0x1C20C8));
 
+	typedef signed int(__thiscall* sub_13C31B2_type)(char* thisx, int a2);
+	sub_13C31B2_type sub_13C31B2 = (sub_13C31B2_type)(h2mod->GetBase() + (h2mod->Server ? 0x19A86A : 0x1C31B2));
+
 	typedef char(__thiscall *dynamic_packet_check_method)(void *thisx, int a2, int a3, char a4, unsigned int type, unsigned int size, int a7);
 	dynamic_packet_check_method dynamic_packet_check = (dynamic_packet_check_method)(h2mod->GetBase() + (h2mod->Server ? 0x1B8C1A : 0x1BED40));
 
@@ -697,43 +700,33 @@ void CustomNetwork::sendCustomPacketToAllPlayers() {
 	memset(packetdata, 0, (sizeof BYTE) * CHAT_PACKET_SIZE);
 
 	int playerCountAddr = sub_12320C8((int)packetDataObj, 0, 0);
-	int playerCounter = 0;
+	int peerIndex = 0;
 	int peerCount = *(DWORD *)(playerCountAddr + 20);
 	TRACE_GAME("[h2mod-network] Peer count %d", peerCount);
-	if (peerCount > 0)
-	{
-		do
-		{
-			if (h2mod->Server && playerCounter == 0) {
-				//this player is the dedi, so we don't send stuff to ourselves
-				++playerCounter;
-				continue;
-			}
-			else {
-				if (playerCounter != *(DWORD *)(packetDataObj + 29120))
-				{
-					int shiftCounter = h2mod->Server ? 1 : 0;
-					int peerIndex = players->getPeerIndex(playerCounter - shiftCounter);
-					if (wcslen(players->getPlayerName(playerCounter - shiftCounter)) == 0) {
-						//if we can't find a player name, either member data is not available or something terrible has gone wrong
-						++playerCounter;
-						continue;
+	if (peerCount > 0) {
+		do {
+			TRACE_GAME("[h2mod-network] sending packet to all players, peerIndex=%d,", peerIndex);
+			//only send the command packet to valid peers
+			char* newPacketObject = (char*)(packetDataObj);
+			if (peerIndex != *(DWORD *)(this + 29120)) {
+				signed int peerIndexPacketStatus = sub_13C31B2(newPacketObject, peerIndex);
+				if (peerIndexPacketStatus != -1) {
+					if (peerIndex != *((DWORD *)newPacketObject + 7280)) {
+						if (newPacketObject[28 * peerIndex + 29125]) {
+							dynamic_packet_check(
+								*((void **)newPacketObject + 2),
+								*((DWORD *)newPacketObject + 5),
+								*(DWORD *)&newPacketObject[28 * peerIndex + 29128],
+								0,
+								0x2F,
+								CHAT_PACKET_SIZE,
+								(int)&packetdata);
+						}
 					}
-					TRACE_GAME("[h2mod-network] sending packet to all players, playerIndex=%d, peerIndex=%d, peerName=%s", playerCounter, peerIndex, players->getPlayerName(playerCounter - shiftCounter));
-					//only send the command packet to the given peer index
-					char* newPacketObject = (char*)(packetDataObj);
-					dynamic_packet_check(
-						*((void **)newPacketObject + 2),
-						*((DWORD *)newPacketObject + 5),
-						*(DWORD *)&newPacketObject[28 * peerIndex + 29128],
-						0,
-						0x2F,
-						CHAT_PACKET_SIZE,
-						(int)&packetdata);
 				}
 			}
-			++playerCounter;
-		} while (playerCounter < peerCount);
+			++peerIndex;
+		} while (peerIndex < peerCount);
 	}
 }
 
@@ -756,12 +749,44 @@ char* __cdecl registerChatPackets(void* packetObject) {
 		0);
 }
 
+typedef int(__cdecl *serialize_peer_properties)(void* packetObject, int a2, int a3);
+serialize_peer_properties serialize_peer_properties_method;
+
+int __cdecl serializePeerPropertiesPacket(void* packetObject, int a2, int a3) {
+	//tell the host you can load the map (even if you can't)
+	*(DWORD *)(a3 + 104) = 4;
+	*(DWORD *)(a3 + 108) = 100;
+	return serialize_peer_properties_method(packetObject, a2, a3);
+}
 
 /* This should happen whenever someone quits or joins a game. */
 typedef int(__cdecl *serialize_membership_packet)(void* a1, int a2, int a3);
 serialize_membership_packet serialize_membership_packet_method;
 
 int __cdecl serializeMembershipPacket(void* a1, int a2, int a3) {
+	
+	/* 
+	//TODO-Issue-34: turn on when ready to enable feature
+	int v3 = 0;
+	if (*(WORD*)(a3 + 32) > 0)
+	{
+		int v4 = a3 + 0x26;
+		do {
+			
+			//let the host tell everyone else the game can start
+			if (*(BYTE *)(v4 + 140)) {
+				TRACE_GAME_N("[h2mod-network] Serialize Original Peer map status - %d", *(DWORD*)(v4 + 142));
+				TRACE_GAME_N("[h2mod-network] Serialize Original Peer map progress percentage - %d", *(DWORD *)(v4 + 146));
+
+				*(DWORD *)(v4 + 142) = 4;
+				*(DWORD *)(v4 + 146) = 100;
+				TRACE_GAME_N("[h2mod-network] Serialize New Peer map status - %d", *(DWORD *)(v4 + 142));
+				TRACE_GAME_N("[h2mod-network] Serialize New Peer map progress percentage - %d", *(DWORD *)(v4 + 146));
+			}
+			++v3;
+			v4 += 184;
+		} while (v3 < *(WORD*)(a3 + 32));
+	}*/
 	mapManager->sendMapInfoPacket();
 	advLobbySettings->sendLobbySettingsPacket();
 	// send server map checksums to client
@@ -778,6 +803,21 @@ int __cdecl deserializeMembershipPacket(void* a1, int a2, int a3) {
 
 	/* Call the original first so the packet is de-serialized into the provided address. */
 	int ret = deserialize_membership_packet_method(a1, a2, a3);
+
+	//TODO-Issue-34: need to figure out how to force clients who cannot load the map to correctly fail to load the map
+	/*
+	int peerCount = *(WORD *)(a3 + 32);
+	if (peerCount > 0) {
+		int v3 = 0;
+		int peerOffset = a3 + 0x26;
+		do {
+			int peerMapStatus = *(DWORD*)(peerOffset + 142);
+			*(DWORD*)(peerOffset + 142) = peerMapStatus;//failedToLoadTheMap ? 1 : peerMapStatus;
+			TRACE_GAME_N("[h2mod-network] Deserialize Peer map status - %d", peerMapStatus);
+			peerOffset += 184;
+			++v3;
+		} while (v3 < peerCount);
+	}*/
 
 	/* The data that gets de-serialized is stored in a3 */
 	WORD player_count = *(WORD*)((BYTE*)a3 + 0x22);
@@ -828,6 +868,7 @@ void CustomNetwork::applyNetworkHooks() {
 	DWORD serializeMembershipPacketOffset = 0x1EF6B9;
 	DWORD deserializeMembershipPacketOffset = 0x1EFADD;
 	DWORD serializeParametersUpdatePacketOffset = 0x1EDC41;
+	DWORD serializePeerPropertiesPacketOffset = 0x1F03F5;
 
 	if (h2mod->Server) {
 		registerConnectionPacketsOffset = 0x1D24EF;
@@ -866,6 +907,10 @@ void CustomNetwork::applyNetworkHooks() {
 
 	serialize_parameters_update_packet_method = (serialize_parameters_update_packet)DetourFunc((BYTE*)h2mod->GetBase() + serializeParametersUpdatePacketOffset, (BYTE*)serializeParametersUpdatePacket, 5);
 	VirtualProtect(serialize_parameters_update_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	//TODO-Issue-34: turning this on makes hosts not care if clients can load map or now
+	//serialize_peer_properties_method = (serialize_peer_properties)DetourFunc((BYTE*)h2mod->GetBase() + serializePeerPropertiesPacketOffset, (BYTE*)serializePeerPropertiesPacket, 5);
+	//VirtualProtect(serialize_peer_properties_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	///////////////////////////////////////
 	//text chat packet customizations below
