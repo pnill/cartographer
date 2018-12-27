@@ -115,7 +115,6 @@ int PlayerWeaponSwitched(int a1, int a2, int a3)
 {
 	if (isEnabled)
 	{
-		int game_state_objects_header = *(DWORD*)(base_address + 0x4E461C);
 		int v3 = *(DWORD*)(*(DWORD*)(game_state_objects_header + 0x44) + 12 * (short)a1 + 8);
 		int global_tag_header = *(DWORD*)(base_address + 0x47CD50);
 		int weap_tag_offset = *(DWORD*)(base_address + 0x47CD54) + *(DWORD*)(0x10 * (*(DWORD*)v3 & 0xFFFF) + global_tag_header + 8);
