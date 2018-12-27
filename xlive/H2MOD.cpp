@@ -1087,7 +1087,7 @@ void H2MOD::PatchWeaponsInteraction(bool b_Enable)
 	WriteBytes(offset, assm, 5);
 }
 
-int OnAutoPickUpHandler(DatumIndex player_datum, DatumIndex object_datum, int playerIndex)
+int OnAutoPickUpHandler(DatumIndex player_datum, DatumIndex object_datum)
 {
 	int(_cdecl*AutoHandler)(DatumIndex, DatumIndex);
 	AutoHandler = (int(_cdecl*)(DatumIndex, DatumIndex))((char*)h2mod->GetBase() + ((!h2mod->Server) ? 0x57AA5 : 0x5FF9D));
@@ -1095,7 +1095,7 @@ int OnAutoPickUpHandler(DatumIndex player_datum, DatumIndex object_datum, int pl
 	if (b_HeadHunter)
 	{
 		headHunterHandler->itemInteraction->SetPlayerIndex(player_datum);
-		bool handled = headHunterHandler->itemInteraction->SetInteractedObject(object_datum, playerIndex);
+		bool handled = headHunterHandler->itemInteraction->SetInteractedObject(object_datum);
 		headHunterHandler->itemInteraction->execute();
 
 		if (handled)
