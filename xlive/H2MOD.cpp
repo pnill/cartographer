@@ -1213,13 +1213,7 @@ void __cdecl OnMapLoad(int a1)
 
 		if (wcsstr(variant_name, L"GraveRobber") > 0 || wcsstr(variant_name, L"graverobber") > 0)
 		{
-			TRACE_GAME("[h2mod] Head Hunter Turned on!");
-			b_HeadHunter = true;
-		}
-
-		if (wcsstr(variant_name, L"GraveRobber") > 0 || wcsstr(variant_name, L"graverobber") > 0)
-		{
-			TRACE_GAME("[h2mod] Head Hunter Turned on!");
+			TRACE_GAME("[h2mod] GraveRobber (Headhunter) Turned on!");
 			b_HeadHunter = true;
 		}
 
