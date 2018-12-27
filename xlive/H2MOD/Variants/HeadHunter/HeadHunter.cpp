@@ -65,7 +65,7 @@ void HeadHunter::PickupSkull(XUID player, DatumIndex SkullDatum)
 		//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
 
 			DatumIndex PlayerDatum = variant_player->GetPlayerDatum(player);
-			pupdate_player_score((void*)0x3000595C, PlayerDatum.Index, 0, 1, -1, 0);
+			pupdate_player_score((void*)(h2mod->Server ? 0x30005508 : 0x3000595C), PlayerDatum.Index, 0, 1, -1, 0);
 			call_hs_object_destroy_datum(SkullDatum); 
 			//pupdate_player_score()
 	}
