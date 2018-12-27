@@ -8,9 +8,8 @@ extern void GivePlayerWeaponDatum(DatumIndex unit_datum, DatumIndex weapon_datum
 //TODO: Convert to TagGroup/Block
 float get_device_power_transition_time(DatumIndex device_datum)
 {
-	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD54);
-	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50);
-	DWORD game_state_objects_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x4E461C);
+	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29BC : 0x47CD54));
+	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50));
 	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
 
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
@@ -31,10 +30,8 @@ float get_device_power_transition_time(DatumIndex device_datum)
 //TODO: Convert to TagGroup/Block
 DatumIndex get_device_open_up_weapon_datum(DatumIndex device_datum)
 {
-
-	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD54);
-	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50);
-	DWORD game_state_objects_header = *(DWORD*)((BYTE*)h2mod->GetBase() + 0x4E461C);
+	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29BC : 0x47CD54));
+	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50));
 	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
 
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;

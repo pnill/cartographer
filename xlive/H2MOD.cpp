@@ -686,7 +686,7 @@ int H2MOD::get_dynamic_player_base(int playerIndex, bool resetDynamicBase) {
 	return cachedDynamicBase;*/
 	int dyanamic = -1;
 	int playerdatum = h2mod->get_unit_datum_from_player_index(playerIndex);
-	int DynamicObjBase = *(DWORD *)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x50C8EC : 0x4E461C));
+	int DynamicObjBase = (int)game_state_objects_header;
 	if (playerdatum != -1)
 		dyanamic = *(DWORD *)(*(DWORD *)(DynamicObjBase + 68) + 12 * (unsigned __int16)playerdatum + 8);
 	return dyanamic;
@@ -1125,6 +1125,13 @@ bool __cdecl player_remove_packet_handler(void *packet, int size, void *data)
 }
 */
 
+void get_object_table_memory()
+{
+	game_state_players = (GameStatePlayerTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4D64C4 : 0x4A8260))));
+	game_state_objects_header = (GameStateObjectHeaderTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x50C8EC : 0x4E461C))));
+	game_state_actors = (GameStateActorTable*)((*(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x9A1C5C : 0xA965DC))));
+}
+
 // this gets called after game globals are updated fyi (which includes game engine type)
 typedef void(__cdecl *set_random_number)(int a1);
 set_random_number p_set_random_number;
@@ -1139,16 +1146,6 @@ void __cdecl OnMapLoad(int a1)
 
 	if (h2mod->GetEngineType() == EngineType::MAIN_MENU_ENGINE)
 	{
-
-		/* Setup the players table and objects_header table so they can be referenced directly */
-		/* TODO: Update offsets for dedis. */
-		if(game_state_players == NULL)
-			game_state_players = (GameStatePlayerTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4D64C4 : 0x4A8260))));
-		if(game_state_objects_header == NULL)
-			game_state_objects_header = (GameStateObjectHeaderTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x50C8EC : 0x4E461C))));
-		if(game_state_actors == NULL)
-			game_state_actors = (GameStateActorTable*)((*(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x9A1C5C : 0xA965DC))));
-
 		addDebugText("GameEngine: Main-Menu");
 		object_to_variant.clear();
 
@@ -1232,8 +1229,10 @@ void __cdecl OnMapLoad(int a1)
 			b_FireFight = true;
 		}
 
+		get_object_table_memory();
+
 		if (tag_instances == NULL)
-			tag_instances = (global_tag_instance*)((*(DWORD*)((BYTE*)h2mod->GetBase() + 0x47CD50)));
+			tag_instances = (global_tag_instance*)(*(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50)));
 
 		H2Tweaks::enableAI_MP();
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
@@ -1697,7 +1696,6 @@ float get_device_acceleration_scale(DatumIndex device_datum)
 {
 	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29BC : 0x47CD54));
 	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50));
-	DWORD game_state_objects_header = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x50C8EC : 0x4E461C));
 	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
 	
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
