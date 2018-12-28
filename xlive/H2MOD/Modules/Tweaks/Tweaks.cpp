@@ -804,10 +804,10 @@ int __stdcall fn_c0024fa19(DWORD* thisptr, int a2, int* a3)//__thiscall
 	int(__stdcall* fn_c0024f9a1)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f9a1));
 	int(__stdcall* fn_c0024f9dd)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f9dd));
 	int(__stdcall* fn_c0024ef79)(int) = (int(__stdcall*)(int))(GetAddress(0x0024ef79));
-	int(__stdcall* fn_c0024f5fd)(DWORD* thisptr, int) = (int(__stdcall*)(DWORD*, int))(GetAddress(0x0024f5fd));
-	int(__thiscall* fn_c0024f015)(DWORD* thisptr, int) = (int(__thiscall*)(DWORD*, int))(GetAddress(0x0024f015));
-	int(__thiscall* fn_c0024f676)(DWORD* thisptr, int) = (int(__thiscall*)(DWORD*, int))(GetAddress(0x0024f676));
-	int(__thiscall* fn_c0024f68a)(DWORD* thisptr, int) = (int(__thiscall*)(DWORD*, int))(GetAddress(0x0024f68a));
+	int(__stdcall* fn_c0024f5fd)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f5fd));
+	int(__stdcall* fn_c0024f015)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f015));
+	int(__stdcall* fn_c0024f676)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f676));
+	int(__stdcall* fn_c0024f68a)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f68a));
 
 	int result = *a3;
 	if (*a3 != -1)
@@ -825,19 +825,19 @@ int __stdcall fn_c0024fa19(DWORD* thisptr, int a2, int* a3)//__thiscall
 			result = fn_c0024ef79(a2);
 			break;
 		case 3:
-			result = fn_c0024f5fd(thisptr, a2);//party management
+			result = fn_c0024f5fd(a2);//party management
 			break;
 		case 4:
 			GSCustomMenuCall_AdvLobbySettings3();
 			break;
 		case 5:
-			result = fn_c0024f015(thisptr, a2);
+			result = fn_c0024f015(a2);
 			break;
 		case 6:
-			result = fn_c0024f676(thisptr, a2);
+			result = fn_c0024f676(a2);
 			break;
 		case 7:
-			result = fn_c0024f68a(thisptr, a2);
+			result = fn_c0024f68a(a2);
 			break;
 		default:
 			return result;
@@ -895,7 +895,7 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 1;
 		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 2;
 		//*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 3;
-		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 4;
+		//*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 4;
 		/*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 5;
 		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 6;
 		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 7;*/
@@ -904,7 +904,7 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 0;
 		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 1;
 		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 2;
-		*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 4;
+		//*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 4;
 		if ((unsigned __int8)fn_c002152b0() && fn_c0021525a() > 1)
 		{
 			*(WORD *)(*(DWORD *)(v2[28] + 68) + 4 * (unsigned __int16)fn_c000667a0(v2[28]) + 2) = 3;
