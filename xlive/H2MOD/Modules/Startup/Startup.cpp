@@ -391,7 +391,7 @@ void InitH2Startup() {
 		network_log = logger::create(prepareLogFileName("h2network"));
 		TRACE_GAME_NETWORK("Log started (H2MOD - Network " DLL_VERSION_STR ")\n");
 	}
-	checksum_log = logger::create(prepareLogFileName("checksum"), true);
+	//checksum_log = logger::create(prepareLogFileName("checksum"), true);
 	LeaveCriticalSection(&log_section);
 #endif
 	InitH2Accounts();
