@@ -304,7 +304,7 @@ void GSMainLoop() {
 			SetWindowText(H2hWnd, titleMod);
 		}
 	}
-	if (H2IsDediServer && !halo2ServerOnce1) {
+	/*if (H2IsDediServer && !halo2ServerOnce1) {
 		halo2ServerOnce1 = true;
 		pushHostLobby();
 		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
@@ -323,7 +323,7 @@ void GSMainLoop() {
 	if (prevPartyPrivacy > 0 && partyPrivacy == 0 && gameManager->isHost()) {
 		pushHostLobby();
 	}
-	prevPartyPrivacy = partyPrivacy;
+	prevPartyPrivacy = partyPrivacy;*/
 
 	if (!H2IsDediServer && (GetFocus() == H2hWnd || GetForegroundWindow() == H2hWnd)) {
 
@@ -339,7 +339,7 @@ void GSMainLoop() {
 			}
 		}
 
-		if (replacedNetworkNormalTextWidget == NULL) {
+		/*if (replacedNetworkNormalTextWidget == NULL) {
 			replacedNetworkNormalTextWidget = new char[128];
 		}
 		if (replacedNetworkNormalTextWidget2 == NULL) {
@@ -367,7 +367,7 @@ void GSMainLoop() {
 		}
 		//TODO: when debug mode is on, gets laggy?
 		sprintf(replacedNetworkNormalTextWidget, replacementText.c_str(), allPlayersCount, allActiveGamesCount, allGamesCount);
-		sprintf(replacedNetworkNormalTextWidget2, replacementText2.c_str(), allPlayersCount, allActiveGamesCount, allGamesCount);
+		sprintf(replacedNetworkNormalTextWidget2, replacementText2.c_str(), allPlayersCount, allActiveGamesCount, allGamesCount);*/
 
 	}
 

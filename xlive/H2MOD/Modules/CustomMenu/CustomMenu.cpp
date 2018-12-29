@@ -3084,7 +3084,7 @@ void* __stdcall sub_248beb_deconstructor_AdvLobbySettings(LPVOID lpMem, char a2)
 	wcsncpy(ServerLobbyName, bufferLobbyName, 32);
 
 	if (gameManager->isHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) {
-		advLobbySettings->sendLobbySettingsPacket();
+		//advLobbySettings->sendLobbySettingsPacket();
 	}
 	
 	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
