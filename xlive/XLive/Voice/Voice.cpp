@@ -156,8 +156,8 @@ HRESULT IXHV2ENGINE::RegisterLocalTalker(VOID *pThis, DWORD dwUserIndex)
 
 HRESULT IXHV2ENGINE::UnregisterLocalTalker(VOID *pThis, DWORD dwUserIndex)
 {
-	TRACE("IXHV2Engine::UnregisterLocalTalker  (dwUserIndex = %d)",
-		dwUserIndex);
+	//TRACE("IXHV2Engine::UnregisterLocalTalker  (dwUserIndex = %d)",
+	//	dwUserIndex);
 
 
 	return ERROR_SUCCESS;
@@ -168,7 +168,7 @@ std::vector<XUID> remotetalkers;
 HRESULT IXHV2ENGINE::RegisterRemoteTalker(VOID *pThis, XUID a1, LPVOID reserved, LPVOID reserved2, LPVOID reserved3)
 {
 
-	TRACE_GAME_N("[h2mod-voice] IXHV2Engine::RegisterRemoteTalker XUID: %lld", a1);
+	//TRACE_GAME_N("[h2mod-voice] IXHV2Engine::RegisterRemoteTalker XUID: %lld", a1);
 	remotetalkers.push_back(a1);
 	return S_OK;
 }
@@ -177,8 +177,8 @@ HRESULT IXHV2ENGINE::RegisterRemoteTalker(VOID *pThis, XUID a1, LPVOID reserved,
 
 HRESULT IXHV2ENGINE::UnregisterRemoteTalker(VOID *pThis, XUID a1)
 {
-	TRACE_GAME_N("[h2mod-voice] IXHV2Engine::UnregisterRemoteTalker  (a1 = %X, a2 = %X)",
-		a1);
+	//TRACE_GAME_N("[h2mod-voice] IXHV2Engine::UnregisterRemoteTalker  (a1 = %X, a2 = %X)",
+	//	a1);
 
 	return S_OK;
 }
@@ -187,7 +187,7 @@ HRESULT IXHV2ENGINE::UnregisterRemoteTalker(VOID *pThis, XUID a1)
 HRESULT IXHV2ENGINE::GetRemoteTalkers(VOID *pThis, PDWORD pdwRemoteTalkersCount, PXUID pxuidRemoteTalkers)
 {
 
-	TRACE_GAME_N("[h2mod-voice] - GetRemoteTalkers");
+	//TRACE_GAME_N("[h2mod-voice] - GetRemoteTalkers");
 	*pdwRemoteTalkersCount = remotetalkers.size();
 	int i = 0;
 	for (std::vector<XUID>::iterator it = remotetalkers.begin(); it != remotetalkers.end(); ++it) {
@@ -205,7 +205,7 @@ DWORD IXHV2ENGINE::GetDataReadyFlags(VOID *pThis)
 
 	if (xuidIsTalkingMap[xFakeXuid[0]])
 	{
-		TRACE_GAME_N("[h2mod-voice] GetDataReadyFlags - called");
+		//TRACE_GAME_N("[h2mod-voice] GetDataReadyFlags - called");
 		ret = 0x1;
 	}
 	// 0x1 = user 0

@@ -279,13 +279,13 @@ signed int __cdecl object_new_hook(void *pObject)
 
 	object_to_variant[result] = variant_index;
 
-	wchar_t DebugText[255] = { 0 };
-	ZeroMemory(DebugText, sizeof(DebugText));
-	wsprintf(DebugText, L"AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result, variant_index);
+	//wchar_t DebugText[255] = { 0 };
+	//ZeroMemory(DebugText, sizeof(DebugText));
+	//wsprintf(DebugText, L"AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result, variant_index);
 
-	TRACE_GAME_N("AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result, variant_index);
+	//TRACE_GAME_N("AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result, variant_index);
 
-	addDebugText(DebugText);
+	//addDebugText(DebugText);
 	
 	return result;
 }
@@ -330,17 +330,17 @@ tc_simulation_unit_entity_definition_creation_encode pc_simulation_unit_entity_d
 
 int __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr, int creation_data_size, void* creation_data, int a3, void* packet)
 {
-	TRACE_GAME_N("c_simulation_unit_entity_definition_creation_encode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, a3: %i, packet: %08X", thisptr, creation_data_size, creation_data, a3, packet);
+	//TRACE_GAME_N("c_simulation_unit_entity_definition_creation_encode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, a3: %i, packet: %08X", thisptr, creation_data_size, creation_data, a3, packet);
 
 
 	int object_permutation_index = *(int*)((char*)creation_data + 0x24);
 	if( object_permutation_index != -1)
 	{
-		TRACE_GAME_N("creation_data+0x24: %08X", object_permutation_index);
+		//TRACE_GAME_N("creation_data+0x24: %08X", object_permutation_index);
 
 		bitstream_write_bool(packet, "object-permutation-exists", 1);
 		bitstream_write_uint(packet, "object-permutation-index", object_permutation_index, 32);
-		TRACE_GAME_N("c_simulation_unit_entity_encode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
+		//TRACE_GAME_N("c_simulation_unit_entity_encode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
 
 	}
 	else
@@ -358,17 +358,17 @@ tc_simulation_unit_entity_definition_creation_decode pc_simulation_unit_entity_d
 
 int __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, int creation_data_size, void* creation_data,void* packet)
 {
-	TRACE_GAME_N("c_simulation_unit_entity_definition_creation_decode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, packet: %08X", thisptr, creation_data_size, creation_data, packet);
+	//TRACE_GAME_N("c_simulation_unit_entity_definition_creation_decode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, packet: %08X", thisptr, creation_data_size, creation_data, packet);
 
 
 	if (bitstream_read_bool(packet, "object-permutation-exists"))
 	{
 
-		TRACE_GAME_N("c_simulation_unit_entity_decode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
+		//TRACE_GAME_N("c_simulation_unit_entity_decode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
 		int object_permutation_index = bitstream_read_uint(packet, "object-permutation-index", 32);
 		*(int*)((char*)creation_data + 0x24) = object_permutation_index;
 
-		TRACE_GAME_N("object_permutation_index: %08X", object_permutation_index);
+		//TRACE_GAME_N("object_permutation_index: %08X", object_permutation_index);
 	}
 	else
 		*(int*)((char*)creation_data + 0x24) = -1;
@@ -391,12 +391,12 @@ int __stdcall set_unit_creation_data_hook(unsigned int object_index, void* objec
 		//We should have allocated an additional 4 bytes above 0x24 so we'll write our in between 0x24 and 0x28
 		*(int*)((char*)object_creation_data + 0x24) = object_to_variant[object_index];
 		
-		wchar_t DebugText[255] = { 0 };
+		/*wchar_t DebugText[255] = { 0 };
 		ZeroMemory(DebugText, sizeof(DebugText));
 		wsprintf(DebugText, L"AI unit_creation_data_setup hook - object_index: %08X - variant_index: %08X", object_index, object_to_variant[object_index]);
 
 		TRACE_GAME_N("set_unit_creation_data_hook - object_index: %08X, variant_index: %08X", object_index, object_to_variant[object_index]);
-		addDebugText(DebugText);
+		addDebugText(DebugText);*/
 	}
 	else
 		*(int*)((char*)object_creation_data + 0x24) = -1;
@@ -430,11 +430,11 @@ bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObje
 {
 	if (*(int*)((char*)pCreationData+0x24) != -1)
 	{	
-		wchar_t DebugText[255] = { 0 };
-		ZeroMemory(DebugText, sizeof(DebugText));
-		wsprintf(DebugText, L"create_unit_hook - variant type: %08X - ", *(int*)((char*)pCreationData + 0x24));
+		//wchar_t DebugText[255] = { 0 };
+		//ZeroMemory(DebugText, sizeof(DebugText));
+		//wsprintf(DebugText, L"create_unit_hook - variant type: %08X - ", *(int*)((char*)pCreationData + 0x24));
 	
-		addDebugText(DebugText);
+		//addDebugText(DebugText);
 
 		*(int*)((char*)pObject + 0xC) = *(int*)((char*)pCreationData+0x24);
 	}
@@ -994,7 +994,7 @@ tconnect_establish_write pconnect_establish_write;
 char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 {
 
-	TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
+	//TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
 
 	/* The first value within a2 ( *(DWORD*)(a2) ) appears to be the datum_index of a player from the gamestate_player_table */
 
@@ -1037,7 +1037,7 @@ char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 
 void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6)
 {
-	TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
+	//TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
 	//20/10/2018 18:46:51.541 update_player_score_hook ( thisptr: 3000595C, a2: 00000000, a3: 00000002, a4: 00000001, a5: 00000007, a6: 00000001 )
 	// / 10 / 2018 18:46 : 51.541 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
 	//	20 / 10 / 2018 18 : 46 : 51.541 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
@@ -1241,7 +1241,7 @@ void __cdecl OnMapLoad(int a1)
 			// send server map checksums to client
 			//MapChecksumSync::SendState();
 			//inform players of the current advanced lobby settings
-			advLobbySettings->sendLobbySettingsPacket();
+			//advLobbySettings->sendLobbySettingsPacket();
 
 			if (b_Infection) {
 				infectionHandler->initializer->execute();

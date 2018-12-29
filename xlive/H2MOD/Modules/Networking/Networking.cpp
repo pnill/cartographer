@@ -247,7 +247,7 @@ bool __cdecl refuse_read(int a1, int a2, int a3) {
 	*(DWORD *)a3 = getDataDecodeIntegerMethod()(a1, (int)"remote-identifier", 32);
 	*(DWORD *)(a3 + 4) = getDataDecodeIntegerMethod()(a1, (int)"reason", 3);
 	bool isValid = getIsValidPacketMethod()(a1) == 0;
-	TRACE_GAME_N("[H2MOD-network] connection refuse read, remote-identifier=%d, reason=%d, isValid=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), isValid);
+	//TRACE_GAME_N("[H2MOD-network] connection refuse read, remote-identifier=%d, reason=%d, isValid=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), isValid);
 	return isValid;
 }
 
@@ -256,7 +256,7 @@ int __cdecl establish_write(void* a1, int a2, int a3) {
 
 	getDataEncodeIntegerMethod()(a1, (int)(h2mod->GetBase() + 0x3C843C), *(DWORD *)a3, 32);
 	int result = getDataEncodeIntegerMethod()(a1, (int)(h2mod->GetBase() + 0x3BDC64), *(DWORD *)(a3 + 4), 32);
-	TRACE_GAME_N("[H2MOD-network] connection establish write, remote-identifier=%d, identifier=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4));
+	//TRACE_GAME_N("[H2MOD-network] connection establish write, remote-identifier=%d, identifier=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4));
 	return result;
 }
 
@@ -264,7 +264,7 @@ bool __cdecl establish_read(int a1, int a2, int a3) {
 	*(DWORD *)a3 = getDataDecodeIntegerMethod()(a1, (int)"remote-identifier", 32);
 	*(DWORD *)(a3 + 4) = getDataDecodeIntegerMethod()(a1, (int)"identifier", 32);
 	bool isValid = getIsValidPacketMethod()(a1) == 0;
-	TRACE_GAME_N("[H2MOD-network] connection establish read, remote-identifier=%d, identifier=%d, isValid=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), isValid);
+	//TRACE_GAME_N("[H2MOD-network] connection establish read, remote-identifier=%d, identifier=%d, isValid=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), isValid);
 	return isValid;
 }
 
@@ -272,7 +272,7 @@ int __cdecl closed_write(void* a1, int a2, int a3) {
 	getDataEncodeIntegerMethod()(a1, (int)"remote-identifier", *(DWORD *)a3, 32);
 	getDataEncodeIntegerMethod()(a1, (int)"identifier", *(DWORD *)(a3 + 4), 32);
 	int result = getDataEncodeIntegerMethod()(a1, (int)"closure-reason", *(DWORD *)(a3 + 8), 5);
-	TRACE_GAME_N("[H2MOD-network] connection closed write, remote-identifier=%d, identifier=%d, closureReason=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), *(DWORD *)(a3 + 8));
+	//TRACE_GAME_N("[H2MOD-network] connection closed write, remote-identifier=%d, identifier=%d, closureReason=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), *(DWORD *)(a3 + 8));
 	return result;
 }
 
@@ -291,8 +291,8 @@ bool __cdecl closed_read(int a1, int a2, int a3) {
 		if (v3 >= 0 && v3 < 18)
 			result = 1;
 	}
-	TRACE_GAME_N("[H2MOD-network] connection closed read, remote-identifier=%d, reason=%d, closureReason=%d, isValid=%d, result=%d",
-		*(DWORD *)a3, *(DWORD *)(a3 + 4), *(DWORD *)(a3 + 8), isValid, result);
+	//TRACE_GAME_N("[H2MOD-network] connection closed read, remote-identifier=%d, reason=%d, closureReason=%d, isValid=%d, result=%d",
+	//	*(DWORD *)a3, *(DWORD *)(a3 + 4), *(DWORD *)(a3 + 8), isValid, result);
 	return result;
 }
 
@@ -563,8 +563,8 @@ void deserializeChatPacketCave() {
 
 	char* command = (char*)(targetData2 + (CHAT_PACKET_ORG_SIZE));
 	getDataDecodeStringMethod()((void*)packet2, (int)"command", (int)command, CHAT_PACKET_EXTEND_SIZE);
-	TRACE_GAME_N("[h2mod-network] chat packet deserialize code cave, commandText=%s", command);
-	TRACE_GAME("[h2mod-network] chat packet deserialize code cave, isFromServer=%d, text=%s", isServer, text);
+	//TRACE_GAME_N("[h2mod-network] chat packet deserialize code cave, commandText=%s", command);
+	//TRACE_GAME("[h2mod-network] chat packet deserialize code cave, isFromServer=%d, text=%s", isServer, text);
 
 	if (command != NULL && command[0] != '\0') {
 		std::string command_decoded = base64_decode(command);
@@ -610,7 +610,7 @@ void deserializePlayerAddCave() {
 	//inform new players of the current map info
 	mapManager->sendMapInfoPacket();
 	//inform new players of the current advanced lobby settings
-	advLobbySettings->sendLobbySettingsPacket();
+	//advLobbySettings->sendLobbySettingsPacket();
 	// send server map checksums to client
 	//MapChecksumSync::SendState();
 }
@@ -788,7 +788,7 @@ int __cdecl serializeMembershipPacket(void* a1, int a2, int a3) {
 		} while (v3 < *(WORD*)(a3 + 32));
 	}*/
 	mapManager->sendMapInfoPacket();
-	advLobbySettings->sendLobbySettingsPacket();
+	//advLobbySettings->sendLobbySettingsPacket();
 	// send server map checksums to client
 	//MapChecksumSync::SendState();
 	return serialize_membership_packet_method(a1, a2, a3);
@@ -847,7 +847,7 @@ serialize_parameters_update_packet serialize_parameters_update_packet_method;
 
 int __cdecl serializeParametersUpdatePacket(void* a1, int a2, int a3) {
 	mapManager->sendMapInfoPacket();
-	advLobbySettings->sendLobbySettingsPacket();
+	//advLobbySettings->sendLobbySettingsPacket();
 	// send server map checksums to client
 	//MapChecksumSync::SendState();
 	return serialize_parameters_update_packet_method(a1, a2, a3);

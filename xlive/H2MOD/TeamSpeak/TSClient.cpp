@@ -81,13 +81,13 @@ void TSClient::initializeCallbacks(bool log) {
 
 void TSClient::onUserLoggingMessageEvent(const char* logMessage, int logLevel, const char* logChannel, uint64 logID, const char* logTime, const char* completeLogString) {
 	//TODO: what to do during critical errors? nothing?
-	TRACE_GAME_N("[h2mod-voice] [%d]User log message: %s", logLevel, logMessage);
+	//TRACE_GAME_N("[h2mod-voice] [%d]User log message: %s", logLevel, logMessage);
 }
 
 void TSClient::connect() {
 	/* Spawn a new server connection handler using the default port and store the server ID */
 	if ((error = ts3client_spawnNewServerConnectionHandler(0, &scHandlerID)) != ERROR_ok) {
-		TRACE("[h2mod-voice] Error spawning server connection handler: %d\n", error);
+		//TRACE("[h2mod-voice] Error spawning server connection handler: %d\n", error);
 	}
 
 	this->openMicrophone();
@@ -96,21 +96,21 @@ void TSClient::connect() {
 
 	char *version;
 	const char* hostnameOrIP = inet_ntoa(serverAddress);
-	TRACE_GAME_N("[h2mod-voice] TeamSpeak::hostname: %s", hostnameOrIP);
-	TRACE_GAME_N("[h2mod-voice] TeamSpeak::port: %d", port);
-	TRACE_GAME_N("[h2mod-voice] TeamSpeak::nickname: %s", nickname);
+	//TRACE_GAME_N("[h2mod-voice] TeamSpeak::hostname: %s", hostnameOrIP);
+	//TRACE_GAME_N("[h2mod-voice] TeamSpeak::port: %d", port);
+	//TRACE_GAME_N("[h2mod-voice] TeamSpeak::nickname: %s", nickname);
 	//TODO: do we need a secret per session?
 	if ((error = ts3client_startConnection(scHandlerID, identity, hostnameOrIP, port, nickname, NULL, "", "secret")) != ERROR_ok) {
-		TRACE_GAME_N("[h2mod-voice] Error connecting to server: %d\n", error);
+		//TRACE_GAME_N("[h2mod-voice] Error connecting to server: %d\n", error);
 		return;
 	}
 
 	/* Query and print client lib version */
 	if ((error = ts3client_getClientLibVersion(&version)) != ERROR_ok) {
-		TRACE_GAME_N("[h2mod-voice] Failed to get clientlib version: %d\n", error);
+		//TRACE_GAME_N("[h2mod-voice] Failed to get clientlib version: %d\n", error);
 		return;
 	}
-	TRACE_GAME_N("[h2mod-voice] Client lib version: %s", version);
+	//TRACE_GAME_N("[h2mod-voice] Client lib version: %s", version);
 	ts3client_freeMemory(version);  /* Release dynamically allocated memory */
 	version = NULL;
 }
