@@ -2,7 +2,7 @@
 #include "H2MOD\Modules\HitFix\Hitfix.h"
 #include "H2MOD.h"
 
-void::HitFix::Initialize()
+void HitFix::Initialize()
 {
 	int offset = 0x47CD54;
 	if (h2mod->Server) {
