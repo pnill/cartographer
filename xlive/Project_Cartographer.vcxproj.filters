@@ -241,6 +241,9 @@
     <Filter Include="Source Files\H2MOD\Modules\MainMenu">
       <UniqueIdentifier>{81d68132-d9e7-4e7c-9500-7aef66a37553}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\HitFix">
+      <UniqueIdentifier>{e2beceb0-3685-4b6a-88e8-2a4b7ac4a822}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -452,6 +455,9 @@
     </ClCompile>
     <ClCompile Include="Util\ClipboardAPI.cpp">
       <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\HitFix\HitFix.cpp">
+      <Filter>Source Files\H2MOD\Modules\HitFix</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -859,6 +865,9 @@
     </ClInclude>
     <ClInclude Include="Util\ClipboardAPI.h">
       <Filter>Source Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\HitFix\HitFix.h">
+      <Filter>Source Files\H2MOD\Modules\HitFix</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
