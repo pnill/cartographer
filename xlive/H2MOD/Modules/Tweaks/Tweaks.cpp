@@ -1343,6 +1343,6 @@ __declspec(naked) void calculate_delta_time(void)
 
 void H2Tweaks::applyPlayersActionsUpdateRatePatch()
 {
-	xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
-	PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
+	//xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
+	//PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
 }

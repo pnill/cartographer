@@ -51,7 +51,7 @@ void StartListenerThread(PBYTE pbData, UINT cbData)
 void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XNQOS** pxnqos,DWORD dwBitsPerSec,XNQOS* pqos)
 {
 
-	TRACE_GAME_N("ClientQoSLookup( cxna: %i, cProbes: %i, XNADDR array: %08X)", cxna,cProbes,apxna);
+	//TRACE_GAME_N("ClientQoSLookup( cxna: %i, cProbes: %i, XNADDR array: %08X)", cxna,cProbes,apxna);
 	//*pxnqos = new XNQOS;
 
 	/**pxnqos = (XNQOS*)malloc(sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna)));
@@ -76,8 +76,8 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 			XNQOSINFO *xnqos = &pqos->axnqosinfo[ ( pqos->cxnqosPending - 1) ];
 			
 
-			if (H2Config_debug_log)
-				TRACE_GAME_N("[XNetQoSLookup] Looping cxnas for probes pqos->xnqosPending: %i", pqos->cxnqosPending);
+			//if (H2Config_debug_log)
+			//	TRACE_GAME_N("[XNetQoSLookup] Looping cxnas for probes pqos->xnqosPending: %i", pqos->cxnqosPending);
 
 			SOCKET connectSocket = INVALID_SOCKET;
 			WSADATA wsaData;
@@ -88,8 +88,8 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 			// Initialize Winsock
 			iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 			if (iResult != 0) {
-				if (H2Config_debug_log)
-					TRACE_GAME_N("WSAStartup failed with error: %d\n", iResult);
+				//if (H2Config_debug_log)
+				//	TRACE_GAME_N("WSAStartup failed with error: %d\n", iResult);
 			}
 
 			ZeroMemory(&hints, sizeof(hints));
@@ -99,14 +99,14 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 			std::string addr = inet_ntoa(xn->ina);
 			std::string prt = std::to_string(ntohs(xn->wPortOnline) + 10);
 
-			if (H2Config_debug_log)
-				TRACE_GAME_N("[XNetQoSLookup] QoSLookup, addr=%s, port=%s", addr.c_str(), prt.c_str());
+			//if (H2Config_debug_log)
+			//	TRACE_GAME_N("[XNetQoSLookup] QoSLookup, addr=%s, port=%s", addr.c_str(), prt.c_str());
 
 			// Resolve the server address and port
 			iResult = getaddrinfo(addr.c_str(), prt.c_str(), &hints, &result);
 			if (iResult != 0) {
-				if (H2Config_debug_log)
-					TRACE_GAME_N("[XnetQoSLookup] getaddrinfo failed with error: %d\n", iResult);
+				//if (H2Config_debug_log)
+				//	TRACE_GAME_N("[XnetQoSLookup] getaddrinfo failed with error: %d\n", iResult);
 				//WSACleanup();
 				
 				xnqos->cProbesRecv = 0;
@@ -171,8 +171,8 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 			
 			if (connectSocket == INVALID_SOCKET)
 			{
-				if (H2Config_debug_log)
-					TRACE_GAME_N("[XNetQoSLookup] Unable to connect to server...");
+				//if (H2Config_debug_log)
+				//	TRACE_GAME_N("[XNetQoSLookup] Unable to connect to server...");
 
 				xnqos->wRttMinInMsecs = 4000;
 				xnqos->wRttMedInMsecs = 4000;
@@ -196,8 +196,8 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 			int probes = cProbes;
 			do
 			{
-				if (H2Config_debug_log)
-					TRACE_GAME_N("[XNetQoSLookup][Client] Sending Probe %i..",probes);
+				//if (H2Config_debug_log)
+				//	TRACE_GAME_N("[XNetQoSLookup][Client] Sending Probe %i..",probes);
 
 				auto started = std::chrono::high_resolution_clock::now();
 
@@ -209,8 +209,8 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 
 				RecvLen = recv(connectSocket, recvbuf, recvbuflen, 0);
 
-				if(H2Config_debug_log)
-					TRACE_GAME_N("[XNetQosLookup][Client] Probe got %i bytes of data back",RecvLen);
+				//if(H2Config_debug_log)
+				//	TRACE_GAME_N("[XNetQosLookup][Client] Probe got %i bytes of data back",RecvLen);
 
 				auto done = std::chrono::high_resolution_clock::now();
 
@@ -218,8 +218,8 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 
 				long long int diff = d.count();
 
-				if (H2Config_debug_log)
-					TRACE_GAME_N("[XNetQoSLookup][Client] Probe %i finished ping: %lld", probes, diff);
+				//if (H2Config_debug_log)
+				//	TRACE_GAME_N("[XNetQoSLookup][Client] Probe %i finished ping: %lld", probes, diff);
 
 				ping_storage.push_back(diff);
 
@@ -230,8 +230,8 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 			if (RecvLen <= 0) 
 			{
 				closesocket(connectSocket);
-				if (H2Config_debug_log)
-					TRACE_GAME_N("[XNetQoSLookup][Socket: %08X] Disconnected!",connectSocket);
+				//if (H2Config_debug_log)
+				//	TRACE_GAME_N("[XNetQoSLookup][Socket: %08X] Disconnected!",connectSocket);
 
 
 				xnqos->wRttMinInMsecs = 4000;
@@ -269,8 +269,8 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 
 			ping_storage.clear();
 
-			if (H2Config_debug_log)
-				TRACE_GAME_N("[XNetQoSLookup][Client] Finished Probes max_ping: %i, min_ping: %i, average: %i", (WORD)max_ping, (WORD)min_ping,average);
+			//if (H2Config_debug_log)
+			//	TRACE_GAME_N("[XNetQoSLookup][Client] Finished Probes max_ping: %i, min_ping: %i, average: %i", (WORD)max_ping, (WORD)min_ping,average);
 				
 			
 			xnqos->wRttMinInMsecs = (WORD)min_ping;
@@ -288,8 +288,8 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 
 			if (pqos->cxnqosPending > 0)
 			{
-				if(H2Config_debug_log)
-					TRACE_GAME_N("[XNetQoSLookup] Finished Probing: %s, %i hosts left to probe.", addr.c_str(), pqos->cxnqosPending);
+				//if(H2Config_debug_log)
+				//	TRACE_GAME_N("[XNetQoSLookup] Finished Probing: %s, %i hosts left to probe.", addr.c_str(), pqos->cxnqosPending);
 				
 				pqos->cxnqosPending--;
 			}
