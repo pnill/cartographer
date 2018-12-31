@@ -1,4 +1,5 @@
 #include "Globals.h"
+#include "3rdparty/opus/include/opus.h"
 #include "xlivedefs.h"
 #include "Voice.h"
 #include "H2MOD\Modules\Config\Config.h"

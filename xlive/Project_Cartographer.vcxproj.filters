@@ -241,6 +241,9 @@
     <Filter Include="Source Files\H2MOD\Modules\HitFix">
       <UniqueIdentifier>{e2beceb0-3685-4b6a-88e8-2a4b7ac4a822}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\3rdparty\opus">
+      <UniqueIdentifier>{c2d12e72-3d9f-4695-a08d-e81a5ef33724}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -853,6 +856,24 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\HitFix\HitFix.h">
       <Filter>Source Files\H2MOD\Modules\HitFix</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_custom.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_defines.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_multistream.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_projection.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_types.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -15,8 +15,6 @@
 #include "Util\ReadIniArguments.h"
 
 #include "Blam\BlamLibrary.h"
-#include "H2MOD\TeamSpeak\TSClient.h"
-#include "H2MOD\TeamSpeak\TSServer.h"
 #include "H2MOD\Modules\Players\Players.h"
 #include "H2MOD\Variants\VariantPlayer.h"
 #include "H2MOD\Variants\VariantSystem.h"
@@ -60,14 +58,10 @@ extern CustomNetwork *network;
 extern char* replacedNetworkNormalTextWidget;
 extern char* replacedNetworkNormalTextWidget2;
 
-extern std::unordered_map<XUID, BOOL> xuidIsTalkingMap;
-extern std::unordered_map<XUID, anyID> xuidToTSid;
 extern std::map<DWORD, bool> achievementList;
 
 extern bool microphoneEnabled;
-extern IN_ADDR clientMachineAddress;
-extern TSClient* tsClient;
-extern TSServer* tsServer;
+extern std::unordered_map<XUID, BOOL> xuidIsTalkingMap;
 
 //some utility functions below
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
