@@ -1921,13 +1921,6 @@ void H2MOD::ApplyHooks() {
 		PatchWinAPICall(GetBase() + 0x352538, CryptUnprotectDataHook);
 		PatchCall(GetBase() + 0x85F73, filo_write__encrypted_data_hook);
 
-
-		if (tsServer == NULL) {
-			//TODO: move into method
-			tsServer = new TSServer(true);
-			tsServer->setPort(H2Config_base_port + 7);
-			tsServer->startListening();
-		}
 	}
 
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */

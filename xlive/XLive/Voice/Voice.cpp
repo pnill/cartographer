@@ -4,6 +4,7 @@
 #include "H2MOD\Modules\Config\Config.h"
 
 IXHV2ENGINE hv2Engine;
+std::vector<XUID> remotetalkers;
 
 //#5008
 int WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, PIXHV2ENGINE *ppEngine)
@@ -62,7 +63,7 @@ LONG IXHV2ENGINE::AddRef(/*CXHVEngine*/ VOID *pThis)
 	TRACE("IXHV2Engine::AddRef");
 
 
-	return 0;
+	return S_OK;
 }
 
 
@@ -71,6 +72,8 @@ LONG IXHV2ENGINE::Release(/*CXHVEngine*/ VOID *pThis)
 {
 	TRACE("IXHV2Engine::Release");
 
+	if (!remotetalkers.empty())
+		remotetalkers.clear();
 
 	return 0;
 }
@@ -159,26 +162,30 @@ HRESULT IXHV2ENGINE::UnregisterLocalTalker(VOID *pThis, DWORD dwUserIndex)
 	//TRACE("IXHV2Engine::UnregisterLocalTalker  (dwUserIndex = %d)",
 	//	dwUserIndex);
 
-
-	return ERROR_SUCCESS;
+	return S_OK;
 }
 
 
-std::vector<XUID> remotetalkers;
 HRESULT IXHV2ENGINE::RegisterRemoteTalker(VOID *pThis, XUID a1, LPVOID reserved, LPVOID reserved2, LPVOID reserved3)
 {
-
 	//TRACE_GAME_N("[h2mod-voice] IXHV2Engine::RegisterRemoteTalker XUID: %lld", a1);
 	remotetalkers.push_back(a1);
 	return S_OK;
 }
 
 
-
-HRESULT IXHV2ENGINE::UnregisterRemoteTalker(VOID *pThis, XUID a1)
+HRESULT IXHV2ENGINE::UnregisterRemoteTalker(VOID *pThis, XUID xuid)
 {
 	//TRACE_GAME_N("[h2mod-voice] IXHV2Engine::UnregisterRemoteTalker  (a1 = %X, a2 = %X)",
 	//	a1);
+
+	for (auto it = remotetalkers.begin(); it != remotetalkers.end(); ++it)
+	{
+		if (*it = xuid) {
+			remotetalkers.erase(it);
+			break;
+		}
+	}
 
 	return S_OK;
 }
@@ -190,10 +197,10 @@ HRESULT IXHV2ENGINE::GetRemoteTalkers(VOID *pThis, PDWORD pdwRemoteTalkersCount,
 	//TRACE_GAME_N("[h2mod-voice] - GetRemoteTalkers");
 	*pdwRemoteTalkersCount = remotetalkers.size();
 	int i = 0;
-	for (std::vector<XUID>::iterator it = remotetalkers.begin(); it != remotetalkers.end(); ++it) {
+	for (auto it = remotetalkers.begin(); it != remotetalkers.end(); ++it) 
+	{
 		pxuidRemoteTalkers[i] = *it;
 		i++;
-
 	}
 
 	return S_OK;
@@ -217,15 +224,22 @@ DWORD IXHV2ENGINE::GetDataReadyFlags(VOID *pThis)
 
 HRESULT IXHV2ENGINE::GetLocalChatData(VOID *pThis, DWORD dwUserIndex, PBYTE pbData, PDWORD pdwSize, PDWORD pdwPackets)
 {
+    *pdwPackets = *pdwSize / XHV_VOICECHAT_MODE_PACKET_SIZE;
+
+	if (*pdwPackets > XHV_MAX_VOICECHAT_PACKETS)
+		*pdwPackets = XHV_MAX_VOICECHAT_PACKETS;
+
 	if (pdwSize && pdwPackets && xuidIsTalkingMap[xFakeXuid[0]])
 	{
-		char dummy_data[0xC] = { 0x01 };
+		//char dummy_data[0xC] = { 0x01 };
 		//memset(dummy_data, 0x00, 0xC);
 		//*(XUID*)&dummy_data = xFakeXuid[0];
 		//*(int*)(&dummy_data+4) = rand();
 		//memcpy(pbData, dummy_data, 0x0C);
-		*pdwSize = 0xC;
-		*pdwPackets = 1;
+		//*pdwSize = 0xC;
+		//*pdwPackets = 1;
+
+		return S_OK;
 	}
 	else
 	{
@@ -233,7 +247,7 @@ HRESULT IXHV2ENGINE::GetLocalChatData(VOID *pThis, DWORD dwUserIndex, PBYTE pbDa
 		if (pdwPackets) *pdwPackets = 0;
 	}
 
-	return S_OK;
+	return E_PENDING;
 }
 
 
@@ -246,11 +260,6 @@ HRESULT IXHV2ENGINE::SetPlaybackPriority(VOID *pThis, XUID xuidRemoteTalker, DWO
 
 HRESULT IXHV2ENGINE::SubmitIncomingChatData(VOID *pThis, XUID xuidRemoteTalker, const BYTE* pbData, PDWORD pdwSize)
 {
-	anyID tsID = xuidToTSid[xuidRemoteTalker];
-
-	if (tsID != 0)
-		tsClient->unmute(tsID);
-
 	XUID test = *(XUID*)pbData;
 	//TRACE_GAME_N("[h2mod-voice][SubmitIncomingChatData] - XUID in packet: %lld", test);
 	//TRACE_GAME_N("[h2mod-voice][SubmitIncomingChatData] - Trying to unmute tsID: %i  xuid: %lld", tsID, xuidRemoteTalker);

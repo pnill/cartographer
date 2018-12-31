@@ -106,9 +106,6 @@
     <Filter Include="Source Files\Util\Hooks">
       <UniqueIdentifier>{6e3b665a-267b-4baf-9978-190c7753a4d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\H2MOD\TeamSpeak">
-      <UniqueIdentifier>{0cc52107-bf23-4ffa-8f69-d153a943b89d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\H2MOD\Variants\H2Final">
       <UniqueIdentifier>{8ae2946e-1bb2-4bd1-8e7c-1dd9790a829e}</UniqueIdentifier>
     </Filter>
@@ -296,12 +293,6 @@
     </ClCompile>
     <ClCompile Include="Util\Debug\Debug.cpp">
       <Filter>Source Files\Util\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\TeamSpeak\TSClient.cpp">
-      <Filter>Source Files\H2MOD\TeamSpeak</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\TeamSpeak\TSServer.cpp">
-      <Filter>Source Files\H2MOD\TeamSpeak</Filter>
     </ClCompile>
     <ClCompile Include="XLive\Networking\xlive_network.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
@@ -625,12 +616,6 @@
     </ClInclude>
     <ClInclude Include="Util\ReadIniArguments.h">
       <Filter>Source Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\TeamSpeak\TSServer.h">
-      <Filter>Source Files\H2MOD\TeamSpeak</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\TeamSpeak\TSClient.h">
-      <Filter>Source Files\H2MOD\TeamSpeak</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\H2Final\H2Final.h">
       <Filter>Source Files\H2MOD\Variants\H2Final</Filter>

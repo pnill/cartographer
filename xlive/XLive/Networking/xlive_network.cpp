@@ -41,7 +41,7 @@ void ForwardPorts()
 	if (upnp != NULL)
 	{
 		upnp->UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
-		upnp->UPnPForwardPort(false, (H2Config_base_port + 7), (H2Config_base_port + 7), "Halo2_voice");
+		//upnp->UPnPForwardPort(false, (H2Config_base_port + 7), (H2Config_base_port + 7), "Halo2_voice");
 		upnp->UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2");
 		upnp->UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2_2");
 	}
@@ -78,11 +78,8 @@ SOCKET voice_sock = NULL;
 // #3: XCreateSocket
 SOCKET WINAPI XCreateSocket(int af, int type, int protocol)
 {
-
-
-	//  TRACE("XCreateSocket (%d, %d, %d)", af, type, protocol);
-
 	TRACE_GAME("XCreateSocket af = %i, type = %i, protocol = %i", af, type, protocol);
+
 	bool vdp = false;
 	if (protocol == 254)
 	{
@@ -109,12 +106,6 @@ SOCKET WINAPI XCreateSocket(int af, int type, int protocol)
 // #5332: XSessionEnd
 int WINAPI XSessionEnd(DWORD, DWORD)
 {
-	if (tsClient != NULL) {
-		tsClient->disconnect();
-	}
-	if (tsServer != NULL) {
-		tsServer->destroyVirtualServer();
-	}
 	mapManager->cleanup();
 	TRACE("XSessionEnd");
 	return 0;

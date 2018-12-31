@@ -297,8 +297,6 @@
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
     <ClCompile Include="H2MOD\Modules\Utils\Utils.cpp" />
     <ClCompile Include="H2MOD\protobuf\h2mod.pb.cc" />
-    <ClCompile Include="H2MOD\TeamSpeak\TSClient.cpp" />
-    <ClCompile Include="H2MOD\TeamSpeak\TSServer.cpp" />
     <ClCompile Include="H2MOD\Variants\DeviceShop\DeviceShop.cpp" />
     <ClCompile Include="H2MOD\Variants\FireFight\FireFight.cpp" />
     <ClCompile Include="H2MOD\Variants\GunGame\GunGame.cpp" />
@@ -429,8 +427,6 @@
     <ClInclude Include="H2MOD\Modules\Updater\Updater.h" />
     <ClInclude Include="H2MOD\Modules\Utils\Utils.h" />
     <ClInclude Include="H2MOD\protobuf\h2mod.pb.h" />
-    <ClInclude Include="H2MOD\TeamSpeak\TSClient.h" />
-    <ClInclude Include="H2MOD\TeamSpeak\TSServer.h" />
     <ClInclude Include="H2MOD\Variants\DeviceShop\DeviceShop.h" />
     <ClInclude Include="H2MOD\Variants\FireFight\FireFight.h" />
     <ClInclude Include="H2MOD\Variants\GunGame\GunGame.h" />
