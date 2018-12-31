@@ -1608,14 +1608,13 @@ int __cdecl device_touch(DatumIndex device_datum, DatumIndex unit_datum)
 				device_active = true;
 				return 0;
 			}
+			// If the purchase fails (they don't have enough points), or the device is not a shopping device return normally.
+			// In general's map returning normally will turn the point display red indicating the user has no points, we do not indicate that the purchase failed in any other way.
+			if (device_active == false)
+				return 0;
+
+			device_active = false;
 		}
-
-		// If the purchase fails (they don't have enough points), or the device is not a shopping device return normally.
-		// In general's map returning normally will turn the point display red indicating the user has no points, we do not indicate that the purchase failed in any other way.
-		if (device_active == false)
-			return 0;
-
-		device_active = false;
 	}
 
 	return pdevice_touch(device_datum, unit_datum);
