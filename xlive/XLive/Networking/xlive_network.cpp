@@ -147,7 +147,7 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 		TRACE("game_sock set for port %i", ntohs(port));
 		TRACE("connect_port set to %i instead of %i", ntohs(nport), ntohs(port));
 		TRACE("g_port was set to %i", H2Config_base_port);
-		if (upnp != NULL) {
+		if (upnp == NULL) {
 			std::thread(ForwardPorts).detach();
 		}
 	}
