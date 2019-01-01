@@ -36,16 +36,13 @@ ModuleUPnP *upnp = NULL;
 
 void ForwardPorts()
 {
-
-	upnp = new ModuleUPnP;
-	if (upnp != NULL)
-	{
-		upnp->UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
-		upnp->UPnPForwardPort(false, (H2Config_base_port + 7), (H2Config_base_port + 7), "Halo2_voice");
-		upnp->UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2");
-		upnp->UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2_2");
-	}
-
+	if (upnp == NULL) {
+		upnp = new ModuleUPnP();
+	} 
+	upnp->UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
+	upnp->UPnPForwardPort(false, (H2Config_base_port + 7), (H2Config_base_port + 7), "Halo2_voice");
+	upnp->UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2");
+	upnp->UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2_2");
 }
 // #5310: XOnlineStartup
 int WINAPI XOnlineStartup()
@@ -150,7 +147,9 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 		TRACE("game_sock set for port %i", ntohs(port));
 		TRACE("connect_port set to %i instead of %i", ntohs(nport), ntohs(port));
 		TRACE("g_port was set to %i", H2Config_base_port);
-		std::thread(ForwardPorts).detach();
+		if (upnp != NULL) {
+			std::thread(ForwardPorts).detach();
+		}
 	}
 
 	if (ntohs(port) == 1000)
