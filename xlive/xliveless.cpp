@@ -2326,13 +2326,13 @@ DWORD WINAPI XOnlineGetServiceInfo( int, int )
 // 5028: ??
 DWORD WINAPI XLiveLoadLibraryEx(LPCWSTR libFileName, HINSTANCE *a2, DWORD dwFlags)
 {
-	TRACE("XLiveLoadLibraryEx  (libFileName = %s, a2 = %X, flags = %X)",
+	TRACE("XLiveLoadLibraryEx (libFileName = %s, a2 = %X, flags = %X)",
 		libFileName, a2, dwFlags);
 
 	HINSTANCE hInstance = LoadLibraryExW(libFileName, NULL, dwFlags);
 
 	if (!hInstance)
-		return 0x80070057;
+		return HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);
 
 	*a2 = hInstance;
 	return 0;

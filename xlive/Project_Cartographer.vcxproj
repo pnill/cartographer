@@ -73,7 +73,7 @@
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
-    <LibraryPath>..\Directx SDK\lib;.\libs;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;.\3rdparty\miniupnpc\lib\;.\3rdparty;.\3rdparty\libcurl\;.\3rdparty\google\;.\3rdparty\teamspeak\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\Directx SDK\lib;.\libs;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;.\3rdparty\;.\3rdparty\libcurl\;.\3rdparty\google\;.\3rdparty\miniupnpc\lib\;.\3rdparty\opus\;.\3rdparty\portaudio\;$(LibraryPath)</LibraryPath>
     <IncludePath>.\3rdparty\;..\Directx SDK\include;.\;.\3rdparty\google;.\3rdparty\teamlog;.\3rdparty\teamspeak;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;.\3rdparty\libcurl\;.\3rdparty\miniupnpc\include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">
@@ -188,7 +188,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>opus_debug.lib;iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdparty/discord/discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;.\3rdparty\discord\discord-rpc-debug.lib;.\3rdparty\opus\opus-debug.lib;.\3rdparty\portaudio\portaudio_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -262,7 +262,6 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AUDIOINPUTDEVICE.CPP" />
     <ClCompile Include="XLive\Voice\AudioDevice.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
     <ClCompile Include="dllmain.cpp" />

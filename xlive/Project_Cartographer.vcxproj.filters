@@ -462,9 +462,6 @@
     <ClCompile Include="XLive\Voice\AudioInputHandler.cpp">
       <Filter>Source Files\XLive\voice</Filter>
     </ClCompile>
-    <ClCompile Include="AUDIOINPUTDEVICE.CPP">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="XLive\Voice\AudioDevice.cpp">
       <Filter>Source Files\XLive\voice</Filter>
     </ClCompile>
