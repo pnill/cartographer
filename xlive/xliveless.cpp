@@ -2326,7 +2326,7 @@ DWORD WINAPI XOnlineGetServiceInfo( int, int )
 // 5028: ??
 DWORD WINAPI XLiveLoadLibraryEx(LPCWSTR libFileName, HINSTANCE *a2, DWORD dwFlags)
 {
-	TRACE("XLiveLoadLibraryEx (?? - FIXME)  (libFileName = %s, a2 = %X, flags = %X)",
+	TRACE("XLiveLoadLibraryEx  (libFileName = %s, a2 = %X, flags = %X)",
 		libFileName, a2, dwFlags);
 
 	HINSTANCE hInstance = LoadLibraryExW(libFileName, NULL, dwFlags);
@@ -2342,13 +2342,13 @@ DWORD WINAPI XLiveLoadLibraryEx(LPCWSTR libFileName, HINSTANCE *a2, DWORD dwFlag
 
 
 // 5238: ??
-DWORD WINAPI XLocatorCreateKey( XNKID* pxnkid, XNKEY* xnkey )
+DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* xnkey)
 {
-  TRACE("XLocatorCreateKey  (a1 = %X, a2 = %X)",
-		pxnkid, xnkey );
+	TRACE("XLocatorCreateKey  (a1 = %X, a2 = %X)",
+		pxnkid, xnkey);
 
 	XNetCreateKey(pxnkid, xnkey);
-	// GFWL offline
+
 	return S_OK;
 }
 

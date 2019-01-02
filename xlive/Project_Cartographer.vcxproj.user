@@ -23,6 +23,6 @@
     <LocalDebuggerCommandArguments>-nointro</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup>
-    <ShowAllFiles>false</ShowAllFiles>
+    <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
 </Project>

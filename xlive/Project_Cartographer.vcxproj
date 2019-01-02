@@ -64,8 +64,8 @@
     <OutDir>$(SolutionDir)Halo2\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>.\3rdparty\libcurl;..\Directx SDK\include;.\;.\3rdparty\;.\3rdparty\google;.\teamlog;.\3rdparty\miniupnpc\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\Directx SDK\lib;.\libs;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;.\3rdparty\miniupnpc\lib\;.\3rdparty\libcurl\;.\3rdparty\opus\;$(LibraryPath)</LibraryPath>
+    <IncludePath>.\;.\3rdparty\;.\3rdparty\libcurl;.3rdparty\portaudio;.\3rdparty\google;..\Directx SDK\include;.\3rdparty\miniupnpc\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\Directx SDK\lib;.\libs;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;.\3rdparty\portaudio;.\3rdparty\miniupnpc\lib\;.\3rdparty\libcurl\;.\3rdparty\opus\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -125,7 +125,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>opus.lib;iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;3rdparty/google/libprotobuf_release.lib;d3d9.lib;d3dx9.lib;3rdparty/discord/discord-rpc.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>portaudio.lib;opus.lib;iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;3rdparty/google/libprotobuf_release.lib;d3d9.lib;d3dx9.lib;3rdparty/discord/discord-rpc.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -262,8 +262,11 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AUDIOINPUTDEVICE.CPP" />
+    <ClCompile Include="XLive\Voice\AudioDevice.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="XLive\Voice\Encoder.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="H2MOD\Discord\DiscordInterface.cpp" />
@@ -307,6 +310,7 @@
     <ClCompile Include="H2MOD\Variants\VariantMPGameEngine.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantPlayer.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
+    <ClCompile Include="XLive\Voice\AudioInputHandler.cpp" />
     <ClCompile Include="Util\Base64.cpp" />
     <ClCompile Include="Util\ClipboardAPI.cpp" />
     <ClCompile Include="Util\Debug\Debug.cpp" />
@@ -324,7 +328,7 @@
     <ClCompile Include="XLive\Networking\XSocket.cpp" />
     <ClCompile Include="XLive\UserManagement\CUser.cpp" />
     <ClCompile Include="XLive\UserManagement\protobuf\packet.pb.cc" />
-    <ClCompile Include="XLive\Voice\Voice.cpp" />
+    <ClCompile Include="XLive\Voice\XHVEngine.cpp" />
     <ClCompile Include="XLive\XAM\xam.cpp" />
     <ClCompile Include="XLive\xbox\xbox.cpp" />
     <ClCompile Include="XLive\XUser\XCustomAction.cpp" />
@@ -341,6 +345,16 @@
     <ClInclude Include="3rdparty\opus\include\opus_multistream.h" />
     <ClInclude Include="3rdparty\opus\include\opus_projection.h" />
     <ClInclude Include="3rdparty\opus\include\opus_types.h" />
+    <ClInclude Include="3rdparty\portaudio\include\pa_jack.h" />
+    <ClInclude Include="3rdparty\portaudio\include\pa_linux_alsa.h" />
+    <ClInclude Include="3rdparty\portaudio\include\pa_mac_core.h" />
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_ds.h" />
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_wasapi.h" />
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_waveformat.h" />
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_wdmks.h" />
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_wmme.h" />
+    <ClInclude Include="3rdparty\portaudio\include\portaudio.h" />
+    <ClInclude Include="XLive\Voice\AudioDevice.h" />
     <ClInclude Include="Blam\BlamLibrary.h" />
     <ClInclude Include="Blam\Cache\Cache.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Bitfield.h" />
@@ -400,6 +414,7 @@
     <ClInclude Include="Blam\Shared\DatumIndex.h" />
     <ClInclude Include="Blam\Shared\Globals.h" />
     <ClInclude Include="Blam\Shared\SharedDefinitions.h" />
+    <ClInclude Include="XLive\Voice\Encoder.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="H2MOD\Discord\DiscordInterface.h" />
@@ -443,6 +458,7 @@
     <ClInclude Include="H2MOD\Variants\VariantMPGameEngine.h" />
     <ClInclude Include="H2MOD\Variants\VariantPlayer.h" />
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
+    <ClInclude Include="XLive\Voice\AudioInputHandler.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Util\Base64.h" />
     <ClInclude Include="Util\ClipboardAPI.h" />
@@ -463,7 +479,7 @@
     <ClInclude Include="XLive\Networking\XSocket.h" />
     <ClInclude Include="XLive\UserManagement\CUser.h" />
     <ClInclude Include="XLive\UserManagement\protobuf\packet.pb.h" />
-    <ClInclude Include="XLive\Voice\Voice.h" />
+    <ClInclude Include="XLive\Voice\XHVEngine.h" />
     <ClInclude Include="XLive\XAM\xam.h" />
     <ClInclude Include="XLive\xbox\xbox.h" />
     <ClInclude Include="XLive\XUser\XCustomAction.h" />

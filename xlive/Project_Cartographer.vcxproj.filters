@@ -244,6 +244,9 @@
     <Filter Include="Source Files\3rdparty\opus">
       <UniqueIdentifier>{c2d12e72-3d9f-4695-a08d-e81a5ef33724}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\3rdparty\portaudio">
+      <UniqueIdentifier>{a11687ea-ad4d-4338-be2a-8150f5fc6ff4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -399,9 +402,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp">
       <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\Voice\Voice.cpp">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClCompile>
     <ClCompile Include="XLive\XAM\xam.cpp">
       <Filter>Source Files\XLive\xam</Filter>
     </ClCompile>
@@ -452,6 +452,21 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\HitFix\HitFix.cpp">
       <Filter>Source Files\H2MOD\Modules\HitFix</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Voice\XHVEngine.cpp">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Voice\Encoder.cpp">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Voice\AudioInputHandler.cpp">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="AUDIOINPUTDEVICE.CPP">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Voice\AudioDevice.cpp">
+      <Filter>Source Files\XLive\voice</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -719,9 +734,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h">
       <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
     </ClInclude>
-    <ClInclude Include="XLive\Voice\Voice.h">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClInclude>
     <ClInclude Include="XLive\XAM\xam.h">
       <Filter>Source Files\XLive\xam</Filter>
     </ClInclude>
@@ -874,6 +886,45 @@
     </ClInclude>
     <ClInclude Include="3rdparty\opus\include\opus_types.h">
       <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_jack.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_linux_alsa.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_mac_core.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_ds.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_wasapi.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_waveformat.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_wdmks.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_wmme.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\portaudio.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Voice\XHVEngine.h">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Voice\Encoder.h">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Voice\AudioInputHandler.h">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Voice\AudioDevice.h">
+      <Filter>Source Files\XLive\voice</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -41,6 +41,7 @@ extern logger *network_log;
 #define TRACE_FUNC_N(msg, ...)  CHECK_PTR(h2mod_log, h2mod_log->write( __FUNCTION__ "(): "  ## msg, __VA_ARGS__ ))
 #define TRACE_GAME_NETWORK(msg, ...) CHECK_PTR(network_log, network_log->write( ## msg, __VA_ARGS__ ))
 #define TRACE(msg, ...) CHECK_PTR(xlive_trace_log, xlive_trace_log->write(L ## msg, __VA_ARGS__))
+#define TRACE_N(msg, ...) CHECK_PTR(xlive_trace_log, xlive_trace_log->write( ## msg, __VA_ARGS__))
 
 template <typename T>
 inline T verify_output(T output, const char *expression, const char *func_name, const char* file, const int line)

@@ -1,11 +1,17 @@
 #include "Globals.h"
-#include "3rdparty/opus/include/opus.h"
+
+#include "AudioDevice.h"
+
+#include "XHVEngine.h"
 #include "xlivedefs.h"
-#include "Voice.h"
+
 #include "H2MOD\Modules\Config\Config.h"
+
 
 IXHV2ENGINE hv2Engine;
 std::vector<XUID> remotetalkers;
+
+CAudioDevice* audioDevices = nullptr;
 
 //#5008
 int WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, PIXHV2ENGINE *ppEngine)
@@ -13,10 +19,15 @@ int WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, PIX
 	TRACE("XHVCreateEngine  (pParams = %X, phWorkerThread = %X, pEngine = %X)",
 		pParams, phWorkerThread, ppEngine);
 
+	// Initialize our audio devices
+
+	audioDevices = new CAudioDevice;
+
 	if (pParams->bCustomVADProvided)
 	{
 		TRACE_GAME_N("XHV Engine - bCustomVADProvided set");
 	}
+
 	if (phWorkerThread)
 	{
 		*phWorkerThread = CreateMutex(0, 0, 0);
@@ -25,23 +36,23 @@ int WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, PIX
 	}
 
 
-	if (ppEngine)
+	if (ppEngine && H2Config_voice_chat && audioDevices->CAudioErr == PaErrorCode::paNoError)
 	{
 		*ppEngine = (PIXHV2ENGINE)&hv2Engine;
-
 		TRACE("- hv2Engine = %X", *ppEngine);
+		TRACE("CAudioDevice: Successful initialization!");
+
+		return ERROR_SUCCESS;
 	}
 
-
-	return ERROR_SUCCESS;
+	return ERROR_FUNCTION_FAILED;
 }
 
 BOOL IXHV2ENGINE::IsHeadsetPresent(VOID *pThis, DWORD dwUserIndex) {
 	//TRACE("IXHV2Engine::IsHeadsetPresent");
 
-	//TODO: add logic that actually validates their audio device is connected
 	//TODO: handle it being connected and disconnected
-	return  H2Config_voice_chat;
+	return H2Config_voice_chat && audioDevices->defaultInputFound;
 }
 
 BOOL IXHV2ENGINE::isRemoteTalking(VOID *pThis, XUID xuid) {
@@ -56,7 +67,7 @@ BOOL IXHV2ENGINE::IsLocalTalking(VOID *pThis, DWORD dwUserIndex) {
 	//check the xuid map
 	XUID id = xFakeXuid[0];
 	BOOL isTalking = xuidIsTalkingMap[id];
-	return H2Config_voice_chat && microphoneEnabled ? xuidIsTalkingMap[id] : false;
+	return H2Config_voice_chat && audioDevices->defaultOutputFound ? xuidIsTalkingMap[id] : false;
 }
 
 LONG IXHV2ENGINE::AddRef(/*CXHVEngine*/ VOID *pThis)
@@ -75,6 +86,8 @@ LONG IXHV2ENGINE::Release(/*CXHVEngine*/ VOID *pThis)
 
 	if (!remotetalkers.empty())
 		remotetalkers.clear();
+
+	delete audioDevices;
 
 	return 0;
 }
@@ -225,6 +238,9 @@ DWORD IXHV2ENGINE::GetDataReadyFlags(VOID *pThis)
 
 HRESULT IXHV2ENGINE::GetLocalChatData(VOID *pThis, DWORD dwUserIndex, PBYTE pbData, PDWORD pdwSize, PDWORD pdwPackets)
 {
+	if (audioDevices->defaultOutputFound == false)
+		return E_PENDING;
+
     *pdwPackets = *pdwSize / XHV_VOICECHAT_MODE_PACKET_SIZE;
 
 	if (*pdwPackets > XHV_MAX_VOICECHAT_PACKETS)

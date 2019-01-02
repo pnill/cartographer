@@ -1,16 +1,8 @@
 #include "stdafx.h"
 #include "XLive\UserManagement\CUser.h"
-#include "resource.h"
-#include <iostream>
-#include <sstream>
-#include <time.h>
-#include <thread>
-#include "h2mod.h"
-#include <mutex>
 #include "Globals.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "XLive\Networking\upnp.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 
 SOCKET boundsock = INVALID_SOCKET;
 SOCKET game_sock = INVALID_SOCKET;
@@ -31,22 +23,17 @@ float getElapsedNetworkTime(void) {
 	return (float)((c.QuadPart - counterAtStart.QuadPart) * 1000.0f / (float)timerFreq.QuadPart);
 }
 
-ModuleUPnP *upnp = NULL;
-
-
 void ForwardPorts()
 {
-
-	upnp = new ModuleUPnP;
-	if (upnp != NULL)
-	{
-		upnp->UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
-		//upnp->UPnPForwardPort(false, (H2Config_base_port + 7), (H2Config_base_port + 7), "Halo2_voice");
-		upnp->UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2");
-		upnp->UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2_2");
-	}
-
+	ModuleUPnP upnp;
+	
+	upnp.UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2_voice");
+	upnp.UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2");
+	upnp.UPnPForwardPort(false, (H2Config_base_port + 5), (H2Config_base_port + 5), "Halo2_2");
+	upnp.UPnPForwardPort(false, (H2Config_base_port + 6), (H2Config_base_port + 6), "Halo2_3");
+	upnp.UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");	
 }
+
 // #5310: XOnlineStartup
 int WINAPI XOnlineStartup()
 {
@@ -66,8 +53,6 @@ int WINAPI XOnlineStartup()
 	{
 		TRACE("XOnlineStartup - We couldn't intialize our socket");
 	}
-	//ForwardPorts();
-	//std::thread(ForwardPorts).detach();
 
 	return 0;
 }

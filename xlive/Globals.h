@@ -13,6 +13,7 @@
 #include "xliveless.h"
 #include "Util\Hooks\Hook.h"
 #include "Util\ReadIniArguments.h"
+#include <3rdparty/portaudio/include/portaudio.h>
 
 #include "Blam\BlamLibrary.h"
 #include "H2MOD\Modules\Players\Players.h"
