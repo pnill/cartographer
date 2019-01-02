@@ -462,7 +462,7 @@
     <ClCompile Include="XLive\Voice\AudioInputHandler.cpp">
       <Filter>Source Files\XLive\voice</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\Voice\AudioDevice.cpp">
+    <ClCompile Include="XLive\Voice\AudioDevices.cpp">
       <Filter>Source Files\XLive\voice</Filter>
     </ClCompile>
   </ItemGroup>
@@ -920,7 +920,7 @@
     <ClInclude Include="XLive\Voice\AudioInputHandler.h">
       <Filter>Source Files\XLive\voice</Filter>
     </ClInclude>
-    <ClInclude Include="XLive\Voice\AudioDevice.h">
+    <ClInclude Include="XLive\Voice\AudioDevices.h">
       <Filter>Source Files\XLive\voice</Filter>
     </ClInclude>
   </ItemGroup>

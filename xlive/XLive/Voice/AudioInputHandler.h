@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Globals.h"
-#include "AudioDevice.h"
+#include "AudioDevices.h"
 
 class CAudioInputHandler
 {

@@ -262,7 +262,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="XLive\Voice\AudioDevice.cpp" />
+    <ClCompile Include="XLive\Voice\AudioDevices.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="XLive\Voice\Encoder.cpp" />
@@ -353,7 +353,7 @@
     <ClInclude Include="3rdparty\portaudio\include\pa_win_wdmks.h" />
     <ClInclude Include="3rdparty\portaudio\include\pa_win_wmme.h" />
     <ClInclude Include="3rdparty\portaudio\include\portaudio.h" />
-    <ClInclude Include="XLive\Voice\AudioDevice.h" />
+    <ClInclude Include="XLive\Voice\AudioDevices.h" />
     <ClInclude Include="Blam\BlamLibrary.h" />
     <ClInclude Include="Blam\Cache\Cache.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Bitfield.h" />
