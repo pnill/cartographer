@@ -36,12 +36,12 @@ CAudioDevices::CAudioDevices()
 
 		if (i == Pa_GetDefaultInputDevice())
 		{
-			TRACE_N("[PortAudio-API] INFO: Foind default input device, index: %i", i);
+			TRACE_N("[PortAudio-API] INFO: Found default input device, index: %i", i);
 			m_defaultInputDeviceIndex = i;
 		}
 		else if (i == Pa_GetDefaultOutputDevice())
 		{
-			TRACE_N("[PortAudio-API] INFO: Foind default output device, index: %i", i);
+			TRACE_N("[PortAudio-API] INFO: Found default output device, index: %i", i);
 			m_defaultOutputDeviceIndex = i;
 		}
 

@@ -1,12 +1,10 @@
 #include "Globals.h"
 
-#include "AudioDevices.h"
-
 #include "XHVEngine.h"
+#include "AudioDevices.h"
 #include "xlivedefs.h"
 
 #include "H2MOD\Modules\Config\Config.h"
-
 
 IXHV2ENGINE hv2Engine;
 std::vector<XUID> remotetalkers;

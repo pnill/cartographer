@@ -8,7 +8,7 @@ enum DeviceType : BYTE
 	Output
 };
 
-typedef struct DeviceInfo
+struct DeviceInfo
 {
 	DeviceType			deviceType;
 	const PaDeviceInfo	*deviceInfo = nullptr;
