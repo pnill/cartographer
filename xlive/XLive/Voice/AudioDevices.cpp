@@ -4,6 +4,9 @@
 
 CAudioDevices::CAudioDevices()
 {
+	if (h2mod->Server)
+		return;
+
 	m_totalDevices = Pa_GetDeviceCount();
 	if (m_totalDevices < 0)
 	{
@@ -67,5 +70,8 @@ void CAudioDevices::SelectAudioInput()
 
 CAudioDevices::~CAudioDevices()
 {
+	if (h2mod->Server)
+		return;
+
 	delete[] m_audioDeviceInfoArray;
 }
