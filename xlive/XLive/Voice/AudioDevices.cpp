@@ -1,29 +1,14 @@
 
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "AudioInputHandler.h"
 #include "AudioDevices.h"
-
-
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
 CAudioDevices::CAudioDevices()
 {
-	m_CAudioErr = Pa_Initialize();
-
-	if (m_CAudioErr != PaErrorCode::paNoError)
-	{
-		TRACE_N("[PortAudio-API] ERROR: PortAudio failed to initialize! Error code: %i", m_CAudioErr);
-		return;
-	}
-
-
-	TRACE_N("[PortAudio-API] INFO: PostAudio version: 0x%08X", Pa_GetVersion());
-	TRACE_N("[PortAudio-API] INFO: Version text: %s", Pa_GetVersionInfo()->versionText);
-
 	m_totalDevices = Pa_GetDeviceCount();
 	if (m_totalDevices < 0)
 	{
 		TRACE_N("[PortAudio-API] ERROR: Pa_GetDeviceCount returned 0x%x", m_totalDevices);
-		m_CAudioErr = m_totalDevices;
+		m_CAudioDeviceErr = m_totalDevices;
 		return;
 	}
 
@@ -50,24 +35,37 @@ CAudioDevices::CAudioDevices()
 		device->deviceInfo = deviceInfo;
 		device->hostApiInfo = Pa_GetHostApiInfo(deviceInfo->hostApi);
 
+		/* Get the device type */
 		if (device->deviceInfo->maxInputChannels > 0)
 			device->deviceType = DeviceType::Input;
-		else
+
+		else if (device->deviceInfo->maxOutputChannels > 0)
 			device->deviceType = DeviceType::Output;
 
 		device->deviceError = paNoError;
 	}
 
+	if (!IsDeviceAvailable(Input))
+		TRACE_N("[PortAudio-API] INFO: No audio input device found. Voice chat will not work!");
+
+	if (!IsDeviceAvailable(Output))
+		TRACE_N("[PortAudio-API] INFO: No audio output device found.");
 
 	TRACE_N("[PortAudio-API] INFO: Total numver of audio devices = %d", m_totalDevices);
-	
 }
+
+void CAudioDevices::SelectAudioOutput()
+{
+
+}
+
+void CAudioDevices::SelectAudioInput()
+{
+
+}
+
 
 CAudioDevices::~CAudioDevices()
 {
-	PaError err = Pa_Terminate();
-	if (err != PaErrorCode::paNoError)
-		TRACE_N("[PortAudio-API] ERROR: Pa_Terminate failed, error code: %i", err);
-
 	delete[] m_audioDeviceInfoArray;
 }

@@ -309,7 +309,7 @@
     <ClCompile Include="H2MOD\Variants\VariantMPGameEngine.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantPlayer.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
-    <ClCompile Include="XLive\Voice\AudioInputHandler.cpp" />
+    <ClCompile Include="XLive\Voice\AudioHandler.cpp" />
     <ClCompile Include="Util\Base64.cpp" />
     <ClCompile Include="Util\ClipboardAPI.cpp" />
     <ClCompile Include="Util\Debug\Debug.cpp" />
@@ -457,7 +457,7 @@
     <ClInclude Include="H2MOD\Variants\VariantMPGameEngine.h" />
     <ClInclude Include="H2MOD\Variants\VariantPlayer.h" />
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
-    <ClInclude Include="XLive\Voice\AudioInputHandler.h" />
+    <ClInclude Include="XLive\Voice\AudioHandler.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Util\Base64.h" />
     <ClInclude Include="Util\ClipboardAPI.h" />

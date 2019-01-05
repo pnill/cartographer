@@ -22,11 +22,13 @@ public:
 	
 	CAudioDevices();
 
-	/*	Default input/output device indexes	*/		
+	void SelectAudioOutput();
+	void SelectAudioInput();
+	/*	Default input/output device indexes	*/
 	int					m_totalDevices;
 	PaDeviceIndex		m_defaultOutputDeviceIndex, m_defaultInputDeviceIndex = -1;
 
-	PaError				GetAudioClassError() { return m_CAudioErr; }
+	PaError				GetAudioClassError() { return m_CAudioDeviceErr; }
 	bool				IsDeviceAvailable(DeviceType devType) { return devType == Input ? (m_defaultInputDeviceIndex != -1 ? true : false) : (m_defaultOutputDeviceIndex != -1 ? true : false); }
 	DeviceInfo*			GetDeviceInfo(PaDeviceIndex index) { if (index < m_totalDevices) return m_audioDeviceInfoArray; else return nullptr; }
 
@@ -34,7 +36,7 @@ public:
 
 private:
 
-	PaError				m_CAudioErr = paNoError;
+	PaError				m_CAudioDeviceErr = paNoError;
 	DeviceInfo*			m_audioDeviceInfoArray = nullptr;
 	bool				m_defaultInputFound, m_defaultOutputFound = false;
 

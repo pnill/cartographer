@@ -459,10 +459,10 @@
     <ClCompile Include="XLive\Voice\Encoder.cpp">
       <Filter>Source Files\XLive\voice</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\Voice\AudioInputHandler.cpp">
+    <ClCompile Include="XLive\Voice\AudioDevices.cpp">
       <Filter>Source Files\XLive\voice</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\Voice\AudioDevices.cpp">
+    <ClCompile Include="XLive\Voice\AudioHandler.cpp">
       <Filter>Source Files\XLive\voice</Filter>
     </ClCompile>
   </ItemGroup>
@@ -917,10 +917,10 @@
     <ClInclude Include="XLive\Voice\Encoder.h">
       <Filter>Source Files\XLive\voice</Filter>
     </ClInclude>
-    <ClInclude Include="XLive\Voice\AudioInputHandler.h">
+    <ClInclude Include="XLive\Voice\AudioDevices.h">
       <Filter>Source Files\XLive\voice</Filter>
     </ClInclude>
-    <ClInclude Include="XLive\Voice\AudioDevices.h">
+    <ClInclude Include="XLive\Voice\AudioHandler.h">
       <Filter>Source Files\XLive\voice</Filter>
     </ClInclude>
   </ItemGroup>

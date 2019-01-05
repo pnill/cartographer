@@ -1,6 +1,7 @@
+#pragma once
 
-#include "AudioInputHandler.h"
-
+#include "Globals.h"
+#include "AudioDevices.h"
 
 /* Select sample format. */
 #if 0
@@ -26,17 +27,19 @@ typedef unsigned char SAMPLE;
 #endif
 
 
-
-CAudioInputHandler::CAudioInputHandler()
+class CAudioHandler
 {
+public:
+	CAudioHandler(CAudioDevices*);
 
+	CAudioDevices* audioDevices;
+	PaError m_CAudioErr;
+	
 
+	~CAudioHandler();
 
+private:
+	PaStreamParameters  inputParameters, outputParameters;
+	PaStream*           stream;
 
-}
-
-
-CAudioInputHandler::~CAudioInputHandler()
-{
-
-}
+};
