@@ -432,12 +432,12 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 			{
 				case 1000:
 					//TRACE_GAME_N("XSocketRecvFrom() User.sockmap mapping port 1000 - port: %i, secure: %08X", htons(port), secure);
-						User.pmap_a[secure] = port;
+					User.pmap_a[secure] = port;
 				break;
 
 				case 1001:
 					//TRACE_GAME_N("XSocketRecvFrom() User.sockmap mapping port 1001 - port: %i, secure: %08X", htons(port), secure);
-						User.pmap_b[secure] = port;
+					User.pmap_b[secure] = port;
 				break;
 
 				default:
