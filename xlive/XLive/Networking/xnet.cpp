@@ -1,5 +1,7 @@
-#include "Globals.h"
 
+#include "xnet.h"
+
+XNetStartupParams g_XnetStartupParams;
 
 // #65: XNetConnect
 int WINAPI XNetConnect(const IN_ADDR ina)
@@ -7,13 +9,12 @@ int WINAPI XNetConnect(const IN_ADDR ina)
 	return 0;
 }
 
-
-// TODO: Move XNet* functions to xnet.cpp
-
 // #51: XNetStartup
-int WINAPI XNetStartup(void *a1)
+int WINAPI XNetStartup(const XNetStartupParams *pxnsp)
 {
-	//TRACE("XNetStartup  (a1 = %X)", a1);
+	memset(&g_XnetStartupParams, NULL, sizeof(XNetStartupParams));
+	memcpy(&g_XnetStartupParams, pxnsp, sizeof(XNetStartupParams));
+
 	return 0;
 }
 

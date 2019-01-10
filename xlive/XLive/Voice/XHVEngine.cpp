@@ -19,9 +19,10 @@ int WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, PIX
 	TRACE("XHVCreateEngine  (pParams = %X, phWorkerThread = %X, pEngine = %X)",
 		pParams, phWorkerThread, ppEngine);
 
+	// disable until ready
 	H2Config_voice_chat = 0;
 
-	if (!h2mod->Server)
+	if (!h2mod->Server && H2Config_voice_chat)
 		p_CAudioHandler = new CAudioHandler(p_CAudioDevices);
 
 	if (pParams->bCustomVADProvided)
@@ -87,7 +88,7 @@ LONG IXHV2ENGINE::Release(/*CXHVEngine*/ VOID *pThis)
 	if (!remotetalkers.empty())
 		remotetalkers.clear();
 
-	if (!h2mod->Server)
+	if (!h2mod->Server && H2Config_voice_chat)
 		delete p_CAudioHandler;
 
 	return S_OK;

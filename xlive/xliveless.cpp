@@ -28,8 +28,6 @@ HANDLE g_dwFakePData = (HANDLE) -2;
 HANDLE g_dwFakeContent = (HANDLE) -2;
 HANDLE g_dwMarketplaceContent = (HANDLE) -2;
 
-INT num_players;
-
 WSADATA wsaData;
 
 
@@ -1244,9 +1242,6 @@ DWORD WINAPI XSessionJoinLocal( HANDLE hSession, DWORD dwUserCount, const DWORD 
 	{
 		TRACE( "- user %d = %d  (%s)", lcv+1, pdwUserIndexes[lcv], pfPrivateSlots[lcv] ? L"Private" : L"Public" );
 	}
-
-
-	num_players++;
 
 	if( pOverlapped == 0 )
 		return ERROR_SUCCESS;
