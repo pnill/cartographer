@@ -1921,7 +1921,7 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetBase() + 0x85F73, filo_write__encrypted_data_hook);
 
 
-		if (tsServer == NULL) {
+		if (tsServer == NULL && H2Config_voice_chat) {
 			//TODO: move into method
 			tsServer = new TSServer(true);
 			tsServer->setPort(H2Config_base_port + 7);
