@@ -721,44 +721,44 @@ bool __cdecl is_supported_build(char *build)
 
 #pragma endregion
 
-typedef int(__cdecl *tfn_c0017a25d)(DWORD, DWORD*);
-tfn_c0017a25d pfn_c0017a25d;
-int __cdecl fn_c0017a25d(DWORD a1, DWORD* a2)
-{
-	if (H2Config_hitmarker_sound) {
-		typedef unsigned long long QWORD;
-		QWORD xuid_p1 = *(QWORD*)((BYTE*)H2BaseAddr + 0x51A629);
-
-		int i = 0;
-		for (; i < 16; i++) {
-			QWORD xuid_list_ele = *(QWORD*)((BYTE*)H2BaseAddr + 0x968F68 + (8 * i));
-			if (xuid_list_ele == xuid_p1) {
-				break;
-			}
-		}
-
-		int local_player_datum = i < 16 ? h2mod->get_unit_datum_from_player_index(i) : -1;
-
-		//if (local_player_datum != -1 && a1 == local_player_datum && a2[4] != -1) {
-		if (local_player_datum != -1 && a2[4] == local_player_datum && a1 != -1 && a1 != local_player_datum) {
-			for (i = 0; i < 16; i++) {
-				int other_datum = h2mod->get_unit_datum_from_player_index(i);
-				if (a1 == other_datum) {
-					if (h2mod->get_unit_team_index(local_player_datum) != h2mod->get_unit_team_index(other_datum)) {
-						std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
-						h2mod->SoundMap[L"sounds/Halo1PCHitSound.wav"] = 0;
-						//unlock immediately after modifying sound map
-						lck.unlock();
-						h2mod->sound_cv.notify_one();
-					}
-					break;
-				}
-			}
-		}
-	}
-	int result = pfn_c0017a25d(a1, a2);
-	return result;
-}
+//typedef int(__cdecl *tfn_c0017a25d)(DWORD, DWORD*);
+//tfn_c0017a25d pfn_c0017a25d;
+//int __cdecl fn_c0017a25d(DWORD a1, DWORD* a2)
+//{
+//	if (H2Config_hitmarker_sound) {
+//		typedef unsigned long long QWORD;
+//		QWORD xuid_p1 = *(QWORD*)((BYTE*)H2BaseAddr + 0x51A629);
+//
+//		int i = 0;
+//		for (; i < 16; i++) {
+//			QWORD xuid_list_ele = *(QWORD*)((BYTE*)H2BaseAddr + 0x968F68 + (8 * i));
+//			if (xuid_list_ele == xuid_p1) {
+//				break;
+//			}
+//		}
+//
+//		int local_player_datum = i < 16 ? h2mod->get_unit_datum_from_player_index(i) : -1;
+//
+//		//if (local_player_datum != -1 && a1 == local_player_datum && a2[4] != -1) {
+//		if (local_player_datum != -1 && a2[4] == local_player_datum && a1 != -1 && a1 != local_player_datum) {
+//			for (i = 0; i < 16; i++) {
+//				int other_datum = h2mod->get_unit_datum_from_player_index(i);
+//				if (a1 == other_datum) {
+//					if (h2mod->get_unit_team_index(local_player_datum) != h2mod->get_unit_team_index(other_datum)) {
+//						std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+//						h2mod->SoundMap[L"sounds/Halo1PCHitSound.wav"] = 0;
+//						//unlock immediately after modifying sound map
+//						lck.unlock();
+//						h2mod->sound_cv.notify_one();
+//					}
+//					break;
+//				}
+//			}
+//		}
+//	}
+//	int result = pfn_c0017a25d(a1, a2);
+//	return result;
+//}
 
 
 typedef char(__stdcall *tfn_c0024eeef)(DWORD*, int, int);
@@ -1052,8 +1052,8 @@ void InitH2Tweaks() {
 		PatchCall(H2BaseAddr + 0x21754C, &sub_20E1D8_boot);
 
 		//Hook for Hitmarker sound effect.
-		pfn_c0017a25d = (tfn_c0017a25d)DetourFunc((BYTE*)H2BaseAddr + 0x0017a25d, (BYTE*)fn_c0017a25d, 10);
-		VirtualProtect(pfn_c0017a25d, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+//		pfn_c0017a25d = (tfn_c0017a25d)DetourFunc((BYTE*)H2BaseAddr + 0x0017a25d, (BYTE*)fn_c0017a25d, 10);
+//		VirtualProtect(pfn_c0017a25d, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//Hook for advanced lobby options.
 		pfn_c0024eeef = (tfn_c0024eeef)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024eeef, (BYTE*)fn_c0024eeef, 9);
