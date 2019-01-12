@@ -1319,13 +1319,13 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 {
 	memcpy(&join_game_xn, host_xn, sizeof(XNADDR));
 
-	TRACE_GAME_N("join_game host_xn->ina.s_addr: %08X ", host_xn->ina.s_addr);
+	TRACE_GAME_NETWORK_N("join_game host_xn->ina.s_addr: %08X ", host_xn->ina.s_addr);
 
 	sockaddr_in SendStruct;
 
 	if (host_xn->ina.s_addr != H2Config_ip_wan)
 	{
-		TRACE_GAME_N("XN is not equal to the WAN address, assigning external XN");
+		TRACE_GAME_NETWORK_N("XN is not equal to the WAN address, assigning external XN");
 		SendStruct.sin_addr.s_addr = host_xn->ina.s_addr;
 	}
 	else
@@ -1334,12 +1334,12 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 	}
 	short nPort = (ntohs(host_xn->wPortOnline) + 1);
 
-	TRACE_GAME_N("join_game nPort: %i", nPort);
+	TRACE_GAME_NETWORK_N("join_game nPort: %i", nPort);
 
 	SendStruct.sin_port = htons(nPort);
 
-	TRACE_GAME_N("join_game SendStruct.sin_port: %i", ntohs(SendStruct.sin_port));
-	TRACE_GAME_N("join_game xn_port: %i", ntohs(host_xn->wPortOnline));
+	TRACE_GAME_NETWORK_N("join_game SendStruct.sin_port: %i", ntohs(SendStruct.sin_port));
+	TRACE_GAME_NETWORK_N("join_game xn_port: %i", ntohs(host_xn->wPortOnline));
 
 	//SendStruct.sin_port = htons(1001); // These kinds of things need to be fixed too cause we would have the port in the XNADDR struct...
 	SendStruct.sin_family = AF_INET;
@@ -1347,15 +1347,15 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 	int securitysend_1001 = sendto(game_sock, (char*)User.SecurityPacket, 8 + sizeof(XNADDR), 0, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
 
 	if (securitysend_1001 != (8 + sizeof(XNADDR)))
-		TRACE_GAME_N("join_game Security Packet Send had return different than len: %i", securitysend_1001);
+		TRACE_GAME_NETWORK_N("join_game Security Packet Send had return different than len: %i", securitysend_1001);
 
 	User.CreateUser(host_xn, FALSE);
 
 
 	if (securitysend_1001 == SOCKET_ERROR )
 	{
-		TRACE_GAME_N("join_game Security Packet - Socket Error True");
-		TRACE_GAME_N("join_game Security Packet - WSAGetLastError(): %08X", WSAGetLastError());
+		TRACE_GAME_NETWORK_N("join_game Security Packet - Socket Error True");
+		TRACE_GAME_NETWORK_N("join_game Security Packet - WSAGetLastError(): %08X", WSAGetLastError());
 	}
 
 	return pjoin_game(thisptr, a2, a3, a4, a5, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
@@ -1363,7 +1363,7 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 
 int __cdecl connect_establish_write(void* a1, int a2, int a3)
 {
-	TRACE_GAME_N("connect_establish_write(a1: %08X,a2 %08X, a3: %08X)", a1, a2, a3);
+	TRACE_GAME_NETWORK_N("connect_establish_write(a1: %08X,a2 %08X, a3: %08X)", a1, a2, a3);
 	h2mod->securityPacketProcessing();
 
 	return pconnect_establish_write(a1, a2, a3);
@@ -1873,12 +1873,12 @@ void H2MOD::ApplyHooks() {
 		PatchWinAPICall(GetBase() + 0x9AF9E, CryptUnprotectDataHook);
 		PatchWinAPICall(GetBase() + 0x9B08A, CryptProtectDataHook);
 
-		calculate_model_lod = GetBase() + 0x19CA3E;
-		calculate_model_lod_detour_end = GetBase() + 0x19CDA3 + 5;
-		WriteJmpTo(GetBase() + 0x19CDA3, calculate_model_lod_detour);
+		//calculate_model_lod = GetBase() + 0x19CA3E;
+		//calculate_model_lod_detour_end = GetBase() + 0x19CDA3 + 5;
+		//WriteJmpTo(GetBase() + 0x19CDA3, calculate_model_lod_detour);
 
 		// set max model qaulity to L6
-		WriteValue(GetBase() + 0x190B38 + 1, 5);
+		//WriteValue(GetBase() + 0x190B38 + 1, 5);
 
 		pfn_c000bd114 = (tfn_c000bd114)DetourFunc((BYTE*)H2BaseAddr + 0x000bd114, (BYTE*)fn_c000bd114_IsSkullEnabled, 5);
 		PatchCall(Base + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
@@ -1978,7 +1978,7 @@ void H2MOD::Initialize()
 	//	addDebugText("Error setting the process priority");
 	//}
 	
-	TRACE_GAME("H2MOD - Initialized v0.4a");
+	TRACE_GAME("H2MOD - Initialized v0.5a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
 
 	h2mod->ApplyHooks();
