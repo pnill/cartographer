@@ -39,6 +39,9 @@ std::unordered_map<int, int> object_to_variant;
 
 using namespace Blam::Cache::DataTypes;
 
+int EXECUTABLE_VERSION = 4;
+int GAME_BUILD = 11123;
+
 int character_datum_from_index(BYTE index)
 {
 	DWORD global_scnr = *(DWORD*)((*(DWORD*)(char*)(h2mod->GetBase() + 0x479E74)) + 0x17C);
@@ -1585,23 +1588,6 @@ char __stdcall interceptMapLoad(LPCRITICAL_SECTION* thisx, const void *a2) {
 	return result;
 }
 
-typedef BYTE*(__cdecl *unicode_string_conversion)(BYTE* nonUnicodeStr, BYTE* unicodeStr, int size);
-unicode_string_conversion unicode_string_conversion_method;
-
-std::string CREATE_NEW_NETWORK_GAME_STR("Create a new network game.");
-std::string JOIN_GAME_OF_HALO2 = "Join a game of Halo 2.";
-
-BYTE* __cdecl unicodeStringConversion(BYTE* nonUnicodeStr, BYTE* unicodeStr, int size) {
-	char* str = (char*)(nonUnicodeStr);
-	if (strcmp(str, CREATE_NEW_NETWORK_GAME_STR.c_str()) == 0 && replacedNetworkNormalTextWidget != NULL) {
-		return unicode_string_conversion_method((BYTE*)replacedNetworkNormalTextWidget, unicodeStr, size);
-	}
-	if (strcmp(str, JOIN_GAME_OF_HALO2.c_str()) == 0 && replacedNetworkNormalTextWidget2 != NULL) {
-		return unicode_string_conversion_method((BYTE*)replacedNetworkNormalTextWidget2, unicodeStr, size);
-	}
-	return unicode_string_conversion_method(nonUnicodeStr, unicodeStr, size);
-}
-
 typedef bool(__cdecl *tfn_c000bd114)(int);
 tfn_c000bd114 pfn_c000bd114;
 bool __cdecl fn_c000bd114_IsSkullEnabled(int skull_index)
@@ -1843,9 +1829,6 @@ void H2MOD::ApplyHooks() {
 		//string_display_hook_method = (string_display_hook)DetourFunc((BYTE*)h2mod->GetBase() + 0x287AB5, (BYTE*)stringDisplayHook, 5);
 		//VirtualProtect(string_display_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		unicode_string_conversion_method = (unicode_string_conversion)DetourFunc((BYTE*)h2mod->GetBase() + 0x4C801, (BYTE*)unicodeStringConversion, 7);
-		VirtualProtect(unicode_string_conversion_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
 		//pResetRound=(ResetRounds)DetourFunc((BYTE*)this->GetBase() + 0x6B1C8, (BYTE*)OnNextRound, 7);
 		//VirtualProtect(pResetRound, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
@@ -1884,8 +1867,6 @@ void H2MOD::ApplyHooks() {
 		PatchCall(Base + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
 		PatchCall(Base + 0x00092C05, BansheeBombIsEngineMPCheck);
 		PatchCall(Base + 0x0013ff75, FlashlightIsEngineSPCheck);
-
-
 	}
 	else {
 
