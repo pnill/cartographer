@@ -456,7 +456,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
 				snprintf(username2, strlen(username) + 1, username);
 			}
 
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF006, 0xFFFFF007);
+			GSCustomMenuCall_Invalid_Login_Token();
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_LOGIN_ID) {
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF008, 0xFFFFF009);
