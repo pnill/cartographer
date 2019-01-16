@@ -181,19 +181,6 @@ void hotkeyFuncTest() {
 	addDebugText(moaartexxt);
 	
 	return;
-
-	extern CUserManagement User;
-	if (User.LocalUserLoggedIn()) {
-		User.UnregisterLocal();
-	}
-	else {
-		char H2Config_login_token[33] = { "" };
-		addDebugText("keypress send");
-		User.RegisterLocalRequest(H2Config_login_token, 0);
-		Sleep(2000);
-		addDebugText("get");
-		User.RegisterLocalRequest(H2Config_login_token, 1);
-	}
 }
 
 

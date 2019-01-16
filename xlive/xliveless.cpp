@@ -768,37 +768,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 	if (hEnum == ServerEnum)
 	{
 		LiveManager.GetServers(pOverlapped, cbBuffer, pvBuffer);
-		return ERROR_IO_PENDING;
-
-		/*
-		while (LiveManager.GetRunning() == true && LiveManager.GetTotalServers() == 0 || LiveManager.servers_left > 0)
-		{
-			
-		}
-
-		if (LiveManager.GetRunning() == false && LiveManager.GetTotalServers() == 0)
-		{
-			LiveManager.GetServers(pOverlapped,pvBuffer);
-
-		}
-		
-		if (LiveManager.GetRunning() == false && LiveManager.GetTotalServers() > 0 && LiveManager.servers_left == 0)
-		{
-			for (int i = 0; i < LiveManager.GetTotalServers(); i++)
-			{
-				memcpy(pvBuffer + (sizeof(_XLOCATOR_SEARCHRESULT) * i), &LiveManager.servers[i], sizeof(_XLOCATOR_SEARCHRESULT));
-			}
-
-			if (async == FALSE)
-				*pcItemsReturned = LiveManager.GetTotalServers();
-			else
-				pOverlapped->InternalHigh = LiveManager.GetTotalServers();
-
-				LiveManager.total_servers = 0;
-
-			
-		}*/
-	
+		return ERROR_IO_PENDING;	
 	}
 
 	if( async == FALSE )
@@ -901,7 +871,6 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 	if ((dwFlags & XSESSION_CREATE_HOST) > 0)
 	{
 		TRACE("XSessionCreate - XSESSION_CREATE_HOST");
-
 	}
 
 	if ((dwFlags & XSESSION_CREATE_USES_ARBITRATION) > 0)
@@ -1066,17 +1035,17 @@ int WINAPI XOnlineCleanup ()
 // #5312: XFriendsCreateEnumerator
 DWORD WINAPI XFriendsCreateEnumerator (DWORD dwUserIndex, DWORD dwStartingIndex, DWORD dwFriendstoReturn, DWORD *pcbBuffer, HANDLE * phEnum)
 {
-		TRACE("XFriendsCreateEnumerator");
-    
-		if(pcbBuffer) *pcbBuffer = dwFriendstoReturn * sizeof(XCONTENT_DATA);
-		if(phEnum)
-		{
-			*phEnum = CreateMutex(NULL,NULL,NULL);
+	TRACE("XFriendsCreateEnumerator");
 
-			TRACE("- Handle = %X", *phEnum);
-		}
+	if (pcbBuffer) *pcbBuffer = dwFriendstoReturn * sizeof(XCONTENT_DATA);
+	if (phEnum)
+	{
+		*phEnum = CreateMutex(NULL, NULL, NULL);
 
-		return ERROR_SUCCESS;
+		TRACE("- Handle = %X", *phEnum);
+	}
+
+	return ERROR_SUCCESS;
 }
 
 

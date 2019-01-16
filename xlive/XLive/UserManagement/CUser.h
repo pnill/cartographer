@@ -46,7 +46,6 @@ public:
 	ULONG GetSecureFromXN(XNADDR *pxna);
 
 	void CreateUser(XNADDR *pxna, BOOL user);
-	void RegisterLocalRequest(char* token, int a2);
 	void UnregisterSecureAddr(const IN_ADDR ina);
 
 	void UpdateConnectionStatus();

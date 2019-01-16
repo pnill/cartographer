@@ -6,7 +6,7 @@ XNetStartupParams g_XnetStartupParams;
 // #65: XNetConnect
 int WINAPI XNetConnect(const IN_ADDR ina)
 {
-	return 0;
+	return ERROR_SUCCESS;
 }
 
 // #51: XNetStartup

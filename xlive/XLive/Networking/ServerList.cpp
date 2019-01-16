@@ -1,23 +1,13 @@
 #include <Winsock2.h>
-#include <windows.h>
 #include "H2MOD.h"
 #include "XLive\Networking\ServerList.h"
-#include "xlivedefs.h"
-#include <string>
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include <curl/curl.h>
 #include "rapidjson/document.h"
-#include "rapidjson/stringbuffer.h"
 #include "rapidjson/prettywriter.h"
-#include <sstream>
-#include <algorithm>
 #include "Globals.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
-#include "XLive\XUser\XUserContext.h"
-#include "XLive\XUSer\XUserProperty.h"
-#include "XLive\XUser\XUser.h"
-#include "xliveless.h"
 
 using namespace rapidjson;
 

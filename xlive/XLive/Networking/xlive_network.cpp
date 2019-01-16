@@ -9,18 +9,20 @@ SOCKET game_sock = INVALID_SOCKET;
 SOCKET game_sock_1000 = INVALID_SOCKET;
 
 CUserManagement User;
-char* ServerStatus = 0;
 int MasterState = 0;
+
+ModuleUPnP *upnp = nullptr;
 
 void ForwardPorts()
 {
-	ModuleUPnP upnp;
-	
-	upnp.UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2");
-	upnp.UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2_1");
-	upnp.UPnPForwardPort(false, (H2Config_base_port + 5), (H2Config_base_port + 5), "Halo2_2");
-	upnp.UPnPForwardPort(false, (H2Config_base_port + 6), (H2Config_base_port + 6), "Halo2_3");
-	upnp.UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");	
+	if (upnp == nullptr)
+		upnp = new ModuleUPnP;
+
+	upnp->UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2");
+	upnp->UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2_1");
+	upnp->UPnPForwardPort(false, (H2Config_base_port + 5), (H2Config_base_port + 5), "Halo2_2");
+	upnp->UPnPForwardPort(false, (H2Config_base_port + 6), (H2Config_base_port + 6), "Halo2_3");
+	upnp->UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
 
 	TRACE_GAME_NETWORK_N("[UPNP] Finished forwarding ports.");
 }
@@ -28,11 +30,8 @@ void ForwardPorts()
 // #5310: XOnlineStartup
 int WINAPI XOnlineStartup()
 {
-	memset(&join_game_xn, 0x00, sizeof(XNADDR));
+	memset(&join_game_xn, NULL, sizeof(XNADDR));
 	//TRACE("XOnlineStartup");
-	ServerStatus = new char[250];
-
-	snprintf(ServerStatus, 250, "Status: Initializing....");
 	
 	boundsock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -351,9 +350,8 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 
 		u_long iplong = (((struct sockaddr_in*)from)->sin_addr.s_addr);
 		short port    =	(((struct sockaddr_in*)from)->sin_port);
-		//unsigned short normport = ntohs(port);
 		
-		std::pair <ULONG, SHORT> hostpair = std::make_pair(iplong,port); 
+		std::pair <ULONG, SHORT> hostpair = std::make_pair(iplong, port); 
 
 		if (iplong != H2Config_master_ip)
 		{

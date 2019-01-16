@@ -51,8 +51,8 @@ D3DPRESENT_PARAMETERS *pD3DPP;
 
 IDirect3DTexture9* Primitive = NULL;
 
-char* BuildText;
-extern char* ServerStatus;
+char* BuildText = nullptr;
+char* ServerStatus = nullptr;
 extern int MasterState;
 
 const char CompileDate[] = __DATE__;
@@ -178,32 +178,28 @@ int WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 // #5000: XLiveInitialize
 int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 {
-		InitInstance();
-		TRACE("XLiveInitialize()");
+	InitInstance();
+	TRACE("XLiveInitialize()");
 
-		if (!h2mod->Server)
-		{
-			//TRACE("XLiveInitialize  (pPii = %X)", pPii);
-			pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
-			pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
+	if (!h2mod->Server)
+	{
+		//TRACE("XLiveInitialize  (pPii = %X)", pPii);
+		pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
+		pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
 
-			//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice + 17);
-			//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
+		//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice + 17);
+		//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
 
-			//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
+		//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
 
-			BuildText = new char[250];
-			snprintf(BuildText, 250, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
-	
-			GUI::Initialize();
+		ServerStatus = new char[250];
+		snprintf(ServerStatus, 250, "Status: Initializing....");
 
-			
-		}
-		
-#if 0
-	while (1)
-		Sleep(1);
-#endif
+		BuildText = new char[250];
+		snprintf(BuildText, 250, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
+
+		GUI::Initialize();
+	}
 	
 	return 0;
 }
