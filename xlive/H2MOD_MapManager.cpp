@@ -271,7 +271,7 @@ static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ul
 }
 
 bool MapManager::downloadFromRepo(std::string mapFilename) {
-	std::string url("http://www.h2pcmt.com/Cartographer/CustomMaps/");
+	std::string url("http://www.h2maps.net/Cartographer/CustomMaps/");
 	url += mapFilename;
 
 	CURL *curl;
