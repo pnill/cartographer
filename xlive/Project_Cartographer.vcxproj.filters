@@ -189,6 +189,9 @@
     <ClCompile Include="H2MOD_Network.cpp">
       <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Debug.cpp">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -391,6 +394,9 @@
     </ClInclude>
     <ClInclude Include="Blam\Engine\Game\HaloScript.h">
       <Filter>Source Files\Blam\Engine\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Source Files\H2MOD\Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
