@@ -78,6 +78,8 @@ bool __cdecl call_assign_equipment_to_unit(int uint, int object_index, short unk
 int __cdecl call_object_placement_data_new(void*, int, int, int);
 signed int __cdecl call_object_new(void*);
 void GivePlayerWeapon(int PlayerIndex, int WeaponId, bool bReset);
+void enableLiveMenus();
+void disableLiveMenus();
 DWORD WINAPI NetworkThread(LPVOID lParam);
 
 class NetworkPlayer

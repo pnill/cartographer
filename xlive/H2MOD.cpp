@@ -135,6 +135,15 @@ bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 	return p_add_object_to_sync(gamestate_object_datum);
 }
 
+void enableLiveMenus() {
+	*(int*)(h2mod->GetBase() + 0x422450) = 1;
+}
+
+void disableLiveMenus() {
+	*(int*)(h2mod->GetBase() + 0x422450) = -1;
+}
+
+
 #pragma endregion
 
 //sub_1cce9b
@@ -1606,7 +1615,7 @@ void H2MOD::Initialize()
 
 		PatchGameDetailsCheck();
 		//PatchPingMeterCheck(true);
-		*(bool*)((char*)h2mod->GetBase() + 0x422450) = 1; //allows for all live menus to be accessed
+		void disableLiveMenus(); //until ready
 
 	}
 
