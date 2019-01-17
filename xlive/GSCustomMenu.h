@@ -7,6 +7,7 @@ void GSCustomMenuCall_Language();
 void GSCustomMenuCall_Update_Note();
 void GSCustomMenuCall_Guide();
 void GSCustomMenuCall_Esc();
+void GSCustomMenuCall_Invalid_Login_Token();
 void GSCustomMenuCall_Error_Inner(int menuId, int title, int description);
 void GSCustomMenuCall_Error_Outer(int menuId, int title, int description);
 void GSCustomMenuCall_Error_Inner(int menuIdTitle, int title, int menuIdDesc, int description);
