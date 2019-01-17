@@ -1,5 +1,6 @@
 #include <stdafx.h>
 #include <windows.h>
+#include <Wincrypt.h>
 #include <iostream>
 #include <sstream>
 #include <codecvt>
@@ -584,13 +585,18 @@ void SoundThread(void)
 
 		if (h2mod->SoundMap.size() > 0)
 		{
-			auto it = h2mod->SoundMap.begin();
-			while (it != h2mod->SoundMap.end())
+			std::unordered_map<wchar_t*, int> tempSoundMap;
+			tempSoundMap.insert(h2mod->SoundMap.begin(), h2mod->SoundMap.end());
+			//unlock immediately after reading everything from sound map
+			lck.unlock();
+
+			auto it = tempSoundMap.begin();
+			while (it != tempSoundMap.end())
 			{
 				TRACE_GAME("[H2MOD-SoundQueue] - attempting to play sound %ws - delaying for %i miliseconds first", it->first, it->second);
 				Sleep(it->second);
 				PlaySound(it->first, NULL, SND_FILENAME);
-				it = h2mod->SoundMap.erase(it);
+				it = tempSoundMap.erase(it);
 			}
 		}
 		
@@ -1103,6 +1109,93 @@ void __cdecl print_to_console(char *output)
 	commands->display(prefix + output);
 }
 
+void DuplicateDataBlob(DATA_BLOB  *pDataIn, DATA_BLOB  *pDataOut)
+{
+	pDataOut->cbData = pDataIn->cbData;
+	pDataOut->pbData = static_cast<BYTE*>(LocalAlloc(LMEM_FIXED, pDataIn->cbData));
+	CopyMemory(pDataOut->pbData, pDataIn->pbData, pDataIn->cbData);
+}
+
+BOOL WINAPI CryptProtectDataHook(
+	_In_       DATA_BLOB                 *pDataIn,
+	_In_opt_   LPCWSTR                   szDataDescr,
+	_In_opt_   DATA_BLOB                 *pOptionalEntropy,
+	_Reserved_ PVOID                     pvReserved,
+	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT *pPromptStruct,
+	_In_       DWORD                     dwFlags,
+	_Out_      DATA_BLOB                 *pDataOut
+)
+{
+	DuplicateDataBlob(pDataIn, pDataOut);
+
+	return TRUE;
+}
+
+BOOL WINAPI CryptUnprotectDataHook(
+	_In_       DATA_BLOB                 *pDataIn,
+	_Out_opt_  LPWSTR                    *ppszDataDescr,
+	_In_opt_   DATA_BLOB                 *pOptionalEntropy,
+	_Reserved_ PVOID                     pvReserved,
+	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT *pPromptStruct,
+	_In_       DWORD                     dwFlags,
+	_Out_      DATA_BLOB                 *pDataOut
+)
+{
+	if (CryptUnprotectData(pDataIn, ppszDataDescr, pOptionalEntropy, pvReserved, pPromptStruct, dwFlags, pDataOut) == FALSE) {
+		DuplicateDataBlob(pDataIn, pDataOut); // if decrypting the data fails just assume it's unencrypted
+	}
+
+	return TRUE;
+}
+
+static struct filo
+{
+	unsigned long			signature;
+	unsigned short      	flags;
+	signed short     		location;
+	char                    path[256];
+	HANDLE		            handle;
+	HRESULT		            api_result;
+};
+
+static bool FiloInterface_change_size(filo *filo_ptr, LONG new_size)
+{
+	if (filo_ptr->handle)
+	{
+		if (SetFilePointer(filo_ptr->handle, new_size, NULL, FILE_BEGIN) != INVALID_SET_FILE_POINTER)
+		{
+			return SetEndOfFile(filo_ptr->handle);
+		}
+	}
+	else {
+		SetLastError(ERROR_INVALID_HANDLE);
+	}
+	return false;
+}
+
+static inline DWORD SwitchServerClient(DWORD client_offset, DWORD server_offset)
+{
+	return h2mod->GetBase() + (h2mod->Server ? server_offset : client_offset);
+}
+
+static bool FiloInterface_write(filo *filo_ptr, LPVOID data, size_t data_size)
+{
+	typedef bool(__cdecl *filo__write)(filo *a1, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer);
+	DWORD func_offset = SwitchServerClient(0x63CBC, 0x65F98);
+	auto filo__write_impl = reinterpret_cast<filo__write>(func_offset);
+
+	return filo__write_impl(filo_ptr, data_size, data);
+}
+
+char filo_write__encrypted_data_hook(filo *file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
+{
+	DWORD file_size = GetFileSize(file_ptr->handle, NULL);
+
+	if (file_size > nNumberOfBytesToWrite) // clear the file as unencrypted data is shorter then encrypted data.
+		FiloInterface_change_size(file_ptr, 0);
+	return FiloInterface_write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
+}
+
 void H2MOD::securityPacketProcessing()
 {
 
@@ -1207,6 +1300,12 @@ void H2MOD::ApplyHooks() {
 		// hook the print command to redirect the output to our console
 		PatchCall(Base + 0xE9E50, reinterpret_cast<DWORD>(print_to_console));
 
+		PatchWinAPICall(GetBase() + 0x9B08A, CryptProtectDataHook);
+
+		PatchWinAPICall(GetBase() + 0x9AF9E, CryptUnprotectDataHook);
+
+		PatchCall(GetBase() + 0x9B09F, filo_write__encrypted_data_hook);
+
 		//FIXME: This causes SP to crash after cutscenes.
 		//allow AI in MP
 		//NopFill(h2mod->GetBase() + 0x30E67C, 0x14);
@@ -1240,6 +1339,12 @@ void H2MOD::ApplyHooks() {
 
 		pplayer_death = (player_death)DetourFunc((BYTE*)this->GetBase() + 0x152ED4, (BYTE*)OnPlayerDeath, 9);
 		VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		PatchWinAPICall(GetBase() + 0x85F5E, CryptProtectDataHook);
+
+		PatchWinAPICall(GetBase() + 0x352538, CryptUnprotectDataHook);
+
+		PatchCall(GetBase() + 0x85F73, filo_write__encrypted_data_hook);
 	}
 
 	//apply any network hooks

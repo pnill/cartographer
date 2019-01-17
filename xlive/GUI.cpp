@@ -533,7 +533,8 @@ int WINAPI XLiveRender()
 					std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
 
 					h2mod->SoundMap[L"sounds/AchievementUnlocked.wav"] = 0;
-
+					//unlock immediately after modifying sound map
+					lck.unlock();
 					h2mod->sound_cv.notify_one();
 
 					it->second = true;

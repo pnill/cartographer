@@ -212,7 +212,8 @@ void Infection::SpawnPlayer(int PlayerIndex)
 				std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
 
 				h2mod->SoundMap[L"sounds/infection.wav"] = 1000;
-				
+				//unlock immediately after modifying sound map
+				lck.unlock();
 				h2mod->sound_cv.notify_one();
 
 
@@ -224,7 +225,8 @@ void Infection::SpawnPlayer(int PlayerIndex)
 				std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
 
 				h2mod->SoundMap[L"sounds/infected.wav"] = 500;
-
+				//unlock immediately after modifying sound map
+				lck.unlock();
 				h2mod->sound_cv.notify_one();
 
 				infected_played = true;
@@ -335,7 +337,8 @@ void Infection::PlayerInfected(int unit_datum_index)
 						std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
 
 						h2mod->SoundMap[L"sounds/new_zombie.wav"] = 1000;
-
+						//unlock immediately after modifying sound map
+						lck.unlock();
 						h2mod->sound_cv.notify_one();
 
 					}

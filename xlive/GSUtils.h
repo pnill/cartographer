@@ -2,7 +2,16 @@
 #include "stdafx.h"
 
 void PatchCall(DWORD call_addr, DWORD new_function_ptr);
+inline void PatchCall(DWORD call_addr, void *new_function_ptr)
+{
+	PatchCall(call_addr, reinterpret_cast<DWORD>(new_function_ptr));
+}
 void WritePointer(DWORD offset, void *ptr);
+void PatchWinAPICall(DWORD call_addr, DWORD new_function_ptr);
+inline void PatchWinAPICall(DWORD call_addr, void * new_function_ptr)
+{
+	PatchWinAPICall(call_addr, reinterpret_cast<DWORD>(new_function_ptr));
+}
 void HexToByteArray(BYTE* byteArray, char* pointerHex);
 int FindLineStart(FILE* fp, int lineStrLen);
 ///FREE MEMOERY in fileLine

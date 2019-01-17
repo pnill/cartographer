@@ -25,6 +25,18 @@ void WritePointer(DWORD offset, void *ptr) {
 	WriteBytes(offset, assmNewFuncRel, 0x4);
 }
 
+void PatchWinAPICall(DWORD call_addr, DWORD new_function_ptr)
+{
+	BYTE call = 0xE8;
+	WriteValue(call_addr, call);
+
+	PatchCall(call_addr, new_function_ptr);
+
+	// pad the extra unused byte
+	BYTE padding = 0x90;
+	WriteValue(call_addr + 5, padding);
+}
+
 void HexToByteArray(BYTE* byteArray, char* pointerHex) {
 	char totext2[32];
 	memset(totext2, '0', 1);
