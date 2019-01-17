@@ -4242,7 +4242,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF006, "Invalid Login Token!");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF007, "Login Again.");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF008, "Invalid Account ID!");
-	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF009, "The Username or Email Address you entered is not one of an existing account. Please check your spelling or create an account on the website.");
+	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF009, "The Username or Email Address you entered is not one of an existing account. Please check your spelling or create a new account if you don't have one already.");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF00A, "Incorrect Password!");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF00B, "The password you entered is incorrect!");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF00C, "BANNED!");
@@ -4349,6 +4349,9 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFF03, "Installing Updates...");
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFF003, "Failed to run updater app!");
 	add_cartographer_label(CMLabelMenuId_Update, 4, "Cancel");
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF2, "Download the following:\n");
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF3, "Install the following:\n");
+	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF4, "Up to date!");
 
 
 	add_cartographer_label(CMLabelMenuId_Update_Note, 0xFFFFFFF0, "Outdated Version!");

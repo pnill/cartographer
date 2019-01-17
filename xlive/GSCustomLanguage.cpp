@@ -521,13 +521,42 @@ __declspec(naked) void getSystemLanguageMethodJmp() {
 }
 
 
-typedef char*(__cdecl *tsub_31b97)(int, int);
-tsub_31b97 psub_31b97;
-char* __cdecl sub_31b97(int buff_len, int a2)//Font Table Filename Override
+char* __cdecl cave_c00031b97(char* result, int buff_len)//Font Table Filename Override
 {
-	char* result = psub_31b97(buff_len, a2);
 	strcpy_s(result, buff_len, current_language->font_table_filename);
 	return result;
+}
+
+char*(__cdecl* pfn_c00031b97)(int, int) = 0;
+//__usercall - edi a1, stack a2
+__declspec(naked) char* nak_c00031b97()
+{
+	__asm {
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		mov eax, [esp + 18h]
+		push eax//buff_len
+
+		push eax
+		call pfn_c00031b97
+		add esp, 4h
+
+		push eax//result
+		call cave_c00031b97
+		add esp, 8h
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn
+	}
 }
 
 #pragma endregion
@@ -625,8 +654,8 @@ void initGSCustomLanguage() {
 		VirtualProtect(pH2GetLabel, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//Hook the function that sets the font table filename.
-		psub_31b97 = (tsub_31b97)DetourFunc((BYTE*)H2BaseAddr + 0x31b97, (BYTE*)sub_31b97, 6);
-		VirtualProtect(psub_31b97, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		pfn_c00031b97 = (char*(__cdecl*)(int, int))((BYTE*)H2BaseAddr + 0x00031b97);
+		PatchCall(H2BaseAddr + 0x00031e89, (DWORD)nak_c00031b97);
 
 		//Hook the part where it sets the global language id.
 		langAfterJmpAddr = (DWORD)(H2BaseAddr + 0x3828c);
