@@ -636,6 +636,7 @@ static void overrideCoreH2Labels() {
 	for (int i = 0; i <= 7; i++) {
 		custom_language* lang = get_custom_language(i, 0);
 		//add_custom_label(lang, 0x000003fd, 0x09000284, "");
+		add_custom_label(lang, 0x000003fd, 0x0a000285, "ONLINE");
 		add_custom_label(lang, 0x000003fd, 0x05000986, "CARTOGRAPHER");
 	}
 } 
