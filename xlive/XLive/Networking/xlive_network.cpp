@@ -365,9 +365,9 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 				CUser* user = User.cusers[secure]; // Try to get the user by the secure address they've sent.
 				if (user)
 				{
-					if (user->pxna.ina.s_addr != iplong)
+					if (user->xnaddr.ina.s_addr != iplong)
 					{
-						user->pxna.ina.s_addr = iplong;
+						user->xnaddr.ina.s_addr = iplong;
 					}
 				}
 				else // only create the user if they're not already in the system.
@@ -439,7 +439,7 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
 	if (user != 0)
 	{
 		memset(pxna, 0x00, sizeof(XNADDR)); // Zero memory of the current buffer passed to us by the game.
-		memcpy(pxna, &user->pxna, sizeof(XNADDR));
+		memcpy(pxna, &user->xnaddr, sizeof(XNADDR));
 
 	}
 	else
@@ -450,7 +450,7 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
 		user = User.cusers[ina.s_addr];
 
 		memset(pxna, 0x00, sizeof(XNADDR)); // Zero the memory of the current buffer before doing the copy.
-		memcpy(pxna, &user->pxna, sizeof(XNADDR));
+		memcpy(pxna, &user->xnaddr, sizeof(XNADDR));
 	}
 
 	return 0;
@@ -460,6 +460,6 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
 int WINAPI XNetUnregisterInAddr(const IN_ADDR ina)
 {
 	//User.UnregisterSecureAddr(ina);
-	TRACE_GAME_NETWORK_N("XNetUnregisterInAddr: %08X",ina.s_addr);
+	TRACE_GAME_NETWORK_N("XNetUnregisterInAddr: %08X", ina.s_addr);
 	return 0;
 }

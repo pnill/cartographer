@@ -10,6 +10,7 @@ using namespace std::chrono_literals;
 
 H2MOD_QoS h2QoS;
 extern XNetStartupParams g_XnetStartupParams;
+extern const DWORD annoyance_factor;
 
 void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XNQOS** pxnqos,DWORD dwBitsPerSec,XNQOS* pqos)
 {
@@ -115,8 +116,8 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 			}
 
 			int recvResult = 0;
-			BYTE *recvBuf = new BYTE[g_XnetStartupParams.cfgQosDataLimitDiv4 * 4];
 			int recvBufLen = g_XnetStartupParams.cfgQosDataLimitDiv4 * 4;
+			BYTE *recvBuf = new BYTE[recvBufLen];
 			memset(recvBuf, NULL, recvBufLen);
 
 			std::vector<long long int> ping_storage;
@@ -126,9 +127,9 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 				//if (H2Config_debug_log)
 				//	TRACE_GAME_NETWORK_N("[XNetQoSLookup][Client] Sending Probe %i..",probes);
 
-				char send_data[3];
-				ZeroMemory(send_data, 3);
-				*(WORD*)&send_data = 0xAADD;
+				char send_data[4];
+				ZeroMemory(send_data, 4);
+				*(DWORD*)&send_data = annoyance_factor;
 
 				auto started = std::chrono::high_resolution_clock::now();
 				send(connectSocket, send_data, sizeof(send_data), 0);
@@ -214,7 +215,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 
 BOOL H2MOD_QoS::IsListening()
 {
-	return listenerThreadRunning;
+	return m_listenerThreadRunning;
 }
 
 LPFN_ACCEPTEX lpfnAcceptEx = nullptr;
@@ -231,10 +232,10 @@ void CALLBACK H2MOD_QoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAO
 	delete[] acceptSockInfo->DataBuf.buf;
 
 	memset(&(acceptSockInfo->Overlapped), NULL, sizeof(WSAOVERLAPPED));
-	acceptSockInfo->DataBuf.len = 3;
+	acceptSockInfo->DataBuf.len = 4;
 	acceptSockInfo->DataBuf.buf = acceptSockInfo->Buffer;
 
-	if (WSARecv(acceptSockInfo->Socket, &(acceptSockInfo->DataBuf), 1, NULL, &flags, &(acceptSockInfo->Overlapped), h2QoS.SendBack) == SOCKET_ERROR)
+	if (WSARecv(acceptSockInfo->Socket, &(acceptSockInfo->DataBuf), 1, NULL, &flags, &(acceptSockInfo->Overlapped), SendBack) == SOCKET_ERROR)
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING) {
 			TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback-> WSARecv asynchronous I/O operation failed with error: %d", WSAGetLastError());
@@ -250,6 +251,7 @@ void CALLBACK H2MOD_QoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERL
 
 	acceptSockInfo->DataBuf.len = g_XnetStartupParams.cfgQosDataLimitDiv4 * 4;
 	acceptSockInfo->DataBuf.buf = new char[acceptSockInfo->DataBuf.len];
+
 	memset(acceptSockInfo->DataBuf.buf, NULL, acceptSockInfo->DataBuf.len);
 	memcpy(acceptSockInfo->DataBuf.buf, h2QoS.pbData, acceptSockInfo->DataBuf.len);
 
@@ -267,24 +269,24 @@ void CALLBACK H2MOD_QoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERL
 		goto cleanup;
 	}
 
-	TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> magic received??? 0x%x", *(WORD*)&(acceptSockInfo->Buffer));
+	//TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> magic received??? 0x%x", *(DWORD*)&(acceptSockInfo->Buffer));
 
 	int wsaError = 0;
-	if (*(WORD*)&(acceptSockInfo->Buffer) == 0xAADD)
+	if (*(DWORD*)&(acceptSockInfo->Buffer) == annoyance_factor)
 	{
 		TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> magic is right, sending data back on port %d", acceptSockInfo->Socket);
 
 		DWORD flags = 0;
 		ZeroMemory(&(acceptSockInfo->Overlapped), sizeof(WSAOVERLAPPED));
-		int wsaError = WSASend(acceptSockInfo->Socket, &(acceptSockInfo->DataBuf), 1, NULL, flags, &(acceptSockInfo->Overlapped), h2QoS.HandleClient);
+		int wsaError = WSASend(acceptSockInfo->Socket, &(acceptSockInfo->DataBuf), 1, NULL, flags, &(acceptSockInfo->Overlapped), HandleClient);
 
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend error: %d\n", wsaError);
+		TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend error: %d", wsaError);
 
 		if (wsaError == SOCKET_ERROR)
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING)
 			{
-				TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend() failed with error %d\n", WSAGetLastError());
+				TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend() failed with error %d", WSAGetLastError());
 				goto cleanup;
 			}
 
@@ -300,17 +302,60 @@ void CALLBACK H2MOD_QoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERL
 	
 cleanup:
 	TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend finished with error code %d (maybe client disconnected).", wsaError);
-	delete[] acceptSockInfo->DataBuf.buf;
 	closesocket(acceptSockInfo->Socket);
+	delete[] acceptSockInfo->DataBuf.buf;
 	delete acceptSockInfo;
 }
 
 void H2MOD_QoS::Listener()
 {
-	h2QoS.listenerThreadRunning = TRUE;
+	m_listenerThreadRunning = TRUE;
 
-	WSAEVENT wsaEvent = WSACreateEvent();;
-	SOCKET AcceptSocket = INVALID_SOCKET;
+	SOCKADDR_IN serverInf;
+	memset(&serverInf, NULL, sizeof(SOCKADDR_IN));
+	serverInf.sin_family = AF_INET;
+	serverInf.sin_addr.s_addr = INADDR_ANY; // anyone can connect (don't loopback to self)
+	serverInf.sin_port = htons(H2Config_base_port + 10);
+
+	m_ListenSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+	if (m_ListenSocket == INVALID_SOCKET)
+	{
+		m_ListenSocket = INVALID_SOCKET;
+		TRACE_GAME_NETWORK_N("[H2MOD-QoS] Listener socket creation failed.");
+	}
+
+	if (bind(h2QoS.m_ListenSocket, (SOCKADDR*)&serverInf, sizeof(serverInf)) == SOCKET_ERROR)
+	{
+		closesocket(m_ListenSocket);
+		m_ListenSocket = INVALID_SOCKET;
+		TRACE_GAME_NETWORK_N("[H2MOD-QoS] Unable to bind listener socket!");
+	}
+
+	DWORD dwBytes;
+	GUID GuidAcceptEx = WSAID_ACCEPTEX;
+
+	DWORD result = WSAIoctl(h2QoS.m_ListenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
+		&GuidAcceptEx, sizeof(GuidAcceptEx),
+		&lpfnAcceptEx, sizeof(lpfnAcceptEx),
+		&dwBytes, NULL, NULL);
+
+	if (result == SOCKET_ERROR)
+	{
+		TRACE_GAME_NETWORK_N("[H2MOD-QoS] Failed to get AcceptEx function pointer! error: %d", WSAGetLastError());
+		closesocket(m_ListenSocket);
+		m_ListenSocket = INVALID_SOCKET;
+	}
+
+	result = listen(m_ListenSocket, SOMAXCONN);
+	if (result == SOCKET_ERROR)
+	{
+		TRACE_GAME_NETWORK_N("[H2MOD-QoS] Listen failed! error: %d", WSAGetLastError());
+		closesocket(m_ListenSocket);
+		m_ListenSocket = INVALID_SOCKET;
+	}
+
+	m_WsaEvent = WSACreateEvent();
+	SOCKET acceptSocket = INVALID_SOCKET;
 	char AcceptBuffer[2 * (sizeof(SOCKADDR_IN) + 16)];
 	OVERLAPPED ListenOverlapped;
 	LPSOCKET_INFORMATION lpSockInfo;
@@ -318,12 +363,12 @@ void H2MOD_QoS::Listener()
 	while (true)
 	{
 		// check if the listen socket has been closed by XNetQoSListen
-		if (listenSocket == INVALID_SOCKET)
+		if (m_ListenSocket == INVALID_SOCKET)
 			goto end;
 
 		memset(&ListenOverlapped, NULL, sizeof(WSAOVERLAPPED));
-		WSAResetEvent(wsaEvent);
-		ListenOverlapped.hEvent = wsaEvent;
+		WSAResetEvent(m_WsaEvent);
+		ListenOverlapped.hEvent = m_WsaEvent;
 
 		if (lpfnAcceptEx == nullptr)
 		{
@@ -331,17 +376,17 @@ void H2MOD_QoS::Listener()
 			goto end;
 		}
 
-		if ((AcceptSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET)
+		if ((acceptSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET)
 		{
 			TRACE_GAME_NETWORK_N("[H2MOD-QoS] WSASocket failed with error: %d", WSAGetLastError());
 			continue;
 		}
 
-		if (lpfnAcceptEx(listenSocket, AcceptSocket, (PVOID)AcceptBuffer, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &ListenOverlapped) == FALSE)
+		if (lpfnAcceptEx(m_ListenSocket, acceptSocket, (PVOID)AcceptBuffer, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &ListenOverlapped) == FALSE)
 		{
 			if (WSAGetLastError() != ERROR_IO_PENDING) {
 				TRACE_GAME_NETWORK_N("[H2MOD-QoS] AcceptEx asynchronous I/O operation failed with error: %d", WSAGetLastError());
-				closesocket(AcceptSocket);
+				closesocket(acceptSocket);
 				continue;
 			}
 		}
@@ -349,11 +394,18 @@ void H2MOD_QoS::Listener()
 		// Wait for acceptex events
 		while (true)
 		{
-			DWORD Index = WSAWaitForMultipleEvents(1, &wsaEvent, FALSE, WSA_INFINITE, TRUE);
+			DWORD Index = WSAWaitForMultipleEvents(1, &m_WsaEvent, FALSE, WSA_INFINITE, TRUE);
+
+			if (m_bStopListening == true) {
+				closesocket(acceptSocket);
+				closesocket(m_ListenSocket);
+				goto end;
+			}
+
 			if (Index == WSA_WAIT_FAILED)
 			{
 				TRACE_GAME_NETWORK_N("WSAWaitForMultipleEvents() failed with error %d", WSAGetLastError());
-				closesocket(AcceptSocket);
+				closesocket(acceptSocket);
 				continue;
 			}
 
@@ -363,23 +415,23 @@ void H2MOD_QoS::Listener()
 
 		lpSockInfo = new SOCKET_INFORMATION;
 		memset(lpSockInfo, NULL, sizeof(SOCKET_INFORMATION));
-		lpSockInfo->Socket = AcceptSocket;
+		lpSockInfo->Socket = acceptSocket;
 		memset(&(lpSockInfo->Overlapped), NULL, sizeof(WSAOVERLAPPED));
 		lpSockInfo->BytesSEND = 0;
 		lpSockInfo->BytesRECV = 0;
-		lpSockInfo->DataBuf.len = 3; // size of buffer to be received
+		lpSockInfo->DataBuf.len = 4; // size of buffer to be received from clients
 		lpSockInfo->DataBuf.buf = lpSockInfo->Buffer;
 
 		DWORD flags = 0;
 
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] WSARecv about to accept data on socket: %d", AcceptSocket);
+		TRACE_GAME_NETWORK_N("[H2MOD-QoS] WSARecv about to accept data on socket: %d", acceptSocket);
 
-		if (WSARecv(lpSockInfo->Socket, &(lpSockInfo->DataBuf), 1, NULL, &flags, &(lpSockInfo->Overlapped), h2QoS.SendBack) == SOCKET_ERROR)
+		if (WSARecv(lpSockInfo->Socket, &(lpSockInfo->DataBuf), 1, NULL, &flags, &(lpSockInfo->Overlapped), SendBack) == SOCKET_ERROR)
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING) 
 			{
 				TRACE_GAME_NETWORK_N("[H2MOD-QoS] WSARecv asynchronous I/O operation failed with error: %d", WSAGetLastError());
-				closesocket(AcceptSocket);
+				closesocket(acceptSocket);
 				delete lpSockInfo;
 			}
 		}
@@ -387,9 +439,10 @@ void H2MOD_QoS::Listener()
 
 
 end:
-	TRACE_GAME_NETWORK_N("[H2MOD-QoS] Listener thread about to terminate with error: %d", listenSocket);
-	WSACloseEvent(wsaEvent);
-	h2QoS.listenerThreadRunning = FALSE;
+	TRACE_GAME_NETWORK_N("[H2MOD-QoS] Listener thread about to terminate with error: %d", m_ListenSocket);
+	WSACloseEvent(m_WsaEvent);
+	m_bStopListening = false;
+	m_listenerThreadRunning = FALSE;
 }
 
 
@@ -414,48 +467,6 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 
 	if (dwFlags & XNET_QOS_LISTEN_ENABLE && h2QoS.IsListening() == FALSE)
 	{
-		h2QoS.listenSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-		if (h2QoS.listenSocket == INVALID_SOCKET)
-		{
-			TRACE_GAME_NETWORK_N("[H2MOD-QoS] Listener socket creation failed.");
-			return ERROR_FUNCTION_FAILED;
-		}
-
-		SOCKADDR_IN serverInf;
-		memset(&serverInf, NULL, sizeof(SOCKADDR_IN));
-		serverInf.sin_family = AF_INET;
-		serverInf.sin_addr.s_addr = INADDR_ANY; // anyone can connect (don't loopback to self)
-		serverInf.sin_port = htons(H2Config_base_port + 10);
-
-		if (bind(h2QoS.listenSocket, (SOCKADDR*)&serverInf, sizeof(serverInf)) == SOCKET_ERROR) 
-		{
-			TRACE_GAME_NETWORK_N("[H2MOD-QoS] Unable to bind listener socket!");
-			return ERROR_FUNCTION_FAILED;
-		}
-
-		DWORD dwBytes;
-		GUID GuidAcceptEx = WSAID_ACCEPTEX;
-
-		DWORD wsaResult = WSAIoctl(h2QoS.listenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
-			&GuidAcceptEx, sizeof(GuidAcceptEx),
-			&lpfnAcceptEx, sizeof(lpfnAcceptEx),
-			&dwBytes, NULL, NULL);
-
-		if (wsaResult == SOCKET_ERROR)
-		{
-			TRACE_GAME_NETWORK_N("[H2MOD-QoS] Failed to get AcceptEx function pointer! error: %d", WSAGetLastError());
-			closesocket(h2QoS.listenSocket);
-			return ERROR_FUNCTION_FAILED;
-		}
-
-		wsaResult = listen(h2QoS.listenSocket, SOMAXCONN); 
-		if (wsaResult == SOCKET_ERROR)
-		{
-			TRACE_GAME_NETWORK_N("[H2MOD-QoS] listen failed! error: %d", WSAGetLastError());
-			closesocket(h2QoS.listenSocket);
-			return ERROR_FUNCTION_FAILED;
-		}
-
 		std::thread(&H2MOD_QoS::Listener, &h2QoS).detach();
 	}
 
@@ -466,9 +477,10 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 
 	if (dwFlags & XNET_QOS_LISTEN_RELEASE)
 	{
-		closesocket(h2QoS.listenSocket);
-		h2QoS.listenSocket = INVALID_SOCKET;
-		h2QoS.listenerThreadRunning = FALSE;
+		h2QoS.m_bStopListening = true;
+		memset(h2QoS.pbData, NULL, h2QoS.cbData);
+		// signal the thread it has to unblock, and based on m_bStopListening it will decide wheter terminate the thread or not
+		WSASetEvent(h2QoS.m_WsaEvent);
 		
 		TRACE_GAME_NETWORK_N("[H2MOD-QoS] Listener released!");
 	}

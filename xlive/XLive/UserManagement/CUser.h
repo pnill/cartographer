@@ -7,9 +7,9 @@
 class CUser
 {
 public:
-	XNADDR pxna;
-	IN_ADDR pina;
-	XNKID pxkid;
+	XNADDR xnaddr;
+	IN_ADDR ina;
+	XNKID xnkid;
 	time_t last_pong;
 	BOOL bValid;
 };
@@ -21,19 +21,18 @@ inline void hash_combine(std::size_t & seed, const T & v)
 	seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
-namespace std
+
+template<typename S, typename T> struct std::hash < std::pair<S, T> >
 {
-	template<typename S, typename T> struct hash < pair<S, T> >
+	inline size_t operator()(const pair<S, T> & v) const
 	{
-		inline size_t operator()(const pair<S, T> & v) const
-		{
-			size_t seed = 0;
-			::hash_combine(seed, v.first);
-			::hash_combine(seed, v.second);
-			return seed;
-		}
-	};
-}
+		size_t seed = 0;
+		::hash_combine(seed, v.first);
+		::hash_combine(seed, v.second);
+		return seed;
+	}
+};
+
 
 extern wchar_t ServerLobbyName[32];
 void SetUserUsername(char* username);
@@ -51,7 +50,7 @@ public:
 	void UpdateConnectionStatus();
 	BOOL LocalUserLoggedIn();
 	void UnregisterLocal();
-	void ConfigureUser(XNADDR* pxna, ULONGLONG xuid, char* username);
+	void ConfigureLocalUser(XNADDR* pxna, ULONGLONG xuid, char* username);
 
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 

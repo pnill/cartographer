@@ -87,19 +87,19 @@ ULONG CUserManagement::GetSecureFromXN(XNADDR* pxna)
 				
 				CUser *nUser = new CUser;
 
-				memset(&nUser->pxna, 0x00, sizeof(XNADDR));
-				nUser->pxna.wPortOnline = htons((short)RecvPak.sreply().port());
+				memset(&nUser->xnaddr, 0x00, sizeof(XNADDR));
+				nUser->xnaddr.wPortOnline = htons((short)RecvPak.sreply().port());
 				
-				nUser->pxna.ina.s_addr = RecvPak.sreply().xnaddr();
-				nUser->pxna.inaOnline.s_addr = secure;
-				memcpy(nUser->pxna.abEnet, RecvPak.sreply().abenet().c_str(), 6);
-				memcpy(nUser->pxna.abOnline, RecvPak.sreply().abonline().c_str(), 20);
+				nUser->xnaddr.ina.s_addr = RecvPak.sreply().xnaddr();
+				nUser->xnaddr.inaOnline.s_addr = secure;
+				memcpy(nUser->xnaddr.abEnet, RecvPak.sreply().abenet().c_str(), 6);
+				memcpy(nUser->xnaddr.abOnline, RecvPak.sreply().abonline().c_str(), 20);
 
-				TRACE("GetSecureFromXN() - nUser->pxna.wPortOnline: %i", ntohs(nUser->pxna.wPortOnline));
+				TRACE("GetSecureFromXN() - nUser->pxna.wPortOnline: %i", ntohs(nUser->xnaddr.wPortOnline));
 				TRACE("GetSecureFromXN() - secure: %08X", secure);
 				TRACE("GetSecureFromXN() - pxna->xnaddr: %08X", pxna->ina.s_addr);
 
-				nUser->pina.s_addr = secure;
+				nUser->ina.s_addr = secure;
 				nUser->bValid = true;
 
 				this->cusers[secure] = nUser;
@@ -137,10 +137,10 @@ void CUserManagement::CreateUser(XNADDR* pxna, BOOL user)
 
 	ULONG secure = pxna->inaOnline.s_addr;
 	CUser *nUser = new CUser;
-	memset(&nUser->pxna, 0x00, sizeof(XNADDR));
+	memset(&nUser->xnaddr, 0x00, sizeof(XNADDR));
 
-	memcpy(&nUser->pxna, pxna, sizeof(XNADDR));
-	nUser->pina.s_addr = secure;
+	memcpy(&nUser->xnaddr, pxna, sizeof(XNADDR));
+	nUser->ina.s_addr = secure;
 	std::string ab(reinterpret_cast<const char*>(pxna->abEnet), 6);
 
 	nUser->bValid = true;
@@ -278,18 +278,18 @@ ULONG CUserManagement::GetXNFromSecure(ULONG secure)
 				std::string abOnline = RecvPak.xreply().abonline();
 
 				CUser *nUser = new CUser;
-				memset(&nUser->pxna, 0x00, sizeof(XNADDR));
+				memset(&nUser->xnaddr, 0x00, sizeof(XNADDR));
 				
-				nUser->pxna.wPortOnline = htons(recvport);
-				nUser->pxna.ina.s_addr = xnaddress;
-				nUser->pxna.inaOnline.s_addr = secure;
+				nUser->xnaddr.wPortOnline = htons(recvport);
+				nUser->xnaddr.ina.s_addr = xnaddress;
+				nUser->xnaddr.inaOnline.s_addr = secure;
 
-				memcpy(nUser->pxna.abEnet, abEnet.c_str(), 6);
-				memcpy(nUser->pxna.abOnline, abOnline.c_str(), 20);
-				nUser->pina.s_addr = secure;
+				memcpy(nUser->xnaddr.abEnet, abEnet.c_str(), 6);
+				memcpy(nUser->xnaddr.abOnline, abOnline.c_str(), 20);
+				nUser->ina.s_addr = secure;
 				nUser->bValid = true;
 
-				TRACE("GetXNFromSecure() - nUser->pxna.wPortOnline: %i", ntohs(nUser->pxna.wPortOnline));
+				TRACE("GetXNFromSecure() - nUser->pxna.wPortOnline: %i", ntohs(nUser->xnaddr.wPortOnline));
 				TRACE("GetXNFromSecure() - secure: %08X", secure);
 				TRACE("GetXNFromSecure() - xnaddr: %08X", xnaddress);
 
@@ -322,7 +322,7 @@ void CUserManagement::UnregisterSecureAddr(const IN_ADDR ina)
 
 	if (deluser != 0)
 	{
-		std::string ab(reinterpret_cast<const char*>(deluser->pxna.abEnet), 6);
+		std::string ab(reinterpret_cast<const char*>(deluser->xnaddr.abEnet), 6);
 		delete[] deluser;
 			
 		if (xntosecure[ab] != 0)
@@ -415,26 +415,26 @@ void SetUserUsername(char* username) {
 
 const DWORD annoyance_factor = 0x11223341;
 
-void CUserManagement::ConfigureUser(XNADDR* pxna, ULONGLONG xuid, char* username) {
+void CUserManagement::ConfigureLocalUser(XNADDR* pxna, ULONGLONG xuid, char* username) {
 	if (Users[0].bValid) {
 		delete[] this->SecurityPacket;
 		Users[0].bValid = false;
 	}
 
-	memcpy(&Users[0].pxna, pxna, sizeof(XNADDR));
+	memcpy(&Users[0].xnaddr, pxna, sizeof(XNADDR));
 
 	this->SecurityPacket = new char[8 + sizeof(XNADDR)];
 	(*(DWORD*)&this->SecurityPacket[0]) = annoyance_factor;
 	(*(DWORD*)&this->SecurityPacket[4]) = pxna->inaOnline.s_addr;
 
-	Users[0].pina.s_addr = pxna->inaOnline.s_addr;
+	Users[0].ina.s_addr = pxna->inaOnline.s_addr;
 
 	xFakeXuid[0] = xuid;
 
-	memcpy(&SecurityPacket[8], &Users[0].pxna, sizeof(XNADDR));
+	memcpy(&SecurityPacket[8], &Users[0].xnaddr, sizeof(XNADDR));
 
 
-	LocalXN = &Users[0].pxna;
+	LocalXN = &Users[0].xnaddr;
 	LocalSec = pxna->inaOnline.s_addr;
 
 	SetUserUsername(username);
@@ -445,15 +445,13 @@ void CUserManagement::ConfigureUser(XNADDR* pxna, ULONGLONG xuid, char* username
 
 	//We want achievements loaded as early as possible, but we can't do it until after we have the XUID.
 	std::thread(Achievement_GetAll).detach();
-
-
 }
 
 BOOL CUserManagement::GetLocalXNAddr(XNADDR* pxna)
 {
 	if (Users[0].bValid)
 	{
-		memcpy(pxna, &Users[0].pxna, sizeof(XNADDR));
+		memcpy(pxna, &Users[0].xnaddr, sizeof(XNADDR));
 		TRACE("GetLocalXNAddr: Returned");
 		TRACE("XNADDR: %08X", pxna->ina.s_addr);
 		return TRUE;

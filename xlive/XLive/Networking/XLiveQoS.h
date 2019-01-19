@@ -19,7 +19,9 @@ public:
 	//void stopListening();
 	BOOL IsListening();
 
-	SOCKET listenSocket;
+	SOCKET m_ListenSocket;
+	bool m_bStopListening = false;
+	WSAEVENT m_WsaEvent;
 
 	// TODO: constructor gets the size of pbdata
 	// for now 255*4 which is what h2v requires
@@ -29,10 +31,9 @@ public:
 	static void CALLBACK HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags);
 	static void CALLBACK SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags);
 
-	volatile std::atomic<BOOL> listenerThreadRunning = FALSE;
+	volatile std::atomic<BOOL> m_listenerThreadRunning = FALSE;
 private:
 	
-	//void shutdownServerSocket();
 };
 
 #define XNET_XNQOSINFO_COMPLETE         0x01    // Qos has finished processing this entry
