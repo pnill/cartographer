@@ -199,8 +199,8 @@
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;.\libs;..\Directx SDK\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;.\;..\protobuf-2.6.1;..\Directx SDK\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\Directx SDK\lib;.\3rdparty\libcurl\;.\libs;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>.\3rdparty\libcurl;..\Directx SDK\include;.\;.\3rdparty\;.\3rdparty\google;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -208,8 +208,8 @@
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;D:\Users\Magic\Documents\Visual Studio 2017\Projects\cartographer\Directx SDK\lib;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
-    <IncludePath>D:\Users\Magic\Documents\Visual Studio 2017\Projects\cartographer\Directx SDK\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
+    <LibraryPath>..\Directx SDK\lib;.\3rdparty\libcurl\;.\libs;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>.\3rdparty\libcurl;..\Directx SDK\include;.\;.\3rdparty\;.\3rdparty\google;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -298,7 +298,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;3rdParty\google\libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdParty\discord\discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -349,7 +349,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;3rdParty\google\libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdParty\discord\discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
