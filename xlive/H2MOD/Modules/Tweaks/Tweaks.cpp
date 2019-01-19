@@ -745,11 +745,9 @@ int __cdecl fn_c0017a25d(DWORD a1, DWORD* a2)
 				int other_datum = h2mod->get_unit_datum_from_player_index(i);
 				if (a1 == other_datum) {
 					if (h2mod->get_unit_team_index(local_player_datum) != h2mod->get_unit_team_index(other_datum)) {
-						std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
-						h2mod->SoundMap[L"sounds/Halo1PCHitSound.wav"] = 0;
-						//unlock immediately after modifying sound map
-						lck.unlock();
-						h2mod->sound_cv.notify_one();
+
+						std::thread(&H2MOD::CustomSoundPlay, h2mod, L"Halo1PCHitSound.wav", 0).detach();
+						
 					}
 					break;
 				}

@@ -5,12 +5,9 @@ std::vector<std::wstring> Infection::zombieNames;
 
 const int ZOMBIE_TEAM = 3;
 const int HUMAN_TEAM = 0;
-std::wstring NEW_ZOMBIE_SOUND1(L"sounds/new_zombie.wav");
-std::wstring INFECTION_SOUND1(L"sounds/infection.wav");
-std::wstring INFECTED_SOUND1(L"sounds/infected.wav");
-const wchar_t* NEW_ZOMBIE_SOUND = NEW_ZOMBIE_SOUND1.c_str();
-const wchar_t* INFECTION_SOUND = INFECTION_SOUND1.c_str();
-const wchar_t* INFECTED_SOUND = INFECTED_SOUND1.c_str();
+const wchar_t* NEW_ZOMBIE_SOUND = L"sounds/new_zombie.wav";
+const wchar_t* INFECTION_SOUND = L"sounds/infection.wav";
+const wchar_t* INFECTED_SOUND = L"sounds/infected.wav";
 
 bool infectedPlayed;
 bool firstSpawn;
@@ -62,11 +59,7 @@ Infection::Infection()
 
 void Infection::triggerSound(const wchar_t* name, int sleep) {
 	TRACE_GAME("[h2mod-infection] Triggering sound %s", name);
-	std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
-	h2mod->SoundMap[(wchar_t*)name] = sleep;
-	//unlock immediately after modifying sound map
-	lck.unlock();
-	h2mod->sound_cv.notify_one();
+	std::thread(&H2MOD::CustomSoundPlay, h2mod, name, sleep).detach();
 }
 
 void Infection::initClient()

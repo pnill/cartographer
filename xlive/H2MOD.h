@@ -129,18 +129,17 @@ public:
 		BYTE get_local_team_index();
 		void set_local_grenades(BYTE type, BYTE count, int pIndex);
 		void DisableSound(int sound);
-		void PatchWeaponsInteraction(bool b_Enable);		
+		void CustomSoundPlay(const wchar_t* soundName, int delay);
+		void PatchWeaponsInteraction(bool b_Enable);
 		void securityPacketProcessing();
 		void ApplyUnitHooks();
 		EngineType GetEngineType();
 		wchar_t* GetLobbyGameVariantName();
 		void exit_game();
 		BOOL Server;
-		std::unordered_map<wchar_t*, int> SoundMap;
 		std::unordered_map<std::string, bool> AchievementMap;
 	
 		std::mutex sound_mutex;
-		std::condition_variable sound_cv;
 
 		std::set<int> hookedObjectDefs;
 		bool isChatBoxCommand = false;

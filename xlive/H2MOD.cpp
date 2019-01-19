@@ -40,7 +40,7 @@ std::unordered_map<int, int> object_to_variant;
 using namespace Blam::Cache::DataTypes;
 
 int EXECUTABLE_VERSION = 4;
-int GAME_BUILD = 11123;
+int GAME_BUILD = 11122;
 
 int character_datum_from_index(BYTE index)
 {
@@ -944,33 +944,17 @@ void H2MOD::DisableSound(int sound)
 	}
 }
 
-void SoundThread(void)
+void H2MOD::CustomSoundPlay(const wchar_t* soundName, int delay)
 {
+	std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+	std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now() + std::chrono::milliseconds(delay);
 
-	while (1)
-	{
-		std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
-		h2mod->sound_cv.wait(lck);
+	TRACE_GAME("[H2MOD-SoundQueue] - attempting to play sound %ws - delaying %i miliseconds first", soundName, delay);
 
-		if (h2mod->SoundMap.size() > 0)
-		{
-			std::unordered_map<wchar_t*, int> tempSoundMap;
-			tempSoundMap.insert(h2mod->SoundMap.begin(), h2mod->SoundMap.end());
-			h2mod->SoundMap.clear();
-			//unlock immediately after reading everything from sound map
-			lck.unlock();
+	if (delay > 0)
+		std::this_thread::sleep_until(timePoint);
 
-			auto it = tempSoundMap.begin();
-			while (it != tempSoundMap.end())
-			{
-				TRACE_GAME("[H2MOD-SoundQueue] - attempting to play sound %ws - delaying for %i miliseconds first", it->first, it->second);
-				Sleep(it->second);
-				PlaySound(it->first, NULL, SND_FILENAME);
-				it = tempSoundMap.erase(it);
-			}
-		}
-	}
-
+	PlaySound(soundName, NULL, SND_FILENAME);
 }
 
 typedef bool(__cdecl *spawn_player)(int a1);
@@ -1933,12 +1917,7 @@ void H2MOD::Initialize()
 	{
 		this->Server = FALSE;
 		
-		std::thread SoundT(SoundThread);
-		SoundT.detach();
-		
 		H2Tweaks::setFOV(H2Config_field_of_view);
-		//setSens(CONTROLLER, H2Config_sens_controller);
-		//setSens(MOUSE, H2Config_sens_mouse);
 		if (H2Config_raw_input)
 			Mouseinput::Initialize();
 
