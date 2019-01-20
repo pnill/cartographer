@@ -1,415 +1,479 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{3e83253f-3671-49c0-ae8d-744a3a2d9c2b}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{26da70fa-61a4-4e90-bbc2-fb167b333db3}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{7df0e8d8-00ce-499a-8c23-c6816b38c73d}</UniqueIdentifier>
-      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
-    </Filter>
-    <Filter Include="Source Files\xlive">
-      <UniqueIdentifier>{cf71a59b-5460-4fe7-8953-30d0bd68357b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\hooks">
-      <UniqueIdentifier>{6e3b665a-267b-4baf-9978-190c7753a4d1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\H2MOD">
-      <UniqueIdentifier>{2c24eac4-ffb8-4f03-b12f-4c8610683f02}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\H2MOD\Header Files">
-      <UniqueIdentifier>{9f856530-dcb3-4e2a-8786-00d436520d3a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\H2MOD\Source Files">
-      <UniqueIdentifier>{aed100e2-acf2-4d0b-9c87-6da40d3b88f9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\xlive\User Handling">
-      <UniqueIdentifier>{6f64c45f-8032-4681-a961-0b27caef7bd5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\H2MOD\GUI">
-      <UniqueIdentifier>{00a6b156-92cb-440a-aca4-40db453e82c1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\H2MOD\GUI\Header Files">
-      <UniqueIdentifier>{c802d0b3-452a-4459-824a-62d80c0815a0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\H2MOD\GUI\Source Files">
-      <UniqueIdentifier>{b245bfb5-9e14-482c-9568-9e01aaab83a1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\H2MOD\GUI\Source Files\Direct3D9">
-      <UniqueIdentifier>{933eb738-ef3b-4896-a991-645018ac135b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\GlitchyScripts">
-      <UniqueIdentifier>{c50ed4e8-db51-43bf-bc48-a7d5abc06719}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam">
-      <UniqueIdentifier>{cc2c99fc-365a-4378-8c80-48e7fc3c5e79}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Engine">
-      <UniqueIdentifier>{1756db8f-ba07-4777-b4ef-1b6de3bf674f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Engine\Extras">
-      <UniqueIdentifier>{ee386d18-ee75-4f64-ab14-4ef7bedf702c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Engine\Game">
-      <UniqueIdentifier>{08197ffa-f27b-417e-8a0f-8e0c7f1e36b3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Engine\Objects">
-      <UniqueIdentifier>{20a09ede-d2c0-4755-8abf-e84f4d8efca9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Engine\Players">
-      <UniqueIdentifier>{4d7ace68-c64c-4829-907a-04ea9f259105}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Enums">
-      <UniqueIdentifier>{f9c50c86-269f-48c1-b6db-37bd6ca68e06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Enums\Players">
-      <UniqueIdentifier>{06078d05-7eda-4844-b030-d46c92832dfb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Enums\Game">
-      <UniqueIdentifier>{0f6b82bd-b3fa-4887-baec-fd8d60b66c1c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Maths">
-      <UniqueIdentifier>{c4fb9ac0-3d6c-4137-8a24-eac1146f5614}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Shared">
-      <UniqueIdentifier>{b66746a4-d12d-44e8-9b07-93611bdb2c72}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Enums\Objects">
-      <UniqueIdentifier>{b6472f0a-f04e-45d0-adb0-c2835f526b6c}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="unsorted\cartographer_main.cpp">
+      <Filter>unsorted</Filter>
     </ClCompile>
-    <ClCompile Include="Network.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
+    <ClCompile Include="unsorted\Network.cpp">
+      <Filter>unsorted</Filter>
     </ClCompile>
-    <ClCompile Include="H2MOD.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
+    <ClCompile Include="Util\Hooks\Detour.cpp">
+      <Filter>Util\Hooks</Filter>
     </ClCompile>
-    <ClCompile Include="xlive_network.cpp">
-      <Filter>Source Files\xlive</Filter>
+    <ClCompile Include="Util\Hooks\Hook.cpp">
+      <Filter>Util\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Debug\Debug.cpp">
+      <Filter>Util\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\UserManagement\protobuf\packet.pb.cc">
+      <Filter>XLive\UserManagement\protobuf</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\UserManagement\CUser.cpp">
+      <Filter>XLive\UserManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Networking\xlive_network.cpp">
+      <Filter>XLive\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Discord\DiscordInterface.cpp">
+      <Filter>H2Mod\Discord</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\GUI\GUI.cpp">
+      <Filter>H2Mod\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\protobuf\h2mod.pb.cc">
+      <Filter>H2Mod\protobuf</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Variants\GunGame\GunGame.cpp">
+      <Filter>H2Mod\Variants\GunGame</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Variants\H2Final\H2Final.cpp">
+      <Filter>H2Mod\Variants\H2Final</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Variants\Zombies\Zombies.cpp">
+      <Filter>H2Mod\Variants\Zombies</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Variants\JustLikeOG\JustLikeOG.cpp">
+      <Filter>H2Mod\Variants\JustLikeOG</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\H2MOD.cpp">
+      <Filter>H2Mod</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\Accounts\AccountCreate.cpp">
+      <Filter>H2Mod\Modules\Accounts</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\Accounts\AccountLogin.cpp">
+      <Filter>H2Mod\Modules\Accounts</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\Accounts\Accounts.cpp">
+      <Filter>H2Mod\Modules\Accounts</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\Config\Config.cpp">
+      <Filter>H2Mod\Modules\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\Console\ConsoleCommands.cpp">
+      <Filter>H2Mod\Modules\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\CustomMenu\CustomLanguage.cpp">
+      <Filter>H2Mod\Modules\CustomMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\CustomMenu\CustomMenu.cpp">
+      <Filter>H2Mod\Modules\CustomMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\GameManager\GameManager.cpp">
+      <Filter>H2Mod\Modules\GameManager</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\Input\Mouseinput.cpp">
+      <Filter>H2Mod\Modules\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\MapManager\MapManager.cpp">
+      <Filter>H2Mod\Modules\MapManager</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\Networking\Networking.cpp">
+      <Filter>H2Mod\Modules\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\OnScreenDebug\OnscreenDebugLog.cpp">
+      <Filter>H2Mod\Modules\OnScreenDebug</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\RunLoop\RunLoop.cpp">
+      <Filter>H2Mod\Modules\RunLoop</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\Startup\Startup.cpp">
+      <Filter>H2Mod\Modules\Startup</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\Utils\Utils.cpp">
+      <Filter>H2Mod\Modules\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\Updater\Updater.cpp">
+      <Filter>H2Mod\Modules\Updater</Filter>
+    </ClCompile>
+    <ClCompile Include="H2Mod\Modules\Tweaks\Tweaks.cpp">
+      <Filter>H2Mod\Modules\Tweaks</Filter>
     </ClCompile>
     <ClCompile Include="xliveless.cpp">
-      <Filter>Source Files\xlive</Filter>
-    </ClCompile>
-    <ClCompile Include="Detour.cpp">
-      <Filter>Source Files\hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="Hook.cpp">
-      <Filter>Source Files\hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="CUser.cpp">
-      <Filter>Source Files\xlive\User Handling</Filter>
-    </ClCompile>
-    <ClCompile Include="packet.pb.cc">
-      <Filter>Source Files\xlive\User Handling</Filter>
-    </ClCompile>
-    <ClCompile Include="GUI.cpp">
-      <Filter>Source Files\H2MOD\GUI\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cartographer_main.cpp">
-      <Filter>Source Files\H2MOD\GUI\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD_GunGame.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD_Infection.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="h2mod.pb.cc">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Globals.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD_MapManager.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD_Halo2Final.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="H2ConsoleCommands.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DiscordInterface.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD_H2X.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD_Mouseinput.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GSAccountCreate.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="GSAccountLogin.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="GSCustomLanguage.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="GSCustomMenu.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="GSRunLoop.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="GSUtils.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="H2OnscreenDebugLog.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="H2Startup.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="H2Tweaks.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="H2Accounts.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="H2Config.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="GSDownload.cpp">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD_GameManager.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD_Network.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug.cpp">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
+      <Filter>XLive</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Network.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="xlivedefs.h">
-      <Filter>Source Files\xlive</Filter>
-    </ClInclude>
-    <ClInclude Include="xliveless.h">
-      <Filter>Source Files\xlive</Filter>
-    </ClInclude>
-    <ClInclude Include="Detour.h">
-      <Filter>Source Files\hooks</Filter>
-    </ClInclude>
-    <ClInclude Include="Hook.h">
-      <Filter>Source Files\hooks</Filter>
-    </ClInclude>
-    <ClInclude Include="CUser.h">
-      <Filter>Source Files\xlive\User Handling</Filter>
-    </ClInclude>
-    <ClInclude Include="packet.pb.h">
-      <Filter>Source Files\xlive\User Handling</Filter>
-    </ClInclude>
-    <ClInclude Include="GUI.h">
-      <Filter>Source Files\H2MOD\GUI\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cartographer_main.hpp">
-      <Filter>Source Files\H2MOD\GUI\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD_Sounds.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD_GunGame.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD_Infection.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="h2mod.pb.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Globals.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD_MapManager.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD_Halo2Final.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="discord-rpc.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DiscordInterface.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="H2ConsoleCommands.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD_H2X.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD_Mouseinput.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GSAccountCreate.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="GSAccountLogin.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="GSCustomLanguage.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="GSCustomMenu.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="GSRunLoop.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="GSUtils.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="H2OnscreenDebugLog.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="H2Startup.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="H2Tweaks.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="H2Accounts.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="H2Config.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="ReadIniArguments.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GSDownload.h">
-      <Filter>Source Files\GlitchyScripts</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD_GameManager.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD_Network.h">
-      <Filter>Source Files\H2MOD\Header Files</Filter>
+    <ClInclude Include="Globals.h" />
+    <ClInclude Include="Ini.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="3rdParty\discord\discord-rpc.h">
+      <Filter>3rdParty\discord</Filter>
     </ClInclude>
     <ClInclude Include="Blam\BlamLibrary.h">
-      <Filter>Source Files\Blam</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Enums.h">
-      <Filter>Source Files\Blam\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Players\Players.h">
-      <Filter>Source Files\Blam\Enums\Players</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h">
-      <Filter>Source Files\Blam\Enums\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\Angle.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\Maths.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\RealColorRGB.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\RealPoint2D.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\RealPoint3D.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\RealVector2D.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\RealVector3D.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Shared\SharedDefinitions.h">
-      <Filter>Source Files\Blam\Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\EngineDefinitions.h">
-      <Filter>Source Files\Blam\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h">
-      <Filter>Source Files\Blam\Engine\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Objects\Objects.h">
-      <Filter>Source Files\Blam\Engine\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Objects\ObjectsHeader.h">
-      <Filter>Source Files\Blam\Engine\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Players\PlayerControls.h">
-      <Filter>Source Files\Blam\Engine\Players</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Players\Players.h">
-      <Filter>Source Files\Blam\Engine\Players</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h">
-      <Filter>Source Files\Blam\Engine\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Game\GameManager.h">
-      <Filter>Source Files\Blam\Engine\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Extras\Skulls.h">
-      <Filter>Source Files\Blam\Engine\Extras</Filter>
+      <Filter>Blam</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Shared\DatumIndex.h">
-      <Filter>Source Files\Blam\Shared</Filter>
+      <Filter>Blam\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Shared\Globals.h">
-      <Filter>Source Files\Blam\Shared</Filter>
+      <Filter>Blam\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Shared\SharedDefinitions.h">
+      <Filter>Blam\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\Angle.h">
+      <Filter>Blam\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\Maths.h">
+      <Filter>Blam\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\RealColorRGB.h">
+      <Filter>Blam\Maths</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Maths\RealMovement.h">
-      <Filter>Source Files\Blam\Maths</Filter>
+      <Filter>Blam\Maths</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Enums\Objects\Objects.h">
-      <Filter>Source Files\Blam\Enums\Objects</Filter>
+    <ClInclude Include="Blam\Maths\RealPoint2D.h">
+      <Filter>Blam\Maths</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Enums\Objects\Unit.h">
-      <Filter>Source Files\Blam\Enums\Objects</Filter>
+    <ClInclude Include="Blam\Maths\RealPoint3D.h">
+      <Filter>Blam\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\RealVector2D.h">
+      <Filter>Blam\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\RealVector3D.h">
+      <Filter>Blam\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Enums.h">
+      <Filter>Blam\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h">
+      <Filter>Blam\Enums\Game</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h">
-      <Filter>Source Files\Blam\Enums\Game</Filter>
+      <Filter>Blam\Enums\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Objects\Objects.h">
+      <Filter>Blam\Enums\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Objects\Unit.h">
+      <Filter>Blam\Enums\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Players\Players.h">
+      <Filter>Blam\Enums\Players</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Extras\Skulls.h">
+      <Filter>Blam\Engine\Extras</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Game\GameManager.h">
+      <Filter>Blam\Engine\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h">
+      <Filter>Blam\Engine\Game</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Engine\Game\HaloScript.h">
-      <Filter>Source Files\Blam\Engine\Game</Filter>
+      <Filter>Blam\Engine\Game</Filter>
     </ClInclude>
-    <ClInclude Include="Debug.h">
-      <Filter>Source Files\H2MOD\Source Files</Filter>
+    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h">
+      <Filter>Blam\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Objects\Objects.h">
+      <Filter>Blam\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Objects\ObjectsHeader.h">
+      <Filter>Blam\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Players\PlayerControls.h">
+      <Filter>Blam\Engine\Players</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Players\Players.h">
+      <Filter>Blam\Engine\Players</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\EngineDefinitions.h">
+      <Filter>Blam\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="unsorted\cartographer_main.hpp">
+      <Filter>unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="unsorted\Network.h">
+      <Filter>unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Hooks\Detour.h">
+      <Filter>Util\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Hooks\Hook.h">
+      <Filter>Util\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Debug\Debug.h">
+      <Filter>Util\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\ReadIniArguments.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\UserManagement\protobuf\packet.pb.h">
+      <Filter>XLive\UserManagement\protobuf</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\UserManagement\CUser.h">
+      <Filter>XLive\UserManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Discord\DiscordInterface.h">
+      <Filter>H2Mod\Discord</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\GUI\GUI.h">
+      <Filter>H2Mod\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\protobuf\h2mod.pb.h">
+      <Filter>H2Mod\protobuf</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Variants\GunGame\GunGame.h">
+      <Filter>H2Mod\Variants\GunGame</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Variants\H2Final\H2Final.h">
+      <Filter>H2Mod\Variants\H2Final</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Variants\Zombies\Zombies.h">
+      <Filter>H2Mod\Variants\Zombies</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Variants\JustLikeOG\JustLikeOG.h">
+      <Filter>H2Mod\Variants\JustLikeOG</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\H2MOD.h">
+      <Filter>H2Mod</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\Accounts\AccountCreate.h">
+      <Filter>H2Mod\Modules\Accounts</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\Accounts\AccountLogin.h">
+      <Filter>H2Mod\Modules\Accounts</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\Accounts\Accounts.h">
+      <Filter>H2Mod\Modules\Accounts</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\Config\Config.h">
+      <Filter>H2Mod\Modules\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\Console\ConsoleCommands.h">
+      <Filter>H2Mod\Modules\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\CustomMenu\CustomLanguage.h">
+      <Filter>H2Mod\Modules\CustomMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\CustomMenu\CustomMenu.h">
+      <Filter>H2Mod\Modules\CustomMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\GameManager\GameManager.h">
+      <Filter>H2Mod\Modules\GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\Input\Mouseinput.h">
+      <Filter>H2Mod\Modules\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\MapManager\MapManager.h">
+      <Filter>H2Mod\Modules\MapManager</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\Networking\Networking.h">
+      <Filter>H2Mod\Modules\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\OnScreenDebug\OnscreenDebugLog.h">
+      <Filter>H2Mod\Modules\OnScreenDebug</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\RunLoop\RunLoop.h">
+      <Filter>H2Mod\Modules\RunLoop</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\Startup\Startup.h">
+      <Filter>H2Mod\Modules\Startup</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\Utils\Utils.h">
+      <Filter>H2Mod\Modules\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\Updater\Updater.h">
+      <Filter>H2Mod\Modules\Updater</Filter>
+    </ClInclude>
+    <ClInclude Include="H2Mod\Modules\Tweaks\Tweaks.h">
+      <Filter>H2Mod\Modules\Tweaks</Filter>
+    </ClInclude>
+    <ClInclude Include="xliveless.h">
+      <Filter>XLive</Filter>
+    </ClInclude>
+    <ClInclude Include="xlivedefs.h">
+      <Filter>XLive</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resource.aps" />
+    <None Include="H2Mod\Variants\GunGame\gungame.ini">
+      <Filter>H2Mod\Variants\GunGame</Filter>
+    </None>
     <None Include="xlive.def">
-      <Filter>Source Files\xlive</Filter>
+      <Filter>XLive</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
     <ResourceCompile Include="xliveless.rc">
-      <Filter>Source Files\xlive</Filter>
+      <Filter>XLive</Filter>
     </ResourceCompile>
-    <ResourceCompile Include="Resource.rc">
-      <Filter>Source Files</Filter>
-    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Blam">
+      <UniqueIdentifier>{f548192d-b194-4c92-8cc7-2f4a3427ffc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{3ecca278-c4e0-44f3-9326-7cef8befb4c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Blam\Engine">
+      <UniqueIdentifier>{e1bc1b27-93fb-4dea-be61-be18dc7602fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Blam\Enums">
+      <UniqueIdentifier>{eedbfea3-8527-4dc3-8102-093acf7db9a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Blam\Maths">
+      <UniqueIdentifier>{cdfc4039-7eaf-444f-bde4-817755da7c37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Blam\Shared">
+      <UniqueIdentifier>{91f677f9-261b-4344-bbf5-4fa8b3f3c9f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Blam\Enums\Game">
+      <UniqueIdentifier>{4b7ca3e9-6514-4c85-b971-a1486b204e02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Blam\Enums\Objects">
+      <UniqueIdentifier>{6fa9ac25-2b32-4ed9-be26-1708cebfe760}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Blam\Enums\Players">
+      <UniqueIdentifier>{7f6b53af-d1d7-4d2d-bbb2-f06ad7685a95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Blam\Engine\Extras">
+      <UniqueIdentifier>{20dc014b-f5bc-45cf-be24-f2a70dde9784}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Blam\Engine\Game">
+      <UniqueIdentifier>{b50b79e7-c26b-4d46-ac0f-f39e6be0fa3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Blam\Engine\Players">
+      <UniqueIdentifier>{a012cde9-9f5d-4a2d-bb1f-f0d70cf9b928}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Blam\Engine\Objects">
+      <UniqueIdentifier>{9946856c-e8b9-46f4-bea7-b7c77f095058}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="unsorted">
+      <UniqueIdentifier>{b41465c9-e0f2-4ee6-99a2-68be9bc1063c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util\Debug">
+      <UniqueIdentifier>{87828ae3-622c-4353-bc2b-c8aa4a1ddbbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util\Hooks">
+      <UniqueIdentifier>{e504eb63-a262-44d6-ae53-90a87a7058db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XLive">
+      <UniqueIdentifier>{f43147d1-5129-41b1-968e-1a9f8675ca9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XLive\Networking">
+      <UniqueIdentifier>{173d5da0-3320-4baa-999b-f6f0df8d9f6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XLive\UserManagement">
+      <UniqueIdentifier>{92c69169-b6e3-44bf-968c-de44102a7154}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XLive\UserManagement\protobuf">
+      <UniqueIdentifier>{53107854-444b-484a-8c12-75441eb11b56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod">
+      <UniqueIdentifier>{3dd6d386-f460-4479-aafe-452694e2e60a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdParty">
+      <UniqueIdentifier>{342db84f-31d8-4cd0-b562-8925dd7474bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdParty\discord">
+      <UniqueIdentifier>{3b18c84e-db0d-442c-a92d-363d3f6bb2b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Discord">
+      <UniqueIdentifier>{00cd6698-3d8c-4817-a740-541c9895518f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\GUI">
+      <UniqueIdentifier>{cc693589-1e6d-4229-801b-b616cdb2251e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\protobuf">
+      <UniqueIdentifier>{cfb966e3-002e-4a9c-9c7d-5b4c8812b35f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Variants">
+      <UniqueIdentifier>{cf7123e1-5665-4004-8646-65a7cf6beeec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Variants\GunGame">
+      <UniqueIdentifier>{45fdf228-c04a-4608-9772-bd5b86212371}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Variants\H2Final">
+      <UniqueIdentifier>{a2359aed-71a4-4b07-8416-3105042009bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Variants\Zombies">
+      <UniqueIdentifier>{a35daa8d-af61-428b-ae4b-32edf91b8db6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Variants\JustLikeOG">
+      <UniqueIdentifier>{c8fe5aac-0f48-47ee-81b1-4987add22ce3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules">
+      <UniqueIdentifier>{5cd2280e-2892-4bac-bcf1-71ec941a3285}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\Accounts">
+      <UniqueIdentifier>{99d14b91-9072-4512-8200-3f78c3a123bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\Config">
+      <UniqueIdentifier>{adf329aa-3c59-4c6e-8c04-5b40dccddd1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\Console">
+      <UniqueIdentifier>{77eb8a73-e003-43e0-87ad-df87ab225ff4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\CustomMenu">
+      <UniqueIdentifier>{d45915e5-e078-4892-8734-186cc2859e06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\Input">
+      <UniqueIdentifier>{379cb7af-bca9-4c07-964e-1b789dd5d278}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\MapManager">
+      <UniqueIdentifier>{c1ff6ea8-134c-409b-afba-d1dbb6b5c9ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\GameManager">
+      <UniqueIdentifier>{23f0a79b-a829-440a-81e8-b2cdc9c58c16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\Networking">
+      <UniqueIdentifier>{1a5f91ab-0fcd-4049-86ac-1645bc1e4ee2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\Utils">
+      <UniqueIdentifier>{2d44b4f0-0a4c-4fe8-af71-577b3504292e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\Updater">
+      <UniqueIdentifier>{c7f84d17-e47c-4227-b5e4-a4500c85e4a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\Tweaks">
+      <UniqueIdentifier>{9342e332-588a-45e0-92ef-da0e108f0610}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\Startup">
+      <UniqueIdentifier>{b3051e33-8bae-45fa-8637-5cc8e31da545}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\RunLoop">
+      <UniqueIdentifier>{5fd652cc-f07b-4953-bf27-492deea256db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2Mod\Modules\OnScreenDebug">
+      <UniqueIdentifier>{9d753bba-8066-4702-b916-2dabb5e58c47}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="3rdParty\discord\discord-rpc.lib">
+      <Filter>3rdParty\discord</Filter>
+    </Library>
+    <Library Include="3rdParty\discord\discord-rpc-debug.lib">
+      <Filter>3rdParty\discord</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="unsorted\nat_punch.txt">
+      <Filter>unsorted</Filter>
+    </Text>
+    <Text Include="unsorted\todo.txt">
+      <Filter>unsorted</Filter>
+    </Text>
   </ItemGroup>
 </Project>

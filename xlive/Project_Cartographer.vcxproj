@@ -14,6 +14,132 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="H2Mod\Discord\DiscordInterface.cpp" />
+    <ClCompile Include="H2Mod\GUI\GUI.cpp" />
+    <ClCompile Include="H2Mod\H2MOD.cpp" />
+    <ClCompile Include="H2Mod\Modules\Accounts\AccountCreate.cpp" />
+    <ClCompile Include="H2Mod\Modules\Accounts\AccountLogin.cpp" />
+    <ClCompile Include="H2Mod\Modules\Accounts\Accounts.cpp" />
+    <ClCompile Include="H2Mod\Modules\Config\Config.cpp" />
+    <ClCompile Include="H2Mod\Modules\Console\ConsoleCommands.cpp" />
+    <ClCompile Include="H2Mod\Modules\CustomMenu\CustomLanguage.cpp" />
+    <ClCompile Include="H2Mod\Modules\CustomMenu\CustomMenu.cpp" />
+    <ClCompile Include="H2Mod\Modules\GameManager\GameManager.cpp" />
+    <ClCompile Include="H2Mod\Modules\Input\Mouseinput.cpp" />
+    <ClCompile Include="H2Mod\Modules\MapManager\MapManager.cpp" />
+    <ClCompile Include="H2Mod\Modules\Networking\Networking.cpp" />
+    <ClCompile Include="H2Mod\Modules\OnScreenDebug\OnscreenDebugLog.cpp" />
+    <ClCompile Include="H2Mod\Modules\RunLoop\RunLoop.cpp" />
+    <ClCompile Include="H2Mod\Modules\Startup\Startup.cpp" />
+    <ClCompile Include="H2Mod\Modules\Tweaks\Tweaks.cpp" />
+    <ClCompile Include="H2Mod\Modules\Updater\Updater.cpp" />
+    <ClCompile Include="H2Mod\Modules\Utils\Utils.cpp" />
+    <ClCompile Include="H2Mod\protobuf\h2mod.pb.cc" />
+    <ClCompile Include="H2Mod\Variants\GunGame\GunGame.cpp" />
+    <ClCompile Include="H2Mod\Variants\H2Final\H2Final.cpp" />
+    <ClCompile Include="H2Mod\Variants\JustLikeOG\JustLikeOG.cpp" />
+    <ClCompile Include="H2Mod\Variants\Zombies\Zombies.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="unsorted\cartographer_main.cpp" />
+    <ClCompile Include="unsorted\Network.cpp" />
+    <ClCompile Include="Util\Debug\Debug.cpp" />
+    <ClCompile Include="Util\Hooks\Detour.cpp" />
+    <ClCompile Include="Util\Hooks\Hook.cpp" />
+    <ClCompile Include="xliveless.cpp" />
+    <ClCompile Include="XLive\Networking\xlive_network.cpp" />
+    <ClCompile Include="XLive\UserManagement\CUser.cpp" />
+    <ClCompile Include="XLive\UserManagement\protobuf\packet.pb.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="3rdParty\discord\discord-rpc.h" />
+    <ClInclude Include="Blam\BlamLibrary.h" />
+    <ClInclude Include="Blam\Engine\EngineDefinitions.h" />
+    <ClInclude Include="Blam\Engine\Extras\Skulls.h" />
+    <ClInclude Include="Blam\Engine\Game\GameManager.h" />
+    <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
+    <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
+    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
+    <ClInclude Include="Blam\Engine\Objects\Objects.h" />
+    <ClInclude Include="Blam\Engine\Objects\ObjectsHeader.h" />
+    <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
+    <ClInclude Include="Blam\Engine\Players\Players.h" />
+    <ClInclude Include="Blam\Enums\Enums.h" />
+    <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h" />
+    <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h" />
+    <ClInclude Include="Blam\Enums\Objects\Objects.h" />
+    <ClInclude Include="Blam\Enums\Objects\Unit.h" />
+    <ClInclude Include="Blam\Enums\Players\Players.h" />
+    <ClInclude Include="Blam\Maths\Angle.h" />
+    <ClInclude Include="Blam\Maths\Maths.h" />
+    <ClInclude Include="Blam\Maths\RealColorRGB.h" />
+    <ClInclude Include="Blam\Maths\RealMovement.h" />
+    <ClInclude Include="Blam\Maths\RealPoint2D.h" />
+    <ClInclude Include="Blam\Maths\RealPoint3D.h" />
+    <ClInclude Include="Blam\Maths\RealVector2D.h" />
+    <ClInclude Include="Blam\Maths\RealVector3D.h" />
+    <ClInclude Include="Blam\Shared\DatumIndex.h" />
+    <ClInclude Include="Blam\Shared\Globals.h" />
+    <ClInclude Include="Blam\Shared\SharedDefinitions.h" />
+    <ClInclude Include="Globals.h" />
+    <ClInclude Include="H2Mod\Discord\DiscordInterface.h" />
+    <ClInclude Include="H2Mod\GUI\GUI.h" />
+    <ClInclude Include="H2Mod\H2MOD.h" />
+    <ClInclude Include="H2Mod\Modules\Accounts\AccountCreate.h" />
+    <ClInclude Include="H2Mod\Modules\Accounts\AccountLogin.h" />
+    <ClInclude Include="H2Mod\Modules\Accounts\Accounts.h" />
+    <ClInclude Include="H2Mod\Modules\Config\Config.h" />
+    <ClInclude Include="H2Mod\Modules\Console\ConsoleCommands.h" />
+    <ClInclude Include="H2Mod\Modules\CustomMenu\CustomLanguage.h" />
+    <ClInclude Include="H2Mod\Modules\CustomMenu\CustomMenu.h" />
+    <ClInclude Include="H2Mod\Modules\GameManager\GameManager.h" />
+    <ClInclude Include="H2Mod\Modules\Input\Mouseinput.h" />
+    <ClInclude Include="H2Mod\Modules\MapManager\MapManager.h" />
+    <ClInclude Include="H2Mod\Modules\Networking\Networking.h" />
+    <ClInclude Include="H2Mod\Modules\OnScreenDebug\OnscreenDebugLog.h" />
+    <ClInclude Include="H2Mod\Modules\RunLoop\RunLoop.h" />
+    <ClInclude Include="H2Mod\Modules\Startup\Startup.h" />
+    <ClInclude Include="H2Mod\Modules\Tweaks\Tweaks.h" />
+    <ClInclude Include="H2Mod\Modules\Updater\Updater.h" />
+    <ClInclude Include="H2Mod\Modules\Utils\Utils.h" />
+    <ClInclude Include="H2Mod\protobuf\h2mod.pb.h" />
+    <ClInclude Include="H2Mod\Variants\GunGame\GunGame.h" />
+    <ClInclude Include="H2Mod\Variants\H2Final\H2Final.h" />
+    <ClInclude Include="H2Mod\Variants\JustLikeOG\JustLikeOG.h" />
+    <ClInclude Include="H2Mod\Variants\Zombies\Zombies.h" />
+    <ClInclude Include="Ini.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="unsorted\cartographer_main.hpp" />
+    <ClInclude Include="unsorted\Network.h" />
+    <ClInclude Include="Util\Debug\Debug.h" />
+    <ClInclude Include="Util\Hooks\Detour.h" />
+    <ClInclude Include="Util\Hooks\Hook.h" />
+    <ClInclude Include="Util\ReadIniArguments.h" />
+    <ClInclude Include="xlivedefs.h" />
+    <ClInclude Include="xliveless.h" />
+    <ClInclude Include="XLive\UserManagement\CUser.h" />
+    <ClInclude Include="XLive\UserManagement\protobuf\packet.pb.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="H2Mod\Variants\GunGame\gungame.ini" />
+    <None Include="Resource.aps" />
+    <None Include="xlive.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+    <ResourceCompile Include="xliveless.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="3rdParty\discord\discord-rpc-debug.lib" />
+    <Library Include="3rdParty\discord\discord-rpc.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="unsorted\nat_punch.txt" />
+    <Text Include="unsorted\todo.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}</ProjectGuid>
     <ProjectName>xlive</ProjectName>
@@ -64,8 +190,8 @@
     <OutDir>$(SolutionDir)Halo2\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;.\;..\protobuf-2.6.1;..\Directx SDK\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;.\libs;..\Directx SDK\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>.\3rdparty\libcurl;..\Directx SDK\include;.\;.\3rdparty\;.\3rdparty\google;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\Directx SDK\lib;.\3rdparty\libcurl\;.\libs;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -73,8 +199,8 @@
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;.\libs;..\Directx SDK\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;.\;..\protobuf-2.6.1;..\Directx SDK\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\Directx SDK\lib;.\3rdparty\libcurl\;.\libs;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>.\3rdparty\libcurl;..\Directx SDK\include;.\;.\3rdparty\;.\3rdparty\google;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -82,8 +208,8 @@
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;D:\Users\Magic\Documents\Visual Studio 2017\Projects\cartographer\Directx SDK\lib;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
-    <IncludePath>D:\Users\Magic\Documents\Visual Studio 2017\Projects\cartographer\Directx SDK\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
+    <LibraryPath>..\Directx SDK\lib;.\3rdparty\libcurl\;.\libs;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>.\3rdparty\libcurl;..\Directx SDK\include;.\;.\3rdparty\;.\3rdparty\google;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -123,7 +249,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;libprotobuf_release.lib;d3d9.lib;d3dx9.lib;discord-rpc.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;3rdParty/google/libprotobuf_release.lib;d3d9.lib;d3dx9.lib;3rdParty/discord/discord-rpc.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -172,7 +298,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;3rdParty\google\libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdParty\discord\discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -223,7 +349,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;3rdParty\google\libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdParty\discord\discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -241,124 +367,6 @@
       <OutputFile>.\Debug/xliveless.bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="cartographer_main.cpp" />
-    <ClCompile Include="CUser.cpp" />
-    <ClCompile Include="Debug.cpp" />
-    <ClCompile Include="Detour.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
-      <InlineFunctionExpansion Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</InlineFunctionExpansion>
-    </ClCompile>
-    <ClCompile Include="DiscordInterface.cpp" />
-    <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Globals.cpp" />
-    <ClCompile Include="GSAccountCreate.cpp" />
-    <ClCompile Include="GSAccountLogin.cpp" />
-    <ClCompile Include="GSCustomLanguage.cpp" />
-    <ClCompile Include="GSCustomMenu.cpp" />
-    <ClCompile Include="GSDownload.cpp" />
-    <ClCompile Include="GSRunLoop.cpp" />
-    <ClCompile Include="GSUtils.cpp" />
-    <ClCompile Include="GUI.cpp" />
-    <ClCompile Include="H2Accounts.cpp" />
-    <ClCompile Include="H2Config.cpp" />
-    <ClCompile Include="H2ConsoleCommands.cpp" />
-    <ClCompile Include="H2MOD.cpp" />
-    <ClCompile Include="h2mod.pb.cc" />
-    <ClCompile Include="H2MOD_GameManager.cpp" />
-    <ClCompile Include="H2MOD_GunGame.cpp" />
-    <ClCompile Include="H2MOD_H2X.cpp" />
-    <ClCompile Include="H2MOD_Halo2Final.cpp" />
-    <ClCompile Include="H2MOD_MapManager.cpp" />
-    <ClCompile Include="H2MOD_Mouseinput.cpp" />
-    <ClCompile Include="H2MOD_Network.cpp" />
-    <ClCompile Include="H2OnscreenDebugLog.cpp" />
-    <ClCompile Include="H2Startup.cpp" />
-    <ClCompile Include="H2Tweaks.cpp" />
-    <ClCompile Include="Hook.cpp" />
-    <ClCompile Include="Network.cpp" />
-    <ClCompile Include="packet.pb.cc" />
-    <ClCompile Include="H2MOD_Infection.cpp" />
-    <ClCompile Include="xliveless.cpp" />
-    <ClCompile Include="xlive_network.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Blam\BlamLibrary.h" />
-    <ClInclude Include="Blam\Engine\EngineDefinitions.h" />
-    <ClInclude Include="Blam\Engine\Extras\Skulls.h" />
-    <ClInclude Include="Blam\Engine\Game\GameManager.h" />
-    <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
-    <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
-    <ClInclude Include="Blam\Engine\Objects\Objects.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectsHeader.h" />
-    <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
-    <ClInclude Include="Blam\Engine\Players\Players.h" />
-    <ClInclude Include="Blam\Enums\Enums.h" />
-    <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h" />
-    <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h" />
-    <ClInclude Include="Blam\Enums\Objects\Objects.h" />
-    <ClInclude Include="Blam\Enums\Objects\Unit.h" />
-    <ClInclude Include="Blam\Enums\Players\Players.h" />
-    <ClInclude Include="Blam\Maths\Angle.h" />
-    <ClInclude Include="Blam\Maths\Maths.h" />
-    <ClInclude Include="Blam\Maths\RealColorRGB.h" />
-    <ClInclude Include="Blam\Maths\RealMovement.h" />
-    <ClInclude Include="Blam\Maths\RealPoint2D.h" />
-    <ClInclude Include="Blam\Maths\RealPoint3D.h" />
-    <ClInclude Include="Blam\Maths\RealVector2D.h" />
-    <ClInclude Include="Blam\Maths\RealVector3D.h" />
-    <ClInclude Include="Blam\Shared\DatumIndex.h" />
-    <ClInclude Include="Blam\Shared\Globals.h" />
-    <ClInclude Include="Blam\Shared\SharedDefinitions.h" />
-    <ClInclude Include="cartographer_main.hpp" />
-    <ClInclude Include="CUser.h" />
-    <ClInclude Include="Debug.h" />
-    <ClInclude Include="Detour.h" />
-    <ClInclude Include="discord-rpc.h" />
-    <ClInclude Include="DiscordInterface.h" />
-    <ClInclude Include="Globals.h" />
-    <ClInclude Include="GSAccountCreate.h" />
-    <ClInclude Include="GSAccountLogin.h" />
-    <ClInclude Include="GSCustomLanguage.h" />
-    <ClInclude Include="GSCustomMenu.h" />
-    <ClInclude Include="GSDownload.h" />
-    <ClInclude Include="GSRunLoop.h" />
-    <ClInclude Include="GSUtils.h" />
-    <ClInclude Include="GUI.h" />
-    <ClInclude Include="H2Accounts.h" />
-    <ClInclude Include="H2Config.h" />
-    <ClInclude Include="H2ConsoleCommands.h" />
-    <ClInclude Include="H2MOD.h" />
-    <ClInclude Include="h2mod.pb.h" />
-    <ClInclude Include="H2MOD_GameManager.h" />
-    <ClInclude Include="H2MOD_GunGame.h" />
-    <ClInclude Include="H2MOD_H2X.h" />
-    <ClInclude Include="H2MOD_Halo2Final.h" />
-    <ClInclude Include="H2MOD_Infection.h" />
-    <ClInclude Include="H2MOD_MapManager.h" />
-    <ClInclude Include="H2MOD_Mouseinput.h" />
-    <ClInclude Include="H2MOD_Network.h" />
-    <ClInclude Include="H2MOD_Sounds.h" />
-    <ClInclude Include="H2OnscreenDebugLog.h" />
-    <ClInclude Include="H2Startup.h" />
-    <ClInclude Include="H2Tweaks.h" />
-    <ClInclude Include="Hook.h" />
-    <ClInclude Include="Network.h" />
-    <ClInclude Include="packet.pb.h" />
-    <ClInclude Include="ReadIniArguments.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="resource1.h" />
-    <ClInclude Include="xlivedefs.h" />
-    <ClInclude Include="xliveless.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="xlive.def" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Resource.rc" />
-    <ResourceCompile Include="xliveless.rc" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -7,8 +7,8 @@
 #include <codecvt>
 #include <unordered_map>
 #include "Globals.h"
-#include "DiscordInterface.h"
-#include "H2Config.h"
+#include "H2Mod\Discord\DiscordInterface.h"
+#include "H2Mod\Modules\Config\Config.h"
 
 using namespace std;
 

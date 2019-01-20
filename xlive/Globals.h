@@ -6,12 +6,12 @@
 #include <algorithm>
 #include "stdafx.h"
 #include <unordered_map>
-#include "h2mod.h"
+#include "H2Mod\H2MOD.h"
 
-#include "H2ConsoleCommands.h"
-#include "H2MOD_MapManager.h"
-#include "H2MOD_Network.h"
-#include "H2MOD_GameManager.h"
+#include "H2Mod\Modules\Console\ConsoleCommands.h"
+#include "H2Mod\Modules\MapManager\MapManager.h"
+#include "H2Mod\Modules\Networking\Networking.h"
+#include "H2Mod\Modules\GameManager\GameManager.h"
 
 extern XNADDR join_game_xn;
 extern MapManager* mapManager;
