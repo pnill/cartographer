@@ -10,6 +10,8 @@
 #include <winsock.h>
 #include "H2Mod\Modules\CustomMenu\CustomMenu.h"
 extern LPDIRECT3DDEVICE9 pDevice;
+extern char* replacedNetworkNormalTextWidget;
+extern char* replacedNetworkNormalTextWidget2;
 
 bool QuitGSMainLoop = false;
 RECT rectScreenOriginal;
