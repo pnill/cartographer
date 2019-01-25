@@ -133,7 +133,7 @@ void CUserManagement::CreateUser(XNADDR* pxna, BOOL user)
 		This should now also be called when receiving the 'SecurityPacket' because we have the data on the first attempt to either establish a connection OR on the attempt to join a game,
 		That should eliminate the need to talk to the Master server in order to get the XNADDR information from the secure address.
 	*/
-	TRACE("CUserManagement::CreateUser()");
+	TRACE("CUserManagement::CreateUser() secure: %08X", pxna->inaOnline.s_addr);
 
 	ULONG secure = pxna->inaOnline.s_addr;
 	CUser *nUser = new CUser;
@@ -210,8 +210,6 @@ void CUserManagement::CreateUser(XNADDR* pxna, BOOL user)
 		this->xntosecure[ab] = secure;
 
 	}
-
-
 }
 
 ULONG CUserManagement::GetXNFromSecure(ULONG secure)

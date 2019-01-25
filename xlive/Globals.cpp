@@ -51,10 +51,3 @@ int stripWhitespace(wchar_t *inputStr) {
 	memmove(inputStr, start, wcslen(start) + 1);
 	return 0;
 }
-
-void patchBYTEs(BYTE* orig, BYTE* values, int size) {
-	DWORD dwBack;
-	VirtualProtect(orig, size, PAGE_EXECUTE_READWRITE, &dwBack);
-	memcpy(orig, (BYTE*)values, size);
-	VirtualProtect(orig, size, dwBack, &dwBack);
-}

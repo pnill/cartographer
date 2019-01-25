@@ -22,10 +22,6 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 		{
 			XNADDR *xn = apxna[ pqos->cxnqosPending - 1 ];
 			XNQOSINFO *xnqosinfo = &pqos->axnqosinfo[ ( pqos->cxnqosPending - 1) ];
-			memset(xnqosinfo, NULL, sizeof(XNQOSINFO));
-			
-			xnqosinfo->dwDnBitsPerSec = dwBitsPerSec;
-			xnqosinfo->dwUpBitsPerSec = dwBitsPerSec;
 
 			//if (H2Config_debug_log)
 			//	TRACE_GAME_NETWORK_N("[XNetQoSLookup] Looping cxnas for probes pqos->xnqosPending: %i", pqos->cxnqosPending);
@@ -53,7 +49,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 				
 				xnqosinfo->cProbesRecv = 0;
 				xnqosinfo->cProbesXmit = 0;
-				xnqosinfo->bFlags |= XNET_XNQOSINFO_TARGET_DISABLED;
+				xnqosinfo->bFlags = XNET_XNQOSINFO_TARGET_DISABLED;
 
 				if(pqos->cxnqosPending > 0)
 					pqos->cxnqosPending--;
@@ -69,7 +65,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 					
 					xnqosinfo->cProbesRecv = 0;
 					xnqosinfo->cProbesXmit = 0;
-					xnqosinfo->bFlags |= XNET_XNQOSINFO_TARGET_DISABLED;
+					xnqosinfo->bFlags = XNET_XNQOSINFO_TARGET_DISABLED;
 					
 					if(pqos->cxnqosPending > 0)
 						pqos->cxnqosPending--;
@@ -89,7 +85,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 					connectSocket = INVALID_SOCKET;		
 					xnqosinfo->cProbesRecv = 0;
 					xnqosinfo->cProbesXmit = 0;
-					xnqosinfo->bFlags |= XNET_XNQOSINFO_TARGET_DISABLED;
+					xnqosinfo->bFlags = XNET_XNQOSINFO_TARGET_DISABLED;
 
 					if(pqos->cxnqosPending > 0)
 						pqos->cxnqosPending--;
@@ -107,7 +103,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 
 				xnqosinfo->cProbesRecv = 0;
 				xnqosinfo->cProbesXmit = 0;
-				xnqosinfo->bFlags |= XNET_XNQOSINFO_TARGET_DISABLED;
+				xnqosinfo->bFlags = XNET_XNQOSINFO_TARGET_DISABLED;
 
 				if(pqos->cxnqosPending > 0 )
 					pqos->cxnqosPending--;
@@ -169,7 +165,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 
 				xnqosinfo->cProbesRecv = 0;
 				xnqosinfo->cProbesXmit = 0;
-				xnqosinfo->bFlags |= XNET_XNQOSINFO_TARGET_DISABLED;
+				xnqosinfo->bFlags = XNET_XNQOSINFO_TARGET_DISABLED;
 
 				if (pqos->cxnqosPending > 0)
 					pqos->cxnqosPending--;
@@ -223,11 +219,21 @@ LPFN_ACCEPTEX lpfnAcceptEx = nullptr;
 void CALLBACK H2MOD_QoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags)
 {
 	if (dwError)
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] WSASend callback error %d", dwError);
+		TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback error %d", dwError);
 
-	DWORD flags = 0;
 	LPSOCKET_INFORMATION acceptSockInfo = reinterpret_cast<LPSOCKET_INFORMATION>(lpOverlapped);
+	TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback -> socket: %d", acceptSockInfo->Socket);
 
+	if (dwError != 0)
+	{
+		TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback -> I/O operation failed with error: %d", dwError);
+	}
+
+	if (cbTransferred == 0)
+	{
+		TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback -> no data received!", dwError);
+	}
+	
 	// delete memory allocated inside SendBack callback
 	delete[] acceptSockInfo->DataBuf.buf;
 
@@ -235,10 +241,11 @@ void CALLBACK H2MOD_QoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAO
 	acceptSockInfo->DataBuf.len = 4;
 	acceptSockInfo->DataBuf.buf = acceptSockInfo->Buffer;
 
+	DWORD flags = 0;
 	if (WSARecv(acceptSockInfo->Socket, &(acceptSockInfo->DataBuf), 1, NULL, &flags, &(acceptSockInfo->Overlapped), SendBack) == SOCKET_ERROR)
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING) {
-			TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback-> WSARecv asynchronous I/O operation failed with error: %d", WSAGetLastError());
+			TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback -> WSARecv asynchronous I/O operation failed with error: %d", WSAGetLastError());
 			closesocket(acceptSockInfo->Socket);
 			delete acceptSockInfo;
 		}
@@ -508,10 +515,15 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 	*pxnqos = (XNQOS*)new char[sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna - 1))];
 
 	XNQOS* pqos = *pxnqos;
-	ZeroMemory(pqos, sizeof(XNQOS) + (sizeof(XNQOSINFO)*(cxna - 1)));
+	ZeroMemory(pqos, sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna - 1)));
 
 	pqos->cxnqos = cxna;
 	pqos->cxnqosPending = cxna;
+	pqos->axnqosinfo[0].wRttMinInMsecs = 10;
+	pqos->axnqosinfo[0].wRttMedInMsecs = 20;
+	pqos->axnqosinfo[0].dwDnBitsPerSec = dwBitsPerSec;
+	pqos->axnqosinfo[0].dwUpBitsPerSec = dwBitsPerSec;
+	pqos->axnqosinfo[0].bFlags |= XNET_XNQOSINFO_TARGET_CONTACTED;
 
 	/*
 	This is gonna hit some CPUs hard when there's a lot of servers on the list, we'll probably want to queue this a bit and only allow X number of threads to run at a time.

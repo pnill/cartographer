@@ -3,9 +3,6 @@
 
 CAudioHandler::CAudioHandler(CAudioDevices* pAudioDevice) 
 {
-	if (h2mod->Server)
-		return;
-
 	m_CAudioErr = Pa_Initialize();
 
 	if (m_CAudioErr != PaErrorCode::paNoError)
@@ -23,16 +20,11 @@ CAudioHandler::CAudioHandler(CAudioDevices* pAudioDevice)
 		TRACE_N("CAudioHandler: CAudioDevices object failed to initialize, aborting.");
 		return;
 	}
-
-
 }
 
 
 CAudioHandler::~CAudioHandler()
 {
-	if (h2mod->Server)
-		return;
-
 	delete audioDevices;
 
 	PaError err = Pa_Terminate();

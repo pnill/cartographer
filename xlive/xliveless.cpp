@@ -828,10 +828,17 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 
 // #5258: XLiveSignout
-int WINAPI XLiveSignout(int a1)
+int WINAPI XLiveSignout(PXOVERLAPPED pXOverlapped)
 {
 	TRACE("XLiveSignout");
-	return 0;
+	if (pXOverlapped)
+	{
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = 1;											
+		pXOverlapped->dwCompletionContext = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+	}
+
+	return S_OK;
 }
 
 
@@ -840,9 +847,14 @@ HRESULT WINAPI XLiveSignin (PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD 
 {
 	TRACE("XLiveSignin");
 
-
 	sys_ui = -1;
 
+	if (pOverlapped)
+	{
+		pOverlapped->InternalLow = ERROR_SUCCESS;
+		pOverlapped->InternalHigh = 0;
+		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+	}
 
 	return S_OK;
 }
@@ -852,9 +864,7 @@ HRESULT WINAPI XLiveSignin (PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD 
 int WINAPI XLiveInitializeEx(void * pXii, DWORD dwVersion)
 {
 	InitInstance();
-
-
-	TRACE("XLiveInitializeEx  (a1 = %X, a2 = %X)", pXii, dwVersion);
+	TRACE("XLiveInitializeEx  (pXii = %X, dwVersion = %X)", pXii, dwVersion);
 	return 0;
 }
 
@@ -957,7 +967,7 @@ DWORD WINAPI XStringVerify( DWORD dwFlags, const CHAR *szLocale, DWORD dwNumStri
 	if( pOverlapped )
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
+		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 
 
 		Check_Overlapped( pOverlapped );
@@ -1174,13 +1184,10 @@ DWORD WINAPI XSessionMigrateHost (DWORD, DWORD, DWORD, DWORD)
 
 
 // #5324: XOnlineGetNatType
-XONLINE_NAT_TYPE WINAPI XOnlineGetNatType ()
+XONLINE_NAT_TYPE WINAPI XOnlineGetNatType()
 {
-    TRACE("XOnlineGetNatType");
-		TRACE("- NAT_OPEN" );
-    
-		
-		return XONLINE_NAT_OPEN ;
+    TRACE("XOnlineGetNatType - NAT_OPEN");
+	return XONLINE_NAT_OPEN ;
 }
 
 
@@ -1193,10 +1200,21 @@ DWORD WINAPI XSessionLeaveLocal (DWORD, DWORD, DWORD, DWORD)
 
 
 // #5326: XSessionJoinRemote
-DWORD WINAPI XSessionJoinRemote (DWORD, DWORD, DWORD, DWORD, DWORD)
+DWORD WINAPI XSessionJoinRemote(HANDLE hSession, DWORD dwXuidCount, const XUID *pXuids, const BOOL *pfPrivateSlots, PXOVERLAPPED pXOverlapped)
 {
     TRACE("XSessionJoinRemote");
-    return 0;
+
+	if (pXOverlapped == 0)
+		return ERROR_SUCCESS;
+
+
+	pXOverlapped->InternalHigh = 0;
+	pXOverlapped->InternalLow = ERROR_SUCCESS;
+	pXOverlapped->dwExtendedError = ERROR_SUCCESS;
+
+	Check_Overlapped(pXOverlapped);
+
+	return ERROR_IO_PENDING;
 }
 
 
@@ -2318,11 +2336,17 @@ DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* xnkey)
 
 
 // 5257: ??
-DWORD WINAPI XLiveManageCredentials( DWORD a1, DWORD a2, DWORD a3, DWORD dwData )
+DWORD WINAPI XLiveManageCredentials(LPCWSTR lpszLiveIdName, LPCWSTR lpszLiveIdPassword, DWORD dwCredFlags, PXOVERLAPPED pXOverlapped)
 {
-  TRACE("XLiveManageCredentials  (*** checkme ***) (a1 = %X, a2 = %X, a3 = %X, dwData = %X)",
-		a1, a2, a3, dwData);
+	TRACE("XLiveManageCredentials (lpszLiveIdName = %s, lpszLiveIdPassword = %s, dwCredFlags = %X, pXOverlapped = %X)",
+		lpszLiveIdName, lpszLiveIdPassword, dwCredFlags, pXOverlapped);
 
+	if (pXOverlapped)
+	{
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = ERROR_SUCCESS;
+		pXOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+	}
 
 	// not done - error now
 	return S_OK;

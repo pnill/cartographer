@@ -55,6 +55,7 @@ CAudioDevices::CAudioDevices()
 		TRACE_N("[PortAudio-API] INFO: No audio output device found.");
 
 	TRACE_N("[PortAudio-API] INFO: Total numver of audio devices = %d", m_totalDevices);
+	TRACE_N("CAudioDevices: Successful initialization!");
 }
 
 void CAudioDevices::SelectAudioOutput()

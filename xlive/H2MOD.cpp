@@ -212,7 +212,7 @@ signed int __cdecl call_object_new(void* pObject)
 
 bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 {
-	typedef int(__cdecl  *add_object_to_sync)(int gamestate_object_datum);
+	typedef int(__cdecl *add_object_to_sync)(int gamestate_object_datum);
 	add_object_to_sync p_add_object_to_sync = (add_object_to_sync)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x1B2C44 : 0x1B8D14));
 
 	return p_add_object_to_sync(gamestate_object_datum);
@@ -229,8 +229,6 @@ int get_actor_datum_from_unit_datum(int unit_datum)
 
 	return -1;
 }
-
-
 
 /* This looks at the actors table to get the character datum which is assigned to the specific actor. */
 int get_char_datum_from_actor(int actor_datum)
@@ -304,7 +302,6 @@ bool bitstream_write_bool(void *packet, char* string_data, bool value)
 
 int bitstream_write_uint(void* packet, char* string_data, unsigned int value, signed int bit_size)
 {
-
 	typedef int(__thiscall *tbitstream_write_uint)(void* packet, char* string_data, unsigned int value, signed int bit_size);
 	tbitstream_write_uint pbitstream_write_uint = (tbitstream_write_uint)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCDD80 : 0xD17C6));
 
@@ -322,7 +319,6 @@ bool bitstream_read_bool(void *packet, char* string_data)
 
 int bitstream_read_uint(void* packet, char* string_data, signed int bit_size)
 {
-
 	typedef int(__thiscall *tbitstream_read_uint)(void* packet, char* string_data, signed int bit_size);
 	tbitstream_read_uint pbitstream_read_uint = (tbitstream_read_uint)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCE49F : 0xD1EE5));
 
@@ -415,7 +411,6 @@ tset_unit_color_data pset_unit_color_data;
 
 bool __cdecl set_unit_color_data_hook(int a1, unsigned __int16 a2, int a3)
 {
-
 	int object_creation_data = a1 - 0x10;
 	int object_permutation_index = *(int*)((char*)object_creation_data + 0x24);
 
@@ -496,8 +491,9 @@ inline wchar_t* H2MOD::GetLobbyGameVariantName()
 
 void H2MOD::exit_game()
 {
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
+
 	if (GetEngineType() != EngineType::MAIN_MENU_ENGINE)
 	{
 		// request_squad_browser
@@ -923,7 +919,7 @@ void H2MOD::DisableSound(int sound)
 	switch (sound)
 	{
 	case SoundType::Slayer:
-		TRACE_GAME("AddressOffset+0xd7dfb4:", (DWORD*)(AddressOffset + 0xd7dfb4));
+		TRACE_GAME("AddressOffset + 0xd7dfb4 = 0x%x", (DWORD*)(AddressOffset + 0xd7dfb4));
 		*(DWORD*)(AddressOffset + 0xd7e05c) = -1;
 		*(DWORD*)(AddressOffset + 0xd7dfb4) = -1;
 		break;
@@ -946,7 +942,7 @@ void H2MOD::DisableSound(int sound)
 
 void H2MOD::CustomSoundPlay(const wchar_t* soundName, int delay)
 {
-	std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+	//std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
 	std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now() + std::chrono::milliseconds(delay);
 
 	TRACE_GAME("[H2MOD-SoundQueue] - attempting to play sound %ws - delaying %i miliseconds first", soundName, delay);
@@ -1387,7 +1383,6 @@ void* __stdcall OnWgitLoad(void* thisptr, int a2, int a3, int a4, unsigned short
 	//addDebugText(NotificationPlayerText);
 	//MessageBoxA(NULL, NotificationPlayerText, "WGITness", MB_OK);
 
-	//void* thisptr = 
 	pload_wgit(thisptr, wgit, a3, a4, a5);
 	return thisptr;
 }
@@ -1736,8 +1731,8 @@ void H2MOD::ApplyUnitHooks()
 	PatchCall(GetBase() + (h2mod->Server ? 0x1E1DE0 : 0x1F807A), set_unit_creation_data_hook);
 	pset_unit_creation_data = (tset_unit_creation_data)(GetBase() + (h2mod->Server ? 0x1DD586 : 0x1F24ED));
 
-	VirtualProtect((char*)h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029), 1, PAGE_EXECUTE_READWRITE, &dwBack); // we have to update privileges on the memory so we can write to it since it's part of the actual game code.
-	memset(((char*)h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029)), 0x28, 1); // updates the size of creation_data allocated for the c_unit_simulation_entity_definition
+	BYTE packet_sz = 0x28;
+	WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029), &packet_sz, 1);
 
 	// Hooks a call within the creat_unit property on the client side in order to set their permutation index before spawn.
 	PatchCall(GetBase() + (h2mod->Server ? 0x1E3BD4 : 0x1F9E6C), create_unit_hook);

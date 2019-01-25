@@ -17,7 +17,7 @@ int WINAPI XWSACleanup()  	// XWSACleanup
 // #4
 int WINAPI XSocketClose(SOCKET s)
 {
-	TRACE("XSocketClose");
+	TRACE("XSocketClose: socket: %d", s);
 	return closesocket(s);
 }
 

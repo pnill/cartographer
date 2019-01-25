@@ -69,8 +69,6 @@ std::vector<std::string> &split(const std::string &s, char delim, std::vector<st
 std::vector<std::string> split(const std::string &s, char delim);
 int stripWhitespace(wchar_t *inputStr);
 
-void patchBYTEs(BYTE* orig, BYTE* values, int size);
-
 extern int H2GetInstanceId();
 
 /* XLive Globals*/
