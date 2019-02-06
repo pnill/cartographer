@@ -451,7 +451,7 @@ char* __cdecl registerConnectionPackets(void* packetObject) {
 	//register_packet(packetObject, 66, (int)customPacketType.c_str(), 0, 8, 8, (int)custom_packet_write, (int)custom_packet_read, 0);
 
 
-	return register_packet(packetObject, 7, (int)"connect_closed", 0, 12, 12, (int)closed_write, (int)closed_read, 0); //closed
+	return register_packet(packetObject, 7, (int)"connect-closed", 0, 12, 12, (int)closed_write, (int)closed_read, 0); //closed
 }
 
 typedef char*(__cdecl *register_player_packets)(void* a1);
