@@ -4522,8 +4522,7 @@ void* __stdcall sub_23BC45(void* thisptr)//__thiscall
 }
 
 int __cdecl sub_209236(int a1,int a2) {
-	extern CUserManagement User;
-	if (User.LocalUserLoggedIn()) {
+	if (userManager.LocalUserLoggedIn()) {
 		int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
 		sub_209236(0,0);
 	}
@@ -4543,9 +4542,8 @@ typedef int(__cdecl *tsub_23f6b7)(int);
 tsub_23f6b7 psub_23f6b7;
 int __cdecl sub_23f6b7(int a1)
 {
-	extern CUserManagement User;
-	if (User.LocalUserLoggedIn()) {
-		User.UnregisterLocal();
+	if (userManager.LocalUserLoggedIn()) {
+		userManager.UnregisterLocal();
 	}
 	return psub_23f6b7(a1);
 }

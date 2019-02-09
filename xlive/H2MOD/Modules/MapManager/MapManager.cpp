@@ -5,6 +5,7 @@
 #include <WS2tcpip.h>
 #include "H2MOD\Modules\Config\Config.h"
 #include <curl/curl.h>
+#include "XLive/UserManagement/CUser.h"
 
 #pragma comment (lib, "mswsock.lib")
 
@@ -386,8 +387,7 @@ void MapManager::sendMapInfoPacket()
 		TRACE_GAME_N("[h2mod-mapmanager] custom map filename missing");
 		return;
 	}
-	const char* mapFilename = mapFilenameStr.c_str();
-	TRACE_GAME_N("[h2mod-mapmanager] custom map name being sent %s", mapFilename);
+	TRACE_GAME_N("[h2mod-mapmanager] custom map name being sent %s", mapFilenameStr.c_str());
 	map_info->set_mapfilename(mapFilenameStr);
 	//TODO: send over size so p2p can work easier
 	map_info->set_mapsize(0);
@@ -514,8 +514,8 @@ bool MapManager::downloadFromHost() {
 		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
-		std::string addr = inet_ntoa(join_game_xn.ina);
-		std::string prt = std::to_string(ntohs(join_game_xn.wPortOnline) + 9);
+		std::string addr = inet_ntoa(userManager.game_host_xn.ina);
+		std::string prt = std::to_string(ntohs(userManager.game_host_xn.wPortOnline) + 9);
 		if (H2Config_debug_log)
 			TRACE_GAME_N("[h2mod-mapmanager] Client map dl, addr=%s, port=%s", addr.c_str(), prt.c_str());
 		// Resolve the server address and port

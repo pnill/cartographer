@@ -89,12 +89,10 @@ public:
 	void GetServers(PXOVERLAPPED, DWORD, char*);
 	int GetServersLeft();
 	int GetTotalServers();
-	void RemoveServer();
 	bool GetServerCounts();
 
 
 };
 
 extern HANDLE ServerEnum;
-extern bool ServerEnumRan;
 extern ServerList LiveManager;

@@ -64,8 +64,7 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	memcpy(&pxna.abEnet, abEnet2, 6);
 	memcpy(&pxna.abOnline, abOnline2, 20);
 
-	extern CUserManagement User;
-	User.ConfigureLocalUser(&pxna, xuid, username);
+	userManager.ConfigureLocalUser(&pxna, xuid, username);
 
 	if (H2CurrentAccountLoginToken) {
 		free(H2CurrentAccountLoginToken);

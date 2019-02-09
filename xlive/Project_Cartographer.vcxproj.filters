@@ -309,9 +309,6 @@
     <ClCompile Include="XLive\Networking\ServerList.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\Networking\XLiveQoS.cpp">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClCompile>
     <ClCompile Include="XLive\Networking\upnp.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
@@ -464,6 +461,9 @@
     </ClCompile>
     <ClCompile Include="XLive\Voice\AudioHandler.cpp">
       <Filter>Source Files\XLive\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Networking\XNetQoS.cpp">
+      <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -636,9 +636,6 @@
       <Filter>Source Files\H2MOD\Variants\H2Final</Filter>
     </ClInclude>
     <ClInclude Include="XLive\Networking\ServerList.h">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Networking\XLiveQoS.h">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClInclude>
     <ClInclude Include="XLive\Networking\upnp.h">
@@ -922,6 +919,9 @@
     </ClInclude>
     <ClInclude Include="XLive\Voice\AudioHandler.h">
       <Filter>Source Files\XLive\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Networking\XNetQoS.h">
+      <Filter>Source Files\XLive\xnet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -801,13 +801,13 @@ int __stdcall fn_c0024fa19(DWORD* thisptr, int a2, int* a3)//__thiscall
 	//int result = pfn_c0024fa19(thisptr, a2, a3);
 	//return result;
 
-	int(__stdcall* fn_c0024f9a1)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f9a1));
-	int(__stdcall* fn_c0024f9dd)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f9dd));
-	int(__stdcall* fn_c0024ef79)(int) = (int(__stdcall*)(int))(GetAddress(0x0024ef79));
-	int(__stdcall* fn_c0024f5fd)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f5fd));
-	int(__stdcall* fn_c0024f015)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f015));
-	int(__stdcall* fn_c0024f676)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f676));
-	int(__stdcall* fn_c0024f68a)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f68a));
+	int(__stdcall* fn_c0024f9a1)(int) = (int(__stdcall*)(int))(GetAddress(0x24f9a1));
+	int(__stdcall* fn_c0024f9dd)(int) = (int(__stdcall*)(int))(GetAddress(0x24f9dd));
+	int(__stdcall* fn_c0024ef79)(int) = (int(__stdcall*)(int))(GetAddress(0x24ef79));
+	int(__stdcall* fn_c0024f5fd)(int) = (int(__stdcall*)(int))(GetAddress(0x24f5fd));
+	int(__stdcall* fn_c0024f015)(int) = (int(__stdcall*)(int))(GetAddress(0x24f015));
+	int(__stdcall* fn_c0024f676)(int) = (int(__stdcall*)(int))(GetAddress(0x24f676));
+	int(__stdcall* fn_c0024f68a)(int) = (int(__stdcall*)(int))(GetAddress(0x24f68a));
 
 	int result = *a3;
 	if (*a3 != -1)
@@ -853,8 +853,8 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 	//DWORD* result = pfn_c0024fabc(thisptr, a2);
 	//return result;
 
-	DWORD* var_c003d9254 = (DWORD*)(GetAddress(0x003d9254));
-	DWORD* var_c003d9188 = (DWORD*)(GetAddress(0x003d9188));
+	DWORD* var_c003d9254 = (DWORD*)(GetAddress(0x3d9254));
+	DWORD* var_c003d9188 = (DWORD*)(GetAddress(0x3d9188));
 
 	DWORD*(__thiscall* fn_c00213b1c)(DWORD* thisptr, int) = (DWORD*(__thiscall*)(DWORD*, int))(GetAddress(0x00213b1c));
 	int(__thiscall* fn_c0000a551)(DWORD* thisptr) = (int(__thiscall*)(DWORD*))(GetAddress(0x0000a551));
@@ -963,6 +963,29 @@ class test_engine : public c_game_engine_base
 
 };
 test_engine g_test_engine;
+
+typedef char(__stdcall *cmp_xnkid)(int thisx, int a2);
+cmp_xnkid p_cmp_xnkid;
+
+char __stdcall xnkid_cmp(int thisx, int a2)
+{
+	return 1;
+}
+
+void H2Tweaks::removeXNetSecurity()
+{
+	DWORD dwBack;
+	/* get actual ip addresses in XSocketSend or recv calls */
+	BYTE jmp = { 0xEB };
+	WriteBytes((DWORD)GetAddress(0x1B5DBE, 0x1961F8), &jmp, 1);
+	NopFill<2>((DWORD)GetAddress(0x1B624A, 0x196684));
+	NopFill<2>((DWORD)GetAddress(0x1B6201, 0x19663B));
+	NopFill<2>((DWORD)GetAddress(0x1B62BC, 0x1966F4));
+
+	/* XNKEY bs */
+	p_cmp_xnkid = (cmp_xnkid)DetourClassFunc((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x199F02 : 0x1C284A), (BYTE*)xnkid_cmp, 9);
+	VirtualProtect(p_cmp_xnkid, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+}
 
 void InitH2Tweaks() {
 	postConfig();
@@ -1079,9 +1102,11 @@ void InitH2Tweaks() {
 	PatchCall(GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
-
-	H2Tweaks::applyPlayersActionsUpdateRatePatch();
+	NopFill<3>((DWORD)GetAddress(0x1F1F9A, 0x1B3CC9));
+	//H2Tweaks::applyPlayersActionsUpdateRatePatch(); //breaks aim assist
 	
+	H2Tweaks::removeXNetSecurity();
+
 	addDebugText("End Startup Tweaks.");
 }
 
@@ -1341,6 +1366,6 @@ __declspec(naked) void calculate_delta_time(void)
 
 void H2Tweaks::applyPlayersActionsUpdateRatePatch()
 {
-	//xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
-	//PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
+	xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
+	PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
 }

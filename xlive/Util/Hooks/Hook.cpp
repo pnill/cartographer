@@ -4,7 +4,7 @@
 #include "hook.h"
 #pragma warning( disable :4996)
 
-void *DetourFunc(BYTE *src, const BYTE *dst, const int len)
+void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 {
 	BYTE *jmp = (BYTE*)malloc(len + 5);
 	DWORD dwBack;
@@ -126,7 +126,6 @@ void PatchWinAPICall(DWORD call_addr, DWORD new_function_ptr)
 
 VOID Codecave(DWORD destAddress, VOID(*func)(VOID), BYTE nopCount)
 {
-
 	DWORD offset = (PtrToUlong(func) - destAddress) - 5;
 
 

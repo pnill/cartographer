@@ -12,7 +12,7 @@ typedef struct _SOCKET_INFORMATION
 	DWORD BytesRECV;
 } SOCKET_INFORMATION, *LPSOCKET_INFORMATION;
 
-class H2MOD_QoS
+class CXNetQoS
 {
 public:
 	void Listener();

@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <stdlib.h>
 #include <mutex>
-#include "h2mod.h"
+#include "H2MOD.h"
 #include <windows.h>
 #include "xliveless.h"
 #include "Util\Hooks\Hook.h"
@@ -46,7 +46,6 @@ extern global_tag_instance* tag_instances;
 extern DeviceShop* device_shop;
 extern VariantPlayer* variant_player;
 
-extern XNADDR join_game_xn;
 extern MapManager* mapManager;
 extern AdvLobbySettings* advLobbySettings;
 extern bool displayXyz;

@@ -1,25 +1,11 @@
 // -No Copyright- 2010 Stanislav "listener" Golovin
 // This file donated to the public domain
 #include "stdafx.h"
-#include "resource.h"
-#include <iostream>
-#include <sstream>
-#include <codecvt>
-#include <unordered_map>
 #include "Globals.h"
-#include "H2MOD/discord/DiscordInterface.h"
-#include "H2MOD\Modules\Config\Config.h"
 #include "XLive\Networking\ServerList.h"
-#include "H2MOD\Modules\Achievements\Achievements.h"
-#include "xlivedefs.h"
-#include "XLive\UserManagement\CUser.h"
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include "XLive\Networking\XLiveQoS.h"
 #include "XLive\XAM\xam.h"
 #include "XLive\achievements\XAchievements.h"
 #include "XLive\xbox\xbox.h"
-#include "XLive\XUser\XUser.h"
 
 //#include "XLive\Globals.h"
 using namespace std;
@@ -2319,21 +2305,6 @@ DWORD WINAPI XLiveLoadLibraryEx(LPCWSTR libFileName, HINSTANCE *a2, DWORD dwFlag
 	*a2 = hInstance;
 	return 0;
 }
-
-
-
-
-// 5238: ??
-DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* xnkey)
-{
-	TRACE("XLocatorCreateKey  (a1 = %X, a2 = %X)",
-		pxnkid, xnkey);
-
-	XNetCreateKey(pxnkid, xnkey);
-
-	return S_OK;
-}
-
 
 // 5257: ??
 DWORD WINAPI XLiveManageCredentials(LPCWSTR lpszLiveIdName, LPCWSTR lpszLiveIdPassword, DWORD dwCredFlags, PXOVERLAPPED pXOverlapped)

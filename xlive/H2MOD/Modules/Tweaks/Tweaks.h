@@ -23,4 +23,5 @@ namespace H2Tweaks {
 	void setCrosshairSize(int size, bool preset);
 	void applyPlayersActionsUpdateRatePatch();
 	void setSens(InputType input_type, int sens);
+	void removeXNetSecurity();
 }

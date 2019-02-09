@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugDedicatedServer|Win32">
@@ -139,8 +139,7 @@
       </AdditionalLibraryDirectories>
       <LinkStatus>
       </LinkStatus>
-      <LinkTimeCodeGeneration>
-      </LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
@@ -321,7 +320,7 @@
     <ClCompile Include="XLive\achievements\XAchievements.cpp" />
     <ClCompile Include="XLive\Networking\ServerList.cpp" />
     <ClCompile Include="XLive\Networking\upnp.cpp" />
-    <ClCompile Include="XLive\Networking\XLiveQoS.cpp" />
+    <ClCompile Include="XLive\Networking\XNetQoS.cpp" />
     <ClCompile Include="XLive\Networking\xlive_network.cpp" />
     <ClCompile Include="XLive\Networking\xnet.cpp" />
     <ClCompile Include="XLive\Networking\XSocket.cpp" />
@@ -473,7 +472,7 @@
     <ClInclude Include="XLive\achievements\XAchievements.h" />
     <ClInclude Include="XLive\Networking\ServerList.h" />
     <ClInclude Include="XLive\Networking\upnp.h" />
-    <ClInclude Include="XLive\Networking\XLiveQoS.h" />
+    <ClInclude Include="XLive\Networking\XNetQoS.h" />
     <ClInclude Include="XLive\Networking\xnet.h" />
     <ClInclude Include="XLive\Networking\XSocket.h" />
     <ClInclude Include="XLive\UserManagement\CUser.h" />

@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <set>
 #include <mutex>
+
 #include "Blam\Enums\Game\GameEngine.h"
 #include "Util\Hooks\Hook.h"
 
@@ -131,7 +132,6 @@ public:
 		void DisableSound(int sound);
 		void CustomSoundPlay(const wchar_t* soundName, int delay);
 		void PatchWeaponsInteraction(bool b_Enable);
-		void securityPacketProcessing();
 		void ApplyUnitHooks();
 		EngineType GetEngineType();
 		wchar_t* GetLobbyGameVariantName();
@@ -144,7 +144,8 @@ public:
 		std::set<int> hookedObjectDefs;
 		bool isChatBoxCommand = false;
 
-		DWORD GetBase() { return this->Base; }
+		void SetBase(DWORD base) { Base = base; }
+		DWORD GetBase() { return Base; }
 
 private:
 		DWORD Base;

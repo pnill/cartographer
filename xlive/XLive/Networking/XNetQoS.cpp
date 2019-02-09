@@ -1,18 +1,18 @@
 #include <WinSock2.h>
-#include "XLive\Networking\XLiveQoS.h"
-#include "H2MOD\Modules\Config\Config.h"
 #include <MSWSock.h>
 #include <WS2tcpip.h>
 #include <numeric>
 #include "xnet.h"
+#include "XLive\Networking\XNetQoS.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
 using namespace std::chrono_literals;
 
-H2MOD_QoS h2QoS;
+CXNetQoS c_xnetqos;
 extern XNetStartupParams g_XnetStartupParams;
-extern const DWORD annoyance_factor;
 
-void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XNQOS** pxnqos,DWORD dwBitsPerSec,XNQOS* pqos)
+void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XNQOS** apxnqos,DWORD dwBitsPerSec,XNQOS* pqos)
 {
 	//TRACE_GAME_NETWORK_N("ClientQoSLookup( cxna: %i, cProbes: %i, XNADDR array: %08X)", cxna,cProbes,apxna);
 
@@ -22,7 +22,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 		{
 			XNADDR *xn = apxna[ pqos->cxnqosPending - 1 ];
 			XNQOSINFO *xnqosinfo = &pqos->axnqosinfo[ ( pqos->cxnqosPending - 1) ];
-
+		
 			//if (H2Config_debug_log)
 			//	TRACE_GAME_NETWORK_N("[XNetQoSLookup] Looping cxnas for probes pqos->xnqosPending: %i", pqos->cxnqosPending);
 
@@ -36,13 +36,13 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 			hints.ai_protocol = IPPROTO_TCP;
 
 			std::string addr = inet_ntoa(xn->ina);
-			std::string prt = std::to_string(ntohs(xn->wPortOnline) + 10);
+			std::string port = std::to_string(ntohs(xn->wPortOnline) + 10);
 
 			//if (H2Config_debug_log)
 			//	TRACE_GAME_NETWORK_N("[XNetQoSLookup] QoSLookup, addr=%s, port=%s", addr.c_str(), prt.c_str());
 
 			// Resolve the server address and port
-			iResult = getaddrinfo(addr.c_str(), prt.c_str(), &hints, &result);
+			iResult = getaddrinfo(addr.c_str(), port.c_str(), &hints, &result);
 			if (iResult != 0) {
 				//if (H2Config_debug_log)
 				//	TRACE_GAME_NETWORK_N("[XnetQoSLookup] getaddrinfo failed with error: %d\n", iResult);
@@ -60,43 +60,29 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 			for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
 
 				connectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
-
 				if (connectSocket == INVALID_SOCKET) {
-					
-					xnqosinfo->cProbesRecv = 0;
-					xnqosinfo->cProbesXmit = 0;
-					xnqosinfo->bFlags = XNET_XNQOSINFO_TARGET_DISABLED;
-					
-					if(pqos->cxnqosPending > 0)
-						pqos->cxnqosPending--;
-
-					break;
+					continue;
 				}
 
 				/* We're only allowing 500ms for a response from server, or connection to server to be established. */
-				int nTimeout = 500;
-				setsockopt(connectSocket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&nTimeout, sizeof(int));
-				setsockopt(connectSocket, SOL_SOCKET, SO_SNDTIMEO, (const char*)&nTimeout, sizeof(int));
+				DWORD nTimeout = 500;
+				setsockopt(connectSocket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&nTimeout, sizeof(DWORD));
+				setsockopt(connectSocket, SOL_SOCKET, SO_SNDTIMEO, (const char*)&nTimeout, sizeof(DWORD));
 
 				// Connect to server.
 				iResult = connect(connectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
 				if (iResult == SOCKET_ERROR) {
 					closesocket(connectSocket);
 					connectSocket = INVALID_SOCKET;		
-					xnqosinfo->cProbesRecv = 0;
-					xnqosinfo->cProbesXmit = 0;
-					xnqosinfo->bFlags = XNET_XNQOSINFO_TARGET_DISABLED;
-
-					if(pqos->cxnqosPending > 0)
-						pqos->cxnqosPending--;
-					
 					continue;
 				}
+
+				break; // if we get here, we must have connected successfully
 			}
 
 			freeaddrinfo(result);
 			
-			if (connectSocket == INVALID_SOCKET)
+			if (connectSocket == INVALID_SOCKET || iResult == SOCKET_ERROR)
 			{
 				//if (H2Config_debug_log)
 				//	TRACE_GAME_NETWORK_N("[XNetQoSLookup] Unable to connect to server...");
@@ -105,7 +91,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 				xnqosinfo->cProbesXmit = 0;
 				xnqosinfo->bFlags = XNET_XNQOSINFO_TARGET_DISABLED;
 
-				if(pqos->cxnqosPending > 0 )
+				if (pqos->cxnqosPending > 0 )
 					pqos->cxnqosPending--;
 
 				continue;
@@ -125,7 +111,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 
 				char send_data[4];
 				ZeroMemory(send_data, 4);
-				*(DWORD*)&send_data = annoyance_factor;
+				*(DWORD*)&send_data = 0xAABBCCDD;
 
 				auto started = std::chrono::high_resolution_clock::now();
 				send(connectSocket, send_data, sizeof(send_data), 0);
@@ -133,7 +119,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 				auto done = std::chrono::high_resolution_clock::now();
 
 				//if(H2Config_debug_log)
-				//	TRACE_GAME_NETWORK_N("[XNetQosLookup][Client] Probe got %i bytes of data back",RecvLen);
+				//	TRACE_GAME_NETWORK_N("[XNetQosLookup][Client] Probe got %i bytes of data back", RecvLen);
 
 				std::chrono::milliseconds d = std::chrono::duration_cast<std::chrono::milliseconds>(done - started);
 
@@ -158,7 +144,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 
 			closesocket(connectSocket);
 
-			if (recvResult <= 0)
+			if (recvResult <= 0 || recvResult != recvBufLen)
 			{
 				//if (H2Config_debug_log)
 				//	TRACE_GAME_NETWORK_N("[XNetQoSLookup][Socket: %08X] Disconnected!",connectSocket);
@@ -171,7 +157,6 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 					pqos->cxnqosPending--;
 
 				continue;
-
 			}
 
 			auto ping_result = std::minmax_element(ping_storage.begin(),ping_storage.end());
@@ -192,7 +177,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 			xnqosinfo->cbData = recvBufLen;
 			xnqosinfo->dwUpBitsPerSec = dwBitsPerSec;
 			xnqosinfo->dwDnBitsPerSec = dwBitsPerSec;
-			xnqosinfo->bFlags |= (XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE | XNET_XNQOSINFO_DATA_RECEIVED);
+			xnqosinfo->bFlags = (XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE | XNET_XNQOSINFO_DATA_RECEIVED);
 
 			if (pqos->cxnqosPending > 0)
 				pqos->cxnqosPending--;
@@ -209,14 +194,14 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XN
 	delete[] apxna;
 }
 
-BOOL H2MOD_QoS::IsListening()
+BOOL CXNetQoS::IsListening()
 {
 	return m_listenerThreadRunning;
 }
 
 LPFN_ACCEPTEX lpfnAcceptEx = nullptr;
 
-void CALLBACK H2MOD_QoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags)
+void CALLBACK CXNetQoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags)
 {
 	if (dwError)
 		TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback error %d", dwError);
@@ -252,7 +237,7 @@ void CALLBACK H2MOD_QoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAO
 	}
 }
 
-void CALLBACK H2MOD_QoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags)
+void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags)
 {					  
 	LPSOCKET_INFORMATION acceptSockInfo = reinterpret_cast<LPSOCKET_INFORMATION>(lpOverlapped);
 
@@ -260,7 +245,7 @@ void CALLBACK H2MOD_QoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERL
 	acceptSockInfo->DataBuf.buf = new char[acceptSockInfo->DataBuf.len];
 
 	memset(acceptSockInfo->DataBuf.buf, NULL, acceptSockInfo->DataBuf.len);
-	memcpy(acceptSockInfo->DataBuf.buf, h2QoS.pbData, acceptSockInfo->DataBuf.len);
+	memcpy(acceptSockInfo->DataBuf.buf, c_xnetqos.pbData, acceptSockInfo->DataBuf.len);
 
 	TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> socket: %d", acceptSockInfo->Socket);
 
@@ -279,13 +264,13 @@ void CALLBACK H2MOD_QoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERL
 	//TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> magic received??? 0x%x", *(DWORD*)&(acceptSockInfo->Buffer));
 
 	int wsaError = 0;
-	if (*(DWORD*)&(acceptSockInfo->Buffer) == annoyance_factor)
+	if (*(DWORD*)&(acceptSockInfo->Buffer) == 0xAABBCCDD)
 	{
 		TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> magic is right, sending data back on port %d", acceptSockInfo->Socket);
 
 		DWORD flags = 0;
 		ZeroMemory(&(acceptSockInfo->Overlapped), sizeof(WSAOVERLAPPED));
-		int wsaError = WSASend(acceptSockInfo->Socket, &(acceptSockInfo->DataBuf), 1, NULL, flags, &(acceptSockInfo->Overlapped), HandleClient);
+		wsaError = WSASend(acceptSockInfo->Socket, &(acceptSockInfo->DataBuf), 1, NULL, flags, &(acceptSockInfo->Overlapped), HandleClient);
 
 		TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend error: %d", wsaError);
 
@@ -314,7 +299,7 @@ cleanup:
 	delete acceptSockInfo;
 }
 
-void H2MOD_QoS::Listener()
+void CXNetQoS::Listener()
 {
 	m_listenerThreadRunning = TRUE;
 
@@ -331,7 +316,7 @@ void H2MOD_QoS::Listener()
 		TRACE_GAME_NETWORK_N("[H2MOD-QoS] Listener socket creation failed.");
 	}
 
-	if (bind(h2QoS.m_ListenSocket, (SOCKADDR*)&serverInf, sizeof(serverInf)) == SOCKET_ERROR)
+	if (bind(c_xnetqos.m_ListenSocket, (SOCKADDR*)&serverInf, sizeof(serverInf)) == SOCKET_ERROR)
 	{
 		closesocket(m_ListenSocket);
 		m_ListenSocket = INVALID_SOCKET;
@@ -341,7 +326,7 @@ void H2MOD_QoS::Listener()
 	DWORD dwBytes;
 	GUID GuidAcceptEx = WSAID_ACCEPTEX;
 
-	DWORD result = WSAIoctl(h2QoS.m_ListenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
+	DWORD result = WSAIoctl(c_xnetqos.m_ListenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
 		&GuidAcceptEx, sizeof(GuidAcceptEx),
 		&lpfnAcceptEx, sizeof(lpfnAcceptEx),
 		&dwBytes, NULL, NULL);
@@ -404,6 +389,7 @@ void H2MOD_QoS::Listener()
 			DWORD Index = WSAWaitForMultipleEvents(1, &m_WsaEvent, FALSE, WSA_INFINITE, TRUE);
 
 			if (m_bStopListening == true) {
+				TRACE_GAME_NETWORK_N("[H2MOD-QoS] Listener thread signaled to terminate thread");
 				closesocket(acceptSocket);
 				closesocket(m_ListenSocket);
 				goto end;
@@ -416,7 +402,7 @@ void H2MOD_QoS::Listener()
 				continue;
 			}
 
-			if (Index != WAIT_IO_COMPLETION)
+			if (Index != WAIT_IO_COMPLETION) 
 				break;
 		}
 
@@ -446,7 +432,7 @@ void H2MOD_QoS::Listener()
 
 
 end:
-	TRACE_GAME_NETWORK_N("[H2MOD-QoS] Listener thread about to terminate with error: %d", m_ListenSocket);
+	TRACE_GAME_NETWORK_N("[H2MOD-QoS] Listener thread about to terminate, last WSA error code: %i", WSAGetLastError());
 	WSACloseEvent(m_WsaEvent);
 	m_bStopListening = false;
 	m_listenerThreadRunning = FALSE;
@@ -464,17 +450,17 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 	{
 		if (cb > 0)
 		{
-			if (cb > h2QoS.cbData)
-				h2QoS.cbData = cb;
+			if (cb > c_xnetqos.cbData)
+				c_xnetqos.cbData = cb;
 
-			ZeroMemory(h2QoS.pbData, cb);
-			memcpy(h2QoS.pbData, pb, cb);
+			ZeroMemory(c_xnetqos.pbData, cb);
+			memcpy(c_xnetqos.pbData, pb, cb);
 		}
 	}
 
-	if (dwFlags & XNET_QOS_LISTEN_ENABLE && h2QoS.IsListening() == FALSE)
+	if (dwFlags & XNET_QOS_LISTEN_ENABLE && c_xnetqos.IsListening() == FALSE)
 	{
-		std::thread(&H2MOD_QoS::Listener, &h2QoS).detach();
+		std::thread(&CXNetQoS::Listener, &c_xnetqos).detach();
 	}
 
 	if (dwFlags & XNET_QOS_LISTEN_DISABLE)
@@ -484,10 +470,10 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 
 	if (dwFlags & XNET_QOS_LISTEN_RELEASE)
 	{
-		h2QoS.m_bStopListening = true;
-		memset(h2QoS.pbData, NULL, h2QoS.cbData);
+		c_xnetqos.m_bStopListening = true;
+		memset(c_xnetqos.pbData, NULL, c_xnetqos.cbData);
 		// signal the thread it has to unblock, and based on m_bStopListening it will decide wheter terminate the thread or not
-		WSASetEvent(h2QoS.m_WsaEvent);
+		WSASetEvent(c_xnetqos.m_WsaEvent);
 		
 		TRACE_GAME_NETWORK_N("[H2MOD-QoS] Listener released!");
 	}
@@ -519,11 +505,6 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 
 	pqos->cxnqos = cxna;
 	pqos->cxnqosPending = cxna;
-	pqos->axnqosinfo[0].wRttMinInMsecs = 10;
-	pqos->axnqosinfo[0].wRttMedInMsecs = 20;
-	pqos->axnqosinfo[0].dwDnBitsPerSec = dwBitsPerSec;
-	pqos->axnqosinfo[0].dwUpBitsPerSec = dwBitsPerSec;
-	pqos->axnqosinfo[0].bFlags |= XNET_XNQOSINFO_TARGET_CONTACTED;
 
 	/*
 	This is gonna hit some CPUs hard when there's a lot of servers on the list, we'll probably want to queue this a bit and only allow X number of threads to run at a time.
@@ -544,8 +525,6 @@ DWORD WINAPI XNetQosServiceLookup(DWORD a1, DWORD a2, DWORD a3)
 	// not connected to LIVE - abort now
 	// - wants a3 return ASYNC struct
 	return ERROR_INVALID_PARAMETER;
-
-	//return 0;
 }
 
 // #72: XNetQosRelease
