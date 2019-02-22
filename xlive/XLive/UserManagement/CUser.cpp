@@ -1,8 +1,8 @@
 #include "CUser.h"
 #include "stdafx.h"
-#include "XLive\UserManagement\protobuf\packet.pb.h"
 #include <time.h>
 #include <sstream>
+#include "XLive\UserManagement\protobuf\packet.pb.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
@@ -13,6 +13,11 @@ CUserManagement userManager;
 
 extern XUID xFakeXuid[4];
 extern CHAR g_szUserName[4][16];
+
+/*
+NOTE:
+	Check inside Tweaks.cpp for removeXNetSecurity
+*/
 
 void CUserManagement::CreateUser(const XNADDR* pxna)
 {
@@ -33,10 +38,9 @@ void CUserManagement::CreateUser(const XNADDR* pxna)
 // TODO: clear from time to time the array (maybe inside GameManager thread)
 void CUserManagement::UnregisterSecureAddr(const IN_ADDR ina)
 {
-	//if (iplong_to_user[ina.s_addr] != 0)
-	//		iplong_to_user[ina.s_addr]->bValid = false;
+	if (iplong_to_user[ina.s_addr] != 0)
+		iplong_to_user[ina.s_addr]->bValid = false;
 }
-
 
 void CUserManagement::UpdateConnectionStatus() {
 	extern int MasterState;

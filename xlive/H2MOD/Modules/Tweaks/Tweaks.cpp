@@ -964,6 +964,7 @@ class test_engine : public c_game_engine_base
 };
 test_engine g_test_engine;
 
+#pragma region XNet stuff
 typedef char(__stdcall *cmp_xnkid)(int thisx, int a2);
 cmp_xnkid p_cmp_xnkid;
 
@@ -972,20 +973,27 @@ char __stdcall xnkid_cmp(int thisx, int a2)
 	return 1;
 }
 
+/* All this does is patch some checks that cause using actual ip addresses not to work. */
+/* When a call to XNetXnaddrtoInaddr happens we provide the actual ip address rather than a secure key */
 void H2Tweaks::removeXNetSecurity()
 {
 	DWORD dwBack;
-	/* get actual ip addresses in XSocketSend or recv calls */
 	BYTE jmp = { 0xEB };
+	// apparently the secure address has 1 free byte 
+	// after HTONL call, game is checking the al register (the lower 8 bits of eax register) if it is zero, if not everything network related will fail
 	WriteBytes((DWORD)GetAddress(0x1B5DBE, 0x1961F8), &jmp, 1);
 	NopFill<2>((DWORD)GetAddress(0x1B624A, 0x196684));
 	NopFill<2>((DWORD)GetAddress(0x1B6201, 0x19663B));
 	NopFill<2>((DWORD)GetAddress(0x1B62BC, 0x1966F4));
 
+	NopFill<9>((DWORD)GetAddress(0x1F1F94, 0x1B3CC3)); 
+
 	/* XNKEY bs */
 	p_cmp_xnkid = (cmp_xnkid)DetourClassFunc((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x199F02 : 0x1C284A), (BYTE*)xnkid_cmp, 9);
 	VirtualProtect(p_cmp_xnkid, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }
+#pragma end
+
 
 void InitH2Tweaks() {
 	postConfig();

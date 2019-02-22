@@ -129,10 +129,8 @@ wchar_t* get_receiving_map_string()
 wchar_t repo_wstr[] = L"repository";
 void get_map_download_source_str(int a1, wchar_t* buffer)
 {	
-	if (buffer == NULL)
-		return;
-
-	wcsncpy_s(buffer, 512, repo_wstr, -1);
+	if (buffer != NULL)
+		wcsncpy_s(buffer, 512, repo_wstr, -1);
 }
 
 /**
@@ -404,17 +402,7 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 }
 
 static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
-	if (mapManager->precalculatedDownloadPercentageStrings.empty()) {
-		for (int i = 0; i <= 100; i++) {
-			std::string downloadMsg;
-			downloadMsg = DOWNLOAD_MAP_PERCENTAGE_PREFIX;
-			downloadMsg += std::to_string(i);
-			downloadMsg += DOWNLOAD_MAP_PERCENTAGE_CHAR;
-			mapManager->precalculatedDownloadPercentageStrings[i] = downloadMsg;
-		}
-	}
 	downloadPercentage = ((double)dlnow / (double)dltotal) * 100;
-	mapManager->setCustomLobbyMessage(mapManager->precalculatedDownloadPercentageStrings[downloadPercentage].c_str());
 	return 0;
 }
 

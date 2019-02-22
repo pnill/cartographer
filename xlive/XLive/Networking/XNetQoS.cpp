@@ -530,7 +530,6 @@ DWORD WINAPI XNetQosServiceLookup(DWORD a1, DWORD a2, DWORD a3)
 // #72: XNetQosRelease
 INT WINAPI XNetQosRelease(XNQOS* pxnqos)
 {
-
 	for (int i = 0; i < pxnqos->cxnqos; i++)
 	{
 		if (pxnqos->axnqosinfo[i].cbData > 0 && pxnqos->axnqosinfo[i].pbData)

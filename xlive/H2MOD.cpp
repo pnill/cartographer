@@ -15,7 +15,6 @@
 #include "H2MOD\Variants\GunGame\GunGame.h"
 #include "XLive\UserManagement\CUser.h"
 
-
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
 Halo2Final *h2f = new Halo2Final();
@@ -504,19 +503,13 @@ void H2MOD::exit_game()
 
 #pragma endregion
 
-//sub_1cce9b
-typedef int(__stdcall *calls_session_boot)(void*, int, char);
-calls_session_boot calls_session_boot_method;
-
-int __stdcall calls_session_boot_sub_1cce9b(void* thisx, int a2, char a3) {
-	TRACE_GAME_N("session boot - this=%d,a2=%d,a3=%d", thisx, a2, a3);
-	return calls_session_boot_method(thisx, a2, a3);
-}
-
 void H2MOD::kick_player(int peerIndex) {
+	typedef void(__thiscall* game_session_boot)(void* a1, int peer_index, bool a3);
+	auto p_game_session_boot = (game_session_boot)(h2mod->GetBase() + 0x1CCE9B);
+
 	DWORD* ptr = (DWORD*)(((char*)h2mod->GetBase()) + 0x420FE8);
 	TRACE_GAME_N("about to kick player index=%d", peerIndex);
-	calls_session_boot_method((DWORD*)(*ptr), peerIndex, (char)0x01);
+	p_game_session_boot((DWORD*)(*ptr), peerIndex, true);
 }
 
 typedef int(__cdecl *show_error_screen)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6);
@@ -1687,10 +1680,6 @@ void H2MOD::ApplyHooks() {
 
 		//on_custom_map_change_method = (on_custom_map_change)DetourFunc((BYTE*)this->GetBase() + 0x32176, (BYTE*)onCustomMapChange, 5);
 		//VirtualProtect(on_custom_map_change_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		//boot method
-		calls_session_boot_method = (calls_session_boot)DetourClassFunc((BYTE*)this->GetBase() + 0x1CCE9B, (BYTE*)calls_session_boot_sub_1cce9b, 8);
-		VirtualProtect(calls_session_boot_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		// disable part of custom map tag verification
 		NopFill<6>(GetBase() + 0x4FA0A);

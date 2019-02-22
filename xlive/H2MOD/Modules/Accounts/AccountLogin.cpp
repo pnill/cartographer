@@ -48,7 +48,7 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 
 	pxna.inaOnline.s_addr = saddr;
 	pxna.ina.s_addr = xnaddr;
-	pxna.wPortOnline = htons((short)H2Config_base_port);
+	pxna.wPortOnline = htons(H2Config_base_port);
 
 	BYTE abEnet2[6];
 	memset(abEnet2, NULL, sizeof(abEnet2));

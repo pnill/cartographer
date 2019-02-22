@@ -40,9 +40,9 @@ public:
 	BOOL LocalUserLoggedIn();
 	void UnregisterLocal();
 	void ConfigureLocalUser(XNADDR* pxna, ULONGLONG xuid, char* username);
-
 	BOOL GetLocalXNAddr(XNADDR* pxna);
-	std::unordered_map<ULONG, CUser*> iplong_to_user; // saddr(security key)->CUser
+
+	std::unordered_map<ULONG, CUser*> iplong_to_user; // iplong->CUser
 	XNADDR game_host_xn;
 };
 

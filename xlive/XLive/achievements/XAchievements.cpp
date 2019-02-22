@@ -219,9 +219,6 @@ DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement
 			pAchievement++;
 			count--;
 		}
-
-		// crash-protect progress
-		//SaveAchievements();
 	}
 
 	if (pOverlapped)
