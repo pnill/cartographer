@@ -59,7 +59,7 @@ Infection::Infection()
 
 void Infection::triggerSound(const wchar_t* name, int sleep) {
 	TRACE_GAME("[h2mod-infection] Triggering sound %s", name);
-	std::thread(&H2MOD::CustomSoundPlay, h2mod, name, sleep).detach();
+	h2mod->CustomSoundPlay(name, sleep);
 }
 
 void Infection::initClient()

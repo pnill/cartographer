@@ -926,15 +926,21 @@ void H2MOD::DisableSound(int sound)
 
 void H2MOD::CustomSoundPlay(const wchar_t* soundName, int delay)
 {
-	//std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
-	std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now() + std::chrono::milliseconds(delay);
+	auto playSound = [=]()
+	{
+		//std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+		std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now() + std::chrono::milliseconds(delay);
 
-	TRACE_GAME("[H2MOD-SoundQueue] - attempting to play sound %ws - delaying %i miliseconds first", soundName, delay);
+		TRACE_GAME("[H2MOD-SoundQueue] - attempting to play sound %ws - delaying %i miliseconds first", soundName, delay);
 
-	if (delay > 0)
-		std::this_thread::sleep_until(timePoint);
+		if (delay > 0)
+			std::this_thread::sleep_until(timePoint);
 
-	PlaySound(soundName, NULL, SND_FILENAME);
+		PlaySound(soundName, NULL, SND_FILENAME);
+	};
+
+	if (!h2mod->Server)
+		std::thread(playSound).detach();
 }
 
 typedef char(__cdecl *player_death)(int unit_datum_index, int a2, char a3, char a4);

@@ -582,7 +582,7 @@ int WINAPI XLiveRender()
 				
 				if (it->second == false)
 				{
-					std::thread(&H2MOD::CustomSoundPlay, h2mod, L"sounds/AchievementUnlocked.wav", 0).detach();
+					h2mod->CustomSoundPlay(L"sounds/AchievementUnlocked.wav", 0);
 					it->second = true;
 				}
 				
