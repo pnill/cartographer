@@ -276,10 +276,6 @@ void InitalizeFont(char *strFontName, char *strFontPath, int size, IDirect3DDevi
 
 void initFontsIfRequired()
 {
-
-
-
-
 	normalSizeFontHeight = 0.017 * verticalRes;
 	largeSizeFontHeight = 0.034 * verticalRes;
 

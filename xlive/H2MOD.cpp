@@ -77,8 +77,6 @@ game_lobby_states call_get_lobby_state()
 
 #pragma region engine calls
 
-
-
 int __cdecl call_get_object(signed int object_datum_index, int object_type)
 {
 	//TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
@@ -765,7 +763,7 @@ wchar_t* H2MOD::get_player_name_from_index(int pIndex)
 		player_table_ptr = *(DWORD*)(this->GetBase() + 0x004D64C4);
 	player_table_ptr += 0x44;
 
-	return	(wchar_t*)(*(DWORD*)player_table_ptr + (pIndex * 0x204) + 0x40);
+	return (wchar_t*)(*(DWORD*)player_table_ptr + (pIndex * 0x204) + 0x40);
 }
 
 int H2MOD::get_player_index_from_unit_datum(int unit_datum_index)
@@ -1234,7 +1232,7 @@ void __cdecl OnMapLoad(int a1)
 typedef bool(__cdecl *spawn_player)(int a1);
 spawn_player pspawn_player;
 
-bool __cdecl OnPlayerSpawn(int player_unit_datum)
+bool __cdecl OnPlayerSpawn(int a1)
 {
 	//I cant find somewhere to put this where it actually works (only needs to be done once on map load). It's only a few instructions so it shouldn't take long to execute.
 	H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
@@ -1243,28 +1241,28 @@ bool __cdecl OnPlayerSpawn(int player_unit_datum)
 	//once players spawn we aren't in lobby anymore ;)
 	isLobby = false;
 	//TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
-	int PlayerIndex = player_unit_datum;
+	int PlayerIndex = a1;
 
 
 	if (b_Infection) {
-		infectionHandler->preSpawnPlayer->setPlayerIndex(PlayerIndex);
+		infectionHandler->preSpawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
 		infectionHandler->preSpawnPlayer->execute();
 	}
 
 	if (b_GunGame) {
-		gunGame->preSpawnPlayer->setPlayerIndex(PlayerIndex);
+		gunGame->preSpawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
 		gunGame->preSpawnPlayer->execute();
 	}
 
-	bool ret = pspawn_player(player_unit_datum);
+	bool ret = pspawn_player(a1);
 
 	if (b_Infection) {
-		infectionHandler->spawnPlayer->setPlayerIndex(PlayerIndex);
+		infectionHandler->spawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
 		infectionHandler->spawnPlayer->execute();
 	}
 
 	if (b_GunGame) {
-		gunGame->spawnPlayer->setPlayerIndex(PlayerIndex);
+		gunGame->spawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
 		gunGame->spawnPlayer->execute();
 	}
 

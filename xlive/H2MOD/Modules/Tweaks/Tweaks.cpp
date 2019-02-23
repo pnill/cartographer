@@ -1269,7 +1269,6 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 
 	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) {
 
-		
 		for (int i = 0; i < 28; i++) {
 			if (configArray[i] == 0) {
 				*reinterpret_cast<short*>(WEAPONS[i]) = disabled[i];
