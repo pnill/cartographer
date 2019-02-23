@@ -39,7 +39,7 @@ extern float H2Config_crosshair_offset;
 extern bool H2Config_disable_ingame_keyboard;
 extern bool H2Config_hide_ingame_chat;
 extern bool H2Config_xDelay;
-extern bool H2Config_hitmarker_sound;
+//extern bool H2Config_hitmarker_sound;
 extern bool H2Config_voice_chat;
 extern int H2Config_custom_resolution_x;
 extern int H2Config_custom_resolution_y;
