@@ -4,10 +4,10 @@
 MapManager* mapManager = new MapManager();
 AdvLobbySettings* advLobbySettings = new AdvLobbySettings();
 
-GameStatePlayerTable *game_state_players = NULL;
-GameStateObjectHeaderTable* game_state_objects_header = NULL;
-GameStateActorTable* game_state_actors = NULL;
-global_tag_instance* tag_instances = NULL;
+GameStatePlayerTable *game_state_players = nullptr;
+GameStateObjectHeaderTable* game_state_objects_header = nullptr;
+GameStateActorTable* game_state_actors = nullptr;
+global_tag_instance* tag_instances = nullptr;
 
 bool displayXyz = false;
 volatile bool isLobby = true;

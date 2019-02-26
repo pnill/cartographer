@@ -345,7 +345,6 @@ void InitH2Startup() {
 		h2mod->Server = FALSE;
 	}
 
-
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
 	H2ProcessFilePath = (wchar_t*)malloc(wcslen(ArgList[0]) * sizeof(wchar_t));

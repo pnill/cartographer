@@ -1090,6 +1090,8 @@ void get_object_table_memory()
 	game_state_players = (GameStatePlayerTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4D64C4 : 0x4A8260))));
 	game_state_objects_header = (GameStateObjectHeaderTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x50C8EC : 0x4E461C))));
 	game_state_actors = (GameStateActorTable*)((*(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x9A1C5C : 0xA965DC))));
+	if (tag_instances == nullptr)
+		tag_instances = (global_tag_instance*)(*(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50)));
 }
 
 // this gets called after game globals are updated fyi (which includes game engine type)
@@ -1184,9 +1186,6 @@ void __cdecl OnMapLoad(int a1)
 		}
 
 		get_object_table_memory();
-
-		if (tag_instances == NULL)
-			tag_instances = (global_tag_instance*)(*(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50)));
 
 		HitFix::Initialize();
 
