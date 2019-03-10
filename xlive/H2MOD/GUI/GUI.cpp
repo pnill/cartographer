@@ -120,19 +120,6 @@ inline void frameTimeManagement()
 	} while (std::chrono::system_clock::now() > nextFrame);
 }
 
-DWORD dwPresent;
-typedef HRESULT(WINAPI* tPresent)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion);
-tPresent pPresent;
-
-HRESULT hkPresent(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)
-{
-	//DSFix FPS Hax - https://github.com/PeterTh/dsfix/blob/d10fc7ad0a72da0585b5f5f71b03daddc37ef890/RenderstateManager.cpp
-	frameTimeManagement();
-
-	return pPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
-}
-
-
 LPDIRECT3DTEXTURE9 Texture_Interface;
 LPD3DXSPRITE Sprite_Interface;
 
@@ -186,11 +173,6 @@ int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 		//TRACE("XLiveInitialize  (pPii = %X)", pPii);
 		pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
 		pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
-
-		//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice + 17);
-		//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
-
-		//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
 
 		ServerStatus = new char[250];
 		snprintf(ServerStatus, 250, "Status: Initializing....");

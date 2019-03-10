@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 CXNetQoS c_xnetqos;
 extern XNetStartupParams g_XnetStartupParams;
 
-void ClientQoSLookUp(UINT cxna, XNADDR *apxna[],UINT cProbes,IN_ADDR  aina[], XNQOS** apxnqos,DWORD dwBitsPerSec,XNQOS* pqos)
+void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], XNQOS** apxnqos, DWORD dwBitsPerSec, XNQOS* pqos)
 {
 	//TRACE_GAME_NETWORK_N("ClientQoSLookup( cxna: %i, cProbes: %i, XNADDR array: %08X)", cxna,cProbes,apxna);
 
@@ -204,7 +204,7 @@ LPFN_ACCEPTEX lpfnAcceptEx = nullptr;
 void CALLBACK CXNetQoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags)
 {
 	if (dwError)
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback error %d", dwError);
+		TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient -> callback error %d", dwError);
 
 	LPSOCKET_INFORMATION acceptSockInfo = reinterpret_cast<LPSOCKET_INFORMATION>(lpOverlapped);
 	TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback -> socket: %d", acceptSockInfo->Socket);

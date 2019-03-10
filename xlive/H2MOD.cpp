@@ -1035,7 +1035,7 @@ void PatchGameDetailsCheck()
 	NopFill<2>(h2mod->GetBase() + 0x219D6D);
 }
 
-void H2MOD::PatchWeaponsInteraction(bool b_Enable)
+void H2MOD::DisableWeaponPickup(bool b_Enable)
 {
 	//Client Sided Patch
 	DWORD offset = h2mod->GetBase() + 0x55EFA;
@@ -1272,17 +1272,6 @@ bool __cdecl OnPlayerSpawn(int a1)
 	}
 
 	return ret;
-}
-
-typedef void(__stdcall *tjoin_game)(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14);
-tjoin_game pjoin_game;
-
-void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
-{
-	memset(&userManager.game_host_xn, NULL, sizeof(XNADDR));
-	memcpy(&userManager.game_host_xn, host_xn, sizeof(XNADDR));
-	userManager.CreateUser(host_xn);	
-	return pjoin_game(thisptr, a2, a3, a4, a5, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 
 typedef int(__cdecl *object_p_hook)(int s_object_placement_data, int a2, signed int a3, int a4);
@@ -1686,9 +1675,6 @@ void H2MOD::ApplyHooks() {
 		// disable part of custom map tag verification
 		NopFill<6>(GetBase() + 0x4FA0A);
 
-		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)this->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
-		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x55952, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
@@ -1790,7 +1776,6 @@ void H2MOD::ApplyHooks() {
 		PatchWinAPICall(GetBase() + 0x85F5E, CryptProtectDataHook);
 		PatchWinAPICall(GetBase() + 0x352538, CryptUnprotectDataHook);
 		PatchCall(GetBase() + 0x85F73, filo_write__encrypted_data_hook);
-
 	}
 
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */

@@ -42,11 +42,15 @@ public:
 	void ConfigureLocalUser(XNADDR* pxna, ULONGLONG xuid, char* username);
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 
-	std::unordered_map<ULONG, CUser*> iplong_to_user; // iplong->CUser
+	std::unordered_map<ULONG, CUser*> address_to_user; // iplong/secure->CUser
+	std::unordered_map<std::pair<ULONG, short>, ULONG> secure_map;
+	CUser local_user;
 	XNADDR game_host_xn;
+	char *secure_packet;
 };
 
+extern bool using_secure;
 extern wchar_t ServerLobbyName[32];
 void SetUserUsername(char* username);
-extern const DWORD annoyance_factor;
 extern CUserManagement userManager;
+extern const DWORD annoyance_factor;

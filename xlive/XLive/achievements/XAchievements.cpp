@@ -8,7 +8,6 @@
 #include "H2MOD\Modules\Achievements\Achievements.h"
 #include <string>
 
-using namespace std;
 int achieveinit = 0;
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
@@ -204,7 +203,7 @@ DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement
 
 				default:
 					AchievementData.append("Unknown|We're honestly not sure wtf? :");
-					AchievementData.append(to_string(AchievementID));
+					AchievementData.append(std::to_string(AchievementID));
 					break;
 				}
 

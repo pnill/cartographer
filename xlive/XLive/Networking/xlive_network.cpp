@@ -6,6 +6,7 @@
 
 int MasterState = 0;
 ModuleUPnP *upnp = nullptr;
+SOCKET game_network_message_gateway_socket = INVALID_SOCKET;
 
 void ForwardPorts()
 {
@@ -78,37 +79,14 @@ INT WINAPI XNetCleanup()
 // #11: XSocketBind
 SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 {
-	int port = (((struct sockaddr_in*)name)->sin_port);
+	u_short port = (((struct sockaddr_in*)name)->sin_port);
 
+	TRACE_GAME_NETWORK_N("[H2MOD-Network] game bound socket: %i", ntohs(port));
 	if (s == voice_sock)
-		TRACE_GAME_NETWORK_N("[h2mod-voice] Game bound potential voice socket to : %i", ntohs(port));
-	
-	if (ntohs(port) == 1000)
-	{
-		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port);
-		int nport = (((struct sockaddr_in*)name)->sin_port);
+		TRACE_GAME_NETWORK_N("[H2MOD-Network] could be voice socket", ntohs(port));
 
-		TRACE_GAME_NETWORK_N("game_sock set for port %i", ntohs(port));
-		TRACE_GAME_NETWORK_N("base_port set to %i instead of %i", ntohs(nport), ntohs(port));
-		TRACE_GAME_NETWORK_N("g_port was set to %i", H2Config_base_port);
-	}
-
-	if (ntohs(port) == 1001)
-	{
-		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 1);
-		int nport = (((struct sockaddr_in*)name)->sin_port);
-
-		TRACE_GAME_NETWORK_N("game_sock set for port %i", ntohs(port));
-		TRACE_GAME_NETWORK_N("connect_port set to %i instead of %i", ntohs(nport), ntohs(port));
-		TRACE_GAME_NETWORK_N("g_port was set to %i", ntohs(H2Config_base_port + 1));
-	}
-
-	if (ntohs(port) == 1005)
-		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 5);
-	if(ntohs(port) == 1006)
-		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 6);
-	if (ntohs(port) == 1007) // used for map downloading, TCP
-		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 7);
+	if (ntohs(port) == H2Config_base_port + 1)
+		game_network_message_gateway_socket = s;
 
 	SOCKET ret = bind(s, name, namelen);
 	
@@ -157,8 +135,8 @@ DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pAddr)
 // #24: XSocketSendTo
 int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr *to, int tolen)
 {
+	u_short port = (((struct sockaddr_in*)to)->sin_port);
 	u_long iplong = (((struct sockaddr_in*)to)->sin_addr.s_addr);
-	u_short send_port =    (((struct sockaddr_in*)to)->sin_port);
 
 	if (iplong == INADDR_BROADCAST || iplong == 0x00)
 	{
@@ -170,39 +148,40 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 	}
 
 	SOCKADDR_IN SendStruct;
-	SendStruct.sin_port = send_port;
+	SendStruct.sin_port = port;
 	SendStruct.sin_family = AF_INET;
 	SendStruct.sin_addr.s_addr = iplong;
 
 	// get the port of the user we have to send data
-	CUser* sendto_user = userManager.iplong_to_user[iplong];
-	if (sendto_user == nullptr)
-		TRACE_GAME_NETWORK_N("XSocketSendTo() Failed to get the user with ip address: %08X", iplong);
+	CUser* userToSend = userManager.address_to_user[iplong];
+	if (userToSend == nullptr)
+		TRACE_GAME_NETWORK_N("XSocketSendTo() Failed to get the user with ip or secure address: %08X", iplong);
 
-	if (sendto_user != nullptr) 
+	if (userToSend != nullptr) 
 	{
-		switch (htons(send_port))
+		switch (htons(port))
 		{
 		case 1000:
-			SendStruct.sin_port = sendto_user->xnaddr.wPortOnline;
+			SendStruct.sin_port = userToSend->xnaddr.wPortOnline;
 			break;
 
 		case 1001:
-			SendStruct.sin_port = ntohs(htons(sendto_user->xnaddr.wPortOnline) + 1);
+			SendStruct.sin_port = ntohs(htons(userToSend->xnaddr.wPortOnline) + 1);
 			break;
 
 		case 1005:
-			SendStruct.sin_port = ntohs(htons(sendto_user->xnaddr.wPortOnline) + 5);
+			SendStruct.sin_port = ntohs(htons(userToSend->xnaddr.wPortOnline) + 5);
 			break;
 
 		case 1006:
-			SendStruct.sin_port = ntohs(htons(sendto_user->xnaddr.wPortOnline) + 6);
+			SendStruct.sin_port = ntohs(htons(userToSend->xnaddr.wPortOnline) + 6);
 			break;
 
 		default:
-			TRACE_GAME_NETWORK_N("XSocketSendTo() port: %i not matched!", htons(send_port));
+			TRACE_GAME_NETWORK_N("XSocketSendTo() port: %i not matched!", htons(port));
 			break;
 		}
+		SendStruct.sin_addr.s_addr = userToSend->xnaddr.ina.s_addr;
 	}
 
 	//TRACE_GAME_NETWORK_N("SendStruct.sin_addr.s_addr == %08X", SendStruct.sin_addr.s_addr);
@@ -213,6 +192,16 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		SendStruct.sin_addr.s_addr = H2Config_ip_lan;
 		//TRACE_GAME_NETWORK_N("Replaced send struct s_addr with g_lLANIP: %08X", H2Config_ip_lan);
 	}
+
+	
+	/*extern void addDebugText(const char*);
+	static int max_dbg;
+	if (max_dbg < 20)
+	{
+		std::string dbg = "sendto port:" + std::to_string(htons(SendStruct.sin_port));
+		addDebugText(dbg.c_str());
+		max_dbg++;
+	}*/
 
 	int ret = sendto(s, buf, len, flags, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
 
@@ -229,11 +218,37 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *from, int *fromlen)
 {
 	int ret = recvfrom(s, buf, len, flags, from, fromlen);
+	u_short port  = (((struct sockaddr_in*)from)->sin_port);
 	u_long iplong = (((struct sockaddr_in*)from)->sin_addr.s_addr);
 
 	if (iplong == H2Config_master_ip)
+		return ret;
+	
+	if (ret > 0)
 	{
-		((struct sockaddr_in*)from)->sin_addr.s_addr = INADDR_BROADCAST;
+		if (using_secure)
+		{
+			std::pair<ULONG, short> spair = std::make_pair(iplong, port);
+			if (*(DWORD*)&buf[0] == annoyance_factor)
+			{
+				XNADDR* nuser = reinterpret_cast<XNADDR*>(&buf[4]);
+				TRACE_GAME_NETWORK_N("[H2MOD-Network] received secure packet from user with XNADDR: %08X", nuser->ina.s_addr);
+				userManager.CreateUser(nuser);
+				spair = std::make_pair(iplong, nuser->wPortOnline);
+				ret = 0;
+			}
+
+			ULONG secure = userManager.secure_map[spair];
+
+			if (secure != NULL)
+			{
+				((struct sockaddr_in*)from)->sin_addr.s_addr = secure;
+			}
+			else
+			{
+				TRACE_GAME_NETWORK_N("[H2MOD-Network] recvfrom: this is probably the issue....now the fucking recv address is 0 you numb nuts. iplong: %08X, port: %i", iplong, htons(port));
+			}
+		}
 	}
 
 	/*if (ret > 0)

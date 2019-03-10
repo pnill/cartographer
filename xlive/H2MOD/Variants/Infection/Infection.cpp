@@ -104,7 +104,7 @@ void Infection::disableSlayerSounds()
 
 void Infection::resetWeaponInteractionAndEmblems() {
 	TRACE_GAME("[h2mod-infection] Resetting weapons interactions and emblem visibility");
-	h2mod->PatchWeaponsInteraction(true);
+	h2mod->DisableWeaponPickup(true);
 	h2mod->IndicatorVisibility(true);
 }
 
@@ -117,17 +117,16 @@ void Infection::preSpawnServerSetup() {
 		if (isZombie) {
 			h2mod->set_unit_biped(BipedType::Elite, playerCounter);
 		} else {
-			h2mod->set_unit_biped(BipedType::MasterChief, playerCounter);
+			h2mod->set_unit_biped(BipedType::MasterChiefMp, playerCounter);
 		}
 		playerCounter++;
 	} while (playerCounter < players->getPlayerCount());
 }
 
 void Infection::setPlayerAsHuman(int index) {
-	h2mod->set_unit_biped(BipedType::MasterChief, index);
+	h2mod->set_unit_biped(BipedType::MasterChiefMp, index);
 	h2mod->set_unit_speed(1.0f, index);
 	
-
 	GivePlayerWeapon(index, Weapon::shotgun, 1);
 	GivePlayerWeapon(index, Weapon::magnum, 0);
 }
@@ -156,13 +155,13 @@ void Infection::spawnPlayerClientSetup(int index) {
 		}
 
 		if (h2mod->get_local_team_index() == HUMAN_TEAM) {
-			h2mod->PatchWeaponsInteraction(true);
+			h2mod->DisableWeaponPickup(true);
 			h2mod->IndicatorVisibility(false);
 		}
 		else if (h2mod->get_local_team_index() == ZOMBIE_TEAM) {
 			h2mod->set_unit_biped(BipedType::Elite, index);
 
-			h2mod->PatchWeaponsInteraction(false);
+			h2mod->DisableWeaponPickup(false);
 			h2mod->IndicatorVisibility(true);
 		}
 	}

@@ -412,7 +412,11 @@ bool engine_basic_init()
 				sub_671B02_orig = (sub_671B02_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x271B02, (BYTE*)sub_671B02_hook, 5);
 				VirtualProtect(sub_671B02_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 			}
-#ifdef _DEBUG
+			else if (_wcsicmp(cmd_line_arg, L"-nosecureaddr") == 0)
+			{
+				using_secure = false;
+			}
+#ifdef _DEBUG	
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
 				int flag_id = _wtol(&cmd_line_arg[10]);
 				flags_array[min(max(0, flag_id), flags::count - 1)] = 1;
@@ -963,35 +967,7 @@ class test_engine : public c_game_engine_base
 };
 test_engine g_test_engine;
 
-#pragma region XNet stuff
-typedef char(__stdcall *cmp_xnkid)(int thisx, int a2);
-cmp_xnkid p_cmp_xnkid;
 
-char __stdcall xnkid_cmp(int thisx, int a2)
-{
-	return 1;
-}
-
-/* All this does is patch some checks that cause using actual ip addresses not to work. */
-/* When a call to XNetXnaddrtoInaddr happens we provide the actual ip address rather than a secure key */
-void H2Tweaks::removeXNetSecurity()
-{
-	DWORD dwBack;
-	BYTE jmp = { 0xEB };
-	// apparently the secure address has 1 free byte 
-	// after HTONL call, game is checking the al register (the lower 8 bits of eax register) if it is zero, if not everything network related will fail
-	WriteBytes((DWORD)GetAddress(0x1B5DBE, 0x1961F8), &jmp, 1);
-	NopFill<2>((DWORD)GetAddress(0x1B624A, 0x196684));
-	NopFill<2>((DWORD)GetAddress(0x1B6201, 0x19663B));
-	NopFill<2>((DWORD)GetAddress(0x1B62BC, 0x1966F4));
-
-	NopFill<9>((DWORD)GetAddress(0x1F1F94, 0x1B3CC3)); 
-
-	/* XNKEY bs */
-	p_cmp_xnkid = (cmp_xnkid)DetourClassFunc((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x199F02 : 0x1C284A), (BYTE*)xnkid_cmp, 9);
-	VirtualProtect(p_cmp_xnkid, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-}
-#pragma end
 
 
 void InitH2Tweaks() {
@@ -1109,11 +1085,8 @@ void InitH2Tweaks() {
 	PatchCall(GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
-	NopFill<3>((DWORD)GetAddress(0x1F1F9A, 0x1B3CC9));
 	//H2Tweaks::applyPlayersActionsUpdateRatePatch(); //breaks aim assist
 	
-	H2Tweaks::removeXNetSecurity();
-
 	addDebugText("End Startup Tweaks.");
 }
 
@@ -1264,7 +1237,6 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 			*configArray[i] = tempArray[i];
 		}
 	}
-
 
 	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) {
 

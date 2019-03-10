@@ -83,4 +83,8 @@ void GetAchievements()
 			achievementList[id] = 1;
 		}
 	}
+
+	// enable single player achievements
+	if (!h2mod->Server)
+		*(BYTE*)(h2mod->GetBase() + 0x518210 + 0x1B41)  = (BYTE)1;
 }

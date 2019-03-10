@@ -45,9 +45,10 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	StatusCheater = false;
 
 	XNADDR pxna;
+	memset(&pxna, NULL, sizeof(XNADDR));
 
-	pxna.inaOnline.s_addr = saddr;
 	pxna.ina.s_addr = xnaddr;
+	pxna.inaOnline.s_addr = saddr;
 	pxna.wPortOnline = htons(H2Config_base_port);
 
 	BYTE abEnet2[6];

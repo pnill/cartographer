@@ -41,7 +41,7 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 
 
 	// error
-	return -1;
+	return ERROR_NOT_LOGGED_ON;
 }
 
 
@@ -128,10 +128,6 @@ DWORD WINAPI XUserGetName(DWORD dwUserIndex, LPSTR szUserName, DWORD cchUserName
 	return ERROR_NO_SUCH_USER;
 }
 
-
-
-
-
 // #5267: XUserGetSigninInfo
 int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_INFO pSigninInfo)
 {
@@ -189,8 +185,6 @@ int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_IN
 	else
 	{
 		if (print < 15) TRACE("- Not signed in");
-
-		pSigninInfo->xuid = INVALID_XUID;
 	}
 
 
