@@ -842,28 +842,7 @@ bool __stdcall bind_network_sockets(__int16 a1, __int16 port, char a3, DWORD *a4
 	return p_bind_network_sockets(a1, port, a3, a4);
 }
 
-extern SOCKET game_network_message_gateway_socket;
-signed int sendSecurePacket()
-{
-	if (using_secure)
-	{
-		SOCKADDR_IN sendToAddr;
-		short port = userManager.game_host_xn.wPortOnline;
-		if (userManager.game_host_xn.ina.s_addr != H2Config_ip_wan)
-			sendToAddr.sin_addr.s_addr = userManager.game_host_xn.ina.s_addr;
-		else
-			sendToAddr.sin_addr.s_addr = H2Config_ip_lan;
 
-		sendToAddr.sin_port = port;
-		sendToAddr.sin_family = AF_INET;
-
-		int ret = sendto(game_network_message_gateway_socket, userManager.secure_packet, 12 + sizeof(XNADDR), NULL, (SOCKADDR*)&sendToAddr, sizeof(sendToAddr));
-		TRACE_GAME_NETWORK_N("[H2MOD-Network] secure packet sent, return code: %d", ret);
-
-		return ret;
-	}
-	return 0;
-}
 
 typedef void(__stdcall *tjoin_game)(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14);
 tjoin_game pjoin_game;

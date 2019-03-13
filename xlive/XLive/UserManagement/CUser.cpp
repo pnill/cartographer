@@ -21,6 +21,29 @@ NOTE:
 	Check inside Tweaks.cpp for removeXNetSecurity
 */
 
+extern SOCKET game_network_message_gateway_socket;
+signed int CUserManagement::sendSecurePacket()
+{
+	if (using_secure)
+	{
+		SOCKADDR_IN sendToAddr;
+		short port = userManager.game_host_xn.wPortOnline;
+		if (userManager.game_host_xn.ina.s_addr != H2Config_ip_wan)
+			sendToAddr.sin_addr.s_addr = userManager.game_host_xn.ina.s_addr;
+		else
+			sendToAddr.sin_addr.s_addr = H2Config_ip_lan;
+
+		sendToAddr.sin_port = port;
+		sendToAddr.sin_family = AF_INET;
+
+		int ret = sendto(game_network_message_gateway_socket, userManager.secure_packet, 12 + sizeof(XNADDR), NULL, (SOCKADDR*)&sendToAddr, sizeof(sendToAddr));
+		TRACE_GAME_NETWORK_N("[H2MOD-Network] secure packet sent, return code: %d", ret);
+
+		return ret;
+	}
+	return 0;
+}
+
 void CUserManagement::CreateUser(const XNADDR* pxna)
 {
 	TRACE_GAME_NETWORK_N("CUserManagement::CreateUser() ip/secure address: %08X", using_secure ? pxna->inaOnline.s_addr : pxna->ina.s_addr);
@@ -68,12 +91,15 @@ void CUserManagement::UnregisterSecureAddr(const IN_ADDR ina)
 		if (to_remove_user != nullptr) 
 		{
 			std::pair<ULONG, short> smap, smap1;
-			smap = std::make_pair(to_remove_user->xnaddr.ina.s_addr, to_remove_user->xnaddr.wPortOnline);
-			smap1 = std::make_pair(to_remove_user->xnaddr.ina.s_addr, ntohs(htons(to_remove_user->xnaddr.wPortOnline) + 1));
 			if (to_remove_user->xnaddr.ina.s_addr == H2Config_ip_wan) 
 			{
 				smap = std::make_pair(H2Config_ip_lan, to_remove_user->xnaddr.wPortOnline);
 				smap1 = std::make_pair(H2Config_ip_lan, ntohs(htons(to_remove_user->xnaddr.wPortOnline) + 1));
+			}
+			else
+			{
+				smap = std::make_pair(to_remove_user->xnaddr.ina.s_addr, to_remove_user->xnaddr.wPortOnline);
+				smap1 = std::make_pair(to_remove_user->xnaddr.ina.s_addr, ntohs(htons(to_remove_user->xnaddr.wPortOnline) + 1));
 			}
 			auto sec_map = secure_map.find(smap);
 			auto sec_map1 = secure_map.find(smap1);
