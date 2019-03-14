@@ -376,7 +376,6 @@ void InitH2Startup() {
 	
 	initInstanceNumber();
 	
-	extern bool using_secure;
 	if (ArgList != NULL)
 	{
 		for (int i = 0; i < ArgCnt; i++)
@@ -389,10 +388,6 @@ void InitH2Startup() {
 					FlagFilePathConfig = (wchar_t*)malloc(sizeof(wchar_t) * pfcbuflen);
 					swprintf(FlagFilePathConfig, pfcbuflen, ArgList[i] + 10);
 				}
-			}
-			else if (_wcsicmp(ArgList[i], L"-nosecureaddr") == 0)
-			{
-				using_secure = false;
 			}
 		}
 	}

@@ -412,10 +412,6 @@ bool engine_basic_init()
 				sub_671B02_orig = (sub_671B02_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x271B02, (BYTE*)sub_671B02_hook, 5);
 				VirtualProtect(sub_671B02_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 			}
-			else if (_wcsicmp(cmd_line_arg, L"-nosecureaddr") == 0)
-			{
-				using_secure = false;
-			}
 #ifdef _DEBUG	
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
 				int flag_id = _wtol(&cmd_line_arg[10]);
@@ -1250,10 +1246,7 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 			else {
 				*reinterpret_cast<short*>(WEAPONS[i]) = *configArray[i];
 			}
-
 		}
-		
-
 	}
 }
 

@@ -14,6 +14,8 @@
 #define CHAT_PACKET_SIZE CHAT_PACKET_ORG_SIZE + CHAT_PACKET_EXTEND_SIZE
 
 extern unsigned short H2Config_base_port;
+extern SOCKET game_network_data_gateway_socket_1000;
+extern SOCKET game_network_message_gateway_socket_1001;
 
 const char* getTextForEnum(int enumVal) {
 	return packet_type_strings[enumVal];
@@ -248,6 +250,7 @@ bool __cdecl refuse_read(int a1, int a2, int a3) {
 }
 
 int __cdecl establish_write(void* a1, int a2, int a3) {
+	userManager.sendSecurePacket(game_network_data_gateway_socket_1000, 1000);
 	getDataEncodeIntegerMethod()(a1, (int)"remote-identifier", *(DWORD *)a3, 32);
 	int result = getDataEncodeIntegerMethod()(a1, (int)"reason", *(DWORD *)(a3 + 4), 32);
 	//TRACE_GAME_NETWORK_N("[H2MOD-network] connection establish write, remote-identifier=%d, identifier=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4));
@@ -751,99 +754,6 @@ void __cdecl serializeParametersUpdatePacket(void* a1, int a2, int a3) {
 	serialize_parameters_update_packet_method(a1, a2, a3);
 }
 
-#pragma region XNet stuff
-typedef char(__stdcall *cmp_xnkid)(int thisx, int a2);
-cmp_xnkid p_cmp_xnkid;
-
-char __stdcall xnkid_cmp(int thisx, int a2)
-{
-	return 1;
-}
-
-/* WIP */
-/* All this does is patch some checks that cause using actual ip addresses not to work. */
-/* When a call to XNetXnaddrtoInaddr happens we provide the actual ip address rather than a secure key */
-void removeXNetSecurity()
-{
-	DWORD dwBack;
-	/* XNKEY bs */
-	p_cmp_xnkid = (cmp_xnkid)DetourClassFunc((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x199F02 : 0x1C284A), (BYTE*)xnkid_cmp, 9);
-	VirtualProtect(p_cmp_xnkid, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-	NopFill<9>(h2mod->GetBase() + (h2mod->Server ? 0x1B3CC3 : 0x1F1F94)); // check if secure/ipaddress != 127.0.0.1
-	if (!using_secure)
-	{	
-		BYTE jmp = 0xEB;
-		// apparently the secure address has 1 free byte 
-		// after HTONL call, game is checking the al register (the lower 8 bits of eax register) if it is zero, if not everything network related will fail
-		WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1961F8 : 0x1B5DBE), &jmp, 1);
-		NopFill<2>(h2mod->GetBase() + (h2mod->Server ? 0x196684 : 0x1B624A));
-		NopFill<2>(h2mod->GetBase() + (h2mod->Server ? 0x19663B : 0x1B6201));
-		NopFill<2>(h2mod->GetBase() + (h2mod->Server ? 0x1966F4 : 0x1B62BC));
-	}
-}
-
-#pragma end
-
-typedef bool(__cdecl* get_and_initialize_peer_network_info_impl)(int a1, DWORD *a2, XNADDR *xn, int port, void* a5);
-get_and_initialize_peer_network_info_impl p_get_and_initialize_peer_network_info;
-
-bool __cdecl get_and_initialize_peer_network_info(int a1, DWORD *a2, XNADDR *xn, int port, void* a5)
-{
-	switch (port)
-	{
-	case 1000:
-		port = htons(xn->wPortOnline);
-		break;
-	case 1001:
-		port = htons(xn->wPortOnline) + 1;
-		break;
-	case 1005:
-		port = htons(xn->wPortOnline) + 5;
-		break;
-	case 1006:
-		port = htons(xn->wPortOnline) + 6;
-		break;
-
-	default:
-		break;
-	}
-	//std::string dbg = "create network channel: " + std::to_string(port);
-	//addDebugText(dbg.c_str());
-
-	return p_get_and_initialize_peer_network_info(a1, a2, xn, port, a5);
-}
-
-typedef bool(__stdcall *bind_network_sockets_impl)(__int16 a1, __int16 port, char a3, DWORD *a4);
-bind_network_sockets_impl p_bind_network_sockets;
-
-bool __stdcall bind_network_sockets(__int16 a1, __int16 port, char a3, DWORD *a4)
-{
-	switch (port)
-	{
-	case 1000:
-		port = H2Config_base_port;
-		break;
-	case 1001:
-		port = H2Config_base_port + 1;
-		break;
-	case 1005:
-		port = H2Config_base_port + 5;
-		break;
-	case 1006:
-		port = H2Config_base_port + 6;
-		break;
-
-	default:
-		break;
-	}
-	TRACE_GAME_NETWORK_N("[H2MOD-Network] created network endpoints: %d", port);
-
-	return p_bind_network_sockets(a1, port, a3, a4);
-}
-
-
-
 typedef void(__stdcall *tjoin_game)(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14);
 tjoin_game pjoin_game;
 
@@ -852,8 +762,8 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 	memset(&userManager.game_host_xn, NULL, sizeof(XNADDR));
 	memcpy(&userManager.game_host_xn, host_xn, sizeof(XNADDR));
 	TRACE_GAME_NETWORK_N("[H2MOD-Network] copied host information, XNADDR: %08X", userManager.game_host_xn.ina.s_addr);
-	userManager.CreateUser(host_xn);
-	sendSecurePacket();
+	userManager.sendSecurePacket(game_network_message_gateway_socket_1001, 1001);
+	userManager.CreateUser(host_xn, FALSE);
 	return pjoin_game(thisptr, a2, a3, a4, a5, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 
@@ -871,37 +781,63 @@ bool __cdecl deserialize_join_request(void* a1, int a2, int a3)
 
 	bool ret = p_deserialize_join_request_impl(a1, a2, a3);
 
-	XNADDR* joining_player_addr = reinterpret_cast<XNADDR*>((BYTE*)a3 + 1320);
-	if (ret == true && !using_secure)
-		userManager.CreateUser(joining_player_addr);
+	/*XNADDR* joining_player_addr = reinterpret_cast<XNADDR*>((BYTE*)a3 + 1320);
+	if (ret == true)
+		userManager.CreateUser(joining_player_addr, TRUE);*/
 	
 	return ret;
 }
 
+/* WIP */
+/* All this does is patch some checks that cause using actual ip addresses not to work. */
+/* When a call to XNetXnaddrtoInaddr happens we provide the actual ip address rather than a secure key */
+typedef char(__stdcall *cmp_xnkid)(int thisx, int a2);
+cmp_xnkid p_cmp_xnkid;
+char __stdcall xnkid_cmp(int thisx, int a2)
+{
+	return 1;
+}
+
+void removeXNetSecurity()
+{
+	DWORD dwBack;
+	/* XNKEY bs */
+	p_cmp_xnkid = (cmp_xnkid)DetourClassFunc((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x199F02 : 0x1C284A), (BYTE*)xnkid_cmp, 9);
+	VirtualProtect(p_cmp_xnkid, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	NopFill<9>(h2mod->GetBase() + (h2mod->Server ? 0x1B3CC3 : 0x1F1F94)); // check if secure/ipaddress != 127.0.0.1
+
+	BYTE jmp = 0xEB;
+	// apparently the secure address has 1 free byte 
+	// after HTONL call, game is checking the al register (the lower 8 bits of eax register) if it is zero, if not everything network related will fail
+	WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1961F8 : 0x1B5DBE), &jmp, 1);
+	NopFill<2>(h2mod->GetBase() + (h2mod->Server ? 0x196684 : 0x1B624A));
+	NopFill<2>(h2mod->GetBase() + (h2mod->Server ? 0x19663B : 0x1B6201));
+	NopFill<2>(h2mod->GetBase() + (h2mod->Server ? 0x1966F4 : 0x1B62BC));
+	
+}
+
+//float unk_flt_ = 60.0f;
 void applyConnectionPatches()
 {
 	DWORD dwBack;
-	removeXNetSecurity();
+	//removeXNetSecurity();
 	WritePointer(h2mod->GetBase() + (h2mod->Server ? 0x1D20E4 : 0x1F172B), (void*)deserialize_join_request);
-
-	p_bind_network_sockets = (bind_network_sockets_impl)DetourFunc((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x1C939B : 0x1BA57A), (BYTE*)bind_network_sockets, 8);
-	VirtualProtect(p_bind_network_sockets, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	// makes Live network not as laggy 
 	int data = 500;
 	WriteValue<int>(h2mod->GetBase() + (h2mod->Server ? 0x24896 : 0x28702), data);
+	
+	// research
+	/*DWORD addresses[] = { 0x1BDE27, 0x1BE2FA, 0x1BFB3C, 0x1C11FA, 0x1C12BF };
+	DWORD addresses_dedi[] = { 0x1B7D01, 0x1B81D4, 0x1B9A1C, 0x1BB0DA, 0x1BB19F };
+	int size = h2mod->Server ? sizeof(addresses_dedi) : sizeof(addresses);
+	for (int i = 0; i < sizeof(size); i++)
+	{
+		DWORD addr = h2mod->Server ? addresses_dedi[i] : addresses[i];
+		WritePointer(h2mod->GetBase() + addr + 4, &unk_flt_);
+	}*/
 
-	//p_get_and_initialize_peer_network_info = (get_and_initialize_peer_network_info_impl)DetourFunc((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x196313 : 0x1B5ED9), (BYTE*)get_and_initialize_peer_network_info, 7);
-	//VirtualProtect(p_get_and_initialize_peer_network_info, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-	/*BYTE add_word_ptr = 0x81;
-	BYTE sub_word_ptr = 0x6C;
-	WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1C98EA : 0x1BAAC9) + 1, &sub_word_ptr, 1);
-	WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1C98EA : 0x1BAAC9), &add_word_ptr, 1); WriteValue<WORD>(h2mod->GetBase() + (h2mod->Server ? 0x1C98EA : 0x1BAAC9) + 4, 1); // case 1000
-	WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1C9905 : 0x1BAAE4), &add_word_ptr, 1); WriteValue<WORD>(h2mod->GetBase() + (h2mod->Server ? 0x1C9905 : 0x1BAAE4) + 4, 0); // case 1001*/
-
-	//WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1C98F3 : 0x1BAAD2), &add_word_ptr, 1); WriteValue<WORD>(h2mod->GetBase() + (h2mod->Server ? 0x1C98F3 : 0x1BAAD2) + 4, 5);
-	//WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1C98FC : 0x1BAADB), &add_word_ptr, 1); WriteValue<WORD>(h2mod->GetBase() + (h2mod->Server ? 0x1C98FC : 0x1BAADB) + 4, 6);
 
 	if (!h2mod->Server)
 	{

@@ -9,6 +9,7 @@ class CUser
 public:
 	XNADDR xnaddr;
 	XNKID xnkid;
+	IN_ADDR secure;
 	bool bValid;
 };
 
@@ -33,23 +34,36 @@ template<typename S, typename T> struct std::hash < std::pair<S, T> >
 class CUserManagement
 {
 public:
-	void CreateUser(const XNADDR *pxna);
+	ULONG GetXNFromSecure(ULONG secure);
+	ULONG GetSecureFromXN(XNADDR *pxna);
+
+	void CreateUser(const XNADDR *pxna, BOOL user);
+	void RegisterLocalRequest(char* token, int a2);
 	void UnregisterSecureAddr(const IN_ADDR ina);
 
 	void UpdateConnectionStatus();
 	BOOL LocalUserLoggedIn();
 	void UnregisterLocal();
 	void ConfigureLocalUser(XNADDR* pxna, ULONGLONG xuid, char* username);
+	int sendSecurePacket(SOCKET s, short to_port);
+
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 
-	std::unordered_map<ULONG, CUser*> address_to_user; // iplong/secure->CUser
-	std::unordered_map<std::pair<ULONG, short>, ULONG> secure_map;
+	std::unordered_map<ULONG, CUser*> cusers; // Map Key(SecureADDR)->CUser
+	std::unordered_map<std::pair<ULONG, SHORT>, ULONG> secure_map; // Map Key(XNHost,XnPort)->Secure
+	std::unordered_map<ULONG, ULONG> xnmap; // Map Key(Secure)->XNHost;
+	std::unordered_map<std::string, ULONG> xntosecure; //Map Key(Xn->Abenet)->Secure Addr
+	std::unordered_map<ULONG, SHORT> pmap_a;
+	std::unordered_map<ULONG, SHORT> pmap_b;
+	std::unordered_map<ULONG, SHORT> pmap_c;
+	std::unordered_map<ULONG, SHORT> pmap_d;
+	std::unordered_map<SOCKET, SHORT> sockmap;
+
 	CUser local_user;
 	XNADDR game_host_xn;
-	char *secure_packet;
+	char* secure_packet;
 };
 
-extern bool using_secure;
 extern wchar_t ServerLobbyName[32];
 void SetUserUsername(char* username);
 extern CUserManagement userManager;

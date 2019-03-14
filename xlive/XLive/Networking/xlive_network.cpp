@@ -6,7 +6,8 @@
 
 int MasterState = 0;
 ModuleUPnP *upnp = nullptr;
-SOCKET game_network_message_gateway_socket = INVALID_SOCKET;
+SOCKET game_network_data_gateway_socket_1000 = INVALID_SOCKET; // used for game data
+SOCKET game_network_message_gateway_socket_1001 = INVALID_SOCKET; // used for messaging like connection requests
 
 void ForwardPorts()
 {
@@ -15,8 +16,8 @@ void ForwardPorts()
 
 	upnp->UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2");
 	upnp->UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2_1");
-	upnp->UPnPForwardPort(false, (H2Config_base_port + 5), (H2Config_base_port + 5), "Halo2_2");
-	upnp->UPnPForwardPort(false, (H2Config_base_port + 6), (H2Config_base_port + 6), "Halo2_3");
+	//upnp->UPnPForwardPort(false, (H2Config_base_port + 5), (H2Config_base_port + 5), "Halo2_2");
+	//upnp->UPnPForwardPort(false, (H2Config_base_port + 6), (H2Config_base_port + 6), "Halo2_3");
 	upnp->UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
 
 	TRACE_GAME_NETWORK_N("[UPNP] Finished forwarding ports.");
@@ -81,12 +82,28 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 {
 	u_short port = (((struct sockaddr_in*)name)->sin_port);
 
-	TRACE_GAME_NETWORK_N("[H2MOD-Network] game bound socket: %i", ntohs(port));
+	TRACE_GAME_NETWORK_N("[H2MOD-Network] game bound socket: %i", htons(port));
 	if (s == voice_sock)
-		TRACE_GAME_NETWORK_N("[H2MOD-Network] could be voice socket", ntohs(port));
+		TRACE_GAME_NETWORK_N("[H2MOD-Network] could be voice socket", htons(port));
 
-	if (ntohs(port) == H2Config_base_port + 1)
-		game_network_message_gateway_socket = s;
+	if (htons(port) == 1000) {
+		game_network_data_gateway_socket_1000 = s;
+		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port);
+		TRACE_GAME_NETWORK_N("[H2MOD-Network] replaced port %i with %i", htons(port), H2Config_base_port);
+	}
+
+	if (htons(port) == 1001) {
+		game_network_message_gateway_socket_1001= s;
+		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port + 1);
+		TRACE_GAME_NETWORK_N("[H2MOD-Network] replaced port %i with %i", htons(port), H2Config_base_port + 1);
+	}
+
+	if (htons(port) == 1005)
+		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port + 5);
+	if (htons(port) == 1006)
+		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port + 6);
+	
+	userManager.sockmap[s] = ntohs(port);
 
 	SOCKET ret = bind(s, name, namelen);
 	
@@ -126,10 +143,11 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 // #73: XNetGetTitleXnAddr
 DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pAddr)
 {
-	if (pAddr && userManager.GetLocalXNAddr(pAddr))
-		return XNET_GET_XNADDR_STATIC | XNET_GET_XNADDR_ETHERNET;
-
-	return XNET_GET_XNADDR_PENDING;
+	if (pAddr)
+	{
+		userManager.GetLocalXNAddr(pAddr);
+	}
+	return XNET_GET_XNADDR_STATIC | XNET_GET_XNADDR_ETHERNET;
 }
 
 // #24: XSocketSendTo
@@ -147,68 +165,81 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		return sendto(s, buf, len, flags, to, tolen);
 	}
 
+	/*
+		Create new SOCKADDR_IN structure,
+		If we overwrite the original the game's security functions know it's not a secure address any longer.
+		Worst case if this is found to cause performance issues we can handle the send and re-update to secure before return.
+	*/
+
 	SOCKADDR_IN SendStruct;
 	SendStruct.sin_port = port;
-	SendStruct.sin_family = AF_INET;
 	SendStruct.sin_addr.s_addr = iplong;
+	SendStruct.sin_family = AF_INET;
 
-	// get the port of the user we have to send data
-	CUser* userToSend = userManager.address_to_user[iplong];
-	if (userToSend == nullptr)
-		TRACE_GAME_NETWORK_N("XSocketSendTo() Failed to get the user with ip or secure address: %08X", iplong);
-
-	if (userToSend != nullptr) 
+	/*
+	 Handle NAT map socket to port
+	 Switch on port to determine which port we're intending to send to.
+	 1000-> User.pmap_a[secureaddress]
+	 1001-> User.pmap_b[secureaddress]
+	*/
+	u_short nPort = 0;
+	switch (htons(port))
 	{
-		switch (htons(port))
+	case 1000:
+		nPort = userManager.pmap_a[iplong];
+
+		if (nPort != 0)
 		{
-		case 1000:
-			SendStruct.sin_port = userToSend->xnaddr.wPortOnline;
-			break;
-
-		case 1001:
-			SendStruct.sin_port = ntohs(htons(userToSend->xnaddr.wPortOnline) + 1);
-			break;
-
-		case 1005:
-			SendStruct.sin_port = ntohs(htons(userToSend->xnaddr.wPortOnline) + 5);
-			break;
-
-		case 1006:
-			SendStruct.sin_port = ntohs(htons(userToSend->xnaddr.wPortOnline) + 6);
-			break;
-
-		default:
-			TRACE_GAME_NETWORK_N("XSocketSendTo() port: %i not matched!", htons(port));
-			break;
+			//TRACE("XSocketSendTo() port 1000 nPort: %i secure: %08X", htons(nPort), iplong);
+			SendStruct.sin_port = nPort;
 		}
-		SendStruct.sin_addr.s_addr = userToSend->xnaddr.ina.s_addr;
+		else {
+			SendStruct.sin_port = ntohs(2000);
+		}
+
+		break;
+
+	case 1001:
+		nPort = userManager.pmap_b[iplong];
+
+		if (nPort != 0)
+		{
+			//TRACE("XSocketSendTo() port 1001 nPort: %i secure: %08X", htons(nPort), iplong);
+			SendStruct.sin_port = nPort;
+		}
+		else {
+			SendStruct.sin_port = ntohs(2001);
+		}
+
+		break;
+
+	default:
+		//TRACE("XSocketSendTo() port: %i not matched!", htons(port));
+		break;
 	}
 
-	//TRACE_GAME_NETWORK_N("SendStruct.sin_addr.s_addr == %08X", SendStruct.sin_addr.s_addr);
+	u_long xn = userManager.xnmap[iplong];
+
+	if (xn != 0)
+	{
+		SendStruct.sin_addr.s_addr = xn;
+	}
+
+	//TRACE("SendStruct.sin_addr.s_addr == %08X", SendStruct.sin_addr.s_addr);
 
 	if (SendStruct.sin_addr.s_addr == H2Config_ip_wan)
 	{
-		//TRACE_GAME_NETWORK_N("Matched g_lWANIP:%08X", H2Config_ip_wan);
+		//TRACE("Matched g_lWANIP:%08X", H2Config_ip_wan);
 		SendStruct.sin_addr.s_addr = H2Config_ip_lan;
-		//TRACE_GAME_NETWORK_N("Replaced send struct s_addr with g_lLANIP: %08X", H2Config_ip_lan);
+		//TRACE("Replaced send struct s_addr with g_lLANIP: %08X", H2Config_ip_lan);
 	}
-
-	
-	/*extern void addDebugText(const char*);
-	static int max_dbg;
-	if (max_dbg < 20)
-	{
-		std::string dbg = "sendto port:" + std::to_string(htons(SendStruct.sin_port));
-		addDebugText(dbg.c_str());
-		max_dbg++;
-	}*/
 
 	int ret = sendto(s, buf, len, flags, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
 
 	if (ret == SOCKET_ERROR)
 	{
-		TRACE_GAME_NETWORK_N("XSocketSendTo() - Socket Error True");
-		TRACE_GAME_NETWORK_N("XSocketSendTo() - WSAGetLastError(): %08X", WSAGetLastError());
+		TRACE_GAME_NETWORK_N("XSocketSendTo - Socket Error True");
+		TRACE_GAME_NETWORK_N("XSocketSendTo - WSAGetLastError(): %08X", WSAGetLastError());
 	}
 
 	return ret;
@@ -218,35 +249,70 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *from, int *fromlen)
 {
 	int ret = recvfrom(s, buf, len, flags, from, fromlen);
-	u_short port  = (((struct sockaddr_in*)from)->sin_port);
-	u_long iplong = (((struct sockaddr_in*)from)->sin_addr.s_addr);
-
-	if (iplong == H2Config_master_ip)
-		return ret;
 	
 	if (ret > 0)
 	{
-		if (using_secure)
+		short port = (((struct sockaddr_in*)from)->sin_port);
+		u_long iplong = (((struct sockaddr_in*)from)->sin_addr.s_addr);
+		std::pair <ULONG, SHORT> hostpair = std::make_pair(iplong, port);
+
+		if (iplong != H2Config_master_ip)
 		{
-			std::pair<ULONG, short> spair = std::make_pair(iplong, port);
-			if (*(DWORD*)&buf[0] == annoyance_factor)
+			if (*(ULONG*)buf == annoyance_factor && ret == 12 + sizeof(XNADDR))
 			{
-				XNADDR* nuser = reinterpret_cast<XNADDR*>(&buf[4]);
-				TRACE_GAME_NETWORK_N("[H2MOD-Network] received secure packet from user with XNADDR: %08X", nuser->ina.s_addr);
-				userManager.CreateUser(nuser);
-				spair = std::make_pair(iplong, nuser->wPortOnline);
+				ULONG secure = *(ULONG*)(buf + 4);
+
+				userManager.secure_map[hostpair] = secure;
+
+				TRACE_GAME_NETWORK("[H2MOD-Network] Received secure packet with ip addr %08X, port: %i, secure: %08X", htonl(iplong), htons(port), secure);
+				CUser* user = userManager.cusers[secure]; // Try to get the user by the secure address they've sent.
+				if (user)
+				{
+					if (user->xnaddr.ina.s_addr != iplong)
+					{
+						user->xnaddr.ina.s_addr = iplong;
+					}
+				}
+				else // only create the user if they're not already in the system.
+					userManager.CreateUser((XNADDR*)(buf + 8), TRUE);
+
 				ret = 0;
 			}
 
-			ULONG secure = userManager.secure_map[spair];
+			ULONG secure = userManager.secure_map[hostpair];
 
-			if (secure != NULL)
+			(((struct sockaddr_in*)from)->sin_addr.s_addr) = secure;
+
+			if (secure == 0)
 			{
-				((struct sockaddr_in*)from)->sin_addr.s_addr = secure;
+				TRACE_GAME_NETWORK_N("[H2MOD-Network] This is probably the issue.... now the fucking recv address is 0 you numb nuts. iplong: %08X, port: %i", htonl(iplong), htons(port));
 			}
 			else
 			{
-				TRACE_GAME_NETWORK_N("[H2MOD-Network] recvfrom: this is probably the issue....now the fucking recv address is 0 you numb nuts. iplong: %08X, port: %i", iplong, htons(port));
+				userManager.xnmap[secure] = iplong;
+			}
+
+			/* Store NAT data
+			   First we look at our socket's intended port.
+			   port 1000 is mapped to the receiving port pmap_a via the secure address.
+			   port 1001 is mapped to the receiving port pmap_b via the secure address.
+			  */
+			switch (userManager.sockmap[s])
+			{
+			case 1000:
+				//TRACE("XSocketRecvFrom() User.sockmap mapping port 1000 - port: %i, secure: %08X", htons(port), secure);
+				userManager.pmap_a[secure] = port;
+				break;
+
+			case 1001:
+				//TRACE("XSocketRecvFrom() User.sockmap mapping port 1001 - port: %i, secure: %08X", htons(port), secure);
+				userManager.pmap_b[secure] = port;
+				break;
+
+			default:
+				//TRACE("XSocketRecvFrom() User.sockmap[s] didn't match any ports!");
+				break;
+
 			}
 		}
 	}

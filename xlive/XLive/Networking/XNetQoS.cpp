@@ -247,7 +247,7 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 	memset(acceptSockInfo->DataBuf.buf, NULL, acceptSockInfo->DataBuf.len);
 	memcpy(acceptSockInfo->DataBuf.buf, c_xnetqos.pbData, acceptSockInfo->DataBuf.len);
 
-	TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> socket: %d", acceptSockInfo->Socket);
+	//TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> socket: %d", acceptSockInfo->Socket);
 
 	if (dwError != 0)
 	{
@@ -286,7 +286,7 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 		}
 
 		else if (wsaError == ERROR_SUCCESS)
-			return; // do not clear the data if operation is successful because it gets used by the callback too
+			return; // do not clear the data if operation is successful because it gets used by the callback
 
 		else
 			goto cleanup;		
@@ -520,7 +520,6 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 DWORD WINAPI XNetQosServiceLookup(DWORD a1, DWORD a2, DWORD a3)
 {
 	TRACE_GAME_NETWORK_N("XNetQosServiceLookup");
-
 
 	// not connected to LIVE - abort now
 	// - wants a3 return ASYNC struct
