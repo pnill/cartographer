@@ -134,6 +134,13 @@ void GunGame::resetPlayerLevels() {
 	gungamePlayers.clear();
 }
 
+void GunGame::setGameScore() {
+	if (H2IsDediServer) {
+		*(int*)(0x300015F4) = 17;
+	}
+	*(int*)(0x30001A48) = 17;
+}
+
 void GunGame::spawnPlayerServer(int playerIndex) {
 	wchar_t* pName = h2mod->get_player_name_from_index(playerIndex);
 	wchar_t* localName = h2mod->get_local_player_name();
@@ -294,11 +301,13 @@ void GunGameDeinitializer::onPeerHost() {
 
 void GunGameInitializer::onClient() {
 	GunGame::initWeaponLevels();
+	GunGame::setGameScore();
 }
 
 void GunGameInitializer::onDedi() {
 	GunGame::initWeaponLevels();
 	GunGame::resetPlayerLevels();
+	GunGame::setGameScore();
 }
 
 void GunGameInitializer::onPeerHost() {

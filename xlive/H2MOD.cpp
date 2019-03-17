@@ -1731,12 +1731,12 @@ void H2MOD::ApplyHooks() {
 		PatchWinAPICall(GetBase() + 0x9AF9E, CryptUnprotectDataHook);
 		PatchWinAPICall(GetBase() + 0x9B08A, CryptProtectDataHook);
 
-		//calculate_model_lod = GetBase() + 0x19CA3E;
-		//calculate_model_lod_detour_end = GetBase() + 0x19CDA3 + 5;
-		//WriteJmpTo(GetBase() + 0x19CDA3, calculate_model_lod_detour);
+		calculate_model_lod = GetBase() + 0x19CA3E;
+		calculate_model_lod_detour_end = GetBase() + 0x19CDA3 + 5;
+		WriteJmpTo(GetBase() + 0x19CDA3, calculate_model_lod_detour);
 
 		// set max model qaulity to L6
-		//WriteValue(GetBase() + 0x190B38 + 1, 5);
+		WriteValue(GetBase() + 0x190B38 + 1, 5);
 
 		pfn_c000bd114 = (tfn_c000bd114)DetourFunc((BYTE*)H2BaseAddr + 0x000bd114, (BYTE*)fn_c000bd114_IsSkullEnabled, 5);
 		PatchCall(Base + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
