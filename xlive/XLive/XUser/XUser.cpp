@@ -41,7 +41,7 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 
 
 	// error
-	return -1;
+	return ERROR_NOT_LOGGED_ON;
 }
 
 
@@ -128,10 +128,6 @@ DWORD WINAPI XUserGetName(DWORD dwUserIndex, LPSTR szUserName, DWORD cchUserName
 	return ERROR_NO_SUCH_USER;
 }
 
-
-
-
-
 // #5267: XUserGetSigninInfo
 int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_INFO pSigninInfo)
 {
@@ -189,8 +185,6 @@ int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_IN
 	else
 	{
 		if (print < 15) TRACE("- Not signed in");
-
-		pSigninInfo->xuid = INVALID_XUID;
 	}
 
 
@@ -204,6 +198,7 @@ int WINAPI XUserAreUsersFriends(DWORD dwUserIndex, DWORD * pXuids, DWORD dwXuidC
 	TRACE("XUserAreUsersFriends");
 	return ERROR_NOT_LOGGED_ON;
 }
+
 // #5265: XUserCheckPrivilege
 DWORD WINAPI XUserCheckPrivilege(DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeType, PBOOL pfResult)
 {
@@ -212,9 +207,6 @@ DWORD WINAPI XUserCheckPrivilege(DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeTyp
 
 	if (print < 15)
 	{
-
-
-
 		if (privilegeType == XPRIVILEGE_MULTIPLAYER_SESSIONS)
 			TRACE("- MULTIPLAYER_SESSIONS");
 
@@ -238,19 +230,11 @@ DWORD WINAPI XUserCheckPrivilege(DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeTyp
 		print++;
 	}
 
-	if (dwUserIndex == 0)
-	{
-		if (print < 15)
-			TRACE("- TRUE");
-
-
-
-		if (pfResult) *pfResult = TRUE;
+	
+	if (pfResult) {
+		*pfResult = TRUE;
 		return ERROR_SUCCESS;
 	}
-	else
-		*pfResult = FALSE;
-
 
 	return ERROR_NOT_LOGGED_ON;
 }

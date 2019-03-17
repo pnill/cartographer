@@ -719,8 +719,8 @@ void PoSmbstowcs(wchar_t* destsrc, int maxCount) {
 void GSCustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen, WORD charsAllowed, int menuIdTitle, int title, int menuIdDesc, int description) {
 	char* lblTitle = H2CustomLanguageGetLabel(menuIdTitle, title);
 	char* lblDesc = H2CustomLanguageGetLabel(menuIdDesc, description);
-	add_cartographer_label(CMLabelMenuId_VKeyTest, 0xFFFFFFF0, lblTitle, true);
-	add_cartographer_label(CMLabelMenuId_VKeyTest, 0xFFFFFFF1, lblDesc, true);
+//	add_cartographer_label(CMLabelMenuId_VKeyTest, 0xFFFFFFF0, lblTitle, true);
+//	add_cartographer_label(CMLabelMenuId_VKeyTest, 0xFFFFFFF1, lblDesc, true);
 
 	int(__thiscall*sub_20B0BC)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B0BC);
 	signed int(__thiscall*sub_20C226)(void*, __int16, int, int, int) = (signed int(__thiscall*)(void*, __int16, int, int, int))((char*)H2BaseAddr + 0x20C226);
@@ -2767,33 +2767,33 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 	else if (button_id == 1) {
 		GSCustomMenuCall_EditStaticLoD();
 	}
+//	else if (button_id == 2) {
+//		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
+//		//loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_controller_aim_assist = !H2Config_controller_aim_assist));
+//		RefreshToggleDisableControllerAimAssist();
+//	}
 	else if (button_id == 2) {
-		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
-		//loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_controller_aim_assist = !H2Config_controller_aim_assist));
-		RefreshToggleDisableControllerAimAssist();
-	}
-	else if (button_id == 3) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_discord_enable = !H2Config_discord_enable));
 		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
 	}
-	else if (button_id == 4) {
+	else if (button_id == 3) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_xDelay = !H2Config_xDelay));
 		RefreshTogglexDelay();
 	}
-	else if (button_id == 5) {
+	else if (button_id == 4) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF6, !(H2Config_skip_intro = !H2Config_skip_intro));
 	}
-	else if (button_id == 6) {
+	else if (button_id == 5) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, !(H2Config_disable_ingame_keyboard = !H2Config_disable_ingame_keyboard));
 		RefreshToggleIngameKeyboardControls();
 	}
-	else if (button_id == 7) {
+	else if (button_id == 6) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_raw_input = !H2Config_raw_input));
 		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
 	}
-	else if (button_id == 8) {
-		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_hitmarker_sound = !H2Config_hitmarker_sound));
-	}
+//	else if (button_id == 8) {
+//		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_hitmarker_sound = !H2Config_hitmarker_sound));
+//	}
 	return false;
 }
 
@@ -2833,14 +2833,14 @@ void CMSetupVFTables_OtherSettings() {
 }
 
 int __cdecl CustomMenu_OtherSettings(int a1) {
-	loadLabelToggle_OtherSettings(3, 0xFFFFFFF2, H2Config_controller_aim_assist);
-	loadLabelToggle_OtherSettings(4, 0xFFFFFFF2, H2Config_discord_enable);
-	loadLabelToggle_OtherSettings(5, 0xFFFFFFF2, H2Config_xDelay);
-	loadLabelToggle_OtherSettings(6, 0xFFFFFFF6, !H2Config_skip_intro);
-	loadLabelToggle_OtherSettings(7, 0xFFFFFFF2, !H2Config_disable_ingame_keyboard);
-	loadLabelToggle_OtherSettings(8, 0xFFFFFFF2, H2Config_raw_input);
-	loadLabelToggle_OtherSettings(9, 0xFFFFFFF2, H2Config_hitmarker_sound);
-	return CustomMenu_CallHead(a1, menu_vftable_1_OtherSettings, menu_vftable_2_OtherSettings, (DWORD)&CMButtonHandler_OtherSettings, 9, 272);
+//	loadLabelToggle_OtherSettings(3, 0xFFFFFFF2, H2Config_controller_aim_assist);
+	loadLabelToggle_OtherSettings(3, 0xFFFFFFF2, H2Config_discord_enable);
+	loadLabelToggle_OtherSettings(4, 0xFFFFFFF2, H2Config_xDelay);
+	loadLabelToggle_OtherSettings(5, 0xFFFFFFF6, !H2Config_skip_intro);
+	loadLabelToggle_OtherSettings(6, 0xFFFFFFF2, !H2Config_disable_ingame_keyboard);
+	loadLabelToggle_OtherSettings(7, 0xFFFFFFF2, H2Config_raw_input);
+//	loadLabelToggle_OtherSettings(9, 0xFFFFFFF2, H2Config_hitmarker_sound);
+	return CustomMenu_CallHead(a1, menu_vftable_1_OtherSettings, menu_vftable_2_OtherSettings, (DWORD)&CMButtonHandler_OtherSettings, 7, 272);
 }
 
 void GSCustomMenuCall_OtherSettings() {
@@ -2907,9 +2907,9 @@ static bool CMButtonHandler_AdvSettings(int button_id) {
 	else if (button_id == 3) {
 		GSCustomMenuCall_ToggleSkulls();
 	}
-	else if (button_id == 4) {
-		GSCustomMenuCall_AdvLobbySettings();
-	}
+//	else if (button_id == 4) {
+//		GSCustomMenuCall_AdvLobbySettings();
+//	}
 	return false;
 }
 
@@ -2949,7 +2949,7 @@ void CMSetupVFTables_AdvSettings() {
 }
 
 int __cdecl CustomMenu_AdvSettings(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, gameManager->isHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE ? 5 : 4, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, gameManager->isHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE ? 4 : 4, 272);
 }
 
 void GSCustomMenuCall_AdvSettings() {
@@ -4522,8 +4522,7 @@ void* __stdcall sub_23BC45(void* thisptr)//__thiscall
 }
 
 int __cdecl sub_209236(int a1,int a2) {
-	extern CUserManagement User;
-	if (User.LocalUserLoggedIn()) {
+	if (userManager.LocalUserLoggedIn()) {
 		int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
 		sub_209236(0,0);
 	}
@@ -4543,9 +4542,8 @@ typedef int(__cdecl *tsub_23f6b7)(int);
 tsub_23f6b7 psub_23f6b7;
 int __cdecl sub_23f6b7(int a1)
 {
-	extern CUserManagement User;
-	if (User.LocalUserLoggedIn()) {
-		User.UnregisterLocal();
+	if (userManager.LocalUserLoggedIn()) {
+		userManager.UnregisterLocal();
 	}
 	return psub_23f6b7(a1);
 }
@@ -4779,7 +4777,7 @@ void initGSCustomMenu() {
 
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 0xFFFFFFF0, "Static Model Level of Detail");
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 0xFFFFFFF1, "Use the buttons below to set a static level on a model's Level of Detail.");
-	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 1, "Disabled");
+	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 1, "Default");
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 2, "L1 - Very Low");
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 3, "L2 - Low");
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 4, "L3 - Medium");
@@ -4871,13 +4869,13 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF7, "Skip %s");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 1, "> FPS Limit");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 2, "> Static Model LoD");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0003, "Controller Aim-Assist");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0004, "Discord Rich Presence");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0005, "xDelay");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0006, "Game Intro Video");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0007, "In-game Keyb. CTRLs");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0008, "Raw Mouse Input");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0009, "Hitmarker Sound Effect");
+//	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0003, "Controller Aim-Assist");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0003, "Discord Rich Presence");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0004, "xDelay");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0005, "Game Intro Video");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0006, "In-game Keyb. CTRLs");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0007, "Raw Mouse Input");
+//	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0009, "Hitmarker Sound Effect");
 
 
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF0, "Advanced Settings");
@@ -4886,11 +4884,11 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 2, "Customise HUD/GUI");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 3, "Other Settings");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 4, "Toggle Skulls");
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 5, "Extra Game Settings");
+//	add_cartographer_label(CMLabelMenuId_AdvSettings, 5, "Extra Game Settings");
 
 
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF0, "Extra Game Settings");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF1, "Customise the game with some extra features / hacks.");
+//	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF0, "Extra Game Settings");
+//	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF1, "Customise the game with some extra features / hacks.");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF2, "Enable %s");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF3, "Disable %s");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF4, "Show %s");

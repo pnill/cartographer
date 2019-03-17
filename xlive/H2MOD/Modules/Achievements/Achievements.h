@@ -1,5 +1,4 @@
 #pragma once
-#include <map>
-void Achievement_Unlock(int achievement_id);
-void Achievement_GetAll();
+void AchievementUnlock(int achievement_id);
+void GetAchievements();
 

@@ -1,22 +1,39 @@
 #pragma once
 #include "xlivedefs.h"
 #include <atomic>
-//void ClientQoSLookUp(UINT cxna, XNADDR* apxna[], UINT cProbes, IN_ADDR  aina[], XNQOS** pxnqos, DWORD dwBitsPerSec,XNQOS* pqos);
-//void StartListenerThread(PBYTE pb, UINT cb);
 
-class H2MOD_QoS
+typedef struct _SOCKET_INFORMATION 
 {
-	public:
-		void startListening();
-		void stopListening();
-		BOOL IsListening();
-		PBYTE pbData = NULL;
-		UINT cbData = 0;
+	OVERLAPPED Overlapped;
+	SOCKET Socket;
+	CHAR Buffer[4];
+	WSABUF DataBuf;
+	DWORD BytesSEND;
+	DWORD BytesRECV;
+} SOCKET_INFORMATION, *LPSOCKET_INFORMATION;
 
-	private:
-		volatile std::atomic<BOOL> listenerThreadRunning = FALSE;
-		//void shutdownServerSocket();
-		SOCKET serverSocket;
+class CXNetQoS
+{
+public:
+	void Listener();
+	//void stopListening();
+	BOOL IsListening();
+
+	SOCKET m_ListenSocket;
+	bool m_bStopListening = false;
+	WSAEVENT m_WsaEvent;
+
+	// TODO: constructor gets the size of pbdata
+	// for now 255*4 which is what h2v requires
+	CHAR* pbData = new CHAR[255*4];
+	UINT cbData = 0;
+
+	static void CALLBACK HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags);
+	static void CALLBACK SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags);
+
+	volatile std::atomic<BOOL> m_listenerThreadRunning = FALSE;
+private:
+	
 };
 
 #define XNET_XNQOSINFO_COMPLETE         0x01    // Qos has finished processing this entry

@@ -1,5 +1,47 @@
 #pragma once
 
+//
+// Each packet reported by voice chat mode is the following size (including the
+// XHV_CODEC_HEADER)
+//
+
+#define XHV_VOICECHAT_MODE_PACKET_SIZE          (10) // 10 bytes - size of voice packet (in newer version of xlive, a packet has to be at least 42 bytes)
+
+//
+// When supplying a buffer to GetLocalChatData, you won't have to supply a
+// buffer any larger than the following number of packets (or
+// XHV_MAX_VOICECHAT_PACKETS * XHV_VOICECHAT_MODE_PACKET_SIZE bytes)
+//
+
+#define XHV_MAX_VOICECHAT_PACKETS               (10)
+
+//
+// Data Ready Flags.  These flags are set when there is local data waiting to be
+// consumed (e.g. through GetLocalChatData).  GetLocalDataFlags() allows you to
+// get the current state of these flags without entering XHV's critical section.
+// Each mask is 4 bits, one for each local talker.  The least significant bit in
+// each section indicates data is available for user index 0, while the most
+// significant bit indicates user index 3.
+//
+
+#define XHV_VOICECHAT_DATA_READY_MASK           (0xF)
+#define XHV_VOICECHAT_DATA_READY_OFFSET         (0)
+
+//
+// This header appears at the beginning of each blob of data reported by voice
+// chat mode
+//
+
+#pragma pack(push, 1)
+typedef struct XHV_CODEC_HEADER
+{
+	WORD                                        bMsgNo : 4;
+	WORD                                        wSeqNo : 11;
+	WORD                                        bFriendsOnly : 1;
+} XHV_CODEC_HEADER, *PXHV_CODEC_HEADER;
+#pragma pack (pop)
+
+
 typedef DWORD                                   XHV_LOCK_TYPE;
 
 typedef DWORD                                   XHV_PROCESSING_MODE, *PXHV_PROCESSING_MODE;

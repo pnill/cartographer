@@ -1,33 +1,18 @@
-#include <Winsock2.h>
-#include <windows.h>
-#include "H2MOD.h"
-#include "XLive\Networking\ServerList.h"
-#include "xlivedefs.h"
-#include <string>
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include <curl/curl.h>
-#include "rapidjson/document.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/prettywriter.h"
-#include <sstream>
-#include <algorithm>
 #include "Globals.h"
+#include "XLive\Networking\ServerList.h"
+#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
-#include "XLive\XUser\XUserContext.h"
-#include "XLive\XUSer\XUserProperty.h"
-#include "XLive\XUser\XUser.h"
-#include "xliveless.h"
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
+#include "curl/curl.h"
 
 using namespace rapidjson;
 
 extern CHAR g_szUserName[4][16];
 extern unsigned short H2Config_base_port;
 
-using namespace std;
-
 HANDLE ServerEnum = NULL;
-bool ServerEnumRan = false;
 ServerList LiveManager;
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -277,11 +262,11 @@ void GetServersFromHttp(ServerList* servptr,PXOVERLAPPED pOverlapped, DWORD cbBu
 			servptr->servers_left--;
 			pOverlapped->InternalLow = ERROR_SUCCESS;			
 			pOverlapped->InternalHigh = servptr->GetTotalServers();
+			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_PENDING);
 		}
-
 	}
-	addDebugText("Server Count:");
-	addDebugText(std::to_string(servptr->total_servers).c_str());
+	std::string debg_1 = "Server Count: " + std::to_string(servptr->total_servers);
+	addDebugText(debg_1.c_str());
 
 	servptr->running = false;
 }
@@ -359,6 +344,7 @@ void ServerList::GetServers(PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBu
 		// set the ERROR_NO_MORE_FILES flag to tell the game XEnumerate is done searching
 		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
 		pOverlapped->InternalHigh = this->GetTotalServers();
+		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
 	}
 
 }
@@ -402,11 +388,6 @@ DWORD WINAPI XLocatorServerUnAdvertise(DWORD a1, DWORD a2)
 	std::thread(RemoveServer).detach();
 
 	return S_OK;
-}
-
-void ServerList::RemoveServer()
-{
-	XLocatorServerUnAdvertise(1, 1);
 }
 
 void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID *xnid, DWORD a4, DWORD a5, DWORD a6, DWORD xnaddr1, DWORD xnaddr2, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
@@ -556,16 +537,20 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int 
 		ServerEnum = *phEnum;
 	}
 
-	//PopulateList();
-
 	// not done - error now
 	return ERROR_SUCCESS;
 }
 
 
-// 5231: ??
+// 5238: ??
+DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* xnkey)
+{
+	TRACE("XLocatorCreateKey");
 
+	XNetCreateKey(pxnkid, xnkey);
 
+	return S_OK;
+}
 
 
 // 5235: ??
@@ -593,17 +578,14 @@ DWORD WINAPI XLocatorServiceInitialize(DWORD a1, PHANDLE phLocatorService)
 	- LocatorV1.434307DE.RTP.
 	*/
 
-	// GFWL offline
 	return ERROR_SUCCESS;
 }
 
 
 // 5237: ??
-DWORD WINAPI XLocatorServiceUnInitialize(DWORD a1)
+DWORD WINAPI XLocatorServiceUnInitialize(HANDLE xlocatorhandle)
 {
-	TRACE("XLocatorServiceUnInitialize(a1 = %X)", a1);
-
-
-	// not done - error now
-	return 0x80004001;
+	TRACE("XLocatorServiceUnInitialize(a1 = %X)", xlocatorhandle);
+	CloseHandle(xlocatorhandle);
+	return ERROR_SUCCESS;
 }

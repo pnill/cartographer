@@ -1,8 +1,10 @@
 
 #include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\RunLoop\RunLoop.h"
+#include "..\H2MOD.h"
 
 #include <Shellapi.h>
 #include <sys/stat.h>
@@ -17,7 +19,6 @@
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
-
 
 
 #ifndef NO_TRACE
@@ -36,6 +37,8 @@ wchar_t* H2ProcessFilePath = 0;
 wchar_t* H2AppDataLocal = 0;
 wchar_t* FlagFilePathConfig = 0;
 HWND H2hWnd = NULL;
+extern CustomNetwork *network;
+
 
 int instanceNumber = 0;
 int H2GetInstanceId() {
@@ -66,7 +69,7 @@ void initInstanceNumber() {
 		instanceNumber++;
 		wchar_t mutexName[32];
 		swprintf(mutexName, sizeof(mutexName), (H2IsDediServer ? L"Halo2Server%d" : L"Halo2Player%d"), instanceNumber);
-		mutex = CreateMutex(0, TRUE, mutexName);
+		mutex = CreateMutexW(0, TRUE, mutexName);
 		lastErr = GetLastError();
 		if (lastErr == ERROR_ALREADY_EXISTS) {
 			CloseHandle(mutex);
@@ -332,6 +335,15 @@ void InitH2Startup() {
 	}
 
 	H2BaseAddr = (DWORD)game_info.base;
+	h2mod->SetBase(H2BaseAddr);
+	if (game_info.process_type == H2Types::H2Server)
+	{
+		h2mod->Server = TRUE;
+	}
+	else if (game_info.process_type == H2Types::H2Game)
+	{
+		h2mod->Server = FALSE;
+	}
 
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
@@ -398,6 +410,8 @@ void InitH2Startup() {
 
 	configureXinput();
 
+	//apply any network hooks
+	network->applyNetworkHooks();
 	InitH2Tweaks();
 	extern void initGSCustomLanguage();
 	initGSCustomLanguage();

@@ -412,7 +412,7 @@ bool engine_basic_init()
 				sub_671B02_orig = (sub_671B02_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x271B02, (BYTE*)sub_671B02_hook, 5);
 				VirtualProtect(sub_671B02_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 			}
-#ifdef _DEBUG
+#ifdef _DEBUG	
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
 				int flag_id = _wtol(&cmd_line_arg[10]);
 				flags_array[min(max(0, flag_id), flags::count - 1)] = 1;
@@ -721,7 +721,7 @@ bool __cdecl is_supported_build(char *build)
 
 #pragma endregion
 
-typedef int(__cdecl *tfn_c0017a25d)(DWORD, DWORD*);
+/*typedef int(__cdecl *tfn_c0017a25d)(DWORD, DWORD*);
 tfn_c0017a25d pfn_c0017a25d;
 int __cdecl fn_c0017a25d(DWORD a1, DWORD* a2)
 {
@@ -745,11 +745,9 @@ int __cdecl fn_c0017a25d(DWORD a1, DWORD* a2)
 				int other_datum = h2mod->get_unit_datum_from_player_index(i);
 				if (a1 == other_datum) {
 					if (h2mod->get_unit_team_index(local_player_datum) != h2mod->get_unit_team_index(other_datum)) {
-						std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
-						h2mod->SoundMap[L"sounds/Halo1PCHitSound.wav"] = 0;
-						//unlock immediately after modifying sound map
-						lck.unlock();
-						h2mod->sound_cv.notify_one();
+
+						h2mod->CustomSoundPlay(L"Halo1PCHitSound.wav", 0);
+						
 					}
 					break;
 				}
@@ -758,8 +756,7 @@ int __cdecl fn_c0017a25d(DWORD a1, DWORD* a2)
 	}
 	int result = pfn_c0017a25d(a1, a2);
 	return result;
-}
-
+} */
 
 typedef char(__stdcall *tfn_c0024eeef)(DWORD*, int, int);
 tfn_c0024eeef pfn_c0024eeef;
@@ -803,13 +800,13 @@ int __stdcall fn_c0024fa19(DWORD* thisptr, int a2, int* a3)//__thiscall
 	//int result = pfn_c0024fa19(thisptr, a2, a3);
 	//return result;
 
-	int(__stdcall* fn_c0024f9a1)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f9a1));
-	int(__stdcall* fn_c0024f9dd)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f9dd));
-	int(__stdcall* fn_c0024ef79)(int) = (int(__stdcall*)(int))(GetAddress(0x0024ef79));
-	int(__stdcall* fn_c0024f5fd)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f5fd));
-	int(__stdcall* fn_c0024f015)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f015));
-	int(__stdcall* fn_c0024f676)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f676));
-	int(__stdcall* fn_c0024f68a)(int) = (int(__stdcall*)(int))(GetAddress(0x0024f68a));
+	int(__stdcall* fn_c0024f9a1)(int) = (int(__stdcall*)(int))(GetAddress(0x24f9a1));
+	int(__stdcall* fn_c0024f9dd)(int) = (int(__stdcall*)(int))(GetAddress(0x24f9dd));
+	int(__stdcall* fn_c0024ef79)(int) = (int(__stdcall*)(int))(GetAddress(0x24ef79));
+	int(__stdcall* fn_c0024f5fd)(int) = (int(__stdcall*)(int))(GetAddress(0x24f5fd));
+	int(__stdcall* fn_c0024f015)(int) = (int(__stdcall*)(int))(GetAddress(0x24f015));
+	int(__stdcall* fn_c0024f676)(int) = (int(__stdcall*)(int))(GetAddress(0x24f676));
+	int(__stdcall* fn_c0024f68a)(int) = (int(__stdcall*)(int))(GetAddress(0x24f68a));
 
 	int result = *a3;
 	if (*a3 != -1)
@@ -855,8 +852,8 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 	//DWORD* result = pfn_c0024fabc(thisptr, a2);
 	//return result;
 
-	DWORD* var_c003d9254 = (DWORD*)(GetAddress(0x003d9254));
-	DWORD* var_c003d9188 = (DWORD*)(GetAddress(0x003d9188));
+	DWORD* var_c003d9254 = (DWORD*)(GetAddress(0x3d9254));
+	DWORD* var_c003d9188 = (DWORD*)(GetAddress(0x3d9188));
 
 	DWORD*(__thiscall* fn_c00213b1c)(DWORD* thisptr, int) = (DWORD*(__thiscall*)(DWORD*, int))(GetAddress(0x00213b1c));
 	int(__thiscall* fn_c0000a551)(DWORD* thisptr) = (int(__thiscall*)(DWORD*))(GetAddress(0x0000a551));
@@ -966,6 +963,9 @@ class test_engine : public c_game_engine_base
 };
 test_engine g_test_engine;
 
+
+
+
 void InitH2Tweaks() {
 	postConfig();
 
@@ -1052,8 +1052,8 @@ void InitH2Tweaks() {
 		PatchCall(H2BaseAddr + 0x21754C, &sub_20E1D8_boot);
 
 		//Hook for Hitmarker sound effect.
-		pfn_c0017a25d = (tfn_c0017a25d)DetourFunc((BYTE*)H2BaseAddr + 0x0017a25d, (BYTE*)fn_c0017a25d, 10);
-		VirtualProtect(pfn_c0017a25d, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+//		pfn_c0017a25d = (tfn_c0017a25d)DetourFunc((BYTE*)H2BaseAddr + 0x0017a25d, (BYTE*)fn_c0017a25d, 10);
+//		VirtualProtect(pfn_c0017a25d, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//Hook for advanced lobby options.
 		pfn_c0024eeef = (tfn_c0024eeef)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024eeef, (BYTE*)fn_c0024eeef, 9);
@@ -1081,8 +1081,7 @@ void InitH2Tweaks() {
 	PatchCall(GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
-
-	H2Tweaks::applyPlayersActionsUpdateRatePatch();
+	//H2Tweaks::applyPlayersActionsUpdateRatePatch(); //breaks aim assist
 	
 	addDebugText("End Startup Tweaks.");
 }
@@ -1235,10 +1234,8 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 		}
 	}
 
-
 	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) {
 
-		
 		for (int i = 0; i < 28; i++) {
 			if (configArray[i] == 0) {
 				*reinterpret_cast<short*>(WEAPONS[i]) = disabled[i];
@@ -1249,10 +1246,7 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 			else {
 				*reinterpret_cast<short*>(WEAPONS[i]) = *configArray[i];
 			}
-
 		}
-		
-
 	}
 }
 
@@ -1343,6 +1337,6 @@ __declspec(naked) void calculate_delta_time(void)
 
 void H2Tweaks::applyPlayersActionsUpdateRatePatch()
 {
-	//xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
-	//PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
+	xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
+	PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
 }

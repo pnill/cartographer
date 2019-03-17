@@ -4,7 +4,7 @@
 #define JMP_RAW_BYTE 0xEB
 #define JNZ_RAW_BYTE 0x75 
 
-void *DetourFunc(BYTE *src, const BYTE *dst, const int len);
+void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len);
 void RetourFunc(BYTE *src, BYTE *restore, const int len);
 void *DetourClassFunc(BYTE *src, const BYTE *dst, const int len);
 void RetourClassFunc(BYTE *src, BYTE *restore, const int len);

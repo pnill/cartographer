@@ -45,10 +45,11 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	StatusCheater = false;
 
 	XNADDR pxna;
+	memset(&pxna, NULL, sizeof(XNADDR));
 
-	pxna.inaOnline.s_addr = saddr;
 	pxna.ina.s_addr = xnaddr;
-	pxna.wPortOnline = htons((short)H2Config_base_port);
+	pxna.inaOnline.s_addr = saddr;
+	pxna.wPortOnline = htons(H2Config_base_port);
 
 	BYTE abEnet2[6];
 	memset(abEnet2, NULL, sizeof(abEnet2));
@@ -64,8 +65,7 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	memcpy(&pxna.abEnet, abEnet2, 6);
 	memcpy(&pxna.abOnline, abOnline2, 20);
 
-	extern CUserManagement User;
-	User.ConfigureUser(&pxna, xuid, username);
+	userManager.ConfigureLocalUser(&pxna, xuid, username);
 
 	if (H2CurrentAccountLoginToken) {
 		free(H2CurrentAccountLoginToken);

@@ -556,7 +556,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				}
 				else {
 					*(BYTE*)(lobby_globals + 0x4C80) = static_cast<BYTE>(maxPlayersToSet);
-					output(L"Maximum players set");
+					output(L"Maximum players set.");
 					return;
 				}
 			}

@@ -8,3 +8,5 @@ private:
 	bool started = false;
 
 };
+
+extern GameManager* gameManager;
