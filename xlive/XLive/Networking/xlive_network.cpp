@@ -86,6 +86,7 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 	if (s == voice_sock)
 		TRACE_GAME_NETWORK_N("[H2MOD-Network] could be voice socket", htons(port));
 
+
 	if (htons(port) == 1000) {
 		game_network_data_gateway_socket_1000 = s;
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port);
