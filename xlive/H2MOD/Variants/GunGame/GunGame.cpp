@@ -135,10 +135,10 @@ void GunGame::resetPlayerLevels() {
 }
 
 void GunGame::setGameScore() {
-	if (H2IsDediServer) {
+	if (h2mod->Server) 
 		*(int*)(0x300015F4) = 17;
-	}
-	*(int*)(0x30001A48) = 17;
+	else 
+		*(int*)(0x30001A48) = 17;
 }
 
 void GunGame::spawnPlayerServer(int playerIndex) {
