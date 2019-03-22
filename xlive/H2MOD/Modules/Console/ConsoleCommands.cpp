@@ -690,6 +690,7 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			if (isNum(sensVal.c_str())) {
 				H2Tweaks::setSens(CONTROLLER, stoi(sensVal));
+				H2Config_controller_sens = stoi(sensVal);
 			}
 			else {
 				output(L"Wrong input! Use a number.");
@@ -705,6 +706,7 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			if (isNum(sensVal.c_str())) {
 				H2Tweaks::setSens(MOUSE, stoi(sensVal));
+				H2Config_mouse_sens = stoi(sensVal);
 			}
 			else {
 				output(L"Wrong input! Use a number.");

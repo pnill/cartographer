@@ -6,6 +6,8 @@
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\HitFix\Hitfix.h"
+#include "H2MOD\Modules\MapFix\SPMapfix.h"
+#include "H2MOD\Modules\MapFix\MPMapfix.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -1129,6 +1131,7 @@ void __cdecl OnMapLoad(int a1)
 		H2Tweaks::disableAI_MP();
 		UIRankPatch();
 		H2Tweaks::disable60FPSCutscenes();
+		H2Tweaks::setHz();
 
 		p_set_random_number(a1);
 		return; 
@@ -1188,12 +1191,14 @@ void __cdecl OnMapLoad(int a1)
 		get_object_table_memory();
 
 		HitFix::Initialize();
+		MPMapFix::Initialize();
 
 		H2Tweaks::enableAI_MP();
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	 
 		H2Tweaks::setCrosshairSize(0, false);
 		H2Tweaks::disable60FPSCutscenes(); 
+		H2Tweaks::setSavedSens();
 		
 		//H2Tweaks::applyShaderTweaks(); 
 
@@ -1229,6 +1234,9 @@ void __cdecl OnMapLoad(int a1)
 
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 		H2Tweaks::enable60FPSCutscenes();
+		H2Tweaks::setSavedSens();
+
+		SPMapFix::Initialize();
 	}
 
 	p_set_random_number(a1);

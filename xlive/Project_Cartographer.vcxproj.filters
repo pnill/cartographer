@@ -247,6 +247,9 @@
     <Filter Include="Source Files\3rdparty\portaudio">
       <UniqueIdentifier>{a11687ea-ad4d-4338-be2a-8150f5fc6ff4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\MapFix">
+      <UniqueIdentifier>{0dcc09a4-5fd5-4f51-9344-1bee701782ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -464,6 +467,12 @@
     </ClCompile>
     <ClCompile Include="XLive\Networking\XNetQoS.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp">
+      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\MapFix\SPMapFix.cpp">
+      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -922,6 +931,12 @@
     </ClInclude>
     <ClInclude Include="XLive\Networking\XNetQoS.h">
       <Filter>Source Files\XLive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h">
+      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\MapFix\SPMapFix.h">
+      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

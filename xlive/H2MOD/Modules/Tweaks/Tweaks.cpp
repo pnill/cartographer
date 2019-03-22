@@ -1134,7 +1134,21 @@ void H2Tweaks::setSens(InputType input_type, int sens) {
 		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B4) = 25.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
 		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B0) = 50.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
 	}
+
 }
+
+void H2Tweaks::setSavedSens() {
+	if (H2Config_mouse_sens == 0)
+		return;
+
+	H2Tweaks::setSens(MOUSE, (H2Config_mouse_sens));
+
+	if (H2Config_controller_sens == 0)
+		return;
+
+	H2Tweaks::setSens(CONTROLLER, (H2Config_controller_sens));
+}
+
 
 void H2Tweaks::setFOV(double field_of_view_degrees) {
 
@@ -1154,6 +1168,10 @@ void H2Tweaks::setFOV(double field_of_view_degrees) {
 		WriteValue(H2BaseAddr + 0x41D984, calculated_radians_FOV); // First Person
 		WriteValue(H2BaseAddr + 0x413780, calculated_radians_FOV + 0.22f); // Third Person
 	}
+}
+
+void H2Tweaks::setHz() {
+	*(BYTE*)(H2BaseAddr + 0xA3DA08) = (H2Config_refresh_rate);
 }
 
 void H2Tweaks::setCrosshairPos(float crosshair_offset) {
