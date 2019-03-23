@@ -44,29 +44,35 @@ extern logger *network_log;
 #define TRACE(msg, ...) CHECK_PTR(xlive_trace_log, xlive_trace_log->write(L ## msg, __VA_ARGS__))
 #define TRACE_N(msg, ...) CHECK_PTR(xlive_trace_log, xlive_trace_log->write( ## msg, __VA_ARGS__))
 
+inline void verify_output_log(const char *expression, const char *func_name, const char* file, const int line)
+{
+	TRACE_GAME_N("'%s' failed in '%s' at '%s:%d'!", func_name, expression, file, line);
+	DWORD last_error = GetLastError();
+	if (last_error)
+	{
+		LPWSTR messageBuffer = NULL;
+		size_t size = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL, last_error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&messageBuffer, 0, NULL);
+		if (size) {
+			TRACE_GAME_N("Last error: '%ws'", messageBuffer);
+			LocalFree(messageBuffer);
+		}
+		else {
+			TRACE_GAME_N("Converting error %d to string failed!", last_error);
+		}
+		SetLastError(0);
+	}
+}
+
 template <typename T>
 inline T verify_output(T output, const char *expression, const char *func_name, const char* file, const int line)
 {
 	if (!output) {
-		TRACE_GAME_N("'%s' failed in '%s' at '%s:%d'!", func_name, expression, file, line);
-		DWORD last_error = GetLastError();
-		if (last_error)
-		{
-			LPWSTR messageBuffer = NULL;
-			size_t size = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL, last_error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&messageBuffer, 0, NULL);
-			if (size) {
-				TRACE_GAME_N("Last error: '%ws'", messageBuffer);
-				LocalFree(messageBuffer);
-			}
-			else {
-				TRACE_GAME_N("Converting error %d to string failed!", last_error);
-			}
-			SetLastError(0);
-}
+		verify_output_log(expression, func_name, file, line);
 	}
 	return output;
 }
+
 #define LOG_CHECK(expression) \
 	verify_output(expression, #expression, __FUNCTION__, __FILE__, __LINE__)
 

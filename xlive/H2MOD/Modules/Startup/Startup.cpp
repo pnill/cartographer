@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include <string>
 #include <sstream>
+#include <io.h>
 #include "Util\Hooks\Hook.h"
 #include "Util\Debug\Debug.h"
 #include "Util\hash.h"
@@ -83,7 +84,11 @@ void initInstanceNumber() {
 
 wchar_t xinput_path[_MAX_PATH];
 
-void configureXinput() {
+bool configureXinput() {
+	auto report_error = [](const std::string &message) {
+		MessageBoxA(NULL, message.c_str(), "Xinput config error!", MB_OK);
+	};
+
 	if (!H2IsDediServer) {
 		if (H2GetInstanceId() > 1) {
 			swprintf(xinput_path, ARRAYSIZE(xinput_path), L"xinput/p%02d/xinput9_1_0.dll", H2GetInstanceId());
@@ -95,112 +100,107 @@ void configureXinput() {
 			char xinputdir[_MAX_PATH];
 			sprintf(xinputdir, "xinput/p%02d", H2GetInstanceId());
 			sprintf(xinputName, "%s/xinput9_1_0.dll", xinputdir);
-			CreateDirectoryA("xinput", NULL);
-			int fperrno1 = GetLastError();
-			if (!(fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS)) {
-				fileFail(NULL);
-				MessageBoxA(NULL, "Error 7g546.", "Unknown Error", MB_OK);
-				exit(EXIT_FAILURE);
-			}
-			CreateDirectoryA(xinputdir, NULL);
-			int fperrno2 = GetLastError();
-			if (!(fperrno2 == ERROR_ALREADY_EXISTS || fperrno2 == ERROR_SUCCESS)) {
-				fileFail(NULL);
-				MessageBoxA(NULL, "Error 7g547.", "Unknown Error", MB_OK);
-				exit(EXIT_FAILURE);
-			}
-			if (FILE *file = fopen(xinputName, "r")) {
-				fclose(file);
-			}
-			else {
-				int xinput_index = -1;
-				char xinput_md5_durazno_0_6_0_0[] = "6140ae76b26a633ce2255f6fc88fbe34";
-				long xinput_offset_durazno_0_6_0_0 = 0x196de;
-				bool xinput_unicode_durazno_0_6_0_0 = true;
-				char xinput_md5_x360ce_3_3_1_444[] = "8f24e36d5f0a71c8a412cec6323cd781";
-				long xinput_offset_x360ce_3_3_1_444 = 0x1ea54;
-				bool xinput_unicode_x360ce_3_3_1_444 = true;
-				char xinput_md5_x360ce_3_4_1_1357[] = "5236623449893c0e1e98fc95f067fcff";
-				long xinput_offset_x360ce_3_4_1_1357 = 0x16110;
-				bool xinput_unicode_x360ce_3_4_1_1357 = false;
-				const int xinput_array_length = 3;
-				char* xinput_md5[xinput_array_length] = { xinput_md5_durazno_0_6_0_0, xinput_md5_x360ce_3_3_1_444, xinput_md5_x360ce_3_4_1_1357 };
-				long xinput_offset[xinput_array_length] = { xinput_offset_durazno_0_6_0_0, xinput_offset_x360ce_3_3_1_444, xinput_offset_x360ce_3_4_1_1357 };
-				bool xinput_unicode[xinput_array_length] = { xinput_unicode_durazno_0_6_0_0, xinput_unicode_x360ce_3_3_1_444, xinput_unicode_x360ce_3_4_1_1357 };
-				std::string available_xinput_md5;
-				int hasherr = hashes::calc_file_md5("xinput9_1_0.dll", available_xinput_md5);
-				FILE* file1 = NULL;
-				if (hasherr == 0 && (file1 = fopen("xinput9_1_0.dll", "rb"))) {
-					for (int i = 0; i < xinput_array_length; i++) {
-						if (strcmp(xinput_md5[i], available_xinput_md5.c_str()) == 0) {
-							xinput_index = i;
-							break;
-						}
-					}
-					if (xinput_index < 0) {
-						char xinputError[] = "ERROR! For \'Split-screen\' play, a supported xinput9_1_0.dll is required to be installed in the local game directory!\nOr you may install a custom one manually in the xinput/p??/ folders.";
-						addDebugText(xinputError);
-						MessageBoxA(NULL, xinputError, "Incorrect DLL Error", MB_OK);
-						exit(EXIT_FAILURE);
-					}
-					FILE* file2 = fopen(xinputName, "wb");
-					if (!file2) {
-						fileFail(file2);
-						MessageBoxA(NULL, "Error bf58i.", "Unknown Error", MB_OK);
-						exit(EXIT_FAILURE);
-					}
-					char buffer[BUFSIZ];
-					size_t n;
-					while ((n = fread(buffer, sizeof(char), sizeof(buffer), file1)) > 0) {
-						if (fwrite(buffer, sizeof(char), n, file2) != n) {
-							char xinputError[255];
-							sprintf(xinputError, "ERROR! Failed to write copied file: %s", xinputName);
-							addDebugText(xinputError);
-							MessageBoxA(NULL, xinputError, "DLL Copy Error", MB_OK);
-							exit(EXIT_FAILURE);
-						}
-					}
-					fclose(file1);
-					fclose(file2);
 
-					FILE* file3 = fopen(xinputName, "r+b");
-					int len_to_write = 2;
-					BYTE assmXinputDuraznoNameEdit[] = { 0x30 + (H2GetInstanceId() / 10), 0x30 + (H2GetInstanceId() % 10), 0x30 + (H2GetInstanceId() % 10) };
-					if (xinput_unicode[xinput_index]) {
-						assmXinputDuraznoNameEdit[1] = 0x00;
-						len_to_write = 3;
-					}
-					if (fseek(file3, xinput_offset[xinput_index], SEEK_SET) == 0 && fwrite(assmXinputDuraznoNameEdit, sizeof(BYTE), len_to_write, file3) == len_to_write) {
-						addDebugText("Successfully copied and patched original xinput9_1_0.dll");
-					}
-					else {
-						fclose(file3);
-						remove(xinputName);
-						char xinputError[255];
-						sprintf(xinputError, "ERROR! Failed to write hex edit to file: %s", xinputName);
-						addDebugText(xinputError);
-						MessageBoxA(NULL, xinputError, "DLL Edit Error", MB_OK);
-						exit(EXIT_FAILURE);
-					}
-					fclose(file3);
+			/* Creates a directory and displays error if it fails */
+			auto create_dir = [=](const std::string &path) -> bool {
+				if (LOG_CHECK(!CreateDirectoryA(path.c_str(), NULL) && GetLastError() != ERROR_ALREADY_EXISTS))
+				{
+					report_error("Failed to create '" + path + "' directory, check logs!");
+					return false;
 				}
-				else if (hasherr == -1 || !file1) {
-					char xinputError[] = "ERROR! An xinput9_1_0.dll does not exist in the local game directory!\nFor \'Split-screen\' play, any supported .dll is required.";
+				return true;
+			};
+
+			if (!create_dir("xinput") || !create_dir(xinputdir))
+			{
+				return false;
+			}
+
+			TRACE_FUNC_N("xinput path: %s", xinputName);
+			if (_access_s(xinputName, 02))
+			{
+				if (errno == EACCES)
+				{
+					report_error("Can't access the xinput dll for writing");
+					return false;
+				}
+
+				if (_access_s("xinput9_1_0.dll", 04) != 0) {
+					char xinputError[] = "ERROR! An xinput9_1_0.dll does not exist in the local game directory or is inaccessible!\nFor \'Split-screen\' play, any supported .dll is required.";
 					addDebugText(xinputError);
 					MessageBoxA(NULL, xinputError, "DLL Missing Error", MB_OK);
 					exit(EXIT_FAILURE);
 				}
-				else {
-					char xinputError[200];
-					snprintf(xinputError, 200, "Hash Error Num: %x - msg: %s", hasherr, available_xinput_md5.c_str());
+				int xinput_index = -1;
+				constexpr char *xinput_md5_durazno_0_6_0_0 = "6140ae76b26a633ce2255f6fc88fbe34";
+				constexpr long xinput_offset_durazno_0_6_0_0 = 0x196de;
+				constexpr bool xinput_unicode_durazno_0_6_0_0 = true;
+				constexpr char *xinput_md5_x360ce_3_3_1_444 = "8f24e36d5f0a71c8a412cec6323cd781";
+				constexpr long xinput_offset_x360ce_3_3_1_444 = 0x1ea54;
+				constexpr bool xinput_unicode_x360ce_3_3_1_444 = true;
+				constexpr char *xinput_md5_x360ce_3_4_1_1357 = "5236623449893c0e1e98fc95f067fcff";
+				constexpr long xinput_offset_x360ce_3_4_1_1357 = 0x16110;
+				constexpr bool xinput_unicode_x360ce_3_4_1_1357 = false;
+				constexpr int xinput_array_length = 3;
+				static constexpr char* xinput_md5[xinput_array_length] = { xinput_md5_durazno_0_6_0_0, xinput_md5_x360ce_3_3_1_444, xinput_md5_x360ce_3_4_1_1357 };
+				static constexpr long xinput_offset[xinput_array_length] = { xinput_offset_durazno_0_6_0_0, xinput_offset_x360ce_3_3_1_444, xinput_offset_x360ce_3_4_1_1357 };
+				static constexpr bool xinput_unicode[xinput_array_length] = { xinput_unicode_durazno_0_6_0_0, xinput_unicode_x360ce_3_3_1_444, xinput_unicode_x360ce_3_4_1_1357 };
+				std::string available_xinput_md5;
+				if (!hashes::calc_file_md5("xinput9_1_0.dll", available_xinput_md5))
+				{
+					report_error("Failed to hash original xinput9_1_0.dll, file might be missing?");
+					return false;
+				}
+				for (int i = 0; i < xinput_array_length; i++) {
+					if (strcmp(xinput_md5[i], available_xinput_md5.c_str()) == 0) {
+						xinput_index = i;
+						break;
+					}
+				}
+				if (xinput_index < 0) {
+					char xinputError[] = "ERROR! For \'Split-screen\' play, a supported xinput9_1_0.dll is required to be installed in the local game directory!\nOr you may install a custom one manually in the xinput/p??/ folders.";
 					addDebugText(xinputError);
-					MessageBoxA(NULL, xinputError, "MD5 Hash Error", MB_OK);
+					MessageBoxA(NULL, xinputError, "Incorrect DLL Error", MB_OK);
 					exit(EXIT_FAILURE);
 				}
+
+				if (!LOG_CHECK(CopyFileA("xinput9_1_0.dll", xinputName, FALSE)))
+				{
+					report_error("Failed to copy Xinput DLL for patching!");
+					return false;
+				}
+
+				FILE* xinput_patched = fopen(xinputName, "r+b");
+				if (!xinput_patched) {
+					fileFail(xinput_patched);
+					report_error("Can't open xinput file for patching.");
+					exit(EXIT_FAILURE);
+				}
+
+				int len_to_write = 2;
+				BYTE assmXinputDuraznoNameEdit[] = { 0x30 + (H2GetInstanceId() / 10), 0x30 + (H2GetInstanceId() % 10), 0x30 + (H2GetInstanceId() % 10) };
+				if (xinput_unicode[xinput_index]) {
+					assmXinputDuraznoNameEdit[1] = 0x00;
+					len_to_write = 3;
+				}
+				if (fseek(xinput_patched, xinput_offset[xinput_index], SEEK_SET) == 0 && fwrite(assmXinputDuraznoNameEdit, sizeof(BYTE), len_to_write, xinput_patched) == len_to_write) {
+					addDebugText("Successfully copied and patched original xinput9_1_0.dll");
+				}
+				else {
+					fclose(xinput_patched);
+					remove(xinputName);
+					char xinputError[255];
+					sprintf(xinputError, "ERROR! Failed to write hex edit to file: %s", xinputName);
+					addDebugText(xinputError);
+					MessageBoxA(NULL, xinputError, "DLL Edit Error", MB_OK);
+					exit(EXIT_FAILURE);
+				}
+				fclose(xinput_patched);
 			}
 		}
 	}
 	addDebugText("Finished Processing Instance Number.");
+	return true;
 }
 
 void initLocalAppData() {
@@ -408,7 +408,8 @@ void InitH2Startup() {
 #endif
 	InitH2Accounts();
 
-	configureXinput();
+	if (!configureXinput())
+		exit(EXIT_FAILURE);
 
 	//apply any network hooks
 	network->applyNetworkHooks();
