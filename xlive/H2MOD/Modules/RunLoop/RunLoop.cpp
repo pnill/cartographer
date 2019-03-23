@@ -288,7 +288,7 @@ void GSMainLoop() {
 			SetWindowText(H2hWnd, titleMod);
 		}
 	}
-	/*if (H2IsDediServer && !halo2ServerOnce1) {
+	if (H2IsDediServer && !halo2ServerOnce1) {
 		halo2ServerOnce1 = true;
 		pushHostLobby();
 		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
@@ -307,7 +307,7 @@ void GSMainLoop() {
 	if (prevPartyPrivacy > 0 && partyPrivacy == 0 && gameManager->isHost()) {
 		pushHostLobby();
 	}
-	prevPartyPrivacy = partyPrivacy;*/
+	prevPartyPrivacy = partyPrivacy;
 
 	if (!H2IsDediServer && (GetFocus() == H2hWnd || GetForegroundWindow() == H2hWnd)) {
 
