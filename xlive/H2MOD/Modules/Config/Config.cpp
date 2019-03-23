@@ -236,10 +236,10 @@ void SaveH2Config() {
 			fputs("\n# 1 - Enables Discord Rich Presence.", fileConfig);
 			fputs("\n\n", fileConfig);
 
-//			fputs("# controller_aim_assist Options (Client):", fileConfig);
-//			fputs("\n# 0 - Disables aim assist for controllers.", fileConfig);
-//			fputs("\n# 1 - Enables aim assist for controllers.", fileConfig);
-//			fputs("\n\n", fileConfig);
+/*			fputs("# controller_aim_assist Options (Client):", fileConfig);
+			fputs("\n# 0 - Disables aim assist for controllers.", fileConfig);
+			fputs("\n# 1 - Enables aim assist for controllers.", fileConfig);
+			fputs("\n\n", fileConfig);*/
 
 			fputs("# fps_limit Options (Client):", fileConfig);
 			fputs("\n# <uint> - 0 disables the built in frame limiter. >0 is the fps limit of the game.", fileConfig);
@@ -296,55 +296,55 @@ void SaveH2Config() {
 		fputs("\n# 0 - Non-host players cannot delay the game start countdown timer.", fileConfig);
 		fputs("\n# 1 - Non-host players can delay the game start countdown timer (native default).", fileConfig);
 		fputs("\n\n", fileConfig);
-//		if (!H2IsDediServer) {
-//			fputs("# enable_hitmarker_sound Options (Client):", fileConfig);
-//			fputs("\n# 0 - Shooting players does not produce a hitmarker sound effect (default).", fileConfig);
-//			fputs("\n# 1 - Shooting players plays a hitmarker sound effect.", fileConfig);
-//			fputs("\n\n", fileConfig);
-//		}
-//		fputs("# voice_chat Options:", fileConfig);
-//		fputs("\n# 0 - Voice chat is not enabled, you cannot host voice servers or connect to them.", fileConfig);
-//		fputs("\n# 1 - Voice chat is enabled, you can host voice servers or connect to them (default).", fileConfig);
-//		fputs("\n\n", fileConfig);
-//
-//		if (H2IsDediServer) {
-//			fputs("# mp_explosion_physics Options (Server):", fileConfig);
-//			fputs("\n# 0 - Explosions do not push players or vehicles they drive.", fileConfig);
-//			fputs("\n# 1 - Enables explosion physics for players in the game.", fileConfig);
-//			fputs("\n\n", fileConfig);
-//
-//			fputs("# mp_sputnik Options (Server):", fileConfig);
-//			fputs("\n# 0 - Sputnik skull is off.", fileConfig);
-//			fputs("\n# 1 - Sputnik skull is on for all players.", fileConfig);
-//			fputs("\n\n", fileConfig);
-//
-//			fputs("# mp_grunt_bday_party Options (Server):", fileConfig);
-//			fputs("\n# 0 - Grunt Birthday Party skull is off.", fileConfig);
-//			fputs("\n# 1 - Grunt Birthday Party skull is on for all players.", fileConfig);
-//			fputs("\n\n", fileConfig);
-//
-//			/*fputs("# grenade_chain_react Options (Server):", fileConfig);
-//			fputs("\n# 0 - Grenades do not chain react in multiplayer.", fileConfig);
-//			fputs("\n# 1 - Grenades chain react in multiplayer.", fileConfig);
-//			fputs("\n\n", fileConfig);*/
-//
-//			fputs("# banshee_bomb Options (Server):", fileConfig);
-//			fputs("\n# 0 - Players cannot use the Banshee Bomb in multiplayer.", fileConfig);
-//			fputs("\n# 1 - Players can use the Banshee Bomb in multiplayer.", fileConfig);
-//			fputs("\n\n", fileConfig);
-//
-//			fputs("# mp_blind Options (Server):", fileConfig);
-//			fputs("\n# 0 - Players do not have missing HUD or First Person elements.", fileConfig);
-//			fputs("\n# 1 - Players cannot see their HUD.", fileConfig);
-//			fputs("\n# 2 - Players cannot see their First Person Model.", fileConfig);
-//			fputs("\n# 3 - Players cannot see their HUD or First Person Model.", fileConfig);
-//			fputs("\n\n", fileConfig);
-//
-//			fputs("# banshee_bomb Options (Server):", fileConfig);
-//			fputs("\n# 0 - Players cannot use their Flashlight in multiplayer.", fileConfig);
-//			fputs("\n# 1 - Players can use their Flashlight in multiplayer.", fileConfig);
-//			fputs("\n\n", fileConfig);
-//		}
+/*		if (!H2IsDediServer) {
+			fputs("# enable_hitmarker_sound Options (Client):", fileConfig);
+			fputs("\n# 0 - Shooting players does not produce a hitmarker sound effect (default).", fileConfig);
+			fputs("\n# 1 - Shooting players plays a hitmarker sound effect.", fileConfig);
+			fputs("\n\n", fileConfig);
+		}
+		fputs("# voice_chat Options:", fileConfig);
+		fputs("\n# 0 - Voice chat is not enabled, you cannot host voice servers or connect to them.", fileConfig);
+		fputs("\n# 1 - Voice chat is enabled, you can host voice servers or connect to them (default).", fileConfig);
+		fputs("\n\n", fileConfig);
+
+		if (H2IsDediServer) {
+			fputs("# mp_explosion_physics Options (Server):", fileConfig);
+			fputs("\n# 0 - Explosions do not push players or vehicles they drive.", fileConfig);
+			fputs("\n# 1 - Enables explosion physics for players in the game.", fileConfig);
+			fputs("\n\n", fileConfig);
+
+			fputs("# mp_sputnik Options (Server):", fileConfig);
+			fputs("\n# 0 - Sputnik skull is off.", fileConfig);
+			fputs("\n# 1 - Sputnik skull is on for all players.", fileConfig);
+			fputs("\n\n", fileConfig);
+
+			fputs("# mp_grunt_bday_party Options (Server):", fileConfig);
+			fputs("\n# 0 - Grunt Birthday Party skull is off.", fileConfig);
+			fputs("\n# 1 - Grunt Birthday Party skull is on for all players.", fileConfig);
+			fputs("\n\n", fileConfig);
+
+			fputs("# grenade_chain_react Options (Server):", fileConfig);
+			fputs("\n# 0 - Grenades do not chain react in multiplayer.", fileConfig);
+			fputs("\n# 1 - Grenades chain react in multiplayer.", fileConfig);
+			fputs("\n\n", fileConfig);
+
+			fputs("# banshee_bomb Options (Server):", fileConfig);
+			fputs("\n# 0 - Players cannot use the Banshee Bomb in multiplayer.", fileConfig);
+			fputs("\n# 1 - Players can use the Banshee Bomb in multiplayer.", fileConfig);
+			fputs("\n\n", fileConfig);
+
+			fputs("# mp_blind Options (Server):", fileConfig);
+			fputs("\n# 0 - Players do not have missing HUD or First Person elements.", fileConfig);
+			fputs("\n# 1 - Players cannot see their HUD.", fileConfig);
+			fputs("\n# 2 - Players cannot see their First Person Model.", fileConfig);
+			fputs("\n# 3 - Players cannot see their HUD or First Person Model.", fileConfig);
+			fputs("\n\n", fileConfig);
+
+			fputs("# banshee_bomb Options (Server):", fileConfig);
+			fputs("\n# 0 - Players cannot use their Flashlight in multiplayer.", fileConfig);
+			fputs("\n# 1 - Players can use their Flashlight in multiplayer.", fileConfig);
+			fputs("\n\n", fileConfig);
+		}*/
 
 		fputs("# debug_log Options:", fileConfig);
 		fputs("\n# 0 - Disables excess logging.", fileConfig);
@@ -958,18 +958,18 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_discord_enable = true;
 			}
 		}
-//		else if (!H2IsDediServer && sscanf(fileLine, "controller_aim_assist =%d", &tempint1) == 1) {
-//			if (est_controller_aim_assist) {
-//				duplicated = true;
-//			}
-//			else if (!(tempint1 == 0 || tempint1 == 1)) {
-//				incorrect = true;
-//			}
-//			else {
-//				H2Config_controller_aim_assist = (bool)tempint1;
-//				est_controller_aim_assist = true;
-//			}
-//		}
+/*		else if (!H2IsDediServer && sscanf(fileLine, "controller_aim_assist =%d", &tempint1) == 1) {
+			if (est_controller_aim_assist) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_controller_aim_assist = (bool)tempint1;
+				est_controller_aim_assist = true;
+			}
+		}*/
 		else if (!H2IsDediServer && sscanf(fileLine, "fps_limit =%d", &tempint1) == 1) {
 			if (est_fps_limit) {
 				duplicated = true;
@@ -1428,67 +1428,67 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_xdelay = true;
 			}
 		}
-//		else if (sscanf(fileLine, "enable_hitmarker_sound =%d", &tempint1) == 1) {
-//			if (est_hitmarker_sound) {
-//				duplicated = true;
-//			}
-//			else if (!(tempint1 == 0 || tempint1 == 1)) {
-//				incorrect = true;
-//			}
-//			else {
-//				H2Config_hitmarker_sound = (bool)tempint1;
-//				est_hitmarker_sound = true;
-//			}
-//		}
-//		else if (sscanf(fileLine, "voice_chat =%d", &tempint1) == 1) {
-//			if (est_voice_chat) {
-//				duplicated = true;
-//			}
-//			else if (!(tempint1 == 0 || tempint1 == 1)) {
-//				incorrect = true;
-//			}
-//			else {
-//				H2Config_voice_chat = (bool)tempint1;
-//				est_voice_chat = true;
-//			}
-//		}
-//		else if (sscanf(fileLine, "mp_explosion_physics =%d", &tempint1) == 1) {
-//			if (est_als_mp_explosion_physics) {
-//				duplicated = true;
-//			}
-//			else if (!(tempint1 == 0 || tempint1 == 1)) {
-//				incorrect = true;
-//			}
-//			else {
-//				AdvLobbySettings_mp_explosion_physics = (bool)tempint1;
-//				est_als_mp_explosion_physics = true;
-//			}
-//		}
-//		else if (sscanf(fileLine, "mp_sputnik =%d", &tempint1) == 1) {
-//			if (est_als_mp_sputnik) {
-//				duplicated = true;
-//			}
-//			else if (!(tempint1 == 0 || tempint1 == 1)) {
-//				incorrect = true;
-//			}
-//			else {
-//				AdvLobbySettings_mp_sputnik = (bool)tempint1;
-//				est_als_mp_sputnik = true;
-//			}
-//		}
-//		else if (sscanf(fileLine, "mp_grunt_bday_party =%d", &tempint1) == 1) {
-//			if (est_als_mp_grunt_bday_party) {
-//				duplicated = true;
-//			}
-//			else if (!(tempint1 == 0 || tempint1 == 1)) {
-//				incorrect = true;
-//			}
-//			else {
-//				AdvLobbySettings_mp_grunt_bday_party = (bool)tempint1;
-//				est_als_mp_grunt_bday_party = true;
-//			}
-//		}
-		/*else if (sscanf(fileLine, "grenade_chain_react =%d", &tempint1) == 1) {
+/*		else if (sscanf(fileLine, "enable_hitmarker_sound =%d", &tempint1) == 1) {
+			if (est_hitmarker_sound) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_hitmarker_sound = (bool)tempint1;
+				est_hitmarker_sound = true;
+			}
+		}
+		else if (sscanf(fileLine, "voice_chat =%d", &tempint1) == 1) {
+			if (est_voice_chat) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_voice_chat = (bool)tempint1;
+				est_voice_chat = true;
+			}
+		}
+		else if (sscanf(fileLine, "mp_explosion_physics =%d", &tempint1) == 1) {
+			if (est_als_mp_explosion_physics) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				AdvLobbySettings_mp_explosion_physics = (bool)tempint1;
+				est_als_mp_explosion_physics = true;
+			}
+		}
+		else if (sscanf(fileLine, "mp_sputnik =%d", &tempint1) == 1) {
+			if (est_als_mp_sputnik) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				AdvLobbySettings_mp_sputnik = (bool)tempint1;
+				est_als_mp_sputnik = true;
+			}
+		}
+		else if (sscanf(fileLine, "mp_grunt_bday_party =%d", &tempint1) == 1) {
+			if (est_als_mp_grunt_bday_party) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				AdvLobbySettings_mp_grunt_bday_party = (bool)tempint1;
+				est_als_mp_grunt_bday_party = true;
+			}
+		}
+		else if (sscanf(fileLine, "grenade_chain_react =%d", &tempint1) == 1) {
 			if (est_als_grenade_chain_react) {
 				duplicated = true;
 			}
@@ -1499,43 +1499,43 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				AdvLobbySettings_grenade_chain_react = (bool)tempint1;
 				est_als_grenade_chain_react = true;
 			}
+		}
+		else if (sscanf(fileLine, "banshee_bomb =%d", &tempint1) == 1) {
+			if (est_als_banshee_bomb) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				AdvLobbySettings_banshee_bomb = (bool)tempint1;
+				est_als_banshee_bomb = true;
+			}
+		}
+		else if (sscanf(fileLine, "mp_blind =%d", &tempint1) == 1) {
+			if (est_als_mp_blind) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1 || tempint1 == 2 || tempint1 == 3)) {
+				incorrect = true;
+			}
+			else {
+				AdvLobbySettings_mp_blind = tempint1;
+				est_als_mp_blind = true;
+			}
+		}
+		else if (sscanf(fileLine, "flashlight =%d", &tempint1) == 1) {
+			if (est_als_flashlight) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				AdvLobbySettings_flashlight = (bool)tempint1;
+				est_als_flashlight = true;
+			}
 		}*/
-//		else if (sscanf(fileLine, "banshee_bomb =%d", &tempint1) == 1) {
-//			if (est_als_banshee_bomb) {
-//				duplicated = true;
-//			}
-//			else if (!(tempint1 == 0 || tempint1 == 1)) {
-//				incorrect = true;
-//			}
-//			else {
-//				AdvLobbySettings_banshee_bomb = (bool)tempint1;
-//				est_als_banshee_bomb = true;
-//			}
-//		}
-//		else if (sscanf(fileLine, "mp_blind =%d", &tempint1) == 1) {
-//			if (est_als_mp_blind) {
-//				duplicated = true;
-//			}
-//			else if (!(tempint1 == 0 || tempint1 == 1 || tempint1 == 2 || tempint1 == 3)) {
-//				incorrect = true;
-//			}
-//			else {
-//				AdvLobbySettings_mp_blind = tempint1;
-//				est_als_mp_blind = true;
-//			}
-//		}
-//		else if (sscanf(fileLine, "flashlight =%d", &tempint1) == 1) {
-//			if (est_als_flashlight) {
-//				duplicated = true;
-//			}
-//			else if (!(tempint1 == 0 || tempint1 == 1)) {
-//				incorrect = true;
-//			}
-//			else {
-//				AdvLobbySettings_flashlight = (bool)tempint1;
-//				est_als_flashlight = true;
-//			}
-//		}
 		else if (sscanf(fileLine, "debug_log =%d", &tempint1) == 1) {
 			if (est_debug_log) {
 				duplicated = true;

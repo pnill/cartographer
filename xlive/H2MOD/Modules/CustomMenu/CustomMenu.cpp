@@ -2476,87 +2476,87 @@ void RefreshToggleIngameKeyboardControls() {
 }
 
 //Reversed from Rainman/Cloud's tool (Credit to him for original hack).
-//void RefreshToggleDisableControllerAimAssist() {
-	//FIXME: Causes the vertical lift on The Armory to kill you and launch Sergeant Johnson.
-	//Probably other weird glitches too.
-//	return;
-//
-//	if (H2IsDediServer)
-//		return;
-//
-//	DWORD GameGlobals = *(DWORD*)((BYTE*)H2BaseAddr + ((H2IsDediServer) ? 0x4CB520 : 0x482D3C));
-//	DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
-//
-//	if (GameEngine == 3)
-//		return;
-//
-//	DWORD AddressOffset = *(DWORD*)((BYTE*)H2BaseAddr + 0x479E70);//0x2E10D000
-//
-//	if (H2Config_controller_aim_assist) {
-//
-//		*(DWORD*)(AddressOffset + 0x7D4C1C) = 0x3DB2B8C2;//0.08726646006f
-//		*(DWORD*)(AddressOffset + 0xB3E094) = 0x3D8EFA35;//0.06981316954f
-//		*(DWORD*)(AddressOffset + 0xAB5AD8) = 0x3E8EFA35;//0.2792526782f
-//		*(DWORD*)(AddressOffset + 0xB9FC5C) = 0x3E32B8C2;//0.1745329201f
-//		*(DWORD*)(AddressOffset + 0xCA421C) = 0x41600000;//14f
-//
-//		DWORD val6 = 0x3DD67750;//0.104719758f
-//		*(DWORD*)(AddressOffset + 0x804120) = val6;
-//		*(DWORD*)(AddressOffset + 0x932988) = val6;
-//		*(DWORD*)(AddressOffset + 0xA0D758) = val6;
-//		*(DWORD*)(AddressOffset + 0xA40028) = val6;
-//		*(DWORD*)(AddressOffset + 0xBD284C) = val6;
-//
-//		DWORD val11 = 0x3E567750;//0.2094395161f
-//		*(DWORD*)(AddressOffset + 0x7A8AEC) = val11;
-//		*(DWORD*)(AddressOffset + 0x8317C8) = val11;
-//		*(DWORD*)(AddressOffset + 0x87B6E0) = val11;
-//		*(DWORD*)(AddressOffset + 0x8DA2F0) = val11;
-//		*(DWORD*)(AddressOffset + 0x900FF4) = val11;
-//		*(DWORD*)(AddressOffset + 0xC89B74) = val11;
-//		*(DWORD*)(AddressOffset + 0xAE239C) = val11;
-//
-//		DWORD val18 = 0x3E20D97C;//0.1570796371f
-//		*(DWORD*)(AddressOffset + 0x984C10) = val18;
-//		*(DWORD*)(AddressOffset + 0x9C6F44) = val18;
-//		*(DWORD*)(AddressOffset + 0xA722A4) = val18;
-//		*(DWORD*)(AddressOffset + 0xCD36FC) = val18;
-//		*(DWORD*)(AddressOffset + 0xCD877C) = val18;
-//
-//	}
-//	else {
-//
-//		*(DWORD*)(AddressOffset + 0x7D4C1C) = 0x0;
-//		*(DWORD*)(AddressOffset + 0xB3E094) = 0x0;
-//		*(DWORD*)(AddressOffset + 0xAB5AD8) = 0x0;
-//		*(DWORD*)(AddressOffset + 0xB9FC5C) = 0x0;
-//		*(DWORD*)(AddressOffset + 0xCA421C) = 0x0;
-//
-//		DWORD val6 = 0x0;
-//		*(DWORD*)(AddressOffset + 0x804120) = val6;
-//		*(DWORD*)(AddressOffset + 0x932988) = val6;
-//		*(DWORD*)(AddressOffset + 0xA0D758) = val6;
-//		*(DWORD*)(AddressOffset + 0xA40028) = val6;
-//		*(DWORD*)(AddressOffset + 0xBD284C) = val6;
-//
-//		DWORD val11 = 0x0;
-//		*(DWORD*)(AddressOffset + 0x7A8AEC) = val11;
-//		*(DWORD*)(AddressOffset + 0x8317C8) = val11;
-//		*(DWORD*)(AddressOffset + 0x87B6E0) = val11;
-//		*(DWORD*)(AddressOffset + 0x8DA2F0) = val11;
-//		*(DWORD*)(AddressOffset + 0x900FF4) = val11;
-//		*(DWORD*)(AddressOffset + 0xC89B74) = val11;
-//		*(DWORD*)(AddressOffset + 0xAE239C) = val11;
-//
-//		DWORD val18 = 0x0;
-//		*(DWORD*)(AddressOffset + 0x984C10) = val18;
-//		*(DWORD*)(AddressOffset + 0x9C6F44) = val18;
-//		*(DWORD*)(AddressOffset + 0xA722A4) = val18;
-//		*(DWORD*)(AddressOffset + 0xCD36FC) = val18;
-//		*(DWORD*)(AddressOffset + 0xCD877C) = val18;
-//
-//	}
-//}
+/*void RefreshToggleDisableControllerAimAssist() {
+	FIXME: Causes the vertical lift on The Armory to kill you and launch Sergeant Johnson.
+	Probably other weird glitches too.
+	return;
+
+	if (H2IsDediServer)
+		return;
+
+	DWORD GameGlobals = *(DWORD*)((BYTE*)H2BaseAddr + ((H2IsDediServer) ? 0x4CB520 : 0x482D3C));
+	DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
+
+	if (GameEngine == 3)
+		return;
+
+	DWORD AddressOffset = *(DWORD*)((BYTE*)H2BaseAddr + 0x479E70);//0x2E10D000
+
+	if (H2Config_controller_aim_assist) {
+
+		*(DWORD*)(AddressOffset + 0x7D4C1C) = 0x3DB2B8C2;//0.08726646006f
+		*(DWORD*)(AddressOffset + 0xB3E094) = 0x3D8EFA35;//0.06981316954f
+		*(DWORD*)(AddressOffset + 0xAB5AD8) = 0x3E8EFA35;//0.2792526782f
+		*(DWORD*)(AddressOffset + 0xB9FC5C) = 0x3E32B8C2;//0.1745329201f
+		*(DWORD*)(AddressOffset + 0xCA421C) = 0x41600000;//14f
+
+		DWORD val6 = 0x3DD67750;//0.104719758f
+		*(DWORD*)(AddressOffset + 0x804120) = val6;
+		*(DWORD*)(AddressOffset + 0x932988) = val6;
+		*(DWORD*)(AddressOffset + 0xA0D758) = val6;
+		*(DWORD*)(AddressOffset + 0xA40028) = val6;
+		*(DWORD*)(AddressOffset + 0xBD284C) = val6;
+
+		DWORD val11 = 0x3E567750;//0.2094395161f
+		*(DWORD*)(AddressOffset + 0x7A8AEC) = val11;
+		*(DWORD*)(AddressOffset + 0x8317C8) = val11;
+		*(DWORD*)(AddressOffset + 0x87B6E0) = val11;
+		*(DWORD*)(AddressOffset + 0x8DA2F0) = val11;
+		*(DWORD*)(AddressOffset + 0x900FF4) = val11;
+		*(DWORD*)(AddressOffset + 0xC89B74) = val11;
+		*(DWORD*)(AddressOffset + 0xAE239C) = val11;
+
+		DWORD val18 = 0x3E20D97C;//0.1570796371f
+		*(DWORD*)(AddressOffset + 0x984C10) = val18;
+		*(DWORD*)(AddressOffset + 0x9C6F44) = val18;
+		*(DWORD*)(AddressOffset + 0xA722A4) = val18;
+		*(DWORD*)(AddressOffset + 0xCD36FC) = val18;
+		*(DWORD*)(AddressOffset + 0xCD877C) = val18;
+
+	}
+	else {
+
+		*(DWORD*)(AddressOffset + 0x7D4C1C) = 0x0;
+		*(DWORD*)(AddressOffset + 0xB3E094) = 0x0;
+		*(DWORD*)(AddressOffset + 0xAB5AD8) = 0x0;
+		*(DWORD*)(AddressOffset + 0xB9FC5C) = 0x0;
+		*(DWORD*)(AddressOffset + 0xCA421C) = 0x0;
+
+		DWORD val6 = 0x0;
+		*(DWORD*)(AddressOffset + 0x804120) = val6;
+		*(DWORD*)(AddressOffset + 0x932988) = val6;
+		*(DWORD*)(AddressOffset + 0xA0D758) = val6;
+		*(DWORD*)(AddressOffset + 0xA40028) = val6;
+		*(DWORD*)(AddressOffset + 0xBD284C) = val6;
+
+		DWORD val11 = 0x0;
+		*(DWORD*)(AddressOffset + 0x7A8AEC) = val11;
+		*(DWORD*)(AddressOffset + 0x8317C8) = val11;
+		*(DWORD*)(AddressOffset + 0x87B6E0) = val11;
+		*(DWORD*)(AddressOffset + 0x8DA2F0) = val11;
+		*(DWORD*)(AddressOffset + 0x900FF4) = val11;
+		*(DWORD*)(AddressOffset + 0xC89B74) = val11;
+		*(DWORD*)(AddressOffset + 0xAE239C) = val11;
+
+		DWORD val18 = 0x0;
+		*(DWORD*)(AddressOffset + 0x984C10) = val18;
+		*(DWORD*)(AddressOffset + 0x9C6F44) = val18;
+		*(DWORD*)(AddressOffset + 0xA722A4) = val18;
+		*(DWORD*)(AddressOffset + 0xCD36FC) = val18;
+		*(DWORD*)(AddressOffset + 0xCD877C) = val18;
+
+	}
+}*/
 
 void RefreshTogglexDelay() {
 	BYTE xDelayJMP[] = { 0x74 };

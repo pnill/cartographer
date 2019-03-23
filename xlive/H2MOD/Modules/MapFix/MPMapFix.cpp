@@ -17,4 +17,10 @@ void MPMapFix::Initialize()
 
 	*(float*)(FloatOffsets + 0xE610B0) = 14.0f; /*masterchief_mp hlmt max abs acc default value doubled*/
 	*(float*)(FloatOffsets + 0xE6CA50) = 20.0f; /*masterchief_mp hlmt max abs acc default value doubled*/
+
+	*(float*)(FloatOffsets + 0xE65D88) = 5.0f; /*elite_mp hlmt min game acc default value doubled*/
+	*(float*)(FloatOffsets + 0xE65D8C) = 9.0f; /*elite_mp hlmt max game acc default value doubled*/
+
+	*(float*)(FloatOffsets + 0xE65D98) = 14.0f; /*elite_mp hlmt max abs acc default value doubled*/
+	*(float*)(FloatOffsets + 0xE65D9C) = 20.0f; /*elite_mp hlmt max abs acc default value doubled*/
 }

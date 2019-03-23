@@ -12,7 +12,7 @@ void SPMapFix::Initialize()
 
 	if (map_checksum == 0xF45A0114)/*05a_deltaapproach map checksum*/
 	{
-		DWORD tree_test = *(DWORD*)(h2mod->GetBase() + 0x00A3FF00);
-		*(DWORD*)(tree_test + 0x1CC) = 0xFFFFFFFF;/*Setting bitmap index 4 in tree_ancient_leaves to null*/
+		DWORD tree_ancient_leaves = *(DWORD*)(h2mod->GetBase() + 0x00A3FF00);
+		*(DWORD*)(tree_ancient_leaves + 0x1CC) = 0xFFFFFFFF;/*Setting bitmap index 4 in tree_ancient_leaves to null*/
 	}
 }
