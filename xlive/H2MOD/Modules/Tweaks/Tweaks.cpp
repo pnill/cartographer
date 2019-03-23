@@ -1171,6 +1171,10 @@ void H2Tweaks::setFOV(double field_of_view_degrees) {
 }
 
 void H2Tweaks::setHz() {
+
+	if (H2IsDediServer)
+		return;
+
 	*(BYTE*)(H2BaseAddr + 0xA3DA08) = (H2Config_refresh_rate);
 }
 
