@@ -1138,15 +1138,11 @@ void H2Tweaks::setSens(InputType input_type, int sens) {
 }
 
 void H2Tweaks::setSavedSens() {
-	if (H2Config_mouse_sens == 0)
-		return;
+	if (H2Config_mouse_sens != 0)
+		H2Tweaks::setSens(MOUSE, (H2Config_mouse_sens));
 
-	H2Tweaks::setSens(MOUSE, (H2Config_mouse_sens));
-
-	if (H2Config_controller_sens == 0)
-		return;
-
-	H2Tweaks::setSens(CONTROLLER, (H2Config_controller_sens));
+	if (H2Config_controller_sens != 0)
+		H2Tweaks::setSens(CONTROLLER, (H2Config_controller_sens));
 }
 
 

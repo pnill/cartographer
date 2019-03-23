@@ -282,7 +282,7 @@ H2Types detect_process_type()
 	// fallback to checking file information in case the file was renamed.
 	wchar_t exe_file_path[_MAX_PATH + 1];
 	int result = GetModuleFileNameW(NULL, exe_file_path, ARRAYSIZE(exe_file_path));
-	if (0 < (result <= _MAX_PATH)) {
+	if (result <= _MAX_PATH && GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
 		DWORD version_info_size = GetFileVersionInfoSizeW(exe_file_path, NULL);
 		if (version_info_size != 0) {
 

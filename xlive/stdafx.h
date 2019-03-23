@@ -8,7 +8,6 @@
 #define _BIND_TO_CURRENT_CRT_VERSION 1
 
 #define VC_EXTRALEAN
-#define STRICT
 
 //#include <WinSDKVer.h>
 

@@ -98,7 +98,6 @@ int H2Config_custom_resolution_x = 0;
 int H2Config_custom_resolution_y = 0;
 char H2Config_dedi_server_name[32] = { "" };
 char H2Config_dedi_server_playlist[256] = { "" };
-bool H2Config_map_downloading_enable = false;
 bool H2Config_chatbox_commands = false;
 bool H2Config_debug_log = false;
 char H2Config_login_identifier[255] = { "" };
@@ -236,7 +235,7 @@ void SaveH2Config() {
 			fputs("\n# 1 - Enables Discord Rich Presence.", fileConfig);
 			fputs("\n\n", fileConfig);
 
-/*			fputs("# controller_aim_assist Options (Client):", fileConfig);
+			/*fputs("# controller_aim_assist Options (Client):", fileConfig);
 			fputs("\n# 0 - Disables aim assist for controllers.", fileConfig);
 			fputs("\n# 1 - Enables aim assist for controllers.", fileConfig);
 			fputs("\n\n", fileConfig);*/
@@ -286,17 +285,17 @@ void SaveH2Config() {
 			fputs("\n# 1 - In-game chat is hidden.", fileConfig);
 			fputs("\n\n", fileConfig);
 
-			//fputs("# custom_resolution Options (Client):", fileConfig);
-			//fputs("\n# <width>x<height> - Sets the resolution of the game via the Windows Registry.", fileConfig);
-			//fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fileConfig);
-			//fputs("\n\n", fileConfig);
+			/*fputs("# custom_resolution Options (Client):", fileConfig);
+			fputs("\n# <width>x<height> - Sets the resolution of the game via the Windows Registry.", fileConfig);
+			fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fileConfig);
+			fputs("\n\n", fileConfig);*/
 
 		}
 		fputs("# enable_xdelay Options:", fileConfig);
 		fputs("\n# 0 - Non-host players cannot delay the game start countdown timer.", fileConfig);
 		fputs("\n# 1 - Non-host players can delay the game start countdown timer (native default).", fileConfig);
 		fputs("\n\n", fileConfig);
-/*		if (!H2IsDediServer) {
+		/*if (!H2IsDediServer) {
 			fputs("# enable_hitmarker_sound Options (Client):", fileConfig);
 			fputs("\n# 0 - Shooting players does not produce a hitmarker sound effect (default).", fileConfig);
 			fputs("\n# 1 - Shooting players plays a hitmarker sound effect.", fileConfig);
@@ -419,7 +418,7 @@ void SaveH2Config() {
 
 			fputs("\ndiscord_enable = ", fileConfig); fputs(H2Config_discord_enable ? "1" : "0", fileConfig);
 
-//			fputs("\ncontroller_aim_assist = ", fileConfig); fputs(H2Config_controller_aim_assist ? "1" : "0", fileConfig);
+			//fputs("\ncontroller_aim_assist = ", fileConfig); fputs(H2Config_controller_aim_assist ? "1" : "0", fileConfig);
 
 			sprintf(settingOutBuffer, "\nfps_limit = %d", H2Config_fps_limit);
 			fputs(settingOutBuffer, fileConfig);
@@ -454,27 +453,28 @@ void SaveH2Config() {
 			//fputs("\ncustom_resolution = 0x0", fileConfig);
 		}
 		fputs("\nenable_xdelay = ", fileConfig); fputs(H2Config_xDelay ? "1" : "0", fileConfig);
-//		if (!H2IsDediServer) {
-//			fputs("\nenable_hitmarker_sound = ", fileConfig); fputs(H2Config_hitmarker_sound ? "1" : "0", fileConfig);
-//		}
-//		fputs("\nvoice_chat = ", fileConfig); fputs(H2Config_voice_chat ? "1" : "0", fileConfig);
-//
-//		if (H2IsDediServer) {
-//			fputs("\nmp_explosion_physics = ", fileConfig); fputs(AdvLobbySettings_mp_explosion_physics ? "1" : "0", fileConfig);
-//
-//			fputs("\nmp_sputnik = ", fileConfig); fputs(AdvLobbySettings_mp_sputnik ? "1" : "0", fileConfig);
-//
-//			fputs("\nmp_grunt_bday_party = ", fileConfig); fputs(AdvLobbySettings_mp_grunt_bday_party ? "1" : "0", fileConfig);
-//
-//			fputs("\ngrenade_chain_react = ", fileConfig); fputs(AdvLobbySettings_grenade_chain_react ? "1" : "0", fileConfig);
-//
-//			fputs("\nbanshee_bomb = ", fileConfig); fputs(AdvLobbySettings_banshee_bomb ? "1" : "0", fileConfig);
-//
-//			char tmpChar[2] = { '0' + AdvLobbySettings_mp_blind, 0 };
-//			fputs("\nmp_blind = ", fileConfig); fputs(tmpChar, fileConfig);
-//
-//			fputs("\nflashlight = ", fileConfig); fputs(AdvLobbySettings_flashlight ? "1" : "0", fileConfig);
-//		}
+
+		/*if (!H2IsDediServer) {
+			fputs("\nenable_hitmarker_sound = ", fileConfig); fputs(H2Config_hitmarker_sound ? "1" : "0", fileConfig);
+		}
+		fputs("\nvoice_chat = ", fileConfig); fputs(H2Config_voice_chat ? "1" : "0", fileConfig);
+
+		if (H2IsDediServer) {
+			fputs("\nmp_explosion_physics = ", fileConfig); fputs(AdvLobbySettings_mp_explosion_physics ? "1" : "0", fileConfig);
+
+			fputs("\nmp_sputnik = ", fileConfig); fputs(AdvLobbySettings_mp_sputnik ? "1" : "0", fileConfig);
+
+			fputs("\nmp_grunt_bday_party = ", fileConfig); fputs(AdvLobbySettings_mp_grunt_bday_party ? "1" : "0", fileConfig);
+
+			fputs("\ngrenade_chain_react = ", fileConfig); fputs(AdvLobbySettings_grenade_chain_react ? "1" : "0", fileConfig);
+
+			fputs("\nbanshee_bomb = ", fileConfig); fputs(AdvLobbySettings_banshee_bomb ? "1" : "0", fileConfig);
+
+			char tmpChar[2] = { '0' + AdvLobbySettings_mp_blind, 0 };
+			fputs("\nmp_blind = ", fileConfig); fputs(tmpChar, fileConfig);
+
+			fputs("\nflashlight = ", fileConfig); fputs(AdvLobbySettings_flashlight ? "1" : "0", fileConfig);
+		}*/
 
 		fputs("\ndebug_log = ", fileConfig); fputs(H2Config_debug_log ? "1" : "0", fileConfig);
 
@@ -483,8 +483,6 @@ void SaveH2Config() {
 
 			fputs("\nserver_playlist = ", fileConfig); fputs(H2Config_dedi_server_playlist, fileConfig);
 		}
-
-		//fputs("\nmap_downloading_enable = ", fileConfig); fputs(H2Config_map_downloading_enable ? "1" : "0", fileConfig);
 
 		if (!H2IsDediServer) {
 			//fputs("\nchatbox_commands = ", fileConfig); fputs(H2Config_chatbox_commands ? "1" : "0", fileConfig);
@@ -644,20 +642,19 @@ static bool est_sens_mouse = false;
 static bool est_disable_ingame_keyboard = false;
 static bool est_hide_ingame_chat = false;
 static bool est_xdelay = false;
-//static bool est_hitmarker_sound = false;
-//static bool est_voice_chat = false;
-//static bool est_als_mp_explosion_physics = false;
-//static bool est_als_mp_sputnik = false;
-//static bool est_als_mp_grunt_bday_party = false;
-//static bool est_als_grenade_chain_react = false;
-//static bool est_als_banshee_bomb = false;
-//static bool est_als_mp_blind = false;
-//static bool est_als_flashlight = false;
+/*static bool est_hitmarker_sound = false;
+static bool est_voice_chat = false;
+static bool est_als_mp_explosion_physics = false;
+static bool est_als_mp_sputnik = false;
+static bool est_als_mp_grunt_bday_party = false;
+static bool est_als_grenade_chain_react = false;
+static bool est_als_banshee_bomb = false;
+static bool est_als_mp_blind = false;
+static bool est_als_flashlight = false;*/
 static bool est_debug_log = false;
 static bool est_custom_resolution = false;
 static bool est_server_name = false;
 static bool est_server_playlist = false;
-static bool est_map_downloading_enable = false;
 static bool est_chatbox_commands = false;
 static bool est_login_token = false;
 static bool est_login_identifier = false;
@@ -709,7 +706,7 @@ static void est_reset_vars() {
 	est_skip_intro = false;
 	est_raw_input = false;
 	est_discord_enable = false;
-//	est_controller_aim_assist = false;
+	//est_controller_aim_assist = false;
 	est_fps_limit = false;
 	est_static_lod_state = false;
 	est_field_of_view = false;
@@ -722,20 +719,19 @@ static void est_reset_vars() {
 	est_disable_ingame_keyboard = false;
 	est_hide_ingame_chat = false;
 	est_xdelay = false;
-	//est_hitmarker_sound = false;
-//	est_voice_chat = false;
-//	est_als_mp_explosion_physics = false;
-//	est_als_mp_sputnik = false;
-//	est_als_mp_grunt_bday_party = false;
-//	est_als_grenade_chain_react = false;
-//	est_als_banshee_bomb = false;
-//	est_als_mp_blind = false;
-//	est_als_flashlight = false;
+	/*est_hitmarker_sound = false;
+	est_voice_chat = false;
+	est_als_mp_explosion_physics = false;
+	est_als_mp_sputnik = false;
+	est_als_mp_grunt_bday_party = false;
+	est_als_grenade_chain_react = false;
+	est_als_banshee_bomb = false;
+	est_als_mp_blind = false;
+	est_als_flashlight = false;*/
 	est_debug_log = false;
 	est_custom_resolution = false;
 	est_server_name = false;
 	est_server_playlist = false;
-	est_map_downloading_enable = false;
 	est_chatbox_commands = false;
 	est_login_token = false;
 	est_login_identifier = false;
@@ -1601,18 +1597,6 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 					}
 				}
 				est_server_playlist = true;
-			}
-		}
-		else if (sscanf(fileLine, "map_downloading_enable =%d", &tempint1) == 1) {
-			if (est_map_downloading_enable) {
-				duplicated = true;
-			}
-			else if (!(tempint1 == 0 || tempint1 == 1)) {
-				incorrect = true;
-			}
-			else {
-				H2Config_map_downloading_enable = (bool)tempint1;
-				est_map_downloading_enable = true;
 			}
 		}
 		else if (!H2IsDediServer && sscanf(fileLine, "chatbox_commands =%d", &tempint1) == 1) {

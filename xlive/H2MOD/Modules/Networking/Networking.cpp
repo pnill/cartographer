@@ -825,6 +825,8 @@ void applyConnectionPatches()
 	NopFill<9>(h2mod->GetBase() + (h2mod->Server ? 0x1B3CC3 : 0x1F1F94)); // check if secure/ipaddress != 127.0.0.1
 	// disable network observer (broken on H2V)
 	WriteValue<BYTE>(h2mod->GetBase() + (h2mod->Server ? 0x1A92BA : 0x1B555C), (BYTE)0);
+	// also ping bars
+	WriteValue<BYTE>(h2mod->GetBase() + (h2mod->Server ? 0x1C1B7F : 0x1D4E35), 0xEB);
 
 	// makes Live network not as laggy 
 	/*int data = 500;
