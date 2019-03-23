@@ -505,6 +505,13 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 
 	pqos->cxnqos = cxna;
 	pqos->cxnqosPending = cxna;
+	pqos->axnqosinfo[0].cProbesXmit = 4;
+	pqos->axnqosinfo[0].cProbesRecv = 4;
+	pqos->axnqosinfo[0].wRttMinInMsecs = 80;
+	pqos->axnqosinfo[0].wRttMedInMsecs = 90;
+	pqos->axnqosinfo[0].dwDnBitsPerSec = dwBitsPerSec;
+	pqos->axnqosinfo[0].dwUpBitsPerSec = dwBitsPerSec;
+	pqos->axnqosinfo[0].bFlags = XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE;
 
 	/*
 	This is gonna hit some CPUs hard when there's a lot of servers on the list, we'll probably want to queue this a bit and only allow X number of threads to run at a time.
