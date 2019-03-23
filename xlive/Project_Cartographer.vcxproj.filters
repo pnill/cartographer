@@ -106,9 +106,6 @@
     <Filter Include="Source Files\Util\Hooks">
       <UniqueIdentifier>{6e3b665a-267b-4baf-9978-190c7753a4d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\H2MOD\TeamSpeak">
-      <UniqueIdentifier>{0cc52107-bf23-4ffa-8f69-d153a943b89d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\H2MOD\Variants\H2Final">
       <UniqueIdentifier>{8ae2946e-1bb2-4bd1-8e7c-1dd9790a829e}</UniqueIdentifier>
     </Filter>
@@ -244,6 +241,15 @@
     <Filter Include="Source Files\H2MOD\Modules\HitFix">
       <UniqueIdentifier>{e2beceb0-3685-4b6a-88e8-2a4b7ac4a822}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\3rdparty\opus">
+      <UniqueIdentifier>{c2d12e72-3d9f-4695-a08d-e81a5ef33724}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\3rdparty\portaudio">
+      <UniqueIdentifier>{a11687ea-ad4d-4338-be2a-8150f5fc6ff4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\MapFix">
+      <UniqueIdentifier>{0dcc09a4-5fd5-4f51-9344-1bee701782ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -297,12 +303,6 @@
     <ClCompile Include="Util\Debug\Debug.cpp">
       <Filter>Source Files\Util\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="H2MOD\TeamSpeak\TSClient.cpp">
-      <Filter>Source Files\H2MOD\TeamSpeak</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\TeamSpeak\TSServer.cpp">
-      <Filter>Source Files\H2MOD\TeamSpeak</Filter>
-    </ClCompile>
     <ClCompile Include="XLive\Networking\xlive_network.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
@@ -310,9 +310,6 @@
       <Filter>Source Files\H2MOD\Variants\H2Final</Filter>
     </ClCompile>
     <ClCompile Include="XLive\Networking\ServerList.cpp">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClCompile>
-    <ClCompile Include="XLive\Networking\XLiveQoS.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
     <ClCompile Include="XLive\Networking\upnp.cpp">
@@ -405,9 +402,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp">
       <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\Voice\Voice.cpp">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClCompile>
     <ClCompile Include="XLive\XAM\xam.cpp">
       <Filter>Source Files\XLive\xam</Filter>
     </ClCompile>
@@ -458,6 +452,27 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\HitFix\HitFix.cpp">
       <Filter>Source Files\H2MOD\Modules\HitFix</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Voice\XHVEngine.cpp">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Voice\Encoder.cpp">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Voice\AudioDevices.cpp">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Voice\AudioHandler.cpp">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Networking\XNetQoS.cpp">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp">
+      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\MapFix\SPMapFix.cpp">
+      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -626,19 +641,10 @@
     <ClInclude Include="Util\ReadIniArguments.h">
       <Filter>Source Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\TeamSpeak\TSServer.h">
-      <Filter>Source Files\H2MOD\TeamSpeak</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\TeamSpeak\TSClient.h">
-      <Filter>Source Files\H2MOD\TeamSpeak</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Variants\H2Final\H2Final.h">
       <Filter>Source Files\H2MOD\Variants\H2Final</Filter>
     </ClInclude>
     <ClInclude Include="XLive\Networking\ServerList.h">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Networking\XLiveQoS.h">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClInclude>
     <ClInclude Include="XLive\Networking\upnp.h">
@@ -730,9 +736,6 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h">
       <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Voice\Voice.h">
-      <Filter>Source Files\XLive\voice</Filter>
     </ClInclude>
     <ClInclude Include="XLive\XAM\xam.h">
       <Filter>Source Files\XLive\xam</Filter>
@@ -868,6 +871,72 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\HitFix\HitFix.h">
       <Filter>Source Files\H2MOD\Modules\HitFix</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_custom.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_defines.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_multistream.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_projection.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_types.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_jack.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_linux_alsa.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_mac_core.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_ds.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_wasapi.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_waveformat.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_wdmks.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_wmme.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\portaudio.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Voice\XHVEngine.h">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Voice\Encoder.h">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Voice\AudioDevices.h">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Voice\AudioHandler.h">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Networking\XNetQoS.h">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h">
+      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\MapFix\SPMapFix.h">
+      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

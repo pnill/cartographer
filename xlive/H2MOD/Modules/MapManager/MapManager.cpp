@@ -5,6 +5,7 @@
 #include <WS2tcpip.h>
 #include "H2MOD\Modules\Config\Config.h"
 #include <curl/curl.h>
+#include "XLive/UserManagement/CUser.h"
 
 #pragma comment (lib, "mswsock.lib")
 
@@ -128,10 +129,8 @@ wchar_t* get_receiving_map_string()
 wchar_t repo_wstr[] = L"repository";
 void get_map_download_source_str(int a1, wchar_t* buffer)
 {	
-	if (buffer == NULL)
-		return;
-
-	wcsncpy_s(buffer, 512, repo_wstr, -1);
+	if (buffer != NULL)
+		wcsncpy_s(buffer, 512, repo_wstr, -1);
 }
 
 /**
@@ -386,8 +385,7 @@ void MapManager::sendMapInfoPacket()
 		TRACE_GAME_N("[h2mod-mapmanager] custom map filename missing");
 		return;
 	}
-	const char* mapFilename = mapFilenameStr.c_str();
-	TRACE_GAME_N("[h2mod-mapmanager] custom map name being sent %s", mapFilename);
+	TRACE_GAME_N("[h2mod-mapmanager] custom map name being sent %s", mapFilenameStr.c_str());
 	map_info->set_mapfilename(mapFilenameStr);
 	//TODO: send over size so p2p can work easier
 	map_info->set_mapsize(0);
@@ -404,17 +402,7 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 }
 
 static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
-	if (mapManager->precalculatedDownloadPercentageStrings.empty()) {
-		for (int i = 0; i <= 100; i++) {
-			std::string downloadMsg;
-			downloadMsg = DOWNLOAD_MAP_PERCENTAGE_PREFIX;
-			downloadMsg += std::to_string(i);
-			downloadMsg += DOWNLOAD_MAP_PERCENTAGE_CHAR;
-			mapManager->precalculatedDownloadPercentageStrings[i] = downloadMsg;
-		}
-	}
 	downloadPercentage = ((double)dlnow / (double)dltotal) * 100;
-	mapManager->setCustomLobbyMessage(mapManager->precalculatedDownloadPercentageStrings[downloadPercentage].c_str());
 	return 0;
 }
 
@@ -514,8 +502,8 @@ bool MapManager::downloadFromHost() {
 		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
-		std::string addr = inet_ntoa(join_game_xn.ina);
-		std::string prt = std::to_string(ntohs(join_game_xn.wPortOnline) + 9);
+		std::string addr = inet_ntoa(userManager.game_host_xn.ina);
+		std::string prt = std::to_string(ntohs(userManager.game_host_xn.wPortOnline) + 9);
 		if (H2Config_debug_log)
 			TRACE_GAME_N("[h2mod-mapmanager] Client map dl, addr=%s, port=%s", addr.c_str(), prt.c_str());
 		// Resolve the server address and port

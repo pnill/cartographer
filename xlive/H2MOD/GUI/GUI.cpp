@@ -51,8 +51,8 @@ D3DPRESENT_PARAMETERS *pD3DPP;
 
 IDirect3DTexture9* Primitive = NULL;
 
-char* BuildText;
-extern char* ServerStatus;
+char* BuildText = nullptr;
+char* ServerStatus = nullptr;
 extern int MasterState;
 
 const char CompileDate[] = __DATE__;
@@ -120,19 +120,6 @@ inline void frameTimeManagement()
 	} while (std::chrono::system_clock::now() > nextFrame);
 }
 
-DWORD dwPresent;
-typedef HRESULT(WINAPI* tPresent)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion);
-tPresent pPresent;
-
-HRESULT hkPresent(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)
-{
-	//DSFix FPS Hax - https://github.com/PeterTh/dsfix/blob/d10fc7ad0a72da0585b5f5f71b03daddc37ef890/RenderstateManager.cpp
-	frameTimeManagement();
-
-	return pPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
-}
-
-
 LPDIRECT3DTEXTURE9 Texture_Interface;
 LPD3DXSPRITE Sprite_Interface;
 
@@ -178,32 +165,23 @@ int WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 // #5000: XLiveInitialize
 int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 {
-		InitInstance();
-		TRACE("XLiveInitialize()");
+	InitInstance();
+	TRACE("XLiveInitialize()");
 
-		if (!h2mod->Server)
-		{
-			//TRACE("XLiveInitialize  (pPii = %X)", pPii);
-			pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
-			pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
+	if (!h2mod->Server)
+	{
+		//TRACE("XLiveInitialize  (pPii = %X)", pPii);
+		pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
+		pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
 
-			//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice + 17);
-			//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
+		ServerStatus = new char[250];
+		snprintf(ServerStatus, 250, "Status: Initializing....");
 
-			//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
+		BuildText = new char[250];
+		snprintf(BuildText, 250, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
 
-			BuildText = new char[250];
-			snprintf(BuildText, 250, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
-	
-			GUI::Initialize();
-
-			
-		}
-		
-#if 0
-	while (1)
-		Sleep(1);
-#endif
+		GUI::Initialize();
+	}
 	
 	return 0;
 }
@@ -280,10 +258,6 @@ void InitalizeFont(char *strFontName, char *strFontPath, int size, IDirect3DDevi
 
 void initFontsIfRequired()
 {
-
-
-
-
 	normalSizeFontHeight = 0.017 * verticalRes;
 	largeSizeFontHeight = 0.034 * verticalRes;
 
@@ -590,13 +564,7 @@ int WINAPI XLiveRender()
 				
 				if (it->second == false)
 				{
-					std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
-
-					h2mod->SoundMap[L"sounds/AchievementUnlocked.wav"] = 0;
-					//unlock immediately after modifying sound map
-					lck.unlock();
-					h2mod->sound_cv.notify_one();
-
+					h2mod->CustomSoundPlay(L"sounds/AchievementUnlocked.wav", 0);
 					it->second = true;
 				}
 				

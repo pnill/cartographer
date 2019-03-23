@@ -43,11 +43,10 @@ void startGameThread() {
 							}
 							break;
 						case H2ModPacket_Type_map_info_request:
-							TRACE_GAME("[h2mod-network] Received map info packet");
 							if (recvpak.has_map_info()) {
 								std::string mapFilename = recvpak.map_info().mapfilename();
 								if (!mapFilename.empty()) {
-									TRACE_GAME_N("[h2mod-network] map file name from packet %s", mapFilename.c_str());
+									TRACE_GAME_N("[h2mod-network] Received map file name from packet: %s", mapFilename.c_str());
 									if (!mapManager->hasCustomMap(mapFilename)) {
 										//TODO: set map filesize
 										mapManager->setMapFileNameToDownload(mapFilename);

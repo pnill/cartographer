@@ -4,10 +4,10 @@
 MapManager* mapManager = new MapManager();
 AdvLobbySettings* advLobbySettings = new AdvLobbySettings();
 
-GameStatePlayerTable *game_state_players = NULL;
-GameStateObjectHeaderTable* game_state_objects_header = NULL;
-GameStateActorTable* game_state_actors = NULL;
-global_tag_instance* tag_instances = NULL;
+GameStatePlayerTable *game_state_players = nullptr;
+GameStateObjectHeaderTable* game_state_objects_header = nullptr;
+GameStateActorTable* game_state_actors = nullptr;
+global_tag_instance* tag_instances = nullptr;
 
 bool displayXyz = false;
 volatile bool isLobby = true;
@@ -25,10 +25,7 @@ Players* players = new Players();
 //TODO: actually check if they have a microphone or check some settings
 bool microphoneEnabled = true;
 std::unordered_map<XUID, BOOL> xuidIsTalkingMap;
-std::unordered_map<XUID, anyID> xuidToTSid;
 IN_ADDR clientMachineAddress = {};
-TSClient* tsClient = NULL;
-TSServer* tsServer = NULL;
 
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
 	std::stringstream ss(s);
@@ -53,11 +50,4 @@ int stripWhitespace(wchar_t *inputStr) {
 	printf("Strlen + 1 is: %i\n", wcslen(start) + 1);
 	memmove(inputStr, start, wcslen(start) + 1);
 	return 0;
-}
-
-void patchBYTEs(BYTE* orig, BYTE* values, int size) {
-	DWORD dwBack;
-	VirtualProtect(orig, size, PAGE_EXECUTE_READWRITE, &dwBack);
-	memcpy(orig, (BYTE*)values, size);
-	VirtualProtect(orig, size, dwBack, &dwBack);
 }

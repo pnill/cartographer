@@ -1,15 +1,9 @@
 #include <string>
 #include <curl/curl.h>
 #include "rapidjson/document.h"
-#include "rapidjson/stringbuffer.h"
 #include "rapidjson/prettywriter.h"
-#include <sstream>
-#include <algorithm>
 #include "Globals.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
-#include "xliveless.h"
 
 using namespace rapidjson;
 using namespace std;
@@ -23,7 +17,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 	return size * nmemb;
 }
 
-void Achievement_Unlock(int achievement_id)
+void AchievementUnlock(int achievement_id)
 {
 	TRACE_GAME_N("[H2Mod-Achievement] - Unlocking achievement ID: %i", achievement_id);
 
@@ -60,7 +54,7 @@ void Achievement_Unlock(int achievement_id)
 	}
 }
 
-void Achievement_GetAll()
+void GetAchievements()
 {
 	CURL *curl;
 	CURLcode res;
@@ -89,4 +83,8 @@ void Achievement_GetAll()
 			achievementList[id] = 1;
 		}
 	}
+
+	// enable single player achievements
+	if (!h2mod->Server)
+		*(BYTE*)(h2mod->GetBase() + 0x518210 + 0x1B41)  = (BYTE)1;
 }

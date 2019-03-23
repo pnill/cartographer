@@ -8,15 +8,14 @@
 #include <unordered_map>
 #include <stdlib.h>
 #include <mutex>
-#include "h2mod.h"
+#include "H2MOD.h"
 #include <windows.h>
 #include "xliveless.h"
 #include "Util\Hooks\Hook.h"
 #include "Util\ReadIniArguments.h"
+#include <3rdparty/portaudio/include/portaudio.h>
 
 #include "Blam\BlamLibrary.h"
-#include "H2MOD\TeamSpeak\TSClient.h"
-#include "H2MOD\TeamSpeak\TSServer.h"
 #include "H2MOD\Modules\Players\Players.h"
 #include "H2MOD\Variants\VariantPlayer.h"
 #include "H2MOD\Variants\VariantSystem.h"
@@ -47,7 +46,6 @@ extern global_tag_instance* tag_instances;
 extern DeviceShop* device_shop;
 extern VariantPlayer* variant_player;
 
-extern XNADDR join_game_xn;
 extern MapManager* mapManager;
 extern AdvLobbySettings* advLobbySettings;
 extern bool displayXyz;
@@ -60,21 +58,15 @@ extern CustomNetwork *network;
 extern char* replacedNetworkNormalTextWidget;
 extern char* replacedNetworkNormalTextWidget2;
 
-extern std::unordered_map<XUID, BOOL> xuidIsTalkingMap;
-extern std::unordered_map<XUID, anyID> xuidToTSid;
 extern std::map<DWORD, bool> achievementList;
 
 extern bool microphoneEnabled;
-extern IN_ADDR clientMachineAddress;
-extern TSClient* tsClient;
-extern TSServer* tsServer;
+extern std::unordered_map<XUID, BOOL> xuidIsTalkingMap;
 
 //some utility functions below
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
 std::vector<std::string> split(const std::string &s, char delim);
 int stripWhitespace(wchar_t *inputStr);
-
-void patchBYTEs(BYTE* orig, BYTE* values, int size);
 
 extern int H2GetInstanceId();
 

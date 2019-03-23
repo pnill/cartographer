@@ -7,7 +7,7 @@ void ReadH2Config();
 
 #define DLL_VERSION_MAJOR               0
 #define DLL_VERSION_MINOR               5
-#define DLL_VERSION_REVISION            0
+#define DLL_VERSION_REVISION            2
 #define DLL_VERSION_BUILD				0
 
 #define DLL_VERSION            DLL_VERSION_MAJOR, DLL_VERSION_MINOR, DLL_VERSION_REVISION, DLL_VERSION_BUILD
@@ -31,21 +31,23 @@ extern bool H2Config_custom_labels_capture_missing;
 extern bool H2Config_skip_intro;
 extern bool H2Config_raw_input;
 extern bool H2Config_discord_enable;
-extern bool H2Config_controller_aim_assist;
+//extern bool H2Config_controller_aim_assist;
 extern int H2Config_fps_limit;
 extern int H2Config_static_lod_state;
 extern int H2Config_field_of_view;
+extern int H2Config_mouse_sens;
+extern int H2Config_controller_sens;
+extern int H2Config_refresh_rate;
 extern float H2Config_crosshair_offset;
 extern bool H2Config_disable_ingame_keyboard;
 extern bool H2Config_hide_ingame_chat;
 extern bool H2Config_xDelay;
-extern bool H2Config_hitmarker_sound;
+//extern bool H2Config_hitmarker_sound;
 extern bool H2Config_voice_chat;
 extern int H2Config_custom_resolution_x;
 extern int H2Config_custom_resolution_y;
 extern char H2Config_dedi_server_name[32];
 extern char H2Config_dedi_server_playlist[256];
-extern bool H2Config_map_downloading_enable;
 extern bool H2Config_chatbox_commands;
 extern bool H2Config_debug_log;
 extern char H2Config_login_identifier[255];

@@ -8,7 +8,6 @@
 #include "H2MOD\Modules\Achievements\Achievements.h"
 #include <string>
 
-using namespace std;
 int achieveinit = 0;
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
@@ -16,10 +15,10 @@ HANDLE g_dwFakeAchievementContent = (HANDLE)-2;
 
 
 // #5278: XUserWriteAchievements
-DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement, LPVOID pOverlap)
+DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement, PXOVERLAPPED pOverlapped)
 {
-	TRACE("XUserWriteAchievements  (count = %x, buffer = %x, overlap = %x)",
-		count, pAchievement, pOverlap);
+	TRACE("XUserWriteAchievements  (count = %x, buffer = %x, pOverlapped = %x)",
+		count, pAchievement, pOverlapped);
 
 	if (count > 0)
 	{
@@ -204,13 +203,13 @@ DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement
 
 				default:
 					AchievementData.append("Unknown|We're honestly not sure wtf? :");
-					AchievementData.append(to_string(AchievementID));
+					AchievementData.append(std::to_string(AchievementID));
 					break;
 				}
 
 				h2mod->AchievementMap[AchievementData.c_str()] = false;
 
-				std::thread(Achievement_Unlock, AchievementID).detach();
+				std::thread(AchievementUnlock, AchievementID).detach();
 			}
 			else {
 				TRACE_GAME_N("Achievement %d was already unlocked", AchievementID);
@@ -219,12 +218,17 @@ DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement
 			pAchievement++;
 			count--;
 		}
-
-		// crash-protect progress
-		//SaveAchievements();
 	}
 
-	return 997;
+	if (pOverlapped)
+	{
+		pOverlapped->InternalLow = ERROR_SUCCESS;
+		pOverlapped->InternalHigh = ERROR_SUCCESS;
+		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+		return ERROR_IO_PENDING;		
+	}
+
+	return ERROR_SUCCESS;
 }
 
 // #5280: XUserCreateAchievementEnumerator

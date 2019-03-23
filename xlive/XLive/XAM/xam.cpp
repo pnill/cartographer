@@ -2,6 +2,7 @@
 #include "xlivedefs.h"
 #include "xliveless.h"
 #include "xam.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
 DWORD sys_ui = -1;
 
@@ -10,13 +11,12 @@ HANDLE g_dwFakeListener = (HANDLE)-2;
 struct NOTIFY_LISTEN
 {
 	HANDLE id;
-	DWORD area;
-
+	ULONGLONG area;
 	DWORD print;
 };
 
-static NOTIFY_LISTEN g_listener[50];
 static int g_dwListener = 0;
+static NOTIFY_LISTEN g_listener[50];
 
 int g_xlive = 0;
 
@@ -24,14 +24,10 @@ DWORD WINAPI sysui_timer(LPVOID lpParam)
 {
 	Sleep(20);
 
-
-
 	SetEvent((HANDLE)lpParam);
 	sys_ui = 2;
 
-
 	TRACE("- %X = XN_SYS_UI  (signal)", (HANDLE)lpParam);
-
 
 	return 0;
 }
@@ -39,26 +35,17 @@ DWORD WINAPI sysui_timer(LPVOID lpParam)
 // #5270: XNotifyCreateListener
 HANDLE WINAPI XNotifyCreateListener(ULONGLONG qwAreas)
 {
-	TRACE("XNotifyCreateListener  (0x%016x)", qwAreas);
+	int listenerIndex = g_dwListener++;
+	g_listener[listenerIndex].print = 0;
+	g_listener[listenerIndex].area = qwAreas;
+	g_listener[listenerIndex].id = CreateMutex(NULL, NULL, NULL);
 
-
-	g_dwFakeListener = CreateMutex(NULL, NULL, NULL);
-
-
-
-	g_listener[g_dwListener].id = g_dwFakeListener;
-	g_listener[g_dwListener].area = qwAreas;
-	g_listener[g_dwListener].print = 0;
-	g_dwListener++;
-
-
-	SetEvent(g_dwFakeListener);
-
-
-	TRACE("- handle = %X", g_dwFakeListener);
-	return g_dwFakeListener;
+	TRACE("XNotifyCreateListener(0x%016X), ", qwAreas);
+	TRACE(" - handle: %X", g_listener[listenerIndex].id);
+	SetEvent(g_listener[listenerIndex].id);
+	
+	return g_listener[listenerIndex].id;
 }
-
 
 // #651: XNotifyGetNext
 BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId, PULONG_PTR pParam)
@@ -75,32 +62,24 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	static DWORD live_content = 0x7FFFFFFF;
 	static DWORD live_membership = 0x7FFFFFFF;
 
-
-
-
 	ResetEvent(hNotification);
-
-
 
 	int curlist = 0;
 	while (curlist < g_dwListener)
 	{
-		if (g_listener[curlist].id == hNotification) break;
+		if (g_listener[curlist].id == hNotification) 
+			break;
 
 		curlist++;
 	}
 
 	if (curlist == g_dwListener)
 	{
-		TRACE("XNotifyGetNext  (hNotification = %X, dwMsgFilter = %X, pdwId = %X, pParam = %X)",
+		TRACE("XNotifyGetNext  (hNotification = %X, dwMsgFilter = %X, pdwId = %X, pParam = %X) - unknown notifier",
 			hNotification, dwMsgFilter, pdwId, pParam);
-
-		TRACE("- unknown notifier");
 
 		return 0;
 	}
-
-
 
 	if ((g_listener[curlist].area & ((XNID_AREA(dwMsgFilter) << 1) | 1)) == 0)
 	{
@@ -112,16 +91,12 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		return 0;
 	}
 
-
-
 	// reset logger
 	if (sys_ui == -1)
 	{
 		sys_ui = 0;
 		g_listener[curlist].print = 0;
 	}
-
-
 
 	if (g_listener[curlist].print < print_limit)
 	{
@@ -132,17 +107,12 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		g_listener[curlist].print++;
 	}
 
-
-
 	EnterCriticalSection(&d_lock);
-
 
 	BOOL exit_code = FALSE;
 
-	if (pdwId) *pdwId = dwMsgFilter;
-
-
-
+	if (pdwId) 
+		*pdwId = dwMsgFilter;
 
 	// set to next available message
 	if ((g_listener[curlist].area & XNOTIFY_SYSTEM) &&
@@ -218,13 +188,8 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			// show UI
 			if (pParam) *pParam = 1;
 
-
-			DWORD threadid;
-
 			sys_ui++;
-			CreateThread(NULL, 0, &sysui_timer, (LPVOID)hNotification, NULL, &threadid);
-
-
+			std::thread(sysui_timer, hNotification).detach();
 
 			TRACE("- %X = XN_SYS_UI (1)", hNotification);
 
@@ -242,9 +207,6 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			TRACE("- %X = XN_SYS_UI (0)", hNotification);
 
 			exit_code = TRUE;
-
-
-
 
 			sys_signin = 0;
 			sys_storage = 0;
@@ -421,14 +383,13 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	return exit_code;
 }
 
-
-
 // #652: XNotifyPositionUI
 DWORD WINAPI XNotifyPositionUI(DWORD dwPosition)
 {
 	TRACE("XNotifyPositionUI (%d)", dwPosition);
 	return 0;
 }
+
 // #653
 int WINAPI XNotifyDelayUI(int a1)
 {

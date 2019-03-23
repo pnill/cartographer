@@ -6,6 +6,8 @@
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\HitFix\Hitfix.h"
+#include "H2MOD\Modules\MapFix\SPMapfix.h"
+#include "H2MOD\Modules\MapFix\MPMapfix.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -14,7 +16,6 @@
 #include "H2MOD\Variants\H2X\H2X.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
 #include "XLive\UserManagement\CUser.h"
-
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -32,12 +33,14 @@ bool b_Infection = false;
 bool b_Halo2Final = false;
 bool b_HeadHunter = false;
 
-extern CUserManagement User;
 extern int H2GetInstanceId();
 extern XUID xFakeXuid[4];
 std::unordered_map<int, int> object_to_variant;
 
 using namespace Blam::Cache::DataTypes;
+
+int GAME_BUILD = 11122;
+int EXECUTABLE_VERSION = 4;
 
 int character_datum_from_index(BYTE index)
 {
@@ -75,8 +78,6 @@ game_lobby_states call_get_lobby_state()
 }
 
 #pragma region engine calls
-
-
 
 int __cdecl call_get_object(signed int object_datum_index, int object_type)
 {
@@ -176,7 +177,6 @@ int __cdecl call_object_placement_data_new_datum(void* s_object_placement_data, 
 }
 int __cdecl call_object_placement_data_new(void* s_object_placement_data, int object_definition_index, int object_owner, int unk)
 {
-
 	//TRACE_GAME("object_placement_data_new(s_object_placement_data: %08X,",s_object_placement_data);
 	//TRACE_GAME("object_definition_index: %08X, object_owner: %08X, unk: %08X)", object_definition_index, object_owner, unk);
 
@@ -184,8 +184,6 @@ int __cdecl call_object_placement_data_new(void* s_object_placement_data, int ob
 	object_placement_data_new pobject_placement_data_new = (object_placement_data_new)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x121033 : 0x132163));
 
 	return pobject_placement_data_new(s_object_placement_data, object_definition_index, object_owner, unk);
-
-
 }
 
 /*int __cdecl call_entity_datum_to_gamestate_datum(int entity_datum)
@@ -209,7 +207,7 @@ signed int __cdecl call_object_new(void* pObject)
 
 bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 {
-	typedef int(__cdecl  *add_object_to_sync)(int gamestate_object_datum);
+	typedef int(__cdecl *add_object_to_sync)(int gamestate_object_datum);
 	add_object_to_sync p_add_object_to_sync = (add_object_to_sync)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x1B2C44 : 0x1B8D14));
 
 	return p_add_object_to_sync(gamestate_object_datum);
@@ -226,8 +224,6 @@ int get_actor_datum_from_unit_datum(int unit_datum)
 
 	return -1;
 }
-
-
 
 /* This looks at the actors table to get the character datum which is assigned to the specific actor. */
 int get_char_datum_from_actor(int actor_datum)
@@ -301,7 +297,6 @@ bool bitstream_write_bool(void *packet, char* string_data, bool value)
 
 int bitstream_write_uint(void* packet, char* string_data, unsigned int value, signed int bit_size)
 {
-
 	typedef int(__thiscall *tbitstream_write_uint)(void* packet, char* string_data, unsigned int value, signed int bit_size);
 	tbitstream_write_uint pbitstream_write_uint = (tbitstream_write_uint)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCDD80 : 0xD17C6));
 
@@ -319,7 +314,6 @@ bool bitstream_read_bool(void *packet, char* string_data)
 
 int bitstream_read_uint(void* packet, char* string_data, signed int bit_size)
 {
-
 	typedef int(__thiscall *tbitstream_read_uint)(void* packet, char* string_data, signed int bit_size);
 	tbitstream_read_uint pbitstream_read_uint = (tbitstream_read_uint)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCE49F : 0xD1EE5));
 
@@ -357,14 +351,12 @@ int __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr,
 typedef int(__stdcall *tc_simulation_unit_entity_definition_creation_decode)(void* thisptr, int creation_data_size, void* creation_data,void* packet);
 tc_simulation_unit_entity_definition_creation_decode pc_simulation_unit_entity_definition_decode;
 
-int __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, int creation_data_size, void* creation_data,void* packet)
+int __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, int creation_data_size, void* creation_data, void* packet)
 {
 	//TRACE_GAME_N("c_simulation_unit_entity_definition_creation_decode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, packet: %08X", thisptr, creation_data_size, creation_data, packet);
 
-
 	if (bitstream_read_bool(packet, "object-permutation-exists"))
 	{
-
 		//TRACE_GAME_N("c_simulation_unit_entity_decode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
 		int object_permutation_index = bitstream_read_uint(packet, "object-permutation-index", 32);
 		*(int*)((char*)creation_data + 0x24) = object_permutation_index;
@@ -375,7 +367,6 @@ int __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr,
 		*(int*)((char*)creation_data + 0x24) = -1;
 	
 	int ret = pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, packet);
-
 
 	return ret;
 }
@@ -412,7 +403,6 @@ tset_unit_color_data pset_unit_color_data;
 
 bool __cdecl set_unit_color_data_hook(int a1, unsigned __int16 a2, int a3)
 {
-
 	int object_creation_data = a1 - 0x10;
 	int object_permutation_index = *(int*)((char*)object_creation_data + 0x24);
 
@@ -429,7 +419,7 @@ tcreate_unit_hook pcreate_unit_hook;
 
 bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObject)
 {
-	if (*(int*)((char*)pCreationData+0x24) != -1)
+	if (*(int*)((char*)pCreationData + 0x24) != -1)
 	{	
 		//wchar_t DebugText[255] = { 0 };
 		//ZeroMemory(DebugText, sizeof(DebugText));
@@ -493,8 +483,9 @@ inline wchar_t* H2MOD::GetLobbyGameVariantName()
 
 void H2MOD::exit_game()
 {
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
+
 	if (GetEngineType() != EngineType::MAIN_MENU_ENGINE)
 	{
 		// request_squad_browser
@@ -512,19 +503,13 @@ void H2MOD::exit_game()
 
 #pragma endregion
 
-//sub_1cce9b
-typedef int(__stdcall *calls_session_boot)(void*, int, char);
-calls_session_boot calls_session_boot_method;
-
-int __stdcall calls_session_boot_sub_1cce9b(void* thisx, int a2, char a3) {
-	TRACE_GAME_N("session boot - this=%d,a2=%d,a3=%d", thisx, a2, a3);
-	return calls_session_boot_method(thisx, a2, a3);
-}
-
 void H2MOD::kick_player(int peerIndex) {
+	typedef void(__thiscall* game_session_boot)(void* a1, int peer_index, bool a3);
+	auto p_game_session_boot = (game_session_boot)(h2mod->GetBase() + 0x1CCE9B);
+
 	DWORD* ptr = (DWORD*)(((char*)h2mod->GetBase()) + 0x420FE8);
 	TRACE_GAME_N("about to kick player index=%d", peerIndex);
-	calls_session_boot_method((DWORD*)(*ptr), peerIndex, (char)0x01);
+	p_game_session_boot((DWORD*)(*ptr), peerIndex, true);
 }
 
 typedef int(__cdecl *show_error_screen)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6);
@@ -780,7 +765,7 @@ wchar_t* H2MOD::get_player_name_from_index(int pIndex)
 		player_table_ptr = *(DWORD*)(this->GetBase() + 0x004D64C4);
 	player_table_ptr += 0x44;
 
-	return	(wchar_t*)(*(DWORD*)player_table_ptr + (pIndex * 0x204) + 0x40);
+	return (wchar_t*)(*(DWORD*)player_table_ptr + (pIndex * 0x204) + 0x40);
 }
 
 int H2MOD::get_player_index_from_unit_datum(int unit_datum_index)
@@ -920,7 +905,7 @@ void H2MOD::DisableSound(int sound)
 	switch (sound)
 	{
 	case SoundType::Slayer:
-		TRACE_GAME("AddressOffset+0xd7dfb4:", (DWORD*)(AddressOffset + 0xd7dfb4));
+		TRACE_GAME("AddressOffset + 0xd7dfb4 = 0x%x", (DWORD*)(AddressOffset + 0xd7dfb4));
 		*(DWORD*)(AddressOffset + 0xd7e05c) = -1;
 		*(DWORD*)(AddressOffset + 0xd7dfb4) = -1;
 		break;
@@ -941,54 +926,30 @@ void H2MOD::DisableSound(int sound)
 	}
 }
 
-void SoundThread(void)
+void H2MOD::CustomSoundPlay(const wchar_t* soundName, int delay)
 {
-
-	while (1)
+	auto playSound = [=]()
 	{
-		std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
-		h2mod->sound_cv.wait(lck);
+		//std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+		std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now() + std::chrono::milliseconds(delay);
 
-		if (h2mod->SoundMap.size() > 0)
-		{
-			std::unordered_map<wchar_t*, int> tempSoundMap;
-			tempSoundMap.insert(h2mod->SoundMap.begin(), h2mod->SoundMap.end());
-			h2mod->SoundMap.clear();
-			//unlock immediately after reading everything from sound map
-			lck.unlock();
+		TRACE_GAME("[H2MOD-SoundQueue] - attempting to play sound %ws - delaying %i miliseconds first", soundName, delay);
 
-			auto it = tempSoundMap.begin();
-			while (it != tempSoundMap.end())
-			{
-				TRACE_GAME("[H2MOD-SoundQueue] - attempting to play sound %ws - delaying for %i miliseconds first", it->first, it->second);
-				Sleep(it->second);
-				PlaySound(it->first, NULL, SND_FILENAME);
-				it = tempSoundMap.erase(it);
-			}
-		}
-	}
+		if (delay > 0)
+			std::this_thread::sleep_until(timePoint);
 
+		PlaySound(soundName, NULL, SND_FILENAME);
+	};
+
+	if (!h2mod->Server)
+		std::thread(playSound).detach();
 }
-
-typedef bool(__cdecl *spawn_player)(int a1);
-spawn_player pspawn_player;
 
 typedef char(__cdecl *player_death)(int unit_datum_index, int a2, char a3, char a4);
 player_death pplayer_death;
 
 typedef void(__stdcall *update_player_score)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
 update_player_score pupdate_player_score;
-
-typedef void(__stdcall *tjoin_game)(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14);
-tjoin_game pjoin_game;
-
-extern SOCKET game_sock;
-extern SOCKET game_sock_1000;
-extern CUserManagement User;
-XNADDR join_game_xn;
-
-typedef int(__cdecl *tconnect_establish_write)(void* a1, int a2, int a3);
-tconnect_establish_write pconnect_establish_write;
 
 /* This is technically closer to object death than player-death as it impacts anything with health at all. */
 
@@ -1076,7 +1037,7 @@ void PatchGameDetailsCheck()
 	NopFill<2>(h2mod->GetBase() + 0x219D6D);
 }
 
-void H2MOD::PatchWeaponsInteraction(bool b_Enable)
+void H2MOD::DisableWeaponPickup(bool b_Enable)
 {
 	//Client Sided Patch
 	DWORD offset = h2mod->GetBase() + 0x55EFA;
@@ -1102,7 +1063,7 @@ int OnAutoPickUpHandler(DatumIndex player_datum, DatumIndex object_datum)
 		if (handled)
 			return 0;
 	}
-
+	
 	return AutoHandler(player_datum, object_datum);
 }
 
@@ -1131,6 +1092,8 @@ void get_object_table_memory()
 	game_state_players = (GameStatePlayerTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4D64C4 : 0x4A8260))));
 	game_state_objects_header = (GameStateObjectHeaderTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x50C8EC : 0x4E461C))));
 	game_state_actors = (GameStateActorTable*)((*(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x9A1C5C : 0xA965DC))));
+	if (tag_instances == nullptr)
+		tag_instances = (global_tag_instance*)(*(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50)));
 }
 
 // this gets called after game globals are updated fyi (which includes game engine type)
@@ -1168,6 +1131,7 @@ void __cdecl OnMapLoad(int a1)
 		H2Tweaks::disableAI_MP();
 		UIRankPatch();
 		H2Tweaks::disable60FPSCutscenes();
+		H2Tweaks::setHz();
 
 		p_set_random_number(a1);
 		return; 
@@ -1226,16 +1190,15 @@ void __cdecl OnMapLoad(int a1)
 
 		get_object_table_memory();
 
-		if (tag_instances == NULL)
-			tag_instances = (global_tag_instance*)(*(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50)));
-
 		HitFix::Initialize();
+		MPMapFix::Initialize();
 
 		H2Tweaks::enableAI_MP();
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	 
 		H2Tweaks::setCrosshairSize(0, false);
 		H2Tweaks::disable60FPSCutscenes(); 
+		H2Tweaks::setSavedSens();
 		
 		//H2Tweaks::applyShaderTweaks(); 
 
@@ -1264,16 +1227,23 @@ void __cdecl OnMapLoad(int a1)
 		}
 	}
 
-	else if (h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE) { //if anyone wants to run code on map load single player
+	else if (h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE) 
+	{ 
+		//if anyone wants to run code on map load single player
 		addDebugText("GameEngine: Singleplayer");
 
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 		H2Tweaks::enable60FPSCutscenes();
+		H2Tweaks::setSavedSens();
+
+		SPMapFix::Initialize();
 	}
 
 	p_set_random_number(a1);
 }
 
+typedef bool(__cdecl *spawn_player)(int a1);
+spawn_player pspawn_player;
 
 bool __cdecl OnPlayerSpawn(int a1)
 {
@@ -1284,87 +1254,32 @@ bool __cdecl OnPlayerSpawn(int a1)
 	//once players spawn we aren't in lobby anymore ;)
 	isLobby = false;
 	//TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
-	int PlayerIndex = a1 & 0x000FFFF;
+	int PlayerIndex = a1;
 
 
 	if (b_Infection) {
-		infectionHandler->preSpawnPlayer->setPlayerIndex(PlayerIndex);
+		infectionHandler->preSpawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
 		infectionHandler->preSpawnPlayer->execute();
 	}
 
 	if (b_GunGame) {
-		gunGame->preSpawnPlayer->setPlayerIndex(PlayerIndex);
+		gunGame->preSpawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
 		gunGame->preSpawnPlayer->execute();
 	}
 
-	bool ret = pspawn_player(a1);	
-
+	bool ret = pspawn_player(a1);
 
 	if (b_Infection) {
-		infectionHandler->spawnPlayer->setPlayerIndex(PlayerIndex);
+		infectionHandler->spawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
 		infectionHandler->spawnPlayer->execute();
 	}
 
 	if (b_GunGame) {
-		gunGame->spawnPlayer->setPlayerIndex(PlayerIndex);
+		gunGame->spawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
 		gunGame->spawnPlayer->execute();
 	}
 
 	return ret;
-}
-
-void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
-{
-	memcpy(&join_game_xn, host_xn, sizeof(XNADDR));
-
-	TRACE("join_game host_xn->ina.s_addr: %08X ", host_xn->ina.s_addr);
-
-	sockaddr_in SendStruct;
-
-	if (host_xn->ina.s_addr != H2Config_ip_wan)
-	{
-		TRACE("XN is not equal to the WAN address, assigning external XN");
-		SendStruct.sin_addr.s_addr = host_xn->ina.s_addr;
-	}
-	else
-	{ 
-		SendStruct.sin_addr.s_addr = H2Config_ip_lan;
-	}
-	short nPort = (ntohs(host_xn->wPortOnline) + 1);
-
-	TRACE("join_game nPort: %i", nPort);
-
-	SendStruct.sin_port = htons(nPort);
-
-	TRACE("join_game SendStruct.sin_port: %i", ntohs(SendStruct.sin_port));
-	TRACE("join_game xn_port: %i", ntohs(host_xn->wPortOnline));
-
-	//SendStruct.sin_port = htons(1001); // These kinds of things need to be fixed too cause we would have the port in the XNADDR struct...
-	SendStruct.sin_family = AF_INET;
-
-	int securitysend_1001 = sendto(game_sock, (char*)User.SecurityPacket, 8 + sizeof(XNADDR), 0, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
-
-	if (securitysend_1001 != (8 + sizeof(XNADDR)))
-		TRACE("join_game Security Packet Send had return different than len: %i", securitysend_1001);
-
-	User.CreateUser(host_xn, FALSE);
-
-
-	if (securitysend_1001 == SOCKET_ERROR )
-	{
-		TRACE("join_game Security Packet - Socket Error True");
-		TRACE("join_game Security Packet - WSAGetLastError(): %08X", WSAGetLastError());
-	}
-
-	return pjoin_game(thisptr, a2, a3, a4, a5, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
-}
-
-int __cdecl connect_establish_write(void* a1, int a2, int a3)
-{
-	TRACE("connect_establish_write(a1: %08X,a2 %08X, a3: %08X)", a1, a2, a3);
-	h2mod->securityPacketProcessing();
-
-	return pconnect_establish_write(a1, a2, a3);
 }
 
 typedef int(__cdecl *object_p_hook)(int s_object_placement_data, int a2, signed int a3, int a4);
@@ -1398,7 +1313,6 @@ void* __stdcall OnWgitLoad(void* thisptr, int a2, int a3, int a4, unsigned short
 	//addDebugText(NotificationPlayerText);
 	//MessageBoxA(NULL, NotificationPlayerText, "WGITness", MB_OK);
 
-	//void* thisptr = 
 	pload_wgit(thisptr, wgit, a3, a4, a5);
 	return thisptr;
 }
@@ -1501,24 +1415,6 @@ __declspec(naked) void calculate_model_lod_detour()
 	}
 }
 
-void H2MOD::securityPacketProcessing()
-{
-	if (!gameManager->isHost())
-	{
-		sockaddr_in SendStruct;
-
-		if (join_game_xn.ina.s_addr != H2Config_ip_wan)
-			SendStruct.sin_addr.s_addr = join_game_xn.ina.s_addr;
-		else
-			SendStruct.sin_addr.s_addr = H2Config_ip_lan;
-
-		SendStruct.sin_port = join_game_xn.wPortOnline;
-		SendStruct.sin_family = AF_INET;
-
-		int securitysend_1000 = sendto(game_sock_1000, (char*)User.SecurityPacket, 8 + sizeof(XNADDR), 0, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
-	}
-}
-
 typedef void(__cdecl *on_custom_map_change)(const void* a1);
 on_custom_map_change on_custom_map_change_method;
 
@@ -1581,23 +1477,6 @@ char __stdcall interceptMapLoad(LPCRITICAL_SECTION* thisx, const void *a2) {
 		result = 0;
 	}
 	return result;
-}
-
-typedef BYTE*(__cdecl *unicode_string_conversion)(BYTE* nonUnicodeStr, BYTE* unicodeStr, int size);
-unicode_string_conversion unicode_string_conversion_method;
-
-std::string CREATE_NEW_NETWORK_GAME_STR("Create a new network game.");
-std::string JOIN_GAME_OF_HALO2 = "Join a game of Halo 2.";
-
-BYTE* __cdecl unicodeStringConversion(BYTE* nonUnicodeStr, BYTE* unicodeStr, int size) {
-	char* str = (char*)(nonUnicodeStr);
-	if (strcmp(str, CREATE_NEW_NETWORK_GAME_STR.c_str()) == 0 && replacedNetworkNormalTextWidget != NULL) {
-		return unicode_string_conversion_method((BYTE*)replacedNetworkNormalTextWidget, unicodeStr, size);
-	}
-	if (strcmp(str, JOIN_GAME_OF_HALO2.c_str()) == 0 && replacedNetworkNormalTextWidget2 != NULL) {
-		return unicode_string_conversion_method((BYTE*)replacedNetworkNormalTextWidget2, unicodeStr, size);
-	}
-	return unicode_string_conversion_method(nonUnicodeStr, unicodeStr, size);
 }
 
 typedef bool(__cdecl *tfn_c000bd114)(int);
@@ -1763,8 +1642,8 @@ void H2MOD::ApplyUnitHooks()
 	PatchCall(GetBase() + (h2mod->Server ? 0x1E1DE0 : 0x1F807A), set_unit_creation_data_hook);
 	pset_unit_creation_data = (tset_unit_creation_data)(GetBase() + (h2mod->Server ? 0x1DD586 : 0x1F24ED));
 
-	VirtualProtect((char*)h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029), 1, PAGE_EXECUTE_READWRITE, &dwBack); // we have to update privileges on the memory so we can write to it since it's part of the actual game code.
-	memset(((char*)h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029)), 0x28, 1); // updates the size of creation_data allocated for the c_unit_simulation_entity_definition
+	BYTE packet_sz = 0x28;
+	WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029), &packet_sz, 1);
 
 	// Hooks a call within the creat_unit property on the client side in order to set their permutation index before spawn.
 	PatchCall(GetBase() + (h2mod->Server ? 0x1E3BD4 : 0x1F9E6C), create_unit_hook);
@@ -1778,10 +1657,10 @@ void H2MOD::ApplyUnitHooks()
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
+	DWORD dwBack;
 	if (this->Server == false) {
 		TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
-		DWORD dwBack;
 
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc((BYTE*)this->GetBase() + 0x1B4C14, (BYTE*)VerifyGameVersionOnJoin, 5);
 		VirtualProtect(p_verify_game_version_on_join, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1801,15 +1680,8 @@ void H2MOD::ApplyHooks() {
 		//on_custom_map_change_method = (on_custom_map_change)DetourFunc((BYTE*)this->GetBase() + 0x32176, (BYTE*)onCustomMapChange, 5);
 		//VirtualProtect(on_custom_map_change_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		//boot method
-		calls_session_boot_method = (calls_session_boot)DetourClassFunc((BYTE*)this->GetBase() + 0x1CCE9B, (BYTE*)calls_session_boot_sub_1cce9b, 8);
-		VirtualProtect(calls_session_boot_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
 		// disable part of custom map tag verification
 		NopFill<6>(GetBase() + 0x4FA0A);
-
-		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)this->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
-		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		pspawn_player = (spawn_player)DetourFunc((BYTE*)this->GetBase() + 0x55952, (BYTE*)OnPlayerSpawn, 6);
 		VirtualProtect(pspawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1839,9 +1711,6 @@ void H2MOD::ApplyHooks() {
 		//TODO: expensive, use for debugging/searching
 		//string_display_hook_method = (string_display_hook)DetourFunc((BYTE*)h2mod->GetBase() + 0x287AB5, (BYTE*)stringDisplayHook, 5);
 		//VirtualProtect(string_display_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		unicode_string_conversion_method = (unicode_string_conversion)DetourFunc((BYTE*)h2mod->GetBase() + 0x4C801, (BYTE*)unicodeStringConversion, 7);
-		VirtualProtect(unicode_string_conversion_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//pResetRound=(ResetRounds)DetourFunc((BYTE*)this->GetBase() + 0x6B1C8, (BYTE*)OnNextRound, 7);
 		//VirtualProtect(pResetRound, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1881,12 +1750,8 @@ void H2MOD::ApplyHooks() {
 		PatchCall(Base + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
 		PatchCall(Base + 0x00092C05, BansheeBombIsEngineMPCheck);
 		PatchCall(Base + 0x0013ff75, FlashlightIsEngineSPCheck);
-
-
 	}
 	else {
-
-		DWORD dwBack;
 
 		p_get_game_version = (get_game_version)DetourFunc((BYTE*)this->GetBase() + 0x1B0043, (BYTE*)GetGameVersion, 8);
 		VirtualProtect(p_get_game_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1919,23 +1784,12 @@ void H2MOD::ApplyHooks() {
 		PatchWinAPICall(GetBase() + 0x85F5E, CryptProtectDataHook);
 		PatchWinAPICall(GetBase() + 0x352538, CryptUnprotectDataHook);
 		PatchCall(GetBase() + 0x85F73, filo_write__encrypted_data_hook);
-
-
-		if (tsServer == NULL && H2Config_voice_chat) {
-			//TODO: move into method
-			tsServer = new TSServer(true);
-			tsServer->setPort(H2Config_base_port + 7);
-			tsServer->startListening();
-		}
 	}
 
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(h2mod->GetBase() + ((!h2mod->Server) ? 0x58789 : 0x60C81), (DWORD)OnAutoPickUpHandler);
 
 	mapManager->applyGamePatches();
-
-	//apply any network hooks
-	network->applyNetworkHooks();
 	ApplyUnitHooks();
 }
 
@@ -1946,22 +1800,11 @@ VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DW
 
 void H2MOD::Initialize()
 {
-	this->Base = (DWORD)game_info.base;
-
-	if (game_info.process_type == H2Types::H2Server)
-	{
-		this->Server = TRUE;
-	}
-	else if (game_info.process_type == H2Types::H2Game)
+	if (!h2mod->Server)
 	{
 		this->Server = FALSE;
 		
-		std::thread SoundT(SoundThread);
-		SoundT.detach();
-		
 		H2Tweaks::setFOV(H2Config_field_of_view);
-		//setSens(CONTROLLER, H2Config_sens_controller);
-		//setSens(MOUSE, H2Config_sens_mouse);
 		if (H2Config_raw_input)
 			Mouseinput::Initialize();
 
@@ -1982,7 +1825,7 @@ void H2MOD::Initialize()
 	//	addDebugText("Error setting the process priority");
 	//}
 	
-	TRACE_GAME("H2MOD - Initialized v0.4a");
+	TRACE_GAME("H2MOD - Initialized v0.5a");
 	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
 
 	h2mod->ApplyHooks();

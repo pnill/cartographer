@@ -58,6 +58,7 @@ static const char* packet_type_strings[] = {
 	"text_chat",
 	"test"
 };
+
 enum packet_type
 {
 	ping,
