@@ -32,8 +32,9 @@ logger *checksum_log = nullptr;
 
 ProcessInfo game_info;
 
-bool H2IsDediServer;
-DWORD H2BaseAddr;
+bool H2IsDediServer = false;
+bool H2DediIsLiveMode = false;
+DWORD H2BaseAddr = NULL;
 wchar_t* H2ProcessFilePath = 0;
 wchar_t* H2AppDataLocal = 0;
 wchar_t* FlagFilePathConfig = 0;
@@ -388,6 +389,10 @@ void InitH2Startup() {
 					FlagFilePathConfig = (wchar_t*)malloc(sizeof(wchar_t) * pfcbuflen);
 					swprintf(FlagFilePathConfig, pfcbuflen, ArgList[i] + 10);
 				}
+			}
+			if (_wcsicmp(ArgList[i], L"-live") == 0)
+			{
+				H2DediIsLiveMode = true;
 			}
 		}
 	}

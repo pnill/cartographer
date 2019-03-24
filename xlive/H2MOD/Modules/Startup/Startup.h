@@ -24,6 +24,7 @@ public:
 extern ProcessInfo game_info;
 
 extern bool H2IsDediServer;
+extern bool H2DediIsLiveMode;
 extern DWORD H2BaseAddr;
 extern wchar_t* H2ProcessFilePath;
 extern wchar_t* H2AppDataLocal;
