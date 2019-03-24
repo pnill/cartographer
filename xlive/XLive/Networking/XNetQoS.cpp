@@ -507,8 +507,8 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 	pqos->cxnqosPending = cxna;
 	pqos->axnqosinfo[0].cProbesXmit = 4;
 	pqos->axnqosinfo[0].cProbesRecv = 4;
-	pqos->axnqosinfo[0].wRttMinInMsecs = 80;
-	pqos->axnqosinfo[0].wRttMedInMsecs = 90;
+	pqos->axnqosinfo[0].wRttMinInMsecs = 5;
+	pqos->axnqosinfo[0].wRttMedInMsecs = 10;
 	pqos->axnqosinfo[0].dwDnBitsPerSec = dwBitsPerSec;
 	pqos->axnqosinfo[0].dwUpBitsPerSec = dwBitsPerSec;
 	pqos->axnqosinfo[0].bFlags = XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE;
