@@ -341,11 +341,15 @@ void ServerList::GetServers(PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBu
 	}
 }
 
-void RemoveServer()
+void RemoveServer(PXOVERLAPPED pOverlapped)
 {
 	CURL *curl;
 	CURLcode res;
 	std::string readBuffer;
+
+	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
+	pOverlapped->InternalHigh = 0;
+	pOverlapped->dwExtendedError = ERROR_IO_INCOMPLETE;
 
 	curl = curl_easy_init();
 	if (curl)
@@ -370,23 +374,28 @@ void RemoveServer()
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, buffer.GetString());
 		res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
-
 	}
+
+	pOverlapped->InternalLow = ERROR_SUCCESS;
+	pOverlapped->InternalHigh = 1;
+	pOverlapped->dwExtendedError = ERROR_SUCCESS;
 }
 
-DWORD WINAPI XLocatorServerUnAdvertise(DWORD a1, DWORD a2)
+DWORD WINAPI XLocatorServerUnAdvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
 {
-	std::thread(RemoveServer).detach();
-
+	std::thread(RemoveServer, pOverlapped).detach();
 	return S_OK;
 }
 
-void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID *xnid, DWORD a4, DWORD a5, DWORD a6, DWORD xnaddr1, DWORD xnaddr2, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
+void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
 {
 	CURL *curl;
 	CURLcode res;
 	std::string readBuffer;
 
+	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
+	pOverlapped->InternalHigh = 0;
+	pOverlapped->dwExtendedError = ERROR_IO_INCOMPLETE;
 
 	curl = curl_easy_init();
 	if (curl) {
@@ -475,19 +484,22 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID *xnid, DWORD a4, DWO
 		res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
 	}
+
+	pOverlapped->InternalLow = ERROR_SUCCESS;
+	pOverlapped->InternalHigh = 1;
+	pOverlapped->dwExtendedError = ERROR_SUCCESS;
 }
 
-DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKID *xnid, DWORD a4, DWORD a5, DWORD a6, DWORD xnaddr1, DWORD xnaddr2, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
+DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
 {
-	std::thread(AddServer, dwUserIndex, dwServerType, xnid, a4, a5, a6, xnaddr1, xnaddr2, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
-
+	std::thread(AddServer, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
 
 	// not done - error now
 	return S_OK;
 }
 
 // 5233: ??
-DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties, PXUSER_PROPERTY pProperties, DWORD pOverlapped)
+DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
 {
 	// TRACE("XLocatorGetServiceProperty  (*** checkme ***) (dwUserIndex = %X, cNumProperties = %X, pProperties = %X, pOverlapped = %X)",
 	//		dwUserIndex, cNumProperties, pProperties, pOverlapped);
