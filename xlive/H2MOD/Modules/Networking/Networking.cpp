@@ -16,6 +16,7 @@
 extern unsigned short H2Config_base_port;
 extern SOCKET game_network_data_gateway_socket_1000;
 extern SOCKET game_network_message_gateway_socket_1001;
+extern int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4);
 
 const char* getTextForEnum(int enumVal) {
 	return packet_type_strings[enumVal];
@@ -298,7 +299,7 @@ bool __cdecl deserializePlayerAdd(void* a1, int a2, int a3) {
 	auto p_deserialize_player_add = reinterpret_cast<deserialize_player_add>(h2mod->GetBase() + (h2mod->Server ? 0x1D110B : 0x1F0752));
 
 	//inform new players of the current map info
-	mapManager->sendMapInfoPacket();
+	mapManager->sendMapInfoPacket(-1);
 	//inform new players of the current advanced lobby settings
 	//advLobbySettings->sendLobbySettingsPacket();
 	// send server map checksums to client
@@ -687,7 +688,7 @@ void __cdecl serializeMembershipPacket(void* a1, int a2, int a3) {
 			v4 += 184;
 		} while (v3 < *(WORD*)(a3 + 32));
 	}*/
-	mapManager->sendMapInfoPacket();
+	mapManager->sendMapInfoPacket(-1);
 	//advLobbySettings->sendLobbySettingsPacket();
 	// send server map checksums to client
 	//MapChecksumSync::SendState();
@@ -747,7 +748,7 @@ typedef void(__cdecl *serialize_parameters_update_packet)(void* a1, int a2, int 
 serialize_parameters_update_packet serialize_parameters_update_packet_method;
 
 void __cdecl serializeParametersUpdatePacket(void* a1, int a2, int a3) {
-	mapManager->sendMapInfoPacket();
+	mapManager->sendMapInfoPacket(-1);
 	//advLobbySettings->sendLobbySettingsPacket();
 	// send server map checksums to client
 	//MapChecksumSync::SendState();
@@ -815,18 +816,20 @@ void removeXNetSecurity()
 	
 }
 
-
 void applyConnectionPatches()
 {
 	DWORD dwBack;
 	//removeXNetSecurity();
 	WritePointer(h2mod->GetBase() + (h2mod->Server ? 0x1D20E4 : 0x1F172B), (void*)deserialize_join_request);
 
-	NopFill<9>(h2mod->GetBase() + (h2mod->Server ? 0x1B3CC3 : 0x1F1F94)); // check if secure/ipaddress != 127.0.0.1
+	// force hard-coded qos data in-lobby
+	PatchCall(h2mod->GetBase() + (h2mod->Server ? 0x1B7B8A : 0x1BDCB0), QoSLookUpImpl);
+
+	//NopFill<9>(h2mod->GetBase() + (h2mod->Server ? 0x1B3CC3 : 0x1F1F94)); // check if secure/ipaddress != 127.0.0.1
 	// disable network observer (broken on H2V)
-	WriteValue<BYTE>(h2mod->GetBase() + (h2mod->Server ? 0x1A92BA : 0x1B555C), (BYTE)0);
+	//WriteValue<BYTE>(h2mod->GetBase() + (h2mod->Server ? 0x1A92BA : 0x1B555C), (BYTE)0);
 	// also ping bars
-	WriteValue<BYTE>(h2mod->GetBase() + (h2mod->Server ? 0x1C1B7F : 0x1D4E35), 0xEB);
+	//WriteValue<BYTE>(h2mod->GetBase() + (h2mod->Server ? 0x1C1B7F : 0x1D4E35), 0xEB);
 
 	// makes Live network not as laggy 
 	/*int data = 500;

@@ -49,11 +49,6 @@ std::string EMPTY_STR("");
 int downloadPercentage = 0;
 
 /**
-* Constructs the map manager for client/servers
-*/
-MapManager::MapManager() {}
-
-/**
 * Download map callback
 */
 char __cdecl handle_map_download_callback()
@@ -92,7 +87,6 @@ char __cdecl handle_map_download_callback()
 	};
 
 	std::thread(mapDownload).detach();
-
 	return 1;
 }
 
@@ -114,14 +108,16 @@ int __cdecl get_total_map_downloading_percentage()
 	return downloadPercentage;
 }
 
-wchar_t receiving_map_wstr[] = L"You are receiving the map from %s. \r\nPlease wait...%i%%";
+wchar_t* receiving_map_wstr[] = {
+	L"You are receiving the map from %s. \r\nPlease wait...%i%%" ,
+};
 wchar_t* get_receiving_map_string()
 { 
 	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x381fd);
 	wchar_t** str_array = (wchar_t**)(h2mod->GetBase() + 0x46575C);
 
 	if (get_default_game_language() == 0) // check if english
-		return receiving_map_wstr;
+		return receiving_map_wstr[0];
 
 	return str_array[get_default_game_language()];
 }
@@ -366,7 +362,8 @@ void MapManager::cleanup() {
 	this->downloadedMaps.clear();
 }
 
-void MapManager::sendMapInfoPacket()
+// set peerIndex argument to -1 send the packet to every connected peer
+void MapManager::sendMapInfoPacket(int peerIndex)
 {
 #ifdef _DEBUG
 	int tmpFlagOrig = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
@@ -390,7 +387,7 @@ void MapManager::sendMapInfoPacket()
 	//TODO: send over size so p2p can work easier
 	map_info->set_mapsize(0);
 
-	network->send_h2mod_packet(teampak);
+	peerIndex == -1 ? network->send_h2mod_packet(teampak) : network->send_h2mod_packet_player(peerIndex, teampak);
 
 #ifdef _DEBUG
 	_CrtSetDbgFlag(tmpFlagOrig);

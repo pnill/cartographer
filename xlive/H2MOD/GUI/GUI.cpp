@@ -540,7 +540,7 @@ int WINAPI XLiveRender()
 				}
 			}
 			DWORD GameGlobals = *(DWORD*)((BYTE*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-			DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
+			DWORD GameEngine = *(DWORD*)(GameGlobals + 0x8);
 			bool paused_or_in_menus = *((BYTE*)h2mod->GetBase() + 0x47A568) != 0;
 			if (GameEngine == 3 || StatusCheater || (GameEngine != 3 && paused_or_in_menus)) {
 				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);

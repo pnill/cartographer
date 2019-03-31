@@ -249,7 +249,7 @@ void sound_initialize()
 enum flags : int
 {
 	windowed,
-	unk, // some network thing
+	disable_voice_chat, 
 	nosound,
 	unk1, // disable vista needed version check?
 	disable_hardware_vertex_processing, // force hardware vertex processing off
@@ -359,6 +359,7 @@ bool engine_basic_init()
 	DWORD* flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
 	memset(flags_array, 0x00, flags::count); // should be zero initalized anyways but the game does it
 
+	flags_array[flags::disable_voice_chat] = 1; // disables voice chat (XHV engine)
 	flags_array[flags::nointro] = H2Config_skip_intro;
 
 	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(GetAddress(0x000285fd));
@@ -411,6 +412,10 @@ bool engine_basic_init()
 				// menu text fix for higher resolutions
 				sub_671B02_orig = (sub_671B02_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x271B02, (BYTE*)sub_671B02_hook, 5);
 				VirtualProtect(sub_671B02_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+			}
+			else if (_wcsicmp(cmd_line_arg, L"-voicechat") == 0)
+			{
+				flags_array[flags::disable_voice_chat] = 0;
 			}
 #ifdef _DEBUG	
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {

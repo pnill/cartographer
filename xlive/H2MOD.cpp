@@ -1420,8 +1420,8 @@ on_custom_map_change on_custom_map_change_method;
 
 void __cdecl onCustomMapChange(const void* a1) {
 	on_custom_map_change_method(a1);
-	//map changed, send update
-	mapManager->sendMapInfoPacket();
+	//map changed, send update to all players
+	mapManager->sendMapInfoPacket(-1);
 }
 
 typedef char(__stdcall *intercept_map_load)(LPCRITICAL_SECTION* thisx, const void *a2);
