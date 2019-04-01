@@ -150,8 +150,7 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 		}
 		nResult->serverID = doc["xuid"].GetUint64();
 
-		memset(&nResult->xnkid, 0xAB, sizeof(XNKID));
-		memset(&nResult->xnkey, 0xAA, sizeof(XNKEY));
+		XLocatorCreateKey(&nResult->xnkid, &nResult->xnkey);
 
 		if (!doc.HasMember("pProperties") || !doc.HasMember("cProperties"))
 		{
@@ -537,11 +536,14 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int 
 
 
 // 5238: ??
-DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* xnkey)
+DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey)
 {
 	TRACE("XLocatorCreateKey");
-
-	XNetCreateKey(pxnkid, xnkey);
+	if (pxnkid && pxnkey) {
+		XNetCreateKey(pxnkid, pxnkey);
+		pxnkid->ab[0] &= ~XNET_XNKID_MASK;
+		pxnkid->ab[0] |= XNET_XNKID_ONLINE_PEER;
+	}
 
 	return S_OK;
 }
@@ -551,8 +553,6 @@ DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* xnkey)
 DWORD WINAPI XLocatorCreateServerEnumeratorByIDs(DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6, DWORD a7, DWORD a8)
 {
 	TRACE("XLocatorCreateServerEnumeratorByIDs");
-
-
 	// not done - error now
 	return 0x57;
 }

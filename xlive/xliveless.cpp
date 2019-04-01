@@ -504,18 +504,18 @@ DWORD WINAPI XLivePBufferFree (FakePBuffer * pBuffer)
 
 
 // #5022: XLiveGetUpdateInformation
-int WINAPI XLiveGetUpdateInformation (DWORD)
+HRESULT  WINAPI XLiveGetUpdateInformation (DWORD)
 {
     TRACE("XLiveGetUpdateInformation");
-    return -1; // no update
+    return S_FALSE; // no update
 }
 
 
 // #5024: XLiveUpdateSystem
-int WINAPI XLiveUpdateSystem (DWORD)
+HRESULT  WINAPI XLiveUpdateSystem (DWORD)
 {
     TRACE("XLiveUpdateSystem");
-    return -1; // no update
+    return S_FALSE; // no update
 }
 
 
@@ -912,6 +912,7 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 	//sessionDetails.pSessionMembers = 0;
 
 
+	gameManager->start();
 
 	TRACE( "- handle = %X", *phEnum );
 
@@ -921,9 +922,9 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 
 
 	pOverlapped->InternalLow = ERROR_SUCCESS;
+	pOverlapped->InternalHigh = 0;
 	pOverlapped->dwExtendedError = ERROR_SUCCESS;
 
-	gameManager->start();
 
 	Check_Overlapped( pOverlapped );
 
@@ -1178,10 +1179,32 @@ XONLINE_NAT_TYPE WINAPI XOnlineGetNatType()
 
 
 // #5325: XSessionLeaveLocal
-DWORD WINAPI XSessionLeaveLocal (DWORD, DWORD, DWORD, DWORD)
+DWORD WINAPI XSessionLeaveLocal (HANDLE hSession, DWORD dwUserCount, const DWORD *pdwUserIndexes, PXOVERLAPPED pXOverlapped)
 {
     TRACE("XSessionLeaveLocal");
-    return 0;
+
+	if (!hSession)
+		return ERROR_INVALID_PARAMETER;
+	if (!pdwUserIndexes)
+		return ERROR_INVALID_PARAMETER;
+
+	//TODO XSessionLeaveLocal
+	if (pXOverlapped) {
+		//asynchronous
+
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = ERROR_SUCCESS;
+		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
+
+		Check_Overlapped(pXOverlapped);
+
+		return ERROR_IO_PENDING;
+	}
+	else {
+		//synchronous
+		//return result;
+	}
+	return ERROR_SUCCESS;
 }
 
 
@@ -1307,12 +1330,31 @@ int WINAPI XSessionFlushStats (DWORD, DWORD)
 
 
 // #5330: XSessionDelete
-DWORD WINAPI XSessionDelete (DWORD, DWORD)
+DWORD WINAPI XSessionDelete(HANDLE hSession, PXOVERLAPPED pXOverlapped)
 {
     TRACE("XSessionDelete");
-		
+	
+	DWORD ret = 0;
+	//TODO XSessionDelete
+	if (pXOverlapped) {
+		//asynchronous
+
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = ERROR_SUCCESS;
+		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
+
+		Check_Overlapped(pXOverlapped);
+
+		ret = ERROR_IO_PENDING;
+	}
+	else {
+		//synchronous
+	}
+	if (!hSession)
+		ret = ERROR_INVALID_PARAMETER;
+
 	mapManager->cleanup();
-    return 0;
+	return ret;
 }
 
 
@@ -1336,10 +1378,33 @@ DWORD WINAPI XTitleServerCreateEnumerator (LPCSTR pszServerInfo, DWORD cItem, DW
 
 
 // #5336: XSessionLeaveRemote
-DWORD WINAPI XSessionLeaveRemote (DWORD, DWORD, DWORD, DWORD)
+DWORD WINAPI XSessionLeaveRemote (HANDLE hSession, DWORD dwXuidCount, const XUID *pXuids, XOVERLAPPED *pXOverlapped)
 {
     TRACE("XSessionLeaveRemote");
-    return 0;
+	if (!hSession)
+		return ERROR_INVALID_PARAMETER;
+	if (!dwXuidCount)
+		return ERROR_INVALID_PARAMETER;
+	if (!pXuids)
+		return ERROR_INVALID_PARAMETER;
+
+	//TODO XSessionLeaveRemote
+	if (pXOverlapped) {
+		//asynchronous
+
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = ERROR_SUCCESS;
+		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
+
+		Check_Overlapped(pXOverlapped);
+
+		return ERROR_IO_PENDING;
+	}
+	else {
+		//synchronous
+		//return result;
+	}
+	return ERROR_SUCCESS;
 }
 
 // #5338: XPresenceSubscribe
@@ -2373,15 +2438,28 @@ DWORD WINAPI XStorageDownloadToMemoryGetProgress( DWORD a1, DWORD a2, DWORD a3, 
 
 
 // 5308
-DWORD WINAPI XStorageDelete( DWORD a1, DWORD a2, DWORD a3 )
+DWORD WINAPI XStorageDelete(DWORD dwUserIndex, const WCHAR *wszServerPath, XOVERLAPPED *pXOverlapped)
 {
-  TRACE("XStorageDelete  (*** checkme ***) (a1 = %X, a2 = %X, a3 = %X)",
-		a1, a2, a3);
+	TRACE("XStorageDelete  (*** checkme ***) (a1 = %X, a2 = %s, a3 = 0x%X)",
+		dwUserIndex, wszServerPath, pXOverlapped);
 
+	//TODO XStorageDelete
+	if (pXOverlapped) {
+		//asynchronous
 
-	// not done - error now
-	SetLastError( 0x57 );
-	return 0x57;
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = ERROR_SUCCESS;
+		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
+
+		Check_Overlapped(pXOverlapped);
+
+		return ERROR_IO_PENDING;
+	}
+	else {
+		//synchronous
+		//return result;
+	}
+	return ERROR_SUCCESS;
 }
 
 

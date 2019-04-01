@@ -132,10 +132,8 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 	{
 		memset(pxnkid, 0xAB, sizeof(XNKID));
 		memset(pxnkey, 0XAA, sizeof(XNKEY));
-
-		/* These are un-necessary. */
-		//pxnkid->ab[0] &= ~XNET_XNKID_MASK;
-		//pxnkid->ab[0] |= XNET_XNKID_SYSTEM_LINK;
+		pxnkid->ab[0] &= ~XNET_XNKID_MASK;
+		pxnkid->ab[0] |= XNET_XNKID_SYSTEM_LINK_XPLAT;
 	}
 
 	return 0;

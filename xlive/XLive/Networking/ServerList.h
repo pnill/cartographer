@@ -97,3 +97,4 @@ public:
 
 extern HANDLE ServerEnum;
 extern ServerList LiveManager;
+DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey);
