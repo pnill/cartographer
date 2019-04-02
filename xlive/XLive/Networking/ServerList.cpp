@@ -453,14 +453,20 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 		Value serv_name(kObjectType);
 		serv_name.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_SERVER_NAME), document.GetAllocator());
 		serv_name.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_UNICODE), document.GetAllocator());
-		serv_name.AddMember("value", Value().SetString(g_szUserName[0], strlen(g_szUserName[0]), document.GetAllocator()), document.GetAllocator());
+		if (h2mod->Server && strlen(H2Config_dedi_server_name) != 0)
+			serv_name.AddMember("value", Value().SetString(H2Config_dedi_server_name, strlen(H2Config_dedi_server_name), document.GetAllocator()), document.GetAllocator());
+		else
+			serv_name.AddMember("value", Value().SetString(g_szUserName[0], strlen(g_szUserName[0]), document.GetAllocator()), document.GetAllocator());
 
 		document["pProperties"].PushBack(serv_name, document.GetAllocator());
 
 		Value user_name(kObjectType);
 		user_name.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_USERNAME_2), document.GetAllocator());
 		user_name.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_UNICODE), document.GetAllocator());
-		user_name.AddMember("value", Value().SetString(g_szUserName[0], strlen(g_szUserName[0]), document.GetAllocator()), document.GetAllocator());
+		if (h2mod->Server && strlen(H2Config_dedi_server_name) != 0)
+			user_name.AddMember("value", Value().SetString(H2Config_dedi_server_name, strlen(H2Config_dedi_server_name), document.GetAllocator()), document.GetAllocator());
+		else
+			user_name.AddMember("value", Value().SetString(g_szUserName[0], strlen(g_szUserName[0]), document.GetAllocator()), document.GetAllocator());
 
 		document["pProperties"].PushBack(user_name, document.GetAllocator());
 
