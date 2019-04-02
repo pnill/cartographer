@@ -1176,7 +1176,7 @@ void H2Tweaks::setHz() {
 	if (H2IsDediServer)
 		return;
 
-	*(BYTE*)(H2BaseAddr + 0xA3DA08) = (H2Config_refresh_rate);
+	*(int*)(H2BaseAddr + 0xA3DA08) = H2Config_refresh_rate;
 }
 
 void H2Tweaks::setCrosshairPos(float crosshair_offset) {
