@@ -565,14 +565,16 @@ int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4)
 	DWORD transport_qos_attempts = *(DWORD*)(h2mod->GetBase() + (h2mod->Server ? 0x991078 : 0x526BF4));
 
 	XNQOS* pxnqos = new XNQOS;
-	pxnqos->cxnqos = 0;
+	pxnqos->cxnqos = 1;
 	pxnqos->cxnqosPending = 0;
 	pxnqos->axnqosinfo->cProbesRecv = 4;
 	pxnqos->axnqosinfo->cProbesXmit = 4;
 	pxnqos->axnqosinfo->wRttMinInMsecs = 10;
-	pxnqos->axnqosinfo->wRttMedInMsecs = 20;
+	pxnqos->axnqosinfo->wRttMedInMsecs = 15;
 	pxnqos->axnqosinfo->dwDnBitsPerSec = 16384;
 	pxnqos->axnqosinfo->dwUpBitsPerSec = 16384;
+	pxnqos->axnqosinfo->cbData = 0;
+	pxnqos->axnqosinfo->pbData = NULL;
 	pxnqos->axnqosinfo->bFlags = (XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE | XNET_XNQOSINFO_DATA_RECEIVED);
 
 	int new_qos_data_datum_index = p_get_free_spot_from_object_header(transport_qos_attempts);
