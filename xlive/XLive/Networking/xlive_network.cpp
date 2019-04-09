@@ -1,8 +1,10 @@
-#include "stdafx.h"
-#include "XLive\UserManagement\CUser.h"
+
 #include "Globals.h"
-#include "H2MOD\Modules\Config\Config.h"
 #include "XLive\Networking\upnp.h"
+#include "XLive\UserManagement\CUser.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\NetworkStats\NetworkStats.h"
+#include <Windows.h>
 
 int MasterState = 0;
 ModuleUPnP *upnp = nullptr;
@@ -233,14 +235,19 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		//TRACE("Replaced send struct s_addr with g_lLANIP: %08X", H2Config_ip_lan);
 	}
 
+	
 	int ret = sendto(s, buf, len, flags, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
-
+	
 	if (ret == SOCKET_ERROR)
 	{
 		TRACE_GAME_NETWORK_N("XSocketSendTo - Socket Error True");
 		TRACE_GAME_NETWORK_N("XSocketSendTo - WSAGetLastError(): %08X", WSAGetLastError());
 	}
-
+	else 
+	{
+		updateSendToStatistics(len);
+	}
+	
 	return ret;
 }
 

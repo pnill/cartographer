@@ -263,6 +263,7 @@
   <ItemGroup>
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp" />
     <ClCompile Include="H2MOD\Modules\MapFix\SPMapFix.cpp" />
+    <ClCompile Include="H2MOD\Modules\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="XLive\Voice\AudioDevices.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -356,6 +357,7 @@
     <ClInclude Include="3rdparty\portaudio\include\portaudio.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\SPMapFix.h" />
+    <ClInclude Include="H2MOD\Modules\NetworkStats\NetworkStats.h" />
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
     <ClInclude Include="Blam\BlamLibrary.h" />
     <ClInclude Include="Blam\Cache\Cache.h" />

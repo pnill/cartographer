@@ -356,14 +356,6 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 				else if (result == 3 || result == 7) {
 					snprintf(ServerStatus, 250, "Status: CHEATER");
-					if (result == 3) {
-						time_t ltime;
-						time(&ltime);//seconds since epoch.
-						unsigned long time = (unsigned long)ltime;
-						extern unsigned long time_end;
-						if (time_end == 0)
-							time_end = time + (60 * 30);
-					}
 					extern bool StatusCheater;
 					StatusCheater = true;
 				}

@@ -7,6 +7,7 @@
 #include "H2MOD\MOdules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\GameManager\GameManager.h"
+#include "H2MOD\Modules\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include <tchar.h>
 
@@ -484,11 +485,6 @@ static void create_exit_countdown_label() {
 	exit_countdown_labels.push_back(exit_cnd_lbl);
 }
 
-unsigned long time_end = 0;
-static int time_sec = 0;
-static unsigned char add_exit_countdown_label = 4;
-static char exit_countdown_timer_label[10] = "30:00";
-
 bool StatusCheater = false;
 int achievement_height = 0;
 bool achievement_freeze = false;
@@ -634,46 +630,6 @@ int WINAPI XLiveRender()
 
 				drawText(0, 60, COLOR_GOLD, xyzTextWidget, normalSizeFont);
 			}
-
-			time_t ltime;
-			time(&ltime);//seconds since epoch.
-			unsigned long time = (unsigned long)ltime;
-
-			int diff;
-			if (time_end && (diff = time_end - time) != time_sec) {
-				time_sec = diff;
-				int time_min = time_sec / 60;
-				snprintf(exit_countdown_timer_label, 10, "%02d:%02d", time_min, time_sec % 60);
-				if (time_sec <= 0) {
-					BYTE& Quit_Exit_Game = *((BYTE*)h2mod->GetBase() + 0x48220b);
-					Quit_Exit_Game = 1;
-				}
-				if (++add_exit_countdown_label >= 4) {
-					add_exit_countdown_label = 0;
-					create_exit_countdown_label();
-				}
-			}
-
-			int width = pViewport.Width;
-			int height = pViewport.Height;
-
-			for (auto const &ent1 : exit_countdown_labels) {
-				ent1->x += ent1->xp ? 1 : -1;
-				ent1->y += ent1->yp ? 1 : -1;
-				if (ent1->x > width) {
-					ent1->xp = false;
-				}
-				else if (ent1->x < 0) {
-					ent1->xp = true;
-				}
-				if (ent1->y > height) {
-					ent1->yp = false;
-				}
-				else if (ent1->y < 0) {
-					ent1->yp = true;
-				}
-				drawText(ent1->x - 25, ent1->y - 10, COLOR_WHITE, exit_countdown_timer_label, normalSizeFont);
-			}
 			
 			if (getDebugTextDisplay()) {
 				for (int i = 0; i < getDebugTextArrayMaxLen(); i++) {
@@ -699,11 +655,16 @@ int WINAPI XLiveRender()
 				drawBox(10, 52, ((Size_Of_Downloaded * 100) / Size_Of_Download) * 2, 6, COLOR_GREEN, COLOR_GREEN);
 			}
 
+			if (NetworkStatistics) {
+				sprintf(packet_info_str, "[ pck/second %d, pck size average: %d ]", ElapsedTime != 0 ? Packets * 1000 / ElapsedTime : 0, TotalPacketsSent != 0 ? TotalBytesSent / TotalPacketsSent : 0);
+				drawText(30, 30, COLOR_WHITE, packet_info_str, normalSizeFont);
+			}
 		}
 
 		if (H2Config_fps_limit > 0) {
 			frameTimeManagement();
 		}
+
 	}
 
 	return 0;

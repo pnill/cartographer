@@ -250,6 +250,9 @@
     <Filter Include="Source Files\H2MOD\Modules\MapFix">
       <UniqueIdentifier>{0dcc09a4-5fd5-4f51-9344-1bee701782ef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\NetworkStats">
+      <UniqueIdentifier>{4bdd249f-f00f-4cbe-b0df-26a3418d073b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -473,6 +476,9 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\MapFix\SPMapFix.cpp">
       <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\NetworkStats\NetworkStats.cpp">
+      <Filter>Source Files\H2MOD\Modules\NetworkStats</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -937,6 +943,9 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\MapFix\SPMapFix.h">
       <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\NetworkStats\NetworkStats.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

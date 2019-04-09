@@ -569,8 +569,8 @@ int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4)
 	pxnqos->cxnqosPending = 0;
 	pxnqos->axnqosinfo->cProbesRecv = 4;
 	pxnqos->axnqosinfo->cProbesXmit = 4;
-	pxnqos->axnqosinfo->wRttMinInMsecs = 10;
-	pxnqos->axnqosinfo->wRttMedInMsecs = 15;
+	pxnqos->axnqosinfo->wRttMinInMsecs = 50;
+	pxnqos->axnqosinfo->wRttMedInMsecs = 50;
 	pxnqos->axnqosinfo->dwDnBitsPerSec = 16384;
 	pxnqos->axnqosinfo->dwUpBitsPerSec = 16384;
 	pxnqos->axnqosinfo->cbData = 0;

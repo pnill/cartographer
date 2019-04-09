@@ -1,10 +1,11 @@
-#include "Globals.h"
 #include <fstream>
+#include "Globals.h"
+#include "Blam/BlamLibrary.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "Blam/BlamLibrary.h"
 #include "H2MOD\Modules\CustomMenu\Credits.h"
+#include "H2MOD\Modules\NetworkStats\NetworkStats.h"
 #include "Util\ClipboardAPI.h"
 
 
@@ -711,7 +712,10 @@ void ConsoleCommands::handle_command(std::string command) {
 			else {
 				output(L"Wrong input! Use a number.");
 			}
-
+		}
+		else if (firstCommand == "$netstats")
+		{
+			NetworkStatistics = NetworkStatistics == false ? true : false;
 		}
 		else {
 			output(L"Unknown command.");
