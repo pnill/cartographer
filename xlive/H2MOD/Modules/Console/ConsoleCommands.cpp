@@ -567,7 +567,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$spawnnear") {
 			if (!gameManager->isHost()) {
-				output(L"Only host can issue a team change");
+				output(L"Only host can spawn objects");
 				return;
 			}
 			if (splitCommands.size() < 3 || splitCommands.size() > 4) {
@@ -652,7 +652,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$spawn") {
 			if (!gameManager->isHost()) {
-				output(L"Only host can issue a team change");
+				output(L"Only host can spawn objects");
 				return;
 			}
 			if (splitCommands.size() != 6) {
