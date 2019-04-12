@@ -12,8 +12,8 @@ using namespace rapidjson;
 extern CHAR g_szUserName[4][16];
 extern unsigned short H2Config_base_port;
 
-HANDLE ServerEnum = NULL;
 ServerList LiveManager;
+HANDLE ServerEnum = NULL;
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
@@ -21,20 +21,18 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 	return size * nmemb;
 }
 
-void BadServer(ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult,const char* log_catch)
+void BadServer(ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult, const char* log_catch)
 {
 	if (H2Config_debug_log)
-		TRACE_GAME_N("BadServer - XUID: %llu - Log Catch: %s", xuid,log_catch);
+		TRACE_GAME_N("BadServer - XUID: %llu - Log Catch: %s", xuid, log_catch);
 
 	ZeroMemory(nResult, sizeof(_XLOCATOR_SEARCHRESULT));
 }
-void QueryServerData(ULONGLONG xuid,_XLOCATOR_SEARCHRESULT* nResult)
-{	
-	CURL *curl;
+void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult)
+{
 	CURLcode res;
 	std::string readBuffer;
 
-	curl = curl_easy_init();
 	if (curl) {
 
 		std::string server_url = std::string("http://cartographer.online/live/servers/");
@@ -44,7 +42,6 @@ void QueryServerData(ULONGLONG xuid,_XLOCATOR_SEARCHRESULT* nResult)
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
-		curl_easy_cleanup(curl);
 
 		rapidjson::Document doc;
 		doc.Parse(readBuffer.c_str());
@@ -126,12 +123,11 @@ void QueryServerData(ULONGLONG xuid,_XLOCATOR_SEARCHRESULT* nResult)
 		for (int i = 0; i < 6; i++) {
 			sscanf(&abEnet[i * 2], "%2hhx", &nResult->serverAddress.abEnet[i]);
 		}
-		
 
 		if (!doc.HasMember("abonline"))
 		{
 			BadServer(xuid, nResult, "Missing Member: abOnline");
-				return;
+			return;
 		}
 
 		const char* abOnline = doc["abonline"].GetString();
@@ -144,7 +140,7 @@ void QueryServerData(ULONGLONG xuid,_XLOCATOR_SEARCHRESULT* nResult)
 		for (int i = 0; i < 20; i++) {
 			sscanf(&abOnline[i * 2], "%2hhx", &nResult->serverAddress.abOnline[i]);
 		}
-	
+
 		if (!doc.HasMember("xuid"))
 		{
 			BadServer(xuid, nResult, "Missing Member: xuid");
@@ -171,45 +167,45 @@ void QueryServerData(ULONGLONG xuid,_XLOCATOR_SEARCHRESULT* nResult)
 		{
 			nResult->pProperties[current_property].dwPropertyId = property["dwPropertyId"].GetInt();
 			nResult->pProperties[current_property].value.type = property["type"].GetInt();
-			
+
 			const char* data = 0;
 			wchar_t *unicode_data = 0;
 			int str_len = 0;
-			
+
 
 			GenericStringBuffer<UTF16<> > buffer;
 			Writer<GenericStringBuffer<UTF16<> >, UTF8<>, UTF16<> > writer(buffer);
 			std::wstring str;
 			switch (property["type"].GetInt())
 			{
-				case XUSER_DATA_TYPE_INT32:
-					nResult->pProperties[current_property].value.nData = property["value"].GetInt();
+			case XUSER_DATA_TYPE_INT32:
+				nResult->pProperties[current_property].value.nData = property["value"].GetInt();
 				break;
 
-				case XUSER_DATA_TYPE_UNICODE:
-					writer.String(property["value"].GetString());
-					
-					str.append(buffer.GetString());
-					
-					str.erase(std::remove(str.begin(), str.end(), '"'), str.end());
-					str.erase(std::remove(str.begin(), str.end(), '\\'), str.end());
+			case XUSER_DATA_TYPE_UNICODE:
+				writer.String(property["value"].GetString());
 
-					unicode_data = new wchar_t[str.size()+1];
-					ZeroMemory(unicode_data, str.size()+1);
+				str.append(buffer.GetString());
 
-					wcscpy(unicode_data, str.c_str());
-					
-					nResult->pProperties[current_property].value.string.cbData = buffer.GetSize();
-					nResult->pProperties[current_property].value.string.pwszData = unicode_data;
+				str.erase(std::remove(str.begin(), str.end(), '"'), str.end());
+				str.erase(std::remove(str.begin(), str.end(), '\\'), str.end());
+
+				unicode_data = new wchar_t[str.size() + 1];
+				ZeroMemory(unicode_data, str.size() + 1);
+
+				wcscpy(unicode_data, str.c_str());
+
+				nResult->pProperties[current_property].value.string.cbData = buffer.GetSize();
+				nResult->pProperties[current_property].value.string.pwszData = unicode_data;
 
 
 				break;
 
-				case XUSER_DATA_TYPE_INT64:
-					nResult->pProperties[current_property].value.i64Data = property["value"].GetInt64();
+			case XUSER_DATA_TYPE_INT64:
+				nResult->pProperties[current_property].value.i64Data = property["value"].GetInt64();
 				break;
 			}
-			
+
 			current_property++;
 		}
 	}
@@ -217,9 +213,9 @@ void QueryServerData(ULONGLONG xuid,_XLOCATOR_SEARCHRESULT* nResult)
 	++LiveManager.total_servers;
 }
 
-void GetServersFromHttp(ServerList* servptr,PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBuffer)
+void GetServersFromHttp(ServerList* servptr, PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBuffer)
 {
-	servptr->running = true;
+	servptr->server_list_download_running = true;
 	
 	addDebugText("Requesting server list");
 
@@ -233,19 +229,18 @@ void GetServersFromHttp(ServerList* servptr,PXOVERLAPPED pOverlapped, DWORD cbBu
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
-		curl_easy_cleanup(curl);
 
 		rapidjson::Document document;
 		document.Parse(readBuffer.c_str());
-		
+
 		int server_count = document["servers"].Size();
 		servptr->servers_left = server_count;
 
 		if (server_count * sizeof(_XLOCATOR_SEARCHRESULT) > cbBuffer) {
-			
-			servptr->running = false;
+
+			servptr->server_list_download_running = false;
 			servptr->servers_left = -1;
-			
+
 			pOverlapped->InternalLow = ERROR_INSUFFICIENT_BUFFER;
 			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
 
@@ -257,24 +252,26 @@ void GetServersFromHttp(ServerList* servptr,PXOVERLAPPED pOverlapped, DWORD cbBu
 		for (auto& server : document["servers"].GetArray())
 		{
 			ULONGLONG xuid = std::stoll(server.GetString());
-			QueryServerData(xuid, &server_buffer[servptr->GetTotalServers()]);
-			
+			QueryServerData(curl, xuid, &server_buffer[servptr->GetTotalServers()]);
+
 			servptr->servers_left--;
-			pOverlapped->InternalLow = ERROR_SUCCESS;			
+			pOverlapped->InternalLow = ERROR_SUCCESS;
 			pOverlapped->InternalHigh = servptr->GetTotalServers();
 			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_PENDING);
 		}
-	}
-	std::string debg_1 = "Server Count: " + std::to_string(servptr->total_servers);
-	addDebugText(debg_1.c_str());
 
-	servptr->running = false;
+		std::string debg_1 = "Server Count: " + std::to_string(servptr->GetTotalServers());
+		addDebugText(debg_1.c_str());
+		curl_easy_cleanup(curl);
+	}
+
+	servptr->server_list_download_running = false;
 }
 
 
-bool ServerList::GetServerCounts()
+void ServerList::GetServerCounts()
 {
-
+	this->server_counts_download_running = true;
 	CURL *curl;
 	CURLcode res;
 	std::string readBuffer;
@@ -299,13 +296,10 @@ bool ServerList::GetServerCounts()
 			total_public = document["public_count"].GetInt();
 			total_public_gold = document["public_gold"].GetInt();
 
-			return true;
 		}
 
-		return false;
 	}
-
-	return false;
+	this->server_counts_download_running = false;
 }
 
 int ServerList::GetServersLeft()
@@ -320,7 +314,7 @@ int ServerList::GetTotalServers()
 
 bool ServerList::GetRunning()
 {
-	return running;
+	return server_list_download_running;
 }
 
 void ServerList::GetServers(PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBuffer)
@@ -329,7 +323,7 @@ void ServerList::GetServers(PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBu
 	pOverlapped->InternalHigh = ERROR_IO_INCOMPLETE;
 
 	// check if another thread isn't running and servers_left is in "unitialized state"
-	if (!this->running && this->servers_left == -1)
+	if (!this->server_list_download_running && this->servers_left == -1)
 	{
 		this->total_servers = 0;
 		this->serv_thread = std::thread(GetServersFromHttp, this, pOverlapped, cbBuffer, pvBuffer);
@@ -346,9 +340,7 @@ void ServerList::GetServers(PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBu
 		pOverlapped->InternalHigh = this->GetTotalServers();
 		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
 	}
-
 }
-
 
 void RemoveServer()
 {
@@ -379,7 +371,6 @@ void RemoveServer()
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, buffer.GetString());
 		res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
-
 	}
 }
 
@@ -502,21 +493,13 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 	// TRACE("XLocatorGetServiceProperty  (*** checkme ***) (dwUserIndex = %X, cNumProperties = %X, pProperties = %X, pOverlapped = %X)",
 	//		dwUserIndex, cNumProperties, pProperties, pOverlapped);
 
-	if (LiveManager.GetServerCounts())
-	{
-		pProperties[0].value.nData = LiveManager.total_count;
-		pProperties[1].value.nData = LiveManager.total_public;
-		pProperties[2].value.nData = LiveManager.total_peer_gold + LiveManager.total_public_gold;
-		pProperties[3].value.nData = LiveManager.total_peer;
+	if (!LiveManager.server_counts_download_running)
+		std::thread(&ServerList::GetServerCounts, &LiveManager).detach();
 
-		return S_OK;
-	}
-
-	//Sets Not Available to display if pProperties fails to get server count.
-	pProperties[0].value.nData = -1;
-	pProperties[1].value.nData = -1;
-	pProperties[2].value.nData = -1;
-	pProperties[3].value.nData = -1;
+	pProperties[0].value.nData = LiveManager.total_count;
+	pProperties[1].value.nData = LiveManager.total_public;
+	pProperties[2].value.nData = LiveManager.total_peer_gold + LiveManager.total_public_gold != -2 ? LiveManager.total_peer_gold + LiveManager.total_public_gold : -1;
+	pProperties[3].value.nData = LiveManager.total_peer;
 
 	return S_OK;
 }
@@ -527,7 +510,7 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int 
 {
 	TRACE("XLocatorCreateServerEnumerator");
 
-	*pcbBuffer = (DWORD)(sizeof(_XLOCATOR_SEARCHRESULT) * (LiveManager.total_count + 10));
+	*pcbBuffer = (DWORD)(sizeof(_XLOCATOR_SEARCHRESULT) * 200); // 200 is the maximum XLocator could hold per title
 
 	if (phEnum)
 	{

@@ -81,10 +81,13 @@ bool H2Config_custom_labels_capture_missing = false;
 bool H2Config_skip_intro = false;
 bool H2Config_raw_input = false;
 bool H2Config_discord_enable = true;
-bool H2Config_controller_aim_assist = true;
+//bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
 int H2Config_static_lod_state = static_lod::disable;
 int H2Config_field_of_view = 0;
+int H2Config_refresh_rate = 60;
+int H2Config_mouse_sens = 0;
+int H2Config_controller_sens = 0;
 float H2Config_crosshair_offset = NAN;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
@@ -233,10 +236,10 @@ void SaveH2Config() {
 			fputs("\n# 1 - Enables Discord Rich Presence.", fileConfig);
 			fputs("\n\n", fileConfig);
 
-			fputs("# controller_aim_assist Options (Client):", fileConfig);
+			/*fputs("# controller_aim_assist Options (Client):", fileConfig);
 			fputs("\n# 0 - Disables aim assist for controllers.", fileConfig);
 			fputs("\n# 1 - Enables aim assist for controllers.", fileConfig);
-			fputs("\n\n", fileConfig);
+			fputs("\n\n", fileConfig);*/
 
 			fputs("# fps_limit Options (Client):", fileConfig);
 			fputs("\n# <uint> - 0 disables the built in frame limiter. >0 is the fps limit of the game.", fileConfig);
@@ -255,6 +258,18 @@ void SaveH2Config() {
 
 			fputs("# field_of_view Options (Client):", fileConfig);
 			fputs("\n# <uint 0 to 110> - 0 disables the built in FoV adjustment. >0 is the FoV set value.", fileConfig);
+			fputs("\n\n", fileConfig);
+
+			fputs("# refresh_rates Options (Client):", fileConfig);
+			fputs("\n# <uint 0 to 240> - 0 disables the built in refresh rate adjustment. >0 is the refresh rate set value.", fileConfig);
+			fputs("\n\n", fileConfig);
+
+			fputs("# mouse_sens Options (Client):", fileConfig);
+			fputs("\n# <uint 0 to inf> - 0 uses the default sensitivity.", fileConfig);
+			fputs("\n\n", fileConfig);
+
+			fputs("# controller_sens Options (Client):", fileConfig);
+			fputs("\n# <uint 0 to inf> - 0 uses the default sensitivity.", fileConfig);
 			fputs("\n\n", fileConfig);
 
 			fputs("# crosshair_offset Options (Client):", fileConfig);
@@ -281,12 +296,12 @@ void SaveH2Config() {
 		fputs("\n# 0 - Non-host players cannot delay the game start countdown timer.", fileConfig);
 		fputs("\n# 1 - Non-host players can delay the game start countdown timer (native default).", fileConfig);
 		fputs("\n\n", fileConfig);
-//		if (!H2IsDediServer) {
-//			fputs("# enable_hitmarker_sound Options (Client):", fileConfig);
-//			fputs("\n# 0 - Shooting players does not produce a hitmarker sound effect (default).", fileConfig);
-//			fputs("\n# 1 - Shooting players plays a hitmarker sound effect.", fileConfig);
-//			fputs("\n\n", fileConfig);
-//		}
+/*		if (!H2IsDediServer) {
+			fputs("# enable_hitmarker_sound Options (Client):", fileConfig);
+			fputs("\n# 0 - Shooting players does not produce a hitmarker sound effect (default).", fileConfig);
+			fputs("\n# 1 - Shooting players plays a hitmarker sound effect.", fileConfig);
+			fputs("\n\n", fileConfig);
+		}
 		fputs("# voice_chat Options:", fileConfig);
 		fputs("\n# 0 - Voice chat is not enabled, you cannot host voice servers or connect to them.", fileConfig);
 		fputs("\n# 1 - Voice chat is enabled, you can host voice servers or connect to them (default).", fileConfig);
@@ -308,10 +323,10 @@ void SaveH2Config() {
 			fputs("\n# 1 - Grunt Birthday Party skull is on for all players.", fileConfig);
 			fputs("\n\n", fileConfig);
 
-			/*fputs("# grenade_chain_react Options (Server):", fileConfig);
+			fputs("# grenade_chain_react Options (Server):", fileConfig);
 			fputs("\n# 0 - Grenades do not chain react in multiplayer.", fileConfig);
 			fputs("\n# 1 - Grenades chain react in multiplayer.", fileConfig);
-			fputs("\n\n", fileConfig);*/
+			fputs("\n\n", fileConfig);
 
 			fputs("# banshee_bomb Options (Server):", fileConfig);
 			fputs("\n# 0 - Players cannot use the Banshee Bomb in multiplayer.", fileConfig);
@@ -329,7 +344,7 @@ void SaveH2Config() {
 			fputs("\n# 0 - Players cannot use their Flashlight in multiplayer.", fileConfig);
 			fputs("\n# 1 - Players can use their Flashlight in multiplayer.", fileConfig);
 			fputs("\n\n", fileConfig);
-		}
+		}*/
 
 		fputs("# debug_log Options:", fileConfig);
 		fputs("\n# 0 - Disables excess logging.", fileConfig);
@@ -404,7 +419,7 @@ void SaveH2Config() {
 
 			fputs("\ndiscord_enable = ", fileConfig); fputs(H2Config_discord_enable ? "1" : "0", fileConfig);
 
-			fputs("\ncontroller_aim_assist = ", fileConfig); fputs(H2Config_controller_aim_assist ? "1" : "0", fileConfig);
+			//fputs("\ncontroller_aim_assist = ", fileConfig); fputs(H2Config_controller_aim_assist ? "1" : "0", fileConfig);
 
 			sprintf(settingOutBuffer, "\nfps_limit = %d", H2Config_fps_limit);
 			fputs(settingOutBuffer, fileConfig);
@@ -413,6 +428,15 @@ void SaveH2Config() {
 			fputs(settingOutBuffer, fileConfig);
 
 			sprintf(settingOutBuffer, "\nfield_of_view = %d", H2Config_field_of_view);
+			fputs(settingOutBuffer, fileConfig);
+
+			sprintf(settingOutBuffer, "\nrefresh_rate = %d", H2Config_refresh_rate);
+			fputs(settingOutBuffer, fileConfig);
+
+			sprintf(settingOutBuffer, "\nmouse_sens = %d", H2Config_mouse_sens);
+			fputs(settingOutBuffer, fileConfig);
+
+			sprintf(settingOutBuffer, "\ncontroller_sens = %d", H2Config_controller_sens);
 			fputs(settingOutBuffer, fileConfig);
 
 			if (FloatIsNaN(H2Config_crosshair_offset)) {
@@ -430,9 +454,9 @@ void SaveH2Config() {
 			//fputs("\ncustom_resolution = 0x0", fileConfig);
 		}
 		fputs("\nenable_xdelay = ", fileConfig); fputs(H2Config_xDelay ? "1" : "0", fileConfig);
-//		if (!H2IsDediServer) {
-//			fputs("\nenable_hitmarker_sound = ", fileConfig); fputs(H2Config_hitmarker_sound ? "1" : "0", fileConfig);
-//		}
+/*		if (!H2IsDediServer) {
+			fputs("\nenable_hitmarker_sound = ", fileConfig); fputs(H2Config_hitmarker_sound ? "1" : "0", fileConfig);
+		}
 		fputs("\nvoice_chat = ", fileConfig); fputs(H2Config_voice_chat ? "1" : "0", fileConfig);
 
 		if (H2IsDediServer) {
@@ -450,7 +474,7 @@ void SaveH2Config() {
 			fputs("\nmp_blind = ", fileConfig); fputs(tmpChar, fileConfig);
 
 			fputs("\nflashlight = ", fileConfig); fputs(AdvLobbySettings_flashlight ? "1" : "0", fileConfig);
-		}
+		}*/
 
 		fputs("\ndebug_log = ", fileConfig); fputs(H2Config_debug_log ? "1" : "0", fileConfig);
 
@@ -607,17 +631,20 @@ static bool est_language_label_capture = false;
 static bool est_skip_intro = false;
 static bool est_raw_input = false;
 static bool est_discord_enable = false;
-static bool est_controller_aim_assist = false;
+//static bool est_controller_aim_assist = false;
 static bool est_fps_limit = false;
 static bool est_static_lod_state = false;
 static bool est_field_of_view = false;
+static bool est_refresh_rate = false;
+static bool est_mouse_sens = false;
+static bool est_controller_sens = false;
 static bool est_crosshair_offset = false;
 static bool est_sens_controller = false;
 static bool est_sens_mouse = false;
 static bool est_disable_ingame_keyboard = false;
 static bool est_hide_ingame_chat = false;
 static bool est_xdelay = false;
-//static bool est_hitmarker_sound = false;
+/*static bool est_hitmarker_sound = false;
 static bool est_voice_chat = false;
 static bool est_als_mp_explosion_physics = false;
 static bool est_als_mp_sputnik = false;
@@ -625,7 +652,7 @@ static bool est_als_mp_grunt_bday_party = false;
 static bool est_als_grenade_chain_react = false;
 static bool est_als_banshee_bomb = false;
 static bool est_als_mp_blind = false;
-static bool est_als_flashlight = false;
+static bool est_als_flashlight = false;*/
 static bool est_debug_log = false;
 static bool est_custom_resolution = false;
 static bool est_server_name = false;
@@ -682,7 +709,7 @@ static void est_reset_vars() {
 	est_skip_intro = false;
 	est_raw_input = false;
 	est_discord_enable = false;
-	est_controller_aim_assist = false;
+	//est_controller_aim_assist = false;
 	est_fps_limit = false;
 	est_static_lod_state = false;
 	est_field_of_view = false;
@@ -692,7 +719,7 @@ static void est_reset_vars() {
 	est_disable_ingame_keyboard = false;
 	est_hide_ingame_chat = false;
 	est_xdelay = false;
-	//est_hitmarker_sound = false;
+	/*est_hitmarker_sound = false;
 	est_voice_chat = false;
 	est_als_mp_explosion_physics = false;
 	est_als_mp_sputnik = false;
@@ -700,7 +727,7 @@ static void est_reset_vars() {
 	est_als_grenade_chain_react = false;
 	est_als_banshee_bomb = false;
 	est_als_mp_blind = false;
-	est_als_flashlight = false;
+	est_als_flashlight = false;*/
 	est_debug_log = false;
 	est_custom_resolution = false;
 	est_server_name = false;
@@ -928,7 +955,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_discord_enable = true;
 			}
 		}
-		else if (!H2IsDediServer && sscanf(fileLine, "controller_aim_assist =%d", &tempint1) == 1) {
+		/*else if (!H2IsDediServer && sscanf(fileLine, "controller_aim_assist =%d", &tempint1) == 1) {
 			if (est_controller_aim_assist) {
 				duplicated = true;
 			}
@@ -939,7 +966,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				H2Config_controller_aim_assist = (bool)tempint1;
 				est_controller_aim_assist = true;
 			}
-		}
+		}*/
 		else if (!H2IsDediServer && sscanf(fileLine, "fps_limit =%d", &tempint1) == 1) {
 			if (est_fps_limit) {
 				duplicated = true;
@@ -976,6 +1003,42 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			else {
 				H2Config_field_of_view = tempint1;
 				est_field_of_view = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "refresh_rate =%d", &tempint1) == 1) {
+			if (est_refresh_rate) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_refresh_rate = tempint1;
+				est_refresh_rate = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "mouse_sens =%d", &tempint1) == 1) {
+			if (est_mouse_sens) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_mouse_sens = tempint1;
+				est_mouse_sens = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "controller_sens =%d", &tempint1) == 1) {
+			if (est_controller_sens) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_controller_sens = tempint1;
+				est_controller_sens = true;
 			}
 		}
 		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_offset =%f", &tempfloat1) == 1) {
@@ -1362,18 +1425,18 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_xdelay = true;
 			}
 		}
-//		else if (sscanf(fileLine, "enable_hitmarker_sound =%d", &tempint1) == 1) {
-//			if (est_hitmarker_sound) {
-//				duplicated = true;
-//			}
-//			else if (!(tempint1 == 0 || tempint1 == 1)) {
-//				incorrect = true;
-//			}
-//			else {
-//				H2Config_hitmarker_sound = (bool)tempint1;
-//				est_hitmarker_sound = true;
-//			}
-//		}
+/*		else if (sscanf(fileLine, "enable_hitmarker_sound =%d", &tempint1) == 1) {
+			if (est_hitmarker_sound) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_hitmarker_sound = (bool)tempint1;
+				est_hitmarker_sound = true;
+			}
+		}
 		else if (sscanf(fileLine, "voice_chat =%d", &tempint1) == 1) {
 			if (est_voice_chat) {
 				duplicated = true;
@@ -1422,7 +1485,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_als_mp_grunt_bday_party = true;
 			}
 		}
-		/*else if (sscanf(fileLine, "grenade_chain_react =%d", &tempint1) == 1) {
+		else if (sscanf(fileLine, "grenade_chain_react =%d", &tempint1) == 1) {
 			if (est_als_grenade_chain_react) {
 				duplicated = true;
 			}
@@ -1433,7 +1496,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				AdvLobbySettings_grenade_chain_react = (bool)tempint1;
 				est_als_grenade_chain_react = true;
 			}
-		}*/
+		}
 		else if (sscanf(fileLine, "banshee_bomb =%d", &tempint1) == 1) {
 			if (est_als_banshee_bomb) {
 				duplicated = true;
@@ -1469,7 +1532,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				AdvLobbySettings_flashlight = (bool)tempint1;
 				est_als_flashlight = true;
 			}
-		}
+		}*/
 		else if (sscanf(fileLine, "debug_log =%d", &tempint1) == 1) {
 			if (est_debug_log) {
 				duplicated = true;
