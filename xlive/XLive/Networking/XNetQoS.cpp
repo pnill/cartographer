@@ -162,7 +162,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 			auto ping_result = std::minmax_element(ping_storage.begin(),ping_storage.end());
 			long long min_ping = ping_storage[ (ping_result.first- ping_storage.begin()) ];
 			long long max_ping = ping_storage[ (ping_result.second - ping_storage.begin())];
-			WORD average = (std::accumulate(ping_storage.begin(), ping_storage.end(), 0) / ping_storage.size());
+			unsigned int average = (std::accumulate(ping_storage.begin(), ping_storage.end(), 0) / ping_storage.size());
 
 			ping_storage.clear();
 
@@ -184,7 +184,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 		}
 	}
 
-	for (int i = 0; i < cxna; i++)
+	for (unsigned int i = 0; i < cxna; i++)
 	{
 		// XNADDR
 		delete apxna[i];
@@ -505,6 +505,13 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 
 	pqos->cxnqos = cxna;
 	pqos->cxnqosPending = cxna;
+	pqos->axnqosinfo[0].cProbesXmit = 4;
+	pqos->axnqosinfo[0].cProbesRecv = 4;
+	pqos->axnqosinfo[0].wRttMinInMsecs = 5;
+	pqos->axnqosinfo[0].wRttMedInMsecs = 10;
+	pqos->axnqosinfo[0].dwDnBitsPerSec = dwBitsPerSec;
+	pqos->axnqosinfo[0].dwUpBitsPerSec = dwBitsPerSec;
+	pqos->axnqosinfo[0].bFlags = XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE;
 
 	/*
 	This is gonna hit some CPUs hard when there's a lot of servers on the list, we'll probably want to queue this a bit and only allow X number of threads to run at a time.
@@ -529,7 +536,7 @@ DWORD WINAPI XNetQosServiceLookup(DWORD a1, DWORD a2, DWORD a3)
 // #72: XNetQosRelease
 INT WINAPI XNetQosRelease(XNQOS* pxnqos)
 {
-	for (int i = 0; i < pxnqos->cxnqos; i++)
+	for (unsigned int i = 0; i < pxnqos->cxnqos; i++)
 	{
 		if (pxnqos->axnqosinfo[i].cbData > 0 && pxnqos->axnqosinfo[i].pbData)
 			delete[] pxnqos->axnqosinfo[i].pbData;

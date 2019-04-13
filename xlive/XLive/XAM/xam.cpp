@@ -188,9 +188,6 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			// show UI
 			if (pParam) *pParam = 1;
 
-
-			DWORD threadid;
-
 			sys_ui++;
 			std::thread(sysui_timer, hNotification).detach();
 

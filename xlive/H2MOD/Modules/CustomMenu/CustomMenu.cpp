@@ -2556,7 +2556,6 @@ void RefreshToggleIngameKeyboardControls() {
 
 	}
 }*/
-
 void RefreshTogglexDelay() {
 	BYTE xDelayJMP[] = { 0x74 };
 	if (!H2Config_xDelay)
@@ -4926,6 +4925,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditHz, 0xFFFF0013, "No Refresh Rate Forced");
 	add_cartographer_label(CMLabelMenuId_EditHz, 4, "-1");
 	add_cartographer_label(CMLabelMenuId_EditHz, 5, "-10");
+
 
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 0xFFFFFFF0, "Static Model Level of Detail");
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 0xFFFFFFF1, "Use the buttons below to set a static level on a model's Level of Detail.");

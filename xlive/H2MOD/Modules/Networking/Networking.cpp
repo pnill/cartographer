@@ -805,8 +805,6 @@ void removeXNetSecurity()
 	p_cmp_xnkid = (cmp_xnkid)DetourClassFunc((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x199F02 : 0x1C284A), (BYTE*)xnkid_cmp, 9);
 	VirtualProtect(p_cmp_xnkid, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	NopFill<9>(h2mod->GetBase() + (h2mod->Server ? 0x1B3CC3 : 0x1F1F94)); // check if secure/ipaddress != 127.0.0.1
-
 	BYTE jmp = 0xEB;
 	// apparently the secure address has 1 free byte 
 	// after HTONL call, game is checking the al register (the lower 8 bits of eax register) if it is zero, if not everything network related will fail
@@ -817,18 +815,25 @@ void removeXNetSecurity()
 	
 }
 
-//float unk_flt_ = 60.0f;
+
 void applyConnectionPatches()
 {
 	DWORD dwBack;
 	//removeXNetSecurity();
 	WritePointer(h2mod->GetBase() + (h2mod->Server ? 0x1D20E4 : 0x1F172B), (void*)deserialize_join_request);
 
+	NopFill<9>(h2mod->GetBase() + (h2mod->Server ? 0x1B3CC3 : 0x1F1F94)); // check if secure/ipaddress != 127.0.0.1
+	// disable network observer (broken on H2V)
+	WriteValue<BYTE>(h2mod->GetBase() + (h2mod->Server ? 0x1A92BA : 0x1B555C), (BYTE)0);
+	// also ping bars
+	WriteValue<BYTE>(h2mod->GetBase() + (h2mod->Server ? 0x1C1B7F : 0x1D4E35), 0xEB);
+
 	// makes Live network not as laggy 
-	int data = 500;
-	WriteValue<int>(h2mod->GetBase() + (h2mod->Server ? 0x24896 : 0x28702), data);
+	/*int data = 500;
+	WriteValue<int>(h2mod->GetBase() + (h2mod->Server ? 0x24896 : 0x28702), data);*/
 	
 	// research
+	//static float unk_flt_ = 60.0f;
 	/*DWORD addresses[] = { 0x1BDE27, 0x1BE2FA, 0x1BFB3C, 0x1C11FA, 0x1C12BF };
 	DWORD addresses_dedi[] = { 0x1B7D01, 0x1B81D4, 0x1B9A1C, 0x1BB0DA, 0x1BB19F };
 	int size = h2mod->Server ? sizeof(addresses_dedi) : sizeof(addresses);
@@ -837,7 +842,6 @@ void applyConnectionPatches()
 		DWORD addr = h2mod->Server ? addresses_dedi[i] : addresses[i];
 		WritePointer(h2mod->GetBase() + addr + 4, &unk_flt_);
 	}*/
-
 
 	if (!h2mod->Server)
 	{

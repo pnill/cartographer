@@ -98,7 +98,6 @@ int H2Config_custom_resolution_x = 0;
 int H2Config_custom_resolution_y = 0;
 char H2Config_dedi_server_name[32] = { "" };
 char H2Config_dedi_server_playlist[256] = { "" };
-bool H2Config_map_downloading_enable = false;
 bool H2Config_chatbox_commands = false;
 bool H2Config_debug_log = false;
 char H2Config_login_identifier[255] = { "" };
@@ -286,16 +285,17 @@ void SaveH2Config() {
 			fputs("\n# 1 - In-game chat is hidden.", fileConfig);
 			fputs("\n\n", fileConfig);
 
-			//fputs("# custom_resolution Options (Client):", fileConfig);
-			//fputs("\n# <width>x<height> - Sets the resolution of the game via the Windows Registry.", fileConfig);
-			//fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fileConfig);
-			//fputs("\n\n", fileConfig);
+			/*fputs("# custom_resolution Options (Client):", fileConfig);
+			fputs("\n# <width>x<height> - Sets the resolution of the game via the Windows Registry.", fileConfig);
+			fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fileConfig);
+			fputs("\n\n", fileConfig);*/
 
 		}
 		fputs("# enable_xdelay Options:", fileConfig);
 		fputs("\n# 0 - Non-host players cannot delay the game start countdown timer.", fileConfig);
 		fputs("\n# 1 - Non-host players can delay the game start countdown timer (native default).", fileConfig);
 		fputs("\n\n", fileConfig);
+
 /*		if (!H2IsDediServer) {
 			fputs("# enable_hitmarker_sound Options (Client):", fileConfig);
 			fputs("\n# 0 - Shooting players does not produce a hitmarker sound effect (default).", fileConfig);
@@ -466,7 +466,7 @@ void SaveH2Config() {
 
 			fputs("\nmp_grunt_bday_party = ", fileConfig); fputs(AdvLobbySettings_mp_grunt_bday_party ? "1" : "0", fileConfig);
 
-			//fputs("\ngrenade_chain_react = ", fileConfig); fputs(AdvLobbySettings_grenade_chain_react ? "1" : "0", fileConfig);
+			fputs("\ngrenade_chain_react = ", fileConfig); fputs(AdvLobbySettings_grenade_chain_react ? "1" : "0", fileConfig);
 
 			fputs("\nbanshee_bomb = ", fileConfig); fputs(AdvLobbySettings_banshee_bomb ? "1" : "0", fileConfig);
 
@@ -483,8 +483,6 @@ void SaveH2Config() {
 
 			fputs("\nserver_playlist = ", fileConfig); fputs(H2Config_dedi_server_playlist, fileConfig);
 		}
-
-		//fputs("\nmap_downloading_enable = ", fileConfig); fputs(H2Config_map_downloading_enable ? "1" : "0", fileConfig);
 
 		if (!H2IsDediServer) {
 			//fputs("\nchatbox_commands = ", fileConfig); fputs(H2Config_chatbox_commands ? "1" : "0", fileConfig);
@@ -657,7 +655,6 @@ static bool est_debug_log = false;
 static bool est_custom_resolution = false;
 static bool est_server_name = false;
 static bool est_server_playlist = false;
-static bool est_map_downloading_enable = false;
 static bool est_chatbox_commands = false;
 static bool est_login_token = false;
 static bool est_login_identifier = false;
@@ -713,6 +710,9 @@ static void est_reset_vars() {
 	est_fps_limit = false;
 	est_static_lod_state = false;
 	est_field_of_view = false;
+	est_refresh_rate = false;
+	est_mouse_sens = false;
+	est_controller_sens = false;
 	est_crosshair_offset = false;
 	est_sens_controller = false;
 	est_sens_mouse = false;
@@ -732,7 +732,6 @@ static void est_reset_vars() {
 	est_custom_resolution = false;
 	est_server_name = false;
 	est_server_playlist = false;
-	est_map_downloading_enable = false;
 	est_chatbox_commands = false;
 	est_login_token = false;
 	est_login_identifier = false;
@@ -955,7 +954,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_discord_enable = true;
 			}
 		}
-		/*else if (!H2IsDediServer && sscanf(fileLine, "controller_aim_assist =%d", &tempint1) == 1) {
+/*		else if (!H2IsDediServer && sscanf(fileLine, "controller_aim_assist =%d", &tempint1) == 1) {
 			if (est_controller_aim_assist) {
 				duplicated = true;
 			}
@@ -1598,18 +1597,6 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 					}
 				}
 				est_server_playlist = true;
-			}
-		}
-		else if (sscanf(fileLine, "map_downloading_enable =%d", &tempint1) == 1) {
-			if (est_map_downloading_enable) {
-				duplicated = true;
-			}
-			else if (!(tempint1 == 0 || tempint1 == 1)) {
-				incorrect = true;
-			}
-			else {
-				H2Config_map_downloading_enable = (bool)tempint1;
-				est_map_downloading_enable = true;
 			}
 		}
 		else if (!H2IsDediServer && sscanf(fileLine, "chatbox_commands =%d", &tempint1) == 1) {

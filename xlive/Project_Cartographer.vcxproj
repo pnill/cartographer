@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugDedicatedServer|Win32">
@@ -261,6 +261,8 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp" />
+    <ClCompile Include="H2MOD\Modules\MapFix\SPMapFix.cpp" />
     <ClCompile Include="XLive\Voice\AudioDevices.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -352,6 +354,8 @@
     <ClInclude Include="3rdparty\portaudio\include\pa_win_wdmks.h" />
     <ClInclude Include="3rdparty\portaudio\include\pa_win_wmme.h" />
     <ClInclude Include="3rdparty\portaudio\include\portaudio.h" />
+    <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />
+    <ClInclude Include="H2MOD\Modules\MapFix\SPMapFix.h" />
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
     <ClInclude Include="Blam\BlamLibrary.h" />
     <ClInclude Include="Blam\Cache\Cache.h" />

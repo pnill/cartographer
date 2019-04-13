@@ -1134,6 +1134,15 @@ void H2Tweaks::setSens(InputType input_type, int sens) {
 		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B4) = 25.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
 		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B0) = 50.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
 	}
+
+}
+
+void H2Tweaks::setSavedSens() {
+	if (H2Config_mouse_sens != 0)
+		H2Tweaks::setSens(MOUSE, (H2Config_mouse_sens));
+
+	if (H2Config_controller_sens != 0)
+		H2Tweaks::setSens(CONTROLLER, (H2Config_controller_sens));
 }
 
 void H2Tweaks::setSavedSens() {

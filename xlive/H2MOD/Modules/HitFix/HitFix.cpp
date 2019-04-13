@@ -13,8 +13,8 @@ void HitFix::Initialize()
 
 	*(float*)(AddressOffset + 0xA4EC88) = 1200.0f; // battle_rifle_bullet.proj Initial Velocity 
 	*(float*)(AddressOffset + 0xA4EC8C) = 1200.0f; //battle_rifle_bullet.proj Final Velocity
-	*(float*)(AddressOffset + 0xA84DD4) = 1200.0f;   //carbine_projectile       Initial Velocity 400
-	*(float*)(AddressOffset + 0xA84DD8) = 1200.0f;   //carbine_projectile       Final Velocity 400
+	*(float*)(AddressOffset + 0xA84DD4) = 1200.0f; //carbine_projectile Initial Velocity 400
+	*(float*)(AddressOffset + 0xA84DD8) = 1200.0f; //carbine_projectile Final Velocity 400
 	*(float*)(AddressOffset + 0xB7F914) = 4000.0f; //sniper_bullet.proj Initial Velocity
 	*(float*)(AddressOffset + 0xB7F918) = 4000.0f; //sniper_bullet.proj Final Velocity
 	

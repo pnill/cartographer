@@ -228,6 +228,15 @@ LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
 }
 
 void pushHostLobby() {
+	extern bool H2IsDediServer;
+	extern bool H2DediIsLiveMode;
+	extern DWORD H2BaseAddr;
+	if (H2IsDediServer && H2DediIsLiveMode)
+		return;
+
+	if (!H2IsDediServer && *(BYTE*)(*(DWORD*)(H2BaseAddr + 0x420FE8) + 0x1C) == 2)
+		return;
+
 	char msg[100] = { 0x00, 0x43, 0x05 };
 	sprintf(msg + 3, "push clientlobby %d", H2Config_base_port + 1);
 

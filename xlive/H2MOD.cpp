@@ -6,6 +6,8 @@
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\HitFix\Hitfix.h"
+#include "H2MOD\Modules\MapFix\SPMapfix.h"
+#include "H2MOD\Modules\MapFix\MPMapfix.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -1189,6 +1191,7 @@ void __cdecl OnMapLoad(int a1)
 		get_object_table_memory();
 
 		HitFix::Initialize();
+		MPMapFix::Initialize();
 
 		H2Tweaks::enableAI_MP();
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
