@@ -566,6 +566,10 @@ void ConsoleCommands::handle_command(std::string command) {
 			this->checked_for_ids = false;
 		}
 		else if (firstCommand == "$spawnnear") {
+			if (!gameManager->isHost()) {
+				output(L"Only host can spawn objects");
+				return;
+			}
 			if (splitCommands.size() < 3 || splitCommands.size() > 4) {
 				output(L"Invalid command, usage $spawn command_name count");
 				return;
@@ -647,6 +651,10 @@ void ConsoleCommands::handle_command(std::string command) {
 			t1.detach();
 		}
 		else if (firstCommand == "$spawn") {
+			if (!gameManager->isHost()) {
+				output(L"Only host can spawn objects");
+				return;
+			}
 			if (splitCommands.size() != 6) {
 				output(L"Invalid command, usage $spawn command_name count x y z");
 				return;
@@ -690,6 +698,7 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			if (isNum(sensVal.c_str())) {
 				H2Tweaks::setSens(CONTROLLER, stoi(sensVal));
+				H2Config_controller_sens = stoi(sensVal);
 			}
 			else {
 				output(L"Wrong input! Use a number.");
@@ -705,6 +714,7 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			if (isNum(sensVal.c_str())) {
 				H2Tweaks::setSens(MOUSE, stoi(sensVal));
+				H2Config_mouse_sens = stoi(sensVal);
 			}
 			else {
 				output(L"Wrong input! Use a number.");
