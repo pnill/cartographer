@@ -19,8 +19,10 @@ namespace H2Tweaks {
 	void enable60FPSCutscenes();
 	void disable60FPSCutscenes();
 	void setFOV(double field_of_view_degrees);
+	void setHz();
 	void setCrosshairPos(float crosshair_offset);
 	void setCrosshairSize(int size, bool preset);
 	void applyPlayersActionsUpdateRatePatch();
 	void setSens(InputType input_type, int sens);
+	void setSavedSens();
 }
