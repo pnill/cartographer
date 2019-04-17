@@ -6,6 +6,7 @@
 #include "H2MOD\Modules\Config\Config.h"
 #include <curl/curl.h>
 #include "XLive/UserManagement/CUser.h"
+#include "..\Networking\Networking.h"
 
 #pragma comment (lib, "mswsock.lib")
 

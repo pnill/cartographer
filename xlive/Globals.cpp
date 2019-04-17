@@ -18,7 +18,6 @@ char* replacedNetworkNormalTextWidget2;
 
 ConsoleCommands* commands = new ConsoleCommands();
 GameManager* gameManager = new GameManager();
-CustomNetwork *network = new CustomNetwork();
 
 Players* players = new Players();
 

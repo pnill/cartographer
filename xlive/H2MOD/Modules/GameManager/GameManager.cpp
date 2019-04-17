@@ -1,5 +1,6 @@
 #include "Globals.h"
-#include <H2MOD\protobuf\h2mod.pb.h>
+#include "H2MOD\protobuf\h2mod.pb.h"
+#include "..\Networking\Networking.h"
 #include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
 
 using namespace std::chrono_literals;

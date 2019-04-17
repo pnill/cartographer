@@ -261,9 +261,11 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
+    <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp" />
     <ClCompile Include="H2MOD\Modules\MapFix\SPMapFix.cpp" />
-    <ClCompile Include="H2MOD\Modules\NetworkStats\NetworkStats.cpp" />
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="XLive\Voice\AudioDevices.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -355,9 +357,11 @@
     <ClInclude Include="3rdparty\portaudio\include\pa_win_wdmks.h" />
     <ClInclude Include="3rdparty\portaudio\include\pa_win_wmme.h" />
     <ClInclude Include="3rdparty\portaudio\include\portaudio.h" />
+    <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
+    <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\SPMapFix.h" />
-    <ClInclude Include="H2MOD\Modules\NetworkStats\NetworkStats.h" />
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
     <ClInclude Include="Blam\BlamLibrary.h" />
     <ClInclude Include="Blam\Cache\Cache.h" />

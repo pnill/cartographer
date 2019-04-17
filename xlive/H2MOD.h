@@ -149,6 +149,12 @@ public:
 		void SetBase(DWORD base) { Base = base; }
 		DWORD GetBase() { return Base; }
 
+		template <typename T = void>
+		inline T *GetAddress(DWORD client, DWORD server = 0)
+		{
+			return reinterpret_cast<T*>(GetBase() + (Server ? server : client));
+		}
+
 private:
 		DWORD Base;
 		std::unordered_map<int, int> playerIndexToDynamicBase;

@@ -16,6 +16,7 @@
 #include "H2MOD\Variants\H2X\H2X.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
 #include "XLive\UserManagement\CUser.h"
+#include "H2MOD\Modules\Networking\Memory\bitstream.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -287,39 +288,6 @@ signed int __cdecl object_new_hook(void *pObject)
 	return result;
 }
 
-bool bitstream_write_bool(void *packet, char* string_data, bool value)
-{
-	typedef bool(__thiscall *tbitstream_write_bool)(void* packet, char* string_data, bool value);
-	tbitstream_write_bool ptbitstream_write_bool = (tbitstream_write_bool)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCDE40 : 0xD1886));
-
-	return ptbitstream_write_bool(packet, string_data, value);
-}
-
-int bitstream_write_uint(void* packet, char* string_data, unsigned int value, signed int bit_size)
-{
-	typedef int(__thiscall *tbitstream_write_uint)(void* packet, char* string_data, unsigned int value, signed int bit_size);
-	tbitstream_write_uint pbitstream_write_uint = (tbitstream_write_uint)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCDD80 : 0xD17C6));
-
-	return pbitstream_write_uint(packet, string_data, value, bit_size);
-}
-
-
-bool bitstream_read_bool(void *packet, char* string_data)
-{
-	typedef bool(__thiscall *tbitstream_read_bool)(void* packet, char* string_data);
-	tbitstream_read_bool ptbitstream_read_bool = (tbitstream_read_bool)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCE501 : 0xD1F47));
-
-	return ptbitstream_read_bool(packet, string_data);
-}
-
-int bitstream_read_uint(void* packet, char* string_data, signed int bit_size)
-{
-	typedef int(__thiscall *tbitstream_read_uint)(void* packet, char* string_data, signed int bit_size);
-	tbitstream_read_uint pbitstream_read_uint = (tbitstream_read_uint)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCE49F : 0xD1EE5));
-
-	return pbitstream_read_uint(packet, string_data,bit_size);
-}
-
 typedef int(__stdcall *tc_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, void* packet);
 tc_simulation_unit_entity_definition_creation_encode pc_simulation_unit_entity_definition_encode;
 
@@ -333,13 +301,13 @@ int __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr,
 	{
 		//TRACE_GAME_N("creation_data+0x24: %08X", object_permutation_index);
 
-		bitstream_write_bool(packet, "object-permutation-exists", 1);
-		bitstream_write_uint(packet, "object-permutation-index", object_permutation_index, 32);
+		bitstream::p_data_encode_bool()(packet, "object-permutation-exists", 1);
+		bitstream::p_data_encode_integer()(packet, "object-permutation-index", object_permutation_index, 32);
 		//TRACE_GAME_N("c_simulation_unit_entity_encode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
 
 	}
 	else
-		bitstream_write_bool(packet, "object-permutation-exists", 0);
+		bitstream::p_data_encode_bool()(packet, "object-permutation-exists", 0);
 
 	int ret = pc_simulation_unit_entity_definition_encode(thisptr, creation_data_size, creation_data, a3, packet);
 
@@ -355,10 +323,10 @@ int __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr,
 {
 	//TRACE_GAME_N("c_simulation_unit_entity_definition_creation_decode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, packet: %08X", thisptr, creation_data_size, creation_data, packet);
 
-	if (bitstream_read_bool(packet, "object-permutation-exists"))
+	if (bitstream::p_data_decode_bool()(packet, "object-permutation-exists"))
 	{
 		//TRACE_GAME_N("c_simulation_unit_entity_decode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
-		int object_permutation_index = bitstream_read_uint(packet, "object-permutation-index", 32);
+		int object_permutation_index = bitstream::p_data_decode_integer()(packet, "object-permutation-index", 32);
 		*(int*)((char*)creation_data + 0x24) = object_permutation_index;
 
 		//TRACE_GAME_N("object_permutation_index: %08X", object_permutation_index);

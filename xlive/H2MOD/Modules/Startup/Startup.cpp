@@ -39,7 +39,6 @@ wchar_t* H2ProcessFilePath = 0;
 wchar_t* H2AppDataLocal = 0;
 wchar_t* FlagFilePathConfig = 0;
 HWND H2hWnd = NULL;
-extern CustomNetwork *network;
 
 
 int instanceNumber = 0;

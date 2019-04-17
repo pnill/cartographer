@@ -1,5 +1,6 @@
 #include "Globals.h"
-#include <H2MOD\protobuf\h2mod.pb.h>
+#include "H2MOD\protobuf\h2mod.pb.h"
+#include "..\..\Modules\Networking\Networking.h"
 
 std::vector<std::wstring> Infection::zombieNames;
 

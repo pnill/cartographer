@@ -7,7 +7,7 @@
 #include "H2MOD\MOdules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\GameManager\GameManager.h"
-#include "H2MOD\Modules\NetworkStats\NetworkStats.h"
+#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include <tchar.h>
 

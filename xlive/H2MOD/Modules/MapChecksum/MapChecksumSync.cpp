@@ -1,6 +1,7 @@
 #include "MapChecksumSync.h"
 #include <unordered_set>
 #include "Globals.h"
+#include "Util/hash.h"
 
 extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;

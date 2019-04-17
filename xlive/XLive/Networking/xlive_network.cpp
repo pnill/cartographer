@@ -3,7 +3,7 @@
 #include "XLive\Networking\upnp.h"
 #include "XLive\UserManagement\CUser.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\NetworkStats\NetworkStats.h"
+#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include <Windows.h>
 
 int MasterState = 0;

@@ -42,6 +42,12 @@
 #include <Winsock2.h>
 //#include <Objbase.h>
 //#include <Shlwapi.h>
+#include <mutex>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <algorithm>
+#include <unordered_map>
 
 // #define XLIVELESS_EXPORTS
 #include "xliveless.h"
