@@ -1,5 +1,4 @@
-#ifndef XLIVEDEFS_H
-#define XLIVEDEFS_H
+#pragma once
 #include "XLive\XUser\XUserProperty.h"
 #include "XLive\XUser\XUserContext.h"
 
@@ -486,8 +485,6 @@ typedef struct {
     XNADDR hostAddress;
     XNKEY keyExchangeKey;
 } XSESSION_INFO, *PXSESSION_INFO;
- 
-
 
 typedef enum _XSESSION_STATE
 {
@@ -664,6 +661,3 @@ typedef struct _STRING_VERIFY_RESPONSE {
 	HRESULT *pStringResult;
 } STRING_VERIFY_RESPONSE;
 #pragma pack( pop )
-
-
-#endif

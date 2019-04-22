@@ -7,6 +7,7 @@
 #include "H2MOD\Modules\CustomMenu\Credits.h"
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
+#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 #include "Util\ClipboardAPI.h"
 
 
@@ -37,6 +38,7 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 	if (wp == H2Config_hotkeyIdConsole) {
 		if (seconds_since_start > 0.5) {
 			this->console = !this->console;
+			*(BYTE*)(h2mod->GetAddress(0x479F51)) = !this->console;
 			start = time(0);
 		}
 		return true;
@@ -717,6 +719,28 @@ void ConsoleCommands::handle_command(std::string command) {
 		else if (firstCommand == "$netstats")
 		{
 			NetworkStatistics = NetworkStatistics == false ? true : false;
+		}
+		else if (firstCommand == "$displayinfos")
+		{
+			std::string str_index = splitCommands[1];
+			int inc = 0;
+			int index = stoi(str_index);
+			network_session* netsession = CustomPackets::getNetworkSessionPtr();
+			do 
+			{
+				std::wstring str_to_print;
+				std::wstring space = L" ";
+				std::wstring xuid = L"XUID: ";
+				str_to_print += netsession[inc].custom_map_name + space + netsession[inc].peers_network_info[index].peer_name + space + netsession[inc].peers_network_info[index].peer_name_2;
+				str_to_print += xuid + std::to_wstring(netsession[inc].player_information[index].identifier);
+				output(str_to_print);
+				inc++;
+
+			} while (inc < 2);
+		}
+		else if (firstCommand == "$requestfilename")
+		{
+		CustomPackets::send_request_map_filename(CustomPackets::getCurrentNetworkSessionPtr());
 		}
 		else {
 			output(L"Unknown command.");

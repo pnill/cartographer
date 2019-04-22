@@ -2,10 +2,11 @@
 // This file donated to the public domain
 #include "stdafx.h"
 #include "Globals.h"
-#include "XLive\Networking\ServerList.h"
 #include "XLive\XAM\xam.h"
-#include "XLive\achievements\XAchievements.h"
 #include "XLive\xbox\xbox.h"
+#include "XLive\UserManagement\CUser.h"
+#include "XLive\Networking\ServerList.h"
+#include "XLive\achievements\XAchievements.h"
 
 //#include "XLive\Globals.h"
 using namespace std;
@@ -912,7 +913,7 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 	//sessionDetails.pSessionMembers = 0;
 
 
-	gameManager->start();
+	//gameManager->start();
 
 	TRACE( "- handle = %X", *phEnum );
 
@@ -1353,7 +1354,7 @@ DWORD WINAPI XSessionDelete(HANDLE hSession, PXOVERLAPPED pXOverlapped)
 	if (!hSession)
 		ret = ERROR_INVALID_PARAMETER;
 
-	mapManager->cleanup();
+	
 	return ret;
 }
 

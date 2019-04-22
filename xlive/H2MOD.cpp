@@ -294,10 +294,8 @@ tc_simulation_unit_entity_definition_creation_encode pc_simulation_unit_entity_d
 int __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr, int creation_data_size, void* creation_data, int a3, void* packet)
 {
 	//TRACE_GAME_N("c_simulation_unit_entity_definition_creation_encode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, a3: %i, packet: %08X", thisptr, creation_data_size, creation_data, a3, packet);
-
-
 	int object_permutation_index = *(int*)((char*)creation_data + 0x24);
-	if( object_permutation_index != -1)
+	if (object_permutation_index != -1)
 	{
 		//TRACE_GAME_N("creation_data+0x24: %08X", object_permutation_index);
 
@@ -308,10 +306,8 @@ int __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr,
 	}
 	else
 		bitstream::p_data_encode_bool()(packet, "object-permutation-exists", 0);
-
+	
 	int ret = pc_simulation_unit_entity_definition_encode(thisptr, creation_data_size, creation_data, a3, packet);
-
-
 	return ret;
 }
 
@@ -333,9 +329,8 @@ int __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr,
 	}
 	else
 		*(int*)((char*)creation_data + 0x24) = -1;
-	
-	int ret = pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, packet);
 
+	int ret = pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, packet);
 	return ret;
 }
 
@@ -1389,7 +1384,6 @@ on_custom_map_change on_custom_map_change_method;
 void __cdecl onCustomMapChange(const void* a1) {
 	on_custom_map_change_method(a1);
 	//map changed, send update to all players
-	mapManager->sendMapInfoPacket(-1);
 }
 
 typedef char(__stdcall *intercept_map_load)(LPCRITICAL_SECTION* thisx, const void *a2);
@@ -1592,6 +1586,9 @@ void H2MOD::ApplyUnitHooks()
 {
 	DWORD dwBack;
 
+	BYTE packet_sz = 0x30;
+	WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029), &packet_sz, 1);
+
 	//This encodes the unit creation packet, only gets executed on host.
 	pc_simulation_unit_entity_definition_encode = (tc_simulation_unit_entity_definition_creation_encode)DetourClassFunc((BYTE*)this->GetBase() + (h2mod->Server ? 0x1E2269 : 0x1F8503), (BYTE*)c_simulation_unit_entity_definition_creation_encode, 10);
 	VirtualProtect(pc_simulation_unit_entity_definition_encode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1609,9 +1606,6 @@ void H2MOD::ApplyUnitHooks()
 	//We update creation data here which is used later on to add data to the packet
 	PatchCall(GetBase() + (h2mod->Server ? 0x1E1DE0 : 0x1F807A), set_unit_creation_data_hook);
 	pset_unit_creation_data = (tset_unit_creation_data)(GetBase() + (h2mod->Server ? 0x1DD586 : 0x1F24ED));
-
-	BYTE packet_sz = 0x28;
-	WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029), &packet_sz, 1);
 
 	// Hooks a call within the creat_unit property on the client side in order to set their permutation index before spawn.
 	PatchCall(GetBase() + (h2mod->Server ? 0x1E3BD4 : 0x1F9E6C), create_unit_hook);
@@ -1701,7 +1695,7 @@ void H2MOD::ApplyHooks() {
 		VirtualProtect(change_team_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		// hook the print command to redirect the output to our console
-		PatchCall(Base + 0xE9E50, print_to_console);
+		PatchCall(GetBase() + 0xE9E50, print_to_console);
 
 		PatchCall(GetBase() + 0x9B09F, filo_write__encrypted_data_hook);
 		PatchWinAPICall(GetBase() + 0x9AF9E, CryptUnprotectDataHook);
@@ -1715,9 +1709,9 @@ void H2MOD::ApplyHooks() {
 		WriteValue(GetBase() + 0x190B38 + 1, 5);
 
 		pfn_c000bd114 = (tfn_c000bd114)DetourFunc((BYTE*)H2BaseAddr + 0x000bd114, (BYTE*)fn_c000bd114_IsSkullEnabled, 5);
-		PatchCall(Base + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
-		PatchCall(Base + 0x00092C05, BansheeBombIsEngineMPCheck);
-		PatchCall(Base + 0x0013ff75, FlashlightIsEngineSPCheck);
+		PatchCall(GetBase() + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
+		PatchCall(GetBase() + 0x00092C05, BansheeBombIsEngineMPCheck);
+		PatchCall(GetBase() + 0x0013ff75, FlashlightIsEngineSPCheck);
 	}
 	else {
 

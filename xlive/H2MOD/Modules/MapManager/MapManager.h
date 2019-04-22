@@ -12,7 +12,6 @@ public:
 	//client and server functions below
 	void reloadMaps();
 	void cleanup();
-	void sendMapInfoPacket(int peerIndex); // set peerIndex to -1 to send to all peers in the lobby
 	const char* getCustomLobbyMessage();
 	std::wstring getMapName();
 	bool hasCustomMap(std::string mapName);

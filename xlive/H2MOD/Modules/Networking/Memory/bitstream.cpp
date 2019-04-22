@@ -57,4 +57,8 @@ data_encode_boolean bitstream::p_data_encode_bool() {
 	return (data_encode_boolean)(h2mod->GetAddress(0xD1886, 0xCDE40));
 }
 
+valid_packet_type bitstream::p_packet_is_valid() {
+	return (valid_packet_type)(h2mod->GetBase() + (h2mod->Server ? 0xCD706 : 0xD114C));
+}
+
 

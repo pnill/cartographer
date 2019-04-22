@@ -2,13 +2,11 @@
 #include <queue>
 #include "Util/hash.h"
 #include <H2MOD\protobuf\h2mod.pb.h>
+#include "CustomPackets\CustomPackets.h"
 
 class CustomNetwork {
 public:
 	void applyNetworkHooks();
-	void sendCustomPacketToAllPlayers();
-	void sendCustomPacket(int peerIndex);
-	int getNetworkSessionPtr();
 	std::string currentMapFilename;
 
 	//command sent from server
@@ -22,8 +20,6 @@ public:
 		std::unique_lock<std::mutex> network_lock(network_send);
 		encode_packet(packet);
 
-		sendCustomPacketToAllPlayers();
-
 		delete[] networkCommand;
 		networkCommand = nullptr;
 	}
@@ -32,8 +28,6 @@ public:
 	{
 		std::unique_lock<std::mutex> network_lock(network_send);
 		encode_packet(packet);
-
-		sendCustomPacket(peerIndex);
 
 		delete[] networkCommand;
 		networkCommand = nullptr;

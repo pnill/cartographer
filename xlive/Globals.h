@@ -2,7 +2,6 @@
 
 #include "stdafx.h"
 #include "H2MOD.h"
-#include "xliveless.h"
 #include "Util\Hooks\Hook.h"
 #include "Util\ReadIniArguments.h"
 #include "3rdparty/portaudio/include/portaudio.h"

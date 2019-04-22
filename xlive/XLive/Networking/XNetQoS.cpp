@@ -207,7 +207,7 @@ void CALLBACK CXNetQoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOV
 		TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient -> callback error %d", dwError);
 
 	LPSOCKET_INFORMATION acceptSockInfo = reinterpret_cast<LPSOCKET_INFORMATION>(lpOverlapped);
-	TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback -> socket: %d", acceptSockInfo->Socket);
+	//TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback -> socket: %d", acceptSockInfo->Socket);
 
 	if (dwError != 0)
 	{
@@ -216,7 +216,7 @@ void CALLBACK CXNetQoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOV
 
 	if (cbTransferred == 0)
 	{
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback -> no data received!", dwError);
+		//TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback -> no data received!", dwError);
 	}
 	
 	// delete memory allocated inside SendBack callback
@@ -257,7 +257,7 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 
 	if (cbTransferred == 0)
 	{
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> no data received!", dwError);
+		//TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> no data received!", dwError);
 		goto cleanup;
 	}
 
@@ -266,19 +266,19 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 	int wsaError = 0;
 	if (*(DWORD*)&(acceptSockInfo->Buffer) == 0xAABBCCDD)
 	{
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> magic is right, sending data back on port %d", acceptSockInfo->Socket);
+		//TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> magic is right, sending data back on port %d", acceptSockInfo->Socket);
 
 		DWORD flags = 0;
 		ZeroMemory(&(acceptSockInfo->Overlapped), sizeof(WSAOVERLAPPED));
 		wsaError = WSASend(acceptSockInfo->Socket, &(acceptSockInfo->DataBuf), 1, NULL, flags, &(acceptSockInfo->Overlapped), HandleClient);
 
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend error: %d", wsaError);
+		//TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend error: %d", wsaError);
 
 		if (wsaError == SOCKET_ERROR)
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING)
 			{
-				TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend() failed with error %d", WSAGetLastError());
+				//TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend() failed with error %d", WSAGetLastError());
 				goto cleanup;
 			}
 
@@ -293,7 +293,7 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 	}
 	
 cleanup:
-	TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend finished with error code %d (maybe client disconnected).", wsaError);
+	//TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend finished with error code %d (maybe client disconnected).", wsaError);
 	closesocket(acceptSockInfo->Socket);
 	delete[] acceptSockInfo->DataBuf.buf;
 	delete acceptSockInfo;
@@ -397,7 +397,7 @@ void CXNetQoS::Listener()
 
 			if (Index == WSA_WAIT_FAILED)
 			{
-				TRACE_GAME_NETWORK_N("WSAWaitForMultipleEvents() failed with error %d", WSAGetLastError());
+				//TRACE_GAME_NETWORK_N("WSAWaitForMultipleEvents() failed with error %d", WSAGetLastError());
 				closesocket(acceptSocket);
 				continue;
 			}
@@ -417,13 +417,13 @@ void CXNetQoS::Listener()
 
 		DWORD flags = 0;
 
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] WSARecv about to accept data on socket: %d", acceptSocket);
+		//TRACE_GAME_NETWORK_N("[H2MOD-QoS] WSARecv about to accept data on socket: %d", acceptSocket);
 
 		if (WSARecv(lpSockInfo->Socket, &(lpSockInfo->DataBuf), 1, NULL, &flags, &(lpSockInfo->Overlapped), SendBack) == SOCKET_ERROR)
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING) 
 			{
-				TRACE_GAME_NETWORK_N("[H2MOD-QoS] WSARecv asynchronous I/O operation failed with error: %d", WSAGetLastError());
+				//TRACE_GAME_NETWORK_N("[H2MOD-QoS] WSARecv asynchronous I/O operation failed with error: %d", WSAGetLastError());
 				closesocket(acceptSocket);
 				delete lpSockInfo;
 			}

@@ -363,38 +363,6 @@ void MapManager::cleanup() {
 	this->downloadedMaps.clear();
 }
 
-// set peerIndex argument to -1 send the packet to every connected peer
-void MapManager::sendMapInfoPacket(int peerIndex)
-{
-#ifdef _DEBUG
-	int tmpFlagOrig = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
-	int tmpFlag = tmpFlagOrig;
-	tmpFlag &= 0xFFFFFFFF ^ (_CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHECK_DF);
-	_CrtSetDbgFlag(tmpFlag);
-#endif
-
-	H2ModPacket teampak;
-	teampak.set_type(H2ModPacket_Type_map_info_request);
-
-	h2mod_map_info* map_info = teampak.mutable_map_info();
-	//TODO: check if its empty before sending
-	std::string mapFilenameStr = this->getMapFilename();
-	if (mapFilenameStr.empty()) {
-		TRACE_GAME_N("[h2mod-mapmanager] custom map filename missing");
-		return;
-	}
-	TRACE_GAME_N("[h2mod-mapmanager] custom map name being sent %s", mapFilenameStr.c_str());
-	map_info->set_mapfilename(mapFilenameStr);
-	//TODO: send over size so p2p can work easier
-	map_info->set_mapsize(0);
-
-	peerIndex == -1 ? network->send_h2mod_packet(teampak) : network->send_h2mod_packet_player(peerIndex, teampak);
-
-#ifdef _DEBUG
-	_CrtSetDbgFlag(tmpFlagOrig);
-#endif
-}
-
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 	return fwrite(ptr, size, nmemb, stream);
 }
