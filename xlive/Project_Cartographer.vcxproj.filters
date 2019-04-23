@@ -142,9 +142,6 @@
     <Filter Include="Source Files\H2MOD\Variants\Infection">
       <UniqueIdentifier>{5bc77bfa-fc93-4ba8-af1d-c04a860609a6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\H2MOD\Modules\GameManager">
-      <UniqueIdentifier>{9354b72a-424d-4049-a65f-bed7faa3c6ee}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\H2MOD\Modules\MapManager">
       <UniqueIdentifier>{59509adf-9363-45db-ab56-214ec75bcc9a}</UniqueIdentifier>
     </Filter>
@@ -259,6 +256,9 @@
     <Filter Include="Source Files\H2MOD\Modules\Networking\CustomPackets">
       <UniqueIdentifier>{68353fe2-183d-4e4b-a2a3-12019ddb1c65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Networking\NetworkSession">
+      <UniqueIdentifier>{81567183-8529-475d-b12a-de4b08ef08db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -353,9 +353,6 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Achievements\Achievements.cpp">
       <Filter>Source Files\H2MOD\Modules\Achievements</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\Modules\GameManager\GameManager.cpp">
-      <Filter>Source Files\H2MOD\Modules\GameManager</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp">
       <Filter>Source Files\H2MOD\Variants</Filter>
@@ -491,6 +488,9 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp">
       <Filter>Source Files\H2MOD\Modules\Networking\CustomPackets</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -697,9 +697,6 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\Achievements\Achievements.h">
       <Filter>Source Files\H2MOD\Modules\Achievements</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\Modules\GameManager\GameManager.h">
-      <Filter>Source Files\H2MOD\Modules\GameManager</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\VariantSystem.h">
       <Filter>Source Files\H2MOD\Variants</Filter>
@@ -967,6 +964,9 @@
     </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

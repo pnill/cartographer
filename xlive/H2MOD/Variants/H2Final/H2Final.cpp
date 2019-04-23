@@ -1,4 +1,5 @@
 #include "Globals.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 /*
 Todo:
@@ -87,7 +88,7 @@ signed int __stdcall GetSecondsUntilEquipmentRespawn(int equipment_index)
 int64_t originalGetSecondsUntilEquipmentRespawnFunctionData;
 void EnableStaticWeaponSpawns()
 {
-	if (gameManager->isHost() || h2mod->Server)
+	if (NetworkSession::localPeerIsSessionHost() || h2mod->Server)
 	{
 		originalGetSecondsUntilEquipmentRespawnFunctionData = *(int64_t*)(base_address + 0x6A8C4);
 		pget_spawn_time = (get_spawn_time)DetourFunc((BYTE*)base_address + 0x6A8C4, (BYTE*)GetSecondsUntilEquipmentRespawn, 5);
@@ -97,7 +98,7 @@ void EnableStaticWeaponSpawns()
 
 void DisableStaticWeaponSpawns()
 {
-	if (gameManager->isHost() || h2mod->Server)
+	if (NetworkSession::localPeerIsSessionHost() || h2mod->Server)
 	{
 		VirtualProtect((LPVOID)(base_address + 0x6A8C4), 8, PAGE_EXECUTE_READWRITE, &dwBack);
 		*(int64_t*)(base_address + 0x6A8C4) = originalGetSecondsUntilEquipmentRespawnFunctionData;

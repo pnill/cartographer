@@ -1,24 +1,16 @@
-#include <d3d9.h>
-#include <d3dx9.h>
+
 #include "GUI.h"
 #include "H2MOD.h"
-#include "xliveless.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\MOdules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
-#include "H2MOD\Modules\GameManager\GameManager.h"
-#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include <tchar.h>
-
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
+#include "H2MOD\MOdules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 extern ConsoleCommands* commands;
-extern GameManager* gameManager;
-
 
 extern void InitInstance();
 extern bool overrideUnicodeMessage;
-extern MapManager* mapManager;
 
 extern bool displayXyz;
 extern volatile bool isLobby;
@@ -85,18 +77,18 @@ struct CVertexList
 };
 
 extern HMODULE hThis;
-extern std::string ModulePathA(HMODULE);
+extern std::wstring ModulePathW(HMODULE);
 
-char dlldir[256];
+wchar_t dlldir[256];
 
-char* GetDirectoryFile(char *filename)
+wchar_t* GetDirectoryFile(wchar_t *filename)
 {
-	static char path[256];
-	strcpy_s(dlldir, ModulePathA(hThis).c_str());
-	for (int i = strlen(dlldir); i > 0; i--) { if (dlldir[i] == '\\') { dlldir[i + 1] = 0; break; } }
+	static wchar_t path[256];
+	wcsncpy_s(dlldir, ModulePathW(hThis).c_str(), 256);
+	for (int i = wcslen(dlldir); i > 0; i--) { if (dlldir[i] == L'\\') { dlldir[i + 1] = 0; break; } }
 
-	strcpy_s(path, dlldir);
-	strcat_s(path, filename);
+	wcsncpy_s(path, dlldir, 256);
+	wcscat_s(path, filename);
 	return path;
 }
 
@@ -128,7 +120,7 @@ void GUI::Initialize()
 {
 	initFontsIfRequired();
 	
-	if (FAILED(D3DXCreateTextureFromFile(pDevice, "sounds/h2pc_logo.png", &Texture_Interface) ) )
+	if (FAILED(D3DXCreateTextureFromFile(pDevice, L"sounds/h2pc_logo.png", &Texture_Interface) ) )
 	{
 		addDebugText("ERROR: Failed to create logo texture (for achievements).");
 	}
@@ -234,15 +226,15 @@ HRESULT WINAPI XLiveOnDestroyDevice()
 	return S_OK;
 }
 
-TCHAR m_strFontName[80];
-TCHAR m_strFontPath[260];
+wchar_t m_strFontName[80];
+wchar_t m_strFontPath[260];
 
-void InitalizeFont(char *strFontName, char *strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
+void InitalizeFont(wchar_t *strFontName, wchar_t *strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
 {
-	_tcscpy(m_strFontName, strFontName);
+	wcsncpy_s(m_strFontName, strFontName, 80);
 	if (OnOff)
 	{
-		_tcscpy(m_strFontPath, strFontPath);
+		wcsncpy_s(m_strFontPath, strFontPath, 260);
 		addDebugText("Adding font: ");
 		addDebugText(m_strFontPath);
 		if(AddFontResource(m_strFontPath) > 0)
@@ -264,10 +256,8 @@ void initFontsIfRequired()
 	normalSizeFontHeight = 0.017 * verticalRes;
 	largeSizeFontHeight = 0.034 * verticalRes;
 
-	InitalizeFont("Conduit ITC Medium", GetDirectoryFile("maps\\fonts\\conduit_itc_medium1.ttf"), largeSizeFontHeight, pDevice, true);
-
-
-	D3DXCreateFont(pDevice, 10, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Lucida Console", &smallFont);
+	InitalizeFont(L"Conduit ITC Medium", GetDirectoryFile(L"maps\\fonts\\conduit_itc_medium1.ttf"), largeSizeFontHeight, pDevice, true);
+	D3DXCreateFont(pDevice, 10, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Lucida Console", &smallFont);
 
 	if (!normalSizeFont || normalSizeFontHeight != normalSizeCurrentFontHeight) {
 		if (normalSizeFont)
@@ -275,7 +265,7 @@ void initFontsIfRequired()
 			normalSizeFont->Release();
 		}
 
-		D3DXCreateFont(pDevice, normalSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Verdana", &normalSizeFont);
+		D3DXCreateFont(pDevice, normalSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Verdana", &normalSizeFont);
 		normalSizeCurrentFontHeight = normalSizeFontHeight;
 	}
 
@@ -285,7 +275,7 @@ void initFontsIfRequired()
 			largeSizeFont->Release();
 		}
 
-		D3DXCreateFont(pDevice, largeSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Tahoma", &largeSizeFont);
+		D3DXCreateFont(pDevice, largeSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Tahoma", &largeSizeFont);
 		largeSizeCurrentFontHeight = largeSizeFontHeight;
 	}
 
@@ -620,7 +610,7 @@ int WINAPI XLiveRender()
 			}
 #pragma endregion achievement rendering
 
-			if (displayXyz && !isLobby && gameManager->isHost()) {
+			if (displayXyz && !isLobby && NetworkSession::localPeerIsSessionHost()) {
 				//only display xyz for host
 				if (xyzTextWidget == NULL) {
 					xyzTextWidget = new char[128];

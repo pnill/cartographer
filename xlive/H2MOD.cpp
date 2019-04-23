@@ -17,6 +17,8 @@
 #include "H2MOD\Variants\GunGame\GunGame.h"
 #include "XLive\UserManagement\CUser.h"
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -1076,7 +1078,7 @@ void __cdecl OnMapLoad(int a1)
 		addDebugText("GameEngine: Main-Menu");
 		object_to_variant.clear();
 
-		if (!gameManager->isHost()) {
+		if (!NetworkSession::localPeerIsSessionHost()) {
 			advLobbySettings->resetLobbySettings();
 		}
 
@@ -1284,7 +1286,7 @@ typedef int(__cdecl *build_gui_list)(int a1, int a2, int a3);
 build_gui_list build_gui_list_method;
 
 int __cdecl buildGuiList(int a1, int a2, int a3) {
-	if (b_Infection && a1 == (DWORD)(h2mod->GetBase() + 0x3d3620) && !gameManager->isHost()) {
+	if (b_Infection && a1 == (DWORD)(h2mod->GetBase() + 0x3d3620) && !NetworkSession::localPeerIsSessionHost()) {
 		a2 = 1;
 	}
 	return build_gui_list_method(a1, a2, a3);

@@ -5,7 +5,6 @@
 #include <codecvt>
 
 #include "Globals.h"
-#include "H2MOD.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\HudElements\RadarPatch.h"
@@ -15,11 +14,10 @@
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Variants\VariantMPGameEngine.h"
-#include "Util\Hooks\Hook.h"
 #include "Util\filesys.h"
 #include "XLive\UserManagement\CUser.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
-
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 #define _USE_MATH_DEFINES
 #include "math.h"
@@ -1109,7 +1107,7 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 	if (enable)
 		return;
 	//TODO 'bool enable'
-	if (!h2mod->Server && gameManager->isHost()) {
+	if (!h2mod->Server && NetworkSession::localPeerIsSessionHost()) {
 		for (int i = 0; i < get_scenario_volume_count(); i++) {
 			kill_volume_disable(i);
 		}

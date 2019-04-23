@@ -21,7 +21,6 @@ void send_packet(void *thisx, int a2, int a3, char a4, unsigned int type, unsign
 	dynamic_packet_check(thisx, a2, a3, a4, type, size, a7);
 }
 
-
 void __cdecl encode_map_file_name_packet(char* buffer, int a2, s_custom_map_filename* data)
 {
 	bitstream::p_data_encode_bool()(buffer, "is-custom-map", data->is_custom_map);
@@ -44,18 +43,6 @@ bool __cdecl decode_request_map_filename_packet(char* buffer, int a2, s_request_
 	//bitstream::p_data_decode_string()(buffer, "user-name", (int)data->username, 16);
 	bitstream::p_data_decode_bits()(buffer, "user-identifier", (int)&data->user_identifier, 64);
 	return bitstream::p_packet_is_valid()(buffer) == 0;
-}
-
-network_session* CustomPackets::getNetworkSessionPtr() 
-{
-	network_session* netsession = reinterpret_cast<network_session*>(*(DWORD*)h2mod->GetAddress(0x51C474, 0x520B94));
-	return netsession; 
-}
-
-network_session* CustomPackets::getCurrentNetworkSessionPtr()
-{
-	network_session* netsession = reinterpret_cast<network_session*>(*(DWORD*)h2mod->GetAddress(0x420FE8, 0x520B94));
-	return netsession;
 }
 
 void register_custom_packets(void* a1)

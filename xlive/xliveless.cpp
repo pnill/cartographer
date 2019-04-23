@@ -912,11 +912,7 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 
 	//sessionDetails.pSessionMembers = 0;
 
-
-	//gameManager->start();
-
 	TRACE( "- handle = %X", *phEnum );
-
 
 	if( pOverlapped == 0 )
 		return ERROR_SUCCESS;
@@ -925,7 +921,6 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 	pOverlapped->InternalLow = ERROR_SUCCESS;
 	pOverlapped->InternalHigh = 0;
 	pOverlapped->dwExtendedError = ERROR_SUCCESS;
-
 
 	Check_Overlapped( pOverlapped );
 

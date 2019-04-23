@@ -17,7 +17,6 @@ char* replacedNetworkNormalTextWidget;
 char* replacedNetworkNormalTextWidget2;
 
 ConsoleCommands* commands = new ConsoleCommands();
-GameManager* gameManager = new GameManager();
 
 Players* players = new Players();
 

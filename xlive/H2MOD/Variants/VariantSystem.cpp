@@ -1,8 +1,9 @@
 #include "Globals.h"
+#include "H2MOD/Modules/Networking/NetworkSession\NetworkSession.h"
 
 void GameClientServerHandler::execute()
 {
-	if (!gameManager->isHost()) {
+	if (!NetworkSession::localPeerIsSessionHost()) {
 		this->onClient();
 	}
 	else {

@@ -265,6 +265,7 @@
     <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp" />
     <ClCompile Include="H2MOD\Modules\MapFix\SPMapFix.cpp" />
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="XLive\Voice\AudioDevices.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
@@ -287,7 +288,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_list_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\GameManager\GameManager.cpp" />
     <ClCompile Include="H2MOD\Modules\HitFix\HitFix.cpp" />
     <ClCompile Include="H2MOD\Modules\HudElements\RadarPatch.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\Mouseinput.cpp" />
@@ -361,6 +361,7 @@
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\SPMapFix.h" />
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
@@ -441,7 +442,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.h" />
-    <ClInclude Include="H2MOD\Modules\GameManager\GameManager.h" />
     <ClInclude Include="H2MOD\Modules\HitFix\HitFix.h" />
     <ClInclude Include="H2MOD\Modules\HudElements\RadarPatch.h" />
     <ClInclude Include="H2MOD\Modules\Input\Mouseinput.h" />

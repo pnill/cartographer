@@ -8,6 +8,7 @@
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "Util\ClipboardAPI.h"
 
 
@@ -462,7 +463,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid kick command, usage - $kick PLAYER_INDEX");
 				return;
 			}
-			if (!gameManager->isHost()) {
+			if (!NetworkSession::localPeerIsSessionHost()) {
 				output(L"Only the server can kick players");
 				return;
 			}
@@ -479,14 +480,14 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 		}
 		else if (firstCommand == "$logplayers") {
-			if (!gameManager->isHost()) {
+			if (!NetworkSession::localPeerIsSessionHost()) {
 				output(L"Only host can log out information about players");
 				return;
 			}
 			players->logAllPlayersToConsole();
 		}
 		else if (firstCommand == "$sendteamchange") {
-			if (!gameManager->isHost()) {
+			if (!NetworkSession::localPeerIsSessionHost()) {
 				output(L"Only host can issue a team change");
 				return;
 			}
@@ -538,7 +539,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Usage: $maxplayers value (betwen 1 and 16).");
 				return;
 			}
-			if (!gameManager->isHost()) {
+			if (!NetworkSession::localPeerIsSessionHost()) {
 				output(L"Can be only used while hosting.");
 				return;
 			}
@@ -625,7 +626,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::wostringstream ws;
 			ws << isHostByteValue;
 			const std::wstring s(ws.str());
-			isHostStr += (gameManager->isHost() ? L"yes" : L"no");
+			isHostStr += (NetworkSession::localPeerIsSessionHost() ? L"yes" : L"no");
 			isHostStr += L",value=";
 			isHostStr += s;
 			output(isHostStr);
@@ -634,7 +635,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			h2mod->exit_game();
 		}
 		else if (firstCommand == "$xyz") {
-			if (!gameManager->isHost()) {
+			if (!NetworkSession::localPeerIsSessionHost()) {
 				output(L"Only host can see xyz for now...");
 				return;
 			}
@@ -725,7 +726,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::string str_index = splitCommands[1];
 			int inc = 0;
 			int index = stoi(str_index);
-			network_session* netsession = CustomPackets::getNetworkSessionPtr();
+			network_session* netsession = NetworkSession::getNetworkSession();
 			do 
 			{
 				std::wstring str_to_print;
@@ -740,7 +741,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$requestfilename")
 		{
-		CustomPackets::send_request_map_filename(CustomPackets::getCurrentNetworkSessionPtr());
+		CustomPackets::send_request_map_filename(NetworkSession::getCurrentNetworkSession());
 		}
 		else {
 			output(L"Unknown command.");

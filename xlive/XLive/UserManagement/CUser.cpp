@@ -6,8 +6,8 @@
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
-#include "H2MOD\Modules\GameManager\GameManager.h"
 #include "XLive\UserManagement\protobuf\packet.pb.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 extern XUID xFakeXuid[4];
 extern CHAR g_szUserName[4][16];
@@ -23,7 +23,7 @@ NOTE:
 extern SOCKET game_network_message_gateway_socket;
 int CUserManagement::sendSecurePacket(SOCKET s, short to_port)
 {
-	if (!gameManager->isHost())
+	if (!NetworkSession::localPeerIsSessionHost())
 	{
 		SOCKADDR_IN sendToAddr;
 		short port = to_port == 1000 ? userManager.game_host_xn.wPortOnline : ntohs(htons(userManager.game_host_xn.wPortOnline) + 1);

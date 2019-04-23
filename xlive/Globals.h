@@ -18,9 +18,8 @@
 #include "H2MOD\Variants\HeadHunter\HeadHunter.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\Modules\GameManager\GameManager.h"
-#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
+#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 
 #define run_async(expression) \
 	std::thread{ [=] { expression; } }.detach();
@@ -44,7 +43,6 @@ extern bool displayXyz;
 extern volatile bool isLobby;
 extern bool overrideUnicodeMessage;
 extern ConsoleCommands* commands; 
-extern GameManager* gameManager;
 extern Players* players;
 extern char* replacedNetworkNormalTextWidget;
 extern char* replacedNetworkNormalTextWidget2;

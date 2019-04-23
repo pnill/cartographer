@@ -8,7 +8,7 @@
 #include <winsock.h>
 #include "Globals.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "XLive\UserManagement\CUser.h"
 
@@ -304,7 +304,7 @@ void GSMainLoop() {
 	else {
 		partyPrivacy = *(int*)((BYTE*)H2BaseAddr + 0x50A398);
 	}
-	if (prevPartyPrivacy > 0 && partyPrivacy == 0 && gameManager->isHost()) {
+	if (prevPartyPrivacy > 0 && partyPrivacy == 0 && NetworkSession::localPeerIsSessionHost()) {
 		pushHostLobby();
 	}
 	prevPartyPrivacy = partyPrivacy;
