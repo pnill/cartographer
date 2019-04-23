@@ -7,6 +7,7 @@
 #include <curl/curl.h>
 #include "XLive/UserManagement/CUser.h"
 #include "..\Networking\Networking.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 #pragma comment (lib, "mswsock.lib")
 
@@ -100,6 +101,7 @@ void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16
 	auto p_map_downloading_menu_constructor = (map_downloading_menu_constructor)(h2mod->GetBase() + 0x20E2E0);
 
 	// TODO: place a timer so if the player doesn't choose any option from the menu they get kicked out in order to stop afks or trolls
+	CustomPackets::send_request_map_filename(NetworkSession::getCurrentNetworkSession());
 
 	p_map_downloading_menu_constructor(a1, a2, a3, a4, reinterpret_cast<int>(handle_map_download_callback), leave_game_callback, a7, a8, a9, a10);
 }
@@ -297,30 +299,26 @@ const char* MapManager::getCustomLobbyMessage() {
 	return this->customLobbyMessage;
 }
 
-
-std::string MapManager::getMapFilename() {
-
-	int lobby_ptr = 0;
+void MapManager::getMapFilename(std::wstring& buffer)
+{
+	network_session* session = nullptr;
 	wchar_t map_file_location[256];
 
 	// we want this to work in-game too
-	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ get_lobby_globals_ptr(&lobby_ptr))
+	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::getCurrentNetworkSession(&session))
 	{
 		memset(map_file_location, NULL, sizeof(map_file_location));
-		get_current_lobby_map_file_location(lobby_ptr, map_file_location, sizeof(map_file_location));
+		NetworkSession::getMapFileLocation(session, map_file_location, sizeof(map_file_location));
 
 		std::wstring unicodeMapFileLocation(map_file_location);
-		std::string nonUnicodeMapFileLocation(unicodeMapFileLocation.begin(), unicodeMapFileLocation.end());
-		std::size_t mapNameOffset = nonUnicodeMapFileLocation.find_last_of("\\");
-		std::size_t mapNameOffsetEnd = nonUnicodeMapFileLocation.find_last_not_of('.');
-		std::string nonUnicodeMapFileName = nonUnicodeMapFileLocation.substr(mapNameOffset + 1, mapNameOffsetEnd);
-		if (!nonUnicodeMapFileName.empty()) {
+		std::size_t mapNameOffset = unicodeMapFileLocation.find_last_of(L"\\");
+		std::size_t mapNameOffsetEnd = unicodeMapFileLocation.find_last_not_of(L'.');
+		std::wstring filename = unicodeMapFileLocation.substr(mapNameOffset + 1, mapNameOffsetEnd);
+		if (!filename.empty()) {
 			//if the filename exists and the current map english name is equal to the iterated map name
-			return nonUnicodeMapFileName;
+			buffer = filename;
 		}
 	}
-	
-	return "";
 }
 
 /**

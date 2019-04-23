@@ -42,7 +42,9 @@
 #include <stdlib.h>
 //#include <Objbase.h>
 //#include <Shlwapi.h>
+#include <set>
 #include <mutex>
+#include <queue>
 #include <string>
 #include <vector>
 #include <sstream>

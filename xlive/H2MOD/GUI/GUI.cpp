@@ -1,10 +1,10 @@
 
 #include "GUI.h"
 #include "H2MOD.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
-#include "H2MOD\MOdules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
+#include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 extern ConsoleCommands* commands;

@@ -490,7 +490,7 @@
       <Filter>Source Files\H2MOD\Modules\Networking\CustomPackets</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkSession</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -966,7 +966,7 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkSession</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -45,7 +45,7 @@ void Infection::sendTeamChange(int playerIndex) {
 	set_team->set_team(ZOMBIE_TEAM);
 	set_team->set_peerindex(players->getPeerIndex(playerIndex));
 
-	network->send_h2mod_packet_player(players->getPeerIndex(playerIndex), teampak);
+	//network->send_h2mod_packet_player(players->getPeerIndex(playerIndex), teampak);
 }
 
 Infection::Infection()

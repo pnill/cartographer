@@ -3,6 +3,7 @@
 #include "H2MOD.h"
 #include "Util\Hooks\Hook.h"
 #include "..\Memory\bitstream.h"
+#include "..\..\MapManager\MapManager.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
 char g_network_message_types[e_network_message_types::end * 32]; // out of band packets
@@ -24,12 +25,12 @@ void send_packet(void *thisx, int a2, int a3, char a4, unsigned int type, unsign
 void __cdecl encode_map_file_name_packet(char* buffer, int a2, s_custom_map_filename* data)
 {
 	bitstream::p_data_encode_bool()(buffer, "is-custom-map", data->is_custom_map);
-	bitstream::p_data_encode_string()(buffer, "map-file-name", (int)data->file_name, 32);
+	bitstream::p_data_encode_string()(buffer, "map-file-name", (int)&data->file_name, 32);
 }
 bool __cdecl decode_map_file_name_packet(char* buffer, int a2, s_custom_map_filename* data)
 {
-	bitstream::p_data_decode_bool()(buffer, "is-custom-map");
-	bitstream::p_data_decode_string()(buffer, "map-file-name", (int)data->file_name, 32);
+	data->is_custom_map = bitstream::p_data_decode_bool()(buffer, "is-custom-map");
+	bitstream::p_data_decode_string()(buffer, "map-file-name", (int)&data->file_name, 32);
 	return bitstream::p_packet_is_valid()(buffer) == 0;
 }
 
@@ -58,10 +59,10 @@ void register_custom_packets(void* a1)
 		(void*)encode_request_map_filename_packet, (void*)decode_request_map_filename_packet, NULL);
 }
 
-typedef void(__stdcall *network_message_gateway)(void *thisx, int a2, int a3, int a4, void* packet);
+typedef void(__stdcall *network_message_gateway)(void *thisx, network_address* addr, int a3, int a4, void* packet);
 network_message_gateway p_network_message_gateway;
 
-void __stdcall message_gateway_hook(void *thisx, int a2, int message_type, int a4, void* packet)
+void __stdcall message_gateway_hook(void *thisx, network_address* addr, int message_type, int a4, void* packet)
 {
 	switch (message_type)
 	{
@@ -69,17 +70,46 @@ void __stdcall message_gateway_hook(void *thisx, int a2, int message_type, int a
 	{
 		s_request_map_filename* pak = (s_request_map_filename*)packet;
 		TRACE_GAME_NETWORK_N("[H2MOD-CustomPackets] received on hook1 request-map-filename from XUID: %lld", pak->user_identifier);
+		network_session* current_session = NetworkSession::getCurrentNetworkSession();
+		signed int peer_index = NetworkSession::getPeerIndexFromNetworkAddress(addr);
+		if (peer_index != -1 && peer_index != current_session->local_peer_index)
+		{
+			s_custom_map_filename buffer;
+			memset(&buffer, NULL, sizeof(s_custom_map_filename));
+			std::wstring map_filename;
+			mapManager->getMapFilename(map_filename);
+			buffer.is_custom_map = false;
+			if (map_filename.size())
+			{
+				buffer.is_custom_map = true;
+				wcsncpy_s(buffer.file_name, map_filename.c_str(), 32);
+			}
+
+			send_packet(current_session->field_8, *(DWORD*)current_session->field_14, current_session->unk_needs_reversing[peer_index].index_unk, 1,
+				e_network_message_types::map_file_name, sizeof(s_custom_map_filename), &buffer);
+		}
+
 		return;
 	}
 
 	case e_network_message_types::map_file_name:
-		break;
+	{
+		s_custom_map_filename* pak = (s_custom_map_filename*)packet;
+		if (pak->is_custom_map)
+		{
+			std::wstring filename_wstr(pak->file_name);
+			std::string filename_str(filename_wstr.begin(), filename_wstr.end());
+			mapManager->setMapFileNameToDownload(filename_str);
+		}
+
+		return;
+	}
 
 	default:
 			break;
 	}
 
-	p_network_message_gateway(thisx, a2, message_type, a4, packet);
+	p_network_message_gateway(thisx, addr, message_type, a4, packet);
 }
 
 typedef void(__stdcall *network_message_gateway_2)(void *thisx, int a2, int message_type, int a4, void* packet);
@@ -135,6 +165,6 @@ void CustomPackets::ApplyGamePatches()
 	p_network_message_gateway = (network_message_gateway)DetourClassFunc((BYTE*)h2mod->GetAddress(0x1E907B, 0x1CB03B), (BYTE*)message_gateway_hook, 8);
 	VirtualProtect(p_network_message_gateway, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	p_network_message_gateway_2 = (network_message_gateway)DetourClassFunc((BYTE*)h2mod->GetAddress(0x1E929C, 0x1CB25C), (BYTE*)message_gateway_hook_2, 8);
+	p_network_message_gateway_2 = (network_message_gateway_2)DetourClassFunc((BYTE*)h2mod->GetAddress(0x1E929C, 0x1CB25C), (BYTE*)message_gateway_hook_2, 8);
 	VirtualProtect(p_network_message_gateway_2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }

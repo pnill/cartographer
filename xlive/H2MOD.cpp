@@ -1,7 +1,7 @@
-#include <stdafx.h>
+#include "stdafx.h"
+#include "H2MOD.h"
 #include <Wincrypt.h>
 #include <Mmsystem.h>
-#include "H2MOD.h"
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
@@ -413,32 +413,6 @@ EngineType H2MOD::GetEngineType()
 	default:
 		return EngineType::INVALID_ENGINE_TYPE; // if everything ok shouldn't ever get here
 	} 
-}
-
-char get_lobby_globals_ptr(int* a1)
-{
-	typedef char(__cdecl* get_lobby_globals_ptr)(int *ptr);
-	auto p_get_lobby_globals_ptr = reinterpret_cast<get_lobby_globals_ptr>(h2mod->GetBase() + ((h2mod->Server) ? 0x1A66B3 : 0x1AD736));
-
-	return p_get_lobby_globals_ptr(a1);
-}
-
-char get_current_lobby_map_file_location(int thisx, wchar_t* buffer, size_t szBuffer)
-{
-	// host-only
-	typedef char(__thiscall* get_map_file_location_impl)(int thisx, wchar_t* buffer, size_t szBuffer);
-	auto p_get_map_file_location_impl = reinterpret_cast<get_map_file_location_impl>(h2mod->GetBase() + ((h2mod->Server) ? 0x19CD4A : 0x1C5678));
-
-	return p_get_map_file_location_impl(thisx, buffer, szBuffer);
-}
-
-void get_map_internal_name(int a1, wchar_t* buffer)
-{
-	// doesn't work on dedicated servers
-	typedef void(__cdecl* get_map_internal_name_impl)(int a1, wchar_t* buffer);
-	auto p_map_internal_name_impl = reinterpret_cast<get_map_internal_name_impl>(h2mod->GetBase() + ((h2mod->Server) ? 0x2094E2 : 0x22E58A));
-
-	p_map_internal_name_impl(a1, buffer); 
 }
 
 inline wchar_t* H2MOD::GetLobbyGameVariantName()

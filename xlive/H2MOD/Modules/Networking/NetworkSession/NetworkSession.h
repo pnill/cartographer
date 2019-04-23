@@ -18,6 +18,16 @@ enum network_session_state : signed int
 };
 
 #pragma pack(push, 1)
+struct network_address
+{
+	DWORD ip_long;
+	BYTE gap_4[12];
+	__int16 port;
+	signed __int16 address_type;
+};
+
+
+
 struct peer_network_info
 {
 	XNADDR address;
@@ -265,6 +275,9 @@ namespace NetworkSession
 {
 	network_session* getNetworkSession();
 	network_session* getCurrentNetworkSession();
+	bool getCurrentNetworkSession(network_session** a1);
 	bool localPeerIsSessionHost();
+	signed int getPeerIndexFromNetworkAddress(network_address* addr);
+	char getMapFileLocation(network_session* thisx, wchar_t* buffer, size_t szBuffer);
 }
 

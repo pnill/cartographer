@@ -7,32 +7,12 @@
 class CustomNetwork {
 public:
 	void applyNetworkHooks();
-	std::string currentMapFilename;
 
 	//command sent from server
 	size_t command_size;
 	unsigned char* networkCommand;
 
 	std::mutex network_send;
-
-	inline void send_h2mod_packet(const H2ModPacket &packet)
-	{
-		std::unique_lock<std::mutex> network_lock(network_send);
-		encode_packet(packet);
-
-		delete[] networkCommand;
-		networkCommand = nullptr;
-	}
-
-	inline void send_h2mod_packet_player(int peerIndex, const H2ModPacket &packet)
-	{
-		std::unique_lock<std::mutex> network_lock(network_send);
-		encode_packet(packet);
-
-		delete[] networkCommand;
-		networkCommand = nullptr;
-	}
-
 	//command queue on the client
 	std::deque<std::string> queuedNetworkCommands;
 

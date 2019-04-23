@@ -25,13 +25,13 @@ public:
 	void startMapDownload();
 	void searchForMap();
 	bool downloadFromRepo(std::string mapFilename);
-	std::string clientMapFilename;
+	std::wstring clientMapFilename;
 	void setCustomLobbyMessage(const char* newStatus);
 	//we precalculate the strings when the MapManager class is loaded to avoid any expensive object creation during game/lobby time
 	std::unordered_map<int, std::string> precalculatedDownloadPercentageStrings;
 
 	//server functions below
-	std::string getMapFilename();
+	void getMapFilename(std::wstring& buffer);
 
 private:
 	class TcpServer {
@@ -53,9 +53,11 @@ private:
 
 	TcpServer* tcpServer = NULL;
 	bool requestMapUrl = false;
-	std::wstring currentMap;
+	std::string currentMap;
 	const char* customLobbyMessage = NULL;
 	volatile BOOL threadRunning = false;
 	std::set<std::string> downloadedMaps;
 	std::string mapFilenameToDownload;
 };
+
+extern MapManager* mapManager;
