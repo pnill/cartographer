@@ -56,6 +56,7 @@ enum e_network_message_types
 	//custom packets bellow
 	request_map_filename,
 	map_file_name,
+	team_change,
 
 	end
 };
@@ -113,6 +114,7 @@ static const char* packet_type_strings[] = {
 	//custom packets bellow
 	"request_map_filename"
 	"map_file_name"
+	"team_change"
 };
 
 struct s_custom_map_filename
@@ -124,13 +126,17 @@ struct s_custom_map_filename
 struct s_request_map_filename
 {
 	XUID user_identifier;
-	//char username[16];
+};
+
+struct s_team_change
+{
+	DWORD team_index;
 };
 
 void register_packet_impl(void *, int, char*, int, int, int, void*, void*, void*);
 namespace CustomPackets
 {
 	void ApplyGamePatches();
-	bool localPeerSessionHost();
 	void send_request_map_filename(network_session* session);
+	void send_team_change(network_session* session, signed int peer_index, int team_index);
 }

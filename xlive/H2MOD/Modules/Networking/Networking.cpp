@@ -607,7 +607,7 @@ void applyConnectionPatches()
 	//WriteValue<BYTE>(h2mod->GetBase() + (h2mod->Server ? 0x1C1B7F : 0x1D4E35), 0xEB);
 
 	// makes Live network not as laggy 
-	int data = 250;
+	int data = 500;
 	WriteValue<int>(h2mod->GetBase() + (h2mod->Server ? 0x24896 : 0x28702), data);
 	
 	// research

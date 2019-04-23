@@ -57,7 +57,7 @@ public:
 	static void initHost();
 	static void preSpawnServerSetup();
 	static void resetWeaponInteractionAndEmblems();
-	static void sendTeamChange(int peerIndex);
+	static void sendTeamChange();
 	static void disableSlayerSounds();
 	static void resetZombiePlayerStatus();
 	static void setZombiePlayerStatus(int index);
@@ -68,7 +68,7 @@ public:
 	static void infectPlayer(int unitDatumIndex, int playerIndex);
 	static void infectPlayers(int unitDatumIndex, int playerIndex);
 	static void triggerSound(const wchar_t* name, int);
-	static int calculateZombieIndexBasedOnPlayerData();
+	static int calculateZombiePlayerIndex();
 private:
 	static std::vector<std::wstring> zombieNames;
 };

@@ -36,13 +36,21 @@ bool __cdecl decode_map_file_name_packet(char* buffer, int a2, s_custom_map_file
 
 void __cdecl encode_request_map_filename_packet(char* buffer, int a2, s_request_map_filename* data)
 {
-	//bitstream::p_data_encode_string()(buffer, "user-name", (int)data->username, 16);
 	bitstream::p_data_encode_bits()(buffer, "user-identifier", &data->user_identifier, 64);
 }
 bool __cdecl decode_request_map_filename_packet(char* buffer, int a2, s_request_map_filename* data)
 {
-	//bitstream::p_data_decode_string()(buffer, "user-name", (int)data->username, 16);
 	bitstream::p_data_decode_bits()(buffer, "user-identifier", (int)&data->user_identifier, 64);
+	return bitstream::p_packet_is_valid()(buffer) == 0;
+}
+
+void __cdecl encode_team_change_packet(char* buffer, int a2, s_team_change* data)
+{
+	bitstream::p_data_encode_integer()(buffer, "team-index", data->team_index, 32);
+}
+bool __cdecl decode_team_change_packet(char* buffer, int a2, s_team_change* data)
+{
+	data->team_index = bitstream::p_data_decode_integer()(buffer, "team-index", 32);
 	return bitstream::p_packet_is_valid()(buffer) == 0;
 }
 
@@ -57,6 +65,9 @@ void register_custom_packets(void* a1)
 
 	register_packet_impl(g_network_message_types, e_network_message_types::request_map_filename, "request-map-filename", 0, sizeof(s_request_map_filename), sizeof(s_request_map_filename),
 		(void*)encode_request_map_filename_packet, (void*)decode_request_map_filename_packet, NULL);
+
+	register_packet_impl(g_network_message_types, e_network_message_types::team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
+		(void*)encode_team_change_packet, (void*)decode_team_change_packet, NULL);
 }
 
 typedef void(__stdcall *network_message_gateway)(void *thisx, network_address* addr, int a3, int a4, void* packet);
@@ -105,6 +116,13 @@ void __stdcall message_gateway_hook(void *thisx, network_address* addr, int mess
 		return;
 	}
 
+	case e_network_message_types::team_change:
+	{
+		s_team_change* pak = (s_team_change*)packet;
+		h2mod->set_local_team_index(pak->team_index);
+		return;
+	}
+
 	default:
 			break;
 	}
@@ -140,7 +158,6 @@ void CustomPackets::send_request_map_filename(network_session* session)
 {
 	if (session->session_state == _network_session_state_peer_established)
 	{
-		//extern char g_szUserName[4][16];
 		s_request_map_filename buffer;
 		memset(&buffer, NULL, sizeof(s_request_map_filename));
 		memcpy(&buffer.user_identifier, &xFakeXuid[0], sizeof(XUID));
@@ -148,6 +165,24 @@ void CustomPackets::send_request_map_filename(network_session* session)
 		if (session->unk_needs_reversing[session->host_index].field_0) {
 			send_packet(session->field_8, *(DWORD*)session->field_14, session->unk_needs_reversing[session->host_index].index_unk, 1,
 				e_network_message_types::request_map_filename, sizeof(s_request_map_filename), (void*)&buffer);
+		}
+	}
+}
+
+void CustomPackets::send_team_change(network_session* session, signed int peer_index, int team_index)
+{
+	if (session->session_state == _network_session_state_session_host)
+	{
+		s_team_change buffer;
+		buffer.team_index = team_index;
+
+		if (peer_index != -1 && peer_index != session->local_peer_index) 
+		{
+			if (session->unk_needs_reversing[peer_index].field_0)
+			{
+				send_packet(session->field_8, *(DWORD*)session->field_14, session->unk_needs_reversing[peer_index].index_unk, 1,
+					e_network_message_types::team_change, sizeof(s_team_change), (void*)&buffer);
+			}
 		}
 	}
 }
