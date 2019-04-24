@@ -9,6 +9,7 @@
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
+#include "H2MOD\Variants\GunGame\GunGame.h"
 #include "Util\ClipboardAPI.h"
 
 
@@ -496,11 +497,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::string firstArg = splitCommands[1];
 			std::string secondArg = splitCommands[2];
 
-			H2ModPacket teampak;
-			teampak.set_type(H2ModPacket_Type_set_player_team);
-
-			h2mod_set_team *set_team = teampak.mutable_h2_set_player_team();
-			set_team->set_team(atoi(secondArg.c_str()));
+			//todo
 		}
 		else if (firstCommand == "$menu_test") {
 			//CreditsMenu_list *menu_test = new CreditsMenu_list(0xFF000006);
@@ -538,8 +535,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 
 			std::string secondArg = splitCommands[1];
-			DWORD lobby_globals = *(DWORD*)((char*)h2mod->GetBase() + 0x420FE8);
-			BYTE playerNumber = *(BYTE*)(lobby_globals + 0x1254);
+			network_session* session = NetworkSession::getCurrentNetworkSession();
 
 			if (isNum(secondArg.c_str())) {
 
@@ -548,12 +544,12 @@ void ConsoleCommands::handle_command(std::string command) {
 					output(L"The value needs to be between 1 and 16.");
 					return;
 				}
-				if (maxPlayersToSet < playerNumber) {
+				if (maxPlayersToSet < session->total_party_players) {
 					output(L"You can't set a value of max players smaller than the actual number of players on the server.");
 					return;
 				}
 				else {
-					*(BYTE*)(lobby_globals + 0x4C80) = static_cast<BYTE>(maxPlayersToSet);
+					session->max_party_players = maxPlayersToSet;
 					output(L"Maximum players set.");
 					return;
 				}
@@ -716,12 +712,10 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Wrong input! Use a number.");
 			}
 		}
-		else if (firstCommand == "$netstats")
-		{
+		else if (firstCommand == "$netstats") {
 			NetworkStatistics = NetworkStatistics == false ? true : false;
 		}
-		else if (firstCommand == "$displayinfos")
-		{
+		else if (firstCommand == "$displayinfos") {
 			std::string str_index = splitCommands[1];
 			int inc = 0;
 			int index = stoi(str_index);
@@ -738,8 +732,7 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			} while (inc < 2);
 		}
-		else if (firstCommand == "$requestfilename")
-		{
+		else if (firstCommand == "$requestfilename") {
 			CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
 		}
 		else {

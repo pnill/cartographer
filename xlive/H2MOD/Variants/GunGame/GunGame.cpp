@@ -271,19 +271,13 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
 		}
 		TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex=%d, peerIndex=%d", pIndex, players->getPeerIndex(pIndex));
 
-		H2ModPacket teampak;
-		teampak.set_type(H2ModPacket_Type_set_unit_grenades);
+		s_unit_grenades data;
+		memset(&data, NULL, sizeof(data));
 
-		h2mod_set_grenade *set_grenade = teampak.mutable_set_grenade();
-		set_grenade->set_count(count);
-
-		//protobuf has some weird bug where passing 0 has type in the current packet definition for set_grenade
-		//completely breaks on the serialization side, https://groups.google.com/forum/#!topic/protobuf/JsougkaRcw4
-		//no idea why, so we always add 1 to value till I can work with protobuf developers and figure out why
-		set_grenade->set_type(type + 1);
-		//send over player index
-		set_grenade->set_pindex(pIndex);
-
+		data.type = type;
+		data.count = count;
+		data.pindex = pIndex;
+		CustomPackets::sendUnitGrenadesPacket(NetworkSession::getCurrentNetworkSession(), players->getPeerIndex(pIndex), &data);
 	}
 }
 
@@ -313,6 +307,7 @@ void GunGameInitializer::onDedi() {
 void GunGameInitializer::onPeerHost() {
 	GunGame::initWeaponLevels();
 	GunGame::resetPlayerLevels();
+	GunGame::setGameScore();
 	//TODO: is this really necessary (from old code)?
 	//init peer host gun game level 
 	GunGame::gungamePlayers[players->getPlayerName(0)] = 0;

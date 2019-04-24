@@ -54,6 +54,20 @@ bool __cdecl decode_team_change_packet(char* buffer, int a2, s_team_change* data
 	return bitstream::p_packet_is_valid()(buffer) == 0;
 }
 
+void __cdecl encode_set_grenades_packet(char* buffer, int a2, s_unit_grenades* data)
+{
+	bitstream::p_data_encode_integer()(buffer, "type", data->type, 32);
+	bitstream::p_data_encode_integer()(buffer, "count", data->count, 32);
+	bitstream::p_data_encode_integer()(buffer, "pindex", data->pindex, 32);
+}
+bool __cdecl decode_set_grenades_packet(char* buffer, int a2, s_unit_grenades* data)
+{
+	data->type = bitstream::p_data_decode_integer()(buffer, "type", 32);
+	data->count = bitstream::p_data_decode_integer()(buffer, "count", 32);
+	data->pindex = bitstream::p_data_decode_integer()(buffer, "pindex", 32);
+	return bitstream::p_packet_is_valid()(buffer) == 0;
+}
+
 void register_custom_packets(void* a1)
 {
 	typedef void(__cdecl* register_test_packet)(void* a1);
@@ -68,6 +82,9 @@ void register_custom_packets(void* a1)
 
 	register_packet_impl(g_network_message_types, e_network_message_types::team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
 		(void*)encode_team_change_packet, (void*)decode_team_change_packet, NULL);
+
+	register_packet_impl(g_network_message_types, e_network_message_types::unit_grenades, "unit-grenades", 0, sizeof(s_unit_grenades), sizeof(s_unit_grenades),
+		(void*)encode_set_grenades_packet, (void*)decode_set_grenades_packet, NULL);
 }
 
 typedef void(__stdcall *network_message_gateway)(void *thisx, network_address* addr, int a3, int a4, void* packet);
@@ -123,6 +140,13 @@ void __stdcall message_gateway_hook(void *thisx, network_address* addr, int mess
 		return;
 	}
 
+	case e_network_message_types::unit_grenades:
+	{
+		s_unit_grenades* pak = (s_unit_grenades*)packet;
+		h2mod->set_local_grenades(pak->type, pak->count, pak->pindex);
+		return;
+	}
+
 	default:
 			break;
 	}
@@ -162,7 +186,7 @@ void CustomPackets::sendRequestMapFilename(network_session* session)
 		memset(&buffer, NULL, sizeof(s_request_map_filename));
 		memcpy(&buffer.user_identifier, &xFakeXuid[0], sizeof(XUID));
 
-		if (session->unk_needs_reversing[session->host_index].field_0) {
+		if (session->unk_needs_reversing[session->host_index].field_0[1]) {
 			send_packet(session->field_8, *(DWORD*)session->field_14, session->unk_needs_reversing[session->host_index].index_unk, 1,
 				e_network_message_types::request_map_filename, sizeof(s_request_map_filename), (void*)&buffer);
 		}
@@ -178,10 +202,25 @@ void CustomPackets::sendTeamChange(network_session* session, signed int peer_ind
 
 		if (peer_index != -1 && peer_index != session->local_peer_index) 
 		{
-			if (session->unk_needs_reversing[peer_index].field_0)
+			if (session->unk_needs_reversing[peer_index].field_0[1])
 			{
 				send_packet(session->field_8, *(DWORD*)session->field_14, session->unk_needs_reversing[peer_index].index_unk, 1,
 					e_network_message_types::team_change, sizeof(s_team_change), (void*)&buffer);
+			}
+		}
+	}
+}
+
+void CustomPackets::sendUnitGrenadesPacket(network_session* session, int peer_index, s_unit_grenades* data)
+{
+	if (session->session_state == _network_session_state_session_host)
+	{
+		if (peer_index != -1 && peer_index != session->local_peer_index)
+		{
+			if (session->unk_needs_reversing[peer_index].field_0[1])
+			{
+				send_packet(session->field_8, *(DWORD*)session->field_14, session->unk_needs_reversing[peer_index].index_unk, 1,
+					e_network_message_types::unit_grenades, sizeof(s_unit_grenades), (void*)data);
 			}
 		}
 	}

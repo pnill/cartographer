@@ -26,8 +26,6 @@ struct network_address
 	signed __int16 address_type;
 };
 
-
-
 struct peer_network_info
 {
 	XNADDR address;
@@ -112,7 +110,7 @@ struct player_info
 
 struct unk_network_connection_info
 {
-	DWORD field_0;
+	char field_0[4];
 	signed int index_unk;
 	signed int field_8;
 	signed int field_C;
