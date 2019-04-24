@@ -332,6 +332,8 @@ signed int(*sub_287a1)();
 static signed int HookedClientRandFunc() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
+
+	mapManager->leaveSessionIfAFK();
 	
 	signed int result = sub_287a1();
 	return result;

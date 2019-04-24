@@ -3,6 +3,7 @@
 #include <fstream>
 #include <Mswsock.h>
 #include <WS2tcpip.h>
+#include <chrono>
 #include "H2MOD\Modules\Config\Config.h"
 #include <curl/curl.h>
 #include "XLive/UserManagement/CUser.h"
@@ -48,13 +49,28 @@ std::wstring CUSTOM_MAP = L"Custom Map";
 wchar_t EMPTY_UNICODE_STR = '\0';
 std::string EMPTY_STR("");
 
+bool mapDownloadCountdown = false;
+auto promptOpenTime = std::chrono::system_clock::now();
 int downloadPercentage = 0;
+
+void MapManager::leaveSessionIfAFK()
+{
+	if (mapDownloadCountdown)
+	{
+		long long duraton = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - promptOpenTime).count();
+		if (duraton / 1000 > 20) {
+			h2mod->exit_game();
+			mapDownloadCountdown = false;
+		}
+	}
+}
 
 /**
 * Download map callback
 */
 char __cdecl handle_map_download_callback()
 {
+	mapDownloadCountdown = false;
 	downloadPercentage = 0;
 
 	auto mapDownload = []()
@@ -88,8 +104,18 @@ char __cdecl handle_map_download_callback()
 		*mapDownloadStatus = 0;
 	};
 
-	std::thread(mapDownload).detach();
+	if (NetworkSession::getCurrentNetworkSession()->session_state != 0)
+		std::thread(mapDownload).detach();
+
 	return 1;
+}
+
+void* leavegame_callback_ptr;
+char leavegame_callback()
+{
+	mapDownloadCountdown = false;
+	char(__cdecl*ptr)() = (char(__cdecl*)())(leavegame_callback_ptr);
+	return ptr();
 }
 
 /**
@@ -100,9 +126,10 @@ void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16
 	typedef void(__cdecl* map_downloading_menu_constructor)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6, int a7, int a8, int a9, int a10);
 	auto p_map_downloading_menu_constructor = (map_downloading_menu_constructor)(h2mod->GetBase() + 0x20E2E0);
 
-	// TODO: place a timer so if the player doesn't choose any option from the menu they get kicked out in order to stop afks or trolls
+	mapDownloadCountdown = true;
+	promptOpenTime = std::chrono::system_clock::now();
 	CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
-
+	leavegame_callback_ptr = (void*)leave_game_callback;
 	p_map_downloading_menu_constructor(a1, a2, a3, a4, reinterpret_cast<int>(handle_map_download_callback), leave_game_callback, a7, a8, a9, a10);
 }
 
@@ -116,7 +143,7 @@ wchar_t* receiving_map_wstr[] = {
 };
 wchar_t* get_receiving_map_string()
 { 
-	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x381fd);
+	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)h2mod->GetBase() + 0x381fd);
 	wchar_t** str_array = (wchar_t**)(h2mod->GetBase() + 0x46575C);
 
 	if (get_default_game_language() == 0) // check if english

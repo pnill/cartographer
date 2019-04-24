@@ -29,6 +29,7 @@ public:
 	void setCustomLobbyMessage(const char* newStatus);
 	//we precalculate the strings when the MapManager class is loaded to avoid any expensive object creation during game/lobby time
 	std::unordered_map<int, std::string> precalculatedDownloadPercentageStrings;
+	void leaveSessionIfAFK();
 
 	//server functions below
 	void getMapFilename(std::wstring& buffer);
