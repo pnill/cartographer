@@ -154,7 +154,7 @@ void __stdcall message_gateway_hook_2(void *thisx, int a2, int message_type, int
 }
 
 extern XUID xFakeXuid[4];
-void CustomPackets::send_request_map_filename(network_session* session)
+void CustomPackets::sendRequestMapFilename(network_session* session)
 {
 	if (session->session_state == _network_session_state_peer_established)
 	{
@@ -169,7 +169,7 @@ void CustomPackets::send_request_map_filename(network_session* session)
 	}
 }
 
-void CustomPackets::send_team_change(network_session* session, signed int peer_index, int team_index)
+void CustomPackets::sendTeamChange(network_session* session, signed int peer_index, int team_index)
 {
 	if (session->session_state == _network_session_state_session_host)
 	{

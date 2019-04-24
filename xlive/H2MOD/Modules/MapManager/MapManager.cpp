@@ -101,7 +101,7 @@ void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16
 	auto p_map_downloading_menu_constructor = (map_downloading_menu_constructor)(h2mod->GetBase() + 0x20E2E0);
 
 	// TODO: place a timer so if the player doesn't choose any option from the menu they get kicked out in order to stop afks or trolls
-	CustomPackets::send_request_map_filename(NetworkSession::getCurrentNetworkSession());
+	CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
 
 	p_map_downloading_menu_constructor(a1, a2, a3, a4, reinterpret_cast<int>(handle_map_download_callback), leave_game_callback, a7, a8, a9, a10);
 }

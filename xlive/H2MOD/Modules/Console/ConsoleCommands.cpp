@@ -524,9 +524,6 @@ void ConsoleCommands::handle_command(std::string command) {
 			GameStateObjectHeader *player1_object_header = &test2->object_header[player1->unit_index.ToAbsoluteIndex()];
 			ObjectEntityDefinition *player1_object = player1_object_header->object;
 
-
-			memset(buf, 0x00, sizeof(buf));
-			
 			output(buf);
 
 		}
@@ -572,7 +569,13 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (isLobby && !h2mod->Server) {
+			if (!h2mod->Server || !NetworkSession::localPeerIsSessionHost())
+			{
+				output(L"Can only be used by the session host!");
+				return;
+			}
+
+			if (isLobby) {
 				//TODO: need a nicer way to detect this for dedis
 				output(L"Can only be used ingame");
 				return;
@@ -737,7 +740,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$requestfilename")
 		{
-		CustomPackets::send_request_map_filename(NetworkSession::getCurrentNetworkSession());
+			CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
 		}
 		else {
 			output(L"Unknown command.");

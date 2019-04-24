@@ -137,6 +137,6 @@ void register_packet_impl(void *, int, char*, int, int, int, void*, void*, void*
 namespace CustomPackets
 {
 	void ApplyGamePatches();
-	void send_request_map_filename(network_session* session);
-	void send_team_change(network_session* session, signed int peer_index, int team_index);
+	void sendRequestMapFilename(network_session* session);
+	void sendTeamChange(network_session* session, signed int peer_index, int team_index);
 }

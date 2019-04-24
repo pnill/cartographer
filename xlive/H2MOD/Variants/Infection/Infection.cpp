@@ -46,7 +46,7 @@ void Infection::sendTeamChange()
 			do 
 			{
 				if (session->host_peer_index != index) {
-					CustomPackets::send_team_change(session, index, zombieIndex == index ? ZOMBIE_TEAM : HUMAN_TEAM);
+					CustomPackets::sendTeamChange(session, index, zombieIndex == index ? ZOMBIE_TEAM : HUMAN_TEAM);
 				} 
 				else
 				{
@@ -186,7 +186,7 @@ void Infection::spawnServerPlayerSetup(int index) {
 	int unit_datum_index = h2mod->get_unit_datum_from_player_index(index);
 	int unit_object = call_get_object(unit_datum_index, 3);
 
-	if (unit_object) {
+	if (unit_object && *(BYTE*)(unit_object + 0xAA) == 0) {
 		//if the unit_object is not 0, the spawned object is "alive"
 
 		TRACE_GAME("[h2mod-infection] Spawn player server index=%, unit team index=%d", index, h2mod->get_unit_team_index(unit_datum_index));
@@ -202,9 +202,10 @@ void Infection::spawnServerPlayerSetup(int index) {
 
 void Infection::infectPlayer(int unitDatumIndex, int playerIndex) {
 	int unit_object = call_get_object(unitDatumIndex, 3);
-	if (unit_object && h2mod->get_unit_team_index(unitDatumIndex) != ZOMBIE_TEAM) {
+	if (unit_object && h2mod->get_unit_team_index(unitDatumIndex) != ZOMBIE_TEAM 
+		&& *(BYTE*)(unit_object + 0xAA) == 0) //check if object type is biped
+	{
 		//if we have a valid object and the object is not on the zombie team 
-
 		wchar_t* playername = h2mod->get_player_name_from_index(h2mod->get_player_index_from_unit_datum(unitDatumIndex));
 
 		TRACE_GAME("[h2mod-infection] Infected player, localName=%s, nameFromUnitDatumIndex=%s", h2mod->get_local_player_name(), playername);
@@ -224,7 +225,7 @@ void Infection::infectPlayer(int unitDatumIndex, int playerIndex) {
 
 void Infection::infectPlayers(int unitDatumIndex, int playerIndex) {
 	int unit_object = call_get_object(unitDatumIndex, 3);
-	if (unit_object) {
+	if (unit_object && *(BYTE*)(unit_object + 0xAA) == 0) {
 		Infection::setZombiePlayerStatus(playerIndex);
 
 		if (h2mod->get_unit_team_index(unitDatumIndex) == ZOMBIE_TEAM) {
