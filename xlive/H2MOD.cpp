@@ -1,7 +1,7 @@
-#include <stdafx.h>
+#include "stdafx.h"
+#include "H2MOD.h"
 #include <Wincrypt.h>
 #include <Mmsystem.h>
-#include "H2MOD.h"
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
@@ -16,6 +16,9 @@
 #include "H2MOD\Variants\H2X\H2X.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
 #include "XLive\UserManagement\CUser.h"
+#include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -287,63 +290,26 @@ signed int __cdecl object_new_hook(void *pObject)
 	return result;
 }
 
-bool bitstream_write_bool(void *packet, char* string_data, bool value)
-{
-	typedef bool(__thiscall *tbitstream_write_bool)(void* packet, char* string_data, bool value);
-	tbitstream_write_bool ptbitstream_write_bool = (tbitstream_write_bool)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCDE40 : 0xD1886));
-
-	return ptbitstream_write_bool(packet, string_data, value);
-}
-
-int bitstream_write_uint(void* packet, char* string_data, unsigned int value, signed int bit_size)
-{
-	typedef int(__thiscall *tbitstream_write_uint)(void* packet, char* string_data, unsigned int value, signed int bit_size);
-	tbitstream_write_uint pbitstream_write_uint = (tbitstream_write_uint)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCDD80 : 0xD17C6));
-
-	return pbitstream_write_uint(packet, string_data, value, bit_size);
-}
-
-
-bool bitstream_read_bool(void *packet, char* string_data)
-{
-	typedef bool(__thiscall *tbitstream_read_bool)(void* packet, char* string_data);
-	tbitstream_read_bool ptbitstream_read_bool = (tbitstream_read_bool)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCE501 : 0xD1F47));
-
-	return ptbitstream_read_bool(packet, string_data);
-}
-
-int bitstream_read_uint(void* packet, char* string_data, signed int bit_size)
-{
-	typedef int(__thiscall *tbitstream_read_uint)(void* packet, char* string_data, signed int bit_size);
-	tbitstream_read_uint pbitstream_read_uint = (tbitstream_read_uint)((char*)h2mod->GetBase() + (h2mod->Server ? 0xCE49F : 0xD1EE5));
-
-	return pbitstream_read_uint(packet, string_data,bit_size);
-}
-
 typedef int(__stdcall *tc_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, void* packet);
 tc_simulation_unit_entity_definition_creation_encode pc_simulation_unit_entity_definition_encode;
 
 int __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr, int creation_data_size, void* creation_data, int a3, void* packet)
 {
 	//TRACE_GAME_N("c_simulation_unit_entity_definition_creation_encode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, a3: %i, packet: %08X", thisptr, creation_data_size, creation_data, a3, packet);
-
-
 	int object_permutation_index = *(int*)((char*)creation_data + 0x24);
-	if( object_permutation_index != -1)
+	if (object_permutation_index != -1)
 	{
 		//TRACE_GAME_N("creation_data+0x24: %08X", object_permutation_index);
 
-		bitstream_write_bool(packet, "object-permutation-exists", 1);
-		bitstream_write_uint(packet, "object-permutation-index", object_permutation_index, 32);
+		bitstream::p_data_encode_bool()(packet, "object-permutation-exists", 1);
+		bitstream::p_data_encode_integer()(packet, "object-permutation-index", object_permutation_index, 32);
 		//TRACE_GAME_N("c_simulation_unit_entity_encode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
 
 	}
 	else
-		bitstream_write_bool(packet, "object-permutation-exists", 0);
-
+		bitstream::p_data_encode_bool()(packet, "object-permutation-exists", 0);
+	
 	int ret = pc_simulation_unit_entity_definition_encode(thisptr, creation_data_size, creation_data, a3, packet);
-
-
 	return ret;
 }
 
@@ -355,19 +321,18 @@ int __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr,
 {
 	//TRACE_GAME_N("c_simulation_unit_entity_definition_creation_decode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, packet: %08X", thisptr, creation_data_size, creation_data, packet);
 
-	if (bitstream_read_bool(packet, "object-permutation-exists"))
+	if (bitstream::p_data_decode_bool()(packet, "object-permutation-exists"))
 	{
 		//TRACE_GAME_N("c_simulation_unit_entity_decode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
-		int object_permutation_index = bitstream_read_uint(packet, "object-permutation-index", 32);
+		int object_permutation_index = bitstream::p_data_decode_integer()(packet, "object-permutation-index", 32);
 		*(int*)((char*)creation_data + 0x24) = object_permutation_index;
 
 		//TRACE_GAME_N("object_permutation_index: %08X", object_permutation_index);
 	}
 	else
 		*(int*)((char*)creation_data + 0x24) = -1;
-	
-	int ret = pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, packet);
 
+	int ret = pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, packet);
 	return ret;
 }
 
@@ -448,32 +413,6 @@ EngineType H2MOD::GetEngineType()
 	default:
 		return EngineType::INVALID_ENGINE_TYPE; // if everything ok shouldn't ever get here
 	} 
-}
-
-char get_lobby_globals_ptr(int* a1)
-{
-	typedef char(__cdecl* get_lobby_globals_ptr)(int *ptr);
-	auto p_get_lobby_globals_ptr = reinterpret_cast<get_lobby_globals_ptr>(h2mod->GetBase() + ((h2mod->Server) ? 0x1A66B3 : 0x1AD736));
-
-	return p_get_lobby_globals_ptr(a1);
-}
-
-char get_current_lobby_map_file_location(int thisx, wchar_t* buffer, size_t szBuffer)
-{
-	// host-only
-	typedef char(__thiscall* get_map_file_location_impl)(int thisx, wchar_t* buffer, size_t szBuffer);
-	auto p_get_map_file_location_impl = reinterpret_cast<get_map_file_location_impl>(h2mod->GetBase() + ((h2mod->Server) ? 0x19CD4A : 0x1C5678));
-
-	return p_get_map_file_location_impl(thisx, buffer, szBuffer);
-}
-
-void get_map_internal_name(int a1, wchar_t* buffer)
-{
-	// doesn't work on dedicated servers
-	typedef void(__cdecl* get_map_internal_name_impl)(int a1, wchar_t* buffer);
-	auto p_map_internal_name_impl = reinterpret_cast<get_map_internal_name_impl>(h2mod->GetBase() + ((h2mod->Server) ? 0x2094E2 : 0x22E58A));
-
-	p_map_internal_name_impl(a1, buffer); 
 }
 
 inline wchar_t* H2MOD::GetLobbyGameVariantName()
@@ -1113,7 +1052,7 @@ void __cdecl OnMapLoad(int a1)
 		addDebugText("GameEngine: Main-Menu");
 		object_to_variant.clear();
 
-		if (!gameManager->isHost()) {
+		if (!NetworkSession::localPeerIsSessionHost()) {
 			advLobbySettings->resetLobbySettings();
 		}
 
@@ -1321,7 +1260,7 @@ typedef int(__cdecl *build_gui_list)(int a1, int a2, int a3);
 build_gui_list build_gui_list_method;
 
 int __cdecl buildGuiList(int a1, int a2, int a3) {
-	if (b_Infection && a1 == (DWORD)(h2mod->GetBase() + 0x3d3620) && !gameManager->isHost()) {
+	if (b_Infection && a1 == (DWORD)(h2mod->GetBase() + 0x3d3620) && !NetworkSession::localPeerIsSessionHost()) {
 		a2 = 1;
 	}
 	return build_gui_list_method(a1, a2, a3);
@@ -1420,8 +1359,7 @@ on_custom_map_change on_custom_map_change_method;
 
 void __cdecl onCustomMapChange(const void* a1) {
 	on_custom_map_change_method(a1);
-	//map changed, send update
-	mapManager->sendMapInfoPacket();
+	//map changed, send update to all players
 }
 
 typedef char(__stdcall *intercept_map_load)(LPCRITICAL_SECTION* thisx, const void *a2);
@@ -1624,6 +1562,9 @@ void H2MOD::ApplyUnitHooks()
 {
 	DWORD dwBack;
 
+	BYTE packet_sz = 0x30;
+	WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029), &packet_sz, 1);
+
 	//This encodes the unit creation packet, only gets executed on host.
 	pc_simulation_unit_entity_definition_encode = (tc_simulation_unit_entity_definition_creation_encode)DetourClassFunc((BYTE*)this->GetBase() + (h2mod->Server ? 0x1E2269 : 0x1F8503), (BYTE*)c_simulation_unit_entity_definition_creation_encode, 10);
 	VirtualProtect(pc_simulation_unit_entity_definition_encode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1641,9 +1582,6 @@ void H2MOD::ApplyUnitHooks()
 	//We update creation data here which is used later on to add data to the packet
 	PatchCall(GetBase() + (h2mod->Server ? 0x1E1DE0 : 0x1F807A), set_unit_creation_data_hook);
 	pset_unit_creation_data = (tset_unit_creation_data)(GetBase() + (h2mod->Server ? 0x1DD586 : 0x1F24ED));
-
-	BYTE packet_sz = 0x28;
-	WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1E1D8F : 0x1F8029), &packet_sz, 1);
 
 	// Hooks a call within the creat_unit property on the client side in order to set their permutation index before spawn.
 	PatchCall(GetBase() + (h2mod->Server ? 0x1E3BD4 : 0x1F9E6C), create_unit_hook);
@@ -1733,7 +1671,7 @@ void H2MOD::ApplyHooks() {
 		VirtualProtect(change_team_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		// hook the print command to redirect the output to our console
-		PatchCall(Base + 0xE9E50, print_to_console);
+		PatchCall(GetBase() + 0xE9E50, print_to_console);
 
 		PatchCall(GetBase() + 0x9B09F, filo_write__encrypted_data_hook);
 		PatchWinAPICall(GetBase() + 0x9AF9E, CryptUnprotectDataHook);
@@ -1747,9 +1685,9 @@ void H2MOD::ApplyHooks() {
 		WriteValue(GetBase() + 0x190B38 + 1, 5);
 
 		pfn_c000bd114 = (tfn_c000bd114)DetourFunc((BYTE*)H2BaseAddr + 0x000bd114, (BYTE*)fn_c000bd114_IsSkullEnabled, 5);
-		PatchCall(Base + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
-		PatchCall(Base + 0x00092C05, BansheeBombIsEngineMPCheck);
-		PatchCall(Base + 0x0013ff75, FlashlightIsEngineSPCheck);
+		PatchCall(GetBase() + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
+		PatchCall(GetBase() + 0x00092C05, BansheeBombIsEngineMPCheck);
+		PatchCall(GetBase() + 0x0013ff75, FlashlightIsEngineSPCheck);
 	}
 	else {
 

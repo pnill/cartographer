@@ -35,13 +35,21 @@
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
 #include <windows.h>
+#include <WinSock2.h>
 
 // TODO: include this only if trac
 #include <stdio.h>
 #include <stdlib.h>
-#include <Winsock2.h>
 //#include <Objbase.h>
 //#include <Shlwapi.h>
+#include <set>
+#include <mutex>
+#include <queue>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <algorithm>
+#include <unordered_map>
 
 // #define XLIVELESS_EXPORTS
 #include "xliveless.h"

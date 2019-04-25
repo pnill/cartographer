@@ -31,7 +31,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 			int iResult;
 
 			ZeroMemory(&hints, sizeof(hints));
-			hints.ai_family = AF_UNSPEC;
+			hints.ai_family = AF_INET;
 			hints.ai_socktype = SOCK_STREAM;
 			hints.ai_protocol = IPPROTO_TCP;
 
@@ -207,7 +207,7 @@ void CALLBACK CXNetQoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOV
 		TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient -> callback error %d", dwError);
 
 	LPSOCKET_INFORMATION acceptSockInfo = reinterpret_cast<LPSOCKET_INFORMATION>(lpOverlapped);
-	TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback -> socket: %d", acceptSockInfo->Socket);
+	//TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback -> socket: %d", acceptSockInfo->Socket);
 
 	if (dwError != 0)
 	{
@@ -216,7 +216,7 @@ void CALLBACK CXNetQoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOV
 
 	if (cbTransferred == 0)
 	{
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback -> no data received!", dwError);
+		//TRACE_GAME_NETWORK_N("[H2MOD-QoS] HandleClient callback -> no data received!", dwError);
 	}
 	
 	// delete memory allocated inside SendBack callback
@@ -257,7 +257,7 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 
 	if (cbTransferred == 0)
 	{
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> no data received!", dwError);
+		//TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> no data received!", dwError);
 		goto cleanup;
 	}
 
@@ -266,19 +266,19 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 	int wsaError = 0;
 	if (*(DWORD*)&(acceptSockInfo->Buffer) == 0xAABBCCDD)
 	{
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> magic is right, sending data back on port %d", acceptSockInfo->Socket);
+		//TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> magic is right, sending data back on port %d", acceptSockInfo->Socket);
 
 		DWORD flags = 0;
 		ZeroMemory(&(acceptSockInfo->Overlapped), sizeof(WSAOVERLAPPED));
 		wsaError = WSASend(acceptSockInfo->Socket, &(acceptSockInfo->DataBuf), 1, NULL, flags, &(acceptSockInfo->Overlapped), HandleClient);
 
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend error: %d", wsaError);
+		//TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend error: %d", wsaError);
 
 		if (wsaError == SOCKET_ERROR)
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING)
 			{
-				TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend() failed with error %d", WSAGetLastError());
+				//TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend() failed with error %d", WSAGetLastError());
 				goto cleanup;
 			}
 
@@ -293,7 +293,7 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 	}
 	
 cleanup:
-	TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend finished with error code %d (maybe client disconnected).", wsaError);
+	//TRACE_GAME_NETWORK_N("[H2MOD-QoS] SendBack callback -> WSASend finished with error code %d (maybe client disconnected).", wsaError);
 	closesocket(acceptSockInfo->Socket);
 	delete[] acceptSockInfo->DataBuf.buf;
 	delete acceptSockInfo;
@@ -397,7 +397,7 @@ void CXNetQoS::Listener()
 
 			if (Index == WSA_WAIT_FAILED)
 			{
-				TRACE_GAME_NETWORK_N("WSAWaitForMultipleEvents() failed with error %d", WSAGetLastError());
+				//TRACE_GAME_NETWORK_N("WSAWaitForMultipleEvents() failed with error %d", WSAGetLastError());
 				closesocket(acceptSocket);
 				continue;
 			}
@@ -417,13 +417,13 @@ void CXNetQoS::Listener()
 
 		DWORD flags = 0;
 
-		TRACE_GAME_NETWORK_N("[H2MOD-QoS] WSARecv about to accept data on socket: %d", acceptSocket);
+		//TRACE_GAME_NETWORK_N("[H2MOD-QoS] WSARecv about to accept data on socket: %d", acceptSocket);
 
 		if (WSARecv(lpSockInfo->Socket, &(lpSockInfo->DataBuf), 1, NULL, &flags, &(lpSockInfo->Overlapped), SendBack) == SOCKET_ERROR)
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING) 
 			{
-				TRACE_GAME_NETWORK_N("[H2MOD-QoS] WSARecv asynchronous I/O operation failed with error: %d", WSAGetLastError());
+				//TRACE_GAME_NETWORK_N("[H2MOD-QoS] WSARecv asynchronous I/O operation failed with error: %d", WSAGetLastError());
 				closesocket(acceptSocket);
 				delete lpSockInfo;
 			}
@@ -505,13 +505,13 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 
 	pqos->cxnqos = cxna;
 	pqos->cxnqosPending = cxna;
-	pqos->axnqosinfo[0].cProbesXmit = 4;
+	/*pqos->axnqosinfo[0].cProbesXmit = 4;
 	pqos->axnqosinfo[0].cProbesRecv = 4;
 	pqos->axnqosinfo[0].wRttMinInMsecs = 5;
 	pqos->axnqosinfo[0].wRttMedInMsecs = 10;
 	pqos->axnqosinfo[0].dwDnBitsPerSec = dwBitsPerSec;
 	pqos->axnqosinfo[0].dwUpBitsPerSec = dwBitsPerSec;
-	pqos->axnqosinfo[0].bFlags = XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE;
+	pqos->axnqosinfo[0].bFlags = XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE;*/
 
 	/*
 	This is gonna hit some CPUs hard when there's a lot of servers on the list, we'll probably want to queue this a bit and only allow X number of threads to run at a time.
@@ -556,4 +556,38 @@ DWORD WINAPI XNetQosGetListenStats(DWORD a1, DWORD a2)
 {
 	TRACE_GAME_NETWORK_N("XNetQosGetListenStats");
 	return ERROR_SUCCESS;
+}
+
+int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4)
+{
+	typedef int(__cdecl* get_free_spot_from_object_header)(int a1);
+	auto p_get_free_spot_from_object_header = (get_free_spot_from_object_header)(h2mod->GetBase() + (h2mod->Server ? 0x3248C : 0x667A0));
+	DWORD transport_qos_attempts = *(DWORD*)(h2mod->GetBase() + (h2mod->Server ? 0x991078 : 0x526BF4));
+
+	XNQOS* pxnqos = new XNQOS;
+	pxnqos->cxnqos = 1;
+	pxnqos->cxnqosPending = 0;
+	pxnqos->axnqosinfo->cProbesRecv = 4;
+	pxnqos->axnqosinfo->cProbesXmit = 4;
+	pxnqos->axnqosinfo->wRttMinInMsecs = 50;
+	pxnqos->axnqosinfo->wRttMedInMsecs = 50;
+	pxnqos->axnqosinfo->dwDnBitsPerSec = 16384;
+	pxnqos->axnqosinfo->dwUpBitsPerSec = 16384;
+	pxnqos->axnqosinfo->cbData = 0;
+	pxnqos->axnqosinfo->pbData = NULL;
+	pxnqos->axnqosinfo->bFlags = (XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE | XNET_XNQOSINFO_DATA_RECEIVED);
+
+	int new_qos_data_datum_index = p_get_free_spot_from_object_header(transport_qos_attempts);
+	if (new_qos_data_datum_index == -1)
+	{
+		XNetQosRelease(pxnqos);
+		delete pxnqos;
+	}
+	else
+	{
+		int qos_data_ptr = *(DWORD*)((char*)transport_qos_attempts + 68) + 8 * (new_qos_data_datum_index & 0xFFFF);
+		*(WORD*)((char*)qos_data_ptr + 2) = 1;
+		*(DWORD*)((char*)qos_data_ptr + 4) = (DWORD)pxnqos;
+	}
+	return new_qos_data_datum_index;
 }

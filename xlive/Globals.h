@@ -1,19 +1,10 @@
 #pragma once
 
-#include <string>
-#include <sstream>
-#include <vector>
-#include <algorithm>
 #include "stdafx.h"
-#include <unordered_map>
-#include <stdlib.h>
-#include <mutex>
 #include "H2MOD.h"
-#include <windows.h>
-#include "xliveless.h"
 #include "Util\Hooks\Hook.h"
 #include "Util\ReadIniArguments.h"
-#include <3rdparty/portaudio/include/portaudio.h>
+#include "3rdparty/portaudio/include/portaudio.h"
 
 #include "Blam\BlamLibrary.h"
 #include "H2MOD\Modules\Players\Players.h"
@@ -27,16 +18,16 @@
 #include "H2MOD\Variants\HeadHunter\HeadHunter.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\Modules\Networking\Networking.h"
-#include "H2MOD\Modules\GameManager\GameManager.h"
-#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
+#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 
+#define run_async(expression) \
+	std::thread{ [=] { expression; } }.detach();
 
+using namespace Blam::EngineDefinitions::Tag;
 using namespace Blam::EngineDefinitions::Players;
 using namespace Blam::EngineDefinitions::Objects;
 using namespace Blam::EngineDefinitions::Actors;
-using namespace Blam::EngineDefinitions::Tag;
 
 extern GameStatePlayerTable *game_state_players;
 extern GameStateObjectHeaderTable* game_state_objects_header;
@@ -52,9 +43,7 @@ extern bool displayXyz;
 extern volatile bool isLobby;
 extern bool overrideUnicodeMessage;
 extern ConsoleCommands* commands; 
-extern GameManager* gameManager;
 extern Players* players;
-extern CustomNetwork *network;
 extern char* replacedNetworkNormalTextWidget;
 extern char* replacedNetworkNormalTextWidget2;
 

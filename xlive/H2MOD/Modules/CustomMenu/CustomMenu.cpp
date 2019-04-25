@@ -1,11 +1,8 @@
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "stdafx.h"
-#include "Util\Hooks\Hook.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
-#include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\AccountCreate.h"
 #include "XLive\UserManagement\CUser.h"
@@ -13,9 +10,8 @@
 #include "H2MOD\Modules\Updater\Updater.h"
 #include <Shellapi.h>
 #include "Globals.h"
-#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
-#include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
 #include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
@@ -3011,7 +3007,7 @@ void CMSetupVFTables_AdvSettings() {
 }
 
 int __cdecl CustomMenu_AdvSettings(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, gameManager->isHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE ? 4 : 4, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE ? 4 : 4, 272);
 }
 
 void GSCustomMenuCall_AdvSettings() {
@@ -3080,7 +3076,7 @@ static bool CMButtonHandler_AdvLobbySettings(int button_id) {
 	}
 	else if (button_id == 2) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_disable_kill_volumes = !AdvLobbySettings_disable_kill_volumes));
-		if (gameManager->isHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE && !AdvLobbySettings_disable_kill_volumes) {
+		if (NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE && !AdvLobbySettings_disable_kill_volumes) {
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
 		}
 		H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
@@ -3145,7 +3141,7 @@ void* __stdcall sub_248beb_deconstructor_AdvLobbySettings(LPVOID lpMem, char a2)
 	}
 	wcsncpy(ServerLobbyName, bufferLobbyName, 32);
 
-	if (gameManager->isHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) {
+	if (NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) {
 		//advLobbySettings->sendLobbySettingsPacket();
 	}
 	
@@ -5160,7 +5156,6 @@ int aab3 = 3;//this value works for some other menu positions in mainmenu
 int aab4 = 4;
 */
 
-#include <chrono>
 
 void CallWgit(int WgitScreenfunctionPtr) {
 	CallWgit(WgitScreenfunctionPtr, 1, 0);

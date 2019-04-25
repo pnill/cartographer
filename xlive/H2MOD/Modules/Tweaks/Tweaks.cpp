@@ -5,7 +5,6 @@
 #include <codecvt>
 
 #include "Globals.h"
-#include "H2MOD.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\HudElements\RadarPatch.h"
@@ -15,11 +14,10 @@
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Variants\VariantMPGameEngine.h"
-#include "Util\Hooks\Hook.h"
 #include "Util\filesys.h"
 #include "XLive\UserManagement\CUser.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
-
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 #define _USE_MATH_DEFINES
 #include "math.h"
@@ -145,38 +143,33 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 
 
 #pragma region init hook
-template <typename T = void>
-static inline T *GetAddress(DWORD client, DWORD server = 0)
-{
-	return reinterpret_cast<T*>(H2BaseAddr + (H2IsDediServer ? server : client));
-}
 
 #pragma region func_wrappers
 void real_math_initialize()
 {
 	typedef int (real_math_initialize)();
-	auto real_math_initialize_impl = GetAddress<real_math_initialize>(0x000340d7);
+	auto real_math_initialize_impl = h2mod->GetAddress<real_math_initialize>(0x000340d7);
 	real_math_initialize_impl();
 }
 
 void async_initialize()
 {
 	typedef int (async_initialize)();
-	auto async_initialize_impl = GetAddress<async_initialize>(0x00032ce5);
+	auto async_initialize_impl = h2mod->GetAddress<async_initialize>(0x00032ce5);
 	async_initialize_impl();
 }
 
 bool init_gfwl_gamestore()
 {
 	typedef char (init_gfwl_gamestore)();
-	auto init_gfwl_gamestore_impl = GetAddress<init_gfwl_gamestore>(0x00202f3e);
+	auto init_gfwl_gamestore_impl = h2mod->GetAddress<init_gfwl_gamestore>(0x00202f3e);
 	return init_gfwl_gamestore_impl();
 }
 // not sure if this is all it does
 HANDLE init_data_checksum_info()
 {
 	typedef HANDLE init_data_checksum_info();
-	auto init_data_checksum_info_impl = GetAddress<init_data_checksum_info>(0x000388d3);
+	auto init_data_checksum_info_impl = h2mod->GetAddress<init_data_checksum_info>(0x000388d3);
 	return init_data_checksum_info_impl();
 }
 
@@ -184,63 +177,63 @@ HANDLE init_data_checksum_info()
 void *runtime_state_init()
 {
 	typedef void *runtime_state_init();
-	auto runtime_state_init_impl = GetAddress<runtime_state_init>(0x00037ed5);
+	auto runtime_state_init_impl = h2mod->GetAddress<runtime_state_init>(0x00037ed5);
 	return runtime_state_init_impl();
 }
 
 void global_preferences_initialize()
 {
 	typedef void global_preferences_initialize();
-	auto global_preferences_initialize_impl = GetAddress<global_preferences_initialize>(0x325FD);
+	auto global_preferences_initialize_impl = h2mod->GetAddress<global_preferences_initialize>(0x325FD);
 	global_preferences_initialize_impl();
 }
 
 void font_initialize()
 {
 	typedef void __cdecl font_initialize();
-	auto font_initialize_impl = GetAddress<font_initialize>(0x00031dff);
+	auto font_initialize_impl = h2mod->GetAddress<font_initialize>(0x00031dff);
 	font_initialize_impl();
 }
 
 bool tag_files_open()
 {
 	typedef bool tag_files_open();
-	auto tag_files_open_impl = GetAddress<tag_files_open>(0x30D58);
+	auto tag_files_open_impl = h2mod->GetAddress<tag_files_open>(0x30D58);
 	return tag_files_open_impl();
 }
 
 void init_timing(int a1)
 {
 	typedef DWORD (__cdecl init_timing)(int a1);
-	auto init_timing_impl = GetAddress<init_timing>(0x37E39);
+	auto init_timing_impl = h2mod->GetAddress<init_timing>(0x37E39);
 	init_timing_impl(a1);
 }
 
 void game_state_initialize(void *data)
 {
 	typedef void __fastcall game_state_initialize(void *data);
-	auto game_state_initialize_impl = GetAddress<game_state_initialize>(0x00030aa6);
+	auto game_state_initialize_impl = h2mod->GetAddress<game_state_initialize>(0x00030aa6);
 	game_state_initialize_impl(data);
 }
 
 bool rasterizer_initialize()
 {
 	typedef char rasterizer_initialize();
-	auto rasterizer_initialize_impl = GetAddress<rasterizer_initialize>(0x00263359);
+	auto rasterizer_initialize_impl = h2mod->GetAddress<rasterizer_initialize>(0x00263359);
 	return rasterizer_initialize_impl();
 }
 
 bool input_initialize()
 {
 	typedef char input_initialize();
-	auto input_initialize_impl = GetAddress<input_initialize>(0x2FD23);
+	auto input_initialize_impl = h2mod->GetAddress<input_initialize>(0x2FD23);
 	return input_initialize_impl();
 }
 
 void sound_initialize()
 {
 	typedef void sound_initialize();
-	auto sound_initialize_impl = GetAddress<sound_initialize>(0x2979E);
+	auto sound_initialize_impl = h2mod->GetAddress<sound_initialize>(0x2979E);
 	return sound_initialize_impl();
 }
 
@@ -249,7 +242,7 @@ void sound_initialize()
 enum flags : int
 {
 	windowed,
-	unk, // some network thing
+	disable_voice_chat, 
 	nosound,
 	unk1, // disable vista needed version check?
 	disable_hardware_vertex_processing, // force hardware vertex processing off
@@ -359,9 +352,10 @@ bool engine_basic_init()
 	DWORD* flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
 	memset(flags_array, 0x00, flags::count); // should be zero initalized anyways but the game does it
 
+	flags_array[flags::disable_voice_chat] = 1; // disables voice chat (XHV engine)
 	flags_array[flags::nointro] = H2Config_skip_intro;
 
-	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(GetAddress(0x000285fd));
+	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(h2mod->GetAddress(0x000285fd));
 
 	init_gfwl_gamestore();
 	init_data_checksum_info();
@@ -398,7 +392,7 @@ bool engine_basic_init()
 				// Fixes issue #118
 			    /* g_depth_bias always NULL rather than taking any value from
 			    shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
-				NopFill<8>(reinterpret_cast<DWORD>(GetAddress(0x269FD5)));
+				NopFill<8>(reinterpret_cast<DWORD>(h2mod->GetAddress(0x269FD5)));
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-hiresfix") == 0)
 			{
@@ -411,6 +405,10 @@ bool engine_basic_init()
 				// menu text fix for higher resolutions
 				sub_671B02_orig = (sub_671B02_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x271B02, (BYTE*)sub_671B02_hook, 5);
 				VirtualProtect(sub_671B02_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+			}
+			else if (_wcsicmp(cmd_line_arg, L"-voicechat") == 0)
+			{
+				flags_array[flags::disable_voice_chat] = 0;
 			}
 #ifdef _DEBUG	
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
@@ -431,11 +429,11 @@ bool engine_basic_init()
 
 	if (!LOG_CHECK(tag_files_open()))
 		return false;
-	void *var_c004ae8e0 = GetAddress(0x004ae8e0);
+	void *var_c004ae8e0 = h2mod->GetAddress(0x004ae8e0);
 	game_state_initialize(var_c004ae8e0);
 
 	// modifies esi need to check what the caller sets that too
-	//char(*fn_c001a9de6)() = (char(*)())(GetAddress(0x001a9de6));
+	//char(*fn_c001a9de6)() = (char(*)())(h2mod->GetAddress(0x001a9de6));
 	//char result_c001a9de6 = fn_c001a9de6();
 	if (!LOG_CHECK(rasterizer_initialize()))
 		return false;
@@ -452,9 +450,9 @@ bool engine_basic_init()
 	};
 	//extern LONG WINAPI XLivePBufferAllocate(DWORD size, FakePBuffer **pBuffer);
 	//extern DWORD WINAPI XLivePBufferSetByte(FakePBuffer * pBuffer, DWORD offset, BYTE value);
-	LONG(__stdcall* XLivePBufferAllocate)(DWORD size, FakePBuffer **pBuffer) = (LONG(__stdcall*)(DWORD, FakePBuffer**))(GetAddress( 0x0000e886));
-	DWORD(__stdcall* XLivePBufferSetByte)(FakePBuffer * pBuffer, DWORD offset, BYTE value) = (DWORD(__stdcall*)(FakePBuffer*, DWORD, BYTE))(GetAddress( 0x0000e880));
-	DWORD* var_c00479e78 = GetAddress<DWORD>(0x00479e78);
+	LONG(__stdcall* XLivePBufferAllocate)(DWORD size, FakePBuffer **pBuffer) = (LONG(__stdcall*)(DWORD, FakePBuffer**))(h2mod->GetAddress( 0x0000e886));
+	DWORD(__stdcall* XLivePBufferSetByte)(FakePBuffer * pBuffer, DWORD offset, BYTE value) = (DWORD(__stdcall*)(FakePBuffer*, DWORD, BYTE))(h2mod->GetAddress( 0x0000e880));
+	DWORD* var_c00479e78 = h2mod->GetAddress<DWORD>(0x00479e78);
 	XLivePBufferAllocate(2, (FakePBuffer**)&var_c00479e78);
 	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 0);
 	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 1, 0);
@@ -477,28 +475,28 @@ bool engine_basic_init()
 bool InitPCCInfo()
 {
 	typedef bool __cdecl InitPCCInfo();
-	auto InitPCCInfoImpl = GetAddress<InitPCCInfo>(0x260DDD);
+	auto InitPCCInfoImpl = h2mod->GetAddress<InitPCCInfo>(0x260DDD);
 	return InitPCCInfoImpl();
 }
 
 void run_main_loop()
 {
 	typedef int __cdecl run_main_loop();
-	auto run_main_loop_impl = GetAddress<run_main_loop>(0x39E2C);
+	auto run_main_loop_impl = h2mod->GetAddress<run_main_loop>(0x39E2C);
 	run_main_loop_impl();
 }
 
 void main_engine_dispose()
 {
 	typedef int main_engine_dispose();
-	auto main_engine_dispose_impl = GetAddress<main_engine_dispose>(0x48A9);
+	auto main_engine_dispose_impl = h2mod->GetAddress<main_engine_dispose>(0x48A9);
 	main_engine_dispose_impl();
 }
 
 void show_error_message_by_id(int id)
 {
 	typedef void __cdecl show_error_message_by_id(int id);
-	auto show_error_message_by_id_impl = GetAddress<show_error_message_by_id>(0x4A2E);
+	auto show_error_message_by_id_impl = h2mod->GetAddress<show_error_message_by_id>(0x4A2E);
 	show_error_message_by_id_impl(id);
 }
 #pragma endregion
@@ -512,8 +510,8 @@ void show_fatal_error(int error_id)
 			DestroyWindow(handle);
 	};
 
-	HWND hWnd = *GetAddress<HWND>(0x46D9C4);
-	HWND d3d_window = *GetAddress<HWND>(0x46D9C8); // not sure what this window is actual for, used in IDirect3DDevice9::Present
+	HWND hWnd = *h2mod->GetAddress<HWND>(0x46D9C4);
+	HWND d3d_window = *h2mod->GetAddress<HWND>(0x46D9C8); // not sure what this window is actual for, used in IDirect3DDevice9::Present
 	destory_window(hWnd);
 	destory_window(d3d_window);
 	show_error_message_by_id(error_id);
@@ -644,14 +642,14 @@ static_assert(sizeof(cache_header) == 0x800, "Bad cache header size");
 bool open_cache_header(const wchar_t *lpFileName, cache_header *cache_header_ptr, HANDLE *map_handle)
 {
 	typedef char __cdecl open_cache_header(const wchar_t *lpFileName, cache_header *lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
-	auto open_cache_header_impl = GetAddress<open_cache_header>(0x642D0, 0x4C327);
+	auto open_cache_header_impl = h2mod->GetAddress<open_cache_header>(0x642D0, 0x4C327);
 	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
 }
 
 void close_cache_header(HANDLE *map_handle)
 {
 	typedef void __cdecl close_cache_header(HANDLE *a1);
-	auto close_cache_header_impl = GetAddress<close_cache_header>(0x64C03, 0x4CC5A);
+	auto close_cache_header_impl = h2mod->GetAddress<close_cache_header>(0x64C03, 0x4CC5A);
 	close_cache_header_impl(map_handle);
 }
 
@@ -691,7 +689,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 
 	// todo move the code for loading the descriptions to our code and get rid of this
 	typedef int __cdecl validate_and_add_custom_map_interal(BYTE *a1);
-	auto validate_and_add_custom_map_interal_impl = GetAddress<validate_and_add_custom_map_interal>(0x4F690, 0x56890);
+	auto validate_and_add_custom_map_interal_impl = h2mod->GetAddress<validate_and_add_custom_map_interal>(0x4F690, 0x56890);
 	if (!validate_and_add_custom_map_interal_impl(a1))
 	{
 		TRACE_FUNC("warning \"%s\" has bad checksums or is blacklisted, map may not work correctly", file_name);
@@ -765,7 +763,7 @@ char __stdcall fn_c0024eeef(DWORD* thisptr, int a2, int a3)//__thiscall
 	//char result = pfn_c0024eeef(thisptr, a2, a3);
 	//return result;
 
-	char(__thiscall* fn_c002139f8)(DWORD*, int, int, int, int*, int) = (char(__thiscall*)(DWORD*, int, int, int, int*, int))(GetAddress(0x002139f8));
+	char(__thiscall* fn_c002139f8)(DWORD*, int, int, int, int*, int) = (char(__thiscall*)(DWORD*, int, int, int, int*, int))(h2mod->GetAddress(0x002139f8));
 
 	int label_list[16];
 	label_list[0] = 0;
@@ -800,13 +798,13 @@ int __stdcall fn_c0024fa19(DWORD* thisptr, int a2, int* a3)//__thiscall
 	//int result = pfn_c0024fa19(thisptr, a2, a3);
 	//return result;
 
-	int(__stdcall* fn_c0024f9a1)(int) = (int(__stdcall*)(int))(GetAddress(0x24f9a1));
-	int(__stdcall* fn_c0024f9dd)(int) = (int(__stdcall*)(int))(GetAddress(0x24f9dd));
-	int(__stdcall* fn_c0024ef79)(int) = (int(__stdcall*)(int))(GetAddress(0x24ef79));
-	int(__stdcall* fn_c0024f5fd)(int) = (int(__stdcall*)(int))(GetAddress(0x24f5fd));
-	int(__stdcall* fn_c0024f015)(int) = (int(__stdcall*)(int))(GetAddress(0x24f015));
-	int(__stdcall* fn_c0024f676)(int) = (int(__stdcall*)(int))(GetAddress(0x24f676));
-	int(__stdcall* fn_c0024f68a)(int) = (int(__stdcall*)(int))(GetAddress(0x24f68a));
+	int(__stdcall* fn_c0024f9a1)(int) = (int(__stdcall*)(int))(h2mod->GetAddress(0x24f9a1));
+	int(__stdcall* fn_c0024f9dd)(int) = (int(__stdcall*)(int))(h2mod->GetAddress(0x24f9dd));
+	int(__stdcall* fn_c0024ef79)(int) = (int(__stdcall*)(int))(h2mod->GetAddress(0x24ef79));
+	int(__stdcall* fn_c0024f5fd)(int) = (int(__stdcall*)(int))(h2mod->GetAddress(0x24f5fd));
+	int(__stdcall* fn_c0024f015)(int) = (int(__stdcall*)(int))(h2mod->GetAddress(0x24f015));
+	int(__stdcall* fn_c0024f676)(int) = (int(__stdcall*)(int))(h2mod->GetAddress(0x24f676));
+	int(__stdcall* fn_c0024f68a)(int) = (int(__stdcall*)(int))(h2mod->GetAddress(0x24f68a));
 
 	int result = *a3;
 	if (*a3 != -1)
@@ -852,22 +850,22 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 	//DWORD* result = pfn_c0024fabc(thisptr, a2);
 	//return result;
 
-	DWORD* var_c003d9254 = (DWORD*)(GetAddress(0x3d9254));
-	DWORD* var_c003d9188 = (DWORD*)(GetAddress(0x3d9188));
+	DWORD* var_c003d9254 = (DWORD*)(h2mod->GetAddress(0x3d9254));
+	DWORD* var_c003d9188 = (DWORD*)(h2mod->GetAddress(0x3d9188));
 
-	DWORD*(__thiscall* fn_c00213b1c)(DWORD* thisptr, int) = (DWORD*(__thiscall*)(DWORD*, int))(GetAddress(0x00213b1c));
-	int(__thiscall* fn_c0000a551)(DWORD* thisptr) = (int(__thiscall*)(DWORD*))(GetAddress(0x0000a551));
-	DWORD*(__thiscall* fn_c0021ffc9)(DWORD* thisptr) = (DWORD*(__thiscall*)(DWORD*))(GetAddress(0x0021ffc9));
-	void(__stdcall* fn_c0028870b)(int, int, int, DWORD*(__thiscall*)(DWORD*), int(__thiscall*)(DWORD*)) = (void(__stdcall*)(int, int, int, DWORD*(__thiscall*)(DWORD*), int(__thiscall*)(DWORD*)))(GetAddress(0x0028870b));
-	DWORD*(__thiscall* fn_c002113c6)(DWORD* thisptr) = (DWORD*(__thiscall*)(DWORD*))(GetAddress(0x002113c6));
-	int(__thiscall* fn_c0024fa19)(DWORD* thisptr, int, int*) = (int(__thiscall*)(DWORD*, int, int*))(GetAddress(0x0024fa19));
-	int(*fn_c00215ea9)() = (int(*)())(GetAddress(0x00215ea9));
-	int(__cdecl* fn_c0020d1fd)(char*, int numberOfButtons, int) = (int(__cdecl*)(char*, int, int))(GetAddress(0x0020d1fd));
-	int(__cdecl* fn_c00066b33)(int) = (int(__cdecl*)(int))(GetAddress(0x00066b33));
-	int(__cdecl* fn_c000667a0)(int) = (int(__cdecl*)(int))(GetAddress(0x000667a0));
-	int(*fn_c002152b0)() = (int(*)())(GetAddress(0x002152b0));
-	int(*fn_c0021525a)() = (int(*)())(GetAddress(0x0021525a));
-	int(__thiscall* fn_c002113d3)(DWORD* thisptr, DWORD*) = (int(__thiscall*)(DWORD*, DWORD*))(GetAddress(0x002113d3));
+	DWORD*(__thiscall* fn_c00213b1c)(DWORD* thisptr, int) = (DWORD*(__thiscall*)(DWORD*, int))(h2mod->GetAddress(0x00213b1c));
+	int(__thiscall* fn_c0000a551)(DWORD* thisptr) = (int(__thiscall*)(DWORD*))(h2mod->GetAddress(0x0000a551));
+	DWORD*(__thiscall* fn_c0021ffc9)(DWORD* thisptr) = (DWORD*(__thiscall*)(DWORD*))(h2mod->GetAddress(0x0021ffc9));
+	void(__stdcall* fn_c0028870b)(int, int, int, DWORD*(__thiscall*)(DWORD*), int(__thiscall*)(DWORD*)) = (void(__stdcall*)(int, int, int, DWORD*(__thiscall*)(DWORD*), int(__thiscall*)(DWORD*)))(h2mod->GetAddress(0x0028870b));
+	DWORD*(__thiscall* fn_c002113c6)(DWORD* thisptr) = (DWORD*(__thiscall*)(DWORD*))(h2mod->GetAddress(0x002113c6));
+	int(__thiscall* fn_c0024fa19)(DWORD* thisptr, int, int*) = (int(__thiscall*)(DWORD*, int, int*))(h2mod->GetAddress(0x0024fa19));
+	int(*fn_c00215ea9)() = (int(*)())(h2mod->GetAddress(0x00215ea9));
+	int(__cdecl* fn_c0020d1fd)(char*, int numberOfButtons, int) = (int(__cdecl*)(char*, int, int))(h2mod->GetAddress(0x0020d1fd));
+	int(__cdecl* fn_c00066b33)(int) = (int(__cdecl*)(int))(h2mod->GetAddress(0x00066b33));
+	int(__cdecl* fn_c000667a0)(int) = (int(__cdecl*)(int))(h2mod->GetAddress(0x000667a0));
+	int(*fn_c002152b0)() = (int(*)())(h2mod->GetAddress(0x002152b0));
+	int(*fn_c0021525a)() = (int(*)())(h2mod->GetAddress(0x0021525a));
+	int(__thiscall* fn_c002113d3)(DWORD* thisptr, DWORD*) = (int(__thiscall*)(DWORD*, DWORD*))(h2mod->GetAddress(0x002113d3));
 
 	DWORD* v2 = thisptr;
 	fn_c00213b1c(thisptr, a2);
@@ -933,7 +931,7 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 //Patch Call to modify tags just after map load
 char _cdecl LoadTagsandMapBases(int a)
 {
-	char(__cdecl* LoadTagsandMapBases_Orig)(int) = (char(__cdecl*)(int))(GetAddress(0x00031348));
+	char(__cdecl* LoadTagsandMapBases_Orig)(int) = (char(__cdecl*)(int))(h2mod->GetAddress(0x00031348));
 	char result = LoadTagsandMapBases_Orig(a);
 	return result;
 }
@@ -1068,19 +1066,19 @@ void InitH2Tweaks() {
 
 		RadarPatch();
 
-		WriteJmpTo(GetAddress(0x7E43), WinMain);
-		WriteJmpTo(GetAddress(0x39EA2), is_remote_desktop);
+		WriteJmpTo(h2mod->GetAddress(0x7E43), WinMain);
+		WriteJmpTo(h2mod->GetAddress(0x39EA2), is_remote_desktop);
 
 		//Redirect the variable for the server name to ours.
 		WriteValue(H2BaseAddr + 0x001b2ce8, (DWORD)ServerLobbyName);
 	}	
   
 	// Both server and client
-	WriteJmpTo(GetAddress(0x1467, 0x12E2), is_supported_build);
-	PatchCall(GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
-	PatchCall(GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
-	PatchCall(GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
-	PatchCall(GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
+	WriteJmpTo(h2mod->GetAddress(0x1467, 0x12E2), is_supported_build);
+	PatchCall(h2mod->GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
+	PatchCall(h2mod->GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
+	PatchCall(h2mod->GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
+	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 	//H2Tweaks::applyPlayersActionsUpdateRatePatch(); //breaks aim assist
 	
 	addDebugText("End Startup Tweaks.");
@@ -1109,7 +1107,7 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 	if (enable)
 		return;
 	//TODO 'bool enable'
-	if (!h2mod->Server && gameManager->isHost()) {
+	if (!h2mod->Server && NetworkSession::localPeerIsSessionHost()) {
 		for (int i = 0; i < get_scenario_volume_count(); i++) {
 			kill_volume_disable(i);
 		}
@@ -1171,7 +1169,7 @@ void H2Tweaks::setHz() {
 	if (H2IsDediServer)
 		return;
 
-	*(BYTE*)(H2BaseAddr + 0xA3DA08) = (H2Config_refresh_rate);
+	*(int*)(H2BaseAddr + 0xA3DA08) = H2Config_refresh_rate;
 }
 
 void H2Tweaks::setCrosshairPos(float crosshair_offset) {
@@ -1355,6 +1353,6 @@ __declspec(naked) void calculate_delta_time(void)
 
 void H2Tweaks::applyPlayersActionsUpdateRatePatch()
 {
-	xb_tickrate_flt = GetAddress<float>(0x3BBEB4, 0x378C84);
-	PatchCall(GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
+	xb_tickrate_flt = h2mod->GetAddress<float>(0x3BBEB4, 0x378C84);
+	PatchCall(h2mod->GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
 }

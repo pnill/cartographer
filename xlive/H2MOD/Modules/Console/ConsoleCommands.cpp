@@ -1,10 +1,15 @@
-#include "Globals.h"
 #include <fstream>
+#include "Globals.h"
+#include "Blam/BlamLibrary.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "Blam/BlamLibrary.h"
 #include "H2MOD\Modules\CustomMenu\Credits.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
+#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
+#include "H2MOD\Variants\GunGame\GunGame.h"
 #include "Util\ClipboardAPI.h"
 
 
@@ -35,6 +40,7 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 	if (wp == H2Config_hotkeyIdConsole) {
 		if (seconds_since_start > 0.5) {
 			this->console = !this->console;
+			*(BYTE*)(h2mod->GetAddress(0x479F51)) = !this->console;
 			start = time(0);
 		}
 		return true;
@@ -435,11 +441,9 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$mapfilename")
 		{
-			std::string map_name_str = mapManager->getMapFilename();
-			std::wstring mapname(map_name_str.begin(), map_name_str.end());
-			std::wstring mapinternalname = mapManager->getMapName();
-			output(mapname);
-			output(mapinternalname);
+			std::wstring map_file_name;
+			mapManager->getMapFilename(map_file_name);
+			output(map_file_name);
 		}
 		else if (firstCommand == "$downloadmap") {
 			if (splitCommands.size() != 2) {
@@ -458,7 +462,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid kick command, usage - $kick PLAYER_INDEX");
 				return;
 			}
-			if (!gameManager->isHost()) {
+			if (!NetworkSession::localPeerIsSessionHost()) {
 				output(L"Only the server can kick players");
 				return;
 			}
@@ -475,14 +479,14 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 		}
 		else if (firstCommand == "$logplayers") {
-			if (!gameManager->isHost()) {
+			if (!NetworkSession::localPeerIsSessionHost()) {
 				output(L"Only host can log out information about players");
 				return;
 			}
 			players->logAllPlayersToConsole();
 		}
 		else if (firstCommand == "$sendteamchange") {
-			if (!gameManager->isHost()) {
+			if (!NetworkSession::localPeerIsSessionHost()) {
 				output(L"Only host can issue a team change");
 				return;
 			}
@@ -493,13 +497,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::string firstArg = splitCommands[1];
 			std::string secondArg = splitCommands[2];
 
-			H2ModPacket teampak;
-			teampak.set_type(H2ModPacket_Type_set_player_team);
-
-			h2mod_set_team *set_team = teampak.mutable_h2_set_player_team();
-			set_team->set_team(atoi(secondArg.c_str()));
-
-			network->send_h2mod_packet_player(atoi(firstArg.c_str()), teampak);
+			//todo
 		}
 		else if (firstCommand == "$menu_test") {
 			//CreditsMenu_list *menu_test = new CreditsMenu_list(0xFF000006);
@@ -523,9 +521,6 @@ void ConsoleCommands::handle_command(std::string command) {
 			GameStateObjectHeader *player1_object_header = &test2->object_header[player1->unit_index.ToAbsoluteIndex()];
 			ObjectEntityDefinition *player1_object = player1_object_header->object;
 
-
-			memset(buf, 0x00, sizeof(buf));
-			
 			output(buf);
 
 		}
@@ -534,14 +529,13 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Usage: $maxplayers value (betwen 1 and 16).");
 				return;
 			}
-			if (!gameManager->isHost()) {
+			if (!NetworkSession::localPeerIsSessionHost()) {
 				output(L"Can be only used while hosting.");
 				return;
 			}
 
 			std::string secondArg = splitCommands[1];
-			DWORD lobby_globals = *(DWORD*)((char*)h2mod->GetBase() + 0x420FE8);
-			BYTE playerNumber = *(BYTE*)(lobby_globals + 0x1254);
+			network_session* session = NetworkSession::getCurrentNetworkSession();
 
 			if (isNum(secondArg.c_str())) {
 
@@ -550,12 +544,12 @@ void ConsoleCommands::handle_command(std::string command) {
 					output(L"The value needs to be between 1 and 16.");
 					return;
 				}
-				if (maxPlayersToSet < playerNumber) {
+				if (maxPlayersToSet < session->total_party_players) {
 					output(L"You can't set a value of max players smaller than the actual number of players on the server.");
 					return;
 				}
 				else {
-					*(BYTE*)(lobby_globals + 0x4C80) = static_cast<BYTE>(maxPlayersToSet);
+					session->max_party_players = maxPlayersToSet;
 					output(L"Maximum players set.");
 					return;
 				}
@@ -571,7 +565,13 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (isLobby && !h2mod->Server) {
+			if (!h2mod->Server || !NetworkSession::localPeerIsSessionHost())
+			{
+				output(L"Can only be used by the session host!");
+				return;
+			}
+
+			if (isLobby) {
 				//TODO: need a nicer way to detect this for dedis
 				output(L"Can only be used ingame");
 				return;
@@ -621,7 +621,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::wostringstream ws;
 			ws << isHostByteValue;
 			const std::wstring s(ws.str());
-			isHostStr += (gameManager->isHost() ? L"yes" : L"no");
+			isHostStr += (NetworkSession::localPeerIsSessionHost() ? L"yes" : L"no");
 			isHostStr += L",value=";
 			isHostStr += s;
 			output(isHostStr);
@@ -630,7 +630,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			h2mod->exit_game();
 		}
 		else if (firstCommand == "$xyz") {
-			if (!gameManager->isHost()) {
+			if (!NetworkSession::localPeerIsSessionHost()) {
 				output(L"Only host can see xyz for now...");
 				return;
 			}
@@ -711,7 +711,29 @@ void ConsoleCommands::handle_command(std::string command) {
 			else {
 				output(L"Wrong input! Use a number.");
 			}
+		}
+		else if (firstCommand == "$netstats") {
+			NetworkStatistics = NetworkStatistics == false ? true : false;
+		}
+		else if (firstCommand == "$displayinfos") {
+			std::string str_index = splitCommands[1];
+			int inc = 0;
+			int index = stoi(str_index);
+			network_session* netsession = NetworkSession::getNetworkSession();
+			do 
+			{
+				std::wstring str_to_print;
+				std::wstring space = L" ";
+				std::wstring xuid = L"XUID: ";
+				str_to_print += netsession[inc].custom_map_name + space + netsession[inc].peers_network_info[index].peer_name + space + netsession[inc].peers_network_info[index].peer_name_2;
+				str_to_print += xuid + std::to_wstring(netsession[inc].player_information[index].identifier);
+				output(str_to_print);
+				inc++;
 
+			} while (inc < 2);
+		}
+		else if (firstCommand == "$requestfilename") {
+			CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
 		}
 		else {
 			output(L"Unknown command.");

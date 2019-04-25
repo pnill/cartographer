@@ -1,5 +1,7 @@
 #include "Globals.h"
-#include <H2MOD\protobuf\h2mod.pb.h>
+#include "H2MOD\protobuf\h2mod.pb.h"
+#include "..\..\Modules\Networking\Networking.h"
+#include "..\..\Modules\Networking\CustomPackets\CustomPackets.h"
 
 std::vector<std::wstring> Infection::zombieNames;
 
@@ -9,42 +11,54 @@ const wchar_t* NEW_ZOMBIE_SOUND = L"sounds/new_zombie.wav";
 const wchar_t* INFECTION_SOUND = L"sounds/infection.wav";
 const wchar_t* INFECTED_SOUND = L"sounds/infected.wav";
 
-bool infectedPlayed;
 bool firstSpawn;
+bool infectedPlayed;
+signed int zombieIndex = -1;
 
-int Infection::calculateZombieIndexBasedOnPlayerData() {
-	//we subtract 1 here cause the player counters are 0 based
-	int max = players->getPlayerCount() - 1;
-	//on a dedi, the dedi itself occupies a peer slot, so we want to avoid selecting 0
-	int min = (h2mod->Server ? 1 : 0);
-	int val = (max - min + 1) + min;
-	if (val == 0) {
-		return 0;
-	}
-	int randNum = rand() % val;
-	return randNum; //Random Alpha Zombie Index
-}
-
-void Infection::sendTeamChange(int playerIndex) {
-	TRACE_GAME("[H2Mod-Infection] Sending zombie team change packet, playerIndex=%d, peerIndex=%d", playerIndex, players->getPeerIndex(playerIndex));
-	if (h2mod->Server) {
-		if (playerIndex != 0) {
-			//when sending a packet we use the players data structure to get peer index
-			//the player structure does not have a slot for dedis, this player index was calculated based on that assumption
-			//so we always subtract by 1 (since 0 here is not the slot for dedi anymore and can be a player)
-			playerIndex -= 1;
-			TRACE_GAME("[h2mod-infection] altering player index from %d to %d", playerIndex - 1, playerIndex);
+signed int Infection::calculateZombiePlayerIndex() {
+	int rand_index = 0;
+	network_session* session = NetworkSession::getCurrentNetworkSession();
+	if (session->total_peers > 0)
+	{
+		rand_index = rand() % session->total_peers;
+		if (rand_index == session->host_peer_index) 
+		{
+			if (session->dedicated_server[0] == 1)
+			{
+				if (session->total_peers <= 1)
+					return -1;
+				else
+					return calculateZombiePlayerIndex();
+			}
 		}
 	}
+	return rand_index;
+}
 
-	H2ModPacket teampak;
-	teampak.set_type(H2ModPacket_Type_set_player_team);
+void Infection::sendTeamChange()
+{
+	network_session* session = NetworkSession::getCurrentNetworkSession();
+	if (session->session_state == _network_session_state_session_host)
+	{
+		if (session->total_peers > 0)
+		{
+			int index = 0;
+			do 
+			{
+				if (session->host_peer_index != index) {
+					CustomPackets::sendTeamChange(session, index, zombieIndex == index ? ZOMBIE_TEAM : HUMAN_TEAM);
+				} 
+				else
+				{
+					if (!h2mod->Server)
+						h2mod->set_local_team_index(zombieIndex == index ? ZOMBIE_TEAM : HUMAN_TEAM);
+				}
 
-	h2mod_set_team *set_team = teampak.mutable_h2_set_player_team();
-	set_team->set_team(ZOMBIE_TEAM);
-	set_team->set_peerindex(players->getPeerIndex(playerIndex));
-
-	network->send_h2mod_packet_player(players->getPeerIndex(playerIndex), teampak);
+				index++;
+			} 
+			while (index < session->total_peers);
+		}
+	}
 }
 
 Infection::Infection()
@@ -172,7 +186,7 @@ void Infection::spawnServerPlayerSetup(int index) {
 	int unit_datum_index = h2mod->get_unit_datum_from_player_index(index);
 	int unit_object = call_get_object(unit_datum_index, 3);
 
-	if (unit_object) {
+	if (unit_object && *(BYTE*)(unit_object + 0xAA) == 0) {
 		//if the unit_object is not 0, the spawned object is "alive"
 
 		TRACE_GAME("[h2mod-infection] Spawn player server index=%, unit team index=%d", index, h2mod->get_unit_team_index(unit_datum_index));
@@ -188,9 +202,10 @@ void Infection::spawnServerPlayerSetup(int index) {
 
 void Infection::infectPlayer(int unitDatumIndex, int playerIndex) {
 	int unit_object = call_get_object(unitDatumIndex, 3);
-	if (unit_object && h2mod->get_unit_team_index(unitDatumIndex) != ZOMBIE_TEAM) {
+	if (unit_object && h2mod->get_unit_team_index(unitDatumIndex) != ZOMBIE_TEAM 
+		&& *(BYTE*)(unit_object + 0xAA) == 0) //check if object type is biped
+	{
 		//if we have a valid object and the object is not on the zombie team 
-
 		wchar_t* playername = h2mod->get_player_name_from_index(h2mod->get_player_index_from_unit_datum(unitDatumIndex));
 
 		TRACE_GAME("[h2mod-infection] Infected player, localName=%s, nameFromUnitDatumIndex=%s", h2mod->get_local_player_name(), playername);
@@ -210,7 +225,7 @@ void Infection::infectPlayer(int unitDatumIndex, int playerIndex) {
 
 void Infection::infectPlayers(int unitDatumIndex, int playerIndex) {
 	int unit_object = call_get_object(unitDatumIndex, 3);
-	if (unit_object) {
+	if (unit_object && *(BYTE*)(unit_object + 0xAA) == 0) {
 		Infection::setZombiePlayerStatus(playerIndex);
 
 		if (h2mod->get_unit_team_index(unitDatumIndex) == ZOMBIE_TEAM) {
@@ -312,20 +327,19 @@ void InfectionInitializer::onPeerHost()
 	TRACE_GAME("[h2mod-infection] Peer host init");
 	Infection::initClient();
 	Infection::initHost();
-	int zombiePlayerIndex = Infection::calculateZombieIndexBasedOnPlayerData();
-	TRACE_GAME("[h2mod-infection] Peer host calculated zombie index %d", zombiePlayerIndex);
-	if (zombiePlayerIndex == 0) {
-		TRACE_GAME("[h2mod-infection] Peer host setting player as zombie");
-		//the peer host is the zombie, change their team to zombies
-		h2mod->set_local_team_index(ZOMBIE_TEAM);
-	} else {
+	zombieIndex = -1;
+	zombieIndex = Infection::calculateZombiePlayerIndex();
+	TRACE_GAME("[h2mod-infection] Peer host calculated zombie index %d", zombieIndex);
+	if (zombieIndex == -1) {
+		TRACE_GAME("[h2mod-infection] Failed selecting a zombie!");
+	} 
+	else {
 		TRACE_GAME("[h2mod-infection] Peer host setting player as human");
-		//the peer host is not the zombie, change their team humans
-		h2mod->set_local_team_index(HUMAN_TEAM);
-		//send out the team change packet to the affected zombie
-		Infection::sendTeamChange(zombiePlayerIndex);
+		//send out the team change packets to peers
+		Infection::sendTeamChange();
+
 		//mark this player as the zombie in the internal players structure
-		Infection::setZombiePlayerStatus(zombiePlayerIndex);
+		Infection::setZombiePlayerStatus(zombieIndex);
 	}
 }
 
@@ -334,12 +348,19 @@ void InfectionInitializer::onDedi()
 	TRACE_GAME("[h2mod-infection] Dedicated server init");
 	Infection::initHost();
 	//figure out who the zombie is
-	int zombiePlayerIndex = Infection::calculateZombieIndexBasedOnPlayerData();
-	TRACE_GAME("[h2mod-infection] Dedicated server calculated zombie index %d", zombiePlayerIndex);
-	//send out the team change packet to the affected zombie
-	Infection::sendTeamChange(zombiePlayerIndex);
-	//mark this player as the zombie in the internal players structure
-	Infection::setZombiePlayerStatus(zombiePlayerIndex);
+	zombieIndex = Infection::calculateZombiePlayerIndex();
+	TRACE_GAME("[h2mod-infection] Dedicated host calculated zombie index %d", zombieIndex);
+	if (zombieIndex == -1) {
+		TRACE_GAME("[h2mod-infection] Failed selecting a zombie!");
+	}
+	else {
+		TRACE_GAME("[h2mod-infection] Dedicated host setting player as human");
+		//send out the team change packets to peers
+		Infection::sendTeamChange();
+
+		//mark this player as the zombie in the internal players structure
+		Infection::setZombiePlayerStatus(zombieIndex);
+	}
 }
 
 void InfectionInitializer::onClient()

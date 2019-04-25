@@ -19,7 +19,7 @@ int WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, PIX
 		pParams, phWorkerThread, ppEngine);
 
 	// disable until ready
-	H2Config_voice_chat = 0;
+	H2Config_voice_chat = false;
 
 	if (H2Config_voice_chat)
 		p_CAudioHandler = new CAudioHandler(p_CAudioDevices);

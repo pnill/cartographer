@@ -94,10 +94,6 @@ int __cdecl call_object_placement_data_new(void*, int, int, int);
 signed int __cdecl call_object_new(void*);
 void GivePlayerWeapon(int PlayerIndex, int WeaponId, bool bReset);
 void GivePlayerWeapon2(int PlayerIndex, int WeaponId, short Unk);
-char get_lobby_globals_ptr(int* a1);
-char get_current_lobby_map_file_location(int thisx, wchar_t* buffer, size_t szBuffer);
-void get_map_internal_name(int a1, wchar_t* buffer);
-
 
 class H2MOD
 {
@@ -148,6 +144,12 @@ public:
 
 		void SetBase(DWORD base) { Base = base; }
 		DWORD GetBase() { return Base; }
+
+		template <typename T = void>
+		inline T *GetAddress(DWORD client, DWORD server = 0)
+		{
+			return reinterpret_cast<T*>(GetBase() + (Server ? server : client));
+		}
 
 private:
 		DWORD Base;

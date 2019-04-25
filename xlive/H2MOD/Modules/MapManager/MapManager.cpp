@@ -3,9 +3,12 @@
 #include <fstream>
 #include <Mswsock.h>
 #include <WS2tcpip.h>
+#include <chrono>
 #include "H2MOD\Modules\Config\Config.h"
 #include <curl/curl.h>
 #include "XLive/UserManagement/CUser.h"
+#include "..\Networking\Networking.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 #pragma comment (lib, "mswsock.lib")
 
@@ -46,18 +49,28 @@ std::wstring CUSTOM_MAP = L"Custom Map";
 wchar_t EMPTY_UNICODE_STR = '\0';
 std::string EMPTY_STR("");
 
+bool mapDownloadCountdown = false;
+auto promptOpenTime = std::chrono::system_clock::now();
 int downloadPercentage = 0;
 
-/**
-* Constructs the map manager for client/servers
-*/
-MapManager::MapManager() {}
+void MapManager::leaveSessionIfAFK()
+{
+	if (mapDownloadCountdown)
+	{
+		long long duraton = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - promptOpenTime).count();
+		if (duraton / 1000 > 20) {
+			h2mod->exit_game();
+			mapDownloadCountdown = false;
+		}
+	}
+}
 
 /**
 * Download map callback
 */
 char __cdecl handle_map_download_callback()
 {
+	mapDownloadCountdown = false;
 	downloadPercentage = 0;
 
 	auto mapDownload = []()
@@ -91,9 +104,18 @@ char __cdecl handle_map_download_callback()
 		*mapDownloadStatus = 0;
 	};
 
-	std::thread(mapDownload).detach();
+	if (NetworkSession::getCurrentNetworkSession()->session_state != 0)
+		std::thread(mapDownload).detach();
 
 	return 1;
+}
+
+void* leavegame_callback_ptr;
+char leavegame_callback()
+{
+	mapDownloadCountdown = false;
+	char(__cdecl*ptr)() = (char(__cdecl*)())(leavegame_callback_ptr);
+	return ptr();
 }
 
 /**
@@ -104,8 +126,10 @@ void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16
 	typedef void(__cdecl* map_downloading_menu_constructor)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6, int a7, int a8, int a9, int a10);
 	auto p_map_downloading_menu_constructor = (map_downloading_menu_constructor)(h2mod->GetBase() + 0x20E2E0);
 
-	// TODO: place a timer so if the player doesn't choose any option from the menu they get kicked out in order to stop afks or trolls
-
+	mapDownloadCountdown = true;
+	promptOpenTime = std::chrono::system_clock::now();
+	CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
+	leavegame_callback_ptr = (void*)leave_game_callback;
 	p_map_downloading_menu_constructor(a1, a2, a3, a4, reinterpret_cast<int>(handle_map_download_callback), leave_game_callback, a7, a8, a9, a10);
 }
 
@@ -114,14 +138,16 @@ int __cdecl get_total_map_downloading_percentage()
 	return downloadPercentage;
 }
 
-wchar_t receiving_map_wstr[] = L"You are receiving the map from %s. \r\nPlease wait...%i%%";
+wchar_t* receiving_map_wstr[] = {
+	L"You are receiving the map from %s. \r\nPlease wait...%i%%" ,
+};
 wchar_t* get_receiving_map_string()
 { 
-	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x381fd);
+	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)h2mod->GetBase() + 0x381fd);
 	wchar_t** str_array = (wchar_t**)(h2mod->GetBase() + 0x46575C);
 
 	if (get_default_game_language() == 0) // check if english
-		return receiving_map_wstr;
+		return receiving_map_wstr[0];
 
 	return str_array[get_default_game_language()];
 }
@@ -300,30 +326,26 @@ const char* MapManager::getCustomLobbyMessage() {
 	return this->customLobbyMessage;
 }
 
-
-std::string MapManager::getMapFilename() {
-
-	int lobby_ptr = 0;
+void MapManager::getMapFilename(std::wstring& buffer)
+{
+	network_session* session = nullptr;
 	wchar_t map_file_location[256];
 
 	// we want this to work in-game too
-	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ get_lobby_globals_ptr(&lobby_ptr))
+	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::getCurrentNetworkSession(&session))
 	{
 		memset(map_file_location, NULL, sizeof(map_file_location));
-		get_current_lobby_map_file_location(lobby_ptr, map_file_location, sizeof(map_file_location));
+		NetworkSession::getMapFileLocation(session, map_file_location, sizeof(map_file_location));
 
 		std::wstring unicodeMapFileLocation(map_file_location);
-		std::string nonUnicodeMapFileLocation(unicodeMapFileLocation.begin(), unicodeMapFileLocation.end());
-		std::size_t mapNameOffset = nonUnicodeMapFileLocation.find_last_of("\\");
-		std::size_t mapNameOffsetEnd = nonUnicodeMapFileLocation.find_last_not_of('.');
-		std::string nonUnicodeMapFileName = nonUnicodeMapFileLocation.substr(mapNameOffset + 1, mapNameOffsetEnd);
-		if (!nonUnicodeMapFileName.empty()) {
+		std::size_t mapNameOffset = unicodeMapFileLocation.find_last_of(L"\\");
+		std::size_t mapNameOffsetEnd = unicodeMapFileLocation.find_last_not_of(L'.');
+		std::wstring filename = unicodeMapFileLocation.substr(mapNameOffset + 1, mapNameOffsetEnd);
+		if (!filename.empty()) {
 			//if the filename exists and the current map english name is equal to the iterated map name
-			return nonUnicodeMapFileName;
+			buffer = filename;
 		}
 	}
-	
-	return "";
 }
 
 /**
@@ -364,37 +386,6 @@ void MapManager::cleanup() {
 	this->resetClient();
 	//clear any attempted map downloads on game end
 	this->downloadedMaps.clear();
-}
-
-void MapManager::sendMapInfoPacket()
-{
-#ifdef _DEBUG
-	int tmpFlagOrig = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
-	int tmpFlag = tmpFlagOrig;
-	tmpFlag &= 0xFFFFFFFF ^ (_CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHECK_DF);
-	_CrtSetDbgFlag(tmpFlag);
-#endif
-
-	H2ModPacket teampak;
-	teampak.set_type(H2ModPacket_Type_map_info_request);
-
-	h2mod_map_info* map_info = teampak.mutable_map_info();
-	//TODO: check if its empty before sending
-	std::string mapFilenameStr = this->getMapFilename();
-	if (mapFilenameStr.empty()) {
-		TRACE_GAME_N("[h2mod-mapmanager] custom map filename missing");
-		return;
-	}
-	TRACE_GAME_N("[h2mod-mapmanager] custom map name being sent %s", mapFilenameStr.c_str());
-	map_info->set_mapfilename(mapFilenameStr);
-	//TODO: send over size so p2p can work easier
-	map_info->set_mapsize(0);
-
-	network->send_h2mod_packet(teampak);
-
-#ifdef _DEBUG
-	_CrtSetDbgFlag(tmpFlagOrig);
-#endif
 }
 
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {

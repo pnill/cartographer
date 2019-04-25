@@ -1,23 +1,16 @@
-#include <d3d9.h>
-#include <d3dx9.h>
+
 #include "GUI.h"
 #include "H2MOD.h"
-#include "xliveless.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\MOdules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
-#include "H2MOD\Modules\GameManager\GameManager.h"
+#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include <tchar.h>
-
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 extern ConsoleCommands* commands;
-extern GameManager* gameManager;
-
 
 extern void InitInstance();
 extern bool overrideUnicodeMessage;
-extern MapManager* mapManager;
 
 extern bool displayXyz;
 extern volatile bool isLobby;
@@ -84,18 +77,18 @@ struct CVertexList
 };
 
 extern HMODULE hThis;
-extern std::string ModulePathA(HMODULE);
+extern std::wstring ModulePathW(HMODULE);
 
-char dlldir[256];
+wchar_t dlldir[256];
 
-char* GetDirectoryFile(char *filename)
+wchar_t* GetDirectoryFile(wchar_t *filename)
 {
-	static char path[256];
-	strcpy_s(dlldir, ModulePathA(hThis).c_str());
-	for (int i = strlen(dlldir); i > 0; i--) { if (dlldir[i] == '\\') { dlldir[i + 1] = 0; break; } }
+	static wchar_t path[256];
+	wcsncpy_s(dlldir, ModulePathW(hThis).c_str(), 256);
+	for (int i = wcslen(dlldir); i > 0; i--) { if (dlldir[i] == L'\\') { dlldir[i + 1] = 0; break; } }
 
-	strcpy_s(path, dlldir);
-	strcat_s(path, filename);
+	wcsncpy_s(path, dlldir, 256);
+	wcscat_s(path, filename);
 	return path;
 }
 
@@ -127,7 +120,7 @@ void GUI::Initialize()
 {
 	initFontsIfRequired();
 	
-	if (FAILED(D3DXCreateTextureFromFile(pDevice, "sounds/h2pc_logo.png", &Texture_Interface) ) )
+	if (FAILED(D3DXCreateTextureFromFile(pDevice, L"sounds/h2pc_logo.png", &Texture_Interface) ) )
 	{
 		addDebugText("ERROR: Failed to create logo texture (for achievements).");
 	}
@@ -148,17 +141,19 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		has_initialised_input = true;
 	}
 
-	if ((GetKeyState(pPii->wParam) & 0x8000) && (pPii->uMSG == WM_KEYDOWN || pPii->uMSG == WM_SYSKEYDOWN)) {
-		//TODO: fHandled doesn't actually work..need to look into how halo2.exe uses the XLIVE_INPUT_INFO struct after calling xliveinput
-		pPii->fHandled = commands->handleInput(pPii->wParam);
-	}
+	//TODO: fHandled doesn't actually work..need to look into how halo2.exe uses the XLIVE_INPUT_INFO struct after calling xliveinput
+	//pPii->fHandled = commands->handleInput(pPii->wParam);
+
 	return S_OK;
 }
 
 // #5030: XLivePreTranslateMessage
-int WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
+BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 {
-	return 0;
+	if ((GetKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
+		commands->handleInput(lpMsg->wParam);
+
+	return false;
 }
 
 
@@ -231,15 +226,15 @@ HRESULT WINAPI XLiveOnDestroyDevice()
 	return S_OK;
 }
 
-TCHAR m_strFontName[80];
-TCHAR m_strFontPath[260];
+wchar_t m_strFontName[80];
+wchar_t m_strFontPath[260];
 
-void InitalizeFont(char *strFontName, char *strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
+void InitalizeFont(wchar_t *strFontName, wchar_t *strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
 {
-	_tcscpy(m_strFontName, strFontName);
+	wcsncpy_s(m_strFontName, strFontName, 80);
 	if (OnOff)
 	{
-		_tcscpy(m_strFontPath, strFontPath);
+		wcsncpy_s(m_strFontPath, strFontPath, 260);
 		addDebugText("Adding font: ");
 		addDebugText(m_strFontPath);
 		if(AddFontResource(m_strFontPath) > 0)
@@ -261,10 +256,8 @@ void initFontsIfRequired()
 	normalSizeFontHeight = 0.017 * verticalRes;
 	largeSizeFontHeight = 0.034 * verticalRes;
 
-	InitalizeFont("Conduit ITC Medium", GetDirectoryFile("maps\\fonts\\conduit_itc_medium1.ttf"), largeSizeFontHeight, pDevice, true);
-
-
-	D3DXCreateFont(pDevice, 10, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Lucida Console", &smallFont);
+	InitalizeFont(L"Conduit ITC Medium", GetDirectoryFile(L"maps\\fonts\\conduit_itc_medium1.ttf"), largeSizeFontHeight, pDevice, true);
+	D3DXCreateFont(pDevice, 10, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Lucida Console", &smallFont);
 
 	if (!normalSizeFont || normalSizeFontHeight != normalSizeCurrentFontHeight) {
 		if (normalSizeFont)
@@ -272,7 +265,7 @@ void initFontsIfRequired()
 			normalSizeFont->Release();
 		}
 
-		D3DXCreateFont(pDevice, normalSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Verdana", &normalSizeFont);
+		D3DXCreateFont(pDevice, normalSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Verdana", &normalSizeFont);
 		normalSizeCurrentFontHeight = normalSizeFontHeight;
 	}
 
@@ -282,7 +275,7 @@ void initFontsIfRequired()
 			largeSizeFont->Release();
 		}
 
-		D3DXCreateFont(pDevice, largeSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Tahoma", &largeSizeFont);
+		D3DXCreateFont(pDevice, largeSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Tahoma", &largeSizeFont);
 		largeSizeCurrentFontHeight = largeSizeFontHeight;
 	}
 
@@ -484,11 +477,6 @@ static void create_exit_countdown_label() {
 	exit_countdown_labels.push_back(exit_cnd_lbl);
 }
 
-unsigned long time_end = 0;
-static int time_sec = 0;
-static unsigned char add_exit_countdown_label = 4;
-static char exit_countdown_timer_label[10] = "30:00";
-
 bool StatusCheater = false;
 int achievement_height = 0;
 bool achievement_freeze = false;
@@ -540,7 +528,7 @@ int WINAPI XLiveRender()
 				}
 			}
 			DWORD GameGlobals = *(DWORD*)((BYTE*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
-			DWORD& GameEngine = *(DWORD*)(GameGlobals + 0x8);
+			DWORD GameEngine = *(DWORD*)(GameGlobals + 0x8);
 			bool paused_or_in_menus = *((BYTE*)h2mod->GetBase() + 0x47A568) != 0;
 			if (GameEngine == 3 || StatusCheater || (GameEngine != 3 && paused_or_in_menus)) {
 				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
@@ -622,7 +610,7 @@ int WINAPI XLiveRender()
 			}
 #pragma endregion achievement rendering
 
-			if (displayXyz && !isLobby && gameManager->isHost()) {
+			if (displayXyz && !isLobby && NetworkSession::localPeerIsSessionHost()) {
 				//only display xyz for host
 				if (xyzTextWidget == NULL) {
 					xyzTextWidget = new char[128];
@@ -633,46 +621,6 @@ int WINAPI XLiveRender()
 				sprintf(xyzTextWidget, xyzTextWidgetTemplate.c_str(), x, y, z);
 
 				drawText(0, 60, COLOR_GOLD, xyzTextWidget, normalSizeFont);
-			}
-
-			time_t ltime;
-			time(&ltime);//seconds since epoch.
-			unsigned long time = (unsigned long)ltime;
-
-			int diff;
-			if (time_end && (diff = time_end - time) != time_sec) {
-				time_sec = diff;
-				int time_min = time_sec / 60;
-				snprintf(exit_countdown_timer_label, 10, "%02d:%02d", time_min, time_sec % 60);
-				if (time_sec <= 0) {
-					BYTE& Quit_Exit_Game = *((BYTE*)h2mod->GetBase() + 0x48220b);
-					Quit_Exit_Game = 1;
-				}
-				if (++add_exit_countdown_label >= 4) {
-					add_exit_countdown_label = 0;
-					create_exit_countdown_label();
-				}
-			}
-
-			int width = pViewport.Width;
-			int height = pViewport.Height;
-
-			for (auto const &ent1 : exit_countdown_labels) {
-				ent1->x += ent1->xp ? 1 : -1;
-				ent1->y += ent1->yp ? 1 : -1;
-				if (ent1->x > width) {
-					ent1->xp = false;
-				}
-				else if (ent1->x < 0) {
-					ent1->xp = true;
-				}
-				if (ent1->y > height) {
-					ent1->yp = false;
-				}
-				else if (ent1->y < 0) {
-					ent1->yp = true;
-				}
-				drawText(ent1->x - 25, ent1->y - 10, COLOR_WHITE, exit_countdown_timer_label, normalSizeFont);
 			}
 			
 			if (getDebugTextDisplay()) {
@@ -699,11 +647,16 @@ int WINAPI XLiveRender()
 				drawBox(10, 52, ((Size_Of_Downloaded * 100) / Size_Of_Download) * 2, 6, COLOR_GREEN, COLOR_GREEN);
 			}
 
+			if (NetworkStatistics) {
+				sprintf(packet_info_str, "[ pck/second %d, pck size average: %d ]", ElapsedTime != 0 ? Packets * 1000 / ElapsedTime : 0, TotalPacketsSent != 0 ? TotalBytesSent / TotalPacketsSent : 0);
+				drawText(30, 30, COLOR_WHITE, packet_info_str, normalSizeFont);
+			}
 		}
 
 		if (H2Config_fps_limit > 0) {
 			frameTimeManagement();
 		}
+
 	}
 
 	return 0;
