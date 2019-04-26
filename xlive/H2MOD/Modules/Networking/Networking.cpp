@@ -9,10 +9,6 @@
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "Util/base64.h"
 
-//original = 0x3DA8
-#define MEMBERSHIP_PACKET_SIZE 0x3DA8
-#define MEMBERSHIP_PACKET_SIZE_RAW_BYTES 0xA8, 0x3D
-
 extern SOCKET game_network_data_gateway_socket_1000;
 extern SOCKET game_network_message_gateway_socket_1001;
 extern int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4);
@@ -23,142 +19,10 @@ const char* getTextForEnum(int enumVal) {
 	return packet_type_strings[enumVal];
 }
 
-typedef unsigned int(__stdcall *trigger_membership_packet)(int thisx);
-trigger_membership_packet trigger_membership_packet_method;
-
-unsigned int __stdcall triggerMembershipPacketData(int thisx) {
-	//return trigger_membership_packet_method(thisx);
-
-	unsigned int v1; // ebx@1
-	int v2; // esi@1
-	int v3; // edi@2
-	char *v4; // ecx@5
-	int v5; // eax@10
-	unsigned int v6; // ebx@19
-	int v7; // edi@20
-	int *v8; // eax@22
-	int v10; // [sp+Ch] [bp-7B5Ch]@1
-	int v11; // [sp+10h] [bp-7B58h]@1
-			 //below are two stack arrays that 
-	int a7[MEMBERSHIP_PACKET_SIZE]; // [sp+14h] [bp-7B54h]@18
-	char v13[MEMBERSHIP_PACKET_SIZE]; // [sp+3DBCh] [bp-3DACh]@16
-
-	typedef bool(__thiscall *sub_13FD95D_method)(char *thisx, int a2, int a3, unsigned __int8 a4);
-	sub_13FD95D_method sub_13FD95D = (sub_13FD95D_method)(h2mod->GetBase() + (h2mod->Server ? 0x1B7837 : 0x1BD95D));
-	
-	typedef int(__thiscall *sub_13FD9FA_method)(void *thisx, int a2, int a3, unsigned __int8 a4);
-	sub_13FD9FA_method sub_13FD9FA = (sub_13FD9FA_method)(h2mod->GetBase() + (h2mod->Server ? 0x1B78D4 : 0x1BD9FA));
-
-	typedef char(__thiscall *dynamic_packet_check_method)(void *thisx, int a2, int a3, char a4, unsigned int type, unsigned int size, int a7);
-	dynamic_packet_check_method dynamic_packet_check = (dynamic_packet_check_method)(h2mod->GetBase() + (h2mod->Server ? 0x1B8C1A : 0x1BED40));
-
-	typedef unsigned int(__cdecl *write_to_memory_method)(unsigned int a1, int a2, unsigned int size);
-	write_to_memory_method write_to_memory = (write_to_memory_method)(h2mod->GetBase() + (h2mod->Server ? 0x234D60 : 0x287E18));
-
-	//0x1C3800
-	typedef int(__thiscall *generate_membership_packet_data)(DWORD* thisx, int a2, int a3, int a4);
-	generate_membership_packet_data generate_membership_packet_data_method = (generate_membership_packet_data)(h2mod->GetBase() + (h2mod->Server ? 0x19AEB8 : 0x1C3800));
-
-	v1 = 0;
-	v2 = thisx;
-	v11 = 0;
-	v10 = 0;
-	if (*(DWORD *)(thisx + 132) > 0)
-	{
-		v3 = thisx + 29128;
-		do
-		{
-			if (*(BYTE *)(v3 - 3))
-			{
-				if (!*(BYTE *)(v3 - 1))
-				{
-					v4 = *(char **)(v2 + 8);
-					//TRACE_GAME_NETWORK_N("CONDITION1, %d", *(BYTE *)(v3 - 1));
-					if ((*(DWORD *)&v4[1856 * *(DWORD *)v3 + 128] == 7 && *(DWORD *)(v3 + 4) != *(DWORD *)(v2 + 112)))
-					{
-						//TRACE_GAME_NETWORK_N("CONDITION2, firstArg=%d, secondArg=%d, thirdArg=%d", *(DWORD *)&v4[1856 * *(DWORD *)v3 + 128], *(DWORD *)(v3 + 4), *(DWORD *)(v2 + 112));
-						if (sub_13FD95D(v4, *(DWORD *)(v2 + 20), *(DWORD *)v3, 0x19u))
-						{
-							//TRACE_GAME_NETWORK_N("CONDITION3");
-							sub_13FD9FA(*(void **)(v2 + 8), *(DWORD *)(v2 + 20), *(DWORD *)v3, 0x19u);
-						}
-						else if (*(DWORD *)(v2 + 29600) != 8)
-						{
-							//TRACE_GAME_NETWORK_N("CONDITION4, arg=%d", *(DWORD *)(v2 + 29600));
-							v5 = *(DWORD *)(v3 + 4);
-							if (v5 == -1 || v5 != *(DWORD *)(v2 + 0x24E0)) {
-								//TRACE_GAME_NETWORK_N("CONDITION5");
-								v10 |= 1 << v1;
-							}
-							else {
-								//TRACE_GAME_NETWORK_N("CONDITION6");
-								v11 |= 1 << v1;
-							}
-						}
-					}
-				}
-			}
-			++v1;
-			v3 += 28;
-		} while (v1 < *(DWORD *)(v2 + 132));
-		if (v10) {
-			//TRACE_GAME_NETWORK_N("CONDITION7");
-			generate_membership_packet_data_method((DWORD *)v2, v2 + 112, 0, (int)&v13);
-		}
-		if (v11) {
-			//TRACE_GAME_NETWORK_N("CONDITION8");
-			generate_membership_packet_data_method((DWORD *)v2, v2 + 112, v2 + 9440, (int)&a7);
-		}
-	}
-	v6 = 0;
-	if (*(DWORD *)(v2 + 132) > 0)
-	{
-		v7 = v2 + 29125;
-		while (!((1 << v6) & v11))
-		{
-			//TRACE_GAME_NETWORK_N("CONDITION9");
-			if (((1 << v6) & v10))
-			{
-				//TRACE_GAME_NETWORK_N("CONDITION10");
-				v8 = (int *)&v13;
-			LABEL_25:
-				*(DWORD *)(v7 + 7) = *(DWORD *)(v2 + 112);
-				if (*(BYTE *)v7) {
-					//TRACE_GAME_NETWORK_N("CONDITION11");
-
-					dynamic_packet_check(
-						*(void **)(v2 + 8),
-						*(DWORD *)(v2 + 20),
-						*(DWORD *)(v7 + 3),
-						0,
-						0x19u,
-						MEMBERSHIP_PACKET_SIZE,
-						(int)v8);
-
-					//reset old values
-					/*
-					*(DWORD *)&v4[1856 * *(DWORD *)v3 + 128] = oldarg1;
-					*(DWORD *)(v3 + 4) = oldarg2;
-					*(DWORD *)(v2 + 112) = oldarg3;
-					*(DWORD *)(v2 + 29600) = oldarg4;*/
-				}
-			}
-			++v6;
-			v7 += 28;
-			if (v6 >= *(DWORD *)(v2 + 132))
-				return write_to_memory(v2 + 0x24E0, v2 + 112, 0x2470u);
-		}
-		v8 = a7;
-		goto LABEL_25;
-	}
-	return write_to_memory(v2 + 0x24E0, v2 + 112, 0x2470u);
-}
-
-int __cdecl request_write(void* a1, int a2, int a3) {
+void __cdecl request_write(void* a1, int a2, int a3) {
 	bitstream::p_data_encode_integer()(a1, "identifier", *(DWORD *)a3, 32);
-	int result = bitstream::p_data_encode_integer()(a1, "flags", *(DWORD *)(a3 + 4), 8);
+	bitstream::p_data_encode_integer()(a1, "flags", *(DWORD *)(a3 + 4), 8);
 	TRACE_GAME_NETWORK_N("[H2MOD-network] connection request write, identifier=%d, flags=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4));
-	return result;
 }
 
 bool __cdecl request_read(void* a1, int a2, int a3) {
@@ -167,10 +31,9 @@ bool __cdecl request_read(void* a1, int a2, int a3) {
 	return bitstream::p_packet_is_valid()(a1) == 0;
 }
 
-int __cdecl refuse_write(void* a1, int a2, int a3) {
+void __cdecl refuse_write(void* a1, int a2, int a3) {
 	bitstream::p_data_encode_integer()(a1, "remote-identifier", *(DWORD *)a3, 32);
-	int result = bitstream::p_data_encode_integer()(a1, "reason", *(DWORD *)(a3 + 4), 3);
-	return result;
+	bitstream::p_data_encode_integer()(a1, "reason", *(DWORD *)(a3 + 4), 3);
 }
 
 bool __cdecl refuse_read(void* a1, int a2, int a3) {
@@ -181,12 +44,11 @@ bool __cdecl refuse_read(void* a1, int a2, int a3) {
 	return isValid;
 }
 
-int __cdecl establish_write(void* a1, int a2, int a3) {
+void __cdecl establish_write(void* a1, int a2, int a3) {
 	userManager.sendSecurePacket(game_network_data_gateway_socket_1000, 1000);
 	bitstream::p_data_encode_integer()(a1, "remote-identifier", *(DWORD *)a3, 32);
-	int result = bitstream::p_data_encode_integer()(a1, "reason", *(DWORD *)(a3 + 4), 32);
+	bitstream::p_data_encode_integer()(a1, "reason", *(DWORD *)(a3 + 4), 32);
 	//TRACE_GAME_NETWORK_N("[H2MOD-network] connection establish write, remote-identifier=%d, identifier=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4));
-	return result;
 }
 
 bool __cdecl establish_read(void* a1, int a2, int a3) {
@@ -197,13 +59,12 @@ bool __cdecl establish_read(void* a1, int a2, int a3) {
 	return isValid;
 }
 
-int __cdecl closed_write(void* a1, int a2, int a3) {
+void __cdecl closed_write(void* a1, int a2, int a3) {
 	memset(&userManager.game_host_xn, NULL, sizeof(XNADDR));
 	bitstream::p_data_encode_integer()(a1, "remote-identifier", *(DWORD *)a3, 32);
 	bitstream::p_data_encode_integer()(a1, "identifier", *(DWORD *)(a3 + 4), 32);
-	int result = bitstream::p_data_encode_integer()(a1, "closure-reason", *(DWORD *)(a3 + 8), 5);
+	bitstream::p_data_encode_integer()(a1, "closure-reason", *(DWORD *)(a3 + 8), 5);
 	//TRACE_GAME_NETWORK_N("[H2MOD-network] connection closed write, remote-identifier=%d, identifier=%d, closureReason=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), *(DWORD *)(a3 + 8));
-	return result;
 }
 
 bool __cdecl closed_read(void* a1, int a2, int a3) {
@@ -251,7 +112,7 @@ register_player_packets register_player_packets_method;
 
 void __cdecl registerPlayerPackets(void* packetObject) {
 
-	register_packet_impl(packetObject, 25, "membership-update", 0, MEMBERSHIP_PACKET_SIZE, MEMBERSHIP_PACKET_SIZE,
+	register_packet_impl(packetObject, 25, "membership-update", 0, 15784, 15784,
 		(void*)(h2mod->GetBase() + (h2mod->Server ? 0x1D0072 : 0x1EF6B9)),
 		(void*)(h2mod->GetBase() + (h2mod->Server ? 0x1D0496 : 0x1EFADD)), 0);
 
@@ -543,27 +404,6 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 	return pjoin_game(thisptr, a2, a3, a4, a5, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 
-void __cdecl serialize_join_request(void *a1, int a2, int a3)
-{
-	typedef void(__cdecl* join_request_serialize_impl)(void* a1, int a2, int a3);
-	auto p_join_request_serialize_impl = reinterpret_cast<join_request_serialize_impl>(h2mod->GetBase() + 0x1F0BC0);
-	p_join_request_serialize_impl(a1, a2, a3);
-}
-
-bool __cdecl deserialize_join_request(void* a1, int a2, int a3)
-{
-	typedef bool(__cdecl* deserialize_join_request_impl)(void* a1, int a2, int a3);
-	auto p_deserialize_join_request_impl = reinterpret_cast<deserialize_join_request_impl>(h2mod->GetBase() + (h2mod->Server ? 0x1D16B5 : 0x1F0CFC));
-
-	bool ret = p_deserialize_join_request_impl(a1, a2, a3);
-
-	/*XNADDR* joining_player_addr = reinterpret_cast<XNADDR*>((BYTE*)a3 + 1320);
-	if (ret == true)
-		userManager.CreateUser(joining_player_addr, TRUE);*/
-	
-	return ret;
-}
-
 /* WIP */
 /* All this does is patch some checks that cause using actual ip addresses not to work. */
 /* When a call to XNetXnaddrtoInaddr happens we provide the actual ip address rather than a secure key */
@@ -595,7 +435,6 @@ void applyConnectionPatches()
 {
 	DWORD dwBack;
 	//removeXNetSecurity();
-	WritePointer(h2mod->GetBase() + (h2mod->Server ? 0x1D20E4 : 0x1F172B), (void*)deserialize_join_request);
 
 	// force hard-coded qos data in-lobby
 	PatchCall(h2mod->GetBase() + (h2mod->Server ? 0x1B7B8A : 0x1BDCB0), QoSLookUpImpl);
@@ -625,8 +464,6 @@ void applyConnectionPatches()
 	{
 		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)h2mod->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		WritePointer(h2mod->GetBase() + 0x1F1730, (void*)serialize_join_request);
 	}
 }
 
@@ -656,8 +493,8 @@ void CustomNetwork::applyNetworkHooks() {
 	deserialize_membership_packet_method = (deserialize_membership_packet)DetourFunc((BYTE*)h2mod->GetAddress(0x1EFADD, 0x1D0496), (BYTE*)deserializeMembershipPacket, 12);
 	VirtualProtect(deserialize_membership_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	serialize_parameters_update_packet_method = (serialize_parameters_update_packet)DetourFunc((BYTE*)h2mod->GetAddress(0x1F03F5, 0x1CE5FA), (BYTE*)serializeParametersUpdatePacket, 5);
-	VirtualProtect(serialize_parameters_update_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	//serialize_parameters_update_packet_method = (serialize_parameters_update_packet)DetourFunc((BYTE*)h2mod->GetAddress(0x1F03F5, 0x1CE5FA), (BYTE*)serializeParametersUpdatePacket, 5);
+	//VirtualProtect(serialize_parameters_update_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//TODO-Issue-34: turning this on makes hosts not care if clients can load map or now
 	//serialize_peer_properties_method = (serialize_peer_properties)DetourFunc((BYTE*)h2mod->GetBase() + serializePeerPropertiesPacketOffset, (BYTE*)serializePeerPropertiesPacket, 5);

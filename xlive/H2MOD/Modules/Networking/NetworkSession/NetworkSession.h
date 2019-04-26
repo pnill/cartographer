@@ -111,7 +111,7 @@ struct player_info
 struct unk_network_connection_info
 {
 	char field_0[4];
-	signed int index_unk;
+	signed int observer_index;
 	signed int field_8;
 	signed int field_C;
 	signed int field_10;
@@ -122,11 +122,12 @@ struct unk_network_connection_info
 struct network_session
 {
 	DWORD field_0;
-	BYTE *field_4;
-	char *field_8;
-	DWORD field_C;
-	DWORD field_10;
-	char field_14[8];
+	void *network_message_gateway_ptr;
+	void *network_observer_ptr;
+	DWORD session_manager_ptr;
+	DWORD text_chat;
+	int unk_index;
+	int field_18;
 	int network_mode;
 	XNKID session_id;
 	char field_28[32];
@@ -136,10 +137,10 @@ struct network_session
 	int xnkey_index;
 	signed int field_60;
 	DWORD host_peer_index;
-	int field_68;
+	int elected_host_peer_index;
 	DWORD field_6C;
 	DWORD membership_1;
-	DWORD host_index;
+	DWORD session_leader_index;
 	XUID dedicated_server_xuid;
 	DWORD field_80;
 	DWORD total_peers;
@@ -157,12 +158,12 @@ struct network_session
 	int field_4AE8;
 	int field_4AEC;
 	BYTE gap_4AF0[56];
-	WORD field_4B28;
+	__int16 field_4B28;
 	BYTE gap_4B2A[62];
 	int field_4B68;
 	int field_4B6C;
 	int field_4B70;
-	WORD field_4B74;
+	__int16 field_4B74;
 	WORD field_4B76;
 	WORD field_4B78;
 	BYTE gap_4B7A[2];
@@ -175,7 +176,7 @@ struct network_session
 	DWORD gap_4C6C;
 	DWORD system_language_id;
 	char dedicated_server[4];
-	BYTE gap_4C78[4];
+	DWORD party_privacy;
 	int max_peers;
 	signed int max_party_players;
 	int gap_4C84;
@@ -207,17 +208,17 @@ struct network_session
 	DWORD parameters_1;
 	BYTE gap_5F14[4780];
 	DWORD local_peer_index;
-	unk_network_connection_info unk_needs_reversing[17]; // used to send packets
-	network_session_state session_state;
+	unk_network_connection_info unk_needs_reversing[17];
+	network_session_state local_session_state;
 	DWORD time_unk_2;
 	DWORD time_unk_3;
 	DWORD time_unk;
-	DWORD field_73B0;
+	DWORD possible_new_peer_host_index;
 	DWORD field_73B4;
 	DWORD field_73B8;
 	int field_73BC;
 	char field_73C0[4];
-	DWORD field_73C4;
+	DWORD time_new_session_host_found;
 	int field_73C8;
 	DWORD field_73CC;
 	int field_73D0;
@@ -263,7 +264,7 @@ struct network_session
 	DWORD field_7974;
 	DWORD field_7978;
 	BYTE gap_797C[508];
-	DWORD field_7B78; // this points to a vtable
+	DWORD c_network_message_gateway;
 	char field_7B7C[12];
 };
 #pragma pack(pop)

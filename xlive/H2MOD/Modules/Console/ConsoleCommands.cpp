@@ -615,9 +615,9 @@ void ConsoleCommands::handle_command(std::string command) {
 			this->spawn(object_datum, count, x += 0.5f, y += 0.5f, z += 0.5f, randomMultiplier);
 		}
 		else if (firstCommand == "$ishost") {
-			int packetDataObj = (*(int*)(h2mod->GetBase() + 0x420FE8));
+			network_session* session = NetworkSession::getCurrentNetworkSession();
 			std::wstring isHostStr = L"isHost=";
-			DWORD isHostByteValue = *(DWORD*)(packetDataObj + 29600);
+			DWORD isHostByteValue = session->local_session_state;
 			std::wostringstream ws;
 			ws << isHostByteValue;
 			const std::wstring s(ws.str());

@@ -113,7 +113,7 @@ void __stdcall message_gateway_hook(void *thisx, network_address* addr, int mess
 				wcsncpy_s(buffer.file_name, map_filename.c_str(), 32);
 			}
 
-			send_packet(current_session->field_8, *(DWORD*)current_session->field_14, current_session->unk_needs_reversing[peer_index].index_unk, 1,
+			send_packet(current_session->network_observer_ptr, current_session->unk_index, current_session->unk_needs_reversing[peer_index].observer_index, 1,
 				e_network_message_types::map_file_name, sizeof(s_custom_map_filename), &buffer);
 		}
 
@@ -180,14 +180,14 @@ void __stdcall message_gateway_hook_2(void *thisx, int a2, int message_type, int
 extern XUID xFakeXuid[4];
 void CustomPackets::sendRequestMapFilename(network_session* session)
 {
-	if (session->session_state == _network_session_state_peer_established)
+	if (session->local_session_state == _network_session_state_peer_established)
 	{
 		s_request_map_filename buffer;
 		memset(&buffer, NULL, sizeof(s_request_map_filename));
 		memcpy(&buffer.user_identifier, &xFakeXuid[0], sizeof(XUID));
 
-		if (session->unk_needs_reversing[session->host_index].field_0[1]) {
-			send_packet(session->field_8, *(DWORD*)session->field_14, session->unk_needs_reversing[session->host_index].index_unk, 1,
+		if (session->unk_needs_reversing[session->host_peer_index].field_0[1]) {
+			send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[session->host_peer_index].observer_index, 1,
 				e_network_message_types::request_map_filename, sizeof(s_request_map_filename), (void*)&buffer);
 		}
 	}
@@ -195,7 +195,7 @@ void CustomPackets::sendRequestMapFilename(network_session* session)
 
 void CustomPackets::sendTeamChange(network_session* session, signed int peer_index, int team_index)
 {
-	if (session->session_state == _network_session_state_session_host)
+	if (session->local_session_state == _network_session_state_session_host)
 	{
 		s_team_change buffer;
 		buffer.team_index = team_index;
@@ -204,7 +204,7 @@ void CustomPackets::sendTeamChange(network_session* session, signed int peer_ind
 		{
 			if (session->unk_needs_reversing[peer_index].field_0[1])
 			{
-				send_packet(session->field_8, *(DWORD*)session->field_14, session->unk_needs_reversing[peer_index].index_unk, 1,
+				send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[peer_index].observer_index, 1,
 					e_network_message_types::team_change, sizeof(s_team_change), (void*)&buffer);
 			}
 		}
@@ -213,13 +213,13 @@ void CustomPackets::sendTeamChange(network_session* session, signed int peer_ind
 
 void CustomPackets::sendUnitGrenadesPacket(network_session* session, int peer_index, s_unit_grenades* data)
 {
-	if (session->session_state == _network_session_state_session_host)
+	if (session->local_session_state == _network_session_state_session_host)
 	{
 		if (peer_index != -1 && peer_index != session->local_peer_index)
 		{
 			if (session->unk_needs_reversing[peer_index].field_0[1])
 			{
-				send_packet(session->field_8, *(DWORD*)session->field_14, session->unk_needs_reversing[peer_index].index_unk, 1,
+				send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[peer_index].observer_index, 1,
 					e_network_message_types::unit_grenades, sizeof(s_unit_grenades), (void*)data);
 			}
 		}

@@ -104,7 +104,7 @@ char __cdecl handle_map_download_callback()
 		*mapDownloadStatus = 0;
 	};
 
-	if (NetworkSession::getCurrentNetworkSession()->session_state != 0)
+	if (NetworkSession::getCurrentNetworkSession()->local_session_state != 0)
 		std::thread(mapDownload).detach();
 
 	return 1;

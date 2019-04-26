@@ -38,7 +38,7 @@ signed int Infection::calculateZombiePlayerIndex() {
 void Infection::sendTeamChange()
 {
 	network_session* session = NetworkSession::getCurrentNetworkSession();
-	if (session->session_state == _network_session_state_session_host)
+	if (session->local_session_state == _network_session_state_session_host)
 	{
 		if (session->total_peers > 0)
 		{
