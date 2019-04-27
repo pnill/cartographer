@@ -21,7 +21,7 @@ signed int Infection::calculateZombiePlayerIndex() {
 	if (session->total_peers > 0)
 	{
 		rand_index = rand() % session->total_peers;
-		if (rand_index == session->host_peer_index) 
+		if (rand_index == session->session_host_peer_index)
 		{
 			if (session->dedicated_server[0] == 1)
 			{
@@ -45,7 +45,7 @@ void Infection::sendTeamChange()
 			int index = 0;
 			do 
 			{
-				if (session->host_peer_index != index) {
+				if (session->session_host_peer_index != index) {
 					CustomPackets::sendTeamChange(session, index, zombieIndex == index ? ZOMBIE_TEAM : HUMAN_TEAM);
 				} 
 				else

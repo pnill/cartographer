@@ -131,16 +131,16 @@ struct network_session
 	int network_mode;
 	XNKID session_id;
 	char field_28[32];
-	char field_48;
+	char field_48; // 69
 	XNKEY xnkey;
 	char pad[3];
 	int xnkey_index;
 	signed int field_60;
-	DWORD host_peer_index;
+	DWORD session_host_peer_index;
 	int elected_host_peer_index;
 	DWORD field_6C;
 	DWORD membership_1;
-	DWORD session_leader_index;
+	DWORD session_leader_index; //this is not host index, but the player which controlls the party
 	XUID dedicated_server_xuid;
 	DWORD field_80;
 	DWORD total_peers;

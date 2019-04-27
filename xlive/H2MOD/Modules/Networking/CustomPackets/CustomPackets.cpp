@@ -186,8 +186,8 @@ void CustomPackets::sendRequestMapFilename(network_session* session)
 		memset(&buffer, NULL, sizeof(s_request_map_filename));
 		memcpy(&buffer.user_identifier, &xFakeXuid[0], sizeof(XUID));
 
-		if (session->unk_needs_reversing[session->host_peer_index].field_0[1]) {
-			send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[session->host_peer_index].observer_index, 1,
+		if (session->unk_needs_reversing[session->session_host_peer_index].field_0[1]) {
+			send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[session->session_host_peer_index].observer_index, 1,
 				e_network_message_types::request_map_filename, sizeof(s_request_map_filename), (void*)&buffer);
 		}
 	}

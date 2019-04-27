@@ -565,7 +565,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (!h2mod->Server || !NetworkSession::localPeerIsSessionHost())
+			if (!NetworkSession::localPeerIsSessionHost())
 			{
 				output(L"Can only be used by the session host!");
 				return;
