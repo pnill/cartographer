@@ -1383,7 +1383,7 @@ const int CMLabelMenuId_EditFOV = 0xFF00000F;
 #pragma region CM_EditFOV
 
 static void loadLabelFOVNum() {
-	if (H2Config_field_of_view) {
+	if (H2Config_field_of_view != 70) {
 		char* lblFpsLimitNum = H2CustomLanguageGetLabel(CMLabelMenuId_EditFOV, 0xFFFF0003);
 		if (!lblFpsLimitNum)
 			return;
@@ -1462,10 +1462,7 @@ static bool CMButtonHandler_EditFOV(int button_id) {
 			H2Config_field_of_view = 0;
 	}
 	else if (button_id == 2) {
-		if (H2Config_field_of_view)
-			H2Config_field_of_view = 0;
-		else
-			H2Config_field_of_view = 100;
+			H2Config_field_of_view = 70;
 	}
 	loadLabelFOVNum();
 	H2Tweaks::setFOV(H2Config_field_of_view);
