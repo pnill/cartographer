@@ -446,11 +446,11 @@ void applyConnectionPatches()
 	//WriteValue<BYTE>(h2mod->GetBase() + (h2mod->Server ? 0x1C1B7F : 0x1D4E35), 0xEB);
 
 	// makes Live network not as laggy 
-	int data = 500;
-	WriteValue<int>(h2mod->GetBase() + (h2mod->Server ? 0x24896 : 0x28702), data);
+	//int data = 500;
+	//WriteValue<int>(h2mod->GetBase() + (h2mod->Server ? 0x24896 : 0x28702), data);
 	
 	// research
-	/*static float unk_flt_ = 120.0f;
+	static float unk_flt_ = 60.0f;
 	DWORD addresses[] = { 0x1BDE27, 0x1BE2FA, 0x1BFB3C, 0x1C11FA, 0x1C12BF };
 	DWORD addresses_dedi[] = { 0x1B7D01, 0x1B81D4, 0x1B9A1C, 0x1BB0DA, 0x1BB19F };
 	int size = (h2mod->Server ? sizeof(addresses_dedi) : sizeof(addresses)) / sizeof(int);
@@ -458,7 +458,7 @@ void applyConnectionPatches()
 	{
 		DWORD addr = h2mod->Server ? addresses_dedi[i] : addresses[i];
 		WritePointer(h2mod->GetBase() + addr + 4, &unk_flt_);
-	}*/
+	}
 
 	if (!h2mod->Server)
 	{
