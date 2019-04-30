@@ -21,3 +21,4 @@ void XboxTickPreSpawnHandler::onDedi() {
 
 void XboxTickPreSpawnHandler::onPeerHost() {
 	XboxTick::tickRate();
+}
