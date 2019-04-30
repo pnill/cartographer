@@ -23,7 +23,7 @@ bool NetworkSession::getCurrentNetworkSession(network_session** a1)
 
 bool NetworkSession::localPeerIsSessionHost()
 {
-	network_session_state state = getCurrentNetworkSession()->session_state;
+	network_session_state state = getCurrentNetworkSession()->local_session_state;
 
 	return state == _network_session_state_session_host
 		|| state == _network_session_state_host_disband
