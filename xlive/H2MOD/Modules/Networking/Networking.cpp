@@ -460,6 +460,9 @@ void applyConnectionPatches()
 		WritePointer(h2mod->GetBase() + addr + 4, &unk_flt_);
 	}
 
+	// increase max bits per second of LIVE netcode (3000 bytes -> ~8000 bytes)
+	WriteValue<DWORD>((DWORD)h2mod->GetAddress(0x1AAD63 + 6, 0x1AB268 + 6), 61440);
+
 	if (!h2mod->Server)
 	{
 		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)h2mod->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
