@@ -652,7 +652,13 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (isLobby && !h2mod->Server) {
+			if (!NetworkSession::localPeerIsSessionHost())
+			{
+				output(L"Can only be used by the session host!");
+				return;
+			}
+
+			if (isLobby) {
 				//TODO: need a nicer way to detect this for dedis
 				output(L"Can only be used ingame");
 				return;
