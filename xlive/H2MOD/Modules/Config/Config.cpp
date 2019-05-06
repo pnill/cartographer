@@ -1,5 +1,7 @@
 #include "H2MOD.h"
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <math.h>
 #include <windows.h>
 #include <Shellapi.h>

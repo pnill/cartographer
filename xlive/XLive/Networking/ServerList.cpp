@@ -347,7 +347,7 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 	std::string readBuffer;
 
 	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
-	pOverlapped->InternalHigh = 0;
+	pOverlapped->InternalHigh = 1;
 	pOverlapped->dwExtendedError = ERROR_IO_INCOMPLETE;
 
 	curl = curl_easy_init();
@@ -376,7 +376,7 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 	}
 
 	pOverlapped->InternalLow = ERROR_SUCCESS;
-	pOverlapped->InternalHigh = 1;
+	pOverlapped->InternalHigh = 0;
 	pOverlapped->dwExtendedError = ERROR_SUCCESS;
 }
 
@@ -393,7 +393,7 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 	std::string readBuffer;
 
 	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
-	pOverlapped->InternalHigh = 0;
+	pOverlapped->InternalHigh = 1;
 	pOverlapped->dwExtendedError = ERROR_IO_INCOMPLETE;
 
 	curl = curl_easy_init();
@@ -491,7 +491,7 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 	}
 
 	pOverlapped->InternalLow = ERROR_SUCCESS;
-	pOverlapped->InternalHigh = 1;
+	pOverlapped->InternalHigh = 0;
 	pOverlapped->dwExtendedError = ERROR_SUCCESS;
 }
 
