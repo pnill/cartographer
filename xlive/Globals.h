@@ -12,6 +12,7 @@
 #include "H2MOD\Variants\VariantSystem.h"
 #include "H2MOD\Variants\DeviceShop\DeviceShop.h"
 #include "H2MOD\Variants\H2Final\H2Final.h"
+#include "H2MOD\Variants\XboxTick\XboxTick.h"
 #include "H2MOD\Variants\Infection\Infection.h"
 #include "H2MOD\Variants\FireFight\FireFight.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"

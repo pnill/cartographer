@@ -23,6 +23,7 @@
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
 Halo2Final *h2f = new Halo2Final();
+XboxTick* xboxTickHandler = new XboxTick();
 Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
 HeadHunter* headHunterHandler = new HeadHunter();
@@ -32,6 +33,7 @@ VariantPlayer* variant_player = new VariantPlayer();
 bool b_H2X = false;
 bool b_GunGame = false;
 bool b_FireFight = false;
+bool b_XboxTick = false;
 bool b_Infection = false;
 bool b_Halo2Final = false;
 bool b_HeadHunter = false;
@@ -1079,6 +1081,7 @@ void __cdecl OnMapLoad(int a1)
 	b_Infection = false;
 	b_GunGame = false;
 	b_Halo2Final = false;
+	b_XboxTick = false;
 	b_H2X = false;
 	b_HeadHunter = false;
 	b_FireFight = false;
@@ -1125,6 +1128,12 @@ void __cdecl OnMapLoad(int a1)
 		{
 			TRACE_GAME("[h2mod] Fire Fight Turned on!");
 			b_FireFight = true;
+		}
+
+		if (wcsstr(variant_name, L"OGH2") > 0 || wcsstr(variant_name, L"ogh2") > 0 || wcsstr(variant_name, L"h2og") > 0 || wcsstr(variant_name, L"H2OG") > 0)
+		{
+			TRACE_GAME("[h2mod] Made The Game Trash By Changing The Tick Rate");
+			b_XboxTick = true;
 		}
 
 		get_object_table_memory();
@@ -1204,6 +1213,10 @@ bool __cdecl OnPlayerSpawn(int a1)
 	if (b_GunGame) {
 		gunGame->preSpawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
 		gunGame->preSpawnPlayer->execute();
+	}
+
+	if (b_XboxTick) {
+		xboxTickHandler->preSpawnPlayer->execute();
 	}
 
 	bool ret = pspawn_player(a1);
