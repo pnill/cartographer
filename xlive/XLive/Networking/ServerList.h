@@ -74,29 +74,27 @@ class ServerList
 	std::thread serv_thread;
 
 public:
-	_XLOCATOR_SEARCHRESULT *servers;
-
-	std::atomic<bool> running = false;
+	std::atomic<bool> server_list_download_running = false;
+	std::atomic<bool> server_counts_download_running= false;
 	bool completed = false;
-	int servers_left = 0;
+	int servers_left = -1;
 	int total_servers = 0;
 
-	int total_count = 0;
-	int total_public = 0;
-	int total_public_gold = 0;
-	int total_peer = 0;
-	int total_peer_gold = 0;
+	int total_count = -1;
+	int total_public = -1;
+	int total_peer = -1;
+	int total_peer_gold = -1;
+	int total_public_gold = -1;
 
 	bool GetRunning();
-	void GetServers(PXOVERLAPPED,char*);
+	void GetServers(PXOVERLAPPED, DWORD, char*);
 	int GetServersLeft();
 	int GetTotalServers();
-	void RemoveServer();
-	bool GetServerCounts();
+	void GetServerCounts();
 
 
 };
 
 extern HANDLE ServerEnum;
-extern bool ServerEnumRan;
 extern ServerList LiveManager;
+DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey);

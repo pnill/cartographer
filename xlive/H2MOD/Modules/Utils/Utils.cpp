@@ -228,6 +228,15 @@ LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
 }
 
 void pushHostLobby() {
+	extern bool H2IsDediServer;
+	extern bool H2DediIsLiveMode;
+	extern DWORD H2BaseAddr;
+	if (H2IsDediServer && H2DediIsLiveMode)
+		return;
+
+	if (!H2IsDediServer && *(BYTE*)(*(DWORD*)(H2BaseAddr + 0x420FE8) + 0x1C) == 2)
+		return;
+
 	char msg[100] = { 0x00, 0x43, 0x05 };
 	sprintf(msg + 3, "push clientlobby %d", H2Config_base_port + 1);
 
@@ -242,7 +251,7 @@ void pushHostLobby() {
 	serverAddress.sin_addr.s_addr = H2Config_master_ip;
 	serverAddress.sin_port = htons(H2Config_master_port_relay);
 
-	if (sendto(socketDescriptor, msg, strlen(msg + 3) + 3, 0, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
+	if (sendto(socketDescriptor, msg, strlen(msg + 3) + 3, 0, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) <= 0) {
 		//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)
 		addDebugText("ERROR: Failed to push open lobby.");
 	}

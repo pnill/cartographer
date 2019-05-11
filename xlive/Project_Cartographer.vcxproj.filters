@@ -106,9 +106,6 @@
     <Filter Include="Source Files\Util\Hooks">
       <UniqueIdentifier>{6e3b665a-267b-4baf-9978-190c7753a4d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\H2MOD\TeamSpeak">
-      <UniqueIdentifier>{0cc52107-bf23-4ffa-8f69-d153a943b89d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\H2MOD\Variants\H2Final">
       <UniqueIdentifier>{8ae2946e-1bb2-4bd1-8e7c-1dd9790a829e}</UniqueIdentifier>
     </Filter>
@@ -144,9 +141,6 @@
     </Filter>
     <Filter Include="Source Files\H2MOD\Variants\Infection">
       <UniqueIdentifier>{5bc77bfa-fc93-4ba8-af1d-c04a860609a6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\H2MOD\Modules\GameManager">
-      <UniqueIdentifier>{9354b72a-424d-4049-a65f-bed7faa3c6ee}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\H2MOD\Modules\MapManager">
       <UniqueIdentifier>{59509adf-9363-45db-ab56-214ec75bcc9a}</UniqueIdentifier>
@@ -241,6 +235,30 @@
     <Filter Include="Source Files\H2MOD\Modules\MainMenu">
       <UniqueIdentifier>{81d68132-d9e7-4e7c-9500-7aef66a37553}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\HitFix">
+      <UniqueIdentifier>{e2beceb0-3685-4b6a-88e8-2a4b7ac4a822}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\3rdparty\opus">
+      <UniqueIdentifier>{c2d12e72-3d9f-4695-a08d-e81a5ef33724}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\3rdparty\portaudio">
+      <UniqueIdentifier>{a11687ea-ad4d-4338-be2a-8150f5fc6ff4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\MapFix">
+      <UniqueIdentifier>{0dcc09a4-5fd5-4f51-9344-1bee701782ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Networking\Memory">
+      <UniqueIdentifier>{94906e75-9ab4-4c55-a467-162cfa48b371}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Networking\NetworkStats">
+      <UniqueIdentifier>{4bdd249f-f00f-4cbe-b0df-26a3418d073b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Networking\CustomPackets">
+      <UniqueIdentifier>{68353fe2-183d-4e4b-a2a3-12019ddb1c65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Networking\NetworkSession">
+      <UniqueIdentifier>{81567183-8529-475d-b12a-de4b08ef08db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -294,12 +312,6 @@
     <ClCompile Include="Util\Debug\Debug.cpp">
       <Filter>Source Files\Util\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="H2MOD\TeamSpeak\TSClient.cpp">
-      <Filter>Source Files\H2MOD\TeamSpeak</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\TeamSpeak\TSServer.cpp">
-      <Filter>Source Files\H2MOD\TeamSpeak</Filter>
-    </ClCompile>
     <ClCompile Include="XLive\Networking\xlive_network.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
@@ -307,9 +319,6 @@
       <Filter>Source Files\H2MOD\Variants\H2Final</Filter>
     </ClCompile>
     <ClCompile Include="XLive\Networking\ServerList.cpp">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClCompile>
-    <ClCompile Include="XLive\Networking\XLiveQoS.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
     <ClCompile Include="XLive\Networking\upnp.cpp">
@@ -344,9 +353,6 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Achievements\Achievements.cpp">
       <Filter>Source Files\H2MOD\Modules\Achievements</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\Modules\GameManager\GameManager.cpp">
-      <Filter>Source Files\H2MOD\Modules\GameManager</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp">
       <Filter>Source Files\H2MOD\Variants</Filter>
@@ -402,9 +408,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp">
       <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\Voice\Voice.cpp">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClCompile>
     <ClCompile Include="XLive\XAM\xam.cpp">
       <Filter>Source Files\XLive\xam</Filter>
     </ClCompile>
@@ -449,6 +452,48 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp">
       <Filter>Source Files\H2MOD\Modules\MainMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\ClipboardAPI.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\HitFix\HitFix.cpp">
+      <Filter>Source Files\H2MOD\Modules\HitFix</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Voice\XHVEngine.cpp">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Voice\Encoder.cpp">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Voice\AudioDevices.cpp">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Voice\AudioHandler.cpp">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\Networking\XNetQoS.cpp">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp">
+      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\MapFix\SPMapFix.cpp">
+      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp">
+      <Filter>Source Files\H2MOD\Modules\Networking\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp">
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkStats</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp">
+      <Filter>Source Files\H2MOD\Modules\Networking\CustomPackets</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp">
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkSession</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -617,19 +662,10 @@
     <ClInclude Include="Util\ReadIniArguments.h">
       <Filter>Source Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\TeamSpeak\TSServer.h">
-      <Filter>Source Files\H2MOD\TeamSpeak</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\TeamSpeak\TSClient.h">
-      <Filter>Source Files\H2MOD\TeamSpeak</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Variants\H2Final\H2Final.h">
       <Filter>Source Files\H2MOD\Variants\H2Final</Filter>
     </ClInclude>
     <ClInclude Include="XLive\Networking\ServerList.h">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Networking\XLiveQoS.h">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClInclude>
     <ClInclude Include="XLive\Networking\upnp.h">
@@ -664,9 +700,6 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\Achievements\Achievements.h">
       <Filter>Source Files\H2MOD\Modules\Achievements</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\Modules\GameManager\GameManager.h">
-      <Filter>Source Files\H2MOD\Modules\GameManager</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\VariantSystem.h">
       <Filter>Source Files\H2MOD\Variants</Filter>
@@ -721,9 +754,6 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h">
       <Filter>Source Files\H2MOD\Modules\CustomMenu</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Voice\Voice.h">
-      <Filter>Source Files\XLive\voice</Filter>
     </ClInclude>
     <ClInclude Include="XLive\XAM\xam.h">
       <Filter>Source Files\XLive\xam</Filter>
@@ -853,6 +883,96 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h">
       <Filter>Source Files\H2MOD\Modules\MainMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\ClipboardAPI.h">
+      <Filter>Source Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\HitFix\HitFix.h">
+      <Filter>Source Files\H2MOD\Modules\HitFix</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_custom.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_defines.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_multistream.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_projection.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_types.h">
+      <Filter>Source Files\3rdparty\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_jack.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_linux_alsa.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_mac_core.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_ds.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_wasapi.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_waveformat.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_wdmks.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\pa_win_wmme.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\portaudio\include\portaudio.h">
+      <Filter>Source Files\3rdparty\portaudio</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Voice\XHVEngine.h">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Voice\Encoder.h">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Voice\AudioDevices.h">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Voice\AudioHandler.h">
+      <Filter>Source Files\XLive\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Networking\XNetQoS.h">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h">
+      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\MapFix\SPMapFix.h">
+      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h">
+      <Filter>Source Files\H2MOD\Modules\Networking\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h">
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkStats</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h">
+      <Filter>Source Files\H2MOD\Modules\Networking\CustomPackets</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h">
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkSession</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

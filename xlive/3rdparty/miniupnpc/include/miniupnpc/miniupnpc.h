@@ -112,7 +112,7 @@ struct UPNPUrls {
  *     3 = an UPnP device has been found but was not recognized as an IGD
  *
  * In any non zero return case, the urls and data structures
- * passed as parameters are set. Donc forget to call FreeUPNPUrls(urls) to
+ * passed as parameters are set. Don't forget to call FreeUPNPUrls(urls) to
  * free allocated memory.
  */
 MINIUPNP_LIBSPEC int

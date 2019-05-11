@@ -1,25 +1,12 @@
 // -No Copyright- 2010 Stanislav "listener" Golovin
 // This file donated to the public domain
 #include "stdafx.h"
-#include "resource.h"
-#include <iostream>
-#include <sstream>
-#include <codecvt>
-#include <unordered_map>
 #include "Globals.h"
-#include "H2MOD/discord/DiscordInterface.h"
-#include "H2MOD\Modules\Config\Config.h"
-#include "XLive\Networking\ServerList.h"
-#include "H2MOD\Modules\Achievements\Achievements.h"
-#include "xlivedefs.h"
-#include "XLive\UserManagement\CUser.h"
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include "XLive\Networking\XLiveQoS.h"
 #include "XLive\XAM\xam.h"
-#include "XLive\achievements\XAchievements.h"
 #include "XLive\xbox\xbox.h"
-#include "XLive\XUser\XUser.h"
+#include "XLive\UserManagement\CUser.h"
+#include "XLive\Networking\ServerList.h"
+#include "XLive\achievements\XAchievements.h"
 
 //#include "XLive\Globals.h"
 using namespace std;
@@ -27,8 +14,6 @@ using namespace std;
 HANDLE g_dwFakePData = (HANDLE) -2;
 HANDLE g_dwFakeContent = (HANDLE) -2;
 HANDLE g_dwMarketplaceContent = (HANDLE) -2;
-
-INT num_players;
 
 WSADATA wsaData;
 
@@ -353,516 +338,6 @@ void Check_Overlapped( PXOVERLAPPED pOverlapped )
 // === Start of xlive functions ===
 
 
-
-//TODO: Move XWSA and XSocket functions to XSocket.cpp
-
-// #1: XWSAStartup
-int WINAPI XWSAStartup (WORD wVersionRequested, LPWSADATA lpWsaData)
-{
-   // TRACE("XWSAStartup(%u, %p)", wVersionRequested, lpWsaData);
-    return WSAStartup(wVersionRequested, lpWsaData);
-}
-
-// #2: XWSACleanup
-int WINAPI XWSACleanup ()  	// XWSACleanup
-{
-    TRACE("XWSACleanup");
-    return WSACleanup();
-}
-
-
-
-// #4
-int WINAPI XSocketClose (SOCKET s)
-{
-    TRACE("XSocketClose");
-    return closesocket(s);
-}
-
-// #5: XSocketShutdown
-int WINAPI XSocketShutdown (SOCKET s, int how)
-{
-    TRACE("XSocketShutdown");
-    return shutdown(s, how);
-}
-
-// #6: XSocketIOCTLSocket
-int WINAPI XSocketIOCTLSocket (SOCKET s, __int32 cmd, u_long *argp)
-{
-    //TRACE("XSocketIOCTLSocket");
-    return ioctlsocket(s, cmd, argp);
-}
-
-// #7: XSocketSetSockOpt
-int WINAPI XSocketSetSockOpt (SOCKET s, int level, int optname, const char *optval, int optlen)
-{
-	int ret;
-
-    TRACE("XSocketSetSockOpt  (socket = %X, level = %d, optname = %d, optval = %s, optlen = %d)",
-			s, level, optname, optval ? optval : "", optlen );
-
-		if ((level & SO_BROADCAST) > 0)
-		{
-
-			TRACE("XSocketSetSockOpt - SO_BROADCAST");
-		}
-		ret = setsockopt(s, level, optname, optval, optlen);
-		if (ret == SOCKET_ERROR)
-		{
-			TRACE("XSocketSetSockOpt - SOCKET_ERROR");
-		}
-		
-		TRACE( "- ret = %X", ret );
-		return ret;
-}
-
-// #8: XSocketGetSockOpt
-int WINAPI XSocketGetSockOpt(SOCKET s, int level, int optname, char *optval, int *optlen)
-{
-    //TRACE("XSocketGetSockOpt");
-    return getsockopt(s, level, optname, optval, optlen);
-}
-
-// #9: XSocketGetSockName
-int WINAPI XSocketGetSockName (SOCKET s, struct sockaddr *name, int *namelen)
-{
-    TRACE("XSocketGetSockName");
-    return getsockname(s, name, namelen);
-}
-
-// #10
-int WINAPI XSocketGetPeerName(SOCKET s, struct sockaddr *name, int *namelen)
-{
-    TRACE("XSocketGetPeerName");
-    return getpeername(s, name, namelen);
-}
-
-
-
-
-// #12: XSocketConnect
-int WINAPI XSocketConnect(SOCKET s, const struct sockaddr *name, int namelen)
-{
-    TRACE("XSocketConnect  (socket = %X, name = %X, namelen = %d)",
-			s, name, namelen );
-
-		return connect(s, name, namelen);
-}
-
-
-// #13: XSocketListen
-int WINAPI XSocketListen(SOCKET s, int backlog)
-{
-    TRACE("XSocketListen  (socket = %X, backlog = %X)",
-			s, backlog );
-
-    return listen(s, backlog);
-}
-
-
-// #14: XSocketAccept
-SOCKET WINAPI XSocketAccept(SOCKET s, struct sockaddr *addr, int *addrlen)
-{
-	static int print = 0;
-
-
-	if( print < 25 )
-	{
-    TRACE("XSocketAccept  (socket = %X, addr = %X, addrlen = %d)",
-			s, addr, *addrlen);
-
-		print++;
-	}
-	
-	
-	return accept(s, addr, addrlen);
-}
-
-
-// #15: XSocketSelect
-int WINAPI XSocketSelect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timeval *timeout)
-{
-	static int print = 0;
-
-
-	if( print < 15 )
-	{
-    TRACE("XSocketSelect");
-
-		print++;
-	}
-
-    return select(nfds, readfds, writefds, exceptfds, timeout);
-}
-
-// #16
-BOOL WINAPI XSocketWSAGetOverlappedResult(SOCKET s, LPWSAOVERLAPPED lpOverlapped, LPDWORD lpcbTransfer, BOOL fWait, LPDWORD lpdwFlags)
-{
-    TRACE("XSocketWSAGetOverlappedResult  (socket = %X, lpWSAOverlapped = %X, lpcbTransfer = %X, fWait = %d, lpdwFlags = %X)",
-			s, lpOverlapped, lpcbTransfer, fWait, lpdwFlags );
-
-    return WSAGetOverlappedResult(s, lpOverlapped, lpcbTransfer, fWait, lpdwFlags);
-}
-
-// #17
-BOOL WINAPI XSocketWSACancelOverlappedIO(HANDLE hFile)
-{
-    TRACE("XSocketWSACancelOverlappedIO");
-    return CancelIo(hFile);
-}
-
-// #18: XSocketRecv
-int WINAPI XSocketRecv (SOCKET s, char * buf, int len, int flags)
-{
-    TRACE("XSocketRecv");
-    return recv(s, buf, len, flags);
-}
-
-// #19
-int WINAPI XSocketWSARecv(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
-{
-    TRACE("XSocketWSARecv");
-    return WSARecv(s, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpOverlapped, lpCompletionRoutine);
-}
-
-
-// #21
-int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr *lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
-{
-    TRACE("XSocketWSARecvFrom");
-    return WSARecvFrom(
-               s,
-               lpBuffers,
-               dwBufferCount,
-               lpNumberOfBytesRecvd,
-               lpFlags,
-               lpFrom,
-               lpFromlen,
-               lpOverlapped,
-               lpCompletionRoutine);
-}
-
-// #22: XSocketSend
-int WINAPI XSocketSend(SOCKET s, const char *buf, int len, int flags)
-{
-    TRACE("XSocketSend");
-    return send(s, buf, len, flags);
-}
-
-
-// #65: XNetConnect
-int WINAPI XNetConnect(const IN_ADDR ina)
-{
-	return 0;
-}
-
-// #23
-int WINAPI XSocketWSASend(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesSent, DWORD dwFlags, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
-{
-    TRACE("XSocketWSASend");
-    return WSASend(s, lpBuffers, dwBufferCount, lpNumberOfBytesSent, dwFlags, lpOverlapped, lpCompletionRoutine);
-}
-
-// #25
-int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesSent, DWORD dwFlags, sockaddr *lpTo, int iTolen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
-{
-    TRACE("XSocketWSASendTo");
-    lpTo->sa_family = AF_INET;
-    return WSASendTo(
-               s,
-               lpBuffers,
-               dwBufferCount,
-               lpNumberOfBytesSent,
-               dwFlags,
-               lpTo,
-               iTolen,
-               lpOverlapped,
-               lpCompletionRoutine);
-}
-
-// #26: XSocketInet_Addr
-LONG WINAPI XSocketInet_Addr(const char *cp)
-{
-    TRACE("XSocketInet_Addr");
-    return inet_addr(cp);
-}
-
-// #27: XWSAGetLastError
-INT WINAPI XSocketWSAGetLastError ()
-{
-	static int print = 0;
-
-	int ret = WSAGetLastError();
-
-	if( print < 15 )
-	{
-		//("XSocketWSAGetLastError");
-		//TRACE("XSocketWSAGetLastError Ret = %i", ret);
-
-		print++;
-	}
-
-
-    return ret;
-}
-
-// #28
-VOID WINAPI XSocketWSASetLastError(int iError)
-{
-    TRACE("XSocketWSASetLastError");
-    WSASetLastError(iError);
-}
-
-// #29
-HANDLE WINAPI XSocketWSACreateEvent()
-{
-    TRACE("XSocketWSACreateEvent");
-    return WSACreateEvent();
-}
-
-// #30
-BOOL WINAPI XSocketWSACloseEvent(HANDLE hEvent)
-{
-    TRACE("XSocketWSACloseEvent");
-    return WSACloseEvent(hEvent);
-}
-
-// #31
-BOOL WINAPI XSocketWSASetEvent(HANDLE hEvent)
-{
-    TRACE("XSocketWSASetEvent");
-    return WSASetEvent(hEvent);
-}
-
-// #32
-BOOL WINAPI XSocketWSAResetEvent(HANDLE hEvent)
-{
-    TRACE("XSocketWSAResetEvent");
-    return WSAResetEvent(hEvent);
-}
-
-// #33
-DWORD WINAPI XSocketWSAWaitForMultipleEvents(DWORD cEvents, HANDLE *lphEvents, BOOL fWaitAll, DWORD dwTimeout, BOOL fAlertable)
-{
-    TRACE("XSocketWSAWaitForMultipleEvents");
-    return WSAWaitForMultipleEvents(cEvents, lphEvents, fWaitAll, dwTimeout, fAlertable);
-}
-
-// #34
-int WINAPI XSocketWSAFDIsSet(SOCKET fd, fd_set *a2)
-{
-    TRACE("XSocketWSAFDIsSet");
-    return __WSAFDIsSet(fd, a2);
-}
-
-// #35
-int WINAPI XSocketWSAEventSelect(SOCKET s, HANDLE hEventObject, __int32 lNetworkEvents)
-{
-    TRACE("XSocketWSAEventSelect");
-    return WSAEventSelect(s, hEventObject, lNetworkEvents);
-}
-
-// #37: XSocketHTONL
-u_long WINAPI XSocketHTONL(u_long hostlong)
-{
-	u_long ret = htonl(hostlong);
-	
-	return ret;
-}
-
-// #38: XSocketNTOHS
-u_short WINAPI XSocketNTOHS (u_short netshort)
-{
-	u_short ret;
-
-	ret = ntohs(netshort);
-
-	return ret;
-}
-
-
-// #39: XSocketNTOHL
-u_long WINAPI XSocketNTOHL(u_long netlong)
-{	
-	u_long ret = ntohl(netlong);
-	
-	return ret;
-}
-
-
-// #40: XSocketHTONS
-u_short WINAPI XSocketHTONS (u_short a1)
-{
-
-	u_short ret = htons(a1);
-
-	return ret;
-}
-
-// TODO: Move XNet* functions to xnet.cpp
-
-// #51: XNetStartup
-int WINAPI XNetStartup (void *a1)
-{
-    //TRACE("XNetStartup  (a1 = %X)", a1);
-    return 0;
-}
-
-// #58: XNetServerToInAddr
-INT   WINAPI XNetServerToInAddr(const IN_ADDR ina, DWORD dwServiceId, IN_ADDR * pina)
-{
-    TRACE("XNetServerToInAddr");
-	if(pina)
-		*pina = ina;
-    return 0;
-}
-
-
-// #59: XNetXnAddrToInAddr
-INT   WINAPI XNetTsAddrToInAddr(const TSADDR * ptsa, DWORD dwServiceId, const XNKID * pxnkid, IN_ADDR * pina)
-{
-	TRACE("XNetTsAddrToInAddr");
-	if(pina)
-		*pina = ptsa->ina;
-	return 0;
-}
-
-
-// #61: XNetInAddrToServer
-INT   WINAPI XNetInAddrToServer(const IN_ADDR ina, IN_ADDR *pina)
-{
-	TRACE("XNetInAddrToServer");
-	if(pina)
-		*pina = ina;
-	return 0;
-}
-
-
-// #62: XNetInAddrToString
-INT   WINAPI XNetInAddrToString(const IN_ADDR ina, char * pchBuf, INT cchBuf)
-{
-	TRACE("XNetInAddrToString");
-	strncpy(pchBuf,inet_ntoa(ina),cchBuf);
-	return 0;
-}
-
-// #64
-INT WINAPI XNetXnAddrToMachineId(const XNADDR * pxnaddr, ULONGLONG * pqwMachineId)
-{
-    TRACE("XNetXnAddrToMachineId");
-
-
-		// ???
-		return -1;
-
-
-		if(pqwMachineId)
-        *pqwMachineId = 0xDEADC0DE;
-
-    return 0;
-}
-
-// #66: XNetGetConnectStatus
-int WINAPI XNetGetConnectStatus (const IN_ADDR ina)
-{
-	return XNET_CONNECT_STATUS_CONNECTED;
-}
-
-
-// #67: XNetDnsLookup
-int WINAPI XNetDnsLookup (const char * pszHost, DWORD hEvent, void ** ppxndns)
-{
-    TRACE("XNetDnsLookup");
-    if (ppxndns)
-        *ppxndns = NULL;
-    return 1;   // ERROR
-}
-
-// #68: XNetDnsRelease
-int WINAPI XNetDnsRelease (void * pxndns)
-{
-    TRACE("XNetDnsRelease");
-    return 0;
-}
-
-// #75
-DWORD WINAPI XNetGetEthernetLinkStatus()
-{
-	static int print = 0;
-
-
-	if( print < 15 )
-	{
-		//("XNetGetEthernetLinkStatus");
-		//TRACE("- active: 100 mbps, full duplex");
-
-		print++;
-	}
-	
-	return XNET_ETHERNET_LINK_ACTIVE | XNET_ETHERNET_LINK_100MBPS | XNET_ETHERNET_LINK_FULL_DUPLEX;
-}
-
-
-// #76
-DWORD WINAPI XNetGetBroadcastVersionStatus(DWORD a1)
-{
-	TRACE("XNetGetBroadcastVersionStatus");
-	return 0;
-}
-
-// #78
-INT WINAPI XNetGetOpt(DWORD dwOptId, BYTE * pbValue, DWORD * pdwValueSize)
-{
-    TRACE("XNetGetOpt");
-    return WSAEINVAL;
-}
-
-
-// #79: XNetSetOpt
-INT WINAPI XNetSetOpt(DWORD dwOptId, const BYTE * pbValue, DWORD dwValueSize)
-{
-	TRACE("XNetSetOpt");
-	return WSAEINVAL;
-}
-
-// #80
-int WINAPI XNetStartupEx(int a1, int a2, int a3)
-{
-	TRACE("XNetStartupEx");
-	return 0;
-}
-
-// #81
-int WINAPI XNetReplaceKey(const XNKID *pxnkidUnregister, const XNKID *pxnkidReplace)
-{
-	TRACE("XNetReplaceKey( pxnkidUnregister: %08X, pxnkidreplace: %08X)",pxnkidUnregister, pxnkidReplace);
-	return 0;
-}
-
-// #82
-int WINAPI XNetGetXnAddrPlatform(in_addr *a1, int a2)
-{
-	TRACE("XNetGetXnAddrPlatform");
-	a2 = XNET_XNADDR_PLATFORM_WINPC;
-	return 0;
-}
-
-// #83
-int WINAPI XNetGetSystemLinkPort(DWORD *a1)
-{
-	TRACE("XNetGetSystemLinkPort");
-	if(a1)
-		*a1 = 0x00000C02;
-	return 0;
-}
-
-// #84: XNetSetSystemLinkPort
-DWORD WINAPI XNetSetSystemLinkPort( DWORD a1 )
-{
-    TRACE("XNetSetSystemLinkPort  (a1 = %X)", a1);
-    return 0;
-}
-
 // #1082: XGetOverlappedExtendedError
 DWORD WINAPI XGetOverlappedExtendedError(PXOVERLAPPED pOverlapped)
 {
@@ -1030,18 +505,18 @@ DWORD WINAPI XLivePBufferFree (FakePBuffer * pBuffer)
 
 
 // #5022: XLiveGetUpdateInformation
-int WINAPI XLiveGetUpdateInformation (DWORD)
+HRESULT  WINAPI XLiveGetUpdateInformation (DWORD)
 {
     TRACE("XLiveGetUpdateInformation");
-    return -1; // no update
+    return S_FALSE; // no update
 }
 
 
 // #5024: XLiveUpdateSystem
-int WINAPI XLiveUpdateSystem (DWORD)
+HRESULT  WINAPI XLiveUpdateSystem (DWORD)
 {
     TRACE("XLiveUpdateSystem");
-    return -1; // no update
+    return S_FALSE; // no update
 }
 
 
@@ -1279,44 +754,8 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 	if (hEnum == ServerEnum)
 	{
-		pOverlapped->InternalHigh = ERROR_IO_INCOMPLETE;
-		pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
-
-		if (!LiveManager.GetRunning() && LiveManager.servers_left == 0)
-			LiveManager.GetServers(pOverlapped, pvBuffer);
-
-
-		return ERROR_IO_PENDING;
-
-		/*
-		while (LiveManager.GetRunning() == true && LiveManager.GetTotalServers() == 0 || LiveManager.servers_left > 0)
-		{
-			
-		}
-
-		if (LiveManager.GetRunning() == false && LiveManager.GetTotalServers() == 0)
-		{
-			LiveManager.GetServers(pOverlapped,pvBuffer);
-
-		}
-		
-		if (LiveManager.GetRunning() == false && LiveManager.GetTotalServers() > 0 && LiveManager.servers_left == 0)
-		{
-			for (int i = 0; i < LiveManager.GetTotalServers(); i++)
-			{
-				memcpy(pvBuffer + (sizeof(_XLOCATOR_SEARCHRESULT) * i), &LiveManager.servers[i], sizeof(_XLOCATOR_SEARCHRESULT));
-			}
-
-			if (async == FALSE)
-				*pcItemsReturned = LiveManager.GetTotalServers();
-			else
-				pOverlapped->InternalHigh = LiveManager.GetTotalServers();
-
-				LiveManager.total_servers = 0;
-
-			
-		}*/
-	
+		LiveManager.GetServers(pOverlapped, cbBuffer, pvBuffer);
+		return ERROR_IO_PENDING;	
 	}
 
 	if( async == FALSE )
@@ -1376,10 +815,17 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 
 // #5258: XLiveSignout
-int WINAPI XLiveSignout(int a1)
+int WINAPI XLiveSignout(PXOVERLAPPED pXOverlapped)
 {
 	TRACE("XLiveSignout");
-	return 0;
+	if (pXOverlapped)
+	{
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = 1;											
+		pXOverlapped->dwCompletionContext = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+	}
+
+	return S_OK;
 }
 
 
@@ -1388,9 +834,14 @@ HRESULT WINAPI XLiveSignin (PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD 
 {
 	TRACE("XLiveSignin");
 
-
 	sys_ui = -1;
 
+	if (pOverlapped)
+	{
+		pOverlapped->InternalLow = ERROR_SUCCESS;
+		pOverlapped->InternalHigh = 0;
+		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+	}
 
 	return S_OK;
 }
@@ -1400,9 +851,7 @@ HRESULT WINAPI XLiveSignin (PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD 
 int WINAPI XLiveInitializeEx(void * pXii, DWORD dwVersion)
 {
 	InitInstance();
-
-
-	TRACE("XLiveInitializeEx  (a1 = %X, a2 = %X)", pXii, dwVersion);
+	TRACE("XLiveInitializeEx  (pXii = %X, dwVersion = %X)", pXii, dwVersion);
 	return 0;
 }
 
@@ -1419,7 +868,6 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 	if ((dwFlags & XSESSION_CREATE_HOST) > 0)
 	{
 		TRACE("XSessionCreate - XSESSION_CREATE_HOST");
-
 	}
 
 	if ((dwFlags & XSESSION_CREATE_USES_ARBITRATION) > 0)
@@ -1464,69 +912,15 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 
 	//sessionDetails.pSessionMembers = 0;
 
-
-
 	TRACE( "- handle = %X", *phEnum );
-
 
 	if( pOverlapped == 0 )
 		return ERROR_SUCCESS;
 
 
 	pOverlapped->InternalLow = ERROR_SUCCESS;
+	pOverlapped->InternalHigh = 0;
 	pOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-	if (H2Config_voice_chat) {
-		if (gameManager->isHost()) {
-			if (tsServer == NULL) {
-				//TODO: move into method
-				tsServer = new TSServer(true);
-				tsServer->setPort(H2Config_base_port + 7);
-				//startup the teamspeak client
-				tsClient = new TSClient(true);
-
-				//only player 1 gets to use voice, guests don't
-				WCHAR strw[32];
-				//needs to live on the heap for the duration of the entire process, cause we reuse ts clients to connect to different ts servers
-				char* strw3 = new char[16];
-				wsprintf(strw, L"%I64x", xFakeXuid[0]);
-				wcstombs(strw3, strw, 32);
-				tsClient->setNickname(strw3);
-
-			}
-			tsServer->startListening();
-
-			//set the local loopback address
-			char strAddr[] = "127.0.0.1";
-			DWORD ip = inet_addr(strAddr);
-			clientMachineAddress.S_un.S_addr = ip;
-
-			tsClient->setServerAddress(clientMachineAddress);
-			tsClient->setServerPort(H2Config_base_port + 7);
-			tsClient->startChatting();
-		}
-		else {
-			if (tsClient == NULL) {
-				//TODO: move into method
-				//startup the teamspeak client
-				tsClient = new TSClient(true);
-
-				//only player 1 gets to use voice, guests don't
-				WCHAR strw[8192];
-				//needs to live on the heap for the duration of the entire process, cause we reuse ts clients to connect to different ts servers
-				char* strw3 = new char[4096];
-				wsprintf(strw, L"%I64x", xFakeXuid[0]);
-				wcstombs(strw3, strw, 8192);
-				tsClient->setNickname(strw3);
-
-			}
-			tsClient->setServerAddress(join_game_xn.ina);
-			tsClient->setServerPort(ntohs(join_game_xn.wPortOnline) + 7);
-			tsClient->startChatting();
-		}
-	}
-
-	gameManager->start();
 
 	Check_Overlapped( pOverlapped );
 
@@ -1556,7 +950,7 @@ DWORD WINAPI XStringVerify( DWORD dwFlags, const CHAR *szLocale, DWORD dwNumStri
 	if( pOverlapped )
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
+		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 
 
 		Check_Overlapped( pOverlapped );
@@ -1634,17 +1028,17 @@ int WINAPI XOnlineCleanup ()
 // #5312: XFriendsCreateEnumerator
 DWORD WINAPI XFriendsCreateEnumerator (DWORD dwUserIndex, DWORD dwStartingIndex, DWORD dwFriendstoReturn, DWORD *pcbBuffer, HANDLE * phEnum)
 {
-		TRACE("XFriendsCreateEnumerator");
-    
-		if(pcbBuffer) *pcbBuffer = dwFriendstoReturn * sizeof(XCONTENT_DATA);
-		if(phEnum)
-		{
-			*phEnum = CreateMutex(NULL,NULL,NULL);
+	TRACE("XFriendsCreateEnumerator");
 
-			TRACE("- Handle = %X", *phEnum);
-		}
+	if (pcbBuffer) *pcbBuffer = dwFriendstoReturn * sizeof(XCONTENT_DATA);
+	if (phEnum)
+	{
+		*phEnum = CreateMutex(NULL, NULL, NULL);
 
-		return ERROR_SUCCESS;
+		TRACE("- Handle = %X", *phEnum);
+	}
+
+	return ERROR_SUCCESS;
 }
 
 
@@ -1773,29 +1167,59 @@ DWORD WINAPI XSessionMigrateHost (DWORD, DWORD, DWORD, DWORD)
 
 
 // #5324: XOnlineGetNatType
-XONLINE_NAT_TYPE WINAPI XOnlineGetNatType ()
+XONLINE_NAT_TYPE WINAPI XOnlineGetNatType()
 {
-    TRACE("XOnlineGetNatType");
-		TRACE("- NAT_OPEN" );
-    
-		
-		return XONLINE_NAT_OPEN ;
+    TRACE("XOnlineGetNatType - NAT_OPEN");
+	return XONLINE_NAT_OPEN ;
 }
 
 
 // #5325: XSessionLeaveLocal
-DWORD WINAPI XSessionLeaveLocal (DWORD, DWORD, DWORD, DWORD)
+DWORD WINAPI XSessionLeaveLocal (HANDLE hSession, DWORD dwUserCount, const DWORD *pdwUserIndexes, PXOVERLAPPED pXOverlapped)
 {
     TRACE("XSessionLeaveLocal");
-    return 0;
+
+	if (!hSession)
+		return ERROR_INVALID_PARAMETER;
+	if (!pdwUserIndexes)
+		return ERROR_INVALID_PARAMETER;
+
+	//TODO XSessionLeaveLocal
+	if (pXOverlapped) {
+		//asynchronous
+
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = ERROR_SUCCESS;
+		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
+
+		Check_Overlapped(pXOverlapped);
+
+		return ERROR_IO_PENDING;
+	}
+	else {
+		//synchronous
+		//return result;
+	}
+	return ERROR_SUCCESS;
 }
 
 
 // #5326: XSessionJoinRemote
-DWORD WINAPI XSessionJoinRemote (DWORD, DWORD, DWORD, DWORD, DWORD)
+DWORD WINAPI XSessionJoinRemote(HANDLE hSession, DWORD dwXuidCount, const XUID *pXuids, const BOOL *pfPrivateSlots, PXOVERLAPPED pXOverlapped)
 {
     TRACE("XSessionJoinRemote");
-    return 0;
+
+	if (pXOverlapped == 0)
+		return ERROR_SUCCESS;
+
+
+	pXOverlapped->InternalHigh = 0;
+	pXOverlapped->InternalLow = ERROR_SUCCESS;
+	pXOverlapped->dwExtendedError = ERROR_SUCCESS;
+
+	Check_Overlapped(pXOverlapped);
+
+	return ERROR_IO_PENDING;
 }
 
 
@@ -1810,9 +1234,6 @@ DWORD WINAPI XSessionJoinLocal( HANDLE hSession, DWORD dwUserCount, const DWORD 
 	{
 		TRACE( "- user %d = %d  (%s)", lcv+1, pdwUserIndexes[lcv], pfPrivateSlots[lcv] ? L"Private" : L"Public" );
 	}
-
-
-	num_players++;
 
 	if( pOverlapped == 0 )
 		return ERROR_SUCCESS;
@@ -1905,17 +1326,31 @@ int WINAPI XSessionFlushStats (DWORD, DWORD)
 
 
 // #5330: XSessionDelete
-DWORD WINAPI XSessionDelete (DWORD, DWORD)
+DWORD WINAPI XSessionDelete(HANDLE hSession, PXOVERLAPPED pXOverlapped)
 {
     TRACE("XSessionDelete");
-		if (tsClient != NULL) {
-			tsClient->disconnect();
-		}
-		if (tsServer != NULL) {
-			tsServer->destroyVirtualServer();
-		}
-		mapManager->cleanup();
-    return 0;
+	
+	DWORD ret = 0;
+	//TODO XSessionDelete
+	if (pXOverlapped) {
+		//asynchronous
+
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = ERROR_SUCCESS;
+		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
+
+		Check_Overlapped(pXOverlapped);
+
+		ret = ERROR_IO_PENDING;
+	}
+	else {
+		//synchronous
+	}
+	if (!hSession)
+		ret = ERROR_INVALID_PARAMETER;
+
+	
+	return ret;
 }
 
 
@@ -1939,10 +1374,33 @@ DWORD WINAPI XTitleServerCreateEnumerator (LPCSTR pszServerInfo, DWORD cItem, DW
 
 
 // #5336: XSessionLeaveRemote
-DWORD WINAPI XSessionLeaveRemote (DWORD, DWORD, DWORD, DWORD)
+DWORD WINAPI XSessionLeaveRemote (HANDLE hSession, DWORD dwXuidCount, const XUID *pXuids, XOVERLAPPED *pXOverlapped)
 {
     TRACE("XSessionLeaveRemote");
-    return 0;
+	if (!hSession)
+		return ERROR_INVALID_PARAMETER;
+	if (!dwXuidCount)
+		return ERROR_INVALID_PARAMETER;
+	if (!pXuids)
+		return ERROR_INVALID_PARAMETER;
+
+	//TODO XSessionLeaveRemote
+	if (pXOverlapped) {
+		//asynchronous
+
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = ERROR_SUCCESS;
+		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
+
+		Check_Overlapped(pXOverlapped);
+
+		return ERROR_IO_PENDING;
+	}
+	else {
+		//synchronous
+		//return result;
+	}
+	return ERROR_SUCCESS;
 }
 
 // #5338: XPresenceSubscribe
@@ -2045,8 +1503,6 @@ DWORD WINAPI XStorageDownloadToMemory( DWORD dwUserIndex, const WCHAR *wszServer
 	pResults->dwBytesTotal = size;
 	memcpy( &pResults->xuidOwner, &xFakeXuid[dwUserIndex], sizeof(xFakeXuid[dwUserIndex]) );
 	//pResults->ftCreated;
-
-
 
 
 	if( pOverlapped )
@@ -2899,39 +2355,30 @@ DWORD WINAPI XOnlineGetServiceInfo( int, int )
 // 5028: ??
 DWORD WINAPI XLiveLoadLibraryEx(LPCWSTR libFileName, HINSTANCE *a2, DWORD dwFlags)
 {
-	TRACE("XLiveLoadLibraryEx (?? - FIXME)  (libFileName = %s, a2 = %X, flags = %X)",
+	TRACE("XLiveLoadLibraryEx (libFileName = %s, a2 = %X, flags = %X)",
 		libFileName, a2, dwFlags);
 
 	HINSTANCE hInstance = LoadLibraryExW(libFileName, NULL, dwFlags);
 
 	if (!hInstance)
-		return 0x80070057;
+		return HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);
 
 	*a2 = hInstance;
 	return 0;
 }
 
-
-
-
-// 5238: ??
-DWORD WINAPI XLocatorCreateKey( XNKID* pxnkid, XNKEY* xnkey )
-{
-  TRACE("XLocatorCreateKey  (a1 = %X, a2 = %X)",
-		pxnkid, xnkey );
-
-	XNetCreateKey(pxnkid, xnkey);
-	// GFWL offline
-	return S_OK;
-}
-
-
 // 5257: ??
-DWORD WINAPI XLiveManageCredentials( DWORD a1, DWORD a2, DWORD a3, DWORD dwData )
+DWORD WINAPI XLiveManageCredentials(LPCWSTR lpszLiveIdName, LPCWSTR lpszLiveIdPassword, DWORD dwCredFlags, PXOVERLAPPED pXOverlapped)
 {
-  TRACE("XLiveManageCredentials  (*** checkme ***) (a1 = %X, a2 = %X, a3 = %X, dwData = %X)",
-		a1, a2, a3, dwData);
+	TRACE("XLiveManageCredentials (lpszLiveIdName = %s, lpszLiveIdPassword = %s, dwCredFlags = %X, pXOverlapped = %X)",
+		lpszLiveIdName, lpszLiveIdPassword, dwCredFlags, pXOverlapped);
 
+	if (pXOverlapped)
+	{
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = ERROR_SUCCESS;
+		pXOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+	}
 
 	// not done - error now
 	return S_OK;
@@ -2987,15 +2434,28 @@ DWORD WINAPI XStorageDownloadToMemoryGetProgress( DWORD a1, DWORD a2, DWORD a3, 
 
 
 // 5308
-DWORD WINAPI XStorageDelete( DWORD a1, DWORD a2, DWORD a3 )
+DWORD WINAPI XStorageDelete(DWORD dwUserIndex, const WCHAR *wszServerPath, XOVERLAPPED *pXOverlapped)
 {
-  TRACE("XStorageDelete  (*** checkme ***) (a1 = %X, a2 = %X, a3 = %X)",
-		a1, a2, a3);
+	TRACE("XStorageDelete  (*** checkme ***) (a1 = %X, a2 = %s, a3 = 0x%X)",
+		dwUserIndex, wszServerPath, pXOverlapped);
 
+	//TODO XStorageDelete
+	if (pXOverlapped) {
+		//asynchronous
 
-	// not done - error now
-	SetLastError( 0x57 );
-	return 0x57;
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = ERROR_SUCCESS;
+		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
+
+		Check_Overlapped(pXOverlapped);
+
+		return ERROR_IO_PENDING;
+	}
+	else {
+		//synchronous
+		//return result;
+	}
+	return ERROR_SUCCESS;
 }
 
 

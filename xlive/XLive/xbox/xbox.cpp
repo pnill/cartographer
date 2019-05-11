@@ -93,8 +93,22 @@ int WINAPI XShowFriendRequestUI(DWORD dwUserIndex, XUID xuidUser)
 // #5212: XShowCustomPlayerListUI
 DWORD WINAPI XShowCustomPlayerListUI(DWORD dwUserIndex, DWORD dwFlags, LPCWSTR pzsTitle, LPCWSTR pszDescription, CONST BYTE *pbImage, DWORD cbImage, CONST XPLAYERLIST_USER *rgPlayers, DWORD cPlayers, CONST XPLAYERLIST_BUTTON *pXButton, CONST XPLAYERLIST_BUTTON *pYButton, XPLAYERLIST_RESULT *pResult, XOVERLAPPED *pOverlapped)
 {
-	TRACE("XShowCustomPlayerListUI");
-	return 1;
+	if (pOverlapped) {
+		//asynchronous
+
+		pOverlapped->InternalLow = ERROR_SUCCESS;
+		pOverlapped->InternalHigh = ERROR_SUCCESS;
+		pOverlapped->dwExtendedError = ERROR_SUCCESS;
+
+		Check_Overlapped(pOverlapped);
+
+		return ERROR_IO_PENDING;
+	}
+	else {
+		//synchronous
+		//return result;
+	}
+	return ERROR_SUCCESS;
 }
 
 HWND hGameWnd = NULL;

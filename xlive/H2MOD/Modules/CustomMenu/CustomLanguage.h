@@ -1,6 +1,6 @@
 #pragma once
-#include <map>
 #include <vector>
+#include <unordered_map>
 
 void initGSCustomLanguage();
 void deinitGSCustomLanguage();
@@ -21,7 +21,7 @@ typedef struct {
 	bool other;
 	char* lang_name;
 	char* font_table_filename;
-	std::map<int, std::map<int, char*>>* label_map;
+	std::unordered_map<int, std::unordered_map<int, char*>>* label_map;
 } custom_language;
 
 extern std::vector<custom_language*> custom_languages;

@@ -12,7 +12,7 @@ struct tag_block
 	{
 		if (this->data != NONE)
 		{
-			BYTE *tag_data_table = *reinterpret_cast<BYTE**>(H2BaseAddr+0x482290);
+			BYTE *tag_data_table = *reinterpret_cast<BYTE**>(H2BaseAddr + (H2IsDediServer ? 0x4A6438 : 0x482290));
 			if (LOG_CHECK(tag_data_table))
 				return reinterpret_cast<T*>(&tag_data_table[this->data]);
 		}

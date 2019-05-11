@@ -51,10 +51,10 @@ void HeadHunter::PickupSkull(XUID player, DatumIndex SkullDatum)
 		//typedef void(__stdcall *update_player_score)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
 		//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
 
-			DatumIndex PlayerDatum = variant_player->GetPlayerDatum(player);
-			pupdate_player_score((void*)0x3000595C, PlayerDatum.Index, 0, 1, -1, 0);
-			call_hs_object_destroy_datum(SkullDatum); 
-			//pupdate_player_score()
+		DatumIndex PlayerDatum = variant_player->GetPlayerDatum(player);
+		pupdate_player_score((void*)(h2mod->Server ? 0x30005508 : 0x3000595C), PlayerDatum.Index, 0, 1, -1, 0);
+		call_hs_object_destroy_datum(SkullDatum);
+		//pupdate_player_score()
 	}
 }
 
@@ -81,7 +81,7 @@ bool HeadHunterHandler::SetInteractedObject(DatumIndex object_datum)
 		return true;
 	}
 	else
-	{ 
+	{
 		this->object_interaction = NULL;
 		return false;
 	}
@@ -104,7 +104,7 @@ DatumIndex HeadHunterHandler::GetDeadPlayer()
 void HeadHunterHandler::SetPlayerIndex(DatumIndex player_datum)
 {
 	XUID player = variant_player->GetXUID(player_datum, true);
-	variant_player->SetPlayerDatum(player,player_datum);
+	variant_player->SetPlayerDatum(player, player_datum);
 
 	SetXUID(player);
 }
@@ -144,7 +144,7 @@ void HeadHunterInitializer::onDedi()
 
 void HeadHunterDeinitializer::onClient()
 {
-	
+
 }
 
 void HeadHunterDeinitializer::onPeerHost()
@@ -204,7 +204,7 @@ void HeadHunterDeathHandler::onDedi()
 
 void HeadHunterKillHandler::onClient()
 {
-	
+
 }
 
 void HeadHunterKillHandler::onPeerHost()

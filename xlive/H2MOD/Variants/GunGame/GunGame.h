@@ -69,6 +69,7 @@ public:
 	static void levelUpServer(int PlayerIndex);
 	static void sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset);
 	static void resetPlayerLevels();
+	static void setGameScore();
 
 	static std::unordered_map<int, int> level_weapon;
 	static std::unordered_map<std::wstring, int> gungamePlayers;

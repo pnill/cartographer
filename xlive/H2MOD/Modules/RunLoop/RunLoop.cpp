@@ -8,7 +8,7 @@
 #include <winsock.h>
 #include "Globals.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "XLive\UserManagement\CUser.h"
 
@@ -181,19 +181,6 @@ void hotkeyFuncTest() {
 	addDebugText(moaartexxt);
 	
 	return;
-
-	extern CUserManagement User;
-	if (User.LocalUserLoggedIn()) {
-		User.UnregisterLocal();
-	}
-	else {
-		char H2Config_login_token[33] = { "" };
-		addDebugText("keypress send");
-		User.RegisterLocalRequest(H2Config_login_token, 0);
-		Sleep(2000);
-		addDebugText("get");
-		User.RegisterLocalRequest(H2Config_login_token, 1);
-	}
 }
 
 
@@ -275,9 +262,6 @@ int prevPartyPrivacy = 0;
 bool halo2WindowExists = false;
 bool halo2ServerOnce1 = false;
 
-std::string replacementText = "Create a new network game.\r\nActive Players: %d\r\nActive Games: %d\r\nTotal Games: %d";
-std::string replacementText2 = "Join a game of Halo 2.\r\nActive Players: %d\r\nActive Games: %d\r\nTotal Games: %d";
-
 void GSMainLoop() {
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
@@ -320,7 +304,7 @@ void GSMainLoop() {
 	else {
 		partyPrivacy = *(int*)((BYTE*)H2BaseAddr + 0x50A398);
 	}
-	if (prevPartyPrivacy > 0 && partyPrivacy == 0 && gameManager->isHost()) {
+	if (prevPartyPrivacy > 0 && partyPrivacy == 0 && NetworkSession::localPeerIsSessionHost()) {
 		pushHostLobby();
 	}
 	prevPartyPrivacy = partyPrivacy;
@@ -338,37 +322,6 @@ void GSMainLoop() {
 				hotkeyFunc[i]();
 			}
 		}
-
-		if (replacedNetworkNormalTextWidget == NULL) {
-			replacedNetworkNormalTextWidget = new char[128];
-		}
-		if (replacedNetworkNormalTextWidget2 == NULL) {
-			replacedNetworkNormalTextWidget2 = new char[128];
-		}
-
-		int allPlayersCount = 0;
-		int allGamesCount = 0;
-		int allActiveGamesCount = 0;
-		//if the data is set
-		if (*(DWORD*)(h2mod->GetBase() + 0x96743C) + (0xAA8 * 0)) {
-			for (int i = 0; i < 200; i++) {
-				DWORD networkListGameDataPointer = *(DWORD*)(h2mod->GetBase() + 0x96743C) + (0xAA8 * i);
-				wchar_t* gameName = (wchar_t*)(networkListGameDataPointer + 0x88);
-				if (gameName != NULL && wcslen(gameName) > 0) {
-					BYTE playerCount = *(BYTE*)(networkListGameDataPointer + 0x88 + 0xD4);
-					if (playerCount > 0) {
-						allActiveGamesCount += 1;
-					}
-					allPlayersCount += playerCount;
-					allGamesCount += 1;
-					//TRACE_GAME("Network List Game %s, Player Count %d", gameName, playerCount);
-				}
-			}
-		}
-		//TODO: when debug mode is on, gets laggy?
-		sprintf(replacedNetworkNormalTextWidget, replacementText.c_str(), allPlayersCount, allActiveGamesCount, allGamesCount);
-		sprintf(replacedNetworkNormalTextWidget2, replacementText2.c_str(), allPlayersCount, allActiveGamesCount, allGamesCount);
-
 	}
 
 	//advLobbySettings->loop();
@@ -379,6 +332,8 @@ signed int(*sub_287a1)();
 static signed int HookedClientRandFunc() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
+
+	mapManager->leaveSessionIfAFK();
 	
 	signed int result = sub_287a1();
 	return result;

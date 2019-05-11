@@ -63,8 +63,8 @@ void InitInstance()
 		else
 			TRACE("H2MOD Failed to intialize");
 
-		extern GunGame* gunGame;
-		gunGame->readWeaponLevels();
+		//extern GunGame* gunGame;
+		//gunGame->readWeaponLevels();
 
 		//extern void LoadAchievements();
 		//LoadAchievements();

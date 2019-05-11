@@ -1,5 +1,6 @@
 #include "Globals.h"
-#include <H2MOD\protobuf\h2mod.pb.h>
+#include "H2MOD\protobuf\h2mod.pb.h"
+#include "..\..\Modules\Networking\Networking.h"
 
 static int weapon_one = 0;
 static int weapon_two = 0;
@@ -134,6 +135,13 @@ void GunGame::resetPlayerLevels() {
 	gungamePlayers.clear();
 }
 
+void GunGame::setGameScore() {
+	if (h2mod->Server) 
+		*(int*)(0x300015F4) = 17;
+	else 
+		*(int*)(0x30001A48) = 17;
+}
+
 void GunGame::spawnPlayerServer(int playerIndex) {
 	wchar_t* pName = h2mod->get_player_name_from_index(playerIndex);
 	wchar_t* localName = h2mod->get_local_player_name();
@@ -263,20 +271,13 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
 		}
 		TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex=%d, peerIndex=%d", pIndex, players->getPeerIndex(pIndex));
 
-		H2ModPacket teampak;
-		teampak.set_type(H2ModPacket_Type_set_unit_grenades);
+		s_unit_grenades data;
+		memset(&data, NULL, sizeof(data));
 
-		h2mod_set_grenade *set_grenade = teampak.mutable_set_grenade();
-		set_grenade->set_count(count);
-
-		//protobuf has some weird bug where passing 0 has type in the current packet definition for set_grenade
-		//completely breaks on the serialization side, https://groups.google.com/forum/#!topic/protobuf/JsougkaRcw4
-		//no idea why, so we always add 1 to value till I can work with protobuf developers and figure out why
-		set_grenade->set_type(type + 1);
-		//send over player index
-		set_grenade->set_pindex(pIndex);
-
-		//network->send_h2mod_packet_player(players->getPeerIndex(pIndex), teampak);
+		data.type = type;
+		data.count = count;
+		data.pindex = pIndex;
+		CustomPackets::sendUnitGrenadesPacket(NetworkSession::getCurrentNetworkSession(), players->getPeerIndex(pIndex), &data);
 	}
 }
 
@@ -294,16 +295,19 @@ void GunGameDeinitializer::onPeerHost() {
 
 void GunGameInitializer::onClient() {
 	GunGame::initWeaponLevels();
+	GunGame::setGameScore();
 }
 
 void GunGameInitializer::onDedi() {
 	GunGame::initWeaponLevels();
 	GunGame::resetPlayerLevels();
+	GunGame::setGameScore();
 }
 
 void GunGameInitializer::onPeerHost() {
 	GunGame::initWeaponLevels();
 	GunGame::resetPlayerLevels();
+	GunGame::setGameScore();
 	//TODO: is this really necessary (from old code)?
 	//init peer host gun game level 
 	GunGame::gungamePlayers[players->getPlayerName(0)] = 0;

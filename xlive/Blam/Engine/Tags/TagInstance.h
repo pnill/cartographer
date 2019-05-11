@@ -3,6 +3,7 @@
 #include "Blam\Shared\SharedDefinitions.h"
 
 extern DWORD H2BaseAddr;
+extern bool H2IsDediServer;
 using namespace Blam::SharedDefinitions;
 namespace Blam
 {
@@ -22,7 +23,7 @@ namespace Blam
 				{
 					if (tag_index.Index != -1)
 					{
-						DWORD mapMemBase = *(DWORD*)((BYTE*)H2BaseAddr + 0x47CD54);
+						DWORD mapMemBase = *(DWORD*)((BYTE*)H2BaseAddr + (H2IsDediServer ? 0x4A29BC : 0x47CD54));
 						return   (void*)(mapMemBase + (BYTE*)this->offset);
 					}
 					return (void*)-1;

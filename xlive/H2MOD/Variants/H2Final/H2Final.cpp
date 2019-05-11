@@ -1,4 +1,5 @@
 #include "Globals.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 /*
 Todo:
@@ -87,7 +88,7 @@ signed int __stdcall GetSecondsUntilEquipmentRespawn(int equipment_index)
 int64_t originalGetSecondsUntilEquipmentRespawnFunctionData;
 void EnableStaticWeaponSpawns()
 {
-	if (gameManager->isHost() || h2mod->Server)
+	if (NetworkSession::localPeerIsSessionHost() || h2mod->Server)
 	{
 		originalGetSecondsUntilEquipmentRespawnFunctionData = *(int64_t*)(base_address + 0x6A8C4);
 		pget_spawn_time = (get_spawn_time)DetourFunc((BYTE*)base_address + 0x6A8C4, (BYTE*)GetSecondsUntilEquipmentRespawn, 5);
@@ -97,7 +98,7 @@ void EnableStaticWeaponSpawns()
 
 void DisableStaticWeaponSpawns()
 {
-	if (gameManager->isHost() || h2mod->Server)
+	if (NetworkSession::localPeerIsSessionHost() || h2mod->Server)
 	{
 		VirtualProtect((LPVOID)(base_address + 0x6A8C4), 8, PAGE_EXECUTE_READWRITE, &dwBack);
 		*(int64_t*)(base_address + 0x6A8C4) = originalGetSecondsUntilEquipmentRespawnFunctionData;
@@ -115,11 +116,10 @@ int PlayerWeaponSwitched(int a1, int a2, int a3)
 {
 	if (isEnabled)
 	{
-		int game_state_objects_header = *(DWORD*)(base_address + 0x4E461C);
-		int v3 = *(DWORD*)(*(DWORD*)(game_state_objects_header + 0x44) + 12 * (short)a1 + 8);
+		int v3 = *(DWORD*)(*(DWORD*)((char*)game_state_objects_header + 0x44) + 12 * (a1 & 0xFFFF) + 8);
 		int global_tag_header = *(DWORD*)(base_address + 0x47CD50);
 		int weap_tag_offset = *(DWORD*)(base_address + 0x47CD54) + *(DWORD*)(0x10 * (*(DWORD*)v3 & 0xFFFF) + global_tag_header + 8);
-		int player_datum = *(DWORD*)(*(DWORD*)(game_state_objects_header + 0x44) + 12 * (a2 & 0xFFFF) + 8);
+		int player_datum = *(DWORD*)(*(DWORD*)((char*)game_state_objects_header + 0x44) + 12 * (a2 & 0xFFFF) + 8);
 		*(float*)(player_datum + 0x2CC) = *(float*)(weap_tag_offset + 0x280);
 	}
 	return pplayer_weapon_switched(a1, a2, a3);

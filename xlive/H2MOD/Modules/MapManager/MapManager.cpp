@@ -3,8 +3,12 @@
 #include <fstream>
 #include <Mswsock.h>
 #include <WS2tcpip.h>
+#include <chrono>
 #include "H2MOD\Modules\Config\Config.h"
 #include <curl/curl.h>
+#include "XLive/UserManagement/CUser.h"
+#include "..\Networking\Networking.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 #pragma comment (lib, "mswsock.lib")
 
@@ -45,10 +49,139 @@ std::wstring CUSTOM_MAP = L"Custom Map";
 wchar_t EMPTY_UNICODE_STR = '\0';
 std::string EMPTY_STR("");
 
+bool mapDownloadCountdown = false;
+auto promptOpenTime = std::chrono::system_clock::now();
+int downloadPercentage = 0;
+
+void MapManager::leaveSessionIfAFK()
+{
+	if (mapDownloadCountdown)
+	{
+		long long duraton = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - promptOpenTime).count();
+		if (duraton / 1000 > 20) {
+			h2mod->exit_game();
+			mapDownloadCountdown = false;
+		}
+	}
+}
+
 /**
-* Constructs the map manager for client/servers
+* Download map callback
 */
-MapManager::MapManager() {}
+char __cdecl handle_map_download_callback()
+{
+	mapDownloadCountdown = false;
+	downloadPercentage = 0;
+
+	auto mapDownload = []()
+	{
+		DWORD* mapDownloadStatus = reinterpret_cast<DWORD*>(h2mod->GetBase() + 0x422570);
+
+		// set the game to downloading map state
+		*mapDownloadStatus = -1;
+
+		if (!mapManager->getMapFilenameToDownload().empty())
+		{
+			TRACE_GAME_N("[h2mod-network] map file name from membership packet %s", mapManager->getMapFilenameToDownload().c_str());
+			if (!mapManager->hasCustomMap(mapManager->getMapFilenameToDownload())) {
+				//TODO: set map filesize
+				//TODO: if downloading from repo files, try p2p
+				if (!mapManager->downloadFromRepo(mapManager->getMapFilenameToDownload()))
+					h2mod->exit_game(); // download has failed
+			}
+			else {
+				TRACE_GAME_N("[h2mod-network] already has map %s", mapManager->getMapFilenameToDownload().c_str());
+			}
+			mapManager->setMapFileNameToDownload("");
+		}
+		else 
+		{
+			// no map filename (probably packet hasn't been received)
+			h2mod->exit_game();
+		}
+
+		// set the game to map is loaded state
+		*mapDownloadStatus = 0;
+	};
+
+	if (NetworkSession::getCurrentNetworkSession()->local_session_state != 0)
+		std::thread(mapDownload).detach();
+
+	return 1;
+}
+
+void* leavegame_callback_ptr;
+char leavegame_callback()
+{
+	mapDownloadCountdown = false;
+	char(__cdecl*ptr)() = (char(__cdecl*)())(leavegame_callback_ptr);
+	return ptr();
+}
+
+/**
+* Menu constructor hook
+*/
+void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16 a4, int map_download_callback, int leave_game_callback, int a7, int a8, int a9, int a10)
+{
+	typedef void(__cdecl* map_downloading_menu_constructor)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6, int a7, int a8, int a9, int a10);
+	auto p_map_downloading_menu_constructor = (map_downloading_menu_constructor)(h2mod->GetBase() + 0x20E2E0);
+
+	mapDownloadCountdown = true;
+	promptOpenTime = std::chrono::system_clock::now();
+	CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
+	leavegame_callback_ptr = (void*)leave_game_callback;
+	p_map_downloading_menu_constructor(a1, a2, a3, a4, reinterpret_cast<int>(handle_map_download_callback), leave_game_callback, a7, a8, a9, a10);
+}
+
+int __cdecl get_total_map_downloading_percentage()
+{
+	return downloadPercentage;
+}
+
+wchar_t* receiving_map_wstr[] = {
+	L"You are receiving the map from %s. \r\nPlease wait...%i%%" ,
+};
+wchar_t* get_receiving_map_string()
+{ 
+	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)h2mod->GetBase() + 0x381fd);
+	wchar_t** str_array = (wchar_t**)(h2mod->GetBase() + 0x46575C);
+
+	if (get_default_game_language() == 0) // check if english
+		return receiving_map_wstr[0];
+
+	return str_array[get_default_game_language()];
+}
+
+wchar_t repo_wstr[] = L"repository";
+void get_map_download_source_str(int a1, wchar_t* buffer)
+{	
+	if (buffer != NULL)
+		wcsncpy_s(buffer, 512, repo_wstr, -1);
+}
+
+/**
+* Makes changes to game functionality
+*/
+void MapManager::applyGamePatches() {
+
+	if (!h2mod->Server) {
+
+		BYTE jmp[1] = { 0xEB };
+
+		WriteBytes(h2mod->GetBase() + 0x215A9E, jmp, 1); /* Allow map download in network */
+		WriteBytes(h2mod->GetBase() + 0x215AC9, jmp, 1); /* Disable "Match has begun" bullshit */
+		PatchCall(h2mod->GetBase() + 0x244A4A, display_map_downloading_menu); /* Redirect the menu constructor to our code to replace the game's map downloading code callback */
+
+		// code below is for percentage display
+		PatchCall(h2mod->GetBase() + 0x244B77, get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
+		PatchCall(h2mod->GetBase() + 0x22EE41, get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
+		PatchCall(h2mod->GetBase() + 0x244B8F, get_map_download_source_str);
+		PatchCall(h2mod->GetBase() + 0x244B9D, get_receiving_map_string);
+	}
+
+	// disables game's map downloading implementation
+	NopFill<5>(h2mod->GetBase() + (h2mod->Server ? 0x1A917F : 0x1B5421));
+}
 
 std::string MapManager::getMapFilenameToDownload()
 {
@@ -102,9 +235,9 @@ std::wstring MapManager::getMapName() {
 
 	DWORD dwBack;
 	//set r/w access on string so we don't have any issues when we do the implicit copy below
-	VirtualProtect((LPVOID)currentMapName, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	VirtualProtect((LPVOID)currentMapName, 4, PAGE_READWRITE, &dwBack);
 	std::wstring ucurrentMapName(currentMapName);
-	VirtualProtect((LPVOID)currentMapName, 4, dwBack, NULL);
+	VirtualProtect((LPVOID)currentMapName, 4, dwBack, &dwBack);
 
 	return ucurrentMapName;
 }
@@ -125,10 +258,10 @@ bool MapManager::hasCustomMap(std::string mapName) {
 bool MapManager::hasCustomMap(std::wstring mapName) {
 	DWORD dwBack;
 	wchar_t* mapsDirectory = (wchar_t*)(h2mod->GetBase() + 0x482D70 + 0x2423C);
-	VirtualProtect(mapsDirectory, 4, PAGE_EXECUTE_READ, &dwBack);
 
+	VirtualProtect(mapsDirectory, 4, PAGE_READWRITE, &dwBack);
 	std::wstring mapFileName(mapsDirectory);
-	VirtualProtect(mapsDirectory, 4, dwBack, NULL);
+	VirtualProtect(mapsDirectory, 4, dwBack, &dwBack);
 
 	mapFileName += mapName;
 	std::ifstream file(mapFileName.c_str());
@@ -141,8 +274,6 @@ void swap(DWORD*& a, DWORD*& b)
 	a = b;
 	b = c;
 }
-
-DWORD *customMapBuffer = new DWORD[6000];
 
 /**
 * Actually calls the real map reload function in halo2.exe
@@ -195,43 +326,26 @@ const char* MapManager::getCustomLobbyMessage() {
 	return this->customLobbyMessage;
 }
 
-std::string MapManager::getMapFilename() {
-	//0x30 (difference from start of maps object to first custom map)
-	//0xB90 (difference between each custom map name)
-	//0x960 (difference between custom map name and its file path
-	DWORD offset;
-	//move to first map
-	DWORD currentMapNameOffset;
-	if (h2mod->Server) {
-		offset = 0x4A70D8;
-		//H2Server.exe+5349B4
-		//H2Server.exe+535C64 (another offset to use if the above fails for whatever reason)
-		currentMapNameOffset = 0x5349B4;
-	}
-	else {
-		offset = 0x482D70;
-		currentMapNameOffset = 0x97737C;
-	}
+void MapManager::getMapFilename(std::wstring& buffer)
+{
+	network_session* session = nullptr;
+	wchar_t map_file_location[256];
 
-	//TODO: one day increase map limit (somehow)
-	for (int i = 0; i <= 50; i++) {
-		wchar_t* mapName = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + (i * 0xB90)));
-		wchar_t* mapPath = (wchar_t*)((DWORD*)(h2mod->GetBase() + offset + 0x30 + ((i * 0xB90) + 0x960)));
-		if (mapName == NULL || *mapName == L'\0') {
-			//skip empty map names
-			continue;
-		}
-		std::wstring unicodeMapFilename(mapPath);
-		std::string nonUnicodeCustomMapFilename(unicodeMapFilename.begin(), unicodeMapFilename.end());
-		std::size_t offset = nonUnicodeCustomMapFilename.find_last_of("\\");
-		std::size_t extOffset = nonUnicodeCustomMapFilename.find_last_not_of(mapExt);
-		std::string nonUnicodeMapFileName = nonUnicodeCustomMapFilename.substr(offset + 1, extOffset);
-		if (!nonUnicodeMapFileName.empty() && wcscmp(this->getMapName().c_str(), mapName) == 0) {
+	// we want this to work in-game too
+	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::getCurrentNetworkSession(&session))
+	{
+		memset(map_file_location, NULL, sizeof(map_file_location));
+		NetworkSession::getMapFileLocation(session, map_file_location, sizeof(map_file_location));
+
+		std::wstring unicodeMapFileLocation(map_file_location);
+		std::size_t mapNameOffset = unicodeMapFileLocation.find_last_of(L"\\");
+		std::size_t mapNameOffsetEnd = unicodeMapFileLocation.find_last_not_of(L'.');
+		std::wstring filename = unicodeMapFileLocation.substr(mapNameOffset + 1, mapNameOffsetEnd);
+		if (!filename.empty()) {
 			//if the filename exists and the current map english name is equal to the iterated map name
-			return nonUnicodeMapFileName;
+			buffer = filename;
 		}
 	}
-	return "";
 }
 
 /**
@@ -274,54 +388,12 @@ void MapManager::cleanup() {
 	this->downloadedMaps.clear();
 }
 
-void MapManager::sendMapInfoPacket()
-{
-#ifdef _DEBUG
-	int tmpFlagOrig = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
-	int tmpFlag = tmpFlagOrig;
-	tmpFlag &= 0xFFFFFFFF ^ (_CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHECK_DF);
-	_CrtSetDbgFlag(tmpFlag);
-#endif
-
-	H2ModPacket teampak;
-	teampak.set_type(H2ModPacket_Type_map_info_request);
-
-	h2mod_map_info* map_info = teampak.mutable_map_info();
-	//TODO: check if its empty before sending
-	std::string mapFilenameStr = this->getMapFilename();
-	if (mapFilenameStr.empty()) {
-		TRACE_GAME_N("[h2mod-mapmanager] custom map filename missing");
-		return;
-	}
-	const char* mapFilename = mapFilenameStr.c_str();
-	TRACE_GAME_N("[h2mod-mapmanager] custom map name being sent %s", mapFilename);
-	map_info->set_mapfilename(mapFilenameStr);
-	//TODO: send over size so p2p can work easier
-	map_info->set_mapsize(0);
-
-//	network->send_h2mod_packet(teampak);
-
-#ifdef _DEBUG
-	_CrtSetDbgFlag(tmpFlagOrig);
-#endif
-}
-
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 	return fwrite(ptr, size, nmemb, stream);
 }
 
 static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
-	if (mapManager->precalculatedDownloadPercentageStrings.empty()) {
-		for (int i = 0; i <= 100; i++) {
-			std::string downloadMsg;
-			downloadMsg = DOWNLOAD_MAP_PERCENTAGE_PREFIX;
-			downloadMsg += std::to_string(i);
-			downloadMsg += DOWNLOAD_MAP_PERCENTAGE_CHAR;
-			mapManager->precalculatedDownloadPercentageStrings[i] = downloadMsg;
-		}
-	}
-	int downloadPercentage = ((double)dlnow / (double)dltotal) * 100;
-	mapManager->setCustomLobbyMessage(mapManager->precalculatedDownloadPercentageStrings[downloadPercentage].c_str());
+	downloadPercentage = ((double)dlnow / (double)dltotal) * 100;
 	return 0;
 }
 
@@ -343,7 +415,7 @@ bool MapManager::downloadFromRepo(std::string mapFilename) {
 	VirtualProtect(mapsDirectory, 4, PAGE_EXECUTE_READ, &dwBack);
 
 	std::wstring mapFileName(mapsDirectory);
-	VirtualProtect(mapsDirectory, 4, dwBack, NULL);
+	VirtualProtect(mapsDirectory, 4, dwBack, &dwBack);
 	std::string nonUnicodeMapFilePath(mapFileName.begin(), mapFileName.end());
 	nonUnicodeMapFilePath += mapFilename;
 
@@ -421,8 +493,8 @@ bool MapManager::downloadFromHost() {
 		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
-		std::string addr = inet_ntoa(join_game_xn.ina);
-		std::string prt = std::to_string(ntohs(join_game_xn.wPortOnline) + 9);
+		std::string addr = inet_ntoa(userManager.game_host_xn.ina);
+		std::string prt = std::to_string(ntohs(userManager.game_host_xn.wPortOnline) + 9);
 		if (H2Config_debug_log)
 			TRACE_GAME_N("[h2mod-mapmanager] Client map dl, addr=%s, port=%s", addr.c_str(), prt.c_str());
 		// Resolve the server address and port

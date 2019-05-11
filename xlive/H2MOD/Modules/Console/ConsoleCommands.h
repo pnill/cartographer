@@ -9,6 +9,7 @@ public:
 	void display(std::string output);
 	std::vector<std::string> prevCommands;
 	BOOL handleInput(WPARAM wp);
+	BOOL consoleOpen() { return this->console; };
 
 	std::string command;
 	int caretPos;

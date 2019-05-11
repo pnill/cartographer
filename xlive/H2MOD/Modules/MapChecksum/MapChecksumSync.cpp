@@ -1,6 +1,8 @@
 #include "MapChecksumSync.h"
 #include <unordered_set>
 #include "Globals.h"
+#include "Util/hash.h"
+#include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
 
 extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;
@@ -230,9 +232,9 @@ void MapChecksumSync::RuntimeError(error_id type)
 
 void MapChecksumSync::SendState()
 {
-	TRACE_FUNC_N("gameManager->isHost() %d", gameManager->isHost());
+	TRACE_FUNC_N("NetworkSession::localPeerIsSessionHost() %d", NetworkSession::localPeerIsSessionHost());
 	TRACE_FUNC_N("h2mod->GetEngineType() %d", h2mod->GetEngineType());
-	if (!gameManager->isHost())
+	if (!NetworkSession::localPeerIsSessionHost())
 		return;
 	H2ModPacket packet;
 	packet.set_type(H2ModPacket::Type::H2ModPacket_Type_map_checksum_state_sync);
@@ -254,7 +256,7 @@ void MapChecksumSync::SendState()
 
 void MapChecksumSync::HandlePacket(const H2ModPacket &packet)
 {
-	if (LOG_CHECK(packet.type() == H2ModPacket::Type::H2ModPacket_Type_map_checksum_state_sync && !gameManager->isHost() && packet.has_checksum()))
+	if (LOG_CHECK(packet.type() == H2ModPacket::Type::H2ModPacket_Type_map_checksum_state_sync && !NetworkSession::localPeerIsSessionHost() && packet.has_checksum()))
 	{
 		CHECKSUM_LOG("Processing packet");
 		auto checksum_packet = packet.checksum();

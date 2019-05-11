@@ -1,149 +1,63 @@
-#include "CUser.h"
 #include "stdafx.h"
-#include "XLive\UserManagement\protobuf\packet.pb.h"
+#include "CUser.h"
 #include <time.h>
 #include <sstream>
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
+#include "XLive\UserManagement\protobuf\packet.pb.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
-extern SOCKET boundsock;
-
-extern CHAR g_szUserName[4][16];
 extern XUID xFakeXuid[4];
+extern CHAR g_szUserName[4][16];
 
+CUserManagement userManager;
+const DWORD annoyance_factor = 0x11223344;
 
-CUser Users[16];
+/*
+NOTE:
+	Check inside Tweaks.cpp for removeXNetSecurity
+*/
 
-enum
+extern SOCKET game_network_message_gateway_socket;
+int CUserManagement::sendSecurePacket(SOCKET s, short to_port)
 {
-	_get_xnaddr,
-	_get_secureaddr
-};
-
-ULONG CUserManagement::GetSecureFromXN(XNADDR* pxna)
-{
-	TRACE("CUserManagement::GetSecureFromXN()");
-	ULONG secure;
-	sockaddr_in RecvAddr;
-
-	RecvAddr.sin_family = AF_INET;
-	RecvAddr.sin_port = htons(H2Config_master_port_login);
-	RecvAddr.sin_addr.s_addr = H2Config_master_ip;
-
-	char RecvBuf[2048];
-	int RecvResult;
-
-	DWORD dwTime = 20;
-
-
-	sockaddr_in SenderAddr;
-	int SenderAddrSize = sizeof(SenderAddr);
-
-	if (setsockopt(boundsock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&dwTime, sizeof(dwTime)) < 0)
+	if (!NetworkSession::localPeerIsSessionHost())
 	{
-		TRACE("Socket Error on register request");
+		SOCKADDR_IN sendToAddr;
+		short port = to_port == 1000 ? userManager.game_host_xn.wPortOnline : ntohs(htons(userManager.game_host_xn.wPortOnline) + 1);
+		if (userManager.game_host_xn.ina.s_addr != H2Config_ip_wan)
+			sendToAddr.sin_addr.s_addr = userManager.game_host_xn.ina.s_addr;
+		else
+			sendToAddr.sin_addr.s_addr = H2Config_ip_lan;
+
+		sendToAddr.sin_port = port;
+		sendToAddr.sin_family = AF_INET;
+
+		int ret = sendto(s, userManager.secure_packet, 12 + sizeof(XNADDR), NULL, (SOCKADDR*)&sendToAddr, sizeof(sendToAddr));
+		TRACE_GAME_NETWORK_N("[H2MOD-Network] secure packet sent, return code: %d", ret);
+		return ret;
 	}
-		
-	Packet pak;
-	pak.set_type(Packet_Type_secure_request);
-	secure_request *secure_req = pak.mutable_srequest();
-
-	std::string ab(reinterpret_cast<const char*>(pxna->abEnet), 6);
-	secure_req->set_abenet(ab.c_str(),6);
-
-	char* SendBuf = new char[pak.ByteSize()];
-	pak.SerializeToArray(SendBuf, pak.ByteSize());
-
-	sendto(boundsock, SendBuf, pak.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
-
-	time_t start = time(0);
-
-	while (1)
-	{
-		TRACE("Trying recvfrom - GetSecureFromXN()");
-
-		double seconds_since_start = difftime(time(0), start);
-
-		if (seconds_since_start > 2)
-		{
-			sendto(boundsock, SendBuf, pak.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
-			start = time(0);
-		}
-
-		RecvResult = recvfrom(boundsock, RecvBuf, 2048, 0, (SOCKADDR*)&SenderAddr, &SenderAddrSize);
-
-		if (RecvResult > 0)
-		{
-			Packet RecvPak;
-			RecvPak.ParseFromArray(RecvBuf, RecvResult);
-
-			if (RecvPak.has_sreply())
-			{
-				TRACE("GetSecureFromXN() - Got Secure Reply");
-				secure = RecvPak.sreply().secure();
-			
-				
-				CUser *nUser = new CUser;
-
-				memset(&nUser->pxna, 0x00, sizeof(XNADDR));
-				nUser->pxna.wPortOnline = htons((short)RecvPak.sreply().port());
-				
-				nUser->pxna.ina.s_addr = RecvPak.sreply().xnaddr();
-				nUser->pxna.inaOnline.s_addr = secure;
-				memcpy(nUser->pxna.abEnet, RecvPak.sreply().abenet().c_str(), 6);
-				memcpy(nUser->pxna.abOnline, RecvPak.sreply().abonline().c_str(), 20);
-
-				TRACE("GetSecureFromXN() - nUser->pxna.wPortOnline: %i", ntohs(nUser->pxna.wPortOnline));
-				TRACE("GetSecureFromXN() - secure: %08X", secure);
-				TRACE("GetSecureFromXN() - pxna->xnaddr: %08X", pxna->ina.s_addr);
-
-				nUser->pina.s_addr = secure;
-				nUser->bValid = true;
-
-				this->cusers[secure] = nUser;
-				this->xnmap[secure] = pxna->ina.s_addr;
-				this->xntosecure[ab] = secure;
-	
-				RecvPak.Clear();
-				break;
-			
-			}
-
-			RecvPak.Clear();
-		}
-	}
-
-
-	delete[] SendBuf;
-	secure_req->Clear();
-	pak.Clear();
-
-	TRACE("CUserManagement::GetSecureFromXN() - END - secure: %08X",secure);
-	return secure;
+	return -1;
 }
 
-void CUserManagement::CreateUser(XNADDR* pxna, BOOL user)
+void CUserManagement::CreateUser(const XNADDR* pxna, BOOL user)
 {
 	/*
 		This only happens for servers because we have all their data from the get go :)...
 
-		- Update 1/20/2017 - 
+		- Update 1/20/2017 -
 		This should now also be called when receiving the 'SecurityPacket' because we have the data on the first attempt to either establish a connection OR on the attempt to join a game,
 		That should eliminate the need to talk to the Master server in order to get the XNADDR information from the secure address.
 	*/
-	TRACE("CUserManagement::CreateUser()");
+	TRACE_GAME_NETWORK_N("CUserManagement::CreateUser() secure address %08X", pxna->inaOnline.s_addr);
 
 	ULONG secure = pxna->inaOnline.s_addr;
 	CUser *nUser = new CUser;
-	memset(&nUser->pxna, 0x00, sizeof(XNADDR));
-
-	memcpy(&nUser->pxna, pxna, sizeof(XNADDR));
-	nUser->pina.s_addr = secure;
-	std::string ab(reinterpret_cast<const char*>(pxna->abEnet), 6);
-
-	nUser->bValid = true;
+	memset(&nUser->xnaddr, 0x00, sizeof(XNADDR));
+	memcpy(&nUser->xnaddr, pxna, sizeof(XNADDR));
+	nUser->secure.s_addr = secure;
 
 	/*
 		In theory to handle multiple instance servers in the future what we can do is populate the port field of CreateUser,
@@ -167,207 +81,69 @@ void CUserManagement::CreateUser(XNADDR* pxna, BOOL user)
 		short nPort_base = pxna->wPortOnline;
 		short nPort_join = htons(ntohs(pxna->wPortOnline) + 1);
 
-		TRACE("CreateUser - nPort_base: %i", ntohs(nPort_base));
-		TRACE("CreateUser - nPort_join: %i", ntohs(nPort_join));
+		TRACE_GAME_NETWORK_N("CreateUser - nPort_base: %i", ntohs(nPort_base));
+		TRACE_GAME_NETWORK_N("CreateUser - nPort_join: %i", ntohs(nPort_join));
 
 		std::pair <ULONG, SHORT> hostpair = std::make_pair(pxna->ina.s_addr, nPort_join);
 		std::pair <ULONG, SHORT> hostpair_1000 = std::make_pair(pxna->ina.s_addr, nPort_base);
-
-		//std::pair <ULONG, SHORT> hostpair = std::make_pair(pxna->ina.s_addr, htons(1001)); // FIX ME ^, this is gonna get really fucked when servers listen on other ports...
-		//std::pair <ULONG, SHORT> hostpair_1000 = std::make_pair(pxna->ina.s_addr, htons(1000)); // FIX ME ^
-
 
 		if (H2Config_ip_wan == pxna->ina.s_addr)
 		{
 			std::pair <ULONG, SHORT> hostpair_or = std::make_pair(H2Config_ip_lan, nPort_join);
 			std::pair <ULONG, SHORT> hostpair_1000_or = std::make_pair(H2Config_ip_lan, nPort_base);
 
-			this->smap[hostpair_or] = secure;
-			this->smap[hostpair_1000_or] = secure;
-
+			this->secure_map[hostpair_or] = secure;
+			this->secure_map[hostpair_1000_or] = secure;
 		}
 
-		this->smap[hostpair] = secure;
-		this->smap[hostpair_1000] = secure;
+		this->secure_map[hostpair] = secure;
+		this->secure_map[hostpair_1000] = secure;
 		this->cusers[secure] = nUser;
 		this->xnmap[secure] = pxna->ina.s_addr;
-		this->xntosecure[ab] = secure;
 
 		this->pmap_a[secure] = nPort_base;
 		this->pmap_b[secure] = nPort_join;
-		//this->pmap_a[secure] = htons(1000); // FIX ME, ^ SEE ABOVE 1000 STATIC DEF.
-		//this->pmap_b[secure] = htons(1001); // FIX ME, ^ SEE ABOVE 1001 STATIC DEF.
 	}
-	else 
+	else
 	{
-		/* 
+		/*
 			If the user variable is true, we update cusers "array" to map the secure address to the newly created object...
 			Then map the secure address to the WAN IP (XN->ina) using xnmap, where secure address is the key to the array.
-			Then map the abenet to the secure address via xntosecure[ab], where AB is the key to the array. 
+			Then map the abenet to the secure address via xntosecure[ab], where AB is the key to the array.
 		*/
 		this->cusers[secure] = nUser;
 		this->xnmap[secure] = pxna->ina.s_addr;
-		this->xntosecure[ab] = secure;
-
 	}
 
-
+	nUser->bValid = true;
 }
 
-ULONG CUserManagement::GetXNFromSecure(ULONG secure)
-{	
-	TRACE("CUserManagement::GetXNFromSecure(%08X)",secure);
-	u_long xnaddress;
-	sockaddr_in RecvAddr;
-
-	RecvAddr.sin_family = AF_INET;
-	RecvAddr.sin_port = htons(H2Config_master_port_login);
-	RecvAddr.sin_addr.s_addr = H2Config_master_ip;
-
-	char RecvBuf[2048];
-	int RecvResult;
-
-	DWORD dwTime = 20;
-
-
-	sockaddr_in SenderAddr;
-	int SenderAddrSize = sizeof(SenderAddr);
-
-	if (setsockopt(boundsock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&dwTime, sizeof(dwTime)) < 0)
-	{
-		TRACE("Socket Error on register request");
-	}
-
-	Packet xnrequest;
-	xnrequest.set_type(Packet_Type_xnaddr_request);
-
-	xnaddr_request *rdata = xnrequest.mutable_xrequest();
-	rdata->set_secure(secure);
-
-	char *secr = new char[xnrequest.ByteSize()];
-	xnrequest.SerializeToArray( secr, xnrequest.ByteSize() );
-	
-	sendto(boundsock, secr, xnrequest.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
-
-	time_t start = time(0);
-
-	while (1)
-	{
-		TRACE("Trying recvfrom - GetXNFromSecure()");
-
-		double seconds_since_start = difftime(time(0), start);
-
-		if (seconds_since_start > 2)
-		{
-			sendto(boundsock, secr, xnrequest.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
-			start = time(0);
-		}
-		
-		RecvResult = recvfrom(boundsock, RecvBuf, 2048, 0, (SOCKADDR*)&SenderAddr, &SenderAddrSize);
-
-		if (RecvResult > 0)
-		{
-			Packet RecvPak;
-			RecvPak.ParseFromArray(RecvBuf, RecvResult);
-			if (RecvPak.has_xreply())
-			{
-				TRACE("GetXNFromSecure() - Reading Xreply data");
-				xnaddress = RecvPak.xreply().xnaddr();
-				short recvport = (short)RecvPak.xreply().port();
-				std::string abEnet = RecvPak.xreply().abenet();
-				std::string abOnline = RecvPak.xreply().abonline();
-
-				CUser *nUser = new CUser;
-				memset(&nUser->pxna, 0x00, sizeof(XNADDR));
-				
-				nUser->pxna.wPortOnline = htons(recvport);
-				nUser->pxna.ina.s_addr = xnaddress;
-				nUser->pxna.inaOnline.s_addr = secure;
-
-				memcpy(nUser->pxna.abEnet, abEnet.c_str(), 6);
-				memcpy(nUser->pxna.abOnline, abOnline.c_str(), 20);
-				nUser->pina.s_addr = secure;
-				nUser->bValid = true;
-
-				TRACE("GetXNFromSecure() - nUser->pxna.wPortOnline: %i", ntohs(nUser->pxna.wPortOnline));
-				TRACE("GetXNFromSecure() - secure: %08X", secure);
-				TRACE("GetXNFromSecure() - xnaddr: %08X", xnaddress);
-
-				this->cusers[secure] = nUser;
-				this->xnmap[secure] = xnaddress;
-				this->xntosecure[abEnet] = secure;
-
-				RecvPak.Clear();
-				break;
-			}
-			RecvPak.Clear();
-		}
-
-	}
-
-
-	rdata->Clear();
-	xnrequest.Clear();
-
-	delete[] secr;
-
-	return xnaddress;
-}
-
+// FIXME
 void CUserManagement::UnregisterSecureAddr(const IN_ADDR ina)
 {
-	CUser* deluser = cusers[ina.s_addr];
-	this->cusers.erase(ina.s_addr);
-
-
-	if (deluser != 0)
+	CUser* to_remove_user = cusers[ina.s_addr];
+	if (to_remove_user != nullptr)
 	{
-		std::string ab(reinterpret_cast<const char*>(deluser->pxna.abEnet), 6);
-		delete[] deluser;
-			
-		if (xntosecure[ab] != 0)
-			xntosecure.erase(ab);
-		else
-			TRACE("XNetUnregisterInAddr() xntosecure couldn't find that abenet");
-
-
-		if (xnmap[ina.s_addr])
-			xnmap.erase(ina.s_addr);
-		else
-			TRACE("XNetUnregisterInAddr() xnmap couldn't find that secure address");
-
-		std::pair <ULONG, SHORT> hostpair = std::make_pair(ina.s_addr, pmap_a[ina.s_addr]);
-		std::pair <ULONG, SHORT> hostpair2 = std::make_pair(ina.s_addr, pmap_b[ina.s_addr]);
-
-		this->sentmap.erase(hostpair);
-		this->sentmap.erase(hostpair2);
-
-		if (pmap_a[ina.s_addr])
-			pmap_a.erase(ina.s_addr);
-		else
-			TRACE("XNetUnregisterInAddr() pmap_a couldn't find that secure address");
-
-		if (pmap_b[ina.s_addr])
-			pmap_b.erase(ina.s_addr);
-		else
-			TRACE("XnetUnregisterInAddr() pmap_b couldn't find that secure address");
-		
-		typedef std::unordered_map<std::pair<ULONG, SHORT>, ULONG>::iterator it_type;
-
-		for (it_type iterator = smap.begin(); iterator != smap.end(); ++iterator)
+		std::pair<ULONG, short> smap, smap1;
+		if (to_remove_user->xnaddr.ina.s_addr == H2Config_ip_wan)
 		{
-			if (iterator->second == ina.s_addr)
-			{
-				TRACE("XNetUnregisterInAddr: Found secure addr in the smap deleting it.");
-				smap.erase(iterator->first);
-				break;
-			}
+			smap = std::make_pair(H2Config_ip_lan, to_remove_user->xnaddr.wPortOnline);
+			smap1 = std::make_pair(H2Config_ip_lan, ntohs(htons(to_remove_user->xnaddr.wPortOnline) + 1));
 		}
-
+		else
+		{
+			smap = std::make_pair(to_remove_user->xnaddr.ina.s_addr, to_remove_user->xnaddr.wPortOnline);
+			smap1 = std::make_pair(to_remove_user->xnaddr.ina.s_addr, ntohs(htons(to_remove_user->xnaddr.wPortOnline) + 1));
+		}
+		auto sec_map = secure_map.find(smap);
+		auto sec_map1 = secure_map.find(smap1);
+		secure_map.erase(sec_map);
+		secure_map.erase(sec_map1);
+		auto it = cusers.find(ina.s_addr);
+		cusers.erase(it);
+		delete to_remove_user;
 	}
-
 }
-
 
 void CUserManagement::UpdateConnectionStatus() {
 	extern int MasterState;
@@ -386,16 +162,17 @@ void CUserManagement::UpdateConnectionStatus() {
 }
 
 BOOL CUserManagement::LocalUserLoggedIn() {
-	return Users[0].bValid;
+	return local_user.bValid;
 }
 
 void CUserManagement::UnregisterLocal()
 {
-	if (!Users[0].bValid)
+	if (!local_user.bValid)
 		return;
 
-	delete[] this->SecurityPacket;
-	Users[0].bValid = false;
+	delete[] this->secure_packet;
+	this->secure_packet = nullptr;
+	local_user.bValid = false;
 	this->UpdateConnectionStatus();
 }
 
@@ -413,156 +190,95 @@ void SetUserUsername(char* username) {
 	}
 }
 
-const DWORD annoyance_factor = 0x11223341;
+void CUserManagement::ConfigureLocalUser(XNADDR* pxna, ULONGLONG xuid, char* username) {
+	if (local_user.bValid) {
+		delete[] this->secure_packet;
 
-void CUserManagement::ConfigureUser(XNADDR* pxna, ULONGLONG xuid, char* username) {
-	if (Users[0].bValid) {
-		delete[] this->SecurityPacket;
-		Users[0].bValid = false;
+		local_user.bValid = false;
 	}
 
-	memcpy(&Users[0].pxna, pxna, sizeof(XNADDR));
-
-	this->SecurityPacket = new char[8 + sizeof(XNADDR)];
-	(*(DWORD*)&this->SecurityPacket[0]) = annoyance_factor;
-	(*(DWORD*)&this->SecurityPacket[4]) = pxna->inaOnline.s_addr;
-
-	Users[0].pina.s_addr = pxna->inaOnline.s_addr;
-
+	// copy local user info
 	xFakeXuid[0] = xuid;
-
-	memcpy(&SecurityPacket[8], &Users[0].pxna, sizeof(XNADDR));
-
-
-	LocalXN = &Users[0].pxna;
-	LocalSec = pxna->inaOnline.s_addr;
-
 	SetUserUsername(username);
 
-	Users[0].bValid = true;
+	memset(&local_user, NULL, sizeof(CUser));
+	memcpy(&local_user.xnaddr, pxna, sizeof(XNADDR));
+	local_user.secure.s_addr = pxna->inaOnline.s_addr;
+	this->secure_packet = new char[12 + sizeof(XNADDR)];
+	memset(secure_packet, NULL, 12 + sizeof(XNADDR));
 
+	// secure packet preparation
+	*(DWORD*)&this->secure_packet[0] = annoyance_factor;
+	*(ULONG*)&this->secure_packet[4] = local_user.secure.s_addr;
+	memcpy(&this->secure_packet[8], &local_user.xnaddr, sizeof(XNADDR));
+
+	local_user.bValid = true;
 	this->UpdateConnectionStatus();
 
 	//We want achievements loaded as early as possible, but we can't do it until after we have the XUID.
-	std::thread(Achievement_GetAll).detach();
-
-
+	std::thread(GetAchievements).detach();
 }
 
 BOOL CUserManagement::GetLocalXNAddr(XNADDR* pxna)
 {
-	if (Users[0].bValid)
+	if (local_user.bValid)
 	{
-		memcpy(pxna, &Users[0].pxna, sizeof(XNADDR));
-		TRACE("GetLocalXNAddr: Returned");
-		TRACE("XNADDR: %08X", pxna->ina.s_addr);
+		memcpy(pxna, &local_user.xnaddr, sizeof(XNADDR));
+		TRACE_GAME_NETWORK_N("GetLocalXNAddr(): XNADDR: %08X", pxna->ina.s_addr);
 		return TRUE;
 	}
-	TRACE("GetLocalXNADDR: User data not populated yet.");
-	//TRACE("GetLocalXNADDR: User data not populated yet calling LocalRegister()");
-	//this->RegisterLocalRequest(H2Config_login_token);
-	//Sleep(3000);
+	//TRACE_GAME_NETWORK_N("GetLocalXNADDR(): Local user network information not populated yet.");
 
 	return FALSE;
 }
 
-
-
-
-void CUserManagement::RegisterLocalRequest(char* token, int a2)
+// #57: XNetXnAddrToInAddr
+INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pnkid, IN_ADDR *pina)
 {
-	if (Users[0].bValid)
-		return;
+	TRACE_GAME_NETWORK_N("XNetXNAddrToInAddr(): secure: %08X", pxna->inaOnline.s_addr);
+	TRACE_GAME_NETWORK_N("XNetXnAddrToInAddr(): ina.s_addr: %08X", pxna->ina.s_addr);
 
-	addDebugText("next0");
+	if (pxna->inaOnline.s_addr != NULL) {
+		CUser* user = userManager.cusers[pxna->inaOnline.s_addr];
 
-	sockaddr_in RecvAddr;
+		if (user == nullptr)
+			userManager.CreateUser(pxna, TRUE);
 
-	RecvAddr.sin_family = AF_INET;
-	RecvAddr.sin_port = htons(H2Config_master_port_login);
-	RecvAddr.sin_addr.s_addr = H2Config_master_ip;
-
-	char RecvBuf[2048];
-	int RecvResult;
-
-	sockaddr_in SenderAddr;
-	int SenderAddrSize = sizeof(SenderAddr);
-
-	//DWORD dwTime = 20;
-
-	struct timeval tv;
-	tv.tv_sec = 2;
-	tv.tv_usec = 0;
-	if (setsockopt(boundsock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv)) < 0) {
-	//if (setsockopt(boundsock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&dwTime, sizeof(dwTime)) < 0) {
-		TRACE("Socket Error on register request");
+		pina->s_addr = pxna->inaOnline.s_addr;
+		return ERROR_SUCCESS;
 	}
+	return ERROR_FUNCTION_FAILED;
+}
 
-	Packet lrequest;
-	lrequest.set_type(Packet_Type_login_request);
-
-	login_request *ldata = lrequest.mutable_lrequest();
-	ldata->set_login_token(token);
-	ldata->set_port(H2Config_base_port);
-
-	char *lreq = new char[lrequest.ByteSize()];
-
-	lrequest.SerializeToArray(lreq, lrequest.ByteSize());
-
-	if (!a2)
-		sendto(boundsock, lreq, lrequest.ByteSize(), 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
-	else {
-		RecvResult = recvfrom(boundsock, RecvBuf, 2048, 0, (SOCKADDR*)&SenderAddr, &SenderAddrSize);
-
-		if (RecvResult > 0)
+// #60: XNetInAddrToXnAddr
+INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
+{
+	TRACE_GAME_NETWORK_N("XNetInAddrToXnAddr() const ina: %08X", ina.s_addr);
+	CUser* user = userManager.cusers[ina.s_addr];
+	if (user != nullptr)
+	{
+		if (pxna)
 		{
-			addDebugText("network reply");
-
-			Packet RecvPak;
-			RecvPak.ParseFromArray(RecvBuf, RecvResult);
-
-			if (RecvPak.has_lreply())
-			{
-				TRACE("GetLocalRegistration() - Reading lreply data");
-
-				ULONGLONG xuid = RecvPak.lreply().xuid();
-				unsigned long saddr = RecvPak.lreply().secure_addr();
-				unsigned long xnaddr = RecvPak.lreply().xnaddr();
-				char abEnet[13] = { "" };
-				char abOnline[41] = { "" };
-				snprintf(abEnet, 13, RecvPak.lreply().abenet().c_str());
-				snprintf(abOnline, 41, RecvPak.lreply().abonline().c_str());
-
-				XNADDR pxna;
-
-				pxna.inaOnline.s_addr = saddr;
-				pxna.ina.s_addr = xnaddr;
-				pxna.wPortOnline = htons((short)H2Config_base_port);
-				memcpy(&pxna.abEnet, abEnet, 6);
-				memcpy(&pxna.abOnline, abOnline, 20);
-
-				extern CUserManagement User;
-				User.ConfigureUser(&pxna, xuid, g_szUserName[0]);
-
-
-				//*(__int64*)((BYTE*)H2BaseAddr + 0x96C860) = RecvPak.lreply().xuid();
-
-				int(__cdecl* sub_209236)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x209236);
-				sub_209236(0);
-
-
-				Users[0].bValid = true;
-
-				this->UpdateConnectionStatus();
-			}
-
-			RecvPak.Clear();
+			memset(pxna, 0x00, sizeof(XNADDR)); // Zero memory of the current buffer passed to us by the game.
+			memcpy(pxna, &user->xnaddr, sizeof(XNADDR));
 		}
+		/*if (pxnkid)
+		{
+			XNetRandom((BYTE*)pxnkid, sizeof(XNKID));
+		}*/
+	}
+	else
+	{
+		TRACE_GAME_NETWORK_N("XNetInAddrToXnAddr() the peer with secure/ipaddress %08X doesn't exist!", ina.s_addr);
 	}
 
-	ldata->Clear();
-	lrequest.Clear();
+	return 0;
+}
 
-	delete[] lreq;
-
+// #63: XNetUnregisterInAddr
+int WINAPI XNetUnregisterInAddr(const IN_ADDR ina)
+{
+	TRACE_GAME_NETWORK_N("XNetUnregisterInAddr(): %08X", ina.s_addr);
+	//userManager.UnregisterSecureAddr(ina);
+	return 0;
 }

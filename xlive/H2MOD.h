@@ -1,12 +1,11 @@
 #pragma once
-#include <unordered_map>
 #include <set>
 #include <mutex>
+#include <queue>
+#include <unordered_map>
+
 #include "Blam\Enums\Game\GameEngine.h"
 #include "Util\Hooks\Hook.h"
-
-constexpr int EXECUTABLE_VERSION = 4; // I don't recommend changing this
-constexpr int GAME_BUILD = 11122;
 
 constexpr signed int NONE = -1;
 
@@ -26,9 +25,9 @@ enum SoundType
 
 enum BipedType
 {
-	MasterChief = 0,
+	MasterChiefSp = 0,
 	Arbiter = 1,
-	Spartan = 2,
+	MasterChiefMp = 2,
 	Elite = 3
 };
 
@@ -128,23 +127,29 @@ public:
 		BYTE get_local_team_index();
 		void set_local_grenades(BYTE type, BYTE count, int pIndex);
 		void DisableSound(int sound);
-		void PatchWeaponsInteraction(bool b_Enable);		
-		void securityPacketProcessing();
+		void CustomSoundPlay(const wchar_t* soundName, int delay);
+		void DisableWeaponPickup(bool b_Enable);
 		void ApplyUnitHooks();
 		EngineType GetEngineType();
 		wchar_t* GetLobbyGameVariantName();
 		void exit_game();
 		BOOL Server;
-		std::unordered_map<wchar_t*, int> SoundMap;
 		std::unordered_map<std::string, bool> AchievementMap;
-	
+		std::deque<std::wstring> CustomSounds;
+		
 		std::mutex sound_mutex;
-		std::condition_variable sound_cv;
 
 		std::set<int> hookedObjectDefs;
 		bool isChatBoxCommand = false;
 
-		DWORD GetBase() { return this->Base; }
+		void SetBase(DWORD base) { Base = base; }
+		DWORD GetBase() { return Base; }
+
+		template <typename T = void>
+		inline T *GetAddress(DWORD client, DWORD server = 0)
+		{
+			return reinterpret_cast<T*>(GetBase() + (Server ? server : client));
+		}
 
 private:
 		DWORD Base;

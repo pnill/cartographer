@@ -1,6 +1,7 @@
-#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
+﻿#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "Globals.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 bool AdvLobbySettings_mp_explosion_physics = false;
 bool AdvLobbySettings_mp_sputnik = false;
@@ -26,7 +27,7 @@ static std::chrono::time_point<std::chrono::system_clock> lastReq;
 static std::chrono::time_point<std::chrono::system_clock> firstReq;
 
 static void actuallySendPacket() {
-	if (!gameManager->isHost() || h2mod->GetEngineType() != EngineType::MULTIPLAYER_ENGINE)
+	if (!NetworkSession::localPeerIsSessionHost() || h2mod->GetEngineType() != EngineType::MULTIPLAYER_ENGINE)
 		return;
 
 	TRACE_GAME("[h2mod] Sending AdvLobbySettings.");
@@ -52,7 +53,7 @@ static void actuallySendPacket() {
 	lobby_settings->set_mp_blind((int)AdvLobbySettings_mp_blind + 1);
 	lobby_settings->set_flashlight((int)AdvLobbySettings_flashlight + 1);
 
-//	network->send_h2mod_packet(teampak);
+	//network->send_h2mod_packet(teampak);
 
 #ifdef _DEBUG
 	_CrtSetDbgFlag(tmpFlagOrig);
@@ -63,7 +64,7 @@ static void actuallySendPacket() {
 
 void AdvLobbySettings::sendLobbySettingsPacket()
 {
-	if (!gameManager->isHost() || h2mod->GetEngineType() != EngineType::MULTIPLAYER_ENGINE)
+	if (!NetworkSession::localPeerIsSessionHost() || h2mod->GetEngineType() != EngineType::MULTIPLAYER_ENGINE)
 		return;
 	
 	lastReq = std::chrono::system_clock::now() + std::chrono::milliseconds(4000);
