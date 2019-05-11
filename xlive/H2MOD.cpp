@@ -1117,6 +1117,11 @@ void __cdecl OnMapLoad(int a1)
 			TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
 			b_H2X = true;
 		}
+		else if (wcsstr(variant_name, L"OGH2") > 0 || wcsstr(variant_name, L"ogh2") > 0 || wcsstr(variant_name, L"h2og") > 0 || wcsstr(variant_name, L"H2OG") > 0)
+		{
+			TRACE_GAME("[h2mod] Made The Game Trash By Changing The Tick Rate");
+			b_XboxTick = true;
+		}		
 
 		if (wcsstr(variant_name, L"GraveRobber") > 0 || wcsstr(variant_name, L"graverobber") > 0)
 		{
@@ -1128,12 +1133,6 @@ void __cdecl OnMapLoad(int a1)
 		{
 			TRACE_GAME("[h2mod] Fire Fight Turned on!");
 			b_FireFight = true;
-		}
-
-		if (wcsstr(variant_name, L"OGH2") > 0 || wcsstr(variant_name, L"ogh2") > 0 || wcsstr(variant_name, L"h2og") > 0 || wcsstr(variant_name, L"H2OG") > 0)
-		{
-			TRACE_GAME("[h2mod] Made The Game Trash By Changing The Tick Rate");
-			b_XboxTick = true;
 		}
 
 		get_object_table_memory();
