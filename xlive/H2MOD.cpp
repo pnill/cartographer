@@ -1285,7 +1285,7 @@ change_team change_team_method;
 
 int __cdecl changeTeam(int a1, int a2) {
 	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
-	if (StrStrIW(variant_name, L"RVB") > 0 && a2 != 0 && a2 != 1) {
+	if (StrStrIW(variant_name, L"RVB") != NULL && a2 != 0 && a2 != 1) {
 		//rvb mode enabled, don't change teams
 		return 4732 * a1;
 	}
