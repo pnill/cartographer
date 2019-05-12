@@ -6,6 +6,7 @@
 
 #include "Blam\Enums\Game\GameEngine.h"
 #include "Util\Hooks\Hook.h"
+#include <Shlwapi.h> /*StrStrIW function in OnMapLoad*/
 
 constexpr signed int NONE = -1;
 

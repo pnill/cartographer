@@ -1094,42 +1094,42 @@ void __cdecl OnMapLoad(int a1)
 	{
 		addDebugText("GameEngine: Multiplayer");
 
-		if (wcsstr(variant_name, L"zombies") > 0 || wcsstr(variant_name, L"Zombies") > 0 || wcsstr(variant_name, L"Infection") > 0 || wcsstr(variant_name, L"infection") > 0)
+		if (StrStrIW(variant_name, L"ZOMBIES") != NULL)
 		{
 			TRACE_GAME("[h2mod] Zombies Turned on!");
 			b_Infection = true;
 		}
 
-		if (wcsstr(variant_name, L"GunGame") > 0 || wcsstr(variant_name, L"gungame") > 0 || wcsstr(variant_name, L"Gungame") > 0)
+		if (StrStrIW(variant_name, L"GUNGAME") != NULL)
 		{
 			TRACE_GAME("[h2mod] GunGame Turned on!");
 			b_GunGame = true;
 		}
 
-		if (wcsstr(variant_name, L"H2F") > 0 || wcsstr(variant_name, L"h2f") > 0 || wcsstr(variant_name, L"Halo2Final") > 0 || wcsstr(variant_name, L"halo2final") > 0)
+		if (StrStrIW(variant_name,L"H2F") != NULL)
 		{
 			TRACE_GAME("[h2mod] Halo2Final Turned on!");
 			b_Halo2Final = true;
 		}
 
-		if (wcsstr(variant_name, L"H2X") > 0 || wcsstr(variant_name, L"h2x") > 0)
+		if (StrStrIW(variant_name,L"H2X") != NULL)
 		{
 			TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
 			b_H2X = true;
 		}
-		else if (wcsstr(variant_name, L"OGH2") > 0 || wcsstr(variant_name, L"ogh2") > 0 || wcsstr(variant_name, L"h2og") > 0 || wcsstr(variant_name, L"H2OG") > 0)
+		else if (StrStrIW(variant_name,L"OGH2") != NULL)
 		{
-			TRACE_GAME("[h2mod] Made The Game Trash By Changing The Tick Rate");
-			b_XboxTick = true;
-		}		
+			TRACE_GAME("[h2mod] 30 Tick Mod Activated!");
+				b_XboxTick = true;
+		}
 
-		if (wcsstr(variant_name, L"GraveRobber") > 0 || wcsstr(variant_name, L"graverobber") > 0)
+		if (StrStrIW(variant_name, L"GRAVEROBBER") != NULL)
 		{
 			TRACE_GAME("[h2mod] GraveRobber (Headhunter) Turned on!");
 			b_HeadHunter = true;
 		}
 
-		if (wcsstr(variant_name, L"WarEconomy") > 0 || wcsstr(variant_name, L"wareconomy") > 0)
+		if (StrStrIW(variant_name, L"WARECONOMY") != NULL)
 		{
 			TRACE_GAME("[h2mod] Fire Fight Turned on!");
 			b_FireFight = true;
