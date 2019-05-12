@@ -44,6 +44,18 @@ extern int H2GetInstanceId();
 extern XUID xFakeXuid[4];
 std::unordered_map<int, int> object_to_variant;
 
+
+/*constants*/
+const wchar_t* ZOMBIES  = L"zombies";
+const wchar_t* GUNGAME  = L"gungame";
+const wchar_t* H2F  = L"h2f";
+const wchar_t* H2X  = L"h2x";
+const wchar_t* OGH2 = L"ogh2";
+const wchar_t* GRAVEROBBER = L"graverobber";
+const wchar_t* HEADHUNTER = L"headhunter";
+const wchar_t* WARECONOMY = L"wareconomy";
+const wchar_t* RVB = L"rvb";
+/*         */
 using namespace Blam::Cache::DataTypes;
 
 int GAME_BUILD = 11122;
@@ -1096,42 +1108,42 @@ void __cdecl OnMapLoad(int a1)
 	{
 		addDebugText("GameEngine: Multiplayer");
 
-		if (StrStrIW(variant_name, L"ZOMBIES") != NULL)
+		if (StrStrIW(variant_name, ZOMBIES) != NULL)
 		{
 			TRACE_GAME("[h2mod] Zombies Turned on!");
 			b_Infection = true;
 		}
 
-		if (StrStrIW(variant_name, L"GUNGAME") != NULL)
+		if (StrStrIW(variant_name, GUNGAME) != NULL)
 		{
 			TRACE_GAME("[h2mod] GunGame Turned on!");
 			b_GunGame = true;
 		}
 
-		if (StrStrIW(variant_name,L"H2F") != NULL)
+		if (StrStrIW(variant_name, H2F) != NULL)
 		{
 			TRACE_GAME("[h2mod] Halo2Final Turned on!");
 			b_Halo2Final = true;
 		}
 
-		if (StrStrIW(variant_name,L"H2X") != NULL)
+		if (StrStrIW(variant_name, H2X) != NULL)
 		{
 			TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
 			b_H2X = true;
 		}
-		else if (StrStrIW(variant_name,L"OGH2") != NULL)
+		else if (StrStrIW(variant_name, OGH2) != NULL)
 		{
 			TRACE_GAME("[h2mod] 30 Tick Mod Activated!");
 				b_XboxTick = true;
 		}
 
-		if (StrStrIW(variant_name, L"GRAVEROBBER") != NULL)
+		if ((StrStrIW(variant_name, GRAVEROBBER) != NULL) | (StrStrIW(variant_name, HEADHUNTER) != NULL))
 		{
 			TRACE_GAME("[h2mod] GraveRobber (Headhunter) Turned on!");
 			b_HeadHunter = true;
 		}
 
-		if (StrStrIW(variant_name, L"WARECONOMY") != NULL)
+		if (StrStrIW(variant_name, WARECONOMY) != NULL)
 		{
 			TRACE_GAME("[h2mod] Fire Fight Turned on!");
 			b_FireFight = true;
@@ -1285,7 +1297,7 @@ change_team change_team_method;
 
 int __cdecl changeTeam(int a1, int a2) {
 	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
-	if (StrStrIW(variant_name, L"RVB") > 0 && a2 != 0 && a2 != 1) {
+	if (StrStrIW(variant_name, RVB) != NULL && a2 != 0 && a2 != 1) {
 		//rvb mode enabled, don't change teams
 		return 4732 * a1;
 	}
