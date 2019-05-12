@@ -19,6 +19,8 @@
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
+#include <Shlwapi.h> /*StrStrIW function in OnMapLoad*/
+
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
