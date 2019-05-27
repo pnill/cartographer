@@ -1160,7 +1160,8 @@ void __cdecl OnMapLoad(int a1)
 		H2Tweaks::setCrosshairSize(0, false);
 		H2Tweaks::disable60FPSCutscenes(); 
 		H2Tweaks::setSavedSens();
-		
+		H2Tweaks::sunFlareFix();
+
 		//H2Tweaks::applyShaderTweaks(); 
 
 		if (GameState == 3)
@@ -1196,6 +1197,7 @@ void __cdecl OnMapLoad(int a1)
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 		H2Tweaks::enable60FPSCutscenes();
 		H2Tweaks::setSavedSens();
+		H2Tweaks::sunFlareFix();
 
 		SPMapFix::Initialize();
 	}
