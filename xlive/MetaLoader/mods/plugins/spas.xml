@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin game="Halo2" baseSize="0x24">
+	<!-- Automatically generated plugin -->
+	<revisions>
+		<revision author="Iron_Forge" version="1">Added basic layout of plugin...</revision>
+		<revision author="Himanshu01" version="2">Mapped from Ripped Definations and added other stuff.</revision>
+		<revision author="Himanshu01" version="3">Completed as far as i can.</revision>
+	</revisions>
+	<undefined name="Unknown" offset="0x10" visible="false" />
+	<reflexive name="Postprocess Definitions" offset="0x1C" visible="true" entrySize="0x58">
+		<reflexive name="Implementations" offset="0x0" visible="true" entrySize="0x14A">
+			<int16 name="Block Index Data" offset="0x0" visible="true" />
+			<int16 name="Block Index Data" offset="0x2" visible="true" />
+			<int32 name="Block Index Data" offset="0x4" visible="true" />
+			<int32 name="Block Index Data" offset="0x8" visible="true" />
+			<int32 name="Block Index Data" offset="0xC" visible="true" />
+			<int32 name="Block Index Data" offset="0x10" visible="true" />
+			<int32 name="Block Index Data" offset="0x14" visible="true" />
+			<int32 name="Block Index Data" offset="0x18" visible="true" />
+			<int32 name="Block Index Data" offset="0x1C" visible="true" />
+			<int32 name="Block Index Data" offset="0x20" visible="true" />
+			<int32 name="Block Index Data" offset="0x24" visible="true" />
+			<int32 name="Block Index Data" offset="0x28" visible="true" />
+			<int32 name="Block Index Data" offset="0x2C" visible="true" />
+			<int32 name="Block Index Data" offset="0x30" visible="true" />
+			<int32 name="Block Index Data" offset="0x34" visible="true" />
+			<int32 name="Block Index Data" offset="0x38" visible="true" />
+			<int32 name="Block Index Data" offset="0x3C" visible="true" />
+			<float32 name="Unknown" offset="0x40" visible="true" />
+			<int32 name="Block Index Data" offset="0x44" visible="true" />
+			<int32 name="Block Index Data" offset="0x4C" visible="true" />
+			<int32 name="Block Index Data" offset="0x50" visible="true" />
+			<int32 name="Block Index Data" offset="0x54" visible="true" />
+			<int32 name="Block Index Data" offset="0x58" visible="true" />
+			<int32 name="Block Index Data" offset="0x5C" visible="true" />
+			<float32 name="Unknown" offset="0x60" visible="true" />
+			<float32 name="Unknown" offset="0x64" visible="true" />
+			<int32 name="Block Index Data" offset="0x68" visible="true" />
+			<int32 name="Block Index Data" offset="0x6C" visible="true" />
+			<int32 name="Block Index Data" offset="0x70" visible="true" />
+			<int32 name="Block Index Data" offset="0x74" visible="true" />
+			<int32 name="Block Index Data" offset="0x78" visible="true" />
+			<int32 name="Block Index Data" offset="0x7C" visible="true" />
+			<int32 name="Block Index Data" offset="0x80" visible="true" />
+			<int32 name="Block Index Data" offset="0x84" visible="true" />
+			<int32 name="Block Index Data" offset="0x88" visible="true" />
+			<int32 name="Block Index Data" offset="0x8C" visible="true" />
+			<int32 name="Block Index Data" offset="0x90" visible="true" />
+			<int32 name="Block Index Data" offset="0x94" visible="true" />
+			<int32 name="Block Index Data" offset="0x98" visible="true" />
+			<int32 name="Block Index Data" offset="0x9C" visible="true" />
+			<int32 name="Block Index Data" offset="0xA0" visible="true" />
+			<int32 name="Block Index Data" offset="0xA4" visible="true" />
+			<int32 name="Block Index Data" offset="0xA8" visible="true" />
+			<int32 name="Block Index Data" offset="0xAC" visible="true" />
+			<int32 name="Block Index Data" offset="0xB0" visible="true" />
+			<int32 name="Block Index Data" offset="0xB4" visible="true" />
+			<int32 name="Block Index Data" offset="0xB8" visible="true" />
+			<int32 name="Block Index Data" offset="0xBC" visible="true" />
+			<int32 name="Block Index Data" offset="0xC0" visible="true" />
+			<int32 name="Block Index Data" offset="0xC4" visible="true" />
+			<int32 name="Block Index Data" offset="0xC8" visible="true" />
+			<int32 name="Block Index Data" offset="0xCC" visible="true" />
+			<int32 name="Block Index Data" offset="0xD0" visible="true" />
+			<int32 name="Block Index Data" offset="0xD4" visible="true" />
+			<int32 name="Block Index Data" offset="0xD8" visible="true" />
+			<int32 name="Block Index Data" offset="0xDC" visible="true" />
+			<int32 name="Block Index Data" offset="0xE0" visible="true" />
+			<int32 name="Block Index Data" offset="0xF4" visible="true" />
+			<int32 name="Block Index Data" offset="0xF8" visible="true" />
+			<tagRef name="Vertex Shader" offset="0xFC" visible="true" />
+			<int32 name="Block Index Data" offset="0x104" visible="true" />
+			<int32 name="Block Index Data" offset="0x108" visible="true" />
+			<int32 name="Block Index Data" offset="0x10C" visible="true" />
+			<int32 name="Block Index Data" offset="0x110" visible="true" />
+			<int32 name="Block Index Data" offset="0x114" visible="true" />
+			<int32 name="Block Index Data" offset="0x118" visible="true" />
+			<int16 name="Block Index Data" offset="0x11C" visible="true" />
+			<int16 name="Block Index Data" offset="0x11E" visible="true" />
+			<int16 name="Block Index Data" offset="0x120" visible="true" />
+			<int16 name="Block Index Data" offset="0x122" visible="true" />
+			<int32 name="Block Index Data" offset="0x124" visible="true" />
+			<int32 name="Block Index Data" offset="0x128" visible="true" />
+			<int32 name="Block Index Data" offset="0x12C" visible="true" />
+			<reflexive name="Pixel Shader" offset="0x132" visible="true" entrySize="0x2C">
+				<int32 name="Pixel Shader Handle(Runtime)" offset="0x0" visible="true" />
+				<int32 name="Pixel Shader Handle(Runtime)" offset="0x4" visible="true" />
+				<int32 name="Pixel Shader Handle(Runtime)" offset="0x8" visible="true" />
+				<reflexive name="Constant Register Values" offset="0xC" visible="true" entrySize="0x4">
+					<undefined name="Defaults" offset="0x0" visible="true" />
+				</reflexive>
+				<dataref name="Compiled Shader" offset="0x14" visible="true" />
+				<dataref name="Compiled Shader" offset="0x1C" visible="true" />
+				<dataref name="Compiled Shader" offset="0x24" visible="true" />
+			</reflexive>
+			<reflexive name="Pixel Shader Switch Extern Map" offset="0x13A" visible="true" entrySize="0x2">
+					<uint8 name="Switch parameter" offset="0x0" visible="true" />
+					<uint8 name="Case scalar" offset="0x1" visible="true" />
+			</reflexive>
+			<reflexive name="Pixel Shader Index Block" offset="0x142" visible="true" entrySize="0x1">
+					<uint8 name="pixel shader index" offset="0x0" visible="true" />
+			</reflexive>
+		</reflexive>
+		<reflexive name="Textures" offset="0x8" visible="true" entrySize="0x4">
+			<uint8 name="Bitmap Parameter Index" offset="0x0" visible="true" />
+			<uint8 name="Bitmap Extern Index" offset="0x1" visible="true" />
+			<uint8 name="Texture Stage Index" offset="0x2" visible="true" />
+			<uint8 name="Flags" offset="0x3" visible="true" />
+		</reflexive>
+		<reflexive name="Render States" offset="0x10" visible="true" entrySize="0x5">
+			<uint8 name="State Index" offset="0x0" visible="true" />
+			<uint8 name="State Value" offset="0x1" visible="true" />		
+		</reflexive>
+		<reflexive name="Texture States" offset="0x18" visible="true" entrySize="0x18">
+			<int32 name="Unknown" offset="0x0" visible="true" />		
+			<int32 name="Unknown" offset="0x4" visible="true" />
+			<int32 name="Unknown" offset="0x8" visible="true" />
+			<int32 name="Unknown" offset="0x10" visible="true" />			
+		</reflexive>
+		<reflexive name="Pixel Shader Fragments" offset="0x20" visible="true" entrySize="0x4">		
+ 		    <int16 name="Switch Parameter Index" offset="0x0" visible="true" />
+ 		    <int16 name="Permutation Index" offset="0x2" visible="true" />
+		</reflexive>
+		<reflexive name="Pixel Shader Permutations" offset="0x28" visible="true" entrySize="0x6">
+			<int16 name="Enum Index" offset="0x0" visible="true" />
+			<int16 name="Flags" offset="0x2" visible="true" />
+			<int16 name="Combiner" offset="0x4" visible="true" />
+		</reflexive>
+		<reflexive name="Pixel Shader Combiners" offset="0x30" visible="true" entrySize="0x20">
+			<uint8 name="Unknown" offset="0x10" visible="true" />
+			<uint8 name="Unknown" offset="0x11" visible="true" />
+			<uint8 name="Unknown" offset="0x12" visible="true" />
+			<uint8 name="Unknown" offset="0x13" visible="true" />
+			<uint8 name="Unknown" offset="0x14" visible="true" />
+			<uint8 name="Unknown" offset="0x15" visible="true" />
+			<uint8 name="Unknown" offset="0x16" visible="true" />
+			<uint8 name="Unknown" offset="0x17" visible="true" />
+			<uint8 name="Unknown" offset="0x18" visible="true" />
+			<uint8 name="Unknown" offset="0x19" visible="true" />
+			<uint8 name="Unknown" offset="0x1A" visible="true" />
+			<uint8 name="Unknown" offset="0x1B" visible="true" />
+			<uint8 name="Unknown" offset="0x1C" visible="true" />
+			<uint8 name="Unknown" offset="0x1D" visible="true" />
+			<uint8 name="Unknown" offset="0x1E" visible="true" />
+			<uint8 name="Unknown" offset="0x1F" visible="true" />
+			<uint8 name="Unknown" offset="0x20" visible="true" />				
+		</reflexive>
+		<reflexive name="Externs" offset="0x38" visible="true" entrySize="0x4">
+			<int32 name="Extern Index" offset="0x0" visible="true" />
+		</reflexive>
+	</reflexive>
+</plugin>

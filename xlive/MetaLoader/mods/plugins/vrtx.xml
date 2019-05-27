@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin game="Halo2" baseSize="0x10">
+	<!-- Automatically generated plugin -->
+	<revisions>
+		<revision author="Iron_Forge" version="1">Added basic layout of plugin...</revision>
+		<revision author="Iron_Forge" version="2">Fixed up basic layout...</revision>
+		<revision author="Himanshu01" version="3">Mapped from ripped definitions..And Completed</revision>
+	</revisions>
+	<enum8 name="Platform Type" offset="0x0" visible="true">
+		<option name="PC" value="0x0" />
+		<option name="XBOX" value="0x1" />	
+	</enum8>
+	<reflexive name="Geometry Classifications" offset="0x4" visible="true" entrySize="0x14">
+		<int32 name="Unknown" offset="0x0" visible="true" />	
+		<dataref name="Compiled shader" offset="0x4" visible="true" />	
+		<dataref name="Code" offset="0xC" visible="true" />	
+	</reflexive>
+	<int32 name="output swizzles" offset="0xC" visible="true" />
+</plugin>

@@ -1,0 +1,6 @@
+#comments
+#Xlive tag_loader 1.1
+#carto v0.5.3.0
+#author Himanshu01
+#dont expect much,it is still bare bones
+module_load("power_module_bloc.cache")
