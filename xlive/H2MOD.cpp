@@ -20,6 +20,8 @@
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include <Shlwapi.h> /*StrStrIW function in OnMapLoad*/
+#include "MetaLoader\tag_loader.h"
+#include "Runtime\init_runtime.h"
 
 
 H2MOD *h2mod = new H2MOD();
@@ -1714,6 +1716,9 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetBase() + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
 		PatchCall(GetBase() + 0x00092C05, BansheeBombIsEngineMPCheck);
 		PatchCall(GetBase() + 0x0013ff75, FlashlightIsEngineSPCheck);
+
+		Initialise_tag_loader();
+		Runtime::Init();
 	}
 	else {
 

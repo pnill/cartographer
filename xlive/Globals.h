@@ -7,6 +7,7 @@
 #include "3rdparty/portaudio/include/portaudio.h"
 
 #include "Blam\BlamLibrary.h"
+#include "Runtime\RuntimeIncludes.h"
 #include "H2MOD\Modules\Players\Players.h"
 #include "H2MOD\Variants\VariantPlayer.h"
 #include "H2MOD\Variants\VariantSystem.h"

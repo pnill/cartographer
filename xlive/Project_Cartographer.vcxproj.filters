@@ -495,6 +495,21 @@
     <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MetaLoader\cache_loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MetaLoader\meta_struct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MetaLoader\tag_loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\init_runtime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">
@@ -972,6 +987,33 @@
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkSession</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaLoader\cache_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaLoader\meta_struct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaLoader\tag_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\tinyxml\tinyxml2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\cache_header.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Engine\Globals\global_ptrs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Cache\cache_ptrs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\init_runtime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\RuntimeIncludes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

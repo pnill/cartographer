@@ -571,73 +571,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
 #pragma region custom map checks
 
-struct cache_header
-{
-	int magic;
-	int engine_gen;
-	int file_size;
-	int field_C;
-	int tag_offset;
-	int data_offset;
-	int data_size;
-	int tag_size;
-	int tag_offset_mask;
-	int field_24;
-	BYTE padding[260];
-	char version[32];
-	enum scnr_type : int
-	{
-		SinglePlayer = 0,
-		Multiplayer = 1,
-		MainMenu = 2,
-		MultiplayerShared = 3,
-		SinglePlayerShared = 4
-	};
-	scnr_type type;
-	int shared_type;
-	int crc_uiid;
-	char field_158;
-	char tracked__maybe;
-	char field_15A;
-	char field_15B;
-	int field_15C;
-	int field_160;
-	int field_164;
-	int field_168;
-	int string_block_offset;
-	int string_table_count;
-	int string_table_size;
-	int string_idx_offset;
-	int string_table_offset;
-	int extern_deps;
-	int time_low;
-	int time_high;
-	int main_menu_time_low;
-	int main_menu_time_high;
-	int shared_time_low;
-	int shared_time_high;
-	int campaign_time_low;
-	int campaign_time_high;
-	char name[32];
-	int field_1C4;
-	char tag_name[256];
-	int minor_version;
-	int TagNamesCount;
-	int TagNamesBufferOffset;
-	int TagNamesBufferSize;
-	int TagNamesIndicesOffset;
-	int LanguagePacksOffset;
-	int LanguagePacksSize;
-	int SecondarySoundGestaltDatumIndex;
-	int FastLoadGeometryBlockOffset;
-	int FastLoadGeometryBlockSize;
-	int Checksum;
-	int MoppCodesChecksum;
-	BYTE field_2F8[1284];
-	int foot;
-};
-
-static_assert(sizeof(cache_header) == 0x800, "Bad cache header size");
 
 bool open_cache_header(const wchar_t *lpFileName, cache_header *cache_header_ptr, HANDLE *map_handle)
 {
@@ -929,12 +862,15 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 }
 
 //Patch Call to modify tags just after map load
+/*
+------had to remove because of conflicts with tag_loader
 char _cdecl LoadTagsandMapBases(int a)
 {
 	char(__cdecl* LoadTagsandMapBases_Orig)(int) = (char(__cdecl*)(int))(h2mod->GetAddress(0x00031348));
 	char result = LoadTagsandMapBases_Orig(a);
 	return result;
 }
+*/
 
 char is_remote_desktop()
 {

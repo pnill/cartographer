@@ -268,6 +268,11 @@
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp" />
+    <ClCompile Include="MetaLoader\cache_loader.cpp" />
+    <ClCompile Include="MetaLoader\meta_struct.cpp" />
+    <ClCompile Include="MetaLoader\tag_loader.cpp" />
+    <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
+    <ClCompile Include="Runtime\init_runtime.cpp" />
     <ClCompile Include="XLive\Voice\AudioDevices.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -358,6 +363,7 @@
     <ClInclude Include="3rdparty\portaudio\include\pa_win_wdmks.h" />
     <ClInclude Include="3rdparty\portaudio\include\pa_win_wmme.h" />
     <ClInclude Include="3rdparty\portaudio\include\portaudio.h" />
+    <ClInclude Include="Blam\Cache\cache_header.h" />
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />
@@ -365,6 +371,14 @@
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
     <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h" />
+    <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
+    <ClInclude Include="MetaLoader\cache_loader.h" />
+    <ClInclude Include="MetaLoader\meta_struct.h" />
+    <ClInclude Include="MetaLoader\tag_loader.h" />
+    <ClInclude Include="Runtime\Cache\cache_ptrs.h" />
+    <ClInclude Include="Runtime\Engine\Globals\global_ptrs.h" />
+    <ClInclude Include="Runtime\init_runtime.h" />
+    <ClInclude Include="Runtime\RuntimeIncludes.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
     <ClInclude Include="Blam\BlamLibrary.h" />
