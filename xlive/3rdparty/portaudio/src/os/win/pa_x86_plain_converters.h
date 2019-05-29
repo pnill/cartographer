@@ -1,12 +1,6 @@
-#ifndef PA_JACK_H
-#define PA_JACK_H
-
 /*
- * $Id:
- * PortAudio Portable Real-Time Audio Library
- * JACK-specific extensions
- *
- * Copyright (c) 1999-2000 Ross Bencina and Phil Burk
+ * Plain Intel IA32 assembly implementations of PortAudio sample converter functions.
+ * Copyright (c) 1999-2002 Ross Bencina, Phil Burk
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files
@@ -40,38 +34,27 @@
  */
 
 /** @file
- *  @ingroup public_header
- *  @brief JACK-specific PortAudio API extension header file.
- */
+ @ingroup win_src
+*/
 
-#include "portaudio.h"
+#ifndef PA_X86_PLAIN_CONVERTERS_H
+#define PA_X86_PLAIN_CONVERTERS_H
 
 #ifdef __cplusplus
-extern "C" {
-#endif
+extern "C"
+{
+#endif /* __cplusplus */
 
-/** Set the JACK client name.
- *
- * During Pa_Initialize, When PA JACK connects as a client of the JACK server, it requests a certain
- * name, which is for instance prepended to port names. By default this name is "PortAudio". The
- * JACK server may append a suffix to the client name, in order to avoid clashes among clients that
- * try to connect with the same name (e.g., different PA JACK clients).
- *
- * This function must be called before Pa_Initialize, otherwise it won't have any effect. Note that
- * the string is not copied, but instead referenced directly, so it must not be freed for as long as
- * PA might need it.
- * @sa PaJack_GetClientName
- */
-PaError PaJack_SetClientName( const char* name );
 
-/** Get the JACK client name used by PA JACK.
- *
- * The caller is responsible for freeing the returned pointer.
- */
-PaError PaJack_GetClientName(const char** clientName);
+/**
+ @brief Install optimized converter functions suitable for all IA32 processors
+
+ It is recommended to call PaUtil_InitializeX86PlainConverters prior to calling Pa_Initialize
+*/
+void PaUtil_InitializeX86PlainConverters( void );
+
 
 #ifdef __cplusplus
 }
-#endif
-
-#endif
+#endif /* __cplusplus */
+#endif /* PA_X86_PLAIN_CONVERTERS_H */
