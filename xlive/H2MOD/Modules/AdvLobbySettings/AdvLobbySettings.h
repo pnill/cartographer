@@ -1,5 +1,5 @@
 #pragma once
-#include <H2MOD\protobuf\h2mod.pb.h>
+#include <H2MOD\h2protobuf\h2mod.pb.h>
 
 class AdvLobbySettings
 {

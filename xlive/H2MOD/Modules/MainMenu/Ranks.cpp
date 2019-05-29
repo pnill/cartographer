@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include "Ranks.h"
+
 #include <ShellAPI.h>
 #include <string>
 #include <unordered_set>

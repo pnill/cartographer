@@ -1,5 +1,6 @@
-
+#include "stdafx.h"
 #include "AudioDevices.h"
+
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
 CAudioDevices::CAudioDevices()

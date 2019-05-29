@@ -1,5 +1,7 @@
+#include "stdafx.h"
+#include "H2X.h"
+
 #include <Windows.h>
-#include "H2MOD\Variants\H2X\H2X.h"
 #include "H2MOD.h"
 
 void H2X::Initialize()

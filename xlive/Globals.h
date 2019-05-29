@@ -1,6 +1,5 @@
 #pragma once
 
-#include "stdafx.h"
 #include "H2MOD.h"
 #include "Util\Hooks\Hook.h"
 #include "Util\ReadIniArguments.h"

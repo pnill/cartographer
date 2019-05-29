@@ -1,5 +1,5 @@
 #pragma once
-#include "stdafx.h"
+#include "H2MOD.h"
 #include <string>
 
 struct filo
@@ -13,13 +13,13 @@ struct filo
 };
 static_assert(sizeof(filo) == 0x110, "Invalid 'filo' struct length.");
 
-enum PATH_FLAGS : BYTE {
+enum class PATH_FLAGS : BYTE {
 	CONTAINING_DIRECTORY_PATH = 1, // base
 	CONTAINING_DIRECTORY_NAME = 2, // base
 	FILE_NAME = 4, // base
 	FILE_EXTENSION = 8, // base
 
-	FULL_PATH = (FILE_NAME | CONTAINING_DIRECTORY_PATH | FILE_EXTENSION),
+	FULL_PATH = FILE_NAME | CONTAINING_DIRECTORY_PATH | FILE_EXTENSION,
 };
 
 inline PATH_FLAGS operator|(PATH_FLAGS a, PATH_FLAGS b)

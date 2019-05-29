@@ -1,5 +1,6 @@
-
+#include "stdafx.h"
 #include "GUI.h"
+
 #include "H2MOD.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
@@ -256,7 +257,7 @@ void initFontsIfRequired()
 	normalSizeFontHeight = 0.017 * verticalRes;
 	largeSizeFontHeight = 0.034 * verticalRes;
 
-	InitalizeFont(L"Conduit ITC Medium", GetDirectoryFile(L"maps\\fonts\\conduit_itc_medium1.ttf"), largeSizeFontHeight, pDevice, true);
+	InitalizeFont(L"Conduit ITC Medium", GetDirectoryFile(L"maps\\fonts\\conduit_itc_medium1.ttf"), (int)largeSizeFontHeight, pDevice, true);
 	D3DXCreateFont(pDevice, 10, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Lucida Console", &smallFont);
 
 	if (!normalSizeFont || normalSizeFontHeight != normalSizeCurrentFontHeight) {
@@ -265,7 +266,7 @@ void initFontsIfRequired()
 			normalSizeFont->Release();
 		}
 
-		D3DXCreateFont(pDevice, normalSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Verdana", &normalSizeFont);
+		D3DXCreateFont(pDevice, (INT)normalSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Verdana", &normalSizeFont);
 		normalSizeCurrentFontHeight = normalSizeFontHeight;
 	}
 
@@ -275,7 +276,7 @@ void initFontsIfRequired()
 			largeSizeFont->Release();
 		}
 
-		D3DXCreateFont(pDevice, largeSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Tahoma", &largeSizeFont);
+		D3DXCreateFont(pDevice, (INT)largeSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Tahoma", &largeSizeFont);
 		largeSizeCurrentFontHeight = largeSizeFontHeight;
 	}
 
@@ -511,20 +512,20 @@ int WINAPI XLiveRender()
 			//TODO: move into chatbox commands
 			//drawPrimitiveRect(0, 0, gameWindowWidth, 200, D3DCOLOR_ARGB(255, 000, 000, 0));
 			if (commands->console) {
-				int x = 0, y = 0;
-				int height = 400;
-				float startingPosY = height - 15.0f;
-				drawPrimitiveRect(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
+				FLOAT x = 0, y = 0;
+				FLOAT height = 400;
+				FLOAT startingPosY = height - 15.0f;
+				drawPrimitiveRect(x, y, (FLOAT)gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				//drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
-				drawText(0, startingPosY, COLOR_WHITE, ">>", normalSizeFont);
-				drawText(35, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
+				drawText(0, (int)startingPosY, COLOR_WHITE, ">>", normalSizeFont);
+				drawText(35, (int)startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
 
 				startingPosY -= 12.0;
 				std::vector<std::string>::iterator it;
 				int i = 0;
 				for (it = commands->prevCommands.begin(); it < commands->prevCommands.end(); it++, i++) {
 					startingPosY -= 15.0;
-					drawText(0, startingPosY, COLOR_WHITE, (*it).c_str(), normalSizeFont);
+					drawText(0, (int)startingPosY, COLOR_WHITE, (*it).c_str(), normalSizeFont);
 				}
 			}
 			DWORD GameGlobals = *(DWORD*)((BYTE*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
@@ -579,7 +580,7 @@ int WINAPI XLiveRender()
 
 
 
-				drawPrimitiveRect(gameWindowWidth / 2 - 250, gameWindowHeight - achievement_height, 500, 100, D3DCOLOR_ARGB(155, 000, 000, 000));
+				drawPrimitiveRect((FLOAT)(gameWindowWidth / 2 - 250), (FLOAT)(gameWindowHeight - achievement_height), 500, 100, D3DCOLOR_ARGB(155, 000, 000, 000));
 
 				size_t delim = it->first.find("|");
 				std::string achievement_title = it->first.substr(0, delim);
@@ -644,7 +645,7 @@ int WINAPI XLiveRender()
 			extern long long Size_Of_Downloaded;
 			if (Size_Of_Download > 0) {
 				drawBox(10, 52, 200, 6, COLOR_RED, COLOR_RED);
-				drawBox(10, 52, ((Size_Of_Downloaded * 100) / Size_Of_Download) * 2, 6, COLOR_GREEN, COLOR_GREEN);
+				drawBox(10, 52, (int)(((Size_Of_Downloaded * 100) / Size_Of_Download) * 2), 6, COLOR_GREEN, COLOR_GREEN);
 			}
 
 			if (NetworkStatistics) {

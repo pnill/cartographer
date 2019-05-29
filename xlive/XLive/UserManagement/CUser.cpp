@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CUser.h"
+
 #include <time.h>
 #include <sstream>
 #include "H2MOD\Modules\Config\Config.h"

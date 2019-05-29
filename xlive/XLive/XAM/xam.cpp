@@ -1,7 +1,9 @@
+#include "stdafx.h"
+#include "xam.h"
+
 #include "Globals.h"
 #include "xlivedefs.h"
 #include "xliveless.h"
-#include "xam.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
 DWORD sys_ui = -1;

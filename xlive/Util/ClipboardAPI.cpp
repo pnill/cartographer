@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ClipboardAPI.h"
+
 #include "xliveless.h"
 #include <mutex>
 

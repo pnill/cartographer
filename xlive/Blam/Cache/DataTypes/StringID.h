@@ -92,7 +92,7 @@ inline bool Blam::Cache::DataTypes::StringID::operator== (const UINT32 &Value)
 }
 inline bool Blam::Cache::DataTypes::StringID::operator== (const StringID &StringID)
 {
-	return this->Handle = StringID.Handle;
+	return this->Handle == StringID.Handle;
 }
 inline bool Blam::Cache::DataTypes::StringID::operator!= (const UINT32 &Value)
 {

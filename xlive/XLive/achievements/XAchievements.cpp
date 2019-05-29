@@ -1,10 +1,12 @@
+#include "stdafx.h"
+#include "XAchievements.h"
+
 #include "Globals.h"
 #include "xlivedefs.h"
 #include "xliveless.h"
 #include "resource.h"
 #include "XLive\xbox\xbox.h"
 #include "XLive\XAM\xam.h"
-#include "Xlive\achievements\XAchievements.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
 #include <string>
 

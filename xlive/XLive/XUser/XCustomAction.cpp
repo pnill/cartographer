@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Globals.h"
 #include "xlivedefs.h"
 #include "xliveless.h"

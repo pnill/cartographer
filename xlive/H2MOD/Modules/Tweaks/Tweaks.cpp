@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include "Tweaks.h"
+
 #include <ShellAPI.h>
 #include <string>
 #include <unordered_set>
@@ -11,7 +13,6 @@
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
 #include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Variants\VariantMPGameEngine.h"
 #include "Util\filesys.h"
@@ -21,6 +22,9 @@
 
 #define _USE_MATH_DEFINES
 #include "math.h"
+
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#define min(a,b)            (((a) < (b)) ? (a) : (b))
 
 #pragma region Done_Tweaks
 
@@ -163,7 +167,7 @@ bool init_gfwl_gamestore()
 {
 	typedef char (init_gfwl_gamestore)();
 	auto init_gfwl_gamestore_impl = h2mod->GetAddress<init_gfwl_gamestore>(0x00202f3e);
-	return init_gfwl_gamestore_impl();
+	return init_gfwl_gamestore_impl() != 0;
 }
 // not sure if this is all it does
 HANDLE init_data_checksum_info()
@@ -220,14 +224,14 @@ bool rasterizer_initialize()
 {
 	typedef char rasterizer_initialize();
 	auto rasterizer_initialize_impl = h2mod->GetAddress<rasterizer_initialize>(0x00263359);
-	return rasterizer_initialize_impl();
+	return rasterizer_initialize_impl() != 0;
 }
 
 bool input_initialize()
 {
 	typedef char input_initialize();
 	auto input_initialize_impl = h2mod->GetAddress<input_initialize>(0x2FD23);
-	return input_initialize_impl();
+	return input_initialize_impl() != 0;
 }
 
 void sound_initialize()
@@ -643,7 +647,7 @@ bool open_cache_header(const wchar_t *lpFileName, cache_header *cache_header_ptr
 {
 	typedef char __cdecl open_cache_header(const wchar_t *lpFileName, cache_header *lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
 	auto open_cache_header_impl = h2mod->GetAddress<open_cache_header>(0x642D0, 0x4C327);
-	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
+	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0) != 0;
 }
 
 void close_cache_header(HANDLE *map_handle)
@@ -1158,7 +1162,7 @@ void H2Tweaks::setFOV(double field_of_view_degrees) {
 
 		const double default_radians_FOV = 70.0f * M_PI / 180.0f;
 
-		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0f) / default_radians_FOV;
+		float calculated_radians_FOV = (float)((field_of_view_degrees * M_PI / 180.0) / default_radians_FOV);
 		WriteValue(H2BaseAddr + 0x41D984, calculated_radians_FOV); // First Person
 		WriteValue(H2BaseAddr + 0x413780, calculated_radians_FOV + 0.22f); // Third Person
 	}
@@ -1356,3 +1360,6 @@ void H2Tweaks::applyPlayersActionsUpdateRatePatch()
 	xb_tickrate_flt = h2mod->GetAddress<float>(0x3BBEB4, 0x378C84);
 	PatchCall(h2mod->GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
 }
+
+#undef max
+#undef min

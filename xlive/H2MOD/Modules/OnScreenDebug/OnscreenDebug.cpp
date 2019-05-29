@@ -1,6 +1,7 @@
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\Startup\Startup.h"
 #include "stdafx.h"
+#include "OnScreenDebug.h"
+
+#include "H2MOD\Modules\Startup\Startup.h"
 
 char** DebugStr;
 int DebugTextArrayLenMax = 160;

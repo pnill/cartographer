@@ -1,9 +1,12 @@
-#include <stdafx.h>
+#include "stdafx.h"
+#include "hash.h"
+
 #include <Wincrypt.h>
 #include <sstream>
 #include <iomanip>
-#include "hash.h"
 #include <codecvt>
+
+#define min 
 
 bool hash_open_file(const wchar_t *file_name, HANDLE &file)
 {
@@ -17,7 +20,7 @@ bool hash_get_crypto_provider(DWORD type, HCRYPTPROV *provider)
 		NULL,
 		NULL,
 		type,
-		CRYPT_VERIFYCONTEXT));
+		CRYPT_VERIFYCONTEXT) != 0);
 }
 
 #define file_chunk_size 1024 * 32
@@ -28,7 +31,7 @@ bool hash_do_file_hashing(HANDLE file, HCRYPTHASH hash, DWORD flags, long long l
 		len = LONG_MAX;
 	}
 	BYTE file_chunk[file_chunk_size];
-	DWORD len_to_read = min(file_chunk_size, len);
+	DWORD len_to_read = (unsigned long)min(file_chunk_size, len);
 	DWORD bytes_read = 0;
 	while (LOG_CHECK(ReadFile(file, file_chunk, len_to_read,
 		&bytes_read, NULL)))
@@ -45,7 +48,7 @@ bool hash_do_file_hashing(HANDLE file, HCRYPTHASH hash, DWORD flags, long long l
 		len = len - bytes_read;
 		if (len <= 0)
 			return true;
-		len_to_read = min(file_chunk_size, len);
+		len_to_read = (unsigned long)min(file_chunk_size, len);
 	}
 	return true;
 }

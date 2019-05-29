@@ -1,8 +1,8 @@
+#include "stdafx.h"
+#include "hook.h"
+
 #include <windows.h>
 #include <malloc.h>
-
-#include "hook.h"
-#pragma warning( disable :4996)
 
 void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 {
@@ -20,7 +20,7 @@ void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 	src[0] = 0xE9;
 	*(DWORD*)(src + 1) = (DWORD)(dst - src) - 5;
 
-	for (int i = 5; i < len; i++)
+	for (unsigned int i = 5; i < len; i++)
 		src[i] = 0x90;
 
 	VirtualProtect(src, len, dwBack, &dwBack);

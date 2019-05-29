@@ -1,5 +1,7 @@
-#include "Globals.h"
+#include "stdafx.h"
 #include "VariantPlayer.h"
+
+#include "Globals.h"
 
 /* 
 	This would replace the current "Players" class... 

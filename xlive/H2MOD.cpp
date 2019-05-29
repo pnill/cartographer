@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "H2MOD.h"
+
 #include <Wincrypt.h>
 #include <Mmsystem.h>
 #include "Blam\Engine\FileSystem\FiloInterface.h"
@@ -229,7 +230,7 @@ bool __cdecl call_add_object_to_sync(int gamestate_object_datum)
 	typedef int(__cdecl *add_object_to_sync)(int gamestate_object_datum);
 	add_object_to_sync p_add_object_to_sync = (add_object_to_sync)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x1B2C44 : 0x1B8D14));
 
-	return p_add_object_to_sync(gamestate_object_datum);
+	return p_add_object_to_sync(gamestate_object_datum) != 0;
 }
 
 /* We should really make this stuff into a struct/class, and access it that way it'd be much cleaner... */
@@ -548,7 +549,7 @@ bool H2MOD::is_team_play() {
 	//0x978CB4 works in both 
 	DWORD ptr = *((DWORD*)(this->GetBase() + 0x978CB4));
 	ptr += 0x1C68;
-	return *(BYTE*)ptr;
+	return (*(BYTE*)ptr) != 0;
 }
 
 #pragma region PlayerFunctions

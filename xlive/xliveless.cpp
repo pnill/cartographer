@@ -2,6 +2,7 @@
 // This file donated to the public domain
 #include "stdafx.h"
 #include "Globals.h"
+
 #include "XLive\XAM\xam.h"
 #include "XLive\xbox\xbox.h"
 #include "XLive\UserManagement\CUser.h"
@@ -938,7 +939,7 @@ DWORD WINAPI XStringVerify( DWORD dwFlags, const CHAR *szLocale, DWORD dwNumStri
 
 	if( pResults )
 	{
-		pResults->wNumStrings = dwNumStrings;
+		pResults->wNumStrings = (WORD)dwNumStrings;
 		pResults->pStringResult = (HRESULT *) ((BYTE *) pResults + sizeof(STRING_VERIFY_RESPONSE));
 
 

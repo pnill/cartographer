@@ -1,4 +1,6 @@
-#include "H2MOD\Modules\Accounts\AccountCreate.h"
+#include "stdafx.h"
+#include "AccountCreate.h"
+
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"

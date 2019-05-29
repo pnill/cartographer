@@ -1,3 +1,6 @@
+#include "stdafx.h"
+#include "ConsoleCommands.h"
+
 #include <fstream>
 #include "Globals.h"
 #include "Blam/BlamLibrary.h"
@@ -544,7 +547,8 @@ void ConsoleCommands::handle_command(std::string command) {
 					output(L"The value needs to be between 1 and 16.");
 					return;
 				}
-				if (maxPlayersToSet < session->total_party_players) {
+				// safe to convert to unsigned
+				if ((unsigned)maxPlayersToSet < session->total_party_players) {
 					output(L"You can't set a value of max players smaller than the actual number of players on the server.");
 					return;
 				}

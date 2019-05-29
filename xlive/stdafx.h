@@ -33,6 +33,7 @@
 #endif
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+#define NOMINMAX                        // Exclude more stupid windows stuff
 // Windows Header Files:
 #include <windows.h>
 #include <WinSock2.h>

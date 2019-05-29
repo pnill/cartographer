@@ -1,5 +1,8 @@
+#include "stdafx.h"
+#include "MapManager.h"
+
 #include "Globals.h"
-#include <H2MOD\protobuf\h2mod.pb.h>
+#include <H2MOD\h2protobuf\h2mod.pb.h>
 #include <fstream>
 #include <Mswsock.h>
 #include <WS2tcpip.h>
@@ -9,8 +12,6 @@
 #include "XLive/UserManagement/CUser.h"
 #include "..\Networking\Networking.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
-
-#pragma comment (lib, "mswsock.lib")
 
 #define DEFAULT_BUFLEN 65536
 
@@ -242,12 +243,14 @@ std::wstring MapManager::getMapName() {
 	return ucurrentMapName;
 }
 
-bool MapManager::hasCustomMap(std::string mapName) {
+bool MapManager::hasCustomMap(const std::string& mapName) {
 	if (mapName.empty()) {
 		return true;
 	}
-	std::wstring unicodeMapName(mapName.length(), L' ');
-	std::copy(mapName.begin(), mapName.end(), unicodeMapName.begin());
+
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
+	std::wstring unicodeMapName = conv.from_bytes(mapName);
+
 	return this->hasCustomMap(unicodeMapName);
 }
 
@@ -255,7 +258,7 @@ bool MapManager::hasCustomMap(std::string mapName) {
 * Checks if the client has the custom map already
 * NOTE - only works on peers (not dedis)
 */
-bool MapManager::hasCustomMap(std::wstring mapName) {
+bool MapManager::hasCustomMap(const std::wstring& mapName) {
 	DWORD dwBack;
 	wchar_t* mapsDirectory = (wchar_t*)(h2mod->GetBase() + 0x482D70 + 0x2423C);
 
@@ -393,7 +396,7 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 }
 
 static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
-	downloadPercentage = ((double)dlnow / (double)dltotal) * 100;
+	downloadPercentage = (int)(100.0 * dlnow / dltotal);
 	return 0;
 }
 
@@ -563,7 +566,7 @@ bool MapManager::downloadFromHost() {
 					for (int i = 0; i < iResult; i++) {
 						fseek(file, bytesRead++, SEEK_SET);
 						fputc(recvbuf[i], file);
-						int downloadPercentage = ((double)bytesRead / (double)fileSize) * 100;
+						int downloadPercentage = (int)(100.0 * bytesRead / fileSize);
 						if (prevDownloadPercentage != downloadPercentage) {
 							downloadLobbyMessage = precalculatedDownloadPercentageStrings[downloadPercentage].c_str();
 							prevDownloadPercentage = downloadPercentage;

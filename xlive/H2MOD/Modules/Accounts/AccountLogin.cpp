@@ -1,13 +1,18 @@
+#include "stdafx.h"
+#include "AccountLogin.h"
+
+#include "Accounts.h"
+
 #include <string>
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD\Modules\Accounts\Accounts.h"
-#include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "XLive\UserManagement\CUser.h"
+
+#include <WS2tcpip.h>
 
 bool AccountEdit_remember = true;
 
@@ -180,7 +185,8 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			snprintf(NotificationPlayerText, 100, "Client External IP Address is: %s", tempstr1);
 			addDebugText(NotificationPlayerText);
 			unsigned long resolvedAddr;
-			if ((resolvedAddr = inet_addr(tempstr1)) != INADDR_NONE) {
+			int result = inet_pton(AF_INET, tempstr1, &resolvedAddr);
+			if (result == 1) {
 				if (strlen(H2Config_str_wan) <= 0 && strlen(H2Config_str_lan) > 0) {
 					H2Config_ip_wan = resolvedAddr;
 				}
@@ -202,7 +208,8 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 			}
 			unsigned long resolvedAddr;
-			if ((resolvedAddr = inet_addr(tempstr1)) != INADDR_NONE || strcmp(tempstr1, "255.255.255.255") == 0) {
+			int result = inet_pton(AF_INET, tempstr1, &resolvedAddr);
+			if (result == 1 || strcmp(tempstr1, "255.255.255.255") == 0) {
 				//char NotificationPlayerText[60];
 				//snprintf(NotificationPlayerText, 60, "H2Master Relay IP is: %s", tempstr1);
 				//addDebugText(NotificationPlayerText);
@@ -370,7 +377,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 }
 
 bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
-	int result = false;
+	bool result = false;
 	char* rtn_result = 0;
 
 	char* os_string = 0;
@@ -393,6 +400,8 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
 			RtlGetVersionPtr rtlGetVersionPtr = (RtlGetVersionPtr)::GetProcAddress(hntdll, "RtlGetVersion");
 			rtlGetVersionPtr(&osvi);
 		} else {
+			// I got nothing better
+            #pragma warning(suppress: 4996)
 			GetVersionEx(&osvi);
 		}
 

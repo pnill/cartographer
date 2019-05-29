@@ -1,6 +1,8 @@
+#include "stdafx.h"
+#include "DeviceShop.h"
+
 #include <unordered_map>
 #include "Globals.h"
-#include "DeviceShop.h"
 extern void __cdecl print_to_console(char *output);
 extern void GivePlayerWeaponDatum(DatumIndex unit_datum, DatumIndex weapon_datum);
 

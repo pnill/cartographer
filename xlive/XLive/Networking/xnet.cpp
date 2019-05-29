@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 #include "xnet.h"
 
 XNetStartupParams g_XnetStartupParams;

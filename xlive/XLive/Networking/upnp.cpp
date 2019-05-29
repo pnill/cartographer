@@ -1,4 +1,6 @@
-#include "XLive\Networking\upnp.h"
+#include "stdafx.h"
+#include "upnp.h"
+
 #include <miniupnpc/upnpcommands.h>
 #include "Globals.h"
 

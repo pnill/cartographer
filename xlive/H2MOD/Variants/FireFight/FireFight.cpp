@@ -1,3 +1,6 @@
+#include "stdafx.h"
+#include "FireFight.h"
+
 #include "Globals.h"
 #include "Blam/BlamLibrary.h"
 

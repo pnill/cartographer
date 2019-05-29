@@ -1,4 +1,6 @@
+#include "stdafx.h"
 #include "VariantMPGameEngine.h"
+
 #include "H2MOD\Modules\Startup\Startup.h"
 #include <unordered_map>
 
@@ -363,7 +365,8 @@ c_engine_func_proto(unk_function_51_wrapper, int, int arg1, int arg2, int arg3, 
 	get_base_engine()->vtable->name(get_base_engine(), 0, ##__VA_ARGS__)
 bool c_game_engine_base::setup()
 {
-	return call_c_base_func(setup_scenario);
+	get_base_engine()->vtable->setup_scenario(get_base_engine(), 0);
+	return call_c_base_func(setup_scenario) != 0;
 }
 void c_game_engine_base::cleanup()
 {
@@ -469,7 +472,7 @@ int c_game_engine_base::unk_function_27()
 }
 bool c_game_engine_base::is_team_enemy(Team team_a, Team team_b)
 {
-	return call_c_base_func(is_team_enemy, team_a, team_b);
+	return call_c_base_func(is_team_enemy, team_a, team_b) != 0;
 }
 void c_game_engine_base::unk_function_29(int arg1)
 {

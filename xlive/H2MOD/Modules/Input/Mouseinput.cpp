@@ -1,4 +1,6 @@
-#include "H2MOD\Modules\Input\Mouseinput.h"
+#include "stdafx.h"
+#include "Mouseinput.h"
+
 #include <Windows.h>
 #include "H2MOD.h"
 
@@ -24,8 +26,8 @@ __declspec(naked) void CC_Fug(void)
 		PUSHFD
 	}
 
-	*dx = -1 * (float)ms->lX * 0.00075;
-	*dy = -1 * (float)ms->lY * 0.00075;
+	*dx = -1 * (float)ms->lX * 0.00075f;
+	*dy = -1 * (float)ms->lY * 0.00075f;
 
 	__asm
 	{

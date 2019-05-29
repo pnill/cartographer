@@ -1,5 +1,6 @@
+#include "stdafx.h"
+#include "Startup.h"
 
-#include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Utils\Utils.h"
@@ -178,7 +179,7 @@ bool configureXinput() {
 				}
 
 				int len_to_write = 2;
-				BYTE assmXinputDuraznoNameEdit[] = { 0x30 + (H2GetInstanceId() / 10), 0x30 + (H2GetInstanceId() % 10), 0x30 + (H2GetInstanceId() % 10) };
+				BYTE assmXinputDuraznoNameEdit[] = { (unsigned char)(0x30 + (H2GetInstanceId() / 10)), (unsigned char)(0x30 + (H2GetInstanceId() % 10)), (unsigned char)(0x30 + (H2GetInstanceId() % 10)) };
 				if (xinput_unicode[xinput_index]) {
 					assmXinputDuraznoNameEdit[1] = 0x00;
 					len_to_write = 3;

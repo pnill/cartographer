@@ -1,5 +1,4 @@
 #include "FiloInterface.h"
-#include "../H2MOD.h"
 
 namespace FiloInterface
 {
@@ -60,7 +59,7 @@ namespace FiloInterface
 		DWORD func_offset = SwitchServerClient(0x63C60, 0x65F3C);
 		auto filo__read_impl = reinterpret_cast<filo__read>(func_offset);
 
-		return filo__read_impl(filo_ptr, nNumberOfBytesToRead, hide_errors_from_user, data_buffer);
+		return filo__read_impl(filo_ptr, nNumberOfBytesToRead, hide_errors_from_user, data_buffer) != 0;
 	}
 
 	bool write(filo *filo_ptr, LPVOID data, size_t data_size)
@@ -78,7 +77,7 @@ namespace FiloInterface
 		{
 			if (SetFilePointer(filo_ptr->handle, new_size, NULL, FILE_BEGIN) != INVALID_SET_FILE_POINTER)
 			{
-				return SetEndOfFile(filo_ptr->handle);
+				return SetEndOfFile(filo_ptr->handle) != 0;
 			}
 		}
 		else {

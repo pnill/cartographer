@@ -1,3 +1,6 @@
+#include "stdafx.h"
+#include "XUserProperty.h"
+
 #include "Globals.h"
 #include "xliveless.h"
 #include "resource.h"
@@ -9,7 +12,6 @@
 #include <sstream>
 #include <codecvt>
 #include <unordered_map>
-#include "XUserProperty.h"
 #include "xlivedefs.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);

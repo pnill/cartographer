@@ -1,12 +1,9 @@
-#include <windows.h>
-
+#include "stdafx.h"
 #include "Detour.h"
+
+#include <windows.h>
 #include <stdio.h>
 #include <Softpub.h>
-
-
-#pragma comment(lib, "Wintrust.lib")
-
 
 //#define DEBUG_FILE
 
@@ -76,7 +73,7 @@ static void __stdcall DetourCreateFileW_code( HANDLE &result, LPCTSTR lpFileName
 	Debug_Log_W( (WCHAR *) lpFileName );
 
 
-		
+
 	// bounce xlive.dll check
 	//if( wcscmp( xlivePathW, (WCHAR *) lpFileName ) == 0 )
 		//return INVALID_HANDLE_VALUE;

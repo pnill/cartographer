@@ -1,4 +1,6 @@
+#include "stdafx.h"
 #include "NetworkSession.h"
+
 #include "H2MOD.h"
 
 network_session* NetworkSession::getNetworkSession()
@@ -18,7 +20,7 @@ bool NetworkSession::getCurrentNetworkSession(network_session** a1)
 	typedef char(__cdecl* get_lobby_globals_ptr)(network_session** ptr);
 	auto p_get_lobby_globals_ptr = reinterpret_cast<get_lobby_globals_ptr>(h2mod->GetBase() + ((h2mod->Server) ? 0x1A66B3 : 0x1AD736));
 
-	return p_get_lobby_globals_ptr(a1);
+	return p_get_lobby_globals_ptr(a1) != 0;
 }
 
 bool NetworkSession::localPeerIsSessionHost()

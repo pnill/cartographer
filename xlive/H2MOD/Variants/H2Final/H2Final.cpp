@@ -1,3 +1,6 @@
+#include "stdafx.h"
+#include "H2Final.h"
+
 #include "Globals.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 

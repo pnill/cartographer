@@ -1,6 +1,8 @@
+#include "stdafx.h"
+
 #include "Globals.h"
-#include "H2MOD\protobuf\h2mod.pb.h"
-#include "..\..\Modules\Networking\Networking.h"
+#include "H2MOD\h2protobuf\h2mod.pb.h"
+#include "H2MOD\Modules\Networking\Networking.h"
 
 static int weapon_one = 0;
 static int weapon_two = 0;
@@ -57,26 +59,26 @@ void GunGame::readWeaponLevels()
 		TRACE("[GunGame Enabled] - Opened GunGame.ini!");
 		while (!feof(gfp))
 		{
-			char gstr[256];
+			char str[256];
 
-			fgets(gstr, 256, gfp);
+			fgets(str, 256, gfp);
 
-			gCHECK_ARG("weapon_one =", weapon_one);
-			gCHECK_ARG("weapon_two =", weapon_two);
-			gCHECK_ARG("weapon_three =", weapon_three);
-			gCHECK_ARG("weapon_four =", weapon_four);
-			gCHECK_ARG("weapon_five =", weapon_five);
-			gCHECK_ARG("weapon_six =", weapon_six);
-			gCHECK_ARG("weapon_seven =", weapon_seven);
-			gCHECK_ARG("weapon_eight =", weapon_eight);
-			gCHECK_ARG("weapon_nine =", weapon_nine);
-			gCHECK_ARG("weapon_ten =", weapon_ten);
-			gCHECK_ARG("weapon_eleven =", weapon_eleven);
-			gCHECK_ARG("weapon_tweleve =", weapon_tweleve);
-			gCHECK_ARG("weapon_thirteen =", weapon_thirteen);
-			gCHECK_ARG("weapon_fourteen =", weapon_fourteen);
-			gCHECK_ARG("weapon_fifteen =", weapon_fiffteen);
-			gCHECK_ARG("weapon_sixteen =", weapon_sixteen);
+			CHECK_ARG("weapon_one =", weapon_one);
+			CHECK_ARG("weapon_two =", weapon_two);
+			CHECK_ARG("weapon_three =", weapon_three);
+			CHECK_ARG("weapon_four =", weapon_four);
+			CHECK_ARG("weapon_five =", weapon_five);
+			CHECK_ARG("weapon_six =", weapon_six);
+			CHECK_ARG("weapon_seven =", weapon_seven);
+			CHECK_ARG("weapon_eight =", weapon_eight);
+			CHECK_ARG("weapon_nine =", weapon_nine);
+			CHECK_ARG("weapon_ten =", weapon_ten);
+			CHECK_ARG("weapon_eleven =", weapon_eleven);
+			CHECK_ARG("weapon_tweleve =", weapon_tweleve);
+			CHECK_ARG("weapon_thirteen =", weapon_thirteen);
+			CHECK_ARG("weapon_fourteen =", weapon_fourteen);
+			CHECK_ARG("weapon_fifteen =", weapon_fiffteen);
+			CHECK_ARG("weapon_sixteen =", weapon_sixteen);
 
 		}
 

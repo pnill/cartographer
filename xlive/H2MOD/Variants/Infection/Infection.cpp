@@ -1,7 +1,8 @@
+#include "stdafx.h"
 #include "Globals.h"
-#include "H2MOD\protobuf\h2mod.pb.h"
-#include "..\..\Modules\Networking\Networking.h"
-#include "..\..\Modules\Networking\CustomPackets\CustomPackets.h"
+#include "H2MOD\h2protobuf\h2mod.pb.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 
 std::vector<std::wstring> Infection::zombieNames;
 
@@ -42,7 +43,7 @@ void Infection::sendTeamChange()
 	{
 		if (session->total_peers > 0)
 		{
-			int index = 0;
+			unsigned int index = 0;
 			do 
 			{
 				if (session->session_host_peer_index != index) {

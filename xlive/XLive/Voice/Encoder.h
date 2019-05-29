@@ -1,3 +1,3 @@
 #pragma once
 
-#include <opus/include/opus.h>
+#include <opus.h>

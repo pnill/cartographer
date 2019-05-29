@@ -5,7 +5,6 @@
 #include <string>
 
 #include <shlwapi.h>
-#pragma comment(lib, "shlwapi.lib")
 
 using namespace std;
 
@@ -22,7 +21,7 @@ public:
         {
             m_inifile = filename;
             return true;
-        }       
+        }
         return false;
     }
 
@@ -30,7 +29,7 @@ public:
     {
         m_strRet.clear();
 
-        if(m_inifile.empty()) 
+        if(m_inifile.empty())
         {
             m_strRet = defVal;
             return m_strRet;
@@ -49,7 +48,7 @@ public:
         }
         else
         {
-            delete [] strOut;          
+            delete [] strOut;
             m_strRet = defVal;
 
             return m_strRet;

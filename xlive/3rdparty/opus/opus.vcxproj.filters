@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\opus.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\opus_custom.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\opus_defines.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\opus_multistream.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\opus_projection.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\opus_types.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\analysis.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mapping_matrix.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mlp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\opus_private.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tansig_table.h">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\analysis.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mapping_matrix.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mlp.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mlp_data.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opus.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opus_decoder.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opus_encoder.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opus_multistream.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opus_multistream_decoder.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opus_multistream_encoder.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opus_projection_decoder.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opus_projection_encoder.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\repacketizer.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\repacketizer_demo.c">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

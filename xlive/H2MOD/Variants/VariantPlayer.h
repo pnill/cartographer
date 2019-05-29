@@ -1,4 +1,6 @@
 #pragma once
+#include "Blam/BlamLibrary.h"
+
 class VariantPlayer {
 	public:
 		XUID GetXUID(DatumIndex unit_datum,bool player);

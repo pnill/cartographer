@@ -1,9 +1,11 @@
+#include "stdafx.h"
+#include "XLive\Networking\XNetQoS.h"
+
 #include <WinSock2.h>
 #include <MSWSock.h>
 #include <WS2tcpip.h>
 #include <numeric>
 #include "xnet.h"
-#include "XLive\Networking\XNetQoS.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
@@ -162,7 +164,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 			auto ping_result = std::minmax_element(ping_storage.begin(),ping_storage.end());
 			long long min_ping = ping_storage[ (ping_result.first- ping_storage.begin()) ];
 			long long max_ping = ping_storage[ (ping_result.second - ping_storage.begin())];
-			unsigned int average = (std::accumulate(ping_storage.begin(), ping_storage.end(), 0) / ping_storage.size());
+			unsigned int average = (unsigned int)(std::accumulate(ping_storage.begin(), ping_storage.end(), 0LL) / (long long)ping_storage.size());
 
 			ping_storage.clear();
 

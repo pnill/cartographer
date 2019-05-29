@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="error">
+      <UniqueIdentifier>{EF21630F-5B36-8BC0-24B8-2E20908B87F1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal">
+      <UniqueIdentifier>{222D348C-0EFA-8E97-3713-7D3F233FC425}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="msinttypes">
+      <UniqueIdentifier>{25A0A853-1158-EAA0-7A5F-C3FC66368591}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\rapidjson\allocators.h" />
+    <ClInclude Include="include\rapidjson\document.h" />
+    <ClInclude Include="include\rapidjson\encodedstream.h" />
+    <ClInclude Include="include\rapidjson\encodings.h" />
+    <ClInclude Include="include\rapidjson\error\en.h">
+      <Filter>error</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\error\error.h">
+      <Filter>error</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\filereadstream.h" />
+    <ClInclude Include="include\rapidjson\filewritestream.h" />
+    <ClInclude Include="include\rapidjson\fwd.h" />
+    <ClInclude Include="include\rapidjson\internal\biginteger.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\internal\diyfp.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\internal\dtoa.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\internal\ieee754.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\internal\itoa.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\internal\meta.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\internal\pow10.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\internal\regex.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\internal\stack.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\internal\strfunc.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\internal\strtod.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\internal\swap.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\istreamwrapper.h" />
+    <ClInclude Include="include\rapidjson\memorybuffer.h" />
+    <ClInclude Include="include\rapidjson\memorystream.h" />
+    <ClInclude Include="include\rapidjson\msinttypes\inttypes.h">
+      <Filter>msinttypes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\msinttypes\stdint.h">
+      <Filter>msinttypes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rapidjson\ostreamwrapper.h" />
+    <ClInclude Include="include\rapidjson\pointer.h" />
+    <ClInclude Include="include\rapidjson\prettywriter.h" />
+    <ClInclude Include="include\rapidjson\rapidjson.h" />
+    <ClInclude Include="include\rapidjson\reader.h" />
+    <ClInclude Include="include\rapidjson\schema.h" />
+    <ClInclude Include="include\rapidjson\stream.h" />
+    <ClInclude Include="include\rapidjson\stringbuffer.h" />
+    <ClInclude Include="include\rapidjson\writer.h" />
+  </ItemGroup>
+</Project>

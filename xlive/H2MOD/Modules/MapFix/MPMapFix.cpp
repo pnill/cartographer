@@ -1,5 +1,7 @@
+#include "stdafx.h"
+#include "MPMapFix.h"
+
 #include <Windows.h>
-#include "H2MOD\Modules\MapFix\MPMapFix.h"
 #include "H2MOD.h"
 
 void MPMapFix::Initialize()

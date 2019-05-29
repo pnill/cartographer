@@ -1,4 +1,6 @@
-#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
+#include "stdafx.h"
+#include "CustomLanguage.h"
+
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "Util\Hooks\Hook.h"
@@ -242,7 +244,7 @@ bool read_custom_labels() {
 										lang_variant = number;
 									}
 									else if (ele_id == 2) {
-										other = (bool)number;
+										other = (bool)(number != 0);
 									}
 								}
 								else if (ele_id == 3 || ele_id == 4) {

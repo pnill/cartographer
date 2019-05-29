@@ -1,4 +1,6 @@
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "stdafx.h"
+#include "Utils.h"
+
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "Util\Hooks\Hook.h"
 #include <stdio.h>
@@ -6,13 +8,7 @@
 #include <Wincrypt.h>
 #include "H2MOD\Modules\Config\Config.h"
 
-#include "libcurl/curl/curl.h"
-
-#ifdef _DEBUG
-#pragma comment(lib, "libcurl_a_debug.lib")
-#else
-#pragma comment(lib, "libcurl_a.lib")
-#endif
+#include "curl/curl.h"
 
 int FindLineStart(FILE* fp, int lineStrLen) {
 	int fp_offset_orig = ftell(fp);
@@ -416,7 +412,7 @@ bool ComputeFileCrc32Hash(wchar_t* filepath, DWORD &rtncrc32) {
 
 static bool rfc3986_allow(char i) {
 	//isalnum(i)//PoS crashes
-	if ((i >= '0' && i <= '9') || 
+	if ((i >= '0' && i <= '9') ||
 		(i >= 'a' && i <= 'z') ||
 		(i >= 'A' && i <= 'Z') ||
 		i == '~' || i == '-' || i == '.' || i == '_')
@@ -623,4 +619,3 @@ int TrimRemoveConsecutiveSpaces(char* text) {
 		text[--text_pos] = 0;
 	return text_pos;//new length
 }
-

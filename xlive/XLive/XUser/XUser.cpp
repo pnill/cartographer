@@ -1,3 +1,6 @@
+#include "stdafx.h"
+#include "XUser.h"
+
 #include "Globals.h"
 #include "xlivedefs.h"
 #include "xliveless.h"
@@ -10,7 +13,6 @@
 #include <sstream>
 #include <codecvt>
 #include <unordered_map>
-#include "XUser.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 WCHAR strw_XUser[8192];

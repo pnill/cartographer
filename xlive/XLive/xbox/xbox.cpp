@@ -1,8 +1,10 @@
+#include "stdafx.h"
+#include "xbox.h"
+
 #include "Globals.h"
 #include "xlivedefs.h"
 #include "xliveless.h"
 #include "resource.h"
-#include "XLive\xbox\xbox.h"
 #include "XLive\XAM\xam.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\Config\Config.h"

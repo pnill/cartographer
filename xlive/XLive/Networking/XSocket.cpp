@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Globals.h"
 
 // #1: XWSAStartup

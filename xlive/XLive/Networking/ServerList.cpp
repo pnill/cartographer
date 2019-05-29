@@ -1,5 +1,7 @@
+#include "stdafx.h"
+#include "ServerList.h"
+
 #include "Globals.h"
-#include "XLive\Networking\ServerList.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"

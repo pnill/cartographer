@@ -1,6 +1,9 @@
+#include "stdafx.h"
+#include "Players.h"
+
 #include "Globals.h"
 #include <mutex>
-#include <H2MOD\protobuf\h2mod.pb.h>
+#include <H2MOD\h2protobuf\h2mod.pb.h>
 
 int Players::getPlayerStart(int index) {
 	int playerDataOffset = this->getPlayerOffset();

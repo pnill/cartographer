@@ -1,4 +1,6 @@
-﻿#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
+﻿#include "stdafx.h"
+#include "AdvLobbySettings.h"
+
 #include "Globals.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
@@ -102,13 +104,13 @@ void AdvLobbySettings::parseLobbySettings(const h2mod_lobby_settings& lobby_sett
 	TRACE_GAME("[h2mod] Parsing AdvLobbySettings.");
 	addDebugText("[h2mod] Parsing AdvLobbySettings.");
 	
-	AdvLobbySettings_mp_explosion_physics = lobby_settings.mp_explosion_physics() - 1;
-	AdvLobbySettings_mp_sputnik = lobby_settings.mp_sputnik() - 1;
-	AdvLobbySettings_mp_grunt_bday_party = lobby_settings.mp_grunt_bday_party() - 1;
-	AdvLobbySettings_grenade_chain_react = lobby_settings.grenade_chain_react() - 1;
-	AdvLobbySettings_banshee_bomb = lobby_settings.banshee_bomb() - 1;
+	AdvLobbySettings_mp_explosion_physics = (bool)((lobby_settings.mp_explosion_physics() - 1) != 0);
+	AdvLobbySettings_mp_sputnik = (bool)((lobby_settings.mp_sputnik() - 1) != 0);
+	AdvLobbySettings_mp_grunt_bday_party = (bool)((lobby_settings.mp_grunt_bday_party() - 1) != 0);
+	AdvLobbySettings_grenade_chain_react = (bool)((lobby_settings.grenade_chain_react() - 1) != 0);
+	AdvLobbySettings_banshee_bomb = (bool)((lobby_settings.banshee_bomb() - 1) != 0);
 	AdvLobbySettings_mp_blind = lobby_settings.mp_blind() - 1;
-	AdvLobbySettings_flashlight = lobby_settings.flashlight() - 1;
+	AdvLobbySettings_flashlight = (bool)((lobby_settings.flashlight() - 1) != 0);
 
 	refresh_mp_explosion_physics();
 }

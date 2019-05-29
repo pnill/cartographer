@@ -1,4 +1,6 @@
+#include "stdafx.h"
 #include "Credits.h"
+
 #include "CustomMenuGlobals.h"
 
 CreditsMenu_list *credits_list_widget;

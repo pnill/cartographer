@@ -1,6 +1,8 @@
+#include "stdafx.h"
+#include "XHVEngine.h"
+
 #include "Globals.h"
 
-#include "XHVEngine.h"
 #include "AudioDevices.h"
 #include "AudioHandler.h"
 #include "xlivedefs.h"

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "RadarPatch.h"
 
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"

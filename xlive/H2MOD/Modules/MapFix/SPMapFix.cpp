@@ -1,5 +1,7 @@
+#include "stdafx.h"
+#include "SPMapFix.h"
+
 #include <Windows.h>
-#include "H2MOD\Modules\MapFix\SPMapFix.h"
 #include "H2MOD.h"
 
 void SPMapFix::Initialize()

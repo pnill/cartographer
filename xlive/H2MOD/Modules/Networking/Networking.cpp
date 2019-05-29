@@ -1,6 +1,7 @@
+#include "stdafx.h"
+#include "Networking.h"
 
 #include "Globals.h"
-#include "Networking.h"
 #include "Memory\bitstream.h"
 #include "CustomPackets\CustomPackets.h"
 #include "XLive\UserManagement\CUser.h"

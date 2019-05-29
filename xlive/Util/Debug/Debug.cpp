@@ -1,10 +1,16 @@
 #include "stdafx.h"
+#include "Debug.h"
+
 #include <string>
+
+#pragma warning(push)
+#pragma warning(disable : 4091)
 #include <Dbghelp.h>
+#pragma warning(pop)
+
 #include <time.h>
 #include <Shlwapi.h>
 #include <Shlobj.h>
-#include "Debug.h"
 #include "../H2MOD.h"
 
 #define crash_reports_path "\\halo2_crash_reports\\"

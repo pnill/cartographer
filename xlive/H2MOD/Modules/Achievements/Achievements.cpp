@@ -1,3 +1,6 @@
+#include "stdafx.h"
+#include "Achievements.h"
+
 #include <string>
 #include <curl/curl.h>
 #include "rapidjson/document.h"
@@ -79,7 +82,7 @@ void GetAchievements()
 
 		for (auto& achievement : document["achievements"].GetArray())
 		{
-			int id = std::stoll(achievement.GetString());
+			int id = (int)std::stoll(achievement.GetString());
 			achievementList[id] = 1;
 		}
 	}

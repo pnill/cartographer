@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 #include "AudioHandler.h"
 
 CAudioHandler::CAudioHandler(CAudioDevices* pAudioDevice) 

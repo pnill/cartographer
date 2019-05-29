@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "c_list_widget.h"
 
 void __fastcall c_list_widget_label_buttons(int thisptr, DWORD _EDX, int a1, int a2)

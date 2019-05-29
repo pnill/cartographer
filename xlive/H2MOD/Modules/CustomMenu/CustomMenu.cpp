@@ -1,4 +1,6 @@
-#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
+#include "stdafx.h"
+#include "CustomMenu.h"
+
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\Utils\Utils.h"

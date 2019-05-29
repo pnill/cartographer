@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "Globals.h"
 #include "XLive\Networking\upnp.h"

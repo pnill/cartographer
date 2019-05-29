@@ -1,4 +1,6 @@
+#include "stdafx.h"
 #include "c_screen_with_menu.h"
+
 #include "CustomMenuGlobals.h"
 
 int __fastcall c_screen_with_menu_title_desc(int a1, DWORD _EDX, char a2)

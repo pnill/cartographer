@@ -1,3 +1,6 @@
+#include "stdafx.h"
+#include "XboxTick.h"
+
 #include "Globals.h"
 
 XboxTick::XboxTick()

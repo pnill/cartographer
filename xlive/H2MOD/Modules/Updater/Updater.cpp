@@ -1,4 +1,6 @@
-#include "H2MOD\Modules\Updater\Updater.h"
+#include "stdafx.h"
+#include "Updater.h"
+
 #include <stdio.h>
 #include <curl/curl.h>
 #include <string>
@@ -9,8 +11,10 @@
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 
+#include <shellapi.h>
+
 bool fork_cmd_elevate(const char* cmd, char* flags = 0) {
-	SHELLEXECUTEINFO shExInfo = { 0 };
+	SHELLEXECUTEINFOA shExInfo = { 0 };
 	shExInfo.cbSize = sizeof(shExInfo);
 	shExInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
 	shExInfo.hwnd = 0;
@@ -21,7 +25,7 @@ bool fork_cmd_elevate(const char* cmd, char* flags = 0) {
 	shExInfo.nShow = SW_SHOW;
 	shExInfo.hInstApp = 0;
 
-	if (ShellExecuteEx(&shExInfo))
+	if (ShellExecuteExA(&shExInfo))
 	{
 		//WaitForSingleObject(shExInfo.hProcess, INFINITE);
 		CloseHandle(shExInfo.hProcess);
@@ -47,7 +51,7 @@ bool fork_cmd(LPSTR cmd) {
 	//siStartInfo.wShowWindow = SW_HIDE; // execute hide 
 
 	// Create the child process. 
-	bSuccess = CreateProcessA(//NULL,
+	bSuccess = 0 != CreateProcessA(//NULL,
 		NULL,     // command line 
 		cmd,
 		NULL,          // process security attributes 

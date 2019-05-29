@@ -1,5 +1,7 @@
+#include "stdafx.h"
+#include "Hitfix.h"
+
 #include <Windows.h>
-#include "H2MOD\Modules\HitFix\Hitfix.h"
 #include "H2MOD.h"
 
 void HitFix::Initialize()

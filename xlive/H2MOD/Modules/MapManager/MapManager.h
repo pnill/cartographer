@@ -14,8 +14,8 @@ public:
 	void cleanup();
 	const char* getCustomLobbyMessage();
 	std::wstring getMapName();
-	bool hasCustomMap(std::string mapName);
-	bool hasCustomMap(std::wstring mapName);
+	bool hasCustomMap(const std::string& mapName);
+	bool hasCustomMap(const std::wstring& mapName);
 
 	//client functions/data below
 	void applyGamePatches();

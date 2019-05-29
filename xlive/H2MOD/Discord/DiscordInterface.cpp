@@ -1,8 +1,9 @@
-#include <unordered_set>
 #include "stdafx.h"
-#include "3rdparty/discord/discord_rpc.h"
-#include "3rdparty/discord/discord_register.h"
 #include "DiscordInterface.h"
+
+#include <unordered_set>
+#include "discord_rpc.h"
+#include "discord_register.h"
 
 const static char api_key[] = "379371722685808641";
 
@@ -88,7 +89,7 @@ static void updateDiscordPresence()
 	Discord_UpdatePresence(&discordPresence);
 }
 
-static void handleDiscordReady()
+static void handleDiscordReady(const DiscordUser* request)
 {
 }
 
@@ -108,7 +109,7 @@ static void handleDiscordSpectate(const char* secret)
 {
 }
 
-static void handleDiscordJoinRequest(const DiscordJoinRequest* request)
+static void handleDiscordJoinRequest(const DiscordUser* request)
 {
 }
 

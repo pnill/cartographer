@@ -1,3 +1,6 @@
+#include "stdafx.h"
+#include "Config.h"
+
 #include "H2MOD.h"
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -9,7 +12,6 @@
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
-#include "H2MOD\Modules\Config\Config.h"
 
 static void HandleFileError(int fpErrNo) {//TODO
 	if (fpErrNo == EACCES || fpErrNo == EIO || fpErrNo == EPERM) {
@@ -817,7 +819,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				incorrect = true;
 			}
 			else {
-				H2Portable = (bool)tempint1;
+				H2Portable = (bool)(tempint1 != 0);
 				est_h2portable = true;
 			}
 		}
@@ -916,7 +918,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				incorrect = true;
 			}
 			else {
-				H2Config_custom_labels_capture_missing = (bool)tempint1;
+				H2Config_custom_labels_capture_missing = (bool)(tempint1 != 0);
 				est_language_label_capture = true;
 			}
 		}
@@ -928,7 +930,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				incorrect = true;
 			}
 			else {
-				H2Config_skip_intro = (bool)tempint1;
+				H2Config_skip_intro = (bool)(tempint1 != 0);
 				est_skip_intro = true;
 			}
 		}
@@ -940,7 +942,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				incorrect = true;
 			}
 			else {
-				H2Config_raw_input = (bool)tempint1;
+				H2Config_raw_input = (bool)(tempint1 != 0);
 				est_raw_input = true;
 			}
 		}
@@ -952,7 +954,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				incorrect = true;
 			}
 			else {
-				H2Config_discord_enable = (bool)tempint1;
+				H2Config_discord_enable = (bool)(tempint1 != 0);
 				est_discord_enable = true;
 			}
 		}
@@ -1062,7 +1064,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				incorrect = true;
 			}
 			else {
-				H2Config_disable_ingame_keyboard = (bool)tempint1;
+				H2Config_disable_ingame_keyboard = (bool)(tempint1 != 0);
 				est_disable_ingame_keyboard = true;
 			}
 		}
@@ -1074,7 +1076,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				incorrect = true;
 			}
 			else {
-				H2Config_hide_ingame_chat = (bool)tempint1;
+				H2Config_hide_ingame_chat = (bool)(tempint1 != 0);
 				est_hide_ingame_chat = true;
 			}
 		}
@@ -1422,7 +1424,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				incorrect = true;
 			}
 			else {
-				H2Config_xDelay = (bool)tempint1;
+				H2Config_xDelay = (bool)(tempint1 != 0);
 				est_xdelay = true;
 			}
 		}
@@ -1542,7 +1544,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				incorrect = true;
 			}
 			else {
-				H2Config_debug_log = (bool)tempint1;
+				H2Config_debug_log = (bool)(tempint1 != 0);
 				est_debug_log = true;
 			}
 		}
@@ -1609,7 +1611,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				incorrect = true;
 			}
 			else {
-				H2Config_chatbox_commands = (bool)tempint1;
+				H2Config_chatbox_commands = (bool)(tempint1 != 0);
 				est_chatbox_commands = true;
 			}
 		}
@@ -1847,7 +1849,7 @@ void ReadH2Config() {
 
 #pragma region Config Init/Deinit
 void InitH2Config() {
-	H2Config_disable_ingame_keyboard = (bool)(H2GetInstanceId() - 1);
+	H2Config_disable_ingame_keyboard = (bool)((H2GetInstanceId() - 1) != 0);
 	ReadH2Config();
 }
 void DeinitH2Config() {
