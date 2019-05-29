@@ -116,6 +116,16 @@ project "H2MOD"
 	language "C++"
 	cppdialect "C++17"
 
+	dependson {
+		"Blam",
+		"discord",
+		"protobuf",
+		"libcurl",
+		"miniupnpc",
+		"opus",
+		"portaudio",
+	}
+
 	-- xlive.dll goes here, and gets copied to /Halo2 post-build
 	targetdir "bin/%{cfg.buildcfg}"
 	objdir "bin-int/%{cfg.buildcfg}"
