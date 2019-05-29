@@ -1,4 +1,4 @@
-/* $Id: upnperrors.h,v 1.2 2008/07/02 23:31:15 nanard Exp $ */
+/* $Id: upnperrors.h,v 1.6 2015/07/21 13:16:55 nanard Exp $ */
 /* (c) 2007-2015 Thomas Bernard
  * All rights reserved.
  * MiniUPnP Project.
