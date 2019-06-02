@@ -6,6 +6,7 @@
 
 #include <codecvt>
 
+
 h2log* h2log::console = nullptr;
 bool h2log::failAlerted = false;
 std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> h2log::string_convert;
