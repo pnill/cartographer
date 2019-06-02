@@ -1160,7 +1160,20 @@ void H2Tweaks::setFOV(double field_of_view_degrees) {
 
 		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0f) / default_radians_FOV;
 		WriteValue(H2BaseAddr + 0x41D984, calculated_radians_FOV); // First Person
-		WriteValue(H2BaseAddr + 0x413780, calculated_radians_FOV + 0.22f); // Third Person
+	}
+}
+
+void H2Tweaks::setVehicleFOV(double field_of_view_degrees) {
+
+	if (H2IsDediServer)
+		return;
+
+	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
+	{
+		float current_FOV = *reinterpret_cast<float*>(H2BaseAddr + 0x413780);
+
+		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0f);
+		WriteValue(H2BaseAddr + 0x413780, calculated_radians_FOV); // Third Person
 	}
 }
 

@@ -1769,6 +1769,7 @@ void H2MOD::Initialize()
 		this->Server = FALSE;
 		
 		H2Tweaks::setFOV(H2Config_field_of_view);
+		H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
 		if (H2Config_raw_input)
 			Mouseinput::Initialize();
 

@@ -87,6 +87,7 @@ bool H2Config_discord_enable = true;
 int H2Config_fps_limit = 60;
 int H2Config_static_lod_state = static_lod::disable;
 int H2Config_field_of_view = 0;
+int H2Config_vehicle_field_of_view = 0;
 int H2Config_refresh_rate = 60;
 int H2Config_mouse_sens = 0;
 int H2Config_controller_sens = 0;
@@ -431,6 +432,9 @@ void SaveH2Config() {
 			sprintf(settingOutBuffer, "\nfield_of_view = %d", H2Config_field_of_view);
 			fputs(settingOutBuffer, fileConfig);
 
+			sprintf(settingOutBuffer, "\nvehicle_field_of_view = %d", H2Config_vehicle_field_of_view);
+			fputs(settingOutBuffer, fileConfig);
+
 			sprintf(settingOutBuffer, "\nrefresh_rate = %d", H2Config_refresh_rate);
 			fputs(settingOutBuffer, fileConfig);
 
@@ -635,6 +639,7 @@ static bool est_discord_enable = false;
 static bool est_fps_limit = false;
 static bool est_static_lod_state = false;
 static bool est_field_of_view = false;
+static bool est_vehicle_field_of_view = false;
 static bool est_refresh_rate = false;
 static bool est_mouse_sens = false;
 static bool est_controller_sens = false;
@@ -712,6 +717,7 @@ static void est_reset_vars() {
 	est_fps_limit = false;
 	est_static_lod_state = false;
 	est_field_of_view = false;
+	est_vehicle_field_of_view = false;
 	est_refresh_rate = false;
 	est_mouse_sens = false;
 	est_controller_sens = false;
@@ -1005,6 +1011,19 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				H2Config_field_of_view = tempint1;
 				est_field_of_view = true;
 			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "vehicle_field_of_view =%d", &tempint1) == 1) {
+			if (est_vehicle_field_of_view) {
+				duplicated = true;
+			}
+		else if (!(tempint1 >= 0)) {
+			incorrect = true;
+		}
+		else {
+			H2Config_vehicle_field_of_view = tempint1;
+			est_vehicle_field_of_view = true;
+		}
+
 		}
 		else if (!H2IsDediServer && sscanf(fileLine, "refresh_rate =%d", &tempint1) == 1) {
 			if (est_refresh_rate) {
