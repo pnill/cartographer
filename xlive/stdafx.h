@@ -36,8 +36,12 @@
 // Windows Header Files:
 #include <windows.h>
 #include <WinSock2.h>
+#include <shellapi.h>
+#include <windef.h>
+#include <timeapi.h>
 
 // TODO: include this only if trac
+#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 //#include <Objbase.h>
@@ -51,6 +55,11 @@
 #include <algorithm>
 #include <unordered_map>
 
-// #define XLIVELESS_EXPORTS
+#include <d3d9.h>
+#include <d3dx9.h>
+
+#include "Util/log.h"
 #include "xliveless.h"
 #include "xlivedefs.h"
+
+#undef small

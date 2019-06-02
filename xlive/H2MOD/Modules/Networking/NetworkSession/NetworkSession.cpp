@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "NetworkSession.h"
 #include "H2MOD.h"
 

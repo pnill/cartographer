@@ -20,6 +20,7 @@ extern unsigned short H2Config_master_port_login;
 extern unsigned short H2Config_master_port_relay;
 
 extern bool H2Portable;
+extern bool H2Config_isConfigFileAppDataLocal;
 extern unsigned short H2Config_base_port;
 extern char H2Config_str_wan[16];
 extern char H2Config_str_lan[16];
@@ -50,6 +51,8 @@ extern char H2Config_dedi_server_name[32];
 extern char H2Config_dedi_server_playlist[256];
 extern bool H2Config_chatbox_commands;
 extern bool H2Config_debug_log;
+extern int H2Config_debug_log_level;
+extern bool H2Config_debug_log_console;
 extern char H2Config_login_identifier[255];
 extern char H2Config_login_password[255];
 extern int H2Config_hotkeyIdHelp;

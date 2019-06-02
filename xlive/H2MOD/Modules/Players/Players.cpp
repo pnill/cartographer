@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Globals.h"
 #include <mutex>
 #include <H2MOD\protobuf\h2mod.pb.h>

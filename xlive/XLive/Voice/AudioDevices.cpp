@@ -1,5 +1,6 @@
-
+#include "stdafx.h"
 #include "AudioDevices.h"
+#include "AudioHandler.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
 CAudioDevices::CAudioDevices()
@@ -10,7 +11,7 @@ CAudioDevices::CAudioDevices()
 	m_totalDevices = Pa_GetDeviceCount();
 	if (m_totalDevices < 0)
 	{
-		TRACE_N("[PortAudio-API] ERROR: Pa_GetDeviceCount returned 0x%x", m_totalDevices);
+		LOG_TRACE(CAudioHandler::logger, "Pa_GetDeviceCount returned {:x}", m_totalDevices);
 		m_CAudioDeviceErr = m_totalDevices;
 		return;
 	}
@@ -24,12 +25,12 @@ CAudioDevices::CAudioDevices()
 
 		if (i == Pa_GetDefaultInputDevice())
 		{
-			TRACE_N("[PortAudio-API] INFO: Found default input device, index: %i", i);
+			LOG_TRACE(CAudioHandler::logger, "Found default input device, index: {}", i);
 			m_defaultInputDeviceIndex = i;
 		}
 		else if (i == Pa_GetDefaultOutputDevice())
 		{
-			TRACE_N("[PortAudio-API] INFO: Found default output device, index: %i", i);
+			LOG_TRACE(CAudioHandler::logger, "Found default output device, index: {}", i);
 			m_defaultOutputDeviceIndex = i;
 		}
 
@@ -49,13 +50,13 @@ CAudioDevices::CAudioDevices()
 	}
 
 	if (!IsDeviceAvailable(Input))
-		TRACE_N("[PortAudio-API] INFO: No audio input device found. Voice chat will not work!");
+		LOG_TRACE(CAudioHandler::logger, "No audio input device found. Voice chat will not work!");
 
 	if (!IsDeviceAvailable(Output))
-		TRACE_N("[PortAudio-API] INFO: No audio output device found.");
+		LOG_TRACE(CAudioHandler::logger, "No audio output device found.");
 
-	TRACE_N("[PortAudio-API] INFO: Total numver of audio devices = %d", m_totalDevices);
-	TRACE_N("CAudioDevices: Successful initialization!");
+	LOG_TRACE(CAudioHandler::logger, "Total numver of audio devices = {}", m_totalDevices);
+	LOG_TRACE(CAudioHandler::logger, "CAudioDevices: Successful initialization!");
 }
 
 void CAudioDevices::SelectAudioOutput()

@@ -1,5 +1,7 @@
+#include "stdafx.h"
+#include "XUserProperty.h"
+
 #include "Globals.h"
-#include "xliveless.h"
 #include "resource.h"
 #include "XLive\xbox\xbox.h"
 #include "XLive\XAM\xam.h"
@@ -9,8 +11,6 @@
 #include <sstream>
 #include <codecvt>
 #include <unordered_map>
-#include "XUserProperty.h"
-#include "xlivedefs.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
@@ -23,15 +23,15 @@ DWORD WINAPI XUserGetProperty(DWORD dwUserIndex, DWORD* pcbActual, XUSER_PROPERT
 // #5276: XUserSetProperty
 void WINAPI XUserSetProperty(DWORD dwUserIndex, DWORD dwPropertyId, DWORD cbValue, CONST VOID *pvValue)
 {
-	TRACE("XUserSetProperty");
+	LOG_TRACE_XLIVE("XUserSetProperty");
 	return;
 }
 
 // #5293: XUserSetPropertyEx
 int WINAPI XUserSetPropertyEx(DWORD dwUserIndex, DWORD dwPropertyId, DWORD cbValue, void * pvValue, PXOVERLAPPED pOverlapped)
 {
-	TRACE("XUserSetPropertyEx  (userIndex = %d, propertyId = %X, cbValue = %d, pvValue = %X, pOverlapped = %X)",
-		dwUserIndex, dwPropertyId, cbValue, pvValue, pOverlapped);
+	LOG_TRACE_XLIVE("XUserSetPropertyEx  (userIndex = {0}, propertyId = {1:x}, cbValue = {2}, pvValue = {3:p}, pOverlapped = {4:p})",
+		dwUserIndex, dwPropertyId, cbValue, (void*)pvValue, (void*)pOverlapped);
 
 
 	if (pOverlapped == 0)

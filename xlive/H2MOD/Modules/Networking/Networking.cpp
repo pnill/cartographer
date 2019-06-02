@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "Globals.h"
 #include "Networking.h"
@@ -22,7 +23,7 @@ const char* getTextForEnum(int enumVal) {
 void __cdecl request_write(void* a1, int a2, int a3) {
 	bitstream::p_data_encode_integer()(a1, "identifier", *(DWORD *)a3, 32);
 	bitstream::p_data_encode_integer()(a1, "flags", *(DWORD *)(a3 + 4), 8);
-	TRACE_GAME_NETWORK_N("[H2MOD-network] connection request write, identifier=%d, flags=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4));
+	LOG_TRACE_NETWORK("[H2MOD-network] connection request write, identifier={0}, flags={1}", *(DWORD *)a3, *(DWORD *)(a3 + 4));
 }
 
 bool __cdecl request_read(void* a1, int a2, int a3) {
@@ -40,7 +41,7 @@ bool __cdecl refuse_read(void* a1, int a2, int a3) {
 	*(DWORD *)a3 = bitstream::p_data_decode_integer()(a1, "remote-identifier", 32);
 	*(DWORD *)(a3 + 4) = bitstream::p_data_decode_integer()(a1, "reason", 3);
 	bool isValid = bitstream::p_packet_is_valid()(a1) == 0;
-	//TRACE_GAME_NETWORK_N("[H2MOD-network] connection refuse read, remote-identifier=%d, reason=%d, isValid=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), isValid);
+	//LOG_TRACE_NETWORK_N("[H2MOD-network] connection refuse read, remote-identifier={}, reason=%d, isValid=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), isValid);
 	return isValid;
 }
 
@@ -48,14 +49,14 @@ void __cdecl establish_write(void* a1, int a2, int a3) {
 	userManager.sendSecurePacket(game_network_data_gateway_socket_1000, 1000);
 	bitstream::p_data_encode_integer()(a1, "remote-identifier", *(DWORD *)a3, 32);
 	bitstream::p_data_encode_integer()(a1, "reason", *(DWORD *)(a3 + 4), 32);
-	//TRACE_GAME_NETWORK_N("[H2MOD-network] connection establish write, remote-identifier=%d, identifier=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4));
+	//LOG_TRACE_NETWORK_N("[H2MOD-network] connection establish write, remote-identifier=%d, identifier=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4));
 }
 
 bool __cdecl establish_read(void* a1, int a2, int a3) {
 	*(DWORD *)a3 = bitstream::p_data_decode_integer()(a1, "remote-identifier", 32);
 	*(DWORD *)(a3 + 4) = bitstream::p_data_decode_integer()(a1, "identifier", 32);
 	bool isValid = bitstream::p_packet_is_valid()(a1) == 0;
-	//TRACE_GAME_NETWORK_N("[H2MOD-network] connection establish read, remote-identifier=%d, identifier=%d, isValid=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), isValid);
+	//LOG_TRACE_NETWORK_N("[H2MOD-network] connection establish read, remote-identifier=%d, identifier=%d, isValid=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), isValid);
 	return isValid;
 }
 
@@ -64,7 +65,7 @@ void __cdecl closed_write(void* a1, int a2, int a3) {
 	bitstream::p_data_encode_integer()(a1, "remote-identifier", *(DWORD *)a3, 32);
 	bitstream::p_data_encode_integer()(a1, "identifier", *(DWORD *)(a3 + 4), 32);
 	bitstream::p_data_encode_integer()(a1, "closure-reason", *(DWORD *)(a3 + 8), 5);
-	//TRACE_GAME_NETWORK_N("[H2MOD-network] connection closed write, remote-identifier=%d, identifier=%d, closureReason=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), *(DWORD *)(a3 + 8));
+	//LOG_TRACE_NETWORK_N("[H2MOD-network] connection closed write, remote-identifier=%d, identifier=%d, closureReason=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), *(DWORD *)(a3 + 8));
 }
 
 bool __cdecl closed_read(void* a1, int a2, int a3) {
@@ -82,7 +83,7 @@ bool __cdecl closed_read(void* a1, int a2, int a3) {
 		if (v3 >= 0 && v3 < 18)
 			result = true;
 	}
-	//TRACE_GAME_NETWORK_N("[H2MOD-network] connection closed read, remote-identifier=%d, reason=%d, closureReason=%d, isValid=%d, result=%d",
+	//LOG_TRACE_NETWORK_N("[H2MOD-network] connection closed read, remote-identifier=%d, reason=%d, closureReason=%d, isValid=%d, result=%d",
 	//	*(DWORD *)a3, *(DWORD *)(a3 + 4), *(DWORD *)(a3 + 8), isValid, result);
 	return result;
 }
@@ -157,7 +158,7 @@ typedef int(__stdcall *send_packet)(void* thisx, void *a2, unsigned int type, un
 send_packet send_packet_method;
 
 int __stdcall sendPacket(void* thisx, void *a2, unsigned int type, unsigned int size, int packet_data_obj) {
-	TRACE_GAME_NETWORK_N("[h2mod-network] send packet type=%d, typeName=%s, size=%d", type, getTextForEnum(type), size);
+	LOG_TRACE_NETWORK("[h2mod-network] send packet type={0}, typeName={1}, size={2}", type, getTextForEnum(type), size);
 	return send_packet_method(thisx, a2, type, size, packet_data_obj);
 }
 
@@ -170,7 +171,7 @@ bool decodePacketTypeAndSize(void *thisx, void* a2, signed int *a3, int a4) {
 	v4 = (char *)thisx;
 	*a3 = bitstream::p_data_decode_integer()(a2, "type", 8);
 	*(DWORD *)a4 = bitstream::p_data_decode_integer()(a2, "size", 16);
-	TRACE_GAME_NETWORK_N("[h2mod-network] received packet decoded type=%d, typeName=%s, size=%d", *a3, getTextForEnum(*a3), *(DWORD *)a4);
+	LOG_TRACE_NETWORK("[h2mod-network] received packet decoded type={0}, typeName={1}, size={2}", *a3, getTextForEnum(*a3), *(DWORD *)a4);
 	if (bitstream::p_packet_is_valid()(a2)
 		|| (v5 = *a3, *a3 < 0)
 		|| v5 >= 49
@@ -194,20 +195,20 @@ char __stdcall receivePacket(void *thisx, void* a2, int packetType, unsigned int
 	char *v5; // ebp@1
 	int v6; // esi@2
 	char result; // al@2
-	TRACE_GAME_NETWORK_N("[h2mod-network] received packet");
+	LOG_TRACE_NETWORK("[h2mod-network] received packet");
 	v5 = (char *)thisx;
 	typedef bool(__thiscall *decode_type_and_size)(void* thisx, int a2, signed int* a3, int a4);
 	decode_type_and_size decode_type_and_size_method = (decode_type_and_size)(h2mod->GetBase() + (h2mod->Server ? 0x1CA1DA : 0x1E8217));
 	if (decodePacketTypeAndSize(thisx, a2, (signed int *)packetType, (int)size))
 	{
-		TRACE_GAME_NETWORK_N("[h2mod-network] received packet succesfully decoded");
+		LOG_TRACE_NETWORK("[h2mod-network] received packet succesfully decoded");
 		v6 = (int)&v5[32 * *(DWORD *)packetType];
 		memset(packet_obj, 0, *size);
 		result = (*(int(__cdecl **)(void*, unsigned int, void *))(v6 + 24))(a2, *size, packet_obj);// calls packet read/write method
 	}
 	else
 	{
-		TRACE_GAME_NETWORK_N("[h2mod-network] received packet was invalid");
+		LOG_TRACE_NETWORK("[h2mod-network] received packet was invalid");
 		result = 0;
 	}
 	return result;
@@ -265,7 +266,7 @@ void __stdcall receiveDataFromSocket(DWORD* thisx) {
 				v5 = h2_calls_socketrecvfrom(*v4, ptr, 4096);
 				if (v5 > 0 && sub_1261E77((int)&v9))
 				{
-					TRACE_GAME_NETWORK_N("[h2mod-network] received socket data %s", ptr);
+					LOG_TRACE_NETWORK("[h2mod-network] received socket data {}", ptr);
 					a1 = v5;
 					v8 = v3;
 					v2 = 1;
@@ -318,13 +319,13 @@ void __cdecl serializeMembershipPacket(void* a1, int a2, int a3) {
 			
 			//let the host tell everyone else the game can start
 			if (*(BYTE *)(v4 + 140)) {
-				TRACE_GAME_NETWORK_N("[h2mod-network] Serialize Original Peer map status - %d", *(DWORD*)(v4 + 142));
-				TRACE_GAME_NETWORK_N("[h2mod-network] Serialize Original Peer map progress percentage - %d", *(DWORD *)(v4 + 146));
+				LOG_TRACE_NETWORK_N("[h2mod-network] Serialize Original Peer map status - {}", *(DWORD*)(v4 + 142));
+				LOG_TRACE_NETWORK_N("[h2mod-network] Serialize Original Peer map progress percentage - {}", *(DWORD *)(v4 + 146));
 
 				*(DWORD *)(v4 + 142) = 4;
 				*(DWORD *)(v4 + 146) = 100;
-				TRACE_GAME_NETWORK_N("[h2mod-network] Serialize New Peer map status - %d", *(DWORD *)(v4 + 142));
-				TRACE_GAME_NETWORK_N("[h2mod-network] Serialize New Peer map progress percentage - %d", *(DWORD *)(v4 + 146));
+				LOG_TRACE_NETWORK_N("[h2mod-network] Serialize New Peer map status - {}", *(DWORD *)(v4 + 142));
+				LOG_TRACE_NETWORK_N("[h2mod-network] Serialize New Peer map progress percentage - {}", *(DWORD *)(v4 + 146));
 			}
 			++v3;
 			v4 += 184;
@@ -354,7 +355,7 @@ int __cdecl deserializeMembershipPacket(void* a1, int a2, int a3) {
 		do {
 			int peerMapStatus = *(DWORD*)(peerOffset + 142);
 			*(DWORD*)(peerOffset + 142) = peerMapStatus;//failedToLoadTheMap ? 1 : peerMapStatus;
-			TRACE_GAME_NETWORK_N("[h2mod-network] Deserialize Peer map status - %d", peerMapStatus);
+			LOG_TRACE_NETWORK_N("[h2mod-network] Deserialize Peer map status - {}", peerMapStatus);
 			peerOffset += 184;
 			++v3;
 		} while (v3 < peerCount);
@@ -364,7 +365,7 @@ int __cdecl deserializeMembershipPacket(void* a1, int a2, int a3) {
 	/* 0x20 offset = total peers offset, 0x22 = total players */
 	WORD player_count = *(WORD*)((BYTE*)a3 + 0x20); 
 	
-	TRACE_GAME_NETWORK_N("[h2mod-network] deserializeMemberShipPacket player count: %i", player_count);
+	LOG_TRACE_NETWORK("[h2mod-network] deserializeMemberShipPacket player count: {}", player_count);
 	
 	/*There's an array of players in + 0x26 */
 	BYTE *PlayerArray = (BYTE*)((BYTE*)a3 + 0x26);
@@ -398,7 +399,7 @@ void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* 
 {
 	memset(&userManager.game_host_xn, NULL, sizeof(XNADDR));
 	memcpy(&userManager.game_host_xn, host_xn, sizeof(XNADDR));
-	TRACE_GAME_NETWORK_N("[H2MOD-Network] copied host information, XNADDR: %08X", userManager.game_host_xn.ina.s_addr);
+	LOG_TRACE_NETWORK("[H2MOD-Network] copied host information, XNADDR: {:#x}", userManager.game_host_xn.ina.s_addr);
 	userManager.sendSecurePacket(game_network_message_gateway_socket_1001, 1001);
 	userManager.CreateUser(host_xn, FALSE);
 	return pjoin_game(thisptr, a2, a3, a4, a5, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);

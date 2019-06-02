@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "XLive\Networking\upnp.h"
 #include <miniupnpc/upnpcommands.h>
 #include "Globals.h"
@@ -39,7 +40,7 @@ Utils::UPnPResult ModuleUPnP::UPnPForwardPort(bool tcp, int externalport, int in
 
 DWORD WINAPI XLiveGetUPnPState(DWORD a1)
 {
-	TRACE("XLiveGetUPnPState  (a1 = %X)", a1);
+	LOG_TRACE_XLIVE("XLiveGetUPnPState  (a1 = {:x})", a1);
 
 
 	return 0;

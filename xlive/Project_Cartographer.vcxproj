@@ -106,7 +106,7 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <PrecompiledHeaderOutputFile>.\Debug/xliveless.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>.\Release/xliveless.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>.\Release/</AssemblerListingLocation>
       <ObjectFileName>.\Release/</ObjectFileName>
       <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
@@ -120,6 +120,7 @@
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -176,8 +177,8 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(SolutionDir)xlive\libcurl;$(SolutionDir)xlive\3rdparty\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -231,8 +232,8 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(SolutionDir)xlive\libcurl;$(SolutionDir)xlive\3rdparty\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -269,8 +270,18 @@
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="XLive\Voice\AudioDevices.cpp" />
-    <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
+    <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="XLive\Voice\Encoder.cpp" />
     <ClCompile Include="Globals.cpp" />
@@ -304,7 +315,11 @@
     <ClCompile Include="H2MOD\Modules\Tweaks\Tweaks.cpp" />
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
     <ClCompile Include="H2MOD\Modules\Utils\Utils.cpp" />
-    <ClCompile Include="H2MOD\protobuf\h2mod.pb.cc" />
+    <ClCompile Include="H2MOD\protobuf\h2mod.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="H2MOD\Variants\DeviceShop\DeviceShop.cpp" />
     <ClCompile Include="H2MOD\Variants\FireFight\FireFight.cpp" />
     <ClCompile Include="H2MOD\Variants\GunGame\GunGame.cpp" />
@@ -332,7 +347,11 @@
     <ClCompile Include="XLive\Networking\xnet.cpp" />
     <ClCompile Include="XLive\Networking\XSocket.cpp" />
     <ClCompile Include="XLive\UserManagement\CUser.cpp" />
-    <ClCompile Include="XLive\UserManagement\protobuf\packet.pb.cc" />
+    <ClCompile Include="XLive\UserManagement\protobuf\packet.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="XLive\Voice\XHVEngine.cpp" />
     <ClCompile Include="XLive\XAM\xam.cpp" />
     <ClCompile Include="XLive\xbox\xbox.cpp" />

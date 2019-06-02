@@ -1,80 +1,198 @@
 #pragma once
-#include <stdio.h>
-#include <mutex>
+#include "stdafx.h"
 
-class logger
+#include "spdlog/spdlog.h"
+
+#include <assert.h>
+
+//#define MICRO_TIME std::chrono::time_point<std::chrono::steady_clock>
+//#define MICRO_CLOCK std::chrono::high_resolution_clock
+//#define MICRO_CLOCK_DURATION std::chrono::duration_cast<std::chrono::microseconds>
+
+enum log_level : unsigned int {
+	trace,    //          Tell me *everything*
+	debug,    //          Give me the dirty details
+	info,     // Default. Occasionally helpful information
+	warning,  //          What probably shouldn't be happening
+	error,    //          Bad news only, please
+	critical  //          I only want to see death and destruction
+};
+
+class h2log
 {
+private:
+	h2log(const std::string& name);
+	h2log() = delete;
+
 public:
-	logger(const std::string &filename, bool append = false)
-	{
-		log_handle = fopen(filename.c_str(), append ? "at" :"wt");
-	}
+	~h2log();
 
-	logger() = delete;
-	~logger()
-	{
-		write(" === LOG END ===");
-		fclose(log_handle);
-		log_handle = nullptr;
-	}
+	// Good for checking if the logger is actually able to ouput logs
+	bool is_valid();
 
-	bool is_valid()
-	{
-		return log_handle != nullptr;
-	}
+	std::string name() const { return this->sname; }
 
-	static logger *create(const std::string &filename, bool append = false)
-	{
-		auto new_logger = new logger(filename, append);
-		if (new_logger->is_valid()) {
-			return new_logger;
-		} else {
-			delete new_logger;
-			return nullptr;
-		}
-	}
+	// Changes the log level and returns the old level, so it could be reset later if needed
+	static log_level set_log_level(log_level level);
 
-	void write(char *format, ...)
-	{
-		va_list	arg;
-		va_start(arg, format);
+	/// <summary>
+	///   <para>Creates a logger which outputs to a file, always returns a
+	///   logger which is safe to call logging commands on even if the file
+	///   could not be created.</para>
+	///   <para>Use logger.is_valid() to check if logging is working.</para>
+	/// </summary>
+	static h2log *create(const std::string &name, std::wstring &filename);
 
-		std::unique_lock<std::mutex> lock(write_mutex);
-		write_time();
+	/// <summary>
+	///   <para>Creates a logger which outputs to a console window, always
+	///   returns a logger which is safe to call logging commands on even
+	///   if the window could not be created.</para>
+	///   <para>Use logger.is_valid() to check if logging is working.</para>
+	/// </summary>
+	static h2log *create_console(const std::string &name);
 
-		vfprintf(log_handle, format, arg);
-		fprintf(log_handle, "\n");
+#define log_a(level) \
+	if (output != nullptr)                      \
+		output->##level(fmt.data(), args...);   \
+	if (!isConsole                              \
+		&& console != nullptr                   \
+		&& console->output != nullptr)          \
+		console->output->##level(               \
+			("[" + sname + "] " + fmt).data()   \
+			, args...)
 
-		va_end(arg);
+#define log_b(level) \
+	if (output != nullptr)                      \
+		output->##level(fmt.data(), args...);   \
+	if (!isConsole                              \
+		&& console != nullptr                   \
+		&& console->output != nullptr)          \
+		console->output->##level(               \
+			(L"[" + wname + L"] " + fmt).data() \
+			, args...)
 
-		fflush(log_handle);
-	}
+#define log_c(level) \
+	if (output != nullptr)                      \
+		output->##level(msg.data());            \
+	if (!isConsole                              \
+		&& console != nullptr                   \
+		&& console->output != nullptr)          \
+		console->output->##level(               \
+			("[" + sname + "] " + msg).data())
 
-	void write(wchar_t *format, ...)
-	{
-		va_list	arg;
-		va_start(arg, format);
+#define log_d(level) \
+	if (output != nullptr)                      \
+		output->##level(msg.data());            \
+	if (!isConsole                              \
+		&& console != nullptr                   \
+		&& console->output != nullptr)          \
+		console->output->##level(               \
+			(L"[" + wname + L"] " + msg).data())
 
-		std::unique_lock<std::mutex> lock(write_mutex);
-		write_time();
+	// For the most unimportant stuff
+	template<typename... Args>
+	void trace(const std::string& fmt, const Args &... args) { log_a(trace); }
 
-		vfwprintf(log_handle, format, arg);
-		fwprintf(log_handle, L"\n");
+	// For the most unimportant stuff
+	template<typename... Args>
+	void trace(const std::wstring& fmt, const Args &... args) { log_b(trace); }
 
-		va_end(arg);
+	// For the most unimportant stuff
+	void trace(const std::string& msg) { log_c(trace); }
 
-		fflush(log_handle);
-	}
+	// For the most unimportant stuff
+	void trace(const std::wstring& msg) { log_d(trace); }
+
+
+	// Somewhat more useful information
+	template<typename... Args>
+	void debug(const std::string& fmt, const Args &... args) { log_a(debug); }
+
+	// Somewhat more useful information
+	template<typename... Args>
+	void debug(const std::wstring& fmt, const Args &... args) { log_b(debug); }
+
+	// Somewhat more useful information
+	void debug(const std::string& msg) { log_c(debug); }
+
+	// Somewhat more useful information
+	void debug(const std::wstring& msg) { log_d(debug); }
+
+
+	// Things that even users may want to see
+	template<typename... Args>
+	void info(const std::string& fmt, const Args &... args) { log_a(info); }
+
+	// Things that even users may want to see
+	template<typename... Args>
+	void info(const std::wstring& fmt, const Args &... args) { log_b(info); }
+
+	// Things that even users may want to see
+	void info(const std::string& msg) { log_c(info); }
+
+	// Things that even users may want to see
+	void info(const std::wstring& msg) { log_d(info); }
+
+
+	// A surprise to be sure, but not a serious one
+	template<typename... Args>
+	void warning(const std::string& fmt, const Args &... args) { log_a(warn); }
+
+	// A surprise to be sure, but not a serious one
+	template<typename... Args>
+	void warning(const std::wstring& fmt, const Args &... args) { log_b(warn); }
+
+	// A surprise to be sure, but not a serious one
+	void warning(const std::string& msg) { log_c(warn); }
+
+	// A surprise to be sure, but not a serious one
+	void warning(const std::wstring& msg) { log_d(warn); }
+
+
+	// Absolutely not good, probably game breaking events
+	template<typename... Args>
+	void error(const std::string& fmt, const Args &... args) { log_a(error); }
+
+	// Absolutely not good, probably game breaking events
+	template<typename... Args>
+	void error(const std::wstring& fmt, const Args &... args) { log_b(error); }
+
+	// Absolutely not good, probably game breaking events
+	void error(const std::string& msg) { log_c(error); }
+
+	// Absolutely not good, probably game breaking events
+	void error(const std::wstring& msg) { log_d(error); }
+
+
+	// "Wait, that's illegal" except it is definitely not a joke
+	template<typename... Args>
+	void critical(const std::string& fmt, const Args &... args) { log_a(critical); }
+
+	// "Wait, that's illegal" except it is definitely not a joke
+	template<typename... Args>
+	void critical(const std::wstring& fmt, const Args &... args) { log_b(critical); }
+
+	// "Wait, that's illegal" except it is definitely not a joke
+	void critical(const std::string& msg) { log_c(critical); }
+
+	// "Wait, that's illegal" except it is definitely not a joke
+	void critical(const std::wstring& msg) { log_d(critical); }
+
+
+#undef log_a
+#undef log_w
+#undef log_b
+
+public:
+	bool isConsole = false;
 
 private:
+	static bool failAlerted;
+	static h2log* console;
+	static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> string_convert;
 
-	inline void write_time()
-	{
-		SYSTEMTIME t;
-		GetLocalTime(&t);
-		fwprintf(log_handle, L"%02d/%02d/%04d %02d:%02d:%02d.%03d ", t.wDay, t.wMonth, t.wYear, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds);
-	}
+	std::string sname;
+	std::wstring wname;
+	std::shared_ptr<spdlog::logger> output = nullptr;
 
-	FILE *log_handle = nullptr;
-	std::mutex write_mutex;
 };

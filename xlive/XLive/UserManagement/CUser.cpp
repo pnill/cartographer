@@ -36,7 +36,7 @@ int CUserManagement::sendSecurePacket(SOCKET s, short to_port)
 		sendToAddr.sin_family = AF_INET;
 
 		int ret = sendto(s, userManager.secure_packet, 12 + sizeof(XNADDR), NULL, (SOCKADDR*)&sendToAddr, sizeof(sendToAddr));
-		TRACE_GAME_NETWORK_N("[H2MOD-Network] secure packet sent, return code: %d", ret);
+		LOG_TRACE_NETWORK("[H2MOD-Network] secure packet sent, return code: {}", ret);
 		return ret;
 	}
 	return -1;
@@ -51,7 +51,7 @@ void CUserManagement::CreateUser(const XNADDR* pxna, BOOL user)
 		This should now also be called when receiving the 'SecurityPacket' because we have the data on the first attempt to either establish a connection OR on the attempt to join a game,
 		That should eliminate the need to talk to the Master server in order to get the XNADDR information from the secure address.
 	*/
-	TRACE_GAME_NETWORK_N("CUserManagement::CreateUser() secure address %08X", pxna->inaOnline.s_addr);
+	LOG_TRACE_NETWORK("CUserManagement::CreateUser() secure address {:x}", pxna->inaOnline.s_addr);
 
 	ULONG secure = pxna->inaOnline.s_addr;
 	CUser *nUser = new CUser;
@@ -81,8 +81,8 @@ void CUserManagement::CreateUser(const XNADDR* pxna, BOOL user)
 		short nPort_base = pxna->wPortOnline;
 		short nPort_join = htons(ntohs(pxna->wPortOnline) + 1);
 
-		TRACE_GAME_NETWORK_N("CreateUser - nPort_base: %i", ntohs(nPort_base));
-		TRACE_GAME_NETWORK_N("CreateUser - nPort_join: %i", ntohs(nPort_join));
+		LOG_TRACE_NETWORK("CreateUser - nPort_base: {}", ntohs(nPort_base));
+		LOG_TRACE_NETWORK("CreateUser - nPort_join: {}", ntohs(nPort_join));
 
 		std::pair <ULONG, SHORT> hostpair = std::make_pair(pxna->ina.s_addr, nPort_join);
 		std::pair <ULONG, SHORT> hostpair_1000 = std::make_pair(pxna->ina.s_addr, nPort_base);
@@ -224,10 +224,10 @@ BOOL CUserManagement::GetLocalXNAddr(XNADDR* pxna)
 	if (local_user.bValid)
 	{
 		memcpy(pxna, &local_user.xnaddr, sizeof(XNADDR));
-		TRACE_GAME_NETWORK_N("GetLocalXNAddr(): XNADDR: %08X", pxna->ina.s_addr);
+		LOG_TRACE_NETWORK("GetLocalXNAddr(): XNADDR: {:x}", pxna->ina.s_addr);
 		return TRUE;
 	}
-	//TRACE_GAME_NETWORK_N("GetLocalXNADDR(): Local user network information not populated yet.");
+	//LOG_TRACE_NETWORK_N("GetLocalXNADDR(): Local user network information not populated yet.");
 
 	return FALSE;
 }
@@ -235,8 +235,8 @@ BOOL CUserManagement::GetLocalXNAddr(XNADDR* pxna)
 // #57: XNetXnAddrToInAddr
 INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pnkid, IN_ADDR *pina)
 {
-	TRACE_GAME_NETWORK_N("XNetXNAddrToInAddr(): secure: %08X", pxna->inaOnline.s_addr);
-	TRACE_GAME_NETWORK_N("XNetXnAddrToInAddr(): ina.s_addr: %08X", pxna->ina.s_addr);
+	LOG_TRACE_NETWORK("XNetXNAddrToInAddr(): secure: {:x}", pxna->inaOnline.s_addr);
+	LOG_TRACE_NETWORK("XNetXnAddrToInAddr(): ina.s_addr: {:x}", pxna->ina.s_addr);
 
 	if (pxna->inaOnline.s_addr != NULL) {
 		CUser* user = userManager.cusers[pxna->inaOnline.s_addr];
@@ -253,7 +253,7 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pnkid, IN_ADDR *p
 // #60: XNetInAddrToXnAddr
 INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
 {
-	TRACE_GAME_NETWORK_N("XNetInAddrToXnAddr() const ina: %08X", ina.s_addr);
+	LOG_TRACE_NETWORK("XNetInAddrToXnAddr() const ina: {:x}", ina.s_addr);
 	CUser* user = userManager.cusers[ina.s_addr];
 	if (user != nullptr)
 	{
@@ -269,7 +269,7 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
 	}
 	else
 	{
-		TRACE_GAME_NETWORK_N("XNetInAddrToXnAddr() the peer with secure/ipaddress %08X doesn't exist!", ina.s_addr);
+		LOG_TRACE_NETWORK("XNetInAddrToXnAddr() the peer with secure/ipaddress {:x} doesn't exist!", ina.s_addr);
 	}
 
 	return 0;
@@ -278,7 +278,7 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
 // #63: XNetUnregisterInAddr
 int WINAPI XNetUnregisterInAddr(const IN_ADDR ina)
 {
-	TRACE_GAME_NETWORK_N("XNetUnregisterInAddr(): %08X", ina.s_addr);
+	LOG_TRACE_NETWORK("XNetUnregisterInAddr(): {:x}", ina.s_addr);
 	//userManager.UnregisterSecureAddr(ina);
 	return 0;
 }

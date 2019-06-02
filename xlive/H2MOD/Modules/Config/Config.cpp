@@ -1,15 +1,12 @@
+#include "stdafx.h"
+#include "Config.h"
+
 #include "H2MOD.h"
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <math.h>
-#include <windows.h>
-#include <Shellapi.h>
+
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
-#include "H2MOD\Modules\Config\Config.h"
 
 static void HandleFileError(int fpErrNo) {//TODO
 	if (fpErrNo == EACCES || fpErrNo == EIO || fpErrNo == EPERM) {
@@ -102,6 +99,8 @@ char H2Config_dedi_server_name[32] = { "" };
 char H2Config_dedi_server_playlist[256] = { "" };
 bool H2Config_chatbox_commands = false;
 bool H2Config_debug_log = false;
+int H2Config_debug_log_level = 2;
+bool H2Config_debug_log_console = false;
 char H2Config_login_identifier[255] = { "" };
 char H2Config_login_password[255] = { "" };
 //weapon crosshair sizes
@@ -145,7 +144,7 @@ int H2Config_hotkeyIdConsole = VK_F10;
 
 
 bool ownsConfigFile = false;
-bool isConfigFileAppDataLocal = false;
+bool H2Config_isConfigFileAppDataLocal = false;
 
 void SaveH2Config() {
 	addDebugText("Saving H2Configuration File...");
@@ -161,7 +160,7 @@ void SaveH2Config() {
 	if (FlagFilePathConfig) {
 		swprintf(fileConfigPath, 1024, FlagFilePathConfig);
 	}
-	else if (H2Portable || !isConfigFileAppDataLocal) {
+	else if (H2Portable || !H2Config_isConfigFileAppDataLocal) {
 		swprintf(fileConfigPath, 1024, H2ConfigFilenames[H2IsDediServer], H2ProcessFilePath, H2GetInstanceId());
 	}
 	else {
@@ -348,8 +347,22 @@ void SaveH2Config() {
 		}*/
 
 		fputs("# debug_log Options:", fileConfig);
-		fputs("\n# 0 - Disables excess logging.", fileConfig);
-		fputs("\n# 1 - Enables excess logging.", fileConfig);
+		fputs("\n# 0 - Disables logging.", fileConfig);
+		fputs("\n# 1 - Enables logging.", fileConfig);
+		fputs("\n\n", fileConfig);
+
+		fputs("# debug_log_level Options:", fileConfig);
+		fputs("\n# 0 - Trace, tell me *everything*.", fileConfig);
+		fputs("\n# 1 - Debug, give me the dirty details.", fileConfig);
+		fputs("\n# 2 - Info, occasionally helpful information.", fileConfig);
+		fputs("\n# 3 - Warning, what probably shouldn't be happening.", fileConfig);
+		fputs("\n# 4 - Error, bad news only, please.", fileConfig);
+		fputs("\n# 5 - Critical, I only want to see death and destruction.", fileConfig);
+		fputs("\n\n", fileConfig);
+
+		fputs("# debug_log_console Options:", fileConfig);
+		fputs("\n# 0 - Disables console window logging.", fileConfig);
+		fputs("\n# 1 - Enables console window logging, will display all output from all loggers.", fileConfig);
 		fputs("\n\n", fileConfig);
 
 		if (H2IsDediServer) {
@@ -479,6 +492,14 @@ void SaveH2Config() {
 		}*/
 
 		fputs("\ndebug_log = ", fileConfig); fputs(H2Config_debug_log ? "1" : "0", fileConfig);
+
+		{
+			char temp[25];
+			sprintf(temp, "\ndebug_log_level = %d", H2Config_debug_log_level);
+			fputs(temp, fileConfig);
+		}
+
+		fputs("\ndebug_log_console = ", fileConfig); fputs(H2Config_debug_log_console ? "1" : "0", fileConfig);
 
 		if (H2IsDediServer) {
 			fputs("\nserver_name = ", fileConfig); fputs(H2Config_dedi_server_name, fileConfig);
@@ -654,6 +675,8 @@ static bool est_als_banshee_bomb = false;
 static bool est_als_mp_blind = false;
 static bool est_als_flashlight = false;*/
 static bool est_debug_log = false;
+static bool est_debug_log_level = false;
+static bool est_debug_log_console = false;
 static bool est_custom_resolution = false;
 static bool est_server_name = false;
 static bool est_server_playlist = false;
@@ -731,6 +754,8 @@ static void est_reset_vars() {
 	est_als_mp_blind = false;
 	est_als_flashlight = false;*/
 	est_debug_log = false;
+	est_debug_log_level = false;
+	est_debug_log_console = false;
 	est_custom_resolution = false;
 	est_server_name = false;
 	est_server_playlist = false;
@@ -1546,6 +1571,30 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_debug_log = true;
 			}
 		}
+		else if (sscanf(fileLine, "debug_log_level =%d", &tempint1) == 1) {
+			if (est_debug_log_level) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0 && tempint1 <= 5)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_debug_log_level = tempint1;
+				est_debug_log_level = true;
+			}
+		}
+		else if (sscanf(fileLine, "debug_log_console =%d", &tempint1) == 1) {
+			if (est_debug_log_console) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_debug_log_console = (bool)tempint1;
+				est_debug_log_console = true;
+			}
+		}
 		else if (!H2IsDediServer && sscanf(fileLine, "custom_resolution =%dx%d", &tempint1, &tempint2) == 2) {
 			if (est_custom_resolution) {
 				duplicated = true;
@@ -1777,7 +1826,7 @@ void ReadH2Config() {
 	int readInstanceIdFile = H2GetInstanceId();
 	wchar_t local[1024];
 	swprintf(local, 1024, L"%ws", H2AppDataLocal);
-	isConfigFileAppDataLocal = false;
+	H2Config_isConfigFileAppDataLocal = false;
 	
 	FILE* fileConfig;
 	wchar_t fileConfigPath[1024];
@@ -1792,7 +1841,7 @@ void ReadH2Config() {
 	else {
 		do {
 			wchar_t* checkFilePath = H2ProcessFilePath;
-			if (isConfigFileAppDataLocal) {
+			if (H2Config_isConfigFileAppDataLocal) {
 				checkFilePath = local;
 			}
 			swprintf(fileConfigPath, 1024, H2ConfigFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
@@ -1803,17 +1852,17 @@ void ReadH2Config() {
 			if (!fileConfig) {
 				addDebugText("H2Configuration File does not exist.");
 			}
-			isConfigFileAppDataLocal = !isConfigFileAppDataLocal;
-			if (!fileConfig && !isConfigFileAppDataLocal) {
+			H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
+			if (!fileConfig && !H2Config_isConfigFileAppDataLocal) {
 				--readInstanceIdFile;
 			}
 		} while (!fileConfig && readInstanceIdFile > 0);
-		isConfigFileAppDataLocal = !isConfigFileAppDataLocal;
+		H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
 	}
 
 	if (!fileConfig) {
 		addDebugText("ERROR: No H2Configuration Files Could Be Found!");
-		isConfigFileAppDataLocal = true;
+		H2Config_isConfigFileAppDataLocal = true;
 	}
 	else {
 		ownsConfigFile = (readInstanceIdFile == H2GetInstanceId());

@@ -26,7 +26,6 @@ typedef unsigned char SAMPLE;
 #define PRINTF_S_FORMAT "%d"
 #endif
 
-
 class CAudioHandler
 {
 public:
@@ -37,6 +36,8 @@ public:
 	
 
 	~CAudioHandler();
+
+	static h2log* logger;
 
 private:
 	PaStreamParameters  inputParameters, outputParameters;

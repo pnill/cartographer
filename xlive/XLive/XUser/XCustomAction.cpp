@@ -1,6 +1,7 @@
+#include "stdafx.h"
+#include "XCustomAction.h"
+
 #include "Globals.h"
-#include "xlivedefs.h"
-#include "xliveless.h"
 #include "resource.h"
 #include "XLive\xbox\xbox.h"
 #include "XLive\XAM\xam.h"
@@ -14,48 +15,48 @@
 // #472
 int WINAPI XCustomSetAction(DWORD dwActionIndex, LPCWSTR szActionText, DWORD dwFlags)
 {
-	TRACE("XCustomSetAction");
+	LOG_TRACE_XLIVE("XCustomSetAction");
 	return 0;
 }
 
 // #477
 void WINAPI XCustomRegisterDynamicActions()
 {
-	TRACE("XCustomRegisterDynamicActions");
+	LOG_TRACE_XLIVE("XCustomRegisterDynamicActions");
 	return;
 }
 
 // #478
 void WINAPI XCustomUnregisterDynamicActions()
 {
-	TRACE("XCustomUnregisterDynamicActions");
+	LOG_TRACE_XLIVE("XCustomUnregisterDynamicActions");
 	return;
 }
 
 // #479
 int WINAPI XCustomGetCurrentGamercard(DWORD* pdwUserIndex, XUID* pXuid)
 {
-	TRACE("XCustomGetCurrentGamercard");
+	LOG_TRACE_XLIVE("XCustomGetCurrentGamercard");
 	return 0;
 }
 
 // #474
 int WINAPI XCustomSetDynamicActions(DWORD dwUserIndex, XUID xuid, CONST XCUSTOMACTION* pCustomActions, WORD cCustomActions)
 {
-	TRACE("XCustomSetDynamicActions");
+	LOG_TRACE_XLIVE("XCustomSetDynamicActions");
 	return 0;
 }
 
 // #473
 int WINAPI XCustomGetLastActionPress(DWORD* pdwUserIndex, DWORD* pdwActionIndex, XUID *pXUID)
 {
-	//TRACE("XCustomGetLastActionPress");
+	//LOG_TRACE_XLIVE("XCustomGetLastActionPress");
 	return 0;
 }
 
 // #476
 BOOL WINAPI XCustomGetLastActionPressEx(DWORD* pdwUserIndex, DWORD* pdwActionId, XUID *pXuid, BYTE* pbPayload, WORD* pcbPayload)
 {
-	TRACE("XCustomGetLastActionPressEx");
+	LOG_TRACE_XLIVE("XCustomGetLastActionPressEx");
 	return FALSE;
 }
