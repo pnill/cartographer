@@ -37,6 +37,9 @@
 #include <windows.h>
 #include <WinSock2.h>
 #include <shellapi.h>
+#include <shlwapi.h>
+#include <wincrypt.h>
+#include <mmsystem.h>
 #include <windef.h>
 #include <timeapi.h>
 
