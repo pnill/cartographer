@@ -41,7 +41,6 @@
 #include <wincrypt.h>
 #include <mmsystem.h>
 #include <windef.h>
-#include <timeapi.h>
 
 // TODO: include this only if trac
 #include <fstream>
