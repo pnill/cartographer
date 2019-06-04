@@ -76,5 +76,7 @@ namespace tag_loader
 	int Load_tag_module(string loc);
 	//loades and execute instructions in the query file
 	void Parse_query_file(string loc);
+	//Adds reference of all the tags present in shared map into the tag_table
+	void Add_all_shared_refs();
 }
 void Initialise_tag_loader();

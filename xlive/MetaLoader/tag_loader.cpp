@@ -839,6 +839,16 @@ namespace tag_loader
 			}
 		}
 	}
+	void Add_all_shared_refs()
+	{
+		DWORD SharedMemBase = *(DWORD*)(h2mod->GetBase() + 0x47CD54);
+		DWORD SharedTables = SharedMemBase + 0x20 + 0xC * *(DWORD*)(SharedMemBase + 4);
+		DWORD Tag_count = *(DWORD*)(*(DWORD*)(h2mod->GetBase() + 0x47D568) + 0x18);
+		DWORD TagTableStart = *(DWORD*)(h2mod->GetBase() + 0x47CD50);
+
+		for (int i = 0x2710; i < Tag_count; i++)
+			memcpy((void*)(TagTableStart + i * 0x10), (void*)(SharedTables + i * 0x10), 0x10);
+	}
 }
 //Used to allocate somemore space for tagtables and tags
 unsigned int __cdecl AllocateMemory(int old_size, char arg_4)
@@ -861,8 +871,11 @@ char _cdecl LoadTagsandMapBases(int a)
 	pLoadTagsandSetMapBases = (LoadTagsandSetMapBases)((char*)h2mod->GetBase() + 0x31348);
 	char result = pLoadTagsandSetMapBases(a);
 
+	//adding all shared references
+	tag_loader::Add_all_shared_refs();
+
 	//only for multiplayer injection
-	if (Runtime::Cache::CacheHeader->type == Blam::Cache::cache_header::scnr_type::Multiplayer)
+	if (Runtime::Cache::CacheHeader->type != Blam::Cache::cache_header::scnr_type::SinglePlayer)
 	{
 		DWORD *TagTableStart = (DWORD*)(h2mod->GetBase() + 0x47CD50);
 		//TABLE EXTENSION  STUFF
