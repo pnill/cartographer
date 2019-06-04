@@ -592,8 +592,18 @@ namespace tag_loader
 	*/
 	//function to load RAW_DATA of the concerned tag from meta_list
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
-	void Load_RAW_refs(int datum_index,string map_loc)
+	void Load_RAW_refs(int datum_index, string map_loc)
 	{
+		DWORD* PMapRawtableoffset = (DWORD*)(h2mod->GetBase() + 0x4AE8B0);
+		DWORD* PRawTableSize = (DWORD*)(h2mod->GetBase() + 0x4AE8B4);
+
+		//a little  precaution to circumvent unexpected behaviour
+		DWORD oldRtable_offset = *PMapRawtableoffset;
+		DWORD oldRtable_size = *PRawTableSize;
+
+		*PMapRawtableoffset = 0x0;
+		*PRawTableSize = 0x0;
+
 		DWORD SharedmapBase = *(DWORD*)(h2mod->GetBase() + 0x47CD64);
 		DWORD ETCOFFSET = *(DWORD*)(h2mod->GetBase() + 0x482290);
 		HANDLE old_file_handle = *(HANDLE*)(h2mod->GetBase() + 0x4AE8A8);
@@ -676,6 +686,9 @@ namespace tag_loader
 		}
 		*(HANDLE*)(h2mod->GetBase() + 0x4AE8A8) = old_file_handle;
 		CloseHandle(new_file_handle);
+
+		*PMapRawtableoffset = oldRtable_offset;
+		*PRawTableSize = oldRtable_size;
 	}
 	//Fixes the reference of the tags to their global objects(vftables)
 	void Fix_global_objects_ref(int datum_index)
