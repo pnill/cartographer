@@ -1517,6 +1517,143 @@ void GSCustomMenuCall_EditFOV() {
 
 #pragma endregion
 
+const int CMLabelMenuId_VehicleEditFOV = 0xFF000020;
+#pragma region CM_EditVehicleFOV
+
+static void loadLabelVehicleFOVNum() {
+	if (H2Config_vehicle_field_of_view != 70) {
+		char* lblFpsLimitNum = H2CustomLanguageGetLabel(CMLabelMenuId_VehicleEditFOV, 0xFFFF0003);
+		if (!lblFpsLimitNum)
+			return;
+		int buildLimitLabelLen = strlen(lblFpsLimitNum) + 20;
+		char* buildLimitLabel = (char*)malloc(sizeof(char) * buildLimitLabelLen);
+		snprintf(buildLimitLabel, buildLimitLabelLen, lblFpsLimitNum, H2Config_vehicle_field_of_view);
+		add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 3, buildLimitLabel, true);
+		free(buildLimitLabel);
+	}
+	else {
+		char* lblFpsLimitDisabled = H2CustomLanguageGetLabel(CMLabelMenuId_VehicleEditFOV, 0xFFFF0013);
+		add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 3, lblFpsLimitDisabled, true);
+	}
+}
+
+void __stdcall CMLabelButtons_EditVehicleFOV(int a1, int a2)
+{
+	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+
+	__int16 button_id = *(WORD*)(a1 + 112);
+	int v3 = sub_211909(a1, 6, 0, 0);
+	if (v3)
+	{
+		sub_21bf85_CMLTD(v3, button_id + 1, CMLabelMenuId_VehicleEditFOV);
+	}
+}
+
+__declspec(naked) void sub_2111ab_CMLTD_nak_EditVehicleFOV() {//__thiscall
+	__asm {
+		mov eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0xFFFFFFF1//label_id_description
+		push 0xFFFFFFF0//label_id_title
+		push CMLabelMenuId_VehicleEditFOV
+		push eax
+		push ecx
+		call sub_2111ab_CMLTD//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+static bool CMButtonHandler_EditVehicleFOV(int button_id) {
+	const int upper_limit = 110;
+	if (button_id == 0) {
+		if (H2Config_vehicle_field_of_view <= upper_limit - 10)
+			H2Config_vehicle_field_of_view += 10;
+		else
+			H2Config_vehicle_field_of_view = upper_limit;
+	}
+	else if (button_id == 1) {
+		if (H2Config_vehicle_field_of_view < upper_limit)
+			H2Config_vehicle_field_of_view += 1;
+	}
+	else if (button_id == 3) {
+		if (H2Config_vehicle_field_of_view > 0)
+			H2Config_vehicle_field_of_view -= 1;
+	}
+	else if (button_id == 4) {
+		if (H2Config_vehicle_field_of_view > 10)
+			H2Config_vehicle_field_of_view -= 10;
+		else
+			H2Config_vehicle_field_of_view = 0;
+	}
+	else if (button_id == 2) {
+			H2Config_vehicle_field_of_view = 70;
+	}
+	loadLabelVehicleFOVNum();
+	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
+	return false;
+}
+
+__declspec(naked) void sub_20F790_CM_nak_EditVehicleFOV() {//__thiscall
+	__asm {
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0//selected button id
+		push ecx
+		call sub_20F790_CM//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn
+	}
+}
+
+int __cdecl CustomMenu_EditVehicleFOV(int);
+
+int(__cdecl *CustomMenuFuncPtrHelp_EditVehicleFOV())(int) {
+	return CustomMenu_EditVehicleFOV;
+}
+
+DWORD* menu_vftable_1_EditVehicleFOV = 0;
+DWORD* menu_vftable_2_EditVehicleFOV = 0;
+
+void CMSetupVFTables_EditVehicleFOV() {
+	CMSetupVFTables(&menu_vftable_1_EditVehicleFOV, &menu_vftable_2_EditVehicleFOV, (DWORD)CMLabelButtons_EditVehicleFOV, (DWORD)sub_2111ab_CMLTD_nak_EditVehicleFOV, (DWORD)CustomMenuFuncPtrHelp_EditVehicleFOV, (DWORD)sub_20F790_CM_nak_EditVehicleFOV, true, 0);
+}
+
+int __cdecl CustomMenu_EditVehicleFOV(int a1) {
+	loadLabelVehicleFOVNum();
+	return CustomMenu_CallHead(a1, menu_vftable_1_EditVehicleFOV, menu_vftable_2_EditVehicleFOV, (DWORD)&CMButtonHandler_EditVehicleFOV, 5, 272);
+}
+
+void GSCustomMenuCall_EditVehicleFOV() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_EditVehicleFOV);
+	CallWgit(WgitScreenfunctionPtr);
+}
+
+#pragma endregion
+
 
 const int CMLabelMenuId_EditHz = 0xFF000018;
 #pragma region CM_EditHz
@@ -2532,18 +2669,21 @@ static bool CMButtonHandler_EditHudGui(int button_id) {
 		GSCustomMenuCall_EditFOV();
 	}
 	else if (button_id == 1) {
-		GSCustomMenuCall_EditCrosshair();
+		GSCustomMenuCall_EditVehicleFOV();
 	}
 	else if (button_id == 2) {
-		GSCustomMenuCall_EditCrosshairSize();
+		GSCustomMenuCall_EditCrosshair();
 	}
 	else if (button_id == 3) {
-		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF4, !(H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat));
+		GSCustomMenuCall_EditCrosshairSize();
 	}
 	else if (button_id == 4) {
-		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF2, !(blind_hud = !blind_hud));
+		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF4, !(H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat));
 	}
 	else if (button_id == 5) {
+		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF2, !(blind_hud = !blind_hud));
+	}
+	else if (button_id == 6) {
 		loadLabelToggle_EditHudGui(button_id + 1, 0xFFFFFFF2, !(blind_fp = !blind_fp));
 	}
 	return false;
@@ -2585,10 +2725,10 @@ void CMSetupVFTables_EditHudGui() {
 }
 
 int __cdecl CustomMenu_EditHudGui(int a1) {
-	loadLabelToggle_EditHudGui(4, 0xFFFFFFF4, !H2Config_hide_ingame_chat);
-	loadLabelToggle_EditHudGui(5, 0xFFFFFFF2, !blind_hud);
-	loadLabelToggle_EditHudGui(6, 0xFFFFFFF2, !blind_fp);
-	return CustomMenu_CallHead(a1, menu_vftable_1_EditHudGui, menu_vftable_2_EditHudGui, (DWORD)&CMButtonHandler_EditHudGui, 6, 272);
+	loadLabelToggle_EditHudGui(5, 0xFFFFFFF4, !H2Config_hide_ingame_chat);
+	loadLabelToggle_EditHudGui(6, 0xFFFFFFF2, !blind_hud);
+	loadLabelToggle_EditHudGui(7, 0xFFFFFFF2, !blind_fp);
+	return CustomMenu_CallHead(a1, menu_vftable_1_EditHudGui, menu_vftable_2_EditHudGui, (DWORD)&CMButtonHandler_EditHudGui, 7, 272);
 }
 
 void GSCustomMenuCall_EditHudGui() {
@@ -4811,14 +4951,24 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditCrosshair, 5, "-0.02");
 
 
-	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFFFFF0, "Edit Field of View");
-	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFFFFF1, "Use the buttons below to modify the in-game Field of View (FoV).");
+	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFFFFF0, "Edit Player Field of View");
+	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFFFFF1, "Use the buttons below to modify the in-game first person Field of View (FoV).");
 	add_cartographer_label(CMLabelMenuId_EditFOV, 1, "+10");
 	add_cartographer_label(CMLabelMenuId_EditFOV, 2, "+1");
 	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFF0003, "FoV: %d");
 	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFF0013, "FoV Alteration Disabled");
 	add_cartographer_label(CMLabelMenuId_EditFOV, 4, "-1");
 	add_cartographer_label(CMLabelMenuId_EditFOV, 5, "-10");
+
+
+	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 0xFFFFFFF0, "Edit Vehicle Field of View");
+	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 0xFFFFFFF1, "Use the buttons below to modify the Field of View (FoV) of vehicles.");
+	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 1, "+10");
+	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 2, "+1");
+	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 0xFFFF0003, "FoV: %d");
+	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 0xFFFF0013, "FoV Alteration Disabled");
+	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 4, "-1");
+	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 5, "-10");
 
 
 	add_cartographer_label(CMLabelMenuId_EditFPS, 0xFFFFFFF0, "Edit FPS Limit");
@@ -4894,12 +5044,13 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF3, "Disable %s");
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF4, "Show %s");
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF5, "Hide %s");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 1, "> Field of View (FOV)");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 2, "> Crosshair Offset");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 3, "> Crosshair Size");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0004, "Ingame Chat");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0005, "HUD");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0006, "First Person Model");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 1, "> Player FOV");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 2, "> Vehicle FOV");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 3, "> Crosshair Offset");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 4, "> Crosshair Size");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0005, "Ingame Chat");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0006, "HUD");
+	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0007, "First Person Model");
 
 
 	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFFFFF0, "Toggle Skulls");
@@ -5097,6 +5248,8 @@ void initGSCustomMenu() {
 	CMSetupVFTables_EditCrosshair();
 
 	CMSetupVFTables_EditFOV();
+
+	CMSetupVFTables_EditVehicleFOV();
 
 	CMSetupVFTables_EditFPS();
 

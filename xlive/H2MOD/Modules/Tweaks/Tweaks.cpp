@@ -1160,7 +1160,20 @@ void H2Tweaks::setFOV(double field_of_view_degrees) {
 
 		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0f) / default_radians_FOV;
 		WriteValue(H2BaseAddr + 0x41D984, calculated_radians_FOV); // First Person
-		WriteValue(H2BaseAddr + 0x413780, calculated_radians_FOV + 0.22f); // Third Person
+	}
+}
+
+void H2Tweaks::setVehicleFOV(double field_of_view_degrees) {
+
+	if (H2IsDediServer)
+		return;
+
+	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
+	{
+		float current_FOV = *reinterpret_cast<float*>(H2BaseAddr + 0x413780);
+
+		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0f);
+		WriteValue(H2BaseAddr + 0x413780, calculated_radians_FOV); // Third Person
 	}
 }
 
@@ -1355,4 +1368,13 @@ void H2Tweaks::applyPlayersActionsUpdateRatePatch()
 {
 	xb_tickrate_flt = h2mod->GetAddress<float>(0x3BBEB4, 0x378C84);
 	PatchCall(h2mod->GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
+}
+
+void H2Tweaks::sunFlareFix()
+{
+	if (H2IsDediServer)
+		return;
+	//rasterizer_near_clip_distance <real>
+	//Changed from game default of 0.06 to 0.0601
+	WriteValue(H2BaseAddr + 0x468150, 0.0601f);
 }

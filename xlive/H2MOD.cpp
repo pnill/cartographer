@@ -1157,8 +1157,9 @@ void __cdecl OnMapLoad(int a1)
 		H2Tweaks::setCrosshairSize(0, false);
 		H2Tweaks::disable60FPSCutscenes();
 		H2Tweaks::setSavedSens();
+		H2Tweaks::sunFlareFix();
 
-		//H2Tweaks::applyShaderTweaks();
+		//H2Tweaks::applyShaderTweaks(); 
 
 		if (GameState == 3)
 		{
@@ -1193,6 +1194,7 @@ void __cdecl OnMapLoad(int a1)
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 		H2Tweaks::enable60FPSCutscenes();
 		H2Tweaks::setSavedSens();
+		H2Tweaks::sunFlareFix();
 
 		SPMapFix::Initialize();
 	}
@@ -1766,6 +1768,7 @@ void H2MOD::Initialize()
 		this->Server = FALSE;
 
 		H2Tweaks::setFOV(H2Config_field_of_view);
+		H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
 		if (H2Config_raw_input)
 			Mouseinput::Initialize();
 
