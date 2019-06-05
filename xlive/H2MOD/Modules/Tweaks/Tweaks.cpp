@@ -1369,3 +1369,12 @@ void H2Tweaks::applyPlayersActionsUpdateRatePatch()
 	xb_tickrate_flt = h2mod->GetAddress<float>(0x3BBEB4, 0x378C84);
 	PatchCall(h2mod->GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
 }
+
+void H2Tweaks::sunFlareFix()
+{
+	if (H2IsDediServer)
+		return;
+	//rasterizer_near_clip_distance <real>
+	//Changed from game default of 0.06 to 0.0601
+	WriteValue(H2BaseAddr + 0x468150, 0.0601f);
+}

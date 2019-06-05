@@ -26,4 +26,5 @@ namespace H2Tweaks {
 	void applyPlayersActionsUpdateRatePatch();
 	void setSens(InputType input_type, int sens);
 	void setSavedSens();
+	void sunFlareFix();
 }
