@@ -1455,7 +1455,7 @@ DWORD WINAPI XStorageBuildServerPath( DWORD dwUserIndex, XSTORAGE_FACILITY Stora
 		//TRACE( "- %s", strw );
 	}
 
-	return 0;
+	return ERROR_FUNCTION_FAILED;
 }
 
 
