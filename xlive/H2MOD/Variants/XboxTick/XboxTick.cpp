@@ -6,9 +6,11 @@ XboxTick::XboxTick()
 }
 
 void XboxTick::tickRate() {
-	*(BYTE*)(0x300029C8 + 0x2) = 30;
-	*(float*)(0x300029C8 + 0x4) = 0.03333333507f;
-	TRACE_GAME("[h2mod] Tried to set values");
+
+	DWORD time_globals = *(DWORD*)(h2mod->GetAddress(0x4C06E4, 0x4CF0EC));
+	*(BYTE*)((char*)time_globals + 0x2) = 30;
+	*(float*)((char*)time_globals + 0x4) = 0.03333333507f;
+	TRACE_GAME("[h2mod] Set tickrate to 30");
 }
 
 void XboxTickPreSpawnHandler::onClient() {

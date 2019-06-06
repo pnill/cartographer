@@ -11,14 +11,11 @@
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\MainMenu\Ranks.h"
 #include "H2MOD\Variants\H2X\H2X.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
-#include "XLive\UserManagement\CUser.h"
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
-#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include <Shlwapi.h> /*StrStrIW function in OnMapLoad*/
 
 
@@ -46,10 +43,11 @@ std::unordered_map<int, int> object_to_variant;
 
 
 /*constants*/
-const wchar_t* ZOMBIES  = L"zombies";
-const wchar_t* GUNGAME  = L"gungame";
-const wchar_t* H2F  = L"h2f";
-const wchar_t* H2X  = L"h2x";
+const wchar_t* ZOMBIES = L"zombies";
+const wchar_t* INFECTION = L"infection";
+const wchar_t* GUNGAME = L"gungame";
+const wchar_t* H2F = L"h2f";
+const wchar_t* H2X = L"h2x";
 const wchar_t* OGH2 = L"ogh2";
 const wchar_t* GRAVEROBBER = L"graverobber";
 const wchar_t* HEADHUNTER = L"headhunter";
@@ -825,11 +823,6 @@ void H2MOD::set_unit_speed(float speed, int pIndex)
 		*(float*)(((char*)((h2mod->Server) ? 0x30002848 : 0x30002C9C) + (pIndex * 0x204))) = speed;
 }
 
-void H2MOD::set_local_team_index(BYTE team)
-{
-	*(BYTE*)(((char*)h2mod->GetBase()) + 0x51A6B4) = team;
-}
-
 void H2MOD::set_local_grenades(BYTE type, BYTE count, int pIndex)
 {
 	int unit_datum_index = h2mod->get_unit_datum_from_player_index(pIndex);
@@ -1092,58 +1085,59 @@ void __cdecl OnMapLoad(int a1)
 		return; 
 	}
 
-	b_Infection = false;
-	b_GunGame = false;
-	b_Halo2Final = false;
-	b_XboxTick = false;
 	b_H2X = false;
-	b_HeadHunter = false;
+	b_GunGame = false;
+	b_XboxTick = false;
 	b_FireFight = false;
+	b_Infection = false;
+	b_HeadHunter = false;
+	b_Halo2Final = false;
 
 	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
 	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", h2mod->GetEngineType(), variant_name);
-	BYTE& GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
+	BYTE GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
 
 	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE)
 	{
 		addDebugText("GameEngine: Multiplayer");
 
-		if (StrStrIW(variant_name, ZOMBIES) != NULL)
+		// StrStrIW returns pointer to first substring occurrence, NULL othewise
+		if (StrStrIW(variant_name, ZOMBIES) || StrStrIW(variant_name, INFECTION))
 		{
 			TRACE_GAME("[h2mod] Zombies Turned on!");
 			b_Infection = true;
 		}
 
-		if (StrStrIW(variant_name, GUNGAME) != NULL)
+		if (StrStrIW(variant_name, GUNGAME))
 		{
 			TRACE_GAME("[h2mod] GunGame Turned on!");
 			b_GunGame = true;
 		}
 
-		if (StrStrIW(variant_name, H2F) != NULL)
+		if (StrStrIW(variant_name, H2F))
 		{
 			TRACE_GAME("[h2mod] Halo2Final Turned on!");
 			b_Halo2Final = true;
 		}
 
-		if (StrStrIW(variant_name, H2X) != NULL)
+		if (StrStrIW(variant_name, H2X))
 		{
 			TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
 			b_H2X = true;
 		}
-		else if (StrStrIW(variant_name, OGH2) != NULL)
+		else if (StrStrIW(variant_name, OGH2))
 		{
 			TRACE_GAME("[h2mod] 30 Tick Mod Activated!");
-				b_XboxTick = true;
+			b_XboxTick = true;
 		}
 
-		if ((StrStrIW(variant_name, GRAVEROBBER) != NULL) | (StrStrIW(variant_name, HEADHUNTER) != NULL))
+		if (StrStrIW(variant_name, GRAVEROBBER) || StrStrIW(variant_name, HEADHUNTER))
 		{
 			TRACE_GAME("[h2mod] GraveRobber (Headhunter) Turned on!");
 			b_HeadHunter = true;
 		}
 
-		if (StrStrIW(variant_name, WARECONOMY) != NULL)
+		if (StrStrIW(variant_name, WARECONOMY))
 		{
 			TRACE_GAME("[h2mod] Fire Fight Turned on!");
 			b_FireFight = true;
@@ -1151,17 +1145,22 @@ void __cdecl OnMapLoad(int a1)
 
 		get_object_table_memory();
 
-		HitFix::Initialize();
-		MPMapFix::Initialize();
-
+		if (!b_XboxTick) 
+		{
+			HitFix::Initialize();
+			MPMapFix::Initialize();
+		}
+		else
+		{
+			xboxTickHandler->preSpawnPlayer->execute();
+		}
+		
 		H2Tweaks::enableAI_MP();
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	 
 		H2Tweaks::setCrosshairSize(0, false);
 		H2Tweaks::disable60FPSCutscenes(); 
 		H2Tweaks::setSavedSens();
-		H2Tweaks::sunFlareFix();
-
 		//H2Tweaks::applyShaderTweaks(); 
 
 		if (GameState == 3)
@@ -1169,6 +1168,7 @@ void __cdecl OnMapLoad(int a1)
 			// send server map checksums to client
 			//MapChecksumSync::SendState();
 			//inform players of the current advanced lobby settings
+			// TODO, now we got good custom packets ;)
 			//advLobbySettings->sendLobbySettingsPacket();
 
 			if (b_Infection) {
@@ -1197,8 +1197,6 @@ void __cdecl OnMapLoad(int a1)
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 		H2Tweaks::enable60FPSCutscenes();
 		H2Tweaks::setSavedSens();
-		H2Tweaks::sunFlareFix();
-
 		SPMapFix::Initialize();
 	}
 
@@ -1284,26 +1282,26 @@ void* __stdcall OnWgitLoad(void* thisptr, int a2, int a3, int a4, unsigned short
 	return thisptr;
 }
 
-typedef int(__cdecl *build_gui_list)(int a1, int a2, int a3);
-build_gui_list build_gui_list_method;
+typedef void(__cdecl *change_team)(int a1, int a2);
+change_team p_change_local_team;
 
-int __cdecl buildGuiList(int a1, int a2, int a3) {
-	if (b_Infection && a1 == (DWORD)(h2mod->GetBase() + 0x3d3620) && !NetworkSession::localPeerIsSessionHost()) {
-		a2 = 1;
+void __cdecl changeTeam(int localPlayerIndex, int teamIndex) {
+	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
+	if (StrStrIW(variant_name, RVB) != NULL && teamIndex != 0 && teamIndex != 1) {
+		//rvb mode enabled, don't change teams
+		return;
 	}
-	return build_gui_list_method(a1, a2, a3);
+	p_change_local_team(localPlayerIndex, teamIndex);
 }
 
-typedef int(__cdecl *change_team)(int a1, int a2);
-change_team change_team_method;
+void H2MOD::set_local_team_index(int local_player_index, int team_index)
+{
+	// we only use player index 0 due to no splitscreen support but whatever
+	typedef void(__cdecl* update_player_profile)(int local_player_index);
+	auto p_update_player_profile = reinterpret_cast<update_player_profile>(h2mod->GetAddress(0x206A97, 0x0));
 
-int __cdecl changeTeam(int a1, int a2) {
-	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
-	if (StrStrIW(variant_name, RVB) != NULL && a2 != 0 && a2 != 1) {
-		//rvb mode enabled, don't change teams
-		return 4732 * a1;
-	}
-	return change_team_method(a1, a2);
+	p_change_local_team(local_player_index, team_index);
+	p_update_player_profile(local_player_index); // fixes infection handicap glitch
 }
 
 void __cdecl print_to_console(char *output)
@@ -1681,9 +1679,6 @@ void H2MOD::ApplyHooks() {
 		//pResetRound=(ResetRounds)DetourFunc((BYTE*)this->GetBase() + 0x6B1C8, (BYTE*)OnNextRound, 7);
 		//VirtualProtect(pResetRound, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		build_gui_list_method = (build_gui_list)DetourFunc((BYTE*)this->GetBase() + 0x20D1FD, (BYTE*)buildGuiList, 8);
-		VirtualProtect(build_gui_list_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
 		/*
 		WritePointer(GetBase() + 0x1F0B3A, player_add_packet_handler);
 		WritePointer(GetBase() + 0x1F0B80, player_remove_packet_handler);
@@ -1695,8 +1690,8 @@ void H2MOD::ApplyHooks() {
 		// Respawn
 		NopFill<0x2b>(GetBase() + 0x8BB98);
 
-		change_team_method = (change_team)DetourFunc((BYTE*)this->GetBase() + 0x2068F2, (BYTE*)changeTeam, 8);
-		VirtualProtect(change_team_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		p_change_local_team = (change_team)DetourFunc((BYTE*)this->GetBase() + 0x2068F2, (BYTE*)changeTeam, 8);
+		VirtualProtect(p_change_local_team, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		// hook the print command to redirect the output to our console
 		PatchCall(GetBase() + 0xE9E50, print_to_console);

@@ -123,7 +123,7 @@ public:
 		void set_unit_speed_patch(bool hackit);
 		void kick_player(int peerIndex);
 		void set_unit_speed(float speed, int pIndex);
-		void set_local_team_index(BYTE team);
+		void set_local_team_index(int local_player_index, int team);
 		BYTE get_local_team_index();
 		void set_local_grenades(BYTE type, BYTE count, int pIndex);
 		void DisableSound(int sound);

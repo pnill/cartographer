@@ -1065,6 +1065,7 @@ void InitH2Tweaks() {
 		//PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);
 
 		RadarPatch();
+		H2Tweaks::sunFlareFix();
 
 		WriteJmpTo(h2mod->GetAddress(0x7E43), WinMain);
 		WriteJmpTo(h2mod->GetAddress(0x39EA2), is_remote_desktop);
