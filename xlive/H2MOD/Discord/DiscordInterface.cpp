@@ -3,6 +3,7 @@
 #include "3rdparty/discord/discord_rpc.h"
 #include "3rdparty/discord/discord_register.h"
 #include "DiscordInterface.h"
+#include "Globals.h"
 
 const static char api_key[] = "379371722685808641";
 
@@ -15,7 +16,14 @@ char mode_details[128] = "";
 bool inited = false;
 int current_player_count = 0;
 int max_player_count = 0;
+static int64_t endTimestamp;
+static int64_t startTimestamp;
 bool hide_players = false;
+bool updateOnNewRound = false;
+bool noElapsedRoundReset = false;
+int previousRoundNumber;
+DWORD roundTimeExists;
+DWORD roundTimeCheck;
 
 // AFAIK there is no easy way to get the list of uploaded assets using the API
 const static std::unordered_set<std::string> maps_with_images = {
@@ -76,6 +84,35 @@ static void updateDiscordPresence()
 	discordPresence.largeImageText = map_mouse_over;
 	discordPresence.smallImageKey = mode_key;
 	discordPresence.smallImageText = mode_details;
+	if (b_inGame != false) //called only in MP engine
+	{
+		previousRoundNumber = *(int*)((BYTE*)0x300056C6);
+		DWORD MPgameState = *(DWORD*)(H2BaseAddr + 0x514E48); //prevents startTimestamp and endTimestamp from being called in postgame
+		roundTimeExists = (DWORD)*(DWORD*)((DWORD)H2BaseAddr + 0x482d3c);
+		roundTimeCheck = *(DWORD*)(roundTimeExists + 0x8 + 0x2A0 + 0x54); //checks whether game has a round time
+
+		if (MPgameState != 1 && roundTimeCheck == 0)
+		{
+			endTimestamp = 0;
+			startTimestamp = time(0);
+			discordPresence.startTimestamp = startTimestamp;
+		}
+		else
+		{
+			if (MPgameState != 1 && roundTimeCheck != 0)
+			{
+				endTimestamp = time(0) + roundTimeCheck;
+				discordPresence.endTimestamp = endTimestamp;
+			}
+
+		}
+	}
+	else
+	{
+		endTimestamp = 0;
+		startTimestamp = 0;
+	}
+
 	if (!hide_players) {
 		discordPresence.partySize = current_player_count;
 		discordPresence.partyMax = max_player_count;
@@ -134,6 +171,21 @@ void DiscordInterface::SetPlayerCountInfo(int current, int max)
 	current_player_count = current;
 	max_player_count = max;
 	updateDiscordPresence();
+}
+
+void DiscordInterface::RoundTimeReset()
+{
+	int currentRoundNumber = *(int*)((BYTE*)0x300056C6);
+	DWORD roundState = *(DWORD*)(0x3000629C); //takes on different values when transitioning from round end to new round
+	
+	if (currentRoundNumber != previousRoundNumber && roundTimeCheck != 0 && updateOnNewRound != true) {
+		updateDiscordPresence();
+		updateOnNewRound = true;
+	}
+
+	if (roundState == 1 && updateOnNewRound != false) {
+		updateOnNewRound = false;
+	}
 }
 
 void DiscordInterface::SetDetails(const std::string &map_name)

@@ -39,6 +39,7 @@ bool b_XboxTick = false;
 bool b_Infection = false;
 bool b_Halo2Final = false;
 bool b_HeadHunter = false;
+bool b_inGame = false;
 
 extern int H2GetInstanceId();
 extern XUID xFakeXuid[4];
@@ -1087,6 +1088,7 @@ void __cdecl OnMapLoad(int a1)
 		UIRankPatch();
 		H2Tweaks::disable60FPSCutscenes();
 		H2Tweaks::setHz();
+		b_inGame = false;
 
 		p_set_random_number(a1);
 		return; 
@@ -1099,6 +1101,7 @@ void __cdecl OnMapLoad(int a1)
 	b_H2X = false;
 	b_HeadHunter = false;
 	b_FireFight = false;
+	b_inGame = false;
 
 	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
 	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", h2mod->GetEngineType(), variant_name);
@@ -1107,6 +1110,7 @@ void __cdecl OnMapLoad(int a1)
 	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE)
 	{
 		addDebugText("GameEngine: Multiplayer");
+		b_inGame = true;
 
 		if (StrStrIW(variant_name, ZOMBIES) != NULL)
 		{
@@ -1161,6 +1165,7 @@ void __cdecl OnMapLoad(int a1)
 		H2Tweaks::disable60FPSCutscenes(); 
 		H2Tweaks::setSavedSens();
 		H2Tweaks::sunFlareFix();
+		
 
 		//H2Tweaks::applyShaderTweaks(); 
 
@@ -1198,6 +1203,7 @@ void __cdecl OnMapLoad(int a1)
 		H2Tweaks::enable60FPSCutscenes();
 		H2Tweaks::setSavedSens();
 		H2Tweaks::sunFlareFix();
+		b_inGame = false;
 
 		SPMapFix::Initialize();
 	}

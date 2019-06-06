@@ -6,6 +6,7 @@ class DiscordInterface
 public:
 	static void Init();
 	static void SetPlayerCountInfo(int current, int max);
+	static void RoundTimeReset();
 	static void SetDetails(const std::string &map_name);
 	static void SetGameMode(const std::string &gamemode_id);
 	static void SetGameState(

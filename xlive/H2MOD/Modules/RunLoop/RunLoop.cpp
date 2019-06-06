@@ -11,6 +11,7 @@
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "XLive\UserManagement\CUser.h"
+#include "H2MOD\Discord\DiscordInterface.h"
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
@@ -334,6 +335,10 @@ static signed int HookedClientRandFunc() {
 		GSMainLoop();
 
 	mapManager->leaveSessionIfAFK();
+	if (b_inGame != false)
+	{
+		DiscordInterface::RoundTimeReset();
+	}
 	
 	signed int result = sub_287a1();
 	return result;

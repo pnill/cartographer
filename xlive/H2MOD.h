@@ -158,4 +158,4 @@ private:
 };
 
 extern H2MOD* h2mod;
-
+extern bool b_inGame;
