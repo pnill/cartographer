@@ -57,8 +57,8 @@ void MapManager::leaveSessionIfAFK()
 {
 	if (mapDownloadCountdown)
 	{
-		long long duraton = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - promptOpenTime).count();
-		if (duraton / 1000 > 20) {
+		long long duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - promptOpenTime).count();
+		if (duration / 1000 > 20) {
 			h2mod->exit_game();
 			mapDownloadCountdown = false;
 		}
