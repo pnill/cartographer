@@ -1234,7 +1234,7 @@ const int CMLabelMenuId_EditCrosshair = 0xFF000010;
 #pragma region CM_EditCrosshair
 
 static void loadLabelCrosshairOffset() {
-	if (!FloatIsNaN(H2Config_crosshair_offset)) {
+	if (H2Config_crosshair_offset != 0.165f) {
 		char* lblFpsLimitNum = H2CustomLanguageGetLabel(CMLabelMenuId_EditCrosshair, 0xFFFF0003);
 		if (!lblFpsLimitNum)
 			return;
@@ -1319,13 +1319,9 @@ static bool CMButtonHandler_EditCrosshair(int button_id) {
 			H2Config_crosshair_offset = 0.0f;
 	}
 	else if (button_id == 2) {
-		if (FloatIsNaN(H2Config_crosshair_offset))
 			H2Config_crosshair_offset = 0.165f;
-		else {
-			H2Config_crosshair_offset = NAN;
-			H2Tweaks::setCrosshairPos(0.165f);
-		}
 	}
+	
 	loadLabelCrosshairOffset();
 	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	return false;
@@ -4945,7 +4941,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditCrosshair, 1, "+0.02");
 	add_cartographer_label(CMLabelMenuId_EditCrosshair, 2, "+0.001");
 	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFF0003, "Offset: %f");
-	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFF0013, "Offset Alteration Disabled");
+	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFF0013, "Default Offset: 0.165000");
 	add_cartographer_label(CMLabelMenuId_EditCrosshair, 4, "-0.001");
 	add_cartographer_label(CMLabelMenuId_EditCrosshair, 5, "-0.02");
 
@@ -4955,7 +4951,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditFOV, 1, "+10");
 	add_cartographer_label(CMLabelMenuId_EditFOV, 2, "+1");
 	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFF0003, "FoV: %d");
-	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFF0013, "FoV Alteration Disabled");
+	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFF0013, "Default FoV: 70");
 	add_cartographer_label(CMLabelMenuId_EditFOV, 4, "-1");
 	add_cartographer_label(CMLabelMenuId_EditFOV, 5, "-10");
 
@@ -4965,7 +4961,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 1, "+10");
 	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 2, "+1");
 	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 0xFFFF0003, "FoV: %d");
-	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 0xFFFF0013, "FoV Alteration Disabled");
+	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 0xFFFF0013, "Default FoV: 70");
 	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 4, "-1");
 	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 5, "-10");
 
