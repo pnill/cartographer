@@ -1,10 +1,10 @@
 #pragma once
-#include "Blam\Enums\Enums.h"
-#include "Blam\Shared\SharedDefinitions.h"
+
+#include "..\Blam\Cache\DataTypes\DatumIndex.h"
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
-using namespace Blam::SharedDefinitions;
+using namespace Blam::Cache::DataTypes;
 namespace Blam
 {
 	namespace EngineDefinitions

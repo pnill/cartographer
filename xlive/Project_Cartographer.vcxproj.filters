@@ -1004,9 +1004,6 @@
     <ClInclude Include="Blam\Cache\cache_header.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Engine\Globals\global_ptrs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Cache\cache_ptrs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1014,6 +1011,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\RuntimeIncludes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Globals\global_ptrs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

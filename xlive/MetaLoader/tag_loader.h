@@ -1,9 +1,17 @@
 ///
-//Tag loader 1.0 madde by Himanshu01
-//version -1.0 :Basic loading and dumping
+//Tag loader made by Himanshu01
+//version -1.1 
 ///
+//<--------------Notes---------------------->
+///v1.0
 //Cache loader is quit completed(its not blam loader)
-//The query parser can currently have module loading and spawn_commands
+//The query parser can currently have module loading and spawn_commands(non-functional[lol])
+///v1.1
+//Removed call to reinjection function as the query parser makes it obselete 
+//Changed the check_shared function definition
+//Removed the NullString id instruction in Load_tag function,beware it may cause crashes when directly loading from a single player map
+//Reworked query parser
+//Added replace tag command
 ///
 #pragma once
 
@@ -28,7 +36,7 @@ using meta_struct::meta;
 using meta_struct::plugins_field;
 using meta_struct::injectRefs;
 
-//the TAG LOADER
+//The TAG LOADER
 //All the StringID related stuff are incomplete
 namespace tag_loader
 {
@@ -38,6 +46,7 @@ namespace tag_loader
 	bool Check_shared(ifstream* fin);
 	//Loads a tag from specified map in accordance with the datum index supplied
 	//and rebases it to 0x0
+	//kindly avoid using this as the map container sorts the tags(causing difficulties to follow the injected tags)
 	void Load_tag(int datum_index, bool recursive, string map, bool custom = false);
 	//Return the size of the meta that is currently in the que
 	unsigned int Que_meta_size();
@@ -57,14 +66,14 @@ namespace tag_loader
 	void Push_Back(int datum_index);	
 	//reinjects the meta upon map reload or map change
 	void Reinject_meta();
-	//Dumps meta data in que in the specified tag folder
+	//Dumps meta data in que in the specified tag folder(integrity checking)
 	void Dump_Que_meta();
 	//return and clears all the error messages incurred
 	string Pop_messages();
 	//Generates a StringId List combining all the default maps
-	void Dump_StringID_list();
+	//void Dump_StringID_list();
 	//Generates a StringId List for a specific map and adds it to the list
-	void Dump_StringID_list(string map_loc);
+	//void Dump_StringID_list(string map_loc);
 	//function to load RAW_DATA of the concerned tag from meta_list
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
 	void Load_RAW_refs(int datum_index, string map_loc);
@@ -78,5 +87,33 @@ namespace tag_loader
 	void Parse_query_file(string loc);
 	//Adds reference of all the tags present in shared map into the tag_table
 	void Add_all_shared_refs();
+	///
+	//<-----------------The query parser or more of a script parser------------------------------->
+	///
+	class query_parser
+	{
+	private:
+		std::unordered_map<std::string, int> DWORD_list;//hash table containing the variables allocated in the script   
+		//try parsing to int
+		int try_parse_int(std::string);
+		//bunch of log text
+		std::vector<std::string> logs;
+		//remove comments ,simplify assignment and others
+		std::vector<std::string> clean_string(std::string);
+		//_mov parser
+		void _mov_parser(string dest, string src);
+		//void replace_tag
+		void replace_tag(string dest, string src);
+		//check for keywords and standard functions and returns appropriately
+		int keyword_check(std::string);
+	public:
+		//reference to vector of queries
+		query_parser(std::vector<std::string>&);
+		//complete file location
+		query_parser(std::string file_loc);
+		//return all logs
+		string _getlogs();
+	};
 }
 void Initialise_tag_loader();
+

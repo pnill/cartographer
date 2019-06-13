@@ -99,17 +99,19 @@ namespace tag_loader
 	//returns whether the map is a shared map or not
 	bool Check_shared(ifstream* fin)
 	{
-		char map_name[0x24];
-		fin->seekg(0x1A4);
-		fin->read(map_name, 0x24);
+		char* map_header= new char[0x800];
+		fin->seekg(0x0);
+		fin->read(map_header, 0x800);
+		
+		Blam::Cache::cache_header* ptr = (Blam::Cache::cache_header*)map_header;
 
-		string temp_str = map_name;
-
-		int ret = temp_str.find("shared", 0);
-
-		if (ret >= 0)
+		if (ptr->type == Blam::Cache::cache_header::scnr_type::MultiplayerShared|| ptr->type == Blam::Cache::cache_header::scnr_type::SinglePlayerShared)
+		{
+			delete[] map_header;
 			return true;
-		else return false;
+		}
+		delete[] map_header;
+		return false;
 	}
 	//Loads a tag from specified map in accordance with the datum index supplied
 	//and rebases it to 0x0
@@ -188,7 +190,6 @@ namespace tag_loader
 						if (!temp_plugin)
 							break;
 
-
 						//we first check the integrity of the datum_index
 						if (Tdatum_index == *(load_tag_list.cbegin()) && mem_off&&size && (que_meta_list.find(Tdatum_index) == que_meta_list.cend()))
 						{
@@ -208,7 +209,6 @@ namespace tag_loader
 							//create a meta object
 							shared_ptr<meta> temp_meta = make_shared<meta>(data, size, mem_off, temp_plugin, fin, map_off, 1, *(load_tag_list.cbegin()), map_loc, type);
 							temp_meta->Rebase_meta(0x0);
-							temp_meta->null_StringID();//<<---------------------------------fix this LATER ON
 
 							que_meta_list.emplace(*(load_tag_list.cbegin()), temp_meta);
 
@@ -388,7 +388,7 @@ namespace tag_loader
 
 			if (!replaced)
 			{
-				if (datum_index != new_datum_index)
+				if (datum_index < new_datum_index)
 					temp.new_datum = datum_index;
 				else
 					temp.new_datum = new_datum_index++;
@@ -403,7 +403,7 @@ namespace tag_loader
 
 			que_iter++;
 		}
-		//StringID listing
+		//StringID listing---IDC
 
 
 		//update the que list tags
@@ -452,7 +452,7 @@ namespace tag_loader
 				delete[] meta_data;
 				mem_off += meta_size;
 			}
-			meta_list.emplace(my_inject_refs_iter->new_datum, que_iter->second);//add it to the meta _list
+			//meta_list.emplace(my_inject_refs_iter->new_datum, que_iter->second);//add it to the meta _list
 			ext_meta_size += meta_size;		
 
 			que_iter++;
@@ -807,6 +807,7 @@ namespace tag_loader
 				//m_ptr += strlen(m_ptr) + 1;
 				ext_meta_size += module_tags[i]->Get_Total_size();
 			}
+			module_tags.clear();
 		}
 		else
 		{
@@ -817,50 +818,246 @@ namespace tag_loader
 
 		return ret;
 	}
-	//speed up and simiplify the injection process
+	//Simiplify the injection process
 	void Parse_query_file(string loc)
 	{
-		std::ifstream fin;
-		fin.open(loc.c_str(), ios::in);
-
-		if (!fin.is_open())
-			return;
-		int eax;
-
-		std::string s1;
-		char query[64];
-		while (!fin.eof())
-		{
-			fin.getline(query, 64);
-			s1 = query;
-			if (s1[0] != '#')
-			{
-				
-				if (s1.find("module_load") != string::npos)
-				{
-					std::string s2 = s1.substr(s1.find('"') + 1, s1.rfind('"') - s1.find('"') - 1);
-					eax = Load_tag_module(meta_struct::Get_file_directory(loc) + "\\" + s2);
-				}
-				else if (s1.find("spawn") != string::npos)
-				{
-
-				}
-				else if (s1.find("spawn()") != string::npos)
-				{
-					
-				}				
-			}
-		}
+		query_parser* my_parser = new query_parser(loc);
+		addDebugText(my_parser->_getlogs().c_str());
+		delete my_parser;
 	}
 	void Add_all_shared_refs()
 	{
 		DWORD SharedMemBase = *(DWORD*)(h2mod->GetBase() + 0x47CD54);
 		DWORD SharedTables = SharedMemBase + 0x20 + 0xC * *(DWORD*)(SharedMemBase + 4);
-		DWORD Tag_count = *(DWORD*)(*(DWORD*)(h2mod->GetBase() + 0x47D568) + 0x18);
 		DWORD TagTableStart = *(DWORD*)(h2mod->GetBase() + 0x47CD50);
 
-		for (int i = 0x2710; i < Tag_count; i++)
+		for (int i = 0x2710; i < tag_loader::tag_count; i++)
 			memcpy((void*)(TagTableStart + i * 0x10), (void*)(SharedTables + i * 0x10), 0x10);
+	}
+	query_parser::query_parser(std::vector<std::string>& vec_query)
+	{
+		DWORD_list.try_emplace("eax", 0);///lol
+		int eax = 0;
+		for (int i = 0; i < vec_query.size(); i++)
+		{
+			///only add small code sections here to prevent cluttering
+			string t = vec_query[i];
+			if (t.find("DWORD") != string::npos)
+			{
+				//well we got some variable definitons
+				std::string var_name = t.substr(t.find("DWORD") + 6);
+				//add, add to list code here
+				DWORD_list.try_emplace(var_name, eax);
+			}
+			//Causes sorting resulting in difficult to follow
+			/*
+			else if (t.find("tag_loadEx") != string::npos)
+			{
+				//similar to tag_load,but adds overwriting functionality
+				///tag_load(datum_index,overwrite_index,map_name);
+				DWORD index = try_parse_int(t.substr(t.find('(') + 1, t.find(',') - (t.find('(') + 1)));
+				DWORD overwrite_index = try_parse_int(t.substr(t.find(',') + 1, t.rfind(',') - (t.find(',') + 1)));
+				std::string map_name = t.substr(t.rfind(',') + 1, t.rfind(')') - t.rfind(',') - 1);
+
+				if (!index && !overwrite_index)
+					return;///before causing any harm
+
+				eax = overwrite_index;
+				Load_tag(index, true, map_name);
+				Push_Back(overwrite_index);
+				DWORD_list["eax"] = eax;
+			}
+			else if (t.find("tag_load") != string::npos)
+			{
+				//load tag directly from map
+				///recursive loading and looks for map in default map folder
+				///tag_load(datum_index,map_name)
+				DWORD index = try_parse_int(t.substr(t.find('(') + 1, t.find(',') - (t.find('(') + 1)));
+				std::string map_name = t.substr(t.find(',') + 1, t.find(')') - (t.find(',') + 1));
+
+				if (!index)
+					return;///safely return
+
+				eax = new_datum_index;///store for future use
+				Load_tag(index, true, map_name);
+				Push_Back();
+				DWORD_list["eax"] = eax;
+			}
+			*/
+			else if (t.find("module_load") != string::npos)
+			{
+				//gotta load some tag
+				std::string s2 = t.substr(t.find('"') + 1, t.rfind('"') - t.find('"') - 1);
+				eax = Load_tag_module(tag_loader::cus_tag_dir + "\\" + s2);
+				DWORD_list["eax"] = eax;
+			}
+			else if (t.find("_mov") != string::npos)
+			{
+				//primitive mov function _mov(dest,src)
+				std::string dest = t.substr(t.find('(') + 1, t.find(',') - t.find('(') - 1);
+				std::string src = t.substr(t.find(',') + 1, t.find(')') - t.find(',') - 1);
+				//add call to move function here
+				_mov_parser(dest, src);
+			}
+			else if (t.find("replace_tag") != string::npos)
+			{
+				std::string dest = t.substr(t.find('(') + 1, t.find(',') - t.find('(') - 1);
+				std::string src = t.substr(t.find(',') + 1, t.find(')') - t.find(',') - 1);
+				
+				replace_tag(dest, src);
+			}
+			else if (t.find("sync_tag") != string::npos)
+			{
+				///incomplete
+			}
+		}
+			
+	}
+	query_parser::query_parser(std::string file_loc)
+	{
+		DWORD_list.try_emplace("eax", 0);
+
+		std::vector<std::string> vec_query;
+
+		std::ifstream fin;
+		fin.open(file_loc.c_str(), ios::in);
+
+		if (!fin.is_open())
+		{
+			logs.push_back("Couldnt load query file:" + file_loc);
+			return;
+		}
+
+		char query[64];
+		while (!fin.eof())
+		{
+			fin.getline(query, 64);
+			std::vector<std::string> temp = clean_string(query);
+
+			if (temp.size())
+				vec_query.insert(vec_query.end(), temp.begin(), temp.end());
+		}
+		fin.close();
+		query_parser::query_parser(vec_query);
+	}
+	std::vector<std::string> query_parser::clean_string(std::string txt)
+	{
+		std::vector<std::string> ret;
+		string temp="";
+		//remove comment sections
+		for (int i = 0; i < txt.length(); i++)
+		{
+			if (txt[i] == '/'&&txt[i + 1] == '/')
+				break;
+			temp += txt[i];
+		}
+		//check for 0 length
+		if (!temp.length())
+			return ret;
+
+		//codes for handling basic assignment(=)
+		///seperate instructions
+		int end_pos = temp.length();
+		for (int i = temp.length() - 1; i >= 0; i--)
+		{
+			if (txt[i] == '=')
+			{
+				ret.push_back(temp.substr(i + 1, end_pos - (i + 1)));
+				end_pos = i;
+			}
+		}
+		ret.push_back(temp.substr(0, end_pos));
+		//-----Put some trimming operations here
+
+		///apply some fixups for assignment operations
+		for (int i = 0; i < ret.size(); i++)
+		{
+			if (!keyword_check(ret[i]))
+				if (i == 0)
+					ret[i] = "_mov(eax," + ret[i] + ")";
+				else ret[i] = "_mov(" + ret[i] + ",eax)";
+		}
+		return ret;
+	}
+	int query_parser::try_parse_int(std::string arg)
+	{
+		//well one could pass funky values at times,i dont want the game crash over here
+		try
+		{
+			//check for hex value
+			if (arg.find("0x") == 0)
+				return  std::stoul(arg.c_str(), nullptr, 16);
+			else //decimal
+				return  std::stoul(arg.c_str(), nullptr, 10);
+		}
+		catch (const std::invalid_argument& ia)
+		{
+			logs.push_back("Invalid integer : " + arg + ",Plz recheck UR PATHETIC SCRIPT");
+		}
+
+		return 0x0;
+	}
+	string query_parser::_getlogs()
+	{
+		string ret = "";
+		for (int i = 0; i < logs.size(); i++)
+			ret += '\n' + logs[i];
+		logs.clear();
+		return ret;
+	}
+	void query_parser::_mov_parser(string dest, string src)
+	{
+		int val = 0x0;
+
+		if (DWORD_list.find(src) != DWORD_list.end())
+			val = DWORD_list[src];
+		else val = try_parse_int(src);
+		
+		if (DWORD_list.find(dest) != DWORD_list.end())
+			DWORD_list[dest] = val;
+		else logs.push_back("Undeclared variable : " + dest);
+	}
+	void query_parser::replace_tag(string dest, string src)
+	{
+		int a = 0;
+		int b = 0;
+
+		if (DWORD_list.find(dest) != DWORD_list.end())
+			a = DWORD_list[dest];
+		else a = try_parse_int(dest);
+
+		if (DWORD_list.find(src) != DWORD_list.end())
+			b = DWORD_list[src];
+		else b = try_parse_int(src);
+		
+		auto tag_instance=(Blam::EngineDefinitions::Tag::global_tag_instance*)*Runtime::Globals::GlobalTagInstances;
+
+		//Only replace tags if they do exist
+		//Game uses similar method to check if the tag actually exists in the table 
+		if (tag_instance[a & 0xFFFF].tag_index.Index == (a & 0xFFFF))
+			tag_instance[a & 0xFFFF].offset = tag_instance[b & 0xFFFF].offset;
+
+
+		
+
+		//Only replace tags if they do exist
+		//Game uses similar method to check if the tag actually exists in the table 
+		//if (Runtime::Globals::GlobalTagInstances[a & 0xFFFF]->tag_index.Index == (a & 0xFFFF))
+			//Runtime::Globals::GlobalTagInstances[a & 0xFFFF]->offset = Runtime::Globals::GlobalTagInstances[b & 0xFFFF]->offset;
+	}
+	int query_parser::keyword_check(std::string t)
+	{
+		if (t.find("DWORD") != string::npos)
+			return 1;
+		else if (t.find("module_load") != string::npos)
+			return 1;
+		else if (t.find("_mov") != string::npos)
+			return 1;
+		else if (t.find("replace_tag") != string::npos)
+			return 1;
+		else if (t.find("sync_tag") != string::npos)
+			return 1;
+		return 0;
 	}
 }
 //Used to allocate somemore space for tagtables and tags
@@ -879,38 +1076,39 @@ unsigned int __cdecl AllocateMemory(int old_size, char arg_4)
 //function patching to load custom tags
 char _cdecl LoadTagsandMapBases(int a)
 {
+	//basic load_Tag call
 	typedef char(_cdecl *LoadTagsandSetMapBases)(int a);
 	LoadTagsandSetMapBases pLoadTagsandSetMapBases;
 	pLoadTagsandSetMapBases = (LoadTagsandSetMapBases)((char*)h2mod->GetBase() + 0x31348);
 	char result = pLoadTagsandSetMapBases(a);
+	
+	//reset starting_datum index
+	tag_loader::new_datum_index = 0x3BA4;
+	tag_loader::ext_meta_size = 0x0;
+
+	//just storing tag_couunt
+	tag_loader::tag_count = *(DWORD*)(*(DWORD*)(h2mod->GetBase() + 0x47D568) + 0x18);
 
 	//adding all shared references
 	tag_loader::Add_all_shared_refs();
 
-	//only for multiplayer injection
+	///Actual injection process after map load
+	//extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
+	///change it according to needs
 	if (Runtime::Cache::CacheHeader->type != Blam::Cache::cache_header::scnr_type::SinglePlayer)
 	{
 		DWORD *TagTableStart = (DWORD*)(h2mod->GetBase() + 0x47CD50);
-		//TABLE EXTENSION  STUFF
+		///---------------TABLE EXTENSION  STUFF
 		memcpy((BYTE*)tag_loader::new_Tables, (BYTE*)*TagTableStart, 0x3BA40);
 		*TagTableStart = (DWORD)tag_loader::new_Tables;
 
-		tag_loader::tag_count = *(DWORD*)(*(DWORD*)(h2mod->GetBase() + 0x47D568) + 0x18);
-		tag_loader::Reinject_meta();
-
-		/*
-		//grunt
-		tag_loader::Load_tag(0xEC020A8C, true, "03a_oldmombasa.map", false);
-		tag_loader::Push_Back();
-		*/
-
-		//tag_loader::Load_tag_module("C:\\h2v\\ff_arena_wall_bloc.cache");
-
+		//actual tag_loading
+		///parse query file
 		tag_loader::Parse_query_file(tag_loader::mods_dir + "\\tags\\load_tags.txt");
 
 		addDebugText(tag_loader::Pop_messages().c_str());
-
 	}
+
 	return result;
 }
 void _Patch_calls()
@@ -926,8 +1124,6 @@ void Initialise_tag_loader()
 	string game_dir = GetExeDirectoryNarrow();
 	string def_maps_loc = game_dir + "\\maps";
 
-	//addDebugText(game_path.c_str());
-	//addDebugText(def_maps_loc.c_str());
 
 	tag_loader::mods_dir = game_dir + "\\mods";
 	tag_loader::Set_directories(def_maps_loc, "", tag_loader::mods_dir + "\\tags", tag_loader::mods_dir + "\\plugins");//no custom support yet

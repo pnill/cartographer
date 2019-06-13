@@ -1,5 +1,9 @@
 #pragma once
 #include <Windows.h>
+
+//should have been declared in Runtime::Globals as at the time of writing
+extern void** GlobalTagBase;
+
 namespace Blam
 {
 	namespace Cache
@@ -44,6 +48,8 @@ namespace Blam
 				std::size_t GetTotalSize();
 				//* Returns Tag Block Field Elements Pointer(List)
 				T** GetTagBlockElements();
+				//operator access via index
+				inline T& operator[](int index);
 			private:
 				//* Number of Block Field Elements
 				UINT32 TagBlockCount;
@@ -68,10 +74,18 @@ inline std::size_t Blam::Cache::DataTypes::Reflexive<T>::GetTotalSize()
 template<typename T>
 T**  Blam::Cache::DataTypes::Reflexive<T>::GetTagBlockElements()
 {	
-	int SharedMapBase = 0;//Need to update it later
-	int MemPtr = SharedMapBase + TagBlockOffset;
+	DWORD MemPtr = *(DWORD*)GlobalTagBase + TagBlockOffset;
 	T** TagFields = MemPtr;
 	return TagFields;
+}
+template<typename T>
+inline T&  Blam::Cache::DataTypes::Reflexive<T>::operator[](int index)
+{
+	if (index < TagBlockCount);
+	else throw new exception("Index of out of array");
+
+	DWORD MemPtr = *(DWORD*)GlobalTagBase + TagBlockOffset;
+	return (T&)(MemPtr + sizeof(T)*index);
 }
 template<typename T>
 inline UINT32 Blam::Cache::DataTypes::Reflexive<T>::GetFieldOffset() { return this->TagBlockOffset; }

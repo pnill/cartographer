@@ -61,7 +61,7 @@
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)Halo2\</OutDir>
+    <OutDir>C:\Program Files (x86)\Microsoft Games\Halo 2</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>.\;.\3rdparty\;.\3rdparty\libcurl;.3rdparty\portaudio;.\3rdparty\google;..\Directx SDK\include;.\3rdparty\miniupnpc\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
@@ -376,7 +376,7 @@
     <ClInclude Include="MetaLoader\meta_struct.h" />
     <ClInclude Include="MetaLoader\tag_loader.h" />
     <ClInclude Include="Runtime\Cache\cache_ptrs.h" />
-    <ClInclude Include="Runtime\Engine\Globals\global_ptrs.h" />
+    <ClInclude Include="Runtime\Globals\global_ptrs.h" />
     <ClInclude Include="Runtime\init_runtime.h" />
     <ClInclude Include="Runtime\RuntimeIncludes.h" />
     <ClInclude Include="stdafx.h" />
