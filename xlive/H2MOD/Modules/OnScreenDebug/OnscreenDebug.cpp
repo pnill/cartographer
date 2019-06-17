@@ -1,14 +1,13 @@
+#include "stdafx.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
-#include "stdafx.h"
 
 char** DebugStr;
 int DebugTextArrayLenMax = 160;
 int DebugTextArrayPos = 0;
 bool DebugTextDisplay = false;
-FILE* debugFile = NULL;
 bool initialisedDebugText = false;
-
+h2log* onscreendebuglog = nullptr;
 
 int getDebugTextArrayMaxLen() {
 	return DebugTextArrayLenMax;
@@ -50,15 +49,7 @@ void addDebugText(char* text) {
 	strncpy(DebugStr[DebugTextArrayPos], text, lenInput);
 	memset(DebugStr[DebugTextArrayPos] + lenInput, 0, 1);
 
-	if (debugFile != NULL) {
-		char* debug_text = (char*)malloc(sizeof(char) * lenInput + 2);
-		strncpy(debug_text, text, lenInput);
-		memset(debug_text + lenInput, '\n', 1);
-		memset(debug_text + lenInput + 1, 0, 1);
-		fputs(debug_text, debugFile);
-		fflush(debugFile);
-		free(debug_text);
-	}
+	onscreendebuglog->debug(text);
 
 	if (endChar) {
 		addDebugText(endChar + 1);
@@ -67,16 +58,11 @@ void addDebugText(char* text) {
 
 void initDebugText() {
 	initialisedDebugText = true;
+	onscreendebuglog = h2log::create("OnScreenDebug", prepareLogFileName(L"h2onscreendebug"));
 	DebugStr = (char**)malloc(sizeof(char*) * DebugTextArrayLenMax);
 	for (int i = 0; i < DebugTextArrayLenMax; i++) {
 		DebugStr[i] = (char*)calloc(1, sizeof(char));
 	}
-	wchar_t debug_file_path[1024];
-	swprintf(debug_file_path, 1024, L"%wsh2onscreendebug.log", H2ProcessFilePath);
-	debugFile = _wfopen(debug_file_path, L"w");
-	char awerg[1034];
-	sprintf(awerg, "PATH: %ws", debug_file_path);
-	addDebugText(awerg);
 	addDebugText("Initialised On Screen Debug Text.");
 }
 

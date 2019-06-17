@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"

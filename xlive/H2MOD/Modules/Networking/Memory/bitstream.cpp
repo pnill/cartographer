@@ -1,5 +1,6 @@
-#include "H2MOD.h"
+#include "stdafx.h"
 #include "bitstream.h"
+#include "H2MOD.h"
 
 // sign flag
 int8_t __SETS__(int x)

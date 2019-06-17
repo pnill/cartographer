@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "CustomPackets.h"
 
 #include "H2MOD.h"
@@ -97,7 +98,7 @@ void __stdcall message_gateway_hook(void *thisx, network_address* addr, int mess
 	case e_network_message_types::request_map_filename:
 	{
 		s_request_map_filename* pak = (s_request_map_filename*)packet;
-		TRACE_GAME_NETWORK_N("[H2MOD-CustomPackets] received on hook1 request-map-filename from XUID: %lld", pak->user_identifier);
+		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] received on hook1 request-map-filename from XUID: {}", pak->user_identifier);
 		network_session* current_session = NetworkSession::getCurrentNetworkSession();
 		signed int peer_index = NetworkSession::getPeerIndexFromNetworkAddress(addr);
 		if (peer_index != -1 && peer_index != current_session->local_peer_index)
@@ -164,7 +165,7 @@ void __stdcall message_gateway_hook_2(void *thisx, int a2, int message_type, int
 	case e_network_message_types::request_map_filename:
 	{
 		s_request_map_filename* pak = (s_request_map_filename*)packet;
-		TRACE_GAME_NETWORK_N("[H2MOD-CustomPackets] received on hook2 request-map-filename from XUID: 0x%016X", pak->user_identifier);
+		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] received on hook2 request-map-filename from XUID: {:#x}", pak->user_identifier);
 		return;
 	}
 	case e_network_message_types::map_file_name:

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <unordered_map>
 #include "Globals.h"
 #include "DeviceShop.h"

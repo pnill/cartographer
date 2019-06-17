@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Globals.h"
 
 //all these global variables live till the app closes

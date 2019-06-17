@@ -79,7 +79,7 @@ LONG WINAPI Debug::On_UnhandledException(struct _EXCEPTION_POINTERS* ExceptionIn
 		MessageBoxA(NULL, message.c_str(), "Crash!", 0);
 	}
 
-	TRACE_GAME_N("Halo 2 has crashed and a dump file has been saved to \"%s\".", dump_file_name.c_str());
+	LOG_TRACE_GAME("Halo 2 has crashed and a dump file has been saved to \"{}\".", dump_file_name.c_str());
 
 	// pass through error to game/server code.
 	if (expection_filter)

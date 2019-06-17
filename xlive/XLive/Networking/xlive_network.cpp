@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 #include "Globals.h"
 #include "XLive\Networking\upnp.h"
 #include "XLive\UserManagement\CUser.h"
@@ -22,13 +22,13 @@ void ForwardPorts()
 	//upnp->UPnPForwardPort(false, (H2Config_base_port + 6), (H2Config_base_port + 6), "Halo2_3");
 	upnp->UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
 
-	TRACE_GAME_NETWORK_N("[UPNP] Finished forwarding ports.");
+	LOG_TRACE_NETWORK("[UPNP] Finished forwarding ports.");
 }
 
 // #5310: XOnlineStartup
 int WINAPI XOnlineStartup()
 {
-	TRACE_GAME_NETWORK_N("XOnlineStartup()");
+	LOG_TRACE_NETWORK("XOnlineStartup()");
 	memset(&userManager.game_host_xn, NULL, sizeof(XNADDR));
 	std::thread(ForwardPorts).detach();
 
@@ -39,7 +39,7 @@ SOCKET voice_sock = NULL;
 // #3: XCreateSocket
 SOCKET WINAPI XCreateSocket(int af, int type, int protocol)
 {
-	TRACE_GAME_NETWORK_N("XCreateSocket() af = %i, type = %i, protocol = %i", af, type, protocol);
+	LOG_TRACE_NETWORK("XCreateSocket() af = {0}, type = {1}, protocol = {2}", af, type, protocol);
 
 	bool vdp = false;
 	if (protocol == 254)
@@ -52,13 +52,13 @@ SOCKET WINAPI XCreateSocket(int af, int type, int protocol)
 
 	if (vdp)
 	{
-		TRACE_GAME_NETWORK_N("Socket: %08X was VDP", ret);
+		LOG_TRACE_NETWORK("Socket: {:x} was VDP", ret);
 		voice_sock = ret;
 	}
 
 	if (ret == INVALID_SOCKET)
 	{
-		TRACE_GAME_NETWORK_N("XCreateSocket - INVALID_SOCKET");
+		LOG_TRACE_NETWORK("XCreateSocket - INVALID_SOCKET");
 	}
 
 	return ret;
@@ -68,14 +68,14 @@ SOCKET WINAPI XCreateSocket(int af, int type, int protocol)
 int WINAPI XSessionEnd(DWORD, DWORD)
 {
 	mapManager->cleanup();
-	TRACE_GAME_NETWORK_N("XSessionEnd()");
+	LOG_TRACE_NETWORK("XSessionEnd()");
 	return 0;
 }
 
 // #52: XNetCleanup
 INT WINAPI XNetCleanup()
 {
-	TRACE_GAME_NETWORK_N("XNetCleanup()");
+	LOG_TRACE_NETWORK("XNetCleanup()");
 	return 0;
 }
 
@@ -84,35 +84,35 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 {
 	u_short port = (((struct sockaddr_in*)name)->sin_port);
 
-	TRACE_GAME_NETWORK_N("[H2MOD-Network] game bound socket: %i", htons(port));
+	LOG_TRACE_NETWORK("[H2MOD-Network] game bound socket: {}", htons(port));
 	if (s == voice_sock)
-		TRACE_GAME_NETWORK_N("[H2MOD-Network] could be voice socket", htons(port));
+		LOG_TRACE_NETWORK("[H2MOD-Network] could be voice socket", htons(port));
 
 
 	if (htons(port) == 1000) {
 		game_network_data_gateway_socket_1000 = s;
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port);
-		TRACE_GAME_NETWORK_N("[H2MOD-Network] replaced port %i with %i", htons(port), H2Config_base_port);
+		LOG_TRACE_NETWORK("[H2MOD-Network] replaced port {0} with {1}", htons(port), H2Config_base_port);
 	}
 
 	if (htons(port) == 1001) {
 		game_network_message_gateway_socket_1001= s;
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port + 1);
-		TRACE_GAME_NETWORK_N("[H2MOD-Network] replaced port %i with %i", htons(port), H2Config_base_port + 1);
+		LOG_TRACE_NETWORK("[H2MOD-Network] replaced port {0} with {1}", htons(port), H2Config_base_port + 1);
 	}
 
 	if (htons(port) == 1005)
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port + 5);
 	if (htons(port) == 1006)
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port + 6);
-	
+
 	userManager.sockmap[s] = ntohs(port);
 
 	SOCKET ret = bind(s, name, namelen);
-	
+
 	if (ret == SOCKET_ERROR)
-		TRACE_GAME_NETWORK_N("XSocketBind() - SOCKET_ERROR");
-	
+		LOG_TRACE_NETWORK("XSocketBind() - SOCKET_ERROR");
+
 	return ret;
 }
 
@@ -129,7 +129,7 @@ INT WINAPI XNetRandom(BYTE * pb, UINT cb)
 // #54: XNetCreateKey
 INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 {
-	TRACE("XNetCreateKey");
+	LOG_TRACE_XLIVE("XNetCreateKey");
 	if (pxnkid && pxnkey)
 	{
 		memset(pxnkid, 0xAB, sizeof(XNKID));
@@ -161,7 +161,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 	{
 		(((struct sockaddr_in*)to)->sin_addr.s_addr) = H2Config_master_ip;
 		((struct sockaddr_in*)to)->sin_port = ntohs(H2Config_master_port_relay);
-		//TRACE_GAME_NETWORK_N("XSocketSendTo - Broadcast");
+		//LOG_TRACE_NETWORK_N("XSocketSendTo - Broadcast");
 
 		return sendto(s, buf, len, flags, to, tolen);
 	}
@@ -191,7 +191,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 
 		if (nPort != 0)
 		{
-			//TRACE("XSocketSendTo() port 1000 nPort: %i secure: %08X", htons(nPort), iplong);
+			//LOG_TRACE_XLIVE("XSocketSendTo() port 1000 nPort: {} secure: %08X", htons(nPort), iplong);
 			SendStruct.sin_port = nPort;
 		}
 		else {
@@ -205,7 +205,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 
 		if (nPort != 0)
 		{
-			//TRACE("XSocketSendTo() port 1001 nPort: %i secure: %08X", htons(nPort), iplong);
+			//LOG_TRACE_XLIVE("XSocketSendTo() port 1001 nPort: %i secure: %08X", htons(nPort), iplong);
 			SendStruct.sin_port = nPort;
 		}
 		else {
@@ -215,7 +215,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		break;
 
 	default:
-		//TRACE("XSocketSendTo() port: %i not matched!", htons(port));
+		//LOG_TRACE_XLIVE("XSocketSendTo() port: %i not matched!", htons(port));
 		break;
 	}
 
@@ -226,28 +226,28 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		SendStruct.sin_addr.s_addr = xn;
 	}
 
-	//TRACE("SendStruct.sin_addr.s_addr == %08X", SendStruct.sin_addr.s_addr);
+	//LOG_TRACE_XLIVE("SendStruct.sin_addr.s_addr == %08X", SendStruct.sin_addr.s_addr);
 
 	if (SendStruct.sin_addr.s_addr == H2Config_ip_wan)
 	{
-		//TRACE("Matched g_lWANIP:%08X", H2Config_ip_wan);
+		//LOG_TRACE_XLIVE("Matched g_lWANIP:%08X", H2Config_ip_wan);
 		SendStruct.sin_addr.s_addr = H2Config_ip_lan;
-		//TRACE("Replaced send struct s_addr with g_lLANIP: %08X", H2Config_ip_lan);
+		//LOG_TRACE_XLIVE("Replaced send struct s_addr with g_lLANIP: %08X", H2Config_ip_lan);
 	}
 
-	
+
 	int ret = sendto(s, buf, len, flags, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
-	
+
 	if (ret == SOCKET_ERROR)
 	{
-		TRACE_GAME_NETWORK_N("XSocketSendTo - Socket Error True");
-		TRACE_GAME_NETWORK_N("XSocketSendTo - WSAGetLastError(): %08X", WSAGetLastError());
+		LOG_TRACE_NETWORK("XSocketSendTo - Socket Error True");
+		LOG_TRACE_NETWORK("XSocketSendTo - WSAGetLastError(): {:x}", WSAGetLastError());
 	}
-	else 
+	else
 	{
 		updateSendToStatistics(len);
 	}
-	
+
 	return ret;
 }
 
@@ -255,7 +255,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *from, int *fromlen)
 {
 	int ret = recvfrom(s, buf, len, flags, from, fromlen);
-	
+
 	if (ret > 0)
 	{
 		short port = (((struct sockaddr_in*)from)->sin_port);
@@ -270,7 +270,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 
 				userManager.secure_map[hostpair] = secure;
 
-				TRACE_GAME_NETWORK("[H2MOD-Network] Received secure packet with ip addr %08X, port: %i, secure: %08X", htonl(iplong), htons(port), secure);
+				LOG_TRACE_NETWORK("[H2MOD-Network] Received secure packet with ip addr {0:x}, port: {1}, secure: {2:x}", htonl(iplong), htons(port), secure);
 				CUser* user = userManager.cusers[secure]; // Try to get the user by the secure address they've sent.
 				if (user)
 				{
@@ -291,7 +291,8 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 
 			if (secure == 0)
 			{
-				TRACE_GAME_NETWORK_N("[H2MOD-Network] This is probably the issue.... now the fucking recv address is 0 you numb nuts. iplong: %08X, port: %i", htonl(iplong), htons(port));
+                // hahaaha -- almic
+				LOG_TRACE_NETWORK("[H2MOD-Network] This is probably the issue.... now the fucking recv address is 0 you numb nuts. iplong: {0:x}, port: {1}", htonl(iplong), htons(port));
 			}
 			else
 			{
@@ -306,17 +307,17 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 			switch (userManager.sockmap[s])
 			{
 			case 1000:
-				//TRACE("XSocketRecvFrom() User.sockmap mapping port 1000 - port: %i, secure: %08X", htons(port), secure);
+				//LOG_TRACE_XLIVE("XSocketRecvFrom() User.sockmap mapping port 1000 - port: %i, secure: %08X", htons(port), secure);
 				userManager.pmap_a[secure] = port;
 				break;
 
 			case 1001:
-				//TRACE("XSocketRecvFrom() User.sockmap mapping port 1001 - port: %i, secure: %08X", htons(port), secure);
+				//LOG_TRACE_XLIVE("XSocketRecvFrom() User.sockmap mapping port 1001 - port: %i, secure: %08X", htons(port), secure);
 				userManager.pmap_b[secure] = port;
 				break;
 
 			default:
-				//TRACE("XSocketRecvFrom() User.sockmap[s] didn't match any ports!");
+				//LOG_TRACE_XLIVE("XSocketRecvFrom() User.sockmap[s] didn't match any ports!");
 				break;
 
 			}
@@ -325,7 +326,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 
 	/*if (ret > 0)
 	{
-		TRACE_GAME_NETWORK_N("[h2mod-network] received socket data, total: %i", ret);
+		LOG_TRACE_NETWORK_N("[h2mod-network] received socket data, total: {}", ret);
 	}*/
 
 	return ret;
@@ -334,7 +335,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 // #55: XNetRegisterKey //need #51
 int WINAPI XNetRegisterKey(XNKID *pxnkid, XNKEY *pxnkey)
 {
-	TRACE_GAME_NETWORK_N("XNetRegisterKey()");
+	LOG_TRACE_NETWORK("XNetRegisterKey()");
 	return 0;
 }
 
@@ -342,7 +343,6 @@ int WINAPI XNetRegisterKey(XNKID *pxnkid, XNKEY *pxnkey)
 // #56: XNetUnregisterKey // need #51
 int WINAPI XNetUnregisterKey(const XNKID* pxnkid)
 {
-	TRACE_GAME_NETWORK_N("XNetUnregisterKey()");
+	LOG_TRACE_NETWORK("XNetUnregisterKey()");
 	return 0;
 }
-

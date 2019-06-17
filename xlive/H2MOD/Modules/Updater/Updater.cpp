@@ -1,22 +1,23 @@
+#include "stdafx.h"
 #include "H2MOD\Modules\Updater\Updater.h"
-#include <stdio.h>
-#include <curl/curl.h>
-#include <string>
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include <vector>
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
+#include <stdio.h>
+#include <curl/curl.h>
+#include <string>
+#include <vector>
 
-bool fork_cmd_elevate(const char* cmd, char* flags = 0) {
+bool fork_cmd_elevate(const wchar_t* cmd, wchar_t* flags = 0) {
 	SHELLEXECUTEINFO shExInfo = { 0 };
 	shExInfo.cbSize = sizeof(shExInfo);
 	shExInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
 	shExInfo.hwnd = 0;
-	shExInfo.lpVerb = "runas";                // Operation to perform
+	shExInfo.lpVerb = L"runas";                // Operation to perform
 	shExInfo.lpFile = cmd;       // Application to start    
-	shExInfo.lpParameters = flags ? flags : "";                  // Additional parameters
+	shExInfo.lpParameters = flags ? flags : L"";                  // Additional parameters
 	shExInfo.lpDirectory = 0;
 	shExInfo.nShow = SW_SHOW;
 	shExInfo.hInstApp = 0;
@@ -524,13 +525,13 @@ void GSDownloadInstall() {
 	//exec installer
 	//quit game
 
-	char existingfilepathupdater[1024 + 260] = "";
-	snprintf(existingfilepathupdater, 1024 + 260, "%wsh2pc-update.exe", dir_update);
+	wchar_t existingfilepathupdater[1024 + 260] = L"";
+	swprintf(existingfilepathupdater, 1024 + 260, L"%wsh2pc-update.exe", dir_update);
 
 	if (updater_params.size() > 0) {
 		int updater_params_buflen = 20 + updater_params.size();
-		char* updater_params_flags = (char*)malloc(sizeof(char) * updater_params_buflen);
-		snprintf(updater_params_flags, updater_params_buflen, "-p %d -t 5000 %s", GetCurrentProcessId(), updater_params.c_str());
+		wchar_t* updater_params_flags = (wchar_t*)malloc(sizeof(wchar_t) * updater_params_buflen);
+		swprintf(updater_params_flags, updater_params_buflen, L"-p %d -t 5000 %s", GetCurrentProcessId(), updater_params.c_str());
 		if (fork_cmd_elevate(existingfilepathupdater, updater_params_flags)) {
 			addDebugText("Shutting down to update!");
 			BYTE& Quit_Exit_Game = *(BYTE*)((char*)H2BaseAddr + (H2IsDediServer ? 0x4a7083 : 0x48220b));

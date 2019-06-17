@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "H2MOD.h"
-#include <Wincrypt.h>
-#include <Mmsystem.h>
+
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
@@ -17,7 +16,6 @@
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 #include <Shlwapi.h> /*StrStrIW function in OnMapLoad*/
-
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -98,7 +96,7 @@ game_lobby_states call_get_lobby_state()
 
 int __cdecl call_get_object(signed int object_datum_index, int object_type)
 {
-	//TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
+	//LOG_TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
 
 	typedef int(__cdecl *get_object)(signed int object_datum_index, int object_type);
 	get_object pget_object = (get_object)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x11F3A6 : 0x1304E3));
@@ -108,7 +106,7 @@ int __cdecl call_get_object(signed int object_datum_index, int object_type)
 
 int __cdecl call_unit_reset_equipment_datum(DatumIndex unit_datum_index)
 {
-	//TRACE_GAME("unit_reset_equipment(unit_datum_index: %08X)", unit_datum_index);
+	//LOG_TRACE_GAME("unit_reset_equipment(unit_datum_index: %08X)", unit_datum_index);
 	typedef int(__cdecl *unit_reset_equipment)(DatumIndex unit_datum_index);
 	unit_reset_equipment punit_reset_equipment = (unit_reset_equipment)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x133030 : 0x1441E0));
 	if (unit_datum_index != -1 && unit_datum_index != 0)
@@ -121,7 +119,7 @@ int __cdecl call_unit_reset_equipment_datum(DatumIndex unit_datum_index)
 
 int __cdecl call_unit_reset_equipment(int unit_datum_index)
 {
-	//TRACE_GAME("unit_reset_equipment(unit_datum_index: %08X)", unit_datum_index);
+	//LOG_TRACE_GAME("unit_reset_equipment(unit_datum_index: %08X)", unit_datum_index);
 	typedef int(__cdecl *unit_reset_equipment)(int unit_datum_index);
 	unit_reset_equipment punit_reset_equipment = (unit_reset_equipment)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x133030 : 0x1441E0));
 	if (unit_datum_index != -1 && unit_datum_index != 0)
@@ -134,7 +132,7 @@ int __cdecl call_unit_reset_equipment(int unit_datum_index)
 
 void __cdecl call_hs_object_destroy_datum(DatumIndex object_datum_index)
 {
-	//TRACE_GAME("hs_object_destory(object_datum_index: %08X)", object_datum_index);
+	//LOG_TRACE_GAME("hs_object_destory(object_datum_index: %08X)", object_datum_index);
 	typedef void(__cdecl *hs_object_destroy)(DatumIndex object_datum_index);
 	hs_object_destroy phs_object_destroy = (hs_object_destroy)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x124ED5 : 0xFDCFD)); // update on dedis
 
@@ -144,7 +142,7 @@ void __cdecl call_hs_object_destroy_datum(DatumIndex object_datum_index)
 
 void __cdecl call_hs_object_destroy(int object_datum_index)
 {
-	//TRACE_GAME("hs_object_destory(object_datum_index: %08X)", object_datum_index);
+	//LOG_TRACE_GAME("hs_object_destory(object_datum_index: %08X)", object_datum_index);
 	typedef void(__cdecl *hs_object_destroy)(int object_datum_index);
 	hs_object_destroy phs_object_destroy = (hs_object_destroy)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x124ED5 : 0xFDCFD)); // update dedi
 
@@ -153,7 +151,7 @@ void __cdecl call_hs_object_destroy(int object_datum_index)
 
 signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit)
 {
-	//TRACE_GAME("unit_inventory_next_weapon(unit: %08X)", unit);
+	//LOG_TRACE_GAME("unit_inventory_next_weapon(unit: %08X)", unit);
 	typedef signed int(__cdecl *unit_inventory_next_weapon)(unsigned short unit);
 	unit_inventory_next_weapon punit_inventory_next_weapon = (unit_inventory_next_weapon)(((char*)h2mod->GetBase()) + 0x139E04);
 
@@ -162,7 +160,7 @@ signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit)
 
 bool __cdecl call_assign_equipment_to_unit_datum(DatumIndex unit, int object_index, short unk)
 {
-	//TRACE_GAME("assign_equipment_to_unit(unit: %08X,object_index: %08X,unk: %08X)", unit, object_index, unk);
+	//LOG_TRACE_GAME("assign_equipment_to_unit(unit: %08X,object_index: %08X,unk: %08X)", unit, object_index, unk);
 	typedef bool(__cdecl *assign_equipment_to_unit)(DatumIndex unit, int object_index, short unk);
 	assign_equipment_to_unit passign_equipment_to_unit = (assign_equipment_to_unit)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x1330FA : 0x1442AA));
 
@@ -172,7 +170,7 @@ bool __cdecl call_assign_equipment_to_unit_datum(DatumIndex unit, int object_ind
 
 bool __cdecl call_assign_equipment_to_unit(int unit, int object_index, short unk)
 {
-	//TRACE_GAME("assign_equipment_to_unit(unit: %08X,object_index: %08X,unk: %08X)", unit, object_index, unk);
+	//LOG_TRACE_GAME("assign_equipment_to_unit(unit: %08X,object_index: %08X,unk: %08X)", unit, object_index, unk);
 	typedef bool(__cdecl *assign_equipment_to_unit)(int unit, int object_index, short unk);
 	assign_equipment_to_unit passign_equipment_to_unit = (assign_equipment_to_unit)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x1330FA : 0x1442AA));
 
@@ -182,8 +180,8 @@ bool __cdecl call_assign_equipment_to_unit(int unit, int object_index, short unk
 int __cdecl call_object_placement_data_new_datum(void* s_object_placement_data, DatumIndex object_definition_index, DatumIndex object_owner, int unk)
 {
 
-	//TRACE_GAME("object_placement_data_new(s_object_placement_data: %08X,",s_object_placement_data);
-	//TRACE_GAME("object_definition_index: %08X, object_owner: %08X, unk: %08X)", object_definition_index, object_owner, unk);
+	//LOG_TRACE_GAME("object_placement_data_new(s_object_placement_data: %08X,",s_object_placement_data);
+	//LOG_TRACE_GAME("object_definition_index: %08X, object_owner: %08X, unk: %08X)", object_definition_index, object_owner, unk);
 
 	typedef int(__cdecl *object_placement_data_new)(void*, DatumIndex, DatumIndex, int);
 	object_placement_data_new pobject_placement_data_new = (object_placement_data_new)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x121033 : 0x132163));
@@ -194,8 +192,8 @@ int __cdecl call_object_placement_data_new_datum(void* s_object_placement_data, 
 }
 int __cdecl call_object_placement_data_new(void* s_object_placement_data, int object_definition_index, int object_owner, int unk)
 {
-	//TRACE_GAME("object_placement_data_new(s_object_placement_data: %08X,",s_object_placement_data);
-	//TRACE_GAME("object_definition_index: %08X, object_owner: %08X, unk: %08X)", object_definition_index, object_owner, unk);
+	//LOG_TRACE_GAME("object_placement_data_new(s_object_placement_data: %08X,",s_object_placement_data);
+	//LOG_TRACE_GAME("object_definition_index: %08X, object_owner: %08X, unk: %08X)", object_definition_index, object_owner, unk);
 
 	typedef int(__cdecl *object_placement_data_new)(void*, int, int, int);
 	object_placement_data_new pobject_placement_data_new = (object_placement_data_new)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x121033 : 0x132163));
@@ -213,7 +211,7 @@ int __cdecl call_object_placement_data_new(void* s_object_placement_data, int ob
 
 signed int __cdecl call_object_new(void* pObject)
 {
-	//TRACE_GAME("object_new(pObject: %08X)", pObject);
+	//LOG_TRACE_GAME("object_new(pObject: %08X)", pObject);
 
 	typedef int(__cdecl *object_new)(void*);
 	object_new pobject_new = (object_new)(((char*)h2mod->GetBase()) + ((h2mod->Server) ? 0x125B77 : 0x136CA7));
@@ -251,7 +249,7 @@ int get_char_datum_from_actor(int actor_datum)
 	DWORD actor_table = *(DWORD*)((BYTE*)actor_table_ptr + 0x44);
 	DWORD actor = (DWORD)((BYTE*)actor_table + (actor_index * 0x898));
 	int character_datum = *(int*)((BYTE*)actor+0x54);
-	
+
 	return character_datum;
 }
 
@@ -297,10 +295,10 @@ signed int __cdecl object_new_hook(void *pObject)
 	//ZeroMemory(DebugText, sizeof(DebugText));
 	//wsprintf(DebugText, L"AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result, variant_index);
 
-	//TRACE_GAME_N("AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result, variant_index);
+	//LOG_TRACE_GAME_N("AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result, variant_index);
 
 	//addDebugText(DebugText);
-	
+
 	return result;
 }
 
@@ -309,20 +307,20 @@ tc_simulation_unit_entity_definition_creation_encode pc_simulation_unit_entity_d
 
 int __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr, int creation_data_size, void* creation_data, int a3, void* packet)
 {
-	//TRACE_GAME_N("c_simulation_unit_entity_definition_creation_encode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, a3: %i, packet: %08X", thisptr, creation_data_size, creation_data, a3, packet);
+	//LOG_TRACE_GAME_N("c_simulation_unit_entity_definition_creation_encode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, a3: %i, packet: %08X", thisptr, creation_data_size, creation_data, a3, packet);
 	int object_permutation_index = *(int*)((char*)creation_data + 0x24);
 	if (object_permutation_index != -1)
 	{
-		//TRACE_GAME_N("creation_data+0x24: %08X", object_permutation_index);
+		//LOG_TRACE_GAME_N("creation_data+0x24: %08X", object_permutation_index);
 
 		bitstream::p_data_encode_bool()(packet, "object-permutation-exists", 1);
 		bitstream::p_data_encode_integer()(packet, "object-permutation-index", object_permutation_index, 32);
-		//TRACE_GAME_N("c_simulation_unit_entity_encode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
+		//LOG_TRACE_GAME_N("c_simulation_unit_entity_encode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
 
 	}
 	else
 		bitstream::p_data_encode_bool()(packet, "object-permutation-exists", 0);
-	
+
 	int ret = pc_simulation_unit_entity_definition_encode(thisptr, creation_data_size, creation_data, a3, packet);
 	return ret;
 }
@@ -333,15 +331,15 @@ tc_simulation_unit_entity_definition_creation_decode pc_simulation_unit_entity_d
 
 int __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, int creation_data_size, void* creation_data, void* packet)
 {
-	//TRACE_GAME_N("c_simulation_unit_entity_definition_creation_decode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, packet: %08X", thisptr, creation_data_size, creation_data, packet);
+	//LOG_TRACE_GAME_N("c_simulation_unit_entity_definition_creation_decode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, packet: %08X", thisptr, creation_data_size, creation_data, packet);
 
 	if (bitstream::p_data_decode_bool()(packet, "object-permutation-exists"))
 	{
-		//TRACE_GAME_N("c_simulation_unit_entity_decode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
+		//LOG_TRACE_GAME_N("c_simulation_unit_entity_decode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
 		int object_permutation_index = bitstream::p_data_decode_integer()(packet, "object-permutation-index", 32);
 		*(int*)((char*)creation_data + 0x24) = object_permutation_index;
 
-		//TRACE_GAME_N("object_permutation_index: %08X", object_permutation_index);
+		//LOG_TRACE_GAME_N("object_permutation_index: %08X", object_permutation_index);
 	}
 	else
 		*(int*)((char*)creation_data + 0x24) = -1;
@@ -361,17 +359,17 @@ int __stdcall set_unit_creation_data_hook(unsigned int object_index, void* objec
 	{
 		//We should have allocated an additional 4 bytes above 0x24 so we'll write our in between 0x24 and 0x28
 		*(int*)((char*)object_creation_data + 0x24) = object_to_variant[object_index];
-		
+
 		/*wchar_t DebugText[255] = { 0 };
 		ZeroMemory(DebugText, sizeof(DebugText));
 		wsprintf(DebugText, L"AI unit_creation_data_setup hook - object_index: %08X - variant_index: %08X", object_index, object_to_variant[object_index]);
 
-		TRACE_GAME_N("set_unit_creation_data_hook - object_index: %08X, variant_index: %08X", object_index, object_to_variant[object_index]);
+		LOG_TRACE_GAME_N("set_unit_creation_data_hook - object_index: %08X, variant_index: %08X", object_index, object_to_variant[object_index]);
 		addDebugText(DebugText);*/
 	}
 	else
 		*(int*)((char*)object_creation_data + 0x24) = -1;
-	
+
 
 
 	return result;
@@ -385,7 +383,7 @@ bool __cdecl set_unit_color_data_hook(int a1, unsigned __int16 a2, int a3)
 	int object_creation_data = a1 - 0x10;
 	int object_permutation_index = *(int*)((char*)object_creation_data + 0x24);
 
-	TRACE_GAME_N("set_unit_color_data_hook - %08X", object_permutation_index);
+	LOG_TRACE_GAME("set_unit_color_data_hook - {:x}", object_permutation_index);
 
 	if ( object_permutation_index == -1)
 		return pset_unit_color_data(a1, a2, a3);
@@ -399,11 +397,11 @@ tcreate_unit_hook pcreate_unit_hook;
 bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObject)
 {
 	if (*(int*)((char*)pCreationData + 0x24) != -1)
-	{	
+	{
 		//wchar_t DebugText[255] = { 0 };
 		//ZeroMemory(DebugText, sizeof(DebugText));
 		//wsprintf(DebugText, L"create_unit_hook - variant type: %08X - ", *(int*)((char*)pCreationData + 0x24));
-	
+
 		//addDebugText(DebugText);
 
 		*(int*)((char*)pObject + 0xC) = *(int*)((char*)pCreationData+0x24);
@@ -426,7 +424,7 @@ EngineType H2MOD::GetEngineType()
 		return EngineType::MAIN_MENU_ENGINE;
 	default:
 		return EngineType::INVALID_ENGINE_TYPE; // if everything ok shouldn't ever get here
-	} 
+	}
 }
 
 inline wchar_t* H2MOD::GetLobbyGameVariantName()
@@ -461,7 +459,7 @@ void H2MOD::kick_player(int peerIndex) {
 	auto p_game_session_boot = (game_session_boot)(h2mod->GetBase() + 0x1CCE9B);
 
 	DWORD* ptr = (DWORD*)(((char*)h2mod->GetBase()) + 0x420FE8);
-	TRACE_GAME_N("about to kick player index=%d", peerIndex);
+	LOG_TRACE_GAME("about to kick player index={}", peerIndex);
 	p_game_session_boot((DWORD*)(*ptr), peerIndex, true);
 }
 
@@ -471,7 +469,7 @@ show_error_screen show_error_screen_method;
 int __cdecl showErrorScreen(int a1, signed int a2, int a3, __int16 a4, int a5, int a6) {
 	if (a2 == 0x117)
 	{
-		TRACE_FUNC("Ignoring need to reinstall maps");
+		LOG_TRACE_FUNC("Ignoring need to reinstall maps");
 		return 0;
 	}
 	return show_error_screen_method(a1, a2, a3, a4, a5, a6);
@@ -529,7 +527,7 @@ typedef int(__cdecl *dedi_command_hook)(wchar_t** a1, int a2, char a3);
 dedi_command_hook dedi_command_hook_method;
 
 int __cdecl dediCommandHook(wchar_t** command_line_args, int a2, int a3) {
-	
+
 	wchar_t* command = command_line_args[0];
 	std::wstring wsCommand(command);
 	if (command[0] == L'$') {
@@ -543,7 +541,7 @@ int __cdecl dediCommandHook(wchar_t** command_line_args, int a2, int a3) {
 
 bool H2MOD::is_team_play() {
 	//0x971A90 only works in lobby (not in game)
-	//0x978CB4 works in both 
+	//0x978CB4 works in both
 	DWORD ptr = *((DWORD*)(this->GetBase() + 0x978CB4));
 	ptr += 0x1C68;
 	return *(BYTE*)ptr;
@@ -635,7 +633,7 @@ int H2MOD::get_dynamic_player_base(int playerIndex, bool resetDynamicBase) {
 
 void GivePlayerWeapon2(int PlayerIndex, int WeaponId, short Unk)
 {
-	//TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
+	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
 	int unit_datum = h2mod->get_unit_datum_from_player_index(PlayerIndex);
 
@@ -659,7 +657,7 @@ void GivePlayerWeapon2(int PlayerIndex, int WeaponId, short Unk)
 
 void GivePlayerWeapon(int PlayerIndex, int WeaponId, bool bReset)
 {
-	//TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
+	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
 	int unit_datum = h2mod->get_unit_datum_from_player_index(PlayerIndex);
 
@@ -699,7 +697,7 @@ int H2MOD::get_player_index_from_name(wchar_t* playername)
 	{
 		wchar_t* comparename = (wchar_t*)(*(DWORD*)player_table_ptr + (i * 0x204) + 0x40);
 
-		TRACE_GAME("[H2MOD]::get_player_index_from_name( %ws : %ws )", playername, comparename);
+		LOG_TRACE_GAME(L"[H2MOD]::get_player_index_from_name( {0} : {1} )", playername, comparename);
 
 		if (wcscmp(comparename, playername))
 		{
@@ -734,7 +732,7 @@ int H2MOD::get_player_index_from_unit_datum(int unit_datum_index)
 	for (pIndex = 0; pIndex <= 16; pIndex++)
 	{
 		int unit_datum_index_check = (int)*(int*)(*(DWORD*)player_table_ptr + (pIndex * 0x204) + 0x28);
-		TRACE("[H2MOD::get_player_index_from_unit_datum] Checking datum: %08X - index: %i against datum: %08X", unit_datum_index_check, pIndex, unit_datum_index);
+		LOG_TRACE_FUNC("Checking datum: {0:x} - index: {1} against datum: {2:x}", unit_datum_index_check, pIndex, unit_datum_index);
 
 		if (unit_datum_index == unit_datum_index_check)
 		{
@@ -803,7 +801,7 @@ void H2MOD::set_unit_biped(BYTE biped, int pIndex)
 		BYTE orig_val = *(BYTE*)(((char*)((h2mod->Server) ? 0x3000274C : 0x30002BA0) + (pIndex * 0x204)));
 		BYTE *orig_addr = (BYTE*)(((char*)((h2mod->Server) ? 0x3000274C : 0x30002BA0) + (pIndex * 0x204)));
 
-		TRACE_GAME("set_unit_biped(biped: %i, index: %i), orig_val: %i, address: %08X", biped, pIndex, orig_val, orig_addr);
+		LOG_TRACE_GAME("set_unit_biped(biped: {0}, index: {1}), orig_val: {2}, address: {3:p}", biped, pIndex, orig_val, (void*)orig_addr);
 		*(BYTE*)(((char*)((h2mod->Server) ? 0x3000274C : 0x30002BA0) + (pIndex * 0x204))) = biped;
 	}
 }
@@ -849,11 +847,11 @@ void H2MOD::DisableSound(int sound)
 {
 	DWORD AddressOffset = *(DWORD*)((char*)this->GetBase() + 0x47CD54);
 
-	TRACE_GAME("AddressOffset: %08X", AddressOffset);
+	LOG_TRACE_GAME("AddressOffset: {:x}", AddressOffset);
 	switch (sound)
 	{
 	case SoundType::Slayer:
-		TRACE_GAME("AddressOffset + 0xd7dfb4 = 0x%x", (DWORD*)(AddressOffset + 0xd7dfb4));
+		LOG_TRACE_GAME("AddressOffset + 0xd7dfb4 = {:p}", (void*)(AddressOffset + 0xd7dfb4));
 		*(DWORD*)(AddressOffset + 0xd7e05c) = -1;
 		*(DWORD*)(AddressOffset + 0xd7dfb4) = -1;
 		break;
@@ -881,7 +879,7 @@ void H2MOD::CustomSoundPlay(const wchar_t* soundName, int delay)
 		//std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
 		std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now() + std::chrono::milliseconds(delay);
 
-		TRACE_GAME("[H2MOD-SoundQueue] - attempting to play sound %ws - delaying %i miliseconds first", soundName, delay);
+		LOG_TRACE_GAME(L"[H2MOD-SoundQueue] - attempting to play sound {0} - delaying {1} miliseconds first", soundName, delay);
 
 		if (delay > 0)
 			std::this_thread::sleep_until(timePoint);
@@ -904,7 +902,7 @@ update_player_score pupdate_player_score;
 char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 {
 
-	//TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
+	//LOG_TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
 
 	/* The first value within a2 ( *(DWORD*)(a2) ) appears to be the datum_index of a player from the gamestate_player_table */
 
@@ -947,7 +945,7 @@ char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 
 void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6)
 {
-	//TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
+	//LOG_TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
 	//20/10/2018 18:46:51.541 update_player_score_hook ( thisptr: 3000595C, a2: 00000000, a3: 00000002, a4: 00000001, a5: 00000007, a6: 00000001 )
 	// / 10 / 2018 18:46 : 51.541 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
 	//	20 / 10 / 2018 18 : 46 : 51.541 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
@@ -1001,7 +999,7 @@ int OnAutoPickUpHandler(DatumIndex player_datum, DatumIndex object_datum)
 {
 	int(_cdecl*AutoHandler)(DatumIndex, DatumIndex);
 	AutoHandler = (int(_cdecl*)(DatumIndex, DatumIndex))((char*)h2mod->GetBase() + ((!h2mod->Server) ? 0x57AA5 : 0x5FF9D));
-	
+
 	if (b_HeadHunter)
 	{
 		headHunterHandler->itemInteraction->SetPlayerIndex(player_datum);
@@ -1011,7 +1009,7 @@ int OnAutoPickUpHandler(DatumIndex player_datum, DatumIndex object_datum)
 		if (handled)
 			return 0;
 	}
-	
+
 	return AutoHandler(player_datum, object_datum);
 }
 
@@ -1082,7 +1080,7 @@ void __cdecl OnMapLoad(int a1)
 		H2Tweaks::setHz();
 
 		p_set_random_number(a1);
-		return; 
+		return;
 	}
 
 	b_H2X = false;
@@ -1094,7 +1092,7 @@ void __cdecl OnMapLoad(int a1)
 	b_Halo2Final = false;
 
 	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
-	TRACE_GAME("[h2mod] OnMapLoad engine mode %d, variant name %ws", h2mod->GetEngineType(), variant_name);
+	LOG_TRACE_GAME(L"[h2mod] OnMapLoad engine mode {0}, variant name {1}", h2mod->GetEngineType(), variant_name);
 	BYTE GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
 
 	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE)
@@ -1104,42 +1102,42 @@ void __cdecl OnMapLoad(int a1)
 		// StrStrIW returns pointer to first substring occurrence, NULL othewise
 		if (StrStrIW(variant_name, ZOMBIES) || StrStrIW(variant_name, INFECTION))
 		{
-			TRACE_GAME("[h2mod] Zombies Turned on!");
+			LOG_TRACE_GAME("[h2mod] Zombies Turned on!");
 			b_Infection = true;
 		}
 
 		if (StrStrIW(variant_name, GUNGAME))
 		{
-			TRACE_GAME("[h2mod] GunGame Turned on!");
+			LOG_TRACE_GAME("[h2mod] GunGame Turned on!");
 			b_GunGame = true;
 		}
 
 		if (StrStrIW(variant_name, H2F))
 		{
-			TRACE_GAME("[h2mod] Halo2Final Turned on!");
+			LOG_TRACE_GAME("[h2mod] Halo2Final Turned on!");
 			b_Halo2Final = true;
 		}
 
 		if (StrStrIW(variant_name, H2X))
 		{
-			TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
+			LOG_TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
 			b_H2X = true;
 		}
 		else if (StrStrIW(variant_name, OGH2))
 		{
-			TRACE_GAME("[h2mod] 30 Tick Mod Activated!");
+			LOG_TRACE_GAME("[h2mod] 30 Tick Mod Activated!");
 			b_XboxTick = true;
 		}
 
 		if (StrStrIW(variant_name, GRAVEROBBER) || StrStrIW(variant_name, HEADHUNTER))
 		{
-			TRACE_GAME("[h2mod] GraveRobber (Headhunter) Turned on!");
+			LOG_TRACE_GAME("[h2mod] GraveRobber (Headhunter) Turned on!");
 			b_HeadHunter = true;
 		}
 
 		if (StrStrIW(variant_name, WARECONOMY))
 		{
-			TRACE_GAME("[h2mod] Fire Fight Turned on!");
+			LOG_TRACE_GAME("[h2mod] Fire Fight Turned on!");
 			b_FireFight = true;
 		}
 
@@ -1157,9 +1155,9 @@ void __cdecl OnMapLoad(int a1)
 		
 		H2Tweaks::enableAI_MP();
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
-	 
+
 		H2Tweaks::setCrosshairSize(0, false);
-		H2Tweaks::disable60FPSCutscenes(); 
+		H2Tweaks::disable60FPSCutscenes();
 		H2Tweaks::setSavedSens();
 		//H2Tweaks::applyShaderTweaks(); 
 
@@ -1189,8 +1187,8 @@ void __cdecl OnMapLoad(int a1)
 		}
 	}
 
-	else if (h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE) 
-	{ 
+	else if (h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE)
+	{
 		//if anyone wants to run code on map load single player
 		addDebugText("GameEngine: Singleplayer");
 
@@ -1214,7 +1212,7 @@ bool __cdecl OnPlayerSpawn(int a1)
 	overrideUnicodeMessage = false;
 	//once players spawn we aren't in lobby anymore ;)
 	isLobby = false;
-	//TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
+	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
 	int PlayerIndex = a1;
 
 
@@ -1254,7 +1252,7 @@ int __cdecl objectPHook(int s_object_placement_data, int object_definition_index
 	if (h2mod->hookedObjectDefs.find(object_definition_index) == h2mod->hookedObjectDefs.end()) {
 		//ingame only
 		wchar_t* mapName = (wchar_t*)(h2mod->GetBase() + 0x97737C);
-		TRACE_GAME("MapName=%s, object_definition_index: %08X", mapName, object_definition_index);
+		LOG_TRACE_GAME(L"MapName={0}, object_definition_index: {1:x}", mapName, object_definition_index);
 		h2mod->hookedObjectDefs.insert(object_definition_index);
 	}
 	return object_p_hook_method(s_object_placement_data, object_definition_index, object_owner, unk);
@@ -1396,7 +1394,7 @@ char __stdcall interceptMapLoad(LPCRITICAL_SECTION* thisx, const void *a2) {
 	struct _RTL_CRITICAL_SECTION *v3; // ebp@1
 	char result; // al@2
 
-	TRACE_GAME("[h2mod] Intercepted map load - crash function");
+	LOG_TRACE_GAME("[h2mod] Intercepted map load - crash function");
 
 	typedef char(__thiscall *map_filetime_check)(LPCRITICAL_SECTION* thisx, int a2, unsigned int a3);
 	map_filetime_check map_filetime_check_method = (map_filetime_check)(h2mod->GetBase() + 0xC1E01);
@@ -1416,9 +1414,9 @@ char __stdcall interceptMapLoad(LPCRITICAL_SECTION* thisx, const void *a2) {
 	v2 = thisx;
 	v3 = *thisx;
 
-	TRACE_GAME("[h2mod] Intercepted map load - about to enter critical section");
+	LOG_TRACE_GAME("[h2mod] Intercepted map load - about to enter critical section");
 	EnterCriticalSection(*thisx);
-	TRACE_GAME("[h2mod] Intercepted map load - in critical section");
+	LOG_TRACE_GAME("[h2mod] Intercepted map load - in critical section");
 	if (a2
 		&& *((WORD *)v2 + 74008) < 0x32u
 		&& map_filetime_check_method(v2, (int)a2, 0xB90u)
@@ -1428,16 +1426,16 @@ char __stdcall interceptMapLoad(LPCRITICAL_SECTION* thisx, const void *a2) {
 			unknown_function_method2((int)a2);
 
 		map_limit_touch_method((int)v2, (int)a2);
-		TRACE_GAME("[h2mod] Intercepted map load - memcpy");
+		LOG_TRACE_GAME("[h2mod] Intercepted map load - memcpy");
 		memcpy(&v2[740 * (*((WORD *)v2 + 0x12118))++ + 4], a2, 0xB90u);
 		LeaveCriticalSection(v3);
-		TRACE_GAME("[h2mod] Intercepted map load - left critical section");
+		LOG_TRACE_GAME("[h2mod] Intercepted map load - left critical section");
 		result = 1;
 	}
 	else
 	{
 		LeaveCriticalSection(v3);
-		TRACE_GAME("[h2mod] Intercepted map load - left critical section");
+		LOG_TRACE_GAME("[h2mod] Intercepted map load - left critical section");
 		result = 0;
 	}
 	return result;
@@ -1537,17 +1535,17 @@ float get_device_acceleration_scale(DatumIndex device_datum)
 	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29BC : 0x47CD54));
 	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50));
 	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
-	
+
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
 	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)game_state_objects_header_table + device_gamestate_offset * 4 + 8);
 	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 
 	__int16 device_control_index = device_control_datum & 0xFFFF;
 	device_control_index = device_control_index << 4;
-	
+
 	DWORD device_control_tag_offset = *(DWORD*)((BYTE*)device_control_index + global_tag_instances + 8);
 	float acceleration_scale = *(float*)((BYTE*)device_control_tag_offset + tag_header + 0x14);
-		
+
 	return acceleration_scale;
 
 }
@@ -1559,7 +1557,7 @@ bool device_active = true;
 //This happens whenever a player activates a device control.
 int __cdecl device_touch(DatumIndex device_datum, DatumIndex unit_datum)
 {
-	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) 
+	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE)
 	{
 		//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 		if (get_device_acceleration_scale(device_datum) == 999.0f)
@@ -1601,7 +1599,7 @@ void H2MOD::ApplyUnitHooks()
 
 	pdevice_touch = (tdevice_touch)DetourFunc((BYTE*)this->GetBase() + (h2mod->Server ? 0x158EE3 : 0x163420), (BYTE*)device_touch, 10);
 	VirtualProtect(pdevice_touch, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-	
+
 	//Only patch the object_new call on host during AI_Place function, no reason to hook all object_new calls.
 	PatchCall(GetBase() + (h2mod->Server ? 0x2C3B56 : 0x318DEC), object_new_hook);
 
@@ -1623,7 +1621,7 @@ void H2MOD::ApplyHooks() {
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
 	DWORD dwBack;
 	if (this->Server == false) {
-		TRACE_GAME("Applying client hooks...");
+		LOG_TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
 
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc((BYTE*)this->GetBase() + 0x1B4C14, (BYTE*)VerifyGameVersionOnJoin, 5);
@@ -1735,7 +1733,7 @@ void H2MOD::ApplyHooks() {
 
 		pupdate_player_score = (update_player_score)DetourClassFunc((BYTE*)this->GetBase() + 0x8C84C, (BYTE*)OnPlayerScore, 12);
 		VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);//
-		
+
 		// disable part of custom map tag verification
 		NopFill<6>(GetBase() + 0x56C0A);
 
@@ -1764,7 +1762,7 @@ void H2MOD::Initialize()
 	if (!h2mod->Server)
 	{
 		this->Server = FALSE;
-		
+
 		H2Tweaks::setFOV(H2Config_field_of_view);
 		H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
 		if (H2Config_raw_input)
@@ -1786,9 +1784,9 @@ void H2MOD::Initialize()
 	//if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS)) {
 	//	addDebugText("Error setting the process priority");
 	//}
-	
-	TRACE_GAME("H2MOD - Initialized v0.5a");
-	TRACE_GAME("H2MOD - BASE ADDR %08X", this->Base);
+
+	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
+	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->Base);
 
 	h2mod->ApplyHooks();
 }

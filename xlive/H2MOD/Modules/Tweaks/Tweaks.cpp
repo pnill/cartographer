@@ -242,7 +242,7 @@ void sound_initialize()
 enum flags : int
 {
 	windowed,
-	disable_voice_chat, 
+	disable_voice_chat,
 	nosound,
 	unk1, // disable vista needed version check?
 	disable_hardware_vertex_processing, // force hardware vertex processing off
@@ -281,10 +281,10 @@ BOOL __cdecl is_init_flag_set(flags id)
 {
 	if (flag_log_count[id] < 10)
 	{
-		TRACE_GAME("is_init_flag_set() : flag %i", id);
+		LOG_TRACE_GAME("is_init_flag_set() : flag {}", id);
 		flag_log_count[id]++;
 		if (flag_log_count[id] == 10)
-			TRACE_GAME("is_init_flag_set() : flag %i logged to many times ignoring", id);
+			LOG_TRACE_GAME("is_init_flag_set() : flag {} logged to many times ignoring", id);
 	}
 	DWORD* init_flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
 	return init_flags_array[id] != 0;
@@ -410,7 +410,7 @@ bool engine_basic_init()
 			{
 				flags_array[flags::disable_voice_chat] = 0;
 			}
-#ifdef _DEBUG	
+#ifdef _DEBUG
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
 				int flag_id = _wtol(&cmd_line_arg[10]);
 				flags_array[min(max(0, flag_id), flags::count - 1)] = 1;
@@ -503,7 +503,7 @@ void show_error_message_by_id(int id)
 
 void show_fatal_error(int error_id)
 {
-	TRACE_FUNC("error_id : %d", error_id);
+	LOG_TRACE_FUNC("error_id : {}", error_id);
 
 	auto destory_window = [](HWND handle) {
 		if (handle)
@@ -531,7 +531,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	WriteValue(H2BaseAddr + 0x46D9D0, g_WndProc); // g_WndProc_ptr
 	if (!LOG_CHECK(InitPCCInfo()))
 	{
-		TRACE_FUNC("Failed to get PCC info / insufficient system resources");
+		LOG_TRACE_FUNC("Failed to get PCC info / insufficient system resources");
 		run_async(
 			MessageBoxA(NULL, "Failed to get compatibility info.", "PCC Error", S_OK);
 		)
@@ -552,7 +552,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		main_engine_dispose(); // cleanup
 	} else
 	{
-		TRACE_FUNC("Engine startup failed!");
+		LOG_TRACE_FUNC("Engine startup failed!");
 		show_fatal_error(108);
 		return 1;
 	}
@@ -664,22 +664,22 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 		return false;
 	if (header.magic != 'head' || header.foot != 'foot' || header.file_size <= 0 || header.engine_gen != 8)
 	{
-		TRACE_FUNC("\"%s\" has invalid header", file_name);
+		LOG_TRACE_FUNCW(L"\"{}\" has invalid header", file_name);
 		return false;
 	}
 	if (header.type > 5 || header.type < 0)
 	{
-		TRACE_FUNC("\"%s\" has bad scenario type", file_name);
+		LOG_TRACE_FUNCW(L"\"{}\" has bad scenario type", file_name);
 		return false;
 	}
 	if (strnlen_s(header.name, 0x20u) >= 0x20 || strnlen_s(header.version, 0x20) >= 0x20)
 	{
-		TRACE_FUNC("\"%s\" has invalid version or name string", file_name);
+		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
 		return false;
 	}
 	if (header.type != cache_header::scnr_type::Multiplayer && header.type != cache_header::scnr_type::SinglePlayer)
 	{
-		TRACE_FUNC("\"%s\" is not playable", file_name);
+		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
 		return false;
 	}
 
@@ -692,7 +692,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 	auto validate_and_add_custom_map_interal_impl = h2mod->GetAddress<validate_and_add_custom_map_interal>(0x4F690, 0x56890);
 	if (!validate_and_add_custom_map_interal_impl(a1))
 	{
-		TRACE_FUNC("warning \"%s\" has bad checksums or is blacklisted, map may not work correctly", file_name);
+		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
 		std::wstring fallback_name;
 		if (strnlen_s(header.name, sizeof(header.name)) > 0) {
 			fallback_name = wstring_to_string.from_bytes(header.name, &header.name[sizeof(header.name) - 1]);
@@ -712,7 +712,7 @@ bool __cdecl is_supported_build(char *build)
 	const static std::unordered_set<std::string> offically_supported_builds{ "11122.07.08.24.1808.main", "11081.07.04.30.0934.main" };
 	if (offically_supported_builds.count(build) == 0)
 	{
-		TRACE_FUNC_N("Build '%s' is not offically supported consider repacking and updating map with supported tools", build);
+		LOG_TRACE_FUNC("Build '{}' is not offically supported consider repacking and updating map with supported tools", build);
 	}
 	return true;
 }
@@ -745,7 +745,7 @@ int __cdecl fn_c0017a25d(DWORD a1, DWORD* a2)
 					if (h2mod->get_unit_team_index(local_player_datum) != h2mod->get_unit_team_index(other_datum)) {
 
 						h2mod->CustomSoundPlay(L"Halo1PCHitSound.wav", 0);
-						
+
 					}
 					break;
 				}
@@ -938,7 +938,7 @@ char _cdecl LoadTagsandMapBases(int a)
 
 char is_remote_desktop()
 {
-	TRACE_FUNC("check disabled");
+	LOG_TRACE_FUNC("check disabled");
 	return 0;
 }
 
@@ -974,7 +974,7 @@ void InitH2Tweaks() {
 	//TODO(Num005) crashes dedis
 	//custom_game_engines::init();
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
-	
+
 	if (H2IsDediServer) {
 		DWORD dwBack;
 
@@ -1072,8 +1072,8 @@ void InitH2Tweaks() {
 
 		//Redirect the variable for the server name to ours.
 		WriteValue(H2BaseAddr + 0x001b2ce8, (DWORD)ServerLobbyName);
-	}	
-  
+	}
+
 	// Both server and client
 	WriteJmpTo(h2mod->GetAddress(0x1467, 0x12E2), is_supported_build);
 	PatchCall(h2mod->GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
@@ -1081,7 +1081,7 @@ void InitH2Tweaks() {
 	PatchCall(h2mod->GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 	//H2Tweaks::applyPlayersActionsUpdateRatePatch(); //breaks aim assist
-	
+
 	addDebugText("End Startup Tweaks.");
 }
 
@@ -1121,15 +1121,15 @@ void H2Tweaks::setSens(InputType input_type, int sens) {
 		return;
 
 	if (sens < 0)
-		return; 
+		return;
 
 	int absSensIndex = sens - 1;
 
-	if (input_type == CONTROLLER) { 
+	if (input_type == CONTROLLER) {
 		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89BC) = 40.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
 		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B8) = 80.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
 	}
-	else if (input_type == MOUSE) { 
+	else if (input_type == MOUSE) {
 		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B4) = 25.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
 		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B0) = 50.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
 	}
@@ -1301,7 +1301,7 @@ void H2Tweaks::applyShaderTweaks() {
 		currentMaterial = MaterialsMem + (0x20 * materialIndex);
 		shader = currentMaterial + 0x8;
 
-		if (materialIndex == 3 || materialIndex == 7) { // arms/hands shaders 
+		if (materialIndex == 3 || materialIndex == 7) { // arms/hands shaders
 			*(DWORD*)(shader + 4) = 0xE3652900;
 		}
 

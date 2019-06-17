@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <string>
 #include <curl/curl.h>
 #include "rapidjson/document.h"
@@ -19,7 +20,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 
 void AchievementUnlock(int achievement_id)
 {
-	TRACE_GAME_N("[H2Mod-Achievement] - Unlocking achievement ID: %i", achievement_id);
+	LOG_TRACE_GAME("[H2Mod-Achievement] - Unlocking achievement ID: {:d}", achievement_id);
 
 	CURL *curl;
 	CURLcode res;

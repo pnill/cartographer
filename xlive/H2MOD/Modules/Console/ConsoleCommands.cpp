@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <fstream>
 #include "Globals.h"
 #include "Blam/BlamLibrary.h"
@@ -321,7 +322,7 @@ void ConsoleCommands::checkForIds() {
 			while (std::getline(infile, line)) {
 				std::vector<std::string> command = split(line, ',');
 				if (command.size() != 2) {
-					TRACE_GAME("Found line not comma separated right, %s", line.c_str());
+					LOG_TRACE_GAME("Found line not comma separated right, {}", line);
 				}
 				else {
 					object_ids[command[0]] = strtoul(command[1].c_str(), NULL, 0);
@@ -345,14 +346,14 @@ void ConsoleCommands::spawn(unsigned int object_datum, int count, float x, float
 				*(float*)(nObject + 0x1C) = h2mod->get_player_x(0, true) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 				*(float*)(nObject + 0x20) = h2mod->get_player_y(0, true) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 				*(float*)(nObject + 0x24) = (h2mod->get_player_z(0, true) + 5.0f) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				TRACE_GAME("object_datum = %08X, x=%d, y=%d, z=%d", object_datum, *(float*)(nObject + 0x1C), *(float*)(nObject + 0x20), *(float*)(nObject + 0x24));
+				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum, *(float*)(nObject + 0x1C), *(float*)(nObject + 0x20), *(float*)(nObject + 0x24));
 				unsigned int object_gamestate_datum = call_object_new(nObject);
 				call_add_object_to_sync(object_gamestate_datum);
 			}
 			delete[] nObject;
 		}
 		catch (...) {
-			TRACE_GAME_N("Error running spawn command");
+			LOG_TRACE_GAME("Error running spawn command");
 		}
 	}
 }
@@ -391,7 +392,7 @@ void downloadFromRepoThruConsole(std::string mapFilename) {
 
 int __cdecl call_get_object_via_datum(DatumIndex object_datum_index, int object_type)
 {
-	//TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
+	//LOG_TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
 
 	typedef int(__cdecl *get_object)(DatumIndex object_datum_index, int object_type);
 	get_object pget_object = (get_object)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x11F3A6 : 0x1304E3));
@@ -605,7 +606,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				count = stoi(thirdArg);
 			}
 			catch (...) {
-				TRACE_GAME("Error converting string to int");
+				LOG_TRACE_GAME("Error converting string to int");
 			}
 			//since these are server only commands, the server would player index 1, which these are the position values for
 			float x = *(float*)(h2mod->GetBase() + 0x4C072C);

@@ -6,6 +6,8 @@ void InitH2Startup2();
 void DeinitH2Startup();
 int H2GetInstanceId();
 
+inline std::wstring prepareLogFileName(std::wstring logFileName);
+
 enum H2Types
 {
 	H2Game,

@@ -1,4 +1,4 @@
-#include <Windows.h>
+#include "stdafx.h"
 #include "H2MOD\Modules\MapFix\MPMapFix.h"
 #include "H2MOD.h"
 
