@@ -1,7 +1,7 @@
-#include "Globals.h"
-#include "xlivedefs.h"
-#include "xliveless.h"
+#include "stdafx.h"
 #include "xam.h"
+
+#include "Globals.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
 DWORD sys_ui = -1;
@@ -27,7 +27,7 @@ DWORD WINAPI sysui_timer(LPVOID lpParam)
 	SetEvent((HANDLE)lpParam);
 	sys_ui = 2;
 
-	TRACE("- %X = XN_SYS_UI  (signal)", (HANDLE)lpParam);
+	LOG_TRACE_XLIVE("- {:p} = XN_SYS_UI  (signal)", (void*)lpParam);
 
 	return 0;
 }
@@ -40,10 +40,10 @@ HANDLE WINAPI XNotifyCreateListener(ULONGLONG qwAreas)
 	g_listener[listenerIndex].area = qwAreas;
 	g_listener[listenerIndex].id = CreateMutex(NULL, NULL, NULL);
 
-	TRACE("XNotifyCreateListener(0x%016X), ", qwAreas);
-	TRACE(" - handle: %X", g_listener[listenerIndex].id);
+	LOG_TRACE_XLIVE("XNotifyCreateListener({:x}), ", qwAreas);
+	LOG_TRACE_XLIVE(" - handle: {:p}", (void*)g_listener[listenerIndex].id);
 	SetEvent(g_listener[listenerIndex].id);
-	
+
 	return g_listener[listenerIndex].id;
 }
 
@@ -67,7 +67,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	int curlist = 0;
 	while (curlist < g_dwListener)
 	{
-		if (g_listener[curlist].id == hNotification) 
+		if (g_listener[curlist].id == hNotification)
 			break;
 
 		curlist++;
@@ -75,18 +75,18 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	if (curlist == g_dwListener)
 	{
-		TRACE("XNotifyGetNext  (hNotification = %X, dwMsgFilter = %X, pdwId = %X, pParam = %X) - unknown notifier",
-			hNotification, dwMsgFilter, pdwId, pParam);
+		LOG_TRACE_XLIVE("XNotifyGetNext  (hNotification = {0:p}, dwMsgFilter = {1:x}, pdwId = {2:p}, pParam = {3:p}) - unknown notifier",
+			(void*)hNotification, dwMsgFilter, (void*)pdwId, (void*)pParam);
 
 		return 0;
 	}
 
 	if ((g_listener[curlist].area & ((XNID_AREA(dwMsgFilter) << 1) | 1)) == 0)
 	{
-		TRACE("XNotifyGetNext  (hNotification = %X, dwMsgFilter = %X, pdwId = %X, pParam = %X)",
-			hNotification, dwMsgFilter, pdwId, pParam);
+		LOG_TRACE_XLIVE("XNotifyGetNext  (hNotification = {0:p}, dwMsgFilter = {1:x}, pdwId = {2:x}, pParam = {3:p})",
+			(void*)hNotification, dwMsgFilter, (void*)pdwId, (void*)pParam);
 
-		TRACE("- bad area: %X ~ %X", g_listener[curlist].area, (XNID_AREA(dwMsgFilter) << 1) | 1);
+		LOG_TRACE_XLIVE("- bad area: {0:x} ~ {1:x}", g_listener[curlist].area, (XNID_AREA(dwMsgFilter) << 1) | 1);
 
 		return 0;
 	}
@@ -100,8 +100,8 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	if (g_listener[curlist].print < print_limit)
 	{
-		TRACE("XNotifyGetNext  (hNotification = %X, dwMsgFilter = %X, pdwId = %X, pParam = %X)",
-			hNotification, dwMsgFilter, pdwId, pParam);
+		LOG_TRACE_XLIVE("XNotifyGetNext  (hNotification = {0:p}, dwMsgFilter = {1:x}, pdwId = {2:p}, pParam = {3:p})",
+			(void*)hNotification, dwMsgFilter, (void*)pdwId, (void*)pParam);
 
 
 		g_listener[curlist].print++;
@@ -111,7 +111,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	BOOL exit_code = FALSE;
 
-	if (pdwId) 
+	if (pdwId)
 		*pdwId = dwMsgFilter;
 
 	// set to next available message
@@ -191,7 +191,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			sys_ui++;
 			std::thread(sysui_timer, hNotification).detach();
 
-			TRACE("- %X = XN_SYS_UI (1)", hNotification);
+			LOG_TRACE_XLIVE("- {:p} = XN_SYS_UI (1)", (void*)hNotification);
 
 			exit_code = TRUE;
 		}
@@ -204,7 +204,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			sys_ui++;
 
 
-			TRACE("- %X = XN_SYS_UI (0)", hNotification);
+			LOG_TRACE_XLIVE("- {:p} = XN_SYS_UI (0)", (void*)hNotification);
 
 			exit_code = TRUE;
 
@@ -240,7 +240,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			sys_signin++;
 
 
-			TRACE("- %X = XN_SYS_SIGNINCHANGED (1) - %08X", hNotification, XN_SYS_SIGNINCHANGED);
+			LOG_TRACE_XLIVE("- {0:p} = XN_SYS_SIGNINCHANGED (1) - {1:x}", (void*)hNotification, XN_SYS_SIGNINCHANGED);
 
 			exit_code = TRUE;
 		}
@@ -253,7 +253,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			sys_storage++;
 
 
-			TRACE("- %X = XN_SYS_STORAGEDEVICESCHANGED (-)", hNotification);
+			LOG_TRACE_XLIVE("- {:p} = XN_SYS_STORAGEDEVICESCHANGED (-)", (void*)hNotification);
 
 			exit_code = TRUE;
 		}
@@ -279,7 +279,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			sys_profile++;
 
 
-			TRACE("- %X = XN_SYS_PROFILESETTINGCHANGED (1)", hNotification);
+			LOG_TRACE_XLIVE("- {:p} = XN_SYS_PROFILESETTINGCHANGED (1)", (void*)hNotification);
 
 			exit_code = TRUE;
 		}
@@ -292,7 +292,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			sys_controller++;
 
 
-			TRACE("- %X = XN_SYS_INPUTDEVICESCHANGED (-)", hNotification);
+			LOG_TRACE_XLIVE("- {:p} = XN_SYS_INPUTDEVICESCHANGED (-)", (void*)hNotification);
 
 			exit_code = TRUE;
 		}
@@ -318,7 +318,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			sys_controller_force++;
 
 
-			TRACE("- %X = XN_SYS_INPUTDEVICECONFIGCHANGED (1)", hNotification);
+			LOG_TRACE_XLIVE("- {:p} = XN_SYS_INPUTDEVICECONFIGCHANGED (1)", (void*)hNotification);
 
 			exit_code = TRUE;
 		}
@@ -335,7 +335,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			if (pParam) *pParam = XONLINE_S_LOGON_CONNECTION_ESTABLISHED;
 
 
-			TRACE("- %X = XN_LIVE_CONNECTIONCHANGED (0) - %08X", hNotification, XN_LIVE_CONNECTIONCHANGED);
+			LOG_TRACE_XLIVE("- {0:p} = XN_LIVE_CONNECTIONCHANGED (0) - {1:x}", (void*)hNotification, XN_LIVE_CONNECTIONCHANGED);
 
 			exit_code = TRUE;
 		}
@@ -348,7 +348,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			live_content++;
 
 
-			TRACE("- %X = XN_LIVE_CONTENT_INSTALLED (-)", hNotification);
+			LOG_TRACE_XLIVE("- {:p} = XN_LIVE_CONTENT_INSTALLED (-)", (void*)hNotification);
 
 			exit_code = TRUE;
 		}
@@ -361,7 +361,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			live_membership++;
 
 
-			TRACE("- %X = XN_LIVE_MEMBERSHIP_PURCHASED (-)", hNotification);
+			LOG_TRACE_XLIVE("- {:p} = XN_LIVE_MEMBERSHIP_PURCHASED (-)", (void*)hNotification);
 
 			exit_code = TRUE;
 		}
@@ -386,13 +386,13 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 // #652: XNotifyPositionUI
 DWORD WINAPI XNotifyPositionUI(DWORD dwPosition)
 {
-	TRACE("XNotifyPositionUI (%d)", dwPosition);
+	LOG_TRACE_XLIVE("XNotifyPositionUI ({})", dwPosition);
 	return 0;
 }
 
 // #653
 int WINAPI XNotifyDelayUI(int a1)
 {
-	//TRACE("XNotifyDelayUI");
+	//LOG_TRACE_XLIVE("XNotifyDelayUI");
 	return 0;
 }

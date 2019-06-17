@@ -1,6 +1,7 @@
+#include "stdafx.h"
+#include "XUser.h"
+
 #include "Globals.h"
-#include "xlivedefs.h"
-#include "xliveless.h"
 #include "resource.h"
 #include "XLive\xbox\xbox.h"
 #include "XLive\XAM\xam.h"
@@ -10,7 +11,6 @@
 #include <sstream>
 #include <codecvt>
 #include <unordered_map>
-#include "XUser.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 WCHAR strw_XUser[8192];
@@ -24,8 +24,8 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 
 	if (print < 15)
 	{
-		TRACE("XUserGetXUID  (userIndex = %d, pXuid = %X)",
-			dwUserIndex, pXuid);
+		LOG_TRACE_XLIVE("XUserGetXUID  (userIndex = {}, pXuid = {:p})",
+			dwUserIndex, (void*)pXuid);
 
 		print++;
 	}
@@ -37,7 +37,7 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 	}
 
 
-	if (print < 15) TRACE("- No user");
+	if (print < 15) LOG_TRACE_XLIVE("- No user");
 
 
 	// error
@@ -56,7 +56,7 @@ XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex)
 
 	if (print < 15)
 	{
-		TRACE("XUserGetSigninState  (index = %d)", dwUserIndex);
+		LOG_TRACE_XLIVE("XUserGetSigninState  (index = {})", dwUserIndex);
 		print++;
 	}
 
@@ -70,7 +70,7 @@ XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex)
 
 
 			if (print < 15)
-				TRACE("- Online - Live");
+				LOG_TRACE_XLIVE("- Online - Live");
 		}
 
 		else
@@ -79,14 +79,14 @@ XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex)
 
 
 			if (print < 15)
-				TRACE("- Offline - not live");
+				LOG_TRACE_XLIVE("- Offline - not live");
 		}
 	}
 
 	else
 	{
 		if (print < 15)
-			TRACE("- Not signed in");
+			LOG_TRACE_XLIVE("- Not signed in");
 	}
 
 
@@ -102,7 +102,7 @@ DWORD WINAPI XUserGetName(DWORD dwUserIndex, LPSTR szUserName, DWORD cchUserName
 
 	if (print < 15)
 	{
-		TRACE("XUserGetName  (userIndex = %d, userName = %X, cchUserName = %d)", dwUserIndex, szUserName, cchUserName);
+		LOG_TRACE_XLIVE("XUserGetName  (userIndex = {0}, userName = {1:x}, cchUserName = {2})", dwUserIndex, szUserName, cchUserName);
 		print++;
 	}
 
@@ -118,7 +118,7 @@ DWORD WINAPI XUserGetName(DWORD dwUserIndex, LPSTR szUserName, DWORD cchUserName
 			wchar_t strw[16];
 			mbstowcs(strw, szUserName, 16);
 
-			TRACE("- name = %s, len = %d", strw, cchUserName);
+			LOG_TRACE_XLIVE(L"- name = {}, len = {}", strw, cchUserName);
 		}
 
 
@@ -136,7 +136,7 @@ int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_IN
 
 	if (print < 15)
 	{
-		TRACE("XUserGetSigninInfo( userIndex = 0x%08x, dwFlags = 0x%08x, pSigninInfo = 0x%08x)", dwUserIndex, dwFlags, pSigninInfo);
+		LOG_TRACE_XLIVE("XUserGetSigninInfo( userIndex = {0:x}, dwFlags = {1:x}, pSigninInfo = {2:p})", dwUserIndex, dwFlags, (void*)pSigninInfo);
 
 
 		print++;
@@ -164,14 +164,14 @@ int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_IN
 
 		if (g_online != 0)
 		{
-			if (print < 15) TRACE("- Signed in: Online");
+			if (print < 15) LOG_TRACE_XLIVE("- Signed in: Online");
 
 			pSigninInfo->UserSigninState = eXUserSigninState_SignedInToLive;
 		}
 
 		else
 		{
-			if (print < 15) TRACE("- Signed in: Offline");
+			if (print < 15) LOG_TRACE_XLIVE("- Signed in: Offline");
 
 			pSigninInfo->UserSigninState = eXUserSigninState_SignedInLocally;
 		}
@@ -184,7 +184,7 @@ int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_IN
 
 	else
 	{
-		if (print < 15) TRACE("- Not signed in");
+		if (print < 15) LOG_TRACE_XLIVE("- Not signed in");
 	}
 
 
@@ -195,7 +195,7 @@ int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_IN
 // #5264: XUserAreUsersFriends
 int WINAPI XUserAreUsersFriends(DWORD dwUserIndex, DWORD * pXuids, DWORD dwXuidCount, DWORD * pResult, PXOVERLAPPED pOverlapped)
 {
-	TRACE("XUserAreUsersFriends");
+	LOG_TRACE_XLIVE("XUserAreUsersFriends");
 	return ERROR_NOT_LOGGED_ON;
 }
 
@@ -208,29 +208,29 @@ DWORD WINAPI XUserCheckPrivilege(DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeTyp
 	if (print < 15)
 	{
 		if (privilegeType == XPRIVILEGE_MULTIPLAYER_SESSIONS)
-			TRACE("- MULTIPLAYER_SESSIONS");
+			LOG_TRACE_XLIVE("- MULTIPLAYER_SESSIONS");
 
 		else if (privilegeType == XPRIVILEGE_COMMUNICATIONS)
 		{
-			TRACE(" - COMMUNICATIONS");
+			LOG_TRACE_XLIVE(" - COMMUNICATIONS");
 		}
 
 		else if (privilegeType == XPRIVILEGE_PROFILE_VIEWING)
-			TRACE("- PROFILE_VIEWING");
+			LOG_TRACE_XLIVE("- PROFILE_VIEWING");
 
 		else if (privilegeType == XPRIVILEGE_PRESENCE)
-			TRACE("- PRESCENCE");
+			LOG_TRACE_XLIVE("- PRESCENCE");
 
 		else
-			TRACE("- UNKNOWN");
+			LOG_TRACE_XLIVE("- UNKNOWN");
 
-		TRACE("XUserCheckPrivilege  (userIndex = %d, privilegeType = %d, pfResult = %X)",
-			dwUserIndex, privilegeType, pfResult);
+		LOG_TRACE_XLIVE("XUserCheckPrivilege  (userIndex = {0}, privilegeType = {1}, pfResult = {2:p})",
+			dwUserIndex, privilegeType, (void*)pfResult);
 
 		print++;
 	}
 
-	
+
 	if (pfResult) {
 		*pfResult = TRUE;
 		return ERROR_SUCCESS;
@@ -243,7 +243,7 @@ DWORD WINAPI XUserCheckPrivilege(DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeTyp
 // #5279: XUserReadAchievementPicture
 int WINAPI XUserReadAchievementPicture(DWORD dwUserIndex, DWORD dwTitleId, DWORD dwPictureId, BYTE* pbTextureBuffer, DWORD dwPitch, DWORD dwHeight, PXOVERLAPPED pOverlapped)
 {
-	TRACE("XUserReadAchievementPicture");
+	LOG_TRACE_XLIVE("XUserReadAchievementPicture");
 
 	return ERROR_INVALID_PARAMETER;
 }
@@ -267,7 +267,7 @@ int WINAPI XUserReadGamerpictureByKey(CONST PXUSER_DATA pGamercardPictureKey, BO
 // #5274: XUserAwardGamerPicture
 DWORD WINAPI XUserAwardGamerPicture(DWORD dwUserIndex, DWORD dwPictureId, DWORD dwReserved, PXOVERLAPPED pXOverlapped)
 {
-	TRACE("XUserAwardGamerPicture");
+	LOG_TRACE_XLIVE("XUserAwardGamerPicture");
 	return 0;
 }
 
@@ -333,7 +333,7 @@ DWORD WINAPI XUserReadStats(DWORD dwTitleId, DWORD dwNumXuids, CONST XUID *pXuid
 // #5284: XUserCreateStatsEnumeratorByRank
 DWORD WINAPI XUserCreateStatsEnumeratorByRank(DWORD dwTitleId, DWORD dwRankStart, DWORD dwNumRows, DWORD dwNuStatSpec, CONST XUSER_STATS_SPEC* pSpecs, DWORD * pcbBuffer, PHANDLE ph)
 {
-	TRACE("XUserCreateStatsEnumeratorByRank");
+	LOG_TRACE_XLIVE("XUserCreateStatsEnumeratorByRank");
 
 	if (pcbBuffer)
 		*pcbBuffer = 0;
@@ -348,7 +348,7 @@ DWORD WINAPI XUserCreateStatsEnumeratorByRank(DWORD dwTitleId, DWORD dwRankStart
 // #5286: XUserCreateStatsEnumeratorByXuid
 DWORD WINAPI XUserCreateStatsEnumeratorByXuid(DWORD dwTitleId, XUID XuidPivot, DWORD dwNumRows, DWORD dwNumStatsSpecs, CONST XUSER_STATS_SPEC* pSpecs, PDWORD pcbBuffer, PHANDLE ph)
 {
-	TRACE("XUserCreateStatsEnumeratorByXuid");
+	LOG_TRACE_XLIVE("XUserCreateStatsEnumeratorByXuid");
 
 	if (pcbBuffer)
 		*pcbBuffer = 0;
@@ -375,8 +375,8 @@ DWORD WINAPI XUserCreateStatsEnumeratorByRating(DWORD dwTitleId, LONGLONG i64Rat
 DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD dwNumSettingIds,
 	DWORD * pdwSettingIds, DWORD * pcbResults, XUSER_READ_PROFILE_SETTING_RESULT * pResults, PXOVERLAPPED pOverlapped)
 {
-	TRACE("XUserReadProfileSettings  (TitleId = %d, UserIndex = %d, NumSettingIds = %d, pdwSettingIds = %X, pcbResults = %d, pResults = %X, pOverlapped = %X)",
-		dwTitleId, dwUserIndex, dwNumSettingIds, pdwSettingIds, *pcbResults, pResults, pOverlapped);
+	LOG_TRACE_XLIVE("XUserReadProfileSettings  (TitleId = {0}, UserIndex = {1}, NumSettingIds = {2}, pdwSettingIds = {3:p}, pcbResults = {4}, pResults = {5:p}, pOverlapped = {6:p})",
+		dwTitleId, dwUserIndex, dwNumSettingIds, (void*)pdwSettingIds, *pcbResults, (void*)pResults, (void*)pOverlapped);
 
 
 	BOOL async;
@@ -458,7 +458,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 
 
 
-				TRACE("%s", strw_XUser);
+				LOG_TRACE_XLIVE(strw_XUser);
 				size += settingSize;
 			}
 
@@ -468,7 +468,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 			*pcbResults += sizeof(XUSER_READ_PROFILE_SETTING_RESULT);
 
 
-			TRACE("- ERROR_INSUFFICIENT_BUFFER  (pcbResults = %d)", *pcbResults);
+			LOG_TRACE_XLIVE("- ERROR_INSUFFICIENT_BUFFER  (pcbResults = {})", *pcbResults);
 
 			if (async)
 			{
@@ -520,21 +520,21 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 			switch (settingId)
 			{
 			case 0x3FFF:
-				TRACE("- XPROFILE_TITLE_SPECIFIC1");
+				LOG_TRACE_XLIVE("- XPROFILE_TITLE_SPECIFIC1");
 
 				wcscat(strw_XUser, L"Title1.dat");
 				break;
 
 
 			case 0x3FFE:
-				TRACE("- XPROFILE_TITLE_SPECIFIC2");
+				LOG_TRACE_XLIVE("- XPROFILE_TITLE_SPECIFIC2");
 
 				wcscat(strw_XUser, L"Title2.dat");
 				break;
 
 
 			case 0x3FFD:
-				TRACE("- XPROFILE_TITLE_SPECIFIC3");
+				LOG_TRACE_XLIVE("- XPROFILE_TITLE_SPECIFIC3");
 
 				wcscat(strw_XUser, L"Title3.dat");
 				break;
@@ -553,7 +553,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 			fp = _wfopen(strw_XUser, L"rb");
 			if (!fp)
 			{
-				TRACE("- Not found: %s", strw_XUser);
+				LOG_TRACE_XLIVE(L"- Not found: {}", strw_XUser);
 
 
 				ptr->source = XSOURCE_NO_VALUE;
@@ -561,7 +561,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 
 			else
 			{
-				TRACE("- Found: %s", strw_XUser);
+				LOG_TRACE_XLIVE(L"- Found: {}", strw_XUser);
 
 
 				if (settingType == 6)
@@ -591,7 +591,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 
 
 
-	TRACE("- pcbResults = %d", *pcbResults);
+	LOG_TRACE_XLIVE("- pcbResults = {}", *pcbResults);
 
 	if (async)
 	{
@@ -623,7 +623,7 @@ DWORD WINAPI XUserReadProfileSettingsByXuid(
 	PXOVERLAPPED pOverlapped
 )
 {
-	TRACE("XUserReadProfileSettingsByXuid");
+	LOG_TRACE_XLIVE("XUserReadProfileSettingsByXuid");
 
 
 	Check_Overlapped(pOverlapped);
@@ -632,11 +632,11 @@ DWORD WINAPI XUserReadProfileSettingsByXuid(
 }
 
 
-// #5337: XUserWriteProfileSettings
+// #5337: XUserWriteProfileSettingsf
 DWORD WINAPI XUserWriteProfileSettings(DWORD dwUserIndex, DWORD dwNumSettings, const PXUSER_PROFILE_SETTING pSettings, PXOVERLAPPED pOverlapped)
 {
-	TRACE("XUserWriteProfileSettings  (dwUserIndex = %d, dwNumSettings = %d, pSettings = %X, pOverlapped = %X)",
-		dwUserIndex, dwNumSettings, pSettings, pOverlapped);
+	LOG_TRACE_XLIVE("XUserWriteProfileSettings  (dwUserIndex = {0}, dwNumSettings = {1}, pSettings = {2:p}, pOverlapped = {3:p})",
+		dwUserIndex, dwNumSettings, (void*)pSettings, (void*)pOverlapped);
 
 
 	for (DWORD lcv = 0; lcv < dwNumSettings; lcv++)
@@ -649,7 +649,7 @@ DWORD WINAPI XUserWriteProfileSettings(DWORD dwUserIndex, DWORD dwNumSettings, c
 
 
 
-		TRACE("- [%d] source = %d, id = %X, type = %d, size = %X, sub-id = %X, type2 = %d",
+		LOG_TRACE_XLIVE("- [{0}] source = {1}, id = {2:x}, type = {3}, size = {4:x}, sub-id = {5:x}, type2 = {6}",
 			lcv,
 			pSettings[lcv].source,
 			pSettings[lcv].dwSettingId,
@@ -670,21 +670,21 @@ DWORD WINAPI XUserWriteProfileSettings(DWORD dwUserIndex, DWORD dwNumSettings, c
 		switch (id)
 		{
 		case 0x3FFF:
-			TRACE("- XPROFILE_TITLE_SPECIFIC1  (cbData = %X)", pSettings[lcv].data.binary.cbData);
+			LOG_TRACE_XLIVE("- XPROFILE_TITLE_SPECIFIC1  (cbData = {:x})", pSettings[lcv].data.binary.cbData);
 
 			wcscat(strw_XUser, L"Title1.dat");
 			break;
 
 
 		case 0x3FFE:
-			TRACE("- XPROFILE_TITLE_SPECIFIC2  (cbData = %X)", pSettings[lcv].data.binary.cbData);
+			LOG_TRACE_XLIVE("- XPROFILE_TITLE_SPECIFIC2  (cbData = {:x})", pSettings[lcv].data.binary.cbData);
 
 			wcscat(strw_XUser, L"Title2.dat");
 			break;
 
 
 		case 0x3FFD:
-			TRACE("- XPROFILE_TITLE_SPECIFIC3  (cbData = %X)", pSettings[lcv].data.binary.cbData);
+			LOG_TRACE_XLIVE("- XPROFILE_TITLE_SPECIFIC3  (cbData = {:x})", pSettings[lcv].data.binary.cbData);
 
 			wcscat(strw_XUser, L"Title3.dat");
 			break;

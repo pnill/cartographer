@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Globals.h"
 #include "H2MOD\protobuf\h2mod.pb.h"
 #include "..\..\Modules\Networking\Networking.h"
@@ -25,7 +26,7 @@ static int weapon_sixteen = 0;
 std::unordered_map<int, int> GunGame::level_weapon;
 std::unordered_map<std::wstring, int> GunGame::gungamePlayers;
 
-unsigned int Weapon_ID[36] = { 
+unsigned int Weapon_ID[36] = {
 	0xE53D2AD8, 0xE5F02B8B, 0xE6322BCD, 0xE6AF2C4A,
 	0xE79B2D36,0xE8172DB2,0xE8382DD3,0xE8742E0F,
 	0xE8D32E6E,0xE9062EA1,0xE90C2EA7,0xE90C2EA7,
@@ -34,7 +35,7 @@ unsigned int Weapon_ID[36] = {
 	0xECD63271,0xED3F32DA,0xED753310,0xEDA2333D,
 	0xEDD4336F,0xEE0933A4,0xEE3433CF,0xEE5233ED,
 	0xEE5F33FA,0xEE7B3416,0xEE993434,0xEE9E3439,
-	0xEED3346E,0xEEF1348C,0xEF1B34B6,0xF33838D2 
+	0xEED3346E,0xEEF1348C,0xEF1B34B6,0xF33838D2
 };
 
 GunGame::GunGame()
@@ -54,7 +55,7 @@ void GunGame::readWeaponLevels()
 
 	if (gfp)
 	{
-		TRACE("[GunGame Enabled] - Opened GunGame.ini!");
+		LOG_TRACE_GAME("[GunGame Enabled] - Opened GunGame.ini!");
 		while (!feof(gfp))
 		{
 			char gstr[256];
@@ -81,11 +82,11 @@ void GunGame::readWeaponLevels()
 		}
 
 #ifdef __DEBUG
-		TRACE("[GunGame] : %i", b_GunGame);
+		LOG_TRACE_GAME("[GunGame] : {}", b_GunGame);
 
-		TRACE("[GunGame] - weapon_one: %i", weapon_one);
-		TRACE("[GunGame] - weapon_two: %i", weapon_two);
-		TRACE("[GunGame] - weapon_three: %i", weapon_three);
+		LOG_TRACE_GAME("[GunGame] - weapon_one: {}", weapon_one);
+		LOG_TRACE_GAME("[GunGame] - weapon_two: {}", weapon_two);
+		LOG_TRACE_GAME("[GunGame] - weapon_three: {}", weapon_three);
 #endif
 
 		fclose(gfp);
@@ -94,9 +95,9 @@ void GunGame::readWeaponLevels()
 
 void GunGame::initWeaponLevels() {
 	if (weapon_one != 0) {
-		TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_one: %i", weapon_one);
-		TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_one enum:  %08X", Weapon_ID[weapon_one]);
-		TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_two enum:  %08X", Weapon_ID[weapon_two]);
+		LOG_TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_one: {}", weapon_one);
+		LOG_TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_one enum:  {:x}", Weapon_ID[weapon_one]);
+		LOG_TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_two enum:  {:x}", Weapon_ID[weapon_two]);
 		GunGame::level_weapon[0] = Weapon_ID[weapon_one];
 		GunGame::level_weapon[1] = Weapon_ID[weapon_two];
 		GunGame::level_weapon[2] = Weapon_ID[weapon_three];
@@ -136,16 +137,16 @@ void GunGame::resetPlayerLevels() {
 }
 
 void GunGame::setGameScore() {
-	if (h2mod->Server) 
+	if (h2mod->Server)
 		*(int*)(0x300015F4) = 17;
-	else 
+	else
 		*(int*)(0x30001A48) = 17;
 }
 
 void GunGame::spawnPlayerServer(int playerIndex) {
 	wchar_t* pName = h2mod->get_player_name_from_index(playerIndex);
 	wchar_t* localName = h2mod->get_local_player_name();
-	TRACE_GAME("[H2Mod-GunGame]: SpawnPlayer(%i) : %ws ", playerIndex, pName);
+	LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer({0}) : {1}", playerIndex, pName);
 
 	int unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
 	int unit_object = call_get_object(unit_datum_index, 3);
@@ -153,12 +154,12 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 	if (unit_object) {
 		int level = GunGame::gungamePlayers[players->getPlayerName(playerIndex)];
 
-		TRACE_GAME("[H2Mod-GunGame]: SpawnPlayer(%i) %ws - Level: %i", playerIndex, pName, level);
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer({0}) {1} - Level: {2}", playerIndex, pName, level);
 
 		int CurrentWeapon = GunGame::level_weapon[level];
 
 		if (level == 15) {
-			TRACE_GAME("[H2Mod-GunGame]: %ws on frag grenade level!", pName);
+			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on frag grenade level!", pName);
 			if (wcscmp(pName, localName) == 0) {
 				call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
 				h2mod->set_local_grenades(GrenadeType::Frag, 99, playerIndex);
@@ -168,7 +169,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 		}
 
 		if (level == 16) {
-			TRACE_GAME("[H2Mod-GunGame]: %ws on plasma grenade level!", pName);
+			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on plasma grenade level!", pName);
 
 			if (wcscmp(pName, localName) == 0) {
 				call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
@@ -200,16 +201,16 @@ void GunGame::levelUpServer(int PlayerIndex)
 {
 	wchar_t* PlayerName = h2mod->get_player_name_from_index(PlayerIndex);
 	wchar_t* localName = h2mod->get_local_player_name();
-	TRACE_GAME("[H2Mod-GunGame]: LevelUp(%i) : %ws", PlayerIndex, PlayerName);
+	LOG_TRACE_GAME(L"[H2Mod-GunGame]: LevelUp({0}) : {1}", PlayerIndex, PlayerName);
 
 	int level = GunGame::gungamePlayers[players->getPlayerName(PlayerIndex)];
 	level++;
 	GunGame::gungamePlayers[players->getPlayerName(PlayerIndex)] = level;
 
-	TRACE_GAME("[H2Mod-GunGame]: LevelUp(%i) - new level: %i ", PlayerIndex, level);
+	LOG_TRACE_GAME("[H2Mod-GunGame]: LevelUp({0}) - new level: {1} ", PlayerIndex, level);
 
 	if (level == 15) {
-		TRACE_GAME("[H2Mod-GunGame]: %ws Level 15 - Frag Grenades!", PlayerName);
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 15 - Frag Grenades!", PlayerName);
 
 		if (wcscmp(PlayerName, localName) == 0) {
 			call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(PlayerIndex));
@@ -220,7 +221,7 @@ void GunGame::levelUpServer(int PlayerIndex)
 	}
 
 	if (level == 16) {
-		TRACE_GAME("[H2Mod-GunGame]: %ws Level 16 - Plasma Grenades!", PlayerName);
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 16 - Plasma Grenades!", PlayerName);
 		if (wcscmp(PlayerName, localName) == 0) {
 			call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(PlayerIndex));
 			h2mod->set_local_grenades(GrenadeType::Plasma, 99, PlayerIndex);
@@ -231,13 +232,13 @@ void GunGame::levelUpServer(int PlayerIndex)
 	}
 
 	if (level < 15)	{
-		TRACE_GAME("[H2Mod-GunGame]: %ws on level %i giving them weapon...", PlayerName, level);
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on level {} giving them weapon...", PlayerName, level);
 
 		int LevelWeapon = GunGame::level_weapon[level];
 		sendGrenadePacket(GrenadeType::Frag, 0, PlayerIndex, 1);
 		sendGrenadePacket(GrenadeType::Plasma, 0, PlayerIndex, 1);
 		GivePlayerWeapon(PlayerIndex, LevelWeapon, 1);
-		
+
 	}
 }
 
@@ -266,10 +267,10 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
 				//the player structure does not have a slot for dedis, this player index was calculated based on that assumption
 				//so we always subtract by 1 (since 0 here is not the slot for dedi anymore and can be a player)
 				pIndex -= 1;
-				TRACE_GAME("[h2mod-GunGame] altering player index from %d to %d", pIndex - 1, pIndex);
+				LOG_TRACE_GAME("[h2mod-GunGame] altering player index from {0} to {1}", pIndex - 1, pIndex);
 			}
 		}
-		TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex=%d, peerIndex=%d", pIndex, players->getPeerIndex(pIndex));
+		LOG_TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex={0}, peerIndex={1}", pIndex, players->getPeerIndex(pIndex));
 
 		s_unit_grenades data;
 		memset(&data, NULL, sizeof(data));
@@ -309,7 +310,7 @@ void GunGameInitializer::onPeerHost() {
 	GunGame::resetPlayerLevels();
 	GunGame::setGameScore();
 	//TODO: is this really necessary (from old code)?
-	//init peer host gun game level 
+	//init peer host gun game level
 	GunGame::gungamePlayers[players->getPlayerName(0)] = 0;
 }
 

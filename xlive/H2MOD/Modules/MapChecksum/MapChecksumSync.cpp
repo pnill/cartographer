@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "MapChecksumSync.h"
 #include <unordered_set>
 #include "Globals.h"
@@ -7,11 +8,11 @@
 extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;
 using namespace MapChecksumSync;
-extern logger *checksum_log;
+extern h2log *checksum_log;
 
 #define CHECKSUM_LOG(msg, ...) \
-	CHECK_PTR(h2mod_log, h2mod_log->write(__FUNCTION__  "(): " msg, __VA_ARGS__)); \
-	CHECK_PTR(checksum_log, checksum_log->write(msg, __VA_ARGS__)); \
+	LOG_DEBUG_FUNC(msg, __VA_ARGS__); \
+	LOG_DEBUG(checksum_log, msg, __VA_ARGS__); \
 	if (H2IsDediServer)\
 		printf(msg "\n", __VA_ARGS__)
 
@@ -34,14 +35,14 @@ bool __cdecl calc_map_checksum(HANDLE *file, BYTE *checksum_out)
 		// needed because the customs maps list uses the checksum to deduplicate the maps
 		wchar_t buf[MAX_PATH];
 		LOG_CHECK(GetFinalPathNameByHandleW(*file, buf, ARRAYSIZE(buf), VOLUME_NAME_DOS) != 0);
-		TRACE_FUNC("map name: %s  handle: %x", buf, *file);
+		LOG_TRACE_FUNCW(L"map name: {0:s}  handle: {1:p}", buf, (void*)file);
 		size_t len = 0x20; // will only use 16 bytes
 		memset(checksum_out, 0, len);
 		if (!LOG_CHECK(hashes::calc_file_md5(buf, checksum_out, len, 0x2000))) { // only checksums header
 			// generate some random data if we can't get an actual checksum
 			XNetRandom(checksum_out, 0x20);
 		}
-		TRACE_FUNC_N("uuid %s", hashes::as_hex_string(checksum_out, 0x20).c_str());
+		LOG_TRACE_FUNC("uuid {}", hashes::as_hex_string(checksum_out, 0x20));
 	}
 	return true;
 }
@@ -54,10 +55,10 @@ static inline DWORD get_address(DWORD client, DWORD server = NULL)
 
 void MapChecksumSync::Init()
 {
-	TRACE_FUNC("Disabling map checksum");
+	LOG_TRACE_FUNC("Disabling map checksum");
 	//WriteJmpTo(get_address(0x8F914, 0x81EBB), compare_map_checksum);
 	//WriteJmpTo(get_address(0x8F664, 0x82171), calc_map_checksum);
-	
+
 	// hang on startup matters less and those functions seem to be called latter
 	//if (H2IsDediServer)
 	//	MapChecksumSync::Calculate();
@@ -93,7 +94,7 @@ bool set_contains_element(const std::unordered_set<T> &set, const T &element)
 void lock_file_write(const std::string &filename)
 {
 #ifdef _DEBUG
-	TRACE_FUNC_N("Skipping locking in debug mode.");
+	LOG_TRACE_FUNC("Skipping locking in debug mode.");
 	return;
 #endif
 	std::unique_lock<std::mutex> map_lock(map_mutex);
@@ -106,7 +107,7 @@ void lock_file_write(const std::string &filename)
 		NULL);
 	if (!LOG_CHECK(hfile != INVALID_HANDLE_VALUE))
 	{
-		CHECKSUM_LOG("Map '%s' couldn't be locked", filename.c_str());
+		CHECKSUM_LOG("Map '%s' couldn't be locked", filename);
 		MapChecksumSync::StartupError("Failed to lock map file, close all map editing programs");
 	}
 }
@@ -115,13 +116,13 @@ bool startup_failure = false;
 void MapChecksumSync::StartupError(const std::string &error)
 {
 #ifdef _DEBUG
-	TRACE_FUNC_N("error: '%s'", error.c_str());
-	TRACE_FUNC_N("continuing despite error due to debug mode being enabled");
+	LOG_TRACE_FUNC("error: '{}'", error);
+	LOG_TRACE_FUNC("continuing despite error due to debug mode being enabled");
 	return;
 #endif
 	if (H2IsDediServer)
 	{
-		CHECKSUM_LOG("%s", error.c_str());
+		CHECKSUM_LOG("{}", error);
 		std::exit(-1);
 	}
 	startup_failure = true;
@@ -179,7 +180,7 @@ void MapChecksumSync::Calculate()
 		// shared
 		{ "shared", {"64df15c07f2b1f28545774de18b7fee2"} },
 	};
-	
+
 	for (auto ilter : builtin_maps)
 	{
 		std::string map_hash;
@@ -190,7 +191,7 @@ void MapChecksumSync::Calculate()
 			maps_status.map_checksum_list[ilter.first] = map_hash;
 			if (!set_contains_element(ilter.second, map_hash))
 			{
-				CHECKSUM_LOG("Map '%s' checksum doesn't match any offical checksum", ilter.first.c_str());
+				CHECKSUM_LOG("Map '%s' checksum doesn't match any offical checksum", ilter.first);
 				if (ilter.first != "shared")
 				{
 					CHECKSUM_LOG("Consider moving modded map to custom maps folder and restoring default");
@@ -203,7 +204,7 @@ void MapChecksumSync::Calculate()
 	}
 	for (auto ilter : maps_status.map_checksum_list)
 	{
-		CHECKSUM_LOG("%s : %s", ilter.first.c_str(), ilter.second.c_str());
+		CHECKSUM_LOG("%s : %s", ilter.first, ilter.second);
 	}
 	CHECKSUM_LOG("is_offical = %s", maps_status.is_offical ? "true" : "false");
 	maps_status.is_done = true;
@@ -232,8 +233,8 @@ void MapChecksumSync::RuntimeError(error_id type)
 
 void MapChecksumSync::SendState()
 {
-	TRACE_FUNC_N("NetworkSession::localPeerIsSessionHost() %d", NetworkSession::localPeerIsSessionHost());
-	TRACE_FUNC_N("h2mod->GetEngineType() %d", h2mod->GetEngineType());
+	LOG_TRACE_FUNC("NetworkSession::localPeerIsSessionHost() {}", NetworkSession::localPeerIsSessionHost());
+	LOG_TRACE_FUNC("h2mod->GetEngineType() {}", h2mod->GetEngineType());
 	if (!NetworkSession::localPeerIsSessionHost())
 		return;
 	H2ModPacket packet;
@@ -296,7 +297,7 @@ void MapChecksumSync::HandlePacket(const H2ModPacket &packet)
 				}
 				if (ilter->second != server_elem.value())
 				{
-					CHECKSUM_LOG("server client mismatch for map: %s, client: %s, server: %s", ilter->first.c_str(), ilter->second.c_str(), server_elem.value().c_str());
+					CHECKSUM_LOG("server client mismatch for map: %s, client: %s, server: %s", ilter->first, ilter->second, server_elem.value());
 					bad_maps_list[ilter->first.c_str()] = { ilter->second, server_elem.value() };
 					is_valid = false;
 				}

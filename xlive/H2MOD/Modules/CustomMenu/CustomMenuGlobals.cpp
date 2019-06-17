@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "CustomMenuGlobals.h"
 #include "CustomLanguage.h"
 #include <chrono>

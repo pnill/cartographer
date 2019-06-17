@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Networking\Networking.h"
@@ -6,11 +7,6 @@
 #include "H2MOD\Modules\RunLoop\RunLoop.h"
 #include "..\H2MOD.h"
 
-#include <Shellapi.h>
-#include <sys/stat.h>
-#include <string>
-#include <sstream>
-#include <io.h>
 #include "Util\Hooks\Hook.h"
 #include "Util\Debug\Debug.h"
 #include "Util\hash.h"
@@ -21,14 +17,28 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
+#include <sys/stat.h>
+#include <string>
+#include <sstream>
+#include <io.h>
+#include <filesystem>
 
-#ifndef NO_TRACE
-logger *xlive_trace_log = nullptr;
-logger *h2mod_log = nullptr;
-logger *network_log = nullptr;
-logger *checksum_log = nullptr;
-#endif
+namespace filesystem = std::experimental::filesystem;
 
+// xLiveLess specific logger
+h2log *xlive_log = nullptr;
+
+// Mod specific logger
+h2log *h2mod_log = nullptr;
+
+// General network logger
+h2log *network_log = nullptr;
+
+// Map loading logger
+h2log *checksum_log = nullptr;
+
+// Console logger, receives output from all loggers
+h2log *console_log = nullptr;
 
 ProcessInfo game_info;
 
@@ -92,7 +102,7 @@ bool configureXinput() {
 	if (!H2IsDediServer) {
 		if (H2GetInstanceId() > 1) {
 			swprintf(xinput_path, ARRAYSIZE(xinput_path), L"xinput/p%02d/xinput9_1_0.dll", H2GetInstanceId());
-			TRACE_FUNC("Changing xinput path to '%s' : '%x'", xinput_path, xinput_path);
+			LOG_TRACE_FUNCW(L"Changing xinput path to '{0}' : '{1}'", xinput_path, xinput_path);
 
 			WriteValue(H2BaseAddr + 0x8AD28, xinput_path);
 
@@ -116,7 +126,7 @@ bool configureXinput() {
 				return false;
 			}
 
-			TRACE_FUNC_N("xinput path: %s", xinputName);
+			LOG_TRACE_FUNC("xinput path: {}", xinputName);
 			if (_access_s(xinputName, 02))
 			{
 				if (errno == EACCES)
@@ -306,18 +316,29 @@ H2Types detect_process_type()
 	return H2Types::Invalid;
 }
 
-inline std::string prepareLogFileName(std::string logFileName) {
-	std::string instanceNumber("");
+inline std::wstring prepareLogFileName(std::wstring logFileName) {
+	std::wstring instanceNumber(L"");
 	if (H2GetInstanceId() > 1) {
-		std::stringstream stream;
+		std::wstringstream stream;
 		stream << H2GetInstanceId();
-		instanceNumber = ".";
+		instanceNumber = L".";
 		instanceNumber += stream.str();
 	}
-	std::string filename = logFileName;
+	std::wstring filename = (H2Config_isConfigFileAppDataLocal ? H2AppDataLocal : L"");
+	filename += L"logs\\";
+	// try making logs directory
+	if (!filesystem::create_directory(filename) && !filesystem::is_directory(filesystem::status(filename)))
+	{
+		// try locally if we didn't already
+		if (H2Config_isConfigFileAppDataLocal
+			&& filesystem::create_directory("logs") || filesystem::is_directory(filesystem::status("logs")))
+			filename = L"logs\\";
+		else
+			filename = L""; // fine then
+	}
+	filename += logFileName;
 	filename += instanceNumber;
-	filename += ".log";
-	return filename;
+	return filename + L".log";
 }
 
 ///Before the game window appears
@@ -358,7 +379,11 @@ void InitH2Startup() {
 
 	initLocalAppData();
 
+	// Force this to always initialize, and try appdata first
+	H2Config_debug_log = H2Config_isConfigFileAppDataLocal = true;
 	initDebugText();
+	H2Config_debug_log = H2Config_isConfigFileAppDataLocal = false;
+
 	//halo2ThreadID = GetCurrentThreadId();
 	if (game_info.process_type == H2Types::H2Server) {
 		H2IsDediServer = true;
@@ -373,9 +398,9 @@ void InitH2Startup() {
 		psub_48BBF = (tsub_48BBF)DetourFunc((BYTE*)H2BaseAddr + 0x48BBF, (BYTE*)sub_48BBF, 11);
 		VirtualProtect(psub_48BBF, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
-	
+
 	initInstanceNumber();
-	
+
 	if (ArgList != NULL)
 	{
 		for (int i = 0; i < ArgCnt; i++)
@@ -397,19 +422,20 @@ void InitH2Startup() {
 	}
 
 	InitH2Config();
-#ifndef NO_TRACE
 	EnterCriticalSection(&log_section);
 	if (H2Config_debug_log) {
-		xlive_trace_log = logger::create(prepareLogFileName("xlive_trace"));
-		TRACE("Log started (xLiveLess " DLL_VERSION_STR ")\n");
-		h2mod_log = logger::create(prepareLogFileName("h2mod"));
-		TRACE_GAME("Log started (H2MOD " DLL_VERSION_STR ")\n");
-		network_log = logger::create(prepareLogFileName("h2network"));
-		TRACE_GAME_NETWORK("Log started (H2MOD - Network " DLL_VERSION_STR ")\n");
+		if (H2Config_debug_log_console) {
+			console_log = h2log::create_console("CONSOLE MAIN");
+		}
+		xlive_log = h2log::create("xLiveLess", prepareLogFileName(L"h2xlive"));
+		LOG_DEBUG_XLIVE(DLL_VERSION_STR "\n");
+		h2mod_log = h2log::create("H2MOD", prepareLogFileName(L"h2mod"));
+		LOG_DEBUG_GAME(DLL_VERSION_STR "\n");
+		network_log = h2log::create("Network", prepareLogFileName(L"h2network"));
+		LOG_DEBUG_NETWORK(DLL_VERSION_STR "\n");
 	}
 	//checksum_log = logger::create(prepareLogFileName("checksum"), true);
 	LeaveCriticalSection(&log_section);
-#endif
 	InitH2Accounts();
 
 	if (!configureXinput())

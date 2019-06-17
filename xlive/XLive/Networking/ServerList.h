@@ -1,5 +1,5 @@
 #pragma once
-#include "xlivedefs.h"
+#include "stdafx.h"
 #include <atomic>
 
 #define XUSER_PROPERTY_GAMETYPE_NAME		0x40008228

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "stdafx.h"
-#include <d3d9.h>
-#include <d3dx9.h>
 
 static void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont);
 static void drawRect(FLOAT X, FLOAT Y, FLOAT Width, FLOAT Height, D3DCOLOR dColor);

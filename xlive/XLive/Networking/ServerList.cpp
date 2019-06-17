@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Globals.h"
 #include "XLive\Networking\ServerList.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
@@ -23,9 +24,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 
 void BadServer(ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult, const char* log_catch)
 {
-	if (H2Config_debug_log)
-		TRACE_GAME_N("BadServer - XUID: %llu - Log Catch: %s", xuid, log_catch);
-
+	LOG_TRACE_GAME("BadServer - XUID: {0} - Log Catch: {1}", xuid, log_catch);
 	ZeroMemory(nResult, sizeof(_XLOCATOR_SEARCHRESULT));
 }
 
@@ -506,7 +505,7 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 // 5233: ??
 DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
 {
-	// TRACE("XLocatorGetServiceProperty  (*** checkme ***) (dwUserIndex = %X, cNumProperties = %X, pProperties = %X, pOverlapped = %X)",
+	// LOG_TRACE_XLIVE("XLocatorGetServiceProperty  (*** checkme ***) (dwUserIndex = {0:x}, cNumProperties = {1:x}, pProperties = {2:x}, pOverlapped = {3:x})",
 	//		dwUserIndex, cNumProperties, pProperties, pOverlapped);
 
 	if (!LiveManager.server_counts_download_running)
@@ -524,7 +523,7 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 // 5234: ??
 DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, DWORD* pcbBuffer, PHANDLE phEnum)
 {
-	TRACE("XLocatorCreateServerEnumerator");
+	LOG_TRACE_XLIVE("XLocatorCreateServerEnumerator");
 
 	*pcbBuffer = (DWORD)(sizeof(_XLOCATOR_SEARCHRESULT) * 200); // 200 is the maximum XLocator could hold per title
 
@@ -532,7 +531,7 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int 
 	{
 		*phEnum = CreateMutex(NULL, NULL, NULL);
 
-		TRACE("- Handle = %X", *phEnum);
+		LOG_TRACE_XLIVE("- Handle = {:p}", (void*)*phEnum);
 		ServerEnum = *phEnum;
 	}
 
@@ -544,7 +543,7 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int 
 // 5238: ??
 DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey)
 {
-	TRACE("XLocatorCreateKey");
+	LOG_TRACE_XLIVE("XLocatorCreateKey");
 	if (pxnkid && pxnkey) {
 		XNetCreateKey(pxnkid, pxnkey);
 		pxnkid->ab[0] &= ~XNET_XNKID_MASK;
@@ -558,7 +557,7 @@ DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey)
 // 5235: ??
 DWORD WINAPI XLocatorCreateServerEnumeratorByIDs(DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6, DWORD a7, DWORD a8)
 {
-	TRACE("XLocatorCreateServerEnumeratorByIDs");
+	LOG_TRACE_XLIVE("XLocatorCreateServerEnumeratorByIDs");
 	// not done - error now
 	return 0x57;
 }
@@ -567,8 +566,8 @@ DWORD WINAPI XLocatorCreateServerEnumeratorByIDs(DWORD a1, DWORD a2, DWORD a3, D
 // 5236: ??
 DWORD WINAPI XLocatorServiceInitialize(DWORD a1, PHANDLE phLocatorService)
 {
-	TRACE("XLocatorServiceInitialize  (a1 = %X, phLocatorService = %X)",
-		a1, phLocatorService);
+	LOG_TRACE_XLIVE("XLocatorServiceInitialize  (a1 = {:x}, phLocatorService = {:p})",
+		a1, (void*)phLocatorService);
 
 	if (phLocatorService)
 		*phLocatorService = CreateMutex(NULL, NULL, NULL);
@@ -585,7 +584,7 @@ DWORD WINAPI XLocatorServiceInitialize(DWORD a1, PHANDLE phLocatorService)
 // 5237: ??
 DWORD WINAPI XLocatorServiceUnInitialize(HANDLE xlocatorhandle)
 {
-	TRACE("XLocatorServiceUnInitialize(a1 = %X)", xlocatorhandle);
+	LOG_TRACE_XLIVE("XLocatorServiceUnInitialize(a1 = {:x})", xlocatorhandle);
 	CloseHandle(xlocatorhandle);
 	return ERROR_SUCCESS;
 }

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "VariantMPGameEngine.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include <unordered_map>
@@ -23,7 +24,7 @@ c_game_engine_base *get_custom_engine(size_t thisptr)
 {
 	if (!LOG_CHECK(custom_engines.find(thisptr) != custom_engines.end()))
 	{
-		TRACE_FUNC("Fatal error can't get custom engine");
+		LOG_TRACE_FUNC("Fatal error can't get custom engine");
 		std::exit(-1);
 	}
 	return LOG_CHECK(custom_engines[thisptr]);

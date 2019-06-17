@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <Windows.h>
 #include "H2MOD\Modules\HitFix\Hitfix.h"
 #include "H2MOD.h"
