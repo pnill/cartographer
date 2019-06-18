@@ -45,13 +45,11 @@ namespace tag_loader
 	//returns whether the map is a shared map or not
 	bool Check_shared(ifstream* fin);
 	//Loads a tag from specified map in accordance with the datum index supplied
-	//and rebases it to 0x0
-	//kindly avoid using this as the map container sorts the tags(causing difficulties to follow the injected tags)
 	void Load_tag(int datum_index, bool recursive, string map, bool custom = false);
 	//Return the size of the meta that is currently in the que
 	unsigned int Que_meta_size();
 	//Return the size of the meta that has been injected or would be injected upon map load
-	unsigned int meta_size();
+	//unsigned int meta_size();
 	//Generates a SID ref table
 	int Generate_SID(int table_index, int set, string STRING);
 	//Returns a list of strings along with their stringIDs
@@ -65,7 +63,7 @@ namespace tag_loader
 	//BECAREFULL WHILE OVERWRITING TAGS
 	void Push_Back(int datum_index);	
 	//reinjects the meta upon map reload or map change
-	void Reinject_meta();
+	//void Reinject_meta();
 	//Dumps meta data in que in the specified tag folder(integrity checking)
 	void Dump_Que_meta();
 	//return and clears all the error messages incurred

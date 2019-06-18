@@ -4,6 +4,7 @@
 #include "..\Util\filesys.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include"..\Runtime\RuntimeIncludes.h"
+#include "Shlwapi.h"
 
 //contains some game functions that returns HANDLE
 namespace global_handle_function
@@ -59,7 +60,8 @@ namespace tag_loader
 
 	static map<string, shared_ptr<plugins_field>> plugins_list;//contains list of various plugin structures
 	map<int, shared_ptr<meta>> que_meta_list;//<datum_index,meta_junk>contains the list of tags that are currently in que to loaded in memory
-	map<int, shared_ptr<meta>> meta_list;//<datum_index,meta_junk>contains the the list of tags that are currently loaded in memory
+	vector<int> key_list;//another var just to keep the keys along with the correct order
+	map<int, shared_ptr<meta>> meta_list;//<datum_index,meta_junk>contains the the list of tags that are currently loaded in memory(never gonna use it anyway)
 	vector<string> error_list;//contains various messages generated during various processes,shouldnt had named it error list
 
 	unsigned int tag_count = 0x0;//unitialised
@@ -114,28 +116,40 @@ namespace tag_loader
 		return false;
 	}
 	//Loads a tag from specified map in accordance with the datum index supplied
-	//and rebases it to 0x0
+	///custom flag is no more needed
 	void Load_tag(int datum_index, bool recursive, string map, bool custom)
 	{
+		ifstream* fin;
+
 		que_list_target_map = map;
 		string map_loc;
 
-		if (!custom)
+		//logic to check the existence of the map at subsequent directories
+		///mods->default->custom
+		if (meta_struct::Get_file_type(map) == "map")
+			map_loc = mods_dir + "\\maps\\" + map;
+		else
+			map_loc = mods_dir + "\\maps\\" + map + ".map";
+
+		if (PathFileExistsA(map_loc.c_str()));
+		else 
 		{
 			if (meta_struct::Get_file_type(map) == "map")
 				map_loc = def_maps_dir + '\\' + map;
 			else
 				map_loc = def_maps_dir + '\\' + map + ".map";
-		}
-		else
-		{
-			if (meta_struct::Get_file_type(map) == "map")
-				map_loc = cus_maps_dir + '\\' + map;
+
+			if (PathFileExistsA(map_loc.c_str()));
 			else
-				map_loc = cus_maps_dir + '\\' + map + ".map";
+			{
+				if (meta_struct::Get_file_type(map) == "map")
+					map_loc = cus_maps_dir + '\\' + map;
+				else
+					map_loc = cus_maps_dir + '\\' + map + ".map";
+			}
 		}
 
-		ifstream* fin = new ifstream(map_loc.c_str(), ios::binary | ios::in);
+		fin = new ifstream(map_loc.c_str(), ios::binary | ios::in);
 
 		if (fin->is_open())
 		{
@@ -208,9 +222,11 @@ namespace tag_loader
 
 							//create a meta object
 							shared_ptr<meta> temp_meta = make_shared<meta>(data, size, mem_off, temp_plugin, fin, map_off, 1, *(load_tag_list.cbegin()), map_loc, type);
-							temp_meta->Rebase_meta(0x0);
+							//temp_meta->Rebase_meta(0x0);
+							//found unnecessary
 
 							que_meta_list.emplace(*(load_tag_list.cbegin()), temp_meta);
+							key_list.push_back(*(load_tag_list.cbegin()));
 
 							if (recursive)
 							{
@@ -253,6 +269,7 @@ namespace tag_loader
 
 			error_list.push_back(temp_error);
 		}
+		delete fin;//uh forgot that
 	}
 	//Return the size of the meta that is currently in the que
 	unsigned int Que_meta_size()
@@ -360,7 +377,6 @@ namespace tag_loader
 	//pushes the tag_data in que to the tag_tables and tag_memory in the custom_tags allocated space
 	void Push_Back()
 	{
-		int que_size = que_meta_list.size();
 		if ((ext_meta_size + Que_meta_size() < _MAX_ADDITIONAL_TAG_SIZE_))
 			//does some maths to help u out
 			Push_Back(new_datum_index);
@@ -378,13 +394,12 @@ namespace tag_loader
 
 		//build up inject refs
 		list<injectRefs> my_inject_refs;
-		map<int, shared_ptr<meta_struct::meta>>::iterator que_iter = que_meta_list.begin();
 
 		bool replaced = false;
-		while (que_iter != que_meta_list.end())
+		for (int i = 0; i < key_list.size(); i++)
 		{
 			injectRefs temp;
-			temp.old_datum = que_iter->first;
+			temp.old_datum = key_list[i];
 
 			if (!replaced)
 			{
@@ -401,38 +416,33 @@ namespace tag_loader
 
 			my_inject_refs.push_back(temp);
 
-			que_iter++;
 		}
 		//StringID listing---IDC
 
 
 		//update the que list tags
-		que_iter = que_meta_list.begin();
-		while (que_iter != que_meta_list.end())
+		for (int i=0;i<key_list.size();i++)
 		{
-			que_iter->second->Update_datum_indexes(my_inject_refs);
+			que_meta_list[key_list[i]]->Update_datum_indexes(my_inject_refs);
 			//<stringID stuff>
 			//-------------IDC anymore----------------
-
-			que_iter++;
 		}
 		//Add them to the tables
-		que_iter = que_meta_list.begin();
 		list<injectRefs>::iterator my_inject_refs_iter = my_inject_refs.begin();
-		while (que_iter != que_meta_list.end())
-		{
-			int meta_size = que_iter->second->Get_Total_size();
+		while (my_inject_refs_iter != my_inject_refs.end())
+		{		
 
 			if (def_meta_size)
 			{
+				int meta_size = que_meta_list[my_inject_refs_iter->old_datum]->Get_Total_size();
 				char tables_data[0x10];
 				DWORD MapMemBase = *(DWORD*)(h2mod->GetBase() + 0x47CD64);
 
-				que_iter->second->Rebase_meta(mem_off);
-				char* meta_data = que_iter->second->Generate_meta_file();
+				que_meta_list[my_inject_refs_iter->old_datum]->Rebase_meta(mem_off);
+				char* meta_data = que_meta_list[my_inject_refs_iter->old_datum]->Generate_meta_file();
 
 				char type[5];
-				memcpy(type, que_iter->second->Get_type().c_str(), 0x5);
+				memcpy(type, que_meta_list[my_inject_refs_iter->old_datum]->Get_type().c_str(), 0x5);
 				reverse(&type[0], &type[4]);
 				memcpy(tables_data, type, 0x4);
 
@@ -447,15 +457,14 @@ namespace tag_loader
 				//fix the global_refs
 				Fix_global_objects_ref(my_inject_refs_iter->new_datum);
 				//Load RAW
-				Load_RAW_refs(my_inject_refs_iter->new_datum, que_iter->second->Get_map_loc());
+				Load_RAW_refs(my_inject_refs_iter->new_datum, que_meta_list[my_inject_refs_iter->old_datum]->Get_map_loc());
 
 				delete[] meta_data;
 				mem_off += meta_size;
+				ext_meta_size += meta_size;
 			}
-			//meta_list.emplace(my_inject_refs_iter->new_datum, que_iter->second);//add it to the meta _list
-			ext_meta_size += meta_size;		
-
-			que_iter++;
+			else break;
+			//meta_list.emplace(my_inject_refs_iter->new_datum, que_iter->second);//add it to the meta _list				
 			my_inject_refs_iter++;
 		}
 		my_inject_refs.clear();
@@ -518,7 +527,7 @@ namespace tag_loader
 	{
 		que_meta_list.clear();
 	}
-	//Dumps meta data in que in the specified tag folder
+	//Rebases to 0x0 and dumps meta data in que in the specified tag folder
 	void Dump_Que_meta()
 	{
 		ofstream fout;
@@ -529,6 +538,7 @@ namespace tag_loader
 		{
 			string file_loc = cus_tag_dir + '\\' + meta_struct::to_hex_string(i->first);
 
+			i->second->Rebase_meta(0x0);
 			int size = i->second->Get_Total_size();
 			char* data = i->second->Generate_meta_file();
 			string type = i->second->Get_type();
@@ -590,6 +600,50 @@ namespace tag_loader
 
 	}
 	*/
+	//function to try and return a handle to the map (map_name or scenario_name(same as the actual map_name) supported)
+	HANDLE try_find_map(string map)
+	{
+		string map_loc;
+
+		if (map.find('\\') == string::npos)
+		{
+			//could be both map_name with or without extension
+			if (meta_struct::Get_file_type(map) == "map")
+				map_loc = mods_dir + "\\maps\\" + map;
+			else
+				map_loc = mods_dir + "\\maps\\" + map + ".map";
+
+			if (PathFileExistsA(map_loc.c_str()));
+			else
+			{
+				if (meta_struct::Get_file_type(map) == "map")
+					map_loc = def_maps_dir + '\\' + map;
+				else
+					map_loc = def_maps_dir + '\\' + map + ".map";
+
+				if (PathFileExistsA(map_loc.c_str()));
+				else
+				{
+					if (meta_struct::Get_file_type(map) == "map")
+						map_loc = cus_maps_dir + '\\' + map;
+					else
+						map_loc = cus_maps_dir + '\\' + map + ".map";
+				}
+			}
+			return CreateFileA(map_loc.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+		}
+		else
+		{
+			//scenario name
+			//try retrieving map_name from scenario
+			string map_name = map_loc.substr(map_loc.rfind('\\') + 1);
+			map_loc = mods_dir + "\\maps\\" + map_name + ".map";
+			//only tries to load from <mods_dir>\\maps cause game can auto load from default locations
+			///i suggest naming map_names same as scenario names--saves the trouble
+			return CreateFileA(map_loc.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+		}
+		
+	}
 	//function to load RAW_DATA of the concerned tag from meta_list
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
 	void Load_RAW_refs(int datum_index, string map_loc)
@@ -624,10 +678,10 @@ namespace tag_loader
 		}
 
 		//supposing full length
-		HANDLE new_file_handle = CreateFileA(map_loc.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+		HANDLE new_file_handle = try_find_map(map_loc);
 		if (new_file_handle == INVALID_HANDLE_VALUE)
 		{
-			//i suppose its in scenario format
+			//i suppose its in scenario fomat and placed in default and custom directories
 			new_file_handle = global_handle_function::get_map_Handle_from_scnr(map_loc.c_str());
 		}
 		*(HANDLE*)(h2mod->GetBase() + 0x4AE8A8) = new_file_handle;
@@ -849,8 +903,7 @@ namespace tag_loader
 				//add, add to list code here
 				DWORD_list.try_emplace(var_name, eax);
 			}
-			//Causes sorting resulting in difficult to follow
-			/*
+			
 			else if (t.find("tag_loadEx") != string::npos)
 			{
 				//similar to tag_load,but adds overwriting functionality
@@ -883,7 +936,6 @@ namespace tag_loader
 				Push_Back();
 				DWORD_list["eax"] = eax;
 			}
-			*/
 			else if (t.find("module_load") != string::npos)
 			{
 				//gotta load some tag
@@ -1036,8 +1088,6 @@ namespace tag_loader
 		//Game uses similar method to check if the tag actually exists in the table 
 		if (tag_instance[a & 0xFFFF].tag_index.Index == (a & 0xFFFF))
 			tag_instance[a & 0xFFFF].offset = tag_instance[b & 0xFFFF].offset;
-
-
 		
 
 		//Only replace tags if they do exist
@@ -1056,6 +1106,10 @@ namespace tag_loader
 		else if (t.find("replace_tag") != string::npos)
 			return 1;
 		else if (t.find("sync_tag") != string::npos)
+			return 1;
+		else if (t.find("tag_loadEx") != string::npos)
+			return 1;
+		else if (t.find("tag_load") != string::npos)
 			return 1;
 		return 0;
 	}
