@@ -428,9 +428,24 @@ void removeXNetSecurity()
 	WriteBytes(h2mod->GetBase() + (h2mod->Server ? 0x1961F8 : 0x1B5DBE), &jmp, 1);
 	NopFill<2>(h2mod->GetBase() + (h2mod->Server ? 0x196684 : 0x1B624A));
 	NopFill<2>(h2mod->GetBase() + (h2mod->Server ? 0x19663B : 0x1B6201));
-	NopFill<2>(h2mod->GetBase() + (h2mod->Server ? 0x1966F4 : 0x1B62BC));
-	
+	NopFill<2>(h2mod->GetBase() + (h2mod->Server ? 0x1966F4 : 0x1B62BC));	
 }
+
+static const float increase_factor = 1.25f;
+__declspec(naked) void network_observer_patch(void)
+{
+	__asm
+	{
+		movd    xmm0, eax
+		mulss   xmm0, increase_factor
+		movd    eax, xmm0
+		imul    eax, ebp
+		cdq
+		idiv ecx
+		ret
+	}
+}
+
 
 void applyConnectionPatches()
 {
@@ -463,6 +478,12 @@ void applyConnectionPatches()
 
 	// increase max bits per second of LIVE netcode (3000 bytes -> ~8000 bytes)
 	WriteValue<DWORD>((DWORD)h2mod->GetAddress(0x1AAD63 + 6, 0x1AB268 + 6), 61440);
+
+	BYTE call[] = { 0xE8 };
+	DWORD network_observer_patch_addr = (DWORD)h2mod->GetAddress(0x1BF1B9, 0x1B9093);
+	WriteBytes(network_observer_patch_addr, call, 1);
+	PatchCall(network_observer_patch_addr, network_observer_patch);
+	NopFill<1>(network_observer_patch_addr + 6);
 
 	if (!h2mod->Server)
 	{

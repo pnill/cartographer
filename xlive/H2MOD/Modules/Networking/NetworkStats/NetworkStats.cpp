@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "NetworkStats.h"
-#include <Windows.h>
 
 int Packets = 0;
 int LastUpdateTime = 0;
