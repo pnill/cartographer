@@ -153,6 +153,9 @@ namespace tag_loader
 
 		if (fin->is_open())
 		{
+			string temp_string = "Loading tag : " + meta_struct::to_hex_string(datum_index) + " from " + map;
+			error_list.push_back(temp_string);
+
 			//some meta reading prologue
 			int table_off, table_size;
 
@@ -248,7 +251,7 @@ namespace tag_loader
 						else
 						{
 							//most of time this is caused due to shared stuff
-							string temp_error = "Invalid Datum index :0x" + meta_struct::to_hex_string(datum_index);
+							string temp_error = "Invalid Datum index :0x" + meta_struct::to_hex_string(*(load_tag_list.cbegin()));
 							error_list.push_back(temp_error);
 						}
 					}
@@ -403,7 +406,7 @@ namespace tag_loader
 
 			if (!replaced)
 			{
-				if (datum_index < new_datum_index)
+				if ((datum_index & 0xFFFF) < new_datum_index)
 					temp.new_datum = datum_index;
 				else
 					temp.new_datum = new_datum_index++;
@@ -417,6 +420,9 @@ namespace tag_loader
 			my_inject_refs.push_back(temp);
 
 		}
+		string temp = "Pushing back tag : " + meta_struct::to_hex_string(my_inject_refs.begin()->old_datum) + " to : " + meta_struct::to_hex_string(my_inject_refs.begin()->new_datum);
+		error_list.push_back(temp);
+
 		//StringID listing---IDC
 
 
@@ -454,10 +460,10 @@ namespace tag_loader
 
 				memcpy((char*)MapMemBase + mem_off, meta_data, meta_size);//copy to the tag memory
 
-				//fix the global_refs
-				Fix_global_objects_ref(my_inject_refs_iter->new_datum);
 				//Load RAW
 				Load_RAW_refs(my_inject_refs_iter->new_datum, que_meta_list[my_inject_refs_iter->old_datum]->Get_map_loc());
+				//fix the global_refs
+				Fix_global_objects_ref(my_inject_refs_iter->new_datum);
 
 				delete[] meta_data;
 				mem_off += meta_size;
@@ -536,7 +542,7 @@ namespace tag_loader
 
 		while (i != que_meta_list.cend())
 		{
-			string file_loc = cus_tag_dir + '\\' + meta_struct::to_hex_string(i->first);
+			string file_loc = cus_tag_dir + "\\que\\" + meta_struct::to_hex_string(i->first);
 
 			i->second->Rebase_meta(0x0);
 			int size = i->second->Get_Total_size();
@@ -603,46 +609,53 @@ namespace tag_loader
 	//function to try and return a handle to the map (map_name or scenario_name(same as the actual map_name) supported)
 	HANDLE try_find_map(string map)
 	{
-		string map_loc;
-
-		if (map.find('\\') == string::npos)
+		string map_loc = map;
+		//checking for full path length
+		if (!PathFileExistsA(map_loc.c_str()))
 		{
-			//could be both map_name with or without extension
-			if (meta_struct::Get_file_type(map) == "map")
-				map_loc = mods_dir + "\\maps\\" + map;
-			else
-				map_loc = mods_dir + "\\maps\\" + map + ".map";
-
-			if (PathFileExistsA(map_loc.c_str()));
-			else
+			if (map.find('\\') == string::npos)
 			{
+				//could be both map_name with or without extension
 				if (meta_struct::Get_file_type(map) == "map")
-					map_loc = def_maps_dir + '\\' + map;
+					map_loc = mods_dir + "\\maps\\" + map;
 				else
-					map_loc = def_maps_dir + '\\' + map + ".map";
+					map_loc = mods_dir + "\\maps\\" + map + ".map";
 
 				if (PathFileExistsA(map_loc.c_str()));
 				else
 				{
 					if (meta_struct::Get_file_type(map) == "map")
-						map_loc = cus_maps_dir + '\\' + map;
+						map_loc = def_maps_dir + '\\' + map;
 					else
-						map_loc = cus_maps_dir + '\\' + map + ".map";
+						map_loc = def_maps_dir + '\\' + map + ".map";
+
+					if (PathFileExistsA(map_loc.c_str()));
+					else
+					{
+						if (meta_struct::Get_file_type(map) == "map")
+							map_loc = cus_maps_dir + '\\' + map;
+						else
+							map_loc = cus_maps_dir + '\\' + map + ".map";
+					}
 				}
+				return CreateFileA(map_loc.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 			}
-			return CreateFileA(map_loc.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+			else
+			{
+				//scenario name
+				//try retrieving map_name from scenario
+				string map_name = map_loc.substr(map_loc.rfind('\\') + 1);
+				map_loc = mods_dir + "\\maps\\" + map_name + ".map";
+				//only tries to load from <mods_dir>\\maps cause game can auto load from default locations
+				///i suggest naming map_names same as scenario names--saves the trouble
+				return CreateFileA(map_loc.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+			}
 		}
 		else
 		{
-			//scenario name
-			//try retrieving map_name from scenario
-			string map_name = map_loc.substr(map_loc.rfind('\\') + 1);
-			map_loc = mods_dir + "\\maps\\" + map_name + ".map";
-			//only tries to load from <mods_dir>\\maps cause game can auto load from default locations
-			///i suggest naming map_names same as scenario names--saves the trouble
+			//full path length
 			return CreateFileA(map_loc.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 		}
-		
 	}
 	//function to load RAW_DATA of the concerned tag from meta_list
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
@@ -1159,6 +1172,11 @@ char _cdecl LoadTagsandMapBases(int a)
 		//actual tag_loading
 		///parse query file
 		tag_loader::Parse_query_file(tag_loader::mods_dir + "\\tags\\load_tags.txt");
+
+		///load via codes
+		//tag_loader::Load_tag(0xE886001D, true, "dreamer");
+		//tag_loader::Dump_Que_meta();
+
 
 		addDebugText(tag_loader::Pop_messages().c_str());
 	}
