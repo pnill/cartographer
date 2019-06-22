@@ -431,21 +431,25 @@ void removeXNetSecurity()
 	NopFill<2>(h2mod->GetBase() + (h2mod->Server ? 0x1966F4 : 0x1B62BC));	
 }
 
-static const float increase_factor = 1.25f;
+static float aux;
+static float increase_factor = 1.3f;
 __declspec(naked) void network_observer_patch(void)
 {
 	__asm
 	{
-		movd    xmm0, eax
-		mulss   xmm0, increase_factor
-		movd    eax, xmm0
-		imul    eax, ebp
+		xorps    xmm0, xmm0 
+		cvtsi2ss xmm0, eax
+		mulss    xmm0, increase_factor
+		movss    aux, xmm0
+		fld      aux
+		fistp    aux
+		mov      eax, aux
+		imul     eax, ebp
 		cdq
-		idiv ecx
+		idiv    ecx
 		ret
 	}
 }
-
 
 void applyConnectionPatches()
 {
@@ -453,7 +457,7 @@ void applyConnectionPatches()
 	//removeXNetSecurity();
 
 	// force hard-coded qos data in-lobby
-	PatchCall(h2mod->GetBase() + (h2mod->Server ? 0x1B7B8A : 0x1BDCB0), QoSLookUpImpl);
+	PatchCall(h2mod->GetAddress(0x1BDCB0, 0x1B7B8A), QoSLookUpImpl);
 
 	//NopFill<9>(h2mod->GetBase() + (h2mod->Server ? 0x1B3CC3 : 0x1F1F94)); // check if secure/ipaddress != 127.0.0.1
 	// disable network observer (broken on H2V)
@@ -474,10 +478,13 @@ void applyConnectionPatches()
 	{
 		DWORD addr = h2mod->Server ? addresses_dedi[i] : addresses[i];
 		WritePointer(h2mod->GetBase() + addr + 4, &unk_flt_);
+
+		// for whatever reason this code will not execute, marking GetAddress not inline or exec in debug mode fixes it
+		//WritePointer((DWORD)h2mod->GetAddress(addresses[i], addresses_dedi[i]) + 4, &unk_flt_); 
 	}
 
 	// increase max bits per second of LIVE netcode (3000 bytes -> ~8000 bytes)
-	WriteValue<DWORD>((DWORD)h2mod->GetAddress(0x1AAD63 + 6, 0x1AB268 + 6), 61440);
+	WriteValue<DWORD>((DWORD)h2mod->GetAddress(0x1AAD63, 0x1AB268) + 6, 61440);
 
 	BYTE call[] = { 0xE8 };
 	DWORD network_observer_patch_addr = (DWORD)h2mod->GetAddress(0x1BF1B9, 0x1B9093);
@@ -487,7 +494,7 @@ void applyConnectionPatches()
 
 	if (!h2mod->Server)
 	{
-		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)h2mod->GetBase() + 0x1CDADE, (BYTE*)join_game, 13);
+		pjoin_game = (tjoin_game)DetourClassFunc((BYTE*)h2mod->GetAddress(0x1CDADE, 0x0), (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 }
