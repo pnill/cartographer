@@ -54,7 +54,6 @@ public:
 #define log_a(level) \
 	if (output != nullptr)                      \
 		output->##level(fmt.data(), args...);   \
-		output->flush();                        \
 	if (!isConsole                              \
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
@@ -65,7 +64,6 @@ public:
 #define log_b(level) \
 	if (output != nullptr)                      \
 		output->##level(fmt.data(), args...);   \
-		output->flush();                        \
 	if (!isConsole                              \
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
@@ -76,7 +74,6 @@ public:
 #define log_c(level) \
 	if (output != nullptr)                      \
 		output->##level(msg.data());            \
-		output->flush();                        \
 	if (!isConsole                              \
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
@@ -86,7 +83,6 @@ public:
 #define log_d(level) \
 	if (output != nullptr)                      \
 		output->##level(msg.data());            \
-		output->flush();                        \
 	if (!isConsole                              \
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
