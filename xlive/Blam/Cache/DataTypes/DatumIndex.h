@@ -53,6 +53,15 @@ namespace Blam
 				return this->data != other.data;
 			}
 
+			inline std::string ToString() const
+			{
+				std::stringstream ss;
+				ss << "Index: " << std::hex << Index <<
+					" Salt: " << std::hex << Salt <<
+					" Datum: " << std::hex << data;
+				return ss.str();
+			}
+
 			union {
 				struct {
 					signed short Index;

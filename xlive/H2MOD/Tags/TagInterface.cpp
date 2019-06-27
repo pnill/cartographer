@@ -57,7 +57,7 @@ bool tags::load_tag_debug_name()
 
 	size_t name_buffer_offset = header->TagNamesBufferOffset;
 	size_t name_buffer_size   = header->TagNamesBufferSize;
-	size_t tag_indices_offset = header->TagNamesIndicesOffset;
+	size_t tag_indices_offset = header->TagIndicesToName;
 	size_t tag_count          = header->TagNamesCount;
 
 	if (name_buffer_offset == 0 || name_buffer_size == 0 || tag_indices_offset == 0 || tag_count == 0
@@ -68,37 +68,56 @@ bool tags::load_tag_debug_name()
 	}
 
 	tag_debug_names = new char[name_buffer_size];
-	uint32_t *tag_idices = new uint32_t[tag_count];
+	uint32_t *tag_name_offsets = new uint32_t[tag_count];
 
 	DWORD size_read; // maybe this should be checked?
 	SetFilePointer(cache_handle, name_buffer_offset, NULL, FILE_BEGIN);
 	ReadFile(cache_handle, tag_debug_names, name_buffer_size, &size_read, NULL);
 
 	SetFilePointer(cache_handle, tag_indices_offset, NULL, FILE_BEGIN);
-	ReadFile(cache_handle, tag_idices, tag_count * 4, &size_read, NULL);
+	ReadFile(cache_handle, tag_name_offsets, tag_count * 4, &size_read, NULL);
 
-	for (size_t i = 0, name_offset = 0; i < tag_count; i++)
+	for (size_t i = 0; i < tag_count; i++)
 	{
+		size_t name_offset = tag_name_offsets[i];
+		if (name_offset == 0xFFFFFFFF) // either there is no such tag or it wasn't added to map
+			continue;
+
 		if (name_offset >= name_buffer_size)
 		{
 			LOG_ERROR_FUNC("Out of bounds of debug name buffer!, corrupt map?");
-			break;
+			delete[] tag_name_offsets;
+			return false;
 		}
-		char *current_name = &tag_debug_names[name_offset];
-		tag_datum_name_map[tag_idices[i]] = current_name;
-		name_offset += strnlen_s(current_name, 255) + 1;
+
+		tag_datum_name_map[i] = &tag_debug_names[name_offset];
 	}
 
-	delete[] tag_idices;
+	delete[] tag_name_offsets;
+	return true;
 }
 
 std::string tags::get_tag_name(DatumIndex tag)
 {
-	auto ilter = tag_datum_name_map.find(tag.data);
+	auto ilter = tag_datum_name_map.find(tag.Index);
 	if (ilter != tag_datum_name_map.end())
 		return ilter->second;
 	LOG_INFO_FUNC("Tag name not found?, this shouldn't happen.");
 	return "tag name lost"; // tool does something similar if it can't find the name of a tag from the shared cache
+}
+
+DatumIndex tags::find_tag(blam_tag type, const std::string &name)
+{
+	for (auto &it = tag_datum_name_map.begin(); it != tag_datum_name_map.end(); it++)
+	{
+		if (_strnicmp(name.c_str(), it->second, 256) == 0)
+		{
+			auto instance = tags::get_tag_instances()[it->first];
+			if (instance.type == type)
+				return index_to_datum(it->first);
+		}
+	}
+	return DatumIndex::Null;
 }
 
 static std::vector<void(*)()> load_callbacks;
@@ -109,6 +128,8 @@ void tags::on_map_load(void(*callback)())
 
 static void __cdecl call_on_map_load()
 {
+	// load debug names before any callbacks are called
+	load_tag_debug_name();
 	for (auto callback : load_callbacks)
 		callback();
 }
@@ -131,5 +152,4 @@ __declspec(naked) static void load_data_from_cache_file__prolog_hook()
 void tags::apply_patches()
 {
 	WriteJmpTo(h2mod->GetAddress(0x315A3, 0x25453), load_data_from_cache_file__prolog_hook);
-	on_map_load([]() { LOG_CHECK(tags::load_tag_debug_name()); });
 }

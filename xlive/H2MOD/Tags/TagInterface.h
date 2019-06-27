@@ -57,7 +57,7 @@ namespace tags
 		uint32_t TagNamesCount;
 		uint32_t TagNamesBufferOffset;
 		uint32_t TagNamesBufferSize;
-		uint32_t TagNamesIndicesOffset;
+		uint32_t TagIndicesToName;
 		int LanguagePacksOffset;
 		int LanguagePacksSize;
 		int SecondarySoundGestaltDatumIndex;
@@ -83,12 +83,19 @@ namespace tags
 		void *parent_info;
 		int tag_parent_info_count;
 		tag_instance *tag_instances;
-		int scenario_datum;
+		DatumIndex scenario_datum;
 		DatumIndex globals_datum;
 		int field_14;
 		int tag_count;
 		int type;
 	};
+
+	/* 
+		Tag Interface
+
+		These functions shouldn't be called while a new cache is being loaded and as such it's not recommended you call them from any thread other than the main one.
+		If you want to run code just after a map load register a callback using tags::on_map_load
+	*/
 
 	/* Apply required patches to executable */
 	void apply_patches();
@@ -108,7 +115,10 @@ namespace tags
 	/* Is a cache loaded? */
 	bool cache_file_loaded();
 
-	/* Load tag names from cache file */
+	/* 
+		Load tag names from cache file.
+		Automatically called on load.
+	*/
 	bool load_tag_debug_name();
 
 	/* helper function for getting a pointer to data at offset in tag data */
@@ -124,14 +134,29 @@ namespace tags
 		return get_at_tag_data_offset<tag_offset_header>(get_cache_header()->tag_offset_mask);
 	}
 
+	/* Returns a pointer to the tag instance array */
 	inline tag_instance *get_tag_instances()
 	{
 		return get_tags_header()->tag_instances;
 	}
 
+	/* Returns the number of tags, pretty self explanatory */
 	inline long get_tag_count()
 	{
 		return get_tags_header()->tag_count;
+	}
+
+	/* Convert a tag index to a tag datum */
+	inline DatumIndex index_to_datum(signed short idx)
+	{
+		if (idx >= get_tag_count())
+		{
+			LOG_ERROR_FUNC("Index out of bounds");
+		}
+		auto instance = get_tag_instances()[idx];
+		DatumIndex tag_datum = instance.tag;
+		LOG_CHECK(tag_datum.Index == idx); // should always be true
+		return tag_datum;
 	}
 
 	/* 
@@ -158,7 +183,7 @@ namespace tags
 		// out of bounds check
 		if (tag.Index > header->tag_count)
 		{
-			LOG_CRITICAL_FUNC("Bad tag datum - index out of bounds (idx: %n, bounds: %n)", tag.Index, header->tag_count);
+			LOG_CRITICAL_FUNC("Bad tag datum - index out of bounds (idx: {}, bounds: {})", tag.Index, header->tag_count);
 			return nullptr;
 		}
 
@@ -171,4 +196,9 @@ namespace tags
 
 		return get_at_tag_data_offset<T>(instance.data_offset);
 	}
+
+	/* 
+		Returns the tag datum or a null datum
+	*/
+	DatumIndex find_tag(blam_tag type, const std::string &name);
 }
