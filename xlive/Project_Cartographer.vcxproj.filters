@@ -501,6 +501,9 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD\Tags\TagInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">
@@ -1182,6 +1185,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Tags\TagInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,6 +1,9 @@
 #pragma once
 #ifndef TAGBLOCK_H
 #define TAGBLOCK_H
+
+#include "..\H2MOD\Tags\TagInterface.h"
+
 extern DWORD H2BaseAddr;
 template<typename T>
 struct tag_block
@@ -12,7 +15,7 @@ struct tag_block
 	{
 		if (this->data != NONE)
 		{
-			BYTE *tag_data_table = *reinterpret_cast<BYTE**>(H2BaseAddr + (H2IsDediServer ? 0x4A6438 : 0x482290));
+			char *tag_data_table = tags::get_tag_data();
 			if (LOG_CHECK(tag_data_table))
 				return reinterpret_cast<T*>(&tag_data_table[this->data]);
 		}
