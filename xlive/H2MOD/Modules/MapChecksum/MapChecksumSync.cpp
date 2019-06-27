@@ -12,9 +12,9 @@ extern h2log *checksum_log;
 
 #define CHECKSUM_LOG(msg, ...) \
 	LOG_DEBUG_FUNC(msg, __VA_ARGS__); \
-	LOG_DEBUG(checksum_log, msg, __VA_ARGS__); \
-	if (H2IsDediServer)\
-		printf(msg "\n", __VA_ARGS__)
+	LOG_DEBUG(checksum_log, msg, __VA_ARGS__);// \
+	//if (H2IsDediServer)\
+		//printf(msg "\n", __VA_ARGS__) // causes issues since the new logging was added
 
 
 #pragma region patches
