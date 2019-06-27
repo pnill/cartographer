@@ -113,7 +113,7 @@ DatumIndex tags::find_tag(blam_tag type, const std::string &name)
 		if (_strnicmp(name.c_str(), it->second, 256) == 0)
 		{
 			auto instance = tags::get_tag_instances()[it->first];
-			if (instance.type == type)
+			if (is_tag_or_parent_tag(instance.type, type))
 				return index_to_datum(it->first);
 		}
 	}

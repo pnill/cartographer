@@ -234,7 +234,7 @@ namespace tags
 		}
 
 		tag_instance instance = header->tag_instances[tag.Index];
-		if (request_type != 0xFFFFFFFF && instance.type != request_type)
+		if (request_type != 0xFFFFFFFF && !is_tag_or_parent_tag(instance.type, request_type))
 		{
 			LOG_ERROR_FUNC("tag type doesn't match requested type - to disable check set requested type to 'none' in template");
 			return nullptr;
