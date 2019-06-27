@@ -7,7 +7,7 @@ namespace tags
 	{
 		int magic;
 		int engine_gen;
-		int file_size;
+		uint32_t file_size;
 		int field_C;
 		int tag_offset;
 		int data_offset;

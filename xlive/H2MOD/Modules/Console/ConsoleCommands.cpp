@@ -337,8 +337,6 @@ void ConsoleCommands::spawn(unsigned int object_datum, int count, float x, float
 	for (int i = 0; i < count; i++) {
 		try {
 			char* nObject = new char[0xC4];
-			DWORD dwBack;
-			VirtualProtect(nObject, 0xC4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 			if (object_datum) {
 				unsigned int player_datum = h2mod->get_unit_datum_from_player_index(0);
