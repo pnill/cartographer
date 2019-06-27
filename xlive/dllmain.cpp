@@ -82,6 +82,7 @@ void ExitInstance()
 	delete h2mod_log;
 	delete network_log;
 	delete console_log;
+	delete onscreendebug_log;
 	LeaveCriticalSection(&log_section);
 	DeleteCriticalSection(&log_section);
 #endif

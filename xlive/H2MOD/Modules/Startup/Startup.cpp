@@ -37,6 +37,9 @@ h2log *network_log = nullptr;
 // Map loading logger
 h2log *checksum_log = nullptr;
 
+// OnScreenDebug logger
+h2log *onscreendebug_log = nullptr;
+
 // Console logger, receives output from all loggers
 h2log *console_log = nullptr;
 
@@ -381,7 +384,10 @@ void InitH2Startup() {
 
 	// Force this to always initialize, and try appdata first
 	H2Config_debug_log = H2Config_isConfigFileAppDataLocal = true;
+	int temp_log_level = H2Config_debug_log_level;
+	H2Config_debug_log_level = 0;
 	initDebugText();
+	H2Config_debug_log_level = temp_log_level;
 	H2Config_debug_log = H2Config_isConfigFileAppDataLocal = false;
 
 	//halo2ThreadID = GetCurrentThreadId();
