@@ -14,8 +14,8 @@ namespace Blam
 			//Default Constructor
 			DatumIndex()
 			{
-				this->Index = 0xFFFFu;
-				this->Salt = 0xFFFFu;
+				this->Index = -1;
+				this->Salt = -1;
 			}
 			//Copy Constructor
 			DatumIndex(INT32 Identifier)
@@ -29,12 +29,12 @@ namespace Blam
 			{
 			}
 
-			static const INT32 Null = 0xFFFFFFFF;
+			static constexpr INT32 Null = 0xFFFFFFFF;
 
 			//Returns true is DatumIndex is not Invalid
 			inline bool IsNull()
 			{
-				return this->Salt = 0xFFFF && this->Index == 0xFFFF;
+				return this->Salt = -1 && this->Index == -1;
 			}
 
 			inline unsigned long ToInt()

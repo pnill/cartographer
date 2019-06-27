@@ -75,7 +75,14 @@ namespace tags
 		blam_tag type;
 		DatumIndex tag;
 		size_t data_offset;
-		size_t field_C;
+		size_t size;
+	};
+
+	struct tag_parent_info
+	{
+		blam_tag tag;
+		blam_tag parent;
+		blam_tag grandparent;
 	};
 
 	struct tag_offset_header
@@ -159,6 +166,45 @@ namespace tags
 		return tag_datum;
 	}
 
+	inline const tag_parent_info *get_tag_parent_info(const blam_tag &tag_type)
+	{
+		auto *header = get_tags_header();
+		if (!header)
+		{
+			LOG_ERROR_FUNC("Tags header not loaded");
+			return nullptr;
+		}
+		auto compare_parent_info = [](const void *a, const void *b) -> int
+		{
+			auto *info_a = static_cast<const tag_parent_info*>(a);
+			auto *info_b = static_cast<const tag_parent_info*>(b);
+			return info_a->tag.as_int() - info_b->tag.as_int();
+		};
+		const tag_parent_info search_for{ tag_type, blam_tag::none(), blam_tag::none() };
+		return static_cast<tag_parent_info*>(
+			bsearch(
+				&search_for,
+				header->parent_info, 
+				header->tag_parent_info_count,
+				sizeof(tag_parent_info), 
+				compare_parent_info
+			));
+	}
+
+	/* Returns true if check is the same tag as main or a parent tag */
+	inline bool is_tag_or_parent_tag(const blam_tag &main, const blam_tag &check)
+	{
+		if (main == check)
+			return true;
+		auto *parent_info = get_tag_parent_info(main);
+		if (LOG_CHECK(parent_info))
+		{
+			if (check == parent_info->tag || check == parent_info->parent || check == parent_info->grandparent)
+				return true;
+		}
+		return false;
+	}
+
 	/* 
 		gets the name of a tag
 		debug names must be loaded or it will fail
@@ -201,4 +247,34 @@ namespace tags
 		Returns the tag datum or a null datum
 	*/
 	DatumIndex find_tag(blam_tag type, const std::string &name);
+
+
+	struct ilterator
+	{
+		ilterator() {};
+		ilterator(blam_tag _type) : type(_type) {};
+
+		blam_tag type = blam_tag::none(); // type we are searching for
+		long current_index = 0; // current tag idx
+		DatumIndex datum = DatumIndex::Null; // last tag datum we returned
+
+		DatumIndex next()
+		{
+			while (current_index < get_tag_count())
+			{
+				auto tag_instance = &get_tag_instances()[current_index++];
+				if (tag_instance && !tag_instance->type.is_none() && !tag_instance->tag.IsNull())
+				{
+					if (type.is_none() || is_tag_or_parent_tag(tag_instance->type, type))
+					{
+						datum = tag_instance->tag;
+						return datum;
+					}
+						
+				}
+			}
+
+			return DatumIndex::Null;
+		}
+	};
 }
