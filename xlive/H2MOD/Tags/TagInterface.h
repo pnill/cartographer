@@ -159,6 +159,7 @@ namespace tags
 		if (idx >= get_tag_count())
 		{
 			LOG_ERROR_FUNC("Index out of bounds");
+			return DatumIndex::Null;
 		}
 		auto instance = get_tag_instances()[idx];
 		DatumIndex tag_datum = instance.tag;

@@ -34,23 +34,23 @@ namespace Blam
 				static constexpr INT32 Null = 0xFFFFFFFF;
 
 				//Returns true is DatumIndex is not Invalid
-				inline bool IsNull()
+				inline bool IsNull() const
 				{
-					return this->Salt = -1 && this->Index == -1;
+					return this->Salt == -1 && this->Index == -1;
 				}
 
-				inline unsigned long ToInt()
+				inline unsigned long ToInt() const
 				{
 					return data;
 				}
 
-				inline signed short ToAbsoluteIndex() { return Index; };
+				inline signed short ToAbsoluteIndex() const { return Index; };
 
-				inline bool operator == (const DatumIndex &other)
+				inline bool operator == (const DatumIndex &other) const
 				{
 					return this->data == other.data;
 				}
-				inline bool operator != (const DatumIndex &other)
+				inline bool operator != (const DatumIndex &other) const
 				{
 					return this->data != other.data;
 				}

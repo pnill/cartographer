@@ -554,9 +554,6 @@
     <ClInclude Include="Blam\Maths\RealVector3D.h">
       <Filter>Source Files\Blam\Maths</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Shared\DatumIndex.h">
-      <Filter>Source Files\Blam\Shared</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Shared\Globals.h">
       <Filter>Source Files\Blam\Shared</Filter>
     </ClInclude>
