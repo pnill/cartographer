@@ -68,6 +68,8 @@ namespace tag_loader
 	void Dump_Que_meta();
 	//return and clears all the error messages incurred
 	string Pop_messages();
+	//return a tag_name list
+	string Pop_tag_list();
 	//Generates a StringId List combining all the default maps
 	//void Dump_StringID_list();
 	//Generates a StringId List for a specific map and adds it to the list

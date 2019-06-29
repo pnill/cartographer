@@ -110,10 +110,7 @@ cache_BLOCK* cache_loader::get_BLOCK(std::string name)
 		
 	while (i != cache_list.end())
 	{
-		const char* str1 = i->name.c_str();
-		const char* str2 = name.c_str();
-
-		int t = strcmp(str1, str2);
+		int t = i->name == name;
 		if (!t)
 		{
 			cache_in.seekg(i->offset);

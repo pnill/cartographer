@@ -63,6 +63,7 @@ namespace tag_loader
 	vector<int> key_list;//another var just to keep the keys along with the correct order
 	map<int, shared_ptr<meta>> meta_list;//<datum_index,meta_junk>contains the the list of tags that are currently loaded in memory(never gonna use it anyway)
 	vector<string> error_list;//contains various messages generated during various processes,shouldnt had named it error list
+	vector<string> tag_list;//contains a list of tag_indices along with their names(currently implemented only for module loading)
 
 	unsigned int tag_count = 0x0;//unitialised
 	unsigned int def_meta_size = 0x0;//uninitialised
@@ -572,6 +573,17 @@ namespace tag_loader
 		}
 		return ret;
 	}
+	//return and clears all the loaded tag list
+	string Pop_tag_list()
+	{
+		string ret;
+		while (tag_list.size())
+		{
+			ret = tag_list[tag_list.size() - 1] + '\n' + ret;
+			tag_list.pop_back();
+		}
+		return ret;
+	}
 	/*
 	*isnt complete yet
 	//Generates a StringId List combining all the default maps
@@ -806,6 +818,7 @@ namespace tag_loader
 			cache_BLOCK* module_tag_table = my_loader->get_BLOCK("tag_table");
 			cache_BLOCK* module_tag_data = my_loader->get_BLOCK("tag_data");
 			cache_BLOCK* module_tag_maps = my_loader->get_BLOCK("tag_maps");
+			cache_BLOCK* module_tag_names = my_loader->get_BLOCK("tag_names");
 
 			if (ext_meta_size + module_tag_data->size > _MAX_ADDITIONAL_TAG_SIZE_)
 			{
@@ -825,6 +838,7 @@ namespace tag_loader
 			char* t_ptr = new_Tables + new_datum_index * 0x10;
 			char* d_ptr = (char*)MapMemBase + mem_off;
 			char* m_ptr = module_tag_maps->data;
+			char* n_ptr = module_tag_names->data;
 			//copying tables
 			memcpy(t_ptr, module_tag_table->data, module_tag_table->size);
 			memcpy(d_ptr, module_tag_data->data, module_tag_data->size);
@@ -856,6 +870,10 @@ namespace tag_loader
 				my_inject_refs.push_back(t_ref);
 				module_tags.push_back(t_meta);
 
+				std::string t_name = n_ptr;
+				tag_list.push_back(t_name.substr(t_name.rfind('\\') + 1) + ",0x" + meta_struct::to_hex_string(t_ref.new_datum));
+
+				n_ptr += t_name.size() + 1;
 				d_ptr += size;
 			}
 			for (int i = 0; i < module_tags.size(); i++)
@@ -901,6 +919,9 @@ namespace tag_loader
 		for (int i = 0x2710; i < tag_loader::tag_count; i++)
 			memcpy((void*)(TagTableStart + i * 0x10), (void*)(SharedTables + i * 0x10), 0x10);
 	}
+
+#pragma region query_parser
+
 	query_parser::query_parser(std::vector<std::string>& vec_query)
 	{
 		DWORD_list.try_emplace("eax", 0);///lol
@@ -971,10 +992,13 @@ namespace tag_loader
 				
 				replace_tag(dest, src);
 			}
+			/*
+			--no need,will auto add to sync tables
 			else if (t.find("sync_tag") != string::npos)
 			{
 				///incomplete
 			}
+			*/
 		}
 			
 	}
@@ -1100,7 +1124,10 @@ namespace tag_loader
 		//Only replace tags if they do exist
 		//Game uses similar method to check if the tag actually exists in the table 
 		if (tag_instance[a & 0xFFFF].tag_index.Index == (a & 0xFFFF))
+		{
 			tag_instance[a & 0xFFFF].offset = tag_instance[b & 0xFFFF].offset;
+			tag_instance[a & 0xFFFF].type = tag_instance[b & 0xFFFF].type;
+		}
 		
 
 		//Only replace tags if they do exist
@@ -1118,14 +1145,17 @@ namespace tag_loader
 			return 1;
 		else if (t.find("replace_tag") != string::npos)
 			return 1;
-		else if (t.find("sync_tag") != string::npos)
-			return 1;
+		//else if (t.find("sync_tag") != string::npos)
+			//return 1;
 		else if (t.find("tag_loadEx") != string::npos)
 			return 1;
 		else if (t.find("tag_load") != string::npos)
 			return 1;
 		return 0;
 	}
+
+#pragma endregion
+
 }
 //Used to allocate somemore space for tagtables and tags
 unsigned int __cdecl AllocateMemory(int old_size, char arg_4)
