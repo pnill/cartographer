@@ -15,7 +15,7 @@
 #include "H2MOD\Variants\GunGame\GunGame.h"
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
-#include <Shlwapi.h> /*StrStrIW function in OnMapLoad*/
+#include <Shlwapi.h>
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -1166,7 +1166,7 @@ void __cdecl OnMapLoad(int a1)
 			// send server map checksums to client
 			//MapChecksumSync::SendState();
 			//inform players of the current advanced lobby settings
-			// TODO, now we got good custom packets ;)
+			// TODO: issue #232
 			//advLobbySettings->sendLobbySettingsPacket();
 
 			if (b_Infection) {

@@ -432,11 +432,14 @@ void removeXNetSecurity()
 }
 
 static float aux;
+extern bool b_XboxTick;
 static float increase_factor = 1.3f;
 __declspec(naked) void network_observer_patch(void)
 {
 	__asm
 	{
+		cmp      b_XboxTick, 1
+		jz       original_code
 		xorps    xmm0, xmm0 
 		cvtsi2ss xmm0, eax
 		mulss    xmm0, increase_factor
@@ -444,6 +447,8 @@ __declspec(naked) void network_observer_patch(void)
 		fld      aux
 		fistp    aux
 		mov      eax, aux
+
+		original_code:
 		imul     eax, ebp
 		cdq
 		idiv    ecx
@@ -486,11 +491,8 @@ void applyConnectionPatches()
 	// increase max bits per second of LIVE netcode (3000 bytes -> ~8000 bytes)
 	WriteValue<DWORD>((DWORD)h2mod->GetAddress(0x1AAD63, 0x1AB268) + 6, 61440);
 
-	BYTE call[] = { 0xE8 };
-	DWORD network_observer_patch_addr = (DWORD)h2mod->GetAddress(0x1BF1B9, 0x1B9093);
-	WriteBytes(network_observer_patch_addr, call, 1);
-	PatchCall(network_observer_patch_addr, network_observer_patch);
-	NopFill<1>(network_observer_patch_addr + 6);
+	// 30 tickrate to 60 compenstation for packet size
+	Codecave((DWORD)h2mod->GetAddress(0x1BF1B9, 0x1B9093), network_observer_patch, 1);
 
 	if (!h2mod->Server)
 	{
