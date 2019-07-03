@@ -111,7 +111,7 @@ cache_BLOCK* cache_loader::get_BLOCK(std::string name)
 	while (i != cache_list.end())
 	{
 		int t = i->name == name;
-		if (!t)
+		if (t)
 		{
 			cache_in.seekg(i->offset);
 			i->data = new char[i->size];

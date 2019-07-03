@@ -8,7 +8,7 @@
 #define UNABLE_TO_LOCATE_FILE 0x1
 /*
 Dont confuse it with blam cache
-Its the cache file which i saves and loades
+Its the cache file which i generate from MapHandler
 */
 struct cache_BLOCK
 {

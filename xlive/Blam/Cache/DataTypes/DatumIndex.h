@@ -43,9 +43,10 @@ namespace Blam
 				bool operator == (const DatumIndex &DatumIndex);
 				bool operator != (const short &Value);
 				bool operator != (const DatumIndex &DatumIndex);
+				bool operator < (const short &Value) const;
+				bool operator < (const DatumIndex &DatumIndex) const;
 
 				signed short Index;
-			private:
 				//Absolute Index 
 
 				//Salt for Unique Identification
@@ -109,6 +110,14 @@ inline std::string Blam::Cache::DataTypes::DatumIndex::ToString()
 	std::string val;
 	val = (INT32)((this->Salt << 16) | this->Index);
 	return val;
+}
+inline bool Blam::Cache::DataTypes::DatumIndex::operator<(const short &Value) const
+{
+	return this->Index < Value;
+}
+inline bool Blam::Cache::DataTypes::DatumIndex::operator<(const DatumIndex &DatumIndex) const
+{
+	return this->Index < DatumIndex.Index;
 }
 
 #pragma endregion

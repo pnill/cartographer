@@ -1,5 +1,5 @@
 #pragma once
-#include "..\..\stdafx.h"
+//#include "..\..\stdafx.h"
 #include "Blam\Enums\Tags\TagGroups.h"
 #include "Blam\Cache\DataTypes\DatumIndex.h"
 

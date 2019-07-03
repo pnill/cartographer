@@ -119,6 +119,7 @@
       <DisableSpecificWarnings>4800;4244</DisableSpecificWarnings>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -261,6 +262,9 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Blam\Cache\Tags\itmc.cpp" />
+    <ClCompile Include="Blam\Cache\Tags\scnr.cpp" />
+    <ClCompile Include="Blam\Cache\Tags\tag_base.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp" />
@@ -272,6 +276,7 @@
     <ClCompile Include="MetaLoader\meta_struct.cpp" />
     <ClCompile Include="MetaLoader\tag_loader.cpp" />
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
+    <ClCompile Include="Runtime\Globals\global_tag_interface.cpp" />
     <ClCompile Include="Runtime\init_runtime.cpp" />
     <ClCompile Include="XLive\Voice\AudioDevices.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
@@ -364,6 +369,10 @@
     <ClInclude Include="3rdparty\portaudio\include\pa_win_wmme.h" />
     <ClInclude Include="3rdparty\portaudio\include\portaudio.h" />
     <ClInclude Include="Blam\Cache\cache_header.h" />
+    <ClInclude Include="Blam\Cache\Tags\itmc.h" />
+    <ClInclude Include="Blam\Cache\Tags\scnr.h" />
+    <ClInclude Include="Blam\Cache\Tags\tag_base.h" />
+    <ClInclude Include="Blam\Cache\Tags\tag_definitons.h" />
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />
@@ -377,6 +386,7 @@
     <ClInclude Include="MetaLoader\tag_loader.h" />
     <ClInclude Include="Runtime\Cache\cache_ptrs.h" />
     <ClInclude Include="Runtime\Globals\global_ptrs.h" />
+    <ClInclude Include="Runtime\Globals\global_tag_interface.h" />
     <ClInclude Include="Runtime\init_runtime.h" />
     <ClInclude Include="Runtime\RuntimeIncludes.h" />
     <ClInclude Include="stdafx.h" />

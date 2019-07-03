@@ -5,6 +5,7 @@
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include"..\Runtime\RuntimeIncludes.h"
 #include "Shlwapi.h"
+#include"..\Blam\Cache\Tags\tag_definitons.h"
 
 //contains some game functions that returns HANDLE
 namespace global_handle_function
@@ -61,18 +62,19 @@ namespace tag_loader
 	static map<string, shared_ptr<plugins_field>> plugins_list;//contains list of various plugin structures
 	map<int, shared_ptr<meta>> que_meta_list;//<datum_index,meta_junk>contains the list of tags that are currently in que to loaded in memory
 	vector<int> key_list;//another var just to keep the keys along with the correct order
-	map<int, shared_ptr<meta>> meta_list;//<datum_index,meta_junk>contains the the list of tags that are currently loaded in memory(never gonna use it anyway)
+	//map<int, shared_ptr<meta>> meta_list;//<datum_index,meta_junk>contains the the list of tags that are currently loaded in memory(never gonna use it anyway)
 	vector<string> error_list;//contains various messages generated during various processes,shouldnt had named it error list
 	vector<string> tag_list;//contains a list of tag_indices along with their names(currently implemented only for module loading)
 
 	unsigned int tag_count = 0x0;//unitialised
 	unsigned int def_meta_size = 0x0;//uninitialised
 	unsigned int ext_meta_size = 0x0;//uninitialised
-	unsigned int new_datum_index = 0x3BA4;//first datum index
+	unsigned int new_datum_index = _INJECTED_TAG_START_;//first datum index
 	char* new_Tables;//new tables pointer
 
 	string meta_list_target_map;//name of the map for which the meta list has been target(used for StringIDs)
 	string que_list_target_map;//name of the map from which the que list has been loaded(used for StringID retargeting)
+	vector<DWORD> sync_list;//container to store tag indices of sync-able Tags
 
 	shared_ptr<plugins_field> Get_plugin(string type)
 	{
@@ -290,6 +292,7 @@ namespace tag_loader
 		return ret;
 	}
 	//Return the size of the meta that has been injected or would be injected upon map load
+	/*
 	unsigned int meta_size()
 	{
 		unsigned int ret = 0;
@@ -298,6 +301,8 @@ namespace tag_loader
 
 		return ret;
 	}
+	*/
+
 	/// <summary>
 	/// 
 	/// </summary>
@@ -477,18 +482,19 @@ namespace tag_loader
 		my_inject_refs.clear();
 		que_meta_list.clear();
 	}
+	/*
 	//function to reinject the meta in meta_list upon map reload
 	void Reinject_meta()
 	{
 		//reset some stuff
 		int mem_off = def_meta_size;
-		new_datum_index = 0x3BA4;
+		new_datum_index = _INJECTED_TAG_START_;
 		ext_meta_size = 0x0;
 
 		map<int, shared_ptr<meta_struct::meta>>::iterator meta_list_iter = meta_list.begin();
 		while (meta_list_iter != meta_list.end())
 		{
-			if (tag_count >= 0x2710 || meta_list_iter->first >= 0x3BA4)
+			if (tag_count >= 0x2710 || meta_list_iter->first >= _INJECTED_TAG_START_)
 			{
 				int meta_size = meta_list_iter->second->Get_Total_size();
 
@@ -529,6 +535,7 @@ namespace tag_loader
 		meta_list.clear();
 		ext_meta_size = 0x0;
 	}
+	*/
 	//clears the tags in que_list
 	void Clear_que_list()
 	{
@@ -619,6 +626,7 @@ namespace tag_loader
 	}
 	*/
 	//function to try and return a handle to the map (map_name or scenario_name(same as the actual map_name) supported)
+	//Checks inside mods//maps folder first then maps folder and finally inside custom maps folder
 	HANDLE try_find_map(string map)
 	{
 		string map_loc = map;
@@ -839,6 +847,8 @@ namespace tag_loader
 			char* d_ptr = (char*)MapMemBase + mem_off;
 			char* m_ptr = module_tag_maps->data;
 			char* n_ptr = module_tag_names->data;
+			if (n_ptr == nullptr)
+				throw new std::exception("tag_names block not found");
 			//copying tables
 			memcpy(t_ptr, module_tag_table->data, module_tag_table->size);
 			memcpy(d_ptr, module_tag_data->data, module_tag_data->size);
@@ -849,12 +859,15 @@ namespace tag_loader
 			int tags_first_d_index = *(int*)&t_ptr[4];
 
 			for (int i = 0; i < module_tag_table->size; i += 0x10)
-			{
+			{				
 				injectRefs t_ref;
 
 				char type[5];
 				type[4] = '\0';
 				*(int*)type = *(int*)&t_ptr[i];
+
+				int type_rev = *(int*)type;
+
 				std::reverse(&type[0], &type[strlen(type)]);
 				int mem_off = *(int*)&t_ptr[i + 0x8];
 				int size = *(int*)&t_ptr[i + 0xC];
@@ -862,7 +875,7 @@ namespace tag_loader
 				*(int*)&t_ptr[i + 0x4] = new_datum_index;//update the datum_index in the tag_tables
 
 				t_ref.old_datum = tags_first_d_index++;
-				t_ref.new_datum = new_datum_index++;
+				t_ref.new_datum = new_datum_index++;//assign and increment it for next tag
 				
 				shared_ptr<plugins_field> t_plugin = Get_plugin(type);
 				shared_ptr<meta> t_meta = make_shared<meta>(d_ptr, size, mem_off, t_plugin, 1, t_ref.old_datum);
@@ -872,6 +885,7 @@ namespace tag_loader
 
 				std::string t_name = n_ptr;
 				tag_list.push_back(t_name.substr(t_name.rfind('\\') + 1) + ",0x" + meta_struct::to_hex_string(t_ref.new_datum));
+				tag_loader::Generate_sync_list(&type_rev, t_ref.new_datum);
 
 				n_ptr += t_name.size() + 1;
 				d_ptr += size;
@@ -918,6 +932,64 @@ namespace tag_loader
 
 		for (int i = 0x2710; i < tag_loader::tag_count; i++)
 			memcpy((void*)(TagTableStart + i * 0x10), (void*)(SharedTables + i * 0x10), 0x10);
+	}
+	void Generate_sync_list(void* type, DWORD index)
+	{
+		//type += '\0';
+		int t = *(int*)type;
+		//std::reverse((char*)&t, (char*)&t + 4);
+		
+		switch((TagGroupTypes)t)
+		{
+		case TagGroupTypes::biped:
+		case TagGroupTypes::vehicle:
+		case TagGroupTypes::weapon:
+		case TagGroupTypes::garbage:
+		case TagGroupTypes::projectile:
+		case TagGroupTypes::crate:
+		case TagGroupTypes::damageeffect:
+		case TagGroupTypes::device:
+		case TagGroupTypes::scenery:
+		case TagGroupTypes::devicelightfixture:
+		case TagGroupTypes::soundscenery:
+		case TagGroupTypes::creature:
+		case TagGroupTypes::devicemachine:
+		case TagGroupTypes::equipment:
+			sync_list.push_back(index);
+			break;
+			
+		}		
+			
+	}
+	void Add_tags_to_simulation_table()
+	{
+		if (sync_list.size() == 0)
+			return;
+		else
+		{
+			auto tag_offset_header = *(DWORD*)(h2mod->GetAddress(0x47D568));
+			DatumIndex scnr_index = *(DWORD*)(tag_offset_header + 0xC);//Scneario DatumIndex
+
+			auto GlobalSCNR = (Blam::Cache::Tags::scnr*)Runtime::Globals::GlobalTagInterface.GetTagInterface(scnr_index, (int)TagGroupTypes::scenario);
+
+			for (int i = 0 ; i < sync_list.size(); i++)
+			{
+				string t;
+
+				t += "Adding Tag To Simulation Block : 0x";
+				t += meta_struct::to_hex_string(GlobalSCNR->SimulationDefinitionTable.GetElementCount()) + ",0x";
+				t += meta_struct::to_hex_string(sync_list[i]);
+
+				addDebugText(t.c_str());
+
+				struct Blam::Cache::Tags::scnr::SimulationDefinitionTable block;
+				block.Tag.TagIndex = sync_list[i];
+
+				GlobalSCNR->SimulationDefinitionTable.PushBack(&block);
+			}		
+			//clearn out the sync list for this module
+			sync_list.clear();
+		}
 	}
 
 #pragma region query_parser
@@ -1180,7 +1252,7 @@ char _cdecl LoadTagsandMapBases(int a)
 	char result = pLoadTagsandSetMapBases(a);
 	
 	//reset starting_datum index
-	tag_loader::new_datum_index = 0x3BA4;
+	tag_loader::new_datum_index = _INJECTED_TAG_START_;
 	tag_loader::ext_meta_size = 0x0;
 
 	//just storing tag_couunt
@@ -1189,27 +1261,89 @@ char _cdecl LoadTagsandMapBases(int a)
 	//adding all shared references
 	tag_loader::Add_all_shared_refs();
 
-	///Actual injection process after map load
 	//extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
-	///change it according to needs
 	if (Runtime::Cache::CacheHeader->type != Blam::Cache::cache_header::scnr_type::SinglePlayer)
 	{
 		DWORD *TagTableStart = (DWORD*)(h2mod->GetBase() + 0x47CD50);
 		///---------------TABLE EXTENSION  STUFF
 		memcpy((BYTE*)tag_loader::new_Tables, (BYTE*)*TagTableStart, 0x3BA40);
 		*TagTableStart = (DWORD)tag_loader::new_Tables;
+	}
 
+
+/*<-------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<-----------------------------------------------------ADD CALLS TO SUBROUTINES BELOW --------------------------------------------------------------------------->
+<--------------------------------------------------------------------------------------------------------------------------------------------------------------->*/
+
+
+	/*Test Codes
+
+	auto tag_offset_header = *(DWORD*)(h2mod->GetAddress(0x47D568));
+	DatumIndex scnr_index = *(DWORD*)(tag_offset_header + 0xC);//Scneario DatumIndex
+
+	auto GlobalSCNR = (Blam::Cache::Tags::scnr*)Runtime::Globals::GlobalTagInterface.GetTagInterface(scnr_index, (int)TagGroupTypes::scenario);
+
+	addDebugText("Sync List Dump0");
+	for (int i = 0; i < GlobalSCNR->SimulationDefinitionTable.GetElementCount(); i++)
+	{
+		string t = "Datum : 0x" + meta_struct::to_hex_string(GlobalSCNR->SimulationDefinitionTable[i]->Tag.TagIndex.ToInt()) + " has index : " + meta_struct::to_hex_string(i);
+		addDebugText(t.c_str());
+	}
+	*/
+
+
+	///tag_injector testing
+	//Just for testing purpose,dont cluter here	
+	///Actual injection process after map load
+	if (Runtime::Cache::CacheHeader->type != Blam::Cache::cache_header::scnr_type::SinglePlayer)
+	{
 		//actual tag_loading
 		///parse query file
 		tag_loader::Parse_query_file(tag_loader::mods_dir + "\\tags\\load_tags.txt");
+
+		//updating SimulationBlock
+		tag_loader::Add_tags_to_simulation_table();
 
 		///load via codes
 		//tag_loader::Load_tag(0xE886001D, true, "dreamer");
 		//tag_loader::Dump_Que_meta();
 
-
+		//Todo :: Make Use of TraceFunctions to Log each step
 		addDebugText(tag_loader::Pop_messages().c_str());
 	}
+
+	///
+	//global_tag_interface testing code
+	//Please dont add every code over here and cluter it,create newer subroutine
+	///
+	
+	if (Runtime::Cache::CacheHeader->type != Blam::Cache::cache_header::scnr_type::MainMenu)
+	{
+		DatumIndex temp(0xE1940018);
+		auto test = (Blam::Cache::Tags::itmc*)Runtime::Globals::GlobalTagInterface.GetTagInterface(temp, (int)TagGroupTypes::itemcollection);
+		
+		if (false)
+		{
+			/*
+			//resolve ambiguity
+			struct Blam::Cache::Tags::itmc::ItemPermutations itemperm;
+
+			itemperm.Weight = 100.0f;
+
+			itemperm.Item.TagGroup = TagGroupTypes::vehicle;
+			itemperm.Item.TagIndex = 0xE7A42D3F;
+			test->ItemPermutations.PushBack(&itemperm);
+
+			itemperm.Item.TagGroup = TagGroupTypes::biped;
+			itemperm.Item.TagIndex = 0xE35028EB;
+			test->ItemPermutations.PushBack(&itemperm);
+			*/
+
+			//test->ItemPermutations.RemoveAt(0);
+			test->ItemPermutations[0]->Item.TagGroup = TagGroupTypes::weapon;
+			test->ItemPermutations[0]->Item.TagIndex = 0x3BA4;
+		}
+	}	
 
 	return result;
 }
@@ -1217,7 +1351,12 @@ void _Patch_calls()
 {
 	PatchCall(h2mod->GetBase() + 0x313B2, (DWORD)AllocateMemory);//allocating more space for meta loading
 	PatchCall(h2mod->GetBase() + 0x3166B, (DWORD)LoadTagsandMapBases);//default maps meta loading
-	PatchCall(h2mod->GetBase() + 0x315ED, (DWORD)LoadTagsandMapBases);//custom maps meta loading,i know i am taking risks
+	PatchCall(h2mod->GetBase() + 0x315ED, (DWORD)LoadTagsandMapBases);//custom maps meta loading,i know i am taking risks	
+
+	//client side desync fix
+	///(noping out jump instructions)	
+	NopFill<2>(h2mod->GetBase() + 0x316CE);
+	NopFill<2>(h2mod->GetBase() + 0x316DC);
 }
 void Initialise_tag_loader()
 {
