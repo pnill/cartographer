@@ -1,0 +1,36 @@
+//DWORD a
+//a=module_load("h2aBR.cache")
+//replace_tag(0xEC3131CC,a)
+//tag_load(0xE886001D,dreamer)
+//tag_loadEx(0xE7080067,0xEF7E3519,lockout)
+//a=module_load("cov_guntower_turret.cache")
+
+//0xEF4C34E7 -coconut
+//0xF33838D2  -juggy_powerup
+//0xEE5233ED -ball
+//0xF28C3826 -masterchief_mp
+
+//DWORD a
+
+
+//a=module_load("jackal_shield.cache")
+//a=module_load("power_module_bloc.cache")
+//a=module_load("ff_arch_brace.bloc.cache")
+//a=module_load("floodcombat_elite.bipd.cache")
+//a=module_load("marine.bipd.cache")
+
+//a=module_load("sent_agg_beam_elim_weap.cache")
+//replace_tag(0xEE5233ED,a)
+
+//power_module_bloc.cache
+//replace_tag(0xF33838D2,a)
+
+
+//a=module_load("marine_bipd.cache")
+//replace_tag(0xF28C3826,a)
+
+//a=module_load("grunt_mode.cache")
+//replace_tag(0xF29C3836,a)
+
+//a=module_load("grunt_jmad.cache")
+//replace_tag(0xF27D3817,a)

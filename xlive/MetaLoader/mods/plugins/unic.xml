@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<plugin game="Halo2" baseSize="0x34">
+	<!-- Automatically generated plugin -->
+	<revisions>
+		<revision author="Iron_Forge" version="1">Added basic layout of plugin...</revision>
+		<revision author="Iron_Forge" version="2">Completed...</revision>
+	</revisions>
+	<unicList name="Strings" offset="0x10" visible="true" languages="9" />
+</plugin>

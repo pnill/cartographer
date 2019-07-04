@@ -519,6 +519,15 @@
     <ClCompile Include="H2MOD\Tags\global_tags_interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MetaLoader\cache_loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MetaLoader\meta_struct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MetaLoader\tag_loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">
@@ -1197,6 +1206,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Tags\global_tags_interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaLoader\tag_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaLoader\cache_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaLoader\meta_struct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
