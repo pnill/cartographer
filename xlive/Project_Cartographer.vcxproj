@@ -273,7 +273,6 @@
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp" />
-    <ClCompile Include="H2MOD\Modules\MapFix\SPMapFix.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="H2MOD\Tags\global_tags_interface.cpp" />
@@ -463,10 +462,10 @@
     <ClInclude Include="Blam\Cache\Tags\scnr.h" />
     <ClInclude Include="Blam\Cache\Tags\tag_base.h" />
     <ClInclude Include="Blam\Cache\Tags\tag_definitons.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\shad.h" />
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />
-    <ClInclude Include="H2MOD\Modules\MapFix\SPMapFix.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
     <ClInclude Include="H2MOD\Tags\global_tags_interface.h" />

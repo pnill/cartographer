@@ -172,8 +172,11 @@ inline T verify_output(T output, const char *expression, const char *func_name, 
 	return output;
 }
 
-#define LOG_CHECK(expression) \
-	verify_output(expression, #expression, __FUNCTION__, __FILE__, __LINE__)
+/*
+	Isn't actually va-args just looks like that so that commas don't cause issues
+*/
+#define LOG_CHECK(...) \
+	verify_output((__VA_ARGS__), #__VA_ARGS__, __FUNCTION__, __FILE__, __LINE__)
 
 
 #else
