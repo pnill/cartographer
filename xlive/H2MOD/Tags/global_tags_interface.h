@@ -17,7 +17,7 @@ namespace TagInterface
 	public:
 		//function to retrieve interface to the tag via datum_index
 		///required to dynamic_cast it to the required type
-		static void* GetTagInterface(DatumIndex arg0, int type);
+		static void* GetTagInterface(DatumIndex tag, int type);
 		//Release function to called pre-map unloading
 		//else MEMORY_LEAKS
 		static void Release();

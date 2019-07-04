@@ -11,24 +11,23 @@ namespace TagInterface
 	//var to store the created interfaces
 	static map<DatumIndex, void*> global_tag_interface_list;
 
-	void* global_tags_interface::GetTagInterface(DatumIndex arg0, int type)
+	void* global_tags_interface::GetTagInterface(DatumIndex tag, int type)
 	{
-		if (global_tag_interface_list.find(arg0) != global_tag_interface_list.end())
+		if (global_tag_interface_list.find(tag) != global_tag_interface_list.end())
 		{
-			return global_tag_interface_list[arg0];
+			return global_tag_interface_list[tag];
 		}
 		auto global_tag_tables = tags::get_tag_instances();
 
 		//tag type verification/protection against accidental type conversion
-		if (global_tag_tables[arg0.Index].type.as_int() != type)
+		if (global_tag_tables[tag.Index].type.as_int() != type)
 			return nullptr;
 
-		void* tag_mem_addr = tags::get_tag_data() + global_tag_tables[arg0.Index].data_offset;
+		void* tag_mem_addr = tags::get_tag(tag);
 
+		Open(global_tag_tables[tag.Index].type.as_int(), tag_mem_addr);
 
-		Open(global_tag_tables[arg0.Index].type.as_int(), tag_mem_addr);
-
-		global_tag_interface_list.emplace(arg0, tag_mem_addr);
+		global_tag_interface_list.emplace(tag, tag_mem_addr);
 		return tag_mem_addr;
 	}
 	void global_tags_interface::Release()
