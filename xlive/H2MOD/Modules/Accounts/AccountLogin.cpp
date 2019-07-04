@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <string>
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"

@@ -1,11 +1,10 @@
-#include "H2MOD\Modules\RunLoop\RunLoop.h"
+#include "stdafx.h"
+#include "RunLoop.h"
+
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Utils\Utils.h"
-#include "stdafx.h"
-#include <d3d9.h>
-#include <fstream>
-#include <winsock.h>
+
 #include "Globals.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"

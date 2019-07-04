@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "GUI.h"
 #include "H2MOD.h"
@@ -161,11 +162,11 @@ BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 {
 	InitInstance();
-	TRACE("XLiveInitialize()");
+	LOG_TRACE_XLIVE("XLiveInitialize()");
 
 	if (!h2mod->Server)
 	{
-		//TRACE("XLiveInitialize  (pPii = %X)", pPii);
+		//LOG_TRACE_XLIVE("XLiveInitialize  (pPii = %X)", pPii);
 		pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
 		pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
 
@@ -191,7 +192,7 @@ int WINAPI XLiveOnCreateDevice(IDirect3DDevice9 *pD3D, VOID* vD3DPP)
 	//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
 	//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
 
-	//TRACE("XLiveOnCreateDevice  (pD3D = %X, pD3DPP = %X)", pD3D, vD3DPP);
+	//LOG_TRACE_XLIVE("XLiveOnCreateDevice  (pD3D = %X, pD3DPP = %X)", pD3D, vD3DPP);
 	return 0;
 }
 
@@ -210,7 +211,7 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 	Sprite_Interface->OnResetDevice();
 	
 	pD3DPP = vD3DPP;
-	//TRACE("XLiveOnResetDevice");
+	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
 	return 0;
 }
 
@@ -222,7 +223,7 @@ HRESULT WINAPI XLiveOnDestroyDevice()
 	smallFont->Release();
 	Sprite_Interface->Release();
 	
-	//TRACE("XLiveOnDestroyDevice");
+	//LOG_TRACE_XLIVE("XLiveOnDestroyDevice");
 	return S_OK;
 }
 

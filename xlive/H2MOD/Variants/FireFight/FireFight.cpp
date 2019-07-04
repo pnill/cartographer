@@ -1,5 +1,7 @@
+#include "stdafx.h"
 #include "Globals.h"
 #include "Blam/BlamLibrary.h"
+#include "H2MOD/Tags/TagInterface.h"
 
 FireFight::FireFight()
 {
@@ -20,10 +22,10 @@ void FireFight::KilledAI(DatumIndex ai_datum,XUID killer)
 		if (actor_datum.Index != -1) // Ensure that it was valid
 		{
 			DatumIndex char_datum = (&game_state_actors->actors[actor_datum.Index])->character_datum; // get the character tag datum assigned to the actor.
-			character_tag_group *char_tag = (character_tag_group*)tag_instances[char_datum.Index].GetTag(); // get the character tag.
+			auto *character = tags::get_tag<'char', character_tag_group>(char_datum);
 
-			if (char_tag->SwarmProperties.size > 0)
-				points = char_tag->SwarmProperties[0]->scatterKilledCount;
+			if (character && character->SwarmProperties.size > 0)
+				points = character->SwarmProperties[0]->scatterKilledCount;
 
 
 			device_shop->AddPoints(killer, points);

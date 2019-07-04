@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Utils\Utils.h"

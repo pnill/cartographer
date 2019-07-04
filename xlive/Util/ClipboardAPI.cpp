@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "ClipboardAPI.h"
-#include "xliveless.h"
+
 #include <mutex>
 
 std::mutex clipboard_mutex;
@@ -43,10 +43,10 @@ bool ClipboardAPI::read(std::string &contents, HWND owner)
 					string_is_good = true;
 				}
 				catch (const std::length_error &e) {
-					TRACE_FUNC_N("clipboard contents too long: \"%s\"", e.what());
+					LOG_TRACE_FUNC("clipboard contents too long: \"{}\"", e.what());
 				}
 				catch (const std::exception &e) {
-					TRACE_FUNC_N("%s", e.what());
+					LOG_TRACE_FUNC("{}", e.what());
 				}
 				if (LOG_CHECK(GlobalUnlock(data) || GetLastError() == NO_ERROR) && string_is_good)
 				{

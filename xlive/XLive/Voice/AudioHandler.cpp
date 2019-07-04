@@ -1,23 +1,27 @@
-
+#include "stdafx.h"
 #include "AudioHandler.h"
 
-CAudioHandler::CAudioHandler(CAudioDevices* pAudioDevice) 
+h2log* CAudioHandler::logger = nullptr;
+
+CAudioHandler::CAudioHandler(CAudioDevices* pAudioDevice)
 {
+	if (logger == nullptr)
+		logger = h2log::create_console("PortAudio");
 	m_CAudioErr = Pa_Initialize();
 
 	if (m_CAudioErr != PaErrorCode::paNoError)
 	{
-		TRACE_N("[PortAudio-API] ERROR: PortAudio failed to initialize! Error code: %i", m_CAudioErr);
+		LOG_TRACE(logger, "Failed to initialize! Error code: {}", m_CAudioErr);
 		return;
 	}
 
-	TRACE_N("[PortAudio-API] INFO: PostAudio version: 0x%08X", Pa_GetVersion());
-	TRACE_N("[PortAudio-API] INFO: Version text: %s", Pa_GetVersionInfo()->versionText);
+	LOG_TRACE(logger, "PostAudio version: {:x}", Pa_GetVersion());
+	LOG_TRACE(logger, "Version text: {}", Pa_GetVersionInfo()->versionText);
 
 	audioDevices = pAudioDevice = new CAudioDevices;
 
 	if (audioDevices->GetAudioClassError() != paNoError) {
-		TRACE_N("CAudioHandler: CAudioDevices object failed to initialize, aborting.");
+		LOG_TRACE(logger, "CAudioDevices object failed to initialize, aborting.");
 		return;
 	}
 }
@@ -29,5 +33,5 @@ CAudioHandler::~CAudioHandler()
 
 	PaError err = Pa_Terminate();
 	if (err != PaErrorCode::paNoError)
-		TRACE_N("[PortAudio-API] ERROR: Pa_Terminate failed, error code: %i", err);
+		LOG_TRACE(logger, "Pa_Terminate failed, error code: {}", err);
 }

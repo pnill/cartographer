@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Globals.h"
 #include "Blam/BlamLibrary.h"
 #include <algorithm>

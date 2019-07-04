@@ -61,7 +61,7 @@ void InitInstance()
 		if (h2mod)
 			h2mod->Initialize();
 		else
-			TRACE("H2MOD Failed to intialize");
+			LOG_CRITICAL_GAME("H2MOD Failed to intialize");
 
 		//extern GunGame* gunGame;
 		//gunGame->readWeaponLevels();
@@ -78,9 +78,10 @@ void ExitInstance()
 	//SaveAchievements();
 #ifndef NO_TRACE
 	EnterCriticalSection(&log_section);
-	delete xlive_trace_log;
+	delete xlive_log;
 	delete h2mod_log;
 	delete network_log;
+	delete console_log;
 	LeaveCriticalSection(&log_section);
 	DeleteCriticalSection(&log_section);
 #endif

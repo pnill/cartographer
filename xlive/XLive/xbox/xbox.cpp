@@ -1,8 +1,8 @@
+#include "stdafx.h"
+#include "xbox.h"
+
 #include "Globals.h"
-#include "xlivedefs.h"
-#include "xliveless.h"
 #include "resource.h"
-#include "XLive\xbox\xbox.h"
 #include "XLive\XAM\xam.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -51,42 +51,42 @@ DWORD WINAPI XShowGuideKeyRemapUI(DWORD dwUserIndex)
 // #5275: XShowFriendsUI
 int WINAPI XShowFriendsUI(DWORD dwUserIndex)
 {
-	TRACE("XShowFriendsUI");
+	LOG_TRACE_XLIVE("XShowFriendsUI");
 	return 0;
 }
 
 // #5271: XShowPlayersUI
 int WINAPI XShowPlayersUI(DWORD dwUserIndex)
 {
-	TRACE("XShowPlayersUI");
+	LOG_TRACE_XLIVE("XShowPlayersUI");
 	return 1;
 }
 
 // #5006: XShowMessagesUI
 int WINAPI XShowMessagesUI(DWORD dwUserIndex)
 {
-	TRACE("XShowMessagesUI");
+	LOG_TRACE_XLIVE("XShowMessagesUI");
 	return 1;   // ERROR_NOT_LOGGED_ON
 }
 
 // #5209: XShowMessageComposeUI
 int WINAPI XShowMessageComposeUI(DWORD dwUserIndex, void * pXuidRecepients, DWORD cRecipients, void * wszText)
 {
-	TRACE("XShowMessageComposeUI");
+	LOG_TRACE_XLIVE("XShowMessageComposeUI");
 	return 1;   // ERROR_NOT_LOGGED_ON
 }
 
 // #5208: XShowGameInviteUI
 int WINAPI XShowGameInviteUI(DWORD dwUserIndex, void * pXuidRecipients, DWORD cRecipients, LPCWSTR pszText)
 {
-	TRACE("XShowGameInviteUI");
+	LOG_TRACE_XLIVE("XShowGameInviteUI");
 	return 1; // ERROR_NOT_LOGGED_ON
 }
 
 // #5210: XShowFriendRequestUI
 int WINAPI XShowFriendRequestUI(DWORD dwUserIndex, XUID xuidUser)
 {
-	TRACE("XShowFriendRequestUI");
+	LOG_TRACE_XLIVE("XShowFriendRequestUI");
 	return 1;
 }
 
@@ -190,8 +190,8 @@ BOOL CALLBACK MyDlgProc_KeyboardUI(HWND hDlg, UINT message, WPARAM wParam, LPARA
 // #5216: XShowKeyboardUI
 DWORD WINAPI XShowKeyboardUI(DWORD dwUserIndex, DWORD dwFlags, LPCWSTR wseDefaultText, LPCWSTR wszTitleText, LPCWSTR wszDescriptionText, LPWSTR wszResultText, DWORD cchResultText, PXOVERLAPPED pOverlapped)
 {
-	TRACE("XShowKeyboardUI  (dwUserIndex = %d, dwFlags = %X, wseDefaultText = %s, wszTitleText = %s, wszDescriptionText = %s, wszResultText = %X, cchResultText = %X, pOverlapped = %X)",
-		dwUserIndex, dwFlags, wseDefaultText, wszTitleText, wszDescriptionText, wszResultText, cchResultText, pOverlapped);
+	LOG_TRACE_XLIVE(L"XShowKeyboardUI  (dwUserIndex = {0}, dwFlags = {1:x}, wseDefaultText = {2}, wszTitleText = {3}, wszDescriptionText = {4}, wszResultText = {5:p}, cchResultText = {6:x}, pOverlapped = {7:p})",
+		dwUserIndex, dwFlags, wseDefaultText, wszTitleText, wszDescriptionText, (void*)wszResultText, cchResultText, (void*)pOverlapped);
 
 
 	DWORD dwPid = GetCurrentProcessId();
@@ -223,7 +223,7 @@ DWORD WINAPI XShowKeyboardUI(DWORD dwUserIndex, DWORD dwFlags, LPCWSTR wseDefaul
 		keydata.ret = ERROR_CANCELLED;
 
 
-	TRACE("- code = %X", keydata.ret);
+	LOG_TRACE_XLIVE("- code = {:x}", keydata.ret);
 
 
 	if (pOverlapped)
@@ -245,7 +245,7 @@ DWORD WINAPI XShowKeyboardUI(DWORD dwUserIndex, DWORD dwFlags, LPCWSTR wseDefaul
 // #5252: XShowGamerCardUI
 int WINAPI XShowGamerCardUI(DWORD dwUserIndex,XUID XuidPlayer)
 {
-	TRACE("XShowGamerCardUI");
+	LOG_TRACE_XLIVE("XShowGamerCardUI");
 
 
 	// signin change
@@ -258,21 +258,21 @@ int WINAPI XShowGamerCardUI(DWORD dwUserIndex,XUID XuidPlayer)
 // #5250
 DWORD WINAPI XShowAchievementsUI(DWORD dwUserIndex)
 {
-	TRACE("XShowAchievementsUI");
+	LOG_TRACE_XLIVE("XShowAchievementsUI");
 	return 0;
 }
 
 // #5365: XShowMarketplaceUI
 DWORD WINAPI XShowMarketplaceUI(DWORD dwUserIndex, DWORD dwEntryPoint, ULONGLONG dwOfferId, DWORD dwContentCategories)
 {
-	TRACE("XShowMarketplaceUI");
+	LOG_TRACE_XLIVE("XShowMarketplaceUI");
 	return 1;
 }
 
 // 5366 XShowMarketplaceDownloadItemsUI
 DWORD WINAPI XShowMarketplaceDownloadItemsUI(DWORD dwUserIndex, DWORD dwEntryPoint, CONST ULONGLONG* pOfferIDs, DWORD dwOfferIdCount, HRESULT *phrResult, PXOVERLAPPED pOverlapped)
 {
-	TRACE("XShowMarketplaceDownloadItemsUI");
+	LOG_TRACE_XLIVE("XShowMarketplaceDownloadItemsUI");
 
 	// not done - error now
 	return 0x57;
@@ -359,7 +359,7 @@ BOOL CALLBACK MyDlgProc_MessageBoxUI(HWND hDlg, UINT message, WPARAM wParam, LPA
 DWORD WINAPI XShowMessageBoxUI(DWORD dwUserIndex, LPCWSTR wszTitle, LPCWSTR wszText, DWORD cButtons, LPCWSTR *pwszButtons,
 	DWORD dwFocusButton, DWORD dwFlags, MESSAGEBOX_RESULT *pResult, XOVERLAPPED *pOverlapped)
 {
-	TRACE("XShowMessageBoxUI  (%s = %s)", wszTitle, wszText);
+	LOG_TRACE_XLIVE(L"XShowMessageBoxUI  ({0} = {1})", wszTitle, wszText);
 
 
 	// Checkme
@@ -407,7 +407,6 @@ DWORD WINAPI XShowMessageBoxUI(DWORD dwUserIndex, LPCWSTR wszTitle, LPCWSTR wszT
 // #5214: XShowPlayerReviewUI
 int WINAPI XShowPlayerReviewUI(DWORD dwUserIndex,XUID XuidFeedbackTarget)
 {
-	TRACE("XShowPlayerReviewUI");
+	LOG_TRACE_XLIVE("XShowPlayerReviewUI");
 	return 0;
 }
-

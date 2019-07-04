@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Globals.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
@@ -55,11 +56,11 @@ signed int __stdcall GetSecondsUntilEquipmentRespawn(int equipment_index)
 {
 	if (isEnabled)
 	{
-		TRACE_GAME("[H2MOD-H2F] : start GetSecondsUntilEquipmentRespawn(%i)", equipment_index);
+		LOG_TRACE_GAME("[H2MOD-H2F] : start GetSecondsUntilEquipmentRespawn({})", equipment_index);
 
 		int currentGameTime = GetCurrentGameTime();
 
-		TRACE_GAME("[H2MOD-H2F] currentGameTime: %i", currentGameTime);
+		LOG_TRACE_GAME("[H2MOD-H2F] currentGameTime: {}", currentGameTime);
 
 		DWORD itemStart = equpiment_offset + (equipment_index * 0x90);
 		int16_t respawnInterval = *(int16_t*)((char*)address_offset + itemStart + 0xE);
@@ -68,7 +69,7 @@ signed int __stdcall GetSecondsUntilEquipmentRespawn(int equipment_index)
 		if (respawnInterval < 1)
 			respawnInterval = 90;
 
-		TRACE_GAME("[H2MOD-H2F] respawnInterval: %i", respawnInterval);
+		LOG_TRACE_GAME("[H2MOD-H2F] respawnInterval: {}", respawnInterval);
 
 		int secondsUntilRespawn;
 		if (game_clock_initial_value)
@@ -78,7 +79,7 @@ signed int __stdcall GetSecondsUntilEquipmentRespawn(int equipment_index)
 			//Calculate secondsUntilRespawn based off of currentGameTime starting at 0 and counting upwards indefinitely
 			secondsUntilRespawn = respawnInterval - (currentGameTime % respawnInterval);
 
-		TRACE_GAME("[H2MOD-H2F] Spawning item %i in %i seconds!", equipment_index, secondsUntilRespawn);
+		LOG_TRACE_GAME("[H2MOD-H2F] Spawning item {0} in {1} seconds!", equipment_index, secondsUntilRespawn);
 
 		return secondsUntilRespawn + 1;
 	}
@@ -176,7 +177,7 @@ void EnableMeleeLunge()
 
 void Halo2Final::Initialize()
 {
-	TRACE_GAME("[H2MOD-H2F] : start Initialize()");
+	LOG_TRACE_GAME("[H2MOD-H2F] : start Initialize()");
 	settings = new Halo2FinalSettings();
 
 #pragma region Load Configuration
@@ -185,7 +186,7 @@ void Halo2Final::Initialize()
 
 	if (h2f)
 	{
-		TRACE_GAME("[H2MOD-H2F] : Opened halo2final.ini");
+		LOG_TRACE_GAME("[H2MOD-H2F] : Opened halo2final.ini");
 
 		while (!feof(h2f))
 		{
@@ -275,7 +276,7 @@ void Halo2Final::Initialize()
 	}
 	else
 	{
-		TRACE_GAME("[H2MOD-H2F] : Could not open halo2final.ini");
+		LOG_TRACE_GAME("[H2MOD-H2F] : Could not open halo2final.ini");
 	}
 
 #pragma endregion
@@ -290,7 +291,7 @@ void Halo2Final::Initialize()
 	equpiment_offset = *(int*)((BYTE*)address_offset + 0x143C124);
 	game_clock_initial_value = *(DWORD*)(base_address + 0x50A5B0);
 
-	TRACE_GAME("[H2MOD-H2F] game_clock_initial_value: %i (0 for no time limit)", game_clock_initial_value);
+	LOG_TRACE_GAME("[H2MOD-H2F] game_clock_initial_value: {} (0 for no time limit)", game_clock_initial_value);
 
 	EnableStaticWeaponSpawns();
 
@@ -485,7 +486,7 @@ void Halo2Final::Initialize()
 	isEnabled = true;
 	detoursHavePreviouslyBeenApplied = true;
 
-	TRACE_GAME("[H2MOD-H2F] : end Initialize()");
+	LOG_TRACE_GAME("[H2MOD-H2F] : end Initialize()");
 }
 
 void Halo2Final::Dispose()

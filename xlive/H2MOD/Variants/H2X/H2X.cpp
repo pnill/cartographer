@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <Windows.h>
 #include "H2MOD\Variants\H2X\H2X.h"
 #include "H2MOD.h"

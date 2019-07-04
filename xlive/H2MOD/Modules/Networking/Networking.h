@@ -26,7 +26,7 @@ private:
 		this->networkCommand = SendBuf;
 
 #if _DEBUG
-		TRACE_FUNC_N("data: %s", hashes::as_hex_string((BYTE*)SendBuf, packet.ByteSize()).c_str());
+		LOG_TRACE_FUNC("data: {}", hashes::as_hex_string((BYTE*)SendBuf, packet.ByteSize()).c_str());
 #endif
 	}
 };

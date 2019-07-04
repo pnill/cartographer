@@ -1,5 +1,7 @@
+#include "stdafx.h"
+#include "XUserContext.h"
+
 #include "Globals.h"
-#include "xliveless.h"
 #include "resource.h"
 #include "XLive\xbox\xbox.h"
 #include "XLive\XAM\xam.h"
@@ -9,8 +11,6 @@
 #include <sstream>
 #include <codecvt>
 #include <unordered_map>
-#include "XUserContext.h"
-#include "xlivedefs.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
@@ -113,7 +113,7 @@ DWORD diff_level;
 // #5277: XUserSetContext
 DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwContextValue)
 {
-	TRACE("XUserSetContext  (userIndex = %d, contextId = %d, contextValue = %d)",
+	LOG_TRACE_XLIVE("XUserSetContext  (userIndex = {0}, contextId = {1}, contextValue = {2})",
 		dwUserIndex, dwContextId, dwContextValue);
 
 	if (h2mod->Server || !H2Config_discord_enable || H2GetInstanceId() > 1)
@@ -124,7 +124,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 
 	if (dwContextId == X_CONTEXT_PRESENCE)
 	{
-		TRACE("- X_CONTEXT_PRESENCE = %d", dwContextValue);
+		LOG_TRACE_XLIVE("- X_CONTEXT_PRESENCE = {}", dwContextValue);
 		int GameGlobals = *reinterpret_cast<int*>(h2mod->GetBase() + 0x482D3C);
 		int GameEngineGlobals = *reinterpret_cast<int*>(h2mod->GetBase() + 0x4BF8F8);
 
@@ -132,7 +132,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 		map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L"\\") + 1);
 
 		std::string map_name = wstring_to_string.to_bytes(map_name_wide);
-		TRACE_GAME("[Discord] map_name: %ws", map_name_wide.c_str());
+		LOG_TRACE_GAME(L"[Discord] map_name: {}", map_name_wide.c_str());
 
 		switch (static_cast<ContextPresence>(dwContextValue)) {
 		case ContextPresence::singleplayer:
@@ -200,14 +200,14 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 
 	else if (dwContextId == X_CONTEXT_GAME_TYPE)
 	{
-		TRACE("- X_CONTEXT_GAME_TYPE = %d", dwContextValue);
+		LOG_TRACE_XLIVE("- X_CONTEXT_GAME_TYPE = {}", dwContextValue);
 
 		sessionDetails.dwGameType = dwContextValue;
 	}
 
 	else if (dwContextId == X_CONTEXT_GAME_MODE)
 	{
-		TRACE("- X_CONTEXT_GAME_MODE = %X", dwContextValue);
+		LOG_TRACE_XLIVE("- X_CONTEXT_GAME_MODE = {:x}", dwContextValue);
 
 		sessionDetails.dwGameMode = dwContextValue;
 	}
@@ -221,8 +221,8 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 // #5292: XUserSetContextEx
 int WINAPI XUserSetContextEx(DWORD dwUserIndex, DWORD dwContextId, DWORD dwContextValue, PXOVERLAPPED pOverlapped)
 {
-	TRACE("XUserSetContextEx  (userIndex = %d, contextId = %d, contextValue = %X, pOverlapped = %X)",
-		dwUserIndex, dwContextId, dwContextValue, pOverlapped);
+	LOG_TRACE_XLIVE("XUserSetContextEx  (userIndex = {0}, contextId = {1}, contextValue = {2:x}, pOverlapped = {3:p})",
+		dwUserIndex, dwContextId, dwContextValue, (void*)pOverlapped);
 
 
 	//return 0;
@@ -230,19 +230,19 @@ int WINAPI XUserSetContextEx(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 
 	if (dwContextId == X_CONTEXT_PRESENCE)
 	{
-		TRACE("- X_CONTEXT_PRESENCE = %X", dwContextValue);
+		LOG_TRACE_XLIVE("- X_CONTEXT_PRESENCE = {:x}", dwContextValue);
 	}
 
 	else if (dwContextId == X_CONTEXT_GAME_TYPE)
 	{
-		TRACE("- X_CONTEXT_GAME_TYPE = %X", dwContextValue);
+		LOG_TRACE_XLIVE("- X_CONTEXT_GAME_TYPE = {:x}", dwContextValue);
 
 		sessionDetails.dwGameType = dwContextValue;
 	}
 
 	else if (dwContextId == X_CONTEXT_GAME_MODE)
 	{
-		TRACE("- X_CONTEXT_GAME_MODE = %X", dwContextValue);
+		LOG_TRACE_XLIVE("- X_CONTEXT_GAME_MODE = {:x}", dwContextValue);
 
 		sessionDetails.dwGameMode = dwContextValue;
 	}

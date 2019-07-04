@@ -1,4 +1,5 @@
-﻿#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
+﻿#include "stdafx.h"
+#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "Globals.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
@@ -30,7 +31,7 @@ static void actuallySendPacket() {
 	if (!NetworkSession::localPeerIsSessionHost() || h2mod->GetEngineType() != EngineType::MULTIPLAYER_ENGINE)
 		return;
 
-	TRACE_GAME("[h2mod] Sending AdvLobbySettings.");
+	LOG_TRACE_GAME("[h2mod] Sending AdvLobbySettings.");
 	addDebugText("[h2mod] Sending AdvLobbySettings.");
 
 #ifdef _DEBUG
@@ -79,7 +80,7 @@ void AdvLobbySettings::resetLobbySettings()
 	if (h2mod->Server)
 		return;
 
-	TRACE_GAME("[h2mod] Resetting AdvLobbySettings.");
+	LOG_TRACE_GAME("[h2mod] Resetting AdvLobbySettings.");
 	addDebugText("[h2mod] Resetting AdvLobbySettings.");
 
 	AdvLobbySettings_mp_explosion_physics = false;
@@ -99,7 +100,7 @@ void AdvLobbySettings::parseLobbySettings(const h2mod_lobby_settings& lobby_sett
 	if (h2mod->Server)
 		return;
 
-	TRACE_GAME("[h2mod] Parsing AdvLobbySettings.");
+	LOG_TRACE_GAME("[h2mod] Parsing AdvLobbySettings.");
 	addDebugText("[h2mod] Parsing AdvLobbySettings.");
 	
 	AdvLobbySettings_mp_explosion_physics = lobby_settings.mp_explosion_physics() - 1;

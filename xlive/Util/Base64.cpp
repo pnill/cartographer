@@ -18,7 +18,7 @@ misrepresented as being the original source code.
 3. This notice may not be removed or altered from any source distribution.
 René Nyffenegger rene.nyffenegger@adp-gmbh.ch
 */
-
+#include "stdafx.h"
 #include "base64.h"
 #include <iostream>
 

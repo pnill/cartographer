@@ -1,10 +1,10 @@
+#include "stdafx.h"
+#include "XAchievements.h"
+
 #include "Globals.h"
-#include "xlivedefs.h"
-#include "xliveless.h"
 #include "resource.h"
 #include "XLive\xbox\xbox.h"
 #include "XLive\XAM\xam.h"
-#include "Xlive\achievements\XAchievements.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
 #include <string>
 
@@ -17,8 +17,8 @@ HANDLE g_dwFakeAchievementContent = (HANDLE)-2;
 // #5278: XUserWriteAchievements
 DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement, PXOVERLAPPED pOverlapped)
 {
-	TRACE("XUserWriteAchievements  (count = %x, buffer = %x, pOverlapped = %x)",
-		count, pAchievement, pOverlapped);
+	LOG_TRACE_XLIVE("XUserWriteAchievements  (count = {0:#x}, buffer = {1:p}, pOverlapped = {2:p})",
+		count, (void*)pAchievement, (void*)pOverlapped);
 
 	if (count > 0)
 	{
@@ -27,7 +27,7 @@ DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement
 
 			int AchievementID = pAchievement->dwAchievementId;
 
-			TRACE_GAME_N("Achievement %d unlock attempt by Player %d - id2: %d", pAchievement->dwAchievementId, pAchievement->dwUserIndex, AchievementID);
+			LOG_TRACE_GAME("Achievement {0} unlock attempt by Player {1} - id2: {2}", pAchievement->dwAchievementId, pAchievement->dwUserIndex, AchievementID);
 
 			if (achievementList[AchievementID] == 0)
 			{
@@ -212,7 +212,7 @@ DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement
 				std::thread(AchievementUnlock, AchievementID).detach();
 			}
 			else {
-				TRACE_GAME_N("Achievement %d was already unlocked", AchievementID);
+				LOG_TRACE_GAME("Achievement {} was already unlocked", AchievementID);
 			}
 
 			pAchievement++;
@@ -225,7 +225,7 @@ DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement
 		pOverlapped->InternalLow = ERROR_SUCCESS;
 		pOverlapped->InternalHigh = ERROR_SUCCESS;
 		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
-		return ERROR_IO_PENDING;		
+		return ERROR_IO_PENDING;
 	}
 
 	return ERROR_SUCCESS;
@@ -234,7 +234,7 @@ DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement
 // #5280: XUserCreateAchievementEnumerator
 DWORD WINAPI XUserCreateAchievementEnumerator(DWORD dwTitleId, DWORD dwUserIndex, XUID xuid, DWORD dwDetailFlags, DWORD dwStartingIndex, DWORD MaxEnumerator, PDWORD pchBuffer, PHANDLE phEnum)
 {
-	TRACE("XUserCreateAchievementEnumerator (dwStartingIndex = %d, MaxEnumerator = %d)", dwStartingIndex, MaxEnumerator);
+	LOG_TRACE_XLIVE("XUserCreateAchievementEnumerator (dwStartingIndex = {0}, MaxEnumerator = {1})", dwStartingIndex, MaxEnumerator);
 
 
 	if (pchBuffer) *pchBuffer = MaxEnumerator * sizeof(XACHIEVEMENT_DETAILS);
@@ -244,7 +244,7 @@ DWORD WINAPI XUserCreateAchievementEnumerator(DWORD dwTitleId, DWORD dwUserIndex
 	achieveinit = 0;
 
 
-	TRACE("- Handle = %X, pchBuffer = %d", g_dwFakeAchievementContent, *pchBuffer);
+	LOG_TRACE_XLIVE("- Handle = {0:p}, pchBuffer = {1}", (void*)g_dwFakeAchievementContent, *pchBuffer);
 
 	return ERROR_SUCCESS;
 }
