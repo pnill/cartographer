@@ -504,6 +504,9 @@
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">
@@ -586,9 +589,6 @@
     </ClInclude>
     <ClInclude Include="Blam\Engine\Extras\Skulls.h">
       <Filter>Source Files\Blam\Engine\Extras</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Shared\DatumIndex.h">
-      <Filter>Source Files\Blam\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Shared\Globals.h">
       <Filter>Source Files\Blam\Shared</Filter>
@@ -1185,6 +1185,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Tags\TagInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\tinyxml\tinyxml2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

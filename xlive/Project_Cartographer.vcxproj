@@ -121,6 +121,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -263,6 +264,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp" />
@@ -447,6 +449,7 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\spdlog.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\tweakme.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h" />
+    <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />
