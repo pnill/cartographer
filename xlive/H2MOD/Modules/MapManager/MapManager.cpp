@@ -284,13 +284,6 @@ void MapManager::reloadMaps() {
 	map_reload_function_type reloadMaps = (map_reload_function_type)(h2mod->GetBase() + (h2mod->Server ? 0x419B5 : 0x4D021));
 	map_reload_function_type reloadMapsSet = (map_reload_function_type)(h2mod->GetBase() + (h2mod->Server ? 0x41501 : 0x4CC30));
 	DWORD* mapsObject = (DWORD*)(h2mod->GetBase() + (h2mod->Server ? 0x4A70D8 : 0x482D70));
-	DWORD dwBack;
-	LOG_TRACE_GAME("[h2mod-mapmanager] before virtual protect");
-	BOOL canprotect = VirtualProtect((WORD*)((int)mapsObject + 148016), sizeof(WORD), PAGE_EXECUTE_READWRITE, &dwBack);
-	if (!canprotect && GetLastError()) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] reloadMaps - canprotect={0:d}, error={1:d}", canprotect, GetLastError());
-	}
-	LOG_TRACE_GAME("[h2mod-mapmanager] after virtual protect");
 
 	LOG_TRACE_GAME("[h2mod-mapmanager] before reload map sets");
 	EnterCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);

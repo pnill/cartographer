@@ -641,8 +641,6 @@ void GivePlayerWeapon2(int PlayerIndex, int WeaponId, short Unk)
 	if (unit_datum != -1 && unit_datum != 0)
 	{
 		char* nObject = new char[0xC4];
-		DWORD dwBack;
-		VirtualProtect(nObject, 0xC4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		call_object_placement_data_new(nObject, WeaponId, unit_datum, 0);
 
@@ -665,8 +663,6 @@ void GivePlayerWeapon(int PlayerIndex, int WeaponId, bool bReset)
 	if (unit_datum != -1 && unit_datum != 0)
 	{
 		char* nObject = new char[0xC4];
-		DWORD dwBack;
-		VirtualProtect(nObject, 0xC4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		call_object_placement_data_new(nObject, WeaponId, unit_datum, 0);
 
@@ -1044,8 +1040,6 @@ void get_object_table_memory()
 	game_state_players = (GameStatePlayerTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4D64C4 : 0x4A8260))));
 	game_state_objects_header = (GameStateObjectHeaderTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x50C8EC : 0x4E461C))));
 	game_state_actors = (GameStateActorTable*)((*(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x9A1C5C : 0xA965DC))));
-	if (tag_instances == nullptr)
-		tag_instances = (global_tag_instance*)(*(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50)));
 }
 
 // this gets called after game globals are updated fyi (which includes game engine type)
@@ -1513,8 +1507,6 @@ void GivePlayerWeaponDatum(DatumIndex unit_datum,DatumIndex weapon_datum)
 	if (unit_datum != -1 && unit_datum != 0)
 	{
 		char* nObject = new char[0xC4];
-		DWORD dwBack;
-		VirtualProtect(nObject, 0xC4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		call_object_placement_data_new_datum(nObject, weapon_datum, unit_datum, 0);
 
@@ -1706,7 +1698,7 @@ void H2MOD::ApplyHooks() {
 		calculate_model_lod_detour_end = GetBase() + 0x19CDA3 + 5;
 		WriteJmpTo(GetBase() + 0x19CDA3, calculate_model_lod_detour);
 
-		// set max model qaulity to L6
+		// set max model quality to L6
 		WriteValue(GetBase() + 0x190B38 + 1, 5);
 
 		pfn_c000bd114 = (tfn_c000bd114)DetourFunc((BYTE*)H2BaseAddr + 0x000bd114, (BYTE*)fn_c000bd114_IsSkullEnabled, 5);
@@ -1750,7 +1742,7 @@ void H2MOD::ApplyHooks() {
 	}
 
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
-	PatchCall(h2mod->GetBase() + ((!h2mod->Server) ? 0x58789 : 0x60C81), (DWORD)OnAutoPickUpHandler);
+	PatchCall(h2mod->GetBase() + ((!h2mod->Server) ? 0x58789 : 0x60C81), OnAutoPickUpHandler);
 
 	mapManager->applyGamePatches();
 	ApplyUnitHooks();
@@ -1793,6 +1785,7 @@ void H2MOD::Initialize()
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->Base);
 
 	h2mod->ApplyHooks();
+	tags::apply_patches();
 }
 
 void H2MOD::Deinitialize() {
@@ -1801,14 +1794,6 @@ void H2MOD::Deinitialize() {
 
 void H2MOD::IndicatorVisibility(bool toggle)
 {
-	BYTE* indicatorPointer = ((BYTE*)h2mod->GetBase() + 0x111197);
-	DWORD dwback;
-	VirtualProtect(indicatorPointer, 1, PAGE_EXECUTE_READWRITE, &dwback);
-
-	if (toggle)
-		*indicatorPointer = 0x74;
-	else
-		*indicatorPointer = 0xEB;
-
-	VirtualProtect(indicatorPointer, 1, dwback, &dwback);
+	// makes toggles between jz and jmp
+	WriteValue<BYTE>(h2mod->GetBase() + 0x111197, toggle ? 0x74 : 0xEB);
 }
