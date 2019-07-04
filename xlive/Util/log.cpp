@@ -19,6 +19,9 @@ h2log::h2log(const std::string& name)
 {
 	sname = name;
 	wname = string_convert.from_bytes(name);
+
+	// should be fine to do this for every logger, better here once than someplace else
+	spdlog::flush_on(spdlog::level::trace);
 }
 
 h2log::~h2log()

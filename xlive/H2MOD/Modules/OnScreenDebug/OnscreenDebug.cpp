@@ -7,7 +7,6 @@ int DebugTextArrayLenMax = 160;
 int DebugTextArrayPos = 0;
 bool DebugTextDisplay = false;
 bool initialisedDebugText = false;
-h2log* onscreendebuglog = nullptr;
 
 int getDebugTextArrayMaxLen() {
 	return DebugTextArrayLenMax;
@@ -49,7 +48,7 @@ void addDebugText(char* text) {
 	strncpy(DebugStr[DebugTextArrayPos], text, lenInput);
 	memset(DebugStr[DebugTextArrayPos] + lenInput, 0, 1);
 
-	onscreendebuglog->debug(text);
+	onscreendebug_log->debug(text);
 
 	if (endChar) {
 		addDebugText(endChar + 1);
@@ -58,7 +57,7 @@ void addDebugText(char* text) {
 
 void initDebugText() {
 	initialisedDebugText = true;
-	onscreendebuglog = h2log::create("OnScreenDebug", prepareLogFileName(L"h2onscreendebug"));
+	onscreendebug_log = h2log::create("OnScreenDebug", prepareLogFileName(L"h2onscreendebug"));
 	DebugStr = (char**)malloc(sizeof(char*) * DebugTextArrayLenMax);
 	for (int i = 0; i < DebugTextArrayLenMax; i++) {
 		DebugStr[i] = (char*)calloc(1, sizeof(char));
