@@ -33,3 +33,4 @@ xliveless.v12.suo
 /xlive/Release
 *.opensdf
 *.user
+*.ipch

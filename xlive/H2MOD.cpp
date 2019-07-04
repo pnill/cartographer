@@ -16,6 +16,7 @@
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 #include <Shlwapi.h>
+#include "H2MOD\Tags\global_tags_interface.h"
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -1782,6 +1783,7 @@ void H2MOD::Initialize()
 
 	h2mod->ApplyHooks();
 	tags::apply_patches();
+	TagInterface::GlobalTagInterface.Init();
 }
 
 void H2MOD::Deinitialize() {

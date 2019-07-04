@@ -507,6 +507,18 @@
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Blam\Cache\Tags\itmc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Blam\Cache\Tags\scnr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Blam\Cache\Tags\tag_base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Tags\global_tags_interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">
@@ -839,26 +851,8 @@
     <ClInclude Include="Blam\Cache\TagBlocks\TagBlocks.h">
       <Filter>Source Files\Blam\Cache\TagBlocks</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Cache\TagBlocks\Globals\hudg.hpp">
-      <Filter>Source Files\Blam\Cache\TagBlocks\Globals</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagBlocks\Globals\matg.hpp">
-      <Filter>Source Files\Blam\Cache\TagBlocks\Globals</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagBlocks\Interface\nhdt.hpp">
-      <Filter>Source Files\Blam\Cache\TagBlocks\Interface</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups\TagGroups.h">
       <Filter>Source Files\Blam\Cache\TagGroups</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\Globals\hudg.hpp">
-      <Filter>Source Files\Blam\Cache\TagGroups\Globals</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\Globals\matg.hpp">
-      <Filter>Source Files\Blam\Cache\TagGroups\Globals</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\Interface\nhdt.hpp">
-      <Filter>Source Files\Blam\Cache\TagGroups\Interface</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Enums\Tags\TagGroups\hudg.hpp">
       <Filter>Source Files\Blam\Enums\Tags\TagGroups</Filter>
@@ -1188,6 +1182,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\Tags\tag_definitons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\Tags\itmc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\Tags\scnr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\Tags\tag_base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Tags\global_tags_interface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

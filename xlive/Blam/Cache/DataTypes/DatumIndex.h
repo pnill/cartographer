@@ -54,6 +54,15 @@ namespace Blam
 				{
 					return this->data != other.data;
 				}
+				inline bool operator<(const short &Value) const
+				{
+					return this->Index < Value;
+				}
+				inline bool operator<(const DatumIndex &DatumIndex) const
+				{
+					return this->Index < DatumIndex.Index;
+				}
+
 
 				inline std::string ToString() const
 				{
