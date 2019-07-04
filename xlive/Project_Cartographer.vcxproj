@@ -269,6 +269,7 @@
     <ClCompile Include="H2MOD\Modules\MapFix\SPMapFix.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
+    <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
     <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -452,6 +453,7 @@
     <ClInclude Include="H2MOD\Modules\MapFix\SPMapFix.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
+    <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
@@ -511,7 +513,6 @@
     <ClInclude Include="Blam\Maths\RealPoint3D.h" />
     <ClInclude Include="Blam\Maths\RealVector2D.h" />
     <ClInclude Include="Blam\Maths\RealVector3D.h" />
-    <ClInclude Include="Blam\Shared\DatumIndex.h" />
     <ClInclude Include="Blam\Shared\Globals.h" />
     <ClInclude Include="Blam\Shared\SharedDefinitions.h" />
     <ClInclude Include="XLive\Voice\Encoder.h" />

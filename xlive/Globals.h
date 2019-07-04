@@ -33,7 +33,6 @@ using namespace Blam::EngineDefinitions::Actors;
 extern GameStatePlayerTable *game_state_players;
 extern GameStateObjectHeaderTable* game_state_objects_header;
 extern GameStateActorTable* game_state_actors;
-extern global_tag_instance* tag_instances;
 
 extern DeviceShop* device_shop;
 extern VariantPlayer* variant_player;
