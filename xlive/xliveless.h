@@ -152,11 +152,11 @@ inline void verify_output_log(const char *expression, const char *func_name, con
 		size_t size = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			NULL, last_error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&messageBuffer, 0, NULL);
 		if (size) {
-			LOG_TRACE_GAME(L"Last error: '{}'", messageBuffer);
+			LOG_ERROR_GAME(L"Last error: '{}'", messageBuffer);
 			LocalFree(messageBuffer);
 		}
 		else {
-			LOG_TRACE_GAME("Converting error {} to string failed!", last_error);
+			LOG_ERROR_GAME("Converting error {} to string failed!", last_error);
 		}
 		SetLastError(0);
 	}

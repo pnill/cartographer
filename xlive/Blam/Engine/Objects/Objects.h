@@ -17,9 +17,9 @@ namespace Blam
 				DatumIndex DefinitionIndex;//0
 				DWORD ObjectFlags;//4
 				DWORD unk_0;//8
-				Blam::SharedDefinitions::c_object_index NextIndex;//0xC
-				Blam::SharedDefinitions::c_object_index CurrentWeaponDatum;//0x10
-				Blam::SharedDefinitions::c_object_index ParentIndex;//0x14
+				DatumIndex NextIndex;//0xC
+				DatumIndex CurrentWeaponDatum;//0x10
+				DatumIndex ParentIndex;//0x14
 				WORD UnitInVehicleFlag;//0x18
 				INT16 PlacementIndex ;//0x1A
 				DWORD unk_2[3];//0x1C
@@ -40,7 +40,7 @@ namespace Blam
 				BYTE unk_5;//0xAE
 				BYTE NetgameEquipmentIndex;//0xAF
 				DWORD unk_6;//0xB0
-				Blam::SharedDefinitions::c_object_index HavokComponentDatum;//0xB4
+				DatumIndex HavokComponentDatum;//0xB4
 				DWORD unk_7[11];//0xB8
 				FLOAT BodyMaxVitality;//0xE4
 				FLOAT ShieldMaxVitality;//0xE8
@@ -73,7 +73,7 @@ namespace Blam
 				BYTE unk_14[102];//0x156
 				Blam::Maths::RealMovement UnitMovement;//0x1BC
 				BYTE unk_15[16];//0x1C4
-				Blam::SharedDefinitions::c_object_index TargetObject;//0x1D4
+				DatumIndex TargetObject;//0x1D4
 				BYTE unk_16[82];//0x1D8
 				Blam::Enums::Objects::Unit::WeaponIndex UnitSwitchWeapon;//0x22A
 				DatumIndex PrimaryWeapon; // 0x22C
