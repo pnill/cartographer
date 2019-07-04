@@ -862,12 +862,14 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 }
 
 //Patch Call to modify tags just after map load
+//Removed this due to conflicts with tag_loader
+/*
 char _cdecl LoadTagsandMapBases(int a)
 {
 	char(__cdecl* LoadTagsandMapBases_Orig)(int) = (char(__cdecl*)(int))(h2mod->GetAddress(0x00031348));
 	char result = LoadTagsandMapBases_Orig(a);
 	return result;
-}
+}*/
 
 char is_remote_desktop()
 {

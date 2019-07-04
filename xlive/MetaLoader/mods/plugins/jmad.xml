@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin game="Halo2" baseSize="0xAC">
+	<revisions>
+		<revision author="Lord Zedd" version="1">ayy lmao</revision>
+	</revisions>
+	<comment title="STRUCT Resources" />
+	<comment title="GRAPH DATA" />
+	<tagRef name="Parent Animation Graph" offset="0x0" visible="true" />
+	<bitfield8 name="Inheritance Flags" offset="0x8" visible="true">
+		<bit name="Inherit Root Trans Scale Only" index="0" />
+		<bit name="Inherit For Use On Player" index="1" />
+	</bitfield8>
+	<bitfield8 name="Private Flags" offset="0x9" visible="true">
+		<bit name="Prepared For Cache" index="0" />
+		<bit name="Unused" index="1" />
+		<bit name="Imported With Codec Compressors" index="2" />
+		<bit name="Unused Smelly Flag" index="3" />
+		<bit name="Written To Cache" index="4" />
+		<bit name="Animation Data Reordered" index="5" />
+	</bitfield8>
+	<int16 name="Animation Codec Pack" offset="0xA" visible="true" />
+	<reflexive name="Skeleton Nodes" offset="0xC" visible="true" entrySize="0x20">
+		<stringid name="Name" offset="0x0" visible="true" />
+		<int16 name="Next Sibling Node Index index" offset="0x4" visible="true" />
+		<int16 name="First Child Node Index index" offset="0x6" visible="true" />
+		<int16 name="Parent Node Index index" offset="0x8" visible="true" />
+		<bitfield8 name="Model Flags" offset="0xA" visible="true">
+			<bit name="Primary Model" index="0" />
+			<bit name="Secondary Model" index="1" />
+			<bit name="Local Root" index="2" />
+			<bit name="Left Hand" index="3" />
+			<bit name="Right Hand" index="4" />
+			<bit name="Left Arm Member" index="5" />
+		</bitfield8>
+		<bitfield8 name="Node Joint Flags" offset="0xB" visible="true">
+			<bit name="Ball-Socket" index="0" />
+			<bit name="Hinge" index="1" />
+			<bit name="No Movement" index="2" />
+		</bitfield8>
+		<float32 name="Base Vector i" offset="0xC" visible="true" />
+		<float32 name="Base Vector j" offset="0x10" visible="true" />
+		<float32 name="Base Vector k" offset="0x14" visible="true" />
+		<float32 name="Vector Range" offset="0x18" visible="true" />
+		<float32 name="Z Pos" offset="0x1C" visible="true" />
+	</reflexive>
+	<reflexive name="Sound References|ABCDCC" offset="0x14" visible="true" entrySize="0xC">
+		<tagRef name="Sound" offset="0x0" visible="true" />
+		<bitfield16 name="Flags" offset="0x8" visible="true">
+			<bit name="Allow On Player" index="0" />
+			<bit name="Left Arm Only" index="1" />
+			<bit name="Right Arm Only" index="2" />
+			<bit name="First-Person Only" index="3" />
+			<bit name="Forward Only" index="4" />
+			<bit name="Reverse Only" index="5" />
+		</bitfield16>
+		<int16 name="Unknown" offset="0xA" visible="false" />
+	</reflexive>
+	<reflexive name="Effect References|ABCDCC" offset="0x1C" visible="true" entrySize="0xC">
+		<tagRef name="Effect" offset="0x0" visible="true" />
+		<bitfield16 name="Flags" offset="0x8" visible="true">
+			<bit name="Allow On Player" index="0" />
+			<bit name="Left Arm Only" index="1" />
+			<bit name="Right Arm Only" index="2" />
+			<bit name="First-Person Only" index="3" />
+			<bit name="Forward Only" index="4" />
+			<bit name="Reverse Only" index="5" />
+		</bitfield16>
+		<int16 name="Unknown" offset="0xA" visible="false" />
+	</reflexive>
+	<reflexive name="Blend Screens|ABCDCC" offset="0x24" visible="true" entrySize="0x1C">
+		<stringid name="Label" offset="0x0" visible="true" />
+		<comment title="STRUCT Aiming Screen" />
+		<degree name="Right Yaw Per Frame" offset="0x4" visible="true" />
+		<degree name="Left Yaw Per Frame" offset="0x8" visible="true" />
+		<int16 name="Right Frame Count" offset="0xC" visible="true" />
+		<int16 name="Left Frame Count" offset="0xE" visible="true" />
+		<degree name="Down Pitch Per Frame" offset="0x10" visible="true" />
+		<degree name="Up Pitch Per Frame" offset="0x14" visible="true" />
+		<int16 name="Down Pitch Frame Count" offset="0x18" visible="true" />
+		<int16 name="Up Pitch Frame Count" offset="0x1A" visible="true" />
+	</reflexive>
+	<reflexive name="Animations" offset="0x2C" visible="true" entrySize="0x60">
+		<stringid name="Name" offset="0x0" visible="true" />
+		<comment title="Play On Player" />
+		<int32 name="Node List Checksum" offset="0x4" visible="true" />
+		<int32 name="Production Checksum" offset="0x8" visible="true" />
+		<int32 name="Import Checksum" offset="0xC" visible="true" />
+		<enum8 name="Type" offset="0x10" visible="true">
+			<option name="Base" value="0x0" />
+			<option name="Overlay" value="0x1" />
+			<option name="Replacement" value="0x2" />
+		</enum8>
+		<enum8 name="Frame Info Type" offset="0x11" visible="true">
+			<option name="None" value="0x0" />
+			<option name="Dx,Dy" value="0x1" />
+			<option name="Dx,Dy,Dyaw" value="0x2" />
+			<option name="Dx,Dy,Dz,Dyaw" value="0x3" />
+		</enum8>
+		<int8 name="Blend Screen index" offset="0x12" visible="true" />
+		<int8 name="Node Count" offset="0x13" visible="true" />
+		<int16 name="Frame Count" offset="0x14" visible="true" />
+		<bitfield8 name="Internal Flags" offset="0x16" visible="true">
+			<bit name="&lt;Unused0&gt;" index="0" />
+			<bit name="World Relative" index="1" />
+			<bit name="&lt;Unused1&gt;" index="2" />
+			<bit name="&lt;Unused2&gt;" index="3" />
+			<bit name="&lt;Unused3&gt;" index="4" />
+			<bit name="Compression Disabled" index="5" />
+			<bit name="Old Production Checksum" index="6" />
+			<bit name="Valid Production Checksum" index="7" />
+		</bitfield8>
+		<bitfield8 name="Production Flags" offset="0x17" visible="true">
+			<bit name="Do Not Monitor Changes" index="0" />
+			<bit name="Verify Sound Events" index="1" />
+			<bit name="Do Not Inherit For Player Graphs" index="2" />
+		</bitfield8>
+		<bitfield16 name="Playback Flags" offset="0x18" visible="true">
+			<bit name="Disable Interpolation In" index="0" />
+			<bit name="Disable Interpolation Out" index="1" />
+			<bit name="Disable Mode Ik" index="2" />
+			<bit name="Disable Weapon Ik" index="3" />
+			<bit name="Disable Weapon Aim/1St Person" index="4" />
+			<bit name="Disable Look Screen" index="5" />
+			<bit name="Disable Transition Adjustment" index="6" />
+		</bitfield16>
+		<enum8 name="Desired Compression" offset="0x1A" visible="true">
+			<option name="Best Score" value="0x0" />
+			<option name="Best Compression" value="0x1" />
+			<option name="Best Accuracy" value="0x2" />
+			<option name="Best Fullframe" value="0x3" />
+			<option name="Best Small Keyframe" value="0x4" />
+			<option name="Best Large Keyframe" value="0x5" />
+		</enum8>
+		<enum8 name="Current Compression" offset="0x1B" visible="true">
+			<option name="Best Score" value="0x0" />
+			<option name="Best Compression" value="0x1" />
+			<option name="Best Accuracy" value="0x2" />
+			<option name="Best Fullframe" value="0x3" />
+			<option name="Best Small Keyframe" value="0x4" />
+			<option name="Best Large Keyframe" value="0x5" />
+		</enum8>
+		<float32 name="Weight" offset="0x1C" visible="true" />
+		<int16 name="Loop Frame Index" offset="0x20" visible="true" />
+		<int16 name=" index" offset="0x22" visible="true" />
+		<int16 name=" index" offset="0x24" visible="true" />
+		<int16 name="Unknown" offset="0x26" visible="false" />
+		<dataref name="" offset="0x28" visible="true" />
+		<int8 name="" offset="0x30" visible="true" />
+		<int8 name="" offset="0x31" visible="true" />
+		<int16 name="" offset="0x32" visible="true" />
+		<int16 name="" offset="0x34" visible="true" />
+		<int16 name="" offset="0x36" visible="true" />
+		<int32 name="" offset="0x38" visible="true" />
+		<int32 name="" offset="0x3C" visible="true" />
+		<reflexive name="Frame Events|ABCDCC" offset="0x40" visible="true" entrySize="0x4">
+			<enum16 name="Type" offset="0x0" visible="true">
+				<option name="Primary Keyframe" value="0x0" />
+				<option name="Secondary Keyframe" value="0x1" />
+				<option name="Left Foot" value="0x2" />
+				<option name="Right Foot" value="0x3" />
+				<option name="Allow Interruption" value="0x4" />
+				<option name="Transition A" value="0x5" />
+				<option name="Transition B" value="0x6" />
+				<option name="Transition C" value="0x7" />
+				<option name="Transition D" value="0x8" />
+				<option name="Both-Feet Shuffle" value="0x9" />
+				<option name="Body Impact" value="0xA" />
+			</enum16>
+			<int16 name="Frame" offset="0x2" visible="true" />
+		</reflexive>
+		<reflexive name="Sound Events|ABCDCC" offset="0x48" visible="true" entrySize="0x8">
+			<int16 name="Sound index" offset="0x0" visible="true" />
+			<int16 name="Frame" offset="0x2" visible="true" />
+			<stringid name="Marker Name" offset="0x4" visible="true" />
+		</reflexive>
+		<reflexive name="Effect Events|ABCDCC" offset="0x50" visible="true" entrySize="0x4">
+			<int16 name="Effect index" offset="0x0" visible="true" />
+			<int16 name="Frame" offset="0x2" visible="true" />
+		</reflexive>
+		<reflexive name="Object-Space Parent Nodes|ABCDCC" offset="0x58" visible="true" entrySize="0x1C">
+			<int16 name="Node Index" offset="0x0" visible="true" />
+			<bitfield16 name="Component Flags" offset="0x2" visible="true">
+				<bit name="Rotation" index="0" />
+				<bit name="Translation" index="1" />
+				<bit name="Scale" index="2" />
+			</bitfield16>
+			<comment title="STRUCT Orientation" />
+			<int16 name="Rotation X" offset="0x4" visible="true" />
+			<int16 name="Rotation Y" offset="0x6" visible="true" />
+			<int16 name="Rotation Z" offset="0x8" visible="true" />
+			<int16 name="Rotation W" offset="0xA" visible="true" />
+			<float32 name="Default Translation x" offset="0xC" visible="true" />
+			<float32 name="Default Translation y" offset="0x10" visible="true" />
+			<float32 name="Default Translation z" offset="0x14" visible="true" />
+			<float32 name="Default Scale" offset="0x18" visible="true" />
+		</reflexive>
+	</reflexive>
+	<comment title="STRUCT Content" />
+	<comment title="MODE-N-STATE GRAPH" />
+	<reflexive name="Modes|AABBCC" offset="0x34" visible="true" entrySize="0x14">
+		<stringid name="Label" offset="0x0" visible="true" />
+		<reflexive name="Weapon Class|AABBCC" offset="0x4" visible="true" entrySize="0x14">
+			<stringid name="Label" offset="0x0" visible="true" />
+			<reflexive name="Weapon Type|AABBCC" offset="0x4" visible="true" entrySize="0x34">
+				<stringid name="Label" offset="0x0" visible="true" />
+				<reflexive name="Actions|AABBCC" offset="0x4" visible="true" entrySize="0x8">
+					<stringid name="Label" offset="0x0" visible="true" />
+					<comment title="STRUCT Animation" />
+					<int16 name="Graph Index" offset="0x4" visible="true" />
+					<int16 name="Animation index" offset="0x6" visible="true" />
+				</reflexive>
+				<reflexive name="Overlays|AABBCC" offset="0xC" visible="true" entrySize="0x8">
+					<stringid name="Label" offset="0x0" visible="true" />
+					<comment title="STRUCT Animation" />
+					<int16 name="Graph Index" offset="0x4" visible="true" />
+					<int16 name="Animation index" offset="0x6" visible="true" />
+				</reflexive>
+				<reflexive name="Death And Damage|AABBCC" offset="0x14" visible="true" entrySize="0xC">
+					<stringid name="Label" offset="0x0" visible="true" />
+					<reflexive name="Directions" offset="0x4" visible="true" entrySize="0x8">
+						<reflexive name="Regions" offset="0x0" visible="true" entrySize="0x4">
+							<comment title="STRUCT Animation" />
+							<int16 name="Graph Index" offset="0x0" visible="true" />
+							<int16 name="Animation index" offset="0x2" visible="true" />
+						</reflexive>
+					</reflexive>
+				</reflexive>
+				<reflexive name="Transitions|AABBCC" offset="0x1C" visible="true" entrySize="0x14">
+					<stringid name="Full Name" offset="0x0" visible="true" />
+					<comment title="STRUCT State Info" />
+					<stringid name="State Name" offset="0x4" visible="true" />
+					<int16 name="Unknown" offset="0x8" visible="false" />
+					<int8 name="Index A" offset="0xA" visible="true" />
+					<int8 name="Index B" offset="0xB" visible="true" />
+					<reflexive name="Destinations|AABBCC" offset="0xC" visible="true" entrySize="0x14">
+						<stringid name="Full Name" offset="0x0" visible="true" />
+						<stringid name="Mode" offset="0x4" visible="true" />
+						<comment title="STRUCT State Info" />
+						<stringid name="State Name" offset="0x8" visible="true" />
+						<enum8 name="Frame Event Link" offset="0xC" visible="true">
+							<option name="NO KEYFRAME" value="0x0" />
+							<option name="KEYFRAME TYPE A" value="0x1" />
+							<option name="KEYFRAME TYPE B" value="0x2" />
+							<option name="KEYFRAME TYPE C" value="0x3" />
+							<option name="KEYFRAME TYPE D" value="0x4" />
+						</enum8>
+						<int8 name="Unknown" offset="0xD" visible="false" />
+						<int8 name="Index A" offset="0xE" visible="true" />
+						<int8 name="Index B" offset="0xF" visible="true" />
+						<comment title="STRUCT Animation" />
+						<int16 name="Graph Index" offset="0x10" visible="true" />
+						<int16 name="Animation index" offset="0x12" visible="true" />
+					</reflexive>
+				</reflexive>
+				<reflexive name="High Precache|CCCCC" offset="0x24" visible="true" entrySize="0x4">
+					<int32 name="Cache Block Index" offset="0x0" visible="true" />
+				</reflexive>
+				<reflexive name="Low Precache|CCCCC" offset="0x2C" visible="true" entrySize="0x4">
+					<int32 name="Cache Block Index" offset="0x0" visible="true" />
+				</reflexive>
+			</reflexive>
+			<reflexive name="Weapon Ik|AABBCC" offset="0xC" visible="true" entrySize="0x8">
+				<stringid name="Marker" offset="0x0" visible="true" />
+				<stringid name="Attach To Marker" offset="0x4" visible="true" />
+			</reflexive>
+		</reflexive>
+		<reflexive name="Mode Ik|AABBCC" offset="0xC" visible="true" entrySize="0x8">
+			<stringid name="Marker" offset="0x0" visible="true" />
+			<stringid name="Attach To Marker" offset="0x4" visible="true" />
+		</reflexive>
+	</reflexive>
+	<comment title="SPECIAL CASE ANIMS" />
+	<reflexive name="Vehicle Suspension|CCAABB" offset="0x3C" visible="true" entrySize="0x28">
+		<stringid name="Label" offset="0x0" visible="true" />
+		<comment title="STRUCT Animation" />
+		<int16 name="Graph Index" offset="0x4" visible="true" />
+		<int16 name="Animation index" offset="0x6" visible="true" />
+		<stringid name="Marker Name" offset="0x8" visible="true" />
+		<float32 name="Mass Point Offset" offset="0xC" visible="true" />
+		<float32 name="Full Extension Ground Depth" offset="0x10" visible="true" />
+		<float32 name="Full Compression Ground Depth" offset="0x14" visible="true" />
+		<comment title="Destroyed Suspension">Only Necessary for suspensions with a destroyed state</comment>
+		<stringid name="Region Name" offset="0x18" visible="true" />
+		<float32 name="Destroyed Mass Point Offset" offset="0x1C" visible="true" />
+		<float32 name="Destroyed Full Extension Ground Depth" offset="0x20" visible="true" />
+		<float32 name="Destroyed Full Compression Ground Depth" offset="0x24" visible="true" />
+	</reflexive>
+	<reflexive name="Object Overlays|CCAABB" offset="0x44" visible="true" entrySize="0x14">
+		<stringid name="Label" offset="0x0" visible="true" />
+		<comment title="STRUCT Animation" />
+		<int16 name="Graph Index" offset="0x4" visible="true" />
+		<int16 name="Animation index" offset="0x6" visible="true" />
+		<int16 name="Unknown" offset="0x8" visible="false" />
+		<enum16 name="Function Controls" offset="0xA" visible="true">
+			<option name="Frame" value="0x0" />
+			<option name="Scale" value="0x1" />
+		</enum16>
+		<stringid name="Function" offset="0xC" visible="true" />
+		<undefined name="Unknown" offset="0x10" visible="false" />
+	</reflexive>
+	<comment title="STRUCT Run Time Data" />
+	<comment title="RUN-TIME DATA" />
+	<reflexive name="Inheritence List" offset="0x4C" visible="true" entrySize="0x20">
+		<tagRef name="Inherited Graph" offset="0x0" visible="true" />
+		<reflexive name="Node Map" offset="0x8" visible="true" entrySize="0x2">
+			<int16 name="Local Node" offset="0x0" visible="true" />
+		</reflexive>
+		<reflexive name="Node Map Flags" offset="0x10" visible="true" entrySize="0x4">
+			<int32 name="Local Node Flags" offset="0x0" visible="true" />
+		</reflexive>
+		<float32 name="Root Z Offset" offset="0x18" visible="true" />
+		<int32 name="Inheritance Flags" offset="0x1C" visible="true" />
+	</reflexive>
+	<reflexive name="Weapon List" offset="0x54" visible="true" entrySize="0x8">
+		<stringid name="Weapon Name" offset="0x0" visible="true" />
+		<stringid name="Weapon Class" offset="0x4" visible="true" />
+	</reflexive>
+	<undefined name="Unknown" offset="0x5C" visible="false" />
+	<undefined name="Unknown" offset="0x60" visible="false" />
+	<undefined name="Unknown" offset="0x64" visible="false" />
+	<undefined name="Unknown" offset="0x68" visible="false" />
+	<undefined name="Unknown" offset="0x6C" visible="false" />
+	<undefined name="Unknown" offset="0x70" visible="false" />
+	<undefined name="Unknown" offset="0x74" visible="false" />
+	<undefined name="Unknown" offset="0x78" visible="false" />
+	<undefined name="Unknown" offset="0x7C" visible="false" />
+	<undefined name="Unknown" offset="0x80" visible="false" />
+	<undefined name="Unknown" offset="0x84" visible="false" />
+	<undefined name="Unknown" offset="0x88" visible="false" />
+	<undefined name="Unknown" offset="0x8C" visible="false" />
+	<undefined name="Unknown" offset="0x90" visible="false" />
+	<undefined name="Unknown" offset="0x94" visible="false" />
+	<undefined name="Unknown" offset="0x98" visible="false" />
+	<comment title="RESULTS OF THE LAST IMPORT" />
+	<dataref name="Last Import Results" offset="0x9C" visible="true" />
+	<reflexive name="Additional Node Data" offset="0xA4" visible="true" entrySize="0x3C">
+		<stringid name="Node Name" offset="0x0" visible="true" />
+		<float32 name="Default Rotation i" offset="0x4" visible="true" />
+		<float32 name="Default Rotation j" offset="0x8" visible="true" />
+		<float32 name="Default Rotation k" offset="0xC" visible="true" />
+		<float32 name="Default Rotation w" offset="0x10" visible="true" />
+		<float32 name="Default Translation x" offset="0x14" visible="true" />
+		<float32 name="Default Translation y" offset="0x18" visible="true" />
+		<float32 name="Default Translation z" offset="0x1C" visible="true" />
+		<float32 name="Default Scale" offset="0x20" visible="true" />
+		<float32 name="Min Bounds x" offset="0x24" visible="true" />
+		<float32 name="Min Bounds y" offset="0x28" visible="true" />
+		<float32 name="Min Bounds z" offset="0x2C" visible="true" />
+		<float32 name="Max Bounds x" offset="0x30" visible="true" />
+		<float32 name="Max Bounds y" offset="0x34" visible="true" />
+		<float32 name="Max Bounds z" offset="0x38" visible="true" />
+	</reflexive>
+</plugin>
