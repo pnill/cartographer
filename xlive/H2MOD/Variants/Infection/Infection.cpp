@@ -52,7 +52,7 @@ void Infection::sendTeamChange()
 				else
 				{
 					if (!h2mod->Server)
-						h2mod->set_local_team_index(zombieIndex == index ? ZOMBIE_TEAM : HUMAN_TEAM);
+						h2mod->set_local_team_index(0, zombieIndex == index ? ZOMBIE_TEAM : HUMAN_TEAM);
 				}
 
 				index++;
@@ -86,7 +86,7 @@ void Infection::initClient()
 	//Change Local Player's Team to Human if Not in Green
 	//(In case player wants to start as Alpha Zombie leave him green)
 	if (h2mod->get_local_team_index() != ZOMBIE_TEAM) {
-		h2mod->set_local_team_index(HUMAN_TEAM);
+		h2mod->set_local_team_index(0, HUMAN_TEAM);
 	}
 }
 
@@ -213,8 +213,8 @@ void Infection::infectPlayer(int unitDatumIndex, int playerIndex) {
 
 		//If player being infected is LocalUser/Player
 		if (wcscmp(playername, h2mod->get_local_player_name()) == 0) {
-			LOG_TRACE_GAME("[h2mod-infection] Infected player, setting player as zombie");
-			h2mod->set_local_team_index(ZOMBIE_TEAM);
+			LOG_TRACE_GAME("[h2mod-infection] Setting player as zombie");
+			h2mod->set_local_team_index(0, ZOMBIE_TEAM);
 			h2mod->set_unit_biped(BipedType::Elite, playerIndex);
 		}
 		else {

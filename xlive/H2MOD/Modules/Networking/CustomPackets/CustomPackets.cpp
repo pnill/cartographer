@@ -137,7 +137,7 @@ void __stdcall message_gateway_hook(void *thisx, network_address* addr, int mess
 	case e_network_message_types::team_change:
 	{
 		s_team_change* pak = (s_team_change*)packet;
-		h2mod->set_local_team_index(pak->team_index);
+		h2mod->set_local_team_index(0, pak->team_index);
 		return;
 	}
 

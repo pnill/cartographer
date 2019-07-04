@@ -26,7 +26,7 @@ DatumIndex VariantPlayer::GetPlayerDatum(XUID xuid)
 {
 	if (xuid_to_player_datum.find(xuid) == xuid_to_player_datum.end())
 	{
-		for (auto i = 0; i < 15; i++)
+		for (auto i = 0; i < 16; i++)
 		{
 			if ((&game_state_players->players[i])->xuid == xuid)
 			{
@@ -57,7 +57,7 @@ DatumIndex VariantPlayer::GetUnitDatum(XUID xuid)
 
 	if (xuid_to_unit_datum.find(xuid) == xuid_to_unit_datum.end())
 	{
-		for (auto i = 0; i < 15; i++)
+		for (auto i = 0; i < 16; i++)
 		{
 
 			if ((&game_state_players->players[i])->xuid == xuid)
