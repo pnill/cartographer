@@ -64,6 +64,7 @@ bool tags::load_tag_debug_name()
 		|| (name_buffer_offset + name_buffer_size) > header->file_size || (tag_indices_offset + (tag_count * 4)) > header->file_size)
 	{
 		LOG_ERROR_FUNC("Debug tag names data in cache seems to be invalid?");
+		CloseHandle(cache_handle);
 		return false;
 	}
 
@@ -87,6 +88,7 @@ bool tags::load_tag_debug_name()
 		{
 			LOG_ERROR_FUNC("Out of bounds of debug name buffer!, corrupt map?");
 			delete[] tag_name_offsets;
+			CloseHandle(cache_handle);
 			return false;
 		}
 
@@ -94,6 +96,7 @@ bool tags::load_tag_debug_name()
 	}
 
 	delete[] tag_name_offsets;
+	CloseHandle(cache_handle);
 	return true;
 }
 

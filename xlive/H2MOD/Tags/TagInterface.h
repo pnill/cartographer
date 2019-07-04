@@ -167,6 +167,7 @@ namespace tags
 		return tag_datum;
 	}
 
+	/* Get parent tag groups for a tag group */
 	inline const tag_parent_info *get_tag_parent_info(const blam_tag &tag_type)
 	{
 		auto *header = get_tags_header();
@@ -271,7 +272,6 @@ namespace tags
 						datum = tag_instance->tag;
 						return datum;
 					}
-						
 				}
 			}
 
