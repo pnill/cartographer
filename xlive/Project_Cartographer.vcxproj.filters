@@ -477,9 +477,6 @@
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp">
       <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
     </ClCompile>
-    <ClCompile Include="H2MOD\Modules\MapFix\SPMapFix.cpp">
-      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp">
       <Filter>Source Files\H2MOD\Modules\Networking\Memory</Filter>
     </ClCompile>
@@ -962,9 +959,6 @@
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h">
       <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\MapFix\SPMapFix.h">
-      <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h">
       <Filter>Source Files\H2MOD\Modules\Networking\Memory</Filter>
     </ClInclude>
@@ -1215,6 +1209,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MetaLoader\meta_struct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\shad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

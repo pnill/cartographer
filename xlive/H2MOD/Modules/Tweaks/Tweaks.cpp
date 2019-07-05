@@ -19,6 +19,7 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD\Tags\TagInterface.h"
+#include "Blam\Cache\TagGroups\shad.h"
 
 #define _USE_MATH_DEFINES
 #include "math.h"
@@ -245,33 +246,33 @@ enum flags : int
 	windowed,
 	disable_voice_chat,
 	nosound,
-	unk1, // disable vista needed version check?
+	unk3, // disable vista needed version check?
 	disable_hardware_vertex_processing, // force hardware vertex processing off
 	novsync,
-	unk3, // squad browser/xlive/ui?
+	unk6, // squad browser/xlive/ui?
 	nointro, // disables intro movie
-	unk5, // some tag thing?
-	unk6, // some tag thing?
-	unk7, // some tag thing?
 	unk8, // some tag thing?
 	unk9, // some tag thing?
 	unk10, // some tag thing?
 	unk11, // some tag thing?
-	unk12, // seen near xlive init code
-	unk13,
+	unk12, // some tag thing?
+	unk13, // some tag thing?
+	unk14, // some tag thing?
+	unk15, // seen near xlive init code
+	unk16,
 	xbox_live_silver_account, // if true, disables 'gold-only' features, like quickmatch etc
-	unk15, // fuzzer/automated testing? (sapien)
+	unk18, // fuzzer/automated testing? (sapien)
 	ui_fast_test_no_start, // same as below but doesn't start a game
 	ui_fast_test, // auto navigates the UI selecting the default option
-	unk18, // player controls related (sapien)
+	unk21, // player controls related, is checked when using a vehicle
 	monitor_count,
-	unk19,
-	unk20,
-	unk21, // something to do with game time?
-	unk22,
-	unk23, // network? value seems unused?
-	high_quality, // forced sound reverb ignoring CPU score and disable forcing low graphical settings (sapien)
+	unk23,
 	unk24,
+	unk25, // something to do with game time?
+	unk26,
+	unk27, // network? value seems unused?
+	high_quality, // forced sound reverb ignoring CPU score and disable forcing low graphical settings (sapien)
+	unk29,
 
 	count
 };
@@ -421,8 +422,8 @@ bool engine_basic_init()
 	}
 	LocalFree(cmd_line_args);
 
-	if (flags_array[flags::unk22])
-		init_timing(1000 * flags_array[flags::unk22]);
+	if (flags_array[flags::unk26])
+		init_timing(1000 * flags_array[flags::unk26]);
 	real_math_initialize();
 	async_initialize();
 	global_preferences_initialize();
@@ -898,6 +899,36 @@ test_engine g_test_engine;
 
 
 
+void fix_shaders_nvida()
+{
+	DatumIndex bitmap_white    = tags::find_tag('bitm', "shaders\\default_bitmaps\\bitmaps\\alpha_white");
+	DatumIndex borked_template = tags::find_tag('stem', "shaders\\shader_templates\\opaque\\tex_bump_alpha_test_single_pass");
+
+	LOG_DEBUG_FUNC("bitmap white {0}, borked_template {1}", bitmap_white.data, borked_template.data);
+
+	if (bitmap_white.IsNull() || borked_template.IsNull())
+		return;
+
+	tags::ilterator shaders('shad');
+	while (!shaders.next().IsNull())
+	{
+		auto *shader = LOG_CHECK(tags::get_tag<'shad', TagGroups::shad>(shaders.datum));
+		if (shader && shader->shader_template.TagIndex == borked_template && LOG_CHECK(shader->postprocessDefinition.size > 0))
+		{
+			LOG_DEBUG_FUNC("shader {} has borked template", tags::get_tag_name(shaders.datum));
+			auto *post_processing = shader->postprocessDefinition[0];
+			if (LOG_CHECK(post_processing->bitmaps.size >= 5))
+			{
+				auto *bitmap_block = post_processing->bitmaps[4];
+				if (bitmap_block->bitmapGroup == bitmap_white)
+				{
+					LOG_DEBUG_FUNC("Nulled bitmap 4");
+					bitmap_block->bitmapGroup = DatumIndex::Null;
+				}
+			}
+		}
+	}
+}
 
 void InitH2Tweaks() {
 	postConfig();
@@ -1007,6 +1038,8 @@ void InitH2Tweaks() {
 
 		//Redirect the variable for the server name to ours.
 		WriteValue(H2BaseAddr + 0x001b2ce8, (DWORD)ServerLobbyName);
+
+		tags::on_map_load(fix_shaders_nvida);
 	}
 
 	// Both server and client

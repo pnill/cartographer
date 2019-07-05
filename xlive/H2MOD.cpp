@@ -5,7 +5,6 @@
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\HitFix\Hitfix.h"
-#include "H2MOD\Modules\MapFix\SPMapfix.h"
 #include "H2MOD\Modules\MapFix\MPMapfix.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
@@ -1191,7 +1190,6 @@ void __cdecl OnMapLoad(int a1)
 		H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 		H2Tweaks::enable60FPSCutscenes();
 		H2Tweaks::setSavedSens();
-		SPMapFix::Initialize();
 	}
 
 	p_set_random_number(a1);

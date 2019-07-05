@@ -17,9 +17,9 @@ namespace Blam
 			struct Reflexive
 			{
 				//* Returns Number of Block Field Elements
-				UINT32 GetElementCount();
+				uint32_t GetElementCount();
 				//* Returns Block Field Offset
-				UINT32 GetFieldOffset();
+				uint32_t GetFieldOffset();
 				//* Returns Tag Block Field Size
 				std::size_t GetFieldSize();
 				//* Returns Total Tag Block Field Size of all Elements
@@ -40,9 +40,9 @@ namespace Blam
 				void RemoveAt(int);
 			private:
 				//* Number of Block Field Elements
-				UINT32 TagBlockCount;
+				uint32_t TagBlockCount;
 				//* Block Field Offset
-				UINT32 TagBlockOffset;
+				uint32_t TagBlockOffset;
 			};
 		}
 	}
@@ -60,7 +60,7 @@ void Blam::Cache::DataTypes::Reflexive<T>::Open()
 
 	//Do same for the child Blocks
 	T* iterator = (T*)(this->GetTagBlockElements());
-	for (int i = 0; i < this->GetElementCount(); i++)
+	for (uint32_t i = 0; i < this->GetElementCount(); i++)
 	{
 		iterator->Open();
 		i++;
@@ -74,7 +74,7 @@ void Blam::Cache::DataTypes::Reflexive<T>::Close()
 
 	//first close child Blocks
 	T* iterator = (T*)(this->GetTagBlockElements());
-	for (int i = 0; i < this->GetElementCount(); i++)
+	for (uint32_t i = 0; i < this->GetElementCount(); i++)
 	{
 		iterator->Close();
 		i++;
@@ -121,7 +121,7 @@ void Blam::Cache::DataTypes::Reflexive<T>::RemoveAt(int index)
 	char* optr = (char*)this->GetTagBlockElements();
 	//iterate and add reqired
 	int j = 0;///to use as an index index for dest
-	for (int i = 0; i < TagBlockCount; i++)
+	for (uint32_t i = 0; i < TagBlockCount; i++)
 	{
 		if (i != index)
 		{

@@ -5,7 +5,7 @@
 #include "..\H2MOD\Tags\TagInterface.h"
 
 extern DWORD H2BaseAddr;
-template<typename T>
+template<typename T = void>
 struct tag_block
 {
 	size_t size;
@@ -24,6 +24,7 @@ struct tag_block
 
 	T *end()
 	{
+		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
 		if (this->begin())
 			return &this->begin()[this->size];
 		else
@@ -32,6 +33,7 @@ struct tag_block
 
 	T *operator[](size_t index)
 	{
+		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
 		if (index == NONE)
 			return nullptr;
 		if (index >= this->size)
