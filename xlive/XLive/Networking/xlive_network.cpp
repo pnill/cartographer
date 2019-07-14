@@ -218,7 +218,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		break;
 	}
 
-	u_long xn = userManager.xnmap[iplong];
+	u_long xn = userManager.xnmap[iplong]; // at this point iplong is secure addr
 
 	if (xn != 0)
 	{
@@ -265,21 +265,12 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 		{
 			if (*(ULONG*)buf == annoyance_factor && ret == 12 + sizeof(XNADDR))
 			{
-				ULONG secure = *(ULONG*)(buf + 4);
-
-				userManager.secure_map[hostpair] = secure;
+				ULONG secure = *(ULONG*)(buf + 4);	
 
 				LOG_TRACE_NETWORK("[H2MOD-Network] Received secure packet with ip addr {0:x}, port: {1}, secure: {2:x}", htonl(iplong), htons(port), secure);
-				CUser* user = userManager.cusers[secure]; // Try to get the user by the secure address they've sent.
-				if (user)
-				{
-					if (user->xnaddr.ina.s_addr != iplong)
-					{
-						user->xnaddr.ina.s_addr = iplong;
-					}
-				}
-				else // only create the user if they're not already in the system.
-					userManager.CreateUser((XNADDR*)(buf + 8), TRUE);
+				XNADDR* userxn = reinterpret_cast<XNADDR*>(buf + 8);
+				userManager.CreateUser(userxn, TRUE);
+				userManager.secure_map[hostpair] = secure;
 
 				ret = 0;
 			}

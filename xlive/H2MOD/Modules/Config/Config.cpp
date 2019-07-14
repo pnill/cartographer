@@ -1867,7 +1867,7 @@ void ReadH2Config() {
 			swprintf(fileConfigPath, 1024, H2ConfigFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
 			swprintf(fileConfigPathLog, 1124, L"Reading Config: \"%ws\"", fileConfigPath);
 			addDebugText(fileConfigPathLog);
-			_wfopen_s(&fileConfig,fileConfigPath, L"rb");
+			_wfopen_s(&fileConfig, fileConfigPath, L"rb");
 
 			if (!fileConfig) {
 				addDebugText("H2Configuration File does not exist.");

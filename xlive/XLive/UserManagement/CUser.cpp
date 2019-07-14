@@ -49,13 +49,29 @@ void CUserManagement::CreateUser(const XNADDR* pxna, BOOL user)
 		This should now also be called when receiving the 'SecurityPacket' because we have the data on the first attempt to either establish a connection OR on the attempt to join a game,
 		That should eliminate the need to talk to the Master server in order to get the XNADDR information from the secure address.
 	*/
-	LOG_TRACE_NETWORK("CUserManagement::CreateUser() secure address {:x}", pxna->inaOnline.s_addr);
 
+	LOG_TRACE_NETWORK("[Resources-Clear] CreateUser executed on thread {:x}", GetCurrentThreadId());
 	ULONG secure = pxna->inaOnline.s_addr;
-	CUser *nUser = new CUser;
-	memset(&nUser->xnaddr, 0x00, sizeof(XNADDR));
-	memcpy(&nUser->xnaddr, pxna, sizeof(XNADDR));
-	nUser->secure.s_addr = secure;
+	CUser* nUser = cusers[secure];
+	// check if the user is already in the system
+	if (nUser == nullptr)
+	{
+		// allocate new mem for the new peer
+		LOG_TRACE_NETWORK("CUserManagement::CreateUser() new secure address {:x}", pxna->inaOnline.s_addr);
+
+		nUser = new CUser;
+		memset(&nUser->xnaddr, 0x00, sizeof(XNADDR));
+		memcpy(&nUser->xnaddr, pxna, sizeof(XNADDR));
+		this->cusers[secure] = nUser;
+		nUser->secure.s_addr = secure;
+		nUser->bValid = true;
+	}
+	else 
+	{
+		// if he is in system update the XNADDR
+		LOG_TRACE_NETWORK("CUserManagement::CreateUser() already present secure address {:x}, updating data", secure);
+		memcpy(&nUser->xnaddr, pxna, sizeof(XNADDR)); // update XNADDR 
+	}
 
 	/*
 		In theory to handle multiple instance servers in the future what we can do is populate the port field of CreateUser,
@@ -96,51 +112,41 @@ void CUserManagement::CreateUser(const XNADDR* pxna, BOOL user)
 
 		this->secure_map[hostpair] = secure;
 		this->secure_map[hostpair_1000] = secure;
-		this->cusers[secure] = nUser;
-		this->xnmap[secure] = pxna->ina.s_addr;
 
 		this->pmap_a[secure] = nPort_base;
 		this->pmap_b[secure] = nPort_join;
 	}
-	else
-	{
-		/*
-			If the user variable is true, we update cusers "array" to map the secure address to the newly created object...
-			Then map the secure address to the WAN IP (XN->ina) using xnmap, where secure address is the key to the array.
-			Then map the abenet to the secure address via xntosecure[ab], where AB is the key to the array.
-		*/
-		this->cusers[secure] = nUser;
-		this->xnmap[secure] = pxna->ina.s_addr;
-	}
-
-	nUser->bValid = true;
+	this->xnmap[secure] = pxna->ina.s_addr;
 }
 
-// FIXME
 void CUserManagement::UnregisterSecureAddr(const IN_ADDR ina)
 {
 	CUser* to_remove_user = cusers[ina.s_addr];
 	if (to_remove_user != nullptr)
 	{
-		std::pair<ULONG, short> smap, smap1;
-		if (to_remove_user->xnaddr.ina.s_addr == H2Config_ip_wan)
+		if (xnmap[ina.s_addr])
+			xnmap.erase(ina.s_addr);
+
+		if (pmap_a[ina.s_addr])
+			pmap_a.erase(ina.s_addr);
+
+		if (pmap_b[ina.s_addr])
+			pmap_b.erase(ina.s_addr);
+
+		if (cusers[ina.s_addr])
+			cusers.erase(ina.s_addr);
+
+		for (auto it : secure_map)
 		{
-			smap = std::make_pair(H2Config_ip_lan, to_remove_user->xnaddr.wPortOnline);
-			smap1 = std::make_pair(H2Config_ip_lan, ntohs(htons(to_remove_user->xnaddr.wPortOnline) + 1));
+			if (it.second == ina.s_addr) {
+				secure_map.erase(it.first);
+				break;
+			}
 		}
-		else
-		{
-			smap = std::make_pair(to_remove_user->xnaddr.ina.s_addr, to_remove_user->xnaddr.wPortOnline);
-			smap1 = std::make_pair(to_remove_user->xnaddr.ina.s_addr, ntohs(htons(to_remove_user->xnaddr.wPortOnline) + 1));
-		}
-		auto sec_map = secure_map.find(smap);
-		auto sec_map1 = secure_map.find(smap1);
-		secure_map.erase(sec_map);
-		secure_map.erase(sec_map1);
-		auto it = cusers.find(ina.s_addr);
-		cusers.erase(it);
+
 		delete to_remove_user;
 	}
+	LOG_TRACE_NETWORK("[Resources-Clear] UnregisterSecureAddr executed on thread {:x}", GetCurrentThreadId());
 }
 
 void CUserManagement::UpdateConnectionStatus() {
@@ -233,8 +239,10 @@ BOOL CUserManagement::GetLocalXNAddr(XNADDR* pxna)
 // #57: XNetXnAddrToInAddr
 INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pnkid, IN_ADDR *pina)
 {
-	LOG_TRACE_NETWORK("XNetXNAddrToInAddr(): secure: {:x}", pxna->inaOnline.s_addr);
-	LOG_TRACE_NETWORK("XNetXnAddrToInAddr(): ina.s_addr: {:x}", pxna->ina.s_addr);
+	LOG_TRACE_NETWORK("XNetXnAddrToInAddr(): secure: {:x}", pxna->inaOnline.s_addr);
+	LOG_TRACE_NETWORK("XNetXnAddrToInAddr(): ip-address: {:x}", pxna->ina.s_addr);
+
+	LOG_TRACE_NETWORK("[Resources-Clear] XNetXnAddrToInAddr executed on thread {:x}", GetCurrentThreadId());
 
 	if (pxna->inaOnline.s_addr != NULL) {
 		CUser* user = userManager.cusers[pxna->inaOnline.s_addr];
@@ -267,7 +275,7 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("XNetInAddrToXnAddr() the peer with secure/ipaddress {:x} doesn't exist!", ina.s_addr);
+		LOG_TRACE_NETWORK("XNetInAddrToXnAddr() the peer with secure/ip-address {:x} doesn't exist!", ina.s_addr);
 	}
 
 	return 0;
@@ -277,6 +285,9 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
 int WINAPI XNetUnregisterInAddr(const IN_ADDR ina)
 {
 	LOG_TRACE_NETWORK("XNetUnregisterInAddr(): {:x}", ina.s_addr);
+	// this doesn't seem to be a good idea for clearing the peer NAT and other information
+	// because for whatever reason the game keeps sending connection requests even in game for a odd reason, maybe voice chat
+	// and it calls this constantly
 	//userManager.UnregisterSecureAddr(ina);
 	return 0;
 }

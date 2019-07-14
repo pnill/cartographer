@@ -932,7 +932,7 @@ void fix_shader_template_nvidia(const std::string &template_name, const std::str
 	}
 }
 
-void fix_shaders_nvida()
+void fix_shaders_nvidia()
 {
 	fix_shader_template_nvidia(
 		"shaders\\shader_templates\\opaque\\tex_bump_alpha_test_single_pass", 
@@ -1056,7 +1056,7 @@ void InitH2Tweaks() {
 		//Redirect the variable for the server name to ours.
 		WriteValue(H2BaseAddr + 0x001b2ce8, (DWORD)ServerLobbyName);
 
-		tags::on_map_load(fix_shaders_nvida);
+		tags::on_map_load(fix_shaders_nvidia);
 	}
 
 	// Both server and client
