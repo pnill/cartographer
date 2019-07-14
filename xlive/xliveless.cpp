@@ -187,7 +187,7 @@ BOOL SetDlcBasepath( int num )
 
 					// check file exists
 					FILE *fp_dlc;
-					fp_dlc = _wfopen( wnum.c_str(), L"rb" );
+					_wfopen_s(&fp_dlc, wnum.c_str(), L"rb" );
 					if( !fp_dlc )
 						continue;
 
@@ -972,8 +972,7 @@ DWORD WINAPI XStorageUploadFromMemory( DWORD dwUserIndex, const WCHAR *wszServer
 
 
 	FILE *fp;
-
-	fp = _wfopen( wszServerPath, L"wb" );
+	_wfopen_s(&fp, wszServerPath, L"wb" );
 	if( fp )
 	{
 		fwrite( pbBuffer, 1, dwBufferSize, fp );
@@ -1471,7 +1470,7 @@ DWORD WINAPI XStorageDownloadToMemory( DWORD dwUserIndex, const WCHAR *wszServer
 
 
 	FILE *fp;
-	fp = _wfopen( wszServerPath, L"rb" );
+	_wfopen_s(&fp, wszServerPath, L"rb" );
 	if( !fp )
 	{
 		LOG_TRACE_XLIVE( "- ERROR: file does not exist" );

@@ -899,15 +899,17 @@ test_engine g_test_engine;
 
 
 
-void fix_shaders_nvida()
+void fix_shader_template_nvidia(const std::string &template_name, const std::string &bitmap_name, size_t bitmap_idx)
 {
-	DatumIndex bitmap_white    = tags::find_tag('bitm', "shaders\\default_bitmaps\\bitmaps\\alpha_white");
-	DatumIndex borked_template = tags::find_tag('stem', "shaders\\shader_templates\\opaque\\tex_bump_alpha_test_single_pass");
+	DatumIndex bitmap_to_fix    = tags::find_tag('bitm', bitmap_name);
+	DatumIndex borked_template  = tags::find_tag('stem', template_name);
 
-	LOG_DEBUG_FUNC("bitmap white {0}, borked_template {1}", bitmap_white.data, borked_template.data);
+	LOG_DEBUG_FUNC("bitmap {0}, borked_template {1}", bitmap_to_fix.data, borked_template.data);
 
-	if (bitmap_white.IsNull() || borked_template.IsNull())
+	if (bitmap_to_fix.IsNull() || borked_template.IsNull())
 		return;
+
+	LOG_DEBUG_FUNC("Fixing: template {}, bitmap {}", template_name, bitmap_name);
 
 	tags::ilterator shaders('shad');
 	while (!shaders.next().IsNull())
@@ -917,17 +919,32 @@ void fix_shaders_nvida()
 		{
 			LOG_DEBUG_FUNC("shader {} has borked template", tags::get_tag_name(shaders.datum));
 			auto *post_processing = shader->postprocessDefinition[0];
-			if (LOG_CHECK(post_processing->bitmaps.size >= 5))
+			if (LOG_CHECK(post_processing->bitmaps.size >= (bitmap_idx + 1)))
 			{
-				auto *bitmap_block = post_processing->bitmaps[4];
-				if (bitmap_block->bitmapGroup == bitmap_white)
+				auto *bitmap_block = post_processing->bitmaps[bitmap_idx];
+				if (bitmap_block->bitmapGroup == bitmap_to_fix)
 				{
-					LOG_DEBUG_FUNC("Nulled bitmap 4");
+					LOG_DEBUG_FUNC("Nulled bitmap {}", bitmap_idx);
 					bitmap_block->bitmapGroup = DatumIndex::Null;
 				}
 			}
 		}
 	}
+}
+
+void fix_shaders_nvida()
+{
+	fix_shader_template_nvidia(
+		"shaders\\shader_templates\\opaque\\tex_bump_alpha_test_single_pass", 
+		"shaders\\default_bitmaps\\bitmaps\\alpha_white",
+		4
+	);
+
+	fix_shader_template_nvidia(
+		"shaders\\shader_templates\\opaque\\tex_bump_alpha_test",
+		"shaders\\default_bitmaps\\bitmaps\\gray_50_percent",
+		1
+	);
 }
 
 void InitH2Tweaks() {
