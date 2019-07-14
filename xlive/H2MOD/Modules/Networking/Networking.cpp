@@ -5,10 +5,8 @@
 #include "Memory\bitstream.h"
 #include "CustomPackets\CustomPackets.h"
 #include "XLive\UserManagement\CUser.h"
-#include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "Util/base64.h"
 
 extern SOCKET game_network_data_gateway_socket_1000;
 extern SOCKET game_network_message_gateway_socket_1001;

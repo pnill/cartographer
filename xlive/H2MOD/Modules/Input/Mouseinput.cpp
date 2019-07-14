@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
-#include <Windows.h>
 #include "H2MOD.h"
 
 typedef struct DIMOUSESTATE {

@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "CUser.h"
-#include <time.h>
-#include <sstream>
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"

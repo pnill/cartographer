@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Globals.h"
 
+#include "..\UserManagement\CUser.h"
+
 // #1: XWSAStartup
 int WINAPI XWSAStartup(WORD wVersionRequested, LPWSADATA lpWsaData)
 {
@@ -19,6 +21,10 @@ int WINAPI XWSACleanup()  	// XWSACleanup
 int WINAPI XSocketClose(SOCKET s)
 {
 	LOG_TRACE_XLIVE("XSocketClose: socket: {}", s);
+
+	if (userManager.sockmap[s])
+		userManager.sockmap.erase(s);
+
 	return closesocket(s);
 }
 

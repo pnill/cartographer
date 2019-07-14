@@ -14,7 +14,6 @@
 #include "H2MOD\Variants\GunGame\GunGame.h"
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
-#include <Shlwapi.h>
 #include "H2MOD\Tags\global_tags_interface.h"
 #include "MetaLoader\tag_loader.h"
 
@@ -881,7 +880,7 @@ void H2MOD::CustomSoundPlay(const wchar_t* soundName, int delay)
 		if (delay > 0)
 			std::this_thread::sleep_until(timePoint);
 
-		PlaySound(soundName, NULL, SND_FILENAME);
+		PlaySound(soundName, NULL, SND_FILENAME | SND_NODEFAULT);
 	};
 
 	if (!h2mod->Server)

@@ -4,7 +4,6 @@
 #include "XLive\UserManagement\CUser.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
-#include <Windows.h>
 
 int MasterState = 0;
 ModuleUPnP *upnp = nullptr;
