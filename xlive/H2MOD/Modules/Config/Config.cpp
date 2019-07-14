@@ -171,7 +171,8 @@ void SaveH2Config() {
 	wchar_t fileConfigPathLog[1124];
 	swprintf(fileConfigPathLog, 1024, L"Saving Config: \"%ws\"", fileConfigPath);
 	addDebugText(fileConfigPathLog);
-	FILE* fileConfig = _wfopen(fileConfigPath, L"wb");
+	FILE* fileConfig; 
+	_wfopen_s(&fileConfig, fileConfigPath, L"wb");
 
 	if (fileConfig == NULL) {
 		HandleFileError(GetLastError());
@@ -1038,9 +1039,9 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			}
 		}
 		else if (!H2IsDediServer && sscanf(fileLine, "vehicle_field_of_view =%d", &tempint1) == 1) {
-			if (est_vehicle_field_of_view) {
-				duplicated = true;
-			}
+		if (est_vehicle_field_of_view) {
+			duplicated = true;
+		}
 		else if (!(tempint1 >= 0)) {
 			incorrect = true;
 		}
@@ -1855,7 +1856,7 @@ void ReadH2Config() {
 		swprintf(fileConfigPath, 1024, FlagFilePathConfig);
 		swprintf(fileConfigPathLog, 1124, L"Reading Flag Config: \"%ws\"", fileConfigPath);
 		addDebugText(fileConfigPathLog);
-		fileConfig = _wfopen(fileConfigPath, L"rb");
+		_wfopen_s(&fileConfig, fileConfigPath, L"rb");
 	}
 	else {
 		do {
@@ -1866,7 +1867,7 @@ void ReadH2Config() {
 			swprintf(fileConfigPath, 1024, H2ConfigFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
 			swprintf(fileConfigPathLog, 1124, L"Reading Config: \"%ws\"", fileConfigPath);
 			addDebugText(fileConfigPathLog);
-			fileConfig = _wfopen(fileConfigPath, L"rb");
+			_wfopen_s(&fileConfig,fileConfigPath, L"rb");
 
 			if (!fileConfig) {
 				addDebugText("H2Configuration File does not exist.");
