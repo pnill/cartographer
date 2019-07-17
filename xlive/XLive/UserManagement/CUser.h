@@ -31,6 +31,13 @@ template<typename S, typename T> struct std::hash < std::pair<S, T> >
 	}
 };
 
+struct SecurePacket 
+{
+	DWORD annoyance_factor;
+	IN_ADDR secure;
+	XNADDR xn;
+};
+
 class CUserManagement
 {
 public:
@@ -61,7 +68,6 @@ public:
 
 	CUser local_user;
 	XNADDR game_host_xn;
-	char* secure_packet;
 };
 
 extern wchar_t ServerLobbyName[32];

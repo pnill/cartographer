@@ -11,7 +11,7 @@ int WINAPI XWSAStartup(WORD wVersionRequested, LPWSADATA lpWsaData)
 }
 
 // #2: XWSACleanup
-int WINAPI XWSACleanup()  	// XWSACleanup
+int WINAPI XWSACleanup()
 {
 	LOG_TRACE_XLIVE("XWSACleanup");
 	return WSACleanup();
@@ -22,8 +22,9 @@ int WINAPI XSocketClose(SOCKET s)
 {
 	LOG_TRACE_XLIVE("XSocketClose: socket: {}", s);
 
-	if (userManager.sockmap[s])
-		userManager.sockmap.erase(s);
+	auto sockmap_elem = userManager.sockmap.find(s);
+	if (sockmap_elem != userManager.sockmap.end())
+		userManager.sockmap.erase(sockmap_elem);
 
 	return closesocket(s);
 }

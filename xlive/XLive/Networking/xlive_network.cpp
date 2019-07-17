@@ -261,15 +261,16 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 		u_long iplong = (((struct sockaddr_in*)from)->sin_addr.s_addr);
 		std::pair <ULONG, SHORT> hostpair = std::make_pair(iplong, port);
 
+		SecurePacket* secure_pck = reinterpret_cast<SecurePacket*>(buf);
 		if (iplong != H2Config_master_ip)
 		{
-			if (*(ULONG*)buf == annoyance_factor && ret == 12 + sizeof(XNADDR))
+			if (ret == sizeof(SecurePacket)
+				&& secure_pck->annoyance_factor == annoyance_factor)
 			{
-				ULONG secure = *(ULONG*)(buf + 4);	
+				ULONG secure = secure_pck->secure.s_addr;	
 
 				LOG_TRACE_NETWORK("[H2MOD-Network] Received secure packet with ip addr {0:x}, port: {1}, secure: {2:x}", htonl(iplong), htons(port), secure);
-				XNADDR* userxn = reinterpret_cast<XNADDR*>(buf + 8);
-				userManager.CreateUser(userxn, TRUE);
+				userManager.CreateUser(&secure_pck->xn, TRUE);
 				userManager.secure_map[hostpair] = secure;
 
 				ret = 0;

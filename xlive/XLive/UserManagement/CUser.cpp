@@ -10,8 +10,9 @@
 extern XUID xFakeXuid[4];
 extern CHAR g_szUserName[4][16];
 
+SecurePacket securePacket;
 CUserManagement userManager;
-const DWORD annoyance_factor = 0x11223344;
+const DWORD annoyance_factor = 0x8E0A40F1;
 
 /*
 NOTE:
@@ -33,7 +34,7 @@ int CUserManagement::sendSecurePacket(SOCKET s, short to_port)
 		sendToAddr.sin_port = port;
 		sendToAddr.sin_family = AF_INET;
 
-		int ret = sendto(s, userManager.secure_packet, 12 + sizeof(XNADDR), NULL, (SOCKADDR*)&sendToAddr, sizeof(sendToAddr));
+		int ret = sendto(s, (char*)&securePacket, sizeof(SecurePacket), NULL, (SOCKADDR*)&sendToAddr, sizeof(sendToAddr));
 		LOG_TRACE_NETWORK("[H2MOD-Network] secure packet sent, return code: {}", ret);
 		return ret;
 	}
@@ -60,7 +61,7 @@ void CUserManagement::CreateUser(const XNADDR* pxna, BOOL user)
 		LOG_TRACE_NETWORK("CUserManagement::CreateUser() new secure address {:x}", pxna->inaOnline.s_addr);
 
 		nUser = new CUser;
-		memset(&nUser->xnaddr, 0x00, sizeof(XNADDR));
+		memset(nUser, NULL, sizeof(CUser));
 		memcpy(&nUser->xnaddr, pxna, sizeof(XNADDR));
 		this->cusers[secure] = nUser;
 		nUser->secure.s_addr = secure;
@@ -124,17 +125,21 @@ void CUserManagement::UnregisterSecureAddr(const IN_ADDR ina)
 	CUser* to_remove_user = cusers[ina.s_addr];
 	if (to_remove_user != nullptr)
 	{
-		if (xnmap[ina.s_addr])
-			xnmap.erase(ina.s_addr);
+		auto xnmap_it = xnmap.find(ina.s_addr);
+		if (xnmap_it != xnmap.end())
+			xnmap.erase(xnmap_it);
 
-		if (pmap_a[ina.s_addr])
-			pmap_a.erase(ina.s_addr);
+		auto pmap_a_it = pmap_a.find(ina.s_addr);
+		if (pmap_a_it != pmap_a.end())
+			pmap_a.erase(pmap_a_it);
 
-		if (pmap_b[ina.s_addr])
-			pmap_b.erase(ina.s_addr);
+		auto pmap_b_it = pmap_b.find(ina.s_addr);
+		if (pmap_b_it != pmap_b.end())
+			pmap_a.erase(pmap_b_it);
 
-		if (cusers[ina.s_addr])
-			cusers.erase(ina.s_addr);
+		auto cusers_it = cusers.find(ina.s_addr);
+		if (cusers_it != cusers.end())
+			cusers.erase(cusers_it);
 
 		for (auto it : secure_map)
 		{
@@ -174,8 +179,6 @@ void CUserManagement::UnregisterLocal()
 	if (!local_user.bValid)
 		return;
 
-	delete[] this->secure_packet;
-	this->secure_packet = nullptr;
 	local_user.bValid = false;
 	this->UpdateConnectionStatus();
 }
@@ -196,8 +199,6 @@ void SetUserUsername(char* username) {
 
 void CUserManagement::ConfigureLocalUser(XNADDR* pxna, ULONGLONG xuid, char* username) {
 	if (local_user.bValid) {
-		delete[] this->secure_packet;
-
 		local_user.bValid = false;
 	}
 
@@ -208,13 +209,12 @@ void CUserManagement::ConfigureLocalUser(XNADDR* pxna, ULONGLONG xuid, char* use
 	memset(&local_user, NULL, sizeof(CUser));
 	memcpy(&local_user.xnaddr, pxna, sizeof(XNADDR));
 	local_user.secure.s_addr = pxna->inaOnline.s_addr;
-	this->secure_packet = new char[12 + sizeof(XNADDR)];
-	memset(secure_packet, NULL, 12 + sizeof(XNADDR));
+	memset(&securePacket, NULL, sizeof(SecurePacket));
 
 	// secure packet preparation
-	*(DWORD*)&this->secure_packet[0] = annoyance_factor;
-	*(ULONG*)&this->secure_packet[4] = local_user.secure.s_addr;
-	memcpy(&this->secure_packet[8], &local_user.xnaddr, sizeof(XNADDR));
+	securePacket.secure.s_addr = local_user.secure.s_addr;
+	securePacket.annoyance_factor = annoyance_factor;
+	memcpy(&securePacket.xn, &local_user.xnaddr, sizeof(XNADDR));
 
 	local_user.bValid = true;
 	this->UpdateConnectionStatus();
