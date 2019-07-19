@@ -17,15 +17,19 @@
 #include "H2MOD\Tags\global_tags_interface.h"
 #include "MetaLoader\tag_loader.h"
 
-H2MOD *h2mod = new H2MOD();
+H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
-Halo2Final *h2f = new Halo2Final();
+Halo2Final* h2f = new Halo2Final();
+DeviceShop* device_shop = new DeviceShop();
 XboxTick* xboxTickHandler = new XboxTick();
 Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
 HeadHunter* headHunterHandler = new HeadHunter();
-DeviceShop* device_shop = new DeviceShop();
 VariantPlayer* variant_player = new VariantPlayer();
+
+extern int H2GetInstanceId();
+extern XUID xFakeXuid[4];
+std::unordered_map<int, int> object_to_variant;
 
 bool b_H2X = false;
 bool b_GunGame = false;
@@ -35,23 +39,19 @@ bool b_Infection = false;
 bool b_Halo2Final = false;
 bool b_HeadHunter = false;
 
-extern int H2GetInstanceId();
-extern XUID xFakeXuid[4];
-std::unordered_map<int, int> object_to_variant;
+std::unordered_map<wchar_t*, bool&> GametypesMap
+{
+	{ L"h2x", b_H2X },
+	{ L"ogh2", b_XboxTick },
+	{ L"h2f", b_Halo2Final },
+	{ L"gungame", b_GunGame },
+	{ L"zombies", b_Infection },
+	{ L"infection", b_Infection },
+	{ L"wareconomy", b_FireFight },
+	{ L"headhunter", b_HeadHunter },
+	{ L"graverobber", b_HeadHunter }
+};
 
-
-/*constants*/
-const wchar_t* ZOMBIES = L"zombies";
-const wchar_t* INFECTION = L"infection";
-const wchar_t* GUNGAME = L"gungame";
-const wchar_t* H2F = L"h2f";
-const wchar_t* H2X = L"h2x";
-const wchar_t* OGH2 = L"ogh2";
-const wchar_t* GRAVEROBBER = L"graverobber";
-const wchar_t* HEADHUNTER = L"headhunter";
-const wchar_t* WARECONOMY = L"wareconomy";
-const wchar_t* RVB = L"rvb";
-/*         */
 using namespace Blam::Cache::DataTypes;
 
 int GAME_BUILD = 11122;
@@ -1072,64 +1072,25 @@ void __cdecl OnMapLoad(int a1)
 
 		p_set_random_number(a1);
 		return;
-	}
-
-	b_H2X = false;
-	b_GunGame = false;
-	b_XboxTick = false;
-	b_FireFight = false;
-	b_Infection = false;
-	b_HeadHunter = false;
-	b_Halo2Final = false;
+	}		
 
 	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
 	LOG_TRACE_GAME(L"[h2mod] OnMapLoad engine mode {0}, variant name {1}", h2mod->GetEngineType(), variant_name);
 	BYTE GameState = *(BYTE*)(h2mod->GetBase() + ((h2mod->Server) ? 0x3C40AC : 0x420FC4));
 
+	for (auto gametype_it : GametypesMap)
+		gametype_it.second = false; // reset custom gametypes state
+
 	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE)
 	{
 		addDebugText("GameEngine: Multiplayer");
 
-		// StrStrIW returns pointer to first substring occurrence, NULL othewise
-		if (StrStrIW(variant_name, ZOMBIES) || StrStrIW(variant_name, INFECTION))
+		for (auto gametype_it : GametypesMap)
 		{
-			LOG_TRACE_GAME("[h2mod] Zombies Turned on!");
-			b_Infection = true;
-		}
-
-		if (StrStrIW(variant_name, GUNGAME))
-		{
-			LOG_TRACE_GAME("[h2mod] GunGame Turned on!");
-			b_GunGame = true;
-		}
-
-		if (StrStrIW(variant_name, H2F))
-		{
-			LOG_TRACE_GAME("[h2mod] Halo2Final Turned on!");
-			b_Halo2Final = true;
-		}
-
-		if (StrStrIW(variant_name, H2X))
-		{
-			LOG_TRACE_GAME("[h2mod] Halo 2 Xbox Rebalance Turned on!");
-			b_H2X = true;
-		}
-		else if (StrStrIW(variant_name, OGH2))
-		{
-			LOG_TRACE_GAME("[h2mod] 30 Tick Mod Activated!");
-			b_XboxTick = true;
-		}
-
-		if (StrStrIW(variant_name, GRAVEROBBER) || StrStrIW(variant_name, HEADHUNTER))
-		{
-			LOG_TRACE_GAME("[h2mod] GraveRobber (Headhunter) Turned on!");
-			b_HeadHunter = true;
-		}
-
-		if (StrStrIW(variant_name, WARECONOMY))
-		{
-			LOG_TRACE_GAME("[h2mod] Fire Fight Turned on!");
-			b_FireFight = true;
+			if (StrStrIW(variant_name, gametype_it.first)) {
+				LOG_TRACE_GAME(L"[h2mod] {1} custom gametype turned on!", gametype_it.first);
+				gametype_it.second = true; // enable a gametype if substring is found
+			}
 		}
 
 		get_object_table_memory();
@@ -1275,7 +1236,7 @@ change_team p_change_local_team;
 
 void __cdecl changeTeam(int localPlayerIndex, int teamIndex) {
 	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
-	if (StrStrIW(variant_name, RVB) != NULL && teamIndex != 0 && teamIndex != 1) {
+	if (StrStrIW(variant_name, L"rvb") != NULL && teamIndex != 0 && teamIndex != 1) {
 		//rvb mode enabled, don't change teams
 		return;
 	}
