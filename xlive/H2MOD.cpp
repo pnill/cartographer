@@ -302,10 +302,10 @@ signed int __cdecl object_new_hook(void *pObject)
 	return result;
 }
 
-typedef int(__stdcall *tc_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, void* packet);
+typedef void(__stdcall *tc_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, void* packet);
 tc_simulation_unit_entity_definition_creation_encode pc_simulation_unit_entity_definition_encode;
 
-int __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr, int creation_data_size, void* creation_data, int a3, void* packet)
+void __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr, int creation_data_size, void* creation_data, int a3, void* packet)
 {
 	//LOG_TRACE_GAME_N("c_simulation_unit_entity_definition_creation_encode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, a3: %i, packet: %08X", thisptr, creation_data_size, creation_data, a3, packet);
 	int object_permutation_index = *(int*)((char*)creation_data + 0x24);
@@ -321,15 +321,14 @@ int __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr,
 	else
 		bitstream::p_data_encode_bool()(packet, "object-permutation-exists", 0);
 
-	int ret = pc_simulation_unit_entity_definition_encode(thisptr, creation_data_size, creation_data, a3, packet);
-	return ret;
+	pc_simulation_unit_entity_definition_encode(thisptr, creation_data_size, creation_data, a3, packet);
 }
 
 
-typedef int(__stdcall *tc_simulation_unit_entity_definition_creation_decode)(void* thisptr, int creation_data_size, void* creation_data,void* packet);
+typedef bool(__stdcall *tc_simulation_unit_entity_definition_creation_decode)(void* thisptr, int creation_data_size, void* creation_data,void* packet);
 tc_simulation_unit_entity_definition_creation_decode pc_simulation_unit_entity_definition_decode;
 
-int __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, int creation_data_size, void* creation_data, void* packet)
+bool __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, int creation_data_size, void* creation_data, void* packet)
 {
 	//LOG_TRACE_GAME_N("c_simulation_unit_entity_definition_creation_decode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, packet: %08X", thisptr, creation_data_size, creation_data, packet);
 
@@ -344,7 +343,7 @@ int __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr,
 	else
 		*(int*)((char*)creation_data + 0x24) = -1;
 
-	int ret = pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, packet);
+	bool ret = pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, packet);
 	return ret;
 }
 
@@ -369,8 +368,6 @@ int __stdcall set_unit_creation_data_hook(unsigned int object_index, void* objec
 	}
 	else
 		*(int*)((char*)object_creation_data + 0x24) = -1;
-
-
 
 	return result;
 }
