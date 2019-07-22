@@ -171,10 +171,10 @@ void SaveH2Config() {
 	wchar_t fileConfigPathLog[1124];
 	swprintf(fileConfigPathLog, 1024, L"Saving Config: \"%ws\"", fileConfigPath);
 	addDebugText(fileConfigPathLog);
-	FILE* fileConfig; 
-	_wfopen_s(&fileConfig, fileConfigPath, L"wb");
+	FILE* fileConfig = nullptr; 
+	errno_t err =  _wfopen_s(&fileConfig, fileConfigPath, L"wb");
 
-	if (fileConfig == NULL) {
+	if (err != 0) {
 		HandleFileError(GetLastError());
 		addDebugText("ERROR: Unable to write H2Configuration File!");
 	}
@@ -1848,7 +1848,8 @@ void ReadH2Config() {
 	swprintf(local, 1024, L"%ws", H2AppDataLocal);
 	H2Config_isConfigFileAppDataLocal = false;
 	
-	FILE* fileConfig;
+	errno_t err = 0;
+	FILE* fileConfig = nullptr;
 	wchar_t fileConfigPath[1024];
 	wchar_t fileConfigPathLog[1124];
 
@@ -1856,7 +1857,7 @@ void ReadH2Config() {
 		swprintf(fileConfigPath, 1024, FlagFilePathConfig);
 		swprintf(fileConfigPathLog, 1124, L"Reading Flag Config: \"%ws\"", fileConfigPath);
 		addDebugText(fileConfigPathLog);
-		_wfopen_s(&fileConfig, fileConfigPath, L"rb");
+		err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 	}
 	else {
 		do {
@@ -1867,20 +1868,20 @@ void ReadH2Config() {
 			swprintf(fileConfigPath, 1024, H2ConfigFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
 			swprintf(fileConfigPathLog, 1124, L"Reading Config: \"%ws\"", fileConfigPath);
 			addDebugText(fileConfigPathLog);
-			_wfopen_s(&fileConfig, fileConfigPath, L"rb");
+			err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 
-			if (!fileConfig) {
+			if (err) {
 				addDebugText("H2Configuration File does not exist.");
 			}
 			H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
-			if (!fileConfig && !H2Config_isConfigFileAppDataLocal) {
+			if (err && !H2Config_isConfigFileAppDataLocal) {
 				--readInstanceIdFile;
 			}
-		} while (!fileConfig && readInstanceIdFile > 0);
+		} while (err && readInstanceIdFile > 0);
 		H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
 	}
 
-	if (!fileConfig) {
+	if (err) {
 		addDebugText("ERROR: No H2Configuration Files Could Be Found!");
 		H2Config_isConfigFileAppDataLocal = true;
 	}

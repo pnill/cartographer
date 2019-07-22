@@ -186,9 +186,9 @@ BOOL SetDlcBasepath( int num )
 
 
 					// check file exists
-					FILE *fp_dlc;
-					_wfopen_s(&fp_dlc, wnum.c_str(), L"rb" );
-					if( !fp_dlc )
+					FILE *fp_dlc = nullptr;
+					errno_t err = _wfopen_s(&fp_dlc, wnum.c_str(), L"rb");
+					if( err )
 						continue;
 
 
