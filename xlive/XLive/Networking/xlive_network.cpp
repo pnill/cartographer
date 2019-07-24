@@ -235,9 +235,9 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 	}
 
 
-	int ret = sendto(s, buf, len, flags, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
+	int total_bytes_sent = sendto(s, buf, len, flags, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
 
-	if (ret == SOCKET_ERROR)
+	if (total_bytes_sent == SOCKET_ERROR)
 	{
 		LOG_TRACE_NETWORK("XSocketSendTo - Socket Error True");
 		LOG_TRACE_NETWORK("XSocketSendTo - WSAGetLastError(): {:x}", WSAGetLastError());
@@ -247,15 +247,15 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		updateSendToStatistics(len);
 	}
 
-	return ret;
+	return total_bytes_sent;
 }
 
 // #20
 int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *from, int *fromlen)
 {
-	int ret = recvfrom(s, buf, len, flags, from, fromlen);
+	int total_bytes_received = recvfrom(s, buf, len, flags, from, fromlen);
 
-	if (ret > 0)
+	if (total_bytes_received > 0)
 	{
 		short port = (((struct sockaddr_in*)from)->sin_port);
 		u_long iplong = (((struct sockaddr_in*)from)->sin_addr.s_addr);
@@ -264,7 +264,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 		SecurePacket* secure_pck = reinterpret_cast<SecurePacket*>(buf);
 		if (iplong != H2Config_master_ip)
 		{
-			if (ret == sizeof(SecurePacket)
+			if (total_bytes_received == sizeof(SecurePacket) 
 				&& secure_pck->annoyance_factor == annoyance_factor)
 			{
 				ULONG secure = secure_pck->secure.s_addr;	
@@ -273,7 +273,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 				userManager.CreateUser(&secure_pck->xn, TRUE);
 				userManager.secure_map[hostpair] = secure;
 
-				ret = 0;
+				total_bytes_received = 0;
 			}
 
 			ULONG secure = userManager.secure_map[hostpair];
@@ -320,7 +320,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 		LOG_TRACE_NETWORK_N("[h2mod-network] received socket data, total: {}", ret);
 	}*/
 
-	return ret;
+	return total_bytes_received;
 }
 
 // #55: XNetRegisterKey //need #51

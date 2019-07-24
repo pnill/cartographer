@@ -20,6 +20,7 @@ NOTE:
 */
 
 extern SOCKET game_network_message_gateway_socket;
+
 int CUserManagement::sendSecurePacket(SOCKET s, short to_port)
 {
 	if (!NetworkSession::localPeerIsSessionHost())
@@ -61,7 +62,7 @@ void CUserManagement::CreateUser(const XNADDR* pxna, BOOL user)
 		LOG_TRACE_NETWORK("CUserManagement::CreateUser() new secure address {:x}", pxna->inaOnline.s_addr);
 
 		nUser = new CUser;
-		memset(nUser, NULL, sizeof(CUser));
+		memset(nUser, 0, sizeof(CUser));
 		memcpy(&nUser->xnaddr, pxna, sizeof(XNADDR));
 		this->cusers[secure] = nUser;
 		nUser->secure.s_addr = secure;
@@ -206,10 +207,10 @@ void CUserManagement::ConfigureLocalUser(XNADDR* pxna, ULONGLONG xuid, char* use
 	xFakeXuid[0] = xuid;
 	SetUserUsername(username);
 
-	memset(&local_user, NULL, sizeof(CUser));
+	memset(&local_user, 0, sizeof(CUser));
 	memcpy(&local_user.xnaddr, pxna, sizeof(XNADDR));
 	local_user.secure.s_addr = pxna->inaOnline.s_addr;
-	memset(&securePacket, NULL, sizeof(SecurePacket));
+	memset(&securePacket, 0, sizeof(SecurePacket));
 
 	// secure packet preparation
 	securePacket.secure.s_addr = local_user.secure.s_addr;
@@ -265,7 +266,7 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
 	{
 		if (pxna)
 		{
-			memset(pxna, 0x00, sizeof(XNADDR)); // Zero memory of the current buffer passed to us by the game.
+			memset(pxna, 0, sizeof(XNADDR)); // Zero memory of the current buffer passed to us by the game.
 			memcpy(pxna, &user->xnaddr, sizeof(XNADDR));
 		}
 		/*if (pxnkid)

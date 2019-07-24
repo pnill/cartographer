@@ -972,8 +972,8 @@ DWORD WINAPI XStorageUploadFromMemory( DWORD dwUserIndex, const WCHAR *wszServer
 
 
 	FILE *fp;
-	_wfopen_s(&fp, wszServerPath, L"wb" );
-	if( fp )
+	errno_t err = _wfopen_s(&fp, wszServerPath, L"wb" );
+	if( !err )
 	{
 		fwrite( pbBuffer, 1, dwBufferSize, fp );
 		fclose( fp );
