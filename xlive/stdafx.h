@@ -56,6 +56,7 @@
 #include <sstream>
 #include <algorithm>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <d3d9.h>
 #include <d3dx9.h>

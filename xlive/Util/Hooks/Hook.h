@@ -1,6 +1,5 @@
 #pragma once
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #define JMP_RAW_BYTE 0xEB
 #define JNZ_RAW_BYTE 0x75 
 

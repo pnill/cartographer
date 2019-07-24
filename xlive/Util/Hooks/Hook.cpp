@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <windows.h>
 #include <malloc.h>
 
 #include "hook.h"

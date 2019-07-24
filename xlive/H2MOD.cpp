@@ -971,10 +971,7 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 	pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
 
-void PatchGameDetailsCheck()
-{
-	NopFill<2>(h2mod->GetBase() + 0x219D6D);
-}
+
 
 void H2MOD::DisableWeaponPickup(bool b_Enable)
 {
@@ -1713,14 +1710,10 @@ void H2MOD::Initialize()
 {
 	if (!h2mod->Server)
 	{
-		this->Server = FALSE;
-
 		H2Tweaks::setFOV(H2Config_field_of_view);
 		H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
 		if (H2Config_raw_input)
 			Mouseinput::Initialize();
-
-		PatchGameDetailsCheck();
 
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init

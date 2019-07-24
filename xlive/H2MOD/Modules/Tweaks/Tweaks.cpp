@@ -1,8 +1,4 @@
 #include "stdafx.h"
-#include <ShellAPI.h>
-#include <string>
-#include <unordered_set>
-#include <codecvt>
 
 #include "Globals.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -1049,6 +1045,9 @@ void InitH2Tweaks() {
 
 		RadarPatch();
 		H2Tweaks::sunFlareFix();
+
+		// patch to show game details menu in NETWORK serverlist too
+		NopFill<2>(h2mod->GetBase() + 0x219D6D);
 
 		WriteJmpTo(h2mod->GetAddress(0x7E43), WinMain);
 		WriteJmpTo(h2mod->GetAddress(0x39EA2), is_remote_desktop);
