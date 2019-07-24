@@ -270,6 +270,7 @@
     <ClCompile Include="Blam\Cache\Tags\itmc.cpp" />
     <ClCompile Include="Blam\Cache\Tags\scnr.cpp" />
     <ClCompile Include="Blam\Cache\Tags\tag_base.cpp" />
+    <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp" />
@@ -463,6 +464,7 @@
     <ClInclude Include="Blam\Cache\Tags\tag_base.h" />
     <ClInclude Include="Blam\Cache\Tags\tag_definitons.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shad.h" />
+    <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolution.h" />
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />

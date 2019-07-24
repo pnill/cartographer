@@ -16,6 +16,7 @@
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD\Tags\TagInterface.h"
 #include "Blam\Cache\TagGroups\shad.h"
+#include "..\CustomResolutions\CustomResolution.h"
 
 #define _USE_MATH_DEFINES
 #include "math.h"
@@ -1006,6 +1007,9 @@ void InitH2Tweaks() {
 			BYTE assmIntroHQ[] = { 0xEB };
 			WriteBytes(H2BaseAddr + 0x221C29, assmIntroHQ, 1);
 		}
+
+		// adds support for more monitor resolutions
+		CustomResolution::Initialize();
 
 		//Disables the ESRB warning (only occurs for English Language).
 		//disables the one if no intro vid occurs.
