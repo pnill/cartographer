@@ -273,7 +273,7 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
 		LOG_TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex={0}, peerIndex={1}", pIndex, players->getPeerIndex(pIndex));
 
 		s_unit_grenades data;
-		memset(&data, NULL, sizeof(data));
+		SecureZeroMemory(&data, sizeof(data));
 
 		data.type = type;
 		data.count = count;

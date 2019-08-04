@@ -7,6 +7,7 @@
 #include "..\..\MapManager\MapManager.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
+extern XUID xFakeXuid[4];
 char g_network_message_types[e_network_message_types::end * 32]; // out of band packets
 
 void register_packet_impl(void *packetObject, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* a9)
@@ -16,11 +17,11 @@ void register_packet_impl(void *packetObject, int type, char* name, int a4, int 
 	return register_packet(packetObject, type, name, a4, size1, size2, write_packet_method, read_packet_method, a9);
 }
 
-void send_packet(void *thisx, int a2, int a3, char a4, unsigned int type, unsigned int size, void* a7)
+void send_packet(void *thisx, int a2, int a3, bool secure, unsigned int type, unsigned int size, void* a7)
 {
 	typedef void(__thiscall *dynamic_packet_check_method)(void *thisx, int a2, int a3, char a4, unsigned int type, unsigned int size, void* a7);
 	auto dynamic_packet_check = reinterpret_cast<dynamic_packet_check_method>(h2mod->GetAddress(0x1BED40, 0x1B8C1A));
-	dynamic_packet_check(thisx, a2, a3, a4, type, size, a7);
+	dynamic_packet_check(thisx, a2, a3, secure, type, size, a7);
 }
 
 void __cdecl encode_map_file_name_packet(char* buffer, int a2, s_custom_map_filename* data)
@@ -75,16 +76,16 @@ void register_custom_packets(void* a1)
 	auto p_register_test_packet = reinterpret_cast<register_test_packet>(h2mod->GetAddress(0x1ECE05, 0x1CD7BE));
 	p_register_test_packet(a1);
 
-	register_packet_impl(g_network_message_types, e_network_message_types::map_file_name, "map-file-name", 0, sizeof(s_custom_map_filename), sizeof(s_custom_map_filename), 
+	register_packet_impl(g_network_message_types, map_file_name, "map-file-name", 0, sizeof(s_custom_map_filename), sizeof(s_custom_map_filename), 
 		(void*)encode_map_file_name_packet, (void*)decode_map_file_name_packet, NULL);
 
-	register_packet_impl(g_network_message_types, e_network_message_types::request_map_filename, "request-map-filename", 0, sizeof(s_request_map_filename), sizeof(s_request_map_filename),
+	register_packet_impl(g_network_message_types, request_map_filename, "request-map-filename", 0, sizeof(s_request_map_filename), sizeof(s_request_map_filename),
 		(void*)encode_request_map_filename_packet, (void*)decode_request_map_filename_packet, NULL);
 
-	register_packet_impl(g_network_message_types, e_network_message_types::team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
+	register_packet_impl(g_network_message_types, team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
 		(void*)encode_team_change_packet, (void*)decode_team_change_packet, NULL);
 
-	register_packet_impl(g_network_message_types, e_network_message_types::unit_grenades, "unit-grenades", 0, sizeof(s_unit_grenades), sizeof(s_unit_grenades),
+	register_packet_impl(g_network_message_types, unit_grenades, "unit-grenades", 0, sizeof(s_unit_grenades), sizeof(s_unit_grenades),
 		(void*)encode_set_grenades_packet, (void*)decode_set_grenades_packet, NULL);
 }
 
@@ -95,16 +96,16 @@ void __stdcall message_gateway_hook(void *thisx, network_address* addr, int mess
 {
 	switch (message_type)
 	{
-	case e_network_message_types::request_map_filename:
+	case request_map_filename:
 	{
 		s_request_map_filename* pak = (s_request_map_filename*)packet;
-		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] received on hook1 request-map-filename from XUID: {}", pak->user_identifier);
+		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] received on message_gateway_hook1 request-map-filename from XUID: {}", pak->user_identifier);
 		network_session* current_session = NetworkSession::getCurrentNetworkSession();
 		signed int peer_index = NetworkSession::getPeerIndexFromNetworkAddress(addr);
 		if (peer_index != -1 && peer_index != current_session->local_peer_index)
 		{
 			s_custom_map_filename buffer;
-			memset(&buffer, NULL, sizeof(s_custom_map_filename));
+			SecureZeroMemory(&buffer, sizeof(s_custom_map_filename));
 			std::wstring map_filename;
 			mapManager->getMapFilename(map_filename);
 			buffer.is_custom_map = false;
@@ -114,14 +115,14 @@ void __stdcall message_gateway_hook(void *thisx, network_address* addr, int mess
 				wcsncpy_s(buffer.file_name, map_filename.c_str(), 32);
 			}
 
-			send_packet(current_session->network_observer_ptr, current_session->unk_index, current_session->unk_needs_reversing[peer_index].observer_index, 1,
-				e_network_message_types::map_file_name, sizeof(s_custom_map_filename), &buffer);
+			send_packet(current_session->network_observer_ptr, current_session->unk_index, current_session->unk_needs_reversing[peer_index].observer_index, true,
+				map_file_name, sizeof(s_custom_map_filename), &buffer);
 		}
 
 		return;
 	}
 
-	case e_network_message_types::map_file_name:
+	case map_file_name:
 	{
 		s_custom_map_filename* pak = (s_custom_map_filename*)packet;
 		if (pak->is_custom_map)
@@ -134,17 +135,18 @@ void __stdcall message_gateway_hook(void *thisx, network_address* addr, int mess
 		return;
 	}
 
-	case e_network_message_types::team_change:
+	case team_change:
 	{
 		s_team_change* pak = (s_team_change*)packet;
 		h2mod->set_local_team_index(0, pak->team_index);
 		return;
 	}
 
-	case e_network_message_types::unit_grenades:
+	case unit_grenades:
 	{
 		s_unit_grenades* pak = (s_unit_grenades*)packet;
-		h2mod->set_local_grenades(pak->type, pak->count, pak->pindex);
+		if (!h2mod->Server)
+			h2mod->set_local_grenades(pak->type, pak->count, pak->pindex);
 		return;
 	}
 
@@ -162,13 +164,13 @@ void __stdcall message_gateway_hook_2(void *thisx, int a2, int message_type, int
 {
 	switch (message_type)
 	{
-	case e_network_message_types::request_map_filename:
+	case request_map_filename:
 	{
 		s_request_map_filename* pak = (s_request_map_filename*)packet;
-		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] received on hook2 request-map-filename from XUID: {:#x}", pak->user_identifier);
+		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] received on message_gateway_hook_2 request-map-filename from XUID: {:#x}", pak->user_identifier);
 		return;
 	}
-	case e_network_message_types::map_file_name:
+	case map_file_name:
 		return;
 
 	default:
@@ -178,18 +180,17 @@ void __stdcall message_gateway_hook_2(void *thisx, int a2, int message_type, int
 	p_network_message_gateway_2(thisx, a2, message_type, a4, packet);
 }
 
-extern XUID xFakeXuid[4];
 void CustomPackets::sendRequestMapFilename(network_session* session)
 {
 	if (session->local_session_state == _network_session_state_peer_established)
 	{
 		s_request_map_filename buffer;
-		memset(&buffer, NULL, sizeof(s_request_map_filename));
+		SecureZeroMemory(&buffer, sizeof(s_request_map_filename));
 		memcpy(&buffer.user_identifier, &xFakeXuid[0], sizeof(XUID));
 
 		if (session->unk_needs_reversing[session->session_host_peer_index].field_0[1]) {
-			send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[session->session_host_peer_index].observer_index, 1,
-				e_network_message_types::request_map_filename, sizeof(s_request_map_filename), (void*)&buffer);
+			send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[session->session_host_peer_index].observer_index, true,
+				request_map_filename, sizeof(s_request_map_filename), (void*)&buffer);
 		}
 	}
 }
@@ -205,8 +206,8 @@ void CustomPackets::sendTeamChange(network_session* session, signed int peer_ind
 		{
 			if (session->unk_needs_reversing[peer_index].field_0[1])
 			{
-				send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[peer_index].observer_index, 1,
-					e_network_message_types::team_change, sizeof(s_team_change), (void*)&buffer);
+				send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[peer_index].observer_index, true,
+					team_change, sizeof(s_team_change), (void*)&buffer);
 			}
 		}
 	}
@@ -220,8 +221,8 @@ void CustomPackets::sendUnitGrenadesPacket(network_session* session, int peer_in
 		{
 			if (session->unk_needs_reversing[peer_index].field_0[1])
 			{
-				send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[peer_index].observer_index, 1,
-					e_network_message_types::unit_grenades, sizeof(s_unit_grenades), (void*)data);
+				send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[peer_index].observer_index, true,
+					unit_grenades, sizeof(s_unit_grenades), (void*)data);
 			}
 		}
 	}

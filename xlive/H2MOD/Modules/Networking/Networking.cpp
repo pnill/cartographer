@@ -59,7 +59,7 @@ bool __cdecl establish_read(void* a1, int a2, int a3) {
 }
 
 void __cdecl closed_write(void* a1, int a2, int a3) {
-	memset(&userManager.game_host_xn, NULL, sizeof(XNADDR));
+	SecureZeroMemory(&userManager.game_host_xn, sizeof(XNADDR));
 	bitstream::p_data_encode_integer()(a1, "remote-identifier", *(DWORD *)a3, 32);
 	bitstream::p_data_encode_integer()(a1, "identifier", *(DWORD *)(a3 + 4), 32);
 	bitstream::p_data_encode_integer()(a1, "closure-reason", *(DWORD *)(a3 + 8), 5);
@@ -201,7 +201,7 @@ char __stdcall receivePacket(void *thisx, void* a2, int packetType, unsigned int
 	{
 		LOG_TRACE_NETWORK("[h2mod-network] received packet succesfully decoded");
 		v6 = (int)&v5[32 * *(DWORD *)packetType];
-		memset(packet_obj, 0, *size);
+		SecureZeroMemory(packet_obj, *size);
 		result = (*(int(__cdecl **)(void*, unsigned int, void *))(v6 + 24))(a2, *size, packet_obj);// calls packet read/write method
 	}
 	else
@@ -278,7 +278,7 @@ void __stdcall receiveDataFromSocket(DWORD* thisx) {
 		if (!v2)
 			return;
 	LABEL_11:
-		memset((char *)&a3, 0, 3624);
+		SecureZeroMemory((char *)&a3, 3624);
 		v1 = v6;
 		a3 = v8;
 		v15 = v9;
@@ -395,7 +395,6 @@ tjoin_game pjoin_game;
 
 void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
 {
-	memset(&userManager.game_host_xn, NULL, sizeof(XNADDR));
 	memcpy(&userManager.game_host_xn, host_xn, sizeof(XNADDR));
 	LOG_TRACE_NETWORK("[H2MOD-Network] copied host information, XNADDR: {:#x}", userManager.game_host_xn.ina.s_addr);
 	userManager.sendSecurePacket(game_network_message_gateway_socket_1001, 1001);
@@ -471,7 +470,7 @@ void applyConnectionPatches()
 	// makes Live network not as laggy 
 	//int data = 500;
 	//WriteValue<int>(h2mod->GetBase() + (h2mod->Server ? 0x24896 : 0x28702), data);
-	
+
 	// research
 	static float unk_flt_ = 60.0f;
 	DWORD addresses[] = { 0x1BDE27, 0x1BE2FA, 0x1BFB3C, 0x1C11FA, 0x1C12BF };

@@ -37,7 +37,7 @@ bool __cdecl calc_map_checksum(HANDLE *file, BYTE *checksum_out)
 		LOG_CHECK(GetFinalPathNameByHandleW(*file, buf, ARRAYSIZE(buf), VOLUME_NAME_DOS) != 0);
 		LOG_TRACE_FUNCW(L"map name: {0:s}  handle: {1:p}", buf, (void*)file);
 		size_t len = 0x20; // will only use 16 bytes
-		memset(checksum_out, 0, len);
+		SecureZeroMemory(checksum_out, len);
 		if (!LOG_CHECK(hashes::calc_file_md5(buf, checksum_out, len, 0x2000))) { // only checksums header
 			// generate some random data if we can't get an actual checksum
 			XNetRandom(checksum_out, 0x20);

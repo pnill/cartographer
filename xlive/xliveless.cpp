@@ -752,9 +752,9 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		marketplaceEnumerate += marketplaceCount;
 	}
 
-	if (hEnum == ServerEnum)
+	if (hEnum == ServerEnumHandle )
 	{
-		LiveManager.GetServers(pOverlapped, cbBuffer, pvBuffer);
+		LiveManager.GetServers(cbBuffer, pvBuffer, pOverlapped);
 		return ERROR_IO_PENDING;
 	}
 
@@ -1441,7 +1441,7 @@ DWORD WINAPI XStorageBuildServerPath( DWORD dwUserIndex, XSTORAGE_FACILITY Stora
 	{
 		//Local_Storage_W( 0, strw );
 
-		ZeroMemory(strw, sizeof(strw));
+		SecureZeroMemory(strw, sizeof(strw));
 		wcscat( strw, L"\\Online\\" );
 		//CreateDirectory( strw, NULL );
 

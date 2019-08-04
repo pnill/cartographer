@@ -6,20 +6,18 @@
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 
 int MasterState = 0;
-ModuleUPnP *upnp = nullptr;
 SOCKET game_network_data_gateway_socket_1000 = INVALID_SOCKET; // used for game data
 SOCKET game_network_message_gateway_socket_1001 = INVALID_SOCKET; // used for messaging like connection requests
 
 void ForwardPorts()
 {
-	if (upnp == nullptr)
-		upnp = new ModuleUPnP;
+	ModuleUPnP upnp;
 
-	upnp->UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2");
-	upnp->UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2_1");
-	//upnp->UPnPForwardPort(false, (H2Config_base_port + 5), (H2Config_base_port + 5), "Halo2_2");
-	//upnp->UPnPForwardPort(false, (H2Config_base_port + 6), (H2Config_base_port + 6), "Halo2_3");
-	upnp->UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
+	upnp.UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2");
+	upnp.UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2_1");
+	//upnp.UPnPForwardPort(false, (H2Config_base_port + 5), (H2Config_base_port + 5), "Halo2_2");
+	//upnp.UPnPForwardPort(false, (H2Config_base_port + 6), (H2Config_base_port + 6), "Halo2_3");
+	upnp.UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
 
 	LOG_TRACE_NETWORK("[UPNP] Finished forwarding ports.");
 }
@@ -28,7 +26,7 @@ void ForwardPorts()
 int WINAPI XOnlineStartup()
 {
 	LOG_TRACE_NETWORK("XOnlineStartup()");
-	memset(&userManager.game_host_xn, NULL, sizeof(XNADDR));
+	SecureZeroMemory(&userManager.game_host_xn, sizeof(XNADDR));
 	std::thread(ForwardPorts).detach();
 
 	return ERROR_SUCCESS;

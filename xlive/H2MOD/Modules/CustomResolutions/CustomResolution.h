@@ -1,7 +1,7 @@
 #pragma once
 
-#define TOTAL_RESOLUTIONS 12
-#define DEFAULT_TOTAL_RESOLUTIONS 12
+#define TOTAL_RESOLUTIONS 14
+#define DEFAULT_TOTAL_RESOLUTIONS 11
 
 struct s_diplay_config
 {

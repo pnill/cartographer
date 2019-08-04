@@ -20,10 +20,13 @@ enum network_session_state : signed int
 #pragma pack(push, 1)
 struct network_address
 {
-	DWORD ip_long;
-	BYTE gap_4[12];
-	__int16 port;
-	signed __int16 address_type;
+	union
+	{
+		int ipv4;
+		char ipv6[16];
+	} address;
+	short port;
+	short address_type;
 };
 
 struct peer_network_info
@@ -175,7 +178,8 @@ struct network_session
 	int field_4C68;
 	DWORD gap_4C6C;
 	DWORD system_language_id;
-	char dedicated_server[4];
+	bool dedicated_server;
+	char pad_1[3];
 	DWORD party_privacy;
 	int max_peers;
 	signed int max_party_players;

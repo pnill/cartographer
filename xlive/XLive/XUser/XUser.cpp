@@ -488,7 +488,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 
 
 
-		memset(pResults, 0, *pcbResults);
+		SecureZeroMemory(pResults, *pcbResults);
 
 
 		pResults->dwSettingsLen = dwNumSettingIds;

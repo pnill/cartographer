@@ -306,36 +306,23 @@ int WINAPI XSocketWSAEventSelect(SOCKET s, HANDLE hEventObject, __int32 lNetwork
 // #37: XSocketHTONL
 u_long WINAPI XSocketHTONL(u_long hostlong)
 {
-	u_long ret = htonl(hostlong);
-
-	return ret;
+	return htonl(hostlong);
 }
 
 // #38: XSocketNTOHS
 u_short WINAPI XSocketNTOHS(u_short netshort)
 {
-	u_short ret;
-
-	ret = ntohs(netshort);
-
-	return ret;
+	return ntohs(netshort);
 }
-
 
 // #39: XSocketNTOHL
 u_long WINAPI XSocketNTOHL(u_long netlong)
 {
-	u_long ret = ntohl(netlong);
-
-	return ret;
+	return ntohl(netlong);
 }
-
 
 // #40: XSocketHTONS
 u_short WINAPI XSocketHTONS(u_short a1)
 {
-
-	u_short ret = htons(a1);
-
-	return ret;
+	return htons(a1);
 }

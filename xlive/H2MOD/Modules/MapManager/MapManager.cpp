@@ -327,7 +327,7 @@ void MapManager::getMapFilename(std::wstring& buffer)
 	// we want this to work in-game too
 	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::getCurrentNetworkSession(&session))
 	{
-		memset(map_file_location, NULL, sizeof(map_file_location));
+		SecureZeroMemory(map_file_location, sizeof(map_file_location));
 		NetworkSession::getMapFileLocation(session, map_file_location, sizeof(map_file_location));
 
 		std::wstring unicodeMapFileLocation(map_file_location);
@@ -480,7 +480,7 @@ bool MapManager::downloadFromHost() {
 			return 1;
 		}
 
-		ZeroMemory(&hints, sizeof(hints));
+		SecureZeroMemory(&hints, sizeof(hints));
 		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
@@ -764,7 +764,7 @@ void MapManager::TcpServer::startListening() {
 		return;
 	}
 
-	ZeroMemory(&hints, sizeof(hints));
+	SecureZeroMemory(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;

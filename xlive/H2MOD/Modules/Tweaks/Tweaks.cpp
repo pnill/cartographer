@@ -238,7 +238,7 @@ void sound_initialize()
 
 #pragma endregion
 
-enum flags : int
+enum startup_flags : int
 {
 	windowed,
 	disable_voice_chat,
@@ -269,14 +269,13 @@ enum flags : int
 	unk26,
 	unk27, // network? value seems unused?
 	high_quality, // forced sound reverb ignoring CPU score and disable forcing low graphical settings (sapien)
-	unk29,
 
 	count
 };
-static_assert(flags::count == 30, "Bad flags count");
+static_assert(startup_flags::count == 29, "Bad flags count");
 
-int flag_log_count[flags::count];
-BOOL __cdecl is_init_flag_set(flags id)
+int flag_log_count[startup_flags::count];
+BOOL __cdecl is_init_flag_set(startup_flags id)
 {
 	if (flag_log_count[id] < 10)
 	{
@@ -348,11 +347,11 @@ int __cdecl sub_671B02_hook(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int 
 const static int max_mointor_count = 9;
 bool engine_basic_init()
 {
-	DWORD* flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
-	memset(flags_array, 0x00, flags::count); // should be zero initalized anyways but the game does it
+	DWORD* flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x46d820);
+	SecureZeroMemory(flags_array, startup_flags::count * sizeof(DWORD)); // should be zero initalized anyways but the game does it
 
-	flags_array[flags::disable_voice_chat] = 1; // disables voice chat (XHV engine)
-	flags_array[flags::nointro] = H2Config_skip_intro;
+	flags_array[startup_flags::disable_voice_chat] = 1; // disables voice chat (XHV engine)
+	flags_array[startup_flags::nointro] = H2Config_skip_intro;
 
 	HANDLE(*fn_c000285fd)() = (HANDLE(*)())(h2mod->GetAddress(0x000285fd));
 
@@ -367,24 +366,24 @@ bool engine_basic_init()
 			wchar_t* cmd_line_arg = cmd_line_args[i];
 
 			if (_wcsicmp(cmd_line_arg, L"-windowed") == 0) {
-				flags_array[flags::windowed] = 1;
+				flags_array[startup_flags::windowed] = 1;
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-nosound") == 0) {
-				flags_array[flags::nosound] = 1;
+				flags_array[startup_flags::nosound] = 1;
 				WriteValue(H2BaseAddr + 0x479EDC, 1);
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-novsync") == 0) {
-				flags_array[flags::novsync] = 1;
+				flags_array[startup_flags::novsync] = 1;
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-nointro") == 0) {
-				flags_array[flags::nointro] = 1;
+				flags_array[startup_flags::nointro] = 1;
 			}
 			else if (_wcsnicmp(cmd_line_arg, L"-monitor:", 9) == 0) {
 				int monitor_id = _wtol(&cmd_line_arg[9]);
-				flags_array[flags::monitor_count] = min(max(0, monitor_id), max_mointor_count);
+				flags_array[startup_flags::monitor_count] = min(max(0, monitor_id), max_mointor_count);
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-highquality") == 0) {
-				flags_array[flags::high_quality] = 1;
+				flags_array[startup_flags::high_quality] = 1;
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-depthbiasfix") == 0)
 			{
@@ -407,20 +406,20 @@ bool engine_basic_init()
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-voicechat") == 0)
 			{
-				flags_array[flags::disable_voice_chat] = 0;
+				flags_array[startup_flags::disable_voice_chat] = 0;
 			}
 #ifdef _DEBUG
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
 				int flag_id = _wtol(&cmd_line_arg[10]);
-				flags_array[min(max(0, flag_id), flags::count - 1)] = 1;
+				flags_array[min(max(0, flag_id), startup_flags::count - 1)] = 1;
 			}
 #endif
 		}
 	}
 	LocalFree(cmd_line_args);
 
-	if (flags_array[flags::unk26])
-		init_timing(1000 * flags_array[flags::unk26]);
+	if (flags_array[startup_flags::unk26])
+		init_timing(1000 * flags_array[startup_flags::unk26]);
 	real_math_initialize();
 	async_initialize();
 	global_preferences_initialize();

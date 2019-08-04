@@ -292,7 +292,7 @@ signed int __cdecl object_new_hook(void *pObject)
 	object_to_variant[result] = variant_index;
 
 	//wchar_t DebugText[255] = { 0 };
-	//ZeroMemory(DebugText, sizeof(DebugText));
+	//SecureZeroMemory(DebugText, sizeof(DebugText));
 	//wsprintf(DebugText, L"AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result, variant_index);
 
 	//LOG_TRACE_GAME_N("AI object_new hook - object_index: %08X - variant_index: %08X - datum: %08X", result, variant_index);
@@ -360,7 +360,7 @@ int __stdcall set_unit_creation_data_hook(unsigned int object_index, void* objec
 		*(int*)((char*)object_creation_data + 0x24) = object_to_variant[object_index];
 
 		/*wchar_t DebugText[255] = { 0 };
-		ZeroMemory(DebugText, sizeof(DebugText));
+		SecureZeroMemory(DebugText, sizeof(DebugText));
 		wsprintf(DebugText, L"AI unit_creation_data_setup hook - object_index: %08X - variant_index: %08X", object_index, object_to_variant[object_index]);
 
 		LOG_TRACE_GAME_N("set_unit_creation_data_hook - object_index: %08X, variant_index: %08X", object_index, object_to_variant[object_index]);
@@ -396,7 +396,7 @@ bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObje
 	if (*(int*)((char*)pCreationData + 0x24) != -1)
 	{
 		//wchar_t DebugText[255] = { 0 };
-		//ZeroMemory(DebugText, sizeof(DebugText));
+		//SecureZeroMemory(DebugText, sizeof(DebugText));
 		//wsprintf(DebugText, L"create_unit_hook - variant type: %08X - ", *(int*)((char*)pCreationData + 0x24));
 
 		//addDebugText(DebugText);
@@ -1025,9 +1025,9 @@ bool __cdecl player_remove_packet_handler(void *packet, int size, void *data)
 
 void get_object_table_memory()
 {
-	game_state_players = (GameStatePlayerTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4D64C4 : 0x4A8260))));
-	game_state_objects_header = (GameStateObjectHeaderTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x50C8EC : 0x4E461C))));
-	game_state_actors = (GameStateActorTable*)((*(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x9A1C5C : 0xA965DC))));
+	game_state_actors = reinterpret_cast<GameStateActorTable*>(*h2mod->GetAddress<DWORD>(0xA965DC, 0x9A1C5C));
+	game_state_players = reinterpret_cast<GameStatePlayerTable*>(*h2mod->GetAddress<DWORD>(0x4A8260, 0x4D64C4));
+	game_state_objects_header = reinterpret_cast<GameStateObjectHeaderTable*>(*h2mod->GetAddress<DWORD>(0x4E461C, 0x50C8EC));
 }
 
 // this gets called after game globals are updated fyi (which includes game engine type)

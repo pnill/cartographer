@@ -38,11 +38,11 @@ bool fork_cmd(LPSTR cmd) {
 	bool bSuccess;
 
 	// Set up members of the PROCESS_INFORMATION structure. 
-	ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
+	SecureZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
 
 	// Set up members of the STARTUPINFO structure. 
 	// This structure specifies the STDERR and STDOUT handles for redirection.
-	ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
+	SecureZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
 	siStartInfo.cb = sizeof(STARTUPINFO);
 	//siStartInfo.dwFlags |= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 	//siStartInfo.wShowWindow = SW_HIDE; // execute hide 

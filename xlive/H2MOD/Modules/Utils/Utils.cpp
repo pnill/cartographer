@@ -181,7 +181,7 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* 
 void GetVKeyCodeString(int vkey, char* rtnString, int strLen) {
 	snprintf(rtnString, 5, "0x%x", vkey);
 	char key_name[20];
-	memset(key_name, 0, sizeof(key_name));
+	SecureZeroMemory(key_name, sizeof(key_name));
 	if (vkey >= 0x70 && vkey <= 0x87) {
 		int func_num = vkey - 0x70 + 1;
 		snprintf(key_name, 20, "VK_F%d", func_num);
@@ -198,7 +198,7 @@ void PadCStringWithChar(char* strToPad, int toFullLength, char c) {
 	for (int i = strlen(strToPad); i < toFullLength - 1; i++) {
 		memset(strToPad + i, c, sizeof(char));
 	}
-	memset(strToPad + toFullLength - 1, 0, sizeof(char));
+	SecureZeroMemory(strToPad + toFullLength - 1, sizeof(char));
 }
 
 int GetWidePathFromFullWideFilename(wchar_t* filepath, wchar_t* rtnpath) {

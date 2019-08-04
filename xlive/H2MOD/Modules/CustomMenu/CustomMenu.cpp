@@ -3716,9 +3716,9 @@ static DWORD WINAPI ThreadCreate(LPVOID lParam)
 		snprintf(username2, strlen(username) + 1, username);
 		char* pass2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
 		snprintf(pass2, strlen(pass) + 1, pass);
-		memset(username, 0, strlen(username));
-		memset(email, 0, strlen(email));
-		memset(pass, 0, strlen(pass));
+		SecureZeroMemory(username, strlen(username));
+		SecureZeroMemory(email, strlen(email));
+		SecureZeroMemory(pass, strlen(pass));
 	}
 
 	updateAccountingActiveHandle(false);
@@ -3919,7 +3919,7 @@ static DWORD WINAPI ThreadLogin(LPVOID lParam)
 			GSCustomMenuCall_Login_Warn();
 			H2AccountLastUsed = 0;
 		}
-		memset(identifier_pass, 0, strlen(identifier_pass));
+		SecureZeroMemory(identifier_pass, strlen(identifier_pass));
 	}
 	else {
 		//login to account

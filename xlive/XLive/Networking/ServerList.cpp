@@ -14,7 +14,7 @@ extern CHAR g_szUserName[4][16];
 extern unsigned short H2Config_base_port;
 
 ServerList LiveManager;
-HANDLE ServerEnum = NULL;
+HANDLE ServerEnumHandle = NULL;
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
@@ -25,7 +25,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 void BadServer(ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult, const char* log_catch)
 {
 	LOG_TRACE_GAME("BadServer - XUID: {0} - Log Catch: {1}", xuid, log_catch);
-	ZeroMemory(nResult, sizeof(_XLOCATOR_SEARCHRESULT));
+	SecureZeroMemory(nResult, sizeof(_XLOCATOR_SEARCHRESULT));
 }
 
 void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult)
@@ -191,7 +191,7 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 				str.erase(std::remove(str.begin(), str.end(), '\\'), str.end());
 
 				unicode_data = new wchar_t[str.size() + 1];
-				ZeroMemory(unicode_data, str.size() + 1);
+				SecureZeroMemory(unicode_data, str.size() + 1);
 
 				wcscpy(unicode_data, str.c_str());
 
@@ -213,7 +213,7 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 	++LiveManager.total_servers;
 }
 
-void GetServersFromHttp(ServerList* servptr, PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBuffer)
+void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
 {
 	servptr->server_list_download_running = true;
 
@@ -238,8 +238,8 @@ void GetServersFromHttp(ServerList* servptr, PXOVERLAPPED pOverlapped, DWORD cbB
 
 		if (server_count * sizeof(_XLOCATOR_SEARCHRESULT) > cbBuffer) {
 
-			servptr->server_list_download_running = false;
 			servptr->servers_left = -1;
+			servptr->server_list_download_running = false;
 
 			pOverlapped->InternalLow = ERROR_INSUFFICIENT_BUFFER;
 			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
@@ -257,7 +257,7 @@ void GetServersFromHttp(ServerList* servptr, PXOVERLAPPED pOverlapped, DWORD cbB
 			servptr->servers_left--;
 			pOverlapped->InternalLow = ERROR_SUCCESS;
 			pOverlapped->InternalHigh = servptr->GetTotalServers();
-			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_PENDING);
+			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 		}
 
 		std::string debg_1 = "Server Count: " + std::to_string(servptr->GetTotalServers());
@@ -314,16 +314,13 @@ bool ServerList::GetRunning()
 	return server_list_download_running;
 }
 
-void ServerList::GetServers(PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBuffer)
+void ServerList::GetServers(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
 {
-	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
-	pOverlapped->InternalHigh = ERROR_IO_INCOMPLETE;
-
 	// check if another thread isn't running and servers_left is in "unitialized state"
 	if (!this->server_list_download_running && this->servers_left == -1)
 	{
 		this->total_servers = 0;
-		this->serv_thread = std::thread(GetServersFromHttp, this, pOverlapped, cbBuffer, pvBuffer);
+		this->serv_thread = std::thread(GetServersFromHttp, this, cbBuffer, pvBuffer, pOverlapped);
 		this->serv_thread.detach();
 	}
 
@@ -337,6 +334,11 @@ void ServerList::GetServers(PXOVERLAPPED pOverlapped, DWORD cbBuffer, char* pvBu
 		pOverlapped->InternalHigh = this->GetTotalServers();
 		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
 	}
+	else
+	{
+		pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
+		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
+	}
 }
 
 void RemoveServer(PXOVERLAPPED pOverlapped)
@@ -347,7 +349,7 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 
 	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
 	pOverlapped->InternalHigh = 1;
-	pOverlapped->dwExtendedError = ERROR_IO_INCOMPLETE;
+	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
 	curl = curl_easy_init();
 	if (curl)
@@ -376,7 +378,7 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 
 	pOverlapped->InternalLow = ERROR_SUCCESS;
 	pOverlapped->InternalHigh = 0;
-	pOverlapped->dwExtendedError = ERROR_SUCCESS;
+	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 }
 
 DWORD WINAPI XLocatorServerUnAdvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
@@ -393,7 +395,7 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 
 	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
 	pOverlapped->InternalHigh = 1;
-	pOverlapped->dwExtendedError = ERROR_IO_INCOMPLETE;
+	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
 	curl = curl_easy_init();
 	if (curl) {
@@ -491,7 +493,7 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 
 	pOverlapped->InternalLow = ERROR_SUCCESS;
 	pOverlapped->InternalHigh = 0;
-	pOverlapped->dwExtendedError = ERROR_SUCCESS;
+	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 }
 
 DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
@@ -532,7 +534,7 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int 
 		*phEnum = CreateMutex(NULL, NULL, NULL);
 
 		LOG_TRACE_XLIVE("- Handle = {:p}", (void*)*phEnum);
-		ServerEnum = *phEnum;
+		ServerEnumHandle = *phEnum;
 	}
 
 	// not done - error now

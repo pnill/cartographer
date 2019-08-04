@@ -24,7 +24,7 @@ signed int Infection::calculateZombiePlayerIndex() {
 		rand_index = rand() % session->total_peers;
 		if (rand_index == session->session_host_peer_index)
 		{
-			if (session->dedicated_server[0] == 1)
+			if (session->dedicated_server)
 			{
 				if (session->total_peers <= 1)
 					return -1;
