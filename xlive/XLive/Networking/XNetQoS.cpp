@@ -561,8 +561,8 @@ DWORD WINAPI XNetQosGetListenStats(DWORD a1, DWORD a2)
 int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4)
 {
 	typedef int(__cdecl* get_free_spot_from_object_header)(int a1);
-	auto p_get_free_spot_from_object_header = (get_free_spot_from_object_header)(h2mod->GetBase() + (h2mod->Server ? 0x3248C : 0x667A0));
-	DWORD transport_qos_attempts = *(DWORD*)(h2mod->GetBase() + (h2mod->Server ? 0x991078 : 0x526BF4));
+	auto p_get_free_spot_from_object_header = reinterpret_cast<get_free_spot_from_object_header>(h2mod->GetAddress(0x667A0, 0x3248C));
+	DWORD transport_qos_attempts = *h2mod->GetPointer<DWORD*>(0x526BF4, 0x991078);
 
 	XNQOS* pxnqos = new XNQOS;
 	pxnqos->cxnqos = 1;

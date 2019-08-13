@@ -13,6 +13,7 @@
 #include "H2MOD\Variants\DeviceShop\DeviceShop.h"
 #include "H2MOD\Variants\H2Final\H2Final.h"
 #include "H2MOD\Variants\XboxTick\XboxTick.h"
+#include "H2MOD\Modules\DataArray\DataArray.h"
 #include "H2MOD\Variants\Infection\Infection.h"
 #include "H2MOD\Variants\FireFight\FireFight.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
@@ -30,9 +31,9 @@ using namespace Blam::EngineDefinitions::Players;
 using namespace Blam::EngineDefinitions::Objects;
 using namespace Blam::EngineDefinitions::Actors;
 
-extern GameStatePlayerTable *game_state_players;
-extern GameStateObjectHeaderTable* game_state_objects_header;
-extern GameStateActorTable* game_state_actors;
+extern s_data_array<Actor>* game_state_actors;
+extern s_data_array<GameStatePlayer>* game_state_players;
+extern s_data_array<GameStateObjectsHeader>* game_state_objects_header;
 
 extern DeviceShop* device_shop;
 extern VariantPlayer* variant_player;

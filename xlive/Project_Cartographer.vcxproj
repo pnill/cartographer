@@ -464,6 +464,7 @@
     <ClInclude Include="Blam\Cache\Tags\tag_base.h" />
     <ClInclude Include="Blam\Cache\Tags\tag_definitons.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shad.h" />
+    <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolution.h" />
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
@@ -505,7 +506,6 @@
     <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
     <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
     <ClInclude Include="Blam\Engine\Objects\Objects.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectsHeader.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="Blam\Engine\Tags\TagInstance.h" />

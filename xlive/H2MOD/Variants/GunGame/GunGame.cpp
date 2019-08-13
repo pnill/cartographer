@@ -144,7 +144,7 @@ void GunGame::setGameScore() {
 }
 
 void GunGame::spawnPlayerServer(int playerIndex) {
-	wchar_t* pName = h2mod->get_player_name_from_index(playerIndex);
+	wchar_t* pName = h2mod->get_player_name_from_player_index(playerIndex);
 	wchar_t* localName = h2mod->get_local_player_name();
 	LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer({0}) : {1}", playerIndex, pName);
 
@@ -191,61 +191,60 @@ void GunGame::playerDiedServer(int unit_datum_index)
 	if (unit_object) {
 		call_unit_reset_equipment(unit_datum_index);
 
-		int pIndex = h2mod->get_player_index_from_unit_datum(unit_datum_index);
-		sendGrenadePacket(GrenadeType::Frag, 0, pIndex, 1);
-		sendGrenadePacket(GrenadeType::Plasma, 0, pIndex, 1);
+		int playerIndex = h2mod->get_player_index_from_unit_datum(unit_datum_index);
+		sendGrenadePacket(GrenadeType::Frag, 0, playerIndex, 1);
+		sendGrenadePacket(GrenadeType::Plasma, 0, playerIndex, 1);
 	}
 }
 
-void GunGame::levelUpServer(int PlayerIndex)
+void GunGame::levelUpServer(int playerIndex)
 {
-	wchar_t* PlayerName = h2mod->get_player_name_from_index(PlayerIndex);
+	wchar_t* playerName = h2mod->get_player_name_from_player_index(playerIndex);
 	wchar_t* localName = h2mod->get_local_player_name();
-	LOG_TRACE_GAME(L"[H2Mod-GunGame]: LevelUp({0}) : {1}", PlayerIndex, PlayerName);
+	LOG_TRACE_GAME(L"[H2Mod-GunGame]: LevelUp({0}) : {1}", playerIndex, playerName);
 
-	int level = GunGame::gungamePlayers[players->getPlayerName(PlayerIndex)];
+	int level = GunGame::gungamePlayers[players->getPlayerName(playerIndex)];
 	level++;
-	GunGame::gungamePlayers[players->getPlayerName(PlayerIndex)] = level;
+	GunGame::gungamePlayers[players->getPlayerName(playerIndex)] = level;
 
-	LOG_TRACE_GAME("[H2Mod-GunGame]: LevelUp({0}) - new level: {1} ", PlayerIndex, level);
+	LOG_TRACE_GAME("[H2Mod-GunGame]: LevelUp({0}) - new level: {1} ", playerIndex, level);
 
 	if (level == 15) {
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 15 - Frag Grenades!", PlayerName);
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 15 - Frag Grenades!", playerName);
 
-		if (wcscmp(PlayerName, localName) == 0) {
-			call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(PlayerIndex));
-			h2mod->set_local_grenades(GrenadeType::Frag, 99, PlayerIndex);
+		if (wcscmp(playerName, localName) == 0) {
+			call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
+			h2mod->set_local_grenades(GrenadeType::Frag, 99, playerIndex);
 		} else {
-			sendGrenadePacket(GrenadeType::Frag, 99, PlayerIndex, 1);
+			sendGrenadePacket(GrenadeType::Frag, 99, playerIndex, 1);
 		}
 	}
 
 	if (level == 16) {
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 16 - Plasma Grenades!", PlayerName);
-		if (wcscmp(PlayerName, localName) == 0) {
-			call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(PlayerIndex));
-			h2mod->set_local_grenades(GrenadeType::Plasma, 99, PlayerIndex);
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 16 - Plasma Grenades!", playerName);
+		if (wcscmp(playerName, localName) == 0) {
+			call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
+			h2mod->set_local_grenades(GrenadeType::Plasma, 99, playerIndex);
 		} else {
-			sendGrenadePacket(GrenadeType::Plasma, 99, PlayerIndex, 1);
+			sendGrenadePacket(GrenadeType::Plasma, 99, playerIndex, 1);
 		}
 		//TODO: end game
 	}
 
 	if (level < 15)	{
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on level {} giving them weapon...", PlayerName, level);
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on level {} giving them weapon...", playerName, level);
 
 		int LevelWeapon = GunGame::level_weapon[level];
-		sendGrenadePacket(GrenadeType::Frag, 0, PlayerIndex, 1);
-		sendGrenadePacket(GrenadeType::Plasma, 0, PlayerIndex, 1);
-		GivePlayerWeapon(PlayerIndex, LevelWeapon, 1);
+		sendGrenadePacket(GrenadeType::Frag, 0, playerIndex, 1);
+		sendGrenadePacket(GrenadeType::Plasma, 0, playerIndex, 1);
+		GivePlayerWeapon(playerIndex, LevelWeapon, 1);
 
 	}
 }
 
-void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
+void GunGame::sendGrenadePacket(BYTE type, BYTE count, int playerIndex, bool bReset)
 {
-	int unit_datum_index = h2mod->get_unit_datum_from_player_index(pIndex);
-	wchar_t* pName = h2mod->get_player_name_from_index(pIndex);
+	int unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
 
 	int unit_object = call_get_object(unit_datum_index, 3);
 	if (unit_object)
@@ -261,24 +260,15 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset)
 		{
 			*(BYTE*)((BYTE*)unit_object + 0x253) = count;
 		}
-		if (h2mod->Server) {
-			if (pIndex != 0) {
-				//when sending a packet we use the players data structure to get peer index
-				//the player structure does not have a slot for dedis, this player index was calculated based on that assumption
-				//so we always subtract by 1 (since 0 here is not the slot for dedi anymore and can be a player)
-				pIndex -= 1;
-				LOG_TRACE_GAME("[h2mod-GunGame] altering player index from {0} to {1}", pIndex - 1, pIndex);
-			}
-		}
-		LOG_TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex={0}, peerIndex={1}", pIndex, players->getPeerIndex(pIndex));
+		LOG_TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex={0}, peerIndex={1}", playerIndex, players->getPeerIndexFromPlayerIndex(playerIndex));
 
 		s_unit_grenades data;
 		SecureZeroMemory(&data, sizeof(data));
 
 		data.type = type;
 		data.count = count;
-		data.pindex = pIndex;
-		CustomPackets::sendUnitGrenadesPacket(NetworkSession::getCurrentNetworkSession(), players->getPeerIndex(pIndex), &data);
+		data.pindex = playerIndex;
+		CustomPackets::sendUnitGrenadesPacket(NetworkSession::getCurrentNetworkSession(), players->getPeerIndexFromPlayerIndex(playerIndex), &data);
 	}
 }
 
@@ -371,7 +361,7 @@ void GunGameHandler::setPlayerIndex(int playerIndex)
 
 void GunGameHandler::setUnitDatumIndex(int unitDatumIndex)
 {
-	this->unitDatumIndex = unitDatumIndex;
+	this->unitDatumIndex = (h2mod->get_player_index_from_unit_datum(unitDatumIndex) != -1 ? unitDatumIndex : -1);
 }
 
 int GunGameHandler::getPlayerIndex()

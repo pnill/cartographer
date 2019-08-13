@@ -13,15 +13,15 @@ FireFight::FireFight()
 	this->playerKill = new FireFightKillHandler();
 }
 
-void FireFight::KilledAI(DatumIndex ai_datum,XUID killer)
+void FireFight::KilledAI(DatumIndex ai_datum, XUID killer)
 {
 	int points = 0;
-	if ((&game_state_objects_header->object_header[ai_datum.Index])->object->ObjectType == Objects::ObjectType::biped)
+	if (game_state_objects_header->data[ai_datum.Index].object->ObjectType == Objects::ObjectType::biped)
 	{
-		DatumIndex actor_datum = (&game_state_objects_header->object_header[ai_datum.Index])->object->ActorDatum; // Grab the actor from the killed AI
+		DatumIndex actor_datum = game_state_objects_header->data[ai_datum.Index].object->ActorDatum; // Grab the actor from the killed AI
 		if (actor_datum.Index != -1) // Ensure that it was valid
 		{
-			DatumIndex char_datum = (&game_state_actors->actors[actor_datum.Index])->character_datum; // get the character tag datum assigned to the actor.
+			DatumIndex char_datum = game_state_actors->data[actor_datum.Index].character_datum; // get the character tag datum assigned to the actor.
 			auto *character = tags::get_tag<'char', character_tag_group>(char_datum);
 
 			if (character && character->SwarmProperties.size > 0)

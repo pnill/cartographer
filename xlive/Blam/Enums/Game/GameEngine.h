@@ -1,6 +1,6 @@
 #pragma once
 
-enum EngineType
+enum EngineType : int
 {
 	INVALID_ENGINE_TYPE = 0,
 	SINGLE_PLAYER_ENGINE = 1,

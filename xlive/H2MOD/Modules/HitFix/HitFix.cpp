@@ -4,14 +4,9 @@
 
 void HitFix::Initialize()
 {
-	int offset = 0x47CD54;
-	if (h2mod->Server) {
-		offset = 0x4A29BC;
-	}
+	DWORD AddressOffset = *h2mod->GetPointer<DWORD*>(0x47CD54, 0x4A29BC);
 
-	DWORD AddressOffset = *(DWORD*)((char*)h2mod->GetBase() + offset);
-
-	*(float*)(AddressOffset + 0xA4EC88) = 1200.0f; // battle_rifle_bullet.proj Initial Velocity 
+	*(float*)(AddressOffset + 0xA4EC88) = 1200.0f; //battle_rifle_bullet.proj Initial Velocity 
 	*(float*)(AddressOffset + 0xA4EC8C) = 1200.0f; //battle_rifle_bullet.proj Final Velocity
 	*(float*)(AddressOffset + 0xA84DD4) = 1200.0f; //carbine_projectile Initial Velocity 400
 	*(float*)(AddressOffset + 0xA84DD8) = 1200.0f; //carbine_projectile Final Velocity 400

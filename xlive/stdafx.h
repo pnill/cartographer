@@ -49,6 +49,7 @@
 //#include <Objbase.h>
 //#include <Shlwapi.h>
 #include <set>
+#include <map>
 #include <mutex>
 #include <queue>
 #include <string>

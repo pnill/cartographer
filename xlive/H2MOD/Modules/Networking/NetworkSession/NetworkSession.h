@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
+#include "..\Blam\Engine\Players\Players.h"
 
 enum network_session_state : signed int
 {
@@ -29,7 +30,7 @@ struct network_address
 	short address_type;
 };
 
-struct peer_network_info
+struct PeerInfo
 {
 	XNADDR address;
 	BYTE gap_24[4];
@@ -49,9 +50,9 @@ struct peer_network_info
 	signed int field_104;
 	signed int field_108;
 };
-static_assert(sizeof(peer_network_info) == 268, "Invalid peer_network_info size");
+static_assert(sizeof(PeerInfo) == 268, "Invalid PeerNetworkInfo size");
 
-struct virtual_couch
+struct VirtualCouch
 {
 	DWORD incremental_update_number;
 	bool exists;
@@ -60,56 +61,26 @@ struct virtual_couch
 	DWORD xuid_count;
 	XUID xuid[16];
 };
-static_assert(sizeof(virtual_couch) == 200, "Invalid virtual_couch size");
+static_assert(sizeof(VirtualCouch) == 200, "Invalid virtual_couch size");
 
-struct player_emblem_data
+struct PlayerInformation
 {
-	char primary_color;
-	char secondary_color;
-	char tertiary_color;
-	char quaternary_color;
-	char player_caracter_type;
-	char foreground_emblem;
-	char background_emblem;
-	char emblem_flags;
-};
-
-struct player_profile_data
-{
-	wchar_t playerName[32];
-	player_emblem_data emblem_data;
-	BYTE gap48[8];
-	wchar_t clan_identifier_name[16];
-	struct {
-		DWORD ID_1;
-		DWORD ID_2;
-		DWORD ID_3;
-	} clan_identifiers;
-	char player_team;
-	char player_handicap_level;
-	char player_displayed_skill;
-	char player_overall_skill;
-	char player_is_griefer;
-	char bungie_user_role;
-	char achievement_flags;
-};
-
-struct player_info
-{
-	XUID identifier;
-	DWORD player_index;
-	signed __int16 peer_index;
-	signed __int16 peer_user_index;
-	WORD player_flags;
-	char properties_valid[2];
+	XUID identifier; // -0xA
+	DWORD peer_index; // -0x8
+	signed __int16 peer_user_index; // -0x4
+	signed __int16 unk; // -0x2
+	WORD player_flags; // 0x0
+	bool properties_valid;
+	char pad[1];
 	unsigned int controller_index;
-	player_profile_data _player_profile_data;
-	BYTE pad_99;
-	player_profile_data _player_profile_data_1;
-	BYTE pad_11D;
+	PlayerProperties player_properties;
+	BYTE biped_index;
+	PlayerProperties player_properties_1;
+	BYTE biped_index2;
 	unsigned int player_voice;
 	unsigned int player_text_chat;
 };
+static_assert(sizeof(PlayerInformation) == 296, "Invalid player_info size");
 
 struct unk_network_connection_info
 {
@@ -120,6 +91,18 @@ struct unk_network_connection_info
 	signed int field_10;
 	signed int field_14;
 	signed int field_18;
+};
+
+struct Membership {
+	DWORD update_number;
+	DWORD session_leader_index; //this is not host index, but the player which controlls the party
+	XUID dedicated_server_xuid;
+	DWORD field_80;
+	DWORD total_peers;
+	PeerInfo peer_info[17];
+	DWORD total_party_players;
+	DWORD peer_bit_flags;
+	PlayerInformation player_info[16];
 };
 
 struct network_session
@@ -142,20 +125,12 @@ struct network_session
 	DWORD session_host_peer_index;
 	int elected_host_peer_index;
 	DWORD field_6C;
-	DWORD membership_1;
-	DWORD session_leader_index; //this is not host index, but the player which controlls the party
-	XUID dedicated_server_xuid;
-	DWORD field_80;
-	DWORD total_peers;
-	peer_network_info peers_network_info[17];
-	DWORD total_party_players;
-	DWORD peer_bit_flags;
-	player_info player_information[16];
-	BYTE gap24DC[4];
-	DWORD membership_2;
-	BYTE gap_24E4[9324];
-	virtual_couch v_couch_1;
-	virtual_couch v_couch_2;
+	Membership membership;
+	DWORD unk_field;
+	DWORD unk_field2;
+	Membership membership_update_buffer;
+	VirtualCouch v_couch_1;
+	VirtualCouch v_couch_2;
 	DWORD voting_information_1;
 	int field_4AE4;
 	int field_4AE8;
@@ -282,5 +257,6 @@ namespace NetworkSession
 	bool localPeerIsSessionHost();
 	signed int getPeerIndexFromNetworkAddress(network_address* addr);
 	char getMapFileLocation(network_session* thisx, wchar_t* buffer, size_t szBuffer);
+	void kick_player(int peerIndex);
 }
 

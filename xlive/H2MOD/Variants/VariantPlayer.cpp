@@ -9,17 +9,17 @@
 XUID VariantPlayer::GetXUID(DatumIndex datum, bool player)
 {
 	if (player)
-		return (&game_state_players->players[datum.ToAbsoluteIndex()])->xuid;
+		return (&game_state_players->data[datum.ToAbsoluteIndex()])->xuid;
 	else
 	{
-		short player_index = (&game_state_objects_header->object_header[datum.ToAbsoluteIndex()])->object->PlayerDatum.ToAbsoluteIndex();
-		return (&game_state_players->players[player_index])->xuid;
+		short player_index = (&game_state_objects_header->data[datum.ToAbsoluteIndex()])->object->PlayerDatum.ToAbsoluteIndex();
+		return (&game_state_players->data[player_index])->xuid;
 	}
 }
 
 DatumIndex VariantPlayer::GetPlayerDatum(DatumIndex unit_datum)
 {
-	return (&game_state_objects_header->object_header[unit_datum.ToAbsoluteIndex()])->object->PlayerDatum;
+	return (&game_state_objects_header->data[unit_datum.ToAbsoluteIndex()])->object->PlayerDatum;
 }
 
 DatumIndex VariantPlayer::GetPlayerDatum(XUID xuid)
@@ -28,7 +28,7 @@ DatumIndex VariantPlayer::GetPlayerDatum(XUID xuid)
 	{
 		for (auto i = 0; i < 16; i++)
 		{
-			if ((&game_state_players->players[i])->xuid == xuid)
+			if ((&game_state_players->data[i])->xuid == xuid)
 			{
 
 				DatumIndex player_datum;
@@ -49,7 +49,7 @@ DatumIndex VariantPlayer::GetPlayerDatum(XUID xuid)
 
 DatumIndex VariantPlayer::GetUnitDatum(DatumIndex player_datum)
 {
-	return (&game_state_players->players[player_datum.Index])->unit_index;
+	return (&game_state_players->data[player_datum.Index])->unit_index;
 }
 
 DatumIndex VariantPlayer::GetUnitDatum(XUID xuid)
@@ -60,9 +60,9 @@ DatumIndex VariantPlayer::GetUnitDatum(XUID xuid)
 		for (auto i = 0; i < 16; i++)
 		{
 
-			if ((&game_state_players->players[i])->xuid == xuid)
+			if ((&game_state_players->data[i])->xuid == xuid)
 			{
-				DatumIndex unit_datum = (&game_state_players->players[i])->unit_index;
+				DatumIndex unit_datum = (&game_state_players->data[i])->unit_index;
 				DatumIndex player_datum;
 				player_datum.Index = i;
 

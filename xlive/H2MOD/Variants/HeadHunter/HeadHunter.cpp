@@ -19,15 +19,15 @@ HeadHunter::HeadHunter()
 
 void HeadHunter::SpawnSkull(DatumIndex unit_datum)
 {
-	if ((&game_state_objects_header->object_header[unit_datum.Index])->object->ObjectType == Objects::ObjectType::biped)
+	if ((&game_state_objects_header->data[unit_datum.Index])->object->ObjectType == Objects::ObjectType::biped)
 	{
 		using namespace Blam::EngineDefinitions::Objects;
 		ObjectPlacementData* nObject = new ObjectPlacementData;
 
 		call_object_placement_data_new(nObject, Weapon::ball, -1, 0);
-		nObject->Placement.X = (&game_state_objects_header->object_header[unit_datum.Index])->object->Placement.X;
-		nObject->Placement.Y = (&game_state_objects_header->object_header[unit_datum.Index])->object->Placement.Y;
-		nObject->Placement.Z = (&game_state_objects_header->object_header[unit_datum.Index])->object->Placement.Z;
+		nObject->Placement.X = (&game_state_objects_header->data[unit_datum.Index])->object->Placement.X;
+		nObject->Placement.Y = (&game_state_objects_header->data[unit_datum.Index])->object->Placement.Y;
+		nObject->Placement.Z = (&game_state_objects_header->data[unit_datum.Index])->object->Placement.Z;
 
 		int GameStateObject = call_object_new(nObject); //TODO: Re-write all these functions to use DatumIndex.
 		if (GameStateObject != NULL)
@@ -76,7 +76,7 @@ void HeadHunterHandler::SetDeadPlayer(DatumIndex dead_datum)
 
 bool HeadHunterHandler::SetInteractedObject(DatumIndex object_datum)
 {
-	if ((&game_state_objects_header->object_header[object_datum.Index])->object->DefinitionIndex.Index == (Weapon::ball & 0xFFFF))
+	if ((&game_state_objects_header->data[object_datum.Index])->object->DefinitionIndex.Index == (Weapon::ball & 0xFFFF))
 	{
 		this->object_interaction = object_datum;
 		return true;

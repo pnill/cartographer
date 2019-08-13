@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <malloc.h>
 
+
 #include "hook.h"
 #pragma warning( disable :4996)
 
@@ -93,12 +94,13 @@ void *VTableFunction(void *ClassPtr, DWORD index)
 
 void WriteBytes(DWORD destAddress, LPVOID bytesToWrite, int numBytes)
 {
-	DWORD OldProtection;
 	DWORD temp;
+	DWORD temp2;
+	LPVOID lpAddr = reinterpret_cast<LPVOID>(destAddress);
 
-	VirtualProtect((LPVOID)destAddress, numBytes, PAGE_EXECUTE_READWRITE, &OldProtection);
-	memcpy((LPVOID)destAddress, bytesToWrite, numBytes);
-	VirtualProtect((LPVOID)destAddress, numBytes, OldProtection, &temp); //quick fix for exception that happens here
+	VirtualProtect(lpAddr, numBytes, PAGE_EXECUTE_READWRITE, &temp);
+	memcpy(lpAddr, bytesToWrite, numBytes);
+	VirtualProtect(lpAddr, numBytes, temp, &temp2); //quick fix for exception that happens here
 }
 
 void PatchCall(DWORD call_addr, DWORD new_function_ptr) {
@@ -108,8 +110,8 @@ void PatchCall(DWORD call_addr, DWORD new_function_ptr) {
 
 void WritePointer(DWORD offset, void *ptr) {
 	BYTE* pbyte = (BYTE*)&ptr;
-	BYTE assmNewFuncRel[0x4] = { pbyte[0], pbyte[1], pbyte[2], pbyte[3] };
-	WriteBytes(offset, assmNewFuncRel, 0x4);
+	BYTE assmNewFuncRel[4] = { pbyte[0], pbyte[1], pbyte[2], pbyte[3] };
+	WriteBytes(offset, assmNewFuncRel, 4);
 }
 
 void PatchWinAPICall(DWORD call_addr, DWORD new_function_ptr)
@@ -143,4 +145,12 @@ VOID Codecave(DWORD destAddress, VOID(*func)(VOID), BYTE nopCount)
 
 
 	WriteBytes(destAddress + 5, nopPatch, nopCount);
+}
+
+void NopFill(DWORD address, int length)
+{
+	BYTE* byteArray = new BYTE[length];
+	memset(byteArray, 0x90, length);
+	WriteBytes(address, byteArray, length);
+	delete[] byteArray;
 }

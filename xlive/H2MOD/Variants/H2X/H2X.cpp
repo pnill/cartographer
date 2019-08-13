@@ -7,7 +7,7 @@ void H2X::Initialize()
 	if (h2mod->Server)
 		return;
 	
-	DWORD FloatOffsets = *(DWORD*)(h2mod->GetBase() + 0x47CD54);
+	DWORD FloatOffsets = *h2mod->GetPointer<DWORD*>(0x47CD54);
 
 	// Weapon fire rates
 	*(float*)(FloatOffsets + 0xA49A7C) = 0.295f; /*H2X BR fire recovery time*/
@@ -95,7 +95,7 @@ void H2X::Deinitialize()
 	if (h2mod->Server)
 		return;
 
-	DWORD FloatOffsets = *(DWORD*)(h2mod->GetBase() + 0x47CD54);
+	DWORD FloatOffsets = *h2mod->GetPointer<DWORD*>(0x47CD54);
 
 	*(float*)(FloatOffsets + 0xA49A7C) = 0.26f; /*H2V BR fire recovery time*/
 	*(float*)(FloatOffsets + 0xB7A330) = 0.5f; /*H2V Sniper Rifle fire recovery time*/

@@ -1,7 +1,11 @@
 #pragma once
+
 #include "Blam\Enums\Enums.h"
 #include "Blam\Shared\SharedDefinitions.h"
 #include "Blam\Cache\DataTypes\DataTypes.h"
+
+using namespace Blam::Enums;
+using namespace Blam::Cache::DataTypes;
 
 struct Item
 {
@@ -14,8 +18,47 @@ struct PlayerInventory {
 	char pad_char[0x1380];
 }; static_assert(sizeof(PlayerInventory) == 0x19C0, "PlayerInventory != 0x19C0");
 
-using namespace Blam::Enums;
-using namespace Blam::Cache::DataTypes;
+#pragma pack(push, 1)
+struct PlayerProperties
+{
+	wchar_t player_name[16];
+	int spawn_protection_time;
+	char unk[28];
+
+	struct PlayerProfile
+	{
+		Player::Color primary_color;
+		Player::Color secondary_color;
+		Player::Color tertiary_color;
+		Player::Color quaternary_color;
+		Player::Biped player_caracter_type;
+		Player::EmblemForeground foreground_emblem;
+		Player::EmblemBackground background_emblem;
+		char emblem_flags;
+	} profile;
+
+	BYTE gap48[8];
+	wchar_t clan_identifier_name[16];
+	struct {
+		DWORD ID_1;
+		DWORD ID_2;
+		DWORD ID_3;
+	} clan_identifiers;
+
+	enum Team : BYTE
+	{
+		RED,
+		BLUE
+	};
+	Player::Team player_team;
+	Player::Handicap player_handicap_level;
+	Player::Handicap player_displayed_skill;
+	char player_overall_skill;
+	char player_is_griefer;
+	char bungie_user_role;
+	char achievement_flags;
+};
+#pragma pack(pop)
 
 namespace Blam 
 {
@@ -27,10 +70,10 @@ namespace Blam
 			struct GameStatePlayer //size:0x204
 			{
 				DWORD UnkPlayerDatum; //0x00
-				XUID xuid;
+				XUID xuid; //0x04
 				/* Trying to convert the peer_user_index to a datum via the entity one used in voice does not work... */
-				int peer_index; //0x0C
-				int peer_user_index; // 0x10
+				DWORD peer_index; //0x0C
+				DWORD peer_user_index; // 0x10
 				/* These are based on the beta and can be wrong/off. */
 				int machine_index; // 0x14  
 				int machine_controller_index; //0x18
@@ -44,35 +87,14 @@ namespace Blam
 				DWORD InputFlags; // 0x34
 				DWORD InputFlags2; // 0x38
 				DWORD unk_4; // 0x3C
-				wchar_t PlayerName[16]; //0x40
-				wchar_t UnkPad[16]; // 0x60
-				Player::PrimaryArmorColor primary_armor_color; //0x80
-				Player::SecondaryArmorColor secondary_armor_color; //0x81
-				Player::PrimaryEmblemColor primary_emblem_color; // 0x82
-				Player::SecondaryEmblemColor secondary_emblem_color; // 0x83
-				Player::Biped biped_index; // 0x84
-				Player::EmblemForeground emblem_foreground; //0x85
-				Player::EmblemBackground emblem_background; //0x86
-				Player::EmblemToggle emblem_toggle;  //0x87
-				BYTE unk_pad[52]; // 0x88
-				Player::Team team_index; // 0xBC
-				Player::Handicap handicap; //0xBD
-				__int16 rank; // 0xBE
-				BYTE bootable; // 0xC0
-				BYTE unk_5; // 0xC1
-				BYTE unk_6; // 0xC2
-				BYTE unk_7; // 0xC3
-				wchar_t PlayerName2[16]; // 0xC4
-				wchar_t UnkPad2[16]; // 0xE4
-				BYTE unk_8; // 0x104
-				BYTE unk_9; // 0x105
-				BYTE unk_10; // 0x106
-				BYTE unk_11; // 0x107
-				BYTE unk_pad2[76]; //0x108
+				PlayerProperties properties; // 0x40
+				BYTE pad1;
+				PlayerProperties player_properties_2;
+				char pad[13];
 				int respawn_time; //0x154
 				int unk_12; //0x158
 				BYTE unk_pad3[36]; //0x15C
-				float player_speed; //0x180
+				float unit_speed; //0x180
 				DatumIndex player_aimed_at; //0x184
 				int unk_13; // 0x188
 				int unk_14_related_to_player_aimed_at; // 0x18C
@@ -83,29 +105,7 @@ namespace Blam
 				int is_chatting; // 0x200
 			};
 #pragma pack(pop)
-			static_assert(sizeof(GameStatePlayer) == 0x204, "Invalid GameStatePlayer size");
-
-			struct GameStatePlayerTable
-			{
-				//BYTE pad[0x44];
-				char tag_string[0x20]; //0x20
-				int maxium_count; // 0x24
-				int datum_size; // 0x28
-				BYTE alignment_bit; // 0x29
-				bool is_valid; // 0x2A
-				WORD flags;  // 0x2C
-				char data_signature[4]; // 0x30
-				void **allocator; // 0x34
-				struct {
-					int next_index; // 0x38
-					int length; // 0x3C
-				}active_indices; //0x3C
-				int actual_count; //0x40 
-				DatumIndex next_datum; //0x44
-				GameStatePlayer *players; //0x48
-
-			};
-			
+			static_assert(sizeof(GameStatePlayer) == 0x204, "Invalid GameStatePlayer size");	
 		}
 	}
 }

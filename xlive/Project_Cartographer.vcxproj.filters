@@ -345,9 +345,6 @@
     <ClCompile Include="H2MOD\Modules\Networking\Networking.cpp">
       <Filter>Source Files\H2MOD\Modules\Networking</Filter>
     </ClCompile>
-    <ClCompile Include="H2MOD\Modules\Players\Players.cpp">
-      <Filter>Source Files\H2MOD\Modules\Players</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD\Modules\MapChecksum\MapChecksumSync.cpp">
       <Filter>Source Files\H2MOD\Modules\MapCheckSum</Filter>
     </ClCompile>
@@ -537,6 +534,9 @@
     <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp">
       <Filter>Source Files\H2MOD\Variants\XboxTick</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Players\Players.cpp">
+      <Filter>Source Files\H2MOD\Modules\Players</Filter>
+    </ClCompile>
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp">
       <Filter>Source Files\H2MOD\Modules\CustomResolutions</Filter>
     </ClCompile>
@@ -559,9 +559,6 @@
     </ClInclude>
     <ClInclude Include="Blam\Enums\Enums.h">
       <Filter>Source Files\Blam\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Players\Players.h">
-      <Filter>Source Files\Blam\Enums\Players</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h">
       <Filter>Source Files\Blam\Enums\Game</Filter>
@@ -605,13 +602,7 @@
     <ClInclude Include="Blam\Engine\Objects\Objects.h">
       <Filter>Source Files\Blam\Engine\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Engine\Objects\ObjectsHeader.h">
-      <Filter>Source Files\Blam\Engine\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h">
-      <Filter>Source Files\Blam\Engine\Players</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Players\Players.h">
       <Filter>Source Files\Blam\Engine\Players</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h">
@@ -718,9 +709,6 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\Networking\Networking.h">
       <Filter>Source Files\H2MOD\Modules\Networking</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\Modules\Players\Players.h">
-      <Filter>Source Files\H2MOD\Modules\Players</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\MapChecksum\MapChecksumSync.h">
       <Filter>Source Files\H2MOD\Modules\MapCheckSum</Filter>
@@ -1229,8 +1217,20 @@
     <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h">
       <Filter>Source Files\H2MOD\Variants\XboxTick</Filter>
     </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Players\Players.h">
+      <Filter>Source Files\H2MOD\Modules\Players</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Players\Players.h">
+      <Filter>Source Files\Blam\Engine\Players</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Enums\Players\Players.h">
+      <Filter>Source Files\Blam\Enums\Players</Filter>
+    </ClInclude>
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolution.h">
       <Filter>Source Files\H2MOD\Modules\CustomResolutions</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

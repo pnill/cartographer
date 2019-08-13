@@ -12,14 +12,14 @@ char g_network_message_types[e_network_message_types::end * 32]; // out of band 
 
 void register_packet_impl(void *packetObject, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* a9)
 {
-	typedef void(__thiscall *register_packet_type)(void *packetObject, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* a9);
+	typedef void(__thiscall* register_packet_type)(void *packetObject, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* a9);
 	auto register_packet = reinterpret_cast<register_packet_type>(h2mod->GetAddress(0x1E81D6, 0x1CA199));
 	return register_packet(packetObject, type, name, a4, size1, size2, write_packet_method, read_packet_method, a9);
 }
 
 void send_packet(void *thisx, int a2, int a3, bool secure, unsigned int type, unsigned int size, void* a7)
 {
-	typedef void(__thiscall *dynamic_packet_check_method)(void *thisx, int a2, int a3, char a4, unsigned int type, unsigned int size, void* a7);
+	typedef void(__thiscall* dynamic_packet_check_method)(void *thisx, int a2, int a3, char a4, unsigned int type, unsigned int size, void* a7);
 	auto dynamic_packet_check = reinterpret_cast<dynamic_packet_check_method>(h2mod->GetAddress(0x1BED40, 0x1B8C1A));
 	dynamic_packet_check(thisx, a2, a3, secure, type, size, a7);
 }
@@ -73,7 +73,7 @@ bool __cdecl decode_set_grenades_packet(char* buffer, int a2, s_unit_grenades* d
 void register_custom_packets(void* a1)
 {
 	typedef void(__cdecl* register_test_packet)(void* a1);
-	auto p_register_test_packet = reinterpret_cast<register_test_packet>(h2mod->GetAddress(0x1ECE05, 0x1CD7BE));
+	auto p_register_test_packet = h2mod->GetPointer<register_test_packet>(0x1ECE05, 0x1CD7BE);
 	p_register_test_packet(a1);
 
 	register_packet_impl(g_network_message_types, map_file_name, "map-file-name", 0, sizeof(s_custom_map_filename), sizeof(s_custom_map_filename), 
@@ -230,17 +230,18 @@ void CustomPackets::sendUnitGrenadesPacket(network_session* session, int peer_in
 
 void CustomPackets::ApplyGamePatches()
 {
-	WritePointer((DWORD)h2mod->GetAddress(0x1AC733, 0x1AC901), g_network_message_types);
-	WritePointer((DWORD)h2mod->GetAddress(0x1AC8F8, 0x1ACAC6), g_network_message_types);
-	WriteValue<BYTE>((DWORD)h2mod->GetAddress(0x1E825E,0x1CA221), e_network_message_types::end);
-	WriteValue<int>((DWORD)h2mod->GetAddress(0x1E81C6, 0x1CA189), e_network_message_types::end * 32);
+	WritePointer(h2mod->GetAddress(0x1AC733, 0x1AC901), g_network_message_types);
+	WritePointer(h2mod->GetAddress(0x1AC8F8, 0x1ACAC6), g_network_message_types);
+	WriteValue<BYTE>(h2mod->GetAddress(0x1E825E,0x1CA221), e_network_message_types::end);
+	WriteValue<int>(h2mod->GetAddress(0x1E81C6, 0x1CA189), e_network_message_types::end * 32);
 
 	PatchCall(h2mod->GetAddress(0x1B5196, 0x1A8EF4), register_custom_packets);
 
 	DWORD dwBack;
-	p_network_message_gateway = (network_message_gateway)DetourClassFunc((BYTE*)h2mod->GetAddress(0x1E907B, 0x1CB03B), (BYTE*)message_gateway_hook, 8);
+	p_network_message_gateway = (network_message_gateway)DetourClassFunc(h2mod->GetPointer<BYTE*>(0x1E907B, 0x1CB03B), (BYTE*)message_gateway_hook, 8);
 	VirtualProtect(p_network_message_gateway, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	p_network_message_gateway_2 = (network_message_gateway_2)DetourClassFunc((BYTE*)h2mod->GetAddress(0x1E929C, 0x1CB25C), (BYTE*)message_gateway_hook_2, 8);
+
+	p_network_message_gateway_2 = (network_message_gateway_2)DetourClassFunc(h2mod->GetPointer<BYTE*>(0x1E929C, 0x1CB25C), (BYTE*)message_gateway_hook_2, 8);
 	VirtualProtect(p_network_message_gateway_2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }

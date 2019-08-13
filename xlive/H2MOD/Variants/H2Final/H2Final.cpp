@@ -285,7 +285,7 @@ void Halo2Final::Initialize()
 	if (h2mod->Server)
 		offset = 0x4A29BC;
 
-	base_address = h2mod->GetBase();
+	base_address = h2mod->GetAddress(0x0);
 	address_offset = *(DWORD*)((char*)base_address + offset);
 	game_time_globals = *(DWORD*)((char*)base_address + 0x4c06e4);
 	equpiment_offset = *(int*)((BYTE*)address_offset + 0x143C124);

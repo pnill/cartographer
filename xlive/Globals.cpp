@@ -5,9 +5,9 @@
 MapManager* mapManager = new MapManager();
 AdvLobbySettings* advLobbySettings = new AdvLobbySettings();
 
-GameStatePlayerTable *game_state_players = nullptr;
-GameStateObjectHeaderTable* game_state_objects_header = nullptr;
-GameStateActorTable* game_state_actors = nullptr;
+s_data_array<Actor>* game_state_actors = nullptr;
+s_data_array<GameStatePlayer>* game_state_players = nullptr;
+s_data_array<GameStateObjectsHeader>* game_state_objects_header = nullptr;
 global_tag_instance* tag_instances = nullptr;
 
 bool displayXyz = false;

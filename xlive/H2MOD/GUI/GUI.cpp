@@ -528,9 +528,11 @@ int WINAPI XLiveRender()
 					drawText(0, startingPosY, COLOR_WHITE, (*it).c_str(), normalSizeFont);
 				}
 			}
-			DWORD GameGlobals = *(DWORD*)((BYTE*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
+
+			DWORD GameGlobals = *h2mod->GetPointer<DWORD*>(0x482D3C, 0x4CB520);
 			DWORD GameEngine = *(DWORD*)(GameGlobals + 0x8);
-			bool paused_or_in_menus = *((BYTE*)h2mod->GetBase() + 0x47A568) != 0;
+			bool paused_or_in_menus = (*h2mod->GetPointer<BYTE*>(0x47A568) != 0);
+
 			if (GameEngine == 3 || StatusCheater || (GameEngine != 3 && paused_or_in_menus)) {
 				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
 				if (MasterState == 0)
@@ -616,9 +618,9 @@ int WINAPI XLiveRender()
 				if (xyzTextWidget == NULL) {
 					xyzTextWidget = new char[128];
 				}
-				float x = *(float*)(h2mod->GetBase() + 0x4C072C);
-				float y = *(float*)(h2mod->GetBase() + 0x4C0728);
-				float z = *(float*)(h2mod->GetBase() + 0x4C0730);
+				float x = *h2mod->GetPointer<float*>(0x4C072C);
+				float y = *h2mod->GetPointer<float*>(0x4C0728);
+				float z = *h2mod->GetPointer<float*>(0x4C0730);
 				sprintf(xyzTextWidget, xyzTextWidgetTemplate.c_str(), x, y, z);
 
 				drawText(0, 60, COLOR_GOLD, xyzTextWidget, normalSizeFont);

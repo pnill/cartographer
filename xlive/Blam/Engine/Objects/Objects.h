@@ -105,11 +105,9 @@ namespace Blam
 				FLOAT ActiveCamoFlageDepletionPower;//0x2CC
 
 				Blam::Enums::Objects::Unit::UnitState UnitState;//0x3F4
-		
-				
 			};
 
-			struct GameStateObjectHeader {
+			struct GameStateObjectsHeader {
 				__int16 datum_salt; //0x00
 				BYTE flags; // 0x02
 				Blam::Enums::Objects::ObjectType type; // 0x03
@@ -117,28 +115,7 @@ namespace Blam
 				__int16 unk_size;  //0x06
 				ObjectEntityDefinition* object; //0x08 - 
 			};
-			static_assert(sizeof(GameStateObjectHeader) == 0xC, "Invalid GameStateObjectHeader size");
-
-			struct GameStateObjectHeaderTable {
-				char tag_string[0x20];
-				int max_count;
-				int datum_size;
-				BYTE alignment_bit;
-				bool is_valid;
-				WORD flags;
-				char data_signature[4];
-				void **allocator;
-				struct {
-					int next_index;
-					int length;
-				}active_indices;
-				int actual_count;
-				DatumIndex next_datum;
-				GameStateObjectHeader* object_header;
-
-			};
-
-	
+			static_assert(sizeof(GameStateObjectsHeader) == 0xC, "Invalid GameStateObjectHeader size");
 		}
 	}
 }

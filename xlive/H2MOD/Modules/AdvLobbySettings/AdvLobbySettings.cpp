@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "Globals.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
@@ -16,9 +16,9 @@ bool AdvLobbySettings_disable_kill_volumes = false;
 static void refresh_mp_explosion_physics() {
 	if (!h2mod->Server) {
 		if (AdvLobbySettings_mp_explosion_physics || AdvLobbySettings_mp_sputnik)
-			WriteValue(h2mod->GetBase() + 0x0017a44b, (BYTE)0x1e);
+			WriteValue(h2mod->GetAddress(0x17a44b), (BYTE)0x1e);
 		else
-			WriteValue(h2mod->GetBase() + 0x0017a44b, (BYTE)0);
+			WriteValue(h2mod->GetAddress(0x17a44b), (BYTE)0);
 	}
 }
 

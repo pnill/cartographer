@@ -41,7 +41,7 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 	if (wp == H2Config_hotkeyIdConsole) {
 		if (seconds_since_start > 0.5) {
 			this->console = !this->console;
-			*(BYTE*)(h2mod->GetAddress(0x479F51)) = !this->console;
+			*h2mod->GetPointer<bool*>(0x479F51) = !this->console;
 			start = time(0);
 		}
 		return true;
@@ -341,9 +341,9 @@ void ConsoleCommands::spawn(unsigned int object_datum, int count, float x, float
 			if (object_datum) {
 				unsigned int player_datum = h2mod->get_unit_datum_from_player_index(0);
 				call_object_placement_data_new(nObject, object_datum, player_datum, 0);
-				*(float*)(nObject + 0x1C) = h2mod->get_player_x(0, true) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				*(float*)(nObject + 0x20) = h2mod->get_player_y(0, true) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				*(float*)(nObject + 0x24) = (h2mod->get_player_z(0, true) + 5.0f) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				*(float*)(nObject + 0x1C) = h2mod->get_player_x(0) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				*(float*)(nObject + 0x20) = h2mod->get_player_y(0) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				*(float*)(nObject + 0x24) = (h2mod->get_player_z(0) + 5.0f) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum, *(float*)(nObject + 0x1C), *(float*)(nObject + 0x20), *(float*)(nObject + 0x24));
 				unsigned int object_gamestate_datum = call_object_new(nObject);
 				call_add_object_to_sync(object_gamestate_datum);
@@ -359,7 +359,7 @@ void ConsoleCommands::spawn(unsigned int object_datum, int count, float x, float
 void ConsoleCommands::output(std::wstring result) {
 	if (h2mod->Server) {
 		result = result + L"\n";
-		h2mod->logToDedicatedServerConsole((wchar_t*)result.c_str());
+		h2mod->logToDedicatedServerConsole(result.c_str());
 	}
 	else {
 		std::string str(result.begin(), result.end());
@@ -393,7 +393,7 @@ int __cdecl call_get_object_via_datum(DatumIndex object_datum_index, int object_
 	//LOG_TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
 
 	typedef int(__cdecl *get_object)(DatumIndex object_datum_index, int object_type);
-	get_object pget_object = (get_object)((char*)h2mod->GetBase() + ((h2mod->Server) ? 0x11F3A6 : 0x1304E3));
+	get_object pget_object = (get_object)(h2mod->GetAddress(0x1304E3, 0x11F3A6));
 
 	return pget_object(object_datum_index, object_type);
 }
@@ -401,7 +401,7 @@ int __cdecl call_get_object_via_datum(DatumIndex object_datum_index, int object_
 int __cdecl call_entity_datum_to_gamestate_datum(int entity_datum)
 {
 	typedef int(__cdecl *entity_datum_to_gamestate_datum)(int entity_datum);
-	entity_datum_to_gamestate_datum pentity_datum_to_gamestate_datum = (entity_datum_to_gamestate_datum)((BYTE*)h2mod->GetBase() + 0x1F2211);
+	entity_datum_to_gamestate_datum pentity_datum_to_gamestate_datum = (entity_datum_to_gamestate_datum)h2mod->GetAddress(0x1F2211);
 
 	return pentity_datum_to_gamestate_datum(entity_datum);
 }
@@ -474,7 +474,7 @@ void ConsoleCommands::handle_command(std::string command) {
 					output(L"Don't kick yourself");
 					return;
 				}
-				h2mod->kick_player(peerIndex);
+				NetworkSession::kick_player(peerIndex);
 			}
 		}
 		else if (firstCommand == "$logplayers") {
@@ -483,6 +483,14 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 			players->logAllPlayersToConsole();
+		}
+		else if (firstCommand == "$logpeers")
+		{
+			if (!NetworkSession::localPeerIsSessionHost()) {
+				output(L"Only host can log out information about players");
+				return;
+			}
+			players->logAllPeersToConsole();
 		}
 		else if (firstCommand == "$sendteamchange") {
 			if (!NetworkSession::localPeerIsSessionHost()) {
@@ -512,12 +520,12 @@ void ConsoleCommands::handle_command(std::string command) {
 			using namespace Blam::EngineDefinitions::Players;
 			using namespace Blam::EngineDefinitions::Objects;
 
-			GameStatePlayerTable *test = (GameStatePlayerTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase()+0x4A8260)));
-			GameStateObjectHeaderTable* test2 = (GameStateObjectHeaderTable*)(*(DWORD*)(((BYTE*)h2mod->GetBase() + 0x4E461C)));
-			GameStatePlayer *player1 = &test->players[0];
-			GameStatePlayer *player2 = &test->players[1];
+			auto test = *h2mod->GetPointer<s_data_array<GameStatePlayer>**>(0x4A8260);
+			auto test2 = *h2mod->GetPointer<s_data_array<GameStateObjectsHeader>**>(0x4E461C);
+			GameStatePlayer *player1 = &test->data[0];
+			GameStatePlayer *player2 = &test->data[1];
 			
-			GameStateObjectHeader *player1_object_header = &test2->object_header[player1->unit_index.ToAbsoluteIndex()];
+			GameStateObjectsHeader *player1_object_header = &test2->data[player1->unit_index.ToAbsoluteIndex()];
 			ObjectEntityDefinition *player1_object = player1_object_header->object;
 
 			output(buf);
@@ -543,7 +551,7 @@ void ConsoleCommands::handle_command(std::string command) {
 					output(L"The value needs to be between 1 and 16.");
 					return;
 				}
-				if (maxPlayersToSet < session->total_party_players) {
+				if (maxPlayersToSet < session->membership.total_party_players) {
 					output(L"You can't set a value of max players smaller than the actual number of players on the server.");
 					return;
 				}
@@ -607,9 +615,9 @@ void ConsoleCommands::handle_command(std::string command) {
 				LOG_TRACE_GAME("Error converting string to int");
 			}
 			//since these are server only commands, the server would player index 1, which these are the position values for
-			float x = *(float*)(h2mod->GetBase() + 0x4C072C);
-			float y = *(float*)(h2mod->GetBase() + 0x4C0728);
-			float z = *(float*)(h2mod->GetBase() + 0x4C0730);
+			float x = *h2mod->GetPointer<float*>(0x4C072C);
+			float y = *h2mod->GetPointer<float*>(0x4C0728);
+			float z = *h2mod->GetPointer<float*>(0x4C0730);
 
 			this->spawn(object_datum, count, x += 0.5f, y += 0.5f, z += 0.5f, randomMultiplier);
 		}
@@ -724,18 +732,15 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::string str_index = splitCommands[1];
 			int inc = 0;
 			int index = stoi(str_index);
-			network_session* netsession = NetworkSession::getNetworkSession();
-			do 
-			{
-				std::wstring str_to_print;
-				std::wstring space = L" ";
-				std::wstring xuid = L"XUID: ";
-				str_to_print += netsession[inc].custom_map_name + space + netsession[inc].peers_network_info[index].peer_name + space + netsession[inc].peers_network_info[index].peer_name_2;
-				str_to_print += xuid + std::to_wstring(netsession[inc].player_information[index].identifier);
-				output(str_to_print);
-				inc++;
-
-			} while (inc < 2);
+			network_session* netsession = NetworkSession::getCurrentNetworkSession();
+		
+			std::wstring str_to_print;
+			std::wstring space = L" ";
+			std::wstring xuid = L"XUID: ";
+			str_to_print += netsession[inc].custom_map_name + space + netsession[inc].membership.peer_info[index].peer_name + space + netsession[inc].membership.peer_info[index].peer_name_2;
+			str_to_print += xuid + std::to_wstring(netsession[inc].membership.player_info[index].identifier);
+			output(str_to_print);
+				
 		}
 		else if (firstCommand == "$requestfilename") {
 			CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
