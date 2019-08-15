@@ -4,6 +4,7 @@
 
 class Players {
 public:
+	bool IsActive(int playerIndex);
 	int getPlayerCount();
 	Membership* getMembershipData();
 	PlayerInformation* getPlayerInformation(int playerIndex);

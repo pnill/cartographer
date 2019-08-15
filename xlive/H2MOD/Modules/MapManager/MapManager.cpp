@@ -223,11 +223,8 @@ void MapManager::TcpServer::stop() {
 * NOTE - this only works on peers (not dedis)
 */
 std::wstring MapManager::getMapName() {
-	DWORD currentMapNameOffset;
-
 	//H2Server.exe+5349B4
 	//H2Server.exe+535C64 (another offset to use if the above fails for whatever reason)
-	
 	const wchar_t* currentMapName = h2mod->GetPointer<wchar_t*>(0x97737C, 0x5349B4);
 
 	DWORD dwBack;

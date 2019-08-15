@@ -19,11 +19,20 @@ bool infectedPlayed;
 signed int zombiePlayerIndex = -1;
 
 signed int Infection::calculateZombiePlayerIndex() {
+	std::vector<int> vecPlayersActiveIndexes;
 	network_session* session = NetworkSession::getCurrentNetworkSession();
-	if (session->membership.total_party_players > 0)
-		return rand() % session->membership.total_party_players;
+	int playerIndex = 0;
+    do {
+		if (players->IsActive(playerIndex))
+			vecPlayersActiveIndexes.push_back(playerIndex);
+
+		playerIndex++;
+    } while (playerIndex < 16);
 	
-	return -1;
+	if (vecPlayersActiveIndexes.empty())
+		return -1;
+	else
+		return vecPlayersActiveIndexes[rand() % session->membership.total_party_players];
 }
 
 void Infection::sendTeamChange()
@@ -36,18 +45,21 @@ void Infection::sendTeamChange()
 			int playerIndex = 0;
 			do
 			{
-				if (session->session_host_peer_index != players->getPeerIndexFromPlayerIndex(playerIndex)) {
-					CustomPackets::sendTeamChange(session, players->getPeerIndexFromPlayerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
-				}
-				else
+				if (players->IsActive(playerIndex))
 				{
-					if (!h2mod->Server)
-						h2mod->set_local_team_index(0, zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
+					if (session->session_host_peer_index != players->getPeerIndexFromPlayerIndex(playerIndex)) {
+						CustomPackets::sendTeamChange(session, players->getPeerIndexFromPlayerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
+					}
+					else
+					{
+						if (!h2mod->Server)
+							h2mod->set_local_team_index(0, zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
+					}
 				}
-
+				
 				playerIndex++;
 			}
-			while (playerIndex < session->membership.total_party_players);
+			while (playerIndex < 16);
 		}
 	}
 }
@@ -114,22 +126,24 @@ void Infection::resetWeaponInteractionAndEmblems() {
 }
 
 void Infection::preSpawnServerSetup() {
-	int playerCounter = 0;
+	int playerIndex = 0;
 	do {
-		std::wstring playerName = players->getPlayerName(playerCounter);
-		BOOL isZombie = std::find(Infection::zombieNames.begin(), Infection::zombieNames.end(), playerName) != Infection::zombieNames.end();
+		if (players->IsActive(playerIndex)) {
+			std::wstring playerName = players->getPlayerName(playerIndex);
+			BOOL isZombie = std::find(Infection::zombieNames.begin(), Infection::zombieNames.end(), playerName) != Infection::zombieNames.end();
 
-		LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={0}, isZombie={1}, playerName={2}", playerCounter, isZombie, playerName);
-		if (isZombie) {
-			h2mod->set_unit_biped(Player::Biped::Elite, playerCounter);
-			if (NetworkSession::localPeerIsSessionHost()) // prevent kids from switching to humans in the pre-game lobby after joining
-				CustomPackets::sendTeamChange(NetworkSession::getCurrentNetworkSession(), players->getPeerIndexFromPlayerIndex(playerCounter), ZOMBIE_TEAM);
-		} 
-		else {
-			h2mod->set_unit_biped(Player::Biped::Spartan, playerCounter);
+			LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={0}, isZombie={1}, playerName={2}", playerIndex, isZombie, playerName);
+			if (isZombie) {
+				h2mod->set_unit_biped(Player::Biped::Elite, playerIndex);
+				if (NetworkSession::localPeerIsSessionHost()) // prevent kids from switching to humans in the pre-game lobby after joining
+					CustomPackets::sendTeamChange(NetworkSession::getCurrentNetworkSession(), players->getPeerIndexFromPlayerIndex(playerIndex), ZOMBIE_TEAM);
+			}
+			else {
+				h2mod->set_unit_biped(Player::Biped::Spartan, playerIndex);
+			}
 		}
-		playerCounter++;
-	} while (playerCounter < players->getPlayerCount());
+		playerIndex++;
+	} while (playerIndex < 16);
 }
 
 void Infection::setPlayerAsHuman(int index) {

@@ -38,7 +38,7 @@ struct PlayerProperties
 	} profile;
 
 	BYTE gap48[8];
-	wchar_t clan_identifier_name[16];
+	wchar_t clan_name[16];
 	struct {
 		DWORD ID_1;
 		DWORD ID_2;
@@ -87,7 +87,7 @@ namespace Blam
 				DWORD InputFlags; // 0x34
 				DWORD InputFlags2; // 0x38
 				DWORD unk_4; // 0x3C
-				PlayerProperties properties; // 0x40
+				PlayerProperties player_properties; // 0x40
 				BYTE pad1;
 				PlayerProperties player_properties_2;
 				char pad[13];

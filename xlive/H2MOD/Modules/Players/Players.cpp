@@ -1,6 +1,11 @@
 #include "stdafx.h"
 #include "Globals.h"
 
+bool Players::IsActive(int playerIndex)
+{
+	return (1 << playerIndex) & NetworkSession::getCurrentNetworkSession()->membership.player_active_mask;
+}
+
 int Players::getPlayerCount()
 {
 	return NetworkSession::getCurrentNetworkSession()->membership.total_party_players;
@@ -21,6 +26,12 @@ int Players::getPeerIndexFromPlayerIndex(int playerIndex)
 	return this->getPlayerInformation(playerIndex)->peer_index;
 }
 
+wchar_t* Players::getPlayerName(int playerIndex)
+{
+	return this->getPlayerInformation(playerIndex)->player_properties.player_name;
+}
+
+
 int Players::getPeerIndexFromPlayerXuid(long long xuid) {
 	if (NetworkSession::getCurrentNetworkSession()->membership.total_party_players > 0) {
 		int playerIndex = 0;
@@ -33,14 +44,6 @@ int Players::getPeerIndexFromPlayerXuid(long long xuid) {
 		} while (playerIndex < NetworkSession::getCurrentNetworkSession()->membership.total_party_players);
 	}
 	return -1;
-}
-
-wchar_t* Players::getPlayerName(int playerIndex) {
-	PlayerInformation* player_info = this->getPlayerInformation(playerIndex);
-	if (playerIndex != -1)
-		return player_info->player_properties.player_name;
-	else
-		return L"";
 }
 
 long long Players::getPlayerXuidFromPlayerIndex(int playerIndex) 
@@ -68,13 +71,14 @@ int Players::getPlayerTeamFromXuid(long long xuid) {
 }
 
 void Players::logAllPlayersToConsole() {
-	if (this->getPlayerCount() > 0) {
-		int playerIndex = 0;
-		do {
+	int playerIndex = 0;
+	do {
+		if (this->IsActive(playerIndex))
+		{
 			std::wstring outStr = L"Name=";
 			outStr += this->getPlayerName(playerIndex);
 
-			outStr += L" , Name from game player state= ";
+			outStr += L", Name from game player state= ";
 			outStr += h2mod->get_player_name_from_player_index(playerIndex);
 
 			outStr += L", Team=";
@@ -98,11 +102,11 @@ void Players::logAllPlayersToConsole() {
 			outStr += ws4.str();
 
 			commands->output(outStr);
-			playerIndex++;
-		} while (playerIndex < this->getPlayerCount());
-	}
+		}
+		playerIndex++;
+	} while (playerIndex < 16);
 
-	std::wstring total_players = std::to_wstring(this->getPlayerCount());
+	std::wstring total_players = L"Total players: " + std::to_wstring(this->getPlayerCount());
 	commands->output(total_players);
 }
 
@@ -120,15 +124,15 @@ void Players::logAllPeersToConsole() {
 
 			outStr += L", Player index= ";
 			std::wostringstream ws2;
-			ws2 << NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].player_information_index;
+			ws2 << NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index;
 			outStr += ws2.str();
 
 			outStr += L", Player Name= ";
-			outStr += this->getPlayerName(NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].player_information_index);
+			outStr += this->getPlayerName(NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index);
 
 			outStr += L", Identifier= ";
 			std::wostringstream ws3;
-			ws3 << this->getPlayerXuidFromPlayerIndex(NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].player_information_index);
+			ws3 << this->getPlayerXuidFromPlayerIndex(NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index);
 			outStr += ws3.str();
 
 			commands->output(outStr);
@@ -136,6 +140,6 @@ void Players::logAllPeersToConsole() {
 		} while (peerIndex < NetworkSession::getCurrentNetworkSession()->membership.total_peers);
 	}
 
-	std::wstring total_players = std::to_wstring(NetworkSession::getCurrentNetworkSession()->membership.total_peers);
+	std::wstring total_players = L"Total peers: " + std::to_wstring(NetworkSession::getCurrentNetworkSession()->membership.total_peers);
 	commands->output(total_players);
 }

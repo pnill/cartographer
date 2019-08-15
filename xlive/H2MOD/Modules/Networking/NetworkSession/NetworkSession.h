@@ -45,7 +45,7 @@ struct PeerInfo
 	DWORD field_F0;
 	DWORD field_F4;
 	DWORD gets_incremented_unk;
-	signed int player_information_index; // used to access the player_info array
+	signed int player_index; // used to access the player_info array
 	signed int field_100;
 	signed int field_104;
 	signed int field_108;
@@ -93,15 +93,16 @@ struct unk_network_connection_info
 	signed int field_18;
 };
 
-struct Membership {
+struct Membership
+{
 	DWORD update_number;
-	DWORD session_leader_index; //this is not host index, but the player which controlls the party
+	DWORD session_leader_index;
 	XUID dedicated_server_xuid;
 	DWORD field_80;
 	DWORD total_peers;
 	PeerInfo peer_info[17];
 	DWORD total_party_players;
-	DWORD peer_bit_flags;
+	DWORD player_active_mask;
 	PlayerInformation player_info[16];
 };
 
@@ -116,7 +117,7 @@ struct network_session
 	int field_18;
 	int network_mode;
 	XNKID session_id;
-	char field_28[32];
+	wchar_t field_28[16];
 	char field_48; // 69
 	XNKEY xnkey;
 	char pad[3];

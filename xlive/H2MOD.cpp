@@ -632,10 +632,9 @@ wchar_t* H2MOD::get_local_player_name()
 
 int H2MOD::get_player_index_from_name(wchar_t* playername)
 {
-
 	for (int playerIndex = 0; playerIndex < 16; playerIndex++)
 	{
-		wchar_t* comparename = game_state_players->data[playerIndex].properties.player_name;
+		wchar_t* comparename = game_state_players->data[playerIndex].player_properties.player_name;
 
 		LOG_TRACE_GAME(L"[H2MOD]::get_player_index_from_name( {0} : {1} )", playername, comparename);
 
@@ -649,7 +648,7 @@ int H2MOD::get_player_index_from_name(wchar_t* playername)
 
 wchar_t* H2MOD::get_player_name_from_player_index(int playerIndex)
 {
-	return game_state_players->data[playerIndex].properties.player_name;
+	return game_state_players->data[playerIndex].player_properties.player_name;
 }
 
 int H2MOD::get_player_index_from_unit_datum(int unit_datum_index)
@@ -700,7 +699,7 @@ void H2MOD::set_unit_team_index(int unit_datum_index, BYTE team)
 void H2MOD::set_unit_biped(Player::Biped biped, int playerIndex)
 {
 	if (playerIndex >= 0 && playerIndex < 16)
-		game_state_players->data[playerIndex].properties.profile.player_caracter_type = biped;
+		game_state_players->data[playerIndex].player_properties.profile.player_caracter_type = biped;
 }
 
 void H2MOD::set_unit_speed_patch(bool hackit) {
