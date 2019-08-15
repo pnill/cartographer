@@ -31,7 +31,6 @@ wchar_t* Players::getPlayerName(int playerIndex)
 	return this->getPlayerInformation(playerIndex)->player_properties.player_name;
 }
 
-
 int Players::getPeerIndexFromPlayerXuid(long long xuid) {
 	if (NetworkSession::getCurrentNetworkSession()->membership.total_party_players > 0) {
 		int playerIndex = 0;
@@ -75,32 +74,15 @@ void Players::logAllPlayersToConsole() {
 	do {
 		if (this->IsActive(playerIndex))
 		{
-			std::wstring outStr = L"Name=";
+			std::wstring outStr = L"Player index=" + std::to_wstring(playerIndex);
+			outStr += L", Peer index=" + std::to_wstring(this->getPeerIndexFromPlayerIndex(playerIndex));
+			outStr += L", PlayerName=";
 			outStr += this->getPlayerName(playerIndex);
-
 			outStr += L", Name from game player state= ";
 			outStr += h2mod->get_player_name_from_player_index(playerIndex);
-
-			outStr += L", Team=";
-			std::wostringstream ws2;
-			ws2 << this->getPlayerTeamFromPlayerIndex(playerIndex);
-			outStr += ws2.str();
-
-			outStr += L", Player index=";
-			std::wostringstream ws3;
-			ws3 << playerIndex;
-			outStr += ws3.str();
-
-			outStr += L", Peer index=";
-			std::wostringstream ws;
-			ws << this->getPeerIndexFromPlayerIndex(playerIndex);
-			outStr += ws.str();
-
-			outStr += L", Identifier=";
-			std::wostringstream ws4;
-			ws4 << this->getPlayerXuidFromPlayerIndex(playerIndex);
-			outStr += ws4.str();
-
+			outStr += L", Team=" + std::to_wstring(this->getPlayerTeamFromPlayerIndex(playerIndex));
+			outStr += L", Identifier=" + std::to_wstring(this->getPlayerXuidFromPlayerIndex(playerIndex));
+			
 			commands->output(outStr);
 		}
 		playerIndex++;
@@ -114,26 +96,17 @@ void Players::logAllPeersToConsole() {
 	if (NetworkSession::getCurrentNetworkSession()->membership.total_peers > 0) {
 		int peerIndex = 0;
 		do {
-			std::wstring outStr = L"Peer Name = ";
+			int playerIndex = NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index;
+
+			std::wstring outStr = L"Peer index=" + std::to_wstring(peerIndex);
+			outStr += L", Player index=" + std::to_wstring(playerIndex);
+			outStr += L", Peer Name=";
 			outStr += NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].peer_name;
-
-			outStr += L", PeerIndex = ";
-			std::wostringstream ws;
-			ws << peerIndex;
-			outStr += ws.str();
-
-			outStr += L", Player index= ";
-			std::wostringstream ws2;
-			ws2 << NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index;
-			outStr += ws2.str();
-
-			outStr += L", Player Name= ";
-			outStr += this->getPlayerName(NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index);
-
-			outStr += L", Identifier= ";
-			std::wostringstream ws3;
-			ws3 << this->getPlayerXuidFromPlayerIndex(NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index);
-			outStr += ws3.str();
+			outStr += L", Player name=";
+			outStr += this->getPlayerName(playerIndex);
+			outStr += L", Name from game player state= ";
+			outStr += h2mod->get_player_name_from_player_index(playerIndex);
+			outStr += L", Identifier=" + std::to_wstring(this->getPlayerXuidFromPlayerIndex(playerIndex));
 
 			commands->output(outStr);
 			peerIndex++;

@@ -458,7 +458,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 			if (splitCommands.size() != 2) {
-				output(L"Invalid kick command, usage - $kick PLAYER_INDEX");
+				output(L"Invalid kick command, usage - $kick PEER_INDEX");
 				return;
 			}
 			if (!NetworkSession::localPeerIsSessionHost()) {
@@ -470,11 +470,15 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			if (isNum(firstArg.c_str())) {
 				int peerIndex = atoi(firstArg.c_str());
-				if (peerIndex == 0) {
+				if (peerIndex == NetworkSession::getCurrentNetworkSession()->session_host_peer_index) {
 					output(L"Don't kick yourself");
 					return;
 				}
-				NetworkSession::kick_player(peerIndex);
+				if (peerIndex >= NetworkSession::getCurrentNetworkSession()->membership.total_peers) {
+					output(L"Peer at the specified index doesn't exist");
+					return;
+				}
+				NetworkSession::kick_peer(peerIndex);
 			}
 		}
 		else if (firstCommand == "$logplayers") {
@@ -629,7 +633,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			ws << isHostByteValue;
 			const std::wstring s(ws.str());
 			isHostStr += (NetworkSession::localPeerIsSessionHost() ? L"yes" : L"no");
-			isHostStr += L",value=";
+			isHostStr += L", value=";
 			isHostStr += s;
 			output(isHostStr);
 		}

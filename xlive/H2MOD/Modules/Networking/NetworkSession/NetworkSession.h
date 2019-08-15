@@ -258,6 +258,6 @@ namespace NetworkSession
 	bool localPeerIsSessionHost();
 	signed int getPeerIndexFromNetworkAddress(network_address* addr);
 	char getMapFileLocation(network_session* thisx, wchar_t* buffer, size_t szBuffer);
-	void kick_player(int peerIndex);
+	void kick_peer(int peerIndex);
 }
 

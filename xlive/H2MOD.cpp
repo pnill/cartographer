@@ -943,6 +943,7 @@ void __cdecl OnMapLoad(int a1)
 	//based on what onGameEngineChange has changed
 	//we do our stuff bellow
 
+	get_object_table_memory();
 	if (h2mod->GetEngineType() == EngineType::MAIN_MENU_ENGINE)
 	{
 		addDebugText("GameEngine: Main-Menu");
@@ -990,8 +991,6 @@ void __cdecl OnMapLoad(int a1)
 				gametype_it.second = true; // enable a gametype if substring is found
 			}
 		}
-
-		get_object_table_memory();
 
 		if (!b_XboxTick) 
 		{

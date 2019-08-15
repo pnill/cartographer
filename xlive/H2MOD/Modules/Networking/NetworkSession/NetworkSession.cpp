@@ -41,7 +41,7 @@ char NetworkSession::getMapFileLocation(network_session* thisx, wchar_t* buffer,
 	return reinterpret_cast<get_map_file_location_impl>(h2mod->GetPointer(0x1C5678, 0x19CD4A))(thisx, buffer, szBuffer);
 }
 
-void NetworkSession::kick_player(int peerIndex) {
+void NetworkSession::kick_peer(int peerIndex) {
 	typedef void(__thiscall* game_session_boot)(network_session* session, int peer_index, bool a3);
 	auto p_game_session_boot = reinterpret_cast<game_session_boot>(h2mod->GetAddress(0x1CCE9B));
 
