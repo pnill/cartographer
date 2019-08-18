@@ -520,12 +520,10 @@ int WINAPI XLiveRender()
 				drawText(0, startingPosY, COLOR_WHITE, ">>", normalSizeFont);
 				drawText(35, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
 
-				startingPosY -= 12.0;
-				std::vector<std::string>::iterator it;
-				int i = 0;
-				for (it = commands->prevCommands.begin(); it < commands->prevCommands.end(); it++, i++) {
-					startingPosY -= 15.0;
-					drawText(0, startingPosY, COLOR_WHITE, (*it).c_str(), normalSizeFont);
+				startingPosY -= 12.0f;
+				for (std::string& it : commands->prevOutput) {
+					startingPosY -= 15.0f;
+					drawText(0, startingPosY, COLOR_WHITE, it.c_str(), normalSizeFont);
 				}
 			}
 

@@ -932,19 +932,24 @@ void get_object_table_memory()
 }
 
 // this gets called after game globals are updated fyi (which includes game engine type)
-typedef void(__cdecl *set_random_number)(int a1);
-set_random_number p_set_random_number;
+typedef bool(__cdecl *map_cache_load)(void* map_load_settings);
+map_cache_load p_map_cache_load;
 
-void __cdecl OnMapLoad(int a1)
+bool __cdecl OnMapLoad(void* map_load_settings)
 {
+	bool result = p_map_cache_load(map_load_settings);
+	tags::run_callbacks();
+	EngineType engine_type = *reinterpret_cast<EngineType*>(map_load_settings);
+
 	overrideUnicodeMessage = false;
 	isLobby = true;
 
-	//based on what onGameEngineChange has changed
-	//we do our stuff bellow
-
 	get_object_table_memory();
-	if (h2mod->GetEngineType() == EngineType::MAIN_MENU_ENGINE)
+
+	for (auto gametype_it : GametypesMap)
+		gametype_it.second = false; // reset custom gametypes state
+	
+	if (engine_type == EngineType::MAIN_MENU_ENGINE)
 	{
 		addDebugText("GameEngine: Main-Menu");
 		object_to_variant.clear();
@@ -969,18 +974,14 @@ void __cdecl OnMapLoad(int a1)
 		H2Tweaks::disable60FPSCutscenes();
 		H2Tweaks::setHz();
 
-		p_set_random_number(a1);
-		return;
+		return result;
 	}		
 
 	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
 	LOG_TRACE_GAME(L"[h2mod] OnMapLoad engine mode {0}, variant name {1}", h2mod->GetEngineType(), variant_name);
 	BYTE GameState = *(BYTE*)(h2mod->GetAddress(0x420FC4, 0x3C40AC));
 
-	for (auto gametype_it : GametypesMap)
-		gametype_it.second = false; // reset custom gametypes state
-
-	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE)
+	if (engine_type == EngineType::MULTIPLAYER_ENGINE)
 	{
 		addDebugText("GameEngine: Multiplayer");
 
@@ -1036,7 +1037,7 @@ void __cdecl OnMapLoad(int a1)
 		}
 	}
 
-	else if (h2mod->GetEngineType() == EngineType::SINGLE_PLAYER_ENGINE)
+	else if (engine_type == EngineType::SINGLE_PLAYER_ENGINE)
 	{
 		//if anyone wants to run code on map load single player
 		addDebugText("GameEngine: Singleplayer");
@@ -1046,7 +1047,7 @@ void __cdecl OnMapLoad(int a1)
 		H2Tweaks::setSavedSens();
 	}
 
-	p_set_random_number(a1);
+	return result;
 }
 
 typedef bool(__cdecl *spawn_player)(int a1);
@@ -1472,8 +1473,8 @@ void H2MOD::ApplyHooks() {
 	PatchCall(h2mod->GetAddress(0x60C81, 0x58789), OnAutoPickUpHandler);
 
 	// hook to initialize stuff before game start
-	PatchCall(GetAddress(0x49E95, 0x43113), OnMapLoad);
-	p_set_random_number = (set_random_number)GetAddress(0x5912D, 0x4E43C);
+	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetPointer<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
+	VirtualProtect(p_map_cache_load, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	// player spawn hook
 	p_spawn_player = (spawn_player)DetourFunc(h2mod->GetPointer<BYTE*>(0x55952, 0x5DE4A), (BYTE*)OnPlayerSpawn, 6);
@@ -1613,7 +1614,6 @@ void H2MOD::Initialize()
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->Base);
 
 	h2mod->ApplyHooks();
-	tags::apply_patches();	
 }
 
 void H2MOD::Deinitialize() {

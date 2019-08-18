@@ -129,30 +129,10 @@ void tags::on_map_load(void(*callback)())
 	load_callbacks.push_back(callback);
 }
 
-static void __cdecl call_on_map_load()
+void __cdecl tags::run_callbacks()
 {
 	// load debug names before any callbacks are called
 	load_tag_debug_name();
 	for (auto callback : load_callbacks)
 		callback();
-}
-
-__declspec(naked) static void load_data_from_cache_file__prolog_hook()
-{
-	__asm {
-		push ecx // not sure if this register is used, saved it just in case
-		call call_on_map_load
-		pop ecx
-
-		// replaced code
-		pop     esi
-		mov     al, 1
-		pop     ebx
-		retn
-	}
-}
-
-void tags::apply_patches()
-{
-	WriteJmpTo(h2mod->GetAddress(0x315A3, 0x25453), load_data_from_cache_file__prolog_hook);
 }

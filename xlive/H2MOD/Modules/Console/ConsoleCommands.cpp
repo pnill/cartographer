@@ -21,14 +21,16 @@ ConsoleCommands::ConsoleCommands() {
 	caretPos = 0;
 }
 
-void ConsoleCommands::writePreviousCommand(std::string msg) {
-	std::vector<std::string>::iterator it;
-	it = this->prevCommands.begin();
-	this->prevCommands.insert(it, msg);
-
-	if (this->prevCommands.size() > 18) {
+void ConsoleCommands::writePreviousCommand(std::string& msg) {
+	this->prevCommands.insert(this->prevCommands.begin(), msg);
+	if (this->prevCommands.size() > 6) 
 		this->prevCommands.pop_back();
-	}
+}
+
+void ConsoleCommands::writePreviousOutput(std::string& msg) {
+	this->prevOutput.insert(this->prevOutput.begin(), msg);
+	if (this->prevOutput.size() > 18) 
+		this->prevOutput.pop_back();
 }
 
 time_t start = time(0);
@@ -60,24 +62,25 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 		}
 		break;
 
-	case '\r':    // return/enter
+		case '\r':    // return/enter
 		{
 			if (console) {
-				this->writePreviousCommand(this->command);
-
+				writePreviousOutput(this->command);
+				writePreviousCommand(this->command);
 				std::string fullCommand("$");
 				fullCommand += this->command;
 				this->handle_command(fullCommand);
 
 				command = "";
 				caretPos = 0;
+				previous_command_index = 0;
 				return true;
 			}
 		}
 		break;
 
-	//copy/paste functionality
-	case 0x56:
+		// copy/paste functionality
+		case 0x56:
 		{
 			//read 'V' before 'CTRL'
 			if (console && (GetAsyncKeyState(VK_CONTROL) & 0x8000)) {
@@ -89,23 +92,17 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 				}
 				this->command += clipboardContent;
 				this->caretPos = this->command.length();
-			}
-			else {
-				goto handleKey;
+				break;
 			}
 		}
-		break;
 
 	default:
 
-		handleKey:
 		if (console) {
 
 			if (wp == VK_UP)
 			{
-				command = "";
-				caretPos = 0;
-				if (prevCommands.size() > 0 && previous_command_index <= prevCommands.size() - 1)
+				if (prevCommands.size() > 0 && previous_command_index < prevCommands.size())
 				{
 					command = prevCommands[previous_command_index];
 					caretPos = command.length();
@@ -116,9 +113,6 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 
 			if (wp == VK_DOWN)
 			{
-				command = "";
-				caretPos = 0;
-
 				if (prevCommands.size() > 0 && previous_command_index > 0)
 				{
 					previous_command_index--;
@@ -159,8 +153,6 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 
 			if (((wp >= 0x30 && wp <= 0x5A) || wp == 0x20 || wp == VK_OEM_MINUS || wp == VK_OEM_COMMA || wp == VK_OEM_PERIOD || wp == VK_OEM_MINUS || wp == VK_OEM_PLUS ||
 				wp == VK_OEM_1 || wp == VK_OEM_2 || wp == VK_OEM_3 || wp == VK_OEM_4 || wp == VK_OEM_5 || wp == VK_OEM_6 || wp == VK_OEM_7)) {
-
-
 
 				switch (wp)
 				{
@@ -363,13 +355,13 @@ void ConsoleCommands::output(std::wstring result) {
 	}
 	else {
 		std::string str(result.begin(), result.end());
-		writePreviousCommand(str);
+		writePreviousOutput(str);
 	}
 }
 
 void ConsoleCommands::display(std::string output)
 {
-	writePreviousCommand(output);
+	writePreviousOutput(output);
 }
 
 bool ConsoleCommands::isNum(const char *s) {
@@ -382,10 +374,6 @@ bool ConsoleCommands::isNum(const char *s) {
 		i++;
 	}
 	return true;
-}
-
-void downloadFromRepoThruConsole(std::string mapFilename) {
-	mapManager->downloadFromRepo(mapFilename);
 }
 
 int __cdecl call_get_object_via_datum(DatumIndex object_datum_index, int object_type)
@@ -423,7 +411,6 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid command, usage - $reloadMaps");
 				return;
 			}
-
 			mapManager->reloadMaps();
 		}
 		else if (firstCommand == "$help") {
@@ -654,8 +641,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 			std::string secondArg = splitCommands[1];
 			secondArg += ".map";
-			std::thread t1(downloadFromRepoThruConsole, secondArg);
-			t1.detach();
+			std::thread(&MapManager::downloadFromRepo, mapManager, secondArg).detach();
 		}
 		else if (firstCommand == "$spawn") {
 			if (splitCommands.size() != 6) {

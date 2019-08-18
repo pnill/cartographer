@@ -8,6 +8,7 @@ public:
 	void output(std::wstring result);
 	void display(std::string output);
 	std::vector<std::string> prevCommands;
+	std::vector<std::string> prevOutput;
 	BOOL handleInput(WPARAM wp);
 	BOOL consoleOpen() { return this->console; };
 
@@ -17,7 +18,8 @@ public:
 	bool console = false;
 	int previous_command_index = 0;
 private:
-	void writePreviousCommand(std::string msg);
+	void writePreviousCommand(std::string& msg);
+	void writePreviousOutput(std::string& msg);
 	bool isNum(const char *s);
 	void checkForIds();
 	bool checked_for_ids = false;
