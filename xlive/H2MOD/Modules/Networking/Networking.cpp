@@ -472,7 +472,7 @@ void applyConnectionPatches()
 	//int data = 500;
 	//WriteValue<int>(h2mod->GetAddress() + (h2mod->Server ? 0x24896 : 0x28702), data);
 
-	// research
+	// increase the netowrk tickrate of hosts to 60 and for the clients to 30
 	static float unk_flt_ = 60.0f;
 	DWORD addresses[] = { 0x1BDE27, 0x1BE2FA, 0x1BFB3C, 0x1C11FA, 0x1C12BF };
 	DWORD addresses_dedi[] = { 0x1B7D01, 0x1B81D4, 0x1B9A1C, 0x1BB0DA, 0x1BB19F };

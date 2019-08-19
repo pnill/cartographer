@@ -241,7 +241,6 @@ void CustomPackets::ApplyGamePatches()
 	p_network_message_gateway = (network_message_gateway)DetourClassFunc(h2mod->GetPointer<BYTE*>(0x1E907B, 0x1CB03B), (BYTE*)message_gateway_hook, 8);
 	VirtualProtect(p_network_message_gateway, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-
 	p_network_message_gateway_2 = (network_message_gateway_2)DetourClassFunc(h2mod->GetPointer<BYTE*>(0x1E929C, 0x1CB25C), (BYTE*)message_gateway_hook_2, 8);
 	VirtualProtect(p_network_message_gateway_2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }

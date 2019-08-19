@@ -858,16 +858,6 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 	return v2;
 }
 
-//Patch Call to modify tags just after map load
-//Removed this due to conflicts with tag_loader
-/*
-char _cdecl LoadTagsandMapBases(int a)
-{
-	char(__cdecl* LoadTagsandMapBases_Orig)(int) = (char(__cdecl*)(int))(h2mod->GetAddress(0x00031348));
-	char result = LoadTagsandMapBases_Orig(a);
-	return result;
-}*/
-
 char is_remote_desktop()
 {
 	LOG_TRACE_FUNC("check disabled");
@@ -1044,7 +1034,6 @@ void InitH2Tweaks() {
 		VirtualProtect(pfn_c0024fabc, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		WriteJmpTo(h2mod->GetAddress(0x4544), is_init_flag_set);
-		//PatchCall(H2BaseAddr + 0x3166B, (DWORD)LoadTagsandMapBases);
 
 		RadarPatch();
 		H2Tweaks::sunFlareFix();
@@ -1067,7 +1056,7 @@ void InitH2Tweaks() {
 	PatchCall(h2mod->GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
 	PatchCall(h2mod->GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
-	//H2Tweaks::applyPlayersActionsUpdateRatePatch(); //breaks aim assist
+	H2Tweaks::applyObjectPredictionPatch(); 
 
 	addDebugText("End Startup Tweaks.");
 }
@@ -1340,22 +1329,21 @@ void H2Tweaks::disableAI_MP() {
 	WriteBytes(H2BaseAddr + (H2IsDediServer ? 0x2B93F4 : 0x30E684), jnz, 1);
 }
 
-float* xb_tickrate_flt;
-__declspec(naked) void calculate_delta_time(void)
+float* seconds_per_tick_xbox_flt;
+__declspec(naked) void get_tick_execution_time_seconds(void)
 {
 	__asm
 	{
-		mov eax, xb_tickrate_flt
+		mov eax, seconds_per_tick_xbox_flt
 		fld dword ptr[eax]
-		fmul dword ptr[esp + 4]
 		retn
 	}
 }
 
-void H2Tweaks::applyPlayersActionsUpdateRatePatch()
+void H2Tweaks::applyObjectPredictionPatch()
 {
-	xb_tickrate_flt = h2mod->GetPointer<float*>(0x3BBEB4, 0x378C84);
-	PatchCall(h2mod->GetAddress(0x1E12FB, 0x1C8327), calculate_delta_time); // inside update_player_actions()
+	seconds_per_tick_xbox_flt = h2mod->GetPointer<float*>(0x3BBEB4, 0x378C84);
+	PatchCall(h2mod->GetAddress(0x1F4435, 0x1DF4CE), get_tick_execution_time_seconds);
 }
 
 void H2Tweaks::sunFlareFix()

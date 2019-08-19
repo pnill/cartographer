@@ -931,7 +931,6 @@ void get_object_table_memory()
 	game_state_objects_header = *h2mod->GetPointer<s_data_array<GameStateObjectsHeader>**>(0x4E461C, 0x50C8EC);
 }
 
-// this gets called after game globals are updated fyi (which includes game engine type)
 typedef bool(__cdecl *map_cache_load)(void* map_load_settings);
 map_cache_load p_map_cache_load;
 

@@ -14,7 +14,6 @@ namespace H2Tweaks {
 	void toggleKillVolumes(bool enable);
 	void enableAI_MP();
 	void disableAI_MP();
-	void PatchPingMeterCheck();
 	void applyShaderTweaks();
 	void enable60FPSCutscenes();
 	void disable60FPSCutscenes();
@@ -23,7 +22,7 @@ namespace H2Tweaks {
 	void setHz();
 	void setCrosshairPos(float crosshair_offset);
 	void setCrosshairSize(int size, bool preset);
-	void applyPlayersActionsUpdateRatePatch();
+	void applyObjectPredictionPatch();
 	void setSens(InputType input_type, int sens);
 	void setSavedSens();
 	void sunFlareFix();
