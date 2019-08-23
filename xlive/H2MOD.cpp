@@ -944,9 +944,6 @@ bool __cdecl OnMapLoad(void* map_load_settings)
 	isLobby = true;
 
 	get_object_table_memory();
-
-	for (auto gametype_it : GametypesMap)
-		gametype_it.second = false; // reset custom gametypes state
 	
 	if (engine_type == EngineType::MAIN_MENU_ENGINE)
 	{
@@ -979,6 +976,9 @@ bool __cdecl OnMapLoad(void* map_load_settings)
 	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
 	LOG_TRACE_GAME(L"[h2mod] OnMapLoad engine mode {0}, variant name {1}", h2mod->GetEngineType(), variant_name);
 	BYTE GameState = *(BYTE*)(h2mod->GetAddress(0x420FC4, 0x3C40AC));
+
+	for (auto gametype_it : GametypesMap)
+		gametype_it.second = false; // reset custom gametypes state
 
 	if (engine_type == EngineType::MULTIPLAYER_ENGINE)
 	{
