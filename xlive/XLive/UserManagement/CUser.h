@@ -1,8 +1,6 @@
 #pragma once 
 
 #include "stdafx.h"
-#include <unordered_map>
-#include <mutex>
 
 class CUser
 {
@@ -54,6 +52,10 @@ public:
 	void ConfigureLocalUser(XNADDR* pxna, ULONGLONG xuid, char* username);
 	int sendSecurePacket(SOCKET s, short to_port);
 
+	void SetKeys(XNKID*, XNKEY*);
+	void EraseKeys();
+	void GetKeys(XNKID* xnkid, XNKEY* xnkey);
+
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 
 	std::unordered_map<ULONG, CUser*> cusers; // Map Key(SecureADDR)->CUser
@@ -68,6 +70,10 @@ public:
 
 	CUser local_user;
 	XNADDR game_host_xn;
+
+private:
+	XNKID host_xnkid;
+	XNKEY host_xnkey;
 };
 
 extern wchar_t ServerLobbyName[32];

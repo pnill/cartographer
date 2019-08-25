@@ -26,7 +26,7 @@ INT   WINAPI XNetServerToInAddr(const IN_ADDR ina, DWORD dwServiceId, IN_ADDR * 
 }
 
 
-// #59: XNetXnAddrToInAddr
+// #59: XNetTsAddrToInAddr
 INT   WINAPI XNetTsAddrToInAddr(const TSADDR * ptsa, DWORD dwServiceId, const XNKID * pxnkid, IN_ADDR * pina)
 {
 	LOG_TRACE_XLIVE("XNetTsAddrToInAddr");
@@ -160,7 +160,7 @@ int WINAPI XNetGetSystemLinkPort(DWORD *a1)
 {
 	LOG_TRACE_XLIVE("XNetGetSystemLinkPort");
 	if (a1)
-		*a1 = 0x00000C02;
+		*a1 = 3074;
 	return 0;
 }
 

@@ -232,7 +232,7 @@ void CustomPackets::ApplyGamePatches()
 {
 	WritePointer(h2mod->GetAddress(0x1AC733, 0x1AC901), g_network_message_types);
 	WritePointer(h2mod->GetAddress(0x1AC8F8, 0x1ACAC6), g_network_message_types);
-	WriteValue<BYTE>(h2mod->GetAddress(0x1E825E,0x1CA221), e_network_message_types::end);
+	WriteValue<BYTE>(h2mod->GetAddress(0x1E825E, 0x1CA221), e_network_message_types::end);
 	WriteValue<int>(h2mod->GetAddress(0x1E81C6, 0x1CA189), e_network_message_types::end * 32);
 
 	PatchCall(h2mod->GetAddress(0x1B5196, 0x1A8EF4), register_custom_packets);

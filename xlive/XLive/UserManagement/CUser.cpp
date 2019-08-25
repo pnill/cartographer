@@ -53,10 +53,13 @@ void CUserManagement::CreateUser(const XNADDR* pxna, BOOL user)
 	*/
 
 	LOG_TRACE_NETWORK("[Resources-Clear] CreateUser executed on thread {:x}", GetCurrentThreadId());
+	CUser* nUser = nullptr;
 	ULONG secure = pxna->inaOnline.s_addr;
-	CUser* nUser = cusers[secure];
+
+	auto cuser_it = userManager.cusers.find(secure);
+
 	// check if the user is already in the system
-	if (nUser == nullptr)
+	if (cuser_it == this->cusers.end())
 	{
 		// allocate new mem for the new peer
 		LOG_TRACE_NETWORK("CUserManagement::CreateUser() new secure address {:x}", pxna->inaOnline.s_addr);
@@ -64,15 +67,19 @@ void CUserManagement::CreateUser(const XNADDR* pxna, BOOL user)
 		nUser = new CUser;
 		SecureZeroMemory(nUser, sizeof(CUser));
 		memcpy(&nUser->xnaddr, pxna, sizeof(XNADDR));
+		
+		this->GetKeys(&nUser->xnkid, NULL);
 		this->cusers[secure] = nUser;
 		nUser->secure.s_addr = secure;
 		nUser->bValid = true;
 	}
 	else 
 	{
+		nUser = cuser_it->second;
 		// if he is in system update the XNADDR
 		LOG_TRACE_NETWORK("CUserManagement::CreateUser() already present secure address {:x}, updating data", secure);
 		memcpy(&nUser->xnaddr, pxna, sizeof(XNADDR)); // update XNADDR 
+		this->GetKeys(&nUser->xnkid, NULL);
 	}
 
 	/*
@@ -184,6 +191,30 @@ void CUserManagement::UnregisterLocal()
 	this->UpdateConnectionStatus();
 }
 
+void CUserManagement::SetKeys(XNKID* xnkid, XNKEY* xnkey)
+{
+	if (xnkid)
+		memcpy(&this->host_xnkid, xnkid, sizeof(XNKID));
+
+	if (xnkey)
+		memcpy(&this->host_xnkey, xnkey, sizeof(XNKEY));
+}
+
+void CUserManagement::EraseKeys()
+{
+	SecureZeroMemory(&this->host_xnkid, sizeof(XNKID));
+	SecureZeroMemory(&this->host_xnkey, sizeof(XNKEY));
+}
+
+void CUserManagement::GetKeys(XNKID* xnkid, XNKEY* xnkey)
+{
+	if (xnkid)
+		memcpy(xnkid, &this->host_xnkid, sizeof(XNKID));
+
+	if (xnkey)
+		memcpy(xnkey, &this->host_xnkey, sizeof(XNKEY));
+}
+
 wchar_t ServerLobbyName[32] = { L"Cartographer" };
 
 void SetUserUsername(char* username) {
@@ -245,40 +276,37 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pnkid, IN_ADDR *p
 
 	LOG_TRACE_NETWORK("[Resources-Clear] XNetXnAddrToInAddr executed on thread {:x}", GetCurrentThreadId());
 
-	if (pxna->inaOnline.s_addr != NULL) {
-		CUser* user = userManager.cusers[pxna->inaOnline.s_addr];
-
-		if (user == nullptr)
-			userManager.CreateUser(pxna, TRUE);
-
+	if (pxna->inaOnline.s_addr 
+		&& (userManager.cusers.find(pxna->inaOnline.s_addr) != userManager.cusers.end())) 
+	{
+		// copy secure address
 		pina->s_addr = pxna->inaOnline.s_addr;
-		return ERROR_SUCCESS;
+		return ERROR_SUCCESS;	
 	}
 	return ERROR_FUNCTION_FAILED;
 }
 
 // #60: XNetInAddrToXnAddr
-INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid)
+INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 {
 	LOG_TRACE_NETWORK("XNetInAddrToXnAddr() const ina: {:x}", ina.s_addr);
-	CUser* user = userManager.cusers[ina.s_addr];
-	if (user != nullptr)
+	auto user_it = userManager.cusers.find(ina.s_addr);
+	if (user_it != userManager.cusers.end())
 	{
+		CUser* user = user_it->second;
+
 		if (pxna)
-		{
 			memcpy(pxna, &user->xnaddr, sizeof(XNADDR));
-		}
-		/*if (pxnkid)
-		{
-			XNetRandom((BYTE*)pxnkid, sizeof(XNKID));
-		}*/
+
+		if (pxnkid)
+			memcpy(pxnkid, &user->xnkid, sizeof(XNKID));
 	}
 	else
 	{
 		LOG_TRACE_NETWORK("XNetInAddrToXnAddr() the peer with secure/ip-address {:x} doesn't exist!", ina.s_addr);
+		return ERROR_FUNCTION_FAILED;
 	}
-
-	return 0;
+	return ERROR_SUCCESS;
 }
 
 // #63: XNetUnregisterInAddr

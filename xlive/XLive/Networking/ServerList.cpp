@@ -446,8 +446,6 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 
 			}
 			document["pProperties"].PushBack(property, document.GetAllocator());
-
-
 		}
 
 		/* For whatever reason the game is currently refusing to send the servername or player profile name so we're going to send it ourselves.*/
@@ -547,7 +545,11 @@ DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey)
 {
 	LOG_TRACE_XLIVE("XLocatorCreateKey");
 	if (pxnkid && pxnkey) {
-		XNetCreateKey(pxnkid, pxnkey);
+		//XNetCreateKey(pxnkid, pxnkey);
+		
+		memset(pxnkid, 0xAB, sizeof(XNKID));
+		memset(pxnkey, 0xAA, sizeof(XNKEY));
+
 		pxnkid->ab[0] &= ~XNET_XNKID_MASK;
 		pxnkid->ab[0] |= XNET_XNKID_ONLINE_PEER;
 	}

@@ -20,3 +20,5 @@ public:
 	void logAllPlayersToConsole();
 	void logAllPeersToConsole();
 };
+
+extern Players* players;

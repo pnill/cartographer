@@ -129,8 +129,8 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 	LOG_TRACE_XLIVE("XNetCreateKey");
 	if (pxnkid && pxnkey)
 	{
-		memset(pxnkid, 0xAB, sizeof(XNKID));
-		memset(pxnkey, 0XAA, sizeof(XNKEY));
+		XNetRandom((BYTE*)pxnkid, sizeof(XNKID));
+		XNetRandom((BYTE*)pxnkey, sizeof(XNKEY));
 		pxnkid->ab[0] &= ~XNET_XNKID_MASK;
 		pxnkid->ab[0] |= XNET_XNKID_SYSTEM_LINK_XPLAT;
 	}
@@ -325,6 +325,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 int WINAPI XNetRegisterKey(XNKID *pxnkid, XNKEY *pxnkey)
 {
 	LOG_TRACE_NETWORK("XNetRegisterKey()");
+	userManager.SetKeys(pxnkid, pxnkey);
 	return 0;
 }
 
@@ -333,5 +334,6 @@ int WINAPI XNetRegisterKey(XNKID *pxnkid, XNKEY *pxnkey)
 int WINAPI XNetUnregisterKey(const XNKID* pxnkid)
 {
 	LOG_TRACE_NETWORK("XNetUnregisterKey()");
+	userManager.EraseKeys();
 	return 0;
 }

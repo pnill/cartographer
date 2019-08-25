@@ -44,7 +44,6 @@ bool __cdecl refuse_read(void* a1, int a2, int a3) {
 }
 
 void __cdecl establish_write(void* a1, int a2, int a3) {
-	userManager.sendSecurePacket(game_network_data_gateway_socket_1000, 1000);
 	bitstream::p_data_encode_integer()(a1, "remote-identifier", *(DWORD *)a3, 32);
 	bitstream::p_data_encode_integer()(a1, "reason", *(DWORD *)(a3 + 4), 32);
 	//LOG_TRACE_NETWORK_N("[H2MOD-network] connection establish write, remote-identifier=%d, identifier=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4));
@@ -390,16 +389,18 @@ void __cdecl serializeParametersUpdatePacket(void* a1, int a2, int a3) {
 	serialize_parameters_update_packet_method(a1, a2, a3);
 }
 
-typedef void(__stdcall *tjoin_game)(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14);
+typedef bool(__stdcall *tjoin_game)(void* thisptr, int a2, int a3, XNKID* xnkid, XNKEY* xnkey, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14);
 tjoin_game pjoin_game;
 
-void __stdcall join_game(void* thisptr, int a2, int a3, int a4, int a5, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
+bool __stdcall join_game(void* thisptr, int a2, int a3, XNKID* xnkid, XNKEY* xnkey, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
 {
 	memcpy(&userManager.game_host_xn, host_xn, sizeof(XNADDR));
 	LOG_TRACE_NETWORK("[H2MOD-Network] copied host information, XNADDR: {:#x}", userManager.game_host_xn.ina.s_addr);
+	userManager.SetKeys(xnkid, xnkey);
+	userManager.sendSecurePacket(game_network_data_gateway_socket_1000, 1000);
 	userManager.sendSecurePacket(game_network_message_gateway_socket_1001, 1001);
 	userManager.CreateUser(host_xn, FALSE);
-	return pjoin_game(thisptr, a2, a3, a4, a5, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
+	return pjoin_game(thisptr, a2, a3, xnkid, xnkey, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 
 /* WIP */
