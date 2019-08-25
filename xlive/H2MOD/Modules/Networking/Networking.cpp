@@ -450,6 +450,7 @@ __declspec(naked) void network_observer_patch(void)
 		imul     eax, ebp
 		cdq
 		idiv    ecx
+		
 		ret
 	}
 }
@@ -491,7 +492,7 @@ void applyConnectionPatches()
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AAD63, 0x1AB268) + 6, 61440);
 
 	// 30 tickrate to 60 compenstation for packet size
-	Codecave(h2mod->GetAddress(0x1BF1B9, 0x1B9093), network_observer_patch, 1);
+	// Codecave(h2mod->GetAddress(0x1BF1B9, 0x1B9093), network_observer_patch, 1);
 
 	if (!h2mod->Server)
 	{
