@@ -489,14 +489,16 @@ void applyConnectionPatches()
 	}
 
 	// increase max bits per second of LIVE netcode (3000 bytes -> ~8000 bytes)
-	WriteValue<DWORD>(h2mod->GetAddress(0x1AAD63, 0x1AB268) + 6, 61440);
+	WriteValue<DWORD>(h2mod->GetAddress(0x1AAD63, 0x1AB268) + 6, 30720 * 2); // max bits per 1 player
+	WriteValue<DWORD>(h2mod->GetAddress(0x1AAD63, 0x1AB268) + 10 + 6, 122880 * 2); // max bits per 4 players (aka splitscreen)
+	WriteValue<DWORD>(h2mod->GetAddress(0x1AAD63, 0x1AB268) + 20 + 6, 512000 * 2); // max bits per full lobby (16/16 lobby)
 
 	// 30 tickrate to 60 compenstation for packet size
-	// Codecave(h2mod->GetAddress(0x1BF1B9, 0x1B9093), network_observer_patch, 1);
+	//Codecave(h2mod->GetAddress(0x1BF1B9, 0x1B9093), network_observer_patch, 1);
 
 	if (!h2mod->Server)
 	{
-		pjoin_game = (tjoin_game)DetourClassFunc(h2mod->GetPointer<BYTE*>(0x1CDADE, 0x0), (BYTE*)join_game, 13);
+		pjoin_game = (tjoin_game)DetourClassFunc(h2mod->GetPointer<BYTE*>(0x1CDADE), (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 }
