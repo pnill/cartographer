@@ -1,25 +1,36 @@
 #include "stdafx.h"
-#include "H2MOD\Modules\HitFix\Hitfix.h"
+
 #include "H2MOD.h"
+#include "H2MOD\Tags\TagInterface.h"
+#include "H2MOD\Modules\HitFix\Hitfix.h"
+
+// object string, initial bullet speed, final bullet speed
+std::vector<std::tuple<std::string, float, float>> weapons = 
+{
+	std::make_tuple("objects\\weapons\\rifle\\battle_rifle\\projectiles\\battle_rifle_bullet", 400.f * 2.f, 400.f * 2.f),
+	std::make_tuple("objects\\weapons\\rifle\\covenant_carbine\\projectiles\\carbine_slug\\carbine_slug", 400.f * 2.f, 400.f * 2.f),
+	std::make_tuple("objects\\weapons\\rifle\\sniper_rifle\\projectiles\\sniper_bullet", 1200.f * 2.f, 1200.f * 2.f),
+	std::make_tuple("objects\\vehicles\\warthog\\turrets\\gauss\\weapon\\gauss_bullet", 90.f * 2.f, 90.f * 2.f),
+	std::make_tuple("objects\\weapons\\pistol\\magnum\\projectiles\\magnum_bullet", 400.f * 2.f, 400.f * 2.f),
+	std::make_tuple("objects\\vehicles\\warthog\\turrets\\chaingun\\weapon\\bullet", 800.f * 2.f, 800.f * 2.f),
+};
 
 void HitFix::Initialize()
 {
-	DWORD AddressOffset = *h2mod->GetPointer<DWORD*>(0x47CD54, 0x4A29BC);
+	for (auto proj_tuple : weapons) 
+	{
+		auto required_datum = tags::find_tag('proj', std::get<0>(proj_tuple));
 
-	*(float*)(AddressOffset + 0xA4EC88) = 1200.0f; //battle_rifle_bullet.proj Initial Velocity 
-	*(float*)(AddressOffset + 0xA4EC8C) = 1200.0f; //battle_rifle_bullet.proj Final Velocity
-	*(float*)(AddressOffset + 0xA84DD4) = 1200.0f; //carbine_projectile Initial Velocity 400
-	*(float*)(AddressOffset + 0xA84DD8) = 1200.0f; //carbine_projectile Final Velocity 400
-	*(float*)(AddressOffset + 0xB7F914) = 4000.0f; //sniper_bullet.proj Initial Velocity
-	*(float*)(AddressOffset + 0xB7F918) = 4000.0f; //sniper_bullet.proj Final Velocity
-	
-	//FIXME COOP will break because of one of these tags not existing.
-	*(float*)(AddressOffset + 0xCE4598) = 4000.0f; //beam_rifle_beam.proj Initial Velocity
-	*(float*)(AddressOffset + 0xCE459C) = 4000.0f; //beam_rifle_beam.proj Final Velocity
-	*(float*)(AddressOffset + 0x81113C) = 200.0f; //gauss_turret.proj Initial Velocity def 90
-	*(float*)(AddressOffset + 0x811140) = 200.0f; //gauss_turret.proj Final Velocity def 90
-	*(float*)(AddressOffset + 0x97A194) = 800.0f; //magnum_bullet.proj initial def 400
-	*(float*)(AddressOffset + 0x97A198) = 800.0f; //magnum_bullet.proj final def 400
-	*(float*)(AddressOffset + 0x7E7E20) = 2000.0f; //bullet.proj (chaingun) initial def 800
-	*(float*)(AddressOffset + 0x7E7E24) = 2000.0f; //bullet.proj (chaingun) final def 800
+		tags::ilterator projectiles('proj');
+		while (!projectiles.next().IsNull())
+		{
+			BYTE* projectile = tags::get_tag<'proj', BYTE>(projectiles.datum);
+
+			if (projectiles.datum == required_datum && projectile != nullptr)
+			{
+				*(float*)(projectile + 380) = std::get<1>(proj_tuple);
+				*(float*)(projectile + 384) = std::get<2>(proj_tuple);
+			}
+		}
+	}
 }
