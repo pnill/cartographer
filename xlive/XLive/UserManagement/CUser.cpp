@@ -12,7 +12,7 @@ extern CHAR g_szUserName[4][16];
 
 SecurePacket securePacket;
 CUserManagement userManager;
-const DWORD annoyance_factor = 0x8E0A40F1;
+const DWORD annoyance_factor = 0x11223344;
 
 /*
 NOTE:
