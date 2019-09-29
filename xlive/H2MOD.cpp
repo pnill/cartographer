@@ -506,7 +506,7 @@ int H2MOD::get_player_index_from_name(wchar_t* playername)
 
 	while (playersIt.get_next_player())
 	{
-		wchar_t* comparename = playersIt.get_current_player_data()->properties.player_name;
+		wchar_t* comparename = playersIt.get_current_player_name();
 
 		LOG_TRACE_GAME(L"[H2MOD]::get_player_index_from_name( {0} : {1} )", playername, comparename);
 
@@ -890,10 +890,12 @@ bool __cdecl OnMapLoad(void* map_load_settings)
 		{
 			HitFix::Initialize();
 			MPMapFix::Initialize();
+			H2Tweaks::setMeleeLungeDistanceFactor(0.33333334f * 2.f);
 		}
 		else
 		{
 			xboxTickHandler->preSpawnPlayer->execute();
+			H2Tweaks::setMeleeLungeDistanceFactor(0.33333334f);
 		}
 		
 		H2Tweaks::enableAI_MP();
@@ -931,6 +933,7 @@ bool __cdecl OnMapLoad(void* map_load_settings)
 		//if anyone wants to run code on map load single player
 		addDebugText("Map type: Singleplayer");
 		H2X::Initialize(true);
+		H2Tweaks::setMeleeLungeDistanceFactor(0.33333334f * 2.f);
 
 		H2Tweaks::enable60FPSCutscenes();
 	}

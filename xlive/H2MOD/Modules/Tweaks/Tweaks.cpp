@@ -1052,6 +1052,9 @@ void InitH2Tweaks() {
 	PatchCall(h2mod->GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
 	PatchCall(h2mod->GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
+
+	// physics patches
+	H2Tweaks::applyMeleePatch(); 
 	H2Tweaks::applyObjectPredictionPatch(); 
 
 	addDebugText("End Startup Tweaks.");
@@ -1342,6 +1345,20 @@ void H2Tweaks::applyObjectPredictionPatch()
 {
 	seconds_per_tick_xbox_flt = h2mod->GetAddress<float*>(0x3BBEB4, 0x378C84);
 	PatchCall(h2mod->GetAddress(0x1F4435, 0x1DF4CE), get_tick_execution_time_seconds);
+}	
+
+float melee_lunge_distance_factor = 0.33333334f;
+void H2Tweaks::setMeleeLungeDistanceFactor(float value)
+{
+	melee_lunge_distance_factor = value;
+}
+
+void H2Tweaks::applyMeleePatch()
+{
+	WritePointer(h2mod->GetAddress(0x10B160, 0xFD790) + 4, &melee_lunge_distance_factor);
+	WritePointer(h2mod->GetAddress(0x10B354, 0xFD984) + 4, &melee_lunge_distance_factor);
+	WritePointer(h2mod->GetAddress(0x10B6A3, 0xFDCD3) + 4, &melee_lunge_distance_factor);
+	WritePointer(h2mod->GetAddress(0x10BB78, 0xFE1A8) + 4, &melee_lunge_distance_factor);
 }
 
 void H2Tweaks::sunFlareFix()
