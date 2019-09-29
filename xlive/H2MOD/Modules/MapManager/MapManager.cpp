@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Globals.h"
-#include <H2MOD\protobuf\h2mod.pb.h>
 #include <fstream>
 #include <Mswsock.h>
 #include <WS2tcpip.h>
@@ -51,15 +50,15 @@ wchar_t EMPTY_UNICODE_STR = '\0';
 std::string EMPTY_STR("");
 
 bool mapDownloadCountdown = false;
-auto promptOpenTime = std::chrono::system_clock::now();
+auto promptOpenTime = std::chrono::high_resolution_clock::now();
 int downloadPercentage = 0;
 
 void MapManager::leaveSessionIfAFK()
 {
 	if (mapDownloadCountdown)
 	{
-		long long duraton = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - promptOpenTime).count();
-		if (duraton >= 20) {
+		auto duraton = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - promptOpenTime);
+		if (duraton >= std::chrono::seconds(20)) {
 			h2mod->exit_game();
 			mapDownloadCountdown = false;
 		}
@@ -76,7 +75,7 @@ char __cdecl handle_map_download_callback()
 
 	auto mapDownload = []()
 	{
-		DWORD* mapDownloadStatus = h2mod->GetPointer<DWORD*>(0x422570);
+		DWORD* mapDownloadStatus = h2mod->GetAddress<DWORD*>(0x422570);
 
 		// set the game to downloading map state
 		*mapDownloadStatus = -1;
@@ -125,10 +124,10 @@ char leavegame_callback()
 void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16 a4, int map_download_callback, int leave_game_callback, int a7, int a8, int a9, int a10)
 {
 	typedef void(__cdecl map_downloading_menu_constructor)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6, int a7, int a8, int a9, int a10);
-	auto p_map_downloading_menu_constructor = h2mod->GetPointer<map_downloading_menu_constructor*>(0x20E2E0);
+	auto p_map_downloading_menu_constructor = h2mod->GetAddress<map_downloading_menu_constructor*>(0x20E2E0);
 
 	mapDownloadCountdown = true;
-	promptOpenTime = std::chrono::system_clock::now();
+	promptOpenTime = std::chrono::high_resolution_clock::now();
 	CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
 	leavegame_callback_ptr = (void*)leave_game_callback;
 	p_map_downloading_menu_constructor(a1, a2, a3, a4, reinterpret_cast<int>(handle_map_download_callback), leave_game_callback, a7, a8, a9, a10);
@@ -145,7 +144,7 @@ wchar_t* receiving_map_wstr[] = {
 wchar_t* get_receiving_map_string()
 { 
 	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)h2mod->GetAddress(0x381fd));
-	wchar_t** str_array = h2mod->GetPointer<wchar_t**>(0x46575C);
+	wchar_t** str_array = h2mod->GetAddress<wchar_t**>(0x46575C);
 
 	if (get_default_game_language() == 0) // check if english
 		return receiving_map_wstr[0];
@@ -225,7 +224,7 @@ void MapManager::TcpServer::stop() {
 std::wstring MapManager::getMapName() {
 	//H2Server.exe+5349B4
 	//H2Server.exe+535C64 (another offset to use if the above fails for whatever reason)
-	const wchar_t* currentMapName = h2mod->GetPointer<wchar_t*>(0x97737C, 0x5349B4);
+	const wchar_t* currentMapName = h2mod->GetAddress<wchar_t*>(0x97737C, 0x5349B4);
 
 	DWORD dwBack;
 	//set r/w access on string so we don't have any issues when we do the implicit copy below
@@ -251,7 +250,7 @@ bool MapManager::hasCustomMap(std::string mapName) {
 */
 bool MapManager::hasCustomMap(std::wstring mapName) {
 	DWORD dwBack;
-	wchar_t* mapsDirectory = h2mod->GetPointer<wchar_t*>(0x2423C, 0x482D70);
+	wchar_t* mapsDirectory = h2mod->GetAddress<wchar_t*>(0x2423C, 0x482D70);
 
 	VirtualProtect(mapsDirectory, 4, PAGE_READWRITE, &dwBack);
 	std::wstring mapFileName(mapsDirectory);
@@ -274,9 +273,9 @@ void swap(DWORD*& a, DWORD*& b)
 */
 void MapManager::reloadMaps() {
 	typedef char(__thiscall *map_reload_function_type)(int thisx);
-	auto reloadMaps = h2mod->GetPointer<map_reload_function_type>(0x4D021, 0x419B5);
-	auto reloadMapsSet = h2mod->GetPointer<map_reload_function_type>(0x4CC30, 0x41501);
-	DWORD* mapsObject = h2mod->GetPointer<DWORD*>(0x482D70, 0x4A70D8);
+	auto reloadMaps = h2mod->GetAddress<map_reload_function_type>(0x4D021, 0x419B5);
+	auto reloadMapsSet = h2mod->GetAddress<map_reload_function_type>(0x4CC30, 0x41501);
+	DWORD* mapsObject = h2mod->GetAddress<DWORD*>(0x482D70, 0x4A70D8);
 
 	LOG_TRACE_GAME("[h2mod-mapmanager] before reload map sets");
 	EnterCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
@@ -396,7 +395,7 @@ bool MapManager::downloadFromRepo(std::string mapFilename) {
 	CURLcode res;
 
 	DWORD dwBack;
-	wchar_t* mapsDirectory = h2mod->GetPointer<wchar_t*>(0x482D70 + 0x2423C);
+	wchar_t* mapsDirectory = h2mod->GetAddress<wchar_t*>(0x482D70 + 0x2423C);
 	VirtualProtect(mapsDirectory, 4, PAGE_EXECUTE_READ, &dwBack);
 
 	std::wstring mapFileName(mapsDirectory);
@@ -454,7 +453,7 @@ bool MapManager::downloadFromHost() {
 				precalculatedDownloadPercentageStrings[i] = downloadMsg;
 			}
 		}
-		DWORD* mapsObject = h2mod->GetPointer<DWORD*>(0x482D70);
+		DWORD* mapsObject = h2mod->GetAddress<DWORD*>(0x482D70);
 		wchar_t* customMapsDirectory = (wchar_t*)((int)mapsObject + 148028);
 		std::wstring customMapsDirU(customMapsDirectory);
 		std::string customMapsDir(customMapsDirU.begin(), customMapsDirU.end());

@@ -73,7 +73,7 @@ bool __cdecl decode_set_grenades_packet(char* buffer, int a2, s_unit_grenades* d
 void register_custom_packets(void* a1)
 {
 	typedef void(__cdecl* register_test_packet)(void* a1);
-	auto p_register_test_packet = h2mod->GetPointer<register_test_packet>(0x1ECE05, 0x1CD7BE);
+	auto p_register_test_packet = h2mod->GetAddress<register_test_packet>(0x1ECE05, 0x1CD7BE);
 	p_register_test_packet(a1);
 
 	register_packet_impl(g_network_message_types, map_file_name, "map-file-name", 0, sizeof(s_custom_map_filename), sizeof(s_custom_map_filename), 
@@ -109,7 +109,7 @@ void __stdcall message_gateway_hook(void *thisx, network_address* addr, int mess
 			std::wstring map_filename;
 			mapManager->getMapFilename(map_filename);
 			buffer.is_custom_map = false;
-			if (map_filename.size())
+			if (map_filename.size() > 0)
 			{
 				buffer.is_custom_map = true;
 				wcsncpy_s(buffer.file_name, map_filename.c_str(), 32);
@@ -238,9 +238,9 @@ void CustomPackets::ApplyGamePatches()
 	PatchCall(h2mod->GetAddress(0x1B5196, 0x1A8EF4), register_custom_packets);
 
 	DWORD dwBack;
-	p_network_message_gateway = (network_message_gateway)DetourClassFunc(h2mod->GetPointer<BYTE*>(0x1E907B, 0x1CB03B), (BYTE*)message_gateway_hook, 8);
+	p_network_message_gateway = (network_message_gateway)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E907B, 0x1CB03B), (BYTE*)message_gateway_hook, 8);
 	VirtualProtect(p_network_message_gateway, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	p_network_message_gateway_2 = (network_message_gateway_2)DetourClassFunc(h2mod->GetPointer<BYTE*>(0x1E929C, 0x1CB25C), (BYTE*)message_gateway_hook_2, 8);
+	p_network_message_gateway_2 = (network_message_gateway_2)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E929C, 0x1CB25C), (BYTE*)message_gateway_hook_2, 8);
 	VirtualProtect(p_network_message_gateway_2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }

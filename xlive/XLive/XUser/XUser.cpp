@@ -2,15 +2,7 @@
 #include "XUser.h"
 
 #include "Globals.h"
-#include "resource.h"
 #include "XLive\xbox\xbox.h"
-#include "XLive\XAM\xam.h"
-#include "H2MOD\Discord\DiscordInterface.h"
-#include "H2MOD\Modules\Config\Config.h"
-#include <iostream>
-#include <sstream>
-#include <codecvt>
-#include <unordered_map>
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 WCHAR strw_XUser[8192];

@@ -52,13 +52,15 @@
 #include <map>
 #include <mutex>
 #include <queue>
+#include <tuple>
 #include <string>
 #include <vector>
+#include <numeric>
 #include <sstream>
 #include <algorithm>
-#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
+
 
 #include <d3d9.h>
 #include <d3dx9.h>

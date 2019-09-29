@@ -89,7 +89,7 @@ namespace tag_loader
 	//Adds reference of all the tags present in shared map into the tag_table
 	void Add_all_shared_refs();
 	//verifies and adds the Datum to  sync_tags list for the module loading
-	void Generate_sync_list(void* type,DWORD index);
+	void Generate_sync_list(int type, DWORD index);
 	//Adds the valid tags to GlobalScenario->SimulationDefinitionTable Block and clears the sync list
 	void Add_tags_to_simulation_table();
 	///

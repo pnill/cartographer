@@ -97,6 +97,12 @@ namespace tags
 		int type;
 	};
 
+	struct tag_data_block
+	{
+		int block_count;
+		DWORD block_data_offset;
+	};
+
 	/* 
 		Tag Interface
 
@@ -112,6 +118,9 @@ namespace tags
 
 	/* tag data in currently loaded map (merged cache and shared cache data afaik) */
 	char *get_tag_data();
+
+	/* gets the globals\globals aka matg for the current map/cache file (TODO: add the matg structure) */
+	char *get_game_globals();
 
 	/* header for the current .map/cache file */
 	cache_header *get_cache_header();
@@ -168,7 +177,7 @@ namespace tags
 	}
 
 	/* Get parent tag groups for a tag group */
-	inline const tag_parent_info *get_tag_parent_info(const blam_tag &tag_type)
+	inline const tag_parent_info* get_tag_parent_info(const blam_tag &tag_type)
 	{
 		auto *header = get_tags_header();
 		if (!header)

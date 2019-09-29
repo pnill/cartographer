@@ -5,6 +5,8 @@
 #include "Util/hash.h"
 #include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
 
+// TODO: use new custom packets
+
 extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;
 using namespace MapChecksumSync;
@@ -234,7 +236,7 @@ void MapChecksumSync::RuntimeError(error_id type)
 void MapChecksumSync::SendState()
 {
 	LOG_TRACE_FUNC("NetworkSession::localPeerIsSessionHost() {}", NetworkSession::localPeerIsSessionHost());
-	LOG_TRACE_FUNC("h2mod->GetEngineType() {}", h2mod->GetEngineType());
+	LOG_TRACE_FUNC("h2mod->GetEngineType() {}", h2mod->GetMapType());
 	if (!NetworkSession::localPeerIsSessionHost())
 		return;
 	H2ModPacket packet;

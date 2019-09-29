@@ -45,10 +45,7 @@ struct PeerInfo
 	DWORD field_F0;
 	DWORD field_F4;
 	DWORD gets_incremented_unk;
-	signed int player_index; // used to access the player_info array
-	signed int field_100;
-	signed int field_104;
-	signed int field_108;
+	signed int player_index[4]; // stores local players indexes of the peer (BIG TODO: maybe fix splitscreen at some point)
 };
 static_assert(sizeof(PeerInfo) == 268, "Invalid PeerNetworkInfo size");
 
@@ -73,10 +70,8 @@ struct PlayerInformation
 	bool properties_valid;
 	char pad[1];
 	unsigned int controller_index;
-	PlayerProperties player_properties;
-	BYTE biped_index;
+	PlayerProperties properties;
 	PlayerProperties player_properties_1;
-	BYTE biped_index2;
 	unsigned int player_voice;
 	unsigned int player_text_chat;
 };
@@ -101,8 +96,8 @@ struct Membership
 	DWORD field_80;
 	DWORD total_peers;
 	PeerInfo peer_info[17];
-	DWORD total_party_players;
-	DWORD player_active_mask;
+	DWORD total_players;
+	DWORD players_active_mask;
 	PlayerInformation player_info[16];
 };
 
@@ -115,7 +110,7 @@ struct network_session
 	DWORD text_chat;
 	int unk_index;
 	int field_18;
-	int network_mode;
+	int network_protocol; // LIVE - 2, Network - 1
 	XNKID session_id;
 	wchar_t field_28[16];
 	char field_48; // 69
@@ -222,7 +217,7 @@ struct network_session
 	BYTE field_78FC[36];
 	int field_7920;
 	DWORD field_7924;
-	DWORD join_request_attempts_number;
+	DWORD total_join_request_attempts;
 	DWORD last_time_join_request_sent;
 	DWORD field_7930;
 	DWORD field_7934;

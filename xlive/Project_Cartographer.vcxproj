@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugDedicatedServer|Win32">
@@ -128,7 +128,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>portaudio.lib;opus.lib;iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;3rdparty/google/libprotobuf_release.lib;d3d9.lib;d3dx9.lib;3rdparty/discord/discord-rpc.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>portaudio.lib;opus.lib;iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;d3d9.lib;d3dx9.lib;3rdparty/discord/discord-rpc.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -191,7 +191,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;.\3rdparty\discord\discord-rpc-debug.lib;.\3rdparty\opus\opus-debug.lib;.\3rdparty\portaudio\portaudio_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;.\3rdparty\discord\discord-rpc-debug.lib;.\3rdparty\opus\opus-debug.lib;.\3rdparty\portaudio\portaudio_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -274,6 +274,7 @@
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp" />
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="H2MOD\Tags\global_tags_interface.cpp" />
@@ -282,6 +283,7 @@
     <ClCompile Include="MetaLoader\cache_loader.cpp" />
     <ClCompile Include="MetaLoader\meta_struct.cpp" />
     <ClCompile Include="MetaLoader\tag_loader.cpp" />
+    <ClCompile Include="H2MOD\Modules\ServerConsole\ServerConsole.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -317,21 +319,15 @@
     <ClCompile Include="H2MOD\Modules\HudElements\RadarPatch.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\Mouseinput.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
-    <ClCompile Include="H2MOD\Modules\MapChecksum\MapChecksumSync.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Networking.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
-    <ClCompile Include="H2MOD\Modules\Players\Players.cpp" />
+    <ClCompile Include="H2MOD\Modules\NetworkPlayers\NetworkPlayers.cpp" />
     <ClCompile Include="H2MOD\Modules\RunLoop\RunLoop.cpp" />
     <ClCompile Include="H2MOD\Modules\Startup\Startup.cpp" />
     <ClCompile Include="H2MOD\Modules\Tweaks\Tweaks.cpp" />
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
     <ClCompile Include="H2MOD\Modules\Utils\Utils.cpp" />
-    <ClCompile Include="H2MOD\protobuf\h2mod.pb.cc">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="H2MOD\Variants\DeviceShop\DeviceShop.cpp" />
     <ClCompile Include="H2MOD\Variants\FireFight\FireFight.cpp" />
     <ClCompile Include="H2MOD\Variants\GunGame\GunGame.cpp" />
@@ -359,11 +355,6 @@
     <ClCompile Include="XLive\Networking\xnet.cpp" />
     <ClCompile Include="XLive\Networking\XSocket.cpp" />
     <ClCompile Include="XLive\UserManagement\CUser.cpp" />
-    <ClCompile Include="XLive\UserManagement\protobuf\packet.pb.cc">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="XLive\Voice\XHVEngine.cpp" />
     <ClCompile Include="XLive\XAM\xam.cpp" />
     <ClCompile Include="XLive\xbox\xbox.cpp" />
@@ -375,21 +366,22 @@
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
     <ClInclude Include="3rdparty\discord\discord_rpc.h" />
-    <ClInclude Include="3rdparty\opus\include\opus.h" />
-    <ClInclude Include="3rdparty\opus\include\opus_custom.h" />
-    <ClInclude Include="3rdparty\opus\include\opus_defines.h" />
-    <ClInclude Include="3rdparty\opus\include\opus_multistream.h" />
-    <ClInclude Include="3rdparty\opus\include\opus_projection.h" />
-    <ClInclude Include="3rdparty\opus\include\opus_types.h" />
-    <ClInclude Include="3rdparty\portaudio\include\pa_jack.h" />
-    <ClInclude Include="3rdparty\portaudio\include\pa_linux_alsa.h" />
-    <ClInclude Include="3rdparty\portaudio\include\pa_mac_core.h" />
-    <ClInclude Include="3rdparty\portaudio\include\pa_win_ds.h" />
-    <ClInclude Include="3rdparty\portaudio\include\pa_win_wasapi.h" />
-    <ClInclude Include="3rdparty\portaudio\include\pa_win_waveformat.h" />
-    <ClInclude Include="3rdparty\portaudio\include\pa_win_wdmks.h" />
-    <ClInclude Include="3rdparty\portaudio\include\pa_win_wmme.h" />
-    <ClInclude Include="3rdparty\portaudio\include\portaudio.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\connecthostport.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\igd_desc_parse.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\minisoap.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\minissdpc.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\miniupnpc.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\miniupnpctypes.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\miniupnpc_declspec.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\miniwget.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\minixml.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\portlistingparse.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\receivedata.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnpcommands.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnpdev.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnperrors.h" />
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnpreplyparse.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\async.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\async_logger-inl.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\async_logger.h" />
@@ -469,8 +461,10 @@
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
+    <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h" />
     <ClInclude Include="H2MOD\Tags\global_tags_interface.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h" />
@@ -493,7 +487,6 @@
     <ClInclude Include="Blam\Cache\TagBlocks.hpp" />
     <ClInclude Include="Blam\Cache\TagBlocks\char.h" />
     <ClInclude Include="Blam\Cache\TagBlocks\TagBlock.h" />
-    <ClInclude Include="Blam\Cache\TagBlocks\TagBlocks.h" />
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\char.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\TagGroups.h" />
@@ -552,17 +545,15 @@
     <ClInclude Include="H2MOD\Modules\HudElements\RadarPatch.h" />
     <ClInclude Include="H2MOD\Modules\Input\Mouseinput.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
-    <ClInclude Include="H2MOD\Modules\MapChecksum\MapChecksumSync.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Networking.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
-    <ClInclude Include="H2MOD\Modules\Players\Players.h" />
+    <ClInclude Include="H2MOD\Modules\NetworkPlayers\NetworkPlayers.h" />
     <ClInclude Include="H2MOD\Modules\RunLoop\RunLoop.h" />
     <ClInclude Include="H2MOD\Modules\Startup\Startup.h" />
     <ClInclude Include="H2MOD\Modules\Tweaks\Tweaks.h" />
     <ClInclude Include="H2MOD\Modules\Updater\Updater.h" />
     <ClInclude Include="H2MOD\Modules\Utils\Utils.h" />
-    <ClInclude Include="H2MOD\protobuf\h2mod.pb.h" />
     <ClInclude Include="H2MOD\Variants\DeviceShop\DeviceShop.h" />
     <ClInclude Include="H2MOD\Variants\FireFight\FireFight.h" />
     <ClInclude Include="H2MOD\Variants\GunGame\GunGame.h" />
@@ -593,7 +584,6 @@
     <ClInclude Include="XLive\Networking\xnet.h" />
     <ClInclude Include="XLive\Networking\XSocket.h" />
     <ClInclude Include="XLive\UserManagement\CUser.h" />
-    <ClInclude Include="XLive\UserManagement\protobuf\packet.pb.h" />
     <ClInclude Include="XLive\Voice\XHVEngine.h" />
     <ClInclude Include="XLive\XAM\xam.h" />
     <ClInclude Include="XLive\xbox\xbox.h" />

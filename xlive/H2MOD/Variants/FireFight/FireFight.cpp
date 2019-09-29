@@ -16,17 +16,20 @@ FireFight::FireFight()
 void FireFight::KilledAI(DatumIndex ai_datum, XUID killer)
 {
 	int points = 0;
-	if (game_state_objects_header->data[ai_datum.Index].object->ObjectType == Objects::ObjectType::biped)
+	DatumIterator<Actor> actorIt(game_state_actors);
+	DatumIterator<ObjectHeader> objectIt(game_state_objects_header);
+	BipedObjectDefinition* actorObject = (BipedObjectDefinition*)objectIt.get_data_at_index(ai_datum.Index)->object;
+
+	if (objectIt.get_data_at_index(ai_datum.Index)->type == Objects::ObjectType::biped)
 	{
-		DatumIndex actor_datum = game_state_objects_header->data[ai_datum.Index].object->ActorDatum; // Grab the actor from the killed AI
+		DatumIndex actor_datum = actorObject->ActorDatum; // Grab the actor from the killed AI
 		if (actor_datum.Index != -1) // Ensure that it was valid
 		{
-			DatumIndex char_datum = game_state_actors->data[actor_datum.Index].character_datum; // get the character tag datum assigned to the actor.
+			DatumIndex char_datum = actorIt.get_data_at_index(actor_datum.Index)->character_datum; // get the character tag datum assigned to the actor.
 			auto *character = tags::get_tag<'char', character_tag_group>(char_datum);
 
 			if (character && character->SwarmProperties.size > 0)
 				points = character->SwarmProperties[0]->scatterKilledCount;
-
 
 			device_shop->AddPoints(killer, points);
 		}
@@ -104,13 +107,13 @@ void FireFightDeinitializer::onClient()
 
 void FireFightDeinitializer::onPeerHost()
 {
-	variant_player->deinitialize();
+	variant_player->Deinitialize();
 	device_shop->deinitialize();
 }
 
 void FireFightDeinitializer::onDedi()
 {
-	variant_player->deinitialize();
+	variant_player->Deinitialize();
 	device_shop->deinitialize();
 }
 

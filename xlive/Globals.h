@@ -7,9 +7,9 @@
 #include "3rdparty/portaudio/include/portaudio.h"
 
 #include "Blam\BlamLibrary.h"
-#include "H2MOD\Modules\Players\Players.h"
 #include "H2MOD\Variants\VariantPlayer.h"
 #include "H2MOD\Variants\VariantSystem.h"
+#include "H2MOD\Modules\NetworkPlayers\NetworkPlayers.h"
 #include "H2MOD\Variants\DeviceShop\DeviceShop.h"
 #include "H2MOD\Variants\H2Final\H2Final.h"
 #include "H2MOD\Variants\XboxTick\XboxTick.h"
@@ -31,9 +31,9 @@ using namespace Blam::EngineDefinitions::Players;
 using namespace Blam::EngineDefinitions::Objects;
 using namespace Blam::EngineDefinitions::Actors;
 
-extern s_data_array<Actor>* game_state_actors;
-extern s_data_array<GameStatePlayer>* game_state_players;
-extern s_data_array<GameStateObjectsHeader>* game_state_objects_header;
+extern s_datum_array* game_state_actors;
+extern s_datum_array* game_state_players;
+extern s_datum_array* game_state_objects_header;
 
 extern DeviceShop* device_shop;
 extern VariantPlayer* variant_player;
@@ -44,7 +44,7 @@ extern bool displayXyz;
 extern volatile bool isLobby;
 extern bool overrideUnicodeMessage;
 extern ConsoleCommands* commands; 
-extern Players* players;
+extern NetworkPlayers* networkPlayers;
 extern char* replacedNetworkNormalTextWidget;
 extern char* replacedNetworkNormalTextWidget2;
 

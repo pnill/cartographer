@@ -10,6 +10,7 @@
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "XLive\UserManagement\CUser.h"
+#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
@@ -260,6 +261,8 @@ int prevPartyPrivacy = 0;
 
 bool halo2WindowExists = false;
 bool halo2ServerOnce1 = false;
+int last_time;
+
 
 void GSMainLoop() {
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
@@ -322,6 +325,22 @@ void GSMainLoop() {
 			}
 		}
 	}
+
+
+	if (last_time == 0)
+		last_time = timeGetTime();
+
+	/*if (h2mod->Server && NetworkStatistics && (timeGetTime() - last_time >= 1000))
+	{
+		last_time = timeGetTime();
+		FILE* f;
+		fopen_s(&f, "netstats.txt", "ab");
+		sprintf(packet_info_str, "\n[ pck/second %d, pck size average: %d ]", ElapsedTime != 0 ? Packets * 1000 / ElapsedTime : 0, TotalPacketsSent != 0 ? TotalBytesSent / TotalPacketsSent : 0);
+		fputs(packet_info_str, f);
+		fputs("\n", f);
+		fclose(f);
+	}*/
+	
 
 	//advLobbySettings->loop();
 }

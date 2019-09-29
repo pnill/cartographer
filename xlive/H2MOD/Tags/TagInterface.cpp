@@ -6,22 +6,27 @@ using namespace tags;
 
 char *tags::get_tag_data()
 {
-	return *h2mod->GetPointer<char**>(0x47CD64, 0x4A29CC);
+	return *h2mod->GetAddress<char**>(0x47CD64, 0x4A29CC);
+}
+
+char *tags::get_game_globals()
+{
+	return *h2mod->GetAddress<char**>(0x479E70, 0x4A642C);
 }
 
 cache_header *tags::get_cache_header()
 {
-	return h2mod->GetPointer<cache_header*>(0x47CD68, 0x4A29D0);
+	return h2mod->GetAddress<cache_header*>(0x47CD68, 0x4A29D0);
 }
 
 HANDLE tags::get_cache_handle()
 {
-	return *h2mod->GetPointer<HANDLE*>(0x4AE8A8, 0x4CF128);
+	return *h2mod->GetAddress<HANDLE*>(0x4AE8A8, 0x4CF128);
 }
 
 bool tags::cache_file_loaded()
 {
-	return *h2mod->GetPointer<bool*>(0x47CD60, 0x4A29C8);
+	return *h2mod->GetAddress<bool*>(0x47CD60, 0x4A29C8);
 }
 
 static char *tag_debug_names = nullptr;

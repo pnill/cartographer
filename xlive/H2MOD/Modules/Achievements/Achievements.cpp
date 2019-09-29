@@ -87,5 +87,5 @@ void GetAchievements()
 
 	// enable single player achievements
 	if (!h2mod->Server)
-		*h2mod->GetPointer<BYTE*>(0x518210 + 0x1B41) = (BYTE)1;
+		*h2mod->GetAddress<BYTE*>(0x518210 + 0x1B41) = (BYTE)1;
 }

@@ -17,8 +17,8 @@ namespace H2Tweaks {
 	void applyShaderTweaks();
 	void enable60FPSCutscenes();
 	void disable60FPSCutscenes();
-	void setFOV(double field_of_view_degrees);
-	void setVehicleFOV(double field_of_view_degrees);
+	void setFOV(int field_of_view_degrees);
+	void setVehicleFOV(int field_of_view_degrees);
 	void setHz();
 	void setCrosshairPos(float crosshair_offset);
 	void setCrosshairSize(int size, bool preset);

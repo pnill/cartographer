@@ -4,7 +4,6 @@
 #include "Globals.h"
 #include "XLive\XAM\xam.h"
 #include "XLive\xbox\xbox.h"
-#include "XLive\UserManagement\CUser.h"
 #include "XLive\Networking\ServerList.h"
 #include "XLive\achievements\XAchievements.h"
 

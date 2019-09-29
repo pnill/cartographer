@@ -5,7 +5,6 @@
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\HudElements\RadarPatch.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Utils\Utils.h"
@@ -147,28 +146,28 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 void real_math_initialize()
 {
 	typedef int (real_math_initialize)();
-	auto real_math_initialize_impl = h2mod->GetPointer<real_math_initialize*>(0x000340d7);
+	auto real_math_initialize_impl = h2mod->GetAddress<real_math_initialize*>(0x000340d7);
 	real_math_initialize_impl();
 }
 
 void async_initialize()
 {
 	typedef int (async_initialize)();
-	auto async_initialize_impl = h2mod->GetPointer<async_initialize*>(0x00032ce5);
+	auto async_initialize_impl = h2mod->GetAddress<async_initialize*>(0x00032ce5);
 	async_initialize_impl();
 }
 
 bool init_gfwl_gamestore()
 {
 	typedef char (init_gfwl_gamestore)();
-	auto init_gfwl_gamestore_impl = h2mod->GetPointer<init_gfwl_gamestore*>(0x00202f3e);
+	auto init_gfwl_gamestore_impl = h2mod->GetAddress<init_gfwl_gamestore*>(0x00202f3e);
 	return init_gfwl_gamestore_impl();
 }
 // not sure if this is all it does
 HANDLE init_data_checksum_info()
 {
 	typedef HANDLE init_data_checksum_info();
-	auto init_data_checksum_info_impl = h2mod->GetPointer<init_data_checksum_info*>(0x000388d3);
+	auto init_data_checksum_info_impl = h2mod->GetAddress<init_data_checksum_info*>(0x000388d3);
 	return init_data_checksum_info_impl();
 }
 
@@ -176,63 +175,63 @@ HANDLE init_data_checksum_info()
 void *runtime_state_init()
 {
 	typedef void *runtime_state_init();
-	auto runtime_state_init_impl = h2mod->GetPointer<runtime_state_init*>(0x00037ed5);
+	auto runtime_state_init_impl = h2mod->GetAddress<runtime_state_init*>(0x00037ed5);
 	return runtime_state_init_impl();
 }
 
 void global_preferences_initialize()
 {
 	typedef void global_preferences_initialize();
-	auto global_preferences_initialize_impl = h2mod->GetPointer<global_preferences_initialize*>(0x325FD);
+	auto global_preferences_initialize_impl = h2mod->GetAddress<global_preferences_initialize*>(0x325FD);
 	global_preferences_initialize_impl();
 }
 
 void font_initialize()
 {
 	typedef void __cdecl font_initialize();
-	auto font_initialize_impl = h2mod->GetPointer<font_initialize*>(0x00031dff);
+	auto font_initialize_impl = h2mod->GetAddress<font_initialize*>(0x00031dff);
 	font_initialize_impl();
 }
 
 bool tag_files_open()
 {
 	typedef bool tag_files_open();
-	auto tag_files_open_impl = h2mod->GetPointer<tag_files_open*>(0x30D58);
+	auto tag_files_open_impl = h2mod->GetAddress<tag_files_open*>(0x30D58);
 	return tag_files_open_impl();
 }
 
 void init_timing(int a1)
 {
 	typedef DWORD (__cdecl init_timing)(int a1);
-	auto init_timing_impl = h2mod->GetPointer<init_timing*>(0x37E39);
+	auto init_timing_impl = h2mod->GetAddress<init_timing*>(0x37E39);
 	init_timing_impl(a1);
 }
 
 void game_state_initialize(void *data)
 {
 	typedef void __fastcall game_state_initialize(void *data);
-	auto game_state_initialize_impl = h2mod->GetPointer<game_state_initialize*>(0x00030aa6);
+	auto game_state_initialize_impl = h2mod->GetAddress<game_state_initialize*>(0x00030aa6);
 	game_state_initialize_impl(data);
 }
 
 bool rasterizer_initialize()
 {
 	typedef char rasterizer_initialize();
-	auto rasterizer_initialize_impl = h2mod->GetPointer<rasterizer_initialize*>(0x00263359);
+	auto rasterizer_initialize_impl = h2mod->GetAddress<rasterizer_initialize*>(0x00263359);
 	return rasterizer_initialize_impl();
 }
 
 bool input_initialize()
 {
 	typedef char input_initialize();
-	auto input_initialize_impl = h2mod->GetPointer<input_initialize*>(0x2FD23);
+	auto input_initialize_impl = h2mod->GetAddress<input_initialize*>(0x2FD23);
 	return input_initialize_impl();
 }
 
 void sound_initialize()
 {
 	typedef void sound_initialize();
-	auto sound_initialize_impl = h2mod->GetPointer<sound_initialize*>(0x2979E);
+	auto sound_initialize_impl = h2mod->GetAddress<sound_initialize*>(0x2979E);
 	return sound_initialize_impl();
 }
 
@@ -347,13 +346,13 @@ int __cdecl sub_671B02_hook(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int 
 const static int max_mointor_count = 9;
 bool engine_basic_init()
 {
-	DWORD* flags_array = h2mod->GetPointer<DWORD*>(0x46d820);
+	DWORD* flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
 	SecureZeroMemory(flags_array, startup_flags::count * sizeof(DWORD)); // should be zero initalized anyways but the game does it
 
 	flags_array[startup_flags::disable_voice_chat] = 1; // disables voice chat (XHV engine)
 	flags_array[startup_flags::nointro] = H2Config_skip_intro;
 
-	HANDLE(*fn_c000285fd)() = (HANDLE(*)())h2mod->GetPointer<void*>(0x000285fd);
+	HANDLE(*fn_c000285fd)() = (HANDLE(*)())h2mod->GetAddress<void*>(0x000285fd);
 
 	init_gfwl_gamestore();
 	init_data_checksum_info();
@@ -427,7 +426,7 @@ bool engine_basic_init()
 
 	if (!LOG_CHECK(tag_files_open()))
 		return false;
-	void *var_c004ae8e0 = h2mod->GetPointer<void*>(0x004ae8e0);
+	void *var_c004ae8e0 = h2mod->GetAddress<void*>(0x004ae8e0);
 	game_state_initialize(var_c004ae8e0);
 
 	// modifies esi need to check what the caller sets that too
@@ -448,9 +447,9 @@ bool engine_basic_init()
 	};
 	//extern LONG WINAPI XLivePBufferAllocate(DWORD size, FakePBuffer **pBuffer);
 	//extern DWORD WINAPI XLivePBufferSetByte(FakePBuffer * pBuffer, DWORD offset, BYTE value);
-	LONG(__stdcall* XLivePBufferAllocate)(DWORD size, FakePBuffer **pBuffer) = (LONG(__stdcall*)(DWORD, FakePBuffer**))h2mod->GetPointer(0xe886);
-	DWORD(__stdcall* XLivePBufferSetByte)(FakePBuffer * pBuffer, DWORD offset, BYTE value) = (DWORD(__stdcall*)(FakePBuffer*, DWORD, BYTE))h2mod->GetPointer(0xe880);
-	DWORD* var_c00479e78 = h2mod->GetPointer<DWORD*>(0x00479e78);
+	LONG(__stdcall* XLivePBufferAllocate)(DWORD size, FakePBuffer **pBuffer) = (LONG(__stdcall*)(DWORD, FakePBuffer**))h2mod->GetAddress(0xe886);
+	DWORD(__stdcall* XLivePBufferSetByte)(FakePBuffer * pBuffer, DWORD offset, BYTE value) = (DWORD(__stdcall*)(FakePBuffer*, DWORD, BYTE))h2mod->GetAddress(0xe880);
+	DWORD* var_c00479e78 = h2mod->GetAddress<DWORD*>(0x00479e78);
 	XLivePBufferAllocate(2, (FakePBuffer**)&var_c00479e78);
 	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 0);
 	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 1, 0);
@@ -473,28 +472,28 @@ bool engine_basic_init()
 bool InitPCCInfo()
 {
 	typedef bool __cdecl InitPCCInfo();
-	auto InitPCCInfoImpl = h2mod->GetPointer<InitPCCInfo*>(0x260DDD);
+	auto InitPCCInfoImpl = h2mod->GetAddress<InitPCCInfo*>(0x260DDD);
 	return InitPCCInfoImpl();
 }
 
 void run_main_loop()
 {
 	typedef int __cdecl run_main_loop();
-	auto run_main_loop_impl = h2mod->GetPointer<run_main_loop*>(0x39E2C);
+	auto run_main_loop_impl = h2mod->GetAddress<run_main_loop*>(0x39E2C);
 	run_main_loop_impl();
 }
 
 void main_engine_dispose()
 {
 	typedef int main_engine_dispose();
-	auto main_engine_dispose_impl = h2mod->GetPointer<main_engine_dispose*>(0x48A9);
+	auto main_engine_dispose_impl = h2mod->GetAddress<main_engine_dispose*>(0x48A9);
 	main_engine_dispose_impl();
 }
 
 void show_error_message_by_id(int id)
 {
 	typedef void __cdecl show_error_message_by_id(int id);
-	auto show_error_message_by_id_impl = h2mod->GetPointer<show_error_message_by_id*>(0x4A2E);
+	auto show_error_message_by_id_impl = h2mod->GetAddress<show_error_message_by_id*>(0x4A2E);
 	show_error_message_by_id_impl(id);
 }
 #pragma endregion
@@ -508,8 +507,8 @@ void show_fatal_error(int error_id)
 			DestroyWindow(handle);
 	};
 
-	HWND hWnd = *h2mod->GetPointer<HWND*>(0x46D9C4);
-	HWND d3d_window = *h2mod->GetPointer<HWND*>(0x46D9C8); // not sure what this window is actual for, used in IDirect3DDevice9::Present
+	HWND hWnd = *h2mod->GetAddress<HWND*>(0x46D9C4);
+	HWND d3d_window = *h2mod->GetAddress<HWND*>(0x46D9C8); // not sure what this window is actual for, used in IDirect3DDevice9::Present
 	destory_window(hWnd);
 	destory_window(d3d_window);
 	show_error_message_by_id(error_id);
@@ -572,14 +571,14 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 bool open_cache_header(const wchar_t *lpFileName, tags::cache_header *cache_header_ptr, HANDLE *map_handle)
 {
 	typedef char (__cdecl open_cache_header)(const wchar_t *lpFileName, tags::cache_header *lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
-	auto open_cache_header_impl = h2mod->GetPointer<open_cache_header*>(0x642D0, 0x4C327);
+	auto open_cache_header_impl = h2mod->GetAddress<open_cache_header*>(0x642D0, 0x4C327);
 	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
 }
 
 void close_cache_header(HANDLE *map_handle)
 {
 	typedef void __cdecl close_cache_header(HANDLE *a1);
-	auto close_cache_header_impl = h2mod->GetPointer<close_cache_header*>(0x64C03, 0x4CC5A);
+	auto close_cache_header_impl = h2mod->GetAddress<close_cache_header*>(0x64C03, 0x4CC5A);
 	close_cache_header_impl(map_handle);
 }
 
@@ -619,7 +618,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 
 	// todo move the code for loading the descriptions to our code and get rid of this
 	typedef int __cdecl validate_and_add_custom_map_interal(BYTE *a1);
-	auto validate_and_add_custom_map_interal_impl = h2mod->GetPointer<validate_and_add_custom_map_interal*>(0x4F690, 0x56890);
+	auto validate_and_add_custom_map_interal_impl = h2mod->GetAddress<validate_and_add_custom_map_interal*>(0x4F690, 0x56890);
 	if (!validate_and_add_custom_map_interal_impl(a1))
 	{
 		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
@@ -693,7 +692,7 @@ char __stdcall fn_c0024eeef(DWORD* thisptr, int a2, int a3)//__thiscall
 	//char result = pfn_c0024eeef(thisptr, a2, a3);
 	//return result;
 
-	char(__thiscall* fn_c002139f8)(DWORD*, int, int, int, int*, int) = (char(__thiscall*)(DWORD*, int, int, int, int*, int))h2mod->GetPointer(0x002139f8);
+	char(__thiscall* fn_c002139f8)(DWORD*, int, int, int, int*, int) = (char(__thiscall*)(DWORD*, int, int, int, int*, int))h2mod->GetAddress(0x002139f8);
 
 	int label_list[16];
 	label_list[0] = 0;
@@ -728,13 +727,13 @@ int __stdcall fn_c0024fa19(DWORD* thisptr, int a2, int* a3)//__thiscall
 	//int result = pfn_c0024fa19(thisptr, a2, a3);
 	//return result;
 
-	int(__stdcall* fn_c0024f9a1)(int) = (int(__stdcall*)(int))h2mod->GetPointer(0x24f9a1);
-	int(__stdcall* fn_c0024f9dd)(int) = (int(__stdcall*)(int))h2mod->GetPointer(0x24f9dd);
-	int(__stdcall* fn_c0024ef79)(int) = (int(__stdcall*)(int))h2mod->GetPointer(0x24ef79);
-	int(__stdcall* fn_c0024f5fd)(int) = (int(__stdcall*)(int))h2mod->GetPointer(0x24f5fd);
-	int(__stdcall* fn_c0024f015)(int) = (int(__stdcall*)(int))h2mod->GetPointer(0x24f015);
-	int(__stdcall* fn_c0024f676)(int) = (int(__stdcall*)(int))h2mod->GetPointer(0x24f676);
-	int(__stdcall* fn_c0024f68a)(int) = (int(__stdcall*)(int))h2mod->GetPointer(0x24f68a);
+	int(__stdcall* fn_c0024f9a1)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24f9a1);
+	int(__stdcall* fn_c0024f9dd)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24f9dd);
+	int(__stdcall* fn_c0024ef79)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24ef79);
+	int(__stdcall* fn_c0024f5fd)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24f5fd);
+	int(__stdcall* fn_c0024f015)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24f015);
+	int(__stdcall* fn_c0024f676)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24f676);
+	int(__stdcall* fn_c0024f68a)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24f68a);
 
 	int result = *a3;
 	if (*a3 != -1)
@@ -780,22 +779,22 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 	//DWORD* result = pfn_c0024fabc(thisptr, a2);
 	//return result;
 
-	DWORD* var_c003d9254 = h2mod->GetPointer<DWORD*>(0x3d9254);
-	DWORD* var_c003d9188 = h2mod->GetPointer<DWORD*>(0x3d9188);
+	DWORD* var_c003d9254 = h2mod->GetAddress<DWORD*>(0x3d9254);
+	DWORD* var_c003d9188 = h2mod->GetAddress<DWORD*>(0x3d9188);
 
-	DWORD*(__thiscall* fn_c00213b1c)(DWORD* thisptr, int) = (DWORD*(__thiscall*)(DWORD*, int))h2mod->GetPointer(0x00213b1c);
-	int(__thiscall* fn_c0000a551)(DWORD* thisptr) = (int(__thiscall*)(DWORD*))h2mod->GetPointer(0x0000a551);
-	DWORD*(__thiscall* fn_c0021ffc9)(DWORD* thisptr) = (DWORD*(__thiscall*)(DWORD*))(h2mod->GetPointer(0x0021ffc9));
-	void(__stdcall* fn_c0028870b)(int, int, int, DWORD*(__thiscall*)(DWORD*), int(__thiscall*)(DWORD*)) = (void(__stdcall*)(int, int, int, DWORD*(__thiscall*)(DWORD*), int(__thiscall*)(DWORD*)))h2mod->GetPointer(0x0028870b);
-	DWORD*(__thiscall* fn_c002113c6)(DWORD* thisptr) = (DWORD*(__thiscall*)(DWORD*))h2mod->GetPointer(0x002113c6);
-	int(__thiscall* fn_c0024fa19)(DWORD* thisptr, int, int*) = (int(__thiscall*)(DWORD*, int, int*))h2mod->GetPointer(0x0024fa19);
-	int(*fn_c00215ea9)() = (int(*)())h2mod->GetPointer(0x00215ea9);
-	int(__cdecl* fn_c0020d1fd)(char*, int numberOfButtons, int) = (int(__cdecl*)(char*, int, int))h2mod->GetPointer(0x0020d1fd);
-	int(__cdecl* fn_c00066b33)(int) = (int(__cdecl*)(int))h2mod->GetPointer(0x00066b33);
-	int(__cdecl* fn_c000667a0)(int) = (int(__cdecl*)(int))h2mod->GetPointer(0x000667a0);
-	int(*fn_c002152b0)() = (int(*)())h2mod->GetPointer(0x002152b0);
-	int(*fn_c0021525a)() = (int(*)())h2mod->GetPointer(0x0021525a);
-	int(__thiscall* fn_c002113d3)(DWORD* thisptr, DWORD*) = (int(__thiscall*)(DWORD*, DWORD*))h2mod->GetPointer(0x002113d3);
+	DWORD*(__thiscall* fn_c00213b1c)(DWORD* thisptr, int) = (DWORD*(__thiscall*)(DWORD*, int))h2mod->GetAddress(0x00213b1c);
+	int(__thiscall* fn_c0000a551)(DWORD* thisptr) = (int(__thiscall*)(DWORD*))h2mod->GetAddress(0x0000a551);
+	DWORD*(__thiscall* fn_c0021ffc9)(DWORD* thisptr) = (DWORD*(__thiscall*)(DWORD*))(h2mod->GetAddress(0x0021ffc9));
+	void(__stdcall* fn_c0028870b)(int, int, int, DWORD*(__thiscall*)(DWORD*), int(__thiscall*)(DWORD*)) = (void(__stdcall*)(int, int, int, DWORD*(__thiscall*)(DWORD*), int(__thiscall*)(DWORD*)))h2mod->GetAddress(0x0028870b);
+	DWORD*(__thiscall* fn_c002113c6)(DWORD* thisptr) = (DWORD*(__thiscall*)(DWORD*))h2mod->GetAddress(0x002113c6);
+	int(__thiscall* fn_c0024fa19)(DWORD* thisptr, int, int*) = (int(__thiscall*)(DWORD*, int, int*))h2mod->GetAddress(0x0024fa19);
+	int(*fn_c00215ea9)() = (int(*)())h2mod->GetAddress(0x00215ea9);
+	int(__cdecl* fn_c0020d1fd)(char*, int numberOfButtons, int) = (int(__cdecl*)(char*, int, int))h2mod->GetAddress(0x0020d1fd);
+	int(__cdecl* fn_c00066b33)(int) = (int(__cdecl*)(int))h2mod->GetAddress(0x00066b33);
+	int(__cdecl* fn_c000667a0)(int) = (int(__cdecl*)(int))h2mod->GetAddress(0x000667a0);
+	int(*fn_c002152b0)() = (int(*)())h2mod->GetAddress(0x002152b0);
+	int(*fn_c0021525a)() = (int(*)())h2mod->GetAddress(0x0021525a);
+	int(__thiscall* fn_c002113d3)(DWORD* thisptr, DWORD*) = (int(__thiscall*)(DWORD*, DWORD*))h2mod->GetAddress(0x002113d3);
 
 	DWORD* v2 = thisptr;
 	fn_c00213b1c(thisptr, a2);
@@ -884,7 +883,6 @@ class test_engine : public c_game_engine_base
 test_engine g_test_engine;
 
 
-
 void fix_shader_template_nvidia(const std::string &template_name, const std::string &bitmap_name, size_t bitmap_idx)
 {
 	DatumIndex bitmap_to_fix    = tags::find_tag('bitm', bitmap_name);
@@ -937,8 +935,6 @@ void InitH2Tweaks() {
 	postConfig();
 
 	addDebugText("Begin Startup Tweaks.");
-
-	MapChecksumSync::Init();
 
 	//TODO(Num005) crashes dedis
 	//custom_game_engines::init();
@@ -1120,36 +1116,33 @@ void H2Tweaks::setSavedSens() {
 		H2Tweaks::setSens(CONTROLLER, (H2Config_controller_sens));
 }
 
-
-void H2Tweaks::setFOV(double field_of_view_degrees) {
+void H2Tweaks::setFOV(int field_of_view_degrees) {
 
 	if (H2IsDediServer)
 		return;
 
 	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
 	{
-		float current_FOV = *reinterpret_cast<float*>(H2BaseAddr + 0x41D984);
-
-		//int res_width = *(int*)(H2BaseAddr + 0xA3DA00); //wip
-		//int res_height = *(int*)(H2BaseAddr + 0xA3DA04);
-
-		const double default_radians_FOV = 70.0f * M_PI / 180.0f;
-
-		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0f) / default_radians_FOV;
-		WriteValue(H2BaseAddr + 0x41D984, calculated_radians_FOV); // First Person
+		const double default_radians_field_of_view = 70.0f * M_PI / 180.0f;
+		float field_of_view_radians = (float)field_of_view_degrees * M_PI / 180.0f;
+		tags::ilterator bipeds('bipd');
+		while (!bipeds.next().IsNull())
+		{
+			BYTE* biped_tag = LOG_CHECK(tags::get_tag<'bipd', BYTE>(bipeds.datum));
+			if (biped_tag != nullptr)
+				*(float*)(biped_tag + 204) = field_of_view_radians;
+		}
 	}
 }
 
-void H2Tweaks::setVehicleFOV(double field_of_view_degrees) {
+void H2Tweaks::setVehicleFOV(int field_of_view_degrees) {
 
 	if (H2IsDediServer)
 		return;
 
 	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
 	{
-		float current_FOV = *reinterpret_cast<float*>(H2BaseAddr + 0x413780);
-
-		float calculated_radians_FOV = ((float)field_of_view_degrees * M_PI / 180.0f);
+		float calculated_radians_FOV = (float)field_of_view_degrees * M_PI / 180.0f;
 		WriteValue(H2BaseAddr + 0x413780, calculated_radians_FOV); // Third Person
 	}
 }
@@ -1168,8 +1161,13 @@ void H2Tweaks::setCrosshairPos(float crosshair_offset) {
 		return;
 
 	if (!FloatIsNaN(crosshair_offset)) {
-		DWORD CrosshairY = *(DWORD*)(H2BaseAddr + 0x479E70) + 0x1AF4 + 0xF0 + 0x1C;
-		*reinterpret_cast<float*>(CrosshairY) = crosshair_offset;
+
+		tags::tag_data_block* player_controls_block = reinterpret_cast<tags::tag_data_block*>(tags::get_game_globals() + 240);
+		if (player_controls_block->block_count > 0)
+		{
+			for (int i = 0; i < player_controls_block->block_count; i++)
+				*(float*)(tags::get_tag_data() + player_controls_block->block_data_offset + 128 * i + 28) = crosshair_offset;
+		}
 	}
 }
 
@@ -1240,7 +1238,7 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 		}
 	}
 
-	if (h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) {
+	if (h2mod->GetMapType() == MapType::MULTIPLAYER_MAP) {
 
 		for (int i = 0; i < 28; i++) {
 			if (configArray[i] == 0) {
@@ -1342,7 +1340,7 @@ __declspec(naked) void get_tick_execution_time_seconds(void)
 
 void H2Tweaks::applyObjectPredictionPatch()
 {
-	seconds_per_tick_xbox_flt = h2mod->GetPointer<float*>(0x3BBEB4, 0x378C84);
+	seconds_per_tick_xbox_flt = h2mod->GetAddress<float*>(0x3BBEB4, 0x378C84);
 	PatchCall(h2mod->GetAddress(0x1F4435, 0x1DF4CE), get_tick_execution_time_seconds);
 }
 
@@ -1353,5 +1351,5 @@ void H2Tweaks::sunFlareFix()
 
 	//rasterizer_near_clip_distance <real>
 	//Changed from game default of 0.06 to 0.0601
-	WriteValue(h2mod->GetAddress(0x468150), 0.0601f);
+	WriteValue<float>(h2mod->GetAddress(0x468150), 0.0601f);
 }

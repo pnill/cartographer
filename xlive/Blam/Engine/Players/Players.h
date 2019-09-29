@@ -4,6 +4,8 @@
 #include "Blam\Shared\SharedDefinitions.h"
 #include "Blam\Cache\DataTypes\DataTypes.h"
 
+#include "H2MOD\Modules\DataArray\DataArray.h"
+
 using namespace Blam::Enums;
 using namespace Blam::Cache::DataTypes;
 
@@ -11,19 +13,20 @@ struct Item
 {
 	short item_id;
 	char pad[0x12];
-}; static_assert(sizeof(Item) == 0x14, "Item size != 0x0A");
+}; 
+static_assert(sizeof(Item) == 0x14, "Item size != 0x14");
 
 struct PlayerInventory {
 	Item items[0x50];
 	char pad_char[0x1380];
-}; static_assert(sizeof(PlayerInventory) == 0x19C0, "PlayerInventory != 0x19C0");
+}; 
+static_assert(sizeof(PlayerInventory) == 0x19C0, "PlayerInventory != 0x19C0");
 
 #pragma pack(push, 1)
 struct PlayerProperties
 {
 	wchar_t player_name[16];
-	int spawn_protection_time;
-	char unk[28];
+	char unk[32];
 
 	struct PlayerProfile
 	{
@@ -57,19 +60,25 @@ struct PlayerProperties
 	char player_is_griefer;
 	char bungie_user_role;
 	char achievement_flags;
+	char unk2;
 };
+static_assert(sizeof(PlayerProperties) == 132, "PlayerProperties size != 132 bytes");
 #pragma pack(pop)
+
+extern s_datum_array* game_state_players;
 
 namespace Blam 
 {
 	namespace EngineDefinitions
 	{
 		namespace Players
-		{	
-#pragma pack(push, 1) 
+		{
+#pragma pack(push, 1)
 			struct GameStatePlayer //size:0x204
 			{
-				DWORD UnkPlayerDatum; //0x00
+				WORD DatumSalt; //0x00
+				BYTE Flags;
+				BYTE unk;
 				XUID xuid; //0x04
 				/* Trying to convert the peer_user_index to a datum via the entity one used in voice does not work... */
 				DWORD peer_index; //0x0C
@@ -81,16 +90,15 @@ namespace Blam
 				int controller_index; // 0x20
 				__int16 user_index; // 0x24;
 				__int16 related_to_pos_on_bsp; // 0x26
-				DatumIndex unit_index; // 0x28 //0x24 in h2x beta
+				DatumIndex BipedUnitDatum; // 0x28 //0x24 in h2x beta
 				DatumIndex DeadGameStateDatum; //0x2C
 				DatumIndex PossiblyDatum; // 0x30
 				DWORD InputFlags; // 0x34
 				DWORD InputFlags2; // 0x38
 				DWORD unk_4; // 0x3C
-				PlayerProperties player_properties; // 0x40
-				BYTE pad1;
-				PlayerProperties player_properties_2;
-				char pad[13];
+				PlayerProperties properties; // 0x40
+				PlayerProperties properties_2;
+				char pad[12];
 				int respawn_time; //0x154
 				int unk_12; //0x158
 				BYTE unk_pad3[36]; //0x15C
@@ -101,11 +109,63 @@ namespace Blam
 				__int16 unk_15; //0x190
 				__int16 unk_16; //0x192
 				DatumIndex betraying_player; //0x194
-				BYTE unk_pad4[0x68]; //0x1FC
+				int field_198; //0x198
+				int field_19C; //0x19C 
+				BYTE unk_pad4[0x60]; //0x1FC
 				int is_chatting; // 0x200
 			};
-#pragma pack(pop)
 			static_assert(sizeof(GameStatePlayer) == 0x204, "Invalid GameStatePlayer size");	
+#pragma pack(pop)
+
+			// use while in game
+			class PlayerIterator : public DatumIterator<GameStatePlayer>
+			{
+			public:
+
+				PlayerIterator() :
+					DatumIterator(game_state_players)
+				{
+
+				}
+
+				bool get_next_player()
+				{
+					m_current_player = get_next_datum();
+					if (m_current_player)
+					{
+						do
+						{
+							if (!(m_current_player->Flags & 2))
+								break;
+
+							m_current_player = get_next_datum();
+
+						} while (m_current_player);
+					}
+
+					return m_current_player != nullptr;
+				}
+
+				GameStatePlayer* get_current_player_data()
+				{
+					return m_current_player;
+				}
+
+				int get_current_player_index()
+				{
+					return get_current_absolute_index();
+				}
+
+				wchar_t* get_current_player_name()
+				{
+					return m_current_player->properties.player_name;
+				}
+
+			private:
+				GameStatePlayer* m_current_player = nullptr;
+			};
 		}
 	}
 }
+
+

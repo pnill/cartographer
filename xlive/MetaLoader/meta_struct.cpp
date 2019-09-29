@@ -1,4 +1,4 @@
-#include"meta_struct.h"
+#include "meta_struct.h"
 
 namespace meta_struct
 {

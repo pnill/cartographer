@@ -1,10 +1,7 @@
 #include "stdafx.h"
 #include "CUser.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
-#include "XLive\UserManagement\protobuf\packet.pb.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 extern XUID xFakeXuid[4];
@@ -12,7 +9,7 @@ extern CHAR g_szUserName[4][16];
 
 SecurePacket securePacket;
 CUserManagement userManager;
-const DWORD annoyance_factor = 0x8E0A40F1;
+const DWORD annoyance_factor = 0x11223344;
 
 /*
 NOTE:

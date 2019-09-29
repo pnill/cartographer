@@ -1,5 +1,5 @@
 #pragma once
-#include"tag_base.h"
+#include "tag_base.h"
 
 namespace Blam
 {

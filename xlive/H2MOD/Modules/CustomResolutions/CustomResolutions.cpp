@@ -23,7 +23,7 @@ int compare(void* context, const void* a1, const void* a2)
 void CustomResolution::Initialize()
 {
 	// copy default settings
-	memcpy(video_options, h2mod->GetPointer<s_diplay_config*>(0x4680C0, 0x0), sizeof(s_diplay_config) * DEFAULT_TOTAL_RESOLUTIONS); // 11 by default
+	memcpy(video_options, h2mod->GetAddress<s_diplay_config*>(0x4680C0, 0x0), sizeof(s_diplay_config) * DEFAULT_TOTAL_RESOLUTIONS); // 11 by default
 
 	WritePointer(h2mod->GetAddress(0x263A53, 0x0), video_options);
 	WritePointer(h2mod->GetAddress(0x263A5E, 0x0), (char*)video_options + 4);

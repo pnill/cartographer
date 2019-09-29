@@ -49,6 +49,7 @@ void *DetourClassFunc(BYTE *src, const BYTE *dst, const int len)
 
 	DWORD dwBack;
 	VirtualProtect(src, len, PAGE_READWRITE, &dwBack);
+	
 	memcpy(jmp + 3, src, len);
 
 	// calculate callback function call

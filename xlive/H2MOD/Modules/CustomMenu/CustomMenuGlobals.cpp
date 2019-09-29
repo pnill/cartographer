@@ -8,7 +8,7 @@ void __stdcall sub_21bf85_CMLTD_(int thisptr, int label_id, int label_menu_id);
 char __stdcall sub_21bb0b_CMLTD_(void* thisptr, __int16 a2, int* aa3, int label_menu_id, int label_id_description);
 void __cdecl sub_3e3ac_CMLTD_(int a1, int label_id, wchar_t* rtn_label, int label_menu_id);
 
-std::chrono::time_point<std::chrono::system_clock> lastOuterMenuUse_;
+std::chrono::time_point<std::chrono::high_resolution_clock> lastOuterMenuUse_;
 int lastOuterMenuFuncPtr_ = 0;
 
 void CallWgit_(int WgitScreenfunctionPtr) {
@@ -38,7 +38,7 @@ void CallWgit_(int WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) 
 		}
 		else if (lastOuterMenuFuncPtr_ > 0 && lastOuterMenuFuncPtr_ == WgitScreenfunctionPtr) {
 			if (CurrentWgitID != menu_wgit_type) {
-				std::chrono::milliseconds difference = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastOuterMenuUse_);
+				std::chrono::milliseconds difference = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - lastOuterMenuUse_);
 				long long timeDiff = difference.count();
 				if (timeDiff < 1500) {
 					open_method = 3;
@@ -51,7 +51,7 @@ void CallWgit_(int WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) 
 		}
 	}
 	lastOuterMenuFuncPtr_ = WgitScreenfunctionPtr;
-	lastOuterMenuUse_ = std::chrono::system_clock::now();
+	lastOuterMenuUse_ = std::chrono::high_resolution_clock::now();
 	prevOpenMethod_ = open_method;
 
 	//char* menu_setup = (char*)malloc(sizeof(char) * 0x20);

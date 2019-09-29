@@ -1,9 +1,8 @@
 #include "stdafx.h"
 #include "Globals.h"
 #include "Blam/BlamLibrary.h"
-#include <algorithm>
 
-extern void __cdecl call_hs_object_destroy_datum(DatumIndex object_datum_index); // need to fix some shit so I don't have to do this.
+#include "H2MOD.h"
 
 HeadHunter::HeadHunter()
 {
@@ -19,24 +18,25 @@ HeadHunter::HeadHunter()
 
 void HeadHunter::SpawnSkull(DatumIndex unit_datum)
 {
-	if ((&game_state_objects_header->data[unit_datum.Index])->object->ObjectType == Objects::ObjectType::biped)
+	DatumIterator<ObjectHeader> objectIt(game_state_objects_header);
+	BipedObjectDefinition* biped_unit = (BipedObjectDefinition*)objectIt.get_data_at_index(unit_datum.Index)->object;
+
+	if (objectIt.get_data_at_index(unit_datum.Index)->type == Objects::ObjectType::biped)
 	{
-		using namespace Blam::EngineDefinitions::Objects;
-		ObjectPlacementData* nObject = new ObjectPlacementData;
+		ObjectPlacementData nObject;
 
-		call_object_placement_data_new(nObject, Weapon::ball, -1, 0);
-		nObject->Placement.X = (&game_state_objects_header->data[unit_datum.Index])->object->Placement.X;
-		nObject->Placement.Y = (&game_state_objects_header->data[unit_datum.Index])->object->Placement.Y;
-		nObject->Placement.Z = (&game_state_objects_header->data[unit_datum.Index])->object->Placement.Z;
+		call_object_placement_data_new(&nObject, Weapon::ball, -1, 0);
 
-		int GameStateObject = call_object_new(nObject); //TODO: Re-write all these functions to use DatumIndex.
-		if (GameStateObject != NULL)
-		{
-			call_add_object_to_sync(GameStateObject);
-		}
-		else
-			delete nObject;
+		nObject.Placement.X = biped_unit->Placement.X;
+		nObject.Placement.Y = biped_unit->Placement.Y;
+		nObject.Placement.Z = biped_unit->Placement.Z;
+		nObject.TranslationalVelocity.X = biped_unit->TranslationalVelocity.X;
+		nObject.TranslationalVelocity.Y = biped_unit->TranslationalVelocity.Y;
+		nObject.TranslationalVelocity.Z = biped_unit->TranslationalVelocity.Z;
 
+		DatumIndex new_object_datum = call_object_new(&nObject); //TODO: Re-write all these functions to use DatumIndex.
+		if (!new_object_datum.IsNull())
+			call_add_object_to_sync(new_object_datum);
 	}
 }
 
@@ -54,8 +54,7 @@ void HeadHunter::PickupSkull(XUID player, DatumIndex SkullDatum)
 
 		DatumIndex PlayerDatum = variant_player->GetPlayerDatum(player);
 		pupdate_player_score((void*)(h2mod->Server ? 0x30005508 : 0x3000595C), PlayerDatum.Index, 0, 1, -1, 0);
-		call_hs_object_destroy_datum(SkullDatum);
-		//pupdate_player_score()
+		call_hs_object_destroy(SkullDatum);
 	}
 }
 
@@ -76,7 +75,10 @@ void HeadHunterHandler::SetDeadPlayer(DatumIndex dead_datum)
 
 bool HeadHunterHandler::SetInteractedObject(DatumIndex object_datum)
 {
-	if ((&game_state_objects_header->data[object_datum.Index])->object->DefinitionIndex.Index == (Weapon::ball & 0xFFFF))
+	DatumIterator<ObjectHeader> objectIt(game_state_objects_header);
+	WeaponObjectDefinition* weaponObject = (WeaponObjectDefinition*)objectIt.get_data_at_index(object_datum.ToAbsoluteIndex())->object;
+
+	if (weaponObject->TagDefinitionIndex.Index == (Weapon::ball & 0xFFFF))
 	{
 		this->object_interaction = object_datum;
 		return true;
@@ -106,13 +108,11 @@ void HeadHunterHandler::SetPlayerIndex(DatumIndex player_datum)
 {
 	XUID player = variant_player->GetXUID(player_datum, true);
 	variant_player->SetPlayerDatum(player, player_datum);
-
 	SetXUID(player);
 }
 
 void HeadHunterHandler::SetUnitDatum(DatumIndex unit_datum)
 {
-
 	XUID player = variant_player->GetXUID(unit_datum, false);
 	variant_player->SetUnitDatum(player, unit_datum);
 	SetXUID(player);
@@ -150,12 +150,12 @@ void HeadHunterDeinitializer::onClient()
 
 void HeadHunterDeinitializer::onPeerHost()
 {
-	variant_player->deinitialize();
+	variant_player->Deinitialize();
 }
 
 void HeadHunterDeinitializer::onDedi()
 {
-	variant_player->deinitialize();
+	variant_player->Deinitialize();
 }
 
 void HeadHunterPreSpawnHandler::onClient()

@@ -5,7 +5,7 @@
 #include "H2MOD\Modules\HitFix\Hitfix.h"
 
 // object string, initial bullet speed, final bullet speed
-std::vector<std::tuple<std::string, float, float>> weapons = 
+std::vector<std::tuple<std::string, float, float>> weapon_projectiles = 
 {
 	std::make_tuple("objects\\weapons\\rifle\\battle_rifle\\projectiles\\battle_rifle_bullet", 400.f * 2.f, 400.f * 2.f),
 	std::make_tuple("objects\\weapons\\rifle\\covenant_carbine\\projectiles\\carbine_slug\\carbine_slug", 400.f * 2.f, 400.f * 2.f),
@@ -17,20 +17,14 @@ std::vector<std::tuple<std::string, float, float>> weapons =
 
 void HitFix::Initialize()
 {
-	for (auto proj_tuple : weapons) 
+	for (auto proj_tuple : weapon_projectiles)
 	{
-		auto required_datum = tags::find_tag('proj', std::get<0>(proj_tuple));
-
-		tags::ilterator projectiles('proj');
-		while (!projectiles.next().IsNull())
+		auto proj_datum = tags::find_tag('proj', std::get<0>(proj_tuple));
+		BYTE* projectile_tag_data = tags::get_tag<'proj', BYTE>(proj_datum);
+		if (projectile_tag_data != nullptr)
 		{
-			BYTE* projectile = tags::get_tag<'proj', BYTE>(projectiles.datum);
-
-			if (projectiles.datum == required_datum && projectile != nullptr)
-			{
-				*(float*)(projectile + 380) = std::get<1>(proj_tuple);
-				*(float*)(projectile + 384) = std::get<2>(proj_tuple);
-			}
+			*(float*)(projectile_tag_data + 380) = std::get<1>(proj_tuple);
+			*(float*)(projectile_tag_data + 384) = std::get<2>(proj_tuple);
 		}
 	}
 }

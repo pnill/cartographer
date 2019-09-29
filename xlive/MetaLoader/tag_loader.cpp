@@ -3,10 +3,8 @@
 #include "..\Globals.h"
 #include "..\Util\filesys.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "..\H2MOD\Tags\TagInterface.h"
 #include "..\H2MOD\Tags\global_tags_interface.h"
 #include "..\Blam\Cache\Tags\tag_definitons.h"
-#include "Shlwapi.h"
 
 using Blam::Enums::Tags::TagGroupTypes;
 //contains some game functions that returns HANDLE
@@ -14,7 +12,7 @@ namespace global_handle_function
 {
 	HANDLE __cdecl get_map_Handle_from_scnr(const char *pScenario)
 	{
-		return	((HANDLE(__cdecl *)(const char*))h2mod->GetPointer(0x38607))(pScenario);
+		return	((HANDLE(__cdecl *)(const char*))h2mod->GetAddress(0x38607))(pScenario);
 	}
 }
 //certain functions which relate tags to their global object(such as Havok objects)(vftables perhaps)
@@ -23,32 +21,32 @@ namespace global_objects_fix
 	void __cdecl bipd_fix(unsigned __int16 datum_index)
 	{
 		void(_cdecl*sub_EC23F)(unsigned __int16);
-		sub_EC23F = (void(_cdecl*)(unsigned __int16))h2mod->GetPointer(0x1389B0);
+		sub_EC23F = (void(_cdecl*)(unsigned __int16))h2mod->GetAddress(0x1389B0);
 		sub_EC23F(datum_index);
 	}
 
 	void __cdecl crea_fix(unsigned __int16 datum_index)
 	{
 		int(_cdecl*sub_EC23F)(unsigned __int16);
-		sub_EC23F = (int(_cdecl*)(unsigned __int16))h2mod->GetPointer(0x138985);
+		sub_EC23F = (int(_cdecl*)(unsigned __int16))h2mod->GetAddress(0x138985);
 		sub_EC23F(datum_index);
 	}
 	void __cdecl vehi_fix(unsigned __int16 datum_index)
 	{
 		int(_cdecl*sub_EC23F)(unsigned __int16);
-		sub_EC23F = (int(_cdecl*)(unsigned __int16))h2mod->GetPointer(0x13895A);
+		sub_EC23F = (int(_cdecl*)(unsigned __int16))h2mod->GetAddress(0x13895A);
 		sub_EC23F(datum_index);
 	}
 	void __cdecl coll_fix(unsigned __int16 datum_index)
 	{
 		int(_cdecl*sub_EC23F)(unsigned __int16);
-		sub_EC23F = (int(_cdecl*)(unsigned __int16))h2mod->GetPointer(0x7BE5C);
+		sub_EC23F = (int(_cdecl*)(unsigned __int16))h2mod->GetAddress(0x7BE5C);
 		sub_EC23F(datum_index);
 	}
 	void __cdecl phmo_fix(unsigned __int16 datum_index)
 	{
 		int(_cdecl*sub_EC23F)(unsigned __int16, int);
-		sub_EC23F = (int(_cdecl*)(unsigned __int16, int))h2mod->GetPointer(0x7B844);
+		sub_EC23F = (int(_cdecl*)(unsigned __int16, int))h2mod->GetAddress(0x7B844);
 		sub_EC23F(datum_index, 0);
 	}
 }
@@ -68,7 +66,6 @@ namespace tag_loader
 	vector<string> error_list;//contains various messages generated during various processes,shouldnt had named it error list
 	vector<string> tag_list;//contains a list of tag_indices along with their names(currently implemented only for module loading)
 
-	unsigned int tag_count = 0x0;//unitialised
 	unsigned int def_meta_size = 0x0;//uninitialised
 	unsigned int ext_meta_size = 0x0;//uninitialised
 	unsigned int new_datum_index = _INJECTED_TAG_START_;//first datum index
@@ -448,7 +445,7 @@ namespace tag_loader
 			{
 				int meta_size = que_meta_list[my_inject_refs_iter->old_datum]->Get_Total_size();
 				char tables_data[0x10];
-				DWORD MapMemBase = *h2mod->GetPointer<DWORD*>(0x47CD64);
+				DWORD MapMemBase = *h2mod->GetAddress<DWORD*>(0x47CD64);
 
 				que_meta_list[my_inject_refs_iter->old_datum]->Rebase_meta(mem_off);
 				char* meta_data = que_meta_list[my_inject_refs_iter->old_datum]->Generate_meta_file();
@@ -499,7 +496,7 @@ namespace tag_loader
 				int meta_size = meta_list_iter->second->Get_Total_size();
 
 				char tables_data[0x10];
-				DWORD MapMemBase = *h2mod->GetPointer<DWORD*>(0x47CD64);
+				DWORD MapMemBase = *h2mod->GetAddress<DWORD*>(0x47CD64);
 				meta_list_iter->second->Rebase_meta(mem_off);
 				char* meta_data = meta_list_iter->second->Generate_meta_file();
 
@@ -681,8 +678,8 @@ namespace tag_loader
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
 	void Load_RAW_refs(int datum_index, string map_loc)
 	{
-		DWORD* PMapRawtableoffset = h2mod->GetPointer<DWORD*>(0x4AE8B0);
-		DWORD* PRawTableSize = h2mod->GetPointer<DWORD*>(0x4AE8B4);
+		DWORD* PMapRawtableoffset = h2mod->GetAddress<DWORD*>(0x4AE8B0);
+		DWORD* PRawTableSize = h2mod->GetAddress<DWORD*>(0x4AE8B4);
 
 		//a little  precaution to circumvent unexpected behaviour
 		DWORD oldRtable_offset = *PMapRawtableoffset;
@@ -691,9 +688,9 @@ namespace tag_loader
 		*PMapRawtableoffset = 0x0;
 		*PRawTableSize = 0x0;
 
-		DWORD SharedmapBase = *h2mod->GetPointer<DWORD*>(0x47CD64);
-		DWORD ETCOFFSET = *h2mod->GetPointer<DWORD*>(0x482290);
-		HANDLE old_file_handle = *h2mod->GetPointer<HANDLE*>(0x4AE8A8);
+		DWORD SharedmapBase = *h2mod->GetAddress<DWORD*>(0x47CD64);
+		DWORD ETCOFFSET = *h2mod->GetAddress<DWORD*>(0x482290);
+		HANDLE old_file_handle = *h2mod->GetAddress<HANDLE*>(0x4AE8A8);
 
 		//char* ripped_map = (char*)(SharedmapBase + tag_scenario_off);
 
@@ -705,7 +702,7 @@ namespace tag_loader
 		//fail safe
 		if (Tdatum_index != datum_index)
 		{
-			string error = "Tag :" + datum_index;
+			string error = "Tag: " + datum_index;
 			error += " not loaded into tag tables and tag memory";;
 			throw new exception(error.c_str());
 		}
@@ -717,7 +714,7 @@ namespace tag_loader
 			//i suppose its in scenario fomat and placed in default and custom directories
 			new_file_handle = global_handle_function::get_map_Handle_from_scnr(map_loc.c_str());
 		}
-		*h2mod->GetPointer<HANDLE*>(0x4AE8A8) = new_file_handle;
+		*h2mod->GetAddress<HANDLE*>(0x4AE8A8) = new_file_handle;
 
 		switch (type)
 		{
@@ -734,7 +731,7 @@ namespace tag_loader
 					int sections_base = 0;
 					if (sections_off != 0xFFFFFFFF)
 						sections_base = ETCOFFSET + sections_off;
-					((void(__cdecl *)(int, unsigned int))h2mod->GetPointer(0x2652BC))(sections_base + off + 0x38, 3u);
+					((void(__cdecl *)(int, unsigned int))h2mod->GetAddress(0x2652BC))(sections_base + off + 0x38, 3u);
 					++v15;
 					off += 0x5C;
 				} while (v15 < *(int*)(tag_mem_addr + 0x24));
@@ -744,7 +741,7 @@ namespace tag_loader
 		case 'bitm': 
 		{
 
-			int old_list_field = *h2mod->GetPointer<DWORD*>(0xA49270 + 0x1FC);
+			int old_list_field = *h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC);
 
 			for (int i = 0; i < *(int*)(tag_mem_addr + 0x44); i++)
 			{
@@ -757,21 +754,21 @@ namespace tag_loader
 
 				int bitmaps_field = bitmaps_field_base + 0x74 * i;
 
-				*h2mod->GetPointer<DWORD*>(0xA49270 + 0x1FC) = bitmaps_field;
+				*h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC) = bitmaps_field;
 
 				int temp = 0;
-				((int(__cdecl *)(int, char, int, void*))h2mod->GetPointer(0x265986))(bitmaps_field, 2, 0, &temp);
+				((int(__cdecl *)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 2, 0, &temp);
 
 				((int(__cdecl *)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 0, 0, &temp);
 
 			}
-			*h2mod->GetPointer<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
+			*h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
 			break;
 		}
 		default:
 			break;
 		}
-		*h2mod->GetPointer<HANDLE*>(0x4AE8A8) = old_file_handle;
+		*h2mod->GetAddress<HANDLE*>(0x4AE8A8) = old_file_handle;
 		CloseHandle(new_file_handle);
 
 		*PMapRawtableoffset = oldRtable_offset;
@@ -785,7 +782,7 @@ namespace tag_loader
 
 		if (Tdatum_index != datum_index)
 		{
-			string error = "Tag :" + datum_index;
+			string error = "Tag: " + datum_index;
 			error += " not loaded into tag tables and tag memory";;
 			throw new exception(error.c_str());
 		}
@@ -830,17 +827,17 @@ namespace tag_loader
 
 			if (ext_meta_size + module_tag_data->size > _MAX_ADDITIONAL_TAG_SIZE_)
 			{
-				string error = "Couldnt load module,MAX_ADDITIONAL_TAG_SIZE_ reached";
+				string error = "Couldnt load module, MAX_ADDITIONAL_TAG_SIZE_ reached";
 				error_list.push_back(error);
 				delete my_loader;
 
 				return ret;
 			}
 			ret = new_datum_index;
-			string error = "Loading module :" + loc+" to datum_index "+meta_struct::to_hex_string(new_datum_index);
+			string error = "Loading module: " + loc + " to datum_index: " + meta_struct::to_hex_string(new_datum_index);
 			error_list.push_back(error);
 
-			DWORD MapMemBase = *h2mod->GetPointer<DWORD*>(0x47CD64);
+			DWORD MapMemBase = *h2mod->GetAddress<DWORD*>(0x47CD64);
 			int mem_off = def_meta_size + ext_meta_size;
 
 			char* t_ptr = new_Tables + new_datum_index * 0x10;
@@ -849,6 +846,7 @@ namespace tag_loader
 			char* n_ptr = module_tag_names->data;
 			if (n_ptr == nullptr)
 				throw new std::exception("tag_names block not found");
+
 			//copying tables
 			memcpy(t_ptr, module_tag_table->data, module_tag_table->size);
 			memcpy(d_ptr, module_tag_data->data, module_tag_data->size);
@@ -885,7 +883,7 @@ namespace tag_loader
 
 				std::string t_name = n_ptr;
 				tag_list.push_back(t_name.substr(t_name.rfind('\\') + 1) + ",0x" + meta_struct::to_hex_string(t_ref.new_datum));
-				tag_loader::Generate_sync_list(&type_rev, t_ref.new_datum);
+				tag_loader::Generate_sync_list(type_rev, t_ref.new_datum);
 
 				n_ptr += t_name.size() + 1;
 				d_ptr += size;
@@ -910,7 +908,7 @@ namespace tag_loader
 		}
 		else
 		{
-			string error = "Couldnt find module :" + loc;
+			string error = "Couldnt find module: " + loc;
 			error_list.push_back(error);
 		}
 		delete my_loader;
@@ -926,19 +924,16 @@ namespace tag_loader
 	}
 	void Add_all_shared_refs()
 	{
-		DWORD SharedMemBase = *h2mod->GetPointer<DWORD*>(0x47CD54);
+		DWORD SharedMemBase = *h2mod->GetAddress<DWORD*>(0x47CD54);
 		DWORD SharedTables = SharedMemBase + 0x20 + 0xC * *(DWORD*)(SharedMemBase + 4);
-		DWORD TagTableStart = *h2mod->GetPointer<DWORD*>(0x47CD50);
+		DWORD TagTableStart = *h2mod->GetAddress<DWORD*>(0x47CD50);
 
-		for (int i = 0x2710; i < tag_loader::tag_count; i++)
+		for (int i = 0x2710; i < tags::get_tag_count(); i++)
 			memcpy((void*)(TagTableStart + i * 0x10), (void*)(SharedTables + i * 0x10), 0x10);
 	}
-	void Generate_sync_list(void* type, DWORD index)
+	void Generate_sync_list(int type, DWORD index)
 	{
-		
-		int t = *(int*)type;	
-		
-		switch((TagGroupTypes)t)
+		switch ((TagGroupTypes)type)
 		{
 		case TagGroupTypes::biped:
 		case TagGroupTypes::vehicle:
@@ -956,9 +951,8 @@ namespace tag_loader
 		case TagGroupTypes::equipment:
 			sync_list.push_back(index);
 			break;
-			
-		}		
-			
+
+		}
 	}
 	void Add_tags_to_simulation_table()
 	{
@@ -1232,7 +1226,7 @@ unsigned int __cdecl AllocateMemory(int old_size, char arg_4)
 {
 	typedef unsigned int(_cdecl *Allocate_memory)(int size, char arg_4);
 	Allocate_memory pAllocate_memory;
-	pAllocate_memory = h2mod->GetPointer<Allocate_memory>(0x37E69);
+	pAllocate_memory = h2mod->GetAddress<Allocate_memory>(0x37E69);
 
 	//i need to allocate more space
 	int new_size = old_size + _MAX_ADDITIONAL_TAG_SIZE_;
@@ -1241,28 +1235,25 @@ unsigned int __cdecl AllocateMemory(int old_size, char arg_4)
 	return pAllocate_memory(new_size, arg_4);
 }
 //function patching to load custom tags
-char _cdecl LoadTagsandMapBases(int a)
+bool _cdecl LoadTagsandMapBases(int a)
 {
-	//basic load_Tag call
-	typedef char(_cdecl *LoadTagsandSetMapBases)(int a);
+	// basic load_Tag call
+	typedef bool(_cdecl *LoadTagsandSetMapBases)(int a);
 	LoadTagsandSetMapBases pLoadTagsandSetMapBases;
-	pLoadTagsandSetMapBases = h2mod->GetPointer<LoadTagsandSetMapBases>(0x31348);
-	char result = pLoadTagsandSetMapBases(a);
+	pLoadTagsandSetMapBases = h2mod->GetAddress<LoadTagsandSetMapBases>(0x31348);
+	bool result = pLoadTagsandSetMapBases(a);
 	
-	//reset starting_datum index
+	// reset starting_datum index
+	tag_loader::ext_meta_size = 0;
 	tag_loader::new_datum_index = _INJECTED_TAG_START_;
-	tag_loader::ext_meta_size = 0x0;
 
-	//just storing tag_couunt
-	tag_loader::tag_count = *(DWORD*)(*h2mod->GetPointer<DWORD*>(0x47D568) + 0x18);
-
-	//adding all shared references
+	// adding all shared references
 	tag_loader::Add_all_shared_refs();
 
-	//extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
+	// extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
 	if (tags::get_cache_header()->type != tags::cache_header::scnr_type::SinglePlayer)
 	{
-		DWORD *TagTableStart = h2mod->GetPointer<DWORD*>(0x47CD50);
+		DWORD *TagTableStart = h2mod->GetAddress<DWORD*>(0x47CD50);
 		///---------------TABLE EXTENSION  STUFF
 		memcpy((BYTE*)tag_loader::new_Tables, (BYTE*)*TagTableStart, 0x3BA40);
 		*TagTableStart = (DWORD)tag_loader::new_Tables;

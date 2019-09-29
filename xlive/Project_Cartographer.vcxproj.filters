@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -99,9 +99,6 @@
     </Filter>
     <Filter Include="Source Files\XLive\User Management">
       <UniqueIdentifier>{82eca85d-aeb0-4259-b4d9-c6ab7f81b459}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\XLive\User Management\protobuf">
-      <UniqueIdentifier>{31c7d0fa-6247-4116-a23a-7900f4b9a44a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Util\Hooks">
       <UniqueIdentifier>{6e3b665a-267b-4baf-9978-190c7753a4d1}</UniqueIdentifier>
@@ -271,6 +268,9 @@
     <Filter Include="Source Files\H2MOD\Modules\CustomResolutions">
       <UniqueIdentifier>{cdcf542d-3568-48e0-af7f-efa918cbc5ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\ServerConsole">
+      <UniqueIdentifier>{e04a07f3-64d7-46c2-9ce1-3d460af18cb4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -306,14 +306,8 @@
     <ClCompile Include="H2MOD\GUI\GUI.cpp">
       <Filter>Source Files\H2MOD\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="H2MOD\protobuf\h2mod.pb.cc">
-      <Filter>Source Files\H2MOD\protobuf</Filter>
-    </ClCompile>
     <ClCompile Include="XLive\UserManagement\CUser.cpp">
       <Filter>Source Files\XLive\User Management</Filter>
-    </ClCompile>
-    <ClCompile Include="XLive\UserManagement\protobuf\packet.pb.cc">
-      <Filter>Source Files\XLive\User Management\protobuf</Filter>
     </ClCompile>
     <ClCompile Include="Util\Hooks\Detour.cpp">
       <Filter>Source Files\Util\Hooks</Filter>
@@ -344,9 +338,6 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Networking\Networking.cpp">
       <Filter>Source Files\H2MOD\Modules\Networking</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\Modules\MapChecksum\MapChecksumSync.cpp">
-      <Filter>Source Files\H2MOD\Modules\MapCheckSum</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Input\Mouseinput.cpp">
       <Filter>Source Files\H2MOD\Modules\Input</Filter>
@@ -534,11 +525,17 @@
     <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp">
       <Filter>Source Files\H2MOD\Variants\XboxTick</Filter>
     </ClCompile>
-    <ClCompile Include="H2MOD\Modules\Players\Players.cpp">
-      <Filter>Source Files\H2MOD\Modules\Players</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp">
       <Filter>Source Files\H2MOD\Modules\CustomResolutions</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\ServerConsole\ServerConsole.cpp">
+      <Filter>Source Files\H2MOD\Modules\ServerConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\NetworkPlayers\NetworkPlayers.cpp">
+      <Filter>Source Files\H2MOD\Modules\Players</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -671,14 +668,8 @@
     <ClInclude Include="H2MOD\GUI\GUI.h">
       <Filter>Source Files\H2MOD\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\protobuf\h2mod.pb.h">
-      <Filter>Source Files\H2MOD\protobuf</Filter>
-    </ClInclude>
     <ClInclude Include="XLive\UserManagement\CUser.h">
       <Filter>Source Files\XLive\User Management</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\UserManagement\protobuf\packet.pb.h">
-      <Filter>Source Files\XLive\User Management\protobuf</Filter>
     </ClInclude>
     <ClInclude Include="Util\Hooks\Detour.h">
       <Filter>Source Files\Util\Hooks</Filter>
@@ -709,9 +700,6 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\Networking\Networking.h">
       <Filter>Source Files\H2MOD\Modules\Networking</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\Modules\MapChecksum\MapChecksumSync.h">
-      <Filter>Source Files\H2MOD\Modules\MapCheckSum</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\Input\Mouseinput.h">
       <Filter>Source Files\H2MOD\Modules\Input</Filter>
@@ -857,9 +845,6 @@
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Cache\TagBlocks\TagBlocks.h">
-      <Filter>Source Files\Blam\Cache\TagBlocks</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups\TagGroups.h">
       <Filter>Source Files\Blam\Cache\TagGroups</Filter>
     </ClInclude>
@@ -898,51 +883,6 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\HitFix\HitFix.h">
       <Filter>Source Files\H2MOD\Modules\HitFix</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\opus\include\opus.h">
-      <Filter>Source Files\3rdparty\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\opus\include\opus_custom.h">
-      <Filter>Source Files\3rdparty\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\opus\include\opus_defines.h">
-      <Filter>Source Files\3rdparty\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\opus\include\opus_multistream.h">
-      <Filter>Source Files\3rdparty\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\opus\include\opus_projection.h">
-      <Filter>Source Files\3rdparty\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\opus\include\opus_types.h">
-      <Filter>Source Files\3rdparty\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\portaudio\include\pa_jack.h">
-      <Filter>Source Files\3rdparty\portaudio</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\portaudio\include\pa_linux_alsa.h">
-      <Filter>Source Files\3rdparty\portaudio</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\portaudio\include\pa_mac_core.h">
-      <Filter>Source Files\3rdparty\portaudio</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\portaudio\include\pa_win_ds.h">
-      <Filter>Source Files\3rdparty\portaudio</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\portaudio\include\pa_win_wasapi.h">
-      <Filter>Source Files\3rdparty\portaudio</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\portaudio\include\pa_win_waveformat.h">
-      <Filter>Source Files\3rdparty\portaudio</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\portaudio\include\pa_win_wdmks.h">
-      <Filter>Source Files\3rdparty\portaudio</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\portaudio\include\pa_win_wmme.h">
-      <Filter>Source Files\3rdparty\portaudio</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\portaudio\include\portaudio.h">
-      <Filter>Source Files\3rdparty\portaudio</Filter>
     </ClInclude>
     <ClInclude Include="XLive\Voice\XHVEngine.h">
       <Filter>Source Files\XLive\voice</Filter>
@@ -1217,9 +1157,6 @@
     <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h">
       <Filter>Source Files\H2MOD\Variants\XboxTick</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\Players\Players.h">
-      <Filter>Source Files\H2MOD\Modules\Players</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Engine\Players\Players.h">
       <Filter>Source Files\Blam\Engine\Players</Filter>
     </ClInclude>
@@ -1231,6 +1168,63 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\connecthostport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\igd_desc_parse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\minisoap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\minissdpc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\miniupnpc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\miniupnpc_declspec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\miniupnpctypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\miniwget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\minixml.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\portlistingparse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\receivedata.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnpcommands.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnpdev.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnperrors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnpreplyparse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\NetworkPlayers\NetworkPlayers.h">
+      <Filter>Source Files\H2MOD\Modules\Players</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

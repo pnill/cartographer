@@ -11,6 +11,9 @@ SOCKET game_network_message_gateway_socket_1001 = INVALID_SOCKET; // used for me
 
 void ForwardPorts()
 {
+	if (h2mod->Server)
+		return;
+
 	ModuleUPnP upnp;
 
 	upnp.UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2");
@@ -158,6 +161,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 	{
 		(((struct sockaddr_in*)to)->sin_addr.s_addr) = H2Config_master_ip;
 		((struct sockaddr_in*)to)->sin_port = ntohs(H2Config_master_port_relay);
+			
 		//LOG_TRACE_NETWORK_N("XSocketSendTo - Broadcast");
 
 		return sendto(s, buf, len, flags, to, tolen);

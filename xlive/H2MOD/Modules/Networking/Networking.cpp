@@ -1,12 +1,15 @@
-#include "stdafx.h"
 
 #include "Globals.h"
+
+#include "XLive\UserManagement\CUser.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\ServerConsole\ServerConsole.h"
+#include "H2MOD\Modules\Config\Config.h"
+
 #include "Networking.h"
 #include "Memory\bitstream.h"
 #include "CustomPackets\CustomPackets.h"
-#include "XLive\UserManagement\CUser.h"
-#include "H2MOD\Modules\MapChecksum\MapChecksumSync.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "NetworkConfiguration\NetworkConfiguration.h"
 
 extern SOCKET game_network_data_gateway_socket_1000;
 extern SOCKET game_network_message_gateway_socket_1001;
@@ -87,11 +90,8 @@ bool __cdecl closed_read(void* a1, int a2, int a3) {
 
 bool __cdecl deserializePlayerAdd(void* a1, int a2, int a3) {
 	typedef bool(__cdecl deserialize_player_add)(void* a1, int a2, int a3);
-	auto p_deserialize_player_add = h2mod->GetPointer<deserialize_player_add*>(0x1F0752, 0x1D110B);
+	auto p_deserialize_player_add = h2mod->GetAddress<deserialize_player_add*>(0x1F0752, 0x1D110B);
 
-	//inform new players of the current map info
-	// send server map checksums to client
-	//MapChecksumSync::SendState();
 	return p_deserialize_player_add(a1, a2, a3);
 }
 
@@ -111,44 +111,44 @@ register_player_packets register_player_packets_method;
 void __cdecl registerPlayerPackets(void* packetObject) {
 
 	register_packet_impl(packetObject, 25, "membership-update", 0, 15784, 15784,
-		h2mod->GetPointer<void*>(0x1EF6B9, 0x1D0072),
-		h2mod->GetPointer<void*>(0x1EFADD, 0x1D0496), 0);
+		h2mod->GetAddress<void*>(0x1EF6B9, 0x1D0072),
+		h2mod->GetAddress<void*>(0x1EFADD, 0x1D0496), 0);
 
 	register_packet_impl(packetObject, 37, "virtual-couch-update", 0, 216, 216,
-		h2mod->GetPointer<void*>(0x1F0042, 0x1D09FB),
-		h2mod->GetPointer<void*>(0x1F0143, 0x1D0AFC), 0);
+		h2mod->GetAddress<void*>(0x1F0042, 0x1D09FB),
+		h2mod->GetAddress<void*>(0x1F0143, 0x1D0AFC), 0);
 
 	register_packet_impl(packetObject, 38, "virtual-couch-request", 0, 208, 208,
-		h2mod->GetPointer<void*>(0x1F0264, 0x1D0C1D),
-		h2mod->GetPointer<void*>(0x1F031D, 0x1D0CD6), 0);
+		h2mod->GetAddress<void*>(0x1F0264, 0x1D0C1D),
+		h2mod->GetAddress<void*>(0x1F031D, 0x1D0CD6), 0);
 
 	register_packet_impl(packetObject, 26, "peer-properties", 0, 208, 208,
-		h2mod->GetPointer<void*>(0x1F03F5, 0x1D0DAE),
-		h2mod->GetPointer<void*>(0x1F04E0, 0x1D0E99), 0);
+		h2mod->GetAddress<void*>(0x1F03F5, 0x1D0DAE),
+		h2mod->GetAddress<void*>(0x1F04E0, 0x1D0E99), 0);
 
 	register_packet_impl(packetObject, 27, "delegate-leadership", 0, 44, 44,
-		h2mod->GetPointer<void*>(0x1F05EE, 0x1D0FA7),
-		h2mod->GetPointer<void*>(0x1F061A, 0x1D0FD3), 0);
+		h2mod->GetAddress<void*>(0x1F05EE, 0x1D0FA7),
+		h2mod->GetAddress<void*>(0x1F061A, 0x1D0FD3), 0);
 
 	register_packet_impl(packetObject, 28, "boot-machine", 0, 44, 44,
-		h2mod->GetPointer<void*>(0x1F0652, 0x1D100B),
-		h2mod->GetPointer<void*>(0x1F067E, 0x1D1037), 0);
+		h2mod->GetAddress<void*>(0x1F0652, 0x1D100B),
+		h2mod->GetAddress<void*>(0x1F067E, 0x1D1037), 0);
 
 	register_packet_impl(packetObject, 29, "player-add", 0, 168, 168,
-		h2mod->GetPointer<void*>(0x1F06B6, 0x1D106F),
+		h2mod->GetAddress<void*>(0x1F06B6, 0x1D106F),
 		(void*)deserializePlayerAdd, 0);
 
 	register_packet_impl(packetObject, 30, "player-refuse", 0, 20, 20,
-		h2mod->GetPointer<void*>(0x1F081F, 0x1D11D8),
-		h2mod->GetPointer<void*>(0x1F085F, 0x1D1218), 0);
+		h2mod->GetAddress<void*>(0x1F081F, 0x1D11D8),
+		h2mod->GetAddress<void*>(0x1F085F, 0x1D1218), 0);
 
 	register_packet_impl(packetObject, 31, "player-remove", 0, 12, 12,
-		h2mod->GetPointer<void*>(0x1F08BC, 0x1D1275),
-		h2mod->GetPointer<void*>(0x1F08EA, 0x1D12A3), 0);
+		h2mod->GetAddress<void*>(0x1F08BC, 0x1D1275),
+		h2mod->GetAddress<void*>(0x1F08EA, 0x1D12A3), 0);
 
 	register_packet_impl(packetObject, 32, "player-properties", 0, 156, 156,
-		h2mod->GetPointer<void*>(0x1F0935, 0x1D12EE),
-		h2mod->GetPointer<void*>(0x1F09AC, 0x1D1365), 0);
+		h2mod->GetAddress<void*>(0x1F0935, 0x1D12EE),
+		h2mod->GetAddress<void*>(0x1F09AC, 0x1D1365), 0);
 }
 
 typedef int(__stdcall *send_packet)(void* thisx, void *a2, unsigned int type, unsigned int size, int packet_data_obj);
@@ -195,7 +195,7 @@ char __stdcall receivePacket(void *thisx, void* a2, int packetType, unsigned int
 	LOG_TRACE_NETWORK("[h2mod-network] received packet");
 	v5 = (char *)thisx;
 	typedef bool(__thiscall* decode_type_and_size)(void* thisx, int a2, signed int* a3, int a4);
-	decode_type_and_size decode_type_and_size_method = h2mod->GetPointer<decode_type_and_size>(0x1E8217, 0x1CA1DA);
+	decode_type_and_size decode_type_and_size_method = h2mod->GetAddress<decode_type_and_size>(0x1E8217, 0x1CA1DA);
 	if (decodePacketTypeAndSize(thisx, a2, (signed int *)packetType, (int)size))
 	{
 		LOG_TRACE_NETWORK("[h2mod-network] received packet succesfully decoded");
@@ -238,16 +238,16 @@ void __stdcall receiveDataFromSocket(DWORD* thisx) {
 	char *ptr = buf;
 
 	typedef int(__cdecl* h2_calls_socketrecvfrom_type)(int a1, char* buf, int len);
-	auto h2_calls_socketrecvfrom = h2mod->GetPointer<h2_calls_socketrecvfrom_type>(0x1F565D);
+	auto h2_calls_socketrecvfrom = h2mod->GetAddress<h2_calls_socketrecvfrom_type>(0x1F565D);
 
 	typedef bool(__cdecl* sub_1261E77_type)(int a1);
-	auto sub_1261E77 = h2mod->GetPointer<sub_1261E77_type>(0x1F1E77);
+	auto sub_1261E77 = h2mod->GetAddress<sub_1261E77_type>(0x1F1E77);
 
 	typedef char(__stdcall* sub_122A93B_type)(unsigned int a1, char* buf, int a3);
-	auto sub_122A93B = h2mod->GetPointer<sub_122A93B_type>(0x1BA93B);
+	auto sub_122A93B = h2mod->GetAddress<sub_122A93B_type>(0x1BA93B);
 
 	typedef int(__thiscall* h2_calls_packet_dispatcher_type)(DWORD* thisx, int a2);
-	auto h2_calls_packet_dispatcher = h2mod->GetPointer<h2_calls_packet_dispatcher_type>(0x1BAFB0);
+	auto h2_calls_packet_dispatcher = h2mod->GetAddress<h2_calls_packet_dispatcher_type>(0x1BAFB0);
 
 	v1 = thisx;
 	v6 = thisx;
@@ -335,13 +335,13 @@ void __cdecl serializeMembershipPacket(void* a1, int a2, int a3) {
 
 
 /* This happens when someone joins or quits a game, the membership packet contains various data about the person. */
-typedef int(__cdecl *deserialize_membership_packet)(void* a1, int a2, int a3);
+typedef bool(__cdecl *deserialize_membership_packet)(void* a1, int a2, int a3);
 deserialize_membership_packet deserialize_membership_packet_method;
 
-int __cdecl deserializeMembershipPacket(void* a1, int a2, int a3) {
+bool __cdecl deserializeMembershipPacket(void* a1, int a2, int a3) {
 
 	/* Call the original first so the packet is de-serialized into the provided address. */
-	int ret = deserialize_membership_packet_method(a1, a2, a3);
+	bool ret = deserialize_membership_packet_method(a1, a2, a3);
 
 	//TODO-Issue-34: need to figure out how to force clients who cannot load the map to correctly fail to load the map
 	/*
@@ -403,6 +403,16 @@ bool __stdcall join_game(void* thisptr, int a2, int a3, XNKID* xnkid, XNKEY* xnk
 	return pjoin_game(thisptr, a2, a3, xnkid, xnkey, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 
+typedef bool(__cdecl* decode_text_chat_packet_)(void* container, int a2, s_text_chat* data_structure);
+decode_text_chat_packet_ p_decode_text_chat_packet;
+
+bool __cdecl decode_text_chat_packet(void* container, int a2, s_text_chat* data_structure)
+{
+	bool ret = p_decode_text_chat_packet(container, a2, data_structure);
+
+	return ret;
+}
+
 /* WIP */
 /* All this does is patch some checks that cause using actual ip addresses not to work. */
 /* When a call to XNetXnaddrtoInaddr happens we provide the actual ip address rather than a secure key */
@@ -417,7 +427,7 @@ void removeXNetSecurity()
 {
 	DWORD dwBack;
 	/* XNKEY bs */
-	p_cmp_xnkid = (cmp_xnkid)DetourClassFunc(h2mod->GetPointer<BYTE*>(0x1C284A, 0x199F02), (BYTE*)xnkid_cmp, 9);
+	p_cmp_xnkid = (cmp_xnkid)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1C284A, 0x199F02), (BYTE*)xnkid_cmp, 9);
 	VirtualProtect(p_cmp_xnkid, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	BYTE jmp = 0xEB;
@@ -429,124 +439,71 @@ void removeXNetSecurity()
 	NopFill(h2mod->GetAddress(0x1B62BC, 0x1966F4), 2);
 }
 
-static float aux;
-extern bool b_XboxTick;
-static float increase_factor = 1.3f;
-__declspec(naked) void network_observer_patch(void)
-{
-	__asm
-	{
-		cmp      b_XboxTick, 1
-		jz       original_code
-		xorps    xmm0, xmm0 
-		cvtsi2ss xmm0, eax
-		mulss    xmm0, increase_factor
-		movss    aux, xmm0
-		fld      aux
-		fistp    aux
-		mov      eax, aux
-
-		original_code:
-		imul     eax, ebp
-		cdq
-		idiv    ecx
-		
-		ret
-	}
-}
-
 void applyConnectionPatches()
 {
 	DWORD dwBack;
 	//removeXNetSecurity();
+
+	// live netcode research
+	NetworkConfiguration::ApplyPatches();
 
 	// force hard-coded qos data in-lobby
 	PatchCall(h2mod->GetAddress(0x1BDCB0, 0x1B7B8A), QoSLookUpImpl);
 
 	//NopFill<9>(h2mod->GetBase() + (h2mod->Server ? 0x1B3CC3 : 0x1F1F94)); // check if secure/ipaddress != 127.0.0.1
 	//NopFill(h2mod->GetAddress() + (h2mod->Server ? 0x1B3CC3 : 0x1F1F94), 9); // check if secure/ipaddress != 127.0.0.1
-	// disable network observer (broken on H2V)
-	//WriteValue<BYTE>(h2mod->GetAddress() + (h2mod->Server ? 0x1A92BA : 0x1B555C), (BYTE)0);
-	// also ping bars
-	//WriteValue<BYTE>(h2mod->GetAddress() + (h2mod->Server ? 0x1C1B7F : 0x1D4E35), 0xEB);
-
-	// makes Live network not as laggy 
-	//int data = 500;
-	//WriteValue<int>(h2mod->GetAddress() + (h2mod->Server ? 0x24896 : 0x28702), data);
-
-	// increase the netowrk tickrate of hosts to 60 and for the clients to 30
-	static float unk_flt_ = 60.0f;
-	DWORD addresses[] = { 0x1BDE27, 0x1BE2FA, 0x1BFB3C, 0x1C11FA, 0x1C12BF };
-	DWORD addresses_dedi[] = { 0x1B7D01, 0x1B81D4, 0x1B9A1C, 0x1BB0DA, 0x1BB19F };
-	int size = (h2mod->Server ? sizeof(addresses_dedi) : sizeof(addresses)) / sizeof(int);
-	for (int i = 0; i < size; i++)
-	{
-		DWORD addr = h2mod->Server ? addresses_dedi[i] : addresses[i];
-		WritePointer(h2mod->GetAddress(addr, addr) + 4, &unk_flt_);
-
-		// for whatever reason this code will not execute, marking GetAddress not inline or exec in debug mode fixes it
-		//WritePointer((DWORD)h2mod->GetAddress(addresses[i], addresses_dedi[i]) + 4, &unk_flt_); 
-	}
-
-	// increase max bits per second of LIVE netcode (3000 bytes -> ~8000 bytes)
-	WriteValue<DWORD>(h2mod->GetAddress(0x1AAD63, 0x1AB268) + 6, 30720 * 2); // max bits per 1 player
-	WriteValue<DWORD>(h2mod->GetAddress(0x1AAD63, 0x1AB268) + 10 + 6, 122880 * 2); // max bits per 4 players (aka splitscreen)
-	WriteValue<DWORD>(h2mod->GetAddress(0x1AAD63, 0x1AB268) + 20 + 6, 512000 * 2); // max bits per full lobby (16/16 lobby)
-
-	// 30 tickrate to 60 compenstation for packet size
-	//Codecave(h2mod->GetAddress(0x1BF1B9, 0x1B9093), network_observer_patch, 1);
 
 	if (!h2mod->Server)
-	{
-		pjoin_game = (tjoin_game)DetourClassFunc(h2mod->GetPointer<BYTE*>(0x1CDADE), (BYTE*)join_game, 13);
+	{	
+		pjoin_game = (tjoin_game)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1CDADE), (BYTE*)join_game, 13);
 		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 }
 
 void CustomNetwork::applyNetworkHooks() {
 	DWORD dwBack;
-	DWORD deserializePlayerAddOffset = 0x1F0753;
 	DWORD serializeParametersUpdatePacketOffset = 0x1EDC41;
-
-	if (h2mod->Server) {
-		deserializePlayerAddOffset = 0x1D110C;
-	}
 
 	///////////////////////////////////////////////
 	//connection/player packet customizations below
 	///////////////////////////////////////////////
 
-	register_connection_packets_method = (register_connection_packets)DetourFunc(h2mod->GetPointer<BYTE*>(0x1F1B36, 0x1D24EF), (BYTE*)registerConnectionPackets, 5);
+	register_connection_packets_method = (register_connection_packets)DetourFunc(h2mod->GetAddress<BYTE*>(0x1F1B36, 0x1D24EF), (BYTE*)registerConnectionPackets, 5);
 	VirtualProtect(register_connection_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	
 	//use for debugging
-	//register_player_packets_method = (register_player_packets)DetourFunc(h2mod->GetPointer<BYTE*>(0x1F0A55, 0x1D140E), (BYTE*)registerPlayerPackets, 5);
+	//register_player_packets_method = (register_player_packets)DetourFunc(h2mod->GetAddress<BYTE*>(0x1F0A55, 0x1D140E), (BYTE*)registerPlayerPackets, 5);
 	//VirtualProtect(register_player_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	serialize_membership_packet_method = (serialize_membership_packet)DetourFunc(h2mod->GetPointer<BYTE*>(0x1EF6B9, 0x1D0072), (BYTE*)serializeMembershipPacket, 5);
+	serialize_membership_packet_method = (serialize_membership_packet)DetourFunc(h2mod->GetAddress<BYTE*>(0x1EF6B9, 0x1D0072), (BYTE*)serializeMembershipPacket, 5);
 	VirtualProtect(serialize_membership_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	deserialize_membership_packet_method = (deserialize_membership_packet)DetourFunc(h2mod->GetPointer<BYTE*>(0x1EFADD, 0x1D0496), (BYTE*)deserializeMembershipPacket, 12);
+	deserialize_membership_packet_method = (deserialize_membership_packet)DetourFunc(h2mod->GetAddress<BYTE*>(0x1EFADD, 0x1D0496), (BYTE*)deserializeMembershipPacket, 12);
 	VirtualProtect(deserialize_membership_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	//serialize_parameters_update_packet_method = (serialize_parameters_update_packet)DetourFunc((BYTE*)h2mod->GetPointer(0x1F03F5, 0x1CE5FA), (BYTE*)serializeParametersUpdatePacket, 5);
+	//serialize_parameters_update_packet_method = (serialize_parameters_update_packet)DetourFunc((BYTE*)h2mod->GetAddress(0x1F03F5, 0x1CE5FA), (BYTE*)serializeParametersUpdatePacket, 5);
 	//VirtualProtect(serialize_parameters_update_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//TODO-Issue-34: turning this on makes hosts not care if clients can load map or now
-	//serialize_peer_properties_method = (serialize_peer_properties)DetourFunc((BYTE*)h2mod->GetPointer(serializePeerPropertiesPacketOffset, serializePeerPropertiesPacketOffset), (BYTE*)serializePeerPropertiesPacket, 5);
+	//serialize_peer_properties_method = (serialize_peer_properties)DetourFunc((BYTE*)h2mod->GetAddress(serializePeerPropertiesPacketOffset, serializePeerPropertiesPacketOffset), (BYTE*)serializePeerPropertiesPacket, 5);
 	//VirtualProtect(serialize_peer_properties_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	/////////////////////////////////////////////////////////////////////
 	//send/recv packet functions below (for troubleshooting and research)
 	/////////////////////////////////////////////////////////////////////
-	//send_packet_method = (send_packet)DetourClassFunc(h2mod->GetPointer<BYTE*>(0x1E8296, 0x1CA259), (BYTE*)sendPacket, 8);
+	//send_packet_method = (send_packet)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E8296, 0x1CA259), (BYTE*)sendPacket, 8);
 	//VirtualProtect(send_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	//receive_packet_method = (receive_packet)DetourClassFunc(h2mod->GetPointer<BYTE*>(0x1E82E0, 0x1CA2A3), (BYTE*)receivePacket, 11);
+	//receive_packet_method = (receive_packet)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E82E0, 0x1CA2A3), (BYTE*)receivePacket, 11);
 	//VirtualProtect(receive_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	//receive_data_from_socket_method = (receive_data_from_socket)DetourClassFunc(h2mod->GetPointer<BYTE*>(0x1BAFB5), (BYTE*)receiveDataFromSocket, 10);
+	//receive_data_from_socket_method = (receive_data_from_socket)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1BAFB5), (BYTE*)receiveDataFromSocket, 10);
 	//VirtualProtect(receive_data_from_socket_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+	if (h2mod->Server) {
+		p_decode_text_chat_packet = (decode_text_chat_packet_)DetourFunc(h2mod->GetAddress<BYTE*>(0x0, 0x1CD8A4), (BYTE*)decode_text_chat_packet, 12);
+		VirtualProtect(p_decode_text_chat_packet, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	}
 
 	CustomPackets::ApplyGamePatches();
 	applyConnectionPatches();

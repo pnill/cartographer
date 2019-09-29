@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "Globals.h"
 
 #include "..\UserManagement\CUser.h"
 

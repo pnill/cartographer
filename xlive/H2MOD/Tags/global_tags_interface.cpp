@@ -97,6 +97,6 @@ void _cdecl ResetMapData()
 
 	//and then call unloading procedure
 	typedef void(_cdecl ResetMapData)();
-	auto pResetMapData = h2mod->GetPointer<ResetMapData*>(0x30CD4);
+	auto pResetMapData = h2mod->GetAddress<ResetMapData*>(0x30CD4);
 	pResetMapData();
 }

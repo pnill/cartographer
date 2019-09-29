@@ -2,11 +2,6 @@
 #include "XAchievements.h"
 
 #include "Globals.h"
-#include "resource.h"
-#include "XLive\xbox\xbox.h"
-#include "XLive\XAM\xam.h"
-#include "H2MOD\Modules\Achievements\Achievements.h"
-#include <string>
 
 int achieveinit = 0;
 
