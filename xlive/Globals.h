@@ -9,7 +9,6 @@
 #include "Blam\BlamLibrary.h"
 #include "H2MOD\Variants\VariantPlayer.h"
 #include "H2MOD\Variants\VariantSystem.h"
-#include "H2MOD\Modules\NetworkPlayers\NetworkPlayers.h"
 #include "H2MOD\Variants\DeviceShop\DeviceShop.h"
 #include "H2MOD\Variants\H2Final\H2Final.h"
 #include "H2MOD\Variants\XboxTick\XboxTick.h"
@@ -22,6 +21,7 @@
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
+#include "H2MOD\Modules\Networking\NetworkPlayers\NetworkPlayers.h"
 
 #define run_async(expression) \
 	std::thread{ [=] { expression; } }.detach();

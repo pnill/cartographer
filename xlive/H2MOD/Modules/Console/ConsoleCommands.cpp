@@ -325,13 +325,13 @@ void ConsoleCommands::checkForIds() {
 	}
 }
 
-void ConsoleCommands::spawn(unsigned int object_datum, int count, float x, float y, float z, float randomMultiplier) {
+void ConsoleCommands::spawn(DatumIndex object_datum, int count, float x, float y, float z, float randomMultiplier) {
 
 	for (int i = 0; i < count; i++) {
 		try {
 			ObjectPlacementData nObject;
 
-			if (object_datum) {
+			if (!object_datum.IsNull()) {
 				DatumIndex player_datum = h2mod->get_unit_datum_from_player_index(0);
 				call_object_placement_data_new(&nObject, object_datum, player_datum, 0);
 				Real::Point3D* player_position = h2mod->get_player_coords(0);
@@ -342,7 +342,7 @@ void ConsoleCommands::spawn(unsigned int object_datum, int count, float x, float
 					nObject.Placement.Z = (player_position->Z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
 				}
 				
-				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum, nObject.Placement.X, nObject.Placement.Y, nObject.Placement.Z);
+				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.Placement.X, nObject.Placement.Y, nObject.Placement.Z);
 				unsigned int object_gamestate_datum = call_object_new(&nObject);
 				call_add_object_to_sync(object_gamestate_datum);
 			}
@@ -546,7 +546,7 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			std::string secondArg = splitCommands[1];
 			std::string thirdArg = splitCommands[2];
-			unsigned int object_datum;
+			DatumIndex object_datum;
 			if (object_ids.find(secondArg) == object_ids.end()) {
 				//read from chatbox line
 				std::string secondArg = splitCommands[1];

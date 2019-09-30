@@ -91,19 +91,21 @@ void NetworkPlayers::logAllPeersToConsole() {
 	if (NetworkSession::getCurrentNetworkSession()->membership.total_peers > 0) {
 		int peerIndex = 0;
 		do {
-			int playerIndex = NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index[0];
-
 			std::wstring outStr = L"Peer index=" + std::to_wstring(peerIndex);
-			outStr += L", Player index=" + std::to_wstring(playerIndex);
 			outStr += L", Peer Name=";
 			outStr += NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].peer_name;
-			outStr += L", Player name=";
-			outStr += this->getPlayerName(playerIndex);
-			outStr += L", Name from game player state=";
-			outStr += h2mod->get_player_name_from_player_index(playerIndex);
-			outStr += L", Identifier=" + std::to_wstring(this->getPlayerXuidFromPlayerIndex(playerIndex));
+			int playerIndex = NetworkSession::getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index[0];
+			if (playerIndex != -1) {
+				outStr += L", Player index=" + std::to_wstring(playerIndex);
+				outStr += L", Player name=";
+				outStr += this->getPlayerName(playerIndex);
+				outStr += L", Name from game player state=";
+				outStr += h2mod->get_player_name_from_player_index(playerIndex);
+				outStr += L", Identifier=" + std::to_wstring(this->getPlayerXuidFromPlayerIndex(playerIndex));
 
+			}
 			commands->output(outStr);
+
 			peerIndex++;
 		} while (peerIndex < NetworkSession::getCurrentNetworkSession()->membership.total_peers);
 	}

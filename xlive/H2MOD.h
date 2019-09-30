@@ -63,10 +63,10 @@ public:
 		wchar_t* GetLobbyGameVariantName();
 		wchar_t* get_player_name_from_player_index(int playerIndex);
 		int get_player_index_from_name(wchar_t* playername);
-		int get_player_index_from_unit_datum(int unit_datum_index);
+		int get_player_index_from_unit_datum(DatumIndex unit_datum_index);
 		BYTE get_unit_team_index(DatumIndex unit_datum_index);
 		void set_unit_team_index(int unit_datum_index, BYTE team);
-		void set_unit_biped(Player::Biped biped, int playerIndex);
+		void set_unit_biped(Player::Biped biped_type, int playerIndex);
 		void set_unit_speed_patch(bool hackit);
 		void set_unit_speed(float speed, int playerIndex);
 		void set_local_team_index(int local_player_index, int team);

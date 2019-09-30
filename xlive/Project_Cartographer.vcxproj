@@ -322,7 +322,7 @@
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Networking.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
-    <ClCompile Include="H2MOD\Modules\NetworkPlayers\NetworkPlayers.cpp" />
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkPlayers\NetworkPlayers.cpp" />
     <ClCompile Include="H2MOD\Modules\RunLoop\RunLoop.cpp" />
     <ClCompile Include="H2MOD\Modules\Startup\Startup.cpp" />
     <ClCompile Include="H2MOD\Modules\Tweaks\Tweaks.cpp" />
@@ -548,7 +548,7 @@
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Networking.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
-    <ClInclude Include="H2MOD\Modules\NetworkPlayers\NetworkPlayers.h" />
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkPlayers\NetworkPlayers.h" />
     <ClInclude Include="H2MOD\Modules\RunLoop\RunLoop.h" />
     <ClInclude Include="H2MOD\Modules\Startup\Startup.h" />
     <ClInclude Include="H2MOD\Modules\Tweaks\Tweaks.h" />

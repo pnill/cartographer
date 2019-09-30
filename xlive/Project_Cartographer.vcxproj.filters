@@ -124,12 +124,6 @@
     <Filter Include="Source Files\H2MOD\Modules\Networking">
       <UniqueIdentifier>{2e1ec1b1-1c28-421f-9051-e2e8b5c70968}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\H2MOD\Modules\MapCheckSum">
-      <UniqueIdentifier>{1b9c38d6-8ed3-47f1-9f96-276f1f4bd069}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\H2MOD\Modules\Players">
-      <UniqueIdentifier>{b20d1df9-2a20-4083-bf79-2da89d1cd15a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\H2MOD\Modules\Console">
       <UniqueIdentifier>{2a2168e9-9704-486d-a293-42bb9c44378e}</UniqueIdentifier>
     </Filter>
@@ -270,6 +264,15 @@
     </Filter>
     <Filter Include="Source Files\H2MOD\Modules\ServerConsole">
       <UniqueIdentifier>{e04a07f3-64d7-46c2-9ce1-3d460af18cb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\MapChecksum">
+      <UniqueIdentifier>{1b9c38d6-8ed3-47f1-9f96-276f1f4bd069}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Networking\NetworkConfiguration">
+      <UniqueIdentifier>{e6f095a5-53b1-4dca-8478-1ccd86c77a79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Networking\NetworkPlayers">
+      <UniqueIdentifier>{b20d1df9-2a20-4083-bf79-2da89d1cd15a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -532,10 +535,10 @@
       <Filter>Source Files\H2MOD\Modules\ServerConsole</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkConfiguration</Filter>
     </ClCompile>
-    <ClCompile Include="H2MOD\Modules\NetworkPlayers\NetworkPlayers.cpp">
-      <Filter>Source Files\H2MOD\Modules\Players</Filter>
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkPlayers\NetworkPlayers.cpp">
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkPlayers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1172,9 +1175,6 @@
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1223,8 +1223,11 @@
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnpreplyparse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\NetworkPlayers\NetworkPlayers.h">
-      <Filter>Source Files\H2MOD\Modules\Players</Filter>
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.h">
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkConfiguration</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkPlayers\NetworkPlayers.h">
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkPlayers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

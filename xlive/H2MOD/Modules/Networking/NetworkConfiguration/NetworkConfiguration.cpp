@@ -5,9 +5,15 @@
 #include "H2MOD.h"
 #include "Util/Hooks/Hook.h"
 
+// LIVE netcode research
+
 network_configuration* g_network_configuration;
 void __cdecl InitializeConfiguration()
 {
+	/*
+		Configuration constants used by the game to define how LIVE netcode will behave
+	*/
+
 	g_network_configuration->field_0 = 1;
 	g_network_configuration->field_2C = 500;
 	g_network_configuration->field_30 = 500;
@@ -174,7 +180,7 @@ bool __stdcall unk_live_netcode_func_2(void *thisx, float a1, float packet_size,
 	return result;
 
 }
-
+ 
 void NetworkConfiguration::ApplyPatches()
 {
 	// increase the netowrk tickrate of hosts to 60 and for the clients to 30

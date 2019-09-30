@@ -41,7 +41,8 @@ struct PeerInfo
 	signed int field_90;
 	signed int field_94;
 	signed int field_98;
-	BYTE gap_9C[84];
+	int peer_bit_mask;
+	BYTE gap_9C[80];
 	DWORD field_F0;
 	DWORD field_F4;
 	DWORD gets_incremented_unk;
@@ -90,15 +91,15 @@ struct unk_network_connection_info
 
 struct Membership
 {
-	DWORD update_number;
-	DWORD session_leader_index;
-	XUID dedicated_server_xuid;
-	DWORD field_80;
-	DWORD total_peers;
-	PeerInfo peer_info[17];
-	DWORD total_players;
-	DWORD players_active_mask;
-	PlayerInformation player_info[16];
+	DWORD update_number; // 0x70
+	DWORD session_leader_index; // 0x74
+	XUID dedicated_server_xuid; // 0x7C
+	DWORD field_80; // 0x80
+	DWORD total_peers; // 0x84
+	PeerInfo peer_info[17]; // 0x88
+	DWORD total_players; // 0x1254
+	DWORD players_active_mask; // 0x1258
+	PlayerInformation player_info[16]; // 0x125C
 };
 
 struct network_session
@@ -113,7 +114,7 @@ struct network_session
 	int network_protocol; // LIVE - 2, Network - 1
 	XNKID session_id;
 	wchar_t field_28[16];
-	char field_48; // 69
+	char field_48;
 	XNKEY xnkey;
 	char pad[3];
 	int xnkey_index;
@@ -121,8 +122,8 @@ struct network_session
 	DWORD session_host_peer_index;
 	int elected_host_peer_index;
 	DWORD field_6C;
-	Membership membership;
-	DWORD unk_field;
+	Membership membership; // 0x70
+	DWORD unk_field; 
 	DWORD unk_field2;
 	Membership membership_update_buffer;
 	VirtualCouch v_couch_1;

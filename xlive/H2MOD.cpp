@@ -524,13 +524,13 @@ wchar_t* H2MOD::get_player_name_from_player_index(int playerIndex)
 	return playersIt.get_data_at_index(playerIndex)->properties.player_name;
 }
 
-int H2MOD::get_player_index_from_unit_datum(int unit_datum_index)
+int H2MOD::get_player_index_from_unit_datum(DatumIndex unit_datum_index)
 {
 	PlayerIterator playersIt;
 	while (playersIt.get_next_player())
 	{
-		int unit_datum_index_check = playersIt.get_current_player_data()->BipedUnitDatum.ToInt();
-		LOG_TRACE_FUNC("Checking datum: {0:x} - index: {1} against datum: {2:x}", unit_datum_index_check, playersIt.get_current_player_index(), unit_datum_index);
+		DatumIndex unit_datum_index_check = playersIt.get_current_player_data()->BipedUnitDatum;
+		LOG_TRACE_FUNC("Checking datum: {0:x} - index: {1} against datum: {2:x}", unit_datum_index_check.ToInt(), playersIt.get_current_player_index(), unit_datum_index.ToInt());
 
 		if (unit_datum_index == unit_datum_index_check)
 			return playersIt.get_current_player_index();
@@ -557,11 +557,11 @@ int H2MOD::get_unit_index_from_player_index(int playerIndex)
 }
 
 //can be used on clients and server
-void H2MOD::set_unit_biped(Player::Biped biped, int playerIndex)
+void H2MOD::set_unit_biped(Player::Biped biped_type, int playerIndex)
 {
 	PlayerIterator playersIt;
 	if (playerIndex >= 0 && playerIndex < 16)
-		playersIt.get_data_at_index(playerIndex)->properties.profile.player_caracter_type = biped;
+		playersIt.get_data_at_index(playerIndex)->properties.profile.player_caracter_type = biped_type;
 }
 
 BYTE H2MOD::get_unit_team_index(DatumIndex unit_datum_index)

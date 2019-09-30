@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Networking/NetworkSession/NetworkSession.h"
+#include "../NetworkSession/NetworkSession.h"
 
 class NetworkPlayers {
 public:

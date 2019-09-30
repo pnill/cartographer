@@ -202,7 +202,7 @@ void CustomPackets::sendTeamChange(network_session* session, signed int peer_ind
 		s_team_change buffer;
 		buffer.team_index = team_index;
 
-		if (peer_index != -1 && peer_index != session->local_peer_index) 
+		if (peer_index != -1 && peer_index != session->local_peer_index)
 		{
 			if (session->unk_needs_reversing[peer_index].field_0[1])
 			{

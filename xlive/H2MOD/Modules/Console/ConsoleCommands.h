@@ -4,7 +4,7 @@ class ConsoleCommands {
 public:
 	ConsoleCommands();
 	void handle_command(std::string);
-	void spawn(unsigned int object_datum, int count, float x, float y, float z, float randomMultiplier);
+	void spawn(DatumIndex object_datum, int count, float x, float y, float z, float randomMultiplier);
 	void output(std::wstring result);
 	void display(std::string output);
 	std::vector<std::string> prevCommands;
