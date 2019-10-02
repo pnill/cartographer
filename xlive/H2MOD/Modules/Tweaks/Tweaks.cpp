@@ -1041,7 +1041,7 @@ void InitH2Tweaks() {
 		WriteJmpTo(h2mod->GetAddress(0x39EA2), is_remote_desktop);
 
 		//Redirect the variable for the server name to ours.
-		WriteValue(H2BaseAddr + 0x001b2ce8, (DWORD)ServerLobbyName);
+		WritePointer(H2BaseAddr + 0x1b2ce8, ServerLobbyName);
 
 		tags::on_map_load(fix_shaders_nvidia);
 	}

@@ -17,7 +17,7 @@ std::vector<std::tuple<std::string, float, float>> weapon_projectiles =
 
 void HitFix::Initialize()
 {
-	for (auto proj_tuple : weapon_projectiles)
+	for (auto& proj_tuple : weapon_projectiles)
 	{
 		auto proj_datum = tags::find_tag('proj', std::get<0>(proj_tuple));
 		BYTE* projectile_tag_data = tags::get_tag<'proj', BYTE>(proj_datum);
