@@ -445,7 +445,7 @@ namespace tag_loader
 			{
 				int meta_size = que_meta_list[my_inject_refs_iter->old_datum]->Get_Total_size();
 				char tables_data[0x10];
-				DWORD MapMemBase = *h2mod->GetAddress<DWORD*>(0x47CD64);
+				DWORD MapMemBase = *h2mod->GetAddress<DWORD*>(0x47CD54);
 
 				que_meta_list[my_inject_refs_iter->old_datum]->Rebase_meta(mem_off);
 				char* meta_data = que_meta_list[my_inject_refs_iter->old_datum]->Generate_meta_file();
@@ -496,7 +496,7 @@ namespace tag_loader
 				int meta_size = meta_list_iter->second->Get_Total_size();
 
 				char tables_data[0x10];
-				DWORD MapMemBase = *h2mod->GetAddress<DWORD*>(0x47CD64);
+				DWORD MapMemBase = *h2mod->GetAddress<DWORD*>(0x47CD54);
 				meta_list_iter->second->Rebase_meta(mem_off);
 				char* meta_data = meta_list_iter->second->Generate_meta_file();
 
@@ -688,7 +688,7 @@ namespace tag_loader
 		*PMapRawtableoffset = 0x0;
 		*PRawTableSize = 0x0;
 
-		DWORD SharedmapBase = *h2mod->GetAddress<DWORD*>(0x47CD64);
+		DWORD SharedmapBase = *h2mod->GetAddress<DWORD*>(0x47CD54);
 		DWORD ETCOFFSET = *h2mod->GetAddress<DWORD*>(0x482290);
 		HANDLE old_file_handle = *h2mod->GetAddress<HANDLE*>(0x4AE8A8);
 
@@ -837,7 +837,7 @@ namespace tag_loader
 			string error = "Loading module: " + loc + " to datum_index: " + meta_struct::to_hex_string(new_datum_index);
 			error_list.push_back(error);
 
-			DWORD MapMemBase = *h2mod->GetAddress<DWORD*>(0x47CD64);
+			DWORD MapMemBase = *h2mod->GetAddress<DWORD*>(0x47CD54);
 			int mem_off = def_meta_size + ext_meta_size;
 
 			char* t_ptr = new_Tables + new_datum_index * 0x10;

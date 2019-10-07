@@ -867,7 +867,7 @@ bool __cdecl OnMapLoad(void* map_load_settings)
 
 	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
 	LOG_INFO_GAME(L"[h2mod] OnMapLoad map type {0}, variant name {1}", h2mod->GetMapType(), variant_name);
-	BYTE GameState = *(BYTE*)(h2mod->GetAddress(0x420FC4, 0x3C40AC));
+	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
 
 	for (auto gametype_it : GametypesMap)
 		gametype_it.second = false; // reset custom gametypes state

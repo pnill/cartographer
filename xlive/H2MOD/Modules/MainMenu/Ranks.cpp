@@ -19,7 +19,7 @@ void UIRankPatch() {
 	if (MapHeaderType != 2) //If not on mainmenu, returns
 		return;
 
-	DWORD SharedMapMetaDataPointer = *(DWORD*)(H2BaseAddr + 0x47CD64);
+	DWORD SharedMapMetaDataPointer = *(DWORD*)(H2BaseAddr + 0x47CD54);
 
 	//Tag : ui\player_skins\player_skin_lobby.skin
 	const DWORD TagOffsetPreGameLobby = 0x0049DE90;	//Property : Bitmap Buttons

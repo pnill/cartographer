@@ -151,11 +151,8 @@ namespace tags
 	}
 
 	/* Returns a pointer to the tag instance array */
-	inline tag_instance *get_tag_instances()
-	{
-		return get_tags_header()->tag_instances;
-	}
-
+	tag_instance *get_tag_instances();
+	
 	/* Returns the number of tags, pretty self explanatory */
 	inline long get_tag_count()
 	{

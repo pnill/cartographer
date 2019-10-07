@@ -4,9 +4,14 @@
 #include "..\Util\Hooks\Hook.h"
 using namespace tags;
 
+tag_instance *tags::get_tag_instances()
+{
+	return *h2mod->GetAddress<tag_instance**>(0x47CD50, 0x4A29B8);
+}
+
 char *tags::get_tag_data()
 {
-	return *h2mod->GetAddress<char**>(0x47CD64, 0x4A29CC);
+	return *h2mod->GetAddress<char**>(0x47CD54, 0x4A29BC);
 }
 
 char *tags::get_game_globals()

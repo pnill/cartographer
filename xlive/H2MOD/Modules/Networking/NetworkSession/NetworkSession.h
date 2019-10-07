@@ -95,9 +95,9 @@ struct Membership
 	DWORD session_leader_index; // 0x74
 	XUID dedicated_server_xuid; // 0x7C
 	DWORD field_80; // 0x80
-	DWORD total_peers; // 0x84
+	int total_peers; // 0x84
 	PeerInfo peer_info[17]; // 0x88
-	DWORD total_players; // 0x1254
+	int total_players; // 0x1254
 	DWORD players_active_mask; // 0x1258
 	PlayerInformation player_info[16]; // 0x125C
 };
