@@ -257,7 +257,6 @@ int* hotkeyId[hotkeyLen] = { &H2Config_hotkeyIdHelp, &H2Config_hotkeyIdToggleDeb
 bool hotkeyPressed[hotkeyLen] = { false, false, false, false, false, false, false, false, false };
 void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotkeyFuncAlignWindow, hotkeyFuncWindowMode, hotkeyFuncToggleHideIngameChat, hotkeyFuncGuide, hotkeyFuncTest, hotkeyFuncTest2, hotkeyFuncEsc };
 
-int prevPartyPrivacy = 0;
 
 bool halo2WindowExists = false;
 bool halo2ServerOnce1 = false;
@@ -299,6 +298,7 @@ void GSMainLoop() {
 		}
 	}
 
+	static int prevPartyPrivacy = 0;
 	int partyPrivacy;
 	if (H2IsDediServer) {
 		partyPrivacy = *(int*)((BYTE*)H2BaseAddr + 0x534850);
@@ -306,7 +306,7 @@ void GSMainLoop() {
 	else {
 		partyPrivacy = *(int*)((BYTE*)H2BaseAddr + 0x50A398);
 	}
-	if (prevPartyPrivacy > 0 && partyPrivacy == 0 && NetworkSession::localPeerIsSessionHost()) {
+	if (prevPartyPrivacy > 0 && partyPrivacy == 0) {
 		pushHostLobby();
 	}
 	prevPartyPrivacy = partyPrivacy;

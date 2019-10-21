@@ -4807,8 +4807,8 @@ void __cdecl sub_bd137(unsigned int skull_id) {
 
 	BYTE* byte_4D8320 = (BYTE*)((char*)H2BaseAddr + 0x4D8320);
 	DWORD* dword_3BCAF8 = (DWORD*)((char*)H2BaseAddr + 0x3BCAF8);
-	DWORD& dword_479E70 = *(DWORD*)((char*)H2BaseAddr + 0x479E70);
-	DWORD& dword_482290 = *(DWORD*)((char*)H2BaseAddr + 0x482290);
+	DWORD dword_479E70 = *(DWORD*)((char*)H2BaseAddr + 0x479E70);
+	DWORD dword_482290 = *(DWORD*)((char*)H2BaseAddr + 0x482290);
 
 	int v1; // ST0C_4
 	int v2; // eax
@@ -5560,7 +5560,7 @@ int __cdecl CustomMenu_CallHead(int a1, DWORD* menu_vftable_1, DWORD* menu_vftab
 	int(__cdecl* sub_20B8C3)(int, int) = (int(__cdecl*)(int, int))((char*)H2BaseAddr + 0x20B8C3);
 
 	int menu_struct = Allocator(3388);
-	int& menu_id = ((int*)menu_struct)[28];
+	int menu_id = ((int*)menu_struct)[28];
 	if (menu_struct) {
 		menu_struct = sub_248B17_CM(menu_struct, *(DWORD*)(a1 + 4), *(DWORD*)(a1 + 8), *(WORD*)(a1 + 2), menu_vftable_1, menu_vftable_2, menu_button_handler, number_of_buttons, menu_wgit_type);
 	}
@@ -5818,7 +5818,7 @@ void* __stdcall sub_20f8ae_CMLTD(void* thisptr, __int16 a2, int* a3, int label_m
 
 int __stdcall sub_20fb1b_CMLTD(void* thisptr, int label_menu_id, int label_id_description)
 {
-	int& dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
 
 	int(__thiscall* sub_20F815)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x20F815);
 	int(__thiscall* sub_20E8C9)(void*, int) = (int(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20E8C9);
@@ -6171,7 +6171,7 @@ void __stdcall sub_21bf85_CMLTD(int thisptr, int label_id, int label_menu_id)
 
 char __stdcall sub_20fd41_CMLTD(void* thisptr, int label_menu_id, int label_id_title)
 {
-	int& dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
 
 	int(__cdecl* sub_20bb89)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x20bb89);
 	int(__cdecl* sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
@@ -6303,7 +6303,7 @@ char __stdcall sub_20fd41_CMLTD(void* thisptr, int label_menu_id, int label_id_t
 
 char __stdcall sub_210a44_CMLTD(int thisptr, int a2, int* a3, int label_menu_id, int label_id_title, int label_id_description)
 {
-	int& dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
 
 	int(__cdecl* sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
 	int(__cdecl* sub_239623)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x239623);

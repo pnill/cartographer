@@ -157,7 +157,7 @@ int __cdecl CustomMenu_CallHead_(int a1, DWORD* menu_vftable_1, DWORD* menu_vfta
 	int(__cdecl* sub_20B8C3)(int, int) = (int(__cdecl*)(int, int))((char*)H2BaseAddr + 0x20B8C3);
 
 	int menu_struct = Allocator(3388);
-	int& menu_id = ((int*)menu_struct)[28];
+	int menu_id = ((int*)menu_struct)[28];
 	if (menu_struct) {
 		menu_struct = sub_248B17_CM_(menu_struct, *(DWORD*)(a1 + 4), *(DWORD*)(a1 + 8), *(WORD*)(a1 + 2), menu_vftable_1, menu_vftable_2, menu_button_handler, number_of_buttons, menu_wgit_type);
 	}
@@ -296,7 +296,7 @@ char __stdcall sub_21bb0b_CMLTD_(void* thisptr, __int16 a2, int* aa3, int label_
 
 int __stdcall sub_20fb1b_CMLTD_(void* thisptr, int label_menu_id, int label_id_description)
 {
-	int& dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
 
 	int(__thiscall* sub_20F815)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x20F815);
 	int(__thiscall* sub_20E8C9)(void*, int) = (int(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20E8C9);
@@ -650,7 +650,7 @@ void __cdecl sub_3e3ac_CMLTD_(int a1, int label_id, wchar_t* rtn_label, int labe
 
 char __stdcall sub_20fd41_CMLTD_(void* thisptr, int label_menu_id, int label_id_title)
 {
-	int& dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
 
 	int(__cdecl* sub_20bb89)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x20bb89);
 	int(__cdecl* sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
@@ -782,7 +782,7 @@ char __stdcall sub_20fd41_CMLTD_(void* thisptr, int label_menu_id, int label_id_
 
 char __stdcall sub_210a44_CMLTD_(int thisptr, int a2, int* a3, int label_menu_id, int label_id_title, int label_id_description)
 {
-	int& dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
 
 	int(__cdecl* sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
 	int(__cdecl* sub_239623)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x239623);
