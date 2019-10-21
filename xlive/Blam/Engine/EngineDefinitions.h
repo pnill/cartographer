@@ -11,4 +11,3 @@
 #include "Objects\Objects.h"
 #include "Objects\ObjectPlacementData.h"
 #include "Actor\Actor.h"
-#include "Tags\TagInstance.h"

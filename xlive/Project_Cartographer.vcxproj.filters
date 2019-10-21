@@ -274,6 +274,9 @@
     <Filter Include="Source Files\H2MOD\Modules\Networking\NetworkPlayers">
       <UniqueIdentifier>{b20d1df9-2a20-4083-bf79-2da89d1cd15a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\3rdparty\tinyxml">
+      <UniqueIdentifier>{4a1d5690-b59a-45da-b355-656a31ecac34}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -498,23 +501,8 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Blam\Cache\Tags\scnr.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Blam\Cache\Tags\tag_base.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MetaLoader\meta_struct.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MetaLoader\tag_loader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MetaLoader\cache_loader.cpp">
-      <Filter>Source Files\H2MOD\Modules\MetaLoader</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Tags\global_tags_interface.cpp">
       <Filter>Source Files\H2MOD\Modules\TagInterface</Filter>
@@ -539,6 +527,21 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Networking\NetworkPlayers\NetworkPlayers.cpp">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkPlayers</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp">
+      <Filter>Source Files\3rdparty\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Tags\MetaLoader\cache_loader.cpp">
+      <Filter>Source Files\H2MOD\Modules\MetaLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Tags\MetaLoader\tag_loader.cpp">
+      <Filter>Source Files\H2MOD\Modules\MetaLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="Blam\Cache\Tags\tag_base.cpp">
+      <Filter>Source Files\H2MOD\Modules\MetaLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp">
+      <Filter>Source Files\H2MOD\Modules\MetaLoader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -805,9 +808,6 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\VariantPlayer.h">
       <Filter>Source Files\H2MOD\Variants</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Tags\TagInstance.h">
-      <Filter>Source Files\Blam\Engine\Tags</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Enums\Tags\TagGroups.h">
       <Filter>Source Files\Blam\Enums\Tags</Filter>
@@ -1145,15 +1145,6 @@
     <ClInclude Include="H2MOD\Tags\global_tags_interface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MetaLoader\tag_loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MetaLoader\cache_loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MetaLoader\meta_struct.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups\shad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1228,6 +1219,15 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\Networking\NetworkPlayers\NetworkPlayers.h">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkPlayers</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

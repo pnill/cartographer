@@ -1,4 +1,4 @@
-///
+﻿///
 //Tag loader made by Himanshu01
 //version -1.1 
 ///
@@ -15,24 +15,15 @@
 ///
 #pragma once
 
-#define _MAX_TAG_TABLE_SIZE_ 0xFFFF0
-#define _INJECTED_TAG_START_ 0x3BA4
-#define _MAX_ADDITIONAL_TAG_SIZE_  0x1400000//20 MB
+#include "stdafx.h"
+#include "meta_struct.h"
+#include "cache_loader.h"
+#include "H2MOD/Tags/TagInterface.h"
 
-#include"..\stdafx.h"
-#include"meta_struct.h"
-#include"cache_loader.h"
-#include<fstream>
-#include<vector>
-#include<algorithm>
-#include<list>
+constexpr int _INJECTED_TAG_START_ = 0x3BA4;
+constexpr int _MAX_ADDITIONAL_TAG_SIZE_ = 0x1400000; //20 MB
+constexpr int _MAX_TAG_TABLE_SIZE_ = 65535;
 
-using std::vector;
-using std::list;
-using std::ifstream;
-using std::ofstream;
-using std::ios;
-using std::reverse;
 using meta_struct::meta;
 using meta_struct::plugins_field;
 using meta_struct::injectRefs;
@@ -42,21 +33,21 @@ using meta_struct::injectRefs;
 namespace tag_loader
 {
 	//returns reference to plugin of specified type
-	shared_ptr<plugins_field> Get_plugin(string type);
+	std::shared_ptr<plugins_field> Get_plugin(std::string type);
 	//returns whether the map is a shared map or not
-	bool Check_shared(ifstream* fin);
+	bool Check_shared(std::ifstream* fin);
 	//Loads a tag from specified map in accordance with the datum index supplied
-	void Load_tag(int datum_index, bool recursive, string map, bool custom = false);
+	void Load_tag(int datum_index, bool recursive, std::string map, bool custom = false);
 	//Return the size of the meta that is currently in the que
 	unsigned int Que_meta_size();
 	//Return the size of the meta that has been injected or would be injected upon map load
 	//unsigned int meta_size();
 	//Generates a SID ref table
-	int Generate_SID(int table_index, int set, string STRING);
+	int Generate_SID(int table_index, int set, std::string STRING);
 	//Returns a list of strings along with their stringIDs
-	list<meta_struct::StringID_info> Get_SID_list(string map_loc);
+	std::list<meta_struct::StringID_info> Get_SID_list(std::string map_loc);
 	//sets various directories required for working of tag stuff
-	void Set_directories(string default_maps, string custom_maps, string custom_tags, string plugin_loc);
+	void Set_directories(std::string default_maps, std::string custom_maps, std::string custom_tags, std::string plugin_loc);
 	//Updates datum_indexes and rebases tags before inserting into memory
 	//pushes the tag_data in que to the tag_tables and tag_memory in the custom_tags allocated space
 	void Push_Back();
@@ -68,24 +59,24 @@ namespace tag_loader
 	//Dumps meta data in que in the specified tag folder(integrity checking)
 	void Dump_Que_meta();
 	//return and clears all the error messages incurred
-	string Pop_messages();
+	std::string Pop_messages();
 	//return a tag_name list
-	string Pop_tag_list();
+	std::string Pop_tag_list();
 	//Generates a StringId List combining all the default maps
 	//void Dump_StringID_list();
 	//Generates a StringId List for a specific map and adds it to the list
 	//void Dump_StringID_list(string map_loc);
 	//function to load RAW_DATA of the concerned tag from meta_list
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
-	void Load_RAW_refs(int datum_index, string map_loc);
+	void Load_RAW_refs(DatumIndex datum_index, std::string map_loc);
 	//Fixes the reference of the tags to their global objects(vftables)
-	void Fix_global_objects_ref(int datum_index);
+	void Fix_global_objects_ref(DatumIndex datum_index);
 	//Loads a file containing a a bunch of tags concerned with some specific element injecting the first tag onto the target datum
 	//modules cand be target onto a specific tag,they have to be loaded into free tag mem pool
 	//return the target_index of the first tag in the memory
-	int Load_tag_module(string loc);
+	int Load_tag_module(std::string loc);
 	//loades and execute instructions in the query file
-	void Parse_query_file(string loc);
+	void Parse_query_file(std::string loc);
 	//Adds reference of all the tags present in shared map into the tag_table
 	void Add_all_shared_refs();
 	//verifies and adds the Datum to  sync_tags list for the module loading
@@ -106,9 +97,9 @@ namespace tag_loader
 		//remove comments ,simplify assignment and others
 		std::vector<std::string> clean_string(std::string);
 		//_mov parser
-		void _mov_parser(string dest, string src);
+		void _mov_parser(std::string dest, std::string src);
 		//void replace_tag
-		void replace_tag(string dest, string src);
+		void replace_tag(std::string dest, std::string src);
 		//check for keywords and standard functions and returns appropriately
 		int keyword_check(std::string);
 	public:
@@ -117,7 +108,7 @@ namespace tag_loader
 		//complete file location
 		query_parser(std::string file_loc);
 		//return all logs
-		string _getlogs();
+		std::string _getlogs();
 	};
 }
 void Initialise_tag_loader();

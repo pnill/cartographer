@@ -280,9 +280,9 @@
     <ClCompile Include="H2MOD\Tags\global_tags_interface.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
     <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp" />
-    <ClCompile Include="MetaLoader\cache_loader.cpp" />
-    <ClCompile Include="MetaLoader\meta_struct.cpp" />
-    <ClCompile Include="MetaLoader\tag_loader.cpp" />
+    <ClCompile Include="H2MOD\Tags\MetaLoader\cache_loader.cpp" />
+    <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp" />
+    <ClCompile Include="H2MOD\Tags\MetaLoader\tag_loader.cpp" />
     <ClCompile Include="H2MOD\Modules\ServerConsole\ServerConsole.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -468,9 +468,9 @@
     <ClInclude Include="H2MOD\Tags\global_tags_interface.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h" />
-    <ClInclude Include="MetaLoader\cache_loader.h" />
-    <ClInclude Include="MetaLoader\meta_struct.h" />
-    <ClInclude Include="MetaLoader\tag_loader.h" />
+    <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h" />
+    <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
+    <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
     <ClInclude Include="Blam\BlamLibrary.h" />
@@ -501,7 +501,6 @@
     <ClInclude Include="Blam\Engine\Objects\Objects.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
     <ClInclude Include="Blam\Engine\Players\Players.h" />
-    <ClInclude Include="Blam\Engine\Tags\TagInstance.h" />
     <ClInclude Include="Blam\Enums\Enums.h" />
     <ClInclude Include="Blam\Enums\Game\GameEngine.h" />
     <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h" />

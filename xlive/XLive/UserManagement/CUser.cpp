@@ -164,13 +164,13 @@ void CUserManagement::UpdateConnectionStatus() {
 	extern char* ServerStatus;
 	if (this->LocalUserLoggedIn()) {
 		MasterState = 10;
-		if (!H2IsDediServer)
+		if (!h2mod->Server)
 			snprintf(ServerStatus, 250, "Status: Online");
 	}
 	else
 	{
 		MasterState = 2;
-		if (!H2IsDediServer)
+		if (!h2mod->Server)
 			snprintf(ServerStatus, 250, "Status: Offline");
 	}
 }
@@ -217,11 +217,11 @@ wchar_t ServerLobbyName[32] = { L"Cartographer" };
 void SetUserUsername(char* username) {
 	SecureZeroMemory(g_szUserName[0], 16);
 	snprintf(g_szUserName[0], 16, username);
-	if (!H2IsDediServer) {
+	if (!h2mod->Server) {
 
-		snprintf((char*)((BYTE*)H2BaseAddr + 0x971316), 16, username);
-		swprintf((wchar_t*)((BYTE*)H2BaseAddr + 0x96DA94), 16, L"%hs", username);
-		swprintf((wchar_t*)((BYTE*)H2BaseAddr + 0x51A638), 16, L"%hs", username);
+		snprintf(h2mod->GetAddress<char*>(0x971316), 16, username);
+		swprintf(h2mod->GetAddress<wchar_t*>(0x96DA94), 16, L"%hs", username);
+		swprintf(h2mod->GetAddress < wchar_t*>(0x51A638), 16, L"%hs", username);
 		swprintf(ServerLobbyName, 16, L"%hs", username);
 	}
 }

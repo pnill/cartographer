@@ -73,7 +73,7 @@ namespace tags
 	struct tag_instance
 	{
 		blam_tag type;
-		DatumIndex tag;
+		DatumIndex datum_index;
 		size_t data_offset;
 		size_t size;
 	};
@@ -168,7 +168,7 @@ namespace tags
 			return DatumIndex::Null;
 		}
 		auto instance = get_tag_instances()[idx];
-		DatumIndex tag_datum = instance.tag;
+		DatumIndex tag_datum = instance.datum_index;
 		LOG_CHECK(tag_datum.Index == idx); // should always be true
 		return tag_datum;
 	}
@@ -230,7 +230,7 @@ namespace tags
 
 		if (tag.IsNull())
 		{
-			LOG_ERROR_FUNC("Bad tag datum - null datum", tag.Index, header->tag_count);
+			LOG_ERROR_FUNC("Bad tag datum - null datum: {}, tag count: {}", tag.Index, header->tag_count);
 			return nullptr;
 		}
 
@@ -271,11 +271,11 @@ namespace tags
 			while (current_index < get_tag_count())
 			{
 				auto tag_instance = &get_tag_instances()[current_index++];
-				if (tag_instance && !tag_instance->type.is_none() && !tag_instance->tag.IsNull())
+				if (tag_instance && !tag_instance->type.is_none() && !tag_instance->datum_index.IsNull())
 				{
 					if (type.is_none() || is_tag_or_parent_tag(tag_instance->type, type))
 					{
-						datum = tag_instance->tag;
+						datum = tag_instance->datum_index;
 						return datum;
 					}
 				}

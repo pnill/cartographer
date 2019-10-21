@@ -5,7 +5,7 @@ namespace meta_struct
 	///
 	//<--------------------------------plugins_field members definition------------------------------------------------>
 	///
-	plugins_field::plugins_field(string name, int off, int entry_size)
+	plugins_field::plugins_field(std::string name, int off, int entry_size)
 	{
 		//initialse some stuff
 		this->name = name;
@@ -20,105 +20,96 @@ namespace meta_struct
 	{
 		return this->entry_size;
 	}
-	string plugins_field::Get_name()
+	std::string plugins_field::Get_name()
 	{
 		return this->name;
 	}
-	void plugins_field::Add_tag_ref(int off, string name)
+	void plugins_field::Add_tag_ref(int off, std::string name)
 	{
 		Tag_refs.try_emplace(off, name);
 	}
-	void plugins_field::Add_data_ref(int off, string name)
+	void plugins_field::Add_data_ref(int off, std::string name)
 	{
 		Data_refs.try_emplace(off, name);
 	}
-	void plugins_field::Add_BLOCK(shared_ptr<plugins_field> field)
+	void plugins_field::Add_BLOCK(std::shared_ptr<plugins_field> field)
 	{
 		reflexive.push_back(field);
 	}
-	void plugins_field::Add_stringid_ref(int off, string name)
+	void plugins_field::Add_stringid_ref(int off, std::string name)
 	{
 		stringID.try_emplace(off, name);
 	}
-	void plugins_field::Add_WCtag_ref(int off, string name)
+	void plugins_field::Add_WCtag_ref(int off, std::string name)
 	{
 		WCTag_refs.try_emplace(off, name);
 	}
-	list<int> plugins_field::Get_tag_ref_list()
+	std::list<int> plugins_field::Get_tag_ref_list()
 	{
-		list<int> ret;
-		map<int, string>::const_iterator i = Tag_refs.cbegin();
-
-		while (i != Tag_refs.cend())
+		std::list<int> ret;
+		for (auto& i : Tag_refs)
 		{
-			ret.push_back(i->first);
-			i++;
+			ret.push_back(i.first);
 		}
 		return ret;
 	}
-	list<int> plugins_field::Get_data_ref_list()
+	std::list<int> plugins_field::Get_data_ref_list()
 	{
-		list<int> ret;		
-		map<int, string>::const_iterator i=Data_refs.cbegin();
+		std::list<int> ret;
 
-		while (i != Data_refs.cend())
+		for (auto& i : Data_refs)
 		{
-			ret.push_back(i->first);
-			i++;
+			ret.push_back(i.first);
 		}
 		return ret;
 	}
-	list<int> plugins_field::Get_stringID_ref_list()
+	std::list<int> plugins_field::Get_stringID_ref_list()
 	{
-		list<int> ret;
-		map<int, string>::const_iterator i = stringID.cbegin();
+		std::list<int> ret;
 
-		while (i != stringID.cend())
+		for (auto& i : stringID)
 		{
-			ret.push_back(i->first);
-			i++;
+			ret.push_back(i.first);
 		}
 		return ret;
 	}
-	list<int> plugins_field::Get_WCtag_ref_list()
+	std::list<int> plugins_field::Get_WCtag_ref_list()
 	{
-		list<int> ret;
-		map<int, string>::const_iterator i = WCTag_refs.cbegin();
+		std::list<int> ret;
 
-		while (i != WCTag_refs.cend())
+		for (auto& i : WCTag_refs)
 		{
-			ret.push_back(i->first);
-			i++;
+			ret.push_back(i.first);
 		}
 		return ret;
 	}
-	list<shared_ptr<plugins_field>> plugins_field::Get_reflexive_list()
+	std::list<std::shared_ptr<plugins_field>> plugins_field::Get_reflexive_list()
 	{
 		return reflexive;
 	}
 	///
 	//<-------------------------Tag_Structure retrieving functions from xml plugin------------------------------------------>
 	///
-	shared_ptr<plugins_field> Get_Tag_stucture_from_plugin(string file_loc)
+	std::shared_ptr<plugins_field> Get_Tag_stucture_from_plugin(std::string file_loc)
 	{
 		tinyxml2::XMLDocument xmlDoc;
 		tinyxml2::XMLError error = xmlDoc.LoadFile(file_loc.c_str());
 
 		if (error == tinyxml2::XML_ERROR_FILE_NOT_FOUND)
 		{
-			string exception_text = "Couldnt find file :" + file_loc;
-			throw new exception(exception_text.c_str());
+			std::string exception_text = "Couldnt find file :" + file_loc;
+			throw new std::exception(exception_text.c_str());
 		}
 		tinyxml2::XMLElement* root_element = xmlDoc.RootElement();
 
 		int base_size = std::stoul(root_element->Attribute("baseSize"), nullptr, 16);
 
-		shared_ptr<plugins_field> ret = make_shared<plugins_field>(Get_file(file_loc), 0x0, base_size);
+		std::shared_ptr<plugins_field> ret = std::make_shared<plugins_field>(Get_file(file_loc), 0x0, base_size);
 
 		tinyxml2::XMLElement* child_element = root_element->FirstChildElement();
 		while (child_element)
 		{
-			string element_name = child_element->Name();
+			std::string element_name = child_element->Name();
 
 			if (element_name == "reflexive")
 			{
@@ -147,18 +138,18 @@ namespace meta_struct
 		}
 		return ret;
 	}
-	shared_ptr<plugins_field> Get_meta_BLOCK(tinyxml2::XMLElement* element)
+	std::shared_ptr<plugins_field> Get_meta_BLOCK(tinyxml2::XMLElement* element)
 	{
 		int offset = std::stoul(element->Attribute("offset"), nullptr, 16);
 		int entry_size = std::stoul(element->Attribute("entrySize"), nullptr, 16);
 
-		shared_ptr<plugins_field> ret = make_shared<plugins_field>(element->Attribute("name"), offset, entry_size);
+		std::shared_ptr<plugins_field> ret = std::make_shared<plugins_field>(element->Attribute("name"), offset, entry_size);
 
 		//iterate through all the child elements
 		tinyxml2::XMLElement* child_element = element->FirstChildElement();
 		while (child_element)
 		{
-			string element_name = child_element->Name();
+			std::string element_name = child_element->Name();
 
 			if (element_name == "reflexive")
 			{
@@ -166,7 +157,7 @@ namespace meta_struct
 			}
 			else if ((element_name == "tagRef") || (element_name == "tagref"))
 			{
-				string name = child_element->Attribute("name");
+				std::string name = child_element->Attribute("name");
 
 				int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
 
@@ -177,14 +168,14 @@ namespace meta_struct
 			}
 			else if ((element_name == "stringId") || (element_name == "stringid"))
 			{
-				string name = child_element->Attribute("name");
+				std::string name = child_element->Attribute("name");
 
 				int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
 				ret->Add_stringid_ref(off, name);
 			}
 			else if (element_name == "dataref")
 			{
-				string name = child_element->Attribute("name");
+				std::string name = child_element->Attribute("name");
 
 				int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
 				ret->Add_data_ref(off, name);
@@ -198,7 +189,7 @@ namespace meta_struct
 	///
 	//constructor for in memory loading and rebasing
 	//houses both meta and extended meta types
-	meta::meta(char* meta, int size, int mem_off, shared_ptr<plugins_field> plugin , ifstream* map_stream , int map_off ,__int8 count,  int datum_index , string loc , string type)
+	meta::meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin , std::ifstream* map_stream , int map_off ,__int8 count,  int datum_index , std::string loc , std::string type)
 	{
 		this->data = meta;
 		this->size = size;
@@ -220,8 +211,8 @@ namespace meta_struct
 			this->entry_size = size / count;
 		else
 		{
-			string exp = "count cannot be zero";
-			throw new exception(exp.c_str());
+			std::string exp = "count cannot be zero";
+			throw new std::exception(exp.c_str());
 		}
 
 		this->count = count;
@@ -233,7 +224,7 @@ namespace meta_struct
 	}
 	//a constructor to utilise tag loaded into memory and to modify them
 	//currently for rebasing and reassigning datum indices
-	meta::meta(char* meta, int size, int mem_off, shared_ptr<plugins_field> plugin,int count,int datum_index)
+	meta::meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin, int count, int datum_index)
 	{
 		this->data = meta;
 		this->size = size;
@@ -254,8 +245,8 @@ namespace meta_struct
 			this->entry_size = size / count;
 		else
 		{
-			string exp = "count cannot be zero";
-			throw new exception(exp.c_str());
+			std::string exp = "count cannot be zero";
+			throw new std::exception(exp.c_str());
 		}
 
 		this->count = count;
@@ -266,9 +257,9 @@ namespace meta_struct
 
 	}
 	//function that lists various dependencies of the meta
-	void meta::List_deps(int off, shared_ptr<plugins_field> fields)
+	void meta::List_deps(int off, std::shared_ptr<plugins_field> fields)
 	{
-		list<int> temp = fields->Get_tag_ref_list();
+		std::list<int> temp = fields->Get_tag_ref_list();
 
 		//first we look for tag_refs and add them
 		for (int& i : temp)
@@ -324,7 +315,7 @@ namespace meta_struct
 								map_stream->seekg(map_off + (field_memaddr - mem_off));
 								map_stream->read(ext_data, length);
 
-								shared_ptr<meta> temp_extend = make_shared<meta>(ext_data, length, field_memaddr, nullptr);
+								std::shared_ptr<meta> temp_extend = std::make_shared<meta>(ext_data, length, field_memaddr, nullptr);
 								list_extended.emplace(field_memaddr, temp_extend);
 							}
 							//we dont need to look into them as extended meta does it for us
@@ -334,8 +325,8 @@ namespace meta_struct
 					{
 						//the program will only reach here when u try to use an extended meta on meta file.
 						//any meta which i extract from a map file have all issues of extended_meta fixed.
-						string exp = "Meta file 0x" + to_hex_string(datum_index) + "." + type + " is broken.\nEither debug the extraction proceedure or fix the meta file";
-						throw new exception(exp.c_str());
+						std::string exp = "Meta file 0x" + to_hex_string(datum_index) + "." + type + " is broken.\nEither debug the extraction proceedure or fix the meta file";
+						throw new std::exception(exp.c_str());
 					}
 				}
 
@@ -354,8 +345,8 @@ namespace meta_struct
 			}
 		}
 		//now we look into reflexive fields and extended meta and add them accordingly
-		list<shared_ptr<plugins_field>> Ptemp = fields->Get_reflexive_list();
-		for (shared_ptr<plugins_field>& i_Pfield : Ptemp)
+		std::list<std::shared_ptr<plugins_field>> Ptemp = fields->Get_reflexive_list();
+		for (auto& i_Pfield : Ptemp)
 		{
 			int Toff = off + i_Pfield->Get_offset();//field table off contains count
 
@@ -397,7 +388,7 @@ namespace meta_struct
 							if (list_extended.find(field_memaddr) == list_extended.end())
 							{
 								//for extended meta we have to read the map file and supply it to the meta object
-								int length = entry_size*count;
+								int length = entry_size * count;
 
 								char* ext_data = new char[length];
 								int extended_meta_map_off = map_off + (field_memaddr - mem_off);
@@ -405,7 +396,7 @@ namespace meta_struct
 								map_stream->seekg(extended_meta_map_off);
 								map_stream->read(ext_data, length);
 
-								shared_ptr<meta> temp_extend = make_shared<meta>(ext_data, length, field_memaddr, i_Pfield, map_stream, extended_meta_map_off, count);
+								std::shared_ptr<meta> temp_extend = std::make_shared<meta>(ext_data, length, field_memaddr, i_Pfield, map_stream, extended_meta_map_off, count);
 								list_extended.emplace(field_memaddr, temp_extend);
 							}
 							//we dont need to look into them as extended meta does it for us
@@ -415,8 +406,8 @@ namespace meta_struct
 					{
 						//the program will only reach here when u try to use an extended meta on meta file.
 						//any meta which i extract from a map file have all issues of extended_meta fixed.
-						string exp = "Meta file 0x" + to_hex_string(datum_index) + "." + type + " is broken.\nEither debug the extraction proceedure or fix the meta file";
-						throw new exception(exp.c_str());
+						std::string exp = "Meta file 0x" + to_hex_string(datum_index) + "." + type + " is broken.\nEither debug the extraction proceedure or fix the meta file";
+						throw new std::exception(exp.c_str());
 					}
 
 				}
@@ -463,36 +454,33 @@ namespace meta_struct
 			//well extende meta are gonna follow meta one by one
 			int extended_new_base = new_base + size;
 
-			list<int> key_mems;
+			std::list<int> key_mems;
 			//map to list conversion
-			map<int, shared_ptr<meta>>::const_iterator i = list_extended.cbegin();
-			while (i != list_extended.cend())
+			for (auto& i : list_extended)
 			{
-				key_mems.push_back(i->first);
-				i++;
+				key_mems.push_back(i.first);
 			}
+
 			//Rebase extended meta
 			for(int& temp_key : key_mems)
 			{
-				shared_ptr<meta> temp_meta = list_extended[temp_key];
+				std::shared_ptr<meta> temp_meta = list_extended[temp_key];
 				temp_meta->Rebase_meta(extended_new_base);
 
 				extended_new_base += temp_meta->Get_Total_size();
 			}
+
 			//now lets update the offsets with the newer values
-			list<int> extend_off;
-			map<int, int>::const_iterator j = ref_extended.cbegin();
-			//i dont know why i cant implement it using the same previous logic			
-			while(j!=ref_extended.cend())
+			std::list<int> extend_off;
+			for (auto& i : ref_extended)
 			{
-				extend_off.push_back(j->first);
-				j++;
+				extend_off.push_back(i.first);
 			}
 
-			for(int& temp_off : extend_off)
+			for (auto& temp_off : extend_off)
 			{
 				int extend_mem_addr = ref_extended[temp_off];
-				shared_ptr<meta> temp_ext = list_extended[extend_mem_addr];
+				std::shared_ptr<meta> temp_ext = list_extended[extend_mem_addr];
 
 				int new_mem_addr = temp_ext->Get_mem_addr();
 
@@ -512,17 +500,15 @@ namespace meta_struct
 		{
 			//lets add the extended meta sizes
 
-			list<int> key_mems;
-			map<int, shared_ptr<meta>>::const_iterator i = list_extended.cbegin();
-			while (i != list_extended.cend())
+			std::list<int> key_mems;
+			for (auto& i : list_extended)
 			{
-				key_mems.push_back(i->first);
-				i++;
+				key_mems.push_back(i.first);
 			}
 
 			for (int& temp_key : key_mems)
 			{
-				shared_ptr<meta> temp_meta = list_extended[temp_key];
+				std::shared_ptr<meta> temp_meta = list_extended[temp_key];
 				Tsize += temp_meta->Get_Total_size();
 			}
 		}
@@ -548,17 +534,15 @@ namespace meta_struct
 		{
 			//now we go for extended meta
 
-			list<int> extend_keys;
-			map<int, shared_ptr<meta>>::const_iterator i = list_extended.cbegin();
-			while (i != list_extended.cend())
+			std::list<int> extend_keys;
+			for (auto& i : list_extended)
 			{
-				extend_keys.push_back(i->first);
-				i++;
+				extend_keys.push_back(i.first);
 			}
 			//here we go
 			for (int& temp_key : extend_keys)
 			{
-				shared_ptr<meta> temp_meta = list_extended[temp_key];
+				std::shared_ptr<meta> temp_meta = list_extended[temp_key];
 				int start_off = temp_meta->Get_mem_addr() - mem_off;
 
 				char* temp_data = temp_meta->Generate_meta_file();
@@ -574,9 +558,9 @@ namespace meta_struct
 	///
 	//return a list all tagRefs mentioned in the meta and the extended meta
 	///
-	list<int> meta::Get_all_tag_refs()
+	std::list<int> meta::Get_all_tag_refs()
 	{
-		list<int> ret;
+		std::list<int> ret;
 
 		//first i add all my the tagRefs in the concerned meta
 		for(int& temp_off : ref_tags)
@@ -592,18 +576,16 @@ namespace meta_struct
 		if (map_stream != nullptr)
 		{
 			//then we add the extended_meta dependencies
-			list<int> key_list;
-			map<int, shared_ptr<meta>>::const_iterator i = list_extended.cbegin();
-			while (i != list_extended.cend())
+			std::list<int> key_list;
+			for (auto& i : list_extended)
 			{
-				key_list.push_back(i->first);
-				i++;
+				key_list.push_back(i.first);
 			}
 
 			for(int& temp_key : key_list)
 			{
-				shared_ptr<meta> temp_meta = list_extended[temp_key];
-				list<int> temp_tagref = temp_meta->Get_all_tag_refs();
+				std::shared_ptr<meta> temp_meta = list_extended[temp_key];
+				std::list<int> temp_tagref = temp_meta->Get_all_tag_refs();
 
 				ret.insert(ret.cend(), temp_tagref.begin(), temp_tagref.end());
 
@@ -625,9 +607,9 @@ namespace meta_struct
 	// a function that updates the datum indexes acoording to the list supplied
 	/// <returns>return a log about different encounters</returns>
 	//
-	string meta::Update_datum_indexes(list<injectRefs> tag_list)
+	std::string meta::Update_datum_indexes(std::list<injectRefs> tag_list)
 	{
-		string log = "\nUPDATE DATUM : " + to_hex_string(datum_index);
+		std::string log = "\nUPDATE DATUM : " + to_hex_string(datum_index);
 
 		//we loop through each offset
 
@@ -698,9 +680,9 @@ namespace meta_struct
 	// A function that updates the StringIDS of the tag to match with the newer map
 	// <returns>return info on various encounters</returns>
 	///
-	string meta::Update_StringID(list<StringIDRef> SID_list)
+	std::string meta::Update_StringID(std::list<StringIDRef> SID_list)
 	{
-		string log = "\nUPDATE StringID : " + to_hex_string(datum_index);
+		std::string log = "\nUPDATE StringID : " + to_hex_string(datum_index);
 
 		for(int& temp_off : ref_stringID)
 		{
@@ -744,7 +726,7 @@ namespace meta_struct
 			*(int*)(data + temp_off) = 0x0;//DATA_READ.WriteINT_LE(new_SID, temp_off, data);
 		}
 	}
-	string meta::Get_type()
+	std::string meta::Get_type()
 	{
 		return type;
 	}
@@ -753,31 +735,31 @@ namespace meta_struct
 		if (!NO_DELETE)
 			delete[] data;
 	}
-	string meta::Get_map_loc()
+	std::string meta::Get_map_loc()
 	{
 		return map_loc;
 	}
 	///
 	//<---------------------------some usefull STRING functions------------------------------------------------->
 	///
-	string to_hex_string(int a)
+	std::string to_hex_string(int a)
 	{
 		char temp[15];
 
 		sprintf(temp, "%X", a);
 
-		string ret = temp;		
+		std::string ret = temp;
 		return ret;
 	}
-	string Get_file(string file_loc)
+	std::string Get_file(std::string file_loc)
 	{
 		return file_loc.substr(file_loc.find_last_of('\\') + 1, file_loc.find_last_of('.') - file_loc.find_last_of('\\') - 1);
 	}
-	string Get_file_directory(string file_loc)
+	std::string Get_file_directory(std::string file_loc)
 	{
 		return file_loc.substr(0x0, file_loc.find_last_of('\\'));
 	}
-	string Get_file_type(string file)
+	std::string Get_file_type(std::string file)
 	{
 		return file.substr(file.find_last_of('.') + 1, file.length() - file.find_last_of('.') - 1);
 	}

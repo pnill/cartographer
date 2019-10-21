@@ -26,10 +26,9 @@
 #define run_async(expression) \
 	std::thread{ [=] { expression; } }.detach();
 
-using namespace Blam::EngineDefinitions::Tag;
+using namespace Blam::EngineDefinitions::Actors;
 using namespace Blam::EngineDefinitions::Players;
 using namespace Blam::EngineDefinitions::Objects;
-using namespace Blam::EngineDefinitions::Actors;
 
 extern s_datum_array* game_state_actors;
 extern s_datum_array* game_state_players;
@@ -42,11 +41,8 @@ extern MapManager* mapManager;
 extern AdvLobbySettings* advLobbySettings;
 extern bool displayXyz;
 extern volatile bool isLobby;
-extern bool overrideUnicodeMessage;
 extern ConsoleCommands* commands; 
 extern NetworkPlayers* networkPlayers;
-extern char* replacedNetworkNormalTextWidget;
-extern char* replacedNetworkNormalTextWidget2;
 
 extern std::map<DWORD, bool> achievementList;
 

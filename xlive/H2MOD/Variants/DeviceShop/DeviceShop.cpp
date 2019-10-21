@@ -9,8 +9,8 @@ extern void GivePlayerWeaponDatum(DatumIndex unit_datum, DatumIndex weapon_datum
 //TODO: Convert to TagGroup/Block
 float get_device_power_transition_time(DatumIndex device_datum)
 {
-	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29BC : 0x47CD54));
-	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50));
+	DWORD tag_data = (DWORD)tags::get_tag_data();
+	DWORD tag_instances = (DWORD)tags::get_tag_instances();
 	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
 
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
@@ -20,8 +20,8 @@ float get_device_power_transition_time(DatumIndex device_datum)
 	__int16 device_control_index = device_control_datum & 0xFFFF;
 	device_control_index = device_control_index << 4;
 
-	DWORD device_control_tag_offset = *(DWORD*)((BYTE*)device_control_index + global_tag_instances + 8);
-	float acceleration_scale = *(float*)((BYTE*)device_control_tag_offset + tag_header + 0xC0);
+	DWORD device_control_tag_offset = *(DWORD*)((BYTE*)device_control_index + tag_instances + 8);
+	float acceleration_scale = *(float*)((BYTE*)device_control_tag_offset + tag_data + 0xC0);
 
 	return acceleration_scale;
 
@@ -31,8 +31,8 @@ float get_device_power_transition_time(DatumIndex device_datum)
 //TODO: Convert to TagGroup/Block
 DatumIndex get_device_open_up_weapon_datum(DatumIndex device_datum)
 {
-	DWORD tag_header = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29BC : 0x47CD54));
-	DWORD global_tag_instances = *(DWORD*)((BYTE*)h2mod->GetBase() + (h2mod->Server ? 0x4A29B8 : 0x47CD50));
+	DWORD tag_data = (DWORD)tags::get_tag_data();;
+	DWORD global_tag_instances = (DWORD)tags::get_tag_instances();
 	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
 
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
@@ -42,7 +42,7 @@ DatumIndex get_device_open_up_weapon_datum(DatumIndex device_datum)
 	device_control_datum.Index = device_control_datum.Index << 4;
 
 	DWORD device_control_tag_offset = *(DWORD*)((BYTE*)device_control_datum.Index + global_tag_instances + 8);
-	DatumIndex weapon_datum = *(DatumIndex*)((BYTE*)device_control_tag_offset + tag_header + 0xE0);
+	DatumIndex weapon_datum = *(DatumIndex*)((BYTE*)device_control_tag_offset + tag_data + 0xE0);
 
 	return weapon_datum;
 }

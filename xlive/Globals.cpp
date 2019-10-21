@@ -5,16 +5,12 @@
 MapManager* mapManager = new MapManager();
 AdvLobbySettings* advLobbySettings = new AdvLobbySettings();
 
-global_tag_instance* tag_instances = nullptr;
 s_datum_array* game_state_actors = nullptr;
 s_datum_array* game_state_players = nullptr;
 s_datum_array* game_state_objects_header = nullptr;
 
 bool displayXyz = false;
 volatile bool isLobby = true;
-
-char* replacedNetworkNormalTextWidget;
-char* replacedNetworkNormalTextWidget2;
 
 ConsoleCommands* commands = new ConsoleCommands();
 

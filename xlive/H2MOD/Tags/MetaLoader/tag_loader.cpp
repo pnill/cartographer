@@ -1,12 +1,14 @@
-#include "..\stdafx.h"
+﻿#include "..\stdafx.h"
 #include "tag_loader.h"
-#include "..\Globals.h"
 #include "..\Util\filesys.h"
+
+#include "Globals.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "..\H2MOD\Tags\global_tags_interface.h"
+#include "H2MOD\Tags\global_tags_interface.h"
 #include "..\Blam\Cache\Tags\tag_definitons.h"
 
 using Blam::Enums::Tags::TagGroupTypes;
+
 //contains some game functions that returns HANDLE
 namespace global_handle_function
 {
@@ -18,96 +20,93 @@ namespace global_handle_function
 //certain functions which relate tags to their global object(such as Havok objects)(vftables perhaps)
 namespace global_objects_fix
 {
-	void __cdecl bipd_fix(unsigned __int16 datum_index)
+	void __cdecl bipd_fix(DatumIndex datum_index)
 	{
-		void(_cdecl*sub_EC23F)(unsigned __int16);
-		sub_EC23F = (void(_cdecl*)(unsigned __int16))h2mod->GetAddress(0x1389B0);
+		void(_cdecl*sub_EC23F)(DatumIndex);
+		sub_EC23F = (void(_cdecl*)(DatumIndex))h2mod->GetAddress(0x1389B0);
 		sub_EC23F(datum_index);
 	}
 
-	void __cdecl crea_fix(unsigned __int16 datum_index)
+	void __cdecl crea_fix(DatumIndex datum_index)
 	{
-		int(_cdecl*sub_EC23F)(unsigned __int16);
-		sub_EC23F = (int(_cdecl*)(unsigned __int16))h2mod->GetAddress(0x138985);
+		int(_cdecl*sub_EC23F)(DatumIndex);
+		sub_EC23F = (int(_cdecl*)(DatumIndex))h2mod->GetAddress(0x138985);
 		sub_EC23F(datum_index);
 	}
-	void __cdecl vehi_fix(unsigned __int16 datum_index)
+	void __cdecl vehi_fix(DatumIndex datum_index)
 	{
-		int(_cdecl*sub_EC23F)(unsigned __int16);
-		sub_EC23F = (int(_cdecl*)(unsigned __int16))h2mod->GetAddress(0x13895A);
+		int(_cdecl*sub_EC23F)(DatumIndex);
+		sub_EC23F = (int(_cdecl*)(DatumIndex))h2mod->GetAddress(0x13895A);
 		sub_EC23F(datum_index);
 	}
-	void __cdecl coll_fix(unsigned __int16 datum_index)
+	void __cdecl coll_fix(DatumIndex datum_index)
 	{
-		int(_cdecl*sub_EC23F)(unsigned __int16);
-		sub_EC23F = (int(_cdecl*)(unsigned __int16))h2mod->GetAddress(0x7BE5C);
+		int(_cdecl*sub_EC23F)(DatumIndex);
+		sub_EC23F = (int(_cdecl*)(DatumIndex))h2mod->GetAddress(0x7BE5C);
 		sub_EC23F(datum_index);
 	}
-	void __cdecl phmo_fix(unsigned __int16 datum_index)
+	void __cdecl phmo_fix(DatumIndex datum_index, bool unk)
 	{
-		int(_cdecl*sub_EC23F)(unsigned __int16, int);
-		sub_EC23F = (int(_cdecl*)(unsigned __int16, int))h2mod->GetAddress(0x7B844);
-		sub_EC23F(datum_index, 0);
+		int(_cdecl*sub_EC23F)(DatumIndex, bool);
+		sub_EC23F = (int(_cdecl*)(DatumIndex, bool))h2mod->GetAddress(0x7B844);
+		sub_EC23F(datum_index, unk);
 	}
 }
 //actual tag_loader namespace
 namespace tag_loader
 {
-	string def_maps_dir;
-	string cus_maps_dir;
-	string cus_tag_dir;
-	string plugins_dir;
-	string mods_dir;
+	std::string def_maps_dir;
+	std::string cus_maps_dir;
+	std::string cus_tag_dir;
+	std::string plugins_dir;
+	std::string mods_dir;
 
-	static map<string, shared_ptr<plugins_field>> plugins_list;//contains list of various plugin structures
-	map<int, shared_ptr<meta>> que_meta_list;//<datum_index,meta_junk>contains the list of tags that are currently in que to loaded in memory
-	vector<int> key_list;//another var just to keep the keys along with the correct order
+	static std::map<std::string, std::shared_ptr<plugins_field>> plugins_list;//contains list of various plugin structures
+	std::map<int, std::shared_ptr<meta>> que_meta_list;//<datum_index,meta_junk>contains the list of tags that are currently in que to loaded in memory
+	std::vector<int> key_list;//another var just to keep the keys along with the correct order
 	//map<int, shared_ptr<meta>> meta_list;//<datum_index,meta_junk>contains the the list of tags that are currently loaded in memory(never gonna use it anyway)
-	vector<string> error_list;//contains various messages generated during various processes,shouldnt had named it error list
-	vector<string> tag_list;//contains a list of tag_indices along with their names(currently implemented only for module loading)
+	std::vector<std::string> error_list;//contains various messages generated during various processes,shouldnt had named it error list
+	std::vector<std::string> tag_list;//contains a list of tag_indices along with their names(currently implemented only for module loading)
 
-	unsigned int def_meta_size = 0x0;//uninitialised
-	unsigned int ext_meta_size = 0x0;//uninitialised
+	unsigned int def_meta_size = 0;
+	unsigned int ext_meta_size = 0;
 	unsigned int new_datum_index = _INJECTED_TAG_START_;//first datum index
-	char* new_Tables;//new tables pointer
+	tags::tag_instance* new_Tables;//new tables pointer
 
-	string meta_list_target_map;//name of the map for which the meta list has been target(used for StringIDs)
-	string que_list_target_map;//name of the map from which the que list has been loaded(used for StringID retargeting)
-	vector<DWORD> sync_list;//container to store tag indices of sync-able Tags
+	std::string meta_list_target_map;//name of the map for which the meta list has been target(used for StringIDs)
+	std::string que_list_target_map;//name of the map from which the que list has been loaded(used for StringID retargeting)
+	std::vector<DWORD> sync_list;//container to store tag indices of sync-able Tags
 
-	shared_ptr<plugins_field> Get_plugin(string type)
+	std::shared_ptr<plugins_field> Get_plugin(std::string type)
 	{
-		map<string, shared_ptr<plugins_field>>::iterator i = plugins_list.begin();
-
 		//we first look into the already loaded plugin list
-		while (i != plugins_list.end())
+		for (auto& i : plugins_list)
 		{
-			if (i->first == type)
-				return i->second;
-			i++;
+			if (i.first == type)
+				return i.second;
 		}
 		//it doesnt contain it therfore we need to load the plugin
-		string plugin_loc = plugins_dir + '\\' + type + ".xml";
-		shared_ptr<plugins_field> temp_plugin = meta_struct::Get_Tag_stucture_from_plugin(plugin_loc);
+		std::string plugin_loc = plugins_dir + '\\' + type + ".xml";
+		std::shared_ptr<plugins_field> temp_plugin = meta_struct::Get_Tag_stucture_from_plugin(plugin_loc);
 
 		if (temp_plugin)		
 			plugins_list.emplace(type, temp_plugin);
 		else
 		{
-			string error = "Couldnt load plugin " + type + ".xml";
+			std::string error = "Couldnt load plugin " + type + ".xml";
 			error_list.push_back(error);
 		}
 
 		return temp_plugin;
 	}
 	//returns whether the map is a shared map or not
-	bool Check_shared(ifstream* fin)
+	bool Check_shared(std::ifstream* fin)
 	{
 		char* map_header= new char[0x800];
 		fin->seekg(0x0);
 		fin->read(map_header, 0x800);		
 
-		if (tags::get_cache_header()->type == tags::cache_header::scnr_type::MultiplayerShared|| tags::get_cache_header()->type == tags::cache_header::scnr_type::SinglePlayerShared)
+		if (tags::get_cache_header()->type == tags::cache_header::scnr_type::MultiplayerShared || tags::get_cache_header()->type == tags::cache_header::scnr_type::SinglePlayerShared)
 		{
 			delete[] map_header;
 			return true;
@@ -117,12 +116,12 @@ namespace tag_loader
 	}
 	//Loads a tag from specified map in accordance with the datum index supplied
 	///custom flag is no more needed
-	void Load_tag(int datum_index, bool recursive, string map, bool custom)
+	void Load_tag(int datum_index, bool recursive, std::string map, bool custom)
 	{
-		ifstream* fin;
+		std::ifstream* fin;
 
 		que_list_target_map = map;
-		string map_loc;
+		std::string map_loc;
 
 		//logic to check the existence of the map at subsequent directories
 		///mods->default->custom
@@ -149,15 +148,15 @@ namespace tag_loader
 			}
 		}
 
-		fin = new ifstream(map_loc.c_str(), ios::binary | ios::in);
+		fin = new std::ifstream(map_loc.c_str(), std::ios::binary | std::ios::in);
 
 		if (fin->is_open())
 		{
-			string temp_string = "Loading tag : " + meta_struct::to_hex_string(datum_index) + " from " + map;
+			std::string temp_string = "Loading tag : " + meta_struct::to_hex_string(datum_index) + " from " + map;
 			error_list.push_back(temp_string);
 
 			//some meta reading prologue
-			int table_off, table_size;
+			int table_off, table_size = 0;
 
 			fin->seekg(0x10);
 			fin->read((char*)&table_off, 4);
@@ -175,14 +174,10 @@ namespace tag_loader
 			fin->seekg(table_start + 0x8);
 			fin->read((char*)&scnr_memaddr, 4);
 
-
-			char type[5];
-			int Tdatum_index, mem_off, size;
-			type[4] = '\0';
-
+			tags::tag_instance tag_info;
 
 			//create a tag_list to load
-			list<int> load_tag_list;
+			std::list<int> load_tag_list;
 			load_tag_list.push_back(datum_index);
 
 			//----------------LOOPING STUFF
@@ -191,40 +186,36 @@ namespace tag_loader
 				if (*load_tag_list.cbegin() != -1 && *load_tag_list.cbegin() != 0)
 				{
 					//method to read tag type
-					fin->seekg(table_start + (0xFFFF & *(load_tag_list.cbegin())) * 0x10);
+					fin->seekg(table_start + (0xFFFF & *(load_tag_list.cbegin())) * sizeof(tags::tag_instance));
 
-					fin->read((char*)&type, 4);
-					reverse(&type[0], &type[4]);
-					fin->read((char*)&Tdatum_index, 4);
-					fin->read((char*)&mem_off, 4);
-					fin->read((char*)&size, 4);
-
-					if (*(load_tag_list.cbegin()) == Tdatum_index)
+					fin->read((char*)&tag_info, sizeof(tags::tag_instance));
+					
+					if (*(load_tag_list.cbegin()) == tag_info.datum_index.ToInt())
 					{
-						shared_ptr<plugins_field> temp_plugin = Get_plugin(type);
+						std::shared_ptr<plugins_field> temp_plugin = Get_plugin(tag_info.type.as_string());
 
 						//precaution for plugin load errors
 						if (!temp_plugin)
 							break;
 
 						//we first check the integrity of the datum_index
-						if (Tdatum_index == *(load_tag_list.cbegin()) && mem_off&&size && (que_meta_list.find(Tdatum_index) == que_meta_list.cend()))
+						if (tag_info.datum_index.ToInt() == *(load_tag_list.cbegin()) && tag_info.data_offset && tag_info.size > 0 && (que_meta_list.find(tag_info.datum_index.ToInt()) == que_meta_list.cend()))
 						{
 							//read the meta data from the map            
-							char* data = new char[size];
+							char* data = new char[tag_info.size];
 
 							int map_off;
 							if (!Check_shared(fin))
-								map_off = scnr_off + (mem_off - scnr_memaddr);
+								map_off = scnr_off + (tag_info.data_offset - scnr_memaddr);
 							else
-								map_off = scnr_off + (mem_off - 0x3c000);
+								map_off = scnr_off + (tag_info.data_offset - 0x3C000);
 							fin->seekg(map_off);
 							//0x3c000 is a hardcoded value in blam engine
 
-							fin->read(data, size);
+							fin->read(data, tag_info.size);
 
 							//create a meta object
-							shared_ptr<meta> temp_meta = make_shared<meta>(data, size, mem_off, temp_plugin, fin, map_off, 1, *(load_tag_list.cbegin()), map_loc, type);
+							std::shared_ptr<meta> temp_meta = std::make_shared<meta>(data, tag_info.size, tag_info.data_offset, temp_plugin, fin, map_off, 1, *(load_tag_list.cbegin()), map_loc, tag_info.type.as_string());
 							//temp_meta->Rebase_meta(0x0);
 							//found unnecessary
 
@@ -233,10 +224,10 @@ namespace tag_loader
 
 							if (recursive)
 							{
-								list<int> temp_tag_ref = temp_meta->Get_all_tag_refs();
+								std::list<int> temp_tag_ref = temp_meta->Get_all_tag_refs();
 
 								//to remove redundancies
-								list<int>::iterator ref_iter = temp_tag_ref.begin();
+								std::list<int>::iterator ref_iter = temp_tag_ref.begin();
 								while (ref_iter != temp_tag_ref.end())
 								{
 									if (que_meta_list.find(*ref_iter) != que_meta_list.end())
@@ -251,7 +242,7 @@ namespace tag_loader
 						else
 						{
 							//most of time this is caused due to shared stuff
-							string temp_error = "Invalid Datum index :0x" + meta_struct::to_hex_string(*(load_tag_list.cbegin()));
+							std::string temp_error = "Invalid Datum index :0x" + meta_struct::to_hex_string(*(load_tag_list.cbegin()));
 							error_list.push_back(temp_error);
 						}
 					}
@@ -264,7 +255,7 @@ namespace tag_loader
 		}
 		else
 		{
-			string temp_error;
+			std::string temp_error;
 			if (!custom)
 				temp_error = "Couldnt open default map " + map;
 			else
@@ -278,12 +269,10 @@ namespace tag_loader
 	unsigned int Que_meta_size()
 	{
 		unsigned int ret = 0;
-		map<int, shared_ptr<meta_struct::meta>>::iterator i = que_meta_list.begin();
 
-		while (i != que_meta_list.end())
+		for (auto& i : que_meta_list)
 		{
-			ret += i->second->Get_Total_size();
-			i++;
+			ret += i.second->Get_Total_size();
 		}
 
 		return ret;
@@ -306,7 +295,7 @@ namespace tag_loader
 	/// <param name="table_index"></param>
 	/// <param name="STRING"></param>
 	/// <returns></returns>
-	int Generate_SID(int table_index, int set, string STRING)
+	int Generate_SID(int table_index, int set, std::string STRING)
 	{
 		int l = (STRING.length() & 0xFF) << 24;
 		int s = (set & 0xFF) << 16;
@@ -317,12 +306,12 @@ namespace tag_loader
 	///
 	//Returns a list of strings along with their stringIDs
 	///
-	list<meta_struct::StringID_info> Get_SID_list(string map_loc)
+	std::list<meta_struct::StringID_info> Get_SID_list(std::string map_loc)
 	{
-		list<meta_struct::StringID_info> ret;
+		std::list<meta_struct::StringID_info> ret;
 
-		ifstream fin;
-		fin.open(map_loc.c_str(), ios::in | ios::binary);
+		std::ifstream fin;
+		fin.open(map_loc.c_str(), std::ios::in | std::ios::binary);
 
 		if (!fin.is_open())
 			return ret;
@@ -345,7 +334,7 @@ namespace tag_loader
 			fin.read((char*)&table_off, 4);
 			table_off = table_off & 0xFFFF;
 
-			string STRING = "";
+			std::string STRING = "";
 
 			fin.seekg(string_table_offset + table_off);
 			char ch;
@@ -372,7 +361,7 @@ namespace tag_loader
 		return ret;
 	}
 	//sets various directories required for working of tag stuff
-	void Set_directories(string default_maps, string custom_maps, string custom_tags, string plugin_loc)
+	void Set_directories(std::string default_maps, std::string custom_maps, std::string custom_tags, std::string plugin_loc)
 	{
 		def_maps_dir = default_maps;
 		cus_maps_dir = custom_maps;
@@ -388,7 +377,7 @@ namespace tag_loader
 			Push_Back(new_datum_index);
 		else
 		{
-			string error = "Coudnt inject,Max meta size reached";
+			std::string error = "Coudn't inject, Max meta size reached";
 			error_list.push_back(error);
 		}
 	}
@@ -399,10 +388,10 @@ namespace tag_loader
 		int mem_off = def_meta_size + ext_meta_size;
 
 		//build up inject refs
-		list<injectRefs> my_inject_refs;
+		std::list<injectRefs> my_inject_refs;
 
 		bool replaced = false;
-		for (int i = 0; i < key_list.size(); i++)
+		for (size_t i = 0; i < key_list.size(); i++)
 		{
 			injectRefs temp;
 			temp.old_datum = key_list[i];
@@ -423,50 +412,45 @@ namespace tag_loader
 			my_inject_refs.push_back(temp);
 
 		}
-		string temp = "Pushing back tag : " + meta_struct::to_hex_string(my_inject_refs.begin()->old_datum) + " to : " + meta_struct::to_hex_string(my_inject_refs.begin()->new_datum);
+		std::string temp = "Pushing back tag : " + meta_struct::to_hex_string(my_inject_refs.begin()->old_datum) + " to : " + meta_struct::to_hex_string(my_inject_refs.begin()->new_datum);
 		error_list.push_back(temp);
 
 		//StringID listing---IDC
 
 
 		//update the que list tags
-		for (int i=0;i<key_list.size();i++)
+		for (auto& i : key_list)
 		{
-			que_meta_list[key_list[i]]->Update_datum_indexes(my_inject_refs);
+			que_meta_list[i]->Update_datum_indexes(my_inject_refs);
 			//<stringID stuff>
 			//-------------IDC anymore----------------
 		}
 		//Add them to the tables
-		list<injectRefs>::iterator my_inject_refs_iter = my_inject_refs.begin();
-		while (my_inject_refs_iter != my_inject_refs.end())
+		for (auto& my_inject_refs_iter : my_inject_refs)
 		{		
 
 			if (def_meta_size)
 			{
-				int meta_size = que_meta_list[my_inject_refs_iter->old_datum]->Get_Total_size();
-				char tables_data[0x10];
-				DWORD MapMemBase = *h2mod->GetAddress<DWORD*>(0x47CD54);
+				int meta_size = que_meta_list[my_inject_refs_iter.old_datum]->Get_Total_size();
+				tags::tag_instance tables_data;
 
-				que_meta_list[my_inject_refs_iter->old_datum]->Rebase_meta(mem_off);
-				char* meta_data = que_meta_list[my_inject_refs_iter->old_datum]->Generate_meta_file();
+				que_meta_list[my_inject_refs_iter.old_datum]->Rebase_meta(mem_off);
+				char* meta_data = que_meta_list[my_inject_refs_iter.old_datum]->Generate_meta_file();
 
-				char type[5];
-				memcpy(type, que_meta_list[my_inject_refs_iter->old_datum]->Get_type().c_str(), 0x5);
-				reverse(&type[0], &type[4]);
-				memcpy(tables_data, type, 0x4);
+				blam_tag type = std::stoi(que_meta_list[my_inject_refs_iter.old_datum]->Get_type());
 
-				memcpy(tables_data + 0x4, &my_inject_refs_iter->new_datum, 0x4);
-				memcpy(tables_data + 0x8, &mem_off, 0x4);
-				memcpy(tables_data + 0xC, &meta_size, 0x4);
-				int temp_write_off = (DWORD)tag_loader::new_Tables + 0x10 * (my_inject_refs_iter->new_datum & 0xFFFF);
-				memcpy((char*)temp_write_off, tables_data, 0x10);//copy to the tables
+				tables_data.type = type;
+				tables_data.data_offset = mem_off;
+				tables_data.size = meta_size;
+				tags::tag_instance *temp_write_off = &tag_loader::new_Tables[my_inject_refs_iter.new_datum & 0xFFFF];
+				memcpy(temp_write_off, &tables_data, sizeof(tags::tag_instance));//copy to the tables
 
-				memcpy((char*)MapMemBase + mem_off, meta_data, meta_size);//copy to the tag memory
+				memcpy(tags::get_tag_data() + mem_off, meta_data, meta_size);//copy to the tag memory
 
 				//Load RAW
-				Load_RAW_refs(my_inject_refs_iter->new_datum, que_meta_list[my_inject_refs_iter->old_datum]->Get_map_loc());
+				Load_RAW_refs(my_inject_refs_iter.new_datum, que_meta_list[my_inject_refs_iter.old_datum]->Get_map_loc());
 				//fix the global_refs
-				Fix_global_objects_ref(my_inject_refs_iter->new_datum);
+				Fix_global_objects_ref(my_inject_refs_iter.new_datum);
 
 				delete[] meta_data;
 				mem_off += meta_size;
@@ -474,7 +458,6 @@ namespace tag_loader
 			}
 			else break;
 			//meta_list.emplace(my_inject_refs_iter->new_datum, que_iter->second);//add it to the meta _list				
-			my_inject_refs_iter++;
 		}
 		my_inject_refs.clear();
 		que_meta_list.clear();
@@ -496,7 +479,7 @@ namespace tag_loader
 				int meta_size = meta_list_iter->second->Get_Total_size();
 
 				char tables_data[0x10];
-				DWORD MapMemBase = *h2mod->GetAddress<DWORD*>(0x47CD54);
+				DWORD MapMemBase = (DWORD)tags::get_tag_data();
 				meta_list_iter->second->Rebase_meta(mem_off);
 				char* meta_data = meta_list_iter->second->Generate_meta_file();
 
@@ -541,36 +524,32 @@ namespace tag_loader
 	//Rebases to 0x0 and dumps meta data in que in the specified tag folder
 	void Dump_Que_meta()
 	{
-		ofstream fout;
+		std::ofstream fout;
 
-		map<int, shared_ptr<meta>>::const_iterator i = que_meta_list.cbegin();
-
-		while (i != que_meta_list.cend())
+		for (auto& i : que_meta_list)
 		{
-			string file_loc = cus_tag_dir + "\\que\\" + meta_struct::to_hex_string(i->first);
+			std::string file_loc = cus_tag_dir + "\\que\\" + meta_struct::to_hex_string(i.first);
 
-			i->second->Rebase_meta(0x0);
-			int size = i->second->Get_Total_size();
-			char* data = i->second->Generate_meta_file();
-			string type = i->second->Get_type();
+			i.second->Rebase_meta(0x0);
+			int size = i.second->Get_Total_size();
+			char* data = i.second->Generate_meta_file();
+			std::string type = i.second->Get_type();
 
 			file_loc += '.' + type;
-			fout.open(file_loc, ios::out | ios::binary);
+			fout.open(file_loc, std::ios::out | std::ios::binary);
 
 			fout.write(data, size);
 
-
 			delete[] data;
 			fout.close();
-			i++;
 		}
 
 	}
 	//return and clears all the error messages incurred
-	string Pop_messages()
+	std::string Pop_messages()
 	{
-		string ret;
-		while (error_list.size())
+		std::string ret;
+		while (!error_list.empty())
 		{
 			ret = error_list[error_list.size() - 1] + '\n' + ret;
 			error_list.pop_back();
@@ -578,10 +557,10 @@ namespace tag_loader
 		return ret;
 	}
 	//return and clears all the loaded tag list
-	string Pop_tag_list()
+	std::string Pop_tag_list()
 	{
-		string ret;
-		while (tag_list.size())
+		std::string ret;
+		while (!tag_list.empty())
 		{
 			ret = tag_list[tag_list.size() - 1] + '\n' + ret;
 			tag_list.pop_back();
@@ -624,13 +603,13 @@ namespace tag_loader
 	*/
 	//function to try and return a handle to the map (map_name or scenario_name(same as the actual map_name) supported)
 	//Checks inside mods//maps folder first then maps folder and finally inside custom maps folder
-	HANDLE try_find_map(string map)
+	HANDLE try_find_map(std::string map)
 	{
-		string map_loc = map;
+		std::string map_loc = map;
 		//checking for full path length
 		if (!PathFileExistsA(map_loc.c_str()))
 		{
-			if (map.find('\\') == string::npos)
+			if (map.find('\\') == std::string::npos)
 			{
 				//could be both map_name with or without extension
 				if (meta_struct::Get_file_type(map) == "map")
@@ -661,7 +640,7 @@ namespace tag_loader
 			{
 				//scenario name
 				//try retrieving map_name from scenario
-				string map_name = map_loc.substr(map_loc.rfind('\\') + 1);
+				std::string map_name = map_loc.substr(map_loc.rfind('\\') + 1);
 				map_loc = mods_dir + "\\maps\\" + map_name + ".map";
 				//only tries to load from <mods_dir>\\maps cause game can auto load from default locations
 				///i suggest naming map_names same as scenario names--saves the trouble
@@ -676,7 +655,7 @@ namespace tag_loader
 	}
 	//function to load RAW_DATA of the concerned tag from meta_list
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
-	void Load_RAW_refs(int datum_index, string map_loc)
+	void Load_RAW_refs(DatumIndex datum_index, std::string map_loc)
 	{
 		DWORD* PMapRawtableoffset = h2mod->GetAddress<DWORD*>(0x4AE8B0);
 		DWORD* PRawTableSize = h2mod->GetAddress<DWORD*>(0x4AE8B4);
@@ -688,23 +667,20 @@ namespace tag_loader
 		*PMapRawtableoffset = 0x0;
 		*PRawTableSize = 0x0;
 
-		DWORD SharedmapBase = *h2mod->GetAddress<DWORD*>(0x47CD54);
 		DWORD ETCOFFSET = *h2mod->GetAddress<DWORD*>(0x482290);
 		HANDLE old_file_handle = *h2mod->GetAddress<HANDLE*>(0x4AE8A8);
 
 		//char* ripped_map = (char*)(SharedmapBase + tag_scenario_off);
 
-		int type = *(int*)(new_Tables + (datum_index & 0xFFFF) * 0x10);
-		int Tdatum_index = *(int*)(0x10 * (datum_index & 0xFFFF) + new_Tables + 0x4);//just to verify
-		int tag_mem_addr = SharedmapBase + *(int*)(0x10 * (datum_index & 0xFFFF) + new_Tables + 0x8);
-		int tag_size = *(int*)(0x10 * (datum_index & 0xFFFF) + new_Tables + 0xC);
+		 tags::tag_instance* tag_info = &new_Tables[datum_index.ToAbsoluteIndex()];
+		 char* tag_data = tags::get_tag_data() + new_Tables[datum_index.ToAbsoluteIndex()].data_offset;
 
 		//fail safe
-		if (Tdatum_index != datum_index)
+		if (tag_info->datum_index.ToAbsoluteIndex() != datum_index.ToAbsoluteIndex())
 		{
-			string error = "Tag: " + datum_index;
+			std::string error = "Tag: " + datum_index.ToInt();
 			error += " not loaded into tag tables and tag memory";;
-			throw new exception(error.c_str());
+			throw new std::exception(error.c_str());
 		}
 
 		//supposing full length
@@ -716,25 +692,25 @@ namespace tag_loader
 		}
 		*h2mod->GetAddress<HANDLE*>(0x4AE8A8) = new_file_handle;
 
-		switch (type)
+		switch (tag_info->type.as_int())
 		{
 		case 'mode':
 
-			if (*(int*)(tag_mem_addr + 0x24) > 0)
+			if (*(int*)(tag_data + 0x24) > 0)
 			{
 				int v15 = 0;
 
 				int off = 0;
 				do
 				{
-					int sections_off = *(int*)(tag_mem_addr + 0x28);
+					int sections_off = *(int*)(tag_data + 0x28);
 					int sections_base = 0;
-					if (sections_off != 0xFFFFFFFF)
+					if (sections_off != -1)
 						sections_base = ETCOFFSET + sections_off;
 					((void(__cdecl *)(int, unsigned int))h2mod->GetAddress(0x2652BC))(sections_base + off + 0x38, 3u);
 					++v15;
 					off += 0x5C;
-				} while (v15 < *(int*)(tag_mem_addr + 0x24));
+				} while (v15 < *(int*)(tag_data + 0x24));
 			}
 			break;
 
@@ -743,13 +719,13 @@ namespace tag_loader
 
 			int old_list_field = *h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC);
 
-			for (int i = 0; i < *(int*)(tag_mem_addr + 0x44); i++)
+			for (int i = 0; i < *(int*)(tag_data + 0x44); i++)
 			{
 
-				int bitmaps_field_off = *(int*)(tag_mem_addr + 0x48);
+				int bitmaps_field_off = *(int*)(tag_data + 0x48);
 
 				int bitmaps_field_base = 0;
-				if (bitmaps_field_off != 0xFFFFFFFF)
+				if (bitmaps_field_off != -1)
 					bitmaps_field_base = bitmaps_field_off + ETCOFFSET;
 
 				int bitmaps_field = bitmaps_field_base + 0x74 * i;
@@ -775,41 +751,41 @@ namespace tag_loader
 		*PRawTableSize = oldRtable_size;
 	}
 	//Fixes the reference of the tags to their global objects(vftables)
-	void Fix_global_objects_ref(int datum_index)
+	void Fix_global_objects_ref(DatumIndex datum_index)
 	{
-		int type = *(int*)(new_Tables + (datum_index & 0xFFFF) * 0x10);
-		int Tdatum_index = *(int*)(new_Tables + (datum_index & 0xFFFF) * 0x10 + 0x4);
+		blam_tag type = new_Tables[datum_index.ToAbsoluteIndex()].type;
+		DatumIndex Tdatum_index = new_Tables[datum_index.ToAbsoluteIndex()].datum_index;
 
 		if (Tdatum_index != datum_index)
 		{
-			string error = "Tag: " + datum_index;
+			std::string error = "Tag: " + datum_index.ToInt();
 			error += " not loaded into tag tables and tag memory";;
-			throw new exception(error.c_str());
+			throw new std::exception(error.c_str());
 		}
 
-		switch (type)
+		switch (type.as_int())
 		{
-		case 0x63726561://crea
-			global_objects_fix::crea_fix(datum_index);
+		case 'crea':
+			global_objects_fix::crea_fix(datum_index.ToAbsoluteIndex());
 			break;
-		case 0x62697064://bipd
-			global_objects_fix::bipd_fix(datum_index);
+		case 'bipd':
+			global_objects_fix::bipd_fix(datum_index.ToAbsoluteIndex());
 			break;
-		case 0x636F6C6C://coll
-			global_objects_fix::coll_fix(datum_index);
+		case 'coll':
+			global_objects_fix::coll_fix(datum_index.ToAbsoluteIndex());
 			break;
-		case 0x70686D6F://phmo
-			global_objects_fix::phmo_fix(datum_index);
+		case 'phmo':
+			global_objects_fix::phmo_fix(datum_index.ToAbsoluteIndex(), false);
 			break;
-		case 0x76656869://vehi
-			global_objects_fix::vehi_fix(datum_index);
+		case 'vehi':
+			global_objects_fix::vehi_fix(datum_index.ToAbsoluteIndex());
 			break;
 		default:
 			break;
 		}
 	}
 	//Basically created to easily transfer working tags from system to system
-	int Load_tag_module(string loc)
+	int Load_tag_module(std::string loc)
 	{
 		int ret = -1;
 
@@ -827,21 +803,20 @@ namespace tag_loader
 
 			if (ext_meta_size + module_tag_data->size > _MAX_ADDITIONAL_TAG_SIZE_)
 			{
-				string error = "Couldnt load module, MAX_ADDITIONAL_TAG_SIZE_ reached";
+				std::string error = "Couldnt load module, MAX_ADDITIONAL_TAG_SIZE_ reached";
 				error_list.push_back(error);
 				delete my_loader;
 
 				return ret;
 			}
 			ret = new_datum_index;
-			string error = "Loading module: " + loc + " to datum_index: " + meta_struct::to_hex_string(new_datum_index);
+			std::string error = "Loading module: " + loc + " to datum_index: " + meta_struct::to_hex_string(new_datum_index);
 			error_list.push_back(error);
 
-			DWORD MapMemBase = *h2mod->GetAddress<DWORD*>(0x47CD54);
 			int mem_off = def_meta_size + ext_meta_size;
 
-			char* t_ptr = new_Tables + new_datum_index * 0x10;
-			char* d_ptr = (char*)MapMemBase + mem_off;
+			tags::tag_instance* t_ptr = &new_Tables[new_datum_index];
+			char* d_ptr = tags::get_tag_data() + mem_off;
 			char* m_ptr = module_tag_maps->data;
 			char* n_ptr = module_tag_names->data;
 			if (n_ptr == nullptr)
@@ -851,54 +826,47 @@ namespace tag_loader
 			memcpy(t_ptr, module_tag_table->data, module_tag_table->size);
 			memcpy(d_ptr, module_tag_data->data, module_tag_data->size);
 
-			list<injectRefs> my_inject_refs;
-			vector<shared_ptr<meta>> module_tags;
+			std::list<injectRefs> my_inject_refs;
+			std::vector<std::shared_ptr<meta>> module_tags;
 
-			int tags_first_d_index = *(int*)&t_ptr[4];
+			int tags_first_d_index = (&t_ptr[0])->datum_index.ToInt();
 
-			for (int i = 0; i < module_tag_table->size; i += 0x10)
+			for (int i = 0; i < module_tag_table->size / sizeof(tags::tag_instance); i++)
 			{				
 				injectRefs t_ref;
 
-				char type[5];
-				type[4] = '\0';
-				*(int*)type = *(int*)&t_ptr[i];
+				int size = (&t_ptr[i])->size;
+				int mem_off = (&t_ptr[i])->data_offset;
+				(&t_ptr[i])->datum_index = new_datum_index; //update the datum_index in the tag_tables
 
-				int type_rev = *(int*)type;
-
-				std::reverse(&type[0], &type[strlen(type)]);
-				int mem_off = *(int*)&t_ptr[i + 0x8];
-				int size = *(int*)&t_ptr[i + 0xC];
-
-				*(int*)&t_ptr[i + 0x4] = new_datum_index;//update the datum_index in the tag_tables
 
 				t_ref.old_datum = tags_first_d_index++;
 				t_ref.new_datum = new_datum_index++;//assign and increment it for next tag
 				
-				shared_ptr<plugins_field> t_plugin = Get_plugin(type);
-				shared_ptr<meta> t_meta = make_shared<meta>(d_ptr, size, mem_off, t_plugin, 1, t_ref.old_datum);
+				std::shared_ptr<plugins_field> t_plugin = Get_plugin((&t_ptr[i])->type.as_string());
+				std::shared_ptr<meta> t_meta = std::make_shared<meta>(d_ptr, size, mem_off, t_plugin, 1, t_ref.old_datum);
 
 				my_inject_refs.push_back(t_ref);
 				module_tags.push_back(t_meta);
 
 				std::string t_name = n_ptr;
 				tag_list.push_back(t_name.substr(t_name.rfind('\\') + 1) + ",0x" + meta_struct::to_hex_string(t_ref.new_datum));
-				tag_loader::Generate_sync_list(type_rev, t_ref.new_datum);
+				tag_loader::Generate_sync_list((&t_ptr[i])->type.as_int(), t_ref.new_datum);
 
 				n_ptr += t_name.size() + 1;
 				d_ptr += size;
 			}
-			for (int i = 0; i < module_tags.size(); i++)
+			for (size_t i = 0; i < module_tags.size(); i++)
 			{
 				int new_mem_off = def_meta_size + ext_meta_size;
 
-				*(int*)&t_ptr[i * 0x10 + 0x8] = new_mem_off;
+				(&t_ptr[i])->data_offset = new_mem_off;
 
 				module_tags[i]->Update_datum_indexes(my_inject_refs);
 				module_tags[i]->Rebase_meta(new_mem_off);
 
-				Load_RAW_refs(*(int*)&t_ptr[i * 0x10 + 0x4], m_ptr);
-				Fix_global_objects_ref(*(int*)&t_ptr[i * 0x10 + 0x4]);
+				Load_RAW_refs((&t_ptr[i])->datum_index, m_ptr);
+				Fix_global_objects_ref((&t_ptr[i])->datum_index);
 
 				//as the tags are from the same map
 				//m_ptr += strlen(m_ptr) + 1;
@@ -908,7 +876,7 @@ namespace tag_loader
 		}
 		else
 		{
-			string error = "Couldnt find module: " + loc;
+			std::string error = "Couldnt find module: " + loc;
 			error_list.push_back(error);
 		}
 		delete my_loader;
@@ -916,7 +884,7 @@ namespace tag_loader
 		return ret;
 	}
 	//Simiplify the injection process
-	void Parse_query_file(string loc)
+	void Parse_query_file(std::string loc)
 	{
 		query_parser* my_parser = new query_parser(loc);
 		addDebugText(my_parser->_getlogs().c_str());
@@ -924,12 +892,10 @@ namespace tag_loader
 	}
 	void Add_all_shared_refs()
 	{
-		DWORD SharedMemBase = *h2mod->GetAddress<DWORD*>(0x47CD54);
-		DWORD SharedTables = SharedMemBase + 0x20 + 0xC * *(DWORD*)(SharedMemBase + 4);
-		DWORD TagTableStart = *h2mod->GetAddress<DWORD*>(0x47CD50);
+		tags::tag_instance* SharedTables = reinterpret_cast<tags::tag_instance*>(tags::get_tag_data() + 0x20 + 0xC * *(DWORD*)(tags::get_tag_data() + 4));
 
-		for (int i = 0x2710; i < tags::get_tag_count(); i++)
-			memcpy((void*)(TagTableStart + i * 0x10), (void*)(SharedTables + i * 0x10), 0x10);
+		for (int i = 10000; i < tags::get_tag_count(); i++)
+			memcpy(&tags::get_tag_instances()[i], &SharedTables[i], sizeof(tags::tag_instance));
 	}
 	void Generate_sync_list(int type, DWORD index)
 	{
@@ -964,9 +930,9 @@ namespace tag_loader
 			DatumIndex scnr_index = tags::get_tags_header()->scenario_datum;
 			auto GlobalSCNR = (Blam::Cache::Tags::scnr*)TagInterface::GlobalTagInterface.GetTagInterface(scnr_index, (int)TagGroupTypes::scenario);		
 			
-			for (int i = 0 ; i < sync_list.size(); i++)
+			for (size_t i = 0 ; i < sync_list.size(); i++)
 			{
-				string t;
+				std::string t;
 
 				t += "Adding Tag To Simulation Block : 0x";
 				t += meta_struct::to_hex_string(GlobalSCNR->SimulationDefinitionTable.GetElementCount()) + ",0x";
@@ -990,11 +956,11 @@ namespace tag_loader
 	{
 		DWORD_list.try_emplace("eax", 0);///lol
 		int eax = 0;
-		for (int i = 0; i < vec_query.size(); i++)
+		for (size_t i = 0; i < vec_query.size(); i++)
 		{
 			///only add small code sections here to prevent cluttering
-			string t = vec_query[i];
-			if (t.find("DWORD") != string::npos)
+			std::string t = vec_query[i];
+			if (t.find("DWORD") != std::string::npos)
 			{
 				//well we got some variable definitons
 				std::string var_name = t.substr(t.find("DWORD") + 6);
@@ -1002,7 +968,7 @@ namespace tag_loader
 				DWORD_list.try_emplace(var_name, eax);
 			}
 			
-			else if (t.find("tag_loadEx") != string::npos)
+			else if (t.find("tag_loadEx") != std::string::npos)
 			{
 				//similar to tag_load,but adds overwriting functionality
 				///tag_load(datum_index,overwrite_index,map_name);
@@ -1018,7 +984,7 @@ namespace tag_loader
 				Push_Back(overwrite_index);
 				DWORD_list["eax"] = eax;
 			}
-			else if (t.find("tag_load") != string::npos)
+			else if (t.find("tag_load") != std::string::npos)
 			{
 				//load tag directly from map
 				///recursive loading and looks for map in default map folder
@@ -1034,14 +1000,14 @@ namespace tag_loader
 				Push_Back();
 				DWORD_list["eax"] = eax;
 			}
-			else if (t.find("module_load") != string::npos)
+			else if (t.find("module_load") != std::string::npos)
 			{
 				//gotta load some tag
 				std::string s2 = t.substr(t.find('"') + 1, t.rfind('"') - t.find('"') - 1);
 				eax = Load_tag_module(tag_loader::cus_tag_dir + "\\" + s2);
 				DWORD_list["eax"] = eax;
 			}
-			else if (t.find("_mov") != string::npos)
+			else if (t.find("_mov") != std::string::npos)
 			{
 				//primitive mov function _mov(dest,src)
 				std::string dest = t.substr(t.find('(') + 1, t.find(',') - t.find('(') - 1);
@@ -1049,7 +1015,7 @@ namespace tag_loader
 				//add call to move function here
 				_mov_parser(dest, src);
 			}
-			else if (t.find("replace_tag") != string::npos)
+			else if (t.find("replace_tag") != std::string::npos)
 			{
 				std::string dest = t.substr(t.find('(') + 1, t.find(',') - t.find('(') - 1);
 				std::string src = t.substr(t.find(',') + 1, t.find(')') - t.find(',') - 1);
@@ -1073,7 +1039,7 @@ namespace tag_loader
 		std::vector<std::string> vec_query;
 
 		std::ifstream fin;
-		fin.open(file_loc.c_str(), ios::in);
+		fin.open(file_loc.c_str(), std::ios::in);
 
 		if (!fin.is_open())
 		{
@@ -1096,9 +1062,9 @@ namespace tag_loader
 	std::vector<std::string> query_parser::clean_string(std::string txt)
 	{
 		std::vector<std::string> ret;
-		string temp="";
+		std::string temp="";
 		//remove comment sections
-		for (int i = 0; i < txt.length(); i++)
+		for (size_t i = 0; i < txt.length(); i++)
 		{
 			if (txt[i] == '/'&&txt[i + 1] == '/')
 				break;
@@ -1123,7 +1089,7 @@ namespace tag_loader
 		//-----Put some trimming operations here
 
 		///apply some fixups for assignment operations
-		for (int i = 0; i < ret.size(); i++)
+		for (size_t i = 0; i < ret.size(); i++)
 		{
 			if (!keyword_check(ret[i]))
 				if (i == 0)
@@ -1150,15 +1116,15 @@ namespace tag_loader
 
 		return 0x0;
 	}
-	string query_parser::_getlogs()
+	std::string query_parser::_getlogs()
 	{
-		string ret = "";
-		for (int i = 0; i < logs.size(); i++)
+		std::string ret = "";
+		for (size_t i = 0; i < logs.size(); i++)
 			ret += '\n' + logs[i];
 		logs.clear();
 		return ret;
 	}
-	void query_parser::_mov_parser(string dest, string src)
+	void query_parser::_mov_parser(std::string dest, std::string src)
 	{
 		int val = 0x0;
 
@@ -1170,7 +1136,7 @@ namespace tag_loader
 			DWORD_list[dest] = val;
 		else logs.push_back("Undeclared variable : " + dest);
 	}
-	void query_parser::replace_tag(string dest, string src)
+	void query_parser::replace_tag(std::string dest, std::string src)
 	{
 		int a = 0;
 		int b = 0;
@@ -1187,7 +1153,7 @@ namespace tag_loader
 
 		//Only replace tags if they do exist
 		//Game uses similar method to check if the tag actually exists in the table 
-		if (tag_instance[a & 0xFFFF].tag.Index == (a & 0xFFFF))
+		if (tag_instance[a & 0xFFFF].datum_index.Index == (a & 0xFFFF))
 		{
 			tag_instance[a & 0xFFFF].data_offset = tag_instance[b & 0xFFFF].data_offset;
 			tag_instance[a & 0xFFFF].type = tag_instance[b & 0xFFFF].type;
@@ -1201,19 +1167,19 @@ namespace tag_loader
 	}
 	int query_parser::keyword_check(std::string t)
 	{
-		if (t.find("DWORD") != string::npos)
+		if (t.find("DWORD") != std::string::npos)
 			return 1;
-		else if (t.find("module_load") != string::npos)
+		else if (t.find("module_load") != std::string::npos)
 			return 1;
-		else if (t.find("_mov") != string::npos)
+		else if (t.find("_mov") != std::string::npos)
 			return 1;
-		else if (t.find("replace_tag") != string::npos)
+		else if (t.find("replace_tag") != std::string::npos)
 			return 1;
-		//else if (t.find("sync_tag") != string::npos)
+		//else if (t.find("sync_tag") != std::string::npos)
 			//return 1;
-		else if (t.find("tag_loadEx") != string::npos)
+		else if (t.find("tag_loadEx") != std::string::npos)
 			return 1;
-		else if (t.find("tag_load") != string::npos)
+		else if (t.find("tag_load") != std::string::npos)
 			return 1;
 		return 0;
 	}
@@ -1255,7 +1221,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	{
 		DWORD *TagTableStart = h2mod->GetAddress<DWORD*>(0x47CD50);
 		///---------------TABLE EXTENSION  STUFF
-		memcpy((BYTE*)tag_loader::new_Tables, (BYTE*)*TagTableStart, 0x3BA40);
+		memcpy((BYTE*)tag_loader::new_Tables, (BYTE*)*TagTableStart, 244288);
 		*TagTableStart = (DWORD)tag_loader::new_Tables;
 	}
 
@@ -1336,10 +1302,10 @@ void _Patch_calls()
 }
 void Initialise_tag_loader()
 {
-	tag_loader::new_Tables = new char[_MAX_TAG_TABLE_SIZE_];
+	tag_loader::new_Tables = new tags::tag_instance[_MAX_TAG_TABLE_SIZE_];
 
-	string game_dir = GetExeDirectoryNarrow();
-	string def_maps_loc = game_dir + "\\maps";
+	std::string game_dir(GetExeDirectoryNarrow());
+	std::string def_maps_loc = game_dir + "\\maps";
 
 
 	tag_loader::mods_dir = game_dir + "\\mods";

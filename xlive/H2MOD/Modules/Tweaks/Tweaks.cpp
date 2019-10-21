@@ -5,20 +5,18 @@
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\HudElements\RadarPatch.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Variants\VariantMPGameEngine.h"
-#include "Util\filesys.h"
 #include "XLive\UserManagement\CUser.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
-#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
-#include "H2MOD\Tags\TagInterface.h"
 #include "Blam\Cache\TagGroups\shad.h"
 #include "..\CustomResolutions\CustomResolution.h"
 
 #define _USE_MATH_DEFINES
 #include "math.h"
+
+extern bool H2IsDediServer;
 
 #pragma region Done_Tweaks
 

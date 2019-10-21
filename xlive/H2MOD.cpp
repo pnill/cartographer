@@ -15,7 +15,7 @@
 #include "H2MOD/Tags/global_tags_interface.h"
 #include "H2MOD/Variants/GunGame/GunGame.h"
 #include "H2MOD/Variants/H2X/H2X.h"
-#include "MetaLoader/tag_loader.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -401,26 +401,6 @@ wcsncpy_s_hook p_wcsncpy_s_hook;
 
 //lets you follow the call path of any string that is displayed (in a debugger)
 signed int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a4) {
-	/*
-	if (overrideUnicodeMessage) {
-	wchar_t* temp = (wchar_t*)a3;
-	if (temp[0] != L' ') {
-	//const wchar_t* lobbyMessage = mapManager->getCustomLobbyMessage();
-	if (lobbyMessage != NULL && wcscmp(temp, yftlm) == 0) {
-	//if we detect that we failed to load the map, we display different strings only for the duration of
-	//this specific string being displayed
-	return string_display_hook_method(a3, a4, (int)(lobbyMessage), a6);
-	}
-
-	/*
-	if (wcscmp(OCTAGON.c_str(), temp) == 0) {
-	__debugbreak();
-	}
-	if (temp != NULL && temp[0] == L'T' && temp[1] == L'i' && temp[2] == L'e' && temp[3] == L'd') {
-	__debugbreak();
-	}*/
-	//}
-	//}*/
 	return p_wcsncpy_s_hook(a1, a2, a3, a4);
 }
 
@@ -624,29 +604,27 @@ BYTE H2MOD::get_local_team_index()
 
 void H2MOD::DisableSound(int sound)
 {
-	DWORD AddressOffset = *h2mod->GetAddress<DWORD*>(0x47CD54);
-
-	LOG_TRACE_GAME("AddressOffset: {:x}", AddressOffset);
+	LOG_TRACE_GAME("tag data address: {:x}", tags::get_tag_data());
 	switch (sound)
 	{
 	case SoundType::Slayer:
-		LOG_TRACE_GAME("AddressOffset + 0xd7dfb4 = {:p}", (void*)(AddressOffset + 0xd7dfb4));
-		*(DWORD*)(AddressOffset + 0xd7e05c) = -1;
-		*(DWORD*)(AddressOffset + 0xd7dfb4) = -1;
+		LOG_TRACE_GAME("tag data address + 0xd7dfb4 = {:p}", tags::get_tag_data()[0xd7dfb4]);
+		*(DWORD*)(&tags::get_tag_data()[0xd7e05c]) = -1;
+		*(DWORD*)(tags::get_tag_data()[0xd7dfb4]) = -1;
 		break;
 
 	case SoundType::GainedTheLead:
-		*(DWORD*)(AddressOffset + 0xd7ab34) = -1;
-		*(DWORD*)(AddressOffset + 0xd7ac84) = -1;
+		*(DWORD*)(tags::get_tag_data()[0xd7ab34]) = -1;
+		*(DWORD*)(tags::get_tag_data()[0xd7ac84]) = -1;
 		break;
 
 	case SoundType::LostTheLead:
-		*(DWORD*)(AddressOffset + 0xd7ad2c) = -1;
-		*(DWORD*)(AddressOffset + 0xd7add4) = -1;
+		*(DWORD*)(tags::get_tag_data()[0xd7ad2c]) = -1;
+		*(DWORD*)(tags::get_tag_data()[0xd7add4]) = -1;
 		break;
 
 	case SoundType::TeamChange:
-		*(DWORD*)(AddressOffset + 0xd7b9a4) = -1;
+		*(DWORD*)(tags::get_tag_data()[0xd7b9a4]) = -1;
 		break;
 	}
 }
@@ -1265,8 +1243,8 @@ void GivePlayerWeaponDatum(DatumIndex unit_datum, DatumIndex weapon_datum)
 //This is used for maps with 'shops' where the device_acceleration_scale is an indicator that they're using the control device as a 'shop'
 float get_device_acceleration_scale(DatumIndex device_datum)
 {
-	DWORD tag_header = *h2mod->GetAddress<DWORD*>(0x47CD54, 0x4A29BC);
-	DWORD global_tag_instances = *h2mod->GetAddress<DWORD*>(0x47CD50, 0x4A29B8);
+	DWORD tag_data = (DWORD)tags::get_tag_data();
+	DWORD tag_instances = (DWORD)tags::get_tag_instances();
 	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
 
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
@@ -1276,8 +1254,8 @@ float get_device_acceleration_scale(DatumIndex device_datum)
 	__int16 device_control_index = device_control_datum & 0xFFFF;
 	device_control_index = device_control_index << 4;
 
-	DWORD device_control_tag_offset = *(DWORD*)((BYTE*)device_control_index + global_tag_instances + 8);
-	float acceleration_scale = *(float*)((BYTE*)device_control_tag_offset + tag_header + 0x14);
+	DWORD device_control_tag_offset = *(DWORD*)((BYTE*)device_control_index + tag_instances + 8);
+	float acceleration_scale = *(float*)((BYTE*)device_control_tag_offset + tag_data + 0x14);
 
 	return acceleration_scale;
 
