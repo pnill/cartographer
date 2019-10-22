@@ -470,7 +470,7 @@ void ConsoleCommands::handle_command(std::string command) {
 					output(L"Peer at the specified index doesn't exist");
 					return;
 				}
-				NetworkSession::kick_peer(peerIndex);
+				NetworkSession::kickPeer(peerIndex);
 			}
 		}
 		else if (firstCommand == "$logplayers") {
@@ -513,7 +513,7 @@ void ConsoleCommands::handle_command(std::string command) {
 					return;
 				}
 				else {
-					session->max_party_players = maxPlayersToSet;
+					session->parameters.max_party_players = maxPlayersToSet;
 					output(L"Maximum players set.");
 					return;
 				}
@@ -689,7 +689,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::wstring str_to_print;
 			std::wstring space = L" ";
 			std::wstring xuid = L"XUID: ";
-			str_to_print += netsession->custom_map_name + space + netsession->membership.peer_info[index].peer_name + space + netsession->membership.peer_info[index].peer_name_2;
+			str_to_print += netsession->parameters.scenario_path + space + netsession->membership.peer_info[index].peer_name + space + netsession->membership.peer_info[index].peer_name_2;
 			str_to_print += xuid + std::to_wstring(netsession->membership.player_info[index].identifier);
 			str_to_print += L"\n Netowork Session state: " + std::to_wstring(netsession->local_session_state);
 			output(str_to_print);

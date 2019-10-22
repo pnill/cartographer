@@ -17,11 +17,11 @@ void register_packet_impl(void *packetObject, int type, char* name, int a4, int 
 	return register_packet(packetObject, type, name, a4, size1, size2, write_packet_method, read_packet_method, a9);
 }
 
-void send_packet(void *thisx, int a2, int a3, bool secure, unsigned int type, unsigned int size, void* a7)
+void send_packet(void *observer, int unk_index, int observer_index, bool send_out_of_band, int type, size_t size, void* buffer)
 {
-	typedef void(__thiscall* dynamic_packet_check_method)(void *thisx, int a2, int a3, char a4, unsigned int type, unsigned int size, void* a7);
+	typedef void(__thiscall* dynamic_packet_check_method)(void *observer, int unk_index, int observer_index, bool send_out_of_band, int type, size_t size, void* buffer);
 	auto dynamic_packet_check = reinterpret_cast<dynamic_packet_check_method>(h2mod->GetAddress(0x1BED40, 0x1B8C1A));
-	dynamic_packet_check(thisx, a2, a3, secure, type, size, a7);
+	dynamic_packet_check(observer, unk_index, observer_index, send_out_of_band, type, size, buffer);
 }
 
 void __cdecl encode_map_file_name_packet(char* buffer, int a2, s_custom_map_filename* data)
@@ -115,7 +115,7 @@ void __stdcall message_gateway_hook(void *thisx, network_address* addr, int mess
 				wcsncpy_s(buffer.file_name, map_filename.c_str(), 32);
 			}
 
-			send_packet(current_session->network_observer_ptr, current_session->unk_index, current_session->unk_needs_reversing[peer_index].observer_index, true,
+			send_packet(current_session->network_observer, current_session->unk_index, current_session->observer_info[peer_index].observer_index, true,
 				map_file_name, sizeof(s_custom_map_filename), &buffer);
 		}
 
@@ -188,8 +188,8 @@ void CustomPackets::sendRequestMapFilename(network_session* session)
 		SecureZeroMemory(&buffer, sizeof(s_request_map_filename));
 		memcpy(&buffer.user_identifier, &xFakeXuid[0], sizeof(XUID));
 
-		if (session->unk_needs_reversing[session->session_host_peer_index].field_0[1]) {
-			send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[session->session_host_peer_index].observer_index, true,
+		if (session->observer_info[session->session_host_peer_index].field_0[1]) {
+			send_packet(session->network_observer, session->unk_index, session->observer_info[session->session_host_peer_index].observer_index, true,
 				request_map_filename, sizeof(s_request_map_filename), (void*)&buffer);
 		}
 	}
@@ -204,9 +204,9 @@ void CustomPackets::sendTeamChange(network_session* session, signed int peer_ind
 
 		if (peer_index != -1 && peer_index != session->local_peer_index)
 		{
-			if (session->unk_needs_reversing[peer_index].field_0[1])
+			if (session->observer_info[peer_index].field_0[1])
 			{
-				send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[peer_index].observer_index, true,
+				send_packet(session->network_observer, session->unk_index, session->observer_info[peer_index].observer_index, true,
 					team_change, sizeof(s_team_change), (void*)&buffer);
 			}
 		}
@@ -219,9 +219,9 @@ void CustomPackets::sendUnitGrenadesPacket(network_session* session, int peer_in
 	{
 		if (peer_index != -1 && peer_index != session->local_peer_index)
 		{
-			if (session->unk_needs_reversing[peer_index].field_0[1])
+			if (session->observer_info[peer_index].field_0[1])
 			{
-				send_packet(session->network_observer_ptr, session->unk_index, session->unk_needs_reversing[peer_index].observer_index, true,
+				send_packet(session->network_observer, session->unk_index, session->observer_info[peer_index].observer_index, true,
 					unit_grenades, sizeof(s_unit_grenades), (void*)data);
 			}
 		}

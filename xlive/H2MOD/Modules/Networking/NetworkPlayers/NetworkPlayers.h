@@ -6,8 +6,8 @@ class NetworkPlayers {
 public:
 	bool IsActive(int playerIndex); // use this only in a multiplayer match, it doesn't work in single player
 	int getPlayerCount();
-	Membership* getMembershipData();
-	PlayerInformation* getPlayerInformation(int playerIndex);
+	membership_info* getMembershipData();
+	player_information* getPlayerInformation(int playerIndex);
 
 	int getPeerIndexFromPlayerXuid(long long xuid);
 	int getPeerIndexFromPlayerIndex(int playerIndex);

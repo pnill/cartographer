@@ -6,7 +6,7 @@ bool NetworkPlayers::IsActive(int playerIndex)
 	return (1 << playerIndex) & NetworkSession::getCurrentNetworkSession()->membership.players_active_mask;
 }
 
-Membership* NetworkPlayers::getMembershipData()
+membership_info* NetworkPlayers::getMembershipData()
 {
 	return &NetworkSession::getCurrentNetworkSession()->membership;
 }
@@ -16,7 +16,7 @@ int NetworkPlayers::getPlayerCount()
 	return getMembershipData()->total_players;
 }
 
-PlayerInformation* NetworkPlayers::getPlayerInformation(int playerIndex) 
+player_information* NetworkPlayers::getPlayerInformation(int playerIndex) 
 {
 	return &this->getMembershipData()->player_info[playerIndex];
 }
