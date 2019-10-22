@@ -610,21 +610,21 @@ void H2MOD::DisableSound(int sound)
 	case SoundType::Slayer:
 		LOG_TRACE_GAME("tag data address + 0xd7dfb4 = {:p}", tags::get_tag_data()[0xd7dfb4]);
 		*(DWORD*)(&tags::get_tag_data()[0xd7e05c]) = -1;
-		*(DWORD*)(tags::get_tag_data()[0xd7dfb4]) = -1;
+		*(DWORD*)(&tags::get_tag_data()[0xd7dfb4]) = -1;
 		break;
 
 	case SoundType::GainedTheLead:
-		*(DWORD*)(tags::get_tag_data()[0xd7ab34]) = -1;
-		*(DWORD*)(tags::get_tag_data()[0xd7ac84]) = -1;
+		*(DWORD*)(&tags::get_tag_data()[0xd7ab34]) = -1;
+		*(DWORD*)(&tags::get_tag_data()[0xd7ac84]) = -1;
 		break;
 
 	case SoundType::LostTheLead:
-		*(DWORD*)(tags::get_tag_data()[0xd7ad2c]) = -1;
-		*(DWORD*)(tags::get_tag_data()[0xd7add4]) = -1;
+		*(DWORD*)(&tags::get_tag_data()[0xd7ad2c]) = -1;
+		*(DWORD*)(&tags::get_tag_data()[0xd7add4]) = -1;
 		break;
 
 	case SoundType::TeamChange:
-		*(DWORD*)(tags::get_tag_data()[0xd7b9a4]) = -1;
+		*(DWORD*)(&tags::get_tag_data()[0xd7b9a4]) = -1;
 		break;
 	}
 }
