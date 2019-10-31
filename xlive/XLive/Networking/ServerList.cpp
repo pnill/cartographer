@@ -15,6 +15,7 @@ extern unsigned short H2Config_base_port;
 
 ServerList LiveManager;
 HANDLE ServerEnumHandle = NULL;
+extern int MasterState;
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
@@ -223,6 +224,17 @@ void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXO
 	CURLcode res;
 	std::string readBuffer;
 
+	if (MasterState == 2)
+	{
+		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
+		pOverlapped->InternalHigh = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
+		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
+		servptr->servers_left = 0;
+
+		servptr->server_list_download_running = false;
+		return;
+	}
+
 	curl = curl_easy_init();
 	if (curl) {
 		curl_easy_setopt(curl, CURLOPT_URL, "http://cartographer.online/live/server_list.php");
@@ -383,7 +395,8 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 
 DWORD WINAPI XLocatorServerUnAdvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
 {
-	std::thread(RemoveServer, pOverlapped).detach();
+	if (MasterState != 2)
+		std::thread(RemoveServer, pOverlapped).detach();
 	return S_OK;
 }
 
@@ -496,7 +509,8 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 
 DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
 {
-	std::thread(AddServer, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
+	if (MasterState != 2)
+		std::thread(AddServer, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
 
 	// not done - error now
 	return S_OK;

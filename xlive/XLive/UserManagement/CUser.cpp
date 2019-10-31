@@ -16,8 +16,6 @@ NOTE:
 	Check inside Tweaks.cpp for removeXNetSecurity
 */
 
-extern SOCKET game_network_message_gateway_socket;
-
 int CUserManagement::sendSecurePacket(SOCKET s, short to_port)
 {
 	if (!NetworkSession::localPeerIsSessionHost())
@@ -65,7 +63,6 @@ void CUserManagement::CreateUser(const XNADDR* pxna, BOOL user)
 		SecureZeroMemory(nUser, sizeof(CUser));
 		memcpy(&nUser->xnaddr, pxna, sizeof(XNADDR));
 		
-		this->GetKeys(&nUser->xnkid, NULL);
 		this->cusers[secure] = nUser;
 		nUser->secure.s_addr = secure;
 		nUser->bValid = true;
@@ -76,7 +73,6 @@ void CUserManagement::CreateUser(const XNADDR* pxna, BOOL user)
 		// if he is in system update the XNADDR
 		LOG_TRACE_NETWORK("CUserManagement::CreateUser() already present secure address {:x}, updating data", secure);
 		memcpy(&nUser->xnaddr, pxna, sizeof(XNADDR)); // update XNADDR 
-		this->GetKeys(&nUser->xnkid, NULL);
 	}
 
 	/*
@@ -109,11 +105,11 @@ void CUserManagement::CreateUser(const XNADDR* pxna, BOOL user)
 
 		if (H2Config_ip_wan == pxna->ina.s_addr)
 		{
-			std::pair <ULONG, SHORT> hostpair_or = std::make_pair(H2Config_ip_lan, nPort_join);
-			std::pair <ULONG, SHORT> hostpair_1000_or = std::make_pair(H2Config_ip_lan, nPort_base);
+			std::pair <ULONG, SHORT> hostpair_loopback = std::make_pair(H2Config_ip_lan, nPort_join);
+			std::pair <ULONG, SHORT> hostpair_loopback_1000 = std::make_pair(H2Config_ip_lan, nPort_base);
 
-			this->secure_map[hostpair_or] = secure;
-			this->secure_map[hostpair_1000_or] = secure;
+			this->secure_map[hostpair_loopback] = secure;
+			this->secure_map[hostpair_loopback_1000] = secure;
 		}
 
 		this->secure_map[hostpair] = secure;
@@ -130,26 +126,15 @@ void CUserManagement::UnregisterSecureAddr(const IN_ADDR ina)
 	CUser* to_remove_user = cusers[ina.s_addr];
 	if (to_remove_user != nullptr)
 	{
-		auto xnmap_it = xnmap.find(ina.s_addr);
-		if (xnmap_it != xnmap.end())
-			xnmap.erase(xnmap_it);
-
-		auto pmap_a_it = pmap_a.find(ina.s_addr);
-		if (pmap_a_it != pmap_a.end())
-			pmap_a.erase(pmap_a_it);
-
-		auto pmap_b_it = pmap_b.find(ina.s_addr);
-		if (pmap_b_it != pmap_b.end())
-			pmap_a.erase(pmap_b_it);
-
-		auto cusers_it = cusers.find(ina.s_addr);
-		if (cusers_it != cusers.end())
-			cusers.erase(cusers_it);
+		xnmap.erase(xnmap.find(ina.s_addr));
+		pmap_a.erase(pmap_a.find(ina.s_addr));
+		pmap_a.erase(pmap_b.find(ina.s_addr));
+		cusers.erase(cusers.find(ina.s_addr));
 
 		for (auto it : secure_map)
 		{
 			if (it.second == ina.s_addr) {
-				secure_map.erase(it.first);
+				secure_map.erase(secure_map.find(it.first));
 				break;
 			}
 		}
@@ -221,7 +206,7 @@ void SetUserUsername(char* username) {
 
 		snprintf(h2mod->GetAddress<char*>(0x971316), 16, username);
 		swprintf(h2mod->GetAddress<wchar_t*>(0x96DA94), 16, L"%hs", username);
-		swprintf(h2mod->GetAddress < wchar_t*>(0x51A638), 16, L"%hs", username);
+		swprintf(h2mod->GetAddress<wchar_t*>(0x51A638), 16, L"%hs", username);
 		swprintf(ServerLobbyName, 16, L"%hs", username);
 	}
 }
@@ -273,14 +258,18 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pnkid, IN_ADDR *p
 
 	LOG_TRACE_NETWORK("[Resources-Clear] XNetXnAddrToInAddr executed on thread {:x}", GetCurrentThreadId());
 
-	if (pxna->inaOnline.s_addr 
-		&& (userManager.cusers.find(pxna->inaOnline.s_addr) != userManager.cusers.end())) 
+	if (pxna)
 	{
-		// copy secure address
-		pina->s_addr = pxna->inaOnline.s_addr;
-		return ERROR_SUCCESS;	
+		auto user = userManager.cusers.find(pxna->inaOnline.s_addr);
+
+		if (user != userManager.cusers.end())
+		{
+			pina->s_addr = pxna->inaOnline.s_addr; // copy secure address
+			return ERROR_SUCCESS;
+		}
 	}
-	return ERROR_FUNCTION_FAILED;
+
+	return ERROR_INVALID_PARAMETER;
 }
 
 // #60: XNetInAddrToXnAddr
@@ -296,7 +285,7 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 			memcpy(pxna, &user->xnaddr, sizeof(XNADDR));
 
 		if (pxnkid)
-			memcpy(pxnkid, &user->xnkid, sizeof(XNKID));
+			userManager.GetKeys(pxnkid, nullptr);
 	}
 	else
 	{

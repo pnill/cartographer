@@ -154,10 +154,12 @@ DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pAddr)
 // #24: XSocketSendTo
 int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr *to, int tolen)
 {
+	LOG_TRACE_NETWORK("XSocketSendTo() - socket: {} and default port: {}", s, htons(((struct sockaddr_in*)to)->sin_port));
+
 	u_short port = (((struct sockaddr_in*)to)->sin_port);
 	u_long iplong = (((struct sockaddr_in*)to)->sin_addr.s_addr);
 
-	if (iplong == INADDR_BROADCAST || iplong == 0x00)
+	if (iplong == INADDR_BROADCAST)
 	{
 		(((struct sockaddr_in*)to)->sin_addr.s_addr) = H2Config_master_ip;
 		((struct sockaddr_in*)to)->sin_port = ntohs(H2Config_master_port_relay);
@@ -195,9 +197,6 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 			//LOG_TRACE_XLIVE("XSocketSendTo() port 1000 nPort: {} secure: %08X", htons(nPort), iplong);
 			SendStruct.sin_port = nPort;
 		}
-		else {
-			SendStruct.sin_port = ntohs(2000);
-		}
 
 		break;
 
@@ -208,9 +207,6 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		{
 			//LOG_TRACE_XLIVE("XSocketSendTo() port 1001 nPort: %i secure: %08X", htons(nPort), iplong);
 			SendStruct.sin_port = nPort;
-		}
-		else {
-			SendStruct.sin_port = ntohs(2001);
 		}
 
 		break;
@@ -280,8 +276,6 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 
 			ULONG secure = userManager.secure_map[hostpair];
 
-			(((struct sockaddr_in*)from)->sin_addr.s_addr) = secure;
-
 			if (secure == 0)
 			{
                 // hahaaha -- almic
@@ -290,6 +284,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 			else
 			{
 				userManager.xnmap[secure] = iplong;
+				(((struct sockaddr_in*)from)->sin_addr.s_addr) = secure;
 			}
 
 			/* Store NAT data

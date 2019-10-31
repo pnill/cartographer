@@ -6,7 +6,6 @@ class CUser
 {
 public:
 	XNADDR xnaddr;
-	XNKID xnkid;
 	IN_ADDR secure;
 	bool bValid;
 };

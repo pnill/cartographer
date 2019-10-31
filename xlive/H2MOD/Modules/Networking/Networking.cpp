@@ -69,20 +69,20 @@ void __cdecl closed_write(void* a1, int a2, int a3) {
 }
 
 bool __cdecl closed_read(void* a1, int a2, int a3) {
-	signed int v3; // edi@2
-	bool result; // al@4
+	bool result = false;
+	signed int closure_reason; 
 
 	*(DWORD *)a3 = bitstream::p_data_decode_integer()(a1, "remote-identifier", 32);
 	*(DWORD *)(a3 + 4) = bitstream::p_data_decode_integer()(a1, "identifier", 32);
 	*(DWORD *)(a3 + 8) = bitstream::p_data_decode_integer()(a1, "closure-reason", 5);
-	result = false;
-	bool isValid = bitstream::p_packet_is_valid()(a1);
-	if (!isValid)
-	{
-		v3 = *(DWORD *)(a3 + 8);
-		if (v3 >= 0 && v3 < 18)
-			result = true;
-	}
+
+	if (bitstream::p_packet_is_valid()(a1))
+		return result;
+	
+	closure_reason = *(DWORD *)(a3 + 8);
+	if (closure_reason >= 0 && closure_reason < 18)
+		result = true;
+	
 	//LOG_TRACE_NETWORK_N("[H2MOD-network] connection closed read, remote-identifier=%d, reason=%d, closureReason=%d, isValid=%d, result=%d",
 	//	*(DWORD *)a3, *(DWORD *)(a3 + 4), *(DWORD *)(a3 + 8), isValid, result);
 	return result;
@@ -211,177 +211,6 @@ char __stdcall receivePacket(void *thisx, void* a2, int packetType, unsigned int
 	return result;
 }
 
-typedef void(__stdcall *receive_data_from_socket)(DWORD* thisx);
-receive_data_from_socket receive_data_from_socket_method;
-
-void __stdcall receiveDataFromSocket(DWORD* thisx) {
-	DWORD *v1; // ebp@1
-	char v2; // bl@2
-	signed int v3; // edi@2
-	DWORD *v4; // ebp@2
-	int v5; // esi@5
-	DWORD *v6; // [sp+10h] [bp-1E4Ch]@1
-	unsigned int a1; // [sp+14h] [bp-1E48h]@0
-	int v8; // [sp+18h] [bp-1E44h]@0
-	int v9; // [sp+1Ch] [bp-1E40h]@6
-//	int v10; // [sp+20h] [bp-1E3Ch]@11
-//	int v11; // [sp+24h] [bp-1E38h]@11
-//	int v12; // [sp+28h] [bp-1E34h]@11
-//	int v13; // [sp+2Ch] [bp-1E30h]@11
-	int a3; // [sp+30h] [bp-1E2Ch]@11
-	int v15; // [sp+38h] [bp-1E24h]@11
-//	int v16; // [sp+3Ch] [bp-1E20h]@11
-//	int v17; // [sp+40h] [bp-1E1Ch]@11
-//	int v18; // [sp+44h] [bp-1E18h]@11
-//	int v19; // [sp+48h] [bp-1E14h]@11
-	char buf[4096]; // [sp+E58h] [bp-1004h]@5
-	char *ptr = buf;
-
-	typedef int(__cdecl* h2_calls_socketrecvfrom_type)(int a1, char* buf, int len);
-	auto h2_calls_socketrecvfrom = h2mod->GetAddress<h2_calls_socketrecvfrom_type>(0x1F565D);
-
-	typedef bool(__cdecl* sub_1261E77_type)(int a1);
-	auto sub_1261E77 = h2mod->GetAddress<sub_1261E77_type>(0x1F1E77);
-
-	typedef char(__stdcall* sub_122A93B_type)(unsigned int a1, char* buf, int a3);
-	auto sub_122A93B = h2mod->GetAddress<sub_122A93B_type>(0x1BA93B);
-
-	typedef int(__thiscall* h2_calls_packet_dispatcher_type)(DWORD* thisx, int a2);
-	auto h2_calls_packet_dispatcher = h2mod->GetAddress<h2_calls_packet_dispatcher_type>(0x1BAFB0);
-
-	v1 = thisx;
-	v6 = thisx;
-	do
-	{
-		v2 = 0;
-		v3 = 0;
-		v4 = v1 + 3;
-		while (v3 < 4)
-		{
-			if (*v4)
-			{
-				v5 = h2_calls_socketrecvfrom(*v4, ptr, 4096);
-				if (v5 > 0 && sub_1261E77((int)&v9))
-				{
-					LOG_TRACE_NETWORK("[h2mod-network] received socket data {}", ptr);
-					a1 = v5;
-					v8 = v3;
-					v2 = 1;
-				}
-			}
-			++v3;
-			++v4;
-			if (v2)
-				goto LABEL_11;
-		}
-		if (!v2)
-			return;
-	LABEL_11:
-		SecureZeroMemory((char *)&a3, 3624);
-		v1 = v6;
-		a3 = v8;
-		v15 = v9;
-		//v16 = v10; // avoid warnings.
-		//v17 = v11;
-		//v18 = v12;
-		//v19 = v13;
-		if (sub_122A93B(a1, ptr, (int)&a3))
-			h2_calls_packet_dispatcher(v6, (int)&a3);
-	} while (v2);
-}
-
-typedef int(__cdecl *serialize_peer_properties)(void* packetObject, int a2, int a3);
-serialize_peer_properties serialize_peer_properties_method;
-
-int __cdecl serializePeerPropertiesPacket(void* packetObject, int a2, int a3) {
-	//tell the host you can load the map (even if you can't)
-	*(DWORD *)(a3 + 104) = 4;
-	*(DWORD *)(a3 + 108) = 100;
-	return serialize_peer_properties_method(packetObject, a2, a3);
-}
-
-/* This should happen whenever someone quits or joins a game. */
-typedef void(__cdecl *serialize_membership_packet)(void* a1, int a2, int a3);
-serialize_membership_packet serialize_membership_packet_method;
-
-void __cdecl serializeMembershipPacket(void* a1, int a2, int a3) {
-	
-	/* 
-	//TODO-Issue-34: turn on when ready to enable feature
-	int v3 = 0;
-	if (*(WORD*)(a3 + 32) > 0)
-	{
-		int v4 = a3 + 0x26;
-		do {
-			
-			//let the host tell everyone else the game can start
-			if (*(BYTE *)(v4 + 140)) {
-				LOG_TRACE_NETWORK_N("[h2mod-network] Serialize Original Peer map status - {}", *(DWORD*)(v4 + 142));
-				LOG_TRACE_NETWORK_N("[h2mod-network] Serialize Original Peer map progress percentage - {}", *(DWORD *)(v4 + 146));
-
-				*(DWORD *)(v4 + 142) = 4;
-				*(DWORD *)(v4 + 146) = 100;
-				LOG_TRACE_NETWORK_N("[h2mod-network] Serialize New Peer map status - {}", *(DWORD *)(v4 + 142));
-				LOG_TRACE_NETWORK_N("[h2mod-network] Serialize New Peer map progress percentage - {}", *(DWORD *)(v4 + 146));
-			}
-			++v3;
-			v4 += 184;
-		} while (v3 < *(WORD*)(a3 + 32));
-	}*/
-	//advLobbySettings->sendLobbySettingsPacket();
-	// send server map checksums to client
-	serialize_membership_packet_method(a1, a2, a3);
-}
-
-
-/* This happens when someone joins or quits a game, the membership packet contains various data about the person. */
-typedef bool(__cdecl *deserialize_membership_packet)(void* a1, int a2, int a3);
-deserialize_membership_packet deserialize_membership_packet_method;
-
-bool __cdecl deserializeMembershipPacket(void* a1, int a2, int a3) {
-
-	/* Call the original first so the packet is de-serialized into the provided address. */
-	bool ret = deserialize_membership_packet_method(a1, a2, a3);
-
-	//TODO-Issue-34: need to figure out how to force clients who cannot load the map to correctly fail to load the map
-	/*
-	int peerCount = *(WORD *)(a3 + 32);
-	if (peerCount > 0) {
-		int v3 = 0;
-		int peerOffset = a3 + 0x26;
-		do {
-			int peerMapStatus = *(DWORD*)(peerOffset + 142);
-			*(DWORD*)(peerOffset + 142) = peerMapStatus;//failedToLoadTheMap ? 1 : peerMapStatus;
-			LOG_TRACE_NETWORK_N("[h2mod-network] Deserialize Peer map status - {}", peerMapStatus);
-			peerOffset += 184;
-			++v3;
-		} while (v3 < peerCount);
-	}*/
-
-	/* The data that gets de-serialized is stored in a3 */
-	/* 0x20 offset = total peers offset, 0x22 = total players */
-	WORD player_count = *(WORD*)((BYTE*)a3 + 0x20); 
-	
-	LOG_TRACE_NETWORK("[h2mod-network] deserializeMemberShipPacket player count: {}", player_count);
-	
-	/*There's an array of players in + 0x26 */
-	BYTE *PlayerArray = (BYTE*)((BYTE*)a3 + 0x26);
-
-	/* Loop the array */
-	for (int i = 0; i < player_count; i++)
-	{
-		/*Each player object in the array +0x02 contains 'peer-address' which is XNADDR */
-		XNADDR *nXN = (XNADDR*)((BYTE*)PlayerArray + 0x02);
-
-		// disable for now until I figure out if this is right: Nuke
-		//userManager.CreateUser(nXN); // Adds all the necessary information about the user so we don't have to request it from master.
-
-		PlayerArray += 0xB8;
-	}
-
-	return ret;
-}
-
 typedef void(__cdecl *serialize_parameters_update_packet)(void* a1, int a2, int a3);
 serialize_parameters_update_packet serialize_parameters_update_packet_method;
 
@@ -396,10 +225,9 @@ bool __stdcall join_game(void* thisptr, int a2, int a3, XNKID* xnkid, XNKEY* xnk
 {
 	memcpy(&userManager.game_host_xn, host_xn, sizeof(XNADDR));
 	LOG_TRACE_NETWORK("[H2MOD-Network] copied host information, XNADDR: {:#x}", userManager.game_host_xn.ina.s_addr);
-	userManager.SetKeys(xnkid, xnkey);
+	userManager.CreateUser(host_xn, FALSE);
 	userManager.sendSecurePacket(game_network_data_gateway_socket_1000, 1000);
 	userManager.sendSecurePacket(game_network_message_gateway_socket_1001, 1001);
-	userManager.CreateUser(host_xn, FALSE);
 	return pjoin_game(thisptr, a2, a3, xnkid, xnkey, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 
@@ -475,18 +303,8 @@ void CustomNetwork::applyNetworkHooks() {
 	//register_player_packets_method = (register_player_packets)DetourFunc(h2mod->GetAddress<BYTE*>(0x1F0A55, 0x1D140E), (BYTE*)registerPlayerPackets, 5);
 	//VirtualProtect(register_player_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-	serialize_membership_packet_method = (serialize_membership_packet)DetourFunc(h2mod->GetAddress<BYTE*>(0x1EF6B9, 0x1D0072), (BYTE*)serializeMembershipPacket, 5);
-	VirtualProtect(serialize_membership_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-	deserialize_membership_packet_method = (deserialize_membership_packet)DetourFunc(h2mod->GetAddress<BYTE*>(0x1EFADD, 0x1D0496), (BYTE*)deserializeMembershipPacket, 12);
-	VirtualProtect(deserialize_membership_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
 	//serialize_parameters_update_packet_method = (serialize_parameters_update_packet)DetourFunc((BYTE*)h2mod->GetAddress(0x1F03F5, 0x1CE5FA), (BYTE*)serializeParametersUpdatePacket, 5);
 	//VirtualProtect(serialize_parameters_update_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-	//TODO-Issue-34: turning this on makes hosts not care if clients can load map or now
-	//serialize_peer_properties_method = (serialize_peer_properties)DetourFunc((BYTE*)h2mod->GetAddress(serializePeerPropertiesPacketOffset, serializePeerPropertiesPacketOffset), (BYTE*)serializePeerPropertiesPacket, 5);
-	//VirtualProtect(serialize_peer_properties_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	/////////////////////////////////////////////////////////////////////
 	//send/recv packet functions below (for troubleshooting and research)
@@ -496,9 +314,6 @@ void CustomNetwork::applyNetworkHooks() {
 
 	//receive_packet_method = (receive_packet)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E82E0, 0x1CA2A3), (BYTE*)receivePacket, 11);
 	//VirtualProtect(receive_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-	//receive_data_from_socket_method = (receive_data_from_socket)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1BAFB5), (BYTE*)receiveDataFromSocket, 10);
-	//VirtualProtect(receive_data_from_socket_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	if (h2mod->Server) {
 		p_decode_text_chat_packet = (decode_text_chat_packet_)DetourFunc(h2mod->GetAddress<BYTE*>(0x0, 0x1CD8A4), (BYTE*)decode_text_chat_packet, 12);

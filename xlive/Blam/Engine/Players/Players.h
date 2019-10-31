@@ -77,14 +77,14 @@ namespace Blam
 			struct GameStatePlayer //size:0x204
 			{
 				WORD DatumSalt; //0x00
-				BYTE Flags;
-				BYTE unk;
+				BYTE Flags; // 0x02
+				BYTE unk; // 0x03
 				XUID xuid; //0x04
 				/* Trying to convert the peer_user_index to a datum via the entity one used in voice does not work... */
 				DWORD peer_index; //0x0C
-				DWORD peer_user_index; // 0x10
+				BYTE abNet[6]; // 0x10 used to identify the peer index
 				/* These are based on the beta and can be wrong/off. */
-				int machine_index; // 0x14  
+				short machine_index; // 0x14  
 				int machine_controller_index; //0x18
 				int unk_1; // 0x1C
 				int controller_index; // 0x20
