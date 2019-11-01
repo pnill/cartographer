@@ -26,7 +26,7 @@ namespace tags
 			SinglePlayerShared = 4
 		};
 		scnr_type type;
-		int shared_type;
+		int crc;
 		int crc_uiid;
 		char field_158;
 		char tracked__maybe;
@@ -42,17 +42,13 @@ namespace tags
 		int string_idx_offset;
 		int string_table_offset;
 		int extern_deps;
-		int time_low;
-		int time_high;
-		int main_menu_time_low;
-		int main_menu_time_high;
-		int shared_time_low;
-		int shared_time_high;
-		int campaign_time_low;
-		int campaign_time_high;
+		FILETIME time;
+		FILETIME main_menu_time;
+		FILETIME shared_time;
+		FILETIME campaign_time;
 		char name[32];
 		int field_1C4;
-		char tag_name[256];
+		char scenario_path[256];
 		int minor_version;
 		uint32_t TagNamesCount;
 		uint32_t TagNamesBufferOffset;
