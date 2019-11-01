@@ -178,7 +178,17 @@ bool __stdcall unk_live_netcode_func_2(void *thisx, float a1, float packet_size,
 	bool result = p_unk_live_netcode_func_2(thisx, a1, packet_size, delay_between_packets, a4, a5, a6, a7, voice_data_buffer, a9);
 
 	return result;
+}
 
+long long int getGameTime()
+{
+	LARGE_INTEGER time;
+	LARGE_INTEGER freq;
+
+	QueryPerformanceFrequency(&freq);
+	QueryPerformanceCounter(&time);
+
+	return time.QuadPart / (freq.QuadPart / 1000);
 }
  
 void NetworkConfiguration::ApplyPatches()
@@ -200,6 +210,9 @@ void NetworkConfiguration::ApplyPatches()
 
 	g_network_configuration = h2mod->GetAddress<network_configuration*>(0x4F960C, 0x523B5C);
 	PatchCall(h2mod->GetAddress(0x1ABE23, 0x1AC328), InitializeConfiguration);
+
+	// use a constant timer rather than the game's timer, seems to improve the medal delay issue
+	WriteJmpTo(h2mod->GetAddress(0x1B3C5C, 0x1Af225), getGameTime);
 
 	// disable network observer (broken on H2V)
 	//WriteValue<BYTE>(h2mod->GetAddress() + (h2mod->Server ? 0x1A92BA : 0x1B555C), (BYTE)0);
