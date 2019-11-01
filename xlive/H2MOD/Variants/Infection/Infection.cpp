@@ -5,6 +5,7 @@
 #include "..\..\Modules\Networking\CustomPackets\CustomPackets.h"
 
 using namespace Blam::Enums;
+using namespace NetworkSession;
 
 std::vector<std::wstring> Infection::zombieNames;
 
@@ -19,14 +20,13 @@ bool infectedPlayed;
 signed int zombiePlayerIndex = -1;
 
 signed int Infection::calculateZombiePlayerIndex() {
-	network_session* session = NetworkSession::getCurrentNetworkSession();
-	if (session->membership.total_players > 0)
+	if (getPlayerCount() > 0)
 	{
 		std::vector<int> vecPlayersActiveIndexes;
 
 		int playerIndex = 0;
 		do {
-			if (networkPlayers->IsActive(playerIndex))
+			if (IsActive(playerIndex))
 				vecPlayersActiveIndexes.push_back(playerIndex);
 
 			playerIndex++;
@@ -35,8 +35,8 @@ signed int Infection::calculateZombiePlayerIndex() {
 		if (vecPlayersActiveIndexes.empty())
 			return -1;
 
-		int infectedPlayerIndex = vecPlayersActiveIndexes[rand() % session->membership.total_players];
-		LOG_TRACE_GAME(L"[h2mod-infection] random infection player index: {}, with name: {}", infectedPlayerIndex, networkPlayers->getPlayerName(infectedPlayerIndex));
+		int infectedPlayerIndex = vecPlayersActiveIndexes[rand() % getPlayerCount()];
+		LOG_TRACE_GAME(L"[h2mod-infection] random infection player index: {}, with name: {}", infectedPlayerIndex, getPlayerName(infectedPlayerIndex));
 
 		return infectedPlayerIndex;
 	}
@@ -46,19 +46,18 @@ signed int Infection::calculateZombiePlayerIndex() {
 
 void Infection::sendTeamChange()
 {
-	network_session* session = NetworkSession::getCurrentNetworkSession();
-	if (session->local_session_state == _network_session_state_session_host)
+	if (getLocalSessionState() == network_session_state_session_host)
 	{
-		if (session->membership.total_players > 0)
+		if (getPlayerCount() > 0)
 		{
 			int playerIndex = 0;
 			do
 			{
-				if (networkPlayers->IsActive(playerIndex))
+				if (IsActive(playerIndex))
 				{
-					if (session->local_peer_index != networkPlayers->getPeerIndexFromPlayerIndex(playerIndex)) {
-						CustomPackets::sendTeamChange(session, networkPlayers->getPeerIndexFromPlayerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
-						LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", playerIndex, networkPlayers->getPlayerName(playerIndex), zombiePlayerIndex == playerIndex ? true : false);
+					if (getLocalPeerIndex() != getPeerIndexFromPlayerIndex(playerIndex)) {
+						CustomPackets::sendTeamChange(getCurrentNetworkSession(), getPeerIndexFromPlayerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
+						LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", playerIndex, getPlayerName(playerIndex), zombiePlayerIndex == playerIndex ? true : false);
 					}
 					else if (!h2mod->Server) {
 						h2mod->set_local_team_index(0, zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
@@ -106,7 +105,7 @@ void Infection::resetZombiePlayerStatus() {
 
 void Infection::setZombiePlayerStatus(int playerIndex)
 {
-	Infection::zombieNames.push_back(networkPlayers->getPlayerName(playerIndex));
+	Infection::zombieNames.push_back(getPlayerName(playerIndex));
 }
 
 void Infection::initHost() {
@@ -136,16 +135,16 @@ void Infection::resetWeaponInteractionAndEmblems() {
 void Infection::preSpawnServerSetup() {
 	int playerIndex = 0;
 	do {
-		if (networkPlayers->IsActive(playerIndex)) {
-			std::wstring playerName = networkPlayers->getPlayerName(playerIndex);
+		if (IsActive(playerIndex)) {
+			std::wstring playerName = getPlayerName(playerIndex);
 			BOOL isZombie = std::find(Infection::zombieNames.begin(), Infection::zombieNames.end(), playerName) != Infection::zombieNames.end();
 
 			LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={0}, isZombie={1}, playerName={2}", playerIndex, isZombie, playerName);
 			if (isZombie) {
 				h2mod->set_unit_biped(Player::Biped::Elite, playerIndex);
-				if (NetworkSession::localPeerIsSessionHost() 
-					&& networkPlayers->getPlayerTeamFromPlayerIndex(playerIndex) != ZOMBIE_TEAM) // prevent kids from switching to humans in the pre-game lobby after joining
-					CustomPackets::sendTeamChange(NetworkSession::getCurrentNetworkSession(), networkPlayers->getPeerIndexFromPlayerIndex(playerIndex), ZOMBIE_TEAM);
+				if (localPeerIsSessionHost() 
+					&& getPlayerTeamFromPlayerIndex(playerIndex) != ZOMBIE_TEAM) // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
+					CustomPackets::sendTeamChange(getCurrentNetworkSession(), getPeerIndexFromPlayerIndex(playerIndex), ZOMBIE_TEAM);
 			}
 			else {
 				h2mod->set_unit_biped(Player::Biped::Spartan, playerIndex);

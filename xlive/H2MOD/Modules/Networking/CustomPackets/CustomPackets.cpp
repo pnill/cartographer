@@ -182,7 +182,7 @@ void __stdcall message_gateway_hook_2(void *thisx, int a2, int message_type, int
 
 void CustomPackets::sendRequestMapFilename(network_session* session)
 {
-	if (session->local_session_state == _network_session_state_peer_established)
+	if (session->local_session_state == network_session_state_peer_established)
 	{
 		s_request_map_filename buffer;
 		SecureZeroMemory(&buffer, sizeof(s_request_map_filename));
@@ -197,7 +197,7 @@ void CustomPackets::sendRequestMapFilename(network_session* session)
 
 void CustomPackets::sendTeamChange(network_session* session, signed int peer_index, int team_index)
 {
-	if (session->local_session_state == _network_session_state_session_host)
+	if (session->local_session_state == network_session_state_session_host)
 	{
 		s_team_change buffer;
 		buffer.team_index = team_index;
@@ -215,7 +215,7 @@ void CustomPackets::sendTeamChange(network_session* session, signed int peer_ind
 
 void CustomPackets::sendUnitGrenadesPacket(network_session* session, int peer_index, s_unit_grenades* data)
 {
-	if (session->local_session_state == _network_session_state_session_host)
+	if (session->local_session_state == network_session_state_session_host)
 	{
 		if (peer_index != -1 && peer_index != session->local_peer_index)
 		{

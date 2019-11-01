@@ -16,7 +16,7 @@ struct s_datum_array
 	void **allocator; // 0x30
 	struct {
 		int bit_index_size; // 0x34
-		int last_used_index; // 0x38
+		int used_data_count; // 0x38
 	} active_indices; 
 	int total_elements_used; // 0x3C 
 	DatumIndex next_datum; // 0x40
@@ -35,6 +35,11 @@ public:
 		m_last_datum_index = -1;
 		m_last_absolute_index = -1;
 	};
+
+	~DatumIterator()
+	{
+
+	}
 
 	s_datum_array* get_datum_array()
 	{
@@ -76,12 +81,12 @@ public:
 		if (index < 0)
 			return -1;
 
-		if (index >= data_array->active_indices.last_used_index)
+		if (index >= data_array->active_indices.used_data_count)
 			return -1;
 
 		while (!((1 << (index & 0x1F)) & data_array->datum_usable_bit_mask[index >> 5]))
 		{
-			if (++index >= data_array->active_indices.last_used_index)
+			if (++index >= data_array->active_indices.used_data_count)
 				return -1;
 		}
 		return index;
@@ -91,12 +96,6 @@ public:
 	{
 		return m_last_absolute_index;
 	}
-
-	~DatumIterator()
-	{
-
-	}
-
 
 private:
 	

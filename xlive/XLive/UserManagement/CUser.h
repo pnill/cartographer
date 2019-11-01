@@ -38,11 +38,7 @@ struct SecurePacket
 class CUserManagement
 {
 public:
-	ULONG GetXNFromSecure(ULONG secure);
-	ULONG GetSecureFromXN(XNADDR *pxna);
-
 	void CreateUser(const XNADDR *pxna, BOOL user);
-	void RegisterLocalRequest(char* token, int a2);
 	void UnregisterSecureAddr(const IN_ADDR ina);
 
 	void UpdateConnectionStatus();

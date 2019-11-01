@@ -94,13 +94,13 @@ public:
 
 		DWORD GetBase() { return Base; }
 
-		DWORD GetAddress(unsigned long client, DWORD server = 0)
+		DWORD GetAddress(DWORD client, DWORD server = 0)
 		{
 			return Base + (Server ? server : client);
 		}
 
 		template <typename T = void*>
-		T GetAddress(unsigned long client, DWORD server = 0)
+		T GetAddress(DWORD client, DWORD server = 0)
 		{
 			return reinterpret_cast<T>(Base + (Server ? server : client));
 		}

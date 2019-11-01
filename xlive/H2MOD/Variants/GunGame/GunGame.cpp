@@ -2,6 +2,8 @@
 #include "Globals.h"
 #include "..\..\Modules\Networking\Networking.h"
 
+using namespace NetworkSession;
+
 static int weapon_one = 0;
 static int weapon_two = 0;
 static int weapon_three = 0;
@@ -151,7 +153,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 	int unit_object = call_get_object(unit_datum_index, 3);
 
 	if (unit_object) {
-		int level = GunGame::gungamePlayers[networkPlayers->getPlayerName(playerIndex)];
+		int level = GunGame::gungamePlayers[getPlayerName(playerIndex)];
 
 		LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer({0}) {1} - Level: {2}", playerIndex, playerName, level);
 
@@ -202,9 +204,9 @@ void GunGame::levelUpServer(int playerIndex)
 	wchar_t* localName = h2mod->get_local_player_name();
 	LOG_TRACE_GAME(L"[H2Mod-GunGame]: LevelUp({0}) : {1}", playerIndex, playerName);
 
-	int level = GunGame::gungamePlayers[networkPlayers->getPlayerName(playerIndex)];
+	int level = GunGame::gungamePlayers[getPlayerName(playerIndex)];
 	level++;
-	GunGame::gungamePlayers[networkPlayers->getPlayerName(playerIndex)] = level;
+	GunGame::gungamePlayers[getPlayerName(playerIndex)] = level;
 
 	LOG_TRACE_GAME("[H2Mod-GunGame]: LevelUp({0}) - new level: {1} ", playerIndex, level);
 
@@ -259,7 +261,7 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int playerIndex, bool bRe
 		{
 			*(BYTE*)((BYTE*)unit_object + 0x253) = count;
 		}
-		LOG_TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex={0}, peerIndex={1}", playerIndex, networkPlayers->getPeerIndexFromPlayerIndex(playerIndex));
+		LOG_TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex={0}, peerIndex={1}", playerIndex, getPeerIndexFromPlayerIndex(playerIndex));
 
 		s_unit_grenades data;
 		SecureZeroMemory(&data, sizeof(data));
@@ -267,7 +269,7 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int playerIndex, bool bRe
 		data.type = type;
 		data.count = count;
 		data.pindex = playerIndex;
-		CustomPackets::sendUnitGrenadesPacket(NetworkSession::getCurrentNetworkSession(), networkPlayers->getPeerIndexFromPlayerIndex(playerIndex), &data);
+		CustomPackets::sendUnitGrenadesPacket(NetworkSession::getCurrentNetworkSession(), getPeerIndexFromPlayerIndex(playerIndex), &data);
 	}
 }
 
@@ -300,7 +302,7 @@ void GunGameInitializer::onPeerHost() {
 	GunGame::setGameScore();
 	//TODO: is this really necessary (from old code)?
 	//init peer host gun game level
-	GunGame::gungamePlayers[networkPlayers->getPlayerName(0)] = 0;
+	GunGame::gungamePlayers[getPlayerName(0)] = 0;
 }
 
 void GunGamePreSpawnHandler::onClient() {

@@ -21,7 +21,7 @@
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
-#include "H2MOD\Modules\Networking\NetworkPlayers\NetworkPlayers.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 #define run_async(expression) \
 	std::thread{ [=] { expression; } }.detach();
@@ -42,7 +42,6 @@ extern AdvLobbySettings* advLobbySettings;
 extern bool displayXyz;
 extern volatile bool isLobby;
 extern ConsoleCommands* commands; 
-extern NetworkPlayers* networkPlayers;
 
 extern std::map<DWORD, bool> achievementList;
 

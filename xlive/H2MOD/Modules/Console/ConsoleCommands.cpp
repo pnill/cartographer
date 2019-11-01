@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <fstream>
+
 #include "Globals.h"
 #include "Blam/BlamLibrary.h"
 #include "H2MOD\Modules\Startup\Startup.h"
@@ -466,7 +466,7 @@ void ConsoleCommands::handle_command(std::string command) {
 					output(L"Don't kick yourself");
 					return;
 				}
-				if (peerIndex >= NetworkSession::getCurrentNetworkSession()->membership.total_peers) {
+				if (peerIndex >= NetworkSession::getPeerCount()) {
 					output(L"Peer at the specified index doesn't exist");
 					return;
 				}
@@ -478,7 +478,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Only host can log out information about players");
 				return;
 			}
-			networkPlayers->logAllPlayersToConsole();
+			NetworkSession::logAllPlayersToConsole();
 		}
 		else if (firstCommand == "$logpeers")
 		{
@@ -486,7 +486,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Only host can log out information about players");
 				return;
 			}
-			networkPlayers->logAllPeersToConsole();
+			NetworkSession::logAllPeersToConsole();
 		}
 		else if (firstCommand == "$maxplayers") {
 			if (splitCommands.size() != 2) {
@@ -499,21 +499,19 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 
 			std::string secondArg = splitCommands[1];
-			network_session* session = NetworkSession::getCurrentNetworkSession();
 
 			if (isNum(secondArg.c_str())) {
-
 				int maxPlayersToSet = atoi(secondArg.c_str());
 				if (maxPlayersToSet < 1 || maxPlayersToSet > 16) {
 					output(L"The value needs to be between 1 and 16.");
 					return;
 				}
-				if (maxPlayersToSet < session->membership.total_players) {
+				if (maxPlayersToSet < NetworkSession::getPlayerCount()) {
 					output(L"You can't set a value of max players smaller than the actual number of players on the server.");
 					return;
 				}
 				else {
-					session->parameters.max_party_players = maxPlayersToSet;
+					NetworkSession::getCurrentNetworkSession()->parameters.max_party_players = maxPlayersToSet;
 					output(L"Maximum players set.");
 					return;
 				}
@@ -689,7 +687,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::wstring str_to_print;
 			std::wstring space = L" ";
 			std::wstring xuid = L"XUID: ";
-			str_to_print += netsession->parameters.scenario_path + space + netsession->membership.peer_info[index].peer_name + space + netsession->membership.peer_info[index].peer_name_2;
+			str_to_print += netsession->parameters.scenario_path + space + netsession->membership.peer_info[index].name + space + netsession->membership.peer_info[index].peer_session_name;
 			str_to_print += xuid + std::to_wstring(netsession->membership.player_info[index].identifier);
 			str_to_print += L"\n Netowork Session state: " + std::to_wstring(netsession->local_session_state);
 			output(str_to_print);

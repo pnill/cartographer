@@ -15,29 +15,27 @@
 #define DEFAULT_BUFLEN 65536
 
 /* String constants below for client/server messages */
-std::string DOWNLOADING_MAP("Downloading Map");
-std::string DOWNLOAD_MAP_PERCENTAGE_PREFIX("Downloaded ");
-std::string DOWNLOAD_MAP_PERCENTAGE_CHAR("%");
-std::string WAITING_FOR_MAP_DOWNLOAD_URL("Waiting for map url from server");
-std::string FOUND_MAP_DOWNLOAD_URL("Found map download url");
-std::string DOWNLOADING_COMPLETE("Downloading complete");
-std::string RELOADING_MAPS("Reloading maps in memory");
-std::string UNZIPPING_MAP_DOWNLOAD("Unzipping map download");
-std::string FAILED_TO_OPEN_ZIP_FILE("Failed to open the zip file");
-std::string STILL_SEARCHING_FOR_MAP("Could not find maps from server, still searching");
-std::string COULD_NOT_FIND_MAPS("Couldn't find the map");
-std::string UNABLE_TO_CONNECT_TO_SERVER("Unable to connect to server");
-std::string BAD_FILE_SIZE("Got bad file size, rejoin");
-std::string VALID_FILE_SIZE("Got filesize from host");
-std::string CONNECTION_TO_HOST_CLOSED("Connection to host closed");
-std::string VALID_FILE_NAME("Got filename from host");
-std::string MAP_WRITTEN_TO_DISK("Wrote downloaded map to disk");
-std::string CONNECTING_TO_HOST("Connecting to host");
-std::string ERROR_CONNECTING_TO_HOST("Socket error connecting to host");
-std::string CHECKING_IF_MAP_EXISTS("Checking if the following map exists, %s");
-std::string MAP_DOESNT_EXIST_IN_REPO("Download failed, map doesn't exist in repo");
+char DOWNLOADING_MAP[] = "Downloading Map";
+char DOWNLOAD_MAP_PERCENTAGE_PREFIX[] = "Downloaded ";
+char WAITING_FOR_MAP_DOWNLOAD_URL[] = "Waiting for map url from server";
+char FOUND_MAP_DOWNLOAD_URL[] = "Found map download url";
+char DOWNLOADING_COMPLETE[] = "Downloading complete";
+char RELOADING_MAPS[] = "Reloading maps in memory";
+char UNZIPPING_MAP_DOWNLOAD[] = "Unzipping map download";
+char FAILED_TO_OPEN_ZIP_FILE[] = "Failed to open the zip file";
+char STILL_SEARCHING_FOR_MAP[] = "Could not find maps from server, still searching";
+char COULD_NOT_FIND_MAPS[] = "Couldn't find the map";
+char UNABLE_TO_CONNECT_TO_SERVER[] = "Unable to connect to server";
+char BAD_FILE_SIZE[] = "Got bad file size, rejoin";
+char VALID_FILE_SIZE[] = "Got filesize from host";
+char CONNECTION_TO_HOST_CLOSED[] = "Connection to host closed";
+char VALID_FILE_NAME[] = "Got filename from host";
+char MAP_WRITTEN_TO_DISK[] = "Wrote downloaded map to disk";
+char CONNECTING_TO_HOST[] = "Connecting to host";
+char ERROR_CONNECTING_TO_HOST[] = "Socket error connecting to host";
+char CHECKING_IF_MAP_EXISTS[] = "Checking if the following map exists, %s";
+char MAP_DOESNT_EXIST_IN_REPO[] = "Download failed, map doesn't exist in repo";
 
-std::string startingDownloadString = ("Downloaded 0%");
 std::string validDigits("0123456789");
 std::string mapExt(".map");
 std::wstring mapExtUnicode(L".map");
@@ -139,8 +137,9 @@ int __cdecl get_total_map_downloading_percentage()
 }
 
 wchar_t* receiving_map_wstr[] = {
-	L"You are receiving the map from %s. \r\nPlease wait...%i%%" ,
+	L"You are receiving the map from %s. \r\nPlease wait...%i%%"
 };
+
 wchar_t* get_receiving_map_string()
 { 
 	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)h2mod->GetAddress(0x381fd));
@@ -297,20 +296,6 @@ void MapManager::resetClient() {
 	this->threadRunning = false;
 }
 
-/**
-* Sets the custom lobby message
-*/
-void MapManager::setCustomLobbyMessage(const char* newStatus) {
-	this->customLobbyMessage = newStatus;
-}
-
-/**
-* Gets pointer to the custom lobby message
-*/
-const char* MapManager::getCustomLobbyMessage() {
-	return this->customLobbyMessage;
-}
-
 void MapManager::getMapFilename(std::wstring& buffer)
 {
 	network_session* session = nullptr;
@@ -320,7 +305,7 @@ void MapManager::getMapFilename(std::wstring& buffer)
 	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::getCurrentNetworkSession(&session))
 	{
 		SecureZeroMemory(map_file_location, sizeof(map_file_location));
-		NetworkSession::getMapFileLocation(session, map_file_location, sizeof(map_file_location));
+		NetworkSession::getMapFileLocation(map_file_location, sizeof(map_file_location));
 
 		std::wstring unicodeMapFileLocation(map_file_location);
 		std::size_t mapNameOffset = unicodeMapFileLocation.find_last_of(L"\\");
@@ -354,8 +339,6 @@ void MapManager::searchForMap() {
 		if (this->downloadFromHost()) {
 			goto cleanup;
 		}
-
-		this->setCustomLobbyMessage(COULD_NOT_FIND_MAPS.c_str());
 	}
 
 cleanup:
@@ -421,13 +404,11 @@ bool MapManager::downloadFromRepo(std::string mapFilename) {
 		fclose(fp);
 		if (http_code != 404) {
 			//if we succesfully downloaded the map, reload the maps and return out
-			setCustomLobbyMessage(NULL);
 			this->reloadMaps();
 			return true;
 		}
 		else {
 			//if we failed, remove the file we created and exit
-			setCustomLobbyMessage(MAP_DOESNT_EXIST_IN_REPO.c_str());
 			remove(nonUnicodeMapFilePath.c_str());
 		}
 	}
@@ -446,17 +427,14 @@ bool MapManager::downloadFromHost() {
 	try {
 		if (precalculatedDownloadPercentageStrings.empty()) {
 			for (int i = 0; i <= 100; i++) {
-				std::string downloadMsg;
-				downloadMsg = DOWNLOAD_MAP_PERCENTAGE_PREFIX;
-				downloadMsg += std::to_string(i);
-				downloadMsg += DOWNLOAD_MAP_PERCENTAGE_CHAR;
+				std::string downloadMsg = "Downloaded " + std::to_string(i) + "%.";;
 				precalculatedDownloadPercentageStrings[i] = downloadMsg;
 			}
 		}
-		DWORD* mapsObject = h2mod->GetAddress<DWORD*>(0x482D70);
-		wchar_t* customMapsDirectory = (wchar_t*)((int)mapsObject + 148028);
-		std::wstring customMapsDirU(customMapsDirectory);
-		std::string customMapsDir(customMapsDirU.begin(), customMapsDirU.end());
+		DWORD mapsObject = h2mod->GetAddress(0x482D70);
+		wchar_t* customMapsDirectory = reinterpret_cast<wchar_t*>(mapsObject + 148028);
+		std::wstring customMapsDirWide(customMapsDirectory);
+		std::string customMapsDir(customMapsDirWide.begin(), customMapsDirWide.end());
 
 		WSADATA wsaData;
 		struct addrinfo *result = NULL,
@@ -472,7 +450,7 @@ bool MapManager::downloadFromHost() {
 			return 1;
 		}
 
-		SecureZeroMemory(&hints, sizeof(hints));
+		SecureZeroMemory(&hints, sizeof(addrinfo));
 		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
@@ -500,12 +478,10 @@ bool MapManager::downloadFromHost() {
 			}
 
 			// Connect to server
-			this->setCustomLobbyMessage(CONNECTING_TO_HOST.c_str());
 			iResult = connect(connectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
 			if (iResult == SOCKET_ERROR) {
 				closesocket(connectSocket);
 				connectSocket = INVALID_SOCKET;
-				this->setCustomLobbyMessage(ERROR_CONNECTING_TO_HOST.c_str());
 				continue;
 			}
 			break;
@@ -515,7 +491,6 @@ bool MapManager::downloadFromHost() {
 
 		if (connectSocket == INVALID_SOCKET) {
 			LOG_TRACE_GAME("[h2mod-mapmanager] {}", UNABLE_TO_CONNECT_TO_SERVER);
-			this->setCustomLobbyMessage(UNABLE_TO_CONNECT_TO_SERVER.c_str());
 			//WSACleanup();
 			return 1;
 		}
@@ -528,25 +503,17 @@ bool MapManager::downloadFromHost() {
 		FILE* file;
 
 		// Receive until the peer closes the connection
-		int prevDownloadPercentage = 0;
-		const char* downloadLobbyMessage = startingDownloadString.c_str();
-
 		do {
 			char recvbuf[DEFAULT_BUFLEN];
 
 			iResult = recv(connectSocket, recvbuf, recvbuflen, 0);
 			if (iResult > 0) {
-				this->setCustomLobbyMessage(downloadLobbyMessage);
 				//LOG_TRACE_GAME_N("Bytes received: %d", iResult);
 				if (receivedFilename && receivedFileSize) {
 					for (int i = 0; i < iResult; i++) {
 						fseek(file, bytesRead++, SEEK_SET);
 						fputc(recvbuf[i], file);
-						int downloadPercentage = ((double)bytesRead / (double)fileSize) * 100;
-						if (prevDownloadPercentage != downloadPercentage) {
-							downloadLobbyMessage = precalculatedDownloadPercentageStrings[downloadPercentage].c_str();
-							prevDownloadPercentage = downloadPercentage;
-						}
+						downloadPercentage = ((double)bytesRead / (double)fileSize) * 100;
 					}
 				}
 				else {
@@ -556,8 +523,6 @@ bool MapManager::downloadFromHost() {
 						std::size_t extOffset = mapName.find(mapExt.c_str());
 						mapName = mapName.substr(0, extOffset);
 						receivedFilename = true;
-						this->setCustomLobbyMessage(VALID_FILE_NAME.c_str());
-
 
 						mapName += mapExt.c_str();
 						std::string mapPath = customMapsDir;
@@ -575,12 +540,10 @@ bool MapManager::downloadFromHost() {
 						bool has_only_digits = (fileSizee.find_first_not_of(validDigits.c_str()) == std::string::npos);
 						if (!has_only_digits) {
 							LOG_TRACE_GAME("[h2mod-mapmanager] {}", BAD_FILE_SIZE);
-							this->setCustomLobbyMessage(BAD_FILE_SIZE.c_str());
 							goto end;
 						}
 						if (fileSizee.empty()) {
 							LOG_TRACE_GAME("[h2mod-mapmanager] {}", BAD_FILE_SIZE);
-							this->setCustomLobbyMessage(BAD_FILE_SIZE.c_str());
 						}
 						fileSize = stoi(fileSizee);
 						receivedFileSize = true;
@@ -588,36 +551,29 @@ bool MapManager::downloadFromHost() {
 							fseek(file, bytesRead++, SEEK_SET);
 							fputc(recvbuf[i], file);
 						}
-						this->setCustomLobbyMessage(VALID_FILE_SIZE.c_str());
 						continue;
 					}
 				}
 			}
 			else if (iResult == 0) {
 				LOG_TRACE_GAME("[h2mod-mapmanager] {}", CONNECTION_TO_HOST_CLOSED);
-				this->setCustomLobbyMessage(CONNECTION_TO_HOST_CLOSED.c_str());
 			}
 			else {
 				LOG_TRACE_GAME("[h2mod-mapmanager] recv failed with error: {}", WSAGetLastError());
-				this->setCustomLobbyMessage("[h2mod-mapmanager] Failure receiving, try rejoining");
 			}
 		} while (iResult > 0);
 
 		fclose(file);
 
-		this->setCustomLobbyMessage(DOWNLOADING_COMPLETE.c_str());
-		this->setCustomLobbyMessage(RELOADING_MAPS.c_str());
 		this->reloadMaps();
 		downloadResult = true;
 		goto end;
 	}
 	catch (std::exception const& e) {
 		LOG_TRACE_GAME("[h2mod-mapmanager] std exception thrown = {}", e.what());
-		this->setCustomLobbyMessage("[h2mod-mapmanager] std exception thrown");
 	}
 	catch (...) {
 		LOG_TRACE_GAME("[h2mod-mapmanager] unknown exception occurred occurred");
-		this->setCustomLobbyMessage("[h2mod-mapmanager] Unknown error occurred");
 	}
 end:
 	// cleanup

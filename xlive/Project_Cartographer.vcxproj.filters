@@ -277,6 +277,9 @@
     <Filter Include="Source Files\3rdparty\tinyxml">
       <UniqueIdentifier>{4a1d5690-b59a-45da-b355-656a31ecac34}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\DataArray">
+      <UniqueIdentifier>{009ec295-3920-4f2e-91ab-5c4dc867750a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -524,9 +527,6 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.cpp">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkConfiguration</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\Modules\Networking\NetworkPlayers\NetworkPlayers.cpp">
-      <Filter>Source Files\H2MOD\Modules\Networking\NetworkPlayers</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp">
       <Filter>Source Files\3rdparty\tinyxml</Filter>
@@ -1160,9 +1160,6 @@
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolution.h">
       <Filter>Source Files\H2MOD\Modules\CustomResolutions</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1217,9 +1214,6 @@
     <ClInclude Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.h">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkConfiguration</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\Networking\NetworkPlayers\NetworkPlayers.h">
-      <Filter>Source Files\H2MOD\Modules\Networking\NetworkPlayers</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1228,6 +1222,9 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h">
+      <Filter>Source Files\H2MOD\Modules\DataArray</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

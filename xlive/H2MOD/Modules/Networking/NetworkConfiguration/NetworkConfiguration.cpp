@@ -183,7 +183,7 @@ bool __stdcall unk_live_netcode_func_2(void *thisx, float a1, float packet_size,
  
 void NetworkConfiguration::ApplyPatches()
 {
-	// increase the netowrk tickrate of hosts to 60 and for the clients to 30
+	// increase the network tickrate of hosts to 60 and for the clients to 30
 	static float unk_flt_ = 60.0f;
 
 	std::vector<std::pair<int, int>> addresses = 
