@@ -319,7 +319,7 @@ char* custom_label_escape(char* label_literal) {
 	return label_escaped;
 }
 
-bool FloatIsNaN(float &vagueFloat) {
+bool FloatIsNaN(float vagueFloat) {
 	DWORD* vague = (DWORD*)&vagueFloat;
 	if ((*vague >= 0x7F800000 && *vague <= 0x7FFFFFFF) || (*vague >= 0xFF800000 && *vague <= 0xFFFFFFFF)) {
 		return true;

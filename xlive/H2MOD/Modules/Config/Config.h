@@ -50,7 +50,7 @@ extern int H2Config_custom_resolution_x;
 extern int H2Config_custom_resolution_y;
 extern char H2Config_dedi_server_name[32];
 extern char H2Config_dedi_server_playlist[256];
-extern bool H2Config_chatbox_commands;
+extern int H2Config_additional_pcr_time;
 extern bool H2Config_debug_log;
 extern int H2Config_debug_log_level;
 extern bool H2Config_debug_log_console;

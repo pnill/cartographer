@@ -15,7 +15,7 @@ void pushHostLobby();
 char* custom_label_literal(char* label_escaped);
 ///FREE MEMOERY in returned char*
 char* custom_label_escape(char* label_literal);
-bool FloatIsNaN(float &vagueFloat);
+bool FloatIsNaN(float vagueFloat);
 ///IP is char array size 100
 int HostnameToIp(char* hostname, char* ip);
 

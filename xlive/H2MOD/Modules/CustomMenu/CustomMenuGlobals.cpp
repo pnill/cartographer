@@ -629,8 +629,6 @@ int __stdcall sub_2107df_CMLTD_(int thisptr, int* a2, char a3, int label_menu_id
 
 void __cdecl sub_3e3ac_CMLTD_(int a1, int label_id, wchar_t* rtn_label, int label_menu_id)
 {
-	int dword_479e70 = *(int*)((char*)H2BaseAddr + 0x479e70);
-
 	int(__cdecl* sub_381fd)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x381fd);
 	void(__thiscall* sub_3e332)(int, int, wchar_t*, int, int) = (void(__thiscall*)(int, int, wchar_t*, int, int))((char*)H2BaseAddr + 0x3e332);
 
@@ -639,7 +637,7 @@ void __cdecl sub_3e3ac_CMLTD_(int a1, int label_id, wchar_t* rtn_label, int labe
 		char* v4 = &tags::get_tag_data()[tags::get_tag_instances()[a1 & 0xFFFF].data_offset];
 
 		sub_3e332(
-			(int)dword_479e70 + 28 * (v3 + 14),
+			(int)tags::get_game_globals() + 28 * (v3 + 14),
 			label_id,
 			rtn_label,
 			label_menu_id,//*(WORD*)(v4 + 4 * (v3 + 14) - 40),
