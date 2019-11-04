@@ -1154,9 +1154,6 @@
     <ClInclude Include="Blam\Enums\Players\Players.h">
       <Filter>Source Files\Blam\Enums\Players</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolution.h">
-      <Filter>Source Files\H2MOD\Modules\CustomResolutions</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1222,6 +1219,9 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h">
       <Filter>Source Files\H2MOD\Modules\DataArray</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h">
+      <Filter>Source Files\H2MOD\Modules\CustomResolutions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -11,7 +11,7 @@
 #include "XLive\UserManagement\CUser.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "Blam\Cache\TagGroups\shad.h"
-#include "..\CustomResolutions\CustomResolution.h"
+#include "..\CustomResolutions\CustomResolutions.h"
 
 #define _USE_MATH_DEFINES
 #include "math.h"

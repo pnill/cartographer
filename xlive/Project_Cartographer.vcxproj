@@ -456,7 +456,7 @@
     <ClInclude Include="Blam\Cache\Tags\tag_definitons.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shad.h" />
     <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h" />
-    <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolution.h" />
+    <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />

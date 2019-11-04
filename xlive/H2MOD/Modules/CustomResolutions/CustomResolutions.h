@@ -3,7 +3,7 @@
 #define TOTAL_RESOLUTIONS 14
 #define DEFAULT_TOTAL_RESOLUTIONS 11
 
-struct s_diplay_config
+struct s_display_res
 {
 	int res_x;
 	int res_y;
