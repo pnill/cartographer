@@ -475,10 +475,9 @@ void combineCartographerLabels(int menuId, int lbl1, int lbl2, int lblCmb) {
 }
 
 void setGameLanguage() {
-	BYTE* HasLoadedLanguage = (BYTE*)((char*)H2BaseAddr + 0x481908);
-	*HasLoadedLanguage = 0;
+	bool* HasLoadedLanguage = (bool*)(H2BaseAddr + 0x481908);
 
-	int& language_id = *(int*)((char*)H2BaseAddr + 0x412818);
+	int& language_id = *(int*)(H2BaseAddr + 0x412818);
 	if (current_language_main >= 0) {
 		language_id = current_language_main;
 	}
@@ -506,19 +505,24 @@ void setGameLanguage() {
 		case 4:
 			language_id = language_ids::chinese;
 			break;
+
 		default:
 			language_id = language_ids::english;
 			break;
 		}
 	}
-}
 
-__declspec(naked) void getSystemLanguageMethodJmp() {
-	__asm
+	size_t ReturnSize;
+	char DstBuf[3];
+
+	if (getenv_s(&ReturnSize, DstBuf, 3, "BLAM_LANGUAGE") && ReturnSize > 0)
 	{
-		call setGameLanguage
-		retn
+		int result = atol(DstBuf);
+		if (result > 0 || result > 9)
+			language_id = language_ids::english;
 	}
+
+	*HasLoadedLanguage = true;
 }
 
 char* __cdecl cave_c00031b97(char* result, int buff_len)//Font Table Filename Override
@@ -657,9 +661,6 @@ void initGSCustomLanguage() {
 		//Hook the function that sets the font table filename.
 		pfn_c00031b97 = (char*(__cdecl*)(int, int))((BYTE*)H2BaseAddr + 0x00031b97);
 		PatchCall(H2BaseAddr + 0x00031e89, nak_c00031b97);
-
-		//Hook the part where it sets the global language id.
-		Codecave(H2BaseAddr + 0x3820d, getSystemLanguageMethodJmp, 1);
 
 		bool redoCapture = H2Config_custom_labels_capture_missing;
 		setCustomLanguage(H2Config_language_code_main, H2Config_language_code_variant);
