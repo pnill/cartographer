@@ -541,7 +541,7 @@ void H2MOD::set_unit_biped(Player::Biped biped_type, int playerIndex)
 {
 	PlayerIterator playersIt;
 	if (playerIndex >= 0 && playerIndex < 16)
-		playersIt.get_data_at_index(playerIndex)->properties.profile.player_caracter_type = biped_type;
+		playersIt.get_data_at_index(playerIndex)->properties.profile.player_character_type = biped_type;
 }
 
 BYTE H2MOD::get_unit_team_index(DatumIndex unit_datum_index)

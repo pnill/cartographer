@@ -19,13 +19,15 @@ bool firstSpawn;
 bool infectedPlayed;
 signed int zombiePlayerIndex = -1;
 
-signed int Infection::calculateZombiePlayerIndex() {
+signed int Infection::calculateZombiePlayerIndex() 
+{
 	if (getPlayerCount() > 0)
 	{
 		std::vector<int> vecPlayersActiveIndexes;
 
 		int playerIndex = 0;
-		do {
+		do 
+		{
 			if (IsActive(playerIndex))
 				vecPlayersActiveIndexes.push_back(playerIndex);
 

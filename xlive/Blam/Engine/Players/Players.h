@@ -34,7 +34,7 @@ struct PlayerProperties
 		Player::Color secondary_color;
 		Player::Color tertiary_color;
 		Player::Color quaternary_color;
-		Player::Biped player_caracter_type;
+		Player::Biped player_character_type;
 		Player::EmblemForeground foreground_emblem;
 		Player::EmblemBackground background_emblem;
 		char emblem_flags;
