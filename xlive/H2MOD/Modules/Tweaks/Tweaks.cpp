@@ -1054,8 +1054,7 @@ void InitH2Tweaks() {
 	PatchCall(h2mod->GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 
-	// physics patches
-	H2Tweaks::applyMeleePatch(); 
+	// physics patches 
 	H2Tweaks::applyObjectPredictionPatch(); 
 
 	addDebugText("End Startup Tweaks.");
@@ -1348,18 +1347,23 @@ void H2Tweaks::applyObjectPredictionPatch()
 	PatchCall(h2mod->GetAddress(0x1F4435, 0x1DF4CE), get_tick_execution_time_seconds);
 }	
 
+/*
 float melee_lunge_distance_factor = 0.33333334f;
 void H2Tweaks::setMeleeLungeDistanceFactor(float value)
 {
 	melee_lunge_distance_factor = value;
 }
+*/
 
-void H2Tweaks::applyMeleePatch()
+void H2Tweaks::applyMeleePatch(bool toggle)
 {
-	WritePointer(h2mod->GetAddress(0x10B160, 0xFD790) + 4, &melee_lunge_distance_factor);
-	WritePointer(h2mod->GetAddress(0x10B354, 0xFD984) + 4, &melee_lunge_distance_factor);
-	WritePointer(h2mod->GetAddress(0x10B6A3, 0xFDCD3) + 4, &melee_lunge_distance_factor);
-	WritePointer(h2mod->GetAddress(0x10BB78, 0xFE1A8) + 4, &melee_lunge_distance_factor);
+	//WritePointer(h2mod->GetAddress(0x10B160, 0xFD790) + 4, &melee_lunge_distance_factor);
+	//WritePointer(h2mod->GetAddress(0x10B354, 0xFD984) + 4, &melee_lunge_distance_factor); // distance when mid air
+	//WritePointer(h2mod->GetAddress(0x10B6A3, 0xFDCD3) + 4, &melee_lunge_distance_factor); // acceleration
+	//WritePointer(h2mod->GetAddress(0x10BB78, 0xFE1A8) + 4, &melee_lunge_distance_factor);
+
+	WriteValue<BYTE>(h2mod->GetAddress(0x10B408, 0xFDA38) + 2, toggle ? 5 : 6); // sword
+	WriteValue<BYTE>(h2mod->GetAddress(0x10B40B, 0xFDA3B) + 2, toggle ? 2 : 1); // generic weapon
 }
 
 void H2Tweaks::sunFlareFix()

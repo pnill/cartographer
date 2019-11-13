@@ -23,8 +23,7 @@ namespace H2Tweaks {
 	void setCrosshairPos(float crosshair_offset);
 	void setCrosshairSize(int size, bool preset);
 	void applyObjectPredictionPatch();
-	void setMeleeLungeDistanceFactor(float value);
-	void applyMeleePatch();
+	void applyMeleePatch(bool toggle);
 	void setSens(InputType input_type, int sens);
 	void setSavedSens();
 	void sunFlareFix();
