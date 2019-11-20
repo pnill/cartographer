@@ -1347,16 +1347,9 @@ void H2Tweaks::applyObjectPredictionPatch()
 	PatchCall(h2mod->GetAddress(0x1F4435, 0x1DF4CE), get_tick_execution_time_seconds);
 }	
 
-/*
-float melee_lunge_distance_factor = 0.33333334f;
-void H2Tweaks::setMeleeLungeDistanceFactor(float value)
-{
-	melee_lunge_distance_factor = value;
-}
-*/
-
 void H2Tweaks::applyMeleePatch(bool toggle)
 {
+	//static float melee_lunge_distance_factor = toggle ? 0.33333334f * 2 : 0.33333334f;
 	//WritePointer(h2mod->GetAddress(0x10B160, 0xFD790) + 4, &melee_lunge_distance_factor);
 	//WritePointer(h2mod->GetAddress(0x10B354, 0xFD984) + 4, &melee_lunge_distance_factor); // distance when mid air
 	//WritePointer(h2mod->GetAddress(0x10B6A3, 0xFDCD3) + 4, &melee_lunge_distance_factor); // acceleration
