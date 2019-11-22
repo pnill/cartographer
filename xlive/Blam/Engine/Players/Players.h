@@ -48,11 +48,6 @@ struct PlayerProperties
 		DWORD ID_3;
 	} clan_identifiers;
 
-	enum Team : BYTE
-	{
-		RED,
-		BLUE
-	};
 	Player::Team player_team;
 	Player::Handicap player_handicap_level;
 	Player::Handicap player_displayed_skill;
