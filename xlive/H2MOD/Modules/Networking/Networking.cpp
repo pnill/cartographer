@@ -13,7 +13,6 @@
 
 extern SOCKET game_network_data_gateway_socket_1000;
 extern SOCKET game_network_message_gateway_socket_1001;
-extern int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4);
 
 CustomNetwork *network = new CustomNetwork;
 
@@ -265,6 +264,12 @@ void removeXNetSecurity()
 	NopFill(h2mod->GetAddress(0x1B624A, 0x196684), 2);
 	NopFill(h2mod->GetAddress(0x1B6201, 0x19663B), 2);
 	NopFill(h2mod->GetAddress(0x1B62BC, 0x1966F4), 2);
+	
+}
+
+int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4)
+{
+	return -1; // stub qos lookup function in-game between peers in a network session
 }
 
 void applyConnectionPatches()
@@ -275,7 +280,7 @@ void applyConnectionPatches()
 	// live netcode research
 	NetworkConfiguration::ApplyPatches();
 
-	// force hard-coded qos data in-lobby
+	// stub QoS lookup function for in-game data
 	PatchCall(h2mod->GetAddress(0x1BDCB0, 0x1B7B8A), QoSLookUpImpl);
 
 	//NopFill<9>(h2mod->GetBase() + (h2mod->Server ? 0x1B3CC3 : 0x1F1F94)); // check if secure/ipaddress != 127.0.0.1

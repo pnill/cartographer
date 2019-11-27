@@ -115,7 +115,7 @@ void __stdcall message_gateway_hook(void *thisx, network_address* addr, int mess
 				wcsncpy_s(buffer.file_name, map_filename.c_str(), 32);
 			}
 
-			send_packet(current_session->network_observer, current_session->unk_index, current_session->observer_info[peer_index].observer_index, true,
+			send_packet(current_session->network_observer, current_session->unk_index, current_session->peer_observer_channels[peer_index].observer_index, true,
 				map_file_name, sizeof(s_custom_map_filename), &buffer);
 		}
 
@@ -188,8 +188,8 @@ void CustomPackets::sendRequestMapFilename(network_session* session)
 		SecureZeroMemory(&buffer, sizeof(s_request_map_filename));
 		memcpy(&buffer.user_identifier, &xFakeXuid[0], sizeof(XUID));
 
-		if (session->observer_info[session->session_host_peer_index].field_0[1]) {
-			send_packet(session->network_observer, session->unk_index, session->observer_info[session->session_host_peer_index].observer_index, true,
+		if (session->peer_observer_channels[session->session_host_peer_index].field_1) {
+			send_packet(session->network_observer, session->unk_index, session->peer_observer_channels[session->session_host_peer_index].observer_index, true,
 				request_map_filename, sizeof(s_request_map_filename), (void*)&buffer);
 		}
 	}
@@ -204,9 +204,9 @@ void CustomPackets::sendTeamChange(network_session* session, signed int peer_ind
 
 		if (peer_index != -1 && peer_index != session->local_peer_index)
 		{
-			if (session->observer_info[peer_index].field_0[1])
+			if (session->peer_observer_channels[peer_index].field_1)
 			{
-				send_packet(session->network_observer, session->unk_index, session->observer_info[peer_index].observer_index, true,
+				send_packet(session->network_observer, session->unk_index, session->peer_observer_channels[peer_index].observer_index, true,
 					team_change, sizeof(s_team_change), (void*)&buffer);
 			}
 		}
@@ -219,9 +219,9 @@ void CustomPackets::sendUnitGrenadesPacket(network_session* session, int peer_in
 	{
 		if (peer_index != -1 && peer_index != session->local_peer_index)
 		{
-			if (session->observer_info[peer_index].field_0[1])
+			if (session->peer_observer_channels[peer_index].field_1)
 			{
-				send_packet(session->network_observer, session->unk_index, session->observer_info[peer_index].observer_index, true,
+				send_packet(session->network_observer, session->unk_index, session->peer_observer_channels[peer_index].observer_index, true,
 					unit_grenades, sizeof(s_unit_grenades), (void*)data);
 			}
 		}

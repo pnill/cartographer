@@ -72,7 +72,7 @@ struct network_configuration
 	float field_178;
 	DWORD field_17C;
 	float field_180;
-	DWORD field_184_21;
+	DWORD field_184;
 	DWORD field_188_21;
 	DWORD field_18C_3072;
 	float field_190_0_2;

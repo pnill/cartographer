@@ -65,9 +65,11 @@ struct peer_information
 };
 static_assert(sizeof(peer_information) == 268, "Invalid PeerNetworkInfo size");
 
-struct peer_channel
+struct peer_observer_channel
 {
-	char field_0[4];
+	bool field_0;
+	bool field_1;
+	char pad[2];
 	signed int observer_index;
 	int membership_update_number;
 	int parameters_update_number;
@@ -190,7 +192,7 @@ struct network_session
 	session_parameters parameters;
 	session_parameters parameters_2;
 	DWORD local_peer_index;
-	peer_channel observer_info[17];
+	peer_observer_channel peer_observer_channels[17];
 	eNetwork_session_state local_session_state;
 	DWORD time_unk_2;
 	DWORD time_unk_3;

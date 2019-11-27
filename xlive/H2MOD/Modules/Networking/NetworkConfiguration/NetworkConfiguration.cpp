@@ -92,7 +92,7 @@ void __cdecl InitializeConfiguration()
 	g_network_configuration->field_174 = 32;
 	g_network_configuration->field_17C = 4;
 	g_network_configuration->field_180 = 0.80000001f;
-	g_network_configuration->field_184_21 = 10;
+	g_network_configuration->field_184 = 10;
 	g_network_configuration->field_188_21 = 21;
 	g_network_configuration->field_18C_3072 = 3072;
 	g_network_configuration->field_194_5120 = 5120;
@@ -212,7 +212,7 @@ void NetworkConfiguration::ApplyPatches()
 	PatchCall(h2mod->GetAddress(0x1ABE23, 0x1AC328), InitializeConfiguration);
 
 	// use a constant timer rather than the game's timer, seems to improve the medal delay issue
-	WriteJmpTo(h2mod->GetAddress(0x1B3C5C, 0x1Af225), getGameTime);
+	WriteJmpTo(h2mod->GetAddress(0x1B3C5C, 0x1AF225), getGameTime);
 
 	// disable network observer (broken on H2V)
 	//WriteValue<BYTE>(h2mod->GetAddress() + (h2mod->Server ? 0x1A92BA : 0x1B555C), (BYTE)0);
