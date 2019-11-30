@@ -16,8 +16,8 @@ extern SOCKET game_network_message_gateway_socket_1001;
 
 CustomNetwork *network = new CustomNetwork;
 
-const char* getTextForEnum(int enumVal) {
-	return packet_type_strings[enumVal];
+const char* getNetworkMessageName(int enumVal) {
+	return network_message_name[enumVal];
 }
 
 void __cdecl request_write(void* a1, int a2, int a3) {
@@ -150,14 +150,6 @@ void __cdecl registerPlayerPackets(void* packetObject) {
 		h2mod->GetAddress<void*>(0x1F09AC, 0x1D1365), 0);
 }
 
-typedef int(__stdcall *send_packet)(void* thisx, void *a2, unsigned int type, unsigned int size, int packet_data_obj);
-send_packet send_packet_method;
-
-int __stdcall sendPacket(void* thisx, void *a2, unsigned int type, unsigned int size, int packet_data_obj) {
-	LOG_TRACE_NETWORK("[h2mod-network] send packet type={0}, typeName={1}, size={2}", type, getTextForEnum(type), size);
-	return send_packet_method(thisx, a2, type, size, packet_data_obj);
-}
-
 bool decodePacketTypeAndSize(void *thisx, void* a2, signed int *a3, int a4) {
 	char *v4; // ebp@1
 	signed int v5; // eax@2
@@ -167,7 +159,7 @@ bool decodePacketTypeAndSize(void *thisx, void* a2, signed int *a3, int a4) {
 	v4 = (char *)thisx;
 	*a3 = bitstream::p_data_decode_integer()(a2, "type", 8);
 	*(DWORD *)a4 = bitstream::p_data_decode_integer()(a2, "size", 16);
-	LOG_TRACE_NETWORK("[h2mod-network] received packet decoded type={0}, typeName={1}, size={2}", *a3, getTextForEnum(*a3), *(DWORD *)a4);
+	LOG_TRACE_NETWORK("[h2mod-network] received packet decoded type={0}, typeName={1}, size={2}", *a3, getNetworkMessageName(*a3), *(DWORD *)a4);
 	if (bitstream::p_packet_is_valid()(a2)
 		|| (v5 = *a3, *a3 < 0)
 		|| v5 >= 49

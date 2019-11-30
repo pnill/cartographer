@@ -17,10 +17,6 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
-#include <sys/stat.h>
-#include <string>
-#include <sstream>
-#include <io.h>
 #include <filesystem>
 
 namespace filesystem = std::experimental::filesystem;
@@ -46,7 +42,6 @@ h2log *console_log = nullptr;
 ProcessInfo game_info;
 
 bool H2IsDediServer = false;
-bool H2DediIsLiveMode = false;
 DWORD H2BaseAddr = NULL;
 wchar_t* H2ProcessFilePath = 0;
 wchar_t* H2AppDataLocal = 0;
@@ -390,7 +385,6 @@ void InitH2Startup() {
 	H2Config_debug_log_level = temp_log_level;
 	H2Config_debug_log = H2Config_isConfigFileAppDataLocal = false;
 
-	//halo2ThreadID = GetCurrentThreadId();
 	if (game_info.process_type == H2Types::H2Server) {
 		H2IsDediServer = true;
 		addDebugText("Process is Dedi-Server");
@@ -419,10 +413,6 @@ void InitH2Startup() {
 					FlagFilePathConfig = (wchar_t*)malloc(sizeof(wchar_t) * pfcbuflen);
 					swprintf(FlagFilePathConfig, pfcbuflen, ArgList[i] + 10);
 				}
-			}
-			if (_wcsicmp(ArgList[i], L"-live") == 0)
-			{
-				H2DediIsLiveMode = true;
 			}
 		}
 	}

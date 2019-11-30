@@ -120,32 +120,6 @@ void __cdecl InitializeConfiguration()
 	g_network_configuration->field_200 = 4096;
 }
 
-static float aux;
-extern bool b_XboxTick;
-static float increase_factor = 1.3f;
-__declspec(naked) void network_observer_patch(void)
-{
-	__asm
-	{
-		cmp      b_XboxTick, 1
-		jz       original_code
-		xorps    xmm0, xmm0
-		cvtsi2ss xmm0, eax
-		mulss    xmm0, increase_factor
-		movss    aux, xmm0
-		fld      aux
-		fistp    aux
-		mov      eax, aux
-
-		original_code :
-		imul     eax, ebp
-			cdq
-			idiv    ecx
-
-			ret
-	}
-}
-
 //1bfb23
 typedef double(__stdcall* unk_live_netcode_func_def)(DWORD *thisx, signed int a2, bool a3, bool a4);
 unk_live_netcode_func_def p_unk_live_netcode_func;
@@ -221,9 +195,6 @@ void NetworkConfiguration::ApplyPatches()
 
 	// makes Live network not as laggy 
 	//WriteValue<int>(h2mod->GetAddress(0x28702, 0x24896), 500);
-
-	// 30 tickrate to 60 compenstation for packet size
-	//Codecave(h2mod->GetAddress(0x1BF1B9, 0x1B9093), network_observer_patch, 1);
 
 	DWORD dwBack;
 

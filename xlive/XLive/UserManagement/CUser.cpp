@@ -256,15 +256,13 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pnkid, IN_ADDR *p
 	LOG_TRACE_NETWORK("XNetXnAddrToInAddr(): secure: {:x}", pxna->inaOnline.s_addr);
 	LOG_TRACE_NETWORK("XNetXnAddrToInAddr(): ip-address: {:x}", pxna->ina.s_addr);
 
-	LOG_TRACE_NETWORK("[Resources-Clear] XNetXnAddrToInAddr executed on thread {:x}", GetCurrentThreadId());
-
 	if (pxna)
 	{
 		auto user = userManager.cusers.find(pxna->inaOnline.s_addr);
 
 		if (user != userManager.cusers.end())
 		{
-			pina->s_addr = pxna->inaOnline.s_addr; // copy secure address
+			*pina = pxna->inaOnline; // copy secure address
 			return ERROR_SUCCESS;
 		}
 	}

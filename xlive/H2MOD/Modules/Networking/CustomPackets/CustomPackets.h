@@ -62,7 +62,7 @@ enum e_network_message_types
 	end
 };
 
-static const char* packet_type_strings[] = {
+static const char* network_message_name[] = {
 	"ping",
 	"pong",
 	"broadcast_search",

@@ -106,7 +106,7 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 	if (htons(port) == 1006)
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port + 6);
 
-	userManager.sockmap[s] = ntohs(port);
+	userManager.sockmap[s] = htons(port);
 
 	SOCKET ret = bind(s, name, namelen);
 
