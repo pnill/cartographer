@@ -447,10 +447,10 @@ bool engine_basic_init()
 	//extern DWORD WINAPI XLivePBufferSetByte(FakePBuffer * pBuffer, DWORD offset, BYTE value);
 	LONG(__stdcall* XLivePBufferAllocate)(DWORD size, FakePBuffer **pBuffer) = (LONG(__stdcall*)(DWORD, FakePBuffer**))h2mod->GetAddress(0xe886);
 	DWORD(__stdcall* XLivePBufferSetByte)(FakePBuffer * pBuffer, DWORD offset, BYTE value) = (DWORD(__stdcall*)(FakePBuffer*, DWORD, BYTE))h2mod->GetAddress(0xe880);
-	DWORD* var_c00479e78 = h2mod->GetAddress<DWORD*>(0x00479e78);
-	XLivePBufferAllocate(2, (FakePBuffer**)&var_c00479e78);
-	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 0);
-	XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 1, 0);
+	FakePBuffer** var_c00479e78 = h2mod->GetAddress<FakePBuffer**>(0x00479e78);
+	XLivePBufferAllocate(2, var_c00479e78);
+	XLivePBufferSetByte(*var_c00479e78, 0, 0);
+	XLivePBufferSetByte(*var_c00479e78, 1, 0);
 
 	//SLDLInitialize
 
