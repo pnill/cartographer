@@ -139,7 +139,7 @@ struct s_unit_grenades
 {
 	int type;
 	int count;
-	int pindex;
+	int player_index;
 };
 
 #pragma pack(push, 1)

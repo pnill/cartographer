@@ -268,7 +268,7 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int playerIndex, bool bRe
 
 		data.type = type;
 		data.count = count;
-		data.pindex = playerIndex;
+		data.player_index = playerIndex;
 		CustomPackets::sendUnitGrenadesPacket(NetworkSession::getCurrentNetworkSession(), getPeerIndexFromPlayerIndex(playerIndex), &data);
 	}
 }
