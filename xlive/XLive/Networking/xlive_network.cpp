@@ -154,8 +154,6 @@ DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pAddr)
 // #24: XSocketSendTo
 int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr *to, int tolen)
 {
-	LOG_TRACE_NETWORK("XSocketSendTo() - socket: {} and default port: {}", s, htons(((struct sockaddr_in*)to)->sin_port));
-
 	u_short port = (((struct sockaddr_in*)to)->sin_port);
 	u_long iplong = (((struct sockaddr_in*)to)->sin_addr.s_addr);
 

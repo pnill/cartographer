@@ -179,14 +179,14 @@ void NetworkConfiguration::ApplyPatches()
 		{ 0x1C12BF, 0x1BB19F }
 	};
 
-	for (auto address : addresses)
-		WritePointer(h2mod->GetAddress(address.first, address.second) + 4, &unk_flt_);
+	//for (auto address : addresses)
+		//WritePointer(h2mod->GetAddress(address.first, address.second) + 4, &unk_flt_);
 
 	g_network_configuration = h2mod->GetAddress<network_configuration*>(0x4F960C, 0x523B5C);
-	PatchCall(h2mod->GetAddress(0x1ABE23, 0x1AC328), InitializeConfiguration);
+	//PatchCall(h2mod->GetAddress(0x1ABE23, 0x1AC328), InitializeConfiguration);
 
 	// use a constant timer rather than the game's timer, seems to improve the medal delay issue
-	WriteJmpTo(h2mod->GetAddress(0x1B3C5C, 0x1AF225), getGameTime);
+	//WriteJmpTo(h2mod->GetAddress(0x1B3C5C, 0x1AF225), getGameTime);
 
 	// disable network observer (broken on H2V)
 	//WriteValue<BYTE>(h2mod->GetAddress() + (h2mod->Server ? 0x1A92BA : 0x1B555C), (BYTE)0);
@@ -194,7 +194,7 @@ void NetworkConfiguration::ApplyPatches()
 	//WriteValue<BYTE>(h2mod->GetAddress() + (h2mod->Server ? 0x1C1B7F : 0x1D4E35), 0xEB);
 
 	// makes Live network not as laggy 
-	//WriteValue<int>(h2mod->GetAddress(0x28702, 0x24896), 500);
+	WriteValue<int>(h2mod->GetAddress(0x28702, 0x24896), 500);
 
 	DWORD dwBack;
 

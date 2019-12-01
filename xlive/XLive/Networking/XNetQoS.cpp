@@ -237,6 +237,7 @@ void CALLBACK CXNetQoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOV
 
 void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags)
 {
+	int wsaError = dwError;
 	LPSOCKET_INFORMATION acceptSockInfo = reinterpret_cast<LPSOCKET_INFORMATION>(lpOverlapped);
 
 	acceptSockInfo->DataBuf.len = g_XnetStartupParams.cfgQosDataLimitDiv4 * 4;
@@ -246,9 +247,9 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 
 	//LOG_TRACE_NETWORK_N("[H2MOD-QoS] SendBack callback -> socket: %d", acceptSockInfo->Socket);
 
-	if (dwError != 0)
+	if (wsaError != 0)
 	{
-		LOG_TRACE_NETWORK("[H2MOD-QoS] SendBack callback -> I/O operation failed with error: {}", dwError);
+		LOG_TRACE_NETWORK("[H2MOD-QoS] SendBack callback -> I/O operation failed with error: {}", wsaError);
 		goto cleanup;
 	}
 
@@ -260,7 +261,6 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 
 	//LOG_TRACE_NETWORK_N("[H2MOD-QoS] SendBack callback -> magic received??? 0x%x", *(DWORD*)&(acceptSockInfo->Buffer));
 
-	int wsaError = 0;
 	if (*(DWORD*)&(acceptSockInfo->Buffer) == 0xAABBCCDD)
 	{
 		//LOG_TRACE_NETWORK_N("[H2MOD-QoS] SendBack callback -> magic is right, sending data back on port %d", acceptSockInfo->Socket);
