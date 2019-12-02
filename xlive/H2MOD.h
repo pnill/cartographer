@@ -81,7 +81,7 @@ public:
 		void SetMapType(MapType value) { mapType = value; }
 
 		void exit_game();
-		BOOL Server;
+		bool Server;
 		std::unordered_map<std::string, bool> AchievementMap;
 		std::deque<std::wstring> CustomSounds;
 		
