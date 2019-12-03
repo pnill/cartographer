@@ -364,7 +364,7 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
 	curl = curl_easy_init();
-	if (curl)
+	if (curl && MasterState != 2)
 	{
 		rapidjson::Document document;
 		document.SetObject();
@@ -419,7 +419,8 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 
 
 		Value token(kStringType);
-		token.SetString(H2CurrentAccountLoginToken, document.GetAllocator());
+		if (H2CurrentAccountLoginToken)
+			token.SetString(H2CurrentAccountLoginToken, document.GetAllocator());
 
 		document.AddMember("token", token, document.GetAllocator());
 		document.AddMember("xuid", Value().SetUint64(xFakeXuid[0]), document.GetAllocator());
@@ -512,7 +513,6 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 	if (MasterState != 2)
 		std::thread(AddServer, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
 
-	// not done - error now
 	return S_OK;
 }
 
@@ -522,7 +522,7 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 	// LOG_TRACE_XLIVE("XLocatorGetServiceProperty  (*** checkme ***) (dwUserIndex = {0:x}, cNumProperties = {1:x}, pProperties = {2:x}, pOverlapped = {3:x})",
 	//		dwUserIndex, cNumProperties, pProperties, pOverlapped);
 
-	if (!LiveManager.server_counts_download_running)
+	if (!LiveManager.server_counts_download_running && MasterState != 2)
 		std::thread(&ServerList::GetServerCounts, &LiveManager).detach();
 
 	pProperties[0].value.nData = LiveManager.total_count;
