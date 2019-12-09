@@ -1,19 +1,4 @@
-﻿///
-//Tag loader made by Himanshu01
-//version -1.1 
-///
-//<--------------Notes---------------------->
-///v1.0
-//Cache loader is quit completed(its not blam loader)
-//The query parser can currently have module loading and spawn_commands(non-functional[lol])
-///v1.1
-//Removed call to reinjection function as the query parser makes it obselete 
-//Changed the check_shared function definition
-//Removed the NullString id instruction in Load_tag function,beware it may cause crashes when directly loading from a single player map
-//Reworked query parser
-//Added replace tag command
-///
-#pragma once
+﻿#pragma once
 
 #include "stdafx.h"
 #include "meta_struct.h"
@@ -29,7 +14,6 @@ using meta_struct::plugins_field;
 using meta_struct::injectRefs;
 
 //The TAG LOADER
-//All the StringID related stuff are incomplete
 namespace tag_loader
 {
 	//returns reference to plugin of specified type
@@ -40,8 +24,6 @@ namespace tag_loader
 	void Load_tag(int datum_index, bool recursive, std::string map, bool custom = false);
 	//Return the size of the meta that is currently in the que
 	unsigned int Que_meta_size();
-	//Return the size of the meta that has been injected or would be injected upon map load
-	//unsigned int meta_size();
 	//Generates a SID ref table
 	int Generate_SID(int table_index, int set, std::string STRING);
 	//Returns a list of strings along with their stringIDs
@@ -54,21 +36,17 @@ namespace tag_loader
 	//pushes the tag_data in que to the tag_tables and tag_memory at specified tag_table index
 	//BECAREFULL WHILE OVERWRITING TAGS
 	void Push_Back(int datum_index);	
-	//reinjects the meta upon map reload or map change
-	//void Reinject_meta();
 	//Dumps meta data in que in the specified tag folder(integrity checking)
 	void Dump_Que_meta();
 	//return and clears all the error messages incurred
 	std::string Pop_messages();
 	//return a tag_name list
 	std::string Pop_tag_list();
-	//Generates a StringId List combining all the default maps
-	//void Dump_StringID_list();
-	//Generates a StringId List for a specific map and adds it to the list
-	//void Dump_StringID_list(string map_loc);
 	//function to load RAW_DATA of the concerned tag from meta_list
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
 	void Load_RAW_refs(DatumIndex datum_index, std::string map_loc);
+	//same as the previous implementation,but it utilises file handle to load from any file 
+	void Load_RAW_refs(DatumIndex datum_index, HANDLE file);
 	//Fixes the reference of the tags to their global objects(vftables)
 	void Fix_global_objects_ref(DatumIndex datum_index);
 	//Loads a file containing a a bunch of tags concerned with some specific element injecting the first tag onto the target datum

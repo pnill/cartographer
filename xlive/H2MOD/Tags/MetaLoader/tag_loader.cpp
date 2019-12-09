@@ -277,24 +277,7 @@ namespace tag_loader
 
 		return ret;
 	}
-	//Return the size of the meta that has been injected or would be injected upon map load
-	/*
-	unsigned int meta_size()
-	{
-		unsigned int ret = 0;
-		for (int i = 0; i < meta_list.size(); i++)
-			ret += meta_list[i]->Get_Total_size();
 
-		return ret;
-	}
-	*/
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="table_index"></param>
-	/// <param name="STRING"></param>
-	/// <returns></returns>
 	int Generate_SID(int table_index, int set, std::string STRING)
 	{
 		int l = (STRING.length() & 0xFF) << 24;
@@ -461,61 +444,7 @@ namespace tag_loader
 		}
 		my_inject_refs.clear();
 		que_meta_list.clear();
-	}
-	/*
-	//function to reinject the meta in meta_list upon map reload
-	void Reinject_meta()
-	{
-		//reset some stuff
-		int mem_off = def_meta_size;
-		new_datum_index = _INJECTED_TAG_START_;
-		ext_meta_size = 0x0;
-
-		map<int, shared_ptr<meta_struct::meta>>::iterator meta_list_iter = meta_list.begin();
-		while (meta_list_iter != meta_list.end())
-		{
-			if (tag_count >= 0x2710 || meta_list_iter->first >= _INJECTED_TAG_START_)
-			{
-				int meta_size = meta_list_iter->second->Get_Total_size();
-
-				char tables_data[0x10];
-				DWORD MapMemBase = (DWORD)tags::get_tag_data();
-				meta_list_iter->second->Rebase_meta(mem_off);
-				char* meta_data = meta_list_iter->second->Generate_meta_file();
-
-				char type[5];
-				memcpy(type, meta_list_iter->second->Get_type().c_str(), 0x5);
-				reverse(&type[0], &type[4]);
-				memcpy(tables_data, type, 0x4);
-
-				memcpy(tables_data + 0x4, &meta_list_iter->first, 0x4);
-				memcpy(tables_data + 0x8, &mem_off, 0x4);
-				memcpy(tables_data + 0xC, &meta_size, 0x4);
-				char* temp_write_off = tag_loader::new_Tables + 0x10 * (meta_list_iter->first & 0xFFFF);
-				memcpy((char*)temp_write_off, tables_data, 0x10);//copy to the tables
-
-				memcpy((char*)MapMemBase + mem_off, meta_data, meta_size);//copy to the tag memory
-
-				//fix the global_refs
-				Fix_global_objects_ref(meta_list_iter->first);
-				//Load RAW
-				Load_RAW_refs(meta_list_iter->first, meta_list_iter->second->Get_map_loc());
-
-				delete[] meta_data;
-				mem_off += meta_size;
-				ext_meta_size += meta_size;
-				new_datum_index = meta_list_iter->first;
-			}
-			meta_list_iter++;
-		}
-	}
-	//clears the tags in meta_list
-	void Clear_meta_list()
-	{
-		meta_list.clear();
-		ext_meta_size = 0x0;
-	}
-	*/
+	}	
 	//clears the tags in que_list
 	void Clear_que_list()
 	{
@@ -566,41 +495,7 @@ namespace tag_loader
 			tag_list.pop_back();
 		}
 		return ret;
-	}
-	/*
-	*isnt complete yet
-	//Generates a StringId List combining all the default maps
-	void Dump_StringID_list()
-	{
-		vector<string> test;
-		read_directory(def_maps_dir, test);//default maps
-
-		for (int i = 0; i < test.size(); i++)
-		{
-			if (meta_struct::Get_file_type(test[i]) == "map")
-				Dump_StringID_list(def_maps_dir + '\\' + test[i]);
-		}
-		test.clear();
-
-		read_directory(cus_maps_dir, test);//custom maps
-		for (int i = 0; i < test.size(); i++)
-		{
-			if (meta_struct::Get_file_type(test[i]) == "map")
-				Dump_StringID_list(cus_maps_dir + '\\' + test[i]);
-		}
-
-		test.clear();
-
 	}	
-	//Generates a StringId List for a specific map and adds it to the list
-	void Dump_StringID_list(string map_loc)
-	{
-		list<meta_struct::StringID_info> SID_list = Get_SID_list(map_loc);
-		cache_loader my_cache_loader("C:\\h2v\\SID_list.bin");
-		cache_BLOCK* strings_block = my_cache_loader.get_BLOCK("strings");
-
-	}
-	*/
 	//function to try and return a handle to the map (map_name or scenario_name(same as the actual map_name) supported)
 	//Checks inside mods//maps folder first then maps folder and finally inside custom maps folder
 	HANDLE try_find_map(std::string map)
@@ -750,6 +645,93 @@ namespace tag_loader
 		*PMapRawtableoffset = oldRtable_offset;
 		*PRawTableSize = oldRtable_size;
 	}
+	void Load_RAW_refs(DatumIndex datum_index, HANDLE file)
+	{
+		DWORD* PMapRawtableoffset = (DWORD*)(h2mod->GetBase() + 0x4AE8B0);
+		DWORD* PRawTableSize = (DWORD*)(h2mod->GetBase() + 0x4AE8B4);
+
+		//a little  precaution to circumvent unexpected behaviour
+		DWORD oldRtable_offset = *PMapRawtableoffset;
+		DWORD oldRtable_size = *PRawTableSize;
+
+		//hax to force loading from the disk
+		*PMapRawtableoffset = 0x0;
+		*PRawTableSize = 0x0;
+		
+		DWORD ETCOFFSET = *(DWORD*)(h2mod->GetBase() + 0x482290);
+		HANDLE old_file_handle = *(HANDLE*)(h2mod->GetBase() + 0x4AE8A8);
+
+
+		tags::tag_instance* tag_info = &new_Tables[datum_index.ToAbsoluteIndex()];
+		char* tag_data = tags::get_tag_data() + new_Tables[datum_index.ToAbsoluteIndex()].data_offset;
+
+		//fail safe
+		if (tag_info->datum_index.ToAbsoluteIndex() != datum_index.ToAbsoluteIndex())
+		{
+			std::string error = "Tag: " + datum_index.ToInt();
+			error += " not loaded into tag tables and tag memory";;
+			throw new std::exception(error.c_str());
+		}
+
+		*(HANDLE*)(h2mod->GetBase() + 0x4AE8A8) = file;
+
+		switch (tag_info->type.as_int())
+		{
+		case 'mode':
+
+			if (*(int*)(tag_data + 0x24) > 0)
+			{
+				int v15 = 0;
+
+				int off = 0;
+				do
+				{
+					int sections_off = *(int*)(tag_data + 0x28);
+					int sections_base = 0;
+					if (sections_off != -1)
+						sections_base = ETCOFFSET + sections_off;
+					((void(__cdecl *)(int, unsigned int))h2mod->GetAddress(0x2652BC))(sections_base + off + 0x38, 3u);
+					++v15;
+					off += 0x5C;
+				} while (v15 < *(int*)(tag_data + 0x24));
+			}
+			break;
+
+		case 'bitm':
+		{
+
+			int old_list_field = *h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC);
+
+			for (int i = 0; i < *(int*)(tag_data + 0x44); i++)
+			{
+
+				int bitmaps_field_off = *(int*)(tag_data + 0x48);
+
+				int bitmaps_field_base = 0;
+				if (bitmaps_field_off != -1)
+					bitmaps_field_base = bitmaps_field_off + ETCOFFSET;
+
+				int bitmaps_field = bitmaps_field_base + 0x74 * i;
+
+				*h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC) = bitmaps_field;
+
+				int temp = 0;
+				((int(__cdecl *)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 2, 0, &temp);
+
+				((int(__cdecl *)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 0, 0, &temp);
+
+			}
+			*h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
+			break;
+		}
+		default:
+			break;
+		}
+		*(HANDLE*)(h2mod->GetBase() + 0x4AE8A8) = old_file_handle;
+
+		*PMapRawtableoffset = oldRtable_offset;
+		*PRawTableSize = oldRtable_size;
+	}
 	//Fixes the reference of the tags to their global objects(vftables)
 	void Fix_global_objects_ref(DatumIndex datum_index)
 	{
@@ -796,6 +778,8 @@ namespace tag_loader
 
 		if (my_loader->get_last_error()!=UNABLE_TO_LOCATE_FILE)
 		{
+			HANDLE file_handle = CreateFileA(loc.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+
 			cache_BLOCK* module_tag_table = my_loader->get_BLOCK("tag_table");
 			cache_BLOCK* module_tag_data = my_loader->get_BLOCK("tag_data");
 			cache_BLOCK* module_tag_maps = my_loader->get_BLOCK("tag_maps");
@@ -865,7 +849,7 @@ namespace tag_loader
 				module_tags[i]->Update_datum_indexes(my_inject_refs);
 				module_tags[i]->Rebase_meta(new_mem_off);
 
-				Load_RAW_refs((&t_ptr[i])->datum_index, m_ptr);
+				Load_RAW_refs((&t_ptr[i])->datum_index, file_handle);
 				Fix_global_objects_ref((&t_ptr[i])->datum_index);
 
 				//as the tags are from the same map
@@ -873,6 +857,8 @@ namespace tag_loader
 				ext_meta_size += module_tags[i]->Get_Total_size();
 			}
 			module_tags.clear();
+			CloseHandle(file_handle);
+
 		}
 		else
 		{
@@ -1214,14 +1200,14 @@ bool _cdecl LoadTagsandMapBases(int a)
 	tag_loader::new_datum_index = _INJECTED_TAG_START_;
 
 	// adding all shared references
-	tag_loader::Add_all_shared_refs();
+	//tag_loader::Add_all_shared_refs();
 
 	// extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
-	if (tags::get_cache_header()->type != tags::cache_header::scnr_type::SinglePlayer)
+	if (tags::get_cache_header()->type != tags::cache_header::scnr_type::SinglePlayerShared)
 	{
 		DWORD *TagTableStart = h2mod->GetAddress<DWORD*>(0x47CD50);
 		///---------------TABLE EXTENSION  STUFF
-		memcpy((BYTE*)tag_loader::new_Tables, (BYTE*)*TagTableStart, 244288);
+		memcpy((BYTE*)tag_loader::new_Tables, (BYTE*)*TagTableStart, 0x3BA40);
 		*TagTableStart = (DWORD)tag_loader::new_Tables;
 	}
 
@@ -1236,7 +1222,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	///tag_injector testing
 	//Just for testing purpose,dont cluter here	
 	///Actual injection process after map load
-	if (tags::get_cache_header()->type != tags::cache_header::scnr_type::SinglePlayer)
+	if (tags::get_cache_header()->type != tags::cache_header::scnr_type::SinglePlayerShared)
 	{
 		//actual tag_loading
 		///parse query file
