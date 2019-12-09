@@ -429,6 +429,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			output(L"spawn");
 			output(L"controller_sens");
 			output(L"mouse_sens");
+			output(L"warpfix");
 		}
 		else if (firstCommand == "$mapfilename")
 		{
@@ -696,6 +697,20 @@ void ConsoleCommands::handle_command(std::string command) {
 		else if (firstCommand == "$requestfilename") {
 			CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
 		}
+		else if (firstCommand == "$warpfix") {
+			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
+				output(L"Invalid command, usage warpfix true/false");
+				return;
+			}
+
+			std::string secondArg = splitCommands[1];
+
+			if (secondArg.compare("true") == 0 || secondArg.compare("1") == 0)
+				H2Tweaks::WarpFix(true);
+			else
+				H2Tweaks::WarpFix(false);
+		}			
+					
 		else {
 			output(L"Unknown command.");
 		}

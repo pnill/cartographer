@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "Globals.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -1372,4 +1372,22 @@ void H2Tweaks::sunFlareFix()
 	//rasterizer_near_clip_distance <real>
 	//Changed from game default of 0.06 to 0.0601
 	WriteValue<float>(h2mod->GetAddress(0x468150), 0.0601f);
+}
+
+void H2Tweaks::WarpFix(bool enable)
+{
+	if (H2IsDediServer)
+		return;
+
+	//Improves warping issues 
+	if (enable)
+	{
+		WriteValue<float>(h2mod->GetAddress(0x4F958C), 4.0);
+		WriteValue<float>(h2mod->GetAddress(0x4F9594), 10.0);
+	}
+	else
+	{
+		WriteValue<float>(h2mod->GetAddress(0x4F958C), 2.5);
+		WriteValue<float>(h2mod->GetAddress(0x4F9594), 7.5);
+	}	
 }

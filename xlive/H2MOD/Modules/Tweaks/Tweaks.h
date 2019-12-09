@@ -27,4 +27,5 @@ namespace H2Tweaks {
 	void setSens(InputType input_type, int sens);
 	void setSavedSens();
 	void sunFlareFix();
+	void WarpFix(bool enable);
 }
