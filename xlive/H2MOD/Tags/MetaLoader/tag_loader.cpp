@@ -1,4 +1,4 @@
-﻿#include "..\stdafx.h"
+#include "..\stdafx.h"
 #include "tag_loader.h"
 #include "..\Util\filesys.h"
 
@@ -1029,7 +1029,7 @@ namespace tag_loader
 
 		if (!fin.is_open())
 		{
-			logs.push_back("Couldnt load query file:" + file_loc);
+			logs.push_back("Couldnt load query file: " + file_loc);
 			return;
 		}
 

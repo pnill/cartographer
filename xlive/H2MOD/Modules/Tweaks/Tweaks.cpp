@@ -205,11 +205,11 @@ void init_timing(int a1)
 	init_timing_impl(a1);
 }
 
-void game_state_initialize(void *data)
+void game_state_initialize()
 {
-	typedef void __fastcall game_state_initialize(void *data);
-	auto game_state_initialize_impl = h2mod->GetAddress<game_state_initialize*>(0x00030aa6);
-	game_state_initialize_impl(data);
+	typedef void (__cdecl* game_state_initialize)();
+	auto game_state_initialize_impl = h2mod->GetAddress<game_state_initialize>(0x00030aa6);
+	game_state_initialize_impl();
 }
 
 bool rasterizer_initialize()
@@ -424,8 +424,8 @@ bool engine_basic_init()
 
 	if (!LOG_CHECK(tag_files_open()))
 		return false;
-	void *var_c004ae8e0 = h2mod->GetAddress<void*>(0x004ae8e0);
-	game_state_initialize(var_c004ae8e0);
+	
+	game_state_initialize();
 
 	// modifies esi need to check what the caller sets that too
 	//char(*fn_c001a9de6)() = (char(*)())(h2mod->GetAddress(0x001a9de6));
