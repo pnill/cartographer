@@ -95,8 +95,6 @@ bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
 //bool H2Config_hitmarker_sound = false;
 bool H2Config_voice_chat = false;
-int H2Config_custom_resolution_x = 0;
-int H2Config_custom_resolution_y = 0;
 char H2Config_dedi_server_name[32] = { "" };
 char H2Config_dedi_server_playlist[256] = { "" };
 int H2Config_additional_pcr_time = 25;
@@ -288,12 +286,6 @@ void SaveH2Config() {
 			fputs("\n# 0 - In-game chat is displayed normally.", fileConfig);
 			fputs("\n# 1 - In-game chat is hidden.", fileConfig);
 			fputs("\n\n", fileConfig);
-
-			/*fputs("# custom_resolution Options (Client):", fileConfig);
-			fputs("\n# <width>x<height> - Sets the resolution of the game via the Windows Registry.", fileConfig);
-			fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fileConfig);
-			fputs("\n\n", fileConfig);*/
-
 		}
 		fputs("# enable_xdelay Options:", fileConfig);
 		fputs("\n# 0 - Non-host players cannot delay the game start countdown timer.", fileConfig);
@@ -1567,19 +1559,6 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			else {
 				H2Config_debug_log_console = (bool)tempint1;
 				est_debug_log_console = true;
-			}
-		}
-		else if (!H2IsDediServer && sscanf(fileLine, "custom_resolution =%dx%d", &tempint1, &tempint2) == 2) {
-			if (est_custom_resolution) {
-				duplicated = true;
-			}
-			else if (!(tempint1 >= 0 && tempint2 >= 0)) {
-				incorrect = true;
-			}
-			else {
-				H2Config_custom_resolution_x = tempint1;
-				H2Config_custom_resolution_y = tempint2;
-				est_custom_resolution = true;
 			}
 		}
 		else if (H2IsDediServer && strstr(fileLine, "server_name =")) {

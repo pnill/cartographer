@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 
 #include "Globals.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -957,35 +957,6 @@ void InitH2Tweaks() {
 		//Problem is if you want to set it via mem poking, it won't push the lobby to the master automatically.
 		//phookChangePrivacy = (thookChangePrivacy)DetourFunc((BYTE*)H2BaseAddr + 0x2153ce, (BYTE*)HookChangePrivacy, 11);
 		//VirtualProtect(phookChangePrivacy, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-		//Scrapped for now, maybe.
-		DWORD tempResX = 0;
-		DWORD tempResY = 0;
-
-		HKEY hKeyResolution = NULL;
-		if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_READ, &hKeyResolution) == ERROR_SUCCESS) {
-			GetDWORDRegKey(hKeyResolution, L"ScreenResX", &tempResX);
-			GetDWORDRegKey(hKeyResolution, L"ScreenResY", &tempResY);
-			RegCloseKey(hKeyResolution);
-		}
-
-		if (H2Config_custom_resolution_x > 0 && H2Config_custom_resolution_y > 0) {
-			if (H2Config_custom_resolution_x != (int)tempResX || H2Config_custom_resolution_y != (int)tempResY) {
-				LSTATUS err;
-				if ((err = RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_ALL_ACCESS, &hKeyResolution)) == ERROR_SUCCESS) {
-					RegSetValueEx(hKeyResolution, L"ScreenResX", NULL, REG_DWORD, (const BYTE*)&H2Config_custom_resolution_x, sizeof(H2Config_custom_resolution_x));
-					RegSetValueEx(hKeyResolution, L"ScreenResY", NULL, REG_DWORD, (const BYTE*)&H2Config_custom_resolution_y, sizeof(H2Config_custom_resolution_y));
-					RegCloseKey(hKeyResolution);
-				}
-				else {
-					char errorMsg[200];
-					sprintf(errorMsg, "Error: 0x%x. Unable to make Screen Resolution changes.\nPlease try restarting Halo 2 with Administrator Privileges.", err);
-					addDebugText(errorMsg);
-					MessageBoxA(NULL, errorMsg, "Registry Write Error", MB_OK);
-					exit(EXIT_FAILURE);
-				}
-			}
-		}
 
 		bool IntroHQ = true;//clients should set on halo2.exe -highquality
 
