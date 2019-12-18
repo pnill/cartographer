@@ -240,7 +240,7 @@ enum startup_flags : int
 	windowed,
 	disable_voice_chat,
 	nosound,
-	unk3, // disable vista needed version check?
+	allow_d3d_ex_version, // allows the d3d ex version to be used instead
 	disable_hardware_vertex_processing, // force hardware vertex processing off
 	novsync,
 	unk6, // squad browser/xlive/ui?
@@ -349,6 +349,7 @@ bool engine_basic_init()
 
 	flags_array[startup_flags::disable_voice_chat] = 1; // disables voice chat (XHV engine)
 	flags_array[startup_flags::nointro] = H2Config_skip_intro;
+	flags_array[startup_flags::allow_d3d_ex_version] = 1; // allow D3DEx version if available (faster alt-tab time)
 
 	HANDLE(*fn_c000285fd)() = (HANDLE(*)())h2mod->GetAddress<void*>(0x000285fd);
 
