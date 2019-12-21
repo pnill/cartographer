@@ -406,6 +406,10 @@ bool engine_basic_init()
 			{
 				flags_array[startup_flags::disable_voice_chat] = 0;
 			}
+			else if (_wcsicmp(cmd_line_arg, L"-disabled3dex") == 0)
+			{
+				flags_array[startup_flags::allow_d3d_ex_version] = 0;
+			}
 #ifdef _DEBUG
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
 				int flag_id = _wtol(&cmd_line_arg[10]);
