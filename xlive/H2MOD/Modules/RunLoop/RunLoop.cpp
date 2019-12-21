@@ -348,14 +348,13 @@ void GSMainLoop() {
 signed int(*sub_287a1)();
 
 static signed int HookedClientRandFunc() {
+
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 
-	if (H2Config_fps_limit > 0) {
-		extern void frameTimeManagement();
-		frameTimeManagement();
-	}
-
+	extern void frameTimeManagement();
+	frameTimeManagement();
+	
 	mapManager->leaveSessionIfAFK();
 	
 	return sub_287a1();
