@@ -654,11 +654,6 @@ int WINAPI XLiveRender()
 				drawText(30, 30, COLOR_WHITE, packet_info_str, normalSizeFont);
 			}
 		}
-
-		if (H2Config_fps_limit > 0) {
-			frameTimeManagement();
-		}
-
 	}
 
 	return 0;

@@ -351,10 +351,14 @@ static signed int HookedClientRandFunc() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 
+	if (H2Config_fps_limit > 0) {
+		extern void frameTimeManagement();
+		frameTimeManagement();
+	}
+
 	mapManager->leaveSessionIfAFK();
 	
-	signed int result = sub_287a1();
-	return result;
+	return sub_287a1();
 }
 
 static char HookedServerShutdownCheck() {
