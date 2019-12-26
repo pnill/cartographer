@@ -45,7 +45,7 @@ std::unordered_map<int, int> object_to_variant;
 
 using namespace Blam::Cache::DataTypes;
 
-int GAME_BUILD = 11122;
+int GAME_BUILD = 11123;
 int EXECUTABLE_VERSION = 4;
 
 int character_datum_from_index(BYTE index)
@@ -1131,6 +1131,12 @@ void __cdecl OnMapLoad(int a1)
 			b_FireFight = true;
 		}
 
+		const wchar_t* OGH2 = L"ogh2";
+		if (wcsstr(variant_name, L"ogh2") > 0 || wcsstr(variant_name, L"Ogh2") > 0 || wcsstr(variant_name, L"oGh2") > 0 || wcsstr(variant_name, L"ogH2") > 0 || wcsstr(variant_name, L"OGh2") > 0 || wcsstr(variant_name, L"oGH2") > 0 || wcsstr(variant_name, L"OgH2") > 0)
+		{
+			b_XboxTick = true;
+		}
+
 		get_object_table_memory();
 
 		HitFix::Initialize();
@@ -1162,8 +1168,8 @@ void __cdecl OnMapLoad(int a1)
 
 			if (!b_XboxTick)
 			{
-				HitFix::Initialize();
-				MPMapFix::Initialize();
+				HitFix::Deinitialize();
+				H2X::Deinitialize();
 			}
 
 			if (b_H2X)
