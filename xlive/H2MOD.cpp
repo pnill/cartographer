@@ -1166,7 +1166,7 @@ void __cdecl OnMapLoad(int a1)
 				gunGame->initializer->execute();
 			}
 
-			if (!b_XboxTick)
+			if (b_XboxTick)
 			{
 				HitFix::Deinitialize();
 				H2X::Deinitialize();
