@@ -16,6 +16,14 @@ void UIRankPatch() {
 
 	DWORD& MapHeaderType = *(DWORD*)(H2BaseAddr + 0x47CD68 + 0x14C);
 
+	DWORD dwBack;
+
+	BYTE PlayerLevel = 0x00;
+	WORD PlayerLevelPCR = 0x0000;
+	WriteValue(H2BaseAddr + 0x1B2C2F, PlayerLevel); //Pregame Lobby
+	//WriteValue(H2BaseAddr + 0xCC72, PlayerLevelPCR);//Postgame Carnage Report
+	//WriteValue(H2BaseAddr + 0xCC74, 0x00); //Postgame Carnage Report enable
+
 	if (MapHeaderType != 2) //If not on mainmenu, returns
 		return;
 
@@ -58,7 +66,7 @@ void UIRankPatch() {
 	const WORD HeightValue = 0x0020;	//Value : 32 (decimal)
 
 
-		//Sets Pregame Lobby 
+	//Sets Pregame Lobby 
 	WriteValue(SharedMapMetaDataPointer + TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset, xValuePGL);
 	WriteValue(SharedMapMetaDataPointer + TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset, yValuePGL);
 	WriteValue(SharedMapMetaDataPointer + TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset, RankIconSM);
