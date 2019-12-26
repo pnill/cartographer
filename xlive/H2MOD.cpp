@@ -1171,6 +1171,8 @@ void __cdecl OnMapLoad(int a1)
 				HitFix::Deinitialize();
 				H2X::Deinitialize();
 			}
+			else
+				HitFix::Initialize();
 
 			if (b_H2X)
 				H2X::Initialize();
