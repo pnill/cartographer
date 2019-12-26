@@ -492,6 +492,9 @@
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkSession</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">
@@ -967,6 +970,9 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkSession</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

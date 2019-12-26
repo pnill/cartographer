@@ -267,6 +267,7 @@
     <ClCompile Include="H2MOD\Modules\MapFix\SPMapFix.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
+    <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp" />
     <ClCompile Include="XLive\Voice\AudioDevices.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -363,6 +364,7 @@
     <ClInclude Include="H2MOD\Modules\MapFix\SPMapFix.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
+    <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
     <ClInclude Include="Blam\BlamLibrary.h" />

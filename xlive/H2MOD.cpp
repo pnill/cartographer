@@ -15,6 +15,7 @@
 #include "H2MOD\Modules\MainMenu\Ranks.h"
 #include "H2MOD\Variants\H2X\H2X.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
+#include "H2MOD\Variants\XboxTick\XboxTick.h"
 #include "XLive\UserManagement\CUser.h"
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
@@ -22,6 +23,7 @@
 
 H2MOD *h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
+XboxTick* xboxTickHandler = new XboxTick();
 Halo2Final *h2f = new Halo2Final();
 Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
@@ -31,6 +33,7 @@ VariantPlayer* variant_player = new VariantPlayer();
 
 bool b_H2X = false;
 bool b_GunGame = false;
+bool b_XboxTick = false;
 bool b_FireFight = false;
 bool b_Infection = false;
 bool b_Halo2Final = false;
@@ -1078,6 +1081,7 @@ void __cdecl OnMapLoad(int a1)
 
 	b_Infection = false;
 	b_GunGame = false;
+	b_XboxTick = false;
 	b_Halo2Final = false;
 	b_H2X = false;
 	b_HeadHunter = false;
@@ -1156,6 +1160,12 @@ void __cdecl OnMapLoad(int a1)
 				gunGame->initializer->execute();
 			}
 
+			if (!b_XboxTick)
+			{
+				HitFix::Initialize();
+				MPMapFix::Initialize();
+			}
+
 			if (b_H2X)
 				H2X::Initialize();
 			else
@@ -1204,6 +1214,10 @@ bool __cdecl OnPlayerSpawn(int a1)
 	if (b_GunGame) {
 		gunGame->preSpawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
 		gunGame->preSpawnPlayer->execute();
+	}
+
+	if (b_XboxTick) {
+		xboxTickHandler->preSpawnPlayer->execute();
 	}
 
 	bool ret = pspawn_player(a1);
@@ -1688,6 +1702,8 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetBase() + 0x00182d6d, GrenadeChainReactIsEngineMPCheck);
 		PatchCall(GetBase() + 0x00092C05, BansheeBombIsEngineMPCheck);
 		PatchCall(GetBase() + 0x0013ff75, FlashlightIsEngineSPCheck);
+
+		xboxTickHandler->applyHooks();
 	}
 	else {
 
