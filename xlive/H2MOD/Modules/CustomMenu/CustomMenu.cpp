@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Globals.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
@@ -6,11 +7,9 @@
 #include "H2MOD\Modules\Accounts\Accounts.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\AccountCreate.h"
-#include "XLive\UserManagement\CUser.h"
+#include "XLive\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Updater\Updater.h"
-#include <Shellapi.h>
-#include "Globals.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
@@ -4718,7 +4717,7 @@ void* __stdcall sub_23BC45(void* thisptr)//__thiscall
 }
 
 int __cdecl sub_209236(int a1,int a2) {
-	if (userManager.LocalUserLoggedIn()) {
+	if (ipManager.LocalUserLoggedIn()) {
 		int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
 		sub_209236(0,0);
 	}
@@ -4738,8 +4737,8 @@ typedef int(__cdecl *tsub_23f6b7)(int);
 tsub_23f6b7 psub_23f6b7;
 int __cdecl sub_23f6b7(int a1)
 {
-	if (userManager.LocalUserLoggedIn()) {
-		userManager.UnregisterLocal();
+	if (ipManager.LocalUserLoggedIn()) {
+		ipManager.UnregisterLocal();
 	}
 	return psub_23f6b7(a1);
 }

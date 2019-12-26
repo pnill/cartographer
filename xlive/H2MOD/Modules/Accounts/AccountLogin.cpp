@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <string>
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\Startup\Startup.h"
@@ -8,7 +7,7 @@
 #include "H2MOD\Modules\Accounts\Accounts.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "XLive\UserManagement\CUser.h"
+#include "XLive\IpManagement\XnIp.h"
 
 bool AccountEdit_remember = true;
 
@@ -66,7 +65,7 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	memcpy(&pxna.abEnet, abEnet2, 6);
 	memcpy(&pxna.abOnline, abOnline2, 20);
 
-	userManager.ConfigureLocalUser(&pxna, xuid, username);
+	ipManager.ConfigureLocalUser(&pxna, xuid, username);
 
 	if (H2CurrentAccountLoginToken) {
 		free(H2CurrentAccountLoginToken);

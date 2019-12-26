@@ -1,7 +1,7 @@
 
 #include "Globals.h"
 
-#include "XLive\UserManagement\CUser.h"
+#include "XLive\IpManagement\XnIp.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\ServerConsole\ServerConsole.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -60,7 +60,6 @@ bool __cdecl establish_read(void* a1, int a2, int a3) {
 }
 
 void __cdecl closed_write(void* a1, int a2, int a3) {
-	SecureZeroMemory(&userManager.game_host_xn, sizeof(XNADDR));
 	bitstream::p_data_encode_integer()(a1, "remote-identifier", *(DWORD *)a3, 32);
 	bitstream::p_data_encode_integer()(a1, "identifier", *(DWORD *)(a3 + 4), 32);
 	bitstream::p_data_encode_integer()(a1, "closure-reason", *(DWORD *)(a3 + 8), 5);
@@ -214,11 +213,15 @@ tjoin_game pjoin_game;
 
 bool __stdcall join_game(void* thisptr, int a2, int a3, XNKID* xnkid, XNKEY* xnkey, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
 {
-	memcpy(&userManager.game_host_xn, host_xn, sizeof(XNADDR));
-	LOG_TRACE_NETWORK("[H2MOD-Network] copied host information, XNADDR: {:#x}", userManager.game_host_xn.ina.s_addr);
-	userManager.CreateUser(host_xn, FALSE);
-	userManager.sendSecurePacket(game_network_data_gateway_socket_1000, 1000);
-	userManager.sendSecurePacket(game_network_message_gateway_socket_1001, 1001);
+	IN_ADDR ipIdentifier;
+
+	memcpy(&ipManager.game_host_xn, host_xn, sizeof(XNADDR));
+	LOG_TRACE_NETWORK("[H2MOD-Network] copied host information, XNADDR: {:#x}", ipManager.game_host_xn.ina.s_addr);
+	memcpy(&ipManager.securePacket.xnkid, xnkid, sizeof(XNKID));
+	XNetXnAddrToInAddr(host_xn, xnkid, &ipIdentifier);
+	ipManager.SaveNatInfo(ipIdentifier, nullptr);
+	ipManager.sendNatInfoUpdate(game_network_data_gateway_socket_1000, host_xn->wPortOnline);
+	ipManager.sendNatInfoUpdate(game_network_message_gateway_socket_1001, ntohs(htons(ipManager.game_host_xn.wPortOnline) + 1));
 	return pjoin_game(thisptr, a2, a3, xnkid, xnkey, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 

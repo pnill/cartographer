@@ -3,12 +3,6 @@
 
 XNetStartupParams g_XnetStartupParams;
 
-// #65: XNetConnect
-int WINAPI XNetConnect(const IN_ADDR ina)
-{
-	return ERROR_SUCCESS;
-}
-
 // #51: XNetStartup
 int WINAPI XNetStartup(const XNetStartupParams *pxnsp)
 {
@@ -69,13 +63,6 @@ INT WINAPI XNetXnAddrToMachineId(const XNADDR * pxnaddr, ULONGLONG * pqwMachineI
 
 	return 0;
 }
-
-// #66: XNetGetConnectStatus
-int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
-{
-	return XNET_CONNECT_STATUS_CONNECTED;
-}
-
 
 // #67: XNetDnsLookup
 int WINAPI XNetDnsLookup(const char * pszHost, DWORD hEvent, void ** ppxndns)

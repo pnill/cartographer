@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Globals.h"
 #include "XLive\Networking\upnp.h"
-#include "XLive\UserManagement\CUser.h"
+#include "XLive\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 
@@ -29,7 +29,7 @@ void ForwardPorts()
 int WINAPI XOnlineStartup()
 {
 	LOG_TRACE_NETWORK("XOnlineStartup()");
-	SecureZeroMemory(&userManager.game_host_xn, sizeof(XNADDR));
+	SecureZeroMemory(&ipManager.game_host_xn, sizeof(XNADDR));
 	std::thread(ForwardPorts).detach();
 
 	return ERROR_SUCCESS;
@@ -106,7 +106,7 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 	if (htons(port) == 1006)
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port + 6);
 
-	userManager.sockmap[s] = htons(port);
+	ipManager.sockmap[s] = htons(port);
 
 	SOCKET ret = bind(s, name, namelen);
 
@@ -126,45 +126,31 @@ INT WINAPI XNetRandom(BYTE * pb, UINT cb)
 	return 0;
 }
 
-// #54: XNetCreateKey
-INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
-{
-	LOG_TRACE_XLIVE("XNetCreateKey");
-	if (pxnkid && pxnkey)
-	{
-		XNetRandom((BYTE*)pxnkid, sizeof(XNKID));
-		XNetRandom((BYTE*)pxnkey, sizeof(XNKEY));
-		pxnkid->ab[0] &= ~XNET_XNKID_MASK;
-		pxnkid->ab[0] |= XNET_XNKID_SYSTEM_LINK_XPLAT;
-	}
-
-	return 0;
-}
-
-// #73: XNetGetTitleXnAddr
-DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pAddr)
-{
-	if (pAddr)
-	{
-		userManager.GetLocalXNAddr(pAddr);
-	}
-	return XNET_GET_XNADDR_STATIC | XNET_GET_XNADDR_ETHERNET;
-}
-
 // #24: XSocketSendTo
 int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr *to, int tolen)
 {
-	u_short port = (((struct sockaddr_in*)to)->sin_port);
-	u_long iplong = (((struct sockaddr_in*)to)->sin_addr.s_addr);
+	DWORD sentBytes = 0;
+	WSABUF sendBuffer;
+	sendBuffer.len = len;
+	sendBuffer.buf = (CHAR*)buf;
 
-	if (iplong == INADDR_BROADCAST)
+	if (((struct sockaddr_in*)to)->sin_addr.s_addr == INADDR_BROADCAST) // handle broadcast
 	{
 		(((struct sockaddr_in*)to)->sin_addr.s_addr) = H2Config_master_ip;
 		((struct sockaddr_in*)to)->sin_port = ntohs(H2Config_master_port_relay);
 			
 		//LOG_TRACE_NETWORK_N("XSocketSendTo - Broadcast");
 
-		return sendto(s, buf, len, flags, to, tolen);
+		int result = WSASendTo(s, &sendBuffer, 1, &sentBytes, flags, (const sockaddr*)to, sizeof(*to), NULL, NULL);
+
+		if (result != ERROR_SUCCESS)
+		{
+			return SOCKET_ERROR;
+		}
+		else
+		{
+			return sentBytes;
+		}
 	}
 
 	/*
@@ -173,10 +159,21 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		Worst case if this is found to cause performance issues we can handle the send and re-update to secure before return.
 	*/
 
-	SOCKADDR_IN SendStruct;
-	SendStruct.sin_port = port;
-	SendStruct.sin_addr.s_addr = iplong;
-	SendStruct.sin_family = AF_INET;
+	u_long connectionIndex = ipManager.getConnectionIndex(((struct sockaddr_in*)to)->sin_addr);
+	
+	sockaddr_in sendAddress;
+	sendAddress.sin_family = AF_INET;
+	sendAddress.sin_port = ((struct sockaddr_in*)to)->sin_port;
+	sendAddress.sin_addr = ipManager.XnIPs[connectionIndex].xnaddr.ina;
+
+	//LOG_TRACE_XLIVE("SendStruct.sin_addr.s_addr == %08X", sendAddress.sin_addr.s_addr);
+
+	if (sendAddress.sin_addr.s_addr == H2Config_ip_wan)
+	{
+		//LOG_TRACE_XLIVE("Matched g_lWANIP:%08X", H2Config_ip_wan);
+		sendAddress.sin_addr.s_addr = H2Config_ip_lan;
+		//LOG_TRACE_XLIVE("Replaced send struct s_addr with g_lLANIP: %08X", H2Config_ip_lan);
+	}
 
 	/*
 	 Handle NAT map socket to port
@@ -185,26 +182,26 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 	 1001-> User.pmap_b[secureaddress]
 	*/
 	u_short nPort = 0;
-	switch (htons(port))
+	switch (htons(((struct sockaddr_in*)to)->sin_port))
 	{
 	case 1000:
-		nPort = userManager.pmap_a[iplong];
+		nPort = ipManager.pmap_a[connectionIndex];
 
 		if (nPort != 0)
 		{
 			//LOG_TRACE_XLIVE("XSocketSendTo() port 1000 nPort: {} secure: %08X", htons(nPort), iplong);
-			SendStruct.sin_port = nPort;
+			sendAddress.sin_port = nPort;
 		}
 
 		break;
 
 	case 1001:
-		nPort = userManager.pmap_b[iplong];
+		nPort = ipManager.pmap_b[connectionIndex];
 
 		if (nPort != 0)
 		{
 			//LOG_TRACE_XLIVE("XSocketSendTo() port 1001 nPort: %i secure: %08X", htons(nPort), iplong);
-			SendStruct.sin_port = nPort;
+			sendAddress.sin_port = nPort;
 		}
 
 		break;
@@ -214,92 +211,72 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		break;
 	}
 
-	u_long xn = userManager.xnmap[iplong]; // at this point iplong is secure addr
+	int result = WSASendTo(s, &sendBuffer, 1, &sentBytes, flags, (const sockaddr*)&sendAddress, sizeof(sendAddress), NULL, NULL);
 
-	if (xn != 0)
+	if (result != ERROR_SUCCESS)
 	{
-		SendStruct.sin_addr.s_addr = xn;
-	}
-
-	//LOG_TRACE_XLIVE("SendStruct.sin_addr.s_addr == %08X", SendStruct.sin_addr.s_addr);
-
-	if (SendStruct.sin_addr.s_addr == H2Config_ip_wan)
-	{
-		//LOG_TRACE_XLIVE("Matched g_lWANIP:%08X", H2Config_ip_wan);
-		SendStruct.sin_addr.s_addr = H2Config_ip_lan;
-		//LOG_TRACE_XLIVE("Replaced send struct s_addr with g_lLANIP: %08X", H2Config_ip_lan);
-	}
-
-
-	int total_bytes_sent = sendto(s, buf, len, flags, (SOCKADDR *)&SendStruct, sizeof(SendStruct));
-
-	if (total_bytes_sent == SOCKET_ERROR)
-	{
-		LOG_TRACE_NETWORK("XSocketSendTo - Socket Error True");
-		LOG_TRACE_NETWORK("XSocketSendTo - WSAGetLastError(): {:x}", WSAGetLastError());
+		LOG_TRACE_NETWORK("XSocketSendTo - Socket Error: {:x}", WSAGetLastError());
+		return SOCKET_ERROR;
 	}
 	else
 	{
-		updateSendToStatistics(len);
+		updateSendToStatistics(sentBytes);
 	}
 
-	return total_bytes_sent;
+	return sentBytes;
 }
 
 // #20
 int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *from, int *fromlen)
 {
-	int total_bytes_received = recvfrom(s, buf, len, flags, from, fromlen);
+	WSABUF wsaBuffer;
+	wsaBuffer.len = len;
+	wsaBuffer.buf = buf;
 
-	if (total_bytes_received > 0)
+	DWORD bytesReceived = 0;
+	int result = WSARecvFrom(s, &wsaBuffer, 1, &bytesReceived, (LPDWORD)&flags, from, fromlen, NULL, NULL);
+
+	if (result == ERROR_SUCCESS && bytesReceived > 0)
 	{
-		short port = (((struct sockaddr_in*)from)->sin_port);
-		u_long iplong = (((struct sockaddr_in*)from)->sin_addr.s_addr);
-		std::pair <ULONG, SHORT> hostpair = std::make_pair(iplong, port);
+		short port = ((struct sockaddr_in*)from)->sin_port;
+		u_long iplong = ((struct sockaddr_in*)from)->sin_addr.s_addr;
 
-		SecurePacket* secure_pck = reinterpret_cast<SecurePacket*>(buf);
+		std::pair<ULONG, SHORT> hostpair = std::make_pair(iplong, port);
+		
+		SecurePacket* secure_pck = reinterpret_cast<SecurePacket*>(wsaBuffer.buf);
 		if (iplong != H2Config_master_ip)
 		{
-			if (total_bytes_received == sizeof(SecurePacket) 
+			if (bytesReceived == sizeof(SecurePacket)
 				&& secure_pck->annoyance_factor == annoyance_factor)
 			{
-				ULONG secure = secure_pck->secure.s_addr;	
+				IN_ADDR ipIdentification;
 
-				LOG_TRACE_NETWORK("[H2MOD-Network] Received secure packet with ip addr {0:x}, port: {1}, secure: {2:x}", htonl(iplong), htons(port), secure);
-				userManager.CreateUser(&secure_pck->xn, TRUE);
-				userManager.secure_map[hostpair] = secure;
+				LOG_TRACE_NETWORK("[H2MOD-Network] Received secure packet with ip address {0:x}, port: {1}", htonl(iplong), htons(port));
+				XNetXnAddrToInAddr(&secure_pck->xnaddr, &secure_pck->xnkid, &ipIdentification); // create identification key for the new connection
+				ipManager.SaveNatInfo(ipIdentification, from); // assign the NAT information to the key
 
-				total_bytes_received = 0;
+				bytesReceived = 0;
 			}
 
-			ULONG secure = userManager.secure_map[hostpair];
+			IN_ADDR connectionIdentifier = ipManager.connection_identifiers_map[hostpair];
 
-			if (secure == 0)
-			{
-                // hahaaha -- almic
-				LOG_TRACE_NETWORK("[H2MOD-Network] This is probably the issue.... now the fucking recv address is 0 you numb nuts. iplong: {0:x}, port: {1}", htonl(iplong), htons(port));
-			}
-			else
-			{
-				userManager.xnmap[secure] = iplong;
-				(((struct sockaddr_in*)from)->sin_addr.s_addr) = secure;
-			}
+			((struct sockaddr_in*)from)->sin_addr = connectionIdentifier;		
 
 			/* Store NAT data
 			   First we look at our socket's intended port.
 			   port 1000 is mapped to the receiving port pmap_a via the secure address.
 			   port 1001 is mapped to the receiving port pmap_b via the secure address.
 			  */
-			switch (userManager.sockmap[s])
+			switch (ipManager.sockmap[s])
 			{
 			case 1000:
 				//LOG_TRACE_XLIVE("XSocketRecvFrom() User.sockmap mapping port 1000 - port: %i, secure: %08X", htons(port), secure);
-				userManager.pmap_a[secure] = port;
+				ipManager.pmap_a[ipManager.getConnectionIndex(connectionIdentifier)] = port;
 				break;
 
 			case 1001:
 				//LOG_TRACE_XLIVE("XSocketRecvFrom() User.sockmap mapping port 1001 - port: %i, secure: %08X", htons(port), secure);
-				userManager.pmap_b[secure] = port;
+				ipManager.pmap_b[ipManager.getConnectionIndex(connectionIdentifier)] = port;
 				break;
 
 			default:
@@ -315,14 +292,14 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 		LOG_TRACE_NETWORK_N("[h2mod-network] received socket data, total: {}", ret);
 	}*/
 
-	return total_bytes_received;
+	return bytesReceived;
 }
 
 // #55: XNetRegisterKey //need #51
 int WINAPI XNetRegisterKey(XNKID *pxnkid, XNKEY *pxnkey)
 {
 	LOG_TRACE_NETWORK("XNetRegisterKey()");
-	userManager.SetKeys(pxnkid, pxnkey);
+	ipManager.SetKeys(pxnkid, pxnkey);
 	return 0;
 }
 
@@ -331,6 +308,6 @@ int WINAPI XNetRegisterKey(XNKID *pxnkid, XNKEY *pxnkey)
 int WINAPI XNetUnregisterKey(const XNKID* pxnkid)
 {
 	LOG_TRACE_NETWORK("XNetUnregisterKey()");
-	userManager.EraseKeys();
+	ipManager.EraseKeys();
 	return 0;
 }

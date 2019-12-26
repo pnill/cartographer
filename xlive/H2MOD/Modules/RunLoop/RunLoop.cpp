@@ -9,7 +9,7 @@
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "XLive\UserManagement\CUser.h"
+#include "XLive\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 
 extern LPDIRECT3DDEVICE9 pDevice;

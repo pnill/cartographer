@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <string>
 #include <curl/curl.h>
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
@@ -7,10 +6,7 @@
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
 using namespace rapidjson;
-using namespace std;
-extern XUID xFakeXuid[4];
 std::map<DWORD, bool> achievementList;
-
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
@@ -18,7 +14,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 	return size * nmemb;
 }
 
-void AchievementUnlock(int achievement_id)
+void AchievementUnlock(XUID xuid, int achievement_id)
 {
 	LOG_TRACE_GAME("[H2Mod-Achievement] - Unlocking achievement ID: {:d}", achievement_id);
 
@@ -37,7 +33,7 @@ void AchievementUnlock(int achievement_id)
 		token.SetString(H2CurrentAccountLoginToken, document.GetAllocator());
 		document.AddMember("token", token, document.GetAllocator());
 		document.AddMember("id", achievement_id, document.GetAllocator());
-		document.AddMember("xuid", Value().SetUint64(xFakeXuid[0]), document.GetAllocator());
+		document.AddMember("xuid", Value().SetUint64(xuid), document.GetAllocator());
 
 
 		StringBuffer buffer;
@@ -55,7 +51,7 @@ void AchievementUnlock(int achievement_id)
 	}
 }
 
-void GetAchievements()
+void GetAchievements(XUID xuid)
 {
 	CURL *curl;
 	CURLcode res;
@@ -66,7 +62,7 @@ void GetAchievements()
 
 		std::string server_url;
 		server_url.append("http://cartographer.online/achievement-api/achievement_list.php?xuid=");
-		server_url.append(to_string(xFakeXuid[0]));
+		server_url.append(std::to_string(xuid));
 
 		curl_easy_setopt(curl, CURLOPT_URL, server_url.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);

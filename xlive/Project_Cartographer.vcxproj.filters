@@ -312,9 +312,6 @@
     <ClCompile Include="H2MOD\GUI\GUI.cpp">
       <Filter>Source Files\H2MOD\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\UserManagement\CUser.cpp">
-      <Filter>Source Files\XLive\User Management</Filter>
-    </ClCompile>
     <ClCompile Include="Util\Hooks\Detour.cpp">
       <Filter>Source Files\Util\Hooks</Filter>
     </ClCompile>
@@ -362,9 +359,6 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp">
       <Filter>Source Files\H2MOD\Variants</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp">
-      <Filter>Source Files\H2MOD\Modules\MapManager</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Tweaks\Tweaks.cpp">
       <Filter>Source Files\H2MOD\Modules\Tweaks</Filter>
@@ -540,6 +534,12 @@
     <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp">
       <Filter>Source Files\H2MOD\Modules\MetaLoader</Filter>
     </ClCompile>
+    <ClCompile Include="XLive\IpManagement\XnIp.cpp">
+      <Filter>Source Files\XLive\User Management</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">
@@ -671,9 +671,6 @@
     <ClInclude Include="H2MOD\GUI\GUI.h">
       <Filter>Source Files\H2MOD\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="XLive\UserManagement\CUser.h">
-      <Filter>Source Files\XLive\User Management</Filter>
-    </ClInclude>
     <ClInclude Include="Util\Hooks\Detour.h">
       <Filter>Source Files\Util\Hooks</Filter>
     </ClInclude>
@@ -721,9 +718,6 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\VariantSystem.h">
       <Filter>Source Files\H2MOD\Variants</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h">
-      <Filter>Source Files\H2MOD\Modules\MapManager</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\Tweaks\Tweaks.h">
       <Filter>Source Files\H2MOD\Modules\Tweaks</Filter>
@@ -1222,6 +1216,12 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h">
       <Filter>Source Files\H2MOD\Modules\CustomResolutions</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\IpManagement\XnIp.h">
+      <Filter>Source Files\XLive\User Management</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

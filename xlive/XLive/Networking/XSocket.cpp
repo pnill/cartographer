@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "..\UserManagement\CUser.h"
+#include "..\IpManagement\XnIp.h"
 
 // #1: XWSAStartup
 int WINAPI XWSAStartup(WORD wVersionRequested, LPWSADATA lpWsaData)
@@ -21,9 +21,9 @@ int WINAPI XSocketClose(SOCKET s)
 {
 	LOG_TRACE_XLIVE("XSocketClose: socket: {}", s);
 
-	auto sockmap_elem = userManager.sockmap.find(s);
-	if (sockmap_elem != userManager.sockmap.end())
-		userManager.sockmap.erase(sockmap_elem);
+	auto sockmap_elem = ipManager.sockmap.find(s);
+	if (sockmap_elem != ipManager.sockmap.end())
+		ipManager.sockmap.erase(sockmap_elem);
 
 	return closesocket(s);
 }

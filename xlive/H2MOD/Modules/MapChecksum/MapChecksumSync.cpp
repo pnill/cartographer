@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "MapChecksumSync.h"
-#include <unordered_set>
 #include "Globals.h"
 #include "Util/hash.h"
 #include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"

@@ -2,11 +2,11 @@
 
 #include "stdafx.h"
 
-class CUser
+struct XnIp
 {
-public:
+	IN_ADDR connectionIdentifier;
 	XNADDR xnaddr;
-	IN_ADDR secure;
+	XNKID xnkid;
 	bool bValid;
 };
 
@@ -31,40 +31,42 @@ template<typename S, typename T> struct std::hash < std::pair<S, T> >
 struct SecurePacket 
 {
 	DWORD annoyance_factor;
-	IN_ADDR secure;
-	XNADDR xn;
+	XNADDR xnaddr;
+	XNKID xnkid;
 };
 
-class CUserManagement
+class CXnIp
 {
 public:
-	void CreateUser(const XNADDR *pxna, BOOL user);
+	void CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier);
 	void UnregisterSecureAddr(const IN_ADDR ina);
 
 	void UpdateConnectionStatus();
 	BOOL LocalUserLoggedIn();
 	void UnregisterLocal();
-	void ConfigureLocalUser(XNADDR* pxna, ULONGLONG xuid, char* username);
-	int sendSecurePacket(SOCKET s, short to_port);
+	void ConfigureLocalUser(XNADDR* pxna, XUID xuid, char* username);
+	int getConnectionIndex(IN_ADDR connectionIdentifier);
+	int sendNatInfoUpdate(SOCKET s, short port);
 
+	void SaveNatInfo(IN_ADDR ipIdentifier, sockaddr* addr);
 	void SetKeys(XNKID*, XNKEY*);
 	void EraseKeys();
 	void GetKeys(XNKID* xnkid, XNKEY* xnkey);
 
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 
-	std::unordered_map<ULONG, CUser*> cusers; // Map Key(SecureADDR)->CUser
-	std::unordered_map<std::pair<ULONG, SHORT>, ULONG> secure_map; // Map Key(XNHost,XnPort)->Secure
-	std::unordered_map<ULONG, ULONG> xnmap; // Map Key(Secure)->XNHost;
-	std::unordered_map<std::string, ULONG> xntosecure; //Map Key(Xn->Abenet)->Secure Addr
-	std::unordered_map<ULONG, SHORT> pmap_a;
-	std::unordered_map<ULONG, SHORT> pmap_b;
-	std::unordered_map<ULONG, SHORT> pmap_c;
-	std::unordered_map<ULONG, SHORT> pmap_d;
+	std::array<XnIp, 32> XnIPs; // ConnectionIndex->CUser
+	std::unordered_map<std::pair<ULONG, SHORT>, IN_ADDR> connection_identifiers_map; // Map Key(XNHost,XnPort)->Secure
+	std::array<SHORT, 32> pmap_a;
+	std::array<SHORT, 32> pmap_b;
+	//std::array<SHORT, 32> pmap_c;
+	//std::array<SHORT, 32> pmap_d;
 	std::unordered_map<SOCKET, SHORT> sockmap;
 
-	CUser local_user;
+	XnIp local_user;
 	XNADDR game_host_xn;
+	int total_connections_saved;
+	SecurePacket securePacket;
 
 private:
 	XNKID host_xnkid;
@@ -73,5 +75,5 @@ private:
 
 extern wchar_t ServerLobbyName[32];
 void SetUserUsername(char* username);
-extern CUserManagement userManager;
+extern CXnIp ipManager;
 extern const DWORD annoyance_factor;
