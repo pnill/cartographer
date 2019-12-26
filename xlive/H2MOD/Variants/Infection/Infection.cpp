@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 #include "Globals.h"
 #include "Blam\Enums\Enums.h"
 #include "..\..\Modules\Networking\Networking.h"
@@ -23,6 +24,8 @@ signed int Infection::calculateZombiePlayerIndex()
 {
 	if (getPlayerCount() > 0)
 	{
+		std::random_device rd;
+		std::mt19937 mt_rand(rd());
 		std::vector<int> vecPlayersActiveIndexes;
 
 		int playerIndex = 0;
@@ -37,7 +40,9 @@ signed int Infection::calculateZombiePlayerIndex()
 		if (vecPlayersActiveIndexes.empty())
 			return -1;
 
-		int infectedPlayerIndex = vecPlayersActiveIndexes[rand() % getPlayerCount()];
+		std::uniform_int_distribution<int> dist(0, getPlayerCount() - 1);
+
+		int infectedPlayerIndex = vecPlayersActiveIndexes[dist(mt_rand)];
 		LOG_TRACE_GAME(L"[h2mod-infection] random infection player index: {}, with name: {}", infectedPlayerIndex, getPlayerName(infectedPlayerIndex));
 
 		return infectedPlayerIndex;
