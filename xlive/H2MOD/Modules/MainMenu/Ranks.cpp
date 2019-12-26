@@ -16,16 +16,13 @@ void UIRankPatch() {
 
 	DWORD& MapHeaderType = *(DWORD*)(H2BaseAddr + 0x47CD68 + 0x14C);
 
-	DWORD dwBack;
-
-	BYTE PlayerLevel = 0x00;
-	WORD PlayerLevelPCR = 0x0000;
-	WriteValue(H2BaseAddr + 0x1B2C2F, PlayerLevel); //Pregame Lobby
-	//WriteValue(H2BaseAddr + 0xCC72, PlayerLevelPCR);//Postgame Carnage Report
-	//WriteValue(H2BaseAddr + 0xCC74, 0x00); //Postgame Carnage Report enable
-
 	if (MapHeaderType != 2) //If not on mainmenu, returns
 		return;
+
+	BYTE PlayerLevel = 0x00;								//eventually this will pull level from webserver
+	WORD PlayerLevelPCR = 0x0000;							//eventually this will pull level from webserver
+	WriteValue(H2BaseAddr + 0x1B2C2F, PlayerLevel);			//sets player level in pregame lobby
+	WriteValue(H2BaseAddr + 0xCC72, PlayerLevelPCR);		//sets player level in postgame carnage report
 
 	DWORD SharedMapMetaDataPointer = *(DWORD*)(H2BaseAddr + 0x47CD64);
 
