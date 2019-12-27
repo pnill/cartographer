@@ -16,6 +16,10 @@ void UIRankPatch() {
 	if (MapHeaderType != 2) //If not on mainmenu, returns
 		return;
 
+	BYTE PlayerLevel = 0x00;								//eventually this will pull level from webserver
+	WORD PlayerLevelPCR = 0x0000;							//eventually this will pull level from webserver
+	WriteValue(H2BaseAddr + 0x1B2C2F, PlayerLevel);			//sets player level in pregame lobby
+	WriteValue(H2BaseAddr + 0xCC72, PlayerLevelPCR);		//sets player level in postgame carnage report
 	//Tag : ui\player_skins\player_skin_lobby.skin
 	const DWORD TagOffsetPreGameLobby = 0x0049DE90;	//Property : Bitmap Buttons
 

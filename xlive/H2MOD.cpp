@@ -21,7 +21,6 @@ H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
 Halo2Final* h2f = new Halo2Final();
 DeviceShop* device_shop = new DeviceShop();
-XboxTick* xboxTickHandler = new XboxTick();
 Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
 HeadHunter* headHunterHandler = new HeadHunter();
@@ -867,13 +866,13 @@ bool __cdecl OnMapLoad(void* map_load_settings)
 		if (!b_XboxTick) 
 		{
 			HitFix::Initialize();
+			H2X::Initialize(b_H2X);
 			MPMapFix::Initialize();
 			H2Tweaks::applyMeleePatch(true);
 		}
 		else
 		{
 			H2Tweaks::applyMeleePatch(false);
-			xboxTickHandler->preSpawnPlayer->execute();
 		}
 		
 		H2Tweaks::enableAI_MP();
@@ -897,8 +896,6 @@ bool __cdecl OnMapLoad(void* map_load_settings)
 			if (b_GunGame) {
 				gunGame->initializer->execute();
 			}
-
-			H2X::Initialize(b_H2X);
 
 			if (b_Halo2Final)
 				h2f->Initialize();
@@ -941,10 +938,6 @@ bool __cdecl OnPlayerSpawn(int a1)
 	if (b_GunGame) {
 		gunGame->preSpawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
 		gunGame->preSpawnPlayer->execute();
-	}
-
-	if (b_XboxTick) {
-		xboxTickHandler->preSpawnPlayer->execute();
 	}
 
 	bool ret = p_spawn_player(a1);
@@ -1367,6 +1360,7 @@ void H2MOD::ApplyHooks() {
 	PatchCall(GetAddress(0x9B09F, 0x85F73), filo_write__encrypted_data_hook);
 
 	ApplyUnitHooks();
+	XboxTick::applyHooks();
 	mapManager->applyGamePatches();
 
 	// bellow hooks applied to specific executables
