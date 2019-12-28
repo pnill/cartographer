@@ -24,8 +24,7 @@ signed int Infection::calculateZombiePlayerIndex()
 {
 	if (getPlayerCount() > 0)
 	{
-		std::random_device rd;
-		std::mt19937 mt_rand(rd());
+		std::mt19937 mt_rand(random_seed);
 		std::vector<int> vecPlayersActiveIndexes;
 
 		int playerIndex = 0;

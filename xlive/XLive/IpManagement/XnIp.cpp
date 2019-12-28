@@ -139,8 +139,7 @@ void CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR
 		// if the ip is not in the system, add it
 		if (i + 1 == XnIPs.max_size())
 		{	
-			std::random_device rd;
-			std::mt19937 mt_rand(rd());
+			std::mt19937 mt_rand(random_seed);
 			std::uniform_int_distribution<int> dist(1, 255);
 
 			memcpy(&XnIPs[firstUnusedDataIndex].xnkid, xnkid, sizeof(XNKID));

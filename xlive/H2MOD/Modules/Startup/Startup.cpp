@@ -361,6 +361,9 @@ void InitH2Startup() {
 		H2IsDediServer = false;
 	}
 
+	std::random_device rd;
+	random_seed = rd();
+	srand(random_seed);
 	initInstanceNumber();
 
 	int ArgCnt;

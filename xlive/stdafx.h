@@ -70,4 +70,6 @@
 #include "xliveless.h"
 #include "xlivedefs.h"
 
+extern unsigned int random_seed;
+
 #undef small
