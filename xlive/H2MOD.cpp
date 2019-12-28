@@ -790,24 +790,24 @@ void get_object_table_memory()
 	game_state_objects_header = *h2mod->GetAddress<s_datum_array**>(0x4E461C, 0x50C8EC);
 }
 
-typedef bool(__cdecl *map_cache_load)(void* map_load_settings);
+typedef bool(__cdecl *map_cache_load)(game_engine_settings* map_load_settings);
 map_cache_load p_map_cache_load;
 
-bool __cdecl OnMapLoad(void* map_load_settings)
+bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 {
-	bool result = p_map_cache_load(map_load_settings);
+	bool result = p_map_cache_load(engine_settings);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
 
 	tags::run_callbacks();
-	MapType map_type = *reinterpret_cast<MapType*>(map_load_settings);
-	h2mod->SetMapType(map_type);
+	
+	h2mod->SetMapType(engine_settings->map_type);
 
 	isLobby = true;
 	get_object_table_memory();
 
-	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	H2Tweaks::setFOV(H2Config_field_of_view);
+	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
 	
 	if (h2mod->GetMapType() == MapType::MAIN_MENU)
@@ -815,9 +815,10 @@ bool __cdecl OnMapLoad(void* map_load_settings)
 		addDebugText("Map Type: Main-Menu");
 		object_to_variant.clear();
 
-		if (!NetworkSession::localPeerIsSessionHost()) {
+		//TODO: issue #232
+		/*if (!NetworkSession::localPeerIsSessionHost()) {
 			advLobbySettings->resetLobbySettings();
-		}
+		}*/
 
 		if (b_Halo2Final && !h2mod->Server) {
 			h2f->Dispose();
@@ -834,10 +835,11 @@ bool __cdecl OnMapLoad(void* map_load_settings)
 			b_GunGame = false;
 		}
 
-		H2Tweaks::disableAI_MP();
 		UIRankPatch();
-		H2Tweaks::disable60FPSCutscenes();
 		H2Tweaks::setHz();
+		H2Tweaks::disableAI_MP();
+		H2Tweaks::disable60FPSCutscenes();
+		engine_settings->tickrate = XboxTick::setTickRate(false);
 
 		return result;
 	}		
@@ -869,10 +871,12 @@ bool __cdecl OnMapLoad(void* map_load_settings)
 			H2X::Initialize(b_H2X);
 			MPMapFix::Initialize();
 			H2Tweaks::applyMeleePatch(true);
+			engine_settings->tickrate = XboxTick::setTickRate(false);
 		}
 		else
 		{
 			H2Tweaks::applyMeleePatch(false);
+			engine_settings->tickrate = XboxTick::setTickRate(true);
 		}
 		
 		H2Tweaks::enableAI_MP();
@@ -1360,7 +1364,6 @@ void H2MOD::ApplyHooks() {
 	PatchCall(GetAddress(0x9B09F, 0x85F73), filo_write__encrypted_data_hook);
 
 	ApplyUnitHooks();
-	XboxTick::applyHooks();
 	mapManager->applyGamePatches();
 
 	// bellow hooks applied to specific executables

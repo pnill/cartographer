@@ -2,10 +2,10 @@
 #include "Globals.h"
 #include "XboxTick.h"
 
-int GetTickrate()
+int XboxTick::setTickRate(bool enable)
 {
 	int tickrate = 60;
-	if (StrStrIW(h2mod->GetLobbyGameVariantName(), L"ogh2")) // enable
+	if (enable) // enable
 	{
 		tickrate = 30;
 
@@ -31,10 +31,5 @@ int GetTickrate()
 
 	WriteValue<DWORD>(h2mod->GetAddress(0x264ABB + 1, 0x1DB8B + 1), tickrate);
 	return tickrate;
-}
-
-void XboxTick::applyHooks()
-{
-	PatchCall(h2mod->GetAddress(0x48D9A, 0x4203B), GetTickrate);
 }
 

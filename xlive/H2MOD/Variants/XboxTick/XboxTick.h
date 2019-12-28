@@ -3,5 +3,5 @@
 
 namespace XboxTick
 {
-	void applyHooks();
+	int setTickRate(bool enable);
 };
