@@ -11,8 +11,6 @@ HMODULE hThis = NULL;
 
 CRITICAL_SECTION d_lock;
 
-unsigned int random_seed;
-
 UINT g_online = 1;
 
 UINT g_signin[4] = { 1,0,0,0 };
@@ -99,6 +97,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 	{
 	case DLL_PROCESS_ATTACH:
 		hThis = hModule;
+		srand((unsigned int)time(NULL));
 		InitH2Startup();
 		Detour();
 		break;
