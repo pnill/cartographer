@@ -251,10 +251,10 @@ signed int __cdecl object_new_hook(ObjectPlacementData* new_object)
 	return result;
 }
 
-typedef void(__stdcall *tc_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, void* packet);
+typedef void(__thiscall *tc_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, void* packet);
 tc_simulation_unit_entity_definition_creation_encode pc_simulation_unit_entity_definition_encode;
 
-void __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr, int creation_data_size, void* creation_data, int a3, void* packet)
+void __fastcall c_simulation_unit_entity_definition_creation_encode(void *thisptr, void* _EDX_UNUSED_, int creation_data_size, void* creation_data, int a3, void* packet)
 {
 	//LOG_TRACE_GAME_N("c_simulation_unit_entity_definition_creation_encode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, a3: %i, packet: %08X", thisptr, creation_data_size, creation_data, a3, packet);
 	int object_permutation_index = *(int*)((char*)creation_data + 0x24);
@@ -274,10 +274,10 @@ void __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr
 }
 
 
-typedef bool(__stdcall *tc_simulation_unit_entity_definition_creation_decode)(void* thisptr, int creation_data_size, void* creation_data,void* packet);
+typedef bool(__thiscall *tc_simulation_unit_entity_definition_creation_decode)(void* thisptr, int creation_data_size, void* creation_data, void* packet);
 tc_simulation_unit_entity_definition_creation_decode pc_simulation_unit_entity_definition_decode;
 
-bool __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, int creation_data_size, void* creation_data, void* packet)
+bool __fastcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, void* _EDX_UNUSED_, int creation_data_size, void* creation_data, void* packet)
 {
 	//LOG_TRACE_GAME_N("c_simulation_unit_entity_definition_creation_decode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, packet: %08X", thisptr, creation_data_size, creation_data, packet);
 
@@ -292,8 +292,7 @@ bool __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr
 	else
 		*(int*)((char*)creation_data + 0x24) = -1;
 
-	bool ret = pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, packet);
-	return ret;
+	return pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, packet);
 }
 
 typedef int(__stdcall *tset_unit_creation_data)(unsigned int object_index, void* object_creation_data);
@@ -1294,16 +1293,16 @@ void H2MOD::ApplyUnitHooks()
 {
 	DWORD dwBack;
 
-	BYTE packet_sz = 0x30;
-	WriteBytes(h2mod->GetAddress(0x1F8029, 0x1E1D8F), &packet_sz, 1);
+	// increase the size of the unit entity creation definition packet
+	WriteValue<DWORD>(h2mod->GetAddress(0x1F8028, 0x1E1D8E) + 1, 48);
 
 	//This encodes the unit creation packet, only gets executed on host.
-	pc_simulation_unit_entity_definition_encode = (tc_simulation_unit_entity_definition_creation_encode)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1F8503, 0x1E2269), (BYTE*)c_simulation_unit_entity_definition_creation_encode, 10);
-	VirtualProtect(pc_simulation_unit_entity_definition_encode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	WritePointer(h2mod->GetAddress(0x3C8E14, 0x38444C), (void*)c_simulation_unit_entity_definition_creation_encode);
+	pc_simulation_unit_entity_definition_encode = h2mod->GetAddress<tc_simulation_unit_entity_definition_creation_encode>(0x1F8503, 0x1E2269);
 
 	//This decodes the unit creation packet, only gets executed on client.
-	pc_simulation_unit_entity_definition_decode = (tc_simulation_unit_entity_definition_creation_decode)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1F8557, 0x1E22BD), (BYTE*)c_simulation_unit_entity_definition_creation_decode, 11);
-	VirtualProtect(pc_simulation_unit_entity_definition_decode, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	WritePointer(h2mod->GetAddress(0x3C8E18, 0x384450), (void*)c_simulation_unit_entity_definition_creation_decode);
+	pc_simulation_unit_entity_definition_decode = h2mod->GetAddress<tc_simulation_unit_entity_definition_creation_decode>(0x1F8557, 0x1E22BD);
 
 	pdevice_touch = (tdevice_touch)DetourFunc(h2mod->GetAddress<BYTE*>(0x163420, 0x158EE3), (BYTE*)device_touch, 10);
 	VirtualProtect(pdevice_touch, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -1313,15 +1312,15 @@ void H2MOD::ApplyUnitHooks()
 
 	//We update creation data here which is used later on to add data to the packet
 	PatchCall(h2mod->GetAddress(0x1F807A, 0x1E1DE0), set_unit_creation_data_hook);
-	pset_unit_creation_data = (tset_unit_creation_data)h2mod->GetAddress(0x1F24ED, 0x1DD586);
+	pset_unit_creation_data = h2mod->GetAddress<tset_unit_creation_data>(0x1F24ED, 0x1DD586);
 
 	// Hooks a call within the creat_unit property on the client side in order to set their permutation index before spawn.
 	PatchCall(h2mod->GetAddress(0x1F9E6C, 0x1E3BD4), create_unit_hook);
-	pcreate_unit_hook = (tcreate_unit_hook)h2mod->GetAddress(0x1F32DB, 0x1DE374);
+	pcreate_unit_hook = h2mod->GetAddress<tcreate_unit_hook>(0x1F32DB, 0x1DE374);
 
 	// Hooks the part of the unit spawn from simulation that handles setting their color data in order to ensure AI do not have their color overridden
 	PatchCall(h2mod->GetAddress(0x1F9E34, 0x1E3B9C), set_unit_color_data_hook);
-	pset_unit_color_data = (tset_unit_color_data)h2mod->GetAddress(0x6E5C3, 0x6D1BF);
+	pset_unit_color_data = h2mod->GetAddress<tset_unit_color_data>(0x6E5C3, 0x6D1BF);
 }
 
 void H2MOD::ApplyHooks() {
