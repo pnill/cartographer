@@ -70,4 +70,6 @@
 #include "xliveless.h"
 #include "xlivedefs.h"
 
+extern std::random_device rd;
+
 #undef small

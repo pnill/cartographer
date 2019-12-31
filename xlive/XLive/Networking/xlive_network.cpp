@@ -119,9 +119,12 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 // #53: XNetRandom
 INT WINAPI XNetRandom(BYTE * pb, UINT cb)
 {
+	std::mt19937 mt_rand(rd());
+	std::uniform_int_distribution<int> dist(0, 255);
+
 	if (cb)
 		for (DWORD i = 0; i < cb; i++)
-			pb[i] = static_cast<BYTE>(rand());
+			pb[i] = static_cast<BYTE>(dist(mt_rand));
 
 	return 0;
 }

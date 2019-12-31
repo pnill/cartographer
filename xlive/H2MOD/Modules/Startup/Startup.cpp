@@ -39,6 +39,8 @@ h2log *onscreendebug_log = nullptr;
 // Console logger, receives output from all loggers
 h2log *console_log = nullptr;
 
+std::random_device rd;
+
 ProcessInfo game_info;
 
 bool H2IsDediServer = false;
