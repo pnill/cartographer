@@ -148,7 +148,7 @@ void CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR
 			
 			int randIdentifier = dist(mt_rand);
 			randIdentifier <<= 8;
-			LOG_TRACE_NETWORK("CreateXnIpIdentifier new connection rand identifier {0:x}, identifier {1:x}", randIdentifier, htonl(firstUnusedDataIndex | randIdentifier));
+			LOG_TRACE_NETWORK("CreateXnIpIdentifier new connection index {0:x}, identifier {1:x}", firstUnusedDataIndex, htonl(firstUnusedDataIndex | randIdentifier));
 
 			outIpIdentifier->s_addr = htonl(firstUnusedDataIndex | randIdentifier);
 			XnIPs[firstUnusedDataIndex].connectionIdentifier.s_addr = htonl(firstUnusedDataIndex | randIdentifier);
@@ -308,7 +308,7 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 // #60: XNetInAddrToXnAddr
 INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 {
-	LOG_TRACE_NETWORK("XNetInAddrToXnAddr() address index: {:x}", ntohl(ina.s_addr));
+	LOG_TRACE_NETWORK("XNetInAddrToXnAddr() address index: {:x}, identifier {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
 	
 	if (pxna == nullptr
 		|| pxnkid == nullptr)

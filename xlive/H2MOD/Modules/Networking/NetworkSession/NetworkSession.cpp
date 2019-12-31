@@ -4,18 +4,18 @@
 
 network_session* NetworkSession::getNetworkSessions()
 {
-	return reinterpret_cast<network_session*>(*h2mod->GetAddress<DWORD*>(0x51C474, 0x520B94));
+	return *h2mod->GetAddress<network_session**>(0x51C474, 0x520B94);
 }
 
 network_session* NetworkSession::getCurrentNetworkSession()
 {
-	return reinterpret_cast<network_session*>(*h2mod->GetAddress<DWORD*>(0x420FE8, 0x520B94));
+	return *h2mod->GetAddress<network_session**>(0x420FE8, 0x520B94);
 }
 
 bool NetworkSession::getCurrentNetworkSession(network_session** outSession)
 {
 	typedef char(__cdecl* get_lobby_globals_ptr)(network_session** ptr);
-	return reinterpret_cast<get_lobby_globals_ptr>(h2mod->GetAddress(0x1AD736, 0x1A66B3))(outSession);
+	return h2mod->GetAddress<get_lobby_globals_ptr>(0x1AD736, 0x1A66B3)(outSession);
 }
 
 eNetwork_session_state NetworkSession::getLocalSessionState()
@@ -36,14 +36,14 @@ bool NetworkSession::localPeerIsSessionHost()
 signed int NetworkSession::getPeerIndexFromNetworkAddress(network_address* address)
 {
 	typedef signed int(__thiscall* get_peer_index_from_network_address)(network_session* session, network_address* address);
-	return reinterpret_cast<get_peer_index_from_network_address>(h2mod->GetAddress(0x1C71DF, 0x19E9CF))(getCurrentNetworkSession(), address);
+	return h2mod->GetAddress<get_peer_index_from_network_address>(0x1C71DF, 0x19E9CF)(getCurrentNetworkSession(), address);
 }
 
 char NetworkSession::getMapFileLocation(wchar_t* buffer, size_t size)
 {
 	// host-only
 	typedef char(__thiscall* get_map_file_location_impl)(network_session* session, wchar_t* buffer, size_t size);
-	return reinterpret_cast<get_map_file_location_impl>(h2mod->GetAddress(0x1C5678, 0x19CD4A))(getCurrentNetworkSession(), buffer, size);
+	return h2mod->GetAddress<get_map_file_location_impl>(0x1C5678, 0x19CD4A)(getCurrentNetworkSession(), buffer, size);
 }
 
 int NetworkSession::getPeerCount()
@@ -129,7 +129,7 @@ int NetworkSession::getPlayerTeamFromXuid(long long xuid)
 void NetworkSession::kickPeer(int peerIndex) 
 {
 	typedef void(__thiscall* game_session_boot)(network_session* session, int peer_index, bool unk);
-	auto p_game_session_boot = reinterpret_cast<game_session_boot>(h2mod->GetAddress(0x1CCE9B));
+	auto p_game_session_boot = h2mod->GetAddress<game_session_boot>(0x1CCE9B);
 
 	if (peerIndex < getPeerCount()) 
 	{
