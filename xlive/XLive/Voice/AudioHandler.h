@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Globals.h"
+#if COMPILE_WITH_VOICE
+
+
 #include "AudioDevices.h"
 
 /* Select sample format. */
@@ -44,3 +46,4 @@ private:
 	PaStream*           stream;
 
 };
+#endif

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Globals.h"
+
+#if COMPILE_WITH_VOICE
+#include "3rdparty/portaudio/include/portaudio.h"
 
 enum DeviceType : BYTE
 {
@@ -19,7 +21,7 @@ struct DeviceInfo
 class CAudioDevices
 {
 public:
-	
+
 	CAudioDevices();
 
 	void SelectAudioOutput();
@@ -41,4 +43,9 @@ private:
 	bool				m_defaultInputFound, m_defaultOutputFound = false;
 
 };
+
+
+#endif // !1
+
+
 

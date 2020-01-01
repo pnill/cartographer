@@ -9,8 +9,10 @@
 
 std::vector<XUID> remotetalkers;
 
+#if COMPILE_WITH_VOICE
 CAudioHandler* p_CAudioHandler = nullptr;
 CAudioDevices* p_CAudioDevices = nullptr;
+#endif
 
 //#5008
 int WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, PIXHV2ENGINE *ppEngine)
@@ -21,8 +23,10 @@ int WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, PIX
 	// disable until ready
 	H2Config_voice_chat = false;
 
+#if COMPILE_WITH_VOICE
 	if (H2Config_voice_chat)
 		p_CAudioHandler = new CAudioHandler(p_CAudioDevices);
+#endif
 
 	if (pParams->bCustomVADProvided)
 	{
@@ -51,7 +55,11 @@ int WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, PIX
 BOOL IXHV2ENGINE::IsHeadsetPresent(VOID *pThis, DWORD dwUserIndex) {
 	//LOG_TRACE_XLIVE("IXHV2Engine::IsHeadsetPresent");
 
-	return H2Config_voice_chat && p_CAudioHandler->audioDevices->IsDeviceAvailable(Input);
+	return H2Config_voice_chat
+#if COMPILE_WITH_VOICE
+		&& p_CAudioHandler->audioDevices->IsDeviceAvailable(Input)
+#endif
+		;
 }
 
 BOOL IXHV2ENGINE::isRemoteTalking(VOID *pThis, XUID xuid) {
@@ -65,7 +73,11 @@ BOOL IXHV2ENGINE::IsLocalTalking(VOID *pThis, DWORD dwUserIndex) {
 	//check the xuid map
 	XUID id = xFakeXuid[0];
 	BOOL isTalking = xuidIsTalkingMap[id];
-	return H2Config_voice_chat && p_CAudioHandler->audioDevices->IsDeviceAvailable(Input) ? xuidIsTalkingMap[id] : false;
+	return H2Config_voice_chat 
+#ifdef COMPILE_WITHOUT_VOICE_LIBRARIES
+		&& p_CAudioHandler->audioDevices->IsDeviceAvailable(Input) ? xuidIsTalkingMap[id] : false;
+#endif
+	;
 }
 
 LONG IXHV2ENGINE::AddRef(/*CXHVEngine*/ VOID *pThis)
@@ -81,8 +93,10 @@ LONG IXHV2ENGINE::Release(/*CXHVEngine*/ VOID *pThis)
 	if (!remotetalkers.empty())
 		remotetalkers.clear();
 
+#ifdef COMPILE_WITHOUT_VOICE_LIBRARIES
 	if (H2Config_voice_chat)
 		delete p_CAudioHandler;
+#endif
 
 	IXHV2ENGINE* pIXHV2Engine = reinterpret_cast<IXHV2ENGINE*>(pThis);
 	delete pIXHV2Engine;

@@ -1,4 +1,6 @@
-#include "stdafx.h"
+
+#if COMPILE_WITH_VOICE
+
 #include "AudioDevices.h"
 #include "AudioHandler.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
@@ -77,3 +79,5 @@ CAudioDevices::~CAudioDevices()
 
 	delete[] m_audioDeviceInfoArray;
 }
+
+#endif
