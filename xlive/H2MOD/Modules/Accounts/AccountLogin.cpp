@@ -41,9 +41,6 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 
 	char result = strlen(login_token) == 32 ? 1 : 2;
 
-	extern bool StatusCheater;
-	StatusCheater = false;
-
 	XNADDR pxna;
 	SecureZeroMemory(&pxna, sizeof(XNADDR));
 
@@ -353,11 +350,6 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				extern char* ServerStatus;
 				if (result == 4) {
 					snprintf(ServerStatus, 250, "Status: Developer");
-				}
-				else if (result == 3 || result == 7) {
-					snprintf(ServerStatus, 250, "Status: CHEATER");
-					extern bool StatusCheater;
-					StatusCheater = true;
 				}
 			}
 		}

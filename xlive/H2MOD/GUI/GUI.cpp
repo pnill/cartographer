@@ -482,7 +482,6 @@ static void create_exit_countdown_label() {
 	exit_countdown_labels.push_back(exit_cnd_lbl);
 }
 
-bool StatusCheater = false;
 int achievement_height = 0;
 bool achievement_freeze = false;
 int achievement_timer = 0;
@@ -535,7 +534,7 @@ int WINAPI XLiveRender()
 			DWORD GameEngine = *(DWORD*)(GameGlobals + 0x8);
 			bool paused_or_in_menus = (*h2mod->GetAddress<BYTE*>(0x47A568) != 0);
 
-			if (GameEngine == 3 || StatusCheater || (GameEngine != 3 && paused_or_in_menus)) {
+			if (GameEngine == 3 || (GameEngine != 3 && paused_or_in_menus)) {
 				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
 				if (MasterState == 0)
 					drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
@@ -544,7 +543,7 @@ int WINAPI XLiveRender()
 				else if (MasterState == 2)
 					drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
 				else if (MasterState == 10)
-					drawText(0, 15, StatusCheater ? COLOR_YELLOW : COLOR_GREEN, ServerStatus, smallFont);
+					drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
 			}
 
 			//drawPrimitiveRect(gameWindowWidth / 1.15, gameWindowHeight - 150, 250, 100, D3DCOLOR_ARGB(155, 41, 65, 129));
