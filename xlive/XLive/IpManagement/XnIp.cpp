@@ -44,10 +44,66 @@ int CXnIp::sendNatInfoUpdate(SOCKET s, short port)
 	return -1;
 }
 
+IN_ADDR CXnIp::GetConnectionIdentifierByNat(sockaddr* addr)
+{
+	for (int i = 0; i < XnIPs.max_size(); i++)
+	{
+		XnIp* xnip = &XnIPs[i];
+		if (memcmp(addr, &xnip->NatAddrSocket1000, sizeof(sockaddr_in)) == 0
+			|| memcmp(addr, &xnip->NatAddrSocket1001, sizeof(sockaddr_in)) == 0)
+		{
+			return xnip->connectionIdentifier;
+		}
+	}
+
+	IN_ADDR addrInval;
+	addrInval.s_addr = 0x7F000001;
+	return addrInval;
+}
+
 /*
 	In order to use this, make sure the XnIp in present in the system
 */
-void CXnIp::SaveNatInfo(IN_ADDR ipIdentifier, sockaddr* addr)
+void CXnIp::SaveNatInfo(IN_ADDR ipIdentifier)
+{
+	/*
+		Use this function when joining a game
+	*/
+	int connectionIndex = getConnectionIndex(ipIdentifier);
+	XnIp* xnIp = &this->XnIPs[connectionIndex];
+	LOG_TRACE_NETWORK("SaveNatInfo() - identifier: {:x}", ipIdentifier.s_addr);
+
+	if (xnIp->bValid
+		&& xnIp->connectionIdentifier.s_addr == ipIdentifier.s_addr)
+	{
+		/* This happens when joining a server, it's a fix to dynamic ports... */
+		/* It sets up the host NAT data */
+
+		sockaddr_in newAddr;
+		newAddr.sin_family = AF_INET;
+
+		// TODO: dinamically handle these
+		xnIp->NatAddrSocket1000.sin_family = AF_INET;
+		xnIp->NatAddrSocket1000.sin_addr = xnIp->xnaddr.ina;
+		xnIp->NatAddrSocket1000.sin_port = xnIp->xnaddr.wPortOnline;
+
+		xnIp->NatAddrSocket1001.sin_family = AF_INET;
+		xnIp->NatAddrSocket1001.sin_addr = xnIp->xnaddr.ina;
+		xnIp->NatAddrSocket1001.sin_port = htons(ntohs(xnIp->xnaddr.wPortOnline) + 1);
+
+		LOG_TRACE_NETWORK("SaveNatInfo() - base port: {}, join port: {}", ntohs(xnIp->NatAddrSocket1000.sin_port), ntohs(xnIp->xnaddr.wPortOnline) + 1);
+
+		// Loopback bs
+		if (H2Config_ip_wan == xnIp->xnaddr.ina.s_addr)
+		{
+			xnIp->NatAddrSocket1000.sin_addr.s_addr = H2Config_ip_lan;
+			xnIp->NatAddrSocket1001.sin_addr.s_addr = H2Config_ip_lan;
+		}
+	}
+	
+}
+
+void CXnIp::SaveNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr)
 {
 	/*
 		In theory to handle multiple instance servers in the future what we can do is populate the port field of CreateUser,
@@ -65,42 +121,36 @@ void CXnIp::SaveNatInfo(IN_ADDR ipIdentifier, sockaddr* addr)
 		This should allow us to handle servers listening on any port without much effort or engine modification.
 	*/
 
+	LOG_TRACE_NETWORK("SaveNatInfo() - Socket: {}, identifier: {:x}", s, ipIdentifier.s_addr);
 	int ipIndex = getConnectionIndex(ipIdentifier);
 	XnIp* xnIp = &this->XnIPs[ipIndex];
 
-	if (addr == nullptr) // if the addr is nullptr, this has been called on join by the client
+	if (xnIp->bValid 
+		&& xnIp->connectionIdentifier.s_addr == ipIdentifier.s_addr)
 	{
-		/* This happens when joining a server, it's a fix to dynamic ports... */
-		/* It sets up the host data */
 
-		short nPort_base = xnIp->xnaddr.wPortOnline;
-		short nPort_join = htons(ntohs(xnIp->xnaddr.wPortOnline) + 1);
-
-		LOG_TRACE_NETWORK("SaveNatInfo - nPort_base: {}", ntohs(nPort_base));
-		LOG_TRACE_NETWORK("SaveNatInfo - nPort_join: {}", ntohs(nPort_join));
-
-		std::pair <ULONG, SHORT> hostpair = std::make_pair(xnIp->xnaddr.ina.s_addr, nPort_join);
-		std::pair <ULONG, SHORT> hostpair_1000 = std::make_pair(xnIp->xnaddr.ina.s_addr, nPort_base);
-
-		if (H2Config_ip_wan == xnIp->xnaddr.ina.s_addr)
+		/* Store NAT data
+		   First we look at our socket's intended port.
+		   port 1000 is mapped to the receiving port pmap_a via the secure address.
+		   port 1001 is mapped to the receiving port pmap_b via the secure address.
+		*/
+		switch (ipManager.sockmap[s])
 		{
-			std::pair <ULONG, SHORT> hostpair_loopback = std::make_pair(H2Config_ip_lan, nPort_join);
-			std::pair <ULONG, SHORT> hostpair_loopback_1000 = std::make_pair(H2Config_ip_lan, nPort_base);
+		case 1000:
+			//LOG_TRACE_NETWORK("XSocketRecvFrom() User.sockmap mapping port 1000 - port: %i, secure: %08X", htons(port), secure);
+			memcpy(&xnIp->NatAddrSocket1000, addr, sizeof(sockaddr));
+			break;
 
-			this->connection_identifiers_map[hostpair_loopback] = ipIdentifier;
-			this->connection_identifiers_map[hostpair_loopback_1000] = ipIdentifier;
+		case 1001:
+			//LOG_TRACE_NETWORK("XSocketRecvFrom() User.sockmap mapping port 1001 - port: %i, secure: %08X", htons(port), secure);
+			memcpy(&xnIp->NatAddrSocket1001, addr, sizeof(sockaddr));
+			break;
+
+		default:
+			//LOG_TRACE_NETWORK("XSocketRecvFrom() User.sockmap[s] didn't match any ports!");
+			break;
+
 		}
-
-		this->connection_identifiers_map[hostpair] = ipIdentifier;
-		this->connection_identifiers_map[hostpair_1000] = ipIdentifier;
-
-		this->pmap_a[ipIndex] = nPort_base;
-		this->pmap_b[ipIndex] = nPort_join;
-	}
-	else
-	{
-		std::pair<ULONG, SHORT> addressPair = std::make_pair(((struct sockaddr_in*)addr)->sin_addr.s_addr, ((struct sockaddr_in*)addr)->sin_port);
-		ipManager.connection_identifiers_map[addressPair] = ipIdentifier;
 	}
 }
 

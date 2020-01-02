@@ -8,6 +8,10 @@ struct XnIp
 	XNADDR xnaddr;
 	XNKID xnkid;
 	bool bValid;
+
+	// NAT info
+	sockaddr_in NatAddrSocket1000; // TODO: allocate dynamically based on how many sockets are up
+	sockaddr_in NatAddrSocket1001;
 };
 
 template <class T>
@@ -48,7 +52,9 @@ public:
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
 	int sendNatInfoUpdate(SOCKET s, short port);
 
-	void SaveNatInfo(IN_ADDR ipIdentifier, sockaddr* addr);
+	IN_ADDR GetConnectionIdentifierByNat(sockaddr* addr);
+	void SaveNatInfo(IN_ADDR ipIdentifier);
+	void SaveNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr);
 	void SetKeys(XNKID*, XNKEY*);
 	void EraseKeys();
 	void GetKeys(XNKID* xnkid, XNKEY* xnkey);
@@ -56,11 +62,6 @@ public:
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 
 	std::array<XnIp, 32> XnIPs; // ConnectionIndex->CUser
-	std::unordered_map<std::pair<ULONG, SHORT>, IN_ADDR> connection_identifiers_map; // Map Key(XNHost,XnPort)->Secure
-	std::array<SHORT, 32> pmap_a;
-	std::array<SHORT, 32> pmap_b;
-	//std::array<SHORT, 32> pmap_c;
-	//std::array<SHORT, 32> pmap_d;
 	std::unordered_map<SOCKET, SHORT> sockmap;
 
 	XnIp local_user;

@@ -163,17 +163,17 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 	*/
 
 	u_long connectionIndex = ipManager.getConnectionIndex(((struct sockaddr_in*)to)->sin_addr);
-	
+	XnIp* xnIp = &ipManager.XnIPs[connectionIndex];
+
 	sockaddr_in sendAddress;
 	sendAddress.sin_family = AF_INET;
+	sendAddress.sin_addr = xnIp->xnaddr.ina;
 	sendAddress.sin_port = ((struct sockaddr_in*)to)->sin_port;
-	sendAddress.sin_addr = ipManager.XnIPs[connectionIndex].xnaddr.ina;
 
 	//LOG_TRACE_XLIVE("SendStruct.sin_addr.s_addr == %08X", sendAddress.sin_addr.s_addr);
 
 	if (sendAddress.sin_addr.s_addr == H2Config_ip_wan)
 	{
-		//LOG_TRACE_XLIVE("Matched g_lWANIP:%08X", H2Config_ip_wan);
 		sendAddress.sin_addr.s_addr = H2Config_ip_lan;
 		//LOG_TRACE_XLIVE("Replaced send struct s_addr with g_lLANIP: %08X", H2Config_ip_lan);
 	}
@@ -188,7 +188,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 	switch (htons(((struct sockaddr_in*)to)->sin_port))
 	{
 	case 1000:
-		nPort = ipManager.pmap_a[connectionIndex];
+		nPort = xnIp->NatAddrSocket1000.sin_port;
 
 		if (nPort != 0)
 		{
@@ -199,7 +199,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		break;
 
 	case 1001:
-		nPort = ipManager.pmap_b[connectionIndex];
+		nPort = xnIp->NatAddrSocket1001.sin_port;
 
 		if (nPort != 0)
 		{
@@ -218,7 +218,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 
 	if (result != ERROR_SUCCESS)
 	{
-		LOG_TRACE_NETWORK("XSocketSendTo - Socket Error: {:x}", WSAGetLastError());
+		LOG_TRACE_NETWORK("XSocketSendTo() - Socket Error: {:x}", WSAGetLastError());
 		return SOCKET_ERROR;
 	}
 	else
@@ -239,13 +239,15 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 	DWORD bytesReceived = 0;
 	int result = WSARecvFrom(s, &wsaBuffer, 1, &bytesReceived, (LPDWORD)&flags, from, fromlen, NULL, NULL);
 
-	if (result == ERROR_SUCCESS && bytesReceived > 0)
+	if (result == SOCKET_ERROR)
 	{
-		short port = ((struct sockaddr_in*)from)->sin_port;
+		LOG_TRACE_NETWORK("XSocketRecvFrom() - Socket Error: {:x}", WSAGetLastError());
+		return SOCKET_ERROR;
+	}
+	else if (bytesReceived > 0)
+	{
 		u_long iplong = ((struct sockaddr_in*)from)->sin_addr.s_addr;
 
-		std::pair<ULONG, SHORT> hostpair = std::make_pair(iplong, port);
-		
 		SecurePacket* secure_pck = reinterpret_cast<SecurePacket*>(wsaBuffer.buf);
 		if (iplong != H2Config_master_ip)
 		{
@@ -254,45 +256,21 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 			{
 				IN_ADDR ipIdentification;
 
-				LOG_TRACE_NETWORK("[H2MOD-Network] Received secure packet with ip address {0:x}, port: {1}", htonl(iplong), htons(port));
+				LOG_TRACE_NETWORK("[H2MOD-Network] Received secure packet with ip address {:x}, port: {}", htonl(iplong), htons(((struct sockaddr_in*)from)->sin_port));
 				XNetXnAddrToInAddr(&secure_pck->xnaddr, &secure_pck->xnkid, &ipIdentification); // create identification key for the new connection
-				ipManager.SaveNatInfo(ipIdentification, from); // assign the NAT information to the key
+				ipManager.SaveNatInfo(s, ipIdentification, from); // copy the nat info in the connection structure
 
 				bytesReceived = 0;
 			}
 
-			IN_ADDR connectionIdentifier = ipManager.connection_identifiers_map[hostpair];
-
-			((struct sockaddr_in*)from)->sin_addr = connectionIdentifier;		
-
-			/* Store NAT data
-			   First we look at our socket's intended port.
-			   port 1000 is mapped to the receiving port pmap_a via the secure address.
-			   port 1001 is mapped to the receiving port pmap_b via the secure address.
-			  */
-			switch (ipManager.sockmap[s])
-			{
-			case 1000:
-				//LOG_TRACE_XLIVE("XSocketRecvFrom() User.sockmap mapping port 1000 - port: %i, secure: %08X", htons(port), secure);
-				ipManager.pmap_a[ipManager.getConnectionIndex(connectionIdentifier)] = port;
-				break;
-
-			case 1001:
-				//LOG_TRACE_XLIVE("XSocketRecvFrom() User.sockmap mapping port 1001 - port: %i, secure: %08X", htons(port), secure);
-				ipManager.pmap_b[ipManager.getConnectionIndex(connectionIdentifier)] = port;
-				break;
-
-			default:
-				//LOG_TRACE_XLIVE("XSocketRecvFrom() User.sockmap[s] didn't match any ports!");
-				break;
-
-			}
+			((struct sockaddr_in*)from)->sin_addr = ipManager.GetConnectionIdentifierByNat(from);		
 		}
 	}
+	
 
 	/*if (ret > 0)
 	{
-		LOG_TRACE_NETWORK_N("[h2mod-network] received socket data, total: {}", ret);
+		LOG_TRACE_NETWORK("XSocketRecvFrom() received socket data, total: {}", bytesReceived);
 	}*/
 
 	return bytesReceived;
