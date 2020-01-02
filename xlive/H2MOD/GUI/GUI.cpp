@@ -614,7 +614,7 @@ int WINAPI XLiveRender()
 			}
 #pragma endregion achievement rendering
 
-			if (displayXyz && !isLobby && NetworkSession::localPeerIsSessionHost()) {
+			if ((displayXyz && NetworkSession::localPeerIsSessionHost()) || h2mod->GetMapType() == SINGLE_PLAYER_MAP) {
 				//only display xyz for host
 				int text_y_coord = 60;
 				PlayerIterator playerIt;
@@ -624,7 +624,7 @@ int WINAPI XLiveRender()
 					if (player_position != nullptr) {
 						std::wstring playerNameWide(playerIt.get_current_player_name());
 						std::string playerName(playerNameWide.begin(), playerNameWide.end());
-						std::string xyzText = "Player name: " + playerName + " xyz = " + std::to_string(player_position->X) + " " + std::to_string(player_position->Y) + " " + std::to_string(player_position->Z);
+						std::string xyzText = "Player name: " + playerName + ", xyz = " + std::to_string(player_position->X) + " " + std::to_string(player_position->Y) + " " + std::to_string(player_position->Z);
 						drawText(0, text_y_coord, COLOR_GOLD, xyzText.c_str(), normalSizeFont);
 						text_y_coord += 15;
 					}

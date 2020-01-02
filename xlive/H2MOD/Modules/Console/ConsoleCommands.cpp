@@ -528,13 +528,13 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost())
+			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MULTIPLAYER_MAP)
 			{
 				output(L"Can only be used by the session host!");
 				return;
 			}
 
-			if (isLobby) {
+			if (isLobby && h2mod->GetMapType() == MULTIPLAYER_MAP) {
 				//TODO: need a nicer way to detect this for dedis
 				output(L"Can only be used ingame");
 				return;
@@ -590,7 +590,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			h2mod->exit_game();
 		}
 		else if (firstCommand == "$xyz") {
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MULTIPLAYER_MAP) {
 				output(L"Only host can see xyz for now...");
 				return;
 			}
@@ -611,12 +611,12 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MULTIPLAYER_MAP) {
 				output(L"Can only be used by the session host!");
 				return;
 			}
 
-			if (isLobby) {
+			if (isLobby && h2mod->GetMapType() == MULTIPLAYER_MAP) {
 				//TODO: need a nicer way to detect this for dedis
 				output(L"Can only be used ingame");
 				return;
