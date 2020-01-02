@@ -68,12 +68,13 @@ unsigned short H2Config_master_port_relay = 1001;
 
 //config variables
 bool H2Portable = false;//TODO
+
 unsigned short H2Config_base_port = 2000;
 char H2Config_str_wan[16] = { "" };
 char H2Config_str_lan[16] = { "" };
 unsigned long H2Config_ip_wan = inet_addr("127.0.0.1");
 unsigned long H2Config_ip_lan = inet_addr("127.0.0.1");
-//int H2Config_ip_master;
+
 int H2Config_language_code_main = -1;
 int H2Config_language_code_variant = 0;
 bool H2Config_custom_labels_capture_missing = false;
@@ -83,8 +84,8 @@ bool H2Config_discord_enable = true;
 //bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
 int H2Config_static_lod_state = static_lod::disable;
-int H2Config_field_of_view = 0;
-int H2Config_vehicle_field_of_view = 0;
+int H2Config_field_of_view = 70;
+int H2Config_vehicle_field_of_view = 70;
 int H2Config_refresh_rate = 60;
 int H2Config_mouse_sens = 0;
 int H2Config_controller_sens = 0;
@@ -94,18 +95,16 @@ bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
 //bool H2Config_hitmarker_sound = false;
 bool H2Config_voice_chat = false;
-int H2Config_custom_resolution_x = 0;
-int H2Config_custom_resolution_y = 0;
 char H2Config_dedi_server_name[32] = { "" };
 char H2Config_dedi_server_playlist[256] = { "" };
-bool H2Config_chatbox_commands = false;
+int H2Config_additional_pcr_time = 25;
 bool H2Config_debug_log = false;
 int H2Config_debug_log_level = 2;
 bool H2Config_debug_log_console = false;
 char H2Config_login_identifier[255] = { "" };
 char H2Config_login_password[255] = { "" };
-//weapon crosshair sizes
 
+//weapon crosshair sizes
 int H2Config_BATRIF_WIDTH = 1;
 int H2Config_BATRIF_HEIGHT = 1;
 int H2Config_SMG_WIDTH = 1;
@@ -171,9 +170,10 @@ void SaveH2Config() {
 	wchar_t fileConfigPathLog[1124];
 	swprintf(fileConfigPathLog, 1024, L"Saving Config: \"%ws\"", fileConfigPath);
 	addDebugText(fileConfigPathLog);
-	FILE* fileConfig = _wfopen(fileConfigPath, L"wb");
+	FILE* fileConfig = nullptr; 
+	errno_t err =  _wfopen_s(&fileConfig, fileConfigPath, L"wb");
 
-	if (fileConfig == NULL) {
+	if (err != 0) {
 		HandleFileError(GetLastError());
 		addDebugText("ERROR: Unable to write H2Configuration File!");
 	}
@@ -286,12 +286,6 @@ void SaveH2Config() {
 			fputs("\n# 0 - In-game chat is displayed normally.", fileConfig);
 			fputs("\n# 1 - In-game chat is hidden.", fileConfig);
 			fputs("\n\n", fileConfig);
-
-			/*fputs("# custom_resolution Options (Client):", fileConfig);
-			fputs("\n# <width>x<height> - Sets the resolution of the game via the Windows Registry.", fileConfig);
-			fputs("\n# 0x0, 0x?, ?x0 - these do not do modify anything where ? is >= 0.", fileConfig);
-			fputs("\n\n", fileConfig);*/
-
 		}
 		fputs("# enable_xdelay Options:", fileConfig);
 		fputs("\n# 0 - Non-host players cannot delay the game start countdown timer.", fileConfig);
@@ -385,6 +379,11 @@ void SaveH2Config() {
 			fputs("# login_password Options (Server):", fileConfig);
 			fputs("\n# The password used to login to the defined account.", fileConfig);
 			fputs("\n\n", fileConfig);
+
+			fputs("# additional_pcr_time Options (Server):", fileConfig);
+			fputs("\n# By default, 25 seconds are added to post game carnage time from the playlist setting.", fileConfig);
+			fputs("\n# Now you have the possibility to change it to your preference.", fileConfig);
+			fputs("\n\n", fileConfig);
 		}
 		if (!H2IsDediServer) {
 			fputs("# hotkey_... Options (Client):", fileConfig);
@@ -401,77 +400,62 @@ void SaveH2Config() {
 			fputs("\n\n", fileConfig);
 
 		}
+	
+		fprintf_s(fileConfig, H2ConfigVersionStr, H2ConfigVersion);
 
-		int fputbufferlen = strlen(H2ConfigVersionStr) + 1;
-		char* fputbuffer = (char*)malloc(sizeof(char) * fputbufferlen);
-		snprintf(fputbuffer, fputbufferlen, H2ConfigVersionStr, H2ConfigVersion);
-		fputs(fputbuffer, fileConfig);
-		free(fputbuffer);
+		fprintf_s(fileConfig, "\nh2portable = %d", H2Portable);
 
-		char settingOutBuffer[60];
+		fprintf_s(fileConfig, "\nbase_port = %d", H2Config_base_port);
 
-		fputs("\nh2portable = ", fileConfig); fputs(H2Portable ? "1" : "0", fileConfig);
+		fprintf_s(fileConfig, "\nwan_ip = %s", H2Config_str_wan);
 
-		sprintf(settingOutBuffer, "\nbase_port = %d", H2Config_base_port);
-		fputs(settingOutBuffer, fileConfig);
-
-		fputs("\nwan_ip = ", fileConfig); fputs(H2Config_str_wan, fileConfig);
-
-		fputs("\nlan_ip = ", fileConfig); fputs(H2Config_str_lan, fileConfig);
+		fprintf_s(fileConfig, "\nlan_ip = %s", H2Config_str_lan);
 
 		if (H2IsDediServer) {
 			//fputs("\nlanguage_code = -1x0", fileConfig);
 		} else {
-			sprintf(settingOutBuffer, "\nlanguage_code = %dx%d", H2Config_language_code_main, H2Config_language_code_variant);
-			fputs(settingOutBuffer, fileConfig);
+			fprintf_s(fileConfig, "\nlanguage_code = %dx%d", H2Config_language_code_main, H2Config_language_code_variant);
 		}
 		if (!H2IsDediServer) {
-			fputs("\nlanguage_label_capture = ", fileConfig); fputs(H2Config_custom_labels_capture_missing ? "1" : "0", fileConfig);
+			fprintf_s(fileConfig, "\nlanguage_label_capture = %d", H2Config_custom_labels_capture_missing);
 
-			fputs("\nskip_intro = ", fileConfig); fputs(H2Config_skip_intro ? "1" : "0", fileConfig);
+			fprintf_s(fileConfig, "\nskip_intro = %d", H2Config_skip_intro);
 
-			fputs("\nraw_mouse_input = ", fileConfig); fputs(H2Config_raw_input ? "1" : "0", fileConfig);
+			fprintf_s(fileConfig, "\nraw_mouse_input = %d", H2Config_raw_input);
 
-			fputs("\ndiscord_enable = ", fileConfig); fputs(H2Config_discord_enable ? "1" : "0", fileConfig);
+			fprintf_s(fileConfig, "\ndiscord_enable = %d", H2Config_discord_enable);
 
-			//fputs("\ncontroller_aim_assist = ", fileConfig); fputs(H2Config_controller_aim_assist ? "1" : "0", fileConfig);
+			//fprintf_s(fileConfig, "\ncontroller_aim_assist = %d", H2Config_controller_aim_assist);
 
-			sprintf(settingOutBuffer, "\nfps_limit = %d", H2Config_fps_limit);
-			fputs(settingOutBuffer, fileConfig);
+			fprintf_s(fileConfig, "\nfps_limit = %d", H2Config_fps_limit);
 
-			sprintf(settingOutBuffer, "\nstatic_lod_state = %d", H2Config_static_lod_state);
-			fputs(settingOutBuffer, fileConfig);
+			fprintf_s(fileConfig, "\nstatic_lod_state = %d", H2Config_static_lod_state);
 
-			sprintf(settingOutBuffer, "\nfield_of_view = %d", H2Config_field_of_view);
-			fputs(settingOutBuffer, fileConfig);
+			fprintf_s(fileConfig, "\nfield_of_view = %d", H2Config_field_of_view);
 
-			sprintf(settingOutBuffer, "\nvehicle_field_of_view = %d", H2Config_vehicle_field_of_view);
-			fputs(settingOutBuffer, fileConfig);
+			fprintf_s(fileConfig, "\nvehicle_field_of_view = %d", H2Config_vehicle_field_of_view);
 
-			sprintf(settingOutBuffer, "\nrefresh_rate = %d", H2Config_refresh_rate);
-			fputs(settingOutBuffer, fileConfig);
+			fprintf_s(fileConfig, "\nrefresh_rate = %d", H2Config_refresh_rate);
 
-			sprintf(settingOutBuffer, "\nmouse_sens = %d", H2Config_mouse_sens);
-			fputs(settingOutBuffer, fileConfig);
+			fprintf_s(fileConfig, "\nmouse_sens = %d", H2Config_mouse_sens);
 
-			sprintf(settingOutBuffer, "\ncontroller_sens = %d", H2Config_controller_sens);
-			fputs(settingOutBuffer, fileConfig);
+			fprintf_s(fileConfig, "\ncontroller_sens = %d", H2Config_controller_sens);
 
 			if (FloatIsNaN(H2Config_crosshair_offset)) {
 				fputs("\ncrosshair_offset = NaN", fileConfig);
 			}
 			else {
-				sprintf(settingOutBuffer, "\ncrosshair_offset = %f", H2Config_crosshair_offset);
-				fputs(settingOutBuffer, fileConfig);
+				fprintf_s(fileConfig, "\ncrosshair_offset = %f", H2Config_crosshair_offset);
 			}
-			fputs("\ndisable_ingame_keyboard = ", fileConfig); fputs(H2Config_disable_ingame_keyboard ? "1" : "0", fileConfig);
+			fprintf_s(fileConfig, "\ndisable_ingame_keyboard = %d", H2Config_disable_ingame_keyboard);
 
-			fputs("\nhide_ingame_chat = ", fileConfig); fputs(H2Config_hide_ingame_chat ? "1" : "0", fileConfig);
+			fprintf_s(fileConfig, "\nhide_ingame_chat = %d", H2Config_hide_ingame_chat);
 
 			//TODO
 			//fputs("\ncustom_resolution = 0x0", fileConfig);
 		}
-		fputs("\nenable_xdelay = ", fileConfig); fputs(H2Config_xDelay ? "1" : "0", fileConfig);
+
+		fprintf_s(fileConfig, "\nenable_xdelay = %d", H2Config_xDelay);
 
 		/*if (!H2IsDediServer) {
 			fputs("\nenable_hitmarker_sound = ", fileConfig); fputs(H2Config_hitmarker_sound ? "1" : "0", fileConfig);
@@ -495,34 +479,28 @@ void SaveH2Config() {
 			fputs("\nflashlight = ", fileConfig); fputs(AdvLobbySettings_flashlight ? "1" : "0", fileConfig);
 		}*/
 
-		fputs("\ndebug_log = ", fileConfig); fputs(H2Config_debug_log ? "1" : "0", fileConfig);
+		fprintf_s(fileConfig, "\ndebug_log = %d", H2Config_debug_log);
 
-		{
-			char temp[25];
-			sprintf(temp, "\ndebug_log_level = %d", H2Config_debug_log_level);
-			fputs(temp, fileConfig);
-		}
+		fprintf_s(fileConfig, "\ndebug_log_level = %d", H2Config_debug_log_level);
 
-		fputs("\ndebug_log_console = ", fileConfig); fputs(H2Config_debug_log_console ? "1" : "0", fileConfig);
+		fprintf_s(fileConfig, "\ndebug_log_console = %d", H2Config_debug_log_console);
 
 		if (H2IsDediServer) {
-			fputs("\nserver_name = ", fileConfig); fputs(H2Config_dedi_server_name, fileConfig);
+			fprintf_s(fileConfig, "\nserver_name = %s", H2Config_dedi_server_name);
 
-			fputs("\nserver_playlist = ", fileConfig); fputs(H2Config_dedi_server_playlist, fileConfig);
+			fprintf_s(fileConfig, "\nserver_playlist = %s", H2Config_dedi_server_playlist);
+
+			fprintf_s(fileConfig, "\nadditional_pcr_time = %d", H2Config_additional_pcr_time);
+		}
+
+		if (H2IsDediServer) {
+			fprintf_s(fileConfig, "\nlogin_identifier = %s", H2Config_login_identifier);
+			fprintf_s(fileConfig, "\nlogin_password = %s", H2Config_login_password);
 		}
 
 		if (!H2IsDediServer) {
-			//fputs("\nchatbox_commands = ", fileConfig); fputs(H2Config_chatbox_commands ? "1" : "0", fileConfig);
-		}
-		if (H2IsDediServer) {
-			fputs("\nlogin_identifier = ", fileConfig); fputs(H2Config_login_identifier, fileConfig);
-			fputs("\nlogin_password = ", fileConfig); fputs(H2Config_login_password, fileConfig);
-		}
 
-		char hotkeyText[70];
-
-		if (!H2IsDediServer) {
-
+			char hotkeyText[70];
 			sprintf(hotkeyText, "\nhotkey_help = %d #", H2Config_hotkeyIdHelp);
 			GetVKeyCodeString(H2Config_hotkeyIdHelp, hotkeyText + strlen(hotkeyText), 20);
 			fputs(hotkeyText, fileConfig);
@@ -552,66 +530,34 @@ void SaveH2Config() {
 			fputs(hotkeyText, fileConfig);
  			fputs("\n\n", fileConfig);
 
-		}
-
-		if (!H2IsDediServer) {
-
-			sprintf(settingOutBuffer, "\ncrosshair_battle_rifle_width = %d", H2Config_BATRIF_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_battle_rifle_height = %d", H2Config_BATRIF_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_smg_width = %d", H2Config_SMG_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_smg_height = %d", H2Config_SMG_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_carbine_width = %d", H2Config_CRBN_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_carbine_height = %d", H2Config_CRBN_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_beam_rifle_width = %d", H2Config_BEAMRIF_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_beam_rifle_height = %d", H2Config_BEAMRIF_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_magnum_width = %d", H2Config_MAG_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_magnum_height = %d", H2Config_MAG_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_plasma_rifle_width = %d", H2Config_PLASRIF_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_plasma_rifle_height = %d", H2Config_PLASRIF_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_shotgun_width = %d", H2Config_SHTGN_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_shotgun_height = %d", H2Config_SHTGN_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_sniper_width = %d", H2Config_SNIP_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_sniper_height = %d", H2Config_SNIP_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_sword_width = %d", H2Config_SWRD_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_sword_height = %d", H2Config_SWRD_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_rocket_launcher_width = %d", H2Config_ROCKLAUN_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_rocket_launcher_height = %d", H2Config_ROCKLAUN_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_plasma_pistol_width = %d", H2Config_PLASPI_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_plasma_pistol_height = %d", H2Config_PLASPI_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_bruteshot_width = %d", H2Config_BRUTESHOT_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_bruteshot_height = %d", H2Config_BRUTESHOT_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_needler_width = %d", H2Config_NEED_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_needler_height = %d", H2Config_NEED_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_sentinal_beam_width = %d", H2Config_SENTBEAM_WIDTH);
-			fputs(settingOutBuffer, fileConfig);
-			sprintf(settingOutBuffer, "\ncrosshair_sentinal_beam_height = %d", H2Config_SENTBEAM_HEIGHT);
-			fputs(settingOutBuffer, fileConfig);
+			fprintf_s(fileConfig, "\ncrosshair_battle_rifle_width = %d", H2Config_BATRIF_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_battle_rifle_height = %d", H2Config_BATRIF_HEIGHT);
+			fprintf_s(fileConfig, "\ncrosshair_smg_width = %d", H2Config_SMG_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_smg_height = %d", H2Config_SMG_HEIGHT);
+			fprintf_s(fileConfig, "\ncrosshair_carbine_width = %d", H2Config_CRBN_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_carbine_height = %d", H2Config_CRBN_HEIGHT);
+			fprintf_s(fileConfig, "\ncrosshair_beam_rifle_width = %d", H2Config_BEAMRIF_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_beam_rifle_height = %d", H2Config_BEAMRIF_HEIGHT);
+			fprintf_s(fileConfig, "\ncrosshair_magnum_width = %d", H2Config_MAG_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_magnum_height = %d", H2Config_MAG_HEIGHT);
+			fprintf_s(fileConfig, "\ncrosshair_plasma_rifle_width = %d", H2Config_PLASRIF_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_plasma_rifle_height = %d", H2Config_PLASRIF_HEIGHT);
+			fprintf_s(fileConfig, "\ncrosshair_shotgun_width = %d", H2Config_SHTGN_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_shotgun_height = %d", H2Config_SHTGN_HEIGHT);
+			fprintf_s(fileConfig, "\ncrosshair_sniper_width = %d", H2Config_SNIP_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_sniper_height = %d", H2Config_SNIP_HEIGHT);
+			fprintf_s(fileConfig, "\ncrosshair_sword_width = %d", H2Config_SWRD_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_sword_height = %d", H2Config_SWRD_HEIGHT);
+			fprintf_s(fileConfig, "\ncrosshair_rocket_launcher_width = %d", H2Config_ROCKLAUN_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_rocket_launcher_height = %d", H2Config_ROCKLAUN_HEIGHT);
+			fprintf_s(fileConfig, "\ncrosshair_plasma_pistol_width = %d", H2Config_PLASPI_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_plasma_pistol_height = %d", H2Config_PLASPI_HEIGHT);
+			fprintf_s(fileConfig, "\ncrosshair_bruteshot_width = %d", H2Config_BRUTESHOT_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_bruteshot_height = %d", H2Config_BRUTESHOT_HEIGHT);
+			fprintf_s(fileConfig, "\ncrosshair_needler_width = %d", H2Config_NEED_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_needler_height = %d", H2Config_NEED_HEIGHT);
+			fprintf_s(fileConfig, "\ncrosshair_sentinal_beam_width = %d", H2Config_SENTBEAM_WIDTH);
+			fprintf_s(fileConfig, "\ncrosshair_sentinal_beam_height = %d", H2Config_SENTBEAM_HEIGHT);
 		}
 
 		fputs("\n", fileConfig);
@@ -684,6 +630,7 @@ static bool est_debug_log_level = false;
 static bool est_debug_log_console = false;
 static bool est_custom_resolution = false;
 static bool est_server_name = false;
+static bool est_additional_pcr_time = false;
 static bool est_server_playlist = false;
 static bool est_chatbox_commands = false;
 static bool est_login_token = false;
@@ -1008,8 +955,8 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			}
 			else {
 				H2Config_fps_limit = tempint1;
-				extern std::chrono::system_clock::duration desiredRenderTime;
-				desiredRenderTime = std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
+				extern std::chrono::high_resolution_clock::duration desiredRenderTime;
+				desiredRenderTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
 				est_fps_limit = true;
 			}
 		}
@@ -1038,9 +985,9 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			}
 		}
 		else if (!H2IsDediServer && sscanf(fileLine, "vehicle_field_of_view =%d", &tempint1) == 1) {
-			if (est_vehicle_field_of_view) {
-				duplicated = true;
-			}
+		if (est_vehicle_field_of_view) {
+			duplicated = true;
+		}
 		else if (!(tempint1 >= 0)) {
 			incorrect = true;
 		}
@@ -1614,19 +1561,6 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_debug_log_console = true;
 			}
 		}
-		else if (!H2IsDediServer && sscanf(fileLine, "custom_resolution =%dx%d", &tempint1, &tempint2) == 2) {
-			if (est_custom_resolution) {
-				duplicated = true;
-			}
-			else if (!(tempint1 >= 0 && tempint2 >= 0)) {
-				incorrect = true;
-			}
-			else {
-				H2Config_custom_resolution_x = tempint1;
-				H2Config_custom_resolution_y = tempint2;
-				est_custom_resolution = true;
-			}
-		}
 		else if (H2IsDediServer && strstr(fileLine, "server_name =")) {
 			if (est_server_name) {
 				duplicated = true;
@@ -1667,18 +1601,6 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 					}
 				}
 				est_server_playlist = true;
-			}
-		}
-		else if (!H2IsDediServer && sscanf(fileLine, "chatbox_commands =%d", &tempint1) == 1) {
-			if (est_chatbox_commands) {
-				duplicated = true;
-			}
-			else if (!(tempint1 == 0 || tempint1 == 1)) {
-				incorrect = true;
-			}
-			else {
-				H2Config_chatbox_commands = (bool)tempint1;
-				est_chatbox_commands = true;
 			}
 		}
 		else if (H2IsDediServer && ownsConfigFile && strstr(fileLine, "login_identifier =")) {
@@ -1807,6 +1729,30 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_hotkey_console = true;
 			}
 		}
+		else if (!H2IsDediServer && sscanf(fileLine, "hotkey_console =%d", &tempint1) == 1) {
+			if (est_hotkey_console) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_hotkeyIdConsole = tempint1;
+				est_hotkey_console = true;
+			}
+		}		
+		else if (H2IsDediServer && sscanf(fileLine, "additional_pcr_time =%d", &tempint1) == 1) {
+			if (est_additional_pcr_time) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_additional_pcr_time = tempint1;
+				est_additional_pcr_time = true;
+			}
+		}
 		else {
 			unrecognised = true;
 		}
@@ -1847,7 +1793,8 @@ void ReadH2Config() {
 	swprintf(local, 1024, L"%ws", H2AppDataLocal);
 	H2Config_isConfigFileAppDataLocal = false;
 	
-	FILE* fileConfig;
+	errno_t err = 0;
+	FILE* fileConfig = nullptr;
 	wchar_t fileConfigPath[1024];
 	wchar_t fileConfigPathLog[1124];
 
@@ -1855,7 +1802,7 @@ void ReadH2Config() {
 		swprintf(fileConfigPath, 1024, FlagFilePathConfig);
 		swprintf(fileConfigPathLog, 1124, L"Reading Flag Config: \"%ws\"", fileConfigPath);
 		addDebugText(fileConfigPathLog);
-		fileConfig = _wfopen(fileConfigPath, L"rb");
+		err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 	}
 	else {
 		do {
@@ -1866,20 +1813,20 @@ void ReadH2Config() {
 			swprintf(fileConfigPath, 1024, H2ConfigFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
 			swprintf(fileConfigPathLog, 1124, L"Reading Config: \"%ws\"", fileConfigPath);
 			addDebugText(fileConfigPathLog);
-			fileConfig = _wfopen(fileConfigPath, L"rb");
+			err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 
-			if (!fileConfig) {
+			if (err) {
 				addDebugText("H2Configuration File does not exist.");
 			}
 			H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
-			if (!fileConfig && !H2Config_isConfigFileAppDataLocal) {
+			if (err && !H2Config_isConfigFileAppDataLocal) {
 				--readInstanceIdFile;
 			}
-		} while (!fileConfig && readInstanceIdFile > 0);
+		} while (err && readInstanceIdFile > 0);
 		H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
 	}
 
-	if (!fileConfig) {
+	if (err) {
 		addDebugText("ERROR: No H2Configuration Files Could Be Found!");
 		H2Config_isConfigFileAppDataLocal = true;
 	}

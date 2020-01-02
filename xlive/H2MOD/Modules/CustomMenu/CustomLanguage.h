@@ -15,6 +15,18 @@ bool reloadCustomLanguages();
 void saveCustomLanguages();
 void combineCartographerLabels(int menuId, int lbl1, int lbl2, int lblCmb);
 
+enum language_ids
+{
+	english,
+	japanese,
+	german,
+	french,
+	spanish,
+	italian,
+	korean,
+	chinese
+};
+
 typedef struct {
 	int lang_base;
 	int lang_variant;

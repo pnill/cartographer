@@ -118,8 +118,8 @@ int PlayerWeaponSwitched(int a1, int a2, int a3)
 	if (isEnabled)
 	{
 		int v3 = *(DWORD*)(*(DWORD*)((char*)game_state_objects_header + 0x44) + 12 * (a1 & 0xFFFF) + 8);
-		int global_tag_header = *(DWORD*)(base_address + 0x47CD50);
-		int weap_tag_offset = *(DWORD*)(base_address + 0x47CD54) + *(DWORD*)(0x10 * (*(DWORD*)v3 & 0xFFFF) + global_tag_header + 8);
+		char* weap_tag_offset = &tags::get_tag_data()[tags::get_tag_instances()[*(DWORD*)v3 & 0xFFFF].data_offset];
+
 		int player_datum = *(DWORD*)(*(DWORD*)((char*)game_state_objects_header + 0x44) + 12 * (a2 & 0xFFFF) + 8);
 		*(float*)(player_datum + 0x2CC) = *(float*)(weap_tag_offset + 0x280);
 	}
@@ -281,15 +281,9 @@ void Halo2Final::Initialize()
 
 #pragma endregion
 
-	int offset = 0x47CD54;
-	if (h2mod->Server)
-		offset = 0x4A29BC;
-
-	base_address = h2mod->GetBase();
-	address_offset = *(DWORD*)((char*)base_address + offset);
-	game_time_globals = *(DWORD*)((char*)base_address + 0x4c06e4);
-	equpiment_offset = *(int*)((BYTE*)address_offset + 0x143C124);
-	game_clock_initial_value = *(DWORD*)(base_address + 0x50A5B0);
+	game_time_globals = *(DWORD*)(&tags::get_tag_data()[0x4c06e4]);
+	equpiment_offset = *(int*)(&tags::get_tag_data()[0x143C124]);
+	game_clock_initial_value = *(DWORD*)(&tags::get_tag_data()[0x50A5B0]);
 
 	LOG_TRACE_GAME("[H2MOD-H2F] game_clock_initial_value: {} (0 for no time limit)", game_clock_initial_value);
 
@@ -297,7 +291,7 @@ void Halo2Final::Initialize()
 
 	if (!detoursHavePreviouslyBeenApplied)
 	{
-		pplayer_weapon_switched = (player_weapon_switched)DetourFunc((BYTE*)base_address + 0x13AA9A, (BYTE*)PlayerWeaponSwitched, 8);
+		pplayer_weapon_switched = (player_weapon_switched)DetourFunc((BYTE*)h2mod->GetAddress(0x13AA9A), (BYTE*)PlayerWeaponSwitched, 8);
 		VirtualProtect(pplayer_weapon_switched, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 

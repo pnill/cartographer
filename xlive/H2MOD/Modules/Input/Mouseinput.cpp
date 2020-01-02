@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
-#include <Windows.h>
 #include "H2MOD.h"
+#include "..\Util\Hooks\Hook.h"
 
 typedef struct DIMOUSESTATE {
 	LONG lX;
@@ -44,7 +44,7 @@ __declspec(naked) void CC_Fug(void)
 
 void Mouseinput::Initialize()
 {
-	base = h2mod->GetBase();
+	base = h2mod->GetAddress(0x0);
 	ms = (DIMOUSESTATE*)(base + 0x47A570);
 	BYTE assmNop[8] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
 

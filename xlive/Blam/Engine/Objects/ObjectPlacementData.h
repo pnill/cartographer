@@ -16,7 +16,7 @@ namespace Blam
 				WORD unk_10;//0x8;
 				BYTE unk_11;//0xA
 				BYTE unk_12;//0xB
-				DWORD unk_13;//0xC
+				DWORD variant_index;//0xC
 				DWORD unk_14;//0x10
 				BYTE unk_15;//0x14
 				BYTE unk_16;//0x15
@@ -41,9 +41,9 @@ namespace Blam
 				WORD unk_23;//0xBA
 				CHAR unk_24;//0xBC
 				BYTE unk_25[3];//0xBD
-				DWORD unk_26;//0xC0
-				DWORD unk_9;//0xC4				
+				DWORD unk_26;//0xC0		
 			};
+			static_assert(sizeof(ObjectPlacementData) == 0xC4, "Invalid ObjectPlacementData size");
 		}
 	}
 }

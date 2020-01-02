@@ -1,10 +1,7 @@
 #include "stdafx.h"
-#include <ShellAPI.h>
-#include <string>
-#include <unordered_set>
-#include <codecvt>
 
 #include "H2MOD.h"
+#include "H2MOD\Tags\TagInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "Util\Hooks\Hook.h"
@@ -19,8 +16,10 @@ void UIRankPatch() {
 	if (MapHeaderType != 2) //If not on mainmenu, returns
 		return;
 
-	DWORD SharedMapMetaDataPointer = *(DWORD*)(H2BaseAddr + 0x47CD64);
-
+	BYTE PlayerLevel = 0x00;								//eventually this will pull level from webserver
+	DWORD PlayerLevelPCR = 0x00000000;						//eventually this will pull level from webserver
+	WriteValue(H2BaseAddr + 0x1B2C2F, PlayerLevel);			//sets player level in pregame lobby
+	WriteValue(H2BaseAddr + 0xCC72, PlayerLevelPCR);		//sets player level in postgame carnage report
 	//Tag : ui\player_skins\player_skin_lobby.skin
 	const DWORD TagOffsetPreGameLobby = 0x0049DE90;	//Property : Bitmap Buttons
 
@@ -59,31 +58,31 @@ void UIRankPatch() {
 
 
 		//Sets Pregame Lobby 
-	WriteValue(SharedMapMetaDataPointer + TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset, xValuePGL);
-	WriteValue(SharedMapMetaDataPointer + TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset, yValuePGL);
-	WriteValue(SharedMapMetaDataPointer + TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset, RankIconSM);
+	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset], yValuePGL);
+	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
+	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset], xValuePGL);
 
 	//Sets Postgame Carnage Report 1
-	WriteValue(SharedMapMetaDataPointer + TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset, xValuePCR);
-	WriteValue(SharedMapMetaDataPointer + TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset, yValuePCR);
-	WriteValue(SharedMapMetaDataPointer + TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset, RankIconSM);
+	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset], xValuePCR);
+	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset], yValuePCR);
+	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
 
 	//Sets Postgame Carnage Report 2
-	WriteValue(SharedMapMetaDataPointer + TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset, xValuePCR);
-	WriteValue(SharedMapMetaDataPointer + TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset, yValuePCR);
-	WriteValue(SharedMapMetaDataPointer + TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset, RankIconSM);
+	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset], xValuePCR);
+	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset], yValuePCR);
+	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
 
 	//Sets Ranks 
 	for (RankChunkIndex = 0; RankChunkIndex < 49; RankChunkIndex++)
 	{
 		//Setting Rank bitmap size
-		WriteValue(SharedMapMetaDataPointer + RankIconOff + (RankChunkIndex * RankChunkSize) + WidthDefOff, WidthValue);
-		WriteValue(SharedMapMetaDataPointer + RankIconOff + (RankChunkIndex * RankChunkSize) + HeightDefOff, HeightValue);
+		WriteValue((DWORD)&tags::get_tag_data()[RankIconOff + (RankChunkIndex * RankChunkSize) + WidthDefOff], WidthValue);
+		WriteValue((DWORD)&tags::get_tag_data()[RankIconOff + (RankChunkIndex * RankChunkSize) + HeightDefOff], HeightValue);
 
 		//Setting Small Rank bitmap size
-		WriteValue(SharedMapMetaDataPointer + RankIconSMOff + (RankChunkIndex * RankChunkSize) + WidthDefOff, WidthValue);
-		WriteValue(SharedMapMetaDataPointer + RankIconSMOff + (RankChunkIndex * RankChunkSize) + HeightDefOff, HeightValue);
-	}
+		WriteValue((DWORD)&tags::get_tag_data()[RankIconSMOff + (RankChunkIndex * RankChunkSize) + WidthDefOff], WidthValue);
+		WriteValue((DWORD)&tags::get_tag_data()[RankIconSMOff + (RankChunkIndex * RankChunkSize) + HeightDefOff], HeightValue);
+	}		
 
 	addDebugText("Rank bitmaps patched.");
 }

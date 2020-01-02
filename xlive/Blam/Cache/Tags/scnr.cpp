@@ -1,4 +1,4 @@
-#include"scnr.h"
+#include "scnr.h"
 
 namespace Blam
 {

@@ -1,14 +1,15 @@
 #include "stdafx.h"
 #include "CustomMenuGlobals.h"
 #include "CustomLanguage.h"
-#include <chrono>
+
+#include "H2MOD/Tags/TagInterface.h"
 
 void __stdcall sub_2101a4_CMLTD_(int thisptr, int label_id, wchar_t* rtn_label, int label_menu_id);
 void __stdcall sub_21bf85_CMLTD_(int thisptr, int label_id, int label_menu_id);
 char __stdcall sub_21bb0b_CMLTD_(void* thisptr, __int16 a2, int* aa3, int label_menu_id, int label_id_description);
 void __cdecl sub_3e3ac_CMLTD_(int a1, int label_id, wchar_t* rtn_label, int label_menu_id);
 
-std::chrono::time_point<std::chrono::system_clock> lastOuterMenuUse_;
+std::chrono::time_point<std::chrono::high_resolution_clock> lastOuterMenuUse_;
 int lastOuterMenuFuncPtr_ = 0;
 
 void CallWgit_(int WgitScreenfunctionPtr) {
@@ -38,7 +39,7 @@ void CallWgit_(int WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) 
 		}
 		else if (lastOuterMenuFuncPtr_ > 0 && lastOuterMenuFuncPtr_ == WgitScreenfunctionPtr) {
 			if (CurrentWgitID != menu_wgit_type) {
-				std::chrono::milliseconds difference = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastOuterMenuUse_);
+				std::chrono::milliseconds difference = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - lastOuterMenuUse_);
 				long long timeDiff = difference.count();
 				if (timeDiff < 1500) {
 					open_method = 3;
@@ -51,7 +52,7 @@ void CallWgit_(int WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) 
 		}
 	}
 	lastOuterMenuFuncPtr_ = WgitScreenfunctionPtr;
-	lastOuterMenuUse_ = std::chrono::system_clock::now();
+	lastOuterMenuUse_ = std::chrono::high_resolution_clock::now();
 	prevOpenMethod_ = open_method;
 
 	//char* menu_setup = (char*)malloc(sizeof(char) * 0x20);
@@ -156,7 +157,7 @@ int __cdecl CustomMenu_CallHead_(int a1, DWORD* menu_vftable_1, DWORD* menu_vfta
 	int(__cdecl* sub_20B8C3)(int, int) = (int(__cdecl*)(int, int))((char*)H2BaseAddr + 0x20B8C3);
 
 	int menu_struct = Allocator(3388);
-	int& menu_id = ((int*)menu_struct)[28];
+	int menu_id = ((int*)menu_struct)[28];
 	if (menu_struct) {
 		menu_struct = sub_248B17_CM_(menu_struct, *(DWORD*)(a1 + 4), *(DWORD*)(a1 + 8), *(WORD*)(a1 + 2), menu_vftable_1, menu_vftable_2, menu_button_handler, number_of_buttons, menu_wgit_type);
 	}
@@ -295,7 +296,7 @@ char __stdcall sub_21bb0b_CMLTD_(void* thisptr, __int16 a2, int* aa3, int label_
 
 int __stdcall sub_20fb1b_CMLTD_(void* thisptr, int label_menu_id, int label_id_description)
 {
-	int& dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
 
 	int(__thiscall* sub_20F815)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x20F815);
 	int(__thiscall* sub_20E8C9)(void*, int) = (int(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20E8C9);
@@ -628,19 +629,15 @@ int __stdcall sub_2107df_CMLTD_(int thisptr, int* a2, char a3, int label_menu_id
 
 void __cdecl sub_3e3ac_CMLTD_(int a1, int label_id, wchar_t* rtn_label, int label_menu_id)
 {
-	int& dword_479e70 = *(int*)((char*)H2BaseAddr + 0x479e70);
-	int& dword_47cd54 = *(int*)((char*)H2BaseAddr + 0x47cd54);
-	int& dword_47cd50 = *(int*)((char*)H2BaseAddr + 0x47cd50);
-
 	int(__cdecl* sub_381fd)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x381fd);
 	void(__thiscall* sub_3e332)(int, int, wchar_t*, int, int) = (void(__thiscall*)(int, int, wchar_t*, int, int))((char*)H2BaseAddr + 0x3e332);
 
 	if (a1 != -1) {
 		int v3 = sub_381fd();
-		int v4 = dword_47cd54 + *(DWORD*)(dword_47cd50 + 16 * (unsigned __int16)a1 + 8);
+		char* v4 = &tags::get_tag_data()[tags::get_tag_instances()[a1 & 0xFFFF].data_offset];
 
 		sub_3e332(
-			(int)dword_479e70 + 28 * (v3 + 14),
+			(int)tags::get_game_globals() + 28 * (v3 + 14),
 			label_id,
 			rtn_label,
 			label_menu_id,//*(WORD*)(v4 + 4 * (v3 + 14) - 40),
@@ -651,7 +648,7 @@ void __cdecl sub_3e3ac_CMLTD_(int a1, int label_id, wchar_t* rtn_label, int labe
 
 char __stdcall sub_20fd41_CMLTD_(void* thisptr, int label_menu_id, int label_id_title)
 {
-	int& dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
 
 	int(__cdecl* sub_20bb89)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x20bb89);
 	int(__cdecl* sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
@@ -783,7 +780,7 @@ char __stdcall sub_20fd41_CMLTD_(void* thisptr, int label_menu_id, int label_id_
 
 char __stdcall sub_210a44_CMLTD_(int thisptr, int a2, int* a3, int label_menu_id, int label_id_title, int label_id_description)
 {
-	int& dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
 
 	int(__cdecl* sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
 	int(__cdecl* sub_239623)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x239623);

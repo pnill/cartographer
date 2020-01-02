@@ -46,7 +46,7 @@ void addDebugText(char* text) {
 	free(DebugStr[DebugTextArrayPos]);
 	DebugStr[DebugTextArrayPos] = (char*)malloc(sizeof(char) * lenInput + 1);
 	strncpy(DebugStr[DebugTextArrayPos], text, lenInput);
-	memset(DebugStr[DebugTextArrayPos] + lenInput, 0, 1);
+	SecureZeroMemory(DebugStr[DebugTextArrayPos] + lenInput, 1);
 
 	onscreendebug_log->debug(text);
 

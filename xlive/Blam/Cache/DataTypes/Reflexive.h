@@ -56,7 +56,7 @@ void Blam::Cache::DataTypes::Reflexive<T>::Open()
 	char* tptr = new char[this->GetTotalSize()];
 	memcpy(tptr, this->GetTagBlockElements(), this->GetTotalSize());
 
-	this->TagBlockOffset = (DWORD)tptr -(DWORD)(*h2mod->GetAddress<char*>(0x47CD64, 0x4A29CC));
+	this->TagBlockOffset = (DWORD)tptr - *h2mod->GetAddress<DWORD*>(0x47CD54, 0x4A29BC);
 
 	//Do same for the child Blocks
 	T* iterator = (T*)(this->GetTagBlockElements());
@@ -103,7 +103,7 @@ void Blam::Cache::DataTypes::Reflexive<T>::PushBack(T* arg)
 	memcpy(tptr + this->GetTotalSize(), arg, GetFieldSize());
 
 	this->TagBlockCount++;
-	this->TagBlockOffset = (DWORD)tptr - (DWORD)(*h2mod->GetAddress<char*>(0x47CD64, 0x4A29CC));
+	this->TagBlockOffset = (DWORD)tptr - *h2mod->GetAddress<DWORD*>(0x47CD54, 0x4A29BC);
 }
 template<typename T>
 void Blam::Cache::DataTypes::Reflexive<T>::RemoveAt(int index)
@@ -141,7 +141,7 @@ void Blam::Cache::DataTypes::Reflexive<T>::RemoveAt(int index)
 	this->TagBlockCount--;
 	//to save from 0 size
 	if (this->TagBlockCount)
-		this->TagBlockOffset = (DWORD)tptr -(DWORD)(*h2mod->GetAddress<char*>(0x47CD64, 0x4A29CC));
+		this->TagBlockOffset = (DWORD)tptr - *h2mod->GetAddress<DWORD*>(0x47CD54, 0x4A29BC);
 }
 template<typename T>
 inline std::size_t Blam::Cache::DataTypes::Reflexive<T>::GetFieldSize()
@@ -156,7 +156,7 @@ inline std::size_t Blam::Cache::DataTypes::Reflexive<T>::GetTotalSize()
 template<typename T>
 void*  Blam::Cache::DataTypes::Reflexive<T>::GetTagBlockElements()
 {		
-	int MemPtr =(DWORD)(*h2mod->GetAddress<char*>(0x47CD64, 0x4A29CC)) + TagBlockOffset;	
+	int MemPtr = *h2mod->GetAddress<DWORD*>(0x47CD54, 0x4A29BC) + TagBlockOffset;	
 	return (void*)MemPtr;
 }
 template<typename T>

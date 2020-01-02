@@ -27,12 +27,12 @@ namespace Blam
 				};
 				enum class UnitState : BYTE
 				{
-					Frozen = 0x00,
-					Normal = 0x01,
-					Frozen2 = 0x02,
-					Dead = 0x03,
-					frozen3 = 0x04,
-					frozen4 = 0x05
+					mode_ground = 1,
+					mode_flying,
+					mode_dead,
+					mode_sentinel,
+					mode_sentinel_2,
+					mode_melee
 				};
 			}
 

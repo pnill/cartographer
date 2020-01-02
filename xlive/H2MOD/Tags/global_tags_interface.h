@@ -1,6 +1,5 @@
 #pragma once
 #include "..\Blam\Cache\DataTypes\DatumIndex.h"
-#include<map>
 
 namespace TagInterface
 {

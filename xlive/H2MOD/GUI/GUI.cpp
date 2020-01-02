@@ -1,22 +1,18 @@
 #include "stdafx.h"
+#include "Globals.h"
 
 #include "GUI.h"
-#include "H2MOD.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
+
 
 extern ConsoleCommands* commands;
 
 extern void InitInstance();
-extern bool overrideUnicodeMessage;
 
 extern bool displayXyz;
 extern volatile bool isLobby;
-char* xyzTextWidget;
-std::string xyzTextWidgetTemplate = "x=%.2f, y=%.2f, z=%.2f";
 
 typedef struct _XLIVE_INITIALIZE_INFO {
 	UINT cbSize;
@@ -104,14 +100,22 @@ BOOL bIsCreated, bNeedsFlush;
 DWORD dwOldFVF;
 LPD3DXSPRITE pSprite;
 
-std::chrono::system_clock::time_point nextFrame = std::chrono::system_clock::now();
-std::chrono::system_clock::duration desiredRenderTime = std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
-inline void frameTimeManagement()
-{
-	std::this_thread::sleep_until(nextFrame);
-	do {
-		nextFrame += desiredRenderTime;
-	} while (std::chrono::system_clock::now() > nextFrame);
+std::chrono::high_resolution_clock::time_point nextFrame = std::chrono::high_resolution_clock::now();
+std::chrono::high_resolution_clock::duration desiredRenderTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
+std::chrono::high_resolution_clock::duration minimizedDesiredThreadTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / 60.0));
+void frameTimeManagement() {
+
+	typedef bool(__cdecl* game_is_minimized)();
+	auto p_game_is_minimized = reinterpret_cast<game_is_minimized>(h2mod->GetAddress(0x28729));
+
+	bool isMinimized = p_game_is_minimized();
+
+	if (H2Config_fps_limit > 0 || isMinimized) {
+		std::this_thread::sleep_until(nextFrame);
+		do {
+			nextFrame += isMinimized ? minimizedDesiredThreadTime : desiredRenderTime;
+		} while (std::chrono::high_resolution_clock::now() > nextFrame);
+	}
 }
 
 LPDIRECT3DTEXTURE9 Texture_Interface;
@@ -478,7 +482,6 @@ static void create_exit_countdown_label() {
 	exit_countdown_labels.push_back(exit_cnd_lbl);
 }
 
-bool StatusCheater = false;
 int achievement_height = 0;
 bool achievement_freeze = false;
 int achievement_timer = 0;
@@ -520,18 +523,18 @@ int WINAPI XLiveRender()
 				drawText(0, startingPosY, COLOR_WHITE, ">>", normalSizeFont);
 				drawText(35, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
 
-				startingPosY -= 12.0;
-				std::vector<std::string>::iterator it;
-				int i = 0;
-				for (it = commands->prevCommands.begin(); it < commands->prevCommands.end(); it++, i++) {
-					startingPosY -= 15.0;
-					drawText(0, startingPosY, COLOR_WHITE, (*it).c_str(), normalSizeFont);
+				startingPosY -= 12.0f;
+				for (std::string& it : commands->prevOutput) {
+					startingPosY -= 15.0f;
+					drawText(0, startingPosY, COLOR_WHITE, it.c_str(), normalSizeFont);
 				}
 			}
-			DWORD GameGlobals = *(DWORD*)((BYTE*)h2mod->GetBase() + ((h2mod->Server) ? 0x4CB520 : 0x482D3C));
+
+			DWORD GameGlobals = *h2mod->GetAddress<DWORD*>(0x482D3C, 0x4CB520);
 			DWORD GameEngine = *(DWORD*)(GameGlobals + 0x8);
-			bool paused_or_in_menus = *((BYTE*)h2mod->GetBase() + 0x47A568) != 0;
-			if (GameEngine == 3 || StatusCheater || (GameEngine != 3 && paused_or_in_menus)) {
+			bool paused_or_in_menus = (*h2mod->GetAddress<BYTE*>(0x47A568) != 0);
+
+			if (GameEngine == 3 || (GameEngine != 3 && paused_or_in_menus)) {
 				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
 				if (MasterState == 0)
 					drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
@@ -540,7 +543,7 @@ int WINAPI XLiveRender()
 				else if (MasterState == 2)
 					drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
 				else if (MasterState == 10)
-					drawText(0, 15, StatusCheater ? COLOR_YELLOW : COLOR_GREEN, ServerStatus, smallFont);
+					drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
 			}
 
 			//drawPrimitiveRect(gameWindowWidth / 1.15, gameWindowHeight - 150, 250, 100, D3DCOLOR_ARGB(155, 41, 65, 129));
@@ -613,15 +616,19 @@ int WINAPI XLiveRender()
 
 			if (displayXyz && !isLobby && NetworkSession::localPeerIsSessionHost()) {
 				//only display xyz for host
-				if (xyzTextWidget == NULL) {
-					xyzTextWidget = new char[128];
+				int text_y_coord = 60;
+				PlayerIterator playerIt;
+				while (playerIt.get_next_player()) 
+				{
+					Real::Point3D* player_position = h2mod->get_player_coords(playerIt.get_current_player_index());
+					if (player_position != nullptr) {
+						std::wstring playerNameWide(playerIt.get_current_player_name());
+						std::string playerName(playerNameWide.begin(), playerNameWide.end());
+						std::string xyzText = "Player name: " + playerName + " xyz = " + std::to_string(player_position->X) + " " + std::to_string(player_position->Y) + " " + std::to_string(player_position->Z);
+						drawText(0, text_y_coord, COLOR_GOLD, xyzText.c_str(), normalSizeFont);
+						text_y_coord += 15;
+					}
 				}
-				float x = *(float*)(h2mod->GetBase() + 0x4C072C);
-				float y = *(float*)(h2mod->GetBase() + 0x4C0728);
-				float z = *(float*)(h2mod->GetBase() + 0x4C0730);
-				sprintf(xyzTextWidget, xyzTextWidgetTemplate.c_str(), x, y, z);
-
-				drawText(0, 60, COLOR_GOLD, xyzTextWidget, normalSizeFont);
 			}
 			
 			if (getDebugTextDisplay()) {
@@ -653,11 +660,6 @@ int WINAPI XLiveRender()
 				drawText(30, 30, COLOR_WHITE, packet_info_str, normalSizeFont);
 			}
 		}
-
-		if (H2Config_fps_limit > 0) {
-			frameTimeManagement();
-		}
-
 	}
 
 	return 0;

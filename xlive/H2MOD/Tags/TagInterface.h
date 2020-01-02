@@ -26,7 +26,7 @@ namespace tags
 			SinglePlayerShared = 4
 		};
 		scnr_type type;
-		int shared_type;
+		int crc;
 		int crc_uiid;
 		char field_158;
 		char tracked__maybe;
@@ -42,17 +42,13 @@ namespace tags
 		int string_idx_offset;
 		int string_table_offset;
 		int extern_deps;
-		int time_low;
-		int time_high;
-		int main_menu_time_low;
-		int main_menu_time_high;
-		int shared_time_low;
-		int shared_time_high;
-		int campaign_time_low;
-		int campaign_time_high;
+		FILETIME time;
+		FILETIME main_menu_time;
+		FILETIME shared_time;
+		FILETIME campaign_time;
 		char name[32];
 		int field_1C4;
-		char tag_name[256];
+		char scenario_path[256];
 		int minor_version;
 		uint32_t TagNamesCount;
 		uint32_t TagNamesBufferOffset;
@@ -73,7 +69,7 @@ namespace tags
 	struct tag_instance
 	{
 		blam_tag type;
-		DatumIndex tag;
+		DatumIndex datum_index;
 		size_t data_offset;
 		size_t size;
 	};
@@ -97,6 +93,12 @@ namespace tags
 		int type;
 	};
 
+	struct tag_data_block
+	{
+		int block_count;
+		DWORD block_data_offset;
+	};
+
 	/* 
 		Tag Interface
 
@@ -104,14 +106,17 @@ namespace tags
 		If you want to run code just after a map load register a callback using tags::on_map_load
 	*/
 
-	/* Apply required patches to executable */
-	void apply_patches();
+	/* Run callbacks after the cache file has been loaded */
+	void run_callbacks();
 
 	/* Register callback on map data load */
 	void on_map_load(void (*callback)());
 
 	/* tag data in currently loaded map (merged cache and shared cache data afaik) */
 	char *get_tag_data();
+
+	/* gets the globals\globals aka matg for the current map/cache file (TODO: add the matg structure) */
+	char *get_game_globals();
 
 	/* header for the current .map/cache file */
 	cache_header *get_cache_header();
@@ -142,11 +147,8 @@ namespace tags
 	}
 
 	/* Returns a pointer to the tag instance array */
-	inline tag_instance *get_tag_instances()
-	{
-		return get_tags_header()->tag_instances;
-	}
-
+	tag_instance *get_tag_instances();
+	
 	/* Returns the number of tags, pretty self explanatory */
 	inline long get_tag_count()
 	{
@@ -162,13 +164,13 @@ namespace tags
 			return DatumIndex::Null;
 		}
 		auto instance = get_tag_instances()[idx];
-		DatumIndex tag_datum = instance.tag;
+		DatumIndex tag_datum = instance.datum_index;
 		LOG_CHECK(tag_datum.Index == idx); // should always be true
 		return tag_datum;
 	}
 
 	/* Get parent tag groups for a tag group */
-	inline const tag_parent_info *get_tag_parent_info(const blam_tag &tag_type)
+	inline const tag_parent_info* get_tag_parent_info(const blam_tag &tag_type)
 	{
 		auto *header = get_tags_header();
 		if (!header)
@@ -224,7 +226,7 @@ namespace tags
 
 		if (tag.IsNull())
 		{
-			LOG_ERROR_FUNC("Bad tag datum - null datum", tag.Index, header->tag_count);
+			LOG_ERROR_FUNC("Bad tag datum - null datum: {}, tag count: {}", tag.Index, header->tag_count);
 			return nullptr;
 		}
 
@@ -265,11 +267,11 @@ namespace tags
 			while (current_index < get_tag_count())
 			{
 				auto tag_instance = &get_tag_instances()[current_index++];
-				if (tag_instance && !tag_instance->type.is_none() && !tag_instance->tag.IsNull())
+				if (tag_instance && !tag_instance->type.is_none() && !tag_instance->datum_index.IsNull())
 				{
 					if (type.is_none() || is_tag_or_parent_tag(tag_instance->type, type))
 					{
-						datum = tag_instance->tag;
+						datum = tag_instance->datum_index;
 						return datum;
 					}
 				}

@@ -87,7 +87,7 @@ public:
 	int total_public_gold = -1;
 
 	bool GetRunning();
-	void GetServers(PXOVERLAPPED, DWORD, char*);
+	void GetServers(DWORD, CHAR*, PXOVERLAPPED);
 	int GetServersLeft();
 	int GetTotalServers();
 	void GetServerCounts();
@@ -95,6 +95,6 @@ public:
 
 };
 
-extern HANDLE ServerEnum;
+extern HANDLE ServerEnumHandle;
 extern ServerList LiveManager;
 DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey);

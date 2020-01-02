@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <string>
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\Startup\Startup.h"
@@ -8,7 +7,7 @@
 #include "H2MOD\Modules\Accounts\Accounts.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "XLive\UserManagement\CUser.h"
+#include "XLive\IpManagement\XnIp.h"
 
 bool AccountEdit_remember = true;
 
@@ -42,31 +41,28 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 
 	char result = strlen(login_token) == 32 ? 1 : 2;
 
-	extern bool StatusCheater;
-	StatusCheater = false;
-
 	XNADDR pxna;
-	memset(&pxna, NULL, sizeof(XNADDR));
+	SecureZeroMemory(&pxna, sizeof(XNADDR));
 
 	pxna.ina.s_addr = xnaddr;
 	pxna.inaOnline.s_addr = saddr;
 	pxna.wPortOnline = htons(H2Config_base_port);
 
 	BYTE abEnet2[6];
-	memset(abEnet2, NULL, sizeof(abEnet2));
+	SecureZeroMemory(abEnet2, sizeof(abEnet2));
 	for (int i = 0; i < 6; i++) {
 		sscanf(&abEnet[i * 2], "%2hhx", &abEnet2[i]);
 	}
 
 	char abOnline2[20];
-	memset(abOnline2, NULL, sizeof(abOnline2));
+	SecureZeroMemory(abOnline2, sizeof(abOnline2));
 	for (int i = 0; i < 20; i++) {
 		sscanf(&abOnline[i * 2], "%2hhx", &abOnline2[i]);
 	}
 	memcpy(&pxna.abEnet, abEnet2, 6);
 	memcpy(&pxna.abOnline, abOnline2, 20);
 
-	userManager.ConfigureLocalUser(&pxna, xuid, username);
+	ipManager.ConfigureLocalUser(&pxna, xuid, username);
 
 	if (H2CurrentAccountLoginToken) {
 		free(H2CurrentAccountLoginToken);
@@ -355,11 +351,6 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				if (result == 4) {
 					snprintf(ServerStatus, 250, "Status: Developer");
 				}
-				else if (result == 3 || result == 7) {
-					snprintf(ServerStatus, 250, "Status: CHEATER");
-					extern bool StatusCheater;
-					StatusCheater = true;
-				}
 			}
 		}
 		else {
@@ -385,7 +376,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
 	}
 	else {
 		OSVERSIONINFO osvi;
-		ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+		SecureZeroMemory(&osvi, sizeof(OSVERSIONINFO));
 		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 		if (hntdll && (RtlGetVersionPtr)::GetProcAddress(hntdll, "RtlGetVersion") != nullptr) {
 			//we don't have a manifest in place, so using GetVersionEx will be capped at 6.2
@@ -492,7 +483,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
 	else {
 		if (!H2IsDediServer) {
 			char* login_identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
-			memset(login_identifier, 0, strlen(login_identifier));
+			SecureZeroMemory(login_identifier, strlen(login_identifier));
 		}
 		if (rtn_code == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) {
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF018, 0xFFFFF019);

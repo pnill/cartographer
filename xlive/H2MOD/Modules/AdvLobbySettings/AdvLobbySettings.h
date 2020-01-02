@@ -1,12 +1,11 @@
 #pragma once
-#include <H2MOD\protobuf\h2mod.pb.h>
 
 class AdvLobbySettings
 {
 public:
 	void sendLobbySettingsPacket();
 	void resetLobbySettings();
-	void parseLobbySettings(const h2mod_lobby_settings& lobby_settings);
+	void parseLobbySettings(void* lobby_settings);
 	void loop();
 private:
 	

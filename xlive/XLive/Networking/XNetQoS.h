@@ -1,6 +1,5 @@
 #pragma once
 #include "stdafx.h"
-#include <atomic>
 
 typedef struct _SOCKET_INFORMATION 
 {

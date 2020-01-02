@@ -1,6 +1,5 @@
 #pragma once
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #define JMP_RAW_BYTE 0xEB
 #define JNZ_RAW_BYTE 0x75 
 
@@ -15,6 +14,7 @@ void WriteBytes(DWORD destAddress, LPVOID bytesToWrite, int numBytes);
 void PatchCall(DWORD call_addr, DWORD new_function_ptr);
 void WritePointer(DWORD offset, void *ptr);
 void PatchWinAPICall(DWORD call_addr, DWORD new_function_ptr);
+void NopFill(DWORD address, int length);
 
 inline void PatchCall(DWORD call_addr, void *new_function_ptr)
 {
@@ -43,7 +43,7 @@ inline void WritePointer(DWORD offset, const void *ptr) {
 template <typename value_type>
 inline void WriteValue(DWORD offset, value_type data)
 {
-	WriteBytes(offset, &data, sizeof(data));
+	WriteBytes(offset, &data, sizeof(value_type));
 }
 
 inline void WriteJmpTo(DWORD call_addr, DWORD new_function_ptr)
@@ -61,12 +61,4 @@ inline void WriteJmpTo(DWORD call_addr, void *new_function_ptr)
 inline void WriteJmpTo(void *call_addr, void *new_function_ptr)
 {
 	WriteJmpTo(reinterpret_cast<DWORD>(call_addr), reinterpret_cast<DWORD>(new_function_ptr));
-}
-
-template<int len>
-inline void NopFill(DWORD address)
-{
-	BYTE bytesArray[len];
-	memset(bytesArray, 0x90, len);
-	WriteBytes(address, bytesArray, len);
 }

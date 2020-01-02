@@ -17,10 +17,6 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
-#include <sys/stat.h>
-#include <string>
-#include <sstream>
-#include <io.h>
 #include <filesystem>
 
 namespace filesystem = std::experimental::filesystem;
@@ -43,10 +39,11 @@ h2log *onscreendebug_log = nullptr;
 // Console logger, receives output from all loggers
 h2log *console_log = nullptr;
 
+std::random_device rd;
+
 ProcessInfo game_info;
 
 bool H2IsDediServer = false;
-bool H2DediIsLiveMode = false;
 DWORD H2BaseAddr = NULL;
 wchar_t* H2ProcessFilePath = 0;
 wchar_t* H2AppDataLocal = 0;
@@ -319,29 +316,24 @@ H2Types detect_process_type()
 	return H2Types::Invalid;
 }
 
-inline std::wstring prepareLogFileName(std::wstring logFileName) {
-	std::wstring instanceNumber(L"");
-	if (H2GetInstanceId() > 1) {
-		std::wstringstream stream;
-		stream << H2GetInstanceId();
-		instanceNumber = L".";
-		instanceNumber += stream.str();
-	}
+std::wstring prepareLogFileName(std::wstring logFileName) {
 	std::wstring filename = (H2Config_isConfigFileAppDataLocal ? H2AppDataLocal : L"");
-	filename += L"logs\\";
+	std::wstring processName(H2IsDediServer ? L"H2Server" : L"Halo2Client");
+	std::wstring folders(L"logs\\" + processName + L"\\instance" + std::to_wstring(H2GetInstanceId()));
+	filename += folders;
+
 	// try making logs directory
-	if (!filesystem::create_directory(filename) && !filesystem::is_directory(filesystem::status(filename)))
+	if (!filesystem::create_directories(filename) && !filesystem::is_directory(filesystem::status(filename)))
 	{
 		// try locally if we didn't already
 		if (H2Config_isConfigFileAppDataLocal
-			&& filesystem::create_directory("logs") || filesystem::is_directory(filesystem::status("logs")))
-			filename = L"logs\\";
+			&& filesystem::create_directories(folders) || filesystem::is_directory(filesystem::status(folders)))
+			filename = folders;
 		else
 			filename = L""; // fine then
 	}
-	filename += logFileName;
-	filename += instanceNumber;
-	return filename + L".log";
+	filename += L"\\" + logFileName + L".log";
+	return filename;
 }
 
 ///Before the game window appears
@@ -362,12 +354,16 @@ void InitH2Startup() {
 	h2mod->SetBase(H2BaseAddr);
 	if (game_info.process_type == H2Types::H2Server)
 	{
-		h2mod->Server = TRUE;
+		h2mod->Server = true;
+		H2IsDediServer = true;
 	}
 	else if (game_info.process_type == H2Types::H2Game)
 	{
-		h2mod->Server = FALSE;
+		h2mod->Server = false;
+		H2IsDediServer = false;
 	}
+
+	initInstanceNumber();
 
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
@@ -390,13 +386,10 @@ void InitH2Startup() {
 	H2Config_debug_log_level = temp_log_level;
 	H2Config_debug_log = H2Config_isConfigFileAppDataLocal = false;
 
-	//halo2ThreadID = GetCurrentThreadId();
-	if (game_info.process_type == H2Types::H2Server) {
-		H2IsDediServer = true;
+	if (H2IsDediServer) {
 		addDebugText("Process is Dedi-Server");
 	}
 	else {
-		H2IsDediServer = false;
 		addDebugText("Process is Client");
 
 		addDebugText("Hooking Shutdown Function");
@@ -404,8 +397,6 @@ void InitH2Startup() {
 		psub_48BBF = (tsub_48BBF)DetourFunc((BYTE*)H2BaseAddr + 0x48BBF, (BYTE*)sub_48BBF, 11);
 		VirtualProtect(psub_48BBF, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
-
-	initInstanceNumber();
 
 	if (ArgList != NULL)
 	{
@@ -419,10 +410,6 @@ void InitH2Startup() {
 					FlagFilePathConfig = (wchar_t*)malloc(sizeof(wchar_t) * pfcbuflen);
 					swprintf(FlagFilePathConfig, pfcbuflen, ArgList[i] + 10);
 				}
-			}
-			if (_wcsicmp(ArgList[i], L"-live") == 0)
-			{
-				H2DediIsLiveMode = true;
 			}
 		}
 	}

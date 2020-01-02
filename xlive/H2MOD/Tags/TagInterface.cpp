@@ -1,27 +1,37 @@
 #include "stdafx.h"
-#include <map>
 #include "TagInterface.h"
-#include "../H2MOD.h"
+#include "H2MOD.h"
+#include "..\Util\Hooks\Hook.h"
 using namespace tags;
+
+tag_instance *tags::get_tag_instances()
+{
+	return *h2mod->GetAddress<tag_instance**>(0x47CD50, 0x4A29B8);
+}
 
 char *tags::get_tag_data()
 {
-	return *h2mod->GetAddress<char*>(0x47CD64, 0x4A29CC);
+	return *h2mod->GetAddress<char**>(0x47CD54, 0x4A29BC);
+}
+
+char *tags::get_game_globals()
+{
+	return *h2mod->GetAddress<char**>(0x479E70, 0x4A642C);
 }
 
 cache_header *tags::get_cache_header()
 {
-	return h2mod->GetAddress<cache_header>(0x47CD68, 0x4A29D0);
+	return h2mod->GetAddress<cache_header*>(0x47CD68, 0x4A29D0);
 }
 
 HANDLE tags::get_cache_handle()
 {
-	return *h2mod->GetAddress<HANDLE>(0x4AE8A8, 0x4CF128);
+	return *h2mod->GetAddress<HANDLE*>(0x4AE8A8, 0x4CF128);
 }
 
 bool tags::cache_file_loaded()
 {
-	return *h2mod->GetAddress<BYTE>(0x47CD60, 0x4A29C8);
+	return *h2mod->GetAddress<bool*>(0x47CD60, 0x4A29C8);
 }
 
 static char *tag_debug_names = nullptr;
@@ -129,30 +139,10 @@ void tags::on_map_load(void(*callback)())
 	load_callbacks.push_back(callback);
 }
 
-static void __cdecl call_on_map_load()
+void __cdecl tags::run_callbacks()
 {
 	// load debug names before any callbacks are called
 	load_tag_debug_name();
 	for (auto callback : load_callbacks)
 		callback();
-}
-
-__declspec(naked) static void load_data_from_cache_file__prolog_hook()
-{
-	__asm {
-		push ecx // not sure if this register is used, saved it just in case
-		call call_on_map_load
-		pop ecx
-
-		// replaced code
-		pop     esi
-		mov     al, 1
-		pop     ebx
-		retn
-	}
-}
-
-void tags::apply_patches()
-{
-	WriteJmpTo(h2mod->GetAddress(0x315A3, 0x25453), load_data_from_cache_file__prolog_hook);
 }
