@@ -114,8 +114,6 @@ void CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR
 		That should eliminate the need to talk to the Master server in order to get the XNADDR information from the secure address.
 	*/
 
-	LOG_TRACE_NETWORK("[Resources-Clear] CreateXnIpIdentifier executed on thread {:x}", GetCurrentThreadId());
-
 	int firstUnusedDataIndex = 0;
 	bool firstUnusedDataIndexFound = false;
 
@@ -124,9 +122,10 @@ void CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR
 	{
 		if (XnIPs[i].bValid && memcmp(&XnIPs[i].xnaddr, pxna, sizeof(XNADDR)) == 0)
 		{
-			if (outIpIdentifier)
+			if (outIpIdentifier) {
 				*outIpIdentifier = XnIPs[i].connectionIdentifier;
-
+				LOG_TRACE_NETWORK("CreateXnIpIdentifier() already present connection, index: {}, identifier: {:x}", i, XnIPs[i].connectionIdentifier.s_addr);
+			}
 			return;
 		}
 
@@ -144,14 +143,14 @@ void CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR
 
 			memcpy(&XnIPs[firstUnusedDataIndex].xnkid, xnkid, sizeof(XNKID));
 			memcpy(&XnIPs[firstUnusedDataIndex].xnaddr, pxna, sizeof(XNADDR));
-			XnIPs[firstUnusedDataIndex].bValid = true;
 			
 			int randIdentifier = dist(mt_rand);
 			randIdentifier <<= 8;
-			LOG_TRACE_NETWORK("CreateXnIpIdentifier new connection index {0:x}, identifier {1:x}", firstUnusedDataIndex, htonl(firstUnusedDataIndex | randIdentifier));
+			LOG_TRACE_NETWORK("CreateXnIpIdentifier() new connection index {0:x}, identifier {1:x}", firstUnusedDataIndex, htonl(firstUnusedDataIndex | randIdentifier));
 
 			outIpIdentifier->s_addr = htonl(firstUnusedDataIndex | randIdentifier);
 			XnIPs[firstUnusedDataIndex].connectionIdentifier.s_addr = htonl(firstUnusedDataIndex | randIdentifier);
+			XnIPs[firstUnusedDataIndex].bValid = true;
 			return;
 		}
 	}
@@ -163,12 +162,8 @@ void CXnIp::UnregisterSecureAddr(const IN_ADDR ina)
 	if (this->XnIPs[ipIndex].bValid 
 		&& this->XnIPs[ipIndex].connectionIdentifier.s_addr == ina.s_addr)
 	{
-		this->XnIPs[ipIndex].bValid = false;
-		memset(&this->XnIPs[ipIndex].xnaddr, 0, sizeof(XNADDR));
-		memset(&this->XnIPs[ipIndex].connectionIdentifier, 0, sizeof(IN_ADDR));
+		memset(&this->XnIPs[ipIndex], 0, sizeof(XnIp));
 	}
-	
-	LOG_TRACE_NETWORK("[Resources-Clear] UnregisterSecureAddr executed on thread {:x}", GetCurrentThreadId());
 }
 
 void CXnIp::UpdateConnectionStatus() {
@@ -308,7 +303,7 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 // #60: XNetInAddrToXnAddr
 INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 {
-	LOG_TRACE_NETWORK("XNetInAddrToXnAddr() address index: {:x}, identifier {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
+	LOG_TRACE_NETWORK("XNetInAddrToXnAddr() connection index: {:x}, identifier {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
 	
 	if (pxna == nullptr
 		|| pxnkid == nullptr)
@@ -333,7 +328,7 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 // #63: XNetUnregisterInAddr
 int WINAPI XNetUnregisterInAddr(const IN_ADDR ina)
 {
-	LOG_TRACE_NETWORK("XNetUnregisterInAddr(): {:x}", ina.s_addr);
+	LOG_TRACE_NETWORK("XNetUnregisterInAddr(): connection index {}, connection identifier: {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
 	ipManager.UnregisterSecureAddr(ina);
 	return ERROR_SUCCESS;
 }
