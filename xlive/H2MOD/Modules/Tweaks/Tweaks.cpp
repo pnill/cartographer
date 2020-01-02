@@ -1099,20 +1099,19 @@ void H2Tweaks::setFOV(int field_of_view_degrees) {
 	if (H2IsDediServer)
 		return;
 
-	static float fov;
+	static float fov = 70;
 	static bool fov_redirected = false;
-
-	if (!fov_redirected)
-	{
-		BYTE opcode[6] = { 0xD9, 0x05, 0x00, 0x00, 0x00, 0x00 };
-		WritePointer((DWORD)&opcode[2], &fov);
-		WriteBytes(h2mod->GetAddress(0x907F3), opcode, sizeof(opcode)); // fld dword ptr[fov]
-
-		fov_redirected = true;
-	}
-
 	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
 	{
+		if (!fov_redirected)
+		{
+			BYTE opcode[6] = { 0xD9, 0x05, 0x00, 0x00, 0x00, 0x00 };
+			WritePointer((DWORD)&opcode[2], &fov);
+			WriteBytes(h2mod->GetAddress(0x907F3), opcode, sizeof(opcode)); // fld dword ptr[fov]
+
+			fov_redirected = true;
+		}
+
 		//const double default_radians_field_of_view = 70.0f * M_PI / 180.0f;
 		fov = (float)field_of_view_degrees * M_PI / 180.0f;
 	}
