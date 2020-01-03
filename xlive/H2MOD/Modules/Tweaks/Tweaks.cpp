@@ -389,7 +389,7 @@ bool engine_basic_init()
 			    shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
 				NopFill(h2mod->GetAddress(0x269FD5), 8);
 			}
-			else if (_wcsicmp(cmd_line_arg, L"-hiresfix") == 0)
+			else if (H2Config_hiresfix)
 			{
 				DWORD dwBack;
 
@@ -405,7 +405,7 @@ bool engine_basic_init()
 			{
 				flags_array[startup_flags::disable_voice_chat] = 0;
 			}
-			else if (_wcsicmp(cmd_line_arg, L"-enabled3dex") == 0)
+			else if (H2Config_d3dex)
 			{
 				flags_array[startup_flags::allow_d3d_ex_version] = 1;
 			}

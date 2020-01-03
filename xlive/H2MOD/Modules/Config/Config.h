@@ -40,6 +40,8 @@ extern int H2Config_vehicle_field_of_view;
 extern int H2Config_mouse_sens;
 extern int H2Config_controller_sens;
 extern int H2Config_refresh_rate;
+extern bool H2Config_hiresfix;
+extern bool H2Config_d3dex;
 extern float H2Config_crosshair_offset;
 extern bool H2Config_disable_ingame_keyboard;
 extern bool H2Config_hide_ingame_chat;

@@ -93,6 +93,8 @@ float H2Config_crosshair_offset = NAN;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
+bool H2Config_hiresfix = false;
+bool H2Config_d3dex = false;
 //bool H2Config_hitmarker_sound = false;
 bool H2Config_voice_chat = false;
 char H2Config_dedi_server_name[32] = { "" };
@@ -269,6 +271,16 @@ void SaveH2Config() {
 			fputs("\n# <uint 0 to inf> - 0 uses the default sensitivity.", fileConfig);
 			fputs("\n\n", fileConfig);
 
+			fputs("# hiresfix Options (Client):", fileConfig);
+			fputs("\n# 0 - Disable hiresfix. User is not running the game at a resolution above 1920x1200", fileConfig);
+			fputs("\n# 1 - Enable hiresfix. User is running the game at a resolution above 1920x1200", fileConfig);
+			fputs("\n\n", fileConfig);
+
+			fputs("# d3dex Options (Client):", fileConfig);
+			fputs("\n# 0 - Disable d3dex.", fileConfig);
+			fputs("\n# 1 - Enable d3dex.", fileConfig);
+			fputs("\n\n", fileConfig);
+
 			fputs("# controller_sens Options (Client):", fileConfig);
 			fputs("\n# <uint 0 to inf> - 0 uses the default sensitivity.", fileConfig);
 			fputs("\n\n", fileConfig);
@@ -438,6 +450,10 @@ void SaveH2Config() {
 			fprintf_s(fileConfig, "\nrefresh_rate = %d", H2Config_refresh_rate);
 
 			fprintf_s(fileConfig, "\nmouse_sens = %d", H2Config_mouse_sens);
+
+			fprintf_s(fileConfig, "\nhiresfix = %d", H2Config_hiresfix);
+
+			fprintf_s(fileConfig, "\nd3dex = %d", H2Config_d3dex);
 
 			fprintf_s(fileConfig, "\ncontroller_sens = %d", H2Config_controller_sens);
 
@@ -610,6 +626,8 @@ static bool est_vehicle_field_of_view = false;
 static bool est_refresh_rate = false;
 static bool est_mouse_sens = false;
 static bool est_controller_sens = false;
+static bool est_hiresfix = false;
+static bool est_d3dex = false;
 static bool est_crosshair_offset = false;
 static bool est_sens_controller = false;
 static bool est_sens_mouse = false;
@@ -694,6 +712,8 @@ static void est_reset_vars() {
 	est_crosshair_offset = false;
 	est_sens_controller = false;
 	est_sens_mouse = false;
+	est_hiresfix = false;
+	est_d3dex = false;
 	est_disable_ingame_keyboard = false;
 	est_hide_ingame_chat = false;
 	est_xdelay = false;
@@ -1031,6 +1051,30 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			else {
 				H2Config_controller_sens = tempint1;
 				est_controller_sens = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "hiresfix =%d", &tempint1) == 1) {
+			if (est_hiresfix) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_hiresfix = (bool)tempint1;
+				est_hiresfix = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "d3dex =%d", &tempint1) == 1) {
+			if (est_d3dex) {
+				duplicated = true;
+			}
+			else if (!(tempint1 == 0 || tempint1 == 1)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_d3dex = (bool)tempint1;
+				est_d3dex = true;
 			}
 		}
 		else if (!H2IsDediServer && sscanf(fileLine, "crosshair_offset =%f", &tempfloat1) == 1) {
