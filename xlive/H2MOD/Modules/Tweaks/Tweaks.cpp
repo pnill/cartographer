@@ -1101,7 +1101,7 @@ void H2Tweaks::setFOV(int field_of_view_degrees) {
 	if (H2IsDediServer)
 		return;
 
-	static float fov = 70;
+	static float fov = 70.0f * M_PI / 180.0f;
 	static bool fov_redirected = false;
 	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
 	{
