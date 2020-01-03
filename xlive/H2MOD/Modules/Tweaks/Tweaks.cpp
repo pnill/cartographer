@@ -356,6 +356,24 @@ bool engine_basic_init()
 	init_data_checksum_info();
 	runtime_state_init();
 
+	if (H2Config_hiresfix != 0)
+	{
+		DWORD dwBack;
+
+		// HUD text size fix for higher resolutions
+		Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x264A18, (BYTE*)Video_HUDSizeUpdate_hook, 7);
+		VirtualProtect(Video_HUDSizeUpdate_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+
+		// menu text fix for higher resolutions
+		sub_671B02_orig = (sub_671B02_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x271B02, (BYTE*)sub_671B02_hook, 5);
+		VirtualProtect(sub_671B02_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	}
+
+	if (H2Config_d3dex != 0)
+	{
+		flags_array[startup_flags::allow_d3d_ex_version] = 1;
+	}
+
 	int arg_count;
 	wchar_t **cmd_line_args = LOG_CHECK(CommandLineToArgvW(GetCommandLineW(), &arg_count));
 	if (cmd_line_args && arg_count > 1) {
@@ -389,25 +407,9 @@ bool engine_basic_init()
 			    shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
 				NopFill(h2mod->GetAddress(0x269FD5), 8);
 			}
-			else if (H2Config_hiresfix)
-			{
-				DWORD dwBack;
-
-				// HUD text size fix for higher resolutions
-				Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x264A18, (BYTE*)Video_HUDSizeUpdate_hook, 7);
-				VirtualProtect(Video_HUDSizeUpdate_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-				// menu text fix for higher resolutions
-				sub_671B02_orig = (sub_671B02_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x271B02, (BYTE*)sub_671B02_hook, 5);
-				VirtualProtect(sub_671B02_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-			}
 			else if (_wcsicmp(cmd_line_arg, L"-voicechat") == 0)
 			{
 				flags_array[startup_flags::disable_voice_chat] = 0;
-			}
-			else if (H2Config_d3dex)
-			{
-				flags_array[startup_flags::allow_d3d_ex_version] = 1;
 			}
 #ifdef _DEBUG
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
