@@ -197,8 +197,8 @@ bool read_custom_labels() {
 		char* fileLine;
 		bool keepReading = true;
 		int lineNumber = 0;
-		int& dword_412818 = *(int*)((char*)H2BaseAddr + 0x412818);
-		custom_language* curr_lang = get_custom_language(dword_412818, 0);
+		int language_id = *(int*)((char*)H2BaseAddr + 0x412818);
+		custom_language* curr_lang = get_custom_language(language_id, 0);
 		while (keepReading && GetFileLine(labelsFile, fileLine)) {
 			lineNumber++;
 			if (fileLine) {
@@ -475,52 +475,55 @@ void combineCartographerLabels(int menuId, int lbl1, int lbl2, int lblCmb) {
 }
 
 void setGameLanguage() {
-	BYTE* HasLoadedLanguage = (BYTE*)((char*)H2BaseAddr + 0x481908);
-	*HasLoadedLanguage = 0;
+	bool* HasLoadedLanguage = (bool*)(H2BaseAddr + 0x481908);
 
-	int& dword_412818 = *(int*)((char*)H2BaseAddr + 0x412818);
+	int& language_id = *(int*)(H2BaseAddr + 0x412818);
 	if (current_language_main >= 0) {
-		dword_412818 = current_language_main;
+		language_id = current_language_main;
 	}
 	else {
 		switch (GetUserDefaultLangID() & 0x3FF)
 		{
 		case 0x11:
-			dword_412818 = 1;//Japanese
+			language_id = language_ids::japanese;
 			break;
 		case 7:
-			dword_412818 = 2;//German
+			language_id = language_ids::german;
 			break;
 		case 0xC:
-			dword_412818 = 3;//French
+			language_id = language_ids::french;
 			break;
 		case 0xA:
-			dword_412818 = 4;//Spanish
+			language_id = language_ids::spanish;
 			break;
 		case 0x10:
-			dword_412818 = 5;//Italian
+			language_id = language_ids::italian;
 			break;
 		case 0x12:
-			dword_412818 = 6;//Korean
+			language_id = language_ids::korean;
 			break;
 		case 4:
-			dword_412818 = 7;//Chinese
+			language_id = language_ids::chinese;
 			break;
+
 		default:
-			dword_412818 = 0;//English
+			language_id = language_ids::english;
 			break;
 		}
 	}
-}
 
-DWORD langAfterJmpAddr;
-__declspec(naked) void getSystemLanguageMethodJmp() {
-	setGameLanguage();
-	__asm {
-		jmp langAfterJmpAddr
+	size_t ReturnSize;
+	char DstBuf[3];
+
+	if (getenv_s(&ReturnSize, DstBuf, 3, "BLAM_LANGUAGE") && ReturnSize > 0)
+	{
+		int result = atol(DstBuf);
+		if (result > 0 || result > 9)
+			language_id = language_ids::english;
 	}
-}
 
+	*HasLoadedLanguage = true;
+}
 
 char* __cdecl cave_c00031b97(char* result, int buff_len)//Font Table Filename Override
 {
@@ -582,9 +585,9 @@ void setCustomLanguage(int main, int variant) {
 	}
 
 	custom_language* old_language = current_language;
-	int& dword_412818 = *(int*)((char*)H2BaseAddr + 0x412818);
-	if ((current_language = get_custom_language(dword_412818, variant)) == 0)
-		current_language = get_custom_language(dword_412818, 0);
+	int language_id = *(int*)((char*)H2BaseAddr + 0x412818);
+	if ((current_language = get_custom_language(language_id, variant)) == 0)
+		current_language = get_custom_language(language_id, 0);
 	current_language_sub = current_language->lang_variant;
 
 	char langcodeprintbuffer[30];
@@ -658,10 +661,6 @@ void initGSCustomLanguage() {
 		//Hook the function that sets the font table filename.
 		pfn_c00031b97 = (char*(__cdecl*)(int, int))((BYTE*)H2BaseAddr + 0x00031b97);
 		PatchCall(H2BaseAddr + 0x00031e89, nak_c00031b97);
-
-		//Hook the part where it sets the global language id.
-		langAfterJmpAddr = (DWORD)(H2BaseAddr + 0x3828c);
-		DetourFunc((BYTE*)H2BaseAddr + 0x3820d, (BYTE*)getSystemLanguageMethodJmp, 6);
 
 		bool redoCapture = H2Config_custom_labels_capture_missing;
 		setCustomLanguage(H2Config_language_code_main, H2Config_language_code_variant);

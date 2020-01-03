@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include <windows.h>
 
 #include "Detour.h"
 #include <stdio.h>

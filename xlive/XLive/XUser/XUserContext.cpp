@@ -2,15 +2,9 @@
 #include "XUserContext.h"
 
 #include "Globals.h"
-#include "resource.h"
 #include "XLive\xbox\xbox.h"
-#include "XLive\XAM\xam.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include <iostream>
-#include <sstream>
-#include <codecvt>
-#include <unordered_map>
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
@@ -61,10 +55,10 @@ static const std::unordered_map <int, std::string> game_mode_list
 
 void update_player_count()
 {
-	int player_count_a = *reinterpret_cast<BYTE*>(h2mod->GetBase() + 0x506974);
-	int player_count_b = *reinterpret_cast<BYTE*>(h2mod->GetBase() + 0x50E4FC);
-	int max_player_count_a = *reinterpret_cast<BYTE*>(h2mod->GetBase() + 0x50A3A0);
-	int max_player_count_b = *reinterpret_cast<BYTE*>(h2mod->GetBase() + 0x511F28);
+	int player_count_a = *h2mod->GetAddress<BYTE*>(0x506974);
+	int player_count_b = *h2mod->GetAddress<BYTE*>(0x50E4FC);
+	int max_player_count_a = *h2mod->GetAddress<BYTE*>(0x50A3A0);
+	int max_player_count_b = *h2mod->GetAddress<BYTE*>(0x511F28);
 
 	DiscordInterface::SetPlayerCountInfo(
 		player_count_a ? player_count_a : player_count_b,
@@ -75,13 +69,13 @@ void update_player_count()
 std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
 std::string getEnglishMapName()
 {
-	wchar_t* englishMapName = (wchar_t*)(h2mod->GetBase() + 0x97737C);
+	wchar_t* englishMapName = h2mod->GetAddress<wchar_t*>(0x97737C);
 	return  wstring_to_string.to_bytes(englishMapName);
 }
 
 std::string getVariantName()
 {
-	std::wstring variant = reinterpret_cast<wchar_t*>(h2mod->GetBase() + 0x97777C);
+	std::wstring variant = h2mod->GetLobbyGameVariantName();
 	variant = variant.substr(0, variant.find_last_not_of(L"\xE008\t\n ") + 1);
 	return wstring_to_string.to_bytes(variant);
 }
@@ -125,10 +119,10 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 	if (dwContextId == X_CONTEXT_PRESENCE)
 	{
 		LOG_TRACE_XLIVE("- X_CONTEXT_PRESENCE = {}", dwContextValue);
-		int GameGlobals = *reinterpret_cast<int*>(h2mod->GetBase() + 0x482D3C);
-		int GameEngineGlobals = *reinterpret_cast<int*>(h2mod->GetBase() + 0x4BF8F8);
+		int GameGlobals = *h2mod->GetAddress<int*>(0x482D3C);
+		int GameEngineGlobals = *h2mod->GetAddress<int*>(0x4BF8F8);
 
-		std::wstring map_name_wide = (wchar_t*)(h2mod->GetBase() + 0x46DAE8);
+		std::wstring map_name_wide = h2mod->GetAddress<wchar_t*>(0x46DAE8);
 		map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L"\\") + 1);
 
 		std::string map_name = wstring_to_string.to_bytes(map_name_wide);
@@ -137,7 +131,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 		switch (static_cast<ContextPresence>(dwContextValue)) {
 		case ContextPresence::singleplayer:
 		{
-			std::wstring map_name_wide = (wchar_t*)(h2mod->GetBase() + 0x46DD88);
+			std::wstring map_name_wide = h2mod->GetAddress<wchar_t*>(0x46DD88);
 			map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L"\\") + 1);
 
 			std::string map_name = wstring_to_string.to_bytes(map_name_wide);

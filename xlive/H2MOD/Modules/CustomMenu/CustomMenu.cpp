@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Globals.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
@@ -6,11 +7,9 @@
 #include "H2MOD\Modules\Accounts\Accounts.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\AccountCreate.h"
-#include "XLive\UserManagement\CUser.h"
+#include "XLive\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Updater\Updater.h"
-#include <Shellapi.h>
-#include "Globals.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
@@ -1881,8 +1880,8 @@ static bool CMButtonHandler_EditFPS(int button_id) {
 			H2Config_fps_limit = 60;
 	}
 	
-	extern std::chrono::system_clock::duration desiredRenderTime;
-	desiredRenderTime = std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
+	extern std::chrono::high_resolution_clock::duration desiredRenderTime;
+	desiredRenderTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
 
 	loadLabelFPSLimit();
 	return false;
@@ -3145,7 +3144,7 @@ void CMSetupVFTables_AdvSettings() {
 }
 
 int __cdecl CustomMenu_AdvSettings(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE ? 4 : 4, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MapType::MULTIPLAYER_MAP ? 4 : 4, 272);
 }
 
 void GSCustomMenuCall_AdvSettings() {
@@ -3214,7 +3213,7 @@ static bool CMButtonHandler_AdvLobbySettings(int button_id) {
 	}
 	else if (button_id == 2) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_disable_kill_volumes = !AdvLobbySettings_disable_kill_volumes));
-		if (NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE && !AdvLobbySettings_disable_kill_volumes) {
+		if (NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MapType::MULTIPLAYER_MAP && !AdvLobbySettings_disable_kill_volumes) {
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
 		}
 		H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
@@ -3279,7 +3278,7 @@ void* __stdcall sub_248beb_deconstructor_AdvLobbySettings(LPVOID lpMem, char a2)
 	}
 	wcsncpy(ServerLobbyName, bufferLobbyName, 32);
 
-	if (NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() == EngineType::MULTIPLAYER_ENGINE) {
+	if (NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MapType::MULTIPLAYER_MAP) {
 		//advLobbySettings->sendLobbySettingsPacket();
 	}
 	
@@ -3716,9 +3715,9 @@ static DWORD WINAPI ThreadCreate(LPVOID lParam)
 		snprintf(username2, strlen(username) + 1, username);
 		char* pass2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
 		snprintf(pass2, strlen(pass) + 1, pass);
-		memset(username, 0, strlen(username));
-		memset(email, 0, strlen(email));
-		memset(pass, 0, strlen(pass));
+		SecureZeroMemory(username, strlen(username));
+		SecureZeroMemory(email, strlen(email));
+		SecureZeroMemory(pass, strlen(pass));
 	}
 
 	updateAccountingActiveHandle(false);
@@ -3919,7 +3918,7 @@ static DWORD WINAPI ThreadLogin(LPVOID lParam)
 			GSCustomMenuCall_Login_Warn();
 			H2AccountLastUsed = 0;
 		}
-		memset(identifier_pass, 0, strlen(identifier_pass));
+		SecureZeroMemory(identifier_pass, strlen(identifier_pass));
 	}
 	else {
 		//login to account
@@ -4176,7 +4175,7 @@ static bool CMButtonHandler_AccountList(int button_id) {
 			if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", 1234571000000000 + H2GetInstanceId(), 0x100 + H2GetInstanceId(), 0x100 * H2GetInstanceId(), "000000101300", "0000000000000000000000000000000000101300")) {
 				//show select profile gui
 				int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
-				sub_209236(0,0);
+				sub_209236(0, 0);
 				H2Config_master_ip = inet_addr("127.0.0.1");
 				H2Config_master_port_relay = 2001;
 				extern int MasterState;
@@ -4718,7 +4717,7 @@ void* __stdcall sub_23BC45(void* thisptr)//__thiscall
 }
 
 int __cdecl sub_209236(int a1,int a2) {
-	if (userManager.LocalUserLoggedIn()) {
+	if (ipManager.LocalUserLoggedIn()) {
 		int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
 		sub_209236(0,0);
 	}
@@ -4738,8 +4737,8 @@ typedef int(__cdecl *tsub_23f6b7)(int);
 tsub_23f6b7 psub_23f6b7;
 int __cdecl sub_23f6b7(int a1)
 {
-	if (userManager.LocalUserLoggedIn()) {
-		userManager.UnregisterLocal();
+	if (ipManager.LocalUserLoggedIn()) {
+		ipManager.UnregisterLocal();
 	}
 	return psub_23f6b7(a1);
 }
@@ -4807,8 +4806,7 @@ void __cdecl sub_bd137(unsigned int skull_id) {
 
 	BYTE* byte_4D8320 = (BYTE*)((char*)H2BaseAddr + 0x4D8320);
 	DWORD* dword_3BCAF8 = (DWORD*)((char*)H2BaseAddr + 0x3BCAF8);
-	DWORD& dword_479E70 = *(DWORD*)((char*)H2BaseAddr + 0x479E70);
-	DWORD& dword_482290 = *(DWORD*)((char*)H2BaseAddr + 0x482290);
+	DWORD dword_482290 = *(DWORD*)((char*)H2BaseAddr + 0x482290);
 
 	int v1; // ST0C_4
 	int v2; // eax
@@ -4832,7 +4830,7 @@ void __cdecl sub_bd137(unsigned int skull_id) {
 		v2 = sub_5343F();
 		sub_22DEA4(v2, v1);
 		sub_A402C(1.0f, 1.0f, 1.0f, 20);//r, g, b, flash length
-		v3 = *(DWORD*)(dword_479E70 + 308);
+		v3 = *(DWORD*)(tags::get_game_globals() + 308);
 		if (v3 != -1) {
 			v4 = v3 + dword_482290;
 			v5 = *(DWORD*)(v4 + 280);
@@ -5034,8 +5032,8 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Update_Note, 2, "No");
 
 
-	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF0, "NO CHEATING!");
-	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF1, "DO NOT CHEAT/HACK ONLINE.\r\nWe have a complex system made to keep you banned if you do. Don't risk it. We will catch you otherwise!");
+	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF0, "Message of the Day!");
+	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF1, "DO NOT CHEAT ONLINE!\r\n\Ranks are on the way!\r\nInitial testing phase is beginning now.\r\nNew variant OGH2, try it out!");
 
 
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF0, "Customise HUD / GUI");
@@ -5311,7 +5309,7 @@ int aab4 = 4;
 void CallWgit(int WgitScreenfunctionPtr) {
 	CallWgit(WgitScreenfunctionPtr, 1, 0);
 }
-std::chrono::time_point<std::chrono::system_clock> lastOuterMenuUse;
+std::chrono::time_point<std::chrono::high_resolution_clock> lastOuterMenuUse;
 int lastOuterMenuFuncPtr = 0;
 void CallWgit(int WgitScreenfunctionPtr, int open_method2) {
 	CallWgit(WgitScreenfunctionPtr, open_method2, 0);
@@ -5335,7 +5333,7 @@ void CallWgit(int WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) {
 		}
 		else if (lastOuterMenuFuncPtr > 0 && lastOuterMenuFuncPtr == WgitScreenfunctionPtr) {
 			if (CurrentWgitID != menu_wgit_type) {
-				std::chrono::milliseconds difference = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastOuterMenuUse);
+				std::chrono::milliseconds difference = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - lastOuterMenuUse);
 				long long timeDiff = difference.count();
 				if (timeDiff < 1500) {
 					open_method = 3;
@@ -5348,7 +5346,7 @@ void CallWgit(int WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) {
 		}
 	}
 	lastOuterMenuFuncPtr = WgitScreenfunctionPtr;
-	lastOuterMenuUse = std::chrono::system_clock::now();
+	lastOuterMenuUse = std::chrono::high_resolution_clock::now();
 	prevOpenMethod = open_method;
 
 	//char* menu_setup = (char*)malloc(sizeof(char) * 0x20);
@@ -5560,7 +5558,7 @@ int __cdecl CustomMenu_CallHead(int a1, DWORD* menu_vftable_1, DWORD* menu_vftab
 	int(__cdecl* sub_20B8C3)(int, int) = (int(__cdecl*)(int, int))((char*)H2BaseAddr + 0x20B8C3);
 
 	int menu_struct = Allocator(3388);
-	int& menu_id = ((int*)menu_struct)[28];
+	int menu_id = ((int*)menu_struct)[28];
 	if (menu_struct) {
 		menu_struct = sub_248B17_CM(menu_struct, *(DWORD*)(a1 + 4), *(DWORD*)(a1 + 8), *(WORD*)(a1 + 2), menu_vftable_1, menu_vftable_2, menu_button_handler, number_of_buttons, menu_wgit_type);
 	}
@@ -5663,19 +5661,15 @@ int __cdecl CustomMenu_CallHead2(int a1, DWORD* menu_vftable_1, DWORD* menu_vfta
 
 void __cdecl sub_3e3ac_CMLTD(int a1, int label_id, wchar_t* rtn_label, int label_menu_id)
 {
-	int& dword_479e70 = *(int*)((char*)H2BaseAddr + 0x479e70);
-	int& dword_47cd54 = *(int*)((char*)H2BaseAddr + 0x47cd54);
-	int& dword_47cd50 = *(int*)((char*)H2BaseAddr + 0x47cd50);
-
 	int(__cdecl* sub_381fd)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x381fd);
 	void(__thiscall* sub_3e332)(int, int, wchar_t*, int, int) = (void(__thiscall*)(int, int, wchar_t*, int, int))((char*)H2BaseAddr + 0x3e332);
 
 	if (a1 != -1) {
 		int v3 = sub_381fd();
-		int v4 = dword_47cd54 + *(DWORD*)(dword_47cd50 + 16 * (unsigned __int16)a1 + 8);
+		char* v4 = &tags::get_tag_data()[tags::get_tag_instances()[a1 & 0xFFFF].data_offset];
 
 		sub_3e332(
-			(int)dword_479e70 + 28 * (v3 + 14),
+			(int)tags::get_game_globals() + 28 * (v3 + 14),
 			label_id,
 			rtn_label,
 			label_menu_id,//*(WORD*)(v4 + 4 * (v3 + 14) - 40),
@@ -5820,7 +5814,7 @@ void* __stdcall sub_20f8ae_CMLTD(void* thisptr, __int16 a2, int* a3, int label_m
 
 int __stdcall sub_20fb1b_CMLTD(void* thisptr, int label_menu_id, int label_id_description)
 {
-	int& dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
 
 	int(__thiscall* sub_20F815)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x20F815);
 	int(__thiscall* sub_20E8C9)(void*, int) = (int(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20E8C9);
@@ -6173,7 +6167,7 @@ void __stdcall sub_21bf85_CMLTD(int thisptr, int label_id, int label_menu_id)
 
 char __stdcall sub_20fd41_CMLTD(void* thisptr, int label_menu_id, int label_id_title)
 {
-	int& dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
 
 	int(__cdecl* sub_20bb89)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x20bb89);
 	int(__cdecl* sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
@@ -6305,7 +6299,7 @@ char __stdcall sub_20fd41_CMLTD(void* thisptr, int label_menu_id, int label_id_t
 
 char __stdcall sub_210a44_CMLTD(int thisptr, int a2, int* a3, int label_menu_id, int label_id_title, int label_id_description)
 {
-	int& dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
 
 	int(__cdecl* sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
 	int(__cdecl* sub_239623)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x239623);

@@ -12,7 +12,6 @@ public:
 	//client and server functions below
 	void reloadMaps();
 	void cleanup();
-	const char* getCustomLobbyMessage();
 	std::wstring getMapName();
 	bool hasCustomMap(std::string mapName);
 	bool hasCustomMap(std::wstring mapName);
@@ -26,7 +25,6 @@ public:
 	void searchForMap();
 	bool downloadFromRepo(std::string mapFilename);
 	std::wstring clientMapFilename;
-	void setCustomLobbyMessage(const char* newStatus);
 	//we precalculate the strings when the MapManager class is loaded to avoid any expensive object creation during game/lobby time
 	std::unordered_map<int, std::string> precalculatedDownloadPercentageStrings;
 	void leaveSessionIfAFK();

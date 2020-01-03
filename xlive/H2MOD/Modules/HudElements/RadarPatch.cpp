@@ -15,5 +15,5 @@ void RadarPatch() {
 	
 	// 4 = D3DBLEND_INVSRCALPHA
 	WriteValue<BYTE>(H2BaseAddr + 0x2849C4, (BYTE)4);
-	addDebugText("Radar patched successfully.");
+	addDebugText("Motion sensor patched successfully.");
 }

@@ -3,18 +3,10 @@
 
 XNetStartupParams g_XnetStartupParams;
 
-// #65: XNetConnect
-int WINAPI XNetConnect(const IN_ADDR ina)
-{
-	return ERROR_SUCCESS;
-}
-
 // #51: XNetStartup
 int WINAPI XNetStartup(const XNetStartupParams *pxnsp)
 {
-	memset(&g_XnetStartupParams, NULL, sizeof(XNetStartupParams));
 	memcpy(&g_XnetStartupParams, pxnsp, sizeof(XNetStartupParams));
-
 	return 0;
 }
 
@@ -28,7 +20,7 @@ INT   WINAPI XNetServerToInAddr(const IN_ADDR ina, DWORD dwServiceId, IN_ADDR * 
 }
 
 
-// #59: XNetXnAddrToInAddr
+// #59: XNetTsAddrToInAddr
 INT   WINAPI XNetTsAddrToInAddr(const TSADDR * ptsa, DWORD dwServiceId, const XNKID * pxnkid, IN_ADDR * pina)
 {
 	LOG_TRACE_XLIVE("XNetTsAddrToInAddr");
@@ -71,13 +63,6 @@ INT WINAPI XNetXnAddrToMachineId(const XNADDR * pxnaddr, ULONGLONG * pqwMachineI
 
 	return 0;
 }
-
-// #66: XNetGetConnectStatus
-int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
-{
-	return XNET_CONNECT_STATUS_CONNECTED;
-}
-
 
 // #67: XNetDnsLookup
 int WINAPI XNetDnsLookup(const char * pszHost, DWORD hEvent, void ** ppxndns)
@@ -162,7 +147,7 @@ int WINAPI XNetGetSystemLinkPort(DWORD *a1)
 {
 	LOG_TRACE_XLIVE("XNetGetSystemLinkPort");
 	if (a1)
-		*a1 = 0x00000C02;
+		*a1 = 3074;
 	return 0;
 }
 

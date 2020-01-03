@@ -1,52 +1,113 @@
 #pragma once
 
 #include "stdafx.h"
+#include "..\Blam\Engine\Players\Players.h"
 
-enum network_session_state : signed int
+enum eNetwork_session_state : signed int
 {
-	_network_session_state_none = -1,
-	_network_session_state_peer_joining = 1,
-	_network_session_state_peer_join_abort = 2,
-	_network_session_state_peer_established = 3,
-	_network_session_state_leaving = 4,
-	_network_session_state_session_host = 5,
-	_network_session_state_host_disband = 6,
-	_network_session_state_host_handoff = 7,
-	_network_session_state_host_reestablish = 8,
-	_network_session_state_election = 9,
-	_network_session_state_unk_2 = 10
+	network_session_state_none,
+	network_session_state_peer_joining,
+	network_session_state_peer_join_abort,
+	network_session_state_peer_established,
+	network_session_state_leaving,
+	network_session_state_session_host,
+	network_session_state_host_disband,
+	network_session_state_host_handoff,
+	network_session_state_host_reestablish,
+	network_session_state_election,
+	network_session_state_unk_2
+};
+
+enum eMap_status : int
+{
+	unk_map_stats,
+	map_unavailable,
+	unk_map_stats2,
+	map_available,
+	map_loaded,
+	map_is_downloading
 };
 
 #pragma pack(push, 1)
 struct network_address
 {
-	DWORD ip_long;
-	BYTE gap_4[12];
-	__int16 port;
-	signed __int16 address_type;
+	union
+	{
+		int ipv4;
+		char ipv6[16];
+	} address;
+	short port;
+	short address_type;
 };
 
-struct peer_network_info
+struct peer_information
 {
 	XNADDR address;
 	BYTE gap_24[4];
-	wchar_t peer_name[16];
-	wchar_t peer_name_2[32];
-	signed int field_88;
-	signed int field_8C;
-	signed int field_90;
-	signed int field_94;
-	signed int field_98;
-	BYTE gap_9C[84];
+	wchar_t name[16];
+	wchar_t peer_session_name[32];
+	eMap_status map_status;
+	unsigned int map_progress_percentage;
+	char field_70;
+	BYTE gap_71[3];
+	char field_74;
+	BYTE gap_75[3];
+	unsigned int nat_type;
+	unsigned int connectivity_mask;
+	unsigned int latency_min;
+	unsigned int latency_est;
+	unsigned int latency_max;
+	BYTE gap_9C[68];
 	DWORD field_F0;
 	DWORD field_F4;
 	DWORD gets_incremented_unk;
-	signed int player_information_index; // used to access the player_info array
-	signed int field_100;
-	signed int field_104;
-	signed int field_108;
+	signed int player_index[4]; // stores local players indexes of the peer (BIG TODO: maybe fix splitscreen at some point)
 };
-static_assert(sizeof(peer_network_info) == 268, "Invalid peer_network_info size");
+static_assert(sizeof(peer_information) == 268, "Invalid PeerNetworkInfo size");
+
+struct peer_observer_channel
+{
+	bool field_0;
+	bool field_1;
+	char pad[2];
+	signed int observer_index;
+	int membership_update_number;
+	int parameters_update_number;
+	int virtual_couch_update_number;
+	int vote_update_number;
+	int field_18;
+};
+
+struct player_information
+{
+	XUID identifier; // -0xA
+	DWORD peer_index; // -0x8
+	DWORD peer_user_index; // -0x4
+	WORD player_flags; // 0x0
+	bool properties_valid;
+	char pad[1];
+	unsigned int controller_index;
+	PlayerProperties properties;
+	PlayerProperties player_properties_1;
+	unsigned int player_voice;
+	unsigned int player_text_chat;
+};
+static_assert(sizeof(player_information) == 296, "Invalid player_info size");
+
+struct membership_info
+{
+	DWORD update_number; // 0x70
+	DWORD session_leader_index; // 0x74
+	XUID dedicated_server_xuid; // 0x7C
+	DWORD field_80; // 0x80
+	int peer_count; // 0x84
+	peer_information peer_info[17]; // 0x88
+	int player_count; // 0x1254
+	DWORD players_active_mask; // 0x1258
+	player_information player_info[16]; // 0x125C
+	DWORD unk;
+};
+static_assert(sizeof(membership_info) == 9328, "Invalid membership_info size");
 
 struct virtual_couch
 {
@@ -59,123 +120,15 @@ struct virtual_couch
 };
 static_assert(sizeof(virtual_couch) == 200, "Invalid virtual_couch size");
 
-struct player_emblem_data
+struct session_parameters
 {
-	char primary_color;
-	char secondary_color;
-	char tertiary_color;
-	char quaternary_color;
-	char player_caracter_type;
-	char foreground_emblem;
-	char background_emblem;
-	char emblem_flags;
-};
-
-struct player_profile_data
-{
-	wchar_t playerName[32];
-	player_emblem_data emblem_data;
-	BYTE gap48[8];
-	wchar_t clan_identifier_name[16];
-	struct {
-		DWORD ID_1;
-		DWORD ID_2;
-		DWORD ID_3;
-	} clan_identifiers;
-	char player_team;
-	char player_handicap_level;
-	char player_displayed_skill;
-	char player_overall_skill;
-	char player_is_griefer;
-	char bungie_user_role;
-	char achievement_flags;
-};
-
-struct player_info
-{
-	XUID identifier;
-	DWORD player_index;
-	signed __int16 peer_index;
-	signed __int16 peer_user_index;
-	WORD player_flags;
-	char properties_valid[2];
-	unsigned int controller_index;
-	player_profile_data _player_profile_data;
-	BYTE pad_99;
-	player_profile_data _player_profile_data_1;
-	BYTE pad_11D;
-	unsigned int player_voice;
-	unsigned int player_text_chat;
-};
-
-struct unk_network_connection_info
-{
-	char field_0[4];
-	signed int observer_index;
-	signed int field_8;
-	signed int field_C;
-	signed int field_10;
-	signed int field_14;
-	signed int field_18;
-};
-
-struct network_session
-{
-	DWORD field_0;
-	void *network_message_gateway_ptr;
-	void *network_observer_ptr;
-	DWORD session_manager_ptr;
-	DWORD text_chat;
-	int unk_index;
-	int field_18;
-	int network_mode;
-	XNKID session_id;
-	char field_28[32];
-	char field_48; // 69
-	XNKEY xnkey;
-	char pad[3];
-	int xnkey_index;
-	signed int field_60;
-	DWORD session_host_peer_index;
-	int elected_host_peer_index;
-	DWORD field_6C;
-	DWORD membership_1;
-	DWORD session_leader_index; //this is not host index, but the player which controlls the party
-	XUID dedicated_server_xuid;
-	DWORD field_80;
-	DWORD total_peers;
-	peer_network_info peers_network_info[17];
-	DWORD total_party_players;
-	DWORD peer_bit_flags;
-	player_info player_information[16];
-	BYTE gap24DC[4];
-	DWORD membership_2;
-	BYTE gap_24E4[9324];
-	virtual_couch v_couch_1;
-	virtual_couch v_couch_2;
-	DWORD voting_information_1;
-	int field_4AE4;
-	int field_4AE8;
-	int field_4AEC;
-	BYTE gap_4AF0[56];
-	__int16 field_4B28;
-	BYTE gap_4B2A[62];
-	int field_4B68;
-	int field_4B6C;
-	int field_4B70;
-	__int16 field_4B74;
-	WORD field_4B76;
-	WORD field_4B78;
-	BYTE gap_4B7A[2];
-	int field_4B7C;
-	DWORD voting_information;
-	BYTE gap_4B84[220];
-	DWORD parameters_2;
+	DWORD parameters_update_number;
 	BYTE gap_4C64[4];
 	int field_4C68;
 	DWORD gap_4C6C;
 	DWORD system_language_id;
-	char dedicated_server[4];
+	bool dedicated_server;
+	char pad_1[3];
 	DWORD party_privacy;
 	int max_peers;
 	signed int max_party_players;
@@ -185,7 +138,8 @@ struct network_session
 	DWORD field_4C90;
 	DWORD field_4C94;
 	BYTE gap_4C98[4];
-	char dedicated_server_state_valid[4];
+	bool current_peer_is_host;
+	char pad[3];
 	DWORD field_4CA0;
 	DWORD field_4CA4;
 	BYTE gap_4CA8[16];
@@ -205,11 +159,41 @@ struct network_session
 	BYTE gap_5EBC[76];
 	DWORD field_5F08;
 	DWORD field_5F0C;
-	DWORD parameters_1;
-	BYTE gap_5F14[4780];
+};
+static_assert(sizeof(session_parameters) == 4784, "Invalid session_params size");
+
+struct network_session
+{
+	DWORD field_0;
+	void *network_message_gateway_ptr;
+	void *network_observer;
+	DWORD session_manager_ptr;
+	DWORD text_chat;
+	int unk_index;
+	int field_18;
+	int network_protocol; // LIVE - 2, Network - 1
+	XNKID session_id;
+	wchar_t field_28[16];
+	char field_48;
+	XNKEY xnkey;
+	char pad[3];
+	int xnkey_index;
+	signed int field_60;
+	DWORD session_host_peer_index;
+	int elected_host_peer_index;
+	DWORD field_6C;
+	membership_info membership; // 0x70
+	membership_info membership_2; // ?? 
+	virtual_couch v_couch;
+	virtual_couch v_couch_2;
+	char voting_information_1[160]; // unused
+	char voting_information_2[160]; // unused
+	BYTE gap_4B84[64];
+	session_parameters parameters;
+	session_parameters parameters_2;
 	DWORD local_peer_index;
-	unk_network_connection_info unk_needs_reversing[17];
-	network_session_state local_session_state;
+	peer_observer_channel peer_observer_channels[17];
+	eNetwork_session_state local_session_state;
 	DWORD time_unk_2;
 	DWORD time_unk_3;
 	DWORD time_unk;
@@ -242,7 +226,7 @@ struct network_session
 	BYTE field_78FC[36];
 	int field_7920;
 	DWORD field_7924;
-	DWORD join_request_attempts_number;
+	DWORD total_join_request_attempts;
 	DWORD last_time_join_request_sent;
 	DWORD field_7930;
 	DWORD field_7934;
@@ -264,7 +248,7 @@ struct network_session
 	DWORD field_7974;
 	DWORD field_7978;
 	BYTE gap_797C[508];
-	DWORD c_network_message_gateway;
+	DWORD c_kablam_session_join_request_handler; // dedicated server session join handler
 	char field_7B7C[12];
 };
 #pragma pack(pop)
@@ -272,11 +256,28 @@ static_assert(sizeof(network_session) == 31624, "Invalid network_session size");
 
 namespace NetworkSession
 {
-	network_session* getNetworkSession();
+	network_session* getNetworkSessions();
 	network_session* getCurrentNetworkSession();
 	bool getCurrentNetworkSession(network_session** a1);
+	eNetwork_session_state getLocalSessionState();
 	bool localPeerIsSessionHost();
 	signed int getPeerIndexFromNetworkAddress(network_address* addr);
-	char getMapFileLocation(network_session* thisx, wchar_t* buffer, size_t szBuffer);
+	char getMapFileLocation(wchar_t* buffer, size_t size);
+
+	int getPeerCount();
+	int getPeerIndexFromPlayerXuid(long long xuid);
+	int getLocalPeerIndex();
+	void kickPeer(int peerIndex);
+	void logAllPeersToConsole();
+
+	int getPlayerCount();
+	bool IsActive(int playerIndex);
+	player_information* getPlayerInformation(int playerIndex);
+	int getPeerIndexFromPlayerIndex(int playerIndex);
+	wchar_t* getPlayerName(int playerIndex);
+	long long getPlayerXuidFromPlayerIndex(int playerIndex);
+	int getPlayerTeamFromPlayerIndex(int playerIndex);
+	int getPlayerTeamFromXuid(long long xuid);
+	void logAllPlayersToConsole();
 }
 

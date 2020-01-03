@@ -69,7 +69,7 @@ static void updateDiscordPresence()
 		return;
 
 	DiscordRichPresence discordPresence;
-	memset(&discordPresence, 0, sizeof(discordPresence));
+	SecureZeroMemory(&discordPresence, sizeof(discordPresence));
 	discordPresence.state = state;
 	discordPresence.details = details;
 	discordPresence.largeImageKey = map_key;
@@ -116,7 +116,7 @@ void DiscordInterface::Init()
 {
 	inited = true;
 	DiscordEventHandlers handlers;
-	memset(&handlers, 0, sizeof(handlers));
+	SecureZeroMemory(&handlers, sizeof(handlers));
 	handlers.ready = handleDiscordReady;
 	handlers.disconnected = handleDiscordDisconnected;
 	handlers.errored = handleDiscordError;

@@ -38,11 +38,11 @@ bool fork_cmd(LPSTR cmd) {
 	bool bSuccess;
 
 	// Set up members of the PROCESS_INFORMATION structure. 
-	ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
+	SecureZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
 
 	// Set up members of the STARTUPINFO structure. 
 	// This structure specifies the STDERR and STDOUT handles for redirection.
-	ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
+	SecureZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
 	siStartInfo.cb = sizeof(STARTUPINFO);
 	//siStartInfo.dwFlags |= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 	//siStartInfo.wShowWindow = SW_HIDE; // execute hide 
@@ -531,7 +531,7 @@ void GSDownloadInstall() {
 	if (updater_params.size() > 0) {
 		int updater_params_buflen = 20 + updater_params.size();
 		wchar_t* updater_params_flags = (wchar_t*)malloc(sizeof(wchar_t) * updater_params_buflen);
-		swprintf(updater_params_flags, updater_params_buflen, L"-p %d -t 5000 %s", GetCurrentProcessId(), updater_params.c_str());
+		swprintf(updater_params_flags, updater_params_buflen, L"-p %d -t 5000 %s", GetCurrentProcessId(), std::wstring(updater_params.begin(), updater_params.end()).c_str());
 		if (fork_cmd_elevate(existingfilepathupdater, updater_params_flags)) {
 			addDebugText("Shutting down to update!");
 			BYTE& Quit_Exit_Game = *(BYTE*)((char*)H2BaseAddr + (H2IsDediServer ? 0x4a7083 : 0x48220b));

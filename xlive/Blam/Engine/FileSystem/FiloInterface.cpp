@@ -3,7 +3,6 @@
 
 namespace FiloInterface
 {
-
 	inline DWORD SwitchServerClient(DWORD client_offset, DWORD server_offset)
 	{
 		return h2mod->GetBase() + (h2mod->Server ? server_offset : client_offset);

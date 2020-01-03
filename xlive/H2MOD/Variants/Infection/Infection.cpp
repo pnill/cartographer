@@ -1,8 +1,12 @@
 #include "stdafx.h"
+
 #include "Globals.h"
-#include "H2MOD\protobuf\h2mod.pb.h"
+#include "Blam\Enums\Enums.h"
 #include "..\..\Modules\Networking\Networking.h"
 #include "..\..\Modules\Networking\CustomPackets\CustomPackets.h"
+
+using namespace Blam::Enums;
+using namespace NetworkSession;
 
 std::vector<std::wstring> Infection::zombieNames;
 
@@ -14,50 +18,61 @@ const wchar_t* INFECTED_SOUND = L"sounds/infected.wav";
 
 bool firstSpawn;
 bool infectedPlayed;
-signed int zombieIndex = -1;
+signed int zombiePlayerIndex = -1;
 
-signed int Infection::calculateZombiePlayerIndex() {
-	int rand_index = 0;
-	network_session* session = NetworkSession::getCurrentNetworkSession();
-	if (session->total_peers > 0)
+signed int Infection::calculateZombiePlayerIndex() 
+{
+	if (getPlayerCount() > 0)
 	{
-		rand_index = rand() % session->total_peers;
-		if (rand_index == session->session_host_peer_index)
+		std::mt19937 mt_rand(rd());
+		std::vector<int> vecPlayersActiveIndexes;
+
+		int playerIndex = 0;
+		do 
 		{
-			if (session->dedicated_server[0] == 1)
-			{
-				if (session->total_peers <= 1)
-					return -1;
-				else
-					return calculateZombiePlayerIndex();
-			}
-		}
+			if (IsActive(playerIndex))
+				vecPlayersActiveIndexes.push_back(playerIndex);
+
+			playerIndex++;
+		} while (playerIndex < 16);
+	
+		if (vecPlayersActiveIndexes.empty())
+			return -1;
+
+		std::uniform_int_distribution<int> dist(0, getPlayerCount() - 1);
+
+		int infectedPlayerIndex = vecPlayersActiveIndexes[dist(mt_rand)];
+		LOG_TRACE_GAME(L"[h2mod-infection] random infection player index: {}, with name: {}", infectedPlayerIndex, getPlayerName(infectedPlayerIndex));
+
+		return infectedPlayerIndex;
 	}
-	return rand_index;
+	
+	return -1;
 }
 
 void Infection::sendTeamChange()
 {
-	network_session* session = NetworkSession::getCurrentNetworkSession();
-	if (session->local_session_state == _network_session_state_session_host)
+	if (getLocalSessionState() == network_session_state_session_host)
 	{
-		if (session->total_peers > 0)
+		if (getPlayerCount() > 0)
 		{
-			int index = 0;
+			int playerIndex = 0;
 			do
 			{
-				if (session->session_host_peer_index != index) {
-					CustomPackets::sendTeamChange(session, index, zombieIndex == index ? ZOMBIE_TEAM : HUMAN_TEAM);
-				}
-				else
+				if (IsActive(playerIndex))
 				{
-					if (!h2mod->Server)
-						h2mod->set_local_team_index(0, zombieIndex == index ? ZOMBIE_TEAM : HUMAN_TEAM);
+					if (getLocalPeerIndex() != getPeerIndexFromPlayerIndex(playerIndex)) {
+						CustomPackets::sendTeamChange(getCurrentNetworkSession(), getPeerIndexFromPlayerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
+						LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", playerIndex, getPlayerName(playerIndex), zombiePlayerIndex == playerIndex ? true : false);
+					}
+					else if (!h2mod->Server) {
+						h2mod->set_local_team_index(0, zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
+						LOG_TRACE_GAME(L"[h2mod-infection] setting local player team index, infected?: {}", zombiePlayerIndex == playerIndex ? true : false);
+					}
 				}
 
-				index++;
-			}
-			while (index < session->total_peers);
+				playerIndex++;
+			} while (playerIndex < 16);
 		}
 	}
 }
@@ -94,9 +109,9 @@ void Infection::resetZombiePlayerStatus() {
 	Infection::zombieNames.clear();
 }
 
-void Infection::setZombiePlayerStatus(int index)
+void Infection::setZombiePlayerStatus(int playerIndex)
 {
-	Infection::zombieNames.push_back(players->getPlayerName(index));
+	Infection::zombieNames.push_back(getPlayerName(playerIndex));
 }
 
 void Infection::initHost() {
@@ -120,44 +135,50 @@ void Infection::disableSlayerSounds()
 void Infection::resetWeaponInteractionAndEmblems() {
 	LOG_TRACE_GAME("[h2mod-infection] Resetting weapons interactions and emblem visibility");
 	h2mod->DisableWeaponPickup(true);
-	h2mod->IndicatorVisibility(true);
+	h2mod->TeamPlayerIndicatorVisibility(true);
 }
 
 void Infection::preSpawnServerSetup() {
-	int playerCounter = 0;
+	int playerIndex = 0;
 	do {
-		std::wstring playerName = players->getPlayerName(playerCounter);
-		BOOL isZombie = std::find(Infection::zombieNames.begin(), Infection::zombieNames.end(), playerName) != Infection::zombieNames.end();
-		LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={0}, isZombie={1}, playerName={2}", playerCounter, isZombie, playerName);
-		if (isZombie) {
-			h2mod->set_unit_biped(BipedType::Elite, playerCounter);
-		} else {
-			h2mod->set_unit_biped(BipedType::MasterChiefMp, playerCounter);
+		if (IsActive(playerIndex)) {
+			std::wstring playerName = getPlayerName(playerIndex);
+			BOOL isZombie = std::find(Infection::zombieNames.begin(), Infection::zombieNames.end(), playerName) != Infection::zombieNames.end();
+
+			LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={0}, isZombie={1}, playerName={2}", playerIndex, isZombie, playerName);
+			if (isZombie) {
+				h2mod->set_unit_biped(Player::Biped::Elite, playerIndex);
+				if (localPeerIsSessionHost() 
+					&& getPlayerTeamFromPlayerIndex(playerIndex) != ZOMBIE_TEAM) // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
+					CustomPackets::sendTeamChange(getCurrentNetworkSession(), getPeerIndexFromPlayerIndex(playerIndex), ZOMBIE_TEAM);
+			}
+			else {
+				h2mod->set_unit_biped(Player::Biped::Spartan, playerIndex);
+			}
 		}
-		playerCounter++;
-	} while (playerCounter < players->getPlayerCount());
+		playerIndex++;
+	} while (playerIndex < 16);
 }
 
 void Infection::setPlayerAsHuman(int index) {
-	h2mod->set_unit_biped(BipedType::MasterChiefMp, index);
+	h2mod->set_unit_biped(Player::Biped::Spartan, index);
 	h2mod->set_unit_speed(1.0f, index);
 
-	GivePlayerWeapon(index, Weapon::shotgun, 1);
-	GivePlayerWeapon(index, Weapon::magnum, 0);
+	call_give_player_weapon(index, Weapon::shotgun, 1);
+	call_give_player_weapon(index, Weapon::magnum, 0);
 }
 
 void Infection::setPlayerAsZombie(int index) {
-	h2mod->set_unit_biped(BipedType::Elite, index);
+	h2mod->set_unit_biped(Player::Biped::Elite, index);
 	h2mod->set_unit_speed(1.1f, index);
 
-	GivePlayerWeapon(index, Weapon::energy_blade, 1);
+	call_give_player_weapon(index, Weapon::energy_blade, 1);
 }
 
-void Infection::spawnPlayerClientSetup(int index) {
-	wchar_t* playername = h2mod->get_player_name_from_index(index);
+void Infection::spawnPlayerClientSetup(int playerIndex) {
+	wchar_t* playername = h2mod->get_player_name_from_player_index(playerIndex);
 	//If player being spawned is LocalUser/Player
 	if (wcscmp(playername, h2mod->get_local_player_name()) == 0) {
-
 		if (firstSpawn == true) {
 			//start of zombie match
 			Infection::triggerSound(INFECTION_SOUND, 1000);
@@ -171,27 +192,27 @@ void Infection::spawnPlayerClientSetup(int index) {
 
 		if (h2mod->get_local_team_index() == HUMAN_TEAM) {
 			h2mod->DisableWeaponPickup(true);
-			h2mod->IndicatorVisibility(false);
+			h2mod->TeamPlayerIndicatorVisibility(false);
 		}
 		else if (h2mod->get_local_team_index() == ZOMBIE_TEAM) {
-			h2mod->set_unit_biped(BipedType::Elite, index);
+			h2mod->set_unit_biped(Player::Biped::Elite, playerIndex);
 
 			h2mod->DisableWeaponPickup(false);
-			h2mod->IndicatorVisibility(true);
+			h2mod->TeamPlayerIndicatorVisibility(true);
 		}
 	}
 }
 
 void Infection::spawnServerPlayerSetup(int index) {
 	LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}", index);
-	int unit_datum_index = h2mod->get_unit_datum_from_player_index(index);
+	DatumIndex unit_datum_index = h2mod->get_unit_datum_from_player_index(index);
 	int unit_object = call_get_object(unit_datum_index, 3);
 
 	if (unit_object && *(BYTE*)(unit_object + 0xAA) == 0) {
 		//if the unit_object is not 0, the spawned object is "alive"
 
 		LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={0}, unit team index={1}", index, h2mod->get_unit_team_index(unit_datum_index));
-		if (h2mod->get_unit_team_index(unit_datum_index) == HUMAN_TEAM)	{
+		if (h2mod->get_unit_team_index(unit_datum_index) == HUMAN_TEAM) {
 			Infection::setPlayerAsHuman(index);
 		}
 
@@ -201,13 +222,13 @@ void Infection::spawnServerPlayerSetup(int index) {
 	}
 }
 
-void Infection::infectPlayer(int unitDatumIndex, int playerIndex) {
+void Infection::infectPlayer(DatumIndex unitDatumIndex, int playerIndex) {
 	int unit_object = call_get_object(unitDatumIndex, 3);
 	if (unit_object && h2mod->get_unit_team_index(unitDatumIndex) != ZOMBIE_TEAM
 		&& *(BYTE*)(unit_object + 0xAA) == 0) //check if object type is biped
 	{
 		//if we have a valid object and the object is not on the zombie team
-		wchar_t* playername = h2mod->get_player_name_from_index(h2mod->get_player_index_from_unit_datum(unitDatumIndex));
+		wchar_t* playername = h2mod->get_player_name_from_player_index(h2mod->get_player_index_from_unit_datum(unitDatumIndex));
 
 		LOG_TRACE_GAME(L"[h2mod-infection] Infected player, localName={0}, nameFromUnitDatumIndex={1}", h2mod->get_local_player_name(), playername);
 
@@ -215,7 +236,7 @@ void Infection::infectPlayer(int unitDatumIndex, int playerIndex) {
 		if (wcscmp(playername, h2mod->get_local_player_name()) == 0) {
 			LOG_TRACE_GAME("[h2mod-infection] Setting player as zombie");
 			h2mod->set_local_team_index(0, ZOMBIE_TEAM);
-			h2mod->set_unit_biped(BipedType::Elite, playerIndex);
+			h2mod->set_unit_biped(Player::Biped::Elite, playerIndex);
 		}
 		else {
 			//if not, then this is a new zombie
@@ -224,7 +245,7 @@ void Infection::infectPlayer(int unitDatumIndex, int playerIndex) {
 	}
 }
 
-void Infection::infectPlayers(int unitDatumIndex, int playerIndex) {
+void Infection::infectPlayers(DatumIndex unitDatumIndex, int playerIndex) {
 	int unit_object = call_get_object(unitDatumIndex, 3);
 	if (unit_object && *(BYTE*)(unit_object + 0xAA) == 0) {
 		Infection::setZombiePlayerStatus(playerIndex);
@@ -241,6 +262,7 @@ void ZombieDeathHandler::onPeerHost()
 	int PlayerIndex = h2mod->get_player_index_from_unit_datum(this->getUnitDatumIndex());
 	//infect peer host
 	Infection::infectPlayer(this->getUnitDatumIndex(), PlayerIndex);
+
 	//infect other players if applicable
 	Infection::infectPlayers(this->getUnitDatumIndex(), PlayerIndex);
 }
@@ -248,15 +270,15 @@ void ZombieDeathHandler::onPeerHost()
 void ZombieDeathHandler::onDedi()
 {
 	//infect other players if applicable
-	Infection::infectPlayers(this->getUnitDatumIndex(), this->getPlayerIndex());
+	Infection::infectPlayers(this->getUnitDatumIndex(), h2mod->get_player_index_from_unit_datum(this->getUnitDatumIndex()));
 }
 
 void ZombieDeathHandler::onClient()
 {
-	LOG_TRACE_GAME("ZombieDeathhandler::OnClient() getUnitDatumIndex: {:x}", this->getUnitDatumIndex());
+	LOG_TRACE_GAME("ZombieDeathhandler::OnClient() getUnitDatumIndex: {:x}", this->getUnitDatumIndex().ToInt());
 
 	//infect client
-	Infection::infectPlayer(this->getUnitDatumIndex(), this->getPlayerIndex());
+	Infection::infectPlayer(this->getUnitDatumIndex(), h2mod->get_player_index_from_unit_datum(this->getUnitDatumIndex()));
 }
 
 void ZombiePreSpawnHandler::onPeerHost()
@@ -272,7 +294,7 @@ void ZombiePreSpawnHandler::onDedi()
 
 void ZombiePreSpawnHandler::onClient()
 {
-	wchar_t* playername = h2mod->get_player_name_from_index(this->getPlayerIndex());
+	wchar_t* playername = h2mod->get_player_name_from_player_index(this->getPlayerIndex());
 	LOG_TRACE_GAME(L"[h2mod-infection] Client pre spawn, playerIndex={0}, playerNameFromIndex={1}, localPlayerName={2}", this->getPlayerIndex(), playername, h2mod->get_local_player_name());
 	//If player being spawned is LocalUser/Player
 	if (wcscmp(playername, h2mod->get_local_player_name()) == 0)
@@ -281,8 +303,8 @@ void ZombiePreSpawnHandler::onClient()
 		//Change biped if LocalUser is in GreenTeam
 		if (h2mod->get_local_team_index() == ZOMBIE_TEAM)
 		{
-			LOG_TRACE_GAME("[h2mod-infection] Client is infected! switching bipeds: {}\r\n",this->getPlayerIndex());
-			h2mod->set_unit_biped(BipedType::Elite, this->getPlayerIndex());
+			LOG_TRACE_GAME("[h2mod-infection] Client is infected! switching bipeds: {}\r\n", this->getPlayerIndex());
+			h2mod->set_unit_biped(Player::Biped::Elite, this->getPlayerIndex());
 		}
 	}
 }
@@ -328,10 +350,9 @@ void InfectionInitializer::onPeerHost()
 	LOG_TRACE_GAME("[h2mod-infection] Peer host init");
 	Infection::initClient();
 	Infection::initHost();
-	zombieIndex = -1;
-	zombieIndex = Infection::calculateZombiePlayerIndex();
-	LOG_TRACE_GAME("[h2mod-infection] Peer host calculated zombie index {}", zombieIndex);
-	if (zombieIndex == -1) {
+	zombiePlayerIndex = Infection::calculateZombiePlayerIndex();
+	LOG_TRACE_GAME("[h2mod-infection] Peer host calculated zombie index {}", zombiePlayerIndex);
+	if (zombiePlayerIndex == -1) {
 		LOG_TRACE_GAME("[h2mod-infection] Failed selecting a zombie!");
 	}
 	else {
@@ -340,7 +361,7 @@ void InfectionInitializer::onPeerHost()
 		Infection::sendTeamChange();
 
 		//mark this player as the zombie in the internal players structure
-		Infection::setZombiePlayerStatus(zombieIndex);
+		Infection::setZombiePlayerStatus(zombiePlayerIndex);
 	}
 }
 
@@ -349,9 +370,9 @@ void InfectionInitializer::onDedi()
 	LOG_TRACE_GAME("[h2mod-infection] Dedicated server init");
 	Infection::initHost();
 	//figure out who the zombie is
-	zombieIndex = Infection::calculateZombiePlayerIndex();
-	LOG_TRACE_GAME("[h2mod-infection] Dedicated host calculated zombie index {}", zombieIndex);
-	if (zombieIndex == -1) {
+	zombiePlayerIndex = Infection::calculateZombiePlayerIndex();
+	LOG_TRACE_GAME("[h2mod-infection] Dedicated host calculated zombie index {}", zombiePlayerIndex);
+	if (zombiePlayerIndex == -1) {
 		LOG_TRACE_GAME("[h2mod-infection] Failed selecting a zombie!");
 	}
 	else {
@@ -360,7 +381,7 @@ void InfectionInitializer::onDedi()
 		Infection::sendTeamChange();
 
 		//mark this player as the zombie in the internal players structure
-		Infection::setZombiePlayerStatus(zombieIndex);
+		Infection::setZombiePlayerStatus(zombiePlayerIndex);
 	}
 }
 
@@ -387,7 +408,7 @@ void ZombieHandler::setPlayerIndex(int playerIndex)
 	this->playerIndex = playerIndex;
 }
 
-void ZombieHandler::setUnitDatumIndex(int unitDatumIndex)
+void ZombieHandler::setUnitDatumIndex(DatumIndex unitDatumIndex)
 {
 	this->unitDatumIndex = unitDatumIndex;
 }
@@ -397,7 +418,7 @@ int ZombieHandler::getPlayerIndex()
 	return this->playerIndex;
 }
 
-int ZombieHandler::getUnitDatumIndex()
+DatumIndex ZombieHandler::getUnitDatumIndex()
 {
 	return this->unitDatumIndex;
 }

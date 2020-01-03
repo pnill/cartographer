@@ -1,4 +1,6 @@
-#include "stdafx.h"
+
+#if COMPILE_WITH_VOICE
+
 #include "AudioHandler.h"
 
 h2log* CAudioHandler::logger = nullptr;
@@ -35,3 +37,4 @@ CAudioHandler::~CAudioHandler()
 	if (err != PaErrorCode::paNoError)
 		LOG_TRACE(logger, "Pa_Terminate failed, error code: {}", err);
 }
+#endif

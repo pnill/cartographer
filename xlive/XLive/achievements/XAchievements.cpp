@@ -2,11 +2,6 @@
 #include "XAchievements.h"
 
 #include "Globals.h"
-#include "resource.h"
-#include "XLive\xbox\xbox.h"
-#include "XLive\XAM\xam.h"
-#include "H2MOD\Modules\Achievements\Achievements.h"
-#include <string>
 
 int achieveinit = 0;
 
@@ -209,7 +204,7 @@ DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement
 
 				h2mod->AchievementMap[AchievementData.c_str()] = false;
 
-				std::thread(AchievementUnlock, AchievementID).detach();
+				std::thread(AchievementUnlock, xFakeXuid[0], AchievementID).detach();
 			}
 			else {
 				LOG_TRACE_GAME("Achievement {} was already unlocked", AchievementID);

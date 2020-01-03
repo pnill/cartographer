@@ -62,7 +62,7 @@ enum e_network_message_types
 	end
 };
 
-static const char* packet_type_strings[] = {
+static const char* network_message_name[] = {
 	"ping",
 	"pong",
 	"broadcast_search",
@@ -139,8 +139,24 @@ struct s_unit_grenades
 {
 	int type;
 	int count;
-	int pindex;
+	int player_index;
 };
+
+#pragma pack(push, 1)
+struct s_text_chat
+{
+	XNKID session_id;
+	unsigned int routed_players_mask;
+	unsigned int metadata;
+	bool source_is_server;
+	XUID source_player_id;
+	XUID destination_players_ids[16];
+	BYTE gap_99[3];
+	int destination_player_count;
+	wchar_t text[122];
+};
+#pragma pack(pop)
+
 
 void register_packet_impl(void *, int, char*, int, int, int, void*, void*, void*);
 namespace CustomPackets

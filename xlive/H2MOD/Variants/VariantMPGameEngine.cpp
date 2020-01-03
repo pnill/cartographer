@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "VariantMPGameEngine.h"
 #include "H2MOD\Modules\Startup\Startup.h"
-#include <unordered_map>
-
-using namespace Blam::Enums::Player;
 
 // should really move this function into some header
 // helper function for getting a pointer to some game data

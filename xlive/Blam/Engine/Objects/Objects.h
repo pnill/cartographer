@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "stdafx.h"
 #include "..\Blam\Shared\SharedDefinitions.h"
 #include "..\Blam\Enums\Enums.h"
@@ -11,10 +11,11 @@ namespace Blam
 		namespace Objects
 		{
 
-			//size : unknown
-			struct ObjectEntityDefinition//To Do
+			//size : depends on the object, there are object definitions for bipeds, projectiles etc...
+			// for example, the size of the biped object definition is 1152 bytes and for the projectiles is 428 bytes
+			struct BipedObjectDefinition//To Do
 			{
-				DatumIndex DefinitionIndex;//0
+				DatumIndex TagDefinitionIndex;//0
 				DWORD ObjectFlags;//4
 				DWORD unk_0;//8
 				DatumIndex NextIndex;//0xC
@@ -80,20 +81,6 @@ namespace Blam
 				DatumIndex SecondaryWeapon; // 0x230
 				DatumIndex DualWieldWeapon; // 0x234
 				BYTE pad[0x18]; //  0x238 
-
-				/* Wtf was trying to be done here?? */
-				//Blam::SharedDefinitions::c_object_index Blam::Enums::Objects::Unit::UnitWeapons::PrimaryWeapon;//0x22C 
-				//Blam::SharedDefinitions::c_object_index Blam::Enums::Objects::Unit::UnitWeapons::SecondaryWeapon;//0x230
-				//Blam::SharedDefinitions::c_object_index Blam::Enums::Objects::Unit::UnitWeapons::DualWeildWeapon;//0x234
-				//Blam::Enums::Objects::Unit::Grenades CurrentGrenadesIndex;//0x250
-				//Blam::Enums::Objects::Unit::Grenades CurrentGrenadesIndex2;//0x251
-				//Blam::Enums::Objects::Unit::Grenades Blam::Enums::Objects::Unit::Grenades::Fragmentation;//0x252
-				//Blam::Enums::Objects::Unit::Grenades Blam::Enums::Objects::Unit::Grenades::Plasma;//0x253
-				/*
-				if (type == GrenadeType::Frag)
-					*(BYTE*)((BYTE*)unit_object + 0x252) = count;
-				if (type == GrenadeType::Plasma)
-					*(BYTE*)((BYTE*)unit_object + 0x253) = count;*/
 				
 				BYTE CurrentGrenadesIndex; //0x250
 				BYTE CurrentGrenadesIndex2; //0x251
@@ -105,40 +92,26 @@ namespace Blam
 				FLOAT ActiveCamoFlageDepletionPower;//0x2CC
 
 				Blam::Enums::Objects::Unit::UnitState UnitState;//0x3F4
-		
-				
+				BYTE unk_18[0x21C];
 			};
+			static_assert(sizeof(BipedObjectDefinition) == 0x480, "Invalid BipedObjectDefinition size");
 
-			struct GameStateObjectHeader {
+			struct WeaponObjectDefinition
+			{
+				DatumIndex TagDefinitionIndex;//0
+				char unk[0x258];
+			};
+			static_assert(sizeof(WeaponObjectDefinition) == 0x25C, "Invalid WeaponObjectDefinition size");
+
+			struct ObjectHeader {
 				__int16 datum_salt; //0x00
 				BYTE flags; // 0x02
 				Blam::Enums::Objects::ObjectType type; // 0x03
 				__int16 unk__;  // 0x04
 				__int16 unk_size;  //0x06
-				ObjectEntityDefinition* object; //0x08 - 
+				char* object; //0x08 - 
 			};
-			static_assert(sizeof(GameStateObjectHeader) == 0xC, "Invalid GameStateObjectHeader size");
-
-			struct GameStateObjectHeaderTable {
-				char tag_string[0x20];
-				int max_count;
-				int datum_size;
-				BYTE alignment_bit;
-				bool is_valid;
-				WORD flags;
-				char data_signature[4];
-				void **allocator;
-				struct {
-					int next_index;
-					int length;
-				}active_indices;
-				int actual_count;
-				DatumIndex next_datum;
-				GameStateObjectHeader* object_header;
-
-			};
-
-	
+			static_assert(sizeof(ObjectHeader) == 0xC, "Invalid GameStateObjectHeader size");
 		}
 	}
 }

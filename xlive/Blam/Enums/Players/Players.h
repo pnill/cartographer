@@ -1,94 +1,32 @@
 #pragma once
-#include "..\stdafx.h"
+#include "stdafx.h"
+
 namespace Blam
 {
 	namespace Enums
 	{
 		namespace Player
 		{
-			enum class PrimaryArmorColor : BYTE
+			enum class Color : BYTE // TODO: move this somewhere else
 			{
-				White = 0,
-				Steel = 1,
-				Red = 2,
-				Orange = 3,
-				Gold = 4,
-				Olive = 5,
-				Green = 6,
-				Sage = 7,
-				Cyan = 8,
-				Teal = 9,
-				Colbat = 10,
-				Blue = 11,
-				Violet = 12,
-				Purple = 13,
-				Pink = 14,
-				Crimson = 15,
-				Brown = 16,
-				Tan = 17
-			};
-			enum class SecondaryArmorColor : BYTE
-			{
-				White = 0,
-				Steel = 1,
-				Red = 2,
-				Orange = 3,
-				Gold = 4,
-				Olive = 5,
-				Green = 6,
-				Sage = 7,
-				Cyan = 8,
-				Teal = 9,
-				Colbat = 10,
-				Blue = 11,
-				Violet = 12,
-				Purple = 13,
-				Pink = 14,
-				Crimson = 15,
-				Brown = 16,
-				Tan = 17
-			};
-			enum class PrimaryEmblemColor : BYTE
-			{
-				White = 0,
-				Steel = 1,
-				Red = 2,
-				Orange = 3,
-				Gold = 4,
-				Olive = 5,
-				Green = 6,
-				Sage = 7,
-				Cyan = 8,
-				Teal = 9,
-				Colbat = 10,
-				Blue = 11,
-				Violet = 12,
-				Purple = 13,
-				Pink = 14,
-				Crimson = 15,
-				Brown = 16,
-				Tan = 17
-			};
-			enum class SecondaryEmblemColor : BYTE
-			{
-				White = 0,
-				Steel = 1,
-				Red = 2,
-				Orange = 3,
-				Gold = 4,
-				Olive = 5,
-				Green = 6,
-				Sage = 7,
-				Cyan = 8,
-				Teal = 9,
-				Colbat = 10,
-				Blue = 11,
-				Violet = 12,
-				Purple = 13,
-				Pink = 14,
-				Crimson = 15,
-				Brown = 16,
-				Tan = 17
+				White,
+				Steel,
+				Red,
+				Orange,
+				Gold,
+				Olive,
+				Green,
+				Sage,
+				Cyan,
+				Teal,
+				Colbat,
+				Blue,
+				Violet,
+				Purple,
+				Pink,
+				Crimson,
+				Brown,
+				Tan
 			};
 			enum class Biped : BYTE
 			{

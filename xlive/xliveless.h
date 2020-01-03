@@ -159,7 +159,7 @@ inline void verify_output_log(const char *expression, const char *func_name, con
 		else {
 			LOG_ERROR_GAME("Converting error {} to string failed!", last_error);
 		}
-		SetLastError(0);
+		SetLastError(ERROR_SUCCESS);
 	}
 }
 

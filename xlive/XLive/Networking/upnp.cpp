@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "XLive\Networking\upnp.h"
 #include <miniupnpc/upnpcommands.h>
-#include "Globals.h"
 
 /* Ripped from ED thanks guys - PermaNull*/
 ModuleUPnP::ModuleUPnP()

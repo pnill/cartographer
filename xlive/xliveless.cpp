@@ -4,7 +4,6 @@
 #include "Globals.h"
 #include "XLive\XAM\xam.h"
 #include "XLive\xbox\xbox.h"
-#include "XLive\UserManagement\CUser.h"
 #include "XLive\Networking\ServerList.h"
 #include "XLive\achievements\XAchievements.h"
 
@@ -186,9 +185,9 @@ BOOL SetDlcBasepath( int num )
 
 
 					// check file exists
-					FILE *fp_dlc;
-					fp_dlc = _wfopen( wnum.c_str(), L"rb" );
-					if( !fp_dlc )
+					FILE *fp_dlc = nullptr;
+					errno_t err = _wfopen_s(&fp_dlc, wnum.c_str(), L"rb");
+					if( err )
 						continue;
 
 
@@ -752,9 +751,9 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		marketplaceEnumerate += marketplaceCount;
 	}
 
-	if (hEnum == ServerEnum)
+	if (hEnum == ServerEnumHandle )
 	{
-		LiveManager.GetServers(pOverlapped, cbBuffer, pvBuffer);
+		LiveManager.GetServers(cbBuffer, pvBuffer, pOverlapped);
 		return ERROR_IO_PENDING;
 	}
 
@@ -972,9 +971,8 @@ DWORD WINAPI XStorageUploadFromMemory( DWORD dwUserIndex, const WCHAR *wszServer
 
 
 	FILE *fp;
-
-	fp = _wfopen( wszServerPath, L"wb" );
-	if( fp )
+	errno_t err = _wfopen_s(&fp, wszServerPath, L"wb" );
+	if( !err )
 	{
 		fwrite( pbBuffer, 1, dwBufferSize, fp );
 		fclose( fp );
@@ -1442,7 +1440,7 @@ DWORD WINAPI XStorageBuildServerPath( DWORD dwUserIndex, XSTORAGE_FACILITY Stora
 	{
 		//Local_Storage_W( 0, strw );
 
-		ZeroMemory(strw, sizeof(strw));
+		SecureZeroMemory(strw, sizeof(strw));
 		wcscat( strw, L"\\Online\\" );
 		//CreateDirectory( strw, NULL );
 
@@ -1471,7 +1469,7 @@ DWORD WINAPI XStorageDownloadToMemory( DWORD dwUserIndex, const WCHAR *wszServer
 
 
 	FILE *fp;
-	fp = _wfopen( wszServerPath, L"rb" );
+	_wfopen_s(&fp, wszServerPath, L"rb" );
 	if( !fp )
 	{
 		LOG_TRACE_XLIVE( "- ERROR: file does not exist" );

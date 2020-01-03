@@ -1,8 +1,10 @@
-#include"global_tags_interface.h"
+#include "global_tags_interface.h"
+
 #include "..\H2MOD.h"
-#include"..\Blam\Cache\Tags\tag_definitons.h"
-#include"..\Blam\Enums\Tags\TagGroups.h"
-#include"TagInterface.h"
+#include "..\Blam\Cache\Tags\tag_definitons.h"
+#include "..\Blam\Enums\Tags\TagGroups.h"
+#include "TagInterface.h"
+#include "..\Util\Hooks\Hook.h"
 
 void _cdecl ResetMapData();
 
@@ -85,7 +87,7 @@ namespace TagInterface
 	}
 	void global_tags_interface::Init()
 	{
-		PatchCall(h2mod->GetBase() + 0x27683, (DWORD)ResetMapData);
+		PatchCall(h2mod->GetAddress(0x27683), (DWORD)ResetMapData);
 	}	
 }
 void _cdecl ResetMapData()
@@ -94,7 +96,7 @@ void _cdecl ResetMapData()
 	TagInterface::GlobalTagInterface.Release();
 
 	//and then call unloading procedure
-	typedef void(_cdecl *ResetMapData)();
-	auto pResetMapData = (ResetMapData)((char*)h2mod->GetBase() + 0x30CD4);
+	typedef void(_cdecl ResetMapData)();
+	auto pResetMapData = h2mod->GetAddress<ResetMapData*>(0x30CD4);
 	pResetMapData();
 }

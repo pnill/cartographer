@@ -2,10 +2,8 @@
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "Util\Hooks\Hook.h"
-#include <stdio.h>
-#include <windows.h>
-#include <Wincrypt.h>
 #include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 #include "libcurl/curl/curl.h"
 
@@ -181,7 +179,7 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* 
 void GetVKeyCodeString(int vkey, char* rtnString, int strLen) {
 	snprintf(rtnString, 5, "0x%x", vkey);
 	char key_name[20];
-	memset(key_name, 0, sizeof(key_name));
+	SecureZeroMemory(key_name, sizeof(key_name));
 	if (vkey >= 0x70 && vkey <= 0x87) {
 		int func_num = vkey - 0x70 + 1;
 		snprintf(key_name, 20, "VK_F%d", func_num);
@@ -198,7 +196,7 @@ void PadCStringWithChar(char* strToPad, int toFullLength, char c) {
 	for (int i = strlen(strToPad); i < toFullLength - 1; i++) {
 		memset(strToPad + i, c, sizeof(char));
 	}
-	memset(strToPad + toFullLength - 1, 0, sizeof(char));
+	SecureZeroMemory(strToPad + toFullLength - 1, sizeof(char));
 }
 
 int GetWidePathFromFullWideFilename(wchar_t* filepath, wchar_t* rtnpath) {
@@ -229,35 +227,32 @@ LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
 }
 
 void pushHostLobby() {
-	extern bool H2IsDediServer;
-	extern bool H2DediIsLiveMode;
-	extern DWORD H2BaseAddr;
-	if (H2IsDediServer && H2DediIsLiveMode)
-		return;
+	typedef bool(__cdecl* should_send_broadcast_reply)(void* session);
+	auto p_should_send_broadcast_reply = reinterpret_cast<should_send_broadcast_reply>(h2mod->GetAddress(0x1ADA7B, 0x1A69DB));
 
-	if (!H2IsDediServer && *(BYTE*)(*(DWORD*)(H2BaseAddr + 0x420FE8) + 0x1C) == 2)
-		return;
+	if (p_should_send_broadcast_reply(NULL))
+	{
+		char msg[100] = { 0x00, 0x43, 0x05 };
+		sprintf(&msg[3], "push clientlobby %d", H2Config_base_port + 1);
 
-	char msg[100] = { 0x00, 0x43, 0x05 };
-	sprintf(msg + 3, "push clientlobby %d", H2Config_base_port + 1);
+		addDebugText("Pushing open lobby.");
 
-	addDebugText("Pushing open lobby.");
+		SOCKET socketDescriptor;
+		struct sockaddr_in serverAddress;
+		if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET) {
+			addDebugText("ERROR: Could not create socket.");
+		}
+		serverAddress.sin_family = AF_INET;
+		serverAddress.sin_addr.s_addr = H2Config_master_ip;
+		serverAddress.sin_port = htons(H2Config_master_port_relay);
 
-	SOCKET socketDescriptor;
-	struct sockaddr_in serverAddress;
-	if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET) {
-		addDebugText("ERROR: Could not create socket.");
+		if (sendto(socketDescriptor, msg, strlen(&msg[3]) + 3, 0, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) <= 0) {
+			//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)
+			addDebugText("ERROR: Failed to push open lobby.");
+		}
+
+		closesocket(socketDescriptor);
 	}
-	serverAddress.sin_family = AF_INET;
-	serverAddress.sin_addr.s_addr = H2Config_master_ip;
-	serverAddress.sin_port = htons(H2Config_master_port_relay);
-
-	if (sendto(socketDescriptor, msg, strlen(msg + 3) + 3, 0, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) <= 0) {
-		//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)
-		addDebugText("ERROR: Failed to push open lobby.");
-	}
-
-	closesocket(socketDescriptor);
 }
 
 char* custom_label_literal(char* label_escaped) {
@@ -324,7 +319,7 @@ char* custom_label_escape(char* label_literal) {
 	return label_escaped;
 }
 
-bool FloatIsNaN(float &vagueFloat) {
+bool FloatIsNaN(float vagueFloat) {
 	DWORD* vague = (DWORD*)&vagueFloat;
 	if ((*vague >= 0x7F800000 && *vague <= 0x7FFFFFFF) || (*vague >= 0xFF800000 && *vague <= 0xFFFFFFFF)) {
 		return true;

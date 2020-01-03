@@ -49,13 +49,19 @@
 //#include <Objbase.h>
 //#include <Shlwapi.h>
 #include <set>
+#include <map>
 #include <mutex>
 #include <queue>
+#include <tuple>
 #include <string>
 #include <vector>
+#include <random>
+#include <numeric>
 #include <sstream>
 #include <algorithm>
 #include <unordered_map>
+#include <unordered_set>
+
 
 #include <d3d9.h>
 #include <d3dx9.h>
@@ -63,5 +69,9 @@
 #include "Util/log.h"
 #include "xliveless.h"
 #include "xlivedefs.h"
+
+extern std::random_device rd;
+
+#define COMPILE_WITH_VOICE 0
 
 #undef small

@@ -23,43 +23,43 @@ int8_t __OFSUB__(int x, int y)
 }
 
 data_decode_string bitstream::p_data_decode_string() {
-	return (data_decode_string)(h2mod->GetAddress(0xD1FA7, 0xCE561));
+	return h2mod->GetAddress<data_decode_string>(0xD1FA7, 0xCE561);
 }
 
 data_decode_address bitstream::p_data_decode_address() {
-	return (data_decode_address)(h2mod->GetAddress(0xD1FFD, 0xCE5B7));
+	return reinterpret_cast<data_decode_address>(h2mod->GetAddress(0xD1FFD, 0xCE5B7));
 }
 
 data_decode_bits bitstream::p_data_decode_bits() {
-	return (data_decode_bits)(h2mod->GetAddress(0xD1F95, 0xCE54F));
+	return h2mod->GetAddress<data_decode_bits>(0xD1F95, 0xCE54F);
 }
 
 data_decode_integer bitstream::p_data_decode_integer() {
-	return (data_decode_integer)(h2mod->GetAddress(0xD1EE5, 0xCE49F));
+	return h2mod->GetAddress<data_decode_integer>(0xD1EE5, 0xCE49F);
 }
 
 data_decode_bool bitstream::p_data_decode_bool() {
-	return (data_decode_bool)(h2mod->GetAddress(0xD1F47, 0xCE501));
+	return h2mod->GetAddress< data_decode_bool>(0xD1F47, 0xCE501);
 }
 
 data_encode_integer bitstream::p_data_encode_integer() {
-	return (data_encode_integer)(h2mod->GetAddress(0xD17C6, 0xCDD80));
+	return h2mod->GetAddress<data_encode_integer>(0xD17C6, 0xCDD80);
 }
 
 data_encode_string bitstream::p_data_encode_string() {
-	return (data_encode_string)(h2mod->GetAddress(0xD18DF, 0xCDE99));
+	return h2mod->GetAddress<data_encode_string>(0xD18DF, 0xCDE99);
 }
 
 data_encode_bits bitstream::p_data_encode_bits() {
-	return (data_encode_bits)(h2mod->GetAddress(0xD18CD, 0xCDE87));
+	return h2mod->GetAddress<data_encode_bits>(0xD18CD, 0xCDE87);
 }
 
 data_encode_boolean bitstream::p_data_encode_bool() {
-	return (data_encode_boolean)(h2mod->GetAddress(0xD1886, 0xCDE40));
+	return h2mod->GetAddress<data_encode_boolean>(0xD1886, 0xCDE40);
 }
 
 valid_packet_type bitstream::p_packet_is_valid() {
-	return (valid_packet_type)(h2mod->GetBase() + (h2mod->Server ? 0xCD706 : 0xD114C));
+	return h2mod->GetAddress<valid_packet_type>(0xD114C, 0xCD706);
 }
 
 
