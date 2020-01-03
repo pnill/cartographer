@@ -241,7 +241,8 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 
 	if (result == SOCKET_ERROR)
 	{
-		LOG_TRACE_NETWORK("XSocketRecvFrom() - Socket Error: {:x}", WSAGetLastError());
+		if (WSAGetLastError() != WSAEWOULDBLOCK)
+			LOG_TRACE_NETWORK("XSocketRecvFrom() - Socket Error: {:x}", WSAGetLastError());
 		return SOCKET_ERROR;
 	}
 	else if (bytesReceived > 0)
