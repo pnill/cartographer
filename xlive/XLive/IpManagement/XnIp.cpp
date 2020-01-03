@@ -79,9 +79,6 @@ void CXnIp::SaveNatInfo(IN_ADDR ipIdentifier)
 		/* This happens when joining a server, it's a fix to dynamic ports... */
 		/* It sets up the host NAT data */
 
-		sockaddr_in newAddr;
-		newAddr.sin_family = AF_INET;
-
 		// TODO: dinamically handle these
 		xnIp->NatAddrSocket1000.sin_family = AF_INET;
 		xnIp->NatAddrSocket1000.sin_addr = xnIp->xnaddr.ina;

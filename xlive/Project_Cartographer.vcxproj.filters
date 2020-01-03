@@ -277,6 +277,9 @@
     <Filter Include="Source Files\H2MOD\Modules\DataArray">
       <UniqueIdentifier>{009ec295-3920-4f2e-91ab-5c4dc867750a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\XLive\Cryptography">
+      <UniqueIdentifier>{72853862-ec1c-4ea0-9c17-88b523b85492}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -537,8 +540,11 @@
     <ClCompile Include="XLive\IpManagement\XnIp.cpp">
       <Filter>Source Files\XLive\User Management</Filter>
     </ClCompile>
+    <ClCompile Include="XLive\Cryptography\Rc4.cpp">
+      <Filter>Source Files\XLive\Cryptography</Filter>
+    </ClCompile>
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\H2MOD\Modules\MapManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1220,8 +1226,11 @@
     <ClInclude Include="XLive\IpManagement\XnIp.h">
       <Filter>Source Files\XLive\User Management</Filter>
     </ClInclude>
+    <ClInclude Include="XLive\Cryptography\Rc4.h">
+      <Filter>Source Files\XLive\Cryptography</Filter>
+    </ClInclude>
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\H2MOD\Modules\MapManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

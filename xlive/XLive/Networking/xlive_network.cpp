@@ -1,5 +1,6 @@
-#include "stdafx.h"
 #include "Globals.h"
+
+#include "..\Cryptography\Rc4.h"
 #include "XLive\Networking\upnp.h"
 #include "XLive\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -8,6 +9,8 @@
 int MasterState = 0;
 SOCKET game_network_data_gateway_socket_1000 = INVALID_SOCKET; // used for game data
 SOCKET game_network_message_gateway_socket_1001 = INVALID_SOCKET; // used for messaging like connection requests
+
+XECRYPT_RC4_STATE Rc4StateRand;
 
 void ForwardPorts()
 {
@@ -119,14 +122,19 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 // #53: XNetRandom
 INT WINAPI XNetRandom(BYTE * pb, UINT cb)
 {
-	std::mt19937 mt_rand(rd());
-	std::uniform_int_distribution<int> dist(0, 255);
+	static bool Rc4CryptInitialized = false;
 
-	if (cb)
-		for (DWORD i = 0; i < cb; i++)
-			pb[i] = static_cast<BYTE>(dist(mt_rand));
+	LARGE_INTEGER key;
 
-	return 0;
+	if (Rc4CryptInitialized == false)
+	{
+		QueryPerformanceCounter(&key);
+		XeCryptRc4Key(&Rc4StateRand, (BYTE*)&key, sizeof(LARGE_INTEGER));
+		Rc4CryptInitialized = true;
+	}
+
+	XeCryptRc4Ecb(&Rc4StateRand, pb, cb);
+	return ERROR_SUCCESS;
 }
 
 // #24: XSocketSendTo
