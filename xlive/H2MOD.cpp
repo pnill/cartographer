@@ -910,7 +910,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	{
 		//if anyone wants to run code on map load single player
 		addDebugText("Map type: Singleplayer");
-		H2X::Initialize(true);
+		//H2X::Initialize(true);
 		H2Tweaks::applyMeleePatch(true);
 
 		H2Tweaks::enable60FPSCutscenes();
