@@ -400,14 +400,28 @@ int WINAPI XNetUnregisterInAddr(const IN_ADDR ina)
 int WINAPI XNetConnect(const IN_ADDR ina)
 {
 	LOG_INFO_NETWORK("XNetConnect(): connection index {}, identifier: {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
-	return ERROR_SUCCESS;
+
+	XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(ina)];
+	if (xnIp->bValid
+		&& xnIp->connectionIdentifier.s_addr == ina.s_addr)
+	{
+		return ERROR_SUCCESS;
+	}
+
+	return WSAEINVAL;
 }
 
 // #66: XNetGetConnectStatus
 int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 {
 	//LOG_INFO_NETWORK("XNetConnect(): connection index {}, identifier: {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
-	return XNET_CONNECT_STATUS_CONNECTED;
+	XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(ina)];
+	if (xnIp->bValid
+		&& xnIp->connectionIdentifier.s_addr == ina.s_addr)
+	{
+		return XNET_CONNECT_STATUS_CONNECTED;
+	}
+	return XNET_CONNECT_STATUS_LOST;
 }
 
 // #73: XNetGetTitleXnAddr
@@ -418,4 +432,30 @@ DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pAddr)
 		ipManager.GetLocalXNAddr(pAddr);
 	}
 	return XNET_GET_XNADDR_STATIC | XNET_GET_XNADDR_ETHERNET;
+}
+
+
+// #55: XNetRegisterKey //need #51
+int WINAPI XNetRegisterKey(XNKID *pxnkid, XNKEY *pxnkey)
+{
+	LOG_INFO_NETWORK("XNetRegisterKey()");
+	ipManager.SetKeys(pxnkid, pxnkey);
+	return ERROR_SUCCESS;
+}
+
+
+// #56: XNetUnregisterKey // need #51
+int WINAPI XNetUnregisterKey(const XNKID* pxnkid)
+{
+	LOG_INFO_NETWORK("XNetUnregisterKey()");
+	ipManager.EraseKeys();
+
+	for (int i = 0; i < ipManager.XnIPs.max_size(); i++)
+	{
+		if (&ipManager.XnIPs[i].bValid 
+			&& memcmp(pxnkid, &ipManager.XnIPs[i].xnkid, sizeof(XNKID)) == 0)
+			ipManager.UnregisterSecureAddr(ipManager.XnIPs[i].connectionIdentifier);
+	}
+
+	return ERROR_SUCCESS;
 }

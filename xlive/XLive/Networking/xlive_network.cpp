@@ -266,19 +266,3 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 	return result;
 }
 
-// #55: XNetRegisterKey //need #51
-int WINAPI XNetRegisterKey(XNKID *pxnkid, XNKEY *pxnkey)
-{
-	LOG_TRACE_NETWORK("XNetRegisterKey()");
-	ipManager.SetKeys(pxnkid, pxnkey);
-	return 0;
-}
-
-
-// #56: XNetUnregisterKey // need #51
-int WINAPI XNetUnregisterKey(const XNKID* pxnkid)
-{
-	LOG_TRACE_NETWORK("XNetUnregisterKey()");
-	ipManager.EraseKeys();
-	return 0;
-}
