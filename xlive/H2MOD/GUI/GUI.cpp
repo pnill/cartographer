@@ -614,8 +614,7 @@ int WINAPI XLiveRender()
 			}
 #pragma endregion achievement rendering
 
-			if ((displayXyz && NetworkSession::localPeerIsSessionHost()) || h2mod->GetMapType() == SINGLE_PLAYER_MAP) {
-				//only display xyz for host
+			if (displayXyz && (NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() == SINGLE_PLAYER_MAP)) {
 				int text_y_coord = 60;
 				PlayerIterator playerIt;
 				while (playerIt.get_next_player()) 
