@@ -219,18 +219,18 @@ bool __stdcall join_game(void* thisptr, int a2, int a3, XNKID* xnkid, XNKEY* xnk
 	LOG_TRACE_NETWORK("[H2MOD-Network] copied host information, XNADDR: {:#x}", ipManager.game_host_xn.ina.s_addr);
 	memcpy(&ipManager.securePacket.xnkid, xnkid, sizeof(XNKID));
 	XNetXnAddrToInAddr(host_xn, xnkid, &ipIdentifier);
-	ipManager.SaveNatInfo(ipIdentifier);
-	ipManager.sendNatInfoUpdate(game_network_data_gateway_socket_1000, host_xn->wPortOnline);
-	ipManager.sendNatInfoUpdate(game_network_message_gateway_socket_1001, ntohs(htons(ipManager.game_host_xn.wPortOnline) + 1));
+	ipManager.SaveConnectionNatInfo(ipIdentifier);
+	ipManager.sendConnectionInfo(game_network_data_gateway_socket_1000, ipIdentifier, host_xn->wPortOnline);
+	ipManager.sendConnectionInfo(game_network_message_gateway_socket_1001, ipIdentifier, ntohs(htons(ipManager.game_host_xn.wPortOnline) + 1));
 	return pjoin_game(thisptr, a2, a3, xnkid, xnkey, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 
-typedef bool(__cdecl* decode_text_chat_packet_)(void* container, int a2, s_text_chat* data_structure);
+typedef bool(__cdecl* decode_text_chat_packet_)(void* container, int a2, s_text_chat* data);
 decode_text_chat_packet_ p_decode_text_chat_packet;
 
-bool __cdecl decode_text_chat_packet(void* container, int a2, s_text_chat* data_structure)
+bool __cdecl decode_text_chat_packet(void* container, int a2, s_text_chat* data)
 {
-	bool ret = p_decode_text_chat_packet(container, a2, data_structure);
+	bool ret = p_decode_text_chat_packet(container, a2, data);
 
 	return ret;
 }

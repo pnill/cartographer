@@ -7,10 +7,9 @@
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 
 int MasterState = 0;
+XECRYPT_RC4_STATE Rc4StateRand;
 SOCKET game_network_data_gateway_socket_1000 = INVALID_SOCKET; // used for game data
 SOCKET game_network_message_gateway_socket_1001 = INVALID_SOCKET; // used for messaging like connection requests
-
-XECRYPT_RC4_STATE Rc4StateRand;
 
 void ForwardPorts()
 {
@@ -32,7 +31,6 @@ void ForwardPorts()
 int WINAPI XOnlineStartup()
 {
 	LOG_TRACE_NETWORK("XOnlineStartup()");
-	SecureZeroMemory(&ipManager.game_host_xn, sizeof(XNADDR));
 	std::thread(ForwardPorts).detach();
 
 	return ERROR_SUCCESS;
@@ -61,7 +59,7 @@ SOCKET WINAPI XCreateSocket(int af, int type, int protocol)
 
 	if (ret == INVALID_SOCKET)
 	{
-		LOG_TRACE_NETWORK("XCreateSocket - INVALID_SOCKET");
+		LOG_TRACE_NETWORK("XCreateSocket() - INVALID_SOCKET");
 	}
 
 	return ret;
@@ -95,13 +93,13 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 	if (htons(port) == 1000) {
 		game_network_data_gateway_socket_1000 = s;
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port);
-		LOG_TRACE_NETWORK("[H2MOD-Network] replaced port {0} with {1}", htons(port), H2Config_base_port);
+		LOG_TRACE_NETWORK("[H2MOD-Network] replaced port {} with {}", htons(port), H2Config_base_port);
 	}
 
 	if (htons(port) == 1001) {
-		game_network_message_gateway_socket_1001= s;
+		game_network_message_gateway_socket_1001 = s;
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port + 1);
-		LOG_TRACE_NETWORK("[H2MOD-Network] replaced port {0} with {1}", htons(port), H2Config_base_port + 1);
+		LOG_TRACE_NETWORK("[H2MOD-Network] replaced port {} with {}", htons(port), H2Config_base_port + 1);
 	}
 
 	if (htons(port) == 1005)
@@ -140,11 +138,6 @@ INT WINAPI XNetRandom(BYTE * pb, UINT cb)
 // #24: XSocketSendTo
 int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr *to, int tolen)
 {
-	DWORD sentBytes = 0;
-	WSABUF sendBuffer;
-	sendBuffer.len = len;
-	sendBuffer.buf = (CHAR*)buf;
-
 	if (((struct sockaddr_in*)to)->sin_addr.s_addr == INADDR_BROADCAST) // handle broadcast
 	{
 		(((struct sockaddr_in*)to)->sin_addr.s_addr) = H2Config_master_ip;
@@ -152,16 +145,9 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 			
 		//LOG_TRACE_NETWORK_N("XSocketSendTo - Broadcast");
 
-		int result = WSASendTo(s, &sendBuffer, 1, &sentBytes, flags, (const sockaddr*)to, sizeof(*to), NULL, NULL);
-
-		if (result != ERROR_SUCCESS)
-		{
-			return SOCKET_ERROR;
-		}
-		else
-		{
-			return sentBytes;
-		}
+		int result = sendto(s, buf, len, flags, (sockaddr*)to, sizeof(sockaddr));
+		
+		return result;
 	}
 
 	/*
@@ -222,30 +208,25 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		break;
 	}
 
-	int result = WSASendTo(s, &sendBuffer, 1, &sentBytes, flags, (const sockaddr*)&sendAddress, sizeof(sendAddress), NULL, NULL);
+	int result = sendto(s, buf, len, flags, (const sockaddr*)&sendAddress, sizeof(sendAddress));
 
-	if (result != ERROR_SUCCESS)
+	if (result == SOCKET_ERROR)
 	{
 		LOG_TRACE_NETWORK("XSocketSendTo() - Socket Error: {:x}", WSAGetLastError());
 		return SOCKET_ERROR;
 	}
 	else
 	{
-		updateSendToStatistics(sentBytes);
+		updateSendToStatistics(result);
 	}
 
-	return sentBytes;
+	return result;
 }
 
 // #20
 int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *from, int *fromlen)
 {
-	WSABUF wsaBuffer;
-	wsaBuffer.len = len;
-	wsaBuffer.buf = buf;
-
-	DWORD bytesReceived = 0;
-	int result = WSARecvFrom(s, &wsaBuffer, 1, &bytesReceived, (LPDWORD)&flags, from, fromlen, NULL, NULL);
+	int result = recvfrom(s, buf, len, flags, from, fromlen);
 
 	if (result == SOCKET_ERROR)
 	{
@@ -253,23 +234,23 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 			LOG_TRACE_NETWORK("XSocketRecvFrom() - Socket Error: {:x}", WSAGetLastError());
 		return SOCKET_ERROR;
 	}
-	else if (bytesReceived > 0)
+	else if (result > 0)
 	{
 		u_long iplong = ((struct sockaddr_in*)from)->sin_addr.s_addr;
 
-		SecurePacket* secure_pck = reinterpret_cast<SecurePacket*>(wsaBuffer.buf);
+		SecurePacket* secure_pck = reinterpret_cast<SecurePacket*>(buf);
 		if (iplong != H2Config_master_ip)
 		{
-			if (bytesReceived == sizeof(SecurePacket)
+			if (result == sizeof(SecurePacket)
 				&& secure_pck->annoyance_factor == annoyance_factor)
 			{
 				IN_ADDR ipIdentification;
 
 				LOG_TRACE_NETWORK("[H2MOD-Network] Received secure packet with ip address {:x}, port: {}", htonl(iplong), htons(((struct sockaddr_in*)from)->sin_port));
 				XNetXnAddrToInAddr(&secure_pck->xnaddr, &secure_pck->xnkid, &ipIdentification); // create identification key for the new connection
-				ipManager.SaveNatInfo(s, ipIdentification, from); // copy the nat info in the connection structure
+				ipManager.SaveConnectionNatInfo(s, ipIdentification, from); // copy the nat info in the connection structure
 
-				bytesReceived = 0;
+				result = 0;
 			}
 
 			((struct sockaddr_in*)from)->sin_addr = ipManager.GetConnectionIdentifierByNat(from);		
@@ -282,7 +263,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 		LOG_TRACE_NETWORK("XSocketRecvFrom() received socket data, total: {}", bytesReceived);
 	}*/
 
-	return bytesReceived;
+	return result;
 }
 
 // #55: XNetRegisterKey //need #51

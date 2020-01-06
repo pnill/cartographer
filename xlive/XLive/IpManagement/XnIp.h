@@ -50,11 +50,11 @@ public:
 	void UnregisterLocal();
 	void ConfigureLocalUser(XNADDR* pxna, XUID xuid, char* username);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
-	int sendNatInfoUpdate(SOCKET s, short port);
+	int sendConnectionInfo(SOCKET s, IN_ADDR ipIdentifier, short port);
 
 	IN_ADDR GetConnectionIdentifierByNat(sockaddr* addr);
-	void SaveNatInfo(IN_ADDR ipIdentifier);
-	void SaveNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr);
+	void SaveConnectionNatInfo(IN_ADDR ipIdentifier);
+	void SaveConnectionNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr);
 	void SetKeys(XNKID*, XNKEY*);
 	void EraseKeys();
 	void GetKeys(XNKID* xnkid, XNKEY* xnkey);

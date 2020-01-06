@@ -24,24 +24,33 @@ int CXnIp::getConnectionIndex(IN_ADDR connectionIdentifier)
 	return connectionIdentifier.s_addr >> 24;
 }
 
-int CXnIp::sendNatInfoUpdate(SOCKET s, short port)
+int CXnIp::sendConnectionInfo(SOCKET s, IN_ADDR ipIdentifier, short port)
 {
-	if (!NetworkSession::localPeerIsSessionHost())
+	sockaddr_in sendToAddr;
+	memset(&sendToAddr, 0, sizeof(sockaddr_in));
+	
+	XnIp* xnIp = &XnIPs[getConnectionIndex(ipIdentifier)];
+
+	if (xnIp->bValid
+		&& xnIp->connectionIdentifier.s_addr == ipIdentifier.s_addr)
 	{
-		sockaddr_in sendToAddr;
-		if (ipManager.game_host_xn.ina.s_addr != H2Config_ip_wan)
-			sendToAddr.sin_addr.s_addr = ipManager.game_host_xn.ina.s_addr;
-		else
+		if (xnIp->xnaddr.ina.s_addr == H2Config_ip_wan)
 			sendToAddr.sin_addr.s_addr = H2Config_ip_lan;
+		else
+			sendToAddr.sin_addr.s_addr = xnIp->xnaddr.ina.s_addr;
 
 		sendToAddr.sin_port = port;
 		sendToAddr.sin_family = AF_INET;
 
-		int ret = sendto(s, (char*)&this->securePacket, sizeof(SecurePacket), NULL, (const sockaddr*)&sendToAddr, sizeof(sendToAddr));
-		LOG_TRACE_NETWORK("[H2MOD-Network] secure packet sent, return code: {}", ret);
+		int ret = sendto(s, (char*)&this->securePacket, sizeof(SecurePacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
+		LOG_INFO_NETWORK("sendNatInfoUpdate() secure packet sent socket: {}, ipaddress: {:x}, port: {}, return code/bytes sent: {}", s, sendToAddr.sin_addr.s_addr, htons(sendToAddr.sin_port), ret);
 		return ret;
 	}
-	return -1;
+	else
+	{
+		LOG_ERROR_NETWORK("sendNatInfoUpdate() - connection index: {}, identifier: {:x} is invalid!", getConnectionIndex(ipIdentifier), ipIdentifier.s_addr);
+		return -1;
+	}
 }
 
 IN_ADDR CXnIp::GetConnectionIdentifierByNat(sockaddr* addr)
@@ -64,14 +73,14 @@ IN_ADDR CXnIp::GetConnectionIdentifierByNat(sockaddr* addr)
 /*
 	In order to use this, make sure the XnIp in present in the system
 */
-void CXnIp::SaveNatInfo(IN_ADDR ipIdentifier)
+void CXnIp::SaveConnectionNatInfo(IN_ADDR ipIdentifier)
 {
 	/*
 		Use this function when joining a game
 	*/
 	int connectionIndex = getConnectionIndex(ipIdentifier);
 	XnIp* xnIp = &this->XnIPs[connectionIndex];
-	LOG_TRACE_NETWORK("SaveNatInfo() - identifier: {:x}", ipIdentifier.s_addr);
+	LOG_INFO_NETWORK("SaveNatInfo() - connection index: {}, identifier: {:x}", connectionIndex, ipIdentifier.s_addr);
 
 	if (xnIp->bValid
 		&& xnIp->connectionIdentifier.s_addr == ipIdentifier.s_addr)
@@ -88,7 +97,7 @@ void CXnIp::SaveNatInfo(IN_ADDR ipIdentifier)
 		xnIp->NatAddrSocket1001.sin_addr = xnIp->xnaddr.ina;
 		xnIp->NatAddrSocket1001.sin_port = htons(ntohs(xnIp->xnaddr.wPortOnline) + 1);
 
-		LOG_TRACE_NETWORK("SaveNatInfo() - base port: {}, join port: {}", ntohs(xnIp->NatAddrSocket1000.sin_port), ntohs(xnIp->xnaddr.wPortOnline) + 1);
+		LOG_INFO_NETWORK("SaveNatInfo() - base port: {}, join port: {}", ntohs(xnIp->NatAddrSocket1000.sin_port), ntohs(xnIp->xnaddr.wPortOnline) + 1);
 
 		// Loopback bs
 		if (H2Config_ip_wan == xnIp->xnaddr.ina.s_addr)
@@ -100,7 +109,7 @@ void CXnIp::SaveNatInfo(IN_ADDR ipIdentifier)
 	
 }
 
-void CXnIp::SaveNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr)
+void CXnIp::SaveConnectionNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr)
 {
 	/*
 		In theory to handle multiple instance servers in the future what we can do is populate the port field of CreateUser,
@@ -118,7 +127,7 @@ void CXnIp::SaveNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr)
 		This should allow us to handle servers listening on any port without much effort or engine modification.
 	*/
 
-	LOG_TRACE_NETWORK("SaveNatInfo() - Socket: {}, identifier: {:x}", s, ipIdentifier.s_addr);
+	LOG_INFO_NETWORK("SaveNatInfo() - socket: {}, connection index: {}, identifier: {:x}", s, getConnectionIndex(ipIdentifier), ipIdentifier.s_addr);
 	int ipIndex = getConnectionIndex(ipIdentifier);
 	XnIp* xnIp = &this->XnIPs[ipIndex];
 
@@ -144,10 +153,14 @@ void CXnIp::SaveNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr)
 			break;
 
 		default:
-			//LOG_TRACE_NETWORK("XSocketRecvFrom() User.sockmap[s] didn't match any ports!");
+			//LOG_ERROR_NETWORK("XSocketRecvFrom() User.sockmap[s] didn't match any ports!");
 			break;
 
 		}
+	}
+	else
+	{
+		LOG_ERROR_NETWORK("SaveNatInfo() - connection index: {} identifier: {:x} is invalid!", getConnectionIndex(ipIdentifier), ipIdentifier.s_addr);
 	}
 }
 
@@ -171,7 +184,7 @@ void CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR
 		{
 			if (outIpIdentifier) {
 				*outIpIdentifier = XnIPs[i].connectionIdentifier;
-				LOG_TRACE_NETWORK("CreateXnIpIdentifier() already present connection, index: {}, identifier: {:x}", i, XnIPs[i].connectionIdentifier.s_addr);
+				LOG_INFO_NETWORK("CreateXnIpIdentifier() already present connection index: {}, identifier: {:x}", i, XnIPs[i].connectionIdentifier.s_addr);
 			}
 			return;
 		}
@@ -188,12 +201,12 @@ void CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR
 			std::mt19937 mt_rand(rd());
 			std::uniform_int_distribution<int> dist(1, 255);
 
-			memcpy(&XnIPs[firstUnusedDataIndex].xnkid, xnkid, sizeof(XNKID));
-			memcpy(&XnIPs[firstUnusedDataIndex].xnaddr, pxna, sizeof(XNADDR));
+			XnIPs[firstUnusedDataIndex].xnkid = *xnkid;
+			XnIPs[firstUnusedDataIndex].xnaddr = *pxna;
 			
 			int randIdentifier = dist(mt_rand);
 			randIdentifier <<= 8;
-			LOG_TRACE_NETWORK("CreateXnIpIdentifier() new connection index {0:x}, identifier {1:x}", firstUnusedDataIndex, htonl(firstUnusedDataIndex | randIdentifier));
+			LOG_INFO_NETWORK("CreateXnIpIdentifier() new connection index {}, identifier {:x}", firstUnusedDataIndex, htonl(firstUnusedDataIndex | randIdentifier));
 
 			outIpIdentifier->s_addr = htonl(firstUnusedDataIndex | randIdentifier);
 			XnIPs[firstUnusedDataIndex].connectionIdentifier.s_addr = htonl(firstUnusedDataIndex | randIdentifier);
@@ -206,10 +219,11 @@ void CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR
 void CXnIp::UnregisterSecureAddr(const IN_ADDR ina)
 {
 	int ipIndex = getConnectionIndex(ina);
-	if (this->XnIPs[ipIndex].bValid 
-		&& this->XnIPs[ipIndex].connectionIdentifier.s_addr == ina.s_addr)
+	XnIp* xnIp = &this->XnIPs[ipIndex];
+	if (xnIp->bValid
+		&& xnIp->connectionIdentifier.s_addr == ina.s_addr)
 	{
-		memset(&this->XnIPs[ipIndex], 0, sizeof(XnIp));
+		memset(xnIp, 0, sizeof(XnIp));
 	}
 }
 
@@ -309,10 +323,10 @@ BOOL CXnIp::GetLocalXNAddr(XNADDR* pxna)
 	if (local_user.bValid)
 	{
 		memcpy(pxna, &local_user.xnaddr, sizeof(XNADDR));
-		LOG_TRACE_NETWORK("GetLocalXNAddr(): XNADDR: {:x}", pxna->ina.s_addr);
+		LOG_INFO_NETWORK("GetLocalXNAddr(): XNADDR: {:x}", pxna->ina.s_addr);
 		return TRUE;
 	}
-	//LOG_TRACE_NETWORK_N("GetLocalXNADDR(): Local user network information not populated yet.");
+	//LOG_INFO_NETWORK("GetLocalXNADDR(): Local user network information not populated yet.");
 
 	return FALSE;
 }
@@ -320,7 +334,7 @@ BOOL CXnIp::GetLocalXNAddr(XNADDR* pxna)
 // #54: XNetCreateKey
 INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 {
-	LOG_TRACE_XLIVE("XNetCreateKey");
+	LOG_INFO_NETWORK("XNetCreateKey()");
 	if (pxnkid && pxnkey)
 	{
 		XNetRandom((BYTE*)pxnkid, sizeof(XNKID));
@@ -335,12 +349,12 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 // #57: XNetXnAddrToInAddr
 INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *pina)
 {
-	LOG_TRACE_NETWORK("XNetXnAddrToInAddr(): local-address: {:x}", pxna->ina.s_addr); // TODO
-	LOG_TRACE_NETWORK("XNetXnAddrToInAddr(): online-address: {:x}", pxna->inaOnline.s_addr);
+	LOG_INFO_NETWORK("XNetXnAddrToInAddr(): local-address: {:x}, online-address: {:x}", pxna->ina.s_addr, pxna->inaOnline.s_addr); // TODO
 
 	if (pxna == nullptr 
-		|| pxnkid == nullptr)
-		return ERROR_INVALID_PARAMETER;
+		|| pxnkid == nullptr
+		|| pina == nullptr)
+		return WSAEINVAL;
 
 	ipManager.CreateXnIpIdentifier(pxna, pxnkid, pina);
 
@@ -350,32 +364,34 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 // #60: XNetInAddrToXnAddr
 INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 {
-	LOG_TRACE_NETWORK("XNetInAddrToXnAddr() connection index: {:x}, identifier {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
+	LOG_INFO_NETWORK("XNetInAddrToXnAddr() connection index: {:x}, identifier {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
 	
 	if (pxna == nullptr
 		|| pxnkid == nullptr)
-		return ERROR_INVALID_PARAMETER;
+		return WSAEINVAL;
+
+	memset(pxna, 0, sizeof(XNADDR));
+	memset(pxnkid, 0, sizeof(XNKID));
 
 	int ipIndex = ipManager.getConnectionIndex(ina);
 	XnIp* xnIp = &ipManager.XnIPs[ipIndex];
 	
-	if (xnIp->bValid && xnIp->connectionIdentifier.s_addr == ina.s_addr)
+	if (xnIp->bValid 
+		&& xnIp->connectionIdentifier.s_addr == ina.s_addr)
 	{
 		memcpy(pxna, &xnIp->xnaddr, sizeof(XNADDR));
 		memcpy(pxnkid, &xnIp->xnkid, sizeof(XNKID));
 
-		ipManager.GetKeys(pxnkid, nullptr);
-
 		return ERROR_SUCCESS;
 	}
 
-	return ERROR_FUNCTION_FAILED;
+	return WSAEINVAL;
 }
 
 // #63: XNetUnregisterInAddr
 int WINAPI XNetUnregisterInAddr(const IN_ADDR ina)
 {
-	LOG_TRACE_NETWORK("XNetUnregisterInAddr(): connection index {}, connection identifier: {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
+	LOG_INFO_NETWORK("XNetUnregisterInAddr(): connection index {}, identifier: {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
 	ipManager.UnregisterSecureAddr(ina);
 	return ERROR_SUCCESS;
 }
@@ -383,12 +399,14 @@ int WINAPI XNetUnregisterInAddr(const IN_ADDR ina)
 // #65: XNetConnect
 int WINAPI XNetConnect(const IN_ADDR ina)
 {
+	LOG_INFO_NETWORK("XNetConnect(): connection index {}, identifier: {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
 	return ERROR_SUCCESS;
 }
 
 // #66: XNetGetConnectStatus
 int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 {
+	//LOG_INFO_NETWORK("XNetConnect(): connection index {}, identifier: {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
 	return XNET_CONNECT_STATUS_CONNECTED;
 }
 

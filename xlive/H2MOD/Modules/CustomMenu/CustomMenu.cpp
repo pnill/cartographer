@@ -5043,7 +5043,7 @@ void initGSCustomMenu() {
 
 
 	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF0, "Message of the Day!");
-	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF1, "DO NOT CHEAT ONLINE!\r\n\Ranks are on the way!\r\nInitial testing phase is beginning now.\r\nNew variant OGH2, try it out!");
+	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF1, "DO NOT CHEAT ONLINE!\r\nRanks are on the way!\r\nInitial testing phase is beginning now.\r\nNew variant OGH2, try it out!");
 
 
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF0, "Customise HUD / GUI");
