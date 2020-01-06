@@ -217,11 +217,7 @@ bool __stdcall join_game(void* thisptr, int a2, int a3, XNKID* xnkid, XNKEY* xnk
 
 	memcpy(&ipManager.game_host_xn, host_xn, sizeof(XNADDR));
 	LOG_TRACE_NETWORK("[H2MOD-Network] copied host information, XNADDR: {:#x}", ipManager.game_host_xn.ina.s_addr);
-	memcpy(&ipManager.securePacket.xnkid, xnkid, sizeof(XNKID));
-	XNetXnAddrToInAddr(host_xn, xnkid, &ipIdentifier);
-	ipManager.SaveConnectionNatInfo(ipIdentifier);
-	ipManager.sendConnectionInfo(game_network_data_gateway_socket_1000, ipIdentifier, host_xn->wPortOnline);
-	ipManager.sendConnectionInfo(game_network_message_gateway_socket_1001, ipIdentifier, ntohs(htons(ipManager.game_host_xn.wPortOnline) + 1));
+	
 	return pjoin_game(thisptr, a2, a3, xnkid, xnkey, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 

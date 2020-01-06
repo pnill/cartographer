@@ -189,6 +189,10 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 			//LOG_TRACE_XLIVE("XSocketSendTo() port 1000 nPort: {} secure: %08X", htons(nPort), iplong);
 			sendAddress.sin_port = nPort;
 		}
+		else 
+		{
+			sendAddress.sin_port = xnIp->xnaddr.wPortOnline;
+		}
 
 		break;
 
@@ -199,6 +203,10 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		{
 			//LOG_TRACE_XLIVE("XSocketSendTo() port 1001 nPort: %i secure: %08X", htons(nPort), iplong);
 			sendAddress.sin_port = nPort;
+		}
+		else
+		{
+			sendAddress.sin_port = ntohs(htons(xnIp->xnaddr.wPortOnline) + 1);
 		}
 
 		break;
@@ -247,13 +255,11 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 				IN_ADDR ipIdentification;
 
 				LOG_TRACE_NETWORK("[H2MOD-Network] Received secure packet with ip address {:x}, port: {}", htonl(iplong), htons(((struct sockaddr_in*)from)->sin_port));
-				XNetXnAddrToInAddr(&secure_pck->xnaddr, &secure_pck->xnkid, &ipIdentification); // create identification key for the new connection
-				ipManager.SaveConnectionNatInfo(s, ipIdentification, from); // copy the nat info in the connection structure
-
-				result = 0;
+				ipManager.CreateXnIpIdentifierWithNat(s, &secure_pck->xnaddr, &secure_pck->xnkid, from); // save NAT info and send back a packet
+				return 0;
 			}
 
-			((struct sockaddr_in*)from)->sin_addr = ipManager.GetConnectionIdentifierByNat(from);		
+			((struct sockaddr_in*)from)->sin_addr = ipManager.GetConnectionIdentifierByNat(from);
 		}
 	}
 	

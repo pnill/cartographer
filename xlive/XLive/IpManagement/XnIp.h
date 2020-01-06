@@ -8,6 +8,8 @@ struct XnIp
 	XNADDR xnaddr;
 	XNKID xnkid;
 	bool bValid;
+	int xnetstatus;
+	int connectionPacketsSentCount;
 
 	// NAT info
 	sockaddr_in NatAddrSocket1000; // TODO: allocate dynamically based on how many sockets are up
@@ -55,6 +57,7 @@ public:
 	IN_ADDR GetConnectionIdentifierByNat(sockaddr* addr);
 	void SaveConnectionNatInfo(IN_ADDR ipIdentifier);
 	void SaveConnectionNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr);
+	void CreateXnIpIdentifierWithNat(SOCKET s, const XNADDR* pxna, const XNKID* xnkid, sockaddr* addr);
 	void SetKeys(XNKID*, XNKEY*);
 	void EraseKeys();
 	void GetKeys(XNKID* xnkid, XNKEY* xnkey);

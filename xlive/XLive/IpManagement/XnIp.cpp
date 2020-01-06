@@ -42,7 +42,11 @@ int CXnIp::sendConnectionInfo(SOCKET s, IN_ADDR ipIdentifier, short port)
 		sendToAddr.sin_port = port;
 		sendToAddr.sin_family = AF_INET;
 
-		int ret = sendto(s, (char*)&this->securePacket, sizeof(SecurePacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
+		GetKeys(&securePacket.xnkid, nullptr);
+
+		xnIp->connectionPacketsSentCount++;
+
+		int ret = sendto(s, (char*)&securePacket, sizeof(SecurePacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
 		LOG_INFO_NETWORK("sendNatInfoUpdate() secure packet sent socket: {}, ipaddress: {:x}, port: {}, return code/bytes sent: {}", s, sendToAddr.sin_addr.s_addr, htons(sendToAddr.sin_port), ret);
 		return ret;
 	}
@@ -140,6 +144,8 @@ void CXnIp::SaveConnectionNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr
 		   port 1000 is mapped to the receiving port pmap_a via the secure address.
 		   port 1001 is mapped to the receiving port pmap_b via the secure address.
 		*/
+		// TODO: handle dynamically
+
 		switch (ipManager.sockmap[s])
 		{
 		case 1000:
@@ -161,6 +167,27 @@ void CXnIp::SaveConnectionNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr
 	else
 	{
 		LOG_ERROR_NETWORK("SaveNatInfo() - connection index: {} identifier: {:x} is invalid!", getConnectionIndex(ipIdentifier), ipIdentifier.s_addr);
+	}
+}
+
+void CXnIp::CreateXnIpIdentifierWithNat(SOCKET s, const XNADDR* pxna, const XNKID* xnkid, sockaddr* addr)
+{
+	IN_ADDR outIpIdentifier;
+
+	CreateXnIpIdentifier(pxna, xnkid, &outIpIdentifier);
+	SaveConnectionNatInfo(s, outIpIdentifier, (sockaddr*)addr);
+
+	XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(outIpIdentifier)];
+
+	if (xnIp->bValid 
+		&& xnIp->xnetstatus != XNET_CONNECT_STATUS_CONNECTED)
+	{
+		ipManager.sendConnectionInfo(s, xnIp->connectionIdentifier, ((sockaddr_in*)addr)->sin_port);
+
+		// TODO: handle dinamically
+		if (xnIp->NatAddrSocket1000.sin_port != 0 && 
+			xnIp->NatAddrSocket1001.sin_port != 0)
+			xnIp->xnetstatus = XNET_CONNECT_STATUS_CONNECTED; // if we have the NAT data for each port, set the status to CONNECTED to prevent spamming xnet connection packets
 	}
 }
 
@@ -208,7 +235,8 @@ void CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR
 			randIdentifier <<= 8;
 			LOG_INFO_NETWORK("CreateXnIpIdentifier() new connection index {}, identifier {:x}", firstUnusedDataIndex, htonl(firstUnusedDataIndex | randIdentifier));
 
-			outIpIdentifier->s_addr = htonl(firstUnusedDataIndex | randIdentifier);
+			if (outIpIdentifier)
+				outIpIdentifier->s_addr = htonl(firstUnusedDataIndex | randIdentifier);
 			XnIPs[firstUnusedDataIndex].connectionIdentifier.s_addr = htonl(firstUnusedDataIndex | randIdentifier);
 			XnIPs[firstUnusedDataIndex].bValid = true;
 			return;
@@ -358,6 +386,18 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 
 	ipManager.CreateXnIpIdentifier(pxna, pxnkid, pina);
 
+	XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(*pina)];
+
+	if (xnIp->bValid 
+		&& xnIp->xnetstatus != XNET_CONNECT_STATUS_CONNECTED)
+	{
+		// TODO: handle dinamically, so it can be used by other games too
+		extern SOCKET game_network_data_gateway_socket_1000; // used for game data
+		extern SOCKET game_network_message_gateway_socket_1001; // used for messaging like connection requests
+		ipManager.sendConnectionInfo(game_network_data_gateway_socket_1000, xnIp->connectionIdentifier, xnIp->xnaddr.wPortOnline);
+		ipManager.sendConnectionInfo(game_network_message_gateway_socket_1001, xnIp->connectionIdentifier, ntohs(htons(xnIp->xnaddr.wPortOnline) + 1));
+	}
+
 	return ERROR_SUCCESS;
 }
 
@@ -421,7 +461,7 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 	{
 		return XNET_CONNECT_STATUS_CONNECTED;
 	}
-	return XNET_CONNECT_STATUS_LOST;
+	return WSAEINVAL;
 }
 
 // #73: XNetGetTitleXnAddr
@@ -452,8 +492,7 @@ int WINAPI XNetUnregisterKey(const XNKID* pxnkid)
 
 	for (int i = 0; i < ipManager.XnIPs.max_size(); i++)
 	{
-		if (&ipManager.XnIPs[i].bValid 
-			&& memcmp(pxnkid, &ipManager.XnIPs[i].xnkid, sizeof(XNKID)) == 0)
+		if (&ipManager.XnIPs[i].bValid && memcmp(pxnkid, &ipManager.XnIPs[i].xnkid, sizeof(XNKID)) == 0)
 			ipManager.UnregisterSecureAddr(ipManager.XnIPs[i].connectionIdentifier);
 	}
 
