@@ -285,6 +285,7 @@
     <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\tag_loader.cpp" />
     <ClCompile Include="H2MOD\Modules\ServerConsole\ServerConsole.cpp" />
+    <ClCompile Include="XLive\XNet\Sockets\UdpSocket.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -348,13 +349,13 @@
     <ClCompile Include="Util\Hooks\Hook.cpp" />
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="XLive\achievements\XAchievements.cpp" />
-    <ClCompile Include="XLive\Networking\ServerList.cpp" />
-    <ClCompile Include="XLive\Networking\upnp.cpp" />
-    <ClCompile Include="XLive\Networking\XNetQoS.cpp" />
-    <ClCompile Include="XLive\Networking\xlive_network.cpp" />
-    <ClCompile Include="XLive\Networking\xnet.cpp" />
-    <ClCompile Include="XLive\Networking\XSocket.cpp" />
-    <ClCompile Include="XLive\IpManagement\XnIp.cpp" />
+    <ClCompile Include="XLive\ServerList\ServerList.cpp" />
+    <ClCompile Include="XLive\XNet\upnp.cpp" />
+    <ClCompile Include="XLive\XNet\XNetQoS.cpp" />
+    <ClCompile Include="XLive\XNet\xlive_network.cpp" />
+    <ClCompile Include="XLive\XNet\xnet.cpp" />
+    <ClCompile Include="XLive\XNet\Sockets\XSocket.cpp" />
+    <ClCompile Include="XLive\XNet\IpManagement\XnIp.cpp" />
     <ClCompile Include="XLive\Voice\XHVEngine.cpp" />
     <ClCompile Include="XLive\XAM\xam.cpp" />
     <ClCompile Include="XLive\xbox\xbox.cpp" />
@@ -472,6 +473,7 @@
     <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
+    <ClInclude Include="XLive\XNet\Sockets\UdpSocket.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
@@ -577,12 +579,12 @@
     <ClInclude Include="xlivedefs.h" />
     <ClInclude Include="xliveless.h" />
     <ClInclude Include="XLive\achievements\XAchievements.h" />
-    <ClInclude Include="XLive\Networking\ServerList.h" />
-    <ClInclude Include="XLive\Networking\upnp.h" />
-    <ClInclude Include="XLive\Networking\XNetQoS.h" />
-    <ClInclude Include="XLive\Networking\xnet.h" />
-    <ClInclude Include="XLive\Networking\XSocket.h" />
-    <ClInclude Include="XLive\IpManagement\XnIp.h" />
+    <ClInclude Include="XLive\ServerList\ServerList.h" />
+    <ClInclude Include="XLive\XNet\upnp.h" />
+    <ClInclude Include="XLive\XNet\XNetQoS.h" />
+    <ClInclude Include="XLive\XNet\xnet.h" />
+    <ClInclude Include="XLive\XNet\Sockets\XSocket.h" />
+    <ClInclude Include="XLive\XNet\IpManagement\XnIp.h" />
     <ClInclude Include="XLive\Voice\XHVEngine.h" />
     <ClInclude Include="XLive\XAM\xam.h" />
     <ClInclude Include="XLive\xbox\xbox.h" />

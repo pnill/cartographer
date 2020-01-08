@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "stdafx.h"
+#include "..\Sockets\UdpSocket.h"
 
 struct XnIp
 {
@@ -44,7 +45,7 @@ struct SecurePacket
 class CXnIp
 {
 public:
-	void CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier);
+	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier);
 	void UnregisterSecureAddr(const IN_ADDR ina);
 
 	void UpdateConnectionStatus();
@@ -52,7 +53,7 @@ public:
 	void UnregisterLocal();
 	void ConfigureLocalUser(XNADDR* pxna, XUID xuid, char* username);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
-	int sendConnectionInfo(SOCKET s, IN_ADDR ipIdentifier, short port);
+	int sendConnectionInfo(SOCKET s, IN_ADDR ipIdentifier);
 
 	IN_ADDR GetConnectionIdentifierByNat(sockaddr* addr);
 	void SaveConnectionNatInfo(IN_ADDR ipIdentifier);
@@ -65,7 +66,7 @@ public:
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 
 	std::array<XnIp, 32> XnIPs; // ConnectionIndex->CUser
-	std::unordered_map<SOCKET, SHORT> sockmap;
+	std::unordered_map<SOCKET, XUdpSocket> UdpSocketRegs; // TODO: support TCP in the future for other games
 
 	XnIp local_user;
 	XNADDR game_host_xn;

@@ -11,6 +11,8 @@ extern CHAR g_szUserName[4][16];
 CXnIp ipManager;
 const DWORD annoyance_factor = 0x8E0A40F1;
 
+extern int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr *to, int tolen);
+
 /*
 NOTE:
 	Check inside Tweaks.cpp for removeXNetSecurity
@@ -24,7 +26,7 @@ int CXnIp::getConnectionIndex(IN_ADDR connectionIdentifier)
 	return connectionIdentifier.s_addr >> 24;
 }
 
-int CXnIp::sendConnectionInfo(SOCKET s, IN_ADDR ipIdentifier, short port)
+int CXnIp::sendConnectionInfo(SOCKET s, IN_ADDR ipIdentifier)
 {
 	sockaddr_in sendToAddr;
 	memset(&sendToAddr, 0, sizeof(sockaddr_in));
@@ -34,20 +36,15 @@ int CXnIp::sendConnectionInfo(SOCKET s, IN_ADDR ipIdentifier, short port)
 	if (xnIp->bValid
 		&& xnIp->connectionIdentifier.s_addr == ipIdentifier.s_addr)
 	{
-		if (xnIp->xnaddr.ina.s_addr == H2Config_ip_wan)
-			sendToAddr.sin_addr.s_addr = H2Config_ip_lan;
-		else
-			sendToAddr.sin_addr.s_addr = xnIp->xnaddr.ina.s_addr;
-
-		sendToAddr.sin_port = port;
 		sendToAddr.sin_family = AF_INET;
+		sendToAddr.sin_addr = ipIdentifier;
 
 		GetKeys(&securePacket.xnkid, nullptr);
 
 		xnIp->connectionPacketsSentCount++;
 
-		int ret = sendto(s, (char*)&securePacket, sizeof(SecurePacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
-		LOG_INFO_NETWORK("sendNatInfoUpdate() secure packet sent socket: {}, ipaddress: {:x}, port: {}, return code/bytes sent: {}", s, sendToAddr.sin_addr.s_addr, htons(sendToAddr.sin_port), ret);
+		int ret = XSocketSendTo(s, (char*)&securePacket, sizeof(SecurePacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
+		LOG_INFO_NETWORK("sendNatInfoUpdate() secure packet sent socket: {}, ipaddress: {:x}, return code/bytes sent: {}", s, sendToAddr.sin_addr.s_addr, ret);
 		return ret;
 	}
 	else
@@ -146,7 +143,7 @@ void CXnIp::SaveConnectionNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr
 		*/
 		// TODO: handle dynamically
 
-		switch (ipManager.sockmap[s])
+		switch (ipManager.UdpSocketRegs[s].port)
 		{
 		case 1000:
 			//LOG_TRACE_NETWORK("XSocketRecvFrom() User.sockmap mapping port 1000 - port: %i, secure: %08X", htons(port), secure);
@@ -174,24 +171,33 @@ void CXnIp::CreateXnIpIdentifierWithNat(SOCKET s, const XNADDR* pxna, const XNKI
 {
 	IN_ADDR outIpIdentifier;
 
-	CreateXnIpIdentifier(pxna, xnkid, &outIpIdentifier);
-	SaveConnectionNatInfo(s, outIpIdentifier, (sockaddr*)addr);
-
-	XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(outIpIdentifier)];
-
-	if (xnIp->bValid 
-		&& xnIp->xnetstatus != XNET_CONNECT_STATUS_CONNECTED)
+	int ret = CreateXnIpIdentifier(pxna, xnkid, &outIpIdentifier);
+	if (ret == ERROR_SUCCESS)
 	{
-		ipManager.sendConnectionInfo(s, xnIp->connectionIdentifier, ((sockaddr_in*)addr)->sin_port);
+		SaveConnectionNatInfo(s, outIpIdentifier, (sockaddr*)addr);
 
-		// TODO: handle dinamically
-		if (xnIp->NatAddrSocket1000.sin_port != 0 && 
-			xnIp->NatAddrSocket1001.sin_port != 0)
-			xnIp->xnetstatus = XNET_CONNECT_STATUS_CONNECTED; // if we have the NAT data for each port, set the status to CONNECTED to prevent spamming xnet connection packets
+		XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(outIpIdentifier)];
+
+		if (xnIp->bValid
+			&& xnIp->xnetstatus < XNET_CONNECT_STATUS_CONNECTED)
+		{
+			ipManager.sendConnectionInfo(s, xnIp->connectionIdentifier);
+
+			// TODO: handle dinamically
+			if (xnIp->NatAddrSocket1000.sin_port != 0 &&
+				xnIp->NatAddrSocket1001.sin_port != 0)
+				xnIp->xnetstatus = XNET_CONNECT_STATUS_CONNECTED; // if we have the NAT data for each port, set the status to CONNECTED to prevent spamming xnet connection packets
+			else
+				xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING;
+		}
+	}
+	else
+	{
+		LOG_TRACE_NETWORK("CreateXnIpIdentifierWithNat(): secure connection couldn't be established!");
 	}
 }
 
-void CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier)
+int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier)
 {
 	/*
 		This only happens for servers because we have all their data from the get go :)...
@@ -213,7 +219,7 @@ void CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR
 				*outIpIdentifier = XnIPs[i].connectionIdentifier;
 				LOG_INFO_NETWORK("CreateXnIpIdentifier() already present connection index: {}, identifier: {:x}", i, XnIPs[i].connectionIdentifier.s_addr);
 			}
-			return;
+			return ERROR_SUCCESS;
 		}
 
 		if (XnIPs[i].bValid == false && firstUnusedDataIndexFound == false)
@@ -225,23 +231,33 @@ void CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR
 		// if the ip is not in the system, add it
 		if (i + 1 == XnIPs.max_size())
 		{	
-			std::mt19937 mt_rand(rd());
-			std::uniform_int_distribution<int> dist(1, 255);
+			if (firstUnusedDataIndexFound)
+			{
+				std::mt19937 mt_rand(rd());
+				std::uniform_int_distribution<int> dist(1, 255);
 
-			XnIPs[firstUnusedDataIndex].xnkid = *xnkid;
-			XnIPs[firstUnusedDataIndex].xnaddr = *pxna;
-			
-			int randIdentifier = dist(mt_rand);
-			randIdentifier <<= 8;
-			LOG_INFO_NETWORK("CreateXnIpIdentifier() new connection index {}, identifier {:x}", firstUnusedDataIndex, htonl(firstUnusedDataIndex | randIdentifier));
+				XnIPs[firstUnusedDataIndex].xnkid = *xnkid;
+				XnIPs[firstUnusedDataIndex].xnaddr = *pxna;
 
-			if (outIpIdentifier)
-				outIpIdentifier->s_addr = htonl(firstUnusedDataIndex | randIdentifier);
-			XnIPs[firstUnusedDataIndex].connectionIdentifier.s_addr = htonl(firstUnusedDataIndex | randIdentifier);
-			XnIPs[firstUnusedDataIndex].bValid = true;
-			return;
+				int randIdentifier = dist(mt_rand);
+				randIdentifier <<= 8;
+				LOG_INFO_NETWORK("CreateXnIpIdentifier() new connection index {}, identifier {:x}", firstUnusedDataIndex, htonl(firstUnusedDataIndex | randIdentifier));
+
+				if (outIpIdentifier)
+					outIpIdentifier->s_addr = htonl(firstUnusedDataIndex | randIdentifier);
+				XnIPs[firstUnusedDataIndex].connectionIdentifier.s_addr = htonl(firstUnusedDataIndex | randIdentifier);
+				XnIPs[firstUnusedDataIndex].bValid = true;
+				return ERROR_SUCCESS;
+			}
+			else 
+			{
+				LOG_TRACE_NETWORK("CreateXnIpIdentifier() no more available connection spots!");
+				return WSAENOMORE;
+			}
 		}
 	}
+
+	return WSAENOMORE;
 }
 
 void CXnIp::UnregisterSecureAddr(const IN_ADDR ina)
@@ -384,21 +400,14 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 		|| pina == nullptr)
 		return WSAEINVAL;
 
-	ipManager.CreateXnIpIdentifier(pxna, pxnkid, pina);
-
-	XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(*pina)];
-
-	if (xnIp->bValid 
-		&& xnIp->xnetstatus != XNET_CONNECT_STATUS_CONNECTED)
+	int ret = ipManager.CreateXnIpIdentifier(pxna, pxnkid, pina);
+	 
+	if (ret == ERROR_SUCCESS)
 	{
-		// TODO: handle dinamically, so it can be used by other games too
-		extern SOCKET game_network_data_gateway_socket_1000; // used for game data
-		extern SOCKET game_network_message_gateway_socket_1001; // used for messaging like connection requests
-		ipManager.sendConnectionInfo(game_network_data_gateway_socket_1000, xnIp->connectionIdentifier, xnIp->xnaddr.wPortOnline);
-		ipManager.sendConnectionInfo(game_network_message_gateway_socket_1001, xnIp->connectionIdentifier, ntohs(htons(xnIp->xnaddr.wPortOnline) + 1));
+		
 	}
 
-	return ERROR_SUCCESS;
+	return ret;
 }
 
 // #60: XNetInAddrToXnAddr
@@ -445,6 +454,17 @@ int WINAPI XNetConnect(const IN_ADDR ina)
 	if (xnIp->bValid
 		&& xnIp->connectionIdentifier.s_addr == ina.s_addr)
 	{
+		if (xnIp->xnetstatus == XNET_CONNECT_STATUS_IDLE)
+		{
+			// TODO: handle dinamically, so it can be used by other games too
+			extern SOCKET game_network_data_gateway_socket_1000; // used for game data
+			extern SOCKET game_network_message_gateway_socket_1001; // used for messaging like connection requests
+			ipManager.sendConnectionInfo(game_network_data_gateway_socket_1000, xnIp->connectionIdentifier);
+			ipManager.sendConnectionInfo(game_network_message_gateway_socket_1001, xnIp->connectionIdentifier);
+			
+			xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING;
+		}
+
 		return ERROR_SUCCESS;
 	}
 
@@ -459,7 +479,7 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 	if (xnIp->bValid
 		&& xnIp->connectionIdentifier.s_addr == ina.s_addr)
 	{
-		return XNET_CONNECT_STATUS_CONNECTED;
+		return xnIp->xnetstatus;
 	}
 	return WSAEINVAL;
 }

@@ -1,8 +1,9 @@
 #include "Globals.h"
 
 #include "..\Cryptography\Rc4.h"
-#include "XLive\Networking\upnp.h"
-#include "XLive\IpManagement\XnIp.h"
+#include "XLive\xnet\upnp.h"
+#include "XLive\xnet\Sockets\XSocket.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 
@@ -36,41 +37,53 @@ int WINAPI XOnlineStartup()
 	return ERROR_SUCCESS;
 }
 
-SOCKET voice_sock = NULL;
 // #3: XCreateSocket
 SOCKET WINAPI XCreateSocket(int af, int type, int protocol)
 {
 	LOG_TRACE_NETWORK("XCreateSocket() af = {0}, type = {1}, protocol = {2}", af, type, protocol);
 
-	bool vdp = false;
-	if (protocol == 254)
+	// TODO: support TCP
+	XUdpSocket UdpSocketReg;
+	if (protocol == IPPROTO_UDP)
 	{
-		vdp = true;
-		protocol = IPPROTO_UDP; // We can't support VDP (Voice / Data Protocol) it's some encrypted crap which isn't standard.
+		UdpSocketReg.protocol = IPPROTO_UDP;
+	}
+	else if (protocol == IPPROTO_VDP)
+	{
+		protocol = IPPROTO_UDP;
+		UdpSocketReg.protocol = IPPROTO_UDP; // We can't support VDP (Voice / Data Protocol) it's some encrypted crap which isn't standard.
+		UdpSocketReg.isVoiceSocket = true;
 	}
 
 	SOCKET ret = socket(af, type, protocol);
 
-	if (vdp)
-	{
-		LOG_TRACE_NETWORK("Socket: {:x} was VDP", ret);
-		voice_sock = ret;
-	}
-
 	if (ret == INVALID_SOCKET)
 	{
 		LOG_TRACE_NETWORK("XCreateSocket() - INVALID_SOCKET");
+		return ret;
 	}
+
+	if (UdpSocketReg.isVoiceSocket)
+	{
+		LOG_TRACE_NETWORK("Socket: {} was VDP", ret);
+	}
+
+	if (UdpSocketReg.protocol == IPPROTO_UDP)
+		ipManager.UdpSocketRegs[ret] = UdpSocketReg;
 
 	return ret;
 }
 
-// #5332: XSessionEnd
-int WINAPI XSessionEnd(DWORD, DWORD)
+// #4
+int WINAPI XSocketClose(SOCKET s)
 {
-	mapManager->cleanup();
-	LOG_TRACE_NETWORK("XSessionEnd()");
-	return 0;
+	LOG_TRACE_NETWORK("XSocketClose(): socket: {}", s);
+
+	auto sockmap_elem = ipManager.UdpSocketRegs.find(s);
+	if (sockmap_elem != ipManager.UdpSocketRegs.end())
+		ipManager.UdpSocketRegs.erase(sockmap_elem);
+
+	return closesocket(s);
 }
 
 // #52: XNetCleanup
@@ -85,21 +98,20 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 {
 	u_short port = (((struct sockaddr_in*)name)->sin_port);
 
-	LOG_TRACE_NETWORK("[H2MOD-Network] game bound socket: {}", htons(port));
-	if (s == voice_sock)
-		LOG_TRACE_NETWORK("[H2MOD-Network] could be voice socket", htons(port));
-
+	// TODO: support TCP
+	if (ipManager.UdpSocketRegs[s].protocol == IPPROTO_UDP)
+		ipManager.UdpSocketRegs[s].port = htons(port);
 
 	if (htons(port) == 1000) {
 		game_network_data_gateway_socket_1000 = s;
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port);
-		LOG_TRACE_NETWORK("[H2MOD-Network] replaced port {} with {}", htons(port), H2Config_base_port);
+		LOG_TRACE_NETWORK("XSocketBind() replaced port {} with {}", htons(port), H2Config_base_port);
 	}
 
 	if (htons(port) == 1001) {
 		game_network_message_gateway_socket_1001 = s;
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port + 1);
-		LOG_TRACE_NETWORK("[H2MOD-Network] replaced port {} with {}", htons(port), H2Config_base_port + 1);
+		LOG_TRACE_NETWORK("XSocketBind() replaced port {} with {}", htons(port), H2Config_base_port + 1);
 	}
 
 	if (htons(port) == 1005)
@@ -107,9 +119,7 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 	if (htons(port) == 1006)
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port + 6);
 
-	ipManager.sockmap[s] = htons(port);
-
-	SOCKET ret = bind(s, name, namelen);
+	int ret = bind(s, name, namelen);
 
 	if (ret == SOCKET_ERROR)
 		LOG_TRACE_NETWORK("XSocketBind() - SOCKET_ERROR");
@@ -127,7 +137,7 @@ INT WINAPI XNetRandom(BYTE * pb, UINT cb)
 	if (Rc4CryptInitialized == false)
 	{
 		QueryPerformanceCounter(&key);
-		XeCryptRc4Key(&Rc4StateRand, (BYTE*)&key, sizeof(LARGE_INTEGER));
+		XeCryptRc4Key(&Rc4StateRand, (BYTE*)&key, sizeof(key));
 		Rc4CryptInitialized = true;
 	}
 
@@ -178,8 +188,10 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 	 1000-> User.pmap_a[secureaddress]
 	 1001-> User.pmap_b[secureaddress]
 	*/
+
+	/* TODO: handle this dynamically */
 	u_short nPort = 0;
-	switch (htons(((struct sockaddr_in*)to)->sin_port))
+	switch (ipManager.UdpSocketRegs[s].port)
 	{
 	case 1000:
 		nPort = xnIp->NatAddrSocket1000.sin_port;
@@ -220,7 +232,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 
 	if (result == SOCKET_ERROR)
 	{
-		LOG_TRACE_NETWORK("XSocketSendTo() - Socket Error: {:x}", WSAGetLastError());
+		LOG_TRACE_NETWORK("XSocketSendTo() - Socket Error: {}", WSAGetLastError());
 		return SOCKET_ERROR;
 	}
 	else

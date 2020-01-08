@@ -8,7 +8,7 @@
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Variants\VariantMPGameEngine.h"
-#include "XLive\IpManagement\XnIp.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "Blam\Cache\TagGroups\shad.h"
 #include "..\CustomResolutions\CustomResolutions.h"

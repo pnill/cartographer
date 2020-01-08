@@ -16,22 +16,10 @@ int WINAPI XWSACleanup()
 	return WSACleanup();
 }
 
-// #4
-int WINAPI XSocketClose(SOCKET s)
-{
-	LOG_TRACE_XLIVE("XSocketClose: socket: {}", s);
-
-	auto sockmap_elem = ipManager.sockmap.find(s);
-	if (sockmap_elem != ipManager.sockmap.end())
-		ipManager.sockmap.erase(sockmap_elem);
-
-	return closesocket(s);
-}
-
 // #5: XSocketShutdown
 int WINAPI XSocketShutdown(SOCKET s, int how)
 {
-	LOG_TRACE_XLIVE("XSocketShutdown");
+	LOG_TRACE_NETWORK("XSocketShutdown");
 	return shutdown(s, how);
 }
 
@@ -47,21 +35,20 @@ int WINAPI XSocketSetSockOpt(SOCKET s, int level, int optname, const char *optva
 {
 	int ret;
 
-	LOG_TRACE_XLIVE("XSocketSetSockOpt  (socket = {0:x}, level = {1}, optname = {2}, optval = {3}, optlen = {4})",
+	LOG_TRACE_NETWORK("XSocketSetSockOpt  (socket = {0:x}, level = {1}, optname = {2}, optval = {3}, optlen = {4})",
 		s, level, optname, optval ? optval : "", optlen);
 
 	if ((level & SO_BROADCAST) > 0)
 	{
-
-		LOG_TRACE_XLIVE("XSocketSetSockOpt - SO_BROADCAST");
+		LOG_TRACE_NETWORK("XSocketSetSockOpt - SO_BROADCAST");
 	}
 	ret = setsockopt(s, level, optname, optval, optlen);
 	if (ret == SOCKET_ERROR)
 	{
-		LOG_TRACE_XLIVE("XSocketSetSockOpt - SOCKET_ERROR");
+		LOG_TRACE_NETWORK("XSocketSetSockOpt - SOCKET_ERROR");
 	}
 
-	LOG_TRACE_XLIVE("- ret = {:x}", ret);
+	LOG_TRACE_NETWORK("- ret = {:x}", ret);
 	return ret;
 }
 

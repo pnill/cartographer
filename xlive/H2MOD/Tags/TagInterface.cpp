@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "TagInterface.h"
 #include "H2MOD.h"
 #include "..\Util\Hooks\Hook.h"
