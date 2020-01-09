@@ -546,9 +546,6 @@
     <ClCompile Include="XLive\XNet\Sockets\XSocket.cpp">
       <Filter>Source Files\XLive\xnet\Sockets</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\XNet\Sockets\UdpSocket.cpp">
-      <Filter>Source Files\XLive\xnet\Sockets</Filter>
-    </ClCompile>
     <ClCompile Include="XLive\ServerList\ServerList.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
@@ -1233,9 +1230,6 @@
       <Filter>Source Files\XLive\xnet\IpManager</Filter>
     </ClInclude>
     <ClInclude Include="XLive\XNet\Sockets\XSocket.h">
-      <Filter>Source Files\XLive\xnet\Sockets</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\XNet\Sockets\UdpSocket.h">
       <Filter>Source Files\XLive\xnet\Sockets</Filter>
     </ClInclude>
     <ClInclude Include="XLive\ServerList\ServerList.h">

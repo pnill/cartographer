@@ -26,7 +26,7 @@ int CXnIp::getConnectionIndex(IN_ADDR connectionIdentifier)
 	return connectionIdentifier.s_addr >> 24;
 }
 
-int CXnIp::sendConnectionInfo(SOCKET s, IN_ADDR ipIdentifier)
+int CXnIp::sendConnectionInfo(XSocket* xsocket, IN_ADDR ipIdentifier)
 {
 	sockaddr_in sendToAddr;
 	memset(&sendToAddr, 0, sizeof(sockaddr_in));
@@ -43,8 +43,8 @@ int CXnIp::sendConnectionInfo(SOCKET s, IN_ADDR ipIdentifier)
 
 		xnIp->connectionPacketsSentCount++;
 
-		int ret = XSocketSendTo(s, (char*)&securePacket, sizeof(SecurePacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
-		LOG_INFO_NETWORK("sendNatInfoUpdate() secure packet sent socket: {}, ipaddress: {:x}, return code/bytes sent: {}", s, sendToAddr.sin_addr.s_addr, ret);
+		int ret = XSocketSendTo((SOCKET)xsocket, (char*)&securePacket, sizeof(SecurePacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
+		LOG_INFO_NETWORK("sendNatInfoUpdate() secure packet sent socket: {}, ipaddress: {:x}, return code/bytes sent: {}", xsocket->WinSockHandle, sendToAddr.sin_addr.s_addr, ret);
 		return ret;
 	}
 	else
@@ -110,7 +110,7 @@ void CXnIp::SaveConnectionNatInfo(IN_ADDR ipIdentifier)
 	
 }
 
-void CXnIp::SaveConnectionNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr)
+void CXnIp::SaveConnectionNatInfo(XSocket* s, IN_ADDR ipIdentifier, sockaddr* addr)
 {
 	/*
 		In theory to handle multiple instance servers in the future what we can do is populate the port field of CreateUser,
@@ -128,7 +128,7 @@ void CXnIp::SaveConnectionNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr
 		This should allow us to handle servers listening on any port without much effort or engine modification.
 	*/
 
-	LOG_INFO_NETWORK("SaveNatInfo() - socket: {}, connection index: {}, identifier: {:x}", s, getConnectionIndex(ipIdentifier), ipIdentifier.s_addr);
+	LOG_INFO_NETWORK("SaveNatInfo() - socket: {}, connection index: {}, identifier: {:x}", s->WinSockHandle, getConnectionIndex(ipIdentifier), ipIdentifier.s_addr);
 	int ipIndex = getConnectionIndex(ipIdentifier);
 	XnIp* xnIp = &this->XnIPs[ipIndex];
 
@@ -143,7 +143,7 @@ void CXnIp::SaveConnectionNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr
 		*/
 		// TODO: handle dynamically
 
-		switch (ipManager.UdpSocketRegs[s].port)
+		switch (s->port)
 		{
 		case 1000:
 			//LOG_TRACE_NETWORK("XSocketRecvFrom() User.sockmap mapping port 1000 - port: %i, secure: %08X", htons(port), secure);
@@ -167,7 +167,7 @@ void CXnIp::SaveConnectionNatInfo(SOCKET s, IN_ADDR ipIdentifier, sockaddr* addr
 	}
 }
 
-void CXnIp::CreateXnIpIdentifierWithNat(SOCKET s, const XNADDR* pxna, const XNKID* xnkid, sockaddr* addr)
+void CXnIp::CreateXnIpIdentifierWithNat(XSocket* s, const XNADDR* pxna, const XNKID* xnkid, sockaddr* addr)
 {
 	IN_ADDR outIpIdentifier;
 
@@ -402,11 +402,6 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 
 	int ret = ipManager.CreateXnIpIdentifier(pxna, pxnkid, pina);
 	 
-	if (ret == ERROR_SUCCESS)
-	{
-		
-	}
-
 	return ret;
 }
 
@@ -457,8 +452,8 @@ int WINAPI XNetConnect(const IN_ADDR ina)
 		if (xnIp->xnetstatus == XNET_CONNECT_STATUS_IDLE)
 		{
 			// TODO: handle dinamically, so it can be used by other games too
-			extern SOCKET game_network_data_gateway_socket_1000; // used for game data
-			extern SOCKET game_network_message_gateway_socket_1001; // used for messaging like connection requests
+			extern XSocket* game_network_data_gateway_socket_1000; // used for game data
+			extern XSocket* game_network_message_gateway_socket_1001; // used for messaging like connection requests
 			ipManager.sendConnectionInfo(game_network_data_gateway_socket_1000, xnIp->connectionIdentifier);
 			ipManager.sendConnectionInfo(game_network_message_gateway_socket_1001, xnIp->connectionIdentifier);
 			

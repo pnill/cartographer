@@ -11,8 +11,8 @@
 #include "CustomPackets\CustomPackets.h"
 #include "NetworkConfiguration\NetworkConfiguration.h"
 
-extern SOCKET game_network_data_gateway_socket_1000;
-extern SOCKET game_network_message_gateway_socket_1001;
+extern XSocket* game_network_data_gateway_socket_1000;
+extern XSocket* game_network_message_gateway_socket_1001;
 
 CustomNetwork *network = new CustomNetwork;
 
