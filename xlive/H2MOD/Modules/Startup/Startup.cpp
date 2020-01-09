@@ -271,12 +271,11 @@ void initLocalAppData() {
 	addDebugText(H2AppDataLocal);
 }
 
-typedef int(__cdecl *tsub_48BBF)();
-tsub_48BBF psub_48BBF;
-int __cdecl sub_48BBF() {
-	int result = psub_48BBF();
+void __cdecl game_modules_dispose() {
+	typedef void(__cdecl *tsub_48BBF)();
+	tsub_48BBF psub_48BBF = (tsub_48BBF)(H2BaseAddr + 0x48BBF);
+	psub_48BBF();
 	DeinitH2Startup();
-	return result;
 }
 
 CRITICAL_SECTION log_section;
@@ -394,8 +393,7 @@ void InitH2Startup() {
 
 		addDebugText("Hooking Shutdown Function");
 		DWORD dwBack;
-		psub_48BBF = (tsub_48BBF)DetourFunc((BYTE*)H2BaseAddr + 0x48BBF, (BYTE*)sub_48BBF, 11);
-		VirtualProtect(psub_48BBF, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		PatchCall(H2BaseAddr + 0x39E7C, game_modules_dispose);
 	}
 
 	if (ArgList != NULL)
