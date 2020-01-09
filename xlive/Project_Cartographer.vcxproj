@@ -285,7 +285,6 @@
     <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\tag_loader.cpp" />
     <ClCompile Include="H2MOD\Modules\ServerConsole\ServerConsole.cpp" />
-    <ClCompile Include="XLive\XNet\Sockets\UdpSocket.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -473,7 +472,6 @@
     <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
-    <ClInclude Include="XLive\XNet\Sockets\UdpSocket.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
