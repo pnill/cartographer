@@ -67,7 +67,7 @@ public:
 
 	std::array<XnIp, 32> XnIPs; // ConnectionIndex->CUser
 
-	std::vector<XSocket*> udpSocketsPtrArray;
+	std::vector<XSocket*> SocketPtrArray;
 
 	XnIp local_user;
 	XNADDR game_host_xn;

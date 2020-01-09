@@ -67,7 +67,7 @@ IN_ADDR CXnIp::GetConnectionIdentifierByNat(sockaddr* addr)
 	}
 
 	IN_ADDR addrInval;
-	addrInval.s_addr = 0x7F000001;
+	addrInval.s_addr = 0;
 	return addrInval;
 }
 
@@ -303,10 +303,10 @@ void CXnIp::UnregisterLocal()
 void CXnIp::SetKeys(XNKID* xnkid, XNKEY* xnkey)
 {
 	if (xnkid)
-		memcpy(&this->host_xnkid, xnkid, sizeof(XNKID));
+		host_xnkid = *xnkid;
 
 	if (xnkey)
-		memcpy(&this->host_xnkey, xnkey, sizeof(XNKEY));
+		host_xnkey = *xnkey;
 }
 
 void CXnIp::EraseKeys()
@@ -318,10 +318,10 @@ void CXnIp::EraseKeys()
 void CXnIp::GetKeys(XNKID* xnkid, XNKEY* xnkey)
 {
 	if (xnkid)
-		memcpy(xnkid, &this->host_xnkid, sizeof(XNKID));
+		*xnkid = host_xnkid;
 
 	if (xnkey)
-		memcpy(xnkey, &this->host_xnkey, sizeof(XNKEY));
+		*xnkey = host_xnkey;
 }
 
 wchar_t ServerLobbyName[32] = { L"Cartographer" };
@@ -348,12 +348,12 @@ void CXnIp::ConfigureLocalUser(XNADDR* pxna, XUID xuid, char* username) {
 	SetUserUsername(username);
 
 	SecureZeroMemory(&local_user, sizeof(XnIp));
-	memcpy(&local_user.xnaddr, pxna, sizeof(XNADDR));
+	local_user.xnaddr = *pxna;
 	SecureZeroMemory(&this->securePacket, sizeof(SecurePacket));
 
 	// secure packet preparation
-	this->securePacket.annoyance_factor = annoyance_factor;
-	memcpy(&this->securePacket.xnaddr, &local_user.xnaddr, sizeof(XNADDR));
+	securePacket.xnaddr = local_user.xnaddr;
+	securePacket.annoyance_factor = annoyance_factor;
 
 	local_user.bValid = true;
 	this->UpdateConnectionStatus();
@@ -366,7 +366,7 @@ BOOL CXnIp::GetLocalXNAddr(XNADDR* pxna)
 {
 	if (local_user.bValid)
 	{
-		memcpy(pxna, &local_user.xnaddr, sizeof(XNADDR));
+		*pxna = local_user.xnaddr;
 		LOG_INFO_NETWORK("GetLocalXNAddr(): XNADDR: {:x}", pxna->ina.s_addr);
 		return TRUE;
 	}
@@ -423,8 +423,8 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 	if (xnIp->bValid 
 		&& xnIp->connectionIdentifier.s_addr == ina.s_addr)
 	{
-		memcpy(pxna, &xnIp->xnaddr, sizeof(XNADDR));
-		memcpy(pxnkid, &xnIp->xnkid, sizeof(XNKID));
+		*pxna = xnIp->xnaddr;
+		*pxnkid = xnIp->xnkid;
 
 		return ERROR_SUCCESS;
 	}

@@ -74,7 +74,7 @@ SOCKET WINAPI XCreateSocket(int af, int type, int protocol)
 		LOG_TRACE_NETWORK("Socket: {} was VDP", ret);
 	}
 
-	ipManager.udpSocketsPtrArray.push_back(newXSocket);
+	ipManager.SocketPtrArray.push_back(newXSocket);
 
 	return (SOCKET)newXSocket;
 }
@@ -86,6 +86,16 @@ int WINAPI XSocketClose(SOCKET s)
 	LOG_TRACE_NETWORK("XSocketClose(): socket: {}", xsocket->WinSockHandle);
 
 	int ret = closesocket(xsocket->WinSockHandle);
+
+	for (auto i = ipManager.SocketPtrArray.begin(); i != ipManager.SocketPtrArray.end(); ++i)
+	{
+		if (*i == xsocket) 
+		{
+			ipManager.SocketPtrArray.erase(i);
+			break;
+		}
+	}
+
 	delete xsocket;
 
 	return ret;
@@ -95,11 +105,12 @@ int WINAPI XSocketClose(SOCKET s)
 INT WINAPI XNetCleanup()
 {
 	LOG_TRACE_NETWORK("XNetCleanup()");
-	for (auto xsocket : ipManager.udpSocketsPtrArray)
+	for (auto xsocket : ipManager.SocketPtrArray)
 	{
 		XSocketClose((SOCKET)xsocket);
 		delete xsocket;
 	}
+	ipManager.SocketPtrArray.clear();
 
 	return 0;
 }
@@ -274,19 +285,22 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 		u_long iplong = ((struct sockaddr_in*)from)->sin_addr.s_addr;
 
 		SecurePacket* secure_pck = reinterpret_cast<SecurePacket*>(buf);
-		if (iplong != H2Config_master_ip)
+		if (iplong == H2Config_master_ip)
 		{
-			if (result == sizeof(SecurePacket)
-				&& secure_pck->annoyance_factor == annoyance_factor)
-			{
-				IN_ADDR ipIdentification;
+			return result;
+		}
+		else if (result == sizeof(SecurePacket)
+			&& secure_pck->annoyance_factor == annoyance_factor)
+		{
+			IN_ADDR ipIdentification;
 
-				LOG_TRACE_NETWORK("[H2MOD-Network] Received secure packet with ip address {:x}, port: {}", htonl(iplong), htons(((struct sockaddr_in*)from)->sin_port));
-				ipManager.CreateXnIpIdentifierWithNat(xsocket, &secure_pck->xnaddr, &secure_pck->xnkid, from); // save NAT info and send back a packet
-				return 0;
-			}
-
-			((struct sockaddr_in*)from)->sin_addr = ipManager.GetConnectionIdentifierByNat(from);
+			LOG_TRACE_NETWORK("[H2MOD-Network] Received secure packet with ip address {:x}, port: {}", htonl(iplong), htons(((struct sockaddr_in*)from)->sin_port));
+			ipManager.CreateXnIpIdentifierWithNat(xsocket, &secure_pck->xnaddr, &secure_pck->xnkid, from); // save NAT info and send back a packet
+			return 0;
+		}
+		else
+		{
+			((struct sockaddr_in*)from)->sin_addr = ipManager.GetConnectionIdentifierByNat(from); // get the connection identifier by NAt
 		}
 	}
 	
