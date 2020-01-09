@@ -4653,16 +4653,12 @@ void setupSomeTests() {
 	//DWORD dwBack;
 
 	//psub_20C226 = (tsub_20C226)DetourClassFunc((BYTE*)H2BaseAddr + 0x20C226, (BYTE*)sub_20C226, 9);
-	//VirtualProtect(psub_20C226, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//psub_24DC0D = (tsub_24DC0D)DetourClassFunc((BYTE*)H2BaseAddr + 0x24DC0D, (BYTE*)sub_24DC0D_CM, 8);
-	//VirtualProtect(psub_24DC0D, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//psub_23D8AE = (tsub_23D8AE)DetourClassFunc((BYTE*)H2BaseAddr + 0x23D8AE, (BYTE*)sub_23D8AE, 9);
-	//VirtualProtect(psub_23D8AE, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//psub_20EEBE = (tsub_20EEBE)DetourClassFunc((BYTE*)H2BaseAddr + 0x20EEBE, (BYTE*)sub_20EEBE_CM, 9);
-	//VirtualProtect(psub_20EEBE, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }
 
 
@@ -5227,23 +5223,16 @@ void initGSCustomMenu() {
 
 	DWORD dwBack;
 	pbtnHandler = (tbtnhandler)DetourClassFunc((BYTE*)H2BaseAddr + 0x213af2, (BYTE*)BtnHandlerCaller, 8);
-	VirtualProtect(pbtnHandler, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	psub_23f6b7 = (tsub_23f6b7)DetourFunc((BYTE*)H2BaseAddr + 0x23f6b7, (BYTE*)sub_23f6b7, 7);
-	VirtualProtect(psub_23f6b7, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//psub_248beb = (tsub_248beb)DetourClassFunc((BYTE*)H2BaseAddr + 0x248beb, (BYTE*)sub_248beb, 8);
-	//VirtualProtect(psub_248beb, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	psub_209129 = (tsub_209129)DetourFunc((BYTE*)H2BaseAddr + 0x209129, (BYTE*)sub_209129, 5);
-	VirtualProtect(psub_209129, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	psub_bd137 = (tsub_bd137)DetourFunc((BYTE*)H2BaseAddr + 0xbd137, (BYTE*)sub_bd137, 5);
-	VirtualProtect(psub_bd137, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
 
 	RefreshToggleIngameKeyboardControls();
-
 
 	CMSetupVFTables_EscSettings();
 	

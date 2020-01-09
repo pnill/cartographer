@@ -1305,7 +1305,6 @@ void H2MOD::ApplyUnitHooks()
 	pc_simulation_unit_entity_definition_decode = h2mod->GetAddress<tc_simulation_unit_entity_definition_creation_decode>(0x1F8557, 0x1E22BD);
 
 	pdevice_touch = (tdevice_touch)DetourFunc(h2mod->GetAddress<BYTE*>(0x163420, 0x158EE3), (BYTE*)device_touch, 10);
-	VirtualProtect(pdevice_touch, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//Only patch the object_new call on host during AI_Place function, no reason to hook all object_new calls.
 	PatchCall(h2mod->GetAddress(0x318DEC, 0x2C3B56), object_new_hook);
@@ -1335,24 +1334,18 @@ void H2MOD::ApplyHooks() {
 
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
-	VirtualProtect(p_map_cache_load, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	// player spawn hook
 	p_spawn_player = (spawn_player)DetourFunc(h2mod->GetAddress<BYTE*>(0x55952, 0x5DE4A), (BYTE*)OnPlayerSpawn, 6);
-	VirtualProtect(p_spawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	// game version hook
 	p_get_game_version = (get_game_version)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4BF5, 0x1B0043), (BYTE*)GetGameVersion, 8);
-	VirtualProtect(p_get_game_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	pplayer_death = (player_death)DetourFunc(h2mod->GetAddress<BYTE*>(0x17B674, 0x152ED4), (BYTE*)OnPlayerDeath, 9);
-	VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	pupdate_player_score = (update_player_score)DetourClassFunc(h2mod->GetAddress<BYTE*>(0xD03ED, 0x8C84C), (BYTE*)OnPlayerScore, 12);
-	VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//on_custom_map_change_method = (on_custom_map_change)DetourFunc(h2mod->GetAddress<BYTE*>(0x32176, 0x25738), (BYTE*)onCustomMapChange, 5);
-	//VirtualProtect(on_custom_map_change_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	// disable part of custom map tag verification
 	NopFill(GetAddress(0x4FA0A, 0x56C0A), 6);
@@ -1372,35 +1365,26 @@ void H2MOD::ApplyHooks() {
 		/* These hooks are only built for the client, don't enable them on the server! */
 
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4C14), (BYTE*)VerifyGameVersionOnJoin, 5);
-		VirtualProtect(p_verify_game_version_on_join, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		p_verify_executable_version = (verify_executable_version)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4C32), (BYTE*)VerifyExecutableVersion, 8);
-		VirtualProtect(p_verify_executable_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//pload_wgit = (tload_wgit)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x2106A2), (BYTE*)OnWgitLoad, 13);
-		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		intercept_map_load_method = (intercept_map_load)DetourClassFunc(h2mod->GetAddress<BYTE*>(0xC259B), (BYTE*)interceptMapLoad, 13);
-		VirtualProtect(intercept_map_load_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		show_error_screen_method = (show_error_screen)DetourFunc(h2mod->GetAddress<BYTE*>(0x20E15A), (BYTE*)showErrorScreen, 8);
-		VirtualProtect(show_error_screen_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//TODO: turn on if you want to debug halo2.exe from start of process
 		//is_debugger_present_method = (is_debugger_present)DetourFunc(h2mod->GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
-		//VirtualProtect(is_debugger_present_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//TODO: use for object spawn hooking
 		//0x132163
 		//object_p_hook_method = (object_p_hook)DetourFunc(h2mod->GetAddress<BYTE*>(0x132163), (BYTE*)objectPHook, 6);
-		//VirtualProtect(object_p_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//TODO: expensive, use for debugging/searching
 		//string_display_hook_method = (string_display_hook)DetourFunc(h2mod->GetAddress<BYTE*>(0x287AB5), (BYTE*)stringDisplayHook, 5);
-		//VirtualProtect(string_display_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//pResetRound=(ResetRounds)DetourFunc(h2mod->GetAddress<BYTE*>(0x6B1C8), (BYTE*)OnNextRound, 7);
-		//VirtualProtect(pResetRound, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		/*
 		WritePointer(h2mod->GetAddress<BYTE*>(0x1F0B3A), player_add_packet_handler);
@@ -1414,7 +1398,6 @@ void H2MOD::ApplyHooks() {
 		NopFill(GetAddress(0x8BB98), 0x2B);
 
 		p_change_local_team = (change_team)DetourFunc(h2mod->GetAddress<BYTE*>(0x2068F2), (BYTE*)changeTeam, 8);
-		VirtualProtect(p_change_local_team, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		// hook the print command to redirect the output to our console
 		PatchCall(GetAddress(0xE9E50), print_to_console);
@@ -1427,6 +1410,7 @@ void H2MOD::ApplyHooks() {
 		WriteValue(GetAddress(0x190B38 + 1), 5);
 
 		pfn_c000bd114 = (tfn_c000bd114)DetourFunc(h2mod->GetAddress<BYTE*>(0xbd114), (BYTE*)fn_c000bd114_IsSkullEnabled, 5);
+
 		PatchCall(GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);
 		PatchCall(GetAddress(0x92C05), BansheeBombIsEngineMPCheck);
 		PatchCall(GetAddress(0x13ff75), FlashlightIsEngineSPCheck);

@@ -199,9 +199,7 @@ void NetworkConfiguration::ApplyPatches()
 	DWORD dwBack;
 
 	//p_unk_live_netcode_func = (unk_live_netcode_func_def)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1BFB23, 0x1B9A03), (BYTE*)unk_live_netcode_func, 10);
-	//VirtualProtect(p_unk_live_netcode_func, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	//NopFill((DWORD)(BYTE*)(p_unk_live_netcode_func)+5 + 3, 5);
 
 	//p_unk_live_netcode_func_2 = (unk_live_netcode_func_def_2)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1BEE8D, 0x1B9A03), (BYTE*)unk_live_netcode_func_2, 14);
-	//VirtualProtect(p_unk_live_netcode_func_2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }

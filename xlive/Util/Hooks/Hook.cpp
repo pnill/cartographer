@@ -7,7 +7,7 @@
 
 void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 {
-	BYTE *jmp = (BYTE*)malloc(len + 5);
+	BYTE *jmp = (BYTE*)VirtualAlloc(nullptr, len + 5, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 	DWORD dwBack;
 
 	VirtualProtect(src, len, PAGE_READWRITE, &dwBack);
@@ -45,7 +45,7 @@ void RetourFunc(BYTE *src, BYTE *restore, const int len)
 
 void *DetourClassFunc(BYTE *src, const BYTE *dst, const int len)
 {
-	BYTE *jmp = (BYTE*)malloc(len + 8);
+	BYTE *jmp = (BYTE*)VirtualAlloc(nullptr, len + 8, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
 	DWORD dwBack;
 	VirtualProtect(src, len, PAGE_READWRITE, &dwBack);

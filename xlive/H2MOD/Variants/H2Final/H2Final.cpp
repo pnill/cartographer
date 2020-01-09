@@ -93,7 +93,6 @@ void EnableStaticWeaponSpawns()
 	{
 		originalGetSecondsUntilEquipmentRespawnFunctionData = *(int64_t*)(base_address + 0x6A8C4);
 		pget_spawn_time = (get_spawn_time)DetourFunc((BYTE*)base_address + 0x6A8C4, (BYTE*)GetSecondsUntilEquipmentRespawn, 5);
-		VirtualProtect(pget_spawn_time, 8, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 }
 
@@ -292,7 +291,6 @@ void Halo2Final::Initialize()
 	if (!detoursHavePreviouslyBeenApplied)
 	{
 		pplayer_weapon_switched = (player_weapon_switched)DetourFunc((BYTE*)h2mod->GetAddress(0x13AA9A), (BYTE*)PlayerWeaponSwitched, 8);
-		VirtualProtect(pplayer_weapon_switched, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 
 #pragma region Apply Weapon Balances

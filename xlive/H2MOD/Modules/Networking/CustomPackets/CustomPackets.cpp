@@ -253,8 +253,6 @@ void CustomPackets::ApplyGamePatches()
 
 	DWORD dwBack;
 	p_handle_out_of_band_message = (handle_out_of_band_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E907B, 0x1CB03B), (BYTE*)handle_out_of_band_message_hook, 8);
-	VirtualProtect(p_handle_out_of_band_message, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	p_handle_channel_message = (handle_channel_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E929C, 0x1CB25C), (BYTE*)handle_channel_message_hook, 8);
-	VirtualProtect(p_handle_channel_message, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }

@@ -362,11 +362,9 @@ bool engine_basic_init()
 
 		// HUD text size fix for higher resolutions
 		Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x264A18, (BYTE*)Video_HUDSizeUpdate_hook, 7);
-		VirtualProtect(Video_HUDSizeUpdate_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		// menu text fix for higher resolutions
 		sub_671B02_orig = (sub_671B02_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x271B02, (BYTE*)sub_671B02_hook, 5);
-		VirtualProtect(sub_671B02_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 
 	if (H2Config_d3dex != 0)
@@ -948,13 +946,11 @@ void InitH2Tweaks() {
 		DWORD dwBack;
 
 		phookServ1 = (thookServ1)DetourFunc((BYTE*)H2BaseAddr + 0x8EFA, (BYTE*)LoadRegistrySettings, 11);
-		VirtualProtect(phookServ1, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		// set the additional pcr time
 		WriteValue<BYTE>(h2mod->GetAddress(0x0, 0xE590) + 2, H2Config_additional_pcr_time);
 
 		//phookServ2 = (thookServ2)DetourFunc((BYTE*)H2BaseAddr + 0xBA3C, (BYTE*)PreReadyLoad, 11);
-		//VirtualProtect(phookServ2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 	else {//is client
 
@@ -962,7 +958,6 @@ void InitH2Tweaks() {
 		//Hook a function which changes the party privacy to detect if the lobby becomes open.
 		//Problem is if you want to set it via mem poking, it won't push the lobby to the master automatically.
 		//phookChangePrivacy = (thookChangePrivacy)DetourFunc((BYTE*)H2BaseAddr + 0x2153ce, (BYTE*)HookChangePrivacy, 11);
-		//VirtualProtect(phookChangePrivacy, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		bool IntroHQ = true;//clients should set on halo2.exe -highquality
 
@@ -997,15 +992,11 @@ void InitH2Tweaks() {
 
 		//Hook for Hitmarker sound effect.
 //		pfn_c0017a25d = (tfn_c0017a25d)DetourFunc((BYTE*)H2BaseAddr + 0x0017a25d, (BYTE*)fn_c0017a25d, 10);
-//		VirtualProtect(pfn_c0017a25d, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//Hook for advanced lobby options.
 		pfn_c0024eeef = (tfn_c0024eeef)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024eeef, (BYTE*)fn_c0024eeef, 9);
-		VirtualProtect(pfn_c0024eeef, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 		pfn_c0024fa19 = (tfn_c0024fa19)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fa19, (BYTE*)fn_c0024fa19, 9);
-		VirtualProtect(pfn_c0024fa19, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 		pfn_c0024fabc = (tfn_c0024fabc)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fabc, (BYTE*)fn_c0024fabc, 13);
-		VirtualProtect(pfn_c0024fabc, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		WriteJmpTo(h2mod->GetAddress(0x4544), is_init_flag_set);
 

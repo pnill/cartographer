@@ -29,7 +29,6 @@ void ServerConsole::ApplyHooks()
 	DWORD dwBack;
 
 	p_dedi_command_hook = (dedi_command_hook)DetourFunc(h2mod->GetAddress<BYTE*>(0x0, 0x1CCFC), (BYTE*)dediCommandHook, 7);
-	VirtualProtect(p_dedi_command_hook, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }
 
 void ServerConsole::logToDedicatedServerConsole(const wchar_t* string, ...) {
