@@ -110,7 +110,7 @@ void CXnIp::SaveConnectionNatInfo(IN_ADDR ipIdentifier)
 	
 }
 
-void CXnIp::SaveConnectionNatInfo(XSocket* s, IN_ADDR ipIdentifier, sockaddr* addr)
+void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr* addr)
 {
 	/*
 		In theory to handle multiple instance servers in the future what we can do is populate the port field of CreateUser,
@@ -128,7 +128,7 @@ void CXnIp::SaveConnectionNatInfo(XSocket* s, IN_ADDR ipIdentifier, sockaddr* ad
 		This should allow us to handle servers listening on any port without much effort or engine modification.
 	*/
 
-	LOG_INFO_NETWORK("SaveNatInfo() - socket: {}, connection index: {}, identifier: {:x}", s->WinSockHandle, getConnectionIndex(ipIdentifier), ipIdentifier.s_addr);
+	LOG_INFO_NETWORK("SaveNatInfo() - socket: {}, connection index: {}, identifier: {:x}", xsocket->WinSockHandle, getConnectionIndex(ipIdentifier), ipIdentifier.s_addr);
 	int ipIndex = getConnectionIndex(ipIdentifier);
 	XnIp* xnIp = &this->XnIPs[ipIndex];
 
@@ -143,7 +143,7 @@ void CXnIp::SaveConnectionNatInfo(XSocket* s, IN_ADDR ipIdentifier, sockaddr* ad
 		*/
 		// TODO: handle dynamically
 
-		switch (s->port)
+		switch (xsocket->nPort)
 		{
 		case 1000:
 			//LOG_TRACE_NETWORK("XSocketRecvFrom() User.sockmap mapping port 1000 - port: %i, secure: %08X", htons(port), secure);
@@ -167,7 +167,7 @@ void CXnIp::SaveConnectionNatInfo(XSocket* s, IN_ADDR ipIdentifier, sockaddr* ad
 	}
 }
 
-void CXnIp::CreateXnIpIdentifierWithNat(XSocket* s, const XNADDR* pxna, const XNKID* xnkid, sockaddr* addr)
+void CXnIp::HandleConnectionPacket(XSocket* s, const XNADDR* pxna, const XNKID* xnkid, sockaddr* addr)
 {
 	IN_ADDR outIpIdentifier;
 

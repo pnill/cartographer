@@ -4,7 +4,7 @@
 
 struct XSocket
 {
-	short port; // port stored in network byte order
+	short nPort; // port stored in network byte order
 	int protocol;
 	bool isVoiceSocket;
 	SOCKET WinSockHandle;

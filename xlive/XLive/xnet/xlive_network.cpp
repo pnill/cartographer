@@ -123,7 +123,7 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 
 	// TODO: support TCP
 	if (xsocket->protocol == IPPROTO_UDP)
-		xsocket->port = htons(port);
+		xsocket->nPort = htons(port);
 
 	if (htons(port) == 1000) {
 		game_network_data_gateway_socket_1000 = xsocket;
@@ -215,16 +215,16 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 	*/
 
 	/* TODO: handle this dynamically */
-	u_short nPort = 0;
-	switch (xsocket->port)
+	u_short hPort = 0;
+	switch (xsocket->nPort)
 	{
 	case 1000:
-		nPort = xnIp->NatAddrSocket1000.sin_port;
+		hPort = xnIp->NatAddrSocket1000.sin_port;
 
-		if (nPort != 0)
+		if (hPort != 0)
 		{
 			//LOG_TRACE_XLIVE("XSocketSendTo() port 1000 nPort: {} secure: %08X", htons(nPort), iplong);
-			sendAddress.sin_port = nPort;
+			sendAddress.sin_port = hPort;
 		}
 		else 
 		{
@@ -234,12 +234,12 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 		break;
 
 	case 1001:
-		nPort = xnIp->NatAddrSocket1001.sin_port;
+		hPort = xnIp->NatAddrSocket1001.sin_port;
 
-		if (nPort != 0)
+		if (hPort != 0)
 		{
 			//LOG_TRACE_XLIVE("XSocketSendTo() port 1001 nPort: %i secure: %08X", htons(nPort), iplong);
-			sendAddress.sin_port = nPort;
+			sendAddress.sin_port = hPort;
 		}
 		else
 		{
@@ -292,10 +292,8 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 		else if (result == sizeof(SecurePacket)
 			&& secure_pck->annoyance_factor == annoyance_factor)
 		{
-			IN_ADDR ipIdentification;
-
 			LOG_TRACE_NETWORK("[H2MOD-Network] Received secure packet with ip address {:x}, port: {}", htonl(iplong), htons(((struct sockaddr_in*)from)->sin_port));
-			ipManager.CreateXnIpIdentifierWithNat(xsocket, &secure_pck->xnaddr, &secure_pck->xnkid, from); // save NAT info and send back a packet
+			ipManager.HandleConnectionPacket(xsocket, &secure_pck->xnaddr, &secure_pck->xnkid, from); // save NAT info and send back a packet
 			return 0;
 		}
 		else
