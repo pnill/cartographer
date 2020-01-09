@@ -4,7 +4,7 @@
 #include "Globals.h"
 #include "XLive\XAM\xam.h"
 #include "XLive\xbox\xbox.h"
-#include "XLive\Networking\ServerList.h"
+#include "XLive\ServerList\ServerList.h"
 #include "XLive\achievements\XAchievements.h"
 
 //#include "XLive\Globals.h"
@@ -924,6 +924,14 @@ LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicS
 	Check_Overlapped( pOverlapped );
 
 	return ERROR_IO_PENDING;
+}
+
+// #5332: XSessionEnd
+int WINAPI XSessionEnd(DWORD, DWORD)
+{
+	mapManager->cleanup();
+	LOG_TRACE_NETWORK("XSessionEnd()");
+	return 0;
 }
 
 

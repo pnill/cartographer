@@ -1,7 +1,7 @@
 
 #include "Globals.h"
 
-#include "XLive\IpManagement\XnIp.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\ServerConsole\ServerConsole.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -11,8 +11,8 @@
 #include "CustomPackets\CustomPackets.h"
 #include "NetworkConfiguration\NetworkConfiguration.h"
 
-extern SOCKET game_network_data_gateway_socket_1000;
-extern SOCKET game_network_message_gateway_socket_1001;
+extern XSocket* game_network_data_gateway_socket_1000;
+extern XSocket* game_network_message_gateway_socket_1001;
 
 CustomNetwork *network = new CustomNetwork;
 
@@ -213,8 +213,6 @@ tjoin_game pjoin_game;
 
 bool __stdcall join_game(void* thisptr, int a2, int a3, XNKID* xnkid, XNKEY* xnkey, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
 {
-	IN_ADDR ipIdentifier;
-
 	memcpy(&ipManager.game_host_xn, host_xn, sizeof(XNADDR));
 	LOG_TRACE_NETWORK("[H2MOD-Network] copied host information, XNADDR: {:#x}", ipManager.game_host_xn.ina.s_addr);
 	

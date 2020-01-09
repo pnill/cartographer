@@ -16,113 +16,107 @@ int WINAPI XWSACleanup()
 	return WSACleanup();
 }
 
-// #4
-int WINAPI XSocketClose(SOCKET s)
-{
-	LOG_TRACE_XLIVE("XSocketClose: socket: {}", s);
-
-	auto sockmap_elem = ipManager.sockmap.find(s);
-	if (sockmap_elem != ipManager.sockmap.end())
-		ipManager.sockmap.erase(sockmap_elem);
-
-	return closesocket(s);
-}
-
 // #5: XSocketShutdown
 int WINAPI XSocketShutdown(SOCKET s, int how)
 {
-	LOG_TRACE_XLIVE("XSocketShutdown");
-	return shutdown(s, how);
+	LOG_TRACE_NETWORK("XSocketShutdown");
+	XSocket* xsocket = (XSocket*)s;
+	return shutdown(xsocket->WinSockHandle, how);
 }
 
 // #6: XSocketIOCTLSocket
 int WINAPI XSocketIOCTLSocket(SOCKET s, __int32 cmd, u_long *argp)
 {
 	//LOG_TRACE_XLIVE("XSocketIOCTLSocket");
-	return ioctlsocket(s, cmd, argp);
+	XSocket* xsocket = (XSocket*)s;
+	return ioctlsocket(xsocket->WinSockHandle, cmd, argp);
 }
 
 // #7: XSocketSetSockOpt
 int WINAPI XSocketSetSockOpt(SOCKET s, int level, int optname, const char *optval, int optlen)
 {
-	int ret;
+	XSocket* xsocket = (XSocket*)s;
 
-	LOG_TRACE_XLIVE("XSocketSetSockOpt  (socket = {0:x}, level = {1}, optname = {2}, optval = {3}, optlen = {4})",
-		s, level, optname, optval ? optval : "", optlen);
+	LOG_TRACE_NETWORK("XSocketSetSockOpt  (socket = {0:x}, level = {1}, optname = {2}, optval = {3}, optlen = {4})",
+		xsocket->WinSockHandle, level, optname, optval ? optval : "", optlen);
 
 	if ((level & SO_BROADCAST) > 0)
 	{
-
-		LOG_TRACE_XLIVE("XSocketSetSockOpt - SO_BROADCAST");
+		LOG_TRACE_NETWORK("XSocketSetSockOpt - SO_BROADCAST");
 	}
-	ret = setsockopt(s, level, optname, optval, optlen);
+	int ret = setsockopt(xsocket->WinSockHandle, level, optname, optval, optlen);
 	if (ret == SOCKET_ERROR)
 	{
-		LOG_TRACE_XLIVE("XSocketSetSockOpt - SOCKET_ERROR");
+		LOG_TRACE_NETWORK("XSocketSetSockOpt - SOCKET_ERROR");
 	}
 
-	LOG_TRACE_XLIVE("- ret = {:x}", ret);
+	LOG_TRACE_NETWORK("- ret = {:x}", ret);
 	return ret;
 }
 
 // #8: XSocketGetSockOpt
 int WINAPI XSocketGetSockOpt(SOCKET s, int level, int optname, char *optval, int *optlen)
 {
+	XSocket* xsocket = (XSocket*)s;
 	//LOG_TRACE_XLIVE("XSocketGetSockOpt");
-	return getsockopt(s, level, optname, optval, optlen);
+	return getsockopt(xsocket->WinSockHandle, level, optname, optval, optlen);
 }
 
 // #9: XSocketGetSockName
 int WINAPI XSocketGetSockName(SOCKET s, struct sockaddr *name, int *namelen)
 {
 	LOG_TRACE_XLIVE("XSocketGetSockName");
-	return getsockname(s, name, namelen);
+	XSocket* xsocket = (XSocket*)s;
+	return getsockname(xsocket->WinSockHandle, name, namelen);
 }
 
 // #10
 int WINAPI XSocketGetPeerName(SOCKET s, struct sockaddr *name, int *namelen)
 {
 	LOG_TRACE_XLIVE("XSocketGetPeerName");
-	return getpeername(s, name, namelen);
+	XSocket* xsocket = (XSocket*)s;
+	return getpeername(xsocket->WinSockHandle, name, namelen);
 }
 
 
 // #12: XSocketConnect
 int WINAPI XSocketConnect(SOCKET s, const struct sockaddr *name, int namelen)
 {
+	XSocket* xsocket = (XSocket*)s;
 	LOG_TRACE_XLIVE("XSocketConnect  (socket = {0:x}, name = {1:p}, namelen = {2})",
-		s, (void*)name, namelen);
+		xsocket->WinSockHandle, (void*)name, namelen);
 
-	return connect(s, name, namelen);
+	return connect(xsocket->WinSockHandle, name, namelen);
 }
 
 
 // #13: XSocketListen
 int WINAPI XSocketListen(SOCKET s, int backlog)
 {
+	XSocket* xsocket = (XSocket*)s;
 	LOG_TRACE_XLIVE("XSocketListen  (socket = {0:x}, backlog = {1:x})",
-		s, backlog);
+		xsocket->WinSockHandle, backlog);
 
-	return listen(s, backlog);
+	return listen(xsocket->WinSockHandle, backlog);
 }
 
 
 // #14: XSocketAccept
 SOCKET WINAPI XSocketAccept(SOCKET s, struct sockaddr *addr, int *addrlen)
 {
+	XSocket* xsocket = (XSocket*)s;
+
 	static int print = 0;
-
-
 	if (print < 25)
 	{
 		LOG_TRACE_XLIVE("XSocketAccept  (socket = {0:x}, addr = {1:p}, addrlen = {2})",
-			s, (void*)addr, *addrlen);
+			xsocket->WinSockHandle, (void*)addr, *addrlen);
 
 		print++;
 	}
 
 
-	return accept(s, addr, addrlen);
+	return accept(xsocket->WinSockHandle, addr, addrlen);
 }
 
 
@@ -130,8 +124,6 @@ SOCKET WINAPI XSocketAccept(SOCKET s, struct sockaddr *addr, int *addrlen)
 int WINAPI XSocketSelect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timeval *timeout)
 {
 	static int print = 0;
-
-
 	if (print < 15)
 	{
 		LOG_TRACE_XLIVE("XSocketSelect");
@@ -145,10 +137,11 @@ int WINAPI XSocketSelect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *ex
 // #16
 BOOL WINAPI XSocketWSAGetOverlappedResult(SOCKET s, LPWSAOVERLAPPED lpOverlapped, LPDWORD lpcbTransfer, BOOL fWait, LPDWORD lpdwFlags)
 {
+	XSocket* xsocket = (XSocket*)s;
 	LOG_TRACE_XLIVE("XSocketWSAGetOverlappedResult  (socket = {0:x}, lpWSAOverlapped = {1:p}, lpcbTransfer = {2:p}, fWait = {3}, lpdwFlags = {4:p})",
-		s, (void*)lpOverlapped, (void*)lpcbTransfer, fWait, (void*)lpdwFlags);
+		xsocket->WinSockHandle, (void*)lpOverlapped, (void*)lpcbTransfer, fWait, (void*)lpdwFlags);
 
-	return WSAGetOverlappedResult(s, lpOverlapped, lpcbTransfer, fWait, lpdwFlags);
+	return WSAGetOverlappedResult(xsocket->WinSockHandle, lpOverlapped, lpcbTransfer, fWait, lpdwFlags);
 }
 
 // #17
@@ -161,24 +154,27 @@ BOOL WINAPI XSocketWSACancelOverlappedIO(HANDLE hFile)
 // #18: XSocketRecv
 int WINAPI XSocketRecv(SOCKET s, char * buf, int len, int flags)
 {
+	XSocket* xsocket = (XSocket*)s;
 	LOG_TRACE_XLIVE("XSocketRecv");
-	return recv(s, buf, len, flags);
+	return recv(xsocket->WinSockHandle, buf, len, flags);
 }
 
 // #19
 int WINAPI XSocketWSARecv(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
+	XSocket* xsocket = (XSocket*)s;
 	LOG_TRACE_XLIVE("XSocketWSARecv");
-	return WSARecv(s, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpOverlapped, lpCompletionRoutine);
+	return WSARecv(xsocket->WinSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpOverlapped, lpCompletionRoutine);
 }
 
 
 // #21
 int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr *lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
+	XSocket* xsocket = (XSocket*)s;
 	LOG_TRACE_XLIVE("XSocketWSARecvFrom");
 	return WSARecvFrom(
-		s,
+		xsocket->WinSockHandle,
 		lpBuffers,
 		dwBufferCount,
 		lpNumberOfBytesRecvd,
@@ -192,24 +188,27 @@ int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount,
 // #22: XSocketSend
 int WINAPI XSocketSend(SOCKET s, const char *buf, int len, int flags)
 {
+	XSocket* xsocket = (XSocket*)s;
 	LOG_TRACE_XLIVE("XSocketSend");
-	return send(s, buf, len, flags);
+	return send(xsocket->WinSockHandle, buf, len, flags);
 }
 
 // #23
 int WINAPI XSocketWSASend(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesSent, DWORD dwFlags, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
+	XSocket* xsocket = (XSocket*)s;
 	LOG_TRACE_XLIVE("XSocketWSASend");
-	return WSASend(s, lpBuffers, dwBufferCount, lpNumberOfBytesSent, dwFlags, lpOverlapped, lpCompletionRoutine);
+	return WSASend(xsocket->WinSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesSent, dwFlags, lpOverlapped, lpCompletionRoutine);
 }
 
 // #25
 int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesSent, DWORD dwFlags, sockaddr *lpTo, int iTolen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
+	XSocket* xsocket = (XSocket*)s;
 	LOG_TRACE_XLIVE("XSocketWSASendTo");
 	lpTo->sa_family = AF_INET;
 	return WSASendTo(
-		s,
+		xsocket->WinSockHandle,
 		lpBuffers,
 		dwBufferCount,
 		lpNumberOfBytesSent,
@@ -298,8 +297,9 @@ int WINAPI XSocketWSAFDIsSet(SOCKET fd, fd_set *a2)
 // #35
 int WINAPI XSocketWSAEventSelect(SOCKET s, HANDLE hEventObject, __int32 lNetworkEvents)
 {
+	XSocket* xsocket = (XSocket*)s;
 	LOG_TRACE_XLIVE("XSocketWSAEventSelect");
-	return WSAEventSelect(s, hEventObject, lNetworkEvents);
+	return WSAEventSelect(xsocket->WinSockHandle, hEventObject, lNetworkEvents);
 }
 
 // #37: XSocketHTONL
@@ -321,7 +321,7 @@ u_long WINAPI XSocketNTOHL(u_long netlong)
 }
 
 // #40: XSocketHTONS
-u_short WINAPI XSocketHTONS(u_short a1)
+u_short WINAPI XSocketHTONS(u_short hostshort)
 {
-	return htons(a1);
+	return htons(hostshort);
 }
