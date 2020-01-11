@@ -9,7 +9,7 @@ extern XUID xFakeXuid[4];
 extern CHAR g_szUserName[4][16];
 
 CXnIp ipManager;
-const DWORD annoyance_factor = 0x8E0A40F1;
+const DWORD annoyance_factor = 0x8E0A40F8;
 
 extern int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr *to, int tolen);
 
