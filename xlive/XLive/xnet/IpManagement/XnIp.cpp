@@ -26,7 +26,7 @@ int CXnIp::getConnectionIndex(IN_ADDR connectionIdentifier)
 	return connectionIdentifier.s_addr >> 24;
 }
 
-int CXnIp::sendConnectionInfo(XSocket* xsocket, IN_ADDR ipIdentifier)
+int CXnIp::sendConnectionRequest(XSocket* xsocket, IN_ADDR ipIdentifier)
 {
 	sockaddr_in sendToAddr;
 	memset(&sendToAddr, 0, sizeof(sockaddr_in));
@@ -44,12 +44,12 @@ int CXnIp::sendConnectionInfo(XSocket* xsocket, IN_ADDR ipIdentifier)
 		xnIp->connectionPacketsSentCount++;
 
 		int ret = XSocketSendTo((SOCKET)xsocket, (char*)&securePacket, sizeof(SecurePacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
-		LOG_INFO_NETWORK("sendNatInfoUpdate() secure packet sent socket: {}, ipaddress: {:x}, return code/bytes sent: {}", xsocket->WinSockHandle, sendToAddr.sin_addr.s_addr, ret);
+		LOG_INFO_NETWORK("sendConnectionRequest() secure packet sent socket handle: {}, connection index: {}, connection identifier: {:x}, return code/bytes sent: {}", xsocket->WinSockHandle, getConnectionIndex(ipIdentifier), sendToAddr.sin_addr.s_addr, ret);
 		return ret;
 	}
 	else
 	{
-		LOG_ERROR_NETWORK("sendNatInfoUpdate() - connection index: {}, identifier: {:x} is invalid!", getConnectionIndex(ipIdentifier), ipIdentifier.s_addr);
+		LOG_ERROR_NETWORK("sendConnectionRequest() - connection index: {}, identifier: {:x} is invalid!", getConnectionIndex(ipIdentifier), ipIdentifier.s_addr);
 		return -1;
 	}
 }
@@ -69,45 +69,6 @@ IN_ADDR CXnIp::GetConnectionIdentifierByNat(sockaddr* addr)
 	IN_ADDR addrInval;
 	addrInval.s_addr = 0;
 	return addrInval;
-}
-
-/*
-	In order to use this, make sure the XnIp in present in the system
-*/
-void CXnIp::SaveConnectionNatInfo(IN_ADDR ipIdentifier)
-{
-	/*
-		Use this function when joining a game
-	*/
-	int connectionIndex = getConnectionIndex(ipIdentifier);
-	XnIp* xnIp = &this->XnIPs[connectionIndex];
-	LOG_INFO_NETWORK("SaveNatInfo() - connection index: {}, identifier: {:x}", connectionIndex, ipIdentifier.s_addr);
-
-	if (xnIp->bValid
-		&& xnIp->connectionIdentifier.s_addr == ipIdentifier.s_addr)
-	{
-		/* This happens when joining a server, it's a fix to dynamic ports... */
-		/* It sets up the host NAT data */
-
-		// TODO: dinamically handle these
-		xnIp->NatAddrSocket1000.sin_family = AF_INET;
-		xnIp->NatAddrSocket1000.sin_addr = xnIp->xnaddr.ina;
-		xnIp->NatAddrSocket1000.sin_port = xnIp->xnaddr.wPortOnline;
-
-		xnIp->NatAddrSocket1001.sin_family = AF_INET;
-		xnIp->NatAddrSocket1001.sin_addr = xnIp->xnaddr.ina;
-		xnIp->NatAddrSocket1001.sin_port = htons(ntohs(xnIp->xnaddr.wPortOnline) + 1);
-
-		LOG_INFO_NETWORK("SaveNatInfo() - base port: {}, join port: {}", ntohs(xnIp->NatAddrSocket1000.sin_port), ntohs(xnIp->xnaddr.wPortOnline) + 1);
-
-		// Loopback bs
-		if (H2Config_ip_wan == xnIp->xnaddr.ina.s_addr)
-		{
-			xnIp->NatAddrSocket1000.sin_addr.s_addr = H2Config_ip_lan;
-			xnIp->NatAddrSocket1001.sin_addr.s_addr = H2Config_ip_lan;
-		}
-	}
-	
 }
 
 void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr* addr)
@@ -167,21 +128,21 @@ void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockad
 	}
 }
 
-void CXnIp::HandleConnectionPacket(XSocket* s, const XNADDR* pxna, const XNKID* xnkid, sockaddr* addr)
+void CXnIp::HandleConnectionPacket(XSocket* xsocket, const XNADDR* pxna, const XNKID* xnkid, sockaddr* addr)
 {
 	IN_ADDR outIpIdentifier;
 
 	int ret = CreateXnIpIdentifier(pxna, xnkid, &outIpIdentifier);
 	if (ret == ERROR_SUCCESS)
 	{
-		SaveConnectionNatInfo(s, outIpIdentifier, (sockaddr*)addr);
+		SaveConnectionNatInfo(xsocket, outIpIdentifier, (sockaddr*)addr);
 
 		XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(outIpIdentifier)];
 
 		if (xnIp->bValid
 			&& xnIp->xnetstatus < XNET_CONNECT_STATUS_CONNECTED)
 		{
-			ipManager.sendConnectionInfo(s, xnIp->connectionIdentifier);
+			ipManager.sendConnectionRequest(xsocket, xnIp->connectionIdentifier);
 
 			// TODO: handle dinamically
 			if (xnIp->NatAddrSocket1000.sin_port != 0 &&
@@ -193,7 +154,7 @@ void CXnIp::HandleConnectionPacket(XSocket* s, const XNADDR* pxna, const XNKID* 
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("CreateXnIpIdentifierWithNat(): secure connection couldn't be established!");
+		LOG_TRACE_NETWORK("HandleConnectionPacket(): secure connection couldn't be established!");
 	}
 }
 
@@ -454,8 +415,8 @@ int WINAPI XNetConnect(const IN_ADDR ina)
 			// TODO: handle dinamically, so it can be used by other games too
 			extern XSocket* game_network_data_gateway_socket_1000; // used for game data
 			extern XSocket* game_network_message_gateway_socket_1001; // used for messaging like connection requests
-			ipManager.sendConnectionInfo(game_network_data_gateway_socket_1000, xnIp->connectionIdentifier);
-			ipManager.sendConnectionInfo(game_network_message_gateway_socket_1001, xnIp->connectionIdentifier);
+			ipManager.sendConnectionRequest(game_network_data_gateway_socket_1000, xnIp->connectionIdentifier);
+			ipManager.sendConnectionRequest(game_network_message_gateway_socket_1001, xnIp->connectionIdentifier);
 			
 			xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING;
 		}

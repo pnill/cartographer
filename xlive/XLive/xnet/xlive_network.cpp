@@ -25,7 +25,7 @@ void ForwardPorts()
 	//upnp.UPnPForwardPort(false, (H2Config_base_port + 6), (H2Config_base_port + 6), "Halo2_3");
 	upnp.UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
 
-	LOG_TRACE_NETWORK("[UPNP] Finished forwarding ports.");
+	LOG_TRACE_NETWORK("ForwardPorts - Finished forwarding ports.");
 }
 
 // #5310: XOnlineStartup
@@ -83,7 +83,7 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 int WINAPI XSocketClose(SOCKET s)
 {
 	XSocket* xsocket = (XSocket*)s;
-	LOG_TRACE_NETWORK("XSocketClose(): socket: {}", xsocket->WinSockHandle);
+	LOG_TRACE_NETWORK("XSocketClose() - socket: {}", xsocket->WinSockHandle);
 
 	int ret = closesocket(xsocket->WinSockHandle);
 
@@ -128,13 +128,13 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 	if (htons(port) == 1000) {
 		game_network_data_gateway_socket_1000 = xsocket;
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port);
-		LOG_TRACE_NETWORK("XSocketBind() replaced port {} with {}", htons(port), H2Config_base_port);
+		LOG_TRACE_NETWORK("XSocketBind() - replaced port {} with {}", htons(port), H2Config_base_port);
 	}
 
 	if (htons(port) == 1001) {
 		game_network_message_gateway_socket_1001 = xsocket;
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port + 1);
-		LOG_TRACE_NETWORK("XSocketBind() replaced port {} with {}", htons(port), H2Config_base_port + 1);
+		LOG_TRACE_NETWORK("XSocketBind() - replaced port {} with {}", htons(port), H2Config_base_port + 1);
 	}
 
 	if (htons(port) == 1005)
@@ -257,7 +257,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr
 
 	if (result == SOCKET_ERROR)
 	{
-		LOG_TRACE_NETWORK("XSocketSendTo() - Socket Error: {}", WSAGetLastError());
+		LOG_ERROR_NETWORK("XSocketSendTo() - Socket Error: {}", WSAGetLastError());
 		return SOCKET_ERROR;
 	}
 	else
@@ -277,7 +277,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 	if (result == SOCKET_ERROR)
 	{
 		if (WSAGetLastError() != WSAEWOULDBLOCK)
-			LOG_TRACE_NETWORK("XSocketRecvFrom() - Socket Error: {}", WSAGetLastError());
+			LOG_ERROR_NETWORK("XSocketRecvFrom() - Socket Error: {}", WSAGetLastError());
 		return SOCKET_ERROR;
 	}
 	else if (result > 0)
@@ -292,7 +292,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 		else if (result == sizeof(SecurePacket)
 			&& secure_pck->annoyance_factor == annoyance_factor)
 		{
-			LOG_TRACE_NETWORK("[H2MOD-Network] Received secure packet with ip address {:x}, port: {}", htonl(iplong), htons(((struct sockaddr_in*)from)->sin_port));
+			LOG_TRACE_NETWORK("XSocketRecvFrom() - Received secure packet with ip address {:x}, port: {}", htonl(iplong), htons(((struct sockaddr_in*)from)->sin_port));
 			ipManager.HandleConnectionPacket(xsocket, &secure_pck->xnaddr, &secure_pck->xnkid, from); // save NAT info and send back a packet
 			return 0;
 		}

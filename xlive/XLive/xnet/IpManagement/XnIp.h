@@ -53,10 +53,9 @@ public:
 	void UnregisterLocal();
 	void ConfigureLocalUser(XNADDR* pxna, XUID xuid, char* username);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
-	int sendConnectionInfo(XSocket* s, IN_ADDR ipIdentifier);
+	int sendConnectionRequest(XSocket* xsocket, IN_ADDR ipIdentifier);
 
 	IN_ADDR GetConnectionIdentifierByNat(sockaddr* addr);
-	void SaveConnectionNatInfo(IN_ADDR ipIdentifier);
 	void SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr* addr);
 	void HandleConnectionPacket(XSocket* xsocket, const XNADDR* pxna, const XNKID* xnkid, sockaddr* addr);
 	void SetKeys(XNKID*, XNKEY*);
@@ -65,9 +64,8 @@ public:
 
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 
-	std::array<XnIp, 32> XnIPs; // ConnectionIndex->CUser
-
-	std::vector<XSocket*> SocketPtrArray;
+	std::array<XnIp, 32> XnIPs = {}; // ConnectionIndex->CUser
+	std::vector<XSocket*> SocketPtrArray = {};
 
 	XnIp local_user;
 	XNADDR game_host_xn;
