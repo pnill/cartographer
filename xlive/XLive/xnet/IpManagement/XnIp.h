@@ -35,9 +35,9 @@ template<typename S, typename T> struct std::hash < std::pair<S, T> >
 	}
 };
 
-struct SecurePacket 
+struct XNetConnectionReqPacket 
 {
-	DWORD annoyance_factor;
+	DWORD ConnectPacketIdentifier;
 	XNADDR xnaddr;
 	XNKID xnkid;
 };
@@ -70,7 +70,8 @@ public:
 	XnIp local_user;
 	XNADDR game_host_xn;
 	int total_connections_saved;
-	SecurePacket securePacket;
+	XNetConnectionReqPacket securePacket;
+	DWORD connectPacketIdentifier = 0x8E0A40F8; // DO NOT TOUCH THIS
 
 private:
 	XNKID host_xnkid;
@@ -80,4 +81,3 @@ private:
 extern wchar_t ServerLobbyName[32];
 void SetUserUsername(char* username);
 extern CXnIp ipManager;
-extern const DWORD annoyance_factor;

@@ -9,7 +9,6 @@ extern XUID xFakeXuid[4];
 extern CHAR g_szUserName[4][16];
 
 CXnIp ipManager;
-const DWORD annoyance_factor = 0x8E0A40F8;
 
 extern int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr *to, int tolen);
 
@@ -43,7 +42,7 @@ int CXnIp::sendConnectionRequest(XSocket* xsocket, IN_ADDR ipIdentifier)
 
 		xnIp->connectionPacketsSentCount++;
 
-		int ret = XSocketSendTo((SOCKET)xsocket, (char*)&securePacket, sizeof(SecurePacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
+		int ret = XSocketSendTo((SOCKET)xsocket, (char*)&securePacket, sizeof(XNetConnectionReqPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
 		LOG_INFO_NETWORK("sendConnectionRequest() secure packet sent socket handle: {}, connection index: {}, connection identifier: {:x}, return code/bytes sent: {}", xsocket->WinSockHandle, getConnectionIndex(ipIdentifier), sendToAddr.sin_addr.s_addr, ret);
 		return ret;
 	}
@@ -310,11 +309,11 @@ void CXnIp::ConfigureLocalUser(XNADDR* pxna, XUID xuid, char* username) {
 
 	SecureZeroMemory(&local_user, sizeof(XnIp));
 	local_user.xnaddr = *pxna;
-	SecureZeroMemory(&this->securePacket, sizeof(SecurePacket));
+	SecureZeroMemory(&this->securePacket, sizeof(XNetConnectionReqPacket));
 
 	// secure packet preparation
 	securePacket.xnaddr = local_user.xnaddr;
-	securePacket.annoyance_factor = annoyance_factor;
+	securePacket.ConnectPacketIdentifier = connectPacketIdentifier;
 
 	local_user.bValid = true;
 	this->UpdateConnectionStatus();

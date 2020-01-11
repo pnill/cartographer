@@ -284,16 +284,16 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 	{
 		u_long iplong = ((struct sockaddr_in*)from)->sin_addr.s_addr;
 
-		SecurePacket* secure_pck = reinterpret_cast<SecurePacket*>(buf);
+		XNetConnectionReqPacket* connectionPck = reinterpret_cast<XNetConnectionReqPacket*>(buf);
 		if (iplong == H2Config_master_ip)
 		{
 			return result;
 		}
-		else if (result == sizeof(SecurePacket)
-			&& secure_pck->annoyance_factor == annoyance_factor)
+		else if (result == sizeof(XNetConnectionReqPacket)
+			&& connectionPck->ConnectPacketIdentifier == ipManager.connectPacketIdentifier)
 		{
 			LOG_TRACE_NETWORK("XSocketRecvFrom() - Received secure packet with ip address {:x}, port: {}", htonl(iplong), htons(((struct sockaddr_in*)from)->sin_port));
-			ipManager.HandleConnectionPacket(xsocket, &secure_pck->xnaddr, &secure_pck->xnkid, from); // save NAT info and send back a packet
+			ipManager.HandleConnectionPacket(xsocket, &connectionPck->xnaddr, &connectionPck->xnkid, from); // save NAT info and send back a packet
 			return 0;
 		}
 		else
