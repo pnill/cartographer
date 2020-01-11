@@ -37,10 +37,10 @@ int WINAPI XOnlineStartup()
 	return ERROR_SUCCESS;
 }
 
-// #3: XCreateSocket
-SOCKET WINAPI XCreateSocket(int af, int type, int protocol)
+// #3: XSocketCreate
+SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 {
-	LOG_TRACE_NETWORK("XCreateSocket() af = {0}, type = {1}, protocol = {2}", af, type, protocol);
+	LOG_TRACE_NETWORK("XSocketCreate() - af = {0}, type = {1}, protocol = {2}", af, type, protocol);
 
 	if (protocol == IPPROTO_TCP)
 		return SOCKET_ERROR; // we dont support TCP yet
@@ -62,7 +62,7 @@ SOCKET WINAPI XCreateSocket(int af, int type, int protocol)
 
 	if (ret == INVALID_SOCKET)
 	{
-		LOG_TRACE_NETWORK("XCreateSocket() Invalid socket, last error: ", WSAGetLastError());
+		LOG_ERROR_NETWORK("XSocketCreate() - Invalid socket, last error: ", WSAGetLastError());
 		delete newXSocket;
 		return ret;
 	}
@@ -71,7 +71,7 @@ SOCKET WINAPI XCreateSocket(int af, int type, int protocol)
 
 	if (newXSocket->isVoiceSocket)
 	{
-		LOG_TRACE_NETWORK("Socket: {} was VDP", ret);
+		LOG_TRACE_NETWORK("XSocketCreate() - Socket: {} was VDP", ret);
 	}
 
 	ipManager.SocketPtrArray.push_back(newXSocket);
