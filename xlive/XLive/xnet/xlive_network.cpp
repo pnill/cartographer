@@ -298,7 +298,14 @@ int WINAPI XSocketRecvFrom(SOCKET s, char *buf, int len, int flags, sockaddr *fr
 		}
 		else
 		{
-			((struct sockaddr_in*)from)->sin_addr = ipManager.GetConnectionIdentifierByNat(from); // get the connection identifier by NAt
+			IN_ADDR ipIdentifier = ipManager.GetConnectionIdentifierByNat(from);
+
+			if (ipIdentifier.s_addr != 0)
+			{
+				ipManager.setTimePacketReceived(ipIdentifier, timeGetTime());
+			}
+
+			((struct sockaddr_in*)from)->sin_addr = ipIdentifier;	
 		}
 	}
 	

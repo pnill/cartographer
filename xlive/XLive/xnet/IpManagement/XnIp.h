@@ -11,6 +11,7 @@ struct XnIp
 	bool bValid;
 	int xnetstatus;
 	int connectionPacketsSentCount;
+	int lastPacketReceivedTime;
 
 	// NAT info
 	sockaddr_in NatAddrSocket1000; // TODO: allocate dynamically based on how many sockets are up
@@ -45,14 +46,16 @@ struct XNetConnectionReqPacket
 class CXnIp
 {
 public:
-	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier);
-	void UnregisterSecureAddr(const IN_ADDR ina);
+	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier, bool handleFromConnectionPacket);
+	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 
 	void UpdateConnectionStatus();
 	BOOL LocalUserLoggedIn();
 	void UnregisterLocal();
 	void ConfigureLocalUser(XNADDR* pxna, XUID xuid, char* username);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
+	void setTimePacketReceived(IN_ADDR ina, int time);
+	void checkForLostConnections();
 	int sendConnectionRequest(XSocket* xsocket, IN_ADDR ipIdentifier);
 
 	IN_ADDR GetConnectionIdentifierByNat(sockaddr* addr);
