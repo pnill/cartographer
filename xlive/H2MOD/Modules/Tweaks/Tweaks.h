@@ -22,7 +22,6 @@ namespace H2Tweaks {
 	void setHz();
 	void setCrosshairPos(float crosshair_offset);
 	void setCrosshairSize(int size, bool preset);
-	void applyObjectPredictionPatch();
 	void applyMeleePatch(bool toggle);
 	void setSens(InputType input_type, int sens);
 	void setSavedSens();
