@@ -1415,8 +1415,8 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetAddress(0x92C05), BansheeBombIsEngineMPCheck);
 		PatchCall(GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
-		Initialise_tag_loader();
-		TagInterface::GlobalTagInterface.Init();
+		//Initialise_tag_loader();
+		//TagInterface::GlobalTagInterface.Init();
 	}
 	else {
 
