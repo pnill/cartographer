@@ -2,7 +2,6 @@
 #include "Globals.h"
 
 //all these global variables live till the app closes
-MapManager* mapManager = new MapManager();
 AdvLobbySettings* advLobbySettings = new AdvLobbySettings();
 
 s_datum_array* game_state_actors = nullptr;

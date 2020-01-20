@@ -74,11 +74,6 @@
 //
 #define XNET_STARTUP_DISABLE_PEER_ENCRYPTION        0x08
 
-
-
-
-
-
 #define XUSER_DATA_TYPE_CONTEXT     ((BYTE)0)
 #define XUSER_DATA_TYPE_INT32       ((BYTE)1)
 #define XUSER_DATA_TYPE_INT64       ((BYTE)2)

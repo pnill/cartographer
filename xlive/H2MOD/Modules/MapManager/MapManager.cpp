@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#include "MapManager.h"
+
 #include "Globals.h"
 #include <Mswsock.h>
 #include <WS2tcpip.h>
@@ -9,6 +12,8 @@
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 #pragma comment (lib, "mswsock.lib")
+
+MapManager* mapManager = new MapManager();
 
 #define DEFAULT_BUFLEN 65536
 

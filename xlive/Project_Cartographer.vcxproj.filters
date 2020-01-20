@@ -549,6 +549,9 @@
     <ClCompile Include="XLive\ServerList\ServerList.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
+    <ClCompile Include="XLive\XSession\XSession.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">

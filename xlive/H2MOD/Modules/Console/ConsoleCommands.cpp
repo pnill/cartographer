@@ -7,6 +7,7 @@
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\Credits.h"
 #include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"

@@ -16,6 +16,7 @@
 #include "H2MOD/Variants/GunGame/GunGame.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();

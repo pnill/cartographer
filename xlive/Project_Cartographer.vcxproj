@@ -358,6 +358,7 @@
     <ClCompile Include="XLive\Voice\XHVEngine.cpp" />
     <ClCompile Include="XLive\XAM\xam.cpp" />
     <ClCompile Include="XLive\xbox\xbox.cpp" />
+    <ClCompile Include="XLive\XSession\XSession.cpp" />
     <ClCompile Include="XLive\XUser\XCustomAction.cpp" />
     <ClCompile Include="XLive\XUser\XUser.cpp" />
     <ClCompile Include="XLive\XUser\XUserContext.cpp" />
@@ -586,6 +587,7 @@
     <ClInclude Include="XLive\Voice\XHVEngine.h" />
     <ClInclude Include="XLive\XAM\xam.h" />
     <ClInclude Include="XLive\xbox\xbox.h" />
+    <ClInclude Include="XLive\XSession\XSession.h" />
     <ClInclude Include="XLive\XUser\XCustomAction.h" />
     <ClInclude Include="XLive\XUser\XUser.h" />
     <ClInclude Include="XLive\XUser\XUserContext.h" />

@@ -5,9 +5,6 @@
 #include "XLive\XAM\xam.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
-XSESSION_LOCAL_DETAILS sessionDetails;
-
-
 
 // #5260: XShowSigninUI
 int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags) // TODO: If this is called, pop cartographer account system UI.
