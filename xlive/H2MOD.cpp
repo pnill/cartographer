@@ -425,8 +425,8 @@ float H2MOD::get_distance(int playerIndex1, int playerIndex2) {
 	Real::Point3D* player1 = nullptr;
 	Real::Point3D* player2 = nullptr;
 
-	player1 = h2mod->get_player_coords(playerIndex1);
-	player2 = h2mod->get_player_coords(playerIndex2);
+	player1 = h2mod->get_player_unit_coords(playerIndex1);
+	player2 = h2mod->get_player_unit_coords(playerIndex2);
 	
 	points_distance.X = abs(player1->X - player2->X);
 	points_distance.Y = abs(player1->Y - player2->Y);
@@ -435,7 +435,7 @@ float H2MOD::get_distance(int playerIndex1, int playerIndex2) {
 	return sqrt(pow(points_distance.X, 2) + pow(points_distance.Y, 2) + pow(points_distance.Z, 2));
 }
 
-Real::Point3D* H2MOD::get_player_coords(int playerIndex) {
+Real::Point3D* H2MOD::get_player_unit_coords(int playerIndex) {
 	BYTE* player_unit = get_player_unit_from_player_index(playerIndex);
 	if (player_unit != nullptr)
 		return reinterpret_cast<Point3D*>(player_unit + 0x64);

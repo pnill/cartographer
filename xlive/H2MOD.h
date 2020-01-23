@@ -58,7 +58,7 @@ public:
 		void handle_command(std::wstring);
 		DatumIndex get_player_datum_index_from_controller_index(int controller_index);
 		wchar_t* get_local_player_name();
-		Real::Point3D* get_player_coords(int playerIndex);
+		Real::Point3D* get_player_unit_coords(int playerIndex);
 		float get_distance(int, int);
 		wchar_t* GetLobbyGameVariantName();
 		wchar_t* get_player_name_from_player_index(int playerIndex);
