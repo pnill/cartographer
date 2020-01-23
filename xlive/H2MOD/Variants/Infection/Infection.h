@@ -60,11 +60,11 @@ public:
 	static void sendTeamChange();
 	static void disableSlayerSounds();
 	static void resetZombiePlayerStatus();
-	static void setZombiePlayerStatus(int index);
-	static void spawnPlayerClientSetup(int index);
-	static void spawnServerPlayerSetup(int index);
-	static void setPlayerAsHuman(int index);
-	static void setPlayerAsZombie(int index);
+	static void setZombiePlayerStatus(int playerIndex);
+	static void spawnPlayerClientSetup(int playerIndex);
+	static void spawnServerPlayerSetup(int playerIndex);
+	static void setPlayerAsHuman(int playerIndex);
+	static void setPlayerAsZombie(int playerIndex);
 	static void infectPlayer(DatumIndex unitDatumIndex, int playerIndex);
 	static void infectPlayers(DatumIndex unitDatumIndex, int playerIndex);
 	static void triggerSound(const wchar_t* name, int);
