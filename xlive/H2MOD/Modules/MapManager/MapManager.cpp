@@ -83,7 +83,7 @@ char __cdecl handle_map_download_callback()
 
 		if (!mapManager->getMapFilenameToDownload().empty())
 		{
-			LOG_TRACE_GAME("[h2mod-network] map file name from membership packet {}", mapManager->getMapFilenameToDownload());
+			LOG_TRACE_NETWORK("[h2mod-network] map file name from membership packet {}", mapManager->getMapFilenameToDownload());
 			if (!mapManager->hasCustomMap(mapManager->getMapFilenameToDownload())) {
 				//TODO: set map filesize
 				//TODO: if downloading from repo files, try p2p
@@ -91,7 +91,7 @@ char __cdecl handle_map_download_callback()
 					h2mod->exit_game(); // download has failed
 			}
 			else {
-				LOG_TRACE_GAME("[h2mod-network] already has map {}", mapManager->getMapFilenameToDownload());
+				LOG_TRACE_NETWORK("[h2mod-network] already has map {}", mapManager->getMapFilenameToDownload());
 			}
 			mapManager->setMapFileNameToDownload("");
 		}
@@ -263,33 +263,24 @@ bool MapManager::hasCustomMap(std::wstring mapName) {
 	return file.good();
 }
 
-void swap(DWORD*& a, DWORD*& b)
-{
-	DWORD* c = a;
-	a = b;
-	b = c;
-}
-
 /**
 * Actually calls the real map reload function in halo2.exe
 */
 void MapManager::reloadMaps() {
-	typedef char(__thiscall *map_reload_function_type)(int thisx);
-	auto reloadMaps = h2mod->GetAddress<map_reload_function_type>(0x4D021, 0x419B5);
-	auto reloadMapsSet = h2mod->GetAddress<map_reload_function_type>(0x4CC30, 0x41501);
-	DWORD* mapsObject = h2mod->GetAddress<DWORD*>(0x482D70, 0x4A70D8);
+	typedef char(__thiscall *custom_maps_load_info)(int thisx);
+	typedef char(__thiscall *cache_custom_map_file_image_preview)(int thisx);
 
-	LOG_TRACE_GAME("[h2mod-mapmanager] before reload map sets");
-	EnterCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
-	reloadMapsSet((int)mapsObject);
-	LeaveCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
-	LOG_TRACE_GAME("[h2mod-mapmanager] after reload maps");
+	DWORD customMapData = h2mod->GetAddress(0x482D70, 0x4A70D8);
+	auto p_custom_maps_load_info = h2mod->GetAddress<custom_maps_load_info>(0x4D021, 0x419B5);
+	auto p_cache_custom_map_file_image_preview = h2mod->GetAddress<cache_custom_map_file_image_preview>(0x4CC30, 0x41501); // this caches the map preview image for the map selection menu
 
-	LOG_TRACE_GAME("[h2mod-mapmanager] before reload map");
-	EnterCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
-	reloadMaps((int)mapsObject);
-	LeaveCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
-	LOG_TRACE_GAME("[h2mod-mapmanager] after reload maps");
+	LOG_TRACE_GAME("[h2mod-mapmanager] before cache_custom_map_file_image_preview()");
+	p_cache_custom_map_file_image_preview((int)customMapData);
+	LOG_TRACE_GAME("[h2mod-mapmanager] after cache_custom_map_file_image_preview()");
+
+	LOG_TRACE_GAME("[h2mod-mapmanager] before custom_maps_load_info()");
+	p_custom_maps_load_info((int)customMapData);
+	LOG_TRACE_GAME("[h2mod-mapmanager] after custom_maps_load_info()");
 }
 
 /**

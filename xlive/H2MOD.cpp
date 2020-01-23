@@ -1098,61 +1098,6 @@ void __cdecl onCustomMapChange(const void* a1) {
 	on_custom_map_change_method(a1);
 }
 
-typedef char(__stdcall *intercept_map_load)(LPCRITICAL_SECTION* thisx, const void *a2);
-intercept_map_load intercept_map_load_method;
-
-char __stdcall interceptMapLoad(LPCRITICAL_SECTION* thisx, const void *a2) {
-	LPCRITICAL_SECTION *v2; // ebx@1
-	struct _RTL_CRITICAL_SECTION *v3; // ebp@1
-	char result; // al@2
-
-	LOG_TRACE_GAME("[h2mod] Intercepted map load - crash function");
-
-	typedef char(__thiscall* map_filetime_check)(LPCRITICAL_SECTION* thisx, int a2, unsigned int a3);
-	auto map_filetime_check_method = h2mod->GetAddress<map_filetime_check>(0xC1E01);
-
-	typedef char(__thiscall* map_touch)(LPCRITICAL_SECTION* thisx, int a2);
-	auto map_touch_method = h2mod->GetAddress<map_touch>(0xC2541);
-
-	typedef char(unknown_function)();
-	auto unknown_function_method = h2mod->GetAddress<unknown_function*>(0x4541);
-
-	typedef char(__stdcall* unknown_function2)(int a1);
-	auto unknown_function_method2 = h2mod->GetAddress<unknown_function2>(0xC2069);
-
-	typedef int(__thiscall* map_limit_touch)(int thisx, int a2);
-	auto map_limit_touch_method = h2mod->GetAddress<map_limit_touch>(0xC1FA6);
-
-	v2 = thisx;
-	v3 = *thisx;
-
-	LOG_TRACE_GAME("[h2mod] Intercepted map load - about to enter critical section");
-	EnterCriticalSection(*thisx);
-	LOG_TRACE_GAME("[h2mod] Intercepted map load - in critical section");
-	if (a2
-		&& *((WORD *)v2 + 74008) < 0x32u
-		&& map_filetime_check_method(v2, (int)a2, 0xB90u)
-		&& !map_touch_method(v2, (int)a2))
-	{
-		if (!unknown_function_method())
-			unknown_function_method2((int)a2);
-
-		map_limit_touch_method((int)v2, (int)a2);
-		LOG_TRACE_GAME("[h2mod] Intercepted map load - memcpy");
-		memcpy(&v2[740 * (*((WORD *)v2 + 0x12118))++ + 4], a2, 0xB90u);
-		LeaveCriticalSection(v3);
-		LOG_TRACE_GAME("[h2mod] Intercepted map load - left critical section");
-		result = 1;
-	}
-	else
-	{
-		LeaveCriticalSection(v3);
-		LOG_TRACE_GAME("[h2mod] Intercepted map load - left critical section");
-		result = 0;
-	}
-	return result;
-}
-
 typedef bool(__cdecl *tfn_c000bd114)(int);
 tfn_c000bd114 pfn_c000bd114;
 bool __cdecl fn_c000bd114_IsSkullEnabled(int skull_index)
@@ -1370,7 +1315,7 @@ void H2MOD::ApplyHooks() {
 
 		//pload_wgit = (tload_wgit)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x2106A2), (BYTE*)OnWgitLoad, 13);
 
-		intercept_map_load_method = (intercept_map_load)DetourClassFunc(h2mod->GetAddress<BYTE*>(0xC259B), (BYTE*)interceptMapLoad, 13);
+		//intercept_map_load_method = (intercept_map_load)DetourClassFunc(h2mod->GetAddress<BYTE*>(0xC259B), (BYTE*)interceptMapLoad, 13);
 
 		show_error_screen_method = (show_error_screen)DetourFunc(h2mod->GetAddress<BYTE*>(0x20E15A), (BYTE*)showErrorScreen, 8);
 
