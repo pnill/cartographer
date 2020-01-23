@@ -60,22 +60,20 @@ int __stdcall PreReadyLoad() {
 }
 
 static bool NotDisplayIngameChat() {
-	int GameGlobals = (int)*(int*)((DWORD)H2BaseAddr + 0x482D3C);
+	int GameGlobals = *(int*)(H2BaseAddr + 0x482D3C);
 	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
-	BYTE* GameState = (BYTE*)((DWORD)H2BaseAddr + 0x420FC4);
+	BYTE* GameState = (BYTE*)(H2BaseAddr + 0x420FC4);
 
 	if (H2Config_hide_ingame_chat) {
-		int GameTimeGlobals = (int)*(int*)((DWORD)H2BaseAddr + 0x4C06E4);
-		DWORD* ChatOpened = (DWORD*)(GameTimeGlobals + 0x354);//MP Only?
-		if (*ChatOpened == 2) {
+		PlayerIterator playerIt;
+		DatumIndex local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
+		if (playerIt.get_data_at_index(local_player_datum_index.Index)->is_chatting == 2) {
 			extern void hotkeyFuncToggleHideIngameChat();
 			hotkeyFuncToggleHideIngameChat();
 		}
-	}
-
-	if (H2Config_hide_ingame_chat) {
 		return true;
 	}
+
 	else if (*GameEngine != 3 && *GameState == 3) {
 		//Enable chat in engine mode and game state mp.
 		return false;
@@ -1117,7 +1115,7 @@ void H2Tweaks::setVehicleFOV(int field_of_view_degrees) {
 	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
 	{
 		float calculated_radians_FOV = (float)field_of_view_degrees * M_PI / 180.0f;
-		WriteValue(H2BaseAddr + 0x413780, calculated_radians_FOV); // Third Person
+		WriteValue(h2mod->GetAddress(0x413780), calculated_radians_FOV); // Third Person
 	}
 }
 

@@ -56,10 +56,10 @@ public:
 		void ApplyHooks(); 
 		void handle_command(std::string);
 		void handle_command(std::wstring);
-		wchar_t* get_local_player_name();		
+		DatumIndex get_player_datum_index_from_controller_index(int controller_index);
+		wchar_t* get_local_player_name();
 		Real::Point3D* get_player_coords(int playerIndex);
 		float get_distance(int, int);
-		bool is_team_play();
 		wchar_t* GetLobbyGameVariantName();
 		wchar_t* get_player_name_from_player_index(int playerIndex);
 		int get_player_index_from_name(wchar_t* playername);

@@ -28,7 +28,6 @@ HeadHunter* headHunterHandler = new HeadHunter();
 VariantPlayer* variant_player = new VariantPlayer();
 
 extern int H2GetInstanceId();
-extern XUID xFakeXuid[4];
 std::unordered_map<int, int> object_to_variant;
 
 bool b_H2X = false;
@@ -411,12 +410,12 @@ void H2MOD::handle_command(std::wstring command) {
 	commands->handle_command(std::string(command.begin(), command.end()));
 }
 
-bool H2MOD::is_team_play() {
-	//0x971A90 only works in lobby (not in game)
-	//0x978CB4 works in both
-	DWORD ptr = *h2mod->GetAddress<DWORD*>(0x978CB4);
-	ptr += 0x1C68;
-	return *(BYTE*)ptr;
+/* controller index aka local player index -> player index */
+DatumIndex H2MOD::get_player_datum_index_from_controller_index(int controller_index) 
+{
+	typedef int(__cdecl* get_local_player_index)(int controller_index); 
+	auto p_get_local_player_index = reinterpret_cast<get_local_player_index>(h2mod->GetAddress(0x5141D));
+	return p_get_local_player_index(controller_index); 
 }
 
 #pragma region PlayerFunctions
@@ -1452,7 +1451,7 @@ void H2MOD::Initialize()
 	}
 
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
-	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->Base);
+	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
 
 	h2mod->ApplyHooks();
 }
