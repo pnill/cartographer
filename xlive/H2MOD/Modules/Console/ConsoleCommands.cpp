@@ -326,21 +326,26 @@ void ConsoleCommands::checkForIds() {
 	}
 }
 
-void ConsoleCommands::spawn(DatumIndex object_datum, int count, float x, float y, float z, float randomMultiplier) {
+void ConsoleCommands::spawn(DatumIndex object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition) {
 
 	for (int i = 0; i < count; i++) {
 		try {
 			ObjectPlacementData nObject;
 
 			if (!object_datum.IsNull()) {
-				DatumIndex player_datum = h2mod->get_unit_datum_from_player_index(0);
+				DatumIndex player_datum = h2mod->get_unit_datum_from_player_index(h2mod->get_player_datum_index_from_controller_index(0).Index);
 				call_object_placement_data_new(&nObject, object_datum, player_datum, 0);
-				Real::Point3D* player_position = h2mod->get_player_coords(0);
+				Real::Point3D* player_position = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
 				
 				if (player_position != nullptr) {
 					nObject.Placement.X = player_position->X * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
 					nObject.Placement.Y = player_position->Y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
 					nObject.Placement.Z = (player_position->Z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+				}
+				if (specificPosition) {
+					nObject.Placement.X = x;
+					nObject.Placement.Y = y;
+					nObject.Placement.Z = z;
 				}
 				
 				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.Placement.X, nObject.Placement.Y, nObject.Placement.Z);
@@ -572,8 +577,8 @@ void ConsoleCommands::handle_command(std::string command) {
 				LOG_TRACE_GAME("Error converting string to int");
 			}
 			
-			Real::Point3D* playerPosition = h2mod->get_player_coords(0);
-			this->spawn(object_datum, count, playerPosition->X + 0.5f, playerPosition->Y + 0.5f, playerPosition->Z + 0.5f, randomMultiplier);
+			Real::Point3D* localPlayerPosition = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
+			this->spawn(object_datum, count, localPlayerPosition->X + 0.5f, localPlayerPosition->Y + 0.5f, localPlayerPosition->Z + 0.5f, randomMultiplier, false);
 		}
 		else if (firstCommand == "$ishost") {
 			network_session* session = NetworkSession::getCurrentNetworkSession();
@@ -644,7 +649,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			float y = stof(splitCommands[4]);
 			float z = stof(splitCommands[5]);
 
-			this->spawn(object_datum, count, x, y, z, 1.0f);
+			this->spawn(object_datum, count, x, y, z, 1.0f, true);
 		}
 		else if (firstCommand == "$controller_sens") {
 			if (splitCommands.size() != 2) {

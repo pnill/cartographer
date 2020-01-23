@@ -160,19 +160,19 @@ void Infection::preSpawnServerSetup() {
 	} while (playerIndex < 16);
 }
 
-void Infection::setPlayerAsHuman(int index) {
-	h2mod->set_unit_biped(Player::Biped::Spartan, index);
-	h2mod->set_unit_speed(1.0f, index);
+void Infection::setPlayerAsHuman(int playerIndex) {
+	h2mod->set_unit_biped(Player::Biped::Spartan, playerIndex);
+	h2mod->set_unit_speed(1.0f, playerIndex);
 
-	call_give_player_weapon(index, Weapon::shotgun, 1);
-	call_give_player_weapon(index, Weapon::magnum, 0);
+	call_give_player_weapon(playerIndex, Weapon::shotgun, 1);
+	call_give_player_weapon(playerIndex, Weapon::magnum, 0);
 }
 
-void Infection::setPlayerAsZombie(int index) {
-	h2mod->set_unit_biped(Player::Biped::Elite, index);
-	h2mod->set_unit_speed(1.1f, index);
+void Infection::setPlayerAsZombie(int playerIndex) {
+	h2mod->set_unit_biped(Player::Biped::Elite, playerIndex);
+	h2mod->set_unit_speed(1.1f, playerIndex);
 
-	call_give_player_weapon(index, Weapon::energy_blade, 1);
+	call_give_player_weapon(playerIndex, Weapon::energy_blade, 1);
 }
 
 void Infection::spawnPlayerClientSetup(int playerIndex) {
@@ -203,21 +203,21 @@ void Infection::spawnPlayerClientSetup(int playerIndex) {
 	}
 }
 
-void Infection::spawnServerPlayerSetup(int index) {
-	LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}", index);
-	DatumIndex unit_datum_index = h2mod->get_unit_datum_from_player_index(index);
+void Infection::spawnServerPlayerSetup(int playerIndex) {
+	LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}", playerIndex);
+	DatumIndex unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
 	int unit_object = call_get_object(unit_datum_index, 3);
 
 	if (unit_object && *(BYTE*)(unit_object + 0xAA) == 0) {
 		//if the unit_object is not 0, the spawned object is "alive"
 
-		LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={0}, unit team index={1}", index, h2mod->get_unit_team_index(unit_datum_index));
+		LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={0}, unit team index={1}", playerIndex, h2mod->get_unit_team_index(unit_datum_index));
 		if (h2mod->get_unit_team_index(unit_datum_index) == HUMAN_TEAM) {
-			Infection::setPlayerAsHuman(index);
+			Infection::setPlayerAsHuman(playerIndex);
 		}
 
 		if (h2mod->get_unit_team_index(unit_datum_index) == ZOMBIE_TEAM) {
-			Infection::setPlayerAsZombie(index);
+			Infection::setPlayerAsZombie(playerIndex);
 		}
 	}
 }
