@@ -7,13 +7,21 @@
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 WCHAR strw_XUser[8192];
 
+UINT g_online = 1;
+UINT g_signin[4] = { 1,0,0,0 };
+
+CHAR g_szUserName[4][16] = { "Cartographer1", "Cartographer2", "Cartographer3", "Cartographer4" };
+XUID xFakeXuid[4] = { 0xEE100000DEADC0DE, 0xEE200000DEADC0DE, 0xEE300000DEADC0DE, 0xEE400000DEADC0DE };
+
 
 // #5261: XUserGetXUID
 int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 {
+	if (dwUserIndex > 0
+		|| pXuid == NULL)
+		return ERROR_INVALID_PARAMETER;
+
 	static int print = 0;
-
-
 	if (print < 15)
 	{
 		LOG_TRACE_XLIVE("XUserGetXUID  (userIndex = {}, pXuid = {:p})",
@@ -40,19 +48,17 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 // #5262: XUserGetSigninState
 XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex)
 {
+	if (dwUserIndex > 0)
+		dwUserIndex = 0;
+
 	XUSER_SIGNIN_STATE ret = eXUserSigninState_NotSignedIn;
 
-
 	static int print = 0;
-
-
 	if (print < 15)
 	{
 		LOG_TRACE_XLIVE("XUserGetSigninState  (index = {})", dwUserIndex);
 		print++;
 	}
-
-
 
 	if (dwUserIndex == 0)
 	{
@@ -125,7 +131,6 @@ int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_IN
 {
 	static int print = 0;
 
-
 	if (print < 15)
 	{
 		LOG_TRACE_XLIVE("XUserGetSigninInfo( userIndex = {0:x}, dwFlags = {1:x}, pSigninInfo = {2:p})", dwUserIndex, dwFlags, (void*)pSigninInfo);
@@ -134,7 +139,7 @@ int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_IN
 		print++;
 	}
 
-
+	memset(pSigninInfo, 0, sizeof(XUSER_SIGNIN_INFO));
 
 
 #if 0
@@ -152,7 +157,7 @@ int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_IN
 	if (pSigninInfo && g_signin[dwUserIndex])
 	{
 		pSigninInfo->xuid = xFakeXuid[dwUserIndex];
-		pSigninInfo->dwInfoFlags = XUSER_INFO_FLAG_LIVE_ENABLED;
+		pSigninInfo->dwInfoFlags |= XUSER_INFO_FLAG_LIVE_ENABLED;
 
 		if (g_online != 0)
 		{
@@ -624,7 +629,7 @@ DWORD WINAPI XUserReadProfileSettingsByXuid(
 }
 
 
-// #5337: XUserWriteProfileSettingsf
+// #5337: XUserWriteProfileSettings
 DWORD WINAPI XUserWriteProfileSettings(DWORD dwUserIndex, DWORD dwNumSettings, const PXUSER_PROFILE_SETTING pSettings, PXOVERLAPPED pOverlapped)
 {
 	LOG_TRACE_XLIVE("XUserWriteProfileSettings  (dwUserIndex = {0}, dwNumSettings = {1}, pSettings = {2:p}, pOverlapped = {3:p})",

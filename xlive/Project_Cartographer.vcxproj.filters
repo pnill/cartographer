@@ -1238,6 +1238,9 @@
     <ClInclude Include="XLive\ServerList\ServerList.h">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClInclude>
+    <ClInclude Include="XLive\XSession\XSession.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def">

@@ -17,7 +17,7 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 
 	if ((dwFlags & XSESSION_CREATE_HOST))
 	{
-		if (pqwSessionNonce) XNetRandom((BYTE*)pqwSessionNonce, 4);
+		if (pqwSessionNonce) XNetRandom((BYTE*)pqwSessionNonce, sizeof(*pqwSessionNonce));
 
 		if (pSessionInfo)
 		{
@@ -70,7 +70,8 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 
 	//sessionDetails.pSessionMembers = 0;
 
-	LOG_TRACE_XLIVE("- handle = {:p}", (void*)*phEnum);
+	if (phEnum)
+		LOG_TRACE_XLIVE("- handle = {}", *phEnum);
 
 	if (pOverlapped)
 	{
@@ -295,9 +296,6 @@ DWORD WINAPI XSessionGetDetails(HANDLE hSession, PDWORD pcbResultsBuffer, PXSESS
 		}
 	}
 
-
-
-
 	// sent in blank template, refill values
 	memset(pSessionDetails, 0xff, max_size);
 	memcpy(pSessionDetails, &sessionDetails, sizeof(sessionDetails));
@@ -311,7 +309,6 @@ DWORD WINAPI XSessionGetDetails(HANDLE hSession, PDWORD pcbResultsBuffer, PXSESS
 
 	if (pOverlapped == 0)
 		return ERROR_SUCCESS;
-
 
 
 	pOverlapped->InternalHigh = 0;

@@ -161,18 +161,18 @@ BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 	return false;
 }
 
-
-// #5000: XLiveInitialize
-int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
+// #5297: XLiveInitializeEx
+int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 {
 	InitInstance();
-	LOG_TRACE_XLIVE("XLiveInitialize()");
+
+	LOG_TRACE_XLIVE("XLiveInitializeEx()");
 
 	if (!h2mod->Server)
 	{
 		//LOG_TRACE_XLIVE("XLiveInitialize  (pPii = %X)", pPii);
-		pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
-		pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
+		pDevice = (LPDIRECT3DDEVICE9)pXii->pD3D;
+		pD3DPP = (D3DPRESENT_PARAMETERS*)pXii->pD3DPP;
 
 		ServerStatus = new char[250];
 		snprintf(ServerStatus, 250, "Status: Initializing....");
@@ -182,8 +182,14 @@ int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 
 		GUI::Initialize();
 	}
-	
+	LOG_TRACE_XLIVE("XLiveInitializeEx - dwVersion = {0:x}", dwVersion);
 	return 0;
+}
+
+// #5000: XLiveInitialize
+int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii)
+{
+	return XLiveInitializeEx(pXii, 0);
 }
 
 // #5005: XLiveOnCreateDevice
@@ -456,30 +462,6 @@ void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont)
 	RECT rect;
 	SetRect(&rect, x, y, x, y);
 	pFont->DrawTextA(NULL, text, -1, &rect, DT_LEFT | DT_NOCLIP, color);
-}
-
-typedef struct {
-	int x;
-	int y;
-	bool xp;
-	bool yp;
-} exit_countdown_label;
-
-static std::vector<exit_countdown_label*> exit_countdown_labels;
-
-static void create_exit_countdown_label() {
-	D3DVIEWPORT9 pViewport;
-	pDevice->GetViewport(&pViewport);
-	int width = pViewport.Width;
-	int height = pViewport.Height;
-
-	exit_countdown_label* exit_cnd_lbl = (exit_countdown_label*)malloc(sizeof(exit_countdown_label));
-	exit_cnd_lbl->x = rand() % width;
-	exit_cnd_lbl->y = rand() % height;
-	exit_cnd_lbl->xp = rand() % 2 ? true : false;
-	exit_cnd_lbl->yp = rand() % 2 ? true : false;
-
-	exit_countdown_labels.push_back(exit_cnd_lbl);
 }
 
 int achievement_height = 0;

@@ -1,5 +1,4 @@
 #pragma once
-extern CHAR g_szUserName[4][16];
 
 typedef struct _XUSER_DATA
 {

@@ -843,15 +843,6 @@ HRESULT WINAPI XLiveSignin (PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD 
 	return S_OK;
 }
 
-
-// #5297: XLiveInitializeEx
-int WINAPI XLiveInitializeEx(void * pXii, DWORD dwVersion)
-{
-	InitInstance();
-	LOG_TRACE_XLIVE("XLiveInitializeEx  (pXii = {0:p}, dwVersion = {1:x})", pXii, dwVersion);
-	return 0;
-}
-
 // #5303: XStringVerify
 DWORD WINAPI XStringVerify( DWORD dwFlags, const CHAR *szLocale, DWORD dwNumStrings, const STRING_DATA *pStringData, DWORD cbResults, STRING_VERIFY_RESPONSE *pResults, PXOVERLAPPED pOverlapped )
 {
