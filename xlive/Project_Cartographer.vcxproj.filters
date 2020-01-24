@@ -531,9 +531,6 @@
     <ClCompile Include="XLive\XNet\upnp.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\XNet\xlive_network.cpp">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClCompile>
     <ClCompile Include="XLive\XNet\xnet.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>

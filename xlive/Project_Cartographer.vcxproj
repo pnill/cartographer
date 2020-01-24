@@ -351,7 +351,6 @@
     <ClCompile Include="XLive\ServerList\ServerList.cpp" />
     <ClCompile Include="XLive\XNet\upnp.cpp" />
     <ClCompile Include="XLive\XNet\XNetQoS.cpp" />
-    <ClCompile Include="XLive\XNet\xlive_network.cpp" />
     <ClCompile Include="XLive\XNet\xnet.cpp" />
     <ClCompile Include="XLive\XNet\Sockets\XSocket.cpp" />
     <ClCompile Include="XLive\XNet\IpManagement\XnIp.cpp" />

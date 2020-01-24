@@ -41,9 +41,9 @@ D3DPRESENT_PARAMETERS *pD3DPP;
 
 IDirect3DTexture9* Primitive = NULL;
 
+int MasterState = 0;
 char* BuildText = nullptr;
 char* ServerStatus = nullptr;
-extern int MasterState;
 
 const char CompileDate[] = __DATE__;
 const char CompileTime[] = __TIME__;

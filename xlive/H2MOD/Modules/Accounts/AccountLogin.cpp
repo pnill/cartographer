@@ -33,6 +33,37 @@ typedef LONG NTSTATUS, *PNTSTATUS;
 
 typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
 
+extern char g_szUserName[4][16];
+wchar_t ServerLobbyName[32] = { L"Cartographer" };
+
+void UpdateConnectionStatus() {
+	extern int MasterState;
+	extern char* ServerStatus;
+	if (ipManager.LocalUserLoggedIn()) {
+		MasterState = 10;
+		if (!h2mod->Server)
+			snprintf(ServerStatus, 250, "Status: Online");
+	}
+	else
+	{
+		MasterState = 2;
+		if (!h2mod->Server)
+			snprintf(ServerStatus, 250, "Status: Offline");
+	}
+}
+
+void SetUserUsername(char* username) {
+	SecureZeroMemory(g_szUserName[0], 16);
+	snprintf(g_szUserName[0], 16, username);
+	if (!h2mod->Server) {
+
+		snprintf(h2mod->GetAddress<char*>(0x971316), 16, username);
+		swprintf(h2mod->GetAddress<wchar_t*>(0x96DA94), 16, L"%hs", username);
+		swprintf(h2mod->GetAddress<wchar_t*>(0x51A638), 16, L"%hs", username);
+		swprintf(ServerLobbyName, 16, L"%hs", username);
+	}
+}
+
 char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long saddr, unsigned long xnaddr, char* abEnet, char* abOnline) {
 
 	if (strlen(username) <= 0 || xuid == 0 || saddr == 0 || strlen(abEnet) != 12 || strlen(abOnline) != 40) {
@@ -62,7 +93,14 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	memcpy(&pxna.abEnet, abEnet2, 6);
 	memcpy(&pxna.abOnline, abOnline2, 20);
 
-	ipManager.ConfigureLocalUser(&pxna, xuid, username);
+	xFakeXuid[0] = xuid;
+	SetUserUsername(username);
+	ipManager.SetupLocalConnectionInfo(&pxna);
+
+	UpdateConnectionStatus();
+
+	//We want achievements loaded as early as possible, but we can't do it until after we have the XUID.
+	std::thread(GetAchievements, xuid).detach();
 
 	if (H2CurrentAccountLoginToken) {
 		free(H2CurrentAccountLoginToken);

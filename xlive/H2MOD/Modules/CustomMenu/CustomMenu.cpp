@@ -4744,7 +4744,8 @@ tsub_23f6b7 psub_23f6b7;
 int __cdecl sub_23f6b7(int a1)
 {
 	if (ipManager.LocalUserLoggedIn()) {
-		ipManager.UnregisterLocal();
+		ipManager.UnregisterLocalConnectionInfo();
+		UpdateConnectionStatus();
 	}
 	return psub_23f6b7(a1);
 }

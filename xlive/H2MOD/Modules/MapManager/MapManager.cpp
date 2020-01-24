@@ -448,8 +448,8 @@ bool MapManager::downloadFromHost() {
 		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
-		std::string addr = inet_ntoa(ipManager.game_host_xn.ina);
-		std::string prt = std::to_string(ntohs(ipManager.game_host_xn.wPortOnline) + 9);
+		std::string addr = inet_ntoa(ipManager.gameHostXn.ina);
+		std::string prt = std::to_string(ntohs(ipManager.gameHostXn.wPortOnline) + 9);
 		LOG_TRACE_GAME("[h2mod-mapmanager] Client map dl, addr={0}, port={1}", addr, prt);
 		// Resolve the server address and port
 		iResult = getaddrinfo(addr.c_str(), prt.c_str(), &hints, &result);
