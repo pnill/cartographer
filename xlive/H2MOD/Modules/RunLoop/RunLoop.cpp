@@ -256,14 +256,19 @@ const int hotkeyLen = 9;
 //GSFIXME: Set only completed 6
 int hotkeyListenLen = 6;
 int* hotkeyId[hotkeyLen] = { &H2Config_hotkeyIdHelp, &H2Config_hotkeyIdToggleDebug, &H2Config_hotkeyIdAlignWindow, &H2Config_hotkeyIdWindowMode, &H2Config_hotkeyIdToggleHideIngameChat, &H2Config_hotkeyIdGuide, &hotkeyIdTest, &hotkeyIdTest2, &hotkeyIdEsc };
-bool hotkeyPressed[hotkeyLen] = { false, false, false, false, false, false, false, false, false };
 void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotkeyFuncAlignWindow, hotkeyFuncWindowMode, hotkeyFuncToggleHideIngameChat, hotkeyFuncGuide, hotkeyFuncTest, hotkeyFuncTest2, hotkeyFuncEsc };
 
+void handleHotkeyInput(WPARAM wparam)
+{
+	for (int i = 0; i < hotkeyListenLen; i++) 
+	{
+		if (wparam == *hotkeyId[i])
+			hotkeyFunc[i]();
+	}
+}
 
 bool halo2WindowExists = false;
 bool halo2ServerOnce1 = false;
-int last_time;
-
 
 void GSMainLoop() {
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
@@ -303,46 +308,15 @@ void GSMainLoop() {
 	static int prevPartyPrivacy = 0;
 	int partyPrivacy;
 	if (H2IsDediServer) {
-		partyPrivacy = *(int*)((BYTE*)H2BaseAddr + 0x534850);
+		partyPrivacy = *(int*)(H2BaseAddr + 0x534850);
 	}
 	else {
-		partyPrivacy = *(int*)((BYTE*)H2BaseAddr + 0x50A398);
+		partyPrivacy = *(int*)(H2BaseAddr + 0x50A398);
 	}
 	if (prevPartyPrivacy > 0 && partyPrivacy == 0) {
 		pushHostLobby();
 	}
 	prevPartyPrivacy = partyPrivacy;
-
-	if (!H2IsDediServer && (GetFocus() == H2hWnd || GetForegroundWindow() == H2hWnd)) {
-
-		for (int i = 0; i < hotkeyListenLen; i++) {
-			//& 0x8000 is pressed
-			//& 0x1 Key just transitioned from released to pressed.
-			if (GetAsyncKeyState(*hotkeyId[i]) & 0x8000) {
-				hotkeyPressed[i] = true;
-			}
-			else if (!(GetAsyncKeyState(*hotkeyId[i]) & 0x8000) && hotkeyPressed[i]) {
-				hotkeyPressed[i] = false;
-				hotkeyFunc[i]();
-			}
-		}
-	}
-
-
-	if (last_time == 0)
-		last_time = timeGetTime();
-
-	/*if (h2mod->Server && NetworkStatistics && (timeGetTime() - last_time >= 1000))
-	{
-		last_time = timeGetTime();
-		FILE* f;
-		fopen_s(&f, "netstats.txt", "ab");
-		sprintf(packet_info_str, "\n[ pck/second %d, pck size average: %d ]", ElapsedTime != 0 ? Packets * 1000 / ElapsedTime : 0, TotalPacketsSent != 0 ? TotalBytesSent / TotalPacketsSent : 0);
-		fputs(packet_info_str, f);
-		fputs("\n", f);
-		fclose(f);
-	}*/
-	
 
 	//advLobbySettings->loop();
 }

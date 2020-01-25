@@ -152,11 +152,18 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 	return S_OK;
 }
 
+extern void handleHotkeyInput(WPARAM lpMsg);
+
 // #5030: XLivePreTranslateMessage
 BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 {
 	if ((GetKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
+	{
+		// hotkeys
+		handleHotkeyInput(lpMsg->wParam);
+		// console
 		commands->handleInput(lpMsg->wParam);
+	}
 
 	return false;
 }
