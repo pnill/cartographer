@@ -51,11 +51,11 @@ int CXnIp::getConnectionIndex(IN_ADDR connectionIdentifier)
 	return connectionIdentifier.s_addr >> 24;
 }
 
-void CXnIp::setTimePacketReceived(IN_ADDR ina, int time)
+void CXnIp::setTimeConnectionInteractionHappened(IN_ADDR ina, int time)
 {
 	XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(ina)];
 	if (xnIp->bValid)
-		xnIp->lastPacketReceivedTime = time;
+		xnIp->lastConnectionInteractionTime = time;
 }
 
 int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, int bytesRecvdCount)
@@ -97,7 +97,7 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 		}
 
 		lpFrom->sin_addr = ipIdentifier;
-		ipManager.setTimePacketReceived(ipIdentifier, timeGetTime());
+		ipManager.setTimeConnectionInteractionHappened(ipIdentifier, timeGetTime());
 
 		return ERROR_SUCCESS;
 	}
@@ -109,7 +109,7 @@ void CXnIp::checkForLostConnections()
 	{
 		XnIp* xnIp = &XnIPs[i];
 		if (xnIp->bValid
-			&& timeGetTime() - xnIp->lastPacketReceivedTime > 30 * 1000) // if there was no packet received in 30 seconds, clear the connection info
+			&& timeGetTime() - xnIp->lastConnectionInteractionTime > 30 * 1000)
 		{
 			ipManager.UnregisterXnIpIdentifier(xnIp->connectionIdentifier);
 		}
@@ -203,12 +203,12 @@ void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier
 		{
 		case 1000:
 			//LOG_TRACE_NETWORK("XSocketRecvFrom() User.sockmap mapping port 1000 - port: %i, secure: %08X", htons(port), secure);
-			memcpy(&xnIp->NatAddrSocket1000, addr, sizeof(sockaddr_in));
+			xnIp->NatAddrSocket1000 = *addr;
 			break;
 
 		case 1001:
 			//LOG_TRACE_NETWORK("XSocketRecvFrom() User.sockmap mapping port 1001 - port: %i, secure: %08X", htons(port), secure);
-			memcpy(&xnIp->NatAddrSocket1001, addr, sizeof(sockaddr_in));
+			xnIp->NatAddrSocket1001 = *addr;
 			break;
 
 		default:
@@ -238,7 +238,7 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetConnectionReqPacket* co
 			&& xnIp->xnetstatus < XNET_CONNECT_STATUS_CONNECTED)
 		{
 			ipManager.sendConnectionRequest(xsocket, xnIp->connectionIdentifier);
-			ipManager.setTimePacketReceived(xnIp->connectionIdentifier, timeGetTime());
+			ipManager.setTimeConnectionInteractionHappened(xnIp->connectionIdentifier, timeGetTime());
 
 			// TODO: handle dynamically
 			if (!sockAddrInIsNull(&xnIp->NatAddrSocket1000) 
@@ -279,18 +279,24 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 		return WSAEINVAL;
 	}
 
+	/*
+		We check for connections that have not received any packets or XNetGetConnectStatus hasn't been called for some connections in the last 30 seconds, then proceed to create a new identifier
+		to prevent people from failing to connect
+	*/
 	checkForLostConnections();
 
 	// check if the user is already in the system
 	for (int i = 0; i < GetMaxXnConnections(); i++)
 	{
-		/*
-			We check for connections that have not received any packets in the last 30 seconds, then proceed to create a new identifier
-			to prevent people from failing to connect
-		*/
-
-		if (XnIPs[i].bValid && memcmp(&XnIPs[i].xnaddr, pxna, sizeof(XNADDR)) == 0)
+		if (XnIPs[i].bValid 
+			&& memcmp(&XnIPs[i].xnaddr.abEnet, pxna->abEnet, sizeof((XNADDR*)0)->abEnet) == 0
+			&& memcmp(&XnIPs[i].xnaddr.abOnline, pxna->abOnline, sizeof((XNADDR*)0)->abOnline) == 0)
 		{
+			/* Update the XNADDR */
+			/* TODO: maybe add some lock but I doubt halo 2 uses this asynchronously */
+			if (memcmp(&XnIPs[i].xnaddr, pxna, sizeof(XNADDR)) != 0)
+				XnIPs[i].xnaddr = *pxna;
+				
 			if (outIpIdentifier) {
 				*outIpIdentifier = XnIPs[i].connectionIdentifier;
 				LOG_INFO_NETWORK("CreateXnIpIdentifier() - already present connection index: {}, identifier: {:x}", i, XnIPs[i].connectionIdentifier.s_addr);
@@ -298,7 +304,7 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 
 			if (handleFromConnectionPacket) 
 			{
-				setTimePacketReceived(XnIPs[i].connectionIdentifier, timeGetTime());
+				setTimeConnectionInteractionHappened(XnIPs[i].connectionIdentifier, timeGetTime());
 			}
 
 			return ERROR_SUCCESS;
@@ -335,11 +341,7 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 				newXnIp->connectionIdentifier.s_addr = htonl(firstUnusedDataIndex | randIdentifier);
 				newXnIp->bValid = true;
 
-				/*
-					When creating a connection identifier, we initialize this with the time at creaation, so in case we receive a handle connection packet from another connection,
-					this connection identifier doesn't get cleared without it being used at all
-				*/
-				setTimePacketReceived(newXnIp->connectionIdentifier, timeGetTime());
+				setTimeConnectionInteractionHappened(newXnIp->connectionIdentifier, timeGetTime());
 
 				if (handleFromConnectionPacket) 
 				{
@@ -554,6 +556,11 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 	if (xnIp->bValid
 		&& xnIp->connectionIdentifier.s_addr == ina.s_addr)
 	{
+		/* 
+			Mainly for H2v because it has P2P connection even on dedicated servers, if the connect status is checked by the game, it means the connection identifier is stil used
+			This prevents connection info being cleared even if no data has been received from the connection (probably the ports were not forwarded/ no data is sent at all between the peers) 
+		*/
+		ipManager.setTimeConnectionInteractionHappened(ina, timeGetTime()); 
 		return xnIp->xnetstatus;
 	}
 	return WSAEINVAL;

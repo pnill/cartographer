@@ -12,7 +12,7 @@ struct XnIp
 	bool bValid;
 	int xnetstatus;
 	int connectionPacketsSentCount;
-	int lastPacketReceivedTime;
+	int lastConnectionInteractionTime;
 
 	// NAT info
 	sockaddr_in NatAddrSocket1000; // TODO: allocate dynamically based on how many sockets are up
@@ -51,7 +51,7 @@ public:
 	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 
 	void checkForLostConnections();
-	void setTimePacketReceived(IN_ADDR ina, int time);
+	void setTimeConnectionInteractionHappened(IN_ADDR ina, int time);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
 	void SetupLocalConnectionInfo(XNADDR* pxna);
 	int sendConnectionRequest(XSocket* xsocket, IN_ADDR ipIdentifier);
