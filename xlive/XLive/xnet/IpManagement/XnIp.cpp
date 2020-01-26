@@ -288,15 +288,8 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 	// check if the user is already in the system
 	for (int i = 0; i < GetMaxXnConnections(); i++)
 	{
-		if (XnIPs[i].bValid 
-			&& memcmp(&XnIPs[i].xnaddr.abEnet, pxna->abEnet, sizeof((XNADDR*)0)->abEnet) == 0
-			&& memcmp(&XnIPs[i].xnaddr.abOnline, pxna->abOnline, sizeof((XNADDR*)0)->abOnline) == 0)
+		if (XnIPs[i].bValid && memcmp(&XnIPs[i].xnaddr, pxna, sizeof(XNADDR)) == 0)
 		{
-			/* Update the XNADDR */
-			/* TODO: maybe add some lock but I doubt halo 2 uses this asynchronously */
-			if (memcmp(&XnIPs[i].xnaddr, pxna, sizeof(XNADDR)) != 0)
-				XnIPs[i].xnaddr = *pxna;
-				
 			if (outIpIdentifier) {
 				*outIpIdentifier = XnIPs[i].connectionIdentifier;
 				LOG_INFO_NETWORK("CreateXnIpIdentifier() - already present connection index: {}, identifier: {:x}", i, XnIPs[i].connectionIdentifier.s_addr);
