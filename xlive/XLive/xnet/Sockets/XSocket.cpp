@@ -247,7 +247,12 @@ int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount,
 			lpCompletionRoutine);
 	}
 	
+#if COMPILE_WITH_STD_SOCK_FUNC
+	int result = recvfrom(xsocket->winSockHandle, lpBuffers->buf, lpBuffers->len, *lpFlags, lpFrom, lpFromlen);
+	*lpNumberOfBytesRecvd = result;
+#else
 	int result = WSARecvFrom(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
+#endif
 	if (result == SOCKET_ERROR)
 	{
 		if (WSAGetLastError() != WSAEWOULDBLOCK)
@@ -351,8 +356,12 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			//LOG_TRACE_NETWORK("XSocketSendTo() port: %i not matched!", htons(port));
 			break;
 		}
-
+#if COMPILE_WITH_STD_SOCK_FUNC
+		int result = sendto(xsocket->winSockHandle, lpBuffers->buf, lpBuffers->len, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr));
+		*lpNumberOfBytesSent = result;
+#else
 		int result = WSASendTo(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesSent, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr), lpOverlapped, lpCompletionRoutine);
+#endif
 
 		if (result == SOCKET_ERROR)
 		{

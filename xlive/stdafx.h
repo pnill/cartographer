@@ -69,5 +69,6 @@
 extern std::random_device rd;
 
 #define COMPILE_WITH_VOICE 0
+#define COMPILE_WITH_STD_SOCK_FUNC 1
 
 #undef small
