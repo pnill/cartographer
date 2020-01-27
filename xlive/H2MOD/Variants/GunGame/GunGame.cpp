@@ -261,7 +261,7 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int playerIndex, bool bRe
 		{
 			*(BYTE*)((BYTE*)unit_object + 0x253) = count;
 		}
-		LOG_TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex={0}, peerIndex={1}", playerIndex, getPeerIndexFromPlayerIndex(playerIndex));
+		LOG_TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex={0}, peerIndex={1}", playerIndex, getPeerIndex(playerIndex));
 
 		s_unit_grenades data;
 		SecureZeroMemory(&data, sizeof(data));
@@ -269,7 +269,7 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int playerIndex, bool bRe
 		data.type = type;
 		data.count = count;
 		data.player_index = playerIndex;
-		CustomPackets::sendUnitGrenadesPacket(NetworkSession::getCurrentNetworkSession(), getPeerIndexFromPlayerIndex(playerIndex), &data);
+		CustomPackets::sendUnitGrenadesPacket(NetworkSession::getCurrentNetworkSession(), getPeerIndex(playerIndex), &data);
 	}
 }
 

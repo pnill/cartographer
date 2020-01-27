@@ -30,7 +30,7 @@ signed int Infection::calculateZombiePlayerIndex()
 		int playerIndex = 0;
 		do 
 		{
-			if (IsActive(playerIndex))
+			if (playerIsActive(playerIndex))
 				vecPlayersActiveIndexes.push_back(playerIndex);
 
 			playerIndex++;
@@ -59,10 +59,10 @@ void Infection::sendTeamChange()
 			int playerIndex = 0;
 			do
 			{
-				if (IsActive(playerIndex))
+				if (playerIsActive(playerIndex))
 				{
-					if (getLocalPeerIndex() != getPeerIndexFromPlayerIndex(playerIndex)) {
-						CustomPackets::sendTeamChange(getCurrentNetworkSession(), getPeerIndexFromPlayerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
+					if (getLocalPeerIndex() != getPeerIndex(playerIndex)) {
+						CustomPackets::sendTeamChange(getCurrentNetworkSession(), getPeerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
 						LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", playerIndex, getPlayerName(playerIndex), zombiePlayerIndex == playerIndex ? true : false);
 					}
 					else if (!h2mod->Server) {
@@ -141,7 +141,7 @@ void Infection::resetWeaponInteractionAndEmblems() {
 void Infection::preSpawnServerSetup() {
 	int playerIndex = 0;
 	do {
-		if (IsActive(playerIndex)) {
+		if (playerIsActive(playerIndex)) {
 			std::wstring playerName = getPlayerName(playerIndex);
 			BOOL isZombie = std::find(Infection::zombieNames.begin(), Infection::zombieNames.end(), playerName) != Infection::zombieNames.end();
 
@@ -149,8 +149,8 @@ void Infection::preSpawnServerSetup() {
 			if (isZombie) {
 				h2mod->set_unit_biped(Player::Biped::Elite, playerIndex);
 				if (localPeerIsSessionHost() 
-					&& getPlayerTeamFromPlayerIndex(playerIndex) != ZOMBIE_TEAM) // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
-					CustomPackets::sendTeamChange(getCurrentNetworkSession(), getPeerIndexFromPlayerIndex(playerIndex), ZOMBIE_TEAM);
+					&& getPlayerTeam(playerIndex) != ZOMBIE_TEAM) // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
+					CustomPackets::sendTeamChange(getCurrentNetworkSession(), getPeerIndex(playerIndex), ZOMBIE_TEAM);
 			}
 			else {
 				h2mod->set_unit_biped(Player::Biped::Spartan, playerIndex);

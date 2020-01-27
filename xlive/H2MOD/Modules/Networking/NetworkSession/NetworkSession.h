@@ -265,19 +265,18 @@ namespace NetworkSession
 	char getMapFileLocation(wchar_t* buffer, size_t size);
 
 	int getPeerCount();
-	int getPeerIndexFromPlayerXuid(long long xuid);
 	int getLocalPeerIndex();
 	void kickPeer(int peerIndex);
-	void logAllPeersToConsole();
+	void logPeersToConsole();
 
 	int getPlayerCount();
-	bool IsActive(int playerIndex);
+	bool playerIsActive(int playerIndex);
 	player_information* getPlayerInformation(int playerIndex);
-	int getPeerIndexFromPlayerIndex(int playerIndex);
+	int getPeerIndex(int playerIndex);
 	wchar_t* getPlayerName(int playerIndex);
-	long long getPlayerXuidFromPlayerIndex(int playerIndex);
-	int getPlayerTeamFromPlayerIndex(int playerIndex);
+	long long getPlayerXuid(int playerIndex);
+	int getPlayerTeam(int playerIndex);
 	int getPlayerTeamFromXuid(long long xuid);
-	void logAllPlayersToConsole();
+	void logPlayersToConsole();
 }
 
