@@ -132,7 +132,7 @@ int CXnIp::sendConnectionRequest(XSocket* xsocket, IN_ADDR connectionIdentifier 
 		XNetConnectionReqPacket connectionPacket;
 
 		GetLocalXNAddr(&connectionPacket.xnaddr);
-		GetKeys(&connectionPacket.xnkid, nullptr);
+		getRegisteredKeys(&connectionPacket.xnkid, nullptr);
 		connectionPacket.ConnectPacketIdentifier = /* reqType */ connectPacketIdentifier;
 
 		xnIp->connectionPacketsSentCount++;
@@ -270,6 +270,14 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 
 	XNADDR localXn;
 	GetLocalXNAddr(&localXn);
+	XNKID XnKid;
+	getRegisteredKeys(&XnKid, nullptr);
+
+	if (memcmp(xnkid, &XnKid, sizeof(XNKID)) != 0)
+	{
+		LOG_INFO_NETWORK("CreateXnIpIdentifier() - the specified XNKID is incorrect!");
+		return WSAEINVAL;
+	}
 
 	// do not allow the connection if the received XNADDR is the same with the local one
 	if (memcmp(&localXn.abEnet, pxna->abEnet, sizeof(((XNADDR*)0))->abEnet) == 0
@@ -395,7 +403,7 @@ void CXnIp::EraseKeys()
 	SecureZeroMemory(&this->host_xnkey, sizeof(XNKEY));
 }
 
-void CXnIp::GetKeys(XNKID* xnkid, XNKEY* xnkey)
+void CXnIp::getRegisteredKeys(XNKID* xnkid, XNKEY* xnkey)
 {
 	if (xnkid)
 		*xnkid = host_xnkid;
@@ -483,7 +491,7 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 // #60: XNetInAddrToXnAddr
 INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 {
-	LOG_INFO_NETWORK("XNetInAddrToXnAddr() - connection index: {:x}, identifier {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
+	LOG_INFO_NETWORK("XNetInAddrToXnAddr() - connection index: {}, identifier {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
 	
 	if (pxna == nullptr
 		|| pxnkid == nullptr)
@@ -492,8 +500,7 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 	memset(pxna, 0, sizeof(XNADDR));
 	memset(pxnkid, 0, sizeof(XNKID));
 
-	int ipIndex = ipManager.getConnectionIndex(ina);
-	XnIp* xnIp = &ipManager.XnIPs[ipIndex];
+	XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(ina)];
 	
 	if (xnIp->bValid 
 		&& xnIp->connectionIdentifier.s_addr == ina.s_addr)
@@ -503,6 +510,8 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 
 		return ERROR_SUCCESS;
 	}
+
+	LOG_ERROR_NETWORK("XNetInAddrToXnAddr() - connection index: {}, identifier: {:x} are invalid!", ipManager.getConnectionIndex(ina), ina.s_addr);
 
 	return WSAEINVAL;
 }

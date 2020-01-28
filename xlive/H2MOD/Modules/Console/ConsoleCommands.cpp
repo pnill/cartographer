@@ -677,6 +677,10 @@ void ConsoleCommands::handle_command(std::string command) {
 		else if (firstCommand == "$netstats") {
 			NetworkStatistics = !NetworkStatistics;
 		}
+		else if (firstCommand == "$lognetworksessionoffsets")
+		{
+		NetworkSession::logStructureOffsets();
+		}
 		else if (firstCommand == "$displayinfos") {
 			std::string str_index = splitCommands[1];
 			int inc = 0;

@@ -29,7 +29,7 @@ void __cdecl request_write(void* a1, int a2, int a3) {
 bool __cdecl request_read(void* a1, int a2, int a3) {
 	*(DWORD *)a3 = bitstream::p_data_decode_integer()(a1, "identifier", 32);
 	*(DWORD *)(a3 + 4) = bitstream::p_data_decode_integer()(a1, "flags", 8);
-	return bitstream::p_packet_is_valid()(a1) == 0;
+	return bitstream::p_packet_is_valid()(a1) == false;
 }
 
 void __cdecl refuse_write(void* a1, int a2, int a3) {
@@ -40,7 +40,7 @@ void __cdecl refuse_write(void* a1, int a2, int a3) {
 bool __cdecl refuse_read(void* a1, int a2, int a3) {
 	*(DWORD *)a3 = bitstream::p_data_decode_integer()(a1, "remote-identifier", 32);
 	*(DWORD *)(a3 + 4) = bitstream::p_data_decode_integer()(a1, "reason", 3);
-	bool isValid = bitstream::p_packet_is_valid()(a1) == 0;
+	bool isValid = bitstream::p_packet_is_valid()(a1) == false;
 	//LOG_TRACE_NETWORK_N("[H2MOD-network] connection refuse read, remote-identifier={}, reason=%d, isValid=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), isValid);
 	return isValid;
 }

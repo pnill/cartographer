@@ -71,7 +71,7 @@ public:
 		void set_unit_speed(float speed, int playerIndex);
 		void set_local_team_index(int local_player_index, int team);
 		BYTE get_local_team_index();
-		void set_local_grenades(BYTE type, BYTE count, int playerIndex);
+		void set_local_player_unit_grenades(BYTE type, BYTE count, int playerIndex);
 		void DisableSound(int sound);
 		void CustomSoundPlay(const wchar_t* soundName, int delay);
 		void DisableWeaponPickup(bool b_Enable);

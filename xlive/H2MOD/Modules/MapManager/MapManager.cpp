@@ -129,7 +129,7 @@ void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16
 
 	mapDownloadCountdown = true;
 	promptOpenTime = std::chrono::high_resolution_clock::now();
-	CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
+	CustomPackets::sendRequestMapFilename();
 	leavegame_callback_ptr = (void*)leave_game_callback;
 	p_map_downloading_menu_constructor(a1, a2, a3, a4, reinterpret_cast<int>(handle_map_download_callback), leave_game_callback, a7, a8, a9, a10);
 }

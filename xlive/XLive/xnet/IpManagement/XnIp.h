@@ -65,7 +65,7 @@ public:
 	void HandleConnectionPacket(XSocket* xsocket, XNetConnectionReqPacket* connectReqPacket, sockaddr_in* addr);
 	void SetKeys(XNKID*, XNKEY*);
 	void EraseKeys();
-	void GetKeys(XNKID* xnkid, XNKEY* xnkey);
+	void getRegisteredKeys(XNKID* xnkid, XNKEY* xnkey);
 	
 	XnIp localUser;
 	BOOL GetLocalXNAddr(XNADDR* pxna);

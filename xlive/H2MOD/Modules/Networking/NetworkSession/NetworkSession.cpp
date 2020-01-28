@@ -122,6 +122,11 @@ void NetworkSession::kickPeer(int peerIndex)
 	}
 }
 
+peer_observer_channel* NetworkSession::getPeerObserverChannel(int peerIndex)
+{
+	return &getCurrentNetworkSession()->peer_observer_channels[peerIndex];
+}
+
 void NetworkSession::logPlayersToConsole() {
 	int playerIndex = 0;
 	do 
@@ -150,12 +155,15 @@ void NetworkSession::logPlayersToConsole() {
 void NetworkSession::logPeersToConsole() {
 	if (getPeerCount() > 0)
 	{
+		network_observer* observer = getCurrentNetworkSession()->network_observer_ptr;
+
 		int peerIndex = 0;
 		do 
 		{
 			std::wstring outStr = L"Peer index=" + std::to_wstring(peerIndex);
 			outStr += L", Peer Name=";
 			outStr += getCurrentNetworkSession()->membership.peer_info[peerIndex].name;
+			outStr += L", Unknown state=" + std::to_wstring(observer->getObserverState(getCurrentNetworkSession()->peer_observer_channels[peerIndex].observer_index));
 			int playerIndex = getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index[0];
 			if (playerIndex != -1) 
 			{
@@ -176,3 +184,16 @@ void NetworkSession::logPeersToConsole() {
 	std::wstring total_players = L"Total peers: " + std::to_wstring(getPeerCount());
 	commands->output(total_players);
 }
+
+void NetworkSession::logStructureOffsets() {
+	
+	std::wostringstream outStr;
+	network_session* session;
+	outStr << L"Offset of local_peer_index=" << std::hex << offsetof(network_session, local_peer_index);
+	outStr << L", Offset of peer_observer_channels=" << std::hex << offsetof(network_session, peer_observer_channels);
+	outStr << L", Offset of local_session_state=" << std::hex << offsetof(network_session, local_session_state);
+	outStr << L", Offset of membership=" << std::hex << offsetof(network_session, membership);
+			
+	commands->output(outStr.str());
+}
+

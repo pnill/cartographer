@@ -578,7 +578,7 @@ void H2MOD::set_unit_speed(float speed, int playerIndex)
 		playersIt.get_data_at_index(playerIndex)->unit_speed = speed;
 }
 
-void H2MOD::set_local_grenades(BYTE type, BYTE count, int playerIndex)
+void H2MOD::set_local_player_unit_grenades(BYTE type, BYTE count, int playerIndex)
 {
 	DatumIndex unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
 

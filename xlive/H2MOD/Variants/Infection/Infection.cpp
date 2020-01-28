@@ -62,7 +62,7 @@ void Infection::sendTeamChange()
 				if (playerIsActive(playerIndex))
 				{
 					if (getLocalPeerIndex() != getPeerIndex(playerIndex)) {
-						CustomPackets::sendTeamChange(getCurrentNetworkSession(), getPeerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
+						CustomPackets::sendTeamChange(getPeerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
 						LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", playerIndex, getPlayerName(playerIndex), zombiePlayerIndex == playerIndex ? true : false);
 					}
 					else if (!h2mod->Server) {
@@ -150,7 +150,7 @@ void Infection::preSpawnServerSetup() {
 				h2mod->set_unit_biped(Player::Biped::Elite, playerIndex);
 				if (localPeerIsSessionHost() 
 					&& getPlayerTeam(playerIndex) != ZOMBIE_TEAM) // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
-					CustomPackets::sendTeamChange(getCurrentNetworkSession(), getPeerIndex(playerIndex), ZOMBIE_TEAM);
+					CustomPackets::sendTeamChange(getPeerIndex(playerIndex), ZOMBIE_TEAM);
 			}
 			else {
 				h2mod->set_unit_biped(Player::Biped::Spartan, playerIndex);

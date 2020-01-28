@@ -22,7 +22,7 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 		if (pSessionInfo)
 		{
 			ipManager.GetLocalXNAddr(&pSessionInfo->hostAddress);
-			ipManager.GetKeys(&pSessionInfo->sessionID, &pSessionInfo->keyExchangeKey);
+			ipManager.getRegisteredKeys(&pSessionInfo->sessionID, &pSessionInfo->keyExchangeKey);
 		}
 
 		LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_HOST");
@@ -90,7 +90,7 @@ int WINAPI XSessionEnd(HANDLE hSession,
 	PXOVERLAPPED pXOverlapped)
 {
 	mapManager->cleanup();
-	LOG_TRACE_NETWORK("XSessionEnd()");
+	LOG_TRACE_XLIVE("XSessionEnd()");
 	return 0;
 }
 

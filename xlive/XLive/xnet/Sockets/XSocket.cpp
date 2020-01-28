@@ -300,7 +300,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		Worst case if this is found to cause performance issues we can handle the send and re-update to secure before return.
 	*/
 
-	int connectionIndex = ipManager.getConnectionIndex(((struct sockaddr_in*)lpTo)->sin_addr);
+	int connectionIndex = ipManager.getConnectionIndex(inTo->sin_addr);
 	XnIp* xnIp = &ipManager.XnIPs[connectionIndex];
 
 	if (xnIp->bValid)
@@ -356,6 +356,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			//LOG_TRACE_NETWORK("XSocketSendTo() port: %i not matched!", htons(port));
 			break;
 		}
+
 #if COMPILE_WITH_STD_SOCK_FUNC
 		int result = sendto(xsocket->winSockHandle, lpBuffers->buf, lpBuffers->len, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr));
 		*lpNumberOfBytesSent = result;
@@ -377,6 +378,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 	}
 	else
 	{
+		LOG_TRACE_NETWORK("XSocketSendTo() - Tried to send packet to unknown connection, connection index: {}, connection identifier: {}", connectionIndex, inTo->sin_addr.s_addr);
 		WSASetLastError(WSAEINVAL);
 		return WSAEINVAL;
 	}

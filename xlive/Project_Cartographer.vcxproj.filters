@@ -283,6 +283,15 @@
     <Filter Include="Source Files\XLive\xnet\IpManager">
       <UniqueIdentifier>{82eca85d-aeb0-4259-b4d9-c6ab7f81b459}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Networking\NetworkObserver">
+      <UniqueIdentifier>{1508a28a-521b-46eb-83f2-2506074d573e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\XLive\XSession">
+      <UniqueIdentifier>{0b290f69-4cf2-4197-87b8-e2009f389a65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Networking\NetworkChannel">
+      <UniqueIdentifier>{ac28b760-f282-48b0-9488-c0f8f6bc7e6f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -546,8 +555,11 @@
     <ClCompile Include="XLive\ServerList\ServerList.cpp">
       <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.cpp">
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkObserver</Filter>
+    </ClCompile>
     <ClCompile Include="XLive\XSession\XSession.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\XLive\XSession</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1236,7 +1248,10 @@
       <Filter>Source Files\XLive\xnet</Filter>
     </ClInclude>
     <ClInclude Include="XLive\XSession\XSession.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\XLive\XSession</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h">
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkObserver</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

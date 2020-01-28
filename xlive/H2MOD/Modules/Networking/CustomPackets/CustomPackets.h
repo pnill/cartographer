@@ -162,7 +162,7 @@ void register_packet_impl(void *, int, char*, int, int, int, void*, void*, void*
 namespace CustomPackets
 {
 	void ApplyGamePatches();
-	void sendRequestMapFilename(network_session* session);
-	void sendTeamChange(network_session* session, signed int peer_index, int team_index);
-	void sendUnitGrenadesPacket(network_session* session, int peer_index, s_unit_grenades* data);
+	void sendRequestMapFilename();
+	void sendTeamChange(int peerIndex, int teamIndex);
+	void sendUnitGrenadesPacket(int peerIndex, s_unit_grenades* data);
 }
