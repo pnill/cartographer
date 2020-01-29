@@ -26,8 +26,6 @@ void ServerConsole::ApplyHooks()
 	if (!h2mod->Server)
 		return;
 
-	DWORD dwBack;
-
 	p_dedi_command_hook = (dedi_command_hook)DetourFunc(h2mod->GetAddress<BYTE*>(0x0, 0x1CCFC), (BYTE*)dediCommandHook, 7);
 }
 

@@ -241,7 +241,6 @@ char __stdcall xnkid_cmp(int thisx, int a2) {
 
 void removeXNetSecurity()
 {
-	DWORD dwBack;
 	/* XNKEY bs */
 	p_cmp_xnkid = (cmp_xnkid)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1C284A, 0x199F02), (BYTE*)xnkid_cmp, 9);
 
@@ -262,7 +261,6 @@ int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4)
 
 void applyConnectionPatches()
 {
-	DWORD dwBack;
 	//removeXNetSecurity();
 
 	// live netcode research
@@ -281,7 +279,6 @@ void applyConnectionPatches()
 }
 
 void CustomNetwork::applyNetworkHooks() {
-	DWORD dwBack;
 	DWORD serializeParametersUpdatePacketOffset = 0x1EDC41;
 
 	///////////////////////////////////////////////

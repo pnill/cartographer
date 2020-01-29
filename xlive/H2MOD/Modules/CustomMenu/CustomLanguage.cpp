@@ -653,8 +653,6 @@ void initGSCustomLanguage() {
 		overrideCoreH2Labels();
 		read_custom_labels();
 
-		DWORD dwBack;
-
 		pH2GetLabel = (tH2GetLabel)DetourClassFunc((BYTE*)H2BaseAddr + 0x3defd, (BYTE*)H2GetLabel, 8);
 
 		//Hook the function that sets the font table filename.

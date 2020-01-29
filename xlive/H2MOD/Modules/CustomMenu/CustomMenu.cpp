@@ -4650,8 +4650,6 @@ void setupSomeTests() {
 
 	memcpy(func_array, func_array2, 16 * sizeof(int*));
 
-	//DWORD dwBack;
-
 	//psub_20C226 = (tsub_20C226)DetourClassFunc((BYTE*)H2BaseAddr + 0x20C226, (BYTE*)sub_20C226, 9);
 
 	//psub_24DC0D = (tsub_24DC0D)DetourClassFunc((BYTE*)H2BaseAddr + 0x24DC0D, (BYTE*)sub_24DC0D_CM, 8);
@@ -5222,7 +5220,6 @@ void initGSCustomMenu() {
 	//"PRESS ANY KEY TO CONTINUE" mainmenu redirect.
 	PatchCall((DWORD)((BYTE*)H2BaseAddr + 0x23EF0A), &sub_209236);
 
-	DWORD dwBack;
 	pbtnHandler = (tbtnhandler)DetourClassFunc((BYTE*)H2BaseAddr + 0x213af2, (BYTE*)BtnHandlerCaller, 8);
 
 	psub_23f6b7 = (tsub_23f6b7)DetourFunc((BYTE*)H2BaseAddr + 0x23f6b7, (BYTE*)sub_23f6b7, 7);

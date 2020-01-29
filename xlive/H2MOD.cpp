@@ -1236,8 +1236,6 @@ int __cdecl device_touch(DatumIndex device_datum, DatumIndex unit_datum)
 
 void H2MOD::ApplyUnitHooks()
 {
-	DWORD dwBack;
-
 	// increase the size of the unit entity creation definition packet
 	WriteValue<DWORD>(h2mod->GetAddress(0x1F8028, 0x1E1D8E) + 1, 48);
 
@@ -1271,7 +1269,6 @@ void H2MOD::ApplyHooks() {
 
 	LOG_TRACE_GAME("Applying hooks...");
 
-	DWORD dwBack;
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(h2mod->GetAddress(0x58789, 0x60C81), OnAutoPickUpHandler);
 

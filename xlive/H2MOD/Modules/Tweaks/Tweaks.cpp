@@ -356,8 +356,6 @@ bool engine_basic_init()
 
 	if (H2Config_hiresfix != 0)
 	{
-		DWORD dwBack;
-
 		// HUD text size fix for higher resolutions
 		Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x264A18, (BYTE*)Video_HUDSizeUpdate_hook, 7);
 
@@ -941,8 +939,6 @@ void InitH2Tweaks() {
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 
 	if (H2IsDediServer) {
-		DWORD dwBack;
-
 		phookServ1 = (thookServ1)DetourFunc((BYTE*)H2BaseAddr + 0x8EFA, (BYTE*)LoadRegistrySettings, 11);
 
 		// set the additional pcr time
@@ -952,7 +948,6 @@ void InitH2Tweaks() {
 	}
 	else {//is client
 
-		DWORD dwBack;
 		//Hook a function which changes the party privacy to detect if the lobby becomes open.
 		//Problem is if you want to set it via mem poking, it won't push the lobby to the master automatically.
 		//phookChangePrivacy = (thookChangePrivacy)DetourFunc((BYTE*)H2BaseAddr + 0x2153ce, (BYTE*)HookChangePrivacy, 11);

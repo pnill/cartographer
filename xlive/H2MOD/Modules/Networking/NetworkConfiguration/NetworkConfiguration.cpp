@@ -196,8 +196,6 @@ void NetworkConfiguration::ApplyPatches()
 	// makes Live network not as laggy 
 	WriteValue<int>(h2mod->GetAddress(0x28702, 0x24896), 500);
 
-	DWORD dwBack;
-
 	//p_unk_live_netcode_func = (unk_live_netcode_func_def)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1BFB23, 0x1B9A03), (BYTE*)unk_live_netcode_func, 10);
 	//NopFill((DWORD)(BYTE*)(p_unk_live_netcode_func)+5 + 3, 5);
 

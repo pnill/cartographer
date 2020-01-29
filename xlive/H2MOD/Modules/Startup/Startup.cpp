@@ -392,7 +392,6 @@ void InitH2Startup() {
 		addDebugText("Process is Client");
 
 		addDebugText("Hooking Shutdown Function");
-		DWORD dwBack;
 		PatchCall(H2BaseAddr + 0x39E7C, game_modules_dispose);
 	}
 
