@@ -8,7 +8,7 @@
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
 extern XUID xFakeXuid[4];
-char g_network_message_types[e_network_message_types::end * 32]; // out of band packets
+char g_network_message_types[e_network_message_types::end * 32];
 
 void register_packet_impl(void *packetObject, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* a9)
 {
@@ -82,22 +82,23 @@ bool __cdecl decode_set_grenades_packet(char* buffer, int a2, s_unit_grenades* d
 	return bitstream::p_packet_is_valid()(buffer) == 0;
 }
 
-void register_custom_packets(void* a1)
+void register_custom_packets(void* network_messages)
 {
-	typedef void(__cdecl* register_test_packet)(void* a1);
+	typedef void(__cdecl* register_test_packet)(void* network_messages);
 	auto p_register_test_packet = h2mod->GetAddress<register_test_packet>(0x1ECE05, 0x1CD7BE);
-	p_register_test_packet(a1);
 
-	register_packet_impl(g_network_message_types, map_file_name, "map-file-name", 0, sizeof(s_custom_map_filename), sizeof(s_custom_map_filename), 
-		(void*)encode_map_file_name_packet, (void*)decode_map_file_name_packet, NULL);
+	p_register_test_packet(network_messages);
 
-	register_packet_impl(g_network_message_types, request_map_filename, "request-map-filename", 0, sizeof(s_request_map_filename), sizeof(s_request_map_filename),
+	register_packet_impl(network_messages, request_map_filename, "request-map-filename", 0, sizeof(s_request_map_filename), sizeof(s_request_map_filename),
 		(void*)encode_request_map_filename_packet, (void*)decode_request_map_filename_packet, NULL);
 
-	register_packet_impl(g_network_message_types, team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
+	register_packet_impl(network_messages, map_file_name, "map-file-name", 0, sizeof(s_custom_map_filename), sizeof(s_custom_map_filename),
+		(void*)encode_map_file_name_packet, (void*)decode_map_file_name_packet, NULL);
+
+	register_packet_impl(network_messages, team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
 		(void*)encode_team_change_packet, (void*)decode_team_change_packet, NULL);
 
-	register_packet_impl(g_network_message_types, unit_grenades, "unit-grenades", 0, sizeof(s_unit_grenades), sizeof(s_unit_grenades),
+	register_packet_impl(network_messages, unit_grenades, "unit-grenades", 0, sizeof(s_unit_grenades), sizeof(s_unit_grenades),
 		(void*)encode_set_grenades_packet, (void*)decode_set_grenades_packet, NULL);
 }
 
@@ -357,8 +358,6 @@ void CustomPackets::ApplyGamePatches()
 
 	PatchCall(h2mod->GetAddress(0x1B5196, 0x1A8EF4), register_custom_packets);
 
-	DWORD dwBack;
 	p_handle_out_of_band_message = (handle_out_of_band_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E907B, 0x1CB03B), (BYTE*)handle_out_of_band_message_hook, 8);
-
 	p_handle_channel_message = (handle_channel_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E929C, 0x1CB25C), (BYTE*)handle_channel_message_hook, 8);
 }

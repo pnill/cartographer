@@ -188,7 +188,6 @@ void NetworkSession::logPeersToConsole() {
 void NetworkSession::logStructureOffsets() {
 	
 	std::wostringstream outStr;
-	network_session* session;
 	outStr << L"Offset of local_peer_index=" << std::hex << offsetof(network_session, local_peer_index);
 	outStr << L", Offset of peer_observer_channels=" << std::hex << offsetof(network_session, peer_observer_channels);
 	outStr << L", Offset of local_session_state=" << std::hex << offsetof(network_session, local_session_state);
