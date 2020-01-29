@@ -481,10 +481,17 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 		}
 		else if (firstCommand == "$logplayers") {
+			if (!NetworkSession::localPeerIsSessionHost()) {
+				output(L"Only host can log player information.");
+				return;
+			}
 			NetworkSession::logPlayersToConsole();
 		}
-		else if (firstCommand == "$logpeers")
-		{
+		else if (firstCommand == "$logpeers") {
+			if (!NetworkSession::localPeerIsSessionHost()) {
+				output(L"Only host can log peer information.");
+				return;
+			}
 			NetworkSession::logPeersToConsole();
 		}
 		else if (firstCommand == "$maxplayers") {
