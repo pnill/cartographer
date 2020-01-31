@@ -167,22 +167,6 @@ IN_ADDR CXnIp::GetConnectionIdentifierByNat(sockaddr_in* fromAddr)
 
 void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier, sockaddr_in* addr)
 {
-	/*
-		In theory to handle multiple instance servers in the future what we can do is populate the port field of CreateUser,
-		Then map the shit before we actually attempt a connection to the server here...
-
-		That way we intercept it and don't even have to modify the game's engine.
-
-		While we only have enough room for one port in the XNADDR struct we can just do, port+1.
-
-		So,
-		"connect" socket = 2001 if the XNADDR struct is 2000 which is the "join" socket.
-
-		Then once TeamSpeak is in just do +6 because the game traditionally tries to map 1000-1006 so we'll just go 2007 = TS, etc.
-
-		This should allow us to handle servers listening on any port without much effort or engine modification.
-	*/
-
 	LOG_INFO_NETWORK("SaveNatInfo() - socket: {}, connection index: {}, identifier: {:x}", xsocket->winSockHandle, getConnectionIndex(connectionIdentifier), connectionIdentifier.s_addr);
 	int ipIndex = getConnectionIndex(connectionIdentifier);
 	XnIp* xnIp = &this->XnIPs[ipIndex];
@@ -191,28 +175,27 @@ void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier
 	if (xnIp->bValid 
 		&& xnIp->connectionIdentifier.s_addr == connectionIdentifier.s_addr)
 	{
-
+		// TODO: handle dynamically
 		/* Store NAT data
 		   First we look at our socket's intended port.
-		   port 1000 is mapped to the receiving port pmap_a via the secure address.
-		   port 1001 is mapped to the receiving port pmap_b via the secure address.
+		   port 1000 is mapped to the receiving address/port xnIp->NatAddrSocket1000 via the connection identifier.
+		   port 1001 is mapped to the receiving address/port xnIp->NatAddrSocket1001 via the connection identifier.
 		*/
-		// TODO: handle dynamically
 
 		switch (xsocket->getNetworkSocketPort())
 		{
 		case 1000:
-			//LOG_TRACE_NETWORK("XSocketRecvFrom() User.sockmap mapping port 1000 - port: %i, secure: %08X", htons(port), secure);
+			//LOG_TRACE_NETWORK("SaveConnectionNatInfo() xnIp->NatAddrSocket1000 mapping port 1000 - port: {}, connection identifier: {:x}", htons(addr->sin_port), xnIp->connectionIdentifier.s_addr);
 			xnIp->NatAddrSocket1000 = *addr;
 			break;
 
 		case 1001:
-			//LOG_TRACE_NETWORK("XSocketRecvFrom() User.sockmap mapping port 1001 - port: %i, secure: %08X", htons(port), secure);
+			//LOG_TRACE_NETWORK("SaveConnectionNatInfo() xnIp->NatAddrSocket1001 mapping port 1001 - port: {}, connection identifier: {:x}", htons(addr->sin_port), xnIp->connectionIdentifier.s_addr);
 			xnIp->NatAddrSocket1001 = *addr;
 			break;
 
 		default:
-			//LOG_ERROR_NETWORK("XSocketRecvFrom() User.sockmap[s] didn't match any ports!");
+			//LOG_ERROR_NETWORK("SaveConnectionNatInfo() xsocket->getNetworkSocketPort() didn't match any ports!");
 			break;
 
 		}
@@ -258,11 +241,10 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetConnectionReqPacket* co
 int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier, bool handleFromConnectionPacket)
 {
 	/*
-		This only happens for servers because we have all their data from the get go :)...
-
-		- Update 1/20/2017 -
-		This should now also be called when receiving the 'SecurityPacket' because we have the data on the first attempt to either establish a connection OR on the attempt to join a game,
-		That should eliminate the need to talk to the Master server in order to get the XNADDR information from the secure address.
+		Update: 1/31/2020
+		- Creates an identifier to be used by WinSock calls from a XNADDR address
+		- It gets created when we received a XNet request connection packet, or when the game calls XNetXnAddrToInAddr
+		- If XNetInAddrToXnAddr passes an invalid identifier, it will return WSAEINVAL
 	*/
 
 	int firstUnusedDataIndex = 0;
