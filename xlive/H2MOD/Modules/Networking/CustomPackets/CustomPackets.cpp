@@ -264,7 +264,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		{
 			s_unit_grenades* received_data = (s_unit_grenades*)packet;
 			if (!h2mod->Server)
-				h2mod->set_local_player_unit_grenades(received_data->type, received_data->count, received_data->player_index);
+				h2mod->set_player_unit_grenades_count(received_data->type, received_data->count, received_data->player_index);
 		}
 		return;
 	}
