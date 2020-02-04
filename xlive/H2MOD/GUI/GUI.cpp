@@ -620,7 +620,7 @@ int WINAPI XLiveRender()
 			}
 			
 			if (getDebugTextDisplay()) {
-				for (int i = 0; i < getDebugTextArrayMaxLen(); i++) {
+				for (int i = 0; i < getDebugTextDisplayCount(); i++) {
 					const char* text = getDebugText(i);
 					//int yOffset = 40 + (i * 14);
 					int yOffset = gameWindowHeight - 55 - (i * 14);
