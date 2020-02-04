@@ -14,9 +14,14 @@ struct XnIp
 	int connectionPacketsSentCount;
 	int lastConnectionInteractionTime;
 
+	// TODO:
+	//int socketCount;
+
 	// NAT info
 	sockaddr_in NatAddrSocket1000; // TODO: allocate dynamically based on how many sockets are up
 	sockaddr_in NatAddrSocket1001;
+
+	bool isValid(IN_ADDR identifier) { return bValid && identifier.s_addr == connectionIdentifier.s_addr; }
 };
 
 template <class T>
@@ -50,7 +55,7 @@ public:
 	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier, bool handleFromConnectionPacket);
 	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 
-	void checkForLostConnections();
+	void checkForLostConnections(IN_ADDR connectionIdentifier);
 	void setTimeConnectionInteractionHappened(IN_ADDR ina, int time);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
 	void SetupLocalConnectionInfo(XNADDR* pxna);
@@ -63,8 +68,8 @@ public:
 	IN_ADDR GetConnectionIdentifierByNat(sockaddr_in* addr);
 	void SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);
 	void HandleConnectionPacket(XSocket* xsocket, XNetConnectionReqPacket* connectReqPacket, sockaddr_in* addr);
-	void SetKeys(XNKID*, XNKEY*);
-	void EraseKeys();
+	void RegisterKeys(XNKID*, XNKEY*);
+	void UnregisterKeys();
 	void getRegisteredKeys(XNKID* xnkid, XNKEY* xnkey);
 	
 	XnIp localUser;
@@ -73,6 +78,7 @@ public:
 	XnIp* XnIPs = nullptr;
 	std::vector<XSocket*> SocketPtrArray = {};
 
+	// TODO: get rid of this
 	XNADDR gameHostXn; // the Xn of the host from the join game hook
 
 	XNetStartupParams startupParams;
