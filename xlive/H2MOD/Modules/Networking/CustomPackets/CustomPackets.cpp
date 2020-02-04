@@ -29,13 +29,6 @@ bool getNetworkAddressFromNetworkChannel(char* network_channel, network_address*
 	return p_get_network_address_from_network_channel(network_channel, out_addr);
 }
 
-void observer_channel_send_message(void *observer, int unk_index, int observer_index, bool send_out_of_band, int type, size_t size, void* data)
-{
-	typedef void(__thiscall* observer_channel_send_message)(void *observer, int unk_index, int observer_index, bool send_out_of_band, int type, size_t size, void* data);
-	auto p_dynamic_packet_check = reinterpret_cast<observer_channel_send_message>(h2mod->GetAddress(0x1BED40, 0x1B8C1A));
-	p_dynamic_packet_check(observer, unk_index, observer_index, send_out_of_band, type, size, data);
-}
-
 void __cdecl encode_map_file_name_packet(char* buffer, int a2, s_custom_map_filename* data)
 {
 	bitstream::p_data_encode_bool()(buffer, "is-custom-map", data->is_custom_map);
@@ -224,8 +217,11 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				}
 
 				LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] sending map file name packet to XUID: {}, peer index: {}, map name: {}", received_data->user_identifier, peer_index, map_filename.c_str());
-				observer_channel_send_message(session->network_observer_ptr, session->unk_index, session->peer_observer_channels[peer_index].observer_index, false,
-					map_file_name, sizeof(s_custom_map_filename), &data);
+
+				network_observer* observer = session->network_observer_ptr;
+				peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peer_index);
+
+				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, map_file_name, sizeof(s_custom_map_filename), &data);
 			}
 		}
 		
@@ -300,8 +296,7 @@ void CustomPackets::sendRequestMapFilename()
 		//if (observer->getObserverState(observer_channel->observer_index) == 7) {
 		//}
 		if (observer_channel->field_1) {
-			observer_channel_send_message(session->network_observer_ptr, session->unk_index, observer_channel->observer_index, false,
-				request_map_filename, sizeof(s_request_map_filename), (void*)&data);
+			observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, request_map_filename, sizeof(s_request_map_filename), &data);
 		}
 	}
 }
@@ -321,8 +316,7 @@ void CustomPackets::sendTeamChange(int peerIndex, int teamIndex)
 		{
 			//if (observer->getObserverState(observer_channel->observer_index) == 7) {
 				if (observer_channel->field_1) {
-					observer_channel_send_message(observer, session->unk_index, observer_channel->observer_index, false,
-						team_change, sizeof(s_team_change), (void*)&data);
+					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, team_change, sizeof(s_team_change), &data);
 				}
 			//}
 		}
@@ -341,8 +335,7 @@ void CustomPackets::sendUnitGrenadesPacket(int peerIndex, s_unit_grenades* data)
 
 			//if (observer->getObserverState(observer_channel->observer_index) == 7) {
 				if (observer_channel->field_1) {
-					observer_channel_send_message(session->network_observer_ptr, session->unk_index, observer_channel->observer_index, false,
-						unit_grenades, sizeof(s_unit_grenades), (void*)data);
+					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, unit_grenades, sizeof(s_unit_grenades), data);
 				}
 			//}
 		}
