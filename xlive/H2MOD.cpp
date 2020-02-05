@@ -251,10 +251,10 @@ signed int __cdecl object_new_hook(ObjectPlacementData* new_object)
 	return result;
 }
 
-typedef void(__stdcall *tc_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, void* packet);
+typedef void(__stdcall *tc_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, bitstream* stream);
 tc_simulation_unit_entity_definition_creation_encode pc_simulation_unit_entity_definition_encode;
 
-void __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr, int creation_data_size, void* creation_data, int a3, void* packet)
+void __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr, int creation_data_size, void* creation_data, int a3, bitstream* stream)
 {
 	//LOG_TRACE_GAME_N("c_simulation_unit_entity_definition_creation_encode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, a3: %i, packet: %08X", thisptr, creation_data_size, creation_data, a3, packet);
 	int object_permutation_index = *(int*)((char*)creation_data + 0x24);
@@ -262,29 +262,29 @@ void __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr
 	{
 		//LOG_TRACE_GAME_N("creation_data+0x24: %08X", object_permutation_index);
 
-		bitstream::p_data_encode_bool()(packet, "object-permutation-exists", 1);
-		bitstream::p_data_encode_integer()(packet, "object-permutation-index", object_permutation_index, 32);
+		stream->data_encode_bool("object-permutation-exists", 1);
+		stream->data_encode_integer("object-permutation-index", object_permutation_index, 32);
 		//LOG_TRACE_GAME_N("c_simulation_unit_entity_encode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
 
 	}
 	else
-		bitstream::p_data_encode_bool()(packet, "object-permutation-exists", 0);
+		stream->data_encode_bool("object-permutation-exists", 0);
 
-	pc_simulation_unit_entity_definition_encode(thisptr, creation_data_size, creation_data, a3, packet);
+	pc_simulation_unit_entity_definition_encode(thisptr, creation_data_size, creation_data, a3, stream);
 }
 
 
-typedef bool(__stdcall *tc_simulation_unit_entity_definition_creation_decode)(void* thisptr, int creation_data_size, void* creation_data, void* packet);
+typedef bool(__stdcall *tc_simulation_unit_entity_definition_creation_decode)(void* thisptr, int creation_data_size, void* creation_data, bitstream* stream);
 tc_simulation_unit_entity_definition_creation_decode pc_simulation_unit_entity_definition_decode;
 
-bool __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, int creation_data_size, void* creation_data, void* packet)
+bool __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, int creation_data_size, void* creation_data, bitstream* stream)
 {
 	//LOG_TRACE_GAME_N("c_simulation_unit_entity_definition_creation_decode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, packet: %08X", thisptr, creation_data_size, creation_data, packet);
 
-	if (bitstream::p_data_decode_bool()(packet, "object-permutation-exists"))
+	if (stream->data_decode_bool("object-permutation-exists"))
 	{
 		//LOG_TRACE_GAME_N("c_simulation_unit_entity_decode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
-		int object_permutation_index = bitstream::p_data_decode_integer()(packet, "object-permutation-index", 32);
+		int object_permutation_index = stream->data_decode_integer("object-permutation-index", 32);
 		*(int*)((char*)creation_data + 0x24) = object_permutation_index;
 
 		//LOG_TRACE_GAME_N("object_permutation_index: %08X", object_permutation_index);
@@ -292,7 +292,7 @@ bool __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr
 	else
 		*(int*)((char*)creation_data + 0x24) = -1;
 
-	return pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, packet);
+	return pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, stream);
 }
 
 typedef int(__stdcall *tset_unit_creation_data)(unsigned int object_index, void* object_creation_data);

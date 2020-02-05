@@ -1,33 +1,24 @@
 #pragma once
 
-typedef void(__thiscall* data_encode_string)(void* thisx, char* a2, int a3, int a4);
-typedef void(__thiscall* data_encode_integer)(void *thisx, char* name, unsigned int value, signed int a3);
-typedef void(__thiscall* data_encode_bits)(void* thisx, char* a2, void* a3, int a4);
-typedef	void(__thiscall* data_encode_boolean)(void* thisx, char* a2, char a3);
-
-typedef void(__thiscall* data_decode_string)(void* thisx, char* a2, int a3, int a4);
-typedef void(__thiscall* data_decode_address)(void* thisx, char* a2, int a3);
-typedef int(__thiscall* data_decode_integer)(void* thisx, char* a2, int a3);
-typedef void(__thiscall* data_decode_bits)(void* thisx, char* a2, int a3, int a4);
-typedef bool(__thiscall* data_decode_bool)(void* thisx, char* a2);
-
-typedef bool(__thiscall* valid_packet_type)(void* thisx);
-
-namespace bitstream
+#pragma pack(push, 1)
+struct bitstream
 {
-	// encoding
-	data_encode_string p_data_encode_string();
-	data_encode_integer p_data_encode_integer();
-	data_encode_bits p_data_encode_bits();
-	data_encode_boolean p_data_encode_bool();
+	DWORD field_0;
+	DWORD field_4;
+	BYTE gap_8[8];
+	DWORD field_10;
+	
+	void data_encode_string(char* name, int a3, int a4);
+	void data_encode_integer(char* name, unsigned int value, signed int a3);
+	void data_encode_bits(char* name, void* a3, int a4);
+	void data_encode_bool(char* name, bool a3);
+		 
+	void data_decode_string(char* name, int a3, int a4);
+	void data_decode_address(char* name, int a3);
+	int  data_decode_integer(char* name, int a3);
+	void data_decode_bits(char* name, int a3, int a4);
+	bool data_decode_bool(char* name);
 
-	// decoding
-	data_decode_string p_data_decode_string();
-	data_decode_address p_data_decode_address();
-	data_decode_integer p_data_decode_integer();
-	data_decode_bits p_data_decode_bits();
-	data_decode_bool p_data_decode_bool();
-
-	// verification
-	valid_packet_type p_packet_is_valid();
-}
+	bool packet_is_valid();
+};
+#pragma pack(pop)

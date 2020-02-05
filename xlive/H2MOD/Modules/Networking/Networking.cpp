@@ -20,61 +20,61 @@ const char* getNetworkMessageName(int enumVal) {
 	return network_message_name[enumVal];
 }
 
-void __cdecl request_write(void* a1, int a2, int a3) {
-	bitstream::p_data_encode_integer()(a1, "identifier", *(DWORD *)a3, 32);
-	bitstream::p_data_encode_integer()(a1, "flags", *(DWORD *)(a3 + 4), 8);
+void __cdecl request_write(bitstream* stream, int a2, int a3) {
+	stream->data_encode_integer("identifier", *(DWORD *)a3, 32);
+	stream->data_encode_integer("flags", *(DWORD *)(a3 + 4), 8);
 	LOG_TRACE_NETWORK("[H2MOD-network] connection request write, identifier={0}, flags={1}", *(DWORD *)a3, *(DWORD *)(a3 + 4));
 }
 
-bool __cdecl request_read(void* a1, int a2, int a3) {
-	*(DWORD *)a3 = bitstream::p_data_decode_integer()(a1, "identifier", 32);
-	*(DWORD *)(a3 + 4) = bitstream::p_data_decode_integer()(a1, "flags", 8);
-	return bitstream::p_packet_is_valid()(a1) == false;
+bool __cdecl request_read(bitstream* stream, int a2, int a3) {
+	*(DWORD *)a3 = stream->data_decode_integer("identifier", 32);
+	*(DWORD *)(a3 + 4) = stream->data_decode_integer("flags", 8);
+	return stream->packet_is_valid() == false;
 }
 
-void __cdecl refuse_write(void* a1, int a2, int a3) {
-	bitstream::p_data_encode_integer()(a1, "remote-identifier", *(DWORD *)a3, 32);
-	bitstream::p_data_encode_integer()(a1, "reason", *(DWORD *)(a3 + 4), 3);
+void __cdecl refuse_write(bitstream* stream, int a2, int a3) {
+	stream->data_encode_integer("remote-identifier", *(DWORD *)a3, 32);
+	stream->data_encode_integer("reason", *(DWORD *)(a3 + 4), 3);
 }
 
-bool __cdecl refuse_read(void* a1, int a2, int a3) {
-	*(DWORD *)a3 = bitstream::p_data_decode_integer()(a1, "remote-identifier", 32);
-	*(DWORD *)(a3 + 4) = bitstream::p_data_decode_integer()(a1, "reason", 3);
-	bool isValid = bitstream::p_packet_is_valid()(a1) == false;
+bool __cdecl refuse_read(bitstream* stream, int a2, int a3) {
+	*(DWORD *)a3 = stream->data_decode_integer("remote-identifier", 32);
+	*(DWORD *)(a3 + 4) = stream->data_decode_integer("reason", 3);
+	bool isValid = stream->packet_is_valid() == false;
 	//LOG_TRACE_NETWORK_N("[H2MOD-network] connection refuse read, remote-identifier={}, reason=%d, isValid=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), isValid);
 	return isValid;
 }
 
-void __cdecl establish_write(void* a1, int a2, int a3) {
-	bitstream::p_data_encode_integer()(a1, "remote-identifier", *(DWORD *)a3, 32);
-	bitstream::p_data_encode_integer()(a1, "reason", *(DWORD *)(a3 + 4), 32);
+void __cdecl establish_write(bitstream* stream, int a2, int a3) {
+	stream->data_encode_integer("remote-identifier", *(DWORD *)a3, 32);
+	stream->data_encode_integer("reason", *(DWORD *)(a3 + 4), 32);
 	//LOG_TRACE_NETWORK_N("[H2MOD-network] connection establish write, remote-identifier=%d, identifier=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4));
 }
 
-bool __cdecl establish_read(void* a1, int a2, int a3) {
-	*(DWORD *)a3 = bitstream::p_data_decode_integer()(a1, "remote-identifier", 32);
-	*(DWORD *)(a3 + 4) = bitstream::p_data_decode_integer()(a1, "identifier", 32);
-	bool isValid = bitstream::p_packet_is_valid()(a1) == 0;
+bool __cdecl establish_read(bitstream* stream, int a2, int a3) {
+	*(DWORD *)a3 = stream->data_decode_integer("remote-identifier", 32);
+	*(DWORD *)(a3 + 4) = stream->data_decode_integer("identifier", 32);
+	bool isValid = stream->packet_is_valid() == false;
 	//LOG_TRACE_NETWORK_N("[H2MOD-network] connection establish read, remote-identifier=%d, identifier=%d, isValid=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), isValid);
 	return isValid;
 }
 
-void __cdecl closed_write(void* a1, int a2, int a3) {
-	bitstream::p_data_encode_integer()(a1, "remote-identifier", *(DWORD *)a3, 32);
-	bitstream::p_data_encode_integer()(a1, "identifier", *(DWORD *)(a3 + 4), 32);
-	bitstream::p_data_encode_integer()(a1, "closure-reason", *(DWORD *)(a3 + 8), 5);
+void __cdecl closed_write(bitstream* stream, int a2, int a3) {
+	stream->data_encode_integer("remote-identifier", *(DWORD *)a3, 32);
+	stream->data_encode_integer("identifier", *(DWORD *)(a3 + 4), 32);
+	stream->data_encode_integer("closure-reason", *(DWORD *)(a3 + 8), 5);
 	//LOG_TRACE_NETWORK_N("[H2MOD-network] connection closed write, remote-identifier=%d, identifier=%d, closureReason=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), *(DWORD *)(a3 + 8));
 }
 
-bool __cdecl closed_read(void* a1, int a2, int a3) {
+bool __cdecl closed_read(bitstream* stream, int a2, int a3) {
 	bool result = false;
 	signed int closure_reason; 
 
-	*(DWORD *)a3 = bitstream::p_data_decode_integer()(a1, "remote-identifier", 32);
-	*(DWORD *)(a3 + 4) = bitstream::p_data_decode_integer()(a1, "identifier", 32);
-	*(DWORD *)(a3 + 8) = bitstream::p_data_decode_integer()(a1, "closure-reason", 5);
+	*(DWORD *)a3 = stream->data_decode_integer("remote-identifier", 32);
+	*(DWORD *)(a3 + 4) = stream->data_decode_integer("identifier", 32);
+	*(DWORD *)(a3 + 8) = stream->data_decode_integer("closure-reason", 5);
 
-	if (bitstream::p_packet_is_valid()(a1))
+	if (stream->packet_is_valid())
 		return result;
 	
 	closure_reason = *(DWORD *)(a3 + 8);
@@ -149,19 +149,19 @@ void __cdecl registerPlayerPackets(void* packetObject) {
 		h2mod->GetAddress<void*>(0x1F09AC, 0x1D1365), 0);
 }
 
-bool decodePacketTypeAndSize(void *thisx, void* a2, signed int *a3, int a4) {
+bool decodePacketTypeAndSize(void *thisx, bitstream* stream, signed int *a3, int a4) {
 	char *v4; // ebp@1
 	signed int v5; // eax@2
 	int v6; // eax@4
 	bool result; // al@7
 
 	v4 = (char *)thisx;
-	*a3 = bitstream::p_data_decode_integer()(a2, "type", 8);
-	*(DWORD *)a4 = bitstream::p_data_decode_integer()(a2, "size", 16);
+	*a3 = stream->data_decode_integer("type", 8);
+	*(DWORD *)a4 = stream->data_decode_integer("size", 16);
 	LOG_TRACE_NETWORK("[h2mod-network] received packet decoded type={0}, typeName={1}, size={2}", *a3, getNetworkMessageName(*a3), *(DWORD *)a4);
-	if (bitstream::p_packet_is_valid()(a2)
+	if (stream->packet_is_valid()
 		|| (v5 = *a3, *a3 < 0)
-		|| v5 >= 49
+		|| v5 >= e_network_message_types::end
 		|| (v6 = (int)&v4[32 * v5], !*(BYTE *)v6)
 		|| *(DWORD *)a4 < *(DWORD *)(v6 + 12)
 		|| *(DWORD *)a4 > *(DWORD *)(v6 + 16))
@@ -170,7 +170,7 @@ bool decodePacketTypeAndSize(void *thisx, void* a2, signed int *a3, int a4) {
 	}
 	else
 	{
-		result = bitstream::p_packet_is_valid()(a2) == 0;
+		result = stream->packet_is_valid() == false;
 	}
 	return result;
 }
@@ -178,7 +178,7 @@ bool decodePacketTypeAndSize(void *thisx, void* a2, signed int *a3, int a4) {
 typedef char(__stdcall *receive_packet)(void *thisx, void* a2, int packetType, unsigned int *size, void *packet_obj);
 receive_packet receive_packet_method;
 
-char __stdcall receivePacket(void *thisx, void* a2, int packetType, unsigned int *size, void *packet_obj) {
+char __stdcall receivePacket(void *thisx, bitstream* stream, int packetType, unsigned int *size, void *packet_obj) {
 	char *v5; // ebp@1
 	int v6; // esi@2
 	char result; // al@2
@@ -186,12 +186,12 @@ char __stdcall receivePacket(void *thisx, void* a2, int packetType, unsigned int
 	v5 = (char *)thisx;
 	typedef bool(__thiscall* decode_type_and_size)(void* thisx, int a2, signed int* a3, int a4);
 	decode_type_and_size decode_type_and_size_method = h2mod->GetAddress<decode_type_and_size>(0x1E8217, 0x1CA1DA);
-	if (decodePacketTypeAndSize(thisx, a2, (signed int *)packetType, (int)size))
+	if (decodePacketTypeAndSize(thisx, stream, (signed int *)packetType, (int)size))
 	{
 		LOG_TRACE_NETWORK("[h2mod-network] received packet succesfully decoded");
 		v6 = (int)&v5[32 * *(DWORD *)packetType];
 		SecureZeroMemory(packet_obj, *size);
-		result = (*(int(__cdecl **)(void*, unsigned int, void *))(v6 + 24))(a2, *size, packet_obj);// calls packet read/write method
+		result = (*(int(__cdecl **)(void*, unsigned int, void *))(v6 + 24))(stream, *size, packet_obj);// calls packet read/write method
 	}
 	else
 	{

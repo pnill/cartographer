@@ -29,50 +29,53 @@ bool getNetworkAddressFromNetworkChannel(char* network_channel, network_address*
 	return p_get_network_address_from_network_channel(network_channel, out_addr);
 }
 
-void __cdecl encode_map_file_name_packet(char* buffer, int a2, s_custom_map_filename* data)
+void __cdecl encode_map_file_name_packet(bitstream* stream, int a2, s_custom_map_filename* data)
 {
-	bitstream::p_data_encode_bool()(buffer, "is-custom-map", data->is_custom_map);
-	bitstream::p_data_encode_string()(buffer, "map-file-name", (int)&data->file_name, 32);
+	stream->data_encode_bool("is-custom-map", data->is_custom_map);
+	if (data->is_custom_map == true)
+		stream->data_encode_string("map-file-name", (int)&data->file_name, 32);
 }
-bool __cdecl decode_map_file_name_packet(char* buffer, int a2, s_custom_map_filename* data)
+bool __cdecl decode_map_file_name_packet(bitstream* stream, int a2, s_custom_map_filename* data)
 {
-	data->is_custom_map = bitstream::p_data_decode_bool()(buffer, "is-custom-map");
-	bitstream::p_data_decode_string()(buffer, "map-file-name", (int)&data->file_name, 32);
-	return bitstream::p_packet_is_valid()(buffer) == 0;
+	data->is_custom_map = stream->data_decode_bool("is-custom-map");
+	if (data->is_custom_map == true)
+		stream->data_decode_string("map-file-name", (int)&data->file_name, 32);
+
+	return stream->packet_is_valid() == false;
 }
 
-void __cdecl encode_request_map_filename_packet(char* buffer, int a2, s_request_map_filename* data)
+void __cdecl encode_request_map_filename_packet(bitstream* stream, int a2, s_request_map_filename* data)
 {
-	bitstream::p_data_encode_bits()(buffer, "user-identifier", &data->user_identifier, 64);
+	stream->data_encode_bits("user-identifier", &data->user_identifier, 64);
 }
-bool __cdecl decode_request_map_filename_packet(char* buffer, int a2, s_request_map_filename* data)
+bool __cdecl decode_request_map_filename_packet(bitstream* stream, int a2, s_request_map_filename* data)
 {
-	bitstream::p_data_decode_bits()(buffer, "user-identifier", (int)&data->user_identifier, 64);
-	return bitstream::p_packet_is_valid()(buffer) == 0;
-}
-
-void __cdecl encode_team_change_packet(char* buffer, int a2, s_team_change* data)
-{
-	bitstream::p_data_encode_integer()(buffer, "team-index", data->team_index, 32);
-}
-bool __cdecl decode_team_change_packet(char* buffer, int a2, s_team_change* data)
-{
-	data->team_index = bitstream::p_data_decode_integer()(buffer, "team-index", 32);
-	return bitstream::p_packet_is_valid()(buffer) == 0;
+	stream->data_decode_bits("user-identifier", (int)&data->user_identifier, 64);
+	return stream->packet_is_valid() == false;
 }
 
-void __cdecl encode_set_grenades_packet(char* buffer, int a2, s_unit_grenades* data)
+void __cdecl encode_team_change_packet(bitstream* stream, int a2, s_team_change* data)
 {
-	bitstream::p_data_encode_integer()(buffer, "type", data->type, 32);
-	bitstream::p_data_encode_integer()(buffer, "count", data->count, 32);
-	bitstream::p_data_encode_integer()(buffer, "player-index", data->player_index, 32);
+	stream->data_encode_integer("team-index", data->team_index, 32);
 }
-bool __cdecl decode_set_grenades_packet(char* buffer, int a2, s_unit_grenades* data)
+bool __cdecl decode_team_change_packet(bitstream* stream, int a2, s_team_change* data)
 {
-	data->type = bitstream::p_data_decode_integer()(buffer, "type", 32);
-	data->count = bitstream::p_data_decode_integer()(buffer, "count", 32);
-	data->player_index = bitstream::p_data_decode_integer()(buffer, "player-index", 32);
-	return bitstream::p_packet_is_valid()(buffer) == 0;
+	data->team_index = stream->data_decode_integer("team-index", 32);
+	return stream->packet_is_valid() == false;
+}
+
+void __cdecl encode_set_grenades_packet(bitstream* stream, int a2, s_unit_grenades* data)
+{
+	stream->data_encode_integer("type", data->type, 32);
+	stream->data_encode_integer("count", data->count, 32);
+	stream->data_encode_integer("player-index", data->player_index, 32);
+}
+bool __cdecl decode_set_grenades_packet(bitstream* stream, int a2, s_unit_grenades* data)
+{
+	data->type = stream->data_decode_integer("type", 32);
+	data->count = stream->data_decode_integer("count", 32);
+	data->player_index = stream->data_decode_integer("player-index", 32);
+	return stream->packet_is_valid() == false;
 }
 
 void register_custom_packets(void* network_messages)
