@@ -300,12 +300,9 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		Worst case if this is found to cause performance issues we can handle the send and re-update to secure before return.
 	*/
 
-	int connectionIndex = ipManager.getConnectionIndex(inTo->sin_addr);
-	XnIp* xnIp = &ipManager.XnIPs[connectionIndex];
-
-	if (xnIp->bValid)
+	XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(inTo->sin_addr)];
+	if (xnIp->isValid(inTo->sin_addr))
 	{
-
 		sockaddr_in sendToAddr;
 		sendToAddr.sin_family = AF_INET;
 		sendToAddr.sin_addr = xnIp->xnaddr.ina;
@@ -366,7 +363,8 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 
 		if (result == SOCKET_ERROR)
 		{
-			LOG_ERROR_NETWORK("XSocketSendTo() - Socket Error: {}", WSAGetLastError());
+			if (WSAGetLastError() != WSAEWOULDBLOCK)
+				LOG_ERROR_NETWORK("XSocketSendTo() - Socket Error: {}", WSAGetLastError());
 			return SOCKET_ERROR;
 		}
 		else
@@ -378,9 +376,9 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("XSocketSendTo() - Tried to send packet to unknown connection, connection index: {}, connection identifier: {}", connectionIndex, inTo->sin_addr.s_addr);
-		WSASetLastError(WSAEINVAL);
-		return WSAEINVAL;
+		LOG_TRACE_NETWORK("XSocketSendTo() - Tried to send packet to unknown connection, connection index: {}, connection identifier: {}", ipManager.getConnectionIndex(inTo->sin_addr), inTo->sin_addr.s_addr);
+		WSASetLastError(WSAEHOSTUNREACH);
+		return SOCKET_ERROR;
 	}
 }
 
