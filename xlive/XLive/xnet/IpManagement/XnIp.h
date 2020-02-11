@@ -63,7 +63,6 @@ public:
 	int handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, int bytesRecvdCount);
 
 	void UnregisterLocalConnectionInfo();
-	BOOL LocalUserLoggedIn();
 	void GetStartupParamsAndUpdate(const XNetStartupParams* netStartupParams);
 	IN_ADDR GetConnectionIdentifierByNat(sockaddr_in* addr);
 	void SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);

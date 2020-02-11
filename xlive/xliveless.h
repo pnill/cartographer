@@ -227,4 +227,3 @@ inline T verify_output(T output, const char *expression, const char *func_name, 
 #endif
 
 void update_player_count();
-extern UINT g_signin[4];

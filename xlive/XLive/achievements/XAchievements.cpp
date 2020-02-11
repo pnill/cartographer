@@ -204,7 +204,7 @@ DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement
 
 				h2mod->AchievementMap[AchievementData.c_str()] = false;
 
-				std::thread(AchievementUnlock, xFakeXuid[0], AchievementID).detach();
+				std::thread(AchievementUnlock, usersSignInInfo[0].xuid, AchievementID).detach();
 			}
 			else {
 				LOG_TRACE_GAME("Achievement {} was already unlocked", AchievementID);

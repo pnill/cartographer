@@ -4,6 +4,7 @@
 #include "Globals.h"
 #include "XLive\XAM\xam.h"
 #include "XLive\xbox\xbox.h"
+#include "XLive\XUser\XUser.h"
 #include "XLive\ServerList\ServerList.h"
 #include "XLive\achievements\XAchievements.h"
 
@@ -751,7 +752,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 	if (hEnum == ServerEnumHandle )
 	{
-		LiveManager.GetServers(cbBuffer, pvBuffer, pOverlapped);
+		serverList.GetServers(cbBuffer, pvBuffer, pOverlapped);
 		return ERROR_IO_PENDING;
 	}
 
@@ -1064,7 +1065,7 @@ DWORD WINAPI XStorageDownloadToMemory( DWORD dwUserIndex, const WCHAR *wszServer
 
 
 	pResults->dwBytesTotal = 0;
-	memcpy( &pResults->xuidOwner, &xFakeXuid[dwUserIndex], sizeof(xFakeXuid[dwUserIndex]) );
+	memcpy( &pResults->xuidOwner, &usersSignInInfo[dwUserIndex].xuid, sizeof(XUID) );
 
 
 	FILE *fp;
@@ -1098,7 +1099,7 @@ DWORD WINAPI XStorageDownloadToMemory( DWORD dwUserIndex, const WCHAR *wszServer
 
 
 	pResults->dwBytesTotal = size;
-	memcpy( &pResults->xuidOwner, &xFakeXuid[dwUserIndex], sizeof(xFakeXuid[dwUserIndex]) );
+	pResults->xuidOwner = usersSignInInfo[dwUserIndex].xuid;
 	//pResults->ftCreated;
 
 

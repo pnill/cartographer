@@ -292,6 +292,9 @@
     <Filter Include="Source Files\H2MOD\Modules\Networking\NetworkChannel">
       <UniqueIdentifier>{ac28b760-f282-48b0-9488-c0f8f6bc7e6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Blam\Cache\Tags">
+      <UniqueIdentifier>{f334ecaa-82d0-463c-83de-c16fb3fb22f2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -492,16 +495,10 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Blam\Cache\Tags\scnr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD\Tags\global_tags_interface.cpp">
       <Filter>Source Files\H2MOD\Modules\TagInterface</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp">
-      <Filter>Source Files\H2MOD\Modules\TagInterface</Filter>
-    </ClCompile>
-    <ClCompile Include="Blam\Cache\Tags\itmc.cpp">
       <Filter>Source Files\H2MOD\Modules\TagInterface</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp">
@@ -560,6 +557,12 @@
     </ClCompile>
     <ClCompile Include="XLive\XSession\XSession.cpp">
       <Filter>Source Files\XLive\XSession</Filter>
+    </ClCompile>
+    <ClCompile Include="Blam\Cache\Tags\scnr.cpp">
+      <Filter>Source Files\Blam\Cache\Tags</Filter>
+    </ClCompile>
+    <ClCompile Include="Blam\Cache\Tags\itmc.cpp">
+      <Filter>Source Files\Blam\Cache\Tags</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1121,28 +1124,13 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Tags\TagInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\Tags\tag_definitons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Cache\Tags\itmc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Cache\Tags\scnr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\Tags\tag_base.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Tags\global_tags_interface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\shad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h">
@@ -1214,12 +1202,6 @@
     <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h">
-      <Filter>Source Files\H2MOD\Modules\DataArray</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h">
       <Filter>Source Files\H2MOD\Modules\CustomResolutions</Filter>
     </ClInclude>
@@ -1252,6 +1234,27 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkObserver</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h">
+      <Filter>Source Files\H2MOD\Modules\DataArray</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\Tags\scnr.h">
+      <Filter>Source Files\Blam\Cache\Tags</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\shad.h">
+      <Filter>Source Files\Blam\Cache\Tags</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\Tags\tag_base.h">
+      <Filter>Source Files\Blam\Cache\Tags</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\Tags\tag_definitons.h">
+      <Filter>Source Files\Blam\Cache\Tags</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Tags\TagInterface.h">
+      <Filter>Source Files\H2MOD\Modules\TagInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h">
+      <Filter>Source Files\H2MOD\Modules\MetaLoader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

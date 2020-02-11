@@ -263,15 +263,15 @@ static void FetchUpdateDetails() {
 
 	wchar_t dir_temp_h2[1024];
 	swprintf(dir_temp_h2, 1024, L"%ws\\Halo2\\", dir_temp);
-	CreateDirectoryW(dir_temp_h2, NULL);
+	CreateDirectory(dir_temp_h2, NULL);
 
 	wchar_t dir_update[1024];
 	swprintf(dir_update, 1024, L"%ws\\Halo2\\Update\\", dir_temp);
-	CreateDirectoryW(dir_update, NULL);
+	CreateDirectory(dir_update, NULL);
 
 	wchar_t dir_update_old[1024];
 	swprintf(dir_update_old, 1024, L"%ws\\Halo2\\UpdateOld\\", dir_temp);
-	CreateDirectoryW(dir_update_old, NULL);
+	CreateDirectory(dir_update_old, NULL);
 
 	int entry_count = UpdateFileEntries.size();
 	for (int i = entry_count - 1; i >= 0; i--) {

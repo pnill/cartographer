@@ -1069,7 +1069,6 @@ char filo_write__encrypted_data_hook(filo *file_ptr, DWORD nNumberOfBytesToWrite
 	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
 }
 
-//int static_lod_state = static_lod::cinematic;
 DWORD calculate_model_lod;
 DWORD calculate_model_lod_detour_end;
 __declspec(naked) void calculate_model_lod_detour()

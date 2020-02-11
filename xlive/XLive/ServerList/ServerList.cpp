@@ -10,12 +10,9 @@
 
 using namespace rapidjson;
 
-extern CHAR g_szUserName[4][16];
+ServerList serverList;
+HANDLE ServerEnumHandle = INVALID_HANDLE_VALUE;
 extern unsigned short H2Config_base_port;
-
-ServerList LiveManager;
-HANDLE ServerEnumHandle = NULL;
-extern int MasterState;
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
@@ -211,7 +208,7 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 		}
 	}
 
-	++LiveManager.total_servers;
+	++serverList.total_servers;
 }
 
 void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
@@ -224,7 +221,7 @@ void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXO
 	CURLcode res;
 	std::string readBuffer;
 
-	if (MasterState == 2)
+	if (!userSignedOnline(0))
 	{
 		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
 		pOverlapped->InternalHigh = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
@@ -364,11 +361,11 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
 	curl = curl_easy_init();
-	if (curl && MasterState != 2)
+	if (curl && userSignedOnline(0))
 	{
 		rapidjson::Document document;
 		document.SetObject();
-		document.AddMember("xuid", Value().SetUint64(xFakeXuid[0]), document.GetAllocator());
+		document.AddMember("xuid", Value().SetUint64(usersSignInInfo[0].xuid), document.GetAllocator());
 
 		Value token(kStringType);
 		token.SetString(H2CurrentAccountLoginToken, document.GetAllocator());
@@ -395,7 +392,7 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 
 DWORD WINAPI XLocatorServerUnAdvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
 {
-	if (MasterState != 2)
+	if (userSignedOnline(dwUserIndex))
 		std::thread(RemoveServer, pOverlapped).detach();
 	return S_OK;
 }
@@ -423,7 +420,7 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 			token.SetString(H2CurrentAccountLoginToken, document.GetAllocator());
 
 		document.AddMember("token", token, document.GetAllocator());
-		document.AddMember("xuid", Value().SetUint64(xFakeXuid[0]), document.GetAllocator());
+		document.AddMember("xuid", Value().SetUint64(usersSignInInfo[dwUserIndex].xuid), document.GetAllocator());
 		document.AddMember("dwServerType", Value().SetInt(dwServerType), document.GetAllocator());
 		document.AddMember("dwMaxPublicSlots", Value().SetInt(dwMaxPublicSlots), document.GetAllocator());
 		document.AddMember("dwFilledPublicSlots", Value().SetInt(dwFilledPublicSlots), document.GetAllocator());
@@ -469,7 +466,7 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 		if (h2mod->Server && strlen(H2Config_dedi_server_name) != 0)
 			serv_name.AddMember("value", Value().SetString(H2Config_dedi_server_name, strlen(H2Config_dedi_server_name), document.GetAllocator()), document.GetAllocator());
 		else
-			serv_name.AddMember("value", Value().SetString(g_szUserName[0], strlen(g_szUserName[0]), document.GetAllocator()), document.GetAllocator());
+			serv_name.AddMember("value", Value().SetString(usersSignInInfo[dwUserIndex].szUserName, XUSER_NAME_SIZE, document.GetAllocator()), document.GetAllocator());
 
 		document["pProperties"].PushBack(serv_name, document.GetAllocator());
 
@@ -479,7 +476,7 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 		if (h2mod->Server && strlen(H2Config_dedi_server_name) != 0)
 			user_name.AddMember("value", Value().SetString(H2Config_dedi_server_name, strlen(H2Config_dedi_server_name), document.GetAllocator()), document.GetAllocator());
 		else
-			user_name.AddMember("value", Value().SetString(g_szUserName[0], strlen(g_szUserName[0]), document.GetAllocator()), document.GetAllocator());
+			user_name.AddMember("value", Value().SetString(usersSignInInfo[dwUserIndex].szUserName, XUSER_NAME_SIZE, document.GetAllocator()), document.GetAllocator());
 
 		document["pProperties"].PushBack(user_name, document.GetAllocator());
 
@@ -510,7 +507,7 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 
 DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
 {
-	if (MasterState != 2)
+	if (userSignedOnline(dwUserIndex))
 		std::thread(AddServer, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
 
 	return S_OK;
@@ -522,13 +519,13 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 	// LOG_TRACE_XLIVE("XLocatorGetServiceProperty  (*** checkme ***) (dwUserIndex = {0:x}, cNumProperties = {1:x}, pProperties = {2:x}, pOverlapped = {3:x})",
 	//		dwUserIndex, cNumProperties, pProperties, pOverlapped);
 
-	if (!LiveManager.server_counts_download_running && MasterState != 2)
-		std::thread(&ServerList::GetServerCounts, &LiveManager).detach();
+	if (!serverList.server_counts_download_running && userSignedOnline(dwUserIndex))
+		std::thread(&ServerList::GetServerCounts, &serverList).detach();
 
-	pProperties[0].value.nData = LiveManager.total_count;
-	pProperties[1].value.nData = LiveManager.total_public;
-	pProperties[2].value.nData = LiveManager.total_peer_gold + LiveManager.total_public_gold != -2 ? LiveManager.total_peer_gold + LiveManager.total_public_gold : -1;
-	pProperties[3].value.nData = LiveManager.total_peer;
+	pProperties[0].value.nData = serverList.total_count;
+	pProperties[1].value.nData = serverList.total_public;
+	pProperties[2].value.nData = serverList.total_peer_gold + serverList.total_public_gold != -2 ? serverList.total_peer_gold + serverList.total_public_gold : -1;
+	pProperties[3].value.nData = serverList.total_peer;
 
 	return S_OK;
 }

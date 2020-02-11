@@ -33,16 +33,21 @@ typedef LONG NTSTATUS, *PNTSTATUS;
 
 typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
 
-extern char g_szUserName[4][16];
 wchar_t ServerLobbyName[32] = { L"Cartographer" };
 
 void UpdateConnectionStatus() {
 	extern int MasterState;
 	extern char* ServerStatus;
-	if (ipManager.LocalUserLoggedIn()) {
+	if (userSignedOnline(0)) {
 		MasterState = 10;
 		if (!h2mod->Server)
 			snprintf(ServerStatus, 250, "Status: Online");
+	}
+	else if (userSignedInLocally(0))
+	{
+		MasterState = 2;
+		if (!h2mod->Server)
+			snprintf(ServerStatus, 250, "Status: Locally signed in");
 	}
 	else
 	{
@@ -53,18 +58,12 @@ void UpdateConnectionStatus() {
 }
 
 void SetUserUsername(char* username) {
-	SecureZeroMemory(g_szUserName[0], 16);
-	snprintf(g_szUserName[0], 16, username);
 	if (!h2mod->Server) {
-
-		snprintf(h2mod->GetAddress<char*>(0x971316), 16, username);
-		swprintf(h2mod->GetAddress<wchar_t*>(0x96DA94), 16, L"%hs", username);
-		swprintf(h2mod->GetAddress<wchar_t*>(0x51A638), 16, L"%hs", username);
 		swprintf(ServerLobbyName, 16, L"%hs", username);
 	}
 }
 
-char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long saddr, unsigned long xnaddr, char* abEnet, char* abOnline) {
+char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long saddr, unsigned long xnaddr, char* abEnet, char* abOnline, bool onlineSignIn) {
 
 	if (strlen(username) <= 0 || xuid == 0 || saddr == 0 || strlen(abEnet) != 12 || strlen(abOnline) != 40) {
 		return 0;
@@ -93,14 +92,11 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	memcpy(&pxna.abEnet, abEnet2, 6);
 	memcpy(&pxna.abOnline, abOnline2, 20);
 
-	xFakeXuid[0] = xuid;
 	SetUserUsername(username);
+	XUserSetup(0, xuid, username, onlineSignIn);
 	ipManager.SetupLocalConnectionInfo(&pxna);
 
 	UpdateConnectionStatus();
-
-	//We want achievements loaded as early as possible, but we can't do it until after we have the XUID.
-	std::thread(GetAchievements, xuid).detach();
 
 	if (H2CurrentAccountLoginToken) {
 		free(H2CurrentAccountLoginToken);
@@ -360,7 +356,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 
 	if (result > 0) {
 		int result_details;
-		if (result_details = ConfigureUserDetails(username, login_token, xuid, saddr, xnaddr, abEnet, abOnline)) {
+		if (result_details = ConfigureUserDetails(username, login_token, xuid, saddr, xnaddr, abEnet, abOnline, true)) {
 			//allow no login_token from backend in DB emergencies / random logins.
 			if (result_details == 1) {
 				if (prev_login_token) {

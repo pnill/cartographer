@@ -91,10 +91,8 @@ public:
 	int GetServersLeft();
 	int GetTotalServers();
 	void GetServerCounts();
-
-
 };
 
 extern HANDLE ServerEnumHandle;
-extern ServerList LiveManager;
+extern ServerList serverList;
 DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey);

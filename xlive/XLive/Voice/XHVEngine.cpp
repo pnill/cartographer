@@ -71,7 +71,7 @@ BOOL IXHV2ENGINE::isRemoteTalking(VOID *pThis, XUID xuid) {
 BOOL IXHV2ENGINE::IsLocalTalking(VOID *pThis, DWORD dwUserIndex) {
 	//LOG_TRACE_XLIVE("IXHV2Engine::isTalking(dwUserIndex = %d)", dwUserIndex);
 	//check the xuid map
-	XUID id = xFakeXuid[0];
+	XUID id = usersSignInInfo[dwUserIndex].xuid;
 	BOOL isTalking = xuidIsTalkingMap[id];
 	return H2Config_voice_chat 
 #if COMPILE_WITH_VOICE
@@ -226,7 +226,7 @@ DWORD IXHV2ENGINE::GetDataReadyFlags(VOID *pThis)
 {
 	int ret = 0x00;
 
-	if (H2Config_voice_chat && xuidIsTalkingMap[xFakeXuid[0]])
+	if (H2Config_voice_chat && xuidIsTalkingMap[usersSignInInfo[0].xuid])
 	{
 		//LOG_TRACE_GAME_N("[h2mod-voice] GetDataReadyFlags - called");
 		ret = 0x1;
@@ -249,7 +249,7 @@ HRESULT IXHV2ENGINE::GetLocalChatData(VOID *pThis, DWORD dwUserIndex, PBYTE pbDa
 		if (*pdwPackets > XHV_MAX_VOICECHAT_PACKETS)
 			*pdwPackets = XHV_MAX_VOICECHAT_PACKETS;
 
-		if (pdwSize && pdwPackets && xuidIsTalkingMap[xFakeXuid[0]])
+		if (pdwSize && pdwPackets && xuidIsTalkingMap[usersSignInInfo[0].xuid])
 		{
 			return S_OK;
 		}

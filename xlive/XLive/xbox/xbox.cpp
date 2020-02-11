@@ -10,6 +10,10 @@ extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags) // TODO: If this is called, pop cartographer account system UI.
 {
 	sys_ui = -1;
+
+	extern void XUiShowSignInH2();
+	XUiShowSignInH2();
+
 	return ERROR_SUCCESS;
 }
 
@@ -17,9 +21,6 @@ int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags) // TODO: If this is called
 // #5215: XShowGuideUI
 int WINAPI XShowGuideUI(DWORD dwUserIndex)
 {
-	// signin change
-	sys_ui = -1;
-
 	extern void GSCustomMenuCall_Guide(); // Custom menu Guide Popup from H2MOD
 	GSCustomMenuCall_Guide();
 

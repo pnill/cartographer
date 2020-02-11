@@ -1,6 +1,5 @@
 #pragma once
 #include "CustomMenuGlobals.h"
-#include <stdio.h>
 
 int __cdecl CustomMenu_Credits_(int a1);
 void GSCustomMenuCall_Credits_();

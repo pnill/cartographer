@@ -49,3 +49,47 @@ typedef enum _XPRIVILEGE_TYPE
 
 	XPRIVILEGE_MULTIPLAYER_DEDICATED_SERVER = 226, // on (allow) | off (disallow)
 } XPRIVILEGE_TYPE;
+
+typedef ULONGLONG XUID;
+typedef XUID *PXUID;
+
+#define INVALID_XUID                    ((XUID) 0)
+
+#define XUSER_NAME_SIZE                 16
+#define XUSER_MAX_NAME_LENGTH           (XUSER_NAME_SIZE - 1)
+
+#define XUSER_GET_SIGNIN_INFO_ONLINE_XUID_ONLY      0x00000002
+#define XUSER_GET_SIGNIN_INFO_OFFLINE_XUID_ONLY     0x00000001
+
+#define XUSER_INFO_FLAG_LIVE_ENABLED    0x00000001
+#define XUSER_INFO_FLAG_GUEST           0x00000002
+
+typedef enum _XUSER_SIGNIN_STATE
+{
+	eXUserSigninState_NotSignedIn,
+	eXUserSigninState_SignedInLocally,
+	eXUserSigninState_SignedInToLive
+} XUSER_SIGNIN_STATE;
+
+typedef struct _XUSER_SIGNIN_INFO
+{
+	XUID                 xuid;
+	DWORD                dwInfoFlags;
+	XUSER_SIGNIN_STATE   UserSigninState;
+	DWORD                dwGuestNumber;
+	DWORD                dwSponsorUserIndex;
+	CHAR                 szUserName[XUSER_NAME_SIZE];
+} XUSER_SIGNIN_INFO, *PXUSER_SIGNIN_INFO;
+
+bool signInStatusChanged();
+extern bool signInChanged[4];
+extern XUSER_SIGNIN_INFO usersSignInInfo[4];
+void XUserSetup(DWORD dwUserIndex, long long xuid, char* userName, bool online);
+void XUserSignOut(DWORD dwUserIndex);
+
+bool userSignedIn(DWORD dwUserIndex);
+bool userSignedOnline(DWORD dwUserIndex);
+bool userSignedInLocally(DWORD dwUserIndex);
+
+int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid);
+XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex);

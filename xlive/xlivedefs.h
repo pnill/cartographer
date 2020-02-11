@@ -5,7 +5,6 @@
 //typedef unsigned __int64 ULONG_PTR, *PULONG_PTR;
 //typedef unsigned long DWORD_PTR;
 
-
 // Xbox Secure Network Library ------------------------------------------------
 
 //
@@ -341,37 +340,6 @@ INT    WINAPI XNetSetOpt(DWORD dwOptId, const BYTE * pbValue, DWORD dwValueSize)
 // Since our socket handles are not file handles, apps can NOT call CancelIO API to cancel
 // outstanding overlapped I/O requests. Apps must call WSACancelOverlappedIO function instead.
 //
-
-typedef ULONGLONG XUID;
-typedef XUID *PXUID;
-
-#define INVALID_XUID                    ((XUID) 0)
-
-#define XUSER_NAME_SIZE                 16
-#define XUSER_MAX_NAME_LENGTH           (XUSER_NAME_SIZE - 1)
-
-#define XUSER_GET_SIGNIN_INFO_ONLINE_XUID_ONLY      0x00000002
-#define XUSER_GET_SIGNIN_INFO_OFFLINE_XUID_ONLY     0x00000001
-
-#define XUSER_INFO_FLAG_LIVE_ENABLED    0x00000001
-#define XUSER_INFO_FLAG_GUEST           0x00000002
-
-typedef enum _XUSER_SIGNIN_STATE
-{
-	eXUserSigninState_NotSignedIn,
-	eXUserSigninState_SignedInLocally,
-	eXUserSigninState_SignedInToLive
-} XUSER_SIGNIN_STATE;
-
-typedef struct _XUSER_SIGNIN_INFO
-{
-	XUID                 xuid;
-	DWORD                dwInfoFlags;
-	XUSER_SIGNIN_STATE   UserSigninState;
-	DWORD                dwGuestNumber;
-	DWORD                dwSponsorUserIndex;
-	CHAR                 szUserName[XUSER_NAME_SIZE];
-} XUSER_SIGNIN_INFO, * PXUSER_SIGNIN_INFO;
 
 // Xbox-specific Overlapped
 

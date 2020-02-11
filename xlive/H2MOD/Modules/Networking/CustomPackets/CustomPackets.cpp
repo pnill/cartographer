@@ -3,11 +3,11 @@
 
 #include "H2MOD.h"
 #include "Util\Hooks\Hook.h"
+#include "XLive\XUser\XUser.h"
 #include "..\Memory\bitstream.h"
 #include "..\..\MapManager\MapManager.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
-extern XUID xFakeXuid[4];
 char g_network_message_types[e_network_message_types::end * 32];
 
 void register_packet_impl(void *packetObject, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* a9)
@@ -282,9 +282,13 @@ void CustomPackets::sendRequestMapFilename()
 
 	if (session->local_session_state == network_session_state_peer_established)
 	{
+		XUID xuid;
 		s_request_map_filename data;
+
+		XUserGetXUID(0, &xuid);
+
 		SecureZeroMemory(&data, sizeof(s_request_map_filename));
-		memcpy(&data.user_identifier, &xFakeXuid[0], sizeof(XUID));
+		data.user_identifier = xuid;
 
 		network_observer* observer = session->network_observer_ptr;
 		peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(session->session_host_peer_index);

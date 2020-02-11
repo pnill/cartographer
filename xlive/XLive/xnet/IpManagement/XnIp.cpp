@@ -341,10 +341,6 @@ void CXnIp::UnregisterXnIpIdentifier(const IN_ADDR ina)
 	}
 }
 
-BOOL CXnIp::LocalUserLoggedIn() {
-	return localUser.bValid;
-}
-
 void CXnIp::UnregisterLocalConnectionInfo()
 {
 	if (!localUser.bValid)

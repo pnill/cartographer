@@ -11,6 +11,7 @@ struct NOTIFY_LISTEN
 	HANDLE id;
 	ULONGLONG area;
 	DWORD print;
+	CRITICAL_SECTION lock;
 };
 
 static int g_dwListener = 0;
@@ -38,6 +39,8 @@ HANDLE WINAPI XNotifyCreateListener(ULONGLONG qwAreas)
 	g_listener[listenerIndex].area = qwAreas;
 	g_listener[listenerIndex].id = CreateMutex(NULL, NULL, NULL);
 
+	InitializeCriticalSection(&g_listener[listenerIndex].lock);
+
 	LOG_TRACE_XLIVE("XNotifyCreateListener({:x}), ", qwAreas);
 	LOG_TRACE_XLIVE(" - handle: {:p}", (void*)g_listener[listenerIndex].id);
 	SetEvent(g_listener[listenerIndex].id);
@@ -50,7 +53,6 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 {
 	static DWORD print_limit = 30;
 
-	static DWORD sys_signin = 0x7FFFFFFF;
 	static DWORD sys_storage = 0x7FFFFFFF;
 	static DWORD sys_profile = 0x7FFFFFFF;
 	static DWORD sys_controller = 0x7FFFFFFF;
@@ -60,18 +62,15 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	static DWORD live_content = 0x7FFFFFFF;
 	static DWORD live_membership = 0x7FFFFFFF;
 
-	ResetEvent(hNotification);
 
-	int curlist = 0;
-	while (curlist < g_dwListener)
+	int listenerIndex = 0;
+	for (; listenerIndex < g_dwListener; listenerIndex++)
 	{
-		if (g_listener[curlist].id == hNotification)
+		if (g_listener[listenerIndex].id == hNotification)
 			break;
-
-		curlist++;
 	}
 
-	if (curlist == g_dwListener)
+	if (listenerIndex >= g_dwListener)
 	{
 		LOG_TRACE_XLIVE("XNotifyGetNext  (hNotification = {0:p}, dwMsgFilter = {1:x}, pdwId = {2:p}, pParam = {3:p}) - unknown notifier",
 			(void*)hNotification, dwMsgFilter, (void*)pdwId, (void*)pParam);
@@ -79,12 +78,14 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		return 0;
 	}
 
-	if ((g_listener[curlist].area & ((XNID_AREA(dwMsgFilter) << 1) | 1)) == 0)
+	ResetEvent(hNotification);
+
+	if ((g_listener[listenerIndex].area & ((XNID_AREA(dwMsgFilter) << 1) | 1)) == 0)
 	{
 		LOG_TRACE_XLIVE("XNotifyGetNext  (hNotification = {0:p}, dwMsgFilter = {1:x}, pdwId = {2:x}, pParam = {3:p})",
 			(void*)hNotification, dwMsgFilter, (void*)pdwId, (void*)pParam);
 
-		LOG_TRACE_XLIVE("- bad area: {0:x} ~ {1:x}", g_listener[curlist].area, (XNID_AREA(dwMsgFilter) << 1) | 1);
+		LOG_TRACE_XLIVE("- bad area: {0:x} ~ {1:x}", g_listener[listenerIndex].area, (XNID_AREA(dwMsgFilter) << 1) | 1);
 
 		return 0;
 	}
@@ -93,19 +94,19 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	if (sys_ui == -1)
 	{
 		sys_ui = 0;
-		g_listener[curlist].print = 0;
+		g_listener[listenerIndex].print = 0;
 	}
 
-	if (g_listener[curlist].print < print_limit)
+	if (g_listener[listenerIndex].print < print_limit)
 	{
 		LOG_TRACE_XLIVE("XNotifyGetNext  (hNotification = {0:p}, dwMsgFilter = {1:x}, pdwId = {2:p}, pParam = {3:p})",
 			(void*)hNotification, dwMsgFilter, (void*)pdwId, (void*)pParam);
 
 
-		g_listener[curlist].print++;
+		g_listener[listenerIndex].print++;
 	}
 
-	EnterCriticalSection(&d_lock);
+	EnterCriticalSection(&g_listener[listenerIndex].lock);
 
 	BOOL exit_code = FALSE;
 
@@ -113,14 +114,13 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		*pdwId = dwMsgFilter;
 
 	// set to next available message
-	if ((g_listener[curlist].area & XNOTIFY_SYSTEM) &&
+	if (g_listener[listenerIndex].area & XNOTIFY_SYSTEM &&
 		dwMsgFilter == 0)
 	{
-
 		if (sys_ui == 0 || sys_ui == 2)
 			dwMsgFilter = XN_SYS_UI;
 
-		else if (sys_signin == 0)
+		else if (signInStatusChanged())
 			dwMsgFilter = XN_SYS_SIGNINCHANGED;
 
 		// ex. GTA IV - recheck DLC containers
@@ -138,7 +138,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	}
 
 
-	if ((g_listener[curlist].area & XNOTIFY_LIVE) &&
+	if ((g_listener[listenerIndex].area & XNOTIFY_LIVE) &&
 		dwMsgFilter == 0)
 	{
 		if (live_connection == 0)
@@ -164,7 +164,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	if (dwMsgFilter == 0)
 	{
-		LeaveCriticalSection(&d_lock);
+		LeaveCriticalSection(&g_listener[listenerIndex].lock);
 
 		return FALSE;
 	}
@@ -206,7 +206,6 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 			exit_code = TRUE;
 
-			sys_signin = 0;
 			sys_storage = 0;
 			sys_profile = 0;
 			sys_controller = 0;
@@ -220,28 +219,30 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 
 	case XN_SYS_SIGNINCHANGED:
-		if (sys_signin == 0)
+		if (pParam)
+		{
+			*pParam = 0;
+
+			for (int i = 0; i < 4; i++)
+				if (signInChanged[i])
+				{
+					signInChanged[i] = false;
+					*pParam |= 1 << i;
+				}
+		}
+
+		if (*pParam)
 		{
 			*pdwId = XN_SYS_SIGNINCHANGED;
-			if (pParam)
-			{
-				*pParam = 0;
-
-
-				// player 1-4
-				if (g_signin[0]) *pParam |= 1;
-				if (g_signin[1]) *pParam |= 2;
-				if (g_signin[2]) *pParam |= 4;
-				if (g_signin[3]) *pParam |= 8;
-			}
-
-			sys_signin++;
-
-
-			LOG_TRACE_XLIVE("- {0:p} = XN_SYS_SIGNINCHANGED (1) - {1:x}", (void*)hNotification, XN_SYS_SIGNINCHANGED);
-
 			exit_code = TRUE;
 		}
+		else
+		{
+			exit_code = FALSE;
+		}
+
+		LOG_TRACE_XLIVE("- {0:p} = XN_SYS_SIGNINCHANGED (1)", (void*)hNotification);
+
 		break;
 
 
@@ -265,21 +266,24 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			{
 				*pParam = 0;
 
-
 				// player 1-4
-				if (g_signin[0]) *pParam |= 1;
-				if (g_signin[1]) *pParam |= 2;
-				if (g_signin[2]) *pParam |= 4;
-				if (g_signin[3]) *pParam |= 8;
+				for (int i = 0; i < 4; i++)
+				{
+					if (userSignedIn(i))
+						*pParam |= 1 << i;
+				}
+
+				if (*pParam) {
+					sys_profile++;
+					exit_code = TRUE;
+				}
+				else {
+					exit_code = FALSE;
+				}
 			}
-
-
-			sys_profile++;
-
 
 			LOG_TRACE_XLIVE("- {:p} = XN_SYS_PROFILESETTINGCHANGED (1)", (void*)hNotification);
 
-			exit_code = TRUE;
 		}
 		break;
 
@@ -304,21 +308,23 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			{
 				*pParam = 0;
 
+				for (int i = 0; i < 4; i++)
+					if (userSignedIn(i)) 
+						*pParam |= 1 << i;
 
-				// player 1-4
-				if (g_signin[0]) *pParam |= 1;
-				if (g_signin[1]) *pParam |= 2;
-				if (g_signin[2]) *pParam |= 4;
-				if (g_signin[3]) *pParam |= 8;
+				if (*pParam)
+				{
+					exit_code = TRUE;
+					sys_controller_force++;
+				}
+				else
+				{
+					exit_code = FALSE;
+				}
 			}
-
-
-			sys_controller_force++;
-
 
 			LOG_TRACE_XLIVE("- {:p} = XN_SYS_INPUTDEVICECONFIGCHANGED (1)", (void*)hNotification);
 
-			exit_code = TRUE;
 		}
 		break;
 
@@ -330,7 +336,10 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 			*pdwId = XN_LIVE_CONNECTIONCHANGED;
 
-			if (pParam) *pParam = XONLINE_S_LOGON_CONNECTION_ESTABLISHED;
+			if (pParam)
+			{
+				*pParam = XONLINE_S_LOGON_CONNECTION_ESTABLISHED;
+			}
 
 
 			LOG_TRACE_XLIVE("- {0:p} = XN_LIVE_CONNECTIONCHANGED (0) - {1:x}", (void*)hNotification, XN_LIVE_CONNECTIONCHANGED);
@@ -377,7 +386,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		SetEvent(hNotification);
 
 
-	LeaveCriticalSection(&d_lock);
+	LeaveCriticalSection(&g_listener[listenerIndex].lock);
 	return exit_code;
 }
 

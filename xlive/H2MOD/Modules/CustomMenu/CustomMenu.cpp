@@ -4182,16 +4182,13 @@ static bool CMButtonHandler_AccountList(int button_id) {
 	else if (button_id == H2AccountCount) {
 		if (!mode_remove_account) {
 			//play offline
-			if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", 1234571000000000 + H2GetInstanceId(), 0x100 + H2GetInstanceId(), 0x100 * H2GetInstanceId(), "000000101300", "0000000000000000000000000000000000101300")) {
+			if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", 1234571000000000 + H2GetInstanceId(), 0x100 + H2GetInstanceId(), 0x100 * H2GetInstanceId(), "000000101300", "0000000000000000000000000000000000101300", false)) {
 				//show select profile gui
 				int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
 				sub_209236(0, 0);
 				H2Config_master_ip = inet_addr("127.0.0.1");
 				H2Config_master_port_relay = 2001;
-				extern int MasterState;
-				MasterState = 2;
-				extern char* ServerStatus;
-				snprintf(ServerStatus, 250, "Status: Offline");
+				UpdateConnectionStatus();
 			}
 		}
 	}
@@ -4720,50 +4717,27 @@ void* __stdcall sub_23BC45(void* thisptr)//__thiscall
 	return v1;
 }
 
-int __cdecl sub_209236(int a1,int a2) {
-	if (ipManager.LocalUserLoggedIn()) {
-		int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
-		sub_209236(0,0);
+void XUiShowSignInH2() {
+	if (!isAccountingActiveHandle() && ReadH2Accounts()) {
+		GSCustomMenuCall_AccountList();
 	}
 	else {
-		if (!isAccountingActiveHandle() && ReadH2Accounts()) {
-			GSCustomMenuCall_AccountList();
-		}
-		else {
-			if (!isAccountingActiveHandle())
-				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF016, 0xFFFFF017);
-		}
+		if (!isAccountingActiveHandle())
+			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF016, 0xFFFFF017);
 	}
-	return 0;
 }
 
 typedef int(__cdecl *tsub_23f6b7)(int);
 tsub_23f6b7 psub_23f6b7;
 int __cdecl sub_23f6b7(int a1)
 {
-	if (ipManager.LocalUserLoggedIn()) {
+	if (userSignedIn(0)) {
+		XUserSignOut(0);
 		ipManager.UnregisterLocalConnectionInfo();
 		UpdateConnectionStatus();
 	}
 	return psub_23f6b7(a1);
 }
-
-typedef char(__cdecl *tsub_209129)(int, int, int, int);
-tsub_209129 psub_209129;
-char __cdecl sub_209129(int a1, int a2, int a3, int a4)//player configuration profile signin
-{
-	char result =
-		psub_209129(a1, a2, a3, a4);
-	extern CHAR g_szUserName[4][16];
-	if (strncmp(g_szUserName[0], "[Username]", 16) == 0) {//change username to player configuration profile name if offline.
-		wchar_t* wideprofileName = (wchar_t*)((BYTE*)H2BaseAddr + 0x96C874);
-		char profileName[32];
-		wcstombs2(profileName, wideprofileName, 32);
-		SetUserUsername(profileName);
-	}
-	return result;
-}
-
 
 #pragma region Obscure_Menus
 
@@ -5217,16 +5191,11 @@ void initGSCustomMenu() {
 
 	setupSomeTests();
 
-	//"PRESS ANY KEY TO CONTINUE" mainmenu redirect.
-	PatchCall((DWORD)((BYTE*)H2BaseAddr + 0x23EF0A), &sub_209236);
-
 	pbtnHandler = (tbtnhandler)DetourClassFunc((BYTE*)H2BaseAddr + 0x213af2, (BYTE*)BtnHandlerCaller, 8);
 
 	psub_23f6b7 = (tsub_23f6b7)DetourFunc((BYTE*)H2BaseAddr + 0x23f6b7, (BYTE*)sub_23f6b7, 7);
 
 	//psub_248beb = (tsub_248beb)DetourClassFunc((BYTE*)H2BaseAddr + 0x248beb, (BYTE*)sub_248beb, 8);
-
-	psub_209129 = (tsub_209129)DetourFunc((BYTE*)H2BaseAddr + 0x209129, (BYTE*)sub_209129, 5);
 
 	psub_bd137 = (tsub_bd137)DetourFunc((BYTE*)H2BaseAddr + 0xbd137, (BYTE*)sub_bd137, 5);
 

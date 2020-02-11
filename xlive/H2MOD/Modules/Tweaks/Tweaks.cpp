@@ -123,13 +123,11 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 	//a2 == 0x5 - system link lost connection
 	if (a2 == 0xb9) {
 		//boot them offline.
-		ConfigureUserDetails("[Username]", "12345678901234567890123456789012", 1234571000000000 + H2GetInstanceId(), 0x100 + H2GetInstanceId(), 0x100 * H2GetInstanceId(), "000000101300", "0000000000000000000000000000000000101300");
+		XUserSignOut(0);
+		ipManager.UnregisterLocalConnectionInfo();
+		UpdateConnectionStatus();
 		H2Config_master_ip = inet_addr("127.0.0.1");
 		H2Config_master_port_relay = 2001;
-		extern int MasterState;
-		MasterState = 2;
-		extern char* ServerStatus;
-		snprintf(ServerStatus, 250, "Status: Offline");
 	}
 	int result = sub_20E1D8(a1, a2, a3, a4, a5, a6);
 	return result;

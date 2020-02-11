@@ -51,7 +51,3 @@ std::vector<std::string> split(const std::string &s, char delim);
 int stripWhitespace(wchar_t *inputStr);
 
 extern int H2GetInstanceId();
-
-/* XLive Globals*/
-extern UINT g_online;
-extern XUID xFakeXuid[4];

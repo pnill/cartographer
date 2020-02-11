@@ -4,89 +4,136 @@
 #include "Globals.h"
 #include "XLive\xbox\xbox.h"
 
-extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 WCHAR strw_XUser[8192];
+extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
-UINT g_online = 1;
-UINT g_signin[4] = { 1,0,0,0 };
+bool signInChanged[4];
+XUSER_SIGNIN_INFO usersSignInInfo[4];
 
-CHAR g_szUserName[4][16] = { "Cartographer1", "Cartographer2", "Cartographer3", "Cartographer4" };
-XUID xFakeXuid[4] = { 0xEE100000DEADC0DE, 0xEE200000DEADC0DE, 0xEE300000DEADC0DE, 0xEE400000DEADC0DE };
+bool signInStatusChanged()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		if (signInChanged[i])
+			return true;
+	}
+	return false;
+}
 
+bool userSignedIn(DWORD dwUserIndex)
+{
+	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInLocally
+		|| usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInToLive)
+		return true;
+
+	return false;
+}
+
+
+bool userSignedInLocally(DWORD dwUserIndex)
+{
+	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInLocally)
+		return true;
+
+	return false;
+}
+
+bool userSignedOnline(DWORD dwUserIndex)
+{
+	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInToLive)
+		return true;
+
+	return false;
+}
+
+void XUserSetup(DWORD dwUserIndex, long long xuid, char* userName, bool online)
+{
+	if (dwUserIndex != 0)
+		dwUserIndex = 0;
+
+	if (online)
+	{
+		usersSignInInfo[dwUserIndex].dwInfoFlags |= XUSER_INFO_FLAG_LIVE_ENABLED;
+		usersSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInToLive;
+	}
+	else
+		usersSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInLocally;
+
+	usersSignInInfo[dwUserIndex].dwGuestNumber = 0;
+	usersSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
+
+	usersSignInInfo[dwUserIndex].xuid = (XUID)xuid;
+	strncpy_s(usersSignInInfo[dwUserIndex].szUserName, userName, XUSER_NAME_SIZE);
+
+	if (online)
+		std::thread(GetAchievements, xuid).detach();
+
+	signInChanged[dwUserIndex] = true;
+}
+
+void XUserSignOut(DWORD dwUserIndex)
+{
+	SecureZeroMemory(&usersSignInInfo[dwUserIndex], sizeof(XUSER_SIGNIN_INFO));
+	signInChanged[dwUserIndex] = true;
+}
 
 // #5261: XUserGetXUID
 int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 {
-	if (dwUserIndex > 0
-		|| pXuid == NULL)
+	if (pXuid == NULL)
 		return ERROR_INVALID_PARAMETER;
+
+	if (dwUserIndex != 0)
+		dwUserIndex = 0;
+
+	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_NotSignedIn)
+		return ERROR_NOT_LOGGED_ON;
 
 	static int print = 0;
 	if (print < 15)
 	{
-		LOG_TRACE_XLIVE("XUserGetXUID  (userIndex = {}, pXuid = {:p})",
-			dwUserIndex, (void*)pXuid);
+		LOG_TRACE_XLIVE("XUserGetXUID()");
 
 		print++;
 	}
 
-	if (pXuid && g_signin[dwUserIndex])
-	{
-		*pXuid = xFakeXuid[dwUserIndex];
-		return ERROR_SUCCESS;
-	}
-
-
-	if (print < 15) LOG_TRACE_XLIVE("- No user");
-
-
-	// error
-	return ERROR_NOT_LOGGED_ON;
+	*pXuid = usersSignInInfo[dwUserIndex].xuid;
+	return ERROR_SUCCESS;
 }
 
 
 // #5262: XUserGetSigninState
 XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex)
 {
-	if (dwUserIndex > 0)
+	static int print = 0;
+
+	if (dwUserIndex != 0)
 		dwUserIndex = 0;
 
-	XUSER_SIGNIN_STATE ret = eXUserSigninState_NotSignedIn;
+	XUSER_SIGNIN_STATE ret;
 
-	static int print = 0;
-	if (print < 15)
+	switch (usersSignInInfo[dwUserIndex].UserSigninState)
 	{
-		LOG_TRACE_XLIVE("XUserGetSigninState  (index = {})", dwUserIndex);
-		print++;
+	case eXUserSigninState_SignedInToLive:
+		ret = eXUserSigninState_SignedInToLive;
+		if (print < 15) LOG_TRACE_XLIVE("XUserGetSigninState() - Online");
+		break;
+
+	case eXUserSigninState_SignedInLocally:
+		ret = eXUserSigninState_SignedInLocally;
+		if (print < 15) LOG_TRACE_XLIVE("XUserGetSigninState() - Local profile");
+		break;
+
+	case eXUserSigninState_NotSignedIn:
+		ret = eXUserSigninState_NotSignedIn;
+		if (print < 15) LOG_TRACE_XLIVE("XUserGetSigninState() - Not signed in");
+		break;
+
+	default:
+		ret = eXUserSigninState_NotSignedIn;
 	}
 
-	if (dwUserIndex == 0)
-	{
-		if (g_online)
-		{
-			ret = eXUserSigninState_SignedInToLive;
-
-
-			if (print < 15)
-				LOG_TRACE_XLIVE("- Online - Live");
-		}
-
-		else
-		{
-			ret = eXUserSigninState_SignedInLocally;
-
-
-			if (print < 15)
-				LOG_TRACE_XLIVE("- Offline - not live");
-		}
-	}
-
-	else
-	{
-		if (print < 15)
-			LOG_TRACE_XLIVE("- Not signed in");
-	}
-
+	print++;
 
 	return ret;
 }
@@ -96,34 +143,24 @@ XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex)
 DWORD WINAPI XUserGetName(DWORD dwUserIndex, LPSTR szUserName, DWORD cchUserName)
 {
 	static int print = 0;
+	if (szUserName == NULL)
+		return ERROR_INVALID_PARAMETER;
 
+	if (dwUserIndex != 0)
+		dwUserIndex = 0;
+
+	if (usersSignInInfo[dwUserIndex].UserSigninState != eXUserSigninState_NotSignedIn)
+		strncpy(szUserName, usersSignInInfo[dwUserIndex].szUserName, cchUserName);
+	else
+		return ERROR_NOT_LOGGED_ON;
 
 	if (print < 15)
 	{
-		LOG_TRACE_XLIVE("XUserGetName  (userIndex = {0}, userName = {1:x}, cchUserName = {2})", dwUserIndex, szUserName, cchUserName);
+		LOG_TRACE_XLIVE("XUserGetName  (userIndex = {0}, userName = {1}, cchUserName = {2})", dwUserIndex, szUserName, cchUserName);
 		print++;
 	}
 
-
-	if (szUserName)
-	{
-		strncpy(szUserName, g_szUserName[dwUserIndex], 16);
-		cchUserName = strlen(g_szUserName[dwUserIndex]);
-
-
-		if (print < 15)
-		{
-			wchar_t strw[16];
-			mbstowcs(strw, szUserName, 16);
-
-			LOG_TRACE_XLIVE(L"- name = {}, len = {}", strw, cchUserName);
-		}
-
-
-		return ERROR_SUCCESS;
-	}
-
-	return ERROR_NO_SUCH_USER;
+	return ERROR_SUCCESS;
 }
 
 // #5267: XUserGetSigninInfo
@@ -131,64 +168,32 @@ int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_IN
 {
 	static int print = 0;
 
+	if (dwUserIndex != 0)
+		dwUserIndex = 0;
+
+	if (pSigninInfo == NULL)
+		return ERROR_INVALID_PARAMETER;
+
 	if (print < 15)
 	{
-		LOG_TRACE_XLIVE("XUserGetSigninInfo( userIndex = {0:x}, dwFlags = {1:x}, pSigninInfo = {2:p})", dwUserIndex, dwFlags, (void*)pSigninInfo);
-
-
+		LOG_TRACE_XLIVE("XUserGetSigninInfo( userIndex = {0:x}, dwFlags = {1:x})", dwUserIndex, dwFlags);
 		print++;
 	}
 
 	memset(pSigninInfo, 0, sizeof(XUSER_SIGNIN_INFO));
 
-
-#if 0
-	while (1)
-		Sleep(1);
-#endif
-
-
-	DWORD ret = ERROR_NO_SUCH_USER;
-	SetLastError(ret);
-
-
-
-	// return same xuid for any profile request
-	if (pSigninInfo && g_signin[dwUserIndex])
+	if (usersSignInInfo[dwUserIndex].UserSigninState != eXUserSigninState_NotSignedIn)
 	{
-		pSigninInfo->xuid = xFakeXuid[dwUserIndex];
-		pSigninInfo->dwInfoFlags |= XUSER_INFO_FLAG_LIVE_ENABLED;
-
-		if (g_online != 0)
-		{
-			if (print < 15) LOG_TRACE_XLIVE("- Signed in: Online");
-
-			pSigninInfo->UserSigninState = eXUserSigninState_SignedInToLive;
-		}
-
-		else
-		{
-			if (print < 15) LOG_TRACE_XLIVE("- Signed in: Offline");
-
-			pSigninInfo->UserSigninState = eXUserSigninState_SignedInLocally;
-		}
-
-		pSigninInfo->dwGuestNumber = 0;
-		pSigninInfo->dwSponsorUserIndex = 0;
-		strncpy(pSigninInfo->szUserName, g_szUserName[dwUserIndex], 16);
-		ret = ERROR_SUCCESS;
+		*pSigninInfo = usersSignInInfo[dwUserIndex];
+		return ERROR_SUCCESS;
 	}
-
 	else
 	{
-		if (print < 15) LOG_TRACE_XLIVE("- Not signed in");
+		if (print < 15) LOG_TRACE_XLIVE("XUserGetSigninInfo() - Not signed in");
+		return ERROR_NO_SUCH_USER;
 	}
-
-
-
-	SetLastError(ret);
-	return ret;
 }
+
 // #5264: XUserAreUsersFriends
 int WINAPI XUserAreUsersFriends(DWORD dwUserIndex, DWORD * pXuids, DWORD dwXuidCount, DWORD * pResult, PXOVERLAPPED pOverlapped)
 {
@@ -200,7 +205,6 @@ int WINAPI XUserAreUsersFriends(DWORD dwUserIndex, DWORD * pXuids, DWORD dwXuidC
 DWORD WINAPI XUserCheckPrivilege(DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeType, PBOOL pfResult)
 {
 	static int print = 0;
-
 
 	if (print < 15)
 	{
@@ -226,7 +230,6 @@ DWORD WINAPI XUserCheckPrivilege(DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeTyp
 
 		print++;
 	}
-
 
 	if (pfResult) {
 		*pfResult = TRUE;
@@ -375,6 +378,8 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 	LOG_TRACE_XLIVE("XUserReadProfileSettings  (TitleId = {0}, UserIndex = {1}, NumSettingIds = {2}, pdwSettingIds = {3:p}, pcbResults = {4}, pResults = {5:p}, pOverlapped = {6:p})",
 		dwTitleId, dwUserIndex, dwNumSettingIds, (void*)pdwSettingIds, *pcbResults, (void*)pResults, (void*)pOverlapped);
 
+	if (dwUserIndex != 0)
+		dwUserIndex = 0;
 
 	BOOL async;
 
