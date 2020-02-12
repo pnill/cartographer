@@ -11,8 +11,6 @@ s_datum_array* game_state_objects_header = nullptr;
 bool displayXyz = false;
 volatile bool isLobby = true;
 
-ConsoleCommands* commands = new ConsoleCommands();
-
 //TODO: actually check if they have a microphone or check some settings
 bool microphoneEnabled = true;
 std::unordered_map<XUID, BOOL> xuidIsTalkingMap;

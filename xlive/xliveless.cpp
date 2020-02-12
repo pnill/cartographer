@@ -832,8 +832,6 @@ HRESULT WINAPI XLiveSignin (PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD 
 {
 	LOG_TRACE_XLIVE("XLiveSignin");
 
-	sys_ui = -1;
-
 	if (pOverlapped)
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;

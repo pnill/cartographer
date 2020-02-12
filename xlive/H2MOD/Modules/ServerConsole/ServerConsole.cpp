@@ -3,6 +3,7 @@
 
 #include "H2MOD.h"
 #include "Util/Hooks/Hook.h"
+#include "H2MOD/Modules/Console/ConsoleCommands.h"
 
 typedef void*(__cdecl *dedi_command_hook)(wchar_t** a1, int a2, char a3);
 dedi_command_hook p_dedi_command_hook;
@@ -14,7 +15,7 @@ void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, ch
 		ServerConsole::logToDedicatedServerConsole(L"Running custom command\n");
 		//run the chatbox commands
 		std::wstring wsCommand(command);
-		h2mod->handle_command(wsCommand);
+		commands->handle_command(std::string(wsCommand.begin(), wsCommand.end()));
 		return 0;
 	}
 

@@ -8,6 +8,7 @@
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/MainMenu/Ranks.h"
 #include "H2MOD/Modules/MapFix/MPMapFix.h"
+#include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "H2MOD/Modules/Networking/Memory/bitstream.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/ServerConsole/ServerConsole.h"
@@ -400,14 +401,6 @@ wcsncpy_s_hook p_wcsncpy_s_hook;
 //lets you follow the call path of any string that is displayed (in a debugger)
 signed int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a4) {
 	return p_wcsncpy_s_hook(a1, a2, a3, a4);
-}
-
-void H2MOD::handle_command(std::string command) {
-	commands->handle_command(command);
-}
-
-void H2MOD::handle_command(std::wstring command) {
-	commands->handle_command(std::string(command.begin(), command.end()));
 }
 
 /* controller index aka local player index -> player index */

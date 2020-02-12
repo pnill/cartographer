@@ -54,8 +54,6 @@ public:
 		DatumIndex get_unit_datum_from_player_index(int);
 		BYTE* get_player_unit_from_player_index(int playerIndex);
 		void ApplyHooks(); 
-		void handle_command(std::string);
-		void handle_command(std::wstring);
 		DatumIndex get_player_datum_index_from_controller_index(int controller_index);
 		wchar_t* get_local_player_name();
 		Real::Point3D* get_player_unit_coords(int playerIndex);

@@ -6,17 +6,20 @@
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
-// #5260: XShowSigninUI
-int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags) // TODO: If this is called, pop cartographer account system UI.
-{
-	sys_ui = -1;
+int update_signin_ui_state_index = 3;
 
-	extern void XUiShowSignInH2();
-	XUiShowSignInH2();
+// #5260: XShowSigninUI
+int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags)
+{
+	if (!userSignedIn(0))
+	{
+		extern void XUiShowSignInH2();
+		XUiShowSignInH2();
+		update_signin_ui_state_index = 0;
+	}
 
 	return ERROR_SUCCESS;
 }
-
 
 // #5215: XShowGuideUI
 int WINAPI XShowGuideUI(DWORD dwUserIndex)
@@ -237,12 +240,6 @@ DWORD WINAPI XShowKeyboardUI(DWORD dwUserIndex, DWORD dwFlags, LPCWSTR wseDefaul
 int WINAPI XShowGamerCardUI(DWORD dwUserIndex,XUID XuidPlayer)
 {
 	LOG_TRACE_XLIVE("XShowGamerCardUI");
-
-
-	// signin change
-	sys_ui = -1;
-
-
 	return 0;
 }
 

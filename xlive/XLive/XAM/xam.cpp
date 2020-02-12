@@ -1,10 +1,9 @@
 #include "stdafx.h"
+
 #include "xam.h"
+#include "H2MOD/Modules/Console/ConsoleCommands.h"
 
-
-DWORD sys_ui = -1;
-
-HANDLE g_dwFakeListener = (HANDLE)-2;
+//extern ConsoleCommands* commands;
 
 struct NOTIFY_LISTEN
 {
@@ -16,20 +15,7 @@ struct NOTIFY_LISTEN
 
 static int g_dwListener = 0;
 static NOTIFY_LISTEN g_listener[50];
-
-int g_xlive = 0;
-
-DWORD WINAPI sysui_timer(LPVOID lpParam)
-{
-	Sleep(20);
-
-	SetEvent((HANDLE)lpParam);
-	sys_ui = 2;
-
-	LOG_TRACE_XLIVE("- {:p} = XN_SYS_UI  (signal)", (void*)lpParam);
-
-	return 0;
-}
+extern int update_signin_ui_state_index;
 
 // #5270: XNotifyCreateListener
 HANDLE WINAPI XNotifyCreateListener(ULONGLONG qwAreas)
@@ -62,6 +48,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	static DWORD live_content = 0x7FFFFFFF;
 	static DWORD live_membership = 0x7FFFFFFF;
 
+	static bool last_ui_state = false;
 
 	int listenerIndex = 0;
 	for (; listenerIndex < g_dwListener; listenerIndex++)
@@ -75,7 +62,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		LOG_TRACE_XLIVE("XNotifyGetNext  (hNotification = {0:p}, dwMsgFilter = {1:x}, pdwId = {2:p}, pParam = {3:p}) - unknown notifier",
 			(void*)hNotification, dwMsgFilter, (void*)pdwId, (void*)pParam);
 
-		return 0;
+		return FALSE;
 	}
 
 	ResetEvent(hNotification);
@@ -87,14 +74,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 		LOG_TRACE_XLIVE("- bad area: {0:x} ~ {1:x}", g_listener[listenerIndex].area, (XNID_AREA(dwMsgFilter) << 1) | 1);
 
-		return 0;
-	}
-
-	// reset logger
-	if (sys_ui == -1)
-	{
-		sys_ui = 0;
-		g_listener[listenerIndex].print = 0;
+		return FALSE;
 	}
 
 	if (g_listener[listenerIndex].print < print_limit)
@@ -108,20 +88,22 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	EnterCriticalSection(&g_listener[listenerIndex].lock);
 
-	BOOL exit_code = FALSE;
-
-	if (pdwId)
-		*pdwId = dwMsgFilter;
-
 	// set to next available message
 	if (g_listener[listenerIndex].area & XNOTIFY_SYSTEM &&
 		dwMsgFilter == 0)
 	{
-		if (sys_ui == 0 || sys_ui == 2)
+		if (commands->consoleOpen() != last_ui_state)
+		{
+			last_ui_state = commands->consoleOpen();
 			dwMsgFilter = XN_SYS_UI;
+		}
 
 		else if (signInStatusChanged())
 			dwMsgFilter = XN_SYS_SIGNINCHANGED;
+
+		/* Hacky fix */
+		else if (update_signin_ui_state_index++ <= 2)
+			dwMsgFilter = XN_SYS_UI;
 
 		// ex. GTA IV - recheck DLC containers
 		else if (sys_storage == 0)
@@ -169,7 +151,10 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		return FALSE;
 	}
 
+	if (pdwId)
+		*pdwId = dwMsgFilter;
 
+	BOOL exit_code = FALSE;
 
 	switch (dwMsgFilter)
 	{
@@ -181,42 +166,30 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		break;*/
 
 	case XN_SYS_UI:
-		if (sys_ui == 0)
+		
+		if (pParam)
 		{
-			// show UI
-			if (pParam) *pParam = 1;
-
-			sys_ui++;
-			std::thread(sysui_timer, hNotification).detach();
+			if (update_signin_ui_state_index == 1)
+			{
+				*pParam = true;
+				update_signin_ui_state_index++;
+			}
+			else if (update_signin_ui_state_index == 2)
+			{
+				*pParam = false;
+				update_signin_ui_state_index++;
+			}
+			else
+			{
+				*pParam = commands->consoleOpen();
+			}
 
 			LOG_TRACE_XLIVE("- {:p} = XN_SYS_UI (1)", (void*)hNotification);
 
 			exit_code = TRUE;
 		}
-
-		else if (sys_ui == 2)
-		{
-			// hide UI
-			if (pParam) *pParam = 0;
-
-			sys_ui++;
-
-
-			LOG_TRACE_XLIVE("- {:p} = XN_SYS_UI (0)", (void*)hNotification);
-
-			exit_code = TRUE;
-
-			sys_storage = 0;
-			sys_profile = 0;
-			sys_controller = 0;
-			sys_controller_force = 0;
-
-			live_connection = 0;
-			live_content = 0;
-			live_membership = 0;
-		}
+		
 		break;
-
 
 	case XN_SYS_SIGNINCHANGED:
 		if (pParam)
@@ -224,21 +197,29 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			*pParam = 0;
 
 			for (int i = 0; i < 4; i++)
+			{
 				if (signInChanged[i])
 				{
-					signInChanged[i] = false;
 					*pParam |= 1 << i;
+					signInChanged[i] = false;
 				}
-		}
+			}
+				
+			if (*pParam) 
+			{
+				if (userSignedIn(0))
+				{
+					sys_storage = 0;
+					sys_profile = 0;
+					sys_controller = 0;
+					sys_controller_force = 0;
 
-		if (*pParam)
-		{
-			*pdwId = XN_SYS_SIGNINCHANGED;
-			exit_code = TRUE;
-		}
-		else
-		{
-			exit_code = FALSE;
+					live_connection = 0;
+					live_content = 0;
+					live_membership = 0;
+				}
+				exit_code = TRUE;
+			}
 		}
 
 		LOG_TRACE_XLIVE("- {0:p} = XN_SYS_SIGNINCHANGED (1)", (void*)hNotification);
@@ -250,8 +231,6 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		if (sys_storage == 0)
 		{
 			sys_storage++;
-
-
 			LOG_TRACE_XLIVE("- {:p} = XN_SYS_STORAGEDEVICESCHANGED (-)", (void*)hNotification);
 
 			exit_code = TRUE;
@@ -273,12 +252,10 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 						*pParam |= 1 << i;
 				}
 
-				if (*pParam) {
+				if (*pParam)
+				{
 					sys_profile++;
 					exit_code = TRUE;
-				}
-				else {
-					exit_code = FALSE;
 				}
 			}
 
@@ -309,17 +286,16 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 				*pParam = 0;
 
 				for (int i = 0; i < 4; i++)
-					if (userSignedIn(i)) 
+				{
+					if (userSignedIn(i)) {
+						
 						*pParam |= 1 << i;
-
+					}
+				}
 				if (*pParam)
 				{
-					exit_code = TRUE;
 					sys_controller_force++;
-				}
-				else
-				{
-					exit_code = FALSE;
+					exit_code = TRUE;
 				}
 			}
 
@@ -334,17 +310,13 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		{
 			live_connection++;
 
-			*pdwId = XN_LIVE_CONNECTIONCHANGED;
-
 			if (pParam)
 			{
+				exit_code = TRUE;
 				*pParam = XONLINE_S_LOGON_CONNECTION_ESTABLISHED;
 			}
 
-
 			LOG_TRACE_XLIVE("- {0:p} = XN_LIVE_CONNECTIONCHANGED (0) - {1:x}", (void*)hNotification, XN_LIVE_CONNECTIONCHANGED);
-
-			exit_code = TRUE;
 		}
 		break;
 
@@ -353,7 +325,6 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		if (live_content == 0)
 		{
 			live_content++;
-
 
 			LOG_TRACE_XLIVE("- {:p} = XN_LIVE_CONTENT_INSTALLED (-)", (void*)hNotification);
 

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "NetworkSession.h"
-#include "Globals.h"
+
+#include "H2MOD/Modules/Console/ConsoleCommands.h"
 
 network_session* NetworkSession::getNetworkSessions()
 {

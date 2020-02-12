@@ -1,7 +1,8 @@
 #include "stdafx.h"
 
 #include "Globals.h"
-#include "Blam/BlamLibrary.h"
+#include "ConsoleCommands.h"
+
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -17,6 +18,8 @@
 #include "Util\ClipboardAPI.h"
 
 std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
+
+ConsoleCommands* commands = new ConsoleCommands();
 
 ConsoleCommands::ConsoleCommands() {
 	command = "";
@@ -45,7 +48,6 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 	if (wp == H2Config_hotkeyIdConsole) {
 		if (seconds_since_start > 0.5) {
 			this->console = !this->console;
-			*h2mod->GetAddress<bool*>(0x479F51) = !this->console;
 			start = time(0);
 		}
 		return true;

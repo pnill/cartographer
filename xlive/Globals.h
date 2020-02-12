@@ -16,7 +16,6 @@
 #include "H2MOD\Variants\FireFight\FireFight.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
 #include "H2MOD\Variants\HeadHunter\HeadHunter.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
@@ -38,7 +37,6 @@ extern VariantPlayer* variant_player;
 extern AdvLobbySettings* advLobbySettings;
 extern bool displayXyz;
 extern volatile bool isLobby;
-extern ConsoleCommands* commands; 
 
 extern std::map<DWORD, bool> achievementList;
 

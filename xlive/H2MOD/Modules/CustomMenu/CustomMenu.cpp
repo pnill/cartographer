@@ -2469,7 +2469,7 @@ void* __stdcall sub_248beb_deconstructor_Login_Warn(LPVOID lpMem, char a2)//__th
 {
 	//show select profile gui
 	int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
-	sub_209236(0,0);
+	sub_209236(0, 0);
 
 	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
 	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
@@ -4188,7 +4188,6 @@ static bool CMButtonHandler_AccountList(int button_id) {
 				sub_209236(0, 0);
 				H2Config_master_ip = inet_addr("127.0.0.1");
 				H2Config_master_port_relay = 2001;
-				UpdateConnectionStatus();
 			}
 		}
 	}

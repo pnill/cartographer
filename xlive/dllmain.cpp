@@ -5,8 +5,6 @@
 #include "H2MOD/Modules/Startup/Startup.h"
 #include "Util/Hooks/Detour.h"
 
-extern ConsoleCommands* commands;
-
 HMODULE hThis = NULL;
 
 CRITICAL_SECTION d_lock;
