@@ -66,7 +66,7 @@ void XUserSetup(DWORD dwUserIndex, long long xuid, char* userName, bool online)
 	strncpy_s(usersSignInInfo[dwUserIndex].szUserName, userName, XUSER_NAME_SIZE);
 
 	if (online)
-		std::thread(GetAchievements, xuid).detach();
+		GetAchievements(xuid);
 
 	signInChanged[dwUserIndex] = true;
 }
