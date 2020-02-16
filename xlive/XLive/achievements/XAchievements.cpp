@@ -3,30 +3,31 @@
 
 #include "Globals.h"
 
-int achieveinit = 0;
+int achievementCount = 0;
+int achievementEnumeratorFlags = 0;
+int achievementEnumeratorIndex = 0;
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 HANDLE g_dwFakeAchievementContent = (HANDLE)-2;
 
 
 // #5278: XUserWriteAchievements
-DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement, PXOVERLAPPED pOverlapped)
+DWORD WINAPI XUserWriteAchievements(DWORD dwNumAchievements, PXUSER_ACHIEVEMENT pAchievement, PXOVERLAPPED pOverlapped)
 {
 	LOG_TRACE_XLIVE("XUserWriteAchievements  (count = {0:#x}, buffer = {1:p}, pOverlapped = {2:p})",
-		count, (void*)pAchievement, (void*)pOverlapped);
+		dwNumAchievements, (void*)pAchievement, (void*)pOverlapped);
 
-	if (count > 0)
+	if (dwNumAchievements > 0)
 	{
-		while (count > 0)
+		while (dwNumAchievements > 0)
 		{
-
-			int AchievementID = pAchievement->dwAchievementId;
+			int AchievementID = pAchievement[dwNumAchievements - 1].dwAchievementId;
 
 			LOG_TRACE_GAME("Achievement {0} unlock attempt by Player {1} - id2: {2}", pAchievement->dwAchievementId, pAchievement->dwUserIndex, AchievementID);
 
-			if (achievementList[AchievementID] == 0)
+			if (achievementList[AchievementID] == false)
 			{
-				achievementList[AchievementID] = 1;
+				achievementList[AchievementID] = true;
 
 				std::string AchievementData;
 
@@ -204,14 +205,14 @@ DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement
 
 				h2mod->AchievementMap[AchievementData.c_str()] = false;
 
-				std::thread(AchievementUnlock, usersSignInInfo[0].xuid, AchievementID).detach();
+				std::thread(AchievementUnlock, usersSignInInfo[0].xuid, AchievementID, pOverlapped).detach();
 			}
 			else {
 				LOG_TRACE_GAME("Achievement {} was already unlocked", AchievementID);
 			}
 
 			pAchievement++;
-			count--;
+			dwNumAchievements--;
 		}
 	}
 
@@ -227,19 +228,76 @@ DWORD WINAPI XUserWriteAchievements(DWORD count, PXUSER_ACHIEVEMENT pAchievement
 }
 
 // #5280: XUserCreateAchievementEnumerator
-DWORD WINAPI XUserCreateAchievementEnumerator(DWORD dwTitleId, DWORD dwUserIndex, XUID xuid, DWORD dwDetailFlags, DWORD dwStartingIndex, DWORD MaxEnumerator, PDWORD pchBuffer, PHANDLE phEnum)
+DWORD WINAPI XUserCreateAchievementEnumerator(DWORD dwTitleId, DWORD dwUserIndex, XUID xuid, DWORD dwDetailFlags, DWORD dwStartingIndex, DWORD cItem, PDWORD pchBuffer, PHANDLE phEnum)
 {
-	LOG_TRACE_XLIVE("XUserCreateAchievementEnumerator (dwStartingIndex = {0}, MaxEnumerator = {1})", dwStartingIndex, MaxEnumerator);
+	LOG_TRACE_XLIVE("XUserCreateAchievementEnumerator (dwStartingIndex = {0}, MaxEnumerator = {1})", dwStartingIndex, cItem);
 
+	achievementCount = cItem;
+	achievementEnumeratorFlags = dwDetailFlags;
+	achievementEnumeratorIndex = dwStartingIndex;
 
-	if (pchBuffer) *pchBuffer = MaxEnumerator * sizeof(XACHIEVEMENT_DETAILS);
+	if (pchBuffer) *pchBuffer = cItem * sizeof(XACHIEVEMENT_DETAILS);
 	if (phEnum) *phEnum = g_dwFakeAchievementContent = CreateMutex(NULL, NULL, NULL);
-
-
-	achieveinit = 0;
-
 
 	LOG_TRACE_XLIVE("- Handle = {0:p}, pchBuffer = {1}", (void*)g_dwFakeAchievementContent, *pchBuffer);
 
 	return ERROR_SUCCESS;
+}
+
+int AchievementEnumerator(DWORD cbBuffer, CHAR* pvBuffer, PDWORD pcItemsReturned, XOVERLAPPED* pOverlapped)
+{
+	memset(pOverlapped, 0, sizeof(XOVERLAPPED));
+
+	for (; achievementEnumeratorIndex < achievementCount; achievementEnumeratorIndex++)
+	{
+		XACHIEVEMENT_DETAILS aaa;
+		memset(&aaa, 0, sizeof(XACHIEVEMENT_DETAILS));
+		bool achieved = achievementList[achievementEnumeratorIndex + 1];
+
+		// check max
+		if ((achievementCount - (achievementEnumeratorIndex + 1)) >= cbBuffer / sizeof(XACHIEVEMENT_DETAILS))
+			break;
+
+		FILETIME fileTime;
+		SYSTEMTIME systemTime;
+
+		GetSystemTime(&systemTime);
+		SystemTimeToFileTime(&systemTime, &fileTime);
+
+		aaa.dwId = achievementEnumeratorIndex + 1;
+		aaa.pwszLabel = L"";
+		aaa.pwszDescription = L"";
+		aaa.pwszUnachieved = L"";
+		aaa.dwImageId = 0;
+
+		if (achieved)
+		{
+			aaa.dwCred = 1000;
+			aaa.ftAchieved = fileTime;
+		}
+
+		aaa.dwFlags = achieved == true ? XACHIEVEMENT_DETAILS_ACHIEVED_ONLINE | XACHIEVEMENT_DETAILS_ACHIEVED : 0;
+
+		if (pOverlapped == NULL)
+			(*pcItemsReturned)++;
+
+		else
+			pOverlapped->InternalHigh++;
+
+		if (pvBuffer)
+		{
+			memcpy(pvBuffer, &aaa, sizeof(XACHIEVEMENT_DETAILS));
+			pvBuffer += sizeof(XACHIEVEMENT_DETAILS);
+		}
+	}
+
+	if (pOverlapped == NULL)
+		return ERROR_SUCCESS;
+	else
+	{
+		pOverlapped->InternalLow = ERROR_SUCCESS;
+		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+
+		return ERROR_IO_PENDING;
+	}
 }

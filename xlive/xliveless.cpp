@@ -660,79 +660,10 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		}
 	}
 
-
-
-
-	if( hEnum == g_dwFakeAchievementContent && achieveinit != 0x7FFFFFFF )
+	if (hEnum == g_dwFakeAchievementContent)
 	{
-		DWORD total = 0;
-
-		for( 0; achieveinit < 42; achieveinit++ )
-		{
-			XACHIEVEMENT_DETAILS aaa;
-
-
-			// check max
-			if( total >= cbBuffer )
-				break;
-
-
-			if( achievementList[ achieveinit ] == 1 )
-			{
-				SYSTEMTIME systemTime;
-				FILETIME fileTime;
-
-
-				GetSystemTime( &systemTime );
-				SystemTimeToFileTime( &systemTime, &fileTime );
-
-
-				aaa.dwId = achieveinit;
-				aaa.pwszLabel = L"";
-				aaa.pwszDescription = L"";
-				aaa.pwszUnachieved = L"";
-				aaa.dwImageId = 0;
-				aaa.dwCred = 0;
-				aaa.ftAchieved = fileTime;
-				aaa.dwFlags = XACHIEVEMENT_DETAILS_ACHIEVED_ONLINE | XACHIEVEMENT_DETAILS_ACHIEVED;
-
-
-
-				if( async == FALSE )
-					(*pcItemsReturned)++;
-
-				else
-					pOverlapped->InternalHigh++;
-
-
-
-				if(pvBuffer)
-				{
-					memcpy(pvBuffer,&aaa,sizeof(aaa));
-					pvBuffer += sizeof(aaa);
-
-
-					total += sizeof(aaa);
-				}
-			}
-		}
-
-
-
-		if( async == FALSE )
-		{
-			if( *pcItemsReturned == 0 )
-				achieveinit = 0x7fffffff;
-		}
-
-		else
-		{
-			if( pOverlapped->InternalHigh == 0 )
-				achieveinit = 0x7fffffff;
-		}
+		return AchievementEnumerator(cbBuffer, pvBuffer, pcItemsReturned, pOverlapped);
 	}
-
-
 
 	if( hEnum == g_dwMarketplaceContent && marketplaceEnumerate < marketplaceCount )
 	{
@@ -876,41 +807,6 @@ DWORD WINAPI XStringVerify( DWORD dwFlags, const CHAR *szLocale, DWORD dwNumStri
 	return ERROR_SUCCESS;
 }
 
-
-// #5305: XStorageUploadFromMemory
-DWORD WINAPI XStorageUploadFromMemory( DWORD dwUserIndex, const WCHAR *wszServerPath, DWORD dwBufferSize, const BYTE *pbBuffer, PXOVERLAPPED pOverlapped )
-{
-	LOG_TRACE_XLIVE(L"XStorageUploadFromMemory  (dwUserIndex = {0}, wszServerPath = {1}, dwBufferSize = {2:x}, pbBuffer = {3:p}, pXOverlapped = {4:p})",
-		dwUserIndex, wszServerPath, dwBufferSize, (void*)pbBuffer, (void*)pOverlapped );
-
-
-
-	FILE *fp;
-	errno_t err = _wfopen_s(&fp, wszServerPath, L"wb" );
-	if( !err )
-	{
-		fwrite( pbBuffer, 1, dwBufferSize, fp );
-		fclose( fp );
-	}
-
-
-
-	if( pOverlapped )
-	{
-		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-
-		Check_Overlapped( pOverlapped );
-
-		return ERROR_IO_PENDING;
-	}
-
-
-	return ERROR_SUCCESS;
-}
-
-
 // #5306: XStorageEnumerate
 int WINAPI XStorageEnumerate( DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD)   // XStorageEnumerate
 {
@@ -1006,8 +902,6 @@ DWORD WINAPI XTitleServerCreateEnumerator (LPCSTR pszServerInfo, DWORD cItem, DW
     return 1;
 }
 
-
-
 // #5338: XPresenceSubscribe
 int WINAPI XPresenceSubscribe(int a1, int a2, int a3)
 {
@@ -1016,7 +910,7 @@ int WINAPI XPresenceSubscribe(int a1, int a2, int a3)
 }
 
 // #5340 XPresenceCreateEnumerator
-int WINAPI XPresenceCreateEnumerator(DWORD dwUserIndex, DWORD cPeers, const XUID *pPeers, DWORD dwStartingIndex,DWORD dwPeersToReturn, DWORD *pcbBuffer, HANDLE *ph)
+int WINAPI XPresenceCreateEnumerator(DWORD dwUserIndex, DWORD cPeers, const XUID *pPeers, DWORD dwStartingIndex, DWORD dwPeersToReturn, DWORD *pcbBuffer, HANDLE *ph)
 {
 	LOG_TRACE_XLIVE("XPresenceCreateEnumerator(dwUserIndex: {0:x}, cPeers: {1:x})", dwUserIndex, cPeers);
 	if(pcbBuffer)
@@ -1025,91 +919,193 @@ int WINAPI XPresenceCreateEnumerator(DWORD dwUserIndex, DWORD cPeers, const XUID
 	return 1;
 }
 
+// #5305: XStorageUploadFromMemory
+DWORD WINAPI XStorageUploadFromMemory(DWORD dwUserIndex, const WCHAR *wszServerPath, DWORD dwBufferSize, const BYTE *pbBuffer, PXOVERLAPPED pOverlapped)
+{
+	LOG_TRACE_XLIVE(L"XStorageUploadFromMemory  ( wszServerPath = {}, dwBufferSize = {} )",
+		wszServerPath, dwBufferSize);
+
+	FILE *fp;
+	errno_t err = _wfopen_s(&fp, wszServerPath, L"wb");
+	if (err)
+	{
+		//LOG_TRACE_XLIVE(" - file copy failure, error: {}", err);
+
+		if (pOverlapped)
+		{
+			pOverlapped->InternalLow = ERROR_FUNCTION_FAILED;
+			pOverlapped->InternalHigh = 0;
+			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_FUNCTION_FAILED);
+
+			Check_Overlapped(pOverlapped);
+
+			return ERROR_IO_PENDING;
+		}
+
+		return ERROR_FUNCTION_FAILED;
+	}
+
+	fseek(fp, 0, SEEK_SET);
+	fwrite(pbBuffer, dwBufferSize, 1, fp);
+
+	fseek(fp, 0, SEEK_END);
+	LOG_TRACE_XLIVE(L" - Uploaded total byte count: {}", ftell(fp));
+
+	fclose(fp);
+
+	if (pOverlapped)
+	{
+		pOverlapped->InternalLow = ERROR_SUCCESS;
+		pOverlapped->InternalHigh = dwBufferSize;
+		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+
+		Check_Overlapped(pOverlapped);
+
+		return ERROR_IO_PENDING;
+	}
+
+	return ERROR_SUCCESS;
+}
+
 // #5344: XStorageBuildServerPath
 DWORD WINAPI XStorageBuildServerPath( DWORD dwUserIndex, XSTORAGE_FACILITY StorageFacility,
                                       const void *pvStorageFacilityInfo, DWORD dwStorageFacilityInfoSize,
                                       LPCWSTR *pwszItemName, WCHAR *pwszServerPath, DWORD *pdwServerPathLength )
 {
-	//LOG_TRACE_XLIVE("XStorageBuildServerPath  (dwUserIndex = %d, StorageFacility = %d, pvStorageFacilityInfo = %X, dwStorageFacilityInfoSize = %X, pwszItemName = %s, pwszServerPath = %X, pdwServerPathLength = %X )",
-	//	dwUserIndex, StorageFacility, pvStorageFacilityInfo, dwStorageFacilityInfoSize, pwszItemName, pwszServerPath, pdwServerPathLength );
+	LOG_TRACE_XLIVE(L"XStorageBuildServerPath  ( StorageFacility = {},  dwStorageFacilityInfoSize = {}, pwszItemName = {}, pwszServerPath = {}, pdwServerPathLength = {} )",
+		 (int)StorageFacility, dwStorageFacilityInfoSize, (wchar_t*)pwszItemName, (wchar_t*)pwszServerPath, *pdwServerPathLength );
 
+	DWORD fileAtributes;
+	bool CreateDirReturn;
+	std::wstring itemName((wchar_t*)pwszItemName);
 
 	if( pwszServerPath )
 	{
 		//Local_Storage_W( 0, strw );
 
-		SecureZeroMemory(strw, sizeof(strw));
-		wcscat( strw, L"\\Online\\" );
-		//CreateDirectory( strw, NULL );
+		std::wstring filePath(_wgetenv(L"USERPROFILE"));
+		filePath += L"\\AppData\\Local";
 
+		fileAtributes = GetFileAttributes(filePath.c_str());
+		if (fileAtributes != INVALID_FILE_ATTRIBUTES && fileAtributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			filePath += L"\\Microsoft\\Halo 2";
+			CreateDirReturn = CreateDirectory(filePath.c_str(), NULL);
+			if (CreateDirReturn || GetLastError() == ERROR_ALREADY_EXISTS)
+			{
+				filePath += L"\\XLive";
+				CreateDirReturn = CreateDirectory(filePath.c_str(), NULL);
+				if (CreateDirReturn || GetLastError() == ERROR_ALREADY_EXISTS)
+				{
+					switch (StorageFacility)
+					{
+					case XSTORAGE_FACILITY_GAME_CLIP:
+					case XSTORAGE_FACILITY_PER_TITLE:
+					case XSTORAGE_FACILITY_PER_USER_TITLE:
+						filePath += L"\\" + std::to_wstring(usersSignInInfo[dwUserIndex].xuid);
+						break;
 
-		wcscat( strw, (WCHAR *) pwszItemName );
-		wcscpy( pwszServerPath, strw );
-		*pdwServerPathLength = wcslen( strw ) + 1;
+					default:
+						return ERROR_INVALID_PARAMETER;
+					}
 
+					CreateDirReturn = CreateDirectory(filePath.c_str(), NULL);
+					if (CreateDirReturn || GetLastError() == ERROR_ALREADY_EXISTS)
+					{
+						filePath += L"\\" + itemName;
+					}
+				}
+			}
+		}
 
-		//LOG_TRACE_XLIVE( "- %s", strw );
+		*pdwServerPathLength = filePath.size();
+		wcsncpy(pwszServerPath, filePath.c_str(), filePath.size());
 	}
 
-	return ERROR_FUNCTION_FAILED;
+	return ERROR_SUCCESS;
 }
 
 
 // #5345: XStorageDownloadToMemory
-DWORD WINAPI XStorageDownloadToMemory( DWORD dwUserIndex, const WCHAR *wszServerPath, DWORD dwBufferSize, const BYTE *pbBuffer, DWORD cbResults, XSTORAGE_DOWNLOAD_TO_MEMORY_RESULTS *pResults, PXOVERLAPPED pOverlapped )
+DWORD WINAPI XStorageDownloadToMemory(DWORD dwUserIndex,
+	const WCHAR *wszServerPath,
+	DWORD dwBufferSize,
+	const BYTE *pbBuffer,
+	DWORD cbResults,
+	XSTORAGE_DOWNLOAD_TO_MEMORY_RESULTS *pResults,
+	XOVERLAPPED *pXOverlapped
+)
 {
-	LOG_TRACE_XLIVE(L"XStorageDownloadToMemory  (dwUserIndex = {0}, wszServerPath = {1}, dwBufferSize = {2:x}, pbBuffer = {3:p}, cbResults = {4}, pResults = {5:p}, pXOverlapped = {6:p})",
-		dwUserIndex, wszServerPath, dwBufferSize, (void*)pbBuffer, cbResults, (void*)pResults, (void*)pOverlapped );
+	LOG_TRACE_XLIVE(L"XStorageDownloadToMemory  ( wszServerPath = {}, dwBufferSize = {}, cbResults = {} )",
+		wszServerPath, dwBufferSize, cbResults);
 
+	memset(pResults, 0, sizeof(XSTORAGE_DOWNLOAD_TO_MEMORY_RESULTS));
 
-	pResults->dwBytesTotal = 0;
-	memcpy( &pResults->xuidOwner, &usersSignInInfo[dwUserIndex].xuid, sizeof(XUID) );
+	DWORD size = 0;
+	FILE *fp = nullptr;
 
+	FILETIME fileTime;
+	SYSTEMTIME systemTime;
 
-	FILE *fp;
-	_wfopen_s(&fp, wszServerPath, L"rb" );
-	if( !fp )
+	GetSystemTime(&systemTime);
+	SystemTimeToFileTime(&systemTime, &fileTime);
+
+	errno_t err = _wfopen_s(&fp, wszServerPath, L"rb");
+	if (err)
 	{
-		LOG_TRACE_XLIVE( "- ERROR: file does not exist" );
+		LOG_TRACE_XLIVE("- ERROR: file does not exist");
 
-		return -1;
+		if (pXOverlapped)
+		{
+			pXOverlapped->InternalHigh = 0;
+			pXOverlapped->InternalLow = ERROR_NO_MORE_FILES;
+			pXOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
+
+			return ERROR_IO_PENDING;
+		}
+
+		return ERROR_NO_MORE_FILES;
 	}
 
-
-	DWORD size;
-
-
-	fseek( fp, 0, SEEK_END );
+	fseek(fp, 0, SEEK_END);
 	size = ftell(fp);
 
-
-	if( dwBufferSize < size )
+	if (dwBufferSize < size)
 	{
-		LOG_TRACE_XLIVE( "- ERROR_INSUFFICIENT_BUFFER = {:x}", ftell(fp) );
+		LOG_TRACE_XLIVE("- ERROR_INSUFFICIENT_BUFFER = {}", ftell(fp));
+
+		fclose(fp);
+
+		if (pXOverlapped)
+		{
+			pXOverlapped->InternalHigh = 0;
+			pXOverlapped->InternalLow = ERROR_INSUFFICIENT_BUFFER;
+			pXOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
+
+			return ERROR_IO_PENDING;
+		}
 
 		return ERROR_INSUFFICIENT_BUFFER;
 	}
 
-
-
-	fseek( fp, 0, SEEK_SET );
-	fread( (void *) pbBuffer, 1, size, fp );
-
+	fseek(fp, 0, SEEK_SET);
+	fread((void *)pbBuffer, size, 1, fp);
 
 	pResults->dwBytesTotal = size;
+	pResults->ftCreated = fileTime;
 	pResults->xuidOwner = usersSignInInfo[dwUserIndex].xuid;
-	//pResults->ftCreated;
 
+	LOG_TRACE_XLIVE("- Read total bytes = {}", pResults->dwBytesTotal);
 
-	if( pOverlapped )
+	fclose(fp);
+
+	if (pXOverlapped)
 	{
-		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = size;
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
 
-		pOverlapped->InternalHigh = 0;
-
-
-		Check_Overlapped( pOverlapped );
+		Check_Overlapped(pXOverlapped);
 
 		return ERROR_IO_PENDING;
 	}
@@ -2028,22 +2024,20 @@ DWORD WINAPI XStorageDelete(DWORD dwUserIndex, const WCHAR *wszServerPath, XOVER
 	LOG_TRACE_XLIVE(L"XStorageDelete  (*** checkme ***) (a1 = {0:x}, a2 = {1}, a3 = {2:p})",
 		dwUserIndex, wszServerPath, (void*)pXOverlapped);
 
-	//TODO XStorageDelete
+	DeleteFile(wszServerPath);
+
 	if (pXOverlapped) {
 		//asynchronous
 
 		pXOverlapped->InternalLow = ERROR_SUCCESS;
-		pXOverlapped->InternalHigh = ERROR_SUCCESS;
-		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = 0;
+		pXOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 
 		Check_Overlapped(pXOverlapped);
 
 		return ERROR_IO_PENDING;
 	}
-	else {
-		//synchronous
-		//return result;
-	}
+
 	return ERROR_SUCCESS;
 }
 

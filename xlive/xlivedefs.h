@@ -570,20 +570,18 @@ typedef enum _XSTORAGE_FACILITY
     XSTORAGE_FACILITY_PER_USER_TITLE = 3
 } XSTORAGE_FACILITY;
  
-
+#pragma pack(push, 1)
 typedef struct _XSTORAGE_DOWNLOAD_TO_MEMORY_RESULTS {
-    DWORD dwBytesTotal;
-    XUID xuidOwner;
-    FILETIME ftCreated;
+	DWORD dwBytesTotal;
+	XUID xuidOwner;
+	FILETIME ftCreated;
 } XSTORAGE_DOWNLOAD_TO_MEMORY_RESULTS;
- 
+#pragma pack(pop)
 
 typedef struct {
     DWORD dwNewOffers;
     DWORD dwTotalOffers;
 } XOFFERING_CONTENTAVAILABLE_RESULT;
- 
-
 
 #define XMARKETPLACE_CONTENT_ID_LEN 20
 

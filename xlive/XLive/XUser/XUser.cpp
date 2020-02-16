@@ -86,9 +86,6 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 	if (dwUserIndex != 0)
 		dwUserIndex = 0;
 
-	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_NotSignedIn)
-		return ERROR_NOT_LOGGED_ON;
-
 	static int print = 0;
 	if (print < 15)
 	{
@@ -96,6 +93,11 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 
 		print++;
 	}
+
+	memset(pXuid, 0, sizeof(XUID));
+
+	if (!userSignedIn(dwUserIndex))
+		return ERROR_NOT_LOGGED_ON;
 
 	*pXuid = usersSignInInfo[dwUserIndex].xuid;
 	return ERROR_SUCCESS;
@@ -292,7 +294,6 @@ DWORD WINAPI XUserReadStats(DWORD dwTitleId, DWORD dwNumXuids, CONST XUID *pXuid
 		if (*pcbResults == 0)
 		{
 			*pcbResults = 4;
-
 
 			if (pOverlapped)
 			{
