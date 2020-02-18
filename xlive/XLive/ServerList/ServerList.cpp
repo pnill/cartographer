@@ -159,8 +159,6 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 		nResult->pProperties = new XUSER_PROPERTY[doc["pProperties"].GetArray().Size()];
 
 		int current_property = 0;
-
-
 		for (auto& property : doc["pProperties"].GetArray())
 		{
 			nResult->pProperties[current_property].dwPropertyId = property["dwPropertyId"].GetInt();
@@ -206,6 +204,8 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 
 			current_property++;
 		}
+
+
 	}
 
 	++serverList.total_servers;
@@ -484,8 +484,13 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 		user_int.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_USER_INT), document.GetAllocator());
 		user_int.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_INT32), document.GetAllocator());
 		user_int.AddMember("value", Value().SetInt(2), document.GetAllocator());
-
 		document["pProperties"].PushBack(user_int, document.GetAllocator());
+
+		Value user_xuid(kObjectType);
+		user_xuid.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_XUID), document.GetAllocator());
+		user_xuid.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_INT64), document.GetAllocator());
+		user_xuid.AddMember("value", Value().SetUint64(usersSignInInfo[dwUserIndex].xuid), document.GetAllocator());
+		document["pProperties"].PushBack(user_xuid, document.GetAllocator());
 
 		StringBuffer buffer;
 		Writer<StringBuffer> writer(buffer);

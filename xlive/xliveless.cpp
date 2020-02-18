@@ -947,8 +947,8 @@ DWORD WINAPI XStorageUploadFromMemory(DWORD dwUserIndex, const WCHAR *wszServerP
 
 	fseek(fp, 0, SEEK_SET);
 	fwrite(pbBuffer, dwBufferSize, 1, fp);
-
 	fseek(fp, 0, SEEK_END);
+
 	LOG_TRACE_XLIVE(L" - Uploaded total byte count: {}", ftell(fp));
 
 	fclose(fp);
