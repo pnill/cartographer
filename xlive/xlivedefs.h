@@ -561,22 +561,6 @@ typedef struct _MESSAGEBOX_RESULT {
 		WORD rgwPasscode[4];
 	};
 }	MESSAGEBOX_RESULT, *PMESSAGEBOX_RESULT;
- 
-
-typedef enum _XSTORAGE_FACILITY
-{
-    XSTORAGE_FACILITY_GAME_CLIP = 1,
-    XSTORAGE_FACILITY_PER_TITLE = 2,
-    XSTORAGE_FACILITY_PER_USER_TITLE = 3
-} XSTORAGE_FACILITY;
- 
-#pragma pack(push, 1)
-typedef struct _XSTORAGE_DOWNLOAD_TO_MEMORY_RESULTS {
-	DWORD dwBytesTotal;
-	XUID xuidOwner;
-	FILETIME ftCreated;
-} XSTORAGE_DOWNLOAD_TO_MEMORY_RESULTS;
-#pragma pack(pop)
 
 typedef struct {
     DWORD dwNewOffers;

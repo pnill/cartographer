@@ -363,6 +363,7 @@
     <ClCompile Include="XLive\XUser\XUser.cpp" />
     <ClCompile Include="XLive\XUser\XUserContext.cpp" />
     <ClCompile Include="XLive\XUser\XUserProperty.cpp" />
+    <ClCompile Include="XLive\XStorage\XStorage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -593,6 +594,7 @@
     <ClInclude Include="XLive\XUser\XUser.h" />
     <ClInclude Include="XLive\XUser\XUserContext.h" />
     <ClInclude Include="XLive\XUser\XUserProperty.h" />
+    <ClInclude Include="XLive\XStorage\XStorage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def" />

@@ -1323,12 +1323,6 @@ void H2MOD::ApplyHooks() {
 		WritePointer(h2mod->GetAddress<BYTE*>(0x1F0B80), player_remove_packet_handler);
 		*/
 
-		// Patch out the code that displays the "Invalid Checkpoint" error
-		// Start
-		NopFill(GetAddress(0x30857), 0x41);
-		// Respawn
-		NopFill(GetAddress(0x8BB98), 0x2B);
-
 		p_change_local_team = (change_team)DetourFunc(h2mod->GetAddress<BYTE*>(0x2068F2), (BYTE*)changeTeam, 8);
 
 		// hook the print command to redirect the output to our console

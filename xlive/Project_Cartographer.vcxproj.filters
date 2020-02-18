@@ -295,6 +295,9 @@
     <Filter Include="Source Files\Blam\Cache\Tags">
       <UniqueIdentifier>{f334ecaa-82d0-463c-83de-c16fb3fb22f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\XLive\XStorage">
+      <UniqueIdentifier>{57e1f434-f9fa-4339-8f08-5a2d087e7721}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -563,6 +566,9 @@
     </ClCompile>
     <ClCompile Include="Blam\Cache\Tags\itmc.cpp">
       <Filter>Source Files\Blam\Cache\Tags</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XStorage\XStorage.cpp">
+      <Filter>Source Files\XLive\XStorage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1255,6 +1261,9 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h">
       <Filter>Source Files\H2MOD\Modules\MetaLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XStorage\XStorage.h">
+      <Filter>Source Files\XLive\XStorage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
