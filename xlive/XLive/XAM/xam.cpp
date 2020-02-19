@@ -15,7 +15,8 @@ struct NOTIFY_LISTEN
 
 static int g_dwListener = 0;
 static NOTIFY_LISTEN g_listener[50];
-extern int update_signin_ui_state_index;
+
+int notify_xlive_ui = -1;
 
 // #5270: XNotifyCreateListener
 HANDLE WINAPI XNotifyCreateListener(ULONGLONG qwAreas)
@@ -101,8 +102,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		else if (signInStatusChanged())
 			dwMsgFilter = XN_SYS_SIGNINCHANGED;
 
-		/* Hacky fix */
-		else if (update_signin_ui_state_index++ <= 2)
+		else if (notify_xlive_ui != -1)
 			dwMsgFilter = XN_SYS_UI;
 
 		// ex. GTA IV - recheck DLC containers
@@ -134,7 +134,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	}
 
-/*	if ((g_listener[curlist].area & XNOTIFY_CUSTOM) &&
+    /*if ((g_listener[curlist].area & XNOTIFY_CUSTOM) &&
 		dwMsgFilter == 0)
 	{
 		if (0) // change this to if player kicked...
@@ -169,15 +169,15 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		
 		if (pParam)
 		{
-			if (update_signin_ui_state_index == 1)
+			if (notify_xlive_ui == 0)
 			{
 				*pParam = true;
-				update_signin_ui_state_index++;
+				notify_xlive_ui++;
 			}
-			else if (update_signin_ui_state_index == 2)
+			else if (notify_xlive_ui == 1)
 			{
 				*pParam = false;
-				update_signin_ui_state_index++;
+				notify_xlive_ui = -1;
 			}
 			else
 			{

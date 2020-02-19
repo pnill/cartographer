@@ -1728,7 +1728,7 @@ DWORD WINAPI XLiveLoadLibraryEx(LPCWSTR libFileName, HINSTANCE *a2, DWORD dwFlag
 	LOG_TRACE_XLIVE(L"XLiveLoadLibraryEx (libFileName = {0}, a2 = {1:p}, flags = {2:x})",
 		libFileName, (void*)a2, dwFlags);
 
-	HINSTANCE hInstance = LoadLibraryExW(libFileName, NULL, dwFlags);
+	HINSTANCE hInstance = LoadLibraryEx(libFileName, NULL, dwFlags);
 
 	if (!hInstance)
 		return HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);

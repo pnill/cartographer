@@ -6,8 +6,6 @@
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
-int update_signin_ui_state_index = 3;
-
 // #5260: XShowSigninUI
 int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags)
 {
@@ -15,7 +13,6 @@ int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags)
 	{
 		extern void XUiShowSignInH2();
 		XUiShowSignInH2();
-		update_signin_ui_state_index = 0;
 	}
 
 	return ERROR_SUCCESS;
