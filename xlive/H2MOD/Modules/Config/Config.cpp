@@ -95,7 +95,6 @@ bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
 bool H2Config_hiresfix = false;
 bool H2Config_d3dex = false;
-//bool H2Config_hitmarker_sound = false;
 bool H2Config_voice_chat = false;
 char H2Config_dedi_server_name[32] = { "" };
 char H2Config_dedi_server_playlist[256] = { "" };
@@ -303,12 +302,7 @@ void SaveH2Config() {
 		fputs("\n# 0 - Non-host players cannot delay the game start countdown timer.", fileConfig);
 		fputs("\n# 1 - Non-host players can delay the game start countdown timer (native default).", fileConfig);
 		fputs("\n\n", fileConfig);
-		/*if (!H2IsDediServer) {
-			fputs("# enable_hitmarker_sound Options (Client):", fileConfig);
-			fputs("\n# 0 - Shooting players does not produce a hitmarker sound effect (default).", fileConfig);
-			fputs("\n# 1 - Shooting players plays a hitmarker sound effect.", fileConfig);
-			fputs("\n\n", fileConfig);
-		}
+		/*
 		fputs("# voice_chat Options:", fileConfig);
 		fputs("\n# 0 - Voice chat is not enabled, you cannot host voice servers or connect to them.", fileConfig);
 		fputs("\n# 1 - Voice chat is enabled, you can host voice servers or connect to them (default).", fileConfig);
@@ -473,9 +467,7 @@ void SaveH2Config() {
 
 		fprintf_s(fileConfig, "\nenable_xdelay = %d", H2Config_xDelay);
 
-		/*if (!H2IsDediServer) {
-			fputs("\nenable_hitmarker_sound = ", fileConfig); fputs(H2Config_hitmarker_sound ? "1" : "0", fileConfig);
-		}
+		/*
 		fputs("\nvoice_chat = ", fileConfig); fputs(H2Config_voice_chat ? "1" : "0", fileConfig);
 
 		if (H2IsDediServer) {
@@ -634,7 +626,7 @@ static bool est_sens_mouse = false;
 static bool est_disable_ingame_keyboard = false;
 static bool est_hide_ingame_chat = false;
 static bool est_xdelay = false;
-/*static bool est_hitmarker_sound = false;
+/*
 static bool est_voice_chat = false;
 static bool est_als_mp_explosion_physics = false;
 static bool est_als_mp_sputnik = false;
@@ -717,7 +709,7 @@ static void est_reset_vars() {
 	est_disable_ingame_keyboard = false;
 	est_hide_ingame_chat = false;
 	est_xdelay = false;
-	/*est_hitmarker_sound = false;
+	/*
 	est_voice_chat = false;
 	est_als_mp_explosion_physics = false;
 	est_als_mp_sputnik = false;
@@ -1461,18 +1453,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_xdelay = true;
 			}
 		}
-/*		else if (sscanf(fileLine, "enable_hitmarker_sound =%d", &tempint1) == 1) {
-			if (est_hitmarker_sound) {
-				duplicated = true;
-			}
-			else if (!(tempint1 == 0 || tempint1 == 1)) {
-				incorrect = true;
-			}
-			else {
-				H2Config_hitmarker_sound = (bool)tempint1;
-				est_hitmarker_sound = true;
-			}
-		}
+/*
 		else if (sscanf(fileLine, "voice_chat =%d", &tempint1) == 1) {
 			if (est_voice_chat) {
 				duplicated = true;

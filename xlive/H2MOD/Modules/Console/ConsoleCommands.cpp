@@ -660,13 +660,12 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::string sensVal = splitCommands[1];
 
 			if (isNum(sensVal.c_str())) {
-				H2Tweaks::setSens(CONTROLLER, stoi(sensVal));
+				H2Tweaks::setSens("controller", stoi(sensVal));
 				H2Config_controller_sens = stoi(sensVal);
 			}
 			else {
 				output(L"Wrong input! Use a number.");
 			}
-
 		}
 		else if (firstCommand == "$mouse_sens") {
 			if (splitCommands.size() != 2) {
@@ -676,7 +675,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::string sensVal = splitCommands[1];
 
 			if (isNum(sensVal.c_str())) {
-				H2Tweaks::setSens(MOUSE, stoi(sensVal));
+				H2Tweaks::setSens("mouse", stoi(sensVal));
 				H2Config_mouse_sens = stoi(sensVal);
 			}
 			else {

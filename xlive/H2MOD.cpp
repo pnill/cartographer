@@ -829,8 +829,8 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 
 		UIRankPatch();
 		H2Tweaks::setHz();
-		H2Tweaks::disableAI_MP();
-		H2Tweaks::disable60FPSCutscenes();
+		H2Tweaks::toggleAiMp(false);
+		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		engine_settings->tickrate = XboxTick::setTickRate(false);
 
 		return result;
@@ -871,10 +871,10 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 			engine_settings->tickrate = XboxTick::setTickRate(true);
 		}
 		
-		H2Tweaks::enableAI_MP();
+		H2Tweaks::toggleAiMp(true);
+		H2Tweaks::toggleUncappedCampaignCinematics(false);
 
 		H2Tweaks::setCrosshairSize(0, false);
-		H2Tweaks::disable60FPSCutscenes();
 		//H2Tweaks::applyShaderTweaks(); 
 
 		if (GameState == 3)
@@ -905,8 +905,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		addDebugText("Map type: Singleplayer");
 		//H2X::Initialize(true);
 		H2Tweaks::applyMeleePatch(true);
-
-		H2Tweaks::enable60FPSCutscenes();
+		H2Tweaks::toggleUncappedCampaignCinematics(true);
 	}
 
 	return result;

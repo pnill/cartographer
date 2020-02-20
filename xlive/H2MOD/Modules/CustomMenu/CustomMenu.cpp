@@ -2994,9 +2994,6 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_d3dex = !H2Config_d3dex));
 		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
 	}
-//	else if (button_id == 8) {
-//		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_hitmarker_sound = !H2Config_hitmarker_sound));
-//	}
 	return false;
 }
 
@@ -3044,7 +3041,6 @@ int __cdecl CustomMenu_OtherSettings(int a1) {
 	loadLabelToggle_OtherSettings(8, 0xFFFFFFF2, H2Config_raw_input);
 	loadLabelToggle_OtherSettings(9, 0xFFFFFFF2, H2Config_hiresfix);
 	loadLabelToggle_OtherSettings(10, 0xFFFFFFF2, H2Config_d3dex);
-//	loadLabelToggle_OtherSettings(9, 0xFFFFFFF2, H2Config_hitmarker_sound);
 	return CustomMenu_CallHead(a1, menu_vftable_1_OtherSettings, menu_vftable_2_OtherSettings, (DWORD)&CMButtonHandler_OtherSettings, 10, 272);
 }
 
@@ -5070,7 +5066,6 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0008, "Raw Mouse Input");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0009, "Hi Res Fix");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF000A, "D3DEX");
-//	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0009, "Hitmarker Sound Effect");
 
 
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF0, "Advanced Settings");

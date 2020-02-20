@@ -110,9 +110,7 @@ void PatchCall(DWORD call_addr, DWORD new_function_ptr) {
 }
 
 void WritePointer(DWORD offset, void *ptr) {
-	BYTE* pbyte = (BYTE*)&ptr;
-	BYTE assmNewFuncRel[4] = { pbyte[0], pbyte[1], pbyte[2], pbyte[3] };
-	WriteBytes(offset, assmNewFuncRel, 4);
+	WriteValue<DWORD>(offset, *(DWORD*)&ptr);
 }
 
 void PatchWinAPICall(DWORD call_addr, DWORD new_function_ptr)
@@ -131,9 +129,6 @@ VOID Codecave(DWORD destAddress, VOID(*func)(VOID), BYTE nopCount)
 {
 	DWORD offset = (PtrToUlong(func) - destAddress) - 5;
 
-
-	BYTE nopPatch[0xFF] = { 0 };
-
 	BYTE patch[5] = { 0xE8, 0x00, 0x00, 0x00, 0x00 };
 	memcpy(patch + 1, &offset, sizeof(DWORD));
 	WriteBytes(destAddress, patch, 5);
@@ -141,11 +136,7 @@ VOID Codecave(DWORD destAddress, VOID(*func)(VOID), BYTE nopCount)
 	if (nopCount == 0)
 		return;
 
-
-	memset(nopPatch, 0x90, nopCount);
-
-
-	WriteBytes(destAddress + 5, nopPatch, nopCount);
+	NopFill(destAddress + 5, nopCount);
 }
 
 void NopFill(DWORD address, int length)
