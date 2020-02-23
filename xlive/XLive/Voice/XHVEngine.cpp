@@ -2,104 +2,92 @@
 #include "XHVEngine.h"
 
 #include "Globals.h"
-#include "AudioDevices.h"
 #include "AudioHandler.h"
+
+#include "DSound.h"
 
 #include "H2MOD\Modules\Config\Config.h"
 
 std::vector<XUID> remotetalkers;
 
 #if COMPILE_WITH_VOICE
-CAudioHandler* p_CAudioHandler = nullptr;
-CAudioDevices* p_CAudioDevices = nullptr;
+CAudioHandler* pAudioHandler = nullptr;
 #endif
 
 //#5008
 int WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, PIXHV2ENGINE *ppEngine)
 {
-	LOG_TRACE_XLIVE("XHVCreateEngine  (pParams = {0:p}, phWorkerThread = {1:p}, pEngine = {2:p})",
-		(void*)pParams, (void*)phWorkerThread, (void*)ppEngine);
-
-	// disable until ready
-	H2Config_voice_chat = false;
-
 #if COMPILE_WITH_VOICE
-	if (H2Config_voice_chat)
-		p_CAudioHandler = new CAudioHandler(p_CAudioDevices);
+	if (H2Config_voice_chat) 
+		pAudioHandler = new CAudioHandler();
+	else
 #endif
+		return DSERR_NODRIVER;
 
 	if (pParams->bCustomVADProvided)
 	{
-		LOG_TRACE_GAME("XHV Engine - bCustomVADProvided set");
+		LOG_TRACE(voice_log, "XHVCreateEngine() - bCustomVADProvided set");
 	}
-
-	if (phWorkerThread)
-	{
-		*phWorkerThread = CreateMutex(0, 0, 0);
-
-		LOG_TRACE_XLIVE("- Handle = {:p}", (void*)*phWorkerThread);
-	}
-
 
 	if (ppEngine)
 	{
 		*ppEngine = new IXHV2ENGINE;
-		LOG_TRACE_XLIVE("- hv2Engine = {:p}", (void*)*ppEngine);
+		LOG_TRACE(voice_log, "XHVCreateEngine() - created engine");
 
-		return ERROR_SUCCESS;
+		return S_OK;
 	}
 
-	return ERROR_FUNCTION_FAILED;
+	return E_INVALIDARG;
 }
 
 BOOL IXHV2ENGINE::IsHeadsetPresent(VOID *pThis, DWORD dwUserIndex) {
-	//LOG_TRACE_XLIVE("IXHV2Engine::IsHeadsetPresent");
+	//LOG_TRACE("IsHeadsetPresent()");
 
 	return H2Config_voice_chat
 #if COMPILE_WITH_VOICE
-		&& p_CAudioHandler->audioDevices->IsDeviceAvailable(Input)
+		&& pAudioHandler->audioDevices->IsDeviceAvailable(Input)
+		&& pAudioHandler->audioDevices->IsDeviceAvailable(Output)
 #endif
 		;
 }
 
 BOOL IXHV2ENGINE::isRemoteTalking(VOID *pThis, XUID xuid) {
-	//LOG_TRACE_XLIVE("IXHV2Engine::isRemoteTalking");
+	//LOG_TRACE(voice_log, "IXHV2Engine::isRemoteTalking()");
 
 	return H2Config_voice_chat && xuidIsTalkingMap[xuid];
 }
 
 BOOL IXHV2ENGINE::IsLocalTalking(VOID *pThis, DWORD dwUserIndex) {
-	//LOG_TRACE_XLIVE("IXHV2Engine::isTalking(dwUserIndex = %d)", dwUserIndex);
+	//LOG_TRACE(voice_log, "IXHV2Engine::isTalking());
 	//check the xuid map
 	XUID id = usersSignInInfo[dwUserIndex].xuid;
 	BOOL isTalking = xuidIsTalkingMap[id];
 	return H2Config_voice_chat 
 #if COMPILE_WITH_VOICE
-		&& p_CAudioHandler->audioDevices->IsDeviceAvailable(Input) ? xuidIsTalkingMap[id] : false;
+		&& pAudioHandler->audioDevices->IsDeviceAvailable(Input) ? xuidIsTalkingMap[id] : false;
 #endif
 	;
 }
 
 LONG IXHV2ENGINE::AddRef(/*CXHVEngine*/ VOID *pThis)
 {
-	LOG_TRACE_XLIVE("IXHV2Engine::AddRef");
+	LOG_TRACE(voice_log, "IXHV2Engine::AddRef");
 	return S_OK;
 }
 
 LONG IXHV2ENGINE::Release(/*CXHVEngine*/ VOID *pThis)
 {
-	LOG_TRACE_XLIVE("IXHV2Engine::Release");
+	LOG_TRACE(voice_log, "IXHV2Engine::Release");
 
 	if (!remotetalkers.empty())
 		remotetalkers.clear();
 
 #if COMPILE_WITH_VOICE
 	if (H2Config_voice_chat)
-		delete p_CAudioHandler;
+		delete pAudioHandler;
 #endif
 
-	IXHV2ENGINE* pIXHV2Engine = reinterpret_cast<IXHV2ENGINE*>(pThis);
-	delete pIXHV2Engine;
+	delete this;
 
 	return S_OK;
 }
@@ -144,7 +132,7 @@ HRESULT IXHV2ENGINE::StopLocalProcessingModes(VOID *pThis, DWORD dwUserIndex, /*
 
 HRESULT IXHV2ENGINE::StartRemoteProcessingModes(VOID *pThis, XUID a1, int a2, int a3)
 {
-	LOG_TRACE_GAME("[h2mod-voice] StartRemoteProcessingModes XUID: {}", a1);
+	LOG_TRACE(voice_log, "[h2mod-voice] StartRemoteProcessingModes XUID: {}", a1);
 	return S_OK;
 }
 
@@ -152,16 +140,14 @@ HRESULT IXHV2ENGINE::StartRemoteProcessingModes(VOID *pThis, XUID a1, int a2, in
 
 HRESULT IXHV2ENGINE::StopRemoteProcessingModes(VOID *pThis, XUID xuidRemoteTalker, /*CONST PXHV_PROCESSING_MODE*/ VOID* a2, int a3)
 {
-	LOG_TRACE_GAME("[h2mod-voice] StopRemoteProcessingModes xuidRemoteTalker: {}", xuidRemoteTalker);
+	LOG_TRACE(voice_log, "[h2mod-voice] StopRemoteProcessingModes xuidRemoteTalker: {}", xuidRemoteTalker);
 	return S_OK;
 }
 
-
-
 HRESULT IXHV2ENGINE::NullSub(VOID *pThis, int a1)
 {
-	LOG_TRACE_XLIVE("IXHV2Engine::NullSub  (a1 = {:x})", a1);
-	return ERROR_SUCCESS;
+	LOG_TRACE(voice_log, "IXHV2Engine::NullSub  (a1 = {:x})", a1);
+	return S_OK;
 }
 
 
@@ -171,20 +157,16 @@ HRESULT IXHV2ENGINE::RegisterLocalTalker(VOID *pThis, DWORD dwUserIndex)
 	return S_OK;
 }
 
-
-
 HRESULT IXHV2ENGINE::UnregisterLocalTalker(VOID *pThis, DWORD dwUserIndex)
 {
-	//LOG_TRACE_XLIVE("IXHV2Engine::UnregisterLocalTalker  (dwUserIndex = %d)",
-	//	dwUserIndex);
+	//LOG_TRACE(voice_log, "UnregisterLocalTalker()");
 
 	return S_OK;
 }
 
-
 HRESULT IXHV2ENGINE::RegisterRemoteTalker(VOID *pThis, XUID a1, LPVOID reserved, LPVOID reserved2, LPVOID reserved3)
 {
-	//LOG_TRACE_GAME_N("[h2mod-voice] IXHV2Engine::RegisterRemoteTalker XUID: %lld", a1);
+	LOG_TRACE(voice_log, "RegisterRemoteTalker XUID: {}", a1);
 	remotetalkers.push_back(a1);
 	return S_OK;
 }
@@ -192,8 +174,7 @@ HRESULT IXHV2ENGINE::RegisterRemoteTalker(VOID *pThis, XUID a1, LPVOID reserved,
 
 HRESULT IXHV2ENGINE::UnregisterRemoteTalker(VOID *pThis, XUID xuid)
 {
-	//LOG_TRACE_GAME_N("[h2mod-voice] IXHV2Engine::UnregisterRemoteTalker  (a1 = %X, a2 = %X)",
-	//	a1);
+	LOG_TRACE(voice_log, "UnregisterRemoteTalker() XUID: {}", xuid);
 
 	for (auto it = remotetalkers.begin(); it != remotetalkers.end(); ++it)
 	{
@@ -210,7 +191,7 @@ HRESULT IXHV2ENGINE::UnregisterRemoteTalker(VOID *pThis, XUID xuid)
 HRESULT IXHV2ENGINE::GetRemoteTalkers(VOID *pThis, PDWORD pdwRemoteTalkersCount, PXUID pxuidRemoteTalkers)
 {
 
-	//LOG_TRACE_GAME_N("[h2mod-voice] - GetRemoteTalkers");
+	//LOG_TRACE(voice_log, "[h2mod-voice] - GetRemoteTalkers");
 	*pdwRemoteTalkersCount = remotetalkers.size();
 	int i = 0;
 	for (auto it = remotetalkers.begin(); it != remotetalkers.end(); ++it)
@@ -224,16 +205,16 @@ HRESULT IXHV2ENGINE::GetRemoteTalkers(VOID *pThis, PDWORD pdwRemoteTalkersCount,
 
 DWORD IXHV2ENGINE::GetDataReadyFlags(VOID *pThis)
 {
-	int ret = 0x00;
+	LOG_TRACE(voice_log, "GetDataReadyFlags()");
+	int ret = 0;
 
 	if (H2Config_voice_chat && xuidIsTalkingMap[usersSignInInfo[0].xuid])
 	{
-		//LOG_TRACE_GAME_N("[h2mod-voice] GetDataReadyFlags - called");
-		ret = 0x1;
+		//LOG_TRACE(voice_log, GetDataReadyFlags()");
+		ret |= 1 << 0; // only 1 user with GFWL
 	}
-	// 0x1 = user 0
-	// 0xF = user 0-3
-	// 0xFF = user 0-7
+	// 0x01 = user 0
+	// 0x0F = user 0-3
 	return ret;
 }
 
@@ -242,6 +223,9 @@ HRESULT IXHV2ENGINE::GetLocalChatData(VOID *pThis, DWORD dwUserIndex, PBYTE pbDa
 {
 	// The game uses 10 bytes / voice packet, so we need to split them
 	// To verify who is talking, add the XUID of the local talker in the first packet
+	
+	memset(pbData, 0, *pdwSize);
+
 	if (H2Config_voice_chat)
 	{
 		*pdwPackets = *pdwSize / XHV_VOICECHAT_MODE_PACKET_SIZE;
@@ -266,8 +250,6 @@ HRESULT IXHV2ENGINE::GetLocalChatData(VOID *pThis, DWORD dwUserIndex, PBYTE pbDa
 	return E_PENDING;
 }
 
-
-
 HRESULT IXHV2ENGINE::SetPlaybackPriority(VOID *pThis, XUID xuidRemoteTalker, DWORD dwUserIndex, int a3)
 {
 	return S_OK;
@@ -276,8 +258,8 @@ HRESULT IXHV2ENGINE::SetPlaybackPriority(VOID *pThis, XUID xuidRemoteTalker, DWO
 
 HRESULT IXHV2ENGINE::SubmitIncomingChatData(VOID *pThis, XUID xuidRemoteTalker, const BYTE* pbData, PDWORD pdwSize)
 {
-	//LOG_TRACE_GAME_N("[h2mod-voice][SubmitIncomingChatData] - XUID in packet: %lld", test);
-	//LOG_TRACE_GAME_N("[h2mod-voice][SubmitIncomingChatData] - Trying to unmute tsID: %i  xuid: %lld", tsID, xuidRemoteTalker);
+	//LOG_TRACE(voice_log, "SubmitIncomingChatData() - XUID in packet: %lld", test);
+	//LOG_TRACE(voice_log, "SubmitIncomingChatData() - Trying to unmute xuid: %lld", xuidRemoteTalker);
 
 	return S_OK;
 }
@@ -286,7 +268,6 @@ HRESULT IXHV2ENGINE::SubmitIncomingChatData(VOID *pThis, XUID xuidRemoteTalker, 
 IXHV2ENGINE::IXHV2ENGINE()
 {
 	funcTablePtr = &(funcPtr[0]);
-
 
 	funcPtr[0] = (HV2FUNCPTR)&IXHV2ENGINE::AddRef;
 	funcPtr[1] = (HV2FUNCPTR)&IXHV2ENGINE::Release;

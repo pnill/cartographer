@@ -3,36 +3,34 @@
 
 #include "AudioDevices.h"
 #include "AudioHandler.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+
+#include "H2MOD/Modules/Startup/Startup.h"
 
 CAudioDevices::CAudioDevices()
 {
-	if (h2mod->Server)
-		return;
-
-	m_totalDevices = Pa_GetDeviceCount();
-	if (m_totalDevices < 0)
+	m_deviceCount = Pa_GetDeviceCount();
+	if (m_deviceCount < 0)
 	{
-		LOG_TRACE(CAudioHandler::logger, "Pa_GetDeviceCount returned {:x}", m_totalDevices);
-		m_CAudioDeviceErr = m_totalDevices;
+		LOG_TRACE(voice_log, "Pa_GetDeviceCount returned {:x}", m_deviceCount);
+		m_lastDeviceErr = m_deviceCount;
 		return;
 	}
 
-	m_audioDeviceInfoArray = new DeviceInfo[m_totalDevices];
+	m_audioDeviceInfoArray = new DeviceInfo[m_deviceCount];
 
-	for (int i = 0; i < m_totalDevices; i++)
+	for (int i = 0; i < m_deviceCount; i++)
 	{
-		const PaDeviceInfo* deviceInfo;
+		const PaDeviceInfo* deviceInfo = nullptr;
 		deviceInfo = Pa_GetDeviceInfo(i);
 
 		if (i == Pa_GetDefaultInputDevice())
 		{
-			LOG_TRACE(CAudioHandler::logger, "Found default input device, index: {}", i);
+			LOG_TRACE(voice_log, "Found default input device, index: {}", i);
 			m_defaultInputDeviceIndex = i;
 		}
 		else if (i == Pa_GetDefaultOutputDevice())
 		{
-			LOG_TRACE(CAudioHandler::logger, "Found default output device, index: {}", i);
+			LOG_INFO(voice_log, "Found default output device, index: {}", i);
 			m_defaultOutputDeviceIndex = i;
 		}
 
@@ -52,14 +50,20 @@ CAudioDevices::CAudioDevices()
 	}
 
 	if (!IsDeviceAvailable(Input))
-		LOG_TRACE(CAudioHandler::logger, "No audio input device found. Voice chat will not work!");
+		LOG_ERROR(voice_log, "No audio input device found. Voice chat will not work!");
 
 	if (!IsDeviceAvailable(Output))
-		LOG_TRACE(CAudioHandler::logger, "No audio output device found.");
+		LOG_ERROR(voice_log, "No audio output device found.");
 
-	LOG_TRACE(CAudioHandler::logger, "Total numver of audio devices = {}", m_totalDevices);
-	LOG_TRACE(CAudioHandler::logger, "CAudioDevices: Successful initialization!");
+	LOG_INFO(voice_log, "Total numver of audio devices = {}", m_deviceCount);
+	LOG_INFO(voice_log, "CAudioDevices: Successful initialization!");
 }
+
+CAudioDevices::~CAudioDevices()
+{
+	delete[] m_audioDeviceInfoArray;
+}
+
 
 void CAudioDevices::SelectAudioOutput()
 {
@@ -69,15 +73,6 @@ void CAudioDevices::SelectAudioOutput()
 void CAudioDevices::SelectAudioInput()
 {
 
-}
-
-
-CAudioDevices::~CAudioDevices()
-{
-	if (h2mod->Server)
-		return;
-
-	delete[] m_audioDeviceInfoArray;
 }
 
 #endif

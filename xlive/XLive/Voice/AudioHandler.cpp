@@ -3,31 +3,28 @@
 
 #include "AudioHandler.h"
 
-h2log* CAudioHandler::logger = nullptr;
+#include "H2MOD\Modules\Startup\Startup.h"
 
-CAudioHandler::CAudioHandler(CAudioDevices* pAudioDevice)
+CAudioHandler::CAudioHandler()
 {
-	if (logger == nullptr)
-		logger = h2log::create_console("PortAudio");
 	m_CAudioErr = Pa_Initialize();
 
 	if (m_CAudioErr != PaErrorCode::paNoError)
 	{
-		LOG_TRACE(logger, "Failed to initialize! Error code: {}", m_CAudioErr);
+		LOG_ERROR(voice_log, "AudioHandler failed to initialize! Error code: {}", m_CAudioErr);
 		return;
 	}
 
-	LOG_TRACE(logger, "PostAudio version: {:x}", Pa_GetVersion());
-	LOG_TRACE(logger, "Version text: {}", Pa_GetVersionInfo()->versionText);
+	LOG_INFO(voice_log, "PostAudio version: {:x}", Pa_GetVersion());
+	LOG_INFO(voice_log, "Version text: {}", Pa_GetVersionInfo()->versionText);
 
-	audioDevices = pAudioDevice = new CAudioDevices;
+	audioDevices = new CAudioDevices;
 
-	if (audioDevices->GetAudioClassError() != paNoError) {
-		LOG_TRACE(logger, "CAudioDevices object failed to initialize, aborting.");
+	if (audioDevices->GetAudioInterfaceError() != paNoError) {
+		LOG_ERROR(voice_log, "CAudioDevices failed to initialize, aborting.");
 		return;
 	}
 }
-
 
 CAudioHandler::~CAudioHandler()
 {
@@ -35,6 +32,6 @@ CAudioHandler::~CAudioHandler()
 
 	PaError err = Pa_Terminate();
 	if (err != PaErrorCode::paNoError)
-		LOG_TRACE(logger, "Pa_Terminate failed, error code: {}", err);
+		LOG_TRACE(voice_log, "Pa_Terminate failed, error code: {}", err);
 }
 #endif

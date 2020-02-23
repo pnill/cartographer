@@ -325,6 +325,7 @@ bool engine_basic_init()
 	DWORD* flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
 	SecureZeroMemory(flags_array, startup_flags::count * sizeof(DWORD)); // should be zero initalized anyways but the game does it
 
+	H2Config_voice_chat = false;
 	flags_array[startup_flags::disable_voice_chat] = 1; // disables voice chat (XHV engine)
 	flags_array[startup_flags::nointro] = H2Config_skip_intro;
 
@@ -381,10 +382,13 @@ bool engine_basic_init()
 			    shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
 				NopFill(h2mod->GetAddress(0x269FD5), 8);
 			}
+#if COMPILE_WITH_VOICE
 			else if (_wcsicmp(cmd_line_arg, L"-voicechat") == 0)
 			{
 				flags_array[startup_flags::disable_voice_chat] = 0;
+				H2Config_voice_chat = true;
 			}
+#endif
 #ifdef _DEBUG
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
 				int flag_id = _wtol(&cmd_line_arg[10]);

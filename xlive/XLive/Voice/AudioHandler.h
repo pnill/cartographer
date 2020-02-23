@@ -2,7 +2,6 @@
 
 #if COMPILE_WITH_VOICE
 
-
 #include "AudioDevices.h"
 
 /* Select sample format. */
@@ -31,16 +30,12 @@ typedef unsigned char SAMPLE;
 class CAudioHandler
 {
 public:
-	CAudioHandler(CAudioDevices*);
+	CAudioHandler();
+	~CAudioHandler();
 
 	CAudioDevices* audioDevices;
 	PaError m_CAudioErr;
 	
-
-	~CAudioHandler();
-
-	static h2log* logger;
-
 private:
 	PaStreamParameters  inputParameters, outputParameters;
 	PaStream*           stream;
