@@ -64,6 +64,7 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 
 	if (lpFrom->sin_addr.s_addr == H2Config_master_ip)
 	{
+		lpFrom->sin_addr.s_addr = INADDR_BROADCAST;
 		return ERROR_SUCCESS;
 	}
 
