@@ -94,9 +94,6 @@ inline void BuildVertex(D3DXVECTOR4 xyzrhw, D3DCOLOR color, CVertexList* vertexL
 	vertexList[index].dColor = color;
 }
 
-BOOL bIsCreated, bNeedsFlush;
-
-DWORD dwOldFVF;
 LPD3DXSPRITE pSprite;
 
 using namespace std::chrono;
@@ -114,7 +111,7 @@ void frameTimeManagement() {
 	if (H2Config_fps_limit > 0 || isMinimized) {
 		std::this_thread::sleep_until(nextFrame);
 
-		auto desiredTime = isMinimized ? minimizedDesiredTime : desiredRenderTime;
+		auto& desiredTime = isMinimized ? minimizedDesiredTime : desiredRenderTime;
 
 		auto frameCount = duration<long long, std::micro>(
 			(1 + (duration_cast<duration<long long, std::micro>>(high_resolution_clock::now() - nextFrame) / duration_cast<duration<long long, std::micro>>(desiredTime)))
@@ -493,10 +490,6 @@ int WINAPI XLiveRender()
 		{
 			D3DVIEWPORT9 pViewport;
 			pDevice->GetViewport(&pViewport);
-			//pViewport
-			/*char textttt[255];
-			sprintf(textttt, "x:%d, y:%d", pViewport.Width, pViewport.Height);
-			drawText(100, 50, COLOR_WHITE, textttt, smallFont);*/
 
 			D3DDEVICE_CREATION_PARAMETERS cparams;
 			pDevice->GetCreationParameters(&cparams);

@@ -956,8 +956,6 @@ void InitH2Tweaks() {
 	PatchCall(h2mod->GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 
-	// physics patches 
-
 	addDebugText("End Startup Tweaks.");
 }
 
@@ -1178,7 +1176,7 @@ void H2Tweaks::toggleUncappedCampaignCinematics(bool toggle) {
 }
 
 void H2Tweaks::toggleAiMp(bool toggle) {
-	WriteValue<BYTE>(h2mod->GetAddress(0x30E684, 0x2B93F4), toggle ? JMP_RAW_BYTE : JNZ_RAW_BYTE);
+	WriteValue<BYTE>(h2mod->GetAddress(0x30E684, 0x2B93F4), toggle ? JMP_OP_CODE : JNZ_OP_CODE);
 }
 
 void H2Tweaks::applyMeleePatch(bool toggle)

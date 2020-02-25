@@ -300,7 +300,7 @@ void CustomNetwork::applyNetworkHooks() {
 	//receive_packet_method = (receive_packet)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E82E0, 0x1CA2A3), (BYTE*)receivePacket, 11);
 
 	if (h2mod->Server) {
-		p_decode_text_chat_packet = (decode_text_chat_packet_)DetourFunc(h2mod->GetAddress<BYTE*>(0x0, 0x1CD8A4), (BYTE*)decode_text_chat_packet, 12);
+		p_decode_text_chat_packet = (decode_text_chat_packet_)DetourFunc(h2mod->GetAddress<BYTE*>(0, 0x1CD8A4), (BYTE*)decode_text_chat_packet, 12);
 	}
 
 	CustomPackets::ApplyGamePatches();

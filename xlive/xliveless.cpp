@@ -8,34 +8,18 @@
 #include "XLive\ServerList\ServerList.h"
 #include "XLive\achievements\XAchievements.h"
 
-//#include "XLive\Globals.h"
-using namespace std;
-
 HANDLE g_dwFakePData = (HANDLE) -2;
 HANDLE g_dwFakeContent = (HANDLE) -2;
 HANDLE g_dwMarketplaceContent = (HANDLE) -2;
-
-WSADATA wsaData;
-
-
-extern CHAR g_profileDirectory[];
 
 extern void InitInstance();
 extern void ExitInstance();
 extern std::wstring dlcbasepath;
 
-
 int dlcinit = 0;
 
-
-#define DEBUG_WAIT 0
-
-
-char filename[1024];
 char str[8192];
 WCHAR strw[8192];
-WCHAR exePath[8192];
-
 
 XMARKETPLACE_CONTENTOFFER_INFO marketplace[100];
 int marketplaceCount = 0;
@@ -177,7 +161,7 @@ BOOL SetDlcBasepath( int num )
 
 
 					// check valid folder
-					wstring wnum;
+					std::wstring wnum;
 					wnum = L"DLC\\";
 					wnum += ffd.cFileName;
 					wnum += L"\\content.xbx";
@@ -304,10 +288,6 @@ BOOL SetDlcBasepath( int num )
 void Check_Overlapped( PXOVERLAPPED pOverlapped )
 {
 	if( !pOverlapped ) return;
-
-
-//	LOG_TRACE_XLIVE( "- async routine" );
-
 
 	if( pOverlapped->hEvent )
 	{
@@ -1401,11 +1381,6 @@ HRESULT WINAPI XLiveProtectData (BYTE * pInBuffer, DWORD dwInDataSize, BYTE * pO
 // #5035: XLiveUnprotectData
 HRESULT WINAPI XLiveUnprotectData (BYTE * pInBuffer, DWORD dwInDataSize, BYTE * pOutBuffer, DWORD * pDataSize, PHANDLE pHandle)
 {
-#if 0
-	while(1)
-		Sleep(1);
-#endif
-
 
 	LOG_TRACE_XLIVE("XLiveUnprotectData  (pInBuffer = {0:p}, dwInDataSize = {1}, pOutBuffer = {2:p}, pDataSize = {3:x}, Handle = {4:p})",
 		(void*)pInBuffer, dwInDataSize, (void*)pOutBuffer, *pDataSize, (void*)pHandle);
@@ -1703,9 +1678,6 @@ DWORD WINAPI TitleExport_XUserFinderUsers(int a1, int a2, int a3, void* a4, unsi
 DWORD WINAPI XLiveGetGuideKey(int pKeyStroke)
 {
     LOG_TRACE_XLIVE("XLiveGetGuideKey(pKeyStroke: {:x})",pKeyStroke);
-
-		// a[0] = x[0]
-		// a[4] = x[4]
 
     return 0;
 }

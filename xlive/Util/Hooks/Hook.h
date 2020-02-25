@@ -1,7 +1,7 @@
 #pragma once
 #define WIN32_LEAN_AND_MEAN
-#define JMP_RAW_BYTE 0xEB
-#define JNZ_RAW_BYTE 0x75 
+#define JMP_OP_CODE 0xEB
+#define JNZ_OP_CODE 0x75 
 
 void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len);
 void RetourFunc(BYTE *src, BYTE *restore, const int len);
