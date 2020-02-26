@@ -604,7 +604,7 @@ DWORD WINAPI XLocatorServiceInitialize(DWORD a1, PHANDLE phLocatorService)
 // 5237: ??
 DWORD WINAPI XLocatorServiceUnInitialize(HANDLE xlocatorhandle)
 {
-	LOG_TRACE_XLIVE("XLocatorServiceUnInitialize(a1 = {:x})", xlocatorhandle);
+	LOG_TRACE_XLIVE("XLocatorServiceUnInitialize(a1 = {})", xlocatorhandle);
 	CloseHandle(xlocatorhandle);
 	return ERROR_SUCCESS;
 }

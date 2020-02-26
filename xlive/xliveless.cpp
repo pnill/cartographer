@@ -756,7 +756,7 @@ HRESULT WINAPI XLiveSignin (PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD 
 // #5303: XStringVerify
 DWORD WINAPI XStringVerify( DWORD dwFlags, const CHAR *szLocale, DWORD dwNumStrings, const STRING_DATA *pStringData, DWORD cbResults, STRING_VERIFY_RESPONSE *pResults, PXOVERLAPPED pOverlapped )
 {
-	LOG_TRACE_XLIVE("XStringVerify  (dwFlags = {0:x}, szLocale = {1:x}, dwNumStrings = {2}, pStringData = {3:p}, cbresults = {4}, pResults = {5:p}, pXOverlapped = {6:p})",
+	LOG_TRACE_XLIVE("XStringVerify  (dwFlags = {0:x}, szLocale = {1}, dwNumStrings = {2}, pStringData = {3:p}, cbresults = {4}, pResults = {5:p}, pXOverlapped = {6:p})",
 		dwFlags, szLocale, dwNumStrings, (void*)pStringData, cbResults, (void*)pResults, (void*)pOverlapped );
 
 
