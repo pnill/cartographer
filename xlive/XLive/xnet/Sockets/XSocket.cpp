@@ -77,7 +77,7 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 
 	if (ret == INVALID_SOCKET)
 	{
-		LOG_ERROR_NETWORK("XSocketCreate() - Invalid socket, last error: ", WSAGetLastError());
+		LOG_ERROR_NETWORK("XSocketCreate() - Invalid socket, last error: {}", WSAGetLastError());
 		delete newXSocket;
 		return ret;
 	}
@@ -287,10 +287,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		inTo->sin_addr.s_addr = H2Config_master_ip;
 		inTo->sin_port = ntohs(H2Config_master_port_relay);
 
-		//LOG_TRACE_NETWORK("XSocketWSASendTo() - Broadcast");
-
 		int result = sendto(xsocket->winSockHandle, lpBuffers->buf, lpBuffers->len, dwFlags, (sockaddr*)lpTo, iTolen);
-
 		return result;
 	}
 

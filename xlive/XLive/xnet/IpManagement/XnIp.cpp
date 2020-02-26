@@ -83,7 +83,7 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 		LOG_TRACE_NETWORK("handleRecvdPacket() - Received secure packet with ip address {:x}, port: {}", htonl(lpFrom->sin_addr.s_addr), htons(lpFrom->sin_port));
 		HandleConnectionPacket(xsocket, connectionPck, lpFrom); // save NAT info and send back a connection packet
 
-		SetLastError(WSAEWOULDBLOCK);
+		WSASetLastError(WSAEWOULDBLOCK);
 		return SOCKET_ERROR;
 	}
 	else
@@ -257,8 +257,8 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 	}
 
 	// do not allow the connection if the received XNADDR is the same with the local one
-	if (memcmp(&localXn.abEnet, pxna->abEnet, sizeof(((XNADDR*)0))->abEnet) == 0
-		&& memcmp(&localXn.abOnline, pxna->abOnline, sizeof(((XNADDR*)0))->abOnline) == 0)
+	if (memcmp(&localXn.abEnet, pxna->abEnet, sizeof(((XNADDR*)0)->abEnet)) == 0
+		&& memcmp(&localXn.abOnline, pxna->abOnline, sizeof(((XNADDR*)0)->abOnline)) == 0)
 	{
 		LOG_INFO_NETWORK("CreateXnIpIdentifier() - the specified XNADDR is the same with the local one, aborting connection.");
 		return WSAEINVAL;
@@ -518,7 +518,7 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 	if (xnIp->isValid(ina))
 	{
 		/* 
-			Mainly for H2v because it has P2P connection even on dedicated servers, if the connect status is checked by the game, it means the connection identifier is stil used
+			Mainly for H2v because it has P2P connection even on dedicated servers, if the connect status is checked by the game, it means the connection identifier is still used
 			This prevents connection info being cleared even if no data has been received from the connection (probably the ports were not forwarded/ no data is sent at all between the peers) 
 		*/
 		ipManager.setTimeConnectionInteractionHappened(ina, timeGetTime()); 
