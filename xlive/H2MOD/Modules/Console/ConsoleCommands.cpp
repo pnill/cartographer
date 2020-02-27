@@ -687,7 +687,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$lognetworksessionoffsets")
 		{
-		NetworkSession::logStructureOffsets();
+			NetworkSession::logStructureOffsets();
 		}
 		else if (firstCommand == "$displayinfos") {
 			std::string str_index = splitCommands[1];
@@ -702,10 +702,9 @@ void ConsoleCommands::handle_command(std::string command) {
 			str_to_print += xuid + std::to_wstring(netsession->membership.player_info[index].identifier);
 			str_to_print += L"\n Netowork Session state: " + std::to_wstring(netsession->local_session_state);
 			output(str_to_print);
-				
 		}
 		else if (firstCommand == "$requestfilename") {
-			CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
+			CustomPackets::sendRequestMapFilename();
 		}
 		else if (firstCommand == "$warpfix") {
 			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
