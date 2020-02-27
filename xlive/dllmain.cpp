@@ -74,6 +74,9 @@ void ExitInstance()
 	delete network_log;
 	delete console_log;
 	delete onscreendebug_log;
+#if COMPILE_WITH_VOICE
+	delete voice_log;
+#endif
 	LeaveCriticalSection(&log_section);
 	DeleteCriticalSection(&log_section);
 #endif

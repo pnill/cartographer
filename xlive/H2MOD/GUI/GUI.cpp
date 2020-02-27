@@ -107,6 +107,12 @@ void frameTimeManagement() {
 	auto p_game_is_minimized = reinterpret_cast<game_is_minimized>(h2mod->GetAddress(0x28729));
 
 	bool isMinimized = p_game_is_minimized();
+
+	static bool initialized = false;
+	if (!initialized) {
+		initialized = true;
+		nextFrame = high_resolution_clock::now();
+	}
 	
 	if (H2Config_fps_limit > 0 || isMinimized) {
 		std::this_thread::sleep_until(nextFrame);
