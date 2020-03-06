@@ -335,8 +335,7 @@ bool engine_basic_init()
 	init_data_checksum_info();
 	runtime_state_init();
 
-	if (H2Config_hiresfix != 0)
-	{
+	if (H2Config_hiresfix) {
 		// HUD text size fix for higher resolutions
 		Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_ptr)DetourFunc(h2mod->GetAddress<BYTE*>(0x264A18), (BYTE*)Video_HUDSizeUpdate_hook, 7);
 
@@ -344,8 +343,7 @@ bool engine_basic_init()
 		sub_671B02_orig = (sub_671B02_ptr)DetourFunc(h2mod->GetAddress<BYTE*>(0x271B02), (BYTE*)sub_671B02_hook, 5);
 	}
 
-	if (H2Config_d3dex != 0)
-	{
+	if (H2Config_d3dex) {
 		flags_array[startup_flags::allow_d3d_ex_version] = 1;
 	}
 
@@ -508,6 +506,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	wcscpy_s(h2mod->GetAddress<wchar_t*>(0x46DA54), 0x40, L"Halo 2 - Project Cartographer"); // WindowName
 	WNDPROC g_WndProc = h2mod->GetAddress<WNDPROC>(0x790E);
 	WriteValue(h2mod->GetAddress(0x46D9D0), g_WndProc); // g_WndProc_ptr
+
 	if (!LOG_CHECK(InitPCCInfo()))
 	{
 		LOG_TRACE_FUNC("Failed to get PCC info / insufficient system resources");
