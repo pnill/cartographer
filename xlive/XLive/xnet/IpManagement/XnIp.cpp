@@ -147,18 +147,26 @@ int CXnIp::sendConnectionRequest(XSocket* xsocket, IN_ADDR connectionIdentifier 
 
 IN_ADDR CXnIp::GetConnectionIdentifierByNat(sockaddr_in* fromAddr)
 {
+	IN_ADDR addrInval;
+	addrInval.s_addr = 0;
+
 	for (int i = 0; i < GetMaxXnConnections(); i++)
 	{
 		XnIp* xnIp = &XnIPs[i];
-		if (sockAddrInEqual(fromAddr, &xnIp->NatAddrSocket1000) 
-			|| sockAddrInEqual(fromAddr, &xnIp->NatAddrSocket1001))
+		if (xnIp->bValid)
 		{
-			return xnIp->connectionIdentifier;
+			// TODO: get rid of H2v only sockets
+			if (sockAddrInEqual(fromAddr, &xnIp->NatAddrSocket1000)
+				|| sockAddrInEqual(fromAddr, &xnIp->NatAddrSocket1001))
+			{
+				if (XNetGetConnectStatus(xnIp->connectionIdentifier) == XNET_CONNECT_STATUS_CONNECTED)
+					return xnIp->connectionIdentifier;
+				else
+					return addrInval; // user is not connected
+			}
 		}
 	}
-
-	IN_ADDR addrInval;
-	addrInval.s_addr = 0;
+	
 	return addrInval;
 }
 
