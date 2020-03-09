@@ -117,7 +117,7 @@ void CXnIp::checkForLostConnections(IN_ADDR connectionIdentifier)
 int CXnIp::sendConnectionRequest(XSocket* xsocket, IN_ADDR connectionIdentifier /* TODO: int reqType */)
 {
 	sockaddr_in sendToAddr;
-	memset(&sendToAddr, 0, sizeof(sockaddr_in));
+	SecureZeroMemory(&sendToAddr, sizeof(sockaddr_in));
 	
 	XnIp* xnIp = &XnIPs[getConnectionIndex(connectionIdentifier)];
 
@@ -127,6 +127,7 @@ int CXnIp::sendConnectionRequest(XSocket* xsocket, IN_ADDR connectionIdentifier 
 		sendToAddr.sin_addr = connectionIdentifier;
 
 		XNetConnectionReqPacket connectionPacket;
+		SecureZeroMemory(&connectionPacket, sizeof(XNetConnectionReqPacket));
 
 		GetLocalXNAddr(&connectionPacket.xnaddr);
 		getRegisteredKeys(&connectionPacket.xnkid, nullptr);
@@ -260,7 +261,7 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 
 	if (memcmp(xnkid, &XnKid, sizeof(XNKID)) != 0)
 	{
-		LOG_INFO_NETWORK("CreateXnIpIdentifier() - the specified XNKID is incorrect!");
+		LOG_INFO_NETWORK("CreateXnIpIdentifier() - the specified XNKID key is incorrect!");
 		return WSAEINVAL;
 	}
 

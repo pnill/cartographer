@@ -22,6 +22,11 @@ char* getNetworkChannelData(int channel_index)
 	return *h2mod->GetAddress<char**>(0x4FADBC, 0x525274) + 248 * channel_index;
 }
 
+const char* getNetworkMessageName(int enumVal) 
+{
+	return network_message_name[enumVal];
+}
+
 bool getNetworkAddressFromNetworkChannel(char* network_channel, network_address* out_addr)
 {
 	typedef bool(__thiscall* get_network_address_from_network_channel)(char*, network_address*);
@@ -177,7 +182,7 @@ void __stdcall handle_out_of_band_message_hook(void *thisx, network_address* add
 	}*/
 
 	/* surprisingly the game doesn't use this too much, pretty much for request-join and tme-sync packets */
-	LOG_TRACE_NETWORK("handle_out_of_band_message_hook() - Received packet type: {} from peer index: {}", message_type, NetworkSession::getPeerIndexFromNetworkAddress(address));
+	LOG_TRACE_NETWORK("handle_out_of_band_message_hook() - Received message {} from peer index: {}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(address));
 
 	p_handle_out_of_band_message(thisx, address, message_type, a4, packet);
 }

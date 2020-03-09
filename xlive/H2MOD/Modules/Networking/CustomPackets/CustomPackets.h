@@ -157,6 +157,7 @@ struct s_text_chat
 };
 #pragma pack(pop)
 
+const char* getNetworkMessageName(int enumVal);
 
 void register_packet_impl(void *, int, char*, int, int, int, void*, void*, void*);
 namespace CustomPackets

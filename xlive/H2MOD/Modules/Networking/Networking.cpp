@@ -16,10 +16,6 @@ extern XSocket* game_network_message_gateway_socket_1001;
 
 CustomNetwork *network = new CustomNetwork;
 
-const char* getNetworkMessageName(int enumVal) {
-	return network_message_name[enumVal];
-}
-
 void __cdecl request_write(bitstream* stream, int a2, int a3) {
 	stream->data_encode_integer("identifier", *(DWORD *)a3, 32);
 	stream->data_encode_integer("flags", *(DWORD *)(a3 + 4), 8);
