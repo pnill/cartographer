@@ -108,7 +108,7 @@ void CXnIp::checkForLostConnections(IN_ADDR connectionIdentifier)
 {
 	XnIp* xnIp = &XnIPs[getConnectionIndex(connectionIdentifier)];
 	if (xnIp->isValid(connectionIdentifier)
-		&& timeGetTime() - xnIp->lastConnectionInteractionTime > 15 * 1000)
+		&& timeGetTime() - xnIp->lastConnectionInteractionTime >= 15 * 1000)
 	{
 		UnregisterXnIpIdentifier(xnIp->connectionIdentifier);
 	}
@@ -129,7 +129,7 @@ int CXnIp::sendConnectionRequest(XSocket* xsocket, IN_ADDR connectionIdentifier 
 		XNetConnectionReqPacket connectionPacket;
 		SecureZeroMemory(&connectionPacket, sizeof(XNetConnectionReqPacket));
 
-		GetLocalXNAddr(&connectionPacket.xnaddr);
+		XNetGetTitleXnAddr(&connectionPacket.xnaddr);
 		getRegisteredKeys(&connectionPacket.xnkid, nullptr);
 		connectionPacket.ConnectPacketIdentifier = /* reqType */ connectPacketIdentifier;
 
@@ -230,7 +230,7 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetConnectionReqPacket* co
 			// TODO: handle dynamically
 			if (!sockAddrInIsNull(&xnIp->NatAddrSocket1000) 
 				&& !sockAddrInIsNull(&xnIp->NatAddrSocket1001))
-				xnIp->xnetstatus = XNET_CONNECT_STATUS_CONNECTED; // if we have the NAT data for each port, set the status to CONNECTED to prevent spamming xnet connection packets
+				xnIp->xnetstatus = XNET_CONNECT_STATUS_CONNECTED; // if we have the NAT data for each port, set the status to CONNECTED
 			else
 				xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING;
 
@@ -238,7 +238,7 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetConnectionReqPacket* co
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("HandleConnectionPacket() - secure connection couldn't be established!");
+		LOG_TRACE_NETWORK("HandleConnectionPacket() - secure connection cannot be established!");
 	}
 }
 
@@ -255,7 +255,12 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 	bool firstUnusedConnectionIndexFound = false;
 
 	XNADDR localXn;
-	GetLocalXNAddr(&localXn);
+	if (!GetLocalXNAddr(&localXn))
+	{
+		LOG_TRACE_NETWORK("CreateXnIpIdentifier() - XNADDR information is not populated!");
+		return WSAEINVAL;
+	}
+
 	XNKID XnKid;
 	getRegisteredKeys(&XnKid, nullptr);
 
@@ -309,7 +314,7 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 				std::uniform_int_distribution<int> dist(1, 255);
 
 				XnIp* newXnIp = &XnIPs[firstUnusedConnectionIndex];
-				memset(newXnIp, 0, sizeof(XnIp));
+				SecureZeroMemory(newXnIp, sizeof(XnIp));
 
 				newXnIp->xnkid = *xnkid;
 				newXnIp->xnaddr = *pxna;
@@ -323,9 +328,9 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 
 				newXnIp->xnetstatus = XNET_CONNECT_STATUS_IDLE;
 				newXnIp->connectionIdentifier.s_addr = htonl(firstUnusedConnectionIndex | randIdentifier);
-				newXnIp->bValid = true;
-
 				setTimeConnectionInteractionHappened(newXnIp->connectionIdentifier, timeGetTime());
+
+				newXnIp->bValid = true;
 
 				return ERROR_SUCCESS;
 			}
@@ -347,15 +352,12 @@ void CXnIp::UnregisterXnIpIdentifier(const IN_ADDR ina)
 	if (xnIp->isValid(ina))
 	{
 		LOG_INFO_NETWORK("UnregisterXnIpIdentifier() - Unregistered connection index: {}, identifier: {:x}", getConnectionIndex(ina), xnIp->connectionIdentifier.s_addr);
-		memset(xnIp, 0, sizeof(XnIp));
+		SecureZeroMemory(xnIp, sizeof(XnIp));
 	}
 }
 
 void CXnIp::UnregisterLocalConnectionInfo()
 {
-	if (!localUser.bValid)
-		return;
-
 	SecureZeroMemory(&localUser, sizeof(XnIp));
 }
 
@@ -396,10 +398,8 @@ BOOL CXnIp::GetLocalXNAddr(XNADDR* pxna)
 	if (localUser.bValid)
 	{
 		*pxna = localUser.xnaddr;
-		LOG_INFO_NETWORK("GetLocalXNAddr() - XNADDR: {:x}", pxna->ina.s_addr);
 		return TRUE;
 	}
-	//LOG_INFO_NETWORK("GetLocalXNADDR(): Local user network information not populated yet.");
 
 	return FALSE;
 }
@@ -468,8 +468,8 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 		|| pxnkid == nullptr)
 		return WSAEINVAL;
 
-	memset(pxna, 0, sizeof(XNADDR));
-	memset(pxnkid, 0, sizeof(XNKID));
+	SecureZeroMemory(pxna, sizeof(XNADDR));
+	SecureZeroMemory(pxnkid, sizeof(XNKID));
 
 	XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(ina)];
 	
@@ -541,9 +541,13 @@ DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pAddr)
 {
 	if (pAddr)
 	{
-		ipManager.GetLocalXNAddr(pAddr);
+		if (ipManager.GetLocalXNAddr(pAddr))
+			return XNET_GET_XNADDR_ETHERNET;
+		else
+			return XNET_GET_XNADDR_PENDING;
 	}
-	return XNET_GET_XNADDR_STATIC | XNET_GET_XNADDR_ETHERNET;
+
+	return XNET_GET_XNADDR_PENDING;
 }
 
 
