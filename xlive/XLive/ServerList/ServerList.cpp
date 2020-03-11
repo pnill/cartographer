@@ -390,13 +390,6 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 }
 
-DWORD WINAPI XLocatorServerUnAdvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
-{
-	if (userSignedOnline(dwUserIndex))
-		std::thread(RemoveServer, pOverlapped).detach();
-	return S_OK;
-}
-
 void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
 {
 	CURL *curl;
@@ -513,9 +506,23 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
 {
 	if (userSignedOnline(dwUserIndex))
+	{
 		std::thread(AddServer, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
+		return HRESULT_FROM_WIN32(ERROR_IO_PENDING);
+	}
+	else
+		return -1;
+}
 
-	return S_OK;
+DWORD WINAPI XLocatorServerUnAdvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
+{
+	if (userSignedOnline(dwUserIndex))
+	{
+		std::thread(RemoveServer, pOverlapped).detach();
+		return HRESULT_FROM_WIN32(ERROR_IO_PENDING);
+	}
+	else
+		return -1;
 }
 
 // 5233: ??
