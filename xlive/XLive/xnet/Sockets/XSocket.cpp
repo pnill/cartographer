@@ -154,7 +154,11 @@ int WINAPI XSocketGetPeerName(SOCKET s, struct sockaddr *name, int *namelen)
 {
 	LOG_TRACE_NETWORK("XSocketGetPeerName()");
 	XSocket* xsocket = (XSocket*)s;
-	return getpeername(xsocket->winSockHandle, name, namelen);
+
+	if (xsocket->isTCP())
+		return getpeername(xsocket->winSockHandle, name, namelen);
+	else
+		return WSAENOTCONN;
 }
 
 
@@ -165,7 +169,10 @@ int WINAPI XSocketConnect(SOCKET s, const struct sockaddr *name, int namelen)
 	LOG_TRACE_NETWORK("XSocketConnect  (socket = {0:x}, name = {1:p}, namelen = {2})",
 		xsocket->winSockHandle, (void*)name, namelen);
 
-	return connect(xsocket->winSockHandle, name, namelen);
+	if (xsocket->isTCP())
+		return connect(xsocket->winSockHandle, name, namelen);
+	else
+		return SOCKET_ERROR;
 }
 
 
@@ -507,7 +514,7 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 
 	u_short port = (((struct sockaddr_in*)name)->sin_port);
 
-	memcpy(&xsocket->socketAddress, name, sizeof(sockaddr_in));
+	memcpy(&xsocket->name, name, sizeof(sockaddr_in));
 
 	if (htons(port) == 1000) {
 		game_network_data_gateway_socket_1000 = xsocket;
