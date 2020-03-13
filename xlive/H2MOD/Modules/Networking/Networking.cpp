@@ -215,10 +215,10 @@ bool __stdcall join_game(void* thisptr, int a2, int a3, XNKID* xnkid, XNKEY* xnk
 	return pjoin_game(thisptr, a2, a3, xnkid, xnkey, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 
-typedef bool(__cdecl* decode_text_chat_packet_)(void* container, int a2, s_text_chat* data);
+typedef bool(__cdecl* decode_text_chat_packet_)(bitstream* container, int a2, s_text_chat* data);
 decode_text_chat_packet_ p_decode_text_chat_packet;
 
-bool __cdecl decode_text_chat_packet(void* container, int a2, s_text_chat* data)
+bool __cdecl decode_text_chat_packet(bitstream* container, int a2, s_text_chat* data)
 {
 	bool ret = p_decode_text_chat_packet(container, a2, data);
 

@@ -104,13 +104,16 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 	}
 }
 
-void CXnIp::checkForLostConnections(IN_ADDR connectionIdentifier)
+void CXnIp::checkForLostConnections()
 {
-	XnIp* xnIp = &XnIPs[getConnectionIndex(connectionIdentifier)];
-	if (xnIp->isValid(connectionIdentifier)
-		&& timeGetTime() - xnIp->lastConnectionInteractionTime >= 15 * 1000)
+	for (int i = 0; i < GetMaxXnConnections(); i++)
 	{
-		UnregisterXnIpIdentifier(xnIp->connectionIdentifier);
+		XnIp* xnIp = &XnIPs[i];
+		if (xnIp->bValid
+			&& timeGetTime() - xnIp->lastConnectionInteractionTime >= 15 * 1000)
+		{
+			UnregisterXnIpIdentifier(xnIp->connectionIdentifier);
+		}
 	}
 }
 
@@ -278,6 +281,8 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 		return WSAEINVAL;
 	}
 
+	checkForLostConnections();
+
 	// check if the user is already in the system
 	for (int i = 0; i < GetMaxXnConnections(); i++)
 	{
@@ -292,12 +297,6 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 
 			return ERROR_SUCCESS;
 		}
-
-		/*
-			We check for connections that have not received any packets or XNetGetConnectStatus hasn't been called for some connections in the last 15 seconds, then proceed to create a new identifier
-			to prevent people from failing to connect
-		*/
-		checkForLostConnections(XnIPs[i].connectionIdentifier);
 
 		if (XnIPs[i].bValid == false && firstUnusedConnectionIndexFound == false)
 		{
@@ -328,9 +327,9 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 
 				newXnIp->xnetstatus = XNET_CONNECT_STATUS_IDLE;
 				newXnIp->connectionIdentifier.s_addr = htonl(firstUnusedConnectionIndex | randIdentifier);
-				setTimeConnectionInteractionHappened(newXnIp->connectionIdentifier, timeGetTime());
 
 				newXnIp->bValid = true;
+				setTimeConnectionInteractionHappened(newXnIp->connectionIdentifier, timeGetTime());
 
 				return ERROR_SUCCESS;
 			}
@@ -504,13 +503,16 @@ int WINAPI XNetConnect(const IN_ADDR ina)
 	{
 		if (xnIp->xnetstatus == XNET_CONNECT_STATUS_IDLE)
 		{
-			// TODO: handle dinamically, so it can be used by other games too
-			extern XSocket* game_network_data_gateway_socket_1000; // used for game data
-			extern XSocket* game_network_message_gateway_socket_1001; // used for messaging like connection requests
-			ipManager.sendConnectionRequest(game_network_data_gateway_socket_1000, xnIp->connectionIdentifier);
-			ipManager.sendConnectionRequest(game_network_message_gateway_socket_1001, xnIp->connectionIdentifier);
-			
-			xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING;
+			for (auto sockIt : ipManager.SocketPtrArray)
+			{
+				// TODO: handle dinamically, so it can be used by other games too
+				if (sockIt->getNetworkSocketPort() == 1000 ||
+					sockIt->getNetworkSocketPort() == 1001)
+				{
+					ipManager.sendConnectionRequest(sockIt, ina);
+					xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING;
+				}
+			}
 		}
 
 		return ERROR_SUCCESS;

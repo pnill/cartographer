@@ -189,6 +189,6 @@ struct __declspec(align(8)) network_observer
 	DWORD field_75C4;
 
 	int getObserverState(int observerIndex) { return observers[observerIndex].unk_state; };
-	void sendNetworkMessage(int unk_index, int observer_index, bool send_out_of_band, int type, size_t size, void* data);
+	void sendNetworkMessage(int unk_index, int observer_index, bool send_out_of_band, int type, int size, void* data);
 };
 static_assert(sizeof(network_observer) == 0x75C8, "Invalid network_observer size");

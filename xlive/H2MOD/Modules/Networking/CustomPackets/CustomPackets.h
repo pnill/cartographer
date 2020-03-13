@@ -55,7 +55,7 @@ enum e_network_message_types
 	test,
 	//custom packets bellow
 	request_map_filename,
-	map_file_name,
+	custom_map_filename,
 	team_change,
 	unit_grenades,
 

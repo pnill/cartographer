@@ -53,8 +53,8 @@ void bitstream::data_encode_bool(char* name, bool a3)
 
 bool bitstream::data_decode_bool(char* name)
 {
-	typedef bool(__thiscall* data_decode_bool_ptr)(bitstream* thisx, char* name);
-	auto p_data_decode_bool = h2mod->GetAddress<data_decode_bool_ptr>(0xD1F47, 0xCE501);
+	typedef bool(__thiscall* data_decode_bool_def)(bitstream* thisx, char* name);
+	auto p_data_decode_bool = h2mod->GetAddress<data_decode_bool_def>(0xD1F47, 0xCE501);
 	return p_data_decode_bool(this, name);
 }
 

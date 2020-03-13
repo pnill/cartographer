@@ -93,7 +93,7 @@ void register_custom_packets(void* network_messages)
 	register_packet_impl(network_messages, request_map_filename, "request-map-filename", 0, sizeof(s_request_map_filename), sizeof(s_request_map_filename),
 		(void*)encode_request_map_filename_packet, (void*)decode_request_map_filename_packet, NULL);
 
-	register_packet_impl(network_messages, map_file_name, "map-file-name", 0, sizeof(s_custom_map_filename), sizeof(s_custom_map_filename),
+	register_packet_impl(network_messages, custom_map_filename, "map-file-name", 0, sizeof(s_custom_map_filename), sizeof(s_custom_map_filename),
 		(void*)encode_map_file_name_packet, (void*)decode_map_file_name_packet, NULL);
 
 	register_packet_impl(network_messages, team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
@@ -182,7 +182,7 @@ void __stdcall handle_out_of_band_message_hook(void *thisx, network_address* add
 	}*/
 
 	/* surprisingly the game doesn't use this too much, pretty much for request-join and tme-sync packets */
-	LOG_TRACE_NETWORK("handle_out_of_band_message_hook() - Received message {} from peer index: {}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(address));
+	LOG_TRACE_NETWORK("handle_out_of_band_message_hook() - Received message: {} from peer index: {}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(address));
 
 	p_handle_out_of_band_message(thisx, address, message_type, a4, packet);
 }
@@ -198,7 +198,8 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 	char* network_channel = getNetworkChannelData(network_channel_index);
 	network_address addr;
-	ZeroMemory(&addr, sizeof(network_address));
+	SecureZeroMemory(&addr, sizeof(network_address));
+	getNetworkAddressFromNetworkChannel(network_channel, &addr);
 
 	switch (message_type)
 	{
@@ -208,6 +209,8 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] received on handle_channel_message_hook request-map-filename from XUID: {}", received_data->user_identifier);
 		if (*(int*)(network_channel + 0x54) == 5 && getNetworkAddressFromNetworkChannel(network_channel, &addr))
 		{
+			LOG_TRACE_NETWORK("  - network address: {:x}", ntohl(addr.address.ipv4));
+
 			int peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
 			network_session* session = NetworkSession::getCurrentNetworkSession();
 			if (peer_index != -1 && peer_index != session->local_peer_index)
@@ -229,13 +232,14 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				network_observer* observer = session->network_observer_ptr;
 				peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peer_index);
 
-				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, map_file_name, sizeof(s_custom_map_filename), &data);
+				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, custom_map_filename, sizeof(s_custom_map_filename), &data);
 			}
 		}
 		
 		return;
 	}
-	case map_file_name:
+
+	case custom_map_filename:
 	{
 		if (*(int*)(network_channel + 0x54) == 5)
 		{
@@ -278,6 +282,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		break;
 	}
 
+	LOG_TRACE_NETWORK("handle_channel_message_hook() - Received message: {} from peer index: {}, address: {:x}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(&addr), ntohl(addr.address.ipv4));
 	p_handle_channel_message(thisx, network_channel_index, message_type, dynamic_data_size, packet);
 }
 
@@ -298,17 +303,14 @@ void CustomPackets::sendRequestMapFilename()
 		network_observer* observer = session->network_observer_ptr;
 		peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(session->session_host_peer_index);
 
-		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] Sending map name request info: session host peer index: {}, observer index {}, observer bool unk: {}, unk index: {}",
-			session->session_host_peer_index, 
-			observer_channel->observer_index,
-			observer_channel->field_1,
-			session->unk_index);
-
-		// use this check for out-of-band packets
-		//if (observer->getObserverState(observer_channel->observer_index) == 7) {
-		//}
 		if (observer_channel->field_1) {
 			observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, request_map_filename, sizeof(s_request_map_filename), &data);
+
+			LOG_TRACE_NETWORK("[H2MOD-CustomPackets] Sending map name request info: session host peer index: {}, observer index {}, observer bool unk: {}, unk index: {}",
+				session->session_host_peer_index,
+				observer_channel->observer_index,
+				observer_channel->field_1,
+				session->unk_index);
 		}
 	}
 }
@@ -326,11 +328,9 @@ void CustomPackets::sendTeamChange(int peerIndex, int teamIndex)
 
 		if (peerIndex != -1 && peerIndex != session->local_peer_index)
 		{
-			//if (observer->getObserverState(observer_channel->observer_index) == 7) {
-				if (observer_channel->field_1) {
-					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, team_change, sizeof(s_team_change), &data);
-				}
-			//}
+			if (observer_channel->field_1) {
+				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, team_change, sizeof(s_team_change), &data);
+			}
 		}
 	}
 }
@@ -345,11 +345,9 @@ void CustomPackets::sendUnitGrenadesPacket(int peerIndex, s_unit_grenades* data)
 			network_observer* observer = session->network_observer_ptr;
 			peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peerIndex);
 
-			//if (observer->getObserverState(observer_channel->observer_index) == 7) {
-				if (observer_channel->field_1) {
-					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, unit_grenades, sizeof(s_unit_grenades), data);
-				}
-			//}
+			if (observer_channel->field_1) {
+				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, unit_grenades, sizeof(s_unit_grenades), data);
+			}
 		}
 	}
 }

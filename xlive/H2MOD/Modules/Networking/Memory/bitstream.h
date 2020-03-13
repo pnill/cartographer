@@ -12,7 +12,7 @@ struct bitstream
 	void data_encode_integer(char* name, unsigned int value, signed int a3);
 	void data_encode_bits(char* name, void* a3, int a4);
 	void data_encode_bool(char* name, bool a3);
-		 
+
 	void data_decode_string(char* name, int a3, int a4);
 	void data_decode_address(char* name, int a3);
 	int  data_decode_integer(char* name, int a3);

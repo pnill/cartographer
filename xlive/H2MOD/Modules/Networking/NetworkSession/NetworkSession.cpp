@@ -193,6 +193,7 @@ void NetworkSession::logStructureOffsets() {
 	outStr << L", Offset of peer_observer_channels=" << std::hex << offsetof(network_session, peer_observer_channels);
 	outStr << L", Offset of local_session_state=" << std::hex << offsetof(network_session, local_session_state);
 	outStr << L", Offset of membership=" << std::hex << offsetof(network_session, membership);
+	outStr << L", Offset of session_host_peer_index=" << std::hex << offsetof(network_session, session_host_peer_index);
 			
 	commands->output(outStr.str());
 }

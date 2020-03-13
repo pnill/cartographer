@@ -55,7 +55,7 @@ public:
 	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier, bool handleFromConnectionPacket);
 	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 
-	void checkForLostConnections(IN_ADDR connectionIdentifier);
+	void checkForLostConnections();
 	void setTimeConnectionInteractionHappened(IN_ADDR ina, int time);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
 	void SetupLocalConnectionInfo(XNADDR* pxna);
