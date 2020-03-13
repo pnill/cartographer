@@ -119,7 +119,7 @@ static const char* network_message_name[] = {
 	"unit_grenades"
 };
 
-struct s_custom_map_filename
+struct __declspec(align(8)) s_custom_map_filename
 {
 	bool is_custom_map;
 	wchar_t file_name[32];
