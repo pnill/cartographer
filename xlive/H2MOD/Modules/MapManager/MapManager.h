@@ -19,7 +19,9 @@ public:
 	//client functions/data below
 	void applyGamePatches();
 	std::string getMapFilenameToDownload();
+	void clearMapFileNameToDownload();
 	void setMapFileNameToDownload(std::string mapFilenameToDownload);
+	void setMapFileNameToDownload(std::wstring mapFilenameToDownload);
 	void startListeningForClients();
 	void startMapDownload();
 	void searchForMap();

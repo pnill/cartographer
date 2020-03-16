@@ -93,7 +93,7 @@ char __cdecl handle_map_download_callback()
 			else {
 				LOG_TRACE_NETWORK("[h2mod-network] already has map {}", mapManager->getMapFilenameToDownload());
 			}
-			mapManager->setMapFileNameToDownload("");
+			mapManager->clearMapFileNameToDownload();
 		}
 		else 
 		{
@@ -190,8 +190,22 @@ std::string MapManager::getMapFilenameToDownload()
 	return this->mapFilenameToDownload;
 }
 
+void MapManager::setMapFileNameToDownload(std::wstring mapFilenameToDownload) {
+	if (mapFilenameToDownload.size() > 0) {
+		std::wstring fileNameWide(mapFilenameToDownload);
+		std::string filename_str(fileNameWide.begin(), fileNameWide.end());
+		setMapFileNameToDownload(filename_str);
+	}
+}
+
 void MapManager::setMapFileNameToDownload(std::string mapFilenameToDownload) {
-	this->mapFilenameToDownload = mapFilenameToDownload;
+	if (mapFilenameToDownload.size() > 0) {
+		this->mapFilenameToDownload = mapFilenameToDownload;
+	}
+}
+
+void MapManager::clearMapFileNameToDownload() {
+	this->mapFilenameToDownload.clear();
 }
 
 /**
