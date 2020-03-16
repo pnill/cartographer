@@ -1346,12 +1346,7 @@ void H2MOD::ApplyHooks() {
 	else {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
-
 		ServerConsole::ApplyHooks();
-
-		//TODO: turn on later
-		//std::thread t1(&MapManager::startListeningForClients, mapManager);
-		//t1.detach();
 	}
 }
 

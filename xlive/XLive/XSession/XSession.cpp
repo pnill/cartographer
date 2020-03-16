@@ -89,7 +89,6 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 int WINAPI XSessionEnd(HANDLE hSession,
 	PXOVERLAPPED pXOverlapped)
 {
-	mapManager->cleanup();
 	LOG_TRACE_XLIVE("XSessionEnd()");
 	return 0;
 }

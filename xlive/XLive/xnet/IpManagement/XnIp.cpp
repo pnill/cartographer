@@ -506,8 +506,8 @@ int WINAPI XNetConnect(const IN_ADDR ina)
 			for (auto sockIt : ipManager.SocketPtrArray)
 			{
 				// TODO: handle dinamically, so it can be used by other games too
-				if (sockIt->getNetworkSocketPort() == 1000 ||
-					sockIt->getNetworkSocketPort() == 1001)
+				if (sockIt->isUDP() // connect only UDP sockets
+					&& (sockIt->getNetworkSocketPort() == 1000 || sockIt->getNetworkSocketPort() == 1001))
 				{
 					ipManager.sendConnectionRequest(sockIt, ina);
 					xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING;
