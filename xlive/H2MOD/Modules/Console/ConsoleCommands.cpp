@@ -424,7 +424,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid command, usage - $reloadMaps");
 				return;
 			}
-			mapManager->reloadMaps();
+			mapManager->reloadAllMaps();
 		}
 		else if (firstCommand == "$help") {
 			output(L"reloadMaps");

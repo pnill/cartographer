@@ -10,7 +10,7 @@
 class MapManager {
 public:
 	//client and server functions below
-	void reloadMaps();
+	void reloadAllMaps();
 	void cleanup();
 	std::wstring getMapName();
 	bool hasCustomMap(std::string mapName);

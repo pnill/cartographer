@@ -228,11 +228,7 @@ std::wstring MapManager::getMapName() {
 	//H2Server.exe+535C64 (another offset to use if the above fails for whatever reason)
 	const wchar_t* currentMapName = h2mod->GetAddress<wchar_t*>(0x97737C, 0x5349B4);
 
-	DWORD dwBack;
-	//set r/w access on string so we don't have any issues when we do the implicit copy below
-	VirtualProtect((LPVOID)currentMapName, 4, PAGE_READWRITE, &dwBack);
 	std::wstring ucurrentMapName(currentMapName);
-	VirtualProtect((LPVOID)currentMapName, 4, dwBack, &dwBack);
 
 	return ucurrentMapName;
 }
@@ -252,11 +248,8 @@ bool MapManager::hasCustomMap(std::string mapName) {
 */
 bool MapManager::hasCustomMap(std::wstring mapName) {
 	DWORD dwBack;
-	wchar_t* mapsDirectory = h2mod->GetAddress<wchar_t*>(0x2423C, 0x482D70);
-
-	VirtualProtect(mapsDirectory, 4, PAGE_READWRITE, &dwBack);
+	wchar_t* mapsDirectory = h2mod->GetAddress<wchar_t*>(0x482D70 + 0x2423C);
 	std::wstring mapFileName(mapsDirectory);
-	VirtualProtect(mapsDirectory, 4, dwBack, &dwBack);
 
 	mapFileName += mapName;
 	std::ifstream file(mapFileName.c_str());
@@ -266,7 +259,7 @@ bool MapManager::hasCustomMap(std::wstring mapName) {
 /**
 * Actually calls the real map reload function in halo2.exe
 */
-void MapManager::reloadMaps() {
+void MapManager::reloadAllMaps() {
 	typedef char(__thiscall *custom_maps_load_info)(int thisx);
 	typedef char(__thiscall *cache_custom_map_file_image_preview)(int thisx);
 
@@ -373,11 +366,9 @@ bool MapManager::downloadFromRepo(std::string mapFilename) {
 
 	DWORD dwBack;
 	wchar_t* mapsDirectory = h2mod->GetAddress<wchar_t*>(0x482D70 + 0x2423C);
-	VirtualProtect(mapsDirectory, 4, PAGE_EXECUTE_READ, &dwBack);
+	std::wstring mapFilePathWide(mapsDirectory);
 
-	std::wstring mapFileName(mapsDirectory);
-	VirtualProtect(mapsDirectory, 4, dwBack, &dwBack);
-	std::string nonUnicodeMapFilePath(mapFileName.begin(), mapFileName.end());
+	std::string nonUnicodeMapFilePath(mapFilePathWide.begin(), mapFilePathWide.end());
 	nonUnicodeMapFilePath += mapFilename;
 
 	curl = curl_easy_init();
@@ -395,10 +386,11 @@ bool MapManager::downloadFromRepo(std::string mapFilename) {
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
 		/* always cleanup */
 		curl_easy_cleanup(curl);
+
 		fclose(fp);
 		if (http_code != 404) {
 			//if we succesfully downloaded the map, reload the maps and return out
-			this->reloadMaps();
+			this->reloadAllMaps();
 			return true;
 		}
 		else {
@@ -426,7 +418,7 @@ bool MapManager::downloadFromHost() {
 			}
 		}
 		DWORD mapsObject = h2mod->GetAddress(0x482D70);
-		wchar_t* customMapsDirectory = reinterpret_cast<wchar_t*>(mapsObject + 148028);
+		wchar_t* customMapsDirectory = reinterpret_cast<wchar_t*>(mapsObject + 0x2423C);
 		std::wstring customMapsDirWide(customMapsDirectory);
 		std::string customMapsDir(customMapsDirWide.begin(), customMapsDirWide.end());
 
@@ -559,7 +551,7 @@ bool MapManager::downloadFromHost() {
 
 		fclose(file);
 
-		this->reloadMaps();
+		this->reloadAllMaps();
 		downloadResult = true;
 		goto end;
 	}
