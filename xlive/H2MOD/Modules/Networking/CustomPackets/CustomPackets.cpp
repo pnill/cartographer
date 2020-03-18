@@ -284,7 +284,6 @@ void CustomPackets::sendRequestMapFilename()
 
 	if (session->local_session_state == network_session_state_peer_established)
 	{
-		XUID xuid;
 		s_request_map_filename data;
 		XUserGetXUID(0, &data.user_identifier);
 
