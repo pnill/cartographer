@@ -57,7 +57,7 @@ static int InterpretMasterCreate(char* response_content) {
 				snprintf(NotificationPlayerText, 60, "Username Should be: %s", tempstr1);
 				addDebugText(NotificationPlayerText);
 				char* username = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
-				strncpy(username, tempstr1, 32);
+				strncpy_s(username, XUSER_NAME_SIZE, tempstr1, strnlen_s(tempstr1, XUSER_MAX_NAME_LENGTH));
 			}
 		}
 
@@ -79,7 +79,7 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password) {
 	char* rtn_result = 0;
 
 	char http_request_body[] = "username=%s&email=%s&password=%s";
-	char http_request_body_build[400];
+	char http_request_body_build[400] = { "" };
 
 	char* escaped_user_username = encode_rfc3986(username);
 	char* escaped_user_email = encode_rfc3986(email);

@@ -705,7 +705,7 @@ int __cdecl sub_23C72F_CM(int a1) {
 #pragma endregion
 
 void PoSmbstowcs(wchar_t* destsrc, int maxCount) {
-	wchar_t* end = (wchar_t*)malloc(sizeof(wchar_t) * maxCount);
+	wchar_t* end = (wchar_t*)calloc(maxCount, sizeof(wchar_t));
 	mbstowcs(end, (char*)destsrc, maxCount);
 	memcpy(destsrc, end, maxCount * sizeof(wchar_t));
 	destsrc[maxCount-1] = 0;
@@ -761,7 +761,7 @@ void GSCustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen
 	*(DWORD*)(v4 + 2652) = VKbMenuType;
 	DWORD* sgdsf = (DWORD*)(v4 + 2652);
 	if (VKbMenuType >= 32 && VKbMenuType < 64 && VKbMenuType & 0b10000) {
-		PoSmbstowcs(textBuffer, textBufferLen);
+		PoSmbstowcs(textBuffer, textBufferLen); // convert multibyte to wide charaters, uses same character buffer
 	}
 	sub_23B118((void*)v4, textBuffer, textBufferLen);
 	//*(DWORD*)(v4 + 2656) = a3;
@@ -3641,17 +3641,17 @@ void setupAccountCreateLabels() {
 	char* bufferUsername = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
 	if (strlen(bufferUsername) <= 0) {
 		char* bufferUsername2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 0xFFFFFFF2);
-		strcpy_s(bufferUsername, 32, bufferUsername2);
+		strcpy_s(bufferUsername, XUSER_NAME_SIZE, bufferUsername2);
 	}
 	char* bufferEmail = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 2);
 	if (strlen(bufferEmail) <= 0) {
 		char* bufferEmail2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 0xFFFFFFF3);
-		strcpy_s(bufferEmail, 255, bufferEmail2);
+		strcpy_s(bufferEmail, 256, bufferEmail2);
 	}
 	char* bufferPassword = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 3);
 	if (strlen(bufferPassword) <= 0) {
 		char* bufferPassword2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 0xFFFFFFF4);
-		strcpy_s(bufferPassword, 255, bufferPassword2);
+		strcpy_s(bufferPassword, 256, bufferPassword2);
 	}
 }
 
@@ -3697,7 +3697,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountCreate() {//__thiscall
 
 static HANDLE hThreadCreate = 0;
 
-static DWORD WINAPI ThreadCreate(LPVOID lParam)
+static DWORD WINAPI AccountCreateThread(LPVOID lParam)
 {
 	//gotta delay it a little to make sure the menu's decide to render correctly.
 	Sleep(200L);
@@ -3729,23 +3729,23 @@ static DWORD WINAPI ThreadCreate(LPVOID lParam)
 
 static bool CMButtonHandler_AccountCreate(int button_id) {
 	if (button_id == 0) {
-		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
-		GSCustomMenuCall_VKeyboard_Inner((wchar_t*)textBuffer, 16, 0b10010, CMLabelMenuId_AccountCreate, 0xFFFFF002, CMLabelMenuId_AccountCreate, 0xFFFFF003);
+		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, XUSER_NAME_SIZE /* Wide string buffer size */, 0b10010, CMLabelMenuId_AccountCreate, 0xFFFFF002, CMLabelMenuId_AccountCreate, 0xFFFFF003);
 	}
 	else if (button_id == 1) {
-		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 2);
-		GSCustomMenuCall_VKeyboard_Inner((wchar_t*)textBuffer, 255, 0b10000, CMLabelMenuId_AccountCreate, 0xFFFFF004, CMLabelMenuId_AccountCreate, 0xFFFFF005);
+		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 2);
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 0b10000, CMLabelMenuId_AccountCreate, 0xFFFFF004, CMLabelMenuId_AccountCreate, 0xFFFFF005);
 	}
 	else if (button_id == 2) {
-		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 3);
-		GSCustomMenuCall_VKeyboard_Inner((wchar_t*)textBuffer, 255, 0b10000, CMLabelMenuId_AccountCreate, 0xFFFFF006, CMLabelMenuId_AccountCreate, 0xFFFFF007);
+		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 3);
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 0b10000, CMLabelMenuId_AccountCreate, 0xFFFFF006, CMLabelMenuId_AccountCreate, 0xFFFFF007);
 	}
 	else if (button_id == 3) {
 		if (!hThreadCreate) {
 			accountingGoBackToList = false;
 			updateAccountingActiveHandle(true);
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02C, 0xFFFFF02D);
-			hThreadCreate = CreateThread(NULL, 0, ThreadCreate, (LPVOID)0, 0, NULL);
+			hThreadCreate = CreateThread(NULL, 0, AccountCreateThread, (LPVOID)0, 0, NULL);
 		}
 	}
 	return false;
@@ -3841,7 +3841,8 @@ void GSCustomMenuCall_AccountCreate() {
 	CallWgit(WgitScreenfunctionPtr);
 }
 
-#pragma endregion
+
+#pragma endregion /* CM_AccountCreate */
 
 
 const int CMLabelMenuId_AccountEdit = 0xFF00000A;
@@ -3937,12 +3938,12 @@ static DWORD WINAPI ThreadLogin(LPVOID lParam)
 
 static bool CMButtonHandler_AccountEdit(int button_id) {
 	if (button_id == 0) {
-		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
-		GSCustomMenuCall_VKeyboard_Inner((wchar_t*)textBuffer, 255, 0b10000, CMLabelMenuId_AccountEdit, 0xFFFFF002, CMLabelMenuId_AccountEdit, 0xFFFFF003);
+		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 0b10000, CMLabelMenuId_AccountEdit, 0xFFFFF002, CMLabelMenuId_AccountEdit, 0xFFFFF003);
 	}
 	else if (button_id == 1) {
-		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
-		GSCustomMenuCall_VKeyboard_Inner((wchar_t*)textBuffer, 255, 0b10000, CMLabelMenuId_AccountEdit, 0xFFFFF004, CMLabelMenuId_AccountEdit, 0xFFFFF005);
+		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 0b10000, CMLabelMenuId_AccountEdit, 0xFFFFF004, CMLabelMenuId_AccountEdit, 0xFFFFF005);
 	}
 	else if (button_id == 2) {
 		AccountEdit_remember = !AccountEdit_remember;
@@ -5130,9 +5131,9 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_AccountCreate, 0xFFFFF005, "Enter the Email Address to be linked to your new account below.");
 	add_cartographer_label(CMLabelMenuId_AccountCreate, 0xFFFFF006, "Create a Password");
 	add_cartographer_label(CMLabelMenuId_AccountCreate, 0xFFFFF007, "Create the Password for your new account below.");
-	add_cartographer_label(CMLabelMenuId_AccountCreate, 1, 255 * 2, true);
-	add_cartographer_label(CMLabelMenuId_AccountCreate, 2, 255 * 2, true);
-	add_cartographer_label(CMLabelMenuId_AccountCreate, 3, 255 * 2, true);
+	add_cartographer_label(CMLabelMenuId_AccountCreate, 1, XUSER_NAME_SIZE * sizeof(wchar_t), true); // if the buffer is going to be used in Virtual Keyboard, allocate wide string buffer (tho mixing multibyte with wide strings is kinda retarded)
+	add_cartographer_label(CMLabelMenuId_AccountCreate, 2, 256 * sizeof(wchar_t), true);
+	add_cartographer_label(CMLabelMenuId_AccountCreate, 3, 256 * sizeof(wchar_t), true);
 	add_cartographer_label(CMLabelMenuId_AccountCreate, 4, "Create Account");
 
 
@@ -5146,8 +5147,8 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFF003, "Enter the Username or Email Address of your account below.");
 	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFF004, "Enter Account Password");
 	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFF005, "Enter the Password of your account below.");
-	add_cartographer_label(CMLabelMenuId_AccountEdit, 1, 255 * 2, true);
-	add_cartographer_label(CMLabelMenuId_AccountEdit, 2, 255 * 2, true);
+	add_cartographer_label(CMLabelMenuId_AccountEdit, 1, 256 * sizeof(wchar_t), true);
+	add_cartographer_label(CMLabelMenuId_AccountEdit, 2, 256 * sizeof(wchar_t), true);
 	add_cartographer_label(CMLabelMenuId_AccountEdit, 4, "Login");
 
 

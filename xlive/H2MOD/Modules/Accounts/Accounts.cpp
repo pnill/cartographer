@@ -223,8 +223,8 @@ void H2AccountBufferCheck() {
 	if (H2AccountBufferI >= H2AccountBufferLen) {
 		H2AccountBufferLen += bufferIncSize;
 		if (!H2AccountBufferLoginToken) {
-			H2AccountBufferUsername = (char**)malloc(sizeof(char*) * H2AccountBufferLen);
-			H2AccountBufferLoginToken = (char**)malloc(sizeof(char*) * H2AccountBufferLen);
+			H2AccountBufferUsername = (char**)calloc(H2AccountBufferLen, sizeof(char*));
+			H2AccountBufferLoginToken = (char**)calloc(H2AccountBufferLen, sizeof(char*));
 		}
 		else {
 			H2AccountBufferUsername = (char**)realloc(H2AccountBufferUsername, sizeof(char*) * H2AccountBufferLen);
@@ -242,7 +242,7 @@ void H2AccountBufferAdd(char* token, char* username) {
 	H2AccountBufferCheck();
 
 	for (int existing_profile = 0; existing_profile < H2AccountCount; existing_profile++) {
-		if (StrnCaseInsensEqu(H2AccountBufferUsername[existing_profile], username, 31)) {
+		if (StrnCaseInsensEqu(H2AccountBufferUsername[existing_profile], username, XUSER_MAX_NAME_LENGTH)) {
 			
 			if (H2AccountBufferLoginToken[existing_profile]) {
 				free(H2AccountBufferLoginToken[existing_profile]);
@@ -252,24 +252,22 @@ void H2AccountBufferAdd(char* token, char* username) {
 			}
 
 			bufflen = strlen(token) + 1;
-			H2AccountBufferLoginToken[existing_profile] = (char*)malloc(sizeof(char) * bufflen);
+			H2AccountBufferLoginToken[existing_profile] = (char*)calloc(bufflen, sizeof(char));
 			snprintf(H2AccountBufferLoginToken[existing_profile], bufflen, token);
 
-			bufflen = strlen(username) + 1;
-			H2AccountBufferUsername[existing_profile] = (char*)malloc(sizeof(char) * bufflen);
-			snprintf(H2AccountBufferUsername[existing_profile], bufflen, username);
+			H2AccountBufferUsername[existing_profile] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
+			strncpy_s(H2AccountBufferUsername[existing_profile], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
 
 			return;
 		}
 	}
 
 	bufflen = strlen(token) + 1;
-	H2AccountBufferLoginToken[H2AccountBufferI] = (char*)malloc(sizeof(char) * bufflen);
+	H2AccountBufferLoginToken[H2AccountBufferI] = (char*)calloc(bufflen, sizeof(char));
 	snprintf(H2AccountBufferLoginToken[H2AccountBufferI], bufflen, token);
 
-	bufflen = strlen(username) + 1;
-	H2AccountBufferUsername[H2AccountBufferI] = (char*)malloc(sizeof(char) * bufflen);
-	snprintf(H2AccountBufferUsername[H2AccountBufferI], bufflen, username);
+	H2AccountBufferUsername[H2AccountBufferI] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
+	strncpy_s(H2AccountBufferUsername[H2AccountBufferI], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
 
 	H2AccountBufferI++;
 	H2AccountCount++;
@@ -330,7 +328,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				while (isspace(*tempName)) {
 					tempName++;
 				}
-				snprintf(tempstr1, 17, tempName);
+				strncpy_s(tempstr1, sizeof(tempstr1), tempName, strnlen_s(tempName, XUSER_MAX_NAME_LENGTH));
 				for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 					if (isspace(tempstr1[j])) {
 						tempstr1[j] = 0;
@@ -339,13 +337,13 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 						break;
 					}
 				}
-				int bufflen = strlen(tempstr1) + 1;
-				if (bufflen <= 1) {
+				int bufflen = strlen(tempstr1);
+				if (bufflen <= 0) {
 					incorrect = true;
 				}
 				else {
-					H2AccountBufferUsername[H2AccountBufferI] = (char*)malloc(sizeof(char) * bufflen);
-					snprintf(H2AccountBufferUsername[H2AccountBufferI], bufflen, tempstr1);
+					H2AccountBufferUsername[H2AccountBufferI] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
+					strncpy_s(H2AccountBufferUsername[H2AccountBufferI], XUSER_NAME_SIZE, tempstr1, strnlen_s(tempstr1, XUSER_MAX_NAME_LENGTH));
 					H2AccountBufferUsername_est = true;
 				}
 			}
@@ -376,7 +374,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 					//incorrect = true;
 				}
 				else {
-					H2AccountBufferLoginToken[H2AccountBufferI] = (char*)malloc(sizeof(char) * bufflen);
+					H2AccountBufferLoginToken[H2AccountBufferI] = (char*)calloc(bufflen, sizeof(char));
 					snprintf(H2AccountBufferLoginToken[H2AccountBufferI], bufflen, tempstr1);
 					H2AccountBufferLoginToken_est = true;
 				}

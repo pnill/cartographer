@@ -139,7 +139,7 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 static int InterpretMasterLogin(char* response_content, char* prev_login_token) {
 	int result = 0;//will stay as 0 when master only returns "return_code=xxx<br>"
 
-	char username[32] = { "" };
+	char username[XUSER_NAME_SIZE] = { "" };
 	char login_token[33] = { "" };
 	unsigned long long xuid = 0;
 	unsigned long saddr = 0;
@@ -274,7 +274,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			snprintf(tempstr1, 32, tempName);
+			strncpy_s(tempstr1, sizeof(tempstr1), tempName, strnlen_s(tempName, XUSER_MAX_NAME_LENGTH));
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -287,7 +287,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				char NotificationPlayerText[60];
 				snprintf(NotificationPlayerText, 60, "Login Username is: %s", tempstr1);
 				addDebugText(NotificationPlayerText);
-				strncpy(username, tempstr1, 32);
+				strncpy_s(username, tempstr1, strnlen_s(tempstr1, XUSER_MAX_NAME_LENGTH));
 			}
 		}
 		else if (sscanf(fileLine, "login_xuid=%llu", &templlu1) == 1) {
@@ -366,8 +366,8 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 								if (H2AccountBufferUsername[i]) {
 									free(H2AccountBufferUsername[i]);
 								}
-								H2AccountBufferUsername[i] = (char*)malloc(sizeof(char) * 17);
-								snprintf(H2AccountBufferUsername[i], 17, username);
+								H2AccountBufferUsername[i] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
+								strncpy_s(H2AccountBufferUsername[i], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
 								snprintf(H2AccountBufferLoginToken[i], 33, login_token);
 								break;
 							}
@@ -485,8 +485,8 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
 			}
 
 			if (username) {
-				char* username2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
-				snprintf(username2, strlen(username) + 1, username);
+				char* login_identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
+				snprintf(login_identifier, strlen(username) + 1, username);
 			}
 
 			GSCustomMenuCall_Invalid_Login_Token();

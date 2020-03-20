@@ -61,9 +61,9 @@ void XUserSetup(DWORD dwUserIndex, long long xuid, char* userName, bool online)
 
 	usersSignInInfo[dwUserIndex].dwGuestNumber = 0;
 	usersSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
-
 	usersSignInInfo[dwUserIndex].xuid = (XUID)xuid;
-	strncpy_s(usersSignInInfo[dwUserIndex].szUserName, userName, XUSER_NAME_SIZE);
+	
+	strncpy_s(usersSignInInfo[dwUserIndex].szUserName, userName, strnlen_s(userName, XUSER_MAX_NAME_LENGTH));
 
 	if (online)
 		GetAchievements(xuid);
@@ -152,7 +152,7 @@ DWORD WINAPI XUserGetName(DWORD dwUserIndex, LPSTR szUserName, DWORD cchUserName
 		dwUserIndex = 0;
 
 	if (usersSignInInfo[dwUserIndex].UserSigninState != eXUserSigninState_NotSignedIn)
-		strncpy(szUserName, usersSignInInfo[dwUserIndex].szUserName, cchUserName);
+		strncpy_s(szUserName, cchUserName, usersSignInInfo[dwUserIndex].szUserName, strnlen_s(usersSignInInfo[dwUserIndex].szUserName, XUSER_MAX_NAME_LENGTH));
 	else
 		return ERROR_NOT_LOGGED_ON;
 

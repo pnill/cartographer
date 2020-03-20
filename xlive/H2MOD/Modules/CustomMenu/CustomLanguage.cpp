@@ -25,10 +25,17 @@ char* add_label(std::unordered_map<int, std::unordered_map<int, char*>> &label_m
 	if (label_map.count(label_menu_id) && label_map[label_menu_id].count(label_id))
 		free(label_map[label_menu_id][label_id]);
 	int label_buflen = (label ? strlen(label) : 0) + 1;
-	char* new_label = (char*)malloc(sizeof(char) * label_buflen);
+	char* new_label = (char*)calloc(label_buflen, sizeof(char));
 	if (label)
 		memcpy(new_label, label, sizeof(char) * label_buflen);
 	new_label[label_buflen - 1] = 0;
+	return label_map[label_menu_id][label_id] = new_label;
+}
+
+char* add_label(std::unordered_map<int, std::unordered_map<int, char*>> &label_map, int label_menu_id, int label_id, int labelBufferLen) {
+	if (label_map.count(label_menu_id) && label_map[label_menu_id].count(label_id))
+		free(label_map[label_menu_id][label_id]);
+	char* new_label = (char*)calloc(labelBufferLen, sizeof(char));
 	return label_map[label_menu_id][label_id] = new_label;
 }
 
@@ -43,14 +50,6 @@ char* add_cartographer_label(int label_menu_id, int label_id, char* label, bool 
 
 char* add_cartographer_label(int label_menu_id, int label_id, char* label) {
 	return add_cartographer_label(label_menu_id, label_id, label, false);
-}
-
-char* add_label(std::unordered_map<int, std::unordered_map<int, char*>> &label_map, int label_menu_id, int label_id, int labelBufferLen) {
-	if (label_map.count(label_menu_id) && label_map[label_menu_id].count(label_id))
-		free(label_map[label_menu_id][label_id]);
-	char* new_label = (char*)malloc(labelBufferLen);
-	new_label[0] = new_label[1] = 0;
-	return label_map[label_menu_id][label_id] = new_label;
 }
 
 char* add_cartographer_label(int label_menu_id, int label_id, int labelBufferLen, bool is_dynamic) {
@@ -112,7 +111,6 @@ int add_custom_language(custom_language* custom_lang) {
 	}
 
 	custom_languages.push_back(custom_lang);
-
 	return 0;
 }
 
