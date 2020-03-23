@@ -89,15 +89,15 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 	else
 	{
 		IN_ADDR ipIdentifier = GetConnectionIdentifierByNat(lpFrom);
+		lpFrom->sin_addr = ipIdentifier;
 
 		/* Let the game know the packet received came from an unkown source */
-		if (ipIdentifier.s_addr == 0)
+		if (lpFrom->sin_addr.s_addr == 0)
 		{
 			WSASetLastError(WSAEWOULDBLOCK);
 			return SOCKET_ERROR;
 		}
 
-		lpFrom->sin_addr = ipIdentifier;
 		setTimeConnectionInteractionHappened(ipIdentifier, timeGetTime());
 
 		return ERROR_SUCCESS;
