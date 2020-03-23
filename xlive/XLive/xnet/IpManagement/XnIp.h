@@ -14,9 +14,6 @@ struct XnIp
 	int connectionPacketsSentCount;
 	int lastConnectionInteractionTime;
 
-	// TODO:
-	//int socketCount;
-
 	// NAT info
 	sockaddr_in NatAddrSocket1000; // TODO: allocate dynamically based on how many sockets are up
 	sockaddr_in NatAddrSocket1001;
@@ -64,7 +61,7 @@ public:
 
 	void UnregisterLocalConnectionInfo();
 	void GetStartupParamsAndUpdate(const XNetStartupParams* netStartupParams);
-	IN_ADDR GetConnectionIdentifierByNat(sockaddr_in* addr);
+	IN_ADDR GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* addr);
 	void SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);
 	void HandleConnectionPacket(XSocket* xsocket, XNetConnectionReqPacket* connectReqPacket, sockaddr_in* addr);
 	void RegisterKeys(XNKID*, XNKEY*);

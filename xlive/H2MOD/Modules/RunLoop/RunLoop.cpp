@@ -284,14 +284,10 @@ void GSMainLoop() {
 			SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
 		}
 
-		//if (custom_resolution_x > 0 && custom_resolution_y > 0) {
-		//	SetWindowPos(H2hWnd, NULL, 0, 0, 500, 500, SWP_NOMOVE | SWP_FRAMECHANGED);
-		//	SetWindowPos(H2hWnd, NULL, 0, 0, custom_resolution_x, custom_resolution_y, SWP_NOMOVE | SWP_FRAMECHANGED);// SWP_FRAMECHANGED |  | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
-		//}
 		if (H2GetInstanceId() > 1) {
-			wchar_t titleOriginal[200];
-			wchar_t titleMod[200];
-			GetWindowText(H2hWnd, titleOriginal, 200);
+			wchar_t titleMod[256];
+			wchar_t titleOriginal[256];
+			GetWindowText(H2hWnd, titleOriginal, 256);
 			wsprintf(titleMod, L"%ls (P%d)", titleOriginal, H2GetInstanceId());
 			SetWindowText(H2hWnd, titleMod);
 		}
@@ -305,7 +301,7 @@ void GSMainLoop() {
 		}
 	}
 
-	static int prevPartyPrivacy = 0;
+	/*static int prevPartyPrivacy = 0;
 	int partyPrivacy;
 	if (H2IsDediServer) {
 		partyPrivacy = *(int*)(H2BaseAddr + 0x534850);
@@ -316,9 +312,7 @@ void GSMainLoop() {
 	if (prevPartyPrivacy > 0 && partyPrivacy == 0) {
 		pushHostLobby();
 	}
-	prevPartyPrivacy = partyPrivacy;
-
-	//advLobbySettings->loop();
+	prevPartyPrivacy = partyPrivacy;*/
 }
 
 signed int(*sub_287a1)();

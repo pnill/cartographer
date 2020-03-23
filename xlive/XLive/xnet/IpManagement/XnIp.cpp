@@ -16,14 +16,14 @@ NOTE:
 	Check inside Tweaks.cpp for removeXNetSecurity
 */
 
-bool sockAddrInEqual(sockaddr_in* a1, sockaddr_in* a2)
+bool sockAddrInEqual(XSocket* xsocket, sockaddr_in* a1, sockaddr_in* a2)
 {
 	return (a1->sin_addr.s_addr == a2->sin_addr.s_addr && a1->sin_port == a2->sin_port);
 }
 
 bool sockAddrInIsNull(sockaddr_in* a1)
 {
-	return a1->sin_addr.s_addr == 0 && a1->sin_port == 0;
+	return a1->sin_addr.s_addr == 0 || a1->sin_port == 0;
 }
 
 void CXnIp::GetStartupParamsAndUpdate(const XNetStartupParams* netStartupParams)
@@ -62,13 +62,10 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 {
 	XNetConnectionReqPacket* connectionPck = reinterpret_cast<XNetConnectionReqPacket*>(lpBuffers->buf);
 
-	if (lpFrom->sin_addr.s_addr == H2Config_master_ip)
-	{
-		lpFrom->sin_addr.s_addr = INADDR_BROADCAST;
-		return ERROR_SUCCESS;
-	}
+	//if (lpFrom->sin_addr.s_addr == INADDR_BROADCAST)
+		//return ERROR_SUCCESS;
 
-	else if (bytesRecvdCount == sizeof(XNetConnectionReqPacket)
+	/*else*/ if (bytesRecvdCount == sizeof(XNetConnectionReqPacket)
 		&& connectionPck->ConnectPacketIdentifier == connectPacketIdentifier)
 	{
 		// TODO: add more XNet request types (like disconnect, network pulse etc...)
@@ -88,7 +85,7 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 	}
 	else
 	{
-		IN_ADDR ipIdentifier = GetConnectionIdentifierByNat(lpFrom);
+		IN_ADDR ipIdentifier = GetConnectionIdentifierByRecvAddr(xsocket, lpFrom);
 		lpFrom->sin_addr = ipIdentifier;
 
 		/* Let the game know the packet received came from an unkown source */
@@ -149,7 +146,11 @@ int CXnIp::sendConnectionRequest(XSocket* xsocket, IN_ADDR connectionIdentifier 
 	}
 }
 
-IN_ADDR CXnIp::GetConnectionIdentifierByNat(sockaddr_in* fromAddr)
+/*
+	Return connection identifier from received address 
+	NOTE: connection has to be established
+*/
+IN_ADDR CXnIp::GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* fromAddr)
 {
 	IN_ADDR addrInval;
 	addrInval.s_addr = 0;
@@ -157,16 +158,26 @@ IN_ADDR CXnIp::GetConnectionIdentifierByNat(sockaddr_in* fromAddr)
 	for (int i = 0; i < GetMaxXnConnections(); i++)
 	{
 		XnIp* xnIp = &XnIPs[i];
-		if (xnIp->bValid)
+		if (xnIp->bValid 
+			&& XNetGetConnectStatus(xnIp->connectionIdentifier) == XNET_CONNECT_STATUS_CONNECTED)
 		{
 			// TODO: get rid of H2v only sockets
-			if (sockAddrInEqual(fromAddr, &xnIp->NatAddrSocket1000)
-				|| sockAddrInEqual(fromAddr, &xnIp->NatAddrSocket1001))
+			switch (xsocket->getNetworkSocketPort())
 			{
-				if (XNetGetConnectStatus(xnIp->connectionIdentifier) == XNET_CONNECT_STATUS_CONNECTED)
+			case 1000:
+				if (sockAddrInEqual(xsocket, fromAddr, &xnIp->NatAddrSocket1000))
 					return xnIp->connectionIdentifier;
-				else
-					return addrInval; // user is not connected
+				break;
+
+			case 1001:
+				if (sockAddrInEqual(xsocket, fromAddr, &xnIp->NatAddrSocket1001))
+					return xnIp->connectionIdentifier;
+				break;
+
+			default:
+				// wtf?... unknown socket
+				LOG_CRITICAL_NETWORK("GetConnectionIdentifierByRecvAddr() - unkown network socket!");
+				return addrInval;
 			}
 		}
 	}
@@ -188,6 +199,7 @@ void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier
 		   port 1001 is mapped to the receiving address/port xnIp->NatAddrSocket1001 via the connection identifier.
 		*/
 
+		// TODO: get rid of H2v only sockets
 		switch (xsocket->getNetworkSocketPort())
 		{
 		case 1000:
@@ -201,7 +213,7 @@ void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier
 			break;
 
 		default:
-			//LOG_ERROR_NETWORK("SaveConnectionNatInfo() xsocket->getNetworkSocketPort() didn't match any ports!");
+			LOG_CRITICAL_NETWORK("SaveConnectionNatInfo() - unkown network socket!");
 			break;
 
 		}
@@ -215,11 +227,12 @@ void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier
 void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetConnectionReqPacket* connectReqPacket, sockaddr_in* recvAddr)
 {
 	IN_ADDR connectionIdentifier;
+	connectionIdentifier.s_addr = 0;
 
 	int ret = CreateXnIpIdentifier(&connectReqPacket->xnaddr, &connectReqPacket->xnkid, &connectionIdentifier, true);
 	if (ret == ERROR_SUCCESS)
 	{
-		/* TODO: support multiple sockets, not just H2v sockets */
+		// TODO: get rid of H2v only sockets
 		SaveConnectionNatInfo(xsocket, connectionIdentifier, recvAddr);
 
 		XnIp* xnIp = &XnIPs[getConnectionIndex(connectionIdentifier)];
@@ -236,7 +249,6 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetConnectionReqPacket* co
 				xnIp->xnetstatus = XNET_CONNECT_STATUS_CONNECTED; // if we have the NAT data for each port, set the status to CONNECTED
 			else
 				xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING;
-
 		}
 	}
 	else
@@ -327,8 +339,8 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 
 				newXnIp->xnetstatus = XNET_CONNECT_STATUS_IDLE;
 				newXnIp->connectionIdentifier.s_addr = htonl(firstUnusedConnectionIndex | randIdentifier);
-
 				newXnIp->bValid = true;
+
 				setTimeConnectionInteractionHappened(newXnIp->connectionIdentifier, timeGetTime());
 
 				return ERROR_SUCCESS;

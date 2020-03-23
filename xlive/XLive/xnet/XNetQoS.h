@@ -21,7 +21,7 @@ public:
 	bool m_bStopListening = false;
 	WSAEVENT m_WsaEvent;
 
-	int cbData = 0;
+	unsigned int cbData = 0;
 	char* pbData = nullptr;
 
 	static void CALLBACK HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags);
