@@ -113,7 +113,7 @@ public:
 	static void setGameScore();
 
 	static std::unordered_map<int, DatumIndex> level_weapon;
-	static std::unordered_map<std::wstring, int> gungamePlayers;
+	static std::unordered_map<XUID, int> gungamePlayers;
 
 	~GunGame() {  };
 };

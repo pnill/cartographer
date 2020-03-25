@@ -356,12 +356,12 @@ bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObje
 	return pcreate_unit_hook(pCreationData, a2, a3, pObject);
 }
 
-wchar_t* H2MOD::GetLobbyGameVariantName()
+wchar_t* H2MOD::get_session_game_variant_name()
 {
 	return h2mod->GetAddress<wchar_t*>(0x97777C, 0x534A18);
 }
 
-void H2MOD::exit_game()
+void H2MOD::leave_session()
 {
 	if (h2mod->Server)
 		return;
@@ -377,8 +377,8 @@ void H2MOD::exit_game()
 	}
 
 	typedef int(__cdecl leave_game_type)(int a1);
-	auto leave_game = h2mod->GetAddress<leave_game_type*>(0x216388);
-	leave_game(0);
+	auto leave_session = h2mod->GetAddress<leave_game_type*>(0x216388);
+	leave_session(0);
 }
 
 #pragma endregion
@@ -466,9 +466,9 @@ void call_give_player_weapon(int PlayerIndex, DatumIndex WeaponId, bool bReset)
 	}
 }
 
-wchar_t* H2MOD::get_local_player_name()
+wchar_t* H2MOD::get_local_player_name(int local_player_index)
 {
-	return h2mod->GetAddress<wchar_t*>(0x51A638);
+	return this->get_player_name_from_player_index(this->get_player_datum_index_from_controller_index(local_player_index).ToAbsoluteIndex());
 }
 
 int H2MOD::get_player_index_from_name(wchar_t* playername)
@@ -593,7 +593,7 @@ BYTE H2MOD::get_local_team_index()
 }
 #pragma endregion
 
-void H2MOD::DisableSound(int sound)
+void H2MOD::disable_sound(int sound)
 {
 	LOG_TRACE_GAME("tag data address: {:x}", tags::get_tag_data());
 	switch (sound)
@@ -620,7 +620,7 @@ void H2MOD::DisableSound(int sound)
 	}
 }
 
-void H2MOD::CustomSoundPlay(const wchar_t* soundName, int delay)
+void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 {
 	auto playSound = [=]()
 	{
@@ -727,7 +727,7 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 	pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
 
-void H2MOD::DisableWeaponPickup(bool b_Enable)
+void H2MOD::disable_weapon_pickup(bool b_Enable)
 {
 	//Client Sided Patch
 	DWORD offset = h2mod->GetAddress(0x55EFA);
@@ -836,7 +836,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		return result;
 	}		
 
-	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
+	wchar_t* variant_name = h2mod->get_session_game_variant_name();
 	LOG_INFO_GAME(L"[h2mod] OnMapLoad map type {0}, variant name {1}", h2mod->GetMapType(), variant_name);
 	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
 
@@ -989,7 +989,7 @@ typedef void(__cdecl *change_team)(int a1, int a2);
 change_team p_change_local_team;
 
 void __cdecl changeTeam(int localPlayerIndex, int teamIndex) {
-	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
+	wchar_t* variant_name = h2mod->get_session_game_variant_name();
 	if (StrStrIW(variant_name, L"rvb") != NULL && teamIndex != 0 && teamIndex != 1) {
 		//rvb mode enabled, don't change teams
 		return;
@@ -1225,6 +1225,21 @@ int __cdecl device_touch(DatumIndex device_datum, DatumIndex unit_datum)
 	return pdevice_touch(device_datum, unit_datum);
 }
 
+
+void H2MOD::team_player_indicator_visibility(bool toggle)
+{
+	this->drawTeamIndicators = toggle;
+}
+
+void __cdecl game_mode_engine_draw_team_indicators()
+{
+	typedef void(__cdecl* game_mode_engine_draw_team_indicators_def)();
+	auto p_game_mode_engine_draw_team_indicators = h2mod->GetAddress<game_mode_engine_draw_team_indicators_def>(0x6AFA4);
+
+	if (h2mod->drawTeamIndicators)
+		p_game_mode_engine_draw_team_indicators();
+}
+
 void H2MOD::ApplyUnitHooks()
 {
 	// increase the size of the unit entity creation definition packet
@@ -1340,6 +1355,8 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetAddress(0x92C05), BansheeBombIsEngineMPCheck);
 		PatchCall(GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
+		PatchCall(h2mod->GetAddress(0x226702), game_mode_engine_draw_team_indicators);
+
 		//Initialise_tag_loader();
 		//TagInterface::GlobalTagInterface.Init();
 	}
@@ -1378,10 +1395,4 @@ void H2MOD::Initialize()
 
 void H2MOD::Deinitialize() {
 
-}
-
-void H2MOD::TeamPlayerIndicatorVisibility(bool toggle)
-{
-	// makes toggles between jz and jmp
-	WriteValue<BYTE>(h2mod->GetAddress(0x111197), toggle ? 0x74 : 0xEB);
 }

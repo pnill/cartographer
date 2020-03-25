@@ -605,7 +605,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$leavegame") {
-			h2mod->exit_game();
+			h2mod->leave_session();
 			return;
 		}
 		else if (firstCommand == "$xyz") {

@@ -70,6 +70,6 @@ public:
 	static void triggerSound(const wchar_t* name, int);
 	static int calculateZombiePlayerIndex();
 private:
-	static std::vector<std::wstring> zombieNames;
+	static std::vector<XUID> zombieIdentifiers;
 };
 

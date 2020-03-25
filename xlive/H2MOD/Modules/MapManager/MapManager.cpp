@@ -58,7 +58,7 @@ void MapManager::leaveSessionIfAFK() {
 	if (mapDownloadCountdown) {
 		auto duraton = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - promptOpenTime);
 		if (duraton >= std::chrono::seconds(20)) {
-			h2mod->exit_game();
+			h2mod->leave_session();
 			mapDownloadCountdown = false;
 		}
 	}
@@ -85,7 +85,7 @@ char __cdecl handle_map_download_callback() {
 				//TODO: set map filesize
 				//TODO: if downloading from repo files, try p2p
 				if (!mapManager->downloadFromRepo(mapManager->getMapFilenameToDownload()))
-					h2mod->exit_game(); // download has failed
+					h2mod->leave_session(); // download has failed
 			}
 			else {
 				LOG_TRACE_NETWORK("[h2mod-network] already has map {}", mapManager->getMapFilenameToDownload());
@@ -95,7 +95,7 @@ char __cdecl handle_map_download_callback() {
 		else 
 		{
 			// no map filename (probably packet hasn't been received)
-			h2mod->exit_game();
+			h2mod->leave_session();
 		}
 
 		// set the game to map is loaded state

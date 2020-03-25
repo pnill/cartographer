@@ -25,7 +25,7 @@ static int weapon_sixteen = 0;
 //TODO(PermaNull): Add additional levels with dual weilding
 
 std::unordered_map<int, DatumIndex> GunGame::level_weapon;
-std::unordered_map<std::wstring, int> GunGame::gungamePlayers;
+std::unordered_map<XUID, int> GunGame::gungamePlayers;
 
 DatumIndex weaponDatums[36] = {
 	0xE53D2AD8, 0xE5F02B8B, 0xE6322BCD, 0xE6AF2C4A,
@@ -145,23 +145,23 @@ void GunGame::setGameScore() {
 }
 
 void GunGame::spawnPlayerServer(int playerIndex) {
-	wchar_t* playerName = h2mod->get_player_name_from_player_index(playerIndex);
-	wchar_t* localName = h2mod->get_local_player_name();
-	LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer({0}) : {1}", playerIndex, playerName);
+	XUID playerIdentifier = getPlayerXuid(playerIndex);
+	XUID localPlayerIdentifier = getPlayerXuid(h2mod->get_player_datum_index_from_controller_index(0).ToAbsoluteIndex());
+	LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() player index: {}, player name: {1}", playerIndex, h2mod->get_player_name_from_player_index(playerIndex));
 
 	DatumIndex unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
 	int unit_object = call_get_object(unit_datum_index, 3);
 
 	if (unit_object) {
-		int level = GunGame::gungamePlayers[getPlayerName(playerIndex)];
+		int level = GunGame::gungamePlayers[getPlayerXuid(playerIndex)];
 
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer({0}) {1} - Level: {2}", playerIndex, playerName, level);
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() - player index: {}, player name: {1} - Level: {2}", playerIndex, h2mod->get_player_name_from_player_index(playerIndex), level);
 
 		DatumIndex CurrentWeapon = GunGame::level_weapon[level];
 
 		if (level == 15) {
-			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on frag grenade level!", playerName);
-			if (wcscmp(playerName, localName) == 0) {
+			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on frag grenade level!", h2mod->get_player_name_from_player_index(playerIndex));
+			if (playerIdentifier == localPlayerIdentifier) {
 				call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
 				h2mod->set_player_unit_grenades_count(GrenadeType::Frag, 99, playerIndex);
 			} else {
@@ -170,9 +170,9 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 		}
 
 		if (level == 16) {
-			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on plasma grenade level!", playerName);
+			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on plasma grenade level!", h2mod->get_player_name_from_player_index(playerIndex));
 
-			if (wcscmp(playerName, localName) == 0) {
+			if (playerIdentifier == localPlayerIdentifier) {
 				call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
 				h2mod->set_player_unit_grenades_count(GrenadeType::Plasma, 99, playerIndex);
 			} else {
@@ -200,20 +200,21 @@ void GunGame::playerDiedServer(int unit_datum_index)
 
 void GunGame::levelUpServer(int playerIndex)
 {
-	wchar_t* playerName = h2mod->get_player_name_from_player_index(playerIndex);
-	wchar_t* localName = h2mod->get_local_player_name();
-	LOG_TRACE_GAME(L"[H2Mod-GunGame]: LevelUp({0}) : {1}", playerIndex, playerName);
+	XUID playerIdentifier = getPlayerXuid(playerIndex);
+	XUID localPlayerIdentifier = getPlayerXuid(h2mod->get_player_datum_index_from_controller_index(0).ToAbsoluteIndex());
+	LOG_TRACE_GAME(L"[H2Mod-GunGame]: LevelUp() player index: {0}, player name: {1}", playerIndex, h2mod->get_player_name_from_player_index(playerIndex));
 
-	int level = GunGame::gungamePlayers[getPlayerName(playerIndex)];
+	int level = GunGame::gungamePlayers[getPlayerXuid(playerIndex)];
 	level++;
-	GunGame::gungamePlayers[getPlayerName(playerIndex)] = level;
 
-	LOG_TRACE_GAME("[H2Mod-GunGame]: LevelUp({0}) - new level: {1} ", playerIndex, level);
+	GunGame::gungamePlayers[getPlayerXuid(playerIndex)] = level;
+
+	LOG_TRACE_GAME("[H2Mod-GunGame]: LevelUp() player index: {0} - new level: {1} ", playerIndex, level);
 
 	if (level == 15) {
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 15 - Frag Grenades!", playerName);
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 15 - Frag Grenades!", h2mod->get_player_name_from_player_index(playerIndex));
 
-		if (wcscmp(playerName, localName) == 0) {
+		if (playerIdentifier == localPlayerIdentifier) {
 			call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
 			h2mod->set_player_unit_grenades_count(GrenadeType::Frag, 99, playerIndex);
 		} else {
@@ -222,8 +223,8 @@ void GunGame::levelUpServer(int playerIndex)
 	}
 
 	if (level == 16) {
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 16 - Plasma Grenades!", playerName);
-		if (wcscmp(playerName, localName) == 0) {
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 16 - Plasma Grenades!", h2mod->get_player_name_from_player_index(playerIndex));
+		if (playerIdentifier == localPlayerIdentifier) {
 			call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
 			h2mod->set_player_unit_grenades_count(GrenadeType::Plasma, 99, playerIndex);
 		} else {
@@ -233,13 +234,12 @@ void GunGame::levelUpServer(int playerIndex)
 	}
 
 	if (level < 15)	{
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on level {} giving them weapon...", playerName, level);
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on level {} giving them weapon...", h2mod->get_player_name_from_player_index(playerIndex), level);
 
 		DatumIndex LevelWeapon = GunGame::level_weapon[level];
 		sendGrenadePacket(GrenadeType::Frag, 0, playerIndex, 1);
 		sendGrenadePacket(GrenadeType::Plasma, 0, playerIndex, 1);
 		call_give_player_weapon(playerIndex, LevelWeapon, 1);
-
 	}
 }
 
@@ -302,7 +302,7 @@ void GunGameInitializer::onPeerHost() {
 	GunGame::setGameScore();
 	//TODO: is this really necessary (from old code)?
 	//init peer host gun game level
-	GunGame::gungamePlayers[getPlayerName(0)] = 0;
+	GunGame::gungamePlayers[getPlayerXuid(h2mod->get_player_datum_index_from_controller_index(0).ToAbsoluteIndex())] = 0;
 }
 
 void GunGamePreSpawnHandler::onClient() {

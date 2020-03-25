@@ -550,7 +550,7 @@ int WINAPI XLiveRender()
 				
 				if (it->second == false)
 				{
-					h2mod->CustomSoundPlay(L"sounds/AchievementUnlocked.wav", 0);
+					h2mod->custom_sound_play(L"sounds/AchievementUnlocked.wav", 0);
 					it->second = true;
 				}
 				
