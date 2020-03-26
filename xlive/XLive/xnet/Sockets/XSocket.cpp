@@ -325,20 +325,19 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		{
 		case 1000:
 			sendToAddr.sin_port = xnIp->xnaddr.wPortOnline;
-			if (xnIp->NatAddrSocket1000.sin_port)
+			if (!sockAddrInIsNull(&xnIp->NatAddrSocket1000))
 			{
-				sendToAddr.sin_port = xnIp->NatAddrSocket1000.sin_port;
+				sendToAddr = xnIp->NatAddrSocket1000;
 				//LOG_TRACE_NETWORK("XSocketSendTo() port 1000 nPort: {} secure: %08X", htons(nPort), iplong);
 			}
 
 			break;
 
 		case 1001:
-
 			sendToAddr.sin_port = ntohs(htons(xnIp->xnaddr.wPortOnline) + 1);
-			if (xnIp->NatAddrSocket1001.sin_port)
+			if (!sockAddrInIsNull(&xnIp->NatAddrSocket1001))
 			{
-				sendToAddr.sin_port = xnIp->NatAddrSocket1001.sin_port;
+				sendToAddr = xnIp->NatAddrSocket1001;
 				//LOG_TRACE_NETWORK("XSocketSendTo() port 1001 nPort: %i secure: %08X", htons(nPort), iplong);
 			}
 

@@ -89,4 +89,5 @@ private:
 };
 
 extern CXnIp ipManager;
-void SetUserUsername(char* username);
+
+bool sockAddrInIsNull(sockaddr_in* a1);
