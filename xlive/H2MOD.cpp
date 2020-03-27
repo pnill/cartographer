@@ -93,7 +93,7 @@ game_lobby_states call_get_lobby_state()
 
 #pragma region engine calls
 
-int __cdecl call_get_object(DatumIndex object_datum_index, int object_type)
+int __cdecl call_object_try_and_get_with_type(DatumIndex object_datum_index, int object_type)
 {
 	//LOG_TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
 
@@ -153,14 +153,6 @@ void __cdecl call_object_placement_data_new(ObjectPlacementData* s_object_placem
 	pobject_placement_data_new(s_object_placement_data, object_definition_index, object_owner, unk);
 }
 
-/*int __cdecl call_entity_datum_to_gamestate_datum(int entity_datum)
-{
-	typedef int(__cdecl entity_datum_to_gamestate_datum)(int entity_datum);
-	auto p_entity_datum_to_gamestate_datum = h2mod->GetAddress<entity_datum_to_gamestate_datum>(0x1F2211);
-
-	return pentity_datum_to_gamestate_datum(entity_datum);
-}*/
-
 signed int __cdecl call_object_new(ObjectPlacementData* pObject)
 {
 	//LOG_TRACE_GAME("object_new(pObject: %08X)", pObject);
@@ -183,7 +175,7 @@ bool __cdecl call_add_object_to_sync(DatumIndex gamestate_object_datum)
 /* We should really make this stuff into a struct/class, and access it that way it'd be much cleaner... */
 int get_actor_datum_from_unit_datum(int unit_datum)
 {
-	int unit_ptr = call_get_object(unit_datum, 3);
+	int unit_ptr = call_object_try_and_get_with_type(unit_datum, 3);
 	if (unit_ptr)
 	{
 		return *(int*)((BYTE*)unit_ptr + 0x130);
@@ -207,7 +199,7 @@ int get_char_datum_from_actor(int actor_datum)
 /*This is to get the datum of the last player who damaged the datum/unit provided */
 int get_damage_owner(int damaged_unit_index)
 {
-	int damaged_player_ptr = call_get_object(damaged_unit_index, 3);
+	int damaged_player_ptr = call_object_try_and_get_with_type(damaged_unit_index, 3);
 	if (damaged_player_ptr)
 	{
 		return *(int*)((BYTE*)damaged_player_ptr + 0xC8); // player_ptr/unit_ptr + 0xC8 = damaging player this works on vehicles/AI and such too.
@@ -538,7 +530,7 @@ void H2MOD::set_unit_biped(Player::Biped biped_type, int playerIndex)
 BYTE H2MOD::get_unit_team_index(DatumIndex unit_datum_index)
 {
 	BYTE tIndex = 0;
-	int unit_object = call_get_object(unit_datum_index, 3);
+	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
 	if (unit_object)
 	{
 		tIndex = *(BYTE*)((BYTE*)unit_object + 0x13C);
@@ -548,7 +540,7 @@ BYTE H2MOD::get_unit_team_index(DatumIndex unit_datum_index)
 
 void H2MOD::set_unit_team_index(int unit_datum_index, BYTE team)
 {
-	int unit_object = call_get_object(unit_datum_index, 3);
+	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
 	if (unit_object)
 	{
 		*(BYTE*)((BYTE*)unit_object + 0x13C) = team;
@@ -571,18 +563,50 @@ void H2MOD::set_unit_speed(float speed, int playerIndex)
 		playersIt.get_data_at_index(playerIndex)->unit_speed = speed;
 }
 
-void H2MOD::set_player_unit_grenades_count(BYTE type, BYTE count, int playerIndex)
+void H2MOD::set_player_unit_grenades_count(int playerIndex, BYTE type, BYTE count, bool resetEquipment)
 {
+	if (type > GrenadeType::Plasma)
+	{
+		LOG_TRACE_GAME("[H2MOD] set_player_unit_grenades_count() Invalid argument: type");
+		return;
+	}
+
+	static std::string grenadeEquipamentTagName[2] =
+	{
+		"objects\\weapons\\grenade\\frag_grenade\\frag_grenade"
+		"objects\\weapons\\grenade\\plasma_grenade\\plasma_grenade"
+	};
+
 	DatumIndex unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
+	DatumIndex grenade_eqip_tag_datum_index = tags::find_tag('eqip', grenadeEquipamentTagName[type]);
 
-	int unit_object = call_get_object(unit_datum_index, 3);
-
+	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
 	if (unit_object)
 	{
-		if (type == GrenadeType::Frag)
-			*(BYTE*)((BYTE*)unit_object + 0x252) = count;
-		if (type == GrenadeType::Plasma)
-			*(BYTE*)((BYTE*)unit_object + 0x253) = count;
+		if (resetEquipment)
+			call_unit_reset_equipment(unit_datum_index);
+
+		typedef bool(__cdecl* simulation_is_predicted)();
+		auto p_simulation_is_predicted = h2mod->GetAddress<simulation_is_predicted>(0x498B7, 0x42B54);
+
+		// not sure what these flags are, but this is called when picking up grenades
+		typedef void(__cdecl* entity_set_unk_flags)(DatumIndex objectIndex, int flags);
+		auto p_entity_set_unk_flags = h2mod->GetAddress<entity_set_unk_flags>(0x1B6685, 0x1B05B5);
+
+		typedef void(__cdecl* unit_add_grenade_to_inventory_send)(DatumIndex unitDatumIndex, DatumIndex equipamentTagIndex);
+		auto p_unit_add_grenade_to_inventory_send = h2mod->GetAddress<unit_add_grenade_to_inventory_send>(0x1B6F12, 0x1B0E42);
+
+		// send simulation update for grenades if we control the simulation
+		if (!p_simulation_is_predicted())
+		{
+			// set grenade count
+			*(BYTE*)((BYTE*)unit_object + 0x252 + type) = count;
+
+			p_entity_set_unk_flags(unit_datum_index, 0x400000); // not sure what this flag is
+			p_unit_add_grenade_to_inventory_send(unit_datum_index, grenade_eqip_tag_datum_index);
+		}
+
+		LOG_TRACE_GAME("[H2Mod-GunGame] set_player_unit_grenades_count - sending grenade simulation update, playerIndex={0}, peerIndex={1}", playerIndex, NetworkSession::getPeerIndex(playerIndex));
 	}
 
 }
@@ -911,10 +935,10 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	return result;
 }
 
-typedef bool(__cdecl *spawn_player)(int a1);
-spawn_player p_spawn_player;
+typedef bool(__cdecl *player_spawn)(DatumIndex playerDatumIndex);
+player_spawn p_player_spawn;
 
-bool __cdecl OnPlayerSpawn(int a1)
+bool __cdecl OnPlayerSpawn(DatumIndex playerDatumIndex)
 {
 	//I cant find somewhere to put this where it actually works (only needs to be done once on map load). It's only a few instructions so it shouldn't take long to execute.
 	H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
@@ -922,28 +946,26 @@ bool __cdecl OnPlayerSpawn(int a1)
 	//once players spawn we aren't in lobby anymore ;)
 	isLobby = false;
 	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
-	int PlayerIndex = a1;
-
 
 	if (b_Infection) {
-		infectionHandler->preSpawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
+		infectionHandler->preSpawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
 		infectionHandler->preSpawnPlayer->execute();
 	}
 
 	if (b_GunGame) {
-		gunGame->preSpawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
+		gunGame->preSpawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
 		gunGame->preSpawnPlayer->execute();
 	}
 
-	bool ret = p_spawn_player(a1);
+	bool ret = p_player_spawn(playerDatumIndex);
 
 	if (b_Infection) {
-		infectionHandler->spawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
+		infectionHandler->spawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
 		infectionHandler->spawnPlayer->execute();
 	}
 
 	if (b_GunGame) {
-		gunGame->spawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
+		gunGame->spawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
 		gunGame->spawnPlayer->execute();
 	}
 
@@ -1282,7 +1304,7 @@ void H2MOD::ApplyHooks() {
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
 
 	// player spawn hook
-	p_spawn_player = (spawn_player)DetourFunc(h2mod->GetAddress<BYTE*>(0x55952, 0x5DE4A), (BYTE*)OnPlayerSpawn, 6);
+	p_player_spawn = (player_spawn)DetourFunc(h2mod->GetAddress<BYTE*>(0x55952, 0x5DE4A), (BYTE*)OnPlayerSpawn, 6);
 
 	// game version hook
 	p_get_game_version = (get_game_version)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4BF5, 0x1B0043), (BYTE*)GetGameVersion, 8);

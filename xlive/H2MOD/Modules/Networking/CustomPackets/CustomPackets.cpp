@@ -64,20 +64,6 @@ bool __cdecl decode_team_change_packet(bitstream* stream, int a2, s_team_change*
 	return stream->packet_is_valid() == false;
 }
 
-void __cdecl encode_set_grenades_packet(bitstream* stream, int a2, s_unit_grenades* data)
-{
-	stream->data_encode_integer("type", data->type, 32);
-	stream->data_encode_integer("count", data->count, 32);
-	stream->data_encode_integer("player-index", data->player_index, 32);
-}
-bool __cdecl decode_set_grenades_packet(bitstream* stream, int a2, s_unit_grenades* data)
-{
-	data->type = stream->data_decode_integer("type", 32);
-	data->count = stream->data_decode_integer("count", 32);
-	data->player_index = stream->data_decode_integer("player-index", 32);
-	return stream->packet_is_valid() == false;
-}
-
 void register_custom_packets(void* network_messages)
 {
 	typedef void(__cdecl* register_test_packet)(void* network_messages);
@@ -93,9 +79,6 @@ void register_custom_packets(void* network_messages)
 
 	register_packet_impl(network_messages, team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
 		(void*)encode_team_change_packet, (void*)decode_team_change_packet, NULL);
-
-	register_packet_impl(network_messages, unit_grenades, "unit-grenades", 0, sizeof(s_unit_grenades), sizeof(s_unit_grenades),
-		(void*)encode_set_grenades_packet, (void*)decode_set_grenades_packet, NULL);
 }
 
 typedef void(__stdcall *handle_out_of_band_message)(void *thisx, network_address* address, int message_type, int a4, void* packet);
@@ -258,18 +241,6 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		}
 	}
 
-	case unit_grenades:
-	{
-		if (*(int*)(network_channel + 0x54) == 5)
-		{
-			s_unit_grenades* received_data = (s_unit_grenades*)packet;
-			if (!h2mod->Server)
-				h2mod->set_player_unit_grenades_count(received_data->type, received_data->count, received_data->player_index);
-		}
-		return;
-	}
-
-
 	default:
 		break;
 	}
@@ -317,23 +288,6 @@ void CustomPackets::sendTeamChange(int peerIndex, int teamIndex)
 		{
 			if (observer_channel->field_1) {
 				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, team_change, sizeof(s_team_change), &data);
-			}
-		}
-	}
-}
-
-void CustomPackets::sendUnitGrenadesPacket(int peerIndex, s_unit_grenades* data)
-{
-	network_session* session = NetworkSession::getCurrentNetworkSession();
-	if (session->local_session_state == network_session_state_session_host)
-	{
-		if (peerIndex != -1 && peerIndex != session->local_peer_index)
-		{
-			network_observer* observer = session->network_observer_ptr;
-			peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peerIndex);
-
-			if (observer_channel->field_1) {
-				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, unit_grenades, sizeof(s_unit_grenades), data);
 			}
 		}
 	}

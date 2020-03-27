@@ -108,11 +108,9 @@ public:
 	static void spawnPlayerServer(int playerIndex);
 	static void playerDiedServer(int unit_datum_index); // We need to start using PlayerIndex here for sanity.
 	static void levelUpServer(int PlayerIndex);
-	static void sendGrenadePacket(BYTE type, BYTE count, int pIndex, bool bReset);
 	static void resetPlayerLevels();
-	static void setGameScore();
 
-	static std::unordered_map<int, DatumIndex> level_weapon;
+	static std::unordered_map<int, DatumIndex> levelWeapon;
 	static std::unordered_map<XUID, int> gungamePlayers;
 
 	~GunGame() {  };

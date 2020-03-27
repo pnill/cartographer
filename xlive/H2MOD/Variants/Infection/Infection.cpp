@@ -206,7 +206,7 @@ void Infection::spawnPlayerClientSetup(int playerIndex) {
 void Infection::spawnServerPlayerSetup(int playerIndex) {
 	LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}", playerIndex);
 	DatumIndex unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
-	int unit_object = call_get_object(unit_datum_index, 3);
+	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
 
 	if (unit_object && *(BYTE*)(unit_object + 0xAA) == 0) {
 		//if the unit_object is not 0, the spawned object is "alive"
@@ -223,7 +223,7 @@ void Infection::spawnServerPlayerSetup(int playerIndex) {
 }
 
 void Infection::infectPlayer(DatumIndex unitDatumIndex, int playerIndex) {
-	int unit_object = call_get_object(unitDatumIndex, 3);
+	int unit_object = call_object_try_and_get_with_type(unitDatumIndex, 3);
 	if (unit_object && h2mod->get_unit_team_index(unitDatumIndex) != ZOMBIE_TEAM
 		&& *(BYTE*)(unit_object + 0xAA) == 0) //check if object type is biped
 	{
@@ -246,7 +246,7 @@ void Infection::infectPlayer(DatumIndex unitDatumIndex, int playerIndex) {
 }
 
 void Infection::infectPlayers(DatumIndex unitDatumIndex, int playerIndex) {
-	int unit_object = call_get_object(unitDatumIndex, 3);
+	int unit_object = call_object_try_and_get_with_type(unitDatumIndex, 3);
 	if (unit_object && *(BYTE*)(unit_object + 0xAA) == 0) {
 		Infection::setZombiePlayerStatus(playerIndex);
 

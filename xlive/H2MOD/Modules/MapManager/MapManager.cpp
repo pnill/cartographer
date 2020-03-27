@@ -233,7 +233,6 @@ bool MapManager::hasCustomMap(std::string mapName) {
 * NOTE - only works on peers (not dedis)
 */
 bool MapManager::hasCustomMap(std::wstring mapName) {
-	DWORD dwBack;
 	wchar_t* mapsDirectory = h2mod->GetAddress<wchar_t*>(0x482D70 + 0x2423C);
 	std::wstring mapFileName(mapsDirectory);
 

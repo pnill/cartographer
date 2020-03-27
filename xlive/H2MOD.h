@@ -34,13 +34,14 @@ enum static_lod : DWORD
 	cinematic
 };
 
-int __cdecl call_get_object(DatumIndex object_datum_index, int object_type);
+int __cdecl call_object_try_and_get_with_type(DatumIndex object_datum_index, int object_type);
 int __cdecl call_unit_reset_equipment(DatumIndex unit_datum_index);
 bool __cdecl call_add_object_to_sync(DatumIndex gamestate_object_datum);
 void __cdecl call_hs_object_destroy(DatumIndex object_datum_index);
 signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit_datum_index);
 bool __cdecl call_assign_equipment_to_unit(DatumIndex uint, int object_index, short unk);
 void __cdecl call_object_placement_data_new(ObjectPlacementData*, DatumIndex, DatumIndex, int);
+void __cdecl call_unit_set_enterable_by_player(DatumIndex unit_datum, bool enable);
 signed int __cdecl call_object_new(ObjectPlacementData*);
 void call_give_player_weapon(int PlayerIndex, DatumIndex WeaponId, bool bReset);
 
@@ -71,7 +72,7 @@ public:
 		void set_unit_speed(float speed, int playerIndex);
 		void set_local_team_index(int local_player_index, int team);
 		BYTE get_local_team_index();
-		void set_player_unit_grenades_count(BYTE type, BYTE count, int playerIndex);
+		void set_player_unit_grenades_count(int playerIndex, BYTE type, BYTE count, bool resetEquipment);
 		void disable_sound(int sound);
 		void custom_sound_play(const wchar_t* soundName, int delay);
 		void disable_weapon_pickup(bool b_Enable);

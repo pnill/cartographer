@@ -937,7 +937,7 @@ void InitH2Tweaks() {
 		H2Tweaks::sunFlareFix();
 
 		// patch to show game details menu in NETWORK serverlist too
-		NopFill(h2mod->GetAddress(0x219D6D), 2);
+		//NopFill(h2mod->GetAddress(0x219D6D), 2);
 
 		WriteJmpTo(h2mod->GetAddress(0x7E43), WinMain);
 		WriteJmpTo(h2mod->GetAddress(0x39EA2), is_remote_desktop);

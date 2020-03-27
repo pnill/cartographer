@@ -57,7 +57,6 @@ enum e_network_message_types
 	request_map_filename,
 	custom_map_filename,
 	team_change,
-	unit_grenades,
 
 	end
 };
@@ -116,7 +115,6 @@ static const char* network_message_name[] = {
 	"request_map_filename"
 	"map_file_name"
 	"team_change"
-	"unit_grenades"
 };
 
 struct __declspec(align(8)) s_custom_map_filename
@@ -132,13 +130,6 @@ struct s_request_map_filename
 struct s_team_change
 {
 	DWORD team_index;
-};
-
-struct s_unit_grenades
-{
-	int type;
-	int count;
-	int player_index;
 };
 
 #pragma pack(push, 1)
@@ -164,5 +155,4 @@ namespace CustomPackets
 	void ApplyGamePatches();
 	void sendRequestMapFilename();
 	void sendTeamChange(int peerIndex, int teamIndex);
-	void sendUnitGrenadesPacket(int peerIndex, s_unit_grenades* data);
 }
