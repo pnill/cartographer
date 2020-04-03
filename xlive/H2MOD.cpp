@@ -73,19 +73,20 @@ int get_player_index_from_datum(DatumIndex unit_datum)
 	return unit_object->PlayerDatum.ToAbsoluteIndex();
 }
 
-enum game_lobby_states : int
+enum game_life_cycle : int
 {
-	not_in_lobby,
-	in_lobby,
-	unk1,
-	in_game,
-	unk2,
-	joining_lobby
+	life_cycle_none,
+	life_cycle_pre_game,
+	life_cycle_start_game,
+	life_cycle_in_game,
+	life_cycle_post_game,
+	life_cycle_joining,
+	life_cycle_matchmaking
 };
 
-game_lobby_states call_get_lobby_state()
+game_life_cycle get_game_life_cycle()
 {
-	typedef game_lobby_states(__cdecl get_lobby_state)();
+	typedef game_life_cycle(__cdecl get_lobby_state)();
 	auto p_get_lobby_state = h2mod->GetAddress<get_lobby_state*>(0x1AD660);
 
 	return p_get_lobby_state();
@@ -1010,9 +1011,11 @@ void* __stdcall OnWgitLoad(void* thisptr, int a2, int a3, int a4, unsigned short
 typedef void(__cdecl *change_team)(int a1, int a2);
 change_team p_change_local_team;
 
-void __cdecl changeTeam(int localPlayerIndex, int teamIndex) {
-	wchar_t* variant_name = h2mod->get_session_game_variant_name();
-	if (StrStrIW(variant_name, L"rvb") != NULL && teamIndex != 0 && teamIndex != 1) {
+void __cdecl changeTeam(int localPlayerIndex, int teamIndex) 
+{
+	network_session* session = NetworkSession::getCurrentNetworkSession();
+	if ((session->parameters.field_8 == 4 && get_game_life_cycle() == life_cycle_pre_game)
+		|| (StrStrIW(h2mod->get_session_game_variant_name(), L"rvb") != NULL && teamIndex != 0 && teamIndex != 1)) {
 		//rvb mode enabled, don't change teams
 		return;
 	}

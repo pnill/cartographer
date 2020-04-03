@@ -114,7 +114,7 @@ struct session_parameters
 {
 	DWORD parameters_update_number;
 	BYTE gap_4C64[4];
-	int field_4C68;
+	int field_8;
 	DWORD gap_4C6C;
 	DWORD system_language_id;
 	bool dedicated_server;
