@@ -265,7 +265,7 @@ int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount,
 		return SOCKET_ERROR;
 	}
 
-	return ipManager.handleRecvdPacket(xsocket, (sockaddr_in*)lpFrom, lpBuffers, *lpNumberOfBytesRecvd);;
+	return ipManager.handleRecvdPacket(xsocket, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);;
 }
 
 // #25
@@ -286,7 +286,8 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			lpCompletionRoutine);
 	}
 
-	if (inTo->sin_addr.s_addr == INADDR_BROADCAST) // handle broadcast
+	if (inTo->sin_addr.s_addr == INADDR_BROADCAST
+		|| inTo->sin_addr.s_addr == INADDR_ANY)
 	{
 		//inTo->sin_addr.s_addr = H2Config_master_ip;
 		//inTo->sin_port = ntohs(H2Config_master_port_relay);

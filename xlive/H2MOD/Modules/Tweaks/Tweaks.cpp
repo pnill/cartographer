@@ -914,9 +914,9 @@ void InitH2Tweaks() {
 		WriteValue(h2mod->GetAddress(0x39948 + 2), 0x7C6 & ~0x40);
 
 		//Set the LAN Server List Ping Frequency (milliseconds).
-		WriteValue(h2mod->GetAddress(0x001e9a89), 3000);
+		//WriteValue(h2mod->GetAddress(0x001e9a89), 3000);
 		//Set the LAN Server List Delete Entry After (milliseconds).
-		WriteValue(h2mod->GetAddress(0x001e9b0a), 9000);
+		//WriteValue(h2mod->GetAddress(0x001e9b0a), 9000);
 
 		//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
 		PatchCall(h2mod->GetAddress(0x22667B), NotDisplayIngameChat);

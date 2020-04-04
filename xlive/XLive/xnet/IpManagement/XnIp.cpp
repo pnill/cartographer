@@ -58,14 +58,14 @@ void CXnIp::setTimeConnectionInteractionHappened(IN_ADDR ina, int time)
 		xnIp->lastConnectionInteractionTime = time;
 }
 
-int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, int bytesRecvdCount)
+int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount)
 {
 	XNetConnectionReqPacket* connectionPck = reinterpret_cast<XNetConnectionReqPacket*>(lpBuffers->buf);
 
 	//if (lpFrom->sin_addr.s_addr == INADDR_BROADCAST)
 		//return ERROR_SUCCESS;
 
-	/*else*/ if (bytesRecvdCount == sizeof(XNetConnectionReqPacket)
+	/*else*/ if (*bytesRecvdCount == sizeof(XNetConnectionReqPacket)
 		&& connectionPck->ConnectPacketIdentifier == connectPacketIdentifier)
 	{
 		// TODO: add more XNet request types (like disconnect, network pulse etc...)

@@ -57,7 +57,7 @@ public:
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
 	void SetupLocalConnectionInfo(XNADDR* pxna);
 	int sendConnectionRequest(XSocket* xsocket, IN_ADDR ipIdentifier);
-	int handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, int bytesRecvdCount);
+	int handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount);
 
 	void UnregisterLocalConnectionInfo();
 	void GetStartupParamsAndUpdate(const XNetStartupParams* netStartupParams);
