@@ -276,7 +276,7 @@ void CustomPackets::sendRequestMapFilename()
 void CustomPackets::sendTeamChange(int peerIndex, int teamIndex)
 {
 	network_session* session = NetworkSession::getCurrentNetworkSession();
-	if (session->local_session_state == network_session_state_session_host)
+	if (NetworkSession::localPeerIsSessionHost())
 	{
 		s_team_change data;
 		data.team_index = teamIndex;

@@ -52,7 +52,7 @@ signed int Infection::calculateZombiePlayerIndex()
 
 void Infection::sendTeamChange()
 {
-	if (getLocalSessionState() == network_session_state_session_host)
+	if (localPeerIsSessionHost())
 	{
 		if (getPlayerCount() > 0)
 		{
