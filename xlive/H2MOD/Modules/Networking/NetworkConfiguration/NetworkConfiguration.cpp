@@ -128,7 +128,7 @@ double __stdcall unk_live_netcode_func(DWORD *thisx, signed int a2, bool a3, boo
 {
 	LOG_DEBUG_FUNC("unk: {0}, bits_per_sec: {1}, protocol_is_sys_link: {2}", a2, a3, a4);
 
-	return p_unk_live_netcode_func(thisx, a2, a3, a4);;
+	return p_unk_live_netcode_func(thisx, a2, a3, a4);
 }
 
 typedef bool(__stdcall* unk_live_netcode_func_def_2)(void *thisx, float a1, float packet_size, int delay_between_packets, int a4, int a5, int a6, int a7, int voice_data_buffer, int a9);

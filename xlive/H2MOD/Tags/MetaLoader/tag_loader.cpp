@@ -574,7 +574,7 @@ namespace tag_loader
 		if (tag_info->datum_index.ToAbsoluteIndex() != datum_index.ToAbsoluteIndex())
 		{
 			std::string error = "Tag: " + datum_index.ToInt();
-			error += " not loaded into tag tables and tag memory";;
+			error += " not loaded into tag tables and tag memory";
 			throw new std::exception(error.c_str());
 		}
 
@@ -669,7 +669,7 @@ namespace tag_loader
 		if (tag_info->datum_index.ToAbsoluteIndex() != datum_index.ToAbsoluteIndex())
 		{
 			std::string error = "Tag: " + datum_index.ToInt();
-			error += " not loaded into tag tables and tag memory";;
+			error += " not loaded into tag tables and tag memory";
 			throw new std::exception(error.c_str());
 		}
 
@@ -741,7 +741,7 @@ namespace tag_loader
 		if (Tdatum_index != datum_index)
 		{
 			std::string error = "Tag: " + datum_index.ToInt();
-			error += " not loaded into tag tables and tag memory";;
+			error += " not loaded into tag tables and tag memory";
 			throw new std::exception(error.c_str());
 		}
 

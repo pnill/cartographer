@@ -31,7 +31,7 @@ float get_device_power_transition_time(DatumIndex device_datum)
 //TODO: Convert to TagGroup/Block
 DatumIndex get_device_open_up_weapon_datum(DatumIndex device_datum)
 {
-	DWORD tag_data = (DWORD)tags::get_tag_data();;
+	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD global_tag_instances = (DWORD)tags::get_tag_instances();
 	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
 

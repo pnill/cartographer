@@ -265,7 +265,7 @@ int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount,
 		return SOCKET_ERROR;
 	}
 
-	return ipManager.handleRecvdPacket(xsocket, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);;
+	return ipManager.handleRecvdPacket(xsocket, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
 }
 
 // #25
