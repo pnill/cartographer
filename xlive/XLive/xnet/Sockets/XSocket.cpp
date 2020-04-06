@@ -292,12 +292,27 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		//inTo->sin_addr.s_addr = H2Config_master_ip;
 		//inTo->sin_port = ntohs(H2Config_master_port_relay);
 
-		// TODO: add LAN support
-		//inTo->sin_port = ntohs(H2Config_base_port + 1);
-		//int result = sendto(xsocket->winSockHandle, lpBuffers->buf, lpBuffers->len, dwFlags, (sockaddr*)lpTo, iTolen);
-		//return result;
+		XBroadcastPakHeader* packet = (XBroadcastPakHeader*)new char[sizeof(XBroadcastPakHeader) + lpBuffers->len];
+		ZeroMemory(packet, sizeof(XBroadcastPakHeader) + lpBuffers->len);
 
-		return SOCKET_ERROR;
+		packet->broadcast_identifier = 'BrOd';
+		packet->name.sin_addr.s_addr = INADDR_BROADCAST;
+		memcpy((char*)packet + sizeof(XBroadcastPakHeader), lpBuffers->buf, lpBuffers->len);
+
+		int portOffset = H2Config_base_port % 1000;
+
+		for (int i = 2000; i <= 5000;)
+		{
+			inTo->sin_port = ntohs(i + portOffset + 1);
+			int result = sendto(xsocket->winSockHandle, (const char*)packet, sizeof(XBroadcastPakHeader) + lpBuffers->len, dwFlags, (sockaddr*)inTo, iTolen);
+			if (result == SOCKET_ERROR) {
+				delete[] packet;
+				return SOCKET_ERROR;
+			}
+			i += 1000;
+		}
+		delete[] packet;
+		return ERROR_SUCCESS;
 	}
 
 	/*

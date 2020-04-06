@@ -60,12 +60,27 @@ void CXnIp::setTimeConnectionInteractionHappened(IN_ADDR ina, int time)
 
 int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount)
 {
+	XBroadcastPakHeader* broadcastPck = reinterpret_cast<XBroadcastPakHeader*>(lpBuffers->buf);
 	XNetConnectionReqPacket* connectionPck = reinterpret_cast<XNetConnectionReqPacket*>(lpBuffers->buf);
 
-	//if (lpFrom->sin_addr.s_addr == INADDR_BROADCAST)
-		//return ERROR_SUCCESS;
+	if (*bytesRecvdCount >= sizeof(XBroadcastPakHeader)
+		&& broadcastPck->broadcast_identifier == 'BrOd'
+		&& broadcastPck->name.sin_addr.s_addr == INADDR_BROADCAST)
+	{
+		if (*bytesRecvdCount > sizeof(XBroadcastPakHeader))
+		{
+			*bytesRecvdCount = *bytesRecvdCount - sizeof(XBroadcastPakHeader);
+			char* buffer = new char[*bytesRecvdCount];
+			memcpy(buffer, lpBuffers->buf + sizeof(XBroadcastPakHeader), *bytesRecvdCount);
+			memcpy(lpBuffers->buf, buffer, *bytesRecvdCount);
+			delete[] buffer;
+			return ERROR_SUCCESS;
+		}
+		WSASetLastError(WSAEWOULDBLOCK);
+		return SOCKET_ERROR;
+	}
 
-	/*else*/ if (*bytesRecvdCount == sizeof(XNetConnectionReqPacket)
+	else if (*bytesRecvdCount == sizeof(XNetConnectionReqPacket)
 		&& connectionPck->ConnectPacketIdentifier == connectPacketIdentifier)
 	{
 		// TODO: add more XNet request types (like disconnect, network pulse etc...)

@@ -19,3 +19,9 @@ struct XSocket
 	short getHostSocketPort() { return name.sin_port; }
 	short getNetworkSocketPort() { return htons(name.sin_port); }
 };
+
+struct XBroadcastPakHeader
+{
+	int broadcast_identifier;
+	sockaddr_in name;
+};
