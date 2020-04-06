@@ -942,9 +942,6 @@ void InitH2Tweaks() {
 		WriteJmpTo(h2mod->GetAddress(0x7E43), WinMain);
 		WriteJmpTo(h2mod->GetAddress(0x39EA2), is_remote_desktop);
 
-		//Redirect the variable for the server name to ours.
-		WritePointer(h2mod->GetAddress(0x1b2ce8), ServerLobbyName);
-
 		tags::on_map_load(fix_shaders_nvidia);
 	}
 

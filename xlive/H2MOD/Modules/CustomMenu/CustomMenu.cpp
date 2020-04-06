@@ -3204,45 +3204,42 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AdvLobbySettings() {//__thiscall
 }
 
 static bool CMButtonHandler_AdvLobbySettings(int button_id) {
+	
 	if (button_id == 0) {
-		wchar_t* bufferLobbyName = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AdvLobbySettings, 0xFFFFF001);
-		GSCustomMenuCall_VKeyboard_Inner(bufferLobbyName, 32, 0b11, CMLabelMenuId_AdvLobbySettings, 0xFFFFFF02, CMLabelMenuId_AdvLobbySettings, 0xFFFFFF03);
-	}
-	else if (button_id == 1) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (vehicleFlipoverEject = !vehicleFlipoverEject));
 		refreshVehicleFlipoverEject();
 	}
-	else if (button_id == 2) {
+	else if (button_id == 1) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_disable_kill_volumes = !AdvLobbySettings_disable_kill_volumes));
 		if (NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MapType::MULTIPLAYER_MAP && !AdvLobbySettings_disable_kill_volumes) {
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
 		}
 		H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
 	}
-	else if (button_id == 3) {
+	else if (button_id == 2) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_mp_explosion_physics = !AdvLobbySettings_mp_explosion_physics));
 	}
-	else if (button_id == 4) {
+	else if (button_id == 3) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_mp_sputnik = !AdvLobbySettings_mp_sputnik));
 	}
-	else if (button_id == 5) {
+	else if (button_id == 4) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_mp_grunt_bday_party = !AdvLobbySettings_mp_grunt_bday_party));
 	}
-	else if (button_id == 6) {
+	else if (button_id == 5) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_grenade_chain_react = !AdvLobbySettings_grenade_chain_react));
 	}
-	else if (button_id == 7) {
+	else if (button_id == 6) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_banshee_bomb = !AdvLobbySettings_banshee_bomb));
 	}
-	else if (button_id == 8) {
+	else if (button_id == 7) {
 		AdvLobbySettings_mp_blind = (AdvLobbySettings_mp_blind & ~0b01) | (~AdvLobbySettings_mp_blind & 0b01);
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b01));
 	}
-	else if (button_id == 9) {
+	else if (button_id == 8) {
 		AdvLobbySettings_mp_blind = (AdvLobbySettings_mp_blind & ~0b10) | (~AdvLobbySettings_mp_blind & 0b10);
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b10));
 	}
-	else if (button_id == 10) {
+	else if (button_id == 9) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_flashlight = !AdvLobbySettings_flashlight));
 	}
 	return false;
@@ -3272,13 +3269,6 @@ __declspec(naked) void sub_20F790_CM_nak_AdvLobbySettings() {//__thiscall
 
 void* __stdcall sub_248beb_deconstructor_AdvLobbySettings(LPVOID lpMem, char a2)//__thiscall
 {
-	wchar_t* bufferLobbyName = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AdvLobbySettings, 0xFFFFF001);
-	if (wcslen(bufferLobbyName) == 0) {
-		wchar_t* ClientName = (wchar_t*)((BYTE*)H2BaseAddr + 0x0051a638);
-		wcsncpy(bufferLobbyName, ClientName, 16);
-	}
-	wcsncpy(ServerLobbyName, bufferLobbyName, 32);
-
 	if (NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MapType::MULTIPLAYER_MAP) {
 		//advLobbySettings->sendLobbySettingsPacket();
 	}
@@ -3331,21 +3321,16 @@ void CMSetupVFTables_AdvLobbySettings() {
 }
 
 int __cdecl CustomMenu_AdvLobbySettings(int a1) {
-	wchar_t* bufferLobbyName = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AdvLobbySettings, 0xFFFFF001);
-	if (wcslen(bufferLobbyName) == 0) {
-		wchar_t* ClientName = (wchar_t*)((BYTE*)H2BaseAddr + 0x0051a638);
-		wcsncpy(bufferLobbyName, ClientName, 16);
-	}
-	loadLabelToggle_AdvLobbySettings(2, 0xFFFFFFF2, vehicleFlipoverEject);
-	loadLabelToggle_AdvLobbySettings(3, 0xFFFFFFF2, !AdvLobbySettings_disable_kill_volumes);
-	loadLabelToggle_AdvLobbySettings(4, 0xFFFFFFF2, AdvLobbySettings_mp_explosion_physics);
-	loadLabelToggle_AdvLobbySettings(5, 0xFFFFFFF2, AdvLobbySettings_mp_sputnik);
-	loadLabelToggle_AdvLobbySettings(6, 0xFFFFFFF2, AdvLobbySettings_mp_grunt_bday_party);
-	loadLabelToggle_AdvLobbySettings(7, 0xFFFFFFF2, AdvLobbySettings_grenade_chain_react);
-	loadLabelToggle_AdvLobbySettings(8, 0xFFFFFFF2, AdvLobbySettings_banshee_bomb);
-	loadLabelToggle_AdvLobbySettings(9, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b01));
-	loadLabelToggle_AdvLobbySettings(10, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b10));
-	loadLabelToggle_AdvLobbySettings(11, 0xFFFFFFF2, AdvLobbySettings_flashlight);
+	loadLabelToggle_AdvLobbySettings(1, 0xFFFFFFF2, vehicleFlipoverEject);
+	loadLabelToggle_AdvLobbySettings(2, 0xFFFFFFF2, !AdvLobbySettings_disable_kill_volumes);
+	loadLabelToggle_AdvLobbySettings(3, 0xFFFFFFF2, AdvLobbySettings_mp_explosion_physics);
+	loadLabelToggle_AdvLobbySettings(4, 0xFFFFFFF2, AdvLobbySettings_mp_sputnik);
+	loadLabelToggle_AdvLobbySettings(5, 0xFFFFFFF2, AdvLobbySettings_mp_grunt_bday_party);
+	loadLabelToggle_AdvLobbySettings(6, 0xFFFFFFF2, AdvLobbySettings_grenade_chain_react);
+	loadLabelToggle_AdvLobbySettings(7, 0xFFFFFFF2, AdvLobbySettings_banshee_bomb);
+	loadLabelToggle_AdvLobbySettings(8, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b01));
+	loadLabelToggle_AdvLobbySettings(9, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b10));
+	loadLabelToggle_AdvLobbySettings(10, 0xFFFFFFF2, AdvLobbySettings_flashlight);
 	return CustomMenu_CallHead(a1, menu_vftable_1_AdvLobbySettings, menu_vftable_2_AdvLobbySettings, (DWORD)&CMButtonHandler_AdvLobbySettings, 11, 272);
 }
 
@@ -5079,10 +5064,6 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF5, "Hide %s");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF6, "Play %s");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF7, "Skip %s");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFF02, "Change Server Name");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFF03, "Enter the new name for your lobby.");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFF001, 32 * sizeof(wchar_t), true);
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 1, ">Change Server Name");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0002, "Vehicle Flip Eject");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0003, "Kill Volumes");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0004, "MP Explosion Physics");
