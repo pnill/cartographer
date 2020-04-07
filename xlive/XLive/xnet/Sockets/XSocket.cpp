@@ -301,7 +301,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 
 		int portOffset = H2Config_base_port % 1000;
 
-		for (int i = 2000; i <= 5000;)
+		for (int i = 2000; i <= 5000; i += 1000)
 		{
 			inTo->sin_port = ntohs(i + portOffset + 1);
 			int result = sendto(xsocket->winSockHandle, (const char*)packet, sizeof(XBroadcastPakHeader) + lpBuffers->len, dwFlags, (sockaddr*)inTo, iTolen);
@@ -309,7 +309,6 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 				delete[] packet;
 				return SOCKET_ERROR;
 			}
-			i += 1000;
 		}
 		delete[] packet;
 		return ERROR_SUCCESS;

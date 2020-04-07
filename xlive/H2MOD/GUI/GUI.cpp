@@ -155,9 +155,6 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		has_initialised_input = true;
 	}
 
-	//TODO: fHandled doesn't actually work..need to look into how halo2.exe uses the XLIVE_INPUT_INFO struct after calling xliveinput
-	//pPii->fHandled = commands->handleInput(pPii->wParam);
-
 	return S_OK;
 }
 
@@ -166,7 +163,7 @@ extern void handleHotkeyInput(WPARAM lpMsg);
 // #5030: XLivePreTranslateMessage
 BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 {
-	if ((GetKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
+	if ((GetAsyncKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
 	{
 		// hotkeys
 		handleHotkeyInput(lpMsg->wParam);
