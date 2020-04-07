@@ -257,6 +257,7 @@ namespace NetworkSession
 	int getPeerCount();
 	int getLocalPeerIndex();
 	void kickPeer(int peerIndex);
+	void endGame();
 	peer_observer_channel* getPeerObserverChannel(int peerIndex);
 
 	void logPeersToConsole();

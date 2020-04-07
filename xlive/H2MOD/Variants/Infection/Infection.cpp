@@ -139,6 +139,7 @@ void Infection::resetWeaponInteractionAndEmblems() {
 }
 
 void Infection::preSpawnServerSetup() {
+	int humanCount = 0;
 	int playerIndex = 0;
 	do {
 		if (playerIsActive(playerIndex)) {
@@ -154,10 +155,15 @@ void Infection::preSpawnServerSetup() {
 			}
 			else {
 				h2mod->set_unit_biped(Player::Biped::Spartan, playerIndex);
+				humanCount++;
 			}
 		}
 		playerIndex++;
 	} while (playerIndex < 16);
+
+	// end the game if all humans are dead
+	if (humanCount == 0 && getPlayerCount() > 1)
+		endGame();
 }
 
 void Infection::setPlayerAsHuman(int playerIndex) {

@@ -123,6 +123,13 @@ void NetworkSession::kickPeer(int peerIndex)
 	}
 }
 
+void NetworkSession::endGame()
+{
+	typedef void(__cdecl* end_game)();
+	auto p_end_game = h2mod->GetAddress<end_game>(0x215470, 0x197F32);
+	p_end_game();
+}
+
 peer_observer_channel* NetworkSession::getPeerObserverChannel(int peerIndex)
 {
 	return &getCurrentNetworkSession()->peer_observer_channels[peerIndex];
