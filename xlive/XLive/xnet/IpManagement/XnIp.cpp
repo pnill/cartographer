@@ -79,7 +79,6 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 		WSASetLastError(WSAEWOULDBLOCK);
 		return SOCKET_ERROR;
 	}
-
 	else if (*bytesRecvdCount == sizeof(XNetConnectionReqPacket)
 		&& connectionPck->ConnectPacketIdentifier == connectPacketIdentifier)
 	{

@@ -267,10 +267,8 @@ void handleHotkeyInput(WPARAM wparam)
 	}
 }
 
-bool halo2WindowExists = false;
-bool halo2ServerOnce1 = false;
-
 void GSMainLoop() {
+	static bool halo2WindowExists = false;
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
 
@@ -292,6 +290,9 @@ void GSMainLoop() {
 			SetWindowText(H2hWnd, titleMod);
 		}
 	}
+
+	/*
+	static bool halo2ServerOnce1 = false;
 	if (H2IsDediServer && !halo2ServerOnce1) {
 		halo2ServerOnce1 = true;
 		pushHostLobby();
@@ -301,7 +302,7 @@ void GSMainLoop() {
 		}
 	}
 
-	/*static int prevPartyPrivacy = 0;
+	static int prevPartyPrivacy = 0;
 	int partyPrivacy;
 	if (H2IsDediServer) {
 		partyPrivacy = *(int*)(H2BaseAddr + 0x534850);
