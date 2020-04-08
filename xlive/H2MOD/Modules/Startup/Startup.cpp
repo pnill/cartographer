@@ -39,6 +39,9 @@ h2log *onscreendebug_log = nullptr;
 // Console logger, receives output from all loggers
 h2log *console_log = nullptr;
 
+// Voice chat logger
+h2log* voice_log = nullptr;
+
 std::random_device rd;
 
 ProcessInfo game_info;
@@ -271,12 +274,11 @@ void initLocalAppData() {
 	addDebugText(H2AppDataLocal);
 }
 
-typedef int(__cdecl *tsub_48BBF)();
-tsub_48BBF psub_48BBF;
-int __cdecl sub_48BBF() {
-	int result = psub_48BBF();
+void __cdecl game_modules_dispose() {
+	typedef void(__cdecl *tsub_48BBF)();
+	tsub_48BBF psub_48BBF = (tsub_48BBF)(H2BaseAddr + 0x48BBF);
+	psub_48BBF();
 	DeinitH2Startup();
-	return result;
 }
 
 CRITICAL_SECTION log_section;
@@ -393,9 +395,7 @@ void InitH2Startup() {
 		addDebugText("Process is Client");
 
 		addDebugText("Hooking Shutdown Function");
-		DWORD dwBack;
-		psub_48BBF = (tsub_48BBF)DetourFunc((BYTE*)H2BaseAddr + 0x48BBF, (BYTE*)sub_48BBF, 11);
-		VirtualProtect(psub_48BBF, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		PatchCall(H2BaseAddr + 0x39E7C, game_modules_dispose);
 	}
 
 	if (ArgList != NULL)
@@ -420,12 +420,16 @@ void InitH2Startup() {
 		if (H2Config_debug_log_console) {
 			console_log = h2log::create_console("CONSOLE MAIN");
 		}
-		xlive_log = h2log::create("xLiveLess", prepareLogFileName(L"h2xlive"));
+		xlive_log = h2log::create("XLive", prepareLogFileName(L"h2xlive"));
 		LOG_DEBUG_XLIVE(DLL_VERSION_STR "\n");
 		h2mod_log = h2log::create("H2MOD", prepareLogFileName(L"h2mod"));
 		LOG_DEBUG_GAME(DLL_VERSION_STR "\n");
 		network_log = h2log::create("Network", prepareLogFileName(L"h2network"));
 		LOG_DEBUG_NETWORK(DLL_VERSION_STR "\n");
+#if COMPILE_WITH_VOICE
+		voice_log = h2log::create("Voice", prepareLogFileName(L"voicechat"));
+		LOG_DEBUG(voice_log, DLL_VERSION_STR "\n");
+#endif
 	}
 	//checksum_log = logger::create(prepareLogFileName("checksum"), true);
 	LeaveCriticalSection(&log_section);

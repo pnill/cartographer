@@ -34,7 +34,7 @@ void HeadHunter::SpawnSkull(DatumIndex unit_datum)
 		nObject.TranslationalVelocity.Y = biped_unit->TranslationalVelocity.Y;
 		nObject.TranslationalVelocity.Z = biped_unit->TranslationalVelocity.Z;
 
-		DatumIndex new_object_datum = call_object_new(&nObject); //TODO: Re-write all these functions to use DatumIndex.
+		DatumIndex new_object_datum = call_object_new(&nObject);
 		if (!new_object_datum.IsNull())
 			call_add_object_to_sync(new_object_datum);
 	}

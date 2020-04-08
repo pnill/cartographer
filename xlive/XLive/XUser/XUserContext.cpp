@@ -7,6 +7,7 @@
 #include "H2MOD\Modules\Config\Config.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
+extern XSESSION_LOCAL_DETAILS sessionDetails;
 
 // 5289: XUserGetContext
 DWORD WINAPI XUserGetContext(DWORD dwUserIndex, XUSER_CONTEXT* pContext, PXOVERLAPPED  pOverlapped)
@@ -75,7 +76,7 @@ std::string getEnglishMapName()
 
 std::string getVariantName()
 {
-	std::wstring variant = h2mod->GetLobbyGameVariantName();
+	std::wstring variant = h2mod->get_session_game_variant_name();
 	variant = variant.substr(0, variant.find_last_not_of(L"\xE008\t\n ") + 1);
 	return wstring_to_string.to_bytes(variant);
 }

@@ -97,9 +97,6 @@
     <Filter Include="Source Files\XLive">
       <UniqueIdentifier>{cf71a59b-5460-4fe7-8953-30d0bd68357b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\XLive\User Management">
-      <UniqueIdentifier>{82eca85d-aeb0-4259-b4d9-c6ab7f81b459}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Util\Hooks">
       <UniqueIdentifier>{6e3b665a-267b-4baf-9978-190c7753a4d1}</UniqueIdentifier>
     </Filter>
@@ -277,6 +274,30 @@
     <Filter Include="Source Files\H2MOD\Modules\DataArray">
       <UniqueIdentifier>{009ec295-3920-4f2e-91ab-5c4dc867750a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\XLive\Cryptography">
+      <UniqueIdentifier>{72853862-ec1c-4ea0-9c17-88b523b85492}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\XLive\xnet\Sockets">
+      <UniqueIdentifier>{0ef5b046-a5fb-4343-b411-dbc21810d666}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\XLive\xnet\IpManager">
+      <UniqueIdentifier>{82eca85d-aeb0-4259-b4d9-c6ab7f81b459}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Networking\NetworkObserver">
+      <UniqueIdentifier>{1508a28a-521b-46eb-83f2-2506074d573e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\XLive\XSession">
+      <UniqueIdentifier>{0b290f69-4cf2-4197-87b8-e2009f389a65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\Networking\NetworkChannel">
+      <UniqueIdentifier>{ac28b760-f282-48b0-9488-c0f8f6bc7e6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Cache\Tags">
+      <UniqueIdentifier>{f334ecaa-82d0-463c-83de-c16fb3fb22f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\XLive\XStorage">
+      <UniqueIdentifier>{57e1f434-f9fa-4339-8f08-5a2d087e7721}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -321,17 +342,8 @@
     <ClCompile Include="Util\Debug\Debug.cpp">
       <Filter>Source Files\Util\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\Networking\xlive_network.cpp">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD\Variants\H2Final\H2Final.cpp">
       <Filter>Source Files\H2MOD\Variants\H2Final</Filter>
-    </ClCompile>
-    <ClCompile Include="XLive\Networking\ServerList.cpp">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClCompile>
-    <ClCompile Include="XLive\Networking\upnp.cpp">
-      <Filter>Source Files\XLive\xnet</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Variants\H2X\H2X.cpp">
       <Filter>Source Files\H2MOD\Variants\H2X</Filter>
@@ -426,12 +438,6 @@
     <ClCompile Include="XLive\XUser\XUserProperty.cpp">
       <Filter>Source Files\XLive\XUser</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\Networking\xnet.cpp">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClCompile>
-    <ClCompile Include="XLive\Networking\XSocket.cpp">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClCompile>
     <ClCompile Include="XLive\XUser\XCustomAction.cpp">
       <Filter>Source Files\XLive\XUser</Filter>
     </ClCompile>
@@ -471,9 +477,6 @@
     <ClCompile Include="XLive\Voice\AudioHandler.cpp">
       <Filter>Source Files\XLive\voice</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\Networking\XNetQoS.cpp">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp">
       <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
     </ClCompile>
@@ -495,16 +498,10 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Blam\Cache\Tags\scnr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD\Tags\global_tags_interface.cpp">
       <Filter>Source Files\H2MOD\Modules\TagInterface</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp">
-      <Filter>Source Files\H2MOD\Modules\TagInterface</Filter>
-    </ClCompile>
-    <ClCompile Include="Blam\Cache\Tags\itmc.cpp">
       <Filter>Source Files\H2MOD\Modules\TagInterface</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp">
@@ -534,11 +531,44 @@
     <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp">
       <Filter>Source Files\H2MOD\Modules\MetaLoader</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\IpManagement\XnIp.cpp">
-      <Filter>Source Files\XLive\User Management</Filter>
+    <ClCompile Include="XLive\Cryptography\Rc4.cpp">
+      <Filter>Source Files\XLive\Cryptography</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\H2MOD\Modules\MapManager</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XNet\upnp.cpp">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XNet\xnet.cpp">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XNet\XNetQoS.cpp">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XNet\IpManagement\XnIp.cpp">
+      <Filter>Source Files\XLive\xnet\IpManager</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XNet\Sockets\XSocket.cpp">
+      <Filter>Source Files\XLive\xnet\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\ServerList\ServerList.cpp">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.cpp">
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkObserver</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XSession\XSession.cpp">
+      <Filter>Source Files\XLive\XSession</Filter>
+    </ClCompile>
+    <ClCompile Include="Blam\Cache\Tags\scnr.cpp">
+      <Filter>Source Files\Blam\Cache\Tags</Filter>
+    </ClCompile>
+    <ClCompile Include="Blam\Cache\Tags\itmc.cpp">
+      <Filter>Source Files\Blam\Cache\Tags</Filter>
+    </ClCompile>
+    <ClCompile Include="XLive\XStorage\XStorage.cpp">
+      <Filter>Source Files\XLive\XStorage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -686,12 +716,6 @@
     <ClInclude Include="H2MOD\Variants\H2Final\H2Final.h">
       <Filter>Source Files\H2MOD\Variants\H2Final</Filter>
     </ClInclude>
-    <ClInclude Include="XLive\Networking\ServerList.h">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Networking\upnp.h">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Variants\H2X\H2X.h">
       <Filter>Source Files\H2MOD\Variants\H2X</Filter>
     </ClInclude>
@@ -784,12 +808,6 @@
     </ClInclude>
     <ClInclude Include="XLive\XUser\XUserProperty.h">
       <Filter>Source Files\XLive\XUser</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Networking\xnet.h">
-      <Filter>Source Files\XLive\xnet</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Networking\XSocket.h">
-      <Filter>Source Files\XLive\xnet</Filter>
     </ClInclude>
     <ClInclude Include="XLive\XUser\XCustomAction.h">
       <Filter>Source Files\XLive\XUser</Filter>
@@ -889,9 +907,6 @@
     </ClInclude>
     <ClInclude Include="XLive\Voice\AudioHandler.h">
       <Filter>Source Files\XLive\voice</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Networking\XNetQoS.h">
-      <Filter>Source Files\XLive\xnet</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h">
       <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
@@ -1115,28 +1130,13 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Tags\TagInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\Tags\tag_definitons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Cache\Tags\itmc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Cache\Tags\scnr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\Tags\tag_base.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Tags\global_tags_interface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\shad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h">
@@ -1208,20 +1208,62 @@
     <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h">
+      <Filter>Source Files\H2MOD\Modules\CustomResolutions</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\Cryptography\Rc4.h">
+      <Filter>Source Files\XLive\Cryptography</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h">
+      <Filter>Source Files\H2MOD\Modules\MapManager</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XNet\upnp.h">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XNet\xnet.h">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XNet\XNetQoS.h">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XNet\IpManagement\XnIp.h">
+      <Filter>Source Files\XLive\xnet\IpManager</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XNet\Sockets\XSocket.h">
+      <Filter>Source Files\XLive\xnet\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\ServerList\ServerList.h">
+      <Filter>Source Files\XLive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XSession\XSession.h">
+      <Filter>Source Files\XLive\XSession</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h">
+      <Filter>Source Files\H2MOD\Modules\Networking\NetworkObserver</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h">
       <Filter>Source Files\H2MOD\Modules\DataArray</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h">
-      <Filter>Source Files\H2MOD\Modules\CustomResolutions</Filter>
+    <ClInclude Include="Blam\Cache\Tags\scnr.h">
+      <Filter>Source Files\Blam\Cache\Tags</Filter>
     </ClInclude>
-    <ClInclude Include="XLive\IpManagement\XnIp.h">
-      <Filter>Source Files\XLive\User Management</Filter>
+    <ClInclude Include="Blam\Cache\TagGroups\shad.h">
+      <Filter>Source Files\Blam\Cache\Tags</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Blam\Cache\Tags\tag_base.h">
+      <Filter>Source Files\Blam\Cache\Tags</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\Tags\tag_definitons.h">
+      <Filter>Source Files\Blam\Cache\Tags</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Tags\TagInterface.h">
+      <Filter>Source Files\H2MOD\Modules\TagInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h">
+      <Filter>Source Files\H2MOD\Modules\MetaLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="XLive\XStorage\XStorage.h">
+      <Filter>Source Files\XLive\XStorage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

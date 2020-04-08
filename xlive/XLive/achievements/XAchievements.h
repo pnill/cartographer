@@ -1,5 +1,5 @@
 #pragma once
-extern int achieveinit;
+extern int achievementCount;
 extern HANDLE g_dwFakeAchievementContent;
 
 #define XACHIEVEMENT_TYPE_COMPLETION            1
@@ -47,3 +47,5 @@ typedef struct
 	FILETIME                            ftAchieved;
 	DWORD                               dwFlags;
 } XACHIEVEMENT_DETAILS, *PXACHIEVEMENT_DETAILS;
+
+int AchievementEnumerator(DWORD cbBuffer, CHAR* pvBuffer, PDWORD pcItemsReturned, XOVERLAPPED* pOverlapped);

@@ -5,24 +5,22 @@
 #include "XLive\XAM\xam.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
-XSESSION_LOCAL_DETAILS sessionDetails;
-
-
 
 // #5260: XShowSigninUI
-int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags) // TODO: If this is called, pop cartographer account system UI.
+int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags)
 {
-	sys_ui = -1;
+	if (!userSignedIn(0))
+	{
+		extern void XUiShowSignInH2();
+		XUiShowSignInH2();
+	}
+
 	return ERROR_SUCCESS;
 }
-
 
 // #5215: XShowGuideUI
 int WINAPI XShowGuideUI(DWORD dwUserIndex)
 {
-	// signin change
-	sys_ui = -1;
-
 	extern void GSCustomMenuCall_Guide(); // Custom menu Guide Popup from H2MOD
 	GSCustomMenuCall_Guide();
 
@@ -239,12 +237,6 @@ DWORD WINAPI XShowKeyboardUI(DWORD dwUserIndex, DWORD dwFlags, LPCWSTR wseDefaul
 int WINAPI XShowGamerCardUI(DWORD dwUserIndex,XUID XuidPlayer)
 {
 	LOG_TRACE_XLIVE("XShowGamerCardUI");
-
-
-	// signin change
-	sys_ui = -1;
-
-
 	return 0;
 }
 

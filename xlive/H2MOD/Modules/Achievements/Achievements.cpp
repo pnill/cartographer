@@ -14,7 +14,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 	return size * nmemb;
 }
 
-void AchievementUnlock(XUID xuid, int achievement_id)
+void AchievementUnlock(XUID xuid, int achievement_id, XOVERLAPPED* pOverlapped)
 {
 	LOG_TRACE_GAME("[H2Mod-Achievement] - Unlocking achievement ID: {:d}", achievement_id);
 
@@ -74,14 +74,11 @@ void GetAchievements(XUID xuid)
 
 		document.Parse(readBuffer.c_str());
 
+		achievementList.clear();
 		for (auto& achievement : document["achievements"].GetArray())
 		{
 			int id = std::stoll(achievement.GetString());
 			achievementList[id] = 1;
 		}
 	}
-
-	// enable single player achievements
-	if (!h2mod->Server)
-		*h2mod->GetAddress<BYTE*>(0x518210 + 0x1B41) = (BYTE)1;
 }

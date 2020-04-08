@@ -128,7 +128,7 @@ double __stdcall unk_live_netcode_func(DWORD *thisx, signed int a2, bool a3, boo
 {
 	LOG_DEBUG_FUNC("unk: {0}, bits_per_sec: {1}, protocol_is_sys_link: {2}", a2, a3, a4);
 
-	return p_unk_live_netcode_func(thisx, a2, a3, a4);;
+	return p_unk_live_netcode_func(thisx, a2, a3, a4);
 }
 
 typedef bool(__stdcall* unk_live_netcode_func_def_2)(void *thisx, float a1, float packet_size, int delay_between_packets, int a4, int a5, int a6, int a7, int voice_data_buffer, int a9);
@@ -193,15 +193,17 @@ void NetworkConfiguration::ApplyPatches()
 	// also ping bars
 	//WriteValue<BYTE>(h2mod->GetAddress() + (h2mod->Server ? 0x1C1B7F : 0x1D4E35), 0xEB);
 
-	// makes Live network not as laggy 
-	WriteValue<int>(h2mod->GetAddress(0x28702, 0x24896), 500);
+	// disable LIVE netcode for now
+	WriteValue<BYTE>(h2mod->GetAddress(0x1B555B, 0x1A92B9) + 1, 0);
+	// disable ping bars
+	NopFill(h2mod->GetAddress(0x1D4E33, 0x1C1B7D), 2);
+	WriteValue<BYTE>(h2mod->GetAddress(0x1D4E35, 0x1C1B7F), 0xEB); // jmp
 
-	DWORD dwBack;
+	// makes Live network not as laggy 
+	//WriteValue<int>(h2mod->GetAddress(0x28702, 0x24896), 500);
 
 	//p_unk_live_netcode_func = (unk_live_netcode_func_def)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1BFB23, 0x1B9A03), (BYTE*)unk_live_netcode_func, 10);
-	//VirtualProtect(p_unk_live_netcode_func, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	//NopFill((DWORD)(BYTE*)(p_unk_live_netcode_func)+5 + 3, 5);
 
 	//p_unk_live_netcode_func_2 = (unk_live_netcode_func_def_2)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1BEE8D, 0x1B9A03), (BYTE*)unk_live_netcode_func_2, 14);
-	//VirtualProtect(p_unk_live_netcode_func_2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }

@@ -276,6 +276,7 @@
     <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.cpp" />
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="H2MOD\Tags\global_tags_interface.cpp" />
@@ -291,6 +292,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Util\log.cpp" />
+    <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
     <ClCompile Include="XLive\Voice\AudioDevices.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -347,20 +349,21 @@
     <ClCompile Include="Util\Hooks\Hook.cpp" />
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="XLive\achievements\XAchievements.cpp" />
-    <ClCompile Include="XLive\Networking\ServerList.cpp" />
-    <ClCompile Include="XLive\Networking\upnp.cpp" />
-    <ClCompile Include="XLive\Networking\XNetQoS.cpp" />
-    <ClCompile Include="XLive\Networking\xlive_network.cpp" />
-    <ClCompile Include="XLive\Networking\xnet.cpp" />
-    <ClCompile Include="XLive\Networking\XSocket.cpp" />
-    <ClCompile Include="XLive\IpManagement\XnIp.cpp" />
+    <ClCompile Include="XLive\ServerList\ServerList.cpp" />
+    <ClCompile Include="XLive\XNet\upnp.cpp" />
+    <ClCompile Include="XLive\XNet\XNetQoS.cpp" />
+    <ClCompile Include="XLive\XNet\xnet.cpp" />
+    <ClCompile Include="XLive\XNet\Sockets\XSocket.cpp" />
+    <ClCompile Include="XLive\XNet\IpManagement\XnIp.cpp" />
     <ClCompile Include="XLive\Voice\XHVEngine.cpp" />
     <ClCompile Include="XLive\XAM\xam.cpp" />
     <ClCompile Include="XLive\xbox\xbox.cpp" />
+    <ClCompile Include="XLive\XSession\XSession.cpp" />
     <ClCompile Include="XLive\XUser\XCustomAction.cpp" />
     <ClCompile Include="XLive\XUser\XUser.cpp" />
     <ClCompile Include="XLive\XUser\XUserContext.cpp" />
     <ClCompile Include="XLive\XUser\XUserProperty.cpp" />
+    <ClCompile Include="XLive\XStorage\XStorage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -462,6 +465,7 @@
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.h" />
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h" />
@@ -472,6 +476,7 @@
     <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
     <ClInclude Include="Blam\BlamLibrary.h" />
     <ClInclude Include="Blam\Cache\Cache.h" />
@@ -575,19 +580,21 @@
     <ClInclude Include="xlivedefs.h" />
     <ClInclude Include="xliveless.h" />
     <ClInclude Include="XLive\achievements\XAchievements.h" />
-    <ClInclude Include="XLive\Networking\ServerList.h" />
-    <ClInclude Include="XLive\Networking\upnp.h" />
-    <ClInclude Include="XLive\Networking\XNetQoS.h" />
-    <ClInclude Include="XLive\Networking\xnet.h" />
-    <ClInclude Include="XLive\Networking\XSocket.h" />
-    <ClInclude Include="XLive\IpManagement\XnIp.h" />
+    <ClInclude Include="XLive\ServerList\ServerList.h" />
+    <ClInclude Include="XLive\XNet\upnp.h" />
+    <ClInclude Include="XLive\XNet\XNetQoS.h" />
+    <ClInclude Include="XLive\XNet\xnet.h" />
+    <ClInclude Include="XLive\XNet\Sockets\XSocket.h" />
+    <ClInclude Include="XLive\XNet\IpManagement\XnIp.h" />
     <ClInclude Include="XLive\Voice\XHVEngine.h" />
     <ClInclude Include="XLive\XAM\xam.h" />
     <ClInclude Include="XLive\xbox\xbox.h" />
+    <ClInclude Include="XLive\XSession\XSession.h" />
     <ClInclude Include="XLive\XUser\XCustomAction.h" />
     <ClInclude Include="XLive\XUser\XUser.h" />
     <ClInclude Include="XLive\XUser\XUserContext.h" />
     <ClInclude Include="XLive\XUser\XUserProperty.h" />
+    <ClInclude Include="XLive\XStorage\XStorage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def" />

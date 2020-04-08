@@ -5,7 +5,6 @@ typedef struct _SOCKET_INFORMATION
 {
 	OVERLAPPED Overlapped;
 	SOCKET Socket;
-	CHAR Buffer[4];
 	WSABUF DataBuf;
 	DWORD BytesSEND;
 	DWORD BytesRECV;
@@ -16,16 +15,14 @@ class CXNetQoS
 public:
 	void Listener();
 	//void stopListening();
-	BOOL IsListening();
+	bool IsListening();
 
 	SOCKET m_ListenSocket;
 	bool m_bStopListening = false;
 	WSAEVENT m_WsaEvent;
 
-	// TODO: constructor gets the size of pbdata
-	// for now 255*4 which is what h2v requires
-	CHAR* pbData = new CHAR[255*4];
-	UINT cbData = 0;
+	unsigned int cbData = 0;
+	char* pbData = nullptr;
 
 	static void CALLBACK HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags);
 	static void CALLBACK SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags);

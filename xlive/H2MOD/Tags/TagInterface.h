@@ -63,6 +63,10 @@ namespace tags
 		int MoppCodesChecksum;
 		BYTE field_2F8[1284];
 		int foot;
+
+		bool is_main_menu() { return type == MainMenu; };
+		bool is_multiplayer() { return type == Multiplayer; };
+		bool is_single_player() { return type == SinglePlayer; };
 	};
 	static_assert(sizeof(cache_header) == 0x800, "Bad cache header size");
 

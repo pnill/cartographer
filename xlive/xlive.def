@@ -1,7 +1,7 @@
 EXPORTS			
 	XWSAStartup								@1	
 	XWSACleanup								@2	
-	XCreateSocket							@3	
+	XSocketCreate							@3	
 	XSocketClose								@4	
 	XSocketShutdown							@5	
 	XSocketIOCTLSocket						@6	

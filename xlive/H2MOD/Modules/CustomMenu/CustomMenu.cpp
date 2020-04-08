@@ -7,7 +7,7 @@
 #include "H2MOD\Modules\Accounts\Accounts.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\AccountCreate.h"
-#include "XLive\IpManagement\XnIp.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Updater\Updater.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -705,7 +705,7 @@ int __cdecl sub_23C72F_CM(int a1) {
 #pragma endregion
 
 void PoSmbstowcs(wchar_t* destsrc, int maxCount) {
-	wchar_t* end = (wchar_t*)malloc(sizeof(wchar_t) * maxCount);
+	wchar_t* end = (wchar_t*)calloc(maxCount, sizeof(wchar_t));
 	mbstowcs(end, (char*)destsrc, maxCount);
 	memcpy(destsrc, end, maxCount * sizeof(wchar_t));
 	destsrc[maxCount-1] = 0;
@@ -761,7 +761,7 @@ void GSCustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen
 	*(DWORD*)(v4 + 2652) = VKbMenuType;
 	DWORD* sgdsf = (DWORD*)(v4 + 2652);
 	if (VKbMenuType >= 32 && VKbMenuType < 64 && VKbMenuType & 0b10000) {
-		PoSmbstowcs(textBuffer, textBufferLen);
+		PoSmbstowcs(textBuffer, textBufferLen); // convert multibyte to wide charaters, uses same character buffer
 	}
 	sub_23B118((void*)v4, textBuffer, textBufferLen);
 	//*(DWORD*)(v4 + 2656) = a3;
@@ -2468,8 +2468,8 @@ __declspec(naked) void sub_20F790_CM_nak_Login_Warn() {//__thiscall
 void* __stdcall sub_248beb_deconstructor_Login_Warn(LPVOID lpMem, char a2)//__thiscall
 {
 	//show select profile gui
-	int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
-	sub_209236(0,0);
+	extern int notify_xlive_ui;
+	notify_xlive_ui = 0;
 
 	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
 	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
@@ -2986,9 +2986,10 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_raw_input = !H2Config_raw_input));
 		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
 	}
-//	else if (button_id == 8) {
-//		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_hitmarker_sound = !H2Config_hitmarker_sound));
-//	}
+	else if (button_id == 8) {
+		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_hiresfix = !H2Config_hiresfix));
+		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
+	}
 	return false;
 }
 
@@ -3034,8 +3035,8 @@ int __cdecl CustomMenu_OtherSettings(int a1) {
 	loadLabelToggle_OtherSettings(6, 0xFFFFFFF6, !H2Config_skip_intro);
 	loadLabelToggle_OtherSettings(7, 0xFFFFFFF2, !H2Config_disable_ingame_keyboard);
 	loadLabelToggle_OtherSettings(8, 0xFFFFFFF2, H2Config_raw_input);
-//	loadLabelToggle_OtherSettings(9, 0xFFFFFFF2, H2Config_hitmarker_sound);
-	return CustomMenu_CallHead(a1, menu_vftable_1_OtherSettings, menu_vftable_2_OtherSettings, (DWORD)&CMButtonHandler_OtherSettings, 8, 272);
+	loadLabelToggle_OtherSettings(9, 0xFFFFFFF2, H2Config_hiresfix);
+	return CustomMenu_CallHead(a1, menu_vftable_1_OtherSettings, menu_vftable_2_OtherSettings, (DWORD)&CMButtonHandler_OtherSettings, 9, 272);
 }
 
 void GSCustomMenuCall_OtherSettings() {
@@ -3640,17 +3641,17 @@ void setupAccountCreateLabels() {
 	char* bufferUsername = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
 	if (strlen(bufferUsername) <= 0) {
 		char* bufferUsername2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 0xFFFFFFF2);
-		strcpy_s(bufferUsername, 32, bufferUsername2);
+		strcpy_s(bufferUsername, XUSER_NAME_SIZE, bufferUsername2);
 	}
 	char* bufferEmail = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 2);
 	if (strlen(bufferEmail) <= 0) {
 		char* bufferEmail2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 0xFFFFFFF3);
-		strcpy_s(bufferEmail, 255, bufferEmail2);
+		strcpy_s(bufferEmail, 256, bufferEmail2);
 	}
 	char* bufferPassword = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 3);
 	if (strlen(bufferPassword) <= 0) {
 		char* bufferPassword2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 0xFFFFFFF4);
-		strcpy_s(bufferPassword, 255, bufferPassword2);
+		strcpy_s(bufferPassword, 256, bufferPassword2);
 	}
 }
 
@@ -3696,7 +3697,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountCreate() {//__thiscall
 
 static HANDLE hThreadCreate = 0;
 
-static DWORD WINAPI ThreadCreate(LPVOID lParam)
+static DWORD WINAPI AccountCreateThread(LPVOID lParam)
 {
 	//gotta delay it a little to make sure the menu's decide to render correctly.
 	Sleep(200L);
@@ -3728,23 +3729,23 @@ static DWORD WINAPI ThreadCreate(LPVOID lParam)
 
 static bool CMButtonHandler_AccountCreate(int button_id) {
 	if (button_id == 0) {
-		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
-		GSCustomMenuCall_VKeyboard_Inner((wchar_t*)textBuffer, 16, 0b10010, CMLabelMenuId_AccountCreate, 0xFFFFF002, CMLabelMenuId_AccountCreate, 0xFFFFF003);
+		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, XUSER_NAME_SIZE /* Wide string buffer size */, 0b10010, CMLabelMenuId_AccountCreate, 0xFFFFF002, CMLabelMenuId_AccountCreate, 0xFFFFF003);
 	}
 	else if (button_id == 1) {
-		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 2);
-		GSCustomMenuCall_VKeyboard_Inner((wchar_t*)textBuffer, 255, 0b10000, CMLabelMenuId_AccountCreate, 0xFFFFF004, CMLabelMenuId_AccountCreate, 0xFFFFF005);
+		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 2);
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 0b10000, CMLabelMenuId_AccountCreate, 0xFFFFF004, CMLabelMenuId_AccountCreate, 0xFFFFF005);
 	}
 	else if (button_id == 2) {
-		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 3);
-		GSCustomMenuCall_VKeyboard_Inner((wchar_t*)textBuffer, 255, 0b10000, CMLabelMenuId_AccountCreate, 0xFFFFF006, CMLabelMenuId_AccountCreate, 0xFFFFF007);
+		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 3);
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 0b10000, CMLabelMenuId_AccountCreate, 0xFFFFF006, CMLabelMenuId_AccountCreate, 0xFFFFF007);
 	}
 	else if (button_id == 3) {
 		if (!hThreadCreate) {
 			accountingGoBackToList = false;
 			updateAccountingActiveHandle(true);
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02C, 0xFFFFF02D);
-			hThreadCreate = CreateThread(NULL, 0, ThreadCreate, (LPVOID)0, 0, NULL);
+			hThreadCreate = CreateThread(NULL, 0, AccountCreateThread, (LPVOID)0, 0, NULL);
 		}
 	}
 	return false;
@@ -3840,7 +3841,8 @@ void GSCustomMenuCall_AccountCreate() {
 	CallWgit(WgitScreenfunctionPtr);
 }
 
-#pragma endregion
+
+#pragma endregion /* CM_AccountCreate */
 
 
 const int CMLabelMenuId_AccountEdit = 0xFF00000A;
@@ -3936,12 +3938,12 @@ static DWORD WINAPI ThreadLogin(LPVOID lParam)
 
 static bool CMButtonHandler_AccountEdit(int button_id) {
 	if (button_id == 0) {
-		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
-		GSCustomMenuCall_VKeyboard_Inner((wchar_t*)textBuffer, 255, 0b10000, CMLabelMenuId_AccountEdit, 0xFFFFF002, CMLabelMenuId_AccountEdit, 0xFFFFF003);
+		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 0b10000, CMLabelMenuId_AccountEdit, 0xFFFFF002, CMLabelMenuId_AccountEdit, 0xFFFFF003);
 	}
 	else if (button_id == 1) {
-		char* textBuffer = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
-		GSCustomMenuCall_VKeyboard_Inner((wchar_t*)textBuffer, 255, 0b10000, CMLabelMenuId_AccountEdit, 0xFFFFF004, CMLabelMenuId_AccountEdit, 0xFFFFF005);
+		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 0b10000, CMLabelMenuId_AccountEdit, 0xFFFFF004, CMLabelMenuId_AccountEdit, 0xFFFFF005);
 	}
 	else if (button_id == 2) {
 		AccountEdit_remember = !AccountEdit_remember;
@@ -4172,16 +4174,12 @@ static bool CMButtonHandler_AccountList(int button_id) {
 	else if (button_id == H2AccountCount) {
 		if (!mode_remove_account) {
 			//play offline
-			if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", 1234571000000000 + H2GetInstanceId(), 0x100 + H2GetInstanceId(), 0x100 * H2GetInstanceId(), "000000101300", "0000000000000000000000000000000000101300")) {
+			if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", 1234571000000000 + H2GetInstanceId(), 0x100 + H2GetInstanceId(), 0x100 * H2GetInstanceId(), "000000101300", "0000000000000000000000000000000000101300", false)) {
 				//show select profile gui
-				int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
-				sub_209236(0, 0);
+				extern int notify_xlive_ui;
+				notify_xlive_ui = 0;
 				H2Config_master_ip = inet_addr("127.0.0.1");
 				H2Config_master_port_relay = 2001;
-				extern int MasterState;
-				MasterState = 2;
-				extern char* ServerStatus;
-				snprintf(ServerStatus, 250, "Status: Offline");
 			}
 		}
 	}
@@ -4640,19 +4638,13 @@ void setupSomeTests() {
 
 	memcpy(func_array, func_array2, 16 * sizeof(int*));
 
-	//DWORD dwBack;
-
 	//psub_20C226 = (tsub_20C226)DetourClassFunc((BYTE*)H2BaseAddr + 0x20C226, (BYTE*)sub_20C226, 9);
-	//VirtualProtect(psub_20C226, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//psub_24DC0D = (tsub_24DC0D)DetourClassFunc((BYTE*)H2BaseAddr + 0x24DC0D, (BYTE*)sub_24DC0D_CM, 8);
-	//VirtualProtect(psub_24DC0D, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//psub_23D8AE = (tsub_23D8AE)DetourClassFunc((BYTE*)H2BaseAddr + 0x23D8AE, (BYTE*)sub_23D8AE, 9);
-	//VirtualProtect(psub_23D8AE, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//psub_20EEBE = (tsub_20EEBE)DetourClassFunc((BYTE*)H2BaseAddr + 0x20EEBE, (BYTE*)sub_20EEBE_CM, 9);
-	//VirtualProtect(psub_20EEBE, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }
 
 
@@ -4716,49 +4708,27 @@ void* __stdcall sub_23BC45(void* thisptr)//__thiscall
 	return v1;
 }
 
-int __cdecl sub_209236(int a1,int a2) {
-	if (ipManager.LocalUserLoggedIn()) {
-		int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
-		sub_209236(0,0);
+void XUiShowSignInH2() {
+	if (!isAccountingActiveHandle() && ReadH2Accounts()) {
+		GSCustomMenuCall_AccountList();
 	}
 	else {
-		if (!isAccountingActiveHandle() && ReadH2Accounts()) {
-			GSCustomMenuCall_AccountList();
-		}
-		else {
-			if (!isAccountingActiveHandle())
-				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF016, 0xFFFFF017);
-		}
+		if (!isAccountingActiveHandle())
+			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF016, 0xFFFFF017);
 	}
-	return 0;
 }
 
 typedef int(__cdecl *tsub_23f6b7)(int);
 tsub_23f6b7 psub_23f6b7;
 int __cdecl sub_23f6b7(int a1)
 {
-	if (ipManager.LocalUserLoggedIn()) {
-		ipManager.UnregisterLocal();
+	if (userSignedIn(0)) {
+		XUserSignOut(0);
+		ipManager.UnregisterLocalConnectionInfo();
+		UpdateConnectionStatus();
 	}
 	return psub_23f6b7(a1);
 }
-
-typedef char(__cdecl *tsub_209129)(int, int, int, int);
-tsub_209129 psub_209129;
-char __cdecl sub_209129(int a1, int a2, int a3, int a4)//player configuration profile signin
-{
-	char result =
-		psub_209129(a1, a2, a3, a4);
-	extern CHAR g_szUserName[4][16];
-	if (strncmp(g_szUserName[0], "[Username]", 16) == 0) {//change username to player configuration profile name if offline.
-		wchar_t* wideprofileName = (wchar_t*)((BYTE*)H2BaseAddr + 0x96C874);
-		char profileName[32];
-		wcstombs2(profileName, wideprofileName, 32);
-		SetUserUsername(profileName);
-	}
-	return result;
-}
-
 
 #pragma region Obscure_Menus
 
@@ -5033,7 +5003,7 @@ void initGSCustomMenu() {
 
 
 	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF0, "Message of the Day!");
-	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF1, "DO NOT CHEAT ONLINE!\r\n\Ranks are on the way!\r\nInitial testing phase is beginning now.\r\nNew variant OGH2, try it out!");
+	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF1, "DO NOT CHEAT ONLINE!\r\nRanks are on the way!\r\nInitial testing phase is beginning now.\r\nNew variant OGH2, try it out!");
 
 
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF0, "Customise HUD / GUI");
@@ -5090,8 +5060,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0006, "Game Intro Video");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0007, "In-game Keyb. CTRLs");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0008, "Raw Mouse Input");
-//	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0009, "Hitmarker Sound Effect");
-
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0009, "Hi Res Fix");
 
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF0, "Advanced Settings");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF1, "Alter additional settings for the game.");
@@ -5162,9 +5131,9 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_AccountCreate, 0xFFFFF005, "Enter the Email Address to be linked to your new account below.");
 	add_cartographer_label(CMLabelMenuId_AccountCreate, 0xFFFFF006, "Create a Password");
 	add_cartographer_label(CMLabelMenuId_AccountCreate, 0xFFFFF007, "Create the Password for your new account below.");
-	add_cartographer_label(CMLabelMenuId_AccountCreate, 1, 255 * 2, true);
-	add_cartographer_label(CMLabelMenuId_AccountCreate, 2, 255 * 2, true);
-	add_cartographer_label(CMLabelMenuId_AccountCreate, 3, 255 * 2, true);
+	add_cartographer_label(CMLabelMenuId_AccountCreate, 1, XUSER_NAME_SIZE * sizeof(wchar_t), true); // if the buffer is going to be used in Virtual Keyboard, allocate wide string buffer (tho mixing multibyte with wide strings is kinda retarded)
+	add_cartographer_label(CMLabelMenuId_AccountCreate, 2, 256 * sizeof(wchar_t), true);
+	add_cartographer_label(CMLabelMenuId_AccountCreate, 3, 256 * sizeof(wchar_t), true);
 	add_cartographer_label(CMLabelMenuId_AccountCreate, 4, "Create Account");
 
 
@@ -5178,8 +5147,8 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFF003, "Enter the Username or Email Address of your account below.");
 	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFF004, "Enter Account Password");
 	add_cartographer_label(CMLabelMenuId_AccountEdit, 0xFFFFF005, "Enter the Password of your account below.");
-	add_cartographer_label(CMLabelMenuId_AccountEdit, 1, 255 * 2, true);
-	add_cartographer_label(CMLabelMenuId_AccountEdit, 2, 255 * 2, true);
+	add_cartographer_label(CMLabelMenuId_AccountEdit, 1, 256 * sizeof(wchar_t), true);
+	add_cartographer_label(CMLabelMenuId_AccountEdit, 2, 256 * sizeof(wchar_t), true);
 	add_cartographer_label(CMLabelMenuId_AccountEdit, 4, "Login");
 
 
@@ -5210,28 +5179,15 @@ void initGSCustomMenu() {
 
 	setupSomeTests();
 
-	//"PRESS ANY KEY TO CONTINUE" mainmenu redirect.
-	PatchCall((DWORD)((BYTE*)H2BaseAddr + 0x23EF0A), &sub_209236);
-
-	DWORD dwBack;
 	pbtnHandler = (tbtnhandler)DetourClassFunc((BYTE*)H2BaseAddr + 0x213af2, (BYTE*)BtnHandlerCaller, 8);
-	VirtualProtect(pbtnHandler, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	psub_23f6b7 = (tsub_23f6b7)DetourFunc((BYTE*)H2BaseAddr + 0x23f6b7, (BYTE*)sub_23f6b7, 7);
-	VirtualProtect(psub_23f6b7, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//psub_248beb = (tsub_248beb)DetourClassFunc((BYTE*)H2BaseAddr + 0x248beb, (BYTE*)sub_248beb, 8);
-	//VirtualProtect(psub_248beb, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-	psub_209129 = (tsub_209129)DetourFunc((BYTE*)H2BaseAddr + 0x209129, (BYTE*)sub_209129, 5);
-	VirtualProtect(psub_209129, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	psub_bd137 = (tsub_bd137)DetourFunc((BYTE*)H2BaseAddr + 0xbd137, (BYTE*)sub_bd137, 5);
-	VirtualProtect(psub_bd137, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
 
 	RefreshToggleIngameKeyboardControls();
-
 
 	CMSetupVFTables_EscSettings();
 	

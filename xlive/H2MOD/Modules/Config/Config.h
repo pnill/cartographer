@@ -7,8 +7,8 @@ void ReadH2Config();
 
 #define DLL_VERSION_MAJOR               0
 #define DLL_VERSION_MINOR               5
-#define DLL_VERSION_REVISION            3
-#define DLL_VERSION_BUILD				2
+#define DLL_VERSION_REVISION            6
+#define DLL_VERSION_BUILD				0
 
 #define DLL_VERSION            DLL_VERSION_MAJOR, DLL_VERSION_MINOR, DLL_VERSION_REVISION, DLL_VERSION_BUILD
 #define STRINGIZE2(s) #s
@@ -40,11 +40,12 @@ extern int H2Config_vehicle_field_of_view;
 extern int H2Config_mouse_sens;
 extern int H2Config_controller_sens;
 extern int H2Config_refresh_rate;
+extern bool H2Config_hiresfix;
+extern bool H2Config_d3dex;
 extern float H2Config_crosshair_offset;
 extern bool H2Config_disable_ingame_keyboard;
 extern bool H2Config_hide_ingame_chat;
 extern bool H2Config_xDelay;
-//extern bool H2Config_hitmarker_sound;
 extern bool H2Config_voice_chat;
 extern char H2Config_dedi_server_name[32];
 extern char H2Config_dedi_server_playlist[256];

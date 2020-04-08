@@ -16,8 +16,6 @@
 #include "H2MOD\Variants\FireFight\FireFight.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
 #include "H2MOD\Variants\HeadHunter\HeadHunter.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
@@ -36,11 +34,9 @@ extern s_datum_array* game_state_objects_header;
 extern DeviceShop* device_shop;
 extern VariantPlayer* variant_player;
 
-extern MapManager* mapManager;
 extern AdvLobbySettings* advLobbySettings;
 extern bool displayXyz;
 extern volatile bool isLobby;
-extern ConsoleCommands* commands; 
 
 extern std::map<DWORD, bool> achievementList;
 
@@ -53,7 +49,3 @@ std::vector<std::string> split(const std::string &s, char delim);
 int stripWhitespace(wchar_t *inputStr);
 
 extern int H2GetInstanceId();
-
-/* XLive Globals*/
-extern UINT g_online;
-extern XUID xFakeXuid[4];

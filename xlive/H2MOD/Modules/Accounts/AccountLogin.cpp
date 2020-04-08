@@ -7,7 +7,7 @@
 #include "H2MOD\Modules\Accounts\Accounts.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "XLive\IpManagement\XnIp.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 
 bool AccountEdit_remember = true;
 
@@ -33,7 +33,37 @@ typedef LONG NTSTATUS, *PNTSTATUS;
 
 typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
 
-char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long saddr, unsigned long xnaddr, char* abEnet, char* abOnline) {
+wchar_t ServerLobbyName[32] = { L"Cartographer" };
+
+void UpdateConnectionStatus() {
+	extern int MasterState;
+	extern char* ServerStatus;
+	if (userSignedOnline(0)) {
+		MasterState = 10;
+		if (!h2mod->Server)
+			snprintf(ServerStatus, 250, "Status: Online");
+	}
+	else if (userSignedInLocally(0))
+	{
+		MasterState = 2;
+		if (!h2mod->Server)
+			snprintf(ServerStatus, 250, "Status: Locally signed in");
+	}
+	else
+	{
+		MasterState = 2;
+		if (!h2mod->Server)
+			snprintf(ServerStatus, 250, "Status: Offline");
+	}
+}
+
+void SetUserUsername(char* username) {
+	if (!h2mod->Server) {
+		swprintf(ServerLobbyName, 16, L"%hs", username);
+	}
+}
+
+char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long saddr, unsigned long xnaddr, char* abEnet, char* abOnline, bool onlineSignIn) {
 
 	if (strlen(username) <= 0 || xuid == 0 || saddr == 0 || strlen(abEnet) != 12 || strlen(abOnline) != 40) {
 		return 0;
@@ -62,7 +92,11 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	memcpy(&pxna.abEnet, abEnet2, 6);
 	memcpy(&pxna.abOnline, abOnline2, 20);
 
-	ipManager.ConfigureLocalUser(&pxna, xuid, username);
+	SetUserUsername(username);
+	XUserSetup(0, xuid, username, onlineSignIn);
+	ipManager.SetupLocalConnectionInfo(&pxna);
+
+	UpdateConnectionStatus();
 
 	if (H2CurrentAccountLoginToken) {
 		free(H2CurrentAccountLoginToken);
@@ -105,7 +139,7 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 static int InterpretMasterLogin(char* response_content, char* prev_login_token) {
 	int result = 0;//will stay as 0 when master only returns "return_code=xxx<br>"
 
-	char username[32] = { "" };
+	char username[XUSER_NAME_SIZE] = { "" };
 	char login_token[33] = { "" };
 	unsigned long long xuid = 0;
 	unsigned long saddr = 0;
@@ -240,7 +274,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			snprintf(tempstr1, 32, tempName);
+			strncpy_s(tempstr1, sizeof(tempstr1), tempName, strnlen_s(tempName, XUSER_MAX_NAME_LENGTH));
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -253,7 +287,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				char NotificationPlayerText[60];
 				snprintf(NotificationPlayerText, 60, "Login Username is: %s", tempstr1);
 				addDebugText(NotificationPlayerText);
-				strncpy(username, tempstr1, 32);
+				strncpy_s(username, tempstr1, strnlen_s(tempstr1, XUSER_MAX_NAME_LENGTH));
 			}
 		}
 		else if (sscanf(fileLine, "login_xuid=%llu", &templlu1) == 1) {
@@ -322,7 +356,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 
 	if (result > 0) {
 		int result_details;
-		if (result_details = ConfigureUserDetails(username, login_token, xuid, saddr, xnaddr, abEnet, abOnline)) {
+		if (result_details = ConfigureUserDetails(username, login_token, xuid, saddr, xnaddr, abEnet, abOnline, true)) {
 			//allow no login_token from backend in DB emergencies / random logins.
 			if (result_details == 1) {
 				if (prev_login_token) {
@@ -332,8 +366,8 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 								if (H2AccountBufferUsername[i]) {
 									free(H2AccountBufferUsername[i]);
 								}
-								H2AccountBufferUsername[i] = (char*)malloc(sizeof(char) * 17);
-								snprintf(H2AccountBufferUsername[i], 17, username);
+								H2AccountBufferUsername[i] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
+								strncpy_s(H2AccountBufferUsername[i], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
 								snprintf(H2AccountBufferLoginToken[i], 33, login_token);
 								break;
 							}
@@ -451,8 +485,8 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
 			}
 
 			if (username) {
-				char* username2 = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
-				snprintf(username2, strlen(username) + 1, username);
+				char* login_identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
+				snprintf(login_identifier, strlen(username) + 1, username);
 			}
 
 			GSCustomMenuCall_Invalid_Login_Token();

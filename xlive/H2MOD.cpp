@@ -8,6 +8,7 @@
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/MainMenu/Ranks.h"
 #include "H2MOD/Modules/MapFix/MPMapFix.h"
+#include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "H2MOD/Modules/Networking/Memory/bitstream.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/ServerConsole/ServerConsole.h"
@@ -16,6 +17,7 @@
 #include "H2MOD/Variants/GunGame/GunGame.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -27,7 +29,6 @@ HeadHunter* headHunterHandler = new HeadHunter();
 VariantPlayer* variant_player = new VariantPlayer();
 
 extern int H2GetInstanceId();
-extern XUID xFakeXuid[4];
 std::unordered_map<int, int> object_to_variant;
 
 bool b_H2X = false;
@@ -72,19 +73,20 @@ int get_player_index_from_datum(DatumIndex unit_datum)
 	return unit_object->PlayerDatum.ToAbsoluteIndex();
 }
 
-enum game_lobby_states : int
+enum game_life_cycle : int
 {
-	not_in_lobby,
-	in_lobby,
-	unk1,
-	in_game,
-	unk2,
-	joining_lobby
+	life_cycle_none,
+	life_cycle_pre_game,
+	life_cycle_start_game,
+	life_cycle_in_game,
+	life_cycle_post_game,
+	life_cycle_joining,
+	life_cycle_matchmaking
 };
 
-game_lobby_states call_get_lobby_state()
+game_life_cycle get_game_life_cycle()
 {
-	typedef game_lobby_states(__cdecl get_lobby_state)();
+	typedef game_life_cycle(__cdecl get_lobby_state)();
 	auto p_get_lobby_state = h2mod->GetAddress<get_lobby_state*>(0x1AD660);
 
 	return p_get_lobby_state();
@@ -92,7 +94,7 @@ game_lobby_states call_get_lobby_state()
 
 #pragma region engine calls
 
-int __cdecl call_get_object(DatumIndex object_datum_index, int object_type)
+int __cdecl call_object_try_and_get_with_type(DatumIndex object_datum_index, int object_type)
 {
 	//LOG_TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
 
@@ -152,14 +154,6 @@ void __cdecl call_object_placement_data_new(ObjectPlacementData* s_object_placem
 	pobject_placement_data_new(s_object_placement_data, object_definition_index, object_owner, unk);
 }
 
-/*int __cdecl call_entity_datum_to_gamestate_datum(int entity_datum)
-{
-	typedef int(__cdecl entity_datum_to_gamestate_datum)(int entity_datum);
-	auto p_entity_datum_to_gamestate_datum = h2mod->GetAddress<entity_datum_to_gamestate_datum>(0x1F2211);
-
-	return pentity_datum_to_gamestate_datum(entity_datum);
-}*/
-
 signed int __cdecl call_object_new(ObjectPlacementData* pObject)
 {
 	//LOG_TRACE_GAME("object_new(pObject: %08X)", pObject);
@@ -182,7 +176,7 @@ bool __cdecl call_add_object_to_sync(DatumIndex gamestate_object_datum)
 /* We should really make this stuff into a struct/class, and access it that way it'd be much cleaner... */
 int get_actor_datum_from_unit_datum(int unit_datum)
 {
-	int unit_ptr = call_get_object(unit_datum, 3);
+	int unit_ptr = call_object_try_and_get_with_type(unit_datum, 3);
 	if (unit_ptr)
 	{
 		return *(int*)((BYTE*)unit_ptr + 0x130);
@@ -206,7 +200,7 @@ int get_char_datum_from_actor(int actor_datum)
 /*This is to get the datum of the last player who damaged the datum/unit provided */
 int get_damage_owner(int damaged_unit_index)
 {
-	int damaged_player_ptr = call_get_object(damaged_unit_index, 3);
+	int damaged_player_ptr = call_object_try_and_get_with_type(damaged_unit_index, 3);
 	if (damaged_player_ptr)
 	{
 		return *(int*)((BYTE*)damaged_player_ptr + 0xC8); // player_ptr/unit_ptr + 0xC8 = damaging player this works on vehicles/AI and such too.
@@ -251,10 +245,10 @@ signed int __cdecl object_new_hook(ObjectPlacementData* new_object)
 	return result;
 }
 
-typedef void(__thiscall *tc_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, void* packet);
+typedef void(__stdcall *tc_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, bitstream* stream);
 tc_simulation_unit_entity_definition_creation_encode pc_simulation_unit_entity_definition_encode;
 
-void __fastcall c_simulation_unit_entity_definition_creation_encode(void *thisptr, void* _EDX_UNUSED_, int creation_data_size, void* creation_data, int a3, void* packet)
+void __stdcall c_simulation_unit_entity_definition_creation_encode(void *thisptr, int creation_data_size, void* creation_data, int a3, bitstream* stream)
 {
 	//LOG_TRACE_GAME_N("c_simulation_unit_entity_definition_creation_encode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, a3: %i, packet: %08X", thisptr, creation_data_size, creation_data, a3, packet);
 	int object_permutation_index = *(int*)((char*)creation_data + 0x24);
@@ -262,29 +256,29 @@ void __fastcall c_simulation_unit_entity_definition_creation_encode(void *thispt
 	{
 		//LOG_TRACE_GAME_N("creation_data+0x24: %08X", object_permutation_index);
 
-		bitstream::p_data_encode_bool()(packet, "object-permutation-exists", 1);
-		bitstream::p_data_encode_integer()(packet, "object-permutation-index", object_permutation_index, 32);
+		stream->data_encode_bool("object-permutation-exists", 1);
+		stream->data_encode_integer("object-permutation-index", object_permutation_index, 32);
 		//LOG_TRACE_GAME_N("c_simulation_unit_entity_encode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
 
 	}
 	else
-		bitstream::p_data_encode_bool()(packet, "object-permutation-exists", 0);
+		stream->data_encode_bool("object-permutation-exists", 0);
 
-	pc_simulation_unit_entity_definition_encode(thisptr, creation_data_size, creation_data, a3, packet);
+	pc_simulation_unit_entity_definition_encode(thisptr, creation_data_size, creation_data, a3, stream);
 }
 
 
-typedef bool(__thiscall *tc_simulation_unit_entity_definition_creation_decode)(void* thisptr, int creation_data_size, void* creation_data, void* packet);
+typedef bool(__stdcall *tc_simulation_unit_entity_definition_creation_decode)(void* thisptr, int creation_data_size, void* creation_data, bitstream* stream);
 tc_simulation_unit_entity_definition_creation_decode pc_simulation_unit_entity_definition_decode;
 
-bool __fastcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, void* _EDX_UNUSED_, int creation_data_size, void* creation_data, void* packet)
+bool __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, int creation_data_size, void* creation_data, bitstream* stream)
 {
 	//LOG_TRACE_GAME_N("c_simulation_unit_entity_definition_creation_decode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, packet: %08X", thisptr, creation_data_size, creation_data, packet);
 
-	if (bitstream::p_data_decode_bool()(packet, "object-permutation-exists"))
+	if (stream->data_decode_bool("object-permutation-exists"))
 	{
 		//LOG_TRACE_GAME_N("c_simulation_unit_entity_decode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
-		int object_permutation_index = bitstream::p_data_decode_integer()(packet, "object-permutation-index", 32);
+		int object_permutation_index = stream->data_decode_integer("object-permutation-index", 32);
 		*(int*)((char*)creation_data + 0x24) = object_permutation_index;
 
 		//LOG_TRACE_GAME_N("object_permutation_index: %08X", object_permutation_index);
@@ -292,7 +286,7 @@ bool __fastcall c_simulation_unit_entity_definition_creation_decode(void *thispt
 	else
 		*(int*)((char*)creation_data + 0x24) = -1;
 
-	return pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, packet);
+	return pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, stream);
 }
 
 typedef int(__stdcall *tset_unit_creation_data)(unsigned int object_index, void* object_creation_data);
@@ -355,12 +349,12 @@ bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObje
 	return pcreate_unit_hook(pCreationData, a2, a3, pObject);
 }
 
-wchar_t* H2MOD::GetLobbyGameVariantName()
+wchar_t* H2MOD::get_session_game_variant_name()
 {
 	return h2mod->GetAddress<wchar_t*>(0x97777C, 0x534A18);
 }
 
-void H2MOD::exit_game()
+void H2MOD::leave_session()
 {
 	if (h2mod->Server)
 		return;
@@ -376,8 +370,8 @@ void H2MOD::exit_game()
 	}
 
 	typedef int(__cdecl leave_game_type)(int a1);
-	auto leave_game = h2mod->GetAddress<leave_game_type*>(0x216388);
-	leave_game(0);
+	auto leave_session = h2mod->GetAddress<leave_game_type*>(0x216388);
+	leave_session(0);
 }
 
 #pragma endregion
@@ -402,20 +396,12 @@ signed int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a
 	return p_wcsncpy_s_hook(a1, a2, a3, a4);
 }
 
-void H2MOD::handle_command(std::string command) {
-	commands->handle_command(command);
-}
-
-void H2MOD::handle_command(std::wstring command) {
-	commands->handle_command(std::string(command.begin(), command.end()));
-}
-
-bool H2MOD::is_team_play() {
-	//0x971A90 only works in lobby (not in game)
-	//0x978CB4 works in both
-	DWORD ptr = *h2mod->GetAddress<DWORD*>(0x978CB4);
-	ptr += 0x1C68;
-	return *(BYTE*)ptr;
+/* controller index aka local player index -> player index */
+DatumIndex H2MOD::get_player_datum_index_from_controller_index(int controller_index) 
+{
+	typedef int(__cdecl* get_local_player_index)(int controller_index); 
+	auto p_get_local_player_index = reinterpret_cast<get_local_player_index>(h2mod->GetAddress(0x5141D));
+	return p_get_local_player_index(controller_index); 
 }
 
 #pragma region PlayerFunctions
@@ -425,8 +411,8 @@ float H2MOD::get_distance(int playerIndex1, int playerIndex2) {
 	Real::Point3D* player1 = nullptr;
 	Real::Point3D* player2 = nullptr;
 
-	player1 = h2mod->get_player_coords(playerIndex1);
-	player2 = h2mod->get_player_coords(playerIndex2);
+	player1 = h2mod->get_player_unit_coords(playerIndex1);
+	player2 = h2mod->get_player_unit_coords(playerIndex2);
 	
 	points_distance.X = abs(player1->X - player2->X);
 	points_distance.Y = abs(player1->Y - player2->Y);
@@ -435,7 +421,7 @@ float H2MOD::get_distance(int playerIndex1, int playerIndex2) {
 	return sqrt(pow(points_distance.X, 2) + pow(points_distance.Y, 2) + pow(points_distance.Z, 2));
 }
 
-Real::Point3D* H2MOD::get_player_coords(int playerIndex) {
+Real::Point3D* H2MOD::get_player_unit_coords(int playerIndex) {
 	BYTE* player_unit = get_player_unit_from_player_index(playerIndex);
 	if (player_unit != nullptr)
 		return reinterpret_cast<Point3D*>(player_unit + 0x64);
@@ -473,9 +459,9 @@ void call_give_player_weapon(int PlayerIndex, DatumIndex WeaponId, bool bReset)
 	}
 }
 
-wchar_t* H2MOD::get_local_player_name()
+wchar_t* H2MOD::get_local_player_name(int local_player_index)
 {
-	return h2mod->GetAddress<wchar_t*>(0x51A638);
+	return this->get_player_name_from_player_index(this->get_player_datum_index_from_controller_index(local_player_index).ToAbsoluteIndex());
 }
 
 int H2MOD::get_player_index_from_name(wchar_t* playername)
@@ -545,7 +531,7 @@ void H2MOD::set_unit_biped(Player::Biped biped_type, int playerIndex)
 BYTE H2MOD::get_unit_team_index(DatumIndex unit_datum_index)
 {
 	BYTE tIndex = 0;
-	int unit_object = call_get_object(unit_datum_index, 3);
+	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
 	if (unit_object)
 	{
 		tIndex = *(BYTE*)((BYTE*)unit_object + 0x13C);
@@ -555,7 +541,7 @@ BYTE H2MOD::get_unit_team_index(DatumIndex unit_datum_index)
 
 void H2MOD::set_unit_team_index(int unit_datum_index, BYTE team)
 {
-	int unit_object = call_get_object(unit_datum_index, 3);
+	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
 	if (unit_object)
 	{
 		*(BYTE*)((BYTE*)unit_object + 0x13C) = team;
@@ -578,18 +564,50 @@ void H2MOD::set_unit_speed(float speed, int playerIndex)
 		playersIt.get_data_at_index(playerIndex)->unit_speed = speed;
 }
 
-void H2MOD::set_local_grenades(BYTE type, BYTE count, int playerIndex)
+void H2MOD::set_player_unit_grenades_count(int playerIndex, BYTE type, BYTE count, bool resetEquipment)
 {
+	if (type > GrenadeType::Plasma)
+	{
+		LOG_TRACE_GAME("[H2MOD] set_player_unit_grenades_count() Invalid argument: type");
+		return;
+	}
+
+	static std::string grenadeEquipamentTagName[2] =
+	{
+		"objects\\weapons\\grenade\\frag_grenade\\frag_grenade"
+		"objects\\weapons\\grenade\\plasma_grenade\\plasma_grenade"
+	};
+
 	DatumIndex unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
+	DatumIndex grenade_eqip_tag_datum_index = tags::find_tag('eqip', grenadeEquipamentTagName[type]);
 
-	int unit_object = call_get_object(unit_datum_index, 3);
-
+	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
 	if (unit_object)
 	{
-		if (type == GrenadeType::Frag)
-			*(BYTE*)((BYTE*)unit_object + 0x252) = count;
-		if (type == GrenadeType::Plasma)
-			*(BYTE*)((BYTE*)unit_object + 0x253) = count;
+		if (resetEquipment)
+			call_unit_reset_equipment(unit_datum_index);
+
+		typedef bool(__cdecl* simulation_is_predicted)();
+		auto p_simulation_is_predicted = h2mod->GetAddress<simulation_is_predicted>(0x498B7, 0x42B54);
+
+		// not sure what these flags are, but this is called when picking up grenades
+		typedef void(__cdecl* entity_set_unk_flags)(DatumIndex objectIndex, int flags);
+		auto p_entity_set_unk_flags = h2mod->GetAddress<entity_set_unk_flags>(0x1B6685, 0x1B05B5);
+
+		typedef void(__cdecl* unit_add_grenade_to_inventory_send)(DatumIndex unitDatumIndex, DatumIndex equipamentTagIndex);
+		auto p_unit_add_grenade_to_inventory_send = h2mod->GetAddress<unit_add_grenade_to_inventory_send>(0x1B6F12, 0x1B0E42);
+
+		// send simulation update for grenades if we control the simulation
+		if (!p_simulation_is_predicted())
+		{
+			// set grenade count
+			*(BYTE*)((BYTE*)unit_object + 0x252 + type) = count;
+
+			p_entity_set_unk_flags(unit_datum_index, 0x400000); // not sure what this flag is
+			p_unit_add_grenade_to_inventory_send(unit_datum_index, grenade_eqip_tag_datum_index);
+		}
+
+		LOG_TRACE_GAME("[H2Mod-GunGame] set_player_unit_grenades_count - sending grenade simulation update, playerIndex={0}, peerIndex={1}", playerIndex, NetworkSession::getPeerIndex(playerIndex));
 	}
 
 }
@@ -600,7 +618,7 @@ BYTE H2MOD::get_local_team_index()
 }
 #pragma endregion
 
-void H2MOD::DisableSound(int sound)
+void H2MOD::disable_sound(int sound)
 {
 	LOG_TRACE_GAME("tag data address: {:x}", tags::get_tag_data());
 	switch (sound)
@@ -627,7 +645,7 @@ void H2MOD::DisableSound(int sound)
 	}
 }
 
-void H2MOD::CustomSoundPlay(const wchar_t* soundName, int delay)
+void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 {
 	auto playSound = [=]()
 	{
@@ -734,7 +752,7 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 	pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
 
-void H2MOD::DisableWeaponPickup(bool b_Enable)
+void H2MOD::disable_weapon_pickup(bool b_Enable)
 {
 	//Client Sided Patch
 	DWORD offset = h2mod->GetAddress(0x55EFA);
@@ -836,14 +854,14 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 
 		UIRankPatch();
 		H2Tweaks::setHz();
-		H2Tweaks::disableAI_MP();
-		H2Tweaks::disable60FPSCutscenes();
+		H2Tweaks::toggleAiMp(false);
+		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		engine_settings->tickrate = XboxTick::setTickRate(false);
 
 		return result;
 	}		
 
-	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
+	wchar_t* variant_name = h2mod->get_session_game_variant_name();
 	LOG_INFO_GAME(L"[h2mod] OnMapLoad map type {0}, variant name {1}", h2mod->GetMapType(), variant_name);
 	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
 
@@ -878,10 +896,10 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 			engine_settings->tickrate = XboxTick::setTickRate(true);
 		}
 		
-		H2Tweaks::enableAI_MP();
+		H2Tweaks::toggleAiMp(true);
+		H2Tweaks::toggleUncappedCampaignCinematics(false);
 
 		H2Tweaks::setCrosshairSize(0, false);
-		H2Tweaks::disable60FPSCutscenes();
 		//H2Tweaks::applyShaderTweaks(); 
 
 		if (GameState == 3)
@@ -910,19 +928,18 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	{
 		//if anyone wants to run code on map load single player
 		addDebugText("Map type: Singleplayer");
-		H2X::Initialize(true);
+		//H2X::Initialize(true);
 		H2Tweaks::applyMeleePatch(true);
-
-		H2Tweaks::enable60FPSCutscenes();
+		H2Tweaks::toggleUncappedCampaignCinematics(true);
 	}
 
 	return result;
 }
 
-typedef bool(__cdecl *spawn_player)(int a1);
-spawn_player p_spawn_player;
+typedef bool(__cdecl *player_spawn)(DatumIndex playerDatumIndex);
+player_spawn p_player_spawn;
 
-bool __cdecl OnPlayerSpawn(int a1)
+bool __cdecl OnPlayerSpawn(DatumIndex playerDatumIndex)
 {
 	//I cant find somewhere to put this where it actually works (only needs to be done once on map load). It's only a few instructions so it shouldn't take long to execute.
 	H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
@@ -930,28 +947,26 @@ bool __cdecl OnPlayerSpawn(int a1)
 	//once players spawn we aren't in lobby anymore ;)
 	isLobby = false;
 	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
-	int PlayerIndex = a1;
-
 
 	if (b_Infection) {
-		infectionHandler->preSpawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
+		infectionHandler->preSpawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
 		infectionHandler->preSpawnPlayer->execute();
 	}
 
 	if (b_GunGame) {
-		gunGame->preSpawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
+		gunGame->preSpawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
 		gunGame->preSpawnPlayer->execute();
 	}
 
-	bool ret = p_spawn_player(a1);
+	bool ret = p_player_spawn(playerDatumIndex);
 
 	if (b_Infection) {
-		infectionHandler->spawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
+		infectionHandler->spawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
 		infectionHandler->spawnPlayer->execute();
 	}
 
 	if (b_GunGame) {
-		gunGame->spawnPlayer->setPlayerIndex(PlayerIndex & 0x0000FFFF);
+		gunGame->spawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
 		gunGame->spawnPlayer->execute();
 	}
 
@@ -996,9 +1011,11 @@ void* __stdcall OnWgitLoad(void* thisptr, int a2, int a3, int a4, unsigned short
 typedef void(__cdecl *change_team)(int a1, int a2);
 change_team p_change_local_team;
 
-void __cdecl changeTeam(int localPlayerIndex, int teamIndex) {
-	wchar_t* variant_name = h2mod->GetLobbyGameVariantName();
-	if (StrStrIW(variant_name, L"rvb") != NULL && teamIndex != 0 && teamIndex != 1) {
+void __cdecl changeTeam(int localPlayerIndex, int teamIndex) 
+{
+	network_session* session = NetworkSession::getCurrentNetworkSession();
+	if ((session->parameters.field_8 == 4 && get_game_life_cycle() == life_cycle_pre_game)
+		|| (StrStrIW(h2mod->get_session_game_variant_name(), L"rvb") != NULL && teamIndex != 0 && teamIndex != 1)) {
 		//rvb mode enabled, don't change teams
 		return;
 	}
@@ -1069,7 +1086,6 @@ char filo_write__encrypted_data_hook(filo *file_ptr, DWORD nNumberOfBytesToWrite
 	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
 }
 
-//int static_lod_state = static_lod::cinematic;
 DWORD calculate_model_lod;
 DWORD calculate_model_lod_detour_end;
 __declspec(naked) void calculate_model_lod_detour()
@@ -1096,61 +1112,6 @@ on_custom_map_change on_custom_map_change_method;
 
 void __cdecl onCustomMapChange(const void* a1) {
 	on_custom_map_change_method(a1);
-}
-
-typedef char(__stdcall *intercept_map_load)(LPCRITICAL_SECTION* thisx, const void *a2);
-intercept_map_load intercept_map_load_method;
-
-char __stdcall interceptMapLoad(LPCRITICAL_SECTION* thisx, const void *a2) {
-	LPCRITICAL_SECTION *v2; // ebx@1
-	struct _RTL_CRITICAL_SECTION *v3; // ebp@1
-	char result; // al@2
-
-	LOG_TRACE_GAME("[h2mod] Intercepted map load - crash function");
-
-	typedef char(__thiscall* map_filetime_check)(LPCRITICAL_SECTION* thisx, int a2, unsigned int a3);
-	auto map_filetime_check_method = h2mod->GetAddress<map_filetime_check>(0xC1E01);
-
-	typedef char(__thiscall* map_touch)(LPCRITICAL_SECTION* thisx, int a2);
-	auto map_touch_method = h2mod->GetAddress<map_touch>(0xC2541);
-
-	typedef char(unknown_function)();
-	auto unknown_function_method = h2mod->GetAddress<unknown_function*>(0x4541);
-
-	typedef char(__stdcall* unknown_function2)(int a1);
-	auto unknown_function_method2 = h2mod->GetAddress<unknown_function2>(0xC2069);
-
-	typedef int(__thiscall* map_limit_touch)(int thisx, int a2);
-	auto map_limit_touch_method = h2mod->GetAddress<map_limit_touch>(0xC1FA6);
-
-	v2 = thisx;
-	v3 = *thisx;
-
-	LOG_TRACE_GAME("[h2mod] Intercepted map load - about to enter critical section");
-	EnterCriticalSection(*thisx);
-	LOG_TRACE_GAME("[h2mod] Intercepted map load - in critical section");
-	if (a2
-		&& *((WORD *)v2 + 74008) < 0x32u
-		&& map_filetime_check_method(v2, (int)a2, 0xB90u)
-		&& !map_touch_method(v2, (int)a2))
-	{
-		if (!unknown_function_method())
-			unknown_function_method2((int)a2);
-
-		map_limit_touch_method((int)v2, (int)a2);
-		LOG_TRACE_GAME("[h2mod] Intercepted map load - memcpy");
-		memcpy(&v2[740 * (*((WORD *)v2 + 0x12118))++ + 4], a2, 0xB90u);
-		LeaveCriticalSection(v3);
-		LOG_TRACE_GAME("[h2mod] Intercepted map load - left critical section");
-		result = 1;
-	}
-	else
-	{
-		LeaveCriticalSection(v3);
-		LOG_TRACE_GAME("[h2mod] Intercepted map load - left critical section");
-		result = 0;
-	}
-	return result;
 }
 
 typedef bool(__cdecl *tfn_c000bd114)(int);
@@ -1289,23 +1250,33 @@ int __cdecl device_touch(DatumIndex device_datum, DatumIndex unit_datum)
 	return pdevice_touch(device_datum, unit_datum);
 }
 
+
+void H2MOD::team_player_indicator_visibility(bool toggle)
+{
+	this->drawTeamIndicators = toggle;
+}
+
+void __cdecl game_mode_engine_draw_team_indicators()
+{
+	typedef void(__cdecl* game_mode_engine_draw_team_indicators_def)();
+	auto p_game_mode_engine_draw_team_indicators = h2mod->GetAddress<game_mode_engine_draw_team_indicators_def>(0x6AFA4);
+
+	if (h2mod->drawTeamIndicators)
+		p_game_mode_engine_draw_team_indicators();
+}
+
 void H2MOD::ApplyUnitHooks()
 {
-	DWORD dwBack;
-
 	// increase the size of the unit entity creation definition packet
 	WriteValue<DWORD>(h2mod->GetAddress(0x1F8028, 0x1E1D8E) + 1, 48);
 
 	//This encodes the unit creation packet, only gets executed on host.
-	WritePointer(h2mod->GetAddress(0x3C8E14, 0x38444C), (void*)c_simulation_unit_entity_definition_creation_encode);
-	pc_simulation_unit_entity_definition_encode = h2mod->GetAddress<tc_simulation_unit_entity_definition_creation_encode>(0x1F8503, 0x1E2269);
+	pc_simulation_unit_entity_definition_encode = (tc_simulation_unit_entity_definition_creation_encode)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1F8503, 0x1E2269), (BYTE*)c_simulation_unit_entity_definition_creation_encode, 10);
 
 	//This decodes the unit creation packet, only gets executed on client.
-	WritePointer(h2mod->GetAddress(0x3C8E18, 0x384450), (void*)c_simulation_unit_entity_definition_creation_decode);
-	pc_simulation_unit_entity_definition_decode = h2mod->GetAddress<tc_simulation_unit_entity_definition_creation_decode>(0x1F8557, 0x1E22BD);
+	pc_simulation_unit_entity_definition_decode = (tc_simulation_unit_entity_definition_creation_decode)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1F8557, 0x1E22BD), (BYTE*)c_simulation_unit_entity_definition_creation_decode, 11);
 
 	pdevice_touch = (tdevice_touch)DetourFunc(h2mod->GetAddress<BYTE*>(0x163420, 0x158EE3), (BYTE*)device_touch, 10);
-	VirtualProtect(pdevice_touch, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//Only patch the object_new call on host during AI_Place function, no reason to hook all object_new calls.
 	PatchCall(h2mod->GetAddress(0x318DEC, 0x2C3B56), object_new_hook);
@@ -1329,30 +1300,23 @@ void H2MOD::ApplyHooks() {
 
 	LOG_TRACE_GAME("Applying hooks...");
 
-	DWORD dwBack;
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(h2mod->GetAddress(0x58789, 0x60C81), OnAutoPickUpHandler);
 
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
-	VirtualProtect(p_map_cache_load, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	// player spawn hook
-	p_spawn_player = (spawn_player)DetourFunc(h2mod->GetAddress<BYTE*>(0x55952, 0x5DE4A), (BYTE*)OnPlayerSpawn, 6);
-	VirtualProtect(p_spawn_player, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	p_player_spawn = (player_spawn)DetourFunc(h2mod->GetAddress<BYTE*>(0x55952, 0x5DE4A), (BYTE*)OnPlayerSpawn, 6);
 
 	// game version hook
 	p_get_game_version = (get_game_version)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4BF5, 0x1B0043), (BYTE*)GetGameVersion, 8);
-	VirtualProtect(p_get_game_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	pplayer_death = (player_death)DetourFunc(h2mod->GetAddress<BYTE*>(0x17B674, 0x152ED4), (BYTE*)OnPlayerDeath, 9);
-	VirtualProtect(pplayer_death, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	pupdate_player_score = (update_player_score)DetourClassFunc(h2mod->GetAddress<BYTE*>(0xD03ED, 0x8C84C), (BYTE*)OnPlayerScore, 12);
-	VirtualProtect(pupdate_player_score, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//on_custom_map_change_method = (on_custom_map_change)DetourFunc(h2mod->GetAddress<BYTE*>(0x32176, 0x25738), (BYTE*)onCustomMapChange, 5);
-	//VirtualProtect(on_custom_map_change_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	// disable part of custom map tag verification
 	NopFill(GetAddress(0x4FA0A, 0x56C0A), 6);
@@ -1372,49 +1336,33 @@ void H2MOD::ApplyHooks() {
 		/* These hooks are only built for the client, don't enable them on the server! */
 
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4C14), (BYTE*)VerifyGameVersionOnJoin, 5);
-		VirtualProtect(p_verify_game_version_on_join, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		p_verify_executable_version = (verify_executable_version)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4C32), (BYTE*)VerifyExecutableVersion, 8);
-		VirtualProtect(p_verify_executable_version, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//pload_wgit = (tload_wgit)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x2106A2), (BYTE*)OnWgitLoad, 13);
-		//VirtualProtect(pload_wgit, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
-		intercept_map_load_method = (intercept_map_load)DetourClassFunc(h2mod->GetAddress<BYTE*>(0xC259B), (BYTE*)interceptMapLoad, 13);
-		VirtualProtect(intercept_map_load_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+		//intercept_map_load_method = (intercept_map_load)DetourClassFunc(h2mod->GetAddress<BYTE*>(0xC259B), (BYTE*)interceptMapLoad, 13);
 
 		show_error_screen_method = (show_error_screen)DetourFunc(h2mod->GetAddress<BYTE*>(0x20E15A), (BYTE*)showErrorScreen, 8);
-		VirtualProtect(show_error_screen_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//TODO: turn on if you want to debug halo2.exe from start of process
 		//is_debugger_present_method = (is_debugger_present)DetourFunc(h2mod->GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
-		//VirtualProtect(is_debugger_present_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//TODO: use for object spawn hooking
 		//0x132163
 		//object_p_hook_method = (object_p_hook)DetourFunc(h2mod->GetAddress<BYTE*>(0x132163), (BYTE*)objectPHook, 6);
-		//VirtualProtect(object_p_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//TODO: expensive, use for debugging/searching
 		//string_display_hook_method = (string_display_hook)DetourFunc(h2mod->GetAddress<BYTE*>(0x287AB5), (BYTE*)stringDisplayHook, 5);
-		//VirtualProtect(string_display_hook_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//pResetRound=(ResetRounds)DetourFunc(h2mod->GetAddress<BYTE*>(0x6B1C8), (BYTE*)OnNextRound, 7);
-		//VirtualProtect(pResetRound, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		/*
 		WritePointer(h2mod->GetAddress<BYTE*>(0x1F0B3A), player_add_packet_handler);
 		WritePointer(h2mod->GetAddress<BYTE*>(0x1F0B80), player_remove_packet_handler);
 		*/
 
-		// Patch out the code that displays the "Invalid Checkpoint" error
-		// Start
-		NopFill(GetAddress(0x30857), 0x41);
-		// Respawn
-		NopFill(GetAddress(0x8BB98), 0x2B);
-
 		p_change_local_team = (change_team)DetourFunc(h2mod->GetAddress<BYTE*>(0x2068F2), (BYTE*)changeTeam, 8);
-		VirtualProtect(p_change_local_team, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		// hook the print command to redirect the output to our console
 		PatchCall(GetAddress(0xE9E50), print_to_console);
@@ -1427,22 +1375,20 @@ void H2MOD::ApplyHooks() {
 		WriteValue(GetAddress(0x190B38 + 1), 5);
 
 		pfn_c000bd114 = (tfn_c000bd114)DetourFunc(h2mod->GetAddress<BYTE*>(0xbd114), (BYTE*)fn_c000bd114_IsSkullEnabled, 5);
+
 		PatchCall(GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);
 		PatchCall(GetAddress(0x92C05), BansheeBombIsEngineMPCheck);
 		PatchCall(GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
-		Initialise_tag_loader();
-		TagInterface::GlobalTagInterface.Init();
+		PatchCall(h2mod->GetAddress(0x226702), game_mode_engine_draw_team_indicators);
+
+		//Initialise_tag_loader();
+		//TagInterface::GlobalTagInterface.Init();
 	}
 	else {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
-
 		ServerConsole::ApplyHooks();
-
-		//TODO: turn on later
-		//std::thread t1(&MapManager::startListeningForClients, mapManager);
-		//t1.detach();
 	}
 }
 
@@ -1467,17 +1413,11 @@ void H2MOD::Initialize()
 	}
 
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
-	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->Base);
+	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
 
 	h2mod->ApplyHooks();
 }
 
 void H2MOD::Deinitialize() {
 
-}
-
-void H2MOD::TeamPlayerIndicatorVisibility(bool toggle)
-{
-	// makes toggles between jz and jmp
-	WriteValue<BYTE>(h2mod->GetAddress(0x111197), toggle ? 0x74 : 0xEB);
 }

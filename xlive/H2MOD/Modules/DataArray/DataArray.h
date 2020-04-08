@@ -16,7 +16,7 @@ struct s_datum_array
 	void **allocator; // 0x30
 	struct {
 		int bit_index_size; // 0x34
-		int used_data_count; // 0x38
+		int max_data_count; // 0x38
 	} active_indices; 
 	int total_elements_used; // 0x3C 
 	DatumIndex next_datum; // 0x40
@@ -33,7 +33,7 @@ public:
 	DatumIterator(s_datum_array* _data_array) : data_array(_data_array)
 	{
 		m_last_datum_index = -1;
-		m_last_absolute_index = -1;
+		m_current_absolute_index = -1;
 	};
 
 	~DatumIterator()
@@ -53,25 +53,25 @@ public:
 
 	T* get_current_datum()
 	{
-		return reinterpret_cast<T*>(&data_array->datum[datum_size * m_last_absolute_index]);
+		return reinterpret_cast<T*>(&data_array->datum[data_array->datum_element_size * m_current_absolute_index]);
 	}
 
 	T* get_next_datum()
 	{
 		T* result = nullptr;
-		int index = get_next_absolute_datum_index(m_last_absolute_index + 1);
+		int index = get_next_absolute_datum_index(m_current_absolute_index + 1);
 
 		if (index == -1)
 		{
-			result = 0;
+			result = nullptr;
 			m_last_datum_index = -1;
-			m_last_absolute_index = data_array->datum_max_elements;
+			m_current_absolute_index = data_array->datum_max_elements;
 		}
 		else
 		{
 			result = reinterpret_cast<T*>(&data_array->datum[data_array->datum_element_size * index]);
-			m_last_absolute_index = index;
-			m_last_datum_index = index | (*(short*)(result) << 16); // absolute index w/ salt
+			m_current_absolute_index = index;
+			m_last_datum_index = DatumIndex(index, *(short*)(result) << 16); // absolute index w/ salt
 		}
 		return result;
 	}
@@ -81,12 +81,12 @@ public:
 		if (index < 0)
 			return -1;
 
-		if (index >= data_array->active_indices.used_data_count)
+		if (index >= data_array->active_indices.max_data_count)
 			return -1;
 
 		while (!((1 << (index & 0x1F)) & data_array->datum_usable_bit_mask[index >> 5]))
 		{
-			if (++index >= data_array->active_indices.used_data_count)
+			if (++index >= data_array->active_indices.max_data_count)
 				return -1;
 		}
 		return index;
@@ -94,12 +94,17 @@ public:
 
 	int get_current_absolute_index()
 	{
-		return m_last_absolute_index;
+		return m_current_absolute_index;
+	}
+
+	DatumIndex get_current_datum_index()
+	{
+		return m_last_datum_index;
 	}
 
 private:
 	
 	s_datum_array* data_array;
-	int m_last_datum_index;
-	int m_last_absolute_index;
+	DatumIndex m_last_datum_index;
+	int m_current_absolute_index;
 };
