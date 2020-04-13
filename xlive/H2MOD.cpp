@@ -103,6 +103,14 @@ int __cdecl call_object_try_and_get_with_type(DatumIndex object_datum_index, int
 	return p_get_object(object_datum_index, object_type);
 }
 
+int __cdecl call_entity_datum_to_gamestate_datum(int entity_datum)
+{
+	typedef int(__cdecl *entity_datum_to_gamestate_datum)(int entity_datum);
+	entity_datum_to_gamestate_datum pentity_datum_to_gamestate_datum = (entity_datum_to_gamestate_datum)h2mod->GetAddress(0x1F2211);
+
+	return pentity_datum_to_gamestate_datum(entity_datum);
+}
+
 int __cdecl call_unit_reset_equipment(DatumIndex unit_datum_index)
 {
 	//LOG_TRACE_GAME("unit_reset_equipment(unit_datum_index: %08X)", unit_datum_index);
@@ -781,25 +789,6 @@ int OnAutoPickUpHandler(DatumIndex player_datum, DatumIndex object_datum)
 	return AutoHandler(player_datum, object_datum);
 }
 
-/*
-TODO: might be useful for updating player count while in-lobby
-typedef bool(__cdecl *PacketHandler)(void *packet, int size, void *data);
-
-int __cdecl player_add_packet_handler(void *packet, int size, void *data)
-{
-	update_player_count();
-	PacketHandler game_player_add_handler = reinterpret_cast<PacketHandler>(h2mod->GetAddress() + 0x1F06B6);
-	return game_player_add_handler(packet, size, data);
-}
-
-bool __cdecl player_remove_packet_handler(void *packet, int size, void *data)
-{
-	update_player_count();
-	PacketHandler game_player_remove_handler = reinterpret_cast<PacketHandler>(h2mod->GetAddress() + 0x1F08BC);
-	return game_player_remove_handler(packet, size, data);
-}
-*/
-
 void get_object_table_memory()
 {
 	game_state_actors = *h2mod->GetAddress<s_datum_array**>(0xA965DC, 0x9A1C5C);
@@ -820,12 +809,12 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	
 	h2mod->SetMapType(engine_settings->map_type);
 
-	isLobby = true;
 	get_object_table_memory();
 
 	H2Tweaks::setFOV(H2Config_field_of_view);
 	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
+
 	
 	if (h2mod->GetMapType() == MapType::MAIN_MENU)
 	{
@@ -944,8 +933,6 @@ bool __cdecl OnPlayerSpawn(DatumIndex playerDatumIndex)
 	//I cant find somewhere to put this where it actually works (only needs to be done once on map load). It's only a few instructions so it shouldn't take long to execute.
 	H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
 
-	//once players spawn we aren't in lobby anymore ;)
-	isLobby = false;
 	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
 
 	if (b_Infection) {

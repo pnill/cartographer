@@ -11,7 +11,6 @@
 extern void InitInstance();
 
 extern bool displayXyz;
-extern volatile bool isLobby;
 
 typedef struct _XLIVE_INITIALIZE_INFO {
 	UINT cbSize;

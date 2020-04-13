@@ -9,7 +9,6 @@ s_datum_array* game_state_players = nullptr;
 s_datum_array* game_state_objects_header = nullptr;
 
 bool displayXyz = false;
-volatile bool isLobby = true;
 
 //TODO: actually check if they have a microphone or check some settings
 bool microphoneEnabled = true;

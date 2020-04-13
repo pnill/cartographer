@@ -36,7 +36,6 @@ extern VariantPlayer* variant_player;
 
 extern AdvLobbySettings* advLobbySettings;
 extern bool displayXyz;
-extern volatile bool isLobby;
 
 extern std::map<DWORD, bool> achievementList;
 

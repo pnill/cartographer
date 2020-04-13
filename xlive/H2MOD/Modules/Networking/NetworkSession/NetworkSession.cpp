@@ -15,7 +15,7 @@ network_session* NetworkSession::getCurrentNetworkSession()
 
 bool NetworkSession::getCurrentNetworkSession(network_session** outSession)
 {
-	typedef char(__cdecl* get_lobby_globals_ptr)(network_session** ptr);
+	typedef bool(__cdecl* get_lobby_globals_ptr)(network_session**);
 	return h2mod->GetAddress<get_lobby_globals_ptr>(0x1AD736, 0x1A66B3)(outSession);
 }
 

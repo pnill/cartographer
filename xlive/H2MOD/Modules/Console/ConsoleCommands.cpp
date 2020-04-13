@@ -389,25 +389,6 @@ bool ConsoleCommands::isNum(const char *s) {
 	return true;
 }
 
-int __cdecl call_get_object_via_datum(DatumIndex object_datum_index, int object_type)
-{
-	//LOG_TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
-
-	typedef int(__cdecl *get_object)(DatumIndex object_datum_index, int object_type);
-	get_object pget_object = (get_object)(h2mod->GetAddress(0x1304E3, 0x11F3A6));
-
-	return pget_object(object_datum_index, object_type);
-}
-
-int __cdecl call_entity_datum_to_gamestate_datum(int entity_datum)
-{
-	typedef int(__cdecl *entity_datum_to_gamestate_datum)(int entity_datum);
-	entity_datum_to_gamestate_datum pentity_datum_to_gamestate_datum = (entity_datum_to_gamestate_datum)h2mod->GetAddress(0x1F2211);
-
-	return pentity_datum_to_gamestate_datum(entity_datum);
-}
-
-
 /*
 * Handles the given string command
 * Returns a bool indicating whether the command is a valid command or not
@@ -549,7 +530,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (isLobby && h2mod->GetMapType() == MULTIPLAYER_MAP) {
+			if (h2mod->GetMapType() == MULTIPLAYER_MAP) {
 				//TODO: need a nicer way to detect this for dedis
 				output(L"Can only be used ingame");
 				return;
@@ -637,7 +618,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (isLobby && h2mod->GetMapType() == MULTIPLAYER_MAP) {
+			if (h2mod->GetMapType() == MULTIPLAYER_MAP) {
 				//TODO: need a nicer way to detect this for dedis
 				output(L"Can only be used ingame");
 				return;
