@@ -21,10 +21,6 @@ std::vector<H2X::h2x_mod_info> weapons =
 	{ "objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle", 10.0f, 11.0f, 0, true }
 };
 
-/* Half of an Xbox tick to avoid firing rates getting round down
-   because of floating point limitations */
-static const float FLOAT_IMPRECISSION_SENTINEL = 30/1000/2;
-
 float calculate_h2x_firerate(float h2v_firerate) {
 	// Calculate the effective firerate per seconds.
 	/* This works because every frame Halo 2 checks to see if enough time has
@@ -38,7 +34,8 @@ float calculate_h2x_firerate(float h2v_firerate) {
 		// Do not divide by 0.
 		return h2v_firerate;
 	}
-	return 30.0 / ceil(1 / h2v_firerate * 30.0 - FLOAT_IMPRECISSION_SENTINEL);
+	// - 0.06 to avoid a really pesky floating point rounding error
+	return 30.0 / ceil(1 / h2v_firerate * 30.0 - 0.06);
 }
 
 float calculate_h2x_recovery_time(float h2v_recovery_time) {
