@@ -72,9 +72,9 @@ void H2X::Initialize(bool enable)
 				for (int i = 0; i < barrel_data_block->block_count; i++) {
 					barrel_block = barrel_block + barrel_data_block_size * i;
 
-					float* firerate_lower = reinterpret_cast<float*>(barrel_block + 4);
-					float* firerate_upper = reinterpret_cast<float*>(barrel_block + 8);
-					float* recovery_time = reinterpret_cast<float*>(barrel_block + 32);
+					float* firerate_lower = (float*)(barrel_block + 4);
+					float* firerate_upper = (float*)(barrel_block + 8);
+					float* recovery_time = (float*)(barrel_block + 32);
 
 					if (*firerate_lower == *firerate_upper) {
 						/* Reason for this comparison is because in cases
