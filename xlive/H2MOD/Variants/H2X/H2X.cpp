@@ -23,7 +23,7 @@ std::vector<H2X::h2x_mod_info> weapons =
 
 /* A 100th of an Xbox tick to avoid firing rates getting round down
    because of floating point limitations */
-static const FLOAT_IMPRECISSION_SENTINEL = 30/1000/100;
+static const float FLOAT_IMPRECISSION_SENTINEL = 30/1000/100;
 
 float calculate_h2x_firerate(float h2v_firerate) {
 	// Calculate the effective firerate per seconds.
