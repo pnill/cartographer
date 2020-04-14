@@ -70,7 +70,7 @@ void H2X::Initialize(bool enable)
 
 				// Go through all barrel blocks and apply the fix.
 				for (int i = 0; i < barrel_data_block->block_count; i++) {
-					barrel_block = barrel_block + barrel_data_block_size * i;
+					auto barrel_block = barrel_block + barrel_data_block_size * i;
 
 					float* firerate_lower = (float*)(barrel_block + 4);
 					float* firerate_upper = (float*)(barrel_block + 8);
