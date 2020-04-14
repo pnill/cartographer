@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "stdafx.h"
 #include "H2MOD\Variants\H2X\H2X.h"
 
@@ -19,11 +21,40 @@ std::vector<H2X::h2x_mod_info> weapons =
 	{ "objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle", 10.0f, 11.0f, 0, true }
 };
 
-// TODO: find a math formula to fix this
+float calculate_h2x_firerate(float h2v_firerate) {
+	// Calculate the effective firerate per seconds.
+	/* This works because every frame Halo 2 checks to see if enough time has
+	   passed for the gun to be allowed to fire again.
+	   These checks happen more often at higher framerates thus where at 30fps
+	   it had to wait an extra frame, it now does not.
+
+	   We simulate it using this formula */
+
+	if (firerate < 0.0001) {
+		// Do not divide by 0.
+		return h2v_firerate;
+	}
+	return 30.0 / ceil(1 / h2v_firerate * 30.0);
+}
+
+float calculate_h2x_recovery_time(float h2v_recovery_time) {
+	/* The + hack is done because all of the brute forced values
+	   I find here seem to add an extra tick. This should be wrong.
+	   Please double check if that is actually right.
+	   Potentially remove the + hack completely.
+
+	   I am convinced that you over compensated and now your guns are too slow.*/
+
+	float hack = 30.0/1000.0;
+	return ceil(h2v_recovery_time * 30.0) / 30.0 + hack;
+}
+
 void H2X::Initialize(bool enable)
 {
 	for (auto& weapon : weapons)
 	{
+		/* With the value calculation being made universal we should consider
+		   applying this math to all weapon tags. */
 		auto required_datum = tags::find_tag('weap', weapon.tag_string);
 		BYTE* weapon_tag = tags::get_tag<'weap', BYTE>(required_datum);
 		if (weapon_tag != nullptr)
@@ -33,10 +64,41 @@ void H2X::Initialize(bool enable)
 
 			if (barrel_data_block->block_data_offset != -1)
 			{
-				*(float*)(tags::get_tag_data()
-					+ barrel_data_block->block_data_offset
-					+ barrel_data_block_size * weapon.barrel_data_block_index
-					+ (weapon.rounds_per_second_based ? 8 : 32)) = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
+				// Get the address of where the barrel blocks start.
+				auto barrel_blocks = tags::get_tag_data()
+					+ barrel_data_block->block_data_offset;
+
+				// Go through all barrel blocks and apply the fix.
+				for (int i = 0; i < barrel_data_block->block_count; i++) {
+					barrel_block = barrel_block + barrel_data_block_size * i;
+
+					float* firerate_lower = reinterpret_cast<float*>(barrel_block + 4);
+					float* firerate_upper = reinterpret_cast<float*>(barrel_block + 8);
+					float* recovery_time = reinterpret_cast<float*>(barrel_block + 32);
+
+					if (*firerate_lower == *firerate_upper) {
+						/* Reason for this comparison is because in cases
+						   where firing rates climb it is more accurate to use
+						   the supplied ones during the climb. Because this
+						   calculation would essentially have to be done on
+						   the output of the mathematical function that
+						   determines the exact firing rate the game will use.
+						   Not the input.
+
+						   Thus, we only edit this for weapons with constant
+						   firerates. */
+						*firerate_lower = calculate_h2x_firerate(*firerate_lower);
+					}
+					/* For the experience of the user it is more accurate to
+					   use the corrected rate of fire for the final rate, as
+					   at that point we have a constant fire rate again.
+
+					   Which is why we do always edit this.
+					*/
+					*firerate_upper = calculate_h2x_firerate(*firerate_upper);
+
+					*recovery_time = calculate_h2x_recovery_time(*recovery_time);
+				}
 			}
 		}
 	}
