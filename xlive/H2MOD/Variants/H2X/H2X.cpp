@@ -30,7 +30,7 @@ float calculate_h2x_firerate(float h2v_firerate) {
 
 	   We simulate it using this formula */
 
-	if (firerate < 0.0001) {
+	if (h2v_firerate < 0.0001) {
 		// Do not divide by 0.
 		return h2v_firerate;
 	}
