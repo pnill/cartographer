@@ -93,7 +93,7 @@ void H2X::Initialize(bool enable)
 						float factor = new_difference / old_difference;
 
 						*acceleration_time = *acceleration_time * factor;
-						*deceleration_time = *acceleration_time * factor;
+						*deceleration_time = *deceleration_time * factor;
 					}
 
 					*firerate_lower = new_lower;
