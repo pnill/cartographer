@@ -39,9 +39,13 @@ float calculate_h2x_firerate(float h2v_firerate) {
 	if (h2v_firerate < 0.0001) {
 		// Do not divide by 0.
 		return h2v_firerate;
+	} else if (h2v_firerate > 30.0) {
+		/* Firing rates above 30 are not possible at 30fps and below. */
+		return 30.0;
 	}
-	// - 0.06 to avoid a really pesky floating point rounding error
-	return 30.0 / ceil(1 / h2v_firerate * 30.0 - 0.06);
+	/* - 0.1 to avoid a really pesky floating point rounding error
+	   This error and rounding hack only affects higher values above 10.*/
+	return 30.0 / ceil(1 / h2v_firerate * 30.0 - 0.1);
 }
 
 float calculate_h2x_recovery_time(float h2v_recovery_time) {
