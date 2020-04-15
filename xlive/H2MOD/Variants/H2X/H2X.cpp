@@ -79,40 +79,25 @@ void H2X::Initialize(bool enable)
 					float* deceleration_time = (float*)(barrel_block + 16);
 					float* recovery_time = (float*)(barrel_block + 32);
 
-					if (*firerate_lower == *firerate_upper) {
-						/* Reason for this comparison is because in cases
-						   where firing rates climb it is more accurate to use
-						   the supplied ones during the climb. Because this
-						   calculation would essentially have to be done on
-						   the output of the mathematical function that
-						   determines the exact firing rate the game will use.
-						   Not the input.
+					float new_upper = calculate_h2x_firerate(*firerate_upper);
+					float new_lower = calculate_h2x_firerate(*firerate_lower);
 
-						   Thus, we only do it like this for weapons with
-						   constant firerates */
-						*firerate_lower = calculate_h2x_firerate(*firerate_lower);
-						*firerate_upper = calculate_h2x_firerate(*firerate_upper);
-					} else {
-						float new_upper = calculate_h2x_firerate(*firerate_upper);
-
+					if (*firerate_lower != *firerate_upper) {
 						/* To simulate the most correct between speeds we
-						   need to make the climb shorter. Otherwise they will
-						   be too slow. */
+						   might need to make the climb shorter.
+						   Otherwise the rates will be too slow. */
 
 						float old_difference = *firerate_upper - *firerate_lower;
-						float new_difference = new_upper - *firerate_lower;
+						float new_difference = new_upper - new_lower;
 
 						float factor = new_difference / old_difference;
 
 						*acceleration_time = *acceleration_time * factor;
 						*deceleration_time = *acceleration_time * factor;
-
-						/* The final fire rate cannot be skipped in edits
-						   because otherwise the gun might be too fast when it
-						   is done climbing. */
-
-						*firerate_upper = new_upper;
 					}
+
+					*firerate_lower = new_lower;
+					*firerate_upper = new_upper;
 
 					*recovery_time = calculate_h2x_recovery_time(*recovery_time);
 				}
