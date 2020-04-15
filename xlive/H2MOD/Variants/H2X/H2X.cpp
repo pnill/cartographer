@@ -52,6 +52,9 @@ float calculate_h2x_recovery_time(float h2v_recovery_time) {
 
 void H2X::Initialize(bool enable)
 {
+	// Why even execute any of this if we're not enabled?
+	if (!enable) return;
+
 	for (auto& weapon : weapons)
 	{
 		/* With the value calculation being made universal we should consider
@@ -104,8 +107,8 @@ void H2X::Initialize(bool enable)
 			}
 		}
 	}
-	
-	if (!h2mod->Server && enable && h2mod->GetMapType() == MULTIPLAYER_MAP)
+
+	if (!h2mod->Server && h2mod->GetMapType() == MULTIPLAYER_MAP)
 	{
 		// H2X Sound_Classes
 		*(float*)(&tags::get_tag_data()[0x4821C]) = 0.0f; /*H2X projectile_impact Index 0 Gains Bounds lower*/
