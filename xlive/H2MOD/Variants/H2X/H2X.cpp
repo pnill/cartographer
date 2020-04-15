@@ -1,3 +1,9 @@
+/*
+	gbMichelle: 2020-04-14  -  2020-04-15
+	 - Added universal firing rate and acceleration calculations for
+	   Xbox behavior emulation.
+*/
+
 #include <math.h>
 
 #include "stdafx.h"
