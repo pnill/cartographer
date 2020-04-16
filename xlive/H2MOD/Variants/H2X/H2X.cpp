@@ -43,9 +43,12 @@ float calculate_h2x_firerate(float h2v_firerate) {
 		/* Firing rates above 30 are not possible at 30fps and below. */
 		return 30.0;
 	}
-	/* - 0.1 to avoid a really pesky floating point rounding error
-	   This error and rounding hack only affects higher values above 10.*/
-	return 30.0 / ceil(1 / h2v_firerate * 30.0 - 0.1);
+
+	/* Convert to double to avoid rounding errors that show up all too often
+	   with floats. */
+	double h2v_firerate_dbl = static_cast<double>(h2v_firerate);
+	// -0.01 to avoid a potential rounding error.
+	return static_cast<float>(30.0 / ceil(1 / h2v_firerate_dbl * 30.0 - 0.01));
 }
 
 float calculate_h2x_recovery_time(float h2v_recovery_time) {
@@ -105,13 +108,13 @@ void H2X::Initialize(bool enable)
 						   might need to make the climb shorter.
 						   Otherwise the rates will be too slow. */
 
-						float old_difference = *firerate_upper - *firerate_lower;
-						float new_difference = new_upper - new_lower;
+						double old_difference = static_cast<double>(*firerate_upper) - static_cast<double>(*firerate_lower);
+						double new_difference = static_cast<double>(new_upper) - static_cast<double>(new_lower);
 
-						float factor = new_difference / old_difference;
+						double factor = new_difference / old_difference;
 
-						*acceleration_time = *acceleration_time * factor;
-						*deceleration_time = *deceleration_time * factor;
+						*acceleration_time = static_cast<float>(*acceleration_time * factor);
+						*deceleration_time = static_cast<float>(*deceleration_time * factor);
 					}
 
 					*firerate_lower = new_lower;
