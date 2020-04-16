@@ -49,9 +49,9 @@ float calculate_h2x_firerate(float h2v_firerate) {
 }
 
 float calculate_h2x_recovery_time(float h2v_recovery_time) {
-	if (h2v_firerate < 0.0001) {
+	if (h2v_recovery_time < 0.0001) {
 		// Our math always adds one tick. So, don't do anything if 0.
-		return h2v_firerate;
+		return h2v_recovery_time;
 	}
 
 	/* The + hack is done because all of the brute forced values
