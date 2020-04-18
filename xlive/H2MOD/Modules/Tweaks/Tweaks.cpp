@@ -875,6 +875,17 @@ void fix_shaders_nvidia()
 	);
 }
 
+// probably MCC does this because it's 64 bit, but w/e, should work just fine
+int system_get_time()
+{
+	LARGE_INTEGER PerformanceCount;
+	LARGE_INTEGER PerformanceFrequency;
+
+	QueryPerformanceCounter(&PerformanceCount);
+	QueryPerformanceFrequency(&PerformanceFrequency);
+	return (unsigned int)(PerformanceCount.QuadPart / (PerformanceFrequency.QuadPart / 1000));
+}
+
 void InitH2Tweaks() {
 	postConfig();
 
@@ -951,6 +962,8 @@ void InitH2Tweaks() {
 	PatchCall(h2mod->GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
 	PatchCall(h2mod->GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
+
+	WriteJmpTo(h2mod->GetAddress(0x37E51, 0x2B4CE), system_get_time);
 
 	addDebugText("End Startup Tweaks.");
 }
