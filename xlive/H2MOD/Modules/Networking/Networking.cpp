@@ -250,9 +250,27 @@ void removeXNetSecurity()
 	
 }
 
+// stub qos lookup function in-game between peers in a network session
 int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4)
 {
-	return -1; // stub qos lookup function in-game between peers in a network session
+	static XNQOS xnqos_stub;
+
+	s_datum_array* qos_probes_datum_array = *h2mod->GetAddress<s_datum_array**>(0x526BF4, 0x991078);
+
+	typedef int(__cdecl* datum_get_free_data_memory)(s_datum_array* datum_array);
+	auto p_datum_get_free_data_memory = h2mod->GetAddress<datum_get_free_data_memory>(0x667A0, 0x3248C);
+
+	DatumIndex free_qos_datum_index = DatumIndex(p_datum_get_free_data_memory(qos_probes_datum_array));
+	if (!free_qos_datum_index.IsNull())
+	{
+		char* datum_mem = &qos_probes_datum_array->datum[free_qos_datum_index.ToAbsoluteIndex() * qos_probes_datum_array->datum_element_size];
+		xnqos_stub.cxnqos = 1;
+		*(short*)(datum_mem + 2) = (short)1;
+		*(XNQOS**)(datum_mem + 4) = &xnqos_stub;
+		return free_qos_datum_index.ToInt();
+	}
+	else
+		return -1; 
 }
 
 void patchAbNetUpdate()
