@@ -47,17 +47,17 @@ void __cdecl InitializeConfiguration()
 	g_network_configuration->field_88 = 1000;
 	g_network_configuration->field_8C = 5000;
 	g_network_configuration->field_90 = 0.5f;
-	g_network_configuration->field_E0_200 = 200;
+	g_network_configuration->field_E0 = 200;
 	g_network_configuration->field_E8 = 0.5f;
 	g_network_configuration->field_EC = 0.75f;
 	g_network_configuration->field_F0 = 12.0f;
 	g_network_configuration->field_F4 = 2000;
 	g_network_configuration->field_F8 = 2000;
 	g_network_configuration->field_FC = 30;
-	g_network_configuration->field_104_0_5 = 0.5;
-	g_network_configuration->field_108_64 = 64;
-	g_network_configuration->field_10C_96 = 96;
-	g_network_configuration->field_110_0_3333333 = 0.33333334f;
+	g_network_configuration->field_104 = 0.5;
+	g_network_configuration->field_108 = 64;
+	g_network_configuration->field_10C = 96;
+	g_network_configuration->field_110 = 0.33333334f;
 	g_network_configuration->field_114 = 10240 * 4; // H2v - 10240, MCC = H2v * 4
 	g_network_configuration->field_118 = 1000;
 	g_network_configuration->field_11C = 0.5f;
@@ -66,37 +66,37 @@ void __cdecl InitializeConfiguration()
 	g_network_configuration->field_128 = 5000;
 	g_network_configuration->field_12C = 15;
 	g_network_configuration->field_130 = 100;
-	g_network_configuration->field_134 = 50;
-	g_network_configuration->field_138 = 50;
-	g_network_configuration->field_13C = 15;
-	g_network_configuration->field_140 = 8;
+	g_network_configuration->field_134 = 50 * 2; // h2v - 50, MCC - 100
+	g_network_configuration->field_138 = 50 * 4; // h2v - 50, MCC - 200
+	g_network_configuration->field_13C = 32; // h2v - 15, MCC - 32
+	g_network_configuration->field_140 = 32; // h2v - 8, MCC - 32
 	g_network_configuration->field_144 = 1;
 	g_network_configuration->field_148 = 2000;
-	g_network_configuration->field_14C_4096 = 4096 * 4; // h2v - 4096, MCC = 4096 * 4
+	g_network_configuration->field_14C = 4096 * 4; // h2v - 4096, MCC = 4096 * 4
 	g_network_configuration->field_150 = 71680 * 4; // H2v - 71680, MCC = H2v * 4
-	g_network_configuration->field_154_1000 = 1000;
+	g_network_configuration->field_154 = 1000;
 	g_network_configuration->max_bits_per_second_single_player = 30720 * 4; // H2v = 30720, MCC = H2v * 4
 	g_network_configuration->max_bits_per_second_full_lobby = 262144; // H2v - 122880, MCC = 262144
 	g_network_configuration->max_bits_per_second_splitscreen_players = 512000;
 	g_network_configuration->field_1C4 = 0.5f;
-	g_network_configuration->field_1A0_1500 = 1500;
+	g_network_configuration->field_1A0 = 1500;
 	g_network_configuration->field_1A4 = 1500;
 	g_network_configuration->field_178 = 0.1f;
-	g_network_configuration->field_190_0_2 = 0.2f;
+	g_network_configuration->field_190 = 0.2f;
 	g_network_configuration->field_1C8 = 20.0f;
 	g_network_configuration->field_168 = 40;
 	g_network_configuration->field_1D8 = 40;
-	g_network_configuration->field_164_8192 = 65536; // H2v 8192, MCC = 65536
-	g_network_configuration->field_16C_320 = 320;
+	g_network_configuration->field_164 = 65536; // H2v 8192, MCC = 65536
+	g_network_configuration->field_16C = 320;
 	g_network_configuration->field_170 = 3;
 	g_network_configuration->field_174 = 32;
 	g_network_configuration->field_17C = 4;
 	g_network_configuration->field_180 = 0.80000001f;
 	g_network_configuration->field_184 = 10;
-	g_network_configuration->field_188_21 = 21;
-	g_network_configuration->field_18C_3072 = 3072;
-	g_network_configuration->field_194_5120 = 5120;
-	g_network_configuration->field_198_0_300000 = 0.30000001f;
+	g_network_configuration->field_188 = 21;
+	g_network_configuration->field_18C = 3072 * 4; // H2v - 3072, MCC = H2V * 4
+	g_network_configuration->field_194 = 5120 * 4; // H2v - 5120, MCC = H2V * 4
+	g_network_configuration->field_198 = 0.30000001f;
 	g_network_configuration->field_19C = 5000;
 	g_network_configuration->field_1B4 = 3;
 	g_network_configuration->field_1B8 = 6144 * 4; // H2v - 6144, MCC = H2v * 4
@@ -157,7 +157,7 @@ bool __stdcall unk_live_netcode_func_2(void *thisx, float a1, float packet_size,
 void NetworkConfiguration::ApplyPatches()
 {
 	// increase the network tickrate of hosts to 60 and for the clients to 30
-	static float unk_flt_ = 60.0f;
+	static float netcode_tickrate = 60.0f;
 
 	std::vector<std::pair<int, int>> addresses = 
 	{
@@ -169,13 +169,14 @@ void NetworkConfiguration::ApplyPatches()
 	};
 
 	for (auto address : addresses)
-		WritePointer(h2mod->GetAddress(address.first, address.second) + 4, &unk_flt_);
+		WritePointer(h2mod->GetAddress(address.first, address.second) + 4, &netcode_tickrate);
 
 	g_network_configuration = h2mod->GetAddress<network_configuration*>(0x4F960C, 0x523B5C);
 	PatchCall(h2mod->GetAddress(0x1ABE23, 0x1AC328), InitializeConfiguration);
 
 	NopFill(h2mod->GetAddress(0x1BFBE7, 0x1B9AC7), 19);
 	NopFill(h2mod->GetAddress(0x1BE33A, 0x1B8214), 15);
+	NopFill(h2mod->GetAddress(0x1BDF1D, 0x1B7DF7), 18);
 
 	// increase the network heap size
 	WriteValue<DWORD>(h2mod->GetAddress(0x1ACCC8, 0x1ACE96) + 6, 10485760); // original H2v: 1048576, MCC: 1048576
