@@ -19,7 +19,7 @@ namespace Blam
 
 			struct Actor {
 				BYTE pad[0x54];
-				DatumIndex character_datum;
+				datum character_datum;
 				BYTE pad2[0x840];
 			};
 			static_assert(sizeof(Actor) == 0x898, "Invalid Actor size");

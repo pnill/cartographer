@@ -4,12 +4,12 @@
 class ZombieHandler : public GameClientServerHandler {
 public:
 	void setPlayerIndex(int playerIndex);
-	void setUnitDatumIndex(DatumIndex unitDatumIndex);
+	void setUnitDatumIndex(datum unitDatumIndex);
 	int getPlayerIndex();
-	DatumIndex getUnitDatumIndex();
+	datum getUnitDatumIndex();
 private:
 	int playerIndex;
-	DatumIndex unitDatumIndex;
+	datum unitDatumIndex;
 };
 
 class InfectionInitializer : public ZombieHandler {
@@ -65,8 +65,8 @@ public:
 	static void spawnServerPlayerSetup(int playerIndex);
 	static void setPlayerAsHuman(int playerIndex);
 	static void setPlayerAsZombie(int playerIndex);
-	static void infectPlayer(DatumIndex unitDatumIndex, int playerIndex);
-	static void infectPlayers(DatumIndex unitDatumIndex, int playerIndex);
+	static void infectPlayer(datum unitDatumIndex, int playerIndex);
+	static void infectPlayers(datum unitDatumIndex, int playerIndex);
 	static void triggerSound(const wchar_t* name, int);
 	static int calculateZombiePlayerIndex();
 private:

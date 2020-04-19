@@ -19,7 +19,7 @@ struct s_datum_array
 		int max_data_count; // 0x38
 	} active_indices; 
 	int total_elements_used; // 0x3C 
-	DatumIndex next_datum; // 0x40
+	datum next_datum; // 0x40
 	char* datum; // 0x44
 	int* datum_usable_bit_mask; // 0x48
 };
@@ -71,7 +71,7 @@ public:
 		{
 			result = reinterpret_cast<T*>(&data_array->datum[data_array->datum_element_size * index]);
 			m_current_absolute_index = index;
-			m_last_datum_index = DatumIndex(index, *(short*)(result) << 16); // absolute index w/ salt
+			m_last_datum_index = datum(index, *(short*)(result) << 16); // absolute index w/ salt
 		}
 		return result;
 	}
@@ -97,7 +97,7 @@ public:
 		return m_current_absolute_index;
 	}
 
-	DatumIndex get_current_datum_index()
+	datum get_current_datum_index()
 	{
 		return m_last_datum_index;
 	}
@@ -105,6 +105,6 @@ public:
 private:
 	
 	s_datum_array* data_array;
-	DatumIndex m_last_datum_index;
+	datum m_last_datum_index;
 	int m_current_absolute_index;
 };

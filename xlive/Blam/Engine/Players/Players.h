@@ -7,7 +7,6 @@
 #include "H2MOD\Modules\DataArray\DataArray.h"
 
 using namespace Blam::Enums;
-using namespace Blam::Cache::DataTypes;
 
 struct Item
 {
@@ -85,9 +84,9 @@ namespace Blam
 				int controller_index; // 0x20
 				__int16 user_index; // 0x24;
 				__int16 related_to_pos_on_bsp; // 0x26
-				DatumIndex BipedUnitDatum; // 0x28 //0x24 in h2x beta
-				DatumIndex DeadGameStateDatum; //0x2C
-				DatumIndex PossiblyDatum; // 0x30
+				datum BipedUnitDatum; // 0x28 //0x24 in h2x beta
+				datum DeadGameStateDatum; //0x2C
+				datum PossiblyDatum; // 0x30
 				DWORD InputFlags; // 0x34
 				DWORD InputFlags2; // 0x38
 				DWORD unk_4; // 0x3C
@@ -98,12 +97,12 @@ namespace Blam
 				int unk_12; //0x158
 				BYTE unk_pad3[36]; //0x15C
 				float unit_speed; //0x180
-				DatumIndex player_aimed_at; //0x184
+				datum player_aimed_at; //0x184
 				int unk_13; // 0x188
 				int unk_14_related_to_player_aimed_at; // 0x18C
 				__int16 unk_15; //0x190
 				__int16 unk_16; //0x192
-				DatumIndex betraying_player; //0x194
+				datum betraying_player; //0x194
 				int field_198; //0x198
 				int field_19C; //0x19C 
 				BYTE unk_pad4[0x60]; //0x1FC

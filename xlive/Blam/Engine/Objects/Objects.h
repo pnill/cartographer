@@ -15,12 +15,12 @@ namespace Blam
 			// for example, the size of the biped object definition is 1152 bytes and for the projectiles is 428 bytes
 			struct BipedObjectDefinition//To Do
 			{
-				DatumIndex TagDefinitionIndex;//0
+				datum TagDefinitionIndex;//0
 				DWORD ObjectFlags;//4
 				DWORD unk_0;//8
-				DatumIndex NextIndex;//0xC
-				DatumIndex CurrentWeaponDatum;//0x10
-				DatumIndex ParentIndex;//0x14
+				datum NextIndex;//0xC
+				datum CurrentWeaponDatum;//0x10
+				datum ParentIndex;//0x14
 				WORD UnitInVehicleFlag;//0x18
 				INT16 PlacementIndex ;//0x1A
 				DWORD unk_2[3];//0x1C
@@ -41,7 +41,7 @@ namespace Blam
 				BYTE unk_5;//0xAE
 				BYTE NetgameEquipmentIndex;//0xAF
 				DWORD unk_6;//0xB0
-				DatumIndex HavokComponentDatum;//0xB4
+				datum HavokComponentDatum;//0xB4
 				DWORD unk_7[11];//0xB8
 				FLOAT BodyMaxVitality;//0xE4
 				FLOAT ShieldMaxVitality;//0xE8
@@ -62,24 +62,24 @@ namespace Blam
 				WORD AnimationUnk;//0x12A
 				BYTE ObjectsAttach;//0x12C
 				BYTE unk_11[3];//0x12D
-				DatumIndex ActorDatum; // 0x130
+				datum ActorDatum; // 0x130
 				BYTE unk_17[4]; //0x138
 				DWORD Flags;//0x138
 				Blam::Enums::Player::Team Team;//0x13C
 				WORD unk_12;//0x13D
-				DatumIndex PlayerDatum;//0x140
+				datum PlayerDatum;//0x140
 				BYTE unk_13[9];//0x144
 				WORD CrouchJumpRelated;//0x150
 				FLOAT UnitShoot;//0x152
 				BYTE unk_14[102];//0x156
 				Blam::Maths::RealMovement UnitMovement;//0x1BC
 				BYTE unk_15[16];//0x1C4
-				DatumIndex TargetObject;//0x1D4
+				datum TargetObject;//0x1D4
 				BYTE unk_16[82];//0x1D8
 				Blam::Enums::Objects::Unit::WeaponIndex UnitSwitchWeapon;//0x22A
-				DatumIndex PrimaryWeapon; // 0x22C
-				DatumIndex SecondaryWeapon; // 0x230
-				DatumIndex DualWieldWeapon; // 0x234
+				datum PrimaryWeapon; // 0x22C
+				datum SecondaryWeapon; // 0x230
+				datum DualWieldWeapon; // 0x234
 				BYTE pad[0x18]; //  0x238 
 				
 				BYTE CurrentGrenadesIndex; //0x250
@@ -98,7 +98,7 @@ namespace Blam
 
 			struct WeaponObjectDefinition
 			{
-				DatumIndex TagDefinitionIndex;//0
+				datum TagDefinitionIndex;//0
 				char unk[0x258];
 			};
 			static_assert(sizeof(WeaponObjectDefinition) == 0x25C, "Invalid WeaponObjectDefinition size");

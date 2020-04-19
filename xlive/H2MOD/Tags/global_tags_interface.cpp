@@ -6,14 +6,16 @@
 #include "TagInterface.h"
 #include "..\Util\Hooks\Hook.h"
 
+using Blam::Enums::Tags::TagGroupTypes;
+
 void _cdecl ResetMapData();
 
 namespace TagInterface
 {
 	//var to store the created interfaces
-	static map<DatumIndex, void*> global_tag_interface_list;
+	static map<datum, void*> global_tag_interface_list;
 
-	void* global_tags_interface::GetTagInterface(DatumIndex tag, int type)
+	void* global_tags_interface::GetTagInterface(datum tag, int type)
 	{
 		if (global_tag_interface_list.find(tag) != global_tag_interface_list.end())
 		{
@@ -34,7 +36,7 @@ namespace TagInterface
 	}
 	void global_tags_interface::Release()
 	{
-		map<DatumIndex, void*>::iterator  i = global_tag_interface_list.begin();
+		map<datum, void*>::iterator  i = global_tag_interface_list.begin();
 		while (i != global_tag_interface_list.end())
 		{
 			auto global_tag_tables = tags::get_tag_instances();

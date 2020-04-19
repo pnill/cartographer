@@ -1,6 +1,4 @@
 #pragma once
-#include "Blam\Cache\DataTypes\Bitfield.h"
-using namespace Blam::Cache;
 namespace Blam
 {
 	namespace Enums
@@ -43,60 +41,8 @@ namespace Blam
 						UserWinning = 68,
 						BombArmingAmount = 69,
 					};
-					struct DoDrawIfUnitFlags
-					{
-						DataTypes::Flags Default = 0;
-						DataTypes::Flags GrenadeTypeIsNONE = 1;
-						DataTypes::Flags GrenadeTypeIsFrag = 2;
-						DataTypes::Flags GrenadeTypeIsPlasma = 3;
-						DataTypes::Flags UnitIsSingleWielding = 4;
-						DataTypes::Flags UnitIsDualWielding = 5;
-						DataTypes::Flags UnitIsUnzoomed = 6;
-						DataTypes::Flags UnitIsZoomedLevel1 = 7;
-						DataTypes::Flags UnitIsZoomedLevel2 = 8;
-						DataTypes::Flags GrenadesDisabled = 9;
-						DataTypes::Flags BinocularsEnabled = 10;
-						DataTypes::Flags MotionSensorEnabled = 11;
-						DataTypes::Flags SheildEnabled = 12;
-						DataTypes::Flags Dervish = 13;
-					};
-					struct DoDrawIfExtraFlags
-					{
-						DataTypes::Flags AutoAimFriendly = 0;
-						DataTypes::Flags AutoAimPlasma = 1;
-						DataTypes::Flags AutoAimHeadshot = 2;
-						DataTypes::Flags AutoAimVulnerable = 3;
-						DataTypes::Flags AutoAimInvincible = 4;
-					};
-					struct DoDrawIfWeaponFlags
-					{
-						DataTypes::Flags PrimaryWeapon = 0;
-						DataTypes::Flags SecondaryWeapon = 1;
-						DataTypes::Flags BackpackWeapon = 2;
-						DataTypes::Flags AgeBelowCutoff = 3;
-						DataTypes::Flags ClipBelowCutoff = 4;
-						DataTypes::Flags TotalBelowCutoff = 5;
-						DataTypes::Flags Overheated = 6;
-						DataTypes::Flags OutOfAmmo = 7;
-						DataTypes::Flags LockTargetAvailable = 8;
-						DataTypes::Flags Locking = 9;
-						DataTypes::Flags Locked = 10;
-					};
-					struct DoDrawIfGameEngineStateFlags
-					{
-						DataTypes::Flags CampaignSolo = 0;
-						DataTypes::Flags CampaignCoop = 1;
-						DataTypes::Flags FreeForAll = 2;
-						DataTypes::Flags TeamGame = 3;
-						DataTypes::Flags UserLeading = 4;
-						DataTypes::Flags UserNotLeading = 5;
-						DataTypes::Flags TimedGame = 6;
-						DataTypes::Flags UntimedGame = 7;
-						DataTypes::Flags OtherScoreValid = 8;
-						DataTypes::Flags OtherScoreInvalid = 9;
-						DataTypes::Flags PlayerIsArmingBomb = 10;
-						DataTypes::Flags PlayerTalking = 11;
-					};
+					
+				
 					enum class Anchor : short
 					{
 						HealthAndSheild = 0,
@@ -105,34 +51,7 @@ namespace Blam
 						Scoreboard = 3,
 						Crosshair = 4,
 						LockonTarget = 5,
-					};
-					struct Flags
-					{
-						DataTypes::Flags FlipHorizontally = 0;
-						DataTypes::Flags FlipVertically = 1;
-						DataTypes::Flags ScopeMirrorHorizontally = 2;
-						DataTypes::Flags ScopeMirrorVertically = 3;
-						DataTypes::Flags ScopeStretch = 4;
-					};
-					namespace NumericalElements
-					{
-						struct Flags
-						{
-							DataTypes::Flags StringIsANumber = 0;
-							DataTypes::Flags Force2DigitNumber = 1;
-							DataTypes::Flags Force3DigitNumber = 2;
-							DataTypes::Flags TalkingPlayerHack = 2;
-						};						
-					}
-					namespace Effect
-					{
-						struct Flags 
-						{
-							DataTypes::Flags ApplyScale = 0;
-							DataTypes::Flags ApplyTheta = 1;
-							DataTypes::Flags ApplyOffset = 2;
-						};
-					}
+					};					
 
 					enum class SpecialHUDType : int
 					{

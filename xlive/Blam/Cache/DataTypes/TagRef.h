@@ -16,7 +16,7 @@ namespace Blam
 			struct tagRef
 			{
 				Blam::Enums::Tags::TagGroupTypes TagGroup;
-				DatumIndex TagIndex;
+				datum TagIndex;
 			};
 			static_assert(sizeof(tagRef) == 8, "Invalid Size for struct (tagRef)");
 			/*********************************************************************
@@ -25,7 +25,7 @@ namespace Blam
 			**********************************************************************/
 			struct tagRefN
 			{
-				DatumIndex TagIndex;
+				datum TagIndex;
 			};
 			static_assert(sizeof(tagRefN) == 4, "Invalid Size for struct (tagRefN)");
 		}

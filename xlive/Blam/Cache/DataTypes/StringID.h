@@ -1,111 +1,104 @@
 #pragma once
+#ifndef STRING_ID_H
+#define STRING_ID_H
 #include <codecvt>
-namespace Blam
+
+/*********************************************************************
+* string_id
+* 4 BYTE Special Tag Structure for String Values
+* Index 3 Bytes
+* Length 1 Byte
+**********************************************************************/
+struct string_id
 {
-	namespace Cache
+	string_id()
 	{
-		namespace DataTypes
-		{			
-			/*********************************************************************
-			* Blam::Cache::DataTypes::StringID
-			* 4 BYTE Special Tag Structure for String Values
-			* Index -3 Bytes
-			* Length -1 Byte
-			**********************************************************************/
-			struct StringID
-			{
-				StringID()
-				{
-					this->Handle = Empty;
-				}
-				StringID(UINT32 Value)
-				{
-					this->Handle = Empty;
-					this->Handle = Value;
-				}
-				StringID(UINT Index, BYTE Length)
-				{
-					this->Handle = Empty;
-					this->Handle = (UINT32)(Length << 24 | (Index & 0x00FFFFFF));
-				}
-				static const UINT32 Invalid = 0xFFFFFFFF;
-				static const UINT32 Empty = 0;
-				static const UINT MaxLength = 0xFF;
-				static const UINT32 MaxIndex = 0xFFFFFF;
-				//Returns Absolute String Index
-				UINT ToIndex();
-				//Returns String Length
-				BYTE ToLength();
-				//Check if String is InValid
-				bool IsInvalid();
-				//Check if String is Empty
-				bool IsEmpty();
-				//Return in StringFormat
-				std::string ToString();
-				//Get the String Linked with This SID
-				std::string GetStringValue();
-
-				void operator = (const UINT32 &Value);
-				void operator = (const StringID &StringID);
-				bool operator == (const UINT32 &Value);
-				bool operator == (const StringID &StringID);
-				bool operator != (const UINT32 &Value);
-				bool operator != (const StringID &StringID);
-			private:
-				UINT32 Handle;
-
-			};
-			static_assert(sizeof(StringID) == 4, "Invalid Size for struct (StringID)");
-		}
+		this->Handle = Empty;
 	}
+	string_id(UINT32 Value)
+	{
+		this->Handle = Empty;
+		this->Handle = Value;
+	}
+	string_id(UINT Index, BYTE Length)
+	{
+		this->Handle = Empty;
+		this->Handle = (UINT32)(Length << 24 | (Index & 0x00FFFFFF));
+	}
+	static const UINT32 Invalid = 0xFFFFFFFF;
+	static const UINT32 Empty = 0;
+	static const UINT MaxLength = 0xFF;
+	static const UINT32 MaxIndex = 0xFFFFFF;
+	//Returns Absolute String Index
+	UINT ToIndex();
+	//Returns String Length
+	BYTE ToLength();
+	//Check if String is InValid
+	bool IsInvalid();
+	//Check if String is Empty
+	bool IsEmpty();
+	//Return in StringFormat
+	std::string ToString();
+	//Get the String Linked with This SID
+	std::string GetStringValue();
 
-}
+	void operator = (const UINT32 &Value);
+	void operator = (const string_id &string_id);
+	bool operator == (const UINT32 &Value);
+	bool operator == (const string_id &string_id);
+	bool operator != (const UINT32 &Value);
+	bool operator != (const string_id &string_id);
+private:
+	UINT32 Handle;
 
-#pragma region StringID
-inline bool Blam::Cache::DataTypes::StringID::IsEmpty()
+};
+static_assert(sizeof(string_id) == 4, "Invalid Size for struct (string_id)");
+
+
+inline bool string_id::IsEmpty()
 {
 	return this->Handle == Empty;
 }
-inline bool Blam::Cache::DataTypes::StringID::IsInvalid()
+inline bool string_id::IsInvalid()
 {
 	return this->Handle == Invalid;
 }
-inline UINT Blam::Cache::DataTypes::StringID::ToIndex()
+inline UINT string_id::ToIndex()
 {
 	return this->Handle & 0x00FFFFFF;
 }
-inline BYTE Blam::Cache::DataTypes::StringID::ToLength()
+inline BYTE string_id::ToLength()
 {
 	return (BYTE)(this->Handle & 0xFF000000);
 }
-inline void Blam::Cache::DataTypes::StringID::operator= (const UINT32 &Value)
+inline void string_id::operator= (const UINT32 &Value)
 {
 	this->Handle = Value;
 }
-inline void Blam::Cache::DataTypes::StringID::operator=(const StringID &StringID)
+inline void string_id::operator=(const string_id &string_id)
 {
-	this->Handle = StringID.Handle;
+	this->Handle = string_id.Handle;
 }
-inline bool Blam::Cache::DataTypes::StringID::operator== (const UINT32 &Value)
+inline bool string_id::operator== (const UINT32 &Value)
 {
 	return this->Handle == Value;
 }
-inline bool Blam::Cache::DataTypes::StringID::operator== (const StringID &StringID)
+inline bool string_id::operator== (const string_id &string_id)
 {
-	return this->Handle = StringID.Handle;
+	return this->Handle = string_id.Handle;
 }
-inline bool Blam::Cache::DataTypes::StringID::operator!= (const UINT32 &Value)
+inline bool string_id::operator!= (const UINT32 &Value)
 {
 	return this->Handle != Value;
 }
-inline bool Blam::Cache::DataTypes::StringID::operator!= (const StringID &StringID)
+inline bool string_id::operator!= (const string_id &string_id)
 {
-	return this->Handle != StringID.Handle;
+	return this->Handle != string_id.Handle;
 }
-inline std::string Blam::Cache::DataTypes::StringID::ToString()
+inline std::string string_id::ToString()
 {
 	std::string val;
 	val = this->Handle;
 	return val;
 }
-#pragma endregion
+#endif

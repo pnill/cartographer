@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugDedicatedServer|Win32">
@@ -480,7 +480,6 @@
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
     <ClInclude Include="Blam\BlamLibrary.h" />
     <ClInclude Include="Blam\Cache\Cache.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\Bitfield.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataTypes.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h" />

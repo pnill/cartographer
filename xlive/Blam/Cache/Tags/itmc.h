@@ -13,7 +13,7 @@ namespace Blam
 				{
 					float Weight;
 					Blam::Cache::DataTypes::tagRef Item;
-					Blam::Cache::DataTypes::StringID VariantName;
+					string_id VariantName;
 				};
 				TAG_BLOCK_SIZE_ASSERT(ItemPermutations, 0x10);
 				Blam::Cache::DataTypes::Reflexive<ItemPermutations> ItemPermutations;

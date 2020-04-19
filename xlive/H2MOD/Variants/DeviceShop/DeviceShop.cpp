@@ -3,11 +3,11 @@
 #include "Globals.h"
 #include "DeviceShop.h"
 extern void __cdecl print_to_console(char *output);
-extern void GivePlayerWeaponDatum(DatumIndex unit_datum, DatumIndex weapon_datum);
+extern void GivePlayerWeaponDatum(datum unit_datum, datum weapon_datum);
 
 //power transition time
 //TODO: Convert to TagGroup/Block
-float get_device_power_transition_time(DatumIndex device_datum)
+float get_device_power_transition_time(datum device_datum)
 {
 	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD tag_instances = (DWORD)tags::get_tag_instances();
@@ -29,7 +29,7 @@ float get_device_power_transition_time(DatumIndex device_datum)
 
 //this is actually the open up sound tag.
 //TODO: Convert to TagGroup/Block
-DatumIndex get_device_open_up_weapon_datum(DatumIndex device_datum)
+datum get_device_open_up_weapon_datum(datum device_datum)
 {
 	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD global_tag_instances = (DWORD)tags::get_tag_instances();
@@ -37,34 +37,34 @@ DatumIndex get_device_open_up_weapon_datum(DatumIndex device_datum)
 
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
 	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)game_state_objects_header_table + device_gamestate_offset * 4 + 8);
-	DatumIndex device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
+	datum device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 
 	device_control_datum.Index = device_control_datum.Index << 4;
 
 	DWORD device_control_tag_offset = *(DWORD*)((BYTE*)device_control_datum.Index + global_tag_instances + 8);
-	DatumIndex weapon_datum = *(DatumIndex*)((BYTE*)device_control_tag_offset + tag_data + 0xE0);
+	datum weapon_datum = *(datum*)((BYTE*)device_control_tag_offset + tag_data + 0xE0);
 
 	return weapon_datum;
 }
 
 
 
-int DeviceShop::GetCost(DatumIndex device_datum)
+int DeviceShop::GetCost(datum device_datum)
 {
 	return (int)get_device_power_transition_time(device_datum);
 }
 
-item_type DeviceShop::GetType(DatumIndex device_datum)
+item_type DeviceShop::GetType(datum device_datum)
 {
 	return weapon_item;
 }
 
-DatumIndex DeviceShop::GetItemDatum(DatumIndex device_datum)
+datum DeviceShop::GetItemDatum(datum device_datum)
 {
 	return get_device_open_up_weapon_datum(device_datum);
 }
 
-bool DeviceShop::BuyItem(DatumIndex device_datum, DatumIndex unit_datum)
+bool DeviceShop::BuyItem(datum device_datum, datum unit_datum)
 {
 
 	XUID player = variant_player->GetXUID(unit_datum, false);
@@ -87,7 +87,7 @@ bool DeviceShop::BuyItem(DatumIndex device_datum, DatumIndex unit_datum)
 	{
 		player_points[player] -= cost;
 
-		DatumIndex item_datum = GetItemDatum(device_datum);
+		datum item_datum = GetItemDatum(device_datum);
 
 		switch (GetType(item_datum))
 		{
@@ -118,17 +118,17 @@ bool DeviceShop::BuyItem(DatumIndex device_datum, DatumIndex unit_datum)
 	return true;
 }
 
-void DeviceShop::SpawnAI(DatumIndex character_datum)
+void DeviceShop::SpawnAI(datum character_datum)
 {
 
 }
 
-void DeviceShop::SpawnVehicle(DatumIndex vehicle_datum)
+void DeviceShop::SpawnVehicle(datum vehicle_datum)
 {
 
 }
 
-void DeviceShop::GiveWeapon(DatumIndex weapon_datum, DatumIndex unit_datum)
+void DeviceShop::GiveWeapon(datum weapon_datum, datum unit_datum)
 {
 	GivePlayerWeaponDatum(unit_datum,weapon_datum);
 }

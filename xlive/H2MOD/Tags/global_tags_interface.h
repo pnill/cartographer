@@ -3,8 +3,7 @@
 
 namespace TagInterface
 {
-	using namespace std;
-	using namespace Blam::Cache::DataTypes;
+	using namespace std;	
 
 	//* Main TagInterface Manager Class
 	static class global_tags_interface
@@ -16,7 +15,7 @@ namespace TagInterface
 	public:
 		//function to retrieve interface to the tag via datum_index
 		///required to dynamic_cast it to the required type
-		static void* GetTagInterface(DatumIndex tag, int type);
+		static void* GetTagInterface(datum tag, int type);
 		//Release function to called pre-map unloading
 		//else MEMORY_LEAKS
 		static void Release();

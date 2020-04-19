@@ -4,18 +4,18 @@
 class HeadHunterHandler : public GameClientServerHandler {
 public:
 	void SetXUID(XUID xuid);
-	void SetPlayerIndex(DatumIndex player_datum);
-	void SetUnitDatum(DatumIndex unit_datum);
-	void SetDeadPlayer(DatumIndex dead_datum);
-	bool SetInteractedObject(DatumIndex object_datum);
-	DatumIndex GetDeadPlayer();
-	DatumIndex GetInteractedObject();
+	void SetPlayerIndex(datum player_datum);
+	void SetUnitDatum(datum unit_datum);
+	void SetDeadPlayer(datum dead_datum);
+	bool SetInteractedObject(datum object_datum);
+	datum GetDeadPlayer();
+	datum GetInteractedObject();
 	XUID GetXUID();
 private:
 	XUID xuid;
-	DatumIndex object_interaction;
-	DatumIndex DeadPlayer;
-	std::vector<DatumIndex> skulls_spawned;
+	datum object_interaction;
+	datum DeadPlayer;
+	std::vector<datum> skulls_spawned;
 };
 
 
@@ -66,8 +66,8 @@ class HeadHunter : public GameType<HeadHunterHandler>
 {
 public:
 	HeadHunter();
-	static void SpawnSkull(DatumIndex PlayerDatum);
-	static void PickupSkull(XUID player, DatumIndex SkullDatum);
+	static void SpawnSkull(datum PlayerDatum);
+	static void PickupSkull(XUID player, datum SkullDatum);
 	static void initClient();
 	static void initHost();
 };

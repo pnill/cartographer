@@ -1,6 +1,5 @@
 #pragma once
-#include "Blam\Cache\DataTypes\Bitfield.h"
-using namespace Blam::Cache::DataTypes;
+
 namespace Blam
 {
 	namespace Enums
@@ -23,10 +22,7 @@ namespace Blam
 						Chinese = 0x7,
 						Portuguese = 0x8,
 					};					
-					struct ActiveCamoFlags
-					{
-						Flags TintEdgeDensity = 0;
-					};
+					
 					enum class OldMaterialType : __int16
 					{
 						Dirt = 0x0,
@@ -63,31 +59,8 @@ namespace Blam
 						Ice = 0x1F,
 						HunterShield = 0x20,
 					};					
-					struct SweetenerInheritanceFlags
-					{
-						Flags SoundSmall = 0;
-						Flags SoundMedium = 1;
-						Flags SoundLarge = 2;
-						Flags SoundRolling = 3;
-						Flags SoundGrinding = 4;
-						Flags SoundMelee = 5;
-						Flags EffectSmall = 6;
-						Flags EffectMedium = 7;
-						Flags EffectLarge = 8;
-						Flags EffectRolling = 9;
-						Flags EffectGrinding = 10;
-						Flags EffectMelee = 11;
-					};
-					struct MatFlags
-					{
-						Flags Flammable = 0;
-						Flags BioMass = 1;
-					};					
-					struct lvlFlags
-					{
-						Flags FUnlockable = 0;
 						
-					};
+					
 				}
 			}
 		}

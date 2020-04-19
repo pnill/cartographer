@@ -49,7 +49,7 @@ static bool NotDisplayIngameChat() {
 
 	if (H2Config_hide_ingame_chat) {
 		PlayerIterator playerIt;
-		DatumIndex local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
+		datum local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
 		if (playerIt.get_data_at_index(local_player_datum_index.Index)->is_chatting == 2) {
 			extern void hotkeyFuncToggleHideIngameChat();
 			hotkeyFuncToggleHideIngameChat();
@@ -829,8 +829,8 @@ test_engine g_test_engine;
 
 void fix_shader_template_nvidia(const std::string &template_name, const std::string &bitmap_name, size_t bitmap_idx)
 {
-	DatumIndex bitmap_to_fix    = tags::find_tag('bitm', bitmap_name);
-	DatumIndex borked_template  = tags::find_tag('stem', template_name);
+	datum bitmap_to_fix    = tags::find_tag('bitm', bitmap_name);
+	datum borked_template  = tags::find_tag('stem', template_name);
 
 	LOG_DEBUG_FUNC("bitmap {0}, borked_template {1}", bitmap_to_fix.data, borked_template.data);
 
@@ -842,10 +842,10 @@ void fix_shader_template_nvidia(const std::string &template_name, const std::str
 	tags::ilterator shaders('shad');
 	while (!shaders.next().IsNull())
 	{
-		auto *shader = LOG_CHECK(tags::get_tag<'shad', TagGroups::shad>(shaders.datum));
+		auto *shader = LOG_CHECK(tags::get_tag<'shad', TagGroups::shad>(shaders.m_datum));
 		if (shader && shader->shader_template.TagIndex == borked_template && LOG_CHECK(shader->postprocessDefinition.size > 0))
 		{
-			LOG_DEBUG_FUNC("shader {} has borked template", tags::get_tag_name(shaders.datum));
+			LOG_DEBUG_FUNC("shader {} has borked template", tags::get_tag_name(shaders.m_datum));
 			auto *post_processing = shader->postprocessDefinition[0];
 			if (LOG_CHECK(post_processing->bitmaps.size >= (bitmap_idx + 1)))
 			{
@@ -853,7 +853,7 @@ void fix_shader_template_nvidia(const std::string &template_name, const std::str
 				if (bitmap_block->bitmapGroup == bitmap_to_fix)
 				{
 					LOG_DEBUG_FUNC("Nulled bitmap {}", bitmap_idx);
-					bitmap_block->bitmapGroup = DatumIndex::Null;
+					bitmap_block->bitmapGroup = datum::Null;
 				}
 			}
 		}

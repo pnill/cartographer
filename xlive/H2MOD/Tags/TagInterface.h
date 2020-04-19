@@ -73,7 +73,7 @@ namespace tags
 	struct tag_instance
 	{
 		blam_tag type;
-		DatumIndex datum_index;
+		datum datum_index;
 		size_t data_offset;
 		size_t size;
 	};
@@ -90,8 +90,8 @@ namespace tags
 		void *parent_info;
 		int tag_parent_info_count;
 		tag_instance *tag_instances;
-		DatumIndex scenario_datum;
-		DatumIndex globals_datum;
+		datum scenario_datum;
+		datum globals_datum;
 		int field_14;
 		int tag_count;
 		int type;
@@ -160,15 +160,15 @@ namespace tags
 	}
 
 	/* Convert a tag index to a tag datum */
-	inline DatumIndex index_to_datum(signed short idx)
+	inline datum index_to_datum(signed short idx)
 	{
 		if (idx >= get_tag_count())
 		{
 			LOG_ERROR_FUNC("Index out of bounds");
-			return DatumIndex::Null;
+			return datum::Null;
 		}
 		auto instance = get_tag_instances()[idx];
-		DatumIndex tag_datum = instance.datum_index;
+		datum tag_datum = instance.datum_index;
 		LOG_CHECK(tag_datum.Index == idx); // should always be true
 		return tag_datum;
 	}
@@ -217,14 +217,14 @@ namespace tags
 		gets the name of a tag
 		debug names must be loaded or it will fail
 	*/
-	std::string get_tag_name(DatumIndex tag);
+	std::string get_tag_name(datum tag);
 
 	/* 
 		Returns a pointer to a tag, if type is set in template it checks if the real type matches the requested type.
 		Returns null on error
 	*/
 	template <int request_type = 0xFFFFFFFF, typename T = void>
-	inline T* get_tag(DatumIndex tag)
+	inline T* get_tag(datum tag)
 	{
 		tag_offset_header *header = get_tags_header();
 
@@ -254,7 +254,7 @@ namespace tags
 	/* 
 		Returns the tag datum or a null datum
 	*/
-	DatumIndex find_tag(blam_tag type, const std::string &name);
+	datum find_tag(blam_tag type, const std::string &name);
 
 
 	struct ilterator
@@ -264,9 +264,9 @@ namespace tags
 
 		blam_tag type = blam_tag::none(); // type we are searching for
 		long current_index = 0; // current tag idx
-		DatumIndex datum = DatumIndex::Null; // last tag datum we returned
+		datum m_datum = datum::Null; // last tag datum we returned
 
-		DatumIndex next()
+		datum next()
 		{
 			while (current_index < get_tag_count())
 			{
@@ -275,13 +275,13 @@ namespace tags
 				{
 					if (type.is_none() || is_tag_or_parent_tag(tag_instance->type, type))
 					{
-						datum = tag_instance->datum_index;
-						return datum;
+						m_datum = tag_instance->datum_index;
+						return m_datum;
 					}
 				}
 			}
 
-			return DatumIndex::Null;
+			return datum::Null;
 		}
 	};
 }

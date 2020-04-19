@@ -24,10 +24,10 @@ static int weapon_sixteen = 0;
 
 //TODO(PermaNull): Add additional levels with dual weilding
 
-std::unordered_map<int, DatumIndex> GunGame::levelWeapon;
+std::unordered_map<int, datum> GunGame::levelWeapon;
 std::unordered_map<XUID, int> GunGame::gungamePlayers;
 
-DatumIndex weaponDatums[36] = {
+datum weaponDatums[36] = {
 	0xE53D2AD8, 0xE5F02B8B, 0xE6322BCD, 0xE6AF2C4A,
 	0xE79B2D36,0xE8172DB2,0xE8382DD3,0xE8742E0F,
 	0xE8D32E6E,0xE9062EA1,0xE90C2EA7,0xE90C2EA7,
@@ -140,7 +140,7 @@ void GunGame::resetPlayerLevels() {
 void GunGame::spawnPlayerServer(int playerIndex) {
 	LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() player index: {}, player name: {1}", playerIndex, h2mod->get_player_name_from_player_index(playerIndex));
 
-	DatumIndex unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
+	datum unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
 	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
 
 	if (unit_object) {
@@ -148,7 +148,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 
 		LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() - player index: {}, player name: {1} - Level: {2}", playerIndex, h2mod->get_player_name_from_player_index(playerIndex), level);
 
-		DatumIndex CurrentWeapon = GunGame::levelWeapon[level];
+		datum CurrentWeapon = GunGame::levelWeapon[level];
 
 		if (level < 15) {
 			call_give_player_weapon(playerIndex, CurrentWeapon, 1);
@@ -191,7 +191,7 @@ void GunGame::levelUpServer(int playerIndex)
 	if (level < 15) {
 		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on level {} giving them weapon...", h2mod->get_player_name_from_player_index(playerIndex), level);
 
-		DatumIndex LevelWeapon = GunGame::levelWeapon[level];
+		datum LevelWeapon = GunGame::levelWeapon[level];
 		h2mod->set_player_unit_grenades_count(playerIndex, GrenadeType::Frag, 0, true);
 		h2mod->set_player_unit_grenades_count(playerIndex, GrenadeType::Plasma, 0, true);
 		call_give_player_weapon(playerIndex, LevelWeapon, 1);

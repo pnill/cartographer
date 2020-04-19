@@ -66,7 +66,7 @@ int character_datum_from_index(BYTE index)
 	return char_tag_datum;
 }
 
-int get_player_index_from_datum(DatumIndex unit_datum)
+int get_player_index_from_datum(datum unit_datum)
 {
 	DatumIterator<ObjectHeader> objectsIt(game_state_objects_header);
 	BipedObjectDefinition *unit_object = (BipedObjectDefinition*)objectsIt.get_data_at_index(unit_datum.ToAbsoluteIndex())->object;
@@ -94,11 +94,11 @@ game_life_cycle get_game_life_cycle()
 
 #pragma region engine calls
 
-int __cdecl call_object_try_and_get_with_type(DatumIndex object_datum_index, int object_type)
+int __cdecl call_object_try_and_get_with_type(datum object_datum_index, int object_type)
 {
 	//LOG_TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
 
-	typedef int(__cdecl get_object)(DatumIndex object_datum_index, int object_type);
+	typedef int(__cdecl get_object)(datum object_datum_index, int object_type);
 	auto p_get_object = h2mod->GetAddress<get_object*>(0x1304E3, 0x11F3A6);
 	return p_get_object(object_datum_index, object_type);
 }
@@ -111,10 +111,10 @@ int __cdecl call_entity_datum_to_gamestate_datum(int entity_datum)
 	return pentity_datum_to_gamestate_datum(entity_datum);
 }
 
-int __cdecl call_unit_reset_equipment(DatumIndex unit_datum_index)
+int __cdecl call_unit_reset_equipment(datum unit_datum_index)
 {
 	//LOG_TRACE_GAME("unit_reset_equipment(unit_datum_index: %08X)", unit_datum_index);
-	typedef int(__cdecl unit_reset_equipment)(DatumIndex unit_datum_index);
+	typedef int(__cdecl unit_reset_equipment)(datum unit_datum_index);
 	auto p_unit_reset_equipment = h2mod->GetAddress<unit_reset_equipment*>(0x1441E0, 0x133030);
 	if (unit_datum_index != -1 && unit_datum_index != 0)
 	{
@@ -124,10 +124,10 @@ int __cdecl call_unit_reset_equipment(DatumIndex unit_datum_index)
 	return 0;
 }
 
-void __cdecl call_hs_object_destroy(DatumIndex object_datum_index)
+void __cdecl call_hs_object_destroy(datum object_datum_index)
 {
 	//LOG_TRACE_GAME("hs_object_destory(object_datum_index: %08X)", object_datum_index);
-	typedef void(__cdecl hs_object_destroy)(DatumIndex object_datum_index);
+	typedef void(__cdecl hs_object_destroy)(datum object_datum_index);
 	auto p_hs_object_destroy = h2mod->GetAddress<hs_object_destroy*>(0xFDCFD, 0x124ED5); // update dedi
 
 	return p_hs_object_destroy(object_datum_index);
@@ -142,21 +142,21 @@ signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit)
 	return p_unit_inventory_next_weapon(unit);
 }
 
-bool __cdecl call_assign_equipment_to_unit(DatumIndex unit, int object_index, short unk)
+bool __cdecl call_assign_equipment_to_unit(datum unit, int object_index, short unk)
 {
 	//LOG_TRACE_GAME("assign_equipment_to_unit(unit: %08X,object_index: %08X,unk: %08X)", unit, object_index, unk);
-	typedef bool(__cdecl assign_equipment_to_unit)(DatumIndex unit, int object_index, short unk);
+	typedef bool(__cdecl assign_equipment_to_unit)(datum unit, int object_index, short unk);
 	auto passign_equipment_to_unit = h2mod->GetAddress<assign_equipment_to_unit*>(0x1442AA, 0x1330FA);
 
 	return passign_equipment_to_unit(unit, object_index, unk);
 }
 
-void __cdecl call_object_placement_data_new(ObjectPlacementData* s_object_placement_data, DatumIndex object_definition_index, DatumIndex object_owner, int unk)
+void __cdecl call_object_placement_data_new(ObjectPlacementData* s_object_placement_data, datum object_definition_index, datum object_owner, int unk)
 {
 	//LOG_TRACE_GAME("object_placement_data_new(s_object_placement_data: %08X,",s_object_placement_data);
 	//LOG_TRACE_GAME("object_definition_index: %08X, object_owner: %08X, unk: %08X)", object_definition_index, object_owner, unk);
 
-	typedef void(__cdecl object_placement_data_new)(void*, DatumIndex, DatumIndex, int);
+	typedef void(__cdecl object_placement_data_new)(void*, datum, datum, int);
 	auto pobject_placement_data_new = h2mod->GetAddress<object_placement_data_new*>(0x132163, 0x121033);
 
 	pobject_placement_data_new(s_object_placement_data, object_definition_index, object_owner, unk);
@@ -173,9 +173,9 @@ signed int __cdecl call_object_new(ObjectPlacementData* pObject)
 
 }
 
-bool __cdecl call_add_object_to_sync(DatumIndex gamestate_object_datum)
+bool __cdecl call_add_object_to_sync(datum gamestate_object_datum)
 {
-	typedef int(__cdecl add_object_to_sync)(DatumIndex gamestate_object_datum);
+	typedef int(__cdecl add_object_to_sync)(datum gamestate_object_datum);
 	auto p_add_object_to_sync = h2mod->GetAddress<add_object_to_sync*>(0x1B8D14, 0x1B2C44);
 
 	return p_add_object_to_sync(gamestate_object_datum);
@@ -405,7 +405,7 @@ signed int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a
 }
 
 /* controller index aka local player index -> player index */
-DatumIndex H2MOD::get_player_datum_index_from_controller_index(int controller_index) 
+datum H2MOD::get_player_datum_index_from_controller_index(int controller_index) 
 {
 	typedef int(__cdecl* get_local_player_index)(int controller_index); 
 	auto p_get_local_player_index = reinterpret_cast<get_local_player_index>(h2mod->GetAddress(0x5141D));
@@ -438,7 +438,7 @@ Real::Point3D* H2MOD::get_player_unit_coords(int playerIndex) {
 }
 
 BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
-	DatumIndex unit_datum = get_unit_datum_from_player_index(playerIndex);
+	datum unit_datum = get_unit_datum_from_player_index(playerIndex);
 	if (unit_datum.IsNull())
 		return nullptr;
 
@@ -446,11 +446,11 @@ BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
 	return (BYTE*)objectsIt.get_data_at_index(unit_datum.ToAbsoluteIndex())->object;
 }
 
-void call_give_player_weapon(int PlayerIndex, DatumIndex WeaponId, bool bReset)
+void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset)
 {
 	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
-	DatumIndex unit_datum = h2mod->get_unit_datum_from_player_index(PlayerIndex);
+	datum unit_datum = h2mod->get_unit_datum_from_player_index(PlayerIndex);
 
 	if (unit_datum != -1)
 	{
@@ -496,12 +496,12 @@ wchar_t* H2MOD::get_player_name_from_player_index(int playerIndex)
 	return playersIt.get_data_at_index(playerIndex)->properties.player_name;
 }
 
-int H2MOD::get_player_index_from_unit_datum(DatumIndex unit_datum_index)
+int H2MOD::get_player_index_from_unit_datum(datum unit_datum_index)
 {
 	PlayerIterator playersIt;
 	while (playersIt.get_next_player())
 	{
-		DatumIndex unit_datum_index_check = playersIt.get_current_player_data()->BipedUnitDatum;
+		datum unit_datum_index_check = playersIt.get_current_player_data()->BipedUnitDatum;
 		LOG_TRACE_FUNC("Checking datum: {0:x} - index: {1} against datum: {2:x}", unit_datum_index_check.ToInt(), playersIt.get_current_player_index(), unit_datum_index.ToInt());
 
 		if (unit_datum_index == unit_datum_index_check)
@@ -510,7 +510,7 @@ int H2MOD::get_player_index_from_unit_datum(DatumIndex unit_datum_index)
 	return -1;
 }
 
-DatumIndex H2MOD::get_unit_datum_from_player_index(int playerIndex)
+datum H2MOD::get_unit_datum_from_player_index(int playerIndex)
 {
 	PlayerIterator playersIt;
 	if (!playersIt.get_data_at_index(playerIndex)->BipedUnitDatum.IsNull())
@@ -536,7 +536,7 @@ void H2MOD::set_unit_biped(Player::Biped biped_type, int playerIndex)
 		playersIt.get_data_at_index(playerIndex)->properties.profile.player_character_type = biped_type;
 }
 
-BYTE H2MOD::get_unit_team_index(DatumIndex unit_datum_index)
+BYTE H2MOD::get_unit_team_index(datum unit_datum_index)
 {
 	BYTE tIndex = 0;
 	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
@@ -586,8 +586,8 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, BYTE type, BYTE coun
 		"objects\\weapons\\grenade\\plasma_grenade\\plasma_grenade"
 	};
 
-	DatumIndex unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
-	DatumIndex grenade_eqip_tag_datum_index = tags::find_tag('eqip', grenadeEquipamentTagName[type]);
+	datum unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
+	datum grenade_eqip_tag_datum_index = tags::find_tag('eqip', grenadeEquipamentTagName[type]);
 
 	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
 	if (unit_object)
@@ -599,10 +599,10 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, BYTE type, BYTE coun
 		auto p_simulation_is_predicted = h2mod->GetAddress<simulation_is_predicted>(0x498B7, 0x42B54);
 
 		// not sure what these flags are, but this is called when picking up grenades
-		typedef void(__cdecl* entity_set_unk_flags)(DatumIndex objectIndex, int flags);
+		typedef void(__cdecl* entity_set_unk_flags)(datum objectIndex, int flags);
 		auto p_entity_set_unk_flags = h2mod->GetAddress<entity_set_unk_flags>(0x1B6685, 0x1B05B5);
 
-		typedef void(__cdecl* unit_add_grenade_to_inventory_send)(DatumIndex unitDatumIndex, DatumIndex equipamentTagIndex);
+		typedef void(__cdecl* unit_add_grenade_to_inventory_send)(datum unitDatumIndex, datum equipamentTagIndex);
 		auto p_unit_add_grenade_to_inventory_send = h2mod->GetAddress<unit_add_grenade_to_inventory_send>(0x1B6F12, 0x1B0E42);
 
 		// send simulation update for grenades if we control the simulation
@@ -692,20 +692,20 @@ char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 
 	if (b_HeadHunter)
 	{
-		DatumIndex dead_player = DatumIndex(unit_datum_index);
+		datum dead_player = datum(unit_datum_index);
 		headHunterHandler->playerDeath->SetDeadPlayer(dead_player); // set this so we can spawn a skull on their position.
 		headHunterHandler->playerDeath->execute();
 	}
 
 	if (b_FireFight)
 	{
-		/* Hack until rest of code is changed to support DatumIndex vs int*/
-		DatumIndex ai_datum = DatumIndex(unit_datum_index);
+		/* Hack until rest of code is changed to support datum vs int*/
+		datum ai_datum = datum(unit_datum_index);
 
 		/*
 			In firefight we want to track AI deaths and execute on them to grant points.
 		*/
-		fireFightHandler->playerDeath->SetPlayerIndex(*(DatumIndex*)(a2)); // this is the player datum of player who killed the datum.
+		fireFightHandler->playerDeath->SetPlayerIndex(*(datum*)(a2)); // this is the player datum of player who killed the datum.
 		fireFightHandler->playerDeath->SetKilledDatum(ai_datum);
 		fireFightHandler->playerDeath->execute();
 	}
@@ -771,10 +771,10 @@ void H2MOD::disable_weapon_pickup(bool b_Enable)
 	WriteBytes(offset, assm, 5);
 }
 
-int OnAutoPickUpHandler(DatumIndex player_datum, DatumIndex object_datum)
+int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 {
-	int(_cdecl* AutoHandler)(DatumIndex, DatumIndex);
-	AutoHandler = (int(_cdecl*)(DatumIndex, DatumIndex))h2mod->GetAddress(0x57AA5, 0x5FF9D);
+	int(_cdecl* AutoHandler)(datum, datum);
+	AutoHandler = (int(_cdecl*)(datum, datum))h2mod->GetAddress(0x57AA5, 0x5FF9D);
 
 	if (b_HeadHunter)
 	{
@@ -925,10 +925,10 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	return result;
 }
 
-typedef bool(__cdecl *player_spawn)(DatumIndex playerDatumIndex);
+typedef bool(__cdecl *player_spawn)(datum playerDatumIndex);
 player_spawn p_player_spawn;
 
-bool __cdecl OnPlayerSpawn(DatumIndex playerDatumIndex)
+bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 {
 	//I cant find somewhere to put this where it actually works (only needs to be done once on map load). It's only a few instructions so it shouldn't take long to execute.
 	H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
@@ -1167,7 +1167,7 @@ void __cdecl GetGameVersion(DWORD *executable_version, DWORD *build_version, DWO
 	*build_version2 = GAME_BUILD;
 }
 
-void GivePlayerWeaponDatum(DatumIndex unit_datum, DatumIndex weapon_datum)
+void GivePlayerWeaponDatum(datum unit_datum, datum weapon_datum)
 {
 	if (unit_datum != -1 && unit_datum != 0)
 	{
@@ -1185,7 +1185,7 @@ void GivePlayerWeaponDatum(DatumIndex unit_datum, DatumIndex weapon_datum)
 }
 
 //This is used for maps with 'shops' where the device_acceleration_scale is an indicator that they're using the control device as a 'shop'
-float get_device_acceleration_scale(DatumIndex device_datum)
+float get_device_acceleration_scale(datum device_datum)
 {
 	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD tag_instances = (DWORD)tags::get_tag_instances();
@@ -1205,12 +1205,12 @@ float get_device_acceleration_scale(DatumIndex device_datum)
 
 }
 
-typedef int(__cdecl *tdevice_touch)(DatumIndex device_datum, DatumIndex unit_datum);
+typedef int(__cdecl *tdevice_touch)(datum device_datum, datum unit_datum);
 tdevice_touch pdevice_touch;
 
 bool device_active = true;
 //This happens whenever a player activates a device control.
-int __cdecl device_touch(DatumIndex device_datum, DatumIndex unit_datum)
+int __cdecl device_touch(datum device_datum, datum unit_datum)
 {
 	if (h2mod->GetMapType() == MapType::MULTIPLAYER_MAP)
 	{

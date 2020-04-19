@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -829,9 +829,6 @@
     </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups.hpp">
       <Filter>Source Files\Blam\Cache</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\DataTypes\Bitfield.h">
-      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>

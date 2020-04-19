@@ -20,35 +20,35 @@ namespace global_handle_function
 //certain functions which relate tags to their global object(such as Havok objects)(vftables perhaps)
 namespace global_objects_fix
 {
-	void __cdecl bipd_fix(DatumIndex datum_index)
+	void __cdecl bipd_fix(datum datum_index)
 	{
-		void(_cdecl*sub_EC23F)(DatumIndex);
-		sub_EC23F = (void(_cdecl*)(DatumIndex))h2mod->GetAddress(0x1389B0);
+		void(_cdecl*sub_EC23F)(datum);
+		sub_EC23F = (void(_cdecl*)(datum))h2mod->GetAddress(0x1389B0);
 		sub_EC23F(datum_index);
 	}
 
-	void __cdecl crea_fix(DatumIndex datum_index)
+	void __cdecl crea_fix(datum datum_index)
 	{
-		int(_cdecl*sub_EC23F)(DatumIndex);
-		sub_EC23F = (int(_cdecl*)(DatumIndex))h2mod->GetAddress(0x138985);
+		int(_cdecl*sub_EC23F)(datum);
+		sub_EC23F = (int(_cdecl*)(datum))h2mod->GetAddress(0x138985);
 		sub_EC23F(datum_index);
 	}
-	void __cdecl vehi_fix(DatumIndex datum_index)
+	void __cdecl vehi_fix(datum datum_index)
 	{
-		int(_cdecl*sub_EC23F)(DatumIndex);
-		sub_EC23F = (int(_cdecl*)(DatumIndex))h2mod->GetAddress(0x13895A);
+		int(_cdecl*sub_EC23F)(datum);
+		sub_EC23F = (int(_cdecl*)(datum))h2mod->GetAddress(0x13895A);
 		sub_EC23F(datum_index);
 	}
-	void __cdecl coll_fix(DatumIndex datum_index)
+	void __cdecl coll_fix(datum datum_index)
 	{
-		int(_cdecl*sub_EC23F)(DatumIndex);
-		sub_EC23F = (int(_cdecl*)(DatumIndex))h2mod->GetAddress(0x7BE5C);
+		int(_cdecl*sub_EC23F)(datum);
+		sub_EC23F = (int(_cdecl*)(datum))h2mod->GetAddress(0x7BE5C);
 		sub_EC23F(datum_index);
 	}
-	void __cdecl phmo_fix(DatumIndex datum_index, bool unk)
+	void __cdecl phmo_fix(datum datum_index, bool unk)
 	{
-		int(_cdecl*sub_EC23F)(DatumIndex, bool);
-		sub_EC23F = (int(_cdecl*)(DatumIndex, bool))h2mod->GetAddress(0x7B844);
+		int(_cdecl*sub_EC23F)(datum, bool);
+		sub_EC23F = (int(_cdecl*)(datum, bool))h2mod->GetAddress(0x7B844);
 		sub_EC23F(datum_index, unk);
 	}
 }
@@ -550,7 +550,7 @@ namespace tag_loader
 	}
 	//function to load RAW_DATA of the concerned tag from meta_list
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
-	void Load_RAW_refs(DatumIndex datum_index, std::string map_loc)
+	void Load_RAW_refs(datum datum_index, std::string map_loc)
 	{
 		DWORD* PMapRawtableoffset = h2mod->GetAddress<DWORD*>(0x4AE8B0);
 		DWORD* PRawTableSize = h2mod->GetAddress<DWORD*>(0x4AE8B4);
@@ -645,7 +645,7 @@ namespace tag_loader
 		*PMapRawtableoffset = oldRtable_offset;
 		*PRawTableSize = oldRtable_size;
 	}
-	void Load_RAW_refs(DatumIndex datum_index, HANDLE file)
+	void Load_RAW_refs(datum datum_index, HANDLE file)
 	{
 		DWORD* PMapRawtableoffset = (DWORD*)(h2mod->GetBase() + 0x4AE8B0);
 		DWORD* PRawTableSize = (DWORD*)(h2mod->GetBase() + 0x4AE8B4);
@@ -733,10 +733,10 @@ namespace tag_loader
 		*PRawTableSize = oldRtable_size;
 	}
 	//Fixes the reference of the tags to their global objects(vftables)
-	void Fix_global_objects_ref(DatumIndex datum_index)
+	void Fix_global_objects_ref(datum datum_index)
 	{
 		blam_tag type = new_Tables[datum_index.ToAbsoluteIndex()].type;
-		DatumIndex Tdatum_index = new_Tables[datum_index.ToAbsoluteIndex()].datum_index;
+		datum Tdatum_index = new_Tables[datum_index.ToAbsoluteIndex()].datum_index;
 
 		if (Tdatum_index != datum_index)
 		{
@@ -913,7 +913,7 @@ namespace tag_loader
 		else
 		{
 			
-			DatumIndex scnr_index = tags::get_tags_header()->scenario_datum;
+			datum scnr_index = tags::get_tags_header()->scenario_datum;
 			auto GlobalSCNR = (Blam::Cache::Tags::scnr*)TagInterface::GlobalTagInterface.GetTagInterface(scnr_index, (int)TagGroupTypes::scenario);		
 			
 			for (size_t i = 0 ; i < sync_list.size(); i++)
@@ -1246,7 +1246,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	
 	if (tags::get_cache_header()->type != tags::cache_header::scnr_type::MainMenu)
 	{
-		DatumIndex temp(0xE1940018);
+		datum temp(0xE1940018);
 		auto test = (Blam::Cache::Tags::itmc*)TagInterface::GlobalTagInterface.GetTagInterface(temp, (int)TagGroupTypes::itemcollection);
 		
 		if (false)

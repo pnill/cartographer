@@ -109,7 +109,7 @@ bool tags::load_tag_debug_name()
 	return true;
 }
 
-std::string tags::get_tag_name(DatumIndex tag)
+std::string tags::get_tag_name(datum tag)
 {
 	auto ilter = tag_datum_name_map.find(tag.Index);
 	if (ilter != tag_datum_name_map.end())
@@ -118,7 +118,7 @@ std::string tags::get_tag_name(DatumIndex tag)
 	return "tag name lost"; // tool does something similar if it can't find the name of a tag from the shared cache
 }
 
-DatumIndex tags::find_tag(blam_tag type, const std::string &name)
+datum tags::find_tag(blam_tag type, const std::string &name)
 {
 	for (auto &it = tag_datum_name_map.begin(); it != tag_datum_name_map.end(); it++)
 	{
@@ -129,7 +129,7 @@ DatumIndex tags::find_tag(blam_tag type, const std::string &name)
 				return index_to_datum(it->first);
 		}
 	}
-	return DatumIndex::Null;
+	return datum::Null;
 }
 
 static std::vector<void(*)()> load_callbacks;

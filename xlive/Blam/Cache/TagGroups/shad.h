@@ -13,7 +13,7 @@ namespace Blam
 		{
 			struct shader_postprocess_bitmap_new_block
 			{
-				DatumIndex bitmapGroup;
+				datum bitmapGroup;
 				size_t bitmapIndex;
 				float logBitmapDimension;
 			};

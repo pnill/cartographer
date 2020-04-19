@@ -11,7 +11,7 @@ namespace Blam
 			//0xC4
 			struct ObjectPlacementData //To Do
 			{
-				DatumIndex object_datum;//0
+				datum object_datum;//0
 				DWORD unk_0;//0x4
 				WORD unk_10;//0x8;
 				BYTE unk_11;//0xA
