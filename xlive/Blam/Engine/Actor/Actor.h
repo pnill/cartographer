@@ -1,10 +1,4 @@
 #pragma once
-#include "..\Blam\Enums\Enums.h"
-#include "..\Blam\Shared\SharedDefinitions.h"
-
-using namespace Blam::SharedDefinitions;
-using namespace Blam::Enums;
-
 namespace Blam
 {
 	namespace EngineDefinitions

@@ -27,12 +27,12 @@ void HeadHunter::SpawnSkull(datum unit_datum)
 
 		call_object_placement_data_new(&nObject, Weapon::ball, -1, 0);
 
-		nObject.Placement.X = biped_unit->Placement.X;
-		nObject.Placement.Y = biped_unit->Placement.Y;
-		nObject.Placement.Z = biped_unit->Placement.Z;
-		nObject.TranslationalVelocity.X = biped_unit->TranslationalVelocity.X;
-		nObject.TranslationalVelocity.Y = biped_unit->TranslationalVelocity.Y;
-		nObject.TranslationalVelocity.Z = biped_unit->TranslationalVelocity.Z;
+		nObject.Placement.x = biped_unit->Placement.x;
+		nObject.Placement.y = biped_unit->Placement.y;
+		nObject.Placement.z = biped_unit->Placement.z;
+		nObject.TranslationalVelocity.x = biped_unit->TranslationalVelocity.x;
+		nObject.TranslationalVelocity.y = biped_unit->TranslationalVelocity.y;
+		nObject.TranslationalVelocity.z = biped_unit->TranslationalVelocity.z;
 
 		datum new_object_datum = call_object_new(&nObject);
 		if (!new_object_datum.IsNull())

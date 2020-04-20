@@ -1,5 +1,4 @@
 #pragma once
-#include "Blam\Shared\SharedDefinitions.h"
 #include "Blam\Maths\Maths.h"
 
 namespace Blam
@@ -22,11 +21,11 @@ namespace Blam
 				BYTE unk_16;//0x15
 				WORD unk_17;//0x16
 				DWORD unk_18;//0x18
-				Blam::Maths::Real::Point3D Placement;//0x1C
-				Blam::Maths::Real::Vector3D Orientation;//0x28
-				Blam::Maths::Real::Vector3D Up;//0x34
-				Blam::Maths::Real::Point3D TranslationalVelocity;//0x40
-				Blam::Maths::Real::Vector3D AngularVelocity;//0x4C
+				real_point3d Placement;//0x1C
+				real_vector3d Orientation;//0x28
+				real_vector3d Up;//0x34
+				real_point3d TranslationalVelocity;//0x40
+				real_vector3d AngularVelocity;//0x4C
 				FLOAT Scale;//0x58
 				DWORD unk_2[5];//0x5C
 				WORD unk_3;//0x70

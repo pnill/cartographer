@@ -415,24 +415,24 @@ datum H2MOD::get_player_datum_index_from_controller_index(int controller_index)
 #pragma region PlayerFunctions
 
 float H2MOD::get_distance(int playerIndex1, int playerIndex2) {
-	Real::Point3D points_distance;
-	Real::Point3D* player1 = nullptr;
-	Real::Point3D* player2 = nullptr;
+	real_point3d points_distance;
+	real_point3d* player1 = nullptr;
+	real_point3d* player2 = nullptr;
 
 	player1 = h2mod->get_player_unit_coords(playerIndex1);
 	player2 = h2mod->get_player_unit_coords(playerIndex2);
 	
-	points_distance.X = abs(player1->X - player2->X);
-	points_distance.Y = abs(player1->Y - player2->Y);
-	points_distance.Z = abs(player1->Z - player2->Z);
+	points_distance.x = abs(player1->x - player2->x);
+	points_distance.y = abs(player1->y - player2->y);
+	points_distance.z = abs(player1->z - player2->z);
 
-	return sqrt(pow(points_distance.X, 2) + pow(points_distance.Y, 2) + pow(points_distance.Z, 2));
+	return sqrt(pow(points_distance.x, 2) + pow(points_distance.y, 2) + pow(points_distance.z, 2));
 }
 
-Real::Point3D* H2MOD::get_player_unit_coords(int playerIndex) {
+real_point3d* H2MOD::get_player_unit_coords(int playerIndex) {
 	BYTE* player_unit = get_player_unit_from_player_index(playerIndex);
 	if (player_unit != nullptr)
-		return reinterpret_cast<Point3D*>(player_unit + 0x64);
+		return reinterpret_cast<real_point3d*>(player_unit + 0x64);
 
 	return nullptr;
 }

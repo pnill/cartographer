@@ -3,7 +3,6 @@
 #define CHAR_BLOCK_H
 #include "Blam\Maths\Maths.h"
 
-using namespace Blam::Maths::Real;
 
 struct character_swarm_block
 {
@@ -19,7 +18,7 @@ struct character_swarm_block
 	/// amount of randomness added to creature's throttle
 	float perlinOffsetScale01;
 	/// how fast the creature changes random offset to throttle
-	Vector2D offsetPeriodS;
+	real_vector2d offsetPeriodS;
 	/// a random offset lower then given threshold is made 0. (threshold of 1 = no movement)
 	float perlinIdleMovementThreshold01;
 	/// a random offset lower then given threshold is made 0. (threshold of 1 = no movement)

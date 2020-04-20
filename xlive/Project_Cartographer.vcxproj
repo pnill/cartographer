@@ -459,6 +459,8 @@
     <ClInclude Include="Blam\Cache\Tags\tag_base.h" />
     <ClInclude Include="Blam\Cache\Tags\tag_definitons.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shad.h" />
+    <ClInclude Include="Blam\Maths\integer_math.hpp" />
+    <ClInclude Include="Blam\Maths\real_math.hpp" />
     <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
@@ -497,7 +499,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\TagGroups.h" />
     <ClInclude Include="Blam\Engine\Actor\Actor.h" />
     <ClInclude Include="Blam\Engine\EngineDefinitions.h" />
-    <ClInclude Include="Blam\Engine\Extras\Skulls.h" />
     <ClInclude Include="Blam\Engine\FileSystem\FiloInterface.h" />
     <ClInclude Include="Blam\Engine\Game\GameManager.h" />
     <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
@@ -517,16 +518,7 @@
     <ClInclude Include="Blam\Enums\Tags\TagGroups\hudg.hpp" />
     <ClInclude Include="Blam\Enums\Tags\TagGroups\matg.hpp" />
     <ClInclude Include="Blam\Enums\Tags\TagGroups\nhdt.hpp" />
-    <ClInclude Include="Blam\Maths\Angle.h" />
     <ClInclude Include="Blam\Maths\Maths.h" />
-    <ClInclude Include="Blam\Maths\RealColorRGB.h" />
-    <ClInclude Include="Blam\Maths\RealMovement.h" />
-    <ClInclude Include="Blam\Maths\RealPoint2D.h" />
-    <ClInclude Include="Blam\Maths\RealPoint3D.h" />
-    <ClInclude Include="Blam\Maths\RealVector2D.h" />
-    <ClInclude Include="Blam\Maths\RealVector3D.h" />
-    <ClInclude Include="Blam\Shared\Globals.h" />
-    <ClInclude Include="Blam\Shared\SharedDefinitions.h" />
     <ClInclude Include="XLive\Voice\Encoder.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="H2MOD.h" />

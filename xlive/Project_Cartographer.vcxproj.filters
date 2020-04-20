@@ -593,35 +593,8 @@
     <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h">
       <Filter>Source Files\Blam\Enums\Game</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Maths\Angle.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Maths\Maths.h">
       <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\RealColorRGB.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\RealMovement.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\RealPoint2D.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\RealPoint3D.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\RealVector2D.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\RealVector3D.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Shared\Globals.h">
-      <Filter>Source Files\Blam\Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Shared\SharedDefinitions.h">
-      <Filter>Source Files\Blam\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Engine\EngineDefinitions.h">
       <Filter>Source Files\Blam\Engine</Filter>
@@ -640,9 +613,6 @@
     </ClInclude>
     <ClInclude Include="Blam\Engine\Game\GameManager.h">
       <Filter>Source Files\Blam\Engine\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Engine\Extras\Skulls.h">
-      <Filter>Source Files\Blam\Engine\Extras</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Shared\Globals.h">
       <Filter>Source Files\Blam\Shared</Filter>
@@ -1264,6 +1234,12 @@
     </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\Macros.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\real_math.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\integer_math.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

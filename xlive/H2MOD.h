@@ -4,7 +4,6 @@
 #include "Blam\Engine\EngineDefinitions.h"
 
 using namespace Blam::Enums;
-using namespace Blam::Maths;
 using namespace Blam::EngineDefinitions::Objects;
 constexpr signed int NONE = -1;
 
@@ -58,7 +57,7 @@ public:
 		BYTE* get_player_unit_from_player_index(int playerIndex);
 		datum get_player_datum_index_from_controller_index(int controller_index);
 		wchar_t* get_local_player_name(int local_player_index);
-		Real::Point3D* get_player_unit_coords(int player_index);
+		real_point3d* get_player_unit_coords(int player_index);
 		float get_distance(int, int);
 		wchar_t* get_session_game_variant_name();
 		wchar_t* get_player_name_from_player_index(int playerIndex);

@@ -1,9 +1,8 @@
 ﻿#pragma once
 #include "stdafx.h"
-#include "..\Blam\Shared\SharedDefinitions.h"
 #include "..\Blam\Enums\Enums.h"
+#include "..\Blam\Maths\Maths.h"
 
-using namespace Blam::SharedDefinitions;
 namespace Blam
 {
 	namespace EngineDefinitions
@@ -25,14 +24,14 @@ namespace Blam
 				INT16 PlacementIndex ;//0x1A
 				DWORD unk_2[3];//0x1C
 				DWORD Location[2];//0x28
-				Blam::Maths::Real::Point3D Center;//0x30
+				real_point3d Center;//0x30
 				FLOAT Radius;//0x3C
 				DWORD unk_3[9];//0x40
-				Blam::Maths::Real::Point3D Placement;//0x64
-				Blam::Maths::Real::Vector3D Orientation;//0x70
-				Blam::Maths::Real::Vector3D Up;//0x7C
-				Blam::Maths::Real::Point3D TranslationalVelocity;//0x88
-				Blam::Maths::Real::Vector3D AngularVelocity;//0x94
+				real_point3d Placement;//0x64
+				real_vector3d Orientation;//0x70
+				real_vector3d Up;//0x7C
+				real_point3d TranslationalVelocity;//0x88
+				real_vector3d AngularVelocity;//0x94
 				FLOAT Scale;//0xA0
 				BYTE unk_4[6];//0xA4
 				Blam::Enums::Objects::ObjectType ObjectType;//0xAA;
@@ -72,7 +71,8 @@ namespace Blam
 				WORD CrouchJumpRelated;//0x150
 				FLOAT UnitShoot;//0x152
 				BYTE unk_14[102];//0x156
-				Blam::Maths::RealMovement UnitMovement;//0x1BC
+				FLOAT forward_movement_speed;//0x1BC
+				FLOAT left_movement_speed;//0x1C0
 				BYTE unk_15[16];//0x1C4
 				datum TargetObject;//0x1D4
 				BYTE unk_16[82];//0x1D8

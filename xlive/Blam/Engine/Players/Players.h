@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Blam\Enums\Enums.h"
-#include "Blam\Shared\SharedDefinitions.h"
 #include "Blam\Cache\DataTypes\DataTypes.h"
-
 #include "H2MOD\Modules\DataArray\DataArray.h"
 
 using namespace Blam::Enums;

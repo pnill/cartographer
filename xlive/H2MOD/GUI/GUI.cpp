@@ -610,11 +610,11 @@ int WINAPI XLiveRender()
 				PlayerIterator playerIt;
 				while (playerIt.get_next_player()) 
 				{
-					Real::Point3D* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
+					real_point3d* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
 					if (player_position != nullptr) {
 						std::wstring playerNameWide(playerIt.get_current_player_name());
 						std::string playerName(playerNameWide.begin(), playerNameWide.end());
-						std::string xyzText = "Player name: " + playerName + ", xyz = " + std::to_string(player_position->X) + " " + std::to_string(player_position->Y) + " " + std::to_string(player_position->Z);
+						std::string xyzText = "Player name: " + playerName + ", xyz = " + std::to_string(player_position->x) + " " + std::to_string(player_position->y) + " " + std::to_string(player_position->z);
 						drawText(0, text_y_coord, COLOR_GOLD, xyzText.c_str(), normalSizeFont);
 						text_y_coord += 15;
 					}
