@@ -839,9 +839,6 @@
     <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Cache\DataTypes\Pad.h">
-      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\Reflexive.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
@@ -1261,6 +1258,12 @@
     </ClInclude>
     <ClInclude Include="XLive\XStorage\XStorage.h">
       <Filter>Source Files\XLive\XStorage</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes\BlamTag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes\Macros.h">
+      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,6 @@
 #pragma once
 #include <codecvt>
+#include "Macros.h"
 #ifndef DATUM_INDEX_H
 #define DATUM_INDEX_H
 /*********************************************************************
@@ -76,5 +77,5 @@ struct datum
 		unsigned long data;
 	};
 };
-static_assert(sizeof(datum) == 4, "Invalid Size for struct (datum)");
+CHECK_STRUCT_SIZE(datum, 4);
 #endif

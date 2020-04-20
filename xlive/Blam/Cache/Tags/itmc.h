@@ -12,7 +12,7 @@ namespace Blam
 				struct ItemPermutations :tag_base
 				{
 					float Weight;
-					Blam::Cache::DataTypes::tagRef Item;
+					tag_reference Item;
 					string_id VariantName;
 				};
 				TAG_BLOCK_SIZE_ASSERT(ItemPermutations, 0x10);

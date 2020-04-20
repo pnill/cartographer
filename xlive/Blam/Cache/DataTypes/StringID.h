@@ -11,94 +11,77 @@
 **********************************************************************/
 struct string_id
 {
-	string_id()
-	{
-		this->Handle = Empty;
-	}
-	string_id(UINT32 Value)
-	{
-		this->Handle = Empty;
-		this->Handle = Value;
-	}
-	string_id(UINT Index, BYTE Length)
-	{
-		this->Handle = Empty;
-		this->Handle = (UINT32)(Length << 24 | (Index & 0x00FFFFFF));
-	}
-	static const UINT32 Invalid = 0xFFFFFFFF;
-	static const UINT32 Empty = 0;
-	static const UINT MaxLength = 0xFF;
-	static const UINT32 MaxIndex = 0xFFFFFF;
-	//Returns Absolute String Index
-	UINT ToIndex();
-	//Returns String Length
-	BYTE ToLength();
-	//Check if String is InValid
-	bool IsInvalid();
-	//Check if String is Empty
-	bool IsEmpty();
-	//Return in StringFormat
-	std::string ToString();
-	//Get the String Linked with This SID
-	std::string GetStringValue();
+	string_id() = default;
 
-	void operator = (const UINT32 &Value);
+	constexpr string_id(uint32_t _value) :
+		value(_value)
+	{};
+
+	constexpr string_id(uint32_t id, uint8_t length) :
+		value(id | (length << 24))
+	{
+	};
+
+	constexpr uint8_t get_length() const
+	{
+		return (value >> 24) & 0xFFu;
+	}
+
+	constexpr uint32_t get_id() const
+	{
+		return value & ~(0xffu << 24);
+	}
+
+	constexpr uint32_t get_packed() const
+	{
+		return value;
+	}
+	constexpr bool is_valid() const
+	{
+		return get_packed() != 0;
+	}
+
+	static const uint32_t Invalid = 0xFFFFFFFF;
+	static const uint32_t Empty = 0;
+	static const uint32_t MaxLength = 0xFF;
+	static const uint32_t MaxIndex = 0xFFFFFF;
+	
+
+	void operator = (const uint32_t &Value);
 	void operator = (const string_id &string_id);
-	bool operator == (const UINT32 &Value);
+	bool operator == (const uint32_t &Value);
 	bool operator == (const string_id &string_id);
-	bool operator != (const UINT32 &Value);
+	bool operator != (const uint32_t &Value);
 	bool operator != (const string_id &string_id);
 private:
-	UINT32 Handle;
+	uint32_t value;
 
 };
-static_assert(sizeof(string_id) == 4, "Invalid Size for struct (string_id)");
+CHECK_STRUCT_SIZE(string_id, 4);
 
 
-inline bool string_id::IsEmpty()
+inline void string_id::operator= (const uint32_t &Value)
 {
-	return this->Handle == Empty;
-}
-inline bool string_id::IsInvalid()
-{
-	return this->Handle == Invalid;
-}
-inline UINT string_id::ToIndex()
-{
-	return this->Handle & 0x00FFFFFF;
-}
-inline BYTE string_id::ToLength()
-{
-	return (BYTE)(this->Handle & 0xFF000000);
-}
-inline void string_id::operator= (const UINT32 &Value)
-{
-	this->Handle = Value;
+	this->value = Value;
 }
 inline void string_id::operator=(const string_id &string_id)
 {
-	this->Handle = string_id.Handle;
+	this->value = string_id.value;
 }
-inline bool string_id::operator== (const UINT32 &Value)
+inline bool string_id::operator== (const uint32_t &Value)
 {
-	return this->Handle == Value;
+	return this->value == Value;
 }
 inline bool string_id::operator== (const string_id &string_id)
 {
-	return this->Handle = string_id.Handle;
+	return this->value = string_id.value;
 }
-inline bool string_id::operator!= (const UINT32 &Value)
+inline bool string_id::operator!= (const uint32_t &Value)
 {
-	return this->Handle != Value;
+	return this->value != Value;
 }
 inline bool string_id::operator!= (const string_id &string_id)
 {
-	return this->Handle != string_id.Handle;
-}
-inline std::string string_id::ToString()
-{
-	std::string val;
-	val = this->Handle;
-	return val;
+	return this->value != string_id.value;
 }
 #endif

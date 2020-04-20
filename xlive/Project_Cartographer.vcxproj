@@ -453,6 +453,7 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\tweakme.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h" />
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
+    <ClInclude Include="Blam\Cache\DataTypes\BlamTag.h" />
     <ClInclude Include="Blam\Cache\Tags\itmc.h" />
     <ClInclude Include="Blam\Cache\Tags\scnr.h" />
     <ClInclude Include="Blam\Cache\Tags\tag_base.h" />
@@ -483,7 +484,7 @@
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataTypes.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\Pad.h" />
+    <ClInclude Include="Blam\Cache\DataTypes\Macros.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Reflexive.h" />
     <ClInclude Include="Blam\Cache\DataTypes\StringID.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Strings.h" />

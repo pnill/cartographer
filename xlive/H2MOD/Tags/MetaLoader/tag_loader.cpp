@@ -927,7 +927,7 @@ namespace tag_loader
 				addDebugText(t.c_str());
 
 				struct Blam::Cache::Tags::scnr::SimulationDefinitionTable block;
-				block.Tag.TagIndex = sync_list[i];
+				block.Tag = sync_list[i];
 
 				GlobalSCNR->SimulationDefinitionTable.PushBack(&block);
 			}		

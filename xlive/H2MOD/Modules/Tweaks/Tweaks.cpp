@@ -842,7 +842,7 @@ void fix_shader_template_nvidia(const std::string &template_name, const std::str
 	tags::ilterator shaders('shad');
 	while (!shaders.next().IsNull())
 	{
-		auto *shader = LOG_CHECK(tags::get_tag<'shad', TagGroups::shad>(shaders.m_datum));
+		auto *shader = LOG_CHECK(tags::get_tag<'shad',Blam::Cache::TagGroups::shad>(shaders.m_datum));
 		if (shader && shader->shader_template.TagIndex == borked_template && LOG_CHECK(shader->postprocessDefinition.size > 0))
 		{
 			LOG_DEBUG_FUNC("shader {} has borked template", tags::get_tag_name(shaders.m_datum));

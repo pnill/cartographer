@@ -1,10 +1,9 @@
 #pragma once
 #pragma pack(push,1)
-#pragma once
 #include "Blam\Cache\DataTypes\DataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
 #include "..\TagBlocks\TagBlock.h"
-using namespace Blam::Cache;
+
 namespace Blam
 {
 	namespace Cache
@@ -60,7 +59,7 @@ namespace Blam
 			struct shad :TagGroup<'shad'>
 			{
 				// TagReference("stem")
-				tagRef shader_template;
+				tag_reference shader_template;
 				DWORD materialName;
 				tag_block<> runtimeProperties;
 
@@ -81,7 +80,7 @@ namespace Blam
 				tag_block<> predictedResources;
 
 				// TagReference("slit")
-				tagRef lightResponse;
+				tag_reference lightResponse;
 
 				enum ShaderLODBias : short
 				{

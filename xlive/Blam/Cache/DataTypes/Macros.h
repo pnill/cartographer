@@ -1,8 +1,9 @@
 #pragma once
-#pragma region PaddingMacros
+
+//PADDING MACROS
 #define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
 #define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2
-//Pad the desired length of BYTES
+//Pad the desired length of BYTES and also hides it
 #define PAD(BYTES) private: BYTE J(Unused_, __LINE__ )[BYTES];  public:             
 
 /// Add an anonymous 8-bit (1 byte) field to a structure.
@@ -19,4 +20,15 @@
 #define PAD64 unsigned __int64 : 64;
 /// Add an anonymous 128-bit (16 byte) field to a structure.
 #define PAD128 unsigned __int64 : 64; unsigned __int64 : 64;
-#pragma endregion
+
+
+///Use this for setting up enum bitfields
+#define FLAG(bit)( 1<<(bit) )
+
+
+#define CHECK_STRUCT_SIZE(STRUCT,_SIZE)\
+static_assert (sizeof(STRUCT) == _SIZE,"Invalid size for struct (" #STRUCT")")
+
+
+#define CHECK_STRUCT_OFFSET(STRUCT,FIELD,OFFSET)\
+static_assert(offsetof(STRUCT, FIELD) == OFFSET, #STRUCT " layout is invalid")

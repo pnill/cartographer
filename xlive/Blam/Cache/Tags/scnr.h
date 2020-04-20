@@ -18,7 +18,7 @@ namespace Blam
 				PAD(0x3D8);			
 				struct SimulationDefinitionTable:tag_base
 				{
-					Blam::Cache::DataTypes::tagRefN Tag;//0x0
+					datum Tag;//0x0
 				};
 				TAG_BLOCK_SIZE_ASSERT(SimulationDefinitionTable, 0x4);
 				Blam::Cache::DataTypes::Reflexive<SimulationDefinitionTable> SimulationDefinitionTable;//0x3D8

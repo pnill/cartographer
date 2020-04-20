@@ -6,22 +6,21 @@
 #include "Blam\Cache\TagGroups.hpp"
 #include "Blam\Cache\TagBlocks\TagBlock.h"
 
-using namespace Blam::Cache::DataTypes;
 
 struct character_tag_group
 {
 	int CharacterFlags; // pad fuck it.
 	//BitField32 CharacterFlags;
 	//[TagRefence("char")]
-	tagRef ParentCharacter;
+	tag_reference ParentCharacter;
 	//[TagRefence("unit")]
-	tagRef Unit;
+	tag_reference Unit;
 	//[TagRefence("crea")]
-	tagRef Creature;
+	tag_reference Creature;
 	//[TagRefence("styl")]
-	tagRef Style;
+	tag_reference Style;
 	//[TagRefence("char")]
-	tagRef MajorCharacter;
+	tag_reference MajorCharacter;
 	
 	__int64 Variants;
 	//Reflexive Variants;
