@@ -185,18 +185,18 @@ struct real_matrix4x3
 	}
 };
 
-struct colour_rgb;
+struct real_color_rgb;
 /* channel intensity is represented on a 0 to 1 scale */
-struct colour_rgba
+struct real_color_argb
 {
 	float alpha = 1.0f;
 	float red = 1.0f;
 	float green = 1.0f;
 	float blue = 1.0f;
 
-	colour_rgba() {}
+	real_color_argb() {}
 
-	colour_rgba(float _alpha, float _red, float _green, float _blue) :
+	real_color_argb(float _alpha, float _red, float _green, float _blue) :
 		alpha(_alpha),
 		red(_red),
 		green(_green),
@@ -204,31 +204,31 @@ struct colour_rgba
 	{}
 	
 };
-CHECK_STRUCT_SIZE(colour_rgba, 4 * 4);
+CHECK_STRUCT_SIZE(real_color_argb, 4 * 4);
 
-struct colour_rgb
+struct real_color_rgb
 {
 	float red = 1.0f;
 	float green = 1.0f;
 	float blue = 1.0f;
 
-	colour_rgb() {}
+	real_color_rgb() {}
 
-	colour_rgb(float _red, float _green, float _blue) :
+	real_color_rgb(float _red, float _green, float _blue) :
 		red(_red),
 		green(_green),
 		blue(_blue)
 	{}
 
-	colour_rgb(const colour_rgba &colour) :
+	real_color_rgb(const real_color_argb &colour) :
 		red(colour.red),
 		green(colour.green),
 		blue(colour.blue)
 	{}
 
-	colour_rgba as_rgba(float _alpha = 1.0f)
+	real_color_argb as_rgba(float _alpha = 1.0f)
 	{
-		colour_rgba converted;
+		real_color_argb converted;
 		converted.alpha = _alpha;
 		converted.red = red;
 		converted.green = green;
@@ -236,4 +236,4 @@ struct colour_rgb
 		return converted;
 	}
 };
-CHECK_STRUCT_SIZE(colour_rgb, 4 * 3);
+CHECK_STRUCT_SIZE(real_color_rgb, 4 * 3);

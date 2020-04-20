@@ -32,3 +32,10 @@ static_assert (sizeof(STRUCT) == _SIZE,"Invalid size for struct (" #STRUCT")")
 
 #define CHECK_STRUCT_OFFSET(STRUCT,FIELD,OFFSET)\
 static_assert(offsetof(STRUCT, FIELD) == OFFSET, #STRUCT " layout is invalid")
+
+
+#define TAG_BLOCK_SIZE_ASSERT(tagblock,size)\
+static_assert (sizeof(tagblock) == (size),"Invalid Size for TagBlock <" #tagblock ">")
+
+#define TAG_GROUP_SIZE_ASSERT(tagGroup,size)\
+static_assert (sizeof(tagGroup) == (size),"Invalid Size for TagGroup <" #tagGroup">");

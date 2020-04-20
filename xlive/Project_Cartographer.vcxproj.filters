@@ -794,9 +794,6 @@
     <ClInclude Include="Blam\Cache\Cache.h">
       <Filter>Source Files\Blam\Cache</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Cache\TagBlocks.hpp">
-      <Filter>Source Files\Blam\Cache</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups.hpp">
       <Filter>Source Files\Blam\Cache</Filter>
     </ClInclude>
@@ -1239,6 +1236,33 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Maths\integer_math.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\ai_mission_dialogue_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\antenna_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\biped_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\camera_track_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\unit_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\object_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
