@@ -466,10 +466,17 @@
     <ClInclude Include="Blam\Cache\TagGroups\device_machine_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\garbage_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\globals_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\hud_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\object_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\scenario_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\scenery_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\unit_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
     <ClInclude Include="Blam\Cache\Tags\itmc.h" />

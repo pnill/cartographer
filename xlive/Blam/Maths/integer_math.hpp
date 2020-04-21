@@ -24,3 +24,22 @@ struct rect2d
 	WORD bottom;
 	WORD right;
 };
+struct byte_color_argb
+{
+	
+	byte alpha = 255;
+	byte red = 255;
+	byte green = 255;
+	byte blue = 255;
+
+	byte_color_argb() {}
+
+	byte_color_argb(float _alpha, float _red, float _green, float _blue) :
+		alpha(_alpha),
+		red(_red),
+		green(_green),
+		blue(_blue)
+	{}
+
+};
+CHECK_STRUCT_SIZE(byte_color_argb, 1 * 4);
