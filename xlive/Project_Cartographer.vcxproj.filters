@@ -1244,6 +1244,30 @@
     <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h">
       <Filter>Source Files\Blam\Cache\TagBlocks</Filter>
     </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\creature_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\device_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\device_light_fixture_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\device_machine_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\device_control_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\garbage_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def">
