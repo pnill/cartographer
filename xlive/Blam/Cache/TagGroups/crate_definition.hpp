@@ -1,6 +1,4 @@
 #pragma once
-#ifndef BLOC_H
-#define BLOC_H
 #pragma pack(push,1)
 #include "object_definition.hpp"
 /*********************************************************************
@@ -21,4 +19,3 @@ struct s_crate_group_definition :TagGroup<'bloc'>
 TAG_GROUP_SIZE_ASSERT(s_crate_group_definition, 0xC0);
 
 #pragma pack(pop)
-#endif

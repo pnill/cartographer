@@ -1,6 +1,4 @@
 #pragma once
-#ifndef DEVI_H
-#define DEVI_H
 #pragma pack(push,1)
 #include "object_definition.hpp"
 /*********************************************************************
@@ -44,4 +42,4 @@ struct s_device_group_definition :TagGroup<'devi'>
 TAG_GROUP_SIZE_ASSERT(s_device_group_definition, 0x11C);
 
 #pragma pack(pop)
-#endif
+

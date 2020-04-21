@@ -1,6 +1,5 @@
 #pragma once
-#ifndef BIPD_H
-#define BIPD_H
+
 #pragma pack(push,1)
 #include "unit_definition.hpp"
 /*********************************************************************
@@ -189,4 +188,4 @@ struct s_biped_group_definition :TagGroup<'bipd'>
 };
 TAG_GROUP_SIZE_ASSERT(s_biped_group_definition, 0x314);
 #pragma pack(pop)
-#endif
+

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef MACH_H
-#define MACH_H
 #pragma pack(push,1)
 #include "device_definition.hpp"
 /*********************************************************************
@@ -48,4 +46,4 @@ struct s_device_machine_group_definition :TagGroup<'mach'>
 TAG_GROUP_SIZE_ASSERT(s_device_machine_group_definition, 0x134);
 
 #pragma pack(pop)
-#endif
+

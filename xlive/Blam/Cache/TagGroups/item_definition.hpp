@@ -1,6 +1,4 @@
 #pragma once
-#ifndef ITEM_H
-#define ITEM_H
 #pragma pack(push,1)
 #include "object_definition.hpp"
 /*********************************************************************
@@ -49,5 +47,5 @@ struct s_item_group_definition :TagGroup<'item'>
 TAG_GROUP_SIZE_ASSERT(s_item_group_definition, 0x12C);
 
 #pragma pack(pop)
-#endif
+
 

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef UNIT_H
-#define UNIT_H
 #pragma pack(push,1)
 #include "object_definition.hpp"
 /*********************************************************************
@@ -267,4 +265,4 @@ struct s_unit_group_definition :TagGroup<'unit'>
 };
 TAG_GROUP_SIZE_ASSERT(s_unit_group_definition, 0x1EC);
 #pragma pack(pop)
-#endif
+

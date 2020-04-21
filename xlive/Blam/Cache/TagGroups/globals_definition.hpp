@@ -1,6 +1,4 @@
 #pragma once
-#ifndef MATG_H
-#define MATG_H
 #pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
@@ -1269,4 +1267,4 @@ struct s_globals_group_definition :TagGroup<'matg'>
 TAG_GROUP_SIZE_ASSERT(s_globals_group_definition, 0x284);
 
 #pragma pack(pop)
-#endif
+

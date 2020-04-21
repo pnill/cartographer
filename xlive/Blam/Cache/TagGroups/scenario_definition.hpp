@@ -1,6 +1,4 @@
 #pragma once
-#ifndef SCNR_H
-#define SCNR_H
 #pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
@@ -3741,4 +3739,4 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 TAG_GROUP_SIZE_ASSERT(s_scenario_group_definition, 0x3E0);
 
 #pragma pack(pop)
-#endif
+

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef ANT_H
-#define ANT_H
 #pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
@@ -40,5 +38,5 @@ struct s_antenna_group_definition :TagGroup<'ant!'>
 TAG_GROUP_SIZE_ASSERT(s_antenna_group_definition, 0xA0);
 
 #pragma pack(pop)
-#endif
+
 

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef SCEN_H
-#define SCEN_H
 #pragma pack(push,1)
 #include "object_definition.hpp"
 /*********************************************************************
@@ -36,4 +34,4 @@ struct s_scenery_group_definition :TagGroup<'scen'>
 TAG_GROUP_SIZE_ASSERT(s_scenery_group_definition, 0xC4);
 
 #pragma pack(pop)
-#endif
+

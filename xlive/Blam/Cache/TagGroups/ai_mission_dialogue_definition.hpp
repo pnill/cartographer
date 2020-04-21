@@ -1,6 +1,4 @@
 #pragma once
-#ifndef MDLG_H
-#define MDLG_H
 #pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
@@ -31,4 +29,4 @@ struct s_ai_mission_dialogue_group_definition :TagGroup<'mdlg'>
 TAG_GROUP_SIZE_ASSERT(s_ai_mission_dialogue_group_definition, 0x8);
 
 #pragma pack(pop)
-#endif
+

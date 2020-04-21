@@ -1,6 +1,4 @@
 #pragma once
-#ifndef PROJ_H
-#define PROJ_H
 #pragma pack(push,1)
 #include "object_definition.hpp"
 /*********************************************************************
@@ -191,4 +189,3 @@ struct s_projectile_group_definition :TagGroup<'proj'>
 TAG_GROUP_SIZE_ASSERT(s_projectile_group_definition, 0x1A4);
 
 #pragma pack(pop)
-#endif

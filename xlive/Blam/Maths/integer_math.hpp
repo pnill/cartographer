@@ -34,7 +34,7 @@ struct byte_color_argb
 
 	byte_color_argb() {}
 
-	byte_color_argb(float _alpha, float _red, float _green, float _blue) :
+	byte_color_argb(byte _alpha, byte _red, byte _green, byte _blue) :
 		alpha(_alpha),
 		red(_red),
 		green(_green),

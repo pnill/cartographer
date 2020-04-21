@@ -1,6 +1,4 @@
 #pragma once
-#ifndef EQUIP_H
-#define EQUIP_H
 #pragma pack(push,1)
 #include "item_definition.hpp"
 /*********************************************************************
@@ -34,4 +32,4 @@ struct s_equipment_group_definition :TagGroup<'eqip'>
 TAG_GROUP_SIZE_ASSERT(s_equipment_group_definition, 0x13C);
 
 #pragma pack(pop)
-#endif
+

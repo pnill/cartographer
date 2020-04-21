@@ -1,7 +1,5 @@
 #pragma once
 #pragma pack(push,1)
-#ifndef CHAR_H
-#define CHAR_H
 #include "Blam\Cache\DataTypes\DataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
 #include "Blam\Cache\DataTypes\TagBlock.h"
@@ -90,5 +88,5 @@ struct character_tag_group
 	__int64 VehicleProperties;
 	//Reflexive VehicleProperties;
 };
-#endif
+
 #pragma pack(pop)

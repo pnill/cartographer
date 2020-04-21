@@ -1,6 +1,4 @@
 #pragma once
-#ifndef TRAK_H
-#define TRAK_H
 #pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
@@ -28,5 +26,5 @@ struct s_camera_track_group_definition :TagGroup<'trak'>
 TAG_GROUP_SIZE_ASSERT(s_camera_track_group_definition, 0xC);
 
 #pragma pack(pop)
-#endif
+
 

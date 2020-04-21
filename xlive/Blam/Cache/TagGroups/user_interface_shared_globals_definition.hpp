@@ -1,6 +1,4 @@
 #pragma once
-#ifndef WIGL_H
-#define WIGL_H
 #pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
@@ -831,4 +829,4 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 TAG_GROUP_SIZE_ASSERT(s_user_interface_shared_globals_group_definition, 0x1C4);
 
 #pragma pack(pop)
-#endif
+

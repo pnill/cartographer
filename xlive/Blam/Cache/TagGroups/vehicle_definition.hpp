@@ -1,6 +1,4 @@
 #pragma once
-#ifndef VEHI_H
-#define VEHI_H
 #pragma pack(push,1)
 #include "unit_definition.hpp"
 /*********************************************************************
@@ -334,4 +332,4 @@ struct s_vehicle_group_definition :TagGroup<'vehi'>
 TAG_GROUP_SIZE_ASSERT(s_vehicle_group_definition, 0x300);
 
 #pragma pack(pop)
-#endif
+

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef WEAP_H
-#define WEAP_H
 #pragma pack(push,1)
 #include "item_definition.hpp"
 /*********************************************************************
@@ -513,4 +511,4 @@ struct s_weapon_group_definition :TagGroup<'weap'>
 TAG_GROUP_SIZE_ASSERT(s_weapon_group_definition, 0x31C);
 
 #pragma pack(pop)
-#endif
+

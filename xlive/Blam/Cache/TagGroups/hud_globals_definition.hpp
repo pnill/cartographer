@@ -1,6 +1,4 @@
 #pragma once
-#ifndef HUDG_H
-#define HUDG_H
 #pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
@@ -308,4 +306,3 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 TAG_GROUP_SIZE_ASSERT(s_hud_globals_group_definition, 0x488);
 
 #pragma pack(pop)
-#endif

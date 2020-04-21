@@ -1,6 +1,4 @@
 #pragma once
-#ifndef GARB_H
-#define GARB_H
 #pragma pack(push,1)
 #include "item_definition.hpp"
 /*********************************************************************
@@ -16,5 +14,5 @@ struct s_garbage_group_definition :TagGroup<'garb'>
 TAG_GROUP_SIZE_ASSERT(s_garbage_group_definition, 0x1D4);
 
 #pragma pack(pop)
-#endif
+
 

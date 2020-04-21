@@ -1,6 +1,4 @@
 #pragma once
-#ifndef CREA_H
-#define CREA_H
 #pragma pack(push,1)
 #include "object_definition.hpp"
 /*********************************************************************
@@ -193,4 +191,4 @@ struct s_creature_group_definition :TagGroup<'crea'>
 TAG_GROUP_SIZE_ASSERT(s_creature_group_definition, 0x180);
 
 #pragma pack(pop)
-#endif
+

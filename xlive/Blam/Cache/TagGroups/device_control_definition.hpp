@@ -1,6 +1,4 @@
 #pragma once
-#ifndef CTRL_H
-#define CTRL_H
 #pragma pack(push,1)
 #include "device_definition.hpp"
 /*********************************************************************
@@ -34,5 +32,5 @@ struct s_device_control_group_definition :TagGroup<'ctrl'>
 TAG_GROUP_SIZE_ASSERT(s_device_control_group_definition, 0x140);
 
 #pragma pack(pop)
-#endif
+
 

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef OBJE_H
-#define OBJE_H
 #pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
@@ -214,4 +212,4 @@ struct s_object_group_definition :TagGroup<'obje'>
 };
 TAG_GROUP_SIZE_ASSERT(s_object_group_definition, 0xBC);
 #pragma pack(pop)
-#endif
+
