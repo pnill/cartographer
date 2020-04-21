@@ -4,7 +4,7 @@
 #define CHAR_H
 #include "Blam\Cache\DataTypes\DataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
-#include "Blam\Cache\TagBlocks\TagBlock.h"
+#include "Blam\Cache\DataTypes\TagBlock.h"
 
 
 struct character_tag_group
@@ -36,6 +36,26 @@ struct character_tag_group
 	//Reflexive LookProperties;
 	__int64 MovementProperties;
 	//Reflexive MovementProperties;
+	struct character_swarm_block
+	{
+		/// After the given number of deaths, the swarm scatters
+		short scatterKilledCount;
+		BYTE padding359[2];
+		/// the distance from the target that the swarm scatters
+		float scatterRadius;
+		/// amount of time to remain scattered
+		float scatterTime;
+		float houndMinDistance;
+		float houndMaxDistance;
+		/// amount of randomness added to creature's throttle
+		float perlinOffsetScale01;
+		/// how fast the creature changes random offset to throttle
+		real_vector2d offsetPeriodS;
+		/// a random offset lower then given threshold is made 0. (threshold of 1 = no movement)
+		float perlinIdleMovementThreshold01;
+		/// a random offset lower then given threshold is made 0. (threshold of 1 = no movement)
+		float perlinCombatMovementThreshold01;
+	};
 	tag_block<character_swarm_block> SwarmProperties;
 	__int64 ReadyProperties;
 	//Reflexive ReadyProperties;

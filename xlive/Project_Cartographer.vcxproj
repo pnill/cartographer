@@ -458,6 +458,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\antenna_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\biped_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\camera_track_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\crate_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\object_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp" />
@@ -491,7 +492,6 @@
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
     <ClInclude Include="Blam\BlamLibrary.h" />
-    <ClInclude Include="Blam\Cache\Cache.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataTypes.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h" />
@@ -500,11 +500,9 @@
     <ClInclude Include="Blam\Cache\DataTypes\StringID.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Strings.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
-    <ClInclude Include="Blam\Cache\TagBlocks\char.h" />
-    <ClInclude Include="Blam\Cache\TagBlocks\TagBlock.h" />
+    <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h" />
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\char.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\TagGroups.h" />
     <ClInclude Include="Blam\Engine\Actor\Actor.h" />
     <ClInclude Include="Blam\Engine\EngineDefinitions.h" />
     <ClInclude Include="Blam\Engine\FileSystem\FiloInterface.h" />
@@ -523,9 +521,6 @@
     <ClInclude Include="Blam\Enums\Objects\Unit.h" />
     <ClInclude Include="Blam\Enums\Players\Players.h" />
     <ClInclude Include="Blam\Enums\Tags\TagGroups.h" />
-    <ClInclude Include="Blam\Enums\Tags\TagGroups\hudg.hpp" />
-    <ClInclude Include="Blam\Enums\Tags\TagGroups\matg.hpp" />
-    <ClInclude Include="Blam\Enums\Tags\TagGroups\nhdt.hpp" />
     <ClInclude Include="Blam\Maths\Maths.h" />
     <ClInclude Include="XLive\Voice\Encoder.h" />
     <ClInclude Include="Globals.h" />

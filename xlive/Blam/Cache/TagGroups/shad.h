@@ -2,7 +2,7 @@
 #pragma pack(push,1)
 #include "Blam\Cache\DataTypes\DataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
-#include "..\TagBlocks\TagBlock.h"
+#include "Blam\Cache\DataTypes\TagBlock.h"
 
 namespace Blam
 {

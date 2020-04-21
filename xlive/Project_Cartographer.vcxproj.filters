@@ -614,12 +614,6 @@
     <ClInclude Include="Blam\Engine\Game\GameManager.h">
       <Filter>Source Files\Blam\Engine\Game</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Shared\Globals.h">
-      <Filter>Source Files\Blam\Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\RealMovement.h">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Enums\Objects\Objects.h">
       <Filter>Source Files\Blam\Enums\Objects</Filter>
     </ClInclude>
@@ -791,9 +785,6 @@
     <ClInclude Include="Blam\Enums\Tags\TagGroups.h">
       <Filter>Source Files\Blam\Enums\Tags</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Cache\Cache.h">
-      <Filter>Source Files\Blam\Cache</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups.hpp">
       <Filter>Source Files\Blam\Cache</Filter>
     </ClInclude>
@@ -818,26 +809,8 @@
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\TagGroups.h">
-      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Tags\TagGroups\hudg.hpp">
-      <Filter>Source Files\Blam\Enums\Tags\TagGroups</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Tags\TagGroups\matg.hpp">
-      <Filter>Source Files\Blam\Enums\Tags\TagGroups</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Tags\TagGroups\nhdt.hpp">
-      <Filter>Source Files\Blam\Enums\Tags\TagGroups</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagBlocks\TagBlock.h">
-      <Filter>Source Files\Blam\Cache\TagBlocks</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups\char.hpp">
       <Filter>Source Files\Blam\Cache\TagGroups</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagBlocks\char.h">
-      <Filter>Source Files\Blam\Cache\TagBlocks\AI</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\HeadHunter\HeadHunter.h">
       <Filter>Source Files\H2MOD\Variants\HeadHunter</Filter>
@@ -1264,6 +1237,12 @@
     </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\crate_definition.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h">
+      <Filter>Source Files\Blam\Cache\TagBlocks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

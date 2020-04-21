@@ -1,5 +1,6 @@
 #pragma once
-#include "..\Blam\Cache\Cache.h"
+#include "..\Blam\Cache\DataTypes\BlamTag.h"
+#include "..\Blam\Cache\DataTypes\DatumIndex.h"
 
 namespace tags
 {

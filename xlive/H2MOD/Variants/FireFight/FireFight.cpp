@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "Blam/BlamLibrary.h"
 #include "H2MOD/Tags/TagInterface.h"
+#include "../Blam/Cache/TagGroups/char.hpp"
 
 FireFight::FireFight()
 {
