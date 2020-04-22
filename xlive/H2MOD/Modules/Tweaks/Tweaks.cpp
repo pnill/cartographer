@@ -12,7 +12,7 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "Blam\Cache\TagGroups\shad.h"
 #include "..\CustomResolutions\CustomResolutions.h"
-
+#include "..\H2MOD\Tags\TagInterface.h"
 #define _USE_MATH_DEFINES
 #include "math.h"
 
@@ -1076,7 +1076,7 @@ void H2Tweaks::setCrosshairPos(float crosshair_offset) {
 
 	if (!FloatIsNaN(crosshair_offset)) {
 
-		tags::tag_data_block* player_controls_block = reinterpret_cast<tags::tag_data_block*>(tags::get_game_globals() + 240);
+		tags::tag_data_block* player_controls_block = reinterpret_cast<tags::tag_data_block*>(tags::get_matg_globals_ptr() + 240);
 		if (player_controls_block->block_count > 0)
 		{
 			for (int i = 0; i < player_controls_block->block_count; i++)
@@ -1089,34 +1089,34 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 	if (H2IsDediServer)
 		return;
 
-	DWORD BATRIF1 = (DWORD)tags::get_game_globals() + 0x7aa750;
-	DWORD BATRIF2 = (DWORD)tags::get_game_globals() + 0x7aa752;
-	DWORD SMG1 = (DWORD)tags::get_game_globals() + 0x7A9F9C;
-	DWORD SMG2 = (DWORD)tags::get_game_globals() + 0x7A9F9E;
-	DWORD CRBN1 = (DWORD)tags::get_game_globals() + 0x7ab970;
-	DWORD CRBN2 = (DWORD)tags::get_game_globals() + 0x7ab972;
-	DWORD BEAMRIF1 = (DWORD)tags::get_game_globals() + 0x7AA838;
-	DWORD BEAMRIF2 = (DWORD)tags::get_game_globals() + 0x7AA83A;
-	DWORD MAG1 = (DWORD)tags::get_game_globals() + 0x7AA33C;
-	DWORD MAG2 = (DWORD)tags::get_game_globals() + 0x7AA33E;
-	DWORD PLASRIF1 = (DWORD)tags::get_game_globals() + 0x7AA16C;
-	DWORD PLASRIF2 = (DWORD)tags::get_game_globals() + 0x7AA16E;
-	DWORD SHTGN1 = (DWORD)tags::get_game_globals() + 0x7AA424;
-	DWORD SHTGN2 = (DWORD)tags::get_game_globals() + 0x7AA426;
-	DWORD SNIP1 = (DWORD)tags::get_game_globals() + 0x7AA994;
-	DWORD SNIP2 = (DWORD)tags::get_game_globals() + 0x7AA996;
-	DWORD SWRD1 = (DWORD)tags::get_game_globals() + 0x7AA8AC;
-	DWORD SWRD2 = (DWORD)tags::get_game_globals() + 0x7AA8AE;
-	DWORD ROCKLAUN1 = (DWORD)tags::get_game_globals() + 0x7AA3B0;
-	DWORD ROCKLAUN2 = (DWORD)tags::get_game_globals() + 0x7AA3B2;
-	DWORD PLASPI1 = (DWORD)tags::get_game_globals() + 0x7AA0F8;
-	DWORD PLASPI2 = (DWORD)tags::get_game_globals() + 0x7AA0FA;
-	DWORD BRUTESHOT1 = (DWORD)tags::get_game_globals() + 0x7AA7C4;
-	DWORD BRUTESHOT2 = (DWORD)tags::get_game_globals() + 0x7AA7C6;
-	DWORD NEED1 = (DWORD)tags::get_game_globals() + 0x7AA254;
-	DWORD NEED2 = (DWORD)tags::get_game_globals() + 0x7AA256;
-	DWORD SENTBEAM1 = (DWORD)tags::get_game_globals() + 0x7AB5D0;
-	DWORD SENTBEAM2 = (DWORD)tags::get_game_globals() + 0x7AB5D2;
+	DWORD BATRIF1 = (DWORD)tags::get_matg_globals_ptr() + 0x7aa750;
+	DWORD BATRIF2 = (DWORD)tags::get_matg_globals_ptr() + 0x7aa752;
+	DWORD SMG1 = (DWORD)tags::get_matg_globals_ptr() + 0x7A9F9C;
+	DWORD SMG2 = (DWORD)tags::get_matg_globals_ptr() + 0x7A9F9E;
+	DWORD CRBN1 = (DWORD)tags::get_matg_globals_ptr() + 0x7ab970;
+	DWORD CRBN2 = (DWORD)tags::get_matg_globals_ptr() + 0x7ab972;
+	DWORD BEAMRIF1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA838;
+	DWORD BEAMRIF2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA83A;
+	DWORD MAG1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA33C;
+	DWORD MAG2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA33E;
+	DWORD PLASRIF1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA16C;
+	DWORD PLASRIF2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA16E;
+	DWORD SHTGN1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA424;
+	DWORD SHTGN2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA426;
+	DWORD SNIP1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA994;
+	DWORD SNIP2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA996;
+	DWORD SWRD1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA8AC;
+	DWORD SWRD2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA8AE;
+	DWORD ROCKLAUN1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA3B0;
+	DWORD ROCKLAUN2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA3B2;
+	DWORD PLASPI1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA0F8;
+	DWORD PLASPI2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA0FA;
+	DWORD BRUTESHOT1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA7C4;
+	DWORD BRUTESHOT2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA7C6;
+	DWORD NEED1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA254;
+	DWORD NEED2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA256;
+	DWORD SENTBEAM1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AB5D0;
+	DWORD SENTBEAM2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AB5D2;
 
 	DWORD WEAPONS[] = { BATRIF1, BATRIF2, SMG1, SMG2, CRBN1, CRBN2, BEAMRIF1, BEAMRIF2, MAG1, MAG2, PLASRIF1, PLASRIF2, SHTGN1, SHTGN2, SNIP1, SNIP2, SWRD1, SWRD2, ROCKLAUN1, ROCKLAUN2, PLASPI1, PLASPI2, BRUTESHOT1, BRUTESHOT2, NEED1, NEED2, SENTBEAM1, SENTBEAM2 };
 
