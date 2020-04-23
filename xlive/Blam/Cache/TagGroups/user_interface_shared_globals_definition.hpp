@@ -830,3 +830,12 @@ TAG_GROUP_SIZE_ASSERT(s_user_interface_shared_globals_group_definition, 0x1C4);
 
 #pragma pack(pop)
 
+/* gets the current loaded user_interface_shared_globals tag aka wigl  */
+s_user_interface_shared_globals_group_definition *get_user_interface_shared_globals_ptr()
+{
+	//dives into globals/globals tag and gets the block "Interface Tags"
+	//from there checks current scnr type and itself returns a pointer for the correct one
+	typedef s_user_interface_shared_globals_group_definition*(_cdecl wgtz_get_user_interface_shared_globals)();
+	auto pwgtz_get_user_interface_shared_globals = h2mod->GetAddress<wgtz_get_user_interface_shared_globals*>(0x20BB89, 0x1F2CC6);
+	return pwgtz_get_user_interface_shared_globals();
+}

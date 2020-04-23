@@ -3739,4 +3739,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 TAG_GROUP_SIZE_ASSERT(s_scenario_group_definition, 0x3E0);
 
 #pragma pack(pop)
-
+/* gets the current scenario tag aka scnr for the current cache file */
+s_scenario_group_definition*  get_scenario_ptr()
+{
+	return *h2mod->GetAddress<s_scenario_group_definition**>(0x479E74, 0x4A6430);
+}

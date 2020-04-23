@@ -18,40 +18,6 @@ char *tags::get_matg_globals_ptr()
 {
 	return *h2mod->GetAddress<char**>(0x479E70, 0x4A642C);
 }
-s_scenario_group_definition *tags::get_scenario_ptr()
-{
-	return *h2mod->GetAddress<s_scenario_group_definition**>(0x479E70, 0x4A6430);
-}
-s_hud_globals_group_definition *tags::get_hud_globals_ptr()
-{
-	return *h2mod->GetAddress<s_hud_globals_group_definition**>(0x9765C8, 0x99FBB0);
-}
-s_user_interface_globals_group_definition *tags::get_user_interface_globals_ptr()
-{
-	//dives into globals/globals tag and gets the block "Interface Tags"
-	//from there checks current scnr type and itself returns a pointer for the correct one
-	typedef s_user_interface_globals_group_definition*(_cdecl matg_interface_tags_get_user_interface_globals)();
-	auto pmatg_interface_tags_get_user_interface_globals = h2mod->GetAddress<matg_interface_tags_get_user_interface_globals*>(0x20BB1D,0x1F2C5A);
-	return pmatg_interface_tags_get_user_interface_globals();
-}
-s_user_interface_shared_globals_group_definition *tags::get_user_interface_shared_globals_ptr()
-{
-	//dives into globals/globals tag and gets the block "Interface Tags"
-	//from there checks current scnr type and itself returns a pointer for the correct one
-	typedef s_user_interface_shared_globals_group_definition*(_cdecl wgtz_get_user_interface_shared_globals)();
-	auto pwgtz_get_user_interface_shared_globals = h2mod->GetAddress<wgtz_get_user_interface_shared_globals*>(0x20BB89, 0x1F2CC6);
-	return pwgtz_get_user_interface_shared_globals();
-}
-s_multiplayer_globals_group_definition *tags::get_multiplayer_globals_ptr()
-{
-	//couldnt find game using a ptr / function for mulg
-	//most likely it was a macro so i manually implemented it
-
-	auto matg = reinterpret_cast<s_globals_group_definition*>(get_matg_globals_ptr());
-	auto *mulg = LOG_CHECK(get_tag<'mulg', s_multiplayer_globals_group_definition>(matg->multiplayer_globals.TagIndex));
-	return mulg;
-
-}
 
 cache_header *tags::get_cache_header()
 {

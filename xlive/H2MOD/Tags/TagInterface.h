@@ -1,12 +1,6 @@
 #pragma once
 #include "..\Blam\Cache\DataTypes\BlamTag.h"
 #include "..\Blam\Cache\DataTypes\DatumIndex.h"
-#include "..\Blam\Cache\TagGroups\scenario_definition.hpp"
-#include "..\Blam\Cache\TagGroups\hud_globals_definition.hpp"
-#include "..\Blam\Cache\TagGroups\user_interface_globals_definition.hpp"
-#include "..\Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp"
-#include "..\Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
-#include "..\Blam\Cache\TagGroups\globals_definition.hpp"
 
 namespace tags
 {
@@ -128,21 +122,6 @@ namespace tags
 
 	/* gets the globals\globals aka matg for the current map/cache file (TODO: add the matg structure) */
 	char *get_matg_globals_ptr();
-
-	/* gets the current scenario tag aka scnr for the current cache file */
-	s_scenario_group_definition *get_scenario_ptr();
-
-	/* gets the current loaded hud globals tag aka hudg */
-	s_hud_globals_group_definition *get_hud_globals_ptr();
-
-	/* gets the current loaded user_interface_globals tag aka wgtz depending on the scenario type */
-	s_user_interface_globals_group_definition *get_user_interface_globals_ptr();
-
-	/* gets the current loaded user_interface_shared_globals tag aka wigl  */
-	s_user_interface_shared_globals_group_definition *get_user_interface_shared_globals_ptr();
-
-	/* gets the current loaded multiplayer_globals_group tag aka mulg  */
-	s_multiplayer_globals_group_definition *get_multiplayer_globals_ptr();
 
 	/* header for the current .map/cache file */
 	cache_header *get_cache_header();

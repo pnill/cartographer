@@ -306,3 +306,8 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 TAG_GROUP_SIZE_ASSERT(s_hud_globals_group_definition, 0x488);
 
 #pragma pack(pop)
+/* gets the current loaded hud globals tag aka hudg */
+s_hud_globals_group_definition *get_hud_globals_ptr()
+{
+	return h2mod->GetAddress<s_hud_globals_group_definition*>(0x9765C8, 0x99FBB0);
+}
