@@ -99,7 +99,7 @@ using namespace std::chrono;
 
 high_resolution_clock::time_point nextFrame;
 high_resolution_clock::duration desiredRenderTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / (double)H2Config_fps_limit));
-high_resolution_clock::duration minimizedDesiredTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / 60.0));
+high_resolution_clock::duration minimizedDesiredTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / 64.0));
 void frameTimeManagement() {
 
 	typedef bool(__cdecl* game_is_minimized)();
