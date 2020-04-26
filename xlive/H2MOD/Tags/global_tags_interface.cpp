@@ -2,20 +2,17 @@
 
 #include "..\H2MOD.h"
 #include "..\Blam\Cache\Tags\tag_definitons.h"
-#include "..\Blam\Enums\Tags\TagGroups.h"
 #include "TagInterface.h"
 #include "..\Util\Hooks\Hook.h"
-
-using Blam::Enums::Tags::TagGroupTypes;
 
 void _cdecl ResetMapData();
 
 namespace TagInterface
 {
 	//var to store the created interfaces
-	static map<datum, void*> global_tag_interface_list;
+	static std::map<datum, void*> global_tag_interface_list;
 
-	void* global_tags_interface::GetTagInterface(datum tag, int type)
+	void* global_tags_interface::GetTagInterface(datum tag, blam_tag type)
 	{
 		if (global_tag_interface_list.find(tag) != global_tag_interface_list.end())
 		{
@@ -24,7 +21,7 @@ namespace TagInterface
 		auto global_tag_tables = tags::get_tag_instances();
 
 		//tag type verification/protection against accidental type conversion
-		if (global_tag_tables[tag.Index].type.as_int() != type)
+		if (global_tag_tables[tag.Index].type != type)
 			return nullptr;
 
 		void* tag_mem_addr = tags::get_tag(tag);
@@ -36,7 +33,7 @@ namespace TagInterface
 	}
 	void global_tags_interface::Release()
 	{
-		map<datum, void*>::iterator  i = global_tag_interface_list.begin();
+		std::map<datum, void*>::iterator  i = global_tag_interface_list.begin();
 		while (i != global_tag_interface_list.end())
 		{
 			auto global_tag_tables = tags::get_tag_instances();
@@ -47,16 +44,16 @@ namespace TagInterface
 	}
 	void global_tags_interface::Open(__int32 type, void* tag_mem)
 	{
-		switch ((TagGroupTypes)type)
+		switch ((blam_tag::tag_group_type)type)
 		{
-		case TagGroupTypes::itemcollection:
+		case blam_tag::tag_group_type::itemcollection:
 		{
 			auto tptr = (Blam::Cache::Tags::itmc*)tag_mem;
 			tptr->Open();
 
 			break;
 		}
-		case TagGroupTypes::scenario:
+		case blam_tag::tag_group_type::scenario:
 		{
 			auto tptr = (Blam::Cache::Tags::scnr*)tag_mem;
 			tptr->Open();
@@ -68,16 +65,16 @@ namespace TagInterface
 	}
 	void global_tags_interface::Close(__int32 type, void* tag_mem)
 	{
-		switch ((TagGroupTypes)type)
+		switch ((blam_tag::tag_group_type)type)
 		{
-		case TagGroupTypes::itemcollection:
+		case blam_tag::tag_group_type::itemcollection:
 		{
 			auto tptr = (Blam::Cache::Tags::itmc*)tag_mem;
 			tptr->Close();
 
 			break;
 		}
-		case TagGroupTypes::scenario:
+		case blam_tag::tag_group_type::scenario:
 		{
 			auto tptr = (Blam::Cache::Tags::scnr*)tag_mem;
 			tptr->Close();

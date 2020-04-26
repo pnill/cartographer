@@ -1,6 +1,4 @@
 #pragma once
-#ifndef TAGBLOCK_H
-#define TAGBLOCK_H
 
 #include "..\H2MOD\Tags\TagInterface.h"
 
@@ -45,4 +43,3 @@ struct tag_block
 		return nullptr;
 	}
 };
-#endif

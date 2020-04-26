@@ -7,8 +7,6 @@
 #include "H2MOD\Tags\global_tags_interface.h"
 #include "..\Blam\Cache\Tags\tag_definitons.h"
 
-using Blam::Enums::Tags::TagGroupTypes;
-
 //contains some game functions that returns HANDLE
 namespace global_handle_function
 {
@@ -420,7 +418,7 @@ namespace tag_loader
 				que_meta_list[my_inject_refs_iter.old_datum]->Rebase_meta(mem_off);
 				char* meta_data = que_meta_list[my_inject_refs_iter.old_datum]->Generate_meta_file();
 
-				blam_tag type = std::stoi(que_meta_list[my_inject_refs_iter.old_datum]->Get_type());
+				blam_tag type(blam_tag::tag_group_type(std::stoi(que_meta_list[my_inject_refs_iter.old_datum]->Get_type())));
 
 				tables_data.type = type;
 				tables_data.data_offset = mem_off;
@@ -885,22 +883,22 @@ namespace tag_loader
 	}
 	void Generate_sync_list(int type, DWORD index)
 	{
-		switch ((TagGroupTypes)type)
+		switch ((blam_tag::tag_group_type)type)
 		{
-		case TagGroupTypes::biped:
-		case TagGroupTypes::vehicle:
-		case TagGroupTypes::weapon:
-		case TagGroupTypes::garbage:
-		case TagGroupTypes::projectile:
-		case TagGroupTypes::crate:
-		case TagGroupTypes::damageeffect:
-		case TagGroupTypes::device:
-		case TagGroupTypes::scenery:
-		case TagGroupTypes::devicelightfixture:
-		case TagGroupTypes::soundscenery:
-		case TagGroupTypes::creature:
-		case TagGroupTypes::devicemachine:
-		case TagGroupTypes::equipment:
+		case blam_tag::tag_group_type::biped:
+		case blam_tag::tag_group_type::vehicle:
+		case blam_tag::tag_group_type::weapon:
+		case blam_tag::tag_group_type::garbage:
+		case blam_tag::tag_group_type::projectile:
+		case blam_tag::tag_group_type::crate:
+		case blam_tag::tag_group_type::damageeffect:
+		case blam_tag::tag_group_type::device:
+		case blam_tag::tag_group_type::scenery:
+		case blam_tag::tag_group_type::devicelightfixture:
+		case blam_tag::tag_group_type::soundscenery:
+		case blam_tag::tag_group_type::creature:
+		case blam_tag::tag_group_type::devicemachine:
+		case blam_tag::tag_group_type::equipment:
 			sync_list.push_back(index);
 			break;
 
@@ -914,7 +912,7 @@ namespace tag_loader
 		{
 			
 			datum scnr_index = tags::get_tags_header()->scenario_datum;
-			auto GlobalSCNR = (Blam::Cache::Tags::scnr*)TagInterface::GlobalTagInterface.GetTagInterface(scnr_index, (int)TagGroupTypes::scenario);		
+			auto GlobalSCNR = (Blam::Cache::Tags::scnr*)TagInterface::GlobalTagInterface.GetTagInterface(scnr_index, blam_tag::tag_group_type::scenario);
 			
 			for (size_t i = 0 ; i < sync_list.size(); i++)
 			{
@@ -1247,7 +1245,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	if (tags::get_cache_header()->type != tags::cache_header::scnr_type::MainMenu)
 	{
 		datum temp(0xE1940018);
-		auto test = (Blam::Cache::Tags::itmc*)TagInterface::GlobalTagInterface.GetTagInterface(temp, (int)TagGroupTypes::itemcollection);
+		auto test = (Blam::Cache::Tags::itmc*)TagInterface::GlobalTagInterface.GetTagInterface(temp, blam_tag::tag_group_type::itemcollection);
 		
 		if (false)
 		{
@@ -1267,7 +1265,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 			*/
 
 			//test->ItemPermutations.RemoveAt(0);
-			test->ItemPermutations[0]->Item.TagGroup = TagGroupTypes::weapon;
+			test->ItemPermutations[0]->Item.TagGroup = blam_tag::tag_group_type::weapon;
 			test->ItemPermutations[0]->Item.TagIndex = 0x3BA4;
 		}
 	}	

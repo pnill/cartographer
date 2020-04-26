@@ -2,7 +2,7 @@
 #include "Globals.h"
 #include "Blam/BlamLibrary.h"
 #include "H2MOD/Tags/TagInterface.h"
-#include "../Blam/Cache/TagGroups/char.hpp"
+#include "../Blam/Cache/TagGroups/character_definition.hpp"
 
 FireFight::FireFight()
 {
@@ -27,7 +27,7 @@ void FireFight::KilledAI(datum ai_datum, XUID killer)
 		if (actor_datum.Index != -1) // Ensure that it was valid
 		{
 			datum char_datum = actorIt.get_data_at_index(actor_datum.Index)->character_datum; // get the character tag datum assigned to the actor.
-			auto *character = tags::get_tag<'char', character_tag_group>(char_datum);
+			auto *character = tags::get_tag<blam_tag::tag_group_type::character, character_tag_group>(char_datum);
 
 			if (character && character->SwarmProperties.size > 0)
 				points = character->SwarmProperties[0]->scatterKilledCount;

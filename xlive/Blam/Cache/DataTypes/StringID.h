@@ -1,7 +1,4 @@
 #pragma once
-#ifndef STRING_ID_H
-#define STRING_ID_H
-#include <codecvt>
 
 /*********************************************************************
 * string_id
@@ -84,4 +81,3 @@ inline bool string_id::operator!= (const string_id &string_id)
 {
 	return this->value != string_id.value;
 }
-#endif

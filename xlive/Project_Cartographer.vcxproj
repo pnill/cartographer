@@ -517,7 +517,7 @@
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h" />
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\char.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\Actor\Actor.h" />
     <ClInclude Include="Blam\Engine\EngineDefinitions.h" />
     <ClInclude Include="Blam\Engine\FileSystem\FiloInterface.h" />
@@ -535,7 +535,6 @@
     <ClInclude Include="Blam\Enums\Objects\Objects.h" />
     <ClInclude Include="Blam\Enums\Objects\Unit.h" />
     <ClInclude Include="Blam\Enums\Players\Players.h" />
-    <ClInclude Include="Blam\Enums\Tags\TagGroups.h" />
     <ClInclude Include="Blam\Maths\Maths.h" />
     <ClInclude Include="XLive\Voice\Encoder.h" />
     <ClInclude Include="Globals.h" />

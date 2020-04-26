@@ -828,8 +828,8 @@ test_engine g_test_engine;
 
 void fix_shader_template_nvidia(const std::string &template_name, const std::string &bitmap_name, size_t bitmap_idx)
 {
-	datum bitmap_to_fix    = tags::find_tag('bitm', bitmap_name);
-	datum borked_template  = tags::find_tag('stem', template_name);
+	datum bitmap_to_fix    = tags::find_tag(blam_tag::tag_group_type::bitmap, bitmap_name);
+	datum borked_template  = tags::find_tag(blam_tag::tag_group_type::shadertemplate, template_name);
 
 	LOG_DEBUG_FUNC("bitmap {0}, borked_template {1}", bitmap_to_fix.data, borked_template.data);
 
@@ -838,10 +838,10 @@ void fix_shader_template_nvidia(const std::string &template_name, const std::str
 
 	LOG_DEBUG_FUNC("Fixing: template {}, bitmap {}", template_name, bitmap_name);
 
-	tags::ilterator shaders('shad');
+	tags::ilterator shaders(blam_tag::tag_group_type::shader);
 	while (!shaders.next().IsNull())
 	{
-		auto *shader = LOG_CHECK(tags::get_tag<'shad', shad>(shaders.m_datum));
+		auto *shader = LOG_CHECK(tags::get_tag<blam_tag::tag_group_type::shader, shad>(shaders.m_datum));
 		if (shader && shader->shader_template.TagIndex == borked_template && LOG_CHECK(shader->postprocessDefinition.size > 0))
 		{
 			LOG_DEBUG_FUNC("shader {} has borked template", tags::get_tag_name(shaders.m_datum));

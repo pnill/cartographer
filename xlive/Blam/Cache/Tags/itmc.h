@@ -7,7 +7,7 @@ namespace Blam
 	{
 		namespace Tags
 		{
-			struct itmc :tag_base
+			struct itmc : tag_base
 			{
 				struct ItemPermutations :tag_base
 				{

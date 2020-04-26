@@ -1,6 +1,6 @@
 #pragma once
-#include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
+#include "..\Blam\Cache\DataTypes.h"
 
 /*********************************************************************
 * name: user_interface_globals

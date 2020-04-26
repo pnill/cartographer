@@ -1,5 +1,5 @@
 #pragma once
-#include "..\Blam\Cache\DataTypes\DataTypes.h"
+#include "..\Blam\Cache\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
 #include "..\Blam\Maths\real_math.hpp"
 #include "..\Blam\Maths\\integer_math.hpp"

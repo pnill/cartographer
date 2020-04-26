@@ -587,7 +587,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, BYTE type, BYTE coun
 	};
 
 	datum unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
-	datum grenade_eqip_tag_datum_index = tags::find_tag('eqip', grenadeEquipamentTagName[type]);
+	datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
 
 	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
 	if (unit_object)

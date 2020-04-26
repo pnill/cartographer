@@ -1,12 +1,11 @@
 #pragma once
-#include <codecvt>
 #include "Macros.h"
-#ifndef DATUM_INDEX_H
-#define DATUM_INDEX_H
+
 /*********************************************************************
 * datum / DatumIndex
 * 4 BYTE Tag Structure for any TagIndices of Halo 2 CacheFiles
 **********************************************************************/
+
 struct datum
 {
 	//Default Constructor
@@ -78,4 +77,3 @@ struct datum
 	};
 };
 CHECK_STRUCT_SIZE(datum, 4);
-#endif

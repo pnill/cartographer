@@ -1,5 +1,7 @@
 #pragma once
+
 #include "..\H2MOD.h"
+
 namespace Blam
 {
 	namespace Cache

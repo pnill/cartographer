@@ -1,7 +1,6 @@
 #pragma once
-#include "..\Blam\Cache\DataTypes\DataTypes.h"
+#include "..\Blam\Cache\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
-#include "..\Blam\Cache\DataTypes\TagBlock.h"
 
 /*********************************************************************
 * name: ai_mission_dialogue
@@ -29,6 +28,5 @@ struct s_ai_mission_dialogue_group_definition :TagGroup<'mdlg'>
 	tag_block<s_lines_block> lines;//0x0
 };
 TAG_GROUP_SIZE_ASSERT(s_ai_mission_dialogue_group_definition, 0x8);
-
 #pragma pack(pop)
 

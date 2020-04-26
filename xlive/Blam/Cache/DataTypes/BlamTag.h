@@ -1,19 +1,138 @@
 #pragma once
-#ifndef BLAM_TAG_H
-#define BLAM_TAG_H
+
 struct blam_tag
 {
-	union {
-		char c_data[4];
-		uint32_t i_data;
+	enum class tag_group_type : __int32
+	{
+		none = -1,
+		model = 'hlmt',
+		rendermodel = 'mode',
+		collisionmodel = 'coll',
+		physicsmodel = 'phmo',
+		bitmap = 'bitm',
+		colortable = 'colo',
+		multilingualunicodestringlist = 'unic',
+		unit = 'unit',
+		biped = 'bipd',
+		vehicle = 'vehi',
+		scenery = 'scen',
+		crate = 'bloc',
+		creature = 'crea',
+		physics = 'phys',
+		object = 'obje',
+		contrail = 'cont',
+		weapon = 'weap',
+		light = 'ligh',
+		effect = 'effe',
+		particle = 'prt3',
+		particlemodel = 'PRTM',
+		particlephysics = 'pmov',
+		globals = 'matg',
+		sound = 'snd!',
+		soundlooping = 'lsnd',
+		item = 'item',
+		equipment = 'eqip',
+		antenna = 'ant!',
+		lightvolume = 'MGS2',
+		liquid = 'tdtl',
+		cellularautomata = 'devo',
+		cellularautomata2d = 'whip',
+		stereosystem = 'BooM',
+		cameratrack = 'trak',
+		projectile = 'proj',
+		device = 'devi',
+		devicemachine = 'mach',
+		devicecontrol = 'ctrl',
+		devicelightfixture = 'lifi',
+		pointphysics = 'pphy',
+		scenariostructurelightmap = 'ltmp',
+		scenariostructurebsp = 'sbsp',
+		scenario = 'scnr',
+		shader = 'shad',
+		shadertemplate = 'stem',
+		shaderlightresponse = 'slit',
+		shaderpass = 'spas',
+		vertexshader = 'vrtx',
+		pixelshader = 'pixl',
+		decoratorset = 'DECR',
+		decorators = 'DECP',
+		sky = 'sky ',
+		wind = 'wind',
+		soundenvironment = 'snde',
+		lensflare = 'lens',
+		planarfog = 'fog ',
+		patchyfog = 'fpch',
+		meter = 'metr',
+		decal = 'deca',
+		colony = 'coln',
+		damageeffect = 'jpt!',
+		dialogue = 'uldg',
+		itemcollection = 'itmc',
+		vehiclecollection = 'vehc',
+		weaponhudinterface = 'wphi',
+		grenadehudinterface = 'grhi',
+		unithudinterface = 'unhi',
+		newhuddefinition = 'nhdt',
+		hudnumber = 'hud#',
+		hudglobals = 'hudg',
+		multiplayerscenariodescription = 'mply',
+		detailobjectcollection = 'dobc',
+		soundscenery = 'ssce',
+		hudmessagetext = 'hmt ',
+		userinterfacescreenwidgetdefinition = 'wgit',
+		userinterfacelistskindefinition = 'skin',
+		userinterfaceglobalsdefinition = 'wgtz',
+		userinterfacesharedglobalsdefinition = 'wigl',
+		textvaluepairdefinition = 'sily',
+		multiplayervariantsettingsinterfacedefinition = 'goof',
+		materialeffects = 'foot',
+		garbage = 'garb',
+		style = 'stly',
+		character = 'char',
+		aidialogueglobals = 'adlg',
+		aimissiondialogue = 'mdlg',
+		scenariosceneryresource = '*cen',
+		scenariobipedsresource = '*ipd',
+		scenariovehiclesresource = '*ehi',
+		scenarioequipmentresource = '*qip',
+		scenarioweaponsresource = '*eap',
+		scenariosoundsceneryresource = '*sce',
+		scenariolightsresource = '*igh',
+		scenariodevicesresource = 'dgr*',
+		scenariodecalsresource = 'dec*',
+		scenariocinematicsresource = 'cin*',
+		scenariotriggervolumesresource = 'trg*',
+		scenarioclusterdataresource = 'clu*',
+		scenariocreatureresource = '*rea',
+		scenariodecoratorsresource = 'dc*s',
+		scenariostructurelightingresource = 'sslt',
+		scenariohssourcefile = 'hsc*',
+		scenarioairesource = 'ai**',
+		scenariocommentsresource = '/**/',
+		breakablesurface = 'bsdt',
+		materialphysics = 'mpdt',
+		soundclasses = 'sncl',
+		multiplayerglobals = 'mulg',
+		soundeffecttemplate = '<fx>',
+		soundeffectcollection = 'sfx+',
+		chocolatemountain = 'gldf',
+		modelanimationgraph = 'jmad',
+		cloth = 'clwd',
+		screeneffect = 'egor',
+		weathersystem = 'weat',
+		soundmix = 'snmx',
+		sounddialogueconstants = 'spk!',
+		soundcachefilegestalt = 'ugh!',
+		cachefilesound = '$#!+',
+		mousecursordefinition = 'mcsr',
 	};
 
 	blam_tag()
 	{
 	}
 
-	constexpr blam_tag(uint32_t data) :
-		i_data(data)
+	constexpr blam_tag(tag_group_type data) :
+		tag_type(data)
 	{
 	}
 
@@ -33,7 +152,7 @@ struct blam_tag
 
 	constexpr int as_int() const
 	{
-		return i_data;
+		return static_cast<int>(tag_type);
 	}
 
 	constexpr bool is_null() const
@@ -43,7 +162,7 @@ struct blam_tag
 
 	constexpr bool is_none() const
 	{
-		return as_int() == 0xFFFFFFFFF;
+		return tag_type == tag_group_type::none;
 	}
 
 	constexpr bool is_set() const
@@ -68,7 +187,11 @@ struct blam_tag
 
 	constexpr static blam_tag none()
 	{
-		return blam_tag(0xFFFFFFFF);
+		return tag_group_type::none;
 	}
+
+	union {
+		char c_data[4];
+		tag_group_type tag_type;
+	};
 };
-#endif 

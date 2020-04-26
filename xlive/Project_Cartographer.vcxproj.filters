@@ -782,9 +782,6 @@
     <ClInclude Include="H2MOD\Variants\VariantPlayer.h">
       <Filter>Source Files\H2MOD\Variants</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Enums\Tags\TagGroups.h">
-      <Filter>Source Files\Blam\Enums\Tags</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups.hpp">
       <Filter>Source Files\Blam\Cache</Filter>
     </ClInclude>
@@ -805,9 +802,6 @@
     </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\char.hpp">
-      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\HeadHunter\HeadHunter.h">
       <Filter>Source Files\H2MOD\Variants\HeadHunter</Filter>
@@ -1288,6 +1282,9 @@
     </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

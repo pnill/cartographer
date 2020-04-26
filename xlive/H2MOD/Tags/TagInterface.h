@@ -224,7 +224,7 @@ namespace tags
 		Returns a pointer to a tag, if type is set in template it checks if the real type matches the requested type.
 		Returns null on error
 	*/
-	template <int request_type = 0xFFFFFFFF, typename T = void>
+	template <blam_tag::tag_group_type request_type = blam_tag::tag_group_type::none, typename T = void>
 	inline T* get_tag(datum tag)
 	{
 		tag_offset_header *header = get_tags_header();
@@ -243,7 +243,7 @@ namespace tags
 		}
 
 		tag_instance instance = header->tag_instances[tag.Index];
-		if (request_type != 0xFFFFFFFF && !is_tag_or_parent_tag(instance.type, request_type))
+		if (request_type != blam_tag::tag_group_type::none && !is_tag_or_parent_tag(instance.type, request_type))
 		{
 			LOG_ERROR_FUNC("tag type doesn't match requested type - to disable check set requested type to 'none' in template");
 			return nullptr;

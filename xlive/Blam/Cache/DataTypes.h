@@ -6,6 +6,6 @@
 #include "DataTypes\StringID.h"
 #include "DataTypes\Strings.h"
 #include "DataTypes\TagRef.h"
-#include "DataTypes\DataRef.h"
 #include "DataTypes\BlamTag.h"
 #include "DataTypes\TagBlock.h"
+#include "DataTypes\DataRef.h"

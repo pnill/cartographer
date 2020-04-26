@@ -1,5 +1,4 @@
 #pragma once
-#include "Blam\Enums\Tags\TagGroups.h"
 
 //Base definition for a TagGroup
 template <const LONG GroupTag>

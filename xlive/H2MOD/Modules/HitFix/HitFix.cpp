@@ -20,8 +20,8 @@ void HitFix::Initialize()
 {
 	for (auto& proj_tuple : weapon_projectiles)
 	{
-		auto proj_datum = tags::find_tag('proj', std::get<0>(proj_tuple));
-		BYTE* projectile_tag_data = tags::get_tag<'proj', BYTE>(proj_datum);
+		auto proj_datum = tags::find_tag(blam_tag::tag_group_type::projectile, std::get<0>(proj_tuple));
+		BYTE* projectile_tag_data = tags::get_tag<blam_tag::tag_group_type::projectile, BYTE>(proj_datum);
 		if (projectile_tag_data != nullptr)
 		{
 			*(float*)(projectile_tag_data + 380) = std::get<1>(proj_tuple);
