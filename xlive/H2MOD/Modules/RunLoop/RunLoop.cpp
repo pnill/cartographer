@@ -316,7 +316,7 @@ void GSMainLoop() {
 	prevPartyPrivacy = partyPrivacy;*/
 }
 
-signed int(*main_game_loop)();
+void (*main_game_loop)();
 
 void main_game_loop_hook() {
 	extern void init_time();
@@ -355,7 +355,7 @@ void initGSRunLoop() {
 	}
 	else {
 		addDebugText("Hooking Loop Function");
-		main_game_loop = (signed int(*)())((char*)H2BaseAddr + 0x399CC);
+		main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
 		PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 	}
 	addDebugText("Post GSRunLoop Hooking.");
