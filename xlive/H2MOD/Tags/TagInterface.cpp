@@ -2,9 +2,7 @@
 #include "H2MOD.h"
 #include "..\Util\Hooks\Hook.h"
 
-using namespace tags;
-
-tag_instance *tags::get_tag_instances()
+tags::tag_instance *tags::get_tag_instances()
 {
 	return *h2mod->GetAddress<tag_instance**>(0x47CD50, 0x4A29B8);
 }
@@ -19,9 +17,9 @@ char *tags::get_matg_globals_ptr()
 	return *h2mod->GetAddress<char**>(0x479E70, 0x4A642C);
 }
 
-cache_header *tags::get_cache_header()
+tags::cache_header *tags::get_cache_header()
 {
-	return h2mod->GetAddress<cache_header*>(0x47CD68, 0x4A29D0);
+	return h2mod->GetAddress<tags::cache_header*>(0x47CD68, 0x4A29D0);
 }
 
 HANDLE tags::get_cache_handle()

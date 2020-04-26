@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugDedicatedServer|Win32">
@@ -270,6 +270,7 @@
     <ClCompile Include="Blam\Cache\Tags\itmc.cpp" />
     <ClCompile Include="Blam\Cache\Tags\scnr.cpp" />
     <ClCompile Include="Blam\Cache\Tags\tag_base.cpp" />
+    <ClCompile Include="Blam\Reflexive\Reflexive.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
@@ -484,6 +485,7 @@
     <ClInclude Include="Blam\Cache\Tags\tag_base.h" />
     <ClInclude Include="Blam\Cache\Tags\tag_definitons.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.h" />
+    <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Maths\integer_math.hpp" />
     <ClInclude Include="Blam\Maths\real_math.hpp" />
     <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h" />
@@ -506,12 +508,11 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
-    <ClInclude Include="Blam\BlamLibrary.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Cache\DataTypes.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Macros.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\Reflexive.h" />
+    <ClInclude Include="Blam\Reflexive\Reflexive.h" />
     <ClInclude Include="Blam\Cache\DataTypes\StringID.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Strings.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
@@ -529,12 +530,9 @@
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="Blam\Enums\Enums.h" />
-    <ClInclude Include="Blam\Enums\Game\GameEngine.h" />
+    <ClInclude Include="Blam\Engine\Game\GameEngine.h" />
     <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h" />
     <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h" />
-    <ClInclude Include="Blam\Enums\Objects\Objects.h" />
-    <ClInclude Include="Blam\Enums\Objects\Unit.h" />
-    <ClInclude Include="Blam\Enums\Players\Players.h" />
     <ClInclude Include="Blam\Maths\Maths.h" />
     <ClInclude Include="XLive\Voice\Encoder.h" />
     <ClInclude Include="Globals.h" />

@@ -1,6 +1,6 @@
-#include "stdafx.h"
 #include "NetworkSession.h"
 
+#include "H2MOD.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
 
 network_session* NetworkSession::getNetworkSessions()
@@ -172,15 +172,22 @@ void NetworkSession::logPeersToConsole() {
 			outStr += L", Peer Name=";
 			outStr += getCurrentNetworkSession()->membership.peer_info[peerIndex].name;
 			outStr += L", Unknown state=" + std::to_wstring(observer->getObserverState(getCurrentNetworkSession()->peer_observer_channels[peerIndex].observer_index));
+			outStr += L", unk_status: " + std::to_wstring(getCurrentNetworkSession()->parameters.field_8);
+
+			int observerIndex = getCurrentNetworkSession()->peer_observer_channels[peerIndex].observer_index;
+
 			int playerIndex = getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index[0];
 			if (playerIndex != -1) 
 			{
+				std::string ipaddress(inet_ntoa(observer->observers[observerIndex].xnaddr.ina));
+				std::wstring wideIpAddress(ipaddress.begin(), ipaddress.end());
 				outStr += L", Player index=" + std::to_wstring(playerIndex);
 				outStr += L", Player name=";
 				outStr += getPlayerName(playerIndex);
 				outStr += L", Name from game player state=";
 				outStr += h2mod->get_player_name_from_player_index(playerIndex);
 				outStr += L", Identifier=" + std::to_wstring(getPlayerXuid(playerIndex));
+				outStr += L", XNADDR: " + wideIpAddress;
 			}
 			commands->output(outStr);
 

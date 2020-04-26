@@ -1,11 +1,9 @@
 #pragma once
 
-#include "stdafx.h"
 #include "H2MOD.h"
 #include "Util\Hooks\Hook.h"
 #include "Util\ReadIniArguments.h"
 
-#include "Blam\BlamLibrary.h"
 #include "H2MOD\Variants\VariantPlayer.h"
 #include "H2MOD\Variants\VariantSystem.h"
 #include "H2MOD\Variants\DeviceShop\DeviceShop.h"
@@ -22,10 +20,6 @@
 
 #define run_async(expression) \
 	std::thread{ [=] { expression; } }.detach();
-
-using namespace Blam::EngineDefinitions::Actors;
-using namespace Blam::EngineDefinitions::Players;
-using namespace Blam::EngineDefinitions::Objects;
 
 extern s_datum_array* game_state_actors;
 extern s_datum_array* game_state_players;

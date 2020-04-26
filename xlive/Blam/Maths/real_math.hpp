@@ -2,13 +2,12 @@
 #pragma once
 #include "..\Blam\Cache\DataTypes\Macros.h"
 
-
 struct real_point2d
 {
 	float x;
 	float y;
 };
-CHECK_STRUCT_SIZE(real_point2d, 4 * 2);
+CHECK_STRUCT_SIZE(real_point2d, sizeof(float) * 2);
 
 struct real_point3d
 {
@@ -16,7 +15,7 @@ struct real_point3d
 	float y;
 	float z;
 };
-CHECK_STRUCT_SIZE(real_point3d, 4 * 3);
+CHECK_STRUCT_SIZE(real_point3d, sizeof(float) * 3);
 
 struct angle
 {
@@ -39,14 +38,13 @@ struct angle
 	}
 };
 CHECK_STRUCT_SIZE(angle, sizeof(float));
-CHECK_STRUCT_SIZE(angle, 4);
 
 struct real_euler_angles2d
 {
 	angle yaw;
 	angle pitch;
 };
-CHECK_STRUCT_SIZE(real_euler_angles2d, 4 * 2);
+CHECK_STRUCT_SIZE(real_euler_angles2d, sizeof(angle) * 2);
 
 struct real_euler_angles3d
 {
@@ -54,14 +52,14 @@ struct real_euler_angles3d
 	angle pitch;
 	angle roll;
 };
-CHECK_STRUCT_SIZE(real_euler_angles3d, 4 * 3);
+CHECK_STRUCT_SIZE(real_euler_angles3d, sizeof(angle) * 3);
 
 struct real_vector2d
 {
 	float i;
 	float j;
 };
-CHECK_STRUCT_SIZE(real_vector2d, 4 * 2);
+CHECK_STRUCT_SIZE(real_vector2d, sizeof(float) * 2);
 
 struct real_vector3d
 {
@@ -77,7 +75,7 @@ struct real_vector3d
 		return angle;
 	}
 };
-CHECK_STRUCT_SIZE(real_vector3d, 4 * 3);
+CHECK_STRUCT_SIZE(real_vector3d, sizeof(float) * 3);
 
 struct real_plane2d
 {
@@ -91,7 +89,7 @@ struct real_plane3d
 	real_vector3d normal;
 	float distance;
 };
-CHECK_STRUCT_SIZE(real_plane3d, sizeof(real_vector3d) + 4);
+CHECK_STRUCT_SIZE(real_plane3d, sizeof(real_vector3d) + sizeof(float));
 
 struct real_quaternion
 {
@@ -105,18 +103,21 @@ struct real_quaternion
 		return i * i + j * j + k * k + w * w;
 	}
 };
+CHECK_STRUCT_SIZE(real_quaternion, sizeof(float) * 4);
 
 struct real_bounds
 {
 	float lower;
 	float upper;
 };
+CHECK_STRUCT_SIZE(real_bounds, sizeof(float) * 2);
 
 struct angle_bounds
 {
 	angle lower;
 	angle upper;
 };
+CHECK_STRUCT_SIZE(angle_bounds, sizeof(angle) * 2);
 
 struct real_matrix4x3
 {
@@ -185,7 +186,6 @@ struct real_matrix4x3
 	}
 };
 
-struct real_color_rgb;
 /* channel intensity is represented on a 0 to 1 scale */
 struct real_color_argb
 {
@@ -202,9 +202,9 @@ struct real_color_argb
 		green(_green),
 		blue(_blue)
 	{}
-	
+
 };
-CHECK_STRUCT_SIZE(real_color_argb, 4 * 4);
+CHECK_STRUCT_SIZE(real_color_argb, sizeof(float) * 4);
 
 struct real_color_rgb
 {
@@ -236,4 +236,4 @@ struct real_color_rgb
 		return converted;
 	}
 };
-CHECK_STRUCT_SIZE(real_color_rgb, 4 * 3);
+CHECK_STRUCT_SIZE(real_color_rgb, sizeof(float) * 3);

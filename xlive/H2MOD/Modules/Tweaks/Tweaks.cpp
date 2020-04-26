@@ -586,7 +586,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
 		return false;
 	}
-	if (header.type != tags::cache_header::scnr_type::Multiplayer && header.type != tags::cache_header::scnr_type::SinglePlayer)
+	if (header.type != scnr_type::Multiplayer && header.type != scnr_type::SinglePlayer)
 	{
 		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
 		return false;
@@ -841,7 +841,7 @@ void fix_shader_template_nvidia(const std::string &template_name, const std::str
 	tags::ilterator shaders(blam_tag::tag_group_type::shader);
 	while (!shaders.next().IsNull())
 	{
-		auto *shader = LOG_CHECK(tags::get_tag<blam_tag::tag_group_type::shader, shad>(shaders.m_datum));
+		auto *shader = LOG_CHECK(tags::get_tag<blam_tag::tag_group_type::shader, shader_definition>(shaders.m_datum)); sizeof(shader_definition);
 		if (shader && shader->shader_template.TagIndex == borked_template && LOG_CHECK(shader->postprocessDefinition.size > 0))
 		{
 			LOG_DEBUG_FUNC("shader {} has borked template", tags::get_tag_name(shaders.m_datum));
@@ -1151,7 +1151,7 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 		}
 	}
 
-	if (h2mod->GetMapType() == MapType::MULTIPLAYER_MAP) {
+	if (h2mod->GetMapType() == scnr_type::Multiplayer) {
 
 		for (int i = 0; i < 28; i++) {
 			if (configArray[i] == 0) {

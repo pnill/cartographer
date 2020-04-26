@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "H2MOD.h"
 
 #include "Blam/Engine/FileSystem/FiloInterface.h"
@@ -367,7 +366,7 @@ void H2MOD::leave_session()
 	if (h2mod->Server)
 		return;
 
-	if (GetMapType() != MapType::MAIN_MENU)
+	if (GetMapType() != scnr_type::MainMenu)
 	{
 		// request_squad_browser
 		WriteValue<BYTE>(h2mod->GetAddress(0x978BAC), 1);
@@ -547,7 +546,7 @@ BYTE H2MOD::get_unit_team_index(datum unit_datum_index)
 	return tIndex;
 }
 
-void H2MOD::set_unit_team_index(int unit_datum_index, BYTE team)
+void H2MOD::set_unit_team_index(int unit_datum_index, BYTE team) 
 {
 	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
 	if (unit_object)
@@ -816,7 +815,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
 
 	
-	if (h2mod->GetMapType() == MapType::MAIN_MENU)
+	if (h2mod->GetMapType() == scnr_type::MainMenu)
 	{
 		addDebugText("Map Type: Main-Menu");
 		object_to_variant.clear();
@@ -859,7 +858,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 
 	H2Tweaks::setSavedSens();
 
-	if (h2mod->GetMapType() == MapType::MULTIPLAYER_MAP)
+	if (h2mod->GetMapType() == scnr_type::Multiplayer)
 	{
 		addDebugText("Map type: Multiplayer");
 
@@ -913,7 +912,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 
 	}
 
-	else if (h2mod->GetMapType() == MapType::SINGLE_PLAYER_MAP)
+	else if (h2mod->GetMapType() == scnr_type::SinglePlayer)
 	{
 		//if anyone wants to run code on map load single player
 		addDebugText("Map type: Singleplayer");
@@ -1126,19 +1125,19 @@ bool __cdecl fn_c000bd114_IsSkullEnabled(int skull_index)
 bool GrenadeChainReactIsEngineMPCheck() {
 	if (AdvLobbySettings_grenade_chain_react)
 		return false;
-	return h2mod->GetMapType() == MapType::MULTIPLAYER_MAP;
+	return h2mod->GetMapType() == scnr_type::Multiplayer;
 }
 
 bool BansheeBombIsEngineMPCheck() {
 	if (AdvLobbySettings_banshee_bomb)
 		return false;
-	return h2mod->GetMapType() == MapType::MULTIPLAYER_MAP;
+	return h2mod->GetMapType() == scnr_type::Multiplayer;
 }
 
 bool FlashlightIsEngineSPCheck() {
 	if (AdvLobbySettings_flashlight)
 		return true;
-	return h2mod->GetMapType() == MapType::SINGLE_PLAYER_MAP;
+	return h2mod->GetMapType() == scnr_type::Multiplayer;
 }
 
 typedef bool(__cdecl* verify_game_version_on_join)(int executable_version, int build_version, int build_version2);
@@ -1212,7 +1211,7 @@ bool device_active = true;
 //This happens whenever a player activates a device control.
 int __cdecl device_touch(datum device_datum, datum unit_datum)
 {
-	if (h2mod->GetMapType() == MapType::MULTIPLAYER_MAP)
+	if (h2mod->GetMapType() == scnr_type::Multiplayer)
 	{
 		//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 		if (get_device_acceleration_scale(device_datum) == 999.0f)

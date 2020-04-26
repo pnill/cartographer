@@ -2,7 +2,6 @@
 
 #include "..\H2MOD\Tags\TagInterface.h"
 
-extern DWORD H2BaseAddr;
 template<typename T = void>
 struct tag_block
 {

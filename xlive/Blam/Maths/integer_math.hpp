@@ -9,32 +9,34 @@ struct point2d
 	short x;
 	short y;
 };
-CHECK_STRUCT_SIZE(point2d, 2 * 2);
+CHECK_STRUCT_SIZE(point2d, sizeof(short) * 2);
 
 struct short_bounds
 {
 	short lower;
 	short upper;
 };
+CHECK_STRUCT_SIZE(short_bounds, sizeof(short) * 2);
 
 struct rect2d
 {
-	WORD top;
-	WORD left;
-	WORD bottom;
-	WORD right;
+	short top;
+	short left;
+	short bottom;
+	short right;
 };
+CHECK_STRUCT_SIZE(rect2d, sizeof(short) * 4);
+
 struct byte_color_argb
 {
-	
-	byte alpha = 255;
-	byte red = 255;
-	byte green = 255;
-	byte blue = 255;
+	BYTE alpha = 255;
+	BYTE red = 255;
+	BYTE green = 255;
+	BYTE blue = 255;
 
 	byte_color_argb() {}
 
-	byte_color_argb(byte _alpha, byte _red, byte _green, byte _blue) :
+	byte_color_argb(BYTE _alpha, BYTE _red, BYTE _green, BYTE _blue) :
 		alpha(_alpha),
 		red(_red),
 		green(_green),
@@ -42,4 +44,4 @@ struct byte_color_argb
 	{}
 
 };
-CHECK_STRUCT_SIZE(byte_color_argb, 1 * 4);
+CHECK_STRUCT_SIZE(byte_color_argb, sizeof(BYTE) * 4);

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "DataTypes\DatumIndex.h"
-#include "DataTypes\Reflexive.h"
 #include "DataTypes\Macros.h"
 #include "DataTypes\StringID.h"
 #include "DataTypes\Strings.h"

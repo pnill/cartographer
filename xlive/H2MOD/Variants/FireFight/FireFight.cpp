@@ -1,8 +1,9 @@
-#include "stdafx.h"
+
 #include "Globals.h"
-#include "Blam/BlamLibrary.h"
 #include "H2MOD/Tags/TagInterface.h"
-#include "../Blam/Cache/TagGroups/character_definition.hpp"
+
+#include "Blam/Engine/Actor/Actor.h"
+#include "Blam/Cache/TagGroups/character_definition.hpp"
 
 FireFight::FireFight()
 {
@@ -21,7 +22,7 @@ void FireFight::KilledAI(datum ai_datum, XUID killer)
 	DatumIterator<ObjectHeader> objectIt(game_state_objects_header);
 	BipedObjectDefinition* actorObject = (BipedObjectDefinition*)objectIt.get_data_at_index(ai_datum.Index)->object;
 
-	if (objectIt.get_data_at_index(ai_datum.Index)->type == Objects::ObjectType::biped)
+	if (objectIt.get_data_at_index(ai_datum.Index)->type == ObjectType::biped)
 	{
 		datum actor_datum = actorObject->ActorDatum; // Grab the actor from the killed AI
 		if (actor_datum.Index != -1) // Ensure that it was valid

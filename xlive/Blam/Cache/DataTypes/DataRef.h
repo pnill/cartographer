@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Blam/Cache/DataTypes/Macros.h"
+
 /*********************************************************************
 * data_block
 * 8 BYTE Tag Structure for any Data Block Field

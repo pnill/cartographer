@@ -1,6 +1,9 @@
 #pragma once
-#include "..\Blam\Cache\DataTypes\BlamTag.h"
-#include "..\Blam\Cache\DataTypes\DatumIndex.h"
+
+#include "Blam\Common\Common.h"
+
+#include "Blam\Cache\DataTypes\BlamTag.h"
+#include "Blam\Cache\DataTypes\DatumIndex.h"
 
 namespace tags
 {
@@ -18,14 +21,6 @@ namespace tags
 		int field_24;
 		BYTE padding[260];
 		char version[32];
-		enum scnr_type : int
-		{
-			SinglePlayer = 0,
-			Multiplayer = 1,
-			MainMenu = 2,
-			MultiplayerShared = 3,
-			SinglePlayerShared = 4
-		};
 		scnr_type type;
 		int crc;
 		int crc_uiid;

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -31,9 +31,6 @@
     <Filter Include="Source Files\Blam\Engine">
       <UniqueIdentifier>{1756db8f-ba07-4777-b4ef-1b6de3bf674f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Blam\Engine\Extras">
-      <UniqueIdentifier>{ee386d18-ee75-4f64-ab14-4ef7bedf702c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Blam\Engine\Game">
       <UniqueIdentifier>{08197ffa-f27b-417e-8a0f-8e0c7f1e36b3}</UniqueIdentifier>
     </Filter>
@@ -54,9 +51,6 @@
     </Filter>
     <Filter Include="Source Files\Blam\Maths">
       <UniqueIdentifier>{c4fb9ac0-3d6c-4137-8a24-eac1146f5614}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Shared">
-      <UniqueIdentifier>{b66746a4-d12d-44e8-9b07-93611bdb2c72}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Blam\Enums\Objects">
       <UniqueIdentifier>{b6472f0a-f04e-45d0-adb0-c2835f526b6c}</UniqueIdentifier>
@@ -181,9 +175,6 @@
     <Filter Include="Source Files\Blam\Engine\Tags">
       <UniqueIdentifier>{9f36ad0a-6f5c-49e2-8c53-502b886c4970}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Blam\Enums\Tags">
-      <UniqueIdentifier>{71764f30-e8b7-4ab1-87ff-a11c3a18f047}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Blam\Cache">
       <UniqueIdentifier>{1fb797ed-045d-46ad-9043-af40d6d37fbc}</UniqueIdentifier>
     </Filter>
@@ -201,15 +192,6 @@
     </Filter>
     <Filter Include="Source Files\Blam\Cache\TagGroups">
       <UniqueIdentifier>{be702785-a2d1-4808-be70-7360906e4941}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Cache\TagGroups\Globals">
-      <UniqueIdentifier>{a33f4642-1337-418e-8d05-23bc455f7147}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Cache\TagGroups\Interface">
-      <UniqueIdentifier>{a68b1322-fb32-4c1d-9e47-658ddf5422fc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Enums\Tags\TagGroups">
-      <UniqueIdentifier>{a0f03676-ade5-468f-ada2-854238dcac94}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Blam\Cache\TagBlocks\AI">
       <UniqueIdentifier>{8ed4f5f1-2e41-4c8c-bf9d-9503ae31a097}</UniqueIdentifier>
@@ -297,6 +279,9 @@
     </Filter>
     <Filter Include="Source Files\XLive\XStorage">
       <UniqueIdentifier>{57e1f434-f9fa-4339-8f08-5a2d087e7721}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Reflexive">
+      <UniqueIdentifier>{d7c0d1e4-5780-41f6-80ff-daef51c01fa4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -570,6 +555,9 @@
     <ClCompile Include="XLive\XStorage\XStorage.cpp">
       <Filter>Source Files\XLive\XStorage</Filter>
     </ClCompile>
+    <ClCompile Include="Blam\Reflexive\Reflexive.cpp">
+      <Filter>Source Files\Blam\Reflexive</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">
@@ -583,9 +571,6 @@
     </ClInclude>
     <ClInclude Include="Globals.h">
       <Filter>Source Files\H2MOD\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\BlamLibrary.h">
-      <Filter>Source Files\Blam</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Enums\Enums.h">
       <Filter>Source Files\Blam\Enums</Filter>
@@ -614,12 +599,6 @@
     <ClInclude Include="Blam\Engine\Game\GameManager.h">
       <Filter>Source Files\Blam\Engine\Game</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Enums\Objects\Objects.h">
-      <Filter>Source Files\Blam\Enums\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Objects\Unit.h">
-      <Filter>Source Files\Blam\Enums\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h">
       <Filter>Source Files\Blam\Enums\Game</Filter>
     </ClInclude>
@@ -628,9 +607,6 @@
     </ClInclude>
     <ClInclude Include="Blam\Engine\FileSystem\FiloInterface.h">
       <Filter>Source Files\Blam\Engine\FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Game\GameEngine.h">
-      <Filter>Source Files\Blam\Enums\Game</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
@@ -789,9 +765,6 @@
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h">
-      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\DataTypes\Reflexive.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\StringID.h">
@@ -1070,9 +1043,6 @@
     <ClInclude Include="Blam\Engine\Players\Players.h">
       <Filter>Source Files\Blam\Engine\Players</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Enums\Players\Players.h">
-      <Filter>Source Files\Blam\Enums\Players</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1187,95 +1157,11 @@
     <ClInclude Include="XLive\XStorage\XStorage.h">
       <Filter>Source Files\XLive\XStorage</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Cache\DataTypes\BlamTag.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\Macros.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Maths\real_math.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\integer_math.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\ai_mission_dialogue_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\antenna_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\biped_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\camera_track_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\unit_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\object_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\crate_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h">
       <Filter>Source Files\Blam\Cache\TagBlocks</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\creature_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\device_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\device_light_fixture_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\device_machine_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\device_control_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\garbage_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\scenery_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\hud_globals_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\globals_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\scenario_definition.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.h">
       <Filter>Source Files\Blam\Cache\Tags</Filter>
@@ -1285,6 +1171,99 @@
     </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp">
       <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Common\Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Reflexive\Reflexive.h">
+      <Filter>Source Files\Blam\Reflexive</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\biped_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\ai_mission_dialogue_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\antenna_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\camera_track_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\crate_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\creature_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\device_control_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\device_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\device_light_fixture_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\device_machine_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\garbage_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\globals_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\hud_globals_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\object_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\scenario_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\scenery_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\unit_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp">
+      <Filter>Source Files\Blam\Cache\TagGroups</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\real_math.hpp">
+      <Filter>Source Files\Blam\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\integer_math.hpp">
+      <Filter>Source Files\Blam\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes\BlamTag.h">
+      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\Game\GameEngine.h">
+      <Filter>Source Files\Blam\Engine\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

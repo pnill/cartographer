@@ -1,54 +1,7 @@
-#pragma once
+#include "Reflexive.h"
 
-#include "..\H2MOD.h"
+#include "H2MOD.h"
 
-namespace Blam
-{
-	namespace Cache
-	{
-		namespace DataTypes
-		{
-			/*********************************************************************
-			* Blam::Cache::DataTypes::Reflexive
-			* 8 BYTE Tag Structure for any Tag Block Field
-			* UINT32 TagBlockCount;
-			* UINT32 TagBlockOffset;
-			* Structs using Reflexive type declaration should at least have an Open() and Close() members
-			**********************************************************************/
-			template<typename T>
-			struct Reflexive
-			{
-				//* Returns Number of Block Field Elements
-				uint32_t GetElementCount();
-				//* Returns Block Field Offset
-				uint32_t GetFieldOffset();
-				//* Returns Tag Block Field Size
-				std::size_t GetFieldSize();
-				//* Returns Total Tag Block Field Size of all Elements
-				std::size_t GetTotalSize();
-				//* Returns Tag Block Field Elements Actual Pointer(List)
-				void* GetTagBlockElements();
-				//* Block access via index
-				inline T* operator[](int index);
-				//* Opens the tag_block for Block addition and Deletion
-				//* Only to be called once else memory_leaks
-				void Open();
-				//* Releases the memory allocated for editing purposes
-				//* Shouldnt be called unless opened else heap_corruption
-				void Close();
-				//Adds an element at the end of the Container(does a memory copy)
-				void PushBack(T*);
-				//Removes the element at the specifed index
-				void RemoveAt(int);
-			private:
-				//* Number of Block Field Elements
-				uint32_t TagBlockCount;
-				//* Block Field Offset
-				uint32_t TagBlockOffset;
-			};
-		}
-	}
-}
 template<typename T>
 void Blam::Cache::DataTypes::Reflexive<T>::Open()
 {
@@ -68,6 +21,7 @@ void Blam::Cache::DataTypes::Reflexive<T>::Open()
 		i++;
 	}
 }
+
 template<typename T>
 void Blam::Cache::DataTypes::Reflexive<T>::Close()
 {
@@ -88,6 +42,7 @@ void Blam::Cache::DataTypes::Reflexive<T>::Close()
 	this->TagBlockCount = 0x0;
 	this->TagBlockOffset = -1;
 }
+
 template<typename T>
 void Blam::Cache::DataTypes::Reflexive<T>::PushBack(T* arg)
 {
@@ -107,6 +62,7 @@ void Blam::Cache::DataTypes::Reflexive<T>::PushBack(T* arg)
 	this->TagBlockCount++;
 	this->TagBlockOffset = (DWORD)tptr - *h2mod->GetAddress<DWORD*>(0x47CD54, 0x4A29BC);
 }
+
 template<typename T>
 void Blam::Cache::DataTypes::Reflexive<T>::RemoveAt(int index)
 {
@@ -145,30 +101,42 @@ void Blam::Cache::DataTypes::Reflexive<T>::RemoveAt(int index)
 	if (this->TagBlockCount)
 		this->TagBlockOffset = (DWORD)tptr - *h2mod->GetAddress<DWORD*>(0x47CD54, 0x4A29BC);
 }
+
 template<typename T>
-inline std::size_t Blam::Cache::DataTypes::Reflexive<T>::GetFieldSize()
+size_t Blam::Cache::DataTypes::Reflexive<T>::GetFieldSize()
 {
 	return sizeof(T);
 }
+
 template<typename T>
-inline std::size_t Blam::Cache::DataTypes::Reflexive<T>::GetTotalSize()
+size_t Blam::Cache::DataTypes::Reflexive<T>::GetTotalSize()
 {
 	return this->GetFieldSize() * TagBlockCount;
 }
+
 template<typename T>
-void*  Blam::Cache::DataTypes::Reflexive<T>::GetTagBlockElements()
-{		
+void* Blam::Cache::DataTypes::Reflexive<T>::GetTagBlockElements()
+{
 	int MemPtr = *h2mod->GetAddress<DWORD*>(0x47CD54, 0x4A29BC) + TagBlockOffset;	
 	return (void*)MemPtr;
 }
+
 template<typename T>
-inline T* Blam::Cache::DataTypes::Reflexive<T>::operator[](int index)
+T* Blam::Cache::DataTypes::Reflexive<T>::operator[](int index)
 {
 	if ((index < this->TagBlockCount) && (index >= 0))
 		return ((T*)GetTagBlockElements() + index);
 	else throw new std::exception("Invalid index");
 }
+
 template<typename T>
-inline UINT32 Blam::Cache::DataTypes::Reflexive<T>::GetFieldOffset() { return this->TagBlockOffset; }
+uint32_t Blam::Cache::DataTypes::Reflexive<T>::GetFieldOffset()
+{ 
+	return this->TagBlockOffset; 
+}
+
 template<typename T>
-inline UINT32 Blam::Cache::DataTypes::Reflexive<T>::GetElementCount() { return this->TagBlockCount; }
+uint32_t Blam::Cache::DataTypes::Reflexive<T>::GetElementCount()
+{ 
+	return this->TagBlockCount; 
+}

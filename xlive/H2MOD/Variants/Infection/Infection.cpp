@@ -5,7 +5,6 @@
 #include "..\..\Modules\Networking\Networking.h"
 #include "..\..\Modules\Networking\CustomPackets\CustomPackets.h"
 
-using namespace Blam::Enums;
 using namespace NetworkSession;
 
 std::vector<XUID> Infection::zombieIdentifiers;

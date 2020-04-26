@@ -13,3 +13,4 @@ struct tag_reference
 	blam_tag TagGroup;
 	datum TagIndex;
 };
+CHECK_STRUCT_SIZE(tag_reference, 8);

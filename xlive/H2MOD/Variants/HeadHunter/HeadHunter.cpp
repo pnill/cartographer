@@ -1,6 +1,4 @@
-#include "stdafx.h"
 #include "Globals.h"
-#include "Blam/BlamLibrary.h"
 
 #include "H2MOD.h"
 
@@ -15,13 +13,12 @@ HeadHunter::HeadHunter()
 	this->itemInteraction = new HeadHunterItmInteraction();
 }
 
-
 void HeadHunter::SpawnSkull(datum unit_datum)
 {
 	DatumIterator<ObjectHeader> objectIt(game_state_objects_header);
 	BipedObjectDefinition* biped_unit = (BipedObjectDefinition*)objectIt.get_data_at_index(unit_datum.Index)->object;
 
-	if (objectIt.get_data_at_index(unit_datum.Index)->type == Objects::ObjectType::biped)
+	if (objectIt.get_data_at_index(unit_datum.Index)->type == ObjectType::biped)
 	{
 		ObjectPlacementData nObject;
 

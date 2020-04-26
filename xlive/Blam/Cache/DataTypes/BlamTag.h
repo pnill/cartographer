@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Blam/Cache/DataTypes/Macros.h"
+
 struct blam_tag
 {
 	enum class tag_group_type : __int32
@@ -195,3 +197,4 @@ struct blam_tag
 		tag_group_type tag_type;
 	};
 };
+CHECK_STRUCT_SIZE(blam_tag, 4);

@@ -42,7 +42,7 @@ void H2X::Initialize(bool enable)
 		}
 	}
 	
-	if (!h2mod->Server && enable && h2mod->GetMapType() == MULTIPLAYER_MAP)
+	if (!h2mod->Server && enable && h2mod->GetMapType() == scnr_type::Multiplayer)
 	{
 		// H2X Sound_Classes
 		*(float*)(&tags::get_tag_data()[0x4821C]) = 0.0f; /*H2X projectile_impact Index 0 Gains Bounds lower*/

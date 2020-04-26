@@ -1,11 +1,12 @@
 #pragma once
-#include "stdafx.h"
+
 namespace Blam
 {
 	namespace EngineDefinitions
 	{
 		namespace Game
-		{			//Broken atm
+		{			
+			//Broken atm
 			struct GameManager
 			{
 				BOOL MapReset;

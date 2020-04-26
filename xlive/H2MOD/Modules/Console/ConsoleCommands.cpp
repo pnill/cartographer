@@ -524,7 +524,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (h2mod->GetMapType() == MAIN_MENU) {
+			if (h2mod->GetMapType() == scnr_type::MainMenu) {
 				//TODO: need a nicer way to detect this for dedis
 				output(L"Can only be used ingame");
 				return;
@@ -590,7 +590,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$xyz") {
-			if (h2mod->GetMapType() == MULTIPLAYER_MAP && !NetworkSession::localPeerIsSessionHost()) {
+			if (h2mod->GetMapType() == scnr_type::Multiplayer && !NetworkSession::localPeerIsSessionHost()) {
 				output(L"Only host can see xyz for now...");
 				return;
 			}
@@ -613,7 +613,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (h2mod->GetMapType() == MAIN_MENU) {
+			if (h2mod->GetMapType() == scnr_type::MainMenu) {
 				output(L"Can only be used ingame");
 				return;
 			}

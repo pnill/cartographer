@@ -1,17 +1,11 @@
 #pragma once
 
-enum MapType : int
-{
-	INVALID_MAP_TYPE = 0,
-	SINGLE_PLAYER_MAP = 1,
-	MULTIPLAYER_MAP = 2,
-	MAIN_MENU = 3
-};
-
+#include "Blam/Common/Common.h"
+#include "Blam/Cache//DataTypes/Macros.h"
 
 struct game_engine_settings
 {
-	MapType map_type;
+	scnr_type map_type;
 	char field_4;
 	char field_5;
 	BYTE gap_6[2];
@@ -27,4 +21,4 @@ struct game_engine_settings
 	WORD field_29A;
 	BYTE gap_29C[3820];
 };
-static_assert(sizeof(game_engine_settings) == 4488, "Invalid game_engine_settings size");
+CHECK_STRUCT_SIZE(game_engine_settings, 0x1188);

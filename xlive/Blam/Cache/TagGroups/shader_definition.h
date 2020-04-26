@@ -49,14 +49,14 @@ struct shader_postprocess_definition_new_block
 * group_tag: shad
 **********************************************************************/
 
-struct shad : TagGroup<'shad'>
+struct shader_definition : TagGroup<'shad'>
 {
 	// TagReference("stem")
 	tag_reference shader_template;
 	DWORD materialName;
 	tag_block<> runtimeProperties;
 
-	BYTE padding13[2];
+	PAD(2);
 
 	enum Flags : short
 	{
@@ -69,7 +69,7 @@ struct shad : TagGroup<'shad'>
 
 	tag_block<shader_postprocess_definition_new_block> postprocessDefinition;
 
-	BYTE padding14[4];
+	PAD(4);
 	tag_block<> predictedResources;
 
 	// TagReference("slit")
@@ -104,7 +104,7 @@ struct shad : TagGroup<'shad'>
 		ShinySpecular = 3,
 	};
 	LightmapType lightmapType;
-	BYTE padding15[2];
+	PAD(2);
 	float lightmapSpecularBrightness;
 	float lightmapAmbientBias11;
 	tag_block<> postprocessProperties;
@@ -112,4 +112,5 @@ struct shad : TagGroup<'shad'>
 	float addedDepthBiasOffset;
 	float addedDepthBiasSlopeScale;
 };
+CHECK_STRUCT_SIZE(shader_definition, 92);
 #pragma pack(pop)

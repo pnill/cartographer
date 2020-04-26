@@ -1,11 +1,13 @@
-#include "..\stdafx.h"
+
 #include "tag_loader.h"
 #include "..\Util\filesys.h"
 
 #include "Globals.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Tags\global_tags_interface.h"
-#include "..\Blam\Cache\Tags\tag_definitons.h"
+
+#include "Blam\Common\Common.h"
+//#include "Blam\Cache\Tags\tag_definitons.h"
+//#include "H2MOD\Tags\global_tags_interface.h"
 
 //contains some game functions that returns HANDLE
 namespace global_handle_function
@@ -104,7 +106,7 @@ namespace tag_loader
 		fin->seekg(0x0);
 		fin->read(map_header, 0x800);		
 
-		if (tags::get_cache_header()->type == tags::cache_header::scnr_type::MultiplayerShared || tags::get_cache_header()->type == tags::cache_header::scnr_type::SinglePlayerShared)
+		if (tags::get_cache_header()->type == scnr_type::MultiplayerShared || tags::get_cache_header()->type == scnr_type::SinglePlayerShared)
 		{
 			delete[] map_header;
 			return true;
@@ -910,27 +912,27 @@ namespace tag_loader
 			return;
 		else
 		{
-			
-			datum scnr_index = tags::get_tags_header()->scenario_datum;
-			auto GlobalSCNR = (Blam::Cache::Tags::scnr*)TagInterface::GlobalTagInterface.GetTagInterface(scnr_index, blam_tag::tag_group_type::scenario);
-			
-			for (size_t i = 0 ; i < sync_list.size(); i++)
-			{
-				std::string t;
-
-				t += "Adding Tag To Simulation Block : 0x";
-				t += meta_struct::to_hex_string(GlobalSCNR->SimulationDefinitionTable.GetElementCount()) + ",0x";
-				t += meta_struct::to_hex_string(sync_list[i]);
-
-				addDebugText(t.c_str());
-
-				struct Blam::Cache::Tags::scnr::SimulationDefinitionTable block;
-				block.Tag = sync_list[i];
-
-				GlobalSCNR->SimulationDefinitionTable.PushBack(&block);
-			}		
-			//clearn out the sync list for this module
-			sync_list.clear();
+			// TODO: Himanshu01, pls fix
+			//datum scnr_index = tags::get_tags_header()->scenario_datum;
+			//auto GlobalSCNR = (Blam::Cache::Tags::scnr*)TagInterface::GlobalTagInterface.GetTagInterface(scnr_index, blam_tag::tag_group_type::scenario);
+			//
+			//for (size_t i = 0 ; i < sync_list.size(); i++)
+			//{
+			//	std::string t;
+			//
+			//	t += "Adding Tag To Simulation Block : 0x";
+			//	t += meta_struct::to_hex_string(GlobalSCNR->SimulationDefinitionTable.GetElementCount()) + ",0x";
+			//	t += meta_struct::to_hex_string(sync_list[i]);
+			//
+			//	addDebugText(t.c_str());
+			//
+			//	struct Blam::Cache::Tags::scnr::SimulationDefinitionTable block;
+			//	block.Tag = sync_list[i];
+			//
+			//	GlobalSCNR->SimulationDefinitionTable.PushBack(&block);
+			//}		
+			////clearn out the sync list for this module
+			//sync_list.clear();
 		}
 	}
 
@@ -1201,7 +1203,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	//tag_loader::Add_all_shared_refs();
 
 	// extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
-	if (tags::get_cache_header()->type != tags::cache_header::scnr_type::SinglePlayerShared)
+	if (tags::get_cache_header()->type != scnr_type::SinglePlayerShared)
 	{
 		DWORD *TagTableStart = h2mod->GetAddress<DWORD*>(0x47CD50);
 		///---------------TABLE EXTENSION  STUFF
@@ -1215,12 +1217,10 @@ bool _cdecl LoadTagsandMapBases(int a)
 <--------------------------------------------------------------------------------------------------------------------------------------------------------------->*/
 
 
-
-
 	///tag_injector testing
 	//Just for testing purpose,dont cluter here	
 	///Actual injection process after map load
-	if (tags::get_cache_header()->type != tags::cache_header::scnr_type::SinglePlayerShared)
+	if (tags::get_cache_header()->type != scnr_type::SinglePlayerShared)
 	{
 		//actual tag_loading
 		///parse query file
@@ -1242,10 +1242,10 @@ bool _cdecl LoadTagsandMapBases(int a)
 	//Please dont add every code over here and cluter it,create newer subroutine
 	///
 	
-	if (tags::get_cache_header()->type != tags::cache_header::scnr_type::MainMenu)
+	if (tags::get_cache_header()->type != scnr_type::MainMenu)
 	{
 		datum temp(0xE1940018);
-		auto test = (Blam::Cache::Tags::itmc*)TagInterface::GlobalTagInterface.GetTagInterface(temp, blam_tag::tag_group_type::itemcollection);
+		//auto test = (Blam::Cache::Tags::itmc*)TagInterface::GlobalTagInterface.GetTagInterface(temp, blam_tag::tag_group_type::itemcollection);
 		
 		if (false)
 		{
@@ -1265,8 +1265,8 @@ bool _cdecl LoadTagsandMapBases(int a)
 			*/
 
 			//test->ItemPermutations.RemoveAt(0);
-			test->ItemPermutations[0]->Item.TagGroup = blam_tag::tag_group_type::weapon;
-			test->ItemPermutations[0]->Item.TagIndex = 0x3BA4;
+			//test->itemPermutations[0]->Item.TagGroup = blam_tag::tag_group_type::weapon;
+			//test->itemPermutations[0]->Item.TagIndex = 0x3BA4;
 		}
 	}	
 

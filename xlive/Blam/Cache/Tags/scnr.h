@@ -1,5 +1,7 @@
 #pragma once
+
 #include"tag_base.h"
+#include "Blam/Reflexive/Reflexive.h"
 
 namespace Blam
 {
@@ -12,11 +14,11 @@ namespace Blam
 			* group_tag : Scnr
 			* header size : 992
 			* *********************************************************************/
-			struct scnr:tag_base 
+			struct scnr : tag_base
 			{
 				//quite a lot of padding :P
 				PAD(0x3D8);			
-				struct SimulationDefinitionTable:tag_base
+				struct SimulationDefinitionTable : tag_base
 				{
 					datum Tag;//0x0
 				};

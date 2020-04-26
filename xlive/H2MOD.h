@@ -1,10 +1,12 @@
 #pragma once
 
-#include "Blam\Enums\Game\GameEngine.h"
-#include "Blam\Engine\EngineDefinitions.h"
+#include "Blam\Maths\Maths.h"
+#include "Blam\Engine\Objects\Objects.h"
+#include "Blam\Engine\Objects\ObjectPlacementData.h"
 
-using namespace Blam::Enums;
-using namespace Blam::EngineDefinitions::Objects;
+#include "Blam\Engine\Game\GameEngine.h"
+#include "Blam\Engine\Players\Players.h"
+
 constexpr signed int NONE = -1;
 
 enum GrenadeType
@@ -39,7 +41,6 @@ void __cdecl call_hs_object_destroy(datum object_datum_index);
 signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit_datum_index);
 bool __cdecl call_assign_equipment_to_unit(datum uint, int object_index, short unk);
 void __cdecl call_object_placement_data_new(ObjectPlacementData*, datum, datum, int);
-void __cdecl call_unit_set_enterable_by_player(datum unit_datum, bool enable);
 signed int __cdecl call_object_new(ObjectPlacementData*);
 void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset);
 
@@ -76,8 +77,8 @@ public:
 		void disable_weapon_pickup(bool b_Enable);
 		void leave_session();
 
-		MapType GetMapType() { return mapType; }
-		void SetMapType(MapType value) { mapType = value; }
+		scnr_type GetMapType() { return mapType; }
+		void SetMapType(scnr_type value) { mapType = value; }
 
 		bool Server;
 		std::unordered_map<std::string, bool> AchievementMap;
@@ -106,7 +107,7 @@ public:
 
 private:
 		DWORD Base;
-		MapType mapType;
+		scnr_type mapType;
 };
 
 extern H2MOD* h2mod;
