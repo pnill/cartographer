@@ -319,9 +319,6 @@ void GSMainLoop() {
 void (*main_game_loop)();
 
 void main_game_loop_hook() {
-	extern void init_time();
-	init_time();
-
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 

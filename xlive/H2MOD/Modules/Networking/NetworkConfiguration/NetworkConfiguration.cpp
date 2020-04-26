@@ -122,49 +122,6 @@ void __cdecl InitializeConfiguration()
 	g_network_configuration->field_200 = 4096 * 4; // H2v - 4096, MCC  = H2v * 4 = 16384
 }
 
-//1bfb23
-typedef double(__stdcall* unk_live_netcode_func_def)(DWORD *thisx, signed int a2, bool a3, bool a4);
-unk_live_netcode_func_def p_unk_live_netcode_func;
-
-double __stdcall unk_live_netcode_func(DWORD *thisx, signed int a2, bool a3, bool a4)
-{
-	LOG_DEBUG_FUNC("unk: {0}, bits_per_sec: {1}, protocol_is_sys_link: {2}", a2, a3, a4);
-
-	return p_unk_live_netcode_func(thisx, a2, a3, a4);
-}
-
-typedef bool(__stdcall* unk_live_netcode_func_def_2)(void *thisx, float a1, float packet_size, int delay_between_packets, int a4, int a5, int a6, int a7, int voice_data_buffer, int a9);
-unk_live_netcode_func_def_2 p_unk_live_netcode_func_2;
-
-static int result_print_last_time = 0;
-bool __stdcall unk_live_netcode_func_2(void *thisx, float a1, float packet_size, int delay_between_packets, int a4, int a5, int a6, int a7, int voice_data_buffer, int a9)
-{
-
-	if (result_print_last_time == 0)
-		result_print_last_time = timeGetTime();
-
-	/*if (timeGetTime() - result_print_last_time >= 1000)
-	{
-		result_print_last_time = timeGetTime();
-
-		LOG_DEBUG_FUNC("unk: {0} , unk2: {1} , unk3: {2} , unk4: {3} , unk5: {4} , unk6: {5} , unk7: {6} , unk8: {7} , unk9: {8}", a1, packet_size, delay_between_packets, a4, a5, a6, a7, voice_data_buffer, a9);
-		LOG_DEBUG_FUNC("result: ", result);
-	}*/
-
-	bool result = p_unk_live_netcode_func_2(thisx, a1, packet_size, delay_between_packets, a4, a5, a6, a7, voice_data_buffer, a9);
-
-	return result;
-}
-
-void disable_live_netcode()
-{
-	// disables LIVE netcode
-	WriteValue<BYTE>(h2mod->GetAddress(0x1B555B, 0x1A92B9) + 1, 0);
-	// disable ping bars
-	NopFill(h2mod->GetAddress(0x1D4E33, 0x1C1B7D), 2);
-	WriteValue<BYTE>(h2mod->GetAddress(0x1D4E35, 0x1C1B7F), 0xEB); // jmp
-}
-
 void NetworkConfiguration::ApplyPatches()
 {
 #if USE_LIVE_NETCODE
@@ -212,11 +169,10 @@ void NetworkConfiguration::ApplyPatches()
 	// increase the network heap size
 	WriteValue<DWORD>(h2mod->GetAddress(0x1ACCC8, 0x1ACE96) + 6, 10485760); // original H2v: 1048576, MCC: 1048576
 #else
-	disable_live_netcode();
+	// disables LIVE netcode
+	WriteValue<BYTE>(h2mod->GetAddress(0x1B555B, 0x1A92B9) + 1, 0);
+	// disable ping bars
+	NopFill(h2mod->GetAddress(0x1D4E33, 0x1C1B7D), 2);
+	WriteValue<BYTE>(h2mod->GetAddress(0x1D4E35, 0x1C1B7F), 0xEB); // jmp
 #endif
-
-	//p_unk_live_netcode_func = (unk_live_netcode_func_def)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1BFB23, 0x1B9A03), (BYTE*)unk_live_netcode_func, 10);
-	//NopFill((DWORD)(BYTE*)(p_unk_live_netcode_func)+5 + 3, 5);
-
-	//p_unk_live_netcode_func_2 = (unk_live_netcode_func_def_2)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1BEE8D, 0x1B9A03), (BYTE*)unk_live_netcode_func_2, 14);
 }

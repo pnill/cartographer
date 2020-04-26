@@ -100,24 +100,19 @@ high_resolution_clock::time_point nextFrame;
 high_resolution_clock::duration desiredRenderTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / (double)H2Config_fps_limit));
 high_resolution_clock::duration minimizedDesiredTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / 64.0));
 
-void init_time()
-{
-	static bool bInitTime = false;
-	if (!bInitTime)
-		bInitTime = true;
-
-	if (bInitTime)
-		return;
-
-	nextFrame = high_resolution_clock::now();
-}
-
 void frameTimeManagement() {
 
 	typedef bool(__cdecl* game_is_minimized)();
 	auto p_game_is_minimized = reinterpret_cast<game_is_minimized>(h2mod->GetAddress(0x28729));
 
 	bool isMinimized = p_game_is_minimized();
+
+	static bool bInitTime = false;
+	if (!bInitTime)
+	{
+		nextFrame = high_resolution_clock::now();
+		bInitTime = true;
+	}
 	
 	if (H2Config_fps_limit > 0 || isMinimized) {
 		std::this_thread::sleep_until(nextFrame);
