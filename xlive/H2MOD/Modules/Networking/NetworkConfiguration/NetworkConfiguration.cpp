@@ -7,6 +7,8 @@
 
 // LIVE netcode research
 
+#define USE_LIVE_NETCODE 1
+
 network_configuration* g_network_configuration;
 void __cdecl InitializeConfiguration()
 {
@@ -153,7 +155,7 @@ bool __stdcall unk_live_netcode_func_2(void *thisx, float a1, float packet_size,
 
 	return result;
 }
- 
+
 void disable_live_netcode()
 {
 	// disables LIVE netcode
@@ -165,24 +167,25 @@ void disable_live_netcode()
 
 void NetworkConfiguration::ApplyPatches()
 {
+#if USE_LIVE_NETCODE
 	// increase the network tickrate of hosts to 60
 	static float netcode_tickrate = 60.0f;
-
+	
 	WritePointer(h2mod->GetAddress(0x1BDE27, 0x1B7D01) + 4, &netcode_tickrate);
 	WritePointer(h2mod->GetAddress(0x1BE2FA, 0x1B81D4) + 4, &netcode_tickrate);
 	WritePointer(h2mod->GetAddress(0x1BFB3C, 0x1B9A1C) + 4, &netcode_tickrate);
 	WritePointer(h2mod->GetAddress(0x1C11FA, 0x1BB0DA) + 4, &netcode_tickrate);
 	WritePointer(h2mod->GetAddress(0x1C12BF, 0x1BB19F) + 4, &netcode_tickrate);
-
+	
 	g_network_configuration = h2mod->GetAddress<network_configuration*>(0x4F960C, 0x523B5C);
 	PatchCall(h2mod->GetAddress(0x1ABE23, 0x1AC328), InitializeConfiguration);
-
+	
 	// other config patches
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB4A1, 0x1AB9A6) + 6, 20480 * 4); // MCC = H2v * 4
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB4AB, 0x1AB9B0) + 6, 51200 * 4); // MCC = H2v * 4
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB4C9, 0x1AB9CE) + 6, 65536 * 4); // MCC = H2v * 4
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB4D3, 0x1AB9D8) + 6, 32678 * 4); // MCC = H2v * 4
-
+	
 	WriteValue<float>(h2mod->GetAddress(0x3A03CC, 0x360E54), 8192.f * 2.f); // MCC = H2v * 2, H2v = 8192
 	WriteValue<float>(h2mod->GetAddress(0x3C60F0, 0x381BDC), 40960.f * 4.f); // MCC = H2v * 4, H2v = 40960
 	WriteValue<float>(h2mod->GetAddress(0x3C60F4, 0x381BE0), 30720.f * 4.f); // MCC = H2v * 4, H2v = 30720
@@ -190,27 +193,27 @@ void NetworkConfiguration::ApplyPatches()
 	
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB4FF, 0x1ABA04) + 1, 8192 * 4); // h2v = 8192, MCC = h2v * 4
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB504, 0x1ABA09) + 1, 40960 * 4); // h2v = 40960, MCC = h2v * 4
-
+	
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB558, 0x1ABA5D) + 1, 15360 * 4); // h2v = 15360, MCC = h2v * 4
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB55D, 0x1ABA62) + 2, 61440 * 4); // h2v = 61440, MCC = h2v * 4
-
+	
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB582, 0x1ABA87) + 1, 131072 * 4); // 524288
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB587, 0x1ABA8C) + 1, 262144 * 4); // 1048576
-
+	
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB5B6, 0x1ABABB) + 6, 10240 * 4); // 40960
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB5C0, 0x1ABAC5) + 6, 131072);
-
-
+	
 	// prevent the game from setting the client's tickrate to half of host's tickrate
 	// this code has been removed from H2MCC as well
 	NopFill(h2mod->GetAddress(0x1BFBE7, 0x1B9AC7), 19);
 	NopFill(h2mod->GetAddress(0x1BE33A, 0x1B8214), 15);
 	NopFill(h2mod->GetAddress(0x1BDF1D, 0x1B7DF7), 18);
-
+	
 	// increase the network heap size
 	WriteValue<DWORD>(h2mod->GetAddress(0x1ACCC8, 0x1ACE96) + 6, 10485760); // original H2v: 1048576, MCC: 1048576
-
-	//disable_live_netcode();
+#else
+	disable_live_netcode();
+#endif
 
 	//p_unk_live_netcode_func = (unk_live_netcode_func_def)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1BFB23, 0x1B9A03), (BYTE*)unk_live_netcode_func, 10);
 	//NopFill((DWORD)(BYTE*)(p_unk_live_netcode_func)+5 + 3, 5);

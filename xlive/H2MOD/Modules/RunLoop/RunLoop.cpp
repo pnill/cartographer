@@ -316,19 +316,21 @@ void GSMainLoop() {
 	prevPartyPrivacy = partyPrivacy;*/
 }
 
-signed int(*sub_287a1)();
+signed int(*main_game_loop)();
 
-static signed int HookedClientRandFunc() {
+void main_game_loop_hook() {
+	extern void init_time();
+	init_time();
 
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 
+	main_game_loop();
+
+	mapManager->leaveSessionIfAFK();
+
 	extern void frameTimeManagement();
 	frameTimeManagement();
-	
-	mapManager->leaveSessionIfAFK();
-	
-	return sub_287a1();
 }
 
 static char HookedServerShutdownCheck() {
@@ -353,8 +355,8 @@ void initGSRunLoop() {
 	}
 	else {
 		addDebugText("Hooking Loop Function");
-		sub_287a1 = (signed int(*)())((char*)H2BaseAddr + 0x287a1);
-		PatchCall(H2BaseAddr + 0x399f3, HookedClientRandFunc);
+		main_game_loop = (signed int(*)())((char*)H2BaseAddr + 0x399CC);
+		PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 	}
 	addDebugText("Post GSRunLoop Hooking.");
 }
