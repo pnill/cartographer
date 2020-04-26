@@ -1,13 +1,15 @@
 #pragma once
-#pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
 #include "..\Blam\Cache\DataTypes\TagBlock.h"
+
 /*********************************************************************
 * name: scenario
 * group_tag : scnr
 * header size : 992
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_scenario_group_definition :TagGroup<'scnr'>
 {
 	tag_reference do_not_use;//0x0
@@ -3737,8 +3739,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_simulation_definition_table_block> simulation_definition_table;//0x3D8
 };
 TAG_GROUP_SIZE_ASSERT(s_scenario_group_definition, 0x3E0);
-
 #pragma pack(pop)
+
 /* gets the current scenario tag aka scnr for the current cache file */
 s_scenario_group_definition*  get_scenario_ptr()
 {

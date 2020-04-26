@@ -1,13 +1,14 @@
 #pragma once
-#pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
-#include "..\Blam\Cache\DataTypes\TagBlock.h"
+
 /*********************************************************************
 * name: user_interface_globals
 * group_tag : wgtz
 * header size : 32
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_user_interface_globals_group_definition :TagGroup<'wgtz'>
 {
 	tag_reference shared_globals;//0x0
@@ -21,8 +22,8 @@ struct s_user_interface_globals_group_definition :TagGroup<'wgtz'>
 	tag_reference game_hopper_descriptions;//0x18
 };
 TAG_GROUP_SIZE_ASSERT(s_user_interface_globals_group_definition, 0x20);
-
 #pragma pack(pop)
+
 /* gets the current loaded user_interface_globals tag aka wgtz depending on the scenario type */
 s_user_interface_globals_group_definition *get_user_interface_globals_ptr()
 {

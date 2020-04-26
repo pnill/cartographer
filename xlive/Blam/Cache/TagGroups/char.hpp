@@ -1,10 +1,9 @@
 #pragma once
-#pragma pack(push,1)
-#include "Blam\Cache\DataTypes\DataTypes.h"
+#include "Blam\Cache\DataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
 #include "Blam\Cache\DataTypes\TagBlock.h"
 
-
+#pragma pack(push,1)
 struct character_tag_group
 {
 	int CharacterFlags; // pad fuck it.
@@ -88,5 +87,4 @@ struct character_tag_group
 	__int64 VehicleProperties;
 	//Reflexive VehicleProperties;
 };
-
 #pragma pack(pop)

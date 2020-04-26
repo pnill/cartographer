@@ -1,15 +1,16 @@
 #pragma once
-#pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
-#include "..\Blam\Cache\DataTypes\TagBlock.h"
 #include "..\Blam\Maths\real_math.hpp"
 #include "..\Blam\Maths\\integer_math.hpp"
+
 /*********************************************************************
 * name: user_interface_shared_globals
 * group_tag : wigl
 * header size : 452
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 {
 	PAD(0x44);//0x0
@@ -827,7 +828,6 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 	__int32 music_fade_time;//0x1C0
 };
 TAG_GROUP_SIZE_ASSERT(s_user_interface_shared_globals_group_definition, 0x1C4);
-
 #pragma pack(pop)
 
 /* gets the current loaded user_interface_shared_globals tag aka wigl  */

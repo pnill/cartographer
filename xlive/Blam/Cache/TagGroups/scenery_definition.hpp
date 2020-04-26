@@ -1,11 +1,13 @@
 #pragma once
-#pragma pack(push,1)
 #include "object_definition.hpp"
+
 /*********************************************************************
 * name: scenery
 * group_tag : scen
 * header size : 196
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_scenery_group_definition :TagGroup<'scen'>
 {
 	s_object_group_definition objectTag;
@@ -32,6 +34,5 @@ struct s_scenery_group_definition :TagGroup<'scen'>
 	PAD(0x2);//0xC2
 };
 TAG_GROUP_SIZE_ASSERT(s_scenery_group_definition, 0xC4);
-
 #pragma pack(pop)
 

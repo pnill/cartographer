@@ -1,11 +1,13 @@
 #pragma once
-#pragma pack(push,1)
 #include "item_definition.hpp"
+
 /*********************************************************************
 * name: equipment
 * group_tag : eqip
 * header size : 316
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_equipment_group_definition :TagGroup<'eqip'>
 {
 	s_item_group_definition itemTag;
@@ -30,6 +32,5 @@ struct s_equipment_group_definition :TagGroup<'eqip'>
 	tag_reference pickup_sound;//0x134
 };
 TAG_GROUP_SIZE_ASSERT(s_equipment_group_definition, 0x13C);
-
 #pragma pack(pop)
 

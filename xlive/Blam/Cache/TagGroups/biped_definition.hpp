@@ -1,12 +1,14 @@
 #pragma once
 
-#pragma pack(push,1)
 #include "unit_definition.hpp"
+
 /*********************************************************************
 * name: biped
 * group_tag : bipd
 * header size : 788
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_biped_group_definition :TagGroup<'bipd'>
 {
 	s_unit_group_definition unitTag;

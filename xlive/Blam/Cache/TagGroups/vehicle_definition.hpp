@@ -1,11 +1,13 @@
 #pragma once
-#pragma pack(push,1)
 #include "unit_definition.hpp"
+
 /*********************************************************************
 * name: vehicle
 * group_tag : vehi
 * header size : 768
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_vehicle_group_definition :TagGroup<'vehi'>
 {
 	s_unit_group_definition unitTag;
@@ -330,6 +332,5 @@ struct s_vehicle_group_definition :TagGroup<'vehi'>
 	tag_block<s_shape_phantom_shape_block> shape_phantom_shape;//0x2F8
 };
 TAG_GROUP_SIZE_ASSERT(s_vehicle_group_definition, 0x300);
-
 #pragma pack(pop)
 

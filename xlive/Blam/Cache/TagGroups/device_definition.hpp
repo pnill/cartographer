@@ -1,11 +1,13 @@
 #pragma once
-#pragma pack(push,1)
 #include "object_definition.hpp"
+
 /*********************************************************************
 * name: device
 * group_tag : devi
 * header size : 284
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_device_group_definition :TagGroup<'devi'>
 {
 	s_object_group_definition objectTag;
@@ -40,6 +42,5 @@ struct s_device_group_definition :TagGroup<'devi'>
 	float automatic_activation_radius;//0x118
 };
 TAG_GROUP_SIZE_ASSERT(s_device_group_definition, 0x11C);
-
 #pragma pack(pop)
 

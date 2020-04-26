@@ -483,7 +483,7 @@
     <ClInclude Include="Blam\Cache\Tags\scnr.h" />
     <ClInclude Include="Blam\Cache\Tags\tag_base.h" />
     <ClInclude Include="Blam\Cache\Tags\tag_definitons.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\shad.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\shader_definition.h" />
     <ClInclude Include="Blam\Maths\integer_math.hpp" />
     <ClInclude Include="Blam\Maths\real_math.hpp" />
     <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h" />
@@ -508,7 +508,7 @@
     <ClInclude Include="XLive\Voice\AudioDevices.h" />
     <ClInclude Include="Blam\BlamLibrary.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\DataTypes.h" />
+    <ClInclude Include="Blam\Cache\DataTypes.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Macros.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Reflexive.h" />

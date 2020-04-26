@@ -1,14 +1,15 @@
 #pragma once
-#pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
-#include "..\Blam\Cache\DataTypes\TagBlock.h"
 #include "..\Blam\Maths\real_math.hpp"
+
 /*********************************************************************
 * name: multiplayer_globals
 * group_tag : mulg
 * header size : 16
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_multiplayer_globals_group_definition :TagGroup<'mulg'>
 {
 	struct s_universal_block
@@ -1105,6 +1106,5 @@ struct s_multiplayer_globals_group_definition :TagGroup<'mulg'>
 	tag_block<s_runtime_block> runtime;//0x8
 };
 TAG_GROUP_SIZE_ASSERT(s_multiplayer_globals_group_definition, 0x10);
-
 #pragma pack(pop)
 

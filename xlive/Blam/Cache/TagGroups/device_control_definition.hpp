@@ -1,11 +1,13 @@
 #pragma once
-#pragma pack(push,1)
 #include "device_definition.hpp"
+
 /*********************************************************************
 * name: device_control
 * group_tag : ctrl
 * header size : 320
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_device_control_group_definition :TagGroup<'ctrl'>
 {
 	s_device_group_definition deviceTag;
@@ -30,7 +32,6 @@ struct s_device_control_group_definition :TagGroup<'ctrl'>
 	tag_reference deny;//0x138
 };
 TAG_GROUP_SIZE_ASSERT(s_device_control_group_definition, 0x140);
-
 #pragma pack(pop)
 
 

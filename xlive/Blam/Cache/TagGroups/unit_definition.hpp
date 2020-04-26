@@ -1,11 +1,13 @@
 #pragma once
-#pragma pack(push,1)
 #include "object_definition.hpp"
+
 /*********************************************************************
 * name: unit
 * group_tag : unit
 * header size : 492
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_unit_group_definition :TagGroup<'unit'>
 {
 	s_object_group_definition objectTag;

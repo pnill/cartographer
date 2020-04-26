@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam\Cache\DataTypes\DataTypes.h"
+#include "Blam\Cache\DataTypes.h"
 
 // The game is using some sort of heap manager developed by Microsoft in 2000's named RockAll Heap Manager 
 

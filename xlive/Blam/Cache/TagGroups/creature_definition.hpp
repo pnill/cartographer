@@ -1,11 +1,13 @@
 #pragma once
-#pragma pack(push,1)
 #include "object_definition.hpp"
+
 /*********************************************************************
 * name: creature
 * group_tag : crea
 * header size : 384
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_creature_group_definition :TagGroup<'crea'>
 {
 	s_object_group_definition objectTag;
@@ -189,6 +191,5 @@ struct s_creature_group_definition :TagGroup<'crea'>
 
 };
 TAG_GROUP_SIZE_ASSERT(s_creature_group_definition, 0x180);
-
 #pragma pack(pop)
 

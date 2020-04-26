@@ -1,11 +1,13 @@
 #pragma once
-#pragma pack(push,1)
 #include "item_definition.hpp"
+
 /*********************************************************************
 * name: weapon
 * group_tag : weap
 * header size : 796
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_weapon_group_definition :TagGroup<'weap'>
 {
 	s_item_group_definition itemTag;

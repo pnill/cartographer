@@ -791,9 +791,6 @@
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Cache\DataTypes\DataTypes.h">
-      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
@@ -1181,9 +1178,6 @@
     <ClInclude Include="Blam\Cache\Tags\scnr.h">
       <Filter>Source Files\Blam\Cache\Tags</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Cache\TagGroups\shad.h">
-      <Filter>Source Files\Blam\Cache\Tags</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\Tags\tag_base.h">
       <Filter>Source Files\Blam\Cache\Tags</Filter>
     </ClInclude>
@@ -1288,6 +1282,12 @@
     </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups\scenario_definition.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\TagGroups\shader_definition.h">
+      <Filter>Source Files\Blam\Cache\Tags</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Cache\DataTypes.h">
+      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

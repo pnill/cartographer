@@ -1,11 +1,13 @@
 #pragma once
-#pragma pack(push,1)
 #include "object_definition.hpp"
+
 /*********************************************************************
 * name: projectile
 * group_tag : proj
 * header size : 420
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_projectile_group_definition :TagGroup<'proj'>
 {
 	s_object_group_definition objectTag;
@@ -187,5 +189,4 @@ struct s_projectile_group_definition :TagGroup<'proj'>
 	tag_block<s_material_responses_block> material_responses;//0x19C
 };
 TAG_GROUP_SIZE_ASSERT(s_projectile_group_definition, 0x1A4);
-
 #pragma pack(pop)

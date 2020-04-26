@@ -1,6 +1,6 @@
 #pragma once
 
-#include"..\DataTypes\DataTypes.h"
+#include"..\DataTypes.h"
 #include"..\TagGroups.hpp"
 #include"..\Blam\Maths\Maths.h"
 

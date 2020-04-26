@@ -1,14 +1,16 @@
 #pragma once
-#pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
 #include "..\Blam\Cache\DataTypes\TagBlock.h"
 #include "..\Blam\Maths\real_math.hpp"
+
 /*********************************************************************
 * name: antenna
 * group_tag : ant!
 * header size : 160
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_antenna_group_definition :TagGroup<'ant!'>
 {
 	string_id attachment_marker_name;//0x0

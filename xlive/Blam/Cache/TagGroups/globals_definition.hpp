@@ -1,15 +1,16 @@
 #pragma once
-#pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
-#include "..\Blam\Cache\DataTypes\TagBlock.h"
 #include "..\Blam\Maths\real_math.hpp"
 #include "..\Blam\Maths\\integer_math.hpp"
+
 /*********************************************************************
 * name: globals
 * group_tag : matg
 * header size : 644
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_globals_group_definition :TagGroup<'matg'>
 {
 	PAD(0xAC);//0x0

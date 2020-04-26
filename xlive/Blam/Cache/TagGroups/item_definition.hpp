@@ -1,11 +1,13 @@
 #pragma once
-#pragma pack(push,1)
 #include "object_definition.hpp"
+
 /*********************************************************************
 * name: item
 * group_tag : item
 * header size : 300
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_item_group_definition :TagGroup<'item'>
 {
 	s_object_group_definition objectTag;
@@ -45,7 +47,6 @@ struct s_item_group_definition :TagGroup<'item'>
 	tag_reference detonation_effect;//0x124
 };
 TAG_GROUP_SIZE_ASSERT(s_item_group_definition, 0x12C);
-
 #pragma pack(pop)
 
 

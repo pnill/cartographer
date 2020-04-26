@@ -1,14 +1,15 @@
 #pragma once
-#pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
-#include "..\Blam\Cache\DataTypes\TagBlock.h"
 #include "..\Blam\Maths\real_math.hpp"
+
 /*********************************************************************
 * name: object
 * group_tag : obje
 * header size : 188
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_object_group_definition :TagGroup<'obje'>
 {
 	PAD(0x2);//0x0

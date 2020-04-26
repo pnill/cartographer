@@ -10,13 +10,12 @@
 #include "H2MOD\Variants\VariantMPGameEngine.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
-#include "Blam\Cache\TagGroups\shad.h"
+#include "Blam\Cache\TagGroups\shader_definition.h"
 #include "..\CustomResolutions\CustomResolutions.h"
 #include "..\H2MOD\Tags\TagInterface.h"
+
 #define _USE_MATH_DEFINES
 #include "math.h"
-
-extern bool H2IsDediServer;
 
 #pragma region Done_Tweaks
 
@@ -842,7 +841,7 @@ void fix_shader_template_nvidia(const std::string &template_name, const std::str
 	tags::ilterator shaders('shad');
 	while (!shaders.next().IsNull())
 	{
-		auto *shader = LOG_CHECK(tags::get_tag<'shad',Blam::Cache::TagGroups::shad>(shaders.m_datum));
+		auto *shader = LOG_CHECK(tags::get_tag<'shad', shad>(shaders.m_datum));
 		if (shader && shader->shader_template.TagIndex == borked_template && LOG_CHECK(shader->postprocessDefinition.size > 0))
 		{
 			LOG_DEBUG_FUNC("shader {} has borked template", tags::get_tag_name(shaders.m_datum));
@@ -895,7 +894,7 @@ void InitH2Tweaks() {
 	//custom_game_engines::init();
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 
-	if (H2IsDediServer) {
+	if (h2mod->Server) {
 		phookServ1 = (thookServ1)DetourFunc(h2mod->GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
 
 		// set the additional pcr time
@@ -1000,7 +999,7 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 
 void H2Tweaks::setSens(std::string input_type, int sens) {
 
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	if (sens < 0)
@@ -1028,7 +1027,7 @@ void H2Tweaks::setSavedSens() {
 
 void H2Tweaks::setFOV(int field_of_view_degrees) {
 
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	static float fov = 70.0f * M_PI / 180.0f;
@@ -1051,7 +1050,7 @@ void H2Tweaks::setFOV(int field_of_view_degrees) {
 
 void H2Tweaks::setVehicleFOV(int field_of_view_degrees) {
 
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
@@ -1063,7 +1062,7 @@ void H2Tweaks::setVehicleFOV(int field_of_view_degrees) {
 
 void H2Tweaks::setHz() {
 
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	*h2mod->GetAddress<int*>(0xA3DA08) = H2Config_refresh_rate;
@@ -1071,7 +1070,7 @@ void H2Tweaks::setHz() {
 
 void H2Tweaks::setCrosshairPos(float crosshair_offset) {
 
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	if (!FloatIsNaN(crosshair_offset)) {
@@ -1086,7 +1085,7 @@ void H2Tweaks::setCrosshairPos(float crosshair_offset) {
 }
 
 void H2Tweaks::setCrosshairSize(int size, bool preset) {
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	DWORD BATRIF1 = (DWORD)tags::get_matg_globals_ptr() + 0x7aa750;
@@ -1173,7 +1172,7 @@ char ret_0() {
 }
 
 void H2Tweaks::toggleUncappedCampaignCinematics(bool toggle) {
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	typedef char(__cdecl *is_cutscene_fps_cap)();
@@ -1202,7 +1201,7 @@ void H2Tweaks::applyMeleePatch(bool toggle)
 
 void H2Tweaks::sunFlareFix()
 {
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	//rasterizer_near_clip_distance <real>
@@ -1212,7 +1211,7 @@ void H2Tweaks::sunFlareFix()
 
 void H2Tweaks::WarpFix(bool enable)
 {
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	//Improves warping issues 

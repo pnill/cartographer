@@ -1,11 +1,13 @@
 #pragma once
-#pragma pack(push,1)
 #include "device_definition.hpp"
+
 /*********************************************************************
 * name: device_machine
 * group_tag : mach
 * header size : 308
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_device_machine_group_definition :TagGroup<'mach'>
 {
 	s_device_group_definition deviceTag;
@@ -44,6 +46,5 @@ struct s_device_machine_group_definition :TagGroup<'mach'>
 	PAD(0x2);//0x132
 };
 TAG_GROUP_SIZE_ASSERT(s_device_machine_group_definition, 0x134);
-
 #pragma pack(pop)
 

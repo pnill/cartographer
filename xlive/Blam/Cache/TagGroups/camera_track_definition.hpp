@@ -1,13 +1,15 @@
 #pragma once
-#pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
 #include "..\Blam\Cache\DataTypes\TagBlock.h"
+
 /*********************************************************************
 * name: camera_track
 * group_tag : trak
 * header size : 12
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_camera_track_group_definition :TagGroup<'trak'>
 {
 	enum class e_flags : __int32
@@ -24,7 +26,6 @@ struct s_camera_track_group_definition :TagGroup<'trak'>
 	tag_block<s_control_points_block> control_points;//0x4
 };
 TAG_GROUP_SIZE_ASSERT(s_camera_track_group_definition, 0xC);
-
 #pragma pack(pop)
 
 

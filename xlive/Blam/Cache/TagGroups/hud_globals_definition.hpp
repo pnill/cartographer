@@ -1,15 +1,16 @@
 #pragma once
-#pragma pack(push,1)
 #include "..\Blam\Cache\DataTypes\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
-#include "..\Blam\Cache\DataTypes\TagBlock.h"
 #include "..\Blam\Maths\real_math.hpp"
 #include "..\Blam\Maths\\integer_math.hpp"
+
 /*********************************************************************
 * name: hud_globals
 * group_tag : hudg
 * header size : 1160
 * *********************************************************************/
+
+#pragma pack(push,1)
 struct s_hud_globals_group_definition :TagGroup<'hudg'>
 {
 	struct
@@ -304,8 +305,8 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 	tag_reference elite_training_middle;//0x480
 };
 TAG_GROUP_SIZE_ASSERT(s_hud_globals_group_definition, 0x488);
-
 #pragma pack(pop)
+
 /* gets the current loaded hud globals tag aka hudg */
 s_hud_globals_group_definition *get_hud_globals_ptr()
 {
