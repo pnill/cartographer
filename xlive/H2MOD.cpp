@@ -12,7 +12,6 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/ServerConsole/ServerConsole.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
-#include "H2MOD/Tags/global_tags_interface.h"
 #include "H2MOD/Variants/GunGame/GunGame.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
@@ -1369,7 +1368,6 @@ void H2MOD::ApplyHooks() {
 		PatchCall(h2mod->GetAddress(0x226702), game_mode_engine_draw_team_indicators);
 
 		//Initialise_tag_loader();
-		//TagInterface::GlobalTagInterface.Init();
 	}
 	else {
 

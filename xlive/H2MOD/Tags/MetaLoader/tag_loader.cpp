@@ -6,8 +6,6 @@
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 
 #include "Blam\Common\Common.h"
-//#include "Blam\Cache\Tags\tag_definitons.h"
-//#include "H2MOD\Tags\global_tags_interface.h"
 
 //contains some game functions that returns HANDLE
 namespace global_handle_function
@@ -906,34 +904,9 @@ namespace tag_loader
 
 		}
 	}
+
 	void Add_tags_to_simulation_table()
 	{
-		if (sync_list.size() == 0)
-			return;
-		else
-		{
-			// TODO: Himanshu01, pls fix
-			//datum scnr_index = tags::get_tags_header()->scenario_datum;
-			//auto GlobalSCNR = (Blam::Cache::Tags::scnr*)TagInterface::GlobalTagInterface.GetTagInterface(scnr_index, blam_tag::tag_group_type::scenario);
-			//
-			//for (size_t i = 0 ; i < sync_list.size(); i++)
-			//{
-			//	std::string t;
-			//
-			//	t += "Adding Tag To Simulation Block : 0x";
-			//	t += meta_struct::to_hex_string(GlobalSCNR->SimulationDefinitionTable.GetElementCount()) + ",0x";
-			//	t += meta_struct::to_hex_string(sync_list[i]);
-			//
-			//	addDebugText(t.c_str());
-			//
-			//	struct Blam::Cache::Tags::scnr::SimulationDefinitionTable block;
-			//	block.Tag = sync_list[i];
-			//
-			//	GlobalSCNR->SimulationDefinitionTable.PushBack(&block);
-			//}		
-			////clearn out the sync list for this module
-			//sync_list.clear();
-		}
 	}
 
 #pragma region query_parser
@@ -1236,39 +1209,6 @@ bool _cdecl LoadTagsandMapBases(int a)
 		//Todo :: Make Use of TraceFunctions to Log each step
 		addDebugText(tag_loader::Pop_messages().c_str());
 	}
-
-	///
-	//global_tag_interface testing code
-	//Please dont add every code over here and cluter it,create newer subroutine
-	///
-	
-	if (tags::get_cache_header()->type != scnr_type::MainMenu)
-	{
-		datum temp(0xE1940018);
-		//auto test = (Blam::Cache::Tags::itmc*)TagInterface::GlobalTagInterface.GetTagInterface(temp, blam_tag::tag_group_type::itemcollection);
-		
-		if (false)
-		{
-			/*
-			//resolve ambiguity
-			struct Blam::Cache::Tags::itmc::ItemPermutations itemperm;
-
-			itemperm.Weight = 100.0f;
-
-			itemperm.Item.TagGroup = TagGroupTypes::vehicle;
-			itemperm.Item.TagIndex = 0xE7A42D3F;
-			test->ItemPermutations.PushBack(&itemperm);
-
-			itemperm.Item.TagGroup = TagGroupTypes::biped;
-			itemperm.Item.TagIndex = 0xE35028EB;
-			test->ItemPermutations.PushBack(&itemperm);
-			*/
-
-			//test->ItemPermutations.RemoveAt(0);
-			//test->itemPermutations[0]->Item.TagGroup = blam_tag::tag_group_type::weapon;
-			//test->itemPermutations[0]->Item.TagIndex = 0x3BA4;
-		}
-	}	
 
 	return result;
 }

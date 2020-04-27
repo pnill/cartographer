@@ -267,10 +267,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
-    <ClCompile Include="Blam\Cache\Tags\itmc.cpp" />
-    <ClCompile Include="Blam\Cache\Tags\scnr.cpp" />
-    <ClCompile Include="Blam\Cache\Tags\tag_base.cpp" />
-    <ClCompile Include="Blam\Reflexive\Reflexive.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
@@ -280,7 +276,6 @@
     <ClCompile Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
-    <ClCompile Include="H2MOD\Tags\global_tags_interface.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
     <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\cache_loader.cpp" />
@@ -480,10 +475,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
-    <ClInclude Include="Blam\Cache\Tags\itmc.h" />
-    <ClInclude Include="Blam\Cache\Tags\scnr.h" />
-    <ClInclude Include="Blam\Cache\Tags\tag_base.h" />
-    <ClInclude Include="Blam\Cache\Tags\tag_definitons.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.h" />
     <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Maths\integer_math.hpp" />
@@ -499,7 +490,6 @@
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h" />
-    <ClInclude Include="H2MOD\Tags\global_tags_interface.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h" />
@@ -512,7 +502,6 @@
     <ClInclude Include="Blam\Cache\DataTypes.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Macros.h" />
-    <ClInclude Include="Blam\Reflexive\Reflexive.h" />
     <ClInclude Include="Blam\Cache\DataTypes\StringID.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Strings.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
