@@ -1136,7 +1136,7 @@ bool BansheeBombIsEngineMPCheck() {
 bool FlashlightIsEngineSPCheck() {
 	if (AdvLobbySettings_flashlight)
 		return true;
-	return h2mod->GetMapType() == scnr_type::Multiplayer;
+	return h2mod->GetMapType() == scnr_type::SinglePlayer;
 }
 
 typedef bool(__cdecl* verify_game_version_on_join)(int executable_version, int build_version, int build_version2);
