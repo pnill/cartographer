@@ -44,11 +44,11 @@ namespace tag_loader
 	std::string Pop_tag_list();
 	//function to load RAW_DATA of the concerned tag from meta_list
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
-	void Load_RAW_refs(DatumIndex datum_index, std::string map_loc);
+	void Load_RAW_refs(datum datum_index, std::string map_loc);
 	//same as the previous implementation,but it utilises file handle to load from any file 
-	void Load_RAW_refs(DatumIndex datum_index, HANDLE file);
+	void Load_RAW_refs(datum datum_index, HANDLE file);
 	//Fixes the reference of the tags to their global objects(vftables)
-	void Fix_global_objects_ref(DatumIndex datum_index);
+	void Fix_global_objects_ref(datum datum_index);
 	//Loads a file containing a a bunch of tags concerned with some specific element injecting the first tag onto the target datum
 	//modules cand be target onto a specific tag,they have to be loaded into free tag mem pool
 	//return the target_index of the first tag in the memory

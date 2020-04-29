@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Globals.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
+#include "..\H2MOD\Tags\TagInterface.h"
 
 /*
 Todo:

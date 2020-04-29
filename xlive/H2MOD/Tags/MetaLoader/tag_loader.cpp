@@ -1,13 +1,11 @@
-#include "..\stdafx.h"
+
 #include "tag_loader.h"
 #include "..\Util\filesys.h"
 
 #include "Globals.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Tags\global_tags_interface.h"
-#include "..\Blam\Cache\Tags\tag_definitons.h"
 
-using Blam::Enums::Tags::TagGroupTypes;
+#include "Blam\Common\Common.h"
 
 //contains some game functions that returns HANDLE
 namespace global_handle_function
@@ -20,35 +18,35 @@ namespace global_handle_function
 //certain functions which relate tags to their global object(such as Havok objects)(vftables perhaps)
 namespace global_objects_fix
 {
-	void __cdecl bipd_fix(DatumIndex datum_index)
+	void __cdecl bipd_fix(datum datum_index)
 	{
-		void(_cdecl*sub_EC23F)(DatumIndex);
-		sub_EC23F = (void(_cdecl*)(DatumIndex))h2mod->GetAddress(0x1389B0);
+		void(_cdecl*sub_EC23F)(datum);
+		sub_EC23F = (void(_cdecl*)(datum))h2mod->GetAddress(0x1389B0);
 		sub_EC23F(datum_index);
 	}
 
-	void __cdecl crea_fix(DatumIndex datum_index)
+	void __cdecl crea_fix(datum datum_index)
 	{
-		int(_cdecl*sub_EC23F)(DatumIndex);
-		sub_EC23F = (int(_cdecl*)(DatumIndex))h2mod->GetAddress(0x138985);
+		int(_cdecl*sub_EC23F)(datum);
+		sub_EC23F = (int(_cdecl*)(datum))h2mod->GetAddress(0x138985);
 		sub_EC23F(datum_index);
 	}
-	void __cdecl vehi_fix(DatumIndex datum_index)
+	void __cdecl vehi_fix(datum datum_index)
 	{
-		int(_cdecl*sub_EC23F)(DatumIndex);
-		sub_EC23F = (int(_cdecl*)(DatumIndex))h2mod->GetAddress(0x13895A);
+		int(_cdecl*sub_EC23F)(datum);
+		sub_EC23F = (int(_cdecl*)(datum))h2mod->GetAddress(0x13895A);
 		sub_EC23F(datum_index);
 	}
-	void __cdecl coll_fix(DatumIndex datum_index)
+	void __cdecl coll_fix(datum datum_index)
 	{
-		int(_cdecl*sub_EC23F)(DatumIndex);
-		sub_EC23F = (int(_cdecl*)(DatumIndex))h2mod->GetAddress(0x7BE5C);
+		int(_cdecl*sub_EC23F)(datum);
+		sub_EC23F = (int(_cdecl*)(datum))h2mod->GetAddress(0x7BE5C);
 		sub_EC23F(datum_index);
 	}
-	void __cdecl phmo_fix(DatumIndex datum_index, bool unk)
+	void __cdecl phmo_fix(datum datum_index, bool unk)
 	{
-		int(_cdecl*sub_EC23F)(DatumIndex, bool);
-		sub_EC23F = (int(_cdecl*)(DatumIndex, bool))h2mod->GetAddress(0x7B844);
+		int(_cdecl*sub_EC23F)(datum, bool);
+		sub_EC23F = (int(_cdecl*)(datum, bool))h2mod->GetAddress(0x7B844);
 		sub_EC23F(datum_index, unk);
 	}
 }
@@ -106,7 +104,7 @@ namespace tag_loader
 		fin->seekg(0x0);
 		fin->read(map_header, 0x800);		
 
-		if (tags::get_cache_header()->type == tags::cache_header::scnr_type::MultiplayerShared || tags::get_cache_header()->type == tags::cache_header::scnr_type::SinglePlayerShared)
+		if (tags::get_cache_header()->type == scnr_type::MultiplayerShared || tags::get_cache_header()->type == scnr_type::SinglePlayerShared)
 		{
 			delete[] map_header;
 			return true;
@@ -420,7 +418,7 @@ namespace tag_loader
 				que_meta_list[my_inject_refs_iter.old_datum]->Rebase_meta(mem_off);
 				char* meta_data = que_meta_list[my_inject_refs_iter.old_datum]->Generate_meta_file();
 
-				blam_tag type = std::stoi(que_meta_list[my_inject_refs_iter.old_datum]->Get_type());
+				blam_tag type(blam_tag::tag_group_type(std::stoi(que_meta_list[my_inject_refs_iter.old_datum]->Get_type())));
 
 				tables_data.type = type;
 				tables_data.data_offset = mem_off;
@@ -550,7 +548,7 @@ namespace tag_loader
 	}
 	//function to load RAW_DATA of the concerned tag from meta_list
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
-	void Load_RAW_refs(DatumIndex datum_index, std::string map_loc)
+	void Load_RAW_refs(datum datum_index, std::string map_loc)
 	{
 		DWORD* PMapRawtableoffset = h2mod->GetAddress<DWORD*>(0x4AE8B0);
 		DWORD* PRawTableSize = h2mod->GetAddress<DWORD*>(0x4AE8B4);
@@ -645,7 +643,7 @@ namespace tag_loader
 		*PMapRawtableoffset = oldRtable_offset;
 		*PRawTableSize = oldRtable_size;
 	}
-	void Load_RAW_refs(DatumIndex datum_index, HANDLE file)
+	void Load_RAW_refs(datum datum_index, HANDLE file)
 	{
 		DWORD* PMapRawtableoffset = (DWORD*)(h2mod->GetBase() + 0x4AE8B0);
 		DWORD* PRawTableSize = (DWORD*)(h2mod->GetBase() + 0x4AE8B4);
@@ -733,10 +731,10 @@ namespace tag_loader
 		*PRawTableSize = oldRtable_size;
 	}
 	//Fixes the reference of the tags to their global objects(vftables)
-	void Fix_global_objects_ref(DatumIndex datum_index)
+	void Fix_global_objects_ref(datum datum_index)
 	{
 		blam_tag type = new_Tables[datum_index.ToAbsoluteIndex()].type;
-		DatumIndex Tdatum_index = new_Tables[datum_index.ToAbsoluteIndex()].datum_index;
+		datum Tdatum_index = new_Tables[datum_index.ToAbsoluteIndex()].datum_index;
 
 		if (Tdatum_index != datum_index)
 		{
@@ -885,55 +883,30 @@ namespace tag_loader
 	}
 	void Generate_sync_list(int type, DWORD index)
 	{
-		switch ((TagGroupTypes)type)
+		switch ((blam_tag::tag_group_type)type)
 		{
-		case TagGroupTypes::biped:
-		case TagGroupTypes::vehicle:
-		case TagGroupTypes::weapon:
-		case TagGroupTypes::garbage:
-		case TagGroupTypes::projectile:
-		case TagGroupTypes::crate:
-		case TagGroupTypes::damageeffect:
-		case TagGroupTypes::device:
-		case TagGroupTypes::scenery:
-		case TagGroupTypes::devicelightfixture:
-		case TagGroupTypes::soundscenery:
-		case TagGroupTypes::creature:
-		case TagGroupTypes::devicemachine:
-		case TagGroupTypes::equipment:
+		case blam_tag::tag_group_type::biped:
+		case blam_tag::tag_group_type::vehicle:
+		case blam_tag::tag_group_type::weapon:
+		case blam_tag::tag_group_type::garbage:
+		case blam_tag::tag_group_type::projectile:
+		case blam_tag::tag_group_type::crate:
+		case blam_tag::tag_group_type::damageeffect:
+		case blam_tag::tag_group_type::device:
+		case blam_tag::tag_group_type::scenery:
+		case blam_tag::tag_group_type::devicelightfixture:
+		case blam_tag::tag_group_type::soundscenery:
+		case blam_tag::tag_group_type::creature:
+		case blam_tag::tag_group_type::devicemachine:
+		case blam_tag::tag_group_type::equipment:
 			sync_list.push_back(index);
 			break;
 
 		}
 	}
+
 	void Add_tags_to_simulation_table()
 	{
-		if (sync_list.size() == 0)
-			return;
-		else
-		{
-			
-			DatumIndex scnr_index = tags::get_tags_header()->scenario_datum;
-			auto GlobalSCNR = (Blam::Cache::Tags::scnr*)TagInterface::GlobalTagInterface.GetTagInterface(scnr_index, (int)TagGroupTypes::scenario);		
-			
-			for (size_t i = 0 ; i < sync_list.size(); i++)
-			{
-				std::string t;
-
-				t += "Adding Tag To Simulation Block : 0x";
-				t += meta_struct::to_hex_string(GlobalSCNR->SimulationDefinitionTable.GetElementCount()) + ",0x";
-				t += meta_struct::to_hex_string(sync_list[i]);
-
-				addDebugText(t.c_str());
-
-				struct Blam::Cache::Tags::scnr::SimulationDefinitionTable block;
-				block.Tag.TagIndex = sync_list[i];
-
-				GlobalSCNR->SimulationDefinitionTable.PushBack(&block);
-			}		
-			//clearn out the sync list for this module
-			sync_list.clear();
-		}
 	}
 
 #pragma region query_parser
@@ -1203,7 +1176,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	//tag_loader::Add_all_shared_refs();
 
 	// extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
-	if (tags::get_cache_header()->type != tags::cache_header::scnr_type::SinglePlayerShared)
+	if (tags::get_cache_header()->type != scnr_type::SinglePlayerShared)
 	{
 		DWORD *TagTableStart = h2mod->GetAddress<DWORD*>(0x47CD50);
 		///---------------TABLE EXTENSION  STUFF
@@ -1217,12 +1190,10 @@ bool _cdecl LoadTagsandMapBases(int a)
 <--------------------------------------------------------------------------------------------------------------------------------------------------------------->*/
 
 
-
-
 	///tag_injector testing
 	//Just for testing purpose,dont cluter here	
 	///Actual injection process after map load
-	if (tags::get_cache_header()->type != tags::cache_header::scnr_type::SinglePlayerShared)
+	if (tags::get_cache_header()->type != scnr_type::SinglePlayerShared)
 	{
 		//actual tag_loading
 		///parse query file
@@ -1238,39 +1209,6 @@ bool _cdecl LoadTagsandMapBases(int a)
 		//Todo :: Make Use of TraceFunctions to Log each step
 		addDebugText(tag_loader::Pop_messages().c_str());
 	}
-
-	///
-	//global_tag_interface testing code
-	//Please dont add every code over here and cluter it,create newer subroutine
-	///
-	
-	if (tags::get_cache_header()->type != tags::cache_header::scnr_type::MainMenu)
-	{
-		DatumIndex temp(0xE1940018);
-		auto test = (Blam::Cache::Tags::itmc*)TagInterface::GlobalTagInterface.GetTagInterface(temp, (int)TagGroupTypes::itemcollection);
-		
-		if (false)
-		{
-			/*
-			//resolve ambiguity
-			struct Blam::Cache::Tags::itmc::ItemPermutations itemperm;
-
-			itemperm.Weight = 100.0f;
-
-			itemperm.Item.TagGroup = TagGroupTypes::vehicle;
-			itemperm.Item.TagIndex = 0xE7A42D3F;
-			test->ItemPermutations.PushBack(&itemperm);
-
-			itemperm.Item.TagGroup = TagGroupTypes::biped;
-			itemperm.Item.TagIndex = 0xE35028EB;
-			test->ItemPermutations.PushBack(&itemperm);
-			*/
-
-			//test->ItemPermutations.RemoveAt(0);
-			test->ItemPermutations[0]->Item.TagGroup = TagGroupTypes::weapon;
-			test->ItemPermutations[0]->Item.TagIndex = 0x3BA4;
-		}
-	}	
 
 	return result;
 }

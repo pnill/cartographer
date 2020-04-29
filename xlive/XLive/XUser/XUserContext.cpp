@@ -56,15 +56,17 @@ static const std::unordered_map <int, std::string> game_mode_list
 
 void update_player_count()
 {
-	int player_count_a = *h2mod->GetAddress<BYTE*>(0x506974);
-	int player_count_b = *h2mod->GetAddress<BYTE*>(0x50E4FC);
-	int max_player_count_a = *h2mod->GetAddress<BYTE*>(0x50A3A0);
-	int max_player_count_b = *h2mod->GetAddress<BYTE*>(0x511F28);
-
-	DiscordInterface::SetPlayerCountInfo(
-		player_count_a ? player_count_a : player_count_b,
-		max_player_count_a ? max_player_count_a : max_player_count_b
-	);
+	network_session* session = nullptr;
+	if (NetworkSession::getCurrentNetworkSession(&session))
+	{
+		DiscordInterface::SetPlayerCountInfo(
+			session->membership.player_count, 
+			session->parameters.max_party_players);
+	}
+	else
+	{
+		DiscordInterface::SetPlayerCountInfo(0, 0);
+	}
 }
 
 std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;

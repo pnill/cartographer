@@ -2,13 +2,12 @@
 
 #include "Blam\Cache\DataTypes\DatumIndex.h"
 
-using Blam::Cache::DataTypes::DatumIndex;
 
 class ConsoleCommands {
 public:
 	ConsoleCommands();
 	void handle_command(std::string);
-	void spawn(DatumIndex object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition);
+	void spawn(datum object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition);
 	void output(std::wstring result);
 	void display(std::string output);
 	std::vector<std::string> prevCommands;

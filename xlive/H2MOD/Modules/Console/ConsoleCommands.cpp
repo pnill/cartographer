@@ -328,29 +328,29 @@ void ConsoleCommands::checkForIds() {
 	}
 }
 
-void ConsoleCommands::spawn(DatumIndex object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition) {
+void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition) {
 
 	for (int i = 0; i < count; i++) {
 		try {
 			ObjectPlacementData nObject;
 
 			if (!object_datum.IsNull()) {
-				DatumIndex player_datum = h2mod->get_unit_datum_from_player_index(h2mod->get_player_datum_index_from_controller_index(0).Index);
+				datum player_datum = h2mod->get_unit_datum_from_player_index(h2mod->get_player_datum_index_from_controller_index(0).Index);
 				call_object_placement_data_new(&nObject, object_datum, player_datum, 0);
-				Real::Point3D* player_position = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
+				real_point3d* player_position = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
 				
 				if (player_position != nullptr) {
-					nObject.Placement.X = player_position->X * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					nObject.Placement.Y = player_position->Y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					nObject.Placement.Z = (player_position->Z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.Placement.x = player_position->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.Placement.y = player_position->y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.Placement.z = (player_position->z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
 				}
 				if (specificPosition) {
-					nObject.Placement.X = x;
-					nObject.Placement.Y = y;
-					nObject.Placement.Z = z;
+					nObject.Placement.x = x;
+					nObject.Placement.y = y;
+					nObject.Placement.z = z;
 				}
 				
-				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.Placement.X, nObject.Placement.Y, nObject.Placement.Z);
+				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.Placement.x, nObject.Placement.y, nObject.Placement.z);
 				unsigned int object_gamestate_datum = call_object_new(&nObject);
 				call_add_object_to_sync(object_gamestate_datum);
 			}
@@ -388,25 +388,6 @@ bool ConsoleCommands::isNum(const char *s) {
 	}
 	return true;
 }
-
-int __cdecl call_get_object_via_datum(DatumIndex object_datum_index, int object_type)
-{
-	//LOG_TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
-
-	typedef int(__cdecl *get_object)(DatumIndex object_datum_index, int object_type);
-	get_object pget_object = (get_object)(h2mod->GetAddress(0x1304E3, 0x11F3A6));
-
-	return pget_object(object_datum_index, object_type);
-}
-
-int __cdecl call_entity_datum_to_gamestate_datum(int entity_datum)
-{
-	typedef int(__cdecl *entity_datum_to_gamestate_datum)(int entity_datum);
-	entity_datum_to_gamestate_datum pentity_datum_to_gamestate_datum = (entity_datum_to_gamestate_datum)h2mod->GetAddress(0x1F2211);
-
-	return pentity_datum_to_gamestate_datum(entity_datum);
-}
-
 
 /*
 * Handles the given string command
@@ -543,15 +524,15 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MULTIPLAYER_MAP)
-			{
-				output(L"Can only be used by the session host!");
+			if (h2mod->GetMapType() == scnr_type::MainMenu) {
+				//TODO: need a nicer way to detect this for dedis
+				output(L"Can only be used ingame");
 				return;
 			}
 
-			if (isLobby && h2mod->GetMapType() == MULTIPLAYER_MAP) {
-				//TODO: need a nicer way to detect this for dedis
-				output(L"Can only be used ingame");
+			if (!NetworkSession::localPeerIsSessionHost())
+			{
+				output(L"Can only be used by the session host!");
 				return;
 			}
 
@@ -560,7 +541,7 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			std::string secondArg = splitCommands[1];
 			std::string thirdArg = splitCommands[2];
-			DatumIndex object_datum;
+			datum object_datum;
 			if (object_ids.find(secondArg) == object_ids.end()) {
 				//read from chatbox line
 				std::string secondArg = splitCommands[1];
@@ -587,8 +568,8 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 			
-			Real::Point3D* localPlayerPosition = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
-			this->spawn(object_datum, count, localPlayerPosition->X + 0.5f, localPlayerPosition->Y + 0.5f, localPlayerPosition->Z + 0.5f, randomMultiplier, false);
+			real_point3d* localPlayerPosition = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
+			this->spawn(object_datum, count, localPlayerPosition->x + 0.5f, localPlayerPosition->y + 0.5f, localPlayerPosition->z + 0.5f, randomMultiplier, false);
 			return;
 		}
 		else if (firstCommand == "$ishost") {
@@ -609,7 +590,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$xyz") {
-			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MULTIPLAYER_MAP) {
+			if (h2mod->GetMapType() == scnr_type::Multiplayer && !NetworkSession::localPeerIsSessionHost()) {
 				output(L"Only host can see xyz for now...");
 				return;
 			}
@@ -632,14 +613,13 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MULTIPLAYER_MAP) {
-				output(L"Can only be used by the session host!");
+			if (h2mod->GetMapType() == scnr_type::MainMenu) {
+				output(L"Can only be used ingame");
 				return;
 			}
 
-			if (isLobby && h2mod->GetMapType() == MULTIPLAYER_MAP) {
-				//TODO: need a nicer way to detect this for dedis
-				output(L"Can only be used ingame");
+			if (!NetworkSession::localPeerIsSessionHost()) {
+				output(L"Can only be used by the session host!");
 				return;
 			}
 

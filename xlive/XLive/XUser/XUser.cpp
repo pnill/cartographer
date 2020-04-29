@@ -46,7 +46,7 @@ bool userSignedOnline(DWORD dwUserIndex)
 	return false;
 }
 
-void XUserSetup(DWORD dwUserIndex, long long xuid, char* userName, bool online)
+void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, bool online)
 {
 	if (dwUserIndex != 0)
 		dwUserIndex = 0;
@@ -55,18 +55,15 @@ void XUserSetup(DWORD dwUserIndex, long long xuid, char* userName, bool online)
 	{
 		usersSignInInfo[dwUserIndex].dwInfoFlags |= XUSER_INFO_FLAG_LIVE_ENABLED;
 		usersSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInToLive;
+		strncpy_s(usersSignInInfo[dwUserIndex].szUserName, userName, strnlen_s(userName, XUSER_MAX_NAME_LENGTH));
+		GetAchievements(xuid);
 	}
 	else
 		usersSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInLocally;
 
+	usersSignInInfo[dwUserIndex].xuid = xuid;
 	usersSignInInfo[dwUserIndex].dwGuestNumber = 0;
 	usersSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
-	usersSignInInfo[dwUserIndex].xuid = (XUID)xuid;
-	
-	strncpy_s(usersSignInInfo[dwUserIndex].szUserName, userName, strnlen_s(userName, XUSER_MAX_NAME_LENGTH));
-
-	if (online)
-		GetAchievements(xuid);
 
 	signInChanged[dwUserIndex] = true;
 }

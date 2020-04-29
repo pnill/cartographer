@@ -11,7 +11,6 @@
 extern void InitInstance();
 
 extern bool displayXyz;
-extern volatile bool isLobby;
 
 typedef struct _XLIVE_INITIALIZE_INFO {
 	UINT cbSize;
@@ -97,10 +96,10 @@ inline void BuildVertex(D3DXVECTOR4 xyzrhw, D3DCOLOR color, CVertexList* vertexL
 LPD3DXSPRITE pSprite;
 
 using namespace std::chrono;
-
 high_resolution_clock::time_point nextFrame;
 high_resolution_clock::duration desiredRenderTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / (double)H2Config_fps_limit));
-high_resolution_clock::duration minimizedDesiredTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / 60.0));
+high_resolution_clock::duration minimizedDesiredTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / 64.0));
+
 void frameTimeManagement() {
 
 	typedef bool(__cdecl* game_is_minimized)();
@@ -108,10 +107,11 @@ void frameTimeManagement() {
 
 	bool isMinimized = p_game_is_minimized();
 
-	static bool initialized = false;
-	if (!initialized) {
-		initialized = true;
+	static bool bInitTime = false;
+	if (!bInitTime)
+	{
 		nextFrame = high_resolution_clock::now();
+		bInitTime = true;
 	}
 	
 	if (H2Config_fps_limit > 0 || isMinimized) {
@@ -155,9 +155,6 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		has_initialised_input = true;
 	}
 
-	//TODO: fHandled doesn't actually work..need to look into how halo2.exe uses the XLIVE_INPUT_INFO struct after calling xliveinput
-	//pPii->fHandled = commands->handleInput(pPii->wParam);
-
 	return S_OK;
 }
 
@@ -166,7 +163,7 @@ extern void handleHotkeyInput(WPARAM lpMsg);
 // #5030: XLivePreTranslateMessage
 BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 {
-	if ((GetKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
+	if ((GetAsyncKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
 	{
 		// hotkeys
 		handleHotkeyInput(lpMsg->wParam);
@@ -608,16 +605,16 @@ int WINAPI XLiveRender()
 			}
 #pragma endregion achievement rendering
 
-			if (displayXyz && (NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() == SINGLE_PLAYER_MAP)) {
+			if (displayXyz && (NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() == scnr_type::SinglePlayer)) {
 				int text_y_coord = 60;
 				PlayerIterator playerIt;
 				while (playerIt.get_next_player()) 
 				{
-					Real::Point3D* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
+					real_point3d* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
 					if (player_position != nullptr) {
 						std::wstring playerNameWide(playerIt.get_current_player_name());
 						std::string playerName(playerNameWide.begin(), playerNameWide.end());
-						std::string xyzText = "Player name: " + playerName + ", xyz = " + std::to_string(player_position->X) + " " + std::to_string(player_position->Y) + " " + std::to_string(player_position->Z);
+						std::string xyzText = "Player name: " + playerName + ", xyz = " + std::to_string(player_position->x) + " " + std::to_string(player_position->y) + " " + std::to_string(player_position->z);
 						drawText(0, text_y_coord, COLOR_GOLD, xyzText.c_str(), normalSizeFont);
 						text_y_coord += 15;
 					}
@@ -649,7 +646,11 @@ int WINAPI XLiveRender()
 			}
 
 			if (NetworkStatistics) {
-				sprintf(packet_info_str, "[ pck/second %d, pck size average: %d ]", ElapsedTime != 0 ? Packets * 1000 / ElapsedTime : 0, TotalPacketsSent != 0 ? TotalBytesSent / TotalPacketsSent : 0);
+				if (!NetworkSession::getCurrentNetworkSession(NULL)) {
+					ElapsedTime = 0;
+					TotalPacketsSent = 0;
+				}
+				sprintf(packet_info_str, "[ pck/second %d, pck size average: %d ]", ElapsedTime > 0 ? Packets * 1000 / ElapsedTime : 0, TotalPacketsSent > 0 ? TotalBytesSent / TotalPacketsSent : 0);
 				drawText(30, 30, COLOR_WHITE, packet_info_str, normalSizeFont);
 			}
 		}

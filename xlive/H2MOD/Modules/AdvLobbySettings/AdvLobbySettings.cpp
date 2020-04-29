@@ -24,7 +24,7 @@ static void refresh_mp_explosion_physics() {
 }
 
 static void actuallySendPacket() {
-	if (!NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() != MapType::MULTIPLAYER_MAP)
+	if (!NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() != scnr_type::Multiplayer)
 		return;
 
 	LOG_TRACE_GAME("[h2mod] Sending AdvLobbySettings.");

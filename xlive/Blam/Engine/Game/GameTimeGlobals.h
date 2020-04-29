@@ -1,6 +1,6 @@
 #pragma once
-#include "stdafx.h"
 #include "../Blam/Enums/Enums.h"
+
 namespace Blam
 {
 	namespace EngineDefinitions

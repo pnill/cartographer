@@ -5,7 +5,6 @@
 #include "..\..\Modules\Networking\Networking.h"
 #include "..\..\Modules\Networking\CustomPackets\CustomPackets.h"
 
-using namespace Blam::Enums;
 using namespace NetworkSession;
 
 std::vector<XUID> Infection::zombieIdentifiers;
@@ -139,6 +138,7 @@ void Infection::resetWeaponInteractionAndEmblems() {
 }
 
 void Infection::preSpawnServerSetup() {
+	int humanCount = 0;
 	int playerIndex = 0;
 	do {
 		if (playerIsActive(playerIndex)) {
@@ -154,10 +154,15 @@ void Infection::preSpawnServerSetup() {
 			}
 			else {
 				h2mod->set_unit_biped(Player::Biped::Spartan, playerIndex);
+				humanCount++;
 			}
 		}
 		playerIndex++;
 	} while (playerIndex < 16);
+
+	// end the game if all humans are dead
+	if (humanCount == 0 && getPlayerCount() > 1)
+		endGame();
 }
 
 void Infection::setPlayerAsHuman(int playerIndex) {
@@ -205,7 +210,7 @@ void Infection::spawnPlayerClientSetup(int playerIndex) {
 
 void Infection::spawnServerPlayerSetup(int playerIndex) {
 	LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}", playerIndex);
-	DatumIndex unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
+	datum unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
 	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
 
 	if (unit_object && *(BYTE*)(unit_object + 0xAA) == 0) {
@@ -222,7 +227,7 @@ void Infection::spawnServerPlayerSetup(int playerIndex) {
 	}
 }
 
-void Infection::infectPlayer(DatumIndex unitDatumIndex, int playerIndex) {
+void Infection::infectPlayer(datum unitDatumIndex, int playerIndex) {
 	int unit_object = call_object_try_and_get_with_type(unitDatumIndex, 3);
 	if (unit_object && h2mod->get_unit_team_index(unitDatumIndex) != ZOMBIE_TEAM
 		&& *(BYTE*)(unit_object + 0xAA) == 0) //check if object type is biped
@@ -245,7 +250,7 @@ void Infection::infectPlayer(DatumIndex unitDatumIndex, int playerIndex) {
 	}
 }
 
-void Infection::infectPlayers(DatumIndex unitDatumIndex, int playerIndex) {
+void Infection::infectPlayers(datum unitDatumIndex, int playerIndex) {
 	int unit_object = call_object_try_and_get_with_type(unitDatumIndex, 3);
 	if (unit_object && *(BYTE*)(unit_object + 0xAA) == 0) {
 		Infection::setZombiePlayerStatus(playerIndex);
@@ -408,7 +413,7 @@ void ZombieHandler::setPlayerIndex(int playerIndex)
 	this->playerIndex = playerIndex;
 }
 
-void ZombieHandler::setUnitDatumIndex(DatumIndex unitDatumIndex)
+void ZombieHandler::setUnitDatumIndex(datum unitDatumIndex)
 {
 	this->unitDatumIndex = unitDatumIndex;
 }
@@ -418,7 +423,7 @@ int ZombieHandler::getPlayerIndex()
 	return this->playerIndex;
 }
 
-DatumIndex ZombieHandler::getUnitDatumIndex()
+datum ZombieHandler::getUnitDatumIndex()
 {
 	return this->unitDatumIndex;
 }

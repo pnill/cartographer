@@ -33,8 +33,6 @@ typedef LONG NTSTATUS, *PNTSTATUS;
 
 typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
 
-wchar_t ServerLobbyName[32] = { L"Cartographer" };
-
 void UpdateConnectionStatus() {
 	extern int MasterState;
 	extern char* ServerStatus;
@@ -54,12 +52,6 @@ void UpdateConnectionStatus() {
 		MasterState = 2;
 		if (!h2mod->Server)
 			snprintf(ServerStatus, 250, "Status: Offline");
-	}
-}
-
-void SetUserUsername(char* username) {
-	if (!h2mod->Server) {
-		swprintf(ServerLobbyName, 16, L"%hs", username);
 	}
 }
 
@@ -92,7 +84,6 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	memcpy(&pxna.abEnet, abEnet2, 6);
 	memcpy(&pxna.abOnline, abOnline2, 20);
 
-	SetUserUsername(username);
 	XUserSetup(0, xuid, username, onlineSignIn);
 	ipManager.SetupLocalConnectionInfo(&pxna);
 
@@ -102,7 +93,7 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 		free(H2CurrentAccountLoginToken);
 	}
 	if (result == 1) {
-		H2CurrentAccountLoginToken = (char*)malloc(sizeof(char) * 33);
+		H2CurrentAccountLoginToken = (char*)calloc(33, sizeof(char));
 		snprintf(H2CurrentAccountLoginToken, 33, login_token);
 	}
 	else {
