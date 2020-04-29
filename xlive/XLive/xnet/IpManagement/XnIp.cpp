@@ -16,17 +16,7 @@ NOTE:
 	Check inside Tweaks.cpp for removeXNetSecurity
 */
 
-bool sockAddrInEqual(XSocket* xsocket, sockaddr_in* a1, sockaddr_in* a2)
-{
-	return (a1->sin_addr.s_addr == a2->sin_addr.s_addr && a1->sin_port == a2->sin_port);
-}
-
-bool sockAddrInIsNull(sockaddr_in* a1)
-{
-	return a1->sin_addr.s_addr == 0 || a1->sin_port == 0;
-}
-
-void CXnIp::GetStartupParamsAndUpdate(const XNetStartupParams* netStartupParams)
+void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 {
 	memcpy(&startupParams, netStartupParams, sizeof(XNetStartupParams));
 
@@ -60,44 +50,56 @@ void CXnIp::setTimeConnectionInteractionHappened(IN_ADDR ina, int time)
 
 int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount)
 {
-	XBroadcastPakHeader* broadcastPck = reinterpret_cast<XBroadcastPakHeader*>(lpBuffers->buf);
-	XNetConnectionReqPacket* connectionPck = reinterpret_cast<XNetConnectionReqPacket*>(lpBuffers->buf);
-
-	if (*bytesRecvdCount >= sizeof(XBroadcastPakHeader)
-		&& broadcastPck->broadcast_identifier == 'BrOd'
-		&& broadcastPck->name.sin_addr.s_addr == INADDR_BROADCAST)
+	XNetPacketHeader* XNetPck = reinterpret_cast<XNetPacketHeader*>(lpBuffers->buf);
+	switch (XNetPck->intHdr)
 	{
-		if (*bytesRecvdCount > sizeof(XBroadcastPakHeader))
+	case 'BrOd':
+	{
+		XBroadcastPacket* broadcastPck = reinterpret_cast<XBroadcastPacket*>(lpBuffers->buf);
+		if (*bytesRecvdCount >= sizeof(XBroadcastPacket)
+			&& strncmp(broadcastPck->pckHeader.HdrStr, broadcastStrHdr, MAX_HDR_STR) == 0
+			&& broadcastPck->data.name.sin_addr.s_addr == INADDR_BROADCAST)
 		{
-			*bytesRecvdCount = *bytesRecvdCount - sizeof(XBroadcastPakHeader);
-			char* buffer = new char[*bytesRecvdCount];
-			memcpy(buffer, lpBuffers->buf + sizeof(XBroadcastPakHeader), *bytesRecvdCount);
-			memcpy(lpBuffers->buf, buffer, *bytesRecvdCount);
-			delete[] buffer;
-			return ERROR_SUCCESS;
+			if (*bytesRecvdCount > sizeof(XBroadcastPacket))
+			{
+				*bytesRecvdCount = *bytesRecvdCount - sizeof(XBroadcastPacket);
+				char* buffer = new char[*bytesRecvdCount];
+				memcpy(buffer, lpBuffers->buf + sizeof(XBroadcastPacket), *bytesRecvdCount);
+				memcpy(lpBuffers->buf, buffer, *bytesRecvdCount);
+				delete[] buffer;
+				return ERROR_SUCCESS;
+			}
+			WSASetLastError(WSAEWOULDBLOCK);
+			return SOCKET_ERROR;
 		}
-		WSASetLastError(WSAEWOULDBLOCK);
-		return SOCKET_ERROR;
 	}
-	else if (*bytesRecvdCount == sizeof(XNetConnectionReqPacket)
-		&& connectionPck->ConnectPacketIdentifier == connectPacketIdentifier)
+
+	case 'XNeT':
 	{
-		// TODO: add more XNet request types (like disconnect, network pulse etc...)
-		/*switch (xnetpacket->reqType) 
+		XNetRequestPacket* XNetPck = reinterpret_cast<XNetRequestPacket*>(lpBuffers->buf);
+		if (*bytesRecvdCount == sizeof(XNetRequestPacket)
+			&& strncmp(XNetPck->pckHeader.HdrStr, requestStrHdr, MAX_HDR_STR) == 0)
 		{
+			switch (XNetPck->data.reqType)
+			{
+			case XnIp_ConnectionEstablishSecure:
+				LOG_TRACE_NETWORK("handleRecvdPacket() - Received secure packet with ip address {:x}, port: {}", htonl(lpFrom->sin_addr.s_addr), htons(lpFrom->sin_port));
+				HandleConnectionPacket(xsocket, XNetPck, lpFrom); // save NAT info and send back a connection packet
+				break;
 
+			case XnIp_ConnectionClose:
+			case XnIp_ConnectionPong:
+			case XnIp_ConnectionPing:
+			default:
+				break;
+			}
 
-		default:
-			break;
-		}*/
-
-		LOG_TRACE_NETWORK("handleRecvdPacket() - Received secure packet with ip address {:x}, port: {}", htonl(lpFrom->sin_addr.s_addr), htons(lpFrom->sin_port));
-		HandleConnectionPacket(xsocket, connectionPck, lpFrom); // save NAT info and send back a connection packet
-
-		WSASetLastError(WSAEWOULDBLOCK);
-		return SOCKET_ERROR;
+			WSASetLastError(WSAEWOULDBLOCK);
+			return SOCKET_ERROR;
+		}
 	}
-	else
+
+	default:
 	{
 		IN_ADDR ipIdentifier = GetConnectionIdentifierByRecvAddr(xsocket, lpFrom);
 		lpFrom->sin_addr = ipIdentifier;
@@ -113,7 +115,9 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 
 		return ERROR_SUCCESS;
 	}
-}
+	
+	} // switch (XNetPck->intHdr)
+} 
 
 void CXnIp::checkForLostConnections()
 {
@@ -140,16 +144,16 @@ int CXnIp::sendConnectionRequest(XSocket* xsocket, IN_ADDR connectionIdentifier 
 		sendToAddr.sin_family = AF_INET;
 		sendToAddr.sin_addr = connectionIdentifier;
 
-		XNetConnectionReqPacket connectionPacket;
-		SecureZeroMemory(&connectionPacket, sizeof(XNetConnectionReqPacket));
+		XNetRequestPacket connectionPacket;
+		SecureZeroMemory(&connectionPacket.data, sizeof(XNetRequestPacket::XNetReq));
 
-		XNetGetTitleXnAddr(&connectionPacket.xnaddr);
-		getRegisteredKeys(&connectionPacket.xnkid, nullptr);
-		connectionPacket.ConnectPacketIdentifier = /* reqType */ connectPacketIdentifier;
+		XNetGetTitleXnAddr(&connectionPacket.data.xnaddr);
+		getRegisteredKeys(&connectionPacket.data.xnkid, nullptr);
+		connectionPacket.data.reqType = XnIp_ConnectionEstablishSecure;
 
 		xnIp->connectionPacketsSentCount++;
 
-		int ret = XSocketSendTo((SOCKET)xsocket, (char*)&connectionPacket, sizeof(XNetConnectionReqPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
+		int ret = XSocketSendTo((SOCKET)xsocket, (char*)&connectionPacket, sizeof(XNetRequestPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
 		LOG_INFO_NETWORK("sendConnectionRequest() secure packet sent socket handle: {}, connection index: {}, connection identifier: {:x}", xsocket->winSockHandle, getConnectionIndex(connectionIdentifier), sendToAddr.sin_addr.s_addr);
 		return ret;
 	}
@@ -179,12 +183,12 @@ IN_ADDR CXnIp::GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* 
 			switch (xsocket->getNetworkSocketPort())
 			{
 			case 1000:
-				if (sockAddrInEqual(xsocket, fromAddr, &xnIp->NatAddrSocket1000))
+				if (xsocket->sockAddrInEqual(fromAddr, &xnIp->NatAddrSocket1000))
 					return xnIp->connectionIdentifier;
 				break;
 
 			case 1001:
-				if (sockAddrInEqual(xsocket, fromAddr, &xnIp->NatAddrSocket1001))
+				if (xsocket->sockAddrInEqual(fromAddr, &xnIp->NatAddrSocket1001))
 					return xnIp->connectionIdentifier;
 				break;
 
@@ -238,12 +242,12 @@ void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier
 	}
 }
 
-void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetConnectionReqPacket* connectReqPacket, sockaddr_in* recvAddr)
+void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectReqPacket, sockaddr_in* recvAddr)
 {
 	IN_ADDR connectionIdentifier;
 	connectionIdentifier.s_addr = 0;
 
-	int ret = CreateXnIpIdentifier(&connectReqPacket->xnaddr, &connectReqPacket->xnkid, &connectionIdentifier, true);
+	int ret = CreateXnIpIdentifier(&connectReqPacket->data.xnaddr, &connectReqPacket->data.xnkid, &connectionIdentifier, true);
 	if (ret == ERROR_SUCCESS)
 	{
 		// TODO: get rid of H2v only sockets
@@ -258,8 +262,8 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetConnectionReqPacket* co
 			setTimeConnectionInteractionHappened(xnIp->connectionIdentifier, timeGetTime());
 
 			// TODO: handle dynamically
-			if (!sockAddrInIsNull(&xnIp->NatAddrSocket1000) 
-				&& !sockAddrInIsNull(&xnIp->NatAddrSocket1001))
+			if (!xsocket->sockAddrInIsNull(&xnIp->NatAddrSocket1000) 
+				&& !xsocket->sockAddrInIsNull(&xnIp->NatAddrSocket1001))
 				xnIp->xnetstatus = XNET_CONNECT_STATUS_CONNECTED; // if we have the NAT data for each port, set the status to CONNECTED
 			else
 				xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING;
@@ -432,7 +436,7 @@ BOOL CXnIp::GetLocalXNAddr(XNADDR* pxna)
 // #51: XNetStartup
 int WINAPI XNetStartup(const XNetStartupParams *pxnsp)
 {
-	ipManager.GetStartupParamsAndUpdate(pxnsp);
+	ipManager.Initialize(pxnsp);
 	return 0;
 }
 
@@ -441,10 +445,9 @@ INT WINAPI XNetRandom(BYTE * pb, UINT cb)
 {
 	static bool Rc4CryptInitialized = false;
 
-	LARGE_INTEGER key;
-
 	if (Rc4CryptInitialized == false)
 	{
+		LARGE_INTEGER key;
 		QueryPerformanceCounter(&key);
 		XeCryptRc4Key(&Rc4StateRand, (BYTE*)&key, sizeof(key));
 		Rc4CryptInitialized = true;
@@ -533,7 +536,8 @@ int WINAPI XNetConnect(const IN_ADDR ina)
 			{
 				// TODO: handle dinamically, so it can be used by other games too
 				if (sockIt->isUDP() // connect only UDP sockets
-					&& (sockIt->getNetworkSocketPort() == 1000 || sockIt->getNetworkSocketPort() == 1001))
+					&& (sockIt->getNetworkSocketPort() == 1000 // h2v sockets only atm
+						|| sockIt->getNetworkSocketPort() == 1001)) 
 				{
 					ipManager.sendConnectionRequest(sockIt, ina);
 					xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING;

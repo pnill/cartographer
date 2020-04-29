@@ -292,19 +292,18 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		//inTo->sin_addr.s_addr = H2Config_master_ip;
 		//inTo->sin_port = ntohs(H2Config_master_port_relay);
 
-		XBroadcastPakHeader* packet = (XBroadcastPakHeader*)new char[sizeof(XBroadcastPakHeader) + lpBuffers->len];
-		ZeroMemory(packet, sizeof(XBroadcastPakHeader) + lpBuffers->len);
+		XBroadcastPacket* packet = (XBroadcastPacket*)new char[sizeof(XBroadcastPacket) + lpBuffers->len];
+		ZeroMemory(&packet->data, sizeof(XBroadcastPacket::XBroadcast));
 
-		packet->broadcast_identifier = 'BrOd';
-		packet->name.sin_addr.s_addr = INADDR_BROADCAST;
-		memcpy((char*)packet + sizeof(XBroadcastPakHeader), lpBuffers->buf, lpBuffers->len);
+		packet->data.name.sin_addr.s_addr = INADDR_BROADCAST;
+		memcpy((char*)&packet->data + sizeof(XBroadcastPacket), lpBuffers->buf, lpBuffers->len);
 
 		int portOffset = H2Config_base_port % 1000;
 
 		for (int i = 2000; i <= 5000; i += 1000)
 		{
 			inTo->sin_port = ntohs(i + portOffset + 1);
-			int result = sendto(xsocket->winSockHandle, (const char*)packet, sizeof(XBroadcastPakHeader) + lpBuffers->len, dwFlags, (sockaddr*)inTo, iTolen);
+			int result = sendto(xsocket->winSockHandle, (const char*)packet, sizeof(XBroadcastPacket) + lpBuffers->len, dwFlags, (sockaddr*)inTo, iTolen);
 			if (result == SOCKET_ERROR) {
 				delete[] packet;
 				return SOCKET_ERROR;
@@ -340,7 +339,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		{
 		case 1000:
 			sendToAddr.sin_port = xnIp->xnaddr.wPortOnline;
-			if (!sockAddrInIsNull(&xnIp->NatAddrSocket1000))
+			if (!xsocket->sockAddrInIsNull(&xnIp->NatAddrSocket1000))
 			{
 				sendToAddr = xnIp->NatAddrSocket1000;
 				//LOG_TRACE_NETWORK("XSocketSendTo() port 1000 nPort: {} secure: %08X", htons(nPort), iplong);
@@ -350,7 +349,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 
 		case 1001:
 			sendToAddr.sin_port = ntohs(htons(xnIp->xnaddr.wPortOnline) + 1);
-			if (!sockAddrInIsNull(&xnIp->NatAddrSocket1001))
+			if (!xsocket->sockAddrInIsNull(&xnIp->NatAddrSocket1001))
 			{
 				sendToAddr = xnIp->NatAddrSocket1001;
 				//LOG_TRACE_NETWORK("XSocketSendTo() port 1001 nPort: %i secure: %08X", htons(nPort), iplong);
@@ -423,7 +422,6 @@ INT WINAPI XSocketWSAGetLastError()
 
 		print++;
 	}
-
 
 	return ret;
 }
