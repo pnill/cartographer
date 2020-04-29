@@ -33,12 +33,10 @@ extern bool displayXyz;
 
 extern std::map<DWORD, bool> achievementList;
 
-extern bool microphoneEnabled;
-extern std::unordered_map<XUID, BOOL> xuidIsTalkingMap;
-
 //some utility functions below
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
 std::vector<std::string> split(const std::string &s, char delim);
-int stripWhitespace(wchar_t *inputStr);
 
 extern int H2GetInstanceId();
+
+int stripWhitespace(wchar_t *inputStr);

@@ -325,7 +325,6 @@ bool engine_basic_init()
 	SecureZeroMemory(flags_array, startup_flags::count * sizeof(DWORD)); // should be zero initalized anyways but the game does it
 
 	H2Config_voice_chat = false;
-	flags_array[startup_flags::disable_voice_chat] = 1; // disables voice chat (XHV engine)
 	flags_array[startup_flags::nointro] = H2Config_skip_intro;
 
 	HANDLE(*fn_c000285fd)() = (HANDLE(*)())h2mod->GetAddress<void*>(0x000285fd);

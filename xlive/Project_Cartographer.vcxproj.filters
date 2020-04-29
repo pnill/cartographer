@@ -453,15 +453,6 @@
     <ClCompile Include="XLive\Voice\XHVEngine.cpp">
       <Filter>Source Files\XLive\voice</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\Voice\Encoder.cpp">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClCompile>
-    <ClCompile Include="XLive\Voice\AudioDevices.cpp">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClCompile>
-    <ClCompile Include="XLive\Voice\AudioHandler.cpp">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp">
       <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
     </ClCompile>
@@ -780,15 +771,6 @@
       <Filter>Source Files\H2MOD\Modules\HitFix</Filter>
     </ClInclude>
     <ClInclude Include="XLive\Voice\XHVEngine.h">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Voice\Encoder.h">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Voice\AudioDevices.h">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Voice\AudioHandler.h">
       <Filter>Source Files\XLive\voice</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h">

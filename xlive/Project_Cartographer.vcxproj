@@ -128,7 +128,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>portaudio.lib;opus.lib;iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;d3d9.lib;d3dx9.lib;3rdparty/discord/discord-rpc.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;d3d9.lib;d3dx9.lib;3rdparty/discord/discord-rpc.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -191,7 +191,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;.\3rdparty\discord\discord-rpc-debug.lib;.\3rdparty\opus\opus-debug.lib;.\3rdparty\portaudio\portaudio_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;.\3rdparty\discord\discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -247,7 +247,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>opus_debug.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;discord/discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;discord/discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -289,14 +289,12 @@
     </ClCompile>
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
-    <ClCompile Include="XLive\Voice\AudioDevices.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="XLive\Voice\Encoder.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="H2MOD\Discord\DiscordInterface.cpp" />
@@ -335,7 +333,6 @@
     <ClCompile Include="H2MOD\Variants\VariantMPGameEngine.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantPlayer.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
-    <ClCompile Include="XLive\Voice\AudioHandler.cpp" />
     <ClCompile Include="Util\Base64.cpp" />
     <ClCompile Include="Util\ClipboardAPI.cpp" />
     <ClCompile Include="Util\Debug\Debug.cpp" />
@@ -497,7 +494,6 @@
     <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
-    <ClInclude Include="XLive\Voice\AudioDevices.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Cache\DataTypes.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h" />
@@ -523,7 +519,6 @@
     <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h" />
     <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h" />
     <ClInclude Include="Blam\Maths\Maths.h" />
-    <ClInclude Include="XLive\Voice\Encoder.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="H2MOD\Discord\DiscordInterface.h" />
@@ -562,7 +557,6 @@
     <ClInclude Include="H2MOD\Variants\VariantMPGameEngine.h" />
     <ClInclude Include="H2MOD\Variants\VariantPlayer.h" />
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
-    <ClInclude Include="XLive\Voice\AudioHandler.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Util\Base64.h" />
     <ClInclude Include="Util\ClipboardAPI.h" />
