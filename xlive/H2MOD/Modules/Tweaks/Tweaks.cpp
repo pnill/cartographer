@@ -884,6 +884,30 @@ int system_get_time()
 	return (unsigned int)(PerformanceCount.QuadPart / (PerformanceFrequency.QuadPart / 1000));
 }
 
+static LARGE_INTEGER network_time_replacement;
+LARGE_INTEGER network_time_function_replacement()
+{
+	// Hopefully this fixes LIVE netcode
+	// Basically the timer that the game uses is 8 bytes long (like a large integer)
+	// but for whatever reason it uses only the low part of the variable
+	// when you minimize the game, it will start using the high part of the variable too
+	// which breaks the packet size calculation sometimes
+	// because the packet size is calculated like this:
+	// packet_size = (time_delta * network_observer_bits_per_second) / 1000 / 8 (convert to bytes by dividing by 8)
+	return network_time_replacement;
+}
+
+int network_time_update()
+{
+	LARGE_INTEGER perfCounter;
+	LARGE_INTEGER perfFrequency;
+	QueryPerformanceCounter(&perfCounter);
+	QueryPerformanceFrequency(&perfFrequency);
+	network_time_replacement.QuadPart = perfCounter.QuadPart / (perfFrequency.QuadPart / 1000);
+
+	return system_get_time();
+}
+
 void InitH2Tweaks() {
 	postConfig();
 
@@ -947,6 +971,9 @@ void InitH2Tweaks() {
 
 		// patch to show game details menu in NETWORK serverlist too
 		//NopFill(h2mod->GetAddress(0x219D6D), 2);
+
+		PatchCall(h2mod->GetAddress(0x28817), network_time_update);
+		WriteJmpTo(h2mod->GetAddress(0x1B3C5C), (void*)network_time_function_replacement);
 
 		WriteJmpTo(h2mod->GetAddress(0x7E43), WinMain);
 		WriteJmpTo(h2mod->GetAddress(0x39EA2), is_remote_desktop);
