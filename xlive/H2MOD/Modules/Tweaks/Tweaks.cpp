@@ -11,6 +11,7 @@
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "Blam\Cache\TagGroups\shader_definition.h"
+#include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
 #include "..\CustomResolutions\CustomResolutions.h"
 #include "..\H2MOD\Tags\TagInterface.h"
 
@@ -840,7 +841,7 @@ void fix_shader_template_nvidia(const std::string &template_name, const std::str
 	tags::ilterator shaders(blam_tag::tag_group_type::shader);
 	while (!shaders.next().IsNull())
 	{
-		auto *shader = LOG_CHECK(tags::get_tag<blam_tag::tag_group_type::shader, shader_definition>(shaders.m_datum)); sizeof(shader_definition);
+		auto *shader = LOG_CHECK(tags::get_tag<blam_tag::tag_group_type::shader, shader_definition>(shaders.m_datum));
 		if (shader && shader->shader_template.TagIndex == borked_template && LOG_CHECK(shader->postprocessDefinition.size > 0))
 		{
 			LOG_DEBUG_FUNC("shader {} has borked template", tags::get_tag_name(shaders.m_datum));
@@ -979,6 +980,7 @@ void InitH2Tweaks() {
 		WriteJmpTo(h2mod->GetAddress(0x39EA2), is_remote_desktop);
 
 		tags::on_map_load(fix_shaders_nvidia);
+		tags::on_map_load(c_xbox_live_task_progress_menu::ApplyPatches);
 	}
 
 	// Both server and client
