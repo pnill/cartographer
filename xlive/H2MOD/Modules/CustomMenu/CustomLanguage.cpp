@@ -430,6 +430,10 @@ tH2GetLabel pH2GetLabel;
 char* __stdcall H2GetLabel(int a1, int label_id, int a3, int a4) { //sub_3defd
 	//int label_menu_id = *(int*)(*(int*)a1 + 8 * a3 + 4);
 	int label_menu_id = a3;
+	if (label_id == 0x600010F)
+	{
+		printf("Ok");
+	}
 	char* label = get_cartographer_label(label_menu_id, label_id, 0b10);
 	if (label)
 		return label;
@@ -640,6 +644,7 @@ static void overrideCoreH2Labels() {
 		add_custom_label(lang, 0x000003fd, 0x09000284, "ONLINE");
 		add_custom_label(lang, 0x000003fd, 0x05000986, "CARTOGRAPHER");
 		add_custom_label(lang, 0x00000718, 0x0E0005D9, "Extra Game Settings...");
+		add_custom_label(lang, 0x000005c2, 0x0E0006D9, "Yoshi's gay");
 	}
 } 
 

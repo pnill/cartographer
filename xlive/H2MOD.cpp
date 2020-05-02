@@ -1,5 +1,4 @@
 #include "H2MOD.h"
-
 #include "Blam/Engine/FileSystem/FiloInterface.h"
 #include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Modules/Config/Config.h"
@@ -17,6 +16,9 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 
+#include <sqrat/include/sqrat.h>
+#include "H2MOD/Modules/Scripting/Squirrel.h"
+
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
 Halo2Final* h2f = new Halo2Final();
@@ -25,6 +27,7 @@ Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
 HeadHunter* headHunterHandler = new HeadHunter();
 VariantPlayer* variant_player = new VariantPlayer();
+
 
 extern int H2GetInstanceId();
 std::unordered_map<int, int> object_to_variant;
@@ -37,7 +40,7 @@ bool b_Infection = false;
 bool b_Halo2Final = false;
 bool b_HeadHunter = false;
 
-std::unordered_map<wchar_t*, bool&> GametypesMap
+std::map<wchar_t*, bool&> GametypesMap
 {
 	{ L"h2x", b_H2X },
 	{ L"ogh2", b_XboxTick },
@@ -794,17 +797,23 @@ void get_object_table_memory()
 	game_state_objects_header = *h2mod->GetAddress<s_datum_array**>(0x4E461C, 0x50C8EC);
 }
 
+
 typedef bool(__cdecl *map_cache_load)(game_engine_settings* map_load_settings);
 map_cache_load p_map_cache_load;
 
 bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 {
+
 	bool result = p_map_cache_load(engine_settings);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
 
+
+
 	tags::run_callbacks();
 	
+
+
 	h2mod->SetMapType(engine_settings->map_type);
 
 	get_object_table_memory();
@@ -812,6 +821,11 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	H2Tweaks::setFOV(H2Config_field_of_view);
 	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
+
+	Sqrat::Function sqOnMapLoad = Sqrat::RootTable().GetFunction("OnMapLoad");
+
+	if (!sqOnMapLoad.IsNull())
+		sqOnMapLoad.Execute();
 
 	
 	if (h2mod->GetMapType() == scnr_type::MainMenu)
@@ -928,6 +942,12 @@ player_spawn p_player_spawn;
 
 bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 {
+
+	Sqrat::Function sqPreSpawn = Sqrat::RootTable().GetFunction("OnPrePlayerSpawn");
+
+	if (!sqPreSpawn.IsNull())
+		sqPreSpawn.Execute();
+
 	//I cant find somewhere to put this where it actually works (only needs to be done once on map load). It's only a few instructions so it shouldn't take long to execute.
 	H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
 
@@ -944,6 +964,11 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	}
 
 	bool ret = p_player_spawn(playerDatumIndex);
+
+	Sqrat::Function sqPostSpawn = Sqrat::RootTable().GetFunction("OnPostPlayerSpawn");
+	if (!sqPostSpawn.IsNull())
+		sqPostSpawn.Execute();
+	
 
 	if (b_Infection) {
 		infectionHandler->spawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
@@ -998,6 +1023,17 @@ change_team p_change_local_team;
 
 void __cdecl changeTeam(int localPlayerIndex, int teamIndex) 
 {
+
+	Sqrat::Function sqOnMapLoad = Sqrat::RootTable().GetFunction("OnChangeTeam");
+
+	if (!sqOnMapLoad.IsNull())
+		if (*sqOnMapLoad.Evaluate<bool>().Get() == false)
+		{
+			return;
+		}
+	
+	
+
 	network_session* session = NetworkSession::getCurrentNetworkSession();
 	if ((session->parameters.field_8 == 4 && get_game_life_cycle() == life_cycle_pre_game)
 		|| (StrStrIW(h2mod->get_session_game_variant_name(), L"rvb") != NULL && teamIndex != 0 && teamIndex != 1)) {
@@ -1236,9 +1272,268 @@ int __cdecl device_touch(datum device_datum, datum unit_datum)
 }
 
 
+#pragma pack(push, 1)
+struct perma_struct
+{
+	void *__vftable;
+	int field_4;
+	BYTE gap_8[4];
+	DWORD field_C;
+	BYTE gap_10[96];
+	s_datum_array *field_70;
+	BYTE gap_74[56];
+	int field_AC;
+	char field_B0;
+	BYTE gap_B1[923];
+	char field_44C;
+	char field_44D;
+	char field_44E;
+	char field_44F;
+	char field_450;
+	BYTE gap_451[3];
+	void *__vftable_454;
+	DWORD field_458;
+	BYTE gap_45C[8];
+	char *field_464;
+	void(__thiscall *field_468)(void **pthis, int a2, int *a3);
+};
+#pragma pop(push)
+
+typedef char(__stdcall* tc_game_engine_category_list_create_labels)(void* pThis, int a2, int a3);
+tc_game_engine_category_list_create_labels pc_game_engine_category_list_create_labels;
+
+char __stdcall c_game_engine_category_list_create_labels(void* pThis, int a2, int a3)
+{
+	char(__thiscall* c_list_create_labels)(void*, int, int, int, int*, int) = (char(__thiscall*)(void*, int, int, int, int*, int))h2mod->GetAddress(0x002139f8);
+
+	int label_list[16];
+	label_list[0] = 0;
+	label_list[1] = 0x600010F;
+	label_list[2] = 1;
+	label_list[3] = 0x4000238;
+	label_list[4] = 2;
+	label_list[5] = 0x7000110;
+	label_list[6] = 3;
+	label_list[7] = 0xA000113;
+	label_list[8] = 4;
+	label_list[9] = 0x3000437;
+	label_list[10] = 5;
+	label_list[11] = 0x700010E;
+	label_list[12] = 6;
+	label_list[13] = 0xB000115;
+	label_list[14] = 7;
+	label_list[15] = 0x0E0006D9;
+
+	return c_list_create_labels(pThis, a2, a3, 0, label_list, 8);
+	//return pc_game_engine_category_list_create_labels(pThis, a2, a3);
+	return 1;
+
+}
+
+typedef void (__stdcall* tConVariantCategoryList)(perma_struct *pThis, int a2);
+tConVariantCategoryList pConVariantCategoryList;
+
+void __stdcall ConVariantCategoryList(perma_struct* pThis, int a2)
+{
+
+	typedef WORD(__cdecl* tget_free_datum)(void* a1);
+	auto get_free_datum = h2mod->GetAddress<tget_free_datum>(0x667A0);
+
+	WriteValue<BYTE>(h2mod->GetAddress(0x249D9D), 0x08);
+	WriteValue<BYTE>(h2mod->GetAddress(0x249DFF), 0x08);
+	
+	pConVariantCategoryList(pThis, a2);
+	
+	*&pThis->field_70->datum[4 * (WORD)get_free_datum(pThis->field_70) + 2] = 7;
+
+}
+
+#pragma region SCRIPT_LOAD_FUNCTION
+/*
+	This is where we'll check for the existence of scripts and create variants in relation to them.
+*/
+struct variant_memory {
+	wchar_t path[0x104];
+	wchar_t name[0x12];
+	BYTE index;
+	char pad[0x07];
+};
+
+std::map<std::wstring, BYTE> variant_paths
+{
+	{ L"Slayer", 1},
+	{ L"KOTH", 2},
+	{ L"Oddball", 4},
+	{ L"Juggernaut", 5},
+	{ L"Territories", 6},
+	{ L"CTF", 7}
+};
+
+std::map<std::wstring, BYTE> variant_engine
+{
+	{L"ctf",1},
+	{L"slayer", 2},
+	{L"oddball",3},
+	{L"juggernaut",7},
+	{L"territories",8},
+	{L"assault",9}
+};
+
+
+void InjectVariant(std::wstring variant_name, BYTE index)
+{
+	BYTE* variant_address = ((*(BYTE**)(h2mod->GetAddress<BYTE*>(0x482300))) + 0x71EC0);
+	int variant_count = *(int*)variant_address;
+
+	FILE *f = std::fopen("Scripts\\binary\\variant_dump.bin", "r+");
+	fread(variant_address + 4 + (0x234 * variant_count), 0x234, 1, f);
+	fclose(f);
+	*(int*)variant_address = variant_count + 1;
+
+	variant_memory *variant = (variant_memory*)((BYTE*)variant_address + 4 + (0x234 * variant_count));
+	variant_name = variant_name.substr(0, variant_name.length() - 4);
+
+	wchar_t *var_name_mod = new wchar_t[variant_name.length()+3];
+	wmemset(var_name_mod, 0x00, variant_name.length() + 3);
+	wsprintf(var_name_mod, L"%ws ",variant_name.c_str());
+	wmemset((var_name_mod + variant_name.length()+1), 0xE007, 1);
+
+	wsprintf(variant->name, var_name_mod);
+	wsprintf(variant->path, L"C:\\SCRIPT_LOAD\\%ws\\", variant_name.c_str());
+	variant->index = index;
+}
+
+void SearchForVariants(std::wstring path)
+{
+	WIN32_FIND_DATA data;
+	HANDLE hFind; 
+
+	std::wstring variant_type = path.substr(17, path.length());
+
+	path.append(L"\\*.nut");
+	if ((hFind = FindFirstFile(path.c_str(), &data)) != INVALID_HANDLE_VALUE)
+	{
+		do {
+			InjectVariant(data.cFileName, variant_paths[variant_type]);
+		} while (FindNextFile(hFind, &data) != 0);
+		FindClose(hFind);
+	}
+	path.clear();
+}
+
+
+
+void LoadSquirrelVariants()
+{
+	for (auto it = begin(variant_paths); it != end(variant_paths); it++)
+	{
+		std::wstring path(L"Scripts\\Variants\\");
+		path.append(it->first);
+		SearchForVariants(path);
+	}
+}
+#pragma endregion
+
+#pragma region SAVE_GAME_LOAD
+/*
+	Responsible for opening variant and save data and loading it into memory.
+	We're placing a hook here to add custom variants based on scripts using generic data.
+
+	-NOTE: Calling convention was LTGR custom, ESI also gets loaded.
+*/
+char __cdecl SaveGameOpenFile_Hook(void* pfileIO,void* OutBuffer,void *size)
+{
+	typedef char (__cdecl *tSaveGameOpenFile)(void* pfileIO,void *OutBuffer,void *size);
+	auto pSaveGameOpenFile = h2mod->GetAddress<tSaveGameOpenFile>(0x9AF07);
+	
+	char* file_path = ((char*)pfileIO + 0x8);
+
+	if (strstr(file_path, "SCRIPT_LOAD"))
+	{
+		__asm {
+			mov byte ptr[esi+2],1 // Some kind of boolean for if the file was loaded or not, without this set it won't show up.
+			mov [esi+4],0
+		}
+
+		FILE* f = std::fopen("Scripts\\binary\\slayer.bin", "r+");
+		fread(OutBuffer, 304, 1, f);
+		fclose(f);
+
+
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> string_to_wstring;
+		std::wstring widepath = string_to_wstring.from_bytes(std::string(file_path));
+		std::wstring engine_name = widepath.substr(widepath.find_last_of(L"\\", widepath.length())+1);
+		std::wstring variant_name = widepath.substr(15, widepath.length()-15-engine_name.length()-1);
+
+		wchar_t *var_name_mod = new wchar_t[variant_name.length() + 3];
+		wmemset(var_name_mod, 0x00, variant_name.length() + 3);
+		wsprintf(var_name_mod, L"%ws  ", variant_name.c_str());
+		//wmemset((var_name_mod + variant_name.length() + 1), 0xE007, 1);
+
+	/*	wchar_t *var_name = new wchar_t[variant_name.length()+2];
+		wmemset(var_name, 0x00, variant_name.length()+2);
+		wsprintf(var_name, variant_name.c_str());
+		wmemset((var_name + variant_name.length()-1), 0xE001, 1);*/
+
+		wsprintf((wchar_t*)((BYTE*)OutBuffer + 4), var_name_mod);
+		*(BYTE*)((BYTE*)OutBuffer + 0x44) = variant_engine[engine_name];
+
+		return 1;
+
+	}
+
+
+	char ret = pSaveGameOpenFile(pfileIO, OutBuffer, size);
+
+	return ret;
+}
+#pragma endregion
+
+#pragma region SAVE_GAME_READ_TO_MEMORY
+/* 
+	Reads data from memory from one location to another related to save game information.
+	Save Game information includes profiles and custom variants.
+
+	- We're hooking here so we can load scripts as variants after the initial custom variants have been loaded.
+*/
+
+typedef char (__cdecl*tReadVariantToMemory)(DWORD a1);
+tReadVariantToMemory pReadVariantToMemory;
+
+char __cdecl ReadVariantToMemory(DWORD a1)
+{
+	char ret = pReadVariantToMemory(a1);
+	LoadSquirrelVariants();
+	return ret;
+}
+#pragma endregion
+
 void H2MOD::team_player_indicator_visibility(bool toggle)
 {
 	this->drawTeamIndicators = toggle;
+}
+
+
+/*
+	Seems to be a function responsible for loading data about maps when displaying them.
+	This is hooked to fix/re-add removed custom map images.
+*/
+DWORD ret_addr;
+
+void __declspec(naked) load_map_data_for_display() {
+	__asm {
+		pop ret_addr
+		mov eax,[esp+0x0C] // grab map_data pointer from stack
+		mov ecx,[eax+0x964] // mov bitmap pointer into ecx
+		mov [ebx],ecx // mov bitmap pointer into map_data on stack
+		push 0
+		push 0x9712C8 // original data to be loaded back to eax, (replaces the original function call)
+		mov ecx,h2mod
+		call H2MOD::GetAddress // get data original function got, and return
+		push ret_addr // push return address to stack
+		ret // return to original load_map_data_for display function
+	
+	}
 }
 
 void __cdecl game_mode_engine_draw_team_indicators()
@@ -1300,6 +1595,7 @@ void H2MOD::ApplyHooks() {
 	pplayer_death = (player_death)DetourFunc(h2mod->GetAddress<BYTE*>(0x17B674, 0x152ED4), (BYTE*)OnPlayerDeath, 9);
 
 	pupdate_player_score = (update_player_score)DetourClassFunc(h2mod->GetAddress<BYTE*>(0xD03ED, 0x8C84C), (BYTE*)OnPlayerScore, 12);
+
 
 	//on_custom_map_change_method = (on_custom_map_change)DetourFunc(h2mod->GetAddress<BYTE*>(0x32176, 0x25738), (BYTE*)onCustomMapChange, 5);
 
@@ -1366,8 +1662,16 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
 		PatchCall(h2mod->GetAddress(0x226702), game_mode_engine_draw_team_indicators);
+		PatchCall(GetAddress(0x9B126), SaveGameOpenFile_Hook);
+		pReadVariantToMemory = (tReadVariantToMemory)DetourFunc(h2mod->GetAddress<BYTE*>(0x46596), (BYTE*)ReadVariantToMemory, 13);
 
-		//Initialise_tag_loader();
+		pConVariantCategoryList = (tConVariantCategoryList)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x249D5E), (BYTE*)ConVariantCategoryList, 13);
+		pc_game_engine_category_list_create_labels = (tc_game_engine_category_list_create_labels)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x2497D8), (BYTE*)c_game_engine_category_list_create_labels, 9);
+
+		//Hooked to fix custom map images.
+		Codecave(GetAddress(0x593F0), load_map_data_for_display,0);
+
+		Initialise_tag_loader();
 	}
 	else {
 
@@ -1380,6 +1684,9 @@ VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DW
 {
 	update_player_count();
 }
+
+
+
 
 void H2MOD::Initialize()
 {
@@ -1399,6 +1706,18 @@ void H2MOD::Initialize()
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
 
+	BindSquirrel(sq_open(1000));
+
+	try {
+		using namespace Sqrat;
+		Script script1;
+		script1.CompileFile("Scripts/Globals.nut");
+		script1.Run();		
+	}
+	catch (Sqrat::Exception e)
+	{
+		MessageBox(NULL, L"Loading or compiling script failed!", L"Squirrel Scripting", MB_OK);
+	}
 	h2mod->ApplyHooks();
 }
 
