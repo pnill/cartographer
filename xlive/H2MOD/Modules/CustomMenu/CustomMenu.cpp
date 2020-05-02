@@ -4013,9 +4013,8 @@ static bool CMButtonHandler_AccountEdit(int button_id) {
 		if (hThreadLogin == INVALID_HANDLE_VALUE) {
 			accountingGoBackToList = false;
 			updateAccountingActiveHandle(true);
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02E, 0xFFFFF02F);
 			hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)-1, 0, NULL);
-			c_xbox_live_task_progress_menu::OpenMenu(xbox_live_task_progress_callback);
+			c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
 		}
 	}
 	return false;
@@ -4215,9 +4214,8 @@ static bool CMButtonHandler_AccountList(int button_id) {
 			if (hThreadLogin == INVALID_HANDLE_VALUE) {
 				accountingGoBackToList = false;
 				updateAccountingActiveHandle(true);
-				//GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02E, 0xFFFFF02F);
 				hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)button_id, 0, NULL);
-				c_xbox_live_task_progress_menu::OpenMenu(xbox_live_task_progress_callback);
+				c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
 			}
 		}
 	}
