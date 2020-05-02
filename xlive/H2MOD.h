@@ -43,6 +43,7 @@ bool __cdecl call_assign_equipment_to_unit(datum uint, int object_index, short u
 void __cdecl call_object_placement_data_new(ObjectPlacementData*, datum, datum, int);
 signed int __cdecl call_object_new(ObjectPlacementData*);
 void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset);
+int character_datum_from_index(BYTE index);
 
 class H2MOD
 {
@@ -81,7 +82,7 @@ public:
 		void SetMapType(scnr_type value) { mapType = value; }
 
 		bool Server;
-		std::unordered_map<std::string, bool> AchievementMap;
+		std::map<std::string, bool> AchievementMap;
 		std::deque<std::wstring> CustomSounds;
 		
 		std::mutex sound_mutex;
@@ -105,7 +106,6 @@ public:
 			return reinterpret_cast<T>(Base + (Server ? server : client));
 		}
 
-private:
 		DWORD Base;
 		scnr_type mapType;
 };
