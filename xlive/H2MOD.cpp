@@ -74,16 +74,7 @@ int get_player_index_from_datum(datum unit_datum)
 	return unit_object->PlayerDatum.ToAbsoluteIndex();
 }
 
-enum game_life_cycle : int
-{
-	life_cycle_none,
-	life_cycle_pre_game,
-	life_cycle_start_game,
-	life_cycle_in_game,
-	life_cycle_post_game,
-	life_cycle_joining,
-	life_cycle_matchmaking
-};
+
 
 game_life_cycle get_game_life_cycle()
 {
@@ -561,10 +552,25 @@ void H2MOD::set_unit_team_index(int unit_datum_index, BYTE team)
 void H2MOD::set_unit_speed_patch(bool hackit) {
 	//TODO: create a way to undo the patch in the case when more than just infection relies on this.
 	//Enable Speed Hacks
+	
+	BYTE origBytes[8] = { 0 };
 
-	BYTE assmPatchSpeed[8];
-	memset(assmPatchSpeed, 0x90, 8);
-	WriteBytes(h2mod->GetAddress(0x6AB7f, 0x6A3BA), assmPatchSpeed, 8);
+	DWORD *patch_addr = h2mod->GetAddress<DWORD*>(0x6AB7F, 0x6A3BA);
+
+	if(origBytes[0] == 0)
+		memcpy(origBytes, patch_addr, 8);
+
+	if (hackit == true)
+	{
+		BYTE assmPatchSpeed[8];
+		memset(assmPatchSpeed, 0x90, 8);
+		WriteBytes((DWORD)patch_addr, assmPatchSpeed, 8);
+	}
+	else
+	{
+		memcpy(patch_addr, origBytes, 8);
+	}
+
 }
 
 void H2MOD::set_unit_speed(float speed, int playerIndex)
@@ -692,6 +698,8 @@ char __cdecl OnPlayerDeath(int unit_datum_index, int a2, char a3, char a4)
 	/* This is the unit of the player who last damaged the object*/
 	int damaging_player_unit = get_damage_owner(unit_datum_index);
 
+	ScriptEngine::sqOnPlayerDeath(NULL, unit_datum_index, *(int*)(a2));
+
 	if (b_HeadHunter)
 	{
 		datum dead_player = datum(unit_datum_index);
@@ -738,6 +746,9 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
 
+	if (!ScriptEngine::sqOnUpdateScore(NULL, a2, a5))
+		return;
+
 	if (a5 == -1)
 	{
 		if(b_HeadHunter)
@@ -762,21 +773,39 @@ void __stdcall OnPlayerScore(void* thisptr, unsigned short a2, int a3, int a4, i
 	pupdate_player_score(thisptr, a2, a3, a4, a5, a6);
 }
 
-void H2MOD::disable_weapon_pickup(bool b_Enable)
+void H2MOD::toggle_weapon_pickup(bool bEnable)
 {
-	//Client Sided Patch
+	BYTE orig_bytes[5] = { 0xE8, 0x18, 0xE0, 0xFF, 0xFF };
 	DWORD offset = h2mod->GetAddress(0x55EFA);
-	BYTE assm[5] = { 0xE8, 0x18, 0xE0, 0xFF, 0xFF };
-	if (!b_Enable)
-		memset(assm, 0x90, 5);
-	
-	WriteBytes(offset, assm, 5);
+
+	if(bEnable)
+		WriteBytes(offset, orig_bytes, 5);
+	else
+		NopFill(offset, 5);
+
+}
+
+void H2MOD::toggle_weapon_pickup()
+{
+
+	//Client Sided Patch
+	BYTE orig_bytes[5] = { 0xE8, 0x18, 0xE0, 0xFF, 0xFF };
+
+	DWORD offset = h2mod->GetAddress(0x55EFA);
+	if (*(BYTE*)offset == 0x90)
+		WriteBytes(offset, orig_bytes, 5);
+	else
+		NopFill(offset, 5);
+
 }
 
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 {
 	int(_cdecl* AutoHandler)(datum, datum);
 	AutoHandler = (int(_cdecl*)(datum, datum))h2mod->GetAddress(0x57AA5, 0x5FF9D);
+
+	if (!ScriptEngine::sqOnAutoPickup(NULL,player_datum.ToInt(), object_datum.ToInt()))
+		return 0;
 
 	if (b_HeadHunter)
 	{
@@ -808,12 +837,10 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	bool result = p_map_cache_load(engine_settings);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
-
+	
 
 
 	tags::run_callbacks();
-	
-
 
 	h2mod->SetMapType(engine_settings->map_type);
 
@@ -823,11 +850,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
 
-	Sqrat::Function sqOnMapLoad = Sqrat::RootTable().GetFunction("OnMapLoad");
-
-	if (!sqOnMapLoad.IsNull())
-		sqOnMapLoad.Execute();
-
+	ScriptEngine::sqOnMapLoad();
 	
 	if (h2mod->GetMapType() == scnr_type::MainMenu)
 	{
@@ -944,15 +967,11 @@ player_spawn p_player_spawn;
 bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 {
 
-	Sqrat::Function sqPreSpawn = Sqrat::RootTable().GetFunction("OnPrePlayerSpawn");
-
-	if (!sqPreSpawn.IsNull())
-		sqPreSpawn.Execute();
+	ScriptEngine::sqPrePlayerSpawn(NULL,playerDatumIndex.ToInt());
 
 	//I cant find somewhere to put this where it actually works (only needs to be done once on map load). It's only a few instructions so it shouldn't take long to execute.
 	H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
 
-	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
 
 	if (b_Infection) {
 		infectionHandler->preSpawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
@@ -966,10 +985,7 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 
 	bool ret = p_player_spawn(playerDatumIndex);
 
-	Sqrat::Function sqPostSpawn = Sqrat::RootTable().GetFunction("OnPostPlayerSpawn");
-	if (!sqPostSpawn.IsNull())
-		sqPostSpawn.Execute();
-	
+	ScriptEngine::sqPostPlayerSpawn(NULL, playerDatumIndex.ToInt());
 
 	if (b_Infection) {
 		infectionHandler->spawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
@@ -1024,16 +1040,8 @@ change_team p_change_local_team;
 
 void __cdecl changeTeam(int localPlayerIndex, int teamIndex) 
 {
-
-	Sqrat::Function sqOnMapLoad = Sqrat::RootTable().GetFunction("OnChangeTeam");
-
-	if (!sqOnMapLoad.IsNull())
-		if (*sqOnMapLoad.Evaluate<bool>().Get() == false)
-		{
-			return;
-		}
-	
-	
+	if (!ScriptEngine::sqOnTeamChange(NULL,localPlayerIndex,teamIndex))
+		return;
 
 	network_session* session = NetworkSession::getCurrentNetworkSession();
 	if ((session->parameters.field_8 == 4 && get_game_life_cycle() == life_cycle_pre_game)
@@ -1277,7 +1285,7 @@ int __cdecl device_touch(datum device_datum, datum unit_datum)
 */
 void H2MOD::session_end()
 {
-	sqSessionEnd();
+	ScriptEngine::sqSessionEnd();
 }
 
 #pragma pack(push, 1)
@@ -1361,7 +1369,7 @@ tvariant_list_button_handler pvariant_list_button_handler;
 
 char __stdcall variant_list_button_handler(DWORD* pThis, int* a2, int *a3)
 {
-	sqSessionEnd();
+	ScriptEngine::sqSessionEnd();
 
 	int button_index = *a3;
 	DWORD button_pointer = *(DWORD*)(pThis[0x1C] + 0x44) + 12 * (WORD)button_index;
@@ -1387,8 +1395,8 @@ char __stdcall variant_list_button_handler(DWORD* pThis, int* a2, int *a3)
 				std::wstring_convert<std::codecvt_utf8<wchar_t>> string_to_wstring;
 				std::string script_path = string_to_wstring.to_bytes(variant_path);
 
-				sqSessionStart();
-				sqLoadScript(script_path);
+				ScriptEngine::sqSessionStart();
+				ScriptEngine::sqLoadScript(script_path);
 		
 				return pvariant_list_button_handler(pThis, a2, a3);
 			}
@@ -1792,7 +1800,9 @@ void H2MOD::Initialize()
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
 
-	BindSquirrel(sq_open(1000));
+	ScriptEngine::sqSessionStart();
+
+/*	BindSquirrel(sq_open(1000));
 
 	try {
 		using namespace Sqrat;
@@ -1803,7 +1813,8 @@ void H2MOD::Initialize()
 	catch (Sqrat::Exception e)
 	{
 		MessageBox(NULL, L"Loading or compiling script failed!", L"Squirrel Scripting", MB_OK);
-	}
+	}*/
+
 	h2mod->ApplyHooks();
 }
 

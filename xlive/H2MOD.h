@@ -34,6 +34,17 @@ enum static_lod : DWORD
 	cinematic
 };
 
+enum game_life_cycle : int
+{
+	life_cycle_none,
+	life_cycle_pre_game,
+	life_cycle_start_game,
+	life_cycle_in_game,
+	life_cycle_post_game,
+	life_cycle_joining,
+	life_cycle_matchmaking
+};
+
 int __cdecl call_object_try_and_get_with_type(datum object_datum_index, int object_type);
 int __cdecl call_unit_reset_equipment(datum unit_datum_index);
 bool __cdecl call_add_object_to_sync(datum gamestate_object_datum);
@@ -44,6 +55,7 @@ void __cdecl call_object_placement_data_new(ObjectPlacementData*, datum, datum, 
 signed int __cdecl call_object_new(ObjectPlacementData*);
 void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset);
 int character_datum_from_index(BYTE index);
+game_life_cycle get_game_life_cycle();
 
 class H2MOD
 {
@@ -75,10 +87,11 @@ public:
 		void set_player_unit_grenades_count(int playerIndex, BYTE type, BYTE count, bool resetEquipment);
 		void disable_sound(int sound);
 		void custom_sound_play(const wchar_t* soundName, int delay);
-		void disable_weapon_pickup(bool b_Enable);
+		void toggle_weapon_pickup();
+		void toggle_weapon_pickup(bool bEnable);
 		void leave_session();
 		void session_end();
-
+		
 		scnr_type GetMapType() { return mapType; }
 		void SetMapType(scnr_type value) { mapType = value; }
 
