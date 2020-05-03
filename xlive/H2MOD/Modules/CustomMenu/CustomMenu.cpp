@@ -11,8 +11,9 @@
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Updater\Updater.h"
 #include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
-#include "..\H2MOD\Tags\TagInterface.h"
+#include "H2MOD\Tags\TagInterface.h"
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
@@ -3889,7 +3890,81 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountEdit() {//__thiscall
 	}
 }
 
-static HANDLE hThreadLogin = 0;
+static DWORD master_login_code;
+static HANDLE hThreadLogin = INVALID_HANDLE_VALUE;
+
+void xbox_live_task_progress_callback(DWORD a1)
+{
+	// if the hThreadLogin handle is INVALID_HANDLE_VALUE, it means that the login thread has ended
+	if (hThreadLogin == INVALID_HANDLE_VALUE)
+	{
+		// this is the ptr of the callback, if it gets set to null, it will close the menu
+		*(DWORD*)(a1 + 2652) = NULL;
+
+		if (master_login_code < 0)
+		{
+			if (master_login_code == ERROR_CODE_CURL_SOCKET_FAILED 
+				|| master_login_code == ERROR_CODE_CURL_HANDLE 
+				|| master_login_code == ERROR_CODE_ACCOUNT_DATA
+				|| master_login_code == ERROR_CODE_INVALID_PARAM) {
+				//internal error
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF014, 0xFFFFF015);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_CURL_EASY_PERF) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF030, 0xFFFFF031);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_INVALID_VERSION) {
+				GSCustomMenuCall_Update_Note();
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_INVALID_LOGIN_TOKEN) {
+				GSCustomMenuCall_Invalid_Login_Token();
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_INVALID_LOGIN_ID) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF008, 0xFFFFF009);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_INVALID_PASSWORD) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF00A, 0xFFFFF00B);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_MACHINE_BANNED) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF00C, 0xFFFFF00D);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_ACCOUNT_BANNED) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF00E, 0xFFFFF00F);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_ACCOUNT_DISABLED) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF010, 0xFFFFF011);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_MACHINE_SERIAL_INSUFFICIENT) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF018, 0xFFFFF019);
+				return;
+			}
+			else {
+				//unknown error!
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF012, 0xFFFFF013);
+				return;
+			}
+		}
+		else {
+			if (master_login_code == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF018, 0xFFFFF019);
+				return;
+			}
+			else {
+				GSCustomMenuCall_Login_Warn();
+				return;
+			}
+		}
+	}
+}
 
 static DWORD WINAPI ThreadLogin(LPVOID lParam)
 {
@@ -3902,23 +3977,22 @@ static DWORD WINAPI ThreadLogin(LPVOID lParam)
 		char* identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
 		char* identifier_pass = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
 		//login to account
-		if (HandleGuiLogin(0, identifier, identifier_pass)) {
-			GSCustomMenuCall_Login_Warn();
+		
+		if (HandleGuiLogin(0, identifier, identifier_pass, &master_login_code)) {
 			H2AccountLastUsed = 0;
 		}
 		SecureZeroMemory(identifier_pass, strlen(identifier_pass));
 	}
 	else {
 		//login to account
-		if (HandleGuiLogin(H2AccountBufferLoginToken[button_id], 0, 0)) {
-			GSCustomMenuCall_Login_Warn();
+		if (HandleGuiLogin(H2AccountBufferLoginToken[button_id], 0, 0, &master_login_code)) {
 			H2AccountLastUsed = button_id;
 		}
 	}
 
 	updateAccountingActiveHandle(false);
 
-	hThreadLogin = 0;
+	hThreadLogin = INVALID_HANDLE_VALUE;
 	return 0;
 }
 
@@ -3935,12 +4009,12 @@ static bool CMButtonHandler_AccountEdit(int button_id) {
 		AccountEdit_remember = !AccountEdit_remember;
 		add_cartographer_label(CMLabelMenuId_AccountEdit, 3, H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 0xFFFFFFF2 + (AccountEdit_remember ? 1 : 0)), true);
 	}
-	else if (button_id == 3) {
-		if (!hThreadLogin) {
+	else if (button_id == 3) { // login button id
+		if (hThreadLogin == INVALID_HANDLE_VALUE) {
 			accountingGoBackToList = false;
 			updateAccountingActiveHandle(true);
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02E, 0xFFFFF02F);
 			hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)-1, 0, NULL);
+			c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
 		}
 	}
 	return false;
@@ -4100,18 +4174,6 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountList() {//__thiscall
 void GSCustomMenuCall_AccountList();
 //using namespace MapChecksumSync;
 static bool CMButtonHandler_AccountList(int button_id) {
-	// todo: better error here
-	/*if (MapChecksumSync::get_startup_info() != startup_state::done)
-	{
-		switch (MapChecksumSync::get_startup_info())
-		{
-		case not_done:
-			MapChecksumSync::Calculate();
-			break;
-		}
-		return true;
-	}*/
-
 	if (button_id == H2AccountCount + 1) {
 		if (!mode_remove_account) {
 			GSCustomMenuCall_AccountCreate();
@@ -4149,11 +4211,11 @@ static bool CMButtonHandler_AccountList(int button_id) {
 			return true;
 		}
 		else {
-			if (!hThreadLogin) {
+			if (hThreadLogin == INVALID_HANDLE_VALUE) {
 				accountingGoBackToList = false;
 				updateAccountingActiveHandle(true);
-				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02E, 0xFFFFF02F);
 				hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)button_id, 0, NULL);
+				c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
 			}
 		}
 	}

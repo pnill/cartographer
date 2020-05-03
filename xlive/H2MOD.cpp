@@ -809,13 +809,11 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
 
-
-
 	tags::run_callbacks();
 	
-
-
 	h2mod->SetMapType(engine_settings->map_type);
+
+	tags::run_callbacks();
 
 	get_object_table_memory();
 

@@ -29,7 +29,6 @@ void ForwardPorts()
 int WINAPI XOnlineStartup()
 {
 	LOG_TRACE_NETWORK("XOnlineStartup()");
-	std::thread(ForwardPorts).detach();
 	return ERROR_SUCCESS;
 }
 

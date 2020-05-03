@@ -283,6 +283,9 @@
     <Filter Include="Source Files\Blam\Reflexive">
       <UniqueIdentifier>{d7c0d1e4-5780-41f6-80ff-daef51c01fa4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\UI">
+      <UniqueIdentifier>{a500f548-26db-4773-9b45-892987193591}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -536,6 +539,8 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Scripting\Squirrel.cpp">
       <Filter>Source Files</Filter>
+    <ClCompile Include="H2MOD\Modules\UI\XboxLiveTaskProgress.cpp">
+      <Filter>Source Files\H2MOD\Modules\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1219,6 +1224,8 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\Scripting\Squirrel.h">
       <Filter>Header Files</Filter>
+    <ClInclude Include="H2MOD\Modules\UI\XboxLiveTaskProgress.h">
+      <Filter>Source Files\H2MOD\Modules\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
