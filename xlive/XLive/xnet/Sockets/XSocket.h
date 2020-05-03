@@ -29,3 +29,5 @@ struct XSocket
 		return a1->sin_addr.s_addr == 0 || a1->sin_port == 0;
 	}
 };
+
+void ForwardPorts();

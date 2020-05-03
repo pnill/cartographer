@@ -11,6 +11,14 @@ struct point2d
 };
 CHECK_STRUCT_SIZE(point2d, sizeof(short) * 2);
 
+struct point3d
+{
+	short x;
+	short y;
+	short z;
+};
+CHECK_STRUCT_SIZE(point3d, sizeof(short) * 3);
+
 struct short_bounds
 {
 	short lower;

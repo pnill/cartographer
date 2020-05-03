@@ -462,7 +462,7 @@ void InitH2Startup2() {
 		//currently credentials are taken from the config file.
 		//also don't enable this since nothing's initialised for the server.
 		AccountEdit_remember = false;
-		HandleGuiLogin(0, H2Config_login_identifier, H2Config_login_password);
+		HandleGuiLogin(0, H2Config_login_identifier, H2Config_login_password, nullptr);
 	}
 }
 

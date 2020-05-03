@@ -8,25 +8,11 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
+#include "XLive\xnet\Sockets\XSocket.h"
 
 bool AccountEdit_remember = true;
 
 #pragma region h2master_login
-
-const int ERROR_CODE_ACCOUNT_DATA = -44;
-
-const int ERROR_CODE_INVALID_PARAM = -1;
-const int ERROR_CODE_INVALID_VERSION = -2;
-const int ERROR_CODE_INVALID_LOGIN_TOKEN = -4;
-const int ERROR_CODE_INVALID_LOGIN_ID = -5;
-const int ERROR_CODE_INVALID_PASSWORD = -6;
-
-const int ERROR_CODE_MACHINE_BANNED = -10;
-const int ERROR_CODE_ACCOUNT_BANNED = -11;
-const int ERROR_CODE_ACCOUNT_DISABLED = -12;
-const int ERROR_CODE_MACHINE_SERIAL_INSUFFICIENT = -13;
-const int SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT = 7;
-
 
 typedef LONG NTSTATUS, *PNTSTATUS;
 #define STATUS_SUCCESS (0x00000000)
@@ -88,6 +74,10 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	ipManager.SetupLocalConnectionInfo(&pxna);
 
 	UpdateConnectionStatus();
+
+	if (onlineSignIn) {
+		ForwardPorts();
+	}
 
 	if (H2CurrentAccountLoginToken) {
 		free(H2CurrentAccountLoginToken);
@@ -344,7 +334,6 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 		index_current = index_next + 4;
 	}
 
-
 	if (result > 0) {
 		int result_details;
 		if (result_details = ConfigureUserDetails(username, login_token, xuid, saddr, xnaddr, abEnet, abOnline, true)) {
@@ -386,8 +375,9 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 	return result;
 }
 
-bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
-	int result = false;
+bool HandleGuiLogin(char* ltoken, char* identifier, char* password, DWORD* out_master_login_interpret_result) {
+
+	bool result = false;
 	char* rtn_result = 0;
 
 	char* os_string = 0;
@@ -436,6 +426,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
 	free(escaped_user_identifier);
 	free(escaped_user_password);
 
+	int master_login_interpret_result = -1;
 	int rtn_code = MasterHttpResponse("https://cartographer.online/login2", http_request_body_build, rtn_result);
 
 	for (int i = strlen(http_request_body_build) - 1; i >= 0; i--) {
@@ -444,28 +435,18 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
 	free(http_request_body_build);
 
 	if (rtn_code == 0) {
-		rtn_code = InterpretMasterLogin(rtn_result, ltoken);
-		if (rtn_code > 0) {
+		master_login_interpret_result = InterpretMasterLogin(rtn_result, ltoken);
+		if (master_login_interpret_result > 0) {
 			result = true;
 		}
 		free(rtn_result);
 	}
-	if (rtn_code <= 0) {
+	if (master_login_interpret_result < 0) {
 		char NotificationPlayerText[40];
-		sprintf(NotificationPlayerText, "ERROR Account Login: %d", rtn_code);
+		sprintf(NotificationPlayerText, "ERROR Account Login: %d", master_login_interpret_result);
 		addDebugText(NotificationPlayerText);
-		if (rtn_code == 0 || rtn_code == ERROR_CODE_CURL_SOCKET_FAILED || rtn_code == ERROR_CODE_CURL_HANDLE || rtn_code == ERROR_CODE_ACCOUNT_DATA
-			|| rtn_code == ERROR_CODE_INVALID_PARAM) {
-			//internal error
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF014, 0xFFFFF015);
-		}
-		else if (rtn_code == ERROR_CODE_CURL_EASY_PERF) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF030, 0xFFFFF031);
-		}
-		else if (rtn_code == ERROR_CODE_INVALID_VERSION) {
-			GSCustomMenuCall_Update_Note();
-		}
-		else if (rtn_code == ERROR_CODE_INVALID_LOGIN_TOKEN) {
+
+		if (master_login_interpret_result == ERROR_CODE_INVALID_LOGIN_TOKEN) {
 
 			char* username = 0;
 			for (int i = 0; i < H2AccountCount; i++) {
@@ -479,42 +460,21 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password) {
 				char* login_identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
 				snprintf(login_identifier, strlen(username) + 1, username);
 			}
-
-			GSCustomMenuCall_Invalid_Login_Token();
-		}
-		else if (rtn_code == ERROR_CODE_INVALID_LOGIN_ID) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF008, 0xFFFFF009);
-		}
-		else if (rtn_code == ERROR_CODE_INVALID_PASSWORD) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF00A, 0xFFFFF00B);
-		}
-		else if (rtn_code == ERROR_CODE_MACHINE_BANNED) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF00C, 0xFFFFF00D);
-		}
-		else if (rtn_code == ERROR_CODE_ACCOUNT_BANNED) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF00E, 0xFFFFF00F);
-		}
-		else if (rtn_code == ERROR_CODE_ACCOUNT_DISABLED) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF010, 0xFFFFF011);
-		}
-		else if (rtn_code == ERROR_CODE_MACHINE_SERIAL_INSUFFICIENT) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF018, 0xFFFFF019);
 		}
 		else {
-			//unknown error!
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF012, 0xFFFFF013);
+			if (!H2IsDediServer) {
+				char* login_identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
+				SecureZeroMemory(login_identifier, strlen(login_identifier));
+			}
+			if (master_login_interpret_result == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) {
+				result = false;
+			}
 		}
 	}
-	else {
-		if (!H2IsDediServer) {
-			char* login_identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
-			SecureZeroMemory(login_identifier, strlen(login_identifier));
-		}
-		if (rtn_code == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF018, 0xFFFFF019);
-			result = false;
-		}
-	}
+
+	if (out_master_login_interpret_result)
+		*out_master_login_interpret_result = master_login_interpret_result;
+
 	return result;
 }
 

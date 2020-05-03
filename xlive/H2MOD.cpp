@@ -839,10 +839,11 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		return false;
 	
 
+	
+	h2mod->SetMapType(engine_settings->map_type);
 
 	tags::run_callbacks();
 
-	h2mod->SetMapType(engine_settings->map_type);
 
 	get_object_table_memory();
 
@@ -969,6 +970,7 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 
 	ScriptEngine::sqPrePlayerSpawn(NULL,playerDatumIndex.ToInt());
 
+
 	//I cant find somewhere to put this where it actually works (only needs to be done once on map load). It's only a few instructions so it shouldn't take long to execute.
 	H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
 
@@ -984,7 +986,7 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	}
 
 	bool ret = p_player_spawn(playerDatumIndex);
-
+	
 	ScriptEngine::sqPostPlayerSpawn(NULL, playerDatumIndex.ToInt());
 
 	if (b_Infection) {
@@ -1042,6 +1044,7 @@ void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 {
 	if (!ScriptEngine::sqOnTeamChange(NULL,localPlayerIndex,teamIndex))
 		return;
+
 
 	network_session* session = NetworkSession::getCurrentNetworkSession();
 	if ((session->parameters.field_8 == 4 && get_game_life_cycle() == life_cycle_pre_game)
@@ -1369,6 +1372,7 @@ tvariant_list_button_handler pvariant_list_button_handler;
 
 char __stdcall variant_list_button_handler(DWORD* pThis, int* a2, int *a3)
 {
+
 	ScriptEngine::sqSessionEnd();
 
 	int button_index = *a3;
@@ -1800,9 +1804,10 @@ void H2MOD::Initialize()
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
 
+
 	ScriptEngine::sqSessionStart();
 
-/*	BindSquirrel(sq_open(1000));
+
 
 	try {
 		using namespace Sqrat;
