@@ -254,6 +254,7 @@ signed int __cdecl object_new_hook(ObjectPlacementData* new_object)
 	return result;
 }
 
+
 typedef void(__stdcall *tc_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, bitstream* stream);
 tc_simulation_unit_entity_definition_creation_encode pc_simulation_unit_entity_definition_encode;
 
@@ -1271,6 +1272,13 @@ int __cdecl device_touch(datum device_datum, datum unit_datum)
 	return pdevice_touch(device_datum, unit_datum);
 }
 
+/*
+	A handler for XLiveSessionEnd to detect when players are leaving games.
+*/
+void H2MOD::session_end()
+{
+	sqSessionEnd();
+}
 
 #pragma pack(push, 1)
 struct perma_struct
@@ -1348,6 +1356,47 @@ void __stdcall ConVariantCategoryList(perma_struct* pThis, int a2)
 
 }
 
+typedef char (__stdcall *tvariant_list_button_handler)(DWORD* pThis, int *a1, int *a3);
+tvariant_list_button_handler pvariant_list_button_handler;
+
+char __stdcall variant_list_button_handler(DWORD* pThis, int* a2, int *a3)
+{
+	sqSessionEnd();
+
+	int button_index = *a3;
+	DWORD button_pointer = *(DWORD*)(pThis[0x1C] + 0x44) + 12 * (WORD)button_index;
+	signed int button_datum = *(DWORD*)(button_pointer + 4);
+
+	DWORD *SaveGameBuffer = h2mod->GetAddress<DWORD*>(0x482300);
+	if (!(((unsigned int)button_datum >> 21) & 1) && *SaveGameBuffer)
+	{
+		int variant_index = button_datum >> 8 & 0x1FFF;
+		DWORD* variant_buff = (DWORD*)(0x234004 * ((button_datum >> 4) & 0xF) + *(DWORD*)SaveGameBuffer + 0x71EC0); // get variant count
+		int variant_count = *variant_buff - 1; // subtract variant count
+		if (variant_index <= variant_count || variant_count == variant_index)
+		{
+			DWORD *variant_pointer = &variant_buff[0x8D * variant_index + 1];
+
+			if (StrStrW((wchar_t*)variant_pointer, L"Scripts\\Variants"))
+			{
+
+				std::wstring variant_path = std::wstring((wchar_t*)variant_pointer);
+				variant_path = variant_path.substr(variant_path.find_first_of(L":\\")+2, variant_path.length()); // Remove C:/
+				variant_path = variant_path.substr(0,variant_path.find_last_of(L"\\"));
+				variant_path.append(L".nut");
+				std::wstring_convert<std::codecvt_utf8<wchar_t>> string_to_wstring;
+				std::string script_path = string_to_wstring.to_bytes(variant_path);
+
+				sqSessionStart();
+				sqLoadScript(script_path);
+		
+				return pvariant_list_button_handler(pThis, a2, a3);
+			}
+		}
+	}
+	return pvariant_list_button_handler(pThis, a2, a3);
+}
+
 #pragma region SCRIPT_LOAD_FUNCTION
 /*
 	This is where we'll check for the existence of scripts and create variants in relation to them.
@@ -1365,8 +1414,9 @@ std::map<std::wstring, BYTE> variant_paths
 	{ L"KOTH", 2},
 	{ L"Oddball", 4},
 	{ L"Juggernaut", 5},
-	{ L"Territories", 6},
-	{ L"CTF", 7}
+	{ L"CTF", 7},
+	{ L"Assault", 8},
+	{ L"Territories", 9},
 };
 
 std::map<std::wstring, BYTE> variant_engine
@@ -1374,13 +1424,14 @@ std::map<std::wstring, BYTE> variant_engine
 	{L"ctf",1},
 	{L"slayer", 2},
 	{L"oddball",3},
+	{L"koth",4},
 	{L"juggernaut",7},
 	{L"territories",8},
 	{L"assault",9}
 };
 
 
-void InjectVariant(std::wstring variant_name, BYTE index)
+void InjectVariant(std::wstring variant_name, BYTE index,std::wstring engine_name)
 {
 	BYTE* variant_address = ((*(BYTE**)(h2mod->GetAddress<BYTE*>(0x482300))) + 0x71EC0);
 	int variant_count = *(int*)variant_address;
@@ -1393,13 +1444,30 @@ void InjectVariant(std::wstring variant_name, BYTE index)
 	variant_memory *variant = (variant_memory*)((BYTE*)variant_address + 4 + (0x234 * variant_count));
 	variant_name = variant_name.substr(0, variant_name.length() - 4);
 
+	for (int i = 0; i < variant_count; i++)
+	{
+		variant_memory *variant = (variant_memory*)((BYTE*)variant_address + 4 + (0x234 * i));
+		//wchar_t* dbgmsg = new wchar_t[255];
+		//wsprintf(dbgmsg, L"Variant Name: %s, Variant_index: %i", variant->name, variant->index);
+		//MessageBoxW(NULL, dbgmsg, L"Debug Data", MB_OK);
+		//MessageBoxW(NULL, variant->name, L"Variant", MB_OK);
+
+		//if (variant->index == 7)
+		//{
+		//	FILE *fw = std::fopen("Scripts\\binary\\ctf_dump.bin", "w");
+		//	fwrite(variant, 0x234, 1, fw);
+		//	fclose(fw);
+		//	MessageBoxA(NULL, "Dumped", "Dumped", MB_OK);
+		//}
+	}
+
 	wchar_t *var_name_mod = new wchar_t[variant_name.length()+3];
 	wmemset(var_name_mod, 0x00, variant_name.length() + 3);
 	wsprintf(var_name_mod, L"%ws ",variant_name.c_str());
 	wmemset((var_name_mod + variant_name.length()+1), 0xE007, 1);
 
 	wsprintf(variant->name, var_name_mod);
-	wsprintf(variant->path, L"C:\\SCRIPT_LOAD\\%ws\\", variant_name.c_str());
+	wsprintf(variant->path, L"C:\\Scripts\\Variants\\%ws\\%ws\\", engine_name.c_str(), variant_name.c_str());
 	variant->index = index;
 }
 
@@ -1414,7 +1482,7 @@ void SearchForVariants(std::wstring path)
 	if ((hFind = FindFirstFile(path.c_str(), &data)) != INVALID_HANDLE_VALUE)
 	{
 		do {
-			InjectVariant(data.cFileName, variant_paths[variant_type]);
+			InjectVariant(data.cFileName, variant_paths[variant_type],variant_type);
 		} while (FindNextFile(hFind, &data) != 0);
 		FindClose(hFind);
 	}
@@ -1438,54 +1506,63 @@ void LoadSquirrelVariants()
 /*
 	Responsible for opening variant and save data and loading it into memory.
 	We're placing a hook here to add custom variants based on scripts using generic data.
-
-	-NOTE: Calling convention was LTGR custom, ESI also gets loaded.
 */
-char __cdecl SaveGameOpenFile_Hook(void* pfileIO,void* OutBuffer,void *size)
+struct SaveStackData {
+	char Pad[2]; //0x00
+	bool FileBool; // 0x02
+	char Pad2[1]; // 0x03
+	int FileState; // 0x04
+	char FilePath[255]; // 0x08
+};
+
+struct SaveStackStruct {
+	void* OutBuffer;
+	int size; // 0x08
+	char pad2[0x04]; // 0x0C
+	struct SaveStackData *pSaveStackData;
+};
+
+typedef int(__cdecl *tLoadSaveGame)(int a1,SaveStackStruct *a2,char);
+tLoadSaveGame pLoadSaveGame;
+
+int __cdecl LoadSaveGameHook(int a1, SaveStackStruct *a2, char a3)
 {
-	typedef char (__cdecl *tSaveGameOpenFile)(void* pfileIO,void *OutBuffer,void *size);
-	auto pSaveGameOpenFile = h2mod->GetAddress<tSaveGameOpenFile>(0x9AF07);
-	
-	char* file_path = ((char*)pfileIO + 0x8);
 
-	if (strstr(file_path, "SCRIPT_LOAD"))
+	if (strstr(a2->pSaveStackData->FilePath, "Scripts\\Variants"))
 	{
-		__asm {
-			mov byte ptr[esi+2],1 // Some kind of boolean for if the file was loaded or not, without this set it won't show up.
-			mov [esi+4],0
-		}
-
-		FILE* f = std::fopen("Scripts\\binary\\slayer.bin", "r+");
-		fread(OutBuffer, 304, 1, f);
-		fclose(f);
 
 
 		std::wstring_convert<std::codecvt_utf8<wchar_t>> string_to_wstring;
-		std::wstring widepath = string_to_wstring.from_bytes(std::string(file_path));
-		std::wstring engine_name = widepath.substr(widepath.find_last_of(L"\\", widepath.length())+1);
-		std::wstring variant_name = widepath.substr(15, widepath.length()-15-engine_name.length()-1);
+		std::wstring widepath = string_to_wstring.from_bytes(std::string(a2->pSaveStackData->FilePath));
+		std::wstring engine_name = widepath.substr(widepath.find_last_of(L"\\", widepath.length()) + 1);
+		std::wstring clean_path = widepath.substr(0, widepath.find_last_of(L"\\"));
+		std::wstring variant_name = clean_path.substr(clean_path.find_last_of(L"\\") + 1, clean_path.length());
+
+		std::string dummy_file = "Scripts\\binary\\";
+		dummy_file.append(string_to_wstring.to_bytes(engine_name));
+		dummy_file.append(".bin");
+
+		FILE* f = std::fopen(dummy_file.c_str(), "r+");
+		//FILE* f = std::fopen("Scripts\\binary\\slayer.bin", "r+");
+		fread(a2->OutBuffer, 304, 1, f);
+		fclose(f);
+
+		a2->pSaveStackData->FileBool = 1;
+		a2->pSaveStackData->FileState = 0;
+
+		//std::wstring variant_name = widepath.substr(17, widepath.length() - 17 - engine_name.length() - 1);
 
 		wchar_t *var_name_mod = new wchar_t[variant_name.length() + 3];
 		wmemset(var_name_mod, 0x00, variant_name.length() + 3);
 		wsprintf(var_name_mod, L"%ws  ", variant_name.c_str());
-		//wmemset((var_name_mod + variant_name.length() + 1), 0xE007, 1);
 
-	/*	wchar_t *var_name = new wchar_t[variant_name.length()+2];
-		wmemset(var_name, 0x00, variant_name.length()+2);
-		wsprintf(var_name, variant_name.c_str());
-		wmemset((var_name + variant_name.length()-1), 0xE001, 1);*/
-
-		wsprintf((wchar_t*)((BYTE*)OutBuffer + 4), var_name_mod);
-		*(BYTE*)((BYTE*)OutBuffer + 0x44) = variant_engine[engine_name];
-
+		wsprintf((wchar_t*)((BYTE*)a2->OutBuffer + 4), var_name_mod);
+		*(BYTE*)((BYTE*)a2->OutBuffer + 0x44) = variant_engine[engine_name];
+		
 		return 1;
-
 	}
 
-
-	char ret = pSaveGameOpenFile(pfileIO, OutBuffer, size);
-
-	return ret;
+	return pLoadSaveGame(a1,a2,a3);
 }
 #pragma endregion
 
@@ -1662,16 +1739,25 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
 		PatchCall(h2mod->GetAddress(0x226702), game_mode_engine_draw_team_indicators);
-		PatchCall(GetAddress(0x9B126), SaveGameOpenFile_Hook);
+		
+		
+	
+
+		pvariant_list_button_handler = (tvariant_list_button_handler)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x251B7E), (BYTE*)variant_list_button_handler, 13);
+		pLoadSaveGame = (tLoadSaveGame)DetourFunc(h2mod->GetAddress<BYTE*>(0x9B0D0), (BYTE*)LoadSaveGameHook, 13);
 		pReadVariantToMemory = (tReadVariantToMemory)DetourFunc(h2mod->GetAddress<BYTE*>(0x46596), (BYTE*)ReadVariantToMemory, 13);
 
-		pConVariantCategoryList = (tConVariantCategoryList)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x249D5E), (BYTE*)ConVariantCategoryList, 13);
-		pc_game_engine_category_list_create_labels = (tc_game_engine_category_list_create_labels)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x2497D8), (BYTE*)c_game_engine_category_list_create_labels, 9);
+		/* 
+			An attempt at adding an additional variant/game engine category (E.x. Slayer,KOTH, Infection).
+			This will work when Himanshu gets meta injection for creating wigt panels working.
+		*/
+		//pConVariantCategoryList = (tConVariantCategoryList)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x249D5E), (BYTE*)ConVariantCategoryList, 13);
+		//pc_game_engine_category_list_create_labels = (tc_game_engine_category_list_create_labels)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x2497D8), (BYTE*)c_game_engine_category_list_create_labels, 9);
 
 		//Hooked to fix custom map images.
 		Codecave(GetAddress(0x593F0), load_map_data_for_display,0);
 
-		Initialise_tag_loader();
+		//Initialise_tag_loader();
 	}
 	else {
 

@@ -428,6 +428,17 @@ void ConsoleCommands::handle_command(std::string command) {
 			output(map_file_name);
 			return;
 		}
+		else if (firstCommand == "$setupcoop") {
+			typedef void(__cdecl* network_session_set_coop_difficulty)(short difficulty);
+			auto p_network_session_set_coop_difficulty = h2mod->GetAddress<network_session_set_coop_difficulty>(0x215624);
+
+			int difficultyIndex = stoi(splitCommands[1]);
+			p_network_session_set_coop_difficulty(difficultyIndex);
+
+			WriteValue<BYTE>(h2mod->GetAddress(0x1D928A) + 2, 2); // set max peers
+			WriteValue<BYTE>(h2mod->GetAddress(0x1D9A7D) + 1, 2); // set max peers
+			NetworkSession::getCurrentNetworkSession()->network_protocol = 0; // splitscreen
+		}
 		else if (firstCommand == "$downloadmap") {
 			if (splitCommands.size() != 2) {
 				output(L"Invalid download map command, usage - $downloadMap MAP_NAME");

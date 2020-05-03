@@ -7,6 +7,28 @@ void MessageBoxTest(char* Msg)
 	MessageBoxA(NULL, Msg, "Squirrel Test", MB_OK);
 }
 
+void sqLoadScript(std::string path)
+{
+	Sqrat::Script varScript;
+	varScript.CompileFile(path);
+	varScript.Run();
+}
+
+void sqSessionStart()
+{
+	BindSquirrel(sq_open(1000));
+	Sqrat::Script GlobalScript;
+	GlobalScript.CompileFile("Scripts/Globals.nut");
+	GlobalScript.Run();
+}
+
+void sqSessionEnd()
+{
+	if (sq_getvmstate(Sqrat::DefaultVM::Get()) == SQ_VMSTATE_RUNNING)
+		sq_close(Sqrat::DefaultVM::Get());
+
+}
+
 BYTE SqGetMapType()
 {
 	return h2mod->GetMapType();

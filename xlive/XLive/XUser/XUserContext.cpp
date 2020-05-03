@@ -16,7 +16,7 @@ DWORD WINAPI XUserGetContext(DWORD dwUserIndex, XUSER_CONTEXT* pContext, PXOVERL
 }
 
 /* This should be cleaned up and moved to an H2MODs module instead of being defined here. */
-static const std::unordered_map <std::string, std::string> singleplayer_maps
+static const std::map <std::string, std::string> singleplayer_maps
 {
 	{ "00a_introduction", "The Heretic" },
 	{ "01a_tutorial", "The Armory" },
@@ -35,7 +35,7 @@ static const std::unordered_map <std::string, std::string> singleplayer_maps
 	{ "08b_deltacontrol", "The Great Journey" }
 };
 
-static const std::unordered_map <int, std::pair<std::string, std::string>> campaign_difficulty_list
+static const std::map <int, std::pair<std::string, std::string>> campaign_difficulty_list
 {
 	{ 0,{ "campaign_easy", "Easy" } },
 	{ 1,{ "campaign_normal", "Normal" } },
@@ -43,7 +43,7 @@ static const std::unordered_map <int, std::pair<std::string, std::string>> campa
 	{ 3,{ "campaign_hard", "Legendary" } }
 };
 
-static const std::unordered_map <int, std::string> game_mode_list
+static const std::map <int, std::string> game_mode_list
 {
 	{ 1,"gamemode_ctf" },
 	{ 2,"gamemode_slayer" },

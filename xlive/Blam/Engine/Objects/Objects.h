@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Blam\Maths\Maths.h"
 #include "Blam\Cache\DataTypes.h"

@@ -26,7 +26,7 @@ private:
 	bool isNum(const char *s);
 	void checkForIds();
 	bool checked_for_ids = false;
-	std::unordered_map<std::string, unsigned int> object_ids;
+	std::map<std::string, unsigned int> object_ids;
 	DWORD sleepTime;
 };
 

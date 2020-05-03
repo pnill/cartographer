@@ -534,6 +534,9 @@
     <ClCompile Include="XLive\XStorage\XStorage.cpp">
       <Filter>Source Files\XLive\XStorage</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Scripting\Squirrel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">
@@ -1213,6 +1216,9 @@
     </ClInclude>
     <ClInclude Include="Blam\Engine\Game\GameEngine.h">
       <Filter>Source Files\Blam\Engine\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Scripting\Squirrel.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

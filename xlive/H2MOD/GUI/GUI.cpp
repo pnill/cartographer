@@ -489,6 +489,7 @@ int WINAPI XLiveRender()
 
 	if (pDevice)
 	{
+		
 		if (pDevice->TestCooperativeLevel() == D3D_OK)
 		{
 			D3DVIEWPORT9 pViewport;
