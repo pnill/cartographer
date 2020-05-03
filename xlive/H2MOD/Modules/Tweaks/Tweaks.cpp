@@ -8,7 +8,7 @@
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Variants\VariantMPGameEngine.h"
-#include "XLive\IpManagement\XnIp.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "Blam\Cache\TagGroups\shad.h"
 #include "..\CustomResolutions\CustomResolutions.h"
@@ -349,13 +349,28 @@ bool engine_basic_init()
 
 	flags_array[startup_flags::disable_voice_chat] = 1; // disables voice chat (XHV engine)
 	flags_array[startup_flags::nointro] = H2Config_skip_intro;
-	flags_array[startup_flags::allow_d3d_ex_version] = 1; // allow D3DEx version if available (faster alt-tab time)
 
 	HANDLE(*fn_c000285fd)() = (HANDLE(*)())h2mod->GetAddress<void*>(0x000285fd);
 
 	init_gfwl_gamestore();
 	init_data_checksum_info();
 	runtime_state_init();
+
+	if (H2Config_hiresfix != 0)
+	{
+		DWORD dwBack;
+
+		// HUD text size fix for higher resolutions
+		Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x264A18, (BYTE*)Video_HUDSizeUpdate_hook, 7);
+
+		// menu text fix for higher resolutions
+		sub_671B02_orig = (sub_671B02_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x271B02, (BYTE*)sub_671B02_hook, 5);
+	}
+
+	if (H2Config_d3dex != 0)
+	{
+		flags_array[startup_flags::allow_d3d_ex_version] = 1;
+	}
 
 	int arg_count;
 	wchar_t **cmd_line_args = LOG_CHECK(CommandLineToArgvW(GetCommandLineW(), &arg_count));
@@ -390,25 +405,9 @@ bool engine_basic_init()
 			    shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
 				NopFill(h2mod->GetAddress(0x269FD5), 8);
 			}
-			else if (_wcsicmp(cmd_line_arg, L"-hiresfix") == 0)
-			{
-				DWORD dwBack;
-
-				// HUD text size fix for higher resolutions
-				Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x264A18, (BYTE*)Video_HUDSizeUpdate_hook, 7);
-				VirtualProtect(Video_HUDSizeUpdate_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
-				// menu text fix for higher resolutions
-				sub_671B02_orig = (sub_671B02_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x271B02, (BYTE*)sub_671B02_hook, 5);
-				VirtualProtect(sub_671B02_orig, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-			}
 			else if (_wcsicmp(cmd_line_arg, L"-voicechat") == 0)
 			{
 				flags_array[startup_flags::disable_voice_chat] = 0;
-			}
-			else if (_wcsicmp(cmd_line_arg, L"-disabled3dex") == 0)
-			{
-				flags_array[startup_flags::allow_d3d_ex_version] = 0;
 			}
 #ifdef _DEBUG
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
@@ -947,13 +946,11 @@ void InitH2Tweaks() {
 		DWORD dwBack;
 
 		phookServ1 = (thookServ1)DetourFunc((BYTE*)H2BaseAddr + 0x8EFA, (BYTE*)LoadRegistrySettings, 11);
-		VirtualProtect(phookServ1, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		// set the additional pcr time
 		WriteValue<BYTE>(h2mod->GetAddress(0x0, 0xE590) + 2, H2Config_additional_pcr_time);
 
 		//phookServ2 = (thookServ2)DetourFunc((BYTE*)H2BaseAddr + 0xBA3C, (BYTE*)PreReadyLoad, 11);
-		//VirtualProtect(phookServ2, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 	else {//is client
 
@@ -961,7 +958,6 @@ void InitH2Tweaks() {
 		//Hook a function which changes the party privacy to detect if the lobby becomes open.
 		//Problem is if you want to set it via mem poking, it won't push the lobby to the master automatically.
 		//phookChangePrivacy = (thookChangePrivacy)DetourFunc((BYTE*)H2BaseAddr + 0x2153ce, (BYTE*)HookChangePrivacy, 11);
-		//VirtualProtect(phookChangePrivacy, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		bool IntroHQ = true;//clients should set on halo2.exe -highquality
 
@@ -996,15 +992,11 @@ void InitH2Tweaks() {
 
 		//Hook for Hitmarker sound effect.
 //		pfn_c0017a25d = (tfn_c0017a25d)DetourFunc((BYTE*)H2BaseAddr + 0x0017a25d, (BYTE*)fn_c0017a25d, 10);
-//		VirtualProtect(pfn_c0017a25d, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//Hook for advanced lobby options.
 		pfn_c0024eeef = (tfn_c0024eeef)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024eeef, (BYTE*)fn_c0024eeef, 9);
-		VirtualProtect(pfn_c0024eeef, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 		pfn_c0024fa19 = (tfn_c0024fa19)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fa19, (BYTE*)fn_c0024fa19, 9);
-		VirtualProtect(pfn_c0024fa19, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 		pfn_c0024fabc = (tfn_c0024fabc)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fabc, (BYTE*)fn_c0024fabc, 13);
-		VirtualProtect(pfn_c0024fabc, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		WriteJmpTo(h2mod->GetAddress(0x4544), is_init_flag_set);
 
@@ -1100,20 +1092,19 @@ void H2Tweaks::setFOV(int field_of_view_degrees) {
 	if (H2IsDediServer)
 		return;
 
-	static float fov;
+	static float fov = 70.0f * M_PI / 180.0f;
 	static bool fov_redirected = false;
-
-	if (!fov_redirected)
-	{
-		BYTE opcode[6] = { 0xD9, 0x05, 0x00, 0x00, 0x00, 0x00 };
-		WritePointer((DWORD)&opcode[2], &fov);
-		WriteBytes(h2mod->GetAddress(0x907F3), opcode, sizeof(opcode)); // fld dword ptr[fov]
-
-		fov_redirected = true;
-	}
-
 	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
 	{
+		if (!fov_redirected)
+		{
+			BYTE opcode[6] = { 0xD9, 0x05, 0x00, 0x00, 0x00, 0x00 };
+			WritePointer((DWORD)&opcode[2], &fov);
+			WriteBytes(h2mod->GetAddress(0x907F3), opcode, sizeof(opcode)); // fld dword ptr[fov]
+
+			fov_redirected = true;
+		}
+
 		//const double default_radians_field_of_view = 70.0f * M_PI / 180.0f;
 		fov = (float)field_of_view_degrees * M_PI / 180.0f;
 	}

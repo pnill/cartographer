@@ -2,7 +2,7 @@
 #include <MSWSock.h>
 #include <WS2tcpip.h>
 #include "xnet.h"
-#include "XLive\Networking\XNetQoS.h"
+#include "XLive\xnet\XNetQoS.h"
 #include "H2MOD\Modules\Config\Config.h"
 
 using namespace std::chrono_literals;

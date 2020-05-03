@@ -656,7 +656,6 @@ void initGSCustomLanguage() {
 		DWORD dwBack;
 
 		pH2GetLabel = (tH2GetLabel)DetourClassFunc((BYTE*)H2BaseAddr + 0x3defd, (BYTE*)H2GetLabel, 8);
-		VirtualProtect(pH2GetLabel, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 		//Hook the function that sets the font table filename.
 		pfn_c00031b97 = (char*(__cdecl*)(int, int))((BYTE*)H2BaseAddr + 0x00031b97);

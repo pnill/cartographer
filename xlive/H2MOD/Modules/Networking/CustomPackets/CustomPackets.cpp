@@ -103,9 +103,9 @@ void __stdcall handle_out_of_band_message_hook(void *thisx, network_address* add
 	case request_map_filename:
 	{
 		s_request_map_filename* received_data = (s_request_map_filename*)packet;
-		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] received on handle_out_of_band_message request-map-filename from XUID: {}", received_data->user_identifier);
-		network_session* current_session = NetworkSession::getCurrentNetworkSession();
 		signed int peer_index = NetworkSession::getPeerIndexFromNetworkAddress(address);
+		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] received on handle_out_of_band_message request-map-filename from XUID: {}, peer index: {}", received_data->user_identifier, peer_index);
+		network_session* current_session = NetworkSession::getCurrentNetworkSession();
 		if (peer_index != -1 && peer_index != current_session->local_peer_index)
 		{
 			s_custom_map_filename data;
@@ -134,6 +134,7 @@ void __stdcall handle_out_of_band_message_hook(void *thisx, network_address* add
 			std::wstring filename_wstr(received_data->file_name);
 			std::string filename_str(filename_wstr.begin(), filename_wstr.end());
 			mapManager->setMapFileNameToDownload(filename_str);
+			LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] received on handle_out_of_band_message map_file_name: {}", received_data->file_name);
 		}
 
 		return;
@@ -196,6 +197,11 @@ void CustomPackets::sendRequestMapFilename(network_session* session)
 		SecureZeroMemory(&data, sizeof(s_request_map_filename));
 		memcpy(&data.user_identifier, &xFakeXuid[0], sizeof(XUID));
 
+		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] Sending map name request info: session host peer index: {}, observer index {}, observer bool unk: {}",
+			session->session_host_peer_index, 
+			session->peer_observer_channels[session->session_host_peer_index].observer_index,
+			session->peer_observer_channels[session->session_host_peer_index].field_1);
+
 		if (session->peer_observer_channels[session->session_host_peer_index].field_1) {
 			observer_channel_send_message(session->network_observer, session->unk_index, session->peer_observer_channels[session->session_host_peer_index].observer_index, true,
 				request_map_filename, sizeof(s_request_map_filename), (void*)&data);
@@ -247,8 +253,6 @@ void CustomPackets::ApplyGamePatches()
 
 	DWORD dwBack;
 	p_handle_out_of_band_message = (handle_out_of_band_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E907B, 0x1CB03B), (BYTE*)handle_out_of_band_message_hook, 8);
-	VirtualProtect(p_handle_out_of_band_message, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	p_handle_channel_message = (handle_channel_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E929C, 0x1CB25C), (BYTE*)handle_channel_message_hook, 8);
-	VirtualProtect(p_handle_channel_message, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }

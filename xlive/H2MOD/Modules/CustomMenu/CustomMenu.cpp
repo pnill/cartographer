@@ -7,7 +7,7 @@
 #include "H2MOD\Modules\Accounts\Accounts.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\AccountCreate.h"
-#include "XLive\IpManagement\XnIp.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Updater\Updater.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -2986,6 +2986,14 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_raw_input = !H2Config_raw_input));
 		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
 	}
+	else if (button_id == 8) {
+		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_hiresfix = !H2Config_hiresfix));
+		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
+	}
+	else if (button_id == 9) {
+		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_d3dex = !H2Config_d3dex));
+		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
+	}
 //	else if (button_id == 8) {
 //		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_hitmarker_sound = !H2Config_hitmarker_sound));
 //	}
@@ -3034,8 +3042,10 @@ int __cdecl CustomMenu_OtherSettings(int a1) {
 	loadLabelToggle_OtherSettings(6, 0xFFFFFFF6, !H2Config_skip_intro);
 	loadLabelToggle_OtherSettings(7, 0xFFFFFFF2, !H2Config_disable_ingame_keyboard);
 	loadLabelToggle_OtherSettings(8, 0xFFFFFFF2, H2Config_raw_input);
+	loadLabelToggle_OtherSettings(9, 0xFFFFFFF2, H2Config_hiresfix);
+	loadLabelToggle_OtherSettings(10, 0xFFFFFFF2, H2Config_d3dex);
 //	loadLabelToggle_OtherSettings(9, 0xFFFFFFF2, H2Config_hitmarker_sound);
-	return CustomMenu_CallHead(a1, menu_vftable_1_OtherSettings, menu_vftable_2_OtherSettings, (DWORD)&CMButtonHandler_OtherSettings, 8, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_OtherSettings, menu_vftable_2_OtherSettings, (DWORD)&CMButtonHandler_OtherSettings, 10, 272);
 }
 
 void GSCustomMenuCall_OtherSettings() {
@@ -4643,16 +4653,12 @@ void setupSomeTests() {
 	//DWORD dwBack;
 
 	//psub_20C226 = (tsub_20C226)DetourClassFunc((BYTE*)H2BaseAddr + 0x20C226, (BYTE*)sub_20C226, 9);
-	//VirtualProtect(psub_20C226, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//psub_24DC0D = (tsub_24DC0D)DetourClassFunc((BYTE*)H2BaseAddr + 0x24DC0D, (BYTE*)sub_24DC0D_CM, 8);
-	//VirtualProtect(psub_24DC0D, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//psub_23D8AE = (tsub_23D8AE)DetourClassFunc((BYTE*)H2BaseAddr + 0x23D8AE, (BYTE*)sub_23D8AE, 9);
-	//VirtualProtect(psub_23D8AE, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//psub_20EEBE = (tsub_20EEBE)DetourClassFunc((BYTE*)H2BaseAddr + 0x20EEBE, (BYTE*)sub_20EEBE_CM, 9);
-	//VirtualProtect(psub_20EEBE, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 }
 
 
@@ -5033,7 +5039,7 @@ void initGSCustomMenu() {
 
 
 	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF0, "Message of the Day!");
-	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF1, "DO NOT CHEAT ONLINE!\r\n\Ranks are on the way!\r\nInitial testing phase is beginning now.\r\nNew variant OGH2, try it out!");
+	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF1, "DO NOT CHEAT ONLINE!\r\nRanks are on the way!\r\nInitial testing phase is beginning now.\r\nNew variant OGH2, try it out!");
 
 
 	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF0, "Customise HUD / GUI");
@@ -5090,6 +5096,8 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0006, "Game Intro Video");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0007, "In-game Keyb. CTRLs");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0008, "Raw Mouse Input");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0009, "Hi Res Fix");
+	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF000A, "D3DEX");
 //	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0009, "Hitmarker Sound Effect");
 
 
@@ -5215,23 +5223,16 @@ void initGSCustomMenu() {
 
 	DWORD dwBack;
 	pbtnHandler = (tbtnhandler)DetourClassFunc((BYTE*)H2BaseAddr + 0x213af2, (BYTE*)BtnHandlerCaller, 8);
-	VirtualProtect(pbtnHandler, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	psub_23f6b7 = (tsub_23f6b7)DetourFunc((BYTE*)H2BaseAddr + 0x23f6b7, (BYTE*)sub_23f6b7, 7);
-	VirtualProtect(psub_23f6b7, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//psub_248beb = (tsub_248beb)DetourClassFunc((BYTE*)H2BaseAddr + 0x248beb, (BYTE*)sub_248beb, 8);
-	//VirtualProtect(psub_248beb, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	psub_209129 = (tsub_209129)DetourFunc((BYTE*)H2BaseAddr + 0x209129, (BYTE*)sub_209129, 5);
-	VirtualProtect(psub_209129, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	psub_bd137 = (tsub_bd137)DetourFunc((BYTE*)H2BaseAddr + 0xbd137, (BYTE*)sub_bd137, 5);
-	VirtualProtect(psub_bd137, 4, PAGE_EXECUTE_READWRITE, &dwBack);
-
 
 	RefreshToggleIngameKeyboardControls();
-
 
 	CMSetupVFTables_EscSettings();
 	

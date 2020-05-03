@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "XLive\Networking\upnp.h"
+#include "upnp.h"
 #include <miniupnpc/upnpcommands.h>
 
 /* Ripped from ED thanks guys - PermaNull*/

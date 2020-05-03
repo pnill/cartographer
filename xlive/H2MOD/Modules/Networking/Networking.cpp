@@ -1,7 +1,7 @@
 
 #include "Globals.h"
 
-#include "XLive\IpManagement\XnIp.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\ServerConsole\ServerConsole.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -11,8 +11,8 @@
 #include "CustomPackets\CustomPackets.h"
 #include "NetworkConfiguration\NetworkConfiguration.h"
 
-extern SOCKET game_network_data_gateway_socket_1000;
-extern SOCKET game_network_message_gateway_socket_1001;
+extern XSocket* game_network_data_gateway_socket_1000;
+extern XSocket* game_network_message_gateway_socket_1001;
 
 CustomNetwork *network = new CustomNetwork;
 
@@ -213,24 +213,18 @@ tjoin_game pjoin_game;
 
 bool __stdcall join_game(void* thisptr, int a2, int a3, XNKID* xnkid, XNKEY* xnkey, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
 {
-	IN_ADDR ipIdentifier;
-
 	memcpy(&ipManager.game_host_xn, host_xn, sizeof(XNADDR));
 	LOG_TRACE_NETWORK("[H2MOD-Network] copied host information, XNADDR: {:#x}", ipManager.game_host_xn.ina.s_addr);
-	memcpy(&ipManager.securePacket.xnkid, xnkid, sizeof(XNKID));
-	XNetXnAddrToInAddr(host_xn, xnkid, &ipIdentifier);
-	ipManager.SaveNatInfo(ipIdentifier, nullptr);
-	ipManager.sendNatInfoUpdate(game_network_data_gateway_socket_1000, host_xn->wPortOnline);
-	ipManager.sendNatInfoUpdate(game_network_message_gateway_socket_1001, ntohs(htons(ipManager.game_host_xn.wPortOnline) + 1));
+	
 	return pjoin_game(thisptr, a2, a3, xnkid, xnkey, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 
-typedef bool(__cdecl* decode_text_chat_packet_)(void* container, int a2, s_text_chat* data_structure);
+typedef bool(__cdecl* decode_text_chat_packet_)(void* container, int a2, s_text_chat* data);
 decode_text_chat_packet_ p_decode_text_chat_packet;
 
-bool __cdecl decode_text_chat_packet(void* container, int a2, s_text_chat* data_structure)
+bool __cdecl decode_text_chat_packet(void* container, int a2, s_text_chat* data)
 {
-	bool ret = p_decode_text_chat_packet(container, a2, data_structure);
+	bool ret = p_decode_text_chat_packet(container, a2, data);
 
 	return ret;
 }
@@ -250,7 +244,6 @@ void removeXNetSecurity()
 	DWORD dwBack;
 	/* XNKEY bs */
 	p_cmp_xnkid = (cmp_xnkid)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1C284A, 0x199F02), (BYTE*)xnkid_cmp, 9);
-	VirtualProtect(p_cmp_xnkid, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	BYTE jmp = 0xEB;
 	// apparently the secure address has 1 free byte 
@@ -284,7 +277,6 @@ void applyConnectionPatches()
 	if (!h2mod->Server)
 	{	
 		pjoin_game = (tjoin_game)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1CDADE), (BYTE*)join_game, 13);
-		VirtualProtect(pjoin_game, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 }
 
@@ -297,27 +289,21 @@ void CustomNetwork::applyNetworkHooks() {
 	///////////////////////////////////////////////
 
 	register_connection_packets_method = (register_connection_packets)DetourFunc(h2mod->GetAddress<BYTE*>(0x1F1B36, 0x1D24EF), (BYTE*)registerConnectionPackets, 5);
-	VirtualProtect(register_connection_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	
 	//use for debugging
 	//register_player_packets_method = (register_player_packets)DetourFunc(h2mod->GetAddress<BYTE*>(0x1F0A55, 0x1D140E), (BYTE*)registerPlayerPackets, 5);
-	//VirtualProtect(register_player_packets_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//serialize_parameters_update_packet_method = (serialize_parameters_update_packet)DetourFunc((BYTE*)h2mod->GetAddress(0x1F03F5, 0x1CE5FA), (BYTE*)serializeParametersUpdatePacket, 5);
-	//VirtualProtect(serialize_parameters_update_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	/////////////////////////////////////////////////////////////////////
 	//send/recv packet functions below (for troubleshooting and research)
 	/////////////////////////////////////////////////////////////////////
 	//send_packet_method = (send_packet)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E8296, 0x1CA259), (BYTE*)sendPacket, 8);
-	//VirtualProtect(send_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	//receive_packet_method = (receive_packet)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E82E0, 0x1CA2A3), (BYTE*)receivePacket, 11);
-	//VirtualProtect(receive_packet_method, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	if (h2mod->Server) {
 		p_decode_text_chat_packet = (decode_text_chat_packet_)DetourFunc(h2mod->GetAddress<BYTE*>(0x0, 0x1CD8A4), (BYTE*)decode_text_chat_packet, 12);
-		VirtualProtect(p_decode_text_chat_packet, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	}
 
 	CustomPackets::ApplyGamePatches();

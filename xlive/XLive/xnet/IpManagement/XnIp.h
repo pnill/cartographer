@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "stdafx.h"
+#include "..\Sockets\XSocket.h"
 
 struct XnIp
 {
@@ -8,6 +9,12 @@ struct XnIp
 	XNADDR xnaddr;
 	XNKID xnkid;
 	bool bValid;
+	int xnetstatus;
+	int connectionPacketsSentCount;
+
+	// NAT info
+	sockaddr_in NatAddrSocket1000; // TODO: allocate dynamically based on how many sockets are up
+	sockaddr_in NatAddrSocket1001;
 };
 
 template <class T>
@@ -38,7 +45,7 @@ struct SecurePacket
 class CXnIp
 {
 public:
-	void CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier);
+	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier);
 	void UnregisterSecureAddr(const IN_ADDR ina);
 
 	void UpdateConnectionStatus();
@@ -46,9 +53,12 @@ public:
 	void UnregisterLocal();
 	void ConfigureLocalUser(XNADDR* pxna, XUID xuid, char* username);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
-	int sendNatInfoUpdate(SOCKET s, short port);
+	int sendConnectionInfo(XSocket* s, IN_ADDR ipIdentifier);
 
-	void SaveNatInfo(IN_ADDR ipIdentifier, sockaddr* addr);
+	IN_ADDR GetConnectionIdentifierByNat(sockaddr* addr);
+	void SaveConnectionNatInfo(IN_ADDR ipIdentifier);
+	void SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr* addr);
+	void HandleConnectionPacket(XSocket* xsocket, const XNADDR* pxna, const XNKID* xnkid, sockaddr* addr);
 	void SetKeys(XNKID*, XNKEY*);
 	void EraseKeys();
 	void GetKeys(XNKID* xnkid, XNKEY* xnkey);
@@ -56,12 +66,8 @@ public:
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 
 	std::array<XnIp, 32> XnIPs; // ConnectionIndex->CUser
-	std::unordered_map<std::pair<ULONG, SHORT>, IN_ADDR> connection_identifiers_map; // Map Key(XNHost,XnPort)->Secure
-	std::array<SHORT, 32> pmap_a;
-	std::array<SHORT, 32> pmap_b;
-	//std::array<SHORT, 32> pmap_c;
-	//std::array<SHORT, 32> pmap_d;
-	std::unordered_map<SOCKET, SHORT> sockmap;
+
+	std::vector<XSocket*> SocketPtrArray;
 
 	XnIp local_user;
 	XNADDR game_host_xn;

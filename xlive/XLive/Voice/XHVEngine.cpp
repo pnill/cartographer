@@ -74,7 +74,7 @@ BOOL IXHV2ENGINE::IsLocalTalking(VOID *pThis, DWORD dwUserIndex) {
 	XUID id = xFakeXuid[0];
 	BOOL isTalking = xuidIsTalkingMap[id];
 	return H2Config_voice_chat 
-#ifdef COMPILE_WITHOUT_VOICE_LIBRARIES
+#if COMPILE_WITH_VOICE
 		&& p_CAudioHandler->audioDevices->IsDeviceAvailable(Input) ? xuidIsTalkingMap[id] : false;
 #endif
 	;
@@ -93,7 +93,7 @@ LONG IXHV2ENGINE::Release(/*CXHVEngine*/ VOID *pThis)
 	if (!remotetalkers.empty())
 		remotetalkers.clear();
 
-#ifdef COMPILE_WITHOUT_VOICE_LIBRARIES
+#if COMPILE_WITH_VOICE
 	if (H2Config_voice_chat)
 		delete p_CAudioHandler;
 #endif

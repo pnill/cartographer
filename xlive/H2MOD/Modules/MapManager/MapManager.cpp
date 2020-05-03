@@ -4,7 +4,7 @@
 #include <WS2tcpip.h>
 #include "H2MOD\Modules\Config\Config.h"
 #include <curl/curl.h>
-#include "XLive\IpManagement\XnIp.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 #include "..\Networking\Networking.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
