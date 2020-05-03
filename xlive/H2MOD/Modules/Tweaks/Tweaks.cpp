@@ -1023,7 +1023,6 @@ void InitH2Tweaks() {
 	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 
 	// physics patches 
-	H2Tweaks::applyObjectPredictionPatch(); 
 
 	addDebugText("End Startup Tweaks.");
 }
@@ -1301,23 +1300,6 @@ void H2Tweaks::disableAI_MP() {
 	BYTE jnz[1] = { JNZ_RAW_BYTE };
 	WriteBytes(H2BaseAddr + (H2IsDediServer ? 0x2B93F4 : 0x30E684), jnz, 1);
 }
-
-float* seconds_per_tick_xbox_flt;
-__declspec(naked) void get_tick_execution_time_seconds(void)
-{
-	__asm
-	{
-		mov eax, seconds_per_tick_xbox_flt
-		fld dword ptr[eax]
-		retn
-	}
-}
-
-void H2Tweaks::applyObjectPredictionPatch()
-{
-	seconds_per_tick_xbox_flt = h2mod->GetAddress<float*>(0x3BBEB4, 0x378C84);
-	PatchCall(h2mod->GetAddress(0x1F4435, 0x1DF4CE), get_tick_execution_time_seconds);
-}	
 
 void H2Tweaks::applyMeleePatch(bool toggle)
 {

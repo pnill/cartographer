@@ -11,6 +11,7 @@ struct XnIp
 	bool bValid;
 	int xnetstatus;
 	int connectionPacketsSentCount;
+	int lastPacketReceivedTime;
 
 	// NAT info
 	sockaddr_in NatAddrSocket1000; // TODO: allocate dynamically based on how many sockets are up
@@ -35,9 +36,9 @@ template<typename S, typename T> struct std::hash < std::pair<S, T> >
 	}
 };
 
-struct SecurePacket 
+struct XNetConnectionReqPacket 
 {
-	DWORD annoyance_factor;
+	DWORD ConnectPacketIdentifier;
 	XNADDR xnaddr;
 	XNKID xnkid;
 };
@@ -45,18 +46,19 @@ struct SecurePacket
 class CXnIp
 {
 public:
-	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier);
-	void UnregisterSecureAddr(const IN_ADDR ina);
+	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier, bool handleFromConnectionPacket);
+	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 
 	void UpdateConnectionStatus();
 	BOOL LocalUserLoggedIn();
 	void UnregisterLocal();
 	void ConfigureLocalUser(XNADDR* pxna, XUID xuid, char* username);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
-	int sendConnectionInfo(XSocket* s, IN_ADDR ipIdentifier);
+	void setTimePacketReceived(IN_ADDR ina, int time);
+	void checkForLostConnections();
+	int sendConnectionRequest(XSocket* xsocket, IN_ADDR ipIdentifier);
 
 	IN_ADDR GetConnectionIdentifierByNat(sockaddr* addr);
-	void SaveConnectionNatInfo(IN_ADDR ipIdentifier);
 	void SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr* addr);
 	void HandleConnectionPacket(XSocket* xsocket, const XNADDR* pxna, const XNKID* xnkid, sockaddr* addr);
 	void SetKeys(XNKID*, XNKEY*);
@@ -65,14 +67,14 @@ public:
 
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 
-	std::array<XnIp, 32> XnIPs; // ConnectionIndex->CUser
-
-	std::vector<XSocket*> SocketPtrArray;
+	std::array<XnIp, 32> XnIPs = {}; // ConnectionIndex->CUser
+	std::vector<XSocket*> SocketPtrArray = {};
 
 	XnIp local_user;
 	XNADDR game_host_xn;
 	int total_connections_saved;
-	SecurePacket securePacket;
+	XNetConnectionReqPacket securePacket;
+	DWORD connectPacketIdentifier = 0x8E0A40F8; // DO NOT TOUCH THIS
 
 private:
 	XNKID host_xnkid;
@@ -82,4 +84,3 @@ private:
 extern wchar_t ServerLobbyName[32];
 void SetUserUsername(char* username);
 extern CXnIp ipManager;
-extern const DWORD annoyance_factor;
