@@ -1,19 +1,10 @@
 #include "stdafx.h"
 #include "xnet.h"
 
-XNetStartupParams g_XnetStartupParams;
-
-// #51: XNetStartup
-int WINAPI XNetStartup(const XNetStartupParams *pxnsp)
-{
-	memcpy(&g_XnetStartupParams, pxnsp, sizeof(XNetStartupParams));
-	return 0;
-}
-
 // #58: XNetServerToInAddr
 INT   WINAPI XNetServerToInAddr(const IN_ADDR ina, DWORD dwServiceId, IN_ADDR * pina)
 {
-	LOG_TRACE_XLIVE("XNetServerToInAddr");
+	LOG_TRACE_NETWORK("XNetServerToInAddr");
 	if (pina)
 		*pina = ina;
 	return 0;
@@ -23,7 +14,7 @@ INT   WINAPI XNetServerToInAddr(const IN_ADDR ina, DWORD dwServiceId, IN_ADDR * 
 // #59: XNetTsAddrToInAddr
 INT   WINAPI XNetTsAddrToInAddr(const TSADDR * ptsa, DWORD dwServiceId, const XNKID * pxnkid, IN_ADDR * pina)
 {
-	LOG_TRACE_XLIVE("XNetTsAddrToInAddr");
+	LOG_TRACE_NETWORK("XNetTsAddrToInAddr");
 	if (pina)
 		*pina = ptsa->ina;
 	return 0;
@@ -33,7 +24,7 @@ INT   WINAPI XNetTsAddrToInAddr(const TSADDR * ptsa, DWORD dwServiceId, const XN
 // #61: XNetInAddrToServer
 INT   WINAPI XNetInAddrToServer(const IN_ADDR ina, IN_ADDR *pina)
 {
-	LOG_TRACE_XLIVE("XNetInAddrToServer");
+	LOG_TRACE_NETWORK("XNetInAddrToServer");
 	if (pina)
 		*pina = ina;
 	return 0;
@@ -43,7 +34,7 @@ INT   WINAPI XNetInAddrToServer(const IN_ADDR ina, IN_ADDR *pina)
 // #62: XNetInAddrToString
 INT   WINAPI XNetInAddrToString(const IN_ADDR ina, char * pchBuf, INT cchBuf)
 {
-	LOG_TRACE_XLIVE("XNetInAddrToString");
+	LOG_TRACE_NETWORK("XNetInAddrToString");
 	strncpy(pchBuf, inet_ntoa(ina), cchBuf);
 	return 0;
 }
@@ -51,7 +42,7 @@ INT   WINAPI XNetInAddrToString(const IN_ADDR ina, char * pchBuf, INT cchBuf)
 // #64
 INT WINAPI XNetXnAddrToMachineId(const XNADDR * pxnaddr, ULONGLONG * pqwMachineId)
 {
-	LOG_TRACE_XLIVE("XNetXnAddrToMachineId");
+	LOG_TRACE_NETWORK("XNetXnAddrToMachineId");
 
 
 	// ???
@@ -67,7 +58,7 @@ INT WINAPI XNetXnAddrToMachineId(const XNADDR * pxnaddr, ULONGLONG * pqwMachineI
 // #67: XNetDnsLookup
 int WINAPI XNetDnsLookup(const char * pszHost, DWORD hEvent, void ** ppxndns)
 {
-	LOG_TRACE_XLIVE("XNetDnsLookup");
+	LOG_TRACE_NETWORK("XNetDnsLookup");
 	if (ppxndns)
 		*ppxndns = NULL;
 	return 1;   // ERROR
@@ -76,7 +67,7 @@ int WINAPI XNetDnsLookup(const char * pszHost, DWORD hEvent, void ** ppxndns)
 // #68: XNetDnsRelease
 int WINAPI XNetDnsRelease(void * pxndns)
 {
-	LOG_TRACE_XLIVE("XNetDnsRelease");
+	LOG_TRACE_NETWORK("XNetDnsRelease");
 	return 0;
 }
 
@@ -88,8 +79,7 @@ DWORD WINAPI XNetGetEthernetLinkStatus()
 
 	if (print < 15)
 	{
-		//("XNetGetEthernetLinkStatus");
-		//LOG_TRACE_XLIVE("- active: 100 mbps, full duplex");
+		//LOG_TRACE_NETWORK("XNetGetEthernetLinkStatus() - active: 100 mbps, full duplex");
 
 		print++;
 	}
@@ -101,14 +91,14 @@ DWORD WINAPI XNetGetEthernetLinkStatus()
 // #76
 DWORD WINAPI XNetGetBroadcastVersionStatus(DWORD a1)
 {
-	LOG_TRACE_XLIVE("XNetGetBroadcastVersionStatus");
+	LOG_TRACE_NETWORK("XNetGetBroadcastVersionStatus");
 	return 0;
 }
 
 // #78
 INT WINAPI XNetGetOpt(DWORD dwOptId, BYTE * pbValue, DWORD * pdwValueSize)
 {
-	LOG_TRACE_XLIVE("XNetGetOpt");
+	LOG_TRACE_NETWORK("XNetGetOpt");
 	return WSAEINVAL;
 }
 
@@ -116,28 +106,28 @@ INT WINAPI XNetGetOpt(DWORD dwOptId, BYTE * pbValue, DWORD * pdwValueSize)
 // #79: XNetSetOpt
 INT WINAPI XNetSetOpt(DWORD dwOptId, const BYTE * pbValue, DWORD dwValueSize)
 {
-	LOG_TRACE_XLIVE("XNetSetOpt");
+	LOG_TRACE_NETWORK("XNetSetOpt");
 	return WSAEINVAL;
 }
 
 // #80
 int WINAPI XNetStartupEx(int a1, int a2, int a3)
 {
-	LOG_TRACE_XLIVE("XNetStartupEx");
+	LOG_TRACE_NETWORK("XNetStartupEx");
 	return 0;
 }
 
 // #81
 int WINAPI XNetReplaceKey(const XNKID *pxnkidUnregister, const XNKID *pxnkidReplace)
 {
-	LOG_TRACE_XLIVE("XNetReplaceKey( pxnkidUnregister: {0:p}, pxnkidreplace: {1:p})", (void*)pxnkidUnregister, (void*)pxnkidReplace);
+	LOG_TRACE_NETWORK("XNetReplaceKey( pxnkidUnregister: {0:p}, pxnkidreplace: {1:p})", (void*)pxnkidUnregister, (void*)pxnkidReplace);
 	return 0;
 }
 
 // #82
 int WINAPI XNetGetXnAddrPlatform(in_addr *a1, int a2)
 {
-	LOG_TRACE_XLIVE("XNetGetXnAddrPlatform");
+	LOG_TRACE_NETWORK("XNetGetXnAddrPlatform()");
 	a2 = XNET_XNADDR_PLATFORM_WINPC;
 	return 0;
 }
@@ -145,7 +135,7 @@ int WINAPI XNetGetXnAddrPlatform(in_addr *a1, int a2)
 // #83
 int WINAPI XNetGetSystemLinkPort(DWORD *a1)
 {
-	LOG_TRACE_XLIVE("XNetGetSystemLinkPort");
+	LOG_TRACE_NETWORK("XNetGetSystemLinkPort()");
 	if (a1)
 		*a1 = 3074;
 	return 0;
@@ -154,6 +144,6 @@ int WINAPI XNetGetSystemLinkPort(DWORD *a1)
 // #84: XNetSetSystemLinkPort
 DWORD WINAPI XNetSetSystemLinkPort(DWORD a1)
 {
-	LOG_TRACE_XLIVE("XNetSetSystemLinkPort  (a1 = {:x})", a1);
+	LOG_TRACE_NETWORK("XNetSetSystemLinkPort  (a1 = {:x})", a1);
 	return 0;
 }

@@ -5,7 +5,6 @@
 //typedef unsigned __int64 ULONG_PTR, *PULONG_PTR;
 //typedef unsigned long DWORD_PTR;
 
-
 // Xbox Secure Network Library ------------------------------------------------
 
 //
@@ -73,11 +72,6 @@
 // versions of the library.
 //
 #define XNET_STARTUP_DISABLE_PEER_ENCRYPTION        0x08
-
-
-
-
-
 
 #define XUSER_DATA_TYPE_CONTEXT     ((BYTE)0)
 #define XUSER_DATA_TYPE_INT32       ((BYTE)1)
@@ -347,37 +341,6 @@ INT    WINAPI XNetSetOpt(DWORD dwOptId, const BYTE * pbValue, DWORD dwValueSize)
 // outstanding overlapped I/O requests. Apps must call WSACancelOverlappedIO function instead.
 //
 
-typedef ULONGLONG XUID;
-typedef XUID *PXUID;
-
-#define INVALID_XUID                    ((XUID) 0)
-
-#define XUSER_NAME_SIZE                 16
-#define XUSER_MAX_NAME_LENGTH           (XUSER_NAME_SIZE - 1)
-
-#define XUSER_GET_SIGNIN_INFO_ONLINE_XUID_ONLY      0x00000002
-#define XUSER_GET_SIGNIN_INFO_OFFLINE_XUID_ONLY     0x00000001
-
-#define XUSER_INFO_FLAG_LIVE_ENABLED    0x00000001
-#define XUSER_INFO_FLAG_GUEST           0x00000002
-
-typedef enum _XUSER_SIGNIN_STATE
-{
-	eXUserSigninState_NotSignedIn,
-	eXUserSigninState_SignedInLocally,
-	eXUserSigninState_SignedInToLive
-} XUSER_SIGNIN_STATE;
-
-typedef struct _XUSER_SIGNIN_INFO
-{
-	XUID                 xuid;
-	DWORD                dwInfoFlags;
-	XUSER_SIGNIN_STATE   UserSigninState;
-	DWORD                dwGuestNumber;
-	DWORD                dwSponsorUserIndex;
-	CHAR                 szUserName[XUSER_NAME_SIZE];
-} XUSER_SIGNIN_INFO, * PXUSER_SIGNIN_INFO;
-
 // Xbox-specific Overlapped
 
 typedef struct _XOVERLAPPED             XOVERLAPPED, *PXOVERLAPPED;
@@ -598,29 +561,11 @@ typedef struct _MESSAGEBOX_RESULT {
 		WORD rgwPasscode[4];
 	};
 }	MESSAGEBOX_RESULT, *PMESSAGEBOX_RESULT;
- 
-
-typedef enum _XSTORAGE_FACILITY
-{
-    XSTORAGE_FACILITY_GAME_CLIP = 1,
-    XSTORAGE_FACILITY_PER_TITLE = 2,
-    XSTORAGE_FACILITY_PER_USER_TITLE = 3
-} XSTORAGE_FACILITY;
- 
-
-typedef struct _XSTORAGE_DOWNLOAD_TO_MEMORY_RESULTS {
-    DWORD dwBytesTotal;
-    XUID xuidOwner;
-    FILETIME ftCreated;
-} XSTORAGE_DOWNLOAD_TO_MEMORY_RESULTS;
- 
 
 typedef struct {
     DWORD dwNewOffers;
     DWORD dwTotalOffers;
 } XOFFERING_CONTENTAVAILABLE_RESULT;
- 
-
 
 #define XMARKETPLACE_CONTENT_ID_LEN 20
 

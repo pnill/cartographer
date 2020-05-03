@@ -276,6 +276,7 @@
     <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.cpp" />
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="H2MOD\Tags\global_tags_interface.cpp" />
@@ -351,17 +352,18 @@
     <ClCompile Include="XLive\ServerList\ServerList.cpp" />
     <ClCompile Include="XLive\XNet\upnp.cpp" />
     <ClCompile Include="XLive\XNet\XNetQoS.cpp" />
-    <ClCompile Include="XLive\XNet\xlive_network.cpp" />
     <ClCompile Include="XLive\XNet\xnet.cpp" />
     <ClCompile Include="XLive\XNet\Sockets\XSocket.cpp" />
     <ClCompile Include="XLive\XNet\IpManagement\XnIp.cpp" />
     <ClCompile Include="XLive\Voice\XHVEngine.cpp" />
     <ClCompile Include="XLive\XAM\xam.cpp" />
     <ClCompile Include="XLive\xbox\xbox.cpp" />
+    <ClCompile Include="XLive\XSession\XSession.cpp" />
     <ClCompile Include="XLive\XUser\XCustomAction.cpp" />
     <ClCompile Include="XLive\XUser\XUser.cpp" />
     <ClCompile Include="XLive\XUser\XUserContext.cpp" />
     <ClCompile Include="XLive\XUser\XUserProperty.cpp" />
+    <ClCompile Include="XLive\XStorage\XStorage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -463,6 +465,7 @@
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.h" />
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h" />
@@ -586,10 +589,12 @@
     <ClInclude Include="XLive\Voice\XHVEngine.h" />
     <ClInclude Include="XLive\XAM\xam.h" />
     <ClInclude Include="XLive\xbox\xbox.h" />
+    <ClInclude Include="XLive\XSession\XSession.h" />
     <ClInclude Include="XLive\XUser\XCustomAction.h" />
     <ClInclude Include="XLive\XUser\XUser.h" />
     <ClInclude Include="XLive\XUser\XUserContext.h" />
     <ClInclude Include="XLive\XUser\XUserProperty.h" />
+    <ClInclude Include="XLive\XStorage\XStorage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def" />

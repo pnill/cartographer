@@ -39,6 +39,9 @@ h2log *onscreendebug_log = nullptr;
 // Console logger, receives output from all loggers
 h2log *console_log = nullptr;
 
+// Voice chat logger
+h2log* voice_log = nullptr;
+
 std::random_device rd;
 
 ProcessInfo game_info;
@@ -392,7 +395,6 @@ void InitH2Startup() {
 		addDebugText("Process is Client");
 
 		addDebugText("Hooking Shutdown Function");
-		DWORD dwBack;
 		PatchCall(H2BaseAddr + 0x39E7C, game_modules_dispose);
 	}
 
@@ -418,12 +420,16 @@ void InitH2Startup() {
 		if (H2Config_debug_log_console) {
 			console_log = h2log::create_console("CONSOLE MAIN");
 		}
-		xlive_log = h2log::create("xLiveLess", prepareLogFileName(L"h2xlive"));
+		xlive_log = h2log::create("XLive", prepareLogFileName(L"h2xlive"));
 		LOG_DEBUG_XLIVE(DLL_VERSION_STR "\n");
 		h2mod_log = h2log::create("H2MOD", prepareLogFileName(L"h2mod"));
 		LOG_DEBUG_GAME(DLL_VERSION_STR "\n");
 		network_log = h2log::create("Network", prepareLogFileName(L"h2network"));
 		LOG_DEBUG_NETWORK(DLL_VERSION_STR "\n");
+#if COMPILE_WITH_VOICE
+		voice_log = h2log::create("Voice", prepareLogFileName(L"voicechat"));
+		LOG_DEBUG(voice_log, DLL_VERSION_STR "\n");
+#endif
 	}
 	//checksum_log = logger::create(prepareLogFileName("checksum"), true);
 	LeaveCriticalSection(&log_section);

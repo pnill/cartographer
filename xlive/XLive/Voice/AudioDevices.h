@@ -26,19 +26,20 @@ public:
 
 	void SelectAudioOutput();
 	void SelectAudioInput();
+
 	/*	Default input/output device indexes	*/
-	int					m_totalDevices;
+	int					m_deviceCount;
 	PaDeviceIndex		m_defaultOutputDeviceIndex, m_defaultInputDeviceIndex = -1;
 
-	PaError				GetAudioClassError() { return m_CAudioDeviceErr; }
+	PaError				GetAudioInterfaceError() { return m_lastDeviceErr; }
 	bool				IsDeviceAvailable(DeviceType devType) { return devType == Input ? (m_defaultInputDeviceIndex != -1 ? true : false) : (m_defaultOutputDeviceIndex != -1 ? true : false); }
-	DeviceInfo*			GetDeviceInfo(PaDeviceIndex index) { if (index < m_totalDevices) return m_audioDeviceInfoArray; else return nullptr; }
+	DeviceInfo*			GetDeviceInfo(PaDeviceIndex index) { if (index < m_deviceCount) return m_audioDeviceInfoArray; else return nullptr; }
 
 	~CAudioDevices();
 
 private:
 
-	PaError				m_CAudioDeviceErr = paNoError;
+	PaError				m_lastDeviceErr = paNoError;
 	DeviceInfo*			m_audioDeviceInfoArray = nullptr;
 	bool				m_defaultInputFound, m_defaultOutputFound = false;
 

@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "stdafx.h"
+#include "..\xnet.h"
 #include "..\Sockets\XSocket.h"
 
 struct XnIp
@@ -11,11 +12,16 @@ struct XnIp
 	bool bValid;
 	int xnetstatus;
 	int connectionPacketsSentCount;
-	int lastPacketReceivedTime;
+	int lastConnectionInteractionTime;
+
+	// TODO:
+	//int socketCount;
 
 	// NAT info
 	sockaddr_in NatAddrSocket1000; // TODO: allocate dynamically based on how many sockets are up
 	sockaddr_in NatAddrSocket1001;
+
+	bool isValid(IN_ADDR identifier) { return bValid && identifier.s_addr == connectionIdentifier.s_addr; }
 };
 
 template <class T>
@@ -49,31 +55,35 @@ public:
 	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier, bool handleFromConnectionPacket);
 	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 
-	void UpdateConnectionStatus();
-	BOOL LocalUserLoggedIn();
-	void UnregisterLocal();
-	void ConfigureLocalUser(XNADDR* pxna, XUID xuid, char* username);
-	int getConnectionIndex(IN_ADDR connectionIdentifier);
-	void setTimePacketReceived(IN_ADDR ina, int time);
 	void checkForLostConnections();
+	void setTimeConnectionInteractionHappened(IN_ADDR ina, int time);
+	int getConnectionIndex(IN_ADDR connectionIdentifier);
+	void SetupLocalConnectionInfo(XNADDR* pxna);
 	int sendConnectionRequest(XSocket* xsocket, IN_ADDR ipIdentifier);
+	int handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, int bytesRecvdCount);
 
-	IN_ADDR GetConnectionIdentifierByNat(sockaddr* addr);
-	void SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr* addr);
-	void HandleConnectionPacket(XSocket* xsocket, const XNADDR* pxna, const XNKID* xnkid, sockaddr* addr);
-	void SetKeys(XNKID*, XNKEY*);
-	void EraseKeys();
-	void GetKeys(XNKID* xnkid, XNKEY* xnkey);
-
+	void UnregisterLocalConnectionInfo();
+	void GetStartupParamsAndUpdate(const XNetStartupParams* netStartupParams);
+	IN_ADDR GetConnectionIdentifierByNat(sockaddr_in* addr);
+	void SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);
+	void HandleConnectionPacket(XSocket* xsocket, XNetConnectionReqPacket* connectReqPacket, sockaddr_in* addr);
+	void RegisterKeys(XNKID*, XNKEY*);
+	void UnregisterKeys();
+	void getRegisteredKeys(XNKID* xnkid, XNKEY* xnkey);
+	
+	XnIp localUser;
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 
-	std::array<XnIp, 32> XnIPs = {}; // ConnectionIndex->CUser
+	XnIp* XnIPs = nullptr;
 	std::vector<XSocket*> SocketPtrArray = {};
 
-	XnIp local_user;
-	XNADDR game_host_xn;
-	int total_connections_saved;
-	XNetConnectionReqPacket securePacket;
+	// TODO: get rid of this
+	XNADDR gameHostXn; // the Xn of the host from the join game hook
+
+	XNetStartupParams startupParams;
+	int GetMaxXnConnections() { return startupParams.cfgSecRegMax; }
+	int GetReqQoSBufferSize() { return startupParams.cfgQosDataLimitDiv4 * 4; }
+
 	DWORD connectPacketIdentifier = 0x8E0A40F8; // DO NOT TOUCH THIS
 
 private:
@@ -81,6 +91,5 @@ private:
 	XNKEY host_xnkey;
 };
 
-extern wchar_t ServerLobbyName[32];
-void SetUserUsername(char* username);
 extern CXnIp ipManager;
+void SetUserUsername(char* username);

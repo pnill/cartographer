@@ -54,12 +54,10 @@ public:
 		DatumIndex get_unit_datum_from_player_index(int);
 		BYTE* get_player_unit_from_player_index(int playerIndex);
 		void ApplyHooks(); 
-		void handle_command(std::string);
-		void handle_command(std::wstring);
-		wchar_t* get_local_player_name();		
-		Real::Point3D* get_player_coords(int playerIndex);
+		DatumIndex get_player_datum_index_from_controller_index(int controller_index);
+		wchar_t* get_local_player_name();
+		Real::Point3D* get_player_unit_coords(int playerIndex);
 		float get_distance(int, int);
-		bool is_team_play();
 		wchar_t* GetLobbyGameVariantName();
 		wchar_t* get_player_name_from_player_index(int playerIndex);
 		int get_player_index_from_name(wchar_t* playername);
@@ -71,7 +69,7 @@ public:
 		void set_unit_speed(float speed, int playerIndex);
 		void set_local_team_index(int local_player_index, int team);
 		BYTE get_local_team_index();
-		void set_local_grenades(BYTE type, BYTE count, int playerIndex);
+		void set_player_unit_grenades_count(BYTE type, BYTE count, int playerIndex);
 		void DisableSound(int sound);
 		void CustomSoundPlay(const wchar_t* soundName, int delay);
 		void DisableWeaponPickup(bool b_Enable);

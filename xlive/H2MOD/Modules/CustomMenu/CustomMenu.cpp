@@ -2468,8 +2468,8 @@ __declspec(naked) void sub_20F790_CM_nak_Login_Warn() {//__thiscall
 void* __stdcall sub_248beb_deconstructor_Login_Warn(LPVOID lpMem, char a2)//__thiscall
 {
 	//show select profile gui
-	int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
-	sub_209236(0,0);
+	extern int notify_xlive_ui;
+	notify_xlive_ui = 0;
 
 	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
 	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
@@ -2990,13 +2990,6 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_hiresfix = !H2Config_hiresfix));
 		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
 	}
-	else if (button_id == 9) {
-		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_d3dex = !H2Config_d3dex));
-		GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02A, 0xFFFFF02B);
-	}
-//	else if (button_id == 8) {
-//		loadLabelToggle_OtherSettings(button_id + 1, 0xFFFFFFF2, (H2Config_hitmarker_sound = !H2Config_hitmarker_sound));
-//	}
 	return false;
 }
 
@@ -3043,9 +3036,7 @@ int __cdecl CustomMenu_OtherSettings(int a1) {
 	loadLabelToggle_OtherSettings(7, 0xFFFFFFF2, !H2Config_disable_ingame_keyboard);
 	loadLabelToggle_OtherSettings(8, 0xFFFFFFF2, H2Config_raw_input);
 	loadLabelToggle_OtherSettings(9, 0xFFFFFFF2, H2Config_hiresfix);
-	loadLabelToggle_OtherSettings(10, 0xFFFFFFF2, H2Config_d3dex);
-//	loadLabelToggle_OtherSettings(9, 0xFFFFFFF2, H2Config_hitmarker_sound);
-	return CustomMenu_CallHead(a1, menu_vftable_1_OtherSettings, menu_vftable_2_OtherSettings, (DWORD)&CMButtonHandler_OtherSettings, 10, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_OtherSettings, menu_vftable_2_OtherSettings, (DWORD)&CMButtonHandler_OtherSettings, 9, 272);
 }
 
 void GSCustomMenuCall_OtherSettings() {
@@ -4182,16 +4173,12 @@ static bool CMButtonHandler_AccountList(int button_id) {
 	else if (button_id == H2AccountCount) {
 		if (!mode_remove_account) {
 			//play offline
-			if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", 1234571000000000 + H2GetInstanceId(), 0x100 + H2GetInstanceId(), 0x100 * H2GetInstanceId(), "000000101300", "0000000000000000000000000000000000101300")) {
+			if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", 1234571000000000 + H2GetInstanceId(), 0x100 + H2GetInstanceId(), 0x100 * H2GetInstanceId(), "000000101300", "0000000000000000000000000000000000101300", false)) {
 				//show select profile gui
-				int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
-				sub_209236(0, 0);
+				extern int notify_xlive_ui;
+				notify_xlive_ui = 0;
 				H2Config_master_ip = inet_addr("127.0.0.1");
 				H2Config_master_port_relay = 2001;
-				extern int MasterState;
-				MasterState = 2;
-				extern char* ServerStatus;
-				snprintf(ServerStatus, 250, "Status: Offline");
 			}
 		}
 	}
@@ -4650,8 +4637,6 @@ void setupSomeTests() {
 
 	memcpy(func_array, func_array2, 16 * sizeof(int*));
 
-	//DWORD dwBack;
-
 	//psub_20C226 = (tsub_20C226)DetourClassFunc((BYTE*)H2BaseAddr + 0x20C226, (BYTE*)sub_20C226, 9);
 
 	//psub_24DC0D = (tsub_24DC0D)DetourClassFunc((BYTE*)H2BaseAddr + 0x24DC0D, (BYTE*)sub_24DC0D_CM, 8);
@@ -4722,49 +4707,27 @@ void* __stdcall sub_23BC45(void* thisptr)//__thiscall
 	return v1;
 }
 
-int __cdecl sub_209236(int a1,int a2) {
-	if (ipManager.LocalUserLoggedIn()) {
-		int(__cdecl* sub_209236)(int,int) = (int(__cdecl*)(int,int))((char*)H2BaseAddr + 0x209236);
-		sub_209236(0,0);
+void XUiShowSignInH2() {
+	if (!isAccountingActiveHandle() && ReadH2Accounts()) {
+		GSCustomMenuCall_AccountList();
 	}
 	else {
-		if (!isAccountingActiveHandle() && ReadH2Accounts()) {
-			GSCustomMenuCall_AccountList();
-		}
-		else {
-			if (!isAccountingActiveHandle())
-				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF016, 0xFFFFF017);
-		}
+		if (!isAccountingActiveHandle())
+			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF016, 0xFFFFF017);
 	}
-	return 0;
 }
 
 typedef int(__cdecl *tsub_23f6b7)(int);
 tsub_23f6b7 psub_23f6b7;
 int __cdecl sub_23f6b7(int a1)
 {
-	if (ipManager.LocalUserLoggedIn()) {
-		ipManager.UnregisterLocal();
+	if (userSignedIn(0)) {
+		XUserSignOut(0);
+		ipManager.UnregisterLocalConnectionInfo();
+		UpdateConnectionStatus();
 	}
 	return psub_23f6b7(a1);
 }
-
-typedef char(__cdecl *tsub_209129)(int, int, int, int);
-tsub_209129 psub_209129;
-char __cdecl sub_209129(int a1, int a2, int a3, int a4)//player configuration profile signin
-{
-	char result =
-		psub_209129(a1, a2, a3, a4);
-	extern CHAR g_szUserName[4][16];
-	if (strncmp(g_szUserName[0], "[Username]", 16) == 0) {//change username to player configuration profile name if offline.
-		wchar_t* wideprofileName = (wchar_t*)((BYTE*)H2BaseAddr + 0x96C874);
-		char profileName[32];
-		wcstombs2(profileName, wideprofileName, 32);
-		SetUserUsername(profileName);
-	}
-	return result;
-}
-
 
 #pragma region Obscure_Menus
 
@@ -5097,9 +5060,6 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0007, "In-game Keyb. CTRLs");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0008, "Raw Mouse Input");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0009, "Hi Res Fix");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF000A, "D3DEX");
-//	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0009, "Hitmarker Sound Effect");
-
 
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF0, "Advanced Settings");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF1, "Alter additional settings for the game.");
@@ -5218,17 +5178,11 @@ void initGSCustomMenu() {
 
 	setupSomeTests();
 
-	//"PRESS ANY KEY TO CONTINUE" mainmenu redirect.
-	PatchCall((DWORD)((BYTE*)H2BaseAddr + 0x23EF0A), &sub_209236);
-
-	DWORD dwBack;
 	pbtnHandler = (tbtnhandler)DetourClassFunc((BYTE*)H2BaseAddr + 0x213af2, (BYTE*)BtnHandlerCaller, 8);
 
 	psub_23f6b7 = (tsub_23f6b7)DetourFunc((BYTE*)H2BaseAddr + 0x23f6b7, (BYTE*)sub_23f6b7, 7);
 
 	//psub_248beb = (tsub_248beb)DetourClassFunc((BYTE*)H2BaseAddr + 0x248beb, (BYTE*)sub_248beb, 8);
-
-	psub_209129 = (tsub_209129)DetourFunc((BYTE*)H2BaseAddr + 0x209129, (BYTE*)sub_209129, 5);
 
 	psub_bd137 = (tsub_bd137)DetourFunc((BYTE*)H2BaseAddr + 0xbd137, (BYTE*)sub_bd137, 5);
 

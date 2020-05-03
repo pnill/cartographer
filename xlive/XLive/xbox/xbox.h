@@ -1,8 +1,7 @@
 #pragma once
-#ifndef XBOX_H
-#define XBOX_H
 
-extern XSESSION_LOCAL_DETAILS sessionDetails;
+#include "..\XUser\XUser.h"
+
 #define CUSTOMACTION_FLAG_CLOSESUI      1
 
 typedef enum
@@ -175,11 +174,4 @@ typedef struct _XUSER_STATS_SPEC
 #define XPROPERTYTYPEFROMID(id)         ((id >> 28) & 0xf)
 #define XISSYSTEMPROPERTY(id)           (id & X_PROPERTY_SCOPE_MASK)
 
-
-
-
-
-#endif // !XBOX_H
-
-
-
+extern int signInUiIndex;

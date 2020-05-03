@@ -2,12 +2,11 @@
 #include "Globals.h"
 
 #include "GUI.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Config\Config.h"
 
-
-extern ConsoleCommands* commands;
 
 extern void InitInstance();
 
@@ -41,9 +40,9 @@ D3DPRESENT_PARAMETERS *pD3DPP;
 
 IDirect3DTexture9* Primitive = NULL;
 
+int MasterState = 0;
 char* BuildText = nullptr;
 char* ServerStatus = nullptr;
-extern int MasterState;
 
 const char CompileDate[] = __DATE__;
 const char CompileTime[] = __TIME__;
@@ -95,14 +94,13 @@ inline void BuildVertex(D3DXVECTOR4 xyzrhw, D3DCOLOR color, CVertexList* vertexL
 	vertexList[index].dColor = color;
 }
 
-BOOL bIsCreated, bNeedsFlush;
-
-DWORD dwOldFVF;
 LPD3DXSPRITE pSprite;
 
-std::chrono::high_resolution_clock::time_point nextFrame = std::chrono::high_resolution_clock::now();
-std::chrono::high_resolution_clock::duration desiredRenderTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
-std::chrono::high_resolution_clock::duration minimizedDesiredThreadTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / 60.0));
+using namespace std::chrono;
+
+high_resolution_clock::time_point nextFrame;
+high_resolution_clock::duration desiredRenderTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / (double)H2Config_fps_limit));
+high_resolution_clock::duration minimizedDesiredTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / 60.0));
 void frameTimeManagement() {
 
 	typedef bool(__cdecl* game_is_minimized)();
@@ -110,11 +108,22 @@ void frameTimeManagement() {
 
 	bool isMinimized = p_game_is_minimized();
 
+	static bool initialized = false;
+	if (!initialized) {
+		initialized = true;
+		nextFrame = high_resolution_clock::now();
+	}
+	
 	if (H2Config_fps_limit > 0 || isMinimized) {
 		std::this_thread::sleep_until(nextFrame);
-		do {
-			nextFrame += isMinimized ? minimizedDesiredThreadTime : desiredRenderTime;
-		} while (std::chrono::high_resolution_clock::now() > nextFrame);
+
+		auto& desiredTime = isMinimized ? minimizedDesiredTime : desiredRenderTime;
+
+		auto frameCount = duration<long long, std::micro>(
+			(1 + (duration_cast<duration<long long, std::micro>>(high_resolution_clock::now() - nextFrame) / duration_cast<duration<long long, std::micro>>(desiredTime)))
+			);
+
+		nextFrame += (desiredTime * frameCount.count());
 	}
 }
 
@@ -152,27 +161,34 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 	return S_OK;
 }
 
+extern void handleHotkeyInput(WPARAM lpMsg);
+
 // #5030: XLivePreTranslateMessage
 BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 {
 	if ((GetKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
+	{
+		// hotkeys
+		handleHotkeyInput(lpMsg->wParam);
+		// console
 		commands->handleInput(lpMsg->wParam);
+	}
 
 	return false;
 }
 
-
-// #5000: XLiveInitialize
-int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
+// #5297: XLiveInitializeEx
+int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 {
 	InitInstance();
-	LOG_TRACE_XLIVE("XLiveInitialize()");
+
+	LOG_TRACE_XLIVE("XLiveInitializeEx()");
 
 	if (!h2mod->Server)
 	{
 		//LOG_TRACE_XLIVE("XLiveInitialize  (pPii = %X)", pPii);
-		pDevice = (LPDIRECT3DDEVICE9)pPii->pD3D;
-		pD3DPP = (D3DPRESENT_PARAMETERS*)pPii->pD3DPP;
+		pDevice = (LPDIRECT3DDEVICE9)pXii->pD3D;
+		pD3DPP = (D3DPRESENT_PARAMETERS*)pXii->pD3DPP;
 
 		ServerStatus = new char[250];
 		snprintf(ServerStatus, 250, "Status: Initializing....");
@@ -182,8 +198,14 @@ int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pPii)
 
 		GUI::Initialize();
 	}
-	
+	LOG_TRACE_XLIVE("XLiveInitializeEx - dwVersion = {0:x}", dwVersion);
 	return 0;
+}
+
+// #5000: XLiveInitialize
+int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii)
+{
+	return XLiveInitializeEx(pXii, 0);
 }
 
 // #5005: XLiveOnCreateDevice
@@ -458,30 +480,6 @@ void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont)
 	pFont->DrawTextA(NULL, text, -1, &rect, DT_LEFT | DT_NOCLIP, color);
 }
 
-typedef struct {
-	int x;
-	int y;
-	bool xp;
-	bool yp;
-} exit_countdown_label;
-
-static std::vector<exit_countdown_label*> exit_countdown_labels;
-
-static void create_exit_countdown_label() {
-	D3DVIEWPORT9 pViewport;
-	pDevice->GetViewport(&pViewport);
-	int width = pViewport.Width;
-	int height = pViewport.Height;
-
-	exit_countdown_label* exit_cnd_lbl = (exit_countdown_label*)malloc(sizeof(exit_countdown_label));
-	exit_cnd_lbl->x = rand() % width;
-	exit_cnd_lbl->y = rand() % height;
-	exit_cnd_lbl->xp = rand() % 2 ? true : false;
-	exit_cnd_lbl->yp = rand() % 2 ? true : false;
-
-	exit_countdown_labels.push_back(exit_cnd_lbl);
-}
-
 int achievement_height = 0;
 bool achievement_freeze = false;
 int achievement_timer = 0;
@@ -498,10 +496,6 @@ int WINAPI XLiveRender()
 		{
 			D3DVIEWPORT9 pViewport;
 			pDevice->GetViewport(&pViewport);
-			//pViewport
-			/*char textttt[255];
-			sprintf(textttt, "x:%d, y:%d", pViewport.Width, pViewport.Height);
-			drawText(100, 50, COLOR_WHITE, textttt, smallFont);*/
 
 			D3DDEVICE_CREATION_PARAMETERS cparams;
 			pDevice->GetCreationParameters(&cparams);
@@ -619,7 +613,7 @@ int WINAPI XLiveRender()
 				PlayerIterator playerIt;
 				while (playerIt.get_next_player()) 
 				{
-					Real::Point3D* player_position = h2mod->get_player_coords(playerIt.get_current_player_index());
+					Real::Point3D* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
 					if (player_position != nullptr) {
 						std::wstring playerNameWide(playerIt.get_current_player_name());
 						std::string playerName(playerNameWide.begin(), playerNameWide.end());
@@ -631,7 +625,7 @@ int WINAPI XLiveRender()
 			}
 			
 			if (getDebugTextDisplay()) {
-				for (int i = 0; i < getDebugTextArrayMaxLen(); i++) {
+				for (int i = 0; i < getDebugTextDisplayCount(); i++) {
 					const char* text = getDebugText(i);
 					//int yOffset = 40 + (i * 14);
 					int yOffset = gameWindowHeight - 55 - (i * 14);

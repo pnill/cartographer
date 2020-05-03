@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "NetworkSession.h"
-#include "Globals.h"
+
+#include "H2MOD/Modules/Console/ConsoleCommands.h"
 
 network_session* NetworkSession::getNetworkSessions()
 {
@@ -9,7 +10,7 @@ network_session* NetworkSession::getNetworkSessions()
 
 network_session* NetworkSession::getCurrentNetworkSession()
 {
-	return *h2mod->GetAddress<network_session**>(0x420FE8, 0x520B94);
+	return *h2mod->GetAddress<network_session**>(0x420FE8, 0x3C40D0);
 }
 
 bool NetworkSession::getCurrentNetworkSession(network_session** outSession)
@@ -56,30 +57,14 @@ int NetworkSession::getLocalPeerIndex()
 	return getCurrentNetworkSession()->local_peer_index;
 }
 
-int NetworkSession::getPeerIndexFromPlayerXuid(long long xuid)
-{
-	if (getPlayerCount() > 0)
-	{
-		int playerIndex = 0;
-		do
-		{
-			if (IsActive(playerIndex) && getPlayerXuidFromPlayerIndex(playerIndex) == xuid)
-				return getPeerIndexFromPlayerIndex(playerIndex);
-
-			playerIndex++;
-		} while (playerIndex < 16);
-	}
-	return -1;
-}
-
-int NetworkSession::getPeerIndexFromPlayerIndex(int playerIndex)
+int NetworkSession::getPeerIndex(int playerIndex)
 {
 	return getPlayerInformation(playerIndex)->peer_index;
 }
 
 /* Use this to verify if a player is currently active in the network session */
 /* Otherwise you will wonder why you don't get the right data/player index etc. */
-bool NetworkSession::IsActive(int playerIndex)
+bool NetworkSession::playerIsActive(int playerIndex)
 {
 	return (1 << playerIndex) & NetworkSession::getCurrentNetworkSession()->membership.players_active_mask;
 }
@@ -99,12 +84,12 @@ wchar_t* NetworkSession::getPlayerName(int playerIndex)
 	return getPlayerInformation(playerIndex)->properties.player_name;
 }
 
-long long NetworkSession::getPlayerXuidFromPlayerIndex(int playerIndex)
+long long NetworkSession::getPlayerXuid(int playerIndex)
 {
 	return getPlayerInformation(playerIndex)->identifier;
 }
 
-int NetworkSession::getPlayerTeamFromPlayerIndex(int playerIndex)
+int NetworkSession::getPlayerTeam(int playerIndex)
 {
 	return getPlayerInformation(playerIndex)->properties.player_team;
 }
@@ -116,8 +101,8 @@ int NetworkSession::getPlayerTeamFromXuid(long long xuid)
 		int playerIndex = 0;
 		do 
 		{
-			if (IsActive(playerIndex) && getPlayerXuidFromPlayerIndex(playerIndex) == xuid)
-				return getPlayerTeamFromPlayerIndex(playerIndex);
+			if (playerIsActive(playerIndex) && getPlayerXuid(playerIndex) == xuid)
+				return getPlayerTeam(playerIndex);
 
 			playerIndex++;
 		} 
@@ -133,25 +118,30 @@ void NetworkSession::kickPeer(int peerIndex)
 
 	if (peerIndex < getPeerCount()) 
 	{
-		LOG_TRACE_GAME("about to kick peer index = {}", peerIndex);
+		LOG_TRACE_GAME("NetworkSession::kickPeer() - about to kick peer index = {}", peerIndex);
 		p_game_session_boot(NetworkSession::getCurrentNetworkSession(), peerIndex, true);
 	}
 }
 
-void NetworkSession::logAllPlayersToConsole() {
+peer_observer_channel* NetworkSession::getPeerObserverChannel(int peerIndex)
+{
+	return &getCurrentNetworkSession()->peer_observer_channels[peerIndex];
+}
+
+void NetworkSession::logPlayersToConsole() {
 	int playerIndex = 0;
 	do 
 	{
-		if (IsActive(playerIndex)) 
+		if (playerIsActive(playerIndex)) 
 		{
 			std::wstring outStr = L"Player index=" + std::to_wstring(playerIndex);
-			outStr += L", Peer index=" + std::to_wstring(getPeerIndexFromPlayerIndex(playerIndex));
+			outStr += L", Peer index=" + std::to_wstring(getPeerIndex(playerIndex));
 			outStr += L", PlayerName=";
 			outStr += getPlayerName(playerIndex);
 			outStr += L", Name from game player state=";
 			outStr += h2mod->get_player_name_from_player_index(playerIndex);
-			outStr += L", Team=" + std::to_wstring(getPlayerTeamFromPlayerIndex(playerIndex));
-			outStr += L", Identifier=" + std::to_wstring(getPlayerXuidFromPlayerIndex(playerIndex));
+			outStr += L", Team=" + std::to_wstring(getPlayerTeam(playerIndex));
+			outStr += L", Identifier=" + std::to_wstring(getPlayerXuid(playerIndex));
 
 			commands->output(outStr);
 		}
@@ -163,15 +153,18 @@ void NetworkSession::logAllPlayersToConsole() {
 	commands->output(total_players);
 }
 
-void NetworkSession::logAllPeersToConsole() {
+void NetworkSession::logPeersToConsole() {
 	if (getPeerCount() > 0)
 	{
+		network_observer* observer = getCurrentNetworkSession()->network_observer_ptr;
+
 		int peerIndex = 0;
 		do 
 		{
 			std::wstring outStr = L"Peer index=" + std::to_wstring(peerIndex);
 			outStr += L", Peer Name=";
 			outStr += getCurrentNetworkSession()->membership.peer_info[peerIndex].name;
+			outStr += L", Unknown state=" + std::to_wstring(observer->getObserverState(getCurrentNetworkSession()->peer_observer_channels[peerIndex].observer_index));
 			int playerIndex = getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index[0];
 			if (playerIndex != -1) 
 			{
@@ -180,7 +173,7 @@ void NetworkSession::logAllPeersToConsole() {
 				outStr += getPlayerName(playerIndex);
 				outStr += L", Name from game player state=";
 				outStr += h2mod->get_player_name_from_player_index(playerIndex);
-				outStr += L", Identifier=" + std::to_wstring(getPlayerXuidFromPlayerIndex(playerIndex));
+				outStr += L", Identifier=" + std::to_wstring(getPlayerXuid(playerIndex));
 			}
 			commands->output(outStr);
 
@@ -192,3 +185,16 @@ void NetworkSession::logAllPeersToConsole() {
 	std::wstring total_players = L"Total peers: " + std::to_wstring(getPeerCount());
 	commands->output(total_players);
 }
+
+void NetworkSession::logStructureOffsets() {
+	
+	std::wostringstream outStr;
+	outStr << L"Offset of local_peer_index=" << std::hex << offsetof(network_session, local_peer_index);
+	outStr << L", Offset of peer_observer_channels=" << std::hex << offsetof(network_session, peer_observer_channels);
+	outStr << L", Offset of local_session_state=" << std::hex << offsetof(network_session, local_session_state);
+	outStr << L", Offset of membership=" << std::hex << offsetof(network_session, membership);
+	outStr << L", Offset of session_host_peer_index=" << std::hex << offsetof(network_session, session_host_peer_index);
+			
+	commands->output(outStr.str());
+}
+

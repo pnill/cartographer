@@ -163,7 +163,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on frag grenade level!", playerName);
 			if (wcscmp(playerName, localName) == 0) {
 				call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
-				h2mod->set_local_grenades(GrenadeType::Frag, 99, playerIndex);
+				h2mod->set_player_unit_grenades_count(GrenadeType::Frag, 99, playerIndex);
 			} else {
 				sendGrenadePacket(GrenadeType::Frag, 99, playerIndex, 1);
 			}
@@ -174,7 +174,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 
 			if (wcscmp(playerName, localName) == 0) {
 				call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
-				h2mod->set_local_grenades(GrenadeType::Plasma, 99, playerIndex);
+				h2mod->set_player_unit_grenades_count(GrenadeType::Plasma, 99, playerIndex);
 			} else {
 				sendGrenadePacket(GrenadeType::Plasma, 99, playerIndex, 1);
 			}
@@ -215,7 +215,7 @@ void GunGame::levelUpServer(int playerIndex)
 
 		if (wcscmp(playerName, localName) == 0) {
 			call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
-			h2mod->set_local_grenades(GrenadeType::Frag, 99, playerIndex);
+			h2mod->set_player_unit_grenades_count(GrenadeType::Frag, 99, playerIndex);
 		} else {
 			sendGrenadePacket(GrenadeType::Frag, 99, playerIndex, 1);
 		}
@@ -225,7 +225,7 @@ void GunGame::levelUpServer(int playerIndex)
 		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 16 - Plasma Grenades!", playerName);
 		if (wcscmp(playerName, localName) == 0) {
 			call_unit_reset_equipment(h2mod->get_unit_datum_from_player_index(playerIndex));
-			h2mod->set_local_grenades(GrenadeType::Plasma, 99, playerIndex);
+			h2mod->set_player_unit_grenades_count(GrenadeType::Plasma, 99, playerIndex);
 		} else {
 			sendGrenadePacket(GrenadeType::Plasma, 99, playerIndex, 1);
 		}
@@ -261,7 +261,7 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int playerIndex, bool bRe
 		{
 			*(BYTE*)((BYTE*)unit_object + 0x253) = count;
 		}
-		LOG_TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex={0}, peerIndex={1}", playerIndex, getPeerIndexFromPlayerIndex(playerIndex));
+		LOG_TRACE_GAME("[H2Mod-GunGame] Sending grenade packet, playerIndex={0}, peerIndex={1}", playerIndex, getPeerIndex(playerIndex));
 
 		s_unit_grenades data;
 		SecureZeroMemory(&data, sizeof(data));
@@ -269,7 +269,7 @@ void GunGame::sendGrenadePacket(BYTE type, BYTE count, int playerIndex, bool bRe
 		data.type = type;
 		data.count = count;
 		data.player_index = playerIndex;
-		CustomPackets::sendUnitGrenadesPacket(NetworkSession::getCurrentNetworkSession(), getPeerIndexFromPlayerIndex(playerIndex), &data);
+		CustomPackets::sendUnitGrenadesPacket(getPeerIndex(playerIndex), &data);
 	}
 }
 

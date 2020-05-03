@@ -2,7 +2,6 @@
 #include "Globals.h"
 
 //all these global variables live till the app closes
-MapManager* mapManager = new MapManager();
 AdvLobbySettings* advLobbySettings = new AdvLobbySettings();
 
 s_datum_array* game_state_actors = nullptr;
@@ -11,8 +10,6 @@ s_datum_array* game_state_objects_header = nullptr;
 
 bool displayXyz = false;
 volatile bool isLobby = true;
-
-ConsoleCommands* commands = new ConsoleCommands();
 
 //TODO: actually check if they have a microphone or check some settings
 bool microphoneEnabled = true;

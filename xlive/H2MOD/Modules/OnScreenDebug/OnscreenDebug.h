@@ -1,6 +1,7 @@
 #pragma once
 
 int getDebugTextArrayMaxLen();
+int getDebugTextDisplayCount();
 void addDebugText(char* text);
 void addDebugText(const char* text);
 void addDebugText(wchar_t* wtext);

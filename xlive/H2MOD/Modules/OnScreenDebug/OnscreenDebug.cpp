@@ -5,6 +5,7 @@
 char** DebugStr;
 int DebugTextArrayLenMax = 160;
 int DebugTextArrayPos = 0;
+int DebugTextCount = 0;
 bool DebugTextDisplay = false;
 bool initialisedDebugText = false;
 
@@ -12,9 +13,13 @@ int getDebugTextArrayMaxLen() {
 	return DebugTextArrayLenMax;
 }
 
+int getDebugTextDisplayCount() {
+	return DebugTextCount;
+}
+
 void addDebugText(wchar_t* wtext) {
 	int lenInput = wcslen(wtext);
-	char* text = (char*)malloc(sizeof(char) * lenInput + 1);
+	char* text = (char*)calloc(1, sizeof(char) * lenInput + 1);
 	snprintf(text, lenInput + 1, "%ls", wtext);
 	addDebugText(text);
 	free(text);
@@ -22,7 +27,7 @@ void addDebugText(wchar_t* wtext) {
 
 void addDebugText(const char* text) {
 	int buflen = strlen(text) + 1;
-	char* text2 = (char*)malloc(sizeof(char) * buflen);
+	char* text2 = (char*)calloc(1, sizeof(char) * buflen);
 	memcpy(text2, text, sizeof(char) * buflen);
 	addDebugText(text2);
 	free(text2);
@@ -38,15 +43,19 @@ void addDebugText(char* text) {
 		lenInput = endChar - text;
 	}
 
+	DebugTextCount++;
+	if (DebugTextCount >= DebugTextArrayLenMax)
+		DebugTextCount = DebugTextArrayLenMax;
+		
 	DebugTextArrayPos++;
-	if (DebugTextArrayPos >= DebugTextArrayLenMax) {
+	if (DebugTextArrayPos >= DebugTextArrayLenMax) 
 		DebugTextArrayPos = 0;
-	}
 
-	free(DebugStr[DebugTextArrayPos]);
-	DebugStr[DebugTextArrayPos] = (char*)malloc(sizeof(char) * lenInput + 1);
+	if (DebugStr[DebugTextArrayPos])
+		free(DebugStr[DebugTextArrayPos]);
+
+	DebugStr[DebugTextArrayPos] = (char*)calloc(1, sizeof(char) * lenInput + 1);
 	strncpy(DebugStr[DebugTextArrayPos], text, lenInput);
-	SecureZeroMemory(DebugStr[DebugTextArrayPos] + lenInput, 1);
 
 	onscreendebug_log->debug(text);
 
@@ -58,10 +67,7 @@ void addDebugText(char* text) {
 void initDebugText() {
 	initialisedDebugText = true;
 	onscreendebug_log = h2log::create("OnScreenDebug", prepareLogFileName(L"h2onscreendebug"));
-	DebugStr = (char**)malloc(sizeof(char*) * DebugTextArrayLenMax);
-	for (int i = 0; i < DebugTextArrayLenMax; i++) {
-		DebugStr[i] = (char*)calloc(1, sizeof(char));
-	}
+	DebugStr = (char**)calloc(1, sizeof(char*) * DebugTextArrayLenMax);
 	addDebugText("Initialised On Screen Debug Text.");
 }
 

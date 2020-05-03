@@ -27,55 +27,36 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 		phookServ1(hKey, lpSubKey);
 	addDebugText("Post Server Registry Read.");
 	if (strlen(H2Config_dedi_server_name) > 0) {
-		wchar_t* PreLoadServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x3B49B4);
+		wchar_t* PreLoadServerName = h2mod->GetAddress<wchar_t*>(0, 0x3B49B4);
 		swprintf(PreLoadServerName, 15, L"%hs", H2Config_dedi_server_name);
 		//char temp[27];
 		//snprintf(temp, 27, "%ws", dedi_server_name);
 		//MessageBoxA(NULL, temp, "Server Pre name thingy", MB_OK);
-		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
+		wchar_t* LanServerName = h2mod->GetAddress<wchar_t*>(0, 0x52042A);
 		swprintf(LanServerName, 2, L"");
 	}
 	if (strlen(H2Config_dedi_server_playlist) > 0) {
-		wchar_t* ServerPlaylist = (wchar_t*)((BYTE*)H2BaseAddr + 0x3B3704);
+		wchar_t* ServerPlaylist = h2mod->GetAddress<wchar_t*>(0, 0x3B3704);
 		swprintf(ServerPlaylist, 256, L"%hs", H2Config_dedi_server_playlist);
 	}
 	return result;
 }
 
-typedef int(__stdcall *thookServ2)();
-thookServ2 phookServ2;
-int __stdcall PreReadyLoad() {
-	MessageBoxA(NULL, "aaaaaaas", "PreCrash", MB_OK);
-	int result =
-		phookServ2();
-	MessageBoxA(NULL, "aaaaaaasaaaaaa", "PostCrash", MB_OK);
-	if (strlen(H2Config_dedi_server_name) > 0) {
-		wchar_t* PreLoadServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
-		swprintf(PreLoadServerName, 32, L"%hs", H2Config_dedi_server_name);
-		char temp[32];
-		snprintf(temp, 32, H2Config_dedi_server_name);
-		MessageBoxA(NULL, temp, "AAA Server Pre name thingy", MB_OK);
-	}
-	return result;
-}
-
 static bool NotDisplayIngameChat() {
-	int GameGlobals = (int)*(int*)((DWORD)H2BaseAddr + 0x482D3C);
+	int GameGlobals = *h2mod->GetAddress<int*>(0x482D3C);
 	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
-	BYTE* GameState = (BYTE*)((DWORD)H2BaseAddr + 0x420FC4);
+	BYTE* GameState = h2mod->GetAddress<BYTE*>(0x420FC4);
 
 	if (H2Config_hide_ingame_chat) {
-		int GameTimeGlobals = (int)*(int*)((DWORD)H2BaseAddr + 0x4C06E4);
-		DWORD* ChatOpened = (DWORD*)(GameTimeGlobals + 0x354);//MP Only?
-		if (*ChatOpened == 2) {
+		PlayerIterator playerIt;
+		DatumIndex local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
+		if (playerIt.get_data_at_index(local_player_datum_index.Index)->is_chatting == 2) {
 			extern void hotkeyFuncToggleHideIngameChat();
 			hotkeyFuncToggleHideIngameChat();
 		}
-	}
-
-	if (H2Config_hide_ingame_chat) {
 		return true;
 	}
+
 	else if (*GameEngine != 3 && *GameState == 3) {
 		//Enable chat in engine mode and game state mp.
 		return false;
@@ -96,7 +77,6 @@ char __cdecl HookChangePrivacy(int privacy) {
 	}
 	return result;
 }
-
 
 void postConfig() {
 
@@ -125,13 +105,11 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 	//a2 == 0x5 - system link lost connection
 	if (a2 == 0xb9) {
 		//boot them offline.
-		ConfigureUserDetails("[Username]", "12345678901234567890123456789012", 1234571000000000 + H2GetInstanceId(), 0x100 + H2GetInstanceId(), 0x100 * H2GetInstanceId(), "000000101300", "0000000000000000000000000000000000101300");
+		XUserSignOut(0);
+		ipManager.UnregisterLocalConnectionInfo();
+		UpdateConnectionStatus();
 		H2Config_master_ip = inet_addr("127.0.0.1");
 		H2Config_master_port_relay = 2001;
-		extern int MasterState;
-		MasterState = 2;
-		extern char* ServerStatus;
-		snprintf(ServerStatus, 250, "Status: Offline");
 	}
 	int result = sub_20E1D8(a1, a2, a3, a4, a5, a6);
 	return result;
@@ -281,7 +259,7 @@ BOOL __cdecl is_init_flag_set(startup_flags id)
 		if (flag_log_count[id] == 10)
 			LOG_TRACE_GAME("is_init_flag_set() : flag {} logged to many times ignoring", id);
 	}
-	DWORD* init_flags_array = reinterpret_cast<DWORD*>(H2BaseAddr + 0x0046d820);
+	DWORD* init_flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
 	return init_flags_array[id] != 0;
 }
 
@@ -295,7 +273,7 @@ int Video_HUDSizeUpdate_hook(int hudSize, int safeArea)
 {
 	int retVal = Video_HUDSizeUpdate_orig(hudSize, safeArea);
 
-	float* HUD_TextScale = (float*)(H2BaseAddr + 0x464028); // gets set by the Video_HUDSizeUpdate_orig call above, affects HUD text and crosshair size
+	float* HUD_TextScale = h2mod->GetAddress<float*>(0x464028); // gets set by the Video_HUDSizeUpdate_orig call above, affects HUD text and crosshair size
 	if (*HUD_TextScale > maxHUDTextScale)
 	{
 		// textScale = resolution_height * 0.0010416667
@@ -305,7 +283,7 @@ int Video_HUDSizeUpdate_hook(int hudSize, int safeArea)
 	}
 
 	// UI_Scale was updated just before we were called, so lets fix it real quick...
-	float* UI_Scale = (float*)(H2BaseAddr + 0xA3E424);
+	float* UI_Scale = h2mod->GetAddress<float*>(0xA3E424);
 	if (*UI_Scale > maxUiScaleFonts)
 	{
 		// uiScale = resolution_height * 0.00083333335f
@@ -332,7 +310,7 @@ sub_671B02_ptr sub_671B02_orig;
 
 int __cdecl sub_671B02_hook(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int a4, int a5, float a6, int a7, int a8)
 {
-	float UI_Scale = *(float*)(H2BaseAddr + 0xA3E424);
+	float UI_Scale = *h2mod->GetAddress<float*>(0xA3E424);
 	if (a2 && a2 != a1) // if a2 == a1 then this is a chapter name which scaling seems to break, so skip those ones
 	{
 		short width = a2->right - a2->left;
@@ -347,6 +325,7 @@ bool engine_basic_init()
 	DWORD* flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
 	SecureZeroMemory(flags_array, startup_flags::count * sizeof(DWORD)); // should be zero initalized anyways but the game does it
 
+	H2Config_voice_chat = false;
 	flags_array[startup_flags::disable_voice_chat] = 1; // disables voice chat (XHV engine)
 	flags_array[startup_flags::nointro] = H2Config_skip_intro;
 
@@ -356,19 +335,15 @@ bool engine_basic_init()
 	init_data_checksum_info();
 	runtime_state_init();
 
-	if (H2Config_hiresfix != 0)
-	{
-		DWORD dwBack;
-
+	if (H2Config_hiresfix) {
 		// HUD text size fix for higher resolutions
-		Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x264A18, (BYTE*)Video_HUDSizeUpdate_hook, 7);
+		Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_ptr)DetourFunc(h2mod->GetAddress<BYTE*>(0x264A18), (BYTE*)Video_HUDSizeUpdate_hook, 7);
 
 		// menu text fix for higher resolutions
-		sub_671B02_orig = (sub_671B02_ptr)DetourFunc((BYTE*)H2BaseAddr + 0x271B02, (BYTE*)sub_671B02_hook, 5);
+		sub_671B02_orig = (sub_671B02_ptr)DetourFunc(h2mod->GetAddress<BYTE*>(0x271B02), (BYTE*)sub_671B02_hook, 5);
 	}
 
-	if (H2Config_d3dex != 0)
-	{
+	if (H2Config_d3dex) {
 		flags_array[startup_flags::allow_d3d_ex_version] = 1;
 	}
 
@@ -383,7 +358,7 @@ bool engine_basic_init()
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-nosound") == 0) {
 				flags_array[startup_flags::nosound] = 1;
-				WriteValue(H2BaseAddr + 0x479EDC, 1);
+				WriteValue(h2mod->GetAddress(0x479EDC), 1);
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-novsync") == 0) {
 				flags_array[startup_flags::novsync] = 1;
@@ -405,10 +380,13 @@ bool engine_basic_init()
 			    shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
 				NopFill(h2mod->GetAddress(0x269FD5), 8);
 			}
+#if COMPILE_WITH_VOICE
 			else if (_wcsicmp(cmd_line_arg, L"-voicechat") == 0)
 			{
 				flags_array[startup_flags::disable_voice_chat] = 0;
+				H2Config_voice_chat = true;
 			}
+#endif
 #ifdef _DEBUG
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
 				int flag_id = _wtol(&cmd_line_arg[10]);
@@ -519,15 +497,16 @@ void show_fatal_error(int error_id)
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	// set args
-	WriteValue(H2BaseAddr + 0x46D9BC, lpCmdLine); // command_line_args
-	WriteValue(H2BaseAddr + 0x46D9C0, hInstance); // g_instance
-	WriteValue(H2BaseAddr + 0x46D9CC, nShowCmd); // g_CmdShow
+	WriteValue(h2mod->GetAddress(0x46D9BC), lpCmdLine); // command_line_args
+	WriteValue(h2mod->GetAddress(0x46D9C0), hInstance); // g_instance
+	WriteValue(h2mod->GetAddress(0x46D9CC), nShowCmd); // g_CmdShow
 
 	// window setup
-	wcscpy_s(reinterpret_cast<wchar_t*>(H2BaseAddr + 0x46D9D4), 0x40, L"halo"); // ClassName
-	wcscpy_s(reinterpret_cast<wchar_t*>(H2BaseAddr + 0x46DA54), 0x40, L"Halo 2 - Project Cartographer"); // WindowName
-	WNDPROC g_WndProc = reinterpret_cast<WNDPROC>(H2BaseAddr + 0x790E);
-	WriteValue(H2BaseAddr + 0x46D9D0, g_WndProc); // g_WndProc_ptr
+	wcscpy_s(h2mod->GetAddress<wchar_t*>(0x46D9D4), 0x40, L"halo"); // ClassName
+	wcscpy_s(h2mod->GetAddress<wchar_t*>(0x46DA54), 0x40, L"Halo 2 - Project Cartographer"); // WindowName
+	WNDPROC g_WndProc = h2mod->GetAddress<WNDPROC>(0x790E);
+	WriteValue(h2mod->GetAddress(0x46D9D0), g_WndProc); // g_WndProc_ptr
+
 	if (!LOG_CHECK(InitPCCInfo()))
 	{
 		LOG_TRACE_FUNC("Failed to get PCC info / insufficient system resources");
@@ -539,10 +518,10 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	}
 	// mouse cursor setup
 	HCURSOR cursor = LOG_CHECK(LoadCursor(NULL, MAKEINTRESOURCE(0x7F00)));
-	WriteValue(H2BaseAddr + 0x46D9B8, cursor); // g_hCursor
+	WriteValue(h2mod->GetAddress(0x46D9B8), cursor); // g_hCursor
 
 	// mess around with xlive (not calling XLiveInitialize etc)
-	WriteValue<BYTE>(H2BaseAddr + 0x4FAD98, 1);
+	WriteValue<BYTE>(h2mod->GetAddress(0x4FAD98), 1);
 
 	// intialize some basic game subsystems
 	if (LOG_CHECK(engine_basic_init()))
@@ -556,7 +535,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		return 1;
 	}
 
-	int g_fatal_error_id = *reinterpret_cast<int*>(H2BaseAddr + 0x46DAD4);
+	int g_fatal_error_id = *h2mod->GetAddress<int*>(0x46DAD4);
 	if (g_fatal_error_id) // check if the game exited cleanly
 	{
 		show_fatal_error(g_fatal_error_id);
@@ -650,43 +629,6 @@ bool __cdecl is_supported_build(char *build)
 
 #pragma endregion
 
-/*typedef int(__cdecl *tfn_c0017a25d)(DWORD, DWORD*);
-tfn_c0017a25d pfn_c0017a25d;
-int __cdecl fn_c0017a25d(DWORD a1, DWORD* a2)
-{
-	if (H2Config_hitmarker_sound) {
-		typedef unsigned long long QWORD;
-		QWORD xuid_p1 = *(QWORD*)((BYTE*)H2BaseAddr + 0x51A629);
-
-		int i = 0;
-		for (; i < 16; i++) {
-			QWORD xuid_list_ele = *(QWORD*)((BYTE*)H2BaseAddr + 0x968F68 + (8 * i));
-			if (xuid_list_ele == xuid_p1) {
-				break;
-			}
-		}
-
-		int local_player_datum = i < 16 ? h2mod->get_unit_datum_from_player_index(i) : -1;
-
-		//if (local_player_datum != -1 && a1 == local_player_datum && a2[4] != -1) {
-		if (local_player_datum != -1 && a2[4] == local_player_datum && a1 != -1 && a1 != local_player_datum) {
-			for (i = 0; i < 16; i++) {
-				int other_datum = h2mod->get_unit_datum_from_player_index(i);
-				if (a1 == other_datum) {
-					if (h2mod->get_unit_team_index(local_player_datum) != h2mod->get_unit_team_index(other_datum)) {
-
-						h2mod->CustomSoundPlay(L"Halo1PCHitSound.wav", 0);
-
-					}
-					break;
-				}
-			}
-		}
-	}
-	int result = pfn_c0017a25d(a1, a2);
-	return result;
-} */
-
 typedef char(__stdcall *tfn_c0024eeef)(DWORD*, int, int);
 tfn_c0024eeef pfn_c0024eeef;
 char __stdcall fn_c0024eeef(DWORD* thisptr, int a2, int a3)//__thiscall
@@ -729,13 +671,13 @@ int __stdcall fn_c0024fa19(DWORD* thisptr, int a2, int* a3)//__thiscall
 	//int result = pfn_c0024fa19(thisptr, a2, a3);
 	//return result;
 
-	int(__stdcall* fn_c0024f9a1)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24f9a1);
-	int(__stdcall* fn_c0024f9dd)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24f9dd);
-	int(__stdcall* fn_c0024ef79)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24ef79);
-	int(__stdcall* fn_c0024f5fd)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24f5fd);
-	int(__stdcall* fn_c0024f015)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24f015);
-	int(__stdcall* fn_c0024f676)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24f676);
-	int(__stdcall* fn_c0024f68a)(int) = (int(__stdcall*)(int))h2mod->GetAddress(0x24f68a);
+	auto fn_c0024f9a1 = h2mod->GetAddress<int(__stdcall*)(int)>(0x24f9a1);
+	auto fn_c0024f9dd = h2mod->GetAddress<int(__stdcall*)(int)>(0x24f9dd);
+	auto fn_c0024ef79 = h2mod->GetAddress<int(__stdcall*)(int)>(0x24ef79);
+	auto fn_c0024f5fd = h2mod->GetAddress<int(__stdcall*)(int)>(0x24f5fd);
+	auto fn_c0024f015 = h2mod->GetAddress<int(__stdcall*)(int)>(0x24f015);
+	auto fn_c0024f676 = h2mod->GetAddress<int(__stdcall*)(int)>(0x24f676);
+	auto fn_c0024f68a = h2mod->GetAddress<int(__stdcall*)(int)>(0x24f68a);
 
 	int result = *a3;
 	if (*a3 != -1)
@@ -802,12 +744,12 @@ DWORD* __stdcall fn_c0024fabc(DWORD* thisptr, int a2)//__thiscall
 	fn_c00213b1c(thisptr, a2);
 	//*v2 = &c_squad_settings_list::`vftable';
 	v2[0] = (DWORD)var_c003d9254;
-	//*v2 = (DWORD)((BYTE*)H2BaseAddr + 0x003d9254);
+	//*v2 = (DWORD)((BYTE*)h2mod->GetAddress(0x003d9254);
 	fn_c0028870b((int)(v2 + 44), 132, 7, fn_c0021ffc9, fn_c0000a551);
 	fn_c002113c6(v2 + 276);
 	//v2[275] = &c_slot2<c_squad_settings_list, s_event_record *, long>::`vftable';
 	v2[275] = (DWORD)var_c003d9188;
-	//v2[275] = (DWORD)((BYTE*)H2BaseAddr + 0x003d9188);
+	//v2[275] = (DWORD)((BYTE*)h2mod->GetAddress(0x003d9188);
 	v2[279] = (DWORD)v2;
 	v2[280] = (DWORD)fn_c0024fa19;
 	int v3 = fn_c00215ea9();
@@ -943,27 +885,22 @@ void InitH2Tweaks() {
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 
 	if (H2IsDediServer) {
-		DWORD dwBack;
-
-		phookServ1 = (thookServ1)DetourFunc((BYTE*)H2BaseAddr + 0x8EFA, (BYTE*)LoadRegistrySettings, 11);
+		phookServ1 = (thookServ1)DetourFunc(h2mod->GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
 
 		// set the additional pcr time
-		WriteValue<BYTE>(h2mod->GetAddress(0x0, 0xE590) + 2, H2Config_additional_pcr_time);
-
-		//phookServ2 = (thookServ2)DetourFunc((BYTE*)H2BaseAddr + 0xBA3C, (BYTE*)PreReadyLoad, 11);
+		WriteValue<BYTE>(h2mod->GetAddress(0, 0xE590) + 2, H2Config_additional_pcr_time);
 	}
 	else {//is client
 
-		DWORD dwBack;
 		//Hook a function which changes the party privacy to detect if the lobby becomes open.
 		//Problem is if you want to set it via mem poking, it won't push the lobby to the master automatically.
-		//phookChangePrivacy = (thookChangePrivacy)DetourFunc((BYTE*)H2BaseAddr + 0x2153ce, (BYTE*)HookChangePrivacy, 11);
+		//phookChangePrivacy = (thookChangePrivacy)DetourFunc((BYTE*)h2mod->GetAddress(0x2153ce), (BYTE*)HookChangePrivacy, 11);
 
 		bool IntroHQ = true;//clients should set on halo2.exe -highquality
 
 		if (!H2Config_skip_intro && IntroHQ) {
 			BYTE assmIntroHQ[] = { 0xEB };
-			WriteBytes(H2BaseAddr + 0x221C29, assmIntroHQ, 1);
+			WriteBytes(h2mod->GetAddress(0x221C29), assmIntroHQ, 1);
 		}
 
 		// adds support for more monitor resolutions
@@ -971,32 +908,28 @@ void InitH2Tweaks() {
 
 		//Disables the ESRB warning (only occurs for English Language).
 		//disables the one if no intro vid occurs.
-		WriteValue<BYTE>(H2BaseAddr + 0x411030, 0);
-		//disables the one after the intro video.
-		BYTE assmIntroESRBSkip[] = { 0x00 };
-		WriteBytes(H2BaseAddr + 0x3a0fa, assmIntroESRBSkip, 1);
-		WriteBytes(H2BaseAddr + 0x3a1ce, assmIntroESRBSkip, 1);
+		WriteValue<BYTE>(h2mod->GetAddress(0x411030), 0);
+
+		//disables the one after the intro video, by removing 0x40 flag from 0x7C6 bitmask
+		WriteValue(h2mod->GetAddress(0x39948 + 2), 0x7C6 & ~0x40);
 
 		//Set the LAN Server List Ping Frequency (milliseconds).
-		WriteValue(H2BaseAddr + 0x001e9a89, 3000);
+		WriteValue(h2mod->GetAddress(0x001e9a89), 3000);
 		//Set the LAN Server List Delete Entry After (milliseconds).
-		WriteValue(H2BaseAddr + 0x001e9b0a, 9000);
+		WriteValue(h2mod->GetAddress(0x001e9b0a), 9000);
 
 		//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
-		PatchCall(H2BaseAddr + 0x22667B, NotDisplayIngameChat);
-		PatchCall(H2BaseAddr + 0x226628, NotDisplayIngameChat);
+		PatchCall(h2mod->GetAddress(0x22667B), NotDisplayIngameChat);
+		PatchCall(h2mod->GetAddress(0x226628), NotDisplayIngameChat);
 
 		//hook the gui popup for when the player is booted.
-		sub_20E1D8 = (int(__cdecl*)(int, int, int, int, int, int))((char*)H2BaseAddr + 0x20E1D8);
-		PatchCall(H2BaseAddr + 0x21754C, &sub_20E1D8_boot);
-
-		//Hook for Hitmarker sound effect.
-//		pfn_c0017a25d = (tfn_c0017a25d)DetourFunc((BYTE*)H2BaseAddr + 0x0017a25d, (BYTE*)fn_c0017a25d, 10);
+		sub_20E1D8 = h2mod->GetAddress<int(__cdecl*)(int, int, int, int, int, int)>(0x20E1D8);
+		PatchCall(h2mod->GetAddress(0x21754C), &sub_20E1D8_boot);
 
 		//Hook for advanced lobby options.
-		pfn_c0024eeef = (tfn_c0024eeef)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024eeef, (BYTE*)fn_c0024eeef, 9);
-		pfn_c0024fa19 = (tfn_c0024fa19)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fa19, (BYTE*)fn_c0024fa19, 9);
-		pfn_c0024fabc = (tfn_c0024fabc)DetourClassFunc((BYTE*)H2BaseAddr + 0x0024fabc, (BYTE*)fn_c0024fabc, 13);
+		pfn_c0024eeef = (tfn_c0024eeef)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x0024eeef), (BYTE*)fn_c0024eeef, 9);
+		pfn_c0024fa19 = (tfn_c0024fa19)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x0024fa19), (BYTE*)fn_c0024fa19, 9);
+		pfn_c0024fabc = (tfn_c0024fabc)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x0024fabc), (BYTE*)fn_c0024fabc, 13);
 
 		WriteJmpTo(h2mod->GetAddress(0x4544), is_init_flag_set);
 
@@ -1010,7 +943,7 @@ void InitH2Tweaks() {
 		WriteJmpTo(h2mod->GetAddress(0x39EA2), is_remote_desktop);
 
 		//Redirect the variable for the server name to ours.
-		WritePointer(H2BaseAddr + 0x1b2ce8, ServerLobbyName);
+		WritePointer(h2mod->GetAddress(0x1b2ce8), ServerLobbyName);
 
 		tags::on_map_load(fix_shaders_nvidia);
 	}
@@ -1022,8 +955,6 @@ void InitH2Tweaks() {
 	PatchCall(h2mod->GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 
-	// physics patches 
-
 	addDebugText("End Startup Tweaks.");
 }
 
@@ -1032,7 +963,7 @@ void DeinitH2Tweaks() {
 }
 
 static DWORD* get_scenario_global_address() {
-	return (DWORD*)(H2BaseAddr + 0x479e74);
+	return h2mod->GetAddress<DWORD*>(0x479e74);
 }
 
 static int get_scenario_volume_count() {
@@ -1042,7 +973,7 @@ static int get_scenario_volume_count() {
 
 static void kill_volume_disable(int volume_id) {
 	void(__cdecl* kill_volume_disable)(int volume_id);
-	kill_volume_disable = (void(__cdecl*)(int))((char*)H2BaseAddr + 0xb3ab8);
+	kill_volume_disable = h2mod->GetAddress<void(__cdecl*)(int)>(0xb3ab8);
 	kill_volume_disable(volume_id);
 }
 
@@ -1057,7 +988,7 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 	}
 }
 
-void H2Tweaks::setSens(InputType input_type, int sens) {
+void H2Tweaks::setSens(std::string input_type, int sens) {
 
 	if (H2IsDediServer)
 		return;
@@ -1067,23 +998,22 @@ void H2Tweaks::setSens(InputType input_type, int sens) {
 
 	int absSensIndex = sens - 1;
 
-	if (input_type == CONTROLLER) {
-		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89BC) = 40.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
-		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B8) = 80.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
+	if (input_type == "controller") {
+		*h2mod->GetAddress<float*>(0x4A89BC) = 40.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
+		*h2mod->GetAddress<float*>(0x4A89B8) = 80.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
 	}
-	else if (input_type == MOUSE) {
-		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B4) = 25.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
-		*reinterpret_cast<float*>(H2BaseAddr + 0x4A89B0) = 50.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
+	else if (input_type == "mouse") {
+		*h2mod->GetAddress<float*>(0x4A89B4) = 25.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
+		*h2mod->GetAddress<float*>(0x4A89B0) = 50.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
 	}
-
 }
 
 void H2Tweaks::setSavedSens() {
 	if (H2Config_mouse_sens != 0)
-		H2Tweaks::setSens(MOUSE, (H2Config_mouse_sens));
+		H2Tweaks::setSens("mouse", (H2Config_mouse_sens));
 
 	if (H2Config_controller_sens != 0)
-		H2Tweaks::setSens(CONTROLLER, (H2Config_controller_sens));
+		H2Tweaks::setSens("controller", (H2Config_controller_sens));
 }
 
 void H2Tweaks::setFOV(int field_of_view_degrees) {
@@ -1117,7 +1047,7 @@ void H2Tweaks::setVehicleFOV(int field_of_view_degrees) {
 	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
 	{
 		float calculated_radians_FOV = (float)field_of_view_degrees * M_PI / 180.0f;
-		WriteValue(H2BaseAddr + 0x413780, calculated_radians_FOV); // Third Person
+		WriteValue(h2mod->GetAddress(0x413780), calculated_radians_FOV); // Third Person
 	}
 }
 
@@ -1126,7 +1056,7 @@ void H2Tweaks::setHz() {
 	if (H2IsDediServer)
 		return;
 
-	*(int*)(H2BaseAddr + 0xA3DA08) = H2Config_refresh_rate;
+	*h2mod->GetAddress<int*>(0xA3DA08) = H2Config_refresh_rate;
 }
 
 void H2Tweaks::setCrosshairPos(float crosshair_offset) {
@@ -1228,77 +1158,24 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 	}
 }
 
-void H2Tweaks::applyShaderTweaks() {
-	//patches in order to get elite glowing lights back on
-	//thanks Himanshu for help
-
-	if (H2IsDediServer)
-		return;
-
-	int materialIndex = 0;
-	DWORD currentMaterial;
-	DWORD shader;
-	DWORD sharedMapAddr = *(DWORD*)(H2BaseAddr + 0x482290);
-	DWORD tagMemOffset = 0xE67D7C;
-
-	DWORD tagMem = sharedMapAddr + tagMemOffset;
-	DWORD MaterialsMem = *(DWORD*)(tagMem + 0x60 + 4) + sharedMapAddr; // reflexive materials block
-	//int count = *(int*)(tagMem + 0x60);
-
-	for (materialIndex = 0; materialIndex < 19; materialIndex++) { // loop through materials
-		currentMaterial = MaterialsMem + (0x20 * materialIndex);
-		shader = currentMaterial + 0x8;
-
-		if (materialIndex == 3 || materialIndex == 7) { // arms/hands shaders
-			*(DWORD*)(shader + 4) = 0xE3652900;
-		}
-
-		else if (materialIndex == 5 || materialIndex == 8) { //legs shaders
-			*(DWORD*)(shader + 4) = 0xE371290C;
-		}
-
-		else if (materialIndex == 15) { // inset_lights_mp shader
-			*(DWORD*)(shader + 4) = 0xE38E2929;
-		}
-	 }
-}
-
 char ret_0() {
 	return 0; //for 60 fps cinematics
 }
 
-void H2Tweaks::enable60FPSCutscenes() {
-
+void H2Tweaks::toggleUncappedCampaignCinematics(bool toggle) {
 	if (H2IsDediServer)
 		return;
+
+	typedef char(__cdecl *is_cutscene_fps_cap)();
+	auto p_is_cutscene_fps_cap = h2mod->GetAddress<is_cutscene_fps_cap>(0x3A938);
 
 	//60 fps cinematics enable
-	PatchCall(H2BaseAddr + 0x97774, ret_0);
-	PatchCall(H2BaseAddr + 0x7C378, ret_0);
-
+	PatchCall(h2mod->GetAddress(0x97774), toggle ? ret_0 : p_is_cutscene_fps_cap);
+	PatchCall(h2mod->GetAddress(0x7C378), toggle ? ret_0 : p_is_cutscene_fps_cap);
 }
 
-void H2Tweaks::disable60FPSCutscenes() {
-
-	if (H2IsDediServer)
-		return;
-
-	typedef char(__cdecl *is_cutscene_fps_cap)(); //restore orig func
-	is_cutscene_fps_cap pIs_cutscene_fps_cap = (is_cutscene_fps_cap)(H2BaseAddr + 0x3A938);
-
-	//60 fps cinematics disable
-	PatchCall(H2BaseAddr + 0x97774, pIs_cutscene_fps_cap);
-	PatchCall(H2BaseAddr + 0x7C378, pIs_cutscene_fps_cap);
-}
-
-void H2Tweaks::enableAI_MP() {
-	BYTE jmp[1] = { JMP_RAW_BYTE };
-	WriteBytes(H2BaseAddr + (H2IsDediServer ? 0x2B93F4 : 0x30E684), jmp, 1);
-}
-
-void H2Tweaks::disableAI_MP() {
-	BYTE jnz[1] = { JNZ_RAW_BYTE };
-	WriteBytes(H2BaseAddr + (H2IsDediServer ? 0x2B93F4 : 0x30E684), jnz, 1);
+void H2Tweaks::toggleAiMp(bool toggle) {
+	WriteValue<BYTE>(h2mod->GetAddress(0x30E684, 0x2B93F4), toggle ? JMP_OP_CODE : JNZ_OP_CODE);
 }
 
 void H2Tweaks::applyMeleePatch(bool toggle)

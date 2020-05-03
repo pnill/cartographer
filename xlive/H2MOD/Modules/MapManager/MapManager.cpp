@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#include "MapManager.h"
+
 #include "Globals.h"
 #include <Mswsock.h>
 #include <WS2tcpip.h>
@@ -9,6 +12,8 @@
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 #pragma comment (lib, "mswsock.lib")
+
+MapManager* mapManager = new MapManager();
 
 #define DEFAULT_BUFLEN 65536
 
@@ -49,10 +54,8 @@ bool mapDownloadCountdown = false;
 auto promptOpenTime = std::chrono::high_resolution_clock::now();
 int downloadPercentage = 0;
 
-void MapManager::leaveSessionIfAFK()
-{
-	if (mapDownloadCountdown)
-	{
+void MapManager::leaveSessionIfAFK() {
+	if (mapDownloadCountdown) {
 		auto duraton = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - promptOpenTime);
 		if (duraton >= std::chrono::seconds(20)) {
 			h2mod->exit_game();
@@ -64,10 +67,9 @@ void MapManager::leaveSessionIfAFK()
 /**
 * Download map callback
 */
-char __cdecl handle_map_download_callback()
-{
-	mapDownloadCountdown = false;
+char __cdecl handle_map_download_callback() {
 	downloadPercentage = 0;
+	mapDownloadCountdown = false;
 
 	auto mapDownload = []()
 	{
@@ -78,7 +80,7 @@ char __cdecl handle_map_download_callback()
 
 		if (!mapManager->getMapFilenameToDownload().empty())
 		{
-			LOG_TRACE_GAME("[h2mod-network] map file name from membership packet {}", mapManager->getMapFilenameToDownload());
+			LOG_TRACE_NETWORK("[h2mod-network] map file name from membership packet {}", mapManager->getMapFilenameToDownload());
 			if (!mapManager->hasCustomMap(mapManager->getMapFilenameToDownload())) {
 				//TODO: set map filesize
 				//TODO: if downloading from repo files, try p2p
@@ -86,9 +88,9 @@ char __cdecl handle_map_download_callback()
 					h2mod->exit_game(); // download has failed
 			}
 			else {
-				LOG_TRACE_GAME("[h2mod-network] already has map {}", mapManager->getMapFilenameToDownload());
+				LOG_TRACE_NETWORK("[h2mod-network] already has map {}", mapManager->getMapFilenameToDownload());
 			}
-			mapManager->setMapFileNameToDownload("");
+			mapManager->clearMapFileNameToDownload();
 		}
 		else 
 		{
@@ -124,7 +126,7 @@ void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16
 
 	mapDownloadCountdown = true;
 	promptOpenTime = std::chrono::high_resolution_clock::now();
-	CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
+	CustomPackets::sendRequestMapFilename();
 	leavegame_callback_ptr = (void*)leave_game_callback;
 	p_map_downloading_menu_constructor(a1, a2, a3, a4, reinterpret_cast<int>(handle_map_download_callback), leave_game_callback, a7, a8, a9, a10);
 }
@@ -185,33 +187,22 @@ std::string MapManager::getMapFilenameToDownload()
 	return this->mapFilenameToDownload;
 }
 
-void MapManager::setMapFileNameToDownload(std::string mapFilenameToDownload) {
-	this->mapFilenameToDownload = mapFilenameToDownload;
-}
-
-/**
-* Start listening for tcp clients
-*/
-void MapManager::startListeningForClients() {
-	this->tcpServer = new MapManager::TcpServer();
-	this->tcpServer->startListening();
-}
-
-/**
-* Stop listening for tcp clients if a tcp server exists
-*/
-void MapManager::stopListeningForClients() {
-	if (this->tcpServer != NULL) {
-		this->tcpServer->stop();
+void MapManager::setMapFileNameToDownload(std::wstring mapFilenameToDownload) {
+	if (mapFilenameToDownload.size() > 0) {
+		std::wstring fileNameWide(mapFilenameToDownload);
+		std::string filename_str(fileNameWide.begin(), fileNameWide.end());
+		setMapFileNameToDownload(filename_str);
 	}
 }
 
-/**
-* Stops the tcp server
-*/
-void MapManager::TcpServer::stop() {
-	this->shutdownServerSocket();
-	listenerThreadRunning = false;
+void MapManager::setMapFileNameToDownload(std::string mapFilenameToDownload) {
+	if (mapFilenameToDownload.size() > 0) {
+		this->mapFilenameToDownload = mapFilenameToDownload;
+	}
+}
+
+void MapManager::clearMapFileNameToDownload() {
+	this->mapFilenameToDownload.clear();
 }
 
 /**
@@ -223,11 +214,7 @@ std::wstring MapManager::getMapName() {
 	//H2Server.exe+535C64 (another offset to use if the above fails for whatever reason)
 	const wchar_t* currentMapName = h2mod->GetAddress<wchar_t*>(0x97737C, 0x5349B4);
 
-	DWORD dwBack;
-	//set r/w access on string so we don't have any issues when we do the implicit copy below
-	VirtualProtect((LPVOID)currentMapName, 4, PAGE_READWRITE, &dwBack);
 	std::wstring ucurrentMapName(currentMapName);
-	VirtualProtect((LPVOID)currentMapName, 4, dwBack, &dwBack);
 
 	return ucurrentMapName;
 }
@@ -247,57 +234,62 @@ bool MapManager::hasCustomMap(std::string mapName) {
 */
 bool MapManager::hasCustomMap(std::wstring mapName) {
 	DWORD dwBack;
-	wchar_t* mapsDirectory = h2mod->GetAddress<wchar_t*>(0x2423C, 0x482D70);
-
-	VirtualProtect(mapsDirectory, 4, PAGE_READWRITE, &dwBack);
+	wchar_t* mapsDirectory = h2mod->GetAddress<wchar_t*>(0x482D70 + 0x2423C);
 	std::wstring mapFileName(mapsDirectory);
-	VirtualProtect(mapsDirectory, 4, dwBack, &dwBack);
 
 	mapFileName += mapName;
 	std::ifstream file(mapFileName.c_str());
 	return file.good();
 }
 
-void swap(DWORD*& a, DWORD*& b)
-{
-	DWORD* c = a;
-	a = b;
-	b = c;
-}
-
 /**
 * Actually calls the real map reload function in halo2.exe
 */
-void MapManager::reloadMaps() {
-	typedef char(__thiscall *map_reload_function_type)(int thisx);
-	auto reloadMaps = h2mod->GetAddress<map_reload_function_type>(0x4D021, 0x419B5);
-	auto reloadMapsSet = h2mod->GetAddress<map_reload_function_type>(0x4CC30, 0x41501);
-	DWORD* mapsObject = h2mod->GetAddress<DWORD*>(0x482D70, 0x4A70D8);
+void MapManager::reloadAllMaps() {
+	typedef char(__thiscall *custom_maps_load_info)(int thisx);
+	typedef char(__thiscall *cache_custom_map_file_image_preview)(int thisx);
 
-	LOG_TRACE_GAME("[h2mod-mapmanager] before reload map sets");
-	EnterCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
-	reloadMapsSet((int)mapsObject);
-	LeaveCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
-	LOG_TRACE_GAME("[h2mod-mapmanager] after reload maps");
+	DWORD customMapData = h2mod->GetAddress(0x482D70, 0x4A70D8);
+	auto p_custom_maps_load_info = h2mod->GetAddress<custom_maps_load_info>(0x4D021, 0x419B5);
+	auto p_cache_custom_map_file_image_preview = h2mod->GetAddress<cache_custom_map_file_image_preview>(0x4CC30, 0x41501); // this caches the map preview image for the map selection menu
 
-	LOG_TRACE_GAME("[h2mod-mapmanager] before reload map");
-	EnterCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
-	reloadMaps((int)mapsObject);
-	LeaveCriticalSection(*(LPCRITICAL_SECTION *)(int)mapsObject);
-	LOG_TRACE_GAME("[h2mod-mapmanager] after reload maps");
+	LOG_TRACE_GAME("[h2mod-mapmanager] before cache_custom_map_file_image_preview()");
+	p_cache_custom_map_file_image_preview((int)customMapData);
+	LOG_TRACE_GAME("[h2mod-mapmanager] after cache_custom_map_file_image_preview()");
+
+	LOG_TRACE_GAME("[h2mod-mapmanager] before custom_maps_load_info()");
+	p_custom_maps_load_info((int)customMapData);
+	LOG_TRACE_GAME("[h2mod-mapmanager] after custom_maps_load_info()");
 }
 
-/**
-* Resets the map downloading state for clients
-*/
-void MapManager::resetClient() {
-	this->threadRunning = false;
+bool MapManager::loadMapInfo(std::wstring& mapFileLocation)
+{
+	char data[2960];
+	ZeroMemory(data, sizeof(data));
+
+	typedef bool(__thiscall* reload_map)(void* a1, char* a2);
+	auto p_reload_map = h2mod->GetAddress<reload_map>(0x4CD1E);
+
+	typedef bool(__cdecl* get_map_info)(char* a1);
+	auto p_get_map_info = h2mod->GetAddress<get_map_info>(0x4F690);
+
+	wcscpy_s(reinterpret_cast<wchar_t*>(data + 2432), 256, mapFileLocation.c_str());
+
+	bool result = false;
+	if (p_get_map_info(data))
+	{
+		void* customMapData = h2mod->GetAddress<void*>(0x482D70, 0x4A70D8);
+		if (p_reload_map(customMapData, data))
+			result = true;
+	}
+
+	return result;
 }
 
 void MapManager::getMapFilename(std::wstring& buffer)
 {
-	network_session* session = nullptr;
 	wchar_t map_file_location[256];
+	network_session* session = nullptr;
 
 	// we want this to work in-game too
 	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::getCurrentNetworkSession(&session))
@@ -316,43 +308,6 @@ void MapManager::getMapFilename(std::wstring& buffer)
 	}
 }
 
-/**
-* Searches for a map to download based on the english map name and the actual filename
-* NOTE - only tries to download from host if we haven't downloaded it before in current game session AND
-* if the client is in the lobby
-*/
-void MapManager::searchForMap() {
-	threadRunning = true;
-
-	std::wstring currentMapName = this->getMapName();
-
-	if (hasCustomMap(currentMapName)) {
-		//if somehow we have the map and made it here, something is wrong, exit
-		LOG_TRACE_GAME("[h2mod-mapmanager] Map already exists, should not be searching for it");
-		goto cleanup;
-	}
-
-	if (isLobby) {
-		//only run map searches if client is in lobby
-		if (this->downloadFromHost()) {
-			goto cleanup;
-		}
-	}
-
-cleanup:
-	threadRunning = false;
-}
-
-/**
-* Cleanups client and server download states
-*/
-void MapManager::cleanup() {
-	this->stopListeningForClients();
-	this->resetClient();
-	//clear any attempted map downloads on game end
-	this->downloadedMaps.clear();
-}
-
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 	return fwrite(ptr, size, nmemb, stream);
 }
@@ -363,30 +318,25 @@ static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ul
 }
 
 bool MapManager::downloadFromRepo(std::string mapFilename) {
-	if (downloadedMaps.find(mapFilename) != downloadedMaps.end()) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] Already tried downloading map {}", mapFilename);
-		return true;
-	}
-	downloadedMaps.insert(mapFilename);
 	std::string url("http://www.h2maps.net/Cartographer/CustomMaps/");
 	url += mapFilename;
 
-	CURL *curl;
-	FILE *fp;
+	FILE *fp = nullptr;
+	CURL *curl = nullptr;
 	CURLcode res;
 
-	DWORD dwBack;
-	wchar_t* mapsDirectory = h2mod->GetAddress<wchar_t*>(0x482D70 + 0x2423C);
-	VirtualProtect(mapsDirectory, 4, PAGE_EXECUTE_READ, &dwBack);
-
-	std::wstring mapFileName(mapsDirectory);
-	VirtualProtect(mapsDirectory, 4, dwBack, &dwBack);
-	std::string nonUnicodeMapFilePath(mapFileName.begin(), mapFileName.end());
+	std::wstring mapFilePathWide(h2mod->GetAddress<wchar_t*>(0x482D70 + 0x2423C));
+	std::string nonUnicodeMapFilePath(mapFilePathWide.begin(), mapFilePathWide.end());
 	nonUnicodeMapFilePath += mapFilename;
 
 	curl = curl_easy_init();
 	if (curl) {
 		fp = fopen(nonUnicodeMapFilePath.c_str(), "wb");
+		if (fp == nullptr) {
+			curl_easy_cleanup(curl);
+			return false;
+		}
+
 		//fail if 404 or any other type of http error
 		curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
 		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -399,10 +349,10 @@ bool MapManager::downloadFromRepo(std::string mapFilename) {
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
 		/* always cleanup */
 		curl_easy_cleanup(curl);
+
 		fclose(fp);
-		if (http_code != 404) {
-			//if we succesfully downloaded the map, reload the maps and return out
-			this->reloadMaps();
+		if (http_code != 404 && this->loadMapInfo(std::wstring(nonUnicodeMapFilePath.begin(), nonUnicodeMapFilePath.end()))) {
+			//if we succesfully downloaded the map, return true
 			return true;
 		}
 		else {
@@ -410,364 +360,6 @@ bool MapManager::downloadFromRepo(std::string mapFilename) {
 			remove(nonUnicodeMapFilePath.c_str());
 		}
 	}
+
 	return false;
-}
-
-/**
-* Downloads .map file from host
-* NOTE - I left the WSACleanup calls commented out to serve as documentation, they are not used cause we don't want to unload the winsock stuff
-* at runtime, since there are other parts of the game using this library, and I can't really know if WSAStartup is called before every
-* socket call.
-*/
-bool MapManager::downloadFromHost() {
-	bool downloadResult = false;
-	SOCKET connectSocket = INVALID_SOCKET;
-	try {
-		if (precalculatedDownloadPercentageStrings.empty()) {
-			for (int i = 0; i <= 100; i++) {
-				std::string downloadMsg = "Downloaded " + std::to_string(i) + "%.";;
-				precalculatedDownloadPercentageStrings[i] = downloadMsg;
-			}
-		}
-		DWORD mapsObject = h2mod->GetAddress(0x482D70);
-		wchar_t* customMapsDirectory = reinterpret_cast<wchar_t*>(mapsObject + 148028);
-		std::wstring customMapsDirWide(customMapsDirectory);
-		std::string customMapsDir(customMapsDirWide.begin(), customMapsDirWide.end());
-
-		WSADATA wsaData;
-		struct addrinfo *result = NULL,
-			*ptr = NULL,
-			hints;
-		int iResult;
-		int recvbuflen = DEFAULT_BUFLEN;
-
-		// Initialize Winsock
-		iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-		if (iResult != 0) {
-			LOG_TRACE_GAME("[h2mod-mapmanager] WSAStartup failed with error: {}\n", iResult);
-			return 1;
-		}
-
-		SecureZeroMemory(&hints, sizeof(addrinfo));
-		hints.ai_family = AF_UNSPEC;
-		hints.ai_socktype = SOCK_STREAM;
-		hints.ai_protocol = IPPROTO_TCP;
-		std::string addr = inet_ntoa(ipManager.game_host_xn.ina);
-		std::string prt = std::to_string(ntohs(ipManager.game_host_xn.wPortOnline) + 9);
-		LOG_TRACE_GAME("[h2mod-mapmanager] Client map dl, addr={0}, port={1}", addr, prt);
-		// Resolve the server address and port
-		iResult = getaddrinfo(addr.c_str(), prt.c_str(), &hints, &result);
-		if (iResult != 0) {
-			LOG_TRACE_GAME("[h2mod-mapmanager] getaddrinfo failed with error: {}\n", iResult);
-			//WSACleanup();
-			return 1;
-		}
-
-		// Attempt to connect to an address until one succeeds
-		for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
-
-			// Create a SOCKET for connecting to server
-			connectSocket = socket(ptr->ai_family, ptr->ai_socktype,
-				ptr->ai_protocol);
-			if (connectSocket == INVALID_SOCKET) {
-				LOG_TRACE_GAME("[h2mod-mapmanager] socket failed with error: {}", WSAGetLastError());
-				//WSACleanup();
-				return 1;
-			}
-
-			// Connect to server
-			iResult = connect(connectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
-			if (iResult == SOCKET_ERROR) {
-				closesocket(connectSocket);
-				connectSocket = INVALID_SOCKET;
-				continue;
-			}
-			break;
-		}
-
-		freeaddrinfo(result);
-
-		if (connectSocket == INVALID_SOCKET) {
-			LOG_TRACE_GAME("[h2mod-mapmanager] {}", UNABLE_TO_CONNECT_TO_SERVER);
-			//WSACleanup();
-			return 1;
-		}
-
-		BOOL receivedFilename = false;
-		BOOL receivedFileSize = false;
-		std::string mapName("");
-		int fileSize;
-		int bytesRead = 0;
-		FILE* file;
-
-		// Receive until the peer closes the connection
-		do {
-			char recvbuf[DEFAULT_BUFLEN];
-
-			iResult = recv(connectSocket, recvbuf, recvbuflen, 0);
-			if (iResult > 0) {
-				//LOG_TRACE_GAME_N("Bytes received: %d", iResult);
-				if (receivedFilename && receivedFileSize) {
-					for (int i = 0; i < iResult; i++) {
-						fseek(file, bytesRead++, SEEK_SET);
-						fputc(recvbuf[i], file);
-						downloadPercentage = ((double)bytesRead / (double)fileSize) * 100;
-					}
-				}
-				else {
-					//the first/second batch of bytes received should be the filename and the file size of the map
-					if (!receivedFilename) {
-						mapName = std::string(recvbuf);
-						std::size_t extOffset = mapName.find(mapExt.c_str());
-						mapName = mapName.substr(0, extOffset);
-						receivedFilename = true;
-
-						mapName += mapExt.c_str();
-						std::string mapPath = customMapsDir;
-						mapPath += mapName;
-						file = fopen(mapPath.c_str(), fileReadMode.c_str());
-						continue;
-					}
-
-					if (!receivedFileSize) {
-						std::string recv(recvbuf);
-						//after file size is sent, we mark the end of the bytes for size with the character $, the rest of the characters would be actual
-						//map data
-						size_t index = recv.find(fileSizeDelim);
-						std::string fileSizee = recv.substr(0, index);
-						bool has_only_digits = (fileSizee.find_first_not_of(validDigits.c_str()) == std::string::npos);
-						if (!has_only_digits) {
-							LOG_TRACE_GAME("[h2mod-mapmanager] {}", BAD_FILE_SIZE);
-							goto end;
-						}
-						if (fileSizee.empty()) {
-							LOG_TRACE_GAME("[h2mod-mapmanager] {}", BAD_FILE_SIZE);
-						}
-						fileSize = stoi(fileSizee);
-						receivedFileSize = true;
-						for (int i = index + 1; i < iResult; i++) {
-							fseek(file, bytesRead++, SEEK_SET);
-							fputc(recvbuf[i], file);
-						}
-						continue;
-					}
-				}
-			}
-			else if (iResult == 0) {
-				LOG_TRACE_GAME("[h2mod-mapmanager] {}", CONNECTION_TO_HOST_CLOSED);
-			}
-			else {
-				LOG_TRACE_GAME("[h2mod-mapmanager] recv failed with error: {}", WSAGetLastError());
-			}
-		} while (iResult > 0);
-
-		fclose(file);
-
-		this->reloadMaps();
-		downloadResult = true;
-		goto end;
-	}
-	catch (std::exception const& e) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] std exception thrown = {}", e.what());
-	}
-	catch (...) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] unknown exception occurred occurred");
-	}
-end:
-	// cleanup
-	closesocket(connectSocket);
-	//WSACleanup();
-	return downloadResult;
-}
-
-void MapManager::startMapDownload() {
-	if (!threadRunning) {
-		std::thread t1(&MapManager::searchForMap, this);
-		t1.detach();
-	}
-}
-
-void handleClientConnection(SOCKET socket, std::wstring customMapName) {
-	HANDLE file;
-	int result;
-	try {
-		file = CreateFile(customMapName.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0, OPEN_EXISTING, 0, 0);
-
-		if (file == INVALID_HANDLE_VALUE) {
-			LOG_TRACE_GAME(L"[h2mod-mapmanager] Unable to open file {} for read", customMapName);
-			return;
-		}
-
-		int fileSize = GetFileSize(file, NULL);
-		if (fileSize == INVALID_FILE_SIZE) {
-			LOG_TRACE_GAME("[h2mod-mapmanager] invalid file size, {}", GetLastError());
-			return;
-		}
-
-		std::string nonUnicodeCustomMapFilename(customMapName.begin(), customMapName.end());
-		std::size_t offset = nonUnicodeCustomMapFilename.find_last_of("\\");
-		std::size_t extOffset = nonUnicodeCustomMapFilename.find_last_not_of(mapExt);
-		std::string mapName = nonUnicodeCustomMapFilename.substr(offset + 1, extOffset);
-
-		std::string buf = mapName;
-		std::string buf2 = std::to_string(fileSize);
-		buf2 += fileSizeDelim;
-
-		result = send(socket, mapName.c_str(), (int)strlen(mapName.c_str()), 0);
-		if (result == SOCKET_ERROR) {
-			LOG_TRACE_GAME("[h2mod-mapmanager] filename send failed with error: {}", WSAGetLastError());
-			result = send(socket, mapName.c_str(), (int)strlen(mapName.c_str()), 0);
-			if (result == SOCKET_ERROR) {
-				LOG_TRACE_GAME("[h2mod-mapmanager] filename retry send failed with error: {}", WSAGetLastError());
-				return;
-			}
-		}
-
-		result = send(socket, buf2.c_str(), (int)strlen(buf2.c_str()), 0);
-		if (result == SOCKET_ERROR) {
-			LOG_TRACE_GAME("[h2mod-mapmanager] filesize send failed with error: {}", WSAGetLastError());
-			result = send(socket, buf2.c_str(), (int)strlen(buf2.c_str()), 0);
-			if (result == SOCKET_ERROR) {
-				LOG_TRACE_GAME("[h2mod-mapmanager] filesize retry send failed with error: {}", WSAGetLastError());
-				return;
-			}
-			else {
-				goto sendFile;
-			}
-		}
-		else {
-		sendFile:
-			try {
-				if (TransmitFile(socket, file, fileSize, DEFAULT_BUFLEN, NULL, NULL, TF_DISCONNECT)) {
-					LOG_TRACE_GAME("[h2mod-mapmanager] Transmit file succeeded");
-				}
-				else {
-					LOG_TRACE_GAME("[h2mod-mapmanager] Transmit file failed, errorCode={}", WSAGetLastError());
-				}
-			}
-			catch (...) {
-				LOG_TRACE_GAME("[h2mod-mapmanager] c++ exception thrown");
-			}
-		}
-
-		goto cleanup;
-	}
-	catch (std::exception const& e) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] std exception thrown = {}", e.what());
-	}
-	catch (...) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] unknown exception occurred occurred");
-	}
-cleanup:
-	//close the file
-	if (CloseHandle(file)) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] closed file handle");
-	}
-	else {
-		LOG_TRACE_GAME("[h2mod-mapmanager] unable to close file");
-	}
-	// shutdown the connection since we're done
-	result = shutdown(socket, SD_SEND);
-	if (result == SOCKET_ERROR) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] shutdown failed with error: {}", WSAGetLastError());
-		closesocket(socket);
-		return;
-	}
-
-	if (closesocket(socket) == SOCKET_ERROR) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] close of socket failed with error: {}", WSAGetLastError());
-	}
-}
-
-/**
-* Shutdowns the tcp server socket
-*/
-void MapManager::TcpServer::shutdownServerSocket() {
-	if (serverSocket != NULL) {
-		closesocket(serverSocket);
-		//shut down once
-		serverSocket = NULL;
-	}
-}
-
-/**
-* Start listening for tcp clients
-*/
-void MapManager::TcpServer::startListening() {
-	struct addrinfo *result = NULL;
-	struct addrinfo hints;
-	int iResult;
-	int port = H2Config_base_port + 9;           /* port number to use */
-	int client;                  /* file descriptor for socket */
-	off_t offset = 0;          /* file offset */
-
-	WSADATA wsaData;
-
-	// Initialize Winsock
-	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (iResult != 0) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] WSAStartup failed with error: {}", iResult);
-		return;
-	}
-
-	SecureZeroMemory(&hints, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-	hints.ai_flags = AI_PASSIVE;
-
-	// Resolve the server address and port
-	iResult = getaddrinfo(NULL, std::to_string(port).c_str(), &hints, &result);
-	if (iResult != 0) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] getaddrinfo failed with error: {0}, port: {1}", iResult, port);
-		//WSACleanup();
-		return;
-	}
-
-	// Create a SOCKET for connecting to server
-	serverSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-	if (serverSocket == INVALID_SOCKET) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] socket failed with error: {}", WSAGetLastError());
-		freeaddrinfo(result);
-		serverSocket = NULL;
-		//WSACleanup();
-		return;
-	}
-
-	/* bind socket to the port */
-	iResult = bind(serverSocket, result->ai_addr, (int)result->ai_addrlen);
-	if (iResult == SOCKET_ERROR) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] unable to bind to socket: {}", strerror(errno));
-		freeaddrinfo(result);
-		closesocket(serverSocket);
-		serverSocket = NULL;
-		return;
-	}
-
-	freeaddrinfo(result);
-
-	/* listen for clients on the socket */
-	iResult = listen(serverSocket, SOMAXCONN);
-	if (iResult == SOCKET_ERROR) {
-		LOG_TRACE_GAME("[h2mod-mapmanager] Error trying to listen on port: {}", strerror(errno));
-		closesocket(serverSocket);
-		serverSocket = NULL;
-		return;
-	}
-
-	LOG_TRACE_GAME("[h2mod-mapmanager] Listening on port: {}", port);
-
-	while (listenerThreadRunning) {
-		/* wait for a client to connect */
-		client = accept(serverSocket, 0, 0);
-		if (client == -1) {
-			LOG_TRACE_GAME("[h2mod-mapmanager] accept failed: {}", strerror(errno));
-			//try to accept again
-			//TODO: if it fails too many times, exit
-			continue;
-		}
-
-		//std::thread t1(&handleClientConnection, client, customMapName);
-		//t1.detach();
-	}
 }

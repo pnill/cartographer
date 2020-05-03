@@ -1,12 +1,14 @@
 #include "stdafx.h"
 
 #include "Globals.h"
-#include "Blam/BlamLibrary.h"
+#include "ConsoleCommands.h"
+
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\Credits.h"
 #include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
@@ -16,6 +18,8 @@
 #include "Util\ClipboardAPI.h"
 
 std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
+
+ConsoleCommands* commands = new ConsoleCommands();
 
 ConsoleCommands::ConsoleCommands() {
 	command = "";
@@ -44,7 +48,6 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 	if (wp == H2Config_hotkeyIdConsole) {
 		if (seconds_since_start > 0.5) {
 			this->console = !this->console;
-			*h2mod->GetAddress<bool*>(0x479F51) = !this->console;
 			start = time(0);
 		}
 		return true;
@@ -325,21 +328,26 @@ void ConsoleCommands::checkForIds() {
 	}
 }
 
-void ConsoleCommands::spawn(DatumIndex object_datum, int count, float x, float y, float z, float randomMultiplier) {
+void ConsoleCommands::spawn(DatumIndex object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition) {
 
 	for (int i = 0; i < count; i++) {
 		try {
 			ObjectPlacementData nObject;
 
 			if (!object_datum.IsNull()) {
-				DatumIndex player_datum = h2mod->get_unit_datum_from_player_index(0);
+				DatumIndex player_datum = h2mod->get_unit_datum_from_player_index(h2mod->get_player_datum_index_from_controller_index(0).Index);
 				call_object_placement_data_new(&nObject, object_datum, player_datum, 0);
-				Real::Point3D* player_position = h2mod->get_player_coords(0);
+				Real::Point3D* player_position = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
 				
 				if (player_position != nullptr) {
 					nObject.Placement.X = player_position->X * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
 					nObject.Placement.Y = player_position->Y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
 					nObject.Placement.Z = (player_position->Z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+				}
+				if (specificPosition) {
+					nObject.Placement.X = x;
+					nObject.Placement.Y = y;
+					nObject.Placement.Z = z;
 				}
 				
 				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.Placement.X, nObject.Placement.Y, nObject.Placement.Z);
@@ -416,7 +424,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid command, usage - $reloadMaps");
 				return;
 			}
-			mapManager->reloadMaps();
+			mapManager->reloadAllMaps();
 		}
 		else if (firstCommand == "$help") {
 			output(L"reloadMaps");
@@ -430,12 +438,14 @@ void ConsoleCommands::handle_command(std::string command) {
 			output(L"controller_sens");
 			output(L"mouse_sens");
 			output(L"warpfix");
+			return;
 		}
 		else if (firstCommand == "$mapfilename")
 		{
 			std::wstring map_file_name;
 			mapManager->getMapFilename(map_file_name);
 			output(map_file_name);
+			return;
 		}
 		else if (firstCommand == "$downloadmap") {
 			if (splitCommands.size() != 2) {
@@ -444,6 +454,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 			std::string firstArg = splitCommands[1];
 			mapManager->downloadFromRepo(firstArg);
+			return;
 		}
 		else if (firstCommand == "$kick") {
 			if (h2mod->Server) {
@@ -473,21 +484,23 @@ void ConsoleCommands::handle_command(std::string command) {
 				}
 				NetworkSession::kickPeer(peerIndex);
 			}
+			return;
 		}
 		else if (firstCommand == "$logplayers") {
 			if (!NetworkSession::localPeerIsSessionHost()) {
-				output(L"Only host can log out information about players");
+				output(L"Only host can log player information.");
 				return;
 			}
-			NetworkSession::logAllPlayersToConsole();
+			NetworkSession::logPlayersToConsole();
+			return;
 		}
-		else if (firstCommand == "$logpeers")
-		{
+		else if (firstCommand == "$logpeers") {
 			if (!NetworkSession::localPeerIsSessionHost()) {
-				output(L"Only host can log out information about players");
+				output(L"Only host can log peer information.");
 				return;
 			}
-			NetworkSession::logAllPeersToConsole();
+			NetworkSession::logPeersToConsole();
+			return;
 		}
 		else if (firstCommand == "$maxplayers") {
 			if (splitCommands.size() != 2) {
@@ -517,10 +530,12 @@ void ConsoleCommands::handle_command(std::string command) {
 					return;
 				}
 			}
+			return;
 		}
 		else if (firstCommand == "$resetspawncommandlist") {
 			//reset checked_for_ids, so you can reload new object_datums at runtime
 			this->checked_for_ids = false;
+			return;
 		}
 		else if (firstCommand == "$spawnnear") {
 			if (splitCommands.size() < 3 || splitCommands.size() > 4) {
@@ -569,10 +584,12 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 			catch (...) {
 				LOG_TRACE_GAME("Error converting string to int");
+				return;
 			}
 			
-			Real::Point3D* playerPosition = h2mod->get_player_coords(0);
-			this->spawn(object_datum, count, playerPosition->X + 0.5f, playerPosition->Y + 0.5f, playerPosition->Z + 0.5f, randomMultiplier);
+			Real::Point3D* localPlayerPosition = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
+			this->spawn(object_datum, count, localPlayerPosition->X + 0.5f, localPlayerPosition->Y + 0.5f, localPlayerPosition->Z + 0.5f, randomMultiplier, false);
+			return;
 		}
 		else if (firstCommand == "$ishost") {
 			network_session* session = NetworkSession::getCurrentNetworkSession();
@@ -585,9 +602,11 @@ void ConsoleCommands::handle_command(std::string command) {
 			isHostStr += L", value=";
 			isHostStr += s;
 			output(isHostStr);
+			return;
 		}
 		else if (firstCommand == "$leavegame") {
 			h2mod->exit_game();
+			return;
 		}
 		else if (firstCommand == "$xyz") {
 			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MULTIPLAYER_MAP) {
@@ -595,6 +614,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 			displayXyz = !displayXyz;
+			return;
 		}
 		else if (firstCommand == "$downloadmap") {
 			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
@@ -604,6 +624,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::string secondArg = splitCommands[1];
 			secondArg += ".map";
 			std::thread(&MapManager::downloadFromRepo, mapManager, secondArg).detach();
+			return;
 		}
 		else if (firstCommand == "$spawn") {
 			if (splitCommands.size() != 6) {
@@ -643,7 +664,8 @@ void ConsoleCommands::handle_command(std::string command) {
 			float y = stof(splitCommands[4]);
 			float z = stof(splitCommands[5]);
 
-			this->spawn(object_datum, count, x, y, z, 1.0f);
+			this->spawn(object_datum, count, x, y, z, 1.0f, true);
+			return;
 		}
 		else if (firstCommand == "$controller_sens") {
 			if (splitCommands.size() != 2) {
@@ -653,13 +675,13 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::string sensVal = splitCommands[1];
 
 			if (isNum(sensVal.c_str())) {
-				H2Tweaks::setSens(CONTROLLER, stoi(sensVal));
+				H2Tweaks::setSens("controller", stoi(sensVal));
 				H2Config_controller_sens = stoi(sensVal);
 			}
 			else {
 				output(L"Wrong input! Use a number.");
 			}
-
+			return;
 		}
 		else if (firstCommand == "$mouse_sens") {
 			if (splitCommands.size() != 2) {
@@ -669,33 +691,24 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::string sensVal = splitCommands[1];
 
 			if (isNum(sensVal.c_str())) {
-				H2Tweaks::setSens(MOUSE, stoi(sensVal));
+				H2Tweaks::setSens("mouse", stoi(sensVal));
 				H2Config_mouse_sens = stoi(sensVal);
 			}
 			else {
 				output(L"Wrong input! Use a number.");
 			}
+			return;
 		}
 		else if (firstCommand == "$netstats") {
 			NetworkStatistics = !NetworkStatistics;
+			return;
 		}
-		else if (firstCommand == "$displayinfos") {
-			std::string str_index = splitCommands[1];
-			int inc = 0;
-			int index = stoi(str_index);
-			network_session* netsession = NetworkSession::getCurrentNetworkSession();
-		
-			std::wstring str_to_print;
-			std::wstring space = L" ";
-			std::wstring xuid = L"XUID: ";
-			str_to_print += netsession->parameters.scenario_path + space + netsession->membership.peer_info[index].name + space + netsession->membership.peer_info[index].peer_session_name;
-			str_to_print += xuid + std::to_wstring(netsession->membership.player_info[index].identifier);
-			str_to_print += L"\n Netowork Session state: " + std::to_wstring(netsession->local_session_state);
-			output(str_to_print);
-				
+		else if (firstCommand == "$lognetworksessionoffsets") {
+			NetworkSession::logStructureOffsets();
+			return;
 		}
 		else if (firstCommand == "$requestfilename") {
-			CustomPackets::sendRequestMapFilename(NetworkSession::getCurrentNetworkSession());
+			CustomPackets::sendRequestMapFilename();
 		}
 		else if (firstCommand == "$warpfix") {
 			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
@@ -709,8 +722,17 @@ void ConsoleCommands::handle_command(std::string command) {
 				H2Tweaks::WarpFix(true);
 			else
 				H2Tweaks::WarpFix(false);
-		}			
-					
+		}
+		else if (firstCommand == "$d3dex") {
+			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
+				output(L"Invalid command, usage d3dex true/false");
+				return;
+			}
+			std::string secondArg = splitCommands[1];
+
+			H2Config_d3dex = (secondArg.compare("true") == 0 || secondArg.compare("1") == 0);
+			return;
+        }
 		else {
 			output(L"Unknown command.");
 		}

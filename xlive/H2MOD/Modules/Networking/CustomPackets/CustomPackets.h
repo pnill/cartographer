@@ -55,7 +55,7 @@ enum e_network_message_types
 	test,
 	//custom packets bellow
 	request_map_filename,
-	map_file_name,
+	custom_map_filename,
 	team_change,
 	unit_grenades,
 
@@ -119,9 +119,8 @@ static const char* network_message_name[] = {
 	"unit_grenades"
 };
 
-struct s_custom_map_filename
+struct __declspec(align(8)) s_custom_map_filename
 {
-	bool is_custom_map;
 	wchar_t file_name[32];
 };
 
@@ -157,12 +156,13 @@ struct s_text_chat
 };
 #pragma pack(pop)
 
+const char* getNetworkMessageName(int enumVal);
 
 void register_packet_impl(void *, int, char*, int, int, int, void*, void*, void*);
 namespace CustomPackets
 {
 	void ApplyGamePatches();
-	void sendRequestMapFilename(network_session* session);
-	void sendTeamChange(network_session* session, signed int peer_index, int team_index);
-	void sendUnitGrenadesPacket(network_session* session, int peer_index, s_unit_grenades* data);
+	void sendRequestMapFilename();
+	void sendTeamChange(int peerIndex, int teamIndex);
+	void sendUnitGrenadesPacket(int peerIndex, s_unit_grenades* data);
 }

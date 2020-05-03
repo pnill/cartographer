@@ -5,18 +5,10 @@
 #include "H2MOD/Modules/Startup/Startup.h"
 #include "Util/Hooks/Detour.h"
 
-extern ConsoleCommands* commands;
-
 HMODULE hThis = NULL;
 
 CRITICAL_SECTION d_lock;
 
-UINT g_online = 1;
-
-UINT g_signin[4] = { 1,0,0,0 };
-CHAR g_szUserName[4][16] = { "Cartographer1", "Cartographer2", "Cartographer3", "Cartographer4" };
-
-XUID xFakeXuid[4] = { 0xEE100000DEADC0DE, 0xEE200000DEADC0DE, 0xEE300000DEADC0DE, 0xEE400000DEADC0DE };
 //CHAR g_profileDirectory[512] = "Profiles";
 
 std::wstring dlcbasepath;
@@ -82,6 +74,9 @@ void ExitInstance()
 	delete network_log;
 	delete console_log;
 	delete onscreendebug_log;
+#if COMPILE_WITH_VOICE
+	delete voice_log;
+#endif
 	LeaveCriticalSection(&log_section);
 	DeleteCriticalSection(&log_section);
 #endif

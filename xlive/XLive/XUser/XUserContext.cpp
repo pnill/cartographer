@@ -7,6 +7,7 @@
 #include "H2MOD\Modules\Config\Config.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
+extern XSESSION_LOCAL_DETAILS sessionDetails;
 
 // 5289: XUserGetContext
 DWORD WINAPI XUserGetContext(DWORD dwUserIndex, XUSER_CONTEXT* pContext, PXOVERLAPPED  pOverlapped)

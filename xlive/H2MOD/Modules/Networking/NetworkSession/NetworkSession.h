@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "..\Blam\Engine\Players\Players.h"
+#include "..\NetworkObserver\NetworkObserver.h"
 
 enum eNetwork_session_state : signed int
 {
@@ -29,17 +30,6 @@ enum eMap_status : int
 };
 
 #pragma pack(push, 1)
-struct network_address
-{
-	union
-	{
-		int ipv4;
-		char ipv6[16];
-	} address;
-	short port;
-	short address_type;
-};
-
 struct peer_information
 {
 	XNADDR address;
@@ -166,7 +156,7 @@ struct network_session
 {
 	DWORD field_0;
 	void *network_message_gateway_ptr;
-	void *network_observer;
+	network_observer *network_observer_ptr;
 	DWORD session_manager_ptr;
 	DWORD text_chat;
 	int unk_index;
@@ -251,8 +241,8 @@ struct network_session
 	DWORD c_kablam_session_join_request_handler; // dedicated server session join handler
 	char field_7B7C[12];
 };
-#pragma pack(pop)
 static_assert(sizeof(network_session) == 31624, "Invalid network_session size");
+#pragma pack(pop)
 
 namespace NetworkSession
 {
@@ -265,19 +255,21 @@ namespace NetworkSession
 	char getMapFileLocation(wchar_t* buffer, size_t size);
 
 	int getPeerCount();
-	int getPeerIndexFromPlayerXuid(long long xuid);
 	int getLocalPeerIndex();
 	void kickPeer(int peerIndex);
-	void logAllPeersToConsole();
+	peer_observer_channel* getPeerObserverChannel(int peerIndex);
+
+	void logPeersToConsole();
+	void logPlayersToConsole();
+	void logStructureOffsets();
 
 	int getPlayerCount();
-	bool IsActive(int playerIndex);
-	player_information* getPlayerInformation(int playerIndex);
-	int getPeerIndexFromPlayerIndex(int playerIndex);
+	bool playerIsActive(int playerIndex);
+	int getPeerIndex(int playerIndex);
 	wchar_t* getPlayerName(int playerIndex);
-	long long getPlayerXuidFromPlayerIndex(int playerIndex);
-	int getPlayerTeamFromPlayerIndex(int playerIndex);
+	long long getPlayerXuid(int playerIndex);
+	int getPlayerTeam(int playerIndex);
 	int getPlayerTeamFromXuid(long long xuid);
-	void logAllPlayersToConsole();
+	player_information* getPlayerInformation(int playerIndex);
 }
 

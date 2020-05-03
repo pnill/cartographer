@@ -2,64 +2,72 @@
 #include "bitstream.h"
 #include "H2MOD.h"
 
-// sign flag
-int8_t __SETS__(int x)
+void bitstream::data_encode_string(char* name, int a3, int a4)
 {
-	if (sizeof(int) == 1)
-		return int8_t(x) < 0;
-	if (sizeof(int) == 2)
-		return int16_t(x) < 0;
-	if (sizeof(int) == 4)
-		return int32_t(x) < 0;
-	return int64_t(x) < 0;
+	typedef void(__thiscall* data_encode_string_def)(bitstream* thisx, char* name, int a3, int a4);
+	auto p_data_encode_string = h2mod->GetAddress<data_encode_string_def>(0xD18DF, 0xCDE99);
+	p_data_encode_string(this, name, a3, a4);
 }
 
-// overflow flag of subtraction (x-y)
-int8_t __OFSUB__(int x, int y)
+void bitstream::data_decode_string(char* name, int a3, int a4)
 {
-	int y2 = y;
-	int8_t sx = __SETS__(x);
-	return (sx ^ __SETS__(y2)) & (sx ^ __SETS__(x - y2));
+	typedef void(__thiscall* data_decode_string_def)(bitstream* thisx, char* name, int a3, int a4);
+	auto p_data_decode_string = h2mod->GetAddress<data_decode_string_def>(0xD1FA7, 0xCE561);
+	p_data_decode_string(this, name, a3, a4);
 }
 
-data_decode_string bitstream::p_data_decode_string() {
-	return h2mod->GetAddress<data_decode_string>(0xD1FA7, 0xCE561);
+void bitstream::data_encode_integer(char* name, unsigned int value, signed int a3)
+{
+	typedef void(__thiscall* data_encode_integer_def)(bitstream* thisx, char* name, unsigned int value, signed int a3);
+	auto p_data_encode_integer = h2mod->GetAddress<data_encode_integer_def>(0xD17C6, 0xCDD80);
+	p_data_encode_integer(this, name, value, a3);
 }
 
-data_decode_address bitstream::p_data_decode_address() {
-	return reinterpret_cast<data_decode_address>(h2mod->GetAddress(0xD1FFD, 0xCE5B7));
+int bitstream::data_decode_integer(char* name, int a3)
+{
+	typedef int(__thiscall* data_decode_integer_def)(bitstream* thisx, char* name, int a3);
+	auto p_data_decode_integer = h2mod->GetAddress<data_decode_integer_def>(0xD1EE5, 0xCE49F);
+	return p_data_decode_integer(this, name, a3);
 }
 
-data_decode_bits bitstream::p_data_decode_bits() {
-	return h2mod->GetAddress<data_decode_bits>(0xD1F95, 0xCE54F);
+void bitstream::data_encode_bits(char* name, void* a3, int a4)
+{
+	typedef void(__thiscall* data_encode_bits_def)(bitstream* thisx, char* name, void* a3, int a4);
+	auto p_data_encode_bits = h2mod->GetAddress<data_encode_bits_def>(0xD18CD, 0xCDE87);
+	p_data_encode_bits(this, name, a3, a4);
 }
 
-data_decode_integer bitstream::p_data_decode_integer() {
-	return h2mod->GetAddress<data_decode_integer>(0xD1EE5, 0xCE49F);
+void bitstream::data_decode_bits(char* name, int a3, int a4)
+{
+	typedef void(__thiscall* data_decode_bits_def)(bitstream* thisx, char* name, int a3, int a4);
+	auto p_data_decode_bits = h2mod->GetAddress<data_decode_bits_def>(0xD1F95, 0xCE54F);
+	p_data_decode_bits(this, name, a3, a4);
 }
 
-data_decode_bool bitstream::p_data_decode_bool() {
-	return h2mod->GetAddress< data_decode_bool>(0xD1F47, 0xCE501);
+void bitstream::data_encode_bool(char* name, bool a3)
+{
+	typedef void(__thiscall* data_encode_bool_def)(bitstream* thisx, char* name, bool a3);
+	auto p_data_encode_bool = h2mod->GetAddress<data_encode_bool_def>(0xD1886, 0xCDE40);
+	p_data_encode_bool(this, name, a3);
 }
 
-data_encode_integer bitstream::p_data_encode_integer() {
-	return h2mod->GetAddress<data_encode_integer>(0xD17C6, 0xCDD80);
+bool bitstream::data_decode_bool(char* name)
+{
+	typedef bool(__thiscall* data_decode_bool_def)(bitstream* thisx, char* name);
+	auto p_data_decode_bool = h2mod->GetAddress<data_decode_bool_def>(0xD1F47, 0xCE501);
+	return p_data_decode_bool(this, name);
 }
 
-data_encode_string bitstream::p_data_encode_string() {
-	return h2mod->GetAddress<data_encode_string>(0xD18DF, 0xCDE99);
+void bitstream::data_decode_address(char* name, int a3)
+{
+	typedef void(__thiscall* data_decode_address_def)(bitstream* thisx, char* name, int a3);
+	auto p_data_decode_address = h2mod->GetAddress<data_decode_address_def>(0xD1FFD, 0xCE5B7);
+	return p_data_decode_address(this, name, a3);
 }
 
-data_encode_bits bitstream::p_data_encode_bits() {
-	return h2mod->GetAddress<data_encode_bits>(0xD18CD, 0xCDE87);
+bool bitstream::packet_is_valid()
+{
+	typedef bool(__thiscall* packet_is_valid_def)(bitstream* thisx);
+	auto p_packet_is_valid = h2mod->GetAddress<packet_is_valid_def>(0xD114C, 0xCD706);
+	return p_packet_is_valid(this);
 }
-
-data_encode_boolean bitstream::p_data_encode_bool() {
-	return h2mod->GetAddress<data_encode_boolean>(0xD1886, 0xCDE40);
-}
-
-valid_packet_type bitstream::p_packet_is_valid() {
-	return h2mod->GetAddress<valid_packet_type>(0xD114C, 0xCD706);
-}
-
-

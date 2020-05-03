@@ -11,13 +11,11 @@ void UIRankPatch() {
 	if (H2IsDediServer)
 		return;
 
-	DWORD& MapHeaderType = *(DWORD*)(H2BaseAddr + 0x47CD68 + 0x14C);
-
-	if (MapHeaderType != 2) //If not on mainmenu, returns
+	if (!tags::get_cache_header()->is_main_menu()) //If not on mainmenu, returns
 		return;
 
-	BYTE PlayerLevel = 0x00;								//eventually this will pull level from webserver
-	DWORD PlayerLevelPCR = 0x00000000;						//eventually this will pull level from webserver
+	BYTE PlayerLevel = -1;								//eventually this will pull level from webserver
+	DWORD PlayerLevelPCR = -1;						//eventually this will pull level from webserver
 	WriteValue(H2BaseAddr + 0x1B2C2F, PlayerLevel);			//sets player level in pregame lobby
 	WriteValue(H2BaseAddr + 0xCC72, PlayerLevelPCR);		//sets player level in postgame carnage report
 	//Tag : ui\player_skins\player_skin_lobby.skin
@@ -73,7 +71,7 @@ void UIRankPatch() {
 	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
 
 	//Sets Ranks 
-	for (RankChunkIndex = 0; RankChunkIndex < 49; RankChunkIndex++)
+	for (RankChunkIndex = 0; RankChunkIndex < 50; RankChunkIndex++)
 	{
 		//Setting Rank bitmap size
 		WriteValue((DWORD)&tags::get_tag_data()[RankIconOff + (RankChunkIndex * RankChunkSize) + WidthDefOff], WidthValue);

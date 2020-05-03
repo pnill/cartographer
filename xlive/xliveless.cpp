@@ -4,39 +4,22 @@
 #include "Globals.h"
 #include "XLive\XAM\xam.h"
 #include "XLive\xbox\xbox.h"
+#include "XLive\XUser\XUser.h"
 #include "XLive\ServerList\ServerList.h"
 #include "XLive\achievements\XAchievements.h"
-
-//#include "XLive\Globals.h"
-using namespace std;
 
 HANDLE g_dwFakePData = (HANDLE) -2;
 HANDLE g_dwFakeContent = (HANDLE) -2;
 HANDLE g_dwMarketplaceContent = (HANDLE) -2;
 
-WSADATA wsaData;
-
-
-extern CHAR g_profileDirectory[];
-
 extern void InitInstance();
 extern void ExitInstance();
 extern std::wstring dlcbasepath;
 
-
 int dlcinit = 0;
 
-
-#define DEBUG_WAIT 0
-
-
-char filename[1024];
 char str[8192];
 WCHAR strw[8192];
-WCHAR exePath[8192];
-
-
-
 
 XMARKETPLACE_CONTENTOFFER_INFO marketplace[100];
 int marketplaceCount = 0;
@@ -178,7 +161,7 @@ BOOL SetDlcBasepath( int num )
 
 
 					// check valid folder
-					wstring wnum;
+					std::wstring wnum;
 					wnum = L"DLC\\";
 					wnum += ffd.cFileName;
 					wnum += L"\\content.xbx";
@@ -305,10 +288,6 @@ BOOL SetDlcBasepath( int num )
 void Check_Overlapped( PXOVERLAPPED pOverlapped )
 {
 	if( !pOverlapped ) return;
-
-
-//	LOG_TRACE_XLIVE( "- async routine" );
-
 
 	if( pOverlapped->hEvent )
 	{
@@ -661,79 +640,10 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		}
 	}
 
-
-
-
-	if( hEnum == g_dwFakeAchievementContent && achieveinit != 0x7FFFFFFF )
+	if (hEnum == g_dwFakeAchievementContent)
 	{
-		DWORD total = 0;
-
-		for( 0; achieveinit < 42; achieveinit++ )
-		{
-			XACHIEVEMENT_DETAILS aaa;
-
-
-			// check max
-			if( total >= cbBuffer )
-				break;
-
-
-			if( achievementList[ achieveinit ] == 1 )
-			{
-				SYSTEMTIME systemTime;
-				FILETIME fileTime;
-
-
-				GetSystemTime( &systemTime );
-				SystemTimeToFileTime( &systemTime, &fileTime );
-
-
-				aaa.dwId = achieveinit;
-				aaa.pwszLabel = L"";
-				aaa.pwszDescription = L"";
-				aaa.pwszUnachieved = L"";
-				aaa.dwImageId = 0;
-				aaa.dwCred = 0;
-				aaa.ftAchieved = fileTime;
-				aaa.dwFlags = XACHIEVEMENT_DETAILS_ACHIEVED_ONLINE | XACHIEVEMENT_DETAILS_ACHIEVED;
-
-
-
-				if( async == FALSE )
-					(*pcItemsReturned)++;
-
-				else
-					pOverlapped->InternalHigh++;
-
-
-
-				if(pvBuffer)
-				{
-					memcpy(pvBuffer,&aaa,sizeof(aaa));
-					pvBuffer += sizeof(aaa);
-
-
-					total += sizeof(aaa);
-				}
-			}
-		}
-
-
-
-		if( async == FALSE )
-		{
-			if( *pcItemsReturned == 0 )
-				achieveinit = 0x7fffffff;
-		}
-
-		else
-		{
-			if( pOverlapped->InternalHigh == 0 )
-				achieveinit = 0x7fffffff;
-		}
+		return AchievementEnumerator(cbBuffer, pvBuffer, pcItemsReturned, pOverlapped);
 	}
-
-
 
 	if( hEnum == g_dwMarketplaceContent && marketplaceEnumerate < marketplaceCount )
 	{
@@ -753,7 +663,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 	if (hEnum == ServerEnumHandle )
 	{
-		LiveManager.GetServers(cbBuffer, pvBuffer, pOverlapped);
+		serverList.GetServers(cbBuffer, pvBuffer, pOverlapped);
 		return ERROR_IO_PENDING;
 	}
 
@@ -833,8 +743,6 @@ HRESULT WINAPI XLiveSignin (PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD 
 {
 	LOG_TRACE_XLIVE("XLiveSignin");
 
-	sys_ui = -1;
-
 	if (pOverlapped)
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
@@ -845,100 +753,10 @@ HRESULT WINAPI XLiveSignin (PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD 
 	return S_OK;
 }
 
-
-// #5297: XLiveInitializeEx
-int WINAPI XLiveInitializeEx(void * pXii, DWORD dwVersion)
-{
-	InitInstance();
-	LOG_TRACE_XLIVE("XLiveInitializeEx  (pXii = {0:p}, dwVersion = {1:x})", pXii, dwVersion);
-	return 0;
-}
-
-//TODO: Move XSession* to XSession.cpp
-// #5300: XSessionCreate
-LONG WINAPI XSessionCreate( DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, ULONGLONG *pqwSessionNonce, PXSESSION_INFO pSessionInfo, PXOVERLAPPED pOverlapped, HANDLE *phEnum )
-{
-	LOG_TRACE_XLIVE("XSessionCreate  (flags = {0:x}, userIndex = {1}, maxPublicSlots = {2}, maxPrivateSlots = {3}, sessionNonce = {4:p}, pSessionInfo = {5:p}, pOverlapped = {6:p}, handle = {7:p})",
-		dwFlags, dwUserIndex, dwMaxPublicSlots, dwMaxPrivateSlots, (void*)pqwSessionNonce, (void*)pSessionInfo, (void*)pOverlapped, (void*)phEnum );
-
-
-	if(phEnum) *phEnum = CreateMutex(NULL,NULL,NULL);
-
-	if ((dwFlags & XSESSION_CREATE_HOST) > 0)
-	{
-		LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_HOST");
-	}
-
-	if ((dwFlags & XSESSION_CREATE_USES_ARBITRATION) > 0)
-	{
-		LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_USES_ARBITRATION");
-	}
-
-	if ((dwFlags & XSESSION_CREATE_USES_PEER_NETWORK) > 0)
-	{
-		LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_USES_PEER_NETWORK");
-	}
-
-	if ((dwFlags & XSESSION_CREATE_USES_PRESENCE) > 0)
-	{
-		LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_USES_PRESENCE");
-	}
-
-
-	// local cache
-	sessionDetails.dwUserIndexHost = 0;
-
-	// already filled - SetContext
-	//sessionDetails.dwGameType = 0;
-	//sessionDetails.dwGameMode = 0;
-
-	sessionDetails.dwFlags = dwFlags;
-
-	sessionDetails.dwMaxPublicSlots = dwMaxPublicSlots;
-	sessionDetails.dwMaxPrivateSlots = dwMaxPrivateSlots;
-	sessionDetails.dwAvailablePublicSlots = dwMaxPublicSlots;
-	sessionDetails.dwAvailablePrivateSlots = dwMaxPrivateSlots;
-
-	sessionDetails.dwActualMemberCount = 0;
-	sessionDetails.dwReturnedMemberCount = 0;
-
-	sessionDetails.eState = XSESSION_STATE_LOBBY;
-	sessionDetails.qwNonce = *pqwSessionNonce;
-
-	// skipme
-	//sessionDetails.sessionInfo = 0;
-	//sessionDetails.xnkidArbitration = 0;
-
-	//sessionDetails.pSessionMembers = 0;
-
-	LOG_TRACE_XLIVE( "- handle = {:p}", (void*)*phEnum );
-
-	if( pOverlapped == 0 )
-		return ERROR_SUCCESS;
-
-
-	pOverlapped->InternalLow = ERROR_SUCCESS;
-	pOverlapped->InternalHigh = 0;
-	pOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-	Check_Overlapped( pOverlapped );
-
-	return ERROR_IO_PENDING;
-}
-
-// #5332: XSessionEnd
-int WINAPI XSessionEnd(DWORD, DWORD)
-{
-	mapManager->cleanup();
-	LOG_TRACE_NETWORK("XSessionEnd()");
-	return 0;
-}
-
-
 // #5303: XStringVerify
 DWORD WINAPI XStringVerify( DWORD dwFlags, const CHAR *szLocale, DWORD dwNumStrings, const STRING_DATA *pStringData, DWORD cbResults, STRING_VERIFY_RESPONSE *pResults, PXOVERLAPPED pOverlapped )
 {
-	LOG_TRACE_XLIVE("XStringVerify  (dwFlags = {0:x}, szLocale = {1:x}, dwNumStrings = {2}, pStringData = {3:p}, cbresults = {4}, pResults = {5:p}, pXOverlapped = {6:p})",
+	LOG_TRACE_XLIVE("XStringVerify  (dwFlags = {0:x}, szLocale = {1}, dwNumStrings = {2}, pStringData = {3:p}, cbresults = {4}, pResults = {5:p}, pXOverlapped = {6:p})",
 		dwFlags, szLocale, dwNumStrings, (void*)pStringData, cbResults, (void*)pResults, (void*)pOverlapped );
 
 
@@ -968,60 +786,6 @@ DWORD WINAPI XStringVerify( DWORD dwFlags, const CHAR *szLocale, DWORD dwNumStri
 
 	return ERROR_SUCCESS;
 }
-
-
-// #5305: XStorageUploadFromMemory
-DWORD WINAPI XStorageUploadFromMemory( DWORD dwUserIndex, const WCHAR *wszServerPath, DWORD dwBufferSize, const BYTE *pbBuffer, PXOVERLAPPED pOverlapped )
-{
-	LOG_TRACE_XLIVE(L"XStorageUploadFromMemory  (dwUserIndex = {0}, wszServerPath = {1}, dwBufferSize = {2:x}, pbBuffer = {3:p}, pXOverlapped = {4:p})",
-		dwUserIndex, wszServerPath, dwBufferSize, (void*)pbBuffer, (void*)pOverlapped );
-
-
-
-	FILE *fp;
-	errno_t err = _wfopen_s(&fp, wszServerPath, L"wb" );
-	if( !err )
-	{
-		fwrite( pbBuffer, 1, dwBufferSize, fp );
-		fclose( fp );
-	}
-
-
-
-	if( pOverlapped )
-	{
-		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-
-		Check_Overlapped( pOverlapped );
-
-		return ERROR_IO_PENDING;
-	}
-
-
-	return ERROR_SUCCESS;
-}
-
-
-// #5306: XStorageEnumerate
-int WINAPI XStorageEnumerate( DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD)   // XStorageEnumerate
-{
-    LOG_TRACE_XLIVE("XStorageEnumerate");
-    return 0;
-}
-
-
-// #5309: XStorageBuildServerPathByXuid
-int WINAPI XStorageBuildServerPathByXuid(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8)
-{
-  LOG_TRACE_XLIVE("XStorageBuildServerPathByXuid  (a1 = {0:x}, a2 = {1:x}, a3 = {2:x}, a4 = {3:x}, a5 = {4:x}, a6 = {5:x}, a7 = {6:x}, a8 = {7:x}",
-		a1, a2, a3, a4, a5, a6, a7, a8);
-
-	return 0;
-}
-
-
 
 // #5311: XOnlineCleanup
 int WINAPI XOnlineCleanup ()
@@ -1075,297 +839,18 @@ int WINAPI XInviteGetAcceptedInfo (DWORD, DWORD)
 
 
 // #5316: XInviteSend
-int WINAPI XInviteSend (DWORD, DWORD, DWORD, DWORD, DWORD)
+int WINAPI XInviteSend(DWORD, DWORD, DWORD, DWORD, DWORD)
 {
-    LOG_TRACE_XLIVE("XInviteSend");
-    return 0;
-}
-
-
-// #5317: XSessionWriteStats
-DWORD WINAPI XSessionWriteStats (DWORD, DWORD, DWORD, DWORD, DWORD, PXOVERLAPPED pOverlapped )
-{
-	LOG_TRACE_XLIVE("XSessionWriteStats  (pOverlapped = {:p})",
-		(void*)pOverlapped );
-
-
-	Check_Overlapped( pOverlapped );
-
-	return ERROR_SUCCESS;
-}
-
-
-// #5318: XSessionStart
-int WINAPI XSessionStart (HANDLE hSession, DWORD dwFlags, PXOVERLAPPED pOverlapped )
-{
-	LOG_TRACE_XLIVE("XSessionStart  (hSession = {0:p}, dwFlags = {1:x}, pOverlapped = {2:p}",
-		(void*)hSession, dwFlags, (void*)pOverlapped );
-
-
-	if( pOverlapped )
-	{
-		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
-		pOverlapped->InternalHigh = 0;
-
-
-		Check_Overlapped( pOverlapped );
-
-		return ERROR_IO_PENDING;
-	}
-
-	return ERROR_SUCCESS;
-}
-
-
-// #5319: XSessionSearchEx
-DWORD WINAPI XSessionSearchEx (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD)
-{
-    LOG_TRACE_XLIVE("XSessionSearchEx");
-    return 0;
-}
-
-
-// #5320: XSessionSearchByID
-DWORD WINAPI XSessionSearchByID (DWORD xnkid1, DWORD xnkid2, DWORD, DWORD * pcbResultsBuffer, void *, PXOVERLAPPED pOverlapped)
-{
-	LOG_TRACE_XLIVE("XSessionSearchByID");
-
-	if (pcbResultsBuffer)
-		*pcbResultsBuffer = 0;
-
-
-	Check_Overlapped( pOverlapped );
-
+	LOG_TRACE_XLIVE("XInviteSend");
 	return 0;
-}
-
-
-// #5321: XSessionSearch
-DWORD WINAPI XSessionSearch (DWORD, DWORD, DWORD, WORD, WORD, void *, void *, DWORD * pcbResultsBuffer, void *, PXOVERLAPPED pOverlapped)
-{
-	LOG_TRACE_XLIVE("XSessionSearch");
-
-	if (pcbResultsBuffer)
-		*pcbResultsBuffer = 0;
-
-
-	Check_Overlapped( pOverlapped );
-
-	return 0;
-}
-
-
-// #5322: XSessionModify
-DWORD WINAPI XSessionModify (DWORD, DWORD, DWORD, DWORD, DWORD)
-{
-    LOG_TRACE_XLIVE("XSessionModify");
-    return 0;
-}
-
-
-// #5323: XSessionMigrateHost
-DWORD WINAPI XSessionMigrateHost (DWORD, DWORD, DWORD, DWORD)
-{
-    LOG_TRACE_XLIVE("XSessionMigrateHost");
-    return 0;
 }
 
 
 // #5324: XOnlineGetNatType
 XONLINE_NAT_TYPE WINAPI XOnlineGetNatType()
 {
-    LOG_TRACE_XLIVE("XOnlineGetNatType - NAT_OPEN");
-	return XONLINE_NAT_OPEN ;
-}
-
-
-// #5325: XSessionLeaveLocal
-DWORD WINAPI XSessionLeaveLocal (HANDLE hSession, DWORD dwUserCount, const DWORD *pdwUserIndexes, PXOVERLAPPED pXOverlapped)
-{
-    LOG_TRACE_XLIVE("XSessionLeaveLocal");
-
-	if (!hSession)
-		return ERROR_INVALID_PARAMETER;
-	if (!pdwUserIndexes)
-		return ERROR_INVALID_PARAMETER;
-
-	//TODO XSessionLeaveLocal
-	if (pXOverlapped) {
-		//asynchronous
-
-		pXOverlapped->InternalLow = ERROR_SUCCESS;
-		pXOverlapped->InternalHigh = ERROR_SUCCESS;
-		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-		Check_Overlapped(pXOverlapped);
-
-		return ERROR_IO_PENDING;
-	}
-	else {
-		//synchronous
-		//return result;
-	}
-	return ERROR_SUCCESS;
-}
-
-
-// #5326: XSessionJoinRemote
-DWORD WINAPI XSessionJoinRemote(HANDLE hSession, DWORD dwXuidCount, const XUID *pXuids, const BOOL *pfPrivateSlots, PXOVERLAPPED pXOverlapped)
-{
-    LOG_TRACE_XLIVE("XSessionJoinRemote");
-
-	if (pXOverlapped == 0)
-		return ERROR_SUCCESS;
-
-
-	pXOverlapped->InternalHigh = 0;
-	pXOverlapped->InternalLow = ERROR_SUCCESS;
-	pXOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-	Check_Overlapped(pXOverlapped);
-
-	return ERROR_IO_PENDING;
-}
-
-
-// #5327: XSessionJoinLocal
-DWORD WINAPI XSessionJoinLocal( HANDLE hSession, DWORD dwUserCount, const DWORD *pdwUserIndexes, const BOOL *pfPrivateSlots, PXOVERLAPPED pOverlapped )
-{
-	LOG_TRACE_XLIVE("XSessionJoinLocal  (hSession = {0:p}, dwUserCount = {1:x}, pdwUserIndexes = {2:p}, pfPrivateSlots = {3:p}, pOverlapped = {4:p})",
-		(void*)hSession, dwUserCount, (void*)pdwUserIndexes, (void*)pfPrivateSlots, (void*)pOverlapped );
-
-
-	for( DWORD lcv = 0; lcv < dwUserCount; lcv++ )
-	{
-		LOG_TRACE_XLIVE("- user {0} = {1}  ({2})", lcv+1, pdwUserIndexes[lcv], pfPrivateSlots[lcv] ? "Private" : "Public" );
-	}
-
-	if( pOverlapped == 0 )
-		return ERROR_SUCCESS;
-
-
-	pOverlapped->InternalHigh = 0;
-	pOverlapped->InternalLow = ERROR_SUCCESS;
-	pOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-
-	Check_Overlapped( pOverlapped );
-
-	return ERROR_IO_PENDING;
-}
-
-
-// #5328: XSessionGetDetails
-DWORD WINAPI XSessionGetDetails( HANDLE hSession, PDWORD pcbResultsBuffer, PXSESSION_LOCAL_DETAILS pSessionDetails, PXOVERLAPPED pOverlapped )
-{
-	DWORD max_size;
-
-
-	LOG_TRACE_XLIVE("XSessionGetDetails  (hSession = {0:p}, pcbResultsBuffer = {1:p} ({2:p}), pSessionDetails = {3:p}, pOverlapped = {4:p})",
-		(void*)hSession, (void*)pcbResultsBuffer, (void*)*pcbResultsBuffer, (void*)pSessionDetails, (void*)pOverlapped );
-
-
-
-	// max allowed
-	max_size = sizeof(XSESSION_LOCAL_DETAILS) + (sessionDetails.dwMaxPrivateSlots + sessionDetails.dwMaxPublicSlots) * sizeof(XSESSION_MEMBER);
-	if( *pcbResultsBuffer < max_size )
-	{
-		*pcbResultsBuffer = max_size;
-
-
-		if( pOverlapped == 0 )
-		{
-			LOG_TRACE_XLIVE( "- ERROR_INSUFFICIENT_BUFFER = {:x}", max_size );
-			return ERROR_INSUFFICIENT_BUFFER;
-		}
-
-		else
-		{
-			pOverlapped->InternalHigh = 0;
-			pOverlapped->InternalLow = ERROR_INSUFFICIENT_BUFFER;
-			pOverlapped->dwExtendedError = ERROR_INSUFFICIENT_BUFFER;
-
-
-			Check_Overlapped( pOverlapped );
-
-			return ERROR_IO_PENDING;
-		}
-	}
-
-
-
-
-	// sent in blank template, refill values
-	memset( pSessionDetails, 0xff, max_size );
-	memcpy( pSessionDetails, &sessionDetails, sizeof(sessionDetails) );
-
-
-	// fixme
-	sessionDetails.dwReturnedMemberCount = 0;
-	sessionDetails.pSessionMembers = 0;
-
-
-
-	if( pOverlapped == 0 )
-		return ERROR_SUCCESS;
-
-
-
-	pOverlapped->InternalHigh = 0;
-	pOverlapped->InternalLow = ERROR_SUCCESS;
-	pOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-
-	Check_Overlapped( pOverlapped );
-
-	return ERROR_IO_PENDING;
-}
-
-
-// #5329: XSessionFlushStats
-int WINAPI XSessionFlushStats (DWORD, DWORD)
-{
-    LOG_TRACE_XLIVE("XSessionFlushStats");
-    return 0;
-}
-
-
-// #5330: XSessionDelete
-DWORD WINAPI XSessionDelete(HANDLE hSession, PXOVERLAPPED pXOverlapped)
-{
-    LOG_TRACE_XLIVE("XSessionDelete");
-
-	DWORD ret = 0;
-	//TODO XSessionDelete
-	if (pXOverlapped) {
-		//asynchronous
-
-		pXOverlapped->InternalLow = ERROR_SUCCESS;
-		pXOverlapped->InternalHigh = ERROR_SUCCESS;
-		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-		Check_Overlapped(pXOverlapped);
-
-		ret = ERROR_IO_PENDING;
-	}
-	else {
-		//synchronous
-	}
-	if (!hSession)
-		ret = ERROR_INVALID_PARAMETER;
-
-
-	return ret;
-}
-
-
-
-// #5333: XSessionArbitrationRegister
-DWORD WINAPI XSessionArbitrationRegister (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD)
-{
-    LOG_TRACE_XLIVE("XSessionArbitrationRegister");
-    return 0;
+	LOG_TRACE_XLIVE("XOnlineGetNatType - NAT_OPEN");
+	return XONLINE_NAT_OPEN;
 }
 
 
@@ -1378,37 +863,6 @@ DWORD WINAPI XTitleServerCreateEnumerator (LPCSTR pszServerInfo, DWORD cItem, DW
     return 1;
 }
 
-
-// #5336: XSessionLeaveRemote
-DWORD WINAPI XSessionLeaveRemote (HANDLE hSession, DWORD dwXuidCount, const XUID *pXuids, XOVERLAPPED *pXOverlapped)
-{
-    LOG_TRACE_XLIVE("XSessionLeaveRemote");
-	if (!hSession)
-		return ERROR_INVALID_PARAMETER;
-	if (!dwXuidCount)
-		return ERROR_INVALID_PARAMETER;
-	if (!pXuids)
-		return ERROR_INVALID_PARAMETER;
-
-	//TODO XSessionLeaveRemote
-	if (pXOverlapped) {
-		//asynchronous
-
-		pXOverlapped->InternalLow = ERROR_SUCCESS;
-		pXOverlapped->InternalHigh = ERROR_SUCCESS;
-		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-		Check_Overlapped(pXOverlapped);
-
-		return ERROR_IO_PENDING;
-	}
-	else {
-		//synchronous
-		//return result;
-	}
-	return ERROR_SUCCESS;
-}
-
 // #5338: XPresenceSubscribe
 int WINAPI XPresenceSubscribe(int a1, int a2, int a3)
 {
@@ -1417,7 +871,7 @@ int WINAPI XPresenceSubscribe(int a1, int a2, int a3)
 }
 
 // #5340 XPresenceCreateEnumerator
-int WINAPI XPresenceCreateEnumerator(DWORD dwUserIndex, DWORD cPeers, const XUID *pPeers, DWORD dwStartingIndex,DWORD dwPeersToReturn, DWORD *pcbBuffer, HANDLE *ph)
+int WINAPI XPresenceCreateEnumerator(DWORD dwUserIndex, DWORD cPeers, const XUID *pPeers, DWORD dwStartingIndex, DWORD dwPeersToReturn, DWORD *pcbBuffer, HANDLE *ph)
 {
 	LOG_TRACE_XLIVE("XPresenceCreateEnumerator(dwUserIndex: {0:x}, cPeers: {1:x})", dwUserIndex, cPeers);
 	if(pcbBuffer)
@@ -1425,109 +879,6 @@ int WINAPI XPresenceCreateEnumerator(DWORD dwUserIndex, DWORD cPeers, const XUID
 
 	return 1;
 }
-
-
-// #5343: XSessionCalculateSkill
-DWORD WINAPI XSessionCalculateSkill (DWORD, DWORD, DWORD, DWORD, DWORD)
-{
-    LOG_TRACE_XLIVE("XSessionCalculateSkill");
-    return 0;
-}
-
-
-// #5344: XStorageBuildServerPath
-DWORD WINAPI XStorageBuildServerPath( DWORD dwUserIndex, XSTORAGE_FACILITY StorageFacility,
-                                      const void *pvStorageFacilityInfo, DWORD dwStorageFacilityInfoSize,
-                                      LPCWSTR *pwszItemName, WCHAR *pwszServerPath, DWORD *pdwServerPathLength )
-{
-	//LOG_TRACE_XLIVE("XStorageBuildServerPath  (dwUserIndex = %d, StorageFacility = %d, pvStorageFacilityInfo = %X, dwStorageFacilityInfoSize = %X, pwszItemName = %s, pwszServerPath = %X, pdwServerPathLength = %X )",
-	//	dwUserIndex, StorageFacility, pvStorageFacilityInfo, dwStorageFacilityInfoSize, pwszItemName, pwszServerPath, pdwServerPathLength );
-
-
-	if( pwszServerPath )
-	{
-		//Local_Storage_W( 0, strw );
-
-		SecureZeroMemory(strw, sizeof(strw));
-		wcscat( strw, L"\\Online\\" );
-		//CreateDirectory( strw, NULL );
-
-
-		wcscat( strw, (WCHAR *) pwszItemName );
-		wcscpy( pwszServerPath, strw );
-		*pdwServerPathLength = wcslen( strw ) + 1;
-
-
-		//LOG_TRACE_XLIVE( "- %s", strw );
-	}
-
-	return ERROR_FUNCTION_FAILED;
-}
-
-
-// #5345: XStorageDownloadToMemory
-DWORD WINAPI XStorageDownloadToMemory( DWORD dwUserIndex, const WCHAR *wszServerPath, DWORD dwBufferSize, const BYTE *pbBuffer, DWORD cbResults, XSTORAGE_DOWNLOAD_TO_MEMORY_RESULTS *pResults, PXOVERLAPPED pOverlapped )
-{
-	LOG_TRACE_XLIVE(L"XStorageDownloadToMemory  (dwUserIndex = {0}, wszServerPath = {1}, dwBufferSize = {2:x}, pbBuffer = {3:p}, cbResults = {4}, pResults = {5:p}, pXOverlapped = {6:p})",
-		dwUserIndex, wszServerPath, dwBufferSize, (void*)pbBuffer, cbResults, (void*)pResults, (void*)pOverlapped );
-
-
-	pResults->dwBytesTotal = 0;
-	memcpy( &pResults->xuidOwner, &xFakeXuid[dwUserIndex], sizeof(xFakeXuid[dwUserIndex]) );
-
-
-	FILE *fp;
-	_wfopen_s(&fp, wszServerPath, L"rb" );
-	if( !fp )
-	{
-		LOG_TRACE_XLIVE( "- ERROR: file does not exist" );
-
-		return -1;
-	}
-
-
-	DWORD size;
-
-
-	fseek( fp, 0, SEEK_END );
-	size = ftell(fp);
-
-
-	if( dwBufferSize < size )
-	{
-		LOG_TRACE_XLIVE( "- ERROR_INSUFFICIENT_BUFFER = {:x}", ftell(fp) );
-
-		return ERROR_INSUFFICIENT_BUFFER;
-	}
-
-
-
-	fseek( fp, 0, SEEK_SET );
-	fread( (void *) pbBuffer, 1, size, fp );
-
-
-	pResults->dwBytesTotal = size;
-	memcpy( &pResults->xuidOwner, &xFakeXuid[dwUserIndex], sizeof(xFakeXuid[dwUserIndex]) );
-	//pResults->ftCreated;
-
-
-	if( pOverlapped )
-	{
-		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-		pOverlapped->InternalHigh = 0;
-
-
-		Check_Overlapped( pOverlapped );
-
-		return ERROR_IO_PENDING;
-	}
-
-
-	return ERROR_SUCCESS;
-}
-
 
 // #5346: XLiveLess_5346
 DWORD WINAPI TitleExport_XUserEstimateRankForRating(DWORD a1, LPDWORD pdwResult, DWORD a3, void* a4, PXOVERLAPPED pOverlapped)
@@ -2030,11 +1381,6 @@ HRESULT WINAPI XLiveProtectData (BYTE * pInBuffer, DWORD dwInDataSize, BYTE * pO
 // #5035: XLiveUnprotectData
 HRESULT WINAPI XLiveUnprotectData (BYTE * pInBuffer, DWORD dwInDataSize, BYTE * pOutBuffer, DWORD * pDataSize, PHANDLE pHandle)
 {
-#if 0
-	while(1)
-		Sleep(1);
-#endif
-
 
 	LOG_TRACE_XLIVE("XLiveUnprotectData  (pInBuffer = {0:p}, dwInDataSize = {1}, pOutBuffer = {2:p}, pDataSize = {3:x}, Handle = {4:p})",
 		(void*)pInBuffer, dwInDataSize, (void*)pOutBuffer, *pDataSize, (void*)pHandle);
@@ -2093,15 +1439,6 @@ DWORD WINAPI XLiveCloseProtectedDataContext (HANDLE h)
 	CloseHandle(h);
     return 0;
 }
-
-
-// #5342: XSessionModifySkill
-DWORD WINAPI XSessionModifySkill (HANDLE, DWORD, void * rgXuid, PXOVERLAPPED pOverlapped)
-{
-    LOG_TRACE_XLIVE("XSessionModifySkill");
-    return 0;
-}
-
 
 // #5348: XLiveProtectedCreateFile
 HRESULT WINAPI XLiveProtectedCreateFile (HANDLE hContentAccess, void * pvReserved, PCWSTR pszFilePath,
@@ -2342,9 +1679,6 @@ DWORD WINAPI XLiveGetGuideKey(int pKeyStroke)
 {
     LOG_TRACE_XLIVE("XLiveGetGuideKey(pKeyStroke: {:x})",pKeyStroke);
 
-		// a[0] = x[0]
-		// a[4] = x[4]
-
     return 0;
 }
 
@@ -2366,7 +1700,7 @@ DWORD WINAPI XLiveLoadLibraryEx(LPCWSTR libFileName, HINSTANCE *a2, DWORD dwFlag
 	LOG_TRACE_XLIVE(L"XLiveLoadLibraryEx (libFileName = {0}, a2 = {1:p}, flags = {2:x})",
 		libFileName, (void*)a2, dwFlags);
 
-	HINSTANCE hInstance = LoadLibraryExW(libFileName, NULL, dwFlags);
+	HINSTANCE hInstance = LoadLibraryEx(libFileName, NULL, dwFlags);
 
 	if (!hInstance)
 		return HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);
@@ -2427,45 +1761,6 @@ DWORD WINAPI XStorageUploadFromMemoryGetProgress( DWORD a1, DWORD a2, DWORD a3, 
 	// not done - error now
 	return 0x57;
 }
-
-
-// 5307
-DWORD WINAPI XStorageDownloadToMemoryGetProgress( DWORD a1, DWORD a2, DWORD a3, DWORD a4 )
-{
-  LOG_TRACE_XLIVE("XStorageDownloadToMemoryGetProgress  (*** checkme ***) (a1 = {0:x}, a2 = {1:x}, a3 = {2:x}, a4 = {3:x})",
-		a1, a2, a3, a4 );
-
-
-	// not done - error now
-	return 0x57;
-}
-
-
-// 5308
-DWORD WINAPI XStorageDelete(DWORD dwUserIndex, const WCHAR *wszServerPath, XOVERLAPPED *pXOverlapped)
-{
-	LOG_TRACE_XLIVE(L"XStorageDelete  (*** checkme ***) (a1 = {0:x}, a2 = {1}, a3 = {2:p})",
-		dwUserIndex, wszServerPath, (void*)pXOverlapped);
-
-	//TODO XStorageDelete
-	if (pXOverlapped) {
-		//asynchronous
-
-		pXOverlapped->InternalLow = ERROR_SUCCESS;
-		pXOverlapped->InternalHigh = ERROR_SUCCESS;
-		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-		Check_Overlapped(pXOverlapped);
-
-		return ERROR_IO_PENDING;
-	}
-	else {
-		//synchronous
-		//return result;
-	}
-	return ERROR_SUCCESS;
-}
-
 
 // 5362
 DWORD WINAPI MarketplaceDoesContentIdMatch( CHAR *a1, DWORD a2 )

@@ -1,6 +1,5 @@
 #pragma once
 #include "stdafx.h"
-#include <atomic>
 
 #define XUSER_PROPERTY_GAMETYPE_NAME		0x40008228
 #define XUSER_PROPERTY_GAMETYPE_NAME_2		0x4000822B
@@ -26,6 +25,7 @@
 #define XUSER_PROPERTY_UNKNOWN_INT32_6		0x10008212
 #define XUSER_PROPERTY_UNKNOWN_INT32_7		0x10008213
 #define XUSER_PROPERTY_USERNAME_2			0x4000822C
+#define XUSER_PROPERTY_XUID                 0x2000822F
 
 #define XLOCATOR_DEDICATEDSERVER_PROPERTY_START     0x200
 
@@ -91,10 +91,8 @@ public:
 	int GetServersLeft();
 	int GetTotalServers();
 	void GetServerCounts();
-
-
 };
 
+extern ServerList serverList;
 extern HANDLE ServerEnumHandle;
-extern ServerList LiveManager;
 DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey);
