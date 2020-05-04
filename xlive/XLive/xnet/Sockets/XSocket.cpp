@@ -291,11 +291,13 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		//inTo->sin_addr.s_addr = H2Config_master_ip;
 		//inTo->sin_port = ntohs(H2Config_master_port_relay);
 
-		XBroadcastPacket* packet = (XBroadcastPacket*)new char[sizeof(XBroadcastPacket) + lpBuffers->len];
+		XBroadcastPacket* packet = (XBroadcastPacket*)malloc(sizeof(XBroadcastPacket) + lpBuffers->len);
+		packet->pckHeader.intHdr = 'BrOd';
+		strncpy(packet->pckHeader.HdrStr, broadcastStrHdr, MAX_HDR_STR);
 		ZeroMemory(&packet->data, sizeof(XBroadcastPacket::XBroadcast));
 
 		packet->data.name.sin_addr.s_addr = INADDR_BROADCAST;
-		memcpy((char*)&packet->data + sizeof(XBroadcastPacket), lpBuffers->buf, lpBuffers->len);
+		memcpy((char*)packet + sizeof(XBroadcastPacket), lpBuffers->buf, lpBuffers->len);
 
 		int portOffset = H2Config_base_port % 1000;
 
@@ -304,11 +306,11 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			inTo->sin_port = ntohs(i + portOffset + 1);
 			int result = sendto(xsocket->winSockHandle, (const char*)packet, sizeof(XBroadcastPacket) + lpBuffers->len, dwFlags, (sockaddr*)inTo, iTolen);
 			if (result == SOCKET_ERROR) {
-				delete[] packet;
+				free(packet);
 				return SOCKET_ERROR;
 			}
 		}
-		delete[] packet;
+		free(packet);
 		return ERROR_SUCCESS;
 	}
 
