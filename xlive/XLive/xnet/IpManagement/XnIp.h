@@ -38,12 +38,6 @@ struct XNetPacketHeader
 
 struct XBroadcastPacket
 {
-	XBroadcastPacket()
-	{
-		pckHeader.intHdr = 'BrOd';
-		strncpy(pckHeader.HdrStr, broadcastStrHdr, MAX_HDR_STR);
-	}
-
 	XNetPacketHeader pckHeader;
 	struct XBroadcast
 	{
@@ -62,7 +56,6 @@ struct XNetRequestPacket
 	}
 
 	XNetPacketHeader pckHeader;
-
 	struct XNetReq
 	{
 		XNKID xnkid;
