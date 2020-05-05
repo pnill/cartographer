@@ -89,6 +89,7 @@ int H2Config_vehicle_field_of_view = 70;
 int H2Config_refresh_rate = 60;
 int H2Config_mouse_sens = 0;
 int H2Config_controller_sens = 0;
+int H2Config_campaign_modifier = 0;
 float H2Config_crosshair_offset = NAN;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
@@ -284,6 +285,10 @@ void SaveH2Config() {
 			fputs("\n# <uint 0 to inf> - 0 uses the default sensitivity.", fileConfig);
 			fputs("\n\n", fileConfig);
 
+			fputs("# campaign_modifier Options (Client):", fileConfig);
+			fputs("\n# <uint 0 to 2> - 0 is default, 1 is H2X and 2 is 30 tick for campaign.", fileConfig);
+			fputs("\n\n", fileConfig);
+
 			fputs("# crosshair_offset Options (Client):", fileConfig);
 			fputs("\n# <0 to 0.53> - NaN disables the built in Crosshair adjustment.", fileConfig);
 			fputs("\n\n", fileConfig);
@@ -450,6 +455,8 @@ void SaveH2Config() {
 			fprintf_s(fileConfig, "\nd3dex = %d", H2Config_d3dex);
 
 			fprintf_s(fileConfig, "\ncontroller_sens = %d", H2Config_controller_sens);
+
+			fprintf_s(fileConfig, "\ncampaign_modifier = %d", H2Config_campaign_modifier);
 
 			if (FloatIsNaN(H2Config_crosshair_offset)) {
 				fputs("\ncrosshair_offset = NaN", fileConfig);
@@ -618,6 +625,7 @@ static bool est_vehicle_field_of_view = false;
 static bool est_refresh_rate = false;
 static bool est_mouse_sens = false;
 static bool est_controller_sens = false;
+static bool est_campaign_modifier = false;
 static bool est_hiresfix = false;
 static bool est_d3dex = false;
 static bool est_crosshair_offset = false;
@@ -701,6 +709,7 @@ static void est_reset_vars() {
 	est_refresh_rate = false;
 	est_mouse_sens = false;
 	est_controller_sens = false;
+	est_campaign_modifier = false;
 	est_crosshair_offset = false;
 	est_sens_controller = false;
 	est_sens_mouse = false;
@@ -1043,6 +1052,18 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 			else {
 				H2Config_controller_sens = tempint1;
 				est_controller_sens = true;
+			}
+		}
+		else if (!H2IsDediServer && sscanf(fileLine, "campaign_modifier =%d", &tempint1) == 1) {
+			if (est_campaign_modifier) {
+				duplicated = true;
+			}
+			else if (!(tempint1 >= 0)) {
+				incorrect = true;
+			}
+			else {
+				H2Config_campaign_modifier = tempint1;
+				est_campaign_modifier = true;
 			}
 		}
 		else if (!H2IsDediServer && sscanf(fileLine, "hiresfix =%d", &tempint1) == 1) {

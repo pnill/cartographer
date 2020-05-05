@@ -918,6 +918,15 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		//H2X::Initialize(true);
 		H2Tweaks::applyMeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
+		if (H2Config_campaign_modifier == 1)
+		{
+			H2X::Initialize(true);
+			engine_settings->tickrate = XboxTick::setTickRate(false);
+		}
+		else if (H2Config_campaign_modifier == 2)
+		{
+			engine_settings->tickrate = XboxTick::setTickRate(true);
+		}
 	}
 
 	return result;

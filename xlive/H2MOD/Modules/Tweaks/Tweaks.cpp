@@ -1168,6 +1168,13 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 	}
 }
 
+void H2Tweaks::setCampaignModifier(int type) {
+	if (h2mod->Server)
+		return;
+
+	H2Config_campaign_modifier = type;
+}
+
 char ret_0() {
 	return 0; //for 60 fps cinematics
 }
