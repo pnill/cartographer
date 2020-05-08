@@ -3890,7 +3890,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountEdit() {//__thiscall
 	}
 }
 
-static DWORD master_login_code;
+static int master_login_code;
 static HANDLE hThreadLogin = INVALID_HANDLE_VALUE;
 
 void xbox_live_task_progress_callback(DWORD a1)

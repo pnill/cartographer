@@ -375,7 +375,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 	return result;
 }
 
-bool HandleGuiLogin(char* ltoken, char* identifier, char* password, DWORD* out_master_login_interpret_result) {
+bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_master_login_interpret_result) {
 
 	bool result = false;
 	char* rtn_result = 0;
@@ -427,14 +427,14 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, DWORD* out_m
 	free(escaped_user_password);
 
 	int master_login_interpret_result = -1;
-	int rtn_code = MasterHttpResponse("https://cartographer.online/login2", http_request_body_build, rtn_result);
+	int master_http_response_result = MasterHttpResponse("https://cartographer.online/login2", http_request_body_build, rtn_result);
 
 	for (int i = strlen(http_request_body_build) - 1; i >= 0; i--) {
 		http_request_body_build[i] = 0;
 	}
 	free(http_request_body_build);
 
-	if (rtn_code == 0) {
+	if (master_http_response_result == 0) {
 		master_login_interpret_result = InterpretMasterLogin(rtn_result, ltoken);
 		if (master_login_interpret_result > 0) {
 			result = true;
@@ -447,7 +447,6 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, DWORD* out_m
 		addDebugText(NotificationPlayerText);
 
 		if (master_login_interpret_result == ERROR_CODE_INVALID_LOGIN_TOKEN) {
-
 			char* username = 0;
 			for (int i = 0; i < H2AccountCount; i++) {
 				if (H2AccountBufferLoginToken[i] && strcmp(H2AccountBufferLoginToken[i], ltoken) == 0) {
@@ -461,14 +460,14 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, DWORD* out_m
 				snprintf(login_identifier, strlen(username) + 1, username);
 			}
 		}
-		else {
-			if (!H2IsDediServer) {
-				char* login_identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
-				SecureZeroMemory(login_identifier, strlen(login_identifier));
-			}
-			if (master_login_interpret_result == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) {
-				result = false;
-			}
+	}
+	else {
+		if (!H2IsDediServer) {
+			char* login_identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
+			SecureZeroMemory(login_identifier, strlen(login_identifier));
+		}
+		if (master_login_interpret_result == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) {
+			result = false;
 		}
 	}
 
