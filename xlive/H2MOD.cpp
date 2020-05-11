@@ -813,7 +813,6 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
 
-	
 	if (h2mod->GetMapType() == scnr_type::MainMenu)
 	{
 		addDebugText("Map Type: Main-Menu");
@@ -839,11 +838,15 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 			b_GunGame = false;
 		}
 
+		if (b_XboxTick) {
+			engine_settings->tickrate = XboxTick::setTickRate(false);
+			b_XboxTick = false;
+		}
+
 		UIRankPatch();
 		H2Tweaks::setHz();
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
-		engine_settings->tickrate = XboxTick::setTickRate(false);
 
 		return result;
 	}		
@@ -1250,6 +1253,16 @@ void __cdecl game_mode_engine_draw_team_indicators()
 		p_game_mode_engine_draw_team_indicators();
 }
 
+bool __cdecl game_is_minimized_hook()
+{
+	// if xbox tickrate is set, use the built in frame limiter
+	if (b_XboxTick)
+		return true;
+	
+	// otherwise never use this frame limiter
+	return false;
+}
+
 void H2MOD::ApplyUnitHooks()
 {
 	// increase the size of the unit entity creation definition packet
@@ -1319,6 +1332,8 @@ void H2MOD::ApplyHooks() {
 
 		LOG_TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
+
+		PatchCall(h2mod->GetAddress(0x288B5), game_is_minimized_hook);
 
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4C14), (BYTE*)VerifyGameVersionOnJoin, 5);
 

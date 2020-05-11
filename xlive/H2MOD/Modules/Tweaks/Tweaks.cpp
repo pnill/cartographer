@@ -861,6 +861,8 @@ void fix_shader_template_nvidia(const std::string &template_name, const std::str
 
 void fix_shaders_nvidia()
 {
+	if (h2mod->Server) return;
+
 	fix_shader_template_nvidia(
 		"shaders\\shader_templates\\opaque\\tex_bump_alpha_test_single_pass", 
 		"shaders\\default_bitmaps\\bitmaps\\alpha_white",

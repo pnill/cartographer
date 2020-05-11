@@ -8,10 +8,7 @@
 
 void UIRankPatch() {
 
-	if (H2IsDediServer)
-		return;
-
-	if (!tags::get_cache_header()->is_main_menu()) //If not on mainmenu, returns
+	if (h2mod->GetMapType() != MainMenu || h2mod->Server)
 		return;
 
 	BYTE PlayerLevel = -1;								//eventually this will pull level from webserver
@@ -26,7 +23,6 @@ void UIRankPatch() {
 
 	//Tag : ui\player_skins\pcr_2.skin
 	const DWORD TagOffsetPostGameCarnage2 = 0x00485F50;	//Property : Bitmap Buttons
-
 
 	const BYTE pSkinChunkSize = 0x38;	//Property size per chunk
 	const int pSkinChunkIndex = 2;		//Property chunk index number (2 represents rank field)
@@ -46,7 +42,6 @@ void UIRankPatch() {
 	const DWORD RankIconSM = 0xE4EC02CA;		//Bitmap Datum Index
 	const DWORD RankIconSMOff = 0x00476D3C;		//Property : Bitmap
 
-
 	const BYTE RankChunkSize = 0x74;	//Property size per chunk
 	int RankChunkIndex;					//Property chunk index number (0-49)
 	const BYTE WidthDefOff = 0x04;		//Definition : Width
@@ -54,8 +49,7 @@ void UIRankPatch() {
 	const BYTE HeightDefOff = 0x06;		//Definition : Height
 	const WORD HeightValue = 0x0020;	//Value : 32 (decimal)
 
-
-		//Sets Pregame Lobby 
+	//Sets Pregame Lobby 
 	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset], yValuePGL);
 	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
 	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset], xValuePGL);
