@@ -50,73 +50,82 @@ void CXnIp::setTimeConnectionInteractionHappened(IN_ADDR ina, int time)
 
 int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount)
 {
-	XNetPacketHeader* XNetPck = reinterpret_cast<XNetPacketHeader*>(lpBuffers->buf);
-	switch (XNetPck->intHdr)
+	// check first if the packet received has the size bigger or equal to the XNet packet header first
+	if (*bytesRecvdCount >= sizeof(XNetPacketHeader))
 	{
-	case 'BrOd':
-	{
-		XBroadcastPacket* broadcastPck = reinterpret_cast<XBroadcastPacket*>(lpBuffers->buf);
-		if (*bytesRecvdCount >= sizeof(XBroadcastPacket)
-			&& strncmp(broadcastPck->pckHeader.HdrStr, broadcastStrHdr, MAX_HDR_STR) == 0
-			&& broadcastPck->data.name.sin_addr.s_addr == INADDR_BROADCAST)
+		XNetPacketHeader* XNetPck = reinterpret_cast<XNetPacketHeader*>(lpBuffers->buf);
+		switch (XNetPck->intHdr)
 		{
-			if (*bytesRecvdCount > sizeof(XBroadcastPacket))
+		case 'BrOd':
+		{
+			XBroadcastPacket* broadcastPck = reinterpret_cast<XBroadcastPacket*>(lpBuffers->buf);
+			if (*bytesRecvdCount >= sizeof(XBroadcastPacket)
+				&& strncmp(broadcastPck->pckHeader.HdrStr, broadcastStrHdr, MAX_HDR_STR) == 0
+				&& broadcastPck->data.name.sin_addr.s_addr == INADDR_BROADCAST)
 			{
-				*bytesRecvdCount = *bytesRecvdCount - sizeof(XBroadcastPacket);
-				char* buffer = new char[*bytesRecvdCount];
-				memcpy(buffer, lpBuffers->buf + sizeof(XBroadcastPacket), *bytesRecvdCount);
-				memcpy(lpBuffers->buf, buffer, *bytesRecvdCount);
-				delete[] buffer;
-				return ERROR_SUCCESS;
+				if (*bytesRecvdCount > sizeof(XBroadcastPacket))
+				{
+					*bytesRecvdCount = *bytesRecvdCount - sizeof(XBroadcastPacket);
+					char* buffer = new char[*bytesRecvdCount];
+					memcpy(buffer, lpBuffers->buf + sizeof(XBroadcastPacket), *bytesRecvdCount);
+					memcpy(lpBuffers->buf, buffer, *bytesRecvdCount);
+					delete[] buffer;
+					return ERROR_SUCCESS;
+				}
+				// set the bytes received count to 0
+				*bytesRecvdCount = 0;
+				WSASetLastError(WSAEWOULDBLOCK);
+				return SOCKET_ERROR;
 			}
-			WSASetLastError(WSAEWOULDBLOCK);
-			return SOCKET_ERROR;
 		}
-	}
 
-	case 'XNeT':
-	{
-		XNetRequestPacket* XNetPck = reinterpret_cast<XNetRequestPacket*>(lpBuffers->buf);
-		if (*bytesRecvdCount == sizeof(XNetRequestPacket)
-			&& strncmp(XNetPck->pckHeader.HdrStr, requestStrHdr, MAX_HDR_STR) == 0)
+		case 'XNeT':
 		{
-			switch (XNetPck->data.reqType)
+			XNetRequestPacket* XNetPck = reinterpret_cast<XNetRequestPacket*>(lpBuffers->buf);
+			if (*bytesRecvdCount == sizeof(XNetRequestPacket)
+				&& strncmp(XNetPck->pckHeader.HdrStr, requestStrHdr, MAX_HDR_STR) == 0)
 			{
-			case XnIp_ConnectionEstablishSecure:
-				LOG_TRACE_NETWORK("handleRecvdPacket() - Received secure packet with ip address {:x}, port: {}", htonl(lpFrom->sin_addr.s_addr), htons(lpFrom->sin_port));
-				HandleConnectionPacket(xsocket, XNetPck, lpFrom); // save NAT info and send back a connection packet
-				break;
+				switch (XNetPck->data.reqType)
+				{
+				case XnIp_ConnectionEstablishSecure:
+					LOG_TRACE_NETWORK("handleRecvdPacket() - Received secure packet from ip address {:x}, port: {}", htonl(lpFrom->sin_addr.s_addr), htons(lpFrom->sin_port));
+					HandleConnectionPacket(xsocket, XNetPck, lpFrom); // save NAT info and send back a connection packet
+					break;
 
-			case XnIp_ConnectionClose:
-			case XnIp_ConnectionPong:
-			case XnIp_ConnectionPing:
-			default:
-				break;
+				case XnIp_ConnectionClose:
+				case XnIp_ConnectionPong:
+				case XnIp_ConnectionPing:
+				default:
+					break;
+				}
+
+				// set the bytes received count to 0
+				*bytesRecvdCount = 0;
+				WSASetLastError(WSAEWOULDBLOCK);
+				return SOCKET_ERROR;
 			}
-
-			WSASetLastError(WSAEWOULDBLOCK);
-			return SOCKET_ERROR;
 		}
+
+		default:
+			break;
+		} // switch (XNetPck->intHdr)
 	}
 
-	default:
+	IN_ADDR ipIdentifier = GetConnectionIdentifierByRecvAddr(xsocket, lpFrom);
+	lpFrom->sin_addr = ipIdentifier;
+
+	// Let the game know the packet received came from an unkown source
+	if (lpFrom->sin_addr.s_addr == 0)
 	{
-		IN_ADDR ipIdentifier = GetConnectionIdentifierByRecvAddr(xsocket, lpFrom);
-		lpFrom->sin_addr = ipIdentifier;
-
-		/* Let the game know the packet received came from an unkown source */
-		if (lpFrom->sin_addr.s_addr == 0)
-		{
-			WSASetLastError(WSAEWOULDBLOCK);
-			return SOCKET_ERROR;
-		}
-
-		setTimeConnectionInteractionHappened(ipIdentifier, timeGetTime());
-
-		return ERROR_SUCCESS;
+		// set the bytes received count to 0
+		*bytesRecvdCount = 0;
+		WSASetLastError(WSAEWOULDBLOCK);
+		return SOCKET_ERROR;
 	}
-	
-	} // switch (XNetPck->intHdr)
+
+	setTimeConnectionInteractionHappened(ipIdentifier, timeGetTime());
+
+	return ERROR_SUCCESS;
 } 
 
 void CXnIp::checkForLostConnections()
@@ -311,6 +320,7 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 		return WSAEINVAL;
 	}
 
+	// clear any lost connections before creating another one
 	checkForLostConnections();
 
 	// check if the user is already in the system
@@ -339,16 +349,14 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 		{	
 			if (firstUnusedConnectionIndexFound)
 			{
-				std::mt19937 mt_rand(rd());
-				std::uniform_int_distribution<int> dist(1, 255);
-
 				XnIp* newXnIp = &XnIPs[firstUnusedConnectionIndex];
 				SecureZeroMemory(newXnIp, sizeof(XnIp));
 
 				newXnIp->xnkid = *xnkid;
 				newXnIp->xnaddr = *pxna;
 
-				int randIdentifier = dist(mt_rand);
+				// if this is zero we are fucked
+				int randIdentifier = (rand() % 0xFF) + 1; // 0 to 254 + 1
 				randIdentifier <<= 8;
 				LOG_INFO_NETWORK("CreateXnIpIdentifier() - new connection index {}, identifier {:x}", firstUnusedConnectionIndex, htonl(firstUnusedConnectionIndex | randIdentifier));
 
