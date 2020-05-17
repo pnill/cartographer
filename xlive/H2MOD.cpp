@@ -15,9 +15,11 @@
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
-
+#include "H2MOD/Modules//Splitscreen/VideoFixes.h"
+#include <xinput.h>
 #include <sqrat/include/sqrat.h>
 #include "H2MOD/Modules/Scripting/Squirrel.h"
+#include <d3d9.h>
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -1631,6 +1633,856 @@ void __cdecl game_mode_engine_draw_team_indicators()
 		p_game_mode_engine_draw_team_indicators();
 }
 
+
+struct controller_input_state
+{
+	BYTE triggers_analog_state[2];
+	BYTE old_triggers_analog_state[2];
+	BYTE triggers_hold_time[2];
+	BYTE button_hold_time[14];
+};
+
+
+void  update_controller_input_hook(BYTE controller_index)
+{
+
+	BYTE trigger_state = false;
+	bool left_trigger_state = false;
+	bool right_trigger_state = false;
+	bool were_buttons_pressed = false;
+
+	//typedef void(__cdecl* tupdate_controller_input)(int);
+	//tupdate_controller_input pupdate_controller_input = (tupdate_controller_input)h2mod->GetAddress(0x2FBD2);
+
+	int *InputDevicesArray = (int*)h2mod->GetAddress(0x479F00);
+	
+	typedef DWORD(__thiscall* tget_xinput_state)(int* pThis, void* a2);
+	tget_xinput_state pxget_input_state = h2mod->GetAddress<tget_xinput_state>(0x8ACE3);
+
+
+	XINPUT_STATE inputs;
+	pxget_input_state((int*)*(InputDevicesArray), &inputs);
+	int trigger_index;
+	
+	BYTE* bController = (BYTE*)h2mod->GetAddress<BYTE*>(0x47A5C8);
+	*(bController + 0x80) = 1;
+
+	DWORD cis_addr = h2mod->GetAddress(0x47A5CC)+0x40;
+	controller_input_state *cis = (controller_input_state*)cis_addr;
+	WORD *trigger_hold_state = h2mod->GetAddress<WORD*>(0x475AE0)+0x40;
+
+	for (trigger_index = 0; trigger_index < 2; trigger_index++)
+	{
+		if (trigger_index)
+		{
+			if (trigger_index == 1)
+				trigger_state = inputs.Gamepad.bRightTrigger;
+		}
+		else
+		{
+			trigger_state = inputs.Gamepad.bLeftTrigger;
+		}
+
+		left_trigger_state = trigger_state < cis->old_triggers_analog_state[trigger_index];
+		right_trigger_state = trigger_state == cis->old_triggers_analog_state[trigger_index];
+		cis->triggers_analog_state[trigger_index] = trigger_state;
+
+		if (left_trigger_state || right_trigger_state)
+		{
+			cis->triggers_hold_time[trigger_index] = 0;
+			*(trigger_hold_state + trigger_index) = 0;
+		}
+		else {
+			BYTE trigger_hold_time = cis->triggers_hold_time[trigger_index] + 1;
+
+			if (trigger_hold_time > 255)
+				trigger_hold_time = -1;
+
+			cis->triggers_hold_time[trigger_index] = trigger_hold_time;
+
+			int trigger_hold_state_2 = (controller_index + (BYTE)trigger_hold_state);
+			if (trigger_hold_state_2 > 65535)
+			{
+				trigger_hold_state_2 = -1;
+			}
+
+			*(trigger_hold_state + trigger_index) = trigger_hold_state_2;
+			were_buttons_pressed = true;
+		}
+
+			BYTE _triggers_analog_state = cis->triggers_analog_state[trigger_index];
+			BYTE triggers_analog_state_new;
+			if (left_trigger_state || right_trigger_state)
+			{
+				if (_triggers_analog_state <= 191)
+					triggers_analog_state_new = _triggers_analog_state + 64;
+				else
+					triggers_analog_state_new = -1;
+				if (triggers_analog_state_new < cis->old_triggers_analog_state[trigger_index])
+				{
+LABEL_26:
+					cis->old_triggers_analog_state[trigger_index] = triggers_analog_state_new;
+					continue;
+				}
+			}
+			else
+			{
+				if (_triggers_analog_state >= 32)
+					triggers_analog_state_new = _triggers_analog_state - 32;
+				else
+					triggers_analog_state_new = 0;
+				if (triggers_analog_state_new > cis->old_triggers_analog_state[trigger_index])
+				{
+					goto LABEL_26;
+				}
+			}
+
+	}
+	
+	int* _xinput_button_bitmask = (int*)h2mod->GetAddress(0x39DEE0);
+	BYTE* button_hold_time = cis->button_hold_time;
+	WORD* button_state_array_ptr = (WORD*)h2mod->GetAddress(0x47A5E4);
+	int button_index = 14;
+	BYTE v21;
+	do {
+		int v14 = inputs.Gamepad.wButtons & *_xinput_button_bitmask;
+		if (v14 <= 0)
+		{
+			*button_hold_time = 0;
+			*button_state_array_ptr = 0;
+		}
+		else {
+			int v15 = *button_hold_time +1;
+			if (v15 > 255)
+				v15 = -1;
+			*button_hold_time = v15;
+			BYTE v16 = controller_index + *button_state_array_ptr;
+			if (v16 > 0xFFFF)
+				v16 = -1;
+			*button_state_array_ptr = v16;
+		}
+
+		if (v14 > 0)
+			v21 = 1;
+		++button_state_array_ptr;
+		++button_hold_time;
+		++_xinput_button_bitmask;
+		--button_index;
+	} while (button_index);
+
+
+
+	//return pupdate_controller_input(controller_index);
+}
+
+
+
+
+typedef bool(__cdecl *tupdate_input_main_loop)();
+tupdate_input_main_loop pupdate_input_main_loop;
+
+bool __cdecl update_input_main_loop()
+{
+	BYTE orig_mouse_bytes[2] =  { 0x74, 0x12 }; // mouse patch 1
+	BYTE orig_mouse_bytes2[2] = { 0x75, 0x05 }; // mouse patch 2
+	BYTE keyboard_bytes[2] = { 0x74, 0x0E }; // keyboard patch 1
+	BYTE orig_mouse_bytes_call[5] = { 0xE8, 0x61, 0xC2, 0xFC, 0xFF };
+
+	//DWORD orig_input_buffer = 0x013FE578;
+	DWORD orig_input_buffer = 0x0089E578;
+	DWORD input_buffer_p2 = (orig_input_buffer + 0xB8);
+	
+
+	
+	WriteValue<DWORD>(h2mod->GetAddress(0x62F4F), input_buffer_p2); // input_buffer + 0xB8
+	WriteValue<BYTE>(h2mod->GetAddress(0x628AF),0); // get_controller_update push 0
+	WriteValue<BYTE>(h2mod->GetAddress(0x62F64), 1); // apply_input to second controller index
+	NopFill(h2mod->GetAddress(0x2E40C), 2); // Force grabbing control cords instead of mouse.
+	WriteValue<BYTE>(h2mod->GetAddress(0x2E419), 0xEB); // Same as above, jump over mouse state pointer.
+	WriteValue<BYTE>(h2mod->GetAddress(0x2F0DF), 0xEB); // Keyboard patch to disable keyboard input.
+	WriteValue<BYTE>(h2mod->GetAddress(0x621ED), 0xEB); // Disable mouse buttons
+	WriteValue<BYTE>(h2mod->GetAddress(0x2E448), 0xEB); // Disable mouse buttons 2
+	//NopFill(h2mod->GetAddress(0x621DA), 5);
+	pupdate_input_main_loop();
+
+	WriteValue<DWORD>(h2mod->GetAddress(0x62F4F), orig_input_buffer); // input_buffer + 0xB8
+	WriteValue<BYTE>(h2mod->GetAddress(0x628AF), 1); // get_controller_update push
+	WriteValue<BYTE>(h2mod->GetAddress(0x62F64), 0); // apply input
+	WriteBytes(h2mod->GetAddress(0x2E40C), &orig_mouse_bytes, 2); // write original mouse bytes back for the first player.
+	WriteBytes(h2mod->GetAddress(0x2E419), &orig_mouse_bytes2, 2); // write original mouse bytes back for the first player.
+	WriteBytes(h2mod->GetAddress(0x2F0DF), &keyboard_bytes, 2); // Keyboard patch to disable keyboard input.
+	WriteValue<BYTE>(h2mod->GetAddress(0x621ED), 0x74); // re-enable mouse.
+	WriteValue<BYTE>(h2mod->GetAddress(0x2E448), 0x74); // re-enable mouse.
+	//WriteBytes(h2mod->GetAddress(0x621DA), &orig_mouse_bytes_call, 5);
+	pupdate_input_main_loop();
+
+	return 1;
+}
+
+typedef int* (__cdecl*tget_controller_input_data)(BYTE controller_index);
+tget_controller_input_data pget_controller_input_data;
+
+
+typedef bool(__cdecl*tupdate_controller_input_to_buffer)(int a1, int a2, int button_state_arrayptr, float* a5, float *a6, int inputBuffer);
+tupdate_controller_input_to_buffer pupdate_controller_input_to_buffer;
+
+bool __cdecl update_controller_input_to_buffer(int a1, int a2, int button_state_arrayptr, float* a5, float *a6, int inputBuffer)
+{
+	pget_controller_input_data = (tget_controller_input_data)h2mod->GetAddress(0x2F433);
+	pupdate_controller_input_to_buffer = (tupdate_controller_input_to_buffer)h2mod->GetAddress(0x61EA2);
+	
+	//button_state_arrayptr = (int)pget_controller_input_data(0);
+	//inputBuffer = inputBuffer + 0xB8;
+	
+
+	
+	
+	return pupdate_controller_input_to_buffer(a1, a2, button_state_arrayptr, a5, a6, inputBuffer);
+
+	//button_state_arrayptr = (int)pget_controller_input_data(0);
+	//pupdate_controller_input_to_buffer(a1, a2, button_state_arrayptr, a5, a6, inputBuffer);
+	
+	//char blah = 1;
+	//WriteBytes((DWORD)0x30002B3C, &blah, 1);
+
+	//button_state_arrayptr = (int)pget_controller_input_data(1);
+	//inputBuffer = inputBuffer + 0xB8;
+	//return false;
+	//return pupdate_controller_input_to_buffer(1, a2, button_state_arrayptr, a5, a6, inputBuffer);
+}
+/*
+enum render_geometry_type
+{
+	texture_accumulate = 0x1,
+	overlay = 0x2,
+	lightmap_indirect = 0x3,
+	lightmap_specular = 0x4,
+	spherical_harmonics_PRT = 0x5,
+	water_alpha_masks = 0x6,
+	selfillumination = 0x7,
+	env_map = 0x8,
+	stencil_shadows = 0x9,
+	shadow_buffer_generate = 0xA,
+	shadow_buffer_apply = 0xB,
+	lightaccum_diffuse = 0xC,
+	lightaccum_specular = 0xD,
+	lightaccum_albedo = 0xE,
+	transparent = 0xF,
+	fog = 0x10,
+	selfibloomination = 0x11,
+	active_camo = 0x12,
+	active_camo_stencil_modulate = 0x13,
+	decal = 0x14,
+	hologram = 0x15,
+	error_report = 0x16,
+	debug_view = 0x17,
+	hud = 0x18,
+};
+
+
+bool render_geo_texture = true;
+bool rendering_geo = false;
+typedef char(__cdecl* trender_geometry)(render_geometry_type a1);
+trender_geometry p_render_geometry;
+
+char __cdecl render_gemetry_hook(render_geometry_type a1)
+{
+	
+	rendering_geo = true;
+
+	
+	if (a1 != render_geometry_type::texture_accumulate && a1!=shadow_buffer_apply && a1!=shadow_buffer_generate && a1!=stencil_shadows && a1!=spherical_harmonics_PRT)
+		render_geo_texture = false;
+	else
+	{
+		
+		render_geo_texture = true;
+	}
+	char ret = p_render_geometry(a1);
+
+	rendering_geo = false;
+	return ret;
+}
+
+
+typedef void(__cdecl *rasterizer_set_target)(signed __int16, __int16, char);
+rasterizer_set_target p_rasterizer_set_target;
+//IDirect3DSurface9 *__cdecl rasterizer_set_target(signed __int16 a1, __int16 a2, char a3)
+
+void __cdecl h_rasterizer_set_target(signed __int16 a1, __int16 a2, char a3)
+{
+	IDirect3DDevice9 *m_d3dDev = *(IDirect3DDevice9**)h2mod->GetAddress(0xA3C6B4);
+	int player_index = *(int*)h2mod->GetAddress(0x4E6800);
+	int split_type = *(int*)h2mod->GetAddress(0x4E6970);
+	int screen_count = *(int*)h2mod->GetAddress(0x4E6974);
+	BYTE texture_camera_view = *(BYTE*)h2mod->GetAddress(0x4F435C);
+	
+	if (screen_count > 1)
+	{
+		if (player_index == 1)
+		{
+
+			p_rasterizer_set_target(a1, a2, a3);
+
+			if (render_geo_texture == false && rendering_geo == true)
+				return;
+
+			if(a1 == 0)
+				m_d3dDev->SetDepthStencilSurface(custom_depth);
+	
+			return;
+		}
+	}
+
+	p_rasterizer_set_target(a1, a2, a3);
+
+	return;
+}*/
+
+struct s_video_settings
+{
+	DWORD DisplayMode;
+	DWORD AspectRatio;
+	DWORD ScreenResX;
+	DWORD ScreenResY;
+	DWORD RefreshRate;
+	DWORD ResArrayIndex; // this is the index of the current used hardcoded video resolution 
+	DWORD Brightness;
+	DWORD Gamma;
+	DWORD AntiAliasing;
+	DWORD HUDSize;
+	DWORD SafeArea;
+	DWORD LevelOfDetail;
+};
+
+enum split_type {
+	horizontal_split = 1,
+	vertical_split = 2
+};
+
+/*
+void __stdcall StrechRect_UnknownFix()
+{
+	int screen_count = *(int*)h2mod->GetAddress(0x4E6974);
+	IDirect3DDevice9 *m_d3dDev = *(IDirect3DDevice9**)h2mod->GetAddress(0xA3C6B4);
+	typedef IDirect3DSurface9* (__cdecl* tGetD3DSurfaceFromIndex)(int Index);
+	tGetD3DSurfaceFromIndex GetD3DSurfaceFromIndex = (tGetD3DSurfaceFromIndex)h2mod->GetAddress(0x28084B);
+	int player_index = *(int*)h2mod->GetAddress(0x4E6800);
+	int split_type = *(int*)h2mod->GetAddress(0x4E6970);
+	s_video_settings* screen_settings = (s_video_settings*)h2mod->GetAddress(0xA3D9F8);
+
+	IDirect3DSurface9* dstSurface = GetD3DSurfaceFromIndex(17);
+	IDirect3DSurface9* srcSurface = *(IDirect3DSurface9**)h2mod->GetAddress(0xA3C64C);
+	
+	if (screen_count > 1)
+	{
+		D3DVIEWPORT9 vp;
+		memset(&vp, 0, sizeof(vp));
+
+		switch (split_type)
+		{
+		case horizontal_split:
+			if (player_index == 1)
+			{
+				vp.Y = screen_settings->ScreenResY / 2;
+			}
+			else {
+				vp.Y = 0;
+			}
+
+			vp.Height = screen_settings->ScreenResY / 2;
+			vp.Width = screen_settings->ScreenResX;
+			vp.X = 0;
+			break;
+
+		case vertical_split:
+			if (player_index == 1)
+			{
+				vp.X = screen_settings->ScreenResX / 2;
+			}
+			else {
+				vp.X = 0;
+			}
+
+			vp.Height = screen_settings->ScreenResY;
+			vp.Width = screen_settings->ScreenResX / 2;
+			vp.Y = 0;
+			break;
+		}
+
+		if (player_index == 1)
+		{
+			RECT sRect;
+			sRect.bottom = screen_settings->ScreenResY;
+			sRect.left = vp.X;
+			sRect.right = screen_settings->ScreenResX;
+			sRect.top = vp.Y;
+			IDirect3DSurface9* backSurface;
+			m_d3dDev->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backSurface);
+			m_d3dDev->StretchRect(backSurface, &sRect, dstSurface, 0, D3DTEXF_LINEAR);
+			return;
+		}
+
+	}
+
+	m_d3dDev->StretchRect(srcSurface, 0, dstSurface, 0, D3DTEXF_LINEAR);
+
+	return;
+}
+
+void __stdcall StrechRect_ShaderFix2()
+{
+	IDirect3DDevice9 *m_d3dDev = *(IDirect3DDevice9**)h2mod->GetAddress(0xA3C6B4);
+	int player_index = *(int*)h2mod->GetAddress(0x4E6800);
+	int split_type = *(int*)h2mod->GetAddress(0x4E6970);
+	int screen_count = *(int*)h2mod->GetAddress(0x4E6974);
+	s_video_settings* screen_settings = (s_video_settings*)h2mod->GetAddress(0xA3D9F8);
+	typedef IDirect3DSurface9* (__cdecl* tGetD3DSurfaceFromIndex)(int Index);
+	tGetD3DSurfaceFromIndex GetD3DSurfaceFromIndex = (tGetD3DSurfaceFromIndex)h2mod->GetAddress(0x28084B);
+
+	IDirect3DSurface9* dstSurface = GetD3DSurfaceFromIndex(21);
+	IDirect3DSurface9* srcSurface = *(IDirect3DSurface9**)h2mod->GetAddress(0xA3C64C);
+
+	D3DVIEWPORT9 vp;
+	memset(&vp, 0, sizeof(vp));
+
+	if (screen_count > 1)
+	{
+		switch (split_type)
+		{
+		case horizontal_split:
+			if (player_index == 1)
+			{
+				vp.Y = screen_settings->ScreenResY / 2;
+			}
+			else {
+				vp.Y = 0;
+			}
+
+			vp.Height = screen_settings->ScreenResY / 2;
+			vp.Width = screen_settings->ScreenResX;
+			vp.X = 0;
+			break;
+
+		case vertical_split:
+			if (player_index == 1)
+			{
+				vp.X = screen_settings->ScreenResX / 2;
+			}
+			else {
+				vp.X = 0;
+			}
+
+			vp.Height = screen_settings->ScreenResY;
+			vp.Width = screen_settings->ScreenResX / 2;
+			vp.Y = 0;
+			break;
+		}
+
+		if (player_index == 0)
+		{
+			RECT sRect;
+			sRect.bottom = screen_settings->ScreenResY;
+			sRect.left = 0;
+			sRect.right = vp.Width;
+			sRect.top = vp.Y;
+
+			m_d3dDev->StretchRect(srcSurface, &sRect, dstSurface, 0, D3DTEXF_LINEAR);
+			return;
+
+		}
+
+		if (player_index == 1)
+		{
+			RECT sRect;
+			sRect.bottom = screen_settings->ScreenResY;
+			sRect.left = vp.X;
+			sRect.right = screen_settings->ScreenResX;
+			sRect.top = vp.Y;
+			IDirect3DSurface9* backSurface;
+			m_d3dDev->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backSurface);
+			m_d3dDev->StretchRect(backSurface, &sRect, dstSurface, 0, D3DTEXF_LINEAR);
+			return;
+		}
+	}
+
+	m_d3dDev->StretchRect(srcSurface, 0, dstSurface, 0, D3DTEXF_LINEAR);
+	return;
+}
+
+
+void __stdcall StrechRect_ShaderFix1()
+{
+	IDirect3DDevice9 *m_d3dDev = *(IDirect3DDevice9**)h2mod->GetAddress(0xA3C6B4);
+	int player_index = *(int*)h2mod->GetAddress(0x4E6800);
+	int split_type = *(int*)h2mod->GetAddress(0x4E6970);
+	int screen_count = *(int*)h2mod->GetAddress(0x4E6974);
+	s_video_settings* screen_settings = (s_video_settings*)h2mod->GetAddress(0xA3D9F8);
+	typedef IDirect3DSurface9* (__cdecl* tGetD3DSurfaceFromIndex)(int Index);
+	tGetD3DSurfaceFromIndex GetD3DSurfaceFromIndex = (tGetD3DSurfaceFromIndex)h2mod->GetAddress(0x28084B);
+	
+	IDirect3DSurface9* dstSurface = GetD3DSurfaceFromIndex(17);
+	IDirect3DSurface9* srcSurface = *(IDirect3DSurface9**)h2mod->GetAddress(0xA3C64C);
+
+	D3DVIEWPORT9 vp;
+	memset(&vp, 0, sizeof(vp));
+
+	if (screen_count > 1)
+	{
+		switch (split_type)
+		{
+		case horizontal_split:
+			if (player_index == 1)
+			{
+				vp.Y = screen_settings->ScreenResY / 2;
+			}
+			else {
+				vp.Y = 0;
+			}
+
+			vp.Height = screen_settings->ScreenResY / 2;
+			vp.Width = screen_settings->ScreenResX;
+			vp.X = 0;
+			break;
+
+		case vertical_split:
+			if (player_index == 1)
+			{
+				vp.X = screen_settings->ScreenResX / 2;
+			}
+			else {
+				vp.X = 0;
+			}
+
+			vp.Height = screen_settings->ScreenResY;
+			vp.Width = screen_settings->ScreenResX / 2;
+			vp.Y = 0;
+			break;
+		}
+
+		if (player_index == 0)
+		{
+			RECT sRect;
+			sRect.bottom = screen_settings->ScreenResY;
+			sRect.left = 0;
+			sRect.right = vp.Width;
+			sRect.top = vp.Y;
+
+			m_d3dDev->StretchRect(srcSurface, &sRect, dstSurface, 0, D3DTEXF_LINEAR);
+			return;
+
+		}
+
+		if (player_index == 1)
+		{
+			RECT sRect;
+			sRect.bottom = screen_settings->ScreenResY;
+			sRect.left = vp.X;
+			sRect.right = screen_settings->ScreenResX;
+			sRect.top = vp.Y;
+			IDirect3DSurface9* backSurface;
+			m_d3dDev->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backSurface);
+			m_d3dDev->StretchRect(backSurface, &sRect, dstSurface, 0, D3DTEXF_LINEAR);
+			return;
+		}
+	}
+
+	m_d3dDev->StretchRect(srcSurface, 0, dstSurface, 0, D3DTEXF_LINEAR);
+	return;
+}
+
+void __stdcall StrechRect_SniperFix(IDirect3DDevice9* m_pD3DDev,IDirect3DSurface9 * srcSurface, RECT* srcRect, IDirect3DSurface9 *dstSurface, RECT* dstRect, D3DTEXTUREFILTERTYPE filter)
+{
+	IDirect3DDevice9 *m_d3dDev = *(IDirect3DDevice9**)h2mod->GetAddress(0xA3C6B4);
+	int player_index = *(int*)h2mod->GetAddress(0x4E6800);
+	int split_type = *(int*)h2mod->GetAddress(0x4E6970);
+	int screen_count = *(int*)h2mod->GetAddress(0x4E6974);
+	s_video_settings* screen_settings = (s_video_settings*)h2mod->GetAddress(0xA3D9F8);
+
+	D3DVIEWPORT9 vp;
+	memset(&vp, 0, sizeof(vp));
+
+	if (screen_count > 1)
+	{
+		switch (split_type)
+		{
+		case horizontal_split:
+			if (player_index == 1)
+			{
+				vp.Y = screen_settings->ScreenResY / 2;
+			}
+			else {
+				vp.Y = 0;
+			}
+
+			vp.Height = screen_settings->ScreenResY / 2;
+			vp.Width = screen_settings->ScreenResX;
+			vp.X = 0;
+			break;
+
+		case vertical_split:
+			if (player_index == 1)
+			{
+				vp.X = screen_settings->ScreenResX / 2;
+			}
+			else {
+				vp.X = 0;
+			}
+
+			vp.Height = screen_settings->ScreenResY;
+			vp.Width = screen_settings->ScreenResX / 2;
+			vp.Y = 0;
+			break;
+		}
+
+	
+		if (player_index == 1)
+		{
+			IDirect3DSurface9* backSurface;
+			m_d3dDev->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backSurface);
+			m_d3dDev->StretchRect(backSurface, srcRect, dstSurface, dstRect, filter);
+			return;
+		}
+	}
+
+	m_d3dDev->StretchRect(srcSurface, srcRect, dstSurface, dstRect, filter);
+	return;
+}
+
+//Fixes split-screen water rendering (only works with two players for now).
+void __stdcall StrechRect_WaterFix(IDirect3DSurface9* srcSurface, RECT* srcRect, IDirect3DSurface9 *dstSurface, RECT* dstRect, D3DTEXTUREFILTERTYPE filter)
+{
+	IDirect3DDevice9 *m_d3dDev = *(IDirect3DDevice9**)h2mod->GetAddress(0xA3C6B4);
+	int player_index = *(int*)h2mod->GetAddress(0x4E6800);
+	int split_type = *(int*)h2mod->GetAddress(0x4E6970);
+	int screen_count = *(int*)h2mod->GetAddress(0x4E6974);
+	s_video_settings* screen_settings = (s_video_settings*)h2mod->GetAddress(0xA3D9F8);
+
+	D3DVIEWPORT9 vp;
+	memset(&vp, 0, sizeof(vp));
+
+	if (screen_count > 1)
+	{
+		switch (split_type)
+		{
+		case horizontal_split:
+			if (player_index == 1)
+			{
+				vp.Y = screen_settings->ScreenResY / 2;
+			}
+			else {
+				vp.Y = 0;
+			}
+
+			vp.Height = screen_settings->ScreenResY / 2;
+			vp.Width = screen_settings->ScreenResX;
+			vp.X = 0;
+			break;
+
+		case vertical_split:
+			if (player_index == 1)
+			{
+				vp.X = screen_settings->ScreenResX / 2;
+			}
+			else {
+				vp.X = 0;
+			}
+
+			vp.Height = screen_settings->ScreenResY;
+			vp.Width = screen_settings->ScreenResX / 2;
+			vp.Y = 0;
+			break;
+		}
+
+		if (player_index == 0)
+		{
+			RECT sRect;
+			sRect.bottom = screen_settings->ScreenResY;
+			sRect.left = 0;
+			sRect.right = vp.Width;
+			sRect.top = vp.Y;
+			
+			m_d3dDev->StretchRect(srcSurface, &sRect, dstSurface, dstRect, filter);
+			return;
+			
+		}
+
+		if (player_index == 1)
+		{
+			RECT sRect;
+			sRect.bottom = screen_settings->ScreenResY;
+			sRect.left = vp.X;
+			sRect.right = screen_settings->ScreenResX;
+			sRect.top = vp.Y;
+			IDirect3DSurface9* backSurface;
+			m_d3dDev->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backSurface);
+			m_d3dDev->StretchRect(backSurface, &sRect, dstSurface, dstRect, filter);
+			return;
+		}
+	}
+
+	m_d3dDev->StretchRect(srcSurface, srcRect, dstSurface, dstRect, filter);
+	return;
+}
+*/
+//Fixes the gamma shader breaking things for the second player in split-screen
+//Additional fixes need to be applied for when gamma shader is turned off.
+void __stdcall StrechRect_BloomHook_H2mod(IDirect3DDevice9* m_pd3dDev, IDirect3DSurface9* srcSurface, RECT* srcRect, IDirect3DSurface9* dstSurface, RECT* dstRect, D3DTEXTUREFILTERTYPE filter)
+{
+	int player_index = *(int*)h2mod->GetAddress(0x4E6800);
+	int split_type = *(int*)h2mod->GetAddress(0x4E6970);
+	int screen_count = *(int*)h2mod->GetAddress(0x4E6974);
+	s_video_settings* screen_settings = (s_video_settings*)h2mod->GetAddress(0xA3D9F8);
+
+	D3DVIEWPORT9 vp;
+	memset(&vp, 0, sizeof(vp));
+
+
+	if (screen_count > 1 && player_index == 1)
+	{
+
+		switch (split_type)
+		{
+			case horizontal_split:
+				if (player_index == 1)
+				{
+					vp.Y = screen_settings->ScreenResY / 2;
+				}
+				else {
+					vp.Y = 0;
+				}
+
+				vp.Height = screen_settings->ScreenResY / 2;
+				vp.Width = screen_settings->ScreenResX;
+				vp.X = 0;
+			break;
+
+			case vertical_split:
+				if (player_index == 1)
+				{
+					vp.X = screen_settings->ScreenResX / 2;
+				}
+				else {
+					vp.X = 0;
+				}
+
+				vp.Height = screen_settings->ScreenResY;
+				vp.Width = screen_settings->ScreenResX / 2;
+				vp.Y = 0;
+			break;
+		}
+		
+		RECT nRect;
+		nRect.bottom = screen_settings->ScreenResY;
+		nRect.left = vp.X;
+		nRect.right = screen_settings->ScreenResX;
+		nRect.top = vp.Y;
+
+		IDirect3DSurface9* surface;
+		m_pd3dDev->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &surface);
+		m_pd3dDev->StretchRect(surface, &nRect, dstSurface, 0, D3DTEXF_POINT);
+
+		return;
+	}
+
+
+	m_pd3dDev->StretchRect(srcSurface, srcRect, dstSurface, dstRect, filter);
+}
+/*
+typedef void(__cdecl* tdraw_motion_sensor_update)(float *arg0, float a2);
+tdraw_motion_sensor_update pdraw_motion_sensor_update;
+
+short orig_res_value = 0;
+short orig_res_value2 = 0;
+void draw_motion_sensor_update_fix(float *arg0, float a2)
+{
+	int player_index = *(int*)h2mod->GetAddress(0x4E6800);
+
+	if (player_index == 0)
+	{
+		orig_res_value = *(short*)((BYTE*)h2mod->GetAddress(0x4E66F8) + 2);
+		orig_res_value2 = *(short*)((BYTE*)h2mod->GetAddress(0x4E66FC) + 2);
+		
+		*arg0 = 8.0f;
+		*(short*)((BYTE*)h2mod->GetAddress(0x4E66FC) + 2) = 1920;
+
+	}
+	
+	if (player_index == 1)
+	{
+		orig_res_value = *(short*)((BYTE*)h2mod->GetAddress(0x4E66F8) + 2);
+		orig_res_value2 = *(short*)((BYTE*)h2mod->GetAddress(0x4E66FC) + 2);
+
+		//X offset of where to render radar, player 2 needs it exactly half of resolution+8
+		*arg0 = 968.0f;
+		*(short*)((BYTE*)h2mod->GetAddress(0x4E66F8) + 2) = 0;
+
+		// screen_bounds value used to scale the radar width
+		*(short*)((BYTE*)h2mod->GetAddress(0x4E66FC) + 2) = 1920;
+	}
+
+
+	pdraw_motion_sensor_update(arg0,a2);
+	*(short*)((BYTE*)h2mod->GetAddress(0x4E66F8) + 2) = orig_res_value;
+	*(short*)((BYTE*)h2mod->GetAddress(0x4E66FC) + 2) = orig_res_value2;
+
+
+
+	return;
+	//return pdraw_motion_sensor_update(arg0, a2);
+}
+
+typedef void(__cdecl* tCalculateHudPoint)(int arg0, float *x);
+tCalculateHudPoint pCalculateHudPoint;
+
+short orig_value = 0;
+short orig_value2 = 0;
+
+// Used to calculate where to draw individual hud elements
+void __cdecl CalculateHudPoint(int arg0, float *x)
+{
+	int player_index = *(int*)h2mod->GetAddress(0x4E6800);
+
+	IDirect3DDevice9 *m_d3dDev = *(IDirect3DDevice9**)h2mod->GetAddress(0xA3C6B4);
+
+	if (player_index == 1 )
+	{
+
+			orig_value = *(short*)((BYTE*)h2mod->GetAddress(0x4E6700) + 2);
+			orig_value2 = *(short*)((BYTE*)h2mod->GetAddress(0x4E6704) + 2);
+			
+			// offset to draw on top of position, some built-in safe area.
+			*(short*)((BYTE*)h2mod->GetAddress(0x4E6700) + 2) = 8;
+
+			//x cordinate to draw at.
+			*(short*)((BYTE*)h2mod->GetAddress(0x4E6704) + 2) = 960;
+
+			pCalculateHudPoint(arg0, x);
+			
+			*(short*)((BYTE*)h2mod->GetAddress(0x4E6700) + 2) = orig_value;
+			*(short*)((BYTE*)h2mod->GetAddress(0x4E6704) + 2) = orig_value2;
+
+			return;		
+		
+	}
+
+	if (player_index == 0)
+	{
+		// fixes scaling and positioning of hud elements for first player in split-screen.
+		float c177[4] = { 0.002083333, 0, 0, -1.001042 };
+		m_d3dDev->SetVertexShaderConstantF(177, (float*)&c177, 1);
+		
+		pCalculateHudPoint(arg0, x);
+
+	
+		return;
+	}
+
+
+	return pCalculateHudPoint(arg0, x);
+}
+*/
+
 void H2MOD::ApplyUnitHooks()
 {
 	// increase the size of the unit entity creation definition packet
@@ -1658,6 +2510,7 @@ void H2MOD::ApplyUnitHooks()
 	// Hooks the part of the unit spawn from simulation that handles setting their color data in order to ensure AI do not have their color overridden
 	PatchCall(h2mod->GetAddress(0x1F9E34, 0x1E3B9C), set_unit_color_data_hook);
 	pset_unit_color_data = h2mod->GetAddress<tset_unit_color_data>(0x6E5C3, 0x6D1BF);
+	
 }
 
 void H2MOD::ApplyHooks() {
@@ -1682,8 +2535,9 @@ void H2MOD::ApplyHooks() {
 
 	pupdate_player_score = (update_player_score)DetourClassFunc(h2mod->GetAddress<BYTE*>(0xD03ED, 0x8C84C), (BYTE*)OnPlayerScore, 12);
 
-
 	//on_custom_map_change_method = (on_custom_map_change)DetourFunc(h2mod->GetAddress<BYTE*>(0x32176, 0x25738), (BYTE*)onCustomMapChange, 5);
+
+
 
 	// disable part of custom map tag verification
 	NopFill(GetAddress(0x4FA0A, 0x56C0A), 6);
@@ -1699,6 +2553,7 @@ void H2MOD::ApplyHooks() {
 	// bellow hooks applied to specific executables
 	if (this->Server == false) {
 
+		//DWORD random_memory = malloc()
 		LOG_TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
 
@@ -1729,6 +2584,40 @@ void H2MOD::ApplyHooks() {
 		WritePointer(h2mod->GetAddress<BYTE*>(0x1F0B80), player_remove_packet_handler);
 		*/
 
+		SplitFixVideoInitialize();
+		//rasterizer_ray_of_buddha  +0x4681B6
+		//patchy_fog_disable +0x41F6AB
+		//PatchWinAPICall(h2mod->GetAddress(0x26227D), StrechRect_BloomHook_H2mod);
+		//NopFill(h2mod->GetAddress(0x262283), 2);
+		/*
+		PatchWinAPICall(h2mod->GetAddress(0x19F923), StrechRect_WaterFix);
+		NopFill(h2mod->GetAddress(0x19F928), 3);
+		p_render_geometry = (trender_geometry)DetourFunc(h2mod->GetAddress<BYTE*>(0x1A155C), (BYTE*)render_gemetry_hook,5);
+
+		PatchWinAPICall(h2mod->GetAddress(0x19A758), StrechRect_ShaderFix1);
+		NopFill(h2mod->GetAddress(0x19A734), 8);
+		NopFill(h2mod->GetAddress(0x19A75E), 34);
+	
+		PatchWinAPICall(h2mod->GetAddress(0x26751B), StrechRect_ShaderFix2);
+		NopFill(h2mod->GetAddress(0x267521), 42);
+		
+		PatchWinAPICall(h2mod->GetAddress(0x269905), StrechRect_UnknownFix);
+		NopFill(h2mod->GetAddress(0x26990B), 40);
+
+		PatchWinAPICall(h2mod->GetAddress(0x27D3A3), StrechRect_SniperFix);
+		NopFill(h2mod->GetAddress(0x27D3A9), 2);
+		
+		//pCalculateHudPoint = (tCalculateHudPoint)DetourFunc((BYTE*)h2mod->GetAddress(0x223969), (BYTE*)CalculateHudPoint, 7);
+		pCalculateHudPoint = (tCalculateHudPoint)((BYTE*)h2mod->GetAddress(0x223969));
+		PatchCall(h2mod->GetAddress(0x222FC0), CalculateHudPoint);
+
+		pdraw_motion_sensor_update = (tdraw_motion_sensor_update)DetourFunc((BYTE*)h2mod->GetAddress(0x284810), (BYTE*)draw_motion_sensor_update_fix, 5);
+		p_rasterizer_set_target = (rasterizer_set_target)DetourFunc(h2mod->GetAddress<BYTE*>(0x25FDC0), (BYTE*)h_rasterizer_set_target, 6);
+		*/
+
+
+		/* end split-screen fixes */
+
 		p_change_local_team = (change_team)DetourFunc(h2mod->GetAddress<BYTE*>(0x2068F2), (BYTE*)changeTeam, 8);
 
 		// hook the print command to redirect the output to our console
@@ -1748,13 +2637,52 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
 		PatchCall(h2mod->GetAddress(0x226702), game_mode_engine_draw_team_indicators);
-		
+			
 		
 	
 
 		pvariant_list_button_handler = (tvariant_list_button_handler)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x251B7E), (BYTE*)variant_list_button_handler, 13);
 		pLoadSaveGame = (tLoadSaveGame)DetourFunc(h2mod->GetAddress<BYTE*>(0x9B0D0), (BYTE*)LoadSaveGameHook, 13);
 		pReadVariantToMemory = (tReadVariantToMemory)DetourFunc(h2mod->GetAddress<BYTE*>(0x46596), (BYTE*)ReadVariantToMemory, 13);
+				
+
+
+
+		//Codecave(h2mod->GetAddress(0x0262274), StrechRect_BloomHook, 3);
+		//NopFill(h2mod->GetAddress(0x262282), 3);
+		//pStrechRect_Return = h2mod->GetAddress(0x262283);
+		//WriteJmpTo(GetAddress(0x26227D), StrechRectJmp);
+		//DWORD dwOld;
+		//VirtualProtect((void*)h2mod->GetAddress(0x628AF), 1, PAGE_EXECUTE_READWRITE, &dwOld);
+		//memset((void*)h2mod->GetAddress(0x628AF), 1, 1);
+
+		//halo2.exe + 563C3
+
+		/*NopFill(h2mod->GetAddress(0x563C3), 3);
+		NopFill(h2mod->GetAddress(0x552D0), 3);
+		NopFill(h2mod->GetAddress(0x553CF), 3);
+		WriteValue<BYTE>(0x30002D40, 1);
+		WriteValue<BYTE>(h2mod->GetAddress(0xA3E460), 1);
+		WriteValue<BYTE>(h2mod->GetAddress(0x51A6E0), 1);
+		WriteValue<XUID>(h2mod->GetAddress(0x51A6E1), 0123456);
+		WriteValue<wchar_t*>(h2mod->GetAddress(0x51A6F0), L"COOP_GAMER");
+		*/
+
+		/* COOP input*/
+		pupdate_input_main_loop = (tupdate_input_main_loop)h2mod->GetAddress(0x628A8);
+		PatchCall(h2mod->GetAddress(0x39B82), update_input_main_loop);
+
+		//PatchCall(h2mod->GetAddress(0x62F65), update_controller_input_to_buffer);
+		//pupdate_controller_input_to_buffer = (tupdate_controller_input_to_buffer)DetourFunc(h2mod->GetAddress<BYTE*>(0x61EA2),(BYTE*)update_controller_input_to_buffer,15);
+
+		//Codecave(h2mod->GetAddress(0x91871), controller_cave, 0);
+		//NopFill(h2mod->GetAddress(0x9188B), 5);
+		//PatchCall(h2mod->GetAddress(0x91877), get_controller_input_data_hook);
+
+		//pget_controller_input_data = (tget_controller_input_data)DetourFunc(h2mod->GetAddress<BYTE*>(0x2F433), (BYTE*)get_controller_input_data_hook, 11);
+		//PatchCall(h2mod->GetAddress(0x2FBD2), update_controller_input_hook);
+
+		//pupdate_controller_input = (tupdate_controller_input)DetourFunc(h2mod->GetAddress<BYTE*>(0x2E7E3), (BYTE*)update_controller_input_hook, 22);
 
 		/* 
 			An attempt at adding an additional variant/game engine category (E.x. Slayer,KOTH, Infection).
@@ -1762,10 +2690,11 @@ void H2MOD::ApplyHooks() {
 		*/
 		//pConVariantCategoryList = (tConVariantCategoryList)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x249D5E), (BYTE*)ConVariantCategoryList, 13);
 		//pc_game_engine_category_list_create_labels = (tc_game_engine_category_list_create_labels)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x2497D8), (BYTE*)c_game_engine_category_list_create_labels, 9);
-
+		
 		//Hooked to fix custom map images.
 		Codecave(GetAddress(0x593F0), load_map_data_for_display,0);
-
+		
+	
 		//Initialise_tag_loader();
 	}
 	else {

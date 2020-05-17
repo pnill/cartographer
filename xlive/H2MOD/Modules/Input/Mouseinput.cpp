@@ -50,7 +50,7 @@ void Mouseinput::Initialize()
 
 	DWORD dwBack;
 
-	dx = (float*)(base + 0x4AE610);
+	/*dx = (float*)(base + 0x4AE610);
 	VirtualProtect(dx, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 
 	dy = (float*)(base + 0x4AE614);
@@ -68,5 +68,5 @@ void Mouseinput::Initialize()
 	VirtualProtect((LPVOID)setDx2, 8, PAGE_EXECUTE_READWRITE, &dwBack);
 	WriteBytes(base + 0x627E7, assmNop, 8);
 
-	Codecave(base + 0x622AA, CC_Fug, 0x8);
+	Codecave(base + 0x622AA, CC_Fug, 0x8);*/
 }

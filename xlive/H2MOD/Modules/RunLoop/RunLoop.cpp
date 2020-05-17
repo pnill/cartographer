@@ -268,6 +268,7 @@ void handleHotkeyInput(WPARAM wparam)
 }
 
 void GSMainLoop() {
+	
 	static bool halo2WindowExists = false;
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;

@@ -107,6 +107,7 @@ namespace ScriptEngine {
 		else
 			addDebugText("[Squirrel] - No OnPostPlayerSpawn function was found!");
 	}
+
 	
 	bool sqOnAutoPickup(HSQUIRRELVM vm,int unit_datum, int object_datum)
 	{
@@ -115,7 +116,7 @@ namespace ScriptEngine {
 			return *sqFunc.Evaluate<bool>(unit_datum, object_datum).Get();
 		else
 		{
-			addDebugText("[Squirrel] - No OnAutoPickup function was found!");
+			//addDebugText("[Squirrel] - No OnAutoPickup function was found!");
 			return true;
 		}
 	}
@@ -404,41 +405,39 @@ void BindSquirrel(HSQUIRRELVM vm)
 
 	DefaultVM::Set(vm);
 
-	RootTable().Func("character_datum_from_index", &character_datum_from_index);
-	RootTable().Func("object_try_and_get_with_type", &sqObject_try_and_get_with_type);
-	RootTable().Func("unit_reset_equipment", &squnit_reset_equipment);
-	RootTable().Func("get_game_life_cylce", &sqget_game_life_cycle);
-	RootTable().Func("leave_session", &sqleave_session);
-	RootTable().Func("get_player_distance_from_player", &sqget_player_distance_from_player);
-	RootTable().Func("set_player_grenades", &sqset_player_grenades);
-	RootTable().Func("hs_object_destroy", &sqhs_object_destroy);
-	RootTable().Func("update_player_score", &squpdate_player_score);
-	RootTable().Func("validate_object_type", &sqvalidate_object_type);
-	RootTable().Func("spawn_object_at_player", &sqspawn_object_at_player);
-	RootTable().Func("validate_object_datum", &sqvalidate_object_datum);
-
-
-	RootTable().Func("GetMapType", &SqGetMapType);
+	RootTable().Func("chacterDatumFromIndex", &character_datum_from_index);
+	RootTable().Func("objectGetWithType", &sqObject_try_and_get_with_type);
+	RootTable().Func("resetPlayerEquipment", &squnit_reset_equipment);
+	RootTable().Func("getGameLifeCycle", &sqget_game_life_cycle);
+	RootTable().Func("leaveSession", &sqleave_session);
+	RootTable().Func("getPlayerDistanceFromPlayer", &sqget_player_distance_from_player);
+	RootTable().Func("setPlayerGrenades", &sqset_player_grenades);
+	RootTable().Func("destroyObject", &sqhs_object_destroy);
+	RootTable().Func("updatePlayerScore", &squpdate_player_score);
+	RootTable().Func("objectValidateType", &sqvalidate_object_type);
+	RootTable().Func("spawnObjectAtPlayer", &sqspawn_object_at_player);
+	RootTable().Func("objectValidateDatum", &sqvalidate_object_datum);
+	RootTable().Func("getMapType", &SqGetMapType);
 	RootTable().Func("addDebugText", &sqAddDebugText);
-	RootTable().Func("GivePlayerWeapon", &sqGivePlayerWeapon);
-	RootTable().Func("PlaySound", &sqPlaySound);
-	RootTable().Func("DisableSound", &sqDisableSound);
-	RootTable().Func("GetPlayerCount", &sqGetPlayerCount);
-	RootTable().Func("GetPlayerNameFromIndex", &sqGetPlayerNameFromIndex);
+	RootTable().Func("givePlayerWeapon", &sqGivePlayerWeapon);
+	RootTable().Func("playSound", &sqPlaySound);
+	RootTable().Func("disableSound", &sqDisableSound);
+	RootTable().Func("getPlayerCount", &sqGetPlayerCount);
+	RootTable().Func("getPlayerNameFromIndex", &sqGetPlayerNameFromIndex);
 	RootTable().Func("localPeerIsSessionHost", &sqlocalPeerIsSessionHost);
-	RootTable().Func("GetLocalPeerIndex", &sqGetLocalPeerIndex);
-	RootTable().Func("SendTeamChange", &sqSendTeamChange);
-	RootTable().Func("SetLocalTeam", &sqSetLocalTeam);
-	RootTable().Func("GetLocalTeam", &sqGetLocalTeam);
-	RootTable().Func("GetPlayerXUID", &sqGetPlayerXUID);
-	RootTable().Func("GetPlayerTeamFromXUID", &sqGetPlayerTeamFromXUID);
-	RootTable().Func("SetUnitSpeedPatch", &sqSetUnitSpeedPatch);
-	RootTable().Func("SetUnitSpeed", &sqSetPlayerSpeed);
-	RootTable().Func("ToggleWeaponPickup", &sqToggleWeaponPickup);
-	RootTable().Func("SetWeaponPickup", &sqSetWeaponPickup);
-	RootTable().Func("SetIndicatorVisiblity", &sqSetTeamPlayerIndicatorVisibility);
-	RootTable().Func("SetPlayerBiped", &sqSetPlayerBiped);
-	RootTable().Func("IsObjectBiped", &sqIsObjectBiped);
+	RootTable().Func("getLocalPeerIndex", &sqGetLocalPeerIndex);
+	RootTable().Func("sendTeamChange", &sqSendTeamChange);
+	RootTable().Func("setLocalTeam", &sqSetLocalTeam);
+	RootTable().Func("getLocalTeam", &sqGetLocalTeam);
+	RootTable().Func("getPlayerXUID", &sqGetPlayerXUID);
+	RootTable().Func("getPlayerTeamFromXUID", &sqGetPlayerTeamFromXUID);
+	RootTable().Func("setUnitSpeedPatch", &sqSetUnitSpeedPatch);
+	RootTable().Func("setUnitSpeed", &sqSetPlayerSpeed);
+	RootTable().Func("toggleWeaponPickup", &sqToggleWeaponPickup);
+	RootTable().Func("setWeaponPickup", &sqSetWeaponPickup);
+	RootTable().Func("setIndicatorVisiblity", &sqSetTeamPlayerIndicatorVisibility);
+	RootTable().Func("setPlayerBiped", &sqSetPlayerBiped);
+	RootTable().Func("isObjectBiped", &sqIsObjectBiped);
 	RootTable().Func("sqRandom", &sqrand);
 	RootTable().Func("playerIsActive", &sqPlayerIsActive);
 	RootTable().Func("getPeerIndex", &sqgetPeerIndex);

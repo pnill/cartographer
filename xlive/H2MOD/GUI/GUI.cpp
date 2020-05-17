@@ -6,7 +6,7 @@
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Config\Config.h"
-
+#include "H2MOD\Modules\Splitscreen\VideoFixes.h"
 
 extern void InitInstance();
 
@@ -140,7 +140,6 @@ void GUI::Initialize()
 	}
 
 	D3DXCreateSprite(pDevice, &Sprite_Interface);
-
 }
 
 // #5001
@@ -219,11 +218,14 @@ int WINAPI XLiveOnCreateDevice(IDirect3DDevice9 *pD3D, VOID* vD3DPP)
 	return 0;
 }
 
+extern IDirect3DSurface9* custom_depth;
+
 // #5007: XLiveOnResetDevice
 int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 {
 	//pFont->OnLostDevice();
 	//pFont->OnResetDevice();
+	SplitFixDeviceReset();
 	largeSizeFont->OnLostDevice();
 	largeSizeFont->OnResetDevice();
 	normalSizeFont->OnLostDevice();
@@ -235,12 +237,13 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 	
 	pD3DPP = vD3DPP;
 	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
-	return 0;
+	return S_OK;
 }
-
+ 
 // #5006 XLiveOnDestroyDevice
 HRESULT WINAPI XLiveOnDestroyDevice()
 {
+	SplitFixDeviceReset();
 	largeSizeFont->Release();
 	normalSizeFont->Release();
 	smallFont->Release();
