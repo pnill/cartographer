@@ -110,7 +110,7 @@ public:
 	static void levelUpServer(int PlayerIndex);
 	static void resetPlayerLevels();
 
-	static std::unordered_map<int, DatumIndex> levelWeapon;
+	static std::unordered_map<int, datum> levelWeapon;
 	static std::unordered_map<XUID, int> gungamePlayers;
 
 	~GunGame() {  };

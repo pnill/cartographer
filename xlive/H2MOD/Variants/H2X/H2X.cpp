@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "H2MOD\Variants\H2X\H2X.h"
+#include "..\H2MOD.h"
 
 #include "H2MOD\Tags\TagInterface.h"
 
@@ -24,8 +25,8 @@ void H2X::Initialize(bool enable)
 {
 	for (auto& weapon : weapons)
 	{
-		auto required_datum = tags::find_tag('weap', weapon.tag_string);
-		BYTE* weapon_tag = tags::get_tag<'weap', BYTE>(required_datum);
+		auto required_datum = tags::find_tag(blam_tag::tag_group_type::weapon, weapon.tag_string);
+		BYTE* weapon_tag = tags::get_tag<blam_tag::tag_group_type::weapon, BYTE>(required_datum);
 		if (weapon_tag != nullptr)
 		{
 			int barrel_data_block_size = 236;
@@ -41,7 +42,7 @@ void H2X::Initialize(bool enable)
 		}
 	}
 	
-	if (!h2mod->Server && enable && h2mod->GetMapType() == MULTIPLAYER_MAP)
+	if (!h2mod->Server && enable && h2mod->GetMapType() == scnr_type::Multiplayer)
 	{
 		// H2X Sound_Classes
 		*(float*)(&tags::get_tag_data()[0x4821C]) = 0.0f; /*H2X projectile_impact Index 0 Gains Bounds lower*/

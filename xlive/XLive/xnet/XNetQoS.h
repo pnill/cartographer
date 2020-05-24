@@ -3,7 +3,7 @@
 
 typedef struct _SOCKET_INFORMATION 
 {
-	OVERLAPPED Overlapped;
+	WSAOVERLAPPED Overlapped;
 	SOCKET Socket;
 	WSABUF DataBuf;
 	DWORD BytesSEND;
@@ -14,20 +14,19 @@ class CXNetQoS
 {
 public:
 	void Listener();
-	//void stopListening();
 	bool IsListening();
 
-	SOCKET m_ListenSocket;
 	bool m_bStopListening = false;
-	WSAEVENT m_WsaEvent;
+	SOCKET m_ListenSocket = INVALID_SOCKET;
+	WSAEVENT m_WsaEvent = WSA_INVALID_EVENT;
 
 	unsigned int cbData = 0;
-	char* pbData = nullptr;
+	PBYTE pbData = nullptr;
 
 	static void CALLBACK HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags);
 	static void CALLBACK SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags);
 
-	volatile std::atomic<BOOL> m_listenerThreadRunning = FALSE;
+	std::atomic<bool> m_listenerThreadRunning = false;
 private:
 	
 };

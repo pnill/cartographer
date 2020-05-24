@@ -10,13 +10,13 @@
 #include "H2MOD\Variants\VariantMPGameEngine.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
-#include "Blam\Cache\TagGroups\shad.h"
+#include "Blam\Cache\TagGroups\shader_definition.h"
+#include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
 #include "..\CustomResolutions\CustomResolutions.h"
+#include "..\H2MOD\Tags\TagInterface.h"
 
 #define _USE_MATH_DEFINES
 #include "math.h"
-
-extern bool H2IsDediServer;
 
 #pragma region Done_Tweaks
 
@@ -49,7 +49,7 @@ static bool NotDisplayIngameChat() {
 
 	if (H2Config_hide_ingame_chat) {
 		PlayerIterator playerIt;
-		DatumIndex local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
+		datum local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
 		if (playerIt.get_data_at_index(local_player_datum_index.Index)->is_chatting == 2) {
 			extern void hotkeyFuncToggleHideIngameChat();
 			hotkeyFuncToggleHideIngameChat();
@@ -326,7 +326,6 @@ bool engine_basic_init()
 	SecureZeroMemory(flags_array, startup_flags::count * sizeof(DWORD)); // should be zero initalized anyways but the game does it
 
 	H2Config_voice_chat = false;
-	flags_array[startup_flags::disable_voice_chat] = 1; // disables voice chat (XHV engine)
 	flags_array[startup_flags::nointro] = H2Config_skip_intro;
 
 	HANDLE(*fn_c000285fd)() = (HANDLE(*)())h2mod->GetAddress<void*>(0x000285fd);
@@ -587,7 +586,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
 		return false;
 	}
-	if (header.type != tags::cache_header::scnr_type::Multiplayer && header.type != tags::cache_header::scnr_type::SinglePlayer)
+	if (header.type != scnr_type::Multiplayer && header.type != scnr_type::SinglePlayer)
 	{
 		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
 		return false;
@@ -829,8 +828,8 @@ test_engine g_test_engine;
 
 void fix_shader_template_nvidia(const std::string &template_name, const std::string &bitmap_name, size_t bitmap_idx)
 {
-	DatumIndex bitmap_to_fix    = tags::find_tag('bitm', bitmap_name);
-	DatumIndex borked_template  = tags::find_tag('stem', template_name);
+	datum bitmap_to_fix    = tags::find_tag(blam_tag::tag_group_type::bitmap, bitmap_name);
+	datum borked_template  = tags::find_tag(blam_tag::tag_group_type::shadertemplate, template_name);
 
 	LOG_DEBUG_FUNC("bitmap {0}, borked_template {1}", bitmap_to_fix.data, borked_template.data);
 
@@ -839,13 +838,13 @@ void fix_shader_template_nvidia(const std::string &template_name, const std::str
 
 	LOG_DEBUG_FUNC("Fixing: template {}, bitmap {}", template_name, bitmap_name);
 
-	tags::ilterator shaders('shad');
+	tags::ilterator shaders(blam_tag::tag_group_type::shader);
 	while (!shaders.next().IsNull())
 	{
-		auto *shader = LOG_CHECK(tags::get_tag<'shad', TagGroups::shad>(shaders.datum));
+		auto *shader = LOG_CHECK(tags::get_tag<blam_tag::tag_group_type::shader, shader_definition>(shaders.m_datum));
 		if (shader && shader->shader_template.TagIndex == borked_template && LOG_CHECK(shader->postprocessDefinition.size > 0))
 		{
-			LOG_DEBUG_FUNC("shader {} has borked template", tags::get_tag_name(shaders.datum));
+			LOG_DEBUG_FUNC("shader {} has borked template", tags::get_tag_name(shaders.m_datum));
 			auto *post_processing = shader->postprocessDefinition[0];
 			if (LOG_CHECK(post_processing->bitmaps.size >= (bitmap_idx + 1)))
 			{
@@ -853,7 +852,7 @@ void fix_shader_template_nvidia(const std::string &template_name, const std::str
 				if (bitmap_block->bitmapGroup == bitmap_to_fix)
 				{
 					LOG_DEBUG_FUNC("Nulled bitmap {}", bitmap_idx);
-					bitmap_block->bitmapGroup = DatumIndex::Null;
+					bitmap_block->bitmapGroup = datum::Null;
 				}
 			}
 		}
@@ -875,6 +874,17 @@ void fix_shaders_nvidia()
 	);
 }
 
+// probably MCC does this because it's 64 bit, but w/e, should work just fine
+int system_get_time()
+{
+	LARGE_INTEGER PerformanceCount;
+	LARGE_INTEGER PerformanceFrequency;
+
+	QueryPerformanceCounter(&PerformanceCount);
+	QueryPerformanceFrequency(&PerformanceFrequency);
+	return (unsigned int)(PerformanceCount.QuadPart / (PerformanceFrequency.QuadPart / 1000));
+}
+
 void InitH2Tweaks() {
 	postConfig();
 
@@ -884,7 +894,7 @@ void InitH2Tweaks() {
 	//custom_game_engines::init();
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 
-	if (H2IsDediServer) {
+	if (h2mod->Server) {
 		phookServ1 = (thookServ1)DetourFunc(h2mod->GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
 
 		// set the additional pcr time
@@ -942,10 +952,8 @@ void InitH2Tweaks() {
 		WriteJmpTo(h2mod->GetAddress(0x7E43), WinMain);
 		WriteJmpTo(h2mod->GetAddress(0x39EA2), is_remote_desktop);
 
-		//Redirect the variable for the server name to ours.
-		WritePointer(h2mod->GetAddress(0x1b2ce8), ServerLobbyName);
-
 		tags::on_map_load(fix_shaders_nvidia);
+		tags::on_map_load(c_xbox_live_task_progress_menu::ApplyPatches);
 	}
 
 	// Both server and client
@@ -954,6 +962,8 @@ void InitH2Tweaks() {
 	PatchCall(h2mod->GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
 	PatchCall(h2mod->GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
+
+	WriteJmpTo(h2mod->GetAddress(0x37E51, 0x2B4CE), system_get_time);
 
 	addDebugText("End Startup Tweaks.");
 }
@@ -990,7 +1000,7 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 
 void H2Tweaks::setSens(std::string input_type, int sens) {
 
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	if (sens < 0)
@@ -1018,7 +1028,7 @@ void H2Tweaks::setSavedSens() {
 
 void H2Tweaks::setFOV(int field_of_view_degrees) {
 
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	static float fov = 70.0f * M_PI / 180.0f;
@@ -1041,7 +1051,7 @@ void H2Tweaks::setFOV(int field_of_view_degrees) {
 
 void H2Tweaks::setVehicleFOV(int field_of_view_degrees) {
 
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
@@ -1053,7 +1063,7 @@ void H2Tweaks::setVehicleFOV(int field_of_view_degrees) {
 
 void H2Tweaks::setHz() {
 
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	*h2mod->GetAddress<int*>(0xA3DA08) = H2Config_refresh_rate;
@@ -1061,12 +1071,12 @@ void H2Tweaks::setHz() {
 
 void H2Tweaks::setCrosshairPos(float crosshair_offset) {
 
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	if (!FloatIsNaN(crosshair_offset)) {
 
-		tags::tag_data_block* player_controls_block = reinterpret_cast<tags::tag_data_block*>(tags::get_game_globals() + 240);
+		tags::tag_data_block* player_controls_block = reinterpret_cast<tags::tag_data_block*>(tags::get_matg_globals_ptr() + 240);
 		if (player_controls_block->block_count > 0)
 		{
 			for (int i = 0; i < player_controls_block->block_count; i++)
@@ -1076,37 +1086,37 @@ void H2Tweaks::setCrosshairPos(float crosshair_offset) {
 }
 
 void H2Tweaks::setCrosshairSize(int size, bool preset) {
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
-	DWORD BATRIF1 = (DWORD)tags::get_game_globals() + 0x7aa750;
-	DWORD BATRIF2 = (DWORD)tags::get_game_globals() + 0x7aa752;
-	DWORD SMG1 = (DWORD)tags::get_game_globals() + 0x7A9F9C;
-	DWORD SMG2 = (DWORD)tags::get_game_globals() + 0x7A9F9E;
-	DWORD CRBN1 = (DWORD)tags::get_game_globals() + 0x7ab970;
-	DWORD CRBN2 = (DWORD)tags::get_game_globals() + 0x7ab972;
-	DWORD BEAMRIF1 = (DWORD)tags::get_game_globals() + 0x7AA838;
-	DWORD BEAMRIF2 = (DWORD)tags::get_game_globals() + 0x7AA83A;
-	DWORD MAG1 = (DWORD)tags::get_game_globals() + 0x7AA33C;
-	DWORD MAG2 = (DWORD)tags::get_game_globals() + 0x7AA33E;
-	DWORD PLASRIF1 = (DWORD)tags::get_game_globals() + 0x7AA16C;
-	DWORD PLASRIF2 = (DWORD)tags::get_game_globals() + 0x7AA16E;
-	DWORD SHTGN1 = (DWORD)tags::get_game_globals() + 0x7AA424;
-	DWORD SHTGN2 = (DWORD)tags::get_game_globals() + 0x7AA426;
-	DWORD SNIP1 = (DWORD)tags::get_game_globals() + 0x7AA994;
-	DWORD SNIP2 = (DWORD)tags::get_game_globals() + 0x7AA996;
-	DWORD SWRD1 = (DWORD)tags::get_game_globals() + 0x7AA8AC;
-	DWORD SWRD2 = (DWORD)tags::get_game_globals() + 0x7AA8AE;
-	DWORD ROCKLAUN1 = (DWORD)tags::get_game_globals() + 0x7AA3B0;
-	DWORD ROCKLAUN2 = (DWORD)tags::get_game_globals() + 0x7AA3B2;
-	DWORD PLASPI1 = (DWORD)tags::get_game_globals() + 0x7AA0F8;
-	DWORD PLASPI2 = (DWORD)tags::get_game_globals() + 0x7AA0FA;
-	DWORD BRUTESHOT1 = (DWORD)tags::get_game_globals() + 0x7AA7C4;
-	DWORD BRUTESHOT2 = (DWORD)tags::get_game_globals() + 0x7AA7C6;
-	DWORD NEED1 = (DWORD)tags::get_game_globals() + 0x7AA254;
-	DWORD NEED2 = (DWORD)tags::get_game_globals() + 0x7AA256;
-	DWORD SENTBEAM1 = (DWORD)tags::get_game_globals() + 0x7AB5D0;
-	DWORD SENTBEAM2 = (DWORD)tags::get_game_globals() + 0x7AB5D2;
+	DWORD BATRIF1 = (DWORD)tags::get_matg_globals_ptr() + 0x7aa750;
+	DWORD BATRIF2 = (DWORD)tags::get_matg_globals_ptr() + 0x7aa752;
+	DWORD SMG1 = (DWORD)tags::get_matg_globals_ptr() + 0x7A9F9C;
+	DWORD SMG2 = (DWORD)tags::get_matg_globals_ptr() + 0x7A9F9E;
+	DWORD CRBN1 = (DWORD)tags::get_matg_globals_ptr() + 0x7ab970;
+	DWORD CRBN2 = (DWORD)tags::get_matg_globals_ptr() + 0x7ab972;
+	DWORD BEAMRIF1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA838;
+	DWORD BEAMRIF2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA83A;
+	DWORD MAG1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA33C;
+	DWORD MAG2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA33E;
+	DWORD PLASRIF1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA16C;
+	DWORD PLASRIF2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA16E;
+	DWORD SHTGN1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA424;
+	DWORD SHTGN2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA426;
+	DWORD SNIP1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA994;
+	DWORD SNIP2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA996;
+	DWORD SWRD1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA8AC;
+	DWORD SWRD2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA8AE;
+	DWORD ROCKLAUN1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA3B0;
+	DWORD ROCKLAUN2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA3B2;
+	DWORD PLASPI1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA0F8;
+	DWORD PLASPI2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA0FA;
+	DWORD BRUTESHOT1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA7C4;
+	DWORD BRUTESHOT2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA7C6;
+	DWORD NEED1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA254;
+	DWORD NEED2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA256;
+	DWORD SENTBEAM1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AB5D0;
+	DWORD SENTBEAM2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AB5D2;
 
 	DWORD WEAPONS[] = { BATRIF1, BATRIF2, SMG1, SMG2, CRBN1, CRBN2, BEAMRIF1, BEAMRIF2, MAG1, MAG2, PLASRIF1, PLASRIF2, SHTGN1, SHTGN2, SNIP1, SNIP2, SWRD1, SWRD2, ROCKLAUN1, ROCKLAUN2, PLASPI1, PLASPI2, BRUTESHOT1, BRUTESHOT2, NEED1, NEED2, SENTBEAM1, SENTBEAM2 };
 
@@ -1142,7 +1152,7 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 		}
 	}
 
-	if (h2mod->GetMapType() == MapType::MULTIPLAYER_MAP) {
+	if (h2mod->GetMapType() == scnr_type::Multiplayer) {
 
 		for (int i = 0; i < 28; i++) {
 			if (configArray[i] == 0) {
@@ -1163,7 +1173,7 @@ char ret_0() {
 }
 
 void H2Tweaks::toggleUncappedCampaignCinematics(bool toggle) {
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	typedef char(__cdecl *is_cutscene_fps_cap)();
@@ -1192,7 +1202,7 @@ void H2Tweaks::applyMeleePatch(bool toggle)
 
 void H2Tweaks::sunFlareFix()
 {
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	//rasterizer_near_clip_distance <real>
@@ -1202,7 +1212,7 @@ void H2Tweaks::sunFlareFix()
 
 void H2Tweaks::WarpFix(bool enable)
 {
-	if (H2IsDediServer)
+	if (h2mod->Server)
 		return;
 
 	//Improves warping issues 

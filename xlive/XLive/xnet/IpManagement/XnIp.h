@@ -1,8 +1,17 @@
 #pragma once 
 
-#include "stdafx.h"
 #include "..\xnet.h"
 #include "..\Sockets\XSocket.h"
+
+#define MAX_HDR_STR 32
+
+const char requestStrHdr[MAX_HDR_STR] = "XNetBrOadPack";
+const char broadcastStrHdr[MAX_HDR_STR] = "XNetReqPack";
+
+#define XnIp_ConnectionPing 0x0
+#define XnIp_ConnectionPong 0x2
+#define XnIp_ConnectionClose 0x4
+#define XnIp_ConnectionEstablishSecure 0x8
 
 struct XnIp
 {
@@ -21,29 +30,42 @@ struct XnIp
 	bool isValid(IN_ADDR identifier) { return bValid && identifier.s_addr == connectionIdentifier.s_addr; }
 };
 
-template <class T>
-inline void hash_combine(std::size_t & seed, const T & v)
+struct XNetPacketHeader
 {
-	std::hash<T> hasher;
-	seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-}
-
-template<typename S, typename T> struct std::hash < std::pair<S, T> >
-{
-	inline size_t operator()(const pair<S, T> & v) const
-	{
-		size_t seed = 0;
-		::hash_combine(seed, v.first);
-		::hash_combine(seed, v.second);
-		return seed;
-	}
+	DWORD intHdr;
+	char HdrStr[MAX_HDR_STR];
 };
 
-struct XNetConnectionReqPacket 
+struct XBroadcastPacket
 {
-	DWORD ConnectPacketIdentifier;
-	XNADDR xnaddr;
-	XNKID xnkid;
+	XNetPacketHeader pckHeader;
+	struct XBroadcast
+	{
+		sockaddr_in name;
+	};
+	XBroadcast data;
+};
+
+struct XNetRequestPacket 
+{
+	XNetRequestPacket()
+	{
+		pckHeader.intHdr = 'XNeT';
+		memset(pckHeader.HdrStr, 0, sizeof(pckHeader.HdrStr));
+		strncpy(pckHeader.HdrStr, requestStrHdr, MAX_HDR_STR);
+	}
+
+	XNetPacketHeader pckHeader;
+	struct XNetReq
+	{
+		XNKID xnkid;
+		DWORD reqType;
+		union
+		{
+			XNADDR xnaddr;
+		};
+	};
+	XNetReq data;
 };
 
 class CXnIp
@@ -60,10 +82,10 @@ public:
 	int handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount);
 
 	void UnregisterLocalConnectionInfo();
-	void GetStartupParamsAndUpdate(const XNetStartupParams* netStartupParams);
+	void Initialize(const XNetStartupParams* netStartupParams);
 	IN_ADDR GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* addr);
 	void SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);
-	void HandleConnectionPacket(XSocket* xsocket, XNetConnectionReqPacket* connectReqPacket, sockaddr_in* addr);
+	void HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectReqPacket, sockaddr_in* addr);
 	void RegisterKeys(XNKID*, XNKEY*);
 	void UnregisterKeys();
 	void getRegisteredKeys(XNKID* xnkid, XNKEY* xnkey);
@@ -81,13 +103,9 @@ public:
 	int GetMaxXnConnections() { return startupParams.cfgSecRegMax; }
 	int GetReqQoSBufferSize() { return startupParams.cfgQosDataLimitDiv4 * 4; }
 
-	DWORD connectPacketIdentifier = 0x8E0A40F8; // DO NOT TOUCH THIS
-
 private:
 	XNKID host_xnkid;
 	XNKEY host_xnkey;
 };
 
 extern CXnIp ipManager;
-
-bool sockAddrInIsNull(sockaddr_in* a1);

@@ -1,7 +1,10 @@
-#include "stdafx.h"
+
+#include "Util\Hooks\Hook.h"
+
+#include "H2MOD.h"
+
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "Util\Hooks\Hook.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 

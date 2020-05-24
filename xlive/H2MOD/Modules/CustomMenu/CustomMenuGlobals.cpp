@@ -637,7 +637,7 @@ void __cdecl sub_3e3ac_CMLTD_(int a1, int label_id, wchar_t* rtn_label, int labe
 		char* v4 = &tags::get_tag_data()[tags::get_tag_instances()[a1 & 0xFFFF].data_offset];
 
 		sub_3e332(
-			(int)tags::get_game_globals() + 28 * (v3 + 14),
+			(int)tags::get_matg_globals_ptr() + 28 * (v3 + 14),
 			label_id,
 			rtn_label,
 			label_menu_id,//*(WORD*)(v4 + 4 * (v3 + 14) - 40),

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "stdafx.h"
-#include "..\Blam\Engine\Players\Players.h"
+#include "Blam\Engine\Players\Players.h"
 #include "..\NetworkObserver\NetworkObserver.h"
 
 enum eNetwork_session_state : signed int
@@ -77,8 +76,8 @@ struct player_information
 	bool properties_valid;
 	char pad[1];
 	unsigned int controller_index;
-	PlayerProperties properties;
-	PlayerProperties player_properties_1;
+	Player::Properties properties;
+	Player::Properties player_properties_1;
 	unsigned int player_voice;
 	unsigned int player_text_chat;
 };
@@ -257,6 +256,7 @@ namespace NetworkSession
 	int getPeerCount();
 	int getLocalPeerIndex();
 	void kickPeer(int peerIndex);
+	void endGame();
 	peer_observer_channel* getPeerObserverChannel(int peerIndex);
 
 	void logPeersToConsole();

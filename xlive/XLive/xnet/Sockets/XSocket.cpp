@@ -29,7 +29,6 @@ void ForwardPorts()
 int WINAPI XOnlineStartup()
 {
 	LOG_TRACE_NETWORK("XOnlineStartup()");
-	std::thread(ForwardPorts).detach();
 	return ERROR_SUCCESS;
 }
 
@@ -292,12 +291,27 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		//inTo->sin_addr.s_addr = H2Config_master_ip;
 		//inTo->sin_port = ntohs(H2Config_master_port_relay);
 
-		// TODO: add LAN support
-		//inTo->sin_port = ntohs(H2Config_base_port + 1);
-		//int result = sendto(xsocket->winSockHandle, lpBuffers->buf, lpBuffers->len, dwFlags, (sockaddr*)lpTo, iTolen);
-		//return result;
+		XBroadcastPacket* packet = (XBroadcastPacket*)malloc(sizeof(XBroadcastPacket) + lpBuffers->len);
+		packet->pckHeader.intHdr = 'BrOd';
+		strncpy(packet->pckHeader.HdrStr, broadcastStrHdr, MAX_HDR_STR);
+		ZeroMemory(&packet->data, sizeof(XBroadcastPacket::XBroadcast));
 
-		return SOCKET_ERROR;
+		packet->data.name.sin_addr.s_addr = INADDR_BROADCAST;
+		memcpy((char*)packet + sizeof(XBroadcastPacket), lpBuffers->buf, lpBuffers->len);
+
+		int portOffset = H2Config_base_port % 1000;
+
+		for (int i = 2000; i <= 5000; i += 1000)
+		{
+			inTo->sin_port = ntohs(i + portOffset + 1);
+			int result = sendto(xsocket->winSockHandle, (const char*)packet, sizeof(XBroadcastPacket) + lpBuffers->len, dwFlags, (sockaddr*)inTo, iTolen);
+			if (result == SOCKET_ERROR) {
+				free(packet);
+				return SOCKET_ERROR;
+			}
+		}
+		free(packet);
+		return ERROR_SUCCESS;
 	}
 
 	/*
@@ -326,7 +340,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		{
 		case 1000:
 			sendToAddr.sin_port = xnIp->xnaddr.wPortOnline;
-			if (!sockAddrInIsNull(&xnIp->NatAddrSocket1000))
+			if (!xsocket->sockAddrInIsNull(&xnIp->NatAddrSocket1000))
 			{
 				sendToAddr = xnIp->NatAddrSocket1000;
 				//LOG_TRACE_NETWORK("XSocketSendTo() port 1000 nPort: {} secure: %08X", htons(nPort), iplong);
@@ -336,7 +350,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 
 		case 1001:
 			sendToAddr.sin_port = ntohs(htons(xnIp->xnaddr.wPortOnline) + 1);
-			if (!sockAddrInIsNull(&xnIp->NatAddrSocket1001))
+			if (!xsocket->sockAddrInIsNull(&xnIp->NatAddrSocket1001))
 			{
 				sendToAddr = xnIp->NatAddrSocket1001;
 				//LOG_TRACE_NETWORK("XSocketSendTo() port 1001 nPort: %i secure: %08X", htons(nPort), iplong);
@@ -409,7 +423,6 @@ INT WINAPI XSocketWSAGetLastError()
 
 		print++;
 	}
-
 
 	return ret;
 }

@@ -4,14 +4,14 @@
 class FireFightHandler : public GameClientServerHandler {
 public:
 	void SetXUID(XUID xuid);
-	void SetPlayerIndex(DatumIndex player_datum);
-	void SetUnitDatum(DatumIndex unit_datum);
-	void SetKilledDatum(DatumIndex unit_datum);
+	void SetPlayerIndex(datum player_datum);
+	void SetUnitDatum(datum unit_datum);
+	void SetKilledDatum(datum unit_datum);
 	XUID GetXUID();
-	DatumIndex GetKilledDatum();
+	datum GetKilledDatum();
 private:
 	XUID xuid;
-	DatumIndex killed_datum;
+	datum killed_datum;
 };
 
 
@@ -56,7 +56,7 @@ class FireFight : public GameType<FireFightHandler>
 {
 public:
 	FireFight();
-	static void KilledAI(DatumIndex ai_datum,XUID killer);
+	static void KilledAI(datum ai_datum,XUID killer);
 	static void initClient();
 	static void initHost();
 };

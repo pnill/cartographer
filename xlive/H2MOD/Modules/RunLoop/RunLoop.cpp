@@ -267,10 +267,8 @@ void handleHotkeyInput(WPARAM wparam)
 	}
 }
 
-bool halo2WindowExists = false;
-bool halo2ServerOnce1 = false;
-
 void GSMainLoop() {
+	static bool halo2WindowExists = false;
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
 
@@ -292,6 +290,9 @@ void GSMainLoop() {
 			SetWindowText(H2hWnd, titleMod);
 		}
 	}
+
+	/*
+	static bool halo2ServerOnce1 = false;
 	if (H2IsDediServer && !halo2ServerOnce1) {
 		halo2ServerOnce1 = true;
 		pushHostLobby();
@@ -301,7 +302,7 @@ void GSMainLoop() {
 		}
 	}
 
-	/*static int prevPartyPrivacy = 0;
+	static int prevPartyPrivacy = 0;
 	int partyPrivacy;
 	if (H2IsDediServer) {
 		partyPrivacy = *(int*)(H2BaseAddr + 0x534850);
@@ -315,19 +316,18 @@ void GSMainLoop() {
 	prevPartyPrivacy = partyPrivacy;*/
 }
 
-signed int(*sub_287a1)();
+void (*main_game_loop)();
 
-static signed int HookedClientRandFunc() {
-
+void main_game_loop_hook() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 
+	main_game_loop();
+
+	mapManager->leaveSessionIfAFK();
+
 	extern void frameTimeManagement();
 	frameTimeManagement();
-	
-	mapManager->leaveSessionIfAFK();
-	
-	return sub_287a1();
 }
 
 static char HookedServerShutdownCheck() {
@@ -352,8 +352,8 @@ void initGSRunLoop() {
 	}
 	else {
 		addDebugText("Hooking Loop Function");
-		sub_287a1 = (signed int(*)())((char*)H2BaseAddr + 0x287a1);
-		PatchCall(H2BaseAddr + 0x399f3, HookedClientRandFunc);
+		main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
+		PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 	}
 	addDebugText("Post GSRunLoop Hooking.");
 }

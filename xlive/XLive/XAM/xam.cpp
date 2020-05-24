@@ -241,6 +241,8 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	case XN_SYS_PROFILESETTINGCHANGED:
 		if (sys_profile == 0)
 		{
+			sys_profile++;
+
 			if (pParam)
 			{
 				*pParam = 0;
@@ -253,10 +255,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 				}
 
 				if (*pParam)
-				{
-					sys_profile++;
 					exit_code = TRUE;
-				}
 			}
 
 			LOG_TRACE_XLIVE("- {:p} = XN_SYS_PROFILESETTINGCHANGED (1)", (void*)hNotification);
@@ -281,6 +280,8 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	case XN_SYS_INPUTDEVICECONFIGCHANGED:
 		if (sys_controller_force == 0)
 		{
+			sys_controller_force++;
+
 			if (pParam)
 			{
 				*pParam = 0;
@@ -292,11 +293,9 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 						*pParam |= 1 << i;
 					}
 				}
+
 				if (*pParam)
-				{
-					sys_controller_force++;
 					exit_code = TRUE;
-				}
 			}
 
 			LOG_TRACE_XLIVE("- {:p} = XN_SYS_INPUTDEVICECONFIGCHANGED (1)", (void*)hNotification);
@@ -337,7 +336,6 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		if (live_membership == 0)
 		{
 			live_membership++;
-
 
 			LOG_TRACE_XLIVE("- {:p} = XN_LIVE_MEMBERSHIP_PURCHASED (-)", (void*)hNotification);
 

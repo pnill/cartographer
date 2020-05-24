@@ -1,6 +1,6 @@
-#include "stdafx.h"
 #include "NetworkSession.h"
 
+#include "H2MOD.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
 
 network_session* NetworkSession::getNetworkSessions()
@@ -15,7 +15,7 @@ network_session* NetworkSession::getCurrentNetworkSession()
 
 bool NetworkSession::getCurrentNetworkSession(network_session** outSession)
 {
-	typedef char(__cdecl* get_lobby_globals_ptr)(network_session** ptr);
+	typedef bool(__cdecl* get_lobby_globals_ptr)(network_session**);
 	return h2mod->GetAddress<get_lobby_globals_ptr>(0x1AD736, 0x1A66B3)(outSession);
 }
 
@@ -123,6 +123,13 @@ void NetworkSession::kickPeer(int peerIndex)
 	}
 }
 
+void NetworkSession::endGame()
+{
+	typedef void(__cdecl* end_game)();
+	auto p_end_game = h2mod->GetAddress<end_game>(0x215470, 0x197F32);
+	p_end_game();
+}
+
 peer_observer_channel* NetworkSession::getPeerObserverChannel(int peerIndex)
 {
 	return &getCurrentNetworkSession()->peer_observer_channels[peerIndex];
@@ -164,7 +171,7 @@ void NetworkSession::logPeersToConsole() {
 			std::wstring outStr = L"Peer index=" + std::to_wstring(peerIndex);
 			outStr += L", Peer Name=";
 			outStr += getCurrentNetworkSession()->membership.peer_info[peerIndex].name;
-			outStr += L", Unknown state=" + std::to_wstring(observer->getObserverState(getCurrentNetworkSession()->peer_observer_channels[peerIndex].observer_index));
+			
 			int playerIndex = getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index[0];
 			if (playerIndex != -1) 
 			{
@@ -173,7 +180,6 @@ void NetworkSession::logPeersToConsole() {
 				outStr += getPlayerName(playerIndex);
 				outStr += L", Name from game player state=";
 				outStr += h2mod->get_player_name_from_player_index(playerIndex);
-				outStr += L", Identifier=" + std::to_wstring(getPlayerXuid(playerIndex));
 			}
 			commands->output(outStr);
 

@@ -9,12 +9,6 @@ s_datum_array* game_state_players = nullptr;
 s_datum_array* game_state_objects_header = nullptr;
 
 bool displayXyz = false;
-volatile bool isLobby = true;
-
-//TODO: actually check if they have a microphone or check some settings
-bool microphoneEnabled = true;
-std::unordered_map<XUID, BOOL> xuidIsTalkingMap;
-IN_ADDR clientMachineAddress = {};
 
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
 	std::stringstream ss(s);

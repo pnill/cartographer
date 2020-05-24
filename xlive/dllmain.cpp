@@ -56,17 +56,12 @@ void InitInstance()
 
 		//extern GunGame* gunGame;
 		//gunGame->readWeaponLevels();
-
-		//extern void LoadAchievements();
-		//LoadAchievements();
 	}
 }
 
 extern CRITICAL_SECTION log_section;
 void ExitInstance()
 {
-	//extern void SaveAchievements();
-	//SaveAchievements();
 #ifndef NO_TRACE
 	EnterCriticalSection(&log_section);
 	delete xlive_log;

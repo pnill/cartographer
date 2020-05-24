@@ -37,6 +37,7 @@
 #include <wincrypt.h>
 #include <mmsystem.h>
 #include <windef.h>
+#include <codecvt>
 
 // TODO: include this only if trac
 #include <fstream>

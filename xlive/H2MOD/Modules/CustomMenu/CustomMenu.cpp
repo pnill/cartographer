@@ -11,7 +11,9 @@
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Updater\Updater.h"
 #include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
+#include "H2MOD\Tags\TagInterface.h"
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
@@ -3145,7 +3147,7 @@ void CMSetupVFTables_AdvSettings() {
 }
 
 int __cdecl CustomMenu_AdvSettings(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MapType::MULTIPLAYER_MAP ? 4 : 4, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == scnr_type::Multiplayer ? 4 : 4, 272);
 }
 
 void GSCustomMenuCall_AdvSettings() {
@@ -3204,45 +3206,42 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AdvLobbySettings() {//__thiscall
 }
 
 static bool CMButtonHandler_AdvLobbySettings(int button_id) {
+	
 	if (button_id == 0) {
-		wchar_t* bufferLobbyName = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AdvLobbySettings, 0xFFFFF001);
-		GSCustomMenuCall_VKeyboard_Inner(bufferLobbyName, 32, 0b11, CMLabelMenuId_AdvLobbySettings, 0xFFFFFF02, CMLabelMenuId_AdvLobbySettings, 0xFFFFFF03);
-	}
-	else if (button_id == 1) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (vehicleFlipoverEject = !vehicleFlipoverEject));
 		refreshVehicleFlipoverEject();
 	}
-	else if (button_id == 2) {
+	else if (button_id == 1) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_disable_kill_volumes = !AdvLobbySettings_disable_kill_volumes));
-		if (NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MapType::MULTIPLAYER_MAP && !AdvLobbySettings_disable_kill_volumes) {
+		if (NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == scnr_type::Multiplayer && !AdvLobbySettings_disable_kill_volumes) {
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
 		}
 		H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
 	}
-	else if (button_id == 3) {
+	else if (button_id == 2) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_mp_explosion_physics = !AdvLobbySettings_mp_explosion_physics));
 	}
-	else if (button_id == 4) {
+	else if (button_id == 3) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_mp_sputnik = !AdvLobbySettings_mp_sputnik));
 	}
-	else if (button_id == 5) {
+	else if (button_id == 4) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_mp_grunt_bday_party = !AdvLobbySettings_mp_grunt_bday_party));
 	}
-	else if (button_id == 6) {
+	else if (button_id == 5) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_grenade_chain_react = !AdvLobbySettings_grenade_chain_react));
 	}
-	else if (button_id == 7) {
+	else if (button_id == 6) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_banshee_bomb = !AdvLobbySettings_banshee_bomb));
 	}
-	else if (button_id == 8) {
+	else if (button_id == 7) {
 		AdvLobbySettings_mp_blind = (AdvLobbySettings_mp_blind & ~0b01) | (~AdvLobbySettings_mp_blind & 0b01);
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b01));
 	}
-	else if (button_id == 9) {
+	else if (button_id == 8) {
 		AdvLobbySettings_mp_blind = (AdvLobbySettings_mp_blind & ~0b10) | (~AdvLobbySettings_mp_blind & 0b10);
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b10));
 	}
-	else if (button_id == 10) {
+	else if (button_id == 9) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, (AdvLobbySettings_flashlight = !AdvLobbySettings_flashlight));
 	}
 	return false;
@@ -3272,14 +3271,7 @@ __declspec(naked) void sub_20F790_CM_nak_AdvLobbySettings() {//__thiscall
 
 void* __stdcall sub_248beb_deconstructor_AdvLobbySettings(LPVOID lpMem, char a2)//__thiscall
 {
-	wchar_t* bufferLobbyName = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AdvLobbySettings, 0xFFFFF001);
-	if (wcslen(bufferLobbyName) == 0) {
-		wchar_t* ClientName = (wchar_t*)((BYTE*)H2BaseAddr + 0x0051a638);
-		wcsncpy(bufferLobbyName, ClientName, 16);
-	}
-	wcsncpy(ServerLobbyName, bufferLobbyName, 32);
-
-	if (NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == MapType::MULTIPLAYER_MAP) {
+	if (NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == scnr_type::Multiplayer) {
 		//advLobbySettings->sendLobbySettingsPacket();
 	}
 	
@@ -3331,21 +3323,16 @@ void CMSetupVFTables_AdvLobbySettings() {
 }
 
 int __cdecl CustomMenu_AdvLobbySettings(int a1) {
-	wchar_t* bufferLobbyName = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AdvLobbySettings, 0xFFFFF001);
-	if (wcslen(bufferLobbyName) == 0) {
-		wchar_t* ClientName = (wchar_t*)((BYTE*)H2BaseAddr + 0x0051a638);
-		wcsncpy(bufferLobbyName, ClientName, 16);
-	}
-	loadLabelToggle_AdvLobbySettings(2, 0xFFFFFFF2, vehicleFlipoverEject);
-	loadLabelToggle_AdvLobbySettings(3, 0xFFFFFFF2, !AdvLobbySettings_disable_kill_volumes);
-	loadLabelToggle_AdvLobbySettings(4, 0xFFFFFFF2, AdvLobbySettings_mp_explosion_physics);
-	loadLabelToggle_AdvLobbySettings(5, 0xFFFFFFF2, AdvLobbySettings_mp_sputnik);
-	loadLabelToggle_AdvLobbySettings(6, 0xFFFFFFF2, AdvLobbySettings_mp_grunt_bday_party);
-	loadLabelToggle_AdvLobbySettings(7, 0xFFFFFFF2, AdvLobbySettings_grenade_chain_react);
-	loadLabelToggle_AdvLobbySettings(8, 0xFFFFFFF2, AdvLobbySettings_banshee_bomb);
-	loadLabelToggle_AdvLobbySettings(9, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b01));
-	loadLabelToggle_AdvLobbySettings(10, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b10));
-	loadLabelToggle_AdvLobbySettings(11, 0xFFFFFFF2, AdvLobbySettings_flashlight);
+	loadLabelToggle_AdvLobbySettings(1, 0xFFFFFFF2, vehicleFlipoverEject);
+	loadLabelToggle_AdvLobbySettings(2, 0xFFFFFFF2, !AdvLobbySettings_disable_kill_volumes);
+	loadLabelToggle_AdvLobbySettings(3, 0xFFFFFFF2, AdvLobbySettings_mp_explosion_physics);
+	loadLabelToggle_AdvLobbySettings(4, 0xFFFFFFF2, AdvLobbySettings_mp_sputnik);
+	loadLabelToggle_AdvLobbySettings(5, 0xFFFFFFF2, AdvLobbySettings_mp_grunt_bday_party);
+	loadLabelToggle_AdvLobbySettings(6, 0xFFFFFFF2, AdvLobbySettings_grenade_chain_react);
+	loadLabelToggle_AdvLobbySettings(7, 0xFFFFFFF2, AdvLobbySettings_banshee_bomb);
+	loadLabelToggle_AdvLobbySettings(8, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b01));
+	loadLabelToggle_AdvLobbySettings(9, 0xFFFFFFF2, !(AdvLobbySettings_mp_blind & 0b10));
+	loadLabelToggle_AdvLobbySettings(10, 0xFFFFFFF2, AdvLobbySettings_flashlight);
 	return CustomMenu_CallHead(a1, menu_vftable_1_AdvLobbySettings, menu_vftable_2_AdvLobbySettings, (DWORD)&CMButtonHandler_AdvLobbySettings, 11, 272);
 }
 
@@ -3903,7 +3890,81 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountEdit() {//__thiscall
 	}
 }
 
-static HANDLE hThreadLogin = 0;
+static int master_login_code;
+static HANDLE hThreadLogin = INVALID_HANDLE_VALUE;
+
+void xbox_live_task_progress_callback(DWORD a1)
+{
+	// if the hThreadLogin handle is INVALID_HANDLE_VALUE, it means that the login thread has ended
+	if (hThreadLogin == INVALID_HANDLE_VALUE)
+	{
+		// this is the ptr of the callback, if it gets set to null, it will close the menu
+		*(DWORD*)(a1 + 2652) = NULL;
+
+		if (master_login_code < 0)
+		{
+			if (master_login_code == ERROR_CODE_CURL_SOCKET_FAILED 
+				|| master_login_code == ERROR_CODE_CURL_HANDLE 
+				|| master_login_code == ERROR_CODE_ACCOUNT_DATA
+				|| master_login_code == ERROR_CODE_INVALID_PARAM) {
+				//internal error
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF014, 0xFFFFF015);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_CURL_EASY_PERF) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF030, 0xFFFFF031);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_INVALID_VERSION) {
+				GSCustomMenuCall_Update_Note();
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_INVALID_LOGIN_TOKEN) {
+				GSCustomMenuCall_Invalid_Login_Token();
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_INVALID_LOGIN_ID) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF008, 0xFFFFF009);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_INVALID_PASSWORD) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF00A, 0xFFFFF00B);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_MACHINE_BANNED) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF00C, 0xFFFFF00D);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_ACCOUNT_BANNED) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF00E, 0xFFFFF00F);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_ACCOUNT_DISABLED) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF010, 0xFFFFF011);
+				return;
+			}
+			else if (master_login_code == ERROR_CODE_MACHINE_SERIAL_INSUFFICIENT) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF018, 0xFFFFF019);
+				return;
+			}
+			else {
+				//unknown error!
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF012, 0xFFFFF013);
+				return;
+			}
+		}
+		else {
+			if (master_login_code == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) {
+				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF018, 0xFFFFF019);
+				return;
+			}
+			else {
+				GSCustomMenuCall_Login_Warn();
+				return;
+			}
+		}
+	}
+}
 
 static DWORD WINAPI ThreadLogin(LPVOID lParam)
 {
@@ -3916,23 +3977,22 @@ static DWORD WINAPI ThreadLogin(LPVOID lParam)
 		char* identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
 		char* identifier_pass = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
 		//login to account
-		if (HandleGuiLogin(0, identifier, identifier_pass)) {
-			GSCustomMenuCall_Login_Warn();
+		
+		if (HandleGuiLogin(0, identifier, identifier_pass, &master_login_code)) {
 			H2AccountLastUsed = 0;
 		}
 		SecureZeroMemory(identifier_pass, strlen(identifier_pass));
 	}
 	else {
 		//login to account
-		if (HandleGuiLogin(H2AccountBufferLoginToken[button_id], 0, 0)) {
-			GSCustomMenuCall_Login_Warn();
+		if (HandleGuiLogin(H2AccountBufferLoginToken[button_id], 0, 0, &master_login_code)) {
 			H2AccountLastUsed = button_id;
 		}
 	}
 
 	updateAccountingActiveHandle(false);
 
-	hThreadLogin = 0;
+	hThreadLogin = INVALID_HANDLE_VALUE;
 	return 0;
 }
 
@@ -3949,12 +4009,12 @@ static bool CMButtonHandler_AccountEdit(int button_id) {
 		AccountEdit_remember = !AccountEdit_remember;
 		add_cartographer_label(CMLabelMenuId_AccountEdit, 3, H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 0xFFFFFFF2 + (AccountEdit_remember ? 1 : 0)), true);
 	}
-	else if (button_id == 3) {
-		if (!hThreadLogin) {
+	else if (button_id == 3) { // login button id
+		if (hThreadLogin == INVALID_HANDLE_VALUE) {
 			accountingGoBackToList = false;
 			updateAccountingActiveHandle(true);
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02E, 0xFFFFF02F);
 			hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)-1, 0, NULL);
+			c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
 		}
 	}
 	return false;
@@ -4114,18 +4174,6 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountList() {//__thiscall
 void GSCustomMenuCall_AccountList();
 //using namespace MapChecksumSync;
 static bool CMButtonHandler_AccountList(int button_id) {
-	// todo: better error here
-	/*if (MapChecksumSync::get_startup_info() != startup_state::done)
-	{
-		switch (MapChecksumSync::get_startup_info())
-		{
-		case not_done:
-			MapChecksumSync::Calculate();
-			break;
-		}
-		return true;
-	}*/
-
 	if (button_id == H2AccountCount + 1) {
 		if (!mode_remove_account) {
 			GSCustomMenuCall_AccountCreate();
@@ -4163,11 +4211,11 @@ static bool CMButtonHandler_AccountList(int button_id) {
 			return true;
 		}
 		else {
-			if (!hThreadLogin) {
+			if (hThreadLogin == INVALID_HANDLE_VALUE) {
 				accountingGoBackToList = false;
 				updateAccountingActiveHandle(true);
-				GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02E, 0xFFFFF02F);
 				hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)button_id, 0, NULL);
+				c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
 			}
 		}
 	}
@@ -4800,7 +4848,7 @@ void __cdecl sub_bd137(unsigned int skull_id) {
 		v2 = sub_5343F();
 		sub_22DEA4(v2, v1);
 		sub_A402C(1.0f, 1.0f, 1.0f, 20);//r, g, b, flash length
-		v3 = *(DWORD*)(tags::get_game_globals() + 308);
+		v3 = *(DWORD*)(tags::get_matg_globals_ptr() + 308);
 		if (v3 != -1) {
 			v4 = v3 + dword_482290;
 			v5 = *(DWORD*)(v4 + 280);
@@ -5079,10 +5127,6 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF5, "Hide %s");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF6, "Play %s");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF7, "Skip %s");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFF02, "Change Server Name");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFF03, "Enter the new name for your lobby.");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFF001, 32 * sizeof(wchar_t), true);
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 1, ">Change Server Name");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0002, "Vehicle Flip Eject");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0003, "Kill Volumes");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0004, "MP Explosion Physics");
@@ -5625,7 +5669,7 @@ void __cdecl sub_3e3ac_CMLTD(int a1, int label_id, wchar_t* rtn_label, int label
 		char* v4 = &tags::get_tag_data()[tags::get_tag_instances()[a1 & 0xFFFF].data_offset];
 
 		sub_3e332(
-			(int)tags::get_game_globals() + 28 * (v3 + 14),
+			(int)tags::get_matg_globals_ptr() + 28 * (v3 + 14),
 			label_id,
 			rtn_label,
 			label_menu_id,//*(WORD*)(v4 + 4 * (v3 + 14) - 40),
