@@ -663,19 +663,20 @@ void SplitFixDeviceReset()
 
 }
 
-void RenderText(void* a1, short* a2, int a3, short a4, short a5, float a6, char* a7)
+void RenderText(int* a1, int* a2, int a3, int a4, int a5, float a6, char* a7)
 {
-	typedef void(__cdecl *tRenderText)(void*, short*, int, short, short, float, char*);
+	typedef void(__cdecl *tRenderText)(int *a1, int*, int, int, int, float, char*);
 	tRenderText pRenderText = h2mod->GetAddress<tRenderText>(0x9975A);
-
+	
 	VertexArray *v = CorrectTextVertex();
 	float c177[4] = { v->verts[0], v->verts[1], v->verts[2], v->verts[3] };
 	float c178[4] = { v->verts[4], v->verts[5], v->verts[6], v->verts[7] };
-
+	
+	
 	if (getRenderingPlayerIndex() == 0)
 	{
 
-
+		
 		if (getSplitType() == vertical_split)
 		{
 			if ((a7[0] == 0x48 && a7[4] == 0x6F && a7[28] == 0x74) // Ho + 28 = t
@@ -692,7 +693,7 @@ void RenderText(void* a1, short* a2, int a3, short a4, short a5, float a6, char*
 
 		}
 
-
+		
 		if (getSplitType() == horizontal_split)
 		{
 			if ((a7[0] == 0x48 && a7[4] == 0x6F && a7[28] == 0x74) // Ho + 28 = t
@@ -751,7 +752,7 @@ void SplitFixVideoInitialize()
 	NopFill(h2mod->GetAddress(0x27D3A9), 2);
 
 
-	//PatchCall(h2mod->GetAddress(0x271ADD), RenderText);
+	PatchCall(h2mod->GetAddress(0x271ADD), RenderText);
 	p_render_geometry = (trender_geometry)DetourFunc(h2mod->GetAddress<BYTE*>(0x1A155C), (BYTE*)render_geometry_hook, 5);
 
 	pCalculateHudPoint = (tCalculateHudPoint)((BYTE*)h2mod->GetAddress(0x223969));

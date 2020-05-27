@@ -15,7 +15,8 @@
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD/Modules//Splitscreen/VideoFixes.h"
+#include "H2MOD/Modules/Splitscreen/VideoFixes.h"
+#include "H2MOD/Modules/Splitscreen/inputfixes.h"
 #include <xinput.h>
 #include <sqrat/include/sqrat.h>
 #include "H2MOD/Modules/Scripting/Squirrel.h"
@@ -1634,15 +1635,15 @@ void __cdecl game_mode_engine_draw_team_indicators()
 }
 
 
-struct controller_input_state
+/*struct controller_input_state
 {
 	BYTE triggers_analog_state[2];
 	BYTE old_triggers_analog_state[2];
 	BYTE triggers_hold_time[2];
 	BYTE button_hold_time[14];
-};
+};*/
 
-
+/*
 void  update_controller_input_hook(BYTE controller_index)
 {
 
@@ -1773,7 +1774,7 @@ LABEL_26:
 
 
 	//return pupdate_controller_input(controller_index);
-}
+}*/
 
 
 
@@ -1783,17 +1784,22 @@ tupdate_input_main_loop pupdate_input_main_loop;
 
 bool __cdecl update_input_main_loop()
 {
+
+	typedef void(__cdecl* tupdate_controller_input)(int);
+	tupdate_controller_input pupdate_controller_input = (tupdate_controller_input)h2mod->GetAddress(0x2E7A4);
+
 	BYTE orig_mouse_bytes[2] =  { 0x74, 0x12 }; // mouse patch 1
 	BYTE orig_mouse_bytes2[2] = { 0x75, 0x05 }; // mouse patch 2
 	BYTE keyboard_bytes[2] = { 0x74, 0x0E }; // keyboard patch 1
 	BYTE orig_mouse_bytes_call[5] = { 0xE8, 0x61, 0xC2, 0xFC, 0xFF };
 
+
 	//DWORD orig_input_buffer = 0x013FE578;
 	DWORD orig_input_buffer = 0x0089E578;
 	DWORD input_buffer_p2 = (orig_input_buffer + 0xB8);
 	
+	WriteValue<BYTE>(h2mod->GetAddress(0x47A5C8), 1);
 
-	
 	WriteValue<DWORD>(h2mod->GetAddress(0x62F4F), input_buffer_p2); // input_buffer + 0xB8
 	WriteValue<BYTE>(h2mod->GetAddress(0x628AF),0); // get_controller_update push 0
 	WriteValue<BYTE>(h2mod->GetAddress(0x62F64), 1); // apply_input to second controller index
@@ -1802,8 +1808,10 @@ bool __cdecl update_input_main_loop()
 	WriteValue<BYTE>(h2mod->GetAddress(0x2F0DF), 0xEB); // Keyboard patch to disable keyboard input.
 	WriteValue<BYTE>(h2mod->GetAddress(0x621ED), 0xEB); // Disable mouse buttons
 	WriteValue<BYTE>(h2mod->GetAddress(0x2E448), 0xEB); // Disable mouse buttons 2
-	//NopFill(h2mod->GetAddress(0x621DA), 5);
+
+
 	pupdate_input_main_loop();
+
 
 	WriteValue<DWORD>(h2mod->GetAddress(0x62F4F), orig_input_buffer); // input_buffer + 0xB8
 	WriteValue<BYTE>(h2mod->GetAddress(0x628AF), 1); // get_controller_update push
@@ -1813,7 +1821,9 @@ bool __cdecl update_input_main_loop()
 	WriteBytes(h2mod->GetAddress(0x2F0DF), &keyboard_bytes, 2); // Keyboard patch to disable keyboard input.
 	WriteValue<BYTE>(h2mod->GetAddress(0x621ED), 0x74); // re-enable mouse.
 	WriteValue<BYTE>(h2mod->GetAddress(0x2E448), 0x74); // re-enable mouse.
-	//WriteBytes(h2mod->GetAddress(0x621DA), &orig_mouse_bytes_call, 5);
+	
+
+	
 	pupdate_input_main_loop();
 
 	return 1;
@@ -2584,7 +2594,7 @@ void H2MOD::ApplyHooks() {
 		WritePointer(h2mod->GetAddress<BYTE*>(0x1F0B80), player_remove_packet_handler);
 		*/
 
-		SplitFixVideoInitialize();
+		//SplitFixVideoInitialize();
 		//rasterizer_ray_of_buddha  +0x4681B6
 		//patchy_fog_disable +0x41F6AB
 		//PatchWinAPICall(h2mod->GetAddress(0x26227D), StrechRect_BloomHook_H2mod);
@@ -2637,17 +2647,11 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
 		PatchCall(h2mod->GetAddress(0x226702), game_mode_engine_draw_team_indicators);
-			
-		
-	
 
 		pvariant_list_button_handler = (tvariant_list_button_handler)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x251B7E), (BYTE*)variant_list_button_handler, 13);
 		pLoadSaveGame = (tLoadSaveGame)DetourFunc(h2mod->GetAddress<BYTE*>(0x9B0D0), (BYTE*)LoadSaveGameHook, 13);
 		pReadVariantToMemory = (tReadVariantToMemory)DetourFunc(h2mod->GetAddress<BYTE*>(0x46596), (BYTE*)ReadVariantToMemory, 13);
-				
-
-
-
+		
 		//Codecave(h2mod->GetAddress(0x0262274), StrechRect_BloomHook, 3);
 		//NopFill(h2mod->GetAddress(0x262282), 3);
 		//pStrechRect_Return = h2mod->GetAddress(0x262283);
@@ -2667,10 +2671,12 @@ void H2MOD::ApplyHooks() {
 		WriteValue<XUID>(h2mod->GetAddress(0x51A6E1), 0123456);
 		WriteValue<wchar_t*>(h2mod->GetAddress(0x51A6F0), L"COOP_GAMER");
 		*/
-
+		
+		
+		InitializeInputFixes();
 		/* COOP input*/
-		pupdate_input_main_loop = (tupdate_input_main_loop)h2mod->GetAddress(0x628A8);
-		PatchCall(h2mod->GetAddress(0x39B82), update_input_main_loop);
+		//pupdate_input_main_loop = (tupdate_input_main_loop)h2mod->GetAddress(0x628A8);
+		//PatchCall(h2mod->GetAddress(0x39B82), update_input_main_loop);
 
 		//PatchCall(h2mod->GetAddress(0x62F65), update_controller_input_to_buffer);
 		//pupdate_controller_input_to_buffer = (tupdate_controller_input_to_buffer)DetourFunc(h2mod->GetAddress<BYTE*>(0x61EA2),(BYTE*)update_controller_input_to_buffer,15);
@@ -2680,6 +2686,7 @@ void H2MOD::ApplyHooks() {
 		//PatchCall(h2mod->GetAddress(0x91877), get_controller_input_data_hook);
 
 		//pget_controller_input_data = (tget_controller_input_data)DetourFunc(h2mod->GetAddress<BYTE*>(0x2F433), (BYTE*)get_controller_input_data_hook, 11);
+		
 		//PatchCall(h2mod->GetAddress(0x2FBD2), update_controller_input_hook);
 
 		//pupdate_controller_input = (tupdate_controller_input)DetourFunc(h2mod->GetAddress<BYTE*>(0x2E7E3), (BYTE*)update_controller_input_hook, 22);
@@ -2688,8 +2695,8 @@ void H2MOD::ApplyHooks() {
 			An attempt at adding an additional variant/game engine category (E.x. Slayer,KOTH, Infection).
 			This will work when Himanshu gets meta injection for creating wigt panels working.
 		*/
-		//pConVariantCategoryList = (tConVariantCategoryList)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x249D5E), (BYTE*)ConVariantCategoryList, 13);
-		//pc_game_engine_category_list_create_labels = (tc_game_engine_category_list_create_labels)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x2497D8), (BYTE*)c_game_engine_category_list_create_labels, 9);
+		pConVariantCategoryList = (tConVariantCategoryList)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x249D5E), (BYTE*)ConVariantCategoryList, 13);
+		pc_game_engine_category_list_create_labels = (tc_game_engine_category_list_create_labels)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x2497D8), (BYTE*)c_game_engine_category_list_create_labels, 9);
 		
 		//Hooked to fix custom map images.
 		Codecave(GetAddress(0x593F0), load_map_data_for_display,0);

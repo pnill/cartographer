@@ -319,6 +319,7 @@
     <ClInclude Include="XLive\XUser\XUserProperty.h" />
     <ClInclude Include="XLive\XStorage\XStorage.h" />
     <ClInclude Include="H2MOD\Modules\Splitscreen\VideoFixes.h" />
+    <ClInclude Include="H2MOD\Modules\Splitscreen\inputfixes.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

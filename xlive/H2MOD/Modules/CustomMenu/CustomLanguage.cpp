@@ -644,7 +644,7 @@ static void overrideCoreH2Labels() {
 		add_custom_label(lang, 0x000003fd, 0x09000284, "ONLINE");
 		add_custom_label(lang, 0x000003fd, 0x05000986, "CARTOGRAPHER");
 		add_custom_label(lang, 0x00000718, 0x0E0005D9, "Extra Game Settings...");
-		add_custom_label(lang, 0x000005c2, 0x0E0006D9, "Yoshi's gay");
+		add_custom_label(lang, 0x000005c2, 0x0E0006D9, "Split-Screen");
 	}
 } 
 
