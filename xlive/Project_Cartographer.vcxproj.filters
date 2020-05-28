@@ -88,6 +88,7 @@
     <ClCompile Include="XLive\XStorage\XStorage.cpp" />
     <ClCompile Include="H2MOD\Modules\Splitscreen\VideoFixes.cpp" />
     <ClCompile Include="H2MOD\Modules\Splitscreen\InputFixes.cpp" />
+    <ClCompile Include="H2MOD\Modules\Splitscreen\SplitScreenCommon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -320,6 +321,7 @@
     <ClInclude Include="XLive\XStorage\XStorage.h" />
     <ClInclude Include="H2MOD\Modules\Splitscreen\VideoFixes.h" />
     <ClInclude Include="H2MOD\Modules\Splitscreen\inputfixes.h" />
+    <ClInclude Include="H2MOD\Modules\Splitscreen\SplitScreenCommon.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

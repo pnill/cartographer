@@ -1,59 +1,12 @@
 #include "H2MOD.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "SplitScreenCommon.h"
+#include "VideoFixes.h"
 #include "Util/Hooks/Hook.h"
 #include <vector>
 
 std::vector<IDirect3DSurface9*> backbuffer_surfaces;
 
-struct s_video_settings
-{
-	DWORD DisplayMode;
-	DWORD AspectRatio;
-	DWORD ScreenResX;
-	DWORD ScreenResY;
-	DWORD RefreshRate;
-	DWORD ResArrayIndex;
-	DWORD Brightness;
-	DWORD Gamma;
-	DWORD AntiAliasing;
-	DWORD HUDSize;
-	DWORD SafeArea;
-	DWORD LevelOfDetail;
-};
-
-enum split_type {
-	horizontal_split = 1,
-	vertical_split = 2
-};
-
-
-enum render_geometry_type
-{
-	texture_accumulate = 0x1,
-	overlay = 0x2,
-	lightmap_indirect = 0x3,
-	lightmap_specular = 0x4,
-	spherical_harmonics_PRT = 0x5,
-	water_alpha_masks = 0x6,
-	selfillumination = 0x7,
-	env_map = 0x8,
-	stencil_shadows = 0x9,
-	shadow_buffer_generate = 0xA,
-	shadow_buffer_apply = 0xB,
-	lightaccum_diffuse = 0xC,
-	lightaccum_specular = 0xD,
-	lightaccum_albedo = 0xE,
-	transparent = 0xF,
-	fog = 0x10,
-	selfibloomination = 0x11,
-	active_camo = 0x12,
-	active_camo_stencil_modulate = 0x13,
-	decal = 0x14,
-	hologram = 0x15,
-	error_report = 0x16,
-	debug_view = 0x17,
-	hud = 0x18,
-};
 
 typedef void(__cdecl* tdraw_motion_sensor_update)(float *arg0, float a2);
 tdraw_motion_sensor_update pdraw_motion_sensor_update;
@@ -73,11 +26,6 @@ tCalculateHudPoint pCalculateHudPoint;
 bool render_geo_texture = true;
 bool rendering_geo = false;
 IDirect3DSurface9* custom_depth;
-
-bool isSplitScreen()
-{
-	return *(int*)h2mod->GetAddress(0x4E6974) > 1;
-}
 
 int getRenderingPlayerIndex()
 {
@@ -104,6 +52,10 @@ struct VertexArray
 	float verts[5* 4];
 };
 
+
+/*
+Used for correcting the vertex shader constants.
+*/
 VertexArray* CorrectVertexForRes()
 {
 	typedef bool(__thiscall* tCorrectVertexRes)(void*,int, void*, int);
@@ -135,6 +87,9 @@ VertexArray* CorrectVertexForRes()
 	return v;
 }
 
+/*
+	Used for correcting the vertex shader constants for Text specifically.
+*/
 VertexArray* CorrectTextVertex()
 {
 	typedef bool(__thiscall* tCorrectVertexRes)(void*, int, void*, int);
@@ -236,6 +191,9 @@ void __cdecl h_rasterizer_set_target(signed __int16 a1, __int16 a2, char a3)
 	return;
 }
 
+/*
+	Used to reduce code repetition, was doing the same thing over and over again, this allows just calling this function to do the calculations but will need to be modified if there's ever more than 2 players.
+*/
 RECT* GetSplitFixedRect()
 {
 	RECT sRect;
@@ -532,6 +490,10 @@ short orig_value3 = 0;
 short orig_value4 = 0;
 
 // PatchCall on hud rendering only.
+/*
+	When HUD elements are rendered this function is responsible for calculating Anchor points for screen positioning.
+	The first player's vertex constants appear to be fine while the first player's vertex constants aren't, so we update them for the first player and only adjust positioning for the second.
+*/
 void __cdecl CalculateHudPoint(int arg0, float *x)
 {
 	if (isSplitScreen())
@@ -605,6 +567,10 @@ void __cdecl CalculateHudPoint(int arg0, float *x)
 	return pCalculateHudPoint(arg0, x);
 }
 
+/*
+	We're still not sure what this function is responsible for doing but it was causing odd issues with the way specific things were being displayed on the screen,
+	It's possible it's related to being on/in a vehicle.
+*/
 int GetSlavePlayer(int playerIndex)
 {
 	if(isSplitScreen())
@@ -614,6 +580,11 @@ int GetSlavePlayer(int playerIndex)
 	return -1;
 }
 
+
+/*
+	During the rasterizer initialization we need to create a depth buffer for the additional player to render depth into.
+	TODO(PermaNull): Additional research will most likely be needed if support is added for more than 2 players.
+*/
 typedef char(__cdecl *trasterizer_secondary_targets_initialize)();
 trasterizer_secondary_targets_initialize prasterizer_secondary_targets_initialize;
 
@@ -626,6 +597,10 @@ bool rasterizer_secondary_targets_initialize()
 }
 
 
+/*
+	Draw the split-screen separation line in the appropriate place.
+	TODO(PermaNull): Support more than 2 screens.
+*/
 void DrawSplitScreenLine()
 {
 	typedef void(__cdecl* tdrawRectangle)(short* points,int rect_color);
@@ -654,6 +629,9 @@ void DrawSplitScreenLine()
 
 }
 
+/*
+	Anything custom we've introduced we need to release on the device reset or the d3d device will fail to reset causing the rendering to seize.
+*/
 void SplitFixDeviceReset()
 {
 	
@@ -663,6 +641,12 @@ void SplitFixDeviceReset()
 
 }
 
+/*
+	Hooks the rendering of text to the screen in order to fix the text size when playing in split-screen.
+
+	TODO(PermaNull): Create an array of string IDs to reference against, 
+	create a global bool to check against within this function when the specific string IDs are loaded to ensure we're not manipulating non-broken strings.
+*/
 void RenderText(int* a1, int* a2, int a3, int a4, int a5, float a6, char* a7)
 {
 	typedef void(__cdecl *tRenderText)(int *a1, int*, int, int, int, float, char*);

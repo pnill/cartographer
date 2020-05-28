@@ -278,6 +278,7 @@
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="H2MOD\Modules\Scripting\Squirrel.cpp" />
     <ClCompile Include="H2MOD\Modules\Splitscreen\InputFixes.cpp" />
+    <ClCompile Include="H2MOD\Modules\Splitscreen\SplitScreenCommon.cpp" />
     <ClCompile Include="H2MOD\Modules\Splitscreen\VideoFixes.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\XboxLiveTaskProgress.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
@@ -493,6 +494,7 @@
     <ClInclude Include="H2MOD\Modules\Scripting\Squirrel.h" />
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h" />
     <ClInclude Include="H2MOD\Modules\Splitscreen\inputfixes.h" />
+    <ClInclude Include="H2MOD\Modules\Splitscreen\SplitScreenCommon.h" />
     <ClInclude Include="H2MOD\Modules\Splitscreen\VideoFixes.h" />
     <ClInclude Include="H2MOD\Modules\UI\XboxLiveTaskProgress.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
