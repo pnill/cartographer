@@ -1,9 +1,10 @@
 #pragma once
 
 #include "Blam\Engine\Players\Players.h"
+#include "..\NetworkChannel\NetworkChannel.h"
 #include "..\NetworkObserver\NetworkObserver.h"
 
-enum eNetwork_session_state : signed int
+enum e_network_session_state : signed int
 {
 	network_session_state_none,
 	network_session_state_peer_joining,
@@ -18,7 +19,7 @@ enum eNetwork_session_state : signed int
 	network_session_state_unk_2
 };
 
-enum eMap_status : int
+enum e_map_status : int
 {
 	unk_map_stats,
 	map_unavailable,
@@ -35,7 +36,7 @@ struct peer_information
 	BYTE gap_24[4];
 	wchar_t name[16];
 	wchar_t peer_session_name[32];
-	eMap_status map_status;
+	e_map_status map_status;
 	unsigned int map_progress_percentage;
 	char field_70;
 	BYTE gap_71[3];
@@ -182,7 +183,7 @@ struct network_session
 	session_parameters parameters_2;
 	DWORD local_peer_index;
 	peer_observer_channel peer_observer_channels[17];
-	eNetwork_session_state local_session_state;
+	e_network_session_state local_session_state;
 	DWORD time_unk_2;
 	DWORD time_unk_3;
 	DWORD time_unk;
@@ -248,7 +249,7 @@ namespace NetworkSession
 	network_session* getNetworkSessions();
 	network_session* getCurrentNetworkSession();
 	bool getCurrentNetworkSession(network_session** a1);
-	eNetwork_session_state getLocalSessionState();
+	e_network_session_state getLocalSessionState();
 	bool localPeerIsSessionHost();
 	signed int getPeerIndexFromNetworkAddress(network_address* addr);
 	char getMapFileLocation(wchar_t* buffer, size_t size);

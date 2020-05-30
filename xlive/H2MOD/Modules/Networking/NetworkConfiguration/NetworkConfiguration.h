@@ -1,5 +1,11 @@
 #pragma once
 
+// enables/disables LIVE netcode, so we can use the LIVE serverlist
+#define USE_LIVE_NETCODE 1
+
+#define DEFAULT_NETWORK_HEAP_SIZE 1048576
+#define INCREASED_NETWORK_HEAP_SIZE 10485760
+
 struct network_configuration
 {
 	DWORD field_0;

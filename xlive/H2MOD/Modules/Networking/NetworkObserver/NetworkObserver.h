@@ -13,7 +13,7 @@ struct network_address
 	short address_type;
 };
 
-struct qosinfo
+struct qos_info
 {
 	DWORD cProbesXmit;
 	DWORD cProbesRecv;
@@ -25,7 +25,7 @@ struct qosinfo
 	DWORD pbData;
 };
 
-struct __declspec(align(8)) observer
+struct __declspec(align(8)) observer_channel
 {
 	DWORD unk_state;
 	DWORD field_4;
@@ -46,7 +46,7 @@ struct __declspec(align(8)) observer
 	DWORD field_58;
 	network_address address;
 	DWORD qos_probe_datum;
-	qosinfo field_74;
+	qos_info field_74;
 	DWORD field_94;
 	DWORD field_98;
 	DWORD field_9C;
@@ -131,14 +131,14 @@ struct __declspec(align(8)) observer
 	DWORD field_734;
 	long long field_738;
 };
-static_assert(sizeof(observer) == 0x740, "Invalid observer size");
+static_assert(sizeof(observer_channel) == 0x740, "Invalid observer size");
 
 struct __declspec(align(8)) network_observer
 {
-	DWORD field_0;
-	DWORD network_link;
-	BYTE* network_message_gateway;
-	DWORD message_types;
+	void* network_observer_vtbl; // vtable at the start
+	void* network_link;
+	void* network_message_gateway;
+	void* message_types;
 	network_configuration* network_configuration;
 	int *field_14;
 	BYTE gap_18[8];
@@ -152,7 +152,7 @@ struct __declspec(align(8)) network_observer
 	BYTE gap_68[12];
 	DWORD field_74;
 	BYTE gap_78[8];
-	observer observers[16];
+	observer_channel observers[16];
 	BYTE network_obeserver_enabled;
 	char field_7481;
 	int field_7484;
@@ -188,7 +188,13 @@ struct __declspec(align(8)) network_observer
 	DWORD field_75C0;
 	DWORD field_75C4;
 
+	enum e_network_message_send_protocol
+	{
+		in_band,
+		out_of_band
+	};
+
 	int getObserverState(int observerIndex) { return observers[observerIndex].unk_state; };
-	void sendNetworkMessage(int unk_index, int observer_index, bool send_out_of_band, int type, int size, void* data);
+	void sendNetworkMessage(int unk_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data);
 };
-static_assert(sizeof(network_observer) == 0x75C8, "Invalid network_observer size");
+static_assert(sizeof(network_observer) == 0x75C8, "network_observer size != 30152");

@@ -7,8 +7,6 @@
 
 // LIVE netcode research
 
-#define USE_LIVE_NETCODE 1
-
 network_configuration* g_network_configuration;
 void __cdecl InitializeConfiguration()
 {
@@ -167,7 +165,7 @@ void NetworkConfiguration::ApplyPatches()
 	NopFill(h2mod->GetAddress(0x1BDF1D, 0x1B7DF7), 18);
 	
 	// increase the network heap size
-	WriteValue<DWORD>(h2mod->GetAddress(0x1ACCC8, 0x1ACE96) + 6, 10485760); // original H2v: 1048576, MCC: 1048576
+	WriteValue<DWORD>(h2mod->GetAddress(0x1ACCC8, 0x1ACE96) + 6, INCREASED_NETWORK_HEAP_SIZE); // original H2v: 1048576, MCC: 1048576
 #else
 	// disables LIVE netcode
 	WriteValue<BYTE>(h2mod->GetAddress(0x1B555B, 0x1A92B9) + 1, 0);
