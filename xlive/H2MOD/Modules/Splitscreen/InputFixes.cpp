@@ -29,10 +29,10 @@ tget_time_passed_since_last_input get_time_passed_since_last_input;
 typedef int(__cdecl* tupdate_all_button_states)(BYTE*,WORD*,BYTE*,char,int);
 tupdate_all_button_states update_all_button_states;
 
-typedef char(__cdecl* tget_unk_biped_data)(short);
+typedef char(__cdecl* tget_unk_biped_data)(unsigned long);
 tget_unk_biped_data get_unk_biped_data;
 
-typedef char(__cdecl* tget_unk_biped_data2)(short);
+typedef char(__cdecl* tget_unk_biped_data2)(unsigned long);
 tget_unk_biped_data2 get_unk_biped_data2;
 
 typedef char(__cdecl* tget_vehicle_input_data)();
@@ -209,6 +209,18 @@ int __stdcall get_controller_index(int controller_index)
 	return controller_index;
 }
 
+#pragma optimize( "", off )
+
+int c2p(int controller_index)
+{
+	__asm {
+		mov eax,controller_index
+	}
+
+	return controller2player();
+}
+#pragma optimize( "", on )
+
 float process_mouse_cord_input(int last_time_button_state_read, float mouse_input_read,keybind_parent *kbp)
 {
 	float acceleration = 0;
@@ -294,6 +306,7 @@ int process_mouse_input(int mkey, keybind_parent* kbp, int last_time_button_stat
 
 	return ret;
 }
+
 
 int __cdecl update_player_input_buffer(int controllerIndex, keybind_parent* kbp, controller_input_state* button_state_arrayptr, control_float_double *a5, control_float_double* a6, inputBuffer* ib)
 {
@@ -607,8 +620,10 @@ int __cdecl update_player_input_buffer(int controllerIndex, keybind_parent* kbp,
 						{
 							BYTE keyboard_state = get_keyboard_states(key_code) > kbp->base[0].action_bind[i].device[dindex].unknown;
 
-							get_controller_index(controllerIndex);
-							int pIndex = controller2player();
+							//get_controller_index(controllerIndex);
+							//int pIndex = controller2player();
+							int pIndex = c2p(controllerIndex);
+
 							Player* game_state_player = (Player*)&game_state_players->datum[pIndex];
 
 							if (!keyboard_state)
@@ -696,9 +711,11 @@ int __cdecl update_player_input_buffer(int controllerIndex, keybind_parent* kbp,
 			}
 		}
 
-		get_controller_index(controllerIndex);
-		int playerindex = controller2player();
-		int unitDatum = -1;
+		//get_controller_index(controllerIndex);
+		//int playerindex = controller2player();
+		int playerindex = c2p(controllerIndex);
+
+		unsigned long unitDatum = -1;
 
 		if (playerindex != -1)
 		{
@@ -711,82 +728,84 @@ int __cdecl update_player_input_buffer(int controllerIndex, keybind_parent* kbp,
 		int _action_index = -1;
 		int __action_index = -1;
 
-
-		if (kbp->base[0].N01E30346 && !kbp->base[0].N01E30340 && unitDatum != -1 && get_unk_biped_data2(unitDatum)) // seems to be an is dual wielding check.
-		{
-			if (get_unk_biped_data(unitDatum))
-			{
-				action_index = rt_button2;
-			}
-			else
-			{
-				action_index = get_unk_biped_data2(unitDatum) != 0 ? rt_button : lmb_button;
-			}
-
-			float old_pressure = kbp->input_state[action_index].Pressure;
-			BYTE old_holdtime = kbp->input_state[action_index].hold_time1;
-
-			_action_index = get_unk_biped_data(unitDatum) != 0 ? lt_button2 : lt_button;
-
-			int action_index2 = 0;
-			if (get_unk_biped_data(unitDatum))
-			{
-				action_index2 = rt_button2;
-			}
-			else
-			{
-				action_index2 = get_unk_biped_data2(unitDatum) != 0 ? rt_button : lmb_button;
-
-			}
-
-			kbp->input_state[action_index2].Pressure = kbp->input_state[_action_index].Pressure;
-			kbp->input_state[action_index2].hold_time1 = kbp->input_state[_action_index].hold_time1;
-
-			int __action_index = get_unk_biped_data(unitDatum) != 0 ? lt_button2 : lt_button;
-			kbp->input_state[__action_index].Pressure = old_pressure;
-			kbp->input_state[__action_index].hold_time1 = old_holdtime;
-		}
-
-
-		for (int action = 0; action < button_walkf; action++) // button_walkf is the size of the structs 0x2D.
-		{
-			ib->bhold_time[action] = kbp->input_state[action].hold_time1; // copy hold_time byte into input_buffer
-			ib->whold_time[action] = kbp->input_state[action].hold_time2; // copy hold_time word into input_buffer
-		}
-
 		bool swap_actions = false;
-		bool lmb_updated = false;
-		if (unitDatum == -1)
+
+		if (unitDatum != -1)
 		{
-			action_index_ = lmb_button;
-			addDebugText("action_index = lmb_button - unitDatum == -1");
-			ib->LMB_orRTrigger = kbp->input_state[action_index_].Pressure;
-			lmb_updated = true;
-
-		}
-
-		if (lmb_updated == false)
-		{
-
-			if (get_unk_biped_data(unitDatum))
+			if (kbp->base[0].N01E30346 && !kbp->base[0].N01E30340 && get_unk_biped_data2(unitDatum)) // seems to be an is dual wielding check.
 			{
-				action_index_ = rt_button;
-				ib->LMB_orRTrigger = kbp->input_state[action_index_].Pressure;
-			}
-			else {
-				if (get_unk_biped_data2(unitDatum) == 0)
+				if (get_unk_biped_data(unitDatum))
 				{
-					action_index_ = lmb_button;
+					action_index = rt_button2;
 				}
 				else
 				{
-					action_index_ = rt_button;
+					action_index = get_unk_biped_data2(unitDatum) != 0 ? rt_button : lmb_button;
 				}
 
-				swap_actions = get_unk_biped_data2(unitDatum) == 0;
-				ib->LMB_orRTrigger = kbp->input_state[action_index_].Pressure;
+				float old_pressure = kbp->input_state[action_index].Pressure;
+				BYTE old_holdtime = kbp->input_state[action_index].hold_time1;
+
+				_action_index = get_unk_biped_data(unitDatum) != 0 ? lt_button2 : lt_button;
+
+				int action_index2 = 0;
+				if (get_unk_biped_data(unitDatum))
+				{
+					action_index2 = rt_button2;
+				}
+				else
+				{
+					action_index2 = get_unk_biped_data2(unitDatum) != 0 ? rt_button : lmb_button;
+
+				}
+
+				kbp->input_state[action_index2].Pressure = kbp->input_state[_action_index].Pressure;
+				kbp->input_state[action_index2].hold_time1 = kbp->input_state[_action_index].hold_time1;
+
+				int __action_index = get_unk_biped_data(unitDatum) != 0 ? lt_button2 : lt_button;
+				kbp->input_state[__action_index].Pressure = old_pressure;
+				kbp->input_state[__action_index].hold_time1 = old_holdtime;
 			}
 
+
+			for (int action = 0; action < button_walkf; action++) // button_walkf is the size of the structs 0x2D.
+			{
+				ib->bhold_time[action] = kbp->input_state[action].hold_time1; // copy hold_time byte into input_buffer
+				ib->whold_time[action] = kbp->input_state[action].hold_time2; // copy hold_time word into input_buffer
+			}
+
+			bool lmb_updated = false;
+			if (unitDatum == -1)
+			{
+				action_index_ = lmb_button;
+				ib->LMB_orRTrigger = kbp->input_state[action_index_].Pressure;
+				lmb_updated = true;
+
+			}
+
+			if (lmb_updated == false)
+			{
+
+				if (get_unk_biped_data(unitDatum))
+				{
+					action_index_ = rt_button;
+					ib->LMB_orRTrigger = kbp->input_state[action_index_].Pressure;
+				}
+				else {
+					if (get_unk_biped_data2(unitDatum) == 0)
+					{
+						action_index_ = lmb_button;
+					}
+					else
+					{
+						action_index_ = rt_button;
+					}
+
+					swap_actions = get_unk_biped_data2(unitDatum) == 0;
+					ib->LMB_orRTrigger = kbp->input_state[action_index_].Pressure;
+				}
+
+			}
 		}
 
 		int nAction = 0;
@@ -802,6 +821,7 @@ int __cdecl update_player_input_buffer(int controllerIndex, keybind_parent* kbp,
 		{
 			get_controller_index(controllerIndex); // load result to eax
 			isMouseInverted = get_vehicle_input_data(); // reads from eax.
+
 		}
 
 		bool isControllerInverted = kbp->base[0].N01DA8A14;
@@ -839,9 +859,10 @@ int __cdecl update_player_input_buffer(int controllerIndex, keybind_parent* kbp,
 			ib->Controller_LookUpDown1 = controller_look_input;
 		}
 	}
+	return 0;
 }
 	
-	
+
 void InitializeInputFixes()
 {
 	datum_try_and_get = h2mod->GetAddress<tdatum_try_and_get>(0x6639B);

@@ -57,6 +57,8 @@ enum e_network_message_types
 	request_map_filename,
 	custom_map_filename,
 	team_change,
+	request_sq_script,
+	send_sq_script,
 
 	end
 };
@@ -115,6 +117,8 @@ static const char* network_message_name[] = {
 	"request_map_filename"
 	"map_file_name"
 	"team_change"
+	"request_sq_script"
+	"send_sq_script"
 };
 
 struct __declspec(align(8)) s_custom_map_filename
@@ -127,9 +131,19 @@ struct s_request_map_filename
 	XUID user_identifier;
 };
 
+struct s_request_script
+{
+	XUID user_identifier;
+};
+
 struct s_team_change
 {
 	DWORD team_index;
+};
+
+struct s_send_script {
+	int script_size;
+	char script_data[];
 };
 
 #pragma pack(push, 1)
@@ -156,3 +170,5 @@ namespace CustomPackets
 	void sendRequestMapFilename();
 	void sendTeamChange(int peerIndex, int teamIndex);
 }
+
+#define parameters_update_additional_data_size 5

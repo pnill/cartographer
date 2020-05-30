@@ -249,6 +249,9 @@ signed int __cdecl object_new_hook(ObjectPlacementData* new_object)
 }
 
 
+
+
+
 typedef void(__stdcall *tc_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, bitstream* stream);
 tc_simulation_unit_entity_definition_creation_encode pc_simulation_unit_entity_definition_encode;
 
@@ -1766,13 +1769,13 @@ void H2MOD::ApplyHooks() {
 			This was implemented specifically for COOP but can be used to do other things such as implementing a proper raw-mouse input fix.
 			TODO(PermaNull): Implement the rest of the input systems to allow for more than 2 players and remove the current restrictions.
 		*/
-		InitializeInputFixes();	
+		//InitializeInputFixes();	
 
 		/*
 		Fix video, this should only be turned on when running split-screen,
 		TODO(PermaNull): Most likely will keep all the hooks active but call original functions if not in COOP/split-screen.
 		*/
-		SplitFixVideoInitialize();
+		//SplitFixVideoInitialize();
 #pragma endregion
 
 

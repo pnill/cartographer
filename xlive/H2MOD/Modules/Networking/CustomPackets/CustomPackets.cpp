@@ -7,8 +7,21 @@
 #include "..\Memory\bitstream.h"
 #include "..\..\MapManager\MapManager.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\Scripting\ScriptDownloader.h"
 
 char g_network_message_types[e_network_message_types::end * 32];
+
+typedef void(__stdcall* tobserver_channel_send_message)(network_observer* pnetwork_observer, int unk_index, int observer_index, bool send_out_of_band, e_network_message_types type, int size, char* buffer);
+tobserver_channel_send_message p_observer_channel_send_message;
+
+void __stdcall observer_channel_send_message(network_observer* pnetwork_observer, int unk_index, int observer_index, bool send_out_of_band, e_network_message_types type, int size, char* buffer)
+{
+	if (type == e_network_message_types::parameters_update)
+		size += parameters_update_additional_data_size;
+
+	return p_observer_channel_send_message(pnetwork_observer, unk_index, observer_index, send_out_of_band, type, size, buffer);
+}
+
 
 void register_packet_impl(void *packetObject, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* a9)
 {
@@ -79,6 +92,13 @@ void register_custom_packets(void* network_messages)
 
 	register_packet_impl(network_messages, team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
 		(void*)encode_team_change_packet, (void*)decode_team_change_packet, NULL);
+
+	register_packet_impl(network_messages, request_sq_script, "request-sq-script", 0, sizeof(s_request_script), sizeof(s_request_script),
+		(void*)sqScriptDownloader::encode_sq_request_packet, (void*)sqScriptDownloader::decode_sq_request_packet, NULL);
+
+	register_packet_impl(network_messages, send_sq_script, "send-sq-script", 0, 4, 65535, (void*)sqScriptDownloader::encode_sq_send_packet,(void*)sqScriptDownloader::decode_sq_send_packet, NULL);
+
+
 }
 
 typedef void(__stdcall *handle_out_of_band_message)(void *thisx, network_address* address, int message_type, int a4, void* packet);
@@ -181,6 +201,39 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 	switch (message_type)
 	{
+	case request_sq_script:
+	{
+		s_request_script *received_data = (s_request_script*)packet;
+		LOG_INFO_NETWORK("[H2MOD-CustomPackets] received on handle_channel_message_hook request-script from XUID: {}", received_data->user_identifier);
+		if (*(int*)(network_channel + 0x54) == 5 && getNetworkAddressFromNetworkChannel(network_channel, &addr))
+		{
+			LOG_TRACE_NETWORK(" - network address: {:x}", ntohl(addr.address.ipv4));
+
+			int peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
+			network_session* session = NetworkSession::getCurrentNetworkSession();
+
+			if (peer_index != -1 && peer_index != session->local_peer_index)
+			{
+				std::string scriptData = sqScriptDownloader::sq_send_script_fill_data();
+				if (!scriptData.empty())
+				{
+					network_observer* observer = session->network_observer_ptr;
+					peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peer_index);
+					
+					size_t data_size = sizeof(s_send_script) + scriptData.size() + 1;
+					s_send_script *data = (s_send_script*)malloc(data_size);
+					ZeroMemory(data, sizeof(s_send_script) + scriptData.size());
+					data->script_size = scriptData.size();
+					strcpy(&data->script_data[0], scriptData.c_str());
+					data->script_data[scriptData.size() + 1] = 0;
+
+					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, send_sq_script, data_size, data);
+				}
+
+			}
+		}
+		return;
+	}
 	case request_map_filename:
 	{
 		s_request_map_filename* received_data = (s_request_map_filename*)packet;
@@ -228,6 +281,17 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] received on handle_out_of_band_message map_file_name: {}", received_data->file_name);
 		}
 		
+		return;
+	}
+
+	case send_sq_script:
+	{
+		if (*(int*)network_channel + 0x54 == 5)
+		{
+			s_send_script* received_data = (s_send_script*)packet;
+			LOG_INFO_FUNC("[H2MOD-CustomPackets] script_size: {}", received_data->script_size);
+			LOG_INFO_FUNC("[H2MOD-CustomPackets] script: {}",(char*)&received_data->script_data);
+		}
 		return;
 	}
 
@@ -301,6 +365,8 @@ void CustomPackets::ApplyGamePatches()
 	WriteValue<int>(h2mod->GetAddress(0x1E81C6, 0x1CA189), e_network_message_types::end * 32);
 
 	PatchCall(h2mod->GetAddress(0x1B5196, 0x1A8EF4), register_custom_packets);
+
+	p_observer_channel_send_message = (tobserver_channel_send_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1BED40, 0x1B8C1A), (BYTE*)observer_channel_send_message, 10);
 
 	p_handle_out_of_band_message = (handle_out_of_band_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E907B, 0x1CB03B), (BYTE*)handle_out_of_band_message_hook, 8);
 	p_handle_channel_message = (handle_channel_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E929C, 0x1CB25C), (BYTE*)handle_channel_message_hook, 8);

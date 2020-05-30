@@ -5,6 +5,9 @@
 #include "H2MOD.h"
 #include "Globals.h"
 
+bool g_sqScriptLoaded = false;
+int g_sqScriptId = 0;
+char* g_sqScriptPath = NULL;
 
 void sqAddDebugText(char* Msg)
 {
@@ -14,12 +17,56 @@ void sqAddDebugText(char* Msg)
 	addDebugText(dbgMsg.c_str());
 }
 
+static SQInteger _sqstd_aux_printerror(HSQUIRRELVM v)
+{
+	SQPRINTFUNCTION pf = sq_geterrorfunc(v);
+	if (pf) {
+		const SQChar *sErr = 0;
+		if (sq_gettop(v) >= 1) {
+			if (SQ_SUCCEEDED(sq_getstring(v, 2, &sErr))) {
+				pf(v, _SC("\nAN ERROR HAS OCCURRED [%s]\n"), sErr);
+			}
+			else {
+				pf(v, _SC("\nAN ERROR HAS OCCURRED [unknown]\n"));
+			}
+			sqstd_printcallstack(v);
+		}
+	}
+	return 0;
+}
+
+
+void sqPrint(HSQUIRRELVM v, const SQChar* desc, ...)
+{
+	char nDbgMsg[2555];
+	std::string dbMsg;
+	va_list arglist;
+	va_start(arglist, desc);
+	vsprintf(nDbgMsg, desc, arglist);
+	va_end(arglist);
+
+	sqAddDebugText(nDbgMsg);
+
+}
+
+void sqError(HSQUIRRELVM v, const SQChar* desc, ...)
+{
+	char nDbgMsg[2555];
+	std::string dbMsg;
+	va_list arglist;
+	va_start(arglist, desc);
+	vsprintf(nDbgMsg, desc, arglist);
+	va_end(arglist);
+
+	sqAddDebugText(nDbgMsg);
+
+}
 
 void compile_error_handler(HSQUIRRELVM v, const SQChar* desc, const SQChar* source, SQInteger line, SQInteger column)
 {
 	char* dbgMsg = new char[2000];
-	sprintf(dbgMsg, "[Squirrel] - Compiler Error: line: %i, column: %i, desc: %s, source: %s", line, column, desc, source);
-	addDebugText(dbgMsg);
+	sprintf(dbgMsg, "Compiler Error: line: %i, column: %i, desc: %s, source: %s", line, column, desc, source);
+	sqAddDebugText(dbgMsg);
 
 }
 
@@ -34,25 +81,51 @@ void debughook(HSQUIRRELVM vm, SQInteger type, const SQChar *sourcename, SQInteg
 }
 
 
-
+#define SCRAT_USE_EXCEPTIONS
 
 namespace ScriptEngine {
 
+	std::string loaded_script;
+
 	void sqLoadScript(std::string path)
 	{
-		Sqrat::Script varScript;
-		varScript.CompileFile(path.c_str());
-		varScript.Run();
-
+		
+		
 		std::string dbgMsg;
 		dbgMsg.append("[Squirrel] - Loading script: ");
 		dbgMsg.append(path);
 		addDebugText(dbgMsg.c_str());
+
+
+		Sqrat::Script varScript;
+		sq_setprintfunc(Sqrat::DefaultVM::Get(), sqPrint, sqError);
+		sq_enabledebuginfo(Sqrat::DefaultVM::Get(), true);
+		sq_notifyallexceptions(Sqrat::DefaultVM::Get(), true);
+		sq_setcompilererrorhandler(Sqrat::DefaultVM::Get(), compile_error_handler);
+		sq_setnativedebughook(Sqrat::DefaultVM::Get(), debughook);
+		sq_newclosure(Sqrat::DefaultVM::Get(), _sqstd_aux_printerror, 0);
+		sq_seterrorhandler(Sqrat::DefaultVM::Get());
+		sqstd_seterrorhandlers(Sqrat::DefaultVM::Get());
+	
+
+		std::string errMsg;
+		if (varScript.CompileFile(path.c_str(), errMsg))
+		{
+			varScript.Run();
+			g_sqScriptLoaded = true;
+			g_sqScriptId = rand();
+			loaded_script = path;
+		}
+		else
+			sqAddDebugText((char*)errMsg.c_str());
+
 	}
 
 	void sqSessionStart()
 	{
-		BindSquirrel(sq_open(1000));
+		HSQUIRRELVM vm = sq_open(1000);
+
+		BindSquirrel(vm);
 		Sqrat::Script GlobalScript;
 		
 		sq_enabledebuginfo(Sqrat::DefaultVM::Get(), true);
@@ -76,6 +149,7 @@ namespace ScriptEngine {
 		if (sq_getvmstate(Sqrat::DefaultVM::Get()) == SQ_VMSTATE_RUNNING)
 			sq_close(Sqrat::DefaultVM::Get());
 
+		g_sqScriptLoaded = false;
 	}
 
 	void sqOnMapLoad()
@@ -83,7 +157,7 @@ namespace ScriptEngine {
 		Sqrat::Function sqMapLoadFunc = Sqrat::RootTable().GetFunction("OnMapLoad");
 
 		if (!sqMapLoadFunc.IsNull())
-			sqMapLoadFunc.Execute();
+				sqMapLoadFunc.Execute();
 		else
 			addDebugText("[Squirrel] - No OnMapLoad function was found!");
 	}
@@ -91,10 +165,20 @@ namespace ScriptEngine {
 	void sqPrePlayerSpawn(HSQUIRRELVM vm, int unit_datum)
 	{
 		Sqrat::Function sqFunc = Sqrat::RootTable().GetFunction("OnPrePlayerSpawn");
+
 		if (!sqFunc.IsNull())
-			sqFunc.Execute(unit_datum);
-		else
+		{
+			try {
+				sqFunc.Execute(unit_datum);
+			}
+			catch (Sqrat::Exception e)
+			{
+				sqAddDebugText((char*)e.Message().c_str());
+			}
+		}
+		else {
 			addDebugText("[Squirrel] - No OnPrePlayerSpawn function was found!");
+		}
 	}
 
 	void sqPostPlayerSpawn(HSQUIRRELVM vm,int unit_datum)
@@ -218,14 +302,17 @@ BYTE sqGetLocalTeam()
 	return h2mod->get_local_team_index();
 }
 
-BYTE sqGetPlayerTeamFromXUID(long long xuid)
+BYTE sqGetPlayerTeamFromXUID(std::string xuid)
 {
-	return NetworkSession::getPlayerTeamFromXuid(xuid);
+	long long ll = std::stoll(xuid);
+	return NetworkSession::getPlayerTeamFromXuid(ll);
 }
 
-long long sqGetPlayerXUID(int playerIndex)
+std::string sqGetPlayerXUID(int playerIndex)
 {
-	return NetworkSession::getPlayerXuid(playerIndex);
+	return std::to_string(NetworkSession::getPlayerXuid(playerIndex));
+	//std::to_string()
+	//return NetworkSession::getPlayerXuid(playerIndex);
 }
 
 wchar_t* sqGetPlayerNameFromXUID(long long xuid)
@@ -368,6 +455,12 @@ bool sqvalidate_object_datum(int object_datum,int object_validate)
 	return false;
 }
 
+int sqcontroller_2_player(int controller_index)
+{
+	int player_index = h2mod->get_player_datum_index_from_controller_index(controller_index).ToInt();
+	return player_index;
+}
+
 void sqendGame()
 {
 	NetworkSession::endGame();
@@ -442,5 +535,6 @@ void BindSquirrel(HSQUIRRELVM vm)
 	RootTable().Func("playerIsActive", &sqPlayerIsActive);
 	RootTable().Func("getPeerIndex", &sqgetPeerIndex);
 	RootTable().Func("getPlayerTeam", &sqgetPlayerTeam);
+	RootTable().Func("controller2player", &sqcontroller_2_player);
 	RootTable().Func("endGame", &sqendGame);
 }

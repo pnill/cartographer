@@ -276,6 +276,7 @@
     <ClCompile Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
+    <ClCompile Include="H2MOD\Modules\Scripting\ScriptDownloader.cpp" />
     <ClCompile Include="H2MOD\Modules\Scripting\Squirrel.cpp" />
     <ClCompile Include="H2MOD\Modules\Splitscreen\InputFixes.cpp" />
     <ClCompile Include="H2MOD\Modules\Splitscreen\SplitScreenCommon.cpp" />
@@ -491,6 +492,7 @@
     <ClInclude Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
+    <ClInclude Include="H2MOD\Modules\Scripting\ScriptDownloader.h" />
     <ClInclude Include="H2MOD\Modules\Scripting\Squirrel.h" />
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h" />
     <ClInclude Include="H2MOD\Modules\Splitscreen\inputfixes.h" />

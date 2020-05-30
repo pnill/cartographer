@@ -12,8 +12,8 @@ namespace ScriptEngine {
 	void sqPrePlayerSpawn(HSQUIRRELVM vm = NULL, int unit_datum = 0);
 	void sqPostPlayerSpawn(HSQUIRRELVM vm = NULL, int unit_datum = 0);
 	void sqOnMapLoad();
-
 	void sqSessionEnd();
 	void sqSessionStart();
 	void sqLoadScript(std::string);
+	extern std::string loaded_script;
 }

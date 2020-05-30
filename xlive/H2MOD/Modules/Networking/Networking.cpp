@@ -10,11 +10,73 @@
 #include "Memory\bitstream.h"
 #include "CustomPackets\CustomPackets.h"
 #include "NetworkConfiguration\NetworkConfiguration.h"
+#include "H2MOD\Modules\Scripting\ScriptDownloader.h"
 
 extern XSocket* game_network_data_gateway_socket_1000;
 extern XSocket* game_network_message_gateway_socket_1001;
 
 CustomNetwork *network = new CustomNetwork;
+extern bool g_sqScriptLoaded;
+extern int g_sqScriptId;
+extern bool g_sqScriptDownloaded;
+
+typedef void(__cdecl* tparameters_update_encode)(bitstream* stream, int a2, int a3);
+tparameters_update_encode pparameters_update_encode;
+
+void __cdecl parameters_update_encode(bitstream* stream, int a2, int a3)
+{
+	LOG_ERROR_NETWORK("[H2MOD-Network] parameters_update_encode scriptLoadded: {}", g_sqScriptLoaded);
+
+	pparameters_update_encode(stream, a2, a3);
+	stream->data_encode_bool("sqScript-loaded", g_sqScriptLoaded);
+	if (g_sqScriptLoaded)
+		stream->data_encode_integer("sqScript-id", g_sqScriptId, 32);
+
+}
+
+typedef bool(__cdecl* tparameters_update_decode)(bitstream* stream, int a2, int a3);
+tparameters_update_decode pparameters_update_decode;
+
+int last_script_id = 0;
+bool __cdecl parameters_update_decode(bitstream* stream, int a2, int a3)
+{	
+	int script_id = 0;
+	bool ret = pparameters_update_decode(stream, a2, a3);
+	bool script_loaded = stream->data_decode_bool("sqScript-loaded");
+	
+	if(script_loaded == true)
+		script_id = stream->data_decode_integer("sqScript-id", 32);
+	
+	if (script_id != last_script_id && script_loaded == true)
+	{
+		g_sqScriptDownloaded = false;
+		last_script_id = script_id;
+		sqScriptDownloader::StartRequestThread();
+		//send download-script request
+	}
+
+	
+	LOG_ERROR_NETWORK("[H2MOD-Network] parameters_update_decode scriptLoaded:{} - script_id: {}",script_loaded,script_id);
+	return ret;
+}
+
+
+typedef void(__stdcall* t_register_packet_hk)(void *packetObject, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* a9);
+t_register_packet_hk register_packet;
+void __stdcall register_packet_hk(void *packetObject, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* a9)
+{
+	if (type == e_network_message_types::parameters_update)
+	{
+		LOG_ERROR_NETWORK("register_packet_hk() - update parameters_update");
+		write_packet_method = (void*)parameters_update_encode;
+		read_packet_method = (void*)parameters_update_decode;
+		size1 += parameters_update_additional_data_size;
+		size2 += parameters_update_additional_data_size;
+	}
+	register_packet(packetObject, type, name, a4, size1, size2, write_packet_method, read_packet_method, a9);
+}
+
+
 
 void __cdecl request_write(bitstream* stream, int a2, int a3) {
 	stream->data_encode_integer("identifier", *(DWORD *)a3, 32);
@@ -284,6 +346,7 @@ void patchAbNetUpdate()
 	}
 }
 
+
 void applyConnectionPatches()
 {
 	//removeXNetSecurity();
@@ -306,6 +369,16 @@ void applyConnectionPatches()
 void CustomNetwork::applyNetworkHooks() {
 	DWORD serializeParametersUpdatePacketOffset = 0x1EDC41;
 
+	register_packet = (t_register_packet_hk)DetourClassFunc((BYTE*)h2mod->GetAddress(0x1E81D6), (BYTE*)register_packet_hk, 8);
+	//PatchCall(h2mod->GetAddress(0x1EF626), register_parameters_update_hk);
+	pparameters_update_decode = h2mod->GetAddress<tparameters_update_decode>(0x1EE313);
+	pparameters_update_encode = h2mod->GetAddress<tparameters_update_encode>(0x1EDC41);
+
+
+
+	//WriteValue<DWORD>(h2mod->GetAddress(0x1EF612), 0x12CC);
+	//WriteValue<DWORD>(h2mod->GetAddress(0x1EF617), 0x12CC);
+	//pparameters_update_encode = h2mod->GetAddress<tparameters_update_encode>(0x1EDC41);
 	///////////////////////////////////////////////
 	//connection/player packet customizations below
 	///////////////////////////////////////////////

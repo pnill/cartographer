@@ -1273,7 +1273,9 @@ public:
             return;
         }
 
-        SQRESULT result = sq_call(vm, 1, false, ErrorHandling::IsEnabled());
+		SQRESULT result = sq_call(vm, 1, false, true);
+
+        //SQRESULT result = sq_call(vm, 1, false, ErrorHandling::IsEnabled());
         sq_settop(vm, top);
 
         //handle an error: throw the exception

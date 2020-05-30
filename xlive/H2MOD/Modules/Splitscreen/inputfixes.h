@@ -1,10 +1,7 @@
 #pragma once
 
 
-struct keybind_base;
-struct keybind_map;
-struct keybind_parent;
-struct input_states;
+
 
 
 enum device_index {
