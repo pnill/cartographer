@@ -876,7 +876,6 @@ void fix_shaders_nvidia()
 	);
 }
 
-// probably MCC does this because it's 64 bit, but w/e, should work just fine
 int system_get_time()
 {
 	LARGE_INTEGER PerformanceCount;

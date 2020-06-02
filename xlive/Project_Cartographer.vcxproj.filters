@@ -489,9 +489,6 @@
     <ClCompile Include="H2MOD\Modules\ServerConsole\ServerConsole.cpp">
       <Filter>Source Files\H2MOD\Modules\ServerConsole</Filter>
     </ClCompile>
-    <ClCompile Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.cpp">
-      <Filter>Source Files\H2MOD\Modules\Networking\NetworkConfiguration</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp">
       <Filter>Source Files\3rdparty\tinyxml</Filter>
     </ClCompile>
@@ -1063,9 +1060,6 @@
     </ClInclude>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnpreplyparse.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.h">
-      <Filter>Source Files\H2MOD\Modules\Networking\NetworkConfiguration</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h">
       <Filter>Header Files</Filter>
