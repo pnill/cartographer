@@ -534,7 +534,8 @@ void H2MOD::set_unit_biped(Player::Biped biped_type, int playerIndex)
 	if (playerIndex >= 0 && playerIndex < 16)
 		playersIt.get_data_at_index(playerIndex)->properties.profile.player_character_type = biped_type;
 
-	*(BYTE*)(((BYTE*)h2mod->GetAddress(0x977104) + 0x20CC * playerIndex) + 8) = (BYTE)biped_type;
+
+	//*(BYTE*)(((BYTE*)h2mod->GetAddress(0x977104) + 0x20CC * playerIndex) + 8) = (BYTE)biped_type;
 }
 
 BYTE H2MOD::get_unit_team_index(datum unit_datum_index)
@@ -1678,6 +1679,16 @@ void __cdecl game_mode_engine_draw_team_indicators()
 
 	if (h2mod->drawTeamIndicators)
 		p_game_mode_engine_draw_team_indicators();
+}
+
+bool __cdecl game_is_minimized_hook()
+{
+	// if xbox tickrate is set, use the built in frame limiter
+	if (b_XboxTick)
+		return true;
+
+	// otherwise never use this frame limiter
+	return false;
 }
 
 

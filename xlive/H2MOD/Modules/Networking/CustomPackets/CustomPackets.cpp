@@ -180,7 +180,8 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 	{
 		s_request_script *received_data = (s_request_script*)packet;
 		LOG_INFO_NETWORK("[H2MOD-CustomPackets] received on handle_channel_message_hook request-script from XUID: {}", received_data->user_identifier);
-		if (*(int*)(network_channel + 0x54) == 5 && getNetworkAddressFromNetworkChannel(network_channel, &addr))
+		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
+			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 		{
 			LOG_TRACE_NETWORK(" - network address: {:x}", ntohl(addr.address.ipv4));
 
@@ -202,7 +203,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 					strcpy(&data->script_data[0], scriptData.c_str());
 					data->script_data[scriptData.size() + 1] = 0;
 
-					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, send_sq_script, data_size, data);
+					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, send_sq_script, data_size, data);
 
 					free(data);
 				}
@@ -264,7 +265,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 	case send_sq_script: // received script from server
 	{
-		if (*(int*)(network_channel + 0x54) == 5)
+		if(peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
 		{
 			s_send_script* received_data = (s_send_script*)packet;
 			LOG_INFO_FUNC("[H2MOD-CustomPackets] script_size: {}", received_data->script_size);
@@ -346,8 +347,6 @@ void CustomPackets::ApplyGamePatches()
 	WriteValue<int>(h2mod->GetAddress(0x1E81C6, 0x1CA189), e_network_message_types::end * 32);
 
 	PatchCall(h2mod->GetAddress(0x1B5196, 0x1A8EF4), register_custom_packets);
-
-	p_observer_channel_send_message = (tobserver_channel_send_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1BED40, 0x1B8C1A), (BYTE*)observer_channel_send_message, 10);
 
 	p_handle_out_of_band_message = (handle_out_of_band_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E907B, 0x1CB03B), (BYTE*)handle_out_of_band_message_hook, 8);
 	p_handle_channel_message = (handle_channel_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E929C, 0x1CB25C), (BYTE*)handle_channel_message_hook, 8);

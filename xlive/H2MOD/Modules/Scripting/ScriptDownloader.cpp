@@ -42,7 +42,7 @@ namespace sqScriptDownloader {
 
 			if (observer_channel->field_1)
 			{
-				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, request_sq_script, sizeof(s_request_script), &data);
+				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, request_sq_script, sizeof(s_request_script), &data);
 			}
 		}
 	}
@@ -80,7 +80,7 @@ namespace sqScriptDownloader {
 
 	bool decode_sq_request_packet(bitstream* stream, int a2, s_request_script* data)
 	{
-		stream->data_decode_bits("user-identifier", (int)&data->user_identifier, 64);
+		stream->data_decode_bits("user-identifier", &data->user_identifier, 64);
 
 		LOG_INFO_FUNC(" user_idenitfier: {}", data->user_identifier);
 
@@ -107,7 +107,7 @@ namespace sqScriptDownloader {
 		if (data->script_size < 0 || data->script_size > 0xFFFF || a2 != data->script_size + 4)
 			LOG_CRITICAL_FUNC("data->script_size < 0 || data->script_size > 0xFFFF || a2 != data->script_size + 4");
 		
-		stream->data_decode_bits("sqScriptData", (int)&data->script_data, data->script_size * CHAR_BIT);
+		stream->data_decode_bits("sqScriptData", &data->script_data, data->script_size * CHAR_BIT);
 
 		g_sqScriptDownloaded = true;
 
