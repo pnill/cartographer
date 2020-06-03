@@ -45,6 +45,25 @@ enum game_life_cycle : int
 	life_cycle_matchmaking
 };
 
+enum variant_flag_bitfield : BYTE
+{
+	_game_engine_teams_bit = 0,
+	_game_engine_motion_sensor_bit,
+	_game_engine_always_invisible_bit,
+	_game_engine_round_switch_resets_map_bit,
+	_game_engine_tie_resolution_bit,
+	_game_engine_observers_bit,
+	_game_engine_changing_teams_bit,
+	_game_engine_friendly_fire_bit,
+	_game_engine_overshields_on_map_bit,
+	_game_engine_invisiblity_on_map_bit,
+	_game_engine_grenades_on_map_bit,
+	_game_engine_starting_grenades_bit,
+	_game_engine_extra_damage_bit,
+	_game_engine_damage_resistant_bit,
+	_game_engine_force_even_teams_bit,
+	_game_engine_round_setting_1_round
+};
 int __cdecl call_object_try_and_get_with_type(datum object_datum_index, int object_type);
 int __cdecl call_unit_reset_equipment(datum unit_datum_index);
 bool __cdecl call_add_object_to_sync(datum gamestate_object_datum);
@@ -87,6 +106,8 @@ public:
 		void set_player_unit_grenades_count(int playerIndex, BYTE type, BYTE count, bool resetEquipment);
 		void disable_sound(int sound);
 		void custom_sound_play(const wchar_t* soundName, int delay);
+		void custom_sound_play(const char* soundName, int delay);
+
 		void toggle_weapon_pickup();
 		void toggle_weapon_pickup(bool bEnable);
 		void leave_session();

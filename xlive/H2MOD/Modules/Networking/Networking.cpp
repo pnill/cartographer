@@ -43,7 +43,6 @@ bool __cdecl parameters_update_decode(bitstream* stream, int a2, int a3)
 	int script_id = 0;
 	bool ret = pparameters_update_decode(stream, a2, a3);
 	bool script_loaded = stream->data_decode_bool("sqScript-loaded");
-	
 	if(script_loaded == true)
 		script_id = stream->data_decode_integer("sqScript-id", 32);
 	

@@ -281,7 +281,7 @@ tc_simulation_unit_entity_definition_creation_decode pc_simulation_unit_entity_d
 bool __stdcall c_simulation_unit_entity_definition_creation_decode(void *thisptr, int creation_data_size, void* creation_data, bitstream* stream)
 {
 	//LOG_TRACE_GAME_N("c_simulation_unit_entity_definition_creation_decode()\r\nthisptr: %08X, creation_data_size: %i, creation_data: %08X, packet: %08X", thisptr, creation_data_size, creation_data, packet);
-
+	
 	if (stream->data_decode_bool("object-permutation-exists"))
 	{
 		//LOG_TRACE_GAME_N("c_simulation_unit_entity_decode - object-permutation-exists packet: %08X, *packet: %08X", packet, *(int*)packet);
@@ -533,6 +533,8 @@ void H2MOD::set_unit_biped(Player::Biped biped_type, int playerIndex)
 	PlayerIterator playersIt;
 	if (playerIndex >= 0 && playerIndex < 16)
 		playersIt.get_data_at_index(playerIndex)->properties.profile.player_character_type = biped_type;
+
+	*(BYTE*)(((BYTE*)h2mod->GetAddress(0x977104) + 0x20CC * playerIndex) + 8) = (BYTE)biped_type;
 }
 
 BYTE H2MOD::get_unit_team_index(datum unit_datum_index)
@@ -574,7 +576,7 @@ void H2MOD::set_unit_speed_patch(bool hackit) {
 	}
 	else
 	{
-		memcpy(patch_addr, origBytes, 8);
+		WriteBytes((DWORD)patch_addr, origBytes, 8);
 	}
 
 }
@@ -665,6 +667,25 @@ void H2MOD::disable_sound(int sound)
 		*(DWORD*)(&tags::get_tag_data()[0xd7b9a4]) = -1;
 		break;
 	}
+}
+
+void H2MOD::custom_sound_play(const char* soundName, int delay)
+{
+	auto playSound = [=]()
+	{
+		//std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+		std::chrono::high_resolution_clock::time_point timePoint = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(delay);
+
+		LOG_TRACE_GAME("[H2MOD-SoundQueue] - attempting to play sound {0} - delaying {1} miliseconds first", soundName, delay);
+
+		if (delay > 0)
+			std::this_thread::sleep_until(timePoint);
+
+		PlaySoundA(soundName, NULL, SND_FILENAME | SND_NODEFAULT);
+	};
+
+	if (!h2mod->Server)
+		std::thread(playSound).detach();
 }
 
 void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
@@ -1573,7 +1594,27 @@ int __cdecl LoadSaveGameHook(int a1, SaveStackStruct *a2, char a3)
 
 		wsprintf((wchar_t*)((BYTE*)a2->OutBuffer + 4), var_name_mod);
 		*(BYTE*)((BYTE*)a2->OutBuffer + 0x44) = variant_engine[engine_name];
-		
+
+		short flags = *(short*)((BYTE*)a2->OutBuffer + 0x48);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sqTeamGame ^ flags) & (1UL << variant_flag_bitfield::_game_engine_teams_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sqMotionSensor ^ flags) & (1UL << variant_flag_bitfield::_game_engine_motion_sensor_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sgAlwaysInvisible ^ flags) & (1UL << variant_flag_bitfield::_game_engine_always_invisible_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sgRoundSwitchResetsMap ^ flags) & (1UL << variant_flag_bitfield::_game_engine_round_switch_resets_map_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sgObservers ^ flags) & (1UL << variant_flag_bitfield::_game_engine_observers_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sgAllowChangingTeams ^ flags) & (1UL << variant_flag_bitfield::_game_engine_changing_teams_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sgFriendlyFire ^ flags) & (1UL << variant_flag_bitfield::_game_engine_friendly_fire_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sgOvershieldsOnMap ^ flags) & (1UL << variant_flag_bitfield::_game_engine_overshields_on_map_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sgInvisibilityOnMap ^ flags) & (1UL << variant_flag_bitfield::_game_engine_invisiblity_on_map_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sgGrenadesOnMap ^ flags) & (1UL << variant_flag_bitfield::_game_engine_grenades_on_map_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sgStartingGrenades ^ flags) & (1UL << variant_flag_bitfield::_game_engine_starting_grenades_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sgExtraDamage ^ flags) & (1UL << variant_flag_bitfield::_game_engine_extra_damage_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sgDamageResistant ^ flags) & (1UL << variant_flag_bitfield::_game_engine_extra_damage_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sgForceEvenTeams ^ flags) & (1UL << variant_flag_bitfield::_game_engine_force_even_teams_bit);
+		*(short*)((BYTE*)a2->OutBuffer + 0x48) ^= (-(unsigned long)ScriptEngine::g_sgRoundSetting1Round ^ flags) & (1UL << variant_flag_bitfield::_game_engine_round_setting_1_round);
+
+
+		*(short*)((BYTE*)a2->OutBuffer + 0x54) = ScriptEngine::g_sqRoundTime;
+
 		return 1;
 	}
 
@@ -1705,6 +1746,7 @@ void H2MOD::ApplyHooks() {
 
 	// bellow hooks applied to specific executables
 	if (this->Server == false) {
+		HMODULE h = GetModuleHandleA("DiscordHook.dll");
 
 		//DWORD random_memory = malloc()
 		LOG_TRACE_GAME("Applying client hooks...");
@@ -1788,8 +1830,7 @@ void H2MOD::ApplyHooks() {
 		
 		//Hooked to fix custom map images.
 		Codecave(GetAddress(0x593F0), load_map_data_for_display,0);
-		
-	
+				
 		//Initialise_tag_loader();
 	}
 	else {

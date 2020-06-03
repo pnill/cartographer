@@ -96,7 +96,7 @@ void register_custom_packets(void* network_messages)
 	register_packet_impl(network_messages, request_sq_script, "request-sq-script", 0, sizeof(s_request_script), sizeof(s_request_script),
 		(void*)sqScriptDownloader::encode_sq_request_packet, (void*)sqScriptDownloader::decode_sq_request_packet, NULL);
 
-	register_packet_impl(network_messages, send_sq_script, "send-sq-script", 0, 4, 65535, (void*)sqScriptDownloader::encode_sq_send_packet,(void*)sqScriptDownloader::decode_sq_send_packet, NULL);
+	register_packet_impl(network_messages, send_sq_script, "send-sq-script", 1, 4, 0xFFFFF, (void*)sqScriptDownloader::encode_sq_send_packet,(void*)sqScriptDownloader::decode_sq_send_packet, NULL);
 
 
 }
@@ -223,11 +223,13 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 					size_t data_size = sizeof(s_send_script) + scriptData.size() + 1;
 					s_send_script *data = (s_send_script*)malloc(data_size);
 					ZeroMemory(data, sizeof(s_send_script) + scriptData.size());
-					data->script_size = scriptData.size();
+					data->script_size = scriptData.size() +1;
 					strcpy(&data->script_data[0], scriptData.c_str());
 					data->script_data[scriptData.size() + 1] = 0;
 
 					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, send_sq_script, data_size, data);
+
+					free(data);
 				}
 
 			}
@@ -284,13 +286,16 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		return;
 	}
 
-	case send_sq_script:
+	case send_sq_script: // received script from server
 	{
-		if (*(int*)network_channel + 0x54 == 5)
+		if (*(int*)(network_channel + 0x54) == 5)
 		{
 			s_send_script* received_data = (s_send_script*)packet;
 			LOG_INFO_FUNC("[H2MOD-CustomPackets] script_size: {}", received_data->script_size);
 			LOG_INFO_FUNC("[H2MOD-CustomPackets] script: {}",(char*)&received_data->script_data);
+
+			sqScriptDownloader::sq_process_script((char*)&received_data->script_data);
+			
 		}
 		return;
 	}
