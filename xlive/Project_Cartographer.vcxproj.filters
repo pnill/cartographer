@@ -540,6 +540,9 @@
     <ClCompile Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.cpp">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkChannel</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">
@@ -1222,6 +1225,9 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.h">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkChannel</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
