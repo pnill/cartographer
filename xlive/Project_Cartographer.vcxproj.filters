@@ -7,7 +7,6 @@
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp" />
-    <ClCompile Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
@@ -90,6 +89,13 @@
     <ClCompile Include="H2MOD\Modules\Splitscreen\InputFixes.cpp" />
     <ClCompile Include="H2MOD\Modules\Splitscreen\SplitScreenCommon.cpp" />
     <ClCompile Include="H2MOD\Modules\Scripting\ScriptDownloader.cpp" />
+    <ClCompile Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.cpp" />
+    <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui_demo.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -215,7 +221,6 @@
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />
-    <ClInclude Include="H2MOD\Modules\Networking\NetworkConfiguration\NetworkConfiguration.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
@@ -324,6 +329,15 @@
     <ClInclude Include="H2MOD\Modules\Splitscreen\inputfixes.h" />
     <ClInclude Include="H2MOD\Modules\Splitscreen\SplitScreenCommon.h" />
     <ClInclude Include="H2MOD\Modules\Scripting\ScriptDownloader.h" />
+    <ClInclude Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.h" />
+    <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h" />
+    <ClInclude Include="3rdparty\imgui\imconfig.h" />
+    <ClInclude Include="3rdparty\imgui\imgui.h" />
+    <ClInclude Include="3rdparty\imgui\imgui_internal.h" />
+    <ClInclude Include="3rdparty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
+    <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
@@ -575,12 +589,6 @@
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\UI\XboxLiveTaskProgress.cpp">
       <Filter>Source Files\H2MOD\Modules\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.cpp">
-      <Filter>Source Files\H2MOD\Modules\Networking\NetworkChannel</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1261,12 +1269,6 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\UI\XboxLiveTaskProgress.h">
       <Filter>Source Files\H2MOD\Modules\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.h">
-      <Filter>Source Files\H2MOD\Modules\Networking\NetworkChannel</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

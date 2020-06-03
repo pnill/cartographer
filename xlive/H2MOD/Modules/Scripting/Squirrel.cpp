@@ -310,13 +310,20 @@ namespace ScriptEngine {
 
 	}
 
+	bool first_run = true;
+
 	void sqSessionStart()
 	{
-		HSQUIRRELVM vm = sq_open(1000);
+		if (first_run == true)
+		{
+			HSQUIRRELVM vm = sq_open(1000);
 
-		BindSquirrel(vm);
+			BindSquirrel(vm);
+			first_run = false;
+		}
+
 		Sqrat::Script GlobalScript;
-		
+
 		sq_enabledebuginfo(Sqrat::DefaultVM::Get(), true);
 		sq_notifyallexceptions(Sqrat::DefaultVM::Get(), true);
 		sq_setcompilererrorhandler(Sqrat::DefaultVM::Get(), compile_error_handler);
@@ -335,22 +342,23 @@ namespace ScriptEngine {
 	{
 		LOG_INFO_FUNC("[Squirrel] - Killing VM");
 
-		if (sq_getvmstate(Sqrat::DefaultVM::Get()) == SQ_VMSTATE_RUNNING)
-			sq_close(Sqrat::DefaultVM::Get());
-
+		//if (sq_getvmstate(Sqrat::DefaultVM::Get()) == SQ_VMSTATE_RUNNING)
+		sq_close(Sqrat::DefaultVM::Get());
+		HSQUIRRELVM vm = sq_open(1000);
+		BindSquirrel(vm);
+		
 		g_sqScriptLoaded = false;
 		g_sqScriptDownloaded = true;
 	}
 
 	void sqOnMapLoad()
 	{
-		
-		Sqrat::Function sqMapLoadFunc = Sqrat::RootTable().GetFunction("OnMapLoad");
+			Sqrat::Function sqMapLoadFunc = Sqrat::RootTable().GetFunction("OnMapLoad");
 
-		if (!sqMapLoadFunc.IsNull())
+			if (!sqMapLoadFunc.IsNull())
 				sqMapLoadFunc.Execute();
-		else
-			LOG_WARNING_FUNC("[Squirrel] - No OnMapLoad function was found!");
+			else
+				LOG_WARNING_FUNC("[Squirrel] - No OnMapLoad function was found!");
 	}
 
 	void sqPrePlayerSpawn(HSQUIRRELVM vm, int unit_datum)

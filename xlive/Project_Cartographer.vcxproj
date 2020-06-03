@@ -64,7 +64,7 @@
     <OutDir>$(SolutionDir)Halo2\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>.\;.\3rdparty\;.\3rdparty\libcurl;.3rdparty\portaudio;.\3rdparty\google;..\Directx SDK\include;.\3rdparty\miniupnpc\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;.\3rdparty\squirrel\include;$(IncludePath)</IncludePath>
+    <IncludePath>.\;.\3rdparty\;.\3rdparty\libcurl;.3rdparty\portaudio;.\3rdparty\imgui;.\3rdparty\google;..\Directx SDK\include;.\3rdparty\miniupnpc\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;.\3rdparty\squirrel\include;$(IncludePath)</IncludePath>
     <LibraryPath>..\Directx SDK\lib;.\libs;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;.\3rdparty\portaudio;.\3rdparty\miniupnpc\lib\;.\3rdparty\libcurl\;.\3rdparty\opus\;.\3rdparty\squirrel\include\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -266,7 +266,12 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="3rdparty\imgui\imgui.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui_demo.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
@@ -368,6 +373,12 @@
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
     <ClInclude Include="3rdparty\discord\discord_rpc.h" />
+    <ClInclude Include="3rdparty\imgui\imconfig.h" />
+    <ClInclude Include="3rdparty\imgui\imgui.h" />
+    <ClInclude Include="3rdparty\imgui\imgui_internal.h" />
+    <ClInclude Include="3rdparty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
+    <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\connecthostport.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\igd_desc_parse.h" />
@@ -483,6 +494,7 @@
     <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Maths\integer_math.hpp" />
     <ClInclude Include="Blam\Maths\real_math.hpp" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.h" />
     <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
