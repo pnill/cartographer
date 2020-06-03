@@ -19,14 +19,14 @@ bool NetworkSession::getCurrentNetworkSession(network_session** outSession)
 	return h2mod->GetAddress<get_lobby_globals_ptr>(0x1AD736, 0x1A66B3)(outSession);
 }
 
-eNetwork_session_state NetworkSession::getLocalSessionState()
+e_network_session_state NetworkSession::getLocalSessionState()
 {
 	return getCurrentNetworkSession()->local_session_state;
 }
 
 bool NetworkSession::localPeerIsSessionHost()
 {
-	eNetwork_session_state state = getCurrentNetworkSession()->local_session_state;
+	e_network_session_state state = getCurrentNetworkSession()->local_session_state;
 
 	return state == network_session_state_session_host
 		|| state == network_session_state_host_disband
