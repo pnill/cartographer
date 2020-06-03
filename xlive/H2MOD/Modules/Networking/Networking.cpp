@@ -9,11 +9,7 @@
 #include "Networking.h"
 #include "Memory\bitstream.h"
 #include "CustomPackets\CustomPackets.h"
-#include "NetworkConfiguration\NetworkConfiguration.h"
 #include "H2MOD\Modules\Scripting\ScriptDownloader.h"
-
-extern XSocket* game_network_data_gateway_socket_1000;
-extern XSocket* game_network_message_gateway_socket_1001;
 
 CustomNetwork *network = new CustomNetwork;
 extern bool g_sqScriptLoaded;
@@ -265,17 +261,6 @@ void __cdecl serializeParametersUpdatePacket(void* a1, int a2, int a3) {
 	serialize_parameters_update_packet_method(a1, a2, a3);
 }
 
-typedef bool(__stdcall *tjoin_game)(void* thisptr, int a2, int a3, XNKID* xnkid, XNKEY* xnkey, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14);
-tjoin_game pjoin_game;
-
-bool __stdcall join_game(void* thisptr, int a2, int a3, XNKID* xnkid, XNKEY* xnkey, XNADDR* host_xn, int a7, int a8, int a9, int a10, int a11, char a12, int a13, int a14)
-{
-	memcpy(&ipManager.gameHostXn, host_xn, sizeof(XNADDR));
-	LOG_TRACE_NETWORK("[H2MOD-Network] copied host information, XNADDR: {:#x}", ipManager.gameHostXn.ina.s_addr);
-	
-	return pjoin_game(thisptr, a2, a3, xnkid, xnkey, host_xn, a7, a8, a9, a10, a11, a12, a13, a14);
-}
-
 typedef bool(__cdecl* decode_text_chat_packet_)(bitstream* container, int a2, s_text_chat* data);
 decode_text_chat_packet_ p_decode_text_chat_packet;
 
@@ -286,9 +271,6 @@ bool __cdecl decode_text_chat_packet(bitstream* container, int a2, s_text_chat* 
 	return ret;
 }
 
-/* WIP */
-/* All this does is patch some checks that cause using actual ip addresses not to work. */
-/* When a call to XNetXnaddrtoInaddr happens we provide the actual ip address rather than a secure key */
 typedef char(__stdcall *cmp_xnkid)(int thisx, int a2);
 cmp_xnkid p_cmp_xnkid;
 
@@ -296,19 +278,19 @@ char __stdcall xnkid_cmp(int thisx, int a2) {
 	return 1;
 }
 
+/* All this does is patch some checks that cause using actual ip addresses not to work. */
+/* When a call to XNetXnaddrtoInaddr happens we provide the actual ip address rather than a secure key */
 void removeXNetSecurity()
 {
 	/* XNKEY bs */
 	p_cmp_xnkid = (cmp_xnkid)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1C284A, 0x199F02), (BYTE*)xnkid_cmp, 9);
 
-	BYTE jmp = 0xEB;
 	// apparently the secure address has 1 free byte 
 	// after HTONL call, game is checking the al register (the lower 8 bits of eax register) if it is zero, if not everything network related will fail
-	WriteBytes(h2mod->GetAddress(0x1B5DBE, 0x1961F8), &jmp, 1);
+	WriteValue<BYTE>(h2mod->GetAddress(0x1B5DBE, 0x1961F8), 0xEB); // place a jump (jmp opcode = 0xEB)
 	NopFill(h2mod->GetAddress(0x1B624A, 0x196684), 2);
 	NopFill(h2mod->GetAddress(0x1B6201, 0x19663B), 2);
 	NopFill(h2mod->GetAddress(0x1B62BC, 0x1966F4), 2);
-	
 }
 
 // stub qos lookup function in-game between peers in a network session
@@ -334,6 +316,8 @@ int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4)
 		return -1; 
 }
 
+// with GFWL this abOnline/abNet data was present on startup, but with our impl we don't have the abOnline/abNet data on startup
+// so we just patch it to always update it instead of getting it only on startup
 void patchAbNetUpdate()
 {
 	PatchCall(h2mod->GetAddress(0x1B583F, 0x195C79), h2mod->GetAddress(0x1B5DF3, 0x19622D));
@@ -348,21 +332,12 @@ void patchAbNetUpdate()
 
 void applyConnectionPatches()
 {
-	//removeXNetSecurity();
 
 	// live netcode research
-	NetworkConfiguration::ApplyPatches();
+	network_observer::ApplyPatches();
 
 	// stub QoS lookup function for in-game data
 	PatchCall(h2mod->GetAddress(0x1BDCB0, 0x1B7B8A), QoSLookUpImpl);
-
-	//NopFill<9>(h2mod->GetBase() + (h2mod->Server ? 0x1B3CC3 : 0x1F1F94)); // check if secure/ipaddress != 127.0.0.1
-	//NopFill(h2mod->GetAddress() + (h2mod->Server ? 0x1B3CC3 : 0x1F1F94), 9); // check if secure/ipaddress != 127.0.0.1
-
-	if (!h2mod->Server)
-	{	
-		pjoin_game = (tjoin_game)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1CDADE), (BYTE*)join_game, 13);
-	}
 }
 
 void CustomNetwork::applyNetworkHooks() {
@@ -383,6 +358,9 @@ void CustomNetwork::applyNetworkHooks() {
 	///////////////////////////////////////////////
 
 	patchAbNetUpdate();
+
+	// removing Xbox Secure Network (IPSec) from the game research
+	//removeXNetSecurity();
 
 	register_connection_packets_method = (register_connection_packets)DetourFunc(h2mod->GetAddress<BYTE*>(0x1F1B36, 0x1D24EF), (BYTE*)registerConnectionPackets, 5);
 	

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "..\NetworkSession/NetworkSession.h"
+#include "..\NetworkSession\NetworkSession.h"
+
+#define player_identifier_size_bits CHAR_BIT * sizeof(XUID)
 
 enum e_network_message_types
 {
@@ -53,6 +55,7 @@ enum e_network_message_types
 	game_results,
 	text_chat,
 	test,
+
 	//custom packets bellow
 	request_map_filename,
 	custom_map_filename,
@@ -113,6 +116,7 @@ static const char* network_message_name[] = {
 	"game_results",
 	"text_chat",
 	"test"
+
 	//custom packets bellow
 	"request_map_filename"
 	"map_file_name"
@@ -162,8 +166,8 @@ struct s_text_chat
 #pragma pack(pop)
 
 const char* getNetworkMessageName(int enumVal);
-
 void register_packet_impl(void *, int, char*, int, int, int, void*, void*, void*);
+
 namespace CustomPackets
 {
 	void ApplyGamePatches();

@@ -902,11 +902,15 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 			b_GunGame = false;
 		}
 
+		if (b_XboxTick) {
+			engine_settings->tickrate = XboxTick::setTickRate(false);
+			b_XboxTick = false;
+		}
+
 		UIRankPatch();
 		H2Tweaks::setHz();
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
-		engine_settings->tickrate = XboxTick::setTickRate(false);
 
 		return result;
 	}		
@@ -1751,6 +1755,8 @@ void H2MOD::ApplyHooks() {
 		//DWORD random_memory = malloc()
 		LOG_TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
+
+		PatchCall(h2mod->GetAddress(0x288B5), game_is_minimized_hook);
 
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4C14), (BYTE*)VerifyGameVersionOnJoin, 5);
 
