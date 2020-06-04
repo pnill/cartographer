@@ -34,6 +34,36 @@ enum static_lod : DWORD
 	cinematic
 };
 
+enum game_life_cycle : int
+{
+	life_cycle_none,
+	life_cycle_pre_game,
+	life_cycle_start_game,
+	life_cycle_in_game,
+	life_cycle_post_game,
+	life_cycle_joining,
+	life_cycle_matchmaking
+};
+
+enum variant_flag_bitfield : BYTE
+{
+	_game_engine_teams_bit = 0,
+	_game_engine_motion_sensor_bit,
+	_game_engine_always_invisible_bit,
+	_game_engine_round_switch_resets_map_bit,
+	_game_engine_tie_resolution_bit,
+	_game_engine_observers_bit,
+	_game_engine_changing_teams_bit,
+	_game_engine_friendly_fire_bit,
+	_game_engine_overshields_on_map_bit,
+	_game_engine_invisiblity_on_map_bit,
+	_game_engine_grenades_on_map_bit,
+	_game_engine_starting_grenades_bit,
+	_game_engine_extra_damage_bit,
+	_game_engine_damage_resistant_bit,
+	_game_engine_force_even_teams_bit,
+	_game_engine_round_setting_1_round
+};
 int __cdecl call_object_try_and_get_with_type(datum object_datum_index, int object_type);
 int __cdecl call_unit_reset_equipment(datum unit_datum_index);
 bool __cdecl call_add_object_to_sync(datum gamestate_object_datum);
@@ -43,6 +73,8 @@ bool __cdecl call_assign_equipment_to_unit(datum uint, int object_index, short u
 void __cdecl call_object_placement_data_new(ObjectPlacementData*, datum, datum, int);
 signed int __cdecl call_object_new(ObjectPlacementData*);
 void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset);
+int character_datum_from_index(BYTE index);
+game_life_cycle get_game_life_cycle();
 
 class H2MOD
 {
@@ -74,14 +106,18 @@ public:
 		void set_player_unit_grenades_count(int playerIndex, BYTE type, BYTE count, bool resetEquipment);
 		void disable_sound(int sound);
 		void custom_sound_play(const wchar_t* soundName, int delay);
-		void disable_weapon_pickup(bool b_Enable);
-		void leave_session();
+		void custom_sound_play(const char* soundName, int delay);
 
+		void toggle_weapon_pickup();
+		void toggle_weapon_pickup(bool bEnable);
+		void leave_session();
+		void session_end();
+		
 		scnr_type GetMapType() { return mapType; }
 		void SetMapType(scnr_type value) { mapType = value; }
 
 		bool Server;
-		std::unordered_map<std::string, bool> AchievementMap;
+		std::map<std::string, bool> AchievementMap;
 		std::deque<std::wstring> CustomSounds;
 		
 		std::mutex sound_mutex;
@@ -105,7 +141,6 @@ public:
 			return reinterpret_cast<T>(Base + (Server ? server : client));
 		}
 
-private:
 		DWORD Base;
 		scnr_type mapType;
 };

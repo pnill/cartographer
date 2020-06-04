@@ -32,6 +32,6 @@ static CONST D3DCOLOR COLOR_BLACK_TRANSPARENT = D3DCOLOR_ARGB(150, 0, 0, 0);
 
 namespace GUI
 {
-	extern void Initialize();
+	extern void Initialize(HWND hWnd);
 };
 

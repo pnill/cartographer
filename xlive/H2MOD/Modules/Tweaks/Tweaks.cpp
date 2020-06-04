@@ -938,9 +938,9 @@ void InitH2Tweaks() {
 		PatchCall(h2mod->GetAddress(0x21754C), &sub_20E1D8_boot);
 
 		//Hook for advanced lobby options.
-		pfn_c0024eeef = (tfn_c0024eeef)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x0024eeef), (BYTE*)fn_c0024eeef, 9);
-		pfn_c0024fa19 = (tfn_c0024fa19)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x0024fa19), (BYTE*)fn_c0024fa19, 9);
-		pfn_c0024fabc = (tfn_c0024fabc)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x0024fabc), (BYTE*)fn_c0024fabc, 13);
+		pfn_c0024eeef = (tfn_c0024eeef)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x0024eeef), (BYTE*)fn_c0024eeef, 9); // c_list_vtable + 0x60
+		pfn_c0024fa19 = (tfn_c0024fa19)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x0024fa19), (BYTE*)fn_c0024fa19, 9); // squad_settings_button_handler
+		pfn_c0024fabc = (tfn_c0024fabc)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x0024fabc), (BYTE*)fn_c0024fabc, 13); //squad_settings_list_constructor
 
 		WriteJmpTo(h2mod->GetAddress(0x4544), is_init_flag_set);
 

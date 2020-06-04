@@ -43,7 +43,7 @@ void InitInstance()
 		CurrentFlags |= _CRTDBG_DELAY_FREE_MEM_DF;
 		CurrentFlags |= _CRTDBG_LEAK_CHECK_DF;
 		CurrentFlags |= _CRTDBG_CHECK_ALWAYS_DF;
-		_CrtSetDbgFlag(CurrentFlags);
+		//_CrtSetDbgFlag(CurrentFlags);
 #endif
 		InitializeCriticalSection(&d_lock);
 

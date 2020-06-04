@@ -389,6 +389,7 @@ bool ConsoleCommands::isNum(const char *s) {
 	return true;
 }
 
+
 /*
 * Handles the given string command
 * Returns a bool indicating whether the command is a valid command or not
@@ -427,6 +428,39 @@ void ConsoleCommands::handle_command(std::string command) {
 			mapManager->getMapFilename(map_file_name);
 			output(map_file_name);
 			return;
+		}
+		else if (firstCommand == "$coop_enable")
+		{
+			WriteValue<BYTE>(0x30002D40, 1);
+			WriteValue<BYTE>(h2mod->GetAddress(0xA3E460), 1);
+			WriteValue<BYTE>(h2mod->GetAddress(0x51A6E0), 1);
+			WriteValue<XUID>(h2mod->GetAddress(0x51A6E1), 0123456);
+			wchar_t name[11] = L"COOP_GAMER";
+			WriteValue<wchar_t>(h2mod->GetAddress(0x51A6F0), *(wchar_t*)name);
+		}
+		else if (firstCommand == "$coop_screen") {
+			BYTE type = stoi(splitCommands[1]);
+			WriteValue<BYTE>(h2mod->GetAddress(0xA3E460), type);
+			//typedef void(__cdecl* network_session_set_coop_difficulty)(short difficulty);
+			//auto p_network_session_set_coop_difficulty = h2mod->GetAddress<network_session_set_coop_difficulty>(0x215624);
+
+			//int difficultyIndex = stoi(splitCommands[1]);
+			//p_network_session_set_coop_difficulty(difficultyIndex);
+
+			//WriteValue<BYTE>(h2mod->GetAddress(0x1D928A) + 2, 2); // set max peers
+			//WriteValue<BYTE>(h2mod->GetAddress(0x1D9A7D) + 1, 2); // set max peers
+			//NetworkSession::getCurrentNetworkSession()->network_protocol = 0; // splitscreen
+		}
+		else if (firstCommand == "$setupcoop") {
+			typedef void(__cdecl* network_session_set_coop_difficulty)(short difficulty);
+			auto p_network_session_set_coop_difficulty = h2mod->GetAddress<network_session_set_coop_difficulty>(0x215624);
+
+			//int difficultyIndex = stoi(splitCommands[1]);
+			p_network_session_set_coop_difficulty(1);
+
+			WriteValue<BYTE>(h2mod->GetAddress(0x1D928A) + 2, 2); // set max peers
+			WriteValue<BYTE>(h2mod->GetAddress(0x1D9A7D) + 1, 2); // set max peers
+			NetworkSession::getCurrentNetworkSession()->network_protocol = 0; // splitscreen
 		}
 		else if (firstCommand == "$downloadmap") {
 			if (splitCommands.size() != 2) {

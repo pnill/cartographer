@@ -7,6 +7,7 @@
 #include "..\Memory\bitstream.h"
 #include "..\..\MapManager\MapManager.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\Scripting\ScriptDownloader.h"
 
 char g_network_message_types[e_network_message_types::end * 32];
 
@@ -67,6 +68,13 @@ void register_custom_packets(void* network_messages)
 
 	register_packet_impl(network_messages, team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
 		(void*)encode_team_change_packet, (void*)decode_team_change_packet, NULL);
+
+	register_packet_impl(network_messages, request_sq_script, "request-sq-script", 0, sizeof(s_request_script), sizeof(s_request_script),
+		(void*)sqScriptDownloader::encode_sq_request_packet, (void*)sqScriptDownloader::decode_sq_request_packet, NULL);
+
+	register_packet_impl(network_messages, send_sq_script, "send-sq-script", 1, 4, 0xFFFFF, (void*)sqScriptDownloader::encode_sq_send_packet,(void*)sqScriptDownloader::decode_sq_send_packet, NULL);
+
+
 }
 
 typedef void(__stdcall *handle_out_of_band_message)(void *thisx, network_address* address, int message_type, int a4, void* packet);
@@ -168,6 +176,42 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 	switch (message_type)
 	{
+	case request_sq_script:
+	{
+		s_request_script *received_data = (s_request_script*)packet;
+		LOG_INFO_NETWORK("[H2MOD-CustomPackets] received on handle_channel_message_hook request-script from XUID: {}", received_data->user_identifier);
+		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
+			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
+		{
+			LOG_TRACE_NETWORK(" - network address: {:x}", ntohl(addr.address.ipv4));
+
+			int peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
+			network_session* session = NetworkSession::getCurrentNetworkSession();
+
+			if (peer_index != -1 && peer_index != session->local_peer_index)
+			{
+				std::string scriptData = sqScriptDownloader::sq_send_script_fill_data();
+				if (!scriptData.empty())
+				{
+					network_observer* observer = session->network_observer_ptr;
+					peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peer_index);
+					
+					size_t data_size = sizeof(s_send_script) + scriptData.size() + 1;
+					s_send_script *data = (s_send_script*)malloc(data_size);
+					ZeroMemory(data, sizeof(s_send_script) + scriptData.size());
+					data->script_size = scriptData.size() +1;
+					strcpy(&data->script_data[0], scriptData.c_str());
+					data->script_data[scriptData.size() + 1] = 0;
+
+					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, send_sq_script, data_size, data);
+
+					free(data);
+				}
+
+			}
+		}
+		return;
+	}
 	case request_map_filename:
 	{
 		s_request_map_filename* received_data = (s_request_map_filename*)packet;
@@ -216,6 +260,20 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] received on handle_out_of_band_message map_file_name: {}", received_data->file_name);
 		}
 		
+		return;
+	}
+
+	case send_sq_script: // received script from server
+	{
+		if(peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
+		{
+			s_send_script* received_data = (s_send_script*)packet;
+			LOG_INFO_FUNC("[H2MOD-CustomPackets] script_size: {}", received_data->script_size);
+			LOG_INFO_FUNC("[H2MOD-CustomPackets] script: {}",(char*)&received_data->script_data);
+
+			sqScriptDownloader::sq_process_script((char*)&received_data->script_data);
+			
+		}
 		return;
 	}
 

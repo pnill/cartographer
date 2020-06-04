@@ -89,6 +89,8 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 int WINAPI XSessionEnd(HANDLE hSession,
 	PXOVERLAPPED pXOverlapped)
 {
+	h2mod->session_end();
+
 	LOG_TRACE_XLIVE("XSessionEnd()");
 	return 0;
 }

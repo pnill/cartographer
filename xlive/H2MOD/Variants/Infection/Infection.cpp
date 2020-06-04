@@ -133,7 +133,7 @@ void Infection::disableSlayerSounds()
 
 void Infection::resetWeaponInteractionAndEmblems() {
 	LOG_TRACE_GAME("[h2mod-infection] Resetting weapons interactions and emblem visibility");
-	h2mod->disable_weapon_pickup(true);
+	h2mod->toggle_weapon_pickup(true);
 	h2mod->team_player_indicator_visibility(true);
 }
 
@@ -196,13 +196,13 @@ void Infection::spawnPlayerClientSetup(int playerIndex) {
 		}
 
 		if (h2mod->get_local_team_index() == HUMAN_TEAM) {
-			h2mod->disable_weapon_pickup(true);
+			h2mod->toggle_weapon_pickup(true);
 			h2mod->team_player_indicator_visibility(false);
 		}
 		else if (h2mod->get_local_team_index() == ZOMBIE_TEAM) {
 			h2mod->set_unit_biped(Player::Biped::Elite, playerIndex);
 
-			h2mod->disable_weapon_pickup(false);
+			h2mod->toggle_weapon_pickup(false);
 			h2mod->team_player_indicator_visibility(true);
 		}
 	}
