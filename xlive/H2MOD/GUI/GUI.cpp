@@ -206,6 +206,7 @@ void ImGuiWin32Frame()
 		ImGui_ImplWin32_UpdateMouseCursor();
 	}
 }
+ImFont* font2;
 
 void GUI::Initialize(HWND hWnd)
 {
@@ -254,6 +255,9 @@ void GUI::Initialize(HWND hWnd)
 	io.KeyMap[ImGuiKey_X] = 'X';
 	io.KeyMap[ImGuiKey_Y] = 'Y';
 	io.KeyMap[ImGuiKey_Z] = 'Z';
+
+	ImFont* font1 = io.Fonts->AddFontDefault();
+	font2 = io.Fonts->AddFontFromFileTTF("maps\\fonts\\conduit_itc_medium1.ttf", (13.0f * 1.0f));
 
 	ImGui_ImplDX9_Init(pDevice);
 
@@ -855,18 +859,47 @@ int WINAPI XLiveRender()
 			RECT rect;
 			::GetClientRect(g_hWnd, &rect);
 			io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
-			static float f = 0.0f;
-			static int fov = 0;
+			static float f = 72.0f;
+			static float fov = 90.0f;
+			static float coffset = 0.5f;
 
 			ImGui_ImplDX9_NewFrame();
 			ImGuiWin32Frame();
 			ImGui::NewFrame();
 			ImGui::ShowDemoWindow();
+			
+			ImGui::PushFont(font2);
 			ImGui::Begin("Advanced Settings");
 			ImGui::Indent(1.0);
-			ImGui::Text("These are advanced settings which project cartographer allows you to control over the game.");
+			ImGui::TextWrapped("These are advanced settings which project cartographer allows you to control over the game.");
 			ImGui::NewLine();
+			if (ImGui::CollapsingHeader("HUD Settings"))
+			{
+				ImGui::TextWrapped("HUD Settings allow you to adjust specific settings related to the HUD being displayed.");
+				ImGui::NewLine();
+				ImGui::Separator();
+				ImGui::NewLine();
+
+				float CursorPos = ImGui::GetCursorPosX();
+				
+				ImGui::NewLine();
+				
+				ImGui::SetCursorPosX(((ImGui::GetWindowContentRegionWidth() - (ImGui::GetWindowContentRegionWidth() * 0.75)) * 0.5f));
+				ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() *0.75f);
+				ImGui::SliderFloat("Player", &f, 0, 120, "FOV = %.3f");
 			
+				ImGui::SetCursorPosX(((ImGui::GetWindowContentRegionWidth() - (ImGui::GetWindowContentRegionWidth() * 0.75)) * 0.5f));
+				ImGui::SliderFloat("Vehicle", &fov, 0, 120, "FOV = %.3f");
+
+				ImGui::SetCursorPosX(((ImGui::GetWindowContentRegionWidth() - (ImGui::GetWindowContentRegionWidth() * 0.75)) * 0.5f));
+				ImGui::SliderFloat("Crosshair", &coffset, 0, 1, "Offset = %.3f");
+				ImGui::PopItemWidth();
+
+
+				ImGui::SetCursorPosX(CursorPos);
+				ImGui::Separator();
+
+			}
 
 			ImGui::End();
 
