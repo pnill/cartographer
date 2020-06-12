@@ -1,6 +1,6 @@
 //use this for all base real math related structs and implementations
 #pragma once
-#include "..\Blam\Cache\DataTypes\Macros.h"
+#include "Blam\Common\Common.h"
 
 struct real_point2d
 {
@@ -202,7 +202,6 @@ struct real_color_argb
 		green(_green),
 		blue(_blue)
 	{}
-
 };
 CHECK_STRUCT_SIZE(real_color_argb, sizeof(float) * 4);
 

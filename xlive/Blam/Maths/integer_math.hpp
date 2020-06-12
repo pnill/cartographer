@@ -1,8 +1,7 @@
 #pragma once
 //use this for all base integer math related structs and implementations
 
-#pragma once
-#include "..\Blam\Cache\DataTypes\Macros.h"
+#include "Blam/Common/Common.h"
 
 struct point2d
 {

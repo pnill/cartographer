@@ -6,21 +6,14 @@
 
 #include "Blam\Engine\Game\GameEngine.h"
 #include "Blam\Engine\Players\Players.h"
-
-constexpr signed int NONE = -1;
-
-enum GrenadeType
-{
-	Frag = 0,
-	Plasma = 1
-};
+#include "Blam\Common\Common.h"
 
 enum SoundType
 {
 	TeamChange = 1,
-	GainedTheLead = 2,
-	LostTheLead = 3,
-	Slayer = 4
+	GainedTheLead,
+	LostTheLead,
+	Slayer
 };
 
 enum static_lod : DWORD
@@ -34,7 +27,7 @@ enum static_lod : DWORD
 	cinematic
 };
 
-int __cdecl call_object_try_and_get_with_type(datum object_datum_index, int object_type);
+char* __cdecl call_object_try_and_get_data_with_type(datum object_datum_index, int object_type);
 int __cdecl call_unit_reset_equipment(datum unit_datum_index);
 bool __cdecl call_add_object_to_sync(datum gamestate_object_datum);
 void __cdecl call_hs_object_destroy(datum object_datum_index);
@@ -65,13 +58,12 @@ public:
 		int get_player_index_from_name(wchar_t* playername);
 		int get_player_index_from_unit_datum(datum unit_datum_index);
 		BYTE get_unit_team_index(datum unit_datum_index);
-		void set_unit_team_index(int unit_datum_index, BYTE team);
-		void set_unit_biped(Player::Biped biped_type, int playerIndex);
+		void set_unit_biped(int playerIndex, Player::Biped biped_type);
 		void set_unit_speed_patch(bool hackit);
 		void set_unit_speed(float speed, int playerIndex);
 		void set_local_team_index(int local_player_index, int team);
 		BYTE get_local_team_index();
-		void set_player_unit_grenades_count(int playerIndex, BYTE type, BYTE count, bool resetEquipment);
+		void set_player_unit_grenades_count(int playerIndex, Grenades type, BYTE count, bool resetEquipment);
 		void disable_sound(int sound);
 		void custom_sound_play(const wchar_t* soundName, int delay);
 		void disable_weapon_pickup(bool b_Enable);

@@ -6,8 +6,8 @@
 extern void __cdecl print_to_console(char *output);
 extern void GivePlayerWeaponDatum(datum unit_datum, datum weapon_datum);
 
-//power transition time
-//TODO: Convert to TagGroup/Block
+// power transition time
+// TODO: Convert to TagGroup/Block
 float get_device_power_transition_time(datum device_datum)
 {
 	DWORD tag_data = (DWORD)tags::get_tag_data();
@@ -111,7 +111,7 @@ bool DeviceShop::BuyItem(datum device_datum, datum unit_datum)
 			debug_text.append(std::to_string(GetCost(device_datum)));
 
 			print_to_console((char*)debug_text.c_str());
-			GiveWeapon(item_datum, unit_datum);
+			GiveWeapon(unit_datum, item_datum);
 			break;
 		}
 	}
@@ -129,9 +129,9 @@ void DeviceShop::SpawnVehicle(datum vehicle_datum)
 
 }
 
-void DeviceShop::GiveWeapon(datum weapon_datum, datum unit_datum)
+void DeviceShop::GiveWeapon(datum unit_datum, datum weapon_datum)
 {
-	GivePlayerWeaponDatum(unit_datum,weapon_datum);
+	GivePlayerWeaponDatum(unit_datum, weapon_datum);
 }
 
 void DeviceShop::AddPoints(XUID xuid, int points)

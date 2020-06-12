@@ -66,7 +66,7 @@ int NetworkSession::getPeerIndex(int playerIndex)
 /* Otherwise you will wonder why you don't get the right data/player index etc. */
 bool NetworkSession::playerIsActive(int playerIndex)
 {
-	return (1 << playerIndex) & NetworkSession::getCurrentNetworkSession()->membership.players_active_mask;
+	return FLAG(playerIndex) & NetworkSession::getCurrentNetworkSession()->membership.players_active_mask;
 }
 
 int NetworkSession::getPlayerCount()
@@ -108,7 +108,7 @@ int NetworkSession::getPlayerTeamFromXuid(long long xuid)
 		} 
 		while (playerIndex < 16);
 	}
-	return -1;
+	return NONE;
 }
 
 void NetworkSession::kickPeer(int peerIndex) 

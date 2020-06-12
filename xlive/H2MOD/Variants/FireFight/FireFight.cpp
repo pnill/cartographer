@@ -22,7 +22,7 @@ void FireFight::KilledAI(datum ai_datum, XUID killer)
 	DatumIterator<ObjectHeader> objectIt(game_state_objects_header);
 	BipedObjectDefinition* actorObject = (BipedObjectDefinition*)objectIt.get_data_at_index(ai_datum.Index)->object;
 
-	if (objectIt.get_data_at_index(ai_datum.Index)->type == ObjectType::biped)
+	if (objectIt.get_data_at_index(ai_datum.Index)->type == e_object_type::biped)
 	{
 		datum actor_datum = actorObject->ActorDatum; // Grab the actor from the killed AI
 		if (actor_datum.Index != -1) // Ensure that it was valid

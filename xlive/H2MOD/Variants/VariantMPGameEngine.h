@@ -61,7 +61,7 @@ public:
 	virtual int unk_function_25(int arg1, int arg2);
 	virtual int unk_function_26(signed int arg1, int arg2, signed int arg3);
 	virtual int unk_function_27();
-	virtual bool is_team_enemy(ObjectTeam team_a, ObjectTeam team_b);
+	virtual bool is_team_enemy(e_object_team team_a, e_object_team team_b);
 	virtual void unk_function_29(int arg1);
 	virtual void unk_function_30(signed int arg1, int arg2, signed int arg3);
 	virtual void unk_function_31(int arg1, int arg2, char arg3, signed int arg4);

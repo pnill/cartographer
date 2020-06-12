@@ -184,17 +184,8 @@
     <Filter Include="Source Files\Blam\Cache\TagBlocks">
       <UniqueIdentifier>{eaef3410-8a93-4a75-9da0-3d35f5db6d4d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Blam\Cache\TagBlocks\Globals">
-      <UniqueIdentifier>{1726633f-726e-41b0-908d-1f78806b3e06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Cache\TagBlocks\Interface">
-      <UniqueIdentifier>{cb283a92-c683-4cf3-8755-a4d3a784d9f3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Blam\Cache\TagGroups">
       <UniqueIdentifier>{be702785-a2d1-4808-be70-7360906e4941}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Cache\TagBlocks\AI">
-      <UniqueIdentifier>{8ed4f5f1-2e41-4c8c-bf9d-9503ae31a097}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\H2MOD\Variants\HeadHunter">
       <UniqueIdentifier>{49f37534-5966-4498-8e32-3fe96744053d}</UniqueIdentifier>
@@ -285,6 +276,9 @@
     </Filter>
     <Filter Include="Source Files\H2MOD\Modules\UI">
       <UniqueIdentifier>{a500f548-26db-4773-9b45-892987193591}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Common">
+      <UniqueIdentifier>{9e25bf39-d83a-44bf-bf85-c1b15d3d37d8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -559,9 +553,6 @@
     </ClInclude>
     <ClInclude Include="Blam\Enums\Enums.h">
       <Filter>Source Files\Blam\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h">
-      <Filter>Source Files\Blam\Enums\Game</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Maths\Maths.h">
       <Filter>Source Files\Blam\Maths</Filter>
@@ -1115,9 +1106,6 @@
     <ClInclude Include="XLive\XStorage\XStorage.h">
       <Filter>Source Files\XLive\XStorage</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Cache\DataTypes\Macros.h">
-      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h">
       <Filter>Source Files\Blam\Cache\TagBlocks</Filter>
     </ClInclude>
@@ -1129,9 +1117,6 @@
     </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp">
       <Filter>Source Files\Blam\Cache\TagGroups</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Common\Common.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups\biped_definition.hpp">
       <Filter>Source Files\Blam\Cache\TagGroups</Filter>
@@ -1228,6 +1213,9 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Common\Common.h">
+      <Filter>Source Files\Blam\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
