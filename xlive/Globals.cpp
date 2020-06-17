@@ -36,7 +36,7 @@ int stripWhitespace(wchar_t *inputStr) {
 }
 
 void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen) {
-	for (unsigned int i = 0; i < hexStr.length() && i < bufLen; i++) {
+	for (size_t i = 0; i < hexStr.length() && i < bufLen; i++) {
 		byteBuf[i] = (BYTE)strtol(hexStr.substr(i * 2, 2).c_str(), NULL, 16);
 	}
 }

@@ -163,7 +163,7 @@ extern void handleHotkeyInput(WPARAM lpMsg);
 // #5030: XLivePreTranslateMessage
 BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 {
-	if ((GetAsyncKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
+	if ((GetKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
 	{
 		// hotkeys
 		handleHotkeyInput(lpMsg->wParam);
