@@ -82,6 +82,13 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 		}
 		nResult->dwServerType = doc["dwServerType"].GetUint();
 
+#pragma region Xbox Network Address Reading
+		if (!doc.HasMember("xnaddr") || !doc["xnaddr"].IsUint())
+		{
+			BadServer(xuid, nResult, "Missing Member: xnaddr");
+			return;
+		}
+		nResult->serverAddress.ina.s_addr = htonl(doc["xnaddr"].GetUint());
 
 		if (!doc.HasMember("saddr") || !doc["saddr"].IsUint())
 		{
@@ -90,13 +97,6 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 		}
 		nResult->serverAddress.inaOnline.s_addr = doc["saddr"].GetUint();
 
-		if (!doc.HasMember("xnaddr") || !doc["xnaddr"].IsUint())
-		{
-			BadServer(xuid, nResult, "Missing Member: xnaddr");
-			return;
-		}
-		nResult->serverAddress.ina.s_addr = htonl(doc["xnaddr"].GetUint());
-
 		if (!doc.HasMember("dwPort"))
 		{
 			BadServer(xuid, nResult, "Missing Member: dwPort");
@@ -104,41 +104,60 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 		}
 		nResult->serverAddress.wPortOnline = htons(doc["dwPort"].GetUint());
 
-
 		if (!doc.HasMember("abenet"))
 		{
 			BadServer(xuid, nResult, "Missing Member: abenet");
 			return;
 		}
-
-		const char* abEnet = doc["abenet"].GetString();
-		if (abEnet == NULL)
+		const char* abEnet_str = doc["abenet"].GetString();
+		if (abEnet_str == NULL)
 		{
-			BadServer(xuid, nResult, "abEnet = NULL");
+			BadServer(xuid, nResult, "abEnet == NULL");
 			return;
 		}
-
-		for (int i = 0; i < 6; i++) {
-			sscanf(&abEnet[i * 2], "%2hhx", &nResult->serverAddress.abEnet[i]);
-		}
-
+		HexStrToBytes(abEnet_str, nResult->serverAddress.abEnet, sizeof(XNADDR::abEnet));
 
 		if (!doc.HasMember("abonline"))
 		{
 			BadServer(xuid, nResult, "Missing Member: abOnline");
 			return;
 		}
-
-		const char* abOnline = doc["abonline"].GetString();
-		if (abOnline == NULL)
+		const char* abOnline_str = doc["abonline"].GetString();
+		if (abOnline_str == NULL)
 		{
-			BadServer(xuid, nResult, "abonline == NULL");
+			BadServer(xuid, nResult, "abOnline == NULL");
 			return;
 		}
-
-		for (int i = 0; i < 20; i++) {
-			sscanf(&abOnline[i * 2], "%2hhx", &nResult->serverAddress.abOnline[i]);
+		HexStrToBytes(abOnline_str, nResult->serverAddress.abOnline, sizeof(XNADDR::abOnline));
+#pragma endregion
+		
+#pragma region Xbox Transport Security Keys Reading
+		if (!doc.HasMember("xnkid"))
+		{
+			BadServer(xuid, nResult, "Missing Member: xnkid");
+			return;
 		}
+		const char* xnkid_str = doc["xnkid"].GetString();
+		if (xnkid_str == NULL)
+		{
+			BadServer(xuid, nResult, "xnkid == NULL");
+			return;
+		}
+		HexStrToBytes(xnkid_str, nResult->xnkid.ab, sizeof(XNKID));
+
+		if (!doc.HasMember("xnkey"))
+		{
+			BadServer(xuid, nResult, "Missing Member: xnkey");
+			return;
+		}
+		const char* xnkey_str = doc["xnkey"].GetString();
+		if (xnkey_str == NULL)
+		{
+			BadServer(xuid, nResult, "xnkey == NULL");
+			return;
+		}
+		HexStrToBytes(xnkey_str, nResult->xnkey.ab, sizeof(XNKEY));
+#pragma endregion
 
 		if (!doc.HasMember("xuid"))
 		{
@@ -146,8 +165,6 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 			return;
 		}
 		nResult->serverID = doc["xuid"].GetUint64();
-
-		XLocatorCreateKey(&nResult->xnkid, &nResult->xnkey);
 
 		if (!doc.HasMember("pProperties") || !doc.HasMember("cProperties"))
 		{
@@ -403,14 +420,18 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 	curl = curl_easy_init();
 	if (curl) {
 
-
 		rapidjson::Document document;
 		document.SetObject();
-
 
 		Value token(kStringType);
 		if (H2CurrentAccountLoginToken)
 			token.SetString(H2CurrentAccountLoginToken, document.GetAllocator());
+
+		Value xnkid_val(kStringType);
+		xnkid_val.SetString(ByteToHexStr(&xnkid.ab[0], sizeof(XNKID)).c_str(), document.GetAllocator());
+
+		Value xnkey_val(kStringType);
+		xnkey_val.SetString(ByteToHexStr(&xnkey.ab[0], sizeof(XNKEY)).c_str(), document.GetAllocator());
 
 		document.AddMember("token", token, document.GetAllocator());
 		document.AddMember("xuid", Value().SetUint64(usersSignInInfo[dwUserIndex].xuid), document.GetAllocator());
@@ -420,6 +441,8 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 		document.AddMember("dwMaxPrivateSlots", Value().SetInt(dwMaxPrivateSlots), document.GetAllocator());
 		document.AddMember("dwMaxFilledPrivateSlots", Value().SetInt(dwFilledPrivateSlots), document.GetAllocator());
 		document.AddMember("dwPort", Value().SetInt(H2Config_base_port), document.GetAllocator());
+		document.AddMember("xnkid", xnkid_val, document.GetAllocator());
+		document.AddMember("xnkey", xnkey_val, document.GetAllocator());
 		document.AddMember("cProperties", Value().SetInt(cProperties + 3), document.GetAllocator());
 		document.AddMember("pProperties", Value().SetArray(), document.GetAllocator());
 
@@ -568,10 +591,7 @@ DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey)
 {
 	LOG_TRACE_XLIVE("XLocatorCreateKey");
 	if (pxnkid && pxnkey) {
-		//XNetCreateKey(pxnkid, pxnkey);
-		
-		memset(pxnkid, 0xAB, sizeof(XNKID));
-		memset(pxnkey, 0xAA, sizeof(XNKEY));
+		XNetCreateKey(pxnkid, pxnkey);
 
 		pxnkid->ab[0] &= ~XNET_XNKID_MASK;
 		pxnkid->ab[0] |= XNET_XNKID_ONLINE_PEER;
