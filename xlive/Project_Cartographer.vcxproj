@@ -478,7 +478,7 @@
     <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Maths\integer_math.hpp" />
     <ClInclude Include="Blam\Maths\real_math.hpp" />
-    <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h" />
+    <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />

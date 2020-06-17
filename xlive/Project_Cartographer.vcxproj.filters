@@ -244,9 +244,6 @@
     <Filter Include="Source Files\3rdparty\tinyxml">
       <UniqueIdentifier>{4a1d5690-b59a-45da-b355-656a31ecac34}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\H2MOD\Modules\DataArray">
-      <UniqueIdentifier>{009ec295-3920-4f2e-91ab-5c4dc867750a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\XLive\Cryptography">
       <UniqueIdentifier>{72853862-ec1c-4ea0-9c17-88b523b85492}</UniqueIdentifier>
     </Filter>
@@ -279,6 +276,9 @@
     </Filter>
     <Filter Include="Source Files\Blam\Common">
       <UniqueIdentifier>{9e25bf39-d83a-44bf-bf85-c1b15d3d37d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Engine\DataArray">
+      <UniqueIdentifier>{009ec295-3920-4f2e-91ab-5c4dc867750a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1094,9 +1094,6 @@
     <ClInclude Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkObserver</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h">
-      <Filter>Source Files\H2MOD\Modules\DataArray</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Tags\TagInterface.h">
       <Filter>Source Files\H2MOD\Modules\TagInterface</Filter>
     </ClInclude>
@@ -1216,6 +1213,9 @@
     </ClInclude>
     <ClInclude Include="Blam\Common\Common.h">
       <Filter>Source Files\Blam\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\DataArray\DataArray.h">
+      <Filter>Source Files\Blam\Engine\DataArray</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

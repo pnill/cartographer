@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Blam/Common/Common.h"
+#include "Blam/Engine/DataArray/DataArray.h"
 #include "Blam/Engine/Objects/Objects.h"
-#include "H2MOD\Modules\DataArray\DataArray.h"
 
 #pragma pack(push, 1)
 struct Player
