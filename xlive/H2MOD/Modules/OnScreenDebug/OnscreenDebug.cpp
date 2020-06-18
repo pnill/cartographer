@@ -17,10 +17,10 @@ int getDebugTextDisplayCount() {
 	return DebugTextCount;
 }
 
-void addDebugText(wchar_t* wtext) {
-	int lenInput = wcslen(wtext);
-	char* text = (char*)calloc(1, sizeof(char) * lenInput + 1);
-	snprintf(text, lenInput + 1, "%ls", wtext);
+void addDebugText(const wchar_t* wtext) {
+	int lenInput = wcslen(wtext) + 1;
+	char* text = (char*)calloc(1, sizeof(char) * lenInput);
+	snprintf(text, lenInput, "%ls", wtext);
 	addDebugText(text);
 	free(text);
 }

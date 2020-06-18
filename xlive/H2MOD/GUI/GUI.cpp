@@ -74,17 +74,11 @@ struct CVertexList
 extern HMODULE hThis;
 extern std::wstring ModulePathW(HMODULE);
 
-wchar_t dlldir[256];
-
-wchar_t* GetDirectoryFile(wchar_t *filename)
+std::wstring GetDirectoryFile(wchar_t *filename)
 {
-	static wchar_t path[256];
-	wcsncpy_s(dlldir, ModulePathW(hThis).c_str(), 256);
-	for (int i = wcslen(dlldir); i > 0; i--) { if (dlldir[i] == L'\\') { dlldir[i + 1] = 0; break; } }
-
-	wcsncpy_s(path, dlldir, 256);
-	wcscat_s(path, filename);
-	return path;
+	std::wstring dirFile(ModulePathW(hThis));
+	dirFile.append(filename);
+	return dirFile;
 }
 
 inline void BuildVertex(D3DXVECTOR4 xyzrhw, D3DCOLOR color, CVertexList* vertexList, int index)
@@ -242,18 +236,13 @@ HRESULT WINAPI XLiveOnDestroyDevice()
 	return S_OK;
 }
 
-wchar_t m_strFontName[80];
-wchar_t m_strFontPath[260];
-
-void InitalizeFont(wchar_t *strFontName, wchar_t *strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
+void InitalizeFont(std::wstring strFontName, std::wstring& strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
 {
-	wcsncpy_s(m_strFontName, strFontName, 80);
 	if (OnOff)
 	{
-		wcsncpy_s(m_strFontPath, strFontPath, 260);
 		addDebugText("Adding font: ");
-		addDebugText(m_strFontPath);
-		if(AddFontResource(m_strFontPath) > 0)
+		addDebugText(strFontPath.c_str());
+		if(AddFontResource(strFontPath.c_str()) > 0)
 		{
 			addDebugText("Font successfully added.");
 		}
@@ -263,7 +252,7 @@ void InitalizeFont(wchar_t *strFontName, wchar_t *strFontPath, int size, IDirect
 		}
 	}
 
-	D3DXCreateFont(pD3Ddev, size, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, m_strFontName, &haloFont);
+	D3DXCreateFont(pD3Ddev, size, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(), &haloFont);
 }
 
 
