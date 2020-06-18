@@ -98,14 +98,8 @@ LPD3DXSPRITE pSprite;
 using namespace std::chrono;
 high_resolution_clock::time_point nextFrame;
 high_resolution_clock::duration desiredRenderTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / (double)H2Config_fps_limit));
-high_resolution_clock::duration minimizedDesiredTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / 64.0));
 
 void frameTimeManagement() {
-
-	typedef bool(__cdecl* game_is_minimized)();
-	auto p_game_is_minimized = reinterpret_cast<game_is_minimized>(h2mod->GetAddress(0x28729));
-
-	bool isMinimized = p_game_is_minimized();
 
 	static bool bInitTime = false;
 	if (!bInitTime)
@@ -114,16 +108,14 @@ void frameTimeManagement() {
 		bInitTime = true;
 	}
 	
-	if (H2Config_fps_limit > 0 || isMinimized) {
+	if (H2Config_fps_limit > 0) {
 		std::this_thread::sleep_until(nextFrame);
 
-		auto& desiredTime = isMinimized ? minimizedDesiredTime : desiredRenderTime;
-
 		auto frameCount = duration<long long, std::micro>(
-			(1 + (duration_cast<duration<long long, std::micro>>(high_resolution_clock::now() - nextFrame) / duration_cast<duration<long long, std::micro>>(desiredTime)))
+			(1 + (duration_cast<duration<long long, std::micro>>(high_resolution_clock::now() - nextFrame) / duration_cast<duration<long long, std::micro>>(desiredRenderTime)))
 			);
 
-		nextFrame += (desiredTime * frameCount.count());
+		nextFrame += (desiredRenderTime * frameCount.count());
 	}
 }
 

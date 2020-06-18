@@ -535,7 +535,7 @@
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkChannel</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\H2MOD\Modules\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1004,9 +1004,6 @@
     <ClInclude Include="Blam\Engine\Players\Players.h">
       <Filter>Source Files\Blam\Engine\Players</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1208,14 +1205,17 @@
     <ClInclude Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.h">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkChannel</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Common\Common.h">
       <Filter>Source Files\Blam\Common</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h">
       <Filter>Source Files\Blam\Engine\DataArray</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h">
+      <Filter>Source Files\H2MOD\Modules\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h">
+      <Filter>Source Files\H2MOD\Modules\ServerConsole</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

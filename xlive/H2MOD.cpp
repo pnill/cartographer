@@ -1267,14 +1267,18 @@ void __cdecl game_mode_engine_draw_team_indicators()
 		p_game_mode_engine_draw_team_indicators();
 }
 
-bool __cdecl game_is_minimized_hook()
+// we disable some broken code added by hired gun, that is also disabled while running a cinematic 
+// this should fix the built in frame limiter (while minimized)
+// as well as the game speeding up while minimized
+bool __cdecl cinematic_in_progress_hook()
 {
-	// if xbox tickrate is set, use the built in frame limiter
-	if (b_XboxTick)
-		return true;
-	
-	// otherwise never use this frame limiter
-	return false;
+	typedef bool(__cdecl* game_is_minimized_def)();
+	auto p_game_is_minimized = h2mod->GetAddress<game_is_minimized_def>(0x28729);
+
+	typedef bool(__cdecl* cinematic_in_progress)();
+	auto p_cinematic_in_progress = h2mod->GetAddress<cinematic_in_progress>(0x3A938);
+
+	return p_cinematic_in_progress() || p_game_is_minimized();
 }
 
 void H2MOD::ApplyUnitHooks()
@@ -1345,8 +1349,6 @@ void H2MOD::ApplyHooks() {
 		LOG_TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
 
-		PatchCall(h2mod->GetAddress(0x288B5), game_is_minimized_hook);
-
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4C14), (BYTE*)VerifyGameVersionOnJoin, 5);
 
 		p_verify_executable_version = (verify_executable_version)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4C32), (BYTE*)VerifyExecutableVersion, 8);
@@ -1393,6 +1395,8 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
 		PatchCall(h2mod->GetAddress(0x226702), game_mode_engine_draw_team_indicators);
+
+		PatchCall(h2mod->GetAddress(0x39A2A), cinematic_in_progress_hook);
 
 		//Initialise_tag_loader();
 	}
