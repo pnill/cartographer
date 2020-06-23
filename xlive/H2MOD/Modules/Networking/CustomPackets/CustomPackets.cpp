@@ -10,16 +10,11 @@
 
 char g_network_message_types[e_network_message_types::end * 32];
 
-void register_packet_impl(void *packetObject, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* a9)
+void register_packet_impl(void *packetObject, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
 {
-	typedef void(__thiscall* register_packet_type)(void *packetObject, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* a9);
+	typedef void(__thiscall* register_packet_type)(void *, int, char*, int, int, int, void*, void*, void*);
 	auto register_packet = reinterpret_cast<register_packet_type>(h2mod->GetAddress(0x1E81D6, 0x1CA199));
-	return register_packet(packetObject, type, name, a4, size1, size2, write_packet_method, read_packet_method, a9);
-}
-
-char* getNetworkChannelData(int channel_index)
-{
-	return *h2mod->GetAddress<char**>(0x4FADBC, 0x525274) + 248 * channel_index;
+	return register_packet(packetObject, type, name, a4, size1, size2, write_packet_method, read_packet_method, unk_callback);
 }
 
 const char* getNetworkMessageName(int enumVal) 
@@ -27,30 +22,23 @@ const char* getNetworkMessageName(int enumVal)
 	return network_message_name[enumVal];
 }
 
-bool getNetworkAddressFromNetworkChannel(char* network_channel, network_address* out_addr)
-{
-	typedef bool(__thiscall* get_network_address_from_network_channel)(char*, network_address*);
-	auto p_get_network_address_from_network_channel = reinterpret_cast<get_network_address_from_network_channel>(h2mod->GetAddress(0x1BA543, 0x1C9364));
-	return p_get_network_address_from_network_channel(network_channel, out_addr);
-}
-
 void __cdecl encode_map_file_name_packet(bitstream* stream, int a2, s_custom_map_filename* data)
 {
-	stream->data_encode_string("map-file-name", (int)&data->file_name, 32);
+	stream->data_encode_string("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
 }
 bool __cdecl decode_map_file_name_packet(bitstream* stream, int a2, s_custom_map_filename* data)
 {
-	stream->data_decode_string("map-file-name", (int)&data->file_name, 32);
+	stream->data_decode_string("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
 	return stream->packet_is_valid() == false;
 }
 
 void __cdecl encode_request_map_filename_packet(bitstream* stream, int a2, s_request_map_filename* data)
 {
-	stream->data_encode_bits("user-identifier", &data->user_identifier, 64);
+	stream->data_encode_bits("user-identifier", &data->user_identifier, player_identifier_size_bits);
 }
 bool __cdecl decode_request_map_filename_packet(bitstream* stream, int a2, s_request_map_filename* data)
 {
-	stream->data_decode_bits("user-identifier", (int)&data->user_identifier, 64);
+	stream->data_decode_bits("user-identifier", &data->user_identifier, player_identifier_size_bits);
 	return stream->packet_is_valid() == false;
 }
 
@@ -115,11 +103,11 @@ void __stdcall handle_out_of_band_message_hook(void *thisx, network_address* add
 			if (map_filename.size() > 0)
 			{
 				data.is_custom_map = true;
-				wcsncpy_s(data.file_name, map_filename.c_str(), 32);
+				wcsncpy_s(data.file_name, map_filename.c_str(), ARRAYSIZE(data.file_name));
 			}
 
 			LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] sending map file name packet to XUID: {}, peer index: {}, map name: {}", received_data->user_identifier, peer_index, map_filename.c_str());
-			observer_channel_send_message(session->network_observer_ptr, session->unk_index, session->peer_observer_channels[peer_index].observer_index, true,
+			observer_channel_send_message(session->network_observer_ptr, session->unk_index, session->peer_observer_channels[peer_index].observer_index, network_observer::network_message_send_protocol::out_of_band,
 				map_file_name, sizeof(s_custom_map_filename), &data);
 		}
 
@@ -174,10 +162,9 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		This handles received in-band data
 	*/
 
-	char* network_channel = getNetworkChannelData(network_channel_index);
 	network_address addr;
-	SecureZeroMemory(&addr, sizeof(network_address));
-	getNetworkAddressFromNetworkChannel(network_channel, &addr);
+	network_channel* peer_network_channel = network_channel::getNetworkChannel(network_channel_index);
+	peer_network_channel->getNetworkAddressFromNetworkChannel(&addr);
 
 	switch (message_type)
 	{
@@ -185,7 +172,8 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 	{
 		s_request_map_filename* received_data = (s_request_map_filename*)packet;
 		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] received on handle_channel_message_hook request-map-filename from XUID: {}", received_data->user_identifier);
-		if (*(int*)(network_channel + 0x54) == 5 && getNetworkAddressFromNetworkChannel(network_channel, &addr))
+		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
+			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 		{
 			LOG_TRACE_NETWORK("  - network address: {:x}", ntohl(addr.address.ipv4));
 
@@ -200,14 +188,14 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				mapManager->getMapFilename(map_filename);
 				if (map_filename.size() > 0)
 				{
-					wcsncpy_s(data.file_name, map_filename.c_str(), 32);
+					wcsncpy_s(data.file_name, map_filename.c_str(), ARRAYSIZE(data.file_name));
 
 					LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] sending map file name packet to XUID: {}, peer index: {}, map name: {}", received_data->user_identifier, peer_index, map_filename.c_str());
 
 					network_observer* observer = session->network_observer_ptr;
 					peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peer_index);
 
-					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, custom_map_filename, sizeof(s_custom_map_filename), &data);
+					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, custom_map_filename, sizeof(s_custom_map_filename), &data);
 				}
 				else
 				{
@@ -221,7 +209,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 	case custom_map_filename:
 	{
-		if (*(int*)(network_channel + 0x54) == 5)
+		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
 		{
 			s_custom_map_filename* received_data = (s_custom_map_filename*)packet;
 			mapManager->setMapFileNameToDownload(received_data->file_name);
@@ -233,7 +221,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 	case team_change:
 	{
-		if (*(int*)(network_channel + 0x54) == 5)
+		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
 		{
 			s_team_change* received_data = (s_team_change*)packet;
 			h2mod->set_local_team_index(0, received_data->team_index);
@@ -262,7 +250,7 @@ void CustomPackets::sendRequestMapFilename()
 		peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(session->session_host_peer_index);
 
 		if (observer_channel->field_1) {
-			observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, request_map_filename, sizeof(s_request_map_filename), &data);
+			observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, request_map_filename, sizeof(s_request_map_filename), &data);
 
 			LOG_TRACE_NETWORK("[H2MOD-CustomPackets] Sending map name request info: session host peer index: {}, observer index {}, observer bool unk: {}, unk index: {}",
 				session->session_host_peer_index,
@@ -287,7 +275,7 @@ void CustomPackets::sendTeamChange(int peerIndex, int teamIndex)
 		if (peerIndex != -1 && peerIndex != session->local_peer_index)
 		{
 			if (observer_channel->field_1) {
-				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, team_change, sizeof(s_team_change), &data);
+				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, team_change, sizeof(s_team_change), &data);
 			}
 		}
 	}
