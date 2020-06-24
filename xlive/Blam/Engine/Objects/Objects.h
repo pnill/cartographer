@@ -3,7 +3,7 @@
 #include "Blam\Maths\Maths.h"
 #include "Blam\Cache\DataTypes.h"
 
-enum ObjectTeam : BYTE
+enum e_object_team : BYTE
 {
 	// MP
 	Red = 0,
@@ -38,14 +38,8 @@ enum ObjectTeam : BYTE
 	None = 255
 };
 
-enum class ObjectType : signed char
+enum e_object_type : signed char
 {
-	/* Because these are unsigned, they can only be positive.*/
-	_object_type_object = -4,
-	_object_type_device = -3,
-	_object_type_item = -2,
-	_object_type_unit = -1,
-
 	biped = 0,
 	vehicle,
 	weapon,
@@ -61,27 +55,27 @@ enum class ObjectType : signed char
 	creature,
 };
 
-enum class UnitWeapons
+enum UnitWeapons
 {
 	PrimaryWeapon,
 	SecondaryWeapon,
 	DualWeildWeapon
 };
 
-enum class Grenades : BYTE
+enum Grenades : BYTE
 {
 	Fragmentation,
 	Plasma
 };
 
-enum class WeaponIndex : WORD
+enum WeaponIndex : WORD
 {
 	Primary = 0xFF00,
 	Secondary = 0xFF01,
 	DualWeild = 0x0201
 };
 
-enum class BipedState : BYTE
+enum BipedState : BYTE
 {
 	mode_ground = 1,
 	mode_flying,
@@ -115,7 +109,7 @@ struct BipedObjectDefinition//To Do
 	real_vector3d AngularVelocity;//0x94
 	FLOAT Scale;//0xA0
 	BYTE unk_4[6];//0xA4
-	ObjectType ObjectType;//0xAA;
+	e_object_type ObjectType;//0xAA;
 	BYTE unk;//0xAB
 	INT16 NameListIndex;//0xAC
 	BYTE unk_5;//0xAE
@@ -145,7 +139,7 @@ struct BipedObjectDefinition//To Do
 	datum ActorDatum; // 0x130
 	BYTE unk_17[4]; //0x138
 	DWORD Flags;//0x138
-	ObjectTeam Team;//0x13C
+	e_object_team Team;//0x13C
 	WORD unk_12;//0x13D
 	datum PlayerDatum;//0x140
 	BYTE unk_13[9];//0x144
@@ -187,7 +181,7 @@ static_assert(sizeof(WeaponObjectDefinition) == 0x25C, "Invalid WeaponObjectDefi
 struct ObjectHeader {
 	__int16 datum_salt; //0x00
 	BYTE flags; // 0x02
-	ObjectType type; // 0x03
+	e_object_type type; // 0x03
 	__int16 unk__;  // 0x04
 	__int16 unk_size;  //0x06
 	char* object; //0x08 - 

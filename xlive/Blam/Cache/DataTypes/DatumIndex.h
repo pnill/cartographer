@@ -1,5 +1,6 @@
 #pragma once
-#include "Macros.h"
+
+#include "Blam/Common/Common.h"
 
 /*********************************************************************
 * datum / DatumIndex

@@ -9,7 +9,7 @@
 #include "H2MOD\Variants\DeviceShop\DeviceShop.h"
 #include "H2MOD\Variants\H2Final\H2Final.h"
 #include "H2MOD\Variants\XboxTick\XboxTick.h"
-#include "H2MOD\Modules\DataArray\DataArray.h"
+#include "Blam/Engine/DataArray/DataArray.h"
 #include "H2MOD\Variants\Infection\Infection.h"
 #include "H2MOD\Variants\FireFight\FireFight.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
@@ -40,3 +40,5 @@ std::vector<std::string> split(const std::string &s, char delim);
 extern int H2GetInstanceId();
 
 int stripWhitespace(wchar_t *inputStr);
+void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen);
+std::string ByteToHexStr(const BYTE* buffer, size_t size);

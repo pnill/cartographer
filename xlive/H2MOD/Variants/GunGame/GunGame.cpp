@@ -141,7 +141,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 	LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() player index: {}, player name: {1}", playerIndex, h2mod->get_player_name_from_player_index(playerIndex));
 
 	datum unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
-	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
+	char* unit_object = call_object_try_and_get_data_with_type(unit_datum_index, FLAG(e_object_type::biped));
 
 	if (unit_object) {
 		int level = GunGame::gungamePlayers[getPlayerXuid(playerIndex)];
@@ -155,22 +155,22 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 		}
 		else if (level == 15) {
 			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on frag grenade level!", h2mod->get_player_name_from_player_index(playerIndex));
-			h2mod->set_player_unit_grenades_count(playerIndex, GrenadeType::Frag, 99, true);
+			h2mod->set_player_unit_grenades_count(playerIndex, Grenades::Fragmentation, 99, true);
 		}
 		else if (level == 16) {
 			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on plasma grenade level!", h2mod->get_player_name_from_player_index(playerIndex));
-			h2mod->set_player_unit_grenades_count(playerIndex, GrenadeType::Plasma, 99, true);
+			h2mod->set_player_unit_grenades_count(playerIndex, Grenades::Plasma, 99, true);
 		}
 	}
 }
 
 void GunGame::playerDiedServer(int unit_datum_index)
 {
-	int unit_object = call_object_try_and_get_with_type(unit_datum_index, 3);
+	char* unit_object = call_object_try_and_get_data_with_type(unit_datum_index, FLAG(e_object_type::biped));
 	if (unit_object) {
 		int playerIndex = h2mod->get_player_index_from_unit_datum(unit_datum_index);
-		h2mod->set_player_unit_grenades_count(playerIndex, GrenadeType::Frag, 0, true);
-		h2mod->set_player_unit_grenades_count(playerIndex, GrenadeType::Plasma, 0, true);
+		h2mod->set_player_unit_grenades_count(playerIndex, Grenades::Fragmentation, 0, true);
+		h2mod->set_player_unit_grenades_count(playerIndex, Grenades::Plasma, 0, true);
 	}
 }
 
@@ -192,21 +192,20 @@ void GunGame::levelUpServer(int playerIndex)
 		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on level {} giving them weapon...", h2mod->get_player_name_from_player_index(playerIndex), level);
 
 		datum LevelWeapon = GunGame::levelWeapon[level];
-		h2mod->set_player_unit_grenades_count(playerIndex, GrenadeType::Frag, 0, true);
-		h2mod->set_player_unit_grenades_count(playerIndex, GrenadeType::Plasma, 0, true);
+		h2mod->set_player_unit_grenades_count(playerIndex, Grenades::Fragmentation, 0, true);
+		h2mod->set_player_unit_grenades_count(playerIndex, Grenades::Plasma, 0, true);
 		call_give_player_weapon(playerIndex, LevelWeapon, 1);
 	}
 
 	else if (level == 15) {
 		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 15 - Frag Grenades!", h2mod->get_player_name_from_player_index(playerIndex));
-		h2mod->set_player_unit_grenades_count(playerIndex, GrenadeType::Frag, 99,  true);
+		h2mod->set_player_unit_grenades_count(playerIndex, Grenades::Fragmentation, 99,  true);
 	}
 
 	else if (level == 16) {
 		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 16 - Plasma Grenades!", h2mod->get_player_name_from_player_index(playerIndex));
-		h2mod->set_player_unit_grenades_count(playerIndex, GrenadeType::Frag, 0,  true);
-		h2mod->set_player_unit_grenades_count(playerIndex, GrenadeType::Plasma, 99,  true);
-		//TODO: end game
+		h2mod->set_player_unit_grenades_count(playerIndex, Grenades::Fragmentation, 0,  true);
+		h2mod->set_player_unit_grenades_count(playerIndex, Grenades::Plasma, 99,  true);
 	}
 }
 

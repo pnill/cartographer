@@ -478,7 +478,7 @@
     <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Maths\integer_math.hpp" />
     <ClInclude Include="Blam\Maths\real_math.hpp" />
-    <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h" />
+    <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
@@ -501,7 +501,6 @@
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Cache\DataTypes.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\Macros.h" />
     <ClInclude Include="Blam\Cache\DataTypes\StringID.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Strings.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
@@ -520,7 +519,6 @@
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="Blam\Enums\Enums.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngine.h" />
-    <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h" />
     <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h" />
     <ClInclude Include="Blam\Maths\Maths.h" />
     <ClInclude Include="Globals.h" />

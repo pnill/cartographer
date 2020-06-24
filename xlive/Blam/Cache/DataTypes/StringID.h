@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Blam/Common/Common.h"
+
 /*********************************************************************
 * string_id
 * 4 BYTE Special Tag Structure for String Values

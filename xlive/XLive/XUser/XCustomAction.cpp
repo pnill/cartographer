@@ -39,10 +39,10 @@ int WINAPI XCustomSetDynamicActions(DWORD dwUserIndex, XUID xuid, CONST XCUSTOMA
 }
 
 // #473
-int WINAPI XCustomGetLastActionPress(DWORD* pdwUserIndex, DWORD* pdwActionIndex, XUID *pXUID)
+BOOL WINAPI XCustomGetLastActionPress(DWORD* pdwUserIndex, DWORD* pdwActionIndex, XUID *pXUID)
 {
 	//LOG_TRACE_XLIVE("XCustomGetLastActionPress");
-	return 0;
+	return FALSE;
 }
 
 // #476

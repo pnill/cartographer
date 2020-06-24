@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Blam/Cache/DataTypes/Macros.h"
+#include "Blam/Common/Common.h"
+#include "Blam/Engine/DataArray/DataArray.h"
 #include "Blam/Engine/Objects/Objects.h"
-#include "H2MOD\Modules\DataArray\DataArray.h"
 
 #pragma pack(push, 1)
 struct Player
@@ -180,7 +180,7 @@ struct Player
 			DWORD ID_3;
 		} clan_identifiers;
 
-		ObjectTeam player_team;
+		e_object_team player_team;
 		Handicap player_handicap_level;
 		Handicap player_displayed_skill;
 		char player_overall_skill;

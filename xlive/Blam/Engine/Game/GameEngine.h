@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Blam/Common/Common.h"
-#include "Blam/Cache//DataTypes/Macros.h"
 
 struct game_engine_settings
 {

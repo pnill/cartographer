@@ -34,3 +34,21 @@ int stripWhitespace(wchar_t *inputStr) {
 	memmove(inputStr, start, wcslen(start) + 1);
 	return 0;
 }
+
+void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen) {
+	for (size_t i = 0; i < hexStr.length() && i < bufLen; i++) {
+		byteBuf[i] = (BYTE)strtol(hexStr.substr(i * 2, 2).c_str(), NULL, 16);
+	}
+}
+
+std::string ByteToHexStr(const BYTE* buffer, size_t size) {
+	std::stringstream str;
+	str.setf(std::ios_base::hex, std::ios::basefield);
+	str.setf(std::ios_base::uppercase);
+	str.fill('0');
+
+	for (size_t i = 0; i < size; i++) {
+		str << std::setw(2) << (unsigned short)(BYTE)buffer[i];
+	}
+	return str.str();
+}
