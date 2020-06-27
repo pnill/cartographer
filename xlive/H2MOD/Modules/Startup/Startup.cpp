@@ -439,7 +439,7 @@ void InitH2Startup() {
 		exit(EXIT_FAILURE);
 
 	//apply any network hooks
-	network->applyNetworkHooks();
+	CustomNetwork::applyNetworkHooks();
 	InitH2Tweaks();
 	extern void initGSCustomLanguage();
 	initGSCustomLanguage();

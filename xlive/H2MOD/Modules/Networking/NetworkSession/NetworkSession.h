@@ -155,11 +155,11 @@ static_assert(sizeof(session_parameters) == 4784, "Invalid session_params size")
 struct network_session
 {
 	DWORD field_0;
-	void *network_message_gateway_ptr;
-	network_observer *network_observer_ptr;
-	DWORD session_manager_ptr;
+	void* network_message_gateway_ptr;
+	network_observer* network_observer_ptr;
+	void* session_manager_ptr;
 	DWORD text_chat;
-	int unk_index;
+	int session_index;
 	int field_18;
 	int network_protocol; // LIVE - 2, Network - 1
 	XNKID session_id;
@@ -238,7 +238,7 @@ struct network_session
 	DWORD field_7974;
 	DWORD field_7978;
 	BYTE gap_797C[508];
-	DWORD c_kablam_session_join_request_handler; // dedicated server session join handler
+	void* c_kablam_session_join_request_handler; // dedicated server session join handler
 	char field_7B7C[12];
 };
 static_assert(sizeof(network_session) == 31624, "Invalid network_session size");

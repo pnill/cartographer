@@ -428,10 +428,10 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 			token.SetString(H2CurrentAccountLoginToken, document.GetAllocator());
 
 		Value xnkid_val(kStringType);
-		xnkid_val.SetString(ByteToHexStr(&xnkid.ab[0], sizeof(XNKID)).c_str(), document.GetAllocator());
+		xnkid_val.SetString(ByteToHexStr(xnkid.ab, sizeof(XNKID)).c_str(), document.GetAllocator());
 
 		Value xnkey_val(kStringType);
-		xnkey_val.SetString(ByteToHexStr(&xnkey.ab[0], sizeof(XNKEY)).c_str(), document.GetAllocator());
+		xnkey_val.SetString(ByteToHexStr(xnkey.ab, sizeof(XNKEY)).c_str(), document.GetAllocator());
 
 		document.AddMember("token", token, document.GetAllocator());
 		document.AddMember("xuid", Value().SetUint64(usersSignInInfo[dwUserIndex].xuid), document.GetAllocator());

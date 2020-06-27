@@ -195,7 +195,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 					network_observer* observer = session->network_observer_ptr;
 					peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peer_index);
 
-					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, custom_map_filename, sizeof(s_custom_map_filename), &data);
+					observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, custom_map_filename, sizeof(s_custom_map_filename), &data);
 				}
 				else
 				{
@@ -250,13 +250,13 @@ void CustomPackets::sendRequestMapFilename()
 		peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(session->session_host_peer_index);
 
 		if (observer_channel->field_1) {
-			observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, request_map_filename, sizeof(s_request_map_filename), &data);
+			observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, request_map_filename, sizeof(s_request_map_filename), &data);
 
-			LOG_TRACE_NETWORK("[H2MOD-CustomPackets] Sending map name request info: session host peer index: {}, observer index {}, observer bool unk: {}, unk index: {}",
+			LOG_TRACE_NETWORK("[H2MOD-CustomPackets] Sending map name request info: session host peer index: {}, observer index {}, observer bool unk: {}, session index: {}",
 				session->session_host_peer_index,
 				observer_channel->observer_index,
 				observer_channel->field_1,
-				session->unk_index);
+				session->session_index);
 		}
 	}
 }
@@ -275,11 +275,13 @@ void CustomPackets::sendTeamChange(int peerIndex, int teamIndex)
 		if (peerIndex != -1 && peerIndex != session->local_peer_index)
 		{
 			if (observer_channel->field_1) {
-				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, team_change, sizeof(s_team_change), &data);
+				observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, team_change, sizeof(s_team_change), &data);
 			}
 		}
 	}
 }
+
+
 
 void CustomPackets::ApplyGamePatches()
 {

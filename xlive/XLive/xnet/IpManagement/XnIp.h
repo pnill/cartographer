@@ -78,7 +78,7 @@ public:
 	void setTimeConnectionInteractionHappened(IN_ADDR ina, int time);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
 	void SetupLocalConnectionInfo(XNADDR* pxna);
-	int sendConnectionRequest(XSocket* xsocket, IN_ADDR ipIdentifier);
+	void sendConnectionRequest(XSocket* xsocket, IN_ADDR ipIdentifier);
 	int handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount);
 
 	void UnregisterLocalConnectionInfo();

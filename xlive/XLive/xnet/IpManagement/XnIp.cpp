@@ -117,6 +117,7 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 	// Let the game know the packet received came from an unkown source
 	if (lpFrom->sin_addr.s_addr == 0)
 	{
+		LOG_CRITICAL_NETWORK("handleRecvdPacket() - discarding packet with size: {}", *bytesRecvdCount);
 		// set the bytes received count to 0
 		*bytesRecvdCount = 0;
 		WSASetLastError(WSAEWOULDBLOCK);
@@ -141,7 +142,7 @@ void CXnIp::checkForLostConnections()
 	}
 }
 
-int CXnIp::sendConnectionRequest(XSocket* xsocket, IN_ADDR connectionIdentifier /* TODO: int reqType */)
+void CXnIp::sendConnectionRequest(XSocket* xsocket, IN_ADDR connectionIdentifier /* TODO: int reqType */)
 {
 	sockaddr_in sendToAddr;
 	SecureZeroMemory(&sendToAddr, sizeof(sockaddr_in));
@@ -164,12 +165,10 @@ int CXnIp::sendConnectionRequest(XSocket* xsocket, IN_ADDR connectionIdentifier 
 
 		int ret = XSocketSendTo((SOCKET)xsocket, (char*)&connectionPacket, sizeof(XNetRequestPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
 		LOG_INFO_NETWORK("sendConnectionRequest() secure packet sent socket handle: {}, connection index: {}, connection identifier: {:x}", xsocket->winSockHandle, getConnectionIndex(connectionIdentifier), sendToAddr.sin_addr.s_addr);
-		return ret;
 	}
 	else
 	{
 		LOG_ERROR_NETWORK("sendConnectionRequest() - connection index: {}, identifier: {:x} is invalid!", getConnectionIndex(connectionIdentifier), connectionIdentifier.s_addr);
-		return -1;
 	}
 }
 
@@ -209,6 +208,8 @@ IN_ADDR CXnIp::GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* 
 		}
 	}
 	
+
+	LOG_CRITICAL_NETWORK("GetConnectionIdentifierByRecvAddr() - received packet from unknown/unregistered source, ip address: {} and port: {}", inet_ntoa(fromAddr->sin_addr), (short)fromAddr->sin_port);
 	return addrInval;
 }
 
@@ -220,7 +221,8 @@ void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier
 	if (xnIp->isValid(connectionIdentifier))
 	{
 		// TODO: handle dynamically
-		/* Store NAT data
+		/* 
+		   Store NAT data
 		   First we look at our socket's intended port.
 		   port 1000 is mapped to the receiving address/port xnIp->NatAddrSocket1000 via the connection identifier.
 		   port 1001 is mapped to the receiving address/port xnIp->NatAddrSocket1001 via the connection identifier.
@@ -313,8 +315,8 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 	}
 
 	// do not allow the connection if the received XNADDR is the same with the local one
-	if (memcmp(&localXn.abEnet, pxna->abEnet, sizeof(((XNADDR*)0)->abEnet)) == 0
-		&& memcmp(&localXn.abOnline, pxna->abOnline, sizeof(((XNADDR*)0)->abOnline)) == 0)
+	if (memcmp(&localXn.abEnet, pxna->abEnet, sizeof(XNADDR::abEnet)) == 0
+		&& memcmp(&localXn.abOnline, pxna->abOnline, sizeof(XNADDR::abOnline)) == 0)
 	{
 		LOG_INFO_NETWORK("CreateXnIpIdentifier() - the specified XNADDR is the same with the local one, aborting connection.");
 		return WSAEINVAL;
@@ -573,6 +575,8 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 		ipManager.setTimeConnectionInteractionHappened(ina, timeGetTime()); 
 		return xnIp->xnetstatus;
 	}
+
+	LOG_ERROR_NETWORK("XNetGetConnectStatus() - connection index: {}, identifier: {:x} is invalid!", ipManager.getConnectionIndex(ina), ina.s_addr);
 	return WSAEINVAL;
 }
 
