@@ -60,17 +60,6 @@ int get_player_index_from_datum(datum unit_datum)
 	return unit_object->PlayerDatum.ToAbsoluteIndex();
 }
 
-enum game_life_cycle : int
-{
-	life_cycle_none,
-	life_cycle_pre_game,
-	life_cycle_start_game,
-	life_cycle_in_game,
-	life_cycle_post_game,
-	life_cycle_joining,
-	life_cycle_matchmaking
-};
-
 game_life_cycle get_game_life_cycle()
 {
 	typedef game_life_cycle(__cdecl get_lobby_state)();
