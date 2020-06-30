@@ -163,8 +163,9 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 	*/
 
 	network_address addr;
+	ZeroMemory(&addr, sizeof(network_address));
 	network_channel* peer_network_channel = network_channel::getNetworkChannel(network_channel_index);
-	peer_network_channel->getNetworkAddressFromNetworkChannel(&addr);
+	
 
 	switch (message_type)
 	{
@@ -233,7 +234,16 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		break;
 	}
 
-	LOG_TRACE_NETWORK("handle_channel_message_hook() - Received message: {} from peer index: {}, address: {:x}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(&addr), ntohl(addr.address.ipv4));
+	if (peer_network_channel->getNetworkAddressFromNetworkChannel(&addr)) 
+	{
+		LOG_TRACE_NETWORK("handle_channel_message_hook() - Received message: {} from peer index: {}, address: {:x}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(&addr), ntohl(addr.address.ipv4));
+	}
+	else
+	{
+		LOG_ERROR_NETWORK("handle_channel_message_hook() - Received message: {} from network channel: {} that maybe shouldn't have been received", getNetworkMessageName(message_type), network_channel_index);
+	}
+
+
 	p_handle_channel_message(thisx, network_channel_index, message_type, dynamic_data_size, packet);
 }
 

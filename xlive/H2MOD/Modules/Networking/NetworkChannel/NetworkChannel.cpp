@@ -5,7 +5,8 @@
 
 network_channel* network_channel::getNetworkChannel(int channelIndex)
 {
-	return h2mod->GetAddress<network_channel**>(0x4FADBC, 0x525274)[channelIndex];
+	network_channel* network_channels = *h2mod->GetAddress<network_channel**>(0x4FADBC, 0x525274);
+	return &network_channels[channelIndex];
 }
 
 bool network_channel::getNetworkAddressFromNetworkChannel(network_address* out_addr)
