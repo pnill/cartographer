@@ -28,7 +28,7 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 		if (pSessionInfo)
 		{
 			ipManager.GetLocalXNAddr(&pSessionInfo->hostAddress);
-			ipManager.getRegisteredKeys(&pSessionInfo->sessionID, &pSessionInfo->keyExchangeKey);
+			ipManager.getLastRegisteredKeys(&pSessionInfo->sessionID, &pSessionInfo->keyExchangeKey);
 		}
 
 		LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_HOST");
