@@ -2,10 +2,7 @@
 
 #include "CustomPackets/CustomPackets.h"
 
-class CustomNetwork {
-public:
+namespace CustomNetwork
+{
 	void applyNetworkHooks();
-private:
-};
-
-extern CustomNetwork *network;
+}

@@ -2,9 +2,9 @@
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 
-XSESSION_LOCAL_DETAILS sessionDetails;
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
+XSESSION_LOCAL_DETAILS sessionDetails;
 
 // #5300: XSessionCreate
 LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, ULONGLONG *pqwSessionNonce, PXSESSION_INFO pSessionInfo, PXOVERLAPPED pOverlapped, HANDLE *phEnum)
@@ -12,7 +12,13 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 	LOG_TRACE_XLIVE("XSessionCreate  (flags = {0:x}, userIndex = {1}, maxPublicSlots = {2}, maxPrivateSlots = {3}, sessionNonce = {4:p}, pSessionInfo = {5:p}, pOverlapped = {6:p}, handle = {7:p})",
 		dwFlags, dwUserIndex, dwMaxPublicSlots, dwMaxPrivateSlots, (void*)pqwSessionNonce, (void*)pSessionInfo, (void*)pOverlapped, (void*)phEnum);
 
+	if (dwFlags & XSESSION_CREATE_USES_ARBITRATION && !(dwFlags & XSESSION_CREATE_USES_PEER_NETWORK))
+		return ERROR_INVALID_PARAMETER;
 
+	if ((dwFlags & XSESSION_CREATE_HOST)
+		&& !(dwFlags & (XSESSION_CREATE_USES_PEER_NETWORK | XSESSION_CREATE_USES_MATCHMAKING | XSESSION_CREATE_USES_STATS)))
+		return ERROR_INVALID_PARAMETER;
+	
 	if (phEnum) *phEnum = CreateMutex(NULL, NULL, NULL);
 
 	if ((dwFlags & XSESSION_CREATE_HOST))
@@ -22,7 +28,7 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 		if (pSessionInfo)
 		{
 			ipManager.GetLocalXNAddr(&pSessionInfo->hostAddress);
-			ipManager.getRegisteredKeys(&pSessionInfo->sessionID, &pSessionInfo->keyExchangeKey);
+			ipManager.getLastRegisteredKeys(&pSessionInfo->sessionID, &pSessionInfo->keyExchangeKey);
 		}
 
 		LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_HOST");
@@ -42,7 +48,6 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 	{
 		LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_USES_PRESENCE");
 	}
-
 
 	// local cache
 	sessionDetails.dwUserIndexHost = 0;
@@ -73,16 +78,17 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 	if (phEnum)
 		LOG_TRACE_XLIVE("- handle = {}", *phEnum);
 
-	if (pOverlapped)
+	return ERROR_SUCCESS;
+
+	/*if (pOverlapped)
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
 		pOverlapped->InternalHigh = 0;
 		pOverlapped->dwExtendedError = ERROR_SUCCESS;
 		Check_Overlapped(pOverlapped);
 		return ERROR_IO_PENDING;
-	}
+	}*/
 	
-	return ERROR_SUCCESS;
 }
 
 // #5332: XSessionEnd
@@ -90,7 +96,7 @@ int WINAPI XSessionEnd(HANDLE hSession,
 	PXOVERLAPPED pXOverlapped)
 {
 	LOG_TRACE_XLIVE("XSessionEnd()");
-	return 0;
+	return ERROR_SUCCESS;
 }
 
 // #5317: XSessionWriteStats
@@ -99,10 +105,9 @@ DWORD WINAPI XSessionWriteStats(DWORD, DWORD, DWORD, DWORD, DWORD, PXOVERLAPPED 
 	LOG_TRACE_XLIVE("XSessionWriteStats  (pOverlapped = {:p})",
 		(void*)pOverlapped);
 
-
-	Check_Overlapped(pOverlapped);
-
 	return ERROR_SUCCESS;
+
+	//Check_Overlapped(pOverlapped);
 }
 
 
@@ -112,19 +117,6 @@ int WINAPI XSessionStart(HANDLE hSession, DWORD dwFlags, PXOVERLAPPED pOverlappe
 	LOG_TRACE_XLIVE("XSessionStart  (hSession = {0:p}, dwFlags = {1:x}, pOverlapped = {2:p}",
 		(void*)hSession, dwFlags, (void*)pOverlapped);
 
-
-	if (pOverlapped)
-	{
-		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
-		pOverlapped->InternalHigh = 0;
-
-
-		Check_Overlapped(pOverlapped);
-
-		return ERROR_IO_PENDING;
-	}
-
 	return ERROR_SUCCESS;
 }
 
@@ -133,7 +125,7 @@ int WINAPI XSessionStart(HANDLE hSession, DWORD dwFlags, PXOVERLAPPED pOverlappe
 DWORD WINAPI XSessionSearchEx(DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD)
 {
 	LOG_TRACE_XLIVE("XSessionSearchEx");
-	return 0;
+	return ERROR_SUCCESS;
 }
 
 
@@ -145,10 +137,7 @@ DWORD WINAPI XSessionSearchByID(DWORD xnkid1, DWORD xnkid2, DWORD, DWORD * pcbRe
 	if (pcbResultsBuffer)
 		*pcbResultsBuffer = 0;
 
-
-	Check_Overlapped(pOverlapped);
-
-	return 0;
+	return ERROR_SUCCESS;
 }
 
 
@@ -161,9 +150,9 @@ DWORD WINAPI XSessionSearch(DWORD, DWORD, DWORD, WORD, WORD, void *, void *, DWO
 		*pcbResultsBuffer = 0;
 
 
-	Check_Overlapped(pOverlapped);
+	//Check_Overlapped(pOverlapped);
 
-	return 0;
+	return ERROR_SUCCESS;
 }
 
 
@@ -193,7 +182,9 @@ DWORD WINAPI XSessionLeaveLocal(HANDLE hSession, DWORD dwUserCount, const DWORD 
 	if (!pdwUserIndexes)
 		return ERROR_INVALID_PARAMETER;
 
-	//TODO XSessionLeaveLocal
+	return ERROR_SUCCESS;
+
+	/*
 	if (pXOverlapped) {
 		//asynchronous
 
@@ -208,8 +199,7 @@ DWORD WINAPI XSessionLeaveLocal(HANDLE hSession, DWORD dwUserCount, const DWORD 
 	else {
 		//synchronous
 		//return result;
-	}
-	return ERROR_SUCCESS;
+	}*/
 }
 
 
@@ -217,8 +207,9 @@ DWORD WINAPI XSessionLeaveLocal(HANDLE hSession, DWORD dwUserCount, const DWORD 
 DWORD WINAPI XSessionJoinRemote(HANDLE hSession, DWORD dwXuidCount, const XUID *pXuids, const BOOL *pfPrivateSlots, PXOVERLAPPED pXOverlapped)
 {
 	LOG_TRACE_XLIVE("XSessionJoinRemote");
+	return ERROR_SUCCESS;
 
-	if (pXOverlapped)
+	/*if (pXOverlapped)
 	{
 		pXOverlapped->InternalHigh = 0;
 		pXOverlapped->InternalLow = ERROR_SUCCESS;
@@ -226,8 +217,7 @@ DWORD WINAPI XSessionJoinRemote(HANDLE hSession, DWORD dwXuidCount, const XUID *
 
 		Check_Overlapped(pXOverlapped);
 		return ERROR_IO_PENDING;
-	}
-	return ERROR_SUCCESS;
+	}*/
 }
 
 
@@ -243,18 +233,18 @@ DWORD WINAPI XSessionJoinLocal(HANDLE hSession, DWORD dwUserCount, const DWORD *
 		LOG_TRACE_XLIVE("- user {0} = {1}  ({2})", lcv + 1, pdwUserIndexes[lcv], pfPrivateSlots[lcv] ? "Private" : "Public");
 	}
 
-	if (pOverlapped == 0)
-		return ERROR_SUCCESS;
+	return ERROR_SUCCESS;
 
+	/*if (pOverlapped)
+	{
+		pOverlapped->InternalHigh = 0;
+		pOverlapped->InternalLow = ERROR_SUCCESS;
+		pOverlapped->dwExtendedError = ERROR_SUCCESS;
 
-	pOverlapped->InternalHigh = 0;
-	pOverlapped->InternalLow = ERROR_SUCCESS;
-	pOverlapped->dwExtendedError = ERROR_SUCCESS;
+		Check_Overlapped(pOverlapped);
 
-
-	Check_Overlapped(pOverlapped);
-
-	return ERROR_IO_PENDING;
+		return ERROR_IO_PENDING;
+	}*/
 }
 
 
@@ -305,19 +295,19 @@ DWORD WINAPI XSessionGetDetails(HANDLE hSession, PDWORD pcbResultsBuffer, PXSESS
 	sessionDetails.pSessionMembers = 0;
 
 
+	return ERROR_SUCCESS;
 
-	if (pOverlapped == 0)
-		return ERROR_SUCCESS;
+	/*if (pOverlapped)
+	{
+		pOverlapped->InternalHigh = 0;
+		pOverlapped->InternalLow = ERROR_SUCCESS;
+		pOverlapped->dwExtendedError = ERROR_SUCCESS;
 
 
-	pOverlapped->InternalHigh = 0;
-	pOverlapped->InternalLow = ERROR_SUCCESS;
-	pOverlapped->dwExtendedError = ERROR_SUCCESS;
+		Check_Overlapped(pOverlapped);
 
-
-	Check_Overlapped(pOverlapped);
-
-	return ERROR_IO_PENDING;
+		return ERROR_IO_PENDING;
+	}*/
 }
 
 
@@ -325,7 +315,7 @@ DWORD WINAPI XSessionGetDetails(HANDLE hSession, PDWORD pcbResultsBuffer, PXSESS
 int WINAPI XSessionFlushStats(DWORD, DWORD)
 {
 	LOG_TRACE_XLIVE("XSessionFlushStats");
-	return 0;
+	return ERROR_SUCCESS;
 }
 
 
@@ -337,7 +327,9 @@ DWORD WINAPI XSessionDelete(HANDLE hSession, PXOVERLAPPED pXOverlapped)
 	if (!hSession)
 		return ERROR_INVALID_PARAMETER;
 
-	DWORD ret = 0;
+	return ERROR_SUCCESS;
+
+	/*DWORD ret = 0;
 	//TODO XSessionDelete
 	if (pXOverlapped) {
 		//asynchronous
@@ -354,14 +346,14 @@ DWORD WINAPI XSessionDelete(HANDLE hSession, PXOVERLAPPED pXOverlapped)
 		//synchronous
 	}
 
-	return ret;
+	return ret;*/
 }
 
 // #5333: XSessionArbitrationRegister
 DWORD WINAPI XSessionArbitrationRegister(DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD)
 {
 	LOG_TRACE_XLIVE("XSessionArbitrationRegister");
-	return 0;
+	return ERROR_SUCCESS;
 }
 
 
@@ -376,7 +368,9 @@ DWORD WINAPI XSessionLeaveRemote(HANDLE hSession, DWORD dwXuidCount, const XUID 
 	if (!pXuids)
 		return ERROR_INVALID_PARAMETER;
 
-	//TODO XSessionLeaveRemote
+	return ERROR_SUCCESS;
+
+	/*//TODO XSessionLeaveRemote
 	if (pXOverlapped) {
 		//asynchronous
 
@@ -391,8 +385,8 @@ DWORD WINAPI XSessionLeaveRemote(HANDLE hSession, DWORD dwXuidCount, const XUID 
 	else {
 		//synchronous
 		//return result;
-	}
-	return ERROR_SUCCESS;
+		return ERROR_SUCCESS;
+	}*/
 }
 
 
@@ -400,12 +394,12 @@ DWORD WINAPI XSessionLeaveRemote(HANDLE hSession, DWORD dwXuidCount, const XUID 
 DWORD WINAPI XSessionCalculateSkill(DWORD, DWORD, DWORD, DWORD, DWORD)
 {
 	LOG_TRACE_XLIVE("XSessionCalculateSkill");
-	return 0;
+	return ERROR_SUCCESS;
 }
 
 // #5342: XSessionModifySkill
 DWORD WINAPI XSessionModifySkill(HANDLE, DWORD, void * rgXuid, PXOVERLAPPED pOverlapped)
 {
 	LOG_TRACE_XLIVE("XSessionModifySkill");
-	return 0;
+	return ERROR_SUCCESS;
 }

@@ -534,6 +534,9 @@
     <ClCompile Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.cpp">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkChannel</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp">
       <Filter>Source Files\H2MOD\Modules\UI</Filter>
     </ClCompile>
@@ -1210,6 +1213,9 @@
     </ClInclude>
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h">
       <Filter>Source Files\Blam\Engine\DataArray</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h">
       <Filter>Source Files\H2MOD\Modules\UI</Filter>

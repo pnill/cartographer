@@ -53,34 +53,12 @@ std::unordered_map<wchar_t*, bool&> GametypesMap
 int GAME_BUILD = 11122;
 int EXECUTABLE_VERSION = 4;
 
-int character_datum_from_index(BYTE index)
-{
-	DWORD global_scnr = *(DWORD*)(*h2mod->GetAddress<DWORD*>(0x479E74) + 0x17C);
-	DWORD var2 = *h2mod->GetAddress<DWORD*>(0x482290);
-	DWORD var3 = var2 + global_scnr;
-	DWORD var4 = var3 + (8 * index) + 4;
-	DWORD char_tag_datum = *(DWORD*)var4;
-
-	return char_tag_datum;
-}
-
 int get_player_index_from_datum(datum unit_datum)
 {
 	DatumIterator<ObjectHeader> objectsIt(game_state_objects_header);
 	BipedObjectDefinition *unit_object = (BipedObjectDefinition*)objectsIt.get_data_at_index(unit_datum.ToAbsoluteIndex())->object;
 	return unit_object->PlayerDatum.ToAbsoluteIndex();
 }
-
-enum game_life_cycle : int
-{
-	life_cycle_none,
-	life_cycle_pre_game,
-	life_cycle_start_game,
-	life_cycle_in_game,
-	life_cycle_post_game,
-	life_cycle_joining,
-	life_cycle_matchmaking
-};
 
 game_life_cycle get_game_life_cycle()
 {
@@ -1267,20 +1245,6 @@ void __cdecl game_mode_engine_draw_team_indicators()
 		p_game_mode_engine_draw_team_indicators();
 }
 
-// we disable some broken code added by hired gun, that is also disabled while running a cinematic 
-// this should fix the built in frame limiter (while minimized)
-// as well as the game speeding up while minimized
-bool __cdecl cinematic_in_progress_hook()
-{
-	typedef bool(__cdecl* game_is_minimized_def)();
-	auto p_game_is_minimized = h2mod->GetAddress<game_is_minimized_def>(0x28729);
-
-	typedef bool(__cdecl* cinematic_in_progress)();
-	auto p_cinematic_in_progress = h2mod->GetAddress<cinematic_in_progress>(0x3A938);
-
-	return p_cinematic_in_progress() || p_game_is_minimized();
-}
-
 void H2MOD::ApplyUnitHooks()
 {
 	// increase the size of the unit entity creation definition packet
@@ -1395,8 +1359,6 @@ void H2MOD::ApplyHooks() {
 		PatchCall(GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
 		PatchCall(h2mod->GetAddress(0x226702), game_mode_engine_draw_team_indicators);
-
-		PatchCall(h2mod->GetAddress(0x39A2A), cinematic_in_progress_hook);
 
 		//Initialise_tag_loader();
 	}

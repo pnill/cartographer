@@ -48,11 +48,10 @@ std::string fileSizeDelim("$");
 
 std::wstring CUSTOM_MAP = L"Custom Map";
 wchar_t EMPTY_UNICODE_STR = '\0';
-std::string EMPTY_STR("");
 
+int downloadPercentage = 0;
 bool mapDownloadCountdown = false;
 auto promptOpenTime = std::chrono::high_resolution_clock::now();
-int downloadPercentage = 0;
 
 void MapManager::leaveSessionIfAFK() {
 	if (mapDownloadCountdown) {
@@ -61,6 +60,12 @@ void MapManager::leaveSessionIfAFK() {
 			h2mod->leave_session();
 			mapDownloadCountdown = false;
 		}
+	}
+	if (get_game_life_cycle() == life_cycle_in_game 
+		|| get_game_life_cycle() == life_cycle_start_game
+		|| get_game_life_cycle() == life_cycle_none)
+	{
+		mapDownloadCountdown = false;
 	}
 }
 
@@ -102,24 +107,25 @@ char __cdecl handle_map_download_callback() {
 		*mapDownloadStatus = 0;
 	};
 
-	if (NetworkSession::getCurrentNetworkSession()->local_session_state != 0)
+	if (NetworkSession::getCurrentNetworkSession()->local_session_state != network_session_state_none)
 		std::thread(mapDownload).detach();
 
 	return 1;
 }
 
-void* leavegame_callback_ptr;
+typedef char(__cdecl* leave_game_callback_def)();
+leave_game_callback_def p_original_leave_game_callback;
+
 char leavegame_callback()
 {
-	auto p_leave_game = (char(*)())(leavegame_callback_ptr);
 	mapDownloadCountdown = false;
-	return p_leave_game();
+	return p_original_leave_game_callback();
 }
 
 /**
 * Menu constructor hook
 */
-void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16 a4, int map_download_callback, int leave_game_callback, int a7, int a8, int a9, int a10)
+void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16 a4, DWORD map_download_callback, DWORD leave_game_callback, int a7, int a8, int a9, int a10)
 {
 	typedef void(__cdecl map_downloading_menu_constructor)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6, int a7, int a8, int a9, int a10);
 	auto p_map_downloading_menu_constructor = h2mod->GetAddress<map_downloading_menu_constructor*>(0x20E2E0);
@@ -127,8 +133,8 @@ void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16
 	mapDownloadCountdown = true;
 	promptOpenTime = std::chrono::high_resolution_clock::now();
 	CustomPackets::sendRequestMapFilename();
-	leavegame_callback_ptr = (void*)leave_game_callback;
-	p_map_downloading_menu_constructor(a1, a2, a3, a4, reinterpret_cast<int>(handle_map_download_callback), leave_game_callback, a7, a8, a9, a10);
+	p_original_leave_game_callback = (leave_game_callback_def)leave_game_callback;
+	p_map_downloading_menu_constructor(a1, a2, a3, a4, (DWORD)handle_map_download_callback, (DWORD)leavegame_callback, a7, a8, a9, a10);
 }
 
 int __cdecl get_total_map_downloading_percentage()

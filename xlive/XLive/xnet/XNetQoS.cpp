@@ -248,7 +248,7 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 
 	if (cbTransferred == 0)
 	{
-		LOG_TRACE_NETWORK("CXNetQoS::SendBack() - no data received!");
+		//LOG_TRACE_NETWORK("CXNetQoS::SendBack() - no data received!");
 		goto cleanup;
 	}
 

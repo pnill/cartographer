@@ -10,8 +10,6 @@
 #include "Memory\bitstream.h"
 #include "CustomPackets\CustomPackets.h"
 
-CustomNetwork *network = new CustomNetwork;
-
 void __cdecl request_write(bitstream* stream, int a2, int a3) {
 	stream->data_encode_integer("identifier", *(DWORD *)a3, 32);
 	stream->data_encode_integer("flags", *(DWORD *)(a3 + 4), 8);

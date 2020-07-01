@@ -10,14 +10,23 @@ const char broadcastStrHdr[MAX_HDR_STR] = "XNetReqPack";
 
 #define XnIp_ConnectionPing 0x0
 #define XnIp_ConnectionPong 0x2
-#define XnIp_ConnectionClose 0x4
+#define XnIp_ConnectionCloseSecure 0x4
 #define XnIp_ConnectionEstablishSecure 0x8
+
+#define IPADDR_LOOPBACK htonl(0x7F000001) // 127.0.0.1
+
+struct XnKeyPair
+{
+	bool bValid;
+	XNKID xnkid;
+	XNKEY xnkey;
+};
 
 struct XnIp
 {
 	IN_ADDR connectionIdentifier;
 	XNADDR xnaddr;
-	XNKID xnkid;
+	XnKeyPair* keyPair;
 	bool bValid;
 	int xnetstatus;
 	int connectionPacketsSentCount;
@@ -78,7 +87,7 @@ public:
 	void setTimeConnectionInteractionHappened(IN_ADDR ina, int time);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
 	void SetupLocalConnectionInfo(XNADDR* pxna);
-	int sendConnectionRequest(XSocket* xsocket, IN_ADDR ipIdentifier);
+	void sendXNetRequest(XSocket* xsocket, IN_ADDR ipIdentifier, int reqType);
 	int handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount);
 
 	void UnregisterLocalConnectionInfo();
@@ -86,26 +95,28 @@ public:
 	IN_ADDR GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* addr);
 	void SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);
 	void HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectReqPacket, sockaddr_in* addr);
-	void RegisterKeys(XNKID*, XNKEY*);
-	void UnregisterKeys();
-	void getRegisteredKeys(XNKID* xnkid, XNKEY* xnkey);
+
+	int RegisterKey(XNKID*, XNKEY*);
+	XnKeyPair* getKeyPair(const XNKID* xnkid);
+	void UnregisterKey(const XNKID* xnkid);
+	void getLastRegisteredKeys(XNKID* xnkid, XNKEY* xnkey);
 	
 	XnIp localUser;
 	BOOL GetLocalXNAddr(XNADDR* pxna);
 
 	XnIp* XnIPs = nullptr;
-	std::vector<XSocket*> SocketPtrArray = {};
+	XnKeyPair* XnKeyPairs = nullptr;
 
-	// TODO: get rid of this
-	XNADDR gameHostXn; // the Xn of the host from the join game hook
+	std::vector<XSocket*> SocketPtrArray = {};
 
 	XNetStartupParams startupParams;
 	int GetMaxXnConnections() { return startupParams.cfgSecRegMax; }
 	int GetReqQoSBufferSize() { return startupParams.cfgQosDataLimitDiv4 * 4; }
+	int GetMaxXnKeyPairs() { return startupParams.cfgKeyRegMax;  }
 
 private:
-	XNKID host_xnkid;
-	XNKEY host_xnkey;
+
+	XnKeyPair* lastRegisteredKey = nullptr;
 };
 
 extern CXnIp ipManager;

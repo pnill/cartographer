@@ -14,6 +14,7 @@
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
 #include "..\CustomResolutions\CustomResolutions.h"
 #include "..\H2MOD\Tags\TagInterface.h"
+#include "H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h"
 
 #define _USE_MATH_DEFINES
 #include "math.h"
@@ -876,16 +877,6 @@ void fix_shaders_nvidia()
 	);
 }
 
-int system_get_time()
-{
-	LARGE_INTEGER PerformanceCount;
-	LARGE_INTEGER PerformanceFrequency;
-
-	QueryPerformanceCounter(&PerformanceCount);
-	QueryPerformanceFrequency(&PerformanceFrequency);
-	return (unsigned int)(PerformanceCount.QuadPart / (PerformanceFrequency.QuadPart / 1000));
-}
-
 void InitH2Tweaks() {
 	postConfig();
 
@@ -964,7 +955,7 @@ void InitH2Tweaks() {
 	PatchCall(h2mod->GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
 	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 
-	WriteJmpTo(h2mod->GetAddress(0x37E51, 0x2B4CE), system_get_time);
+	UncappedFPS::ApplyPatches();
 
 	addDebugText("End Startup Tweaks.");
 }

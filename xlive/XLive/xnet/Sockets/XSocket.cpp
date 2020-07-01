@@ -397,7 +397,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("XSocketSendTo() - Tried to send packet to unknown connection, connection index: {}, connection identifier: {}", ipManager.getConnectionIndex(inTo->sin_addr), inTo->sin_addr.s_addr);
+		LOG_TRACE_NETWORK("XSocketSendTo() - Tried to send packet to unknown connection, connection index: {}, connection identifier: {:x}", ipManager.getConnectionIndex(inTo->sin_addr), inTo->sin_addr.s_addr);
 		WSASetLastError(WSAEHOSTUNREACH);
 		return SOCKET_ERROR;
 	}
