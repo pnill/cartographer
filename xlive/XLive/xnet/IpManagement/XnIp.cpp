@@ -461,13 +461,12 @@ void CXnIp::UnregisterKey(const XNKID* xnkid)
 		if (memcmp(&XnKeyPairs[i].xnkid, xnkid, sizeof(XNKID)) == 0)
 		{
 			// close any connections present on this key
-
-			for (int j = 0; j < GetMaxXnConnections(); j++)
-			{
-				if (XnIPs[j].bValid
-					&& XnIPs[j].keyPair == &XnKeyPairs[i])
-					UnregisterXnIpIdentifier(XnIPs[j].connectionIdentifier);
-			}
+			//for (int j = 0; j < GetMaxXnConnections(); j++)
+			//{
+			//	if (XnIPs[j].bValid
+			//		&& XnIPs[j].keyPair == &XnKeyPairs[i])
+			//		UnregisterXnIpIdentifier(XnIPs[j].connectionIdentifier);
+			//}
 
 			if (XnKeyPairs[i].bValid == true)
 			{
