@@ -83,19 +83,15 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 		nResult->dwServerType = doc["dwServerType"].GetUint();
 
 #pragma region Xbox Network Address Reading
+		// TODO: this is the LAN address, may be useful in the future
+		nResult->serverAddress.ina.s_addr = 0; // currently we set it to 0
+
 		if (!doc.HasMember("xnaddr") || !doc["xnaddr"].IsUint())
 		{
 			BadServer(xuid, nResult, "Missing Member: xnaddr");
 			return;
 		}
-		nResult->serverAddress.ina.s_addr = htonl(doc["xnaddr"].GetUint());
-
-		if (!doc.HasMember("saddr") || !doc["saddr"].IsUint())
-		{
-			BadServer(xuid, nResult, "Missing Member: saddr");
-			return;
-		}
-		nResult->serverAddress.inaOnline.s_addr = doc["saddr"].GetUint();
+		nResult->serverAddress.inaOnline.s_addr = htonl(doc["xnaddr"].GetUint());
 
 		if (!doc.HasMember("dwPort"))
 		{
@@ -106,7 +102,7 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 
 		if (!doc.HasMember("abenet"))
 		{
-			BadServer(xuid, nResult, "Missing Member: abenet");
+			BadServer(xuid, nResult, "Missing Member: abEnet");
 			return;
 		}
 		const char* abEnet_str = doc["abenet"].GetString();
