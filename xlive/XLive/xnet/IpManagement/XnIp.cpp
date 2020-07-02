@@ -682,7 +682,7 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 	}
 
 	LOG_ERROR_NETWORK("XNetGetConnectStatus() - connection index: {}, identifier: {:x} is invalid!", ipManager.getConnectionIndex(ina), ina.s_addr);
-	return WSAEINVAL;
+	return XNET_CONNECT_STATUS_LOST;
 }
 
 // #73: XNetGetTitleXnAddr
