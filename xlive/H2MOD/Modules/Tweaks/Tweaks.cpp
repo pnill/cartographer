@@ -1188,8 +1188,15 @@ void H2Tweaks::applyMeleePatch(bool toggle)
 	//WritePointer(h2mod->GetAddress(0x10B6A3, 0xFDCD3) + 4, &melee_lunge_distance_factor); // acceleration
 	//WritePointer(h2mod->GetAddress(0x10BB78, 0xFE1A8) + 4, &melee_lunge_distance_factor);
 
-	WriteValue<BYTE>(h2mod->GetAddress(0x10B408, 0xFDA38) + 2, toggle ? 5 : 6); // sword
-	WriteValue<BYTE>(h2mod->GetAddress(0x10B40B, 0xFDA3B) + 2, toggle ? 2 : 1); // generic weapon
+	//WriteValue<BYTE>(h2mod->GetAddress(0x10B408, 0xFDA38) + 2, toggle ? 5 : 6); // sword
+	//WriteValue<BYTE>(h2mod->GetAddress(0x10B40B, 0xFDA3B) + 2, toggle ? 2 : 1); // generic weapon
+
+	//WriteValue<BYTE>(h2mod->GetAddress(0x10BC0A) + 2, 12);
+
+	// this fixes the airborne melee, where you are above the target
+	static float melee_lunge_deceleration_tick_val;
+	melee_lunge_deceleration_tick_val = toggle ? 2.0f : 4.0f;
+	WritePointer(h2mod->GetAddress(0x10B7D8, 0xFDE08) + 4, &melee_lunge_deceleration_tick_val);
 }
 
 void H2Tweaks::sunFlareFix()
