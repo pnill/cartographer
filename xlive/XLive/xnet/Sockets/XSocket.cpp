@@ -311,7 +311,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			}
 		}
 		free(packet);
-		return ERROR_SUCCESS;
+		return 0;
 	}
 
 	/*
@@ -325,7 +325,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 	{
 		sockaddr_in sendToAddr;
 		sendToAddr.sin_family = AF_INET;
-		sendToAddr.sin_addr = xnIp->xnaddr.ina;
+		sendToAddr.sin_addr = xnIp->xnaddr.inaOnline;
 
 		//LOG_TRACE_NETWORK("SendStruct.sin_addr.s_addr == %08X", sendAddress.sin_addr.s_addr);
 
@@ -393,7 +393,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			updateSendToStatistics(*lpNumberOfBytesSent);
 		}
 
-		return ERROR_SUCCESS;
+		return 0;
 	}
 	else
 	{
@@ -577,7 +577,7 @@ int WINAPI XSocketSend(SOCKET s, const char* buf, int len, int flags)
 	wsaBuf.buf = (CHAR*)buf;
 	DWORD numberOfBytesSent = 0;
 
-	if (XSocketWSASendTo(s, &wsaBuf, 1, &numberOfBytesSent, flags, NULL, NULL, NULL, NULL) != ERROR_SUCCESS)
+	if (XSocketWSASendTo(s, &wsaBuf, 1, &numberOfBytesSent, flags, NULL, NULL, NULL, NULL) != 0)
 		return SOCKET_ERROR;
 	else
 		return numberOfBytesSent;
@@ -591,7 +591,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char* buf, int len, int flags, sockaddr
 	wsaBuf.buf = (CHAR*)buf;
 	DWORD numberOfBytesSent = 0;
 
-	if ( XSocketWSASendTo(s, &wsaBuf, 1, &numberOfBytesSent, flags, to, tolen, NULL, NULL) != ERROR_SUCCESS)
+	if ( XSocketWSASendTo(s, &wsaBuf, 1, &numberOfBytesSent, flags, to, tolen, NULL, NULL) != 0)
 		return SOCKET_ERROR;
 	else
 		return numberOfBytesSent;
@@ -605,7 +605,7 @@ int WINAPI XSocketRecv(SOCKET s, char* buf, int len, int flags)
 	wsaBuf.buf = (CHAR*)buf;
 	DWORD numberOfbytesRecvd;
 
-	if (XSocketWSARecvFrom(s, &wsaBuf, 1, &numberOfbytesRecvd, (LPDWORD)&flags, NULL, NULL, NULL, NULL) != ERROR_SUCCESS)
+	if (XSocketWSARecvFrom(s, &wsaBuf, 1, &numberOfbytesRecvd, (LPDWORD)&flags, NULL, NULL, NULL, NULL) != 0)
 		return SOCKET_ERROR;
 	else
 		return numberOfbytesRecvd;
@@ -619,7 +619,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char* buf, int len, int flags, sockaddr *fr
 	wsaBuf.buf = (CHAR*)buf;
 	DWORD numberOfbytesRecvd;
 
-	if (XSocketWSARecvFrom(s, &wsaBuf, 1, &numberOfbytesRecvd, (LPDWORD)&flags, from, fromlen, NULL, NULL) != ERROR_SUCCESS)
+	if (XSocketWSARecvFrom(s, &wsaBuf, 1, &numberOfbytesRecvd, (LPDWORD)&flags, from, fromlen, NULL, NULL) != 0)
 		return SOCKET_ERROR;
 	else
 		return numberOfbytesRecvd;

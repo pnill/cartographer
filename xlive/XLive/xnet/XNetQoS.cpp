@@ -32,7 +32,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 			hints.ai_socktype = SOCK_STREAM;
 			hints.ai_protocol = IPPROTO_TCP;
 
-			std::string addr = inet_ntoa(xn->ina);
+			std::string addr = inet_ntoa(xn->inaOnline);
 			std::string port = std::to_string(ntohs(xn->wPortOnline) + 10);
 
 			//	LOG_TRACE_NETWORK_N("[XNetQoSLookup] QoSLookup, addr={0}, port={1}", addr.c_str(), prt.c_str());

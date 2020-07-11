@@ -49,29 +49,8 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 
 	char result = strlen(login_token) == 32 ? 1 : 2;
 
-	XNADDR pxna;
-	SecureZeroMemory(&pxna, sizeof(XNADDR));
-
-	pxna.ina.s_addr = xnaddr;
-	pxna.inaOnline.s_addr = saddr;
-	pxna.wPortOnline = htons(H2Config_base_port);
-
-	BYTE abEnet2[6];
-	SecureZeroMemory(abEnet2, sizeof(abEnet2));
-	for (int i = 0; i < 6; i++) {
-		sscanf(&abEnet[i * 2], "%2hhx", &abEnet2[i]);
-	}
-
-	char abOnline2[20];
-	SecureZeroMemory(abOnline2, sizeof(abOnline2));
-	for (int i = 0; i < 20; i++) {
-		sscanf(&abOnline[i * 2], "%2hhx", &abOnline2[i]);
-	}
-	memcpy(&pxna.abEnet, abEnet2, 6);
-	memcpy(&pxna.abOnline, abOnline2, 20);
-
 	XUserSetup(0, xuid, username, onlineSignIn);
-	ipManager.SetupLocalConnectionInfo(&pxna);
+	ipManager.SetupLocalConnectionInfo(xnaddr, abEnet, abOnline);
 
 	UpdateConnectionStatus();
 

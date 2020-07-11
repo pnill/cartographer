@@ -221,8 +221,7 @@ IN_ADDR CXnIp::GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* 
 		}
 	}
 	
-
-	LOG_CRITICAL_NETWORK("GetConnectionIdentifierByRecvAddr() - received packet from unknown/unregistered source, ip address: {} and port: {}", inet_ntoa(fromAddr->sin_addr), htons(fromAddr->sin_port));
+	LOG_CRITICAL_NETWORK("GetConnectionIdentifierByRecvAddr() - received packet from unknown/unregistered source, ip address: {}:{}", inet_ntoa(fromAddr->sin_addr), htons(fromAddr->sin_port));
 	return addrInval;
 }
 
@@ -230,7 +229,7 @@ void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier
 {
 	LOG_INFO_NETWORK("SaveNatInfo() - socket: {}, connection index: {}, identifier: {:x}", xsocket->winSockHandle, getConnectionIndex(connectionIdentifier), connectionIdentifier.s_addr);
 
-	XnIp* xnIp = &this->XnIPs[getConnectionIndex(connectionIdentifier)];
+	XnIp* xnIp = &XnIPs[getConnectionIndex(connectionIdentifier)];
 	if (xnIp->isValid(connectionIdentifier))
 	{
 		// TODO: handle dynamically
@@ -318,7 +317,6 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 		return WSAEINVAL;
 	}
 
-	// do not allow the connection if the received XNADDR is the same with the local one
 	if (memcmp(&localXn.abEnet, pxna->abEnet, sizeof(XNADDR::abEnet)) == 0)
 	{
 		LOG_INFO_NETWORK("CreateXnIpIdentifier() - the specified XNADDR is the same with the local one, aborting connection.");
@@ -405,7 +403,7 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 void CXnIp::UnregisterXnIpIdentifier(const IN_ADDR ina)
 {
 	// TODO: let the other connection end know that the connection has to be closed
-	XnIp* xnIp = &this->XnIPs[getConnectionIndex(ina)];
+	XnIp* xnIp = &XnIPs[getConnectionIndex(ina)];
 	if (xnIp->isValid(ina))
 	{
 		LOG_INFO_NETWORK("UnregisterXnIpIdentifier() - Unregistered connection index: {}, identifier: {:x}", getConnectionIndex(ina), xnIp->connectionIdentifier.s_addr);
@@ -463,13 +461,12 @@ void CXnIp::UnregisterKey(const XNKID* xnkid)
 		if (memcmp(&XnKeyPairs[i].xnkid, xnkid, sizeof(XNKID)) == 0)
 		{
 			// close any connections present on this key
-
-			for (int j = 0; j < GetMaxXnConnections(); j++)
-			{
-				if (XnIPs[j].bValid
-					&& XnIPs[j].keyPair == &XnKeyPairs[i])
-					UnregisterXnIpIdentifier(XnIPs[j].connectionIdentifier);
-			}
+			//for (int j = 0; j < GetMaxXnConnections(); j++)
+			//{
+			//	if (XnIPs[j].bValid
+			//		&& XnIPs[j].keyPair == &XnKeyPairs[i])
+			//		UnregisterXnIpIdentifier(XnIPs[j].connectionIdentifier);
+			//}
 
 			if (XnKeyPairs[i].bValid == true)
 			{
@@ -518,19 +515,31 @@ void CXnIp::getLastRegisteredKeys(XNKID* xnkid, XNKEY* xnkey)
 	}
 }
 
-void CXnIp::SetupLocalConnectionInfo(XNADDR* pxna) 
+void CXnIp::SetupLocalConnectionInfo(unsigned long xnaddr, char* abEnet, char* abOnline)
 {
 	SecureZeroMemory(&localUser, sizeof(XnIp));
-	localUser.xnaddr = *pxna;
+	
+	// TODO: this field is the lan address, make use of it at some point
+	//localUser.xnaddr.ina.s_addr = saddr; 
+	localUser.xnaddr.ina.s_addr = 0; 
+	localUser.xnaddr.inaOnline.s_addr = xnaddr;
+	localUser.xnaddr.wPortOnline = htons(H2Config_base_port);
+	HexStrToBytes(std::string(abEnet, sizeof(XNADDR::abEnet) * 2), localUser.xnaddr.abEnet, sizeof(XNADDR::abEnet));
+	HexStrToBytes(std::string(abOnline, sizeof(XNADDR::abOnline) * 2), localUser.xnaddr.abOnline, sizeof(XNADDR::abOnline));
+
 	localUser.bValid = true;
 }
 
 BOOL CXnIp::GetLocalXNAddr(XNADDR* pxna)
 {
-	SecureZeroMemory(pxna, sizeof(XNADDR));
+	if (pxna)
+		SecureZeroMemory(pxna, sizeof(XNADDR));
+
 	if (localUser.bValid)
 	{
-		*pxna = localUser.xnaddr;
+		if (pxna)
+			*pxna = localUser.xnaddr;
+
 		return TRUE;
 	}
 
@@ -579,8 +588,6 @@ INT WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey)
 // #57: XNetXnAddrToInAddr
 INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *pina)
 {
-	LOG_INFO_NETWORK("XNetXnAddrToInAddr() - local-address: {:x}, online-address: {:x}", pxna->ina.s_addr, pxna->inaOnline.s_addr); // TODO
-
 	if (pxna == nullptr 
 		|| pxnkid == nullptr
 		|| pina == nullptr)
@@ -588,6 +595,7 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 
 	int ret = ipManager.CreateXnIpIdentifier(pxna, pxnkid, pina, false);
 	 
+	LOG_INFO_NETWORK("XNetXnAddrToInAddr() - local-address: {:x}, online-address: {:x}", pxna->ina.s_addr, pxna->inaOnline.s_addr);
 	return ret;
 }
 
@@ -673,21 +681,16 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 	}
 
 	LOG_ERROR_NETWORK("XNetGetConnectStatus() - connection index: {}, identifier: {:x} is invalid!", ipManager.getConnectionIndex(ina), ina.s_addr);
-	return WSAEINVAL;
+	return XNET_CONNECT_STATUS_LOST;
 }
 
 // #73: XNetGetTitleXnAddr
-DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pAddr)
+DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pxna)
 {
-	if (pAddr)
-	{
-		if (ipManager.GetLocalXNAddr(pAddr))
-			return XNET_GET_XNADDR_ETHERNET;
-		else
-			return XNET_GET_XNADDR_PENDING;
-	}
-
-	return XNET_GET_XNADDR_PENDING;
+	if (ipManager.GetLocalXNAddr(pxna))
+		return XNET_GET_XNADDR_ETHERNET;
+	else
+		return XNET_GET_XNADDR_PENDING;
 }
 
 

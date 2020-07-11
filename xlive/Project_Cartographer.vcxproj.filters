@@ -280,6 +280,12 @@
     <Filter Include="Source Files\Blam\Engine\DataArray">
       <UniqueIdentifier>{009ec295-3920-4f2e-91ab-5c4dc867750a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\MainLoopPatches">
+      <UniqueIdentifier>{a9f1ac05-d6e3-401a-98da-40f2ddb55a82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\MainLoopPatches\UncappedFPS">
+      <UniqueIdentifier>{4aa06548-b335-4829-8959-31266ac32cd4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -534,11 +540,11 @@
     <ClCompile Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.cpp">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkChannel</Filter>
     </ClCompile>
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp">
       <Filter>Source Files\H2MOD\Modules\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.cpp">
+      <Filter>Source Files\H2MOD\Modules\MainLoopPatches\UncappedFPS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1214,14 +1220,14 @@
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h">
       <Filter>Source Files\Blam\Engine\DataArray</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h">
       <Filter>Source Files\H2MOD\Modules\UI</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h">
       <Filter>Source Files\H2MOD\Modules\ServerConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h">
+      <Filter>Source Files\H2MOD\Modules\MainLoopPatches\UncappedFPS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
