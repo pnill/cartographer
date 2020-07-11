@@ -1,8 +1,9 @@
+
 #include "H2MOD.h"
 
+#include "H2MOD/Modules/Config/Config.h"
 #include "Blam/Engine/FileSystem/FiloInterface.h"
 #include "H2MOD/Discord/DiscordInterface.h"
-#include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/HitFix/HitFix.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/MainMenu/Ranks.h"
@@ -993,7 +994,7 @@ void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 {
 	network_session* session = NetworkSession::getCurrentNetworkSession();
 	if ((session->parameters.field_8 == 4 && get_game_life_cycle() == life_cycle_pre_game)
-		|| (StrStrIW(h2mod->get_session_game_variant_name(), L"rvb") != NULL && teamIndex != 0 && teamIndex != 1)) {
+		|| (StrStrIW(h2mod->get_session_game_variant_name(), L"rvb") != NULL && teamIndex > 1)) {
 		//rvb mode enabled, don't change teams
 		return;
 	}

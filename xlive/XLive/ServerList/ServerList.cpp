@@ -11,7 +11,6 @@
 using namespace rapidjson;
 
 ServerList serverList;
-HANDLE ServerEnumHandle = INVALID_HANDLE_VALUE;
 extern unsigned short H2Config_base_port;
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -571,10 +570,9 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int 
 
 	if (phEnum)
 	{
-		*phEnum = CreateMutex(NULL, NULL, NULL);
+		serverList.handle = *phEnum = CreateMutex(NULL, NULL, NULL);
 
 		LOG_TRACE_XLIVE("- Handle = {:p}", (void*)*phEnum);
-		ServerEnumHandle = *phEnum;
 	}
 
 	// not done - error now

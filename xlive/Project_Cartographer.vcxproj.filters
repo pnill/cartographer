@@ -1196,12 +1196,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp">
       <Filter>Source Files\Blam\Cache\TagGroups</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Maths\real_math.hpp">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\integer_math.hpp">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\BlamTag.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
@@ -1228,6 +1222,15 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h">
       <Filter>Source Files\H2MOD\Modules\MainLoopPatches\UncappedFPS</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\SimpleIni.h">
+      <Filter>Source Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\integer_math.h">
+      <Filter>Source Files\Blam\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\real_math.h">
+      <Filter>Source Files\Blam\Maths</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

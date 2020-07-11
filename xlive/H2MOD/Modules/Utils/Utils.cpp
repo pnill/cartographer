@@ -179,20 +179,17 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* 
 	}
 }
 
-void GetVKeyCodeString(int vkey, char* rtnString, int strLen) {
-	snprintf(rtnString, 5, "0x%x", vkey);
-	char key_name[20];
-	SecureZeroMemory(key_name, sizeof(key_name));
+std::string GetVKeyCodeString(int vkey) {
+	std::ostringstream strStream;
+	strStream << "0x" << std::hex << vkey;
 	if (vkey >= 0x70 && vkey <= 0x87) {
 		int func_num = vkey - 0x70 + 1;
-		snprintf(key_name, 20, "VK_F%d", func_num);
+		strStream << " - VK_F" << std::dec << func_num;
 	}
 	else if (vkey == 0x24) {
-		snprintf(key_name, 20, "VK_Home");
+		strStream << " - VK_Home";
 	}
-	if (strlen(key_name) > 0) {
-		snprintf(rtnString + strlen(rtnString), strLen - 5, " - %s", key_name);
-	}
+	return strStream.str();
 }
 
 void PadCStringWithChar(char* strToPad, int toFullLength, char c) {

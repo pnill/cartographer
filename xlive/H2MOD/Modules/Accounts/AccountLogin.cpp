@@ -319,15 +319,15 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			//allow no login_token from backend in DB emergencies / random logins.
 			if (result_details == 1) {
 				if (prev_login_token) {
-					if (H2AccountBufferLoginToken && H2AccountCount > 0) {
+					if (H2AccountArrayLoginToken && H2AccountCount > 0) {
 						for (int i = 0; i < H2AccountCount; i++) {
-							if (H2AccountBufferLoginToken[i] && strcmp(H2AccountBufferLoginToken[i], prev_login_token) == 0) {
-								if (H2AccountBufferUsername[i]) {
-									free(H2AccountBufferUsername[i]);
+							if (H2AccountArrayLoginToken[i] && strcmp(H2AccountArrayLoginToken[i], prev_login_token) == 0) {
+								if (H2AccountArrayUsername[i]) {
+									free(H2AccountArrayUsername[i]);
 								}
-								H2AccountBufferUsername[i] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
-								strncpy_s(H2AccountBufferUsername[i], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
-								snprintf(H2AccountBufferLoginToken[i], 33, login_token);
+								H2AccountArrayUsername[i] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
+								strncpy_s(H2AccountArrayUsername[i], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
+								snprintf(H2AccountArrayLoginToken[i], 33, login_token);
 								break;
 							}
 						}
@@ -335,7 +335,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 				else {
 					if (AccountEdit_remember) {
-						H2AccountBufferAdd(login_token, username);
+						H2AccountAccountAdd(username, login_token);
 					}
 				}
 			}
@@ -428,8 +428,8 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 		if (master_login_interpret_result == ERROR_CODE_INVALID_LOGIN_TOKEN) {
 			char* username = 0;
 			for (int i = 0; i < H2AccountCount; i++) {
-				if (H2AccountBufferLoginToken[i] && strcmp(H2AccountBufferLoginToken[i], ltoken) == 0) {
-					username = H2AccountBufferUsername[i];
+				if (H2AccountArrayLoginToken[i] && strcmp(H2AccountArrayLoginToken[i], ltoken) == 0) {
+					username = H2AccountArrayUsername[i];
 					break;
 				}
 			}

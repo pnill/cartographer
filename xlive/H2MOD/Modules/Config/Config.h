@@ -1,4 +1,7 @@
+
 #pragma once
+
+#include "H2MOD.h"
 
 void InitH2Config();
 void DeinitH2Config();
@@ -15,6 +18,11 @@ void ReadH2Config();
 #define STRINGIZE(s) STRINGIZE2(s)
 #define DLL_VERSION_STR        STRINGIZE(DLL_VERSION_MAJOR) "." STRINGIZE(DLL_VERSION_MINOR) "." STRINGIZE(DLL_VERSION_REVISION) "." STRINGIZE(DLL_VERSION_BUILD)
 
+struct _H2Config_language {
+	int code_main;
+	int code_variant;
+};
+
 extern unsigned long H2Config_master_ip;
 extern unsigned short H2Config_master_port_login;
 extern unsigned short H2Config_master_port_relay;
@@ -26,13 +34,13 @@ extern char H2Config_str_wan[16];
 extern char H2Config_str_lan[16];
 extern unsigned long H2Config_ip_wan;
 extern unsigned long H2Config_ip_lan;
-extern int H2Config_language_code_main;
-extern int H2Config_language_code_variant;
+
+extern _H2Config_language H2Config_language;
 extern bool H2Config_custom_labels_capture_missing;
 extern bool H2Config_skip_intro;
 extern bool H2Config_raw_input;
 extern bool H2Config_discord_enable;
-//extern bool H2Config_controller_aim_assist;
+extern bool H2Config_controller_aim_assist;
 extern int H2Config_fps_limit;
 extern int H2Config_static_lod_state;
 extern int H2Config_field_of_view;
@@ -63,32 +71,17 @@ extern int H2Config_hotkeyIdToggleHideIngameChat;
 extern int H2Config_hotkeyIdGuide;
 extern int H2Config_hotkeyIdConsole;
 
-extern int H2Config_BATRIF_WIDTH;
-extern int H2Config_BATRIF_HEIGHT;
-extern int H2Config_SMG_WIDTH;
-extern int H2Config_SMG_HEIGHT;
-extern int H2Config_CRBN_WIDTH;
-extern int H2Config_CRBN_HEIGHT;
-extern int H2Config_BEAMRIF_WIDTH;
-extern int H2Config_BEAMRIF_HEIGHT;
-extern int H2Config_MAG_WIDTH;
-extern int H2Config_MAG_HEIGHT;
-extern int H2Config_PLASRIF_WIDTH;
-extern int H2Config_PLASRIF_HEIGHT;
-extern int H2Config_SHTGN_WIDTH;
-extern int H2Config_SHTGN_HEIGHT;
-extern int H2Config_SNIP_WIDTH;
-extern int H2Config_SNIP_HEIGHT;
-extern int H2Config_SWRD_WIDTH;
-extern int H2Config_SWRD_HEIGHT;
-extern int H2Config_ROCKLAUN_WIDTH;
-extern int H2Config_ROCKLAUN_HEIGHT;
-extern int H2Config_PLASPI_WIDTH;
-extern int H2Config_PLASPI_HEIGHT;
-extern int H2Config_BRUTESHOT_WIDTH;
-extern int H2Config_BRUTESHOT_HEIGHT;
-extern int H2Config_NEED_WIDTH;
-extern int H2Config_NEED_HEIGHT;
-extern int H2Config_SENTBEAM_WIDTH;
-extern int H2Config_SENTBEAM_HEIGHT;
-
+extern point2d H2Config_BATRIF;
+extern point2d H2Config_SMG;
+extern point2d H2Config_CRBN;
+extern point2d H2Config_BEAMRIF;
+extern point2d H2Config_MAG;
+extern point2d H2Config_PLASRIF;
+extern point2d H2Config_SHTGN;
+extern point2d H2Config_SNIP;
+extern point2d H2Config_SWRD;
+extern point2d H2Config_ROCKLAUN;
+extern point2d H2Config_PLASPI;
+extern point2d H2Config_BRUTESHOT;
+extern point2d H2Config_NEED;
+extern point2d H2Config_SENTBEAM;

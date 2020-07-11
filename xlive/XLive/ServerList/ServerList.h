@@ -86,6 +86,8 @@ public:
 	int total_peer_gold = -1;
 	int total_public_gold = -1;
 
+	HANDLE handle = INVALID_HANDLE_VALUE;
+
 	bool GetRunning();
 	void GetServers(DWORD, CHAR*, PXOVERLAPPED);
 	int GetServersLeft();
@@ -94,5 +96,3 @@ public:
 };
 
 extern ServerList serverList;
-extern HANDLE ServerEnumHandle;
-DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey);

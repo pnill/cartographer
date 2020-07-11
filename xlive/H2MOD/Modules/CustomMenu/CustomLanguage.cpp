@@ -658,7 +658,7 @@ void initGSCustomLanguage() {
 		PatchCall(H2BaseAddr + 0x00031e89, nak_c00031b97);
 
 		bool redoCapture = H2Config_custom_labels_capture_missing;
-		setCustomLanguage(H2Config_language_code_main, H2Config_language_code_variant);
+		setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
 		H2Config_custom_labels_capture_missing = redoCapture;
 	}
 }

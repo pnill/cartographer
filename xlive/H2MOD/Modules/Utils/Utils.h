@@ -6,7 +6,7 @@ int FindLineStart(FILE* fp, int lineStrLen);
 bool GetFileLine(FILE* fp, char* &fileLine);
 char CmpVersions(char* version_base, char* version_alt);
 void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* headerVersion, int(interpretSettingFunc)(char* fileLine, char* version, int lineNumber));
-void GetVKeyCodeString(int vkey, char* rtnString, int strLen);
+std::string GetVKeyCodeString(int vkey);
 void PadCStringWithChar(char* strToPad, int toFullLength, char c);
 int GetWidePathFromFullWideFilename(wchar_t* filepath, wchar_t* rtnpath);
 LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue);

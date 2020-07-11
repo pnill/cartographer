@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Blam\Maths\Maths.h"
 #include "Blam\Engine\Objects\Objects.h"
 #include "Blam\Engine\Objects\ObjectPlacementData.h"
 

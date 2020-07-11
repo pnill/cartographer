@@ -1,14 +1,12 @@
-#include "stdafx.h"
+
 #include "H2MOD\Modules\Updater\Updater.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include <stdio.h>
+
 #include <curl/curl.h>
-#include <string>
-#include <vector>
 
 bool fork_cmd_elevate(const wchar_t* cmd, wchar_t* flags = 0) {
 	SHELLEXECUTEINFO shExInfo = { 0 };

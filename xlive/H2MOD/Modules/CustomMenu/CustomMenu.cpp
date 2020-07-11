@@ -3985,7 +3985,7 @@ static DWORD WINAPI ThreadLogin(LPVOID lParam)
 	}
 	else {
 		//login to account
-		if (HandleGuiLogin(H2AccountBufferLoginToken[button_id], 0, 0, &master_login_code)) {
+		if (HandleGuiLogin(H2AccountArrayLoginToken[button_id], 0, 0, &master_login_code)) {
 			H2AccountLastUsed = button_id;
 		}
 	}
@@ -4122,7 +4122,7 @@ static void CM_AccountList_Setup_Buttons() {
 	mode_remove_account = false;
 
 	for (int i = 0; i < H2AccountCount; i++) {
-		add_cartographer_label(CMLabelMenuId_AccountList, 1 + i, H2AccountBufferUsername[i] ? H2AccountBufferUsername[i] : H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0005), true);
+		add_cartographer_label(CMLabelMenuId_AccountList, 1 + i, H2AccountArrayUsername[i] ? H2AccountArrayUsername[i] : H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0005), true);
 	}
 
 	add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0004), true);
@@ -4191,21 +4191,7 @@ static bool CMButtonHandler_AccountList(int button_id) {
 	}
 	else if (H2AccountCount > 0 && button_id >= 0 && button_id < H2AccountCount) {
 		if (mode_remove_account) {
-			int account_id = button_id;
-			if (H2AccountBufferLoginToken && H2AccountBufferLoginToken[account_id]) {
-				if (H2AccountBufferUsername[account_id]) {
-					free(H2AccountBufferUsername[account_id]);
-				}
-				if (H2AccountBufferLoginToken[account_id]) {
-					free(H2AccountBufferLoginToken[account_id]);
-				}
-				for (int i = account_id + 1; i < H2AccountCount; i++) {
-					H2AccountBufferUsername[i - 1] = H2AccountBufferUsername[i];
-					H2AccountBufferLoginToken[i - 1] = H2AccountBufferLoginToken[i];
-				}
-				H2AccountCount--;
-				H2AccountBufferI--;
-			}
+			H2AccountAccountRemove(button_id);
 			GSCustomMenuCall_AccountList();
 			H2AccountLastUsed = 0;
 			return true;
@@ -4418,9 +4404,7 @@ void CMSetupVFTables_Guide() {
 int __cdecl CustomMenu_Guide(int a1) {
 	char* guide_desc_base = H2CustomLanguageGetLabel(CMLabelMenuId_Guide, 0xFFFFFFF2);
 	char* guide_description = (char*)malloc(strlen(guide_desc_base) + 50);
-	char hotkeyname[20];
-	GetVKeyCodeString(H2Config_hotkeyIdGuide, hotkeyname, 20);
-	sprintf(guide_description, guide_desc_base, hotkeyname);
+	sprintf(guide_description, guide_desc_base, GetVKeyCodeString (H2Config_hotkeyIdGuide).c_str());
 	add_cartographer_label(CMLabelMenuId_Guide, 0xFFFFFFF1, guide_description, true);
 	free(guide_description);
 	return CustomMenu_CallHead(a1, menu_vftable_1_Guide, menu_vftable_2_Guide, (DWORD)&CMButtonHandler_Guide, 4, 272);
