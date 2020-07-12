@@ -127,6 +127,14 @@ void network_observer::sendNetworkMessage(int session_index, int observer_index,
 	p_observer_channel_send_message(this, session_index, observer_index, send_out_of_band, type, size, data);
 }
 
+bool __cdecl is_network_observer_mode_managed()
+{
+	// or in other terms this verifies if the network protocol is LIVE (aka managed)
+	// this is used for host migration happening on game start (that causes the short delay when the game starts in a p2p session)
+	// which is disabled in LAN mode
+	return false;
+}
+
 void network_observer::ApplyPatches()
 {
 #if USE_LIVE_NETCODE
@@ -179,4 +187,9 @@ void network_observer::ApplyPatches()
 	NopFill(h2mod->GetAddress(0x1D4E33, 0x1C1B7D), 2);
 	WriteValue<BYTE>(h2mod->GetAddress(0x1D4E35, 0x1C1B7F), 0xEB); // jmp
 #endif
+
+	if (!h2mod->Server)
+	{
+		PatchCall(h2mod->GetAddress(0x1D97DD), is_network_observer_mode_managed);
+	}
 }
