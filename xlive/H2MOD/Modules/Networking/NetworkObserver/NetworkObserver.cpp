@@ -171,7 +171,6 @@ void network_observer::ApplyPatches()
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB587, 0x1ABA8C) + 1, 262144 * 4); // 60 tick - 1048576
 
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB5B6, 0x1ABABB) + 6, 10240 * 4); // 60 tick - 40960
-	WriteValue<DWORD>(h2mod->GetAddress(0x1AB5C0, 0x1ABAC5) + 6, 131072);
 
 	// prevent the game from setting the client's tickrate to half of host network tickrate
 	NopFill(h2mod->GetAddress(0x1BFBE7, 0x1B9AC7), 19);
