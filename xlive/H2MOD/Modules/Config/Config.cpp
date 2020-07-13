@@ -69,6 +69,8 @@ int H2Config_debug_log_level = 2;
 bool H2Config_debug_log_console = false;
 char H2Config_login_identifier[255] = { "" };
 char H2Config_login_password[255] = { "" };
+char H2Config_team_bit_flags_str[] = "1-1-1-1-1-1-1-1";
+short H2Config_team_bit_flags = 0xFF;
 
 //weapon crosshair sizes
 point2d	H2Config_BATRIF = { 1 , 1 };
@@ -348,7 +350,8 @@ void SaveH2Config() {
 				"# additional_pcr_time Options (Server):"
 				"\n# By default, 25 seconds are added to post game carnage time from the playlist setting."
 				"\n# Now you have the possibility to change it to your preference."
-				"\n\n";
+				"\n\n"
+				;
 		}
 
 		if (!H2IsDediServer) {
@@ -446,6 +449,7 @@ void SaveH2Config() {
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "debug_log_console", H2Config_debug_log_console);
 
 		if (H2IsDediServer) {
+
 			ini.SetValue(H2ConfigVersionSection.c_str(), "server_name", H2Config_dedi_server_name);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "server_playlist", H2Config_dedi_server_playlist);
@@ -453,7 +457,19 @@ void SaveH2Config() {
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "additional_pcr_time", H2Config_additional_pcr_time);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
+
 			ini.SetValue(H2ConfigVersionSection.c_str(), "login_password", H2Config_login_password);
+
+			ini.SetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str, 
+				"# teams_enabled_bit_flags (Server)"
+				"\n# By default, the game reads team bitflags from the current map."
+				"\n# With this option, you can enable which teams are enabled."
+				"\n# Each bit corresponds to a team. Example bellow where we disable Blue, Green and Pink teams:"
+				"\n# Teams:   Red  Blue  Yellow  Green  Purple  Orange  Brown  Pink"
+				"\n#           |     |     |       |       |       |      |      |  "
+				"\n#          \\/    \\/    \\/      \\/      \\/      \\/     \\/     \\/  "
+				"\n#           1  -  0  -  1   -   0   -   1   -   1  -   1  -  0"
+				"\n");
 		}
 
 		if (!H2IsDediServer) {
@@ -699,6 +715,26 @@ void ReadH2Config() {
 				const char* login_password = ini.GetValue(H2ConfigVersionSection.c_str(), "login_password", H2Config_login_password);
 				if (login_password) {
 					strncpy(H2Config_login_password, login_password, sizeof(H2Config_login_password));
+				}
+
+				std::string team_bit_mask(ini.GetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str));
+				if (!team_bit_mask.empty())
+				{
+					strncpy_s(H2Config_team_bit_flags_str, sizeof(H2Config_team_bit_flags_str), team_bit_mask.c_str(), 15);
+					size_t last_offset = 0;
+					size_t occurance_offset = 0;
+					H2Config_team_bit_flags = 0;
+					for (int i = 0; i < 8; i++)
+					{
+						occurance_offset = team_bit_mask.find_first_not_of("-", last_offset);
+						last_offset += 2;
+						if (occurance_offset != std::string::npos 
+							&& team_bit_mask.substr(occurance_offset, 1) == "1") // check if the team is enabled
+						{
+							H2Config_team_bit_flags |= FLAG(i); // if so, enable the flag
+						}
+
+					}
 				}
 			}
 		}

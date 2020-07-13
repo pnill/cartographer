@@ -1246,6 +1246,19 @@ void __cdecl game_mode_engine_draw_team_indicators()
 		p_game_mode_engine_draw_team_indicators();
 }
 
+typedef short(__cdecl* get_enabled_teams_flags_def)(network_session*);
+get_enabled_teams_flags_def p_get_enabled_teams_flags;
+
+short __cdecl get_enabled_teams_flags(network_session* session)
+{
+	short default_teams_enabled_flags = p_get_enabled_teams_flags(session);
+	short new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
+	if (new_teams_enabled_flags)
+		return new_teams_enabled_flags;
+	else
+		return default_teams_enabled_flags;
+}
+
 void H2MOD::ApplyUnitHooks()
 {
 	// increase the size of the unit entity creation definition packet
@@ -1367,6 +1380,8 @@ void H2MOD::ApplyHooks() {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
 		ServerConsole::ApplyHooks();
+
+		p_get_enabled_teams_flags = (get_enabled_teams_flags_def)DetourFunc(h2mod->GetAddress<BYTE*>(0, 0x19698B), (BYTE*)get_enabled_teams_flags, 6);
 	}
 }
 

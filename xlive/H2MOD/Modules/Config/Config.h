@@ -63,6 +63,8 @@ extern int H2Config_debug_log_level;
 extern bool H2Config_debug_log_console;
 extern char H2Config_login_identifier[255];
 extern char H2Config_login_password[255];
+extern short H2Config_team_bit_flags;
+
 extern int H2Config_hotkeyIdHelp;
 extern int H2Config_hotkeyIdToggleDebug;
 extern int H2Config_hotkeyIdAlignWindow;
