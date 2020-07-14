@@ -17,6 +17,7 @@
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
+#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -600,30 +601,51 @@ BYTE H2MOD::get_local_team_index()
 }
 #pragma endregion
 
-void H2MOD::disable_sound(int sound)
+void H2MOD::disable_sounds(int sound_flags)
 {
-	LOG_TRACE_GAME("tag data address: {:x}", tags::get_tag_data());
-	switch (sound)
+	static const std::string multiplayerGlobalsTag("multiplayer\\multiplayer_globals");
+	if (sound_flags)
 	{
-	case SoundType::Slayer:
-		LOG_TRACE_GAME("tag data address + 0xd7dfb4 = {:p}", tags::get_tag_data()[0xd7dfb4]);
-		*(DWORD*)(&tags::get_tag_data()[0xd7e05c]) = NONE;
-		*(DWORD*)(&tags::get_tag_data()[0xd7dfb4]) = NONE;
-		break;
+		datum multiplayerGlobalsTagIndex = tags::find_tag(blam_tag::tag_group_type::multiplayerglobals, multiplayerGlobalsTag);
 
-	case SoundType::GainedTheLead:
-		*(DWORD*)(&tags::get_tag_data()[0xd7ab34]) = NONE;
-		*(DWORD*)(&tags::get_tag_data()[0xd7ac84]) = NONE;
-		break;
+		if (!multiplayerGlobalsTagIndex.IsNull())
+		{
+			s_multiplayer_globals_group_definition* multiplayerGlobalsTag = tags::get_tag<blam_tag::tag_group_type::multiplayerglobals, s_multiplayer_globals_group_definition>(multiplayerGlobalsTagIndex);
 
-	case SoundType::LostTheLead:
-		*(DWORD*)(&tags::get_tag_data()[0xd7ad2c]) = NONE;
-		*(DWORD*)(&tags::get_tag_data()[0xd7add4]) = NONE;
-		break;
+			if (multiplayerGlobalsTag->runtime.size)
+			{
+				auto* runtime_tag_block_data = multiplayerGlobalsTag->runtime[0];
 
-	case SoundType::TeamChange:
-		*(DWORD*)(&tags::get_tag_data()[0xd7b9a4]) = NONE;
-		break;
+				if (sound_flags & FLAG(SoundType::Slayer))
+				{
+					runtime_tag_block_data->slayer_events.size = 0;
+					runtime_tag_block_data->slayer_events.data = 0;
+				}
+
+				if (sound_flags & ALL_SOUNDS_NO_SLAYER) // check if there is any point in running the code bellow
+				{
+					for (int i = 0; i < runtime_tag_block_data->general_events.size; i++)
+					{
+						using sound_events = s_multiplayer_globals_group_definition::s_runtime_block::s_general_events_block::e_event;
+						auto* general_event = runtime_tag_block_data->general_events[i];
+						auto event = general_event->event;
+						if (
+							(sound_flags & FLAG(SoundType::GainedTheLead) && (event == sound_events::gained_lead || event == sound_events::gained_team_lead))
+							|| (sound_flags & FLAG(SoundType::TeamChange) && event == sound_events::player_changed_team)
+							|| (sound_flags & FLAG(SoundType::LostTheLead) && (event == sound_events::lost_lead))
+							|| (sound_flags & FLAG(SoundType::TiedLeader) && (event == sound_events::tied_leader || event == sound_events::tied_team_leader))
+							)
+						{
+							// disable all sounds from english to chinese
+							for (int j = 0; j < 8; j++)
+							{
+								(&general_event->sound)[j].TagIndex = datum::Null;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
 

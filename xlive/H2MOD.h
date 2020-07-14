@@ -9,11 +9,13 @@
 
 enum SoundType
 {
-	TeamChange = 1,
+	TeamChange,
 	GainedTheLead,
 	LostTheLead,
+	TiedLeader,
 	Slayer
 };
+#define ALL_SOUNDS_NO_SLAYER (FLAG(SoundType::TeamChange) | FLAG(SoundType::GainedTheLead) | FLAG(SoundType::LostTheLead) | FLAG(SoundType::TiedLeader))
 
 enum static_lod : DWORD
 {
@@ -64,7 +66,7 @@ public:
 		void set_local_team_index(int local_player_index, int team);
 		BYTE get_local_team_index();
 		void set_player_unit_grenades_count(int playerIndex, Grenades type, BYTE count, bool resetEquipment);
-		void disable_sound(int sound);
+		void disable_sounds(int sound);
 		void custom_sound_play(const wchar_t* soundName, int delay);
 		void disable_weapon_pickup(bool b_Enable);
 		void leave_session();

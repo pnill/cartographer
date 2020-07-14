@@ -145,8 +145,7 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(network_session *session
 
 	if (membership->peer_count > 0)
 	{
-		int i = 0;
-		do
+		for (int i = 0; i < membership->peer_count; i++)
 		{
 			// check only session host and local peer indexes
 			if (i == session->local_peer_index
@@ -154,20 +153,19 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(network_session *session
 			{
 				switch (membership->peer_info[i].map_status)
 				{
-				case 0u:
-				case 1u:
-				case 2u:
-				case 5u:
-					result_bitflags |= 1 << i;
+				case unk_map_stats:
+				case map_unavailable:
+				case unk_map_stats2:
+				case map_is_downloading:
+					result_bitflags |= FLAG(i);
 					everyone_loaded_the_map = false;
 					break;
-				case 3u:
-				case 4u:
+				case map_available:
+				case map_loaded:
 					break;
 				}
 			}
-			i++;
-		} while (i < membership->peer_count);
+		}
 	}
 	if (player_flags_that_didnt_load_map)
 		*player_flags_that_didnt_load_map = result_bitflags;

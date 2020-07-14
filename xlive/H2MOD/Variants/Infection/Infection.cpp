@@ -125,10 +125,7 @@ void Infection::disableSlayerSounds()
 {
 	LOG_TRACE_GAME("[h2mod-infection] Disabling slayer sounds");
 	//disable slayer sounds for the infection game type
-	h2mod->disable_sound(SoundType::Slayer);
-	h2mod->disable_sound(SoundType::GainedTheLead);
-	h2mod->disable_sound(SoundType::LostTheLead);
-	h2mod->disable_sound(SoundType::TeamChange);
+	h2mod->disable_sounds(FLAG(SoundType::Slayer) | ALL_SOUNDS_NO_SLAYER);
 }
 
 void Infection::resetWeaponInteractionAndEmblems() {
