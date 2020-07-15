@@ -642,7 +642,6 @@ void* __stdcall sub_23BC45_CM(void* thisptr)//__thiscall
 void* __stdcall sub_23BDF6_CM(void* thisptr, int a2, int a3, int a4) { //__thiscall
 
 	void*(__thiscall* sub_2106A2)(void*, int, int, int, __int16) = (void*(__thiscall*)(void*, int, int, int, __int16))((char*)H2BaseAddr + 0x2106A2);
-	void*(__cdecl* sub_287BA9)(void*, int, unsigned int) = (void*(__cdecl*)(void*, int, unsigned int))((char*)H2BaseAddr + 0x287BA9);
 	//void(__stdcall* sub_28870B)(int, int, int, void(__thiscall*)(DWORD), int) = (void(__stdcall*)(int, int, int, void(__thiscall*)(DWORD), int))((char*)H2BaseAddr + 0x28870B);
 	char(__cdecl* sub_2067FC)(char) = (char(__cdecl*)(char))((char*)H2BaseAddr + 0x2067FC);
 
@@ -664,7 +663,7 @@ void* __stdcall sub_23BDF6_CM(void* thisptr, int a2, int a3, int a4) { //__thisc
 	*(DWORD*)v4 = (DWORD)menu_vftable_2_VKeyTest;
 	*((DWORD*)v4 + 663) = -1;//VKbMenuType
 	*((DWORD*)v4 + 664) = -1;
-	sub_287BA9((char*)v4 + 2660, 0, 0x200u);
+	memset((char*)v4 + 2660, 0, 0x200u);
 	*((DWORD*)v4 + 793) = 0;
 	*((DWORD*)v4 + 794) = 0;
 	*((WORD*)v4 + 1590) = 0;
@@ -6352,7 +6351,6 @@ char __stdcall sub_210a44_CMLTD(int thisptr, int a2, int* a3, int label_menu_id,
 int __stdcall sub_2111ab_CMLTD(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description)
 {
 	int(__cdecl* sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
-	void*(__cdecl* sub_287BA9)(void* a1, int a2, unsigned int a3) = (void*(__cdecl*)(void*, int, unsigned int))((char*)H2BaseAddr + 0x287BA9);
 	//int(__thiscall* sub_210a44)(int, int, int*) = (int(__thiscall*)(int, int, int*))((char*)H2BaseAddr + 0x210a44);
 	int(__cdecl* sub_239623)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x239623);
 	int(__thiscall* sub_211e23)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x211e23);
@@ -6369,7 +6367,7 @@ int __stdcall sub_2111ab_CMLTD(int thisptr, int a2, int label_menu_id, int label
 	var68[4] = v4;
 	var68[5] = 0;
 
-	sub_287BA9(&var68[6], 0, 0x50u);
+	memset(&var68[6], 0, 0x50u);
 	sub_210a44_CMLTD(v2, v3, var68, label_menu_id, label_id_title, label_id_description);
 	int v6 = sub_20c701(*(DWORD*)(v2 + 0x70));
 
@@ -6410,17 +6408,16 @@ int __stdcall sub_23ae3c_CMLTD(void* thisptr, int label_menu_id, int label_id_ti
 int __stdcall sub_23bf3e_CMLTD(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description)
 {
 	int(__cdecl* sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
-	void*(__cdecl* sub_287BA9)(void* a1, int a2, unsigned int a3) = (void*(__cdecl*)(void*, int, unsigned int))((char*)H2BaseAddr + 0x287BA9);
 	//int(__thiscall* sub_210a44)(int, int, int*) = (int(__thiscall*)(int, int, int*))((char*)H2BaseAddr + 0x210a44);
 	int(__thiscall* sub_211e23)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x211e23);
 
-	void(__thiscall* sub_23BBBE)(void*, int, int) = (void(__thiscall*)(void*, int, int))((char*)H2BaseAddr + 0x23BBBE);
+	void(__thiscall* sub_23BBBE)(void*, void*, int) = (void(__thiscall*)(void*, void*, int))((char*)H2BaseAddr + 0x23BBBE);
 	//int(__thiscall* sub_23AE3C)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x23AE3C);
 
-	DWORD& dword_3D2E38 = *(DWORD*)((char*)H2BaseAddr + 0x3D2E38);
-	DWORD& dword_3D2A78 = *(DWORD*)((char*)H2BaseAddr + 0x3D2A78);
-	DWORD& dword_3D2CB8 = *(DWORD*)((char*)H2BaseAddr + 0x3D2CB8);
-	DWORD& dword_3D2B38 = *(DWORD*)((char*)H2BaseAddr + 0x3D2B38);
+	void* dword_3D2E38 = (void*)(H2BaseAddr + 0x3D2E38);
+	void* dword_3D2A78 = (void*)(H2BaseAddr + 0x3D2A78);
+	void* dword_3D2CB8 = (void*)(H2BaseAddr + 0x3D2CB8);
+	void* dword_3D2B38 = (void*)(H2BaseAddr + 0x3D2B38);
 	BYTE* byte_3D2F30 = (BYTE*)((char*)H2BaseAddr + 0x3D2F30);
 
 	int* v2; // esi
@@ -6441,7 +6438,7 @@ int __stdcall sub_23bf3e_CMLTD(int thisptr, int a2, int label_menu_id, int label
 		v7[3] = (int)v14;
 		v7[4] = 0;
 		v7[5] = 0;
-		sub_287BA9(&v7[6], 0, 80);
+		memset(&v7[6], 0, 80);
 		v4 = 0;
 		v5 = (int)(v2 + 798);
 		do
@@ -6452,10 +6449,10 @@ int __stdcall sub_23bf3e_CMLTD(int thisptr, int a2, int label_menu_id, int label
 		sub_210a44_CMLTD((int)v2, v3, v7, label_menu_id, label_id_title, label_id_description);
 	}
 	sub_211e23((int)v2);
-	sub_23BBBE(v2, (int)&dword_3D2E38, 47);
-	sub_23BBBE(v2, (int)&dword_3D2A78, 47);
-	sub_23BBBE(v2, (int)&dword_3D2CB8, 47);
-	sub_23BBBE(v2, (int)&dword_3D2B38, 47);
+	sub_23BBBE(v2, dword_3D2E38, 47);
+	sub_23BBBE(v2, dword_3D2A78, 47);
+	sub_23BBBE(v2, dword_3D2CB8, 47);
+	sub_23BBBE(v2, dword_3D2B38, 47);
 	result = sub_23ae3c_CMLTD(v2, label_menu_id, label_id_title, label_id_description);
 	int VKbMenuType = v2[663];
 	//"SYMBOLS" AND "ACCENTS" buttons are greyed out by default
@@ -6622,7 +6619,7 @@ char __stdcall sub_23D060_CM(void* thisptr, int* a2) //__thiscall
 	//return psub_23D060(thisptr, a2);
 
 	char(__thiscall* sub_23AF4E)(void*, int) = (char(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x23AF4E);
-	void(__thiscall* sub_23BBBE)(void*, int, int) = (void(__thiscall*)(void*, int, int))((char*)H2BaseAddr + 0x23BBBE);
+	void(__thiscall* sub_23BBBE)(void*, void*, int) = (void(__thiscall*)(void*, void*, int))((char*)H2BaseAddr + 0x23BBBE);
 	int(__thiscall*sub_23B080)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x23B080);
 	int(__cdecl*sub_21DD04)(signed int) = (int(__cdecl*)(signed int))((char*)H2BaseAddr + 0x21DD04);
 	int(__thiscall*sub_23B9DE)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x23B9DE);
@@ -6634,11 +6631,11 @@ char __stdcall sub_23D060_CM(void* thisptr, int* a2) //__thiscall
 	int(__cdecl*sub_4BD54)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x4BD54);
 	char(__cdecl*sub_4C6E0)(__int16) = (char(__cdecl*)(__int16))((char*)H2BaseAddr + 0x4C6E0);
 
-	DWORD& dword_3D2D78 = *(DWORD*)((char*)H2BaseAddr + 0x3D2D78);
-	DWORD& dword_3D2A78 = *(DWORD*)((char*)H2BaseAddr + 0x3D2A78);
-	DWORD& dword_3D2B38 = *(DWORD*)((char*)H2BaseAddr + 0x3D2B38);
-	DWORD& dword_3D2CB8 = *(DWORD*)((char*)H2BaseAddr + 0x3D2CB8);
-	DWORD& dword_3D2E38 = *(DWORD*)((char*)H2BaseAddr + 0x3D2E38);
+	void* dword_3D2D78 = (void*)(H2BaseAddr + 0x3D2D78);
+	void* dword_3D2A78 = (void*)(H2BaseAddr + 0x3D2A78);
+	void* dword_3D2B38 = (void*)(H2BaseAddr + 0x3D2B38);
+	void* dword_3D2CB8 = (void*)(H2BaseAddr + 0x3D2CB8);
+	void* dword_3D2E38 = (void*)(H2BaseAddr + 0x3D2E38);
 	BYTE* byte_3D2F30 = (BYTE*)((char*)H2BaseAddr + 0x3D2F30);
 
 	bool v4; // zf
@@ -6649,7 +6646,7 @@ char __stdcall sub_23D060_CM(void* thisptr, int* a2) //__thiscall
 	WORD* v10; // eax
 	WORD* v11; // eax
 	char v12; // bl
-	DWORD v13; // eax
+	void* v13 = nullptr; // eax
 
 	signed __int16 v20;
 
@@ -6680,7 +6677,7 @@ char __stdcall sub_23D060_CM(void* thisptr, int* a2) //__thiscall
 				LABEL_47:
 			v13 = dword_3D2E38;
 		LABEL_48:
-			sub_23BBBE(thisptr, (int)v13, 47);
+			sub_23BBBE(thisptr, v13, 47);
 			break;
 		default:
 			break;
