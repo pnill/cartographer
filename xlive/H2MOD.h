@@ -29,6 +29,8 @@ enum static_lod : DWORD
 };
 
 game_life_cycle get_game_life_cycle();
+int __cdecl call_get_game_tick_rate();
+bool __cdecl call_is_game_minimized();
 char* __cdecl call_object_try_and_get_data_with_type(datum object_datum_index, int object_type);
 int __cdecl call_unit_reset_equipment(datum unit_datum_index);
 bool __cdecl call_add_object_to_sync(datum gamestate_object_datum);

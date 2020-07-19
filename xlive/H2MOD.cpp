@@ -69,6 +69,20 @@ game_life_cycle get_game_life_cycle()
 
 #pragma region engine calls
 
+int __cdecl call_get_game_tick_rate()
+{
+	typedef int(__cdecl* get_tickrate)();
+	auto p_get_tickrate = h2mod->GetAddress<get_tickrate>(0x28707);
+	return p_get_tickrate();
+}
+
+bool __cdecl call_is_game_minimized()
+{
+	typedef bool(__cdecl* is_game_is_minimized)();
+	auto p_game_is_minimized = h2mod->GetAddress<is_game_is_minimized>(0x28729);
+	return p_game_is_minimized();
+}
+
 char* __cdecl call_object_try_and_get_data_with_type(datum object_datum_index, int object_type_flags)
 {
 	//LOG_TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
