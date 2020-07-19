@@ -329,7 +329,6 @@
     <ClCompile Include="H2MOD\Variants\DeviceShop\DeviceShop.cpp" />
     <ClCompile Include="H2MOD\Variants\FireFight\FireFight.cpp" />
     <ClCompile Include="H2MOD\Variants\GunGame\GunGame.cpp" />
-    <ClCompile Include="H2MOD\Variants\H2Final\H2Final.cpp" />
     <ClCompile Include="H2MOD\Variants\H2X\H2X.cpp" />
     <ClCompile Include="H2MOD\Variants\HeadHunter\HeadHunter.cpp" />
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
@@ -555,7 +554,6 @@
     <ClInclude Include="H2MOD\Variants\DeviceShop\DeviceShop.h" />
     <ClInclude Include="H2MOD\Variants\FireFight\FireFight.h" />
     <ClInclude Include="H2MOD\Variants\GunGame\GunGame.h" />
-    <ClInclude Include="H2MOD\Variants\H2Final\H2Final.h" />
     <ClInclude Include="H2MOD\Variants\H2X\H2X.h" />
     <ClInclude Include="H2MOD\Variants\HeadHunter\HeadHunter.h" />
     <ClInclude Include="H2MOD\Variants\Infection\Infection.h" />

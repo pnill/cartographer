@@ -21,7 +21,6 @@
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
-Halo2Final* h2f = new Halo2Final();
 DeviceShop* device_shop = new DeviceShop();
 Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
@@ -36,14 +35,12 @@ bool b_GunGame = false;
 bool b_FireFight = false;
 bool b_XboxTick = false;
 bool b_Infection = false;
-bool b_Halo2Final = false;
 bool b_HeadHunter = false;
 
 std::unordered_map<wchar_t*, bool&> GametypesMap
 {
 	{ L"h2x", b_H2X },
 	{ L"ogh2", b_XboxTick },
-	{ L"h2f", b_Halo2Final },
 	{ L"gungame", b_GunGame },
 	{ L"zombies", b_Infection },
 	{ L"infection", b_Infection },
@@ -836,11 +833,6 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 			advLobbySettings->resetLobbySettings();
 		}*/
 
-		if (b_Halo2Final && !h2mod->Server) {
-			h2f->Dispose();
-			b_Halo2Final = false;
-		}
-
 		if (b_Infection) {
 			infectionHandler->deinitializer->execute();
 			b_Infection = false;
@@ -920,9 +912,6 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 			if (b_GunGame) {
 				gunGame->initializer->execute();
 			}
-
-			if (b_Halo2Final)
-				h2f->Initialize();
 		}
 
 	}
