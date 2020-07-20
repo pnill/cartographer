@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "Globals.h"
 #include "ConsoleCommands.h"
 
 #include "H2MOD\Modules\Startup\Startup.h"
@@ -14,6 +13,8 @@
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD\Modules\ServerConsole\ServerConsole.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
+
+#include "H2MOD\Modules\Utils\Utils.h"
 
 #include "Util\ClipboardAPI.h"
 

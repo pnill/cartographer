@@ -86,7 +86,7 @@ public:
 	void checkForLostConnections();
 	void setTimeConnectionInteractionHappened(IN_ADDR ina, int time);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
-	void SetupLocalConnectionInfo(unsigned long xnaddr, char* abEnet, char* abOnline);
+	void SetupLocalConnectionInfo(unsigned long xnaddr, const char* abEnet, const char* abOnline);
 	void sendXNetRequest(XSocket* xsocket, IN_ADDR ipIdentifier, int reqType);
 	int handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount);
 

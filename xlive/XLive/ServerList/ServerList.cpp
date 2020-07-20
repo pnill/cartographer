@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "Globals.h"
 #include "ServerList.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -7,6 +6,8 @@
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 #include "curl/curl.h"
+
+#include "H2MOD\Modules\Utils\Utils.h"
 
 using namespace rapidjson;
 

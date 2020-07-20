@@ -31,3 +31,6 @@ struct XSocket
 };
 
 void ForwardPorts();
+
+SOCKET WINAPI XSocketCreate(int af, int type, int protocol);
+int WINAPI XSocketSendTo(SOCKET s, const char* buf, int len, int flags, sockaddr *to, int tolen);

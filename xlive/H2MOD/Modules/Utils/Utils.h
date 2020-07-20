@@ -87,3 +87,11 @@ void EnsureDirectoryExists(wchar_t* path);
 
 int TrimRemoveConsecutiveSpaces(char* text);
 
+//some utility functions below
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
+std::vector<std::string> split(const std::string &s, char delim);
+
+int stripWhitespace(wchar_t *inputStr);
+void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen);
+std::string ByteToHexStr(const BYTE* buffer, size_t size);
+

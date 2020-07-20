@@ -2,7 +2,6 @@
 
 #include "MapManager.h"
 
-#include "Globals.h"
 #include <Mswsock.h>
 #include <WS2tcpip.h>
 #include "H2MOD\Modules\Config\Config.h"

@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "Globals.h"
 
+#include "Globals.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"

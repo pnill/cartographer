@@ -7,7 +7,6 @@
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
-#include "Globals.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD\Modules\Config\Config.h"

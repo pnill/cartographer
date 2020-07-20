@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Globals.h"
+
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
@@ -4207,7 +4207,11 @@ static bool CMButtonHandler_AccountList(int button_id) {
 	else if (button_id == H2AccountCount) {
 		if (!mode_remove_account) {
 			//play offline
-			if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", 1234571000000000 + H2GetInstanceId(), 0x100 + H2GetInstanceId(), 0x100 * H2GetInstanceId(), "000000101300", "0000000000000000000000000000000000101300", false)) {
+			BYTE abEnet[6];
+			BYTE abOnline[20];
+			XNetRandom(abEnet, 6);
+			XNetRandom(abOnline, 20);
+			if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, 6).c_str(), ByteToHexStr(abOnline, 20).c_str(), false)) {
 				//show select profile gui
 				extern int notify_xlive_ui;
 				notify_xlive_ui = 0;

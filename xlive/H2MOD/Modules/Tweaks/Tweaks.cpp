@@ -1,6 +1,4 @@
 
-#include "Globals.h"
-
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\HudElements\RadarPatch.h"

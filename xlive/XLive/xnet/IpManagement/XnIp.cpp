@@ -3,13 +3,11 @@
 #include "XnIp.h"
 #include "..\..\Cryptography\Rc4.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Achievements\Achievements.h"
-#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
+
+#include "H2MOD\Modules\Utils\Utils.h"
 
 CXnIp ipManager;
 XECRYPT_RC4_STATE Rc4StateRand;
-
-extern int WINAPI XSocketSendTo(SOCKET s, const char *buf, int len, int flags, sockaddr *to, int tolen);
 
 /*
 NOTE:
@@ -515,7 +513,7 @@ void CXnIp::getLastRegisteredKeys(XNKID* xnkid, XNKEY* xnkey)
 	}
 }
 
-void CXnIp::SetupLocalConnectionInfo(unsigned long xnaddr, char* abEnet, char* abOnline)
+void CXnIp::SetupLocalConnectionInfo(unsigned long xnaddr, const char* abEnet, const char* abOnline)
 {
 	SecureZeroMemory(&localUser, sizeof(XnIp));
 	
