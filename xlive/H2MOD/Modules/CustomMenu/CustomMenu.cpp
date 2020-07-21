@@ -2898,6 +2898,101 @@ void GSCustomMenuCall_ToggleSkulls() {
 #pragma endregion
 
 
+const int CMLabelMenuId_Campaign_Modifiers = 0xFF00002A;
+#pragma region CM_Campaign_Modifiers
+
+void __stdcall CMLabelButtons_Campaign_Modifiers(int a1, int a2)
+{
+	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+
+	__int16 button_id = *(WORD*)(a1 + 112);
+	int v3 = sub_211909(a1, 6, 0, 0);
+	if (v3)
+	{
+		sub_21bf85_CMLTD(v3, button_id + 1, CMLabelMenuId_Campaign_Modifiers);
+	}
+}
+
+__declspec(naked) void sub_2111ab_CMLTD_nak_Campaign_Modifiers() {//__thiscall
+	__asm {
+		mov eax, [esp + 4h]
+
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0xFFFFFFF1//label_id_description
+		push 0xFFFFFFF0//label_id_title
+		push CMLabelMenuId_Campaign_Modifiers
+		push eax
+		push ecx
+		call sub_2111ab_CMLTD//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn 4
+	}
+}
+
+static bool CMButtonHandler_Campaign_Modifiers(int button_id) {
+	H2Tweaks::setCampaignModifier(button_id);
+	return true;
+}
+
+__declspec(naked) void sub_20F790_CM_nak_Campaign_Modifiers() {//__thiscall
+	__asm {
+		push ebp
+		push edi
+		push esi
+		push ecx
+		push ebx
+
+		push 0//selected button id
+		push ecx
+		call sub_20F790_CM//__stdcall
+
+		pop ebx
+		pop ecx
+		pop esi
+		pop edi
+		pop ebp
+
+		retn
+	}
+}
+
+int CustomMenu_Campaign_Modifiers(int);
+
+int(__cdecl *CustomMenuFuncPtrHelp_Campaign_Modifiers())(int) {
+	return CustomMenu_Campaign_Modifiers;
+}
+
+DWORD * menu_vftable_1_Campaign_Modifiers = 0;
+DWORD * menu_vftable_2_Campaign_Modifiers = 0;
+
+void CMSetupVFTables_Campaign_Modifiers() {
+	CMSetupVFTables(&menu_vftable_1_Campaign_Modifiers, &menu_vftable_2_Campaign_Modifiers, (DWORD)CMLabelButtons_Campaign_Modifiers, (DWORD)sub_2111ab_CMLTD_nak_Campaign_Modifiers, (DWORD)CustomMenuFuncPtrHelp_Campaign_Modifiers, (DWORD)sub_20F790_CM_nak_Campaign_Modifiers, true, 0);
+}
+
+int CustomMenu_Campaign_Modifiers(int a1) {
+	return CustomMenu_CallHead(a1, menu_vftable_1_Campaign_Modifiers, menu_vftable_2_Campaign_Modifiers, (DWORD)&CMButtonHandler_Campaign_Modifiers, 3, 272);
+}
+
+void GSCustomMenuCall_Campaign_Modifiers() {
+	int WgitScreenfunctionPtr = (int)(CustomMenu_Campaign_Modifiers);
+	CallWgit(WgitScreenfunctionPtr);
+}
+
+#pragma endregion
+
+
 const int CMLabelMenuId_OtherSettings = 0xFF00000D;
 #pragma region CM_OtherSettings
 
@@ -3105,6 +3200,9 @@ static bool CMButtonHandler_AdvSettings(int button_id) {
 	else if (button_id == 3) {
 		GSCustomMenuCall_ToggleSkulls();
 	}
+	else if (button_id == 4) {
+		GSCustomMenuCall_Campaign_Modifiers();
+	}
 //	else if (button_id == 4) {
 //		GSCustomMenuCall_AdvLobbySettings();
 //	}
@@ -3147,7 +3245,7 @@ void CMSetupVFTables_AdvSettings() {
 }
 
 int __cdecl CustomMenu_AdvSettings(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == scnr_type::Multiplayer ? 4 : 4, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() == scnr_type::Multiplayer ? 5 : 5, 272);
 }
 
 void GSCustomMenuCall_AdvSettings() {
@@ -5026,6 +5124,13 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 5, "Large");
 	
 
+	add_cartographer_label(CMLabelMenuId_Campaign_Modifiers, 0xFFFFFFF0, "Campaign Modifiers");
+	add_cartographer_label(CMLabelMenuId_Campaign_Modifiers, 0xFFFFFFF1, "Select a modifier for campaign");
+	add_cartographer_label(CMLabelMenuId_Campaign_Modifiers, 1, "Default");
+	add_cartographer_label(CMLabelMenuId_Campaign_Modifiers, 2, "H2X");
+	add_cartographer_label(CMLabelMenuId_Campaign_Modifiers, 3, "30 Tick");
+
+
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF0, "Update");
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF1, "Update Project Cartographer.");
 	add_cartographer_label(CMLabelMenuId_Update, 1, (char*)0, true);
@@ -5116,6 +5221,7 @@ void initGSCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 2, "Customise HUD/GUI");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 3, "Other Settings");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 4, "Toggle Skulls");
+	add_cartographer_label(CMLabelMenuId_AdvSettings, 5, "Campaign Modifiers");
 //	add_cartographer_label(CMLabelMenuId_AdvSettings, 5, "Extra Game Settings");
 
 
@@ -5244,6 +5350,8 @@ void initGSCustomMenu() {
 	CMSetupVFTables_Language();
 
 	CMSetupVFTables_EditCrosshair();
+
+	CMSetupVFTables_Campaign_Modifiers();
 
 	CMSetupVFTables_EditFOV();
 
