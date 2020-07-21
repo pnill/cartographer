@@ -48,7 +48,6 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 			BadServer(xuid, nResult, "Missing Member: dwMaxPublicSlots");
 			return;
 		}
-
 		nResult->dwMaxPublicSlots = doc["dwMaxPublicSlots"].GetUint();
 
 		if (!doc.HasMember("dwFilledPublicSlots"))
@@ -56,7 +55,6 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 			BadServer(xuid, nResult, "Missing Member: dwFilledPublicSlots");
 			return;
 		}
-
 		nResult->dwFilledPublicSlots = doc["dwFilledPublicSlots"].GetUint();
 
 		if (!doc.HasMember("dwMaxPrivateSlots"))
@@ -64,9 +62,7 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 			BadServer(xuid, nResult, "Missing Member: dwFilledPublicSlots");
 			return;
 		}
-
 		nResult->dwMaxPrivateSlots = doc["dwMaxPrivateSlots"].GetUint();
-
 
 		if (!doc.HasMember("dwMaxFilledPrivateSlots"))
 		{
@@ -217,8 +213,6 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 
 			current_property++;
 		}
-
-
 	}
 
 	++serverList.total_servers;
@@ -239,7 +233,7 @@ void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXO
 		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
 		pOverlapped->InternalHigh = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
 		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
-		servptr->servers_left = 0;
+		servptr->document_servers_left = 0;
 
 		servptr->server_list_download_running = false;
 		return;
@@ -256,11 +250,11 @@ void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXO
 		document.Parse(readBuffer.c_str());
 
 		int server_count = document["servers"].Size();
-		servptr->servers_left = server_count;
+		servptr->document_servers_left = server_count;
 
 		if (server_count * sizeof(_XLOCATOR_SEARCHRESULT) > cbBuffer) {
 
-			servptr->servers_left = -1;
+			servptr->document_servers_left = -1;
 			servptr->server_list_download_running = false;
 
 			pOverlapped->InternalLow = ERROR_INSUFFICIENT_BUFFER;
@@ -273,12 +267,24 @@ void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXO
 
 		for (auto& server : document["servers"].GetArray())
 		{
-			ULONGLONG xuid = std::stoll(server.GetString());
-			QueryServerData(curl, xuid, &server_buffer[servptr->GetTotalServers()]);
+			ZeroMemory(&server_buffer[servptr->GetTotalServers()], sizeof(XLOCATOR_SEARCHRESULT));
+			QueryServerData(curl, std::stoll(server.GetString()), &server_buffer[servptr->GetTotalServers()]);
 
-			servptr->servers_left--;
+			servptr->document_servers_left--;
+			if (servptr->GetTotalServers() > 0)
+			{
+				pOverlapped->InternalLow = ERROR_SUCCESS;
+				pOverlapped->InternalHigh = servptr->GetTotalServers();
+				pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+			}
+		}
+		
+		// check if we didn't find any servers
+		if (servptr->GetTotalServers() == 0)
+		{
+			// if we didn't find any, let the game know
 			pOverlapped->InternalLow = ERROR_SUCCESS;
-			pOverlapped->InternalHigh = servptr->GetTotalServers();
+			pOverlapped->InternalHigh = 0;
 			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 		}
 
@@ -323,7 +329,7 @@ void ServerList::GetServerCounts()
 
 int ServerList::GetServersLeft()
 {
-	return servers_left;
+	return document_servers_left;
 }
 
 int ServerList::GetTotalServers()
@@ -339,17 +345,17 @@ bool ServerList::GetRunning()
 void ServerList::GetServers(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
 {
 	// check if another thread isn't running and servers_left is in "unitialized state"
-	if (!this->server_list_download_running && this->servers_left == -1)
+	if (!this->server_list_download_running && this->document_servers_left == -1)
 	{
 		this->total_servers = 0;
 		this->serv_thread = std::thread(GetServersFromHttp, this, cbBuffer, pvBuffer, pOverlapped);
 		this->serv_thread.detach();
 	}
 
-	if (this->servers_left == 0)
+	if (this->document_servers_left == 0)
 	{
 		// reset servers_left to "unitialized state"
-		this->servers_left = -1;
+		this->document_servers_left = -1;
 
 		// set the ERROR_NO_MORE_FILES flag to tell the game XEnumerate is done searching
 		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;

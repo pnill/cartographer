@@ -77,7 +77,7 @@ public:
 	std::atomic<bool> server_list_download_running = false;
 	std::atomic<bool> server_counts_download_running= false;
 	bool completed = false;
-	int servers_left = -1;
+	int document_servers_left = -1;
 	int total_servers = 0;
 
 	int total_count = -1;
