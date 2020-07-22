@@ -456,21 +456,19 @@ void InitH2Startup() {
 void InitH2Startup2() {
 	InitGSDownload();
 
-	if (H2IsDediServer) {
-		addDebugText("Logging the Dedi Server in...");
-		//none of that stuff is setup for the dedi server yet since there are no gui commands for it.
-		//currently credentials are taken from the config file.
-		//also don't enable this since nothing's initialised for the server.
+	// initialize default data to run under LAN
+	// if the server runs in LIVE mode, check XLiveSignIn/XLiveSignOut in AccountLogin.cpp
+	if (H2IsDediServer)
+	{
+		addDebugText("Signing in dedicated server locally.");
+
 		AccountEdit_remember = false;
-		if (HandleGuiLogin(0, H2Config_login_identifier, H2Config_login_password, nullptr) == false)
-		{
-			// if login fails, setup default data, so the server will not stale
-			BYTE abEnet[6];
-			BYTE abOnline[20];
-			XNetRandom(abEnet, 6);
-			XNetRandom(abOnline, 20);
-			ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, 6).c_str(), ByteToHexStr(abOnline, 20).c_str(), false);
-		}
+
+		BYTE abEnet[6];
+		BYTE abOnline[20];
+		XNetRandom(abEnet, 6);
+		XNetRandom(abOnline, 20);
+		ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, 6).c_str(), ByteToHexStr(abOnline, 20).c_str(), false);
 	}
 }
 

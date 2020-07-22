@@ -456,5 +456,77 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 	return result;
 }
 
+#pragma region Online Server Sign-in
+
+// 5257: ??
+HRESULT WINAPI XLiveManageCredentials(LPCWSTR lpszLiveIdName, LPCWSTR lpszLiveIdPassword, DWORD dwCredFlags, PXOVERLAPPED pXOverlapped)
+{
+	LOG_TRACE_XLIVE(L"XLiveManageCredentials (lpszLiveIdName = {0}, lpszLiveIdPassword = {1}, dwCredFlags = {2:#x}, pXOverlapped = {3:p})",
+		lpszLiveIdName, lpszLiveIdPassword, dwCredFlags, (void*)pXOverlapped);
+
+	if (pXOverlapped)
+	{
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = 0;
+		pXOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+	}
+
+	// not done - error now
+	return S_OK;
+}
+
+// #5259: XLiveSignin
+HRESULT WINAPI XLiveSignin(PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD dwFlags, PXOVERLAPPED pOverlapped)
+{
+	LOG_TRACE_XLIVE("XLiveSignin() - signin in");
+
+	addDebugText("Logging the Dedi Server in...");
+
+	// clear LAN login info if we are logged in locally
+	if (userSignedInLocally(0))
+	{
+		XUserSignOut(0);
+		ipManager.UnregisterLocalConnectionInfo();
+	}
+
+	// if we are not signed in online, sign us in
+	if (!userSignedOnline(0))
+	{
+		//none of that stuff is setup for the dedi server yet since there are no gui commands for it.
+		//currently credentials are taken from the config file.
+		//also don't enable this since nothing's initialised for the server.
+		addDebugText("Signing in dedicated server online.");
+		HandleGuiLogin(0, H2Config_login_identifier, H2Config_login_password, nullptr);
+	}
+	
+	if (pOverlapped)
+	{
+		pOverlapped->InternalLow = ERROR_SUCCESS;
+		pOverlapped->InternalHigh = 0;
+		pOverlapped->dwExtendedError = S_OK;
+	}
+
+	return S_OK;
+}
+
+// #5258: XLiveSignout
+HRESULT WINAPI XLiveSignout(PXOVERLAPPED pXOverlapped)
+{
+	LOG_TRACE_XLIVE("XLiveSignout");
+
+	XUserSignOut(0);
+	ipManager.UnregisterLocalConnectionInfo();
+
+	if (pXOverlapped)
+	{
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = 0;
+		pXOverlapped->dwExtendedError = S_OK;
+	}
+
+	return S_OK;
+}
+#pragma endregion
+
 #pragma endregion
 
