@@ -218,9 +218,9 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 	++serverList.total_servers;
 }
 
-void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
+void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
 {
-	servptr->server_list_download_running = true;
+	this->ServerListDownloadRunning = true;
 
 	addDebugText("Requesting server list");
 
@@ -231,11 +231,11 @@ void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXO
 	if (!userSignedOnline(0))
 	{
 		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
-		pOverlapped->InternalHigh = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
+		pOverlapped->InternalHigh = 0;
 		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
-		servptr->document_servers_left = 0;
+		this->ServersLeftInDocumentCount = 0;
 
-		servptr->server_list_download_running = false;
+		this->ServerListDownloadRunning = false;
 		return;
 	}
 
@@ -250,12 +250,12 @@ void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXO
 		document.Parse(readBuffer.c_str());
 
 		int server_count = document["servers"].Size();
-		servptr->document_servers_left = server_count;
+		this->ServersLeftInDocumentCount = server_count;
 
 		if (server_count * sizeof(_XLOCATOR_SEARCHRESULT) > cbBuffer) {
 
-			servptr->document_servers_left = -1;
-			servptr->server_list_download_running = false;
+			this->ServersLeftInDocumentCount = -1;
+			this->ServerListDownloadRunning = false;
 
 			pOverlapped->InternalLow = ERROR_INSUFFICIENT_BUFFER;
 			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
@@ -267,20 +267,20 @@ void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXO
 
 		for (auto& server : document["servers"].GetArray())
 		{
-			ZeroMemory(&server_buffer[servptr->GetTotalServers()], sizeof(XLOCATOR_SEARCHRESULT));
-			QueryServerData(curl, std::stoll(server.GetString()), &server_buffer[servptr->GetTotalServers()]);
+			ZeroMemory(&server_buffer[this->GetTotalServers()], sizeof(XLOCATOR_SEARCHRESULT));
+			QueryServerData(curl, std::stoll(server.GetString()), &server_buffer[this->GetTotalServers()]);
 
-			servptr->document_servers_left--;
-			if (servptr->GetTotalServers() > 0)
+			this->ServersLeftInDocumentCount--;
+			if (this->GetTotalServers() > 0)
 			{
 				pOverlapped->InternalLow = ERROR_SUCCESS;
-				pOverlapped->InternalHigh = servptr->GetTotalServers();
+				pOverlapped->InternalHigh = this->GetTotalServers();
 				pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 			}
 		}
 		
 		// check if we didn't find any servers
-		if (servptr->GetTotalServers() == 0)
+		if (this->GetTotalServers() == 0)
 		{
 			// if we didn't find any, let the game know
 			pOverlapped->InternalLow = ERROR_SUCCESS;
@@ -288,17 +288,17 @@ void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXO
 			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 		}
 
-		std::string debg_1 = "Server Count: " + std::to_string(servptr->GetTotalServers());
+		std::string debg_1 = "Server Count: " + std::to_string(this->GetTotalServers());
 		addDebugText(debg_1.c_str());
 		curl_easy_cleanup(curl);
 	}
 
-	servptr->server_list_download_running = false;
+	this->ServerListDownloadRunning = false;
 }
 
-void ServerList::GetServerCounts()
+void ServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 {
-	this->server_counts_download_running = true;
+	std::lock_guard<std::mutex> lg(GetServerCountsMutex);
 	CURL *curl;
 	CURLcode res;
 	std::string readBuffer;
@@ -314,7 +314,6 @@ void ServerList::GetServerCounts()
 		rapidjson::Document document;
 		document.Parse(readBuffer.c_str());
 
-
 		if (document.HasMember("public_count"))
 		{
 			total_count = document["total"].GetInt();
@@ -322,14 +321,16 @@ void ServerList::GetServerCounts()
 			total_peer_gold = document["peer_gold"].GetInt();
 			total_public = document["public_count"].GetInt();
 			total_public_gold = document["public_gold"].GetInt();
+
+			// we updated the results, they can be used just fine
+			CountResultsUpdated = true;
 		}
 	}
-	this->server_counts_download_running = false;
 }
 
 int ServerList::GetServersLeft()
 {
-	return document_servers_left;
+	return ServersLeftInDocumentCount;
 }
 
 int ServerList::GetTotalServers()
@@ -339,29 +340,31 @@ int ServerList::GetTotalServers()
 
 bool ServerList::GetRunning()
 {
-	return server_list_download_running;
+	return ServerListDownloadRunning;
 }
 
 void ServerList::GetServers(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
 {
-	// check if another thread isn't running and servers_left is in "unitialized state"
-	if (!this->server_list_download_running && this->document_servers_left == -1)
+	// check if another thread isn't running and ServersLeftInDocumentCount is in "unitialized state"
+	if (!this->ServerListDownloadRunning && this->ServersLeftInDocumentCount == -1)
 	{
 		this->total_servers = 0;
-		this->serv_thread = std::thread(GetServersFromHttp, this, cbBuffer, pvBuffer, pOverlapped);
+		this->serv_thread = std::thread(&ServerList::GetServersFromHttp, this, cbBuffer, pvBuffer, pOverlapped);
 		this->serv_thread.detach();
 	}
 
-	if (this->document_servers_left == 0)
+	// if there are no more servers to be read from the received document, return ERROR_NO_MORE_FILES
+	if (this->ServersLeftInDocumentCount == 0)
 	{
-		// reset servers_left to "unitialized state"
-		this->document_servers_left = -1;
+		// reset ServersLeftInDocumentCount to "unitialized state"
+		this->ServersLeftInDocumentCount = -1;
 
 		// set the ERROR_NO_MORE_FILES flag to tell the game XEnumerate is done searching
 		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
 		pOverlapped->InternalHigh = this->GetTotalServers();
 		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
 	}
+	// otherwise tell the game we are still running I/O operations
 	else
 	{
 		pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
@@ -369,8 +372,10 @@ void ServerList::GetServers(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverla
 	}
 }
 
-void RemoveServer(PXOVERLAPPED pOverlapped)
+void ServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 {
+	std::lock_guard<std::mutex> lk(RemoveServerMutex);
+
 	CURL *curl;
 	CURLcode res;
 	std::string readBuffer;
@@ -380,7 +385,7 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
 	curl = curl_easy_init();
-	if (curl && userSignedOnline(0))
+	if (curl)
 	{
 		rapidjson::Document document;
 		document.SetObject();
@@ -409,8 +414,10 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 }
 
-void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
+void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
 {
+	std::lock_guard<std::mutex> lk(AddServerMutex);
+
 	CURL *curl;
 	CURLcode res;
 	std::string readBuffer;
@@ -532,7 +539,7 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 {
 	if (userSignedOnline(dwUserIndex))
 	{
-		std::thread(AddServer, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
+		std::thread(&ServerList::AddServer, &serverList, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
 		return HRESULT_FROM_WIN32(ERROR_IO_PENDING);
 	}
 	else
@@ -543,7 +550,7 @@ DWORD WINAPI XLocatorServerUnAdvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapp
 {
 	if (userSignedOnline(dwUserIndex))
 	{
-		std::thread(RemoveServer, pOverlapped).detach();
+		std::thread(&ServerList::RemoveServer, &serverList, pOverlapped).detach();
 		return HRESULT_FROM_WIN32(ERROR_IO_PENDING);
 	}
 	else
@@ -556,13 +563,23 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 	// LOG_TRACE_XLIVE("XLocatorGetServiceProperty  (*** checkme ***) (dwUserIndex = {0:x}, cNumProperties = {1:x}, pProperties = {2:x}, pOverlapped = {3:x})",
 	//		dwUserIndex, cNumProperties, pProperties, pOverlapped);
 
-	if (!serverList.server_counts_download_running && userSignedOnline(dwUserIndex))
-		std::thread(&ServerList::GetServerCounts, &serverList).detach();
+	// hacky but does the job, because the memory we are writing to is not global (at least in H2v)
+	if (userSignedOnline(dwUserIndex))
+		std::thread(&ServerList::GetServerCounts, &serverList, pOverlapped).detach();
 
-	pProperties[0].value.nData = serverList.total_count;
-	pProperties[1].value.nData = serverList.total_public;
-	pProperties[2].value.nData = serverList.total_peer_gold + serverList.total_public_gold != -2 ? serverList.total_peer_gold + serverList.total_public_gold : -1;
-	pProperties[3].value.nData = serverList.total_peer;
+	// we simply just give the game the results synchronously, if we have any
+	// it'll query the data each 5 seconds
+	if (serverList.CountResultsUpdated)
+	{
+		pProperties[0].value.nData = serverList.total_count;
+		pProperties[1].value.nData = serverList.total_public;
+		pProperties[2].value.nData = serverList.total_peer_gold;
+		pProperties[3].value.nData = serverList.total_peer;
+	}
+
+	pOverlapped->InternalLow = ERROR_SUCCESS;
+	pOverlapped->InternalHigh = 0;
+	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 
 	return S_OK;
 }
@@ -571,13 +588,13 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 // 5234: ??
 DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, DWORD* pcbBuffer, PHANDLE phEnum)
 {
-	LOG_TRACE_XLIVE("XLocatorCreateServerEnumerator");
+	LOG_TRACE_XLIVE("XLocatorCreateServerEnumerator()");
 
 	*pcbBuffer = (DWORD)(sizeof(_XLOCATOR_SEARCHRESULT) * 200); // 200 is the maximum XLocator could hold per title
 
 	if (phEnum)
 	{
-		serverList.handle = *phEnum = CreateMutex(NULL, NULL, NULL);
+		serverList.Handle = *phEnum = CreateMutex(NULL, NULL, NULL);
 
 		LOG_TRACE_XLIVE("- Handle = {:p}", (void*)*phEnum);
 	}
@@ -590,7 +607,7 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int 
 // 5238: ??
 DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey)
 {
-	LOG_TRACE_XLIVE("XLocatorCreateKey");
+	LOG_TRACE_XLIVE("XLocatorCreateKey()");
 	if (pxnkid && pxnkey) {
 		XNetCreateKey(pxnkid, pxnkey);
 
@@ -605,9 +622,9 @@ DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey)
 // 5235: ??
 DWORD WINAPI XLocatorCreateServerEnumeratorByIDs(DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6, DWORD a7, DWORD a8)
 {
-	LOG_TRACE_XLIVE("XLocatorCreateServerEnumeratorByIDs");
+	LOG_TRACE_XLIVE("XLocatorCreateServerEnumeratorByIDs()");
 	// not done - error now
-	return 0x57;
+	return ERROR_INVALID_PARAMETER;
 }
 
 
