@@ -911,7 +911,7 @@ void InitH2Tweaks() {
 		WriteValue<BYTE>(h2mod->GetAddress(0x411030), 0);
 
 		//disables the one after the intro video, by removing 0x40 flag from 0x7C6 bitmask
-		WriteValue(h2mod->GetAddress(0x39948 + 2), 0x7C6 & ~0x40);
+		WriteValue(h2mod->GetAddress(0x39948 + 2), 0x7C6 & ~FLAG(6));
 
 		//Set the LAN Server List Ping Frequency (milliseconds).
 		//WriteValue(h2mod->GetAddress(0x001e9a89), 3000);
@@ -944,6 +944,9 @@ void InitH2Tweaks() {
 
 		tags::on_map_load(fix_shaders_nvidia);
 		tags::on_map_load(c_xbox_live_task_progress_menu::ApplyPatches);
+
+		// disable cloth debugging that writes to cloth.txt
+		WriteValue<bool>(h2mod->GetAddress(0x41F650), false);
 	}
 
 	// Both server and client
