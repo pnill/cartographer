@@ -608,6 +608,36 @@ void setCustomLanguage(int main) {
 	setCustomLanguage(main, 0);
 }
 
+#pragma region Weapon Pickup training string fix
+typedef void(__stdcall* string_id_to_wide_string)(int thisx, int string_id, wchar_t *a3, int a4, int a5);
+string_id_to_wide_string p_string_id_to_wide_string;
+
+void __stdcall string_id_to_wide_string_hook(int thisx, int string_id, wchar_t *output, int a4, int a5)
+{
+	typedef void(__cdecl* decode_utf8_to_wide_string)(char* input, wchar_t* output, size_t output_len);
+	auto p_decode_utf8_to_wide_string = h2mod->GetAddress<decode_utf8_to_wide_string>(0x4C801);
+
+	wchar_t buffer[512];
+
+	if (*(BYTE*)(thisx + 0x18))
+	{
+		char* utf8_str = H2GetLabel(thisx, string_id, a4, a5);
+		p_decode_utf8_to_wide_string(utf8_str, buffer, ARRAYSIZE(buffer));
+		if (string_id == 0x110023FD) // check if the string id is training_swaphold
+		{
+			// if it's the case, 
+			const wchar_t reload_weapon_game_str = 0xE448;
+			const wchar_t weapon_pickup_game_str = 0xE45A;
+			wchar_t* string_occurance = wcsstr(buffer, &reload_weapon_game_str);
+			if (string_occurance)
+			{
+				string_occurance[0] = weapon_pickup_game_str;
+			}
+		}
+		wcsncpy(output, buffer, ARRAYSIZE(buffer));
+	}
+}
+#pragma endregion
 
 static void overrideCoreH2Labels() {
 	/*custom_language* lang_english = get_custom_language(0, 0);
@@ -650,6 +680,8 @@ void initGSCustomLanguage() {
 		initialise_core_languages();
 		overrideCoreH2Labels();
 		read_custom_labels();
+
+		p_string_id_to_wide_string = (string_id_to_wide_string)DetourClassFunc((BYTE*)H2BaseAddr + 0x3E332, (BYTE*)string_id_to_wide_string_hook, 11);
 
 		pH2GetLabel = (tH2GetLabel)DetourClassFunc((BYTE*)H2BaseAddr + 0x3defd, (BYTE*)H2GetLabel, 8);
 
