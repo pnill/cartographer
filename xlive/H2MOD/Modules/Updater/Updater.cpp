@@ -1,4 +1,5 @@
 
+#include "..\Config\Config.h"
 #include "H2MOD\Modules\Updater\Updater.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
@@ -285,7 +286,7 @@ static void FetchUpdateDetails() {
 
 	addDebugText("Fetching Update Details.");
 	char* rtn_result = 0;
-	int rtn_code = MasterHttpResponse("https://cartographer.online/update1.ini", "", rtn_result);
+	int rtn_code = MasterHttpResponse(std::string(cartographerURL + "/update1.ini"), "", rtn_result);
 	if (rtn_code == 0) {
 		addDebugText("Got Update Details.");
 

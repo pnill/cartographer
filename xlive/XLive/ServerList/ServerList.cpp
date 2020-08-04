@@ -33,7 +33,7 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 
 	if (curl) {
 
-		std::string server_url = std::string("http://cartographer.online/live/servers/");
+		std::string server_url = std::string(cartographerURL + "/live/servers/");
 		server_url.append(std::to_string(xuid).c_str());
 
 		curl_easy_setopt(curl, CURLOPT_URL, server_url.c_str());
@@ -241,7 +241,7 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED
 
 	curl = curl_easy_init();
 	if (curl) {
-		curl_easy_setopt(curl, CURLOPT_URL, "http://cartographer.online/live/server_list.php");
+		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/server_list.php"));
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
@@ -305,7 +305,7 @@ void ServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 
 	curl = curl_easy_init();
 	if (curl) {
-		curl_easy_setopt(curl, CURLOPT_URL, "http://cartographer.online/live/dedicount.php");
+		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/dedicount.php"));
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
@@ -400,7 +400,7 @@ void ServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
 
-		curl_easy_setopt(curl, CURLOPT_URL, "http://cartographer.online/live/del_server.php");
+		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/del_server.php"));
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);
@@ -457,6 +457,9 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 
 		for (DWORD i = 0; i < cProperties; i++)
 		{
+			if (pProperties[i].dwPropertyId == XUSER_PROPERTY_USERNAME_2) // this data isn't set right by the game
+				continue;
+
 			Value property(kObjectType);
 			property.AddMember("dwPropertyId", Value().SetInt(pProperties[i].dwPropertyId), document.GetAllocator());
 			property.AddMember("type", Value().SetInt(pProperties[i].value.type), document.GetAllocator());
@@ -484,26 +487,21 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 			document["pProperties"].PushBack(property, document.GetAllocator());
 		}
 
+		char* name = strnlen_s(H2Config_dedi_server_name, XUSER_MAX_NAME_LENGTH) > 0 ? H2Config_dedi_server_name : usersSignInInfo[dwUserIndex].szUserName;
+
 		/* For whatever reason the game is currently refusing to send the servername or player profile name so we're going to send it ourselves.*/
-		Value serv_name(kObjectType);
-		serv_name.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_SERVER_NAME), document.GetAllocator());
-		serv_name.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_UNICODE), document.GetAllocator());
-		if (h2mod->Server && strlen(H2Config_dedi_server_name) != 0)
-			serv_name.AddMember("value", Value().SetString(H2Config_dedi_server_name, strlen(H2Config_dedi_server_name), document.GetAllocator()), document.GetAllocator());
-		else
-			serv_name.AddMember("value", Value().SetString(usersSignInInfo[dwUserIndex].szUserName, XUSER_NAME_SIZE, document.GetAllocator()), document.GetAllocator());
+		Value serv_name_property(kObjectType);
+		serv_name_property.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_SERVER_NAME), document.GetAllocator());
+		serv_name_property.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_UNICODE), document.GetAllocator());
+		serv_name_property.AddMember("value", Value().SetString(name, strnlen_s(name, XUSER_MAX_NAME_LENGTH), document.GetAllocator()), document.GetAllocator());
 
-		document["pProperties"].PushBack(serv_name, document.GetAllocator());
+		Value user_name_property(kObjectType);
+		user_name_property.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_USERNAME_2), document.GetAllocator());
+		user_name_property.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_UNICODE), document.GetAllocator());
+		user_name_property.AddMember("value", Value().SetString(name, strnlen_s(name, XUSER_MAX_NAME_LENGTH), document.GetAllocator()), document.GetAllocator());
 
-		Value user_name(kObjectType);
-		user_name.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_USERNAME_2), document.GetAllocator());
-		user_name.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_UNICODE), document.GetAllocator());
-		if (h2mod->Server && strlen(H2Config_dedi_server_name) != 0)
-			user_name.AddMember("value", Value().SetString(H2Config_dedi_server_name, strlen(H2Config_dedi_server_name), document.GetAllocator()), document.GetAllocator());
-		else
-			user_name.AddMember("value", Value().SetString(usersSignInInfo[dwUserIndex].szUserName, XUSER_NAME_SIZE, document.GetAllocator()), document.GetAllocator());
-
-		document["pProperties"].PushBack(user_name, document.GetAllocator());
+		document["pProperties"].PushBack(user_name_property, document.GetAllocator());
+		document["pProperties"].PushBack(serv_name_property, document.GetAllocator());
 
 		Value user_int(kObjectType);
 		user_int.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_USER_INT), document.GetAllocator());
@@ -521,7 +519,7 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
 
-		curl_easy_setopt(curl, CURLOPT_URL, "http://cartographer.online/live/add_server.php");
+		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/add_server_dev.php"));
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);
@@ -548,6 +546,7 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 
 DWORD WINAPI XLocatorServerUnAdvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
 {
+	LOG_TRACE_XLIVE("XLocatorServerUnAdvertise()");
 	if (userSignedOnline(dwUserIndex))
 	{
 		std::thread(&ServerList::RemoveServer, &serverList, pOverlapped).detach();

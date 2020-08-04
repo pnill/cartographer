@@ -36,6 +36,8 @@ unsigned short H2Config_master_port_relay = 1001;
 //config variables
 bool H2Portable = false;//TODO
 
+std::string cartographerURL = "https://cartographer.online";
+
 unsigned short H2Config_base_port = 2000;
 char H2Config_str_wan[16] = { "" };
 char H2Config_str_lan[16] = { "" };
@@ -61,7 +63,7 @@ bool H2Config_xDelay = true;
 bool H2Config_hiresfix = false;
 bool H2Config_d3dex = false;
 bool H2Config_voice_chat = false;
-char H2Config_dedi_server_name[32] = { "" };
+char H2Config_dedi_server_name[XUSER_NAME_SIZE] = { "" };
 char H2Config_dedi_server_playlist[256] = { "" };
 int H2Config_additional_pcr_time = 25;
 bool H2Config_debug_log = false;
@@ -329,7 +331,7 @@ void SaveH2Config() {
 		if (H2IsDediServer) {
 			iniStringBuffer <<
 				"# server_name Options (Server):"
-				"\n# Sets the name of the server up to 31 characters long."
+				"\n# Sets the name of the server up to 15 characters long."
 				"\n# Leave blank/empty for no effect."
 				"\n\n"
 
@@ -449,7 +451,6 @@ void SaveH2Config() {
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "debug_log_console", H2Config_debug_log_console);
 
 		if (H2IsDediServer) {
-
 			ini.SetValue(H2ConfigVersionSection.c_str(), "server_name", H2Config_dedi_server_name);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "server_playlist", H2Config_dedi_server_playlist);
@@ -697,7 +698,7 @@ void ReadH2Config() {
 			{
 				const char* server_name = ini.GetValue(H2ConfigVersionSection.c_str(), "server_name", H2Config_dedi_server_name);
 				if (server_name) {
-					strncpy(H2Config_dedi_server_name, server_name, sizeof(H2Config_dedi_server_name));
+					strncpy(H2Config_dedi_server_name, server_name, XUSER_MAX_NAME_LENGTH);
 				}
 
 				const char* server_playlist = ini.GetValue(H2ConfigVersionSection.c_str(), "server_playlist", H2Config_dedi_server_playlist);

@@ -23,6 +23,8 @@ struct _H2Config_language {
 	int code_variant;
 };
 
+extern std::string cartographerURL;
+
 extern unsigned long H2Config_master_ip;
 extern unsigned short H2Config_master_port_login;
 extern unsigned short H2Config_master_port_relay;
@@ -55,7 +57,7 @@ extern bool H2Config_disable_ingame_keyboard;
 extern bool H2Config_hide_ingame_chat;
 extern bool H2Config_xDelay;
 extern bool H2Config_voice_chat;
-extern char H2Config_dedi_server_name[32];
+extern char H2Config_dedi_server_name[XUSER_NAME_SIZE];
 extern char H2Config_dedi_server_playlist[256];
 extern int H2Config_additional_pcr_time;
 extern bool H2Config_debug_log;

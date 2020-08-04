@@ -406,7 +406,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 	free(escaped_user_password);
 
 	int master_login_interpret_result = -1;
-	int master_http_response_result = MasterHttpResponse("https://cartographer.online/login2", http_request_body_build, rtn_result);
+	int master_http_response_result = MasterHttpResponse(std::string(cartographerURL + "/login2"), http_request_body_build, rtn_result);
 
 	for (int i = strlen(http_request_body_build) - 1; i >= 0; i--) {
 		http_request_body_build[i] = 0;

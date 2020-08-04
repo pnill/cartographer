@@ -490,7 +490,7 @@ const int ERROR_CODE_CURL_SOCKET_FAILED = -40;
 const int ERROR_CODE_CURL_HANDLE = -41;
 const int ERROR_CODE_CURL_EASY_PERF = -42;
 
-int MasterHttpResponse(char* url, char* http_request, char* &rtn_response) {
+int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response) {
 	int result = ERROR_CODE_CURL_SOCKET_FAILED;//Socket failed to connect to server
 
 	CURL *curl;

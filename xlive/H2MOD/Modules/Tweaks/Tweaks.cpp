@@ -22,18 +22,8 @@
 typedef int(__cdecl *thookServ1)(HKEY, LPCWSTR);
 thookServ1 phookServ1;
 int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
-	char result =
-		phookServ1(hKey, lpSubKey);
+	char result = phookServ1(hKey, lpSubKey);
 	addDebugText("Post Server Registry Read.");
-	if (strlen(H2Config_dedi_server_name) > 0) {
-		wchar_t* PreLoadServerName = h2mod->GetAddress<wchar_t*>(0, 0x3B49B4);
-		swprintf(PreLoadServerName, 15, L"%hs", H2Config_dedi_server_name);
-		//char temp[27];
-		//snprintf(temp, 27, "%ws", dedi_server_name);
-		//MessageBoxA(NULL, temp, "Server Pre name thingy", MB_OK);
-		wchar_t* LanServerName = h2mod->GetAddress<wchar_t*>(0, 0x52042A);
-		swprintf(LanServerName, 2, L"");
-	}
 	if (strlen(H2Config_dedi_server_playlist) > 0) {
 		wchar_t* ServerPlaylist = h2mod->GetAddress<wchar_t*>(0, 0x3B3704);
 		swprintf(ServerPlaylist, 256, L"%hs", H2Config_dedi_server_playlist);

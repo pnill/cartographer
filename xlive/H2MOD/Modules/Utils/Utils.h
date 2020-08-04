@@ -79,7 +79,7 @@ extern const int ERROR_CODE_CURL_SOCKET_FAILED;
 extern const int ERROR_CODE_CURL_HANDLE;
 extern const int ERROR_CODE_CURL_EASY_PERF;
 ///FREE MEMOERY in rtn_response if returned 0 (success).
-int MasterHttpResponse(char* url, char* http_request, char* &rtn_response);
+int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response);
 
 bool StrnCaseInsensEqu(char* str1, char* str2, unsigned int chk_len);
 
