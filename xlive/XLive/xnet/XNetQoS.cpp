@@ -525,11 +525,8 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 // #70: XNetQosLookup
 DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY * apxnkey[], UINT cina, IN_ADDR aina[], DWORD adwServiceId[], UINT cProbes, DWORD dwBitsPerSec, DWORD dwFlags, WSAEVENT hEvent, XNQOS** pxnqos)
 {
-	LOG_TRACE_NETWORK("XNetQosLookup ( cxna: {0}, cina: {1}, cProbes: {2}, dwBitsPerSec: {3}, hEvent: {3:p})",
-		cxna, cina, cProbes, dwBitsPerSec, (void*)hEvent);
-	LOG_TRACE_NETWORK("XNetQoSLookup( apxna: {0:p}, apxnkid: {1:p}, apxnkey: {2:p}, aina: {3:p}, adwServiceId: {4:p}, pxnqos: {5:p})",
-		(void*)apxna, (void*)apxnkid, (void*)apxnkey, (void*)aina, (void*)adwServiceId, (void*)pxnqos);
-	//void ClientQoSLookUp(UINT cxna, XNADDR* apxna[],UINT cProbes,IN_ADDR  aina[], XNQOS** pxnqos,DWORD dwBitsPerSec)
+	LOG_TRACE_NETWORK("XNetQosLookup ( cxna: {0}, cina: {1}, cProbes: {2}, dwBitsPerSec: {3}, hEvent: {4})",
+		cxna, cina, cProbes, dwBitsPerSec, hEvent);
 
 	XNADDR** apxna_copy = new XNADDR*[cxna];
 	for (DWORD i = 0; i < cxna; i++)
