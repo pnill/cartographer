@@ -2537,25 +2537,25 @@ void GSCustomMenuCall_Login_Warn() {
 static bool blind_fp = false;
 static bool blind_hud = false;
 
-char __cdecl sub_BD114_blind_fp(unsigned int a1)//render first person model
+bool __cdecl sub_BD114_blind_fp(unsigned int a1)//render first person model
 {
-	char result = blind_fp ? 1 : 0;
+	bool result = blind_fp ? true : false;
 	if (AdvLobbySettings_mp_blind & 0b10)
-		result = 1;
+		result = true;
 	return result;
 }
 
-char __cdecl sub_BD114_blind_hud(unsigned int a1)//render hud
+bool __cdecl sub_BD114_blind_hud(unsigned int a1)//render hud
 {
-	DWORD PlayerGlobalBase = (DWORD)0x30004B60;
-	bool& IsPlayerDead = (bool&)*(BYTE*)(PlayerGlobalBase + 4);
-	if (IsPlayerDead) {//fixes game notification text from glitching out
-		return 0;
-	}
-	char result = blind_hud ? 1 : 0;
+	bool result = blind_hud ? true : false;
 	if (AdvLobbySettings_mp_blind & 0b01)
-		result = 1;
-	return result;
+		result = true;
+
+	// TODO: cleanup
+	DWORD new_hud_globals = *(DWORD*)(H2BaseAddr + 0x9770F4);
+	*(float*)(new_hud_globals + 0x228) = result ? 0.f : 1.f; // set the opacity
+
+	return false;
 }
 
 static BYTE enableKeyboard3[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -2774,15 +2774,15 @@ int getSkullIndexOffset(int lblIndex) {
 		return 0x4D8321;//Grunt Birthday Party
 	else if (lblIndex == 9)
 		return 0x4D832B;//Iron
-	else if (lblIndex == 0xA)
+	else if (lblIndex == 10)
 		return 0x4D8325;//IWHBYD
-	else if (lblIndex == 0xB)
+	else if (lblIndex == 11)
 		return 0x4D832C;//Mythic
-	else if (lblIndex == 0xC)
+	else if (lblIndex == 12)
 		return 0x4D832A;//Sputnik
-	else if (lblIndex == 0xD)
+	else if (lblIndex == 13)
 		return 0x4D8323;//Thunderstorm
-	else if (lblIndex == 0xE)
+	else if (lblIndex == 14)
 		return 0x4D832E;//Whuppopotamus
 	return 0;
 }
