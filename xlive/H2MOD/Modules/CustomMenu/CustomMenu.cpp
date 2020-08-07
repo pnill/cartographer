@@ -2547,13 +2547,21 @@ bool __cdecl sub_BD114_blind_fp(unsigned int a1)//render first person model
 
 bool __cdecl sub_BD114_blind_hud(unsigned int a1)//render hud
 {
-	bool result = blind_hud ? true : false;
-	if (AdvLobbySettings_mp_blind & 0b01)
-		result = true;
-
 	// TODO: cleanup
+	static bool hud_opacity_reset = false;
 	DWORD new_hud_globals = *(DWORD*)(H2BaseAddr + 0x9770F4);
-	*(float*)(new_hud_globals + 0x228) = result ? 0.f : 1.f; // set the opacity
+	float& hud_opacity = *(float*)(new_hud_globals + 0x228); // set the opacity
+
+	if (blind_hud || AdvLobbySettings_mp_blind & 0b01)
+	{
+		hud_opacity = 0.f;
+		hud_opacity_reset = false;
+	}
+	else if (!hud_opacity_reset)
+	{
+		hud_opacity = 1.f;
+		hud_opacity_reset = true;
+	}
 
 	return false;
 }
