@@ -95,6 +95,9 @@ high_resolution_clock::duration desiredRenderTime = duration_cast<high_resolutio
 
 void frameTimeManagement() {
 
+	if (H2Config_experimental_game_main_loop_patches)
+		return;
+
 	static bool bInitTime = false;
 	if (!bInitTime)
 	{

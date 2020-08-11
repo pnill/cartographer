@@ -50,6 +50,7 @@ bool H2Config_raw_input = false;
 bool H2Config_discord_enable = true;
 //bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
+bool H2Config_experimental_game_main_loop_patches = false;
 int H2Config_static_lod_state = static_lod::disable;
 int H2Config_field_of_view = 70;
 int H2Config_vehicle_field_of_view = 70;
@@ -208,6 +209,15 @@ void SaveH2Config() {
 				"\n# <uint> - 0 disables the built in frame limiter. >0 is the fps limit of the game."
 				"\n\n"
 
+				"# experimental_game_main_loop_patches Options (Client):"
+				"\n# <uint> - 0 - keep game main loop patches that Hired Gun added when porting Halo 2 to PC from Xbox"
+				"\n# <uint> - 1 - disable game main loop patches that Hired Gun added when porting Halo 2 to PC from Xbox"
+				"\n# NOTE: enabling this will improve game/network synchronization between dedicated servers and the game"
+				"\n# at the cost of having the game locked at 60 FPS (or at which tickrate the game is set at), because at unlocked FPS (or even when using external frame limiters) the game is not in sync with game ticks,"
+				"\n# forcing the game to render a stale state of the game causing heavy stuttering and jagged movement because prior frame rendering no game tick has been executed."
+				"\n# Enabling this will force the game to render frames only if a game tick has been executed."
+				"\n\n"
+
 				"# static_lod_state Options (Client):"
 				"\n# 0 - Disables the Level of Detail level enforcement for models."
 				"\n# The following describes each Level of Detail setting:"
@@ -237,8 +247,9 @@ void SaveH2Config() {
 				"\n\n"
 
 				"# d3dex Options (Client):"
-				"\n# 0 - Disable d3dex."
-				"\n# 1 - Enable d3dex."
+				"\n# 0 - NOTE: If your game crashes on startup, consider disabling this. If it's not enabled, seek for help."
+				"\n# 0 - Disable D3D9Ex version of D3D9."
+				"\n# 1 - Enable D3D9Ex version of D3D9."
 				"\n\n"
 
 				"# controller_sens Options (Client):"
@@ -396,6 +407,8 @@ void SaveH2Config() {
 			//ini.SetBoolValue(H2ConfigVersionSection.c_str(), "controller_aim_assist", H2Config_controller_aim_assist);
 
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "fps_limit", H2Config_fps_limit);
+
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "experimental_game_main_loop_patches", H2Config_experimental_game_main_loop_patches);
 
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "static_lod_state", H2Config_static_lod_state);
 
@@ -636,6 +649,7 @@ void ReadH2Config() {
 				H2Config_raw_input = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "raw_mouse_input", H2Config_raw_input);
 				H2Config_discord_enable = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "discord_enable", H2Config_discord_enable);
 				H2Config_fps_limit = ini.GetLongValue(H2ConfigVersionSection.c_str(), "fps_limit", H2Config_fps_limit);
+				H2Config_experimental_game_main_loop_patches = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "experimental_game_main_loop_patches", H2Config_experimental_game_main_loop_patches);
 				H2Config_static_lod_state = ini.GetLongValue(H2ConfigVersionSection.c_str(), "static_lod_state", H2Config_static_lod_state);
 
 				H2Config_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "field_of_view", H2Config_field_of_view);
