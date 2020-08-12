@@ -2548,7 +2548,7 @@ bool __cdecl sub_BD114_blind_fp(unsigned int a1)//render first person model
 bool __cdecl sub_BD114_blind_hud(unsigned int a1)//render hud
 {
 	// TODO: cleanup
-	static bool hud_opacity_reset = false;
+	static bool hud_opacity_reset = true;
 	DWORD new_hud_globals = *(DWORD*)(H2BaseAddr + 0x9770F4);
 	float& hud_opacity = *(float*)(new_hud_globals + 0x228); // set the opacity
 
