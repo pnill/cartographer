@@ -1,6 +1,7 @@
 #pragma once
 
 #define IPPROTO_VDP 254
+#define COMPILE_WITH_STD_SOCK_FUNC 1
 
 struct XSocket
 {
