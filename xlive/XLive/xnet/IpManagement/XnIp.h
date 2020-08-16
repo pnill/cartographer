@@ -47,6 +47,14 @@ struct XNetPacketHeader
 
 struct XBroadcastPacket
 {
+	XBroadcastPacket::XBroadcastPacket()
+	{
+		pckHeader.intHdr = 'BrOd';
+		strncpy(pckHeader.HdrStr, broadcastStrHdr, MAX_HDR_STR);
+		ZeroMemory(&data, sizeof(XBroadcastPacket::XBroadcast));
+		data.name.sin_addr.s_addr = INADDR_BROADCAST;
+	};
+
 	XNetPacketHeader pckHeader;
 	struct XBroadcast
 	{
