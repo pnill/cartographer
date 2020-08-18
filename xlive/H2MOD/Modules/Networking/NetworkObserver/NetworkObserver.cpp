@@ -176,9 +176,6 @@ void network_observer::ApplyPatches()
 	NopFill(h2mod->GetAddress(0x1BFBE7, 0x1B9AC7), 19);
 	NopFill(h2mod->GetAddress(0x1BE33A, 0x1B8214), 15);
 	NopFill(h2mod->GetAddress(0x1BDF1D, 0x1B7DF7), 18);
-
-	// increase the network heap size
-	WriteValue<DWORD>(h2mod->GetAddress(0x1ACCC8, 0x1ACE96) + 6, INCREASED_NETWORK_HEAP_SIZE); // original H2v: 1048576, 60 tick: 1048576
 #else
 	// disables LIVE netcode
 	WriteValue<BYTE>(h2mod->GetAddress(0x1B555B, 0x1A92B9) + 1, 0);
@@ -186,6 +183,9 @@ void network_observer::ApplyPatches()
 	NopFill(h2mod->GetAddress(0x1D4E33, 0x1C1B7D), 2);
 	WriteValue<BYTE>(h2mod->GetAddress(0x1D4E35, 0x1C1B7F), 0xEB); // jmp
 #endif
+
+	// increase the network heap size
+	WriteValue<DWORD>(h2mod->GetAddress(0x1ACCC8, 0x1ACE96) + 6, NETWORK_HEAP_SIZE);
 
 	if (!h2mod->Server)
 	{
