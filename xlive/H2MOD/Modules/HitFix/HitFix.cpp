@@ -36,7 +36,7 @@ void __cdecl projectile_update_instantaneous(datum projectile_object_index, real
 {
 	updateInstantaneousProjectile = true;
 	projectileToBeUpdated = projectile_object_index;
-	LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {}, just making sure: {}", projectileToBeUpdated.ToAbsoluteIndex(), *(int*)&projectile_object_index & 0xFFFF);
+	//LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {}, just making sure: {}", projectileToBeUpdated.ToAbsoluteIndex(), *(int*)&projectile_object_index & 0xFFFF);
 	p_projectile_update(projectile_object_index, a2);
 }
 
@@ -44,12 +44,12 @@ void __cdecl projectile_update_regular(datum projectile_object_index, real_point
 {
 	updateInstantaneousProjectile = false;
 	projectileToBeUpdated = projectile_object_index;
-	LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {}, just making sure: {}", projectileToBeUpdated.ToAbsoluteIndex(), *(int*)&projectile_object_index & 0xFFFF);
+	//LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {}, just making sure: {}", projectileToBeUpdated.ToAbsoluteIndex(), *(int*)&projectile_object_index & 0xFFFF);
 	p_projectile_update(projectile_object_index, a2);
 }
 
 // this will get executed when p_projectile_update is called
-void get_seconds_per_tick_internal_patch()
+float __cdecl get_seconds_per_tick_internal_patch()
 {
 	ObjectHeader* objects_header = (ObjectHeader*)game_state_objects_header->datum;
 	char* object_data = objects_header[projectileToBeUpdated.ToAbsoluteIndex()].object;
@@ -60,13 +60,11 @@ void get_seconds_per_tick_internal_patch()
 	if (*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5) // check if travels instantaneously flag is set in the projectile flags
 		&& (updateInstantaneousProjectile || *(DWORD*)(object_data + 428) == p_time_globals->tick_count))
 	{
-		LOG_TRACE_GAME("get_time_delta_internal() - projectile obj index: {}, projectile creation tick: {}, current tick count {}", projectileToBeUpdated.ToAbsoluteIndex(), *(DWORD*)(object_data + 428), p_time_globals->tick_count);
+		//LOG_TRACE_GAME("get_time_delta_internal() - projectile obj index: {}, projectile creation tick: {}, current tick count {}", projectileToBeUpdated.ToAbsoluteIndex(), *(DWORD*)(object_data + 428), p_time_globals->tick_count);
 		timeDelta = timeDelta * (float)((float)p_time_globals->ticks_per_second / 30.0f);
 	}
-	__asm
-	{
-		fld timeDelta
-	}
+
+	return timeDelta;
 }
 
 __declspec(naked) void get_seconds_per_tick()
