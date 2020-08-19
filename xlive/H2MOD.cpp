@@ -893,7 +893,6 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 
 		if (!b_XboxTick) 
 		{
-			HitFix::Initialize();
 			H2X::Initialize(b_H2X);
 			MPMapFix::Initialize();
 			H2Tweaks::applyMeleePatch(true);
@@ -1344,6 +1343,8 @@ void H2MOD::ApplyHooks() {
 
 	ApplyUnitHooks();
 	mapManager->applyGamePatches();
+
+	HitFix::ApplyPatches();
 
 	// bellow hooks applied to specific executables
 	if (this->Server == false) {
