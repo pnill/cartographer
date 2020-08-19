@@ -21,9 +21,9 @@ enum e_network_session_state : signed int
 
 enum e_map_status : int
 {
-	unk_map_stats,
+	unk_0,
 	map_unavailable,
-	unk_map_stats2,
+	map_someone_loading,
 	map_available,
 	map_loaded,
 	map_is_downloading

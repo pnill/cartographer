@@ -12,10 +12,10 @@ float get_device_power_transition_time(datum device_datum)
 {
 	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD tag_instances = (DWORD)tags::get_tag_instances();
-	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
+	BYTE* game_state_objects_header_table = (BYTE*)game_state_objects_header->datum;
 
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
-	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)game_state_objects_header_table + device_gamestate_offset * 4 + 8);
+	DWORD device_gamestate_datum_pointer = *(DWORD*)(game_state_objects_header_table + device_gamestate_offset * 4 + 8);
 	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 
 	__int16 device_control_index = device_control_datum & 0xFFFF;
@@ -34,10 +34,10 @@ datum get_device_open_up_weapon_datum(datum device_datum)
 {
 	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD global_tag_instances = (DWORD)tags::get_tag_instances();
-	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
+	BYTE* game_state_objects_header_table = (BYTE*)game_state_objects_header->datum;
 
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
-	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)game_state_objects_header_table + device_gamestate_offset * 4 + 8);
+	DWORD device_gamestate_datum_pointer = *(DWORD*)(game_state_objects_header_table + device_gamestate_offset * 4 + 8);
 	datum device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 
 	device_control_datum.Index = device_control_datum.Index << 4;

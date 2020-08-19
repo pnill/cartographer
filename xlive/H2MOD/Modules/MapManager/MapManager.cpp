@@ -56,7 +56,7 @@ typedef signed int(__cdecl* get_map_load_status_for_all_peers)(signed int*, unsi
 get_map_load_status_for_all_peers p_get_map_load_status_for_all_peers;
 
 //allow hosts to start the game while other peers didn't load the map
-signed int __cdecl get_map_load_status_for_all_peers_hook(signed int *a1, unsigned int *a2)
+signed int __cdecl get_map_load_status_for_all_peers_hook(signed int *smallest_load_percentage, unsigned int *host_map_status)
 {
 	// this just gets the current network_session, but has some extra misc checks
 	typedef bool(__cdecl* get_network_session_with_misc_checks)(network_session**);
@@ -86,15 +86,17 @@ signed int __cdecl get_map_load_status_for_all_peers_hook(signed int *a1, unsign
 		case network_session_state_host_reestablish:
 			membership_info* membership = &session->membership;
 
-			if (a2)
-				*a2 = membership->peer_info[session->session_host_peer_index].map_status;
+			if (host_map_status)
+				*host_map_status = membership->peer_info[session->session_host_peer_index].map_status;
 
 			result_map_status = map_loaded;
-			result_map_percentage = 100;
+
+			// i don't think this is really used anymore, it has been replaced by the load screen in H2v from Xbox
+			result_map_percentage = 100; 
 			
 			for (int i = 0; i < session->membership.peer_count; i++)
 			{
-				// now we only check our peer and session host peer, instead of all peers
+				// now we only check our peer and session host peer, instead of all the peers
 				if (i == session->session_host_peer_index
 					|| i == session->local_peer_index)
 				{
@@ -116,10 +118,9 @@ signed int __cdecl get_map_load_status_for_all_peers_hook(signed int *a1, unsign
 							result_map_status = map_available;
 						break;
 
-					case unk_map_stats2:
-						result_map_status = unk_map_stats2;
-						if (result_map_percentage > membership->peer_info[i].map_progress_percentage)
-							result_map_percentage = membership->peer_info[i].map_progress_percentage;
+					case map_someone_loading:
+						result_map_status = map_someone_loading;
+						result_map_percentage = min(membership->peer_info[i].map_progress_percentage, result_map_percentage); // get the least map load percentage
 						break;
 					}
 				}
@@ -130,8 +131,8 @@ signed int __cdecl get_map_load_status_for_all_peers_hook(signed int *a1, unsign
 		}
 	}
 
-	if (a1)
-		*a1 = result_map_percentage;
+	if (smallest_load_percentage)
+		*smallest_load_percentage = result_map_percentage;
 
 	return result_map_status;
 }
@@ -152,9 +153,9 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(network_session *session
 			{
 				switch (membership->peer_info[i].map_status)
 				{
-				case unk_map_stats:
+				case unk_0:
 				case map_unavailable:
-				case unk_map_stats2:
+				case map_someone_loading:
 				case map_is_downloading:
 					result_bitflags |= FLAG(i);
 					everyone_loaded_the_map = false;

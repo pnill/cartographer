@@ -13,6 +13,8 @@ struct __declspec(align(4)) time_globals
 	float field_18;
 	float field_1C;
 	float field_20;
+
+	static time_globals* get_game_time_globals();
 };
 
 
