@@ -53,7 +53,7 @@ float __cdecl get_seconds_per_tick_internal_patch()
 {
 	ObjectHeader* objects_header = (ObjectHeader*)game_state_objects_header->datum;
 	char* object_data = objects_header[projectileToBeUpdated.ToAbsoluteIndex()].object;
-	char* proj_tag_data = (char*)tags::get_tag(*((datum*)object_data));
+	char* proj_tag_data = tags::get_tag_fast<char>(*((datum*)object_data));
 	time_globals* p_time_globals = time_globals::get_game_time_globals();
 
 	float timeDelta = p_time_globals->seconds_per_tick;
