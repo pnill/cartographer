@@ -36,7 +36,10 @@ struct XnIp
 	sockaddr_in NatAddrSocket1000; // TODO: allocate dynamically based on how many sockets are up
 	sockaddr_in NatAddrSocket1001;
 
-	bool isValid(IN_ADDR identifier) { return bValid && identifier.s_addr == connectionIdentifier.s_addr; }
+	unsigned int pckSent;
+	unsigned int pckRecvd;
+
+	bool isValid(IN_ADDR identifier);
 };
 
 struct XNetPacketHeader
@@ -90,6 +93,8 @@ class CXnIp
 public:
 	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier, bool handleFromConnectionPacket);
 	void UnregisterXnIpIdentifier(const IN_ADDR ina);
+
+	XnIp* getConnection(IN_ADDR ina);
 
 	void checkForLostConnections();
 	void setTimeConnectionInteractionHappened(IN_ADDR ina, int time);

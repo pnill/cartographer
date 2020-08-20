@@ -317,8 +317,8 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		Worst case if this is found to cause performance issues we can handle the send and re-update to secure before return.
 	*/
 
-	XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(inTo->sin_addr)];
-	if (xnIp->isValid(inTo->sin_addr))
+	XnIp* xnIp = ipManager.getConnection(inTo->sin_addr);
+	if (xnIp != nullptr)
 	{
 		sockaddr_in sendToAddr;
 		sendToAddr.sin_family = AF_INET;
@@ -364,16 +364,15 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		*lpNumberOfBytesSent = 0;
 
 #if COMPILE_WITH_STD_SOCK_FUNC
-		if (dwBufferCount >= 1)
+		for (DWORD i = 0; i < dwBufferCount; i++)
 		{
-			for (DWORD i = 0; i < dwBufferCount; i++)
-			{
-				result = sendto(xsocket->winSockHandle, lpBuffers[i].buf, lpBuffers[i].len, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr));
-				if (result == SOCKET_ERROR)
-					break;
+			result = sendto(xsocket->winSockHandle, lpBuffers[i].buf, lpBuffers[i].len, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr));
+			if (result == SOCKET_ERROR)
+				break;
 
-				*lpNumberOfBytesSent += result;
-			}
+			xnIp->pckSent++;
+
+			*lpNumberOfBytesSent += result;
 		}
 #else
 		int result = WSASendTo(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesSent, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr), lpOverlapped, lpCompletionRoutine);
