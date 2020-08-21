@@ -144,10 +144,10 @@ void *runtime_state_init()
 	return runtime_state_init_impl();
 }
 
-void global_preferences_initialize()
+void game_preferences_initialize()
 {
-	typedef void global_preferences_initialize();
-	auto global_preferences_initialize_impl = h2mod->GetAddress<global_preferences_initialize*>(0x325FD);
+	typedef void game_preferences_initialize();
+	auto global_preferences_initialize_impl = h2mod->GetAddress<game_preferences_initialize*>(0x325FD);
 	global_preferences_initialize_impl();
 }
 
@@ -389,7 +389,11 @@ bool engine_basic_init()
 		init_timing(1000 * flags_array[startup_flags::unk26]);
 	real_math_initialize();
 	async_initialize();
-	global_preferences_initialize();
+	game_preferences_initialize();
+
+	// clear the network bandwidth preferences so they won't cause issues
+	SecureZeroMemory(h2mod->GetAddress<void*>(0x47E9D8 + 0x1DC), 108);
+
 	font_initialize();
 
 	if (!LOG_CHECK(tag_files_open()))
