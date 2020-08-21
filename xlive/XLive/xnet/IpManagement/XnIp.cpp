@@ -288,7 +288,6 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectR
 		SaveConnectionNatInfo(xsocket, connectionIdentifier, recvAddr);
 
 		XnIp* xnIp = &XnIPs[getConnectionIndex(connectionIdentifier)];
-
 		if (xnIp->isValid(connectionIdentifier)
 			&& xnIp->xnetstatus < XNET_CONNECT_STATUS_CONNECTED)
 		{
@@ -302,6 +301,9 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectR
 			else
 				xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING;
 		}
+
+		// increase packets received count
+		xnIp->pckRecvd++;
 	}
 	else
 	{
