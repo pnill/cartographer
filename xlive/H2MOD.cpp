@@ -896,6 +896,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 			H2X::Initialize(b_H2X);
 			MPMapFix::Initialize();
 			H2Tweaks::applyMeleePatch(true);
+			HitFix::ApplyProjectileVelocity();
 			engine_settings->tickrate = XboxTick::setTickRate(false);
 		}
 		else

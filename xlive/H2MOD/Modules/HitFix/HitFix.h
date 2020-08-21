@@ -3,4 +3,5 @@
 namespace HitFix
 {
 	void ApplyPatches();
+	void ApplyProjectileVelocity();
 };

@@ -82,6 +82,33 @@ __declspec(naked) void get_seconds_per_tick()
 	}
 }
 
+// we still keep this because the fix above doen't fully fix it
+// object string, initial bullet speed, final bullet speed
+std::vector<std::tuple<std::string, float, float>> weapon_projectiles =
+{
+	std::make_tuple("objects\\weapons\\rifle\\battle_rifle\\projectiles\\battle_rifle_bullet", 400.f * 2, 400.f * 2),
+	std::make_tuple("objects\\weapons\\rifle\\covenant_carbine\\projectiles\\carbine_slug\\carbine_slug", 400.f * 2, 400.f * 2),
+	std::make_tuple("objects\\weapons\\rifle\\sniper_rifle\\projectiles\\sniper_bullet", 1200.0f * 2, 1200.0f * 2),
+	std::make_tuple("objects\\weapons\\rifle\\beam_rifle\\projectiles\\beam_rifle_beam", 1200.0f * 2, 1200.0f * 2),
+	std::make_tuple("objects\\vehicles\\warthog\\turrets\\gauss\\weapon\\gauss_bullet", 90.f * 2.f, 90.f * 2.f),
+	std::make_tuple("objects\\weapons\\pistol\\magnum\\projectiles\\magnum_bullet", 400.f * 2, 400.f * 2),
+	std::make_tuple("objects\\vehicles\\warthog\\turrets\\chaingun\\weapon\\bullet", 2000.0f, 2000.0f)
+};
+
+void HitFix::ApplyProjectileVelocity()
+{
+	for (auto& proj_tuple : weapon_projectiles)
+	{
+		auto proj_datum = tags::find_tag(blam_tag::tag_group_type::projectile, std::get<0>(proj_tuple));
+		BYTE* projectile_tag_data = tags::get_tag<blam_tag::tag_group_type::projectile, BYTE>(proj_datum);
+		if (projectile_tag_data != nullptr)
+		{
+			*(float*)(projectile_tag_data + 380) = std::get<1>(proj_tuple);
+			*(float*)(projectile_tag_data + 384) = std::get<2>(proj_tuple);
+		}
+	}
+}
+
 void HitFix::ApplyPatches()
 {
 	// increase projectile game object data size to store the elapsed tick time when created
