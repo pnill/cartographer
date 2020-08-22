@@ -391,8 +391,7 @@ bool engine_basic_init()
 	async_initialize();
 	game_preferences_initialize();
 
-	// clear the network bandwidth preferences so they won't cause issues
-	SecureZeroMemory(h2mod->GetAddress<void*>(0x47E9D8 + 0x1DC), 108);
+	network_observer::ResetNetworkPreferences();
 
 	font_initialize();
 

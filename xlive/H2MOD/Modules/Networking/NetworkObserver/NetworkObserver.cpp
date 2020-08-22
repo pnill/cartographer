@@ -121,7 +121,7 @@ void __cdecl initialize_network_observer_configuration()
 
 void network_observer::sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data)
 {
-	typedef void(__thiscall* observer_channel_send_message)(void*, int, int, e_network_message_send_protocol, int, int, void*);
+	typedef void(__thiscall* observer_channel_send_message)(network_observer*, int, int, e_network_message_send_protocol, int, int, void*);
 	auto p_observer_channel_send_message = h2mod->GetAddress<observer_channel_send_message>(0x1BED40, 0x1B8C1A);
 
 	p_observer_channel_send_message(this, session_index, observer_index, send_out_of_band, type, size, data);
@@ -133,6 +133,27 @@ bool __cdecl is_network_observer_mode_managed()
 	// this is used for host migration happening on game start (that causes the short delay when the game starts in a p2p session)
 	// which is disabled in LAN mode
 	return false;
+}
+
+void network_observer::ResetNetworkPreferences()
+{
+	// clear the network bandwidth preferences so they won't cause issues
+	SecureZeroMemory(h2mod->GetAddress<void*>(0x47E9D8 + 0x1DC), 108);
+}
+
+bool __thiscall network_observer::GetNetworkMeasurements(DWORD *out_throughput, float *out_satiation, DWORD *a4)
+{
+	// tell the game we don't have any bandwidth measurements available to save
+	return false;
+}
+
+void __declspec(naked) call_GetNetworkMeasurements()
+{
+	__asm
+	{
+		// for some reason PatchCall doen't work on member function
+		jmp network_observer::GetNetworkMeasurements 
+	}
 }
 
 DWORD* dataToOverwrite1 = nullptr;
@@ -201,6 +222,8 @@ void network_observer::ApplyPatches()
 
 	// increase the network heap size
 	WriteValue<DWORD>(h2mod->GetAddress(0x1ACCC8, 0x1ACE96) + 6, NETWORK_HEAP_SIZE);
+
+	PatchCall(h2mod->GetAddress(0x1E0FEE, 0x1B5EDE), call_GetNetworkMeasurements);
 
 	if (!h2mod->Server)
 	{

@@ -306,6 +306,8 @@ struct __declspec(align(8)) network_observer
 	};
 
 	static void ApplyPatches();
+	static void ResetNetworkPreferences();
+	bool __thiscall GetNetworkMeasurements(DWORD *out_throughput, float *out_satiation, DWORD *a4);
 	int getObserverState(int observerIndex) { return observers[observerIndex].unk_state; };
 	void sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data);
 };
