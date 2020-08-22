@@ -235,12 +235,16 @@ void initLocalAppData() {
 		CreateDirectoryW(local2, NULL);
 		int fperrno1 = GetLastError();
 		if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
+#if USE_DEV_PREVIEW_CONFIG_FILE_PATHS
+			swprintf(local2, 1024, L"%ws\\AppData\\Local\\Microsoft\\Halo 2\\DevPreview\\", userprofile);
+#else
 			swprintf(local2, 1024, L"%ws\\AppData\\Local\\Microsoft\\Halo 2\\", userprofile);
+#endif
 			CreateDirectoryW(local2, NULL);
 			int fperrno1 = GetLastError();
 			if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
 				int appdatabuflen = wcslen(local2) + 1;
-				H2AppDataLocal = (wchar_t*)malloc(sizeof(wchar_t) * appdatabuflen);
+				H2AppDataLocal = (wchar_t*)calloc(1, sizeof(wchar_t) * appdatabuflen);
 				wcscpy_s(H2AppDataLocal, appdatabuflen, local2);
 			}
 		}
@@ -251,20 +255,24 @@ void initLocalAppData() {
 		CreateDirectoryW(local2, NULL);
 		int fperrno1 = GetLastError();
 		if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
+#if USE_DEV_PREVIEW_CONFIG_FILE_PATHS
+			swprintf(local2, 1024, L"%ws\\Local Settings\\Application Data\\Microsoft\\Halo 2\\DevPreview\\", userprofile);
+#else
 			swprintf(local2, 1024, L"%ws\\Local Settings\\Application Data\\Microsoft\\Halo 2\\", userprofile);
+#endif
 			CreateDirectoryW(local2, NULL);
 			int fperrno1 = GetLastError();
 			if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
 				int appdatabuflen = wcslen(local2) + 1;
-				H2AppDataLocal = (wchar_t*)malloc(sizeof(wchar_t) * appdatabuflen);
+				H2AppDataLocal = (wchar_t*)calloc(1, sizeof(wchar_t) * appdatabuflen);
 				wcscpy_s(H2AppDataLocal, appdatabuflen, local2);
 			}
 		}
 	}
 
-	if (H2AppDataLocal == 0) {
+	if (H2AppDataLocal == nullptr) {
 		int appdatabuflen = wcslen(H2ProcessFilePath) + 1;
-		H2AppDataLocal = (wchar_t*)malloc(sizeof(wchar_t) * appdatabuflen);
+		H2AppDataLocal = (wchar_t*)calloc(1, sizeof(wchar_t) * appdatabuflen);
 		swprintf(H2AppDataLocal, appdatabuflen, L"%ws", H2ProcessFilePath);
 		addDebugText("ERROR: Could not find AppData Local. Using Process File Path:");
 	}
@@ -369,7 +377,7 @@ void InitH2Startup() {
 
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
-	H2ProcessFilePath = (wchar_t*)malloc(wcslen(ArgList[0]) * sizeof(wchar_t));
+	H2ProcessFilePath = (wchar_t*)calloc(1, wcslen(ArgList[0]) * sizeof(wchar_t));
 	int rtncodepath = GetWidePathFromFullWideFilename(ArgList[0], H2ProcessFilePath);
 	if (rtncodepath == -1) {
 		swprintf(H2ProcessFilePath, 2, L"");

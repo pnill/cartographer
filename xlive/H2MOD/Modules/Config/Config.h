@@ -8,6 +8,9 @@ void DeinitH2Config();
 void SaveH2Config();
 void ReadH2Config();
 
+// added this until the code gets released
+#define USE_DEV_PREVIEW_CONFIG_FILE_PATHS 1
+
 #define DLL_VERSION_MAJOR               0
 #define DLL_VERSION_MINOR               5
 #define DLL_VERSION_REVISION            6
