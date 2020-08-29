@@ -156,15 +156,18 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 
 void CXnIp::checkForLostConnections()
 {
+	int lostConnectionsCount = 0;
 	for (int i = 0; i < GetMaxXnConnections(); i++)
 	{
 		XnIp* xnIp = &XnIPs[i];
 		if (xnIp->bValid
 			&& timeGetTime() - xnIp->lastConnectionInteractionTime >= 15 * 1000)
 		{
+			lostConnectionsCount++;
 			UnregisterXnIpIdentifier(xnIp->connectionIdentifier);
 		}
 	}
+	LOG_INFO_NETWORK("CXnIp::checkForLostConnections() - lost {} connections!", lostConnectionsCount);
 }
 
 void CXnIp::sendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, int reqType)
