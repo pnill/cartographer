@@ -726,7 +726,7 @@ bool XnIp::isValid(IN_ADDR identifier)
 	bool ret = bValid && identifier.s_addr == connectionIdentifier.s_addr;
 	if (identifier.s_addr != connectionIdentifier.s_addr)
 	{
-		LOG_CRITICAL_NETWORK("XnIp::isValid() - CRITICAL ERROR: {} != {}", identifier.s_addr, connectionIdentifier.s_addr);
+		LOG_CRITICAL_NETWORK("XnIp::isValid() - CRITICAL ERROR: {:x} != {:x}", identifier.s_addr, connectionIdentifier.s_addr);
 		return false;
 	}
 
