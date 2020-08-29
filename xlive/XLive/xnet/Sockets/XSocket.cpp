@@ -386,6 +386,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		}
 		else
 		{
+			ipManager.setTimeConnectionInteractionHappened(xnIp->connectionIdentifier);
 			updateSendToStatistics(*lpNumberOfBytesSent);
 		}
 

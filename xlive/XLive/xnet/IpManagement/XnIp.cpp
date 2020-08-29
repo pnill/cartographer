@@ -57,11 +57,11 @@ int CXnIp::getConnectionIndex(IN_ADDR connectionIdentifier)
 	return connectionIdentifier.s_addr >> 24;
 }
 
-void CXnIp::setTimeConnectionInteractionHappened(IN_ADDR ina, int time)
+void CXnIp::setTimeConnectionInteractionHappened(IN_ADDR ina)
 {
 	XnIp* xnIp = getConnection(ina);
 	if (xnIp != nullptr)
-		xnIp->lastConnectionInteractionTime = time;
+		xnIp->lastConnectionInteractionTime = timeGetTime();
 }
 
 int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount)
@@ -144,7 +144,7 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 		return SOCKET_ERROR;
 	}
 
-	setTimeConnectionInteractionHappened(ipIdentifier, timeGetTime());
+	setTimeConnectionInteractionHappened(ipIdentifier);
 	XnIp* xnIp = getConnection(ipIdentifier);
 	if (xnIp != nullptr)
 	{
@@ -161,7 +161,7 @@ void CXnIp::checkForLostConnections()
 	{
 		XnIp* xnIp = &XnIPs[i];
 		if (xnIp->bValid
-			&& timeGetTime() - xnIp->lastConnectionInteractionTime >= 15 * 1000)
+			&& timeGetTime() - xnIp->lastConnectionInteractionTime >= XnIp_ConnectionTimeOut)
 		{
 			lostConnectionsCount++;
 			UnregisterXnIpIdentifier(xnIp->connectionIdentifier);
@@ -295,7 +295,7 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectR
 			&& xnIp->xnetstatus < XNET_CONNECT_STATUS_CONNECTED)
 		{
 			sendXNetRequest(xsocket, xnIp->connectionIdentifier, XnIp_ConnectionEstablishSecure); // establish 'secure' connection on the socket
-			setTimeConnectionInteractionHappened(xnIp->connectionIdentifier, timeGetTime());
+			setTimeConnectionInteractionHappened(xnIp->connectionIdentifier);
 
 			// TODO: handle dynamically
 			if (!xsocket->sockAddrInIsNull(&xnIp->NatAddrSocket1000) 
@@ -359,7 +359,7 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 			// update with new information
 			XnIPs[i].xnaddr = *pxna;
 
-			setTimeConnectionInteractionHappened(XnIPs[i].connectionIdentifier, timeGetTime());
+			setTimeConnectionInteractionHappened(XnIPs[i].connectionIdentifier);
 
 			// if it is already in the system, return
 			return 0;
@@ -396,7 +396,7 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 			newXnIp->connectionIdentifier.s_addr = htonl(firstUnusedConnectionIndex | randIdentifier);
 			newXnIp->bValid = true;
 
-			setTimeConnectionInteractionHappened(newXnIp->connectionIdentifier, timeGetTime());
+			setTimeConnectionInteractionHappened(newXnIp->connectionIdentifier);
 
 			return 0;
 		}
@@ -689,7 +689,7 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 			Mainly for H2v because it has P2P connection even on dedicated servers, if the connect status is checked by the game, it means the connection identifier is still used
 			This prevents connection info being cleared even if no data has been received from the connection (probably the ports were not forwarded/ no data is sent at all between the peers) 
 		*/
-		ipManager.setTimeConnectionInteractionHappened(ina, timeGetTime()); 
+		ipManager.setTimeConnectionInteractionHappened(ina); 
 		return xnIp->xnetstatus;
 	}
 

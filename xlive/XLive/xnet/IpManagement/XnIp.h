@@ -13,6 +13,8 @@ const char broadcastStrHdr[MAX_HDR_STR] = "XNetReqPack";
 #define XnIp_ConnectionCloseSecure 0x4
 #define XnIp_ConnectionEstablishSecure 0x8
 
+#define XnIp_ConnectionTimeOut 15 * 1000 // msec
+
 #define IPADDR_LOOPBACK htonl(0x7F000001) // 127.0.0.1
 
 struct XnKeyPair
@@ -97,7 +99,7 @@ public:
 	XnIp* getConnection(IN_ADDR ina);
 
 	void checkForLostConnections();
-	void setTimeConnectionInteractionHappened(IN_ADDR ina, int time);
+	void setTimeConnectionInteractionHappened(IN_ADDR ina);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
 	void SetupLocalConnectionInfo(unsigned long xnaddr, const char* abEnet, const char* abOnline);
 	void sendXNetRequest(XSocket* xsocket, IN_ADDR ipIdentifier, int reqType);
