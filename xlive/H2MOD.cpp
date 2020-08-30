@@ -341,11 +341,6 @@ bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObje
 	return h2mod->GetAddress<tcreate_unit_hook>(0x1F32DB, 0x1DE374)(pCreationData, a2, a3, pObject);
 }
 
-wchar_t* H2MOD::get_session_game_variant_name()
-{
-	return h2mod->GetAddress<wchar_t*>(0x97777C, 0x534A18);
-}
-
 void H2MOD::leave_session()
 {
 	if (h2mod->Server)
@@ -820,6 +815,8 @@ map_cache_load p_map_cache_load;
 
 bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 {
+	static bool resetAfterMatch = false;
+
 	bool result = p_map_cache_load(engine_settings);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
@@ -834,14 +831,15 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 
 	get_object_table_memory();
 
+	H2Tweaks::setHz();
 	H2Tweaks::setFOV(H2Config_field_of_view);
 	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
 
-	if (h2mod->GetMapType() == scnr_type::MainMenu)
+	// when the game is minimized, the game might skip loading Main menu
+	// this is where resetAfterMatch var comes in for help
+	if (resetAfterMatch)
 	{
-		addDebugText("Map Type: Main-Menu");
-
 		//TODO: issue #232
 		/*if (!NetworkSession::localPeerIsSessionHost()) {
 			advLobbySettings->resetLobbySettings();
@@ -862,23 +860,28 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 			b_XboxTick = false;
 		}
 
+		resetAfterMatch = false;
+	}
+
+	if (h2mod->GetMapType() == scnr_type::MainMenu)
+	{
+		addDebugText("Map Type: Main-Menu");
 		UIRankPatch();
-		H2Tweaks::setHz();
+
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
 
 		return result;
 	}		
 
-	wchar_t* variant_name = h2mod->get_session_game_variant_name();
-	LOG_INFO_GAME(L"[h2mod] OnMapLoad map type {0}, variant name {1}", h2mod->GetMapType(), variant_name);
+	wchar_t* variant_name = NetworkSession::getGameVariantName();
+	LOG_INFO_GAME(L"[h2mod] OnMapLoad map type {}, variant name {}", (int)h2mod->GetMapType(), variant_name);
 	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
 
 	for (auto gametype_it : GametypesMap)
 		gametype_it.second = false; // reset custom gametypes state
 
 	H2Tweaks::setSavedSens();
-
 	if (h2mod->GetMapType() == scnr_type::Multiplayer)
 	{
 		addDebugText("Map type: Multiplayer");
@@ -886,7 +889,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		for (auto gametype_it : GametypesMap)
 		{
 			if (StrStrIW(variant_name, gametype_it.first)) {
-				LOG_INFO_GAME(L"[h2mod] {1} custom gametype turned on!", gametype_it.first);
+				LOG_INFO_GAME(L"[h2mod] {} custom gametype turned on!", gametype_it.first);
 				gametype_it.second = true; // enable a gametype if substring is found
 			}
 		}
@@ -938,6 +941,9 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		H2Tweaks::applyMeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
 	}
+
+	// if we got this far, it means map is MP or SP, and if map load is called again, it should reset/deinitialize any custom gametypes
+	resetAfterMatch = true;
 
 	return result;
 }
@@ -1019,7 +1025,7 @@ void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 {
 	network_session* session = NetworkSession::getCurrentNetworkSession();
 	if ((session->parameters.field_8 == 4 && get_game_life_cycle() == life_cycle_pre_game)
-		|| (StrStrIW(h2mod->get_session_game_variant_name(), L"rvb") != NULL && teamIndex > 1)) {
+		|| (StrStrIW(NetworkSession::getGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
 		//rvb mode enabled, don't change teams
 		return;
 	}

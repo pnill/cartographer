@@ -405,27 +405,26 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 	free(escaped_user_identifier);
 	free(escaped_user_password);
 
-	int master_login_interpret_result = -1;
-	int master_http_response_result = MasterHttpResponse(std::string(cartographerURL + "/login2"), http_request_body_build, rtn_result);
+	int error_code = MasterHttpResponse(std::string(cartographerURL + "/login2"), http_request_body_build, rtn_result);
 
 	for (int i = strlen(http_request_body_build) - 1; i >= 0; i--) {
 		http_request_body_build[i] = 0;
 	}
 	free(http_request_body_build);
 
-	if (master_http_response_result == 0) {
-		master_login_interpret_result = InterpretMasterLogin(rtn_result, ltoken);
-		if (master_login_interpret_result > 0) {
+	if (error_code == 0) {
+		error_code = InterpretMasterLogin(rtn_result, ltoken);
+		if (error_code > 0) {
 			result = true;
 		}
 		free(rtn_result);
 	}
-	if (master_login_interpret_result < 0) {
+	if (error_code < 0) {
 		char NotificationPlayerText[40];
-		sprintf(NotificationPlayerText, "ERROR Account Login: %d", master_login_interpret_result);
+		sprintf(NotificationPlayerText, "ERROR Account Login: %d", error_code);
 		addDebugText(NotificationPlayerText);
 
-		if (master_login_interpret_result == ERROR_CODE_INVALID_LOGIN_TOKEN) {
+		if (error_code == ERROR_CODE_INVALID_LOGIN_TOKEN) {
 			char* username = 0;
 			for (int i = 0; i < H2AccountCount; i++) {
 				if (H2AccountArrayLoginToken[i] && strcmp(H2AccountArrayLoginToken[i], ltoken) == 0) {
@@ -445,13 +444,13 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 			char* login_identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
 			SecureZeroMemory(login_identifier, strlen(login_identifier));
 		}
-		if (master_login_interpret_result == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) {
+		if (error_code == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) {
 			result = false;
 		}
 	}
 
 	if (out_master_login_interpret_result)
-		*out_master_login_interpret_result = master_login_interpret_result;
+		*out_master_login_interpret_result = error_code;
 
 	return result;
 }

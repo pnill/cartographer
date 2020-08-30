@@ -135,6 +135,11 @@ peer_observer_channel* NetworkSession::getPeerObserverChannel(int peerIndex)
 	return &getCurrentNetworkSession()->peer_observer_channels[peerIndex];
 }
 
+wchar_t* NetworkSession::getGameVariantName()
+{
+	return getCurrentNetworkSession()->parameters.game_variant_name;
+}
+
 void NetworkSession::logPlayersToConsole() {
 	int playerIndex = 0;
 	do 

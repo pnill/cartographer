@@ -57,7 +57,6 @@ public:
 		wchar_t* get_local_player_name(int local_player_index);
 		real_point3d* get_player_unit_coords(int player_index);
 		float get_distance(int, int);
-		wchar_t* get_session_game_variant_name();
 		wchar_t* get_player_name_from_player_index(int playerIndex);
 		int get_player_index_from_name(wchar_t* playername);
 		int get_player_index_from_unit_datum(datum unit_datum_index);

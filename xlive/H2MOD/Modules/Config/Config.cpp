@@ -420,7 +420,7 @@ void SaveH2Config() {
 
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "mouse_sens", H2Config_mouse_sens);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "hiresfix", H2Config_hiresfix);
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "hires_fix", H2Config_hiresfix);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3dex);
 
@@ -770,7 +770,7 @@ void ReadH2Config() {
 
 #pragma region Config Init/Deinit
 void InitH2Config() {
-	H2Config_disable_ingame_keyboard = (bool)(H2GetInstanceId() - 1);
+	H2Config_disable_ingame_keyboard = H2GetInstanceId() > 1 ? true : false;
 	ReadH2Config();
 }
 void DeinitH2Config() {

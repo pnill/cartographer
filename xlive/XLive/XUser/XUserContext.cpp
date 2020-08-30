@@ -78,7 +78,7 @@ std::string getEnglishMapName()
 
 std::string getVariantName()
 {
-	std::wstring variant = h2mod->get_session_game_variant_name();
+	std::wstring variant = NetworkSession::getGameVariantName();
 	variant = variant.substr(0, variant.find_last_not_of(L"\xE008\t\n ") + 1);
 	return wstring_to_string.to_bytes(variant);
 }
