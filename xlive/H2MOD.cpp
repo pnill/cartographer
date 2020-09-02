@@ -16,6 +16,8 @@
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
+#include "H2MOD/Modules/Stats/StatsHandler.h"
+
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -25,7 +27,7 @@ Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
 HeadHunter* headHunterHandler = new HeadHunter();
 VariantPlayer* variant_player = new VariantPlayer();
-
+StatsHandler* stats_handler = new StatsHandler();
 extern int H2GetInstanceId();
 std::unordered_map<int, int> object_to_variant;
 
@@ -803,6 +805,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	H2Tweaks::setFOV(H2Config_field_of_view);
 	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
+	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
 
 	if (h2mod->GetMapType() == scnr_type::MainMenu)
 	{
@@ -837,13 +840,12 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		H2Tweaks::setHz();
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
-
 		return result;
 	}		
 
 	wchar_t* variant_name = h2mod->get_session_game_variant_name();
 	LOG_INFO_GAME(L"[h2mod] OnMapLoad map type {0}, variant name {1}", h2mod->GetMapType(), variant_name);
-	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
+	
 
 	for (auto gametype_it : GametypesMap)
 		gametype_it.second = false; // reset custom gametypes state
@@ -1015,6 +1017,7 @@ void __cdecl print_to_console(char *output)
 	const static std::string prefix = "[HSC Print] ";
 	commands->display(prefix + output);
 }
+
 
 void DuplicateDataBlob(DATA_BLOB  *pDataIn, DATA_BLOB  *pDataOut)
 {
@@ -1271,6 +1274,61 @@ void H2MOD::ApplyUnitHooks()
 	PatchCall(h2mod->GetAddress(0x1F9E34, 0x1E3B9C), set_unit_color_data_hook);
 	pset_unit_color_data = h2mod->GetAddress<tset_unit_color_data>(0x6E5C3, 0x6D1BF);
 }
+static BYTE previousGamestate = 0;
+typedef int(__thiscall* ChangeGameState)(BYTE* this_);
+ChangeGameState p_ChangeGameState;
+typedef std::function<void()> GameState_Callback;
+std::map<std::string, std::vector<GameState_Callback> > gamestateCallbacks;
+void registerGamestateCallback(const GameState_Callback &cb, std::string GameState)
+{
+	// add callback to end of callback list
+	gamestateCallbacks[GameState].push_back(cb);
+}
+void EvaluateGameState()
+{
+	p_ChangeGameState(h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC));
+	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
+	if (previousGamestate != GameState) {
+		switch (GameState)
+		{
+			case 1: //Lobby
+				for (const auto &cb : gamestateCallbacks["Lobby"])
+				{
+					cb();
+				}
+				break;
+			case 2: //Starting/Loading
+				for (const auto &cb : gamestateCallbacks["Starting"])
+				{
+					cb();
+				}
+				break;
+			case 3: //In game
+				for (const auto &cb : gamestateCallbacks["InGame"])
+				{
+					cb();
+				}
+				break;
+			case 4: //Post Game
+				for (const auto &cb : gamestateCallbacks["PostGame"])
+				{
+					cb();
+				}
+				break;
+			case 5: //Match Making
+				for (const auto &cb : gamestateCallbacks["MatchMaking"])
+				{
+					cb();
+				}
+				break;
+			default:
+				break;
+		}
+		previousGamestate = GameState;
+	}
+}
+
+
 
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
@@ -1280,6 +1338,12 @@ void H2MOD::ApplyHooks() {
 
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(h2mod->GetAddress(0x58789, 0x60C81), OnAutoPickUpHandler);
+
+	//Hook to do stuff after Game State Change
+	p_ChangeGameState = h2mod->GetAddress<ChangeGameState>(0x1d7738, 0x1BCDA8);
+	PatchCall(h2mod->GetAddress(0x1AD84D, 0x1A67CA), EvaluateGameState);
+	//std::bind(&Client::func, &c, std::placeholders::_1)
+	registerGamestateCallback(&stats_handler->Test, "PostGame");
 
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
@@ -1365,6 +1429,7 @@ void H2MOD::ApplyHooks() {
 	else {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
+
 		ServerConsole::ApplyHooks();
 	}
 }

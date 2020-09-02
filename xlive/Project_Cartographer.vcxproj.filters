@@ -546,6 +546,9 @@
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.cpp">
       <Filter>Source Files\H2MOD\Modules\MainLoopPatches\UncappedFPS</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Stats\StatsHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">
@@ -1228,6 +1231,9 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h">
       <Filter>Source Files\H2MOD\Modules\MainLoopPatches\UncappedFPS</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Stats\StatsHandler.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
