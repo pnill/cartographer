@@ -82,7 +82,7 @@ void initInstanceNumber() {
 	do {
 		instanceNumber++;
 		wchar_t mutexName[32];
-		swprintf(mutexName, sizeof(mutexName), (H2IsDediServer ? L"Halo2Server%d" : L"Halo2Player%d"), instanceNumber);
+		swprintf(mutexName, ARRAYSIZE(mutexName), (H2IsDediServer ? L"Halo2Server%d" : L"Halo2Player%d"), instanceNumber);
 		mutex = CreateMutexW(0, TRUE, mutexName);
 		lastErr = GetLastError();
 		if (lastErr == ERROR_ALREADY_EXISTS) {
@@ -107,7 +107,7 @@ bool configureXinput() {
 			swprintf(xinput_path, ARRAYSIZE(xinput_path), L"xinput/p%02d/xinput9_1_0.dll", H2GetInstanceId());
 			LOG_TRACE_FUNCW(L"Changing xinput path to '{0}' : '{1}'", xinput_path, xinput_path);
 
-			WriteValue(H2BaseAddr + 0x8AD28, xinput_path);
+			WritePointer(H2BaseAddr + 0x8AD28, xinput_path);
 
 			char xinputName[_MAX_PATH];
 			char xinputdir[_MAX_PATH];
@@ -228,17 +228,17 @@ void initLocalAppData() {
 
 	wchar_t local2[1024];
 
-	swprintf(local2, 1024, L"%ws\\AppData\\Local\\", userprofile);
+	swprintf(local2, ARRAYSIZE(local2), L"%ws\\AppData\\Local\\", userprofile);
 	struct _stat64i32 sb;
 	if (_wstat(local2, &sb) == 0 && sb.st_mode & S_IFDIR) {
-		swprintf(local2, 1024, L"%ws\\AppData\\Local\\Microsoft\\", userprofile);
+		swprintf(local2, ARRAYSIZE(local2), L"%ws\\AppData\\Local\\Microsoft\\", userprofile);
 		CreateDirectoryW(local2, NULL);
 		int fperrno1 = GetLastError();
 		if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
 #if USE_DEV_PREVIEW_CONFIG_FILE_PATHS
-			swprintf(local2, 1024, L"%ws\\AppData\\Local\\Microsoft\\Halo 2\\DevPreview\\", userprofile);
+			swprintf(local2, ARRAYSIZE(local2), L"%ws\\AppData\\Local\\Microsoft\\Halo 2\\DevPreview\\", userprofile);
 #else
-			swprintf(local2, 1024, L"%ws\\AppData\\Local\\Microsoft\\Halo 2\\", userprofile);
+			swprintf(local2, ARRAYSIZE(local2), L"%ws\\AppData\\Local\\Microsoft\\Halo 2\\", userprofile);
 #endif
 			CreateDirectoryW(local2, NULL);
 			int fperrno1 = GetLastError();
@@ -249,14 +249,14 @@ void initLocalAppData() {
 			}
 		}
 	}
-	else if (swprintf(local2, 1024, L"%ws\\Local Settings\\Application Data\\", userprofile), _wstat(local2, &sb) == 0 && sb.st_mode & S_IFDIR)
+	else if (swprintf(local2, ARRAYSIZE(local2), L"%ws\\Local Settings\\Application Data\\", userprofile), _wstat(local2, &sb) == 0 && sb.st_mode & S_IFDIR)
 	{
-		swprintf(local2, 1024, L"%ws\\Local Settings\\Application Data\\Microsoft\\", userprofile);
+		swprintf(local2, ARRAYSIZE(local2), L"%ws\\Local Settings\\Application Data\\Microsoft\\", userprofile);
 		CreateDirectoryW(local2, NULL);
 		int fperrno1 = GetLastError();
 		if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
 #if USE_DEV_PREVIEW_CONFIG_FILE_PATHS
-			swprintf(local2, 1024, L"%ws\\Local Settings\\Application Data\\Microsoft\\Halo 2\\DevPreview\\", userprofile);
+			swprintf(local2, ARRAYSIZE(local2), L"%ws\\Local Settings\\Application Data\\Microsoft\\Halo 2\\DevPreview\\", userprofile);
 #else
 			swprintf(local2, 1024, L"%ws\\Local Settings\\Application Data\\Microsoft\\Halo 2\\", userprofile);
 #endif

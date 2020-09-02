@@ -171,6 +171,7 @@ __declspec (naked) void overwrite1()
 void network_observer::ApplyPatches()
 {
 #if USE_LIVE_NETCODE
+#if INCREASE_NETWORK_TICKRATE
 	// increase the network tickrate of hosts to 60
 	static float netcode_tickrate = 60.0f;
 
@@ -212,6 +213,7 @@ void network_observer::ApplyPatches()
 	NopFill(h2mod->GetAddress(0x1BFBE7, 0x1B9AC7), 19);
 	NopFill(h2mod->GetAddress(0x1BE33A, 0x1B8214), 15);
 	NopFill(h2mod->GetAddress(0x1BDF1D, 0x1B7DF7), 18);
+#endif
 #else
 	// disables LIVE netcode
 	WriteValue<BYTE>(h2mod->GetAddress(0x1B555B, 0x1A92B9) + 1, 0);

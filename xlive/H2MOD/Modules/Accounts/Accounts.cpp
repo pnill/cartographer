@@ -83,7 +83,7 @@ bool TestGetAccountConfigLock(wchar_t* mutexName) {
 
 	DWORD crc32num = crc32buf((char*)mutexName, wcslen(mutexName) * 2);
 	wchar_t crc32mutexName[40] = { L"" };
-	swprintf(crc32mutexName, 40, L"Halo2AccountsFile-%x", crc32num);
+	swprintf(crc32mutexName, ARRAYSIZE(crc32mutexName), L"Halo2AccountsFile-%x", crc32num);
 
 	HANDLE mutex = CreateMutexW(0, true, crc32mutexName);
 	DWORD lastErr = GetLastError();
@@ -106,10 +106,10 @@ void SaveH2Accounts() {
 
 		wchar_t fileConfigPath[1024];
 		if (H2Portable) {
-			swprintf(fileConfigPath, 1024, H2AccountsFilename, H2ProcessFilePath);
+			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2ProcessFilePath);
 		}
 		else {
-			swprintf(fileConfigPath, 1024, H2AccountsFilename, H2AppDataLocal);
+			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2AppDataLocal);
 		}
 
 		wchar_t fileConfigPathLog[1124];
@@ -266,10 +266,10 @@ bool ReadH2Accounts() {
 	wchar_t fileConfigPath[1024];
 
 	if (H2Portable) {
-		swprintf(fileConfigPath, 1024, H2AccountsFilename, H2ProcessFilePath);
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2ProcessFilePath);
 	}
 	else {
-		swprintf(fileConfigPath, 1024, H2AccountsFilename, H2AppDataLocal);
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2AppDataLocal);
 	}
 
 	wchar_t fileConfigPathLog[1124];

@@ -182,7 +182,7 @@ bool read_custom_labels() {
 	H2Config_custom_labels_capture_missing = false;
 
 	wchar_t labels_file_path[1024];
-	swprintf(labels_file_path, 1024, L"%wsh2customlanguage.ini", H2ProcessFilePath);
+	swprintf(labels_file_path, ARRAYSIZE(labels_file_path), L"%wsh2customlanguage.ini", H2ProcessFilePath);
 	FILE* labelsFile = _wfopen(labels_file_path, L"rb");
 	addDebugText(labels_file_path);
 
@@ -379,7 +379,7 @@ void write_custom_labels() {
 		H2Config_custom_labels_capture_missing = false;
 
 		wchar_t labels_file_path[1024];
-		swprintf(labels_file_path, 1024, L"%wsh2customlanguage.ini", H2ProcessFilePath);
+		swprintf(labels_file_path, ARRAYSIZE(labels_file_path), L"%wsh2customlanguage.ini", H2ProcessFilePath);
 		FILE* labelsFile = _wfopen(labels_file_path, L"wb");
 		addDebugText(labels_file_path);
 

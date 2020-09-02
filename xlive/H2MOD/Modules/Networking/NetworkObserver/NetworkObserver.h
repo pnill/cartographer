@@ -1,7 +1,11 @@
 #pragma once
 
 // enables/disables LIVE netcode, so we can use the LIVE serverlist
-#define USE_LIVE_NETCODE 1
+#define USE_LIVE_NETCODE 0
+
+#if USE_LIVE_NETCODE == 1
+#define INCREASE_NETWORK_TICKRATE 0
+#endif
 
 // network heap size
 #define NETWORK_HEAP_SIZE 10485760 // default: 1048576

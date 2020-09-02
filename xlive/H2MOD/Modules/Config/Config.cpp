@@ -114,13 +114,13 @@ void SaveH2Config() {
 
 	wchar_t fileConfigPath[1024];
 	if (FlagFilePathConfig) {
-		swprintf(fileConfigPath, 1024, FlagFilePathConfig);
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
 	}
 	else if (H2Portable || !H2Config_isConfigFileAppDataLocal) {
-		swprintf(fileConfigPath, 1024, H2ConfigFilenames[H2IsDediServer], H2ProcessFilePath, H2GetInstanceId());
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], H2ProcessFilePath, H2GetInstanceId());
 	}
 	else {
-		swprintf(fileConfigPath, 1024, H2ConfigFilenames[H2IsDediServer], H2AppDataLocal, H2GetInstanceId());
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], H2AppDataLocal, H2GetInstanceId());
 	}
 
 	wchar_t fileConfigPathLog[1124];
@@ -543,7 +543,7 @@ void ReadH2Config() {
 
 	int readInstanceIdFile = H2GetInstanceId();
 	wchar_t local[1024];
-	swprintf(local, 1024, L"%ws", H2AppDataLocal);
+	swprintf(local, ARRAYSIZE(local), L"%ws", H2AppDataLocal);
 	H2Config_isConfigFileAppDataLocal = false;
 
 	errno_t err = 0;
@@ -552,7 +552,7 @@ void ReadH2Config() {
 	wchar_t fileConfigPathLog[1124];
 
 	if (FlagFilePathConfig) {
-		swprintf(fileConfigPath, 1024, FlagFilePathConfig);
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
 		swprintf(fileConfigPathLog, 1124, L"Reading Flag Config: \"%ws\"", fileConfigPath);
 		addDebugText(fileConfigPathLog);
 		err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
@@ -563,7 +563,7 @@ void ReadH2Config() {
 			if (H2Config_isConfigFileAppDataLocal) {
 				checkFilePath = local;
 			}
-			swprintf(fileConfigPath, 1024, H2ConfigFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
+			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
 			swprintf(fileConfigPathLog, 1124, L"Reading Config: \"%ws\"", fileConfigPath);
 			addDebugText(fileConfigPathLog);
 			err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
