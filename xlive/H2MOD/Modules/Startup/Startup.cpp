@@ -258,7 +258,7 @@ void initLocalAppData() {
 #if USE_DEV_PREVIEW_CONFIG_FILE_PATHS
 			swprintf(local2, ARRAYSIZE(local2), L"%ws\\Local Settings\\Application Data\\Microsoft\\Halo 2\\DevPreview\\", userprofile);
 #else
-			swprintf(local2, 1024, L"%ws\\Local Settings\\Application Data\\Microsoft\\Halo 2\\", userprofile);
+			swprintf(local2, ARRAYSIZE(local2), L"%ws\\Local Settings\\Application Data\\Microsoft\\Halo 2\\", userprofile);
 #endif
 			CreateDirectoryW(local2, NULL);
 			int fperrno1 = GetLastError();

@@ -145,28 +145,6 @@ void SaveH2Accounts() {
 
 			ini.SaveFile(fileConfig);
 
-			/*if (badConfigBuffer && badConfigBufferI > 0) {
-				for (int i = 0; i < badConfigBufferI; i++) {
-					fputs("\n", fileConfig);
-					if (badConfigBuffer[i][0] != '#' && badConfigBuffer[i][0] != ';')
-						fputs("#", fileConfig);
-					fputs(badConfigBuffer[i], fileConfig);
-				}
-			}
-			badConfigBufferFree();
-
-			fputs("\n\n", fileConfig);
-
-			if (oldConfigBuffer && oldConfigBufferI > 0) {
-				for (int i = 0; i < oldConfigBufferI; i++) {
-					fputs("\n", fileConfig);
-					fputs(oldConfigBuffer[i], fileConfig);
-				}
-			}
-			oldConfigBufferFree();
-
-			fputs("\n", fileConfig);*/
-
 #pragma endregion
 			fclose(fileConfig);
 		}
