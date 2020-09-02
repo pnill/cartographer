@@ -11,5 +11,9 @@ public:
 	static void Test()
 	{
 		sendStats();
-	};
+	}
+	static void Test2(std::string message)
+	{
+		commands->display(message);
+	}
 };

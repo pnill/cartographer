@@ -1342,7 +1342,8 @@ void H2MOD::ApplyHooks() {
 	//Hook to do stuff after Game State Change
 	p_ChangeGameState = h2mod->GetAddress<ChangeGameState>(0x1d7738, 0x1BCDA8);
 	PatchCall(h2mod->GetAddress(0x1AD84D, 0x1A67CA), EvaluateGameState);
-	//std::bind(&Client::func, &c, std::placeholders::_1)
+	
+	registerGamestateCallback([]() { stats_handler->Test2("Banana"); }, "Lobby");
 	registerGamestateCallback(&stats_handler->Test, "PostGame");
 
 	// hook to initialize stuff before game start
