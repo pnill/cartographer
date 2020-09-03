@@ -1278,10 +1278,17 @@ static BYTE previousGamestate = 0;
 typedef int(__thiscall* ChangeGameState)(BYTE* this_);
 ChangeGameState p_ChangeGameState;
 typedef std::function<void()> GameState_Callback;
+
+
 std::map<std::string, std::vector<GameState_Callback> > gamestateCallbacks;
 void registerGamestateCallback(const GameState_Callback &cb, std::string GameState)
 {
-	// add callback to end of callback list
+	//For functions that require no paramters
+	//registerGamestateCallback(&Class->function, "Lobby");
+
+	//For functions that require parameters create a lambda container
+	//registerGamestateCallback([]() { commands->display("Apple Jacks"); }, "Lobby");
+	
 	gamestateCallbacks[GameState].push_back(cb);
 }
 void EvaluateGameState()
@@ -1343,8 +1350,9 @@ void H2MOD::ApplyHooks() {
 	p_ChangeGameState = h2mod->GetAddress<ChangeGameState>(0x1d7738, 0x1BCDA8);
 	PatchCall(h2mod->GetAddress(0x1AD84D, 0x1A67CA), EvaluateGameState);
 	
-	registerGamestateCallback([]() { stats_handler->Test2("Banana"); }, "Lobby");
-	registerGamestateCallback(&stats_handler->Test, "PostGame");
+	
+	//Register callback on Post Game to upload the stats to the server
+	registerGamestateCallback(&stats_handler->sendStats, "PostGame");
 
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);

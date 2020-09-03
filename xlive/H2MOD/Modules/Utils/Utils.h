@@ -74,7 +74,8 @@ bool ComputeFileCrc32Hash(wchar_t* filepath, DWORD &rtncrc32);
 
 char* encode_rfc3986(char* label_literal, int label_literal_length = -1);
 void wcstombs2(char* buffer, wchar_t* text, int buf_len);
-
+char* wcstombs2r(wchar_t* text);
+std::string ToNarrow(const wchar_t *s, char dfault = '?', const std::locale& loc = std::locale());
 extern const int ERROR_CODE_CURL_SOCKET_FAILED;
 extern const int ERROR_CODE_CURL_HANDLE;
 extern const int ERROR_CODE_CURL_EASY_PERF;

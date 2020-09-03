@@ -458,6 +458,22 @@ void wcstombs2(char* buffer, wchar_t* text, int buf_len) {
 	buffer[buffer_i] = 0;
 }
 
+std::string ToNarrow(const wchar_t *s, char dfault,	const std::locale& loc)
+{
+	std::ostringstream stm;
+
+	while (*s != L'\0') {
+		stm << std::use_facet< std::ctype<wchar_t> >(loc).narrow(*s++, dfault);
+	}
+	return stm.str();
+}
+
+char* wcstombs2r(wchar_t* text)
+{
+	char* output = (char*)malloc(sizeof(char) * wcslen(text) + 1);
+	wcstombs2(output, text, wcslen(text) + 1);
+	return output;
+}
 
 struct stringMe {
 	char *ptr;
