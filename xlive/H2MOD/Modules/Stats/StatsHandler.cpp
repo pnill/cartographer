@@ -379,8 +379,27 @@ char* StatsHandler::buildJSON()
 		value.SetInt(TerrLost);
 		Player.AddMember(L"TerrLost", value, allocator);
 		
-		
-		
+		WValue Medals(rapidjson::kArrayType);
+		for(auto j = 0; j < 24; j++)
+		{
+			value.SetInt(*h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x4A + (j * 2)));
+			Medals.PushBack(value, allocator);
+		}
+		Player.AddMember(L"MedalData", Medals, allocator);
+
+		WValue Weapons(rapidjson::kArrayType);
+		for(auto j = 0; j < 36; j++)
+		{
+			WValue Weapon(rapidjson::kArrayType);
+			for(auto k = 0; k < 6; k++)
+			{
+				value.SetInt(*h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0xDE + (j * 0x10) + (k * 2)));
+				Weapon.PushBack(value, allocator);
+			}
+			Weapons.PushBack(Weapon, allocator);
+		}
+		Player.AddMember(L"WeaponData", Weapons, allocator);
+
 		Players.PushBack(Player, allocator);
 	}
 	document.AddMember(L"Players", Players, allocator);
