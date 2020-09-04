@@ -69,7 +69,7 @@ public:
 		void custom_sound_play(const wchar_t* soundName, int delay);
 		void disable_weapon_pickup(bool b_Enable);
 		void leave_session();
-
+		void set_local_rank(BYTE rank);
 		scnr_type GetMapType() { return mapType; }
 		void SetMapType(scnr_type value) { mapType = value; }
 

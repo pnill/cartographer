@@ -11,12 +11,14 @@
 #include <iostream>
 #include "XLive/XNet/upnp.h"
 #include "H2MOD/Modules/Startup/Startup.h"
+#include "XLive/xbox/xbox.h"
 #ifdef _DEBUG
 #pragma comment(lib, "libcurl_a_debug.lib")
 #else
 #pragma comment(lib, "libcurl_a.lib")
 #endif
 
+static const bool verbose = true;
 StatsHandler::StatsHandler()
 = default;
 /*
@@ -38,21 +40,22 @@ std::string StatsHandler::getChecksum()
 }
 int StatsHandler::uploadPlaylist()
 {
+	if (verbose)
+		LOG_INFO_GAME("Uploading Playlist");
 	wchar_t* playlist_file = getPlaylistFile();
 	char* pFile = (char*)malloc(sizeof(char) * wcslen(playlist_file) + 1);
 	wcstombs2(pFile, playlist_file, wcslen(playlist_file) + 1);
-#if !_DEBUG
-	LOG_INFO_GAME(pFile);
-#endif
+	if(verbose)
+		LOG_INFO_GAME(pFile);
 	std::string checksum = getChecksum();
 	if (checksum == "")
 	{
 		LOG_ERROR_GAME(L"[H2MOD] playlistVerified failed to Hash Playlist file");
 		return -1;
 	}
-#if !_DEBUG
-	LOG_INFO_GAME(checksum);
-#endif		
+	if (verbose)
+		LOG_INFO_GAME(checksum);
+
 
 	CURL *curl;
 	CURLcode result;
@@ -92,9 +95,8 @@ int StatsHandler::uploadPlaylist()
 	{
 		int response_code;
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-#if !_DEBUG
-		LOG_INFO_GAME(std::to_string(response_code));
-#endif
+		if (verbose)
+			LOG_INFO_GAME(std::to_string(response_code));
 		return response_code;
 	}
 	return -1;
@@ -104,11 +106,13 @@ int StatsHandler::uploadPlaylist()
 
 int StatsHandler::verifyPlaylist()
 {
+	if (verbose)
+		LOG_INFO_GAME(L"Verifying Playlist..");
 	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=PlaylistCheck&Playlist_Checksum=";
 	wchar_t* playlist_file = getPlaylistFile();
-#if _DEBUG
-	LOG_INFO_GAME(L"[H2MOD] playlistVerified loaded playlist is {0}", playlist_file);
-#endif
+	if (verbose)
+		LOG_INFO_GAME(L"[H2MOD] playlistVerified loaded playlist is {0}", playlist_file);
+
 	std::string checksum = getChecksum();
 	if (checksum == "")
 	{
@@ -117,13 +121,11 @@ int StatsHandler::verifyPlaylist()
 	}
 	else
 	{
-#if _DEBUG
-		LOG_INFO_GAME(checksum);
-#endif		
+		if (verbose)
+			LOG_INFO_GAME(checksum);	
 		http_request_body.append(checksum);
-#if _DEBUG
-		LOG_INFO_GAME(http_request_body);
-#endif
+		if (verbose)
+			LOG_INFO_GAME(http_request_body);
 		char* Response;
 		CURL *curl;
 		CURLcode curlResult;
@@ -150,9 +152,8 @@ int StatsHandler::verifyPlaylist()
 			{
 				int response_code;
 				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-#if _DEBUG
-				LOG_INFO_GAME(std::to_string(response_code));
-#endif
+				if (verbose)
+					LOG_INFO_GAME(std::to_string(response_code));
 				return response_code;
 			}
 			curl_easy_cleanup(curl);
@@ -160,6 +161,51 @@ int StatsHandler::verifyPlaylist()
 	}
 	return -1;
 }
+
+
+int StatsHandler::uploadStats(char* filepath)
+{
+	CURL *curl;
+	CURLcode result;
+	curl_mime *form = NULL;
+	curl_mimepart *field = NULL;
+	struct curl_slist *headerlist = NULL;
+	static const char buf[] = "Expect:";
+	curl_global_init(CURL_GLOBAL_ALL);
+	curl = curl_easy_init();
+	if (!curl)
+	{
+		LOG_ERROR_GAME(L"[H2MOD] uploadStats failed to init curl");
+		return -1;
+	}
+	form = curl_mime_init(curl);
+	field = curl_mime_addpart(form);
+	curl_mime_name(field, "file");
+	curl_mime_filedata(field, filepath);
+	field = curl_mime_addpart(form);
+	curl_mime_name(field, "Type");
+	curl_mime_data(field, "GameStats", CURL_ZERO_TERMINATED);
+	headerlist = curl_slist_append(headerlist, buf);
+
+	curl_easy_setopt(curl, CURLOPT_URL, "https://www.halo2pc.com/test-pages/CartoStat/API/post.php");
+	curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
+	result = curl_easy_perform(curl);
+	if (result != CURLE_OK)
+	{
+		LOG_ERROR_GAME(L"[H2MOD]::uploadStats failed to execute curl");
+		//LOG_ERROR_GAME(curl_easy_strerror(result));
+		return -1;
+	}
+	else
+	{
+		int response_code;
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+		LOG_INFO_GAME(std::to_string(response_code));
+		return response_code;
+	}
+	return -1;
+}
+
 
 //Really should make structs for these but I don't want to take the time to learn how.
 static const int baseOffset  = 0x4dc722;
@@ -205,8 +251,9 @@ char* StatsHandler::buildJSON()
 	
 	//Build the Server Object
 	WValue Server(rapidjson::kObjectType);
-	unsigned long ServerXUID = *h2mod->GetAddress<unsigned long*>(0, 0x52FC50);
-	value.SetString(std::to_wstring(ServerXUID).c_str(), allocator);
+	auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
+	auto sXUID = IntToWString<::XUID>(ServerXUID, std::dec).c_str();
+	value.SetString(sXUID, allocator);
 	Server.AddMember(L"XUID", value, allocator);
 	//h2mod->get_local_player_name(0)
 	auto ServerName = h2mod->GetAddress<wchar_t*>(0, 0x52FC88);
@@ -220,14 +267,24 @@ char* StatsHandler::buildJSON()
 	for(auto i = 0; i < 16; i++)
 	{
 		int calcBaseOffset  = baseOffset + (i * 0x94);
+		auto XUID = *h2mod->GetAddress<::XUID*>(0, calcBaseOffset);
+		if (XUID == 0) //Skip if it doesnt exists
+			continue;
+
+
 		int calcRTPCROffset = rtPCROffset + (i * 0x36A);
 		int calcPCROffset = 0;
 		int EndgameIndex = 0;
 		WValue Player(rapidjson::kObjectType);
+		
+		
 		auto Gamertag = h2mod->GetAddress<wchar_t*>(0, calcBaseOffset + 0xA);
 		for(auto j = 0; j < 16; j++)
 		{
 			auto tGamertag = h2mod->GetAddress<wchar_t*>(0, PCROffset + (i * 0x110));
+			//I dont know why but I couldn't get any other method of comparing to work,
+			//Someone else can fix it because I know this probably is a terrible way
+			//To compare the wchar_t*.
 			if(std::wstring(Gamertag) == std::wstring(tGamertag))
 			{
 				calcPCROffset = PCROffset + (i * 0x110);
@@ -235,9 +292,7 @@ char* StatsHandler::buildJSON()
 				break;
 			}
 		}
-		auto XUID = *h2mod->GetAddress<unsigned long*>(0, calcBaseOffset);
-		if (XUID == 0) //Skip if it doesnt exists
-			continue;
+		
 		playerCount++;
 		auto PrimaryColor = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4A);
 		auto SecondaryColor = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4B);
@@ -292,7 +347,7 @@ char* StatsHandler::buildJSON()
 
 		value.SetInt(EndgameIndex);
 		Player.AddMember(L"EndGameIndex", value, allocator);
-		value.SetString(std::to_wstring(XUID).c_str(), allocator);
+		value.SetString(IntToWString<::XUID>(XUID, std::dec).c_str(), allocator);
 		Player.AddMember(L"XUID", value, allocator);
 		value.SetString(Gamertag, allocator);
 		Player.AddMember(L"Gamertag", value, allocator);
@@ -405,30 +460,24 @@ char* StatsHandler::buildJSON()
 
 		Players.PushBack(Player, allocator);
 	}
-	////Shrink Versus Data
-	//for (auto i = 15; i > 15 - playerCount; i--)
-	//	for (auto j = 0; j < playerCount; j++)
-	//		Players[j][L"Versus"].PopBack();
 
-	//////Populate Versus Data
-	////for(auto i = 0; i < 16; i++)
-	////	for(auto j = 0; j < 16; j++)
-	////		Players[i][L"Versus"][Players[j][L"EndGameIndex"]][1] = 
-	////			Players[j][L"Versus"][Players[i][L"EndGameIndex"]][0];
+
 	for (auto i = 0; i < playerCount; i++) {
 		WValue Versus(rapidjson::kArrayType);
 		int iOffset = PCROffset + Players[i][L"EndGameIndex"].GetInt() * 0x110;
 		for (auto j = 0; j < playerCount; j++)
 		{
 			WValue Matchup(rapidjson::kArrayType);
-			int jOffset = PCROffset + Players[i][L"EndGameIndex"].GetInt() * 0x110;
+			int jOffset = PCROffset + Players[j][L"EndGameIndex"].GetInt() * 0x110;
+			//Player I: Killed J
 			value.SetInt(*h2mod->GetAddress<unsigned int*>(0, iOffset + 0x90 + (j * 0x4)));
 			Matchup.PushBack(value, allocator);
+			//Player I: Killed by J
 			value.SetInt(*h2mod->GetAddress<unsigned int*>(0, jOffset + 0x90 + (i * 0x4)));
 			Matchup.PushBack(value, allocator);
 			Versus.PushBack(Matchup, allocator);
 		}
-		Players[i].AddMember(L"Versus", Versus, allocator);
+		Players[i].AddMember(L"VersusData", Versus, allocator);
 	}
 
 	document.AddMember(L"Players", Players, allocator);
@@ -469,5 +518,105 @@ char* StatsHandler::buildJSON()
 
 	//rapidjson::Value array(rapidjson::kArrayType);
 	//rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
-	
+}
+
+
+struct stringMe {
+	char *ptr;
+	size_t len;
+};
+
+static void init_string(struct stringMe *s) {
+	s->len = 0;
+	s->ptr = (char*)malloc(s->len + 1);
+	if (s->ptr == NULL) {
+		fprintf(stderr, "malloc() failed\n");
+		exit(EXIT_FAILURE);
+	}
+	s->ptr[0] = '\0';
+}
+
+static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct stringMe *s)
+{
+	size_t new_len = s->len + size * nmemb;
+	s->ptr = (char*)realloc(s->ptr, new_len + 1);
+	if (s->ptr == NULL) {
+		fprintf(stderr, "realloc() failed\n");
+		exit(EXIT_FAILURE);
+	}
+	memcpy(s->ptr + s->len, ptr, size*nmemb);
+	s->ptr[new_len] = '\0';
+	s->len = new_len;
+
+	return size * nmemb;
+}
+
+
+rapidjson::Document StatsHandler::getPlayerRanks()
+{
+	std::string XUIDs;
+	rapidjson::Document document;
+	BYTE playerCount = 0;
+	for (auto i = 0; i < 16; i++)
+	{
+		auto XUID = *h2mod->GetAddress<::XUID*>(0, baseOffset + (i * 0x94));
+		if (XUID == 0) continue;
+		playerCount++;
+		XUIDs.append(IntToString(XUID, std::dec));
+		XUIDs.append(",");
+	}
+	if (playerCount == 0) return document;
+	XUIDs = XUIDs.substr(0, XUIDs.length() - 1);
+	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=PlaylistRanks&Playlist_Checksum=";
+	http_request_body.append(getChecksum());
+	http_request_body.append("&Player_XUIDS=");
+	http_request_body.append(XUIDs);
+	LOG_INFO_GAME(http_request_body);
+	CURL *curl;
+	CURLcode curlResult;
+	CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
+	if (global_init != CURLE_OK)
+	{
+		LOG_INFO_GAME(L"[H2MOD]::getPlayerRanks failed to init curl");
+		return document;
+	}
+	curl = curl_easy_init();
+	if (curl)
+	{
+
+		struct stringMe s;
+		init_string(&s);
+
+
+		//Set the URL for the GET
+		curl_easy_setopt(curl, CURLOPT_URL, http_request_body.c_str());
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
+
+		curlResult = curl_easy_perform(curl);
+		if (curlResult != CURLE_OK)
+		{
+			LOG_ERROR_GAME(L"[H2MOD]::getPlayerRanks failed to execute curl");
+			//LOG_ERROR_GAME(curl_easy_strerror(curlResult));
+			return document;
+		}
+		else
+		{
+
+			int response_code;
+			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+			if (verbose)
+				LOG_INFO_GAME(std::to_string(response_code));
+			LOG_INFO_GAME(s.ptr);
+			
+			document.Parse(s.ptr);
+			curl_easy_cleanup(curl);
+			free(s.ptr);
+			return document;
+		}
+		
+	}
+	return document;
 }

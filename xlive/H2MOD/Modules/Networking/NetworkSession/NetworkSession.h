@@ -271,6 +271,7 @@ namespace NetworkSession
 	long long getPlayerXuid(int playerIndex);
 	int getPlayerTeam(int playerIndex);
 	int getPlayerTeamFromXuid(long long xuid);
+	int getPeerIndexFromXUID(long long xuid);
 	player_information* getPlayerInformation(int playerIndex);
 }
 

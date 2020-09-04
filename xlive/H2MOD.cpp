@@ -758,6 +758,20 @@ void H2MOD::disable_weapon_pickup(bool b_Enable)
 	}
 }
 
+void H2MOD::set_local_rank(BYTE rank)
+{
+	DWORD address1 = h2mod->GetAddress(0x1b2c2b);
+	DWORD address2 = h2mod->GetAddress(0x1b2c2F);
+	DWORD address3 = h2mod->GetAddress(0x51A6B6);
+	DWORD address4 = h2mod->GetAddress(0x51A6B7);
+	BYTE Rank[1];
+	Rank[0] = rank;
+	WriteBytes(address1, Rank, sizeof(Rank));
+	WriteBytes(address2, Rank, sizeof(Rank));
+	WriteBytes(address3, Rank, sizeof(Rank));
+	WriteBytes(address4, Rank, sizeof(Rank));
+}
+
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 {
 	int(_cdecl* AutoHandler)(datum, datum);
@@ -1012,6 +1026,7 @@ void H2MOD::set_local_team_index(int local_player_index, int team_index)
 	p_update_player_profile(local_player_index); // fixes infection handicap glitch
 }
 
+
 void __cdecl print_to_console(char *output)
 {
 	const static std::string prefix = "[HSC Print] ";
@@ -1234,6 +1249,7 @@ int __cdecl device_touch(datum device_datum, datum unit_datum)
 }
 
 
+
 void H2MOD::team_player_indicator_visibility(bool toggle)
 {
 	this->drawTeamIndicators = toggle;
@@ -1298,6 +1314,12 @@ void EvaluateGameState()
 	if (previousGamestate != GameState) {
 		switch (GameState)
 		{
+			case 0: //Main Menu? (Client Only?)
+				for (const auto &cb : gamestateCallbacks["MainMenu"])
+				{
+					cb();
+				}
+				break;
 			case 1: //Lobby
 				for (const auto &cb : gamestateCallbacks["Lobby"])
 				{
@@ -1350,9 +1372,12 @@ void H2MOD::ApplyHooks() {
 	p_EvaulateGameState = h2mod->GetAddress<ChangeGameState>(0x1d7738, 0x1BCDA8);
 	PatchCall(h2mod->GetAddress(0x1AD84D, 0x1A67CA), EvaluateGameState);
 	
-	
 	//Register callback on Post Game to upload the stats to the server
 	registerGamestateCallback(&stats_handler->sendStats, "PostGame");
+	//Register callback to reset rank to 255 on mainmenu
+	registerGamestateCallback([]() {if (!h2mod->Server) h2mod->set_local_rank(20);}, "MainMenu");
+	//Register callback to send player ranks on lobby
+	registerGamestateCallback([]() {if (h2mod->Server) stats_handler->sendRankChange();}, "Lobby");
 
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
@@ -1438,7 +1463,7 @@ void H2MOD::ApplyHooks() {
 	else {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
-
+		 
 		ServerConsole::ApplyHooks();
 	}
 }

@@ -52,6 +52,17 @@ bool __cdecl decode_team_change_packet(bitstream* stream, int a2, s_team_change*
 	return stream->packet_is_valid() == false;
 }
 
+void __cdecl encode_rank_change_packet(bitstream* stream, int a2, s_rank_change* data)
+{
+	stream->data_encode_integer("rank", data->rank, 8);
+}
+
+bool __cdecl decode_rank_change_packet(bitstream* stream, int a2, s_rank_change* data)
+{
+	data->rank = stream->data_decode_integer("rank", 8);
+	return stream->packet_is_valid() == false;
+}
+
 void register_custom_packets(void* network_messages)
 {
 	typedef void(__cdecl* register_test_packet)(void* network_messages);
@@ -67,6 +78,9 @@ void register_custom_packets(void* network_messages)
 
 	register_packet_impl(network_messages, team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
 		(void*)encode_team_change_packet, (void*)decode_team_change_packet, NULL);
+
+	register_packet_impl(network_messages, rank_change, "rank-change", 0, sizeof(s_rank_change), sizeof(s_rank_change),
+		(void*)encode_rank_change_packet, (void*)decode_rank_change_packet, NULL);
 }
 
 typedef void(__stdcall *handle_out_of_band_message)(void *thisx, network_address* address, int message_type, int a4, void* packet);
@@ -229,7 +243,14 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			return;
 		}
 	}
-
+	case rank_change:
+		{
+			if(peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
+			{
+				s_rank_change* recieved_data = (s_rank_change*)packet;
+				h2mod->set_local_rank(recieved_data->rank);
+			}
+		}
 	default:
 		break;
 	}
@@ -291,6 +312,25 @@ void CustomPackets::sendTeamChange(int peerIndex, int teamIndex)
 	}
 }
 
+void CustomPackets::sendRankChange(int peerIndex, byte rank)
+{
+	network_session* session = NetworkSession::getCurrentNetworkSession();
+	if (NetworkSession::localPeerIsSessionHost())
+	{
+		s_rank_change data;
+		data.rank = rank;
+
+		network_observer* observer = session->network_observer_ptr;
+		peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peerIndex);
+
+		if (peerIndex != -1 && peerIndex != session->local_peer_index)
+		{
+			if (observer_channel->field_1) {
+				observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, rank_change, sizeof(s_rank_change), &data);
+			}
+		}
+	}
+}
 
 
 void CustomPackets::ApplyGamePatches()

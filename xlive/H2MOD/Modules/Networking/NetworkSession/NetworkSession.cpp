@@ -111,6 +111,21 @@ int NetworkSession::getPlayerTeamFromXuid(long long xuid)
 	return NONE;
 }
 
+int NetworkSession::getPeerIndexFromXUID(long long xuid)
+{
+	if(getPlayerCount() > 0)
+	{
+		int playerIndex = 0;
+		do
+		{
+			if (playerIsActive(playerIndex) && getPlayerXuid(playerIndex) == xuid)
+				return getPeerIndex(playerIndex);
+			playerIndex++;
+		} while (playerIndex < 16);
+	}
+	return NONE;
+}
+
 void NetworkSession::kickPeer(int peerIndex) 
 {
 	typedef void(__thiscall* game_session_boot)(network_session* session, int peer_index, bool unk);
