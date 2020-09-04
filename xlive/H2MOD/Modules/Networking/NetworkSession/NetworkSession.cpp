@@ -52,6 +52,8 @@ int NetworkSession::getPeerCount()
 	return getCurrentNetworkSession()->membership.peer_count;
 }
 
+
+
 int NetworkSession::getLocalPeerIndex()
 {
 	return getCurrentNetworkSession()->local_peer_index;

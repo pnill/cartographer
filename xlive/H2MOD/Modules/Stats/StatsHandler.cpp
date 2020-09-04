@@ -25,10 +25,13 @@ StatsHandler::StatsHandler()
  * Player leave store the data  if non team game sort rank them at the bottom of the list
  * if team game rank them with their team, will require changes to the API. Will probably be easy
  * to impliment just modify the way placement is calculate to allow placements under 16
+ * All placements under 16 should be considered maximum loss in non team games.
+ * Team Games match with thier team
+ * FFA place at losest remove maximum XP.
  */
 wchar_t* StatsHandler::getPlaylistFile()
 {
-	auto output = h2mod->GetAddress<wchar_t*>(0, 0x46ECC4);
+	auto output = h2mod->GetAddress<wchar_t*>(0, 0x3B3704);
 	return output;
 }
 std::string StatsHandler::getChecksum()
@@ -552,18 +555,38 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct stringMe *s
 }
 
 
-rapidjson::Document StatsHandler::getPlayerRanks()
+std::vector<XUID> alreadySent;
+struct compare
+{
+	XUID key;
+	compare(XUID const &i) : key(i) { }
+
+	bool operator()(XUID const &i)
+	{
+		return (i == key);
+	}
+};
+rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 {
 	std::string XUIDs;
 	rapidjson::Document document;
 	BYTE playerCount = 0;
-	for (auto i = 0; i < 16; i++)
+	if (forceAll)
+		alreadySent.clear();
+	for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
 	{
-		auto XUID = *h2mod->GetAddress<::XUID*>(0, baseOffset + (i * 0x94));
-		if (XUID == 0) continue;
-		playerCount++;
-		XUIDs.append(IntToString(XUID, std::dec));
-		XUIDs.append(",");
+		if(NetworkSession::playerIsActive(i) && NetworkSession::getLocalPeerIndex() != NetworkSession::getPeerIndex(i))
+		{
+			auto XUID = NetworkSession::getPlayerXuid(i);
+			if (std::none_of(alreadySent.begin(), alreadySent.end(), compare(XUID))) 
+			{
+				playerCount++;
+				XUIDs.append(IntToString(XUID, std::dec));
+				XUIDs.append(",");
+				alreadySent.push_back(XUID);
+			}
+		}
+		
 	}
 	if (playerCount == 0) return document;
 	XUIDs = XUIDs.substr(0, XUIDs.length() - 1);

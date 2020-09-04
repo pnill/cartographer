@@ -251,6 +251,13 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				h2mod->set_local_rank(recieved_data->rank);
 			}
 		}
+	case peer_properties:
+		{
+			if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
+			{
+				h2mod->sendRanksToNewPlayers();
+			}
+		}
 	default:
 		break;
 	}

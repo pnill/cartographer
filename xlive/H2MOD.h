@@ -97,7 +97,7 @@ public:
 		{
 			return reinterpret_cast<T>(Base + (Server ? server : client));
 		}
-
+		void sendRanksToNewPlayers();
 private:
 		DWORD Base;
 		scnr_type mapType;

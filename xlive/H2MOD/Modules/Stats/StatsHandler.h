@@ -50,11 +50,11 @@ public:
 			}
 		}
 	}
-	static void sendRankChange()
+	static void sendRankChange(bool forceAll = false)
 	{
 		if (NetworkSession::localPeerIsSessionHost())
 		{
-			auto document = getPlayerRanks();
+			auto document = getPlayerRanks(forceAll);
 			if (document.MemberCount() == 0)
 			{
 				LOG_ERROR_GAME(L"[H2MOD] failed to retrieve player ranks");
@@ -79,7 +79,7 @@ public:
 			}
 		}
 	}
-	static rapidjson::Document getPlayerRanks();
+	static rapidjson::Document getPlayerRanks(bool forceAll = false);
 	static int verifyPlaylist();
 	static int uploadPlaylist();
 	static char* buildJSON();

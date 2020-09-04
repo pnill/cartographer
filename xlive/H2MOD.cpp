@@ -772,6 +772,11 @@ void H2MOD::set_local_rank(BYTE rank)
 	WriteBytes(address4, Rank, sizeof(Rank));
 }
 
+void H2MOD::sendRanksToNewPlayers()
+{
+	stats_handler->sendRankChange();
+}
+
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 {
 	int(_cdecl* AutoHandler)(datum, datum);
@@ -1311,6 +1316,7 @@ void EvaluateGameState()
 {
 	p_EvaulateGameState(h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC));
 	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
+
 	if (previousGamestate != GameState) {
 		switch (GameState)
 		{
@@ -1374,10 +1380,11 @@ void H2MOD::ApplyHooks() {
 	
 	//Register callback on Post Game to upload the stats to the server
 	registerGamestateCallback(&stats_handler->sendStats, "PostGame");
-	//Register callback to reset rank to 255 on mainmenu
-	registerGamestateCallback([]() {if (!h2mod->Server) h2mod->set_local_rank(20);}, "MainMenu");
 	//Register callback to send player ranks on lobby
-	registerGamestateCallback([]() {if (h2mod->Server) stats_handler->sendRankChange();}, "Lobby");
+	registerGamestateCallback([]() {if (h2mod->Server) stats_handler->sendRankChange(true);}, "Lobby");
+	//Register callback to reset rank to 255 on mainmenu
+	registerGamestateCallback([]() {if (!h2mod->Server) h2mod->set_local_rank(255);}, "MainMenu");
+	
 
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
