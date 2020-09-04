@@ -19,20 +19,11 @@
 
 StatsHandler::StatsHandler()
 = default;
-struct stringMe {
-	char *ptr;
-	size_t len;
-};
-static void init_string(struct stringMe *s) {
-	s->len = 0;
-	s->ptr = (char*)malloc(s->len + 1);
-	if (s->ptr == NULL) {
-		fprintf(stderr, "malloc() failed\n");
-		exit(EXIT_FAILURE);
-	}
-	s->ptr[0] = '\0';
-}
-
+/*
+ * Player leave store the data  if non team game sort rank them at the bottom of the list
+ * if team game rank them with their team, will require changes to the API. Will probably be easy
+ * to impliment just modify the way placement is calculate to allow placements under 16
+ */
 wchar_t* StatsHandler::getPlaylistFile()
 {
 	auto output = h2mod->GetAddress<wchar_t*>(0, 0x46ECC4);
@@ -224,6 +215,7 @@ char* StatsHandler::buildJSON()
 	document.AddMember(L"Server", Server, allocator);
 
 	//Players
+	int playerCount = 0;
 	WValue Players(rapidjson::kArrayType);
 	for(auto i = 0; i < 16; i++)
 	{
@@ -246,7 +238,7 @@ char* StatsHandler::buildJSON()
 		auto XUID = *h2mod->GetAddress<unsigned long*>(0, calcBaseOffset);
 		if (XUID == 0) //Skip if it doesnt exists
 			continue;
-
+		playerCount++;
 		auto PrimaryColor = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4A);
 		auto SecondaryColor = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4B);
 		auto PrimaryEmblem = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4C);
@@ -400,10 +392,49 @@ char* StatsHandler::buildJSON()
 		}
 		Player.AddMember(L"WeaponData", Weapons, allocator);
 
+		/*WValue Versus(rapidjson::kArrayType);
+		for(auto j = 0; j < 16; j++)
+		{
+			WValue Matchup(rapidjson::kArrayType);
+			value.SetInt(*h2mod->GetAddress<unsigned int*>(0, calcPCROffset + 0x90 + (i * 0x4)));
+			Matchup.PushBack(value, allocator);
+			Matchup.PushBack(0, allocator);
+			Versus.PushBack(Matchup, allocator);
+		}
+		Player.AddMember(L"VersusData", Versus, allocator);*/
+
 		Players.PushBack(Player, allocator);
 	}
+	////Shrink Versus Data
+	//for (auto i = 15; i > 15 - playerCount; i--)
+	//	for (auto j = 0; j < playerCount; j++)
+	//		Players[j][L"Versus"].PopBack();
+
+	//////Populate Versus Data
+	////for(auto i = 0; i < 16; i++)
+	////	for(auto j = 0; j < 16; j++)
+	////		Players[i][L"Versus"][Players[j][L"EndGameIndex"]][1] = 
+	////			Players[j][L"Versus"][Players[i][L"EndGameIndex"]][0];
+	for (auto i = 0; i < playerCount; i++) {
+		WValue Versus(rapidjson::kArrayType);
+		int iOffset = PCROffset + Players[i][L"EndGameIndex"].GetInt() * 0x110;
+		for (auto j = 0; j < playerCount; j++)
+		{
+			WValue Matchup(rapidjson::kArrayType);
+			int jOffset = PCROffset + Players[i][L"EndGameIndex"].GetInt() * 0x110;
+			value.SetInt(*h2mod->GetAddress<unsigned int*>(0, iOffset + 0x90 + (j * 0x4)));
+			Matchup.PushBack(value, allocator);
+			value.SetInt(*h2mod->GetAddress<unsigned int*>(0, jOffset + 0x90 + (i * 0x4)));
+			Matchup.PushBack(value, allocator);
+			Versus.PushBack(Matchup, allocator);
+		}
+		Players[i].AddMember(L"Versus", Versus, allocator);
+	}
+
 	document.AddMember(L"Players", Players, allocator);
 
+	//Shrink Versus Data
+	
 
 	//Export the file
 	rapidjson::StringBuffer strbuf;
@@ -428,8 +459,13 @@ char* StatsHandler::buildJSON()
 	swprintf(fileOutPath, 1024, L"%wsstats\\%s-%s.json", H2ProcessFilePath, ServerName, unix);
 	std::ofstream of(fileOutPath);
 	of << json;
-	if (!of.good()) throw std::runtime_error("Can't write the JSON string to the file!");
-	return "";
+	if (!of.good())
+	{
+		LOG_ERROR_GAME("[H2MOD] Stats BuildJSON Failed to write to file");
+	}
+	char* oFile = (char*)malloc(sizeof(char) * wcslen(fileOutPath) + 1);
+	wcstombs2(oFile, fileOutPath, wcslen(fileOutPath) + 1);
+	return oFile;
 
 	//rapidjson::Value array(rapidjson::kArrayType);
 	//rapidjson::Document::AllocatorType& allocator = document.GetAllocator();

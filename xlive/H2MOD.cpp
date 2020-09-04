@@ -1276,7 +1276,7 @@ void H2MOD::ApplyUnitHooks()
 }
 static BYTE previousGamestate = 0;
 typedef int(__thiscall* ChangeGameState)(BYTE* this_);
-ChangeGameState p_ChangeGameState;
+ChangeGameState p_EvaulateGameState;
 typedef std::function<void()> GameState_Callback;
 
 
@@ -1293,7 +1293,7 @@ void registerGamestateCallback(const GameState_Callback &cb, std::string GameSta
 }
 void EvaluateGameState()
 {
-	p_ChangeGameState(h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC));
+	p_EvaulateGameState(h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC));
 	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
 	if (previousGamestate != GameState) {
 		switch (GameState)
@@ -1347,7 +1347,7 @@ void H2MOD::ApplyHooks() {
 	PatchCall(h2mod->GetAddress(0x58789, 0x60C81), OnAutoPickUpHandler);
 
 	//Hook to do stuff after Game State Change
-	p_ChangeGameState = h2mod->GetAddress<ChangeGameState>(0x1d7738, 0x1BCDA8);
+	p_EvaulateGameState = h2mod->GetAddress<ChangeGameState>(0x1d7738, 0x1BCDA8);
 	PatchCall(h2mod->GetAddress(0x1AD84D, 0x1A67CA), EvaluateGameState);
 	
 	
