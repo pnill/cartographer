@@ -849,7 +849,6 @@ char __stdcall sub_210a44_CMLTD_(int thisptr, int a2, int* a3, int label_menu_id
 int __stdcall sub_2111ab_CMLTD_(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description)
 {
 	int(__cdecl* sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
-	void*(__cdecl* sub_287BA9)(void* a1, int a2, unsigned int a3) = (void*(__cdecl*)(void*, int, unsigned int))((char*)H2BaseAddr + 0x287BA9);
 	//int(__thiscall* sub_210a44)(int, int, int*) = (int(__thiscall*)(int, int, int*))((char*)H2BaseAddr + 0x210a44);
 	int(__cdecl* sub_239623)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x239623);
 	int(__thiscall* sub_211e23)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x211e23);
@@ -866,7 +865,7 @@ int __stdcall sub_2111ab_CMLTD_(int thisptr, int a2, int label_menu_id, int labe
 	var68[4] = v4;
 	var68[5] = 0;
 
-	sub_287BA9(&var68[6], 0, 0x50u);
+	memset(&var68[6], 0, 0x50u);
 	sub_210a44_CMLTD_(v2, v3, var68, label_menu_id, label_id_title, label_id_description);
 	int v6 = sub_20c701(*(DWORD*)(v2 + 0x70));
 

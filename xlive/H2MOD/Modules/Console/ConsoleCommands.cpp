@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "Globals.h"
 #include "ConsoleCommands.h"
 
 #include "H2MOD\Modules\Startup\Startup.h"
@@ -14,6 +13,8 @@
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD\Modules\ServerConsole\ServerConsole.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
+
+#include "H2MOD\Modules\Utils\Utils.h"
 
 #include "Util\ClipboardAPI.h"
 
@@ -419,6 +420,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			output(L"controller_sens");
 			output(L"mouse_sens");
 			output(L"warpfix");
+			output(L"maingamelooppatches");
 			return;
 		}
 		else if (firstCommand == "$mapfilename")
@@ -709,10 +711,38 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 			std::string secondArg = splitCommands[1];
-
-			H2Config_d3dex = (secondArg.compare("true") == 0 || secondArg.compare("1") == 0);
+			if (secondArg.compare("true") == 0 || secondArg.compare("1") == 0) {
+				H2Config_d3dex = true;
+				output(L"D3D9Ex version of D3D9 has been enabled. Restart your game to take effect. If your game crashes on startup, disable it from the config file.");
+			}
+			else if (secondArg.compare("false") == 0 || secondArg.compare("0") == 0) {
+				H2Config_d3dex = false;
+				output(L"D3D9Ex version of D3D9 has been disabled. Restart your game to take effect.");
+			}
+			else {
+				output(L"Invalid command, usage d3dex true/false");
+			}
 			return;
         }
+		else if (firstCommand == "$maingamelooppatches") {
+			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
+				output(L"Invalid command, usage maingamelooppatches true/false");
+				return;
+			}
+			std::string secondArg = splitCommands[1];
+			if (secondArg.compare("true") == 0 || secondArg.compare("1") == 0) {
+				H2Config_experimental_game_main_loop_patches = true;
+				output(L"Experimental main game loop patches enabled. Restart your game to take effect.");
+			}
+			else if (secondArg.compare("false") == 0 || secondArg.compare("0") == 0) {
+				H2Config_experimental_game_main_loop_patches = false;
+				output(L"Experimental main game loop patches disabled. Restart your game to take effect.");
+			}
+			else {
+				output(L"Invalid command, usage maingamelooppatches true/false");
+			}
+			return;
+		}
 		else {
 			output(L"Unknown command.");
 		}

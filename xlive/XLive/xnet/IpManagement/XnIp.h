@@ -13,6 +13,8 @@ const char broadcastStrHdr[MAX_HDR_STR] = "XNetReqPack";
 #define XnIp_ConnectionCloseSecure 0x4
 #define XnIp_ConnectionEstablishSecure 0x8
 
+#define XnIp_ConnectionTimeOut 15 * 1000 // msec
+
 #define IPADDR_LOOPBACK htonl(0x7F000001) // 127.0.0.1
 
 struct XnKeyPair
@@ -36,7 +38,10 @@ struct XnIp
 	sockaddr_in NatAddrSocket1000; // TODO: allocate dynamically based on how many sockets are up
 	sockaddr_in NatAddrSocket1001;
 
-	bool isValid(IN_ADDR identifier) { return bValid && identifier.s_addr == connectionIdentifier.s_addr; }
+	unsigned int pckSent;
+	unsigned int pckRecvd;
+
+	bool isValid(IN_ADDR identifier);
 };
 
 struct XNetPacketHeader
@@ -47,6 +52,14 @@ struct XNetPacketHeader
 
 struct XBroadcastPacket
 {
+	XBroadcastPacket::XBroadcastPacket()
+	{
+		pckHeader.intHdr = 'BrOd';
+		strncpy(pckHeader.HdrStr, broadcastStrHdr, MAX_HDR_STR);
+		ZeroMemory(&data, sizeof(XBroadcastPacket::XBroadcast));
+		data.name.sin_addr.s_addr = INADDR_BROADCAST;
+	};
+
 	XNetPacketHeader pckHeader;
 	struct XBroadcast
 	{
@@ -83,10 +96,12 @@ public:
 	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier, bool handleFromConnectionPacket);
 	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 
+	XnIp* getConnection(IN_ADDR ina);
+
 	void checkForLostConnections();
-	void setTimeConnectionInteractionHappened(IN_ADDR ina, int time);
+	void setTimeConnectionInteractionHappened(IN_ADDR ina);
 	int getConnectionIndex(IN_ADDR connectionIdentifier);
-	void SetupLocalConnectionInfo(unsigned long xnaddr, char* abEnet, char* abOnline);
+	void SetupLocalConnectionInfo(unsigned long xnaddr, const char* abEnet, const char* abOnline);
 	void sendXNetRequest(XSocket* xsocket, IN_ADDR ipIdentifier, int reqType);
 	int handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount);
 

@@ -94,9 +94,6 @@
     <Filter Include="Source Files\Util\Hooks">
       <UniqueIdentifier>{6e3b665a-267b-4baf-9978-190c7753a4d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\H2MOD\Variants\H2Final">
-      <UniqueIdentifier>{8ae2946e-1bb2-4bd1-8e7c-1dd9790a829e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\H2MOD\Variants\H2X">
       <UniqueIdentifier>{4f0cf4ee-45db-4c9d-8c6a-5821d6e50a0e}</UniqueIdentifier>
     </Filter>
@@ -329,9 +326,6 @@
     </ClCompile>
     <ClCompile Include="Util\Debug\Debug.cpp">
       <Filter>Source Files\Util\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\Variants\H2Final\H2Final.cpp">
-      <Filter>Source Files\H2MOD\Variants\H2Final</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Variants\H2X\H2X.cpp">
       <Filter>Source Files\H2MOD\Variants\H2X</Filter>
@@ -637,9 +631,6 @@
     </ClInclude>
     <ClInclude Include="Util\ReadIniArguments.h">
       <Filter>Source Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\Variants\H2Final\H2Final.h">
-      <Filter>Source Files\H2MOD\Variants\H2Final</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\H2X\H2X.h">
       <Filter>Source Files\H2MOD\Variants\H2X</Filter>
@@ -1196,12 +1187,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp">
       <Filter>Source Files\Blam\Cache\TagGroups</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Maths\real_math.hpp">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\integer_math.hpp">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\BlamTag.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
@@ -1228,6 +1213,15 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h">
       <Filter>Source Files\H2MOD\Modules\MainLoopPatches\UncappedFPS</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\SimpleIni.h">
+      <Filter>Source Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\integer_math.h">
+      <Filter>Source Files\Blam\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\real_math.h">
+      <Filter>Source Files\Blam\Maths</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

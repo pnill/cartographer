@@ -21,9 +21,9 @@ enum e_network_session_state : signed int
 
 enum e_map_status : int
 {
-	unk_map_stats,
+	unk_0,
 	map_unavailable,
-	unk_map_stats2,
+	map_someone_loading,
 	map_available,
 	map_loaded,
 	map_is_downloading
@@ -142,7 +142,8 @@ struct session_parameters
 	DWORD field_4DD8;
 	wchar_t custom_map_name[48];
 	DWORD field_4E3C;
-	BYTE gap_4E40[704];
+	wchar_t game_variant_name[16];
+	BYTE gap_4E40[672];
 	DWORD field_5100;
 	BYTE gap_5104[3508];
 	DWORD field_5EB8;
@@ -154,7 +155,7 @@ static_assert(sizeof(session_parameters) == 4784, "Invalid session_params size")
 
 struct network_session
 {
-	DWORD field_0;
+	void* vtbl;
 	void* network_message_gateway_ptr;
 	network_observer* network_observer_ptr;
 	void* session_manager_ptr;
@@ -272,5 +273,7 @@ namespace NetworkSession
 	int getPlayerTeam(int playerIndex);
 	int getPlayerTeamFromXuid(long long xuid);
 	player_information* getPlayerInformation(int playerIndex);
+
+	wchar_t* getGameVariantName();
 }
 

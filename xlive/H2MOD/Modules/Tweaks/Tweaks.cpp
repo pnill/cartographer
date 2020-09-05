@@ -1,6 +1,4 @@
-#include "stdafx.h"
 
-#include "Globals.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\HudElements\RadarPatch.h"
@@ -17,25 +15,15 @@
 #include "H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h"
 
 #define _USE_MATH_DEFINES
-#include "math.h"
+#include <math.h>
 
 #pragma region Done_Tweaks
 
 typedef int(__cdecl *thookServ1)(HKEY, LPCWSTR);
 thookServ1 phookServ1;
 int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
-	char result =
-		phookServ1(hKey, lpSubKey);
+	char result = phookServ1(hKey, lpSubKey);
 	addDebugText("Post Server Registry Read.");
-	if (strlen(H2Config_dedi_server_name) > 0) {
-		wchar_t* PreLoadServerName = h2mod->GetAddress<wchar_t*>(0, 0x3B49B4);
-		swprintf(PreLoadServerName, 15, L"%hs", H2Config_dedi_server_name);
-		//char temp[27];
-		//snprintf(temp, 27, "%ws", dedi_server_name);
-		//MessageBoxA(NULL, temp, "Server Pre name thingy", MB_OK);
-		wchar_t* LanServerName = h2mod->GetAddress<wchar_t*>(0, 0x52042A);
-		swprintf(LanServerName, 2, L"");
-	}
 	if (strlen(H2Config_dedi_server_playlist) > 0) {
 		wchar_t* ServerPlaylist = h2mod->GetAddress<wchar_t*>(0, 0x3B3704);
 		swprintf(ServerPlaylist, 256, L"%hs", H2Config_dedi_server_playlist);
@@ -156,10 +144,10 @@ void *runtime_state_init()
 	return runtime_state_init_impl();
 }
 
-void global_preferences_initialize()
+void game_preferences_initialize()
 {
-	typedef void global_preferences_initialize();
-	auto global_preferences_initialize_impl = h2mod->GetAddress<global_preferences_initialize*>(0x325FD);
+	typedef void game_preferences_initialize();
+	auto global_preferences_initialize_impl = h2mod->GetAddress<game_preferences_initialize*>(0x325FD);
 	global_preferences_initialize_impl();
 }
 
@@ -401,7 +389,10 @@ bool engine_basic_init()
 		init_timing(1000 * flags_array[startup_flags::unk26]);
 	real_math_initialize();
 	async_initialize();
-	global_preferences_initialize();
+	game_preferences_initialize();
+
+	network_observer::ResetNetworkPreferences();
+
 	font_initialize();
 
 	if (!LOG_CHECK(tag_files_open()))
@@ -913,7 +904,7 @@ void InitH2Tweaks() {
 		WriteValue<BYTE>(h2mod->GetAddress(0x411030), 0);
 
 		//disables the one after the intro video, by removing 0x40 flag from 0x7C6 bitmask
-		WriteValue(h2mod->GetAddress(0x39948 + 2), 0x7C6 & ~0x40);
+		WriteValue(h2mod->GetAddress(0x39948 + 2), 0x7C6 & ~FLAG(6));
 
 		//Set the LAN Server List Ping Frequency (milliseconds).
 		//WriteValue(h2mod->GetAddress(0x001e9a89), 3000);
@@ -946,6 +937,9 @@ void InitH2Tweaks() {
 
 		tags::on_map_load(fix_shaders_nvidia);
 		tags::on_map_load(c_xbox_live_task_progress_menu::ApplyPatches);
+
+		// disable cloth debugging that writes to cloth.txt
+		WriteValue<bool>(h2mod->GetAddress(0x41F650), false);
 	}
 
 	// Both server and client
@@ -1081,50 +1075,40 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 	if (h2mod->Server)
 		return;
 
-	DWORD BATRIF1 = (DWORD)tags::get_matg_globals_ptr() + 0x7aa750;
-	DWORD BATRIF2 = (DWORD)tags::get_matg_globals_ptr() + 0x7aa752;
-	DWORD SMG1 = (DWORD)tags::get_matg_globals_ptr() + 0x7A9F9C;
-	DWORD SMG2 = (DWORD)tags::get_matg_globals_ptr() + 0x7A9F9E;
-	DWORD CRBN1 = (DWORD)tags::get_matg_globals_ptr() + 0x7ab970;
-	DWORD CRBN2 = (DWORD)tags::get_matg_globals_ptr() + 0x7ab972;
-	DWORD BEAMRIF1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA838;
-	DWORD BEAMRIF2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA83A;
-	DWORD MAG1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA33C;
-	DWORD MAG2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA33E;
-	DWORD PLASRIF1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA16C;
-	DWORD PLASRIF2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA16E;
-	DWORD SHTGN1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA424;
-	DWORD SHTGN2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA426;
-	DWORD SNIP1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA994;
-	DWORD SNIP2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA996;
-	DWORD SWRD1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA8AC;
-	DWORD SWRD2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA8AE;
-	DWORD ROCKLAUN1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA3B0;
-	DWORD ROCKLAUN2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA3B2;
-	DWORD PLASPI1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA0F8;
-	DWORD PLASPI2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA0FA;
-	DWORD BRUTESHOT1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA7C4;
-	DWORD BRUTESHOT2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA7C6;
-	DWORD NEED1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA254;
-	DWORD NEED2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AA256;
-	DWORD SENTBEAM1 = (DWORD)tags::get_matg_globals_ptr() + 0x7AB5D0;
-	DWORD SENTBEAM2 = (DWORD)tags::get_matg_globals_ptr() + 0x7AB5D2;
+	point2d* BATRIF1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7aa750);
+	point2d* SMG1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7A9F9C);
+	point2d* CRBN1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7ab970);
+	point2d* BEAMRIF1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA838);
+	point2d* MAG1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA33C);
+	point2d* PLASRIF1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA16C);
+	point2d* SHTGN1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA424);
+	point2d* SNIP1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA994);
+	point2d* SWRD1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA8AC);
+	point2d* ROCKLAUN1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA3B0);
+	point2d* PLASPI1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA0F8);
+	point2d* BRUTESHOT1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA7C4);
+	point2d* NEED1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA254);
+	point2d* SENTBEAM1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AB5D0);
 
-	DWORD WEAPONS[] = { BATRIF1, BATRIF2, SMG1, SMG2, CRBN1, CRBN2, BEAMRIF1, BEAMRIF2, MAG1, MAG2, PLASRIF1, PLASRIF2, SHTGN1, SHTGN2, SNIP1, SNIP2, SWRD1, SWRD2, ROCKLAUN1, ROCKLAUN2, PLASPI1, PLASPI2, BRUTESHOT1, BRUTESHOT2, NEED1, NEED2, SENTBEAM1, SENTBEAM2 };
+	point2d* tempArray = nullptr;
 
-	int disabled[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	int defaultSize[] = { 70, 70, 110, 110, 78, 52, 26, 10, 50, 50, 90, 90,110, 110, 20, 20, 110, 106, 126, 126, 106, 91, 102, 124, 112, 34, 70, 38 };
-	int verySmall[] = { 30, 30, 40, 40, 39, 26, 26, 10, 25, 25, 45, 45, 65, 65, 12, 12, 55, 53, 63, 63, 53, 45, 51, 62, 56, 17, 35, 19 };
-	int small[] = { 40, 40, 65, 65, 57, 38, 26, 10, 35, 35, 55, 55, 80, 80, 15, 15, 82, 79, 90, 90, 79, 68, 76, 93, 84, 25, 52, 27};
-	int large[] = { 80, 80, 130, 130, 114, 76, 52, 20, 70, 70, 110, 110, 160, 160, 30, 30, 164, 158, 180, 180, 158, 136, 152, 186, 168, 50, 104, 57 };
-	int* configArray[] = { &H2Config_BATRIF_WIDTH, &H2Config_BATRIF_HEIGHT, &H2Config_SMG_WIDTH, &H2Config_SMG_HEIGHT, &H2Config_CRBN_WIDTH, &H2Config_CRBN_HEIGHT, &H2Config_BEAMRIF_WIDTH, &H2Config_BEAMRIF_HEIGHT, &H2Config_MAG_WIDTH, &H2Config_MAG_HEIGHT, &H2Config_PLASRIF_WIDTH, &H2Config_PLASRIF_HEIGHT, &H2Config_SHTGN_WIDTH, &H2Config_SHTGN_HEIGHT, &H2Config_SNIP_WIDTH, &H2Config_SNIP_HEIGHT, &H2Config_SWRD_WIDTH, &H2Config_SWRD_HEIGHT, &H2Config_ROCKLAUN_WIDTH, &H2Config_ROCKLAUN_HEIGHT, &H2Config_PLASPI_WIDTH, &H2Config_PLASPI_HEIGHT, &H2Config_BRUTESHOT_WIDTH, &H2Config_BRUTESHOT_HEIGHT, &H2Config_NEED_WIDTH, &H2Config_NEED_HEIGHT, &H2Config_SENTBEAM_WIDTH, &H2Config_SENTBEAM_HEIGHT};
-	int* tempArray;
+	point2d* WEAPONS[] = { BATRIF1, SMG1, CRBN1, BEAMRIF1, MAG1, PLASRIF1, SHTGN1, SNIP1, SWRD1, ROCKLAUN1, PLASPI1, BRUTESHOT1, NEED1, SENTBEAM1 };
+	point2d* configArray[] = { &H2Config_BATRIF, &H2Config_SMG, &H2Config_CRBN, &H2Config_BEAMRIF, &H2Config_MAG, &H2Config_PLASRIF, &H2Config_SHTGN, &H2Config_SNIP, &H2Config_SWRD, &H2Config_ROCKLAUN, &H2Config_PLASPI, &H2Config_BRUTESHOT, &H2Config_NEED, &H2Config_SENTBEAM };
+
+	point2d disabled = {0, 0};
+	point2d large[] = { {80, 80}, {130, 130}, {114, 76}, {52, 20}, {70, 70}, {110, 110}, {160, 160}, {30, 30}, {164, 158}, {180, 180}, {158, 136}, {152, 186}, {168, 50}, {104, 57} };
+	point2d small[] = { {40, 40}, {65, 65}, {57, 38}, {26, 10}, {35, 35}, {55, 55}, {80, 80}, {15, 15}, {82, 79}, {90, 90}, {79, 68}, {76, 93}, {84, 25}, {52, 27} };
+	point2d verySmall[] = { {30, 30}, {40, 40}, {39, 26}, {26, 10}, {25, 25}, {45, 45}, {65, 65}, {12, 12}, {55, 53}, {63, 63}, {53, 45}, {51, 62}, {56, 17}, {35, 19} };
+	point2d defaultSize[] = { {70, 70}, {110, 110}, {78, 52}, {26, 10}, {50, 50}, {90, 90}, {110, 110}, {20, 20}, {110, 106}, {126, 126}, {106, 91}, {102, 124}, {112, 34}, {70, 38} };
 
 	if (preset) {
 		switch (size) {
 		case 1:
-			tempArray = disabled;
+			for (int i = 0; i < 14; i++) {
+				*configArray[i] = disabled;
+			}
 			break;
+
 		case 2:
 			tempArray = verySmall;
 			break;
@@ -1139,22 +1123,21 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 			break;
 		}
 
-		for (int i = 0; i < 28; i++) {
-			*configArray[i] = tempArray[i];
+		if (tempArray)
+		{
+			for (int i = 0; i < 14; i++) {
+				*configArray[i] = tempArray[i];
+			}
 		}
 	}
 
 	if (h2mod->GetMapType() == scnr_type::Multiplayer) {
-
-		for (int i = 0; i < 28; i++) {
-			if (configArray[i] == 0) {
-				*reinterpret_cast<short*>(WEAPONS[i]) = disabled[i];
-			}
-			else if (*configArray[i] == 1 || *configArray[i] < 0 || *configArray[i] > 65535) {
-				*reinterpret_cast<short*>(WEAPONS[i]) = defaultSize[i];
+		for (int i = 0; i < 14; i++) {
+			if (configArray[i]->x == 1 || configArray[i]->x < 0) {
+				*WEAPONS[i] = defaultSize[i];
 			}
 			else {
-				*reinterpret_cast<short*>(WEAPONS[i]) = *configArray[i];
+				*WEAPONS[i] = *configArray[i];
 			}
 		}
 	}

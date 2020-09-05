@@ -183,7 +183,7 @@ typedef struct
 } XNQOSLISTENSTATS;
 
 
-//INT   WINAPI XNetCleanup();
+INT   WINAPI XNetCleanup();
 
 INT   WINAPI XNetRandom(BYTE * pb, UINT cb);
 

@@ -135,6 +135,11 @@ peer_observer_channel* NetworkSession::getPeerObserverChannel(int peerIndex)
 	return &getCurrentNetworkSession()->peer_observer_channels[peerIndex];
 }
 
+wchar_t* NetworkSession::getGameVariantName()
+{
+	return getCurrentNetworkSession()->parameters.game_variant_name;
+}
+
 void NetworkSession::logPlayersToConsole() {
 	int playerIndex = 0;
 	do 
@@ -178,8 +183,13 @@ void NetworkSession::logPeersToConsole() {
 				outStr += L", Player index=" + std::to_wstring(playerIndex);
 				outStr += L", Player name=";
 				outStr += getPlayerName(playerIndex);
-				outStr += L", Name from game player state=";
-				outStr += h2mod->get_player_name_from_player_index(playerIndex);
+
+				// TODO FIXME fix this for dedis
+				if (!h2mod->Server)
+				{
+					outStr += L", Name from game player state=";
+					outStr += h2mod->get_player_name_from_player_index(playerIndex);
+				}
 			}
 			commands->output(outStr);
 

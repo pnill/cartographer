@@ -1,12 +1,13 @@
 // -No Copyright- 2010 Stanislav "listener" Golovin
 // This file donated to the public domain
-#include "stdafx.h"
-#include "Globals.h"
+
 #include "XLive\XAM\xam.h"
 #include "XLive\xbox\xbox.h"
 #include "XLive\XUser\XUser.h"
 #include "XLive\ServerList\ServerList.h"
 #include "XLive\achievements\XAchievements.h"
+
+#include "XLive\xnet\IpManagement\XnIp.h"
 
 HANDLE g_dwFakePData = (HANDLE) -2;
 HANDLE g_dwFakeContent = (HANDLE) -2;
@@ -661,7 +662,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		marketplaceEnumerate += marketplaceCount;
 	}
 
-	if (hEnum == ServerEnumHandle )
+	if ( hEnum == serverList.Handle )
 	{
 		serverList.GetServers(cbBuffer, pvBuffer, pOverlapped);
 		return ERROR_IO_PENDING;
@@ -720,37 +721,6 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 			return ERROR_IO_PENDING;
 		}
 	}
-}
-
-
-// #5258: XLiveSignout
-int WINAPI XLiveSignout(PXOVERLAPPED pXOverlapped)
-{
-	LOG_TRACE_XLIVE("XLiveSignout");
-	if (pXOverlapped)
-	{
-		pXOverlapped->InternalLow = ERROR_SUCCESS;
-		pXOverlapped->InternalHigh = 1;
-		pXOverlapped->dwCompletionContext = HRESULT_FROM_WIN32(ERROR_SUCCESS);
-	}
-
-	return S_OK;
-}
-
-
-// #5259: XLiveSignin
-HRESULT WINAPI XLiveSignin (PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD dwFlags, PXOVERLAPPED pOverlapped)
-{
-	LOG_TRACE_XLIVE("XLiveSignin");
-
-	if (pOverlapped)
-	{
-		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->InternalHigh = 0;
-		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
-	}
-
-	return S_OK;
 }
 
 // #5303: XStringVerify
@@ -1707,23 +1677,6 @@ DWORD WINAPI XLiveLoadLibraryEx(LPCWSTR libFileName, HINSTANCE *a2, DWORD dwFlag
 
 	*a2 = hInstance;
 	return 0;
-}
-
-// 5257: ??
-DWORD WINAPI XLiveManageCredentials(LPCWSTR lpszLiveIdName, LPCWSTR lpszLiveIdPassword, DWORD dwCredFlags, PXOVERLAPPED pXOverlapped)
-{
-	LOG_TRACE_XLIVE(L"XLiveManageCredentials (lpszLiveIdName = {0}, lpszLiveIdPassword = {1}, dwCredFlags = {2:#x}, pXOverlapped = {3:p})",
-		lpszLiveIdName, lpszLiveIdPassword, dwCredFlags, (void*)pXOverlapped);
-
-	if (pXOverlapped)
-	{
-		pXOverlapped->InternalLow = ERROR_SUCCESS;
-		pXOverlapped->InternalHigh = ERROR_SUCCESS;
-		pXOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
-	}
-
-	// not done - error now
-	return S_OK;
 }
 
 // 5290: ??

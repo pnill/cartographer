@@ -1,5 +1,6 @@
-//use this for all base real math related structs and implementations
 #pragma once
+//use this for all base real math related structs and implementations
+
 #include "Blam\Common\Common.h"
 
 struct real_point2d

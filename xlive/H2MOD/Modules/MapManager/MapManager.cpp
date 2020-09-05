@@ -2,7 +2,6 @@
 
 #include "MapManager.h"
 
-#include "Globals.h"
 #include <Mswsock.h>
 #include <WS2tcpip.h>
 #include "H2MOD\Modules\Config\Config.h"
@@ -52,6 +51,127 @@ wchar_t EMPTY_UNICODE_STR = '\0';
 int downloadPercentage = 0;
 bool mapDownloadCountdown = false;
 auto promptOpenTime = std::chrono::high_resolution_clock::now();
+
+typedef signed int(__cdecl* get_map_load_status_for_all_peers)(signed int*, unsigned int*);
+get_map_load_status_for_all_peers p_get_map_load_status_for_all_peers;
+
+//allow hosts to start the game while other peers didn't load the map
+signed int __cdecl get_map_load_status_for_all_peers_hook(signed int *smallest_load_percentage, unsigned int *host_map_status)
+{
+	// this just gets the current network_session, but has some extra misc checks
+	typedef bool(__cdecl* get_network_session_with_misc_checks)(network_session**);
+	auto p_get_network_session_with_misc_checks = h2mod->GetAddress<get_network_session_with_misc_checks>(0x1AD782, 0x1A66FF);
+
+	network_session* session = nullptr;
+	int result_map_status = 0;
+	int result_map_percentage = 0;
+	bool someone_downloading_map = false;
+
+	if (p_get_network_session_with_misc_checks(&session))
+	{
+		switch (session->local_session_state)
+		{
+		case network_session_state_none:
+		case network_session_state_peer_joining:
+		case network_session_state_peer_join_abort:
+		case network_session_state_election:
+		case network_session_state_unk_2:
+			break;
+
+		case network_session_state_peer_established:
+		case network_session_state_leaving:
+		case network_session_state_session_host:
+		case network_session_state_host_disband:
+		case network_session_state_host_handoff:
+		case network_session_state_host_reestablish:
+			membership_info* membership = &session->membership;
+
+			if (host_map_status)
+				*host_map_status = membership->peer_info[session->session_host_peer_index].map_status;
+
+			result_map_status = map_loaded;
+
+			// i don't think this is really used anymore, it has been replaced by the load screen in H2v from Xbox
+			result_map_percentage = 100; 
+			
+			for (int i = 0; i < session->membership.peer_count; i++)
+			{
+				// now we only check our peer and session host peer, instead of all the peers
+				if (i == session->session_host_peer_index
+					|| i == session->local_peer_index)
+				{
+					if (membership->peer_info[i].map_status == map_unavailable)
+					{
+						result_map_status = map_unavailable;
+						result_map_percentage = 0;
+						break;
+					}
+
+					switch (membership->peer_info[i].map_status)
+					{
+					case map_is_downloading:
+						someone_downloading_map = true;
+						break;
+
+					case map_available:
+						if (result_map_status == map_loaded)
+							result_map_status = map_available;
+						break;
+
+					case map_someone_loading:
+						result_map_status = map_someone_loading;
+						result_map_percentage = min(membership->peer_info[i].map_progress_percentage, result_map_percentage); // get the least map load percentage
+						break;
+					}
+				}
+			}
+
+			if (someone_downloading_map && result_map_status != map_unavailable)
+				result_map_status = map_is_downloading;
+		}
+	}
+
+	if (smallest_load_percentage)
+		*smallest_load_percentage = result_map_percentage;
+
+	return result_map_status;
+}
+
+bool __stdcall get_map_load_status_for_all_peers_hook_2(network_session *session, DWORD *player_flags_that_didnt_load_map)
+{
+	int result_bitflags = 0;
+	membership_info* membership = &session->membership;
+	bool everyone_loaded_the_map = true;
+
+	if (membership->peer_count > 0)
+	{
+		for (int i = 0; i < membership->peer_count; i++)
+		{
+			// check only session host and local peer indexes
+			if (i == session->local_peer_index
+				|| i == session->session_host_peer_index)
+			{
+				switch (membership->peer_info[i].map_status)
+				{
+				case unk_0:
+				case map_unavailable:
+				case map_someone_loading:
+				case map_is_downloading:
+					result_bitflags |= FLAG(i);
+					everyone_loaded_the_map = false;
+					break;
+				case map_available:
+				case map_loaded:
+					break;
+				}
+			}
+		}
+	}
+	if (player_flags_that_didnt_load_map)
+		*player_flags_that_didnt_load_map = result_bitflags;
+
+	return everyone_loaded_the_map;
+}
 
 void MapManager::leaveSessionIfAFK() {
 	if (mapDownloadCountdown) {
@@ -183,6 +303,10 @@ void MapManager::applyGamePatches() {
 		PatchCall(h2mod->GetAddress(0x244B8F), get_map_download_source_str);
 		PatchCall(h2mod->GetAddress(0x244B9D), get_receiving_map_string);
 	}
+
+	// allow host to start the game, even if there are peers that didn't load the map
+	p_get_map_load_status_for_all_peers = (get_map_load_status_for_all_peers)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B1929, 0x197879), (BYTE*)get_map_load_status_for_all_peers_hook, 8);
+	WriteJmpTo(h2mod->GetAddress<BYTE*>(0x1D76C5, 0x1BCD32), get_map_load_status_for_all_peers_hook_2);
 
 	// disables game's map downloading implementation
 	NopFill(h2mod->GetAddress(0x1B5421, 0x1A917F), 5);

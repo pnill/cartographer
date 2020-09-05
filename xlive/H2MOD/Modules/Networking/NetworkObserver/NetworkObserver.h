@@ -1,10 +1,14 @@
 #pragma once
 
 // enables/disables LIVE netcode, so we can use the LIVE serverlist
-#define USE_LIVE_NETCODE 1
+#define USE_LIVE_NETCODE 0
 
-#define DEFAULT_NETWORK_HEAP_SIZE 1048576
-#define INCREASED_NETWORK_HEAP_SIZE 10485760
+#if USE_LIVE_NETCODE == 1
+#define INCREASE_NETWORK_TICKRATE 0
+#endif
+
+// network heap size
+#define NETWORK_HEAP_SIZE 10485760 // default: 1048576
 
 struct network_observer_configuration
 {
@@ -306,6 +310,8 @@ struct __declspec(align(8)) network_observer
 	};
 
 	static void ApplyPatches();
+	static void ResetNetworkPreferences();
+	bool __thiscall GetNetworkMeasurements(DWORD *out_throughput, float *out_satiation, DWORD *a4);
 	int getObserverState(int observerIndex) { return observers[observerIndex].unk_state; };
 	void sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data);
 };

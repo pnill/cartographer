@@ -179,20 +179,17 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* 
 	}
 }
 
-void GetVKeyCodeString(int vkey, char* rtnString, int strLen) {
-	snprintf(rtnString, 5, "0x%x", vkey);
-	char key_name[20];
-	SecureZeroMemory(key_name, sizeof(key_name));
+std::string GetVKeyCodeString(int vkey) {
+	std::ostringstream strStream;
+	strStream << "0x" << std::hex << vkey;
 	if (vkey >= 0x70 && vkey <= 0x87) {
 		int func_num = vkey - 0x70 + 1;
-		snprintf(key_name, 20, "VK_F%d", func_num);
+		strStream << " - VK_F" << std::dec << func_num;
 	}
 	else if (vkey == 0x24) {
-		snprintf(key_name, 20, "VK_Home");
+		strStream << " - VK_Home";
 	}
-	if (strlen(key_name) > 0) {
-		snprintf(rtnString + strlen(rtnString), strLen - 5, " - %s", key_name);
-	}
+	return strStream.str();
 }
 
 void PadCStringWithChar(char* strToPad, int toFullLength, char c) {
@@ -493,7 +490,7 @@ const int ERROR_CODE_CURL_SOCKET_FAILED = -40;
 const int ERROR_CODE_CURL_HANDLE = -41;
 const int ERROR_CODE_CURL_EASY_PERF = -42;
 
-int MasterHttpResponse(char* url, char* http_request, char* &rtn_response) {
+int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response) {
 	int result = ERROR_CODE_CURL_SOCKET_FAILED;//Socket failed to connect to server
 
 	CURL *curl;
@@ -622,4 +619,48 @@ int TrimRemoveConsecutiveSpaces(char* text) {
 		text[--text_pos] = 0;
 	return text_pos;//new length
 }
+
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+	std::stringstream ss(s);
+	std::string item;
+	while (std::getline(ss, item, delim)) {
+		elems.push_back(item);
+	}
+	return elems;
+}
+
+std::vector<std::string> split(const std::string &s, char delim) {
+	std::vector<std::string> elems;
+	split(s, delim, elems);
+	return elems;
+}
+
+int stripWhitespace(wchar_t *inputStr) {
+	wchar_t *start;
+	start = inputStr;
+	while (*start && *start == ' ') start++;
+	printf("It is %p and %p\n", inputStr, start);
+	printf("Strlen + 1 is: %i\n", wcslen(start) + 1);
+	memmove(inputStr, start, wcslen(start) + 1);
+	return 0;
+}
+
+void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen) {
+	for (size_t i = 0; i < hexStr.length() && i < bufLen; i++) {
+		byteBuf[i] = (BYTE)strtol(hexStr.substr(i * 2, 2).c_str(), NULL, 16);
+	}
+}
+
+std::string ByteToHexStr(const BYTE* buffer, size_t size) {
+	std::stringstream str;
+	str.setf(std::ios_base::hex, std::ios::basefield);
+	str.setf(std::ios_base::uppercase);
+	str.fill('0');
+
+	for (size_t i = 0; i < size; i++) {
+		str << std::setw(2) << (unsigned short)(BYTE)buffer[i];
+	}
+	return str.str();
+}
+
 

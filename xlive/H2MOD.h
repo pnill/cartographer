@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Blam\Maths\Maths.h"
 #include "Blam\Engine\Objects\Objects.h"
 #include "Blam\Engine\Objects\ObjectPlacementData.h"
 
@@ -10,11 +9,13 @@
 
 enum SoundType
 {
-	TeamChange = 1,
+	TeamChange,
 	GainedTheLead,
 	LostTheLead,
+	TiedLeader,
 	Slayer
 };
+#define ALL_SOUNDS_NO_SLAYER (FLAG(SoundType::TeamChange) | FLAG(SoundType::GainedTheLead) | FLAG(SoundType::LostTheLead) | FLAG(SoundType::TiedLeader))
 
 enum static_lod : DWORD
 {
@@ -28,6 +29,8 @@ enum static_lod : DWORD
 };
 
 game_life_cycle get_game_life_cycle();
+int __cdecl call_get_game_tick_rate();
+bool __cdecl call_is_game_minimized();
 char* __cdecl call_object_try_and_get_data_with_type(datum object_datum_index, int object_type);
 int __cdecl call_unit_reset_equipment(datum unit_datum_index);
 bool __cdecl call_add_object_to_sync(datum gamestate_object_datum);
@@ -54,7 +57,6 @@ public:
 		wchar_t* get_local_player_name(int local_player_index);
 		real_point3d* get_player_unit_coords(int player_index);
 		float get_distance(int, int);
-		wchar_t* get_session_game_variant_name();
 		wchar_t* get_player_name_from_player_index(int playerIndex);
 		int get_player_index_from_name(wchar_t* playername);
 		int get_player_index_from_unit_datum(datum unit_datum_index);
@@ -65,7 +67,7 @@ public:
 		void set_local_team_index(int local_player_index, int team);
 		BYTE get_local_team_index();
 		void set_player_unit_grenades_count(int playerIndex, Grenades type, BYTE count, bool resetEquipment);
-		void disable_sound(int sound);
+		void disable_sounds(int sound);
 		void custom_sound_play(const wchar_t* soundName, int delay);
 		void disable_weapon_pickup(bool b_Enable);
 		void leave_session();
