@@ -592,6 +592,30 @@ void StatsHandler::playerJoinEvent(XUID playerXUID)
 	//the main function.
 	sendRankChange();
 }
+
+static BYTE EmptyByte[2]{ 0, 0 };
+void StatsHandler::FixClientPCRRanks()
+{
+	for(auto i = 0; i < NetworkSession::getPeerCount(); i++)
+	{
+		if(NetworkSession::playerIsActive(i))
+		{
+			auto gt = NetworkSession::getPlayerInformation(i)->properties.player_name;
+			auto rank = NetworkSession::getPlayerInformation(i)->properties.player_displayed_skill;
+			for(auto j = 0; j < 16; j++)
+			{
+				auto tgt = h2mod->GetAddress<wchar_t*>(0x46EEF8 + (j * 0x110));
+				if (std::wstring(gt) == std::wstring(tgt))
+				{
+					auto rankAddress = h2mod->GetAddress(0x46EF70 + (j * 0x110));
+					WriteValue(rankAddress, WORD(rank));
+					WriteBytes(rankAddress + 2, EmptyByte, sizeof(EmptyByte));
+				}
+			}
+		}
+	}
+}
+
 rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 {
 	std::string XUIDs;
