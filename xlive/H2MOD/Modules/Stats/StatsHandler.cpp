@@ -20,7 +20,9 @@
 
 static const bool verbose = true;
 StatsHandler::StatsHandler()
-= default;
+{
+	
+}
 /*
  * Player leave store the data  if non team game sort rank them at the bottom of the list
  * if team game rank them with their team, will require changes to the API. Will probably be easy
@@ -217,8 +219,8 @@ static const int PCROffset   = 0x49F6B0;
 
 char* StatsHandler::buildJSON()
 {
-	typedef rapidjson::GenericDocument<rapidjson::UTF16<> > WDocument;
-	typedef rapidjson::GenericValue<rapidjson::UTF16<> > WValue;
+	typedef rapidjson::GenericDocument<rapidjson::UTF16<>> WDocument;
+	typedef rapidjson::GenericValue<rapidjson::UTF16<>> WValue;
 	WDocument document;
 	WValue value;
 	document.SetObject();
@@ -284,13 +286,18 @@ char* StatsHandler::buildJSON()
 		auto Gamertag = h2mod->GetAddress<wchar_t*>(0, calcBaseOffset + 0xA);
 		for(auto j = 0; j < 16; j++)
 		{
-			auto tGamertag = h2mod->GetAddress<wchar_t*>(0, PCROffset + (i * 0x110));
+			auto tGamertag = h2mod->GetAddress<wchar_t*>(0, PCROffset + (j * 0x110));
 			//I dont know why but I couldn't get any other method of comparing to work,
 			//Someone else can fix it because I know this probably is a terrible way
 			//To compare the wchar_t*.
+			LOG_INFO_GAME("Checking for match for..");
+			LOG_INFO_GAME(Gamertag);
+			LOG_INFO_GAME(tGamertag);
 			if(std::wstring(Gamertag) == std::wstring(tGamertag))
 			{
-				calcPCROffset = PCROffset + (i * 0x110);
+				
+				calcPCROffset = PCROffset + (j * 0x110);
+				LOG_INFO_GAME(IntToString(calcPCROffset, std::hex));
 				EndgameIndex = i;
 				break;
 			}
@@ -312,8 +319,12 @@ char* StatsHandler::buildJSON()
 		auto Rank = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x88);
 		auto Nameplate = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x8B);
 		
-		auto Place = h2mod->GetAddress<wchar_t*>(0, calcPCROffset + 0xE0);
-		auto Score = h2mod->GetAddress<wchar_t*>(0, calcPCROffset + 0x40);
+		wchar_t Place[16];
+		std::wcsncpy(Place, h2mod->GetAddress<wchar_t*>(0, calcPCROffset + 0xE0), 16);
+		
+		wchar_t Score[16];
+		std::wcsncpy(Score, h2mod->GetAddress<wchar_t*>(0, calcPCROffset + 0x40), 16);
+
 		auto Kills = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset);
 		auto Assists = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x2);
 		auto Deaths = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x4);
@@ -566,6 +577,21 @@ struct compare
 		return (i == key);
 	}
 };
+void StatsHandler::playerLeftEvent(XUID playerXUID)
+{
+	auto it = std::find(alreadySent.begin(), alreadySent.end(), playerXUID);
+	if(it != alreadySent.end())
+		alreadySent.erase(alreadySent.begin() + std::distance(alreadySent.begin(), it));
+}
+void StatsHandler::playerJoinEvent(XUID playerXUID)
+{
+	//No need to do anything fancy like filtering or 
+	//another function to send a specific rank
+	//The main function already filters out players
+	//who have been sent their rank before so just fire
+	//the main function.
+	sendRankChange();
+}
 rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 {
 	std::string XUIDs;
@@ -594,13 +620,16 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 	http_request_body.append(getChecksum());
 	http_request_body.append("&Player_XUIDS=");
 	http_request_body.append(XUIDs);
-	LOG_INFO_GAME(http_request_body);
 	CURL *curl;
 	CURLcode curlResult;
 	CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
 	if (global_init != CURLE_OK)
 	{
+		char CurlError[500];
+		snprintf(CurlError, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
 		LOG_INFO_GAME(L"[H2MOD]::getPlayerRanks failed to init curl");
+		LOG_INFO_GAME(CurlError);
+		alreadySent.clear();
 		return document;
 	}
 	curl = curl_easy_init();
@@ -631,8 +660,7 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 			int response_code;
 			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
 			if (verbose)
-				LOG_INFO_GAME(std::to_string(response_code));
-			LOG_INFO_GAME(s.ptr);
+				LOG_INFO_GAME(s.ptr);
 			
 			document.Parse(s.ptr);
 			curl_easy_cleanup(curl);

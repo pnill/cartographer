@@ -772,11 +772,6 @@ void H2MOD::set_local_rank(BYTE rank)
 	WriteBytes(address4, Rank, sizeof(Rank));
 }
 
-void H2MOD::sendRanksToNewPlayers()
-{
-	stats_handler->sendRankChange();
-}
-
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 {
 	int(_cdecl* AutoHandler)(datum, datum);
@@ -1295,6 +1290,56 @@ void H2MOD::ApplyUnitHooks()
 	PatchCall(h2mod->GetAddress(0x1F9E34, 0x1E3B9C), set_unit_color_data_hook);
 	pset_unit_color_data = h2mod->GetAddress<tset_unit_color_data>(0x6E5C3, 0x6D1BF);
 }
+
+
+std::vector<H2MOD::playerEventCallback> playerLeaveCallbacks;
+void H2MOD::registerPlayerLeaveCallback(const playerEvent_Callback &cb, std::string name)
+{
+	playerLeaveCallbacks.push_back({cb, name});
+}
+void H2MOD::unregisterPlayerLeaveCallback(std::string name)
+{
+	for (std::vector<H2MOD::playerEventCallback>::size_type i = 0; i != playerLeaveCallbacks.size(); i++) {
+		if(playerLeaveCallbacks[i].name == name)
+		{
+			playerLeaveCallbacks.erase(playerLeaveCallbacks.begin() + i);
+			break;
+		}
+	}
+}
+void H2MOD::playerLeaveEvent(XUID playerXUID)
+{
+	for(const auto &cb : playerLeaveCallbacks)
+	{
+		cb.cb(playerXUID);
+	}
+}
+
+std::vector<H2MOD::playerEventCallback> playerJoinCallbacks;
+void H2MOD::registerPlayerJoinCallback(const playerEvent_Callback& cb, std::string name)
+{
+	playerJoinCallbacks.push_back({ cb, name });
+}
+void H2MOD::unregisterPlayerJoinCallback(std::string name)
+{
+	for (std::vector<H2MOD::playerEventCallback>::size_type i = 0; i != playerJoinCallbacks.size(); i++) {
+		if (playerJoinCallbacks[i].name == name)
+		{
+			playerJoinCallbacks.erase(playerJoinCallbacks.begin() + i);
+			break;
+		}
+	}
+}
+void H2MOD::playerJoinEvent(XUID playerXUID)
+{
+	for(const auto &cb : playerJoinCallbacks)
+	{
+		cb.cb(playerXUID);
+	}
+}
+
+
+
 static BYTE previousGamestate = 0;
 typedef int(__thiscall* ChangeGameState)(BYTE* this_);
 ChangeGameState p_EvaulateGameState;
@@ -1384,7 +1429,10 @@ void H2MOD::ApplyHooks() {
 	registerGamestateCallback([]() {if (h2mod->Server) stats_handler->sendRankChange(true);}, "Lobby");
 	//Register callback to reset rank to 255 on mainmenu
 	registerGamestateCallback([]() {if (!h2mod->Server) h2mod->set_local_rank(255);}, "MainMenu");
-	
+	//register callback on player leave to remove them from the packet filter
+	registerPlayerLeaveCallback(&stats_handler->playerLeftEvent, "statshandler");
+	//register callback on player join to send them their rank.
+	registerPlayerJoinCallback(&stats_handler->playerJoinEvent, "statshandler");
 
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);

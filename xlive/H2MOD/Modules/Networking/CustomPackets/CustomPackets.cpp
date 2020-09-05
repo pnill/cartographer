@@ -7,6 +7,7 @@
 #include "..\Memory\bitstream.h"
 #include "..\..\MapManager\MapManager.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD/Modules/Utils/Utils.h"
 
 char g_network_message_types[e_network_message_types::end * 32];
 
@@ -251,11 +252,30 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				h2mod->set_local_rank(recieved_data->rank);
 			}
 		}
-	case peer_properties:
+	case player_remove:
 		{
-			if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
+			if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
+				&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 			{
-				h2mod->sendRanksToNewPlayers();
+				auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
+				auto XUID = NetworkSession::getPeerXUID(peer_index);
+				if(XUID != NONE)
+				{
+					h2mod->playerLeaveEvent(XUID);
+				}
+			}
+		}
+	case player_add:
+		{
+			if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
+				&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
+			{
+				auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
+				auto XUID = NetworkSession::getPeerXUID(peer_index);
+				if (XUID != NONE)
+				{
+					h2mod->playerJoinEvent(XUID);
+				}
 			}
 		}
 	default:

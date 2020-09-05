@@ -269,6 +269,7 @@ namespace NetworkSession
 	int getPeerIndex(int playerIndex);
 	wchar_t* getPlayerName(int playerIndex);
 	long long getPlayerXuid(int playerIndex);
+	long long getPeerXUID(int peerIndex);
 	int getPlayerTeam(int playerIndex);
 	int getPlayerTeamFromXuid(long long xuid);
 	int getPeerIndexFromXUID(long long xuid);

@@ -68,11 +68,9 @@ public:
 					std::string::size_type sz = 0;
 					long long xuid = std::stoll(document[i]["XUID"].GetString(), &sz, 0);
 					int peer = NetworkSession::getPeerIndexFromXUID(xuid);
-					LOG_INFO_GAME(std::to_string(peer));
 					if(peer != NetworkSession::getLocalPeerIndex())
 					{
 						byte rank = std::stoi(document[i]["Rank"].GetString(), nullptr);
-						LOG_INFO_GAME(std::to_string(rank));
 						CustomPackets::sendRankChange(peer, rank);
 					}
 				}
@@ -86,4 +84,6 @@ public:
 	static std::string getChecksum();
 	static wchar_t* getPlaylistFile();
 	static int uploadStats(char* filepath);
+	static void playerLeftEvent(XUID playerXUID);
+	static void playerJoinEvent(XUID playerXUID);
 };
