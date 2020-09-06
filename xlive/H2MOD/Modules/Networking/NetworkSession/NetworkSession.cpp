@@ -58,6 +58,10 @@ int NetworkSession::getLocalPeerIndex()
 {
 	return getCurrentNetworkSession()->local_peer_index;
 }
+IN_ADDR NetworkSession::getLocalNetworkAddress()
+{
+	return getCurrentNetworkSession()->membership.peer_info[getLocalPeerIndex()].address.inaOnline;
+}
 
 int NetworkSession::getPeerIndex(int playerIndex)
 {
@@ -202,7 +206,6 @@ void NetworkSession::logPeersToConsole() {
 			std::wstring outStr = L"Peer index=" + std::to_wstring(peerIndex);
 			outStr += L", Peer Name=";
 			outStr += getCurrentNetworkSession()->membership.peer_info[peerIndex].name;
-			
 			int playerIndex = getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index[0];
 			if (playerIndex != -1) 
 			{

@@ -12,6 +12,8 @@
 #include "XLive/XNet/upnp.h"
 #include "H2MOD/Modules/Startup/Startup.h"
 #include "XLive/xbox/xbox.h"
+#include <ws2ipdef.h>
+#include <WS2tcpip.h>
 #ifdef _DEBUG
 #pragma comment(lib, "libcurl_a_debug.lib")
 #else
@@ -264,6 +266,11 @@ char* StatsHandler::buildJSON()
 	auto ServerName = h2mod->GetAddress<wchar_t*>(0, 0x52FC88);
 	value.SetString(ServerName, allocator);
 	Server.AddMember(L"Name", value, allocator);
+	auto IP = NetworkSession::getLocalNetworkAddress();
+	auto IPString = std::string(inet_ntoa(IP));
+	auto wIPString = std::wstring(IPString.begin(), IPString.end());
+	value.SetString(wIPString.c_str(), allocator);
+	Server.AddMember(L"IP", value, allocator);
 	document.AddMember(L"Server", Server, allocator);
 
 	//Players
@@ -618,8 +625,13 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 	XUIDs = XUIDs.substr(0, XUIDs.length() - 1);
 	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=PlaylistRanks&Playlist_Checksum=";
 	http_request_body.append(getChecksum());
+	http_request_body.append("&Server_XUID=");
+	auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
+	auto sXUID = IntToString<::XUID>(ServerXUID, std::dec);
+	http_request_body.append(sXUID);
 	http_request_body.append("&Player_XUIDS=");
 	http_request_body.append(XUIDs);
+	
 	CURL *curl;
 	CURLcode curlResult;
 	CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
@@ -661,7 +673,6 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
 			if (verbose)
 				LOG_INFO_GAME(s.ptr);
-			
 			document.Parse(s.ptr);
 			curl_easy_cleanup(curl);
 			free(s.ptr);
