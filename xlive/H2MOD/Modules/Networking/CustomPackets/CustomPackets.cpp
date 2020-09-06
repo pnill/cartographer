@@ -265,7 +265,8 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				}
 			}
 		}
-	case player_add:
+	//TODO: THIS IS SO WRONG
+	case player_properties:
 		{
 			if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
 				&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))

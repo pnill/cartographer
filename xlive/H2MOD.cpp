@@ -1416,13 +1416,6 @@ void EvaluateGameState()
 		previousGamestate = GameState;
 	}
 }
-void BuildPostgameCarnageReport()
-{
-	void(*Build)() = reinterpret_cast<void(*)()>(h2mod->GetAddress(0xC8CE));
-	Build();
-	stats_handler->FixClientPCRRanks();
-}
-
 
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
@@ -1430,13 +1423,15 @@ void H2MOD::ApplyHooks() {
 
 	LOG_TRACE_GAME("Applying hooks...");
 
+
+
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(h2mod->GetAddress(0x58789, 0x60C81), OnAutoPickUpHandler);
 
 	//Hook to do stuff after Game State Change
 	p_EvaulateGameState = h2mod->GetAddress<ChangeGameState>(0x1d7738, 0x1BCDA8);
 	PatchCall(h2mod->GetAddress(0x1AD84D, 0x1A67CA), EvaluateGameState);
-	
+		
 	//Register callback on Post Game to upload the stats to the server
 	registerGamestateCallback(&stats_handler->sendStats, "PostGame");
 	//Register callback to send player ranks on lobby
@@ -1493,9 +1488,9 @@ void H2MOD::ApplyHooks() {
 		show_error_screen_method = (show_error_screen)DetourFunc(h2mod->GetAddress<BYTE*>(0x20E15A), (BYTE*)showErrorScreen, 8);
 
 		//Disable the code that overrides the PCR Rank
-		NopFill(h2mod->GetAddress(0xCC6F), 7);
+		/*NopFill(h2mod->GetAddress(0xCC6F), 7);*/
 		//Patch the call to BuildPostGameCarnage
-		PatchCall(h2mod->GetAddress(0x69CCA), BuildPostgameCarnageReport);
+		/*PatchCall(h2mod->GetAddress(0x69CCA), BuildPostgameCarnageReport);*/
 
 		//TODO: turn on if you want to debug halo2.exe from start of process
 		//is_debugger_present_method = (is_debugger_present)DetourFunc(h2mod->GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
@@ -1539,7 +1534,6 @@ void H2MOD::ApplyHooks() {
 	else {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
-		 
 		ServerConsole::ApplyHooks();
 	}
 }
