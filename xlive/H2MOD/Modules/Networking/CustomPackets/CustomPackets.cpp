@@ -252,32 +252,19 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				h2mod->set_local_rank(recieved_data->rank);
 			}
 		}
-	case player_remove:
+	case leave_session:
+	{
+		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
+			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 		{
-			if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
-				&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
+			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
+			auto XUID = NetworkSession::getPeerXUID(peer_index);
+			if (XUID != NONE)
 			{
-				auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
-				auto XUID = NetworkSession::getPeerXUID(peer_index);
-				if(XUID != NONE)
-				{
-					h2mod->playerLeaveEvent(XUID);
-				}
+				h2mod->playerLeaveEvent(XUID);
 			}
 		}
-	case player_add:
-		{
-			if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
-				&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
-			{
-				auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
-				auto XUID = NetworkSession::getPeerXUID(peer_index);
-				if (XUID != NONE)
-				{
-					h2mod->playerJoinEvent(XUID);
-				}
-			}
-		}
+	}
 	default:
 		break;
 	}
@@ -293,6 +280,22 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 
 	p_handle_channel_message(thisx, network_channel_index, message_type, dynamic_data_size, packet);
+
+	switch(message_type)
+	{
+		case player_add:
+		{
+			if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
+				&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
+			{
+				auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
+				auto XUID = NetworkSession::getPeerXUID(peer_index);
+				h2mod->playerJoinEvent(XUID);
+			}
+		}
+		default:
+			break;
+	}
 }
 
 void CustomPackets::sendRequestMapFilename()

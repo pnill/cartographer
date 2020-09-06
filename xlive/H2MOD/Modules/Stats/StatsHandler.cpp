@@ -601,9 +601,9 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 		alreadySent.clear();
 	for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
 	{
-		if(NetworkSession::playerIsActive(i) && NetworkSession::getLocalPeerIndex() != NetworkSession::getPeerIndex(i))
+		if(NetworkSession::getLocalPeerIndex() != i)
 		{
-			auto XUID = NetworkSession::getPlayerXuid(i);
+			auto XUID = NetworkSession::getPeerXUID(i);
 			if (std::none_of(alreadySent.begin(), alreadySent.end(), compare(XUID))) 
 			{
 				playerCount++;

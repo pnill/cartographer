@@ -71,7 +71,7 @@ long long NetworkSession::getPeerXUID(int peerIndex)
 		int playerIndex = 0;
 		do
 		{
-			if (playerIsActive(playerIndex) && getPeerIndex(playerIndex) == peerIndex)
+			if (getPeerIndex(playerIndex) == peerIndex)
 				return getPlayerXuid(playerIndex);
 			playerIndex++;
 		} while (playerIndex < 16);

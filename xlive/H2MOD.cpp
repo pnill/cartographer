@@ -1309,6 +1309,10 @@ void H2MOD::unregisterPlayerLeaveCallback(std::string name)
 }
 void H2MOD::playerLeaveEvent(XUID playerXUID)
 {
+	LOG_TRACE_GAME("Player Leave Event..");
+	//if (h2mod->Server) {
+	//	stats_handler->playerLeftEvent(playerXUID);
+	//}
 	for(const auto &cb : playerLeaveCallbacks)
 	{
 		cb.cb(playerXUID);
@@ -1332,6 +1336,11 @@ void H2MOD::unregisterPlayerJoinCallback(std::string name)
 }
 void H2MOD::playerJoinEvent(XUID playerXUID)
 {
+	LOG_TRACE_GAME("Player Join Event..");
+	//if(h2mod->Server)
+	//{
+	//	stats_handler->playerJoinEvent(playerXUID);
+	//}
 	for(const auto &cb : playerJoinCallbacks)
 	{
 		cb.cb(playerXUID);
