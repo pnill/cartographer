@@ -21,6 +21,7 @@
 static const bool verbose = true;
 StatsHandler::StatsHandler()
 {
+	
 }
 /*
  * Player leave store the data  if non team game sort rank them at the bottom of the list
@@ -576,7 +577,6 @@ struct compare
 		return (i == key);
 	}
 };
-
 void StatsHandler::playerLeftEvent(XUID playerXUID)
 {
 	auto it = std::find(alreadySent.begin(), alreadySent.end(), playerXUID);
@@ -628,7 +628,6 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 		if(NetworkSession::playerIsActive(i) && NetworkSession::getLocalPeerIndex() != NetworkSession::getPeerIndex(i))
 		{
 			auto XUID = NetworkSession::getPlayerXuid(i);
-			LOG_INFO_GAME(IntToString<::XUID>(XUID, std::dec));
 			if (std::none_of(alreadySent.begin(), alreadySent.end(), compare(XUID))) 
 			{
 				playerCount++;
@@ -645,8 +644,6 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 	http_request_body.append(getChecksum());
 	http_request_body.append("&Player_XUIDS=");
 	http_request_body.append(XUIDs);
-	if (verbose)
-		LOG_INFO_GAME(http_request_body);
 	CURL *curl;
 	CURLcode curlResult;
 	CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);

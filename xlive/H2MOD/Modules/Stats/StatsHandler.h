@@ -57,7 +57,7 @@ public:
 			auto document = getPlayerRanks(forceAll);
 			if (document.MemberCount() == 0)
 			{
-				sendRankChange(forceAll);
+				LOG_ERROR_GAME(L"[H2MOD] failed to retrieve player ranks");
 			}
 			else
 			{
