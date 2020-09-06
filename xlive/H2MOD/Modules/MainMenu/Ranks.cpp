@@ -13,8 +13,8 @@ void UIRankPatch() {
 
 	BYTE PlayerLevel = -1;								//eventually this will pull level from webserver
 	DWORD PlayerLevelPCR = -1;						//eventually this will pull level from webserver
-	//WriteValue(H2BaseAddr + 0x1B2C2F, PlayerLevel);			//sets player level in pregame lobby
-	//WriteValue(H2BaseAddr + 0xCC72, PlayerLevelPCR);		//sets player level in postgame carnage report
+	WriteValue(H2BaseAddr + 0x1B2C2F, PlayerLevel);			//sets player level in pregame lobby
+	WriteValue(H2BaseAddr + 0xCC72, PlayerLevelPCR);		//sets player level in postgame carnage report
 	//Tag : ui\player_skins\player_skin_lobby.skin
 	const DWORD TagOffsetPreGameLobby = 0x0049DE90;	//Property : Bitmap Buttons
 
@@ -51,18 +51,18 @@ void UIRankPatch() {
 
 	//Sets Pregame Lobby 
 	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset], yValuePGL);
-	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIcon);
+	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
 	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset], xValuePGL);
 
 	//Sets Postgame Carnage Report 1
 	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset], xValuePCR);
 	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset], yValuePCR);
-	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIcon);
+	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
 
 	//Sets Postgame Carnage Report 2
 	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset], xValuePCR);
 	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset], yValuePCR);
-	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIcon);
+	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
 
 	//Sets Ranks 
 	for (RankChunkIndex = 0; RankChunkIndex < 50; RankChunkIndex++)

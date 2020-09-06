@@ -86,5 +86,4 @@ public:
 	static int uploadStats(char* filepath);
 	static void playerLeftEvent(XUID playerXUID);
 	static void playerJoinEvent(XUID playerXUID);
-	static void FixClientPCRRanks();
 };

@@ -17,7 +17,6 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
-#include "H2MOD/Modules/Utils/Utils.h"
 
 
 H2MOD* h2mod = new H2MOD();
@@ -765,20 +764,12 @@ void H2MOD::set_local_rank(BYTE rank)
 	DWORD address2 = h2mod->GetAddress(0x1b2c2F);
 	DWORD address3 = h2mod->GetAddress(0x51A6B6);
 	DWORD address4 = h2mod->GetAddress(0x51A6B7);
-	/*DWORD address5 = h2mod->GetAddress(0xCC72);
-	DWORD address6 = h2mod->GetAddress(0xCC74);*/
 	BYTE Rank[1];
 	Rank[0] = rank;
 	WriteBytes(address1, Rank, sizeof(Rank));
 	WriteBytes(address2, Rank, sizeof(Rank));
 	WriteBytes(address3, Rank, sizeof(Rank));
 	WriteBytes(address4, Rank, sizeof(Rank));
-	//WORD Rank2 = WORD(rank);
-	//commands->display(IntToString<WORD>(Rank2, std::dec));
-	//WriteValue(address5, Rank2);
-	//BYTE EmtpyBytes[2] {0, 0};
-	////Writing a Word was causing a crash?
-	//WriteBytes(address6, EmtpyBytes, sizeof(EmtpyBytes));
 }
 
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)
@@ -1416,12 +1407,7 @@ void EvaluateGameState()
 		previousGamestate = GameState;
 	}
 }
-void BuildPostgameCarnageReport()
-{
-	void(*Build)() = reinterpret_cast<void(*)()>(h2mod->GetAddress(0xC8CE));
-	Build();
-	stats_handler->FixClientPCRRanks();
-}
+
 
 
 void H2MOD::ApplyHooks() {
@@ -1447,8 +1433,6 @@ void H2MOD::ApplyHooks() {
 	registerPlayerLeaveCallback(&stats_handler->playerLeftEvent, "statshandler");
 	//register callback on player join to send them their rank.
 	registerPlayerJoinCallback(&stats_handler->playerJoinEvent, "statshandler");
-
-	
 
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
@@ -1491,11 +1475,6 @@ void H2MOD::ApplyHooks() {
 		//intercept_map_load_method = (intercept_map_load)DetourClassFunc(h2mod->GetAddress<BYTE*>(0xC259B), (BYTE*)interceptMapLoad, 13);
 
 		show_error_screen_method = (show_error_screen)DetourFunc(h2mod->GetAddress<BYTE*>(0x20E15A), (BYTE*)showErrorScreen, 8);
-
-		//Disable the code that overrides the PCR Rank
-		NopFill(h2mod->GetAddress(0xCC6F), 7);
-		//Patch the call to BuildPostGameCarnage
-		PatchCall(h2mod->GetAddress(0x69CCA), BuildPostgameCarnageReport);
 
 		//TODO: turn on if you want to debug halo2.exe from start of process
 		//is_debugger_present_method = (is_debugger_present)DetourFunc(h2mod->GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);

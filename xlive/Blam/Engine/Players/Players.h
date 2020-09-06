@@ -182,8 +182,8 @@ struct Player
 
 		e_object_team player_team;
 		Handicap player_handicap_level;
-		BYTE player_displayed_skill;
-		BYTE player_overall_skill;
+		Handicap player_displayed_skill;
+		char player_overall_skill;
 		char player_is_griefer;
 		char bungie_user_role;
 		char achievement_flags;
