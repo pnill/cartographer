@@ -1349,7 +1349,7 @@ void H2MOD::ApplyHooks() {
 	PatchCall(GetAddress(0x9B09F, 0x85F73), filo_write__encrypted_data_hook);
 
 	ApplyUnitHooks();
-	mapManager->applyGamePatches();
+	mapManager->applyHooks();
 
 	HitFix::ApplyPatches();
 
