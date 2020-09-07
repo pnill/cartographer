@@ -252,7 +252,8 @@ char* StatsHandler::buildJSON()
 	
 	WValue VariantSettings(rapidjson::kObjectType);
 	BYTE TeamPlay = *h2mod->GetAddress<BYTE*>(0, 0x992880);
-	VariantSettings.AddMember(L"Team Play", TeamPlay, allocator);
+	value.SetString(IntToWString<BYTE>(TeamPlay, std::dec).c_str(), allocator);
+	VariantSettings.AddMember(L"Team Play", value, allocator);
 	Variant.AddMember(L"Settings", VariantSettings, allocator);
 	document.AddMember(L"Variant", Variant, allocator);
 	

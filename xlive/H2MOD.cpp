@@ -1439,9 +1439,7 @@ void H2MOD::ApplyHooks() {
 	//Register callback to reset rank to 255 on mainmenu
 	registerGamestateCallback([]() {if (!h2mod->Server) h2mod->set_local_rank(255);}, "MainMenu");
 	//register callback on player leave to remove them from the packet filter
-	registerPlayerLeaveCallback(&stats_handler->playerLeftEvent, "statshandler");
-	//register callback on player join to send them their rank.
-	registerPlayerJoinCallback(&stats_handler->playerJoinEvent, "statshandler");
+
 
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
@@ -1527,7 +1525,9 @@ void H2MOD::ApplyHooks() {
 	else {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
-		 
+		registerPlayerLeaveCallback(&stats_handler->playerLeftEvent, "statshandler");
+		//register callback on player join to send them their rank.
+		registerPlayerJoinCallback(&stats_handler->playerJoinEvent, "statshandler");
 		ServerConsole::ApplyHooks();
 	}
 }
