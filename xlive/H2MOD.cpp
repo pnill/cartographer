@@ -1292,6 +1292,7 @@ void H2MOD::ApplyUnitHooks()
 }
 
 
+
 std::vector<H2MOD::playerEventCallback> playerLeaveCallbacks;
 void H2MOD::registerPlayerLeaveCallback(const playerEvent_Callback &cb, std::string name)
 {
@@ -1420,6 +1421,28 @@ void EvaluateGameState()
 	std::thread(executeCallbacks, GameState).detach();
 }
 
+void H2MOD::RegisterEvents()
+{
+
+	if(!h2mod->Server)//Client only callbacks	
+	{
+		//Register callback to reset rank to 255 on mainmenu
+		registerGamestateCallback([]() { h2mod->set_local_rank(255); }, "MainMenu");
+	}
+	else //Server only callbacks
+	{
+		//Register callback on Post Game to upload the stats to the server
+		registerGamestateCallback(&stats_handler->sendStats, "PostGame");
+		//Register callback to send player ranks on lobby
+		registerGamestateCallback([]() {stats_handler->sendRankChange(true);}, "Lobby");
+		//register callback on player leave to remove them from the packet filter
+		registerPlayerLeaveCallback(&stats_handler->playerLeftEvent, "statshandler");
+		//register callback on player join to send them their rank.
+		registerPlayerJoinCallback(&stats_handler->playerJoinEvent, "statshandler");
+	}
+	//Things that apply to both
+
+}
 
 
 void H2MOD::ApplyHooks() {
@@ -1435,13 +1458,10 @@ void H2MOD::ApplyHooks() {
 	p_EvaulateGameState = h2mod->GetAddress<ChangeGameState>(0x1d7738, 0x1BCDA8);
 	PatchCall(h2mod->GetAddress(0x1AD84D, 0x1A67CA), EvaluateGameState);
 	
-	//Register callback on Post Game to upload the stats to the server
-	registerGamestateCallback(&stats_handler->sendStats, "PostGame");
-	//Register callback to send player ranks on lobby
-	registerGamestateCallback([]() {if (h2mod->Server) stats_handler->sendRankChange(true);}, "Lobby");
-	//Register callback to reset rank to 255 on mainmenu
-	registerGamestateCallback([]() {if (!h2mod->Server) h2mod->set_local_rank(255);}, "MainMenu");
-	//register callback on player leave to remove them from the packet filter
+	
+	
+	
+	
 
 
 	// hook to initialize stuff before game start
@@ -1528,9 +1548,7 @@ void H2MOD::ApplyHooks() {
 	else {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
-		registerPlayerLeaveCallback(&stats_handler->playerLeftEvent, "statshandler");
-		//register callback on player join to send them their rank.
-		registerPlayerJoinCallback(&stats_handler->playerJoinEvent, "statshandler");
+
 		ServerConsole::ApplyHooks();
 	}
 }
@@ -1559,6 +1577,7 @@ void H2MOD::Initialize()
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
 
 	h2mod->ApplyHooks();
+	h2mod->RegisterEvents();
 }
 
 void H2MOD::Deinitialize() {

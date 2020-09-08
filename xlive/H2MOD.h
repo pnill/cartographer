@@ -45,6 +45,7 @@ public:
 		void Deinitialize();
 		void ApplyHooks(); 
 		void ApplyUnitHooks();
+		void RegisterEvents();
 
 		void team_player_indicator_visibility(bool toggle);
 		int get_unit_index_from_player_index(int);
