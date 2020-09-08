@@ -264,7 +264,17 @@ int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount,
 		return SOCKET_ERROR;
 	}
 
-	return ipManager.handleRecvdPacket(xsocket, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
+	// if the result returned by handleRecvdPacket is SOCKET_ERROR, pool another packet until we get an error directly from WINSOCK's recvfrom API (like WSAEWOULDBLOCK)
+	// or the packet received is a valid game packet
+	// because we don't want to lose/delay an in-bound game packet
+	// this should improve performance especially if someone is sending from an unknown connection packets (like DDoS-ing), depending on the performance of the server
+	result = ipManager.handleRecvdPacket(xsocket, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
+	if (result == SOCKET_ERROR)
+	{
+		return XSocketWSARecvFrom(s, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
+	}
+
+	return result;
 }
 
 // #25
