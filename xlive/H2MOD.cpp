@@ -1310,13 +1310,14 @@ void H2MOD::unregisterPlayerLeaveCallback(std::string name)
 void H2MOD::playerLeaveEvent(XUID playerXUID)
 {
 	LOG_TRACE_GAME("Player Leave Event..");
-	//if (h2mod->Server) {
-	//	stats_handler->playerLeftEvent(playerXUID);
-	//}
-	for(const auto &cb : playerLeaveCallbacks)
+	auto executeCallbacks = [](XUID playerXUID)
 	{
-		cb.cb(playerXUID);
-	}
+		for(const auto &cb : playerLeaveCallbacks)
+		{
+			cb.cb(playerXUID);
+		}
+	};
+	std::thread(executeCallbacks, playerXUID).detach();
 }
 
 std::vector<H2MOD::playerEventCallback> playerJoinCallbacks;
@@ -1337,14 +1338,14 @@ void H2MOD::unregisterPlayerJoinCallback(std::string name)
 void H2MOD::playerJoinEvent(XUID playerXUID)
 {
 	LOG_TRACE_GAME("Player Join Event..");
-	//if(h2mod->Server)
-	//{
-	//	stats_handler->playerJoinEvent(playerXUID);
-	//}
-	for(const auto &cb : playerJoinCallbacks)
+	auto executeCallbacks = [](XUID playerXUID)
 	{
-		cb.cb(playerXUID);
-	}
+		for(const auto &cb : playerJoinCallbacks)
+		{
+			cb.cb(playerXUID);
+		}
+	};
+	std::thread(executeCallbacks, playerXUID).detach();
 }
 
 
@@ -1370,51 +1371,53 @@ void EvaluateGameState()
 {
 	p_EvaulateGameState(h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC));
 	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
-
-	if (previousGamestate != GameState) {
-		switch (GameState)
-		{
-			case 0: //Main Menu? (Client Only?)
-				for (const auto &cb : gamestateCallbacks["MainMenu"])
-				{
-					cb();
-				}
-				break;
-			case 1: //Lobby
-				for (const auto &cb : gamestateCallbacks["Lobby"])
-				{
-					cb();
-				}
-				break;
-			case 2: //Starting/Loading
-				for (const auto &cb : gamestateCallbacks["Starting"])
-				{
-					cb();
-				}
-				break;
-			case 3: //In game
-				for (const auto &cb : gamestateCallbacks["InGame"])
-				{
-					cb();
-				}
-				break;
-			case 4: //Post Game
-				for (const auto &cb : gamestateCallbacks["PostGame"])
-				{
-					cb();
-				}
-				break;
-			case 5: //Match Making
-				for (const auto &cb : gamestateCallbacks["MatchMaking"])
-				{
-					cb();
-				}
-				break;
-			default:
-				break;
+	auto executeCallbacks = [](BYTE GameState) {
+		if (previousGamestate != GameState) {
+			switch (GameState)
+			{
+				case 0: //Main Menu? (Client Only?)
+					for (const auto &cb : gamestateCallbacks["MainMenu"])
+					{
+						cb();
+					}
+					break;
+				case 1: //Lobby
+					for (const auto &cb : gamestateCallbacks["Lobby"])
+					{
+						cb();
+					}
+					break;
+				case 2: //Starting/Loading
+					for (const auto &cb : gamestateCallbacks["Starting"])
+					{
+						cb();
+					}
+					break;
+				case 3: //In game
+					for (const auto &cb : gamestateCallbacks["InGame"])
+					{
+						cb();
+					}
+					break;
+				case 4: //Post Game
+					for (const auto &cb : gamestateCallbacks["PostGame"])
+					{
+						cb();
+					}
+					break;
+				case 5: //Match Making
+					for (const auto &cb : gamestateCallbacks["MatchMaking"])
+					{
+						cb();
+					}
+					break;
+				default:
+					break;
+			}
+			previousGamestate = GameState;
 		}
-		previousGamestate = GameState;
-	}
+	};
+	std::thread(executeCallbacks, GameState).detach();
 }
 
 
