@@ -99,19 +99,6 @@ public:
 			return reinterpret_cast<T>(Base + (Server ? server : client));
 		}
 		
-		struct playerEventCallback
-		{
-			std::function<void(XUID)> cb;
-			std::string name;
-		};
-		typedef std::function<void(XUID)> playerEvent_Callback;
-		void registerPlayerLeaveCallback(const playerEvent_Callback &cb, std::string name);
-		void unregisterPlayerLeaveCallback(std::string name);
-		void playerLeaveEvent(XUID playerXUID);
-		void registerPlayerJoinCallback(const playerEvent_Callback &cb, std::string name);
-		void unregisterPlayerJoinCallback(std::string name);
-		void playerJoinEvent(XUID playerXUID);
-		
 private:
 		DWORD Base;
 		scnr_type mapType;

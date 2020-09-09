@@ -84,6 +84,6 @@ public:
 	static std::string getChecksum();
 	static wchar_t* getPlaylistFile();
 	static int uploadStats(char* filepath);
-	static void playerLeftEvent(XUID playerXUID);
-	static void playerJoinEvent(XUID playerXUID);
+	static void playerLeftEvent(int peerIndex);
+	static void playerJoinEvent(int peerIndex);
 };

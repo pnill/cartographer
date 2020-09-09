@@ -585,19 +585,19 @@ struct compare
 		return (i == key);
 	}
 };
-void StatsHandler::playerLeftEvent(XUID playerXUID)
+void StatsHandler::playerLeftEvent(int peerIndex)
 {
-	auto it = std::find(alreadySent.begin(), alreadySent.end(), playerXUID);
+	auto it = std::find(alreadySent.begin(), alreadySent.end(), NetworkSession::getPeerXUID(peerIndex));
 	if(it != alreadySent.end())
 		alreadySent.erase(alreadySent.begin() + std::distance(alreadySent.begin(), it));
 }
-void StatsHandler::playerJoinEvent(XUID playerXUID)
+void StatsHandler::playerJoinEvent(int peerIndex)
 {
-	//No need to do anything fancy like filtering or 
-	//another function to send a specific rank
-	//The main function already filters out players
-	//who have been sent their rank before so just fire
-	//the main function.
+	/*No need to do anything fancy like filtering or 
+	 *another function to send a specific rank
+	 *The main function already filters out players
+	 *who have been sent their rank before so just fire
+	 *the main function.*/
 	sendRankChange();
 }
 rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)

@@ -6,8 +6,7 @@
 #include "XLive\XUser\XUser.h"
 #include "..\Memory\bitstream.h"
 #include "..\..\MapManager\MapManager.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD/Modules/Utils/Utils.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.h"
 
 char g_network_message_types[e_network_message_types::end * 32];
 
@@ -258,11 +257,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 		{
 			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
-			auto XUID = NetworkSession::getPeerXUID(peer_index);
-			if (XUID != NONE)
-			{
-				h2mod->playerLeaveEvent(XUID);
-			}
+			EventHandler::executeNetworkPlayerRemoveCallbacks(peer_index);
 		}
 	}
 	default:
@@ -289,8 +284,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 			{
 				auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
-				auto XUID = NetworkSession::getPeerXUID(peer_index);
-				h2mod->playerJoinEvent(XUID);
+				EventHandler::executeNetworkPlayerAddCallbacks(peer_index);
 			}
 		}
 		default:

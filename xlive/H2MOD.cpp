@@ -17,6 +17,7 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.h"
 
 
 H2MOD* h2mod = new H2MOD();
@@ -1292,133 +1293,17 @@ void H2MOD::ApplyUnitHooks()
 }
 
 
-
-std::vector<H2MOD::playerEventCallback> playerLeaveCallbacks;
-void H2MOD::registerPlayerLeaveCallback(const playerEvent_Callback &cb, std::string name)
-{
-	playerLeaveCallbacks.push_back({cb, name});
-}
-void H2MOD::unregisterPlayerLeaveCallback(std::string name)
-{
-	for (std::vector<H2MOD::playerEventCallback>::size_type i = 0; i != playerLeaveCallbacks.size(); i++) {
-		if(playerLeaveCallbacks[i].name == name)
-		{
-			playerLeaveCallbacks.erase(playerLeaveCallbacks.begin() + i);
-			break;
-		}
-	}
-}
-void H2MOD::playerLeaveEvent(XUID playerXUID)
-{
-	LOG_TRACE_GAME("Player Leave Event..");
-	auto executeCallbacks = [](XUID playerXUID)
-	{
-		for(const auto &cb : playerLeaveCallbacks)
-		{
-			cb.cb(playerXUID);
-		}
-	};
-	std::thread(executeCallbacks, playerXUID).detach();
-}
-
-std::vector<H2MOD::playerEventCallback> playerJoinCallbacks;
-void H2MOD::registerPlayerJoinCallback(const playerEvent_Callback& cb, std::string name)
-{
-	playerJoinCallbacks.push_back({ cb, name });
-}
-void H2MOD::unregisterPlayerJoinCallback(std::string name)
-{
-	for (std::vector<H2MOD::playerEventCallback>::size_type i = 0; i != playerJoinCallbacks.size(); i++) {
-		if (playerJoinCallbacks[i].name == name)
-		{
-			playerJoinCallbacks.erase(playerJoinCallbacks.begin() + i);
-			break;
-		}
-	}
-}
-void H2MOD::playerJoinEvent(XUID playerXUID)
-{
-	LOG_TRACE_GAME("Player Join Event..");
-	auto executeCallbacks = [](XUID playerXUID)
-	{
-		for(const auto &cb : playerJoinCallbacks)
-		{
-			cb.cb(playerXUID);
-		}
-	};
-	std::thread(executeCallbacks, playerXUID).detach();
-}
-
-
-
 static BYTE previousGamestate = 0;
 typedef int(__thiscall* ChangeGameState)(BYTE* this_);
 ChangeGameState p_EvaulateGameState;
-typedef std::function<void()> GameState_Callback;
-
-
-std::map<std::string, std::vector<GameState_Callback> > gamestateCallbacks;
-void registerGamestateCallback(const GameState_Callback &cb, std::string GameState)
-{
-	//For functions that require no paramters
-	//registerGamestateCallback(&Class->function, "Lobby");
-
-	//For functions that require parameters create a lambda container
-	//registerGamestateCallback([]() { commands->display("Apple Jacks"); }, "Lobby");
-	
-	gamestateCallbacks[GameState].push_back(cb);
-}
 void EvaluateGameState()
 {
 	p_EvaulateGameState(h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC));
 	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
-	auto executeCallbacks = [](BYTE GameState) {
-		if (previousGamestate != GameState) {
-			switch (GameState)
-			{
-				case 0: //Main Menu? (Client Only?)
-					for (const auto &cb : gamestateCallbacks["MainMenu"])
-					{
-						cb();
-					}
-					break;
-				case 1: //Lobby
-					for (const auto &cb : gamestateCallbacks["Lobby"])
-					{
-						cb();
-					}
-					break;
-				case 2: //Starting/Loading
-					for (const auto &cb : gamestateCallbacks["Starting"])
-					{
-						cb();
-					}
-					break;
-				case 3: //In game
-					for (const auto &cb : gamestateCallbacks["InGame"])
-					{
-						cb();
-					}
-					break;
-				case 4: //Post Game
-					for (const auto &cb : gamestateCallbacks["PostGame"])
-					{
-						cb();
-					}
-					break;
-				case 5: //Match Making
-					for (const auto &cb : gamestateCallbacks["MatchMaking"])
-					{
-						cb();
-					}
-					break;
-				default:
-					break;
-			}
-			previousGamestate = GameState;
-		}
-	};
-	std::thread(executeCallbacks, GameState).detach();
+	if (previousGamestate != GameState) {
+		previousGamestate = GameState;
+		EventHandler::executeGameStateCallbacks(GameState);
+	}
 }
 
 void H2MOD::RegisterEvents()
@@ -1427,21 +1312,40 @@ void H2MOD::RegisterEvents()
 	if(!h2mod->Server)//Client only callbacks	
 	{
 		//Register callback to reset rank to 255 on mainmenu
-		registerGamestateCallback([]() { h2mod->set_local_rank(255); }, "MainMenu");
+		//registerGamestateCallback([]() { h2mod->set_local_rank(255); }, "MainMenu");
+		EventHandler::registerGameStateCallback({
+				"StatsResetRank",
+				GS_MainMenu,
+				[]() {h2mod->set_local_rank(255);}
+			}, false);
 	}
 	else //Server only callbacks
 	{
 		//Register callback on Post Game to upload the stats to the server
-		registerGamestateCallback(&stats_handler->sendStats, "PostGame");
+		EventHandler::registerGameStateCallback({
+				"StatsSendStats",
+				GS_PostGame,
+				&stats_handler->sendStats
+			}, true);
 		//Register callback to send player ranks on lobby
-		registerGamestateCallback([]() {stats_handler->sendRankChange(true);}, "Lobby");
+		EventHandler::registerGameStateCallback({
+				"StatsSendRanks",
+				GS_Lobby,
+				[]() {stats_handler->sendRankChange(true);}
+			}, true);
 		//register callback on player leave to remove them from the packet filter
-		registerPlayerLeaveCallback(&stats_handler->playerLeftEvent, "statshandler");
+		EventHandler::registerNetworkPlayerRemoveCallback({
+				"StatsPlayerLeave",
+				stats_handler->playerLeftEvent
+			}, false);
 		//register callback on player join to send them their rank.
-		registerPlayerJoinCallback(&stats_handler->playerJoinEvent, "statshandler");
+		EventHandler::registerNetworkPlayerAddCallback({
+				"StatsPlayerJoin",
+				stats_handler->playerJoinEvent
+			}, true);
 	}
 	//Things that apply to both
-
+	
 }
 
 
