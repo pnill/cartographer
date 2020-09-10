@@ -20,7 +20,7 @@
 #pragma comment(lib, "libcurl_a.lib")
 #endif
 
-static const bool verbose = true;
+static const bool verbose = false;
 StatsHandler::StatsHandler()
 {
 	
