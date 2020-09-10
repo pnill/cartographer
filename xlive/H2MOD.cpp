@@ -18,6 +18,7 @@
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/Utils/Utils.h"
 
 
 H2MOD* h2mod = new H2MOD();
@@ -1306,6 +1307,31 @@ void EvaluateGameState()
 	}
 }
 
+typedef char(_cdecl* startCountdownTimer)(char a1, int countdown_time, int a2, int a3, char a4);
+startCountdownTimer p_StartCountdownTimer;
+static int previousPlayerCount = 0;
+char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, char a4)
+{
+	char result = 0;
+	if(H2Config_minimum_player_start > 0)
+	{
+		int playerCount = NetworkSession::getPlayerCount();
+		if(previousPlayerCount != playerCount)
+		{
+
+		}
+		previousPlayerCount = playerCount;
+		if (playerCount >= H2Config_minimum_player_start)
+			result = p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
+		else
+			result = 0;
+	} 
+	else
+		result = p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
+
+	return result;
+}
+
 void H2MOD::RegisterEvents()
 {
 
@@ -1452,7 +1478,8 @@ void H2MOD::ApplyHooks() {
 	else {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
-
+		p_StartCountdownTimer = h2mod->GetAddress<startCountdownTimer>(0, 0x19718A);
+		PatchCall(GetAddress(0, 0xBF54), StartCountdownTimer);
 		ServerConsole::ApplyHooks();
 	}
 }
@@ -1475,6 +1502,10 @@ void H2MOD::Initialize()
 			DiscordInterface::Init();
 			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
 		}
+	}
+	else
+	{
+		stats_handler->verifySendPlaylist();
 	}
 
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");

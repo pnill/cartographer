@@ -50,6 +50,23 @@ public:
 			}
 		}
 	}
+	static void verifySendPlaylist()
+	{
+		if(h2mod->Server)
+		{
+			int verifyPlaylistResponse = verifyPlaylist();
+			if (verifyPlaylistResponse == 500 || verifyPlaylistResponse == -1)
+			{
+				LOG_ERROR_GAME(L"[H2MOD] Playlist Verification encountered a server error");
+			}
+			else if (verifyPlaylistResponse == 201)
+			{
+				if (uploadPlaylist() != 200) {
+					LOG_ERROR_GAME(L"[H2MOD] Playlist Uploading encountered an error");
+				}
+			}
+		}
+	}
 	static void sendRankChange(bool forceAll = false)
 	{
 		if (NetworkSession::localPeerIsSessionHost())

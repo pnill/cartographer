@@ -587,6 +587,7 @@ struct compare
 };
 void StatsHandler::playerLeftEvent(int peerIndex)
 {
+	//LeftPlayers.push_back(XUID)
 	auto it = std::find(alreadySent.begin(), alreadySent.end(), NetworkSession::getPeerXUID(peerIndex));
 	if(it != alreadySent.end())
 		alreadySent.erase(alreadySent.begin() + std::distance(alreadySent.begin(), it));

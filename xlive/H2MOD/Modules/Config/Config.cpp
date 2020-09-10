@@ -104,6 +104,7 @@ int H2Config_debug_log_level = 2;
 bool H2Config_debug_log_console = false;
 char H2Config_login_identifier[255] = { "" };
 char H2Config_login_password[255] = { "" };
+int H2Config_minimum_player_start = 0;
 
 //weapon crosshair sizes
 int H2Config_BATRIF_WIDTH = 1;
@@ -390,6 +391,11 @@ void SaveH2Config() {
 			fputs("\n# By default, 25 seconds are added to post game carnage time from the playlist setting.", fileConfig);
 			fputs("\n# Now you have the possibility to change it to your preference.", fileConfig);
 			fputs("\n\n", fileConfig);
+
+			fputs("# minimum_player_start options (Server):", fileConfig);
+			fputs("\n# Changes the starting behaviour of the countdown, setting this to any value (1-16) will cause the", fileConfig);
+			fputs("\n# Server to not start until the player count is equal to or above the given value. A value of 0 will disable this setting.", fileConfig);
+			fputs("\n\n", fileConfig);
 		}
 		if (!H2IsDediServer) {
 			fputs("# hotkey_... Options (Client):", fileConfig);
@@ -499,6 +505,8 @@ void SaveH2Config() {
 			fprintf_s(fileConfig, "\nserver_playlist = %s", H2Config_dedi_server_playlist);
 
 			fprintf_s(fileConfig, "\nadditional_pcr_time = %d", H2Config_additional_pcr_time);
+
+			fprintf_s(fileConfig, "\nminimum_player_start = %d", H2Config_minimum_player_start);
 		}
 
 		if (H2IsDediServer) {
@@ -626,6 +634,7 @@ static bool est_sens_mouse = false;
 static bool est_disable_ingame_keyboard = false;
 static bool est_hide_ingame_chat = false;
 static bool est_xdelay = false;
+static bool est_minimum_player_start = false;
 /*
 static bool est_voice_chat = false;
 static bool est_als_mp_explosion_physics = false;
@@ -709,6 +718,7 @@ static void est_reset_vars() {
 	est_disable_ingame_keyboard = false;
 	est_hide_ingame_chat = false;
 	est_xdelay = false;
+	est_minimum_player_start = false;
 	/*
 	est_voice_chat = false;
 	est_als_mp_explosion_physics = false;
@@ -1453,6 +1463,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_xdelay = true;
 			}
 		}
+
 /*
 		else if (sscanf(fileLine, "voice_chat =%d", &tempint1) == 1) {
 			if (est_voice_chat) {
@@ -1628,6 +1639,19 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_server_playlist = true;
 			}
 		}
+		else if (H2IsDediServer && sscanf(fileLine, "minimum_player_start =%d", &tempint1) == 1)
+		{
+		if (est_minimum_player_start) {
+			duplicated = true;
+		}
+		else if (!(tempint1 >= 0)) {
+			incorrect = true;
+		}
+		else {
+			H2Config_minimum_player_start = tempint1;
+			est_minimum_player_start = true;
+		}
+		}
 		else if (H2IsDediServer && ownsConfigFile && strstr(fileLine, "login_identifier =")) {
 			if (est_login_identifier) {
 				duplicated = true;
@@ -1670,6 +1694,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				est_login_password = true;
 			}
 		}
+
 		else if (!H2IsDediServer && sscanf(fileLine, "hotkey_help =%d", &tempint1) == 1) {
 			if (est_hotkey_help) {
 				duplicated = true;

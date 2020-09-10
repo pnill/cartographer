@@ -62,6 +62,7 @@ extern int H2Config_hotkeyIdWindowMode;
 extern int H2Config_hotkeyIdToggleHideIngameChat;
 extern int H2Config_hotkeyIdGuide;
 extern int H2Config_hotkeyIdConsole;
+extern int H2Config_minimum_player_start;
 
 extern int H2Config_BATRIF_WIDTH;
 extern int H2Config_BATRIF_HEIGHT;
