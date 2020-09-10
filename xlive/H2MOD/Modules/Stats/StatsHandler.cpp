@@ -21,10 +21,6 @@
 #endif
 
 static const bool verbose = false;
-StatsHandler::StatsHandler()
-{
-	
-}
 /*
  * Player leave store the data  if non team game sort rank them at the bottom of the list
  * if team game rank them with their team, will require changes to the API. Will probably be easy
@@ -55,14 +51,13 @@ int StatsHandler::uploadPlaylist()
 	if(verbose)
 		LOG_INFO_GAME(pFile);
 	std::string checksum = getChecksum();
-	if (checksum == "")
+	if (checksum.empty())
 	{
 		LOG_ERROR_GAME(L"[H2MOD] playlistVerified failed to Hash Playlist file");
 		return -1;
 	}
 	if (verbose)
 		LOG_INFO_GAME(checksum);
-
 
 	CURL *curl;
 	CURLcode result;
@@ -543,12 +538,12 @@ char* StatsHandler::buildJSON()
 }
 
 
-struct stringMe {
+struct curl_response_text {
 	char *ptr;
 	size_t len;
 };
 
-static void init_string(struct stringMe *s) {
+static void init_curl_response(struct curl_response_text *s) {
 	s->len = 0;
 	s->ptr = (char*)malloc(s->len + 1);
 	if (s->ptr == NULL) {
@@ -558,7 +553,7 @@ static void init_string(struct stringMe *s) {
 	s->ptr[0] = '\0';
 }
 
-static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct stringMe *s)
+static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct curl_response_text *s)
 {
 	size_t new_len = s->len + size * nmemb;
 	s->ptr = (char*)realloc(s->ptr, new_len + 1);
@@ -650,8 +645,8 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 	if (curl)
 	{
 
-		struct stringMe s;
-		init_string(&s);
+		struct curl_response_text s;
+		init_curl_response(&s);
 
 
 		//Set the URL for the GET

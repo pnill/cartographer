@@ -276,19 +276,13 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 	p_handle_channel_message(thisx, network_channel_index, message_type, dynamic_data_size, packet);
 
-	switch(message_type)
-	{
-		case player_add:
+	if (message_type == player_add) {
+		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
+			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 		{
-			if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
-				&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
-			{
-				auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
-				EventHandler::executeNetworkPlayerAddCallbacks(peer_index);
-			}
+			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
+			EventHandler::executeNetworkPlayerAddCallbacks(peer_index);
 		}
-		default:
-			break;
 	}
 }
 

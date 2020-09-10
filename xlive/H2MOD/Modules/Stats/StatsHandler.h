@@ -34,8 +34,8 @@ public:
 					{
 						if(uploadStats(filepath) == 200)
 						{
-							//Stats upload success
-						} 
+							remove(filepath);
+						}
 						else
 						{
 							LOG_ERROR_GAME(L"[H2MOD] Stats Uploading encountered an error");
@@ -72,15 +72,10 @@ public:
 		if (NetworkSession::localPeerIsSessionHost())
 		{
 			auto document = getPlayerRanks(forceAll);
-			if (document.MemberCount() == 0)
-			{
-			}
-			else
+			if (document.MemberCount() != 0)
 			{
 				for (auto i = 0; i < document.MemberCount(); i++)
 				{
-					//LOG_INFO_GAME(document[i]["XUID"].GetString());
-					//LOG_INFO_GAME(document[i]["Rank"].GetString());
 					std::string::size_type sz = 0;
 					long long xuid = std::stoll(document[i]["XUID"].GetString(), &sz, 0);
 					int peer = NetworkSession::getPeerIndexFromXUID(xuid);

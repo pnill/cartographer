@@ -1353,27 +1353,17 @@ void EvaluateGameState()
 
 typedef char(_cdecl* startCountdownTimer)(char a1, int countdown_time, int a2, int a3, char a4);
 startCountdownTimer p_StartCountdownTimer;
-static int previousPlayerCount = 0;
 char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, char a4)
 {
-	char result = 0;
 	if(H2Config_minimum_player_start > 0)
 	{
-		int playerCount = NetworkSession::getPlayerCount();
-		if(previousPlayerCount != playerCount)
-		{
-
-		}
-		previousPlayerCount = playerCount;
-		if (playerCount >= H2Config_minimum_player_start)
-			result = p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
-		else
-			result = 0;
+		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
+			return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
+		
+		return 0;
 	} 
 	else
-		result = p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
-
-	return result;
+		return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
 }
 
 void H2MOD::RegisterEvents()
@@ -1431,12 +1421,6 @@ void H2MOD::ApplyHooks() {
 	//Hook to do stuff after Game State Change
 	p_EvaulateGameState = h2mod->GetAddress<ChangeGameState>(0x1d7738, 0x1BCDA8);
 	PatchCall(h2mod->GetAddress(0x1AD84D, 0x1A67CA), EvaluateGameState);
-	
-	
-	
-	
-	
-
 
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
