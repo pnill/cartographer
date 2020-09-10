@@ -525,7 +525,7 @@ char* StatsHandler::buildJSON()
 
 	swprintf(unix, 100, L"%.f", seconds);
 	
-	swprintf(fileOutPath, 1024, L"%wsstats\\%s-%s.json", H2ProcessFilePath, ServerName, unix);
+	swprintf(fileOutPath, 1024, L"%ws\\%s-%s.json", H2ProcessFilePath, ServerName, unix);
 	std::ofstream of(fileOutPath);
 	of << json;
 	if (!of.good())
