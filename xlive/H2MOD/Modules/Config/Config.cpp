@@ -366,10 +366,10 @@ void SaveH2Config() {
 				"\n# Now you have the possibility to change it to your preference."
 				"\n\n"
         
-        "# minimum_player_start options (Server):"
-        "\n# Changes the starting behaviour of the countdown, setting this to any value (1-16) will cause the"
-        "\n# Server to not start until the player count is equal to or above the given value. A value of 0 will disable this setting."
-        "\n\n"
+		        "# minimum_player_start options (Server):"
+		        "\n# Changes the starting behaviour of the countdown, setting this to any value (1-16) will cause the"
+		        "\n# Server to not start until the player count is equal to or above the given value. A value of 0 will disable this setting."
+		        "\n\n"
 				;
       
 		}
@@ -475,7 +475,7 @@ void SaveH2Config() {
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "server_playlist", H2Config_dedi_server_playlist);
 
-      ini.SetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
+			ini.SetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "additional_pcr_time", H2Config_additional_pcr_time);
 
 
@@ -730,7 +730,7 @@ void ReadH2Config() {
 
 				H2Config_additional_pcr_time = ini.GetLongValue(H2ConfigVersionSection.c_str(), "additional_pcr_time", H2Config_additional_pcr_time);
         
-        H2Config_minimum_player_start = ini.GetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
+				H2Config_minimum_player_start = ini.GetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
 
 				const char* login_identifier = ini.GetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 				if (login_identifier) {

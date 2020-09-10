@@ -21,6 +21,9 @@
 #endif
 
 static const bool verbose = false;
+StatsHandler::StatsHandler()
+= default;
+
 /*
  * Player leave store the data  if non team game sort rank them at the bottom of the list
  * if team game rank them with their team, will require changes to the API. Will probably be easy
