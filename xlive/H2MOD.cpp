@@ -1,8 +1,9 @@
+
 #include "H2MOD.h"
 
+#include "H2MOD/Modules/Config/Config.h"
 #include "Blam/Engine/FileSystem/FiloInterface.h"
 #include "H2MOD/Discord/DiscordInterface.h"
-#include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/HitFix/HitFix.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/MainMenu/Ranks.h"
@@ -19,11 +20,11 @@
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/Modules/Utils/Utils.h"
+#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
-Halo2Final* h2f = new Halo2Final();
 DeviceShop* device_shop = new DeviceShop();
 Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
@@ -38,14 +39,12 @@ bool b_GunGame = false;
 bool b_FireFight = false;
 bool b_XboxTick = false;
 bool b_Infection = false;
-bool b_Halo2Final = false;
 bool b_HeadHunter = false;
 
 std::unordered_map<wchar_t*, bool&> GametypesMap
 {
 	{ L"h2x", b_H2X },
 	{ L"ogh2", b_XboxTick },
-	{ L"h2f", b_Halo2Final },
 	{ L"gungame", b_GunGame },
 	{ L"zombies", b_Infection },
 	{ L"infection", b_Infection },
@@ -73,6 +72,20 @@ game_life_cycle get_game_life_cycle()
 }
 
 #pragma region engine calls
+
+int __cdecl call_get_game_tick_rate()
+{
+	typedef int(__cdecl* get_tickrate)();
+	auto p_get_tickrate = h2mod->GetAddress<get_tickrate>(0x28707);
+	return p_get_tickrate();
+}
+
+bool __cdecl call_is_game_minimized()
+{
+	typedef bool(__cdecl* is_game_is_minimized)();
+	auto p_game_is_minimized = h2mod->GetAddress<is_game_is_minimized>(0x28729);
+	return p_game_is_minimized();
+}
 
 char* __cdecl call_object_try_and_get_data_with_type(datum object_datum_index, int object_type_flags)
 {
@@ -330,11 +343,6 @@ bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObje
 	}
 
 	return h2mod->GetAddress<tcreate_unit_hook>(0x1F32DB, 0x1DE374)(pCreationData, a2, a3, pObject);
-}
-
-wchar_t* H2MOD::get_session_game_variant_name()
-{
-	return h2mod->GetAddress<wchar_t*>(0x97777C, 0x534A18);
 }
 
 void H2MOD::leave_session()
@@ -603,30 +611,51 @@ BYTE H2MOD::get_local_team_index()
 }
 #pragma endregion
 
-void H2MOD::disable_sound(int sound)
+void H2MOD::disable_sounds(int sound_flags)
 {
-	LOG_TRACE_GAME("tag data address: {:x}", tags::get_tag_data());
-	switch (sound)
+	static const std::string multiplayerGlobalsTag("multiplayer\\multiplayer_globals");
+	if (sound_flags)
 	{
-	case SoundType::Slayer:
-		LOG_TRACE_GAME("tag data address + 0xd7dfb4 = {:p}", tags::get_tag_data()[0xd7dfb4]);
-		*(DWORD*)(&tags::get_tag_data()[0xd7e05c]) = NONE;
-		*(DWORD*)(&tags::get_tag_data()[0xd7dfb4]) = NONE;
-		break;
+		datum multiplayerGlobalsTagIndex = tags::find_tag(blam_tag::tag_group_type::multiplayerglobals, multiplayerGlobalsTag);
 
-	case SoundType::GainedTheLead:
-		*(DWORD*)(&tags::get_tag_data()[0xd7ab34]) = NONE;
-		*(DWORD*)(&tags::get_tag_data()[0xd7ac84]) = NONE;
-		break;
+		if (!multiplayerGlobalsTagIndex.IsNull())
+		{
+			s_multiplayer_globals_group_definition* multiplayerGlobalsTag = tags::get_tag<blam_tag::tag_group_type::multiplayerglobals, s_multiplayer_globals_group_definition>(multiplayerGlobalsTagIndex);
 
-	case SoundType::LostTheLead:
-		*(DWORD*)(&tags::get_tag_data()[0xd7ad2c]) = NONE;
-		*(DWORD*)(&tags::get_tag_data()[0xd7add4]) = NONE;
-		break;
+			if (multiplayerGlobalsTag->runtime.size)
+			{
+				auto* runtime_tag_block_data = multiplayerGlobalsTag->runtime[0];
 
-	case SoundType::TeamChange:
-		*(DWORD*)(&tags::get_tag_data()[0xd7b9a4]) = NONE;
-		break;
+				if (sound_flags & FLAG(SoundType::Slayer))
+				{
+					runtime_tag_block_data->slayer_events.size = 0;
+					runtime_tag_block_data->slayer_events.data = 0;
+				}
+
+				if (sound_flags & ALL_SOUNDS_NO_SLAYER) // check if there is any point in running the code bellow
+				{
+					for (int i = 0; i < runtime_tag_block_data->general_events.size; i++)
+					{
+						using sound_events = s_multiplayer_globals_group_definition::s_runtime_block::s_general_events_block::e_event;
+						auto* general_event = runtime_tag_block_data->general_events[i];
+						auto event = general_event->event;
+						if (
+							(sound_flags & FLAG(SoundType::GainedTheLead) && (event == sound_events::gained_lead || event == sound_events::gained_team_lead))
+							|| (sound_flags & FLAG(SoundType::TeamChange) && event == sound_events::player_changed_team)
+							|| (sound_flags & FLAG(SoundType::LostTheLead) && (event == sound_events::lost_lead))
+							|| (sound_flags & FLAG(SoundType::TiedLeader) && (event == sound_events::tied_leader || event == sound_events::tied_team_leader))
+							)
+						{
+							// disable all sounds from english to chinese
+							for (int j = 0; j < 8; j++)
+							{
+								(&general_event->sound)[j].TagIndex = datum::Null;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -804,6 +833,8 @@ map_cache_load p_map_cache_load;
 
 bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 {
+	static bool resetAfterMatch = false;
+
 	bool result = p_map_cache_load(engine_settings);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
@@ -818,24 +849,19 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 
 	get_object_table_memory();
 
+	H2Tweaks::setHz();
 	H2Tweaks::setFOV(H2Config_field_of_view);
 	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
 	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
-	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
 
-	if (h2mod->GetMapType() == scnr_type::MainMenu)
+	// when the game is minimized, the game might skip loading Main menu
+	// this is where resetAfterMatch var comes in for help
+	if (resetAfterMatch)
 	{
-		addDebugText("Map Type: Main-Menu");
-
 		//TODO: issue #232
 		/*if (!NetworkSession::localPeerIsSessionHost()) {
 			advLobbySettings->resetLobbySettings();
 		}*/
-
-		if (b_Halo2Final && !h2mod->Server) {
-			h2f->Dispose();
-			b_Halo2Final = false;
-		}
 
 		if (b_Infection) {
 			infectionHandler->deinitializer->execute();
@@ -852,22 +878,28 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 			b_XboxTick = false;
 		}
 
+		resetAfterMatch = false;
+	}
+
+	if (h2mod->GetMapType() == scnr_type::MainMenu)
+	{
+		addDebugText("Map Type: Main-Menu");
 		UIRankPatch();
-		H2Tweaks::setHz();
+
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		return result;
 	}		
 
-	wchar_t* variant_name = h2mod->get_session_game_variant_name();
-	LOG_INFO_GAME(L"[h2mod] OnMapLoad map type {0}, variant name {1}", h2mod->GetMapType(), variant_name);
-	
+
+	wchar_t* variant_name = NetworkSession::getGameVariantName();
+	LOG_INFO_GAME(L"[h2mod] OnMapLoad map type {}, variant name {}", (int)h2mod->GetMapType(), variant_name);
+	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
 
 	for (auto gametype_it : GametypesMap)
 		gametype_it.second = false; // reset custom gametypes state
 
 	H2Tweaks::setSavedSens();
-
 	if (h2mod->GetMapType() == scnr_type::Multiplayer)
 	{
 		addDebugText("Map type: Multiplayer");
@@ -875,17 +907,17 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		for (auto gametype_it : GametypesMap)
 		{
 			if (StrStrIW(variant_name, gametype_it.first)) {
-				LOG_INFO_GAME(L"[h2mod] {1} custom gametype turned on!", gametype_it.first);
+				LOG_INFO_GAME(L"[h2mod] {} custom gametype turned on!", gametype_it.first);
 				gametype_it.second = true; // enable a gametype if substring is found
 			}
 		}
 
 		if (!b_XboxTick) 
 		{
-			HitFix::Initialize();
 			H2X::Initialize(b_H2X);
 			MPMapFix::Initialize();
 			H2Tweaks::applyMeleePatch(true);
+			HitFix::ApplyProjectileVelocity();
 			engine_settings->tickrate = XboxTick::setTickRate(false);
 		}
 		else
@@ -915,9 +947,6 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 			if (b_GunGame) {
 				gunGame->initializer->execute();
 			}
-
-			if (b_Halo2Final)
-				h2f->Initialize();
 		}
 
 	}
@@ -930,6 +959,9 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		H2Tweaks::applyMeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
 	}
+
+	// if we got this far, it means map is MP or SP, and if map load is called again, it should reset/deinitialize any custom gametypes
+	resetAfterMatch = true;
 
 	return result;
 }
@@ -1011,7 +1043,7 @@ void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 {
 	network_session* session = NetworkSession::getCurrentNetworkSession();
 	if ((session->parameters.field_8 == 4 && get_game_life_cycle() == life_cycle_pre_game)
-		|| (StrStrIW(h2mod->get_session_game_variant_name(), L"rvb") != NULL && teamIndex != 0 && teamIndex != 1)) {
+		|| (StrStrIW(NetworkSession::getGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
 		//rvb mode enabled, don't change teams
 		return;
 	}
@@ -1202,10 +1234,10 @@ float get_device_acceleration_scale(datum device_datum)
 {
 	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD tag_instances = (DWORD)tags::get_tag_instances();
-	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
+	BYTE* game_state_objects_header_table = (BYTE*)game_state_objects_header->datum;
 
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
-	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)game_state_objects_header_table + device_gamestate_offset * 4 + 8);
+	DWORD device_gamestate_datum_pointer = *(DWORD*)(game_state_objects_header_table + device_gamestate_offset * 4 + 8);
 	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 
 	__int16 device_control_index = device_control_datum & 0xFFFF;
@@ -1215,7 +1247,6 @@ float get_device_acceleration_scale(datum device_datum)
 	float acceleration_scale = *(float*)((BYTE*)device_control_tag_offset + tag_data + 0x14);
 
 	return acceleration_scale;
-
 }
 
 typedef int(__cdecl *tdevice_touch)(datum device_datum, datum unit_datum);
@@ -1264,6 +1295,19 @@ void __cdecl game_mode_engine_draw_team_indicators()
 
 	if (h2mod->drawTeamIndicators)
 		p_game_mode_engine_draw_team_indicators();
+}
+
+typedef short(__cdecl* get_enabled_teams_flags_def)(network_session*);
+get_enabled_teams_flags_def p_get_enabled_teams_flags;
+
+short __cdecl get_enabled_teams_flags(network_session* session)
+{
+	short default_teams_enabled_flags = p_get_enabled_teams_flags(session);
+	short new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
+	if (new_teams_enabled_flags)
+		return new_teams_enabled_flags;
+	else
+		return default_teams_enabled_flags;
 }
 
 void H2MOD::ApplyUnitHooks()
@@ -1420,6 +1464,8 @@ void H2MOD::ApplyHooks() {
 	ApplyUnitHooks();
 	mapManager->applyGamePatches();
 
+	HitFix::ApplyPatches();
+
 	// bellow hooks applied to specific executables
 	if (this->Server == false) {
 
@@ -1481,6 +1527,8 @@ void H2MOD::ApplyHooks() {
 		p_StartCountdownTimer = h2mod->GetAddress<startCountdownTimer>(0, 0x19718A);
 		PatchCall(GetAddress(0, 0xBF54), StartCountdownTimer);
 		ServerConsole::ApplyHooks();
+
+		p_get_enabled_teams_flags = (get_enabled_teams_flags_def)DetourFunc(h2mod->GetAddress<BYTE*>(0, 0x19698B), (BYTE*)get_enabled_teams_flags, 6);
 	}
 }
 

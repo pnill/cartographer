@@ -1,6 +1,4 @@
 
-#include "Globals.h"
-
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\ServerConsole\ServerConsole.h"

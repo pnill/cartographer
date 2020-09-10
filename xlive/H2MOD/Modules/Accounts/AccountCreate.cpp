@@ -89,7 +89,7 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password) {
 	free(escaped_user_email);
 	free(escaped_user_password);
 
-	int rtn_code = MasterHttpResponse("https://cartographer.online/create1", http_request_body_build, rtn_result);
+	int rtn_code = MasterHttpResponse(std::string(cartographerURL + "/create1"), http_request_body_build, rtn_result);
 	if (rtn_code == 0) {
 		rtn_code = InterpretMasterCreate(rtn_result);
 		if (rtn_code > 0) {

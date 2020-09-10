@@ -65,8 +65,8 @@ public:
 	static void spawnServerPlayerSetup(int playerIndex);
 	static void setPlayerAsHuman(int playerIndex);
 	static void setPlayerAsZombie(int playerIndex);
-	static void infectPlayer(datum unitDatumIndex, int playerIndex);
-	static void infectPlayers(datum unitDatumIndex, int playerIndex);
+	static void infectPlayer(int playerIndex, datum unitDatumIndex);
+	static void infectPlayers(int playerIndex, datum unitDatumIndex);
 	static void triggerSound(const wchar_t* name, int);
 	static int calculateZombiePlayerIndex();
 private:

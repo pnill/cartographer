@@ -7,7 +7,6 @@
 #include "H2MOD\Variants\VariantPlayer.h"
 #include "H2MOD\Variants\VariantSystem.h"
 #include "H2MOD\Variants\DeviceShop\DeviceShop.h"
-#include "H2MOD\Variants\H2Final\H2Final.h"
 #include "H2MOD\Variants\XboxTick\XboxTick.h"
 #include "Blam/Engine/DataArray/DataArray.h"
 #include "H2MOD\Variants\Infection\Infection.h"
@@ -33,12 +32,5 @@ extern bool displayXyz;
 
 extern std::map<DWORD, bool> achievementList;
 
-//some utility functions below
-std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
-std::vector<std::string> split(const std::string &s, char delim);
-
 extern int H2GetInstanceId();
 
-int stripWhitespace(wchar_t *inputStr);
-void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen);
-std::string ByteToHexStr(const BYTE* buffer, size_t size);

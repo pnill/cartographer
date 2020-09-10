@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "Globals.h"
 #include "ServerList.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -8,10 +7,11 @@
 #include "rapidjson/prettywriter.h"
 #include "curl/curl.h"
 
+#include "H2MOD\Modules\Utils\Utils.h"
+
 using namespace rapidjson;
 
 ServerList serverList;
-HANDLE ServerEnumHandle = INVALID_HANDLE_VALUE;
 extern unsigned short H2Config_base_port;
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -33,7 +33,7 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 
 	if (curl) {
 
-		std::string server_url = std::string("http://cartographer.online/live/servers/");
+		std::string server_url = std::string(cartographerURL + "/live/servers/");
 		server_url.append(std::to_string(xuid).c_str());
 
 		curl_easy_setopt(curl, CURLOPT_URL, server_url.c_str());
@@ -48,7 +48,6 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 			BadServer(xuid, nResult, "Missing Member: dwMaxPublicSlots");
 			return;
 		}
-
 		nResult->dwMaxPublicSlots = doc["dwMaxPublicSlots"].GetUint();
 
 		if (!doc.HasMember("dwFilledPublicSlots"))
@@ -56,7 +55,6 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 			BadServer(xuid, nResult, "Missing Member: dwFilledPublicSlots");
 			return;
 		}
-
 		nResult->dwFilledPublicSlots = doc["dwFilledPublicSlots"].GetUint();
 
 		if (!doc.HasMember("dwMaxPrivateSlots"))
@@ -64,9 +62,7 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 			BadServer(xuid, nResult, "Missing Member: dwFilledPublicSlots");
 			return;
 		}
-
 		nResult->dwMaxPrivateSlots = doc["dwMaxPrivateSlots"].GetUint();
-
 
 		if (!doc.HasMember("dwMaxFilledPrivateSlots"))
 		{
@@ -217,16 +213,14 @@ void QueryServerData(CURL* curl, ULONGLONG xuid, _XLOCATOR_SEARCHRESULT* nResult
 
 			current_property++;
 		}
-
-
 	}
 
 	++serverList.total_servers;
 }
 
-void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
+void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
 {
-	servptr->server_list_download_running = true;
+	this->ServerListDownloadRunning = true;
 
 	addDebugText("Requesting server list");
 
@@ -237,17 +231,17 @@ void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXO
 	if (!userSignedOnline(0))
 	{
 		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
-		pOverlapped->InternalHigh = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
+		pOverlapped->InternalHigh = 0;
 		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
-		servptr->servers_left = 0;
+		this->ServersLeftInDocumentCount = 0;
 
-		servptr->server_list_download_running = false;
+		this->ServerListDownloadRunning = false;
 		return;
 	}
 
 	curl = curl_easy_init();
 	if (curl) {
-		curl_easy_setopt(curl, CURLOPT_URL, "http://cartographer.online/live/server_list.php");
+		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/server_list.php"));
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
@@ -256,12 +250,12 @@ void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXO
 		document.Parse(readBuffer.c_str());
 
 		int server_count = document["servers"].Size();
-		servptr->servers_left = server_count;
+		this->ServersLeftInDocumentCount = server_count;
 
 		if (server_count * sizeof(_XLOCATOR_SEARCHRESULT) > cbBuffer) {
 
-			servptr->servers_left = -1;
-			servptr->server_list_download_running = false;
+			this->ServersLeftInDocumentCount = -1;
+			this->ServerListDownloadRunning = false;
 
 			pOverlapped->InternalLow = ERROR_INSUFFICIENT_BUFFER;
 			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
@@ -273,33 +267,45 @@ void GetServersFromHttp(ServerList* servptr, DWORD cbBuffer, CHAR* pvBuffer, PXO
 
 		for (auto& server : document["servers"].GetArray())
 		{
-			ULONGLONG xuid = std::stoll(server.GetString());
-			QueryServerData(curl, xuid, &server_buffer[servptr->GetTotalServers()]);
+			ZeroMemory(&server_buffer[this->GetTotalServers()], sizeof(XLOCATOR_SEARCHRESULT));
+			QueryServerData(curl, std::stoll(server.GetString()), &server_buffer[this->GetTotalServers()]);
 
-			servptr->servers_left--;
+			this->ServersLeftInDocumentCount--;
+			if (this->GetTotalServers() > 0)
+			{
+				pOverlapped->InternalLow = ERROR_SUCCESS;
+				pOverlapped->InternalHigh = this->GetTotalServers();
+				pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+			}
+		}
+		
+		// check if we didn't find any servers
+		if (this->GetTotalServers() == 0)
+		{
+			// if we didn't find any, let the game know
 			pOverlapped->InternalLow = ERROR_SUCCESS;
-			pOverlapped->InternalHigh = servptr->GetTotalServers();
+			pOverlapped->InternalHigh = 0;
 			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 		}
 
-		std::string debg_1 = "Server Count: " + std::to_string(servptr->GetTotalServers());
+		std::string debg_1 = "Server Count: " + std::to_string(this->GetTotalServers());
 		addDebugText(debg_1.c_str());
 		curl_easy_cleanup(curl);
 	}
 
-	servptr->server_list_download_running = false;
+	this->ServerListDownloadRunning = false;
 }
 
-void ServerList::GetServerCounts()
+void ServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 {
-	this->server_counts_download_running = true;
+	std::lock_guard<std::mutex> lg(GetServerCountsMutex);
 	CURL *curl;
 	CURLcode res;
 	std::string readBuffer;
 
 	curl = curl_easy_init();
 	if (curl) {
-		curl_easy_setopt(curl, CURLOPT_URL, "http://cartographer.online/live/dedicount.php");
+		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/dedicount.php"));
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
@@ -308,7 +314,6 @@ void ServerList::GetServerCounts()
 		rapidjson::Document document;
 		document.Parse(readBuffer.c_str());
 
-
 		if (document.HasMember("public_count"))
 		{
 			total_count = document["total"].GetInt();
@@ -316,14 +321,16 @@ void ServerList::GetServerCounts()
 			total_peer_gold = document["peer_gold"].GetInt();
 			total_public = document["public_count"].GetInt();
 			total_public_gold = document["public_gold"].GetInt();
+
+			// we updated the results, they can be used just fine
+			CountResultsUpdated = true;
 		}
 	}
-	this->server_counts_download_running = false;
 }
 
 int ServerList::GetServersLeft()
 {
-	return servers_left;
+	return ServersLeftInDocumentCount;
 }
 
 int ServerList::GetTotalServers()
@@ -333,29 +340,31 @@ int ServerList::GetTotalServers()
 
 bool ServerList::GetRunning()
 {
-	return server_list_download_running;
+	return ServerListDownloadRunning;
 }
 
 void ServerList::GetServers(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
 {
-	// check if another thread isn't running and servers_left is in "unitialized state"
-	if (!this->server_list_download_running && this->servers_left == -1)
+	// check if another thread isn't running and ServersLeftInDocumentCount is in "unitialized state"
+	if (!this->ServerListDownloadRunning && this->ServersLeftInDocumentCount == -1)
 	{
 		this->total_servers = 0;
-		this->serv_thread = std::thread(GetServersFromHttp, this, cbBuffer, pvBuffer, pOverlapped);
+		this->serv_thread = std::thread(&ServerList::GetServersFromHttp, this, cbBuffer, pvBuffer, pOverlapped);
 		this->serv_thread.detach();
 	}
 
-	if (this->servers_left == 0)
+	// if there are no more servers to be read from the received document, return ERROR_NO_MORE_FILES
+	if (this->ServersLeftInDocumentCount == 0)
 	{
-		// reset servers_left to "unitialized state"
-		this->servers_left = -1;
+		// reset ServersLeftInDocumentCount to "unitialized state"
+		this->ServersLeftInDocumentCount = -1;
 
 		// set the ERROR_NO_MORE_FILES flag to tell the game XEnumerate is done searching
 		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
 		pOverlapped->InternalHigh = this->GetTotalServers();
 		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
 	}
+	// otherwise tell the game we are still running I/O operations
 	else
 	{
 		pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
@@ -363,8 +372,10 @@ void ServerList::GetServers(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverla
 	}
 }
 
-void RemoveServer(PXOVERLAPPED pOverlapped)
+void ServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 {
+	std::lock_guard<std::mutex> lk(RemoveServerMutex);
+
 	CURL *curl;
 	CURLcode res;
 	std::string readBuffer;
@@ -374,7 +385,7 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
 	curl = curl_easy_init();
-	if (curl && userSignedOnline(0))
+	if (curl)
 	{
 		rapidjson::Document document;
 		document.SetObject();
@@ -389,7 +400,7 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
 
-		curl_easy_setopt(curl, CURLOPT_URL, "http://cartographer.online/live/del_server.php");
+		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/del_server.php"));
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);
@@ -403,8 +414,10 @@ void RemoveServer(PXOVERLAPPED pOverlapped)
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 }
 
-void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
+void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
 {
+	std::lock_guard<std::mutex> lk(AddServerMutex);
+
 	CURL *curl;
 	CURLcode res;
 	std::string readBuffer;
@@ -444,6 +457,9 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 
 		for (DWORD i = 0; i < cProperties; i++)
 		{
+			if (pProperties[i].dwPropertyId == XUSER_PROPERTY_USERNAME_2) // this data isn't set right by the game
+				continue;
+
 			Value property(kObjectType);
 			property.AddMember("dwPropertyId", Value().SetInt(pProperties[i].dwPropertyId), document.GetAllocator());
 			property.AddMember("type", Value().SetInt(pProperties[i].value.type), document.GetAllocator());
@@ -471,26 +487,21 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 			document["pProperties"].PushBack(property, document.GetAllocator());
 		}
 
+		char* name = strnlen_s(H2Config_dedi_server_name, XUSER_MAX_NAME_LENGTH) > 0 ? H2Config_dedi_server_name : usersSignInInfo[dwUserIndex].szUserName;
+
 		/* For whatever reason the game is currently refusing to send the servername or player profile name so we're going to send it ourselves.*/
-		Value serv_name(kObjectType);
-		serv_name.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_SERVER_NAME), document.GetAllocator());
-		serv_name.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_UNICODE), document.GetAllocator());
-		if (h2mod->Server && strlen(H2Config_dedi_server_name) != 0)
-			serv_name.AddMember("value", Value().SetString(H2Config_dedi_server_name, strlen(H2Config_dedi_server_name), document.GetAllocator()), document.GetAllocator());
-		else
-			serv_name.AddMember("value", Value().SetString(usersSignInInfo[dwUserIndex].szUserName, XUSER_NAME_SIZE, document.GetAllocator()), document.GetAllocator());
+		Value serv_name_property(kObjectType);
+		serv_name_property.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_SERVER_NAME), document.GetAllocator());
+		serv_name_property.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_UNICODE), document.GetAllocator());
+		serv_name_property.AddMember("value", Value().SetString(name, strnlen_s(name, XUSER_MAX_NAME_LENGTH), document.GetAllocator()), document.GetAllocator());
 
-		document["pProperties"].PushBack(serv_name, document.GetAllocator());
+		Value user_name_property(kObjectType);
+		user_name_property.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_USERNAME_2), document.GetAllocator());
+		user_name_property.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_UNICODE), document.GetAllocator());
+		user_name_property.AddMember("value", Value().SetString(name, strnlen_s(name, XUSER_MAX_NAME_LENGTH), document.GetAllocator()), document.GetAllocator());
 
-		Value user_name(kObjectType);
-		user_name.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_USERNAME_2), document.GetAllocator());
-		user_name.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_UNICODE), document.GetAllocator());
-		if (h2mod->Server && strlen(H2Config_dedi_server_name) != 0)
-			user_name.AddMember("value", Value().SetString(H2Config_dedi_server_name, strlen(H2Config_dedi_server_name), document.GetAllocator()), document.GetAllocator());
-		else
-			user_name.AddMember("value", Value().SetString(usersSignInInfo[dwUserIndex].szUserName, XUSER_NAME_SIZE, document.GetAllocator()), document.GetAllocator());
-
-		document["pProperties"].PushBack(user_name, document.GetAllocator());
+		document["pProperties"].PushBack(user_name_property, document.GetAllocator());
+		document["pProperties"].PushBack(serv_name_property, document.GetAllocator());
 
 		Value user_int(kObjectType);
 		user_int.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_USER_INT), document.GetAllocator());
@@ -508,7 +519,7 @@ void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, 
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
 
-		curl_easy_setopt(curl, CURLOPT_URL, "http://cartographer.online/live/add_server.php");
+		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/add_server.php"));
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);
@@ -526,7 +537,7 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 {
 	if (userSignedOnline(dwUserIndex))
 	{
-		std::thread(AddServer, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
+		std::thread(&ServerList::AddServer, &serverList, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
 		return HRESULT_FROM_WIN32(ERROR_IO_PENDING);
 	}
 	else
@@ -535,9 +546,10 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 
 DWORD WINAPI XLocatorServerUnAdvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
 {
+	LOG_TRACE_XLIVE("XLocatorServerUnAdvertise()");
 	if (userSignedOnline(dwUserIndex))
 	{
-		std::thread(RemoveServer, pOverlapped).detach();
+		std::thread(&ServerList::RemoveServer, &serverList, pOverlapped).detach();
 		return HRESULT_FROM_WIN32(ERROR_IO_PENDING);
 	}
 	else
@@ -550,13 +562,23 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 	// LOG_TRACE_XLIVE("XLocatorGetServiceProperty  (*** checkme ***) (dwUserIndex = {0:x}, cNumProperties = {1:x}, pProperties = {2:x}, pOverlapped = {3:x})",
 	//		dwUserIndex, cNumProperties, pProperties, pOverlapped);
 
-	if (!serverList.server_counts_download_running && userSignedOnline(dwUserIndex))
-		std::thread(&ServerList::GetServerCounts, &serverList).detach();
+	// hacky but does the job, because the memory we are writing to is not global (at least in H2v)
+	if (userSignedOnline(dwUserIndex))
+		std::thread(&ServerList::GetServerCounts, &serverList, pOverlapped).detach();
 
-	pProperties[0].value.nData = serverList.total_count;
-	pProperties[1].value.nData = serverList.total_public;
-	pProperties[2].value.nData = serverList.total_peer_gold + serverList.total_public_gold != -2 ? serverList.total_peer_gold + serverList.total_public_gold : -1;
-	pProperties[3].value.nData = serverList.total_peer;
+	// we simply just give the game the results synchronously, if we have any
+	// it'll query the data each 5 seconds
+	if (serverList.CountResultsUpdated)
+	{
+		pProperties[0].value.nData = serverList.total_count;
+		pProperties[1].value.nData = serverList.total_public;
+		pProperties[2].value.nData = serverList.total_peer_gold;
+		pProperties[3].value.nData = serverList.total_peer;
+	}
+
+	pOverlapped->InternalLow = ERROR_SUCCESS;
+	pOverlapped->InternalHigh = 0;
+	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 
 	return S_OK;
 }
@@ -565,16 +587,15 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 // 5234: ??
 DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, DWORD* pcbBuffer, PHANDLE phEnum)
 {
-	LOG_TRACE_XLIVE("XLocatorCreateServerEnumerator");
+	LOG_TRACE_XLIVE("XLocatorCreateServerEnumerator()");
 
 	*pcbBuffer = (DWORD)(sizeof(_XLOCATOR_SEARCHRESULT) * 200); // 200 is the maximum XLocator could hold per title
 
 	if (phEnum)
 	{
-		*phEnum = CreateMutex(NULL, NULL, NULL);
+		serverList.Handle = *phEnum = CreateMutex(NULL, NULL, NULL);
 
 		LOG_TRACE_XLIVE("- Handle = {:p}", (void*)*phEnum);
-		ServerEnumHandle = *phEnum;
 	}
 
 	// not done - error now
@@ -585,7 +606,7 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, int a2, int a3, int a4, int 
 // 5238: ??
 DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey)
 {
-	LOG_TRACE_XLIVE("XLocatorCreateKey");
+	LOG_TRACE_XLIVE("XLocatorCreateKey()");
 	if (pxnkid && pxnkey) {
 		XNetCreateKey(pxnkid, pxnkey);
 
@@ -600,9 +621,9 @@ DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey)
 // 5235: ??
 DWORD WINAPI XLocatorCreateServerEnumeratorByIDs(DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6, DWORD a7, DWORD a8)
 {
-	LOG_TRACE_XLIVE("XLocatorCreateServerEnumeratorByIDs");
+	LOG_TRACE_XLIVE("XLocatorCreateServerEnumeratorByIDs()");
 	// not done - error now
-	return 0x57;
+	return ERROR_INVALID_PARAMETER;
 }
 
 

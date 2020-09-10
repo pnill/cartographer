@@ -6,7 +6,7 @@ int FindLineStart(FILE* fp, int lineStrLen);
 bool GetFileLine(FILE* fp, char* &fileLine);
 char CmpVersions(char* version_base, char* version_alt);
 void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* headerVersion, int(interpretSettingFunc)(char* fileLine, char* version, int lineNumber));
-void GetVKeyCodeString(int vkey, char* rtnString, int strLen);
+std::string GetVKeyCodeString(int vkey);
 void PadCStringWithChar(char* strToPad, int toFullLength, char c);
 int GetWidePathFromFullWideFilename(wchar_t* filepath, wchar_t* rtnpath);
 LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue);
@@ -80,13 +80,14 @@ extern const int ERROR_CODE_CURL_SOCKET_FAILED;
 extern const int ERROR_CODE_CURL_HANDLE;
 extern const int ERROR_CODE_CURL_EASY_PERF;
 ///FREE MEMOERY in rtn_response if returned 0 (success).
-int MasterHttpResponse(char* url, char* http_request, char* &rtn_response);
+int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response);
 
 bool StrnCaseInsensEqu(char* str1, char* str2, unsigned int chk_len);
 
 void EnsureDirectoryExists(wchar_t* path);
 
 int TrimRemoveConsecutiveSpaces(char* text);
+
 //Converts int types to string given a format std::oct, std::dec, std::hex.
 template<class T>
 std::string IntToString(T t, std::ios_base & (*f)(std::ios_base&))
@@ -101,3 +102,11 @@ std::wstring IntToWString(T t, std::ios_base & (*f)(std::ios_base&))
 	auto out = IntToString(t, f);
 	return std::wstring(out.begin(), out.end());
 }
+
+//some utility functions below
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
+std::vector<std::string> split(const std::string &s, char delim);
+
+int stripWhitespace(wchar_t *inputStr);
+void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen);
+std::string ByteToHexStr(const BYTE* buffer, size_t size);

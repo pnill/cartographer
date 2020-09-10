@@ -15,6 +15,6 @@ const int SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT = 7;
 
 void UpdateConnectionStatus();
 bool HandleGuiLogin(char* token, char* identifier, char* password, int* master_login_interpret_result);
-char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long saddr, unsigned long xnaddr, char* abEnet, char* abOnline, bool onlineSignIn);
+char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long lanaddr, unsigned long xnaddr, const char* abEnet, const char* abOnline, bool onlineSignIn);
 
 extern bool AccountEdit_remember;

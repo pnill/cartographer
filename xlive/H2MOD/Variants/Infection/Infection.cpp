@@ -105,12 +105,12 @@ void Infection::initClient()
 }
 
 void Infection::resetZombiePlayerStatus() {
-	Infection::zombieIdentifiers.clear();
+	zombieIdentifiers.clear();
 }
 
 void Infection::setZombiePlayerStatus(int playerIndex)
 {
-	Infection::zombieIdentifiers.push_back(getPlayerXuid(playerIndex));
+	zombieIdentifiers.push_back(getPlayerXuid(playerIndex));
 }
 
 void Infection::initHost() {
@@ -125,10 +125,7 @@ void Infection::disableSlayerSounds()
 {
 	LOG_TRACE_GAME("[h2mod-infection] Disabling slayer sounds");
 	//disable slayer sounds for the infection game type
-	h2mod->disable_sound(SoundType::Slayer);
-	h2mod->disable_sound(SoundType::GainedTheLead);
-	h2mod->disable_sound(SoundType::LostTheLead);
-	h2mod->disable_sound(SoundType::TeamChange);
+	h2mod->disable_sounds(FLAG(SoundType::Slayer) | ALL_SOUNDS_NO_SLAYER);
 }
 
 void Infection::resetWeaponInteractionAndEmblems() {
@@ -143,7 +140,12 @@ void Infection::preSpawnServerSetup() {
 	do {
 		if (playerIsActive(playerIndex)) {
 			XUID playerIdentifier = getPlayerXuid(playerIndex);
-			BOOL isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
+			bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
+			if (getPlayerTeam(playerIndex) == ZOMBIE_TEAM && isZombie == false) {
+				// if the player just joined the and he doesn't have zombie status, and his team is green, add him in the array
+				setZombiePlayerStatus(playerIndex); 
+				isZombie = true;
+			}
 
 			LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={0}, isZombie={1}, playerIdentifier={2}, playerName:{3}", playerIndex, isZombie, playerIdentifier, getPlayerName(playerIndex));
 			if (isZombie) {
@@ -226,7 +228,7 @@ void Infection::spawnServerPlayerSetup(int playerIndex) {
 	}
 }
 
-void Infection::infectPlayer(datum unitDatumIndex, int playerIndex) {
+void Infection::infectPlayer(int playerIndex, datum unitDatumIndex) {
 	char* unit_object = call_object_try_and_get_data_with_type(unitDatumIndex, FLAG(e_object_type::biped));
 	if (unit_object && h2mod->get_unit_team_index(unitDatumIndex) != ZOMBIE_TEAM)
 	{
@@ -248,7 +250,7 @@ void Infection::infectPlayer(datum unitDatumIndex, int playerIndex) {
 	}
 }
 
-void Infection::infectPlayers(datum unitDatumIndex, int playerIndex) {
+void Infection::infectPlayers(int playerIndex, datum unitDatumIndex) {
 	char* unit_object = call_object_try_and_get_data_with_type(unitDatumIndex, FLAG(e_object_type::biped));
 	if (unit_object) {
 		Infection::setZombiePlayerStatus(playerIndex);
@@ -264,16 +266,16 @@ void ZombieDeathHandler::onPeerHost()
 {
 	int PlayerIndex = h2mod->get_player_index_from_unit_datum(this->getUnitDatumIndex());
 	//infect peer host
-	Infection::infectPlayer(this->getUnitDatumIndex(), PlayerIndex);
+	Infection::infectPlayer(PlayerIndex, this->getUnitDatumIndex());
 
 	//infect other players if applicable
-	Infection::infectPlayers(this->getUnitDatumIndex(), PlayerIndex);
+	Infection::infectPlayers(PlayerIndex, this->getUnitDatumIndex());
 }
 
 void ZombieDeathHandler::onDedi()
 {
 	//infect other players if applicable
-	Infection::infectPlayers(this->getUnitDatumIndex(), h2mod->get_player_index_from_unit_datum(this->getUnitDatumIndex()));
+	Infection::infectPlayers(h2mod->get_player_index_from_unit_datum(this->getUnitDatumIndex()), this->getUnitDatumIndex());
 }
 
 void ZombieDeathHandler::onClient()
@@ -281,7 +283,7 @@ void ZombieDeathHandler::onClient()
 	LOG_TRACE_GAME("ZombieDeathhandler::OnClient() getUnitDatumIndex: {:x}", this->getUnitDatumIndex().ToInt());
 
 	//infect client
-	Infection::infectPlayer(this->getUnitDatumIndex(), h2mod->get_player_index_from_unit_datum(this->getUnitDatumIndex()));
+	Infection::infectPlayer(h2mod->get_player_index_from_unit_datum(this->getUnitDatumIndex()), this->getUnitDatumIndex());
 }
 
 void ZombiePreSpawnHandler::onPeerHost()

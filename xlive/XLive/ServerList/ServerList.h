@@ -74,25 +74,33 @@ class ServerList
 	std::thread serv_thread;
 
 public:
-	std::atomic<bool> server_list_download_running = false;
-	std::atomic<bool> server_counts_download_running= false;
+	std::atomic<bool> ServerListDownloadRunning = false;
 	bool completed = false;
-	int servers_left = -1;
+	int ServersLeftInDocumentCount = -1;
 	int total_servers = 0;
 
-	int total_count = -1;
-	int total_public = -1;
-	int total_peer = -1;
-	int total_peer_gold = -1;
-	int total_public_gold = -1;
+	bool CountResultsUpdated = false;
+	int total_count;
+	int total_public;
+	int total_peer;
+	int total_peer_gold;
+	int total_public_gold;
+
+	HANDLE Handle = INVALID_HANDLE_VALUE;
 
 	bool GetRunning();
 	void GetServers(DWORD, CHAR*, PXOVERLAPPED);
 	int GetServersLeft();
 	int GetTotalServers();
-	void GetServerCounts();
+	void GetServerCounts(PXOVERLAPPED);
+
+	void GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped);
+	void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped);
+	void RemoveServer(PXOVERLAPPED pOverlapped);
+
+	std::mutex AddServerMutex;
+	std::mutex RemoveServerMutex;
+	std::mutex GetServerCountsMutex;
 };
 
 extern ServerList serverList;
-extern HANDLE ServerEnumHandle;
-DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey);

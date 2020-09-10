@@ -1,6 +1,7 @@
 #pragma once
 
 #define IPPROTO_VDP 254
+#define COMPILE_WITH_STD_SOCK_FUNC 1
 
 struct XSocket
 {
@@ -31,3 +32,6 @@ struct XSocket
 };
 
 void ForwardPorts();
+
+SOCKET WINAPI XSocketCreate(int af, int type, int protocol);
+int WINAPI XSocketSendTo(SOCKET s, const char* buf, int len, int flags, sockaddr *to, int tolen);

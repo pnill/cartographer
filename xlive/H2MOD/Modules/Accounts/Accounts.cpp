@@ -1,9 +1,12 @@
-#include "stdafx.h"
+
 #include "H2MOD\Modules\Accounts\Accounts.h"
+
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Startup\Startup.h"
+
+#include "Util\SimpleIni.h"
 
 static void HandleFileError(int fpErrNo) {//TODO
 	if (fpErrNo == EACCES || fpErrNo == EIO || fpErrNo == EPERM) {
@@ -23,96 +26,64 @@ static void HandleFileError(int fpErrNo) {//TODO
 #pragma region Config IO
 const wchar_t H2AccountsFilename[] = L"%wshalo2accounts.ini";
 
-static const char H2AccConfigVersionStr[] = "[H2AccountsVersion:%hs]";
-static const char H2AccConfigVersionReadStr[] = "[H2AccountsVersion:%[^]]]";
-static char H2AccConfigVersion[] = "1";
-static const char H2ConfigAccountStr[] = "[Account]";
+static const std::string H2ConfigAccountStr = "Account:";
 
-static const int bufferIncSize = 10;
-static int oldConfigBufferI = 0;
-static int oldConfigBufferLen = 0;
-static char** oldConfigBuffer = 0;
-static int badConfigBufferI = 0;
-static int badConfigBufferLen = 0;
-static char** badConfigBuffer = 0;
+static const std::string H2AccConfigVersion = "1";
+static const std::string H2AccConfigVersionStr = "H2AccountsVersion:" + H2AccConfigVersion;
+
 int H2AccountCount = 0;
-int H2AccountBufferI = -1;
-static int H2AccountBufferLen = 0;
-char** H2AccountBufferUsername = 0;
-char** H2AccountBufferLoginToken = 0;
+static int H2AccountArrayLen = 0;
+char** H2AccountArrayUsername = nullptr;
+char** H2AccountArrayLoginToken = nullptr;
 int H2AccountLastUsed = 0;
-static bool H2AccountBufferUsername_est = false;
-static bool H2AccountBufferLoginToken_est = false;
-static bool H2AccountLastUsed_est = false;
+int arrayIncSize = 10;
 
-char* H2CurrentAccountLoginToken = 0;
+char* H2CurrentAccountLoginToken = nullptr;
 
-static void oldConfigBufferFree() {
-	if (oldConfigBuffer) {
-		for (int i = 0; i < oldConfigBufferI; i++) {
-			free(oldConfigBuffer[i]);
-		}
-		oldConfigBufferI = 0;
-		oldConfigBufferLen = 0;
-		free(oldConfigBuffer);
-		oldConfigBuffer = 0;
-	}
-}
-static void badConfigBufferFree() {
-	if (badConfigBuffer) {
-		for (int i = 0; i < badConfigBufferI; i++) {
-			free(badConfigBuffer[i]);
-		}
-		badConfigBufferI = 0;
-		badConfigBufferLen = 0;
-		free(badConfigBuffer);
-		badConfigBuffer = 0;
-	}
-}
 static void H2AccountBufferFree() {
-	if (H2AccountBufferUsername) {
-		for (int i = 0; i < H2AccountBufferI; i++) {
-			if (H2AccountBufferUsername[i])
-				free(H2AccountBufferUsername[i]);
+	if (H2AccountArrayUsername) {
+		for (int i = 0; i < H2AccountCount; i++) {
+			if (H2AccountArrayUsername[i])
+				free(H2AccountArrayUsername[i]);
 		}
-		free(H2AccountBufferUsername);
-		H2AccountBufferUsername = 0;
+		free(H2AccountArrayUsername);
+		H2AccountArrayUsername = nullptr;
 	}
-	if (H2AccountBufferLoginToken) {
-		for (int i = 0; i < H2AccountBufferI; i++) {
-			if (H2AccountBufferLoginToken[i])
-				free(H2AccountBufferLoginToken[i]);
+	if (H2AccountArrayLoginToken) {
+		for (int i = 0; i < H2AccountCount; i++) {
+			if (H2AccountArrayLoginToken[i])
+				free(H2AccountArrayLoginToken[i]);
 		}
-		free(H2AccountBufferLoginToken);
-		H2AccountBufferLoginToken = 0;
+		free(H2AccountArrayLoginToken);
+		H2AccountArrayLoginToken = nullptr;
 	}
-	H2AccountBufferI = -1;
-	H2AccountBufferLen = 0;
+	H2AccountArrayLen = 0;
+	H2AccountCount = 0;
 }
 
-HANDLE H2Accounts_mutex = 0;
+HANDLE H2Accounts_mutex = INVALID_HANDLE_VALUE;
 
 void ReleaseAccountConfigLock() {
 	if (H2Accounts_mutex) {
 		ReleaseMutex(H2Accounts_mutex);
 		CloseHandle(H2Accounts_mutex);
-		H2Accounts_mutex = 0;
+		H2Accounts_mutex = INVALID_HANDLE_VALUE;
 	}
 }
 
 bool TestAccountConfigLock() {
-	return H2Accounts_mutex != 0;
+	return H2Accounts_mutex != INVALID_HANDLE_VALUE;
 }
 
 bool TestGetAccountConfigLock(wchar_t* mutexName) {
 
-	if (H2Accounts_mutex) {
+	if (H2Accounts_mutex != INVALID_HANDLE_VALUE) {
 		return true;
 	}
 
 	DWORD crc32num = crc32buf((char*)mutexName, wcslen(mutexName) * 2);
 	wchar_t crc32mutexName[40] = { L"" };
-	swprintf(crc32mutexName, 40, L"Halo2AccountsFile-%x", crc32num);
+	swprintf(crc32mutexName, ARRAYSIZE(crc32mutexName), L"Halo2AccountsFile-%x", crc32num);
 
 	HANDLE mutex = CreateMutexW(0, true, crc32mutexName);
 	DWORD lastErr = GetLastError();
@@ -135,10 +106,10 @@ void SaveH2Accounts() {
 
 		wchar_t fileConfigPath[1024];
 		if (H2Portable) {
-			swprintf(fileConfigPath, 1024, H2AccountsFilename, H2ProcessFilePath);
+			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2ProcessFilePath);
 		}
 		else {
-			swprintf(fileConfigPath, 1024, H2AccountsFilename, H2AppDataLocal);
+			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2AppDataLocal);
 		}
 
 		wchar_t fileConfigPathLog[1124];
@@ -146,67 +117,34 @@ void SaveH2Accounts() {
 		addDebugText(fileConfigPathLog);
 		FILE* fileConfig = _wfopen(fileConfigPath, L"wb");
 
-		if (fileConfig == NULL) {
+		if (fileConfig == nullptr) {
 			HandleFileError(GetLastError());
 			addDebugText("ERROR: Unable to write H2Accounts File!");
 		}
 		else {
 #pragma region Put Data To File
-			fputs("#--- Halo 2 Project Cartographer Accounts File ---", fileConfig);
-			fputs("\n\n", fileConfig);
-			fputs("# DO NOT SHARE THE CONTENTS OF THIS FILE.", fileConfig);
-			fputs("\n\n", fileConfig);
+			std::fstream fileStream(fileConfig);
+			CSimpleIniA ini;
 
-			int fputbufferlen = strlen(H2AccConfigVersionStr) + 1;
-			char* fputbuffer = (char*)malloc(sizeof(char) * fputbufferlen);
-			snprintf(fputbuffer, fputbufferlen, H2AccConfigVersionStr, H2AccConfigVersion);
-			fputs(fputbuffer, fileConfig);
-			free(fputbuffer);
+			fileStream <<
+				"#--- Halo 2 Project Cartographer Accounts File ---"
+				"\n\n"
+				"# DO NOT SHARE THE CONTENTS OF THIS FILE."
+				"\n\n"
+				;
 
-			fputs("\n", fileConfig);
+			ini.SetLongValue(H2AccConfigVersionStr.c_str(), "last_used", H2AccountLastUsed);
+			ini.SetLongValue(H2AccConfigVersionStr.c_str(), "account_count", H2AccountCount);
 
-			char last_used_buff[30];
-			snprintf(last_used_buff, 30, "\nlast_used = %d\n", H2AccountLastUsed);
-			fputs(last_used_buff, fileConfig);
-
-			if (H2AccountBufferLoginToken && H2AccountBufferUsername && H2AccountCount > 0) {
+			if (H2AccountArrayLoginToken && H2AccountArrayUsername && H2AccountCount > 0) {
 				for (int i = 0; i < H2AccountCount; i++) {
-					fputs("\n", fileConfig); fputs(H2ConfigAccountStr, fileConfig);
-					if (H2AccountBufferUsername[i]) {
-						fputs("\nusername = ", fileConfig); fputs(H2AccountBufferUsername[i], fileConfig);
-					}
-					fputs("\nlogin_token = ", fileConfig); fputs(H2AccountBufferLoginToken[i] ? H2AccountBufferLoginToken[i] : "", fileConfig);
-					fputs("\n", fileConfig);
+					ini.SetValue((H2ConfigAccountStr + std::to_string(i + 1)).c_str(), "username", H2AccountArrayUsername[i] ? H2AccountArrayUsername[i] : "");
+					ini.SetValue((H2ConfigAccountStr + std::to_string(i + 1)).c_str(), "login_token", H2AccountArrayLoginToken[i] ? H2AccountArrayLoginToken[i] : "");
 				}
 			}
-			else {
-				fputs("\n", fileConfig); fputs(H2ConfigAccountStr, fileConfig);
-				fputs("\nlogin_token = ", fileConfig);
-			}
 
-			fputs("\n", fileConfig);
+			ini.SaveFile(fileConfig);
 
-			if (badConfigBuffer && badConfigBufferI > 0) {
-				for (int i = 0; i < badConfigBufferI; i++) {
-					fputs("\n", fileConfig);
-					if (badConfigBuffer[i][0] != '#' && badConfigBuffer[i][0] != ';')
-						fputs("#", fileConfig);
-					fputs(badConfigBuffer[i], fileConfig);
-				}
-			}
-			badConfigBufferFree();
-
-			fputs("\n\n", fileConfig);
-
-			if (oldConfigBuffer && oldConfigBufferI > 0) {
-				for (int i = 0; i < oldConfigBufferI; i++) {
-					fputs("\n", fileConfig);
-					fputs(oldConfigBuffer[i], fileConfig);
-				}
-			}
-			oldConfigBufferFree();
-
-			fputs("\n", fileConfig);
 #pragma endregion
 			fclose(fileConfig);
 		}
@@ -220,208 +158,84 @@ void SaveH2Accounts() {
 }
 
 void H2AccountBufferCheck() {
-	if (H2AccountBufferI >= H2AccountBufferLen) {
-		H2AccountBufferLen += bufferIncSize;
-		if (!H2AccountBufferLoginToken) {
-			H2AccountBufferUsername = (char**)calloc(H2AccountBufferLen, sizeof(char*));
-			H2AccountBufferLoginToken = (char**)calloc(H2AccountBufferLen, sizeof(char*));
+	if (H2AccountCount >= H2AccountArrayLen) {
+		H2AccountArrayLen += arrayIncSize;
+		if (!H2AccountArrayLoginToken) {
+			H2AccountArrayUsername = (char**)calloc(H2AccountArrayLen, sizeof(char*));
+			H2AccountArrayLoginToken = (char**)calloc(H2AccountArrayLen, sizeof(char*));
 		}
 		else {
-			H2AccountBufferUsername = (char**)realloc(H2AccountBufferUsername, sizeof(char*) * H2AccountBufferLen);
-			H2AccountBufferLoginToken = (char**)realloc(H2AccountBufferLoginToken, sizeof(char*) * H2AccountBufferLen);
+			H2AccountArrayUsername = (char**)realloc(H2AccountArrayUsername, sizeof(char*) * H2AccountArrayLen);
+			H2AccountArrayLoginToken = (char**)realloc(H2AccountArrayLoginToken, sizeof(char*) * H2AccountArrayLen);
 		}
-		for (int i = H2AccountBufferLen - bufferIncSize; i < H2AccountBufferLen; i++) {
-			H2AccountBufferUsername[i] = 0;
-			H2AccountBufferLoginToken[i] = 0;
+		for (int i = H2AccountArrayLen - arrayIncSize; i < H2AccountArrayLen; i++) { // dont look, this is G
+			H2AccountArrayUsername[i] = 0;
+			H2AccountArrayLoginToken[i] = 0;
 		}
 	}
 }
 
-void H2AccountBufferAdd(char* token, char* username) {
+void H2AccountAccountAdd(const char* username, const char* token) {
 	int bufflen;
-	H2AccountBufferCheck();
 
-	for (int existing_profile = 0; existing_profile < H2AccountCount; existing_profile++) {
-		if (StrnCaseInsensEqu(H2AccountBufferUsername[existing_profile], username, XUSER_MAX_NAME_LENGTH)) {
+	// verify if the same credentials already exist
+	for (int i = 0; i < H2AccountCount; i++) {
+		if (StrnCaseInsensEqu(H2AccountArrayUsername[i], (char*)username, XUSER_MAX_NAME_LENGTH)) {
 			
-			if (H2AccountBufferLoginToken[existing_profile]) {
-				free(H2AccountBufferLoginToken[existing_profile]);
+			if (H2AccountArrayLoginToken[i]) {
+				free(H2AccountArrayLoginToken[i]);
 			}
-			if (H2AccountBufferUsername[existing_profile]) {
-				free(H2AccountBufferUsername[existing_profile]);
+			if (H2AccountArrayUsername[i]) {
+				free(H2AccountArrayUsername[i]);
 			}
 
 			bufflen = strlen(token) + 1;
-			H2AccountBufferLoginToken[existing_profile] = (char*)calloc(bufflen, sizeof(char));
-			snprintf(H2AccountBufferLoginToken[existing_profile], bufflen, token);
+			H2AccountArrayLoginToken[i] = (char*)calloc(bufflen, sizeof(*token));
+			snprintf(H2AccountArrayLoginToken[i], bufflen, token);
 
-			H2AccountBufferUsername[existing_profile] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
-			strncpy_s(H2AccountBufferUsername[existing_profile], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
+			H2AccountArrayUsername[i] = (char*)calloc(XUSER_NAME_SIZE, sizeof(*username));
+			strncpy_s(H2AccountArrayUsername[i], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
 
 			return;
 		}
 	}
 
-	bufflen = strlen(token) + 1;
-	H2AccountBufferLoginToken[H2AccountBufferI] = (char*)calloc(bufflen, sizeof(char));
-	snprintf(H2AccountBufferLoginToken[H2AccountBufferI], bufflen, token);
-
-	H2AccountBufferUsername[H2AccountBufferI] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
-	strncpy_s(H2AccountBufferUsername[H2AccountBufferI], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
-
-	H2AccountBufferI++;
 	H2AccountCount++;
+	H2AccountBufferCheck();
+	int H2AccountArrayIndex = H2AccountCount - 1;
+
+	// allocate new token/username pair if it doesn't already exist
+	bufflen = strlen(token) + 1;
+	H2AccountArrayLoginToken[H2AccountArrayIndex] = (char*)calloc(bufflen, sizeof(*token));
+	snprintf(H2AccountArrayLoginToken[H2AccountArrayIndex], bufflen, token);
+
+	H2AccountArrayUsername[H2AccountArrayIndex] = (char*)calloc(XUSER_NAME_SIZE, sizeof(*username));
+	strncpy_s(H2AccountArrayUsername[H2AccountArrayIndex], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
 }
 
-static int interpretConfigSetting(char* fileLine, char* version, int lineNumber) {
-	if (!version) {
-		return 0;
-	}
-	else if (CmpVersions(H2AccConfigVersion, version) != 0) {
-		if (oldConfigBufferI >= oldConfigBufferLen) {
-			if (!oldConfigBuffer) {
-				oldConfigBuffer = (char**)malloc(sizeof(char*) * (oldConfigBufferLen += bufferIncSize));
+void H2AccountAccountRemove(int accountArrayIndex)
+{
+	if (H2AccountCount > 0)
+	{
+		if (H2AccountArrayLoginToken) {
+			if (H2AccountArrayLoginToken[accountArrayIndex]) {
+				free(H2AccountArrayLoginToken[accountArrayIndex]);
 			}
-			else {
-				oldConfigBuffer = (char**)realloc(oldConfigBuffer, sizeof(char*) * (oldConfigBufferLen += bufferIncSize));
+			for (int i = accountArrayIndex + 1; i < H2AccountCount; i++) {
+				H2AccountArrayLoginToken[i - 1] = H2AccountArrayLoginToken[i];
 			}
-		}
-		oldConfigBuffer[oldConfigBufferI] = fileLine;
-		oldConfigBufferI++;
-		return 0b10;
-	}
-	else {
-		bool unrecognised = false;
-		bool duplicated = false;
-		bool incorrect = false;
-		bool dontSave = false;
-		int fileLineLen = strlen(fileLine);
-		int tempint1 = -1;
-		unsigned short tempushort1 = -1;
-		int tempint2 = -1;
-		float tempfloat1 = NULL;
-		char tempstr1[33] = { "" };
-		if (fileLine[0] == '#' || fileLine[0] == ';' || fileLineLen <= 2) {
-			unrecognised = true;
-		}
-		else if (strstr(fileLine, H2ConfigAccountStr)) {
-			if (!H2AccountBufferLoginToken_est && H2AccountBufferI >= 0) {
-				incorrect = true;
-				dontSave = true;
-			}
-			else {
-				H2AccountBufferI++;
-				H2AccountBufferUsername_est = false;
-				H2AccountBufferLoginToken_est = false;
-				H2AccountBufferCheck();
-			}
-		}
-		else if (strstr(fileLine, "username =")) {
-			if (H2AccountBufferUsername_est) {
-				duplicated = true;
-			}
-			else if (H2AccountBufferI < 0) {
-				incorrect = true;
-			}
-			else {
-				char* tempName = fileLine + strlen("username =");
-				while (isspace(*tempName)) {
-					tempName++;
-				}
-				strncpy_s(tempstr1, sizeof(tempstr1), tempName, strnlen_s(tempName, XUSER_MAX_NAME_LENGTH));
-				for (int j = strlen(tempstr1) - 1; j > 0; j--) {
-					if (isspace(tempstr1[j])) {
-						tempstr1[j] = 0;
-					}
-					else {
-						break;
-					}
-				}
-				int bufflen = strlen(tempstr1);
-				if (bufflen <= 0) {
-					incorrect = true;
-				}
-				else {
-					H2AccountBufferUsername[H2AccountBufferI] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
-					strncpy_s(H2AccountBufferUsername[H2AccountBufferI], XUSER_NAME_SIZE, tempstr1, strnlen_s(tempstr1, XUSER_MAX_NAME_LENGTH));
-					H2AccountBufferUsername_est = true;
-				}
-			}
-		}
-		else if (strstr(fileLine, "login_token =")) {
-			if (H2AccountBufferLoginToken_est) {
-				duplicated = true;
-			}
-			else if (H2AccountBufferI < 0) {
-				incorrect = true;
-			}
-			else {
-				char* tempName = fileLine + strlen("login_token =");
-				while (isspace(*tempName)) {
-					tempName++;
-				}
-				snprintf(tempstr1, 33, tempName);
-				for (int j = strlen(tempstr1) - 1; j > 0; j--) {
-					if (isspace(tempstr1[j])) {
-						tempstr1[j] = 0;
-					}
-					else {
-						break;
-					}
-				}
-				int bufflen = strlen(tempstr1) + 1;
-				if (bufflen <= 1) {
-					//incorrect = true;
-				}
-				else {
-					H2AccountBufferLoginToken[H2AccountBufferI] = (char*)calloc(bufflen, sizeof(char));
-					snprintf(H2AccountBufferLoginToken[H2AccountBufferI], bufflen, tempstr1);
-					H2AccountBufferLoginToken_est = true;
-				}
-			}
-		}
-		else if (sscanf(fileLine, "last_used =%d", &tempint1) == 1) {
-			if (H2AccountLastUsed_est) {
-				duplicated = true;
-			}
-			else if (!(tempint1 >= 0)) {
-				incorrect = true;
-			}
-			else {
-				H2AccountLastUsed = tempint1;
-				H2AccountLastUsed_est = true;
-			}
-		}
-		else {
-			unrecognised = true;
-		}
 
-		if (unrecognised || duplicated || incorrect) {
-			char textDebugBuffer[60];
-			if (duplicated) {
-				snprintf(textDebugBuffer, 60, "ERROR: Duplicated Config Setting on Line: %d", lineNumber);
-				addDebugText(textDebugBuffer);
-			}
-			else if (incorrect) {
-				snprintf(textDebugBuffer, 60, "ERROR: Incorrect Config Setting on Line: %d", lineNumber);
-				addDebugText(textDebugBuffer);
-			}
-			if (!dontSave) {
-				if (badConfigBufferI >= badConfigBufferLen) {
-					if (!badConfigBuffer) {
-						badConfigBuffer = (char**)malloc(sizeof(char*) * (badConfigBufferLen += bufferIncSize));
-					}
-					else {
-						badConfigBuffer = (char**)realloc(badConfigBuffer, sizeof(char*) * (badConfigBufferLen += bufferIncSize));
-					}
+			if (H2AccountArrayUsername) {
+				if (H2AccountArrayUsername[accountArrayIndex]) {
+					free(H2AccountArrayUsername[accountArrayIndex]);
 				}
-				badConfigBuffer[badConfigBufferI] = fileLine;
-				badConfigBufferI++;
-				return 0b10;
+				for (int i = accountArrayIndex + 1; i < H2AccountCount; i++) {
+					H2AccountArrayUsername[i - 1] = H2AccountArrayUsername[i];
+				}
 			}
+			H2AccountCount--;
 		}
 	}
-	return 0;
 }
 
 bool ReadH2Accounts() {
@@ -430,10 +244,10 @@ bool ReadH2Accounts() {
 	wchar_t fileConfigPath[1024];
 
 	if (H2Portable) {
-		swprintf(fileConfigPath, 1024, H2AccountsFilename, H2ProcessFilePath);
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2ProcessFilePath);
 	}
 	else {
-		swprintf(fileConfigPath, 1024, H2AccountsFilename, H2AppDataLocal);
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2AppDataLocal);
 	}
 
 	wchar_t fileConfigPathLog[1124];
@@ -449,29 +263,40 @@ bool ReadH2Accounts() {
 		}
 		else {
 
-			oldConfigBufferFree();
-			badConfigBufferFree();
+			//clear the buffers before reading any accounts from the file
 			H2AccountBufferFree();
 
-			H2AccountLastUsed_est = false;
+			CSimpleIniA ini;
+			ini.SetUnicode();
 
-			ReadIniFile(fileConfig, true, H2AccConfigVersionReadStr, H2AccConfigVersion, interpretConfigSetting);
-
-			if (H2AccountBufferLoginToken && H2AccountBufferLoginToken[H2AccountBufferI]) {
-				H2AccountBufferI++;
+			// load the file in SimpleIni
+			SI_Error rc = ini.LoadFile(fileConfig);
+			if (rc < 0)
+			{
+				addDebugText(std::string("ini.LoadFile() failed with error: " + std::to_string(rc) + " while reading H2 accounts file").c_str());
 			}
+			else
+			{
+				// read the accounts in the file
+				H2AccountLastUsed = ini.GetLongValue(H2AccConfigVersionStr.c_str(), "last_used", H2AccountLastUsed);
+				int AccountCount = ini.GetLongValue(H2AccConfigVersionStr.c_str(), "account_count", 0);
+				if (AccountCount > 0)
+				{
+					for (int i = 0; i < AccountCount; i++)
+					{
+						const char* username = ini.GetValue((H2ConfigAccountStr + std::to_string(i + 1)).c_str(), "username", "");
+						const char* login_token = ini.GetValue((H2ConfigAccountStr + std::to_string(i + 1)).c_str(), "login_token", "");
 
-			H2AccountCount = H2AccountBufferI;
+						H2AccountAccountAdd(username, login_token);
+					}
+				}
+			}
 
 			fclose(fileConfig);
 		}
 	}
 	else {
 		addDebugText("Mutex In use!");
-	}
-
-	if (H2AccountBufferI < 0) {
-		H2AccountBufferI = 0;
 	}
 
 	addDebugText("End Reading H2Accounts File.");
