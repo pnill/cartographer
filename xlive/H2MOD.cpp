@@ -62,7 +62,7 @@ int get_player_index_from_datum(datum unit_datum)
 game_life_cycle get_game_life_cycle()
 {
 	typedef game_life_cycle(__cdecl get_lobby_state)();
-	auto p_get_lobby_state = h2mod->GetAddress<get_lobby_state*>(0x1AD660);
+	auto p_get_lobby_state = h2mod->GetAddress<get_lobby_state*>(0x1AD660, 0x1A65DD);
 
 	return p_get_lobby_state();
 }
@@ -876,7 +876,6 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 
 	wchar_t* variant_name = NetworkSession::getGameVariantName();
 	LOG_INFO_GAME(L"[h2mod] OnMapLoad map type {}, variant name {}", (int)h2mod->GetMapType(), variant_name);
-	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
 
 	for (auto gametype_it : GametypesMap)
 		gametype_it.second = false; // reset custom gametypes state
@@ -914,7 +913,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		H2Tweaks::setCrosshairSize(0, false);
 		//H2Tweaks::applyShaderTweaks(); 
 
-		if (GameState == 3)
+		if (get_game_life_cycle() == life_cycle_in_game)
 		{
 			// send server map checksums to client
 			//MapChecksumSync::SendState();

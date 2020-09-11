@@ -34,7 +34,6 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 static bool NotDisplayIngameChat() {
 	int GameGlobals = *h2mod->GetAddress<int*>(0x482D3C);
 	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
-	BYTE* GameState = h2mod->GetAddress<BYTE*>(0x420FC4);
 
 	if (H2Config_hide_ingame_chat) {
 		PlayerIterator playerIt;
@@ -46,7 +45,7 @@ static bool NotDisplayIngameChat() {
 		return true;
 	}
 
-	else if (*GameEngine != 3 && *GameState == 3) {
+	else if (*GameEngine != 3 && get_game_life_cycle() == life_cycle_in_game) {
 		//Enable chat in engine mode and game state mp.
 		return false;
 	}
