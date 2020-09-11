@@ -1387,12 +1387,8 @@ void H2MOD::RegisterEvents()
 				GS_PostGame,
 				&stats_handler->sendStats
 			}, true);
-		//Register callback to send player ranks on lobby
-		EventHandler::registerGameStateCallback({
-				"StatsSendRanks",
-				GS_Lobby,
-				[]() {stats_handler->sendRankChange(true);}
-			}, true);
+		
+		
 		//register callback on player leave to remove them from the packet filter
 		EventHandler::registerNetworkPlayerRemoveCallback({
 				"StatsPlayerLeave",
@@ -1402,6 +1398,23 @@ void H2MOD::RegisterEvents()
 		EventHandler::registerNetworkPlayerAddCallback({
 				"StatsPlayerJoin",
 				stats_handler->playerJoinEvent
+			}, true);
+		//register a callback when the server reaches the lobby for the first time
+		EventHandler::registerGameStateCallback({
+				"InitStats",
+				GS_Lobby,
+				[]()
+				{
+					stats_handler->verifyRegistrationStatus();
+					stats_handler->verifySendPlaylist();
+					//Register callback to send player ranks on lobby	
+					EventHandler::registerGameStateCallback({
+						"StatsSendRanks",
+						GS_Lobby,
+						[]() {stats_handler->sendRankChange(true);}
+					}, true);
+				},
+				true
 			}, true);
 	}
 	//Things that apply to both
@@ -1534,10 +1547,6 @@ void H2MOD::Initialize()
 			DiscordInterface::Init();
 			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
 		}
-	}
-	else
-	{
-		stats_handler->verifySendPlaylist();
 	}
 
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");

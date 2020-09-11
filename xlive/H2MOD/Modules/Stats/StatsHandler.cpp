@@ -14,6 +14,7 @@
 #include "XLive/xbox/xbox.h"
 #include <ws2ipdef.h>
 #include <WS2tcpip.h>
+#include "H2MOD/Modules/Config/Config.h"
 #ifdef _DEBUG
 #pragma comment(lib, "libcurl_a_debug.lib")
 #else
@@ -23,6 +24,8 @@
 static const bool verbose = false;
 StatsHandler::StatsHandler()
 = default;
+
+
 
 /*
  * Player leave store the data  if non team game sort rank them at the bottom of the list
@@ -44,7 +47,214 @@ std::string StatsHandler::getChecksum()
 		output = "";
 	return output;
 }
-int StatsHandler::uploadPlaylist()
+struct curl_response_text {
+	char *ptr;
+	size_t len;
+};
+
+static void init_curl_response(struct curl_response_text *s) {
+	s->len = 0;
+	s->ptr = (char*)malloc(s->len + 1);
+	if (s->ptr == NULL) {
+		fprintf(stderr, "malloc() failed\n");
+		exit(EXIT_FAILURE);
+	}
+	s->ptr[0] = '\0';
+}
+
+static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct curl_response_text *s)
+{
+	size_t new_len = s->len + size * nmemb;
+	s->ptr = (char*)realloc(s->ptr, new_len + 1);
+	if (s->ptr == NULL) {
+		fprintf(stderr, "realloc() failed\n");
+		exit(EXIT_FAILURE);
+	}
+	memcpy(s->ptr + s->len, ptr, size*nmemb);
+	s->ptr[new_len] = '\0';
+	s->len = new_len;
+
+	return size * nmemb;
+}
+
+char* StatsHandler::checkServerRegistration()
+{
+
+	CURL *curl;
+	CURLcode curlResult;
+	CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
+	if (global_init != CURLE_OK)
+	{
+		char CurlError[500];
+		snprintf(CurlError, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
+		LOG_ERROR_GAME(L"[H2MOD]::checkServerRegistration failed to init curl");
+		LOG_ERROR_GAME(CurlError);
+		return "";
+	}
+	curl = curl_easy_init();
+	if (curl)
+	{
+		std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=ServerRegistrationCheck&Server_XUID=";
+		auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
+		auto sXUID = IntToString<::XUID>(ServerXUID, std::dec).c_str();
+		//http_request_body.append(curl_easy_escape(curl, H2Config_login_identifier, strlen(H2Config_login_identifier)));
+		http_request_body.append(sXUID);
+
+		struct curl_response_text s;
+		init_curl_response(&s);
+
+
+		//Set the URL for the GET
+		curl_easy_setopt(curl, CURLOPT_URL, http_request_body.c_str());
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
+
+		curlResult = curl_easy_perform(curl);
+		if (curlResult != CURLE_OK)
+		{
+			LOG_ERROR_GAME(L"[H2MOD]::checkServerRegistration failed to execute curl");
+		}
+		else
+		{
+			int response_code;
+			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+			LOG_INFO_GAME(std::to_string(response_code));
+			if(response_code == 500)
+			{
+				//LOG_ERROR_GAME(L"[H2MOD]::checkServerRegistration API threw an error. {0}", std::string(s.ptr));
+				curl_easy_cleanup(curl);
+				return ""; //Server Error
+			}
+			if (response_code == 200)
+			{
+				curl_easy_cleanup(curl);
+				return "Ok"; //Server is registered
+			}
+			if(response_code == 201)
+			{
+				curl_easy_cleanup(curl);
+				return s.ptr; //Server is unregisterd and returned a AuthKey
+			}
+			curl_easy_cleanup(curl);
+		}
+	}
+	return ""; 
+}
+
+bool StatsHandler::serverRegistration(char* authKey)
+{
+	CURL *curl;
+	CURLcode result;
+	curl_mime *form = NULL;
+	curl_mimepart *field = NULL;
+	struct curl_slist *headerlist = NULL;
+	static const char buf[] = "Expect:";
+	curl_global_init(CURL_GLOBAL_ALL);
+	curl = curl_easy_init();
+	if (!curl)
+	{
+		LOG_ERROR_GAME(L"[H2MOD] serverRegistration failed to init curl");
+		return false;
+	}
+	form = curl_mime_init(curl);
+	field = curl_mime_addpart(form);
+	curl_mime_name(field, "Type");
+	curl_mime_data(field, "ServerRegistration", CURL_ZERO_TERMINATED);
+	field = curl_mime_addpart(form);
+	curl_mime_name(field, "Server_Name");
+	curl_mime_data(field, H2Config_login_identifier, CURL_ZERO_TERMINATED);
+	field = curl_mime_addpart(form);
+	//auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
+	auto sXUID = IntToString<::XUID>(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid, std::dec).c_str();
+	curl_mime_name(field, "Server_XUID");
+	curl_mime_data(field, sXUID, CURL_ZERO_TERMINATED);
+	field = curl_mime_addpart(form);
+	curl_mime_name(field, "AuthKey");
+	curl_mime_data(field, authKey, CURL_ZERO_TERMINATED);
+	headerlist = curl_slist_append(headerlist, buf);
+
+	curl_easy_setopt(curl, CURLOPT_URL, "https://www.halo2pc.com/test-pages/CartoStat/API/post.php");
+	curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
+	result = curl_easy_perform(curl);
+	if (result != CURLE_OK)
+	{
+		LOG_ERROR_GAME(L"[H2MOD]::serverRegistration failed to execute curl");
+
+		return false;
+	}
+
+	int response_code;
+	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+	if(response_code == 500)
+	{
+		curl_easy_cleanup(curl);
+		return false;
+	}
+	if(response_code == 200)
+	{
+		curl_easy_cleanup(curl);
+		return true;
+	}
+	curl_easy_cleanup(curl);
+	return response_code;
+
+}
+
+char* StatsHandler::getAPIToken()
+{
+	CURL *curl;
+	CURLcode result;
+	curl_mime *form = NULL;
+	curl_mimepart *field = NULL;
+	struct curl_slist *headerlist = NULL;
+	static const char buf[] = "Expect:";
+	curl_global_init(CURL_GLOBAL_ALL);
+	curl = curl_easy_init();
+	if (!curl)
+	{
+		LOG_ERROR_GAME(L"[H2MOD] getAPIToken failed to init curl");
+		return "";
+	}
+	form = curl_mime_init(curl);
+	field = curl_mime_addpart(form);
+	curl_mime_name(field, "Type");
+	curl_mime_data(field, "ServerLogin", CURL_ZERO_TERMINATED);
+	field = curl_mime_addpart(form);
+	curl_mime_name(field, "AuthKey");
+	curl_mime_data(field, H2Config_stats_authkey, CURL_ZERO_TERMINATED);
+	headerlist = curl_slist_append(headerlist, buf);
+	
+	struct curl_response_text s;
+	init_curl_response(&s);
+	curl_easy_setopt(curl, CURLOPT_URL, "https://www.halo2pc.com/test-pages/CartoStat/API/post.php");
+	curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
+	result = curl_easy_perform(curl);
+	if (result != CURLE_OK)
+	{
+		LOG_ERROR_GAME(L"[H2MOD]::getAPIToken failed to execute curl");
+		return "";
+	}
+
+	int response_code;
+	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+	if (response_code == 500)
+	{
+		LOG_ERROR_GAME(L"[H2MOD]::getAPIToken failed get token for stats API");
+		return "";
+	}
+	if (response_code == 200)
+	{
+		return s.ptr;
+	}
+	return "";
+}
+
+
+int StatsHandler::uploadPlaylist(char* token)
 {
 	if (verbose)
 		LOG_INFO_GAME("Uploading Playlist");
@@ -85,6 +295,9 @@ int StatsHandler::uploadPlaylist()
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "Playlist_Checksum");
 	curl_mime_data(field, checksum.c_str(), CURL_ZERO_TERMINATED);
+	field = curl_mime_addpart(form);
+	curl_mime_name(field, "AuthToken");
+	curl_mime_data(field, token, CURL_ZERO_TERMINATED);
 	headerlist = curl_slist_append(headerlist, buf);
 
 	curl_easy_setopt(curl, CURLOPT_URL, "https://www.halo2pc.com/test-pages/CartoStat/API/post.php");
@@ -107,9 +320,7 @@ int StatsHandler::uploadPlaylist()
 	return -1;
 }
 
-
-
-int StatsHandler::verifyPlaylist()
+int StatsHandler::verifyPlaylist(char* token)
 {
 	if (verbose)
 		LOG_INFO_GAME(L"Verifying Playlist..");
@@ -131,6 +342,8 @@ int StatsHandler::verifyPlaylist()
 		http_request_body.append(checksum);
 		if (verbose)
 			LOG_INFO_GAME(http_request_body);
+		http_request_body.append("&AuthToken=");
+		http_request_body.append(token);
 		char* Response;
 		CURL *curl;
 		CURLcode curlResult;
@@ -167,8 +380,7 @@ int StatsHandler::verifyPlaylist()
 	return -1;
 }
 
-
-int StatsHandler::uploadStats(char* filepath)
+int StatsHandler::uploadStats(char* filepath, char* token)
 {
 	CURL *curl;
 	CURLcode result;
@@ -190,6 +402,9 @@ int StatsHandler::uploadStats(char* filepath)
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "Type");
 	curl_mime_data(field, "GameStats", CURL_ZERO_TERMINATED);
+	field = curl_mime_addpart(form);
+	curl_mime_name(field, "AuthToken");
+	curl_mime_data(field, token, CURL_ZERO_TERMINATED);
 	headerlist = curl_slist_append(headerlist, buf);
 
 	curl_easy_setopt(curl, CURLOPT_URL, "https://www.halo2pc.com/test-pages/CartoStat/API/post.php");
@@ -199,6 +414,7 @@ int StatsHandler::uploadStats(char* filepath)
 	{
 		LOG_ERROR_GAME(L"[H2MOD]::uploadStats failed to execute curl");
 		//LOG_ERROR_GAME(curl_easy_strerror(result));
+		curl_easy_cleanup(curl);
 		return -1;
 	}
 	else
@@ -206,11 +422,11 @@ int StatsHandler::uploadStats(char* filepath)
 		int response_code;
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
 		LOG_INFO_GAME(std::to_string(response_code));
+		curl_easy_cleanup(curl);
 		return response_code;
 	}
 	return -1;
 }
-
 
 //Really should make structs for these but I don't want to take the time to learn how.
 static const int baseOffset  = 0x4dc722;
@@ -256,21 +472,21 @@ char* StatsHandler::buildJSON()
 	document.AddMember(L"Variant", Variant, allocator);
 	
 	//Build the Server Object
-	WValue Server(rapidjson::kObjectType);
-	auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
-	auto sXUID = IntToWString<::XUID>(ServerXUID, std::dec).c_str();
-	value.SetString(sXUID, allocator);
-	Server.AddMember(L"XUID", value, allocator);
-	//h2mod->get_local_player_name(0)
+	//WValue Server(rapidjson::kObjectType);
+	//auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
+	//auto sXUID = IntToWString<::XUID>(ServerXUID, std::dec).c_str();
+	//value.SetString(sXUID, allocator);
+	//Server.AddMember(L"XUID", value, allocator);
+	////h2mod->get_local_player_name(0)
 	auto ServerName = h2mod->GetAddress<wchar_t*>(0, 0x52FC88);
-	value.SetString(ServerName, allocator);
-	Server.AddMember(L"Name", value, allocator);
-	auto IP = NetworkSession::getLocalNetworkAddress();
-	auto IPString = std::string(inet_ntoa(IP));
-	auto wIPString = std::wstring(IPString.begin(), IPString.end());
-	value.SetString(wIPString.c_str(), allocator);
-	Server.AddMember(L"IP", value, allocator);
-	document.AddMember(L"Server", Server, allocator);
+	//value.SetString(ServerName, allocator);
+	//Server.AddMember(L"Name", value, allocator);
+	//auto IP = NetworkSession::getLocalNetworkAddress();
+	//auto IPString = std::string(inet_ntoa(IP));
+	//auto wIPString = std::wstring(IPString.begin(), IPString.end());
+	//value.SetString(wIPString.c_str(), allocator);
+	//Server.AddMember(L"IP", value, allocator);
+	//document.AddMember(L"Server", Server, allocator);
 
 	//Players
 	int playerCount = 0;
@@ -296,20 +512,17 @@ char* StatsHandler::buildJSON()
 			//I dont know why but I couldn't get any other method of comparing to work,
 			//Someone else can fix it because I know this probably is a terrible way
 			//To compare the wchar_t*.
-			LOG_INFO_GAME("Checking for match for..");
-			LOG_INFO_GAME(Gamertag);
-			LOG_INFO_GAME(tGamertag);
 			if(std::wstring(Gamertag) == std::wstring(tGamertag))
 			{
-				
 				calcPCROffset = PCROffset + (j * 0x110);
-				LOG_INFO_GAME(IntToString(calcPCROffset, std::hex));
 				EndgameIndex = i;
 				break;
 			}
 		}
 		
 		playerCount++;
+
+		#pragma region Memory_Reading
 		auto PrimaryColor = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4A);
 		auto SecondaryColor = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4B);
 		auto PrimaryEmblem = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4C);
@@ -364,7 +577,9 @@ char* StatsHandler::buildJSON()
 
 		auto TerrTaken = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x48);
 		auto TerrLost = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x46);
+		#pragma endregion 
 
+		#pragma region Document_Writing
 		value.SetInt(EndgameIndex);
 		Player.AddMember(L"EndGameIndex", value, allocator);
 		value.SetString(IntToWString<::XUID>(XUID, std::dec).c_str(), allocator);
@@ -466,17 +681,7 @@ char* StatsHandler::buildJSON()
 			Weapons.PushBack(Weapon, allocator);
 		}
 		Player.AddMember(L"WeaponData", Weapons, allocator);
-
-		/*WValue Versus(rapidjson::kArrayType);
-		for(auto j = 0; j < 16; j++)
-		{
-			WValue Matchup(rapidjson::kArrayType);
-			value.SetInt(*h2mod->GetAddress<unsigned int*>(0, calcPCROffset + 0x90 + (i * 0x4)));
-			Matchup.PushBack(value, allocator);
-			Matchup.PushBack(0, allocator);
-			Versus.PushBack(Matchup, allocator);
-		}
-		Player.AddMember(L"VersusData", Versus, allocator);*/
+		#pragma endregion
 
 		Players.PushBack(Player, allocator);
 	}
@@ -535,48 +740,13 @@ char* StatsHandler::buildJSON()
 	char* oFile = (char*)malloc(sizeof(char) * wcslen(fileOutPath) + 1);
 	wcstombs2(oFile, fileOutPath, wcslen(fileOutPath) + 1);
 	return oFile;
-
-	//rapidjson::Value array(rapidjson::kArrayType);
-	//rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
 }
-
-
-struct curl_response_text {
-	char *ptr;
-	size_t len;
-};
-
-static void init_curl_response(struct curl_response_text *s) {
-	s->len = 0;
-	s->ptr = (char*)malloc(s->len + 1);
-	if (s->ptr == NULL) {
-		fprintf(stderr, "malloc() failed\n");
-		exit(EXIT_FAILURE);
-	}
-	s->ptr[0] = '\0';
-}
-
-static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct curl_response_text *s)
-{
-	size_t new_len = s->len + size * nmemb;
-	s->ptr = (char*)realloc(s->ptr, new_len + 1);
-	if (s->ptr == NULL) {
-		fprintf(stderr, "realloc() failed\n");
-		exit(EXIT_FAILURE);
-	}
-	memcpy(s->ptr + s->len, ptr, size*nmemb);
-	s->ptr[new_len] = '\0';
-	s->len = new_len;
-
-	return size * nmemb;
-}
-
 
 std::vector<XUID> alreadySent;
-struct compare
+struct compareXUID
 {
 	XUID key;
-	compare(XUID const &i) : key(i) { }
+	compareXUID(XUID const &i) : key(i) { }
 
 	bool operator()(XUID const &i)
 	{
@@ -590,6 +760,7 @@ void StatsHandler::playerLeftEvent(int peerIndex)
 	if(it != alreadySent.end())
 		alreadySent.erase(alreadySent.begin() + std::distance(alreadySent.begin(), it));
 }
+
 void StatsHandler::playerJoinEvent(int peerIndex)
 {
 	/*No need to do anything fancy like filtering or 
@@ -599,6 +770,7 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 	 *the main function.*/
 	sendRankChange();
 }
+
 rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 {
 	std::string XUIDs;
@@ -611,7 +783,7 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 		if(NetworkSession::getLocalPeerIndex() != i)
 		{
 			auto XUID = NetworkSession::getPeerXUID(i);
-			if (std::none_of(alreadySent.begin(), alreadySent.end(), compare(XUID))) 
+			if (std::none_of(alreadySent.begin(), alreadySent.end(), compareXUID(XUID)))
 			{
 				playerCount++;
 				XUIDs.append(IntToString(XUID, std::dec));

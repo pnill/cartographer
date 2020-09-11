@@ -32,17 +32,19 @@ struct GameStateCallback
 	std::string name;
 	GameState gameState;
 	std::function<void()> callback;
+	bool runOnce;
 	/**
 	 * \brief Callback that executes when the GameState reaches the given GameState
 	 * \param name A name that is stored with this callback that can later be referenced for removal.
 	 * \param gameState The GameState type in which this should execute
 	 * \param callback a void that will be executed when this event happens.
 	 */
-	GameStateCallback(std::string name, GameState gameState, std::function<void()> callback)
+	GameStateCallback(std::string name, GameState gameState, std::function<void()> callback, bool runOnce = false)
 	{
 		this->name = name;
 		this->gameState = gameState;
 		this->callback = callback;
+		this->runOnce = runOnce;
 	}
 };
 struct NetworkPeerEventCallback
@@ -79,6 +81,8 @@ namespace EventHandler
 	 * \param gamestate
 	 */
 	void executeGameStateCallbacks(BYTE gamestate);
+
+	void cleanupGameStateCallbacks(BYTE gamestate);
 
 	/**
 	 * \brief Adds a callback to be executed when the NetworkSession recieves a player_add packet

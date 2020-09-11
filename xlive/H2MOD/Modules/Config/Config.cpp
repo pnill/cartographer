@@ -75,6 +75,7 @@ char H2Config_login_password[255] = { "" };
 int H2Config_minimum_player_start = 0;
 char H2Config_team_bit_flags_str[] = "1-1-1-1-1-1-1-1";
 short H2Config_team_bit_flags = 0xFF;
+char H2Config_stats_authkey[32] = { "" };
 
 //weapon crosshair sizes
 point2d	H2Config_BATRIF = { 1 , 1 };
@@ -482,7 +483,8 @@ void SaveH2Config() {
 			ini.SetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "login_password", H2Config_login_password);
-
+			ini.SetValue(H2ConfigVersionSection.c_str(), "stats_auth_key", H2Config_stats_authkey,
+				"#DO NOT CHANGE THIS OR YOUR SERVER WILL NO LONGER TRACK STATS");
 			ini.SetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str, 
 				"# teams_enabled_bit_flags (Server)"
 				"\n# By default, the game reads team bitflags from the current map."
@@ -740,6 +742,11 @@ void ReadH2Config() {
 				const char* login_password = ini.GetValue(H2ConfigVersionSection.c_str(), "login_password", H2Config_login_password);
 				if (login_password) {
 					strncpy(H2Config_login_password, login_password, sizeof(H2Config_login_password));
+				}
+
+				const char* stats_authkey = ini.GetValue(H2ConfigVersionSection.c_str(), "stats_auth_key", H2Config_stats_authkey);
+				if(stats_authkey) {
+					strncpy(H2Config_stats_authkey, stats_authkey, sizeof(stats_authkey));
 				}
 
 				std::string team_bit_mask(ini.GetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str));

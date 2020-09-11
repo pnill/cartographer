@@ -41,17 +41,50 @@ namespace EventHandler
 		{
 			auto executeThreaded = [](BYTE gamestate)
 			{
-				for(const auto &cb : gameStateCallbacksThreaded)
-					if (cb.gameState == gamestate)
+				for (const auto &cb : gameStateCallbacksThreaded) {
+					if (cb.gameState == gamestate) {
 						cb.callback();
+					}
+				}
 			};
 			std::thread(executeThreaded, gamestate).detach();
 		}
-		if(!gameStateCallbacks.empty())
-			for (const auto &cb : gameStateCallbacks)
-				if (cb.gameState == gamestate)
+		if (!gameStateCallbacks.empty()) {
+			for (const auto &cb : gameStateCallbacks) {
+				if (cb.gameState == gamestate) {
 					cb.callback();
+				}
+			}
+		}
+		cleanupGameStateCallbacks(gamestate);
 	}
+
+	void cleanupGameStateCallbacks(BYTE gamestate)
+	{
+		if (!gameStateCallbacksThreaded.empty())
+		{
+			auto it = gameStateCallbacksThreaded.begin();
+			while(it != gameStateCallbacksThreaded.end())
+			{
+				if(it->runOnce)
+					it = gameStateCallbacksThreaded.erase(it);
+				else
+					++it;
+			}
+		}
+		if(!gameStateCallbacks.empty())
+		{
+			auto it = gameStateCallbacks.begin();
+			while (it != gameStateCallbacks.end())
+			{
+				if (it->runOnce)
+					it = gameStateCallbacks.erase(it);
+				else
+					++it;
+			}
+		}
+	}
+
 
 	void registerNetworkPlayerAddCallback(NetworkPeerEventCallback callback, bool threaded)
 	{
