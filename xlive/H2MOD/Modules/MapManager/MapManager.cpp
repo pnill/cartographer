@@ -544,8 +544,7 @@ static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ul
 }
 
 bool MapManager::downloadFromRepo(std::string mapFilename) {
-	std::string url("http://www.h2maps.net/Cartographer/CustomMaps/");
-	url += mapFilename;
+	std::string url(cartographerMapRepoURL + "/");
 
 	FILE *fp = nullptr;
 	CURL *curl = nullptr;
@@ -562,6 +561,10 @@ bool MapManager::downloadFromRepo(std::string mapFilename) {
 			curl_easy_cleanup(curl);
 			return false;
 		}
+
+		char *url_encoded_map_filename = curl_easy_escape(curl, mapFilename.c_str(), mapFilename.length());
+		url += url_encoded_map_filename;
+		curl_free(url_encoded_map_filename);
 
 		//fail if 404 or any other type of http error
 		curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);

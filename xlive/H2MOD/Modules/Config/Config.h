@@ -27,6 +27,7 @@ struct _H2Config_language {
 };
 
 extern std::string cartographerURL;
+extern std::string cartographerMapRepoURL;
 
 extern unsigned long H2Config_master_ip;
 extern unsigned short H2Config_master_port_login;
