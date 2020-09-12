@@ -132,18 +132,19 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 	}
 
 	IN_ADDR ipIdentifier = GetConnectionIdentifierByRecvAddr(xsocket, lpFrom);
-	lpFrom->sin_addr = ipIdentifier;
 
 	// Let the game know the packet received came from an unkown source
-	if (lpFrom->sin_addr.s_addr == 0)
+	if (ipIdentifier.s_addr == 0)
 	{
 		LOG_CRITICAL_NETWORK("handleRecvdPacket() - discarding packet with size: {}", *bytesRecvdCount);
-		// set the bytes received count to 0
+		// set the bytes received count to 0 and recv address/identifier
 		*bytesRecvdCount = 0;
+		lpFrom->sin_addr.s_addr = 0;
 		WSASetLastError(WSAEWOULDBLOCK);
 		return SOCKET_ERROR;
 	}
 
+	lpFrom->sin_addr = ipIdentifier;
 	setTimeConnectionInteractionHappened(ipIdentifier);
 	XnIp* xnIp = getConnection(ipIdentifier);
 	if (xnIp != nullptr)

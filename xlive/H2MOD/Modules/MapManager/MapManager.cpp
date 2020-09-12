@@ -2,13 +2,14 @@
 
 #include "MapManager.h"
 
-#include <Mswsock.h>
-#include <WS2tcpip.h>
 #include "H2MOD\Modules\Config\Config.h"
-#include <curl/curl.h>
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "..\Networking\Networking.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
+
+#include <Mswsock.h>
+#include <WS2tcpip.h>
+#include <curl/curl.h>
 
 #pragma comment (lib, "mswsock.lib")
 
@@ -51,6 +52,90 @@ wchar_t EMPTY_UNICODE_STR = '\0';
 int downloadPercentage = 0;
 bool mapDownloadCountdown = false;
 auto promptOpenTime = std::chrono::high_resolution_clock::now();
+
+#pragma region custom map checks
+
+bool open_cache_header(const wchar_t *lpFileName, tags::cache_header *cache_header_ptr, HANDLE *map_handle)
+{
+	typedef char(__cdecl open_cache_header)(const wchar_t *lpFileName, tags::cache_header *lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
+	auto open_cache_header_impl = h2mod->GetAddress<open_cache_header*>(0x642D0, 0x4C327);
+	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
+}
+
+void close_cache_header(HANDLE *map_handle)
+{
+	typedef void __cdecl close_cache_header(HANDLE *a1);
+	auto close_cache_header_impl = h2mod->GetAddress<close_cache_header*>(0x64C03, 0x4CC5A);
+	close_cache_header_impl(map_handle);
+}
+
+static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
+
+int __cdecl validate_and_add_custom_map(BYTE *a1)
+{
+	tags::cache_header header;
+	HANDLE map_cache_handle;
+	wchar_t *file_name = (wchar_t*)(a1 + 2432);
+	if (!open_cache_header(file_name, &header, &map_cache_handle))
+		return false;
+	if (header.magic != 'head' || header.foot != 'foot' || header.file_size <= 0 || header.engine_gen != 8)
+	{
+		LOG_TRACE_FUNCW(L"\"{}\" has invalid header", file_name);
+		return false;
+	}
+	if (header.type > 5 || header.type < 0)
+	{
+		LOG_TRACE_FUNCW(L"\"{}\" has bad scenario type", file_name);
+		return false;
+	}
+	if (strnlen_s(header.name, 0x20u) >= 0x20 || strnlen_s(header.version, 0x20) >= 0x20)
+	{
+		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
+		return false;
+	}
+	if (header.type != scnr_type::Multiplayer && header.type != scnr_type::SinglePlayer)
+	{
+		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
+		return false;
+	}
+
+	close_cache_header(&map_cache_handle);
+	// needed because the game loads the human readable map name and description from scenario after checks
+	// without this the map is just called by it's file name
+
+	// todo move the code for loading the descriptions to our code and get rid of this
+	typedef int __cdecl validate_and_add_custom_map_interal(BYTE *a1);
+	auto validate_and_add_custom_map_interal_impl = h2mod->GetAddress<validate_and_add_custom_map_interal*>(0x4F690, 0x56890);
+	if (!validate_and_add_custom_map_interal_impl(a1))
+	{
+		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
+		std::wstring fallback_name;
+		if (strnlen_s(header.name, sizeof(header.name)) > 0) {
+			fallback_name = wstring_to_string.from_bytes(header.name, &header.name[sizeof(header.name) - 1]);
+		}
+		else {
+			std::wstring full_file_name = file_name;
+			auto start = full_file_name.find_last_of('\\');
+			fallback_name = full_file_name.substr(start != std::wstring::npos ? start : 0, full_file_name.find_last_not_of('.'));
+		}
+		wcsncpy_s(reinterpret_cast<wchar_t*>(a1 + 32), 0x20, fallback_name.c_str(), fallback_name.size());
+	}
+	// load the map even if some of the checks failed, will still mostly work
+	return true;
+}
+
+bool __cdecl is_supported_build(char *build)
+{
+	const static std::unordered_set<std::string> offically_supported_builds{ "11122.07.08.24.1808.main", "11081.07.04.30.0934.main" };
+	if (offically_supported_builds.count(build) == 0)
+	{
+		LOG_TRACE_FUNC("Build '{}' is not offically supported consider repacking and updating map with supported tools", build);
+	}
+	return true;
+}
+#pragma endregion
+
+#pragma region allow host to start game, without all players loading the map
 
 typedef signed int(__cdecl* get_map_load_status_for_all_peers)(signed int*, unsigned int*);
 get_map_load_status_for_all_peers p_get_map_load_status_for_all_peers;
@@ -172,6 +257,7 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(network_session *session
 
 	return everyone_loaded_the_map;
 }
+#pragma endregion
 
 void MapManager::leaveSessionIfAFK() {
 	if (mapDownloadCountdown) {
@@ -196,30 +282,37 @@ char __cdecl handle_map_download_callback() {
 	downloadPercentage = 0;
 	mapDownloadCountdown = false;
 
-	auto mapDownload = []()
+	auto mapDownloadThread = []()
 	{
 		DWORD* mapDownloadStatus = h2mod->GetAddress<DWORD*>(0x422570);
 
 		// set the game to downloading map state
 		*mapDownloadStatus = -1;
 
+		// sleep 500 msec to let the game receive the packet
+		Sleep(500);
+
 		if (!mapManager->getMapFilenameToDownload().empty())
 		{
-			LOG_TRACE_NETWORK("[h2mod-network] map file name from membership packet {}", mapManager->getMapFilenameToDownload());
+			LOG_TRACE_NETWORK("[h2mod-mapmanager] map file name from packet: {}", mapManager->getMapFilenameToDownload());
 			if (!mapManager->hasCustomMap(mapManager->getMapFilenameToDownload())) {
 				//TODO: set map filesize
 				//TODO: if downloading from repo files, try p2p
 				if (!mapManager->downloadFromRepo(mapManager->getMapFilenameToDownload()))
+				{
+					LOG_TRACE_NETWORK("[h2mod-mapmanager] handle_map_download_callback() - MapManager::downloadFromRepo failed, leaving session!");
 					h2mod->leave_session(); // download has failed
+				}
 			}
 			else {
-				LOG_TRACE_NETWORK("[h2mod-network] already has map {}", mapManager->getMapFilenameToDownload());
+				LOG_TRACE_NETWORK("[h2mod-mapmanager] already has map {}", mapManager->getMapFilenameToDownload());
 			}
 			mapManager->clearMapFileNameToDownload();
 		}
 		else 
 		{
 			// no map filename (probably packet hasn't been received)
+			LOG_TRACE_NETWORK("[h2mod-mapmanager] no map filename received from host!");
 			h2mod->leave_session();
 		}
 
@@ -228,7 +321,7 @@ char __cdecl handle_map_download_callback() {
 	};
 
 	if (NetworkSession::getCurrentNetworkSession()->local_session_state != network_session_state_none)
-		std::thread(mapDownload).detach();
+		std::thread(mapDownloadThread).detach();
 
 	return 1;
 }
@@ -287,7 +380,7 @@ void get_map_download_source_str(int a1, wchar_t* buffer)
 /**
 * Makes changes to game functionality
 */
-void MapManager::applyGamePatches() {
+void MapManager::applyHooks() {
 
 	if (!h2mod->Server) {
 
@@ -303,6 +396,13 @@ void MapManager::applyGamePatches() {
 		PatchCall(h2mod->GetAddress(0x244B8F), get_map_download_source_str);
 		PatchCall(h2mod->GetAddress(0x244B9D), get_receiving_map_string);
 	}
+
+	// Both server and client
+	WriteJmpTo(h2mod->GetAddress(0x1467, 0x12E2), is_supported_build);
+	PatchCall(h2mod->GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
+	PatchCall(h2mod->GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
+	PatchCall(h2mod->GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
+	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 
 	// allow host to start the game, even if there are peers that didn't load the map
 	p_get_map_load_status_for_all_peers = (get_map_load_status_for_all_peers)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B1929, 0x197879), (BYTE*)get_map_load_status_for_all_peers_hook, 8);
@@ -393,26 +493,23 @@ void MapManager::reloadAllMaps() {
 
 bool MapManager::loadMapInfo(std::wstring& mapFileLocation)
 {
-	char data[2960];
+	BYTE data[2960];
 	ZeroMemory(data, sizeof(data));
 
-	typedef bool(__thiscall* reload_map)(void* a1, char* a2);
+	typedef bool(__thiscall* reload_map)(void* a1, BYTE* a2);
 	auto p_reload_map = h2mod->GetAddress<reload_map>(0x4CD1E);
-
-	typedef bool(__cdecl* get_map_info)(char* a1);
-	auto p_get_map_info = h2mod->GetAddress<get_map_info>(0x4F690);
 
 	wcscpy_s(reinterpret_cast<wchar_t*>(data + 2432), 256, mapFileLocation.c_str());
 
-	bool result = false;
-	if (p_get_map_info(data))
+	bool mapLoaded = false;
+	if (validate_and_add_custom_map(data))
 	{
 		void* customMapData = h2mod->GetAddress<void*>(0x482D70, 0x4A70D8);
 		if (p_reload_map(customMapData, data))
-			result = true;
+			mapLoaded = true;
 	}
 
-	return result;
+	return mapLoaded;
 }
 
 void MapManager::getMapFilename(std::wstring& buffer)
@@ -447,8 +544,7 @@ static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ul
 }
 
 bool MapManager::downloadFromRepo(std::string mapFilename) {
-	std::string url("http://www.h2maps.net/Cartographer/CustomMaps/");
-	url += mapFilename;
+	std::string url(cartographerMapRepoURL + "/");
 
 	FILE *fp = nullptr;
 	CURL *curl = nullptr;
@@ -465,6 +561,10 @@ bool MapManager::downloadFromRepo(std::string mapFilename) {
 			curl_easy_cleanup(curl);
 			return false;
 		}
+
+		char *url_encoded_map_filename = curl_easy_escape(curl, mapFilename.c_str(), mapFilename.length());
+		url += url_encoded_map_filename;
+		curl_free(url_encoded_map_filename);
 
 		//fail if 404 or any other type of http error
 		curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
