@@ -34,7 +34,6 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 static bool NotDisplayIngameChat() {
 	int GameGlobals = *h2mod->GetAddress<int*>(0x482D3C);
 	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
-	BYTE* GameState = h2mod->GetAddress<BYTE*>(0x420FC4);
 
 	if (H2Config_hide_ingame_chat) {
 		PlayerIterator playerIt;
@@ -46,7 +45,7 @@ static bool NotDisplayIngameChat() {
 		return true;
 	}
 
-	else if (*GameEngine != 3 && *GameState == 3) {
+	else if (*GameEngine != 3 && get_game_life_cycle() == life_cycle_in_game) {
 		//Enable chat in engine mode and game state mp.
 		return false;
 	}
@@ -538,88 +537,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 }
 #pragma endregion
 
-#pragma region custom map checks
-
-bool open_cache_header(const wchar_t *lpFileName, tags::cache_header *cache_header_ptr, HANDLE *map_handle)
-{
-	typedef char (__cdecl open_cache_header)(const wchar_t *lpFileName, tags::cache_header *lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
-	auto open_cache_header_impl = h2mod->GetAddress<open_cache_header*>(0x642D0, 0x4C327);
-	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
-}
-
-void close_cache_header(HANDLE *map_handle)
-{
-	typedef void __cdecl close_cache_header(HANDLE *a1);
-	auto close_cache_header_impl = h2mod->GetAddress<close_cache_header*>(0x64C03, 0x4CC5A);
-	close_cache_header_impl(map_handle);
-}
-
-static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
-
-int __cdecl validate_and_add_custom_map(BYTE *a1)
-{
-	tags::cache_header header;
-	HANDLE map_cache_handle;
-	wchar_t *file_name = (wchar_t*)a1 + 1216;
-	if (!open_cache_header(file_name, &header, &map_cache_handle))
-		return false;
-	if (header.magic != 'head' || header.foot != 'foot' || header.file_size <= 0 || header.engine_gen != 8)
-	{
-		LOG_TRACE_FUNCW(L"\"{}\" has invalid header", file_name);
-		return false;
-	}
-	if (header.type > 5 || header.type < 0)
-	{
-		LOG_TRACE_FUNCW(L"\"{}\" has bad scenario type", file_name);
-		return false;
-	}
-	if (strnlen_s(header.name, 0x20u) >= 0x20 || strnlen_s(header.version, 0x20) >= 0x20)
-	{
-		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
-		return false;
-	}
-	if (header.type != scnr_type::Multiplayer && header.type != scnr_type::SinglePlayer)
-	{
-		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
-		return false;
-	}
-
-	close_cache_header(&map_cache_handle);
-	// needed because the game loads the human readable map name and description from scenario after checks
-	// without this the map is just called by it's file name
-
-	// todo move the code for loading the descriptions to our code and get rid of this
-	typedef int __cdecl validate_and_add_custom_map_interal(BYTE *a1);
-	auto validate_and_add_custom_map_interal_impl = h2mod->GetAddress<validate_and_add_custom_map_interal*>(0x4F690, 0x56890);
-	if (!validate_and_add_custom_map_interal_impl(a1))
-	{
-		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
-		std::wstring fallback_name;
-		if (strnlen_s(header.name, sizeof(header.name)) > 0) {
-			fallback_name = wstring_to_string.from_bytes(header.name, &header.name[sizeof(header.name) - 1]);
-		} else {
-			std::wstring full_file_name = file_name;
-			auto start = full_file_name.find_last_of('\\');
-			fallback_name = full_file_name.substr(start != std::wstring::npos ? start : 0, full_file_name.find_last_not_of('.'));
-		}
-		wcsncpy_s(reinterpret_cast<wchar_t*>(a1 + 32), 0x20, fallback_name.c_str(), fallback_name.size());
-	}
-	// load the map even if some of the checks failed, will still mostly work
-	return true;
-}
-
-bool __cdecl is_supported_build(char *build)
-{
-	const static std::unordered_set<std::string> offically_supported_builds{ "11122.07.08.24.1808.main", "11081.07.04.30.0934.main" };
-	if (offically_supported_builds.count(build) == 0)
-	{
-		LOG_TRACE_FUNC("Build '{}' is not offically supported consider repacking and updating map with supported tools", build);
-	}
-	return true;
-}
-
-#pragma endregion
-
 typedef char(__stdcall *tfn_c0024eeef)(DWORD*, int, int);
 tfn_c0024eeef pfn_c0024eeef;
 char __stdcall fn_c0024eeef(DWORD* thisptr, int a2, int a3)//__thiscall
@@ -941,13 +858,6 @@ void InitH2Tweaks() {
 		// disable cloth debugging that writes to cloth.txt
 		WriteValue<bool>(h2mod->GetAddress(0x41F650), false);
 	}
-
-	// Both server and client
-	WriteJmpTo(h2mod->GetAddress(0x1467, 0x12E2), is_supported_build);
-	PatchCall(h2mod->GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
-	PatchCall(h2mod->GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
-	PatchCall(h2mod->GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
-	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 
 	UncappedFPS::ApplyPatches();
 

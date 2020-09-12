@@ -243,6 +243,7 @@ int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4)
 	{
 		char* datum_mem = &qos_probes_datum_array->datum[free_qos_datum_index.ToAbsoluteIndex() * qos_probes_datum_array->datum_element_size];
 		xnqos_stub.cxnqos = 1;
+		xnqos_stub.cxnqosPending = 0;
 		*(short*)(datum_mem + 2) = (short)1;
 		*(XNQOS**)(datum_mem + 4) = &xnqos_stub;
 		return free_qos_datum_index.ToInt();
