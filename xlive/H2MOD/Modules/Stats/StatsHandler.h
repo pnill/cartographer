@@ -6,20 +6,17 @@
 #include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
 #include "H2MOD/Modules/Config/Config.h"
 
+extern bool Registered;
 class StatsHandler
 {
 	
 public:
 	StatsHandler();
-	static bool& Registered()
-	{
-		static bool registered;
-		return registered;
-	}
+
 	static void sendStats()
 	{
 		if (h2mod->Server) {
-			if (Registered()) {
+			if (isRegistered()) {
 				auto token = getAPIToken();
 				if (strlen(token) != 0) {
 					int verifyPlaylistResponse = verifyPlaylist(token);
@@ -65,7 +62,7 @@ public:
 	{
 		if(h2mod->Server)
 		{
-			if (Registered()) {
+			if (isRegistered()) {
 				auto token = getAPIToken();
 				int verifyPlaylistResponse = verifyPlaylist(token);
 				if (verifyPlaylistResponse == 500 || verifyPlaylistResponse == -1)
@@ -102,28 +99,8 @@ public:
 			}
 		}
 	}
-	static void verifyRegistrationStatus()
-	{
-		auto checkResult = checkServerRegistration();
-		if (strlen(checkResult) == 32)
-		{
-			//Check result returned a new AuthKey, attempt to register the server with it
-			if (serverRegistration(checkResult)) {
-				//Success save AuthKey to config
-				LOG_INFO_GAME(L"[H2MOD] verifyRegistrationStatus was successful.");
-				strncpy(H2Config_stats_authkey, checkResult, 32);
-				Registered() = true;
-			} else {
-				//Failure 
-				LOG_ERROR_GAME(L"[H2MOD] verifyRegistrationStatus webserver error on register attempt, this will be attempted again next server launch");
-				Registered() = false;
-			}
-		}
-		if(strlen(checkResult) == 2)
-			Registered() = true;
-		Registered() = false;
-		LOG_INFO_GAME(std::to_string(Registered()));
-	}
+	static void verifyRegistrationStatus();
+	static bool isRegistered();
 	static char* checkServerRegistration();
 	static bool serverRegistration(char* authKey);
 	static char* getAPIToken();

@@ -746,7 +746,7 @@ void ReadH2Config() {
 
 				const char* stats_authkey = ini.GetValue(H2ConfigVersionSection.c_str(), "stats_auth_key", H2Config_stats_authkey);
 				if(stats_authkey) {
-					strncpy(H2Config_stats_authkey, stats_authkey, sizeof(stats_authkey));
+					strncpy(H2Config_stats_authkey, stats_authkey, sizeof(H2Config_stats_authkey));
 				}
 
 				std::string team_bit_mask(ini.GetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str));

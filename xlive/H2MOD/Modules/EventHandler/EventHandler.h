@@ -1,18 +1,11 @@
 
+#include "Blam/Common/Common.h"
+
 enum EventTypes
 {
 	player_leave,
 	player_join,
 	gamestate_change,
-};
-enum GameState : BYTE
-{
-	GS_MainMenu = 0,
-	GS_Lobby = 1,
-	GS_Loading = 2,
-	GS_InGame = 3,
-	GS_PostGame = 4,
-	GS_MatchMaking = 5
 };
 //template <class T>
 //struct EventCallback
@@ -30,7 +23,7 @@ enum GameState : BYTE
 struct GameStateCallback
 {
 	std::string name;
-	GameState gameState;
+	game_life_cycle  gameState;
 	std::function<void()> callback;
 	bool runOnce;
 	/**
@@ -39,7 +32,7 @@ struct GameStateCallback
 	 * \param gameState The GameState type in which this should execute
 	 * \param callback a void that will be executed when this event happens.
 	 */
-	GameStateCallback(std::string name, GameState gameState, std::function<void()> callback, bool runOnce = false)
+	GameStateCallback(std::string name, game_life_cycle  gameState, std::function<void()> callback, bool runOnce = false)
 	{
 		this->name = name;
 		this->gameState = gameState;

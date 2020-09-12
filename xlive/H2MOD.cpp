@@ -1375,7 +1375,7 @@ void H2MOD::RegisterEvents()
 		//registerGamestateCallback([]() { h2mod->set_local_rank(255); }, "MainMenu");
 		EventHandler::registerGameStateCallback({
 				"StatsResetRank",
-				GS_MainMenu,
+				life_cycle_none,
 				[]() {h2mod->set_local_rank(255);}
 			}, false);
 	}
@@ -1384,7 +1384,7 @@ void H2MOD::RegisterEvents()
 		//Register callback on Post Game to upload the stats to the server
 		EventHandler::registerGameStateCallback({
 				"StatsSendStats",
-				GS_PostGame,
+				life_cycle_post_game,
 				&stats_handler->sendStats
 			}, true);
 		
@@ -1402,7 +1402,7 @@ void H2MOD::RegisterEvents()
 		//register a callback when the server reaches the lobby for the first time
 		EventHandler::registerGameStateCallback({
 				"InitStats",
-				GS_Lobby,
+				life_cycle_pre_game,
 				[]()
 				{
 					stats_handler->verifyRegistrationStatus();
@@ -1410,7 +1410,7 @@ void H2MOD::RegisterEvents()
 					//Register callback to send player ranks on lobby	
 					EventHandler::registerGameStateCallback({
 						"StatsSendRanks",
-						GS_Lobby,
+						life_cycle_pre_game,
 						[]() {stats_handler->sendRankChange(true);}
 					}, true);
 				},

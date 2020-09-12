@@ -22,6 +22,7 @@
 #endif
 
 static const bool verbose = false;
+bool Registered = false;
 StatsHandler::StatsHandler()
 = default;
 
@@ -75,6 +76,33 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct curl_respon
 	s->len = new_len;
 
 	return size * nmemb;
+}
+
+void StatsHandler::verifyRegistrationStatus()
+{
+	auto checkResult = checkServerRegistration();
+	if (strlen(checkResult) == 32)
+	{
+		//Check result returned a new AuthKey, attempt to register the server with it
+		if (serverRegistration(checkResult)) {
+			//Success save AuthKey to config
+			LOG_INFO_GAME(L"[H2MOD] verifyRegistrationStatus was successful.");
+			strncpy(H2Config_stats_authkey, checkResult, 32);
+			Registered = true;
+		}
+		else {
+			//Failure 
+			LOG_ERROR_GAME(L"[H2MOD] verifyRegistrationStatus webserver error on register attempt, this will be attempted again next server launch");
+			Registered = false;
+		}
+	}
+	Registered = strlen(checkResult) == 2;
+}
+
+bool StatsHandler::isRegistered()
+{
+	//Kill me
+	return Registered;
 }
 
 char* StatsHandler::checkServerRegistration()
@@ -236,6 +264,7 @@ char* StatsHandler::getAPIToken()
 	if (result != CURLE_OK)
 	{
 		LOG_ERROR_GAME(L"[H2MOD]::getAPIToken failed to execute curl");
+		curl_easy_cleanup(curl);
 		return "";
 	}
 
@@ -244,12 +273,15 @@ char* StatsHandler::getAPIToken()
 	if (response_code == 500)
 	{
 		LOG_ERROR_GAME(L"[H2MOD]::getAPIToken failed get token for stats API");
+		curl_easy_cleanup(curl);
 		return "";
 	}
 	if (response_code == 200)
 	{
+		curl_easy_cleanup(curl);
 		return s.ptr;
 	}
+	curl_easy_cleanup(curl);
 	return "";
 }
 
@@ -363,8 +395,12 @@ int StatsHandler::verifyPlaylist(char* token)
 			curlResult = curl_easy_perform(curl);
 			if(curlResult != CURLE_OK)
 			{
+				char CurlError[500];
+				snprintf(CurlError, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
 				LOG_ERROR_GAME(L"[H2MOD]::playlistVerified failed to execute curl");
+				LOG_INFO_GAME(CurlError);
 				//LOG_ERROR_GAME(curl_easy_strerror(curlResult));
+				curl_easy_cleanup(curl);
 				return -1;
 			} else
 			{
@@ -372,11 +408,13 @@ int StatsHandler::verifyPlaylist(char* token)
 				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
 				if (verbose)
 					LOG_INFO_GAME(std::to_string(response_code));
+				curl_easy_cleanup(curl);
 				return response_code;
 			}
 			curl_easy_cleanup(curl);
 		}
 	}
+
 	return -1;
 }
 
@@ -421,7 +459,6 @@ int StatsHandler::uploadStats(char* filepath, char* token)
 	{
 		int response_code;
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-		LOG_INFO_GAME(std::to_string(response_code));
 		curl_easy_cleanup(curl);
 		return response_code;
 	}
@@ -707,8 +744,6 @@ char* StatsHandler::buildJSON()
 
 	document.AddMember(L"Players", Players, allocator);
 
-	//Shrink Versus Data
-	
 
 	//Export the file
 	rapidjson::StringBuffer strbuf;
