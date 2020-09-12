@@ -125,7 +125,6 @@ char* StatsHandler::checkServerRegistration()
 		std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=ServerRegistrationCheck&Server_XUID=";
 		auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
 		auto sXUID = IntToString<::XUID>(ServerXUID, std::dec).c_str();
-		//http_request_body.append(curl_easy_escape(curl, H2Config_login_identifier, strlen(H2Config_login_identifier)));
 		http_request_body.append(sXUID);
 
 		struct curl_response_text s;
@@ -151,7 +150,6 @@ char* StatsHandler::checkServerRegistration()
 			LOG_INFO_GAME(std::to_string(response_code));
 			if(response_code == 500)
 			{
-				//LOG_ERROR_GAME(L"[H2MOD]::checkServerRegistration API threw an error. {0}", std::string(s.ptr));
 				curl_easy_cleanup(curl);
 				return ""; //Server Error
 			}
@@ -194,7 +192,6 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl_mime_name(field, "Server_Name");
 	curl_mime_data(field, H2Config_login_identifier, CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
-	//auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
 	auto sXUID = IntToString<::XUID>(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid, std::dec).c_str();
 	curl_mime_name(field, "Server_XUID");
 	curl_mime_data(field, sXUID, CURL_ZERO_TERMINATED);
@@ -399,7 +396,6 @@ int StatsHandler::verifyPlaylist(char* token)
 				snprintf(CurlError, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
 				LOG_ERROR_GAME(L"[H2MOD]::playlistVerified failed to execute curl");
 				LOG_INFO_GAME(CurlError);
-				//LOG_ERROR_GAME(curl_easy_strerror(curlResult));
 				curl_easy_cleanup(curl);
 				return -1;
 			} else
@@ -508,22 +504,7 @@ char* StatsHandler::buildJSON()
 	Variant.AddMember(L"Settings", VariantSettings, allocator);
 	document.AddMember(L"Variant", Variant, allocator);
 	
-	//Build the Server Object
-	//WValue Server(rapidjson::kObjectType);
-	//auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
-	//auto sXUID = IntToWString<::XUID>(ServerXUID, std::dec).c_str();
-	//value.SetString(sXUID, allocator);
-	//Server.AddMember(L"XUID", value, allocator);
-	////h2mod->get_local_player_name(0)
 	auto ServerName = h2mod->GetAddress<wchar_t*>(0, 0x52FC88);
-	//value.SetString(ServerName, allocator);
-	//Server.AddMember(L"Name", value, allocator);
-	//auto IP = NetworkSession::getLocalNetworkAddress();
-	//auto IPString = std::string(inet_ntoa(IP));
-	//auto wIPString = std::wstring(IPString.begin(), IPString.end());
-	//value.SetString(wIPString.c_str(), allocator);
-	//Server.AddMember(L"IP", value, allocator);
-	//document.AddMember(L"Server", Server, allocator);
 
 	//Players
 	int playerCount = 0;
@@ -870,7 +851,6 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 		if (curlResult != CURLE_OK)
 		{
 			LOG_ERROR_GAME(L"[H2MOD]::getPlayerRanks failed to execute curl");
-			//LOG_ERROR_GAME(curl_easy_strerror(curlResult));
 			return document;
 		}
 		else
