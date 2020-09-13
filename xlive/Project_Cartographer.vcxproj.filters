@@ -540,6 +540,9 @@
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.cpp">
       <Filter>Source Files\H2MOD\Modules\MainLoopPatches\UncappedFPS</Filter>
     </ClCompile>
+    <ClCompile Include="Blam\Engine\Players\Players.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="H2MOD.h">

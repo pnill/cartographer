@@ -151,7 +151,7 @@ void NetworkSession::logPlayersToConsole() {
 			outStr += L", PlayerName=";
 			outStr += getPlayerName(playerIndex);
 			outStr += L", Name from game player state=";
-			outStr += h2mod->get_player_name_from_player_index(playerIndex);
+			outStr += Player::getName(playerIndex);
 			outStr += L", Team=" + std::to_wstring(getPlayerTeam(playerIndex));
 			outStr += L", Identifier=" + std::to_wstring(getPlayerXuid(playerIndex));
 
@@ -184,12 +184,8 @@ void NetworkSession::logPeersToConsole() {
 				outStr += L", Player name=";
 				outStr += getPlayerName(playerIndex);
 
-				// TODO FIXME fix this for dedis
-				if (!h2mod->Server)
-				{
-					outStr += L", Name from game player state=";
-					outStr += h2mod->get_player_name_from_player_index(playerIndex);
-				}
+				outStr += L", Name from game player state=";
+				outStr += Player::getName(playerIndex);
 			}
 			commands->output(outStr);
 
