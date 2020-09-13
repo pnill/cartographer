@@ -50,20 +50,14 @@ public:
 		void ApplyUnitHooks();
 
 		void team_player_indicator_visibility(bool toggle);
-		int get_unit_index_from_player_index(int);
-		datum get_unit_datum_from_player_index(int);
 		BYTE* get_player_unit_from_player_index(int playerIndex);
 		datum get_player_datum_index_from_controller_index(int controller_index);
 		wchar_t* get_local_player_name(int local_player_index);
 		real_point3d* get_player_unit_coords(int player_index);
 		float get_distance(int, int);
-		wchar_t* get_player_name_from_player_index(int playerIndex);
-		int get_player_index_from_name(wchar_t* playername);
-		int get_player_index_from_unit_datum(datum unit_datum_index);
+		int get_player_index_from_unit_datum_index(datum unit_datum_index);
 		BYTE get_unit_team_index(datum unit_datum_index);
-		void set_unit_biped(int playerIndex, Player::Biped biped_type);
 		void set_unit_speed_patch(bool hackit);
-		void set_unit_speed(float speed, int playerIndex);
 		void set_local_team_index(int local_player_index, int team);
 		BYTE get_local_team_index();
 		void set_player_unit_grenades_count(int playerIndex, Grenades type, BYTE count, bool resetEquipment);

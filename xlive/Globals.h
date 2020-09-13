@@ -21,7 +21,6 @@
 	std::thread{ [=] { expression; } }.detach();
 
 extern s_datum_array* game_state_actors;
-extern s_datum_array* game_state_players;
 extern s_datum_array* game_state_objects_header;
 
 extern DeviceShop* device_shop;

@@ -60,7 +60,7 @@ public:
 	static void sendTeamChange();
 	static void disableSlayerSounds();
 	static void resetZombiePlayerStatus();
-	static void setZombiePlayerStatus(int playerIndex);
+	static void setZombiePlayerStatus(XUID identifier);
 	static void spawnPlayerClientSetup(int playerIndex);
 	static void spawnServerPlayerSetup(int playerIndex);
 	static void setPlayerAsHuman(int playerIndex);
