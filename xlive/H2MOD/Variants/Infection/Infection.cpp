@@ -110,7 +110,9 @@ void Infection::resetZombiePlayerStatus() {
 
 void Infection::setZombiePlayerStatus(int playerIndex)
 {
-	zombieIdentifiers.push_back(getPlayerXuid(playerIndex));
+	if (playerIndex != NONE) {
+		zombieIdentifiers.push_back(getPlayerXuid(playerIndex));
+	}
 }
 
 void Infection::initHost() {
@@ -147,7 +149,7 @@ void Infection::preSpawnServerSetup() {
 				isZombie = true;
 			}
 
-			LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={0}, isZombie={1}, playerIdentifier={2}, playerName:{3}", playerIndex, isZombie, playerIdentifier, getPlayerName(playerIndex));
+			LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={}, isZombie={}, playerIdentifier={}, playerName:{}", playerIndex, isZombie, playerIdentifier, getPlayerName(playerIndex));
 			if (isZombie) {
 				h2mod->set_unit_biped(playerIndex, Player::Biped::Elite);
 				if (localPeerIsSessionHost() 
@@ -183,81 +185,89 @@ void Infection::setPlayerAsZombie(int playerIndex) {
 }
 
 void Infection::spawnPlayerClientSetup(int playerIndex) {
-	XUID playerIdentifier = getPlayerXuid(playerIndex);
-	//If player being spawned is LocalUser/Player
-	if (playerIdentifier == getPlayerXuid(h2mod->get_player_datum_index_from_controller_index(0).ToAbsoluteIndex())) {
-		if (firstSpawn == true) {
-			//start of zombie match
-			Infection::triggerSound(INFECTION_SOUND, 1000);
-			firstSpawn = false;
-		}
+	if (playerIndex != NONE) {
+		XUID playerIdentifier = getPlayerXuid(playerIndex);
+		//If player being spawned is LocalUser/Player
+		if (playerIdentifier == getPlayerXuid(h2mod->get_player_datum_index_from_controller_index(0).ToAbsoluteIndex())) {
+			if (firstSpawn == true) {
+				//start of zombie match
+				Infection::triggerSound(INFECTION_SOUND, 1000);
+				firstSpawn = false;
+			}
 
-		if (h2mod->get_local_team_index() == ZOMBIE_TEAM && infectedPlayed == false) {
-			Infection::triggerSound(INFECTED_SOUND, 500);
-			infectedPlayed = true;
-		}
+			if (h2mod->get_local_team_index() == ZOMBIE_TEAM && infectedPlayed == false) {
+				Infection::triggerSound(INFECTED_SOUND, 500);
+				infectedPlayed = true;
+			}
 
-		if (h2mod->get_local_team_index() == HUMAN_TEAM) {
-			h2mod->disable_weapon_pickup(true);
-			h2mod->team_player_indicator_visibility(false);
-		}
-		else if (h2mod->get_local_team_index() == ZOMBIE_TEAM) {
-			h2mod->set_unit_biped(playerIndex, Player::Biped::Elite);
+			if (h2mod->get_local_team_index() == HUMAN_TEAM) {
+				h2mod->disable_weapon_pickup(true);
+				h2mod->team_player_indicator_visibility(false);
+			}
+			else if (h2mod->get_local_team_index() == ZOMBIE_TEAM) {
+				h2mod->set_unit_biped(playerIndex, Player::Biped::Elite);
 
-			h2mod->disable_weapon_pickup(false);
-			h2mod->team_player_indicator_visibility(true);
+				h2mod->disable_weapon_pickup(false);
+				h2mod->team_player_indicator_visibility(true);
+			}
 		}
 	}
 }
 
 void Infection::spawnServerPlayerSetup(int playerIndex) {
-	LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}", playerIndex);
-	datum unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
-	char* unit_object = call_object_try_and_get_data_with_type(unit_datum_index, FLAG(e_object_type::biped));
-	if (unit_object) {
-		//if the unit_object data pointer is not nullptr, the spawned object is "alive"
+	if (playerIndex != NONE) {
+		LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}", playerIndex);
+		datum unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
+		char* unit_object = call_object_try_and_get_data_with_type(unit_datum_index, FLAG(e_object_type::biped));
+		if (unit_object) {
+			//if the unit_object data pointer is not nullptr, the spawned object is "alive"
 
-		LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={0}, unit team index={1}", playerIndex, h2mod->get_unit_team_index(unit_datum_index));
-		if (h2mod->get_unit_team_index(unit_datum_index) == HUMAN_TEAM) {
-			Infection::setPlayerAsHuman(playerIndex);
-		}
+			LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={0}, unit team index={1}", playerIndex, h2mod->get_unit_team_index(unit_datum_index));
+			if (h2mod->get_unit_team_index(unit_datum_index) == HUMAN_TEAM) {
+				Infection::setPlayerAsHuman(playerIndex);
+			}
 
-		if (h2mod->get_unit_team_index(unit_datum_index) == ZOMBIE_TEAM) {
-			Infection::setPlayerAsZombie(playerIndex);
+			if (h2mod->get_unit_team_index(unit_datum_index) == ZOMBIE_TEAM) {
+				Infection::setPlayerAsZombie(playerIndex);
+			}
 		}
 	}
 }
 
 void Infection::infectPlayer(int playerIndex, datum unitDatumIndex) {
-	char* unit_object = call_object_try_and_get_data_with_type(unitDatumIndex, FLAG(e_object_type::biped));
-	if (unit_object && h2mod->get_unit_team_index(unitDatumIndex) != ZOMBIE_TEAM)
-	{
-		//if we have a valid object and the object is not on the zombie team
-		XUID playerIdentifier = getPlayerXuid(h2mod->get_player_index_from_unit_datum(unitDatumIndex));
+	if (playerIndex != NONE) {
+		char* unit_object = call_object_try_and_get_data_with_type(unitDatumIndex, FLAG(e_object_type::biped));
+		if (unit_object && getPlayerTeam(playerIndex) != ZOMBIE_TEAM)
+		{
+			//if we have a valid object and the object is not on the zombie team
+			XUID playerIdentifier = getPlayerXuid(playerIndex);
 
-		LOG_TRACE_GAME(L"[h2mod-infection] Infected player, localName={0}, nameFromUnitDatumIndex={1}", h2mod->get_local_player_name(0), playerIdentifier);
+			LOG_TRACE_GAME(L"[h2mod-infection] Infected player, localName={0}, nameFromUnitDatumIndex={1}", h2mod->get_local_player_name(0), playerIdentifier);
 
-		//If player being infected is LocalUser/Player
-		if (playerIdentifier == getPlayerXuid(h2mod->get_player_datum_index_from_controller_index(0).ToAbsoluteIndex())) {
-			LOG_TRACE_GAME("[h2mod-infection] Setting player as zombie");
-			h2mod->set_local_team_index(0, ZOMBIE_TEAM);
-			h2mod->set_unit_biped(playerIndex, Player::Biped::Elite);
-		}
-		else {
-			//if not, then this is a new zombie
-			Infection::triggerSound(NEW_ZOMBIE_SOUND, 1000);
+			//If player being infected is LocalUser/Player
+			if (playerIdentifier == getPlayerXuid(h2mod->get_player_datum_index_from_controller_index(0).ToAbsoluteIndex())) {
+				LOG_TRACE_GAME("[h2mod-infection] Setting player as zombie");
+				h2mod->set_local_team_index(0, ZOMBIE_TEAM);
+				h2mod->set_unit_biped(playerIndex, Player::Biped::Elite);
+			}
+			else {
+				//if not, then this is a new zombie
+				Infection::triggerSound(NEW_ZOMBIE_SOUND, 1000);
+			}
 		}
 	}
 }
 
 void Infection::infectPlayers(int playerIndex, datum unitDatumIndex) {
-	char* unit_object = call_object_try_and_get_data_with_type(unitDatumIndex, FLAG(e_object_type::biped));
-	if (unit_object) {
-		Infection::setZombiePlayerStatus(playerIndex);
+	if (playerIndex != NONE) {
+		char* unit_object = call_object_try_and_get_data_with_type(unitDatumIndex, FLAG(e_object_type::biped));
+		if (unit_object) {
+			Infection::setZombiePlayerStatus(playerIndex);
 
-		if (h2mod->get_unit_team_index(unitDatumIndex) == ZOMBIE_TEAM) {
-			//don't drop swords after zombie death
-			call_unit_reset_equipment(unitDatumIndex); //Take away zombie's weapons
+			if (h2mod->get_unit_team_index(unitDatumIndex) == ZOMBIE_TEAM) {
+				//don't drop swords after zombie death
+				call_unit_reset_equipment(unitDatumIndex); //Take away zombie's weapons
+			}
 		}
 	}
 }
@@ -357,7 +367,7 @@ void InfectionInitializer::onPeerHost()
 	Infection::initHost();
 	zombiePlayerIndex = Infection::calculateZombiePlayerIndex();
 	LOG_TRACE_GAME("[h2mod-infection] Peer host calculated zombie index {}", zombiePlayerIndex);
-	if (zombiePlayerIndex == -1) {
+	if (zombiePlayerIndex == NONE) {
 		LOG_TRACE_GAME("[h2mod-infection] Failed selecting a zombie!");
 	}
 	else {
@@ -377,7 +387,7 @@ void InfectionInitializer::onDedi()
 	//figure out who the zombie is
 	zombiePlayerIndex = Infection::calculateZombiePlayerIndex();
 	LOG_TRACE_GAME("[h2mod-infection] Dedicated host calculated zombie index {}", zombiePlayerIndex);
-	if (zombiePlayerIndex == -1) {
+	if (zombiePlayerIndex == NONE) {
 		LOG_TRACE_GAME("[h2mod-infection] Failed selecting a zombie!");
 	}
 	else {

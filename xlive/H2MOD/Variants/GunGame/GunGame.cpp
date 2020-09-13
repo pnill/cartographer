@@ -137,6 +137,13 @@ void GunGame::resetPlayerLevels() {
 	gungamePlayers.clear();
 }
 
+void GunGame::preSpawnPlayerSetup(int playerIndex)
+{
+	if (playerIndex != NONE) {
+		h2mod->set_unit_biped(playerIndex, Player::Biped::Spartan);
+	}
+}
+
 void GunGame::spawnPlayerServer(int playerIndex) {
 	LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() player index: {}, player name: {1}", playerIndex, h2mod->get_player_name_from_player_index(playerIndex));
 
@@ -239,15 +246,17 @@ void GunGameInitializer::onPeerHost() {
 }
 
 void GunGamePreSpawnHandler::onClient() {
-	//gungame does nothing during pre spawn
+	// do the same thing host does
+	onPeerHost();
 }
 
 void GunGamePreSpawnHandler::onDedi() {
-	//gungame does nothing during pre spawn
+	// do the same thing host does
+	onPeerHost();
 }
 
 void GunGamePreSpawnHandler::onPeerHost() {
-	//gungame does nothing during pre spawn
+	GunGame::preSpawnPlayerSetup(this->getPlayerIndex());
 }
 
 void GunGameSpawnHandler::onClient() {
