@@ -421,7 +421,7 @@ real_point3d* H2MOD::get_player_unit_coords(int playerIndex) {
 }
 
 BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
-	datum unit_datum = get_unit_datum_from_player_index(playerIndex);
+	datum unit_datum = Player::getPlayerUnitDatumIndex(playerIndex);
 	if (unit_datum.IsNull())
 		return nullptr;
 
@@ -429,16 +429,16 @@ BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
 	return (BYTE*)objectsIt.get_data_at_index(unit_datum.ToAbsoluteIndex())->object;
 }
 
-void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset)
+void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 {
 	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
-	datum unit_datum = h2mod->get_unit_datum_from_player_index(PlayerIndex);
+	datum unit_datum = Player::getPlayerUnitDatumIndex(playerIndex);
 	if (unit_datum != NONE)
 	{
 		ObjectPlacementData nObject;
 
-		call_object_placement_data_new(&nObject, WeaponId, unit_datum, 0);
+		call_object_placement_data_new(&nObject, weaponId, unit_datum, 0);
 
 		int object_index = call_object_new(&nObject);
 
@@ -451,34 +451,10 @@ void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset)
 
 wchar_t* H2MOD::get_local_player_name(int local_player_index)
 {
-	return this->get_player_name_from_player_index(this->get_player_datum_index_from_controller_index(local_player_index).ToAbsoluteIndex());
+	return Player::getName(this->get_player_datum_index_from_controller_index(local_player_index).ToAbsoluteIndex());
 }
 
-int H2MOD::get_player_index_from_name(wchar_t* playername)
-{
-	PlayerIterator playersIt;
-
-	while (playersIt.get_next_player())
-	{
-		wchar_t* comparename = playersIt.get_current_player_name();
-
-		LOG_TRACE_GAME(L"[H2MOD]::get_player_index_from_name( {0} : {1} )", playername, comparename);
-
-		if (wcscmp(comparename, playername))
-		{
-			return playersIt.get_current_player_index();
-		}
-	}
-	return NONE;
-}
-
-wchar_t* H2MOD::get_player_name_from_player_index(int playerIndex)
-{
-	PlayerIterator playersIt;
-	return playersIt.get_data_at_index(playerIndex)->properties.player_name;
-}
-
-int H2MOD::get_player_index_from_unit_datum(datum unit_datum_index)
+int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
 {
 	PlayerIterator playersIt;
 	while (playersIt.get_next_player())
@@ -490,32 +466,6 @@ int H2MOD::get_player_index_from_unit_datum(datum unit_datum_index)
 			return playersIt.get_current_player_index();
 	}
 	return NONE;
-}
-
-datum H2MOD::get_unit_datum_from_player_index(int playerIndex)
-{
-	PlayerIterator playersIt;
-	if (!playersIt.get_data_at_index(playerIndex)->BipedUnitDatum.IsNull())
-		return playersIt.get_data_at_index(playerIndex)->BipedUnitDatum;
-
-	return NONE;
-}
-
-int H2MOD::get_unit_index_from_player_index(int playerIndex)
-{
-	PlayerIterator playersIt;
-	if (!playersIt.get_data_at_index(playerIndex)->BipedUnitDatum.IsNull())
-		return playersIt.get_data_at_index(playerIndex)->BipedUnitDatum.ToAbsoluteIndex();
-
-	return NONE;
-}
-
-//can be used on clients and server
-void H2MOD::set_unit_biped(int playerIndex, Player::Biped biped_type)
-{
-	PlayerIterator playersIt;
-	if (playerIndex >= 0 && playerIndex < 16)
-		playersIt.get_data_at_index(playerIndex)->properties.profile.player_character_type = biped_type;
 }
 
 BYTE H2MOD::get_unit_team_index(datum unit_datum_index)
@@ -550,13 +500,6 @@ void H2MOD::set_unit_speed_patch(bool hackit) {
 	}
 }
 
-void H2MOD::set_unit_speed(float speed, int playerIndex)
-{
-	PlayerIterator playersIt;
-	if (playerIndex >= 0 && playerIndex < 16)
-		playersIt.get_data_at_index(playerIndex)->unit_speed = speed;
-}
-
 void H2MOD::set_player_unit_grenades_count(int playerIndex, Grenades type, BYTE count, bool resetEquipment)
 {
 	if (type > Grenades::Plasma)
@@ -571,7 +514,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, Grenades type, BYTE 
 		"objects\\weapons\\grenade\\plasma_grenade\\plasma_grenade"
 	};
 
-	datum unit_datum_index = h2mod->get_unit_datum_from_player_index(playerIndex);
+	datum unit_datum_index = Player::getPlayerUnitDatumIndex(playerIndex);
 	datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
 
 	char* unit_object = call_object_try_and_get_data_with_type(unit_datum_index, FLAG(e_object_type::biped));
@@ -824,7 +767,6 @@ int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 void get_object_table_memory()
 {
 	game_state_actors = *h2mod->GetAddress<s_datum_array**>(0xA965DC, 0x9A1C5C);
-	game_state_players = *h2mod->GetAddress<s_datum_array**>(0x4A8260, 0x4D64C4);
 	game_state_objects_header = *h2mod->GetAddress<s_datum_array**>(0x4E461C, 0x50C8EC);
 }
 

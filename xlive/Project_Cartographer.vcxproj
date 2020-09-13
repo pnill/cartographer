@@ -267,6 +267,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
+    <ClCompile Include="Blam\Engine\Players\Players.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.cpp" />

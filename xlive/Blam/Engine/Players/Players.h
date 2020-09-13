@@ -4,10 +4,12 @@
 #include "Blam/Engine/DataArray/DataArray.h"
 #include "Blam/Engine/Objects/Objects.h"
 
+#define ENGINE_PLAYER_MAX 16
+
 #pragma pack(push, 1)
 struct Player
 {
-	enum class Color : BYTE // TODO: move this somewhere else
+	enum class Color : BYTE
 	{
 		White,
 		Steel,
@@ -191,7 +193,6 @@ struct Player
 	};
 	CHECK_STRUCT_SIZE(Properties, 132);
 
-
 	WORD DatumSalt; //0x00
 	BYTE Flags; // 0x02
 	BYTE unk; // 0x03
@@ -229,57 +230,40 @@ struct Player
 	int field_19C; //0x19C 
 	BYTE unk_pad4[0x60]; //0x1FC
 	int is_chatting; // 0x200
+
+	/*
+	- TO NOTE: 
+	- This functions work only after game has started, if you need to do something in the pregame lobby, use the functions available in Network Session (H2MOD/Modules/Networking/NetworkSession)
+	*/
+
+	static s_datum_array* getArray();
+	static bool indexValid(int playerIndex);
+	static Player* getPlayer(int playerIndex);
+	static e_object_team getTeam(int playerIndex);
+	static void setTeam(int playerIndex, e_object_team team);
+	static void setUnitBipedType(int playerIndex, Player::Biped bipedType);
+	static void setBipedSpeed(int playerIndex, float speed);
+	static wchar_t* getName(int playerIndex);
+	static datum getPlayerUnitDatumIndex(int playerIndex);
+	static XUID getIdentifier(int playerIndex);
 };
 CHECK_STRUCT_SIZE(Player, 0x204);
 #pragma pack(pop)
 
-extern s_datum_array* game_state_players;
-
-// use while in game
 class PlayerIterator : public DatumIterator<Player>
 {
 public:
 
-	PlayerIterator() :
-		DatumIterator(game_state_players)
-	{
+	PlayerIterator();
 
-	}
+	bool get_next_player();
 
-	bool get_next_player()
-	{
-		m_current_player = get_next_datum();
-		if (m_current_player)
-		{
-			do
-			{
-				if (!(m_current_player->Flags & 2))
-					break;
+	Player* get_current_player_data();
 
-				m_current_player = get_next_datum();
+	int get_current_player_index();
 
-			} while (m_current_player);
-		}
-
-		return m_current_player != nullptr;
-	}
-
-	Player* get_current_player_data()
-	{
-		return m_current_player;
-	}
-
-	int get_current_player_index()
-	{
-		return get_current_absolute_index();
-	}
-
-	wchar_t* get_current_player_name()
-	{
-		return m_current_player->properties.player_name;
-	}
+	wchar_t* get_current_player_name();
 
 private:
 	Player* m_current_player = nullptr;
 };
-

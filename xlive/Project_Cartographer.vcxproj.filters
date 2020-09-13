@@ -544,6 +544,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp">
+    <ClCompile Include="Blam\Engine\Players\Players.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -336,7 +336,7 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 			ObjectPlacementData nObject;
 
 			if (!object_datum.IsNull()) {
-				datum player_datum = h2mod->get_unit_datum_from_player_index(h2mod->get_player_datum_index_from_controller_index(0).Index);
+				datum player_datum = Player::getPlayerUnitDatumIndex(h2mod->get_player_datum_index_from_controller_index(0).Index);
 				call_object_placement_data_new(&nObject, object_datum, player_datum, 0);
 				real_point3d* player_position = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
 				
