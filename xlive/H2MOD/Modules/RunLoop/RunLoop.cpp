@@ -12,6 +12,7 @@
 #include "H2MOD\Modules\Config\Config.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
+#include "H2MOD/Modules/Stats/StatsHandler.h"
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
@@ -278,7 +279,10 @@ void GSMainLoop() {
 			SetWindowText(H2hWnd, titleMod);
 		}
 	}
-
+	if(H2IsDediServer)
+	{
+		StatsHandler::verifyPlayerRanks();
+	}
 	/*
 	static bool halo2ServerOnce1 = false;
 	if (H2IsDediServer && !halo2ServerOnce1) {

@@ -15,7 +15,7 @@ public:
 	static void sendStats()
 	{
 		if (h2mod->Server) {
-			if (isRegistered()) {
+			if (RegisteredStatus().Registered && RegisteredStatus().StatsEnabled) {
 				auto token = getAPIToken();
 				if (strlen(token) != 0) {
 					int verifyPlaylistResponse = verifyPlaylist(token);
@@ -40,7 +40,7 @@ public:
 							{
 								if (uploadStats(filepath, token) == 200)
 								{
-									//remove(filepath);
+									remove(filepath);
 								}
 								else
 								{
@@ -61,7 +61,7 @@ public:
 	{
 		if(h2mod->Server)
 		{
-			if (isRegistered()) {
+			if (RegisteredStatus().Registered) {
 				auto token = getAPIToken();
 				int verifyPlaylistResponse = verifyPlaylist(token);
 				if (verifyPlaylistResponse == 500 || verifyPlaylistResponse == -1)
@@ -79,7 +79,7 @@ public:
 	}
 	static void sendRankChange(bool forceAll = false)
 	{
-		if (NetworkSession::localPeerIsSessionHost())
+		if (NetworkSession::localPeerIsSessionHost() && RegisteredStatus().RanksEnabled)
 		{
 			auto document = getPlayerRanks(forceAll);
 			if (document.MemberCount() != 0)
@@ -98,8 +98,15 @@ public:
 			}
 		}
 	}
+	struct StatsAPIRegisteredStatus
+	{
+		bool Registered = false;
+		bool StatsEnabled = false;
+		bool RanksEnabled = false;
+	};
+	static void verifyPlayerRanks();
 	static void verifyRegistrationStatus();
-	static bool isRegistered();
+	static StatsAPIRegisteredStatus RegisteredStatus();
 	static char* checkServerRegistration();
 	static bool serverRegistration(char* authKey);
 	static char* getAPIToken();

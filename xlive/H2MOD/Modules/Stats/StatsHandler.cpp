@@ -25,6 +25,7 @@
 static const bool verbose = true;
 bool Registered = false;
 
+StatsHandler::StatsAPIRegisteredStatus Status;
 
 
 /*
@@ -77,6 +78,8 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct curl_respon
 	return size * nmemb;
 }
 
+
+
 void StatsHandler::verifyRegistrationStatus()
 {
 	auto checkResult = checkServerRegistration();
@@ -87,22 +90,19 @@ void StatsHandler::verifyRegistrationStatus()
 			//Success save AuthKey to config
 			LOG_INFO_GAME(L"[H2MOD] verifyRegistrationStatus was successful.");
 			strncpy(H2Config_stats_authkey, checkResult, 32);
-			Registered = true;
+			Status.Registered = true;
 		}
 		else {
-			//Failure 
 			LOG_ERROR_GAME(L"[H2MOD] verifyRegistrationStatus webserver error on register attempt, this will be attempted again next server launch");
-			Registered = false;
 		}
 	}
-	Registered = strlen(checkResult) == 2;
 }
 
-bool StatsHandler::isRegistered()
+StatsHandler::StatsAPIRegisteredStatus StatsHandler::RegisteredStatus()
 {
-	//Kill me
-	return Registered;
+	return Status;
 }
+
 
 char* StatsHandler::checkServerRegistration()
 {
@@ -155,7 +155,12 @@ char* StatsHandler::checkServerRegistration()
 			if (response_code == 200)
 			{
 				curl_easy_cleanup(curl);
-				return "Ok"; //Server is registered
+				rapidjson::Document result;
+				result.Parse(s.ptr);
+				Status.Registered = true;
+				Status.RanksEnabled = std::strncmp(result["RanksEnabled"].GetString(), "true", 4) == 0;
+				Status.StatsEnabled = std::strncmp(result["StatsEnabled"].GetString(), "true", 4) == 0;
+				return ""; //Server is registered
 			}
 			if(response_code == 201)
 			{
@@ -497,8 +502,7 @@ char* StatsHandler::buildJSON()
 	
 	WValue VariantSettings(rapidjson::kObjectType);
 	BYTE TeamPlay = *h2mod->GetAddress<BYTE*>(0, 0x992880);
-	value.SetString(IntToWString<BYTE>(TeamPlay, std::dec).c_str(), allocator);
-	VariantSettings.AddMember(L"Team Play", value, allocator);
+	VariantSettings.AddMember(L"Team Play", TeamPlay, allocator);
 	Variant.AddMember(L"Settings", VariantSettings, allocator);
 	document.AddMember(L"Variant", Variant, allocator);
 	
@@ -767,6 +771,16 @@ struct compareXUID
 		return (i == key);
 	}
 };
+
+void StatsHandler::verifyPlayerRanks()
+{
+	if(Status.RanksEnabled)
+		for (auto i = 0; i < NetworkSession::getPlayerCount(); i++)
+			//if(ServerStatus.Ranked)
+			if (NetworkSession::getPlayerInformation(i)->properties.player_displayed_skill <= 50 && NetworkSession::getPlayerInformation(i)->properties.player_displayed_skill >= 0)
+				if (!std::none_of(alreadySent.begin(), alreadySent.end(), compareXUID(NetworkSession::getPlayerInformation(i)->identifier)))
+					sendRankChange(true);
+}
 void StatsHandler::playerLeftEvent(int peerIndex)
 {
 	//LeftPlayers.push_back(XUID)
