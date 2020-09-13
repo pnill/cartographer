@@ -777,7 +777,7 @@ void StatsHandler::verifyPlayerRanks()
 	if(Status.RanksEnabled)
 		for (auto i = 0; i < NetworkSession::getPlayerCount(); i++)
 			//if(ServerStatus.Ranked)
-			if (NetworkSession::getPlayerInformation(i)->properties.player_displayed_skill <= 50 && NetworkSession::getPlayerInformation(i)->properties.player_displayed_skill >= 0)
+			if (NetworkSession::getPlayerInformation(i)->properties.player_displayed_skill >= 50)
 				if (!std::none_of(alreadySent.begin(), alreadySent.end(), compareXUID(NetworkSession::getPlayerInformation(i)->identifier)))
 					sendRankChange(true);
 }
