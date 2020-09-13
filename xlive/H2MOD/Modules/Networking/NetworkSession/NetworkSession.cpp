@@ -82,6 +82,20 @@ long long NetworkSession::getPeerXUID(int peerIndex)
 	}
 	return NONE;
 }
+wchar_t* NetworkSession::getPeerPlayerName(int peerIndex)
+{
+	if (getPeerCount() > 0)
+	{
+		int playerIndex = 0;
+		do
+		{
+			if (getPeerIndex(playerIndex) == peerIndex)
+				return getPlayerName(playerIndex);
+			playerIndex++;
+		} while (playerIndex < 16);
+	}
+	return L"";
+}
 /* Use this to verify if a player is currently active in the network session */
 /* Otherwise you will wonder why you don't get the right data/player index etc. */
 bool NetworkSession::playerIsActive(int playerIndex)

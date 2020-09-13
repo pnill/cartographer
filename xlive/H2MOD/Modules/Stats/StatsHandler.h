@@ -11,7 +11,6 @@ class StatsHandler
 {
 	
 public:
-	StatsHandler();
 
 	static void sendStats()
 	{
@@ -41,7 +40,7 @@ public:
 							{
 								if (uploadStats(filepath, token) == 200)
 								{
-									remove(filepath);
+									//remove(filepath);
 								}
 								else
 								{
@@ -108,6 +107,8 @@ public:
 	static rapidjson::Document getPlayerRanks(bool forceAll = false);
 	static int verifyPlaylist(char* token);
 	static int uploadPlaylist(char* token);
+	typedef rapidjson::GenericDocument<rapidjson::UTF16<>> WDocument;
+	typedef rapidjson::GenericValue<rapidjson::UTF16<>> WValue;
 	static char* buildJSON();
 	static std::string getChecksum();
 	static wchar_t* getPlaylistFile();

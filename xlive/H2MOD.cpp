@@ -1380,14 +1380,35 @@ void H2MOD::RegisterEvents()
 	}
 	else //Server only callbacks
 	{
+		//Setup Events for H2Config_vip_lock
+		if(H2Config_vip_lock)
+		{
+			EventHandler::registerGameStateCallback({
+				"VIPLockClear",
+				life_cycle_post_game,
+				[]()
+				{
+					ServerConsole::SendCommand2(1, L"vip", L"clear");
+					ServerConsole::SendCommand2(1, L"Privacy", L"Open");
+				}}, true);
+			EventHandler::registerGameStateCallback({
+				"VIPLockAdd",
+				life_cycle_in_game,
+				[]()
+				{
+					for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
+					{
+						ServerConsole::SendCommand2(2, L"vip", L"add", NetworkSession::getPeerPlayerName(i));
+					}
+					ServerConsole::SendCommand2(1, L"Privacy", L"VIP");
+				}}, true);
+		}
 		//Register callback on Post Game to upload the stats to the server
 		EventHandler::registerGameStateCallback({
 				"StatsSendStats",
 				life_cycle_post_game,
 				&stats_handler->sendStats
 			}, true);
-		
-		
 		//register callback on player leave to remove them from the packet filter
 		EventHandler::registerNetworkPlayerRemoveCallback({
 				"StatsPlayerLeave",

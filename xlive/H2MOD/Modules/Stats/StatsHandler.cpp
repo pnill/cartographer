@@ -15,16 +15,15 @@
 #include <ws2ipdef.h>
 #include <WS2tcpip.h>
 #include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD/Modules/ServerConsole/ServerConsole.h"
 #ifdef _DEBUG
 #pragma comment(lib, "libcurl_a_debug.lib")
 #else
 #pragma comment(lib, "libcurl_a.lib")
 #endif
 
-static const bool verbose = false;
+static const bool verbose = true;
 bool Registered = false;
-StatsHandler::StatsHandler()
-= default;
 
 
 
@@ -468,8 +467,7 @@ static const int PCROffset   = 0x49F6B0;
 
 char* StatsHandler::buildJSON()
 {
-	typedef rapidjson::GenericDocument<rapidjson::UTF16<>> WDocument;
-	typedef rapidjson::GenericValue<rapidjson::UTF16<>> WValue;
+
 	WDocument document;
 	WValue value;
 	document.SetObject();
@@ -784,6 +782,7 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 	 *The main function already filters out players
 	 *who have been sent their rank before so just fire
 	 *the main function.*/
+	
 	sendRankChange();
 }
 
@@ -794,18 +793,37 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 	BYTE playerCount = 0;
 	if (forceAll)
 		alreadySent.clear();
+	if (verbose)
+		LOG_INFO_GAME(L"Fetching player rank(s) - Total Peers {0}", NetworkSession::getPeerCount() - 1);
 	for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
 	{
+
 		if(NetworkSession::getLocalPeerIndex() != i)
 		{
 			auto XUID = NetworkSession::getPeerXUID(i);
-			if (std::none_of(alreadySent.begin(), alreadySent.end(), compareXUID(XUID)))
+			if(XUID == NONE)
 			{
-				playerCount++;
-				XUIDs.append(IntToString(XUID, std::dec));
-				XUIDs.append(",");
-				alreadySent.push_back(XUID);
-			}
+				if(verbose)
+					LOG_INFO_GAME(L"No XUID found for Peer: {0}", i);
+			} 
+			else
+				if (std::none_of(alreadySent.begin(), alreadySent.end(), compareXUID(XUID)))
+				{
+					if (verbose) {
+						LOG_INFO_GAME(NetworkSession::getPeerPlayerName(i));
+						LOG_INFO_GAME(L"\t Peer: {0} XUID: {1}", i, IntToWString(XUID, std::dec));
+					}
+					playerCount++;
+					XUIDs.append(IntToString(XUID, std::dec));
+					XUIDs.append(",");
+					alreadySent.push_back(XUID);
+				} else
+				{
+					if (verbose) {
+						LOG_INFO_GAME(L"{0} - Skipped", NetworkSession::getPeerPlayerName(i));
+						LOG_INFO_GAME(L"\t Peer: {0} XUID: {1} Name: {2}", i, IntToWString(XUID, std::dec));
+					}
+				}
 		}
 		
 	}

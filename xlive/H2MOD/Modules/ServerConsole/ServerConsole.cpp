@@ -18,7 +18,11 @@ void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, ch
 		commands->handle_command(std::string(wsCommand.begin(), wsCommand.end()));
 		return 0;
 	}
-
+	
+	for(auto i = 0; i < split_strings; i++)
+		LOG_INFO_GAME(command_line_args[i]);
+	LOG_INFO_GAME(std::to_string(split_strings));
+	LOG_INFO_GAME(std::to_string(a3));
 	return p_dedi_command_hook(command_line_args, split_strings, a3);
 }
 
@@ -75,3 +79,25 @@ void ServerConsole::SendCommand(wchar_t** command, int split_commands_size, char
 		logToDedicatedServerConsole(L"\r\n");
 }
 
+
+void ServerConsole::SendCommand2(int argCount, wchar_t* command, wchar_t* argument, ...)
+{
+	typedef int(__cdecl* ProcessCommand)(wchar_t** commandArray, int argumentCount, char a3);
+	auto p_process_command = h2mod->GetAddress<ProcessCommand>(0, 0x1CCFC);
+
+	std::vector<wchar_t*> commandVector;
+	int size = 0;
+	commandVector.push_back(command);
+	va_list arguments;
+	va_start(arguments, argument);
+	while (argument)
+	{
+		LOG_INFO_GAME(L"{0} {1}", argument, size);
+		commandVector.push_back(argument);
+		size++;
+		if (size == argCount) break;
+		argument = va_arg(arguments, wchar_t*);
+	}
+	size++;
+	SendCommand(commandVector.data(), size, 1);
+}

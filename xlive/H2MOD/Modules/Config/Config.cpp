@@ -77,6 +77,7 @@ int H2Config_minimum_player_start = 0;
 char H2Config_team_bit_flags_str[] = "1-1-1-1-1-1-1-1";
 short H2Config_team_bit_flags = 0xFF;
 char H2Config_stats_authkey[32] = { "" };
+bool H2Config_vip_lock = false;
 
 //weapon crosshair sizes
 point2d	H2Config_BATRIF = { 1 , 1 };
@@ -372,6 +373,12 @@ void SaveH2Config() {
 		        "\n# Changes the starting behaviour of the countdown, setting this to any value (1-16) will cause the"
 		        "\n# Server to not start until the player count is equal to or above the given value. A value of 0 will disable this setting."
 		        "\n\n"
+
+				"# vip_lock (Server):"
+				"\n# This flag tells the server to lock the game to VIP mode when the game starts"
+				"\n# Players who are in the lobby when the game starts are added to VIP and can rejoin if there are connection issues"
+				"\n# The VIP list will be cleared when the lobby reaches Post game"
+				"\n\n"
 				;
       
 		}
@@ -480,6 +487,7 @@ void SaveH2Config() {
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "additional_pcr_time", H2Config_additional_pcr_time);
 
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 
@@ -734,6 +742,7 @@ void ReadH2Config() {
 				H2Config_additional_pcr_time = ini.GetLongValue(H2ConfigVersionSection.c_str(), "additional_pcr_time", H2Config_additional_pcr_time);
         
 				H2Config_minimum_player_start = ini.GetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
+				H2Config_vip_lock = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
 
 				const char* login_identifier = ini.GetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 				if (login_identifier) {

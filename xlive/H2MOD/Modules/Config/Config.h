@@ -72,6 +72,7 @@ extern char H2Config_login_identifier[255];
 extern char H2Config_login_password[255];
 extern short H2Config_team_bit_flags;
 extern char H2Config_stats_authkey[32];
+extern bool H2Config_vip_lock;
 
 extern int H2Config_hotkeyIdHelp;
 extern int H2Config_hotkeyIdToggleDebug;
