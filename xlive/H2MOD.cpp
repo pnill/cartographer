@@ -845,6 +845,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	{
 		addDebugText("Map type: Multiplayer");
 
+		
 		for (auto gametype_it : GametypesMap)
 		{
 			if (StrStrIW(variant_name, gametype_it.first)) {
@@ -869,7 +870,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
-
+		H2Tweaks::setVisualTweaks();
 		H2Tweaks::setCrosshairSize(0, false);
 		//H2Tweaks::applyShaderTweaks(); 
 
@@ -1251,6 +1252,17 @@ short __cdecl get_enabled_teams_flags(network_session* session)
 		return default_teams_enabled_flags;
 }
 
+typedef int(__cdecl* getnexthillindex)(int previousHill);
+getnexthillindex p_get_next_hill_index;
+signed int __cdecl get_next_hill_index(int previousHill)
+{
+	int hillCount = *h2mod->GetAddress<int*>(0x4dd0a8);
+	if (previousHill + 1 > hillCount) {
+		return 0;
+	}
+	return previousHill + 1;
+}
+
 void H2MOD::ApplyUnitHooks()
 {
 	// increase the size of the unit entity creation definition packet
@@ -1400,6 +1412,9 @@ void H2MOD::ApplyHooks() {
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
 
+	//get next hill index hook
+	//p_get_next_hill_index = (getnexthillindex)DetourFunc(h2mod->GetAddress<BYTE*>(0x10DF1E, 0xDA4CE), (BYTE*)get_next_hill_index, 9);
+
 	// player spawn hook
 	p_player_spawn = (player_spawn)DetourFunc(h2mod->GetAddress<BYTE*>(0x55952, 0x5DE4A), (BYTE*)OnPlayerSpawn, 6);
 
@@ -1430,6 +1445,9 @@ void H2MOD::ApplyHooks() {
 
 		LOG_TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
+
+		//PatchCall(GetAddress(0x10FE1F), get_next_hill_index);
+		//PatchCall(GetAddress(0x10FE55), get_next_hill_index);
 
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4C14), (BYTE*)VerifyGameVersionOnJoin, 5);
 
