@@ -271,7 +271,6 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				break;
 			}
 		}
-		addDebugText(tempstr1);
 		accBuff = std::string(tempstr1);
 		accSet = true;
 	}
@@ -289,7 +288,6 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 				break;
 			}
 		}
-		addDebugText(tempstr1);
 		tokBuff = std::string(tempstr1);
 		tokSet = true;
 	}
