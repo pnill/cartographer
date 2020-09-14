@@ -49,24 +49,30 @@ void ServerConsole::SendCommand(wchar_t** command, int split_commands_size, char
 	typedef void(__cdecl* unk_func1)(void* a1);
 	auto func_unk1 = h2mod->GetAddress<unk_func1>(0, 0x1D6EA);
 
+	typedef void(__cdecl* free_memory_game_impl)(LPVOID lpMem);
+	auto p_free_memory_game_impl = h2mod->GetAddress<free_memory_game_impl>(0x0, 0x2344B8);
+
+	typedef void(__thiscall* async_set_atomic_long_value)(void *thisx, LONG Value);
+	auto p_async_set_atomic_long_value = h2mod->GetAddress<async_set_atomic_long_value>(0, 0x6E00);
+
+	typedef void(__cdecl* unk_func3)(wchar_t *a1);
+	auto func_unk3 = h2mod->GetAddress<unk_func3>(0, 0x19C93);
+
 	if (unk1)
 	{
 		if (*(BYTE*)(unk1 + 8))
 		{
-			typedef void(__thiscall* func_unk2_def)(void *thisx, LONG Value);
-			auto func_unk2 = h2mod->GetAddress<func_unk2_def>(0, 0x6E00);
-			func_unk2(*(BYTE**)(threadparams + 8), (LONG)unk1);
-
+			p_async_set_atomic_long_value(*(BYTE**)(threadparams + 8), (LONG)unk1);
 			func_unk1(unk1);
 		}
 		else
 		{
-			typedef void(__cdecl* unk_func3)(wchar_t *a1);
-			auto func_unk3 = h2mod->GetAddress<unk_func3>(0, 0x19C93);
-
 			func_unk1(unk1);
 			func_unk3(*command);
 		}
+
+		// free allocated command resources
+		p_free_memory_game_impl(unk1);
 	}
 
 	BYTE v8 = (*(BYTE**)(threadparams + 8))[20];
