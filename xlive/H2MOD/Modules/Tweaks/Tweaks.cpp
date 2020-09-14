@@ -1128,6 +1128,15 @@ void H2Tweaks::setVisualTweaks()
 	auto visor_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\masterchief\\shaders\\masterchief_visor");
 	BYTE* visor_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(visor_shader_datum);
 	
-	if (visor_shader_tag_data != nullptr)
-		*(unsigned long*)(visor_shader_tag_data + 0x4) = tex_bump_env_datum.data;
+	if (visor_shader_tag_data != nullptr) 
+	{
+		auto *visor_pp = reinterpret_cast<tags::tag_data_block*>(visor_shader_tag_data + 0x20);
+		if (visor_pp->block_count > 0 && visor_pp->block_data_offset != -1)
+		{
+			auto visor_pp_data = tags::get_tag_data() + visor_pp->block_data_offset;
+			*(unsigned long*)(visor_shader_tag_data + 0x4) = tex_bump_env_datum.data;
+		}
+	}
+	
+		
 }

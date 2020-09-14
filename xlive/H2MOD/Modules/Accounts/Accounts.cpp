@@ -7,6 +7,7 @@
 #include "H2MOD\Modules\Startup\Startup.h"
 
 #include "Util\SimpleIni.h"
+#include "spdlog/fmt/bundled/printf.h"
 
 static void HandleFileError(int fpErrNo) {//TODO
 	if (fpErrNo == EACCES || fpErrNo == EIO || fpErrNo == EPERM) {
@@ -27,6 +28,7 @@ static void HandleFileError(int fpErrNo) {//TODO
 const wchar_t H2AccountsFilename[] = L"%wshalo2accounts.ini";
 
 static const std::string H2ConfigAccountStr = "Account:";
+static const std::string H2ConfigAccountStrOld = "Account";
 
 static const std::string H2AccConfigVersion = "1";
 static const std::string H2AccConfigVersionStr = "H2AccountsVersion:" + H2AccConfigVersion;
@@ -237,7 +239,68 @@ void H2AccountAccountRemove(int accountArrayIndex)
 		}
 	}
 }
-
+static std::string accBuff;
+static std::string tokBuff;
+static bool accSet;
+static bool tokSet;
+static int interpretConfigSetting(char* fileLine, char* version, int lineNumber) {
+	bool unrecognised = false;
+	bool duplicated = false;
+	bool incorrect = false;
+	bool dontSave = false;
+	int fileLineLen = strlen(fileLine);
+	int tempint1 = -1;
+	unsigned short tempushort1 = -1;
+	int tempint2 = -1;
+	float tempfloat1 = NULL;
+	char tempstr1[33] = { "" };
+	if (fileLine[0] == '#' || fileLine[0] == ';' || fileLineLen <= 2) {
+		unrecognised = true;
+	}
+	else if (strstr(fileLine, "username =")) {
+		char* tempName = fileLine + strlen("username =");
+		while (isspace(*tempName)) {
+			tempName++;
+		}
+		snprintf(tempstr1, 17, tempName);
+		for (int j = strlen(tempstr1) - 1; j > 0; j--) {
+			if (isspace(tempstr1[j])) {
+				tempstr1[j] = 0;
+			}
+			else {
+				break;
+			}
+		}
+		addDebugText(tempstr1);
+		accBuff = std::string(tempstr1);
+		accSet = true;
+	}
+	else if (strstr(fileLine, "login_token =")) {
+		char* tempName = fileLine + strlen("login_token =");
+		while (isspace(*tempName)) {
+			tempName++;
+		}
+		snprintf(tempstr1, 33, tempName);
+		for (int j = strlen(tempstr1) - 1; j > 0; j--) {
+			if (isspace(tempstr1[j])) {
+				tempstr1[j] = 0;
+			}
+			else {
+				break;
+			}
+		}
+		addDebugText(tempstr1);
+		tokBuff = std::string(tempstr1);
+		tokSet = true;
+	}
+	if(tokSet && accSet)
+	{
+		accSet = false;
+		tokSet = false;
+		H2AccountAccountAdd(accBuff.c_str(), tokBuff.c_str());
+	}
+	return 0;
+}
 bool ReadH2Accounts() {
 	addDebugText("Reading H2Accounts File...");
 
@@ -279,8 +342,8 @@ bool ReadH2Accounts() {
 			{
 				// read the accounts in the file
 				H2AccountLastUsed = ini.GetLongValue(H2AccConfigVersionStr.c_str(), "last_used", H2AccountLastUsed);
-				int AccountCount = ini.GetLongValue(H2AccConfigVersionStr.c_str(), "account_count", 0);
-				if (AccountCount > 0)
+				int AccountCount = ini.GetLongValue(H2AccConfigVersionStr.c_str(), "account_count", -1);
+				if (AccountCount != -1 && AccountCount > 0)
 				{
 					for (int i = 0; i < AccountCount; i++)
 					{
@@ -289,6 +352,38 @@ bool ReadH2Accounts() {
 
 						H2AccountAccountAdd(username, login_token);
 					}
+				} 
+				else if (AccountCount == -1)
+				{
+					//If AccountCount is not found it's probably an old config file
+					FILE* fileConfig1 = _wfopen(fileConfigPath, L"rb");
+					addDebugText("Old accounts file detected");
+					ReadIniFile(fileConfig1, true, "[H2AccountsVersion:%[^]]]", "1", interpretConfigSetting);
+					/*CSimpleIniA::TNamesDepend usernames;
+					CSimpleIniA::TNamesDepend login_tokens;
+					CSimpleIniA::TNamesDepend sections;
+					ini.GetAllSections(sections);
+					ini.GetAllValues(H2ConfigAccountStrOld.c_str(), "username", usernames);
+					ini.GetAllValues(H2ConfigAccountStrOld.c_str(), "login_token", login_tokens);
+					usernames.sort(CSimpleIniA::Entry::LoadOrder());
+					login_tokens.sort(CSimpleIniA::Entry::LoadOrder());
+
+					for (const auto & username : sections)
+					{
+						addDebugText(username.pItem);
+					}
+
+					if (!usernames.empty()) {
+						addDebugText(std::to_string(usernames.size()).c_str());
+						for (auto i = 0; i < usernames.size(); i++)
+						{
+							auto uit = usernames.begin();
+							auto lit = login_tokens.begin();
+							std::advance(uit, i);
+							std::advance(lit, i);
+							H2AccountAccountAdd(uit->pItem, lit->pItem);
+						}
+					}*/
 				}
 			}
 
