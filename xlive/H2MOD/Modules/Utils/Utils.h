@@ -93,8 +93,8 @@ template<class T>
 std::string IntToString(T t, std::ios_base & (*f)(std::ios_base&))
 {
 	std::ostringstream stream;
-	stream << f << t;
-	return stream.str();
+	(stream << f << t);
+	return std::string(stream.str().c_str());
 }
 template<class T>
 std::wstring IntToWString(T t, std::ios_base & (*f)(std::ios_base&))

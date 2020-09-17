@@ -1124,19 +1124,22 @@ void H2Tweaks::setVisualTweaks()
 		*(float*)(fp_shader_tag_data + 0x44) = 1;
 
 	//Fix the Visor
-	auto tex_bump_env_datum = tags::find_tag(blam_tag::tag_group_type::shadertemplate, "shaders\\shader_templates\\opaque\\tex_bump_env");
-	auto visor_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\masterchief\\shaders\\masterchief_visor");
-	BYTE* visor_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(visor_shader_datum);
-	
-	if (visor_shader_tag_data != nullptr) 
-	{
-		auto *visor_pp = reinterpret_cast<tags::tag_data_block*>(visor_shader_tag_data + 0x20);
-		if (visor_pp->block_count > 0 && visor_pp->block_data_offset != -1)
-		{
-			auto visor_pp_data = tags::get_tag_data() + visor_pp->block_data_offset;
-			*(unsigned long*)(visor_shader_tag_data + 0x4) = tex_bump_env_datum.data;
-		}
-	}
+	//
+	//COMMENTED OUT AS IT HAS BEEN EXPLAINED CHANGING TEMPLATES IS A BAD IDEA, BUT LEAVING IN CASE IT'S DEEMED OKAY IN THE FUTURE
+	//
+	//auto tex_bump_env_datum = tags::find_tag(blam_tag::tag_group_type::shadertemplate, "shaders\\shader_templates\\opaque\\tex_bump_env");
+	//auto visor_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\masterchief\\shaders\\masterchief_visor");
+	//BYTE* visor_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(visor_shader_datum);
+	//
+	//if (visor_shader_tag_data != nullptr) 
+	//{
+	//	auto *visor_pp = reinterpret_cast<tags::tag_data_block*>(visor_shader_tag_data + 0x20);
+	//	if (visor_pp->block_count > 0 && visor_pp->block_data_offset != -1)
+	//	{
+	//		auto visor_pp_data = tags::get_tag_data() + visor_pp->block_data_offset;
+	//		*(unsigned long*)(visor_shader_tag_data + 0x4) = tex_bump_env_datum.data;
+	//	}
+	//}
 	
 		
 }

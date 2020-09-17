@@ -123,9 +123,8 @@ char* StatsHandler::checkServerRegistration()
 	{
 		std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=ServerRegistrationCheck&Server_XUID=";
 		auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
-		auto sXUID = IntToString<::XUID>(ServerXUID, std::dec).c_str();
-		http_request_body.append(sXUID);
-
+		auto sXUID = IntToString<::XUID>(ServerXUID, std::dec);
+		http_request_body += sXUID;
 		struct curl_response_text s;
 		init_curl_response(&s);
 
@@ -146,7 +145,6 @@ char* StatsHandler::checkServerRegistration()
 		{
 			int response_code;
 			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-			LOG_INFO_GAME(std::to_string(response_code));
 			if(response_code == 500)
 			{
 				curl_easy_cleanup(curl);
@@ -196,9 +194,10 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl_mime_name(field, "Server_Name");
 	curl_mime_data(field, H2Config_login_identifier, CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
-	auto sXUID = IntToString<::XUID>(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid, std::dec).c_str();
+	auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
+	auto sXUID = IntToString<::XUID>(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid, std::dec);
 	curl_mime_name(field, "Server_XUID");
-	curl_mime_data(field, sXUID, CURL_ZERO_TERMINATED);
+	curl_mime_data(field, sXUID.c_str(), CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "AuthKey");
 	curl_mime_data(field, authKey, CURL_ZERO_TERMINATED);

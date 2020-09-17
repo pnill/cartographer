@@ -1372,7 +1372,7 @@ void H2MOD::RegisterEvents()
 		EventHandler::registerNetworkPlayerAddCallback({
 				"StatsPlayerJoin",
 				stats_handler->playerJoinEvent
-			}, true);
+			}, false);
 		//register a callback when the server reaches the lobby for the first time
 		EventHandler::registerGameStateCallback({
 				"InitStats",
@@ -1389,7 +1389,7 @@ void H2MOD::RegisterEvents()
 					}, true);
 				},
 				true
-			}, true);
+			}, false);
 	}
 	//Things that apply to both
 	

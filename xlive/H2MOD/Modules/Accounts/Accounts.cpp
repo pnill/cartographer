@@ -357,31 +357,6 @@ bool ReadH2Accounts() {
 					FILE* fileConfig1 = _wfopen(fileConfigPath, L"rb");
 					addDebugText("Old accounts file detected");
 					ReadIniFile(fileConfig1, true, "[H2AccountsVersion:%[^]]]", "1", interpretConfigSetting);
-					/*CSimpleIniA::TNamesDepend usernames;
-					CSimpleIniA::TNamesDepend login_tokens;
-					CSimpleIniA::TNamesDepend sections;
-					ini.GetAllSections(sections);
-					ini.GetAllValues(H2ConfigAccountStrOld.c_str(), "username", usernames);
-					ini.GetAllValues(H2ConfigAccountStrOld.c_str(), "login_token", login_tokens);
-					usernames.sort(CSimpleIniA::Entry::LoadOrder());
-					login_tokens.sort(CSimpleIniA::Entry::LoadOrder());
-
-					for (const auto & username : sections)
-					{
-						addDebugText(username.pItem);
-					}
-
-					if (!usernames.empty()) {
-						addDebugText(std::to_string(usernames.size()).c_str());
-						for (auto i = 0; i < usernames.size(); i++)
-						{
-							auto uit = usernames.begin();
-							auto lit = login_tokens.begin();
-							std::advance(uit, i);
-							std::advance(lit, i);
-							H2AccountAccountAdd(uit->pItem, lit->pItem);
-						}
-					}*/
 				}
 			}
 
