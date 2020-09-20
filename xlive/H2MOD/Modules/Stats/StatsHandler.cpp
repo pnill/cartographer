@@ -688,18 +688,35 @@ char* StatsHandler::buildJSON()
 		}
 		Player.AddMember(L"MedalData", Medals, allocator);
 
-		WValue Weapons(rapidjson::kArrayType);
-		for(auto j = 0; j < 36; j++)
+		WValue DamageReport(rapidjson::kObjectType);
+		for(int j = 0; j < 36; j++)
 		{
-			WValue Weapon(rapidjson::kArrayType);
-			for(auto k = 0; k < 6; k++)
+			WValue DamageType(rapidjson::kArrayType);
+			int uselessCheck = 0;
+			for(auto k = 0; k < 7; k++)
 			{
-				value.SetInt(*h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0xDE + (j * 0x10) + (k * 2)));
-				Weapon.PushBack(value, allocator);
+				/*
+				 * 0 = Kills
+				 * 1 = Deaths
+				 * 2 = Betrayals
+				 * 3 = Suicides
+				 * 4 = Shots Fired
+				 * 5 = Shots Hit
+				 * 6 = Headshot kills
+				 * 8 = Nothing stored here, move on.
+				 */
+				auto val = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x8E + (j * 0x10) + (k * 2));
+				value.SetInt(val);
+				DamageType.PushBack(value, allocator);
+				if (val > 0)
+					uselessCheck++;
 			}
-			Weapons.PushBack(Weapon, allocator);
+			if (uselessCheck > 0) {
+				WValue n(std::to_wstring(j).c_str(), allocator); //This is fucking stupid.
+				DamageReport.AddMember(n, DamageType, allocator);
+			}
 		}
-		Player.AddMember(L"WeaponData", Weapons, allocator);
+		Player.AddMember(L"DamageData", DamageReport, allocator);
 		#pragma endregion
 
 		Players.PushBack(Player, allocator);

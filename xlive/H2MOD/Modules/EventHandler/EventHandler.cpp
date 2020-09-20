@@ -11,6 +11,9 @@ namespace EventHandler
 
 		std::vector<NetworkPeerEventCallback> playerRemoveCallbacks;
 		std::vector<NetworkPeerEventCallback> playerRemoveCallbacksThreaded;
+
+		std::vector<GameLoopEventCallback> gameLoopCallbacks;
+		std::vector<GameLoopEventCallback> gameLoopCallbacksThreaded;
 	}
 	void registerGameStateCallback(GameStateCallback callback, bool threaded)
 	{
@@ -41,18 +44,20 @@ namespace EventHandler
 		{
 			auto executeThreaded = [](BYTE gamestate)
 			{
-				for (const auto &cb : gameStateCallbacksThreaded) {
+				for (auto &cb : gameStateCallbacksThreaded) {
 					if (cb.gameState == gamestate) {
 						cb.callback();
+						cb.hasRun = true;
 					}
 				}
 			};
 			std::thread(executeThreaded, gamestate).detach();
 		}
 		if (!gameStateCallbacks.empty()) {
-			for (const auto &cb : gameStateCallbacks) {
+			for (auto &cb : gameStateCallbacks) {
 				if (cb.gameState == gamestate) {
 					cb.callback();
+					cb.hasRun = true;
 				}
 			}
 		}
@@ -66,7 +71,7 @@ namespace EventHandler
 			auto it = gameStateCallbacksThreaded.begin();
 			while(it != gameStateCallbacksThreaded.end())
 			{
-				if(it->runOnce)
+				if(it->runOnce && it->hasRun)
 					it = gameStateCallbacksThreaded.erase(it);
 				else
 					++it;
@@ -77,7 +82,7 @@ namespace EventHandler
 			auto it = gameStateCallbacks.begin();
 			while (it != gameStateCallbacks.end())
 			{
-				if (it->runOnce)
+				if (it->runOnce && it->hasRun)
 					it = gameStateCallbacks.erase(it);
 				else
 					++it;
@@ -162,5 +167,52 @@ namespace EventHandler
 		if (!playerRemoveCallbacks.empty())
 			for (const auto &cb : playerRemoveCallbacks)
 				cb.callback(peerIndex);
+	}
+
+	void registerGameLoopCallback(GameLoopEventCallback callback, bool threaded)
+	{
+		if (threaded) {
+			auto it = std::find_if(gameLoopCallbacksThreaded.begin(), gameLoopCallbacksThreaded.end(),
+				[&callback](const GameLoopEventCallback &obj) {return obj.name == callback.name;});
+			if (it != gameLoopCallbacksThreaded.end())
+				gameLoopCallbacksThreaded.push_back(callback);
+		}
+		else {
+			auto it = std::find_if(gameLoopCallbacks.begin(), gameLoopCallbacks.end(),
+				[&callback](const GameLoopEventCallback &obj) {return obj.name == callback.name;});
+			if (it == gameLoopCallbacks.end())
+				gameLoopCallbacks.push_back(callback);
+		}
+	}
+
+	void removeGameLoopCallback(std::string name)
+	{
+		auto it = std::find_if(gameLoopCallbacks.begin(), gameLoopCallbacks.end(),
+			[&name](const GameLoopEventCallback &obj) {return obj.name == name;});
+		if (it != gameLoopCallbacks.end())
+			gameLoopCallbacks.erase(gameLoopCallbacks.begin() +
+				std::distance(gameLoopCallbacks.begin(), it));
+
+		it = std::find_if(gameLoopCallbacksThreaded.begin(), gameLoopCallbacksThreaded.end(),
+			[&name](const GameLoopEventCallback &obj) {return obj.name == name;});
+		if (it != gameLoopCallbacksThreaded.end())
+			gameLoopCallbacksThreaded.erase(gameLoopCallbacksThreaded.begin() +
+				std::distance(gameLoopCallbacksThreaded.begin(), it));
+	}
+
+	void executeGameLoopCallbacks()
+	{
+		if (!gameLoopCallbacksThreaded.empty())
+		{
+			auto executeCallbacks = []()
+			{
+				for (const auto &cb : gameLoopCallbacksThreaded)
+					cb.callback();
+			};
+			std::thread(executeCallbacks).detach();
+		}
+		if (!gameLoopCallbacks.empty())
+			for (const auto &cb : gameLoopCallbacks)
+				cb.callback();
 	}
 }

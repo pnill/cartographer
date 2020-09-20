@@ -13,6 +13,7 @@
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.h"
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
@@ -260,7 +261,6 @@ void GSMainLoop() {
 	static bool halo2WindowExists = false;
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
-
 		DWORD Display_Mode = 1;
 		HKEY hKeyVideoSettings = NULL;
 		if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_READ, &hKeyVideoSettings) == ERROR_SUCCESS) {
@@ -316,6 +316,7 @@ void main_game_loop_hook() {
 		GSMainLoop();
 
 	main_game_loop();
+	EventHandler::executeGameLoopCallbacks();
 
 	mapManager->leaveSessionIfAFK();
 

@@ -40,7 +40,7 @@ public:
 							{
 								if (uploadStats(filepath, token) == 200)
 								{
-									remove(filepath);
+									//remove(filepath);
 								}
 								else
 								{

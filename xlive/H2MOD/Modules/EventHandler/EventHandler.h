@@ -6,6 +6,7 @@ enum EventTypes
 	player_leave,
 	player_join,
 	gamestate_change,
+	game_loog
 };
 //template <class T>
 //struct EventCallback
@@ -26,6 +27,7 @@ struct GameStateCallback
 	game_life_cycle  gameState;
 	std::function<void()> callback;
 	bool runOnce;
+	bool hasRun = false;
 	/**
 	 * \brief Callback that executes when the GameState reaches the given GameState
 	 * \param name A name that is stored with this callback that can later be referenced for removal.
@@ -51,6 +53,17 @@ struct NetworkPeerEventCallback
 	 * \param callback a void that will be executed when this event happens the paramter in is the peer index.
 	 */
 	NetworkPeerEventCallback(std::string name, std::function<void(int)> callback){
+		this->name = name;
+		this->callback = callback;
+	}
+};
+
+struct GameLoopEventCallback
+{
+	std::string name;
+	std::function<void()> callback;
+	GameLoopEventCallback(std::string name, std::function<void()> callback)
+	{
 		this->name = name;
 		this->callback = callback;
 	}
@@ -110,4 +123,8 @@ namespace EventHandler
 	 * \param peerIndex 
 	 */
 	void executeNetworkPlayerRemoveCallbacks(int peerIndex);
+
+	void registerGameLoopCallback(GameLoopEventCallback callback, bool threaded);
+	void removeGameLoopCallback(std::string name);
+	void executeGameLoopCallbacks();
 }

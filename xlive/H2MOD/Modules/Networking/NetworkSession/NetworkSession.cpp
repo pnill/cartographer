@@ -113,10 +113,28 @@ player_information* NetworkSession::getPlayerInformation(int playerIndex)
 	return &getCurrentNetworkSession()->membership.player_info[playerIndex];
 }
 
+
+int NetworkSession::getPlayerIdByName(wchar_t* name)
+{
+	if (getPlayerCount() > 0)
+	{
+		int playerIndex = 0;
+		do
+		{
+			if (playerIsActive(playerIndex) && wcscmp(getPlayerName(playerIndex), name) == 0)
+				return playerIndex;
+
+			playerIndex++;
+		} while (playerIndex < 16);
+	}
+	return NONE;
+}
+
 wchar_t* NetworkSession::getPlayerName(int playerIndex)
 {
 	return getPlayerInformation(playerIndex)->properties.player_name;
 }
+
 
 long long NetworkSession::getPlayerXuid(int playerIndex)
 {

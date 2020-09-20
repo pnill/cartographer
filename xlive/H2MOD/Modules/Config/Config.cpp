@@ -75,9 +75,12 @@ char H2Config_login_identifier[255] = { "" };
 char H2Config_login_password[255] = { "" };
 int H2Config_minimum_player_start = 0;
 char H2Config_team_bit_flags_str[] = "1-1-1-1-1-1-1-1";
+bool H2Config_team_flag_array[8];
+byte H2Config_team_enabled_count;
 short H2Config_team_bit_flags = 0xFF;
 char H2Config_stats_authkey[32] = { "" };
 bool H2Config_vip_lock = false;
+bool H2Config_force_even = false;
 
 //weapon crosshair sizes
 point2d	H2Config_BATRIF = { 1 , 1 };
@@ -379,6 +382,11 @@ void SaveH2Config() {
 				"\n# Players who are in the lobby when the game starts are added to VIP and can rejoin if there are connection issues"
 				"\n# The VIP list will be cleared when the lobby reaches Post game"
 				"\n\n"
+
+				"# force_even (Server):"
+				"\n# This flag tells the server to force even teams before starting"
+				"\n# The server will automatically organize teams before starting if the game is uneven"
+				"\n\n"
 				;
       
 		}
@@ -488,6 +496,7 @@ void SaveH2Config() {
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "additional_pcr_time", H2Config_additional_pcr_time);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "force_even", H2Config_force_even);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 
@@ -743,6 +752,7 @@ void ReadH2Config() {
         
 				H2Config_minimum_player_start = ini.GetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
 				H2Config_vip_lock = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
+				H2Config_force_even = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "force_even", H2Config_force_even);
 
 				const char* login_identifier = ini.GetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 				if (login_identifier) {
@@ -774,8 +784,10 @@ void ReadH2Config() {
 							&& team_bit_mask.substr(occurance_offset, 1) == "1") // check if the team is enabled
 						{
 							H2Config_team_bit_flags |= FLAG(i); // if so, enable the flag
-						}
-
+							H2Config_team_flag_array[i] = true;
+							H2Config_team_enabled_count++;
+						} else
+							H2Config_team_flag_array[i] = false;
 					}
 				}
 			}
