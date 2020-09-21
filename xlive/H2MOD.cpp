@@ -1506,39 +1506,6 @@ void H2MOD::RegisterEvents()
 					ServerConsole::SendCommand2(1, L"Privacy", L"VIP");
 				}}, true);
 		}
-		//Register callback on Post Game to upload the stats to the server
-		EventHandler::registerGameStateCallback({
-				"StatsSendStats",
-				life_cycle_post_game,
-				&stats_handler->sendStats
-			}, true);
-		//register callback on player leave to remove them from the packet filter
-		EventHandler::registerNetworkPlayerRemoveCallback({
-				"StatsPlayerLeave",
-				stats_handler->playerLeftEvent
-			}, false);
-		//register callback on player join to send them their rank.
-		EventHandler::registerNetworkPlayerAddCallback({
-				"StatsPlayerJoin",
-				stats_handler->playerJoinEvent
-			}, false);
-		//register a callback when the server reaches the lobby for the first time
-		EventHandler::registerGameStateCallback({
-				"InitStats",
-				life_cycle_pre_game,
-				[]()
-				{
-					stats_handler->verifyRegistrationStatus();
-					stats_handler->verifySendPlaylist();
-					//Register callback to send player ranks on lobby	
-					EventHandler::registerGameStateCallback({
-						"StatsSendRanks",
-						life_cycle_pre_game,
-						[]() {stats_handler->sendRankChange(true);}
-					}, true);
-				},
-				true
-			}, false);
 	}
 	//Things that apply to both
 	

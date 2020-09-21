@@ -14,10 +14,13 @@ namespace EventHandler
 
 		std::vector<GameLoopEventCallback> gameLoopCallbacks;
 		std::vector<GameLoopEventCallback> gameLoopCallbacksThreaded;
+
+		std::vector<ServerCommandEventCallback> serverCommandCallbacks;
+		std::vector<ServerCommandEventCallback> serverCommandCallbacksThreaded;
 	}
 	void registerGameStateCallback(GameStateCallback callback, bool threaded)
 	{
-		if(threaded)
+		if (threaded)
 			gameStateCallbacksThreaded.push_back(callback);
 		else
 			gameStateCallbacks.push_back(callback);
@@ -27,8 +30,8 @@ namespace EventHandler
 	{
 		auto it = std::find_if(gameStateCallbacks.begin(), gameStateCallbacks.end(),
 			[&name](const GameStateCallback &obj) {return obj.name == name;});
-		if(it != gameStateCallbacks.end())
-			gameStateCallbacks.erase(gameStateCallbacks.begin() + 
+		if (it != gameStateCallbacks.end())
+			gameStateCallbacks.erase(gameStateCallbacks.begin() +
 				std::distance(gameStateCallbacks.begin(), it));
 
 		it = std::find_if(gameStateCallbacksThreaded.begin(), gameStateCallbacksThreaded.end(),
@@ -40,7 +43,7 @@ namespace EventHandler
 
 	void executeGameStateCallbacks(BYTE gamestate)
 	{
-		if(!gameStateCallbacksThreaded.empty())
+		if (!gameStateCallbacksThreaded.empty())
 		{
 			auto executeThreaded = [](BYTE gamestate)
 			{
@@ -69,15 +72,15 @@ namespace EventHandler
 		if (!gameStateCallbacksThreaded.empty())
 		{
 			auto it = gameStateCallbacksThreaded.begin();
-			while(it != gameStateCallbacksThreaded.end())
+			while (it != gameStateCallbacksThreaded.end())
 			{
-				if(it->runOnce && it->hasRun)
+				if (it->runOnce && it->hasRun)
 					it = gameStateCallbacksThreaded.erase(it);
 				else
 					++it;
 			}
 		}
-		if(!gameStateCallbacks.empty())
+		if (!gameStateCallbacks.empty())
 		{
 			auto it = gameStateCallbacks.begin();
 			while (it != gameStateCallbacks.end())
@@ -116,7 +119,7 @@ namespace EventHandler
 
 	void executeNetworkPlayerAddCallbacks(int peerIndex)
 	{
-		if(!playerAddCallbacksThreaded.empty())
+		if (!playerAddCallbacksThreaded.empty())
 		{
 			auto executeCallbacks = [](int peerIndex)
 			{
@@ -174,7 +177,7 @@ namespace EventHandler
 		if (threaded) {
 			auto it = std::find_if(gameLoopCallbacksThreaded.begin(), gameLoopCallbacksThreaded.end(),
 				[&callback](const GameLoopEventCallback &obj) {return obj.name == callback.name;});
-			if (it != gameLoopCallbacksThreaded.end())
+			if (it == gameLoopCallbacksThreaded.end())
 				gameLoopCallbacksThreaded.push_back(callback);
 		}
 		else {
@@ -214,5 +217,59 @@ namespace EventHandler
 		if (!gameLoopCallbacks.empty())
 			for (const auto &cb : gameLoopCallbacks)
 				cb.callback();
+	}
+
+	void registerServerCommandCallback(ServerCommandEventCallback callback, bool threaded)
+	{
+		if (threaded) {
+			auto it = std::find_if(serverCommandCallbacksThreaded.begin(), serverCommandCallbacksThreaded.end(),
+				[&callback](const ServerCommandEventCallback &obj) {return obj.name == callback.name;});
+			if (it == serverCommandCallbacksThreaded.end())
+				serverCommandCallbacksThreaded.push_back(callback);
+		}
+		else {
+			auto it = std::find_if(serverCommandCallbacks.begin(), serverCommandCallbacks.end(),
+				[&callback](const ServerCommandEventCallback &obj) {return obj.name == callback.name;});
+			if (it == serverCommandCallbacks.end())
+				serverCommandCallbacks.push_back(callback);
+		}
+	}
+
+	void removeServerCommandCallback(std::string name)
+	{
+		auto it = std::find_if(serverCommandCallbacksThreaded.begin(), serverCommandCallbacksThreaded.end(),
+			[&name](const ServerCommandEventCallback &obj) {return obj.name == name;});
+		if (it != serverCommandCallbacksThreaded.end())
+			serverCommandCallbacksThreaded.erase(serverCommandCallbacksThreaded.begin() +
+				std::distance(serverCommandCallbacksThreaded.begin(), it));
+
+		it = std::find_if(serverCommandCallbacks.begin(), serverCommandCallbacks.end(),
+			[&name](const ServerCommandEventCallback &obj) {return obj.name == name;});
+		if (it != serverCommandCallbacks.end())
+			serverCommandCallbacks.erase(serverCommandCallbacks.begin() +
+				std::distance(serverCommandCallbacks.begin(), it));
+	}
+
+	void executeServerCommandCallback(ServerConsole::ServerConsoleCommands command)
+	{
+		if (!serverCommandCallbacksThreaded.empty())
+		{
+			auto executeThreaded = [](ServerConsole::ServerConsoleCommands command)
+			{
+				for (auto &cb : serverCommandCallbacksThreaded) {
+					if (cb.command == command || command == ServerConsole::any) {
+						cb.callback();
+					}
+				}
+			};
+			std::thread(executeThreaded, command).detach();
+		}
+		if (!serverCommandCallbacks.empty()) {
+			for (auto &cb : serverCommandCallbacks) {
+				if (cb.command == command || command == ServerConsole::any) {
+					cb.callback();
+				}
+			}
+		}
 	}
 }

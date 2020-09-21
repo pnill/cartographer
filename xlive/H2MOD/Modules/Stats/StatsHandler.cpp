@@ -16,6 +16,7 @@
 #include <WS2tcpip.h>
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/ServerConsole/ServerConsole.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.h"
 #ifdef _DEBUG
 #pragma comment(lib, "libcurl_a_debug.lib")
 #else
@@ -24,9 +25,55 @@
 
 static const bool verbose = true;
 bool Registered = false;
-
+bool MatchInvalidated = false;
 StatsHandler::StatsAPIRegisteredStatus Status;
 
+StatsHandler::StatsHandler()
+{
+	//Register callback on Post Game to upload the stats to the server
+	EventHandler::registerGameStateCallback({
+			"StatsSendStats",
+			life_cycle_post_game,
+			&this->sendStats
+		}, true);
+	//register callback on player leave to remove them from the packet filter
+	EventHandler::registerNetworkPlayerRemoveCallback({
+			"StatsPlayerLeave",
+			this->playerLeftEvent
+		}, false);
+	//register callback on player join to send them their rank.
+	EventHandler::registerNetworkPlayerAddCallback({
+			"StatsPlayerJoin",
+			this->playerJoinEvent
+		}, false);
+	//register a callback when the server reaches the lobby for the first time
+	EventHandler::registerGameStateCallback({
+			"InitStats",
+			life_cycle_pre_game,
+			[this]()
+			{
+				this->verifyRegistrationStatus();
+				this->verifySendPlaylist();
+				//Register callback to send player ranks on lobby and reset the match invalide state
+				EventHandler::registerGameStateCallback({
+					"StatsSendRanks",
+					life_cycle_pre_game,
+					[this]()
+					{
+						this->sendRankChange(true);
+						this->InvalidateMatch(false);
+					}
+				}, true);
+			},
+			true
+		}, false);
+	//Register a callback that will invalidate the current match if the skip command is used.
+	EventHandler::registerServerCommandCallback({
+			"StatsSkipPrevention",
+			[this]() {this->InvalidateMatch(true);},
+			ServerConsole::ServerConsoleCommands::skip
+		}, true);
+}
 
 /*
  * Player leave store the data  if non team game sort rank them at the bottom of the list
@@ -88,9 +135,10 @@ void StatsHandler::verifyRegistrationStatus()
 		//Check result returned a new AuthKey, attempt to register the server with it
 		if (serverRegistration(checkResult)) {
 			//Success save AuthKey to config
-			LOG_INFO_GAME(L"[H2MOD] verifyRegistrationStatus was successful.");
+			LOG_TRACE_GAME(L"[H2MOD] verifyRegistrationStatus was successful.");
 			strncpy(H2Config_stats_authkey, checkResult, 32);
 			Status.Registered = true;
+			Status.StatsEnabled = true;
 		}
 		else {
 			LOG_ERROR_GAME(L"[H2MOD] verifyRegistrationStatus webserver error on register attempt, this will be attempted again next server launch");
@@ -232,6 +280,10 @@ bool StatsHandler::serverRegistration(char* authKey)
 
 char* StatsHandler::getAPIToken()
 {
+	if (MatchInvalidated) {
+		LOG_INFO_GAME("StatsHandler - Match was invalidated and will not be sent to the API");
+		return "";
+	}
 	CURL *curl;
 	CURLcode result;
 	curl_mime *form = NULL;
@@ -272,7 +324,7 @@ char* StatsHandler::getAPIToken()
 	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
 	if (response_code == 500)
 	{
-		LOG_ERROR_GAME(L"[H2MOD]::getAPIToken failed get token for stats API");
+		LOG_INFO_GAME(L"[H2MOD]::getAPIToken failed get token for stats API");
 		curl_easy_cleanup(curl);
 		return "";
 	}
@@ -288,21 +340,18 @@ char* StatsHandler::getAPIToken()
 
 int StatsHandler::uploadPlaylist(char* token)
 {
-	if (verbose)
-		LOG_INFO_GAME("Uploading Playlist");
+	LOG_TRACE_GAME("Uploading Playlist");
 	wchar_t* playlist_file = getPlaylistFile();
 	char* pFile = (char*)malloc(sizeof(char) * wcslen(playlist_file) + 1);
 	wcstombs2(pFile, playlist_file, wcslen(playlist_file) + 1);
-	if(verbose)
-		LOG_INFO_GAME(pFile);
+	LOG_TRACE_GAME(pFile);
 	std::string checksum = getChecksum();
 	if (checksum.empty())
 	{
 		LOG_ERROR_GAME(L"[H2MOD] playlistVerified failed to Hash Playlist file");
 		return -1;
 	}
-	if (verbose)
-		LOG_INFO_GAME(checksum);
+	LOG_TRACE_GAME(checksum);
 
 	CURL *curl;
 	CURLcode result;
@@ -345,8 +394,7 @@ int StatsHandler::uploadPlaylist(char* token)
 	{
 		int response_code;
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-		if (verbose)
-			LOG_INFO_GAME(std::to_string(response_code));
+		LOG_TRACE_GAME(std::to_string(response_code));
 		return response_code;
 	}
 	return -1;
@@ -354,12 +402,10 @@ int StatsHandler::uploadPlaylist(char* token)
 
 int StatsHandler::verifyPlaylist(char* token)
 {
-	if (verbose)
-		LOG_INFO_GAME(L"Verifying Playlist..");
+	LOG_TRACE_GAME(L"Verifying Playlist..");
 	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=PlaylistCheck&Playlist_Checksum=";
 	wchar_t* playlist_file = getPlaylistFile();
-	if (verbose)
-		LOG_INFO_GAME(L"[H2MOD] playlistVerified loaded playlist is {0}", playlist_file);
+	LOG_TRACE_GAME(L"[H2MOD] playlistVerified loaded playlist is {0}", playlist_file);
 
 	std::string checksum = getChecksum();
 	if (checksum == "")
@@ -369,11 +415,9 @@ int StatsHandler::verifyPlaylist(char* token)
 	}
 	else
 	{
-		if (verbose)
-			LOG_INFO_GAME(checksum);	
+		LOG_TRACE_GAME(checksum);	
 		http_request_body.append(checksum);
-		if (verbose)
-			LOG_INFO_GAME(http_request_body);
+		LOG_TRACE_GAME(http_request_body);
 		http_request_body.append("&AuthToken=");
 		http_request_body.append(token);
 		char* Response;
@@ -398,15 +442,14 @@ int StatsHandler::verifyPlaylist(char* token)
 				char CurlError[500];
 				snprintf(CurlError, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
 				LOG_ERROR_GAME(L"[H2MOD]::playlistVerified failed to execute curl");
-				LOG_INFO_GAME(CurlError);
+				LOG_ERROR_GAME(CurlError);
 				curl_easy_cleanup(curl);
 				return -1;
 			} else
 			{
 				int response_code;
 				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-				if (verbose)
-					LOG_INFO_GAME(std::to_string(response_code));
+				LOG_TRACE_GAME(std::to_string(response_code));
 				curl_easy_cleanup(curl);
 				return response_code;
 			}
@@ -788,6 +831,12 @@ struct compareXUID
 	}
 };
 
+
+void StatsHandler::InvalidateMatch(bool state)
+{
+	MatchInvalidated = state;
+}
+
 void StatsHandler::verifyPlayerRanks()
 {
 	if(Status.RanksEnabled)
@@ -823,8 +872,7 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 	BYTE playerCount = 0;
 	if (forceAll)
 		alreadySent.clear();
-	if (verbose)
-		LOG_INFO_GAME(L"Fetching player rank(s) - Total Peers {0}", NetworkSession::getPeerCount() - 1);
+	LOG_TRACE_GAME(L"Fetching player rank(s) - Total Peers {0}", NetworkSession::getPeerCount() - 1);
 	for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
 	{
 
@@ -833,26 +881,21 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 			auto XUID = NetworkSession::getPeerXUID(i);
 			if(XUID == NONE)
 			{
-				if(verbose)
-					LOG_INFO_GAME(L"No XUID found for Peer: {0}", i);
+				LOG_TRACE_GAME(L"No XUID found for Peer: {0}", i);
 			} 
 			else
 				if (std::none_of(alreadySent.begin(), alreadySent.end(), compareXUID(XUID)))
 				{
-					if (verbose) {
-						LOG_INFO_GAME(NetworkSession::getPeerPlayerName(i));
-						LOG_INFO_GAME(L"\t Peer: {0} XUID: {1}", i, IntToWString(XUID, std::dec));
-					}
+					LOG_TRACE_GAME(NetworkSession::getPeerPlayerName(i));
+					LOG_TRACE_GAME(L"\t Peer: {0} XUID: {1}", i, IntToWString(XUID, std::dec));
 					playerCount++;
 					XUIDs.append(IntToString(XUID, std::dec));
 					XUIDs.append(",");
 					alreadySent.push_back(XUID);
 				} else
 				{
-					if (verbose) {
-						LOG_INFO_GAME(L"{0} - Skipped", NetworkSession::getPeerPlayerName(i));
-						LOG_INFO_GAME(L"\t Peer: {0} XUID: {1} Name: {2}", i, IntToWString(XUID, std::dec));
-					}
+					LOG_TRACE_GAME(L"{0} - Skipped", NetworkSession::getPeerPlayerName(i));
+					LOG_TRACE_GAME(L"\t Peer: {0} XUID: {1} Name: {2}", i, IntToWString(XUID, std::dec));
 				}
 		}
 		
@@ -875,8 +918,8 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 	{
 		char CurlError[500];
 		snprintf(CurlError, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
-		LOG_INFO_GAME(L"[H2MOD]::getPlayerRanks failed to init curl");
-		LOG_INFO_GAME(CurlError);
+		LOG_ERROR_GAME(L"[H2MOD]::getPlayerRanks failed to init curl");
+		LOG_ERROR_GAME(CurlError);
 		alreadySent.clear();
 		return document;
 	}
@@ -906,8 +949,7 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 
 			int response_code;
 			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-			if (verbose)
-				LOG_INFO_GAME(s.ptr);
+				LOG_TRACE_GAME(s.ptr);
 			document.Parse(s.ptr);
 			curl_easy_cleanup(curl);
 			free(s.ptr);

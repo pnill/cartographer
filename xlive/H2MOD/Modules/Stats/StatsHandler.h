@@ -11,7 +11,7 @@ class StatsHandler
 {
 	
 public:
-
+	StatsHandler();
 	static void sendStats()
 	{
 		if (h2mod->Server) {
@@ -40,7 +40,7 @@ public:
 							{
 								if (uploadStats(filepath, token) == 200)
 								{
-									//remove(filepath);
+									remove(filepath);
 								}
 								else
 								{
@@ -104,6 +104,7 @@ public:
 		bool StatsEnabled = false;
 		bool RanksEnabled = false;
 	};
+	static void InvalidateMatch(bool state);
 	static void verifyPlayerRanks();
 	static void verifyRegistrationStatus();
 	static StatsAPIRegisteredStatus RegisteredStatus();

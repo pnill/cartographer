@@ -1,7 +1,29 @@
 #pragma once
 
+
+
 namespace ServerConsole
 {
+	static enum ServerConsoleCommands {
+		ban,
+		description,
+		exit,
+		kick,
+		live,
+		name,
+		play,
+		players,
+		playing,
+		privacy,
+		sendmsg,
+		skip,
+		statsfolder,
+		status,
+		unban,
+		vip,
+		any
+	};
+	static std::map<std::wstring, ServerConsoleCommands> s_commandsMap;
 	void ApplyHooks();
 	void logToDedicatedServerConsole(const wchar_t* string, ...);
 	void SendCommand(wchar_t** command, int split_commands_size, char unk);

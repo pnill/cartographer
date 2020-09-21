@@ -1,12 +1,14 @@
 
 #include "Blam/Common/Common.h"
+#include "H2MOD/Modules/ServerConsole/ServerConsole.h"
 
 enum EventTypes
 {
 	player_leave,
 	player_join,
 	gamestate_change,
-	game_loog
+	game_loop,
+	server_command
 };
 //template <class T>
 //struct EventCallback
@@ -69,6 +71,19 @@ struct GameLoopEventCallback
 	}
 };
 
+struct ServerCommandEventCallback
+{
+	std::string name;
+	std::function<void()> callback;
+	ServerConsole::ServerConsoleCommands command;
+	ServerCommandEventCallback(std::string name, std::function<void()> callback, ServerConsole::ServerConsoleCommands command)
+	{
+		this->name = name;
+		this->callback = callback;
+		this->command = command;
+	}
+};
+
 namespace EventHandler
 {
 	/**
@@ -124,7 +139,38 @@ namespace EventHandler
 	 */
 	void executeNetworkPlayerRemoveCallbacks(int peerIndex);
 
+
+	/**
+	 * \brief Adds a callback to be executed everytime main_game_loop is ran
+	 * \param callback A GameLoopEventCallback to be executed when the event happens.
+	 * \param threaded Tells the EventHandler whether or not this callback should be ran in its own thread with other threaded callbacks.
+	 */
 	void registerGameLoopCallback(GameLoopEventCallback callback, bool threaded);
+
+	/**
+	 * \brief Removes a callback from the store
+	 * \param name Name of the callback to remove
+	 */
 	void removeGameLoopCallback(std::string name);
+	/**
+	 * \brief Executes the callbacks with no information passed to the function
+	 */
 	void executeGameLoopCallbacks();
+
+	/**
+	 * \brief Adds a callback to be executed when a server command is recieved
+	 * \param callback A ServerCommandEventCallback to be executed when the event happens, give that the server command being executed matches the command inside the Callback object
+	 * \param threaded Tells the EventHandler whether or not this callback should be ran in its own thread with other threaded callbacks.
+	 */
+	void registerServerCommandCallback(ServerCommandEventCallback callback, bool threaded);
+	/**
+	 * \brief Remvoes a callback from the store
+	 * \param name Name of the callback to remove
+	 */
+	void removeServerCommandCallback(std::string name);
+	/**
+	 * \brief Executes the callbacks that match the input ServerConsoleCommands value with no informations passed to the function 
+	 * \param command The server command that has been called
+	 */
+	void executeServerCommandCallback(ServerConsole::ServerConsoleCommands command);
 }
