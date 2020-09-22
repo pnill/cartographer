@@ -81,6 +81,7 @@ short H2Config_team_bit_flags = 0xFF;
 char H2Config_stats_authkey[32] = { "" };
 bool H2Config_vip_lock = false;
 bool H2Config_force_even = false;
+bool H2Config_koth_random = true;
 
 //weapon crosshair sizes
 point2d	H2Config_BATRIF = { 1 , 1 };
@@ -387,6 +388,12 @@ void SaveH2Config() {
 				"\n# This flag tells the server to force even teams before starting"
 				"\n# The server will automatically organize teams before starting if the game is uneven"
 				"\n\n"
+
+				"# koth_random (Server):"
+				"\n# This flag tells which behaviour the koth will use for getting the next hill"
+				"\n# True (default) will have the server select the hill randomly"
+				"\n# false will have the server select the hill in order"
+				"\n\n"
 				;
       
 		}
@@ -497,6 +504,7 @@ void SaveH2Config() {
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "force_even", H2Config_force_even);
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 
@@ -753,6 +761,7 @@ void ReadH2Config() {
 				H2Config_minimum_player_start = ini.GetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
 				H2Config_vip_lock = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
 				H2Config_force_even = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "force_even", H2Config_force_even);
+				H2Config_koth_random = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random);
 
 				const char* login_identifier = ini.GetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 				if (login_identifier) {

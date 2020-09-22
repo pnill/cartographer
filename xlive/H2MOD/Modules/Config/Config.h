@@ -76,6 +76,7 @@ extern byte H2Config_team_enabled_count;
 extern char H2Config_stats_authkey[32];
 extern bool H2Config_vip_lock;
 extern bool H2Config_force_even;
+extern bool H2Config_koth_random;
 
 extern int H2Config_hotkeyIdHelp;
 extern int H2Config_hotkeyIdToggleDebug;

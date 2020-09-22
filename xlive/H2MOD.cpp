@@ -1276,9 +1276,8 @@ getnexthillindex p_get_next_hill_index;
 signed int __cdecl get_next_hill_index(int previousHill)
 {
 	int hillCount = *h2mod->GetAddress<int*>(0x4dd0a8);
-	if (previousHill + 1 > hillCount) {
+	if (previousHill + 1 > hillCount)
 		return 0;
-	}
 	return previousHill + 1;
 }
 
@@ -1331,7 +1330,7 @@ char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, cha
 	{
 		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
 		{
-			//ServerConsole::SendCommand2(1, L"sendmsg", L"Server has enough players to start.");
+			//ServerConsole::SendCommand2(1, L"sendmsg", L"\"Server has enough players to start.\"");
 			LOG_TRACE_GAME(L"Minimum Player count met.");
 			BYTE TeamPlay = *h2mod->GetAddress<BYTE*>(0, 0x992880);
 			if (H2Config_force_even && TeamPlay == 1)
@@ -1529,7 +1528,8 @@ void H2MOD::ApplyHooks() {
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
 
 	//get next hill index hook
-	//p_get_next_hill_index = (getnexthillindex)DetourFunc(h2mod->GetAddress<BYTE*>(0x10DF1E, 0xDA4CE), (BYTE*)get_next_hill_index, 9);
+	if(!H2Config_koth_random)
+		p_get_next_hill_index = (getnexthillindex)DetourFunc(h2mod->GetAddress<BYTE*>(0x10DF1E, 0xDA4CE), (BYTE*)get_next_hill_index, 9);
 
 	// player spawn hook
 	p_player_spawn = (player_spawn)DetourFunc(h2mod->GetAddress<BYTE*>(0x55952, 0x5DE4A), (BYTE*)OnPlayerSpawn, 6);
