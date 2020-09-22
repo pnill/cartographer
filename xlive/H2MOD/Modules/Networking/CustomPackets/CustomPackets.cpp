@@ -180,6 +180,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 	network_address addr;
 	ZeroMemory(&addr, sizeof(network_address));
 	network_channel* peer_network_channel = network_channel::getNetworkChannel(network_channel_index);
+
 	
 
 	switch (message_type)
@@ -272,23 +273,15 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			{
 				const auto host_xuid = NetworkSession::getPeerXUID(peer_index);
 				if (host_xuid != NONE) {
-					LOG_INFO_NETWORK(L"Setting up team persistance with host xuid {}", IntToWString<XUID>(host_xuid, std::dec));
+					LOG_TRACE_NETWORK(L"Setting up team persistance with host xuid {}", IntToWString<XUID>(host_xuid, std::dec));
 					h2mod->set_local_clan_tag(0, host_xuid);
-					//EventHandler::registerGameLoopCallback({
-					//	"PersistHostTeam",
-					//[host_xuid]()
-					//		{
-					//			h2mod->set_local_team_match_xuid(host_xuid);
-					//		}
-					//	}, false);
 					EventHandler::registerGameStateCallback({
 							"UnPersistHostTeam1",
 							game_life_cycle::life_cycle_in_game,
 							[]()
 							{
+								LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
 								h2mod->set_local_clan_tag(0, 0);
-								LOG_INFO_GAME(L"Removing Persistance");
-								//EventHandler::removeGameLoopCallback("PersistHostTeam");
 							}, true
 						}, false);
 					EventHandler::registerGameStateCallback({
@@ -296,9 +289,8 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 							game_life_cycle::life_cycle_none,
 							[]()
 							{
-								LOG_INFO_GAME(L"Removing Persistance");
+								LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
 								h2mod->set_local_clan_tag(0, 0);
-								//EventHandler::removeGameLoopCallback("PersistHostTeam");
 							}, true
 						}, false);
 				}
