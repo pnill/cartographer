@@ -1275,7 +1275,7 @@ typedef int(__cdecl* getnexthillindex)(int previousHill);
 getnexthillindex p_get_next_hill_index;
 signed int __cdecl get_next_hill_index(int previousHill)
 {
-	int hillCount = *h2mod->GetAddress<int*>(0x4dd0a8);
+	int hillCount = *h2mod->GetAddress<int*>(0x4dd0a8, 0x5008e8);
 	if (previousHill + 1 > hillCount)
 		return 0;
 	return previousHill + 1;
