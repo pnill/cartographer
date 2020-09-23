@@ -544,6 +544,8 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp">
+	  <Filter>Source Files</Filter>
+	<ClCompile>
     <ClCompile Include="Blam\Engine\Players\Players.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1226,6 +1228,7 @@
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Util\SimpleIni.h">
       <Filter>Source Files\Util</Filter>
     </ClInclude>
