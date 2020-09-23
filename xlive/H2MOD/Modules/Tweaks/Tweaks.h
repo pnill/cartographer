@@ -17,4 +17,5 @@ namespace H2Tweaks {
 	void setSavedSens();
 	void sunFlareFix();
 	void WarpFix(bool enable);
+	void setVisualTweaks();
 }

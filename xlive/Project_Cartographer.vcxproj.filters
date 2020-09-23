@@ -94,9 +94,6 @@
     <Filter Include="Source Files\Util\Hooks">
       <UniqueIdentifier>{6e3b665a-267b-4baf-9978-190c7753a4d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\H2MOD\Variants\H2Final">
-      <UniqueIdentifier>{8ae2946e-1bb2-4bd1-8e7c-1dd9790a829e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\H2MOD\Variants\H2X">
       <UniqueIdentifier>{4f0cf4ee-45db-4c9d-8c6a-5821d6e50a0e}</UniqueIdentifier>
     </Filter>
@@ -184,17 +181,8 @@
     <Filter Include="Source Files\Blam\Cache\TagBlocks">
       <UniqueIdentifier>{eaef3410-8a93-4a75-9da0-3d35f5db6d4d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Blam\Cache\TagBlocks\Globals">
-      <UniqueIdentifier>{1726633f-726e-41b0-908d-1f78806b3e06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Cache\TagBlocks\Interface">
-      <UniqueIdentifier>{cb283a92-c683-4cf3-8755-a4d3a784d9f3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Blam\Cache\TagGroups">
       <UniqueIdentifier>{be702785-a2d1-4808-be70-7360906e4941}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Blam\Cache\TagBlocks\AI">
-      <UniqueIdentifier>{8ed4f5f1-2e41-4c8c-bf9d-9503ae31a097}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\H2MOD\Variants\HeadHunter">
       <UniqueIdentifier>{49f37534-5966-4498-8e32-3fe96744053d}</UniqueIdentifier>
@@ -253,9 +241,6 @@
     <Filter Include="Source Files\3rdparty\tinyxml">
       <UniqueIdentifier>{4a1d5690-b59a-45da-b355-656a31ecac34}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\H2MOD\Modules\DataArray">
-      <UniqueIdentifier>{009ec295-3920-4f2e-91ab-5c4dc867750a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\XLive\Cryptography">
       <UniqueIdentifier>{72853862-ec1c-4ea0-9c17-88b523b85492}</UniqueIdentifier>
     </Filter>
@@ -285,6 +270,18 @@
     </Filter>
     <Filter Include="Source Files\H2MOD\Modules\UI">
       <UniqueIdentifier>{a500f548-26db-4773-9b45-892987193591}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Common">
+      <UniqueIdentifier>{9e25bf39-d83a-44bf-bf85-c1b15d3d37d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Blam\Engine\DataArray">
+      <UniqueIdentifier>{009ec295-3920-4f2e-91ab-5c4dc867750a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\MainLoopPatches">
+      <UniqueIdentifier>{a9f1ac05-d6e3-401a-98da-40f2ddb55a82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\H2MOD\Modules\MainLoopPatches\UncappedFPS">
+      <UniqueIdentifier>{4aa06548-b335-4829-8959-31266ac32cd4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -329,9 +326,6 @@
     </ClCompile>
     <ClCompile Include="Util\Debug\Debug.cpp">
       <Filter>Source Files\Util\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="H2MOD\Variants\H2Final\H2Final.cpp">
-      <Filter>Source Files\H2MOD\Variants\H2Final</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Variants\H2X\H2X.cpp">
       <Filter>Source Files\H2MOD\Variants\H2X</Filter>
@@ -541,6 +535,16 @@
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkChannel</Filter>
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp">
+      <Filter>Source Files\H2MOD\Modules\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.cpp">
+      <Filter>Source Files\H2MOD\Modules\MainLoopPatches\UncappedFPS</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Stats\StatsHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp">
+    <ClCompile Include="Blam\Engine\Players\Players.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -559,9 +563,6 @@
     </ClInclude>
     <ClInclude Include="Blam\Enums\Enums.h">
       <Filter>Source Files\Blam\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Enums\Game\GameTimeGlobals.h">
-      <Filter>Source Files\Blam\Enums\Game</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Maths\Maths.h">
       <Filter>Source Files\Blam\Maths</Filter>
@@ -637,9 +638,6 @@
     </ClInclude>
     <ClInclude Include="Util\ReadIniArguments.h">
       <Filter>Source Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="H2MOD\Variants\H2Final\H2Final.h">
-      <Filter>Source Files\H2MOD\Variants\H2Final</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Variants\H2X\H2X.h">
       <Filter>Source Files\H2MOD\Variants\H2X</Filter>
@@ -1013,9 +1011,6 @@
     <ClInclude Include="Blam\Engine\Players\Players.h">
       <Filter>Source Files\Blam\Engine\Players</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1103,9 +1098,6 @@
     <ClInclude Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkObserver</Filter>
     </ClInclude>
-    <ClInclude Include="H2MOD\Modules\DataArray\DataArray.h">
-      <Filter>Source Files\H2MOD\Modules\DataArray</Filter>
-    </ClInclude>
     <ClInclude Include="H2MOD\Tags\TagInterface.h">
       <Filter>Source Files\H2MOD\Modules\TagInterface</Filter>
     </ClInclude>
@@ -1114,9 +1106,6 @@
     </ClInclude>
     <ClInclude Include="XLive\XStorage\XStorage.h">
       <Filter>Source Files\XLive\XStorage</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Cache\DataTypes\Macros.h">
-      <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h">
       <Filter>Source Files\Blam\Cache\TagBlocks</Filter>
@@ -1129,9 +1118,6 @@
     </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp">
       <Filter>Source Files\Blam\Cache\TagGroups</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Common\Common.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Blam\Cache\TagGroups\biped_definition.hpp">
       <Filter>Source Files\Blam\Cache\TagGroups</Filter>
@@ -1208,12 +1194,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp">
       <Filter>Source Files\Blam\Cache\TagGroups</Filter>
     </ClInclude>
-    <ClInclude Include="Blam\Maths\real_math.hpp">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Blam\Maths\integer_math.hpp">
-      <Filter>Source Files\Blam\Maths</Filter>
-    </ClInclude>
     <ClInclude Include="Blam\Cache\DataTypes\BlamTag.h">
       <Filter>Source Files\Blam\Cache\DataTypes</Filter>
     </ClInclude>
@@ -1226,8 +1206,34 @@
     <ClInclude Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.h">
       <Filter>Source Files\H2MOD\Modules\Networking\NetworkChannel</Filter>
     </ClInclude>
+    <ClInclude Include="Blam\Common\Common.h">
+      <Filter>Source Files\Blam\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Engine\DataArray\DataArray.h">
+      <Filter>Source Files\Blam\Engine\DataArray</Filter>
+    </ClInclude>
     <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h">
+      <Filter>Source Files\H2MOD\Modules\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h">
+      <Filter>Source Files\H2MOD\Modules\ServerConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h">
+      <Filter>Source Files\H2MOD\Modules\MainLoopPatches\UncappedFPS</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Stats\StatsHandler.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.h">
+      <Filter>Header Files</Filter>
+    <ClInclude Include="Util\SimpleIni.h">
+      <Filter>Source Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\integer_math.h">
+      <Filter>Source Files\Blam\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Blam\Maths\real_math.h">
+      <Filter>Source Files\Blam\Maths</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 #pragma once
 
-class HitFix
+namespace HitFix
 {
-public:
-	static void Initialize();
+	void ApplyPatches();
+	void ApplyProjectileVelocity();
 };

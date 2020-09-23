@@ -1,27 +1,21 @@
 #pragma once
 
-#include "Blam\Maths\Maths.h"
 #include "Blam\Engine\Objects\Objects.h"
 #include "Blam\Engine\Objects\ObjectPlacementData.h"
 
 #include "Blam\Engine\Game\GameEngine.h"
 #include "Blam\Engine\Players\Players.h"
-
-constexpr signed int NONE = -1;
-
-enum GrenadeType
-{
-	Frag = 0,
-	Plasma = 1
-};
+#include "Blam\Common\Common.h"
 
 enum SoundType
 {
-	TeamChange = 1,
-	GainedTheLead = 2,
-	LostTheLead = 3,
-	Slayer = 4
+	TeamChange,
+	GainedTheLead,
+	LostTheLead,
+	TiedLeader,
+	Slayer
 };
+#define ALL_SOUNDS_NO_SLAYER (FLAG(SoundType::TeamChange) | FLAG(SoundType::GainedTheLead) | FLAG(SoundType::LostTheLead) | FLAG(SoundType::TiedLeader))
 
 enum static_lod : DWORD
 {
@@ -34,7 +28,10 @@ enum static_lod : DWORD
 	cinematic
 };
 
-int __cdecl call_object_try_and_get_with_type(datum object_datum_index, int object_type);
+game_life_cycle get_game_life_cycle();
+int __cdecl call_get_game_tick_rate();
+bool __cdecl call_is_game_minimized();
+char* __cdecl call_object_try_and_get_data_with_type(datum object_datum_index, int object_type);
 int __cdecl call_unit_reset_equipment(datum unit_datum_index);
 bool __cdecl call_add_object_to_sync(datum gamestate_object_datum);
 void __cdecl call_hs_object_destroy(datum object_datum_index);
@@ -51,32 +48,27 @@ public:
 		void Deinitialize();
 		void ApplyHooks(); 
 		void ApplyUnitHooks();
+		void RegisterEvents();
 
 		void team_player_indicator_visibility(bool toggle);
-		int get_unit_index_from_player_index(int);
-		datum get_unit_datum_from_player_index(int);
 		BYTE* get_player_unit_from_player_index(int playerIndex);
 		datum get_player_datum_index_from_controller_index(int controller_index);
 		wchar_t* get_local_player_name(int local_player_index);
 		real_point3d* get_player_unit_coords(int player_index);
 		float get_distance(int, int);
-		wchar_t* get_session_game_variant_name();
-		wchar_t* get_player_name_from_player_index(int playerIndex);
-		int get_player_index_from_name(wchar_t* playername);
-		int get_player_index_from_unit_datum(datum unit_datum_index);
+		int get_player_index_from_unit_datum_index(datum unit_datum_index);
 		BYTE get_unit_team_index(datum unit_datum_index);
-		void set_unit_team_index(int unit_datum_index, BYTE team);
-		void set_unit_biped(Player::Biped biped_type, int playerIndex);
 		void set_unit_speed_patch(bool hackit);
-		void set_unit_speed(float speed, int playerIndex);
 		void set_local_team_index(int local_player_index, int team);
+		void set_local_team_match_xuid(XUID xuid);
+		void set_local_clan_tag(int local_player_index, XUID tag);
 		BYTE get_local_team_index();
-		void set_player_unit_grenades_count(int playerIndex, BYTE type, BYTE count, bool resetEquipment);
-		void disable_sound(int sound);
+		void set_player_unit_grenades_count(int playerIndex, Grenades type, BYTE count, bool resetEquipment);
+		void disable_sounds(int sound);
 		void custom_sound_play(const wchar_t* soundName, int delay);
 		void disable_weapon_pickup(bool b_Enable);
 		void leave_session();
-
+		void set_local_rank(BYTE rank);
 		scnr_type GetMapType() { return mapType; }
 		void SetMapType(scnr_type value) { mapType = value; }
 
@@ -104,7 +96,7 @@ public:
 		{
 			return reinterpret_cast<T>(Base + (Server ? server : client));
 		}
-
+		
 private:
 		DWORD Base;
 		scnr_type mapType;

@@ -247,6 +247,12 @@ namespace tags
 		return get_at_tag_data_offset<T>(instance.data_offset);
 	}
 
+	template <typename T = void>
+	inline T* get_tag_fast(datum tag)
+	{
+		return reinterpret_cast<T*>(&get_tag_data()[get_tag_instances()[tag.ToAbsoluteIndex()].data_offset]);
+	}
+
 	/* 
 		Returns the tag datum or a null datum
 	*/

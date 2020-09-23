@@ -74,17 +74,11 @@ struct CVertexList
 extern HMODULE hThis;
 extern std::wstring ModulePathW(HMODULE);
 
-wchar_t dlldir[256];
-
-wchar_t* GetDirectoryFile(wchar_t *filename)
+std::wstring GetDirectoryFile(wchar_t *filename)
 {
-	static wchar_t path[256];
-	wcsncpy_s(dlldir, ModulePathW(hThis).c_str(), 256);
-	for (int i = wcslen(dlldir); i > 0; i--) { if (dlldir[i] == L'\\') { dlldir[i + 1] = 0; break; } }
-
-	wcsncpy_s(path, dlldir, 256);
-	wcscat_s(path, filename);
-	return path;
+	std::wstring dirFile(ModulePathW(hThis));
+	dirFile.append(filename);
+	return dirFile;
 }
 
 inline void BuildVertex(D3DXVECTOR4 xyzrhw, D3DCOLOR color, CVertexList* vertexList, int index)
@@ -98,14 +92,11 @@ LPD3DXSPRITE pSprite;
 using namespace std::chrono;
 high_resolution_clock::time_point nextFrame;
 high_resolution_clock::duration desiredRenderTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / (double)H2Config_fps_limit));
-high_resolution_clock::duration minimizedDesiredTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / 64.0));
 
 void frameTimeManagement() {
 
-	typedef bool(__cdecl* game_is_minimized)();
-	auto p_game_is_minimized = reinterpret_cast<game_is_minimized>(h2mod->GetAddress(0x28729));
-
-	bool isMinimized = p_game_is_minimized();
+	if (H2Config_experimental_game_main_loop_patches)
+		return;
 
 	static bool bInitTime = false;
 	if (!bInitTime)
@@ -114,16 +105,14 @@ void frameTimeManagement() {
 		bInitTime = true;
 	}
 	
-	if (H2Config_fps_limit > 0 || isMinimized) {
+	if (H2Config_fps_limit > 0) {
 		std::this_thread::sleep_until(nextFrame);
 
-		auto& desiredTime = isMinimized ? minimizedDesiredTime : desiredRenderTime;
-
 		auto frameCount = duration<long long, std::micro>(
-			(1 + (duration_cast<duration<long long, std::micro>>(high_resolution_clock::now() - nextFrame) / duration_cast<duration<long long, std::micro>>(desiredTime)))
+			(1 + (duration_cast<duration<long long, std::micro>>(high_resolution_clock::now() - nextFrame) / duration_cast<duration<long long, std::micro>>(desiredRenderTime)))
 			);
 
-		nextFrame += (desiredTime * frameCount.count());
+		nextFrame += (desiredRenderTime * frameCount.count());
 	}
 }
 
@@ -163,7 +152,7 @@ extern void handleHotkeyInput(WPARAM lpMsg);
 // #5030: XLivePreTranslateMessage
 BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 {
-	if ((GetAsyncKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
+	if ((GetKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
 	{
 		// hotkeys
 		handleHotkeyInput(lpMsg->wParam);
@@ -250,18 +239,13 @@ HRESULT WINAPI XLiveOnDestroyDevice()
 	return S_OK;
 }
 
-wchar_t m_strFontName[80];
-wchar_t m_strFontPath[260];
-
-void InitalizeFont(wchar_t *strFontName, wchar_t *strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
+void InitalizeFont(std::wstring strFontName, std::wstring& strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
 {
-	wcsncpy_s(m_strFontName, strFontName, 80);
 	if (OnOff)
 	{
-		wcsncpy_s(m_strFontPath, strFontPath, 260);
 		addDebugText("Adding font: ");
-		addDebugText(m_strFontPath);
-		if(AddFontResource(m_strFontPath) > 0)
+		addDebugText(strFontPath.c_str());
+		if(AddFontResource(strFontPath.c_str()) > 0)
 		{
 			addDebugText("Font successfully added.");
 		}
@@ -271,7 +255,7 @@ void InitalizeFont(wchar_t *strFontName, wchar_t *strFontPath, int size, IDirect
 		}
 	}
 
-	D3DXCreateFont(pD3Ddev, size, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, m_strFontName, &haloFont);
+	D3DXCreateFont(pD3Ddev, size, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(), &haloFont);
 }
 
 

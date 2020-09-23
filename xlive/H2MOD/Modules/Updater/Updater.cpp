@@ -1,14 +1,13 @@
-#include "stdafx.h"
+
+#include "..\Config\Config.h"
 #include "H2MOD\Modules\Updater\Updater.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include <stdio.h>
+
 #include <curl/curl.h>
-#include <string>
-#include <vector>
 
 bool fork_cmd_elevate(const wchar_t* cmd, wchar_t* flags = 0) {
 	SHELLEXECUTEINFO shExInfo = { 0 };
@@ -262,15 +261,15 @@ static void FetchUpdateDetails() {
 	wchar_t* dir_temp = _wgetenv(L"TEMP");
 
 	wchar_t dir_temp_h2[1024];
-	swprintf(dir_temp_h2, 1024, L"%ws\\Halo2\\", dir_temp);
+	swprintf(dir_temp_h2, ARRAYSIZE(dir_temp_h2), L"%ws\\Halo2\\", dir_temp);
 	CreateDirectory(dir_temp_h2, NULL);
 
 	wchar_t dir_update[1024];
-	swprintf(dir_update, 1024, L"%ws\\Halo2\\Update\\", dir_temp);
+	swprintf(dir_update, ARRAYSIZE(dir_update), L"%ws\\Halo2\\Update\\", dir_temp);
 	CreateDirectory(dir_update, NULL);
 
 	wchar_t dir_update_old[1024];
-	swprintf(dir_update_old, 1024, L"%ws\\Halo2\\UpdateOld\\", dir_temp);
+	swprintf(dir_update_old, ARRAYSIZE(dir_update_old), L"%ws\\Halo2\\UpdateOld\\", dir_temp);
 	CreateDirectory(dir_update_old, NULL);
 
 	int entry_count = UpdateFileEntries.size();
@@ -287,7 +286,7 @@ static void FetchUpdateDetails() {
 
 	addDebugText("Fetching Update Details.");
 	char* rtn_result = 0;
-	int rtn_code = MasterHttpResponse("https://cartographer.online/update1.ini", "", rtn_result);
+	int rtn_code = MasterHttpResponse(std::string(cartographerURL + "/update1.ini"), "", rtn_result);
 	if (rtn_code == 0) {
 		addDebugText("Got Update Details.");
 
@@ -318,7 +317,7 @@ static void FetchUpdateDetails() {
 					existingfpdir = H2AppDataLocal;
 				}
 
-				swprintf(existingfilepath, 1024 + 260, L"%ws%hs", existingfpdir, UpdateFileEntries[i]->local_name);
+				swprintf(existingfilepath, ARRAYSIZE(existingfilepath), L"%ws%hs", existingfpdir, UpdateFileEntries[i]->local_name);
 
 				DWORD crc32_file = 0;
 				if (ComputeFileCrc32Hash(existingfilepath, crc32_file)) {
@@ -329,10 +328,10 @@ static void FetchUpdateDetails() {
 				}
 
 				if (UpdateFileEntries[i]->location_id) {
-					swprintf(existingfilepath, 1024 + 260, L"%ws%hs\\%hs", dir_update, H2UpdateLocationsStr[UpdateFileEntries[i]->location_id], UpdateFileEntries[i]->local_name);
+					swprintf(existingfilepath, ARRAYSIZE(existingfilepath), L"%ws%hs\\%hs", dir_update, H2UpdateLocationsStr[UpdateFileEntries[i]->location_id], UpdateFileEntries[i]->local_name);
 				}
 				else {
-					swprintf(existingfilepath, 1024 + 260, L"%ws%hs", dir_update, UpdateFileEntries[i]->local_name);
+					swprintf(existingfilepath, ARRAYSIZE(existingfilepath), L"%ws%hs", dir_update, UpdateFileEntries[i]->local_name);
 				}
 
 				if (ComputeFileCrc32Hash(existingfilepath, crc32_file)) {
@@ -412,7 +411,7 @@ bool DownloadUpdatedFiles() {
 	wchar_t* dir_temp = _wgetenv(L"TEMP");
 
 	wchar_t dir_update[1024];
-	swprintf(dir_update, 1024, L"%ws\\Halo2\\Update\\", dir_temp);
+	swprintf(dir_update, ARRAYSIZE(dir_update), L"%ws\\Halo2\\Update\\", dir_temp);
 
 	int entry_count = UpdateFileEntries.size();
 	for (int i = 0; i < entry_count; i++) {
@@ -420,10 +419,10 @@ bool DownloadUpdatedFiles() {
 			files_downloaded = true;
 			wchar_t existingfilepath[1024 + 260] = L"";
 			if (UpdateFileEntries[i]->location_id) {
-				swprintf(existingfilepath, 1024 + 260, L"%s%hs\\%hs", dir_update, H2UpdateLocationsStr[UpdateFileEntries[i]->location_id], UpdateFileEntries[i]->local_name);
+				swprintf(existingfilepath, ARRAYSIZE(existingfilepath), L"%s%hs\\%hs", dir_update, H2UpdateLocationsStr[UpdateFileEntries[i]->location_id], UpdateFileEntries[i]->local_name);
 			}
 			else {
-				swprintf(existingfilepath, 1024 + 260, L"%s%hs", dir_update, UpdateFileEntries[i]->local_name);
+				swprintf(existingfilepath, ARRAYSIZE(existingfilepath), L"%s%hs", dir_update, UpdateFileEntries[i]->local_name);
 			}
 			_wremove(existingfilepath);
 			std::string im_lazy_2_dl = "https://cartographer.online/";
@@ -490,7 +489,7 @@ void GSDownloadInstall() {
 	wchar_t* dir_temp = _wgetenv(L"TEMP");
 
 	wchar_t dir_update[1024];
-	swprintf(dir_update, 1024, L"%ws\\Halo2\\Update\\", dir_temp);
+	swprintf(dir_update, ARRAYSIZE(dir_update), L"%ws\\Halo2\\Update\\", dir_temp);
 
 
 	std::string updater_params = "";
@@ -526,7 +525,7 @@ void GSDownloadInstall() {
 	//quit game
 
 	wchar_t existingfilepathupdater[1024 + 260] = L"";
-	swprintf(existingfilepathupdater, 1024 + 260, L"%wsh2pc-update.exe", dir_update);
+	swprintf(existingfilepathupdater, ARRAYSIZE(existingfilepathupdater), L"%wsh2pc-update.exe", dir_update);
 
 	if (updater_params.size() > 0) {
 		int updater_params_buflen = 20 + updater_params.size();

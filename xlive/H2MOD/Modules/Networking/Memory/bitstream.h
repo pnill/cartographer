@@ -3,10 +3,17 @@
 #pragma pack(push, 1)
 struct bitstream
 {
-	DWORD field_0;
-	DWORD field_4;
-	BYTE gap_8[8];
-	DWORD field_10;
+	BYTE *packet_buffer;
+	int packet_length_in_bytes;
+	DWORD alignment;
+	signed int field_C;
+	signed int used_packet_length_in_bits;
+	char packet_is_debug;
+	BYTE gap_15[3];
+	signed int field_18;
+	BYTE gap_1C[16];
+	DWORD field_2C;
+	DWORD field_30;
 
 	void data_encode_string(char* name, void* string, int size_in_words);
 	void data_decode_string(char* name, void* string_buffer, int size_in_words);
@@ -20,3 +27,4 @@ struct bitstream
 	bool packet_is_valid();
 };
 #pragma pack(pop)
+static_assert(sizeof(bitstream) == 0x34, "invalid bitstream size");

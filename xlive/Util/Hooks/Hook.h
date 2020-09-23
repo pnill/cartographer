@@ -1,7 +1,7 @@
 #pragma once
 #define WIN32_LEAN_AND_MEAN
 #define JMP_OP_CODE 0xEB
-#define JNZ_OP_CODE 0x75 
+#define JNZ_OP_CODE 0x75
 
 void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len);
 void RetourFunc(BYTE *src, BYTE *restore, const int len);
@@ -15,6 +15,7 @@ void PatchCall(DWORD call_addr, DWORD new_function_ptr);
 void WritePointer(DWORD offset, void *ptr);
 void PatchWinAPICall(DWORD call_addr, DWORD new_function_ptr);
 void NopFill(DWORD address, int length);
+void ReadBytesProtected(DWORD address, BYTE* buf, BYTE count);
 
 inline void PatchCall(DWORD call_addr, void *new_function_ptr)
 {

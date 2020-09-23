@@ -1,21 +1,21 @@
 #include "stdafx.h"
-#include <unordered_map>
 #include "Globals.h"
 #include "DeviceShop.h"
 #include "..\H2MOD\Tags\TagInterface.h"
+
 extern void __cdecl print_to_console(char *output);
 extern void GivePlayerWeaponDatum(datum unit_datum, datum weapon_datum);
 
-//power transition time
-//TODO: Convert to TagGroup/Block
+// power transition time
+// TODO: Convert to TagGroup/Block
 float get_device_power_transition_time(datum device_datum)
 {
 	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD tag_instances = (DWORD)tags::get_tag_instances();
-	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
+	BYTE* game_state_objects_header_table = (BYTE*)game_state_objects_header->datum;
 
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
-	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)game_state_objects_header_table + device_gamestate_offset * 4 + 8);
+	DWORD device_gamestate_datum_pointer = *(DWORD*)(game_state_objects_header_table + device_gamestate_offset * 4 + 8);
 	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 
 	__int16 device_control_index = device_control_datum & 0xFFFF;
@@ -34,10 +34,10 @@ datum get_device_open_up_weapon_datum(datum device_datum)
 {
 	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD global_tag_instances = (DWORD)tags::get_tag_instances();
-	DWORD game_state_objects_header_table = *(DWORD*)((BYTE*)game_state_objects_header + 0x44);
+	BYTE* game_state_objects_header_table = (BYTE*)game_state_objects_header->datum;
 
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
-	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)game_state_objects_header_table + device_gamestate_offset * 4 + 8);
+	DWORD device_gamestate_datum_pointer = *(DWORD*)(game_state_objects_header_table + device_gamestate_offset * 4 + 8);
 	datum device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 
 	device_control_datum.Index = device_control_datum.Index << 4;
@@ -111,7 +111,7 @@ bool DeviceShop::BuyItem(datum device_datum, datum unit_datum)
 			debug_text.append(std::to_string(GetCost(device_datum)));
 
 			print_to_console((char*)debug_text.c_str());
-			GiveWeapon(item_datum, unit_datum);
+			GiveWeapon(unit_datum, item_datum);
 			break;
 		}
 	}
@@ -129,9 +129,9 @@ void DeviceShop::SpawnVehicle(datum vehicle_datum)
 
 }
 
-void DeviceShop::GiveWeapon(datum weapon_datum, datum unit_datum)
+void DeviceShop::GiveWeapon(datum unit_datum, datum weapon_datum)
 {
-	GivePlayerWeaponDatum(unit_datum,weapon_datum);
+	GivePlayerWeaponDatum(unit_datum, weapon_datum);
 }
 
 void DeviceShop::AddPoints(XUID xuid, int points)

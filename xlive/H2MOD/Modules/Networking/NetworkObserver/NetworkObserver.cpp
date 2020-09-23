@@ -119,17 +119,59 @@ void __cdecl initialize_network_observer_configuration()
 	g_network_configuration->field_200 = 4096 * 4; // H2v - 4096, 60 tick  = H2v * 4 = 16384
 }
 
-void network_observer::sendNetworkMessage(int unk_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data)
+void network_observer::sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data)
 {
-	typedef void(__thiscall* observer_channel_send_message)(void*, int, int, e_network_message_send_protocol, int, int, void*);
-	auto p_observer_channel_send_message = reinterpret_cast<observer_channel_send_message>(h2mod->GetAddress(0x1BED40, 0x1B8C1A));
+	typedef void(__thiscall* observer_channel_send_message)(network_observer*, int, int, e_network_message_send_protocol, int, int, void*);
+	auto p_observer_channel_send_message = h2mod->GetAddress<observer_channel_send_message>(0x1BED40, 0x1B8C1A);
 
-	p_observer_channel_send_message(this, unk_index, observer_index, send_out_of_band, type, size, data);
+	p_observer_channel_send_message(this, session_index, observer_index, send_out_of_band, type, size, data);
+}
+
+bool __cdecl is_network_observer_mode_managed()
+{
+	// or in other terms this verifies if the network protocol is LIVE (aka managed)
+	// this is used for host migration happening on game start (that causes the short delay when the game starts in a p2p session)
+	// which is disabled in LAN mode
+	return false;
+}
+
+void network_observer::ResetNetworkPreferences()
+{
+	// clear the network bandwidth preferences so they won't cause issues
+	SecureZeroMemory(h2mod->GetAddress<void*>(0x47E9D8 + 0x1DC), 108);
+}
+
+bool __thiscall network_observer::GetNetworkMeasurements(DWORD *out_throughput, float *out_satiation, DWORD *a4)
+{
+	// tell the game we don't have any bandwidth measurements available to save
+	return false;
+}
+
+void __declspec(naked) call_GetNetworkMeasurements()
+{
+	__asm
+	{
+		// for some reason PatchCall doen't work on member function
+		jmp network_observer::GetNetworkMeasurements 
+	}
+}
+
+DWORD* dataToOverwrite1 = nullptr;
+__declspec (naked) void overwrite1()
+{
+	__asm 
+	{
+		mov eax, dataToOverwrite1
+		mov dword ptr[eax], 131072
+		mov dword ptr[eax + 4], 131072
+		ret
+	}
 }
 
 void network_observer::ApplyPatches()
 {
 #if USE_LIVE_NETCODE
+#if INCREASE_NETWORK_TICKRATE
 	// increase the network tickrate of hosts to 60
 	static float netcode_tickrate = 60.0f;
 
@@ -146,14 +188,14 @@ void network_observer::ApplyPatches()
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB4A1, 0x1AB9A6) + 6, 20480 * 4); // 60 tick = H2v * 4
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB4AB, 0x1AB9B0) + 6, 51200 * 4); // 60 tick = H2v * 4
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB4C9, 0x1AB9CE) + 6, 65536 * 4); // 60 tick = H2v * 4
-	WriteValue<DWORD>(h2mod->GetAddress(0x1AB4D3, 0x1AB9D8) + 6, 32678 * 4); // 60 tick = H2v * 4
+	WriteValue<DWORD>(h2mod->GetAddress(0x1AB4D3, 0x1AB9D8) + 6, 32768 * 4); // 60 tick = H2v * 4
 
 	WriteValue<float>(h2mod->GetAddress(0x3A03CC, 0x360E54), 8192.f * 2.f);  // 60 tick = H2v * 2, H2v = 8192
 	WriteValue<float>(h2mod->GetAddress(0x3C60F0, 0x381BDC), 40960.f * 4.f); // 60 tick = H2v * 4, H2v = 40960
 	WriteValue<float>(h2mod->GetAddress(0x3C60F4, 0x381BE0), 30720.f * 4.f); // 60 tick = H2v * 4, H2v = 30720
 	WriteValue<float>(h2mod->GetAddress(0x3C60F8, 0x381BE4), 53248.f);		 // 60 tick = 53248, H2v = 9216
 
-	WriteValue<DWORD>(h2mod->GetAddress(0x1AB4FF, 0x1ABA04) + 1, 8192 * 4);  // h2v = 8192, 60 tick = h2v * 4
+	WriteValue<DWORD>(h2mod->GetAddress(0x1AB4FF, 0x1ABA04) + 1, 8192 * 2);  // h2v = 8192, 60 tick = h2v * 4
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB504, 0x1ABA09) + 1, 40960 * 4); // h2v = 40960, 60 tick = h2v * 4
 
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB558, 0x1ABA5D) + 1, 15360 * 4); // h2v = 15360, 60 tick = h2v * 4
@@ -163,15 +205,15 @@ void network_observer::ApplyPatches()
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB587, 0x1ABA8C) + 1, 262144 * 4); // 60 tick - 1048576
 
 	WriteValue<DWORD>(h2mod->GetAddress(0x1AB5B6, 0x1ABABB) + 6, 10240 * 4); // 60 tick - 40960
-	WriteValue<DWORD>(h2mod->GetAddress(0x1AB5C0, 0x1ABAC5) + 6, 131072);
+
+	dataToOverwrite1 = h2mod->GetAddress<DWORD*>(0x4F8200, 0x522750);
+	Codecave(h2mod->GetAddress(0x1AB5A2, 0x1ABAA7), overwrite1, 5);
 
 	// prevent the game from setting the client's tickrate to half of host network tickrate
 	NopFill(h2mod->GetAddress(0x1BFBE7, 0x1B9AC7), 19);
 	NopFill(h2mod->GetAddress(0x1BE33A, 0x1B8214), 15);
 	NopFill(h2mod->GetAddress(0x1BDF1D, 0x1B7DF7), 18);
-
-	// increase the network heap size
-	WriteValue<DWORD>(h2mod->GetAddress(0x1ACCC8, 0x1ACE96) + 6, INCREASED_NETWORK_HEAP_SIZE); // original H2v: 1048576, 60 tick: 1048576
+#endif
 #else
 	// disables LIVE netcode
 	WriteValue<BYTE>(h2mod->GetAddress(0x1B555B, 0x1A92B9) + 1, 0);
@@ -179,4 +221,14 @@ void network_observer::ApplyPatches()
 	NopFill(h2mod->GetAddress(0x1D4E33, 0x1C1B7D), 2);
 	WriteValue<BYTE>(h2mod->GetAddress(0x1D4E35, 0x1C1B7F), 0xEB); // jmp
 #endif
+
+	// increase the network heap size
+	WriteValue<DWORD>(h2mod->GetAddress(0x1ACCC8, 0x1ACE96) + 6, NETWORK_HEAP_SIZE);
+
+	PatchCall(h2mod->GetAddress(0x1E0FEE, 0x1B5EDE), call_GetNetworkMeasurements);
+
+	if (!h2mod->Server)
+	{
+		PatchCall(h2mod->GetAddress(0x1D97DD), is_network_observer_mode_managed);
+	}
 }

@@ -82,7 +82,7 @@ void initInstanceNumber() {
 	do {
 		instanceNumber++;
 		wchar_t mutexName[32];
-		swprintf(mutexName, sizeof(mutexName), (H2IsDediServer ? L"Halo2Server%d" : L"Halo2Player%d"), instanceNumber);
+		swprintf(mutexName, ARRAYSIZE(mutexName), (H2IsDediServer ? L"Halo2Server%d" : L"Halo2Player%d"), instanceNumber);
 		mutex = CreateMutexW(0, TRUE, mutexName);
 		lastErr = GetLastError();
 		if (lastErr == ERROR_ALREADY_EXISTS) {
@@ -107,7 +107,7 @@ bool configureXinput() {
 			swprintf(xinput_path, ARRAYSIZE(xinput_path), L"xinput/p%02d/xinput9_1_0.dll", H2GetInstanceId());
 			LOG_TRACE_FUNCW(L"Changing xinput path to '{0}' : '{1}'", xinput_path, xinput_path);
 
-			WriteValue(H2BaseAddr + 0x8AD28, xinput_path);
+			WritePointer(H2BaseAddr + 0x8AD28, xinput_path);
 
 			char xinputName[_MAX_PATH];
 			char xinputdir[_MAX_PATH];
@@ -228,43 +228,51 @@ void initLocalAppData() {
 
 	wchar_t local2[1024];
 
-	swprintf(local2, 1024, L"%ws\\AppData\\Local\\", userprofile);
+	swprintf(local2, ARRAYSIZE(local2), L"%ws\\AppData\\Local\\", userprofile);
 	struct _stat64i32 sb;
 	if (_wstat(local2, &sb) == 0 && sb.st_mode & S_IFDIR) {
-		swprintf(local2, 1024, L"%ws\\AppData\\Local\\Microsoft\\", userprofile);
+		swprintf(local2, ARRAYSIZE(local2), L"%ws\\AppData\\Local\\Microsoft\\", userprofile);
 		CreateDirectoryW(local2, NULL);
 		int fperrno1 = GetLastError();
 		if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
-			swprintf(local2, 1024, L"%ws\\AppData\\Local\\Microsoft\\Halo 2\\", userprofile);
+#if USE_DEV_PREVIEW_CONFIG_FILE_PATHS
+			swprintf(local2, ARRAYSIZE(local2), L"%ws\\AppData\\Local\\Microsoft\\Halo 2\\DevPreview\\", userprofile);
+#else
+			swprintf(local2, ARRAYSIZE(local2), L"%ws\\AppData\\Local\\Microsoft\\Halo 2\\", userprofile);
+#endif
 			CreateDirectoryW(local2, NULL);
 			int fperrno1 = GetLastError();
 			if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
 				int appdatabuflen = wcslen(local2) + 1;
-				H2AppDataLocal = (wchar_t*)malloc(sizeof(wchar_t) * appdatabuflen);
+				H2AppDataLocal = (wchar_t*)calloc(1, sizeof(wchar_t) * appdatabuflen);
 				wcscpy_s(H2AppDataLocal, appdatabuflen, local2);
 			}
 		}
 	}
-	else if (swprintf(local2, 1024, L"%ws\\Local Settings\\Application Data\\", userprofile), _wstat(local2, &sb) == 0 && sb.st_mode & S_IFDIR)
+	else if (swprintf(local2, ARRAYSIZE(local2), L"%ws\\Local Settings\\Application Data\\", userprofile), _wstat(local2, &sb) == 0 && sb.st_mode & S_IFDIR)
 	{
-		swprintf(local2, 1024, L"%ws\\Local Settings\\Application Data\\Microsoft\\", userprofile);
+		swprintf(local2, ARRAYSIZE(local2), L"%ws\\Local Settings\\Application Data\\Microsoft\\", userprofile);
 		CreateDirectoryW(local2, NULL);
 		int fperrno1 = GetLastError();
 		if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
-			swprintf(local2, 1024, L"%ws\\Local Settings\\Application Data\\Microsoft\\Halo 2\\", userprofile);
+#if USE_DEV_PREVIEW_CONFIG_FILE_PATHS
+			swprintf(local2, ARRAYSIZE(local2), L"%ws\\Local Settings\\Application Data\\Microsoft\\Halo 2\\DevPreview\\", userprofile);
+#else
+			swprintf(local2, ARRAYSIZE(local2), L"%ws\\Local Settings\\Application Data\\Microsoft\\Halo 2\\", userprofile);
+#endif
 			CreateDirectoryW(local2, NULL);
 			int fperrno1 = GetLastError();
 			if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
 				int appdatabuflen = wcslen(local2) + 1;
-				H2AppDataLocal = (wchar_t*)malloc(sizeof(wchar_t) * appdatabuflen);
+				H2AppDataLocal = (wchar_t*)calloc(1, sizeof(wchar_t) * appdatabuflen);
 				wcscpy_s(H2AppDataLocal, appdatabuflen, local2);
 			}
 		}
 	}
 
-	if (H2AppDataLocal == 0) {
+	if (H2AppDataLocal == nullptr) {
 		int appdatabuflen = wcslen(H2ProcessFilePath) + 1;
-		H2AppDataLocal = (wchar_t*)malloc(sizeof(wchar_t) * appdatabuflen);
+		H2AppDataLocal = (wchar_t*)calloc(1, sizeof(wchar_t) * appdatabuflen);
 		swprintf(H2AppDataLocal, appdatabuflen, L"%ws", H2ProcessFilePath);
 		addDebugText("ERROR: Could not find AppData Local. Using Process File Path:");
 	}
@@ -369,7 +377,7 @@ void InitH2Startup() {
 
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
-	H2ProcessFilePath = (wchar_t*)malloc(wcslen(ArgList[0]) * sizeof(wchar_t));
+	H2ProcessFilePath = (wchar_t*)calloc(1, wcslen(ArgList[0]) * sizeof(wchar_t));
 	int rtncodepath = GetWidePathFromFullWideFilename(ArgList[0], H2ProcessFilePath);
 	if (rtncodepath == -1) {
 		swprintf(H2ProcessFilePath, 2, L"");
@@ -439,7 +447,7 @@ void InitH2Startup() {
 		exit(EXIT_FAILURE);
 
 	//apply any network hooks
-	network->applyNetworkHooks();
+	CustomNetwork::applyNetworkHooks();
 	InitH2Tweaks();
 	extern void initGSCustomLanguage();
 	initGSCustomLanguage();
@@ -456,13 +464,19 @@ void InitH2Startup() {
 void InitH2Startup2() {
 	InitGSDownload();
 
-	if (H2IsDediServer) {
-		addDebugText("Logging the Dedi Server in...");
-		//none of that stuff is setup for the dedi server yet since there are no gui commands for it.
-		//currently credentials are taken from the config file.
-		//also don't enable this since nothing's initialised for the server.
+	// initialize default data to run under LAN
+	// if the server runs in LIVE mode, check XLiveSignIn/XLiveSignOut in AccountLogin.cpp
+	if (H2IsDediServer)
+	{
+		addDebugText("Signing in dedicated server locally.");
+
 		AccountEdit_remember = false;
-		HandleGuiLogin(0, H2Config_login_identifier, H2Config_login_password, nullptr);
+
+		BYTE abEnet[6];
+		BYTE abOnline[20];
+		XNetRandom(abEnet, 6);
+		XNetRandom(abOnline, 20);
+		ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, 6).c_str(), ByteToHexStr(abOnline, 20).c_str(), false);
 	}
 }
 

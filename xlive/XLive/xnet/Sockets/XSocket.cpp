@@ -264,7 +264,17 @@ int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount,
 		return SOCKET_ERROR;
 	}
 
-	return ipManager.handleRecvdPacket(xsocket, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
+	// if the result returned by handleRecvdPacket is SOCKET_ERROR, pool another packet until we get an error directly from WINSOCK's recvfrom API (like WSAEWOULDBLOCK)
+	// or the packet received is a valid game packet
+	// because we don't want to lose/delay an in-bound game packet
+	// this should improve performance especially if someone is sending from an unknown connection packets (like DDoS-ing), depending on the performance of the server
+	result = ipManager.handleRecvdPacket(xsocket, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
+	if (result == SOCKET_ERROR)
+	{
+		return XSocketWSARecvFrom(s, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
+	}
+
+	return result;
 }
 
 // #25
@@ -291,12 +301,9 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		//inTo->sin_addr.s_addr = H2Config_master_ip;
 		//inTo->sin_port = ntohs(H2Config_master_port_relay);
 
-		XBroadcastPacket* packet = (XBroadcastPacket*)malloc(sizeof(XBroadcastPacket) + lpBuffers->len);
-		packet->pckHeader.intHdr = 'BrOd';
-		strncpy(packet->pckHeader.HdrStr, broadcastStrHdr, MAX_HDR_STR);
-		ZeroMemory(&packet->data, sizeof(XBroadcastPacket::XBroadcast));
+		XBroadcastPacket* packet = (XBroadcastPacket*)::operator new(sizeof(XBroadcastPacket) + lpBuffers->len);
+		new (packet) XBroadcastPacket();
 
-		packet->data.name.sin_addr.s_addr = INADDR_BROADCAST;
 		memcpy((char*)packet + sizeof(XBroadcastPacket), lpBuffers->buf, lpBuffers->len);
 
 		int portOffset = H2Config_base_port % 1000;
@@ -306,12 +313,12 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			inTo->sin_port = ntohs(i + portOffset + 1);
 			int result = sendto(xsocket->winSockHandle, (const char*)packet, sizeof(XBroadcastPacket) + lpBuffers->len, dwFlags, (sockaddr*)inTo, iTolen);
 			if (result == SOCKET_ERROR) {
-				free(packet);
+				::operator delete(packet);
 				return SOCKET_ERROR;
 			}
 		}
-		free(packet);
-		return ERROR_SUCCESS;
+		::operator delete(packet);
+		return 0;
 	}
 
 	/*
@@ -320,12 +327,12 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		Worst case if this is found to cause performance issues we can handle the send and re-update to secure before return.
 	*/
 
-	XnIp* xnIp = &ipManager.XnIPs[ipManager.getConnectionIndex(inTo->sin_addr)];
-	if (xnIp->isValid(inTo->sin_addr))
+	XnIp* xnIp = ipManager.getConnection(inTo->sin_addr);
+	if (xnIp != nullptr)
 	{
 		sockaddr_in sendToAddr;
 		sendToAddr.sin_family = AF_INET;
-		sendToAddr.sin_addr = xnIp->xnaddr.ina;
+		sendToAddr.sin_addr = xnIp->xnaddr.inaOnline;
 
 		//LOG_TRACE_NETWORK("SendStruct.sin_addr.s_addr == %08X", sendAddress.sin_addr.s_addr);
 
@@ -367,19 +374,18 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		*lpNumberOfBytesSent = 0;
 
 #if COMPILE_WITH_STD_SOCK_FUNC
-		if (dwBufferCount >= 1)
+		for (DWORD i = 0; i < dwBufferCount; i++)
 		{
-			for (DWORD i = 0; i < dwBufferCount; i++)
-			{
-				result = sendto(xsocket->winSockHandle, lpBuffers[i].buf, lpBuffers[i].len, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr));
-				if (result == SOCKET_ERROR)
-					break;
+			result = sendto(xsocket->winSockHandle, lpBuffers[i].buf, lpBuffers[i].len, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr));
+			if (result == SOCKET_ERROR)
+				break;
 
-				*lpNumberOfBytesSent += result;
-			}
+			xnIp->pckSent++;
+
+			*lpNumberOfBytesSent += result;
 		}
 #else
-		int result = WSASendTo(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesSent, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr), lpOverlapped, lpCompletionRoutine);
+		result = WSASendTo(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesSent, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr), lpOverlapped, lpCompletionRoutine);
 #endif
 
 		if (result == SOCKET_ERROR)
@@ -390,14 +396,15 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		}
 		else
 		{
+			ipManager.setTimeConnectionInteractionHappened(xnIp->connectionIdentifier);
 			updateSendToStatistics(*lpNumberOfBytesSent);
 		}
 
-		return ERROR_SUCCESS;
+		return 0;
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("XSocketSendTo() - Tried to send packet to unknown connection, connection index: {}, connection identifier: {}", ipManager.getConnectionIndex(inTo->sin_addr), inTo->sin_addr.s_addr);
+		LOG_TRACE_NETWORK("XSocketSendTo() - Tried to send packet to unknown connection, connection index: {}, connection identifier: {:x}", ipManager.getConnectionIndex(inTo->sin_addr), inTo->sin_addr.s_addr);
 		WSASetLastError(WSAEHOSTUNREACH);
 		return SOCKET_ERROR;
 	}
@@ -524,7 +531,10 @@ INT WINAPI XNetCleanup()
 SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 {
 	if (name->sa_family == AF_INET6) // we don't support IPV6
-		return WSAEADDRNOTAVAIL;
+	{
+		WSASetLastError(WSAEADDRNOTAVAIL);
+		return SOCKET_ERROR;
+	}
 
 	XSocket* xsocket = (XSocket*)s;
 
@@ -577,7 +587,7 @@ int WINAPI XSocketSend(SOCKET s, const char* buf, int len, int flags)
 	wsaBuf.buf = (CHAR*)buf;
 	DWORD numberOfBytesSent = 0;
 
-	if (XSocketWSASendTo(s, &wsaBuf, 1, &numberOfBytesSent, flags, NULL, NULL, NULL, NULL) != ERROR_SUCCESS)
+	if (XSocketWSASendTo(s, &wsaBuf, 1, &numberOfBytesSent, flags, NULL, NULL, NULL, NULL) != 0)
 		return SOCKET_ERROR;
 	else
 		return numberOfBytesSent;
@@ -591,7 +601,7 @@ int WINAPI XSocketSendTo(SOCKET s, const char* buf, int len, int flags, sockaddr
 	wsaBuf.buf = (CHAR*)buf;
 	DWORD numberOfBytesSent = 0;
 
-	if ( XSocketWSASendTo(s, &wsaBuf, 1, &numberOfBytesSent, flags, to, tolen, NULL, NULL) != ERROR_SUCCESS)
+	if ( XSocketWSASendTo(s, &wsaBuf, 1, &numberOfBytesSent, flags, to, tolen, NULL, NULL) != 0)
 		return SOCKET_ERROR;
 	else
 		return numberOfBytesSent;
@@ -605,7 +615,7 @@ int WINAPI XSocketRecv(SOCKET s, char* buf, int len, int flags)
 	wsaBuf.buf = (CHAR*)buf;
 	DWORD numberOfbytesRecvd;
 
-	if (XSocketWSARecvFrom(s, &wsaBuf, 1, &numberOfbytesRecvd, (LPDWORD)&flags, NULL, NULL, NULL, NULL) != ERROR_SUCCESS)
+	if (XSocketWSARecvFrom(s, &wsaBuf, 1, &numberOfbytesRecvd, (LPDWORD)&flags, NULL, NULL, NULL, NULL) != 0)
 		return SOCKET_ERROR;
 	else
 		return numberOfbytesRecvd;
@@ -619,7 +629,7 @@ int WINAPI XSocketRecvFrom(SOCKET s, char* buf, int len, int flags, sockaddr *fr
 	wsaBuf.buf = (CHAR*)buf;
 	DWORD numberOfbytesRecvd;
 
-	if (XSocketWSARecvFrom(s, &wsaBuf, 1, &numberOfbytesRecvd, (LPDWORD)&flags, from, fromlen, NULL, NULL) != ERROR_SUCCESS)
+	if (XSocketWSARecvFrom(s, &wsaBuf, 1, &numberOfbytesRecvd, (LPDWORD)&flags, from, fromlen, NULL, NULL) != 0)
 		return SOCKET_ERROR;
 	else
 		return numberOfbytesRecvd;

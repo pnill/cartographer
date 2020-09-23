@@ -41,37 +41,16 @@ void UpdateConnectionStatus() {
 	}
 }
 
-char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long saddr, unsigned long xnaddr, char* abEnet, char* abOnline, bool onlineSignIn) {
+char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long lanaddr, unsigned long xnaddr, const char* abEnet, const char* abOnline, bool onlineSignIn) {
 
-	if (strlen(username) <= 0 || xuid == 0 || saddr == 0 || strlen(abEnet) != 12 || strlen(abOnline) != 40) {
+	if (strlen(username) <= 0 || xuid == 0 || strnlen(abEnet, 12) != 12 || strnlen(abOnline, 40) != 40) {
 		return 0;
 	}
 
 	char result = strlen(login_token) == 32 ? 1 : 2;
 
-	XNADDR pxna;
-	SecureZeroMemory(&pxna, sizeof(XNADDR));
-
-	pxna.ina.s_addr = xnaddr;
-	pxna.inaOnline.s_addr = saddr;
-	pxna.wPortOnline = htons(H2Config_base_port);
-
-	BYTE abEnet2[6];
-	SecureZeroMemory(abEnet2, sizeof(abEnet2));
-	for (int i = 0; i < 6; i++) {
-		sscanf(&abEnet[i * 2], "%2hhx", &abEnet2[i]);
-	}
-
-	char abOnline2[20];
-	SecureZeroMemory(abOnline2, sizeof(abOnline2));
-	for (int i = 0; i < 20; i++) {
-		sscanf(&abOnline[i * 2], "%2hhx", &abOnline2[i]);
-	}
-	memcpy(&pxna.abEnet, abEnet2, 6);
-	memcpy(&pxna.abOnline, abOnline2, 20);
-
 	XUserSetup(0, xuid, username, onlineSignIn);
-	ipManager.SetupLocalConnectionInfo(&pxna);
+	ipManager.SetupLocalConnectionInfo(xnaddr, abEnet, abOnline);
 
 	UpdateConnectionStatus();
 
@@ -340,15 +319,15 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			//allow no login_token from backend in DB emergencies / random logins.
 			if (result_details == 1) {
 				if (prev_login_token) {
-					if (H2AccountBufferLoginToken && H2AccountCount > 0) {
+					if (H2AccountArrayLoginToken && H2AccountCount > 0) {
 						for (int i = 0; i < H2AccountCount; i++) {
-							if (H2AccountBufferLoginToken[i] && strcmp(H2AccountBufferLoginToken[i], prev_login_token) == 0) {
-								if (H2AccountBufferUsername[i]) {
-									free(H2AccountBufferUsername[i]);
+							if (H2AccountArrayLoginToken[i] && strcmp(H2AccountArrayLoginToken[i], prev_login_token) == 0) {
+								if (H2AccountArrayUsername[i]) {
+									free(H2AccountArrayUsername[i]);
 								}
-								H2AccountBufferUsername[i] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
-								strncpy_s(H2AccountBufferUsername[i], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
-								snprintf(H2AccountBufferLoginToken[i], 33, login_token);
+								H2AccountArrayUsername[i] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
+								strncpy_s(H2AccountArrayUsername[i], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
+								snprintf(H2AccountArrayLoginToken[i], 33, login_token);
 								break;
 							}
 						}
@@ -356,7 +335,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 				else {
 					if (AccountEdit_remember) {
-						H2AccountBufferAdd(login_token, username);
+						H2AccountAccountAdd(username, login_token);
 					}
 				}
 			}
@@ -426,31 +405,30 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 	free(escaped_user_identifier);
 	free(escaped_user_password);
 
-	int master_login_interpret_result = -1;
-	int master_http_response_result = MasterHttpResponse("https://cartographer.online/login2", http_request_body_build, rtn_result);
+	int error_code = MasterHttpResponse(std::string(cartographerURL + "/login2"), http_request_body_build, rtn_result);
 
 	for (int i = strlen(http_request_body_build) - 1; i >= 0; i--) {
 		http_request_body_build[i] = 0;
 	}
 	free(http_request_body_build);
 
-	if (master_http_response_result == 0) {
-		master_login_interpret_result = InterpretMasterLogin(rtn_result, ltoken);
-		if (master_login_interpret_result > 0) {
+	if (error_code == 0) {
+		error_code = InterpretMasterLogin(rtn_result, ltoken);
+		if (error_code > 0) {
 			result = true;
 		}
 		free(rtn_result);
 	}
-	if (master_login_interpret_result < 0) {
+	if (error_code < 0) {
 		char NotificationPlayerText[40];
-		sprintf(NotificationPlayerText, "ERROR Account Login: %d", master_login_interpret_result);
+		sprintf(NotificationPlayerText, "ERROR Account Login: %d", error_code);
 		addDebugText(NotificationPlayerText);
 
-		if (master_login_interpret_result == ERROR_CODE_INVALID_LOGIN_TOKEN) {
+		if (error_code == ERROR_CODE_INVALID_LOGIN_TOKEN) {
 			char* username = 0;
 			for (int i = 0; i < H2AccountCount; i++) {
-				if (H2AccountBufferLoginToken[i] && strcmp(H2AccountBufferLoginToken[i], ltoken) == 0) {
-					username = H2AccountBufferUsername[i];
+				if (H2AccountArrayLoginToken[i] && strcmp(H2AccountArrayLoginToken[i], ltoken) == 0) {
+					username = H2AccountArrayUsername[i];
 					break;
 				}
 			}
@@ -466,16 +444,88 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 			char* login_identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
 			SecureZeroMemory(login_identifier, strlen(login_identifier));
 		}
-		if (master_login_interpret_result == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) {
+		if (error_code == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) {
 			result = false;
 		}
 	}
 
 	if (out_master_login_interpret_result)
-		*out_master_login_interpret_result = master_login_interpret_result;
+		*out_master_login_interpret_result = error_code;
 
 	return result;
 }
+
+#pragma region Online Server Sign-in
+
+// 5257: ??
+HRESULT WINAPI XLiveManageCredentials(LPCWSTR lpszLiveIdName, LPCWSTR lpszLiveIdPassword, DWORD dwCredFlags, PXOVERLAPPED pXOverlapped)
+{
+	LOG_TRACE_XLIVE(L"XLiveManageCredentials (lpszLiveIdName = {0}, lpszLiveIdPassword = {1}, dwCredFlags = {2:#x}, pXOverlapped = {3:p})",
+		lpszLiveIdName, lpszLiveIdPassword, dwCredFlags, (void*)pXOverlapped);
+
+	if (pXOverlapped)
+	{
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = 0;
+		pXOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+	}
+
+	// not done - error now
+	return S_OK;
+}
+
+// #5259: XLiveSignin
+HRESULT WINAPI XLiveSignin(PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD dwFlags, PXOVERLAPPED pOverlapped)
+{
+	LOG_TRACE_XLIVE("XLiveSignin() - signin in");
+
+	addDebugText("Logging the Dedi Server in...");
+
+	// clear LAN login info if we are logged in locally
+	if (userSignedInLocally(0))
+	{
+		XUserSignOut(0);
+		ipManager.UnregisterLocalConnectionInfo();
+	}
+
+	// if we are not signed in online, sign us in
+	if (!userSignedOnline(0))
+	{
+		//none of that stuff is setup for the dedi server yet since there are no gui commands for it.
+		//currently credentials are taken from the config file.
+		//also don't enable this since nothing's initialised for the server.
+		addDebugText("Signing in dedicated server online.");
+		HandleGuiLogin(0, H2Config_login_identifier, H2Config_login_password, nullptr);
+	}
+	
+	if (pOverlapped)
+	{
+		pOverlapped->InternalLow = ERROR_SUCCESS;
+		pOverlapped->InternalHigh = 0;
+		pOverlapped->dwExtendedError = S_OK;
+	}
+
+	return S_OK;
+}
+
+// #5258: XLiveSignout
+HRESULT WINAPI XLiveSignout(PXOVERLAPPED pXOverlapped)
+{
+	LOG_TRACE_XLIVE("XLiveSignout");
+
+	XUserSignOut(0);
+	ipManager.UnregisterLocalConnectionInfo();
+
+	if (pXOverlapped)
+	{
+		pXOverlapped->InternalLow = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = 0;
+		pXOverlapped->dwExtendedError = S_OK;
+	}
+
+	return S_OK;
+}
+#pragma endregion
 
 #pragma endregion
 

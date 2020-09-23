@@ -18,7 +18,7 @@ void HeadHunter::SpawnSkull(datum unit_datum)
 	DatumIterator<ObjectHeader> objectIt(game_state_objects_header);
 	BipedObjectDefinition* biped_unit = (BipedObjectDefinition*)objectIt.get_data_at_index(unit_datum.Index)->object;
 
-	if (objectIt.get_data_at_index(unit_datum.Index)->type == ObjectType::biped)
+	if (objectIt.get_data_at_index(unit_datum.Index)->type == e_object_type::biped)
 	{
 		ObjectPlacementData nObject;
 
@@ -49,9 +49,16 @@ void HeadHunter::PickupSkull(XUID player, datum SkullDatum)
 		//typedef void(__stdcall *update_player_score)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
 		//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
 
-		datum PlayerDatum = variant_player->GetPlayerDatum(player);
-		pupdate_player_score((void*)(h2mod->Server ? 0x30005508 : 0x3000595C), PlayerDatum.Index, 0, 1, -1, 0);
-		call_hs_object_destroy(SkullDatum);
+		typedef char*(__cdecl* get_score_data_ptr)();
+		auto p_get_score_data_ptr = h2mod->GetAddress<get_score_data_ptr>(0x6B8A7, 0x6AD32);
+
+		char* player_score_data = p_get_score_data_ptr();
+		if (player_score_data)
+		{
+			datum PlayerDatum = variant_player->GetPlayerDatum(player);
+			pupdate_player_score(player_score_data, PlayerDatum.Index, 0, 1, -1, 0);
+			call_hs_object_destroy(SkullDatum);
+		}
 	}
 }
 

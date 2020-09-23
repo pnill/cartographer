@@ -1,8 +1,8 @@
 #pragma once
 #include "..\Blam\Cache\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
-#include "..\Blam\Maths\real_math.hpp"
-#include "..\Blam\Maths\\integer_math.hpp"
+#include "..\Blam\Maths\real_math.h"
+#include "..\Blam\Maths\integer_math.h"
 
 /*********************************************************************
 * name: hud_globals

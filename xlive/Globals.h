@@ -7,9 +7,8 @@
 #include "H2MOD\Variants\VariantPlayer.h"
 #include "H2MOD\Variants\VariantSystem.h"
 #include "H2MOD\Variants\DeviceShop\DeviceShop.h"
-#include "H2MOD\Variants\H2Final\H2Final.h"
 #include "H2MOD\Variants\XboxTick\XboxTick.h"
-#include "H2MOD\Modules\DataArray\DataArray.h"
+#include "Blam/Engine/DataArray/DataArray.h"
 #include "H2MOD\Variants\Infection\Infection.h"
 #include "H2MOD\Variants\FireFight\FireFight.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
@@ -22,7 +21,6 @@
 	std::thread{ [=] { expression; } }.detach();
 
 extern s_datum_array* game_state_actors;
-extern s_datum_array* game_state_players;
 extern s_datum_array* game_state_objects_header;
 
 extern DeviceShop* device_shop;
@@ -33,10 +31,5 @@ extern bool displayXyz;
 
 extern std::map<DWORD, bool> achievementList;
 
-//some utility functions below
-std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
-std::vector<std::string> split(const std::string &s, char delim);
-
 extern int H2GetInstanceId();
 
-int stripWhitespace(wchar_t *inputStr);

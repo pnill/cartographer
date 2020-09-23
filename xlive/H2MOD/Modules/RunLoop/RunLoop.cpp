@@ -7,12 +7,13 @@
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
-#include "Globals.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
+#include "H2MOD/Modules/Stats/StatsHandler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.h"
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
@@ -218,36 +219,25 @@ void hotkeyFuncHelp() {
 	addDebugText("------------------------------");
 	addDebugText("Options:");
 	char tempTextEntry[255];
-	char hotkeyname[20];
-	GetVKeyCodeString(H2Config_hotkeyIdToggleDebug, hotkeyname, 20);
-	PadCStringWithChar(hotkeyname, 20, ' ');
-	snprintf(tempTextEntry, 255, "%s- Toggle hiding this text display.", hotkeyname);
+	
+	snprintf(tempTextEntry, 255, "%s - Toggle hiding this text display.", GetVKeyCodeString(H2Config_hotkeyIdToggleDebug).c_str());
 	addDebugText(tempTextEntry);
-	GetVKeyCodeString(H2Config_hotkeyIdHelp, hotkeyname, 20);
-	PadCStringWithChar(hotkeyname, 20, ' ');
-	snprintf(tempTextEntry, 255, "%s- Print and show this help text.", hotkeyname);
+
+	snprintf(tempTextEntry, 255, "%s - Print and show this help text.", GetVKeyCodeString(H2Config_hotkeyIdHelp).c_str());
 	addDebugText(tempTextEntry);
-	GetVKeyCodeString(H2Config_hotkeyIdAlignWindow, hotkeyname, 20);
-	PadCStringWithChar(hotkeyname, 20, ' ');
-	snprintf(tempTextEntry, 255, "%s- Align/Correct window positioning (into Borderless).", hotkeyname);
+
+	snprintf(tempTextEntry, 255, "%s - Align/Correct window positioning (into Borderless).", GetVKeyCodeString(H2Config_hotkeyIdAlignWindow).c_str());
 	addDebugText(tempTextEntry);
-	GetVKeyCodeString(H2Config_hotkeyIdWindowMode, hotkeyname, 20);
-	PadCStringWithChar(hotkeyname, 20, ' ');
-	snprintf(tempTextEntry, 255, "%s- Toggle Windowed/Borderless mode.", hotkeyname);
+
+	snprintf(tempTextEntry, 255, "%s - Toggle Windowed/Borderless mode.", GetVKeyCodeString(H2Config_hotkeyIdWindowMode).c_str());
 	addDebugText(tempTextEntry);
-	GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat, hotkeyname, 20);
-	PadCStringWithChar(hotkeyname, 20, ' ');
-	snprintf(tempTextEntry, 255, "%s- Toggles hiding the in-game chat menu.", hotkeyname);
+
+	snprintf(tempTextEntry, 255, "%s - Toggles hiding the in-game chat menu.", GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat).c_str());
 	addDebugText(tempTextEntry);
-	GetVKeyCodeString(H2Config_hotkeyIdConsole, hotkeyname, 20);
-	PadCStringWithChar(hotkeyname, 20, ' ');
-	snprintf(tempTextEntry, 255, "%s- Toggles hiding the Console Menu.", hotkeyname);
+
+	snprintf(tempTextEntry, 255, "%s - Toggles hiding the Console Menu.", GetVKeyCodeString(H2Config_hotkeyIdConsole).c_str());
 	addDebugText(tempTextEntry);
-	//addDebugText("F5      - Toggle online Coop mode.");
-	//addDebugText("F10     - Fix in-game player camera from a white/black bad cutscene.");
-	//addDebugText("Home    - Sight Possession Hack.");
-	//addDebugText("Page Up - Set Lobby Privacy to OPEN.");
-	//addDebugText("Page Dn - Set Lobby Privacy to INVITE ONLY.");
+
 	addDebugText("------------------------------");
 	setDebugTextDisplay(true);
 }
@@ -271,7 +261,6 @@ void GSMainLoop() {
 	static bool halo2WindowExists = false;
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
-
 		DWORD Display_Mode = 1;
 		HKEY hKeyVideoSettings = NULL;
 		if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_READ, &hKeyVideoSettings) == ERROR_SUCCESS) {
@@ -290,7 +279,10 @@ void GSMainLoop() {
 			SetWindowText(H2hWnd, titleMod);
 		}
 	}
-
+	if(H2IsDediServer)
+	{
+		StatsHandler::verifyPlayerRanks();
+	}
 	/*
 	static bool halo2ServerOnce1 = false;
 	if (H2IsDediServer && !halo2ServerOnce1) {
@@ -313,7 +305,8 @@ void GSMainLoop() {
 	if (prevPartyPrivacy > 0 && partyPrivacy == 0) {
 		pushHostLobby();
 	}
-	prevPartyPrivacy = partyPrivacy;*/
+	prevPartyPrivacy = partyPrivacy;
+	*/
 }
 
 void (*main_game_loop)();
@@ -323,6 +316,7 @@ void main_game_loop_hook() {
 		GSMainLoop();
 
 	main_game_loop();
+	EventHandler::executeGameLoopCallbacks();
 
 	mapManager->leaveSessionIfAFK();
 

@@ -21,9 +21,9 @@ enum e_network_session_state : signed int
 
 enum e_map_status : int
 {
-	unk_map_stats,
+	unk_0,
 	map_unavailable,
-	unk_map_stats2,
+	map_someone_loading,
 	map_available,
 	map_loaded,
 	map_is_downloading
@@ -142,7 +142,8 @@ struct session_parameters
 	DWORD field_4DD8;
 	wchar_t custom_map_name[48];
 	DWORD field_4E3C;
-	BYTE gap_4E40[704];
+	wchar_t game_variant_name[16];
+	BYTE gap_4E40[672];
 	DWORD field_5100;
 	BYTE gap_5104[3508];
 	DWORD field_5EB8;
@@ -154,12 +155,12 @@ static_assert(sizeof(session_parameters) == 4784, "Invalid session_params size")
 
 struct network_session
 {
-	DWORD field_0;
-	void *network_message_gateway_ptr;
-	network_observer *network_observer_ptr;
-	DWORD session_manager_ptr;
+	void* vtbl;
+	void* network_message_gateway_ptr;
+	network_observer* network_observer_ptr;
+	void* session_manager_ptr;
 	DWORD text_chat;
-	int unk_index;
+	int session_index;
 	int field_18;
 	int network_protocol; // LIVE - 2, Network - 1
 	XNKID session_id;
@@ -238,7 +239,7 @@ struct network_session
 	DWORD field_7974;
 	DWORD field_7978;
 	BYTE gap_797C[508];
-	DWORD c_kablam_session_join_request_handler; // dedicated server session join handler
+	void* c_kablam_session_join_request_handler; // dedicated server session join handler
 	char field_7B7C[12];
 };
 static_assert(sizeof(network_session) == 31624, "Invalid network_session size");
@@ -256,6 +257,7 @@ namespace NetworkSession
 
 	int getPeerCount();
 	int getLocalPeerIndex();
+	IN_ADDR getLocalNetworkAddress();
 	void kickPeer(int peerIndex);
 	void endGame();
 	peer_observer_channel* getPeerObserverChannel(int peerIndex);
@@ -268,9 +270,16 @@ namespace NetworkSession
 	bool playerIsActive(int playerIndex);
 	int getPeerIndex(int playerIndex);
 	wchar_t* getPlayerName(int playerIndex);
+	int getPlayerIdByName(wchar_t* name);
 	long long getPlayerXuid(int playerIndex);
+	long long getPeerXUID(int peerIndex);
+	wchar_t* getPeerPlayerName(int peerIndex);
+
 	int getPlayerTeam(int playerIndex);
 	int getPlayerTeamFromXuid(long long xuid);
+	int getPeerIndexFromXUID(long long xuid);
 	player_information* getPlayerInformation(int playerIndex);
+
+	wchar_t* getGameVariantName();
 }
 

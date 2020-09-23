@@ -6,7 +6,8 @@
 #include "XLive\XUser\XUser.h"
 #include "..\Memory\bitstream.h"
 #include "..\..\MapManager\MapManager.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/Utils/Utils.h"
 
 char g_network_message_types[e_network_message_types::end * 32];
 
@@ -52,6 +53,17 @@ bool __cdecl decode_team_change_packet(bitstream* stream, int a2, s_team_change*
 	return stream->packet_is_valid() == false;
 }
 
+void __cdecl encode_rank_change_packet(bitstream* stream, int a2, s_rank_change* data)
+{
+	stream->data_encode_integer("rank", data->rank, 8);
+}
+
+bool __cdecl decode_rank_change_packet(bitstream* stream, int a2, s_rank_change* data)
+{
+	data->rank = stream->data_decode_integer("rank", 8);
+	return stream->packet_is_valid() == false;
+}
+
 void register_custom_packets(void* network_messages)
 {
 	typedef void(__cdecl* register_test_packet)(void* network_messages);
@@ -67,6 +79,9 @@ void register_custom_packets(void* network_messages)
 
 	register_packet_impl(network_messages, team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
 		(void*)encode_team_change_packet, (void*)decode_team_change_packet, NULL);
+
+	register_packet_impl(network_messages, rank_change, "rank-change", 0, sizeof(s_rank_change), sizeof(s_rank_change),
+		(void*)encode_rank_change_packet, (void*)decode_rank_change_packet, NULL);
 }
 
 typedef void(__stdcall *handle_out_of_band_message)(void *thisx, network_address* address, int message_type, int a4, void* packet);
@@ -163,8 +178,10 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 	*/
 
 	network_address addr;
+	ZeroMemory(&addr, sizeof(network_address));
 	network_channel* peer_network_channel = network_channel::getNetworkChannel(network_channel_index);
-	peer_network_channel->getNetworkAddressFromNetworkChannel(&addr);
+
+	
 
 	switch (message_type)
 	{
@@ -195,7 +212,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 					network_observer* observer = session->network_observer_ptr;
 					peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peer_index);
 
-					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, custom_map_filename, sizeof(s_custom_map_filename), &data);
+					observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, custom_map_filename, sizeof(s_custom_map_filename), &data);
 				}
 				else
 				{
@@ -228,13 +245,82 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			return;
 		}
 	}
-
+	case rank_change:
+		{
+			if(peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
+			{
+				s_rank_change* recieved_data = (s_rank_change*)packet;
+				h2mod->set_local_rank(recieved_data->rank);
+			}
+		}
+	case leave_session:
+	{
+		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
+			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
+		{
+			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
+			EventHandler::executeNetworkPlayerRemoveCallbacks(peer_index);
+		}
+	}
+	case parameters_update:
+	{
+		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
+			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
+		{
+			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
+			LOG_INFO_NETWORK(L"Got a parameters update from {} : {}", NetworkSession::getPeerPlayerName(peer_index), std::to_wstring(NetworkSession::getCurrentNetworkSession()->parameters.dedicated_server));
+			if (peer_index == NetworkSession::getCurrentNetworkSession()->session_host_peer_index && !NetworkSession::getCurrentNetworkSession()->parameters.dedicated_server)
+			{
+				const auto host_xuid = NetworkSession::getPeerXUID(peer_index);
+				if (host_xuid != NONE) {
+					LOG_TRACE_NETWORK(L"Setting up team persistance with host xuid {}", IntToWString<XUID>(host_xuid, std::dec));
+					h2mod->set_local_clan_tag(0, host_xuid);
+					EventHandler::registerGameStateCallback({
+							"UnPersistHostTeam1",
+							game_life_cycle::life_cycle_in_game,
+							[]()
+							{
+								LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
+								h2mod->set_local_clan_tag(0, 0);
+							}, true
+						}, false);
+					EventHandler::registerGameStateCallback({
+							"UnPersistHostTeam2",
+							game_life_cycle::life_cycle_none,
+							[]()
+							{
+								LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
+								h2mod->set_local_clan_tag(0, 0);
+							}, true
+						}, false);
+				}
+			}
+		}
+	}
 	default:
 		break;
 	}
 
-	LOG_TRACE_NETWORK("handle_channel_message_hook() - Received message: {} from peer index: {}, address: {:x}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(&addr), ntohl(addr.address.ipv4));
+	if (peer_network_channel->getNetworkAddressFromNetworkChannel(&addr)) 
+	{
+		LOG_TRACE_NETWORK("handle_channel_message_hook() - Received message: {} from peer index: {}, address: {:x}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(&addr), ntohl(addr.address.ipv4));
+	}
+	else
+	{
+		LOG_ERROR_NETWORK("handle_channel_message_hook() - Received message: {} from network channel: {} that maybe shouldn't have been received", getNetworkMessageName(message_type), network_channel_index);
+	}
+
+
 	p_handle_channel_message(thisx, network_channel_index, message_type, dynamic_data_size, packet);
+
+	if (message_type == player_add) {
+		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
+			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
+		{
+			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
+			EventHandler::executeNetworkPlayerAddCallbacks(peer_index);
+		}
+	}
 }
 
 void CustomPackets::sendRequestMapFilename()
@@ -250,13 +336,13 @@ void CustomPackets::sendRequestMapFilename()
 		peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(session->session_host_peer_index);
 
 		if (observer_channel->field_1) {
-			observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, request_map_filename, sizeof(s_request_map_filename), &data);
+			observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, request_map_filename, sizeof(s_request_map_filename), &data);
 
-			LOG_TRACE_NETWORK("[H2MOD-CustomPackets] Sending map name request info: session host peer index: {}, observer index {}, observer bool unk: {}, unk index: {}",
+			LOG_TRACE_NETWORK("[H2MOD-CustomPackets] Sending map name request info: session host peer index: {}, observer index {}, observer bool unk: {}, session index: {}",
 				session->session_host_peer_index,
 				observer_channel->observer_index,
 				observer_channel->field_1,
-				session->unk_index);
+				session->session_index);
 		}
 	}
 }
@@ -275,11 +361,32 @@ void CustomPackets::sendTeamChange(int peerIndex, int teamIndex)
 		if (peerIndex != -1 && peerIndex != session->local_peer_index)
 		{
 			if (observer_channel->field_1) {
-				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, team_change, sizeof(s_team_change), &data);
+				observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, team_change, sizeof(s_team_change), &data);
 			}
 		}
 	}
 }
+
+void CustomPackets::sendRankChange(int peerIndex, byte rank)
+{
+	network_session* session = NetworkSession::getCurrentNetworkSession();
+	if (NetworkSession::localPeerIsSessionHost())
+	{
+		s_rank_change data;
+		data.rank = rank;
+
+		network_observer* observer = session->network_observer_ptr;
+		peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peerIndex);
+
+		if (peerIndex != -1 && peerIndex != session->local_peer_index)
+		{
+			if (observer_channel->field_1) {
+				observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, rank_change, sizeof(s_rank_change), &data);
+			}
+		}
+	}
+}
+
 
 void CustomPackets::ApplyGamePatches()
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Cache/DataTypes/Macros.h"
+#include "Blam/Common/Common.h"
 
 struct blam_tag
 {

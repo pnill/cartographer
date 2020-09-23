@@ -55,6 +55,7 @@
 #include <random>
 #include <numeric>
 #include <sstream>
+#include <iomanip>
 #include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
@@ -70,6 +71,5 @@
 extern std::random_device rd;
 
 #define COMPILE_WITH_VOICE 0
-#define COMPILE_WITH_STD_SOCK_FUNC 1
 
 #undef small

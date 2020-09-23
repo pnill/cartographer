@@ -2,7 +2,6 @@
 #include <curl/curl.h>
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
-#include "Globals.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
 using namespace rapidjson;
