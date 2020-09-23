@@ -52,9 +52,15 @@ int NetworkSession::getPeerCount()
 	return getCurrentNetworkSession()->membership.peer_count;
 }
 
+
+
 int NetworkSession::getLocalPeerIndex()
 {
 	return getCurrentNetworkSession()->local_peer_index;
+}
+IN_ADDR NetworkSession::getLocalNetworkAddress()
+{
+	return getCurrentNetworkSession()->membership.peer_info[getLocalPeerIndex()].address.inaOnline;
 }
 
 int NetworkSession::getPeerIndex(int playerIndex)
@@ -62,6 +68,34 @@ int NetworkSession::getPeerIndex(int playerIndex)
 	return getPlayerInformation(playerIndex)->peer_index;
 }
 
+long long NetworkSession::getPeerXUID(int peerIndex)
+{
+	if(getPeerCount() > 0)
+	{
+		int playerIndex = 0;
+		do
+		{
+			if (getPeerIndex(playerIndex) == peerIndex)
+				return getPlayerXuid(playerIndex);
+			playerIndex++;
+		} while (playerIndex < 16);
+	}
+	return NONE;
+}
+wchar_t* NetworkSession::getPeerPlayerName(int peerIndex)
+{
+	if (getPeerCount() > 0)
+	{
+		int playerIndex = 0;
+		do
+		{
+			if (getPeerIndex(playerIndex) == peerIndex)
+				return getPlayerName(playerIndex);
+			playerIndex++;
+		} while (playerIndex < 16);
+	}
+	return L"";
+}
 /* Use this to verify if a player is currently active in the network session */
 /* Otherwise you will wonder why you don't get the right data/player index etc. */
 bool NetworkSession::playerIsActive(int playerIndex)
@@ -79,10 +113,28 @@ player_information* NetworkSession::getPlayerInformation(int playerIndex)
 	return &getCurrentNetworkSession()->membership.player_info[playerIndex];
 }
 
+
+int NetworkSession::getPlayerIdByName(wchar_t* name)
+{
+	if (getPlayerCount() > 0)
+	{
+		int playerIndex = 0;
+		do
+		{
+			if (playerIsActive(playerIndex) && wcscmp(getPlayerName(playerIndex), name) == 0)
+				return playerIndex;
+
+			playerIndex++;
+		} while (playerIndex < 16);
+	}
+	return NONE;
+}
+
 wchar_t* NetworkSession::getPlayerName(int playerIndex)
 {
 	return getPlayerInformation(playerIndex)->properties.player_name;
 }
+
 
 long long NetworkSession::getPlayerXuid(int playerIndex)
 {
@@ -107,6 +159,21 @@ int NetworkSession::getPlayerTeamFromXuid(long long xuid)
 			playerIndex++;
 		} 
 		while (playerIndex < 16);
+	}
+	return NONE;
+}
+
+int NetworkSession::getPeerIndexFromXUID(long long xuid)
+{
+	if(getPlayerCount() > 0)
+	{
+		int playerIndex = 0;
+		do
+		{
+			if (playerIsActive(playerIndex) && getPlayerXuid(playerIndex) == xuid)
+				return getPeerIndex(playerIndex);
+			playerIndex++;
+		} while (playerIndex < 16);
 	}
 	return NONE;
 }
@@ -176,7 +243,6 @@ void NetworkSession::logPeersToConsole() {
 			std::wstring outStr = L"Peer index=" + std::to_wstring(peerIndex);
 			outStr += L", Peer Name=";
 			outStr += getCurrentNetworkSession()->membership.peer_info[peerIndex].name;
-			
 			int playerIndex = getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index[0];
 			if (playerIndex != -1) 
 			{

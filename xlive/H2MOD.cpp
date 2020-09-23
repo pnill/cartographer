@@ -17,7 +17,11 @@
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
+#include "H2MOD/Modules/Stats/StatsHandler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/Utils/Utils.h"
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -26,7 +30,7 @@ Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
 HeadHunter* headHunterHandler = new HeadHunter();
 VariantPlayer* variant_player = new VariantPlayer();
-
+StatsHandler* stats_handler = new StatsHandler();
 extern int H2GetInstanceId();
 std::unordered_map<int, int> object_to_variant;
 
@@ -728,6 +732,20 @@ void H2MOD::disable_weapon_pickup(bool b_Enable)
 	}
 }
 
+void H2MOD::set_local_rank(BYTE rank)
+{
+	DWORD address1 = h2mod->GetAddress(0x1b2c2b);
+	DWORD address2 = h2mod->GetAddress(0x1b2c2F);
+	DWORD address3 = h2mod->GetAddress(0x51A6B6);
+	DWORD address4 = h2mod->GetAddress(0x51A6B7);
+	BYTE Rank[1];
+	Rank[0] = rank;
+	WriteBytes(address1, Rank, sizeof(Rank));
+	WriteBytes(address2, Rank, sizeof(Rank));
+	WriteBytes(address3, Rank, sizeof(Rank));
+	WriteBytes(address4, Rank, sizeof(Rank));
+}
+
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 {
 	int(_cdecl* AutoHandler)(datum, datum);
@@ -812,9 +830,9 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
-
 		return result;
 	}		
+
 
 	wchar_t* variant_name = NetworkSession::getGameVariantName();
 	LOG_INFO_GAME(L"[h2mod] OnMapLoad map type {}, variant name {}", (int)h2mod->GetMapType(), variant_name);
@@ -827,6 +845,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	{
 		addDebugText("Map type: Multiplayer");
 
+		
 		for (auto gametype_it : GametypesMap)
 		{
 			if (StrStrIW(variant_name, gametype_it.first)) {
@@ -851,7 +870,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
-
+		H2Tweaks::setVisualTweaks();
 		H2Tweaks::setCrosshairSize(0, false);
 		//H2Tweaks::applyShaderTweaks(); 
 
@@ -983,11 +1002,32 @@ void H2MOD::set_local_team_index(int local_player_index, int team_index)
 	p_update_player_profile(local_player_index); // fixes infection handicap glitch
 }
 
+void H2MOD::set_local_team_match_xuid(XUID xuid)
+{
+	network_session* session = NetworkSession::getCurrentNetworkSession();
+	if ((get_game_life_cycle() == life_cycle_pre_game))
+		for(auto i = 0; i < 16; i++)
+			if(session->membership.player_info[i].identifier == xuid)
+			{
+				changeTeam(0, session->membership.player_info[i].properties.player_team);
+				break;
+			}
+}
+void H2MOD::set_local_clan_tag(int local_player_index, XUID tag)
+{
+	typedef void(__cdecl update_player_profile)(int local_player_index);
+	auto p_update_player_profile = h2mod->GetAddress<update_player_profile*>(0x206A97);
+	unsigned long low = tag & 0xFFFFFFFF;
+	*(unsigned long*)h2mod->GetAddress(0x51A6A8 + (0xB8 * local_player_index)) = low;
+	p_update_player_profile(local_player_index);
+}
+
 void __cdecl print_to_console(char *output)
 {
 	const static std::string prefix = "[HSC Print] ";
 	commands->display(prefix + output);
 }
+
 
 void DuplicateDataBlob(DATA_BLOB  *pDataIn, DATA_BLOB  *pDataOut)
 {
@@ -1203,6 +1243,7 @@ int __cdecl device_touch(datum device_datum, datum unit_datum)
 }
 
 
+
 void H2MOD::team_player_indicator_visibility(bool toggle)
 {
 	this->drawTeamIndicators = toggle;
@@ -1228,6 +1269,16 @@ short __cdecl get_enabled_teams_flags(network_session* session)
 		return new_teams_enabled_flags;
 	else
 		return default_teams_enabled_flags;
+}
+
+typedef int(__cdecl* getnexthillindex)(int previousHill);
+getnexthillindex p_get_next_hill_index;
+signed int __cdecl get_next_hill_index(int previousHill)
+{
+	int hillCount = *h2mod->GetAddress<int*>(0x4dd0a8, 0x5008e8);
+	if (previousHill + 1 > hillCount)
+		return 0;
+	return previousHill + 1;
 }
 
 void H2MOD::ApplyUnitHooks()
@@ -1257,6 +1308,209 @@ void H2MOD::ApplyUnitHooks()
 	pset_unit_color_data = h2mod->GetAddress<tset_unit_color_data>(0x6E5C3, 0x6D1BF);
 }
 
+
+static BYTE previousGamestate = 0;
+typedef int(__thiscall* ChangeGameState)(BYTE* this_);
+ChangeGameState p_EvaulateGameState;
+void EvaluateGameState()
+{
+	p_EvaulateGameState(h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC));
+	BYTE GameState = *h2mod->GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
+	if (previousGamestate != GameState) {
+		previousGamestate = GameState;
+		EventHandler::executeGameStateCallbacks(GameState);
+	}
+}
+
+typedef char(_cdecl* startCountdownTimer)(char a1, int countdown_time, int a2, int a3, char a4);
+startCountdownTimer p_StartCountdownTimer;
+char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, char a4)
+{
+	if (H2Config_minimum_player_start > 0)
+	{
+		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
+		{
+			//ServerConsole::SendCommand2(1, L"sendmsg", L"\"Server has enough players to start.\"");
+			LOG_TRACE_GAME(L"Minimum Player count met.");
+			BYTE TeamPlay = *h2mod->GetAddress<BYTE*>(0, 0x992880);
+			if (H2Config_force_even && TeamPlay == 1)
+			{
+				LOG_TRACE_GAME(L"Shuffling teams");
+				//ServerConsole::SendCommand2(1, L"sendmsg", L"Shuffling teams automatically for a fair match.");
+				std::map<std::string, std::vector<int>> Parties;
+				std::vector<int> nonPartyPlayers;
+				int pCount = 0;
+				for (auto i = 0; i < 16; i++) //Detect party members
+				{
+					if (NetworkSession::playerIsActive(i))
+					{
+						pCount++;
+						auto player = NetworkSession::getPlayerInformation(i);
+						int calcBaseOffset = 0x530E34 + (i * 0x128);
+						auto ClanDescripton = *h2mod->GetAddress<unsigned long*>(0, calcBaseOffset + 0x88);
+						auto Gamertag = h2mod->GetAddress<wchar_t*>(0, calcBaseOffset + 0x18);
+						//NetworkSession::getPlayerInformation(i).properties->ClanTag was not actually storing the data.
+						auto partyCode = IntToString<unsigned long>(ClanDescripton, std::dec);
+						LOG_TRACE_GAME(L"Checking if {} is part of a party", Gamertag);
+						if (ClanDescripton != 0)
+						{
+							LOG_TRACE_GAME(L"Party {} adding member {}", std::wstring(partyCode.begin(), partyCode.end()), Gamertag);
+							Parties[partyCode].push_back(NetworkSession::getPlayerIdByName(Gamertag));
+						}
+						else
+							nonPartyPlayers.push_back(NetworkSession::getPlayerIdByName(Gamertag));
+					}
+				}
+				for (auto i = 0; i < 16; i++) //Do it again to detect party leaders, probably can be removed if the function for paramters request is hooked.
+				{
+					if (NetworkSession::playerIsActive(i))
+					{
+						auto player = NetworkSession::getPlayerInformation(i);
+						
+						int calcBaseOffset = 0x530E34 + (i * 0x128);
+						auto XUID = *h2mod->GetAddress<::XUID*>(0, calcBaseOffset);
+						auto Gamertag = h2mod->GetAddress<wchar_t*>(0, calcBaseOffset + 0x18);
+						auto xuidslug = IntToString<unsigned long>(XUID & 0xFFFFFFFF, std::dec);
+						LOG_TRACE_GAME(L"Checking if {} is leader of party {}", Gamertag, std::wstring(xuidslug.begin(), xuidslug.end()));
+					
+						if (Parties.count(xuidslug) == 1) //Party leader found
+						{
+							LOG_TRACE_GAME(L"Party {} adding leader {}", std::wstring(xuidslug.begin(), xuidslug.end()), player->properties.player_name);
+							Parties[xuidslug].push_back(NetworkSession::getPlayerIdByName(Gamertag));
+							std::vector<int>::iterator position = std::find(nonPartyPlayers.begin(), nonPartyPlayers.end(), NetworkSession::getPlayerIdByName(Gamertag));
+							if (position != nonPartyPlayers.end())
+								nonPartyPlayers.erase(position);
+						}
+					}
+				}
+				byte playersPerTeam = (*h2mod->GetAddress<BYTE*>(0, 0x534858)) / H2Config_team_enabled_count;
+				int currentTeam = 0;
+				int currentTeamPlayers = 0;
+				std::map<int, int> teamPlayers;
+				for (auto i = 0; i < 8; i++) //Detect the first enabled team flag, this is so that if red isn't the first enabled team it doesn't place players there
+					if (H2Config_team_flag_array[i]) {
+						LOG_TRACE_GAME(L"First team Index is {}", currentTeam);
+						currentTeam = i;
+						break;
+					}
+				LOG_TRACE_GAME(L"Starting with team {}", IntToWString<int>(currentTeam, std::dec));
+				std::vector<int> sortedPlayers;
+				for (const auto& party : Parties)
+				{
+					LOG_TRACE_GAME("Setting teams for party {}", party.first);
+					for (const int &player : party.second)
+					{
+						teamPlayers[currentTeam]++;
+						LOG_TRACE_GAME(L"Setting party player Team for {} to {}", IntToWString<int>(player, std::dec), IntToWString<int>(currentTeam, std::dec));
+						sortedPlayers.push_back(player);
+						CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(player), currentTeam);
+						currentTeamPlayers++;
+						if (currentTeamPlayers == playersPerTeam)
+							for (auto i = 0; i < 8; i++)
+								if (H2Config_team_flag_array[i] && i != currentTeam) {
+									if (teamPlayers[i] != playersPerTeam) {
+										currentTeam = i;
+										break;
+									}
+								}
+					}
+					for (auto i = 0; i < 8; i++)
+						if (H2Config_team_flag_array[i] && i != currentTeam) {
+							if (teamPlayers[i] != playersPerTeam) {
+								currentTeam = i;
+								break;
+							}
+						}
+				}
+
+				for (auto i = 0; i < 8; i++)
+					if (H2Config_team_flag_array[i]) {
+						if (teamPlayers[i] != playersPerTeam) {
+							if (teamPlayers[i] != playersPerTeam) {
+								currentTeam = i;
+								break;
+							}
+						}
+					}
+				for (const auto &player : nonPartyPlayers)
+				{
+					LOG_TRACE_GAME(L"Setting Non party player Team for {} to {}", IntToWString<int>(player, std::dec), IntToWString<int>(currentTeam, std::dec));
+					sortedPlayers.push_back(player);
+					CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(player), currentTeam);
+					currentTeamPlayers++;
+					teamPlayers[currentTeam]++;
+					if (currentTeamPlayers == playersPerTeam)
+						for (auto i = 0; i < 8; i++)
+							if (H2Config_team_flag_array[i] && i != currentTeam) {
+								if (teamPlayers[i] != playersPerTeam) {
+									currentTeam = i;
+									break;
+								}
+							}
+				}
+				int validTeams = 0;
+				for (auto i = 0; i < 8; i++)
+					if (H2Config_team_flag_array[i]) {
+						if (teamPlayers[i] > 0) validTeams++;
+					}
+				if (validTeams > 1)
+					return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
+				else
+					return 0;
+			}
+			else
+				return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
+		}
+
+		return 0;
+	}
+	else
+		return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
+}
+
+void H2MOD::RegisterEvents()
+{
+
+	if(!h2mod->Server)//Client only callbacks	
+	{
+		//Register callback to reset rank to 255 on mainmenu
+		EventHandler::registerGameStateCallback({
+				"StatsResetRank",
+				life_cycle_none,
+				[]() {h2mod->set_local_rank(255);}
+			}, false);
+	}
+	else //Server only callbacks
+	{
+		//Setup Events for H2Config_vip_lock
+		if(H2Config_vip_lock)
+		{
+			EventHandler::registerGameStateCallback({
+				"VIPLockClear",
+				life_cycle_post_game,
+				[]()
+				{
+					ServerConsole::SendCommand2(1, L"vip", L"clear");
+					ServerConsole::SendCommand2(1, L"Privacy", L"Open");
+				}}, true);
+			EventHandler::registerGameStateCallback({
+				"VIPLockAdd",
+				life_cycle_in_game,
+				[]()
+				{
+					for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
+					{
+						ServerConsole::SendCommand2(2, L"vip", L"add", NetworkSession::getPeerPlayerName(i));
+					}
+					ServerConsole::SendCommand2(1, L"Privacy", L"VIP");
+				}}, true);
+		}
+	}
+	//Things that apply to both
+	
+}
+
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1266,8 +1520,16 @@ void H2MOD::ApplyHooks() {
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(h2mod->GetAddress(0x58789, 0x60C81), OnAutoPickUpHandler);
 
+	//Hook to do stuff after Game State Change
+	p_EvaulateGameState = h2mod->GetAddress<ChangeGameState>(0x1d7738, 0x1BCDA8);
+	PatchCall(h2mod->GetAddress(0x1AD84D, 0x1A67CA), EvaluateGameState);
+
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(h2mod->GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
+
+	//get next hill index hook
+	if(!H2Config_koth_random)
+		p_get_next_hill_index = (getnexthillindex)DetourFunc(h2mod->GetAddress<BYTE*>(0x10DF1E, 0xDA4CE), (BYTE*)get_next_hill_index, 9);
 
 	// player spawn hook
 	p_player_spawn = (player_spawn)DetourFunc(h2mod->GetAddress<BYTE*>(0x55952, 0x5DE4A), (BYTE*)OnPlayerSpawn, 6);
@@ -1352,6 +1614,8 @@ void H2MOD::ApplyHooks() {
 	else {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
+		p_StartCountdownTimer = h2mod->GetAddress<startCountdownTimer>(0, 0x19718A);
+		PatchCall(GetAddress(0, 0xBF54), StartCountdownTimer);
 		ServerConsole::ApplyHooks();
 
 		p_get_enabled_teams_flags = (get_enabled_teams_flags_def)DetourFunc(h2mod->GetAddress<BYTE*>(0, 0x19698B), (BYTE*)get_enabled_teams_flags, 6);
@@ -1382,6 +1646,7 @@ void H2MOD::Initialize()
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
 
 	h2mod->ApplyHooks();
+	h2mod->RegisterEvents();
 }
 
 void H2MOD::Deinitialize() {

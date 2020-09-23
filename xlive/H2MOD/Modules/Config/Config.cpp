@@ -73,8 +73,15 @@ int H2Config_debug_log_level = 2;
 bool H2Config_debug_log_console = false;
 char H2Config_login_identifier[255] = { "" };
 char H2Config_login_password[255] = { "" };
+int H2Config_minimum_player_start = 0;
 char H2Config_team_bit_flags_str[] = "1-1-1-1-1-1-1-1";
+bool H2Config_team_flag_array[8];
+byte H2Config_team_enabled_count;
 short H2Config_team_bit_flags = 0xFF;
+char H2Config_stats_authkey[32] = { "" };
+bool H2Config_vip_lock = false;
+bool H2Config_force_even = false;
+bool H2Config_koth_random = true;
 
 //weapon crosshair sizes
 point2d	H2Config_BATRIF = { 1 , 1 };
@@ -365,7 +372,30 @@ void SaveH2Config() {
 				"\n# By default, 25 seconds are added to post game carnage time from the playlist setting."
 				"\n# Now you have the possibility to change it to your preference."
 				"\n\n"
+        
+		        "# minimum_player_start options (Server):"
+		        "\n# Changes the starting behaviour of the countdown, setting this to any value (1-16) will cause the"
+		        "\n# Server to not start until the player count is equal to or above the given value. A value of 0 will disable this setting."
+		        "\n\n"
+
+				"# vip_lock (Server):"
+				"\n# This flag tells the server to lock the game to VIP mode when the game starts"
+				"\n# Players who are in the lobby when the game starts are added to VIP and can rejoin if there are connection issues"
+				"\n# The VIP list will be cleared when the lobby reaches Post game"
+				"\n\n"
+
+				"# force_even (Server):"
+				"\n# This flag tells the server to force even teams before starting"
+				"\n# The server will automatically organize teams before starting if the game is uneven"
+				"\n\n"
+
+				"# koth_random (Server):"
+				"\n# This flag tells which behaviour the koth will use for getting the next hill"
+				"\n# True (default) will have the server select the hill randomly"
+				"\n# false will have the server select the hill in order"
+				"\n\n"
 				;
+      
 		}
 
 		if (!H2IsDediServer) {
@@ -469,12 +499,18 @@ void SaveH2Config() {
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "server_playlist", H2Config_dedi_server_playlist);
 
+			ini.SetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "additional_pcr_time", H2Config_additional_pcr_time);
+
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "force_even", H2Config_force_even);
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "login_password", H2Config_login_password);
-
+			ini.SetValue(H2ConfigVersionSection.c_str(), "stats_auth_key", H2Config_stats_authkey,
+				"#DO NOT CHANGE THIS OR YOUR SERVER WILL NO LONGER TRACK STATS");
 			ini.SetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str, 
 				"# teams_enabled_bit_flags (Server)"
 				"\n# By default, the game reads team bitflags from the current map."
@@ -537,7 +573,6 @@ void SaveH2Config() {
 	addDebugText("End Saving H2Configuration File.");
 }
 
-#pragma endregion
 
 void ReadH2Config() {
 	addDebugText("Reading H2Configuration File...");
@@ -722,6 +757,11 @@ void ReadH2Config() {
 				}
 
 				H2Config_additional_pcr_time = ini.GetLongValue(H2ConfigVersionSection.c_str(), "additional_pcr_time", H2Config_additional_pcr_time);
+        
+				H2Config_minimum_player_start = ini.GetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
+				H2Config_vip_lock = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
+				H2Config_force_even = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "force_even", H2Config_force_even);
+				H2Config_koth_random = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random);
 
 				const char* login_identifier = ini.GetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 				if (login_identifier) {
@@ -731,6 +771,11 @@ void ReadH2Config() {
 				const char* login_password = ini.GetValue(H2ConfigVersionSection.c_str(), "login_password", H2Config_login_password);
 				if (login_password) {
 					strncpy(H2Config_login_password, login_password, sizeof(H2Config_login_password));
+				}
+
+				const char* stats_authkey = ini.GetValue(H2ConfigVersionSection.c_str(), "stats_auth_key", H2Config_stats_authkey);
+				if(stats_authkey) {
+					strncpy(H2Config_stats_authkey, stats_authkey, sizeof(H2Config_stats_authkey));
 				}
 
 				std::string team_bit_mask(ini.GetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str));
@@ -748,8 +793,10 @@ void ReadH2Config() {
 							&& team_bit_mask.substr(occurance_offset, 1) == "1") // check if the team is enabled
 						{
 							H2Config_team_bit_flags |= FLAG(i); // if so, enable the flag
-						}
-
+							H2Config_team_flag_array[i] = true;
+							H2Config_team_enabled_count++;
+						} else
+							H2Config_team_flag_array[i] = false;
 					}
 				}
 			}

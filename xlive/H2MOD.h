@@ -48,6 +48,7 @@ public:
 		void Deinitialize();
 		void ApplyHooks(); 
 		void ApplyUnitHooks();
+		void RegisterEvents();
 
 		void team_player_indicator_visibility(bool toggle);
 		BYTE* get_player_unit_from_player_index(int playerIndex);
@@ -59,13 +60,15 @@ public:
 		BYTE get_unit_team_index(datum unit_datum_index);
 		void set_unit_speed_patch(bool hackit);
 		void set_local_team_index(int local_player_index, int team);
+		void set_local_team_match_xuid(XUID xuid);
+		void set_local_clan_tag(int local_player_index, XUID tag);
 		BYTE get_local_team_index();
 		void set_player_unit_grenades_count(int playerIndex, Grenades type, BYTE count, bool resetEquipment);
 		void disable_sounds(int sound);
 		void custom_sound_play(const wchar_t* soundName, int delay);
 		void disable_weapon_pickup(bool b_Enable);
 		void leave_session();
-
+		void set_local_rank(BYTE rank);
 		scnr_type GetMapType() { return mapType; }
 		void SetMapType(scnr_type value) { mapType = value; }
 
@@ -93,7 +96,7 @@ public:
 		{
 			return reinterpret_cast<T>(Base + (Server ? server : client));
 		}
-
+		
 private:
 		DWORD Base;
 		scnr_type mapType;

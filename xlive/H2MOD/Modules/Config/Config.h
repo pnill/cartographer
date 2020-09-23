@@ -14,7 +14,7 @@ void ReadH2Config();
 #define DLL_VERSION_MAJOR               0
 #define DLL_VERSION_MINOR               5
 #define DLL_VERSION_REVISION            6
-#define DLL_VERSION_BUILD				0
+#define DLL_VERSION_BUILD				1
 
 #define DLL_VERSION            DLL_VERSION_MAJOR, DLL_VERSION_MINOR, DLL_VERSION_REVISION, DLL_VERSION_BUILD
 #define STRINGIZE2(s) #s
@@ -71,6 +71,12 @@ extern bool H2Config_debug_log_console;
 extern char H2Config_login_identifier[255];
 extern char H2Config_login_password[255];
 extern short H2Config_team_bit_flags;
+extern bool H2Config_team_flag_array[8];
+extern byte H2Config_team_enabled_count;
+extern char H2Config_stats_authkey[32];
+extern bool H2Config_vip_lock;
+extern bool H2Config_force_even;
+extern bool H2Config_koth_random;
 
 extern int H2Config_hotkeyIdHelp;
 extern int H2Config_hotkeyIdToggleDebug;
@@ -79,6 +85,7 @@ extern int H2Config_hotkeyIdWindowMode;
 extern int H2Config_hotkeyIdToggleHideIngameChat;
 extern int H2Config_hotkeyIdGuide;
 extern int H2Config_hotkeyIdConsole;
+extern int H2Config_minimum_player_start;
 
 extern point2d H2Config_BATRIF;
 extern point2d H2Config_SMG;

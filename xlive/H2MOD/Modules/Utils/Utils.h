@@ -74,7 +74,8 @@ bool ComputeFileCrc32Hash(wchar_t* filepath, DWORD &rtncrc32);
 
 char* encode_rfc3986(char* label_literal, int label_literal_length = -1);
 void wcstombs2(char* buffer, wchar_t* text, int buf_len);
-
+char* wcstombs2r(wchar_t* text);
+std::string ToNarrow(const wchar_t *s, char dfault = '?', const std::locale& loc = std::locale());
 extern const int ERROR_CODE_CURL_SOCKET_FAILED;
 extern const int ERROR_CODE_CURL_HANDLE;
 extern const int ERROR_CODE_CURL_EASY_PERF;
@@ -87,6 +88,21 @@ void EnsureDirectoryExists(wchar_t* path);
 
 int TrimRemoveConsecutiveSpaces(char* text);
 
+//Converts int types to string given a format std::oct, std::dec, std::hex.
+template<class T>
+std::string IntToString(T t, std::ios_base & (*f)(std::ios_base&))
+{
+	std::ostringstream stream;
+	(stream << f << t);
+	return std::string(stream.str().c_str());
+}
+template<class T>
+std::wstring IntToWString(T t, std::ios_base & (*f)(std::ios_base&))
+{
+	auto out = IntToString(t, f);
+	return std::wstring(out.begin(), out.end());
+}
+
 //some utility functions below
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
 std::vector<std::string> split(const std::string &s, char delim);
@@ -94,4 +110,3 @@ std::vector<std::string> split(const std::string &s, char delim);
 int stripWhitespace(wchar_t *inputStr);
 void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen);
 std::string ByteToHexStr(const BYTE* buffer, size_t size);
-

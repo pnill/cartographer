@@ -257,6 +257,7 @@ namespace NetworkSession
 
 	int getPeerCount();
 	int getLocalPeerIndex();
+	IN_ADDR getLocalNetworkAddress();
 	void kickPeer(int peerIndex);
 	void endGame();
 	peer_observer_channel* getPeerObserverChannel(int peerIndex);
@@ -269,9 +270,14 @@ namespace NetworkSession
 	bool playerIsActive(int playerIndex);
 	int getPeerIndex(int playerIndex);
 	wchar_t* getPlayerName(int playerIndex);
+	int getPlayerIdByName(wchar_t* name);
 	long long getPlayerXuid(int playerIndex);
+	long long getPeerXUID(int peerIndex);
+	wchar_t* getPeerPlayerName(int peerIndex);
+
 	int getPlayerTeam(int playerIndex);
 	int getPlayerTeamFromXuid(long long xuid);
+	int getPeerIndexFromXUID(long long xuid);
 	player_information* getPlayerInformation(int playerIndex);
 
 	wchar_t* getGameVariantName();

@@ -540,6 +540,10 @@
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.cpp">
       <Filter>Source Files\H2MOD\Modules\MainLoopPatches\UncappedFPS</Filter>
     </ClCompile>
+    <ClCompile Include="H2MOD\Modules\Stats\StatsHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp">
     <ClCompile Include="Blam\Engine\Players\Players.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1217,6 +1221,11 @@
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h">
       <Filter>Source Files\H2MOD\Modules\MainLoopPatches\UncappedFPS</Filter>
     </ClInclude>
+    <ClInclude Include="H2MOD\Modules\Stats\StatsHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.h">
+      <Filter>Header Files</Filter>
     <ClInclude Include="Util\SimpleIni.h">
       <Filter>Source Files\Util</Filter>
     </ClInclude>
