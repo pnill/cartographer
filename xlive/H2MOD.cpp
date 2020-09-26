@@ -1473,12 +1473,8 @@ void H2MOD::RegisterEvents()
 
 	if(!h2mod->Server)//Client only callbacks	
 	{
-		//Register callback to reset rank to 255 on mainmenu
-		EventHandler::registerGameStateCallback({
-				"StatsResetRank",
-				life_cycle_none,
-				[]() {h2mod->set_local_rank(255);}
-			}, false);
+		
+
 	}
 	else //Server only callbacks
 	{
