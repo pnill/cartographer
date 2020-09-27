@@ -282,8 +282,9 @@ void GSMainLoop() {
 	if(H2IsDediServer)
 	{
 		StatsHandler::verifyPlayerRanks();
-		EventHandler::executeGameLoopCallbacks();
+		
 	}
+	EventHandler::executeGameLoopCallbacks();
 	/*
 	static bool halo2ServerOnce1 = false;
 	if (H2IsDediServer && !halo2ServerOnce1) {
