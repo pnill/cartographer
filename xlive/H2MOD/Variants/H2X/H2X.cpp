@@ -5,6 +5,20 @@
 #include "H2MOD\Tags\TagInterface.h"
 #include "Util/Hooks/Hook.h"
 
+std::vector<H2X::h2x_mod_info> weapons =
+{
+	{ "objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle", 0.535f, 0.5f, 0, false },
+	{ "objects\\weapons\\rifle\\battle_rifle\\battle_rifle", 0.295f, 0.26f, 0, false },
+	{ "objects\\weapons\\pistol\\magnum\\magnum", 0.13f, 0.1f, 0, false },
+	{ "objects\\weapons\\rifle\\shotgun\\shotgun", 1.035f, 1.0f, 0, false },
+	{ "objects\\weapons\\rifle\\beam_rifle\\beam_rifle", 0.25875f, 0.25f, 0, false },
+	{ "objects\\weapons\\support_low\\brute_shot\\brute_shot", 0.39f, 0.3f, 0, false },
+	{ "objects\\weapons\\pistol\\plasma_pistol\\plasma_pistol", 0.11f, 0.05f, 0, false },
+	{ "objects\\weapons\\rifle\\covenant_carbine\\covenant_carbine", 0.20f, 0.14f, 1, false },
+	{ "objects\\weapons\\support_high\\rocket_launcher\\rocket_launcher", 0.85f, 0.8f, 0, false },
+	{ "objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle", 8.5f, 9.0f, 0, true },
+	{ "objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle", 10.0f, 11.0f, 0, true }
+};
 __declspec(naked) void time_globals_seconds_to_ticks()
 {
 	__asm
@@ -43,19 +57,41 @@ void H2X::Initialize(bool enable)
 	 *	
 	 *	
 	 */
-	if(!h2mod->Server)
+	//if(!h2mod->Server)
+	//{
+	//	if(enable)
+	//	{
+	//		PatchCall(h2mod->GetAddress(0x15c5b3), time_globals_seconds_to_ticks);
+	//		PatchCall(h2mod->GetAddress(0x15c5e2), time_globals_seconds_to_ticks);
+	//	}
+	//	else
+	//	{	
+	//		typedef float(__cdecl time_globals_seconds_to_tick_percise)(float s);
+	//		auto p_time_globals_seconds_to_tick_percise = (time_globals_seconds_to_tick_percise*)h2mod->GetAddress(0x7c0c5);
+	//		PatchCall(h2mod->GetAddress(0x15c5b3), p_time_globals_seconds_to_tick_percise);
+	//		PatchCall(h2mod->GetAddress(0x15c5e2), p_time_globals_seconds_to_tick_percise);
+	//	}
+	//}
+
+	for (auto& weapon : weapons)
 	{
-		if(enable)
+		for (auto& weapon : weapons)
 		{
-			PatchCall(h2mod->GetAddress(0x15c5b3), time_globals_seconds_to_ticks);
-			PatchCall(h2mod->GetAddress(0x15c5e2), time_globals_seconds_to_ticks);
-		}
-		else
-		{
-			typedef float(__cdecl time_globals_seconds_to_tick_percise)(float s);
-			auto p_time_globals_seconds_to_tick_percise = (time_globals_seconds_to_tick_percise*)h2mod->GetAddress(0x7c0c5);
-			PatchCall(h2mod->GetAddress(0x15c5b3), p_time_globals_seconds_to_tick_percise);
-			PatchCall(h2mod->GetAddress(0x15c5e2), p_time_globals_seconds_to_tick_percise);
+			auto required_datum = tags::find_tag(blam_tag::tag_group_type::weapon, weapon.tag_string);
+			BYTE* weapon_tag = tags::get_tag<blam_tag::tag_group_type::weapon, BYTE>(required_datum);
+			if (weapon_tag != nullptr)
+			{
+				int barrel_data_block_size = 236;
+				tags::tag_data_block* barrel_data_block = reinterpret_cast<tags::tag_data_block*>(weapon_tag + 720);
+
+				if (barrel_data_block->block_data_offset != -1)
+				{
+					*(float*)(tags::get_tag_data()
+						+ barrel_data_block->block_data_offset
+						+ barrel_data_block_size * weapon.barrel_data_block_index
+						+ (weapon.rounds_per_second_based ? 8 : 32)) = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
+				}
+			}
 		}
 	}
 
