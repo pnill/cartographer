@@ -30,7 +30,7 @@ Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
 HeadHunter* headHunterHandler = new HeadHunter();
 VariantPlayer* variant_player = new VariantPlayer();
-StatsHandler* stats_handler;
+StatsHandler* stats_handler = new StatsHandler;
 extern int H2GetInstanceId();
 std::unordered_map<int, int> object_to_variant;
 
@@ -1637,9 +1637,6 @@ void H2MOD::Initialize()
 			DiscordInterface::Init();
 			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
 		}
-	}else
-	{
-		stats_handler = new StatsHandler;
 	}
 
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
