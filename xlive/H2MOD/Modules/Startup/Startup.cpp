@@ -331,7 +331,6 @@ std::wstring prepareLogFileName(std::wstring logFileName) {
 	std::wstring processName(H2IsDediServer ? L"H2Server" : L"Halo2Client");
 	std::wstring folders(L"logs\\" + processName + L"\\instance" + std::to_wstring(H2GetInstanceId()));
 	filename += folders;
-
 	// try making logs directory
 	if (!filesystem::create_directories(filename) && !filesystem::is_directory(filesystem::status(filename)))
 	{
@@ -392,7 +391,6 @@ void InitH2Startup() {
 	H2Config_debug_log = H2Config_isConfigFileAppDataLocal = true;
 	int temp_log_level = H2Config_debug_log_level;
 	H2Config_debug_log_level = 0;
-	initDebugText();
 	H2Config_debug_log_level = temp_log_level;
 	H2Config_debug_log = H2Config_isConfigFileAppDataLocal = false;
 
@@ -424,6 +422,7 @@ void InitH2Startup() {
 
 	InitH2Config();
 	EnterCriticalSection(&log_section);
+	initDebugText();
 	if (H2Config_debug_log) {
 		if (H2Config_debug_log_console) {
 			console_log = h2log::create_console("CONSOLE MAIN");

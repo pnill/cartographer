@@ -30,49 +30,63 @@ StatsHandler::StatsAPIRegisteredStatus Status;
 
 StatsHandler::StatsHandler()
 {
-	//Register callback on Post Game to upload the stats to the server
-	EventHandler::registerGameStateCallback({
-			"StatsSendStats",
-			life_cycle_post_game,
-			&this->sendStats
-		}, true);
-	//register callback on player leave to remove them from the packet filter
-	EventHandler::registerNetworkPlayerRemoveCallback({
-			"StatsPlayerLeave",
-			this->playerLeftEvent
-		}, false);
-	//register callback on player join to send them their rank.
-	EventHandler::registerNetworkPlayerAddCallback({
-			"StatsPlayerJoin",
-			this->playerJoinEvent
-		}, false);
-	//register a callback when the server reaches the lobby for the first time
-	EventHandler::registerGameStateCallback({
-			"InitStats",
-			life_cycle_pre_game,
-			[this]()
-			{
-				this->verifyRegistrationStatus();
-				this->verifySendPlaylist();
-				//Register callback to send player ranks on lobby and reset the match invalide state
-				EventHandler::registerGameStateCallback({
-					"StatsSendRanks",
-					life_cycle_pre_game,
-					[this]()
-					{
-						this->sendRankChange(true);
-						this->InvalidateMatch(false);
-					}
-				}, true);
-			},
-			true
-		}, false);
-	//Register a callback that will invalidate the current match if the skip command is used.
-	EventHandler::registerServerCommandCallback({
-			"StatsSkipPrevention",
-			[this]() {this->InvalidateMatch(true);},
-			ServerConsole::ServerConsoleCommands::skip
-		}, true);
+	if (h2mod->Server) {
+		Status.Registered = false;
+		Status.RanksEnabled = false;
+		Status.StatsEnabled = false;
+		//Register callback on Post Game to upload the stats to the server
+		EventHandler::registerGameStateCallback({
+				"StatsSendStats",
+				life_cycle_post_game,
+				&this->sendStats
+			}, true);
+		//register callback on player leave to remove them from the packet filter
+		EventHandler::registerNetworkPlayerRemoveCallback({
+				"StatsPlayerLeave",
+				this->playerLeftEvent
+			}, true);
+		//register callback on player join to send them their rank.
+		EventHandler::registerNetworkPlayerAddCallback({
+				"StatsPlayerJoin",
+				this->playerJoinEvent
+			}, true);
+		//register a callback when the server reaches the lobby for the first time
+		EventHandler::registerGameStateCallback({
+				"InitStats",
+				life_cycle_pre_game,
+				[this]()
+				{
+					this->verifyRegistrationStatus();
+					this->verifySendPlaylist();
+					//Register callback to send player ranks on lobby and reset the match invalide state
+					EventHandler::registerGameStateCallback({
+						"StatsSendRanks",
+						life_cycle_pre_game,
+						[this]()
+						{
+							this->sendRankChange(true);
+							this->InvalidateMatch(false);
+						}
+					}, true);
+				},
+				true
+			}, false);
+		//Register a callback that will invalidate the current match if the skip command is used.
+		EventHandler::registerServerCommandCallback({
+				"StatsSkipPrevention",
+				[this]() {this->InvalidateMatch(true);},
+				ServerConsole::ServerConsoleCommands::skip
+			}, true);
+	} 
+	else
+	{
+		//Register callback to reset rank to 255 on mainmenu
+		EventHandler::registerGameStateCallback({
+		"StatsResetRank",
+		life_cycle_none,
+		[]() {h2mod->set_local_rank(255);}
+			}, true);
+	}
 }
 
 /*
@@ -240,7 +254,7 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl_mime_data(field, "ServerRegistration", CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "Server_Name");
-	curl_mime_data(field, H2Config_login_identifier, CURL_ZERO_TERMINATED);
+	curl_mime_data(field, H2Config_dedi_server_name, CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
 	auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
 	auto sXUID = IntToString<::XUID>(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid, std::dec);
@@ -941,7 +955,12 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 		curlResult = curl_easy_perform(curl);
 		if (curlResult != CURLE_OK)
 		{
+			char CurlError[500];
+			snprintf(CurlError, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
+			LOG_ERROR_GAME(L"[H2MOD]::getPlayerRanks failed to init curl");
+			LOG_ERROR_GAME(CurlError);
 			LOG_ERROR_GAME(L"[H2MOD]::getPlayerRanks failed to execute curl");
+			curl_easy_cleanup(curl);
 			return document;
 		}
 		else

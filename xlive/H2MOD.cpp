@@ -30,7 +30,7 @@ Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
 HeadHunter* headHunterHandler = new HeadHunter();
 VariantPlayer* variant_player = new VariantPlayer();
-StatsHandler* stats_handler = new StatsHandler();
+StatsHandler* stats_handler = new StatsHandler;
 extern int H2GetInstanceId();
 std::unordered_map<int, int> object_to_variant;
 
@@ -1265,7 +1265,7 @@ short __cdecl get_enabled_teams_flags(network_session* session)
 {
 	short default_teams_enabled_flags = p_get_enabled_teams_flags(session);
 	short new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
-	if (new_teams_enabled_flags)
+	if (new_teams_enabled_flags && !b_Infection)
 		return new_teams_enabled_flags;
 	else
 		return default_teams_enabled_flags;
@@ -1326,94 +1326,76 @@ typedef char(_cdecl* startCountdownTimer)(char a1, int countdown_time, int a2, i
 startCountdownTimer p_StartCountdownTimer;
 char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, char a4)
 {
-	if (H2Config_minimum_player_start > 0)
+	bool canStart[2]{ false, false };
+	BYTE TeamPlay = *h2mod->GetAddress<BYTE*>(0, 0x992880);
+	if (H2Config_force_even && TeamPlay == 1)
 	{
-		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
+		LOG_DEBUG_GAME(L"Balancing teams");
+		std::map<std::string, std::vector<int>> Parties;
+		std::vector<int> nonPartyPlayers;
+		for (auto i = 0; i < 16; i++) //Detect party members
 		{
-			//ServerConsole::SendCommand2(1, L"sendmsg", L"\"Server has enough players to start.\"");
-			LOG_TRACE_GAME(L"Minimum Player count met.");
-			BYTE TeamPlay = *h2mod->GetAddress<BYTE*>(0, 0x992880);
-			if (H2Config_force_even && TeamPlay == 1)
+			if (NetworkSession::playerIsActive(i))
 			{
-				LOG_TRACE_GAME(L"Shuffling teams");
-				//ServerConsole::SendCommand2(1, L"sendmsg", L"Shuffling teams automatically for a fair match.");
-				std::map<std::string, std::vector<int>> Parties;
-				std::vector<int> nonPartyPlayers;
-				int pCount = 0;
-				for (auto i = 0; i < 16; i++) //Detect party members
+				//auto player = NetworkSession::getPlayerInformation(i);
+				int calcBaseOffset = 0x530E34 + (i * 0x128);
+				auto ClanDescripton = *h2mod->GetAddress<unsigned long*>(0, calcBaseOffset + 0x88);
+				auto Gamertag = h2mod->GetAddress<wchar_t*>(0, calcBaseOffset + 0x18);
+				//NetworkSession::getPlayerInformation(i).properties->ClanTag did not appear to have this data.
+				auto partyCode = IntToString<unsigned long>(ClanDescripton, std::dec);
+				LOG_DEBUG_GAME(L"Checking if {} is part of a party", Gamertag);
+				if (ClanDescripton != 0)
 				{
-					if (NetworkSession::playerIsActive(i))
-					{
-						pCount++;
-						auto player = NetworkSession::getPlayerInformation(i);
-						int calcBaseOffset = 0x530E34 + (i * 0x128);
-						auto ClanDescripton = *h2mod->GetAddress<unsigned long*>(0, calcBaseOffset + 0x88);
-						auto Gamertag = h2mod->GetAddress<wchar_t*>(0, calcBaseOffset + 0x18);
-						//NetworkSession::getPlayerInformation(i).properties->ClanTag was not actually storing the data.
-						auto partyCode = IntToString<unsigned long>(ClanDescripton, std::dec);
-						LOG_TRACE_GAME(L"Checking if {} is part of a party", Gamertag);
-						if (ClanDescripton != 0)
-						{
-							LOG_TRACE_GAME(L"Party {} adding member {}", std::wstring(partyCode.begin(), partyCode.end()), Gamertag);
-							Parties[partyCode].push_back(NetworkSession::getPlayerIdByName(Gamertag));
-						}
-						else
-							nonPartyPlayers.push_back(NetworkSession::getPlayerIdByName(Gamertag));
-					}
+					LOG_DEBUG_GAME(L"Party {} adding member {}", std::wstring(partyCode.begin(), partyCode.end()), Gamertag);
+					Parties[partyCode].push_back(NetworkSession::getPlayerIdByName(Gamertag));
 				}
-				for (auto i = 0; i < 16; i++) //Do it again to detect party leaders, probably can be removed if the function for paramters request is hooked.
+				else
+					nonPartyPlayers.push_back(NetworkSession::getPlayerIdByName(Gamertag));
+			}
+		}
+		for (auto i = 0; i < 16; i++) //Detect party leaders
+		{
+			if (NetworkSession::playerIsActive(i))
+			{
+
+
+				int calcBaseOffset = 0x530E34 + (i * 0x128);
+				auto XUID = *h2mod->GetAddress<::XUID*>(0, calcBaseOffset);
+				auto Gamertag = h2mod->GetAddress<wchar_t*>(0, calcBaseOffset + 0x18);
+				auto xuidslug = IntToString<unsigned long>(XUID & 0xFFFFFFFF, std::dec);
+				LOG_DEBUG_GAME(L"Checking if {} is leader of party {}", Gamertag, std::wstring(xuidslug.begin(), xuidslug.end()));
+				if (Parties.count(xuidslug) == 1) //Party leader found
 				{
-					if (NetworkSession::playerIsActive(i))
-					{
-						auto player = NetworkSession::getPlayerInformation(i);
-						
-						int calcBaseOffset = 0x530E34 + (i * 0x128);
-						auto XUID = *h2mod->GetAddress<::XUID*>(0, calcBaseOffset);
-						auto Gamertag = h2mod->GetAddress<wchar_t*>(0, calcBaseOffset + 0x18);
-						auto xuidslug = IntToString<unsigned long>(XUID & 0xFFFFFFFF, std::dec);
-						LOG_TRACE_GAME(L"Checking if {} is leader of party {}", Gamertag, std::wstring(xuidslug.begin(), xuidslug.end()));
-					
-						if (Parties.count(xuidslug) == 1) //Party leader found
-						{
-							LOG_TRACE_GAME(L"Party {} adding leader {}", std::wstring(xuidslug.begin(), xuidslug.end()), player->properties.player_name);
-							Parties[xuidslug].push_back(NetworkSession::getPlayerIdByName(Gamertag));
-							std::vector<int>::iterator position = std::find(nonPartyPlayers.begin(), nonPartyPlayers.end(), NetworkSession::getPlayerIdByName(Gamertag));
-							if (position != nonPartyPlayers.end())
-								nonPartyPlayers.erase(position);
-						}
-					}
+					LOG_DEBUG_GAME(L"Party {} adding leader {}", std::wstring(xuidslug.begin(), xuidslug.end()), Gamertag);
+					Parties[xuidslug].push_back(NetworkSession::getPlayerIdByName(Gamertag));
+					std::vector<int>::iterator position = std::find(nonPartyPlayers.begin(), nonPartyPlayers.end(), NetworkSession::getPlayerIdByName(Gamertag));
+					if (position != nonPartyPlayers.end())
+						nonPartyPlayers.erase(position);
 				}
-				byte playersPerTeam = (*h2mod->GetAddress<BYTE*>(0, 0x534858)) / H2Config_team_enabled_count;
-				int currentTeam = 0;
-				int currentTeamPlayers = 0;
-				std::map<int, int> teamPlayers;
-				for (auto i = 0; i < 8; i++) //Detect the first enabled team flag, this is so that if red isn't the first enabled team it doesn't place players there
-					if (H2Config_team_flag_array[i]) {
-						LOG_TRACE_GAME(L"First team Index is {}", currentTeam);
-						currentTeam = i;
-						break;
-					}
-				LOG_TRACE_GAME(L"Starting with team {}", IntToWString<int>(currentTeam, std::dec));
-				std::vector<int> sortedPlayers;
-				for (const auto& party : Parties)
-				{
-					LOG_TRACE_GAME("Setting teams for party {}", party.first);
-					for (const int &player : party.second)
-					{
-						teamPlayers[currentTeam]++;
-						LOG_TRACE_GAME(L"Setting party player Team for {} to {}", IntToWString<int>(player, std::dec), IntToWString<int>(currentTeam, std::dec));
-						sortedPlayers.push_back(player);
-						CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(player), currentTeam);
-						currentTeamPlayers++;
-						if (currentTeamPlayers == playersPerTeam)
-							for (auto i = 0; i < 8; i++)
-								if (H2Config_team_flag_array[i] && i != currentTeam) {
-									if (teamPlayers[i] != playersPerTeam) {
-										currentTeam = i;
-										break;
-									}
-								}
-					}
+			}
+		}
+		byte playersPerTeam = (*h2mod->GetAddress<BYTE*>(0, 0x534858)) / H2Config_team_enabled_count;
+		LOG_DEBUG_GAME(L"Players Per Team: {}", playersPerTeam);
+		int currentTeam = 0;
+		int currentTeamPlayers = 0;
+		std::map<int, int> teamPlayers;
+		for (auto i = 0; i < 8; i++) //Detect the first enabled team flag, this is so that if red isn't the first enabled team it doesn't place players there
+			if (H2Config_team_flag_array[i]) {
+				currentTeam = i;
+				break;
+			}
+		LOG_DEBUG_GAME(L"Starting with team {}", IntToWString<int>(currentTeam, std::dec));
+		std::vector<int> sortedPlayers;
+		for (const auto& party : Parties)
+		{
+			LOG_DEBUG_GAME("Setting teams for party {}", party.first);
+			for (const int &player : party.second)
+			{
+				LOG_DEBUG_GAME(L"Setting party player Team for {} to {}", IntToWString<int>(player, std::dec), IntToWString<int>(currentTeam, std::dec));
+				sortedPlayers.push_back(player);
+				CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(player), currentTeam);
+				teamPlayers[currentTeam] += 1;
+				if (teamPlayers[currentTeam] == playersPerTeam)
 					for (auto i = 0; i < 8; i++)
 						if (H2Config_team_flag_array[i] && i != currentTeam) {
 							if (teamPlayers[i] != playersPerTeam) {
@@ -1421,51 +1403,70 @@ char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, cha
 								break;
 							}
 						}
+			}
+			for (auto i = 0; i < 8; i++)
+				if (H2Config_team_flag_array[i] && i != currentTeam) {
+					if (teamPlayers[i] != playersPerTeam) {
+						currentTeam = i;
+						break;
+					}
 				}
-
+		}
+		for (const auto &team : teamPlayers)
+		{
+			LOG_DEBUG_GAME(L"Team {} - {} Players", team.first, team.second);
+		}
+		for (const auto &player : nonPartyPlayers)
+		{
+			LOG_DEBUG_GAME(L"Setting Non party player Team for {} to {}", IntToWString<int>(player, std::dec), IntToWString<int>(currentTeam, std::dec));
+			sortedPlayers.push_back(player);
+			CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(player), currentTeam);
+			teamPlayers[currentTeam] += 1;
+			if (teamPlayers[currentTeam] == playersPerTeam)
 				for (auto i = 0; i < 8; i++)
-					if (H2Config_team_flag_array[i]) {
+					if (H2Config_team_flag_array[i] && i != currentTeam) {
 						if (teamPlayers[i] != playersPerTeam) {
-							if (teamPlayers[i] != playersPerTeam) {
-								currentTeam = i;
-								break;
-							}
+							currentTeam = i;
+							break;
 						}
 					}
-				for (const auto &player : nonPartyPlayers)
-				{
-					LOG_TRACE_GAME(L"Setting Non party player Team for {} to {}", IntToWString<int>(player, std::dec), IntToWString<int>(currentTeam, std::dec));
-					sortedPlayers.push_back(player);
-					CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(player), currentTeam);
-					currentTeamPlayers++;
-					teamPlayers[currentTeam]++;
-					if (currentTeamPlayers == playersPerTeam)
-						for (auto i = 0; i < 8; i++)
-							if (H2Config_team_flag_array[i] && i != currentTeam) {
-								if (teamPlayers[i] != playersPerTeam) {
-									currentTeam = i;
-									break;
-								}
-							}
-				}
-				int validTeams = 0;
-				for (auto i = 0; i < 8; i++)
-					if (H2Config_team_flag_array[i]) {
-						if (teamPlayers[i] > 0) validTeams++;
-					}
-				if (validTeams > 1)
-					return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
-				else
-					return 0;
-			}
-			else
-				return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
 		}
+		for (const auto &team : teamPlayers)
+		{
+			LOG_DEBUG_GAME(L"Team {} - {} Players", team.first, team.second);
+		}
+		int validTeams = 0;
+		for (auto i = 0; i < 8; i++)
+			if (H2Config_team_flag_array[i]) {
+				if (teamPlayers[i] == playersPerTeam)
+					validTeams++;
+			}
 
-		return 0;
+		if (validTeams == H2Config_team_enabled_count)
+			canStart[0] = true;
 	}
+	else 
+	{
+		canStart[0] = true;
+	}
+
+	if (H2Config_minimum_player_start > 0)
+	{
+		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
+		{
+			LOG_DEBUG_GAME(L"Minimum Player count met.");
+			canStart[1] = true;
+		}
+	} 
 	else
+	{
+		canStart[1] = true;
+	}
+
+	if (canStart[0] && canStart[1])
 		return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
+	else
+		return 0;
 }
 
 void H2MOD::RegisterEvents()
@@ -1473,12 +1474,8 @@ void H2MOD::RegisterEvents()
 
 	if(!h2mod->Server)//Client only callbacks	
 	{
-		//Register callback to reset rank to 255 on mainmenu
-		EventHandler::registerGameStateCallback({
-				"StatsResetRank",
-				life_cycle_none,
-				[]() {h2mod->set_local_rank(255);}
-			}, false);
+		
+
 	}
 	else //Server only callbacks
 	{

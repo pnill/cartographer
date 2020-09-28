@@ -188,7 +188,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 	case request_map_filename:
 	{
 		s_request_map_filename* received_data = (s_request_map_filename*)packet;
-		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] received on handle_channel_message_hook request-map-filename from XUID: {}", received_data->user_identifier);
+		LOG_DEBUG_NETWORK("[H2MOD-CustomPackets] received on handle_channel_message_hook request-map-filename from XUID: {}", received_data->user_identifier);
 		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
 			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 		{
@@ -216,7 +216,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				}
 				else
 				{
-					LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] no map file name found, abort sending packet!", received_data->user_identifier, peer_index, map_filename.c_str());
+					LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] no map file name found, abort sending packet! {} - {}", received_data->user_identifier, peer_index, map_filename.c_str());
 				}
 			}
 		}
@@ -226,11 +226,12 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 	case custom_map_filename:
 	{
+		
 		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
 		{
 			s_custom_map_filename* received_data = (s_custom_map_filename*)packet;
 			mapManager->setMapFileNameToDownload(received_data->file_name);
-			LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] received on handle_out_of_band_message map_file_name: {}", received_data->file_name);
+			LOG_DEBUG_NETWORK(L"[H2MOD-CustomPackets] received on handle_channel_message_hook custom_map_filename: {}", received_data->file_name);
 		}
 		
 		return;
@@ -241,6 +242,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
 		{
 			s_team_change* received_data = (s_team_change*)packet;
+			LOG_DEBUG_NETWORK(L"[H2MOD-CustomPackets] recieved on handle_channel_message_hook team_chage: {}", received_data->team_index);
 			h2mod->set_local_team_index(0, received_data->team_index);
 			return;
 		}
@@ -250,6 +252,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			if(peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
 			{
 				s_rank_change* recieved_data = (s_rank_change*)packet;
+				LOG_DEBUG_NETWORK(L"H2MOD-CustomPackets] recieved on handle_channel_message_hook rank_change: {}", recieved_data->rank);
 				h2mod->set_local_rank(recieved_data->rank);
 			}
 		}
@@ -268,28 +271,28 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 		{
 			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
-			LOG_INFO_NETWORK(L"Got a parameters update from {} : {}", NetworkSession::getPeerPlayerName(peer_index), std::to_wstring(NetworkSession::getCurrentNetworkSession()->parameters.dedicated_server));
+			//LOG_INFO_NETWORK(L"Got a parameters update from {} : {}", NetworkSession::getPeerPlayerName(peer_index), std::to_wstring(NetworkSession::getCurrentNetworkSession()->parameters.dedicated_server));
 			if (peer_index == NetworkSession::getCurrentNetworkSession()->session_host_peer_index && !NetworkSession::getCurrentNetworkSession()->parameters.dedicated_server)
 			{
 				const auto host_xuid = NetworkSession::getPeerXUID(peer_index);
 				if (host_xuid != NONE) {
-					LOG_TRACE_NETWORK(L"Setting up team persistance with host xuid {}", IntToWString<XUID>(host_xuid, std::dec));
+					//LOG_TRACE_NETWORK(L"Setting up team persistance with host xuid {}", IntToWString<XUID>(host_xuid, std::dec));
 					h2mod->set_local_clan_tag(0, host_xuid);
-					EventHandler::registerGameStateCallback({
-							"UnPersistHostTeam1",
-							game_life_cycle::life_cycle_in_game,
-							[]()
-							{
-								LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
-								h2mod->set_local_clan_tag(0, 0);
-							}, true
-						}, false);
+					//EventHandler::registerGameStateCallback({
+					//		"UnPersistHostTeam1",
+					//		game_life_cycle::life_cycle_in_game,
+					//		[]()
+					//		{
+					//			//LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
+					//			h2mod->set_local_clan_tag(0, 0);
+					//		}, true
+					//	}, false);
 					EventHandler::registerGameStateCallback({
 							"UnPersistHostTeam2",
 							game_life_cycle::life_cycle_none,
 							[]()
 							{
-								LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
+								//LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
 								h2mod->set_local_clan_tag(0, 0);
 							}, true
 						}, false);
@@ -338,11 +341,11 @@ void CustomPackets::sendRequestMapFilename()
 		if (observer_channel->field_1) {
 			observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, request_map_filename, sizeof(s_request_map_filename), &data);
 
-			LOG_TRACE_NETWORK("[H2MOD-CustomPackets] Sending map name request info: session host peer index: {}, observer index {}, observer bool unk: {}, session index: {}",
+			/*LOG_TRACE_NETWORK("[H2MOD-CustomPackets] Sending map name request info: session host peer index: {}, observer index {}, observer bool unk: {}, session index: {}",
 				session->session_host_peer_index,
 				observer_channel->observer_index,
 				observer_channel->field_1,
-				session->session_index);
+				session->session_index);*/
 		}
 	}
 }

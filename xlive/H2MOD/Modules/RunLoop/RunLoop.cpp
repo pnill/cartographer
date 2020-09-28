@@ -282,7 +282,9 @@ void GSMainLoop() {
 	if(H2IsDediServer)
 	{
 		StatsHandler::verifyPlayerRanks();
+		
 	}
+	EventHandler::executeGameLoopCallbacks();
 	/*
 	static bool halo2ServerOnce1 = false;
 	if (H2IsDediServer && !halo2ServerOnce1) {
@@ -316,7 +318,7 @@ void main_game_loop_hook() {
 		GSMainLoop();
 
 	main_game_loop();
-	EventHandler::executeGameLoopCallbacks();
+	
 
 	mapManager->leaveSessionIfAFK();
 
