@@ -7,7 +7,7 @@ namespace H2Tweaks {
 	void toggleKillVolumes(bool enable);
 	void toggleAiMp(bool toggle);
 	void toggleUncappedCampaignCinematics(bool toggle);
-	void setFOV(int field_of_view_degrees);
+	void setFOV(float field_of_view_degrees);
 	void setVehicleFOV(int field_of_view_degrees);
 	void setHz();
 	void setCrosshairPos(float crosshair_offset);

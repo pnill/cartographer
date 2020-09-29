@@ -1027,7 +1027,7 @@ void H2Tweaks::setSavedSens() {
 		H2Tweaks::setSens("controller", (H2Config_controller_sens));
 }
 
-void H2Tweaks::setFOV(int field_of_view_degrees) {
+void H2Tweaks::setFOV(float field_of_view_degrees) {
 
 	if (h2mod->Server)
 		return;

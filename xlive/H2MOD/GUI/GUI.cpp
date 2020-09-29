@@ -9,6 +9,7 @@
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Splitscreen\VideoFixes.h"
+#include "H2MOD\Modules\Tweaks\Tweaks.h"
 
 extern void InitInstance();
 
@@ -115,7 +116,7 @@ void frameTimeManagement() {
 		nextFrame = high_resolution_clock::now();
 		bInitTime = true;
 	}
-	
+
 	if (H2Config_fps_limit > 0 || isMinimized) {
 		std::this_thread::sleep_until(nextFrame);
 
@@ -142,8 +143,8 @@ static bool                 g_WantUpdateHasGamepad = true;
 static bool ImGui_ImplWin32_UpdateMouseCursor()
 {
 	ImGuiIO& io = ImGui::GetIO();
-	if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange)
-		return false;
+	//if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange)
+	return false;
 
 	ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
 	if (imgui_cursor == ImGuiMouseCursor_None || io.MouseDrawCursor)
@@ -211,8 +212,8 @@ ImFont* font2;
 void GUI::Initialize(HWND hWnd)
 {
 	initFontsIfRequired();
-	
-	if (FAILED(D3DXCreateTextureFromFile(pDevice, L"sounds/h2pc_logo.png", &Texture_Interface) ) )
+
+	if (FAILED(D3DXCreateTextureFromFile(pDevice, L"sounds/h2pc_logo.png", &Texture_Interface)))
 	{
 		addDebugText("ERROR: Failed to create logo texture (for achievements).");
 	}
@@ -223,10 +224,67 @@ void GUI::Initialize(HWND hWnd)
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-	ImGui::StyleColorsDark();
+	io.Fonts->AddFontDefault();
+	font2 = io.Fonts->AddFontFromFileTTF("./Conduit_ITC.ttf", (30.0f * 1.0f));
+	font2->DisplayOffset.y -= 1;
+
+
+
+	const ImVec2 wPadding(20, 10);
+	const ImVec2 fPadding(8, 3);
+	const ImVec2 iSpacing(6, 6);
+	const ImVec2 iiSpacing(6, 6);
+	const float indentSpacing = 20.0f;
+	const float ScrollBarSize = 16.0f;
+	const float GrabMinSize = 13.0f;
+
+	const float WindowBorderSize = 0.0f;
+	const float ChildBorderSize = 0.0f;
+	const float PopupBorderSize = 0.0f;
+	const float FrameBorderSize = 0.0f;
+	const float TabBorderSize = 0.0f;
+
+	const float WindowRound = 0.0f;
+	const float ChildRounding = 0.0f;
+	const float FrameRounding = 0.0f;
+	const float PopupRounding = 0.0f;
+	const float ScrollbarRounding = 0.0f;
+	const float GrabRounding = 0.0f;
+	const float TabRounding = 0.0f;
+
+	const ImVec2 WindowTitleAlign(0.0, 0.50);
+	const ImVec2 ButtonTextAlign(0.50, 0.50);
+	const ImVec2 SelectabletextAlign(0.0, 0.50);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, wPadding);
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, fPadding);
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, iSpacing);
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, iiSpacing);
+	ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, indentSpacing);
+	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, ScrollBarSize);
+	ImGui::PushStyleVar(ImGuiStyleVar_GrabMinSize, GrabMinSize);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, WindowBorderSize);
+	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, ChildBorderSize);
+	ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, PopupBorderSize);
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, FrameBorderSize);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, WindowRound);
+	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, ChildRounding);
+	ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, PopupRounding);
+	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarRounding, ScrollbarRounding);
+	ImGui::PushStyleVar(ImGuiStyleVar_GrabRounding, GrabRounding);
+	ImGui::PushStyleVar(ImGuiStyleVar_TabRounding, TabRounding);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, WindowTitleAlign);
+	ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ButtonTextAlign);
+	ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, SelectabletextAlign);
+
+	ImGui::StyleColorsMaik();
+	//ImGui::StyleColorsDark();
 
 	g_hWnd = hWnd;
-//	ImGuiIO& io = ImGui::GetIO();
+	//	ImGuiIO& io = ImGui::GetIO();
 	io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
 	io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
 	io.BackendPlatformName = "imgui_impl_win32";
@@ -256,10 +314,9 @@ void GUI::Initialize(HWND hWnd)
 	io.KeyMap[ImGuiKey_Y] = 'Y';
 	io.KeyMap[ImGuiKey_Z] = 'Z';
 
-	ImFont* font1 = io.Fonts->AddFontDefault();
-	font2 = io.Fonts->AddFontFromFileTTF("maps\\fonts\\conduit_itc_medium1.ttf", (13.0f * 1.0f));
 
 	ImGui_ImplDX9_Init(pDevice);
+
 
 }
 
@@ -415,6 +472,7 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 {
 	//pFont->OnLostDevice();
 	//pFont->OnResetDevice();
+	ImGui_ImplDX9_InvalidateDeviceObjects();
 	SplitFixDeviceReset();
 	largeSizeFont->OnLostDevice();
 	largeSizeFont->OnResetDevice();
@@ -424,12 +482,12 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 	smallFont->OnResetDevice();
 	Sprite_Interface->OnLostDevice();
 	Sprite_Interface->OnResetDevice();
-	
+
 	pD3DPP = vD3DPP;
 	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
 	return S_OK;
 }
- 
+
 // #5006 XLiveOnDestroyDevice
 HRESULT WINAPI XLiveOnDestroyDevice()
 {
@@ -438,7 +496,7 @@ HRESULT WINAPI XLiveOnDestroyDevice()
 	normalSizeFont->Release();
 	smallFont->Release();
 	Sprite_Interface->Release();
-	
+
 	//LOG_TRACE_XLIVE("XLiveOnDestroyDevice");
 	return S_OK;
 }
@@ -454,7 +512,7 @@ void InitalizeFont(wchar_t *strFontName, wchar_t *strFontPath, int size, IDirect
 		wcsncpy_s(m_strFontPath, strFontPath, 260);
 		addDebugText("Adding font: ");
 		addDebugText(m_strFontPath);
-		if(AddFontResource(m_strFontPath) > 0)
+		if (AddFontResource(m_strFontPath) > 0)
 		{
 			addDebugText("Font successfully added.");
 		}
@@ -676,20 +734,53 @@ int achievement_timer = 0;
 
 char* Auto_Update_Text = 0;
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+int current_crosshair_size = 0;
+static float f = 72.0f;
+static float fov = 90.0f;
+static float coffset = 0.5f;
+bool inGamechat = false;
+bool disableHUD = true;
+bool fp_model = false;
+bool bDiscordRich = false;
+bool bXDelay = false;
+bool bplay_game_videos = false;
+bool bDisableKeyboard = false;
+bool bRawMouse = false;
+bool bHiResFix = false;
+
+int current_fps_limit = 0;
+int current_lod = 0;
+int current_refresh = 0;
+
+bool bSkullAnger = false;
+bool bSkullAssassins = false;
+bool bSkullBlackeye = false;
+bool bSkullBlind = false;
+bool bSkullCatch = false;
+bool bSkullEnvy = false;
+bool bSkullFamine = false;
+bool bSkullGhost = false;
+bool bSkullGrundBday = false;
+bool bSkullIron = false;
+bool bSkullIWHBYD = false;
+bool bMythic = false;
+bool bSputnik = false;
+bool bThunderstorm = false;
+bool bWhupporpotamus = false;
 
 // #5002: XLiveRender
 int WINAPI XLiveRender()
 {
-	
+
 
 	if (pDevice)
 	{
-		
-	
+
+
 		if (pDevice->TestCooperativeLevel() == D3D_OK)
 		{
 
-			
+
 			D3DVIEWPORT9 pViewport;
 			pDevice->GetViewport(&pViewport);
 
@@ -738,24 +829,24 @@ int WINAPI XLiveRender()
 
 			//drawPrimitiveRect(gameWindowWidth / 1.15, gameWindowHeight - 150, 250, 100, D3DCOLOR_ARGB(155, 41, 65, 129));
 			//drawText(gameWindowWidth / 1.13, gameWindowHeight - 145, COLOR_WHITE, "Points: 10,000", haloFont);
-	
+
 #pragma region Achievement Rendering		
 			if (h2mod->AchievementMap.size() > 0)
 			{
 				auto it = h2mod->AchievementMap.begin();
-				
+
 				if (it->second == false)
 				{
 					h2mod->custom_sound_play(L"sounds/AchievementUnlocked.wav", 0);
 					it->second = true;
 				}
-				
+
 				if (achievement_height >= 150)
 				{
 					achievement_freeze = true;
 				}
 				else
-					achievement_height = achievement_height + 2;		
+					achievement_height = achievement_height + 2;
 
 				float scalar = 11.0f;
 				D3DXVECTOR3 Position;
@@ -777,7 +868,7 @@ int WINAPI XLiveRender()
 
 				size_t delim = it->first.find("|");
 				std::string achievement_title = it->first.substr(0, delim);
-				std::string achievement_desc = it->first.substr(delim+1, it->first.size() - delim);
+				std::string achievement_desc = it->first.substr(delim + 1, it->first.size() - delim);
 
 				drawText(gameWindowWidth / 2 - 100, gameWindowHeight - (achievement_height - 25), COLOR_WHITE, achievement_title.c_str(), normalSizeFont);
 				drawText(gameWindowWidth / 2 - 100, gameWindowHeight - (achievement_height - 50), COLOR_WHITE, achievement_desc.c_str(), normalSizeFont);
@@ -807,7 +898,7 @@ int WINAPI XLiveRender()
 			if (displayXyz && (NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() == scnr_type::SinglePlayer)) {
 				int text_y_coord = 60;
 				PlayerIterator playerIt;
-				while (playerIt.get_next_player()) 
+				while (playerIt.get_next_player())
 				{
 					real_point3d* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
 					if (player_position != nullptr) {
@@ -819,7 +910,7 @@ int WINAPI XLiveRender()
 					}
 				}
 			}
-			
+
 			if (getDebugTextDisplay()) {
 				for (int i = 0; i < getDebugTextDisplayCount(); i++) {
 					const char* text = getDebugText(i);
@@ -859,15 +950,12 @@ int WINAPI XLiveRender()
 			RECT rect;
 			::GetClientRect(g_hWnd, &rect);
 			io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
-			static float f = 72.0f;
-			static float fov = 90.0f;
-			static float coffset = 0.5f;
+
 
 			ImGui_ImplDX9_NewFrame();
 			ImGuiWin32Frame();
 			ImGui::NewFrame();
 			ImGui::ShowDemoWindow();
-			
 			ImGui::PushFont(font2);
 			ImGui::Begin("Advanced Settings");
 			ImGui::Indent(1.0);
@@ -877,30 +965,578 @@ int WINAPI XLiveRender()
 			{
 				ImGui::TextWrapped("HUD Settings allow you to adjust specific settings related to the HUD being displayed.");
 				ImGui::NewLine();
-				ImGui::Separator();
-				ImGui::NewLine();
-
 				float CursorPos = ImGui::GetCursorPosX();
-				
-				ImGui::NewLine();
-				
-				ImGui::SetCursorPosX(((ImGui::GetWindowContentRegionWidth() - (ImGui::GetWindowContentRegionWidth() * 0.75)) * 0.5f));
-				ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() *0.75f);
-				ImGui::SliderFloat("Player", &f, 0, 120, "FOV = %.3f");
-			
-				ImGui::SetCursorPosX(((ImGui::GetWindowContentRegionWidth() - (ImGui::GetWindowContentRegionWidth() * 0.75)) * 0.5f));
-				ImGui::SliderFloat("Vehicle", &fov, 0, 120, "FOV = %.3f");
 
-				ImGui::SetCursorPosX(((ImGui::GetWindowContentRegionWidth() - (ImGui::GetWindowContentRegionWidth() * 0.75)) * 0.5f));
-				ImGui::SliderFloat("Crosshair", &coffset, 0, 1, "Offset = %.3f");
+				ImGui::NewLine();
+
+
+
+				//ImGui::PushFont(font2);
+
+				ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() *0.25f);
+
+				const char* crosshair_label = "Crosshair Offset";
+				ImVec2 LargestText = ImGui::CalcTextSize(crosshair_label, NULL, true);
+
+				float float_offset = ImGui::GetCursorPosX() + LargestText.x + (LargestText.x * 0.075);
+				ImGui::TextUnformatted("Player FOV");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Changes the field of view for the player.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+
+				ImGui::SetCursorPosX(float_offset);
+				ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() *0.75f) - float_offset);
+				ImGui::SliderFloat("##hidelabel t", &H2Config_field_of_view, 40, 110, "", 1.5f);
+				if (ImGui::IsItemEdited())
+				{
+					H2Tweaks::setFOV(H2Config_field_of_view);
+				}
+				ImGui::PopItemWidth();
+				ImGui::SameLine();
+
+				ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth());
+				ImGui::InputFloat("", &H2Config_field_of_view);
+				if (ImGui::IsItemEdited())
+				{
+					if (H2Config_field_of_view < 40)
+						H2Config_field_of_view = 40.0f;
+					if (H2Config_field_of_view > 110)
+						H2Config_field_of_view = 110;
+
+					H2Tweaks::setFOV(H2Config_field_of_view);
+				}
+
+				ImGui::PopItemWidth();
+
+				ImGui::TextUnformatted("Vehicle FOV");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Changes the field of view for the vehicle.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(float_offset);
+
+				ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() *0.75f) - float_offset);
+				ImGui::SliderFloat("##hidelabel y", &fov, 0, 120, "");
+				ImGui::PopItemWidth();
+
+				ImGui::SameLine();
+
+				ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth());
+				ImGui::InputFloat("##hidelabel x", &fov);
+				ImGui::PopItemWidth();
+
+				ImGui::TextUnformatted(crosshair_label);
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Changes the offset of where the crosshair is displayed.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(float_offset);
+
+				ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() *0.75f) - float_offset);
+				ImGui::SliderFloat("##hidelabel f", &coffset, 0, 1, "", 2.0);
 				ImGui::PopItemWidth();
 
 
-				ImGui::SetCursorPosX(CursorPos);
+				ImGui::SameLine();
+
+				ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth());
+
+				ImGui::InputFloat("##hidelabel z", &coffset);
+				ImGui::PopItemWidth();
+
+				//ImGui::BeginCombo("##hidelabel xx", "Default");
+				ImGui::TextUnformatted("Crosshair Size");
+
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Changes the size of the crosshair.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+
+				ImGui::PushItemWidth((ImGui::GetWindowContentRegionMax().x - float_offset) + 10.0f);
+				ImGui::SetCursorPosX(float_offset);
+				ImGui::Combo("##hidelabel crosshair_size", &current_crosshair_size, "Default\0Very Small\0Small\0Large\0");
+				ImGui::PopItemWidth();
+
+				ImGui::NewLine();
 				ImGui::Separator();
+				ImGui::NewLine();
+
+				float largest_check_text = ImGui::CalcTextSize("Hide First Person Model").x;
+				float checkbox_offset = ImGui::GetCursorPosX() + largest_check_text + (largest_check_text* 0.075);
+
+				ImGui::TextUnformatted("Hide HUD");
+
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Hides the Heads Up Display.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(checkbox_offset);
+				ImGui::Checkbox("##hidelabel hide_hud", &disableHUD);
+
+				ImGui::TextUnformatted("Hide In-Game Chat");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Hides the In-game chat box");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+
+
+				ImGui::SetCursorPosX(checkbox_offset);
+				ImGui::Checkbox("##hidelabel ingame_chat", &H2Config_hide_ingame_chat);
+
+
+
+				ImGui::TextUnformatted("Hide First Person Model");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Hides the first person weapon model and arms.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(checkbox_offset);
+				ImGui::Checkbox("##hidelabel hide_fp", (bool*)&AdvLobbySettings_mp_blind);
+				//ImGui::EndCombo();
+
+				ImGui::SetCursorPosX(CursorPos);
+				ImGui::NewLine();
 
 			}
 
+
+			if (ImGui::CollapsingHeader("Other Settings"))
+			{
+				ImGui::TextWrapped("Customize other settings and features of Halo 2 / Project Cartographer.");
+				ImGui::NewLine();
+
+
+				const char* largest_setting_text = "Level of Detail";
+				float largest_setting_size = ImGui::CalcTextSize(largest_setting_text, NULL, true).x;
+				float largest_setting_offset = ImGui::GetCursorPosX() + largest_setting_size + (largest_setting_size * 0.075);
+
+				ImGui::TextUnformatted("FPS Limit");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Updates the max frame limit, disabled will turn off the internal frame limiter but frame rates above 60fps are not currently supported!");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+				ImGui::SameLine();
+
+				ImGui::PushItemWidth((ImGui::GetWindowContentRegionMax().x - largest_setting_offset) + 10.0f);
+				ImGui::SetCursorPosX(largest_setting_offset);
+
+				ImGui::Combo("##hidelabel fps", &current_fps_limit, "Disabled\00030 fps\00060 fps\0");
+
+				ImGui::PopItemWidth();
+
+				ImGui::TextUnformatted("Refresh Rate");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Sets a static refresh rate.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+				ImGui::SameLine();
+				ImGui::PushItemWidth((ImGui::GetWindowContentRegionMax().x - largest_setting_offset) + 10.0f);
+				ImGui::SetCursorPosX(largest_setting_offset);
+
+				ImGui::Combo("##hidelabel refresh", &current_refresh, "Default\00060hz\000120hz\000140hz\0");
+
+				ImGui::PopItemWidth();
+
+
+				ImGui::TextUnformatted("Level of Detail");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Sets a static level of detail to force at all times.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+				ImGui::SameLine();
+				ImGui::PushItemWidth((ImGui::GetWindowContentRegionMax().x - largest_setting_offset) + 10.0f);
+				ImGui::SetCursorPosX(largest_setting_offset);
+
+
+				ImGui::Combo("##hidelabel lod", &H2Config_static_lod_state, "Default\0Very Low\0Low\0Medium\0High\0Very High\0Cinematic\0");
+
+				ImGui::PopItemWidth();
+				ImGui::NewLine();
+				ImGui::Separator();
+
+				ImGui::TextWrapped("Items marked with an * indicate that they require a game restart to take effect.");
+				ImGui::NewLine();
+
+				const char * largest_checkbox_text = "Disable Game Intro Videos";
+				float largest_checkbox_text_size = ImGui::CalcTextSize(largest_checkbox_text, NULL, true).x;
+				float largest_checkbox_offset = ImGui::GetCursorPosX() + largest_checkbox_text_size + (largest_checkbox_text_size * 0.075);
+
+				ImGui::TextUnformatted("HiRes Fix *");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Fixes issues with UI elements in resolutions above 1080p.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_checkbox_offset);
+				ImGui::Checkbox("##hidelabel hiresfix", &H2Config_hiresfix);
+
+				ImGui::TextUnformatted("xDelay");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("When disabled turns off the countdown for games.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_checkbox_offset);
+
+				ImGui::Checkbox("##hidelabel xdelay", &H2Config_xDelay);
+
+				ImGui::TextUnformatted("Raw Mose Input");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Disables mouse acceleration.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_checkbox_offset);
+
+				ImGui::Checkbox("##hidelabel rawmouse", &H2Config_raw_input);
+
+				ImGui::TextUnformatted("Disable Keyboard");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Disables in-game keyboard input.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_checkbox_offset);
+
+				ImGui::Checkbox("##hidelabel disablekeyboard", &H2Config_disable_ingame_keyboard);
+
+				ImGui::TextUnformatted("Discord Rich Presence*");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Enables discord rich presence. (Makes discord show the game and information about it).");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_checkbox_offset);
+
+				ImGui::Checkbox("##hidelabel discord", &H2Config_discord_enable);
+
+				ImGui::TextUnformatted("Disable Game Intro Videos");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Disables the videos which play when you first open the game.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_checkbox_offset);
+
+				ImGui::Checkbox("##hidelabel introvideo", &H2Config_skip_intro);
+
+				ImGui::NewLine();
+
+			}
+
+			if (ImGui::CollapsingHeader("Toggle Skulls"))
+			{
+
+				const char* largest_skull_text = "Grunt Birthday Party";
+				float largest_skull_text_size = ImGui::CalcTextSize(largest_skull_text, NULL, true).x;
+				float largest_skull_offset = ImGui::GetCursorPosX() + largest_skull_text_size + (largest_skull_text_size * 0.075);
+
+				ImGui::TextWrapped("Enable and disable Halo 2's Skulls.\r\nWhat ice cream flavor would you like to choose today?");
+				ImGui::NewLine();
+
+				ImGui::TextUnformatted("Angry");
+
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Enemies have a faster fire rate and will shoot more often.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+
+				ImGui::Checkbox("##hidelabel anger", &bSkullAnger);
+
+				ImGui::TextUnformatted("Blind");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Your HUD becomes completely invisible as well as your weapon, except the Energy Sword.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+
+				ImGui::Checkbox("##hidelabel blind", &bSkullBlind);
+
+				ImGui::TextUnformatted("Catch");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Allies and enemies throw grenades with increased frequency. They will also drop more grenades upon death.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+				ImGui::Checkbox("##hidelabel catch", &bSkullCatch);
+
+				ImGui::TextUnformatted("Ghost");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Enemies cannot be staggered.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+				ImGui::Checkbox("##hidelabel ghost", &bSkullGhost);
+
+				ImGui::TextUnformatted("Envy");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Cloak instead of Flashlight, 5 second cloak with 10 second recharge.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+				ImGui::Checkbox("##hidelabel envy", &bSkullEnvy);
+
+				ImGui::TextUnformatted("Iron");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Allies are immune to melee attacks.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+				ImGui::Checkbox("##hidelabel iron", &bSkullIron);
+
+				ImGui::TextUnformatted("Sputnik");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Explosions and melee have more of an effect on objects, which may be the result of less gravity. Enemies who are meleed will also be turned around, making for an easy assassination.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+				ImGui::Checkbox("##hidelabel sputnik", &bSputnik);
+
+				ImGui::TextUnformatted("Mythic");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Enemy health and shields becomes equivalent to the next highest difficulty (ex. Easy becomes Normal and Legendary becomes Mythic).");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+				ImGui::Checkbox("##hidelabel mythic", &bMythic);
+
+				ImGui::TextUnformatted("Famine");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Weapons picked up only have half ammo.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+				ImGui::Checkbox("##hidelabel famine", &bSkullFamine);
+
+				ImGui::TextUnformatted("IWHBYD");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Rare combat dialogue becomes more common.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+				ImGui::Checkbox("##hidelabel iwhbyd", &bSkullIWHBYD);
+
+				ImGui::TextUnformatted("Black Eye");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Shield won’t regenerate, when you melee someone you get energy power back, so if you melee someone you get a little bit of shield. So you can get a bit at a time all the way to overshield!");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+				ImGui::Checkbox("##hidelabel blackeye", &bSkullBlackeye);
+
+				ImGui::TextUnformatted("Assassins");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("All enemies in game are permanently cloaked, AI cannot see them and so are no help at all.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+				ImGui::Checkbox("##hidelabel assasins", &bSkullAssassins);
+				if (ImGui::IsItemEdited())
+				{
+					*(bool*)(h2mod->GetAddress(0x4D8322)) = bSkullAssassins;
+				}
+
+				ImGui::TextUnformatted("Thunderstorm");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Promotes most enemies to their highest rank. Does not affect Flood Human Combat Forms or Marines.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+				ImGui::Checkbox("##hidelabel thunderstorm", &bThunderstorm);
+
+				ImGui::TextUnformatted("Whuppopotamus");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("AI become more observant, noticing even active camouflage, shadows, the sound of reloading or drawing a weapon, footsteps, etc. They also have better accuracy and are much less likely to kill themselves or their teammates with explosive weapons.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+				ImGui::Checkbox("##hidelabel whuppopotamus", &bWhupporpotamus);
+
+				ImGui::TextUnformatted(largest_skull_text);
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("Shoot enemy in the head and they will explode.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(largest_skull_offset);
+				ImGui::Checkbox("##hidelabel gbday", &bSkullGrundBday);
+			}
+
+			ImGui::PopFont();
 			ImGui::End();
 
 			ImGui::EndFrame();

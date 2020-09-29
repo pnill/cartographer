@@ -35,7 +35,7 @@ extern bool H2Config_discord_enable;
 //extern bool H2Config_controller_aim_assist;
 extern int H2Config_fps_limit;
 extern int H2Config_static_lod_state;
-extern int H2Config_field_of_view;
+extern float H2Config_field_of_view;
 extern int H2Config_vehicle_field_of_view;
 extern int H2Config_mouse_sens;
 extern int H2Config_controller_sens;
