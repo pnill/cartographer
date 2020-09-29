@@ -871,7 +871,8 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		H2Tweaks::setVisualTweaks();
-		H2Tweaks::setCrosshairSize(0, false);
+		H2Tweaks::setCrosshairSize2();
+		//H2Tweaks::setCrosshairSize(0, false);
 		//H2Tweaks::applyShaderTweaks(); 
 
 		if (get_game_life_cycle() == life_cycle_in_game)
@@ -1573,7 +1574,7 @@ void H2MOD::ApplyHooks() {
 		show_error_screen_method = (show_error_screen)DetourFunc(h2mod->GetAddress<BYTE*>(0x20E15A), (BYTE*)showErrorScreen, 8);
 
 		//TODO: turn on if you want to debug halo2.exe from start of process
-		//is_debugger_present_method = (is_debugger_present)DetourFunc(h2mod->GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
+		is_debugger_present_method = (is_debugger_present)DetourFunc(h2mod->GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
 
 		//TODO: use for object spawn hooking
 		//0x132163

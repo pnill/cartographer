@@ -980,8 +980,55 @@ void H2Tweaks::setCrosshairPos(float crosshair_offset) {
 		}
 	}
 }
+bool crosshairInit = false;
+point2d defaultCrosshairSizes[59];
+void H2Tweaks::setCrosshairSize2()
+{
+	if (h2mod->Server)
+		return;
+	point2d* Weapons[59];
 
+	auto hud_reticles = tags::find_tag(blam_tag::tag_group_type::bitmap, "ui\\hud\\bitmaps\\new_hud\\crosshairs\\hud_reticles");
+	char* hud_reticles_data = tags::get_tag<blam_tag::tag_group_type::bitmap, char>(hud_reticles);
+	tags::tag_data_block* hud_reticles_bitmaps = reinterpret_cast<tags::tag_data_block*>(hud_reticles_data + 0x44);
+	if(hud_reticles_bitmaps->block_data_offset != -1)
+	{
+		char* reticle_bitmap = tags::get_tag_data() + hud_reticles_bitmaps->block_data_offset;
+		for(auto i = 0; i < hud_reticles_bitmaps->block_count; i++)
+		{
+			point2d* ui_bitmap_size = reinterpret_cast<point2d*>(reticle_bitmap + (i * 0x74) + 0x4);
+			Weapons[i] = ui_bitmap_size;
+			if (!crosshairInit) {
+				defaultCrosshairSizes[i].x = ui_bitmap_size->x;
+				defaultCrosshairSizes[i].y = ui_bitmap_size->y;
+			}
+		}
+	}
+	crosshairInit = true;
+	//point2d* BATRIF1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7aa750);
+	//point2d* SMG1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7A9F9C);
+	//point2d* CRBN1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7ab970);
+	//point2d* BEAMRIF1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA838);
+	//point2d* MAG1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA33C);
+	//point2d* PLASRIF1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA16C);
+	//point2d* SHTGN1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA424);
+	//point2d* SNIP1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA994);
+	//point2d* SWRD1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA8AC);
+	//point2d* ROCKLAUN1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA3B0);
+	//point2d* PLASPI1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA0F8);
+	//point2d* BRUTESHOT1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA7C4);
+	//point2d* NEED1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA254);
+	//point2d* SENTBEAM1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AB5D0);
+	//point2d* WEAPONS[] = { BATRIF1, SMG1, CRBN1, BEAMRIF1, MAG1, PLASRIF1, SHTGN1, SNIP1, SWRD1, ROCKLAUN1, PLASPI1, BRUTESHOT1, NEED1, SENTBEAM1 };
+	//point2d defaultSize[] = { {70, 70}, {110, 110}, {78, 52}, {26, 10}, {50, 50}, {90, 90}, {110, 110}, {20, 20}, {110, 106}, {126, 126}, {106, 91}, {102, 124}, {112, 34}, {70, 38} };
+	//point2d* configArray[] = { &H2Config_BATRIF, &H2Config_SMG, &H2Config_CRBN, &H2Config_BEAMRIF, &H2Config_MAG, &H2Config_PLASRIF, &H2Config_SHTGN, &H2Config_SNIP, &H2Config_SWRD, &H2Config_ROCKLAUN, &H2Config_PLASPI, &H2Config_BRUTESHOT, &H2Config_NEED, &H2Config_SENTBEAM };
 
+	if (h2mod->GetMapType() == scnr_type::Multiplayer) {
+		for (int i = 0; i < 59; i++) {
+			*Weapons[i] = *new point2d{ (short)round(defaultCrosshairSizes[i].x * H2Config_crosshair_scale), (short)round(defaultCrosshairSizes[i].y * H2Config_crosshair_scale) };
+		}
+	}
+}
 
 void H2Tweaks::setCrosshairSize(int size, bool preset) {
 	if (h2mod->Server)
@@ -1009,10 +1056,10 @@ void H2Tweaks::setCrosshairSize(int size, bool preset) {
 
 	point2d disabled = {0, 0};
 	point2d large[] = { {80, 80}, {130, 130}, {114, 76}, {52, 20}, {70, 70}, {110, 110}, {160, 160}, {30, 30}, {164, 158}, {180, 180}, {158, 136}, {152, 186}, {168, 50}, {104, 57} };
+	point2d defaultSize[] = { {70, 70}, {110, 110}, {78, 52}, {26, 10}, {50, 50}, {90, 90}, {110, 110}, {20, 20}, {110, 106}, {126, 126}, {106, 91}, {102, 124}, {112, 34}, {70, 38} };
 	point2d small[] = { {40, 40}, {65, 65}, {57, 38}, {26, 10}, {35, 35}, {55, 55}, {80, 80}, {15, 15}, {82, 79}, {90, 90}, {79, 68}, {76, 93}, {84, 25}, {52, 27} };
 	point2d verySmall[] = { {30, 30}, {40, 40}, {39, 26}, {26, 10}, {25, 25}, {45, 45}, {65, 65}, {12, 12}, {55, 53}, {63, 63}, {53, 45}, {51, 62}, {56, 17}, {35, 19} };
-	point2d defaultSize[] = { {70, 70}, {110, 110}, {78, 52}, {26, 10}, {50, 50}, {90, 90}, {110, 110}, {20, 20}, {110, 106}, {126, 126}, {106, 91}, {102, 124}, {112, 34}, {70, 38} };
-
+	
 	if (preset) {
 		switch (size) {
 		case 1:

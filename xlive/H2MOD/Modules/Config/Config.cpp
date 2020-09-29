@@ -83,6 +83,7 @@ bool H2Config_vip_lock = false;
 bool H2Config_force_even = false;
 bool H2Config_koth_random = true;
 
+float H2Config_crosshair_scale = 1.0f;
 //weapon crosshair sizes
 point2d	H2Config_BATRIF = { 1 , 1 };
 point2d	H2Config_SMG = { 1 , 1 };
@@ -463,6 +464,14 @@ void SaveH2Config() {
 			else {
 				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", std::to_string(H2Config_crosshair_offset).c_str());
 			}
+			if(FloatIsNaN(H2Config_crosshair_scale))
+			{
+				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", "NaN");
+			}
+			else
+			{
+				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", std::to_string(H2Config_crosshair_scale).c_str());
+			}
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "hide_ingame_chat", H2Config_hide_ingame_chat);
@@ -533,34 +542,34 @@ void SaveH2Config() {
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_guide", H2Config_hotkeyIdGuide, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdGuide)).c_str());
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_console", H2Config_hotkeyIdConsole, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdConsole)).c_str());
 
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "\ncrosshair_battle_rifle_width", H2Config_BATRIF.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_battle_rifle_height", H2Config_BATRIF.y);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_smg_width",	H2Config_SMG.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_smg_height", H2Config_SMG.y);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_carbine_width", H2Config_CRBN.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_carbine_height", H2Config_CRBN.y);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_beam_rifle_width", H2Config_BEAMRIF.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_beam_rifle_height", H2Config_BEAMRIF.y);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_magnum_width", H2Config_MAG.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_magnum_height", H2Config_MAG.y);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_plasma_rifle_width", H2Config_PLASRIF.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_plasma_rifle_height", H2Config_PLASRIF.y);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_shotgun_width", H2Config_SHTGN.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_shotgun_height", H2Config_SHTGN.y);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sniper_width", H2Config_SNIP.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sniper_height", H2Config_SNIP.y);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sword_width", H2Config_SWRD.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sword_height", H2Config_SWRD.y);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_rocket_launcher_width", H2Config_ROCKLAUN.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_rocket_launcher_height", H2Config_ROCKLAUN.y);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_plasma_pistol_width", H2Config_PLASPI.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_plasma_pistol_height", H2Config_PLASPI.y);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_bruteshot_width", H2Config_BRUTESHOT.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_bruteshot_height", H2Config_BRUTESHOT.y);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_needler_width", H2Config_NEED.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_needler_height", H2Config_NEED.y);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sentinal_beam_width", H2Config_SENTBEAM.x);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sentinal_beam_height", H2Config_SENTBEAM.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "\ncrosshair_battle_rifle_width", H2Config_BATRIF.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_battle_rifle_height", H2Config_BATRIF.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_smg_width",	H2Config_SMG.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_smg_height", H2Config_SMG.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_carbine_width", H2Config_CRBN.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_carbine_height", H2Config_CRBN.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_beam_rifle_width", H2Config_BEAMRIF.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_beam_rifle_height", H2Config_BEAMRIF.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_magnum_width", H2Config_MAG.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_magnum_height", H2Config_MAG.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_plasma_rifle_width", H2Config_PLASRIF.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_plasma_rifle_height", H2Config_PLASRIF.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_shotgun_width", H2Config_SHTGN.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_shotgun_height", H2Config_SHTGN.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sniper_width", H2Config_SNIP.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sniper_height", H2Config_SNIP.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sword_width", H2Config_SWRD.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sword_height", H2Config_SWRD.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_rocket_launcher_width", H2Config_ROCKLAUN.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_rocket_launcher_height", H2Config_ROCKLAUN.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_plasma_pistol_width", H2Config_PLASPI.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_plasma_pistol_height", H2Config_PLASPI.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_bruteshot_width", H2Config_BRUTESHOT.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_bruteshot_height", H2Config_BRUTESHOT.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_needler_width", H2Config_NEED.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_needler_height", H2Config_NEED.y);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sentinal_beam_width", H2Config_SENTBEAM.x);
+			//ini.SetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sentinal_beam_height", H2Config_SENTBEAM.y);
 		}
 
 		ini.SaveFile(fileConfig);
@@ -697,6 +706,12 @@ void ReadH2Config() {
 				else
 					H2Config_crosshair_offset = NAN;
 
+				std::string crosshair_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", "NaN"));
+				if (crosshair_scale_str != "NaN")
+					H2Config_crosshair_scale = std::stof(crosshair_scale_str);
+				else
+					H2Config_crosshair_scale = 1.0f;
+
 				H2Config_refresh_rate = ini.GetLongValue(H2ConfigVersionSection.c_str(), "refresh_rate", H2Config_refresh_rate);
 				H2Config_mouse_sens = ini.GetLongValue(H2ConfigVersionSection.c_str(), "mouse_sens", H2Config_mouse_sens);
 				H2Config_controller_sens = ini.GetLongValue(H2ConfigVersionSection.c_str(), "controller_sens", H2Config_controller_sens);
@@ -713,7 +728,7 @@ void ReadH2Config() {
 				H2Config_hotkeyIdGuide = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_guide", H2Config_hotkeyIdGuide);
 				H2Config_hotkeyIdConsole = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_console", H2Config_hotkeyIdConsole);
 			
-				H2Config_BATRIF.x = ini.GetLongValue(H2ConfigVersionSection.c_str(), "crosshair_battle_rifle_width", 1);
+			/*	H2Config_BATRIF.x = ini.GetLongValue(H2ConfigVersionSection.c_str(), "crosshair_battle_rifle_width", 1);
 				H2Config_BATRIF.y = ini.GetLongValue(H2ConfigVersionSection.c_str(), "crosshair_battle_rifle_height", 1);
 				H2Config_SMG.x = ini.GetLongValue(H2ConfigVersionSection.c_str(), "crosshair_smg_width", 1);
 				H2Config_SMG.y = ini.GetLongValue(H2ConfigVersionSection.c_str(), "crosshair_smg_height", 1);
@@ -740,7 +755,7 @@ void ReadH2Config() {
 				H2Config_NEED.x = ini.GetLongValue(H2ConfigVersionSection.c_str(), "crosshair_needler_width", 1);
 				H2Config_NEED.y = ini.GetLongValue(H2ConfigVersionSection.c_str(), "crosshair_needler_height", 1);
 				H2Config_SENTBEAM.x = ini.GetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sentinal_beam_width", 1);
-				H2Config_SENTBEAM.y = ini.GetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sentinal_beam_height", 1);
+				H2Config_SENTBEAM.y = ini.GetLongValue(H2ConfigVersionSection.c_str(), "crosshair_sentinal_beam_height", 1);*/
 			}
 
 			// dedicated server only
