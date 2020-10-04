@@ -2,6 +2,8 @@
 
 #include "stdafx.h"
 
+extern std::chrono::high_resolution_clock::duration desiredRenderTime;
+
 static void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont);
 static void drawRect(FLOAT X, FLOAT Y, FLOAT Width, FLOAT Height, D3DCOLOR dColor);
 static void drawHorizontalLine(int x, int y, int width, D3DCOLOR Color);
@@ -35,5 +37,9 @@ namespace GUI
 	extern void Initialize(HWND hWnd);
 	extern void ToggleMenu();
 	extern void ShowAdvancedSettings(bool* p_open = NULL);
+	extern float WidthPercentage(float percent);
+	extern void TextVerticalPad(char* label, float amount);
+	extern void ResetDevice();
+
 };
 

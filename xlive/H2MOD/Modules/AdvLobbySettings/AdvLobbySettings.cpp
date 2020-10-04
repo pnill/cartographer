@@ -14,7 +14,10 @@ char AdvLobbySettings_mp_blind = false;
 bool AdvLobbySettings_flashlight = false;
 bool AdvLobbySettings_disable_kill_volumes = false;
 
+
+
 static void refresh_mp_explosion_physics() {
+	
 	if (!h2mod->Server) {
 		if (AdvLobbySettings_mp_explosion_physics || AdvLobbySettings_mp_sputnik)
 			WriteValue(h2mod->GetAddress(0x17a44b), (BYTE)0x1e);

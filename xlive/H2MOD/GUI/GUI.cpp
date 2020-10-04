@@ -94,7 +94,7 @@ LPD3DXSPRITE pSprite;
 
 using namespace std::chrono;
 high_resolution_clock::time_point nextFrame;
-high_resolution_clock::duration desiredRenderTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / (double)H2Config_fps_limit));
+extern high_resolution_clock::duration desiredRenderTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / (double)H2Config_fps_limit));
 
 void frameTimeManagement() {
 
@@ -186,9 +186,8 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 	smallFont->OnResetDevice();
 	Sprite_Interface->OnLostDevice();
 	Sprite_Interface->OnResetDevice();
-	
-	pD3DPP = vD3DPP;
 
+	pD3DPP = vD3DPP;
 	//Have to invalidate ImGUI on device reset, otherwise it hangs the device in a reset loop.
 	//https://github.com/ocornut/imgui/issues/1464#issuecomment-347469716
 	ImGui_ImplDX9_InvalidateDeviceObjects();
@@ -197,7 +196,10 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
 	return 0;
 }
-
+void GUI::ResetDevice()
+{
+	pDevice->Reset(pD3DPP);
+}
 // #5006 XLiveOnDestroyDevice
 HRESULT WINAPI XLiveOnDestroyDevice()
 {
@@ -691,7 +693,6 @@ void GUI::Initialize(HWND hWnd)
 	io.KeyMap[ImGuiKey_Z] = 'Z';
 
 	ImFont* font1 = io.Fonts->AddFontDefault();
-	font2 = io.Fonts->AddFontFromFileTTF("maps\\fonts\\conduit_itc_light.ttf", (13.0f * 1.5f));
 
 	ImGui_ImplDX9_Init(pDevice);
 
@@ -735,6 +736,7 @@ int WINAPI XLiveRender()
 {
 	if (pDevice)
 	{
+		
 		if (pDevice->TestCooperativeLevel() == D3D_OK)
 		{
 			D3DVIEWPORT9 pViewport;
@@ -940,180 +942,19 @@ int WINAPI XLiveRender()
 	}
 	return 0;
 }
+float GUI::WidthPercentage(float percent)
+{
+	auto Width = ImGui::GetWindowContentRegionWidth();
+	if (ImGui::GetColumnsCount() > 1)
+		Width = ImGui::GetColumnWidth();
+	
+	return Width * (percent / 100.0f);
+}
 
-// #5002: XLiveRender
-//int WINAPI XLiveRender()
-//{
-//
-//	if (pDevice)
-//	{
-//		if (pDevice->TestCooperativeLevel() == D3D_OK)
-//		{
-//			D3DVIEWPORT9 pViewport;
-//			pDevice->GetViewport(&pViewport);
-//
-//			D3DDEVICE_CREATION_PARAMETERS cparams;
-//			pDevice->GetCreationParameters(&cparams);
-//			RECT gameWindowRect;
-//			GetWindowRect(cparams.hFocusWindow, &gameWindowRect);
-//			RECT gameWindowInnerRect;
-//			GetClientRect(cparams.hFocusWindow, &gameWindowInnerRect);
-//
-//			int gameWindowWidth = gameWindowRect.right - gameWindowRect.left - GetSystemMetrics(SM_CXSIZEFRAME);
-//			int gameWindowHeight = gameWindowRect.bottom - gameWindowRect.top;
-//			//TODO: move into chatbox commands
-//			//drawPrimitiveRect(0, 0, gameWindowWidth, 200, D3DCOLOR_ARGB(255, 000, 000, 0));
-//			if (commands->console) {
-//				int x = 0, y = 0;
-//				int height = 400;
-//				float startingPosY = height - 15.0f;
-//				drawPrimitiveRect(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
-//				//drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
-//				drawText(0, startingPosY, COLOR_WHITE, ">>", normalSizeFont);
-//				drawText(35, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
-//
-//				startingPosY -= 12.0f;
-//				for (std::string& it : commands->prevOutput) {
-//					startingPosY -= 15.0f;
-//					drawText(0, startingPosY, COLOR_WHITE, it.c_str(), normalSizeFont);
-//				}
-//			}
-//
-//			DWORD GameGlobals = *h2mod->GetAddress<DWORD*>(0x482D3C, 0x4CB520);
-//			DWORD GameEngine = *(DWORD*)(GameGlobals + 0x8);
-//			bool paused_or_in_menus = (*h2mod->GetAddress<BYTE*>(0x47A568) != 0);
-//
-//			if (GameEngine == 3 || (GameEngine != 3 && paused_or_in_menus)) {
-//				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
-//				if (MasterState == 0)
-//					drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
-//				else if (MasterState == 1)
-//					drawText(0, 15, COLOR_GREY, ServerStatus, smallFont);
-//				else if (MasterState == 2)
-//					drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
-//				else if (MasterState == 10)
-//					drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
-//			}
-//
-//			//drawPrimitiveRect(gameWindowWidth / 1.15, gameWindowHeight - 150, 250, 100, D3DCOLOR_ARGB(155, 41, 65, 129));
-//			//drawText(gameWindowWidth / 1.13, gameWindowHeight - 145, COLOR_WHITE, "Points: 10,000", haloFont);
-//	
-//#pragma region Achievement Rendering		
-//			if (h2mod->AchievementMap.size() > 0)
-//			{
-//				auto it = h2mod->AchievementMap.begin();
-//				
-//				if (it->second == false)
-//				{
-//					h2mod->custom_sound_play(L"sounds/AchievementUnlocked.wav", 0);
-//					it->second = true;
-//				}
-//				
-//				if (achievement_height >= 150)
-//				{
-//					achievement_freeze = true;
-//				}
-//				else
-//					achievement_height = achievement_height + 2;		
-//
-//				float scalar = 11.0f;
-//				D3DXVECTOR3 Position;
-//				Position.x = (gameWindowWidth / 2 - 250 + 3) * scalar;
-//				Position.y = (gameWindowHeight - achievement_height + 3) * scalar;
-//
-//
-//				Sprite_Interface->Begin(D3DXSPRITE_ALPHABLEND);
-//				D3DXVECTOR2 vCenter(0.0f, 0.0f);
-//				D3DXVECTOR2 vScale((1 / scalar), (1 / scalar));
-//				D3DXVECTOR2 vPosition(150.0f, 200.0f);
-//				D3DXVECTOR2 vRotationCenter(0.0f, 0.0f);
-//
-//				D3DXMATRIX mat;
-//
-//
-//
-//				drawPrimitiveRect(gameWindowWidth / 2 - 250, gameWindowHeight - achievement_height, 500, 100, D3DCOLOR_ARGB(155, 000, 000, 000));
-//
-//				size_t delim = it->first.find("|");
-//				std::string achievement_title = it->first.substr(0, delim);
-//				std::string achievement_desc = it->first.substr(delim+1, it->first.size() - delim);
-//
-//				drawText(gameWindowWidth / 2 - 100, gameWindowHeight - (achievement_height - 25), COLOR_WHITE, achievement_title.c_str(), normalSizeFont);
-//				drawText(gameWindowWidth / 2 - 100, gameWindowHeight - (achievement_height - 50), COLOR_WHITE, achievement_desc.c_str(), normalSizeFont);
-//
-//				D3DXMatrixTransformation2D(&mat, &vCenter, NULL, &vScale, NULL, NULL, NULL);
-//				Sprite_Interface->SetTransform(&mat);
-//
-//				Sprite_Interface->Draw(Texture_Interface, NULL, NULL, &Position, 0xFFFFFFFF);
-//				Sprite_Interface->End();
-//
-//				if (achievement_freeze == true)
-//				{
-//					if (achievement_timer >= 400)
-//					{
-//						achievement_freeze = false;
-//						achievement_timer = 0;
-//						achievement_height = 0;
-//						h2mod->AchievementMap.erase(it);
-//					}
-//
-//					achievement_timer++;
-//				}
-//
-//			}
-//#pragma endregion achievement rendering
-//
-//			if (displayXyz && (NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() == scnr_type::SinglePlayer)) {
-//				int text_y_coord = 60;
-//				PlayerIterator playerIt;
-//				while (playerIt.get_next_player()) 
-//				{
-//					real_point3d* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
-//					if (player_position != nullptr) {
-//						std::wstring playerNameWide(playerIt.get_current_player_name());
-//						std::string playerName(playerNameWide.begin(), playerNameWide.end());
-//						std::string xyzText = "Player name: " + playerName + ", xyz = " + std::to_string(player_position->x) + " " + std::to_string(player_position->y) + " " + std::to_string(player_position->z);
-//						drawText(0, text_y_coord, COLOR_GOLD, xyzText.c_str(), normalSizeFont);
-//						text_y_coord += 15;
-//					}
-//				}
-//			}
-//			
-//			if (getDebugTextDisplay()) {
-//				for (int i = 0; i < getDebugTextDisplayCount(); i++) {
-//					const char* text = getDebugText(i);
-//					//int yOffset = 40 + (i * 14);
-//					int yOffset = gameWindowHeight - 55 - (i * 14);
-//					if (yOffset < 35) {
-//						break;
-//					}
-//					if (strlen(text) > 0) {
-//						drawText(10, yOffset, COLOR_WHITE, text, smallFont);
-//					}
-//				}
-//			}
-//
-//			if (Auto_Update_Text) {
-//				drawText(10, 60, COLOR_WHITE, Auto_Update_Text, normalSizeFont);
-//			}
-//			extern long long Size_Of_Download;
-//			extern long long Size_Of_Downloaded;
-//			if (Size_Of_Download > 0) {
-//				drawBox(10, 52, 200, 6, COLOR_RED, COLOR_RED);
-//				drawBox(10, 52, ((Size_Of_Downloaded * 100) / Size_Of_Download) * 2, 6, COLOR_GREEN, COLOR_GREEN);
-//			}
-//
-//			if (NetworkStatistics) {
-//				if (!NetworkSession::getCurrentNetworkSession(NULL)) {
-//					ElapsedTime = 0;
-//					TotalPacketsSent = 0;
-//				}
-//				sprintf(packet_info_str, "[ pck/second %d, pck size average: %d ]", ElapsedTime > 0 ? Packets * 1000 / ElapsedTime : 0, TotalPacketsSent > 0 ? TotalBytesSent / TotalPacketsSent : 0);
-//				drawText(30, 30, COLOR_WHITE, packet_info_str, normalSizeFont);
-//			}
-//		}
-//	}
-//
-//	return 0;
-//}
-
+void GUI::TextVerticalPad(char* label, float amount)
+{
+	ImGui::GetFont()->DisplayOffset.y += 8.5;
+	ImGui::Text(label);
+	ImGui::GetFont()->DisplayOffset.y -= 8.5;
+	//ImGui::SetCursorPosY(cursor_pos.y);
+}

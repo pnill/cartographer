@@ -21,6 +21,7 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "H2MOD/Modules/HudElements/HudElements.h"
 
 
 H2MOD* h2mod = new H2MOD();
@@ -792,9 +793,6 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	get_object_table_memory();
 
 	H2Tweaks::setHz();
-	H2Tweaks::setFOV(H2Config_field_of_view);
-	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
-	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
 
 	// when the game is minimized, the game might skip loading Main menu
 	// this is where resetAfterMatch var comes in for help
@@ -845,7 +843,8 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	{
 		addDebugText("Map type: Multiplayer");
 
-		
+		HudElements::OnMapLoad();
+
 		for (auto gametype_it : GametypesMap)
 		{
 			if (StrStrIW(variant_name, gametype_it.first)) {
@@ -870,10 +869,6 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
-		H2Tweaks::setVisualTweaks();
-		H2Tweaks::setCrosshairSize2();
-		//H2Tweaks::setCrosshairSize(0, false);
-		//H2Tweaks::applyShaderTweaks(); 
 
 		if (get_game_life_cycle() == life_cycle_in_game)
 		{

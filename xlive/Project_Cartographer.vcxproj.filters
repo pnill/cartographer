@@ -46,7 +46,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_list_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\HitFix\HitFix.cpp" />
-    <ClCompile Include="H2MOD\Modules\HudElements\RadarPatch.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\Mouseinput.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Networking.cpp" />
@@ -95,6 +94,7 @@
     <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.cpp" />
     <ClCompile Include="H2MOD\GUI\AdvancedSettings.cpp" />
+    <ClCompile Include="H2MOD\Modules\HudElements\HudElements.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -279,7 +279,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.h" />
     <ClInclude Include="H2MOD\Modules\HitFix\HitFix.h" />
-    <ClInclude Include="H2MOD\Modules\HudElements\RadarPatch.h" />
     <ClInclude Include="H2MOD\Modules\Input\Mouseinput.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Networking.h" />
@@ -333,6 +332,8 @@
     <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.h" />
+    <ClInclude Include="H2MOD\Modules\HudElements\HudElements.h" />
+    <ClInclude Include="H2MOD\Modules\SettingHooks\SettingHooks.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

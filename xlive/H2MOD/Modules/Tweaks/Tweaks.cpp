@@ -1,7 +1,6 @@
 
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\HudElements\RadarPatch.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Utils\Utils.h"
@@ -13,6 +12,7 @@
 #include "..\CustomResolutions\CustomResolutions.h"
 #include "..\H2MOD\Tags\TagInterface.h"
 #include "H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h"
+#include "H2MOD/Modules/HudElements/HudElements.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -31,29 +31,7 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 	return result;
 }
 
-static bool NotDisplayIngameChat() {
-	int GameGlobals = *h2mod->GetAddress<int*>(0x482D3C);
-	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
 
-	if (H2Config_hide_ingame_chat) {
-		PlayerIterator playerIt;
-		datum local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
-		if (playerIt.get_data_at_index(local_player_datum_index.Index)->is_chatting == 2) {
-			extern void hotkeyFuncToggleHideIngameChat();
-			hotkeyFuncToggleHideIngameChat();
-		}
-		return true;
-	}
-
-	else if (*GameEngine != 3 && get_game_life_cycle() == life_cycle_in_game) {
-		//Enable chat in engine mode and game state mp.
-		return false;
-	}
-	else {
-		//original test - if is campaign
-		return *GameEngine == 1;
-	}
-}
 
 typedef char(__cdecl *thookChangePrivacy)(int);
 thookChangePrivacy phookChangePrivacy;
@@ -828,9 +806,7 @@ void InitH2Tweaks() {
 		//Set the LAN Server List Delete Entry After (milliseconds).
 		//WriteValue(h2mod->GetAddress(0x001e9b0a), 9000);
 
-		//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
-		PatchCall(h2mod->GetAddress(0x22667B), NotDisplayIngameChat);
-		PatchCall(h2mod->GetAddress(0x226628), NotDisplayIngameChat);
+
 
 		//hook the gui popup for when the player is booted.
 		sub_20E1D8 = h2mod->GetAddress<int(__cdecl*)(int, int, int, int, int, int)>(0x20E1D8);
@@ -843,7 +819,9 @@ void InitH2Tweaks() {
 
 		WriteJmpTo(h2mod->GetAddress(0x4544), is_init_flag_set);
 
-		RadarPatch();
+		HudElements::Init();
+
+
 		H2Tweaks::sunFlareFix();
 
 		// patch to show game details menu in NETWORK serverlist too
@@ -922,184 +900,12 @@ void H2Tweaks::setSavedSens() {
 		H2Tweaks::setSens("controller", (H2Config_controller_sens));
 }
 
-void H2Tweaks::setFOV(int field_of_view_degrees) {
-
-	if (h2mod->Server)
-		return;
-
-	static float fov = 70.0f * M_PI / 180.0f;
-	static bool fov_redirected = false;
-	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
-	{
-		if (!fov_redirected)
-		{
-			BYTE opcode[6] = { 0xD9, 0x05, 0x00, 0x00, 0x00, 0x00 };
-			WritePointer((DWORD)&opcode[2], &fov);
-			WriteBytes(h2mod->GetAddress(0x907F3), opcode, sizeof(opcode)); // fld dword ptr[fov]
-
-			fov_redirected = true;
-		}
-
-		//const double default_radians_field_of_view = 70.0f * M_PI / 180.0f;
-		fov = (float)field_of_view_degrees * M_PI / 180.0f;
-	}
-}
-
-void H2Tweaks::setVehicleFOV(int field_of_view_degrees) {
-
-	if (h2mod->Server)
-		return;
-
-	if (field_of_view_degrees > 0 && field_of_view_degrees <= 110)
-	{
-		float calculated_radians_FOV = (float)field_of_view_degrees * M_PI / 180.0f;
-		WriteValue(h2mod->GetAddress(0x413780), calculated_radians_FOV); // Third Person
-	}
-}
-
 void H2Tweaks::setHz() {
 
 	if (h2mod->Server)
 		return;
 
 	*h2mod->GetAddress<int*>(0xA3DA08) = H2Config_refresh_rate;
-}
-
-void H2Tweaks::setCrosshairPos(float crosshair_offset) {
-
-	if (h2mod->Server)
-		return;
-
-	if (!FloatIsNaN(crosshair_offset)) {
-
-		tags::tag_data_block* player_controls_block = reinterpret_cast<tags::tag_data_block*>(tags::get_matg_globals_ptr() + 240);
-		if (player_controls_block->block_count > 0)
-		{
-			for (int i = 0; i < player_controls_block->block_count; i++)
-				*(float*)(tags::get_tag_data() + player_controls_block->block_data_offset + 128 * i + 28) = crosshair_offset;
-		}
-	}
-}
-bool crosshairInit = false;
-point2d defaultCrosshairSizes[59];
-void H2Tweaks::setCrosshairSize2()
-{
-	if (h2mod->Server)
-		return;
-	point2d* Weapons[59];
-
-	auto hud_reticles = tags::find_tag(blam_tag::tag_group_type::bitmap, "ui\\hud\\bitmaps\\new_hud\\crosshairs\\hud_reticles");
-	char* hud_reticles_data = tags::get_tag<blam_tag::tag_group_type::bitmap, char>(hud_reticles);
-	tags::tag_data_block* hud_reticles_bitmaps = reinterpret_cast<tags::tag_data_block*>(hud_reticles_data + 0x44);
-	if(hud_reticles_bitmaps->block_data_offset != -1)
-	{
-		char* reticle_bitmap = tags::get_tag_data() + hud_reticles_bitmaps->block_data_offset;
-		for(auto i = 0; i < hud_reticles_bitmaps->block_count; i++)
-		{
-			point2d* ui_bitmap_size = reinterpret_cast<point2d*>(reticle_bitmap + (i * 0x74) + 0x4);
-			Weapons[i] = ui_bitmap_size;
-			if (!crosshairInit) {
-				defaultCrosshairSizes[i].x = ui_bitmap_size->x;
-				defaultCrosshairSizes[i].y = ui_bitmap_size->y;
-			}
-		}
-	}
-	crosshairInit = true;
-	//point2d* BATRIF1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7aa750);
-	//point2d* SMG1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7A9F9C);
-	//point2d* CRBN1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7ab970);
-	//point2d* BEAMRIF1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA838);
-	//point2d* MAG1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA33C);
-	//point2d* PLASRIF1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA16C);
-	//point2d* SHTGN1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA424);
-	//point2d* SNIP1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA994);
-	//point2d* SWRD1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA8AC);
-	//point2d* ROCKLAUN1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA3B0);
-	//point2d* PLASPI1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA0F8);
-	//point2d* BRUTESHOT1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA7C4);
-	//point2d* NEED1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA254);
-	//point2d* SENTBEAM1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AB5D0);
-	//point2d* WEAPONS[] = { BATRIF1, SMG1, CRBN1, BEAMRIF1, MAG1, PLASRIF1, SHTGN1, SNIP1, SWRD1, ROCKLAUN1, PLASPI1, BRUTESHOT1, NEED1, SENTBEAM1 };
-	//point2d defaultSize[] = { {70, 70}, {110, 110}, {78, 52}, {26, 10}, {50, 50}, {90, 90}, {110, 110}, {20, 20}, {110, 106}, {126, 126}, {106, 91}, {102, 124}, {112, 34}, {70, 38} };
-	//point2d* configArray[] = { &H2Config_BATRIF, &H2Config_SMG, &H2Config_CRBN, &H2Config_BEAMRIF, &H2Config_MAG, &H2Config_PLASRIF, &H2Config_SHTGN, &H2Config_SNIP, &H2Config_SWRD, &H2Config_ROCKLAUN, &H2Config_PLASPI, &H2Config_BRUTESHOT, &H2Config_NEED, &H2Config_SENTBEAM };
-
-	if (h2mod->GetMapType() == scnr_type::Multiplayer) {
-		for (int i = 0; i < 59; i++) {
-			*Weapons[i] = *new point2d{ (short)round(defaultCrosshairSizes[i].x * H2Config_crosshair_scale), (short)round(defaultCrosshairSizes[i].y * H2Config_crosshair_scale) };
-		}
-	}
-}
-
-void H2Tweaks::setCrosshairSize(int size, bool preset) {
-	if (h2mod->Server)
-		return;
-
-	point2d* BATRIF1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7aa750);
-	point2d* SMG1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7A9F9C);
-	point2d* CRBN1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7ab970);
-	point2d* BEAMRIF1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA838);
-	point2d* MAG1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA33C);
-	point2d* PLASRIF1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA16C);
-	point2d* SHTGN1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA424);
-	point2d* SNIP1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA994);
-	point2d* SWRD1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA8AC);
-	point2d* ROCKLAUN1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA3B0);
-	point2d* PLASPI1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA0F8);
-	point2d* BRUTESHOT1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA7C4);
-	point2d* NEED1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AA254);
-	point2d* SENTBEAM1 = (point2d*)(tags::get_matg_globals_ptr() + 0x7AB5D0);
-
-	point2d* tempArray = nullptr;
-
-	point2d* WEAPONS[] = { BATRIF1, SMG1, CRBN1, BEAMRIF1, MAG1, PLASRIF1, SHTGN1, SNIP1, SWRD1, ROCKLAUN1, PLASPI1, BRUTESHOT1, NEED1, SENTBEAM1 };
-	point2d* configArray[] = { &H2Config_BATRIF, &H2Config_SMG, &H2Config_CRBN, &H2Config_BEAMRIF, &H2Config_MAG, &H2Config_PLASRIF, &H2Config_SHTGN, &H2Config_SNIP, &H2Config_SWRD, &H2Config_ROCKLAUN, &H2Config_PLASPI, &H2Config_BRUTESHOT, &H2Config_NEED, &H2Config_SENTBEAM };
-
-	point2d disabled = {0, 0};
-	point2d large[] = { {80, 80}, {130, 130}, {114, 76}, {52, 20}, {70, 70}, {110, 110}, {160, 160}, {30, 30}, {164, 158}, {180, 180}, {158, 136}, {152, 186}, {168, 50}, {104, 57} };
-	point2d defaultSize[] = { {70, 70}, {110, 110}, {78, 52}, {26, 10}, {50, 50}, {90, 90}, {110, 110}, {20, 20}, {110, 106}, {126, 126}, {106, 91}, {102, 124}, {112, 34}, {70, 38} };
-	point2d small[] = { {40, 40}, {65, 65}, {57, 38}, {26, 10}, {35, 35}, {55, 55}, {80, 80}, {15, 15}, {82, 79}, {90, 90}, {79, 68}, {76, 93}, {84, 25}, {52, 27} };
-	point2d verySmall[] = { {30, 30}, {40, 40}, {39, 26}, {26, 10}, {25, 25}, {45, 45}, {65, 65}, {12, 12}, {55, 53}, {63, 63}, {53, 45}, {51, 62}, {56, 17}, {35, 19} };
-	
-	if (preset) {
-		switch (size) {
-		case 1:
-			for (int i = 0; i < 14; i++) {
-				*configArray[i] = disabled;
-			}
-			break;
-
-		case 2:
-			tempArray = verySmall;
-			break;
-		case 3:
-			tempArray = small;
-			break;
-		case 4:
-			tempArray = large;
-			break;
-		default:
-			tempArray = defaultSize;
-			break;
-		}
-
-		if (tempArray)
-		{
-			for (int i = 0; i < 14; i++) {
-				*configArray[i] = tempArray[i];
-			}
-		}
-	}
-
-	if (h2mod->GetMapType() == scnr_type::Multiplayer) {
-		for (int i = 0; i < 14; i++) {
-			if (configArray[i]->x == 1 || configArray[i]->x < 0) {
-				*WEAPONS[i] = defaultSize[i];
-			}
-			else {
-				*WEAPONS[i] = *configArray[i];
-			}
-		}
-	}
 }
 
 char ret_0() {
@@ -1160,33 +966,4 @@ void H2Tweaks::WarpFix(bool enable)
 		WriteValue<float>(h2mod->GetAddress(0x4F958C), 2.5);
 		WriteValue<float>(h2mod->GetAddress(0x4F9594), 7.5);
 	}	
-}
-
-void H2Tweaks::setVisualTweaks()
-{
-	//Fix the FP Arms
-	auto fp_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\masterchief\\fp\\shaders\\fp_arms");
-	BYTE* fp_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(fp_shader_datum);
-	if(fp_shader_tag_data != nullptr)
-		*(float*)(fp_shader_tag_data + 0x44) = 1;
-
-	//Fix the Visor
-	//
-	//COMMENTED OUT AS IT HAS BEEN EXPLAINED CHANGING TEMPLATES IS A BAD IDEA, BUT LEAVING IN CASE IT'S DEEMED OKAY IN THE FUTURE
-	//
-	//auto tex_bump_env_datum = tags::find_tag(blam_tag::tag_group_type::shadertemplate, "shaders\\shader_templates\\opaque\\tex_bump_env");
-	//auto visor_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\masterchief\\shaders\\masterchief_visor");
-	//BYTE* visor_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(visor_shader_datum);
-	//
-	//if (visor_shader_tag_data != nullptr) 
-	//{
-	//	auto *visor_pp = reinterpret_cast<tags::tag_data_block*>(visor_shader_tag_data + 0x20);
-	//	if (visor_pp->block_count > 0 && visor_pp->block_data_offset != -1)
-	//	{
-	//		auto visor_pp_data = tags::get_tag_data() + visor_pp->block_data_offset;
-	//		*(unsigned long*)(visor_shader_tag_data + 0x4) = tex_bump_env_datum.data;
-	//	}
-	//}
-	
-		
 }
