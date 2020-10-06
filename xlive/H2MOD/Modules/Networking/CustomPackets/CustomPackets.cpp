@@ -25,11 +25,11 @@ const char* getNetworkMessageName(int enumVal)
 
 void __cdecl encode_map_file_name_packet(bitstream* stream, int a2, s_custom_map_filename* data)
 {
-	stream->data_encode_string("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
+	stream->data_encode_string_wide("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
 }
 bool __cdecl decode_map_file_name_packet(bitstream* stream, int a2, s_custom_map_filename* data)
 {
-	stream->data_decode_string("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
+	stream->data_decode_string_wide("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
 	return stream->packet_is_valid() == false;
 }
 

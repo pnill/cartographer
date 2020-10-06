@@ -164,8 +164,8 @@ signed int __cdecl get_map_load_status_for_all_peers_hook(signed int *smallest_l
 			break;
 
 		case network_session_state_peer_established:
-		case network_session_state_leaving:
-		case network_session_state_session_host:
+		case network_session_state_peer_leaving:
+		case network_session_state_host_established:
 		case network_session_state_host_disband:
 		case network_session_state_host_handoff:
 		case network_session_state_host_reestablish:
