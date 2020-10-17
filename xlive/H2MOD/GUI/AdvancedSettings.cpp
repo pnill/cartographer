@@ -6,6 +6,10 @@
 #include "H2MOD/Modules/HudElements/HudElements.h"
 #include "imgui_internal.h"
 #include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
+#include "H2MOD/AC/AC.h"
+#include "H2MOD/Modules/HitFix/HitFix.h"
+#include "H2MOD/Modules/Input/KeyboardInput.h"
+#include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
 
 float crosshairSize = 1.0f;
 bool g_showHud = true;
@@ -13,6 +17,8 @@ bool g_showFP = true;
 bool g_UncappedFPS = false;
 bool g_experimentalFPSPatch = false;
 int g_fpsLimit = 60;
+int g_raw_scale = (int)H2Config_raw_mouse_scale;
+bool g_hitfix = true;
 void GUI::ShowAdvancedSettings(bool* p_open)
 {
 	ImGuiWindowFlags window_flags = 0;
@@ -25,6 +31,17 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 		ImGui::SetNextWindowBgAlpha(1);
 	if(ImGui::Begin("  Advanced Settings", p_open, window_flags))
 	{
+		ImGui::Text("Anti-Cheat: ");
+		ImGui::SameLine();
+		if(H2Config_anti_cheat_enabled)
+		{
+			ImGui::Text("Enabled");
+		}
+		else
+		{
+			ImGui::Text("Disabled");
+		}
+		ImGui::NewLine();
 		ImVec2 item_size = ImGui::GetItemRectSize();
 		if (ImGui::CollapsingHeader("HUD Settings"))
 		{
@@ -211,9 +228,9 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 				desiredRenderTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
 			}
 			ImGui::SameLine();
-			ImGui::Checkbox("Experimental Uncapped FPS Fix", &g_experimentalFPSPatch);
+			ImGui::Checkbox("Experimental Uncapped FPS Fix", &H2Config_experimental_fps);
 			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("This will enabled experimental changes to the way the games engine renders.");
+				ImGui::SetTooltip("This will enabled experimental changes to the way the games engine renders.\nA restart is required for the changes to take effect.");
 
 			//ImGui::Columns(2, "VideoSettings", false);
 			//Refresh Rate
@@ -270,7 +287,14 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 			//Disable Ingame Keyboard
 			TextVerticalPad("Disable Keyboard Input", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##KeyboardInput", &H2Config_disable_ingame_keyboard);
+			if(ImGui::Checkbox("##KeyboardInput", &H2Config_disable_ingame_keyboard))
+			{
+				KeyboardInput::ToggleKeyboardInput();
+			}
+			else
+			{
+				KeyboardInput::ToggleKeyboardInput();
+			}
 
 			ImGui::NextColumn();
 
@@ -281,7 +305,32 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("This setting requires a restart to take effect.");
 			ImGui::Columns(1);
+
+			ImGui::Text("Raw Mouse Scale");
+			ImGui::PushItemWidth(GUI::WidthPercentage(70));
+			ImGui::SliderInt("##RawMouseScale1", &g_raw_scale, 1, 100, ""); ImGui::SameLine();
+			if(ImGui::IsItemEdited())
+			{
+				H2Config_raw_mouse_scale = (float)g_raw_scale;
+			}
+			ImGui::PushItemWidth(WidthPercentage(20));
+			ImGui::InputInt("##RawMouseScale2", &g_raw_scale, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+			if (ImGui::IsItemEdited()) {
+				if (g_raw_scale > 100)
+					g_raw_scale = 100;
+				if (g_raw_scale < 1)
+					g_raw_scale = 1;
+				H2Config_raw_mouse_scale = (float)g_raw_scale;
+			}
+			ImGui::PushItemWidth(WidthPercentage(10));
+			if (ImGui::Button("Reset##RawMouseScale2", ImVec2(WidthPercentage(10), item_size.y)))
+			{
+				g_raw_scale = 25;
+				H2Config_raw_mouse_scale = 25.0f;
+			}
+			ImGui::PopItemWidth();
 			ImGui::NewLine();
+
 		}
 
 		if(ImGui::CollapsingHeader("Host Settings"))
@@ -292,92 +341,126 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 			TextVerticalPad("Anger", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullAnger", &Skulls->Anger);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Enemies and allies fire their weapons faster and more frequently.");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("Assassins", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullAssassins", &Skulls->Assassians);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("All enemies in game are permanently cloaked. Allies can sometimes\nsee them but mostly they can't, so they can't help much.");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("Black Eye", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullBlackEye", &Skulls->Black_Eye);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Your shield does not charge normally. To charge your shields you\nmust kill something (enemy, ally, or turret) with a melee attack");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("Blind", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullBlind", &Skulls->Blind);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Your heads-up display becomes invisible. In other words, you cannot\nsee your weapon (unless it's the Energy Sword, which has a glitched appearance with this Skull),\n body, shields, ammunition, motion tracker, or use your flashlight.\nMuzzle flare from weapons though, are still visible.");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("Catch", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullCatch", &Skulls->Catch);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("A.I. will throw more grenades. Also, everybody (allies and enemies)\nwill drop two grenades of their kind (humans drop frag grenades and aliens drop plasma grenades)\nFlood will drop grenades depending on whether they're human or Covenant.");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("Envy", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullEnvy", &Skulls->Envy);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip(" The Master Chief now has an Active camouflage just like the Arbiter's.\nHowever, there is no visible timer, so remember: five second cloak with ten second recharge on Legendary");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("Famine", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullFamine", &Skulls->Famine);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("All dropped weapons have half ammo. Weapons that spawned on the floor or\nspawned with are unaffected.");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("Ghost", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullGhost", &Skulls->Ghost);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("A.I. characters will not flinch from attacks, melee or otherwise.");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("Grunt Birthday Party", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullGBP", &Skulls->Grunt_Birthday_Party);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Headshots turn into Plasma Grenade explosions.");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("Iron", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullIron", &Skulls->Iron);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("When playing co-op, if either player dies the game restarts you at your last checkpoint.");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("IWHBYD", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullIWHBYD", &Skulls->IWHBYD);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("The rarity of combat dialog is changed, rare lines become far more common but common lines are still present at their normal rate");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("Mythic", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullMythic", &Skulls->Mythic);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Enemies have more health and shielding, and are therefore harder to kill.");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("Sputnik", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullSputnik", &Skulls->Sputnik);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("The mass of certain objects is severely reduced, making them fly further when smacked with a melee hit, or when they are near an explosion");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("Thunderstorm", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullThunderstorm", &Skulls->Thunderstorm);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Causes most enemy and ally units to be their highest rank.");
 
 			ImGui::NextColumn();
 
 			TextVerticalPad("Whuppopotamus", 8.5);
 			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 			ImGui::Checkbox("##SkullWhuppopatamus", &Skulls->Whuppopotamus);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Strengthens the hearing of both allies and enemies");
 
 			ImGui::Columns(1);
+			ImGui::Separator();
+			if (NetworkSession::getCurrentNetworkSession()->session_host_peer_index == NetworkSession::getLocalPeerIndex()) {
+				ImGui::Checkbox("Anti-Cheat##AC", &H2Config_anti_cheat_enabled);
+			}
 		}
 
 		if(ImGui::CollapsingHeader("Project Settings"))
@@ -385,7 +468,18 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 			TextVerticalPad("Discord Rich Presence", 8.5);
 			ImGui::SameLine();
 			ImGui::Checkbox("##DRP", &H2Config_discord_enable);
+			ImGui::NewLine();
 		}
+#if DISPLAY_DEV_TESTING_MENU
+		if(ImGui::CollapsingHeader("Dev Testing"))
+		{
+			ImGui::Checkbox("Projectile Update Tickrate Patch", &g_hitfix);
+			if (g_hitfix)
+				HitFix_Projectile_Tick_Rate = 30.0f;
+			else
+				HitFix_Projectile_Tick_Rate = 60.0f;
+		}
+#endif
 		ImGui::End();
 	}
 }

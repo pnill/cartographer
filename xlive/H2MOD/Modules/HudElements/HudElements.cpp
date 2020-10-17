@@ -8,6 +8,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "H2MOD/Modules/Utils/Utils.h"
+#include "H2MOD/Modules/Console/ConsoleCommands.h"
 
 static bool b_showHUD = true;
 static bool b_showFirstPerson = true;
@@ -34,7 +35,7 @@ static bool RenderIngameChat() {
 		return *GameEngine == 1;
 	}
 }
-
+skull_enabled_flags* SkullFlags;
 static bool __cdecl RenderFirstPersonCheck(unsigned int a1)
 {
 	if (AdvLobbySettings_mp_blind & 0b10)
@@ -48,7 +49,7 @@ static bool __cdecl RenderHudCheck(unsigned int a1)
 	DWORD new_hud_globals = *(DWORD*)(H2BaseAddr + 0x9770F4);
 	float& hud_opacity = *(float*)(new_hud_globals + 0x228); // set the opacity
 
-	if (!b_showHUD || AdvLobbySettings_mp_blind & 0b01)
+	if (!b_showHUD || SkullFlags->Blind)
 	{
 		hud_opacity = 0.f;
 		hud_opacity_reset = false;
@@ -97,14 +98,17 @@ void HudElements::setCrosshairPos() {
 
 	if (h2mod->Server)
 		return;
-
+	commands->display("Setting Chrosshair position");
 	if (!FloatIsNaN(H2Config_crosshair_offset)) {
-
+		commands->display("Crosshair override position is:" + std::to_string(H2Config_crosshair_offset));
 		tags::tag_data_block* player_controls_block = reinterpret_cast<tags::tag_data_block*>(tags::get_matg_globals_ptr() + 240);
+		commands->display("Player_Controls_Block: " + IntToString<int>(player_controls_block->block_data_offset, std::hex) + " : " + IntToString<int>(player_controls_block->block_count));
 		if (player_controls_block->block_count > 0)
 		{
-			for (int i = 0; i < player_controls_block->block_count; i++)
+			for (int i = 0; i < player_controls_block->block_count; i++) {
+				commands->display("Setting Player Control Tag Block Index: " + IntToString<int>(i));
 				*(float*)(tags::get_tag_data() + player_controls_block->block_data_offset + 128 * i + 28) = H2Config_crosshair_offset;
+			}
 		}
 	}
 }
@@ -194,6 +198,7 @@ void HudElements::Init()
 {
 	if (H2IsDediServer)
 		return;
+	SkullFlags = reinterpret_cast<skull_enabled_flags*>(h2mod->GetAddress(0x4D8320));
 	ApplyHooks();
 	setFOV();
 	setVehicleFOV();

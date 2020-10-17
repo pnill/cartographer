@@ -82,8 +82,11 @@ char H2Config_stats_authkey[32] = { "" };
 bool H2Config_vip_lock = false;
 bool H2Config_force_even = false;
 bool H2Config_koth_random = true;
+bool H2Config_experimental_fps = false;
+bool H2Config_anti_cheat_enabled = false;
 
 float H2Config_crosshair_scale = 1.0f;
+float H2Config_raw_mouse_scale = 25.0f;
 //weapon crosshair sizes
 point2d	H2Config_BATRIF = { 1 , 1 };
 point2d	H2Config_SMG = { 1 , 1 };
@@ -395,7 +398,10 @@ void SaveH2Config() {
 				"\n# True (default) will have the server select the hill randomly"
 				"\n# false will have the server select the hill in order"
 				"\n\n"
-				;
+
+				"# enable_anti_cheat (Server):"
+				"\n# This flag will enable anti-cheat on your server."
+				"\n\n";
       
 		}
 
@@ -457,6 +463,8 @@ void SaveH2Config() {
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3dex);
 
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "controller_sens", H2Config_controller_sens);
+			
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
 
 			if (FloatIsNaN(H2Config_crosshair_offset)) {
 				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN");
@@ -472,6 +480,15 @@ void SaveH2Config() {
 			{
 				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", std::to_string(H2Config_crosshair_scale).c_str());
 			}
+			if(FloatIsNaN(H2Config_raw_mouse_scale))
+			{
+				ini.SetValue(H2ConfigVersionSection.c_str(), "raw_mouse_scale", "0.045");
+			}
+			else
+			{
+				ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", std::to_string(H2Config_raw_mouse_scale).c_str());
+			}
+
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "hide_ingame_chat", H2Config_hide_ingame_chat);
@@ -514,6 +531,7 @@ void SaveH2Config() {
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "force_even", H2Config_force_even);
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random);
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_anti_cheat", H2Config_anti_cheat_enabled);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 
@@ -699,7 +717,7 @@ void ReadH2Config() {
 
 				H2Config_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "field_of_view", H2Config_field_of_view);
 				H2Config_vehicle_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view);
-
+				H2Config_experimental_fps = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
 				std::string crosshair_offset_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN"));
 				if (crosshair_offset_str != "NaN")
 					H2Config_crosshair_offset = std::stof(crosshair_offset_str);
@@ -711,6 +729,8 @@ void ReadH2Config() {
 					H2Config_crosshair_scale = std::stof(crosshair_scale_str);
 				else
 					H2Config_crosshair_scale = 1.0f;
+				std::string raw_mouse_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "raw_mouse_scale", "25"));
+				H2Config_raw_mouse_scale = std::stof(raw_mouse_scale_str);
 
 				H2Config_refresh_rate = ini.GetLongValue(H2ConfigVersionSection.c_str(), "refresh_rate", H2Config_refresh_rate);
 				H2Config_mouse_sens = ini.GetLongValue(H2ConfigVersionSection.c_str(), "mouse_sens", H2Config_mouse_sens);
@@ -777,6 +797,7 @@ void ReadH2Config() {
 				H2Config_vip_lock = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
 				H2Config_force_even = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "force_even", H2Config_force_even);
 				H2Config_koth_random = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random);
+				H2Config_anti_cheat_enabled = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "enable_anti_cheat", H2Config_anti_cheat_enabled);
 
 				const char* login_identifier = ini.GetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 				if (login_identifier) {

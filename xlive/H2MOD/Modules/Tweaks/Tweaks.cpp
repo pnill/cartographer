@@ -837,7 +837,8 @@ void InitH2Tweaks() {
 		WriteValue<bool>(h2mod->GetAddress(0x41F650), false);
 	}
 
-	UncappedFPS::ApplyPatches();
+	if(H2Config_experimental_game_main_loop_patches)
+		UncappedFPS::ApplyPatches();
 
 	addDebugText("End Startup Tweaks.");
 }

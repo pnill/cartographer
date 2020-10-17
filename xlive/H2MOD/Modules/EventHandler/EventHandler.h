@@ -71,6 +71,30 @@ struct GameLoopEventCallback
 	}
 };
 
+struct PlayerControlChangeEventCallback
+{
+	std::string name;
+	std::function<void(float, float)> callback;
+	PlayerControlChangeEventCallback(std::string name, std::function<void(float, float)> callback)
+	{
+		this->name = name;
+		this->callback = callback;
+	}
+};
+
+struct MapLoadEventCallback
+{
+	std::string name;
+	scnr_type Type;
+	std::function<void()> callback;
+	MapLoadEventCallback(std::string name, scnr_type type, std::function<void()> callback)
+	{
+		this->name = name;
+		this->Type = type;
+		this->callback = callback;
+	}
+};
+
 struct ServerCommandEventCallback
 {
 	std::string name;
@@ -173,4 +197,14 @@ namespace EventHandler
 	 * \param command The server command that has been called
 	 */
 	void executeServerCommandCallback(ServerConsole::ServerConsoleCommands command);
+
+	void registerPlayerControlCallback(PlayerControlChangeEventCallback callback, bool threaded);
+
+	void removePlayerControlCallback(std::string name);
+
+	void executePlayerControlCallback(float yaw, float pitch);
+
+	void registerMapLoadCallback(MapLoadEventCallback callback, bool threaded);
+	void removeMapLoadCallback(std::string name);
+	void executeMapLoadCallback(scnr_type map_type);
 }

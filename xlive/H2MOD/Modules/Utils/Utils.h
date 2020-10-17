@@ -90,7 +90,7 @@ int TrimRemoveConsecutiveSpaces(char* text);
 
 //Converts int types to string given a format std::oct, std::dec, std::hex.
 template<class T>
-std::string IntToString(T t, std::ios_base & (*f)(std::ios_base&))
+std::string IntToString(T t, std::ios_base & (*f)(std::ios_base&) = std::dec)
 {
 	std::ostringstream stream;
 	(stream << f << t);

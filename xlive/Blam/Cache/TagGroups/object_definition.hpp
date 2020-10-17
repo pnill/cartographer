@@ -1,7 +1,8 @@
 #pragma once
 #include "..\Blam\Cache\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
-#include "..\Blam\Maths\real_math.hpp"
+#include "..\Blam\Maths\real_math.h"
+#include "visit_struct/visit_struct.hpp"
 
 /*********************************************************************
 * name: object
@@ -212,5 +213,29 @@ struct s_object_group_definition :TagGroup<'obje'>
 	tag_block<s_predicted_resources_block> predicted_resources;//0xB4
 };
 TAG_GROUP_SIZE_ASSERT(s_object_group_definition, 0xBC);
+
+VISITABLE_STRUCT(s_object_group_definition, object_flags, bounding_radius, bounding_offset_x, bounding_offset_y, bounding_offset_z, acceleration_scale, 
+	lightmap_shadow_mode, sweetener_size, dynamic_light_sphere_radius, dynamic_light_sphere_offset, default_model_variant, model, crate_object, modifier_shader, 
+	creation_effect, material_effects, ai_properties, functions, apply_collision_damage_scale, min_game_acc_default, max_game_acc_default, min_game_scale_default, 
+	max_game_scale_default, min_abs_acc_default, max_abs_acc_default, min_abs_scale_default, max_abs_scale_default, hud_text_message_index, attachments, widgets,
+	old_functions, change_colors, predicted_resources);
+
+VISITABLE_STRUCT(s_object_group_definition::s_ai_properties_block, ai_flags, ai_type_name, ai_size, leap_jump_speed);
+
+VISITABLE_STRUCT(s_object_group_definition::s_functions_block, flags, import_name, export_name, turn_off_with, min_value, data, scale_by);
+
+VISITABLE_STRUCT(s_object_group_definition::s_attachments_block, type, marker_old_string_id, change_color, primary_scale, secondary_scale);
+
+VISITABLE_STRUCT(s_object_group_definition::s_widgets_block, type);
+
+VISITABLE_STRUCT(s_object_group_definition::s_old_functions_block, old_string_id);
+
+VISITABLE_STRUCT(s_object_group_definition::s_change_colors_block, initial_permutations, functions);
+
+VISITABLE_STRUCT(s_object_group_definition::s_change_colors_block::s_initial_permutations_block, weight, color_lower_bound, color_upper_bound, variant_name);
+
+VISITABLE_STRUCT(s_object_group_definition::s_change_colors_block::s_functions_block, scale_flags, color_lower_bound, color_upper_bound, darken_by, scale_by);
+
+VISITABLE_STRUCT(s_object_group_definition::s_predicted_resources_block, type, resource_index, tag_index);
 #pragma pack(pop)
 

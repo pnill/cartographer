@@ -509,6 +509,7 @@ struct s_weapon_group_definition :TagGroup<'weap'>
 	PAD(0xC);//0x308
 	float first_person_scope_size_i;//0x314
 	float first_person_scope_size_j;//0x318
+
 };
 TAG_GROUP_SIZE_ASSERT(s_weapon_group_definition, 0x31C);
 

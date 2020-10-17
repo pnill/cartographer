@@ -8,6 +8,7 @@
 #include "..\..\MapManager\MapManager.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/Modules/Utils/Utils.h"
+#include "H2MOD/Modules/Config/Config.h"
 
 char g_network_message_types[e_network_message_types::end * 32];
 
@@ -64,6 +65,16 @@ bool __cdecl decode_rank_change_packet(bitstream* stream, int a2, s_rank_change*
 	return stream->packet_is_valid() == false;
 }
 
+void __cdecl encode_anti_cheat_packet(bitstream* stream, int a2, s_anti_cheat* data)
+{
+	stream->data_encode_bool("anti-cheat-enabled", data->enabled);
+}
+bool __cdecl decode_anti_cheat_packet(bitstream* stream, int a2, s_anti_cheat* data)
+{
+	data->enabled = stream->data_decode_bool("anti-cheat-enabled");
+	return stream->packet_is_valid() == false;
+}
+
 void register_custom_packets(void* network_messages)
 {
 	typedef void(__cdecl* register_test_packet)(void* network_messages);
@@ -82,6 +93,9 @@ void register_custom_packets(void* network_messages)
 
 	register_packet_impl(network_messages, rank_change, "rank-change", 0, sizeof(s_rank_change), sizeof(s_rank_change),
 		(void*)encode_rank_change_packet, (void*)decode_rank_change_packet, NULL);
+
+	register_packet_impl(network_messages, anti_cheat, "anti-cheat", 0, sizeof(s_anti_cheat), sizeof(s_anti_cheat),
+		(void*)encode_anti_cheat_packet, (void*)decode_anti_cheat_packet, NULL);
 }
 
 typedef void(__stdcall *handle_out_of_band_message)(void *thisx, network_address* address, int message_type, int a4, void* packet);
@@ -251,6 +265,17 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			{
 				s_rank_change* recieved_data = (s_rank_change*)packet;
 				h2mod->set_local_rank(recieved_data->rank);
+				return;
+
+			}
+		}
+	case anti_cheat:
+		{
+			if(peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
+			{
+				s_anti_cheat* recieved_data = (s_anti_cheat*)packet;
+				H2Config_anti_cheat_enabled = recieved_data->enabled;
+				return;
 			}
 		}
 	case leave_session:
@@ -319,6 +344,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		{
 			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
 			EventHandler::executeNetworkPlayerAddCallbacks(peer_index);
+			CustomPackets::sendAntiCheat(peer_index);
 		}
 	}
 }
@@ -386,7 +412,23 @@ void CustomPackets::sendRankChange(int peerIndex, byte rank)
 		}
 	}
 }
+void CustomPackets::sendAntiCheat(int peerIndex)
+{
+	network_session* session = NetworkSession::getCurrentNetworkSession();
 
+	if (NetworkSession::localPeerIsSessionHost())
+	{
+
+		network_observer* observer = session->network_observer_ptr;
+		peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peerIndex);
+
+		s_anti_cheat data;
+		data.enabled = H2Config_anti_cheat_enabled;
+		if (observer_channel->field_1) {
+			observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, anti_cheat, sizeof(s_anti_cheat), &data);
+		}
+	}
+}
 
 void CustomPackets::ApplyGamePatches()
 {

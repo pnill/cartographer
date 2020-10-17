@@ -10,10 +10,13 @@
 // TODO: move the struct time_globals in here somewhere else
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS/UncappedFPS.h"
 
+float HitFix_Projectile_Tick_Rate = 30.0f;
+
 // game logic is updated synchronously, this shouldn't cause any issues
 // TODO: find if there is any way to add function arguments in a compiled function lol
 datum projectileToBeUpdated;
 bool updateInstantaneousProjectile = false;
+
 
 typedef void(__cdecl* projectile_update_def)(datum projectile_object_index, real_point3d *a2);
 projectile_update_def p_projectile_update;
@@ -61,7 +64,7 @@ float __cdecl get_seconds_per_tick_internal_patch()
 		&& (updateInstantaneousProjectile || *(DWORD*)(object_data + 428) == p_time_globals->tick_count))
 	{
 		//LOG_TRACE_GAME("get_time_delta_internal() - projectile obj index: {}, projectile creation tick: {}, current tick count {}", projectileToBeUpdated.ToAbsoluteIndex(), *(DWORD*)(object_data + 428), p_time_globals->tick_count);
-		timeDelta = timeDelta * (float)((float)p_time_globals->ticks_per_second / 30.0f);
+		timeDelta = timeDelta * (float)((float)p_time_globals->ticks_per_second / HitFix_Projectile_Tick_Rate);
 	}
 
 	return timeDelta;

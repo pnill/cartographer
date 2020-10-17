@@ -87,7 +87,7 @@ struct s_unit_group_definition :TagGroup<'unit'>
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_camera_tracks_block, 0x8);
 	tag_block<s_camera_tracks_block> camera_tracks;//0xE8
-	PAD(0xC);//0xF0
+	real_vector3d accel_range;//0xF0
 	float accel_action_scale;//0xFC
 	float accel_attach_scale;//0x100
 	float soft_ping_threshold;//0x104
@@ -204,7 +204,7 @@ struct s_unit_group_definition :TagGroup<'unit'>
 		string_id boarding_melee_string;//0x18
 		float ping_scale;//0x1C
 		float turnover_time;//0x20
-		PAD(0xC);//0x24
+		real_vector3d accel_range; //0x24
 		float accel_action_scale;//0x30
 		float accel_attach_scale;//0x34
 		float ai_scariness;//0x38

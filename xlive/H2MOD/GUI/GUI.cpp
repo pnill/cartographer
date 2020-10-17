@@ -7,6 +7,7 @@
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD/Modules/Input/PlayerControl.h"
 
 
 extern void InitInstance();
@@ -901,6 +902,7 @@ int WINAPI XLiveRender()
 				sprintf(packet_info_str, "[ pck/second %d, pck size average: %d ]", ElapsedTime > 0 ? Packets * 1000 / ElapsedTime : 0, TotalPacketsSent > 0 ? TotalBytesSent / TotalPacketsSent : 0);
 				drawText(30, 30, COLOR_WHITE, packet_info_str, normalSizeFont);
 			}
+			PlayerControl::GetControls(0)->DisableCamera = doDrawIMGUI;
 			if (doDrawIMGUI) {
 				ImGuiIO& io = ImGui::GetIO();
 
@@ -914,7 +916,7 @@ int WINAPI XLiveRender()
 				ImGui_ImplDX9_NewFrame();
 				ImGuiWin32Frame();
 				ImGui::NewFrame();
-
+				
 				ImGui::ShowDemoWindow();
 				ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
@@ -934,7 +936,6 @@ int WINAPI XLiveRender()
 				pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 				pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 				D3DCOLOR clear_col_dx = D3DCOLOR_RGBA((int)(clear_color.x*255.0f), (int)(clear_color.y*255.0f), (int)(clear_color.z*255.0f), (int)(clear_color.w*255.0f));
-
 				ImGui::Render();
 				ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 			}

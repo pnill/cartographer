@@ -15,6 +15,7 @@
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/GUI/GUI.h"
+#include "H2MOD/AC/AC.h"
 
 extern LPDIRECT3DDEVICE9 pDevice;
 

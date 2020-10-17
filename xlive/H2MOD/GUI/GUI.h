@@ -2,6 +2,8 @@
 
 #include "stdafx.h"
 
+#define DISPLAY_DEV_TESTING_MENU 1
+
 extern std::chrono::high_resolution_clock::duration desiredRenderTime;
 
 static void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont);

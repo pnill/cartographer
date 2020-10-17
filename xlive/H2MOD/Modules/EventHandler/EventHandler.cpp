@@ -17,6 +17,12 @@ namespace EventHandler
 
 		std::vector<ServerCommandEventCallback> serverCommandCallbacks;
 		std::vector<ServerCommandEventCallback> serverCommandCallbacksThreaded;
+
+		std::vector< PlayerControlChangeEventCallback> playerControlCallbacks;
+		std::vector< PlayerControlChangeEventCallback> playerControlCallbacksThreaded;
+
+		std::vector<MapLoadEventCallback> mapLoadCallbacks;
+		std::vector<MapLoadEventCallback> mapLoadCallbacksThreaded;
 	}
 	void registerGameStateCallback(GameStateCallback callback, bool threaded)
 	{
@@ -269,6 +275,109 @@ namespace EventHandler
 				if (cb.command == command || command == ServerConsole::any) {
 					cb.callback();
 				}
+			}
+		}
+	}
+
+	void registerPlayerControlCallback(PlayerControlChangeEventCallback callback, bool threaded)
+	{
+		if (threaded) {
+			auto it = std::find_if(playerControlCallbacksThreaded.begin(), playerControlCallbacksThreaded.end(),
+				[&callback](const PlayerControlChangeEventCallback &obj) {return obj.name == callback.name;});
+			if (it == playerControlCallbacksThreaded.end())
+				playerControlCallbacksThreaded.push_back(callback);
+		}
+		else {
+			auto it = std::find_if(playerControlCallbacks.begin(), playerControlCallbacks.end(),
+				[&callback](const PlayerControlChangeEventCallback &obj) {return obj.name == callback.name;});
+			if (it == playerControlCallbacks.end())
+				playerControlCallbacks.push_back(callback);
+		}
+	}
+
+	void removePlayerControlCallback(std::string name)
+	{
+		auto it = std::find_if(playerControlCallbacksThreaded.begin(), playerControlCallbacksThreaded.end(),
+			[&name](const PlayerControlChangeEventCallback &obj) {return obj.name == name;});
+		if (it != playerControlCallbacksThreaded.end())
+			playerControlCallbacksThreaded.erase(playerControlCallbacksThreaded.begin() +
+				std::distance(playerControlCallbacksThreaded.begin(), it));
+
+		it = std::find_if(playerControlCallbacks.begin(), playerControlCallbacks.end(),
+			[&name](const PlayerControlChangeEventCallback &obj) {return obj.name == name;});
+		if (it != playerControlCallbacks.end())
+			playerControlCallbacks.erase(playerControlCallbacks.begin() +
+				std::distance(playerControlCallbacks.begin(), it));
+	}
+
+	void executePlayerControlCallback(float yaw, float pitch)
+	{
+		if (!playerControlCallbacksThreaded.empty())
+		{
+			auto executeThreaded = [](float yaw, float pitch)
+			{
+				for (auto &cb : playerControlCallbacksThreaded) {
+					
+						cb.callback(yaw, pitch);
+				}
+			};
+			std::thread(executeThreaded, yaw, pitch).detach();
+		}
+		if (!playerControlCallbacks.empty()) {
+			for (auto &cb : playerControlCallbacks) {
+					cb.callback(yaw, pitch);
+			}
+		}
+	}
+
+	void registerMapLoadCallback(MapLoadEventCallback callback, bool threaded)
+	{
+		if (threaded) {
+			auto it = std::find_if(mapLoadCallbacksThreaded.begin(), mapLoadCallbacksThreaded.end(),
+				[&callback](const MapLoadEventCallback &obj) {return obj.name == callback.name;});
+			if (it == mapLoadCallbacksThreaded.end())
+				mapLoadCallbacksThreaded.push_back(callback);
+		}
+		else {
+			auto it = std::find_if(mapLoadCallbacks.begin(), mapLoadCallbacks.end(),
+				[&callback](const MapLoadEventCallback &obj) {return obj.name == callback.name;});
+			if (it == mapLoadCallbacks.end())
+				mapLoadCallbacks.push_back(callback);
+		}
+	}
+
+	void removeMapLoadCallback(std::string name)
+	{
+		auto it = std::find_if(mapLoadCallbacksThreaded.begin(), mapLoadCallbacksThreaded.end(),
+			[&name](const MapLoadEventCallback &obj) {return obj.name == name;});
+		if (it != mapLoadCallbacksThreaded.end())
+			mapLoadCallbacksThreaded.erase(mapLoadCallbacksThreaded.begin() +
+				std::distance(mapLoadCallbacksThreaded.begin(), it));
+
+		it = std::find_if(mapLoadCallbacks.begin(), mapLoadCallbacks.end(),
+			[&name](const MapLoadEventCallback &obj) {return obj.name == name;});
+		if (it != mapLoadCallbacks.end())
+			mapLoadCallbacks.erase(mapLoadCallbacks.begin() +
+				std::distance(mapLoadCallbacks.begin(), it));
+	}
+
+	void executeMapLoadCallback(scnr_type map_type)
+	{
+		if (!mapLoadCallbacksThreaded.empty())
+		{
+			auto executeThreaded = [](scnr_type map_type)
+			{
+				for (auto &cb : mapLoadCallbacksThreaded) {
+					if(map_type == cb.Type)
+						cb.callback();
+				}
+			};
+			std::thread(executeThreaded, map_type).detach();
+		}
+		if (!mapLoadCallbacks.empty()) {
+			for (auto &cb : mapLoadCallbacks) {
+				if(map_type == cb.Type)
+					cb.callback();
 			}
 		}
 	}
