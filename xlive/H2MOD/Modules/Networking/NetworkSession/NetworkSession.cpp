@@ -28,7 +28,7 @@ bool NetworkSession::localPeerIsSessionHost()
 {
 	e_network_session_state state = getCurrentNetworkSession()->local_session_state;
 
-	return state == network_session_state_session_host
+	return state == network_session_state_host_established
 		|| state == network_session_state_host_disband
 		|| state == network_session_state_host_handoff
 		|| state == network_session_state_host_reestablish;
