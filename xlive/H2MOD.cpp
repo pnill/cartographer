@@ -21,6 +21,14 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "H2MOD/Modules/HudElements/HudElements.h"
+#include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
+#include "H2MOD/Modules/MainLoopPatches/TestGameTimePrep.h"
+#include "H2MOD/Modules/Input/PlayerControl.h"
+#include "H2MOD/Modules/Input/KeyboardInput.h"
+#include "Blam/Cache/TagGroups/vehicle_definition.hpp"
+#include "H2MOD/Tags/MetaExtender.h"
+#include "Blam/Cache/TagGroups/projectile_definition.hpp"
 
 
 H2MOD* h2mod = new H2MOD();
@@ -792,10 +800,7 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	get_object_table_memory();
 
 	H2Tweaks::setHz();
-	H2Tweaks::setFOV(H2Config_field_of_view);
-	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
-	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
-
+	//EventHandler::executeMapLoadCallback(h2mod->GetMapType());
 	// when the game is minimized, the game might skip loading Main menu
 	// this is where resetAfterMatch var comes in for help
 	if (resetAfterMatch)
@@ -830,8 +835,9 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
+		MetaExtender::free_tag_blocks();
 		return result;
-	}		
+	}
 
 
 	wchar_t* variant_name = NetworkSession::getGameVariantName();
@@ -845,7 +851,6 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	{
 		addDebugText("Map type: Multiplayer");
 
-		
 		for (auto gametype_it : GametypesMap)
 		{
 			if (StrStrIW(variant_name, gametype_it.first)) {
@@ -853,7 +858,6 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 				gametype_it.second = true; // enable a gametype if substring is found
 			}
 		}
-
 		if (!b_XboxTick) 
 		{
 			H2X::Initialize(b_H2X);
@@ -867,12 +871,12 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 			H2Tweaks::applyMeleePatch(false);
 			engine_settings->tickrate = XboxTick::setTickRate(true);
 		}
-		
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
-		H2Tweaks::setVisualTweaks();
-		H2Tweaks::setCrosshairSize(0, false);
-		//H2Tweaks::applyShaderTweaks(); 
+		EventHandler::executeMapLoadCallback(scnr_type::Multiplayer);
+		HudElements::OnMapLoad();
+
+
 
 		if (get_game_life_cycle() == life_cycle_in_game)
 		{
@@ -900,6 +904,8 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 		//H2X::Initialize(true);
 		H2Tweaks::applyMeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
+		HudElements::OnMapLoad();
+		EventHandler::executeMapLoadCallback(scnr_type::SinglePlayer);
 	}
 
 	// if we got this far, it means map is MP or SP, and if map load is called again, it should reset/deinitialize any custom gametypes
@@ -1556,6 +1562,7 @@ void H2MOD::ApplyHooks() {
 
 	HitFix::ApplyPatches();
 
+
 	// bellow hooks applied to specific executables
 	if (this->Server == false) {
 
@@ -1573,7 +1580,7 @@ void H2MOD::ApplyHooks() {
 		show_error_screen_method = (show_error_screen)DetourFunc(h2mod->GetAddress<BYTE*>(0x20E15A), (BYTE*)showErrorScreen, 8);
 
 		//TODO: turn on if you want to debug halo2.exe from start of process
-		//is_debugger_present_method = (is_debugger_present)DetourFunc(h2mod->GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
+		is_debugger_present_method = (is_debugger_present)DetourFunc(h2mod->GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
 
 		//TODO: use for object spawn hooking
 		//0x132163
@@ -1610,6 +1617,7 @@ void H2MOD::ApplyHooks() {
 		PatchCall(h2mod->GetAddress(0x226702), game_mode_engine_draw_team_indicators);
 
 		//Initialise_tag_loader();
+		PlayerControl::ApplyHooks();
 	}
 	else {
 
@@ -1633,6 +1641,7 @@ void H2MOD::Initialize()
 	{
 		if (H2Config_raw_input)
 			Mouseinput::Initialize();
+		KeyboardInput::Init();
 
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
@@ -1640,6 +1649,7 @@ void H2MOD::Initialize()
 			DiscordInterface::Init();
 			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
 		}
+		
 	}
 
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");

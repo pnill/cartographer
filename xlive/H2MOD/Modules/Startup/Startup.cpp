@@ -18,6 +18,7 @@
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
 #include <filesystem>
+#include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 
 namespace filesystem = std::experimental::filesystem;
 
@@ -455,6 +456,7 @@ void InitH2Startup() {
 	initGSCustomMenu();
 	extern void initGSRunLoop();
 	initGSRunLoop();
+	UncappedFPS2::Init();
 	addDebugText("ProcessStartup finished.");
 }
 

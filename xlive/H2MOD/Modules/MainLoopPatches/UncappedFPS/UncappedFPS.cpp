@@ -44,7 +44,7 @@ void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out
 	}*/
 
 #if USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE
-	time_globals* timeGlobals = get_game_time_globals();
+	time_globals* timeGlobals = time_globals::get_game_time_globals();
 	if (p_unk_check() && !timeGlobals->game_is_paused && timeGlobals->game_speed > 0.f)
 	{
 		float game_speed_in_ticks = timeGlobals->game_speed * timeGlobals->ticks_per_second;

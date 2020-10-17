@@ -37,6 +37,14 @@ struct angle
 	{
 		return rad;
 	}
+	inline bool operator==(const angle& lhs) const
+	{
+		return (lhs.rad == rad);
+	}
+	inline bool operator!=(const angle& lhs) const
+	{
+		return !operator==(lhs);
+	}
 };
 CHECK_STRUCT_SIZE(angle, sizeof(float));
 
@@ -74,6 +82,14 @@ struct real_vector3d
 		angle.pitch = acos(j);
 		angle.roll = acos(k);
 		return angle;
+	}
+	inline bool operator==(const real_vector3d& lhs) const
+	{
+		return (lhs.i == i && lhs.j == j && lhs.k == k);
+	}
+	inline bool operator!=(const real_vector3d& lhs) const
+	{
+		return !operator==(lhs);
 	}
 };
 CHECK_STRUCT_SIZE(real_vector3d, sizeof(float) * 3);

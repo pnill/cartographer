@@ -4,7 +4,7 @@
 
 #define player_identifier_size_bits CHAR_BIT * sizeof(XUID)
 
-enum e_network_message_types
+enum e_network_message_types : int
 {
 	ping,
 	pong,
@@ -61,6 +61,7 @@ enum e_network_message_types
 	custom_map_filename,
 	team_change,
 	rank_change,
+	anti_cheat,
 
 	end
 };
@@ -121,6 +122,7 @@ static const char* network_message_name[] = {
 	"map_file_name"
 	"team_change"
 	"rank_change"
+	"anti_cheat"
 };
 
 struct __declspec(align(8)) s_custom_map_filename
@@ -141,6 +143,11 @@ struct s_team_change
 struct s_rank_change
 {
 	BYTE rank;
+};
+
+struct s_anti_cheat
+{
+	bool enabled;
 };
 
 #pragma pack(push, 1)
@@ -167,4 +174,5 @@ namespace CustomPackets
 	void sendRequestMapFilename();
 	void sendTeamChange(int peerIndex, int teamIndex);
 	void sendRankChange(int peerIndex, byte rank);
+	void sendAntiCheat(int peerIndex);
 }

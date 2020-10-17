@@ -131,6 +131,19 @@ datum tags::find_tag(blam_tag type, const std::string &name)
 	return datum::Null;
 }
 
+std::map<datum, std::string> tags::find_tags(blam_tag type)
+{
+	std::map<datum, std::string> result;
+	for (auto &it = tag_datum_name_map.begin(); it != tag_datum_name_map.end(); it++)
+	{
+		auto instance = tags::get_tag_instances()[it->first];
+		if (is_tag_or_parent_tag(instance.type, type)) {
+			result.emplace(index_to_datum(it->first), std::string(it->second));
+		}
+	}
+	return result;
+}
+
 static std::vector<void(*)()> load_callbacks;
 void tags::on_map_load(void(*callback)())
 {

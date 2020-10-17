@@ -77,6 +77,8 @@ extern char H2Config_stats_authkey[32];
 extern bool H2Config_vip_lock;
 extern bool H2Config_force_even;
 extern bool H2Config_koth_random;
+extern bool H2Config_experimental_fps;
+extern bool H2Config_anti_cheat_enabled;
 
 extern int H2Config_hotkeyIdHelp;
 extern int H2Config_hotkeyIdToggleDebug;
@@ -87,6 +89,8 @@ extern int H2Config_hotkeyIdGuide;
 extern int H2Config_hotkeyIdConsole;
 extern int H2Config_minimum_player_start;
 
+extern float H2Config_raw_mouse_scale;
+extern float H2Config_crosshair_scale;
 extern point2d H2Config_BATRIF;
 extern point2d H2Config_SMG;
 extern point2d H2Config_CRBN;

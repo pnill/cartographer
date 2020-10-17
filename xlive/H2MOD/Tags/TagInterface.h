@@ -257,7 +257,7 @@ namespace tags
 		Returns the tag datum or a null datum
 	*/
 	datum find_tag(blam_tag type, const std::string &name);
-
+	std::map<datum, std::string> find_tags(blam_tag type);
 
 	struct ilterator
 	{
@@ -285,5 +285,6 @@ namespace tags
 
 			return datum::Null;
 		}
+
 	};
 }

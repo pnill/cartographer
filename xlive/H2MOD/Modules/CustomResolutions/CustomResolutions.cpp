@@ -60,6 +60,5 @@ void CustomResolution::Initialize()
 	video_options[13].res_x = 640;
 	video_options[13].res_y = 480;
 	video_options[13].unk = 0;
-
 	qsort_s(video_options, TOTAL_RESOLUTIONS, sizeof(s_display_res), compare, NULL);
 }
