@@ -462,6 +462,11 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 				HitFix_Projectile_Tick_Rate = 30.0f;
 			else
 				HitFix_Projectile_Tick_Rate = 60.0f;
+			if(ImGui::Button("Dump Game Globals"))
+			{
+				auto game_globals = Blam::EngineDefinitions::game_globals(**h2mod->GetAddress<Blam::EngineDefinitions::game_globals**>(0x482D3C));
+				LOG_INFO_GAME(game_globals.engine_settings.game_variant.variant_name);
+			}
 		}
 #endif
 		ImGui::End();

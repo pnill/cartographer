@@ -917,7 +917,6 @@ int WINAPI XLiveRender()
 				ImGuiWin32Frame();
 				ImGui::NewFrame();
 				
-				ImGui::ShowDemoWindow();
 				ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
 				ImGui::PushFont(font2);

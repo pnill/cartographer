@@ -501,6 +501,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.h" />
     <ClInclude Include="Blam\Common\Common.h" />
+    <ClInclude Include="Blam\Engine\Game\GameEngineEnum.h" />
     <ClInclude Include="Blam\Maths\integer_math.h" />
     <ClInclude Include="Blam\Maths\real_math.h" />
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />

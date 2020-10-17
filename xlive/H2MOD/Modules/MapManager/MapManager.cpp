@@ -376,7 +376,26 @@ void get_map_download_source_str(int a1, wchar_t* buffer)
 	if (buffer != NULL)
 		wcsncpy_s(buffer, 512, repo_wstr, -1);
 }
+/*
+	Seems to be a function responsible for loading data about maps when displaying them.
+	This is hooked to fix/re-add removed custom map images.
+*/
+DWORD ret_addr;
+void __declspec(naked) load_map_data_for_display() {
+	__asm {
+		pop ret_addr
+		mov eax, [esp + 0x0C] // grab map_data pointer from stack
+		mov ecx, [eax + 0x964] // mov bitmap pointer into ecx
+		mov[ebx], ecx // mov bitmap pointer into map_data on stack
+		push 0
+		push 0x9712C8 // original data to be loaded back to eax, (replaces the original function call)
+		mov ecx, h2mod
+		call H2MOD::GetAddress // get data original function got, and return
+		push ret_addr // push return address to stack
+		ret // return to original load_map_data_for display function
 
+	}
+}
 /**
 * Makes changes to game functionality
 */
@@ -395,6 +414,8 @@ void MapManager::applyHooks() {
 		PatchCall(h2mod->GetAddress(0x22EE41), get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
 		PatchCall(h2mod->GetAddress(0x244B8F), get_map_download_source_str);
 		PatchCall(h2mod->GetAddress(0x244B9D), get_receiving_map_string);
+		//Hooked to fix custom map images.
+		Codecave(h2mod->GetAddress(0x593F0), load_map_data_for_display, 0);
 	}
 
 	// Both server and client
@@ -434,6 +455,7 @@ void MapManager::setMapFileNameToDownload(std::string mapFilenameToDownload) {
 void MapManager::clearMapFileNameToDownload() {
 	this->mapFilenameToDownload.clear();
 }
+
 
 /**
 * Gets a copy of the english map name as a wstring

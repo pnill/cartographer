@@ -22,14 +22,9 @@
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "H2MOD/Modules/HudElements/HudElements.h"
-#include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
-#include "H2MOD/Modules/MainLoopPatches/TestGameTimePrep.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "Blam/Cache/TagGroups/vehicle_definition.hpp"
 #include "H2MOD/Tags/MetaExtender.h"
-#include "Blam/Cache/TagGroups/projectile_definition.hpp"
-
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -778,10 +773,10 @@ void get_object_table_memory()
 	game_state_objects_header = *h2mod->GetAddress<s_datum_array**>(0x4E461C, 0x50C8EC);
 }
 
-typedef bool(__cdecl *map_cache_load)(game_engine_settings* map_load_settings);
+typedef bool(__cdecl *map_cache_load)(Blam::EngineDefinitions::game_engine_settings* map_load_settings);
 map_cache_load p_map_cache_load;
 
-bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
+bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_settings)
 {
 	static bool resetAfterMatch = false;
 
@@ -800,7 +795,6 @@ bool __cdecl OnMapLoad(game_engine_settings* engine_settings)
 	get_object_table_memory();
 
 	H2Tweaks::setHz();
-	//EventHandler::executeMapLoadCallback(h2mod->GetMapType());
 	// when the game is minimized, the game might skip loading Main menu
 	// this is where resetAfterMatch var comes in for help
 	if (resetAfterMatch)
@@ -1618,6 +1612,8 @@ void H2MOD::ApplyHooks() {
 
 		//Initialise_tag_loader();
 		PlayerControl::ApplyHooks();
+		
+		
 	}
 	else {
 

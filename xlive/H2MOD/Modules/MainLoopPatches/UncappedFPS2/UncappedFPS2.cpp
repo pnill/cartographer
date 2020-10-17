@@ -3,6 +3,7 @@
 #include "Util/Hooks/Hook.h"
 #include "Blam/Cache/TagGroups/globals_definition.hpp"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/Config/Config.h"
 
 BYTE lobby[] = { 0x53, 0x30, 0xDB };
 BYTE ingame[] = { 0xB0, 0x01, 0xC3 };
