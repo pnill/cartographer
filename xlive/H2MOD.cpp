@@ -22,7 +22,6 @@
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "H2MOD/Modules/HudElements/HudElements.h"
-#include "H2MOD/AC/AC.h"
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "H2MOD/Modules/MainLoopPatches/TestGameTimePrep.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"

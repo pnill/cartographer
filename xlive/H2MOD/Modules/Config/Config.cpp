@@ -482,7 +482,7 @@ void SaveH2Config() {
 			}
 			if(FloatIsNaN(H2Config_raw_mouse_scale))
 			{
-				ini.SetValue(H2ConfigVersionSection.c_str(), "raw_mouse_scale", "0.045");
+				ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", "25");
 			}
 			else
 			{
@@ -729,7 +729,7 @@ void ReadH2Config() {
 					H2Config_crosshair_scale = std::stof(crosshair_scale_str);
 				else
 					H2Config_crosshair_scale = 1.0f;
-				std::string raw_mouse_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "raw_mouse_scale", "25"));
+				std::string raw_mouse_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", "25"));
 				H2Config_raw_mouse_scale = std::stof(raw_mouse_scale_str);
 
 				H2Config_refresh_rate = ini.GetLongValue(H2ConfigVersionSection.c_str(), "refresh_rate", H2Config_refresh_rate);

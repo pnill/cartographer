@@ -6,7 +6,6 @@
 #include "H2MOD/Modules/HudElements/HudElements.h"
 #include "imgui_internal.h"
 #include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
-#include "H2MOD/AC/AC.h"
 #include "H2MOD/Modules/HitFix/HitFix.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
@@ -17,7 +16,6 @@ bool g_showFP = true;
 bool g_UncappedFPS = false;
 bool g_experimentalFPSPatch = false;
 int g_fpsLimit = 60;
-int g_raw_scale = (int)H2Config_raw_mouse_scale;
 bool g_hitfix = true;
 void GUI::ShowAdvancedSettings(bool* p_open)
 {
@@ -31,17 +29,6 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 		ImGui::SetNextWindowBgAlpha(1);
 	if(ImGui::Begin("  Advanced Settings", p_open, window_flags))
 	{
-		ImGui::Text("Anti-Cheat: ");
-		ImGui::SameLine();
-		if(H2Config_anti_cheat_enabled)
-		{
-			ImGui::Text("Enabled");
-		}
-		else
-		{
-			ImGui::Text("Disabled");
-		}
-		ImGui::NewLine();
 		ImVec2 item_size = ImGui::GetItemRectSize();
 		if (ImGui::CollapsingHeader("HUD Settings"))
 		{
@@ -307,13 +294,14 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 			ImGui::Columns(1);
 
 			ImGui::Text("Raw Mouse Scale");
-			ImGui::PushItemWidth(GUI::WidthPercentage(70));
+			ImGui::PushItemWidth(GUI::WidthPercentage(80));
+			int g_raw_scale = (int)H2Config_raw_mouse_scale;
 			ImGui::SliderInt("##RawMouseScale1", &g_raw_scale, 1, 100, ""); ImGui::SameLine();
 			if(ImGui::IsItemEdited())
 			{
 				H2Config_raw_mouse_scale = (float)g_raw_scale;
 			}
-			ImGui::PushItemWidth(WidthPercentage(20));
+			ImGui::PushItemWidth(WidthPercentage(10));
 			ImGui::InputInt("##RawMouseScale2", &g_raw_scale, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 			if (ImGui::IsItemEdited()) {
 				if (g_raw_scale > 100)
@@ -457,10 +445,6 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 				ImGui::SetTooltip("Strengthens the hearing of both allies and enemies");
 
 			ImGui::Columns(1);
-			ImGui::Separator();
-			if (NetworkSession::getCurrentNetworkSession()->session_host_peer_index == NetworkSession::getLocalPeerIndex()) {
-				ImGui::Checkbox("Anti-Cheat##AC", &H2Config_anti_cheat_enabled);
-			}
 		}
 
 		if(ImGui::CollapsingHeader("Project Settings"))
