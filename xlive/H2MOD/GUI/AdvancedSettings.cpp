@@ -4,7 +4,7 @@
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Modules/Startup/Startup.h"
 #include "H2MOD/Modules/HudElements/HudElements.h"
-#include "imgui_internal.h"
+#include "3rdparty/imgui/imgui_internal.h"
 #include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
 #include "H2MOD/Modules/HitFix/HitFix.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
@@ -23,8 +23,8 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 	window_flags |= ImGuiWindowFlags_NoCollapse;
 	window_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
-	ImGui::SetNextWindowSize(ImVec2(650, 500), ImGuiCond_Appearing);
-	ImGui::SetNextWindowSizeConstraints(ImVec2(610, 500), ImVec2(1920, 1080));
+	ImGui::SetNextWindowSize(ImVec2(650, 510), ImGuiCond_Appearing);
+	ImGui::SetNextWindowSizeConstraints(ImVec2(610, 510), ImVec2(1920, 1080));
 	if(h2mod->GetMapType() == MainMenu)
 		ImGui::SetNextWindowBgAlpha(1);
 	if(ImGui::Begin("  Advanced Settings", p_open, window_flags))

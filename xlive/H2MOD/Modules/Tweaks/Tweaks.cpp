@@ -16,6 +16,7 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "H2MOD/Modules/MainLoopPatches/TestGameTimePrep.h"
 
 #pragma region Done_Tweaks
 

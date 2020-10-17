@@ -80,7 +80,10 @@ BOOL __cdecl t_is_init_flag_set(t_startup_flags id)
 	DWORD* init_flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
 	return init_flags_array[id] != 0;
 }
-
+int ftoi(float in)
+{
+	return *reinterpret_cast<int*>(&in);
+}
 void __cdecl game_time_globals_prep(float dt, float *out_dt, int *out_target_ticks)
 {
 	int *v4; // r14
@@ -187,9 +190,9 @@ void __cdecl game_time_globals_prep(float dt, float *out_dt, int *out_target_tic
 		valid_game_speed = (float)((float)v17->ticks_per_second * v7)
 			+ v17->field_10;
 		v35 = valid_game_speed + 0.000099999997;
-		v8 = fminf(floor(v35), 1);
-			//(((unsigned __int8)((signed int)(valid_game_speed + 0.000099999997f) >> 23) - 127) >> 31) & 
-				//((((signed int)(valid_game_speed + 0.000099999997f) >> 31) ^ ((signed int)((signed int)(valid_game_speed + 0.000099999997f) & 0x7FFFFF | 0x800000) >> (-106 - ((signed int)(valid_game_speed + 0.000099999997f) >> 23)))) - ((signed int)(valid_game_speed + 0.000099999997f) >> 31));
+		//v8 = fminf(floor(v35), 1);
+		int fi = ftoi(valid_game_speed + 0.000099999997);
+		v8 = ~(((unsigned __int8)(fi >> 23) - 127) >> 31) & (((fi >> 31) ^ ((signed int)(fi & 0x7FFFFF | 0x800000) >> (-106 - (fi >> 23)))) - (fi >> 31));
 		if (cinimatic_is_running() && get_tickrate() > 30)
 		{
 			if (t_is_init_flag_set(unk21))
@@ -257,15 +260,8 @@ LABEL_50:
 	valid_game_speed_2 = (float)((float)*(signed __int16 *)(v14 + 2) * v7) + *(float *)(v14 + 16);
 	v35 = valid_game_speed_2 + 0.000099999997;
 	//v30 = fminf(floor(v35), 1);
-		//(((unsigned __int8)(static_cast< signed int>(valid_game_speed_2 + 0.000099999997f) >> 23) - 127) >> 31) & (((static_cast<signed int>(valid_game_speed_2 + 0.000099999997f) >> 31) ^ ((signed int)(static_cast<signed int>(valid_game_speed_2 + 0.000099999997f) & 0x7FFFFF | 0x800000) >> (-106 - (static_cast<signed int>(valid_game_speed_2 + 0.000099999997f) >> 23)))) - (static_cast<signed int>(valid_game_speed_2 + 0.000099999997f) >> 31));
-	auto a = (static_cast<signed int>(valid_game_speed_2 + 0.000099999997f) >> 23);
-	auto b = ((unsigned __int8)a - 127);
-	auto c = (static_cast<signed int>(valid_game_speed_2 + 0.000099999997f) >> 31);
-
-	auto d = (signed int)(static_cast<signed int>(valid_game_speed_2 + 0.000099999997f) & 0x7FFFFF | 0x800000);
-	auto e = (static_cast<signed int>(valid_game_speed_2 + 0.000099999997f) >> 23);
-	auto f = (static_cast<signed int>(valid_game_speed_2 + 0.000099999997f) >> 31);
-	v30 = (b >> 31) & ((c ^ (d >> (-106 - e))) - f);
+	int fi = ftoi(valid_game_speed + 0.000099999997);
+	v30 = ~(((unsigned __int8)(fi >> 23) - 127) >> 31) & (((fi >> 31) ^ ((signed int)(fi & 0x7FFFFF | 0x800000) >> (-106 - (fi >> 23)))) - (fi >> 31));
 	if (!cinimatic_is_running())
 		goto LABEL_81;
 	v13 = get_tickrate();
@@ -304,15 +300,15 @@ LABEL_50:
 		v8 = v30;
 LABEL_53:
 	
-	*(float *)(v14 + 16) = abs(valid_game_speed - (float)v8);
+	*(float *)(v14 + 16) = v6;
 	addDebugText(IntToString<float>(v7, std::dec).c_str());
 	addDebugText(IntToString<float>(v8, std::dec).c_str());
 	addDebugText(IntToString<float>(v6, std::dec).c_str());
 	if (v5)
-		*v5 = abs(v7);
+		*v5 = v7;
 	if (v4)
-		*v4 = abs(v8);
-	//*(float *)(v14 + 40) = (float)v8;
+		*v4 = v8;
+	*(float *)(v14 + 40) = (float)v8;
 }
 
 
@@ -326,5 +322,5 @@ void TestGameTimePrep::Init()
 	cinimatic_is_running = h2mod->GetAddress<c_cinematic_is_running*>(0x3a938);
 	get_tickrate = h2mod->GetAddress<c_get_tickrate*>(0x28707);
 
-	//PatchCall(h2mod->GetAddress(0x39d04), game_time_globals_prep);
+	PatchCall(h2mod->GetAddress(0x39d04), game_time_globals_prep);
 }
