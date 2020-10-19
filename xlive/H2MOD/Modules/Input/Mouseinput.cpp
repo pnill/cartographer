@@ -64,18 +64,18 @@ void Mouseinput::Initialize()
 	base = h2mod->GetAddress(0x0);
 	ms = (DIMOUSESTATE*)(base + 0x47A570);
 	dx = (float*)(base + 0x4AE610);
-	VirtualProtect(dx, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	//VirtualProtect(dx, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	dy = (float*)(base + 0x4AE614);
-	VirtualProtect(dy, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	//VirtualProtect(dy, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	ReadBytesProtected(base + 0x627CC, o_SetDX, 8);
 	ReadBytesProtected(base + 0x62802, o_SetDY, 8);
 	ReadBytesProtected(base + 0x627E7, o_SetDX2, 8);
 	auto setDx = (base + 0x627CC);
-	VirtualProtect((LPVOID)setDx, 8, PAGE_EXECUTE_READWRITE, &dwBack);
+	//VirtualProtect((LPVOID)setDx, 8, PAGE_EXECUTE_READWRITE, &dwBack);
 	auto setDy = (base + 0x62802);
-	VirtualProtect((LPVOID)setDy, 8, PAGE_EXECUTE_READWRITE, &dwBack);
+	//VirtualProtect((LPVOID)setDy, 8, PAGE_EXECUTE_READWRITE, &dwBack);
 	auto setDx2 = (base + 0x627E7);
-	VirtualProtect((LPVOID)setDx2, 8, PAGE_EXECUTE_READWRITE, &dwBack);
+	//VirtualProtect((LPVOID)setDx2, 8, PAGE_EXECUTE_READWRITE, &dwBack);
 	c_mouse_input = h2mod->GetAddress<p_mouse_input*>(0x61ea2);
 	PatchCall(h2mod->GetAddress(0x62f65), mouse_input);
 }

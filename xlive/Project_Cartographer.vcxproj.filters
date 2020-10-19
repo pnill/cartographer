@@ -100,6 +100,7 @@
     <ClCompile Include="H2MOD\Modules\Input\PlayerControl.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
+    <ClCompile Include="H2MOD\Modules\Twizzler\Twizzler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -346,6 +347,7 @@
     <ClInclude Include="3rdparty\visit_struct\visit_struct.hpp" />
     <ClInclude Include="Blam\Engine\Game\GameEngine.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngineEnum.h" />
+    <ClInclude Include="H2MOD\Modules\Twizzler\Twizzler.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

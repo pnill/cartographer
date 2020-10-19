@@ -15,6 +15,7 @@
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/GUI/GUI.h"
+#include "H2MOD/Modules/MainLoopPatches/UncappedFPS/UncappedFPS.h"
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
@@ -339,6 +340,58 @@ static char HookedServerShutdownCheck() {
 	//original test - if game should shutdown
 	return Quit_Exit_Game;
 }
+typedef void(_cdecl p_present_rendered_screen)();
+p_present_rendered_screen* present_rendered_screen;
+
+typedef char(p_sub_9A96B1)();
+p_sub_9A96B1* sub_9A96B1;
+
+typedef bool(p_game_in_simulation)();
+p_game_in_simulation* game_in_simulation;
+
+typedef void(__cdecl p_observer_update)(float a1);
+p_observer_update* observer_update;
+
+LARGE_INTEGER freq;
+LARGE_INTEGER start_tick;
+LARGE_INTEGER end_tick;
+LARGE_INTEGER start_render;
+LARGE_INTEGER end_render;
+double render_time;
+bool init = false;
+void alt_main_game_loop_hook()
+{
+
+	QueryPerformanceCounter(&end_tick);
+	time_globals* time_globals = time_globals::get_game_time_globals();
+	double tick_time = (static_cast<double>(end_tick.QuadPart - start_tick.QuadPart) / freq.QuadPart);// -render_time;
+	if (tick_time >= time_globals->seconds_per_tick || !init)
+	{
+		QueryPerformanceCounter(&start_tick);
+		if (!QuitGSMainLoop)
+			GSMainLoop();
+		init = true;
+		main_game_loop();
+		EventHandler::executeGameLoopCallbacks();
+
+		mapManager->leaveSessionIfAFK();
+	}
+	if (H2Config_fps_limit != 0) {
+		QueryPerformanceCounter(&end_render);
+		render_time = static_cast<double>(end_render.QuadPart - start_render.QuadPart) / freq.QuadPart;
+		if (render_time >= (1.0f / H2Config_fps_limit)) {
+			QueryPerformanceCounter(&start_render);
+			present_rendered_screen();
+		}
+	}
+	else
+	{
+		present_rendered_screen();
+	}
+
+	
+}
+
 
 void initGSRunLoop() {
 	addDebugText("Pre GSRunLoop Hooking.");
@@ -349,7 +402,20 @@ void initGSRunLoop() {
 	else {
 		addDebugText("Hooking Loop Function");
 		main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
-		PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
+		
+		if (!H2Config_experimental_fps) {
+			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
+		}
+		else {
+			PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
+			present_rendered_screen = h2mod->GetAddress<p_present_rendered_screen*>(0x27002A);
+			sub_9A96B1 = h2mod->GetAddress<p_sub_9A96B1*>(0x396B1);
+			game_in_simulation = h2mod->GetAddress<p_game_in_simulation*>(0x1ADD30);
+			observer_update = h2mod->GetAddress<p_observer_update*>(0x83E6A);
+			QueryPerformanceFrequency(&freq);
+			//Remove original render call
+			NopFill(h2mod->GetAddress(0x39DAA), 5);
+		}
 	}
 	addDebugText("Post GSRunLoop Hooking.");
 }

@@ -83,7 +83,7 @@ bool H2Config_vip_lock = false;
 bool H2Config_force_even = false;
 bool H2Config_koth_random = true;
 bool H2Config_experimental_fps = false;
-bool H2Config_anti_cheat_enabled = false;
+bool H2Config_anti_cheat_enabled = true;
 
 float H2Config_crosshair_scale = 1.0f;
 float H2Config_raw_mouse_scale = 25.0f;

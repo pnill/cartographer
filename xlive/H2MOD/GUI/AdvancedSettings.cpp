@@ -9,6 +9,9 @@
 #include "H2MOD/Modules/HitFix/HitFix.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
+#include "H2MOD/Modules/Stats/StatsHandler.h"
+#include "H2MOD/Modules/Input/PlayerControl.h"
+#include "Util/Hooks/Hook.h"
 
 float crosshairSize = 1.0f;
 bool g_showHud = true;
@@ -22,13 +25,29 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 	ImGuiWindowFlags window_flags = 0;
 	window_flags |= ImGuiWindowFlags_NoCollapse;
 	window_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
+	//window_flags |= ImGuiWindowFlags_MenuBar;
 
-	ImGui::SetNextWindowSize(ImVec2(650, 510), ImGuiCond_Appearing);
-	ImGui::SetNextWindowSizeConstraints(ImVec2(610, 510), ImVec2(1920, 1080));
+	ImGui::SetNextWindowSize(ImVec2(650, 530), ImGuiCond_Appearing);
+	ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
 	if(h2mod->GetMapType() == MainMenu)
 		ImGui::SetNextWindowBgAlpha(1);
-	if(ImGui::Begin("  Advanced Settings", p_open, window_flags))
+	std::string AcStatus = "  Advanced Settings - Anti-Cheat: ";
+	if (H2Config_anti_cheat_enabled)
+		AcStatus += "Enabled";
+	else
+		AcStatus += "Disabled";
+	if(ImGui::Begin(AcStatus.c_str(), p_open, window_flags))
 	{
+		/*if(ImGui::BeginMenuBar())
+		{
+			if(ImGui::MenuItem("Close"))
+			{
+				*p_open = false;
+			}
+
+			ImGui::MenuItem(AcStatus.c_str(), 0, false, true);
+			ImGui::EndMenuBar();
+		}*/
 		ImVec2 item_size = ImGui::GetItemRectSize();
 		if (ImGui::CollapsingHeader("HUD Settings"))
 		{
@@ -320,131 +339,146 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 			ImGui::NewLine();
 
 		}
+		if (NetworkSession::localPeerIsSessionHost()) {
+			if (ImGui::CollapsingHeader("Host Settings"))
+			{
+				TextVerticalPad("Anti-Cheat", 8.5);
+				ImGui::SameLine();
+				if(ImGui::Checkbox("##Anti-Cheat", &H2Config_anti_cheat_enabled))
+				{
+					for(auto i = 0; i < NetworkSession::getCurrentNetworkSession()->membership.peer_count; i++)
+					{
+						CustomPackets::sendAntiCheat(i);
+					}
+				}
+				if(ImGui::IsItemHovered())
+				{
+					ImGui::SetTooltip("Allows you to disable the Anti-Cheat for your lobby.");
+				}
+				ImGui::Separator();
+				auto Skulls = reinterpret_cast<skull_enabled_flags*>(h2mod->GetAddress(0x4D8320));
+				ImGui::Columns(3, "", false);
 
-		if(ImGui::CollapsingHeader("Host Settings"))
-		{
-			auto Skulls = reinterpret_cast<skull_enabled_flags*>(h2mod->GetAddress(0x4D8320));
-			ImGui::Columns(3, "", true);
+				TextVerticalPad("Anger", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullAnger", &Skulls->Anger);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Enemies and allies fire their weapons faster and more frequently.");
 
-			TextVerticalPad("Anger", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullAnger", &Skulls->Anger);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Enemies and allies fire their weapons faster and more frequently.");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("Assassins", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullAssassins", &Skulls->Assassians);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("All enemies in game are permanently cloaked. Allies can sometimes\nsee them but mostly they can't, so they can't help much.");
 
-			TextVerticalPad("Assassins", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullAssassins", &Skulls->Assassians);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("All enemies in game are permanently cloaked. Allies can sometimes\nsee them but mostly they can't, so they can't help much.");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("Black Eye", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullBlackEye", &Skulls->Black_Eye);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Your shield does not charge normally. To charge your shields you\nmust kill something with a melee attack");
 
-			TextVerticalPad("Black Eye", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullBlackEye", &Skulls->Black_Eye);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Your shield does not charge normally. To charge your shields you\nmust kill something (enemy, ally, or turret) with a melee attack");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("Blind", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullBlind", &Skulls->Blind);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Your heads-up display becomes invisible. In other words, you cannot\nsee your weapon, body, shields, ammunition, motion tracker,\n or use your flashlight.");
 
-			TextVerticalPad("Blind", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullBlind", &Skulls->Blind);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Your heads-up display becomes invisible. In other words, you cannot\nsee your weapon (unless it's the Energy Sword, which has a glitched appearance with this Skull),\n body, shields, ammunition, motion tracker, or use your flashlight.\nMuzzle flare from weapons though, are still visible.");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("Catch", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullCatch", &Skulls->Catch);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("A.I. will throw more grenades. Also, everybody will drop two grenades\n of their kind Flood will drop grenades depending on whether\n they're human or Covenant.");
 
-			TextVerticalPad("Catch", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullCatch", &Skulls->Catch);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("A.I. will throw more grenades. Also, everybody (allies and enemies)\nwill drop two grenades of their kind (humans drop frag grenades and aliens drop plasma grenades)\nFlood will drop grenades depending on whether they're human or Covenant.");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("Envy", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullEnvy", &Skulls->Envy);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip(" The Master Chief now has an Active camouflage just like the Arbiter's.\nHowever, there is no visible timer, so remember: five second\n cloak with ten second recharge on Legendary");
 
-			TextVerticalPad("Envy", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullEnvy", &Skulls->Envy);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip(" The Master Chief now has an Active camouflage just like the Arbiter's.\nHowever, there is no visible timer, so remember: five second cloak with ten second recharge on Legendary");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("Famine", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullFamine", &Skulls->Famine);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("All dropped weapons have half ammo. Weapons that spawned on the floor or\nspawned with are unaffected.");
 
-			TextVerticalPad("Famine", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullFamine", &Skulls->Famine);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("All dropped weapons have half ammo. Weapons that spawned on the floor or\nspawned with are unaffected.");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("Ghost", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullGhost", &Skulls->Ghost);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("A.I. characters will not flinch from attacks, melee or otherwise.");
 
-			TextVerticalPad("Ghost", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullGhost", &Skulls->Ghost);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("A.I. characters will not flinch from attacks, melee or otherwise.");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("Grunt Birthday Party", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullGBP", &Skulls->Grunt_Birthday_Party);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Headshots turn into Plasma Grenade explosions.");
 
-			TextVerticalPad("Grunt Birthday Party", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullGBP", &Skulls->Grunt_Birthday_Party);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Headshots turn into Plasma Grenade explosions.");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("Iron", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullIron", &Skulls->Iron);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("When playing co-op, if either player dies the game restarts you at your\nlast checkpoint.");
 
-			TextVerticalPad("Iron", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullIron", &Skulls->Iron);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("When playing co-op, if either player dies the game restarts you at your last checkpoint.");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("IWHBYD", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullIWHBYD", &Skulls->IWHBYD);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("The rarity of combat dialog is changed, rare lines become far more common\nbut common lines are still present at their normal rate");
 
-			TextVerticalPad("IWHBYD", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullIWHBYD", &Skulls->IWHBYD);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("The rarity of combat dialog is changed, rare lines become far more common but common lines are still present at their normal rate");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("Mythic", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullMythic", &Skulls->Mythic);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Enemies have more health and shielding, and are therefore harder to kill.");
 
-			TextVerticalPad("Mythic", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullMythic", &Skulls->Mythic);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Enemies have more health and shielding, and are therefore harder to kill.");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("Sputnik", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullSputnik", &Skulls->Sputnik);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("The mass of certain objects is severely reduced, making them fly further\nwhen smacked with a melee hit, or when they are near an explosion");
 
-			TextVerticalPad("Sputnik", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullSputnik", &Skulls->Sputnik);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("The mass of certain objects is severely reduced, making them fly further when smacked with a melee hit, or when they are near an explosion");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("Thunderstorm", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullThunderstorm", &Skulls->Thunderstorm);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Causes most enemy and ally units to be their highest rank.");
 
-			TextVerticalPad("Thunderstorm", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullThunderstorm", &Skulls->Thunderstorm);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Causes most enemy and ally units to be their highest rank.");
+				ImGui::NextColumn();
 
-			ImGui::NextColumn();
+				TextVerticalPad("Whuppopotamus", 8.5);
+				ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+				ImGui::Checkbox("##SkullWhuppopatamus", &Skulls->Whuppopotamus);
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Strengthens the hearing of both allies and enemies");
 
-			TextVerticalPad("Whuppopotamus", 8.5);
-			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-			ImGui::Checkbox("##SkullWhuppopatamus", &Skulls->Whuppopotamus);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Strengthens the hearing of both allies and enemies");
-
-			ImGui::Columns(1);
+				ImGui::Columns(1);
+			}
 		}
 
 		if(ImGui::CollapsingHeader("Project Settings"))
@@ -467,9 +501,16 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 				auto game_globals = Blam::EngineDefinitions::game_globals(**h2mod->GetAddress<Blam::EngineDefinitions::game_globals**>(0x482D3C));
 				LOG_INFO_GAME(game_globals.engine_settings.game_variant.variant_name);
 			}
+			ImGui::Checkbox("Anti-Cheat", &H2Config_anti_cheat_enabled);
 		}
 #endif
 		ImGui::End();
+	}
+	if(!*p_open)
+	{
+		WriteValue<byte>(h2mod->GetAddress(0x9712cC), *p_open ? 1 : 0);
+		PlayerControl::GetControls(0)->DisableCamera = *p_open;
+		SaveH2Config();
 	}
 }
 

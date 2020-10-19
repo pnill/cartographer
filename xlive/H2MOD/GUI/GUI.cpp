@@ -593,6 +593,9 @@ void GUI::ToggleMenu()
 {
 	doDrawIMGUI = !doDrawIMGUI;
 	WriteValue<byte>(h2mod->GetAddress(0x9712cC), doDrawIMGUI ? 1 : 0);
+	PlayerControl::GetControls(0)->DisableCamera = doDrawIMGUI;
+	if(!doDrawIMGUI)
+		SaveH2Config();
 }
 
 
@@ -902,7 +905,6 @@ int WINAPI XLiveRender()
 				sprintf(packet_info_str, "[ pck/second %d, pck size average: %d ]", ElapsedTime > 0 ? Packets * 1000 / ElapsedTime : 0, TotalPacketsSent > 0 ? TotalBytesSent / TotalPacketsSent : 0);
 				drawText(30, 30, COLOR_WHITE, packet_info_str, normalSizeFont);
 			}
-			PlayerControl::GetControls(0)->DisableCamera = doDrawIMGUI;
 			if (doDrawIMGUI) {
 				ImGuiIO& io = ImGui::GetIO();
 
@@ -916,11 +918,10 @@ int WINAPI XLiveRender()
 				ImGui_ImplDX9_NewFrame();
 				ImGuiWin32Frame();
 				ImGui::NewFrame();
-				
 				ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
 				ImGui::PushFont(font2);
-				GUI::ShowAdvancedSettings();
+				GUI::ShowAdvancedSettings(&doDrawIMGUI);
 				ImGui::PopFont();
 				ImGui::EndFrame();
 

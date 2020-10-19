@@ -25,6 +25,7 @@
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Tags/MetaExtender.h"
+#include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -1635,10 +1636,8 @@ void H2MOD::Initialize()
 {
 	if (!h2mod->Server)
 	{
-		if (H2Config_raw_input)
-			Mouseinput::Initialize();
+		Mouseinput::Initialize();
 		KeyboardInput::Init();
-
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");

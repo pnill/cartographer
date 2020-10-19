@@ -137,6 +137,7 @@ void StatsHandler::verifyRegistrationStatus()
 			//Success save AuthKey to config
 			LOG_TRACE_GAME(L"[H2MOD] verifyRegistrationStatus was successful.");
 			strncpy(H2Config_stats_authkey, checkResult, 32);
+			SaveH2Config();
 			Status.Registered = true;
 			Status.StatsEnabled = true;
 		}
