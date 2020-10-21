@@ -7,9 +7,14 @@ static BYTE enableKeyboard3[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 //Leveraging this call to enable keyboards to switch death targets
 typedef char*(__cdecl p_get_controller_input)(__int16 a1);
 p_get_controller_input* c_get_controller_input;
+//Leveraging this call to unset the controller state
+typedef void(__cdecl p_sub_B524F7)(signed int a1);
+p_sub_B524F7* c_sub_B524F7;
 
+__int16 last_a1;
 char* __cdecl get_controller_input(__int16 a1)
 {
+	last_a1 = a1;
 	char* result = c_get_controller_input(a1);
 	if(GetKeyState(VK_SPACE) & 0x8000)
 	{
@@ -17,6 +22,12 @@ char* __cdecl get_controller_input(__int16 a1)
 		result[16] = 1; 
 	}
 	return result;
+}
+
+void __cdecl sub_B524F7(signed int a1)
+{
+	char* result = c_get_controller_input(last_a1);
+	result[16] = 0;
 }
 
 void KeyboardInput::ToggleKeyboardInput()
@@ -62,7 +73,9 @@ void KeyboardInput::ToggleKeyboardInput()
 void KeyboardInput::Initialize()
 {
 	c_get_controller_input = h2mod->GetAddress<p_get_controller_input*>(0x2F433);
+	c_sub_B524F7 = h2mod->GetAddress<p_sub_B524F7*>(0x824F7);
 	PatchCall(h2mod->GetAddress(0xCDEF3), get_controller_input);
+	PatchCall(h2mod->GetAddress(0xCDF5E), sub_B524F7);
 	if (!enableKeyboard3[0]) {
 		for (int i = 0; i < 6; i++) {
 			enableKeyboard3[i] = *((BYTE*)H2BaseAddr + 0x2FA67 + i);
