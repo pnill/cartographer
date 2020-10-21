@@ -26,6 +26,7 @@
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
+#include "H2MOD/Modules/Input/ControllerInput.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -841,7 +842,8 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	for (auto gametype_it : GametypesMap)
 		gametype_it.second = false; // reset custom gametypes state
 
-	H2Tweaks::setSavedSens();
+	ControllerInput::SetSensitiviy(H2Config_controller_sens);
+	MouseInput::SetSensitivity(H2Config_mouse_sens);
 	if (h2mod->GetMapType() == scnr_type::Multiplayer)
 	{
 		addDebugText("Map type: Multiplayer");
@@ -1636,8 +1638,9 @@ void H2MOD::Initialize()
 {
 	if (!h2mod->Server)
 	{
-		Mouseinput::Initialize();
-		KeyboardInput::Init();
+		MouseInput::Initialize();
+		KeyboardInput::Initialize();
+		ControllerInput::Initialize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");

@@ -3,5 +3,5 @@
 namespace KeyboardInput
 {
 	void ToggleKeyboardInput();
-	void Init();
+	void Initialize();
 }

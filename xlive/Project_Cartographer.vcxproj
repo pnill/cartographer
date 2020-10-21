@@ -277,6 +277,7 @@
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\HudElements\HudElements.cpp" />
+    <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\PlayerControl.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.cpp" />
@@ -291,7 +292,6 @@
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="H2MOD\Modules\Stats\StatsHandler.cpp" />
-    <ClCompile Include="H2MOD\Modules\Twizzler\Twizzler.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\XboxLiveTaskProgress.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
@@ -510,6 +510,7 @@
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.h" />
     <ClInclude Include="H2MOD\Modules\HudElements\HudElements.h" />
+    <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\PlayerControl.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.h" />
@@ -526,7 +527,6 @@
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h" />
     <ClInclude Include="H2MOD\Modules\SettingHooks\SettingHooks.h" />
     <ClInclude Include="H2MOD\Modules\Stats\StatsHandler.h" />
-    <ClInclude Include="H2MOD\Modules\Twizzler\Twizzler.h" />
     <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h" />
     <ClInclude Include="H2MOD\Modules\UI\XboxLiveTaskProgress.h" />
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />

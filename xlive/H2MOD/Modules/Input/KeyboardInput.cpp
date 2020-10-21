@@ -4,6 +4,21 @@
 #include "H2MOD/Modules/Config/Config.h"
 static BYTE enableKeyboard3[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
+//Leveraging this call to enable keyboards to switch death targets
+typedef char*(__cdecl p_get_controller_input)(__int16 a1);
+p_get_controller_input* c_get_controller_input;
+
+char* __cdecl get_controller_input(__int16 a1)
+{
+	char* result = c_get_controller_input(a1);
+	if(GetKeyState(VK_SPACE) & 0x8000)
+	{
+		//Modifies the result for A button pressed if space is.
+		result[16] = 1; 
+	}
+	return result;
+}
+
 void KeyboardInput::ToggleKeyboardInput()
 {
 	if (H2Config_disable_ingame_keyboard) {
@@ -44,8 +59,10 @@ void KeyboardInput::ToggleKeyboardInput()
 	}
 }
 
-void KeyboardInput::Init()
+void KeyboardInput::Initialize()
 {
+	c_get_controller_input = h2mod->GetAddress<p_get_controller_input*>(0x2F433);
+	PatchCall(h2mod->GetAddress(0xCDEF3), get_controller_input);
 	if (!enableKeyboard3[0]) {
 		for (int i = 0; i < 6; i++) {
 			enableKeyboard3[i] = *((BYTE*)H2BaseAddr + 0x2FA67 + i);

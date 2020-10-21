@@ -874,34 +874,6 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 	}
 }
 
-void H2Tweaks::setSens(std::string input_type, int sens) {
-
-	if (h2mod->Server)
-		return;
-
-	if (sens < 0)
-		return;
-
-	int absSensIndex = sens - 1;
-
-	if (input_type == "controller") {
-		*h2mod->GetAddress<float*>(0x4A89BC) = 40.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
-		*h2mod->GetAddress<float*>(0x4A89B8) = 80.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
-	}
-	else if (input_type == "mouse") {
-		*h2mod->GetAddress<float*>(0x4A89B4) = 25.0f + 10.0f * static_cast<float>(absSensIndex); //y-axis
-		*h2mod->GetAddress<float*>(0x4A89B0) = 50.0f + 20.0f * static_cast<float>(absSensIndex); //x-axis
-	}
-}
-
-void H2Tweaks::setSavedSens() {
-	if (H2Config_mouse_sens != 0)
-		H2Tweaks::setSens("mouse", (H2Config_mouse_sens));
-
-	if (H2Config_controller_sens != 0)
-		H2Tweaks::setSens("controller", (H2Config_controller_sens));
-}
-
 void H2Tweaks::setHz() {
 
 	if (h2mod->Server)

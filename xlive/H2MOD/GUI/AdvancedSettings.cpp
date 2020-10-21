@@ -12,6 +12,8 @@
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "Util/Hooks/Hook.h"
+#include "H2MOD/Modules/Input/Mouseinput.h"
+#include "H2MOD/Modules/Input/ControllerInput.h"
 
 float crosshairSize = 1.0f;
 bool g_showHud = true;
@@ -234,7 +236,7 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 				desiredRenderTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
 			}
 			ImGui::SameLine();
-			ImGui::Checkbox("Experimental Uncapped FPS Fix", &H2Config_experimental_fps);
+			ImGui::Checkbox("Experimental Rendering Changes", &H2Config_experimental_fps);
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("This will enabled experimental changes to the way the games engine renders.\nA restart is required for the changes to take effect.");
 
@@ -310,30 +312,100 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 			ImGui::Checkbox("##RawMouse", &H2Config_raw_input);
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("This setting requires a restart to take effect.");
+
+			ImGui::NextColumn();
+			TextVerticalPad("Uniform Sensitivity", 8.5);
+			ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+			ImGui::Checkbox("##MK_Sep", &H2Config_mouse_uniform);
+			if (ImGui::IsItemEdited())
+			{
+				MouseInput::SetSensitivity(H2Config_mouse_sens);
+			}
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("By default the game has the horizontal sensitivity half of the vertical.\nEnabling this option will make these match.");
+			}
 			ImGui::Columns(1);
 
-			ImGui::Text("Raw Mouse Scale");
-			ImGui::PushItemWidth(GUI::WidthPercentage(80));
-			int g_raw_scale = (int)H2Config_raw_mouse_scale;
-			ImGui::SliderInt("##RawMouseScale1", &g_raw_scale, 1, 100, ""); ImGui::SameLine();
-			if(ImGui::IsItemEdited())
-			{
-				H2Config_raw_mouse_scale = (float)g_raw_scale;
+			if (H2Config_raw_input) {
+				ImGui::Text("Raw Mouse Sensitivity");
+				ImGui::PushItemWidth(GUI::WidthPercentage(75));
+				int g_raw_scale = (int)H2Config_raw_mouse_scale;
+				ImGui::SliderInt("##RawMouseScale1", &g_raw_scale, 1, 100, ""); ImGui::SameLine();
+				if (ImGui::IsItemEdited())
+				{
+					H2Config_raw_mouse_scale = (float)g_raw_scale;
+				}
+				ImGui::PushItemWidth(WidthPercentage(15));
+				ImGui::InputFloat("##RawMouseScale2", &H2Config_raw_mouse_scale, 0, 110, 5, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+				if (ImGui::IsItemEdited()) {
+					if (g_raw_scale > 100)
+						g_raw_scale = 100;
+					if (g_raw_scale < 1)
+						g_raw_scale = 1;
+					g_raw_scale = (int)H2Config_raw_mouse_scale;
+				}
+				ImGui::PushItemWidth(WidthPercentage(10));
+				if (ImGui::Button("Reset##RawMouseScale2", ImVec2(WidthPercentage(10), item_size.y)))
+				{
+					g_raw_scale = 25;
+					H2Config_raw_mouse_scale = 25.0f;
+				}
 			}
-			ImGui::PushItemWidth(WidthPercentage(10));
-			ImGui::InputInt("##RawMouseScale2", &g_raw_scale, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+			else
+			{
+				ImGui::Text("Mouse Sensitivity");
+				ImGui::PushItemWidth(GUI::WidthPercentage(75));
+				int g_mouse_sens = (int)H2Config_mouse_sens;
+				ImGui::SliderInt("##Mousesens1", &g_mouse_sens, 1, 100, ""); ImGui::SameLine();
+				if (ImGui::IsItemEdited())
+				{
+					H2Config_mouse_sens = (float)g_mouse_sens;
+					MouseInput::SetSensitivity(H2Config_mouse_sens);
+				}
+				ImGui::PushItemWidth(WidthPercentage(15));
+				ImGui::InputFloat("##Mousesens2", &H2Config_mouse_sens, 0, 110, 5, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+				if (ImGui::IsItemEdited()) {
+					if (g_mouse_sens > 100)
+						g_mouse_sens = 100;
+					if (g_mouse_sens < 1)
+						g_mouse_sens = 1;
+					g_mouse_sens = (int)H2Config_mouse_sens;
+					MouseInput::SetSensitivity(H2Config_mouse_sens);
+				}
+				ImGui::PushItemWidth(WidthPercentage(10));
+				if (ImGui::Button("Reset##Mousesens3", ImVec2(WidthPercentage(10), item_size.y)))
+				{
+					g_mouse_sens = 3;
+					H2Config_mouse_sens = 3.0f;
+					MouseInput::SetSensitivity(H2Config_mouse_sens);
+				}
+			}
+			ImGui::Text("Controller Sensitivity");
+			ImGui::PushItemWidth(GUI::WidthPercentage(75));
+			int g_controller_sens = (int)H2Config_controller_sens;
+			ImGui::SliderInt("##Controllersens1", &g_controller_sens, 1, 100, ""); ImGui::SameLine();
+			if (ImGui::IsItemEdited())
+			{
+				H2Config_controller_sens = (float)g_controller_sens;
+				ControllerInput::SetSensitiviy(H2Config_controller_sens);
+			}
+			ImGui::PushItemWidth(WidthPercentage(15));
+			ImGui::InputFloat("##Controllersens2", &H2Config_controller_sens, 0, 110, 5, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 			if (ImGui::IsItemEdited()) {
-				if (g_raw_scale > 100)
-					g_raw_scale = 100;
-				if (g_raw_scale < 1)
-					g_raw_scale = 1;
-				H2Config_raw_mouse_scale = (float)g_raw_scale;
+				if (g_controller_sens > 100)
+					g_controller_sens = 100;
+				if (g_controller_sens < 1)
+					g_controller_sens = 1;
+				g_controller_sens = (int)H2Config_controller_sens;
+				ControllerInput::SetSensitiviy(H2Config_controller_sens);
 			}
 			ImGui::PushItemWidth(WidthPercentage(10));
-			if (ImGui::Button("Reset##RawMouseScale2", ImVec2(WidthPercentage(10), item_size.y)))
+			if (ImGui::Button("Reset##Controllersens3", ImVec2(WidthPercentage(10), item_size.y)))
 			{
-				g_raw_scale = 25;
-				H2Config_raw_mouse_scale = 25.0f;
+				g_controller_sens = 3;
+				H2Config_controller_sens = 3.0f;
+				ControllerInput::SetSensitiviy(H2Config_controller_sens);
 			}
 			ImGui::PopItemWidth();
 			ImGui::NewLine();
