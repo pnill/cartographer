@@ -472,7 +472,7 @@ byte* sound_impulse_unk;
 byte* sound_impulse_called;
 int* dword_F52260;
 byte* b_restart_game_loop;
-
+time_globals* time_globals;
 const int input_devices_update = 0x2F9AC;
 const int vibrations_update = 0x90438;
 const int loaded_custom_maps_data = 0x482D70;
@@ -497,7 +497,6 @@ void __cdecl game_main_loop()
 	static float out_dt; // [esp+30h] [ebp-14h]
 	static int out_target_ticks; // [esp+34h] [ebp-10h]
 	int v18; // [esp+40h] [ebp-4h]
-
 	v1 = sub_AF87A1(); //Some sort of initializer for timing.
 	a3 = v1;
 	v11 = 0;
@@ -575,7 +574,7 @@ void __cdecl game_main_loop()
 			else
 			{
 				if (v1 > 0 && sub_B4BFD1())
-					v3 = (1.0f / 60.0f);
+					v3 = time_globals::get_game_time_globals()->seconds_per_tick;
 				else
 					v3 = 0.0;
 				a2 = v3;
@@ -663,10 +662,9 @@ void __cdecl game_main_loop()
 }
 void alt_main_game_loop_hook()
 {
-	QueryPerformanceFrequency(&freq);
 	QueryPerformanceCounter(&end_tick);
 	double tick_time = (static_cast<double>(end_tick.QuadPart - start_tick.QuadPart) / freq.QuadPart);// -render_time;
-	if (tick_time >= tps || !init)
+	if (tick_time >= time_globals::get_game_time_globals()->seconds_per_tick || !init)
 	{
 		QueryPerformanceCounter(&start_tick);
 		if (!QuitGSMainLoop)
@@ -763,9 +761,12 @@ void initGSRunLoop() {
 			dword_F52260 = h2mod->GetAddress<int*>(0x482260);
 			b_restart_game_loop = h2mod->GetAddress<byte*>(0x479EA0);
 		
-
+			time_globals = time_globals::get_game_time_globals();
 			PatchCall(h2mod->GetAddress(0x39D04), alt_prep_time);
 			PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
+			QueryPerformanceFrequency(&freq);
+			//Remove original render call
+			NopFill(h2mod->GetAddress(0x39DAA), 5);
 		}
 	}
 	addDebugText("Post GSRunLoop Hooking.");
