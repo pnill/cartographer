@@ -371,6 +371,7 @@ void(*sub_C7E9D3)();
 void(*sub_AD7902)();
 void(*sub_AD96EB)();
 void(*sub_B09783)();
+void(*sub_B727EB)();
 void(*vibrations_clear)();
 void(*game_network_dispatcher)();
 
@@ -441,6 +442,7 @@ typedef void(_cdecl p_sub_AF8716)(int a1);
 p_sub_AF8716* sub_AF8716;
 
 
+
 LARGE_INTEGER freq;
 LARGE_INTEGER start_tick;
 LARGE_INTEGER end_tick;
@@ -472,7 +474,6 @@ byte* sound_impulse_unk;
 byte* sound_impulse_called;
 int* dword_F52260;
 byte* b_restart_game_loop;
-time_globals* time_globals;
 const int input_devices_update = 0x2F9AC;
 const int vibrations_update = 0x90438;
 const int loaded_custom_maps_data = 0x482D70;
@@ -489,7 +490,7 @@ void __cdecl game_main_loop()
 	int v8; // esi
 	int v9; // [esp+Ch] [ebp-38h]
 	char v10; // [esp+21h] [ebp-23h]
-	char v11; // [esp+22h] [ebp-22h]
+	char Interpolate; // [esp+22h] [ebp-22h]
 	bool v12; // [esp+23h] [ebp-21h]
 	static float v13;// [esp+24h] [ebp-20h]
 	signed int a3; // [esp+28h] [ebp-1Ch]
@@ -497,9 +498,9 @@ void __cdecl game_main_loop()
 	static float out_dt; // [esp+30h] [ebp-14h]
 	static int out_target_ticks; // [esp+34h] [ebp-10h]
 	int v18; // [esp+40h] [ebp-4h]
-	v1 = sub_AF87A1(); //Some sort of initializer for timing.
+	v1 = 1;//sub_AF87A1(); //Some sort of initializer for timing.
 	a3 = v1;
-	v11 = 0;
+	Interpolate = 1;
 	if (!(*dword_F52268 & 1)) //Game loop init
 	{
 		*dword_F52268 |= 1u;
@@ -510,7 +511,7 @@ void __cdecl game_main_loop()
 	{
 		a3 = 1;
 		v1 = 1;
-		v11 = 1;
+		Interpolate = 1;
 	}
 	else
 	{
@@ -521,7 +522,7 @@ void __cdecl game_main_loop()
 	{
 		a3 = 1;
 		v1 = 1;
-		v11 = 1;
+		Interpolate = 1;
 	}
 	v2 = 0;
 	while (1)
@@ -567,7 +568,7 @@ void __cdecl game_main_loop()
 		{
 			out_dt = 0.0;
 			out_target_ticks = 0;
-			if (v11)
+			if (Interpolate)
 			{
 				v15 = main_game_time_system_update(0, 0.0);
 			}
@@ -640,7 +641,7 @@ void __cdecl game_main_loop()
 			else if (v10)
 			{
 				v0 = system_milliseconds();
-				//present_rendered_screen();
+				present_rendered_screen();
 				v8 = system_milliseconds() - v0;
 				DWORD* init_flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
 				if (init_flags_array[2] == 0)
@@ -660,6 +661,13 @@ void __cdecl game_main_loop()
 	//sub_AF86E7 replacement, as it is a call that is only made here.
 	*b_restart_game_loop = 0;
 }
+int update_bsp = 0x4A16D;
+
+float __cdecl fps_get_seconds_per_frame()
+{
+	return (1.0f / H2Config_fps_limit);
+}
+
 void alt_main_game_loop_hook()
 {
 	QueryPerformanceCounter(&end_tick);
@@ -717,6 +725,8 @@ void initGSRunLoop() {
 			sub_AD7902 = (void(*)())((char*)H2BaseAddr + 0x7902);
 			sub_AD96EB = (void(*)())((char*)H2BaseAddr + 0x96EB);
 			sub_B09783 = (void(*)())((char*)H2BaseAddr + 0x39783);
+			sub_B727EB = (void(*)())((char*)H2BaseAddr + 0xA27EB);
+
 			sub_C7E7C5 = h2mod->GetAddress<p_sub_C7E7C5*>(0x1AE7C5);
 			sub_B328A8 = h2mod->GetAddress<p_sub_B328A8*>(0x628A8);
 			sub_B5DD5C = h2mod->GetAddress<p_sub_B5DD5C*>(0x8DD5C);
@@ -761,9 +771,8 @@ void initGSRunLoop() {
 			dword_F52260 = h2mod->GetAddress<int*>(0x482260);
 			b_restart_game_loop = h2mod->GetAddress<byte*>(0x479EA0);
 		
-			time_globals = time_globals::get_game_time_globals();
-			PatchCall(h2mod->GetAddress(0x39D04), alt_prep_time);
-			PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
+			//PatchCall(h2mod->GetAddress(0x39D04), alt_prep_time);
+			PatchCall(H2BaseAddr + 0x39E64, game_main_loop);
 			QueryPerformanceFrequency(&freq);
 			//Remove original render call
 			NopFill(h2mod->GetAddress(0x39DAA), 5);
