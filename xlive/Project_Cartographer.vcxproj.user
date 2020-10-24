@@ -20,7 +20,7 @@
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>
-    <LocalDebuggerCommandArguments>-nointro -windowed</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-nointro  -novsync</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup>
     <ShowAllFiles>true</ShowAllFiles>

@@ -17,6 +17,8 @@
 #include "H2MOD\Modules\Utils\Utils.h"
 
 #include "Util\ClipboardAPI.h"
+#include "H2MOD/Modules/Input/Mouseinput.h"
+#include "H2MOD/Modules/Input/ControllerInput.h"
 
 std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
 
@@ -657,8 +659,8 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::string sensVal = splitCommands[1];
 
 			if (isNum(sensVal.c_str())) {
-				H2Tweaks::setSens("controller", stoi(sensVal));
-				H2Config_controller_sens = stoi(sensVal);
+				ControllerInput::SetSensitiviy(stof(sensVal));
+				H2Config_controller_sens = stof(sensVal);
 			}
 			else {
 				output(L"Wrong input! Use a number.");
@@ -673,8 +675,8 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::string sensVal = splitCommands[1];
 
 			if (isNum(sensVal.c_str())) {
-				H2Tweaks::setSens("mouse", stoi(sensVal));
-				H2Config_mouse_sens = stoi(sensVal);
+				MouseInput::SetSensitivity(stof(sensVal));
+				H2Config_mouse_sens = stof(sensVal);
 			}
 			else {
 				output(L"Wrong input! Use a number.");

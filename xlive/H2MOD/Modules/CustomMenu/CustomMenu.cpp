@@ -1295,7 +1295,7 @@ static bool CMButtonHandler_EditCrosshair(int button_id) {
 	const float upper_limit = 0.53f;
 	const float major_inc = 0.02f;
 	const float minor_inc = 0.001f;
-	if (button_id == 0) {
+	/*if (button_id == 0) {
 		if (H2Config_crosshair_offset <= upper_limit - major_inc)
 			H2Config_crosshair_offset += major_inc;
 		else
@@ -1328,7 +1328,7 @@ static bool CMButtonHandler_EditCrosshair(int button_id) {
 		}
 	}
 	loadLabelCrosshairOffset();
-	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);
+	H2Tweaks::setCrosshairPos(H2Config_crosshair_offset);*/
 	return false;
 }
 
@@ -1466,7 +1466,7 @@ static bool CMButtonHandler_EditFOV(int button_id) {
 			H2Config_field_of_view = 70;
 	}
 	loadLabelFOVNum();
-	H2Tweaks::setFOV(H2Config_field_of_view);
+//	H2Tweaks::setFOV(H2Config_field_of_view);
 	return false;
 }
 
@@ -1603,7 +1603,7 @@ static bool CMButtonHandler_EditVehicleFOV(int button_id) {
 			H2Config_vehicle_field_of_view = 70;
 	}
 	loadLabelVehicleFOVNum();
-	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
+//	H2Tweaks::setVehicleFOV(H2Config_vehicle_field_of_view);
 	return false;
 }
 
@@ -2075,7 +2075,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditCrosshairSize() {//__thiscall
 }
 
 static bool CMButtonHandler_EditCrosshairSize(int button_id) {
-	H2Tweaks::setCrosshairSize(button_id, true);
+//	H2Tweaks::setCrosshairSize(button_id, true);
 	return true;
 }
 
@@ -2795,6 +2795,8 @@ int getSkullIndexOffset(int lblIndex) {
 	return 0;
 }
 
+
+
 void __stdcall CMLabelButtons_ToggleSkulls(int a1, int a2)
 {
 	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
@@ -2880,8 +2882,8 @@ DWORD* menu_vftable_1_ToggleSkulls = 0;
 DWORD* menu_vftable_2_ToggleSkulls = 0;
 
 void CMSetupVFTables_ToggleSkulls() {
-	PatchCall(H2BaseAddr + 0x228579, sub_BD114_blind_fp);
-	PatchCall(H2BaseAddr + 0x223955, sub_BD114_blind_hud);
+	
+	
 
 	CMSetupVFTables(&menu_vftable_1_ToggleSkulls, &menu_vftable_2_ToggleSkulls, (DWORD)CMLabelButtons_ToggleSkulls, (DWORD)sub_2111ab_CMLTD_nak_ToggleSkulls, (DWORD)CustomMenuFuncPtrHelp_ToggleSkulls, (DWORD)sub_20F790_CM_nak_ToggleSkulls, true, 0);
 }

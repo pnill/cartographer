@@ -2,6 +2,10 @@
 
 #include "stdafx.h"
 
+#define DISPLAY_DEV_TESTING_MENU 0
+
+extern std::chrono::high_resolution_clock::duration desiredRenderTime;
+
 static void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont);
 static void drawRect(FLOAT X, FLOAT Y, FLOAT Width, FLOAT Height, D3DCOLOR dColor);
 static void drawHorizontalLine(int x, int y, int width, D3DCOLOR Color);
@@ -32,6 +36,12 @@ static CONST D3DCOLOR COLOR_BLACK_TRANSPARENT = D3DCOLOR_ARGB(150, 0, 0, 0);
 
 namespace GUI
 {
-	extern void Initialize();
+	extern void Initialize(HWND hWnd);
+	extern void ToggleMenu();
+	extern void ShowAdvancedSettings(bool* p_open = NULL);
+	extern float WidthPercentage(float percent);
+	extern void TextVerticalPad(char* label, float amount);
+	extern void ResetDevice();
+
 };
 
