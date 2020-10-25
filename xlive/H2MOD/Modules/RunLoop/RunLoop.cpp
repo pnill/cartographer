@@ -500,9 +500,9 @@ void __cdecl game_main_loop()
 	static float out_dt; // [esp+30h] [ebp-14h]
 	static int out_target_ticks; // [esp+34h] [ebp-10h]
 	int v18; // [esp+40h] [ebp-4h]
-	v1 = 1;//sub_AF87A1(); //Some sort of initializer for timing.
+	v1 = sub_AF87A1(); //Some sort of initializer for timing.
 	a3 = v1;
-	Interpolate = 1;
+	Interpolate = 0;
 	if (!(*dword_F52268 & 1)) //Game loop init
 	{
 		*dword_F52268 |= 1u;
@@ -643,7 +643,7 @@ void __cdecl game_main_loop()
 			else if (v10)
 			{
 				v0 = system_milliseconds();
-				present_rendered_screen();
+				//present_rendered_screen();
 				v8 = system_milliseconds() - v0;
 				DWORD* init_flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
 				if (init_flags_array[2] == 0)
@@ -774,7 +774,7 @@ void initGSRunLoop() {
 			b_restart_game_loop = h2mod->GetAddress<byte*>(0x479EA0);
 		
 			//PatchCall(h2mod->GetAddress(0x39D04), alt_prep_time);
-			PatchCall(H2BaseAddr + 0x39E64, game_main_loop);
+			PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
 			QueryPerformanceFrequency(&freq);
 			//Remove original render call
 			NopFill(h2mod->GetAddress(0x39DAA), 5);
