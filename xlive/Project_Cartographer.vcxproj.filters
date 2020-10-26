@@ -344,7 +344,6 @@
     <ClInclude Include="H2MOD\Modules\Input\PlayerControl.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
-    <ClInclude Include="3rdparty\visit_struct\visit_struct.hpp" />
     <ClInclude Include="Blam\Engine\Game\GameEngine.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngineEnum.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />

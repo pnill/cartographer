@@ -8,6 +8,7 @@
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
+#include "H2MOD/Modules/Input/KeyboardInput.h"
 
 
 extern void InitInstance();
@@ -726,7 +727,8 @@ BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 	if ((GetKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
 	{
 		// hotkeys
-		handleHotkeyInput(lpMsg->wParam);
+		KeyboardInput::ExecuteHotkey(lpMsg->wParam);
+		//handleHotkeyInput(lpMsg->wParam);
 		// console
 		commands->handleInput(lpMsg->wParam);
 	}

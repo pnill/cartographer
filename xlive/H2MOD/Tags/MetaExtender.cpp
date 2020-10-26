@@ -71,39 +71,6 @@ namespace MetaExtender {
 		*block_count = *block_count + 1;
 		*block_offset = (int)((unsigned long)new_memory - int(*h2mod->GetAddress<int**>(0x47CD54)));
 
-		if (visit_struct::traits::is_visitable<T>::value)
-		{
-			for (auto i = 0; i < *block_count; i++)
-			{
-				const T* t_block = reinterpret_cast<T*>(((unsigned long)new_memory) + (sizeof(T) * i));
-				/*for(static int j = 0; j < visit_struct::field_count(t_block); j++)
-				{
-					static int index = j;
-					auto t_name = typeid(visit_struct::type_at<index, T>()).name();
-					if(strstr(t_name, "tag_block") != NULL)
-					{
-						auto v_t_block = reinterpret_cast<visit_struct::type_at<index, T>()>(visit_struct::get_pointer<index, T>());
-						LOG_INFO_GAME(std::to_string(v_t_block.size));
-					}
-				}*/
-				//visit_struct::for_each(*t_block, [](const char *name, const auto &value)
-				//{
-				//	if(std::string(typeid(value).name()).find("tag_block") != std::string::npos)
-				//	{
-				//		auto a = reinterpret_cast<decltype(value)>(value);
-				//		int* block_size = reinterpret_cast<int*>((unsigned long)std::addressof(value));
-				//		LOG_INFO_GAME(IntToString<unsigned long>((unsigned long)std::addressof(value), std::hex));
-
-				//		if(value.size != 0)
-				//		{
-				//			visit_struct::get<>()
-				//			move_child_block<decltype(value[0])>((unsigned long)std::addressof(value));
-				//		}
-				//	}
-				//});
-			}
-		}
-
 		return reinterpret_cast<T*>(((unsigned long)new_memory) + (sizeof(T) * (*block_count - 1)));
 	}
 	template<typename T = void>
@@ -117,35 +84,6 @@ namespace MetaExtender {
 
 		block->size = block->size + 1;
 		block->data = (int)((unsigned long)new_memory - int(*h2mod->GetAddress<int**>(0x47CD54)));
-
-		return reinterpret_cast<T*>(((unsigned long)new_memory) + (sizeof(T) * (block->size - 1)));
-	}
-	template<typename T = void>
-	T* add_tag_block4(tag_block<T>* block)
-	{
-		
-		size_t block_size = block->size * sizeof(T);
-		void* new_memory = calloc(block->size + 1, sizeof(T));
-		ToFree.push_back(new_memory);
-
-		memcpy(new_memory, &tags::get_tag_data()[block->data], block_size);
-
-		block->size = block->size + 1;
-		block->data = (int)((unsigned long)new_memory - int(*h2mod->GetAddress<int**>(0x47CD54)));
-
-		if (visit_struct::traits::is_visitable<T>::value)
-		{
-			for(auto i = 0; i < (int)block->size; i++)
-			{
-				const T t_block = 
-				visit_struct::for_each(&t_block, [](const char *name, visit_struct::type_c<tag_block<void*>>)
-				{
-					if(dynamic_cast<const tag_block<void*>*>(value) != nullptr)
-					{
-					}
-				});
-			}
-		}
 
 		return reinterpret_cast<T*>(((unsigned long)new_memory) + (sizeof(T) * (block->size - 1)));
 	}

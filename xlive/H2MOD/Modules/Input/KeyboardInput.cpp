@@ -2,6 +2,7 @@
 #include "H2MOD/Modules/Startup/Startup.h"
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD/Modules/Utils/Utils.h"
 static BYTE enableKeyboard3[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 //Leveraging this call to enable keyboards to switch death targets
@@ -69,6 +70,27 @@ void KeyboardInput::ToggleKeyboardInput()
 		WriteBytes(H2BaseAddr + 0x2FA67, enableKeyboard3, 6);
 	}
 }
+std::map<int*, std::function<void()>> hotKeyMap;
+void KeyboardInput::RegisterHotkey(int* hotkey, std::function<void()> callback)
+{
+	if(hotKeyMap.count(hotkey) == 0)
+	{
+		hotKeyMap.emplace(hotkey, callback);
+	} 
+	else
+	{
+		LOG_ERROR_GAME("Hotkey {} is already in use", GetVKeyCodeString(*hotkey));
+	}
+}
+
+void KeyboardInput::ExecuteHotkey(WPARAM message)
+{
+	for(auto &hk : hotKeyMap)
+	{
+		if (*hk.first == message)
+			hk.second();
+	}
+}
 
 void KeyboardInput::Initialize()
 {
@@ -83,3 +105,5 @@ void KeyboardInput::Initialize()
 	}
 	ToggleKeyboardInput();
 }
+
+

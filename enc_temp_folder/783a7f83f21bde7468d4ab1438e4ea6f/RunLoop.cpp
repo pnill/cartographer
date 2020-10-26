@@ -710,16 +710,15 @@ void initGSRunLoop() {
 		PatchCall(H2BaseAddr + 0xc6cb, HookedServerShutdownCheck);
 	}
 	else {
-		addDebugText("Registering Hotkeys");
+		addDebugText("Hooking Loop Function");
+		main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
 		KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdHelp, hotkeyFuncHelp);
 		KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdToggleDebug, hotkeyFuncHideDebug);
 		KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdAlignWindow, hotkeyFuncAlignWindow);
 		KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdWindowMode, hotkeyFuncWindowMode);
+		
 		KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdGuide, hotkeyFuncGuide);
-		
-		
-		addDebugText("Hooking Loop Function");
-		main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
+
 		if (!H2Config_experimental_fps) {
 			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 		}

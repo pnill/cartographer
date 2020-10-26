@@ -9,6 +9,7 @@
 #include <math.h>
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
+#include "H2MOD/Modules/Input/KeyboardInput.h"
 
 static bool b_showHUD = true;
 static bool b_showFirstPerson = true;
@@ -199,6 +200,11 @@ void HudElements::Init()
 	if (H2IsDediServer)
 		return;
 	SkullFlags = reinterpret_cast<skull_enabled_flags*>(h2mod->GetAddress(0x4D8320));
+	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdToggleHideIngameChat, 
+		[]()	{
+			H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat;
+		}
+	);
 	ApplyHooks();
 	setFOV();
 	setVehicleFOV();
