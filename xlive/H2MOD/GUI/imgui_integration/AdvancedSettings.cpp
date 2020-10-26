@@ -1,5 +1,4 @@
 #include "3rdparty/imgui/imgui.h"
-#include "GUI.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Modules/Startup/Startup.h"
@@ -14,6 +13,8 @@
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
+#include "imgui_handler.h"
+#include "H2MOD/GUI/GUI.h"
 
 float crosshairSize = 1.0f;
 bool g_showHud = true;
@@ -22,13 +23,21 @@ bool g_UncappedFPS = false;
 bool g_experimentalFPSPatch = false;
 int g_fpsLimit = 60;
 bool g_hitfix = true;
-void GUI::ShowAdvancedSettings(bool* p_open)
+
+void imgui_handler::AdvancedSettings(bool* p_open)
 {
+	ImGuiIO& io = ImGui::GetIO();
+
+	RECT rect;
+	::GetClientRect(get_HWND(), &rect);
+	io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
 	ImGuiWindowFlags window_flags = 0;
 	window_flags |= ImGuiWindowFlags_NoCollapse;
 	window_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
 	//window_flags |= ImGuiWindowFlags_MenuBar;
-
+	ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
+	//ImGui::PushFont(font2);
 	ImGui::SetNextWindowSize(ImVec2(650, 530), ImGuiCond_Appearing);
 	ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
 	if(h2mod->GetMapType() == MainMenu)
@@ -58,7 +67,7 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 			ImGui::Separator();
 			//Player FOV
 			ImGui::Text("Player Field of View");
-			ImGui::PushItemWidth(GUI::WidthPercentage(80));
+			ImGui::PushItemWidth(WidthPercentage(80));
 			ImGui::SliderInt("##PlayerFOV1", &H2Config_field_of_view, 45, 110,""); ImGui::SameLine();
 			if (ImGui::IsItemEdited())
 				HudElements::setFOV();
@@ -84,7 +93,7 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 
 			//Vehicle FOV
 			ImGui::Text("Vehicle Field of View");
-			ImGui::PushItemWidth(GUI::WidthPercentage(80));
+			ImGui::PushItemWidth(WidthPercentage(80));
 			ImGui::SliderInt("##VehicleFOV1", &H2Config_vehicle_field_of_view, 45, 110, "");ImGui::SameLine();
 			if (ImGui::IsItemEdited())
 				HudElements::setVehicleFOV();
@@ -109,7 +118,7 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 
 			//Crosshair Offset
 			ImGui::Text("Crosshair Offset");
-			ImGui::PushItemWidth(GUI::WidthPercentage(80));
+			ImGui::PushItemWidth(WidthPercentage(80));
 			ImGui::SliderFloat("##Crosshair1", &H2Config_crosshair_offset, 0.0f, 0.5f, ""); ImGui::SameLine();
 			if (ImGui::IsItemEdited())
 				HudElements::setCrosshairPos();
@@ -133,7 +142,7 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 
 			//Crosshair Size
 			ImGui::Text("Crosshair Size");
-			ImGui::PushItemWidth(GUI::WidthPercentage(80));
+			ImGui::PushItemWidth(WidthPercentage(80));
 			ImGui::SliderFloat("##CrosshairSize1", &H2Config_crosshair_scale, 0.0f, 2.0f, "");  ImGui::SameLine();
 			if (ImGui::IsItemEdited())
 				HudElements::setCrosshairSize();
@@ -218,7 +227,7 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 			TextVerticalPad("FPS Limit", 8.5);
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(float_offset);
-			ImGui::PushItemWidth(GUI::WidthPercentage(10.0f));
+			ImGui::PushItemWidth(WidthPercentage(10.0f));
 			ImGui::InputInt("##FPS1", &H2Config_fps_limit, 0, 110); ImGui::SameLine();
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("Setting this to 0 will uncap your games frame rate.\nAnything over 60 may cause performance issues\nUse the Experiment FPS Fix to resolve them");
@@ -329,7 +338,7 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 
 			if (H2Config_raw_input) {
 				ImGui::Text("Raw Mouse Sensitivity");
-				ImGui::PushItemWidth(GUI::WidthPercentage(75));
+				ImGui::PushItemWidth(WidthPercentage(75));
 				int g_raw_scale = (int)H2Config_raw_mouse_scale;
 				ImGui::SliderInt("##RawMouseScale1", &g_raw_scale, 1, 100, ""); ImGui::SameLine();
 				if (ImGui::IsItemEdited())
@@ -355,7 +364,7 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 			else
 			{
 				ImGui::Text("Mouse Sensitivity");
-				ImGui::PushItemWidth(GUI::WidthPercentage(75));
+				ImGui::PushItemWidth(WidthPercentage(75));
 				int g_mouse_sens = (int)H2Config_mouse_sens;
 				ImGui::SliderInt("##Mousesens1", &g_mouse_sens, 1, 100, ""); ImGui::SameLine();
 				if (ImGui::IsItemEdited())
@@ -382,7 +391,7 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 				}
 			}
 			ImGui::Text("Controller Sensitivity");
-			ImGui::PushItemWidth(GUI::WidthPercentage(75));
+			ImGui::PushItemWidth(WidthPercentage(75));
 			int g_controller_sens = (int)H2Config_controller_sens;
 			ImGui::SliderInt("##Controllersens1", &g_controller_sens, 1, 100, ""); ImGui::SameLine();
 			if (ImGui::IsItemEdited())

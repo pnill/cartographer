@@ -18,6 +18,7 @@
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS/UncappedFPS.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/HudElements/HudElements.h"
+#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
@@ -139,7 +140,7 @@ void hotkeyFuncGuide() {
 	if (H2IsDediServer) {
 		return;
 	}
-	GUI::ToggleMenu();
+	imgui_handler::ToggleWindow("Advanced Settings");
 	//GSCustomMenuCall_Guide();
 }
 

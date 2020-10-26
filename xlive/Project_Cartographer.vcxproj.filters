@@ -93,7 +93,6 @@
     <ClCompile Include="3rdparty\imgui\imgui_draw.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.cpp" />
-    <ClCompile Include="H2MOD\GUI\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\HudElements\HudElements.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.cpp" />
@@ -101,6 +100,8 @@
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_handler.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -347,6 +348,7 @@
     <ClInclude Include="Blam\Engine\Game\GameEngine.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngineEnum.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_handler.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
