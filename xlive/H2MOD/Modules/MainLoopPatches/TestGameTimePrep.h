@@ -1,5 +1,5 @@
-#pragma once
-namespace TestGameTimePrep
-{
-	void Init();
-}
+//#pragma once
+//namespace TestGameTimePrep
+//{
+//	void Init();
+//}

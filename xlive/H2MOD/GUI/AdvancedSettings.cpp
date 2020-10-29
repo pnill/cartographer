@@ -157,7 +157,7 @@ void GUI::ShowAdvancedSettings(bool* p_open)
 			ImVec2 b3_size = ImVec2(WidthPercentage(33.3333333333f), item_size.y);
 			ImGui::NewLine();
 			//Ingame Change Display
-			if(!H2Config_hide_ingame_chat)
+			if(H2Config_hide_ingame_chat)
 			{
 				if(ImGui::Button("Show Ingame Chat", b3_size))
 					H2Config_hide_ingame_chat = false;
