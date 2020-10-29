@@ -27,6 +27,7 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Modules/SettingHooks/ButtonSettings.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -831,6 +832,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
+		SettingsMenus::Controller::ButtonLayout::Initialize();
 		MetaExtender::free_tag_blocks();
 		return result;
 	}
@@ -1644,6 +1646,7 @@ void H2MOD::Initialize()
 			DiscordInterface::Init();
 			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
 		}
+		
 		
 	}
 

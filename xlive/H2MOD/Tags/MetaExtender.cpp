@@ -7,6 +7,7 @@
 #include <typeinfo>
 #include <typeindex>
 #include "Blam/Cache/TagGroups/scenario_definition.hpp"
+#include "Blam/Cache/TagGroups/s_user_interface_screen_widget_definition.hpp"
 std::vector<void*> ToFree;
 
 
@@ -88,13 +89,38 @@ namespace MetaExtender {
 		return reinterpret_cast<T*>(((unsigned long)new_memory) + (sizeof(T) * (block->size - 1)));
 	}
 
+
+
 	void test()
 	{
+		auto wigt = tags::find_tag(blam_tag::tag_group_type::userinterfacescreenwidgetdefinition, "ui\\screens\\game_shell\\settings_screen\\player_profile\\button_settings");
+		auto t_wigt = tags::get_tag<blam_tag::tag_group_type::userinterfacescreenwidgetdefinition, s_user_interface_screen_widget_definition>(wigt);
+
+		//auto new_panel = MetaExtender::add_tag_block2<s_user_interface_screen_widget_definition::s_panes_block>((unsigned long)std::addressof(t_wigt->panes));
+		//auto new_list_block = MetaExtender::add_tag_block2<s_user_interface_screen_widget_definition::s_panes_block::s_list_block_block>((unsigned long)std::addressof(new_panel->list_block));
+		//new_list_block->skin_index = s_user_interface_screen_widget_definition::s_panes_block::s_list_block_block::e_skin_index::default;
+		//new_list_block->animation_index = s_user_interface_screen_widget_definition::s_panes_block::s_list_block_block::e_animation_index::NUM_22;
+		//new_list_block->num_visible_items = 5;
+		//new_list_block->bottom_left_x = -490;
+		//new_list_block->bottom_left_y = 365;
+		//new_list_block->intro_animation_delay_milliseconds = 0;
+
+		//auto new_text_blocks
+		//
+
+		//if (t_wigt != nullptr)
+		//{
+		//	tags::tag_data_block* menu_content = reinterpret_cast<tags::tag_data_block*>(t_wigt + 0x20);
+		//	MetaExtender::add_tag_block((unsigned long)std::addressof(menu_content), 76, 8, 1);
+
+		//}
+
+
 		/*auto bull = tags::find_tag(blam_tag::tag_group_type::biped, "objects\\characters\\masterchief\\masterchief_mp");
 		auto t_bull = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(bull);*/
-		auto scnr = tags::find_tag(blam_tag::tag_group_type::scenario, "scenarios\\multi\\cyclotron\\cyclotron");
-		auto t_scnr = tags::get_tag<blam_tag::tag_group_type::scenario, s_scenario_group_definition>(scnr);
-		auto new_decoration = MetaExtender::add_tag_block2<s_scenario_group_definition::s_decorators_block>((unsigned long)std::addressof(t_scnr->decals));
+		//auto scnr = tags::find_tag(blam_tag::tag_group_type::scenario, "scenarios\\multi\\cyclotron\\cyclotron");
+		//auto t_scnr = tags::get_tag<blam_tag::tag_group_type::scenario, s_scenario_group_definition>(scnr);
+		//auto new_decoration = MetaExtender::add_tag_block2<s_scenario_group_definition::s_decorators_block>((unsigned long)std::addressof(t_scnr->decals));
 		//t_bull->initial_velocity = 1;
 		//t_bull->final_velocity = 1;
 		///*MetaExtender::add_tag_block((unsigned long)std::addressof(t_bull->objectTag.attachments), 0x18, t_bull->objectTag.attachments.size, 1);
@@ -115,4 +141,8 @@ namespace MetaExtender {
 		ToFree.clear();
 	}
 
+	void add_to_free(void* mem)
+	{
+		ToFree.push_back(mem);
+	}
 }

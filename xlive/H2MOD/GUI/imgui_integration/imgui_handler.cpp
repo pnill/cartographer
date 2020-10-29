@@ -27,6 +27,8 @@ namespace imgui_handler
 			if (std::get<1>(window))
 				return true;
 		}
+		WriteValue<byte>(h2mod->GetAddress(0x9712cC), 0);
+		PlayerControl::GetControls(0)->DisableCamera = false;
 		return false;
 	}
 
@@ -42,7 +44,6 @@ namespace imgui_handler
 				std::get<2>(window)(&std::get<1>(window));
 			}
 		}
-		//ImGui::PopFont();
 		ImGui::EndFrame();
 		ImGui::Render();
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
@@ -198,7 +199,8 @@ namespace imgui_handler
 
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd)
 	{
-		windows.emplace_back("Advanced Settings", false, imgui_handler::AdvancedSettings);
+		windows.emplace_back("Advanced Settings", false, AdvancedSettings);
+		windows.emplace_back("motd", false, MessageOfTheDay);
 		
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
