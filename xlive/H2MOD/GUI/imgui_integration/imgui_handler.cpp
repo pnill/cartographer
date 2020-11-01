@@ -7,7 +7,10 @@
 
 namespace imgui_handler
 {
-	std::vector<std::tuple<std::string, bool, std::function<void(bool*)>>> windows;
+	//Window Name, DrawState, RenderFunc, OpenFunc, CloseFunc
+	/*std::vector<std::tuple<std::string, bool, std::function<void(bool*)>,
+		std::function<void()>, std::function<void()>>> windows;*/
+	std::vector<s_imgui_window> windows;
 	static HWND                 g_hWnd = NULL;
 	static INT64                g_Time = 0;
 	static INT64                g_TicksPerSecond = 0;
@@ -24,11 +27,9 @@ namespace imgui_handler
 	{
 		for(auto &window : windows)
 		{
-			if (std::get<1>(window))
+			if (window.DoRender)
 				return true;
 		}
-		WriteValue<byte>(h2mod->GetAddress(0x9712cC), 0);
-		PlayerControl::GetControls(0)->DisableCamera = false;
 		return false;
 	}
 
@@ -39,9 +40,9 @@ namespace imgui_handler
 		ImGui::NewFrame();
 		for (auto &window : windows)
 		{
-			if (std::get<1>(window))
+			if (window.DoRender)
 			{
-				std::get<2>(window)(&std::get<1>(window));
+				window.RenderFunc(&window.DoRender);
 			}
 		}
 		ImGui::EndFrame();
@@ -53,11 +54,19 @@ namespace imgui_handler
 	{
 		for(auto &window : windows)
 		{
-			if(std::get<0>(window) == name)
+			if(window.name == name)
 			{
-				std::get<1>(window) = !std::get<1>(window);
-				WriteValue<byte>(h2mod->GetAddress(0x9712cC), std::get<1>(window) ? 1 : 0);
-				PlayerControl::GetControls(0)->DisableCamera = std::get<1>(window);
+				window.DoRender = !window.DoRender;
+				if (window.DoRender) 
+				{
+					if(window.OpenFunc != nullptr)
+						window.OpenFunc();
+				}
+				else 
+				{
+					if (window.CloseFunc != nullptr)
+						window.CloseFunc();
+				}
 			}
 		}
 	}
@@ -199,8 +208,8 @@ namespace imgui_handler
 
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd)
 	{
-		windows.emplace_back("Advanced Settings", false, AdvancedSettings);
-		windows.emplace_back("motd", false, MessageOfTheDay);
+		windows.emplace_back("Advanced Settings", false, AdvancedSettings::Render, AdvancedSettings::Open, AdvancedSettings::Close);
+		windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
 		
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -299,11 +308,11 @@ namespace imgui_handler
 		return Width * (percent / 100.0f);
 	}
 
-	void TextVerticalPad(char* label, float amount)
+	void TextVerticalPad(char* label, float amount = 8.5)
 	{
-		ImGui::GetFont()->DisplayOffset.y += 8.5;
+		ImGui::GetFont()->DisplayOffset.y += amount;
 		ImGui::Text(label);
-		ImGui::GetFont()->DisplayOffset.y -= 8.5;
+		ImGui::GetFont()->DisplayOffset.y -= amount;
 		//ImGui::SetCursorPosY(cursor_pos.y);
 	}
 }

@@ -3969,7 +3969,9 @@ void xbox_live_task_progress_callback(DWORD a1)
 				return;
 			}
 			else {
-				//imgui_handler::ToggleWindow("motd");
+				imgui_handler::ToggleWindow("motd");
+				extern int notify_xlive_ui;
+				notify_xlive_ui = 0;
 				//sub_248beb_nak_deconstructor_Login_Warn();
 				//GSCustomMenuCall_Login_Warn();
 				return;

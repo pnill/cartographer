@@ -20,142 +20,7 @@
 #include "H2MOD/Modules/HudElements/HudElements.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 
-extern LPDIRECT3DDEVICE9 pDevice;
-
 bool QuitGSMainLoop = false;
-RECT rectScreenOriginal;
-
-void setBorderless(int originX, int originY, int width, int height) {
-	SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) & ~(WS_THICKFRAME | WS_BORDER | WS_DLGFRAME));// | WS_SIZEBOX
-	//SetWindowLong(halo2hWnd, GWL_STYLE, GetWindowLong(halo2hWnd, GWL_EXSTYLE) & ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
-
-	SetWindowPos(H2hWnd, NULL, originX, originY, width, height, 0);// SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
-
-}
-
-void setWindowed(int originX, int originY, int width, int height) {
-	SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_THICKFRAME | WS_BORDER | WS_DLGFRAME);
-	SetWindowPos(H2hWnd, NULL, originX, originY, width, height, SWP_FRAMECHANGED);
-}
-
-
-void hotkeyFuncHideDebug() {
-	setDebugTextDisplay(!getDebugTextDisplay());
-}
-
-void hotkeyFuncAlignWindow() {
-	if (H2IsDediServer) {
-		return;
-	}
-	if (!pDevice || !H2hWnd) {
-		return;
-	}
-	HMONITOR monitor = MonitorFromWindow(H2hWnd, MONITOR_DEFAULTTONEAREST);
-	MONITORINFO info;
-	info.cbSize = sizeof(MONITORINFO);
-	GetMonitorInfo(monitor, &info);
-	int monitor_width = info.rcMonitor.right - info.rcMonitor.left;
-	int monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;
-	int interval_width = monitor_width / 2;
-	int interval_height = monitor_height / 2;
-	D3DVIEWPORT9 pViewport;
-	pDevice->GetViewport(&pViewport);
-	int width = interval_width * round(pViewport.Width / (double)interval_width);
-	int height = interval_height * round(pViewport.Height / (double)interval_height);
-	RECT gameWindowRect;
-	GetWindowRect(H2hWnd, &gameWindowRect);
-	int monitorXOffset = gameWindowRect.left - info.rcMonitor.left;
-	int monitorYOffset = gameWindowRect.top - info.rcMonitor.top;
-	int padX = interval_width * round(monitorXOffset / (double)interval_width);
-	int padY = interval_height * round(monitorYOffset / (double)interval_height);
-	int posX = info.rcMonitor.left + padX;
-	int posY = info.rcMonitor.top + padY;
-
-	setBorderless(posX, posY, width, height);
-}
-
-void hotkeyFuncWindowMode() {
-	if (H2IsDediServer) {
-		return;
-	}
-	if (!pDevice || !H2hWnd) {
-		return;
-	}
-	/*wchar_t title[255];
-	wsprintf(title, L"Confirm Window Mode for Player %d", getPlayerNumber());
-	int msgboxID = MessageBox(halo2hWnd,
-	L"Go to Borderless Mode?\nNo = Windowed mode.\nWarning: Clicking the same option that is currently active can have weird side effects.",
-	title,
-	MB_ICONEXCLAMATION | MB_YESNOCANCEL
-	);*/
-	//if (msgboxID == IDYES) {}
-	if (GetWindowLong(H2hWnd, GWL_STYLE) & (WS_THICKFRAME | WS_BORDER | WS_DLGFRAME)) {
-		RECT rectScreen;
-		GetWindowRect(H2hWnd, &rectScreen);
-		D3DVIEWPORT9 pViewport;
-		pDevice->GetViewport(&pViewport);
-		int width = pViewport.Width;
-		int height = pViewport.Height;
-		long borderPadX = 0;
-		long borderPadY = 0;
-		int excessY = GetSystemMetrics(SM_CYCAPTION);
-
-		WINDOWPLACEMENT place3;
-		GetWindowPlacement(H2hWnd, &place3);
-		if ((place3.flags & WPF_RESTORETOMAXIMIZED) == WPF_RESTORETOMAXIMIZED) {
-			WINDOWPLACEMENT place2;
-			GetWindowPlacement(H2hWnd, &place2);
-			place2.showCmd = (place2.showCmd | SW_SHOWNOACTIVATE) & ~SW_MAXIMIZE;
-			SetWindowPlacement(H2hWnd, &place2);
-			borderPadX = GetSystemMetrics(SM_CXSIZEFRAME);
-			borderPadY = GetSystemMetrics(SM_CYSIZEFRAME);
-		}
-		GetWindowRect(H2hWnd, &rectScreenOriginal);
-
-		setBorderless(rectScreen.left + borderPadX, rectScreen.top + borderPadY, width, height + excessY);
-
-	}
-	else {
-		//else if (msgboxID == IDNO) {
-		long width = rectScreenOriginal.right - rectScreenOriginal.left;// -GetSystemMetrics(SM_CXSIZEFRAME) - GetSystemMetrics(SM_CXSIZEFRAME);
-		long height = rectScreenOriginal.bottom - rectScreenOriginal.top;// -GetSystemMetrics(SM_CYSIZEFRAME) - GetSystemMetrics(SM_CYSIZEFRAME);
-		setWindowed(rectScreenOriginal.left, rectScreenOriginal.top, width, height);
-	}
-}
-
-void hotkeyFuncToggleHideIngameChat() {
-	if (H2IsDediServer) {
-		return;
-	}
-	H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat;
-	if (H2Config_hide_ingame_chat) {
-		addDebugText("Hiding In-game Chat Menu.");
-	}
-	else {
-		addDebugText("Showing In-game Chat Menu.");
-	}
-}
-
-void hotkeyFuncGuide() {
-	if (H2IsDediServer) {
-		return;
-	}
-	imgui_handler::ToggleWindow("Advanced Settings");
-	//GSCustomMenuCall_Guide();
-}
-
-//VK_ESCAPE
-int hotkeyIdEsc = VK_F4;
-void hotkeyFuncEsc() {
-	if (H2IsDediServer) {
-		return;
-	}
-	int GameGlobals = (int)*(int*)((char*)H2BaseAddr + 0x482D3C);
-	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
-	if (*GameEngine == 2) {
-		//int WgitScreenfunctionPtr = (int)((char*)H2BaseAddr + 0x20e0c0);//Alt+F4 ingame
-	}
-}
 
 DWORD* get_scenario_global_address() {
 	return (DWORD*)(H2BaseAddr + 0x479e74);
@@ -176,91 +41,6 @@ void kill_volume_enable(int volume_id) {
 	void(__cdecl* kill_volume_enable)(int volume_id);
 	kill_volume_enable = (void(__cdecl*)(int))((char*)H2BaseAddr + 0xb3a64);
 	kill_volume_enable(volume_id);
-}
-
-
-int hotkeyIdTest = VK_F5;
-void hotkeyFuncTest() {
-
-	for (int i = 0; i < get_scenario_volume_count(); i++) {
-		kill_volume_disable(i);
-	}
-	char moaartexxt[300];
-	sprintf(moaartexxt, "Number of Volumes Disabled: %d", get_scenario_volume_count());
-	addDebugText(moaartexxt);
-	
-	return;
-}
-
-
-int hotkeyIdTest2 = VK_F6;
-void hotkeyFuncTest2() {
-	addDebugText("unconfused");
-
-	GSCustomMenuCall_Obscure();
-
-	return;
-	//0 - Go to main menu root.
-	//1 - Activate Product to continue playing diag.
-	//2 - opens main menu wgit (6) - (doesn't render when ingame).
-	//3 - Post Game Carnage Report (crashes when ingame)
-	//5 - Post Game Carnage Report (crashes when ingame)
-	//6 - Post Game Carnage Report (crashes when ingame)
-	//7 - Post Game Carnage Report (crashes when ingame)
-	//8 - Log User Out (crashes when ingame)
-	//9 - ESRB Warning
-	//  - 0x9100
-	void(__cdecl* sub_20CE70)(signed int) = (void(__cdecl*)(int))((char*)H2BaseAddr + 0x20CE70);
-	sub_20CE70(1);
-	return;
-
-	extern int keyHandler_itr;
-	keyHandler_itr++;
-	char NotificationPlayerText2[30];
-	snprintf(NotificationPlayerText2, 30, "keyHandler_itr: %d", keyHandler_itr);
-	addDebugText(NotificationPlayerText2);
-}
-
-void hotkeyFuncHelp() {
-	addDebugText("------------------------------");
-	addDebugText("Options:");
-	char tempTextEntry[255];
-	
-	snprintf(tempTextEntry, 255, "%s - Toggle hiding this text display.", GetVKeyCodeString(H2Config_hotkeyIdToggleDebug).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Print and show this help text.", GetVKeyCodeString(H2Config_hotkeyIdHelp).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Align/Correct window positioning (into Borderless).", GetVKeyCodeString(H2Config_hotkeyIdAlignWindow).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Toggle Windowed/Borderless mode.", GetVKeyCodeString(H2Config_hotkeyIdWindowMode).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Toggles hiding the in-game chat menu.", GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Toggles hiding the Console Menu.", GetVKeyCodeString(H2Config_hotkeyIdConsole).c_str());
-	addDebugText(tempTextEntry);
-
-	addDebugText("------------------------------");
-	setDebugTextDisplay(true);
-}
-
-const int hotkeyLen = 9;
-//GSFIXME: Set only completed 6
-int hotkeyListenLen = 6;
-int* hotkeyId[hotkeyLen] = { &H2Config_hotkeyIdHelp, &H2Config_hotkeyIdToggleDebug, &H2Config_hotkeyIdAlignWindow, &H2Config_hotkeyIdWindowMode, &H2Config_hotkeyIdToggleHideIngameChat, &H2Config_hotkeyIdGuide, &hotkeyIdTest, &hotkeyIdTest2, &hotkeyIdEsc };
-void(*hotkeyFunc[hotkeyLen])(void) = { hotkeyFuncHelp, hotkeyFuncHideDebug, hotkeyFuncAlignWindow, hotkeyFuncWindowMode, hotkeyFuncToggleHideIngameChat, hotkeyFuncGuide, hotkeyFuncTest, hotkeyFuncTest2, hotkeyFuncEsc };
-
-void handleHotkeyInput(WPARAM wparam)
-{
-	for (int i = 0; i < hotkeyListenLen; i++) 
-	{
-		if (wparam == *hotkeyId[i])
-			hotkeyFunc[i]();
-	}
 }
 
 void GSMainLoop() {
@@ -288,7 +68,6 @@ void GSMainLoop() {
 	if(H2IsDediServer)
 	{
 		StatsHandler::verifyPlayerRanks();
-		
 	}
 	EventHandler::executeGameLoopCallbacks();
 	/*
@@ -503,9 +282,9 @@ void __cdecl game_main_loop()
 	static float out_dt; // [esp+30h] [ebp-14h]
 	static int out_target_ticks; // [esp+34h] [ebp-10h]
 	int v18; // [esp+40h] [ebp-4h]
-	v1 = 1;//sub_AF87A1(); //Some sort of initializer for timing.
+	v1 = sub_AF87A1(); //Some sort of initializer for timing.
 	a3 = v1;
-	Interpolate = 1;
+	Interpolate = 0;
 	if (!(*dword_F52268 & 1)) //Game loop init
 	{
 		*dword_F52268 |= 1u;
@@ -514,9 +293,9 @@ void __cdecl game_main_loop()
 	}
 	if (cinematic_is_running())
 	{
-		a3 = 1;
+	/*	a3 = 1;
 		v1 = 1;
-		Interpolate = 1;
+		Interpolate = 1;*/
 	}
 	else
 	{
@@ -646,7 +425,7 @@ void __cdecl game_main_loop()
 			else if (v10)
 			{
 				v0 = system_milliseconds();
-				present_rendered_screen();
+				//present_rendered_screen();
 				v8 = system_milliseconds() - v0;
 				DWORD* init_flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
 				if (init_flags_array[2] == 0)
@@ -675,6 +454,7 @@ float __cdecl fps_get_seconds_per_frame()
 
 void alt_main_game_loop_hook()
 {
+	QueryPerformanceFrequency(&freq);
 	QueryPerformanceCounter(&end_tick);
 	double tick_time = (static_cast<double>(end_tick.QuadPart - start_tick.QuadPart) / freq.QuadPart);// -render_time;
 	if (tick_time >= time_globals::get_game_time_globals()->seconds_per_tick || !init)
@@ -704,6 +484,7 @@ void alt_main_game_loop_hook()
 	}
 	
 }
+
 void initGSRunLoop() {
 	addDebugText("Pre GSRunLoop Hooking.");
 	if (H2IsDediServer) {
@@ -711,14 +492,6 @@ void initGSRunLoop() {
 		PatchCall(H2BaseAddr + 0xc6cb, HookedServerShutdownCheck);
 	}
 	else {
-		addDebugText("Registering Hotkeys");
-		KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdHelp, hotkeyFuncHelp);
-		KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdToggleDebug, hotkeyFuncHideDebug);
-		KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdAlignWindow, hotkeyFuncAlignWindow);
-		KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdWindowMode, hotkeyFuncWindowMode);
-		KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdGuide, hotkeyFuncGuide);
-		
-		
 		addDebugText("Hooking Loop Function");
 		main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
 		if (!H2Config_experimental_fps) {
@@ -783,11 +556,11 @@ void initGSRunLoop() {
 			dword_F52260 = h2mod->GetAddress<int*>(0x482260);
 			b_restart_game_loop = h2mod->GetAddress<byte*>(0x479EA0);
 		
-			//PatchCall(h2mod->GetAddress(0x39D04), alt_prep_time);
-			PatchCall(H2BaseAddr + 0x39E64, game_main_loop);
-			QueryPerformanceFrequency(&freq);
+			PatchCall(h2mod->GetAddress(0x39D04), alt_prep_time);
+			PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
+			
 			//Remove original render call
-			NopFill(h2mod->GetAddress(0x39DAA), 5);
+			//NopFill(h2mod->GetAddress(0x39DAA), 5);
 		}
 	}
 	addDebugText("Post GSRunLoop Hooking.");

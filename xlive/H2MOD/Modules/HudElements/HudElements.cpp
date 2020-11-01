@@ -177,12 +177,6 @@ void HudElements::OnMapLoad()
 {
 	if (h2mod->GetMapType() == Multiplayer)
 	{
-		//Fix the Master Chief FP Arms Shader
-		auto fp_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\masterchief\\fp\\shaders\\fp_arms");
-		BYTE* fp_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(fp_shader_datum);
-		if (fp_shader_tag_data != nullptr)
-			*(float*)(fp_shader_tag_data + 0x44) = 1;
-
 		setCrosshairSize();
 		setCrosshairPos();
 	}
