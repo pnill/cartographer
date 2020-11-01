@@ -27,6 +27,7 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Modules/TagFixes/TagFixes.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -1638,12 +1639,14 @@ void H2MOD::Initialize()
 		MouseInput::Initialize();
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
+		TagFixes::Initalize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");
 			DiscordInterface::Init();
 			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
 		}
+		
 		
 	}
 

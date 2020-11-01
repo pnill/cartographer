@@ -60,5 +60,21 @@ void CustomResolution::Initialize()
 	video_options[13].res_x = 640;
 	video_options[13].res_y = 480;
 	video_options[13].unk = 0;
+
+	video_options[14].res_x = 3440;
+	video_options[14].res_y = 1440;
+	video_options[14].unk = 2;
+
+	RECT desktop;
+	// Get a handle to the desktop window
+	const HWND hDesktop = GetDesktopWindow();
+	// Get the size of screen to the variable desktop
+	GetWindowRect(hDesktop, &desktop);
+	// The top left corner will have coordinates (0,0)
+	// and the bottom right corner will have coordinates
+	// (horizontal, vertical)
+	video_options[15].res_x = desktop.right;
+	video_options[15].res_y = desktop.bottom;
+	video_options[15].unk = 2;
 	qsort_s(video_options, TOTAL_RESOLUTIONS, sizeof(s_display_res), compare, NULL);
 }

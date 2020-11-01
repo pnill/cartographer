@@ -14,6 +14,7 @@
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD\Tags\TagInterface.h"
+#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
@@ -3968,7 +3969,11 @@ void xbox_live_task_progress_callback(DWORD a1)
 				return;
 			}
 			else {
-				GSCustomMenuCall_Login_Warn();
+				imgui_handler::ToggleWindow("motd");
+				extern int notify_xlive_ui;
+				notify_xlive_ui = 0;
+				//sub_248beb_nak_deconstructor_Login_Warn();
+				//GSCustomMenuCall_Login_Warn();
 				return;
 			}
 		}
