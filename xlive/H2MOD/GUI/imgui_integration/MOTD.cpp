@@ -101,6 +101,7 @@ namespace imgui_handler
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoCollapse;
 			window_flags |= ImGuiWindowFlags_NoResize;
+			window_flags |= ImGuiWindowFlags_NoMove;
 			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
 			//ImGui::PushFont(font2);
@@ -108,7 +109,7 @@ namespace imgui_handler
 			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
 			if (h2mod->GetMapType() == MainMenu)
 				ImGui::SetNextWindowBgAlpha(1);
-			if (ImGui::Begin("   Message of The Day", p_open, window_flags))
+			if (ImGui::Begin("   Message of the Day", p_open, window_flags))
 			{
 
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.0f);

@@ -59,6 +59,11 @@ int H2Config_refresh_rate = 60;
 float H2Config_mouse_sens = 0;
 bool H2Config_mouse_uniform = false;
 float H2Config_controller_sens = 0;
+bool H2Config_controller_modern = false;
+H2Config_Deadzone_Type H2Config_Controller_Deadzone = H2Config_Deadzone_Type::Axial;
+float H2Config_Deadzone_A_X = 1.0f;
+float H2Config_Deadzone_A_Y = 1.0f;
+float H2Config_Deadzone_Radial = 1.0f;
 float H2Config_crosshair_offset = NAN;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
@@ -432,6 +437,8 @@ void SaveH2Config() {
 		if (!H2IsDediServer) {
 			std::string lang_str(std::to_string(H2Config_language.code_main) + "x" + std::to_string(H2Config_language.code_variant));
 			ini.SetValue(H2ConfigVersionSection.c_str(), "language_code", lang_str.c_str());
+
+			
 		}
 
 		if (!H2IsDediServer) {
@@ -466,6 +473,16 @@ void SaveH2Config() {
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3dex);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "controller_sens", std::to_string(H2Config_controller_sens).c_str());
+
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "controller_modern", H2Config_controller_modern);
+
+			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_type", std::to_string(H2Config_Controller_Deadzone).c_str());
+
+			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", std::to_string(H2Config_Deadzone_A_X).c_str());
+
+			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", std::to_string(H2Config_Deadzone_A_Y).c_str());
+
+			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", std::to_string(H2Config_Deadzone_Radial).c_str());
 			
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
 
@@ -697,7 +714,7 @@ void ReadH2Config() {
 				if (crosshair_offset_str != "NaN")
 					H2Config_crosshair_offset = std::stof(crosshair_offset_str);
 				else
-					H2Config_crosshair_offset = NAN;
+					H2Config_crosshair_offset = 0.138f;
 
 				std::string crosshair_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", "NaN"));
 				if (crosshair_scale_str != "NaN")
@@ -713,6 +730,38 @@ void ReadH2Config() {
 				H2Config_mouse_sens = std::stof(mouse_sens_str);
 				std::string controller_sens_str(ini.GetValue(H2ConfigVersionSection.c_str(), "controller_sens", "0"));
 				H2Config_controller_sens = std::stof(controller_sens_str);
+				H2Config_controller_modern = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "controller_modern", H2Config_controller_modern);
+				/*
+				 * ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_type", std::to_string(H2Config_Controller_Deadzone).c_str());
+
+			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", std::to_string(H2Config_Deadzone_A_X).c_str());
+
+			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", std::to_string(H2Config_Deadzone_A_Y).c_str());
+
+			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", std::to_string(H2Config_Deadzone_Radial).c_str());
+				 */
+
+				switch (std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_type", "0")))
+				{
+					default:
+					case 0:
+						H2Config_Controller_Deadzone = Axial;
+						break;
+					case 1:
+						H2Config_Controller_Deadzone = Radial;
+						break;
+					case 2:
+						H2Config_Controller_Deadzone = Both;
+						break;
+				}
+				std::string deadzone_axial_x(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", "26.5"));
+				H2Config_Deadzone_A_X = std::stof(deadzone_axial_x);
+				std::string deadzone_axial_y(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", "26.5"));
+				H2Config_Deadzone_A_Y = std::stof(deadzone_axial_y);
+				std::string deadzone_radial(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", "26.5"));
+				H2Config_Deadzone_Radial = std::stof(deadzone_radial);
+
+
 				H2Config_hiresfix = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "hires_fix", H2Config_hiresfix);
 				H2Config_d3dex = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3dex);
 				H2Config_disable_ingame_keyboard = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);

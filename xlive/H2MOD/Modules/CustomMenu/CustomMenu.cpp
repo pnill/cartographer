@@ -4370,7 +4370,8 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Guide() {//__thiscall
 
 static bool CMButtonHandler_Guide(int button_id) {
 	if (button_id == 0) {
-		GSCustomMenuCall_AdvSettings();
+		imgui_handler::ToggleWindow("Advanced Settings");
+		//GSCustomMenuCall_AdvSettings();
 	}
 	else if (button_id == 1) {
 		ShellExecuteA(NULL, "open", "https://cartographer.online/", NULL, NULL, SW_SHOWDEFAULT);

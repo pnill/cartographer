@@ -28,9 +28,81 @@ namespace imgui_handler {
 			bool g_experimentalFPSPatch = false;
 			int g_fpsLimit = 60;
 			bool g_hitfix = true;
+			int g_deadzone = 0;
+			int g_aiming = 0;
+			bool g_init = false;
+			void DrawDeadzones()
+			{
+				ImDrawList* draw_list = ImGui::GetOverlayDrawList();
+				ImVec2 Center(
+					ImGui::GetIO().DisplaySize.x - 100,
+					ImGui::GetIO().DisplaySize.y - 100
+				);
+				
+				draw_list->AddRectFilled(ImVec2(Center.x - 100, Center.y - 100), ImVec2(Center.x + 100, Center.y + 100), ImColor(20, 20, 20));
+				draw_list->AddCircleFilled(Center, 100, ImColor(255, 255, 255), 120);
+				if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
+					int X_Axis = (int)(100 * (H2Config_Deadzone_A_X / 100));
+					int Y_Axis = (int)(100 * (H2Config_Deadzone_A_Y / 100));
+					ImVec2 Y_TopLeft(
+						Center.x - 100,
+						Center.y - Y_Axis);
+					ImVec2 Y_BottomRight(
+						Center.x + 100,
+						Center.y + Y_Axis);
+					draw_list->AddRectFilled(Y_TopLeft, Y_BottomRight, ImColor(20, 20, 20, 125));
+					ImVec2 X_TopLeft(Center.x - X_Axis, Center.y - 100);
+					ImVec2 X_BottomRight(Center.x + X_Axis, Center.y + 100);
+					draw_list->AddRectFilled(X_TopLeft, X_BottomRight, ImColor(20, 20, 20, 125));
+				}
+				if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both) {
+					draw_list->AddCircleFilled(Center, H2Config_Deadzone_Radial, ImColor(20, 20, 20, 125), 120);
+				}
+
+				short* C_Input = (short*)ControllerInput::get_controller_input(0);
+				ImVec2 Thumb_Pos(
+					Center.x - (100 * (C_Input[28] / (float)MAXSHORT)),
+					Center.y - (100 * (C_Input[29] / (float)MAXSHORT)));
+				int axial_invalid = 0;
+				if (abs(C_Input[28]) <= ((float)MAXSHORT * (H2Config_Deadzone_A_X / 100)))
+					axial_invalid++;
+				if (abs(C_Input[29]) <= ((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100)))
+					axial_invalid++;
+				bool radial_invalid = false;
+				unsigned int ar = pow((short)((float)MAXSHORT * (H2Config_Deadzone_Radial / 100)), 2);
+				unsigned int arx = pow(C_Input[28], 2);
+				unsigned int ary = pow(C_Input[29], 2);
+				unsigned int rh = arx + ary;
+				if (rh <= ar)
+				{
+					radial_invalid = true;
+				}
+				bool valid = true;
+				if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both)
+					if (axial_invalid == 2)
+						valid = false;
+				if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both)
+					if (radial_invalid)
+						valid = false;
+
+				if(valid)
+				{
+					draw_list->AddCircleFilled(Thumb_Pos, 5, ImColor(0, 255, 0), 60);
+				}
+				else
+				{
+					draw_list->AddCircleFilled(Thumb_Pos, 5, ImColor(255, 0, 0), 60);
+				}
+			}
 		}
 		void Render(bool* p_open)
 		{
+			if(!g_init)
+			{
+				g_deadzone = (int)H2Config_Controller_Deadzone;
+				g_aiming = (int)H2Config_controller_modern;
+				g_init = true;
+			}
 			ImGuiIO& io = ImGui::GetIO();
 
 			RECT rect;
@@ -52,6 +124,7 @@ namespace imgui_handler {
 				AcStatus += "Enabled";
 			else
 				AcStatus += "Disabled";
+			AcStatus += "##ADV";
 			if (ImGui::Begin(AcStatus.c_str(), p_open, window_flags))
 			{
 				ImVec2 item_size = ImGui::GetItemRectSize();
@@ -294,6 +367,13 @@ namespace imgui_handler {
 
 					ImGui::NextColumn();
 
+					ImGui::Columns(1);
+					ImGui::NewLine();
+
+				}
+				if(ImGui::CollapsingHeader("Mouse and Keyboard Input"))
+				{
+					ImGui::Columns(2, "", false);
 					//Disable Ingame Keyboard
 					TextVerticalPad("Disable Keyboard Input", 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
@@ -312,9 +392,8 @@ namespace imgui_handler {
 					TextVerticalPad("Raw Mouse Input", 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##RawMouse", &H2Config_raw_input);
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("This setting requires a restart to take effect.");
 
+					//Uniform Sensitivity
 					ImGui::NextColumn();
 					TextVerticalPad("Uniform Sensitivity", 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
@@ -328,7 +407,6 @@ namespace imgui_handler {
 						ImGui::SetTooltip("By default the game has the horizontal sensitivity half of the vertical.\nEnabling this option will make these match.");
 					}
 					ImGui::Columns(1);
-
 					if (H2Config_raw_input) {
 						ImGui::Text("Raw Mouse Sensitivity");
 						ImGui::PushItemWidth(WidthPercentage(75));
@@ -383,6 +461,26 @@ namespace imgui_handler {
 							MouseInput::SetSensitivity(H2Config_mouse_sens);
 						}
 					}
+				}
+				if(ImGui::CollapsingHeader("Controller Input"))
+				{
+					DrawDeadzones();
+					ImGui::Columns(2, "", false);
+					//Uniform Sensitivity
+					TextVerticalPad("Uniform Sensitivity", 8.5);
+					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+					ImGui::Checkbox("##C_Sep", &H2Config_mouse_uniform);
+					if (ImGui::IsItemEdited())
+					{
+						MouseInput::SetSensitivity(H2Config_mouse_sens);
+					}
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::SetTooltip("By default the game has the horizontal sensitivity half of the vertical.\nEnabling this option will make these match.");
+					}
+					ImGui::Columns(1);
+					
+					
 					ImGui::Text("Controller Sensitivity");
 					ImGui::PushItemWidth(WidthPercentage(75));
 					int g_controller_sens = (int)H2Config_controller_sens;
@@ -410,9 +508,124 @@ namespace imgui_handler {
 						ControllerInput::SetSensitiviy(H2Config_controller_sens);
 					}
 					ImGui::PopItemWidth();
-					ImGui::NewLine();
 
+					ImGui::Columns(2, "", false);
+					ImGui::Text("Aiming Type");
+					const char* a_items[] = { "Default", "Modern" };
+					ImGui::PushItemWidth(ImGui::GetColumnWidth());
+					if (ImGui::Combo("##C_Aiming_Style", &g_aiming, a_items, 2))
+					{
+						H2Config_controller_modern = g_aiming != 0;
+						ControllerInput::ToggleModern();
+					}
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::SetTooltip("Mordern Aiming will remove the native acceleration zones from a controller while aiming, allowing for more percise aim.");
+					}
+					ImGui::PopItemWidth();
+
+					ImGui::NextColumn();
+
+					ImGui::Text("Deadzone Type");
+					const char* items[] = { "Axial", "Radial", "Both" };
+					ImGui::PushItemWidth(ImGui::GetColumnWidth());;
+					if(ImGui::Combo("##C_Deadzone_Type", &g_deadzone, items, 3))
+					{
+						H2Config_Controller_Deadzone = (H2Config_Deadzone_Type)(byte)g_deadzone;
+						ControllerInput::SetDeadzones();
+					}
+					if(ImGui::IsItemHovered())
+					{
+						ImGui::SetTooltip("Halo 2 by default uses Axial deadzones, radial deadzones have been added as another option for players.");
+					}
+					ImGui::PopItemWidth();
+					ImGui::Columns(1);
+
+					if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
+						ImGui::Text("Axial Deadzone X");
+						ImGui::PushItemWidth(WidthPercentage(75));
+						ImGui::SliderFloat("##C_Deadzone_A_X_1", &H2Config_Deadzone_A_X, 0, 100, "");
+						if (ImGui::IsItemEdited())
+						{
+							ControllerInput::SetDeadzones();
+						}
+						ImGui::SameLine();
+						ImGui::PushItemWidth(WidthPercentage(13));
+						ImGui::InputFloat("##C_Deadzone_A_X_2", &H2Config_Deadzone_A_X, 0, 3);
+						if (ImGui::IsItemEdited())
+						{
+							if (H2Config_Deadzone_A_X < 0)
+								H2Config_Deadzone_A_X = 0;
+							if (H2Config_Deadzone_A_X > 100)
+								H2Config_Deadzone_A_X = 100;
+							ControllerInput::SetDeadzones();
+						}
+						ImGui::SameLine();
+						ImGui::PushItemWidth(WidthPercentage(15));
+						if (ImGui::Button("Default##C_Deadzone_A_X_3", ImVec2(WidthPercentage(12), item_size.y)))
+						{
+							H2Config_Deadzone_A_X = (8689.0f / (float)MAXSHORT) * 100;
+							ControllerInput::SetDeadzones();
+						}
+						ImGui::PopItemWidth();
+						ImGui::Text("Axial Deadzone Y");
+						ImGui::PushItemWidth(WidthPercentage(75));
+						ImGui::SliderFloat("##C_Deadzone_A_Y_1", &H2Config_Deadzone_A_Y, 0, 100, "");
+						if (ImGui::IsItemEdited())
+						{
+							ControllerInput::SetDeadzones();
+						}
+						ImGui::SameLine();
+						ImGui::PushItemWidth(WidthPercentage(13));
+						ImGui::InputFloat("##C_Deadzone_A_Y_2", &H2Config_Deadzone_A_Y, 0, 3);
+						if (ImGui::IsItemEdited())
+						{
+							if (H2Config_Deadzone_A_Y < 0)
+								H2Config_Deadzone_A_Y = 0;
+							if (H2Config_Deadzone_A_Y > 100)
+								H2Config_Deadzone_A_Y = 100;
+							ControllerInput::SetDeadzones();
+						}
+						ImGui::SameLine();
+						ImGui::PushItemWidth(WidthPercentage(12));
+						if (ImGui::Button("Default##C_Deadzone_A_Y_3", ImVec2(WidthPercentage(12), item_size.y)))
+						{
+							H2Config_Deadzone_A_Y = (8689.0f / (float)MAXSHORT) * 100;
+							ControllerInput::SetDeadzones();
+						}
+						ImGui::PopItemWidth();
+					}
+					if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both) {
+						ImGui::Text("Radial Deadzone Radius");
+						ImGui::PushItemWidth(WidthPercentage(75));
+						ImGui::SliderFloat("##C_Deadzone_R_1", &H2Config_Deadzone_Radial, 0, 100, "");
+						if (ImGui::IsItemEdited())
+						{
+							ControllerInput::SetDeadzones();
+						}
+						ImGui::SameLine();
+						ImGui::PushItemWidth(WidthPercentage(13));
+						ImGui::InputFloat("##C_Deadzone_R_2", &H2Config_Deadzone_Radial, 0, 3);
+						if (ImGui::IsItemEdited())
+						{
+							if (H2Config_Deadzone_Radial < 0)
+								H2Config_Deadzone_Radial = 0;
+							if (H2Config_Deadzone_Radial > 100)
+								H2Config_Deadzone_Radial = 100;
+							ControllerInput::SetDeadzones();
+						}
+						ImGui::SameLine();
+						ImGui::PushItemWidth(WidthPercentage(12));
+						if (ImGui::Button("Default##C_Deadzone_R_R_3", ImVec2(WidthPercentage(12), item_size.y)))
+						{
+							H2Config_Deadzone_Radial = (8689.0f / (float)MAXSHORT) * 100;
+							ControllerInput::SetDeadzones();
+						}
+						ImGui::PopItemWidth();
+					}
+					ImGui::NewLine();
 				}
+
 				if (NetworkSession::localPeerIsSessionHost()) {
 					if (ImGui::CollapsingHeader("Host Settings"))
 					{

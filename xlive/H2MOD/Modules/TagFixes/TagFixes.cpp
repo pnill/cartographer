@@ -66,6 +66,32 @@ namespace TagFixes
 			if (fp_shader_tag_data != nullptr)
 				*(float*)(fp_shader_tag_data + 0x44) = 1;
 
+			//Fix the Visor(s)
+			auto tex_bump_env_datum = tags::find_tag(blam_tag::tag_group_type::shadertemplate, "shaders\\shader_templates\\opaque\\tex_bump_env");
+
+			//Fix the Visor
+			auto visor_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\masterchief\\shaders\\masterchief_visor");
+			BYTE* visor_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(visor_shader_datum);
+
+			if (visor_shader_tag_data != nullptr)
+				*(unsigned long*)(visor_shader_tag_data + 0x4) = tex_bump_env_datum.data;
+			if (visor_shader_tag_data != nullptr)
+			{
+				auto *visor_pp = reinterpret_cast<tags::tag_data_block*>(visor_shader_tag_data + 0x20);
+				if (visor_pp->block_count > 0 && visor_pp->block_data_offset != -1)
+				{
+					auto visor_pp_data = tags::get_tag_data() + visor_pp->block_data_offset;
+					*(unsigned long*)(visor_pp_data) = tex_bump_env_datum.data;
+				}
+			}
+
+			auto pilot_visor_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\marine\\shaders\\helmet_pilot_visor");
+			auto pilot_visor_tag = tags::get_tag < blam_tag::tag_group_type::shader, shader_definition>(pilot_visor_shader_datum);
+			if(pilot_visor_tag != nullptr)
+			{
+				pilot_visor_tag->postprocessDefinition[0]->shaderTemplateIndex.TagIndex = tex_bump_env_datum;
+			}
+
 			//Fix the Grunt Shaders
 			auto grunt_arm_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\grunt\\shaders\\grunt_arms");
 			BYTE* grunt_arm_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(grunt_arm_shader_datum);
@@ -85,10 +111,12 @@ namespace TagFixes
 		}
 		void fall_damage_fix()
 		{
-			*(float*)(&tags::get_tag_data()[0xE610B0]) = 14.0f; /*masterchief_mp hlmt max abs acc default value doubled*/
-			*(float*)(&tags::get_tag_data()[0xE610B4]) = 20.0f; /*masterchief_mp hlmt max abs acc default value doubled*/
-			*(float*)(&tags::get_tag_data()[0xE65D98]) = 14.0f; /*elite_mp hlmt max abs acc default value doubled*/
-			*(float*)(&tags::get_tag_data()[0xE65D9C]) = 20.0f; /*elite_mp hlmt max abs acc default value doubled*/
+			if (get_game_life_cycle() == Multiplayer) {
+				*(float*)(&tags::get_tag_data()[0xE610B0]) = 14.0f; /*masterchief_mp hlmt max abs acc default value doubled*/
+				*(float*)(&tags::get_tag_data()[0xE610B4]) = 20.0f; /*masterchief_mp hlmt max abs acc default value doubled*/
+				*(float*)(&tags::get_tag_data()[0xE65D98]) = 14.0f; /*elite_mp hlmt max abs acc default value doubled*/
+				*(float*)(&tags::get_tag_data()[0xE65D9C]) = 20.0f; /*elite_mp hlmt max abs acc default value doubled*/
+			}
 		}
 	}
 

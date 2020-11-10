@@ -352,6 +352,8 @@
     <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_handler.h" />
     <ClInclude Include="Blam\Cache\TagGroups\s_user_interface_screen_widget_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\item_collection_defenition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_defenition.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

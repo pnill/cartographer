@@ -16,6 +16,7 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/GUI/GUI.h"
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS/UncappedFPS.h"
+#include "H2MOD/Modules/Input/ControllerInput.h"
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
@@ -330,7 +331,12 @@ void __cdecl game_main_loop()
 			call eax
 		}
 		if (!game_minimized())
-			sub_B328A8();
+			if (H2Config_controller_modern) {
+				ControllerInput::procces_input();
+			}
+			else {
+				sub_B328A8();
+			}
 		if (v12)
 		{
 			sub_B16834();

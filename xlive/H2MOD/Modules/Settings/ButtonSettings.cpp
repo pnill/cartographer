@@ -16,46 +16,11 @@ namespace SettingsMenus
 			p_set_button_settings set_button_settings;
 
 
-			void __fastcall h_set_button_settings(void* pThis, byte* pThis_1, int a2, __int16 *a3)
+			void __fastcall h_set_button_settings(void* pThis, byte* pThis_1, int a2, __int16 *new_index)
 			{
-				LOG_INFO_GAME("{} {}", a2, IntToString<__int16>(*a3));
-				//__int16 new_settings_index; // di
-				//BYTE *v4; // ebx
-				//BYTE *Player_profile_settings =  h2mod->GetAddress<byte*>(0x972870);
-				//char valid_new_setting_index; // al
-				//int v8; // ST20_4
-				//int v9; // eax
-				//char v11; // [esp+10h] [ebp-1680h]
-				//new_settings_index = *a3;
-				//switch (new_settings_index)
-				//{
-				//case 1: //Southpaw
-				//	valid_new_setting_index = 1;
-				//	break;
-				//case 2: //Boxer
-				//	valid_new_setting_index = 2;
-				//	break;
-				//case 3: //Green Thumb
-				//	valid_new_setting_index = 3;
-				//	break;
-				//case 4: //Bumper Jumper
-				//	valid_new_setting_index = 4;
-				//	break;
-				//default:
-				//	valid_new_setting_index = 0;
-				//	break;
-				//}
-				//Player_profile_settings[752] = valid_new_setting_index;
-				//sub_B31AD0((int)&v11, (int)(Player_profile_settings + 748));
-				//sub_B2EE72((int)&v11, (unsigned __int8)Player_profile_settings[753], valid_new_setting_index, Player_profile_settings[756]);
-				//sub_B31B62((int)&v11, (int)(Player_profile_settings + 748));
-				//if (pThis_1[704])
-				//	sub_CD9C3E();
-				//v8 = (*(int(__thiscall **)(BYTE *))(*(DWORD *)pThis_1 + 56))(pThis_1);
-				//v9 = (*(int(__thiscall **)(BYTE *))(*(DWORD *)pThis_1 + 52))(pThis_1);
-				//return sub_CD96DA(v9, v8);
-				set_button_settings(pThis, pThis_1, a2, a3);
-				h2mod->GetAddress<byte*>(0x972870)[752] = *a3;
+				LOG_INFO_GAME("{} {}", a2, IntToString<__int16>(*new_index));
+				set_button_settings(pThis, pThis_1, a2, new_index);
+				h2mod->GetAddress<byte*>(0x972870)[752] = *new_index;
 			}
 
 			void __stdcall get_button_settings_label(int a1, int a2)

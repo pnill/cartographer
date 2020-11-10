@@ -12,7 +12,7 @@ struct shader_postprocess_bitmap_new_block
 
 struct shader_postprocess_definition_new_block
 {
-	int shaderTemplateIndex;
+	tag_reference shaderTemplateIndex;
 	tag_block<shader_postprocess_bitmap_new_block> bitmaps;
 
 	tag_block<> pixelConstants;
