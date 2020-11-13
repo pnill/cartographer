@@ -15,6 +15,7 @@
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "imgui_handler.h"
 #include "H2MOD/GUI/GUI.h"
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 
 
 namespace imgui_handler {
@@ -35,8 +36,8 @@ namespace imgui_handler {
 			{
 				ImDrawList* draw_list = ImGui::GetOverlayDrawList();
 				ImVec2 Center(
-					ImGui::GetIO().DisplaySize.x - 100,
-					ImGui::GetIO().DisplaySize.y - 100
+					ImGui::GetIO().DisplaySize.x - 200,
+					ImGui::GetIO().DisplaySize.y - 200
 				);
 				
 				draw_list->AddRectFilled(ImVec2(Center.x - 100, Center.y - 100), ImVec2(Center.x + 100, Center.y + 100), ImColor(20, 20, 20));
@@ -61,7 +62,7 @@ namespace imgui_handler {
 
 				short* C_Input = (short*)ControllerInput::get_controller_input(0);
 				ImVec2 Thumb_Pos(
-					Center.x - (100 * (C_Input[28] / (float)MAXSHORT)),
+					Center.x + (100 * (C_Input[28] / (float)MAXSHORT)),
 					Center.y - (100 * (C_Input[29] / (float)MAXSHORT)));
 				int axial_invalid = 0;
 				if (abs(C_Input[28]) <= ((float)MAXSHORT * (H2Config_Deadzone_A_X / 100)))
@@ -119,12 +120,7 @@ namespace imgui_handler {
 			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
 			if (h2mod->GetMapType() == MainMenu)
 				ImGui::SetNextWindowBgAlpha(1);
-			std::string AcStatus = "  Advanced Settings - Anti-Cheat: ";
-			if (H2Config_anti_cheat_enabled)
-				AcStatus += "Enabled";
-			else
-				AcStatus += "Disabled";
-			AcStatus += "##ADV";
+			std::string AcStatus = "  Advanced Settings";
 			if (ImGui::Begin(AcStatus.c_str(), p_open, window_flags))
 			{
 				ImVec2 item_size = ImGui::GetItemRectSize();
@@ -284,7 +280,6 @@ namespace imgui_handler {
 					}
 					ImGui::NewLine();
 				}
-
 				if (ImGui::CollapsingHeader("Video Settings"))
 				{
 					ImVec2 LargestText = ImGui::CalcTextSize("High Resolution Fix", NULL, true);
@@ -313,8 +308,7 @@ namespace imgui_handler {
 					ImGui::SameLine();
 					ImGui::Checkbox("Experimental Rendering Changes", &H2Config_experimental_fps);
 					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("This will enabled experimental changes to the way the games engine renders.\nA restart is required for the changes to take effect.");
-
+						ImGui::SetTooltip("This will enabled experimental changes to the way the games engine renders.\nA restart is required for the changes to take effect.\n\nThis will cause controller Vibrations not to work.");
 					//ImGui::Columns(2, "VideoSettings", false);
 					//Refresh Rate
 					TextVerticalPad("Refresh Rate", 8.5);
@@ -347,29 +341,6 @@ namespace imgui_handler {
 						ImGui::SetTooltip("This will enable fixes for high resolution monitors that will fix text clipping\nA restart is required for these changes to take effect.");
 					//ImGui::Columns(0);
 					ImGui::NewLine();
-				}
-
-				if (ImGui::CollapsingHeader("Game Settings"))
-				{
-					ImGui::Columns(2, "", false);
-
-					//XDelay
-					TextVerticalPad("Disable X to Delay", 8.5);
-					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##XDelay", &H2Config_xDelay);
-
-					ImGui::NextColumn();
-
-					//Skip Intro
-					TextVerticalPad("Disable Intro videos", 8.5);
-					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##Intro", &H2Config_skip_intro);
-
-					ImGui::NextColumn();
-
-					ImGui::Columns(1);
-					ImGui::NewLine();
-
 				}
 				if(ImGui::CollapsingHeader("Mouse and Keyboard Input"))
 				{
@@ -404,7 +375,7 @@ namespace imgui_handler {
 					}
 					if (ImGui::IsItemHovered())
 					{
-						ImGui::SetTooltip("By default the game has the horizontal sensitivity half of the vertical.\nEnabling this option will make these match.");
+						ImGui::SetTooltip("By default the game has the horizontal sensitivity half of the vertical.\nEnabling this option will make these match.\n\nNOTE: Controller Modern Aiming will make this not work.");
 					}
 					ImGui::Columns(1);
 					if (H2Config_raw_input) {
@@ -520,7 +491,7 @@ namespace imgui_handler {
 					}
 					if (ImGui::IsItemHovered())
 					{
-						ImGui::SetTooltip("Mordern Aiming will remove the native acceleration zones from a controller while aiming, allowing for more percise aim.");
+						ImGui::SetTooltip("Mordern Aiming will remove the native acceleration zones from a controller while aiming, allowing for more percise aim.\n\nNOTE: Modern Aiming will make MK not function correctly.");
 					}
 					ImGui::PopItemWidth();
 
@@ -536,7 +507,7 @@ namespace imgui_handler {
 					}
 					if(ImGui::IsItemHovered())
 					{
-						ImGui::SetTooltip("Halo 2 by default uses Axial deadzones, radial deadzones have been added as another option for players.");
+						ImGui::SetTooltip("Halo 2 by default uses axial deadzones, radial deadzones have been added as another option for players.");
 					}
 					ImGui::PopItemWidth();
 					ImGui::Columns(1);
@@ -626,11 +597,12 @@ namespace imgui_handler {
 					ImGui::NewLine();
 				}
 
-				if (NetworkSession::localPeerIsSessionHost()) {
-					if (ImGui::CollapsingHeader("Host Settings"))
+				if (NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() == scnr_type::SinglePlayer) {
+					if (ImGui::CollapsingHeader("Host & Campaign Settings"))
 					{
+						ImGui::Columns(2, "", false);
 						TextVerticalPad("Anti-Cheat", 8.5);
-						ImGui::SameLine();
+						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						if (ImGui::Checkbox("##Anti-Cheat", &H2Config_anti_cheat_enabled))
 						{
 							for (auto i = 0; i < NetworkSession::getCurrentNetworkSession()->membership.peer_count; i++)
@@ -642,6 +614,15 @@ namespace imgui_handler {
 						{
 							ImGui::SetTooltip("Allows you to disable the Anti-Cheat for your lobby.");
 						}
+
+						ImGui::NextColumn();
+
+						//XDelay
+						TextVerticalPad("Disable X to Delay", 8.5);
+						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+						ImGui::Checkbox("##XDelay", &H2Config_xDelay);
+
+						ImGui::Columns(1);
 						ImGui::Separator();
 						auto Skulls = reinterpret_cast<skull_enabled_flags*>(h2mod->GetAddress(0x4D8320));
 						ImGui::Columns(3, "", false);
@@ -710,7 +691,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Grunt Birthday Party", 8.5);
+						TextVerticalPad("Grunt Birthday", 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullGBP", &Skulls->Grunt_Birthday_Party);
 						if (ImGui::IsItemHovered())
@@ -768,11 +749,32 @@ namespace imgui_handler {
 					}
 				}
 
-				if (ImGui::CollapsingHeader("Project Settings"))
+				if (ImGui::CollapsingHeader("Game Settings"))
 				{
+					ImGui::Columns(2, "", false);
+
 					TextVerticalPad("Discord Rich Presence", 8.5);
-					ImGui::SameLine();
+					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##DRP", &H2Config_discord_enable);
+					
+					ImGui::NextColumn();
+
+					//Skip Intro
+					TextVerticalPad("Disable Intro videos", 8.5);
+					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+					ImGui::Checkbox("##Intro", &H2Config_skip_intro);
+
+					ImGui::NextColumn();
+
+					ImGui::Text("Language");
+					const char* l_items[]{ "English", "Japanese", "German", "French", "Spanish", "Italian", "Korean", "Chinese" };
+					ImGui::PushItemWidth(ImGui::GetColumnWidth());
+					if (ImGui::Combo("##Language_Selection", &H2Config_language.code_main, l_items, 8))
+					{
+						setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
+					}
+					ImGui::PopItemWidth();
+					ImGui::Columns(1);
 					ImGui::NewLine();
 				}
 #if DISPLAY_DEV_TESTING_MENU

@@ -671,6 +671,11 @@ static void overrideCoreH2Labels() {
 		add_custom_label(lang, 0x000003fd, 0x05000986, "CARTOGRAPHER");
 		add_custom_label(lang, 0x00000718, 0x0E0005D9, "Extra Game Settings...");
 		add_custom_label(lang, 0x00000937, 0x0700064a, "Signing into Project Cartographer, please wait...");
+		add_custom_label(lang, 0x00000ae5, 0x0a001b30, "Join others in online multiplayer fun with Project Cartographer! Choose from a vast selection of Ranked, Social and Custom games!");
+		add_custom_label(lang, 0x00000ae5, 0x0b001b2e, "Join our amazing community online at halo2pc.com!");
+		add_custom_label(lang, 0x00000ae5, 0x06000234, "Cartographer");
+		add_custom_label(lang, 0x00000ae5, 0x0f001ae6, "Jump right into a game of Halo 2");
+		add_custom_label(lang, 0x00000ae5, 0x11001b2f, "Online Stats");
 	}
 } 
 

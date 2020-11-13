@@ -17,6 +17,8 @@ namespace imgui_handler
 	static ImGuiMouseCursor     g_LastMouseCursor = ImGuiMouseCursor_COUNT;
 	static bool                 g_HasGamepad = false;
 	static bool                 g_WantUpdateHasGamepad = true;
+	static LPDIRECT3DDEVICE9	g_pDevice;
+	static PDIRECT3DTEXTURE9	g_patchNotes_Image = NULL;
 
 	HWND get_HWND()
 	{
@@ -265,6 +267,7 @@ namespace imgui_handler
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ButtonTextAlign);
 		ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, SelectabletextAlign);
 		g_hWnd = hWnd;
+		g_pDevice = pDevice;
 		//	ImGuiIO& io = ImGui::GetIO();
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
 		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
@@ -298,6 +301,12 @@ namespace imgui_handler
 		ImFont* font1 = io.Fonts->AddFontDefault();
 
 		ImGui_ImplDX9_Init(pDevice);
+
+		//int my_image_width = 1786;
+		//int my_image_height = 745;
+		
+		//bool ret = LoadTextureFromFile("patchnotes.png", , &my_image_width, &my_image_height);
+		//IM_ASSERT(ret);
 	}
 	float WidthPercentage(float percent)
 	{
@@ -314,5 +323,38 @@ namespace imgui_handler
 		ImGui::Text(label);
 		ImGui::GetFont()->DisplayOffset.y -= amount;
 		//ImGui::SetCursorPosY(cursor_pos.y);
+	}
+
+	bool LoadTextureFromFile(const char* filename, s_imgui_images image, int* out_width, int* out_height)
+	{
+		// Load texture from disk
+		PDIRECT3DTEXTURE9 texture;
+		HRESULT hr = D3DXCreateTextureFromFileA(g_pDevice, filename, &texture);
+		if (hr != S_OK)
+			return false;
+
+		// Retrieve description of the texture surface so we can access its size
+		D3DSURFACE_DESC my_image_desc;
+		texture->GetLevelDesc(0, &my_image_desc);
+		switch (image)
+		{
+		case patch_notes:
+			g_patchNotes_Image = texture;
+			break;
+		default:
+			return false;
+		}
+		*out_width = (int)my_image_desc.Width;
+		*out_height = (int)my_image_desc.Height;
+		return true;
+	}
+
+	PDIRECT3DTEXTURE9 GetImage(s_imgui_images image)
+	{
+		switch(image) { 
+			case patch_notes: 
+				return g_patchNotes_Image;
+			default: NULL;
+		}
 	}
 }

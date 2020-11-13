@@ -569,8 +569,13 @@ int WINAPI XLiveRender()
 					drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
 				else if (MasterState == 10)
 					drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
-			}
 
+				if(H2Config_anti_cheat_enabled)
+					drawText(0, 30, COLOR_GREEN, "Anti-Cheat: Enabled", smallFont);
+				else
+					drawText(0, 30, COLOR_RED, "Anti-Cheat: Disabled", smallFont);
+			}
+			
 			//drawPrimitiveRect(gameWindowWidth / 1.15, gameWindowHeight - 150, 250, 100, D3DCOLOR_ARGB(155, 41, 65, 129));
 			//drawText(gameWindowWidth / 1.13, gameWindowHeight - 145, COLOR_WHITE, "Points: 10,000", haloFont);
 	

@@ -1,8 +1,13 @@
 #pragma once
 #include "imgui.h"
+#include <D3dx9tex.h>
 
 namespace imgui_handler
 {
+	enum s_imgui_images
+	{
+		patch_notes
+	};
 	struct s_imgui_window
 	{
 		std::string name;
@@ -30,7 +35,8 @@ namespace imgui_handler
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd);
 	float WidthPercentage(float percent);
 	void TextVerticalPad(char* label, float amount);
-
+	bool LoadTextureFromFile(const char* filename, s_imgui_images image, int* out_width, int* out_height);
+	PDIRECT3DTEXTURE9 GetImage(s_imgui_images image);
 
 	namespace MOTD {
 		void Render(bool* p_open);

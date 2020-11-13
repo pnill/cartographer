@@ -407,11 +407,13 @@ void __cdecl game_main_loop()
 				game_effects_update(out_dt);
 				director_update(v13);
 				observer_update(v13);
-				__asm{
-					mov eax, [vibrations_update]
-					add eax, [H2BaseAddr]
-					call eax
-				}
+				//TODO: Fix Controller Vibrations
+				//__asm{
+				//	fstp dword ptr [v13]
+				//	mov eax, [vibrations_update]
+				//	add eax, [H2BaseAddr]
+				//	call eax
+				//}
 			}
 			else
 			{

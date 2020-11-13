@@ -8,6 +8,7 @@
 #include <typeindex>
 #include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Cache/TagGroups/s_user_interface_screen_widget_definition.hpp"
+#include "Blam/Cache/TagGroups/new_hud_definition.hpp"
 std::vector<void*> ToFree;
 
 
@@ -93,8 +94,32 @@ namespace MetaExtender {
 
 	void test()
 	{
-		auto wigt = tags::find_tag(blam_tag::tag_group_type::userinterfacescreenwidgetdefinition, "ui\\screens\\game_shell\\settings_screen\\player_profile\\button_settings");
-		auto t_wigt = tags::get_tag<blam_tag::tag_group_type::userinterfacescreenwidgetdefinition, s_user_interface_screen_widget_definition>(wigt);
+		auto chief_hud_datum = tags::find_tag(blam_tag::tag_group_type::newhuddefinition, "ui\\hud\\masterchief");
+		auto chief_hud_tag = tags::get_tag<blam_tag::tag_group_type::newhuddefinition, s_new_hud_definition_group_definition>(chief_hud_datum);
+
+		auto new_text_widget = MetaExtender::add_tag_block2<s_new_hud_definition_group_definition::s_text_widgets_block>((unsigned long)std::addressof(chief_hud_tag->text_widgets));
+		new_text_widget->name = chief_hud_tag->text_widgets[0]->name;
+		new_text_widget->input_1 = s_new_hud_definition_group_definition::e_input::unit_frag_gren_cnt;
+		new_text_widget->enable_unit_flags = s_new_hud_definition_group_definition::s_text_widgets_block::enable_unit_flags::unit_is_unzoomed;
+		new_text_widget->disable_unit_flags = s_new_hud_definition_group_definition::s_text_widgets_block::disable_unit_flags::binoculars_enabled;
+		new_text_widget->age_cutoff = 0;
+		new_text_widget->clip_cutoff = 4;
+		new_text_widget->total_cutoff = 4;
+		new_text_widget->anchor = s_new_hud_definition_group_definition::s_text_widgets_block::e_anchor::weapon_hud;
+		new_text_widget->shader = chief_hud_tag->text_widgets[0]->shader;
+		new_text_widget->string = chief_hud_tag->text_widgets[0]->string;
+		new_text_widget->justification = s_new_hud_definition_group_definition::s_text_widgets_block::e_justification::center;
+		new_text_widget->fullscreen_offset_x = 130;
+		new_text_widget->fullscreen_offset_y = -10;
+		new_text_widget->halfscreen_offset_x = 65;
+		new_text_widget->halfscreen_offset_y = -5;
+		new_text_widget->quarterscreen_offset_x = 65;
+		new_text_widget->quarterscreen_offset_y = -5;
+		LOG_INFO_GAME(IntToString<unsigned long>((unsigned long)std::addressof(*new_text_widget), std::hex));
+
+
+		//auto wigt = tags::find_tag(blam_tag::tag_group_type::userinterfacescreenwidgetdefinition, "ui\\screens\\game_shell\\settings_screen\\player_profile\\button_settings");
+		//auto t_wigt = tags::get_tag<blam_tag::tag_group_type::userinterfacescreenwidgetdefinition, s_user_interface_screen_widget_definition>(wigt);
 
 		//auto new_panel = MetaExtender::add_tag_block2<s_user_interface_screen_widget_definition::s_panes_block>((unsigned long)std::addressof(t_wigt->panes));
 		//auto new_list_block = MetaExtender::add_tag_block2<s_user_interface_screen_widget_definition::s_panes_block::s_list_block_block>((unsigned long)std::addressof(new_panel->list_block));

@@ -354,6 +354,8 @@
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_defenition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_defenition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\Shader_pass_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\new_hud_definition.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

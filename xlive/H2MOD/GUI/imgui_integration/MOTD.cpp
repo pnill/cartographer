@@ -7,12 +7,17 @@
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
 #include "Util/Hooks/Hook.h"
+#include "H2MOD/Modules/Input/Mouseinput.h"
+#include "H2MOD/Modules/Startup/Startup.h"
 
+extern int notify_xlive_ui;
 namespace imgui_handler
 {
 	namespace MOTD {
 		namespace
 		{
+			int DimX = 1786;
+			int DimY = 745;
 			struct curl_response_text {
 				char *ptr;
 				size_t len;
@@ -42,8 +47,12 @@ namespace imgui_handler
 
 				return size * nmemb;
 			}
+			size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+				size_t written = fwrite(ptr, size, nmemb, stream);
+				return written;
+			}
 			bool b_motd_fetched = false;
-			std::string motd = "Thank you for playing!\n please do not hack or cheat";
+			/*std::string motd = "Thank you for playing!\n please do not hack or cheat";
 			std::string getMOTD()
 			{
 				if (!b_motd_fetched)
@@ -89,48 +98,131 @@ namespace imgui_handler
 				{
 					return motd;
 				}
+			}*/
+			bool GetMOTD()
+			{
+				CURL *curl;
+				FILE *fp;
+				CURLcode res;
+				char *url = "http://www.halo2pc.com/motd.png";
+				auto path = std::wstring(H2ProcessFilePath);
+				auto cpath = std::string(path.begin(), path.end()) + "motd.png";
+				
+				curl = curl_easy_init();
+				if(curl)
+				{
+					fp = fopen(cpath.c_str(), "wb");
+					curl_easy_setopt(curl, CURLOPT_URL, url);
+					curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
+					curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+					res = curl_easy_perform(curl);
+					curl_easy_cleanup(curl);
+					fclose(fp);
+					imgui_handler::LoadTextureFromFile(cpath.c_str(), patch_notes,&DimX, &DimY);
+					return true;
+				}
+				return false;
 			}
+			bool g_init = false;
 		}
 		void Render(bool *p_open)
 		{
-			ImGuiIO& io = ImGui::GetIO();
-
-			RECT rect;
-			::GetClientRect(get_HWND(), &rect);
-			io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
-			ImGuiWindowFlags window_flags = 0;
-			window_flags |= ImGuiWindowFlags_NoCollapse;
-			window_flags |= ImGuiWindowFlags_NoResize;
-			window_flags |= ImGuiWindowFlags_NoMove;
-			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
-			//ImGui::PushFont(font2);
-			ImGui::SetNextWindowSize(ImVec2(650, 530), ImGuiCond_Appearing);
-			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
-			if (h2mod->GetMapType() == MainMenu)
-				ImGui::SetNextWindowBgAlpha(1);
-			if (ImGui::Begin("   Message of the Day", p_open, window_flags))
+			if(!g_init)
 			{
-
-				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.0f);
-				std::istringstream f(getMOTD());
-				std::string s;
-				while (std::getline(f, s, '\n'))
+				if(GetMOTD())
 				{
-					ImGui::TextWrapped(s.c_str());
-					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 0.5f);
+					g_init = true;
 				}
-				ImGui::NewLine();
-				ImGui::NewLine();
-				ImGui::SetCursorPos({ 10, 480 + ImGui::GetScrollY() });
-				if (ImGui::Button("Close", { 630, 40 }))
+				else
 				{
 					*p_open = false;
 				}
+			}
+			else {
+				ImGuiIO& io = ImGui::GetIO();
+				RECT rect;
+				::GetClientRect(get_HWND(), &rect);
+				io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
+				ImDrawList* draw_list = ImGui::GetOverlayDrawList();
+				ImVec2 Resolution(
+					ImGui::GetIO().DisplaySize.x,
+					ImGui::GetIO().DisplaySize.y
+				);
+				
+				ImVec2 Dimensions(
+					1786, 745
+				);
+				float MinScale = 1.5f;
+
+				ImVec2 Scale(
+					fmaxf(MinScale, (Dimensions.x / Resolution.x)),
+					fmaxf(MinScale, (Dimensions.y / Resolution.y))
+				);
+				/*Scale.x = fmaxf(MinScale, Scale.x);
+				Scale.y = fmaxf(MinScale, Scale.y);*/
+				float scaledx = Dimensions.x / Scale.x;
+				float scaledy = Dimensions.y / Scale.y;
+
+				ImVec2 TopLeft(
+					(ImGui::GetIO().DisplaySize.x / 2) - (scaledx / 2),
+					(ImGui::GetIO().DisplaySize.y / 2) - (scaledy / 2)
+				);
+				ImVec2 BottomRight(
+					(ImGui::GetIO().DisplaySize.x / 2) + (scaledx / 2),
+					(ImGui::GetIO().DisplaySize.y / 2) + (scaledy / 2)
+				);
+				draw_list->AddImage((void*)imgui_handler::GetImage(patch_notes), TopLeft, BottomRight);
+
 				if (ControllerInput::get_controller_input(0)[16] == 1)
 				{
 					*p_open = false;
+					notify_xlive_ui = 0;
 				}
+				if(MouseInput::GetMouseState()[0xC] != 0)
+				{
+					*p_open = false;
+					notify_xlive_ui = 0;
+				}
+
+				//ImGuiIO& io = ImGui::GetIO();
+				//RECT rect;
+				//::GetClientRect(get_HWND(), &rect);
+				//io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
+				//ImGuiWindowFlags window_flags = 0;
+				//window_flags |= ImGuiWindowFlags_NoCollapse;
+				//window_flags |= ImGuiWindowFlags_NoResize;
+				//window_flags |= ImGuiWindowFlags_NoMove;
+				//ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+				//ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
+				////ImGui::PushFont(font2);
+				//ImGui::SetNextWindowSize(ImVec2(650, 530), ImGuiCond_Appearing);
+				//ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
+				//if (h2mod->GetMapType() == MainMenu)
+				//	ImGui::SetNextWindowBgAlpha(1);
+				/*if (ImGui::Begin("   Message of the Day", p_open, window_flags))
+				{
+					ImGui::Image((void*)imgui_handler::GetImage(patch_notes), ImVec2(1786, 745));
+
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.0f);
+					std::istringstream f(getMOTD());
+					std::string s;
+					while (std::getline(f, s, '\n'))
+					{
+						ImGui::TextWrapped(s.c_str());
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 0.5f);
+					}
+					ImGui::NewLine();
+					ImGui::NewLine();
+					ImGui::SetCursorPos({ 10, 480 + ImGui::GetScrollY() });
+					if (ImGui::Button("Close", { 630, 40 }))
+					{
+						*p_open = false;
+					}
+					if (ControllerInput::get_controller_input(0)[16] == 1)
+					{
+						*p_open = false;
+					}
+				}*/
 			}
 		}
 		void Open()

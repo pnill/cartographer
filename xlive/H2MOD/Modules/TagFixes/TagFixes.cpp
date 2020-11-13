@@ -57,7 +57,30 @@ namespace TagFixes
 				1
 			);
 		}
+		void fix_dynamic_lights()
+		{
+			auto cinematic_shadow_datum = tags::find_tag(blam_tag::tag_group_type::vertexshader, "rasterizer\\vertex_shaders_dx9\\shadow_buffer_generation_cinematic");
+			auto shadow_datum = tags::find_tag(blam_tag::tag_group_type::shaderpass, "shaders\\shader_passes\\shadow\\shadow_generate");
+			byte* shadow_tag = tags::get_tag<blam_tag::tag_group_type::shaderpass, BYTE>(shadow_datum);
+			if(shadow_tag != nullptr)
+			{
+				auto *shadow_pp = reinterpret_cast<tags::tag_data_block*>(shadow_tag + 0x1C);
+				if(shadow_pp->block_count > 0 && shadow_pp->block_data_offset != -1)
+				{
+					auto shadow_pp_data = tags::get_tag_data() + shadow_pp->block_data_offset;
+					auto *shadow_impl_block = reinterpret_cast<tags::tag_data_block*>(shadow_pp_data);
+					if(shadow_impl_block->block_count > 0 && shadow_impl_block->block_data_offset != -1)
+					{
+						auto *shadow_impl = tags::get_tag_data() + shadow_impl_block->block_data_offset;
+						tag_reference* impl_1 = reinterpret_cast<tag_reference*>(shadow_impl + (0x14A) + 0xFC);
+						tag_reference* impl_2 = reinterpret_cast<tag_reference*>(shadow_impl + (0x14A*2) + 0xFC);
 
+						impl_1->TagIndex = cinematic_shadow_datum.data;
+						impl_2->TagIndex = cinematic_shadow_datum.data;
+					}
+				}
+			}
+		}
 		void ShaderSpecularFix()
 		{
 			//Fix the Master Chief FP Arms Shader
@@ -118,6 +141,8 @@ namespace TagFixes
 				*(float*)(&tags::get_tag_data()[0xE65D9C]) = 20.0f; /*elite_mp hlmt max abs acc default value doubled*/
 			}
 		}
+
+
 	}
 
 
@@ -126,6 +151,7 @@ namespace TagFixes
 		fix_shaders_nvidia();
 		ShaderSpecularFix();
 		fall_damage_fix();
+		fix_dynamic_lights();
 	}
 
 	void Initalize()
