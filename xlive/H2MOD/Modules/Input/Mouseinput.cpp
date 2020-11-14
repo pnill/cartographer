@@ -34,7 +34,6 @@ p_mouse_input* c_mouse_input;
 char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, float *a6, void *a7)
 {
 	time_globals* time = time_globals::get_game_time_globals();
-	bool b = ControllerInput::HasInput();
 	if(H2Config_raw_input)
 	{
 		if (!b_raw_init) {
@@ -44,10 +43,8 @@ char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, 
 			WriteBytes(base + 0x627E7, assmNop, 8);
 			b_raw_init = true;
 		}
-		if (!b) {
-			*dx = time->seconds_per_tick * (float)ms->lX * -(H2Config_raw_mouse_scale / 100);
-			*dy = time->seconds_per_tick * (float)ms->lY * -(H2Config_raw_mouse_scale / 100);
-		}
+		*dx = time->seconds_per_tick * (float)ms->lX * -(H2Config_raw_mouse_scale / 100);
+		*dy = time->seconds_per_tick * (float)ms->lY * -(H2Config_raw_mouse_scale / 100);
 	} 
 	else
 	{
@@ -60,10 +57,7 @@ char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, 
 			b_raw_init = false;
 		}
 	}
-	
-	if (!b) {
-		return c_mouse_input(local_player_index, data, a4, a5, a6, a7);
-	}
+	return c_mouse_input(local_player_index, data, a4, a5, a6, a7);
 }
 
 char* MouseInput::GetMouseState()
