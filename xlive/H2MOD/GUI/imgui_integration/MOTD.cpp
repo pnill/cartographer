@@ -142,10 +142,14 @@ namespace imgui_handler
 		}
 		void Render(bool *p_open)
 		{
+
 			ImGuiIO& io = ImGui::GetIO();
 			RECT rect;
 			::GetClientRect(get_HWND(), &rect);
 			io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
+			s_aspect_ratio ratio = getAspectRatio(
+				ImGui::GetIO().DisplaySize.x,
+				ImGui::GetIO().DisplaySize.y);
 			if(!g_init)
 			{
 				if(!g_motd)
@@ -178,10 +182,23 @@ namespace imgui_handler
 					ImGui::GetIO().DisplaySize.x,
 					ImGui::GetIO().DisplaySize.y
 				);
+				ImVec2 Dimensions;
+				switch(ratio)
+				{
+					case four_three: 
+						Dimensions = ImVec2(
+							1184, 745
+						);
+					break;
+					default:
+					case sixten_nine:
+						Dimensions = ImVec2(
+							1786, 745
+						);
+					break;
 				
-				ImVec2 Dimensions(
-					1786, 745
-				);
+				}
+
 				float MinScale = 1.5f;
 
 				ImVec2 Scale(

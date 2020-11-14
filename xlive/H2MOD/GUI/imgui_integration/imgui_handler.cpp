@@ -216,6 +216,7 @@ namespace imgui_handler
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
+
 		ImGui::StyleColorsMaik();
 		const ImVec2 wPadding(20, 10);
 		const ImVec2 fPadding(8, 3);
@@ -307,13 +308,7 @@ namespace imgui_handler
 		
 		//bool ret = LoadTextureFromFile("patchnotes.png", , &my_image_width, &my_image_height);
 		//IM_ASSERT(ret);
-		auto grab_thread = []()
-		{
-			MOTD::GetMOTD(getAspectRatio(
-				ImGui::GetIO().DisplaySize.x,
-				ImGui::GetIO().DisplaySize.y));
-		};
-		std::thread(grab_thread).detach();
+		preloadImages();
 	}
 	float WidthPercentage(float percent)
 	{
@@ -367,7 +362,29 @@ namespace imgui_handler
 
 	s_aspect_ratio getAspectRatio(float width, float height)
 	{
-		auto ratio = width / height;
-		return (abs(ratio - 4 / 3) < abs(ratio - 16 / 9)) ? four_three : sixten_nine;
+		if(width / height >= 1.6f)
+		{
+			return sixten_nine;
+		}
+		else
+		{
+			return four_three;
+		}
+	}
+
+	void preloadImages()
+	{
+
+		auto grab_thread = []()
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			RECT rect;
+			::GetClientRect(get_HWND(), &rect);
+			io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
+			MOTD::GetMOTD(getAspectRatio(
+				ImGui::GetIO().DisplaySize.x,
+				ImGui::GetIO().DisplaySize.y));
+		};
+		std::thread(grab_thread).detach();
 	}
 }
