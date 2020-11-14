@@ -32,6 +32,7 @@ namespace imgui_handler {
 			int g_deadzone = 0;
 			int g_aiming = 0;
 			bool g_init = false;
+			int g_language_code = -1;
 			void DrawDeadzones()
 			{
 				ImDrawList* draw_list = ImGui::GetOverlayDrawList();
@@ -102,6 +103,9 @@ namespace imgui_handler {
 			{
 				g_deadzone = (int)H2Config_Controller_Deadzone;
 				g_aiming = (int)H2Config_controller_modern;
+				g_language_code = H2Config_language.code_main;
+				if (g_language_code == -1)
+					g_language_code = 8;
 				g_init = true;
 			}
 			ImGuiIO& io = ImGui::GetIO();
@@ -346,7 +350,7 @@ namespace imgui_handler {
 				{
 					ImGui::Columns(2, "", false);
 					//Disable Ingame Keyboard
-					TextVerticalPad("Disable Keyboard Input", 8.5);
+					/*TextVerticalPad("Disable Keyboard Input", 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					if (ImGui::Checkbox("##KeyboardInput", &H2Config_disable_ingame_keyboard))
 					{
@@ -357,7 +361,7 @@ namespace imgui_handler {
 						KeyboardInput::ToggleKeyboardInput();
 					}
 
-					ImGui::NextColumn();
+					ImGui::NextColumn();*/
 
 					//Raw Input
 					TextVerticalPad("Raw Mouse Input", 8.5);
@@ -375,7 +379,7 @@ namespace imgui_handler {
 					}
 					if (ImGui::IsItemHovered())
 					{
-						ImGui::SetTooltip("By default the game has the horizontal sensitivity half of the vertical.\nEnabling this option will make these match.\n\nNOTE: Controller Modern Aiming will make this not work.");
+						ImGui::SetTooltip("By default the game has the vertical sensitivity half of the horizontal.\nEnabling this option will make these match.\n\nNOTE: Controller Modern Aiming will make this not work.");
 					}
 					ImGui::Columns(1);
 					if (H2Config_raw_input) {
@@ -447,7 +451,7 @@ namespace imgui_handler {
 					}
 					if (ImGui::IsItemHovered())
 					{
-						ImGui::SetTooltip("By default the game has the horizontal sensitivity half of the vertical.\nEnabling this option will make these match.");
+						ImGui::SetTooltip("By default the game has the vertical sensitivity half of the horizontal.\nEnabling this option will make these match.");
 					}
 					ImGui::Columns(1);
 					
@@ -767,10 +771,14 @@ namespace imgui_handler {
 					ImGui::NextColumn();
 
 					ImGui::Text("Language");
-					const char* l_items[]{ "English", "Japanese", "German", "French", "Spanish", "Italian", "Korean", "Chinese" };
+					const char* l_items[]{"English", "Japanese", "German", "French", "Spanish", "Italian", "Korean", "Chinese", "Native" };
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());
-					if (ImGui::Combo("##Language_Selection", &H2Config_language.code_main, l_items, 8))
+					if (ImGui::Combo("##Language_Selection", &g_language_code, l_items, 9))
 					{
+						if (g_language_code == 8)
+							H2Config_language.code_main = -1;
+						else
+							H2Config_language.code_main = g_language_code;
 						setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
 					}
 					ImGui::PopItemWidth();

@@ -5,6 +5,7 @@ namespace ControllerInput
 	void __cdecl procces_input();
 	void ToggleModern();
 	void SetSensitiviy(float value);
+	bool HasInput();
 	void SetDeadzones();
 	void Initialize();
 }

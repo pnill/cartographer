@@ -215,6 +215,14 @@ namespace ControllerInput
 		}
 	}
 
+	bool ControllerInput::HasInput()
+	{
+		char* cInput = (char*)ControllerInput::get_controller_input(0);
+		for(auto i = 0; i < 42; i++)
+			if(cInput[i] != 0 && cInput[i] != MAXBYTE && cInput[i] != 0x40)
+				return true;
+		return false;
+	}
 
 	void ControllerInput::Initialize()
 	{

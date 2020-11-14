@@ -104,6 +104,7 @@ public:
 		bool StatsEnabled = false;
 		bool RanksEnabled = false;
 	};
+	static void init();
 	static void InvalidateMatch(bool state);
 	static void verifyPlayerRanks();
 	static void verifyRegistrationStatus();

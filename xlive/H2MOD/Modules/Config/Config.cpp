@@ -754,11 +754,11 @@ void ReadH2Config() {
 						H2Config_Controller_Deadzone = Both;
 						break;
 				}
-				std::string deadzone_axial_x(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", "26.5"));
+				std::string deadzone_axial_x(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", "26.518"));
 				H2Config_Deadzone_A_X = std::stof(deadzone_axial_x);
-				std::string deadzone_axial_y(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", "26.5"));
+				std::string deadzone_axial_y(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", "26.518"));
 				H2Config_Deadzone_A_Y = std::stof(deadzone_axial_y);
-				std::string deadzone_radial(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", "26.5"));
+				std::string deadzone_radial(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", "26.518"));
 				H2Config_Deadzone_Radial = std::stof(deadzone_radial);
 
 

@@ -36,7 +36,8 @@ Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
 HeadHunter* headHunterHandler = new HeadHunter();
 VariantPlayer* variant_player = new VariantPlayer();
-StatsHandler* stats_handler = new StatsHandler;
+StatsHandler* stats_handler; 
+
 extern int H2GetInstanceId();
 std::unordered_map<int, int> object_to_variant;
 
@@ -1634,6 +1635,7 @@ VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DW
 
 void H2MOD::Initialize()
 {
+	stats_handler = new StatsHandler();
 	if (!h2mod->Server)
 	{
 		MouseInput::Initialize();

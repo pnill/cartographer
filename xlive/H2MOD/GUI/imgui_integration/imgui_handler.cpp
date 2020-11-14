@@ -307,6 +307,9 @@ namespace imgui_handler
 		
 		//bool ret = LoadTextureFromFile("patchnotes.png", , &my_image_width, &my_image_height);
 		//IM_ASSERT(ret);
+		MOTD::GetMOTD(getAspectRatio(
+			ImGui::GetIO().DisplaySize.x,
+			ImGui::GetIO().DisplaySize.y));
 	}
 	float WidthPercentage(float percent)
 	{
@@ -356,5 +359,11 @@ namespace imgui_handler
 				return g_patchNotes_Image;
 			default: NULL;
 		}
+	}
+
+	s_aspect_ratio getAspectRatio(float width, float height)
+	{
+		auto ratio = width / height;
+		return (abs(ratio - 4 / 3) < abs(ratio - 16 / 9)) ? four_three : sixten_nine;
 	}
 }

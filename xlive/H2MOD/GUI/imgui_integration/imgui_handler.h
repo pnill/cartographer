@@ -24,6 +24,11 @@ namespace imgui_handler
 			this->CloseFunc = closeFunc;
 		}
 	};
+	enum s_aspect_ratio : byte
+	{
+		four_three,
+		sixten_nine
+	};
 	HWND get_HWND();
 	bool CanDrawImgui();
 	void DrawImgui();
@@ -37,8 +42,9 @@ namespace imgui_handler
 	void TextVerticalPad(char* label, float amount);
 	bool LoadTextureFromFile(const char* filename, s_imgui_images image, int* out_width, int* out_height);
 	PDIRECT3DTEXTURE9 GetImage(s_imgui_images image);
-
+	s_aspect_ratio getAspectRatio(float width, float height);
 	namespace MOTD {
+		bool GetMOTD(s_aspect_ratio ratio);
 		void Render(bool* p_open);
 		void Open();
 		void Close();

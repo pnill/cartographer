@@ -18,11 +18,10 @@ namespace imgui_handler
 		{
 			int DimX = 1786;
 			int DimY = 745;
-			struct curl_response_text {
+			/*struct curl_response_text {
 				char *ptr;
 				size_t len;
 			};
-
 			static void init_curl_response(struct curl_response_text *s) {
 				s->len = 0;
 				s->ptr = (char*)malloc(s->len + 1);
@@ -32,7 +31,6 @@ namespace imgui_handler
 				}
 				s->ptr[0] = '\0';
 			}
-
 			static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct curl_response_text *s)
 			{
 				size_t new_len = s->len + size * nmemb;
@@ -46,12 +44,7 @@ namespace imgui_handler
 				s->len = new_len;
 
 				return size * nmemb;
-			}
-			size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
-				size_t written = fwrite(ptr, size, nmemb, stream);
-				return written;
-			}
-			bool b_motd_fetched = false;
+			}*/
 			/*std::string motd = "Thank you for playing!\n please do not hack or cheat";
 			std::string getMOTD()
 			{
@@ -99,50 +92,87 @@ namespace imgui_handler
 					return motd;
 				}
 			}*/
-			bool GetMOTD()
-			{
-				CURL *curl;
-				FILE *fp;
-				CURLcode res;
-				char *url = "http://www.halo2pc.com/motd.png";
-				auto path = std::wstring(H2ProcessFilePath);
-				auto cpath = std::string(path.begin(), path.end()) + "motd.png";
-				
-				curl = curl_easy_init();
-				if(curl)
-				{
-					fp = fopen(cpath.c_str(), "wb");
-					curl_easy_setopt(curl, CURLOPT_URL, url);
-					curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
-					curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-					res = curl_easy_perform(curl);
-					curl_easy_cleanup(curl);
-					fclose(fp);
-					imgui_handler::LoadTextureFromFile(cpath.c_str(), patch_notes,&DimX, &DimY);
-					return true;
-				}
-				return false;
-			}
+			bool g_motd = false;
+			bool g_complete = false;
+			bool g_success = false;	
 			bool g_init = false;
+		}
+		bool GetMOTD(s_aspect_ratio ratio)
+		{
+			if (g_complete)
+				return g_success;
+
+			CURL *curl;
+			FILE *fp;
+			CURLcode res;
+			std::string url = "http://www.halo2pc.com/";
+			switch (ratio)
+			{
+				case four_three:
+					url += "motd_43.png";
+					break;
+				case sixten_nine:
+					url += "motd_169.png";
+					break;
+				default:
+					return false;
+			}
+			auto path = std::wstring(H2ProcessFilePath);
+			auto cpath = std::string(path.begin(), path.end()) + "motd.png";
+
+			curl = curl_easy_init();
+			if (curl)
+			{
+				fp = fopen(cpath.c_str(), "wb");
+				curl_easy_setopt(curl, CURLOPT_URL, url);
+				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
+				curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+				res = curl_easy_perform(curl);
+				curl_easy_cleanup(curl);
+				fseek(fp, 0, SEEK_END);
+				int size = ftell(fp);
+				fclose(fp);
+				if (size > 5126) {
+					imgui_handler::LoadTextureFromFile(cpath.c_str(), patch_notes, &DimX, &DimY);
+					g_success = true;
+				}
+			}
+			g_complete = true;
+			return g_success;
 		}
 		void Render(bool *p_open)
 		{
+			ImGuiIO& io = ImGui::GetIO();
+			RECT rect;
+			::GetClientRect(get_HWND(), &rect);
+			io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
 			if(!g_init)
 			{
-				if(GetMOTD())
+				if(!g_motd)
 				{
-					g_init = true;
-				}
+					auto grab_thread = []()
+					{
+						GetMOTD(getAspectRatio(
+							ImGui::GetIO().DisplaySize.x,
+							ImGui::GetIO().DisplaySize.y));
+					};
+					std::thread(grab_thread).detach();
+					g_motd = true;
+				} 
 				else
 				{
-					*p_open = false;
+					if(g_complete)
+					{
+						if (!g_success) {
+							*p_open = false;
+							notify_xlive_ui = 0;
+							MOTD::Close();
+						}
+						g_init = true;
+					}
 				}
 			}
 			else {
-				ImGuiIO& io = ImGui::GetIO();
-				RECT rect;
-				::GetClientRect(get_HWND(), &rect);
-				io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
 				ImDrawList* draw_list = ImGui::GetOverlayDrawList();
 				ImVec2 Resolution(
 					ImGui::GetIO().DisplaySize.x,
@@ -176,11 +206,13 @@ namespace imgui_handler
 				if (ControllerInput::get_controller_input(0)[16] == 1)
 				{
 					*p_open = false;
+					MOTD::Close();
 					notify_xlive_ui = 0;
 				}
 				if(MouseInput::GetMouseState()[0xC] != 0)
 				{
 					*p_open = false;
+					MOTD::Close();
 					notify_xlive_ui = 0;
 				}
 

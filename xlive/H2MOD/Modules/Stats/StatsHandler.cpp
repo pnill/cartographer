@@ -847,6 +847,8 @@ struct compareXUID
 };
 
 
+
+
 void StatsHandler::InvalidateMatch(bool state)
 {
 	MatchInvalidated = state;
@@ -978,4 +980,9 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 		
 	}
 	return document;
+}
+
+void StatsHandler::init()
+{
+
 }
