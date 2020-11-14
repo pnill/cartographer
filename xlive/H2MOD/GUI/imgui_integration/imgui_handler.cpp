@@ -307,9 +307,13 @@ namespace imgui_handler
 		
 		//bool ret = LoadTextureFromFile("patchnotes.png", , &my_image_width, &my_image_height);
 		//IM_ASSERT(ret);
-		MOTD::GetMOTD(getAspectRatio(
-			ImGui::GetIO().DisplaySize.x,
-			ImGui::GetIO().DisplaySize.y));
+		auto grab_thread = []()
+		{
+			MOTD::GetMOTD(getAspectRatio(
+				ImGui::GetIO().DisplaySize.x,
+				ImGui::GetIO().DisplaySize.y));
+		};
+		std::thread(grab_thread).detach();
 	}
 	float WidthPercentage(float percent)
 	{
