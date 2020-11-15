@@ -341,13 +341,17 @@ namespace imgui_handler
 	{
 		// Load texture from disk
 		PDIRECT3DTEXTURE9 texture;
-		HRESULT hr = D3DXCreateTextureFromFileA(g_pDevice, filename, &texture);
+		D3DXIMAGE_INFO imgInfo;
+		//HRESULT hr = D3DXCreateTextureFromFileA(g_pDevice, filename, &texture);
+		HRESULT hr = D3DXCreateTextureFromFileExA(g_pDevice, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
+				D3DFMT_FROM_FILE, D3DPOOL_MANAGED, D3DX_FILTER_NONE, D3DX_FILTER_NONE, 0, &imgInfo, NULL, &texture);
+		
 		if (hr != S_OK)
 			return false;
 
 		// Retrieve description of the texture surface so we can access its size
-		D3DSURFACE_DESC my_image_desc;
-		texture->GetLevelDesc(0, &my_image_desc);
+		//D3DSURFACE_DESC my_image_desc;
+		//texture->GetLevelDesc(0, &my_image_desc);
 		switch (image)
 		{
 		case patch_notes:
@@ -356,8 +360,8 @@ namespace imgui_handler
 		default:
 			return false;
 		}
-		*out_width = (int)my_image_desc.Width;
-		*out_height = (int)my_image_desc.Height;
+		*out_width = imgInfo.Width;
+		*out_height = imgInfo.Height;
 		return true;
 	}
 

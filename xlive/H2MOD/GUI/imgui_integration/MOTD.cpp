@@ -20,7 +20,9 @@ namespace imgui_handler
 			bool g_motd = false;
 			bool g_complete = false;
 			bool g_success = false;	
-			bool g_init = false;	
+			bool g_init = false;
+			int X;
+			int Y;
 		}
 		bool GetMOTD(s_aspect_ratio ratio)
 		{
@@ -62,8 +64,8 @@ namespace imgui_handler
 					RECT rect;
 					::GetClientRect(get_HWND(), &rect);
 					io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
-					int X = ImGui::GetIO().DisplaySize.x;
-					int Y = ImGui::GetIO().DisplaySize.y;
+					//int X = ImGui::GetIO().DisplaySize.x;
+					//int Y = ImGui::GetIO().DisplaySize.y;
 					imgui_handler::LoadTextureFromFile(cpath.c_str(), patch_notes, &X, &Y);
 					g_success = true;
 				}
@@ -149,7 +151,10 @@ namespace imgui_handler
 				//	(ImGui::GetIO().DisplaySize.x / 2) + (scaledx / 2),
 				//	(ImGui::GetIO().DisplaySize.y / 2) + (scaledy / 2)
 				//);
-				draw_list->AddImage((void*)imgui_handler::GetImage(patch_notes), ImVec2(0,0), ImVec2(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y));
+				draw_list->AddImage((void*)imgui_handler::GetImage(patch_notes), ImVec2(0,0), 
+					ImVec2(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y));
+				/*draw_list->AddImage((void*)imgui_handler::GetImage(patch_notes), ImVec2(0, 0),
+					ImVec2(X, Y));*/
 
 				if (ControllerInput::get_controller_input(0)[16] == 1)
 				{
