@@ -109,7 +109,6 @@ namespace imgui_handler {
 				g_init = true;
 			}
 			ImGuiIO& io = ImGui::GetIO();
-
 			RECT rect;
 			::GetClientRect(get_HWND(), &rect);
 			io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
@@ -295,7 +294,7 @@ namespace imgui_handler {
 					ImGui::PushItemWidth(WidthPercentage(10.0f));
 					ImGui::InputInt("##FPS1", &H2Config_fps_limit, 0, 110); ImGui::SameLine();
 					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("Setting this to 0 will uncap your games frame rate.\nAnything over 60 may cause performance issues\nUse the Experiment FPS Fix to resolve them");
+						ImGui::SetTooltip("Setting this to 0 will uncap your games frame rate.\nAnything over 60 may cause performance issues\nUse the Experimental Rendering Changes to resolve them");
 					if (ImGui::IsItemEdited()) {
 						if (H2Config_fps_limit < 10 && H2Config_fps_limit != 0)
 							H2Config_fps_limit = 10;
@@ -334,7 +333,7 @@ namespace imgui_handler {
 					ImGui::SetCursorPosX(float_offset);
 					ImGui::Combo("##LOD", &H2Config_static_lod_state, items, 7);
 					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("Changing this will force the game to use the set Level of Detail for models that have them\nLeaving it at default makes it dynamic which is the games\n default behaviour.");
+						ImGui::SetTooltip("Changing this will force the game to use the set Level of Detail for models that have them\nLeaving it at default makes it dynamic which is the games default behaviour.");
 					ImGui::PopItemWidth();
 					//Hires Fix
 					TextVerticalPad("High Resolution Fix", 8.5);
@@ -367,7 +366,10 @@ namespace imgui_handler {
 					TextVerticalPad("Raw Mouse Input", 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##RawMouse", &H2Config_raw_input);
-
+					if(ImGui::IsItemHovered())
+					{
+						ImGui::SetTooltip("This will remove the game's default mouse acceleration.\n\nNOTE: This setting does not work if you have Modern Aiming turned on for your controller.");
+					}
 					//Uniform Sensitivity
 					ImGui::NextColumn();
 					TextVerticalPad("Uniform Sensitivity", 8.5);
@@ -379,7 +381,7 @@ namespace imgui_handler {
 					}
 					if (ImGui::IsItemHovered())
 					{
-						ImGui::SetTooltip("By default the game has the vertical sensitivity half of the horizontal.\nEnabling this option will make these match.\n\nNOTE: Controller Modern Aiming will make this not work.");
+						ImGui::SetTooltip("By default the game has the vertical sensitivity half of the horizontal.\nEnabling this option will make these match.");
 					}
 					ImGui::Columns(1);
 					if (H2Config_raw_input) {
@@ -495,7 +497,7 @@ namespace imgui_handler {
 					}
 					if (ImGui::IsItemHovered())
 					{
-						ImGui::SetTooltip("Mordern Aiming will remove the native acceleration zones from a controller while aiming, allowing for more percise aim.\n\nNOTE: Modern Aiming will make MK not function correctly.");
+						ImGui::SetTooltip("Modern Aiming will remove the native acceleration zones from a controller while aiming, allowing for a more precise aim.\n\nNOTE: Selecting Modern Aiming will cause Raw Mouse input to not work.");
 					}
 					ImGui::PopItemWidth();
 

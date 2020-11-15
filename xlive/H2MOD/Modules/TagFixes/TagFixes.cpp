@@ -2,45 +2,46 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD.h"
 #include "Blam/Cache/TagGroups/shader_definition.h"
+#include "H2MOD/Modules/Utils/Utils.h"
+#include "Util/Hooks/Hook.h"
 
 namespace TagFixes
 {
 	namespace
 	{
-
 		void fix_shader_template_nvidia(const std::string &template_name, const std::string &bitmap_name, size_t bitmap_idx)
 		{
 			datum bitmap_to_fix = tags::find_tag(blam_tag::tag_group_type::bitmap, bitmap_name);
 			datum borked_template = tags::find_tag(blam_tag::tag_group_type::shadertemplate, template_name);
-
 			LOG_DEBUG_FUNC("bitmap {0}, borked_template {1}", bitmap_to_fix.data, borked_template.data);
-
 			if (bitmap_to_fix.IsNull() || borked_template.IsNull())
 				return;
-
 			LOG_DEBUG_FUNC("Fixing: template {}, bitmap {}", template_name, bitmap_name);
-
-			tags::ilterator shaders(blam_tag::tag_group_type::shader);
-			while (!shaders.next().IsNull())
+			auto shaders = tags::find_tags(blam_tag::tag_group_type::shader);
+			for(auto &shader_item : shaders)
 			{
-				auto *shader = LOG_CHECK(tags::get_tag<blam_tag::tag_group_type::shader, shader_definition>(shaders.m_datum));
-				if (shader && shader->shader_template.TagIndex == borked_template && LOG_CHECK(shader->postprocessDefinition.size > 0))
+				auto shader = tags::get_tag<blam_tag::tag_group_type::shader, byte>(shader_item.first);
+				if(shader != nullptr)
 				{
-					LOG_DEBUG_FUNC("shader {} has borked template", tags::get_tag_name(shaders.m_datum));
-					auto *post_processing = shader->postprocessDefinition[0];
-					if (LOG_CHECK(post_processing->bitmaps.size >= (bitmap_idx + 1)))
+					tag_reference* shader_template = reinterpret_cast<tag_reference*>(shader);
+					if(shader_template->TagIndex == borked_template)
 					{
-						auto *bitmap_block = post_processing->bitmaps[bitmap_idx];
-						if (bitmap_block->bitmapGroup == bitmap_to_fix)
+						auto *shader_post = reinterpret_cast<tags::tag_data_block*>(shader + 0x20);
+						if(shader_post->block_count > 0)
 						{
-							LOG_DEBUG_FUNC("Nulled bitmap {}", bitmap_idx);
-							bitmap_block->bitmapGroup = datum::Null;
+							auto shader_post_data = tags::get_tag_data() + shader_post->block_data_offset;
+							auto shader_post_bitmap = reinterpret_cast<tags::tag_data_block*>(shader_post_data + 0x4);
+							if(shader_post_bitmap->block_count >= bitmap_idx + 1)
+							{
+								auto bitmap_data = tags::get_tag_data() + (shader_post_bitmap->block_data_offset + (bitmap_idx * 0xC));
+								unsigned long* bitmap = reinterpret_cast<unsigned long*>(bitmap_data);
+								*bitmap = datum::Null;
+							}
 						}
 					}
 				}
 			}
 		}
-
 		void fix_shaders_nvidia()
 		{
 			if (h2mod->Server) return;
@@ -141,17 +142,25 @@ namespace TagFixes
 				*(float*)(&tags::get_tag_data()[0xE65D9C]) = 20.0f; /*elite_mp hlmt max abs acc default value doubled*/
 			}
 		}
-
-
+		void font_table_fix()
+		{
+			WriteValue<int>(h2mod->GetAddress(0x464940), 0);
+			WriteValue<int>(h2mod->GetAddress(0x46494C), 0);
+			WriteValue<int>(h2mod->GetAddress(0x464958), 0);
+			WriteValue<int>(h2mod->GetAddress(0x464964), 0);
+		}
 	}
 
 
 	void OnMapLoad()
 	{
-		fix_shaders_nvidia();
-		ShaderSpecularFix();
-		fall_damage_fix();
-		fix_dynamic_lights();
+		if (!h2mod->Server) {
+			fix_shaders_nvidia();
+			ShaderSpecularFix();
+			fall_damage_fix();
+			fix_dynamic_lights();
+			font_table_fix();
+		}
 	}
 
 	void Initalize()

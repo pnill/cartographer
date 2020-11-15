@@ -504,6 +504,7 @@ extern void handleHotkeyInput(WPARAM lpMsg);
 // #5030: XLivePreTranslateMessage
 BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 {
+	//return true;
 	if ((GetKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
 	{
 		// hotkeys
@@ -512,8 +513,10 @@ BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 		// console
 		commands->handleInput(lpMsg->wParam);
 	}
-
-	return false;
+	if (imgui_handler::IsWindowActive("motd"))
+		return true;
+	else
+		return false;
 }
 
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -560,20 +563,20 @@ int WINAPI XLiveRender()
 			bool paused_or_in_menus = (*h2mod->GetAddress<BYTE*>(0x47A568) != 0);
 
 			if (GameEngine == 3 || (GameEngine != 3 && paused_or_in_menus)) {
-				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
+				drawText(0, 0, COLOR_WHITE, BuildText, normalSizeFont);
 				if (MasterState == 0)
-					drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
+					drawText(0, 15, COLOR_WHITE, ServerStatus, normalSizeFont);
 				else if (MasterState == 1)
-					drawText(0, 15, COLOR_GREY, ServerStatus, smallFont);
+					drawText(0, 15, COLOR_GREY, ServerStatus, normalSizeFont);
 				else if (MasterState == 2)
-					drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
+					drawText(0, 15, COLOR_RED, ServerStatus, normalSizeFont);
 				else if (MasterState == 10)
-					drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
+					drawText(0, 15, COLOR_GREEN, ServerStatus, normalSizeFont);
 
 				if(H2Config_anti_cheat_enabled)
-					drawText(0, 30, COLOR_GREEN, "Anti-Cheat: Enabled", smallFont);
+					drawText(0, 30, COLOR_GREEN, "Anti-Cheat: Enabled", normalSizeFont);
 				else
-					drawText(0, 30, COLOR_RED, "Anti-Cheat: Disabled", smallFont);
+					drawText(0, 30, COLOR_RED, "Anti-Cheat: Disabled", normalSizeFont);
 			}
 			
 			//drawPrimitiveRect(gameWindowWidth / 1.15, gameWindowHeight - 150, 250, 100, D3DCOLOR_ARGB(155, 41, 65, 129));

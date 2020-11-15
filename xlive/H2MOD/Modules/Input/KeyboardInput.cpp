@@ -90,6 +90,11 @@ void KeyboardInput::RegisterHotkey(int* hotkey, std::function<void()> callback)
 	}
 }
 
+void KeyboardInput::RemoveHotkey(int* hotkey)
+{
+	hotKeyMap.erase(hotkey);
+}
+
 void KeyboardInput::ExecuteHotkey(WPARAM message)
 {
 	for(auto &hk : hotKeyMap)

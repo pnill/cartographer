@@ -5,7 +5,7 @@
 #pragma pack(push,1)
 struct shader_postprocess_bitmap_new_block
 {
-	datum bitmapGroup;
+	tag_reference bitmapGroup;
 	size_t bitmapIndex;
 	float logBitmapDimension;
 };

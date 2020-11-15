@@ -32,7 +32,8 @@ namespace imgui_handler
 	HWND get_HWND();
 	bool CanDrawImgui();
 	void DrawImgui();
-	void ToggleWindow(std::string);
+	void ToggleWindow(std::string name);
+	bool IsWindowActive(std::string name);
 	static bool ImGui_ImplWin32_UpdateMouseCursor();
 	static void ImGui_ImplWin32_UpdateMousePos();
 	IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

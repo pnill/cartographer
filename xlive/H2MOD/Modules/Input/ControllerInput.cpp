@@ -218,10 +218,38 @@ namespace ControllerInput
 	bool ControllerInput::HasInput()
 	{
 		char* cInput = (char*)ControllerInput::get_controller_input(0);
-		for(auto i = 0; i < 42; i++)
-			if(cInput[i] != 0 && cInput[i] != MAXBYTE && cInput[i] != 0x40)
-				return true;
-		return false;
+		bool buttons = false;
+		for (auto i = 0; i < 42; i++)
+			if (cInput[i] != 0 && cInput[i] != MAXBYTE && cInput[i] != 0x40)
+				buttons = true;
+		short* scInput = (short*)cInput;
+
+		int thumbStickL = 0;
+		int thumbStickR = 0;
+		bool radialL = false;
+		bool radialR = false;
+		if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
+			if (abs(scInput[26]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_X / 100)))
+				thumbStickL++;
+			if (abs(scInput[27]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100)))
+				thumbStickL++;
+			if (abs(scInput[28]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_X / 100)))
+				thumbStickR++;
+			if (abs(scInput[29]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100)))
+				thumbStickR++;
+		}
+		unsigned int ar = pow((short)((float)MAXSHORT * (H2Config_Deadzone_Radial / 100)), 2);
+		unsigned int alx = pow(scInput[26], 2);
+		unsigned int aly = pow(scInput[27], 2);
+		unsigned int arx = pow(scInput[28], 2);
+		unsigned int ary = pow(scInput[29], 2);
+		unsigned int lh = alx + aly;
+		unsigned int rh = arx + ary;
+		if (rh >= ar)
+			radialR = true;
+		if (lh >= ar)
+			radialL = true;
+		return radialR || radialL || thumbStickL > 1 || thumbStickR > 1 || buttons;
 	}
 
 	void ControllerInput::Initialize()

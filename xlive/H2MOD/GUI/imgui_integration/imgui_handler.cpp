@@ -73,6 +73,16 @@ namespace imgui_handler
 		}
 	}
 
+	bool IsWindowActive(std::string name)
+	{
+		for(auto &window : windows)
+		{
+			if (window.name == name)
+				return window.DoRender;
+		}
+		return false;
+	}
+
 	static bool ImGui_ImplWin32_UpdateMouseCursor()
 	{
 		ImGuiIO& io = ImGui::GetIO();
