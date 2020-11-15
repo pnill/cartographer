@@ -151,7 +151,7 @@ namespace imgui_handler
 				//);
 				draw_list->AddImage((void*)imgui_handler::GetImage(patch_notes), ImVec2(0,0), ImVec2(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y));
 
-				/*if (ControllerInput::get_controller_input(0)[16] == 1)
+				if (ControllerInput::get_controller_input(0)[16] == 1)
 				{
 					*p_open = false;
 					MOTD::Close();
@@ -174,7 +174,7 @@ namespace imgui_handler
 						notify_xlive_ui = 0;
 						break;
 					}
-				}*/
+				}
 			}
 		}
 		void Open()
