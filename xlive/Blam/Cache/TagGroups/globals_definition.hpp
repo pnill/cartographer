@@ -3,7 +3,6 @@
 #include "..\Blam\Cache\TagGroups.hpp"
 #include "..\Blam\Maths\real_math.h"
 #include "..\Blam\Maths\integer_math.h"
-#include "H2MOD/Modules/Config/Config.h"
 
 /*********************************************************************
 * name: globals
@@ -1270,6 +1269,7 @@ TAG_GROUP_SIZE_ASSERT(s_globals_group_definition, 0x284);
 
 #pragma pack(pop)
 
+//Redundant defined in tags namespace
 //s_globals_group_definition *get_matg_globals_ptr()
 //{
 //	return *h2mod->GetAddress<s_globals_group_definition**>(0x479E70, 0x4A642C);

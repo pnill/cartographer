@@ -4,6 +4,7 @@
 #include "..\Util\Hooks\Hook.h"
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS/UncappedFPS.h"
 #include "H2MOD/Modules/Config/Config.h"
+#include "ControllerInput.h"
 
 typedef struct DIMOUSESTATE {
 	LONG lX;
@@ -29,13 +30,14 @@ typedef char(__cdecl p_mouse_input)(int local_player_index, void *data, int a4, 
 p_mouse_input* c_mouse_input;
 
 
+
 char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, float *a6, void *a7)
 {
 	time_globals* time = time_globals::get_game_time_globals();
 	if(H2Config_raw_input)
 	{
 		if (!b_raw_init) {
-
+			MouseInput::SetSensitivity(1);
 			WriteBytes(base + 0x627CC, assmNop, 8);
 			WriteBytes(base + 0x62802, assmNop, 8);
 			WriteBytes(base + 0x627E7, assmNop, 8);
@@ -48,34 +50,54 @@ char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, 
 	{
 		if(b_raw_init)
 		{
+			MouseInput::SetSensitivity(H2Config_mouse_sens);
 			WriteBytes(base + 0x627CC, o_SetDX, 8);
 			WriteBytes(base + 0x62802, o_SetDY, 8);
 			WriteBytes(base + 0x627E7, o_SetDX2, 8);
 			b_raw_init = false;
 		}
 	}
-
 	return c_mouse_input(local_player_index, data, a4, a5, a6, a7);
 }
 
+char* MouseInput::GetMouseState()
+{
+	return h2mod->GetAddress<char*>(0x47a570);
+}
 
-void Mouseinput::Initialize()
+void MouseInput::SetSensitivity(float value)
+{
+	
+	if (value == 0)
+		return;
+	float t_value = value;
+	if (H2Config_raw_input)
+		t_value = 1;
+	*h2mod->GetAddress<float*>(0x4A89B0) = 50.0f + 20.0f * t_value; //x-axis
+	if(!H2Config_mouse_uniform)
+		*h2mod->GetAddress<float*>(0x4A89B4) = 25.0f + 10.0f * t_value; //y-axis
+	else
+		*h2mod->GetAddress<float*>(0x4A89B4) = 50.0f + 20.0f * t_value; //y-axis
+}
+
+void MouseInput::Initialize()
 {
 	base = h2mod->GetAddress(0x0);
 	ms = (DIMOUSESTATE*)(base + 0x47A570);
 	dx = (float*)(base + 0x4AE610);
-	VirtualProtect(dx, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	//VirtualProtect(dx, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	dy = (float*)(base + 0x4AE614);
-	VirtualProtect(dy, 4, PAGE_EXECUTE_READWRITE, &dwBack);
+	//VirtualProtect(dy, 4, PAGE_EXECUTE_READWRITE, &dwBack);
 	ReadBytesProtected(base + 0x627CC, o_SetDX, 8);
 	ReadBytesProtected(base + 0x62802, o_SetDY, 8);
 	ReadBytesProtected(base + 0x627E7, o_SetDX2, 8);
 	auto setDx = (base + 0x627CC);
-	VirtualProtect((LPVOID)setDx, 8, PAGE_EXECUTE_READWRITE, &dwBack);
+	//VirtualProtect((LPVOID)setDx, 8, PAGE_EXECUTE_READWRITE, &dwBack);
 	auto setDy = (base + 0x62802);
-	VirtualProtect((LPVOID)setDy, 8, PAGE_EXECUTE_READWRITE, &dwBack);
+	//VirtualProtect((LPVOID)setDy, 8, PAGE_EXECUTE_READWRITE, &dwBack);
 	auto setDx2 = (base + 0x627E7);
-	VirtualProtect((LPVOID)setDx2, 8, PAGE_EXECUTE_READWRITE, &dwBack);
+	//VirtualProtect((LPVOID)setDx2, 8, PAGE_EXECUTE_READWRITE, &dwBack);
 	c_mouse_input = h2mod->GetAddress<p_mouse_input*>(0x61ea2);
 	PatchCall(h2mod->GetAddress(0x62f65), mouse_input);
+	SetSensitivity(H2Config_mouse_sens);
 }

@@ -39,8 +39,6 @@ namespace GUI
 	extern void Initialize(HWND hWnd);
 	extern void ToggleMenu();
 	extern void ShowAdvancedSettings(bool* p_open = NULL);
-	extern float WidthPercentage(float percent);
-	extern void TextVerticalPad(char* label, float amount);
 	extern void ResetDevice();
 
 };

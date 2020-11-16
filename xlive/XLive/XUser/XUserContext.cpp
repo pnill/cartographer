@@ -128,6 +128,13 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 		std::wstring map_name_wide = h2mod->GetAddress<wchar_t*>(0x46DAE8);
 		map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L"\\") + 1);
 
+		if(map_name_wide.empty())
+		{
+			std::string custom_map_wide_s = h2mod->GetAddress<char*>(0x47CF0C);
+			map_name_wide = std::wstring(custom_map_wide_s.begin(), custom_map_wide_s.end());
+			map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L"\\") + 1);
+		}
+
 		std::string map_name = wstring_to_string.to_bytes(map_name_wide);
 		LOG_TRACE_GAME(L"[Discord] map_name: {}", map_name_wide.c_str());
 

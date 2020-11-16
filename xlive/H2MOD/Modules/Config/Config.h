@@ -26,6 +26,12 @@ struct _H2Config_language {
 	int code_variant;
 };
 
+enum H2Config_Deadzone_Type : byte {
+	Axial,
+	Radial,
+	Both
+};
+
 extern std::string cartographerURL;
 extern std::string cartographerMapRepoURL;
 
@@ -52,8 +58,14 @@ extern bool H2Config_experimental_game_main_loop_patches;
 extern int H2Config_static_lod_state;
 extern int H2Config_field_of_view;
 extern int H2Config_vehicle_field_of_view;
-extern int H2Config_mouse_sens;
-extern int H2Config_controller_sens;
+extern float H2Config_mouse_sens;
+extern bool H2Config_mouse_uniform;
+extern float H2Config_controller_sens;
+extern bool H2Config_controller_modern;
+extern H2Config_Deadzone_Type H2Config_Controller_Deadzone;
+extern float H2Config_Deadzone_A_X;
+extern float H2Config_Deadzone_A_Y;
+extern float H2Config_Deadzone_Radial;
 extern int H2Config_refresh_rate;
 extern bool H2Config_hiresfix;
 extern bool H2Config_d3dex;

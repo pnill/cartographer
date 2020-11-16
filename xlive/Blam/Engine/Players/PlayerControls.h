@@ -2,7 +2,6 @@
 #include "..\Blam\Enums\Enums.h"
 #include "Blam/Common/Common.h"
 #include "Blam/Cache/DataTypes/DatumIndex.h"
-#include "H2MOD/Modules/Config/Config.h"
 
 typedef DWORD c_object_entity;
 namespace Blam 

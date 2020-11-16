@@ -5,14 +5,14 @@
 #pragma pack(push,1)
 struct shader_postprocess_bitmap_new_block
 {
-	datum bitmapGroup;
+	tag_reference bitmapGroup;
 	size_t bitmapIndex;
 	float logBitmapDimension;
 };
 
 struct shader_postprocess_definition_new_block
 {
-	int shaderTemplateIndex;
+	tag_reference shaderTemplateIndex;
 	tag_block<shader_postprocess_bitmap_new_block> bitmaps;
 
 	tag_block<> pixelConstants;

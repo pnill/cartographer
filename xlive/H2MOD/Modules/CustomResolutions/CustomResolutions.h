@@ -1,6 +1,6 @@
 #pragma once
 
-#define TOTAL_RESOLUTIONS 14
+#define TOTAL_RESOLUTIONS 16
 #define DEFAULT_TOTAL_RESOLUTIONS 11
 
 struct s_display_res

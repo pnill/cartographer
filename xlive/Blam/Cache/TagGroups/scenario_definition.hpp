@@ -3,7 +3,6 @@
 #include "..\Blam\Cache\TagGroups.hpp"
 #include "..\Blam\Cache\DataTypes\TagBlock.h"
 #include "..\Blam\Maths\real_math.h"
-#include "visit_struct/visit_struct.hpp"
 
 /*********************************************************************
 * name: scenario
@@ -3741,25 +3740,5 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_simulation_definition_table_block> simulation_definition_table;//0x3D8
 };
 TAG_GROUP_SIZE_ASSERT(s_scenario_group_definition, 0x3E0);
-VISITABLE_STRUCT(s_scenario_group_definition, decorators);
-
-VISITABLE_STRUCT(s_scenario_group_definition::s_decorators_block, grid_origin_x, grid_origin_y, grid_origin_z, cell_count_per_dimension, cache_blocks, groups, cells, decals);
-
-VISITABLE_STRUCT(s_scenario_group_definition::s_decorators_block::s_cache_blocks_block, block_offset, block_size, section_data_size, resource_data_size, resources, owner_tag_section_offset, cache_block_data);
-
-VISITABLE_STRUCT(s_scenario_group_definition::s_decorators_block::s_cache_blocks_block::s_resources_block, type, primary_locator, secondary_locator, resource_data_size, resource_data_offset);
-
-VISITABLE_STRUCT(s_scenario_group_definition::s_decorators_block::s_cache_blocks_block::s_cache_block_data_block, placements, decal_vertices, decal_indices, sprite_vertices, sprite_indices);
-VISITABLE_STRUCT(s_scenario_group_definition::s_decorators_block::s_cache_blocks_block::s_cache_block_data_block::s_placements_block, internal_data_1, compressed_position, compressed_light_direction, compressed_light_2_direction);
-
-VISITABLE_STRUCT(s_scenario_group_definition::s_decorators_block::s_cache_blocks_block::s_cache_block_data_block::s_decal_vertices_block, position_x, position_y, position_z, texcoord_0_x, texcoord_0_y, texcoord_1_x, texcoord_1_y);
-
-VISITABLE_STRUCT(s_scenario_group_definition::s_decorators_block::s_cache_blocks_block::s_cache_block_data_block::s_decal_indices_block, index);
-
-VISITABLE_STRUCT(s_scenario_group_definition::s_decorators_block::s_cache_blocks_block::s_cache_block_data_block::s_sprite_vertices_block, position_x, position_y, position_z, texcoord_x, texcoord_y);
-
-VISITABLE_STRUCT(s_scenario_group_definition::s_decorators_block::s_cache_blocks_block::s_cache_block_data_block::s_sprite_indices_block, index);
-
-
 #pragma pack(pop)
 

@@ -3,8 +3,8 @@
 #include "..\H2MOD.h"
 
 #include "H2MOD\Tags\TagInterface.h"
+#include "Util/Hooks/Hook.h"
 
-// object string, H2X rate of fire, H2v rate of fire, active barrel index, rounds per second based
 std::vector<H2X::h2x_mod_info> weapons =
 {
 	{ "objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle", 0.535f, 0.5f, 0, false },
@@ -19,29 +19,82 @@ std::vector<H2X::h2x_mod_info> weapons =
 	{ "objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle", 8.5f, 9.0f, 0, true },
 	{ "objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle", 10.0f, 11.0f, 0, true }
 };
+__declspec(naked) void time_globals_seconds_to_ticks()
+{
+	__asm
+	{
+		push ecx
+		mov ecx, 120
+		mov[esp], ecx
+		fild dword ptr[esp]
+		fmul dword ptr[esp + 8]
+		pop ecx
+		ret
+	}
+}
 
-// TODO: find a math formula to fix this
 void H2X::Initialize(bool enable)
 {
+	/*
+	 * Hook the call that takes the fire recovery time and soft recovery time
+	 * 
+	 * * 
+	 * X = (tickrate * fire recovery)							| 30 * 0.1				= 3 Ticks
+	 * Y = tickrate * ((1 - soft recovery) * fire recovery)		| 30 * ((1 - 0.5) * 0.1)= 1.5 Ticks
+	 * Z = floor(X) - floor(y)									| 3 - 1.5				= 1.5 Ticks
+	 * 
+	 * 
+	 * X = (tickrate * fire recovery)							| 60 * 0.1				= 6 Ticks
+	 * Y = tickrate * ((1 - soft recovery) * fire recovery)		| 60 * ((1 - 0.5) * 0.1)= 3 Ticks
+	 * Z = floor(X) - floor(y)									| 6 - 3					= 3 Ticks
+	 * 
+	 * 
+	 * X = (tickrate * fire recovery)							| 120 * 0.1				 = 12 Ticks
+	 * Y = tickrate * ((1 - soft recovery) * fire recovery)		| 120 * ((1 - 0.5) * 0.1)= 6 Ticks
+	 * Z = floor(X) - floor(y)									| 12 - 6				 = 6 Ticks
+	 *
+	 *	H2V does calculate the 2x ticks to wait as you would expect the issue is that the game also runs at 2x the speed.
+	 *	
+	 *	
+	 */
+	//if(!h2mod->Server)
+	//{
+	//	if(enable)
+	//	{
+	//		PatchCall(h2mod->GetAddress(0x15c5b3), time_globals_seconds_to_ticks);
+	//		PatchCall(h2mod->GetAddress(0x15c5e2), time_globals_seconds_to_ticks);
+	//	}
+	//	else
+	//	{	
+	//		typedef float(__cdecl time_globals_seconds_to_tick_percise)(float s);
+	//		auto p_time_globals_seconds_to_tick_percise = (time_globals_seconds_to_tick_percise*)h2mod->GetAddress(0x7c0c5);
+	//		PatchCall(h2mod->GetAddress(0x15c5b3), p_time_globals_seconds_to_tick_percise);
+	//		PatchCall(h2mod->GetAddress(0x15c5e2), p_time_globals_seconds_to_tick_percise);
+	//	}
+	//}
+
 	for (auto& weapon : weapons)
 	{
-		auto required_datum = tags::find_tag(blam_tag::tag_group_type::weapon, weapon.tag_string);
-		BYTE* weapon_tag = tags::get_tag<blam_tag::tag_group_type::weapon, BYTE>(required_datum);
-		if (weapon_tag != nullptr)
+		for (auto& weapon : weapons)
 		{
-			int barrel_data_block_size = 236;
-			tags::tag_data_block* barrel_data_block = reinterpret_cast<tags::tag_data_block*>(weapon_tag + 720);
-
-			if (barrel_data_block->block_data_offset != -1)
+			auto required_datum = tags::find_tag(blam_tag::tag_group_type::weapon, weapon.tag_string);
+			BYTE* weapon_tag = tags::get_tag<blam_tag::tag_group_type::weapon, BYTE>(required_datum);
+			if (weapon_tag != nullptr)
 			{
-				*(float*)(tags::get_tag_data()
-					+ barrel_data_block->block_data_offset
-					+ barrel_data_block_size * weapon.barrel_data_block_index
-					+ (weapon.rounds_per_second_based ? 8 : 32)) = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
+				int barrel_data_block_size = 236;
+				tags::tag_data_block* barrel_data_block = reinterpret_cast<tags::tag_data_block*>(weapon_tag + 720);
+
+				if (barrel_data_block->block_data_offset != -1)
+				{
+					*(float*)(tags::get_tag_data()
+						+ barrel_data_block->block_data_offset
+						+ barrel_data_block_size * weapon.barrel_data_block_index
+						+ (weapon.rounds_per_second_based ? 8 : 32)) = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
+				}
 			}
 		}
 	}
-	
+
 	if (!h2mod->Server && enable && h2mod->GetMapType() == scnr_type::Multiplayer)
 	{
 		// H2X Sound_Classes

@@ -9,6 +9,12 @@
 typedef void*(__cdecl *dedi_command_hook)(wchar_t** a1, int a2, char a3);
 dedi_command_hook p_dedi_command_hook;
 
+typedef int(__cdecl p_kablam_vip_add)(LPCWSTR gamertag);
+p_kablam_vip_add* kablam_vip_add;
+
+typedef signed int(p_kablam_vip_clear)();
+p_kablam_vip_clear* kablam_vip_clear;
+
 void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, char a3) {
 
 	wchar_t* command = command_line_args[0];
@@ -76,6 +82,8 @@ void ServerConsole::ApplyHooks()
 	s_commandsMap[L"vip"] = ServerConsoleCommands::vip;
 	s_commandsMap[L"any"] = ServerConsoleCommands::any;
 	p_dedi_command_hook = (dedi_command_hook)DetourFunc(h2mod->GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)dediCommandHook, 7);
+	kablam_vip_add = h2mod->GetAddress<p_kablam_vip_add*>(0, 0x1D932);
+	kablam_vip_clear = h2mod->GetAddress<p_kablam_vip_clear*>(0, 0x1DB16);
 }
 
 void ServerConsole::logToDedicatedServerConsole(const wchar_t* string, ...) {
@@ -147,6 +155,18 @@ void ServerConsole::SendCommand2(int argCount, wchar_t* command, wchar_t* argume
 		if (size == argCount) break;
 		argument = va_arg(arguments, wchar_t*);
 	}
+	
 	size++;
 	SendCommand(commandVector.data(), size, 1);
+}
+
+void ServerConsole::AddVip(std::wstring Gamertag)
+{
+	//HKEY* VIPHKey = h2mod->GetAddress<HKEY*>(0, 0x3B49F8);
+	kablam_vip_add(Gamertag.c_str());
+}
+
+void ServerConsole::ClearVip()
+{
+	kablam_vip_clear();
 }
