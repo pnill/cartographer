@@ -397,6 +397,11 @@ void SaveH2Config() {
 				"# force_even (Server):"
 				"\n# This flag tells the server to force even teams before starting"
 				"\n# The server will automatically organize teams before starting if the game is uneven"
+				"\n# This setting is dependent on the settings for team_enable_bit_flags and the servers current max players."
+				"\n# The server will attempt to fill each team with an equal amount of players for every enabled team."
+				"\n# As an example if the server allows 8 players to join and has 2 teams enabled it will place 4 players in each team before the game can start"
+				"\n# If you configure these settings to not line up to an equal amount of players on each team it will not start."
+				"\n# As an example if you set the player count to 4 and have 3 teams enabled you will never get an even amount of players on each team."
 				"\n\n"
 
 				"# koth_random (Server):"

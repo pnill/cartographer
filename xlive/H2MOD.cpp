@@ -1492,8 +1492,10 @@ void H2MOD::RegisterEvents()
 				life_cycle_post_game,
 				[]()
 				{
-					ServerConsole::SendCommand2(1, L"vip", L"clear");
-					ServerConsole::SendCommand2(1, L"Privacy", L"Open");
+					ServerConsole::ClearVip();
+					*h2mod->GetAddress<byte*>(0, 0x534850) = 0;
+					//ServerConsole::SendCommand2(1, L"vip", L"clear");
+					//ServerConsole::SendCommand2(1, L"Privacy", L"Open");
 				}}, true);
 			EventHandler::registerGameStateCallback({
 				"VIPLockAdd",
@@ -1502,9 +1504,11 @@ void H2MOD::RegisterEvents()
 				{
 					for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
 					{
-						ServerConsole::SendCommand2(2, L"vip", L"add", NetworkSession::getPeerPlayerName(i));
+						ServerConsole::AddVip(NetworkSession::getPeerPlayerName(i));
+						//ServerConsole::SendCommand2(2, L"vip", L"add", NetworkSession::getPeerPlayerName(i));
 					}
-					ServerConsole::SendCommand2(1, L"Privacy", L"VIP");
+					//ServerConsole::SendCommand2(1, L"Privacy", L"VIP");
+					*h2mod->GetAddress<byte*>(0, 0x534850) = 2;
 				}}, true);
 		}
 	}
