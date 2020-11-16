@@ -12,9 +12,9 @@ void ReadH2Config();
 #define USE_DEV_PREVIEW_CONFIG_FILE_PATHS 1
 
 #define DLL_VERSION_MAJOR               0
-#define DLL_VERSION_MINOR               5
-#define DLL_VERSION_REVISION            6
-#define DLL_VERSION_BUILD				1
+#define DLL_VERSION_MINOR               6
+#define DLL_VERSION_REVISION            0
+#define DLL_VERSION_BUILD				0
 
 #define DLL_VERSION            DLL_VERSION_MAJOR, DLL_VERSION_MINOR, DLL_VERSION_REVISION, DLL_VERSION_BUILD
 #define STRINGIZE2(s) #s

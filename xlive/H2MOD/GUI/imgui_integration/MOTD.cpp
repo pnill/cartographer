@@ -44,7 +44,7 @@ namespace imgui_handler
 				default:
 					return false;
 			}*/
-			auto path = std::wstring(H2ProcessFilePath);
+			auto path = std::wstring(H2AppDataLocal);
 			auto cpath = std::string(path.begin(), path.end()) + "motd.png";
 
 			curl = curl_easy_init();

@@ -35,7 +35,8 @@ namespace TagFixes
 							{
 								auto bitmap_data = tags::get_tag_data() + (shader_post_bitmap->block_data_offset + (bitmap_idx * 0xC));
 								unsigned long* bitmap = reinterpret_cast<unsigned long*>(bitmap_data);
-								*bitmap = datum::Null;
+								if(*bitmap == bitmap_to_fix.data)
+									*bitmap = datum::Null;
 							}
 						}
 					}
