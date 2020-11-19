@@ -330,13 +330,17 @@ void __cdecl game_main_loop()
 			add eax, [H2BaseAddr]
 			call eax
 		}
-		if (!game_minimized())
-			if (H2Config_controller_modern) {
+		if (!game_minimized()) 
+		{
+			if (H2Config_controller_modern)
+			{
 				ControllerInput::procces_input();
 			}
-			else {
+			else
+			{
 				sub_B328A8();
 			}
+		}
 		if (v12)
 		{
 			sub_B16834();

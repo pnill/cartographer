@@ -679,4 +679,3 @@ std::string ByteToHexStr(const BYTE* buffer, size_t size) {
 	return str.str();
 }
 
-

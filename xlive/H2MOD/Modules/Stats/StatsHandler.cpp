@@ -68,6 +68,14 @@ StatsHandler::StatsHandler()
 							this->InvalidateMatch(false);
 						}
 					}, true);
+					EventHandler::registerGameStateCallback({
+						"StatsSkipReset",
+						life_cycle_in_game,
+						[this]()
+						{
+							this->InvalidateMatch(false);
+						}
+					}, true);
 				},
 				true
 			}, false);
@@ -821,8 +829,8 @@ char* StatsHandler::buildJSON()
 	wchar_t unix[100];
 
 	swprintf(unix, 100, L"%.f", seconds);
-	
-	swprintf(fileOutPath, 1024, L"%ws\\%s-%s.json", H2ProcessFilePath, ServerName, unix);
+	auto sXUID = IntToString<::XUID>(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid, std::dec);
+	swprintf(fileOutPath, 1024, L"%ws\\%s-%s.json", H2ProcessFilePath, sXUID.c_str(), unix);
 	std::ofstream of(fileOutPath);
 	of << json;
 	if (!of.good())

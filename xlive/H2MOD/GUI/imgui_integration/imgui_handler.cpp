@@ -354,11 +354,11 @@ namespace imgui_handler
 		//texture->GetLevelDesc(0, &my_image_desc);
 		switch (image)
 		{
-		case patch_notes:
-			g_patchNotes_Image = texture;
-			break;
-		default:
-			return false;
+			case patch_notes:
+				g_patchNotes_Image = texture;
+				break;
+			default:
+				return false;
 		}
 		*out_width = imgInfo.Width;
 		*out_height = imgInfo.Height;
