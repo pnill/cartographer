@@ -162,7 +162,6 @@ void ServerConsole::SendCommand2(int argCount, wchar_t* command, wchar_t* argume
 
 void ServerConsole::AddVip(std::wstring Gamertag)
 {
-	//HKEY* VIPHKey = h2mod->GetAddress<HKEY*>(0, 0x3B49F8);
 	kablam_vip_add(Gamertag.c_str());
 }
 
@@ -170,3 +169,12 @@ void ServerConsole::ClearVip()
 {
 	kablam_vip_clear();
 }
+//void sendmessage()
+//{
+//	DWORD* mem = (DWORD*)calloc(64, sizeof(DWORD));
+//	*((BYTE *)mem + 8) = 1;
+//	*mem = h2mod->GetAddress(0, 0x352DFC);
+//	mem[64] = 0;
+//	sub_633E0D(ebx0, (__int16 *)this + 6, 121u, (__int16 *)a2);
+//	return v3;
+//}

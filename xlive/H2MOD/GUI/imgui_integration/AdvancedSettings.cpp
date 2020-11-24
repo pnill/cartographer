@@ -33,6 +33,10 @@ namespace imgui_handler {
 			int g_aiming = 0;
 			bool g_init = false;
 			int g_language_code = -1;
+			std::map<int, std::map<e_advanced_string, char*>> string_table;
+			//Used for controls that use the same string, A identifier has to be appended to them
+			//I.E Reset##1... Reset##20
+			std::map<std::string, std::string> string_cache;
 			void DrawDeadzones()
 			{
 				ImDrawList* draw_list = ImGui::GetOverlayDrawList();
@@ -97,6 +101,39 @@ namespace imgui_handler {
 				}
 			}
 		}
+		char* GetString(e_advanced_string string, std::string id)
+		{
+			if (string_table.count(H2Config_language.code_main))
+			{
+				if (id.empty()) {
+					return const_cast<char*>(string_table.at(H2Config_language.code_main).at(string));
+				}
+
+				if(!string_cache.count(id))
+				{
+					std::string temp_str(const_cast<char*>(string_table.at(H2Config_language.code_main).at(string)));
+					temp_str.append("##");
+					temp_str.append(id);
+					string_cache[id] = temp_str;
+				}
+				return (char*)string_cache[id].c_str();
+
+			}
+			else
+			{
+				if (id.empty()) {
+					return const_cast<char*>(string_table.at(0).at(string));
+				}
+				if (!string_cache.count(id))
+				{
+					std::string temp_str(const_cast<char*>(string_table.at(0).at(string)));
+					temp_str.append("##");
+					temp_str.append(id);
+					string_cache[id] = temp_str;
+				}
+				return (char*)string_cache[id].c_str();
+			}
+		}
 		void Render(bool* p_open)
 		{
 			if(!g_init)
@@ -123,15 +160,14 @@ namespace imgui_handler {
 			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
 			if (h2mod->GetMapType() == MainMenu)
 				ImGui::SetNextWindowBgAlpha(1);
-			std::string AcStatus = "  Advanced Settings";
-			if (ImGui::Begin(AcStatus.c_str(), p_open, window_flags))
+			if (ImGui::Begin(GetString(e_advanced_string::title), p_open, window_flags))
 			{
 				ImVec2 item_size = ImGui::GetItemRectSize();
-				if (ImGui::CollapsingHeader("HUD Settings"))
+				if (ImGui::CollapsingHeader(GetString(hud_title)))
 				{
 					ImVec2 b2_size = ImVec2(WidthPercentage(10), item_size.y);
 					//Player FOV
-					ImGui::Text("Player Field of View");
+					ImGui::Text(GetString(player_field_of_view));
 					ImGui::PushItemWidth(WidthPercentage(80));
 					ImGui::SliderInt("##PlayerFOV1", &H2Config_field_of_view, 45, 110, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
@@ -148,7 +184,7 @@ namespace imgui_handler {
 						HudElements::setFOV();
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
-					if (ImGui::Button("Reset##PlayerFov3", b2_size))
+					if (ImGui::Button(GetString(reset,"PlayerFov3"), b2_size))
 					{
 						H2Config_field_of_view = 78.0f;
 						HudElements::setFOV();
@@ -157,7 +193,7 @@ namespace imgui_handler {
 
 
 					//Vehicle FOV
-					ImGui::Text("Vehicle Field of View");
+					ImGui::Text(GetString(vehicle_field_of_view));
 					ImGui::PushItemWidth(WidthPercentage(80));
 					ImGui::SliderInt("##VehicleFOV1", &H2Config_vehicle_field_of_view, 45, 110, "");ImGui::SameLine();
 					if (ImGui::IsItemEdited())
@@ -174,7 +210,7 @@ namespace imgui_handler {
 						HudElements::setVehicleFOV();
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
-					if (ImGui::Button("Reset##VehicleFOV3", b2_size))
+					if (ImGui::Button(GetString(reset, "VehicleFOV3"), b2_size))
 					{
 						H2Config_vehicle_field_of_view = 78.0f;
 						HudElements::setVehicleFOV();
@@ -182,7 +218,7 @@ namespace imgui_handler {
 					ImGui::PopItemWidth();
 
 					//Crosshair Offset
-					ImGui::Text("Crosshair Offset");
+					ImGui::Text(GetString(crosshair_offset));
 					ImGui::PushItemWidth(WidthPercentage(80));
 					ImGui::SliderFloat("##Crosshair1", &H2Config_crosshair_offset, 0.0f, 0.5f, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
@@ -198,7 +234,7 @@ namespace imgui_handler {
 						HudElements::setCrosshairPos();
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
-					if (ImGui::Button("Reset##Crosshair3", b2_size))
+					if (ImGui::Button(GetString(reset, "Crosshair3"), b2_size))
 					{
 						H2Config_crosshair_offset = 0.138f;
 						HudElements::setCrosshairPos();
@@ -206,7 +242,7 @@ namespace imgui_handler {
 					ImGui::PopItemWidth();
 
 					//Crosshair Size
-					ImGui::Text("Crosshair Size");
+					ImGui::Text(GetString(crosshair_size));
 					ImGui::PushItemWidth(WidthPercentage(80));
 					ImGui::SliderFloat("##CrosshairSize1", &H2Config_crosshair_scale, 0.0f, 2.0f, "");  ImGui::SameLine();
 					if (ImGui::IsItemEdited())
@@ -221,7 +257,7 @@ namespace imgui_handler {
 						HudElements::setCrosshairSize();
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
-					if (ImGui::Button("Reset##CrosshairSize3", b2_size))
+					if (ImGui::Button(GetString(reset, "CrosshairSize3"), b2_size))
 					{
 						H2Config_crosshair_scale = 1;
 						HudElements::setCrosshairSize();
@@ -233,13 +269,13 @@ namespace imgui_handler {
 					//Ingame Change Display
 					if (!H2Config_hide_ingame_chat)
 					{
-						if (ImGui::Button("Show Ingame Chat", b3_size))
+						if (ImGui::Button(GetString(show_ingame_chat), b3_size))
 							H2Config_hide_ingame_chat = false;
 						ImGui::SameLine();
 					}
 					else
 					{
-						if (ImGui::Button("Hide Ingame Chat", b3_size))
+						if (ImGui::Button(GetString(hide_ingame_chat), b3_size))
 							H2Config_hide_ingame_chat = true;
 						ImGui::SameLine();
 					}
@@ -247,7 +283,7 @@ namespace imgui_handler {
 					//Toggle HUD
 					if (g_showHud)
 					{
-						if (ImGui::Button("Disable HUD", b3_size))
+						if (ImGui::Button(GetString(disable_hud), b3_size))
 						{
 							HudElements::ToggleHUD(false);
 							g_showHud = false;
@@ -256,7 +292,7 @@ namespace imgui_handler {
 					}
 					else
 					{
-						if (ImGui::Button("Enable HUD", b3_size))
+						if (ImGui::Button(GetString(enable_hud), b3_size))
 						{
 							HudElements::ToggleHUD(true);
 							g_showHud = true;
@@ -267,7 +303,7 @@ namespace imgui_handler {
 					//Toggle First Person
 					if (g_showFP)
 					{
-						if (ImGui::Button("Disable First Person", b3_size))
+						if (ImGui::Button(GetString(disable_first_person), b3_size))
 						{
 							HudElements::ToggleFirstPerson(false);
 							g_showFP = false;
@@ -275,7 +311,7 @@ namespace imgui_handler {
 					}
 					else
 					{
-						if (ImGui::Button("Enable First Person", b3_size))
+						if (ImGui::Button(GetString(enable_first_person), b3_size))
 						{
 							HudElements::ToggleFirstPerson(true);
 							g_showFP = true;
@@ -283,18 +319,18 @@ namespace imgui_handler {
 					}
 					ImGui::NewLine();
 				}
-				if (ImGui::CollapsingHeader("Video Settings"))
+				if (ImGui::CollapsingHeader(GetString(video_title)))
 				{
-					ImVec2 LargestText = ImGui::CalcTextSize("High Resolution Fix", NULL, true);
+					ImVec2 LargestText = ImGui::CalcTextSize(GetString(hires_fix), NULL, true);
 					float float_offset = ImGui::GetCursorPosX() + LargestText.x + (LargestText.x * 0.075);
 					//FPS Limit
-					TextVerticalPad("FPS Limit", 8.5);
+					TextVerticalPad(GetString(fps_limit), 8.5);
 					ImGui::SameLine();
 					ImGui::SetCursorPosX(float_offset);
 					ImGui::PushItemWidth(WidthPercentage(10.0f));
 					ImGui::InputInt("##FPS1", &H2Config_fps_limit, 0, 110); ImGui::SameLine();
 					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("Setting this to 0 will uncap your games frame rate.\nAnything over 60 may cause performance issues\nUse the Experimental Rendering Changes to resolve them");
+						ImGui::SetTooltip(GetString(fps_limit_tooltip));
 					if (ImGui::IsItemEdited()) {
 						if (H2Config_fps_limit < 10 && H2Config_fps_limit != 0)
 							H2Config_fps_limit = 10;
@@ -303,49 +339,49 @@ namespace imgui_handler {
 						desiredRenderTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
 					}
 					ImGui::PopItemWidth();
-					if (ImGui::Button("Reset##FPS2", ImVec2(WidthPercentage(10.0f), item_size.y)))
+					if (ImGui::Button(GetString(reset,"FPS2"), ImVec2(WidthPercentage(10.0f), item_size.y)))
 					{
 						H2Config_fps_limit = 60;
 						desiredRenderTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
 					}
 					ImGui::SameLine();
-					ImGui::Checkbox("Experimental Rendering Changes", &H2Config_experimental_fps);
+					ImGui::Checkbox(GetString(experimental_rendering_changes), &H2Config_experimental_fps);
 					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("This will enabled experimental changes to the way the games engine renders.\nA restart is required for the changes to take effect.\n\nThis will cause controller Vibrations not to work.");
+						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
 					//ImGui::Columns(2, "VideoSettings", false);
 					//Refresh Rate
-					TextVerticalPad("Refresh Rate", 8.5);
+					TextVerticalPad(GetString(refresh_rate), 8.5);
 					ImGui::SameLine();
 					ImGui::SetCursorPosX(float_offset);
 					ImGui::PushItemWidth(165);
 					ImGui::InputInt("##Refresh1", &H2Config_refresh_rate, 0, 110, ImGuiInputTextFlags_AlwaysInsertMode); //ImGui::SameLine();
 					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("This setting requires a restart to take effect.");
+						ImGui::SetTooltip(GetString(refresh_rate_tooltip));
 					ImGui::PopItemWidth();
 					//ImGui::NextColumn();
 
 
 					//LOD
-					TextVerticalPad("Level of Detail", 8.5);
+					TextVerticalPad(GetString(lod), 8.5);
 					ImGui::SameLine();
-					const char* items[] = { "Default", "L1 - Very Low", "L2 - Low", "L3 - Medium", "L4 - High", "L5 - Very High", "L6 - Cinematic" };
+					const char* items[] = { GetString(e_default), GetString(lod_1), GetString(lod_2), GetString(lod_3), GetString(lod_4), GetString(lod_5), GetString(lod_6) };
 					ImGui::PushItemWidth(165);
 					ImGui::SetCursorPosX(float_offset);
 					ImGui::Combo("##LOD", &H2Config_static_lod_state, items, 7);
 					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("Changing this will force the game to use the set Level of Detail for models that have them\nLeaving it at default makes it dynamic which is the games default behaviour.");
+						ImGui::SetTooltip(GetString(lod_tooltip));
 					ImGui::PopItemWidth();
 					//Hires Fix
-					TextVerticalPad("High Resolution Fix", 8.5);
+					TextVerticalPad(GetString(hires_fix), 8.5);
 					ImGui::SameLine();
 					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5);
 					ImGui::Checkbox("##HighRes", &H2Config_hiresfix);
 					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("This will enable fixes for high resolution monitors that will fix text clipping\nA restart is required for these changes to take effect.");
+						ImGui::SetTooltip(GetString(hires_fix_tooltip));
 					//ImGui::Columns(0);
 					ImGui::NewLine();
 				}
-				if(ImGui::CollapsingHeader("Mouse and Keyboard Input"))
+				if(ImGui::CollapsingHeader(GetString(m_k_title)))
 				{
 					ImGui::Columns(2, "", false);
 					//Disable Ingame Keyboard
@@ -363,16 +399,16 @@ namespace imgui_handler {
 					ImGui::NextColumn();*/
 
 					//Raw Input
-					TextVerticalPad("Raw Mouse Input", 8.5);
+					TextVerticalPad(GetString(raw_mouse), 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##RawMouse", &H2Config_raw_input);
 					if(ImGui::IsItemHovered())
 					{
-						ImGui::SetTooltip("This will remove the game's default mouse acceleration.\n\nNOTE: This setting does not work if you have Modern Aiming turned on for your controller.");
+						ImGui::SetTooltip(GetString(raw_mouse_tooltip));
 					}
 					//Uniform Sensitivity
 					ImGui::NextColumn();
-					TextVerticalPad("Uniform Sensitivity", 8.5);
+					TextVerticalPad(GetString(uniform_sensitivity), 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##MK_Sep", &H2Config_mouse_uniform);
 					if (ImGui::IsItemEdited())
@@ -381,11 +417,11 @@ namespace imgui_handler {
 					}
 					if (ImGui::IsItemHovered())
 					{
-						ImGui::SetTooltip("By default the game has the vertical sensitivity half of the horizontal.\nEnabling this option will make these match.");
+						ImGui::SetTooltip(GetString(uniform_sensitivity_tooltip));
 					}
 					ImGui::Columns(1);
 					if (H2Config_raw_input) {
-						ImGui::Text("Raw Mouse Sensitivity");
+						ImGui::Text(GetString(raw_mouse_sensitivity));
 						ImGui::PushItemWidth(WidthPercentage(75));
 						int g_raw_scale = (int)H2Config_raw_mouse_scale;
 						ImGui::SliderInt("##RawMouseScale1", &g_raw_scale, 1, 100, ""); ImGui::SameLine();
@@ -403,7 +439,7 @@ namespace imgui_handler {
 							g_raw_scale = (int)H2Config_raw_mouse_scale;
 						}
 						ImGui::PushItemWidth(WidthPercentage(10));
-						if (ImGui::Button("Reset##RawMouseScale2", ImVec2(WidthPercentage(10), item_size.y)))
+						if (ImGui::Button(GetString(reset, "RawMouseScale2"), ImVec2(WidthPercentage(10), item_size.y)))
 						{
 							g_raw_scale = 25;
 							H2Config_raw_mouse_scale = 25.0f;
@@ -411,7 +447,7 @@ namespace imgui_handler {
 					}
 					else
 					{
-						ImGui::Text("Mouse Sensitivity");
+						ImGui::Text(GetString(mouse_sensitivity));
 						ImGui::PushItemWidth(WidthPercentage(75));
 						int g_mouse_sens = (int)H2Config_mouse_sens;
 						ImGui::SliderInt("##Mousesens1", &g_mouse_sens, 1, 100, ""); ImGui::SameLine();
@@ -431,7 +467,7 @@ namespace imgui_handler {
 							MouseInput::SetSensitivity(H2Config_mouse_sens);
 						}
 						ImGui::PushItemWidth(WidthPercentage(10));
-						if (ImGui::Button("Reset##Mousesens3", ImVec2(WidthPercentage(10), item_size.y)))
+						if (ImGui::Button(GetString(reset, "Mousesens3"), ImVec2(WidthPercentage(10), item_size.y)))
 						{
 							g_mouse_sens = 3;
 							H2Config_mouse_sens = 3.0f;
@@ -439,12 +475,12 @@ namespace imgui_handler {
 						}
 					}
 				}
-				if(ImGui::CollapsingHeader("Controller Input"))
+				if(ImGui::CollapsingHeader(GetString(controller_title)))
 				{
 					DrawDeadzones();
 					ImGui::Columns(2, "", false);
 					//Uniform Sensitivity
-					TextVerticalPad("Uniform Sensitivity", 8.5);
+					TextVerticalPad(GetString(uniform_sensitivity), 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##C_Sep", &H2Config_mouse_uniform);
 					if (ImGui::IsItemEdited())
@@ -453,12 +489,12 @@ namespace imgui_handler {
 					}
 					if (ImGui::IsItemHovered())
 					{
-						ImGui::SetTooltip("By default the game has the vertical sensitivity half of the horizontal.\nEnabling this option will make these match.");
+						ImGui::SetTooltip(GetString(uniform_sensitivity_tooltip));
 					}
 					ImGui::Columns(1);
 					
 					
-					ImGui::Text("Controller Sensitivity");
+					ImGui::Text(GetString(controller_sensitivity));
 					ImGui::PushItemWidth(WidthPercentage(75));
 					int g_controller_sens = (int)H2Config_controller_sens;
 					ImGui::SliderInt("##Controllersens1", &g_controller_sens, 1, 100, ""); ImGui::SameLine();
@@ -478,7 +514,7 @@ namespace imgui_handler {
 						ControllerInput::SetSensitiviy(H2Config_controller_sens);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
-					if (ImGui::Button("Reset##Controllersens3", ImVec2(WidthPercentage(10), item_size.y)))
+					if (ImGui::Button(GetString(reset, "Controllersens3"), ImVec2(WidthPercentage(10), item_size.y)))
 					{
 						g_controller_sens = 3;
 						H2Config_controller_sens = 3.0f;
@@ -487,8 +523,8 @@ namespace imgui_handler {
 					ImGui::PopItemWidth();
 
 					ImGui::Columns(2, "", false);
-					ImGui::Text("Aiming Type");
-					const char* a_items[] = { "Default", "Modern" };
+					ImGui::Text(GetString(aiming_type));
+					const char* a_items[] = { GetString(e_default), GetString(modern) };
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());
 					if (ImGui::Combo("##C_Aiming_Style", &g_aiming, a_items, 2))
 					{
@@ -497,14 +533,14 @@ namespace imgui_handler {
 					}
 					if (ImGui::IsItemHovered())
 					{
-						ImGui::SetTooltip("Modern Aiming will remove the native acceleration zones from a controller while aiming, allowing for a more precise aim.\n\nNOTE: Selecting Modern Aiming will cause Raw Mouse input to not work.");
+						ImGui::SetTooltip(GetString(aiming_type_tooltip));
 					}
 					ImGui::PopItemWidth();
 
 					ImGui::NextColumn();
 
-					ImGui::Text("Deadzone Type");
-					const char* items[] = { "Axial", "Radial", "Both" };
+					ImGui::Text(GetString(deadzone_type));
+					const char* items[] = { GetString(axial), GetString(radial), GetString(both) };
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());;
 					if(ImGui::Combo("##C_Deadzone_Type", &g_deadzone, items, 3))
 					{
@@ -513,13 +549,13 @@ namespace imgui_handler {
 					}
 					if(ImGui::IsItemHovered())
 					{
-						ImGui::SetTooltip("Halo 2 by default uses axial deadzones, radial deadzones have been added as another option for players.");
+						ImGui::SetTooltip(GetString(deadzone_type_tooltip));
 					}
 					ImGui::PopItemWidth();
 					ImGui::Columns(1);
 
 					if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
-						ImGui::Text("Axial Deadzone X");
+						ImGui::Text(GetString(axial_deadzone_X));
 						ImGui::PushItemWidth(WidthPercentage(75));
 						ImGui::SliderFloat("##C_Deadzone_A_X_1", &H2Config_Deadzone_A_X, 0, 100, "");
 						if (ImGui::IsItemEdited())
@@ -539,13 +575,13 @@ namespace imgui_handler {
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(15));
-						if (ImGui::Button("Default##C_Deadzone_A_X_3", ImVec2(WidthPercentage(12), item_size.y)))
+						if (ImGui::Button(GetString(e_default, "C_Deadzone_A_X_3"), ImVec2(WidthPercentage(12), item_size.y)))
 						{
 							H2Config_Deadzone_A_X = (8689.0f / (float)MAXSHORT) * 100;
 							ControllerInput::SetDeadzones();
 						}
 						ImGui::PopItemWidth();
-						ImGui::Text("Axial Deadzone Y");
+						ImGui::Text(GetString(axial_deadzone_Y));
 						ImGui::PushItemWidth(WidthPercentage(75));
 						ImGui::SliderFloat("##C_Deadzone_A_Y_1", &H2Config_Deadzone_A_Y, 0, 100, "");
 						if (ImGui::IsItemEdited())
@@ -565,7 +601,7 @@ namespace imgui_handler {
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(12));
-						if (ImGui::Button("Default##C_Deadzone_A_Y_3", ImVec2(WidthPercentage(12), item_size.y)))
+						if (ImGui::Button(GetString(e_default, "C_Deadzone_A_Y_3"), ImVec2(WidthPercentage(12), item_size.y)))
 						{
 							H2Config_Deadzone_A_Y = (8689.0f / (float)MAXSHORT) * 100;
 							ControllerInput::SetDeadzones();
@@ -573,7 +609,7 @@ namespace imgui_handler {
 						ImGui::PopItemWidth();
 					}
 					if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both) {
-						ImGui::Text("Radial Deadzone Radius");
+						ImGui::Text(GetString(radial_deadzone_radius));
 						ImGui::PushItemWidth(WidthPercentage(75));
 						ImGui::SliderFloat("##C_Deadzone_R_1", &H2Config_Deadzone_Radial, 0, 100, "");
 						if (ImGui::IsItemEdited())
@@ -593,7 +629,7 @@ namespace imgui_handler {
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(12));
-						if (ImGui::Button("Default##C_Deadzone_R_R_3", ImVec2(WidthPercentage(12), item_size.y)))
+						if (ImGui::Button(GetString(e_default, "C_Deadzone_R_R_3"), ImVec2(WidthPercentage(12), item_size.y)))
 						{
 							H2Config_Deadzone_Radial = (8689.0f / (float)MAXSHORT) * 100;
 							ControllerInput::SetDeadzones();
@@ -604,10 +640,10 @@ namespace imgui_handler {
 				}
 
 				if (NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() == scnr_type::SinglePlayer) {
-					if (ImGui::CollapsingHeader("Host & Campaign Settings"))
+					if (ImGui::CollapsingHeader(GetString(host_campagin_settings)))
 					{
 						ImGui::Columns(2, "", false);
-						TextVerticalPad("Anti-Cheat", 8.5);
+						TextVerticalPad(GetString(anti_cheat), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						if (ImGui::Checkbox("##Anti-Cheat", &H2Config_anti_cheat_enabled))
 						{
@@ -618,13 +654,13 @@ namespace imgui_handler {
 						}
 						if (ImGui::IsItemHovered())
 						{
-							ImGui::SetTooltip("Allows you to disable the Anti-Cheat for your lobby.");
+							ImGui::SetTooltip(GetString(anti_cheat_tooltip));
 						}
 
 						ImGui::NextColumn();
 
 						//XDelay
-						TextVerticalPad("Disable X to Delay", 8.5);
+						TextVerticalPad(GetString(disable_x_delay), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##XDelay", &H2Config_xDelay);
 
@@ -633,147 +669,147 @@ namespace imgui_handler {
 						auto Skulls = reinterpret_cast<skull_enabled_flags*>(h2mod->GetAddress(0x4D8320));
 						ImGui::Columns(3, "", false);
 
-						TextVerticalPad("Anger", 8.5);
+						TextVerticalPad(GetString(skull_anger), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullAnger", &Skulls->Anger);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("Enemies and allies fire their weapons faster and more frequently.");
+							ImGui::SetTooltip(GetString(skull_anger_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Assassins", 8.5);
+						TextVerticalPad(GetString(skull_assassins), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullAssassins", &Skulls->Assassians);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("All enemies in game are permanently cloaked. Allies can sometimes\nsee them but mostly they can't, so they can't help much.");
+							ImGui::SetTooltip(GetString(skull_assassins_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Black Eye", 8.5);
+						TextVerticalPad(GetString(skull_black_eye), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullBlackEye", &Skulls->Black_Eye);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("Your shield does not charge normally. To charge your shields you\nmust kill something with a melee attack");
+							ImGui::SetTooltip(GetString(skull_black_eye_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Blind", 8.5);
+						TextVerticalPad(GetString(skull_blind), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullBlind", &Skulls->Blind);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("Your heads-up display becomes invisible. In other words, you cannot\nsee your weapon, body, shields, ammunition, motion tracker,\n or use your flashlight.");
+							ImGui::SetTooltip(GetString(skull_blind_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Catch", 8.5);
+						TextVerticalPad(GetString(skull_catch), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullCatch", &Skulls->Catch);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("A.I. will throw more grenades. Also, everybody will drop two grenades\n of their kind Flood will drop grenades depending on whether\n they're human or Covenant.");
+							ImGui::SetTooltip(GetString(skull_catch_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Envy", 8.5);
+						TextVerticalPad(GetString(skull_envy), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullEnvy", &Skulls->Envy);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip(" The Master Chief now has an Active camouflage just like the Arbiter's.\nHowever, there is no visible timer, so remember: five second\n cloak with ten second recharge on Legendary");
+							ImGui::SetTooltip(GetString(skull_envy_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Famine", 8.5);
+						TextVerticalPad(GetString(skull_famine), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullFamine", &Skulls->Famine);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("All dropped weapons have half ammo. Weapons that spawned on the floor or\nspawned with are unaffected.");
+							ImGui::SetTooltip(GetString(skull_famine_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Ghost", 8.5);
+						TextVerticalPad(GetString(skull_ghost), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullGhost", &Skulls->Ghost);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("A.I. characters will not flinch from attacks, melee or otherwise.");
+							ImGui::SetTooltip(GetString(skull_ghost_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Grunt Birthday", 8.5);
+						TextVerticalPad(GetString(skull_grunt), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullGBP", &Skulls->Grunt_Birthday_Party);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("Headshots turn into Plasma Grenade explosions.");
+							ImGui::SetTooltip(GetString(skull_grunt_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Iron", 8.5);
+						TextVerticalPad(GetString(skull_iron), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullIron", &Skulls->Iron);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("When playing co-op, if either player dies the game restarts you at your\nlast checkpoint.");
+							ImGui::SetTooltip(GetString(skull_iron_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("IWHBYD", 8.5);
+						TextVerticalPad(GetString(skull_iwbyd), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullIWHBYD", &Skulls->IWHBYD);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("The rarity of combat dialog is changed, rare lines become far more common\nbut common lines are still present at their normal rate");
+							ImGui::SetTooltip(GetString(skull_iwbyd_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Mythic", 8.5);
+						TextVerticalPad(GetString(skull_mythic), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullMythic", &Skulls->Mythic);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("Enemies have more health and shielding, and are therefore harder to kill.");
+							ImGui::SetTooltip(GetString(skull_mythic_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Sputnik", 8.5);
+						TextVerticalPad(GetString(skull_sputnik), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullSputnik", &Skulls->Sputnik);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("The mass of certain objects is severely reduced, making them fly further\nwhen smacked with a melee hit, or when they are near an explosion");
+							ImGui::SetTooltip(GetString(skull_sputnik_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Thunderstorm", 8.5);
+						TextVerticalPad(GetString(skull_thunderstorm), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullThunderstorm", &Skulls->Thunderstorm);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("Causes most enemy and ally units to be their highest rank.");
+							ImGui::SetTooltip(GetString(skull_thunderstorm_tooltip));
 
 						ImGui::NextColumn();
 
-						TextVerticalPad("Whuppopotamus", 8.5);
+						TextVerticalPad(GetString(skull_whuppopotamus), 8.5);
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullWhuppopatamus", &Skulls->Whuppopotamus);
 						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip("Strengthens the hearing of both allies and enemies");
+							ImGui::SetTooltip(GetString(skull_whuppopotamus_tooltip));
 
 						ImGui::Columns(1);
 					}
 				}
 
-				if (ImGui::CollapsingHeader("Game Settings"))
+				if (ImGui::CollapsingHeader(GetString(game_title)))
 				{
 					ImGui::Columns(2, "", false);
 
-					TextVerticalPad("Discord Rich Presence", 8.5);
+					TextVerticalPad(GetString(discord_presence), 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##DRP", &H2Config_discord_enable);
 					
 					ImGui::NextColumn();
 
 					//Skip Intro
-					TextVerticalPad("Disable Intro videos", 8.5);
+					TextVerticalPad(GetString(disable_intro_videos), 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##Intro", &H2Config_skip_intro);
 
 					ImGui::NextColumn();
 
-					ImGui::Text("Language");
-					const char* l_items[]{"English", "Japanese", "German", "French", "Spanish", "Italian", "Korean", "Chinese", "Native" };
+					ImGui::Text(GetString(language));
+					const char* l_items[]{GetString(lang_english), GetString(lang_japanese), GetString(lang_german), GetString(lang_french), GetString(lang_spanish), GetString(lang_italian), GetString(lang_korean), GetString(lang_chinese), GetString(lang_native) };
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());
 					if (ImGui::Combo("##Language_Selection", &g_language_code, l_items, 9))
 					{
@@ -790,17 +826,10 @@ namespace imgui_handler {
 #if DISPLAY_DEV_TESTING_MENU
 				if (ImGui::CollapsingHeader("Dev Testing"))
 				{
-					ImGui::Checkbox("Projectile Update Tickrate Patch", &g_hitfix);
-					if (g_hitfix)
-						HitFix_Projectile_Tick_Rate = 30.0f;
-					else
-						HitFix_Projectile_Tick_Rate = 60.0f;
-					if (ImGui::Button("Dump Game Globals"))
+					if(ImGui::Button("test"))
 					{
-						auto game_globals = Blam::EngineDefinitions::game_globals(**h2mod->GetAddress<Blam::EngineDefinitions::game_globals**>(0x482D3C));
-						LOG_INFO_GAME(game_globals.engine_settings.game_variant.variant_name);
+						h2mod->cine_start_tex();
 					}
-					ImGui::Checkbox("Anti-Cheat", &H2Config_anti_cheat_enabled);
 				}
 #endif
 				ImGui::End();
@@ -818,6 +847,207 @@ namespace imgui_handler {
 			WriteValue<byte>(h2mod->GetAddress(0x9712cC), 0);
 			PlayerControl::GetControls(0)->DisableCamera = false;
 			SaveH2Config();
+		}
+		void BuildStringsTable()
+		{
+			string_table[0][e_advanced_string::title] = "        Advanced Settings";
+			string_table[0][e_advanced_string::hud_title] = "HUD Settings";
+			string_table[0][e_advanced_string::player_field_of_view] = "Player Field of View";
+			string_table[0][e_advanced_string::reset] = "Reset";
+			string_table[0][e_advanced_string::vehicle_field_of_view] = "Vehicle Field of View";
+			string_table[0][e_advanced_string::crosshair_offset] = "Crosshair Offset";
+			string_table[0][e_advanced_string::crosshair_size] = "Crosshair Size";
+			string_table[0][e_advanced_string::show_ingame_chat] = "Show Ingame Chat";
+			string_table[0][e_advanced_string::hide_ingame_chat] = "Hide Ingame Chat";
+			string_table[0][e_advanced_string::disable_hud] = "Disable HUD";
+			string_table[0][e_advanced_string::enable_hud] = "Enable HUD";
+			string_table[0][e_advanced_string::disable_first_person] = "Disable First Person";
+			string_table[0][e_advanced_string::enable_first_person] = "Enable First Person";
+			string_table[0][e_advanced_string::video_title] = "Video Settings";
+			string_table[0][e_advanced_string::fps_limit] = "FPS Limit";
+			string_table[0][e_advanced_string::fps_limit_tooltip] = "Setting this to 0 will uncap your games frame rate.\nAnything over 60 may cause performance issues\nUse the Experimental Rendering Changes to resolve them";
+			string_table[0][e_advanced_string::experimental_rendering_changes] = "Experimental Rendering Changes";
+			string_table[0][e_advanced_string::experimental_rendering_tooltip] = "This will enabled experimental changes to the way the games engine renders.\nA restart is required for the changes to take effect.\n\nThis will cause controller Vibrations not to work.";
+			string_table[0][e_advanced_string::refresh_rate] = "Refresh Rate";
+			string_table[0][e_advanced_string::refresh_rate_tooltip] = "This settings requires a restart to take effect";
+			string_table[0][e_advanced_string::lod] = "Level of Detail";
+			string_table[0][e_advanced_string::e_default] = "Default";
+			string_table[0][e_advanced_string::lod_1] = "L1 - Very Low";
+			string_table[0][e_advanced_string::lod_2] = "L2 - Low";
+			string_table[0][e_advanced_string::lod_3] = "L3 - Medium";
+			string_table[0][e_advanced_string::lod_4] = "L4 - High";
+			string_table[0][e_advanced_string::lod_5] = "L5 - Very High";
+			string_table[0][e_advanced_string::lod_6] = "L6 - Cinematic";
+			string_table[0][e_advanced_string::lod_tooltip] = "Changing this will force the game to use the set Level of Detail for models that have them\nLeaving it at default makes it dynamic which is the games default behaviour.";
+			string_table[0][e_advanced_string::hires_fix] = "High Resolution Fix";
+			string_table[0][e_advanced_string::hires_fix_tooltip] = "This will enable fixes for high resolution monitors that will fix text clipping\nA restart is required for these changes to take effect.";
+			string_table[0][e_advanced_string::m_k_title] = "Mouse and Keyboard Input";
+			string_table[0][e_advanced_string::raw_mouse] = "Raw Mouse Input";
+			string_table[0][e_advanced_string::raw_mouse_tooltip] = "This will remove the game's default mouse acceleration.\n\nNOTE: This setting does not work if you have Modern Aiming turned on for your controller.";
+			string_table[0][e_advanced_string::uniform_sensitivity] = "Uniform Sensitivity";
+			string_table[0][e_advanced_string::uniform_sensitivity_tooltip] = "By default the game has the vertical sensitivity half of the horizontal.\nEnabling this option will make these match.";
+			string_table[0][e_advanced_string::raw_mouse_sensitivity] = "Raw Mouse Sensitivity";
+			string_table[0][e_advanced_string::mouse_sensitivity] = "Mouse Sensitivity";
+			string_table[0][e_advanced_string::controller_title] = "Controller Input";
+			string_table[0][e_advanced_string::controller_sensitivity] = "Controller Sensitivity";
+			string_table[0][e_advanced_string::aiming_type] = "Aiming Type";
+			string_table[0][e_advanced_string::modern] = "Modern";
+			string_table[0][e_advanced_string::aiming_type_tooltip] = "Modern Aiming will remove the native acceleration zones from a controller while aiming, allowing for a more precise aim.\n\nNOTE: Selecting Modern Aiming will cause Raw Mouse input to not work.";
+			string_table[0][e_advanced_string::deadzone_type] = "Deadzone Type";
+			string_table[0][e_advanced_string::axial] = "Axial";
+			string_table[0][e_advanced_string::radial] = "Radial";
+			string_table[0][e_advanced_string::both] = "Both";
+			string_table[0][e_advanced_string::deadzone_type_tooltip] = "Halo 2 by default uses axial deadzones, radial deadzones have been added as another option for players.";
+			string_table[0][e_advanced_string::axial_deadzone_X] = "Axial Deadzone X";
+			string_table[0][e_advanced_string::axial_deadzone_Y] = "Axial Deadzone Y";
+			string_table[0][e_advanced_string::radial_deadzone_radius] = "Radial Deadzone Radius";
+			string_table[0][e_advanced_string::host_campagin_settings] = "Host & Campaign Settings";
+			string_table[0][e_advanced_string::anti_cheat] = "Anti-Cheat";
+			string_table[0][e_advanced_string::anti_cheat_tooltip] = "Allows you to disable the Anti-Cheat for your lobby.";
+			string_table[0][e_advanced_string::disable_x_delay] = "Disable X to Delay";
+			string_table[0][e_advanced_string::skull_anger] = "Anger";
+			string_table[0][e_advanced_string::skull_anger_tooltip] = "Enemies and allies fire their weapons faster and more frequently.";
+			string_table[0][e_advanced_string::skull_assassins] = "Assassins";
+			string_table[0][e_advanced_string::skull_assassins_tooltip] = "All enemies in game are permanently cloaked. Allies can sometimes\nsee them but mostly they can't, so they can't help much.";
+			string_table[0][e_advanced_string::skull_black_eye] = "Black Eye";
+			string_table[0][e_advanced_string::skull_black_eye_tooltip] = "Your shield does not charge normally. To charge your shields you\nmust kill something with a melee attack";
+			string_table[0][e_advanced_string::skull_blind] = "Blind";
+			string_table[0][e_advanced_string::skull_blind_tooltip] = "Your heads-up display becomes invisible. In other words, you cannot\nsee your weapon, body, shields, ammunition, motion tracker,\n or use your flashlight.";
+			string_table[0][e_advanced_string::skull_catch] = "Catch";
+			string_table[0][e_advanced_string::skull_catch_tooltip] = "A.I. will throw more grenades. Also] = everybody will drop two grenades\n of their kind Flood will drop grenades depending on whether\n they're human or Covenant.";
+			string_table[0][e_advanced_string::skull_envy] = "Envy";
+			string_table[0][e_advanced_string::skull_envy_tooltip] = "The Master Chief now has an Active camouflage just like the Arbiter's.\nHowever, there is no visible timer, so remember: five second\n cloak with ten second recharge on Legendary";
+			string_table[0][e_advanced_string::skull_famine] = "Famine";
+			string_table[0][e_advanced_string::skull_famine_tooltip] = "All dropped weapons have half ammo. Weapons that spawned on the floor or\nspawned with are unaffected.";
+			string_table[0][e_advanced_string::skull_ghost] = "Ghost";
+			string_table[0][e_advanced_string::skull_ghost_tooltip] = "A.I. characters will not flinch from attacks, melee or otherwise.";
+			string_table[0][e_advanced_string::skull_grunt] = "Grunt Birthday";
+			string_table[0][e_advanced_string::skull_grunt_tooltip] = "Headshots turn into Plasma Grenade explosions.";
+			string_table[0][e_advanced_string::skull_iron] = "Iron";
+			string_table[0][e_advanced_string::skull_iron_tooltip] = "When playing co-op, if either player dies the game restarts you at your\nlast checkpoint.";
+			string_table[0][e_advanced_string::skull_iwbyd] = "IWBYD";
+			string_table[0][e_advanced_string::skull_iwbyd_tooltip] = "The rarity of combat dialog is changed, rare lines become far more common\nbut common lines are still present at their normal rate";
+			string_table[0][e_advanced_string::skull_mythic] = "Mythic";
+			string_table[0][e_advanced_string::skull_mythic_tooltip] = "Enemies have more health and shielding, and are therefore harder to kill.";
+			string_table[0][e_advanced_string::skull_sputnik] = "Sputnik";
+			string_table[0][e_advanced_string::skull_sputnik_tooltip] = "The mass of certain objects is severely reduced, making them fly further\nwhen smacked with a melee hit, or when they are near an explosion";
+			string_table[0][e_advanced_string::skull_thunderstorm] = "Thunderstorm";
+			string_table[0][e_advanced_string::skull_thunderstorm_tooltip] = "Causes most enemy and ally units to be their highest rank.";
+			string_table[0][e_advanced_string::skull_whuppopotamus] = "Whuppopotamus";
+			string_table[0][e_advanced_string::skull_whuppopotamus_tooltip] = "Strengthens the hearing of both allies and enemies";
+			string_table[0][e_advanced_string::game_title] = "Game Settings";
+			string_table[0][e_advanced_string::discord_presence] = "Discord Rich Presence";
+			string_table[0][e_advanced_string::disable_intro_videos] = "Disable Intro videos";
+			string_table[0][e_advanced_string::language] = "Language";
+			string_table[0][e_advanced_string::lang_english] = "English";
+			string_table[0][e_advanced_string::lang_japanese] = "Japanese";
+			string_table[0][e_advanced_string::lang_german] = "German";
+			string_table[0][e_advanced_string::lang_french] = "French";
+			string_table[0][e_advanced_string::lang_spanish] = "Spanish";
+			string_table[0][e_advanced_string::lang_italian] = "Italian";
+			string_table[0][e_advanced_string::lang_korean] = "Korean";
+			string_table[0][e_advanced_string::lang_chinese] = "Chinese";
+			string_table[0][e_advanced_string::lang_native] = "Native";
+
+			//Spanish.
+			string_table[4][e_advanced_string::title] = u8"      Ajustes avanzados";
+			string_table[4][e_advanced_string::hud_title] = u8"Ajustes de Interfaz";
+			string_table[4][e_advanced_string::player_field_of_view] = u8"Campo de visión (Personaje)";
+			string_table[4][e_advanced_string::reset] = u8"Reiniciar";
+			string_table[4][e_advanced_string::vehicle_field_of_view] = u8"Campo de visión (Vehículo)";
+			string_table[4][e_advanced_string::crosshair_offset] = u8"Posición de la mira";
+			string_table[4][e_advanced_string::crosshair_size] = u8"Tamaño de la mira";
+			string_table[4][e_advanced_string::show_ingame_chat] = u8"Mostrar chat en partida";
+			string_table[4][e_advanced_string::hide_ingame_chat] = u8"Ocultar chat en partida";
+			string_table[4][e_advanced_string::disable_hud] = u8"Esconder Interfaz";
+			string_table[4][e_advanced_string::enable_hud] = u8"Mostrar Interfaz";
+			string_table[4][e_advanced_string::disable_first_person] = u8"Activar primera persona";
+			string_table[4][e_advanced_string::enable_first_person] = u8"Desactivar primera persona";
+			string_table[4][e_advanced_string::video_title] = u8"Ajustes de video";
+			string_table[4][e_advanced_string::fps_limit] = u8"Limitar FPS";
+			string_table[4][e_advanced_string::fps_limit_tooltip] = u8"Dejar este ajuste en 0 quitará el límite de fotogramas por segundo.\nCualquier valor mayor a 60 puede causar problemas de rendimiento.\nUsa el Cambio de Renderizado Experimental para solucionarlo.";
+			string_table[4][e_advanced_string::experimental_rendering_changes] = u8"Cambio de Renderizado Experimental";
+			string_table[4][e_advanced_string::experimental_rendering_tooltip] = u8"Esto activará cambios experimentales a la forma de renderizado del motor del juego.\nDebes reiniciar el juego para que los cambios tengan efecto.\n\nEsto causará que la Vibración de Mandos no funcione.";
+			string_table[4][e_advanced_string::refresh_rate] = u8"Taza de refresco";
+			string_table[4][e_advanced_string::refresh_rate_tooltip] = u8"Este ajuste requiere reiniciar el juego para que tenga efecto.";
+			string_table[4][e_advanced_string::lod] = u8"Nivel de detalle";
+			string_table[4][e_advanced_string::e_default] = u8"Predeterminado";
+			string_table[4][e_advanced_string::lod_1] = u8"N1 - Muy bajo";
+			string_table[4][e_advanced_string::lod_2] = u8"N2 - Bajo";
+			string_table[4][e_advanced_string::lod_3] = u8"N3 - Medio";
+			string_table[4][e_advanced_string::lod_4] = u8"N4 - Alto";
+			string_table[4][e_advanced_string::lod_5] = u8"N5 - Muy alto";
+			string_table[4][e_advanced_string::lod_6] = u8"N6 - Cinemático";
+			string_table[4][e_advanced_string::lod_tooltip] = u8"Cambiar esto forzará el juego a usar los modelos del nivel de detalle seleccionado si están disponibles.\nDejarlo en Predeterminado hará que el nivel de detalle sea dinámico y controlado por el juego.";
+			string_table[4][e_advanced_string::hires_fix] = u8"Arreglos de alta resolución";
+			string_table[4][e_advanced_string::hires_fix_tooltip] = u8"Esto habilitará arreglos para monitores de alta resolución, solucionará textos recortados.\nEste ajuste requiere reiniciar el juego para que tenga efecto.";
+			string_table[4][e_advanced_string::m_k_title] = u8"Entrada de mouse y teclado";
+			string_table[4][e_advanced_string::raw_mouse] = u8"Entrada de mouse pura";
+			string_table[4][e_advanced_string::raw_mouse_tooltip] = u8"Esto desactivará la aceleración de mouse predeterminada del juego.\n\nNOTA: Este ajuste no funcionará si tienes Apuntado Moderno activado para tu mando.";
+			string_table[4][e_advanced_string::uniform_sensitivity] = u8"Sensibilidad uniforme";
+			string_table[4][e_advanced_string::uniform_sensitivity_tooltip] = u8"Por defecto el juego tiene la sensibilidad vertical a la mitad de la horizontal.\nActivar esta opción igualará estas sensibilidades.";
+			string_table[4][e_advanced_string::raw_mouse_sensitivity] = u8"Sensibilidad de mouse pura";
+			string_table[4][e_advanced_string::mouse_sensitivity] = u8"Sensibilidad de mouse";
+			string_table[4][e_advanced_string::controller_title] = u8"Entrada de mando";
+			string_table[4][e_advanced_string::controller_sensitivity] = u8"Sensibilidad de mando";
+			string_table[4][e_advanced_string::aiming_type] = u8"Tipo de apuntado";
+			string_table[4][e_advanced_string::modern] = u8"Moderno";
+			string_table[4][e_advanced_string::aiming_type_tooltip] = u8"El apuntado Moderno eliminará las zonas de aceleración por defecto del mando al apuntar, lo que permite un apuntado más preciso.\n\nNOTA: Seleccionar apuntado Moderno hará que la Entrada de mouse pura no funcione.";
+			string_table[4][e_advanced_string::deadzone_type] = u8"Tipo de Zona muerta";
+			string_table[4][e_advanced_string::axial] = u8"Por eje";
+			string_table[4][e_advanced_string::radial] = u8"Radial";
+			string_table[4][e_advanced_string::both] = u8"Ambos";
+			string_table[4][e_advanced_string::deadzone_type_tooltip] = u8"Por defecto, Halo 2 usa zonas muertas axiales. Las zonas muertas radiales fueron agregadas como otra opción para los jugadores.";
+			string_table[4][e_advanced_string::axial_deadzone_X] = u8"Zona muerta del Eje X";
+			string_table[4][e_advanced_string::axial_deadzone_Y] = u8"Zona muerta del Eje Y";
+			string_table[4][e_advanced_string::radial_deadzone_radius] = u8"Radio de zona muerta radial";
+			string_table[4][e_advanced_string::host_campagin_settings] = u8"Ajustes de anfitrión y campaña";
+			string_table[4][e_advanced_string::anti_cheat] = u8"Anti-Trampas";
+			string_table[4][e_advanced_string::anti_cheat_tooltip] = u8"Permite desactivar el anti-trampas de tu sala.";
+			string_table[4][e_advanced_string::disable_x_delay] = u8"Desactivar X para retrasar";
+			string_table[4][e_advanced_string::skull_anger] = u8"Ira";
+			string_table[4][e_advanced_string::skull_anger_tooltip] = u8"Los enemigos y aliados disparan sus armas de forma más rápida y frecuente.";
+			string_table[4][e_advanced_string::skull_assassins] = u8"Asesinos";
+			string_table[4][e_advanced_string::skull_assassins_tooltip] = u8"Todos los enemigos en la partida serán camuflados permanentemente. Los aliados algunas veces\nlos verán pero no será muy frecuente, por esto no podrán ayudarte mucho.";
+			string_table[4][e_advanced_string::skull_black_eye] = u8"Ojo Morado";
+			string_table[4][e_advanced_string::skull_black_eye_tooltip] = u8"Tu escudo no se recarga normalmente. Para recargar tu escudo\ndebes matar algo con un ataque cuerpo a cuerpo. ";
+			string_table[4][e_advanced_string::skull_blind] = u8"Ciego";
+			string_table[4][e_advanced_string::skull_blind_tooltip] = u8"Tu interfaz en partida se hace invisible. En otras palabras, no podrás\nver tu arma, cuerpo, escudos, munición, sensor de movimiento,\no usar tu linterna.";
+			string_table[4][e_advanced_string::skull_catch] = u8"Pilla";
+			string_table[4][e_advanced_string::skull_catch_tooltip] = u8"La I.A. arrojará más granadas. Además, todos dejarán 2 granadas\ncorrespondientes. Los Flood dejarán granadas dependiendo\nsi son humanos o Covenant.";
+			string_table[4][e_advanced_string::skull_envy] = u8"Envidia";
+			string_table[4][e_advanced_string::skull_envy_tooltip] = u8"El Jefe Maestro ahora tiene un Camuflaje activo al igual que El Árbitro.\nSin embargo, no verás el cronómetro, así que recuerda: cinco segundos\n de camuflaje con diez segundos de recarga en dificultad Legendario.";
+			string_table[4][e_advanced_string::skull_famine] = u8"Hambruna";
+			string_table[4][e_advanced_string::skull_famine_tooltip] = u8"Todas las armas que dejen al morir tienen la mitad de la munición. Las armas que aparecen en el mapa\n no serán afectadas.";
+			string_table[4][e_advanced_string::skull_ghost] = u8"Fantasma";
+			string_table[4][e_advanced_string::skull_ghost_tooltip] = u8"Los personajes de I.A. no retrocederán a los ataques, ya sean cuerpo a cuerpo u otro tipo.";
+			string_table[4][e_advanced_string::skull_grunt] = u8"Cumpleaños Grunt";
+			string_table[4][e_advanced_string::skull_grunt_tooltip] = u8"Los tiros a la cabeza se convierten en explosiones de Granada de Plasma.";
+			string_table[4][e_advanced_string::skull_iron] = u8"Hierro";
+			string_table[4][e_advanced_string::skull_iron_tooltip] = u8"Al jugar co-operativo, si alguno de los jugadores muere el juego volverá al\núltimo punto de control.";
+			string_table[4][e_advanced_string::skull_iwbyd] = u8"IWBYD";
+			string_table[4][e_advanced_string::skull_iwbyd_tooltip] = u8"La rareza del diálogo de combate cambiará, el diálogo raro será más frecuente\n pero el diálogo común seguirá escuchándose con la misma frecuencia.";
+			string_table[4][e_advanced_string::skull_mythic] = u8"Mítico";
+			string_table[4][e_advanced_string::skull_mythic_tooltip] = u8"Los enemigos tienen más salud y escudo, así que serán más difíciles de matar.";
+			string_table[4][e_advanced_string::skull_sputnik] = u8"Sputnik";
+			string_table[4][e_advanced_string::skull_sputnik_tooltip] = u8"La masa de ciertos objetos será muy reducida, haciendo que vuelen más lejos\nsi son golpeados por un ataque cuerpo a cuerpo o si están cerca de una explosión.";
+			string_table[4][e_advanced_string::skull_thunderstorm] = u8"Tormenta Eléctrica";
+			string_table[4][e_advanced_string::skull_thunderstorm_tooltip] = u8"La mayoría de unidades enemigas y aliadas serán del rango más alto.";
+			string_table[4][e_advanced_string::skull_whuppopotamus] = u8"Whuppopotamus";
+			string_table[4][e_advanced_string::skull_whuppopotamus_tooltip] = u8"Mejora el oído de aliados y enemigos.";
+			string_table[4][e_advanced_string::game_title] = u8"Ajustes del juego";
+			string_table[4][e_advanced_string::discord_presence] = u8"Discord Rich Presence";
+			string_table[4][e_advanced_string::disable_intro_videos] = u8"Desactivar Videos al inicio";
+			string_table[4][e_advanced_string::language] = u8"Idioma";
+			string_table[4][e_advanced_string::lang_english] = u8"Inglés";
+			string_table[4][e_advanced_string::lang_japanese] = u8"Japonés";
+			string_table[4][e_advanced_string::lang_german] = u8"Alemán";
+			string_table[4][e_advanced_string::lang_french] = u8"Francés";
+			string_table[4][e_advanced_string::lang_spanish] = u8"Español";
+			string_table[4][e_advanced_string::lang_italian] = u8"Italiano";
+			string_table[4][e_advanced_string::lang_korean] = u8"Coreano";
+			string_table[4][e_advanced_string::lang_chinese] = u8"Chino";
+			string_table[4][e_advanced_string::lang_native] = u8"Nativo";
 		}
 	}
 }

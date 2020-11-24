@@ -310,6 +310,7 @@ namespace imgui_handler
 		io.KeyMap[ImGuiKey_Z] = 'Z';
 
 		ImFont* font1 = io.Fonts->AddFontDefault();
+		
 
 		ImGui_ImplDX9_Init(pDevice);
 
@@ -319,6 +320,7 @@ namespace imgui_handler
 		//bool ret = LoadTextureFromFile("patchnotes.png", , &my_image_width, &my_image_height);
 		//IM_ASSERT(ret);
 		preloadImages();
+		AdvancedSettings::BuildStringsTable();
 	}
 	float WidthPercentage(float percent)
 	{

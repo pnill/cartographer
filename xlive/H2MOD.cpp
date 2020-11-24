@@ -7,7 +7,6 @@
 #include "H2MOD/Modules/HitFix/HitFix.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/MainMenu/Ranks.h"
-#include "H2MOD/Modules/MapFix/MPMapFix.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "H2MOD/Modules/Networking/Memory/bitstream.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -16,7 +15,7 @@
 #include "H2MOD/Variants/GunGame/GunGame.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
+#include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/Modules/Utils/Utils.h"
@@ -25,9 +24,9 @@
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Tags/MetaExtender.h"
-#include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
+#include "H2MOD/Modules/Startup/Startup.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -823,6 +822,12 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 			b_XboxTick = false;
 		}
 
+		if(b_HeadHunter)
+		{
+			headHunterHandler->deinitializer->execute();
+			b_HeadHunter = false;
+		}
+
 		resetAfterMatch = false;
 	}
 
@@ -846,6 +851,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 
 	ControllerInput::SetSensitiviy(H2Config_controller_sens);
 	MouseInput::SetSensitivity(H2Config_mouse_sens);
+	HudElements::OnMapLoad();
 	if (h2mod->GetMapType() == scnr_type::Multiplayer)
 	{
 		addDebugText("Map type: Multiplayer");
@@ -860,7 +866,6 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		if (!b_XboxTick) 
 		{
 			H2X::Initialize(b_H2X);
-			MPMapFix::Initialize();
 			H2Tweaks::applyMeleePatch(true);
 			HitFix::ApplyProjectileVelocity();
 			engine_settings->tickrate = XboxTick::setTickRate(false);
@@ -873,9 +878,6 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		EventHandler::executeMapLoadCallback(scnr_type::Multiplayer);
-		HudElements::OnMapLoad();
-
-
 
 		if (get_game_life_cycle() == life_cycle_in_game)
 		{
@@ -892,6 +894,11 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 			if (b_GunGame) {
 				gunGame->initializer->execute();
 			}
+
+			if(b_HeadHunter)
+			{
+				headHunterHandler->initializer->execute();
+			}
 		}
 
 	}
@@ -903,7 +910,6 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		//H2X::Initialize(true);
 		H2Tweaks::applyMeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
-		HudElements::OnMapLoad();
 		EventHandler::executeMapLoadCallback(scnr_type::SinglePlayer);
 	}
 
@@ -923,6 +929,12 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 
 	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
 
+	if(b_HeadHunter)
+	{
+		headHunterHandler->preSpawnPlayer->SetPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
+		headHunterHandler->preSpawnPlayer->execute();
+	}
+
 	if (b_Infection) {
 		infectionHandler->preSpawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
 		infectionHandler->preSpawnPlayer->execute();
@@ -934,6 +946,12 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	}
 
 	bool ret = p_player_spawn(playerDatumIndex);
+
+	if(b_HeadHunter)
+	{
+		headHunterHandler->spawnPlayer->SetPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
+		headHunterHandler->spawnPlayer->execute();
+	}
 
 	if (b_Infection) {
 		infectionHandler->spawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());

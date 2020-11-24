@@ -26,7 +26,9 @@ namespace Blam
 				char secondary_weapon_index;
 				WORD grenade_index;
 				__int16 zoom_level;
-				__int16 interaction_type;
+				byte auto_look_centering;
+				byte auto_look_centering_scale;
+				//__int16 interaction_type;
 				__int16 field_2E;
 				int interaction_object;
 				int melee_target_exists;
@@ -52,9 +54,9 @@ namespace Blam
 				datum ControllingDatum;
 				int InputFlags_1;
 				int InputFlags_2;
-				BYTE Pad_3[sizeof(DWORD) * 3];
+				BYTE Pad_3[sizeof(DWORD) * 2];
 				s_player_actions Actions;
-				BYTE Pad_4[12];
+				BYTE Pad_4[16];
 				int melee_target_exists;
 				BYTE Pad_5[16];
 			};

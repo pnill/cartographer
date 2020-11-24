@@ -175,11 +175,8 @@ void HudElements::ToggleHUD(bool state)
 
 void HudElements::OnMapLoad()
 {
-	if (h2mod->GetMapType() == Multiplayer)
-	{
-		setCrosshairSize();
-		setCrosshairPos();
-	}
+	setCrosshairSize();
+	setCrosshairPos();
 }
 void HudElements::ApplyHooks()
 {

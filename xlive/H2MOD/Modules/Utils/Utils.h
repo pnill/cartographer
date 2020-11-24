@@ -110,3 +110,5 @@ std::vector<std::string> split(const std::string &s, char delim);
 int stripWhitespace(wchar_t *inputStr);
 void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen);
 std::string ByteToHexStr(const BYTE* buffer, size_t size);
+int GetCurrentTimeMS();
+int TimeElapsedMS(int startms);
