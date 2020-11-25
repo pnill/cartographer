@@ -62,12 +62,9 @@ namespace imgui_handler
 			vehicle_field_of_view,
 			crosshair_offset,
 			crosshair_size,
-			show_ingame_chat,
 			hide_ingame_chat,
-			disable_hud,
-			enable_hud,
-			disable_first_person,
-			enable_first_person,
+			show_hud,
+			show_first_person,
 			video_title,
 			fps_limit,
 			fps_limit_tooltip,
@@ -152,7 +149,9 @@ namespace imgui_handler
 			lang_italian,
 			lang_korean,
 			lang_chinese,
-			lang_native
+			lang_native,
+			static_fp,
+			static_fp_tooltip
 		};
 		void BuildStringsTable();
 		char* GetString(e_advanced_string string, std::string id = "");

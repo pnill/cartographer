@@ -56,6 +56,7 @@ int H2Config_static_lod_state = static_lod::disable;
 int H2Config_field_of_view = 70;
 int H2Config_vehicle_field_of_view = 70;
 int H2Config_refresh_rate = 60;
+bool H2Config_static_first_person = false;
 float H2Config_mouse_sens = 0;
 bool H2Config_mouse_uniform = false;
 float H2Config_controller_sens = 0;
@@ -467,6 +468,8 @@ void SaveH2Config() {
 
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view);
 
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", H2Config_static_first_person);
+
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "refresh_rate", H2Config_refresh_rate);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_sens", std::to_string(H2Config_mouse_sens).c_str());
@@ -714,6 +717,7 @@ void ReadH2Config() {
 
 				H2Config_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "field_of_view", H2Config_field_of_view);
 				H2Config_vehicle_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view);
+				H2Config_static_first_person = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", false);
 				H2Config_experimental_fps = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
 				std::string crosshair_offset_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN"));
 				if (crosshair_offset_str != "NaN")

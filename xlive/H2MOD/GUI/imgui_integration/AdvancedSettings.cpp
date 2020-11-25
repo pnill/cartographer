@@ -267,56 +267,72 @@ namespace imgui_handler {
 					ImVec2 b3_size = ImVec2(WidthPercentage(33.3333333333f), item_size.y);
 					ImGui::NewLine();
 					//Ingame Change Display
-					if (!H2Config_hide_ingame_chat)
-					{
-						if (ImGui::Button(GetString(show_ingame_chat), b3_size))
-							H2Config_hide_ingame_chat = false;
-						ImGui::SameLine();
-					}
-					else
-					{
-						if (ImGui::Button(GetString(hide_ingame_chat), b3_size))
-							H2Config_hide_ingame_chat = true;
-						ImGui::SameLine();
-					}
+					ImGui::Columns(2, "", false);
 
-					//Toggle HUD
-					if (g_showHud)
-					{
-						if (ImGui::Button(GetString(disable_hud), b3_size))
-						{
-							HudElements::ToggleHUD(false);
-							g_showHud = false;
-						}
-						ImGui::SameLine();
-					}
-					else
-					{
-						if (ImGui::Button(GetString(enable_hud), b3_size))
-						{
-							HudElements::ToggleHUD(true);
-							g_showHud = true;
-						}
-						ImGui::SameLine();
-					}
+					ImGui::Checkbox(GetString(hide_ingame_chat), &H2Config_hide_ingame_chat);
+					ImGui::NextColumn();
+					ImGui::Checkbox(GetString(static_fp), &H2Config_static_first_person);
+					if(ImGui::IsItemHovered())
+						ImGui::SetTooltip(GetString(static_fp_tooltip));
+					ImGui::NextColumn();
+					ImGui::Checkbox(GetString(show_hud), &g_showHud);
+					if(ImGui::IsItemEdited())
+						HudElements::ToggleHUD(g_showHud);
+					ImGui::NextColumn();
+					ImGui::Checkbox(GetString(show_first_person), &g_showFP);
+					if (ImGui::IsItemEdited())
+						HudElements::ToggleFirstPerson(g_showFP);
+					ImGui::Columns(1);
+					//if (!H2Config_hide_ingame_chat)
+					//{
+					//	if (ImGui::Button(GetString(show_ingame_chat), b3_size))
+					//		H2Config_hide_ingame_chat = false;
+					//	ImGui::SameLine();
+					//}
+					//else
+					//{
+					//	if (ImGui::Button(GetString(hide_ingame_chat), b3_size))
+					//		H2Config_hide_ingame_chat = true;
+					//	ImGui::SameLine();
+					//}
 
-					//Toggle First Person
-					if (g_showFP)
-					{
-						if (ImGui::Button(GetString(disable_first_person), b3_size))
-						{
-							HudElements::ToggleFirstPerson(false);
-							g_showFP = false;
-						}
-					}
-					else
-					{
-						if (ImGui::Button(GetString(enable_first_person), b3_size))
-						{
-							HudElements::ToggleFirstPerson(true);
-							g_showFP = true;
-						}
-					}
+					////Toggle HUD
+					//if (g_showHud)
+					//{
+					//	if (ImGui::Button(GetString(disable_hud), b3_size))
+					//	{
+					//		HudElements::ToggleHUD(false);
+					//		g_showHud = false;
+					//	}
+					//	ImGui::SameLine();
+					//}
+					//else
+					//{
+					//	if (ImGui::Button(GetString(enable_hud), b3_size))
+					//	{
+					//		HudElements::ToggleHUD(true);
+					//		g_showHud = true;
+					//	}
+					//	ImGui::SameLine();
+					//}
+
+					////Toggle First Person
+					//if (g_showFP)
+					//{
+					//	if (ImGui::Button(GetString(disable_first_person), b3_size))
+					//	{
+					//		HudElements::ToggleFirstPerson(false);
+					//		g_showFP = false;
+					//	}
+					//}
+					//else
+					//{
+					//	if (ImGui::Button(GetString(enable_first_person), b3_size))
+					//	{
+					//		HudElements::ToggleFirstPerson(true);
+					//		g_showFP = true;
+					//	}
+					//}
 					ImGui::NewLine();
 				}
 				if (ImGui::CollapsingHeader(GetString(video_title)))
@@ -857,12 +873,9 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::vehicle_field_of_view] = "Vehicle Field of View";
 			string_table[0][e_advanced_string::crosshair_offset] = "Crosshair Offset";
 			string_table[0][e_advanced_string::crosshair_size] = "Crosshair Size";
-			string_table[0][e_advanced_string::show_ingame_chat] = "Show Ingame Chat";
 			string_table[0][e_advanced_string::hide_ingame_chat] = "Hide Ingame Chat";
-			string_table[0][e_advanced_string::disable_hud] = "Disable HUD";
-			string_table[0][e_advanced_string::enable_hud] = "Enable HUD";
-			string_table[0][e_advanced_string::disable_first_person] = "Disable First Person";
-			string_table[0][e_advanced_string::enable_first_person] = "Enable First Person";
+			string_table[0][e_advanced_string::show_hud] = "Show HUD";
+			string_table[0][e_advanced_string::show_first_person] = "Show First Person";
 			string_table[0][e_advanced_string::video_title] = "Video Settings";
 			string_table[0][e_advanced_string::fps_limit] = "FPS Limit";
 			string_table[0][e_advanced_string::fps_limit_tooltip] = "Setting this to 0 will uncap your games frame rate.\nAnything over 60 may cause performance issues\nUse the Experimental Rendering Changes to resolve them";
@@ -948,7 +961,8 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::lang_korean] = "Korean";
 			string_table[0][e_advanced_string::lang_chinese] = "Chinese";
 			string_table[0][e_advanced_string::lang_native] = "Native";
-
+			string_table[0][e_advanced_string::static_fp] = "Static FP Scale";
+			string_table[0][e_advanced_string::static_fp_tooltip] = "This setting will force your First person model to stay the default size independent of FOV.";
 			//Spanish.
 			string_table[4][e_advanced_string::title] = u8"      Ajustes avanzados";
 			string_table[4][e_advanced_string::hud_title] = u8"Ajustes de Interfaz";
@@ -957,12 +971,9 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::vehicle_field_of_view] = u8"Campo de visión (Vehículo)";
 			string_table[4][e_advanced_string::crosshair_offset] = u8"Posición de la mira";
 			string_table[4][e_advanced_string::crosshair_size] = u8"Tamaño de la mira";
-			string_table[4][e_advanced_string::show_ingame_chat] = u8"Mostrar chat en partida";
 			string_table[4][e_advanced_string::hide_ingame_chat] = u8"Ocultar chat en partida";
-			string_table[4][e_advanced_string::disable_hud] = u8"Esconder Interfaz";
-			string_table[4][e_advanced_string::enable_hud] = u8"Mostrar Interfaz";
-			string_table[4][e_advanced_string::disable_first_person] = u8"Activar primera persona";
-			string_table[4][e_advanced_string::enable_first_person] = u8"Desactivar primera persona";
+			string_table[4][e_advanced_string::show_hud] = u8"Mostrar Interfaz";
+			string_table[4][e_advanced_string::show_first_person] = u8"Mostrar primera persona";
 			string_table[4][e_advanced_string::video_title] = u8"Ajustes de video";
 			string_table[4][e_advanced_string::fps_limit] = u8"Limitar FPS";
 			string_table[4][e_advanced_string::fps_limit_tooltip] = u8"Dejar este ajuste en 0 quitará el límite de fotogramas por segundo.\nCualquier valor mayor a 60 puede causar problemas de rendimiento.\nUsa el Cambio de Renderizado Experimental para solucionarlo.";
@@ -1048,6 +1059,8 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::lang_korean] = u8"Coreano";
 			string_table[4][e_advanced_string::lang_chinese] = u8"Chino";
 			string_table[4][e_advanced_string::lang_native] = u8"Nativo";
+			string_table[4][e_advanced_string::static_fp] = "Escala FP estática";
+			string_table[4][e_advanced_string::static_fp_tooltip] = "Esta configuración obligará a su modelo en primera persona a mantener el tamaño predeterminado\nindependientemente del campo de visión.";
 		}
 	}
 }

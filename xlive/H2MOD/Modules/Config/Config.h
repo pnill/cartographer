@@ -58,6 +58,7 @@ extern bool H2Config_experimental_game_main_loop_patches;
 extern int H2Config_static_lod_state;
 extern int H2Config_field_of_view;
 extern int H2Config_vehicle_field_of_view;
+extern bool H2Config_static_first_person;
 extern float H2Config_mouse_sens;
 extern bool H2Config_mouse_uniform;
 extern float H2Config_controller_sens;
