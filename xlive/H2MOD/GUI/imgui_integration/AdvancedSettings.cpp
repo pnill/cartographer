@@ -967,7 +967,7 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::title] = u8"      Ajustes avanzados";
 			string_table[4][e_advanced_string::hud_title] = u8"Ajustes de Interfaz";
 			string_table[4][e_advanced_string::player_field_of_view] = u8"Campo de visión (Personaje)";
-			string_table[4][e_advanced_string::reset] = u8"Reiniciar";
+			string_table[4][e_advanced_string::reset] = u8"Inicial";
 			string_table[4][e_advanced_string::vehicle_field_of_view] = u8"Campo de visión (Vehículo)";
 			string_table[4][e_advanced_string::crosshair_offset] = u8"Posición de la mira";
 			string_table[4][e_advanced_string::crosshair_size] = u8"Tamaño de la mira";
@@ -982,7 +982,7 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::refresh_rate] = u8"Taza de refresco";
 			string_table[4][e_advanced_string::refresh_rate_tooltip] = u8"Este ajuste requiere reiniciar el juego para que tenga efecto.";
 			string_table[4][e_advanced_string::lod] = u8"Nivel de detalle";
-			string_table[4][e_advanced_string::e_default] = u8"Predeterminado";
+			string_table[4][e_advanced_string::e_default] = u8"Inicial";
 			string_table[4][e_advanced_string::lod_1] = u8"N1 - Muy bajo";
 			string_table[4][e_advanced_string::lod_2] = u8"N2 - Bajo";
 			string_table[4][e_advanced_string::lod_3] = u8"N3 - Medio";
@@ -1059,8 +1059,8 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::lang_korean] = u8"Coreano";
 			string_table[4][e_advanced_string::lang_chinese] = u8"Chino";
 			string_table[4][e_advanced_string::lang_native] = u8"Nativo";
-			string_table[4][e_advanced_string::static_fp] = "Escala FP estática";
-			string_table[4][e_advanced_string::static_fp_tooltip] = "Esta configuración obligará a su modelo en primera persona a mantener el tamaño predeterminado\nindependientemente del campo de visión.";
+			string_table[4][e_advanced_string::static_fp] = u8"Escala FP estática";
+			string_table[4][e_advanced_string::static_fp_tooltip] = u8"Esta configuración obligará a su modelo en primera persona a mantener el tamaño predeterminado\nindependientemente del campo de visión.";
 		}
 	}
 }
