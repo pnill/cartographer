@@ -1350,9 +1350,25 @@ startCountdownTimer p_StartCountdownTimer;
 char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, char a4)
 {
 	bool canStart[2]{ false, false };
-	BYTE TeamPlay = *h2mod->GetAddress<BYTE*>(0, 0x992880);
-	if (H2Config_force_even && TeamPlay == 1)
+
+	if (H2Config_minimum_player_start > 0)
 	{
+		ServerConsole::SendMsg(L"Waiting for Players | Esperando a los jugadores", true);
+		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
+		{
+			LOG_DEBUG_GAME(L"Minimum Player count met.");
+			canStart[1] = true;
+		}
+	}
+	else
+	{
+		canStart[1] = true;
+	}
+
+	BYTE TeamPlay = *h2mod->GetAddress<BYTE*>(0, 0x992880);
+	if (H2Config_force_even && TeamPlay == 1 && canStart[1])
+	{
+		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
 		LOG_DEBUG_GAME(L"Balancing teams");
 		std::map<std::string, std::vector<int>> Parties;
 		std::vector<int> nonPartyPlayers;
@@ -1473,18 +1489,6 @@ char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, cha
 		canStart[0] = true;
 	}
 
-	if (H2Config_minimum_player_start > 0)
-	{
-		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
-		{
-			LOG_DEBUG_GAME(L"Minimum Player count met.");
-			canStart[1] = true;
-		}
-	} 
-	else
-	{
-		canStart[1] = true;
-	}
 
 	if (canStart[0] && canStart[1])
 		return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);

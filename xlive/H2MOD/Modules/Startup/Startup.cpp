@@ -345,6 +345,11 @@ std::wstring prepareLogFileName(std::wstring logFileName) {
 	return filename;
 }
 
+void ServerStartupFixes()
+{
+	
+}
+
 ///Before the game window appears
 void InitH2Startup() {
 	InitializeCriticalSection(&log_section);

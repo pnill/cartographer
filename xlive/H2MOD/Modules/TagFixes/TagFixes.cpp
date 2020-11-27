@@ -78,7 +78,8 @@ namespace TagFixes
 						tag_reference* impl_2 = reinterpret_cast<tag_reference*>(shadow_impl + (0x14A*2) + 0xFC);
 
 						impl_1->TagIndex = cinematic_shadow_datum.data;
-						impl_2->TagIndex = cinematic_shadow_datum.data;
+						//TODO: Re-enable this once the vertex shaders for shadows are fixed.
+						//impl_2->TagIndex = cinematic_shadow_datum.data;
 					}
 				}
 			}

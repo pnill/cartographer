@@ -5,6 +5,7 @@
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/Utils/Utils.h"
 
 typedef void*(__cdecl *dedi_command_hook)(wchar_t** a1, int a2, char a3);
 dedi_command_hook p_dedi_command_hook;
@@ -169,12 +170,44 @@ void ServerConsole::ClearVip()
 {
 	kablam_vip_clear();
 }
-//void sendmessage()
-//{
-//	DWORD* mem = (DWORD*)calloc(64, sizeof(DWORD));
-//	*((BYTE *)mem + 8) = 1;
-//	*mem = h2mod->GetAddress(0, 0x352DFC);
-//	mem[64] = 0;
-//	sub_633E0D(ebx0, (__int16 *)this + 6, 121u, (__int16 *)a2);
-//	return v3;
-//}
+struct send_message_command_block
+{
+	DWORD v_table;
+	DWORD unk_1;
+	DWORD unk_2;
+	wchar_t message[110];
+};
+
+int messageTimeout = 0;
+
+void ServerConsole::SendMsg(wchar_t* message, bool timeout)
+{
+	bool execute = !timeout;
+	if (TimeElapsedMS(messageTimeout) > 10000)
+	{
+		messageTimeout = GetCurrentTimeMS();
+		execute = true;
+	}
+
+	if (execute) {
+		send_message_command_block a{
+		h2mod->GetAddress(0, 0x352dfc),
+		8,
+		1
+		};
+		DWORD test = (DWORD)std::addressof(a);
+		size_t len = wcslen(message);
+		for (auto i = 0; i < 110; i++) {
+			if (i < len)
+				a.message[i] = message[i];
+			else
+				a.message[i] = 0;
+		}
+		__asm {
+			mov eax, [a]
+			mov edx, [eax]
+			mov ecx, test
+			call edx
+		}
+	}
+}
