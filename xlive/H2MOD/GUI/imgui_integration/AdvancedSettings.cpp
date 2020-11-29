@@ -283,56 +283,6 @@ namespace imgui_handler {
 					if (ImGui::IsItemEdited())
 						HudElements::ToggleFirstPerson(g_showFP);
 					ImGui::Columns(1);
-					//if (!H2Config_hide_ingame_chat)
-					//{
-					//	if (ImGui::Button(GetString(show_ingame_chat), b3_size))
-					//		H2Config_hide_ingame_chat = false;
-					//	ImGui::SameLine();
-					//}
-					//else
-					//{
-					//	if (ImGui::Button(GetString(hide_ingame_chat), b3_size))
-					//		H2Config_hide_ingame_chat = true;
-					//	ImGui::SameLine();
-					//}
-
-					////Toggle HUD
-					//if (g_showHud)
-					//{
-					//	if (ImGui::Button(GetString(disable_hud), b3_size))
-					//	{
-					//		HudElements::ToggleHUD(false);
-					//		g_showHud = false;
-					//	}
-					//	ImGui::SameLine();
-					//}
-					//else
-					//{
-					//	if (ImGui::Button(GetString(enable_hud), b3_size))
-					//	{
-					//		HudElements::ToggleHUD(true);
-					//		g_showHud = true;
-					//	}
-					//	ImGui::SameLine();
-					//}
-
-					////Toggle First Person
-					//if (g_showFP)
-					//{
-					//	if (ImGui::Button(GetString(disable_first_person), b3_size))
-					//	{
-					//		HudElements::ToggleFirstPerson(false);
-					//		g_showFP = false;
-					//	}
-					//}
-					//else
-					//{
-					//	if (ImGui::Button(GetString(enable_first_person), b3_size))
-					//	{
-					//		HudElements::ToggleFirstPerson(true);
-					//		g_showFP = true;
-					//	}
-					//}
 					ImGui::NewLine();
 				}
 				if (ImGui::CollapsingHeader(GetString(video_title)))
@@ -364,8 +314,6 @@ namespace imgui_handler {
 					ImGui::Checkbox(GetString(experimental_rendering_changes), &H2Config_experimental_fps);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
-					//ImGui::Columns(2, "VideoSettings", false);
-					//Refresh Rate
 					TextVerticalPad(GetString(refresh_rate), 8.5);
 					ImGui::SameLine();
 					ImGui::SetCursorPosX(float_offset);
@@ -374,8 +322,6 @@ namespace imgui_handler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(refresh_rate_tooltip));
 					ImGui::PopItemWidth();
-					//ImGui::NextColumn();
-
 
 					//LOD
 					TextVerticalPad(GetString(lod), 8.5);
@@ -400,20 +346,7 @@ namespace imgui_handler {
 				if(ImGui::CollapsingHeader(GetString(m_k_title)))
 				{
 					ImGui::Columns(2, "", false);
-					//Disable Ingame Keyboard
-					/*TextVerticalPad("Disable Keyboard Input", 8.5);
-					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					if (ImGui::Checkbox("##KeyboardInput", &H2Config_disable_ingame_keyboard))
-					{
-						KeyboardInput::ToggleKeyboardInput();
-					}
-					else
-					{
-						KeyboardInput::ToggleKeyboardInput();
-					}
-
-					ImGui::NextColumn();*/
-
+					
 					//Raw Input
 					TextVerticalPad(GetString(raw_mouse), 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
@@ -963,6 +896,7 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::lang_native] = "Native";
 			string_table[0][e_advanced_string::static_fp] = "Static FP Scale";
 			string_table[0][e_advanced_string::static_fp_tooltip] = "This setting will force your First person model to stay the default size independent of FOV.";
+			
 			//Spanish.
 			string_table[4][e_advanced_string::title] = u8"      Ajustes avanzados";
 			string_table[4][e_advanced_string::hud_title] = u8"Ajustes de Interfaz";

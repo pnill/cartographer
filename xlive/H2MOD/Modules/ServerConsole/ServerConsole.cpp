@@ -170,6 +170,7 @@ void ServerConsole::ClearVip()
 {
 	kablam_vip_clear();
 }
+
 struct send_message_command_block
 {
 	DWORD v_table;
@@ -191,9 +192,9 @@ void ServerConsole::SendMsg(wchar_t* message, bool timeout)
 
 	if (execute) {
 		send_message_command_block a{
-		h2mod->GetAddress(0, 0x352dfc),
-		8,
-		1
+			h2mod->GetAddress(0, 0x352dfc),
+			8,
+			1
 		};
 		DWORD test = (DWORD)std::addressof(a);
 		size_t len = wcslen(message);
@@ -203,6 +204,7 @@ void ServerConsole::SendMsg(wchar_t* message, bool timeout)
 			else
 				a.message[i] = 0;
 		}
+
 		__asm {
 			mov eax, [a]
 			mov edx, [eax]
