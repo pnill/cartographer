@@ -100,67 +100,7 @@ namespace imgui_handler {
 					draw_list->AddCircleFilled(Thumb_Pos, 5, ImColor(255, 0, 0), 60);
 				}
 			}
-		}
-		char* GetString(e_advanced_string string, std::string id)
-		{
-			if (string_table.count(H2Config_language.code_main))
-			{
-				if (id.empty()) {
-					return const_cast<char*>(string_table.at(H2Config_language.code_main).at(string));
-				}
-
-				if(!string_cache.count(id))
-				{
-					std::string temp_str(const_cast<char*>(string_table.at(H2Config_language.code_main).at(string)));
-					temp_str.append("##");
-					temp_str.append(id);
-					string_cache[id] = temp_str;
-				}
-				return (char*)string_cache[id].c_str();
-
-			}
-			else
-			{
-				if (id.empty()) {
-					return const_cast<char*>(string_table.at(0).at(string));
-				}
-				if (!string_cache.count(id))
-				{
-					std::string temp_str(const_cast<char*>(string_table.at(0).at(string)));
-					temp_str.append("##");
-					temp_str.append(id);
-					string_cache[id] = temp_str;
-				}
-				return (char*)string_cache[id].c_str();
-			}
-		}
-		void Render(bool* p_open)
-		{
-			if(!g_init)
-			{
-				g_deadzone = (int)H2Config_Controller_Deadzone;
-				g_aiming = (int)H2Config_controller_modern;
-				g_language_code = H2Config_language.code_main;
-				if (g_language_code == -1)
-					g_language_code = 8;
-				g_init = true;
-			}
-			ImGuiIO& io = ImGui::GetIO();
-			RECT rect;
-			::GetClientRect(get_HWND(), &rect);
-			io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
-			ImGuiWindowFlags window_flags = 0;
-			window_flags |= ImGuiWindowFlags_NoCollapse;
-			window_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
-			//window_flags |= ImGuiWindowFlags_MenuBar;
-			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
-			//ImGui::PushFont(font2);
-			ImGui::SetNextWindowSize(ImVec2(650, 530), ImGuiCond_Appearing);
-			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
-			if (h2mod->GetMapType() == MainMenu)
-				ImGui::SetNextWindowBgAlpha(1);
-			if (ImGui::Begin(GetString(e_advanced_string::title), p_open, window_flags))
+			void HudSettings()
 			{
 				ImVec2 item_size = ImGui::GetItemRectSize();
 				if (ImGui::CollapsingHeader(GetString(hud_title)))
@@ -184,7 +124,7 @@ namespace imgui_handler {
 						HudElements::setFOV();
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
-					if (ImGui::Button(GetString(reset,"PlayerFov3"), b2_size))
+					if (ImGui::Button(GetString(reset, "PlayerFov3"), b2_size))
 					{
 						H2Config_field_of_view = 78.0f;
 						HudElements::setFOV();
@@ -272,11 +212,11 @@ namespace imgui_handler {
 					ImGui::Checkbox(GetString(hide_ingame_chat), &H2Config_hide_ingame_chat);
 					ImGui::NextColumn();
 					ImGui::Checkbox(GetString(static_fp), &H2Config_static_first_person);
-					if(ImGui::IsItemHovered())
+					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(static_fp_tooltip));
 					ImGui::NextColumn();
 					ImGui::Checkbox(GetString(show_hud), &g_showHud);
-					if(ImGui::IsItemEdited())
+					if (ImGui::IsItemEdited())
 						HudElements::ToggleHUD(g_showHud);
 					ImGui::NextColumn();
 					ImGui::Checkbox(GetString(show_first_person), &g_showFP);
@@ -285,6 +225,10 @@ namespace imgui_handler {
 					ImGui::Columns(1);
 					ImGui::NewLine();
 				}
+			}
+			void VideoSettings()
+			{
+				ImVec2 item_size = ImGui::GetItemRectSize();
 				if (ImGui::CollapsingHeader(GetString(video_title)))
 				{
 					ImVec2 LargestText = ImGui::CalcTextSize(GetString(hires_fix), NULL, true);
@@ -305,7 +249,7 @@ namespace imgui_handler {
 						desiredRenderTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
 					}
 					ImGui::PopItemWidth();
-					if (ImGui::Button(GetString(reset,"FPS2"), ImVec2(WidthPercentage(10.0f), item_size.y)))
+					if (ImGui::Button(GetString(reset, "FPS2"), ImVec2(WidthPercentage(10.0f), item_size.y)))
 					{
 						H2Config_fps_limit = 60;
 						desiredRenderTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
@@ -343,15 +287,19 @@ namespace imgui_handler {
 					//ImGui::Columns(0);
 					ImGui::NewLine();
 				}
-				if(ImGui::CollapsingHeader(GetString(m_k_title)))
+			}
+			void MouseKeyboardSettings()
+			{
+				ImVec2 item_size = ImGui::GetItemRectSize();
+				if (ImGui::CollapsingHeader(GetString(m_k_title)))
 				{
 					ImGui::Columns(2, "", false);
-					
+
 					//Raw Input
 					TextVerticalPad(GetString(raw_mouse), 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##RawMouse", &H2Config_raw_input);
-					if(ImGui::IsItemHovered())
+					if (ImGui::IsItemHovered())
 					{
 						ImGui::SetTooltip(GetString(raw_mouse_tooltip));
 					}
@@ -424,7 +372,11 @@ namespace imgui_handler {
 						}
 					}
 				}
-				if(ImGui::CollapsingHeader(GetString(controller_title)))
+			}
+			void ControllerSettings()
+			{
+				ImVec2 item_size = ImGui::GetItemRectSize();
+				if (ImGui::CollapsingHeader(GetString(controller_title)))
 				{
 					DrawDeadzones();
 					ImGui::Columns(2, "", false);
@@ -441,8 +393,8 @@ namespace imgui_handler {
 						ImGui::SetTooltip(GetString(uniform_sensitivity_tooltip));
 					}
 					ImGui::Columns(1);
-					
-					
+
+
 					ImGui::Text(GetString(controller_sensitivity));
 					ImGui::PushItemWidth(WidthPercentage(75));
 					int g_controller_sens = (int)H2Config_controller_sens;
@@ -491,12 +443,12 @@ namespace imgui_handler {
 					ImGui::Text(GetString(deadzone_type));
 					const char* items[] = { GetString(axial), GetString(radial), GetString(both) };
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());;
-					if(ImGui::Combo("##C_Deadzone_Type", &g_deadzone, items, 3))
+					if (ImGui::Combo("##C_Deadzone_Type", &g_deadzone, items, 3))
 					{
 						H2Config_Controller_Deadzone = (H2Config_Deadzone_Type)(byte)g_deadzone;
 						ControllerInput::SetDeadzones();
 					}
-					if(ImGui::IsItemHovered())
+					if (ImGui::IsItemHovered())
 					{
 						ImGui::SetTooltip(GetString(deadzone_type_tooltip));
 					}
@@ -587,7 +539,9 @@ namespace imgui_handler {
 					}
 					ImGui::NewLine();
 				}
-
+			}
+			void HostSettings()
+			{
 				if (NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() == scnr_type::SinglePlayer) {
 					if (ImGui::CollapsingHeader(GetString(host_campagin_settings)))
 					{
@@ -739,7 +693,9 @@ namespace imgui_handler {
 						ImGui::Columns(1);
 					}
 				}
-
+			}
+			void GameSettings()
+			{
 				if (ImGui::CollapsingHeader(GetString(game_title)))
 				{
 					ImGui::Columns(2, "", false);
@@ -747,7 +703,7 @@ namespace imgui_handler {
 					TextVerticalPad(GetString(discord_presence), 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##DRP", &H2Config_discord_enable);
-					
+
 					ImGui::NextColumn();
 
 					//Skip Intro
@@ -758,7 +714,7 @@ namespace imgui_handler {
 					ImGui::NextColumn();
 
 					ImGui::Text(GetString(language));
-					const char* l_items[]{GetString(lang_english), GetString(lang_japanese), GetString(lang_german), GetString(lang_french), GetString(lang_spanish), GetString(lang_italian), GetString(lang_korean), GetString(lang_chinese), GetString(lang_native) };
+					const char* l_items[]{ GetString(lang_english), GetString(lang_japanese), GetString(lang_german), GetString(lang_french), GetString(lang_spanish), GetString(lang_italian), GetString(lang_korean), GetString(lang_chinese), GetString(lang_native) };
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());
 					if (ImGui::Combo("##Language_Selection", &g_language_code, l_items, 9))
 					{
@@ -772,6 +728,77 @@ namespace imgui_handler {
 					ImGui::Columns(1);
 					ImGui::NewLine();
 				}
+			}
+		}
+		char* GetString(e_advanced_string string, std::string id)
+		{
+			if (string_table.count(H2Config_language.code_main))
+			{
+				if (id.empty()) {
+					return const_cast<char*>(string_table.at(H2Config_language.code_main).at(string));
+				}
+
+				if(!string_cache.count(id))
+				{
+					std::string temp_str(const_cast<char*>(string_table.at(H2Config_language.code_main).at(string)));
+					temp_str.append("##");
+					temp_str.append(id);
+					string_cache[id] = temp_str;
+				}
+				return (char*)string_cache[id].c_str();
+
+			}
+			else
+			{
+				if (id.empty()) {
+					return const_cast<char*>(string_table.at(0).at(string));
+				}
+				if (!string_cache.count(id))
+				{
+					std::string temp_str(const_cast<char*>(string_table.at(0).at(string)));
+					temp_str.append("##");
+					temp_str.append(id);
+					string_cache[id] = temp_str;
+				}
+				return (char*)string_cache[id].c_str();
+			}
+		}
+		void Render(bool* p_open)
+		{
+			if(!g_init)
+			{
+				g_deadzone = (int)H2Config_Controller_Deadzone;
+				g_aiming = (int)H2Config_controller_modern;
+				g_language_code = H2Config_language.code_main;
+				if (g_language_code == -1)
+					g_language_code = 8;
+				g_init = true;
+			}
+			ImGuiIO& io = ImGui::GetIO();
+			RECT rect;
+			::GetClientRect(get_HWND(), &rect);
+			io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
+			ImGuiWindowFlags window_flags = 0;
+			window_flags |= ImGuiWindowFlags_NoCollapse;
+			window_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
+			//window_flags |= ImGuiWindowFlags_MenuBar;
+			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
+			//ImGui::PushFont(font2);
+			ImGui::SetNextWindowSize(ImVec2(650, 530), ImGuiCond_Appearing);
+			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
+			if (h2mod->GetMapType() == MainMenu)
+				ImGui::SetNextWindowBgAlpha(1);
+			if (ImGui::Begin(GetString(e_advanced_string::title), p_open, window_flags))
+			{
+				HudSettings();
+				VideoSettings();
+				MouseKeyboardSettings();
+				ControllerSettings();
+				HostSettings();
+				GameSettings();
+
+				
 #if DISPLAY_DEV_TESTING_MENU
 				if (ImGui::CollapsingHeader("Dev Testing"))
 				{

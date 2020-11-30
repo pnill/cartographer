@@ -1345,6 +1345,14 @@ void EvaluateGameState()
 	}
 }
 
+//typedef void(__cdecl p_set_screen_bounds)(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
+//p_set_screen_bounds* c_set_screen_bounds;
+//
+//void __cdecl set_screen_bounds(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale)
+//{
+//	c_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 2.0f);
+//}
+
 typedef char(_cdecl* startCountdownTimer)(char a1, int countdown_time, int a2, int a3, char a4);
 startCountdownTimer p_StartCountdownTimer;
 char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, char a4)
@@ -1640,7 +1648,8 @@ void H2MOD::ApplyHooks() {
 
 		//Initialise_tag_loader();
 		PlayerControl::ApplyHooks();
-		
+		/*c_set_screen_bounds = GetAddress<p_set_screen_bounds*>(0x264979);
+		PatchCall(GetAddress(0x25E1E5), set_screen_bounds);*/
 		
 	}
 	else {
