@@ -103,6 +103,7 @@
     <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\MOTD.cpp" />
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
+    <ClCompile Include="H2MOD\Tags\Export\TagExport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -354,6 +355,8 @@
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_defenition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\Shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\new_hud_definition.hpp" />
+    <ClInclude Include="H2MOD\Tags\Export\TagExport.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

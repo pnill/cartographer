@@ -851,6 +851,8 @@ void H2Tweaks::toggleAiMp(bool toggle) {
 	WriteValue<BYTE>(h2mod->GetAddress(0x30E684, 0x2B93F4), toggle ? JMP_OP_CODE : JNZ_OP_CODE);
 }
 
+static float melee_distance_additional_ticks = 12.0f;
+
 void H2Tweaks::applyMeleePatch(bool toggle)
 {
 	//static float melee_lunge_distance_factor = toggle ? 0.33333334f * 2 : 0.33333334f;
@@ -858,9 +860,9 @@ void H2Tweaks::applyMeleePatch(bool toggle)
 	//WritePointer(h2mod->GetAddress(0x10B354, 0xFD984) + 4, &melee_lunge_distance_factor); // distance when mid air
 	//WritePointer(h2mod->GetAddress(0x10B6A3, 0xFDCD3) + 4, &melee_lunge_distance_factor); // acceleration
 	//WritePointer(h2mod->GetAddress(0x10BB78, 0xFE1A8) + 4, &melee_lunge_distance_factor);
-
-	WriteValue<BYTE>(h2mod->GetAddress(0x10B408, 0xFDA38) + 2, toggle ? 5 : 6); // sword
-	WriteValue<BYTE>(h2mod->GetAddress(0x10B40B, 0xFDA3B) + 2, toggle ? 2 : 1); // generic weapon
+	WritePointer(h2mod->GetAddress(0x10B36B, 0xFD99B) + 4, &melee_distance_additional_ticks);
+	//WriteValue<BYTE>(h2mod->GetAddress(0x10B408, 0xFDA38) + 2, toggle ? 9 : 7); // sword
+	//WriteValue<BYTE>(h2mod->GetAddress(0x10B40B, 0xFDA3B) + 2, toggle ? 2 : 1); // generic weapon
 }
 
 void H2Tweaks::sunFlareFix()

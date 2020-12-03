@@ -27,6 +27,7 @@
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
 #include "H2MOD/Modules/Startup/Startup.h"
+#include "H2MOD/Tags/Export/TagExport.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -835,7 +836,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	{
 		addDebugText("Map Type: Main-Menu");
 		UIRankPatch();
-
+		TagExtractor::extract_render_model("objects\\weapons\\rifle\\battle_rifle\\battle_rifle");
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		MetaExtender::free_tag_blocks();
@@ -855,7 +856,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	if (h2mod->GetMapType() == scnr_type::Multiplayer)
 	{
 		addDebugText("Map type: Multiplayer");
-
+		
 		for (auto gametype_it : GametypesMap)
 		{
 			if (StrStrIW(variant_name, gametype_it.first)) {
@@ -863,6 +864,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 				gametype_it.second = true; // enable a gametype if substring is found
 			}
 		}
+		
 		if (!b_XboxTick) 
 		{
 			H2X::Initialize(b_H2X);
@@ -1345,13 +1347,13 @@ void EvaluateGameState()
 	}
 }
 
-//typedef void(__cdecl p_set_screen_bounds)(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
-//p_set_screen_bounds* c_set_screen_bounds;
-//
-//void __cdecl set_screen_bounds(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale)
-//{
-//	c_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 2.0f);
-//}
+typedef void(__cdecl p_set_screen_bounds)(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
+p_set_screen_bounds* c_set_screen_bounds;
+
+void __cdecl set_screen_bounds(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale)
+{
+	c_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
+}
 
 typedef char(_cdecl* startCountdownTimer)(char a1, int countdown_time, int a2, int a3, char a4);
 startCountdownTimer p_StartCountdownTimer;
@@ -1648,8 +1650,8 @@ void H2MOD::ApplyHooks() {
 
 		//Initialise_tag_loader();
 		PlayerControl::ApplyHooks();
-		/*c_set_screen_bounds = GetAddress<p_set_screen_bounds*>(0x264979);
-		PatchCall(GetAddress(0x25E1E5), set_screen_bounds);*/
+		c_set_screen_bounds = GetAddress<p_set_screen_bounds*>(0x264979);
+		//PatchCall(GetAddress(0x25E1E5), set_screen_bounds);
 		
 	}
 	else {
@@ -1677,6 +1679,7 @@ void H2MOD::Initialize()
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
 		TagFixes::Initalize();
+
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");

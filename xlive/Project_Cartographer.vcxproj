@@ -296,6 +296,7 @@
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\XboxLiveTaskProgress.cpp" />
+    <ClCompile Include="H2MOD\Tags\Export\TagExport.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
     <ClCompile Include="H2MOD\Variants\XboxTick\XboxTick.cpp" />
@@ -492,6 +493,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\hud_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_defenition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\new_hud_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\object_definition.hpp" />
@@ -535,6 +537,7 @@
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h" />
     <ClInclude Include="H2MOD\Modules\UI\XboxLiveTaskProgress.h" />
+    <ClInclude Include="H2MOD\Tags\Export\TagExport.h" />
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h" />
