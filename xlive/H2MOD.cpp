@@ -27,7 +27,7 @@
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
 #include "H2MOD/Modules/Startup/Startup.h"
-#include "H2MOD/Tags/Export/TagExport.h"
+#include "H2MOD/Tags/TagLoader/TagLoader.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -836,7 +836,6 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	{
 		addDebugText("Map Type: Main-Menu");
 		UIRankPatch();
-		TagExtractor::extract_render_model("objects\\weapons\\rifle\\battle_rifle\\battle_rifle");
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		MetaExtender::free_tag_blocks();
@@ -902,7 +901,9 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 				headHunterHandler->initializer->execute();
 			}
 		}
-
+		std::vector<datum> temp;
+		temp.push_back(datum(0xE19B001D));
+		//TagLoader::LoadTags(temp, true, L"christmas_hat_map.map");
 	}
 
 	else if (h2mod->GetMapType() == scnr_type::SinglePlayer)
@@ -1679,7 +1680,7 @@ void H2MOD::Initialize()
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
 		TagFixes::Initalize();
-
+		TagLoader::Initialize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");

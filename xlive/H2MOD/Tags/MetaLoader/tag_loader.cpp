@@ -1203,7 +1203,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 		tag_loader::Add_tags_to_simulation_table();
 
 		///load via codes
-		//tag_loader::Load_tag(0xE886001D, true, "dreamer");
+		tag_loader::Load_tag(0xE886001D, true, "dreamer");
 		//tag_loader::Dump_Que_meta();
 
 		//Todo :: Make Use of TraceFunctions to Log each step
