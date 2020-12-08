@@ -1,4 +1,5 @@
 #include "meta_struct.h"
+#include "Blam/Cache/DataTypes/BlamTag.h"
 
 namespace meta_struct
 {
@@ -189,7 +190,7 @@ namespace meta_struct
 	///
 	//constructor for in memory loading and rebasing
 	//houses both meta and extended meta types
-	meta::meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin , std::ifstream* map_stream , int map_off ,__int8 count,  int datum_index , std::string loc , std::string type)
+	meta::meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin , std::ifstream* map_stream , int map_off ,__int8 count,  int datum_index , std::string loc , blam_tag type)
 	{
 		this->data = meta;
 		this->size = size;
@@ -234,7 +235,7 @@ namespace meta_struct
 		this->map_off = -1;
 		this->datum_index = datum_index;
 		this->map_loc = -1;
-		this->type = "";
+		this->type = blam_tag::none();
 
 		NO_DELETE = true;
 
@@ -325,7 +326,7 @@ namespace meta_struct
 					{
 						//the program will only reach here when u try to use an extended meta on meta file.
 						//any meta which i extract from a map file have all issues of extended_meta fixed.
-						std::string exp = "Meta file 0x" + to_hex_string(datum_index) + "." + type + " is broken.\nEither debug the extraction proceedure or fix the meta file";
+						std::string exp = "Meta file 0x" + to_hex_string(datum_index) + "." + type.as_string() + " is broken.\nEither debug the extraction proceedure or fix the meta file";
 						throw new std::exception(exp.c_str());
 					}
 				}
@@ -406,7 +407,7 @@ namespace meta_struct
 					{
 						//the program will only reach here when u try to use an extended meta on meta file.
 						//any meta which i extract from a map file have all issues of extended_meta fixed.
-						std::string exp = "Meta file 0x" + to_hex_string(datum_index) + "." + type + " is broken.\nEither debug the extraction proceedure or fix the meta file";
+						std::string exp = "Meta file 0x" + to_hex_string(datum_index) + "." + type.as_string() + " is broken.\nEither debug the extraction proceedure or fix the meta file";
 						throw new std::exception(exp.c_str());
 					}
 
@@ -726,7 +727,7 @@ namespace meta_struct
 			*(int*)(data + temp_off) = 0x0;//DATA_READ.WriteINT_LE(new_SID, temp_off, data);
 		}
 	}
-	std::string meta::Get_type()
+	blam_tag meta::Get_type()
 	{
 		return type;
 	}

@@ -61,6 +61,8 @@ namespace tag_loader
 	void Generate_sync_list(int type, DWORD index);
 	//Adds the valid tags to GlobalScenario->SimulationDefinitionTable Block and clears the sync list
 	void Add_tags_to_simulation_table();
+	//Get new datum from old datum
+	datum ResolveNewDatum(int oldDatum);
 	///
 	//<-----------------The query parser or more of a script parser------------------------------->
 	///

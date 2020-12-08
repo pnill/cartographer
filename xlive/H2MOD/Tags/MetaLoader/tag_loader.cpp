@@ -6,6 +6,9 @@
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 
 #include "Blam\Common\Common.h"
+#include "H2MOD/Tags/MetaExtender.h"
+#include "Blam/Cache/TagGroups/scenery_definition.hpp"
+#include "Blam/Cache/TagGroups/model_defenition.hpp"
 
 //contains some game functions that returns HANDLE
 namespace global_handle_function
@@ -65,7 +68,7 @@ namespace tag_loader
 	//map<int, shared_ptr<meta>> meta_list;//<datum_index,meta_junk>contains the the list of tags that are currently loaded in memory(never gonna use it anyway)
 	std::vector<std::string> error_list;//contains various messages generated during various processes,shouldnt had named it error list
 	std::vector<std::string> tag_list;//contains a list of tag_indices along with their names(currently implemented only for module loading)
-
+	std::list<injectRefs> injected_tag_refs;
 	unsigned int def_meta_size = 0;
 	unsigned int ext_meta_size = 0;
 	unsigned int new_datum_index = _INJECTED_TAG_START_;//first datum index
@@ -213,7 +216,7 @@ namespace tag_loader
 							fin->read(data, tag_info.size);
 
 							//create a meta object
-							std::shared_ptr<meta> temp_meta = std::make_shared<meta>(data, tag_info.size, tag_info.data_offset, temp_plugin, fin, map_off, 1, *(load_tag_list.cbegin()), map_loc, tag_info.type.as_string());
+							std::shared_ptr<meta> temp_meta = std::make_shared<meta>(data, tag_info.size, tag_info.data_offset, temp_plugin, fin, map_off, 1, *(load_tag_list.cbegin()), map_loc, tag_info.type);
 							//temp_meta->Rebase_meta(0x0);
 							//found unnecessary
 
@@ -407,9 +410,9 @@ namespace tag_loader
 			//-------------IDC anymore----------------
 		}
 		//Add them to the tables
+		injected_tag_refs = my_inject_refs;
 		for (auto& my_inject_refs_iter : my_inject_refs)
 		{		
-
 			if (def_meta_size)
 			{
 				int meta_size = que_meta_list[my_inject_refs_iter.old_datum]->Get_Total_size();
@@ -418,11 +421,12 @@ namespace tag_loader
 				que_meta_list[my_inject_refs_iter.old_datum]->Rebase_meta(mem_off);
 				char* meta_data = que_meta_list[my_inject_refs_iter.old_datum]->Generate_meta_file();
 
-				blam_tag type(blam_tag::tag_group_type(std::stoi(que_meta_list[my_inject_refs_iter.old_datum]->Get_type())));
-
-				tables_data.type = type;
+				//blam_tag type(blam_tag::tag_group_type(std::atoi(.c_str())));
+				
+				tables_data.type = que_meta_list[my_inject_refs_iter.old_datum]->Get_type();
 				tables_data.data_offset = mem_off;
 				tables_data.size = meta_size;
+				tables_data.datum_index = datum(my_inject_refs_iter.new_datum);
 				tags::tag_instance *temp_write_off = &tag_loader::new_Tables[my_inject_refs_iter.new_datum & 0xFFFF];
 				memcpy(temp_write_off, &tables_data, sizeof(tags::tag_instance));//copy to the tables
 
@@ -460,7 +464,7 @@ namespace tag_loader
 			i.second->Rebase_meta(0x0);
 			int size = i.second->Get_Total_size();
 			char* data = i.second->Generate_meta_file();
-			std::string type = i.second->Get_type();
+			std::string type = i.second->Get_type().as_string();
 
 			file_loc += '.' + type;
 			fout.open(file_loc, std::ios::out | std::ios::binary);
@@ -565,8 +569,8 @@ namespace tag_loader
 
 		//char* ripped_map = (char*)(SharedmapBase + tag_scenario_off);
 
-		 tags::tag_instance* tag_info = &new_Tables[datum_index.ToAbsoluteIndex()];
-		 char* tag_data = tags::get_tag_data() + new_Tables[datum_index.ToAbsoluteIndex()].data_offset;
+		 tags::tag_instance* tag_info = &new_Tables[datum_index.Index];
+		 char* tag_data = tags::get_tag_data() + new_Tables[datum_index.Index].data_offset;
 
 		//fail safe
 		if (tag_info->datum_index.ToAbsoluteIndex() != datum_index.ToAbsoluteIndex())
@@ -909,6 +913,16 @@ namespace tag_loader
 	{
 	}
 
+	datum ResolveNewDatum(int oldDatum)
+	{
+		for(auto &ref : injected_tag_refs)
+		{
+			if (ref.old_datum == oldDatum)
+				return datum(ref.new_datum);
+		}
+		return datum::Null;
+	}
+
 #pragma region query_parser
 
 	query_parser::query_parser(std::vector<std::string>& vec_query)
@@ -993,30 +1007,30 @@ namespace tag_loader
 	}
 	query_parser::query_parser(std::string file_loc)
 	{
-		DWORD_list.try_emplace("eax", 0);
+		//DWORD_list.try_emplace("eax", 0);
 
-		std::vector<std::string> vec_query;
+		//std::vector<std::string> vec_query;
 
-		std::ifstream fin;
-		fin.open(file_loc.c_str(), std::ios::in);
+		//std::ifstream fin;
+		//fin.open(file_loc.c_str(), std::ios::in);
 
-		if (!fin.is_open())
-		{
-			logs.push_back("Couldnt load query file: " + file_loc);
-			return;
-		}
+		//if (!fin.is_open())
+		//{
+		//	logs.push_back("Couldnt load query file: " + file_loc);
+		//	return;
+		//}
 
-		char query[64];
-		while (!fin.eof())
-		{
-			fin.getline(query, 64);
-			std::vector<std::string> temp = clean_string(query);
+		//char query[64];
+		//while (!fin.eof())
+		//{
+		//	fin.getline(query, 64);
+		//	std::vector<std::string> temp = clean_string(query);
 
-			if (temp.size())
-				vec_query.insert(vec_query.end(), temp.begin(), temp.end());
-		}
-		fin.close();
-		query_parser::query_parser(vec_query);
+		//	if (temp.size())
+		//		vec_query.insert(vec_query.end(), temp.begin(), temp.end());
+		//}
+		//fin.close();
+		//query_parser::query_parser(vec_query);
 	}
 	std::vector<std::string> query_parser::clean_string(std::string txt)
 	{
@@ -1167,7 +1181,14 @@ bool _cdecl LoadTagsandMapBases(int a)
 	LoadTagsandSetMapBases pLoadTagsandSetMapBases;
 	pLoadTagsandSetMapBases = h2mod->GetAddress<LoadTagsandSetMapBases>(0x31348);
 	bool result = pLoadTagsandSetMapBases(a);
-	
+
+	//Clear the table
+	for(auto i = _INJECTED_TAG_START_; i < tag_loader::new_datum_index; i++)
+	{
+		tag_loader::new_Tables[i] = tags::tag_instance{ blam_tag::none(), -1, 0, 0 };
+	}
+	tag_loader::que_meta_list.clear();
+	tag_loader::key_list.clear();
 	// reset starting_datum index
 	tag_loader::ext_meta_size = 0;
 	tag_loader::new_datum_index = _INJECTED_TAG_START_;
@@ -1197,17 +1218,20 @@ bool _cdecl LoadTagsandMapBases(int a)
 	{
 		//actual tag_loading
 		///parse query file
-		tag_loader::Parse_query_file(tag_loader::mods_dir + "\\tags\\load_tags.txt");
+		//tag_loader::Parse_query_file(tag_loader::mods_dir + "\\tags\\load_tags.txt");
 
 		//updating SimulationBlock
 		tag_loader::Add_tags_to_simulation_table();
 
 		///load via codes
-		tag_loader::Load_tag(0xE886001D, true, "dreamer");
-		//tag_loader::Dump_Que_meta();
+		//tag_loader::Load_tag(0xE19B001D, true, "christmas_hat_map");
+		//tag_loader::Load_tag(0xE1BF0024, true, "christmas_hat_map");
+		////tag_loader::Dump_Que_meta();
+		//tag_loader::Push_Back();
 
+		
 		//Todo :: Make Use of TraceFunctions to Log each step
-		addDebugText(tag_loader::Pop_messages().c_str());
+		//addDebugText(tag_loader::Pop_messages().c_str());
 	}
 
 	return result;

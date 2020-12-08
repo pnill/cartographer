@@ -1,4 +1,7 @@
 #include "TagLoader.h"
+#include "H2MOD/Modules/Utils/Utils.h"
+#include "Blam/Cache/TagGroups/lite/lite_object_defenition.hpp"
+#include "Blam/Cache/TagGroups/lite/lite_scenery_defenition.hpp"
 
 constexpr int _INJECTED_TAG_START_ = 0x3BA4;
 constexpr int _MAX_ADDITIONAL_TAG_SIZE_ = 0x1400000; //20 MB
@@ -14,33 +17,6 @@ namespace TagLoader
 		unsigned int nextDatumIndex = _INJECTED_TAG_START_;
 		s_tag_instance* movedTagTable;
 
-		std::vector<s_slim_tag_block> scenaryTagBlocks()
-		{
-			//std::map<int, std::map<int, void*>> base;
-			//std::map<int, std::map<int, void*>> child;
-			std::vector<s_slim_tag_block> base;
-			std::vector<s_slim_tag_block> child;
-			//s_ai_properties_block
-			base.push_back({ 0x5C, 0x10 });
-			//s_functions_block
-			base.push_back({ 0x64, 0x20 });
-			//s_attachments_block
-			base.push_back({ 0x94, 0x18 });
-			//s_widgets_block
-			base.push_back({ 0x9C, 0x8 });
-			//s_old_functions_block
-			base.push_back({ 0xA4, 0x50 });
-			//s_change_colors_block::s_initial_permutations_block
-			child.push_back({ 0x0, 0x20 });
-			//s_change_colors_block::s_functions_block
-			child.push_back({ 0x8, 0x28 });
-			//s_change_colors_block
-			base.push_back({ 0xAC, 0x10, child });
-			//s_predicted_resources_block
-			base.push_back({ 0xB4, 0x8 });
-
-			return base;
-		}
 		//TODO: Refactor into a more accessable area
 		s_cache_header *getCacheHeader()
 		{
@@ -81,6 +57,29 @@ namespace TagLoader
 				*TagTableStart = (DWORD)movedTagTable;
 			}
 			return result;
+		}
+	}
+
+	void RebaseMetaBlocks(char* data, std::vector<s_lite_tag_block> blocks, int oldTagOffset, int newTagOffset)
+	{
+		for (auto &block : blocks) {
+			LOG_TRACE_GAME(L"[TagLoader] Rebasing Block Offset {} - Size {}", block.offset, block.size);
+			*(int*)(data + block.offset + 4) = newTagOffset + (*(int*)(data + block.offset + 4) - oldTagOffset);
+			if (block.children.size())
+			{
+				LOG_TRACE_GAME(L"[TagLoader] Rebasing Block Children");
+				RebaseMetaBlocks(data, block.children, oldTagOffset, newTagOffset);
+			}
+		}
+	}
+	void RebaseMeta(char* data, s_tag_instance instance, int newTagOffset)
+	{
+		switch(instance.type.tag_type)
+		{
+			case blam_tag::tag_group_type::scenery:
+				s_lite_scenery_group_definition def;
+				RebaseMetaBlocks(data, def.tagBlocks, instance.data_offset, newTagOffset);
+			break;
 		}
 	}
 	bool LoadTags(std::vector<datum> tags, bool recursive, std::wstring map)
@@ -165,23 +164,25 @@ namespace TagLoader
 						int newTagOffset = originalMetaSize + newMetaSize;
 
 
-						auto holyHell = scenaryTagBlocks();
-
-						//Right now it's two deep so manually do a second level but refactor.. refactor
-						for(auto &block : holyHell)
-						{
-							LOG_INFO_GAME(L"[TagLoader] Offset {} - Size {}", block.offset, block.size);
-							*(int*)(tagData + block.offset + 4) = newTagOffset + (*(int*)(tagData + block.offset + 4) - tagInstance.data_offset);
-							if(block.blocks.size())
-							{
-								for(auto &child : block.blocks)
-								{
-									*(int*)(tagData + child.offset + 4) = newTagOffset + (*(int*)(tagData + child.offset + 4) - tagInstance.data_offset);
-								}
-							}
-						}
-
-						s_tag_instance *newInstance = &movedTagTable[currentInstance.newDatum.ToInt() && 0xFFFF];
+						RebaseMeta(tagData, tagInstance, newTagOffset);
+						//s_lite_scenery_group_definition holyHell;
+						////Right now it's two deep so manually do a second level but refactor.. refactor
+						//for(auto &block : holyHell.tagBlocks)
+						//{
+						//	LOG_TRACE_GAME(L"[TagLoader] Offset {} - Size {}", block.offset, block.size);
+						//	*(int*)(tagData + block.offset + 4) = newTagOffset + (*(int*)(tagData + block.offset + 4) - tagInstance.data_offset);
+						//	if(block.children.size())
+						//	{
+						//		for(auto &child : block.children)
+						//		{
+						//			LOG_TRACE_GAME(L"[TagLoader] Child Offset {} - Size {}", child.offset, child.size);
+						//			*(int*)(tagData + child.offset + 4) = newTagOffset + (*(int*)(tagData + child.offset + 4) - tagInstance.data_offset);
+						//		}
+						//	}
+						//}
+						tagInstance.data_offset = newTagOffset;
+						s_tag_instance *newInstance = &movedTagTable[currentInstance.newDatum.Index];
+						LOG_TRACE_GAME(L"[TagLoader] New Instance Index {} - New Instance Location {}", currentInstance.newDatum.Index, IntToWString<unsigned long>((unsigned long)std::addressof(*newInstance), std::hex));
 						memcpy(newInstance, &tagInstance, sizeof(s_tag_instance));
 						memcpy(tags::get_tag_data() + newTagOffset, tagData, tagInstance.size);
 

@@ -78,6 +78,8 @@ namespace TagLoader
 		datum originalDatum;
 		datum newDatum;
 		bool injected;
+		s_tag_instance originalInstance;
+		s_tag_instance newInstance;
 	};
 	struct s_slim_tag_block
 	{
@@ -88,5 +90,4 @@ namespace TagLoader
 	bool LoadTags(std::vector<datum> tags, bool recursive, std::wstring map);
 	void PatchCalls();
 	void Initialize();
-
 }
