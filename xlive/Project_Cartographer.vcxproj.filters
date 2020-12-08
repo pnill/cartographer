@@ -354,6 +354,8 @@
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_defenition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\Shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\new_hud_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\model_defenition.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

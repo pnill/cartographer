@@ -492,6 +492,8 @@
     <ClInclude Include="Blam\Cache\TagGroups\hud_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_defenition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\model_defenition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\new_hud_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\object_definition.hpp" />

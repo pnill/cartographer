@@ -169,6 +169,11 @@ namespace tags
 		return tag_datum;
 	}
 
+	inline tag_instance* datum_to_instance(datum datum)
+	{
+		return &get_tag_instances()[datum.ToAbsoluteIndex()];
+	}
+
 	/* Get parent tag groups for a tag group */
 	inline const tag_parent_info* get_tag_parent_info(const blam_tag &tag_type)
 	{

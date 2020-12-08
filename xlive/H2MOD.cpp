@@ -27,6 +27,8 @@
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
 #include "H2MOD/Modules/Startup/Startup.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "Blam/Cache/TagGroups/model_defenition.hpp"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -835,7 +837,6 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	{
 		addDebugText("Map Type: Main-Menu");
 		UIRankPatch();
-
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		MetaExtender::free_tag_blocks();
@@ -855,7 +856,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	if (h2mod->GetMapType() == scnr_type::Multiplayer)
 	{
 		addDebugText("Map type: Multiplayer");
-
+		
 		for (auto gametype_it : GametypesMap)
 		{
 			if (StrStrIW(variant_name, gametype_it.first)) {
@@ -863,6 +864,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 				gametype_it.second = true; // enable a gametype if substring is found
 			}
 		}
+		
 		if (!b_XboxTick) 
 		{
 			H2X::Initialize(b_H2X);
@@ -899,6 +901,30 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 			{
 				headHunterHandler->initializer->execute();
 			}
+		}
+		//HACKY HACK
+		tag_loader::Load_tag(0xE19B001D, true, "christmas_hat_map");
+		tag_loader::Load_tag(0xE1BF0024, true, "christmas_hat_map");
+		tag_loader::Push_Back();
+		//auto scen = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(datum(_INJECTED_TAG_START_));
+		auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
+		if (hlmt_chief_datum != datum::Null) {
+			auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
+			auto b = hlmt_chief->variants[0];
+			auto a = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
+			a->parent_marker = string_id(184552154);
+			a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+			a->child_object.TagIndex = tag_loader::ResolveNewDatum(0xE19B001D);
+		}
+		auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
+		if (hlmt_elite_datum != datum::Null)
+		{
+			auto hlmt_eliete = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_elite_datum);
+			auto b = hlmt_eliete->variants[0];
+			auto a = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
+			a->parent_marker = string_id(184552154);
+			a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+			a->child_object.TagIndex = tag_loader::ResolveNewDatum(0xE1BF0024);
 		}
 
 	}
@@ -1345,6 +1371,14 @@ void EvaluateGameState()
 	}
 }
 
+typedef void(__cdecl p_set_screen_bounds)(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
+p_set_screen_bounds* c_set_screen_bounds;
+
+void __cdecl set_screen_bounds(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale)
+{
+	c_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
+}
+
 typedef char(_cdecl* startCountdownTimer)(char a1, int countdown_time, int a2, int a3, char a4);
 startCountdownTimer p_StartCountdownTimer;
 char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, char a4)
@@ -1640,7 +1674,8 @@ void H2MOD::ApplyHooks() {
 
 		//Initialise_tag_loader();
 		PlayerControl::ApplyHooks();
-		
+		c_set_screen_bounds = GetAddress<p_set_screen_bounds*>(0x264979);
+		//PatchCall(GetAddress(0x25E1E5), set_screen_bounds);
 		
 	}
 	else {
@@ -1668,6 +1703,7 @@ void H2MOD::Initialize()
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
 		TagFixes::Initalize();
+		Initialise_tag_loader();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");

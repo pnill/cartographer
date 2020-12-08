@@ -2,12 +2,17 @@
 
 #include "..\H2MOD\Tags\TagInterface.h"
 
+
+
 template<typename T = void>
 struct tag_block
 {
 	size_t size;
 	size_t data;
-
+	int data_size() const
+	{
+		return size * sizeof(T);
+	}
 	T *begin()
 	{
 		if (this->data != NONE)

@@ -480,7 +480,6 @@ float __cdecl fps_get_seconds_per_frame()
 {
 	return (1.0f / H2Config_fps_limit);
 }
-
 void alt_main_game_loop_hook()
 {
 	QueryPerformanceCounter(&end_tick);
