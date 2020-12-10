@@ -16,6 +16,8 @@
 #include "imgui_handler.h"
 #include "H2MOD/GUI/GUI.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
+#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
+#include "H2MOD/Modules/Utils/Utils.h"
 
 
 namespace imgui_handler {
@@ -31,6 +33,8 @@ namespace imgui_handler {
 			bool g_hitfix = true;
 			int g_deadzone = 0;
 			int g_aiming = 0;
+			int g_shadows = 0;
+			int g_water = 0;
 			bool g_init = false;
 			int g_language_code = -1;
 			std::map<int, std::map<e_advanced_string, char*>> string_table;
@@ -234,11 +238,10 @@ namespace imgui_handler {
 					ImVec2 LargestText = ImGui::CalcTextSize(GetString(hires_fix), NULL, true);
 					float float_offset = ImGui::GetCursorPosX() + LargestText.x + (LargestText.x * 0.075);
 					//FPS Limit
-					TextVerticalPad(GetString(fps_limit), 8.5);
-					ImGui::SameLine();
-					ImGui::SetCursorPosX(float_offset);
-					ImGui::PushItemWidth(WidthPercentage(10.0f));
-					ImGui::InputInt("##FPS1", &H2Config_fps_limit, 0, 110); ImGui::SameLine();
+					ImGui::Columns(2, "", false);
+					ImGui::Text(GetString(fps_limit));
+					ImGui::PushItemWidth(WidthPercentage(50));
+					ImGui::InputInt("##FPS1", &H2Config_fps_limit, 0, 110);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(fps_limit_tooltip));
 					if (ImGui::IsItemEdited()) {
@@ -248,44 +251,59 @@ namespace imgui_handler {
 							H2Config_fps_limit = 2048;
 						desiredRenderTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
 					}
-					ImGui::PopItemWidth();
-					if (ImGui::Button(GetString(reset, "FPS2"), ImVec2(WidthPercentage(10.0f), item_size.y)))
+					
+					ImGui::SameLine();
+					if (ImGui::Button(GetString(reset, "FPS2"), ImVec2(WidthPercentage(50), item_size.y)))
 					{
 						H2Config_fps_limit = 60;
 						desiredRenderTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
 					}
-					ImGui::SameLine();
-					ImGui::Checkbox(GetString(experimental_rendering_changes), &H2Config_experimental_fps);
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
-					TextVerticalPad(GetString(refresh_rate), 8.5);
-					ImGui::SameLine();
-					ImGui::SetCursorPosX(float_offset);
-					ImGui::PushItemWidth(165);
-					ImGui::InputInt("##Refresh1", &H2Config_refresh_rate, 0, 110, ImGuiInputTextFlags_AlwaysInsertMode); //ImGui::SameLine();
+					ImGui::NextColumn();
+					ImGui::PopItemWidth();
+					ImGui::Text(GetString(refresh_rate));
+					ImGui::PushItemWidth(WidthPercentage(100));
+					ImGui::InputInt("##Refresh1", &H2Config_refresh_rate, 0, 110, ImGuiInputTextFlags_AlwaysInsertMode);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(refresh_rate_tooltip));
-					ImGui::PopItemWidth();
 
+					ImGui::NextColumn();
 					//LOD
-					TextVerticalPad(GetString(lod), 8.5);
-					ImGui::SameLine();
+					ImGui::Text(GetString(lod));
 					const char* items[] = { GetString(e_default), GetString(lod_1), GetString(lod_2), GetString(lod_3), GetString(lod_4), GetString(lod_5), GetString(lod_6) };
-					ImGui::PushItemWidth(165);
-					ImGui::SetCursorPosX(float_offset);
+					ImGui::PushItemWidth(WidthPercentage(100));
 					ImGui::Combo("##LOD", &H2Config_static_lod_state, items, 7);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(lod_tooltip));
-					ImGui::PopItemWidth();
+
+					ImGui::NextColumn();
+					ImGui::Text(GetString(shadow_title));
+					const char* s_items[] = { GetString(tex_L1), GetString(e_default), GetString(tex_L2), GetString(tex_L3) };
+					ImGui::PushItemWidth(WidthPercentage(100));
+					if(ImGui::Combo("##Shadows", &g_shadows, s_items, 4))
+					{
+						H2Config_Override_Shadows = (e_override_texture_resolution)g_shadows;
+						RenderHooks::ResetDevice();
+					}
+					ImGui::NextColumn();
+					ImGui::Text(GetString(water_title));
+					ImGui::PushItemWidth(WidthPercentage(100));
+					if (ImGui::Combo("##Water", &g_water, s_items, 4))
+					{
+						H2Config_Override_Water = (e_override_texture_resolution)g_water;
+						RenderHooks::ResetDevice();
+					}
+
+					ImGui::Columns(1);
 					//Hires Fix
-					TextVerticalPad(GetString(hires_fix), 8.5);
-					ImGui::SameLine();
-					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5);
-					ImGui::Checkbox("##HighRes", &H2Config_hiresfix);
+
+					ImGui::Checkbox(GetString(hires_fix), &H2Config_hiresfix);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(hires_fix_tooltip));
-					//ImGui::Columns(0);
-					ImGui::NewLine();
+
+					ImGui::Checkbox(GetString(experimental_rendering_changes), &H2Config_experimental_fps);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
+					
 				}
 			}
 			void MouseKeyboardSettings()
@@ -770,6 +788,8 @@ namespace imgui_handler {
 				g_deadzone = (int)H2Config_Controller_Deadzone;
 				g_aiming = (int)H2Config_controller_modern;
 				g_language_code = H2Config_language.code_main;
+				g_shadows = (int)H2Config_Override_Shadows;
+				g_water = (int)H2Config_Override_Water;
 				if (g_language_code == -1)
 					g_language_code = 8;
 				g_init = true;
@@ -802,9 +822,27 @@ namespace imgui_handler {
 #if DISPLAY_DEV_TESTING_MENU
 				if (ImGui::CollapsingHeader("Dev Testing"))
 				{
-					if(ImGui::Button("test"))
+					if (ImGui::CollapsingHeader("Raster Layers")) {
+						ImGui::Columns(4, "", false);
+						for (auto i = 0; i < 25; i++)
+						{
+							if (ImGui::Checkbox(IntToString<int>(i).c_str(), &ras_layer_overrides[i]))
+							{
+								RenderHooks::ResetDevice();
+							}
+							ImGui::NextColumn();
+						}
+						ImGui::Columns(1);
+					}
+					if(ImGui::CollapsingHeader("Render Geometries"))
 					{
-						h2mod->cine_start_tex();
+						ImGui::Columns(4, "", false);
+						for(auto i = 0; i < 24; i++)
+						{
+							ImGui::Checkbox(IntToString<int>(i).c_str(), &geo_render_overrides[i]);
+							ImGui::NextColumn();
+						}
+						ImGui::Columns(1);
 					}
 				}
 #endif
@@ -851,6 +889,11 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::lod_4] = "L4 - High";
 			string_table[0][e_advanced_string::lod_5] = "L5 - Very High";
 			string_table[0][e_advanced_string::lod_6] = "L6 - Cinematic";
+			string_table[0][e_advanced_string::shadow_title] = "Shadow Quality";
+			string_table[0][e_advanced_string::water_title] = "Water Quality";
+			string_table[0][e_advanced_string::tex_L1] = "Low";
+			string_table[0][e_advanced_string::tex_L2] = "High";
+			string_table[0][e_advanced_string::tex_L3] = "Ultra";
 			string_table[0][e_advanced_string::lod_tooltip] = "Changing this will force the game to use the set Level of Detail for models that have them\nLeaving it at default makes it dynamic which is the games default behaviour.";
 			string_table[0][e_advanced_string::hires_fix] = "High Resolution Fix";
 			string_table[0][e_advanced_string::hires_fix_tooltip] = "This will enable fixes for high resolution monitors that will fix text clipping\nA restart is required for these changes to take effect.";
@@ -950,6 +993,11 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::lod_4] = u8"N4 - Alto";
 			string_table[4][e_advanced_string::lod_5] = u8"N5 - Muy alto";
 			string_table[4][e_advanced_string::lod_6] = u8"N6 - Cinemático";
+			string_table[4][e_advanced_string::shadow_title] = u8"Calidad sombra";
+			string_table[4][e_advanced_string::water_title] = u8"Calidad del agua";
+			string_table[4][e_advanced_string::tex_L1] = u8"Bajo";
+			string_table[4][e_advanced_string::tex_L2] = u8"Alto";
+			string_table[4][e_advanced_string::tex_L3] = u8"Muy alto";
 			string_table[4][e_advanced_string::lod_tooltip] = u8"Cambiar esto forzará el juego a usar los modelos del nivel de detalle seleccionado si están disponibles.\nDejarlo en Predeterminado hará que el nivel de detalle sea dinámico y controlado por el juego.";
 			string_table[4][e_advanced_string::hires_fix] = u8"Arreglos de alta resolución";
 			string_table[4][e_advanced_string::hires_fix_tooltip] = u8"Esto habilitará arreglos para monitores de alta resolución, solucionará textos recortados.\nEste ajuste requiere reiniciar el juego para que tenga efecto.";

@@ -151,7 +151,12 @@ namespace imgui_handler
 			lang_chinese,
 			lang_native,
 			static_fp,
-			static_fp_tooltip
+			static_fp_tooltip,
+			tex_L1,
+			tex_L2,
+			tex_L3,
+			shadow_title,
+			water_title
 		};
 		void BuildStringsTable();
 		char* GetString(e_advanced_string string, std::string id = "");

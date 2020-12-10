@@ -29,6 +29,7 @@
 #include "H2MOD/Modules/Startup/Startup.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "Blam/Cache/TagGroups/model_defenition.hpp"
+#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -1708,6 +1709,7 @@ void H2MOD::Initialize()
 		ControllerInput::Initialize();
 		TagFixes::Initalize();
 		Initialise_tag_loader();
+		RenderHooks::Initialize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");
