@@ -103,7 +103,6 @@ void KeyboardInput::ExecuteHotkey(WPARAM message)
 			hk.second();
 	}
 }
-int tilde_key = VK_OEM_3;
 
 void hotkeyFuncHelp() {
 	addDebugText("------------------------------");
@@ -269,7 +268,6 @@ void KeyboardInput::Initialize()
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdAlignWindow, hotkeyFuncAlignWindow);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdWindowMode, hotkeyFuncWindowMode);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdGuide, hotkeyFuncGuide);
-	KeyboardInput::RegisterHotkey(&tilde_key, hotkeyFuncGuide);
 }
 
 

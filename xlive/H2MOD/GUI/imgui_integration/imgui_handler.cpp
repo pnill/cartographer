@@ -136,7 +136,6 @@ namespace imgui_handler
 				if (::GetCursorPos(&pos) && ::ScreenToClient(g_hWnd, &pos))
 					io.MousePos = ImVec2((float)pos.x, (float)pos.y);
 	}
-
 	IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (ImGui::GetCurrentContext() == NULL)
