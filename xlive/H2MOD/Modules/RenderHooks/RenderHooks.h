@@ -10,6 +10,7 @@ namespace RenderHooks
 		unk_1 = 1,
 		unk_2 = 2,
 		unk_3 = 3,
+		//Fog shit /Glowing stuff?
 		unk_4 = 4,
 		unk_5 = 5,
 		unk_6 = 6,
@@ -21,14 +22,19 @@ namespace RenderHooks
 		unk_12 = 12,
 		unk_13 = 13,
 		unk_14 = 14,
+		//Active camo
 		unk_15 = 15,
 		unk_16 = 16,
 		unk_17 = 17,
 		unk_18 = 18,
 		water = 19,
+		//Screen distortion effects
 		unk_20 = 20,
+		//Out of focus blur
 		unk_21 = 21,
+		//Main Menu Transition Blur
 		unk_22 = 22,
+		// main menu background blur
 		unk_23 = 23,
 		unk_24 = 24,
 		unk_25 = 25
