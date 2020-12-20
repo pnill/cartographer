@@ -120,49 +120,49 @@ void Infection::initHost() {
 	//Applying SpeedCheck fix
 	h2mod->set_unit_speed_patch(true);
 	//Fixing broken equipment and replace powerups/vehicles with weapons
-	auto scenarios = tags::find_tags(blam_tag::tag_group_type::scenario);
-	auto magnum_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\magnum\\magnum");
-	auto shotgun_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\shotgun\\shotgun");
-	for(auto &scenario_ : scenarios)
-	{
-		auto scenario = tags::get_tag<blam_tag::tag_group_type::scenario, s_scenario_group_definition>(scenario_.first);
-		//Using this to make all vehicle spawns be shotguns
-		datum itmc_override;
-		bool flop = false;
-		for(auto i = 0; i < scenario->netgame_equipment.size; i++)
-		{
-			auto equipment = scenario->netgame_equipment[i];
-			equipment->classification = s_scenario_group_definition::s_netgame_equipment_block::e_classification::powerup;
-			s_item_collection_group_definition* i_collection;
-			s_vehicle_collection_group_definition* v_collection;
-			switch(equipment->itemvehicle_collection.TagGroup.tag_type)
-			{
-				case blam_tag::tag_group_type::itemcollection:
-					if (!flop)
-						itmc_override = equipment->itemvehicle_collection.TagIndex;
-					i_collection = tags::get_tag<blam_tag::tag_group_type::itemcollection, s_item_collection_group_definition>(equipment->itemvehicle_collection.TagIndex);
-					for(auto j = 0; j < i_collection->item_permutations.size; j++)
-					{
-						i_collection->item_permutations[j]->item.TagGroup = blam_tag::tag_group_type::weapon;
-						if (flop) {
-							i_collection->item_permutations[j]->item.TagIndex = magnum_datum;
-						}
-						else
-						{
-							flop = true;
-							i_collection->item_permutations[j]->item.TagIndex = shotgun_datum;
-						}
-					}
-					
-					break;
-				case blam_tag::tag_group_type::vehiclecollection:
-					equipment->itemvehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
-					equipment->itemvehicle_collection.TagIndex = itmc_override;
-					break;
-			}
+	//auto scenarios = tags::find_tags(blam_tag::tag_group_type::scenario);
+	//auto magnum_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\magnum\\magnum");
+	//auto shotgun_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\shotgun\\shotgun");
+	//for(auto &scenario_ : scenarios)
+	//{
+	//	auto scenario = tags::get_tag<blam_tag::tag_group_type::scenario, s_scenario_group_definition>(scenario_.first);
+	//	//Using this to make all vehicle spawns be shotguns
+	//	datum itmc_override;
+	//	bool flop = false;
+	//	for(auto i = 0; i < scenario->netgame_equipment.size; i++)
+	//	{
+	//		auto equipment = scenario->netgame_equipment[i];
+	//		equipment->classification = s_scenario_group_definition::s_netgame_equipment_block::e_classification::powerup;
+	//		s_item_collection_group_definition* i_collection;
+	//		s_vehicle_collection_group_definition* v_collection;
+	//		switch(equipment->itemvehicle_collection.TagGroup.tag_type)
+	//		{
+	//			case blam_tag::tag_group_type::itemcollection:
+	//				if (!flop)
+	//					itmc_override = equipment->itemvehicle_collection.TagIndex;
+	//				i_collection = tags::get_tag<blam_tag::tag_group_type::itemcollection, s_item_collection_group_definition>(equipment->itemvehicle_collection.TagIndex);
+	//				for(auto j = 0; j < i_collection->item_permutations.size; j++)
+	//				{
+	//					i_collection->item_permutations[j]->item.TagGroup = blam_tag::tag_group_type::weapon;
+	//					if (flop) {
+	//						i_collection->item_permutations[j]->item.TagIndex = magnum_datum;
+	//					}
+	//					else
+	//					{
+	//						flop = true;
+	//						i_collection->item_permutations[j]->item.TagIndex = shotgun_datum;
+	//					}
+	//				}
+	//				
+	//				break;
+	//			case blam_tag::tag_group_type::vehiclecollection:
+	//				equipment->itemvehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
+	//				equipment->itemvehicle_collection.TagIndex = itmc_override;
+	//				break;
+	//		}
 
-		}
-	}
+	//	}
+	//}
 	LOG_TRACE_GAME("[h2mod-infection] Host init resetting zombie player data status");
 	Infection::resetZombiePlayerStatus();
 }
