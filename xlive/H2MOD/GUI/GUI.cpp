@@ -650,7 +650,7 @@ int WINAPI XLiveRender()
 			if (displayXyz && (NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() == scnr_type::SinglePlayer)) {
 				int text_y_coord = 60;
 				PlayerIterator playerIt;
-				while (playerIt.get_next_player()) 
+				while (playerIt.get_next_active_player()) 
 				{
 					real_point3d* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
 					if (player_position != nullptr) {

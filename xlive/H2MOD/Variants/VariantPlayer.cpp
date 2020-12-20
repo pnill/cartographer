@@ -2,18 +2,17 @@
 #include "Globals.h"
 #include "VariantPlayer.h"
 
-XUID VariantPlayer::GetXUID(datum datum, bool player)
+XUID VariantPlayer::GetXUID(datum _datum, bool player)
 {
-	PlayerIterator playersIt;
 	DatumIterator<ObjectHeader> objectIt(game_state_objects_header);
-	BipedObjectDefinition* playerUnit = (BipedObjectDefinition*)objectIt.get_data_at_index(datum.ToAbsoluteIndex())->object;
+	BipedObjectDefinition* playerUnit = (BipedObjectDefinition*)objectIt.get_data_at_index(_datum.ToAbsoluteIndex())->object;
 
 	if (player)
-		return playersIt.get_data_at_index(datum.ToAbsoluteIndex())->xuid;
+		return Player::getPlayer(_datum.ToAbsoluteIndex())->identifier;
 	else
 	{
 		short player_index = playerUnit->PlayerDatum.ToAbsoluteIndex();
-		return playersIt.get_data_at_index(player_index)->xuid;
+		return Player::getPlayer(player_index)->identifier;
 	}
 }
 
@@ -30,9 +29,9 @@ datum VariantPlayer::GetPlayerDatum(XUID xuid)
 	if (xuid_to_player_datum.find(xuid) == xuid_to_player_datum.end())
 	{
 		PlayerIterator playersIt;
-		while (playersIt.get_next_player())
+		while (playersIt.get_next_active_player())
 		{
-			if (playersIt.get_current_player_data()->xuid == xuid)
+			if (playersIt.get_current_player_data()->identifier == xuid)
 			{
 				datum player_datum;
 				player_datum.Index = playersIt.get_current_player_index();
@@ -52,7 +51,7 @@ datum VariantPlayer::GetPlayerDatum(XUID xuid)
 datum VariantPlayer::GetUnitDatum(datum player_datum)
 {
 	PlayerIterator playersIt;
-	return playersIt.get_data_at_index(player_datum.Index)->BipedUnitDatum;
+	return playersIt.get_data_at_index(player_datum.Index)->controlled_unit_index;
 }
 
 datum VariantPlayer::GetUnitDatum(XUID xuid)
@@ -60,11 +59,11 @@ datum VariantPlayer::GetUnitDatum(XUID xuid)
 	if (xuid_to_unit_datum.find(xuid) == xuid_to_unit_datum.end())
 	{
 		PlayerIterator playersIt;
-		while (playersIt.get_next_player())
+		while (playersIt.get_next_active_player())
 		{
-			if (playersIt.get_current_player_data()->xuid == xuid)
+			if (playersIt.get_current_player_data()->identifier == xuid)
 			{
-				datum unit_datum = playersIt.get_current_player_data()->BipedUnitDatum;
+				datum unit_datum = playersIt.get_current_player_data()->controlled_unit_index;
 				datum player_datum;
 				player_datum.Index = playersIt.get_current_player_index();
 

@@ -30,7 +30,7 @@ char __cdecl projectile_new(unsigned __int16 projectile_object_index, int a2)
 
 	ObjectHeader* objects_header = (ObjectHeader*)game_state_objects_header->datum;
 	char* object_data = objects_header[projectile_object_index].object;
-	*(DWORD*)(object_data + 428) = time_globals::get_game_time_globals()->tick_count; // store the projectile creation tick count
+	*(DWORD*)(object_data + 428) = time_globals::get()->tick_count; // store the projectile creation tick count
 
 	return ret;
 }
@@ -57,7 +57,7 @@ float __cdecl get_seconds_per_tick_internal_patch()
 	ObjectHeader* objects_header = (ObjectHeader*)game_state_objects_header->datum;
 	char* object_data = objects_header[projectileToBeUpdated.ToAbsoluteIndex()].object;
 	char* proj_tag_data = tags::get_tag_fast<char>(*((datum*)object_data));
-	time_globals* p_time_globals = time_globals::get_game_time_globals();
+	time_globals* p_time_globals = time_globals::get();
 
 	float timeDelta = p_time_globals->seconds_per_tick;
 	if (*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5) // check if travels instantaneously flag is set in the projectile flags

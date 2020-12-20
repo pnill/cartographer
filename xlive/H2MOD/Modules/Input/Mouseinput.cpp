@@ -33,7 +33,7 @@ p_mouse_input* c_mouse_input;
 
 char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, float *a6, void *a7)
 {
-	time_globals* time = time_globals::get_game_time_globals();
+	time_globals* time = time_globals::get();
 	if(H2Config_raw_input)
 	{
 		if (!b_raw_init) {

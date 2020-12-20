@@ -373,6 +373,8 @@ namespace imgui_handler
 				return g_patchNotes_Image;
 			default: NULL;
 		}
+
+		return NULL;
 	}
 
 	s_aspect_ratio getAspectRatio(float width, float height)

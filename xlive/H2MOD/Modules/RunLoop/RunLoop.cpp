@@ -409,7 +409,7 @@ void __cdecl game_main_loop()
 			else
 			{
 				if (v1 > 0 && sub_B4BFD1())
-					v3 = time_globals::get_game_time_globals()->seconds_per_tick;
+					v3 = time_globals::get()->seconds_per_tick;
 				else
 					v3 = 0.0;
 				a2 = v3;
@@ -507,7 +507,7 @@ void alt_main_game_loop_hook()
 {
 	QueryPerformanceCounter(&end_tick);
 	double tick_time = (static_cast<double>(end_tick.QuadPart - start_tick.QuadPart) / freq.QuadPart);// -render_time;
-	if (tick_time >= time_globals::get_game_time_globals()->seconds_per_tick || !init)
+	if (tick_time >= time_globals::get()->seconds_per_tick || !init)
 	{
 		QueryPerformanceCounter(&start_tick);
 		if (!QuitGSMainLoop)
@@ -518,7 +518,7 @@ void alt_main_game_loop_hook()
 			render_audio();
 		if(game_in_simulation())
 		{
-			game_effects_update(time_globals::get_game_time_globals()->seconds_per_tick);
+			game_effects_update(time_globals::get()->seconds_per_tick);
 		}
 		//game_main_loop();
 		//main_game_loop();

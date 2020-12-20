@@ -5,6 +5,8 @@
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Config/Config.h"
 
+#include "Blam\Engine\Game\GameTimeGlobals.h"
+
 extern bool b_XboxTick;
 static LARGE_INTEGER frequency;
 static LARGE_INTEGER timeAtStartup;
@@ -12,15 +14,10 @@ static LARGE_INTEGER timeAtStartup;
 // if this is enabled, the tick count to be executed will be calculated the same way as in Halo 1/CE
 #define USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE 0
 
-time_globals* time_globals::get_game_time_globals()
-{
-	return *h2mod->GetAddress<time_globals**>(0x4C06E4, 0x4CF0EC);
-}
-
 float get_remaining_time_until_next_tick_in_seconds()
 {
-	time_globals* timeGlobals = time_globals::get_game_time_globals();
-	float result = timeGlobals->seconds_per_tick - (float)(timeGlobals->field_10 / (float)timeGlobals->ticks_per_second);
+	time_globals* timeGlobals = time_globals::get();
+	float result = timeGlobals->seconds_per_tick - (float)(timeGlobals->update_time / (float)timeGlobals->ticks_per_second);
 	return fmaxf(result, 0.f);
 }
 
@@ -44,7 +41,7 @@ void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out
 	}*/
 
 #if USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE
-	time_globals* timeGlobals = time_globals::get_game_time_globals();
+	time_globals* timeGlobals = time_globals::get();
 	if (p_unk_check() && !timeGlobals->game_is_paused && timeGlobals->game_speed > 0.f)
 	{
 		float game_speed_in_ticks = timeGlobals->game_speed * timeGlobals->ticks_per_second;
@@ -112,7 +109,7 @@ float __cdecl compute_time_delta(bool use_static_time_increase, float static_tim
 		auto p_translate_windows_messages = h2mod->GetAddress<translate_windows_messages>(0x7902);
 
 		p_translate_windows_messages(); // TranslateMessage()
-		time_globals* timeGlobals = time_globals::get_game_time_globals();
+		time_globals* timeGlobals = time_globals::get();
 		QueryPerformanceCounter(&currentTime);
 		timeDeltaSeconds = (double)(currentTime.LowPart - lastTime.LowPart) / (double)(int)frequency.LowPart;
 
