@@ -219,7 +219,7 @@ DWORD WINAPI XUserWriteAchievements(DWORD dwNumAchievements, PXUSER_ACHIEVEMENT 
 	if (pOverlapped)
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->InternalHigh = ERROR_SUCCESS;
+		pOverlapped->InternalHigh = dwNumAchievements;
 		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 		return ERROR_IO_PENDING;
 	}
