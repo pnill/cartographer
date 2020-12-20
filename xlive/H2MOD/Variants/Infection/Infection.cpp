@@ -8,14 +8,15 @@
 #include "Blam/Cache/TagGroups/item_collection_defenition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_definition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_defenition.hpp"
+#include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 
 std::vector<XUID> Infection::zombieIdentifiers;
 
 const e_object_team HUMAN_TEAM = e_object_team::Red;
 const e_object_team ZOMBIE_TEAM = e_object_team::Green;
-const wchar_t* NEW_ZOMBIE_SOUND = L"sounds/new_zombie.wav";
-const wchar_t* INFECTION_SOUND = L"sounds/infection.wav";
-const wchar_t* INFECTED_SOUND = L"sounds/infected.wav";
+
+std::map<int, std::map<e_infection_sounds, const wchar_t*>> i_SoundsTable;
 
 bool firstSpawn;
 bool infectedPlayed;
@@ -88,9 +89,18 @@ Infection::Infection()
 	this->playerKill = new KillZombieHandler();
 }
 
-void Infection::triggerSound(const wchar_t* name, int sleep) {
-	LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", name);
-	h2mod->custom_sound_play(name, sleep);
+void Infection::triggerSound(e_infection_sounds sound, int sleep)
+{
+	if (i_SoundsTable.count(H2Config_language.code_main))
+	{
+		LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", i_SoundsTable[H2Config_language.code_main][sound]);
+		h2mod->custom_sound_play(i_SoundsTable[H2Config_language.code_main][sound], sleep);
+	}
+	else
+	{
+		LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", i_SoundsTable[0][sound]);
+		h2mod->custom_sound_play(i_SoundsTable[0][sound], sleep);
+	}
 }
 
 void Infection::initClient()
@@ -99,6 +109,12 @@ void Infection::initClient()
 	infectedPlayed = false;
 	firstSpawn = true;
 
+	i_SoundsTable[english][e_infection_sounds::infected] = L"sounds/en/infected.wav";
+	i_SoundsTable[english][e_infection_sounds::infection] = L"sounds/en/infection.wav";
+	i_SoundsTable[english][e_infection_sounds::new_zombie] = L"sounds/en/new_zombie.wav";
+	i_SoundsTable[spanish][e_infection_sounds::infected] = L"sounds/es/infected.wav";
+	i_SoundsTable[spanish][e_infection_sounds::infection] = L"sounds/es/infection.wav";
+	i_SoundsTable[spanish][e_infection_sounds::new_zombie] = L"sounds/es/new_zombie.wav";
 	//Change Local Player's Team to Human if Not in Green
 	//(In case player wants to start as Alpha Zombie leave him green)
 	if (h2mod->get_local_team_index() != ZOMBIE_TEAM) {
@@ -121,48 +137,48 @@ void Infection::initHost() {
 	h2mod->set_unit_speed_patch(true);
 	//Fixing broken equipment and replace powerups/vehicles with weapons
 	auto scenarios = tags::find_tags(blam_tag::tag_group_type::scenario);
-	auto magnum_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\magnum\\magnum");
-	auto shotgun_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\shotgun\\shotgun");
-	for(auto &scenario_ : scenarios)
-	{
-		auto scenario = tags::get_tag<blam_tag::tag_group_type::scenario, s_scenario_group_definition>(scenario_.first);
-		//Using this to make all vehicle spawns be shotguns
-		datum itmc_override;
-		bool flop = false;
-		for(auto i = 0; i < scenario->netgame_equipment.size; i++)
-		{
-			auto equipment = scenario->netgame_equipment[i];
-			equipment->classification = s_scenario_group_definition::s_netgame_equipment_block::e_classification::powerup;
-			s_item_collection_group_definition* i_collection;
-			s_vehicle_collection_group_definition* v_collection;
-			switch(equipment->itemvehicle_collection.TagGroup.tag_type)
-			{
-				case blam_tag::tag_group_type::itemcollection:
-					if (!flop)
-						itmc_override = equipment->itemvehicle_collection.TagIndex;
-					i_collection = tags::get_tag<blam_tag::tag_group_type::itemcollection, s_item_collection_group_definition>(equipment->itemvehicle_collection.TagIndex);
-					for(auto j = 0; j < i_collection->item_permutations.size; j++)
-					{
-						i_collection->item_permutations[j]->item.TagGroup = blam_tag::tag_group_type::weapon;
-						if (flop) {
-							i_collection->item_permutations[j]->item.TagIndex = magnum_datum;
-						}
-						else
-						{
-							flop = true;
-							i_collection->item_permutations[j]->item.TagIndex = shotgun_datum;
-						}
-					}
-					
-					break;
-				case blam_tag::tag_group_type::vehiclecollection:
-					equipment->itemvehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
-					equipment->itemvehicle_collection.TagIndex = itmc_override;
-					break;
-			}
+	//auto magnum_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\magnum\\magnum");
+	//auto shotgun_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\shotgun\\shotgun");
+	//for(auto &scenario_ : scenarios)
+	//{
+	//	auto scenario = tags::get_tag<blam_tag::tag_group_type::scenario, s_scenario_group_definition>(scenario_.first);
+	//	//Using this to make all vehicle spawns be shotguns
+	//	datum itmc_override;
+	//	bool flop = false;
+	//	for(auto i = 0; i < scenario->netgame_equipment.size; i++)
+	//	{
+	//		auto equipment = scenario->netgame_equipment[i];
+	//		equipment->classification = s_scenario_group_definition::s_netgame_equipment_block::e_classification::powerup;
+	//		s_item_collection_group_definition* i_collection;
+	//		s_vehicle_collection_group_definition* v_collection;
+	//		switch(equipment->itemvehicle_collection.TagGroup.tag_type)
+	//		{
+	//			case blam_tag::tag_group_type::itemcollection:
+	//				if (!flop)
+	//					itmc_override = equipment->itemvehicle_collection.TagIndex;
+	//				i_collection = tags::get_tag<blam_tag::tag_group_type::itemcollection, s_item_collection_group_definition>(equipment->itemvehicle_collection.TagIndex);
+	//				for(auto j = 0; j < i_collection->item_permutations.size; j++)
+	//				{
+	//					i_collection->item_permutations[j]->item.TagGroup = blam_tag::tag_group_type::weapon;
+	//					if (flop) {
+	//						i_collection->item_permutations[j]->item.TagIndex = magnum_datum;
+	//					}
+	//					else
+	//					{
+	//						flop = true;
+	//						i_collection->item_permutations[j]->item.TagIndex = shotgun_datum;
+	//					}
+	//				}
+	//				
+	//				break;
+	//			case blam_tag::tag_group_type::vehiclecollection:
+	//				equipment->itemvehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
+	//				equipment->itemvehicle_collection.TagIndex = itmc_override;
+	//				break;
+	//		}
 
-		}
-	}
+	//	}
+	//}
 	LOG_TRACE_GAME("[h2mod-infection] Host init resetting zombie player data status");
 	Infection::resetZombiePlayerStatus();
 }
@@ -241,12 +257,12 @@ void Infection::spawnPlayerClientSetup(int playerIndex) {
 		if (playerIdentifier == Player::getIdentifier(h2mod->get_player_datum_index_from_controller_index(0).ToAbsoluteIndex())) {
 			if (firstSpawn == true) {
 				//start of zombie match
-				Infection::triggerSound(INFECTION_SOUND, 1000);
+				Infection::triggerSound(e_infection_sounds::infection, 1000);
 				firstSpawn = false;
 			}
 
 			if (h2mod->get_local_team_index() == ZOMBIE_TEAM && infectedPlayed == false) {
-				Infection::triggerSound(INFECTED_SOUND, 500);
+				Infection::triggerSound(infected, 500);
 				infectedPlayed = true;
 			}
 
@@ -303,7 +319,7 @@ void Infection::infectPlayer(int playerIndex, datum unitDatumIndex) {
 			else {
 				//if not, then this is a new zombie
 				LOG_TRACE_GAME(L"[h2mod-infection] Player died, name={}, identifer={}", Player::getName(playerIndex), playerIdentifier);
-				Infection::triggerSound(NEW_ZOMBIE_SOUND, 1000);
+				Infection::triggerSound(new_zombie, 1000);
 			}
 		}
 	}

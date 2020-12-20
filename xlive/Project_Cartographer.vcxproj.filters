@@ -9,7 +9,6 @@
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
-    <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
@@ -104,6 +103,7 @@
     <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\MOTD.cpp" />
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
+    <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -230,7 +230,6 @@
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
-    <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
@@ -356,6 +355,9 @@
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_defenition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\Shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\new_hud_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\model_defenition.hpp" />
+    <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

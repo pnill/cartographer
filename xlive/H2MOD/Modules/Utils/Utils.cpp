@@ -1,6 +1,6 @@
 
 #include "Util\Hooks\Hook.h"
-
+#include <sys/timeb.h>
 #include "H2MOD.h"
 
 #include "H2MOD\Modules\Utils\Utils.h"
@@ -679,4 +679,18 @@ std::string ByteToHexStr(const BYTE* buffer, size_t size) {
 	return str.str();
 }
 
+int GetCurrentTimeMS()
+{
+	timeb tb;
+	ftime(&tb);
+	int nCount = tb.millitm + (tb.time & 0xfffff) * 1000;
+	return nCount;
+}
 
+int TimeElapsedMS(int startms)
+{
+	int nSpan = GetCurrentTimeMS() - startms;
+	if (nSpan < 0)
+		nSpan += 0x100000 * 1000;
+	return nSpan;
+}

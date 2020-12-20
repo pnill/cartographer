@@ -1,6 +1,13 @@
 #include "Globals.h"
 
 #include "H2MOD.h"
+#include "H2MOD/Modules/Utils/Utils.h"
+#include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
+
+int soundBuffer = 0;
+std::map<int, std::map<e_headhunter_sounds, const wchar_t*>> H_SoundsTable;
+bool h_firstSpawn = true;
 
 HeadHunter::HeadHunter()
 {
@@ -11,6 +18,29 @@ HeadHunter::HeadHunter()
 	this->playerDeath = new HeadHunterDeathHandler();
 	this->playerKill = new HeadHunterKillHandler();
 	this->itemInteraction = new HeadHunterItmInteraction();
+
+}
+void HeadHunter::triggerSound(e_headhunter_sounds sound, int sleep)
+{
+	if (H_SoundsTable.count(H2Config_language.code_main)) 
+	{
+		LOG_TRACE_GAME(L"[h2mod-headhunter] Triggering sound {}", H_SoundsTable[H2Config_language.code_main][sound]);
+		h2mod->custom_sound_play(H_SoundsTable[H2Config_language.code_main][sound], sleep);
+	}
+	else 
+	{
+		LOG_TRACE_GAME(L"[h2mod-headhunter] Triggering sound {}", H_SoundsTable[0][sound]);
+		h2mod->custom_sound_play(H_SoundsTable[0][sound], sleep);
+	}
+}
+
+void HeadHunter::spawnPlayerClientSetup()
+{
+	if (h_firstSpawn)
+	{
+		triggerSound(head_hunter, 1000);
+		h_firstSpawn = false;
+	}
 }
 
 void HeadHunter::SpawnSkull(datum unit_datum)
@@ -58,6 +88,11 @@ void HeadHunter::PickupSkull(XUID player, datum SkullDatum)
 			datum PlayerDatum = variant_player->GetPlayerDatum(player);
 			pupdate_player_score(player_score_data, PlayerDatum.Index, 0, 1, -1, 0);
 			call_hs_object_destroy(SkullDatum);
+			if(TimeElapsedMS(soundBuffer) > 2500)
+			{
+				soundBuffer = GetCurrentTimeMS();
+				triggerSound(skull_scored, 500);
+			}
 		}
 	}
 }
@@ -124,7 +159,12 @@ void HeadHunterHandler::SetUnitDatum(datum unit_datum)
 
 void HeadHunter::initClient()
 {
-
+	h_firstSpawn = true;
+	h2mod->disable_sounds(FLAG(SoundType::Slayer) | ALL_SOUNDS_NO_SLAYER);
+	H_SoundsTable[language_ids::english][e_headhunter_sounds::head_hunter] = L"sounds/en/headhunter.wav";
+	H_SoundsTable[language_ids::english][e_headhunter_sounds::skull_scored] = L"sounds/en/skull_scored.wav";
+	H_SoundsTable[language_ids::spanish][e_headhunter_sounds::head_hunter] = L"sounds/es/headhunter.wav";
+	H_SoundsTable[language_ids::spanish][e_headhunter_sounds::skull_scored] = L"sounds/es/skull_scored.wav";
 }
 
 void HeadHunter::initHost()
@@ -132,14 +172,16 @@ void HeadHunter::initHost()
 
 }
 
+
+
 void HeadHunterInitializer::onClient()
 {
-
+	HeadHunter::initClient();
 }
 
 void HeadHunterInitializer::onPeerHost()
 {
-
+	HeadHunter::initClient();
 }
 
 void HeadHunterInitializer::onDedi()
@@ -179,17 +221,17 @@ void HeadHunterPreSpawnHandler::onDedi()
 
 void HeadHunterSpawnHandler::onClient()
 {
-
+	HeadHunter::spawnPlayerClientSetup();
 }
 
 void HeadHunterSpawnHandler::onPeerHost()
 {
-
+	HeadHunter::spawnPlayerClientSetup();
 }
 
 void HeadHunterSpawnHandler::onDedi()
 {
-
+	HeadHunter::spawnPlayerClientSetup();
 }
 
 void HeadHunterDeathHandler::onClient()

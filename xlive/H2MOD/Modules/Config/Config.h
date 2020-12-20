@@ -2,6 +2,7 @@
 #pragma once
 
 #include "H2MOD.h"
+#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 
 void InitH2Config();
 void DeinitH2Config();
@@ -12,8 +13,8 @@ void ReadH2Config();
 #define USE_DEV_PREVIEW_CONFIG_FILE_PATHS 1
 
 #define DLL_VERSION_MAJOR               0
-#define DLL_VERSION_MINOR               5
-#define DLL_VERSION_REVISION            6
+#define DLL_VERSION_MINOR               6
+#define DLL_VERSION_REVISION            0
 #define DLL_VERSION_BUILD				1
 
 #define DLL_VERSION            DLL_VERSION_MAJOR, DLL_VERSION_MINOR, DLL_VERSION_REVISION, DLL_VERSION_BUILD
@@ -30,6 +31,14 @@ enum H2Config_Deadzone_Type : byte {
 	Axial,
 	Radial,
 	Both
+};
+
+enum e_override_texture_resolution : int
+{
+	tex_low,
+	tex_default,
+	tex_high,
+	tex_ultra
 };
 
 extern std::string cartographerURL;
@@ -58,6 +67,7 @@ extern bool H2Config_experimental_game_main_loop_patches;
 extern int H2Config_static_lod_state;
 extern int H2Config_field_of_view;
 extern int H2Config_vehicle_field_of_view;
+extern bool H2Config_static_first_person;
 extern float H2Config_mouse_sens;
 extern bool H2Config_mouse_uniform;
 extern float H2Config_controller_sens;
@@ -117,3 +127,7 @@ extern point2d H2Config_PLASPI;
 extern point2d H2Config_BRUTESHOT;
 extern point2d H2Config_NEED;
 extern point2d H2Config_SENTBEAM;
+
+
+extern e_override_texture_resolution H2Config_Override_Shadows;
+extern e_override_texture_resolution H2Config_Override_Water;

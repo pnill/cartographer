@@ -51,4 +51,20 @@ namespace MetaExtender
 		}
 
 	}
+	template<typename T = void>
+	T* add_tag_block2(unsigned long tag_block_ptr)
+	{
+		int* block_count = reinterpret_cast<int*>(tag_block_ptr);
+		int* block_offset = reinterpret_cast<int*>(tag_block_ptr + 4);
+		size_t block_size = *block_count * sizeof(T);
+		void* new_memory = calloc(*block_count + 1, sizeof(T));
+		add_to_free(new_memory);
+
+		memcpy(new_memory, &tags::get_tag_data()[*block_offset], block_size);
+
+		*block_count = *block_count + 1;
+		*block_offset = (int)((unsigned long)new_memory - int(*h2mod->GetAddress<int**>(0x47CD54)));
+
+		return reinterpret_cast<T*>(((unsigned long)new_memory) + (sizeof(T) * (*block_count - 1)));
+	}
 }

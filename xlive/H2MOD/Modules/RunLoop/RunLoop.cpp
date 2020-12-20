@@ -252,6 +252,22 @@ void alt_prep_time(float a1, float *a2, int *a3)
 		*a3 = 1;
 	}
 }
+bool b_sys_init = false;
+int startTime;
+
+float alt_system_time_update()
+{
+	if(!b_sys_init)
+	{
+		startTime = timeGetTime();
+		b_sys_init = true;
+		return 1;
+	}
+	int currentTime = timeGetTime();
+	float result = (float)(currentTime - startTime) * 0.001;
+	startTime = currentTime;
+	return result;
+}
 
 int* dword_F52268;
 int* max_tick_count;
@@ -285,7 +301,7 @@ void __cdecl game_main_loop()
 	int v18; // [esp+40h] [ebp-4h]
 	v1 = sub_AF87A1(); //Some sort of initializer for timing.
 	a3 = v1;
-	Interpolate = 0;
+	Interpolate = 1;
 	if (!(*dword_F52268 & 1)) //Game loop init
 	{
 		*dword_F52268 |= 1u;
@@ -330,13 +346,17 @@ void __cdecl game_main_loop()
 			add eax, [H2BaseAddr]
 			call eax
 		}
-		if (!game_minimized())
-			if (H2Config_controller_modern) {
+		if (!game_minimized()) 
+		{
+			if (H2Config_controller_modern)
+			{
 				ControllerInput::procces_input();
 			}
-			else {
+			else
+			{
 				sub_B328A8();
 			}
+		}
 		if (v12)
 		{
 			sub_B16834();
@@ -360,7 +380,8 @@ void __cdecl game_main_loop()
 			out_target_ticks = 0;
 			if (Interpolate)
 			{
-				v15 = main_game_time_system_update(0, 0.0);
+				//v15 = main_game_time_system_update(0, 0.0);
+				v15 = alt_system_time_update();
 			}
 			else
 			{
@@ -404,7 +425,7 @@ void __cdecl game_main_loop()
 				simulation_update(out_target_ticks, &out_dt);
 				if (v10)
 					game_network_dispatcher();
-				game_effects_update(out_dt);
+				//game_effects_update(out_dt);
 				director_update(v13);
 				observer_update(v13);
 				//TODO: Fix Controller Vibrations
@@ -433,11 +454,11 @@ void __cdecl game_main_loop()
 			else if (v10)
 			{
 				v0 = system_milliseconds();
-				//present_rendered_screen();
+				present_rendered_screen();
 				v8 = system_milliseconds() - v0;
-				DWORD* init_flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
-				if (init_flags_array[2] == 0)
-					render_audio();
+				//DWORD* init_flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
+				//if (init_flags_array[2] == 0)
+				//	render_audio();
 				if (*sound_impulse_called)
 				{
 					*sound_impulse_called = 0;
@@ -459,7 +480,6 @@ float __cdecl fps_get_seconds_per_frame()
 {
 	return (1.0f / H2Config_fps_limit);
 }
-
 void alt_main_game_loop_hook()
 {
 	QueryPerformanceCounter(&end_tick);
@@ -470,7 +490,14 @@ void alt_main_game_loop_hook()
 		if (!QuitGSMainLoop)
 			GSMainLoop();
 		init = true;
-		game_main_loop();
+		DWORD* init_flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
+		if (init_flags_array[2] == 0)
+			render_audio();
+		if(game_in_simulation())
+		{
+			game_effects_update(time_globals::get_game_time_globals()->seconds_per_tick);
+		}
+		//game_main_loop();
 		//main_game_loop();
 	
 		EventHandler::executeGameLoopCallbacks();
@@ -482,12 +509,13 @@ void alt_main_game_loop_hook()
 		render_time = static_cast<double>(end_render.QuadPart - start_render.QuadPart) / freq.QuadPart;
 		if (render_time >= (1.0f / H2Config_fps_limit)) {
 			QueryPerformanceCounter(&start_render);
-			present_rendered_screen();
+			game_main_loop();
+			//present_rendered_screen();
 		}
 	}
 	else
 	{
-		present_rendered_screen();
+		game_main_loop();
 	}
 	
 }
@@ -565,6 +593,7 @@ void initGSRunLoop() {
 		
 			//PatchCall(h2mod->GetAddress(0x39D04), alt_prep_time);
 			PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
+			//PatchCall(H2BaseAddr + 0x39e64, game_main_loop);
 			QueryPerformanceFrequency(&freq);
 			//Remove original render call
 			NopFill(h2mod->GetAddress(0x39DAA), 5);

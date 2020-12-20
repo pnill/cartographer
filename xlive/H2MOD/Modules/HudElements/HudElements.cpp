@@ -63,6 +63,26 @@ static bool __cdecl RenderHudCheck(unsigned int a1)
 
 	return false;
 }
+typedef void(__cdecl p_render_camera_build_frustum)(int a1, int a2, int a3);
+p_render_camera_build_frustum* c_render_camera_build_frustum;
+
+void __cdecl render_camera_build_frustum(int a1, int a2, int a3)
+{
+	if (H2Config_static_first_person) 
+	{
+		float old_flt = *(float*)(a1 + 0x28);
+
+		*(float*)(a1 + 0x28) = ((64.f * M_PI) / 180.0f) * 0.78500003f;
+		//*(float*)(a1 + 0x28) = 0.86558843f;
+		//h2mod->GetAddress<void(__cdecl*)(int, int, int)>(0x1953F5)(a1, a2, a3);
+		c_render_camera_build_frustum(a1, a2, a3);
+		*(float*)(a1 + 0x28) = old_flt;
+	}
+	else
+	{
+		c_render_camera_build_frustum(a1, a2, a3);
+	}
+}
 
 bool crosshairInit = false;
 static point2d defaultCrosshairSizes[59];
@@ -175,11 +195,8 @@ void HudElements::ToggleHUD(bool state)
 
 void HudElements::OnMapLoad()
 {
-	if (h2mod->GetMapType() == Multiplayer)
-	{
-		setCrosshairSize();
-		setCrosshairPos();
-	}
+	setCrosshairSize();
+	setCrosshairPos();
 }
 void HudElements::ApplyHooks()
 {
@@ -188,6 +205,8 @@ void HudElements::ApplyHooks()
 	PatchCall(h2mod->GetAddress(0x226628), RenderIngameChat);
 	PatchCall(h2mod->GetAddress(0x228579), RenderFirstPersonCheck);
 	PatchCall(h2mod->GetAddress(0x223955), RenderHudCheck);
+	PatchCall(h2mod->GetAddress(0x191440), render_camera_build_frustum);
+	c_render_camera_build_frustum = h2mod->GetAddress<p_render_camera_build_frustum*>(0x1953f5);
 }
 void HudElements::Init()
 {

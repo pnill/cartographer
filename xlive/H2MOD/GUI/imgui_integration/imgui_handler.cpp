@@ -136,7 +136,6 @@ namespace imgui_handler
 				if (::GetCursorPos(&pos) && ::ScreenToClient(g_hWnd, &pos))
 					io.MousePos = ImVec2((float)pos.x, (float)pos.y);
 	}
-
 	IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (ImGui::GetCurrentContext() == NULL)
@@ -310,6 +309,7 @@ namespace imgui_handler
 		io.KeyMap[ImGuiKey_Z] = 'Z';
 
 		ImFont* font1 = io.Fonts->AddFontDefault();
+		
 
 		ImGui_ImplDX9_Init(pDevice);
 
@@ -319,6 +319,7 @@ namespace imgui_handler
 		//bool ret = LoadTextureFromFile("patchnotes.png", , &my_image_width, &my_image_height);
 		//IM_ASSERT(ret);
 		preloadImages();
+		AdvancedSettings::BuildStringsTable();
 	}
 	float WidthPercentage(float percent)
 	{
@@ -354,11 +355,11 @@ namespace imgui_handler
 		//texture->GetLevelDesc(0, &my_image_desc);
 		switch (image)
 		{
-		case patch_notes:
-			g_patchNotes_Image = texture;
-			break;
-		default:
-			return false;
+			case patch_notes:
+				g_patchNotes_Image = texture;
+				break;
+			default:
+				return false;
 		}
 		*out_width = imgInfo.Width;
 		*out_height = imgInfo.Height;

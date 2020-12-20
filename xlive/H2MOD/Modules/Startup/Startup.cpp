@@ -345,6 +345,11 @@ std::wstring prepareLogFileName(std::wstring logFileName) {
 	return filename;
 }
 
+void ServerStartupFixes()
+{
+	
+}
+
 ///Before the game window appears
 void InitH2Startup() {
 	InitializeCriticalSection(&log_section);
@@ -379,11 +384,16 @@ void InitH2Startup() {
 	H2ProcessFilePath = (wchar_t*)calloc(1, wcslen(ArgList[0]) * sizeof(wchar_t));
 	int rtncodepath = GetWidePathFromFullWideFilename(ArgList[0], H2ProcessFilePath);
 	if (rtncodepath == -1) {
-		swprintf(H2ProcessFilePath, 2, L"");
+		std::wstring path = GetExeDirectoryWide();
+		path.append(L"\\");
+		H2ProcessFilePath = (wchar_t*)calloc(1, path.length() * sizeof(wchar_t));
+		swprintf(H2ProcessFilePath, path.c_str());
 	}
-
 	// fix the game not finding the files it needs if the current directory is not the install directory
 	SetCurrentDirectoryW(GetExeDirectoryWide().c_str());
+	//If H2ProcessFilePath is empty (Server Console Mode?) set to working directory
+	
+
 
 	initLocalAppData();
 

@@ -13,6 +13,10 @@ int XboxTick::setTickRate(bool enable)
 		if (!h2mod->Server)
 			WriteBytes(h2mod->GetAddress(0x3A938, 0x8DCE5), mov_al_1_retn, sizeof(mov_al_1_retn));
 
+		BYTE jne[] = { 0x85 };
+		if (!h2mod->Server)
+			WriteBytes(h2mod->GetAddress(0x288BD, 0x249CB), jne, sizeof(jne));
+
 		LOG_TRACE_GAME("[h2mod] Set the game tickrate to 30");
 	}
 	else
@@ -21,6 +25,10 @@ int XboxTick::setTickRate(bool enable)
 		BYTE push_ebp_xor_bl_bl[] = { 0x53, 0x32, 0xDB };
 		if (!h2mod->Server)
 			WriteBytes(h2mod->GetAddress(0x3A938, 0x8DCE5), push_ebp_xor_bl_bl, sizeof(push_ebp_xor_bl_bl));
+
+		BYTE je[] = { 0x84 };
+		if (!h2mod->Server)
+			WriteBytes(h2mod->GetAddress(0x288BD, 0x249CB), je, sizeof(je));
 
 		LOG_TRACE_GAME("[h2mod] Set the game tickrate to 60");
 	}

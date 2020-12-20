@@ -56,6 +56,7 @@ int H2Config_static_lod_state = static_lod::disable;
 int H2Config_field_of_view = 70;
 int H2Config_vehicle_field_of_view = 70;
 int H2Config_refresh_rate = 60;
+bool H2Config_static_first_person = false;
 float H2Config_mouse_sens = 0;
 bool H2Config_mouse_uniform = false;
 float H2Config_controller_sens = 0;
@@ -108,6 +109,9 @@ point2d	H2Config_PLASPI = { 1 , 1 };
 point2d	H2Config_BRUTESHOT = { 1 , 1 };
 point2d	H2Config_NEED = { 1 , 1 };
 point2d	H2Config_SENTBEAM = { 1 , 1 };
+
+e_override_texture_resolution H2Config_Override_Shadows;
+e_override_texture_resolution H2Config_Override_Water;
 
 int H2Config_hotkeyIdHelp = VK_F3;
 int H2Config_hotkeyIdToggleDebug = VK_F2;
@@ -467,6 +471,8 @@ void SaveH2Config() {
 
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view);
 
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", H2Config_static_first_person);
+
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "refresh_rate", H2Config_refresh_rate);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_sens", std::to_string(H2Config_mouse_sens).c_str());
@@ -517,6 +523,9 @@ void SaveH2Config() {
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "hide_ingame_chat", H2Config_hide_ingame_chat);
+
+			ini.SetValue(H2ConfigVersionSection.c_str(), "override_shadows", std::to_string(H2Config_Override_Shadows).c_str());
+			ini.SetValue(H2ConfigVersionSection.c_str(), "override_water", std::to_string(H2Config_Override_Water).c_str());
 		}
 
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay);
@@ -714,6 +723,7 @@ void ReadH2Config() {
 
 				H2Config_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "field_of_view", H2Config_field_of_view);
 				H2Config_vehicle_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view);
+				H2Config_static_first_person = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", false);
 				H2Config_experimental_fps = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
 				std::string crosshair_offset_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN"));
 				if (crosshair_offset_str != "NaN")
@@ -780,6 +790,38 @@ void ReadH2Config() {
 				H2Config_hotkeyIdGuide = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_guide", H2Config_hotkeyIdGuide);
 				H2Config_hotkeyIdConsole = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_console", H2Config_hotkeyIdConsole);
 
+				switch(std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "override_shadows", "1")))
+				{
+					case 0:
+						H2Config_Override_Shadows = e_override_texture_resolution::tex_low;
+					break;
+					default:
+					case 1:
+						H2Config_Override_Shadows = e_override_texture_resolution::tex_default;
+					break;
+					case 2:
+						H2Config_Override_Shadows = e_override_texture_resolution::tex_high;
+					break;
+					case 3:
+						H2Config_Override_Shadows = e_override_texture_resolution::tex_ultra;
+					break;
+				}
+				switch(std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "override_water", "1")))
+				{
+					case 0:
+						H2Config_Override_Water = e_override_texture_resolution::tex_low;
+						break;
+					default:
+					case 1:
+						H2Config_Override_Water = e_override_texture_resolution::tex_default;
+						break;
+					case 2:
+						H2Config_Override_Water = e_override_texture_resolution::tex_high;
+						break;
+					case 3:
+						H2Config_Override_Water = e_override_texture_resolution::tex_ultra;
+						break;
+				}
 			}
 
 			// dedicated server only

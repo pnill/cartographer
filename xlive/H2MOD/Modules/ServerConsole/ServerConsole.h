@@ -37,4 +37,5 @@ namespace ServerConsole
 	 * \param ... An additional argument
 	 */
 	void SendCommand2(int argCount, wchar_t* command, wchar_t* argument, ...);
+	void SendMsg(wchar_t* message, bool timeout = false);
 }

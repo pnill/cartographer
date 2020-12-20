@@ -61,7 +61,11 @@ class HeadHunterItmInteraction : public HeadHunterHandler {
 	virtual void onDedi() override;
 	virtual void onClient() override;
 };
-
+enum e_headhunter_sounds
+{
+	head_hunter,
+	skull_scored
+};
 class HeadHunter : public GameType<HeadHunterHandler>
 {
 public:
@@ -70,4 +74,6 @@ public:
 	static void PickupSkull(XUID player, datum SkullDatum);
 	static void initClient();
 	static void initHost();
+	static void triggerSound(e_headhunter_sounds sound, int sleep);
+	static void spawnPlayerClientSetup();
 };

@@ -69,6 +69,7 @@ public:
 		void disable_weapon_pickup(bool b_Enable);
 		void leave_session();
 		void set_local_rank(BYTE rank);
+		void cine_start_tex();
 		scnr_type GetMapType() { return mapType; }
 		void SetMapType(scnr_type value) { mapType = value; }
 

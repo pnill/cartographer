@@ -5,6 +5,7 @@
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/Utils/Utils.h"
 
 typedef void*(__cdecl *dedi_command_hook)(wchar_t** a1, int a2, char a3);
 dedi_command_hook p_dedi_command_hook;
@@ -162,11 +163,53 @@ void ServerConsole::SendCommand2(int argCount, wchar_t* command, wchar_t* argume
 
 void ServerConsole::AddVip(std::wstring Gamertag)
 {
-	//HKEY* VIPHKey = h2mod->GetAddress<HKEY*>(0, 0x3B49F8);
 	kablam_vip_add(Gamertag.c_str());
 }
 
 void ServerConsole::ClearVip()
 {
 	kablam_vip_clear();
+}
+
+struct send_message_command_block
+{
+	DWORD v_table;
+	DWORD unk_1;
+	DWORD unk_2;
+	wchar_t message[110];
+};
+
+int messageTimeout = 0;
+
+void ServerConsole::SendMsg(wchar_t* message, bool timeout)
+{
+	bool execute = !timeout;
+	if (TimeElapsedMS(messageTimeout) > 10000)
+	{
+		messageTimeout = GetCurrentTimeMS();
+		execute = true;
+	}
+
+	if (execute) {
+		send_message_command_block a{
+			h2mod->GetAddress(0, 0x352dfc),
+			8,
+			1
+		};
+		DWORD test = (DWORD)std::addressof(a);
+		size_t len = wcslen(message);
+		for (auto i = 0; i < 110; i++) {
+			if (i < len)
+				a.message[i] = message[i];
+			else
+				a.message[i] = 0;
+		}
+
+		__asm {
+			mov eax, [a]
+			mov edx, [eax]
+			mov ecx, test
+			call edx
+		}
+	}
 }

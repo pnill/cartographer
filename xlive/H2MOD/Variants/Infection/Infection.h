@@ -48,7 +48,12 @@ class KillZombieHandler : public ZombieHandler {
 	virtual void onDedi() override;
 	virtual void onClient() override;
 };
-
+enum e_infection_sounds
+{
+	infection,
+	infected,
+	new_zombie
+};
 class Infection : public GameType<ZombieHandler>
 {
 public:
@@ -67,7 +72,7 @@ public:
 	static void setPlayerAsZombie(int playerIndex);
 	static void infectPlayer(int playerIndex, datum unitDatumIndex);
 	static void infectPlayers(int playerIndex, datum unitDatumIndex);
-	static void triggerSound(const wchar_t* name, int);
+	static void triggerSound(e_infection_sounds sound, int sleep);
 	static int calculateZombiePlayerIndex();
 private:
 	static std::vector<XUID> zombieIdentifiers;

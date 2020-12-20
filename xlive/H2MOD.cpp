@@ -7,7 +7,6 @@
 #include "H2MOD/Modules/HitFix/HitFix.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/MainMenu/Ranks.h"
-#include "H2MOD/Modules/MapFix/MPMapFix.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "H2MOD/Modules/Networking/Memory/bitstream.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -16,7 +15,7 @@
 #include "H2MOD/Variants/GunGame/GunGame.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
+#include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/Modules/Utils/Utils.h"
@@ -25,9 +24,12 @@
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Tags/MetaExtender.h"
-#include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
+#include "H2MOD/Modules/Startup/Startup.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "Blam/Cache/TagGroups/model_defenition.hpp"
+#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -823,6 +825,12 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 			b_XboxTick = false;
 		}
 
+		if(b_HeadHunter)
+		{
+			headHunterHandler->deinitializer->execute();
+			b_HeadHunter = false;
+		}
+
 		resetAfterMatch = false;
 	}
 
@@ -830,7 +838,6 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	{
 		addDebugText("Map Type: Main-Menu");
 		UIRankPatch();
-
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		MetaExtender::free_tag_blocks();
@@ -846,10 +853,11 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 
 	ControllerInput::SetSensitiviy(H2Config_controller_sens);
 	MouseInput::SetSensitivity(H2Config_mouse_sens);
+	HudElements::OnMapLoad();
 	if (h2mod->GetMapType() == scnr_type::Multiplayer)
 	{
 		addDebugText("Map type: Multiplayer");
-
+		
 		for (auto gametype_it : GametypesMap)
 		{
 			if (StrStrIW(variant_name, gametype_it.first)) {
@@ -857,10 +865,10 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 				gametype_it.second = true; // enable a gametype if substring is found
 			}
 		}
+		
 		if (!b_XboxTick) 
 		{
 			H2X::Initialize(b_H2X);
-			MPMapFix::Initialize();
 			H2Tweaks::applyMeleePatch(true);
 			HitFix::ApplyProjectileVelocity();
 			engine_settings->tickrate = XboxTick::setTickRate(false);
@@ -873,9 +881,6 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		EventHandler::executeMapLoadCallback(scnr_type::Multiplayer);
-		HudElements::OnMapLoad();
-
-
 
 		if (get_game_life_cycle() == life_cycle_in_game)
 		{
@@ -892,8 +897,43 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 			if (b_GunGame) {
 				gunGame->initializer->execute();
 			}
-		}
 
+			if(b_HeadHunter)
+			{
+				headHunterHandler->initializer->execute();
+			}
+		}
+		//Christmas hat importing move later, auto disables after january.
+		if (!h2mod->Server) {
+			std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+			time_t tt = std::chrono::system_clock::to_time_t(now);
+			tm utc_tm = *gmtime(&tt);
+			if (utc_tm.tm_mon == 11 || utc_tm.tm_mon == 0) {
+				tag_loader::Load_tag(0xE19B001D, true, "christmas_hat_map");
+				tag_loader::Load_tag(0xE1BF0024, true, "christmas_hat_map");
+				tag_loader::Push_Back();
+				//auto scen = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(datum(_INJECTED_TAG_START_));
+				auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
+				if (hlmt_chief_datum != datum::Null) {
+					auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
+					auto b = hlmt_chief->variants[0];
+					auto a = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
+					a->parent_marker = string_id(184552154);
+					a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+					a->child_object.TagIndex = tag_loader::ResolveNewDatum(0xE19B001D);
+				}
+				auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
+				if (hlmt_elite_datum != datum::Null)
+				{
+					auto hlmt_eliete = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_elite_datum);
+					auto b = hlmt_eliete->variants[0];
+					auto a = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
+					a->parent_marker = string_id(184552154);
+					a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+					a->child_object.TagIndex = tag_loader::ResolveNewDatum(0xE1BF0024);
+				}
+			}
+		}
 	}
 
 	else if (h2mod->GetMapType() == scnr_type::SinglePlayer)
@@ -903,7 +943,6 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		//H2X::Initialize(true);
 		H2Tweaks::applyMeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
-		HudElements::OnMapLoad();
 		EventHandler::executeMapLoadCallback(scnr_type::SinglePlayer);
 	}
 
@@ -923,6 +962,12 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 
 	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
 
+	if(b_HeadHunter)
+	{
+		headHunterHandler->preSpawnPlayer->SetPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
+		headHunterHandler->preSpawnPlayer->execute();
+	}
+
 	if (b_Infection) {
 		infectionHandler->preSpawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
 		infectionHandler->preSpawnPlayer->execute();
@@ -934,6 +979,12 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	}
 
 	bool ret = p_player_spawn(playerDatumIndex);
+
+	if(b_HeadHunter)
+	{
+		headHunterHandler->spawnPlayer->SetPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
+		headHunterHandler->spawnPlayer->execute();
+	}
 
 	if (b_Infection) {
 		infectionHandler->spawnPlayer->setPlayerIndex(playerDatumIndex.ToAbsoluteIndex());
@@ -1327,14 +1378,38 @@ void EvaluateGameState()
 	}
 }
 
+typedef void(__cdecl p_set_screen_bounds)(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
+p_set_screen_bounds* c_set_screen_bounds;
+
+void __cdecl set_screen_bounds(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale)
+{
+	c_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
+}
+
 typedef char(_cdecl* startCountdownTimer)(char a1, int countdown_time, int a2, int a3, char a4);
 startCountdownTimer p_StartCountdownTimer;
 char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, char a4)
 {
 	bool canStart[2]{ false, false };
-	BYTE TeamPlay = *h2mod->GetAddress<BYTE*>(0, 0x992880);
-	if (H2Config_force_even && TeamPlay == 1)
+
+	if (H2Config_minimum_player_start > 0)
 	{
+		ServerConsole::SendMsg(L"Waiting for Players | Esperando a los jugadores", true);
+		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
+		{
+			LOG_DEBUG_GAME(L"Minimum Player count met.");
+			canStart[1] = true;
+		}
+	}
+	else
+	{
+		canStart[1] = true;
+	}
+
+	BYTE TeamPlay = *h2mod->GetAddress<BYTE*>(0, 0x992880);
+	if (H2Config_force_even && TeamPlay == 1 && canStart[1])
+	{
+		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
 		LOG_DEBUG_GAME(L"Balancing teams");
 		std::map<std::string, std::vector<int>> Parties;
 		std::vector<int> nonPartyPlayers;
@@ -1455,18 +1530,6 @@ char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, cha
 		canStart[0] = true;
 	}
 
-	if (H2Config_minimum_player_start > 0)
-	{
-		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
-		{
-			LOG_DEBUG_GAME(L"Minimum Player count met.");
-			canStart[1] = true;
-		}
-	} 
-	else
-	{
-		canStart[1] = true;
-	}
 
 	if (canStart[0] && canStart[1])
 		return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
@@ -1618,7 +1681,8 @@ void H2MOD::ApplyHooks() {
 
 		//Initialise_tag_loader();
 		PlayerControl::ApplyHooks();
-		
+		c_set_screen_bounds = GetAddress<p_set_screen_bounds*>(0x264979);
+		//PatchCall(GetAddress(0x25E1E5), set_screen_bounds);
 		
 	}
 	else {
@@ -1646,6 +1710,8 @@ void H2MOD::Initialize()
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
 		TagFixes::Initalize();
+		Initialise_tag_loader();
+		RenderHooks::Initialize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");
