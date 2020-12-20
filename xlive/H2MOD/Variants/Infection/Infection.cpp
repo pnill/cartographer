@@ -162,7 +162,7 @@ void Infection::initHost() {
 	//		}
 
 	//	}
-	}
+	//}
 	LOG_TRACE_GAME("[h2mod-infection] Host init resetting zombie player data status");
 	Infection::resetZombiePlayerStatus();
 }
