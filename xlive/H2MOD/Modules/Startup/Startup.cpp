@@ -17,6 +17,8 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
+#include "Util/Memory.h"
+
 #include <filesystem>
 
 namespace filesystem = std::experimental::filesystem;
@@ -366,6 +368,8 @@ void InitH2Startup() {
 
 	H2BaseAddr = (DWORD)game_info.base;
 	h2mod->SetBase(H2BaseAddr);
+
+
 	if (game_info.process_type == H2Types::H2Server)
 	{
 		h2mod->Server = true;
@@ -376,6 +380,7 @@ void InitH2Startup() {
 		h2mod->Server = false;
 		H2IsDediServer = false;
 	}
+	Memory::setBaseAddress(H2BaseAddr, H2IsDediServer);
 
 	initInstanceNumber();
 
