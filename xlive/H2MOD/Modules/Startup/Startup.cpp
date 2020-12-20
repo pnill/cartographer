@@ -17,10 +17,6 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
-#include "Util/Memory.h"
-
-#include <filesystem>
-
 namespace filesystem = std::experimental::filesystem;
 
 // xLiveLess specific logger
@@ -284,13 +280,6 @@ void initLocalAppData() {
 	addDebugText(H2AppDataLocal);
 }
 
-void __cdecl game_modules_dispose() {
-	typedef void(__cdecl *tsub_48BBF)();
-	tsub_48BBF psub_48BBF = (tsub_48BBF)(H2BaseAddr + 0x48BBF);
-	psub_48BBF();
-	DeinitH2Startup();
-}
-
 CRITICAL_SECTION log_section;
 
 H2Types detect_process_type()
@@ -414,9 +403,6 @@ void InitH2Startup() {
 	}
 	else {
 		addDebugText("Process is Client");
-
-		addDebugText("Hooking Shutdown Function");
-		PatchCall(H2BaseAddr + 0x39E7C, game_modules_dispose);
 	}
 
 	if (ArgList != NULL)

@@ -785,6 +785,10 @@ void InitH2Tweaks() {
 
 		// disable cloth debugging that writes to cloth.txt
 		WriteValue<bool>(h2mod->GetAddress(0x41F650), false);
+
+		// prevent game from setting timeBeginPeriod/timeEndPeriod
+		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
+		NopFill(Memory::GetAddressRelative(0x66A092), 8);
 	}
 
 	if(H2Config_experimental_game_main_loop_patches)
