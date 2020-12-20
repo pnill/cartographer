@@ -520,7 +520,6 @@ INT WINAPI XNetCleanup()
 	for (auto xsocket : ipManager.SocketPtrArray)
 	{
 		XSocketClose((SOCKET)xsocket);
-		delete xsocket;
 	}
 	ipManager.SocketPtrArray.clear();
 
