@@ -6,6 +6,8 @@
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 
+#include <MSWSock.h>
+
 #include "..\IpManagement\XnIp.h"
 
 ModuleUPnP* upnp;
@@ -52,37 +54,59 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 {
 	LOG_TRACE_NETWORK("XSocketCreate() - af = {0}, type = {1}, protocol = {2}", af, type, protocol);
 
-	if (protocol == IPPROTO_TCP)
-		return SOCKET_ERROR; // we dont support TCP yet
+	if (af != AF_INET)
+		return SOCKET_ERROR;
 
-	// TODO: support TCP
-	XSocket* newXSocket = new XSocket;
-	SecureZeroMemory(newXSocket, sizeof(XSocket));
-	if (protocol == IPPROTO_UDP)
+	// TODO: add TCP support
+	if (protocol != IPPROTO_UDP
+		&& protocol != IPPROTO_VDP)
+		return SOCKET_ERROR;
+
+	bool isVoice = false;
+	if (protocol == IPPROTO_VDP)
 	{
-		newXSocket->protocol = IPPROTO_UDP;
-	}
-	else if (protocol == IPPROTO_VDP)
-	{
+		isVoice = true;
 		protocol = IPPROTO_UDP; // We can't support VDP (Voice / Data Protocol) it's some encrypted crap which isn't standard.
-		newXSocket->protocol = IPPROTO_UDP;
-		newXSocket->isVoiceSocket = true;
 	}
 
+	// TODO: use an array of sockets rather than allocating the memory on heap
+	XSocket* newXSocket = new XSocket(protocol, isVoice);
+
+#if COMPILE_WITH_STD_SOCK_FUNC
 	SOCKET ret = socket(af, type, protocol);
+#else
+	SOCKET ret = WSASocket(af, type, protocol, 0, 0, 0);
+#endif
 
 	if (ret == INVALID_SOCKET)
 	{
 		LOG_ERROR_NETWORK("XSocketCreate() - Invalid socket, last error: {}", WSAGetLastError());
 		delete newXSocket;
-		return ret;
+		return INVALID_SOCKET;
 	}
 
+	LOG_TRACE_NETWORK("XSocketCreate() - Socket created with descriptor: {}.", ret);
 	newXSocket->winSockHandle = ret;
 
 	if (newXSocket->isVoiceSocket)
 	{
-		LOG_TRACE_NETWORK("XSocketCreate() - Socket: {} is VDP", ret);
+		LOG_TRACE_NETWORK("XSocketCreate() - Socket: {} was set to VDP", ret);
+	}
+
+	// set socket send/recv buffers size
+	newXSocket->setBufferSize(ipManager.GetMinSockSendBufferSizeInBytes(), ipManager.GetMinSockRecvBufferSizeInBytes());
+
+	// disable SIO_UDP_CONNRESET
+
+	DWORD ioctlSetting = 0;
+	DWORD cbBytesReturned;
+	if (WSAIoctl(newXSocket->winSockHandle, SIO_UDP_CONNRESET, &ioctlSetting, 4u, 0, 0, &cbBytesReturned, 0, 0) == SOCKET_ERROR)
+	{
+		LOG_ERROR_NETWORK("XSocketCreate() - couldn't disable SIO_UDP_CONNRESET", ret);
+	}
+	else
+	{
+		LOG_TRACE_NETWORK("XSocketCreate() - disabled SIO_UDP_CONNRESET");
 	}
 
 	ipManager.SocketPtrArray.push_back(newXSocket);
@@ -656,4 +680,41 @@ u_long WINAPI XSocketNTOHL(u_long netlong)
 u_short WINAPI XSocketHTONS(u_short hostshort)
 {
 	return htons(hostshort);
+}
+
+void XSocket::setBufferSize(INT sendBufsize, INT recvBufsize)
+{
+	static INT sockOpts[] = { SO_RCVBUF, SO_SNDBUF };
+	static char* sockOptsStr[] = { "SO_RCVBUF", "SO_SNDBUF" };
+
+	if (this->isUDP()) // increase recvbuffer only for UDP sockets for now
+	{
+		int bufOpt, bufOptSize;
+		bufOptSize = sizeof(bufOpt);
+
+		for (int i = 0; i < ARRAYSIZE(sockOpts); i++)
+		{
+			if (getsockopt(this->winSockHandle, SOL_SOCKET, sockOpts[i], (char*)&bufOpt, &bufOptSize) == SOCKET_ERROR)
+			{
+				LOG_ERROR_NETWORK("XSocketCreate() - getsockopt() failed, last error: {}, cannot increase UDP packet send/recv buffer if needed", WSAGetLastError());
+				continue;
+			}
+
+			LOG_TRACE_NETWORK("XSocketCreate() - getsockopt() - {}: {}", sockOptsStr[i], bufOpt);
+
+			// if i is 0, set SO_RCVBUF, otherwise SO_SNDBUF
+			int bufSize = i == 0 ? recvBufsize : sendBufsize;
+
+			// this may only affect Windows 7/Server 2008 R2 and bellow, as Windows 10 uses an 64K buffer already
+			if (bufOpt < bufSize)
+			{
+				bufOpt = bufSize; // set the recvbuf to needed size
+				// increase socket recv buffer
+				if (setsockopt(this->winSockHandle, SOL_SOCKET, sockOpts[i], (char*)&bufOpt, sizeof(bufOptSize)) == SOCKET_ERROR) // then attempt to increase the buffer
+				{
+					LOG_ERROR_NETWORK("XSocketCreate() - setsockopt() failed, last error: {}", WSAGetLastError());
+				}
+			}
+		}
+	}
 }

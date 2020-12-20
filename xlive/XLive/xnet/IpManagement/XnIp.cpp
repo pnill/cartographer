@@ -37,7 +37,13 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 	SecureZeroMemory(XnKeyPairs, startupParams.cfgKeyRegMax * sizeof(XnKeyPair));
 
 	if (startupParams.cfgQosDataLimitDiv4 == 0)
-		startupParams.cfgQosDataLimitDiv4 = 64; // 256 bytes as default
+		startupParams.cfgQosDataLimitDiv4 = 256 / 4; // 256 bytes as default
+
+	if (startupParams.cfgSockDefaultRecvBufsizeInK <= 0)
+		startupParams.cfgSockDefaultRecvBufsizeInK = SOCK_UDP_MIN_RECV_BUFFER_K_UNITS;
+
+	if (startupParams.cfgSockDefaultSendBufsizeInK <= 0)
+		startupParams.cfgSockDefaultSendBufsizeInK = SOCK_UDP_MIN_SEND_BUFFER_K_UNITS;
 }
 
 XnIp* CXnIp::getConnection(IN_ADDR ina)

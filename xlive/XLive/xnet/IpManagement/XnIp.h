@@ -127,7 +127,11 @@ public:
 	XNetStartupParams startupParams;
 	int GetMaxXnConnections() { return startupParams.cfgSecRegMax; }
 	int GetReqQoSBufferSize() { return startupParams.cfgQosDataLimitDiv4 * 4; }
-	int GetMaxXnKeyPairs() { return startupParams.cfgKeyRegMax;  }
+	int GetMaxXnKeyPairs() { return startupParams.cfgKeyRegMax; }
+
+	// socket buffer sizes
+	int GetMinSockRecvBufferSizeInBytes() { return startupParams.cfgSockDefaultRecvBufsizeInK * SOCK_K_UNIT; }
+	int GetMinSockSendBufferSizeInBytes() { return startupParams.cfgSockDefaultSendBufsizeInK * SOCK_K_UNIT; }
 
 private:
 
