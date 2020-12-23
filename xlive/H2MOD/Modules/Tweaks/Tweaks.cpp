@@ -853,13 +853,21 @@ void H2Tweaks::toggleAiMp(bool toggle) {
 
 static float melee_distance_additional_ticks_60 = 12;
 static float melee_distance_additional_ticks_30 = 6;
+static float melee_deceleration_ticks_60 = 8;
+static float melee_deceleration_ticks_30 = 4;
 
 void H2Tweaks::applyMeleePatch(bool toggle)
 {
-	if (toggle)
+	if (toggle) 
+	{
 		WritePointer(h2mod->GetAddress(0x10B36B, 0xFD99B) + 4, &melee_distance_additional_ticks_60);
+		WritePointer(h2mod->GetAddress(0x10B7D8, 0xFDE08) + 4, &melee_deceleration_ticks_60);
+	}
 	else
+	{
 		WritePointer(h2mod->GetAddress(0x10B36B, 0xFD99B) + 4, &melee_distance_additional_ticks_30);
+		WritePointer(h2mod->GetAddress(0x10B7D8, 0xFDE08) + 4, &melee_deceleration_ticks_30);
+	}
 
 	//static float melee_lunge_distance_factor = toggle ? 0.33333334f * 2 : 0.33333334f;
 	//WritePointer(h2mod->GetAddress(0x10B160, 0xFD790) + 4, &melee_lunge_distance_factor);

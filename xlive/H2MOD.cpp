@@ -1394,11 +1394,14 @@ char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, cha
 
 	if (H2Config_minimum_player_start > 0)
 	{
-		ServerConsole::SendMsg(L"Waiting for Players | Esperando a los jugadores", true);
 		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
 		{
 			LOG_DEBUG_GAME(L"Minimum Player count met.");
 			canStart[1] = true;
+		}
+		else
+		{
+			ServerConsole::SendMsg(L"Waiting for Players | Esperando a los jugadores", true);
 		}
 	}
 	else

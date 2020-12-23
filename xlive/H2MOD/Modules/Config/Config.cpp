@@ -89,7 +89,7 @@ char H2Config_stats_authkey[32] = { "" };
 bool H2Config_vip_lock = false;
 bool H2Config_force_even = false;
 bool H2Config_koth_random = true;
-bool H2Config_experimental_fps = false;
+H2Config_Experimental_Rendering_Mode H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_none;
 bool H2Config_anti_cheat_enabled = true;
 
 float H2Config_crosshair_scale = 1.0f;
@@ -495,7 +495,8 @@ void SaveH2Config() {
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", std::to_string(H2Config_Deadzone_Radial).c_str());
 			
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
+			//ini.SetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
+			ini.SetValue(H2ConfigVersionSection.c_str(), "experimental_rendering", std::to_string(H2Config_experimental_fps).c_str());
 
 			if (FloatIsNaN(H2Config_crosshair_offset)) {
 				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN");
@@ -724,7 +725,21 @@ void ReadH2Config() {
 				H2Config_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "field_of_view", H2Config_field_of_view);
 				H2Config_vehicle_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view);
 				H2Config_static_first_person = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", false);
-				H2Config_experimental_fps = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
+				//H2Config_experimental_fps = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
+				switch(std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "experimental_rendering", "0")))
+				{
+					default:
+					case 0:
+						H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_none;
+						break;
+					case 1:
+						H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_old;
+						break;
+					case 2:
+						H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_new;
+						break;
+				}
+				
 				std::string crosshair_offset_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN"));
 				if (crosshair_offset_str != "NaN")
 					H2Config_crosshair_offset = std::stof(crosshair_offset_str);

@@ -35,6 +35,7 @@ namespace imgui_handler {
 			int g_aiming = 0;
 			int g_shadows = 0;
 			int g_water = 0;
+			int g_experimental = 0;
 			bool g_init = false;
 			int g_language_code = -1;
 			std::map<int, std::map<e_advanced_string, char*>> string_table;
@@ -292,7 +293,16 @@ namespace imgui_handler {
 						H2Config_Override_Water = (e_override_texture_resolution)g_water;
 						RenderHooks::ResetDevice();
 					}
-
+					ImGui::NextColumn();
+					ImGui::Text(GetString(experimental_rendering_changes));
+					const char* r_items[] = { GetString(render_none), GetString(render_cinematic), GetString(render_engine) };
+					ImGui::PushItemWidth(WidthPercentage(100));
+					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 3))
+					{
+						H2Config_experimental_fps = (H2Config_Experimental_Rendering_Mode)g_experimental;
+					}
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
 					ImGui::Columns(1);
 					//Hires Fix
 
@@ -300,9 +310,10 @@ namespace imgui_handler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(hires_fix_tooltip));
 
-					ImGui::Checkbox(GetString(experimental_rendering_changes), &H2Config_experimental_fps);
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
+					
+					//ImGui::Checkbox(GetString(experimental_rendering_changes), &H2Config_experimental_fps);
+					//if (ImGui::IsItemHovered())
+					//	ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
 					
 				}
 			}
@@ -790,6 +801,7 @@ namespace imgui_handler {
 				g_language_code = H2Config_language.code_main;
 				g_shadows = (int)H2Config_Override_Shadows;
 				g_water = (int)H2Config_Override_Water;
+				g_experimental = (int)H2Config_experimental_fps;
 				if (g_language_code == -1)
 					g_language_code = 8;
 				g_init = true;
@@ -877,8 +889,11 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::video_title] = "Video Settings";
 			string_table[0][e_advanced_string::fps_limit] = "FPS Limit";
 			string_table[0][e_advanced_string::fps_limit_tooltip] = "Setting this to 0 will uncap your games frame rate.\nAnything over 60 may cause performance issues\nUse the Experimental Rendering Changes to resolve them";
-			string_table[0][e_advanced_string::experimental_rendering_changes] = "Experimental Rendering Changes";
-			string_table[0][e_advanced_string::experimental_rendering_tooltip] = "This will enabled experimental changes to the way the games engine renders.\nA restart is required for the changes to take effect.\n\nThis will cause controller Vibrations not to work.";
+			string_table[0][e_advanced_string::experimental_rendering_changes] = "Experimental Rendering Mode";
+			string_table[0][e_advanced_string::experimental_rendering_tooltip] = "This will change how the game handles rendering, requires a restart to take effect.\n\nNone: Default behavior of the game, will not work past 60FPS\n\nCinematic: Tricks the game into rending in cinematic mode\n\nEngine: Forces the unused native engine interpolation";
+			string_table[0][e_advanced_string::render_none] = "None";
+			string_table[0][e_advanced_string::render_cinematic] = "Cinematic Force";
+			string_table[0][e_advanced_string::render_engine] = "Engine Force";
 			string_table[0][e_advanced_string::refresh_rate] = "Refresh Rate";
 			string_table[0][e_advanced_string::refresh_rate_tooltip] = "This settings requires a restart to take effect";
 			string_table[0][e_advanced_string::lod] = "Level of Detail";
@@ -982,7 +997,10 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::fps_limit] = u8"Limitar FPS";
 			string_table[4][e_advanced_string::fps_limit_tooltip] = u8"Dejar este ajuste en 0 quitará el límite de fotogramas por segundo.\nCualquier valor mayor a 60 puede causar problemas de rendimiento.\nUsa el Cambio de Renderizado Experimental para solucionarlo.";
 			string_table[4][e_advanced_string::experimental_rendering_changes] = u8"Cambio de Renderizado Experimental";
-			string_table[4][e_advanced_string::experimental_rendering_tooltip] = u8"Esto activará cambios experimentales a la forma de renderizado del motor del juego.\nDebes reiniciar el juego para que los cambios tengan efecto.\n\nEsto causará que la Vibración de Mandos no funcione.";
+			string_table[4][e_advanced_string::experimental_rendering_tooltip] = u8"Esto cambiará la forma en que el juego maneja el renderizado, requiere un reinicio para que surta efecto.\n\nNinguno: el comportamiento predeterminado del juego, no funcionará más allá de los 60FPS \n\nCinematic: Hace que el juego se desgarre en modo cinemático\n\nEngine: Fuerza la interpolación del motor nativo no utilizado";
+			string_table[4][e_advanced_string::render_none] = u8"Ninguno";
+			string_table[4][e_advanced_string::render_cinematic] = u8"Fuerza Cinematográfica";
+			string_table[4][e_advanced_string::render_engine] = u8"Fuerza del motor";
 			string_table[4][e_advanced_string::refresh_rate] = u8"Taza de refresco";
 			string_table[4][e_advanced_string::refresh_rate_tooltip] = u8"Este ajuste requiere reiniciar el juego para que tenga efecto.";
 			string_table[4][e_advanced_string::lod] = u8"Nivel de detalle";
