@@ -645,7 +645,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		}
 	}
 
-	if (hEnum == g_dwFakeAchievementContent)
+	if ( hEnum == g_dwFakeAchievementContent )
 	{
 		return AchievementEnumerator(cbBuffer, pvBuffer, pcItemsReturned, pOverlapped);
 	}
@@ -666,10 +666,10 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		marketplaceEnumerate += marketplaceCount;
 	}
 
-	if ( hEnum == serverList.Handle )
 	{
-		serverList.GetServers(cbBuffer, pvBuffer, pOverlapped);
-		return ERROR_IO_PENDING;
+		DWORD error = ServerList::GetServers(hEnum, cbBuffer, pvBuffer, pOverlapped);
+		if (error != ERROR_NOT_FOUND)
+			return error;
 	}
 
 	if( async == FALSE )

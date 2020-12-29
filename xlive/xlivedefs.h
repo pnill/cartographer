@@ -606,3 +606,5 @@ typedef struct _STRING_VERIFY_RESPONSE {
 	HRESULT *pStringResult;
 } STRING_VERIFY_RESPONSE;
 #pragma pack( pop )
+
+BOOL WINAPI XCloseHandle(HANDLE hObject);
