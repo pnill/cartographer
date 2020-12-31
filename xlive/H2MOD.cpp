@@ -30,6 +30,7 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "Blam/Cache/TagGroups/model_defenition.hpp"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
+#include "H2MOD/Modules/HaloScript/HaloScript.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -903,12 +904,12 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 				headHunterHandler->initializer->execute();
 			}
 		}
-		//Christmas hat importing move later, auto disables after january.
+		//Christmas hat importing move later, auto disables after december.
 		if (!h2mod->Server) {
 			std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 			time_t tt = std::chrono::system_clock::to_time_t(now);
 			tm utc_tm = *gmtime(&tt);
-			if (utc_tm.tm_mon == 11 || utc_tm.tm_mon == 0) {
+			if (utc_tm.tm_mon == 11) {
 				tag_loader::Load_tag(0xE19B001D, true, "christmas_hat_map");
 				tag_loader::Load_tag(0xE1BF0024, true, "christmas_hat_map");
 				tag_loader::Push_Back();
@@ -1728,6 +1729,7 @@ void H2MOD::Initialize()
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
 
+	HaloScript::Initialize();
 	h2mod->ApplyHooks();
 	h2mod->RegisterEvents();
 }
