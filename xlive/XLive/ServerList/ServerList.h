@@ -83,9 +83,6 @@ public:
 
 	HANDLE Handle = INVALID_HANDLE_VALUE;
 
-	DWORD cSearchPropertiesIDs = 0;
-	DWORD* pSearchPropertyIDs = nullptr;
-
 	int GetServersLeft();
 	int GetTotalServers();
 	static DWORD GetServers(HANDLE, DWORD, CHAR*, PXOVERLAPPED);
@@ -96,16 +93,33 @@ public:
 
 #pragma region ServerListQuery
 
-	void CancelOvelapped() { cancelOperation = true; }
+	ServerList::ServerList(DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties)
+	{
+		cSearchPropertiesIDs = _cSearchPropertiesIDs;
+		pSearchPropertyIDs = new DWORD[_cSearchPropertiesIDs];
+		memcpy(pSearchPropertyIDs, _pSearchProperties, _cSearchPropertiesIDs * sizeof(*_pSearchProperties));
+	}
+
+	void CancelOperation() { cancelOperation = true; }
 
 	void GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer);
 	void QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESULT* nResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer);
 
 	PXOVERLAPPED ovelapped;
 
-	bool inProgress = false;
+	enum OperationState : int
+	{
+		OperationPending,
+		OperationIncomplete,
+		OperationFinished
+	};
+
+	OperationState operationState = OperationPending;
 	int ServersLeftInDocumentCount = -1;
 	int total_servers = 0;
+
+	DWORD cSearchPropertiesIDs = 0;
+	DWORD* pSearchPropertyIDs = nullptr;
 
 	//TODO:
 	std::atomic<bool> cancelOperation = false;

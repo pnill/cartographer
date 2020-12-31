@@ -36,10 +36,9 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 	return size * nmemb;
 }
 
-void BadServer(ULONGLONG xuid, XLOCATOR_SEARCHRESULT* nResult, const char* log_catch)
+void BadServer(ULONGLONG xuid, const char* log_catch)
 {
-	LOG_TRACE_GAME("BadServer - XUID: {0} - Log Catch: {1}", xuid, log_catch);
-	SecureZeroMemory(nResult, sizeof(XLOCATOR_SEARCHRESULT));
+	LOG_TRACE_GAME("{} - XUID: {0} - Log Catch: {1}", __FUNCTION__, xuid, log_catch);
 }
 
 DWORD ComputeXLocatorServerEnumeratorBufferSize(DWORD cItems, DWORD cRequiredPropertyIDs, DWORD* pRequredPropertiesIDs, DWORD* outStringBufferSize)
@@ -76,6 +75,9 @@ void ServerList::QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESU
 
 	int strings = 0;
 
+	XLOCATOR_SEARCHRESULT tSearchResults;
+	ZeroMemory(&tSearchResults, sizeof(XLOCATOR_SEARCHRESULT));
+
 	if (curl) {
 
 		std::string server_url = std::string(cartographerURL + "/live/servers/");
@@ -90,135 +92,134 @@ void ServerList::QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESU
 		doc.Parse(readBuffer.c_str());
 
 		if (!doc.HasMember("dwMaxPublicSlots")) {
-			BadServer(xuid, nResult, "Missing Member: dwMaxPublicSlots");
+			BadServer(xuid, "Missing Member: dwMaxPublicSlots");
 			return;
 		}
-		nResult->dwMaxPublicSlots = doc["dwMaxPublicSlots"].GetUint();
+		tSearchResults.dwMaxPublicSlots = doc["dwMaxPublicSlots"].GetUint();
 
 		if (!doc.HasMember("dwFilledPublicSlots"))
 		{
-			BadServer(xuid, nResult, "Missing Member: dwFilledPublicSlots");
+			BadServer(xuid, "Missing Member: dwFilledPublicSlots");
 			return;
 		}
-		nResult->dwFilledPublicSlots = doc["dwFilledPublicSlots"].GetUint();
+		tSearchResults.dwFilledPublicSlots = doc["dwFilledPublicSlots"].GetUint();
 
 		if (!doc.HasMember("dwMaxPrivateSlots"))
 		{
-			BadServer(xuid, nResult, "Missing Member: dwFilledPublicSlots");
+			BadServer(xuid, "Missing Member: dwFilledPublicSlots");
 			return;
 		}
-		nResult->dwMaxPrivateSlots = doc["dwMaxPrivateSlots"].GetUint();
+		tSearchResults.dwMaxPrivateSlots = doc["dwMaxPrivateSlots"].GetUint();
 
 		if (!doc.HasMember("dwMaxFilledPrivateSlots"))
 		{
-			BadServer(xuid, nResult, "Missing Member: dwMaxFilledPrivateSlots");
+			BadServer(xuid, "Missing Member: dwMaxFilledPrivateSlots");
 			return;
 		}
-		nResult->dwFilledPrivateSlots = doc["dwMaxFilledPrivateSlots"].GetUint();
+		tSearchResults.dwFilledPrivateSlots = doc["dwMaxFilledPrivateSlots"].GetUint();
 
 		if (!doc.HasMember("dwServerType"))
 		{
-			BadServer(xuid, nResult, "Missing Member: dwServerType");
+			BadServer(xuid, "Missing Member: dwServerType");
 			return;
 		}
-		nResult->dwServerType = doc["dwServerType"].GetUint();
+		tSearchResults.dwServerType = doc["dwServerType"].GetUint();
 
 #pragma region Xbox Network Address Reading
 		// TODO: this is the LAN address, may be useful in the future
-		nResult->serverAddress.ina.s_addr = 0; // currently we set it to 0
+		tSearchResults.serverAddress.ina.s_addr = 0; // currently we set it to 0
 
 		if (!doc.HasMember("xnaddr") || !doc["xnaddr"].IsUint())
 		{
-			BadServer(xuid, nResult, "Missing Member: xnaddr");
+			BadServer(xuid, "Missing Member: xnaddr");
 			return;
 		}
 		nResult->serverAddress.inaOnline.s_addr = htonl(doc["xnaddr"].GetUint());
 
 		if (!doc.HasMember("dwPort"))
 		{
-			BadServer(xuid, nResult, "Missing Member: dwPort");
+			BadServer(xuid, "Missing Member: dwPort");
 			return;
 		}
-		nResult->serverAddress.wPortOnline = htons(doc["dwPort"].GetUint());
+		tSearchResults.serverAddress.wPortOnline = htons(doc["dwPort"].GetUint());
 
 		if (!doc.HasMember("abenet"))
 		{
-			BadServer(xuid, nResult, "Missing Member: abEnet");
+			BadServer(xuid, "Missing Member: abEnet");
 			return;
 		}
 		const char* abEnet_str = doc["abenet"].GetString();
 		if (abEnet_str == NULL)
 		{
-			BadServer(xuid, nResult, "abEnet == NULL");
+			BadServer(xuid, "abEnet == NULL");
 			return;
 		}
-		HexStrToBytes(abEnet_str, nResult->serverAddress.abEnet, sizeof(XNADDR::abEnet));
+		HexStrToBytes(abEnet_str, tSearchResults.serverAddress.abEnet, sizeof(XNADDR::abEnet));
 
 		if (!doc.HasMember("abonline"))
 		{
-			BadServer(xuid, nResult, "Missing Member: abOnline");
+			BadServer(xuid, "Missing Member: abOnline");
 			return;
 		}
 		const char* abOnline_str = doc["abonline"].GetString();
 		if (abOnline_str == NULL)
 		{
-			BadServer(xuid, nResult, "abOnline == NULL");
+			BadServer(xuid, "abOnline == NULL");
 			return;
 		}
-		HexStrToBytes(abOnline_str, nResult->serverAddress.abOnline, sizeof(XNADDR::abOnline));
+		HexStrToBytes(abOnline_str, tSearchResults.serverAddress.abOnline, sizeof(XNADDR::abOnline));
 #pragma endregion
 		
 #pragma region Xbox Transport Security Keys Reading
 		if (!doc.HasMember("xnkid"))
 		{
-			BadServer(xuid, nResult, "Missing Member: xnkid");
+			BadServer(xuid, "Missing Member: xnkid");
 			return;
 		}
 		const char* xnkid_str = doc["xnkid"].GetString();
 		if (xnkid_str == NULL)
 		{
-			BadServer(xuid, nResult, "xnkid == NULL");
+			BadServer(xuid, "xnkid == NULL");
 			return;
 		}
-		HexStrToBytes(xnkid_str, nResult->xnkid.ab, sizeof(XNKID));
+		HexStrToBytes(xnkid_str, tSearchResults.xnkid.ab, sizeof(XNKID));
 
 		if (!doc.HasMember("xnkey"))
 		{
-			BadServer(xuid, nResult, "Missing Member: xnkey");
+			BadServer(xuid, "Missing Member: xnkey");
 			return;
 		}
 		const char* xnkey_str = doc["xnkey"].GetString();
 		if (xnkey_str == NULL)
 		{
-			BadServer(xuid, nResult, "xnkey == NULL");
+			BadServer(xuid, "xnkey == NULL");
 			return;
 		}
-		HexStrToBytes(xnkey_str, nResult->xnkey.ab, sizeof(XNKEY));
+		HexStrToBytes(xnkey_str, tSearchResults.xnkey.ab, sizeof(XNKEY));
 #pragma endregion
 
 		if (!doc.HasMember("xuid"))
 		{
-			BadServer(xuid, nResult, "Missing Member: xuid");
+			BadServer(xuid, "Missing Member: xuid");
 			return;
 		}
-		nResult->serverID = doc["xuid"].GetUint64();
+		tSearchResults.serverID = doc["xuid"].GetUint64();
 
 		if (!doc.HasMember("pProperties") || !doc.HasMember("cProperties"))
 		{
-			BadServer(xuid, nResult, "Missing Member: cProperties or pProperties");
+			BadServer(xuid, "Missing Member: cProperties or pProperties");
 			return;
 		}
 
-		nResult->cProperties = 0;
-		nResult->pProperties = *propertiesBuffer;
+		tSearchResults.cProperties = 0;
+		tSearchResults.pProperties = *propertiesBuffer;
 
 		std::vector<DWORD> propertiesWritten;
 
 		for (auto& property : doc["pProperties"].GetArray())
 		{
-			DWORD propertyId = property["dwPropertyId"].GetInt();
-
 			bool propertyNeeded = false;
+			DWORD propertyId = property["dwPropertyId"].GetInt();
 
 			for (int i = 0; i < cSearchPropertiesIDs; i++)
 			{
@@ -235,11 +236,12 @@ void ServerList::QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESU
 				continue;
 			}
 
-			XUSER_PROPERTY* userProperty = &nResult->pProperties[nResult->cProperties];
+			// temporary memory
+			XUSER_PROPERTY tProperty;
+			ZeroMemory(&tProperty, sizeof(XUSER_PROPERTY));
 
-			ZeroMemory(userProperty, sizeof(XUSER_PROPERTY));
-			userProperty->dwPropertyId = propertyId;
-			userProperty->value.type = property["type"].GetInt();
+			tProperty.dwPropertyId = propertyId;
+			tProperty.value.type = property["type"].GetInt();
 
 			propertiesWritten.push_back(propertyId);
 
@@ -247,37 +249,40 @@ void ServerList::QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESU
 			int str_len = 0;
 
 			std::wstring str;
-			wchar_t* unicode_data = nullptr;
 			GenericStringBuffer<UTF16<> > buffer;
 			Writer<GenericStringBuffer<UTF16<> >, UTF8<>, UTF16<> > writer(buffer);
+
 			switch (property["type"].GetInt())
 			{
 			case XUSER_DATA_TYPE_INT32:
-				userProperty->value.nData = property["value"].GetInt();
+				tProperty.value.nData = property["value"].GetInt();
+				break;
+
+			case XUSER_DATA_TYPE_INT64:
+				tProperty.value.i64Data = property["value"].GetInt64();
 				break;
 
 			case XUSER_DATA_TYPE_UNICODE:
-				unicode_data = *stringBuffer;
 				writer.String(property["value"].GetString());
 
 				str.append(buffer.GetString());
 				str.erase(std::remove(str.begin(), str.end(), '"'), str.end());
 				str.erase(std::remove(str.begin(), str.end(), '\\'), str.end());
 
-				SecureZeroMemory(unicode_data, X_PROPERTY_UNICODE_BUFFER_SIZE);
+				if (!cancelOperation)
+				{
+					SecureZeroMemory(*stringBuffer, X_PROPERTY_UNICODE_BUFFER_SIZE);
 
-				wcscpy(*stringBuffer, str.c_str());
+					wcscpy(*stringBuffer, str.c_str());
 
-				userProperty->value.string.cbData = wcsnlen(unicode_data, 64) * sizeof(WCHAR) + 2;
-				userProperty->value.string.pwszData = unicode_data;
+					tProperty.value.string.cbData = wcsnlen(*stringBuffer, 64) * sizeof(WCHAR) + 2;
+					tProperty.value.string.pwszData = *stringBuffer;
 
-				*stringBuffer = (WCHAR*)((BYTE*)(*stringBuffer) + X_PROPERTY_UNICODE_BUFFER_SIZE);
+					*stringBuffer = (WCHAR*)((BYTE*)(*stringBuffer) + X_PROPERTY_UNICODE_BUFFER_SIZE);
+				}
+				
 				strings++;
 
-				break;
-
-			case XUSER_DATA_TYPE_INT64:
-				userProperty->value.i64Data = property["value"].GetInt64();
 				break;
 
 			case XUSER_DATA_TYPE_BINARY:
@@ -288,29 +293,37 @@ void ServerList::QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESU
 				break;
 			}
 
-			nResult->cProperties++;
-
-			(*propertiesBuffer)++;
-		}
-
-		for (auto property : propertiesWritten)
-		{
-			int i = 0;
-			bool foundMatch = false;
-			for (i; i < cSearchPropertiesIDs; i++)
+			if (!cancelOperation)
 			{
-				if (pSearchPropertyIDs[i] == property)
+				tSearchResults.pProperties[tSearchResults.cProperties] = tProperty;
+				tSearchResults.cProperties++;
+				(*propertiesBuffer)++;
+			}
+
+			for (auto property : propertiesWritten)
+			{
+				int i = 0;
+				bool foundMatch = false;
+				for (i; i < cSearchPropertiesIDs; i++)
 				{
-					foundMatch = true;
-					break;
+					if (pSearchPropertyIDs[i] == property)
+					{
+						foundMatch = true;
+						break;
+					}
+				}
+
+				if (!foundMatch)
+				{
+					LOG_ERROR_XLIVE("{} - couldn't find property: 0x{:X}", __FUNCTION__, pSearchPropertyIDs[i]);
 				}
 			}
-
-			if (!foundMatch)
-			{
-				LOG_ERROR_XLIVE("{} - couldn't find property: 0x{:X}", __FUNCTION__, pSearchPropertyIDs[i]);
-			}
 		}
+	}
+
+	if (!cancelOperation)
+	{
+		*nResult = tSearchResults;
 	}
 
 	//LOG_ERROR_XLIVE("{} : string count: {}, properties: {}", __FUNCTION__, strings, nResult->cProperties);
@@ -322,14 +335,18 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 {
 	auto cleanup = [this]()
 	{
+
+		// FIXME: fix logic
+		// for now keep the way we handled serverlist request before
 		ServerListRequestsMutex.lock();
+		this->operationState = OperationFinished;
 
-		serverListRequests.erase(Handle);
-		XCloseHandle(Handle);
+		//serverListRequests.erase(this->Handle);
+		//XCloseHandle(this->Handle);
 
-		delete[] this->pSearchPropertyIDs;
+		//delete[] this->pSearchPropertyIDs;
 
-		delete this;
+		//delete this;
 
 		ServerListRequestsMutex.unlock();
 	};
@@ -352,6 +369,8 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 
 	// we sucessfully locked ServerListRequestInProgress, let's get the server list
 
+	ovelapped->InternalLow = ERROR_IO_INCOMPLETE;
+
 	addDebugText("Requesting server list");
 
 	CURL *curl;
@@ -359,9 +378,6 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 	std::string readBuffer;
 
 	this->total_servers = 0;
-
-	// first we set the overlapped status to ERROR_IO_PENDING
-	ovelapped->InternalLow = ERROR_IO_INCOMPLETE;
 
 	curl = curl_easy_init();
 	if (curl) {
@@ -401,6 +417,9 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 
 		for (auto& server : document["servers"].GetArray())
 		{
+			if (cancelOperation)
+				break;
+
 			ZeroMemory(&searchResults[this->GetTotalServers()], sizeof(XLOCATOR_SEARCHRESULT));
 			LOG_ERROR_XLIVE("{} - search results ptr: 0x{:x}, properties buffer: 0x{:X}, stringBuffer: 0x{:X}", __FUNCTION__, (DWORD)searchResults, (DWORD)propertiesBuffer, (DWORD)stringBuffer);
 
@@ -425,7 +444,7 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 			ovelapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
 		}
 
-		LOG_TRACE_XLIVE("{} - found a total of: {} servers", this->GetTotalServers());
+		LOG_TRACE_XLIVE("{} - found a total of: {} servers", __FUNCTION__, this->GetTotalServers());
 
 		curl_easy_cleanup(curl);
 	}
@@ -498,33 +517,37 @@ DWORD ServerList::GetServers(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXO
 	}
 
 	// check if the thread didn't start and if the I/O operation didn't execute
-	if (!serverQuery->inProgress)
+	if (serverQuery->operationState == OperationPending)
 	{
-		serverQuery->inProgress = true;
+		serverQuery->operationState = OperationIncomplete;
 		serverQuery->ovelapped = pOverlapped;
 		serverQuery->serv_thread = std::thread(&ServerList::GetServersFromHttp, serverQuery, cbBuffer, pvBuffer);
 		serverQuery->serv_thread.detach();
 	}
-
 	// if there are no more servers to be read from the received document, return ERROR_NO_MORE_FILES
-	if (serverQuery->ServersLeftInDocumentCount == 0)
-	{
-		// reset ServersLeftInDocumentCount to "unitialized state"
-		serverQuery->ServersLeftInDocumentCount = -1;
-
-		// set the ERROR_NO_MORE_FILES flag to tell the game XEnumerate is done searching
-		if (serverQuery->GetTotalServers() > 0)
-		{
-			pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
-			pOverlapped->InternalHigh = serverQuery->GetTotalServers();
-			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
-		}
-	}
-	else
+	else if (serverQuery->operationState == OperationIncomplete)
 	{
 		// otherwise tell the game we are still running I/O operations
 		pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
 		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
+	}
+	else if (serverQuery->operationState == OperationFinished)
+	{
+		// check if we didn't find any servers
+		if (serverQuery->GetTotalServers() > 0)
+		{
+			// if we didn't find any, let the game know
+			serverQuery->ovelapped->InternalLow = ERROR_NO_MORE_FILES;
+			serverQuery->ovelapped->InternalHigh = 0;
+			serverQuery->ovelapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
+		}
+
+		serverListRequests.erase(serverQuery->Handle);
+		XCloseHandle(serverQuery->Handle);
+
+		delete[] serverQuery->pSearchPropertyIDs;
+
+		delete serverQuery;
 	}
 
 	return ERROR_IO_PENDING;
@@ -734,7 +757,6 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 	return S_OK;
 }
 
-// 5234: ??
 // TODO: implement filters
 DWORD WINAPI XLocatorCreateServerEnumerator(int a1, DWORD cItems, DWORD cRequiredPropertyIDs, DWORD* pRequiredPropertyIDs, int a5, int a6, int a7, int a8, DWORD* pcbBuffer, PHANDLE phEnum)
 {
@@ -742,27 +764,34 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, DWORD cItems, DWORD cRequire
 
 	std::lock_guard<std::mutex> lg(ServerListRequestsMutex);
 
-	ServerList* serverListRequest = new ServerList;
+	ServerList* serverListRequest = nullptr;
+
+	// FIXME: for now we keep only 1 serverlist request, just update the handle
+	if (serverListRequests.empty())
+	{
+		serverListRequest = new ServerList(cRequiredPropertyIDs, pRequiredPropertyIDs);
+	}
+	else
+	{
+		serverListRequest = serverListRequests.begin()->second; // get the first and the only element for now
+		serverListRequests.erase(serverListRequest->Handle);
+		XCloseHandle(serverListRequest->Handle);
+	}
 
 	*pcbBuffer = ComputeXLocatorServerEnumeratorBufferSize(cItems, cRequiredPropertyIDs, pRequiredPropertyIDs, nullptr);
-
-	serverListRequest->cSearchPropertiesIDs = cRequiredPropertyIDs;
-	serverListRequest->pSearchPropertyIDs = new DWORD[cRequiredPropertyIDs];
-	memcpy(serverListRequest->pSearchPropertyIDs, pRequiredPropertyIDs, cRequiredPropertyIDs * sizeof(*pRequiredPropertyIDs));
-
+	
 	if (phEnum)
 	{
 		*phEnum = serverListRequest->Handle = CreateMutex(NULL, NULL, NULL);
 
 		LOG_TRACE_XLIVE("- Handle = {:p}", (void*)*phEnum);
-
+		
 		serverListRequests.insert(std::make_pair(serverListRequest->Handle, serverListRequest));
 
 		return ERROR_SUCCESS;
 	}
 	else
 	{
-		delete serverListRequest;
 		return ERROR_INVALID_PARAMETER;
 	}
 
@@ -794,7 +823,6 @@ DWORD WINAPI XLocatorCreateServerEnumeratorByIDs(DWORD a1, DWORD a2, DWORD a3, D
 	return ERROR_INVALID_PARAMETER;
 }
 
-
 // 5236: ??
 DWORD WINAPI XLocatorServiceInitialize(DWORD a1, PHANDLE phLocatorService)
 {
@@ -811,12 +839,18 @@ DWORD WINAPI XLocatorServiceInitialize(DWORD a1, PHANDLE phLocatorService)
 	return ERROR_SUCCESS;
 }
 
-
 // 5237: ??
 DWORD WINAPI XLocatorServiceUnInitialize(HANDLE xlocatorhandle)
 {
+	std::lock_guard<std::mutex> lg(ServerListRequestsMutex);
+
 	LOG_TRACE_XLIVE("XLocatorServiceUnInitialize(a1 = {})", xlocatorhandle);
 	CloseHandle(xlocatorhandle);
+
+	for (auto request : serverListRequests)
+	{
+		request.second->CancelOperation();
+	}
 
 	g_hXLocatorHandle = INVALID_HANDLE_VALUE;
 
