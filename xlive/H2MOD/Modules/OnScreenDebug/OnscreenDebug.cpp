@@ -17,17 +17,35 @@ int getDebugTextDisplayCount() {
 	return DebugTextCount;
 }
 
-void addDebugText(const wchar_t* wtext) {
-	int lenInput = wcslen(wtext) + 1;
-	char* text = (char*)calloc(1, sizeof(char) * lenInput);
-	snprintf(text, lenInput, "%ls", wtext);
-	addDebugText(text);
-	free(text);
+void addDebugText(const wchar_t* format, ...)
+{
+	va_list valist;
+	va_start(valist, format);
+
+	/* get the formatted buffer size */
+	int stringLength = _vscwprintf(format, valist) + 1; // +1 adds null characeter, "_vscwprintf" doesn't add it
+
+	if (stringLength == -1)
+	{
+		LOG_TRACE_GAME("{} - error trying to get string length size", __FUNCTION__);
+		return;
+	}
+
+	wchar_t* textBufferW = (wchar_t*)calloc(stringLength, sizeof(wchar_t));
+	_vswprintf(textBufferW, format, valist);
+
+	char* textBufferA = (char*)calloc(stringLength, sizeof(char));
+	_snprintf(textBufferA, stringLength, "%ls", textBufferW);
+
+	addDebugText(textBufferA);
+
+	free(textBufferW);
+	free(textBufferA);
 }
 
 void addDebugText(const char* text) {
 	int buflen = strlen(text) + 1;
-	char* text2 = (char*)calloc(1, sizeof(char) * buflen);
+	char* text2 = (char*)calloc(buflen, sizeof(char));
 	memcpy(text2, text, sizeof(char) * buflen);
 	addDebugText(text2);
 	free(text2);
@@ -46,9 +64,9 @@ void addDebugText(char* text) {
 	DebugTextCount++;
 	if (DebugTextCount >= DebugTextArrayLenMax)
 		DebugTextCount = DebugTextArrayLenMax;
-		
+
 	DebugTextArrayPos++;
-	if (DebugTextArrayPos >= DebugTextArrayLenMax) 
+	if (DebugTextArrayPos >= DebugTextArrayLenMax)
 		DebugTextArrayPos = 0;
 
 	if (DebugStr[DebugTextArrayPos])
