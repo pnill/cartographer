@@ -394,7 +394,7 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 
 		DWORD outStringBufferSize = 0;
 
-		if (ComputeXLocatorServerEnumeratorBufferSize(server_count, cSearchPropertiesIDs, pSearchPropertyIDs, &outStringBufferSize) > cbBuffer) 
+		if (ComputeXLocatorServerEnumeratorBufferSize(server_count, cSearchPropertiesIDs, pSearchPropertyIDs, &outStringBufferSize) > cbBuffer)
 		{
 			curl_easy_cleanup(curl);
 
@@ -402,7 +402,7 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 
 			ovelapped->InternalLow = ERROR_INSUFFICIENT_BUFFER;
 			ovelapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-			
+
 			ServerListRequestInProgress.unlock();
 			cleanup();
 
@@ -434,7 +434,7 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 
 			this->ServersLeftInDocumentCount--;
 		}
-		
+
 		// check if we didn't find any servers
 		if (this->GetTotalServers() == 0)
 		{
@@ -445,6 +445,8 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 		}
 
 		LOG_TRACE_XLIVE("{} - found a total of: {} servers", __FUNCTION__, this->GetTotalServers());
+
+		addDebugText(L"Found %d servers", this->GetTotalServers());
 
 		curl_easy_cleanup(curl);
 	}
@@ -779,13 +781,13 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, DWORD cItems, DWORD cRequire
 	}
 
 	*pcbBuffer = ComputeXLocatorServerEnumeratorBufferSize(cItems, cRequiredPropertyIDs, pRequiredPropertyIDs, nullptr);
-	
+
 	if (phEnum)
 	{
 		*phEnum = serverListRequest->Handle = CreateMutex(NULL, NULL, NULL);
 
 		LOG_TRACE_XLIVE("- Handle = {:p}", (void*)*phEnum);
-		
+
 		serverListRequests.insert(std::make_pair(serverListRequest->Handle, serverListRequest));
 
 		return ERROR_SUCCESS;

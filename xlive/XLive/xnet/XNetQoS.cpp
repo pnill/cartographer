@@ -531,9 +531,8 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 	XNADDR** apxna_copy = new XNADDR*[cxna];
 	for (DWORD i = 0; i < cxna; i++)
 	{
-		XNADDR* xn = apxna[i];
 		apxna_copy[i] = new XNADDR;
-		memcpy(apxna_copy[i], xn, sizeof(XNADDR));
+		memcpy(apxna_copy[i], apxna[i], sizeof(XNADDR));
 	}
 
 	*pxnqos = (XNQOS*)new char[sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna - 1))];
