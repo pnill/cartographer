@@ -41,6 +41,7 @@ void addDebugText(const wchar_t* format, ...)
 
 	free(textBufferW);
 	free(textBufferA);
+	va_end(valist);
 }
 
 void addDebugText(const char* text) {
