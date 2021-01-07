@@ -598,6 +598,8 @@ void initGSRunLoop() {
 				QueryPerformanceFrequency(&freq);
 				//Remove original render call
 				NopFill(h2mod->GetAddress(0x39DAA), 5);
+				//Stop Hold to Zoom.
+				NopFill(h2mod->GetAddress(0x9355C), 4);
 			break;
 		}
 

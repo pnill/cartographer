@@ -914,7 +914,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 				tag_loader::Load_tag(0xE1BF0024, true, "christmas_hat_map");
 				tag_loader::Push_Back();
 				//auto scen = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(datum(_INJECTED_TAG_START_));
-				auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
+				/*auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
 				if (hlmt_chief_datum != datum::Null) {
 					auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
 					auto b = hlmt_chief->variants[0];
@@ -932,7 +932,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 					a->parent_marker = string_id(184552154);
 					a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 					a->child_object.TagIndex = tag_loader::ResolveNewDatum(0xE1BF0024);
-				}
+				}*/
 			}
 		}
 	}
@@ -980,6 +980,7 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	}
 
 	bool ret = p_player_spawn(playerDatumIndex);
+	//auto PlayerDatum = Player::getPlayerUnitDatumIndex(playerDatumIndex.ToAbsoluteIndex());
 
 	if(b_HeadHunter)
 	{
