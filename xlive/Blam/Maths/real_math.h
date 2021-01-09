@@ -83,6 +83,26 @@ struct real_vector3d
 		angle.roll = acos(k);
 		return angle;
 	}
+	float length() const
+	{
+		return sqrtf(i * i + j * j + k * k);
+	}
+	real_vector3d normal() const
+	{
+		return *this / length();
+	}
+	float dot(const real_vector3d& lhs) const
+	{
+		return this->i*lhs.i + this->j * lhs.j + this->k  * lhs.k;
+	}
+	real_vector3d cross_product(const real_vector3d& lhs) const
+	{
+		real_vector3d r;
+		r.i = this->j * lhs.k - this->k * lhs.j;
+		r.j = this->k * lhs.i - this->i * lhs.k;
+		r.k = this->i * lhs.j - this->j * lhs.i;
+		return r;
+	}
 	inline bool operator==(const real_vector3d& lhs) const
 	{
 		return (lhs.i == i && lhs.j == j && lhs.k == k);
@@ -90,6 +110,26 @@ struct real_vector3d
 	inline bool operator!=(const real_vector3d& lhs) const
 	{
 		return !operator==(lhs);
+	}
+	real_vector3d operator/(const float rhs) const
+	{
+		real_vector3d r;
+		r.i = this->i / rhs;
+		r.j = this->j / rhs;
+		r.k = this->k / rhs;
+		return r;
+	}
+	real_vector3d operator+(const real_vector3d& lhs) const
+	{
+		return { this->i + lhs.i, this->j + lhs.j, this->k + lhs.k };
+	}
+	real_vector3d operator-(const real_vector3d& lhs) const
+	{
+		return { this->i - lhs.i, this->j - lhs.j, this->k - lhs.k };
+	}
+	real_vector3d operator*(const float lhs) const
+	{
+		return { this->i * lhs, this->j *lhs, this->k * lhs };
 	}
 };
 CHECK_STRUCT_SIZE(real_vector3d, sizeof(float) * 3);
