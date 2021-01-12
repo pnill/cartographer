@@ -137,7 +137,7 @@ namespace TagFixes
 		}
 		void fall_damage_fix()
 		{
-			if (get_game_life_cycle() == Multiplayer) {
+			if (h2mod->GetMapType() == Multiplayer) {
 				*(float*)(&tags::get_tag_data()[0xE610B0]) = 14.0f; /*masterchief_mp hlmt max abs acc default value doubled*/
 				*(float*)(&tags::get_tag_data()[0xE610B4]) = 20.0f; /*masterchief_mp hlmt max abs acc default value doubled*/
 				*(float*)(&tags::get_tag_data()[0xE65D98]) = 14.0f; /*elite_mp hlmt max abs acc default value doubled*/

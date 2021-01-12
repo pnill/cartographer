@@ -274,6 +274,7 @@
     <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
     <ClCompile Include="Blam\Engine\Players\Players.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\debug_overlay.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_handler.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\MOTD.cpp" />

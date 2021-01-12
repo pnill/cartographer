@@ -19,12 +19,21 @@ namespace imgui_handler
 	static bool                 g_WantUpdateHasGamepad = true;
 	static LPDIRECT3DDEVICE9	g_pDevice;
 	static PDIRECT3DTEXTURE9	g_patchNotes_Image = NULL;
+	static bool					g_block_input = false;
 
 	HWND get_HWND()
 	{
 		return g_hWnd;
 	}
 
+	bool ImGuiShoulBlockInput()
+	{
+		return g_block_input;
+	}
+	void ImGuiToggleInput(bool state)
+	{
+		g_block_input = state;
+	}
 	bool CanDrawImgui()
 	{
 		for(auto &window : windows)
@@ -221,6 +230,7 @@ namespace imgui_handler
 	{
 		windows.emplace_back("Advanced Settings", false, AdvancedSettings::Render, AdvancedSettings::Open, AdvancedSettings::Close);
 		windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
+		windows.emplace_back("debug_overlay", false, DebugOverlay::Render, DebugOverlay::Open, DebugOverlay::Close);
 		
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -402,4 +412,5 @@ namespace imgui_handler
 		};
 		std::thread(grab_thread).detach();
 	}
+
 }
