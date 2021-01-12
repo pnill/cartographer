@@ -87,10 +87,7 @@ void initInstanceNumber() {
 			CloseHandle(mutex);
 		}
 	} while (lastErr == ERROR_ALREADY_EXISTS);
-
-	char NotificationPlayerText[30];
-	sprintf(NotificationPlayerText, "You are Instance #%d.", instanceNumber);
-	addDebugText(NotificationPlayerText);
+	addDebugText("You are Instance #%d.", instanceNumber);
 }
 
 wchar_t xinput_path[_MAX_PATH];
@@ -275,9 +272,8 @@ void initLocalAppData() {
 		addDebugText("ERROR: Could not find AppData Local. Using Process File Path:");
 	}
 	else {
-		addDebugText("Found AppData Local:");
+		addDebugText("Found AppData Local: %s", H2AppDataLocal);
 	}
-	addDebugText(H2AppDataLocal);
 }
 
 CRITICAL_SECTION log_section;

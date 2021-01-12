@@ -6,6 +6,8 @@
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 
+#include "..\xnet\IpManagement\XnIp.h"
+
 #include "H2MOD\Modules\Utils\Utils.h"
 
 using namespace rapidjson;
@@ -126,15 +128,19 @@ void ServerList::QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESU
 		tSearchResults.dwServerType = doc["dwServerType"].GetUint();
 
 #pragma region Xbox Network Address Reading
-		// TODO: this is the LAN address, may be useful in the future
-		tSearchResults.serverAddress.ina.s_addr = 0; // currently we set it to 0
+		if (!doc.HasMember("lanaddr") || !doc["lanaddr"].IsUint())
+		{
+			BadServer(xuid, "Missing Member: lanaddr");
+			return;
+		}
+		tSearchResults.serverAddress.ina.s_addr = doc["lanaddr"].GetUint();
 
 		if (!doc.HasMember("xnaddr") || !doc["xnaddr"].IsUint())
 		{
 			BadServer(xuid, "Missing Member: xnaddr");
 			return;
 		}
-		nResult->serverAddress.inaOnline.s_addr = htonl(doc["xnaddr"].GetUint());
+		tSearchResults.serverAddress.inaOnline.s_addr = htonl(doc["xnaddr"].GetUint());
 
 		if (!doc.HasMember("dwPort"))
 		{
@@ -394,7 +400,7 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 
 		DWORD outStringBufferSize = 0;
 
-		if (ComputeXLocatorServerEnumeratorBufferSize(server_count, cSearchPropertiesIDs, pSearchPropertyIDs, &outStringBufferSize) > cbBuffer)
+		if (ComputeXLocatorServerEnumeratorBufferSize(server_count, cSearchPropertiesIDs, pSearchPropertyIDs, &outStringBufferSize) > cbBuffer) 
 		{
 			curl_easy_cleanup(curl);
 
@@ -402,7 +408,7 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 
 			ovelapped->InternalLow = ERROR_INSUFFICIENT_BUFFER;
 			ovelapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-
+			
 			ServerListRequestInProgress.unlock();
 			cleanup();
 
@@ -432,7 +438,7 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 
 			this->ServersLeftInDocumentCount--;
 		}
-
+		
 		// check if we didn't find any servers
 		if (this->GetTotalServers() == 0)
 		{
@@ -623,6 +629,8 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 		Value xnkey_val(kStringType);
 		xnkey_val.SetString(ByteToHexStr(xnkey.ab, sizeof(XNKEY)).c_str(), document.GetAllocator());
 
+		XnIp* localUser = gXnIp.GetLocalUserXn();
+
 		document.AddMember("token", token, document.GetAllocator());
 		document.AddMember("xuid", Value().SetUint64(usersSignInInfo[dwUserIndex].xuid), document.GetAllocator());
 		document.AddMember("dwServerType", Value().SetInt(dwServerType), document.GetAllocator());
@@ -631,6 +639,9 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 		document.AddMember("dwMaxPrivateSlots", Value().SetInt(dwMaxPrivateSlots), document.GetAllocator());
 		document.AddMember("dwMaxFilledPrivateSlots", Value().SetInt(dwFilledPrivateSlots), document.GetAllocator());
 		document.AddMember("dwPort", Value().SetInt(H2Config_base_port), document.GetAllocator());
+		if (localUser) {
+			document.AddMember("lanaddr", Value().SetUint(localUser->xnaddr.ina.s_addr), document.GetAllocator());
+		}
 		document.AddMember("xnkid", xnkid_val, document.GetAllocator());
 		document.AddMember("xnkey", xnkey_val, document.GetAllocator());
 		document.AddMember("cProperties", Value().SetInt(cProperties + 3), document.GetAllocator());
@@ -779,13 +790,13 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, DWORD cItems, DWORD cRequire
 	}
 
 	*pcbBuffer = ComputeXLocatorServerEnumeratorBufferSize(cItems, cRequiredPropertyIDs, pRequiredPropertyIDs, nullptr);
-
+	
 	if (phEnum)
 	{
 		*phEnum = serverListRequest->Handle = CreateMutex(NULL, NULL, NULL);
 
 		LOG_TRACE_XLIVE("- Handle = {:p}", (void*)*phEnum);
-
+		
 		serverListRequests.insert(std::make_pair(serverListRequest->Handle, serverListRequest));
 
 		return ERROR_SUCCESS;

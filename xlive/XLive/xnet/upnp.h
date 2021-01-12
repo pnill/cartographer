@@ -42,12 +42,14 @@ namespace Utils
 	};
 }
 
-	class ModuleUPnP
-	{
-	public:
-		ModuleUPnP();
-		Utils::UPnPResult UPnPForwardPort(bool tcp, int externalport, int internalport, const std::string & ruleName);
-	private:
-		int upnpDiscoverError;
-		UPNPDev* upnpDevice = nullptr;
-	};
+class ModuleUPnP
+{
+public:
+	ModuleUPnP();
+	Utils::UPnPResult UPnPForwardPort(bool tcp, int externalport, int internalport, const std::string & ruleName);
+private:
+	int upnpDiscoverError;
+	UPNPDev* upnpDevice = nullptr;
+};
+
+void ForwardPorts();

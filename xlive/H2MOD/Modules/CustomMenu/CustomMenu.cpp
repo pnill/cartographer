@@ -873,11 +873,7 @@ void GSCustomMenuCall_Error_Inner() {
 			addDebugText(lblDesc);
 	}
 	else {
-		int debugTextBuflen = (strlen(lblTitle) + strlen(lblDesc) + 6) * sizeof(char);
-		char* debugText = (char*)malloc(debugTextBuflen);
-		snprintf(debugText, debugTextBuflen, "%s - %s", lblTitle, lblDesc);
-		addDebugText(debugText);
-		free(debugText);
+		addDebugText("%s - %s", lblTitle, lblDesc);
 	}
 }
 
@@ -923,11 +919,7 @@ void GSCustomMenuCall_Error_Outer() {
 	}
 	char* lblTitle = H2CustomLanguageGetLabel(CMLabelMenuId_Error, 0xFFFFFFF0);
 	char* lblDesc = H2CustomLanguageGetLabel(CMLabelMenuId_Error, 0xFFFFFFF1);
-	int debugTextBuflen = (strlen(lblTitle) + strlen(lblDesc) + 6) * sizeof(char);
-	char* debugText = (char*)malloc(debugTextBuflen);
-	snprintf(debugText, debugTextBuflen, "%s - %s", lblTitle, lblDesc);
-	addDebugText(debugText);
-	free(debugText);
+	addDebugText("%s - %s", lblTitle, lblDesc);
 }
 
 void GSCustomMenuCall_Error_Outer(char* title, char* description) {
@@ -1033,11 +1025,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Language_Sub() {//__thiscall
 }
 
 static bool CMButtonHandler_Language_Sub(int button_id) {
-	char NotificationPlayerText[40];
-	sprintf(NotificationPlayerText, "Button ID: %d", button_id);
-	//MessageBoxA(NULL, NotificationPlayerText, "btnness", MB_OK);
-	addDebugText(NotificationPlayerText);
-
+	addDebugText("Button ID: %d", button_id);
 	setCustomLanguage(CM_Language_Main == -1 ? cm_lang_other_lang_map[button_id] : CM_Language_Main, cm_lang_variant_map[button_id]);
 	return false;
 }
@@ -2386,11 +2374,7 @@ void GSCustomMenuCall_Update_Note() {
 			addDebugText(lblDesc);
 	}
 	else {
-		int debugTextBuflen = (strlen(lblTitle) + strlen(lblDesc) + 6) * sizeof(char);
-		char* debugText = (char*)malloc(debugTextBuflen);
-		snprintf(debugText, debugTextBuflen, "%s - %s", lblTitle, lblDesc);
-		addDebugText(debugText);
-		free(debugText);
+		addDebugText("%s - %s", lblTitle, lblDesc);
 	}
 }
 
@@ -3479,9 +3463,7 @@ static bool isAccountingActiveHandle() {
 
 static void updateAccountingActiveHandle(bool active) {
 	accountingActiveHandleCount += active ? 1 : -1;
-	char handleCountString[40];
-	snprintf(handleCountString, 40, "Accounting Active: %d", accountingActiveHandleCount);
-	addDebugText(handleCountString);
+	addDebugText("Accounting Active: %d", accountingActiveHandleCount);
 	if (accountingActiveHandleCount <= 0) {
 		SaveH2Accounts();
 	}
@@ -4775,7 +4757,6 @@ int __cdecl sub_23f6b7(int a1)
 {
 	if (userSignedIn(0)) {
 		XUserSignOut(0);
-		ipManager.UnregisterLocalConnectionInfo();
 		UpdateConnectionStatus();
 	}
 	return psub_23f6b7(a1);

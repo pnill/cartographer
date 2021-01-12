@@ -106,6 +106,7 @@
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
+    <ClCompile Include="XLive\xnet\sock_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -361,6 +362,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\model_defenition.hpp" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="Util\Memory.h" />
+    <ClInclude Include="XLive\xnet\sock_utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

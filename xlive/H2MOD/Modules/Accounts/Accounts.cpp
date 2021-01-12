@@ -311,9 +311,7 @@ bool ReadH2Accounts() {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2AppDataLocal);
 	}
 
-	wchar_t fileConfigPathLog[1124];
-	swprintf(fileConfigPathLog, 1024, L"Reading Accounts: \"%ws\"", fileConfigPath);
-	addDebugText(fileConfigPathLog);
+	addDebugText(L"Reading Accounts: \"%ws\"", fileConfigPath);
 	if (TestGetAccountConfigLock(fileConfigPath)) {
 		addDebugText("Mutex Obtained!");
 
@@ -334,7 +332,7 @@ bool ReadH2Accounts() {
 			SI_Error rc = ini.LoadFile(fileConfig);
 			if (rc < 0)
 			{
-				addDebugText(std::string("ini.LoadFile() failed with error: " + std::to_string(rc) + " while reading H2 accounts file").c_str());
+				addDebugText("ini.LoadFile() failed with error: %d while reading H2 accounts file", (int)rc);
 			}
 			else
 			{

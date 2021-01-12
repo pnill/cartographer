@@ -57,9 +57,7 @@ void postConfig() {
 		addDebugText(NotificationPlayerText);
 		MessageBoxA(NULL, NotificationPlayerText, "BASE PORT BIND WARNING!", MB_OK);
 	}
-	char NotificationText5[120];
-	sprintf(NotificationText5, "Base port: %d.", H2Config_base_port);
-	addDebugText(NotificationText5);
+	addDebugText("Base port: %d.", H2Config_base_port);
 
 	RefreshTogglexDelay();
 }
@@ -73,7 +71,6 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 	if (a2 == 0xb9) {
 		//boot them offline.
 		XUserSignOut(0);
-		ipManager.UnregisterLocalConnectionInfo();
 		UpdateConnectionStatus();
 		H2Config_master_ip = inet_addr("127.0.0.1");
 		H2Config_master_port_relay = 2001;

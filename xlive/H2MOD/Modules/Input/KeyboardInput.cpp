@@ -107,26 +107,12 @@ void KeyboardInput::ExecuteHotkey(WPARAM message)
 void hotkeyFuncHelp() {
 	addDebugText("------------------------------");
 	addDebugText("Options:");
-	char tempTextEntry[255];
-
-	snprintf(tempTextEntry, 255, "%s - Toggle hiding this text display.", GetVKeyCodeString(H2Config_hotkeyIdToggleDebug).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Print and show this help text.", GetVKeyCodeString(H2Config_hotkeyIdHelp).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Align/Correct window positioning (into Borderless).", GetVKeyCodeString(H2Config_hotkeyIdAlignWindow).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Toggle Windowed/Borderless mode.", GetVKeyCodeString(H2Config_hotkeyIdWindowMode).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Toggles hiding the in-game chat menu.", GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Toggles hiding the Console Menu.", GetVKeyCodeString(H2Config_hotkeyIdConsole).c_str());
-	addDebugText(tempTextEntry);
-
+	addDebugText("%s - Toggle hiding this text display.", GetVKeyCodeString(H2Config_hotkeyIdToggleDebug).c_str());
+	addDebugText("%s - Print and show this help text.", GetVKeyCodeString(H2Config_hotkeyIdHelp).c_str());
+	addDebugText("%s - Align/Correct window positioning (into Borderless).", GetVKeyCodeString(H2Config_hotkeyIdAlignWindow).c_str());
+	addDebugText("%s - Toggle Windowed/Borderless mode.", GetVKeyCodeString(H2Config_hotkeyIdWindowMode).c_str());
+	addDebugText("%s - Toggles hiding the in-game chat menu.", GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat).c_str());
+	addDebugText("%s - Toggles hiding the Console Menu.", GetVKeyCodeString(H2Config_hotkeyIdConsole).c_str());
 	addDebugText("------------------------------");
 	setDebugTextDisplay(true);
 }

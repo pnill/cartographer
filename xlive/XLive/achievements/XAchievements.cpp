@@ -8,7 +8,7 @@ int achievementEnumeratorFlags = 0;
 int achievementEnumeratorIndex = 0;
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
-HANDLE g_dwFakeAchievementContent = (HANDLE)-2;
+HANDLE g_dwFakeAchievementContent = INVALID_HANDLE_VALUE;
 
 
 // #5278: XUserWriteAchievements

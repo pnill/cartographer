@@ -27,8 +27,12 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 
 		if (pSessionInfo)
 		{
-			ipManager.GetLocalXNAddr(&pSessionInfo->hostAddress);
-			ipManager.getLastRegisteredKeys(&pSessionInfo->sessionID, &pSessionInfo->keyExchangeKey);
+			ZeroMemory(&pSessionInfo->hostAddress, sizeof(pSessionInfo->hostAddress));
+			if (gXnIp.GetLocalUserXn() != nullptr)
+				pSessionInfo->hostAddress = gXnIp.GetLocalUserXn()->xnaddr;
+
+			// TODO FIXME this is a hack, determine another way of getting the session id key
+			gXnIp.getLastRegisteredKeys(&pSessionInfo->sessionID, &pSessionInfo->keyExchangeKey);
 		}
 
 		LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_HOST");

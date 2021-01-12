@@ -1,6 +1,9 @@
 #include "stdafx.h"
+
 #include "upnp.h"
 #include <miniupnpc/upnpcommands.h>
+
+#include "H2MOD\Modules\Config\Config.h"
 
 /* Ripped from ED thanks guys - PermaNull*/
 ModuleUPnP::ModuleUPnP()
@@ -36,11 +39,26 @@ Utils::UPnPResult ModuleUPnP::UPnPForwardPort(bool tcp, int externalport, int in
 	return Utils::UPnPResult(type, ret);
 }
 
+void ForwardPorts()
+{
+	ModuleUPnP upnp;
+	Utils::UPnPResult upnpResult(Utils::UPnPErrorType::None, 0);
+
+	upnpResult = upnp.UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2");
+	LOG_TRACE_NETWORK("ForwardPorts() - Halo2 port forwarding result: {}", upnpResult.ErrorCode);
+
+	upnp.UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2_1");
+	LOG_TRACE_NETWORK("ForwardPorts() - Halo2_1 port forwarding result: {}", upnpResult.ErrorCode);
+
+	upnp.UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
+	LOG_TRACE_NETWORK("ForwardPorts() - Halo2_QoSport forwarding result: {}", upnpResult.ErrorCode);
+
+	LOG_TRACE_NETWORK("ForwardPorts() - Finished forwarding ports.");
+}
 
 DWORD WINAPI XLiveGetUPnPState(DWORD a1)
 {
 	LOG_TRACE_XLIVE("XLiveGetUPnPState  (a1 = {:x})", a1);
-
 
 	return 0;
 }

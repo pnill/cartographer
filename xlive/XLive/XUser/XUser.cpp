@@ -4,6 +4,8 @@
 #include "Globals.h"
 #include "XLive\xbox\xbox.h"
 
+#include "../xnet/IpManagement/XnIp.h"
+
 WCHAR strw_XUser[8192];
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
@@ -46,7 +48,7 @@ bool userSignedOnline(DWORD dwUserIndex)
 	return false;
 }
 
-void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, bool online)
+void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, unsigned long xnaddr, unsigned long lanaddr, const char* abEnet, const char* abOnline, bool online)
 {
 	if (dwUserIndex != 0)
 		dwUserIndex = 0;
@@ -65,12 +67,17 @@ void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, bool online)
 	usersSignInInfo[dwUserIndex].dwGuestNumber = 0;
 	usersSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
 
+	gXnIp.SetupLocalConnectionInfo(xnaddr, lanaddr, abEnet, abOnline);
+
 	signInChanged[dwUserIndex] = true;
 }
 
 void XUserSignOut(DWORD dwUserIndex)
 {
+	// clear user sign in
 	SecureZeroMemory(&usersSignInInfo[dwUserIndex], sizeof(XUSER_SIGNIN_INFO));
+	// clear connection data
+	gXnIp.UnregisterLocalConnectionInfo();
 	signInChanged[dwUserIndex] = true;
 }
 
@@ -583,6 +590,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 
 	return ERROR_SUCCESS;
 }
+
 
 // #5339: XUserReadProfileSettingsByXuid
 DWORD WINAPI XUserReadProfileSettingsByXuid(
