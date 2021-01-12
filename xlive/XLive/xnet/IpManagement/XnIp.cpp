@@ -489,6 +489,9 @@ void CXnIp::UnregisterKey(const XNKID* xnkid)
 			//		UnregisterXnIpIdentifier(XnIPs[j].connectionIdentifier);
 			//}
 
+			if (&XnKeyPairs[i] == lastRegisteredKey)
+				lastRegisteredKey = nullptr;
+
 			if (XnKeyPairs[i].bValid == true)
 			{
 				SecureZeroMemory(&XnKeyPairs[i], sizeof(XnKeyPair));
