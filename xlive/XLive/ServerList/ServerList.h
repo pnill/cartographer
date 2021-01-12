@@ -83,8 +83,6 @@ public:
 
 	HANDLE Handle = INVALID_HANDLE_VALUE;
 
-	int GetServersLeft();
-	int GetTotalServers();
 	static DWORD GetServers(HANDLE, DWORD, CHAR*, PXOVERLAPPED);
 
 	static void GetServerCounts(PXOVERLAPPED);
@@ -99,6 +97,9 @@ public:
 		pSearchPropertyIDs = new DWORD[_cSearchPropertiesIDs];
 		memcpy(pSearchPropertyIDs, _pSearchProperties, _cSearchPropertiesIDs * sizeof(*_pSearchProperties));
 	}
+
+	int GetServersLeft();
+	int GetTotalServers();
 
 	void CancelOperation() { cancelOperation = true; }
 

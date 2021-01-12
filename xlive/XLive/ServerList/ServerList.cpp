@@ -232,7 +232,7 @@ void ServerList::QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESU
 
 			if (!propertyNeeded)
 			{
-				LOG_INFO_XLIVE("{} - unrequested property ID: 0x{:X}, skipping", __FUNCTION__, propertyId);
+				//LOG_INFO_XLIVE("{} - unrequested property ID: 0x{:X}, skipping", __FUNCTION__, propertyId);
 				continue;
 			}
 
@@ -421,8 +421,6 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 				break;
 
 			ZeroMemory(&searchResults[this->GetTotalServers()], sizeof(XLOCATOR_SEARCHRESULT));
-			LOG_ERROR_XLIVE("{} - search results ptr: 0x{:x}, properties buffer: 0x{:X}, stringBuffer: 0x{:X}", __FUNCTION__, (DWORD)searchResults, (DWORD)propertiesBuffer, (DWORD)stringBuffer);
-
 			QueryServerData(curl, std::stoll(server.GetString()), &searchResults[this->GetTotalServers()], &propertiesBuffer, &stringBuffer);
 
 			if (this->GetTotalServers() > 0)

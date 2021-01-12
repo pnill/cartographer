@@ -239,7 +239,7 @@ DWORD WINAPI XUserCreateAchievementEnumerator(DWORD dwTitleId, DWORD dwUserIndex
 	if (pchBuffer) *pchBuffer = cItem * sizeof(XACHIEVEMENT_DETAILS);
 	if (phEnum) *phEnum = g_dwFakeAchievementContent = CreateMutex(NULL, NULL, NULL);
 
-	LOG_TRACE_XLIVE("- Handle = {0:p}, pchBuffer = {1}", (void*)g_dwFakeAchievementContent, *pchBuffer);
+	LOG_TRACE_XLIVE("- Handle = {}, pchBuffer = {}", (void*)g_dwFakeAchievementContent, *pchBuffer);
 
 	return ERROR_SUCCESS;
 }
