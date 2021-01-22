@@ -18,6 +18,8 @@
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/Utils/Utils.h"
+#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
+#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 
 
 namespace imgui_handler {
@@ -38,6 +40,8 @@ namespace imgui_handler {
 			int g_experimental = 0;
 			bool g_init = false;
 			int g_language_code = -1;
+			
+
 			std::map<int, std::map<e_advanced_string, char*>> string_table;
 			//Used for controls that use the same string, A identifier has to be appended to them
 			//I.E Reset##1... Reset##20
@@ -834,6 +838,54 @@ namespace imgui_handler {
 #if DISPLAY_DEV_TESTING_MENU
 				if (ImGui::CollapsingHeader("Dev Testing"))
 				{
+					if(ImGui::CollapsingHeader("Misc"))
+					{
+						if(ImGui::Button("Log Player Unit Objects"))
+						{
+							PlayerIterator playerIt;
+							s_datum_array* Objects = *h2mod->GetAddress<s_datum_array**>(0x4E461C);
+							
+							while(playerIt.get_next_player())
+							{
+								auto player = playerIt.get_current_player_data();
+								int object = *(int*)&Objects->datum[12 * player->BipedUnitDatum.Index + 8];
+								LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->BipedUnitDatum.ToInt(), std::hex), IntToWString<int>(object, std::hex));
+							}
+						}
+					}
+					if(ImGui::CollapsingHeader("Director Mode"))
+					{
+						if(ImGui::Button("Game"))
+						{
+							DirectorHooks::SetDirectorMode(DirectorHooks::e_game);
+							ObserverMode::SwitchObserverMode(ObserverMode::observer_none);
+						}
+						if(ImGui::Button("Editor"))
+						{
+							ObserverMode::SwitchObserverMode(ObserverMode::observer_freecam);
+						}
+						ImGui::SameLine();
+						if (ImGui::Button("Editor Follow"))
+						{
+							ObserverMode::NextPlayer();
+							ObserverMode::SwitchObserverMode(ObserverMode::observer_followcam);
+						}
+						ImGui::SameLine();
+						if(ImGui::Button("Editor First Person"))
+						{
+							ObserverMode::NextPlayer();
+							ObserverMode::SwitchObserverMode(ObserverMode::observer_firstperson);
+						}
+						if(ImGui::Button("Player"))
+						{
+							DirectorHooks::SetDirectorMode(DirectorHooks::e_game);
+							ObserverMode::SwitchObserverMode(ObserverMode::observer_none);
+						}
+						if(ImGui::Button("N"))
+						{
+							ObserverMode::NextPlayer();
+						}
+					}
 					if (ImGui::CollapsingHeader("Raster Layers")) {
 						ImGui::Columns(4, "", false);
 						for (auto i = 0; i < 25; i++)
