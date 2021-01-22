@@ -10,7 +10,25 @@ namespace Blam
 	{
 		namespace Players
 		{
-			struct s_player_actions
+
+			struct __unaligned __declspec(align(1)) s_network_player_actions
+			{
+				float yaw;
+				float pitch;
+				float throttle_x;
+				float throttle_y;
+				WORD control_flag;
+				WORD weapon_set_identifier;
+				BYTE primary_weapon_identifier;
+				BYTE secondary_weapon_identifier;
+				WORD zoom_level;
+				BYTE pad1[26];
+				BYTE byte32;
+				BYTE pad2[85];
+			};
+			CHECK_STRUCT_SIZE(s_network_player_actions, 0x88);
+
+			struct __declspec(align(4)) s_player_actions
 			{
 				int control_flag0;
 				int control_flag1;
@@ -41,24 +59,36 @@ namespace Blam
 				float secondary_autoaim_level;
 				BYTE field_5C;
 			};
-			//size  : 0xB0
-			struct s_gamestate_player_controls
+			struct __declspec(align(4))  s_player_control
 			{
-				bool Initialized;
-				BYTE Pad_1[3];
-				int Flags;
-				int Field_10;
-				int Field_14;
-				bool DisableCamera;
-				BYTE Pad_2[7];
+				BYTE Initialized;
+				BYTE Pad1[3];
+				DWORD Flags;
+				DWORD Field_10;
+				DWORD Field_14;
+				BYTE DisableCamera;
+				BYTE Pad2[7];
 				datum ControllingDatum;
-				int InputFlags_1;
-				int InputFlags_2;
-				BYTE Pad_3[sizeof(DWORD) * 2];
+				DWORD InputFlags_1;
+				DWORD InputFlags_2;
+				DWORD Pad3[3];
 				s_player_actions Actions;
-				BYTE Pad_4[16];
-				int melee_target_exists;
-				BYTE Pad_5[16];
+				BYTE Pad4[32];
+				//bool Initialized;
+				//BYTE Pad_1[3];
+				//int Flags;
+				//int Field_10;
+				//int Field_14;
+				//bool DisableCamera;
+				//BYTE Pad_2[7];
+				//datum ControllingDatum;
+				//int InputFlags_1;
+				//int InputFlags_2;
+				//BYTE Pad_3[sizeof(DWORD) * 2];
+				//s_player_actions Actions;
+				//BYTE Pad_4[20];
+				//int melee_target_exists;
+				//BYTE Pad_5[16];
 			};
 		}
 	}

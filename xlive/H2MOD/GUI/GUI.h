@@ -2,7 +2,7 @@
 
 #include "stdafx.h"
 
-#define DISPLAY_DEV_TESTING_MENU 0
+#define DISPLAY_DEV_TESTING_MENU 1
 
 extern std::chrono::high_resolution_clock::duration desiredRenderTime;
 

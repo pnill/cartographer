@@ -31,6 +31,8 @@
 #include "Blam/Cache/TagGroups/model_defenition.hpp"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
+#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
+#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -354,6 +356,7 @@ bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObje
 
 	return h2mod->GetAddress<tcreate_unit_hook>(0x1F32DB, 0x1DE374)(pCreationData, a2, a3, pObject);
 }
+
 
 void H2MOD::leave_session()
 {
@@ -1585,6 +1588,8 @@ void H2MOD::RegisterEvents()
 }
 
 
+
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1717,6 +1722,8 @@ void H2MOD::Initialize()
 		TagFixes::Initalize();
 		Initialise_tag_loader();
 		RenderHooks::Initialize();
+		DirectorHooks::Initialize();
+		ObserverMode::Initialize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");
