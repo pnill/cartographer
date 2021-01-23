@@ -1723,7 +1723,7 @@ void H2MOD::Initialize()
 		Initialise_tag_loader();
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
-		ObserverMode::Initialize();
+		//ObserverMode::Initialize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");

@@ -38,15 +38,15 @@ namespace Blam
 				float throttle_y;
 				float trigger;
 				float secondary_trigger;
-				int action_flags;
+				//int action_flags;
 				__int16 weapon_set_identifier;
 				char primary_weapon_index;
 				char secondary_weapon_index;
 				WORD grenade_index;
 				__int16 zoom_level;
+				//__int16 interaction_type;
 				byte auto_look_centering;
 				byte auto_look_centering_scale;
-				//__int16 interaction_type;
 				__int16 field_2E;
 				int interaction_object;
 				int melee_target_exists;
@@ -73,22 +73,11 @@ namespace Blam
 				DWORD InputFlags_2;
 				DWORD Pad3[3];
 				s_player_actions Actions;
-				BYTE Pad4[32];
-				//bool Initialized;
-				//BYTE Pad_1[3];
-				//int Flags;
-				//int Field_10;
-				//int Field_14;
-				//bool DisableCamera;
-				//BYTE Pad_2[7];
-				//datum ControllingDatum;
-				//int InputFlags_1;
-				//int InputFlags_2;
-				//BYTE Pad_3[sizeof(DWORD) * 2];
-				//s_player_actions Actions;
-				//BYTE Pad_4[20];
-				//int melee_target_exists;
-				//BYTE Pad_5[16];
+				//BYTE Pad4[32];
+				BYTE Pad_4[12];
+				int pickup_object_target;
+				int melee_autoaim_target;
+				BYTE Pad_5[16];
 			};
 		}
 	}
