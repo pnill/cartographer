@@ -1022,7 +1022,6 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	}
 
 	bool ret = p_player_spawn(playerDatumIndex);
-	//auto PlayerDatum = Player::getPlayerUnitDatumIndex(playerDatumIndex.ToAbsoluteIndex());
 
 	if(b_HeadHunter)
 	{
