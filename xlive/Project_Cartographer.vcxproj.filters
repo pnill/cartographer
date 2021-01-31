@@ -104,6 +104,11 @@
     <ClCompile Include="H2MOD\GUI\imgui_integration\MOTD.cpp" />
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
+    <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
+    <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
+    <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\debug_overlay.cpp" />
+    <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -358,6 +363,10 @@
     <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\model_defenition.hpp" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
+    <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
+    <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
+    <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
+    <ClInclude Include="Blam\Engine\Game\DamageData.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

@@ -30,6 +30,10 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "Blam/Cache/TagGroups/model_defenition.hpp"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
+#include "H2MOD/Modules/HaloScript/HaloScript.h"
+#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
+#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
+#include "Blam/Engine/Game/DamageData.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -81,6 +85,44 @@ game_life_cycle get_game_life_cycle()
 }
 
 #pragma region engine calls
+
+
+typedef void(__cdecl p_object_cause_damage)(Blam::Engine::Game::damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7);
+p_object_cause_damage* c_object_cause_damage;
+
+void __cdecl projectile_collision_object_cause_damage(Blam::Engine::Game::damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7)
+{
+	if (b_Infection) {
+		if (damage_data->creator_datum != -1 && damage_data->field_10 != -1)
+		{
+			LOG_TRACE_GAME(
+				"{} {} {} {} {} {} {} {}",
+				damage_data->flags,
+				IntToString<int>(damage_data->damage_tag_index, std::hex),
+				IntToString<int>(damage_data->creator_datum.ToInt(), std::hex),
+				IntToString<int>(damage_data->field_10, std::hex),
+				IntToString<int>(damage_data->field_14, std::hex),
+				IntToString<int>(damage_data->field_18, std::hex),
+				IntToString<int>(damage_data->field_1C, std::hex),
+				IntToString<int>(damage_data->field_24, std::hex),
+				IntToString<int>(damage_data->field_28, std::hex)
+			);
+			c_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
+			//LOG_TRACE_GAME("[Projectile Damage]: {} {} {} {} {}", damaged_object_indexes, a4, a5, a6, a7);
+		}
+		else
+		{
+			LOG_TRACE_GAME("GUARDIAN GLITCH PREVENTED");
+		}
+	}
+	else
+	{
+		c_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
+	}
+}
+
+
+
 
 int __cdecl call_get_game_tick_rate()
 {
@@ -353,6 +395,7 @@ bool __stdcall create_unit_hook(void* pCreationData, int a2, int a3, void* pObje
 
 	return h2mod->GetAddress<tcreate_unit_hook>(0x1F32DB, 0x1DE374)(pCreationData, a2, a3, pObject);
 }
+
 
 void H2MOD::leave_session()
 {
@@ -903,17 +946,17 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 				headHunterHandler->initializer->execute();
 			}
 		}
-		//Christmas hat importing move later, auto disables after january.
+		//Christmas hat importing move later, auto disables after december.
 		if (!h2mod->Server) {
 			std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 			time_t tt = std::chrono::system_clock::to_time_t(now);
 			tm utc_tm = *gmtime(&tt);
-			if (utc_tm.tm_mon == 11 || utc_tm.tm_mon == 0) {
+			if (utc_tm.tm_mon == 11) {
 				tag_loader::Load_tag(0xE19B001D, true, "christmas_hat_map");
 				tag_loader::Load_tag(0xE1BF0024, true, "christmas_hat_map");
 				tag_loader::Push_Back();
 				//auto scen = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(datum(_INJECTED_TAG_START_));
-				auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
+				/*auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
 				if (hlmt_chief_datum != datum::Null) {
 					auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
 					auto b = hlmt_chief->variants[0];
@@ -931,7 +974,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 					a->parent_marker = string_id(184552154);
 					a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 					a->child_object.TagIndex = tag_loader::ResolveNewDatum(0xE1BF0024);
-				}
+				}*/
 			}
 		}
 	}
@@ -1332,8 +1375,12 @@ getnexthillindex p_get_next_hill_index;
 signed int __cdecl get_next_hill_index(int previousHill)
 {
 	int hillCount = *h2mod->GetAddress<int*>(0x4dd0a8, 0x5008e8);
-	if (previousHill + 1 > hillCount)
+	if (previousHill + 1 >= hillCount) 
+	{
+		//LOG_TRACE_GAME("[KoTH Behavior] Hill Count: {} Current Hill: {} Next Hill: {}", hillCount, previousHill, 0);
 		return 0;
+	}
+	//LOG_TRACE_GAME("[KoTH Behavior] Hill Count: {} Current Hill: {} Next Hill: {}", hillCount, previousHill, previousHill + 1);
 	return previousHill + 1;
 }
 
@@ -1394,11 +1441,14 @@ char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, cha
 
 	if (H2Config_minimum_player_start > 0)
 	{
-		ServerConsole::SendMsg(L"Waiting for Players | Esperando a los jugadores", true);
 		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
 		{
 			LOG_DEBUG_GAME(L"Minimum Player count met.");
 			canStart[1] = true;
+		}
+		else
+		{
+			ServerConsole::SendMsg(L"Waiting for Players | Esperando a los jugadores", true);
 		}
 	}
 	else
@@ -1579,6 +1629,15 @@ void H2MOD::RegisterEvents()
 	
 }
 
+//Shader LOD Bias stuff
+//typedef int(__cdecl p_sub_81A676)(int a1, int a2, float a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10);
+//p_sub_81A676* c_sub_81A676;
+//
+//int __cdecl sub_81A676(int a1, int a2, float a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10)
+//{
+//	return c_sub_81A676(a1, a2, a3, 4, a5, a6, a7, a8, a9, a10);
+//}
+
 
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
@@ -1625,12 +1684,21 @@ void H2MOD::ApplyHooks() {
 
 	HitFix::ApplyPatches();
 
+	//Guardian Patch
+	c_object_cause_damage = h2mod->GetAddress<p_object_cause_damage*>(0x17AD81, 0x1525E1);
+	PatchCall(h2mod->GetAddress(0x147DB8, 0x172D55), projectile_collision_object_cause_damage);
 
 	// bellow hooks applied to specific executables
 	if (this->Server == false) {
 
 		LOG_TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
+
+
+		//Shader LOD Bias stuff
+		//c_sub_81A676 = h2mod->GetAddress<p_sub_81A676*>(0x19A676);
+		//PatchCall(h2mod->GetAddress(0x19AD71), sub_81A676);
+		//PatchCall(h2mod->GetAddress(0x19ADBC), sub_81A676);
 
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4C14), (BYTE*)VerifyGameVersionOnJoin, 5);
 
@@ -1712,6 +1780,9 @@ void H2MOD::Initialize()
 		TagFixes::Initalize();
 		Initialise_tag_loader();
 		RenderHooks::Initialize();
+		DirectorHooks::Initialize();
+		H2Tweaks::applyMeleeCollisionPatch();
+		//ObserverMode::Initialize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");
@@ -1725,6 +1796,7 @@ void H2MOD::Initialize()
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
 
+	HaloScript::Initialize();
 	h2mod->ApplyHooks();
 	h2mod->RegisterEvents();
 }

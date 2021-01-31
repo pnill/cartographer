@@ -15,8 +15,9 @@
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/GUI/GUI.h"
-#include "H2MOD/Modules/MainLoopPatches/UncappedFPS/UncappedFPS.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
+#include "Blam/Engine/Game/GameTimeGlobals.h"
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
@@ -386,7 +387,7 @@ void __cdecl game_main_loop()
 			else
 			{
 				if (v1 > 0 && sub_B4BFD1())
-					v3 = time_globals::get_game_time_globals()->seconds_per_tick;
+					v3 = time_globals::get()->seconds_per_tick;
 				else
 					v3 = 0.0;
 				a2 = v3;
@@ -484,7 +485,7 @@ void alt_main_game_loop_hook()
 {
 	QueryPerformanceCounter(&end_tick);
 	double tick_time = (static_cast<double>(end_tick.QuadPart - start_tick.QuadPart) / freq.QuadPart);// -render_time;
-	if (tick_time >= time_globals::get_game_time_globals()->seconds_per_tick || !init)
+	if (tick_time >= time_globals::get()->seconds_per_tick || !init)
 	{
 		QueryPerformanceCounter(&start_tick);
 		if (!QuitGSMainLoop)
@@ -495,7 +496,7 @@ void alt_main_game_loop_hook()
 			render_audio();
 		if(game_in_simulation())
 		{
-			game_effects_update(time_globals::get_game_time_globals()->seconds_per_tick);
+			game_effects_update(time_globals::get()->seconds_per_tick);
 		}
 		//game_main_loop();
 		//main_game_loop();
@@ -528,76 +529,80 @@ void initGSRunLoop() {
 	else {
 		addDebugText("Hooking Loop Function");
 		main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
-		
-		if (!H2Config_experimental_fps) {
-			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
+		switch(H2Config_experimental_fps)
+		{
+		default:;
+		case e_render_none:
+				PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
+			break;
+		case e_render_old:
+				PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
+				UncappedFPS2::Init();
+			break;
+		case e_render_new:
+				sub_9AA221 = (void(*)())((char*)H2BaseAddr + 0x3A221);
+				sub_C8542F = (void(*)())((char*)H2BaseAddr + 0x1B542F);
+				sub_C853C7 = (void(*)())((char*)H2BaseAddr + 0x1B53C7);
+				sub_C7D83F = (void(*)())((char*)H2BaseAddr + 0x1AD83F);
+				sub_B02590 = (void(*)())((char*)H2BaseAddr + 0x325A2);
+				sub_B0A221 = (void(*)())((char*)H2BaseAddr + 0x3A221);
+				sub_C7E9D3 = (void(*)())((char*)H2BaseAddr + 0x1AE9D3);
+				sub_AD7902 = (void(*)())((char*)H2BaseAddr + 0x7902);
+				sub_AD96EB = (void(*)())((char*)H2BaseAddr + 0x96EB);
+				sub_B09783 = (void(*)())((char*)H2BaseAddr + 0x39783);
+				sub_B727EB = (void(*)())((char*)H2BaseAddr + 0xA27EB);
+
+				sub_C7E7C5 = h2mod->GetAddress<p_sub_C7E7C5*>(0x1AE7C5);
+				sub_B328A8 = h2mod->GetAddress<p_sub_B328A8*>(0x628A8);
+				sub_B5DD5C = h2mod->GetAddress<p_sub_B5DD5C*>(0x8DD5C);
+				sub_B16834 = h2mod->GetAddress<p_sub_B16834*>(0x46834);
+				sub_B1BA65 = h2mod->GetAddress<p_sub_B1BA65*>(0x4BA65);
+				sub_B361EC = h2mod->GetAddress<p_sub_B361EC*>(0x661EC);
+				sub_AF87A1 = h2mod->GetAddress<p_sub_AF87A1*>(0x287A1);
+				sub_AD985E = h2mod->GetAddress<p_sub_AD985E*>(0x985E);
+				sub_B4BFD1 = h2mod->GetAddress<p_sub_B4BFD1*>(0x7BFD1);
+				sub_9A96B1 = h2mod->GetAddress<p_sub_9A96B1*>(0x396B1);
+				sub_CDCA7D = h2mod->GetAddress<p_sub_B7CA7D*>(0x20CA7D);
+				sub_AF8716 = h2mod->GetAddress<p_sub_AF8716*>(0x28716);
+				sub_B1D31F = h2mod->GetAddress<p_sub_B1D31F*>(0x4D31F);
+
+				vibrations_clear = (void(*)())((char*)H2BaseAddr + 0x901B8);
+				game_network_dispatcher = (void(*)())((char*)H2BaseAddr + 0x1B5456);
+				restart_game_loop = h2mod->GetAddress<p_restart_game_loop*>(0x286E1);
+				game_time_globals_prep = h2mod->GetAddress<p_game_time_globals_prep*>(0x7C1BF);
+				present_rendered_screen = h2mod->GetAddress<p_present_rendered_screen*>(0x27002A);
+				game_in_simulation = h2mod->GetAddress<p_game_in_simulation*>(0x1ADD30);
+				game_freeze = h2mod->GetAddress<p_game_freeze*>(0x145B);
+				game_minimized = h2mod->GetAddress<p_game_minimized*>(0x28729);
+				render_audio = h2mod->GetAddress<p_render_audio*>(0x2DF87);
+				system_milliseconds = h2mod->GetAddress<p_system_milliseconds*>(0x37E51);
+				cinematic_in_progress = h2mod->GetAddress<c_cinematic_in_progress*>(0x3a928);
+				cinematic_is_running = h2mod->GetAddress<c_cinematic_is_running*>(0x3a938);
+				observer_update = h2mod->GetAddress<p_observer_update*>(0x83E6A);
+				local_players_update_and_send_synchronous_actions = h2mod->GetAddress<p_local_players_update_and_send_synchronous_actions*>(0x93857);
+				simulation_update = h2mod->GetAddress<p_simulation_update*>(0x4A5D0);
+				game_effects_update = h2mod->GetAddress<p_game_effects_update*>(0x48CDC);
+				director_update = h2mod->GetAddress<p_director_update*>(0x5A658);
+				main_game_time_system_update = h2mod->GetAddress<p_main_game_time_system_update*>(0x28814);
+
+				dword_F52268 = h2mod->GetAddress<int*>(0x482268);
+				max_tick_count = h2mod->GetAddress<int*>(0x482264);
+				sound_impulse_unk = h2mod->GetAddress<byte*>(0x48225B);
+				sound_impulse_called = h2mod->GetAddress<byte*>(0x48225A);
+				dword_F52260 = h2mod->GetAddress<int*>(0x482260);
+				b_restart_game_loop = h2mod->GetAddress<byte*>(0x479EA0);
+
+				//PatchCall(h2mod->GetAddress(0x39D04), alt_prep_time);
+				PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
+				//PatchCall(H2BaseAddr + 0x39e64, game_main_loop);
+				QueryPerformanceFrequency(&freq);
+				//Remove original render call
+				NopFill(h2mod->GetAddress(0x39DAA), 5);
+				//Stop Hold to Zoom.
+				NopFill(h2mod->GetAddress(0x9355C), 4);
+			break;
 		}
-		else {
 
-
-			sub_9AA221 = (void(*)())((char*)H2BaseAddr + 0x3A221);
-			sub_C8542F = (void(*)())((char*)H2BaseAddr + 0x1B542F);
-			sub_C853C7 = (void(*)())((char*)H2BaseAddr + 0x1B53C7);
-			sub_C7D83F = (void(*)())((char*)H2BaseAddr + 0x1AD83F);
-			sub_B02590 = (void(*)())((char*)H2BaseAddr + 0x325A2);
-			sub_B0A221 = (void(*)())((char*)H2BaseAddr + 0x3A221);
-			sub_C7E9D3 = (void(*)())((char*)H2BaseAddr + 0x1AE9D3);
-			sub_AD7902 = (void(*)())((char*)H2BaseAddr + 0x7902);
-			sub_AD96EB = (void(*)())((char*)H2BaseAddr + 0x96EB);
-			sub_B09783 = (void(*)())((char*)H2BaseAddr + 0x39783);
-			sub_B727EB = (void(*)())((char*)H2BaseAddr + 0xA27EB);
-
-			sub_C7E7C5 = h2mod->GetAddress<p_sub_C7E7C5*>(0x1AE7C5);
-			sub_B328A8 = h2mod->GetAddress<p_sub_B328A8*>(0x628A8);
-			sub_B5DD5C = h2mod->GetAddress<p_sub_B5DD5C*>(0x8DD5C);
-			sub_B16834 = h2mod->GetAddress<p_sub_B16834*>(0x46834);
-			sub_B1BA65 = h2mod->GetAddress<p_sub_B1BA65*>(0x4BA65);
-			sub_B361EC = h2mod->GetAddress<p_sub_B361EC*>(0x661EC);
-			sub_AF87A1 = h2mod->GetAddress<p_sub_AF87A1*>(0x287A1);
-			sub_AD985E = h2mod->GetAddress<p_sub_AD985E*>(0x985E);
-			sub_B4BFD1 = h2mod->GetAddress<p_sub_B4BFD1*>(0x7BFD1);
-			sub_9A96B1 = h2mod->GetAddress<p_sub_9A96B1*>(0x396B1);
-			sub_CDCA7D = h2mod->GetAddress<p_sub_B7CA7D*>(0x20CA7D);
-			sub_AF8716 = h2mod->GetAddress<p_sub_AF8716*>(0x28716);
-			sub_B1D31F = h2mod->GetAddress<p_sub_B1D31F*>(0x4D31F);
-
-
-
-			vibrations_clear = (void(*)())((char*)H2BaseAddr + 0x901B8);
-			game_network_dispatcher = (void(*)())((char*)H2BaseAddr + 0x1B5456);
-			restart_game_loop = h2mod->GetAddress<p_restart_game_loop*>(0x286E1);
-			game_time_globals_prep = h2mod->GetAddress<p_game_time_globals_prep*>(0x7C1BF);
-			present_rendered_screen = h2mod->GetAddress<p_present_rendered_screen*>(0x27002A);
-			game_in_simulation = h2mod->GetAddress<p_game_in_simulation*>(0x1ADD30);
-			game_freeze = h2mod->GetAddress<p_game_freeze*>(0x145B);
-			game_minimized = h2mod->GetAddress<p_game_minimized*>(0x28729);
-			render_audio = h2mod->GetAddress<p_render_audio*>(0x2DF87);
-			system_milliseconds = h2mod->GetAddress<p_system_milliseconds*>(0x37E51);
-			cinematic_in_progress = h2mod->GetAddress<c_cinematic_in_progress*>(0x3a928);
-			cinematic_is_running = h2mod->GetAddress<c_cinematic_is_running*>(0x3a938);
-			observer_update = h2mod->GetAddress<p_observer_update*>(0x83E6A);
-			local_players_update_and_send_synchronous_actions = h2mod->GetAddress<p_local_players_update_and_send_synchronous_actions*>(0x93857);
-			simulation_update = h2mod->GetAddress<p_simulation_update*>(0x4A5D0);
-			game_effects_update = h2mod->GetAddress<p_game_effects_update*>(0x48CDC);
-			director_update = h2mod->GetAddress<p_director_update*>(0x5A658);
-			main_game_time_system_update = h2mod->GetAddress<p_main_game_time_system_update*>(0x28814);
-
-			
-
-			dword_F52268 = h2mod->GetAddress<int*>(0x482268);
-			max_tick_count = h2mod->GetAddress<int*>(0x482264);
-			sound_impulse_unk = h2mod->GetAddress<byte*>(0x48225B);
-			sound_impulse_called = h2mod->GetAddress<byte*>(0x48225A);
-			dword_F52260 = h2mod->GetAddress<int*>(0x482260);
-			b_restart_game_loop = h2mod->GetAddress<byte*>(0x479EA0);
-		
-			//PatchCall(h2mod->GetAddress(0x39D04), alt_prep_time);
-			PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
-			//PatchCall(H2BaseAddr + 0x39e64, game_main_loop);
-			QueryPerformanceFrequency(&freq);
-			//Remove original render call
-			NopFill(h2mod->GetAddress(0x39DAA), 5);
-		}
 	}
 	addDebugText("Post GSRunLoop Hooking.");
 }

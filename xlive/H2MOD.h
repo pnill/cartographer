@@ -49,7 +49,6 @@ public:
 		void ApplyHooks(); 
 		void ApplyUnitHooks();
 		void RegisterEvents();
-
 		void team_player_indicator_visibility(bool toggle);
 		BYTE* get_player_unit_from_player_index(int playerIndex);
 		datum get_player_datum_index_from_controller_index(int controller_index);

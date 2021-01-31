@@ -485,7 +485,7 @@ void GUI::Initialize(HWND hWnd)
 // #5001
 int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 {
-	if(imgui_handler::CanDrawImgui())
+	if(imgui_handler::ImGuiShoulBlockInput())
 		imgui_handler::ImGui_ImplWin32_WndProcHandler(pPii->hWnd, pPii->uMSG, pPii->wParam, pPii->lParam);
 	static bool has_initialised_input = false;
 	if (!has_initialised_input) {

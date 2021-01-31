@@ -14,15 +14,21 @@ void ForwardPorts()
 {
 	if (h2mod->Server)
 		return;
+	if (H2Config_upnp_enable)
+	{
+		if (upnp == nullptr)
+			upnp = new ModuleUPnP;
 
-	if (upnp == nullptr)
-		upnp = new ModuleUPnP;
+		upnp->UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2");
+		upnp->UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2_1");
+		upnp->UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
 
-	upnp->UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2");
-	upnp->UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2_1");
-	upnp->UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
-
-	LOG_TRACE_NETWORK("ForwardPorts() - Finished forwarding ports.");
+		LOG_TRACE_NETWORK("ForwardPorts() - Finished forwarding ports.");
+	}
+	else
+	{
+		LOG_TRACE_NETWORK("ForwardPorts() - UPNP disabled by config, skipping forwarding.");
+	}
 }
 
 // #5310: XOnlineStartup

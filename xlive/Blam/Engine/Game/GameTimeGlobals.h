@@ -1,30 +1,30 @@
 #pragma once
-#include "../Blam/Enums/Enums.h"
+
+#include "Blam\Common\Common.h"
 
 //size: 0x24
-struct game_time_globals
+struct time_globals
 {
-	enum CameraState : BOOL
+	enum GameState : bool
 	{
-		Frozen = FALSE,
-		Normal = TRUE
+		Running = false,
+		Paused = true
 	};
 
-	enum GameState : BOOL
-	{
-		Running = FALSE,
-		Paused = TRUE
-	};
+	bool initialized;
+	GameState GameState;
+	WORD ticks_per_second;
+	float seconds_per_tick;
+	DWORD tick_count;
+	float game_speed;
+	float update_time;
+	float field_14;
+	float field_18;
+	float field_1C;
+	float field_20;
 
-	CameraState CameraState;//0
-	GameState GameState;//1
-	WORD GameEngineClockSpeed;//2
-	FLOAT GameEngineTickRate;//4
-	DWORD GameTimeElapsed;//8
-	FLOAT GameSpeedMultiplier;//0xC
-	FLOAT unk_0;//0x10
-	FLOAT unk_1;//0x14
-	DWORD unk_2;//0x18
-	FLOAT unk_3;//0x20
-	DWORD unk_4;//0x24
+	static time_globals* get();
+	static float get_seconds_per_tick();
+	static float seconds_to_ticks_precise(float s);
 };
+CHECK_STRUCT_SIZE(time_globals, 0x24);

@@ -248,8 +248,11 @@ void hotkeyFuncGuide() {
 	}
 	imgui_handler::ToggleWindow("Advanced Settings");
 }
-
-
+void hotkeyFuncDebug()
+{
+	imgui_handler::ToggleWindow("debug_overlay");
+}
+int pause = VK_PRIOR;
 void KeyboardInput::Initialize()
 {
 	
@@ -268,6 +271,7 @@ void KeyboardInput::Initialize()
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdAlignWindow, hotkeyFuncAlignWindow);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdWindowMode, hotkeyFuncWindowMode);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdGuide, hotkeyFuncGuide);
+	KeyboardInput::RegisterHotkey(&pause, hotkeyFuncDebug);
 }
 
 
