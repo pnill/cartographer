@@ -33,6 +33,7 @@
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
+#include "Blam/Engine/Game/DamageData.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -84,6 +85,44 @@ game_life_cycle get_game_life_cycle()
 }
 
 #pragma region engine calls
+
+
+typedef void(__cdecl p_object_cause_damage)(Blam::Engine::Game::damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7);
+p_object_cause_damage* c_object_cause_damage;
+
+void __cdecl projectile_collision_object_cause_damage(Blam::Engine::Game::damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7)
+{
+	if (b_Infection) {
+		if (damage_data->creator_datum != -1 && damage_data->field_10 != -1)
+		{
+			LOG_TRACE_GAME(
+				"{} {} {} {} {} {} {} {}",
+				damage_data->flags,
+				IntToString<int>(damage_data->damage_tag_index, std::hex),
+				IntToString<int>(damage_data->creator_datum.ToInt(), std::hex),
+				IntToString<int>(damage_data->field_10, std::hex),
+				IntToString<int>(damage_data->field_14, std::hex),
+				IntToString<int>(damage_data->field_18, std::hex),
+				IntToString<int>(damage_data->field_1C, std::hex),
+				IntToString<int>(damage_data->field_24, std::hex),
+				IntToString<int>(damage_data->field_28, std::hex)
+			);
+			c_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
+			//LOG_TRACE_GAME("[Projectile Damage]: {} {} {} {} {}", damaged_object_indexes, a4, a5, a6, a7);
+		}
+		else
+		{
+			LOG_TRACE_GAME("GUARDIAN GLITCH PREVENTED");
+		}
+	}
+	else
+	{
+		c_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
+	}
+}
+
+
+
 
 int __cdecl call_get_game_tick_rate()
 {
@@ -1337,8 +1376,12 @@ getnexthillindex p_get_next_hill_index;
 signed int __cdecl get_next_hill_index(int previousHill)
 {
 	int hillCount = *h2mod->GetAddress<int*>(0x4dd0a8, 0x5008e8);
-	if (previousHill + 1 > hillCount)
+	if (previousHill + 1 >= hillCount) 
+	{
+		//LOG_TRACE_GAME("[KoTH Behavior] Hill Count: {} Current Hill: {} Next Hill: {}", hillCount, previousHill, 0);
 		return 0;
+	}
+	//LOG_TRACE_GAME("[KoTH Behavior] Hill Count: {} Current Hill: {} Next Hill: {}", hillCount, previousHill, previousHill + 1);
 	return previousHill + 1;
 }
 
@@ -1587,7 +1630,14 @@ void H2MOD::RegisterEvents()
 	
 }
 
-
+//Shader LOD Bias stuff
+//typedef int(__cdecl p_sub_81A676)(int a1, int a2, float a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10);
+//p_sub_81A676* c_sub_81A676;
+//
+//int __cdecl sub_81A676(int a1, int a2, float a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10)
+//{
+//	return c_sub_81A676(a1, a2, a3, 4, a5, a6, a7, a8, a9, a10);
+//}
 
 
 void H2MOD::ApplyHooks() {
@@ -1635,12 +1685,21 @@ void H2MOD::ApplyHooks() {
 
 	HitFix::ApplyPatches();
 
+	//Guardian Patch
+	c_object_cause_damage = h2mod->GetAddress<p_object_cause_damage*>(0x17AD81, 0x1525E1);
+	PatchCall(h2mod->GetAddress(0x147DB8, 0x172D55), projectile_collision_object_cause_damage);
 
 	// bellow hooks applied to specific executables
 	if (this->Server == false) {
 
 		LOG_TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
+
+
+		//Shader LOD Bias stuff
+		//c_sub_81A676 = h2mod->GetAddress<p_sub_81A676*>(0x19A676);
+		//PatchCall(h2mod->GetAddress(0x19AD71), sub_81A676);
+		//PatchCall(h2mod->GetAddress(0x19ADBC), sub_81A676);
 
 		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B4C14), (BYTE*)VerifyGameVersionOnJoin, 5);
 
@@ -1723,6 +1782,7 @@ void H2MOD::Initialize()
 		Initialise_tag_loader();
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
+		H2Tweaks::applyMeleeCollisionPatch();
 		//ObserverMode::Initialize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init

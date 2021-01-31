@@ -161,7 +161,11 @@ namespace imgui_handler
 			tex_L2,
 			tex_L3,
 			shadow_title,
-			water_title
+			water_title,
+			upnp_title,
+			upnp_tooltip,
+			melee_fix_title,
+			melee_fix_tooltip
 		};
 		void BuildStringsTable();
 		char* GetString(e_advanced_string string, std::string id = "");

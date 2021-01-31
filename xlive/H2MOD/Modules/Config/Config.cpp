@@ -113,6 +113,9 @@ point2d	H2Config_SENTBEAM = { 1 , 1 };
 e_override_texture_resolution H2Config_Override_Shadows;
 e_override_texture_resolution H2Config_Override_Water;
 
+bool H2Config_upnp_enable = true;
+bool H2Config_melee_fix = true;
+
 int H2Config_hotkeyIdHelp = VK_F3;
 int H2Config_hotkeyIdToggleDebug = VK_F2;
 int H2Config_hotkeyIdAlignWindow = VK_F7;
@@ -443,6 +446,8 @@ void SaveH2Config() {
 
 		ini.SetValue(H2ConfigVersionSection.c_str(), "lan_ip", H2Config_str_lan);
 
+		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "upnp", H2Config_upnp_enable);
+
 		if (!H2IsDediServer) {
 			std::string lang_str(std::to_string(H2Config_language.code_main) + "x" + std::to_string(H2Config_language.code_variant));
 			ini.SetValue(H2ConfigVersionSection.c_str(), "language_code", lang_str.c_str());
@@ -527,6 +532,8 @@ void SaveH2Config() {
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "override_shadows", std::to_string(H2Config_Override_Shadows).c_str());
 			ini.SetValue(H2ConfigVersionSection.c_str(), "override_water", std::to_string(H2Config_Override_Water).c_str());
+
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
 		}
 
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay);
@@ -676,7 +683,7 @@ void ReadH2Config() {
 			// global
 			H2Portable = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "h2portable", false);
 			H2Config_base_port = ini.GetLongValue(H2ConfigVersionSection.c_str(), "base_port", H2Config_base_port);
-
+			H2Config_upnp_enable = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "upnp", true);
 			H2Config_xDelay = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay);
 
 			H2Config_debug_log = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "debug_log", H2Config_debug_log);
@@ -837,6 +844,7 @@ void ReadH2Config() {
 						H2Config_Override_Water = e_override_texture_resolution::tex_ultra;
 						break;
 				}
+				H2Config_melee_fix = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
 			}
 
 			// dedicated server only

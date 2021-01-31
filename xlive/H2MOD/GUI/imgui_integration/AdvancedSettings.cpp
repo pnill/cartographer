@@ -745,6 +745,28 @@ namespace imgui_handler {
 					ImGui::Checkbox("##Intro", &H2Config_skip_intro);
 
 					ImGui::NextColumn();
+				
+
+					TextVerticalPad(GetString(upnp_title), 8.5);
+					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+					ImGui::Checkbox("##upnp", &H2Config_upnp_enable);
+					if(ImGui::IsItemHovered())
+					{
+						ImGui::SetTooltip(GetString(upnp_tooltip));
+					}
+
+					ImGui::NextColumn();
+
+					TextVerticalPad(GetString(melee_fix_title), 8.5);
+					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+					ImGui::Checkbox("##melee_fix", &H2Config_melee_fix);
+					if(ImGui::IsItemEdited())
+						H2Tweaks::applyMeleeCollisionPatch();
+					if(ImGui::IsItemHovered())
+						ImGui::SetTooltip(GetString(melee_fix_tooltip));
+
+					ImGui::NextColumn();
+					ImGui::Columns(1);
 
 					ImGui::Text(GetString(language));
 					const char* l_items[]{ GetString(lang_english), GetString(lang_japanese), GetString(lang_german), GetString(lang_french), GetString(lang_spanish), GetString(lang_italian), GetString(lang_korean), GetString(lang_chinese), GetString(lang_native) };
@@ -758,6 +780,8 @@ namespace imgui_handler {
 						setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
 					}
 					ImGui::PopItemWidth();
+					
+					
 					ImGui::Columns(1);
 					ImGui::NewLine();
 				}
@@ -1035,6 +1059,10 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::lang_native] = "Native";
 			string_table[0][e_advanced_string::static_fp] = "Static FP Scale";
 			string_table[0][e_advanced_string::static_fp_tooltip] = "This setting will force your First person model to stay the default size independent of FOV.";
+			string_table[0][e_advanced_string::upnp_title] = "UPNP Enabled";
+			string_table[0][e_advanced_string::upnp_tooltip] = "Enabled UPNP Port forwarding for the project.";
+			string_table[0][e_advanced_string::melee_fix_title] = "Melee Patch";
+			string_table[0][e_advanced_string::melee_fix_tooltip] = "Allows you to turn off the melee patch";
 			
 			//Spanish.
 			string_table[4][e_advanced_string::title] = u8"      Ajustes avanzados";
@@ -1142,6 +1170,10 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::lang_native] = u8"Nativo";
 			string_table[4][e_advanced_string::static_fp] = u8"Escala FP estática";
 			string_table[4][e_advanced_string::static_fp_tooltip] = u8"Esta configuración obligará a su modelo en primera persona a mantener el tamaño predeterminado\nindependientemente del campo de visión.";
+			string_table[4][e_advanced_string::upnp_title] = u8"UPNP habilitado";
+			string_table[4][e_advanced_string::upnp_tooltip] = u8"Habilita el reenvío de puertos UPNP para el proyecto.";
+			string_table[4][e_advanced_string::melee_fix_title] = u8"Parche cuerpo a cuerpo";
+			string_table[4][e_advanced_string::melee_fix_tooltip] = u8"Te permite desactivar el parche cuerpo a cuerpo";
 		}
 	}
 }
