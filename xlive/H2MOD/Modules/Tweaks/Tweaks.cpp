@@ -17,6 +17,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "H2MOD/Modules/MainLoopPatches/TestGameTimePrep.h"
+#include "Blam/Engine/Game/GameTimeGlobals.h"
 
 #pragma region Done_Tweaks
 
@@ -852,24 +853,31 @@ void H2Tweaks::toggleAiMp(bool toggle) {
 	WriteValue<BYTE>(h2mod->GetAddress(0x30E684, 0x2B93F4), toggle ? JMP_OP_CODE : JNZ_OP_CODE);
 }
 
-static float melee_distance_additional_ticks_60 = 12;
-static float melee_distance_additional_ticks_30 = 6;
-
 void H2Tweaks::applyMeleePatch(bool toggle)
 {
-	if (toggle)
-		WritePointer(h2mod->GetAddress(0x10B36B, 0xFD99B) + 4, &melee_distance_additional_ticks_60);
-	else
-		WritePointer(h2mod->GetAddress(0x10B36B, 0xFD99B) + 4, &melee_distance_additional_ticks_30);
+	WriteValue<BYTE>(h2mod->GetAddress(0x10B408, 0xFDA38) + 2, toggle ? 5 : 6); // sword
+	WriteValue<BYTE>(h2mod->GetAddress(0x10B40B, 0xFDA3B) + 2, toggle ? 2 : 1); // generic weapon
+}
 
-	//static float melee_lunge_distance_factor = toggle ? 0.33333334f * 2 : 0.33333334f;
-	//WritePointer(h2mod->GetAddress(0x10B160, 0xFD790) + 4, &melee_lunge_distance_factor);
-	//WritePointer(h2mod->GetAddress(0x10B354, 0xFD984) + 4, &melee_lunge_distance_factor); // distance when mid air
-	//WritePointer(h2mod->GetAddress(0x10B6A3, 0xFDCD3) + 4, &melee_lunge_distance_factor); // acceleration
-	//WritePointer(h2mod->GetAddress(0x10BB78, 0xFE1A8) + 4, &melee_lunge_distance_factor);
-	
-	//WriteValue<BYTE>(h2mod->GetAddress(0x10B408, 0xFDA38) + 2, toggle ? 9 : 7); // sword
-	//WriteValue<BYTE>(h2mod->GetAddress(0x10B40B, 0xFDA3B) + 2, toggle ? 2 : 1); // generic weapon
+void H2Tweaks::applyMeleeCollisionPatch()
+{
+	if (!h2mod->Server) {
+		/*
+			.text:007C3027 148 E8 C1 73 F8 FF       call    collision_test_vector ; Call Procedure
+			.text:007C302C 148 83 C4 18             add     esp, 18h        ; Add
+			.text:007C302F 130 84 C0                test    al, al          ; Logical Compare
+			.text:007C3031 130 0F 84 4B 01 00 00    jz      loc_7C3182      <=== Remove this jump
+		 */
+		static byte original_melee_collision_instruction[]{ 0x0F, 0x84, 0x4B, 0x01, 0x00, 0x00 };
+		if (H2Config_melee_fix) 
+		{
+			NopFill(h2mod->GetAddress(0x143031, 0), 6);
+		}
+		else
+		{
+			WriteBytes(h2mod->GetAddress(0x143031, 0), original_melee_collision_instruction, 6);
+		}
+	}
 }
 
 void H2Tweaks::sunFlareFix()

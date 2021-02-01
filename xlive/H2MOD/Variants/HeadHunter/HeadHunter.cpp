@@ -186,7 +186,7 @@ void HeadHunterInitializer::onPeerHost()
 
 void HeadHunterInitializer::onDedi()
 {
-
+	HeadHunter::initClient();
 }
 
 void HeadHunterDeinitializer::onClient()

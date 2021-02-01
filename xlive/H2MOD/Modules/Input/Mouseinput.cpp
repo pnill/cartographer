@@ -2,9 +2,9 @@
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD.h"
 #include "..\Util\Hooks\Hook.h"
-#include "H2MOD/Modules/MainLoopPatches/UncappedFPS/UncappedFPS.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "ControllerInput.h"
+#include "Blam/Engine/Game/GameTimeGlobals.h"
 
 typedef struct DIMOUSESTATE {
 	LONG lX;

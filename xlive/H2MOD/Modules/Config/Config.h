@@ -14,8 +14,8 @@ void ReadH2Config();
 
 #define DLL_VERSION_MAJOR               0
 #define DLL_VERSION_MINOR               6
-#define DLL_VERSION_REVISION            0
-#define DLL_VERSION_BUILD				1
+#define DLL_VERSION_REVISION            1
+#define DLL_VERSION_BUILD				0
 
 #define DLL_VERSION            DLL_VERSION_MAJOR, DLL_VERSION_MINOR, DLL_VERSION_REVISION, DLL_VERSION_BUILD
 #define STRINGIZE2(s) #s
@@ -39,6 +39,13 @@ enum e_override_texture_resolution : int
 	tex_default,
 	tex_high,
 	tex_ultra
+};
+
+enum H2Config_Experimental_Rendering_Mode : byte
+{
+	e_render_none,
+	e_render_old,
+	e_render_new
 };
 
 extern std::string cartographerURL;
@@ -99,7 +106,7 @@ extern char H2Config_stats_authkey[32];
 extern bool H2Config_vip_lock;
 extern bool H2Config_force_even;
 extern bool H2Config_koth_random;
-extern bool H2Config_experimental_fps;
+extern H2Config_Experimental_Rendering_Mode H2Config_experimental_fps;
 extern bool H2Config_anti_cheat_enabled;
 
 extern int H2Config_hotkeyIdHelp;
@@ -131,3 +138,6 @@ extern point2d H2Config_SENTBEAM;
 
 extern e_override_texture_resolution H2Config_Override_Shadows;
 extern e_override_texture_resolution H2Config_Override_Water;
+
+extern bool H2Config_upnp_enable;
+extern bool H2Config_melee_fix;

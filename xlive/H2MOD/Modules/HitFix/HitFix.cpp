@@ -8,7 +8,7 @@
 #include "Globals.h"
 
 // TODO: move the struct time_globals in here somewhere else
-#include "H2MOD/Modules/MainLoopPatches/UncappedFPS/UncappedFPS.h"
+#include "Blam/Engine/Game/GameTimeGlobals.h"
 
 float HitFix_Projectile_Tick_Rate = 30.0f;
 

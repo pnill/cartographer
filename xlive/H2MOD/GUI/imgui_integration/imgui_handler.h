@@ -30,6 +30,8 @@ namespace imgui_handler
 		sixten_nine
 	};
 	HWND get_HWND();
+	bool ImGuiShoulBlockInput();
+	void ImGuiToggleInput(bool state);
 	bool CanDrawImgui();
 	void DrawImgui();
 	void ToggleWindow(std::string name);
@@ -69,6 +71,9 @@ namespace imgui_handler
 			fps_limit,
 			fps_limit_tooltip,
 			experimental_rendering_changes,
+			render_none,
+			render_cinematic,
+			render_engine,
 			experimental_rendering_tooltip,
 			refresh_rate,
 			refresh_rate_tooltip,
@@ -156,11 +161,24 @@ namespace imgui_handler
 			tex_L2,
 			tex_L3,
 			shadow_title,
-			water_title
+			water_title,
+			upnp_title,
+			upnp_tooltip,
+			melee_fix_title,
+			melee_fix_tooltip
 		};
 		void BuildStringsTable();
 		char* GetString(e_advanced_string string, std::string id = "");
 		void Render(bool* p_open);
+		void Open();
+		void Close();
+	}
+	namespace DebugOverlay
+	{
+
+		void Render(bool* p_open);
+		void AddWatchItem(std::string Key, std::string Description);
+		void UpdateWatchItem(std::string Key, std::string Value);
 		void Open();
 		void Close();
 	}

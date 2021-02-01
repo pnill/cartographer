@@ -189,8 +189,8 @@ struct Player
 
 		e_object_team player_team;
 		Handicap player_handicap_level;
-		BYTE player_displayed_skill;
-		char player_overall_skill;
+		byte player_displayed_skill;
+		byte player_overall_skill;
 		char player_is_griefer;
 		char bungie_user_role;
 		char achievement_flags;
@@ -272,6 +272,7 @@ public:
 	PlayerIterator();
 
 	bool get_next_active_player();
+
 
 	Player* get_current_player_data();
 
