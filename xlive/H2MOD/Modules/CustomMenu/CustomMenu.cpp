@@ -16,6 +16,8 @@
 #include "H2MOD\Tags\TagInterface.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 
+#include "c_screen_with_menu.h"
+
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
 
@@ -5269,6 +5271,7 @@ void initGSCustomMenu() {
 
 	CMSetupVFTables_Guide();
 	
+	c_screen_with_menu::applyPatches();
 }
 
 void deinitGSCustomMenu() {
