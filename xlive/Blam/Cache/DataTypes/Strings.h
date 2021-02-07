@@ -90,12 +90,14 @@ inline std::string  tag_string<T>::get_tag_string()
 template<int T>
 inline void tag_string<T>::operator= (const char* Value)
 {
-	this->Text = Value;
+	strcpy(this->Text, Value);
+	//this->Text = Value;
 }
 template<int T>
 inline void tag_string<T>::operator= (const tag_string Value)
 {
-	this->Text = Value.Text;
+	strcpy(this->Text, Value.Text);
+	//this->Text = Value.Text;
 }
 
 template<int T>
@@ -107,10 +109,12 @@ inline std::wstring  tag_unicode<T>::get_tag_string()
 template<int T>
 inline void tag_unicode<T>::operator= (const wchar_t* Value)
 {
-	this->Text = Value;
+	wcscpy(this->Text, Value);
+	//this->Text = Value;
 }
 template<int T>
 inline void tag_unicode<T>::operator= (const tag_unicode Value)
 {
-	this->Text = Value.Text;
+	wcscpy(this->Text, Value.Text);
+	//this->Text = Value.Text;
 }

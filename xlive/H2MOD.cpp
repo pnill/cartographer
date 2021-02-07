@@ -34,6 +34,7 @@
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "Blam/Engine/Game/DamageData.h"
+#include "H2MOD/Modules/MainMenu/MapSlots.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -832,7 +833,6 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	bool result = p_map_cache_load(engine_settings);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
-
 	// clear all the object variant data
 	object_to_variant.clear();
 
@@ -1777,7 +1777,7 @@ void H2MOD::Initialize()
 		MouseInput::Initialize();
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
-		TagFixes::Initalize();
+		
 		Initialise_tag_loader();
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
@@ -1792,11 +1792,12 @@ void H2MOD::Initialize()
 		
 		
 	}
-
+	TagFixes::Initalize();
+	MapSlots::Initialize();
+	HaloScript::Initialize();
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
 
-	HaloScript::Initialize();
 	h2mod->ApplyHooks();
 	h2mod->RegisterEvents();
 }

@@ -159,10 +159,10 @@ namespace TagFixes
 		if (!h2mod->Server) {
 			fix_shaders_nvidia();
 			ShaderSpecularFix();
-			fall_damage_fix();
 			fix_dynamic_lights();
 			font_table_fix();
 		}
+		fall_damage_fix();
 	}
 
 	void Initalize()
