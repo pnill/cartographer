@@ -131,22 +131,6 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 	return 0;
 } 
 
-void CXnIp::checkForLostConnections()
-{
-	int lostConnectionsCount = 0;
-	for (int i = 0; i < GetMaxXnConnections(); i++)
-	{
-		XnIp* xnIp = &XnIPs[i];
-		if (xnIp->bValid
-			&& timeGetTime() - xnIp->lastConnectionInteractionTime >= XnIp_ConnectionTimeOut)
-		{
-			lostConnectionsCount++;
-			UnregisterXnIpIdentifier(xnIp->connectionIdentifier);
-		}
-	}
-	LOG_INFO_NETWORK("{} - lost {} connections!", __FUNCTION__, lostConnectionsCount);
-}
-
 /*
 	Return connection identifier from received address 
 	NOTE: connection has to be established
@@ -166,12 +150,12 @@ IN_ADDR CXnIp::GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* 
 			switch (xsocket->getHostOrderSocketPort())
 			{
 			case 1000:
-				if (xsocket->sockAddrInEqual(fromAddr, &xnIp->NatAddrSocket1000))
+				if (xsocket->sockAddrInEqual(fromAddr, xnIp->getNatAddr(H2vSocket1000)))
 					return xnIp->connectionIdentifier;
 				break;
 
 			case 1001:
-				if (xsocket->sockAddrInEqual(fromAddr, &xnIp->NatAddrSocket1001))
+				if (xsocket->sockAddrInEqual(fromAddr, xnIp->getNatAddr(H2vSocket1001)))
 					return xnIp->connectionIdentifier;
 				break;
 
@@ -187,7 +171,7 @@ IN_ADDR CXnIp::GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* 
 	return addrInval;
 }
 
-void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier, sockaddr_in* addr)
+void CXnIp::SaveNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier, sockaddr_in* addr)
 {
 	LOG_INFO_NETWORK("{} - socket: {}, connection index: {}, identifier: {:x}", __FUNCTION__, xsocket->winSockHandle, getConnectionIndex(connectionIdentifier), connectionIdentifier.s_addr);
 
@@ -207,12 +191,12 @@ void CXnIp::SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier
 		{
 		case 1000:
 			//LOG_TRACE_NETWORK("SaveConnectionNatInfo() xnIp->NatAddrSocket1000 mapping port 1000 - port: {}, connection identifier: {:x}", htons(addr->sin_port), xnIp->connectionIdentifier.s_addr);
-			xnIp->NatAddrSocket1000 = *addr;
+			xnIp->updateNat(H2vSocket1000, addr);
 			break;
 
 		case 1001:
 			//LOG_TRACE_NETWORK("SaveConnectionNatInfo() xnIp->NatAddrSocket1001 mapping port 1001 - port: {}, connection identifier: {:x}", htons(addr->sin_port), xnIp->connectionIdentifier.s_addr);
-			xnIp->NatAddrSocket1001 = *addr;
+			xnIp->updateNat(H2vSocket1001, addr);
 			break;
 
 		default:
@@ -236,7 +220,7 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectR
 	if (ret == 0)
 	{
 		// TODO: get rid of H2v only sockets
-		SaveConnectionNatInfo(xsocket, connectionIdentifier, recvAddr);
+		SaveNatInfo(xsocket, connectionIdentifier, recvAddr);
 
 		XnIp* xnIp = &XnIPs[getConnectionIndex(connectionIdentifier)];
 		if (xnIp->isValid(connectionIdentifier)
@@ -246,11 +230,10 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectR
 			setTimeConnectionInteractionHappened(xnIp->connectionIdentifier);
 
 			// TODO FIXME: handle dynamically
-			if (!xsocket->sockAddrInIsNull(&xnIp->NatAddrSocket1000) 
-				&& !xsocket->sockAddrInIsNull(&xnIp->NatAddrSocket1001))
-				xnIp->xnetstatus = XNET_CONNECT_STATUS_CONNECTED; // if we have the NAT data for each port, set the status to CONNECTED
+			if (xnIp->natIsUpdated())
+				xnIp->xnetstatus = XNET_CONNECT_STATUS_CONNECTED; // if we have received the NAT data for each port, set the status to CONNECTED
 			else
-				xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING;
+				xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING; // otherwise we keep it pending
 		}
 
 		// increase packets received count
@@ -318,7 +301,7 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 	{
 		// compare current connection index with what we got passed to us
 		if (XnIPs[i].bValid
-			&& memcmp(&XnIPs[i].xnaddr.abEnet, pxna->abEnet, sizeof(XNADDR::abEnet)) == 0
+			&& memcmp(&XnIPs[i].xnaddr.abEnet, pxna->abEnet, sizeof(XNADDR::abEnet)) == 0 // check the MAC address
 			&& memcmp(&XnIPs[i].keyPair->xnkid, xnkid, sizeof(XNKID)) == 0)
 		{
 			if (outIpIdentifier) {
@@ -326,8 +309,13 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 				LOG_INFO_NETWORK("{} - already present connection index: {}, identifier: {:X}", __FUNCTION__, i, XnIPs[i].connectionIdentifier.s_addr);
 			}
 
-			// update with new information
-			XnIPs[i].xnaddr = *pxna;
+			// if there are differences between XNADDRs (like the port or even the IP address) but the MAC address is the same, update and set the connection status to IDLE and discard NAT data
+			if (memcmp(&XnIPs[i].xnaddr, pxna, sizeof(XNADDR)))
+			{
+				XnIPs[i].natDiscard();
+				XnIPs[i].xnaddr = *pxna;
+				XnIPs[i].xnetstatus = XNET_CONNECT_STATUS_IDLE; // setting this to IDLE will tell the game to call XNetConnect (or in the case this gets called after receiving a connect packet, it'll update the state to PENDING)
+			}
 			setTimeConnectionInteractionHappened(XnIPs[i].connectionIdentifier);
 
 			// if it is already in the system, return
@@ -510,6 +498,22 @@ void CXnIp::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr
 	ipLocal.bValid = true;
 }
 
+void CXnIp::checkForLostConnections()
+{
+	int lostConnectionsCount = 0;
+	for (int i = 0; i < GetMaxXnConnections(); i++)
+	{
+		XnIp* xnIp = &XnIPs[i];
+		if (xnIp->bValid
+			&& timeGetTime() - xnIp->lastConnectionInteractionTime >= XnIp_ConnectionTimeOut)
+		{
+			lostConnectionsCount++;
+			UnregisterXnIpIdentifier(xnIp->connectionIdentifier);
+		}
+	}
+	LOG_INFO_NETWORK("{} - lost {} connections!", __FUNCTION__, lostConnectionsCount);
+}
+
 // #51: XNetStartup
 int WINAPI XNetStartup(const XNetStartupParams *pxnsp)
 {
@@ -617,6 +621,7 @@ int WINAPI XNetConnect(const IN_ADDR ina)
 	XnIp* xnIp = gXnIp.getConnection(ina);
 	if (xnIp != nullptr)
 	{
+		// send connect packets only if the state is idle
 		if (xnIp->xnetstatus == XNET_CONNECT_STATUS_IDLE)
 		{
 			for (auto sockIt : XSocket::Sockets)
@@ -626,9 +631,9 @@ int WINAPI XNetConnect(const IN_ADDR ina)
 					&& H2v_socketsToConnect.find(sockIt->getHostOrderSocketPort()) != H2v_socketsToConnect.end())
 				{
 					sockIt->sendXNetRequest(ina, XnIp_ConnectionEstablishSecure); // establish 'secure' connection on the sockets
-					xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING;
 				}
 			}
+			xnIp->xnetstatus = XNET_CONNECT_STATUS_PENDING; // after we sent, set the state to PENDING
 		}
 
 		return 0;
@@ -640,7 +645,7 @@ int WINAPI XNetConnect(const IN_ADDR ina)
 // #66: XNetGetConnectStatus
 int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 {
-	//LOG_INFO_NETWORK("XNetConnect(): connection index {}, identifier: {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
+	//LOG_INFO_NETWORK("{} : connection index {}, identifier: {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
 	XnIp* xnIp = gXnIp.getConnection(ina);
 	if (xnIp != nullptr)
 	{

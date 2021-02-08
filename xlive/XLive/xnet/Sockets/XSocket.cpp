@@ -365,18 +365,19 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		{
 		case 1000:
 			sendToAddr.sin_port = xnIp->xnaddr.wPortOnline;
-			if (!xsocket->sockAddrInIsNull(&xnIp->NatAddrSocket1000))
+			if (!xsocket->sockAddrInInvalid(xnIp->getNatAddr(H2vSocket1000)))
 			{
-				sendToAddr = xnIp->NatAddrSocket1000;
+				// if there's nat data use it
+				sendToAddr = *xnIp->getNatAddr(H2vSocket1000);
 			}
 
 			break;
 
 		case 1001:
 			sendToAddr.sin_port = htons(ntohs(xnIp->xnaddr.wPortOnline) + 1);
-			if (!xsocket->sockAddrInIsNull(&xnIp->NatAddrSocket1001))
+			if (!xsocket->sockAddrInInvalid(xnIp->getNatAddr(H2vSocket1001)))
 			{
-				sendToAddr = xnIp->NatAddrSocket1001;
+				sendToAddr = *xnIp->getNatAddr(H2vSocket1001);
 			}
 
 			break;

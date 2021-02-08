@@ -72,20 +72,77 @@ struct XnKeyPair
 	XNKEY xnkey;
 };
 
+enum H2v_sockets
+{
+	H2vSocket1000 = 0,
+	H2vSocket1001
+};
+
 struct XnIp
 {
 	IN_ADDR connectionIdentifier;
 	XNADDR xnaddr;
 
+	// key we connected with
 	XnKeyPair* keyPair;
+
 	bool bValid;
 	int xnetstatus;
 	int connectionPacketsSentCount;
 	DWORD lastConnectionInteractionTime;
 
-	// NAT info
-	sockaddr_in NatAddrSocket1000; // TODO: allocate dynamically based on how many sockets are up
-	sockaddr_in NatAddrSocket1001;
+#pragma region Nat
+
+	struct NatTranslation
+	{
+		enum State : unsigned int
+		{
+			natUnavailable,
+			natAvailable,
+		};
+
+		State state;
+		sockaddr_in natAddress;
+	};
+	
+	// TODO: add single async socket implementation or figure out another way
+	NatTranslation natTranslation[2];
+
+	void updateNat(H2v_sockets natIndex, sockaddr_in* addr)
+	{
+		natTranslation[natIndex].natAddress = *addr;
+		natTranslation[natIndex].state = XnIp::NatTranslation::State::natAvailable;
+	}
+
+	sockaddr_in* getNatAddr(H2v_sockets natIndex)
+	{
+		return &natTranslation[natIndex].natAddress;
+	}
+
+	void natDiscard()
+	{
+		for (auto& translation : natTranslation)
+		{
+			memset(&translation, 0, sizeof(translation));
+			translation.state = NatTranslation::natUnavailable;
+		}
+	}
+
+	bool natIsUpdated(int natIndex) const
+	{
+		return natTranslation[natIndex].state == NatTranslation::natAvailable;
+	}
+
+	bool natIsUpdated() const
+	{
+		for (auto& translation : natTranslation)
+		{
+			if (translation.state != NatTranslation::natAvailable)
+				return false;
+		}
+		return true;
+	}
+#pragma endregion
 
 	unsigned int pckSent;
 	unsigned int pckRecvd;
@@ -93,17 +150,17 @@ struct XnIp
 	unsigned int bytesSent;
 	unsigned int bytesRecvd;
 
-	IN_ADDR getOnlineIpAddress()
+	IN_ADDR getOnlineIpAddress() const
 	{
 		return xnaddr.inaOnline;
 	}
 
-	IN_ADDR getLanIpAddr()
+	IN_ADDR getLanIpAddr() const
 	{
 		return xnaddr.ina;
 	}
 
-	bool XnIp::isValid(IN_ADDR identifier)
+	bool XnIp::isValid(IN_ADDR identifier) const
 	{
 		if (identifier.s_addr != connectionIdentifier.s_addr)
 		{
@@ -167,7 +224,7 @@ public:
 
 	void Initialize(const XNetStartupParams* netStartupParams);
 	IN_ADDR GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* addr);
-	void SaveConnectionNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);
+	void SaveNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);
 	void HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectReqPkt, sockaddr_in* addr, LPDWORD bytesRecvdCount);
 
 	void HandleDisconnectPacket(XSocket* xsocket, XNetRequestPacket* disconnectReqPck, sockaddr_in* recvAddr);
