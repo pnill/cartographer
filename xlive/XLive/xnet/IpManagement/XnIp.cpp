@@ -41,6 +41,23 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 		startupParams.cfgSockDefaultSendBufsizeInK = SOCK_UDP_MIN_SEND_BUFFER_K_UNITS;
 }
 
+void CXnIp::LogConnectionsDetails()
+{
+	for (int i = 0; i < GetMaxXnConnections(); i++)
+	{
+		if (XnIPs[i].bValid)
+		{
+			XnIp* xnIp = &XnIPs[i];
+			float connectionLastInteractionSeconds = (float)(timeGetTime() - xnIp->lastConnectionInteractionTime) / 1000.f;
+			LOG_CRITICAL(onscreendebug_log, "{} - connection index: {}, packets sent: {}, packets received: {}, time since last interaction: {:.4f} seconds", __FUNCTION__, i, xnIp->pckSent, xnIp->pckRecvd, connectionLastInteractionSeconds);
+		}
+		else
+		{
+			LOG_CRITICAL(onscreendebug_log, "{} hold up pendejo, wtf - connection index: {}, we have free connection registry and couldn't use it.", __FUNCTION__, i);
+		}
+	}
+}
+
 int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount)
 {
 	// check first if the packet received has the size bigger or equal to the XNet packet header first
@@ -243,6 +260,7 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectR
 	}
 	else
 	{
+		LogConnectionsDetails(); // TODO: disable after connection bug is fixed
 		LOG_TRACE_NETWORK("{} - secure connection cannot be established!, __FUNCTION__");
 		// TODO: send back the connection cannot be established
 	}
@@ -359,13 +377,15 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR*
 		}
 		else
 		{
+			LOG_CRITICAL(onscreendebug_log, "{} - unknown key when trying to create new connection!", __FUNCTION__);
 			return WSAEINVAL;
 		}
 
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("{} - no more available connection spots!", __FUNCTION__);
+		//LOG_TRACE_NETWORK("{} - no more available connection spots!", __FUNCTION__);
+		LOG_CRITICAL(onscreendebug_log, "{} - no more available connection spots!", __FUNCTION__); // TODO: undo and remove this line after connection bug is fixed
 		return WSAENOMORE;
 	}
 }
@@ -459,7 +479,8 @@ XnKeyPair* CXnIp::getKeyPair(const XNKID* pxnkid)
 		}
 	}
 
-	LOG_CRITICAL_NETWORK("{} - unknown session key id - {}", __FUNCTION__, ByteToHexStr((BYTE*)pxnkid, sizeof(*pxnkid)));
+	//LOG_CRITICAL_NETWORK("{} - unknown session key id - {}", __FUNCTION__, ByteToHexStr((BYTE*)pxnkid, sizeof(*pxnkid)));
+	LOG_CRITICAL(onscreendebug_log, "{} - unknown session key id - {}", __FUNCTION__, ByteToHexStr((BYTE*)pxnkid, sizeof(*pxnkid))); // TODO: undo after connection bug is fixed
 	return nullptr;
 }
 
