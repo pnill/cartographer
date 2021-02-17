@@ -288,9 +288,12 @@ namespace imgui_handler
 		ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, SelectabletextAlign);
 		g_hWnd = hWnd;
 		g_pDevice = pDevice;
-		//	ImGuiIO& io = ImGui::GetIO();
+
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
 		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
+
+		io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+
 		io.BackendPlatformName = "imgui_impl_win32";
 		io.ImeWindowHandle = hWnd;
 
