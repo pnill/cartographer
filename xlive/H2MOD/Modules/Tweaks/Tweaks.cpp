@@ -711,6 +711,24 @@ class test_engine : public c_game_engine_base
 };
 test_engine g_test_engine;
 
+// fixes the biped unit movement physics from applying too much movement, especially when edge-dropping by adjusting the default constant (0.117) value to tickrate
+__declspec(naked) void update_biped_ground_mode_physics_constant()
+{
+	static float edgeDropFactorConverted = 0.117f * 30.f; // value converted from h2x tickrate
+
+	__asm
+	{
+		PUSHAD // preserve registers on stack, until we are done
+		PUSHFD
+		call time_globals::get // get the game time globals pointer in eax register
+		movss xmm2, edgeDropFactorConverted // multiply the edge drop value 
+		mulss xmm2, dword ptr[eax + 0x4] // multiply by seconds per tick or game tick length
+		POPFD // restore registers from stack
+		POPAD
+		ret
+	}
+}
+
 void InitH2Tweaks() {
 	postConfig();
 
@@ -784,13 +802,16 @@ void InitH2Tweaks() {
 		// disable cloth debugging that writes to cloth.txt
 		WriteValue<bool>(h2mod->GetAddress(0x41F650), false);
 
-		// prevent game from setting timeBeginPeriod/timeEndPeriod
+		// prevent game from setting timeBeginPeriod/timeEndPeriod, when rendering loading screen
 		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
 		NopFill(Memory::GetAddressRelative(0x66A092), 8);
 	}
 
 	if(H2Config_experimental_game_main_loop_patches)
 		UncappedFPS::ApplyPatches();
+
+	// fixes edge drop fast fall when using higher tickrates than 30
+	Codecave(Memory::GetAddressRelative(0x506E23, 0x4F9143), update_biped_ground_mode_physics_constant, 3);
 
 	addDebugText("End Startup Tweaks.");
 }
