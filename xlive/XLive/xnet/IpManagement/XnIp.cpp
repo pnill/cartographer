@@ -41,7 +41,7 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 		startupParams.cfgSockDefaultSendBufsizeInK = SOCK_UDP_MIN_SEND_BUFFER_K_UNITS;
 }
 
-void CXnIp::LogConnectionsDetails(sockaddr_in* address = nullptr)
+void CXnIp::LogConnectionsDetails(sockaddr_in* address)
 {
 	if (address != nullptr)
 		LOG_CRITICAL(onscreendebug_log, "{} - received connection request from {}:{} we can't fulfil", __FUNCTION__, inet_ntoa(address->sin_addr), htons(address->sin_port));
