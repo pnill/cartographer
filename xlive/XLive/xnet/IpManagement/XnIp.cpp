@@ -41,8 +41,11 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 		startupParams.cfgSockDefaultSendBufsizeInK = SOCK_UDP_MIN_SEND_BUFFER_K_UNITS;
 }
 
-void CXnIp::LogConnectionsDetails()
+void CXnIp::LogConnectionsDetails(sockaddr_in* address = nullptr)
 {
+	if (address != nullptr)
+		LOG_CRITICAL(onscreendebug_log, "{} - received connection request from {}:{} we can't fulfil", __FUNCTION__, inet_ntoa(address->sin_addr), htons(address->sin_port));
+
 	for (int i = 0; i < GetMaxXnConnections(); i++)
 	{
 		if (XnIPs[i].bValid)
@@ -260,7 +263,7 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectR
 	}
 	else
 	{
-		LogConnectionsDetails(); // TODO: disable after connection bug is fixed
+		LogConnectionsDetails(recvAddr); // TODO: disable after connection bug is fixed
 		LOG_TRACE_NETWORK("{} - secure connection cannot be established!, __FUNCTION__");
 		// TODO: send back the connection cannot be established
 	}
@@ -593,6 +596,11 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 		return WSAEINVAL;
 
 	int ret = gXnIp.CreateXnIpIdentifier(pxna, pxnkid, pina, false);
+
+	if (ret != 0)
+	{
+		gXnIp.LogConnectionsDetails();
+	}
 	 
 	LOG_INFO_NETWORK("{} - local-address: {:X}, online-address: {:X}", __FUNCTION__, pxna->ina.s_addr, pxna->inaOnline.s_addr);
 	return ret;
