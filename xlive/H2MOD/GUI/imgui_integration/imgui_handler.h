@@ -165,7 +165,7 @@ namespace imgui_handler
 			upnp_title,
 			upnp_tooltip,
 			melee_fix_title,
-			melee_fix_tooltip
+			melee_fix_tooltip,
 		};
 		void BuildStringsTable();
 		char* GetString(e_advanced_string string, std::string id = "");

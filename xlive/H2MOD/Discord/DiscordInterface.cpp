@@ -62,7 +62,9 @@ const static std::unordered_set<std::string> maps_with_images = {
 	"waterworks",
 	"zanzibar",
 	"salvation",
-	"Epitaph"
+	"Epitaph",
+	"tombstone",
+	"highplains"
 };
 
 static void updateDiscordPresence()

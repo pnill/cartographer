@@ -35,6 +35,7 @@
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "Blam/Engine/Game/DamageData.h"
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
+#include "H2MOD/Modules/HitFix/MeleeFix.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -912,13 +913,13 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		if (!b_XboxTick) 
 		{
 			H2X::Initialize(b_H2X);
-			H2Tweaks::applyMeleePatch(true);
+			MeleeFix::MeleePatch(true);
 			HitFix::ApplyProjectileVelocity();
 			engine_settings->tickrate = XboxTick::setTickRate(false);
 		}
 		else
 		{
-			H2Tweaks::applyMeleePatch(false);
+			MeleeFix::MeleePatch(false);
 			engine_settings->tickrate = XboxTick::setTickRate(true);
 		}
 		H2Tweaks::toggleAiMp(true);
@@ -984,7 +985,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		//if anyone wants to run code on map load single player
 		addDebugText("Map type: Singleplayer");
 		//H2X::Initialize(true);
-		H2Tweaks::applyMeleePatch(true);
+		MeleeFix::MeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
 		EventHandler::executeMapLoadCallback(scnr_type::SinglePlayer);
 	}
@@ -1781,7 +1782,7 @@ void H2MOD::Initialize()
 		Initialise_tag_loader();
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
-		H2Tweaks::applyMeleeCollisionPatch();
+		MeleeFix::Initialize();
 		//ObserverMode::Initialize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
@@ -1797,7 +1798,7 @@ void H2MOD::Initialize()
 	HaloScript::Initialize();
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
-
+	//WriteValue(GetAddress(0xC25EA + 8), 100);
 	h2mod->ApplyHooks();
 	h2mod->RegisterEvents();
 }

@@ -113,6 +113,8 @@ point2d	H2Config_SENTBEAM = { 1 , 1 };
 e_override_texture_resolution H2Config_Override_Shadows;
 e_override_texture_resolution H2Config_Override_Water;
 
+ControllerInput::CustomControllerLayout H2Config_CustomLayout;
+
 bool H2Config_upnp_enable = true;
 bool H2Config_melee_fix = true;
 
@@ -534,6 +536,8 @@ void SaveH2Config() {
 			ini.SetValue(H2ConfigVersionSection.c_str(), "override_water", std::to_string(H2Config_Override_Water).c_str());
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
+
+			ini.SetValue(H2ConfigVersionSection.c_str(), "controller_layout", H2Config_CustomLayout.ToString().c_str());
 		}
 
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay);
@@ -845,6 +849,8 @@ void ReadH2Config() {
 						break;
 				}
 				H2Config_melee_fix = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
+
+				H2Config_CustomLayout.FromString(std::string(ini.GetValue(H2ConfigVersionSection.c_str(), "controller_layout", "1-2-4-8-16-32-64-128-256-512-4096-8192-16384-32768")));
 			}
 
 			// dedicated server only

@@ -2,7 +2,7 @@
 #pragma once
 
 #include "H2MOD.h"
-#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
+#include "H2MOD/Modules/Input/ControllerInput.h"
 
 void InitH2Config();
 void DeinitH2Config();
@@ -134,7 +134,7 @@ extern point2d H2Config_PLASPI;
 extern point2d H2Config_BRUTESHOT;
 extern point2d H2Config_NEED;
 extern point2d H2Config_SENTBEAM;
-
+extern ControllerInput::CustomControllerLayout H2Config_CustomLayout;
 
 extern e_override_texture_resolution H2Config_Override_Shadows;
 extern e_override_texture_resolution H2Config_Override_Water;

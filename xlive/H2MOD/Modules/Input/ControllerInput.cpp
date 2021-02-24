@@ -43,6 +43,58 @@ namespace ControllerInput
 		byte* default_profile;
 		byte* unk_input_struct;
 	}
+
+
+	XINPUT_BUTTONS Overwrite = XINPUT_GAMEPAD_NONE;
+	//Main function that iterates through all available input devices and calls update_xinput_state from the items vtable
+	void __cdecl update_xinput_devices()
+	{
+		auto InputDevices = h2mod->GetAddress<controller_info**>(0x479F00);
+		//Game checks for only a max of 20 inputs, if someone ever exceeds this.. I'll be impressed
+		for(auto i = 0; i < 20; i++)
+		{
+			auto InputDevice = InputDevices[i];
+			if(InputDevice->error_level == 0)
+			{
+				(*reinterpret_cast<void(__thiscall *)(controller_info*)>(InputDevice->xinput_device_vtbl[2]))(InputDevice);
+				if (get_game_life_cycle() == life_cycle_in_game) {
+					Overwrite = XINPUT_GAMEPAD_NONE;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
+						Overwrite |= H2Config_CustomLayout.DPAD_UP;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
+						Overwrite |= H2Config_CustomLayout.DPAD_DOWN;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT)
+						Overwrite |= H2Config_CustomLayout.DPAD_LEFT;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
+						Overwrite |= H2Config_CustomLayout.DPAD_RIGHT;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_START)
+						Overwrite |= H2Config_CustomLayout.START;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
+						Overwrite |= H2Config_CustomLayout.BACK;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB)
+						Overwrite |= H2Config_CustomLayout.LEFT_THUMB;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
+						Overwrite |= H2Config_CustomLayout.RIGHT_THUMB;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
+						Overwrite |= H2Config_CustomLayout.LEFT_SHOULDER;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
+						Overwrite |= H2Config_CustomLayout.RIGHT_SHOULDER;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_A)
+						Overwrite |= H2Config_CustomLayout.A;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_B)
+						Overwrite |= H2Config_CustomLayout.B;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_X)
+						Overwrite |= H2Config_CustomLayout.X;
+					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y)
+						Overwrite |= H2Config_CustomLayout.Y;
+					InputDevice->xinput_state.Gamepad.wButtons = Overwrite;
+				}
+			}
+		}
+	}
+
+
+
 	void __cdecl sub_B31BF4(int user_index, unsigned int a2)
 	{
 		memcpy((void *)a2, &default_profile + user_index, 0x1680u);
@@ -288,6 +340,7 @@ namespace ControllerInput
 		system_milliseconds = h2mod->GetAddress<p_system_milliseconds*>(0x37E51);
 		//PatchCall(h2mod->GetAddress(0x2FBD2), update_controller_input);
 		PatchCall(h2mod->GetAddress(0x2eb1b), h_game_is_minimized);
+		PatchCall(h2mod->GetAddress(0x2FA58), update_xinput_devices);
 		//Codecave(h2mod->GetAddress(0x2e975), apply_dead_zones, 166);
 		SetSensitiviy(H2Config_controller_sens);
 		ToggleModern();
