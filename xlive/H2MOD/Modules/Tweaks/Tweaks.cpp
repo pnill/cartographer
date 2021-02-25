@@ -58,9 +58,7 @@ void postConfig() {
 		addDebugText(NotificationPlayerText);
 		MessageBoxA(NULL, NotificationPlayerText, "BASE PORT BIND WARNING!", MB_OK);
 	}
-	char NotificationText5[120];
-	sprintf(NotificationText5, "Base port: %d.", H2Config_base_port);
-	addDebugText(NotificationText5);
+	addDebugText("Base port: %d.", H2Config_base_port);
 
 	RefreshTogglexDelay();
 }
@@ -74,7 +72,6 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 	if (a2 == 0xb9) {
 		//boot them offline.
 		XUserSignOut(0);
-		ipManager.UnregisterLocalConnectionInfo();
 		UpdateConnectionStatus();
 		H2Config_master_ip = inet_addr("127.0.0.1");
 		H2Config_master_port_relay = 2001;
@@ -714,6 +711,24 @@ class test_engine : public c_game_engine_base
 };
 test_engine g_test_engine;
 
+// fixes the biped unit movement physics from applying too much movement, especially when edge-dropping by adjusting the default constant (0.117) value to tickrate
+__declspec(naked) void update_biped_ground_mode_physics_constant()
+{
+	static float edgeDropFactorConverted = 0.117f * 30.f; // value converted from h2x tickrate
+
+	__asm
+	{
+		PUSHAD // preserve registers on stack, until we are done
+		PUSHFD
+		call time_globals::get // get the game time globals pointer in eax register
+		movss xmm2, edgeDropFactorConverted // multiply the edge drop value 
+		mulss xmm2, dword ptr[eax + 0x4] // multiply by seconds per tick or game tick length
+		POPFD // restore registers from stack
+		POPAD
+		ret
+	}
+}
+
 void InitH2Tweaks() {
 	postConfig();
 
@@ -786,10 +801,25 @@ void InitH2Tweaks() {
 
 		// disable cloth debugging that writes to cloth.txt
 		WriteValue<bool>(h2mod->GetAddress(0x41F650), false);
+
+		// prevent game from setting timeBeginPeriod/timeEndPeriod, when rendering loading screen
+		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
+		NopFill(Memory::GetAddressRelative(0x66A092), 8);
+
+		// disable gamma correction by using D3D9::SetGammaRamp, TODO: implement a shader to take care of this, because D3D9::SetGammaRamp function seems to have 2 issues:
+		// 1) it's very heavy on NVIDIA/Intel (not sure about AMD) GPUs (or there is something wrong with the drivers), causing stuttering on maps that override gamma (like Warlock, Turf, Backwash)
+		// 2) it doesn't apply the gamma override when playing in windowed mode (thus why some people like using windowed mode, because it doesn't cause stuttering on these maps)
+
+		// maybe we could find a way to use the gamma shader built in by converting the override gamma ramp to something that shader could understand
+		BYTE SetGammaRampSkipBytes[] = { 0x90, 0x90, 0x90, 0xE9, 0x94, 0x00, 0x00, 0x00, 0x90 };
+		WriteBytes(Memory::GetAddressRelative(0x66193B), SetGammaRampSkipBytes, sizeof(SetGammaRampSkipBytes));
 	}
 
 	if(H2Config_experimental_game_main_loop_patches)
 		UncappedFPS::ApplyPatches();
+
+	// fixes edge drop fast fall when using higher tickrates than 30
+	Codecave(Memory::GetAddressRelative(0x506E23, 0x4F9143), update_biped_ground_mode_physics_constant, 3);
 
 	addDebugText("End Startup Tweaks.");
 }

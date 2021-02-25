@@ -511,9 +511,9 @@ wchar_t* H2MOD::get_local_player_name(int local_player_index)
 int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
 {
 	PlayerIterator playersIt;
-	while (playersIt.get_next_player())
+	while (playersIt.get_next_active_player())
 	{
-		datum unit_datum_index_check = playersIt.get_current_player_data()->BipedUnitDatum;
+		datum unit_datum_index_check = playersIt.get_current_player_data()->controlled_unit_index;
 		LOG_TRACE_FUNC("Checking datum: {0:x} - index: {1} against datum: {2:x}", unit_datum_index_check.ToInt(), playersIt.get_current_player_index(), unit_datum_index.ToInt());
 
 		if (unit_datum_index == unit_datum_index_check)
