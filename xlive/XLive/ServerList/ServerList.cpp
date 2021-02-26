@@ -40,7 +40,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 
 void BadServer(ULONGLONG xuid, const char* log_catch)
 {
-	LOG_TRACE_GAME("{} - XUID: {0} - Log Catch: {1}", __FUNCTION__, xuid, log_catch);
+	LOG_TRACE_GAME("{} - XUID: {} - Log Catch: {}", __FUNCTION__, xuid, log_catch);
 }
 
 DWORD ComputeXLocatorServerEnumeratorBufferSize(DWORD cItems, DWORD cRequiredPropertyIDs, DWORD* pRequredPropertiesIDs, DWORD* outStringBufferSize)
