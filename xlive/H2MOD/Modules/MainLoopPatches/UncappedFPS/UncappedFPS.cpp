@@ -97,7 +97,7 @@ void __cdecl reset_time()
 	*h2mod->GetAddress<BYTE*>(0x479EA0) = (BYTE)1;
 }
 
-float __cdecl compute_time_delta(bool use_static_time_increase, float static_time_delta)
+float __cdecl main_time_update(bool use_static_time_increase, float static_time_delta)
 {
 	typedef float(__cdecl* compute_time_delta_def)(bool, float);
 	auto p_compute_time_delta_def = h2mod->GetAddress<compute_time_delta_def>(0x28814);
@@ -151,36 +151,14 @@ float __cdecl compute_time_delta(bool use_static_time_increase, float static_tim
 	return timeDeltaSeconds;
 }
 
-// we disable some broken code added by hired gun, that is also disabled while running a cinematic 
-// this should fix the built in frame limiter (while minimized)
-// as well as the game speeding up while minimized
-bool __cdecl cinematic_in_progress_hook()
-{
-	typedef bool(__cdecl* cinematic_in_progress)();
-	auto p_cinematic_in_progress = h2mod->GetAddress<cinematic_in_progress>(0x3A938);
-
-	bool unk = *h2mod->GetAddress<bool*>(0x48225B);
-	if (!p_cinematic_in_progress())
-		unk = false;
-
-	*h2mod->GetAddress<bool*>(0x48225B) = unk;
-
-	return H2Config_experimental_game_main_loop_patches || p_cinematic_in_progress() || call_get_game_tick_rate() < 60 || b_XboxTick || call_is_game_minimized();
-}
-
-bool __cdecl should_limit_framerate()
-{
-	return !H2Config_experimental_game_main_loop_patches && (call_is_game_minimized() || b_XboxTick);
-}
-
 void UncappedFPS::ApplyPatches()
 {
 	if (h2mod->Server == false)
 	{
 		//NopFill(h2mod->GetAddress(0x2728E7), 5);
 
-		PatchCall(h2mod->GetAddress(0x39BE3), compute_time_delta);
-		PatchCall(h2mod->GetAddress(0x39C0D), compute_time_delta);
+		PatchCall(h2mod->GetAddress(0x39BE3), main_time_update);
+		PatchCall(h2mod->GetAddress(0x39C0D), main_time_update);
 		WriteJmpTo(h2mod->GetAddress(0x1B3C5C), get_time_delta_msec);
 		WriteJmpTo(h2mod->GetAddress(0x286D9), reset_time);
 
@@ -192,10 +170,6 @@ void UncappedFPS::ApplyPatches()
 		//NopFill(h2mod->GetAddress(0x39DF0), 8);
 
 		//NopFill(h2mod->GetAddress(0x39DE1), 5);
-
-		PatchCall(h2mod->GetAddress(0x288B5), should_limit_framerate);
-
-		PatchCall(h2mod->GetAddress(0x39A2A), cinematic_in_progress_hook);
 	}
 
 	//PatchWinAPICall(h2mod->GetAddress(0x37E51), timeGetTime_hook);

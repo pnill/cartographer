@@ -238,8 +238,8 @@ p_game_time_globals_prep* game_time_globals_prep;
 typedef int(__cdecl p_system_milliseconds)();
 p_system_milliseconds* system_milliseconds;
 
-typedef float(__cdecl p_main_game_time_system_update)(char a1, float a2);
-p_main_game_time_system_update* main_game_time_system_update;
+typedef float(__cdecl main_game_time_system_update)(bool a1, float a2);
+main_game_time_system_update* p_main_time_update;
 
 typedef void(__cdecl p_render_audio)();
 p_render_audio* render_audio;
@@ -250,7 +250,52 @@ p_sub_B1D31F* sub_B1D31F;
 typedef void(_cdecl p_sub_AF8716)(int a1);
 p_sub_AF8716* sub_AF8716;
 
+extern bool b_XboxTick;
 
+// we disable some broken code added by hired gun, that is also disabled while running a cinematic 
+// this should fix the built in frame limiter (while minimized)
+// as well as the game speeding up while minimized
+bool __cdecl cinematic_in_progress_hook()
+{
+	typedef bool(__cdecl* cinematic_in_progress)();
+	auto p_cinematic_in_progress = h2mod->GetAddress<cinematic_in_progress>(0x3A938);
+
+	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+	if (H2Config_experimental_game_main_loop_patches) // if we are using the original game rendering mode
+		experimental_rendering_mode = e_render_none; // H2Config_experimental_game_main_loop_patches will override H2Config_experimental_fps
+
+	switch (experimental_rendering_mode)
+	{
+	default:
+	case e_render_none:
+		if (!p_cinematic_in_progress())
+			*h2mod->GetAddress<bool*>(0x48225B) = false;
+	case e_render_old:
+	case e_render_new:
+		return p_cinematic_in_progress() || H2Config_experimental_game_main_loop_patches || b_XboxTick || call_is_game_minimized();
+		break;
+	}
+
+	return false;
+}
+
+bool __cdecl should_limit_framerate()
+{
+	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+	if (H2Config_experimental_game_main_loop_patches) // if we are using the original game rendering mode
+		experimental_rendering_mode = e_render_none; // H2Config_experimental_game_main_loop_patches will override H2Config_experimental_fps
+
+	switch (experimental_rendering_mode)
+	{
+	default:
+	case e_render_none:
+	case e_render_old:
+	case e_render_new:
+		return (call_is_game_minimized() || b_XboxTick) && !H2Config_experimental_game_main_loop_patches;
+	}
+
+	return false;
+}
 
 LARGE_INTEGER freq;
 LARGE_INTEGER start_tick;
@@ -315,7 +360,7 @@ void __cdecl game_main_loop()
 	int v8; // esi
 	int v9; // [esp+Ch] [ebp-38h]
 	char v10; // [esp+21h] [ebp-23h]
-	char Interpolate; // [esp+22h] [ebp-22h]
+	bool Interpolate; // [esp+22h] [ebp-22h]
 	bool v12; // [esp+23h] [ebp-21h]
 	static float v13;// [esp+24h] [ebp-20h]
 	signed int a3; // [esp+28h] [ebp-1Ch]
@@ -325,7 +370,8 @@ void __cdecl game_main_loop()
 	int v18; // [esp+40h] [ebp-4h]
 	v1 = sub_AF87A1(); //Some sort of initializer for timing.
 	a3 = v1;
-	Interpolate = 1;
+	Interpolate = true; // by default this is false, and needs to be set to true if a cinematic is running, to run the main loop how it originally worked in H2X
+						// (Nuke: also theres no interpolation in the game, it has to be added, mo idea why this is called like this because it's quite misleading)
 	if (!(*dword_F52268 & 1)) //Game loop init
 	{
 		*dword_F52268 |= 1u;
@@ -336,7 +382,7 @@ void __cdecl game_main_loop()
 	{
 		a3 = 1;
 		v1 = 1;
-		Interpolate = 1;
+		Interpolate = true;
 	}
 	else
 	{
@@ -347,7 +393,7 @@ void __cdecl game_main_loop()
 	{
 		a3 = 1;
 		v1 = 1;
-		Interpolate = 1;
+		Interpolate = true;
 	}
 	v2 = 0;
 	while (1)
@@ -404,17 +450,19 @@ void __cdecl game_main_loop()
 			out_target_ticks = 0;
 			if (Interpolate)
 			{
-				//v15 = main_game_time_system_update(0, 0.0);
-				v15 = alt_system_time_update();
+				if (cinematic_in_progress_hook()) 
+					v15 = p_main_time_update(false, 0.0f);
+				else
+					v15 = alt_system_time_update(); // (Nuke: no idea why main_time_update is replaced by this but p_main_time_update does the same thing, just gets a time delta)
 			}
 			else
 			{
 				if (v1 > 0 && sub_B4BFD1())
 					v3 = time_globals::get()->seconds_per_tick;
 				else
-					v3 = 0.0;
+					v3 = 0.0f;
 				a2 = v3;
-				v15 = main_game_time_system_update(1, a2);
+				v15 = p_main_time_update(true, a2);
 				if (*dword_F52260 < 2)
 				{
 					++*dword_F52260;
@@ -552,7 +600,14 @@ void initGSRunLoop() {
 	else {
 		addDebugText("Hooking Loop Function");
 		main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
-		switch(H2Config_experimental_fps)
+
+		// (TODO (Kant): add H2Config_experimental_game_main_loop_patches as render mode, but should pretty much be e_render_none plus the call to UncappedFPS::ApplyPatches())
+		// what it does is make the game throttle the main loop as the original game on Xbox did, and removes the bs Hired Gun Added
+		H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+		if (H2Config_experimental_game_main_loop_patches) // if we are using the original game rendering mode
+			experimental_rendering_mode = e_render_none; // H2Config_experimental_game_main_loop_patches will override H2Config_experimental_fps
+
+		switch (experimental_rendering_mode)
 		{
 		default:;
 		case e_render_none:
@@ -606,7 +661,7 @@ void initGSRunLoop() {
 				simulation_update = h2mod->GetAddress<p_simulation_update*>(0x4A5D0);
 				game_effects_update = h2mod->GetAddress<p_game_effects_update*>(0x48CDC);
 				director_update = h2mod->GetAddress<p_director_update*>(0x5A658);
-				main_game_time_system_update = h2mod->GetAddress<p_main_game_time_system_update*>(0x28814);
+				p_main_time_update = h2mod->GetAddress<main_game_time_system_update*>(0x28814);
 
 				dword_F52268 = h2mod->GetAddress<int*>(0x482268);
 				max_tick_count = h2mod->GetAddress<int*>(0x482264);
@@ -626,6 +681,9 @@ void initGSRunLoop() {
 			break;
 		}
 
+		// apply the code that fixes and determines if the amin loop should be throttled
+		PatchCall(h2mod->GetAddress(0x288B5), should_limit_framerate);
+		PatchCall(h2mod->GetAddress(0x39A2A), cinematic_in_progress_hook);
 	}
 
 	PatchCall(Memory::GetAddressRelative(0x439E3D, 0x40BA40), main_game_time_initialize_defaults_hook);
