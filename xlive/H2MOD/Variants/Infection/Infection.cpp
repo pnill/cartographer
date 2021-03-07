@@ -238,9 +238,6 @@ void Infection::preSpawnServerSetup() {
 void Infection::setPlayerAsHuman(int playerIndex) {
 	Player::setUnitBipedType(playerIndex, Player::Biped::Spartan);
 	Player::setBipedSpeed(playerIndex, 1.0f);
-
-	call_give_player_weapon(playerIndex, Weapon::shotgun, 1);
-	call_give_player_weapon(playerIndex, Weapon::magnum, 0);
 }
 
 void Infection::setPlayerAsZombie(int playerIndex) {
