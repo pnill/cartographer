@@ -42,6 +42,10 @@ struct datum
 
 	inline signed short ToAbsoluteIndex() const { return Index; };
 
+	inline void operator=(const datum &other)
+	{
+		this->data = other.data;
+	}
 	inline bool operator == (const datum &other) const
 	{
 		return this->data == other.data;
