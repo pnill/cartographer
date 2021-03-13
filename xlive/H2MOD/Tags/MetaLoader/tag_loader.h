@@ -20,6 +20,10 @@ namespace tag_loader
 	std::shared_ptr<plugins_field> Get_plugin(std::string type);
 	//returns whether the map is a shared map or not
 	bool Check_shared(std::ifstream* fin);
+	//Checks if the map file exists
+	bool Map_exists(std::string map);
+	//Find tag datum based off of tag name
+	datum Get_tag_datum(std::string tag_name, std::string map);
 	//Loads a tag from specified map in accordance with the datum index supplied
 	void Load_tag(int datum_index, bool recursive, std::string map, bool custom = false);
 	//Return the size of the meta that is currently in the que

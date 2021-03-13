@@ -36,6 +36,7 @@
 #include "Blam/Engine/Game/DamageData.h"
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
 #include "H2MOD/Modules/HitFix/MeleeFix.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -947,37 +948,6 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 				headHunterHandler->initializer->execute();
 			}
 		}
-		//Christmas hat importing move later, auto disables after december.
-		if (!h2mod->Server) {
-			std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-			time_t tt = std::chrono::system_clock::to_time_t(now);
-			tm utc_tm = *gmtime(&tt);
-			if (utc_tm.tm_mon == 11) {
-				tag_loader::Load_tag(0xE19B001D, true, "christmas_hat_map");
-				tag_loader::Load_tag(0xE1BF0024, true, "christmas_hat_map");
-				tag_loader::Push_Back();
-				//auto scen = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(datum(_INJECTED_TAG_START_));
-				/*auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
-				if (hlmt_chief_datum != datum::Null) {
-					auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
-					auto b = hlmt_chief->variants[0];
-					auto a = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
-					a->parent_marker = string_id(184552154);
-					a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
-					a->child_object.TagIndex = tag_loader::ResolveNewDatum(0xE19B001D);
-				}
-				auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
-				if (hlmt_elite_datum != datum::Null)
-				{
-					auto hlmt_eliete = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_elite_datum);
-					auto b = hlmt_eliete->variants[0];
-					auto a = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
-					a->parent_marker = string_id(184552154);
-					a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
-					a->child_object.TagIndex = tag_loader::ResolveNewDatum(0xE1BF0024);
-				}*/
-			}
-		}
 	}
 
 	else if (h2mod->GetMapType() == scnr_type::SinglePlayer)
@@ -1783,6 +1753,7 @@ void H2MOD::Initialize()
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
 		MeleeFix::Initialize();
+		SpecialEvents::Initialize();
 		//ObserverMode::Initialize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init

@@ -42,7 +42,7 @@ namespace imgui_handler {
 			bool g_init = false;
 			int g_language_code = -1;
 			
-			const char* button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flash Light","Swap Grenade","Jump","Melee","Reload","Switch Weapons" };
+			const char* button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Left Thumb","Right Thumb","Left Bumper","Right Bumper","A","B","X","Y" };
 			const WORD button_values[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 4096, 8192, 16384, 32768 };
 			int button_placeholders[14];
 			std::map<int, std::map<e_advanced_string, char*>> string_table;
@@ -831,6 +831,12 @@ namespace imgui_handler {
 						ImGui::SetTooltip(GetString(melee_fix_tooltip));
 
 					ImGui::NextColumn();
+
+					TextVerticalPad(GetString(no_events_title), 8.5);
+					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+					ImGui::Checkbox("##no_events", &H2Config_no_events);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(GetString(no_events_tooltip));
 					ImGui::Columns(1);
 
 					ImGui::Text(GetString(language));
@@ -1137,6 +1143,8 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::upnp_tooltip] = "Enabled UPNP Port forwarding for the project.";
 			string_table[0][e_advanced_string::melee_fix_title] = "Melee Patch";
 			string_table[0][e_advanced_string::melee_fix_tooltip] = "Allows you to turn off the melee patch";
+			string_table[0][e_advanced_string::no_events_title] = "No Events";
+			string_table[0][e_advanced_string::no_events_tooltip] = "Opt out of event cosmetics restart required to take effect";
 			
 			//Spanish.
 			string_table[4][e_advanced_string::title] = u8"      Ajustes avanzados";
@@ -1248,6 +1256,8 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::upnp_tooltip] = u8"Habilita el reenvío de puertos UPNP para el proyecto.";
 			string_table[4][e_advanced_string::melee_fix_title] = u8"Parche cuerpo a cuerpo";
 			string_table[4][e_advanced_string::melee_fix_tooltip] = u8"Te permite desactivar el parche cuerpo a cuerpo";
+			string_table[4][e_advanced_string::no_events_title] = u8"No hay eventos";
+			string_table[4][e_advanced_string::no_events_tooltip] = u8"Se requiere el reinicio de los cosméticos del evento para que surta efecto";
 		}
 	}
 }
