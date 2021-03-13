@@ -4,6 +4,7 @@
 
 extern DWORD H2BaseAddr;
 const int CreditsMenu_ID = 0xFF000006;
+const int CMLabelMenuId_Error = 0xFF000001;
 
 void __stdcall sub_21bf85_CMLTD_(int thisptr, int label_id, int label_menu_id);
 int __stdcall sub_2111ab_CMLTD_(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description);

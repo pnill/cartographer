@@ -9,7 +9,7 @@ bool ras_layer_overrides[25];
 bool geo_render_overrides[24];
 namespace RenderHooks
 {
-	int layer_calls[]
+	int layer_calls[17]
 	{
 		0x28053A,
 		0x280557,
@@ -29,7 +29,7 @@ namespace RenderHooks
 		0x280799,
 		0x2807B7
 	};
-	int render_calls[]
+	int render_calls[18]
 	{
 		0x190B0F,
 		0x1914D4,
@@ -56,7 +56,7 @@ namespace RenderHooks
 	typedef bool(__cdecl p_initialize_rasterizer_layer)(e_layer_type type, unsigned int width, unsigned int height, bool fmt, int a5);
 	p_initialize_rasterizer_layer* c_initialize_rasterizer_layer;
 
-	typedef void(__cdecl p_render_geometry)(e_render_geometry_type type);
+	typedef char(__cdecl p_render_geometry)(e_render_geometry_type type);
 	p_render_geometry* c_render_geometry;
 
 	int oWidth = 0;
@@ -148,7 +148,7 @@ namespace RenderHooks
 		return c_initialize_rasterizer_layer(type, oWidth, oHeight, fmt, a5);
 	}
 
-	void __cdecl h_render_geometry(e_render_geometry_type type)
+	char __cdecl h_render_geometry(e_render_geometry_type type)
 	{
 		if (!geo_render_overrides[(int)type - 1]) {
 			return c_render_geometry(type);

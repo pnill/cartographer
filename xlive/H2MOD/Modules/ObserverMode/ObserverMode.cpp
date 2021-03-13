@@ -191,27 +191,23 @@ namespace ObserverMode
 	void SightJackObject()
 	{
 		if (ObserverMode == observer_firstperson) {
-			PlayerIterator playerIt;
-
-			datum unitIndexSameAsObserverIndex(datum::Null);
-
-			while (playerIt.get_next_active_player())
-			{
-				Player* player = playerIt.get_current_player_data();
-				if (player->controlled_unit_index == observer_current_index)
-				{
-					unitIndexSameAsObserverIndex = observer_current_index;
-					break;
-				}
-			}
-				
+			//auto pArray = Player::getArray();
+			
+			//int index = 0;
+			//do
+			//{
+			//	datum pDatum = ((datum)pArray->datum[0x204 * index + 0x28]);
+			//	if (pDatum == observer_current_index)
+			//		break;
+			//	index++;
+			//} while (index < 16);
 			auto control = PlayerControl::GetControls(0);
-			auto player_actions = PlayerControl::GetPlayerActions(currentPlayerIndex);
-			Player::getPlayer(h2mod->get_player_datum_index_from_controller_index(0).Index)->controlled_unit_index = observer_current_index;
+			auto player_actions = PlayerControl::GetPlayerMotion(currentPlayerIndex);
+			Player::getPlayer(h2mod->get_player_datum_index_from_controller_index(0).Index)->BipedUnitDatum = observer_current_index;
 			//control->ControllingDatum = observer_current_index;
-			//control->Actions.yaw = player_actions.yaw;
-			//control->Actions.pitch = player_actions.pitch;
-			control->Actions = player_actions;
+			control->Actions.yaw = player_actions->facing.yaw.as_rad();
+			control->Actions.pitch = player_actions->facing.pitch.as_rad();
+			//control->Actions = player_actions;
 		}
 	}
 

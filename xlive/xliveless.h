@@ -34,7 +34,8 @@ extern h2log *onscreendebug_log;
 extern h2log *voice_log;
 
 #define CHECK_PTR(check, expression) \
-	((void) ((!(check)) || ((expression), true)))
+	if (check) \
+		expression
 
 // Generic logging
 // For the most unimportant stuff

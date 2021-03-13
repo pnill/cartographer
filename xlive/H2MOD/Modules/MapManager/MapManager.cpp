@@ -6,7 +6,6 @@
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "..\Networking\Networking.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 #include <Mswsock.h>
 #include <WS2tcpip.h>
@@ -302,7 +301,6 @@ char __cdecl handle_map_download_callback() {
 				if (!mapManager->downloadFromRepo(mapManager->getMapFilenameToDownload()))
 				{
 					LOG_TRACE_NETWORK("[h2mod-mapmanager] handle_map_download_callback() - MapManager::downloadFromRepo failed, leaving session!");
-					addDebugText("Failed to download custom map %s .", mapManager->getMapFilenameToDownload().c_str());
 					h2mod->leave_session(); // download has failed
 				}
 			}
@@ -314,7 +312,6 @@ char __cdecl handle_map_download_callback() {
 		else 
 		{
 			// no map filename (probably packet hasn't been received)
-			addDebugText("Failed to download custom map, no map filename received.");
 			LOG_TRACE_NETWORK("[h2mod-mapmanager] no map filename received from host!");
 			h2mod->leave_session();
 		}

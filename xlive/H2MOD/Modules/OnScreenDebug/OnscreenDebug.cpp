@@ -3,14 +3,11 @@
 #include "H2MOD\Modules\Startup\Startup.h"
 
 char** DebugStr;
-const int DebugTextArrayLenMax = 160;
+int DebugTextArrayLenMax = 160;
 int DebugTextArrayPos = 0;
 int DebugTextCount = 0;
 bool DebugTextDisplay = false;
 bool initialisedDebugText = false;
-
-// we change global variables, async debug text could result in hazzard
-std::mutex addTextMutex;
 
 int getDebugTextArrayMaxLen() {
 	return DebugTextArrayLenMax;
@@ -20,9 +17,23 @@ int getDebugTextDisplayCount() {
 	return DebugTextCount;
 }
 
-void addDebugTextInternal(char* text) {
-	std::lock_guard<std::mutex> lg(addTextMutex);
+void addDebugText(const wchar_t* wtext) {
+	int lenInput = wcslen(wtext) + 1;
+	char* text = (char*)calloc(1, sizeof(char) * lenInput);
+	snprintf(text, lenInput, "%ls", wtext);
+	addDebugText(text);
+	free(text);
+}
 
+void addDebugText(const char* text) {
+	int buflen = strlen(text) + 1;
+	char* text2 = (char*)calloc(1, sizeof(char) * buflen);
+	memcpy(text2, text, sizeof(char) * buflen);
+	addDebugText(text2);
+	free(text2);
+}
+
+void addDebugText(char* text) {
 	if (!initialisedDebugText) return;
 
 	int lenInput = strlen(text);
@@ -32,87 +43,31 @@ void addDebugTextInternal(char* text) {
 		lenInput = endChar - text;
 	}
 
-	int _DebugTextCount = DebugTextCount;
-	_DebugTextCount++;
-	if (_DebugTextCount >= DebugTextArrayLenMax)
-		_DebugTextCount = DebugTextArrayLenMax;
+	DebugTextCount++;
+	if (DebugTextCount >= DebugTextArrayLenMax)
+		DebugTextCount = DebugTextArrayLenMax;
+		
+	DebugTextArrayPos++;
+	if (DebugTextArrayPos >= DebugTextArrayLenMax) 
+		DebugTextArrayPos = 0;
 
-	int _DebugTextArrayPos = DebugTextArrayPos;
-	_DebugTextArrayPos++;
-	if (_DebugTextArrayPos >= DebugTextArrayLenMax)
-		_DebugTextArrayPos = 0;
+	if (DebugStr[DebugTextArrayPos])
+		free(DebugStr[DebugTextArrayPos]);
 
-	if (DebugStr[_DebugTextArrayPos])
-		free(DebugStr[_DebugTextArrayPos]);
-
-	DebugStr[_DebugTextArrayPos] = (char*)calloc(lenInput + 1, sizeof(char));
-	strncpy(DebugStr[_DebugTextArrayPos], text, lenInput);
+	DebugStr[DebugTextArrayPos] = (char*)calloc(1, sizeof(char) * lenInput + 1);
+	strncpy(DebugStr[DebugTextArrayPos], text, lenInput);
 
 	onscreendebug_log->debug(text);
 
-	// set global counters just after we added the text
-	DebugTextCount = _DebugTextCount;
-	DebugTextArrayPos = _DebugTextArrayPos;
-
 	if (endChar) {
-		return addDebugTextInternal(endChar + 1);
+		addDebugText(endChar + 1);
 	}
-}
-
-void addDebugText(const wchar_t* format, ...)
-{
-	va_list valist;
-	va_start(valist, format);
-
-	/* get the formatted buffer size */
-	int stringLength = _vscwprintf(format, valist) + 1; // +1 adds null characeter, "_vscwprintf" doesn't add it
-
-	if (stringLength == -1)
-	{
-		LOG_TRACE_GAME("{} - error trying to get string length size", __FUNCTION__);
-		return;
-	}
-
-	wchar_t* textBufferW = (wchar_t*)calloc(stringLength, sizeof(wchar_t));
-	_vswprintf(textBufferW, format, valist);
-
-	char* textBufferA = (char*)calloc(stringLength, sizeof(char));
-	_snprintf(textBufferA, stringLength, "%ls", textBufferW);
-
-	addDebugTextInternal(textBufferA);
-
-	free(textBufferW);
-	free(textBufferA);
-	va_end(valist);
-}
-
-void addDebugText(const char* format, ...)
-{
-	va_list valist;
-	va_start(valist, format);
-
-	/* get the formatted buffer size */
-	int stringLength = _vscprintf(format, valist) + 1; // +1 adds null characeter, "_vscwprintf" doesn't add it
-
-	if (stringLength == -1)
-	{
-		LOG_TRACE_GAME("{} - error trying to get string length size", __FUNCTION__);
-		return;
-	}
-
-	char* textBufferA = (char*)calloc(stringLength, sizeof(char));
-	vsprintf(textBufferA, format, valist);
-
-	addDebugTextInternal(textBufferA);
-
-	free(textBufferA);
-	va_end(valist);
 }
 
 void initDebugText() {
 	initialisedDebugText = true;
 	onscreendebug_log = h2log::create("OnScreenDebug", prepareLogFileName(L"h2onscreendebug"));
-	DebugStr = (char**)calloc(DebugTextArrayLenMax, sizeof(char*));
+	DebugStr = (char**)calloc(1, sizeof(char*) * DebugTextArrayLenMax);
 	addDebugText("Initialised On Screen Debug Text.");
 }
 

@@ -41,6 +41,4 @@ public:
 
 	};
 
-	static void applyPatches();
-	void __thiscall build_player_list(void* a1, int player_count);
 }; static_assert(sizeof(c_screen_with_menu) == 0xB0, "Warning size of c_screen_with_menu != 0xA4");

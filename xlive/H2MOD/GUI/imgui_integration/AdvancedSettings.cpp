@@ -940,11 +940,11 @@ namespace imgui_handler {
 							PlayerIterator playerIt;
 							s_datum_array* Objects = *h2mod->GetAddress<s_datum_array**>(0x4E461C);
 							
-							while(playerIt.get_next_active_player())
+							while(playerIt.get_next_player())
 							{
 								auto player = playerIt.get_current_player_data();
-								int object = *(int*)&Objects->datum[12 * player->controlled_unit_index.Index + 8];
-								LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->controlled_unit_index.ToInt(), std::hex), IntToWString<int>(object, std::hex));
+								int object = *(int*)&Objects->datum[12 * player->BipedUnitDatum.Index + 8];
+								LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->BipedUnitDatum.ToInt(), std::hex), IntToWString<int>(object, std::hex));
 							}
 						}
 					}

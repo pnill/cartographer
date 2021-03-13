@@ -17,6 +17,8 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
+#include <filesystem>
+
 namespace filesystem = std::experimental::filesystem;
 
 // xLiveLess specific logger
@@ -87,7 +89,10 @@ void initInstanceNumber() {
 			CloseHandle(mutex);
 		}
 	} while (lastErr == ERROR_ALREADY_EXISTS);
-	addDebugText("You are Instance #%d.", instanceNumber);
+
+	char NotificationPlayerText[30];
+	sprintf(NotificationPlayerText, "You are Instance #%d.", instanceNumber);
+	addDebugText(NotificationPlayerText);
 }
 
 wchar_t xinput_path[_MAX_PATH];
@@ -272,8 +277,16 @@ void initLocalAppData() {
 		addDebugText("ERROR: Could not find AppData Local. Using Process File Path:");
 	}
 	else {
-		addDebugText("Found AppData Local: %s", H2AppDataLocal);
+		addDebugText("Found AppData Local:");
 	}
+	addDebugText(H2AppDataLocal);
+}
+
+void __cdecl game_modules_dispose() {
+	typedef void(__cdecl *tsub_48BBF)();
+	tsub_48BBF psub_48BBF = (tsub_48BBF)(H2BaseAddr + 0x48BBF);
+	psub_48BBF();
+	DeinitH2Startup();
 }
 
 CRITICAL_SECTION log_section;
@@ -353,8 +366,6 @@ void InitH2Startup() {
 
 	H2BaseAddr = (DWORD)game_info.base;
 	h2mod->SetBase(H2BaseAddr);
-
-
 	if (game_info.process_type == H2Types::H2Server)
 	{
 		h2mod->Server = true;
@@ -365,7 +376,6 @@ void InitH2Startup() {
 		h2mod->Server = false;
 		H2IsDediServer = false;
 	}
-	Memory::setBaseAddress(H2BaseAddr, H2IsDediServer);
 
 	initInstanceNumber();
 
@@ -399,6 +409,9 @@ void InitH2Startup() {
 	}
 	else {
 		addDebugText("Process is Client");
+
+		addDebugText("Hooking Shutdown Function");
+		PatchCall(H2BaseAddr + 0x39E7C, game_modules_dispose);
 	}
 
 	if (ArgList != NULL)

@@ -146,7 +146,7 @@ template <bool IsSigned>
 struct int_checker {
   template <typename T>
   static bool fits_in_int(T value) {
-    unsigned max = (std::numeric_limits<int>::max)();
+    unsigned max = std::numeric_limits<int>::max();
     return value <= max;
   }
   static bool fits_in_int(bool) { return true; }
@@ -156,8 +156,8 @@ template <>
 struct int_checker<true> {
   template <typename T>
   static bool fits_in_int(T value) {
-    return value >= (std::numeric_limits<int>::min)() &&
-           value <= (std::numeric_limits<int>::max)();
+    return value >= std::numeric_limits<int>::min() &&
+           value <= std::numeric_limits<int>::max();
   }
   static bool fits_in_int(int) { return true; }
 };
@@ -303,7 +303,7 @@ class printf_width_handler: public function<unsigned> {
       spec_.align_ = ALIGN_LEFT;
       width = 0 - width;
     }
-    unsigned int_max = (std::numeric_limits<int>::max)();
+    unsigned int_max = std::numeric_limits<int>::max();
     if (width > int_max)
       FMT_THROW(format_error("number is too big"));
     return static_cast<unsigned>(width);
@@ -550,7 +550,7 @@ typename basic_printf_context<OutputIt, Char, AF>::format_arg
   basic_printf_context<OutputIt, Char, AF>::get_arg(
     iterator it, unsigned arg_index) {
   (void)it;
-  if (arg_index == (std::numeric_limits<unsigned>::max)())
+  if (arg_index == std::numeric_limits<unsigned>::max())
     return this->do_get_arg(this->parse_context().next_arg_id());
   return base::get_arg(arg_index - 1);
 }
@@ -558,7 +558,7 @@ typename basic_printf_context<OutputIt, Char, AF>::format_arg
 template <typename OutputIt, typename Char, typename AF>
 unsigned basic_printf_context<OutputIt, Char, AF>::parse_header(
   iterator &it, format_specs &spec) {
-  unsigned arg_index = (std::numeric_limits<unsigned>::max)();
+  unsigned arg_index = std::numeric_limits<unsigned>::max();
   char_type c = *it;
   if (c >= '0' && c <= '9') {
     // Parse an argument index (if followed by '$') or a width possibly

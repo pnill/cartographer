@@ -158,7 +158,9 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* 
 		if (fileLine) {
 			if (fileLine[0] == header[0] && sscanf_s(fileLine, header, &version, 30)) {
 				foundFirstHeader = true;
-				addDebugText("Found header on line %d asserting version: %s", lineNumber, version);
+				char debugTextBuffer[50];
+				snprintf(debugTextBuffer, 50, "Found header on line %d asserting version: %s", lineNumber, version);
+				addDebugText(debugTextBuffer);
 				if (CmpVersions(headerVersion, version) == 0) {//does not send this line to interpreter.
 					free(fileLine);
 					continue;
@@ -513,7 +515,9 @@ int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response
 	/* In windows, this will init the winsock stuff */
 	CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
 	if (global_init != CURLE_OK) {
-		addDebugText("curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
+		char NotificationPlayerText[100];
+		snprintf(NotificationPlayerText, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
+		addDebugText(NotificationPlayerText);
 	}
 
 	/* get a curl handle */
@@ -542,7 +546,9 @@ int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response
 		/* Check for errors */
 		if (res != CURLE_OK) {
 			result = ERROR_CODE_CURL_EASY_PERF;//curl_easy_perform() issue
-			addDebugText("curl_easy_perform() failed: %s", curl_easy_strerror(res));
+			char NotificationPlayerText[500];
+			snprintf(NotificationPlayerText, 500, "curl_easy_perform() failed: %s", curl_easy_strerror(res));
+			addDebugText(NotificationPlayerText);
 			free(s.ptr);
 		}
 		else {

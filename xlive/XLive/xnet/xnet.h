@@ -4,6 +4,7 @@
 
 typedef struct
 {
+
 	//
 	// Must be set to sizeof(XNetStartupParams).  There is no default.
 	//

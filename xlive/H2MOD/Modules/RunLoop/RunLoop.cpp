@@ -98,33 +98,6 @@ void GSMainLoop() {
 	*/
 }
 
-void __cdecl main_game_time_initialize_defaults_hook()
-{
-	// windows 10 version 2004 and above added behaviour changes to how windows timer resolution works, and we have to explicitly set the time resolution
-	// and since they were added, when playing on a laptop on battery it migth add heavy stuttering when using a frame limiter based on Sleep function (or std::this_thread::sleep_for) implementation
-	// the game sets them already but only during the loading screen period, then it resets to system default when the loading screen ends 
-	// (tho i think in the new implementation is working on a per thread basis now instead of global frequency, since it still works even when the game resets after loading screen ends and loading screen runs in another thread)
-
-	// More code in Tweaks.cpp in InitH2Tweaks
-
-	// More details @ https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/
-
-	timeBeginPeriod(1);
-
-	auto p_main_game_time_initialize_defaults = Memory::GetAddressRelative<void(__cdecl*)()>(0x42869F, 0x424841);
-	return p_main_game_time_initialize_defaults();
-}
-
-void __cdecl game_modules_dispose() {
-	auto p_game_modules_dispose = Memory::GetAddress<void(__cdecl*)()>(0x48BBF, 0x41E60);
-	p_game_modules_dispose();
-
-	DeinitH2Startup();
-
-	// reset time resolution to system default on game exit (initialization happens in main_game_time_initialize_defaults_hook())
-	timeEndPeriod(1);
-}
-
 void (*main_game_loop)();
 
 void main_game_loop_hook() {
@@ -144,7 +117,11 @@ static char HookedServerShutdownCheck() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 	
-	bool& Quit_Exit_Game = *(bool*)((char*)H2BaseAddr + 0x4a7083);
+	BYTE& Quit_Exit_Game = *(BYTE*)((char*)H2BaseAddr + 0x4a7083);
+
+	if (Quit_Exit_Game) {
+		DeinitH2Startup();
+	}
 
 	//original test - if game should shutdown
 	return Quit_Exit_Game;
@@ -627,10 +604,6 @@ void initGSRunLoop() {
 		}
 
 	}
-
-	PatchCall(Memory::GetAddressRelative(0x439E3D, 0x40BA40), main_game_time_initialize_defaults_hook);
-	PatchCall(Memory::GetAddress(0x39E7C, 0xC6F7), game_modules_dispose);
-
 	addDebugText("Post GSRunLoop Hooking.");
 }
 

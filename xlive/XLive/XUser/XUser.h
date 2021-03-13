@@ -84,7 +84,7 @@ typedef struct _XUSER_SIGNIN_INFO
 bool signInStatusChanged();
 extern bool signInChanged[4];
 extern XUSER_SIGNIN_INFO usersSignInInfo[4];
-void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, unsigned long xnaddr, unsigned long lanaddr, const char* abEnet, const char* abOnline, bool online);
+void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, bool online);
 void XUserSignOut(DWORD dwUserIndex);
 
 bool userSignedIn(DWORD dwUserIndex);

@@ -5,8 +5,6 @@
 #include "Blam/Engine/DataArray/DataArray.h"
 #include "Blam/Engine/Players/Players.h"
 
-#include "Blam/Engine/Game/GameTimeGlobals.h"
-
 namespace Blam
 {
 	namespace EngineDefinitions
@@ -97,13 +95,27 @@ namespace Blam
 			BYTE gap_44C[3388];
 		};
 		CHECK_STRUCT_SIZE(game_engine_settings, 0x1188);
+		struct __declspec(align(4)) game_time_globals
+		{
+			bool initialized;
+			bool game_is_paused;
+			WORD ticks_per_second;
+			float seconds_per_tick;
+			DWORD tick_count;
+			float game_speed;
+			float field_10;
+			float field_14;
+			float field_18;
+			float field_1C;
+			float field_20;
+		};
 		struct game_globals
 		{
 			byte gap0[8];
 			game_engine_settings engine_settings;
 			byte gap1[215];
 			byte gap2[16];
-			time_globals time_settings;
+			game_time_globals time_settings;
 			PlayerIterator players;
 		};
 	}

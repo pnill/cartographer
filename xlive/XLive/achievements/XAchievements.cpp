@@ -8,7 +8,7 @@ int achievementEnumeratorFlags = 0;
 int achievementEnumeratorIndex = 0;
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
-HANDLE g_dwFakeAchievementContent = INVALID_HANDLE_VALUE;
+HANDLE g_dwFakeAchievementContent = (HANDLE)-2;
 
 
 // #5278: XUserWriteAchievements
@@ -219,7 +219,7 @@ DWORD WINAPI XUserWriteAchievements(DWORD dwNumAchievements, PXUSER_ACHIEVEMENT 
 	if (pOverlapped)
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->InternalHigh = dwNumAchievements;
+		pOverlapped->InternalHigh = ERROR_SUCCESS;
 		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
 		return ERROR_IO_PENDING;
 	}
@@ -239,7 +239,7 @@ DWORD WINAPI XUserCreateAchievementEnumerator(DWORD dwTitleId, DWORD dwUserIndex
 	if (pchBuffer) *pchBuffer = cItem * sizeof(XACHIEVEMENT_DETAILS);
 	if (phEnum) *phEnum = g_dwFakeAchievementContent = CreateMutex(NULL, NULL, NULL);
 
-	LOG_TRACE_XLIVE("- Handle = {}, pchBuffer = {}", (void*)g_dwFakeAchievementContent, *pchBuffer);
+	LOG_TRACE_XLIVE("- Handle = {0:p}, pchBuffer = {1}", (void*)g_dwFakeAchievementContent, *pchBuffer);
 
 	return ERROR_SUCCESS;
 }

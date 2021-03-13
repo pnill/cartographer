@@ -18,8 +18,9 @@ static bool RenderIngameChat() {
 	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
 
 	if (H2Config_hide_ingame_chat) {
+		PlayerIterator playerIt;
 		datum local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
-		if (Player::getPlayer(local_player_datum_index.Index)->is_chatting == 2) {
+		if (playerIt.get_data_at_index(local_player_datum_index.Index)->is_chatting == 2) {
 			extern void hotkeyFuncToggleHideIngameChat();
 			hotkeyFuncToggleHideIngameChat();
 		}

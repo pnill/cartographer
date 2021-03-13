@@ -3,7 +3,7 @@
 class VariantPlayer
 {
 public:
-	XUID GetXUID(datum _datum, bool player);
+	XUID GetXUID(datum unit_datum, bool player);
 	datum GetPlayerDatum(datum unit_datum);
 	datum GetPlayerDatum(XUID xuid);
 	datum GetUnitDatum(datum player_datum);

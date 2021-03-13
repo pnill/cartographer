@@ -1,8 +1,15 @@
 #pragma once
 
+extern int Packets;
+extern int LastUpdateTime;
+extern int CurrentTime;
+extern int ElapsedTime;
+
+extern int ElapsedTimeAvg;
+extern int LastUpdateTimeAvg;
+extern int TotalBytesSent;
+extern int TotalPacketsSent;
 extern bool NetworkStatistics;
-extern int packetSizeAvg;
-extern int packetsPerSecondAvg;
 extern char packet_info_str[255];
 
-void updateSendToStatistics(int packetsSent, int packetSize);
+void updateSendToStatistics(int packetSize);

@@ -172,7 +172,7 @@ struct blam_tag
 		return !is_null() && !is_none();
 	}
 
-	bool is_printable() const
+	constexpr bool is_printable() const
 	{
 		return isprint(c_data[0]) && isprint(c_data[1]) && isprint(c_data[2]) && isprint(c_data[3]);
 	}

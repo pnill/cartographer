@@ -9,23 +9,9 @@
 
 #include "XLive\xnet\IpManagement\XnIp.h"
 
-HANDLE g_dwFakePData = INVALID_HANDLE_VALUE;
-HANDLE g_dwFakeContent = INVALID_HANDLE_VALUE;
-HANDLE g_dwMarketplaceContent = INVALID_HANDLE_VALUE;
-HANDLE g_dwFakeFriendsEnumerator = INVALID_HANDLE_VALUE;
-
-// TODO FIXME: add proper XHandle handling
-// when closing the handles, we need to make sure we set the handles to INVALID_HANDLE_VALUE
-// otherwise it'll interfere with XLocator Enumeration handles, causing serverlist enumeration to fail
-// because closed handles could be reused for server enumeration
-HANDLE* g_dwEnumeratorHandleObjects[] =
-{
-	&g_dwFakePData,
-	&g_dwFakeContent,
-	&g_dwMarketplaceContent,
-	&g_dwFakeAchievementContent,
-	&g_dwFakeFriendsEnumerator
-};
+HANDLE g_dwFakePData = (HANDLE) -2;
+HANDLE g_dwFakeContent = (HANDLE) -2;
+HANDLE g_dwMarketplaceContent = (HANDLE) -2;
 
 extern void InitInstance();
 extern void ExitInstance();
@@ -334,15 +320,12 @@ void Check_Overlapped( PXOVERLAPPED pOverlapped )
 // #1082: XGetOverlappedExtendedError
 DWORD WINAPI XGetOverlappedExtendedError(PXOVERLAPPED pOverlapped)
 {
-	if (pOverlapped == nullptr)
+	if( pOverlapped == 0 )
 	{
-		return GetLastError();
+		return ERROR_INVALID_PARAMETER;
 	}
 
-	if (pOverlapped->InternalLow != ERROR_IO_PENDING)
-		return pOverlapped->dwExtendedError;
-
-	return ERROR_IO_INCOMPLETE;
+	return pOverlapped->dwExtendedError;
 }
 
 
@@ -356,7 +339,6 @@ DWORD WINAPI XGetOverlappedResult(PXOVERLAPPED pOverlapped, LPDWORD pResult, BOO
 	{
 		while (pOverlapped->InternalLow == ERROR_IO_INCOMPLETE)
 		{
-			Sleep(1);
 		}
 	}
 
@@ -533,12 +515,6 @@ BOOL WINAPI XCloseHandle (HANDLE hObject)
 	//LOG_TRACE_XLIVE("XCloseHandle  (hObject = %X)", hObject );
 	BOOL ret = 0;
 
-	for (auto pHandle : g_dwEnumeratorHandleObjects)
-	{
-		if (*pHandle == hObject)
-			*pHandle = INVALID_HANDLE_VALUE;
-	}
-
 	if(hObject) ret = CloseHandle(hObject);
 
 	return ret;
@@ -665,7 +641,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		}
 	}
 
-	if ( hEnum == g_dwFakeAchievementContent )
+	if (hEnum == g_dwFakeAchievementContent)
 	{
 		return AchievementEnumerator(cbBuffer, pvBuffer, pcItemsReturned, pOverlapped);
 	}
@@ -686,10 +662,10 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		marketplaceEnumerate += marketplaceCount;
 	}
 
+	if ( hEnum == serverList.Handle )
 	{
-		DWORD error = ServerList::GetServers(hEnum, cbBuffer, pvBuffer, pOverlapped);
-		if (error != ERROR_NOT_FOUND)
-			return error;
+		serverList.GetServers(cbBuffer, pvBuffer, pOverlapped);
+		return ERROR_IO_PENDING;
 	}
 
 	if( async == FALSE )
@@ -797,12 +773,12 @@ DWORD WINAPI XFriendsCreateEnumerator (DWORD dwUserIndex, DWORD dwStartingIndex,
 	if (pcbBuffer) *pcbBuffer = dwFriendstoReturn * sizeof(XCONTENT_DATA);
 	if (phEnum)
 	{
-		*phEnum = g_dwFakeFriendsEnumerator = CreateMutex(NULL, NULL, NULL);
+		*phEnum = CreateMutex(NULL, NULL, NULL);
 
 		LOG_TRACE_XLIVE("- Handle = {:p}", (void*)*phEnum);
 	}
 
-	return ERROR_NO_MORE_FILES;
+	return ERROR_SUCCESS;
 }
 
 

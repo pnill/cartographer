@@ -588,7 +588,9 @@ void setCustomLanguage(int main, int variant) {
 		current_language = get_custom_language(language_id, 0);
 	current_language_sub = current_language->lang_variant;
 
-	addDebugText("language_code = %dx%d", current_language_main, current_language_sub);
+	char langcodeprintbuffer[30];
+	snprintf(langcodeprintbuffer, 30, "language_code = %dx%d", current_language_main, current_language_sub);
+	addDebugText(langcodeprintbuffer);
 
 	if (GameGlobals) {
 		BYTE* LoadedFonts = (BYTE*)((char*)H2BaseAddr + 0x47e7c0);

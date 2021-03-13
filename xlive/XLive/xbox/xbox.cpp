@@ -88,6 +88,8 @@ DWORD WINAPI XShowCustomPlayerListUI(DWORD dwUserIndex, DWORD dwFlags, LPCWSTR p
 		//asynchronous
 
 		pOverlapped->InternalLow = ERROR_SUCCESS;
+		pOverlapped->InternalHigh = ERROR_SUCCESS;
+		pOverlapped->dwExtendedError = ERROR_SUCCESS;
 
 		Check_Overlapped(pOverlapped);
 

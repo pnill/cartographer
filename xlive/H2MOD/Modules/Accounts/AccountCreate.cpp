@@ -33,7 +33,9 @@ static int InterpretMasterCreate(char* response_content) {
 
 
 		if (sscanf(fileLine, "return_code=%d", &tempint1) == 1) {
-			addDebugText("Return code is: %d", tempint1);
+			char NotificationPlayerText[60];
+			snprintf(NotificationPlayerText, 60, "Return code is: %d", tempint1);
+			addDebugText(NotificationPlayerText);
 			result = tempint1;
 		}
 		else if (strstr(fileLine, "username=")) {
@@ -51,7 +53,9 @@ static int InterpretMasterCreate(char* response_content) {
 				}
 			}
 			if (strlen(tempstr1) > 0) {
-				addDebugText("Username Should be: %s", tempstr1);
+				char NotificationPlayerText[60];
+				snprintf(NotificationPlayerText, 60, "Username Should be: %s", tempstr1);
+				addDebugText(NotificationPlayerText);
 				char* username = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
 				strncpy_s(username, XUSER_NAME_SIZE, tempstr1, strnlen_s(tempstr1, XUSER_MAX_NAME_LENGTH));
 			}
@@ -94,7 +98,9 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password) {
 		free(rtn_result);
 	}
 	if (rtn_code <= 0) {
-		addDebugText("ERROR Account Create: %d", rtn_code);
+		char NotificationPlayerText[40];
+		sprintf(NotificationPlayerText, "ERROR Account Create: %d", rtn_code);
+		addDebugText(NotificationPlayerText);
 		if (rtn_code == 0 || rtn_code == ERROR_CODE_CURL_SOCKET_FAILED || rtn_code == ERROR_CODE_CURL_HANDLE || rtn_code == ERROR_CODE_CURL_EASY_PERF
 			|| rtn_code == ERROR_CODE_INVALID_PARAM) {
 			//internal error

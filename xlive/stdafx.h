@@ -59,7 +59,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
-#include <filesystem>
+
 
 #include <d3d9.h>
 #include <d3dx9.h>
@@ -67,8 +67,6 @@
 #include "Util/log.h"
 #include "xliveless.h"
 #include "xlivedefs.h"
-
-#include "Util/Memory.h"
 
 extern std::random_device rd;
 

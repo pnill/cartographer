@@ -204,7 +204,7 @@ void Infection::preSpawnServerSetup() {
 	int humanCount = 0;
 	int playerCount = 0;
 	PlayerIterator playerIt;
-	while (playerIt.get_next_active_player())
+	while (playerIt.get_next_player())
 	{
 		int currentPlayerIndex = playerIt.get_current_player_index();
 		XUID playerIdentifier = Player::getIdentifier(currentPlayerIndex);
