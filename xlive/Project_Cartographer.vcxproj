@@ -319,6 +319,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Util\log.cpp" />
+    <ClCompile Include="Util\Memory.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -345,8 +346,8 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\HitFix\HitFix.cpp">
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NoExtensions</EnableEnhancedInstructionSet>
-      <FloatingPointModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Fast</FloatingPointModel>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">NoExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <ClCompile Include="H2MOD\Modules\Input\Mouseinput.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
@@ -376,6 +377,7 @@
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="XLive\achievements\XAchievements.cpp" />
     <ClCompile Include="XLive\ServerList\ServerList.cpp" />
+    <ClCompile Include="XLive\xnet\sock_utils.cpp" />
     <ClCompile Include="XLive\XNet\upnp.cpp" />
     <ClCompile Include="XLive\XNet\XNetQoS.cpp" />
     <ClCompile Include="XLive\XNet\xnet.cpp" />
@@ -564,6 +566,7 @@
     <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
@@ -639,6 +642,7 @@
     <ClInclude Include="xliveless.h" />
     <ClInclude Include="XLive\achievements\XAchievements.h" />
     <ClInclude Include="XLive\ServerList\ServerList.h" />
+    <ClInclude Include="XLive\xnet\sock_utils.h" />
     <ClInclude Include="XLive\XNet\upnp.h" />
     <ClInclude Include="XLive\XNet\XNetQoS.h" />
     <ClInclude Include="XLive\XNet\xnet.h" />

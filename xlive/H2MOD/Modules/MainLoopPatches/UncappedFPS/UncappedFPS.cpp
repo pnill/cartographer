@@ -6,13 +6,14 @@
 #include "H2MOD/Modules/Config/Config.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
 
+#include "Blam\Engine\Game\GameTimeGlobals.h"
+
 extern bool b_XboxTick;
 static LARGE_INTEGER frequency;
 static LARGE_INTEGER timeAtStartup;
 
 // if this is enabled, the tick count to be executed will be calculated the same way as in Halo 1/CE
 #define USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE 0
-
 
 float get_remaining_time_until_next_tick_in_seconds()
 {
@@ -41,7 +42,7 @@ void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out
 	}*/
 
 #if USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE
-	time_globals* timeGlobals = time_globals::get_game_time_globals();
+	time_globals* timeGlobals = time_globals::get();
 	if (p_unk_check() && !timeGlobals->game_is_paused && timeGlobals->game_speed > 0.f)
 	{
 		float game_speed_in_ticks = timeGlobals->game_speed * timeGlobals->ticks_per_second;

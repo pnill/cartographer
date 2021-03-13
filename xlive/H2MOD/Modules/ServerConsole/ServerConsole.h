@@ -4,7 +4,7 @@
 
 namespace ServerConsole
 {
-	static enum ServerConsoleCommands {
+	enum ServerConsoleCommands {
 		ban,
 		description,
 		exit,

@@ -92,7 +92,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 			}
 
 			int recvResult = 0;
-			int recvBufLen = ipManager.GetReqQoSBufferSize();
+			int recvBufLen = gXnIp.GetReqQoSBufferSize();
 			BYTE *recvBuf = new BYTE[recvBufLen];
 			SecureZeroMemory(recvBuf, recvBufLen);
 
@@ -282,9 +282,9 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 		delete[] acceptSockInfo->DataBuf.buf;
 
 		// copy the data passed by the game
-		acceptSockInfo->DataBuf.len = ipManager.GetReqQoSBufferSize();
-		acceptSockInfo->DataBuf.buf = new CHAR[ipManager.GetReqQoSBufferSize()];
-		memcpy(acceptSockInfo->DataBuf.buf, XNetQoS.pbData, ipManager.GetReqQoSBufferSize());
+		acceptSockInfo->DataBuf.len = gXnIp.GetReqQoSBufferSize();
+		acceptSockInfo->DataBuf.buf = new CHAR[gXnIp.GetReqQoSBufferSize()];
+		memcpy(acceptSockInfo->DataBuf.buf, XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
 
 		SecureZeroMemory(&acceptSockInfo->Overlapped, sizeof(acceptSockInfo->Overlapped));
 		DWORD sendResult = WSASend(acceptSockInfo->Socket, &acceptSockInfo->DataBuf, 1, NULL, 0, &acceptSockInfo->Overlapped, HandleClient);
@@ -479,8 +479,8 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 
 	if (XNetQoS.pbData == nullptr)
 	{
-		XNetQoS.pbData = new BYTE[ipManager.GetReqQoSBufferSize()];
-		SecureZeroMemory(XNetQoS.pbData, ipManager.GetReqQoSBufferSize());
+		XNetQoS.pbData = new BYTE[gXnIp.GetReqQoSBufferSize()];
+		SecureZeroMemory(XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
 	}
 
 	if (dwFlags & XNET_QOS_LISTEN_SET_DATA)
@@ -490,7 +490,7 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 			if (cb > XNetQoS.cbData)
 				XNetQoS.cbData = cb;
 
-			SecureZeroMemory(XNetQoS.pbData, ipManager.GetReqQoSBufferSize());
+			SecureZeroMemory(XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
 			memcpy(XNetQoS.pbData, pb, cb);
 		}
 	}
@@ -531,9 +531,8 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 	XNADDR** apxna_copy = new XNADDR*[cxna];
 	for (DWORD i = 0; i < cxna; i++)
 	{
-		XNADDR* xn = apxna[i];
 		apxna_copy[i] = new XNADDR;
-		memcpy(apxna_copy[i], xn, sizeof(XNADDR));
+		memcpy(apxna_copy[i], apxna[i], sizeof(XNADDR));
 	}
 
 	*pxnqos = (XNQOS*)new char[sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna - 1))];

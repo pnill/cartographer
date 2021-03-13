@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "NetworkStats.h"
 
+#include "..\NetworkSession\NetworkSession.h"
+
 int Packets = 0;
 int LastUpdateTime = 0;
 int CurrentTime = 0;
@@ -12,30 +14,47 @@ int TotalBytesSent = 0;
 int TotalPacketsSent = 0;
 bool NetworkStatistics = false;
 
+int packetSizeAvg = 0;
+int packetsPerSecondAvg = 0;
+
 char packet_info_str[255];
-void updateSendToStatistics(int packetSize)
+
+static void updateAvg()
 {
-	if (NetworkStatistics) 
+	if (!NetworkSession::getCurrentNetworkSession(NULL)) {
+		ElapsedTime = 0;
+		TotalPacketsSent = 0;
+	}
+
+	packetsPerSecondAvg = TotalPacketsSent > 0 ? Packets * 1000 / ElapsedTime : 0;
+	packetSizeAvg = TotalPacketsSent > 0 ? TotalBytesSent / TotalPacketsSent : 0;
+}
+
+void updateSendToStatistics(int packetsSent, int packetSize)
+{
+	if (NetworkStatistics)
 	{
 		CurrentTime = timeGetTime();
 		ElapsedTime = CurrentTime - LastUpdateTime;
 
-		if (ElapsedTime >= 1000)
+		if (ElapsedTime >= 1 * 1000)
 		{
 			LastUpdateTime = CurrentTime;
 			Packets = 0;
 		}
 
 		ElapsedTimeAvg = CurrentTime - LastUpdateTimeAvg;
-		if (ElapsedTimeAvg >= 10000)
+		if (ElapsedTimeAvg >= 10 * 1000)
 		{
 			LastUpdateTimeAvg = CurrentTime;
 			TotalBytesSent = 0;
 			TotalPacketsSent = 0;
 		}
 
-		Packets++;
-		TotalPacketsSent++;
+		Packets += packetsSent;
+		TotalPacketsSent += packetsSent;
 		TotalBytesSent += packetSize;
+
+		updateAvg();
 	}
 }

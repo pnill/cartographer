@@ -151,9 +151,7 @@ void SaveH2Config() {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], H2AppDataLocal, H2GetInstanceId());
 	}
 
-	wchar_t fileConfigPathLog[1124];
-	swprintf(fileConfigPathLog, 1024, L"Saving Config: \"%ws\"", fileConfigPath);
-	addDebugText(fileConfigPathLog);
+	addDebugText(L"Saving Config: \"%ws\"", fileConfigPath);
 	FILE* fileConfig = nullptr;
 	errno_t err = _wfopen_s(&fileConfig, fileConfigPath, L"wb");
 
@@ -633,12 +631,10 @@ void ReadH2Config() {
 	errno_t err = 0;
 	FILE* fileConfig = nullptr;
 	wchar_t fileConfigPath[1024];
-	wchar_t fileConfigPathLog[1124];
 
 	if (FlagFilePathConfig) {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
-		swprintf(fileConfigPathLog, 1124, L"Reading Flag Config: \"%ws\"", fileConfigPath);
-		addDebugText(fileConfigPathLog);
+		addDebugText(L"Reading Flag Config: \"%ws\"", fileConfigPath);
 		err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 	}
 	else {
@@ -648,8 +644,7 @@ void ReadH2Config() {
 				checkFilePath = local;
 			}
 			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
-			swprintf(fileConfigPathLog, 1124, L"Reading Config: \"%ws\"", fileConfigPath);
-			addDebugText(fileConfigPathLog);
+			addDebugText(L"Reading Config: \"%ws\"", fileConfigPath);
 			err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 
 			if (err) {
@@ -683,7 +678,7 @@ void ReadH2Config() {
 		SI_Error rc = ini.LoadFile(fileConfig);
 		if (rc < 0)
 		{
-			addDebugText(std::string("ini.LoadFile() failed with error: " + std::to_string(rc) + "while trying to read configuration file!").c_str());
+			addDebugText("ini.LoadFile() failed with error: %d while trying to read configuration file!", (int)rc);
 		}
 		else
 		{
