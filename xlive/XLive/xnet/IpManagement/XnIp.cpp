@@ -264,7 +264,7 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectR
 	else
 	{
 		LogConnectionsDetails(recvAddr); // TODO: disable after connection bug is fixed
-		LOG_TRACE_NETWORK("{} - secure connection cannot be established!, __FUNCTION__");
+		LOG_TRACE_NETWORK("{} - secure connection cannot be established!", __FUNCTION__);
 		// TODO: send back the connection cannot be established
 	}
 }
