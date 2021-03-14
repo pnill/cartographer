@@ -20,6 +20,7 @@
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
+#include "H2MOD/Modules/HitFix/MeleeFix.h"
 
 
 namespace imgui_handler {
@@ -41,7 +42,10 @@ namespace imgui_handler {
 			bool g_init = false;
 			int g_language_code = -1;
 			
-
+			const char* button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Left Thumb","Right Thumb","Left Bumper","Right Bumper","A","B","X","Y" };
+			const char* action_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flashlight","Switch Grenades","Jump","Melee","Reload","Switch Weapons" };
+			const WORD button_values[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 4096, 8192, 16384, 32768 };
+			int button_placeholders[14];
 			std::map<int, std::map<e_advanced_string, char*>> string_table;
 			//Used for controls that use the same string, A identifier has to be appended to them
 			//I.E Reset##1... Reset##20
@@ -267,7 +271,10 @@ namespace imgui_handler {
 					ImGui::PopItemWidth();
 					ImGui::Text(GetString(refresh_rate));
 					ImGui::PushItemWidth(WidthPercentage(100));
-					ImGui::InputInt("##Refresh1", &H2Config_refresh_rate, 0, 110, ImGuiInputTextFlags_AlwaysInsertMode);
+					int gRefresh = H2Config_refresh_rate;
+					ImGui::InputInt("##Refresh1", &gRefresh, 0, 110, ImGuiInputTextFlags_AlwaysInsertMode);
+					if(ImGui::IsItemEdited())
+						H2Config_refresh_rate = gRefresh;
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(refresh_rate_tooltip));
 
@@ -571,6 +578,68 @@ namespace imgui_handler {
 						ImGui::PopItemWidth();
 					}
 					ImGui::NewLine();
+					ImGui::Text("Controller Layout");
+					ImGui::NewLine();
+					ImGui::TextWrapped("To use this you must have your games controller layout SET TO DEFAULT. Changing the drop down for the specific action will remap the button to the new one");
+					ImGui::NewLine();
+					ImGui::Columns(3, "", false);
+					for (auto i = 0; i < 14; i++) 
+					{
+						ImGui::Text(button_items[i]);
+						ImGui::PushItemWidth(ImGui::GetColumnWidth());
+						std::string Id = "##C_L" + std::to_string(i);
+						if (ImGui::Combo(Id.c_str(), &button_placeholders[i], action_items, 14))
+						{
+							switch((ControllerInput::XINPUT_BUTTONS)button_values[i])
+							{
+								case ControllerInput::XINPUT_GAMEPAD_DPAD_UP: 
+									H2Config_CustomLayout.DPAD_UP = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+								case ControllerInput::XINPUT_GAMEPAD_DPAD_DOWN:
+									H2Config_CustomLayout.DPAD_DOWN = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+								case ControllerInput::XINPUT_GAMEPAD_DPAD_LEFT:
+									H2Config_CustomLayout.DPAD_LEFT = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+								case ControllerInput::XINPUT_GAMEPAD_DPAD_RIGHT: 
+									H2Config_CustomLayout.DPAD_RIGHT = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+								case ControllerInput::XINPUT_GAMEPAD_START: 
+									H2Config_CustomLayout.START = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+								case ControllerInput::XINPUT_GAMEPAD_BACK: 
+									H2Config_CustomLayout.BACK = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+								case ControllerInput::XINPUT_GAMEPAD_LEFT_THUMB: 
+									H2Config_CustomLayout.LEFT_THUMB = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+								case ControllerInput::XINPUT_GAMEPAD_RIGHT_THUMB: 
+									H2Config_CustomLayout.RIGHT_THUMB = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+								case ControllerInput::XINPUT_GAMEPAD_LEFT_SHOULDER: 
+									H2Config_CustomLayout.LEFT_SHOULDER = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+								case ControllerInput::XINPUT_GAMEPAD_RIGHT_SHOULDER: 
+									H2Config_CustomLayout.RIGHT_SHOULDER = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+								case ControllerInput::XINPUT_GAMEPAD_A: 
+									H2Config_CustomLayout.A = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+								case ControllerInput::XINPUT_GAMEPAD_B: 
+									H2Config_CustomLayout.B = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+								case ControllerInput::XINPUT_GAMEPAD_X: 
+									H2Config_CustomLayout.X = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+								case ControllerInput::XINPUT_GAMEPAD_Y: 
+									H2Config_CustomLayout.Y = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+									break;
+							}
+						}
+						ImGui::PopItemWidth();
+						ImGui::NextColumn();
+					}
+					ImGui::Columns(1);
 				}
 			}
 			void HostSettings()
@@ -761,11 +830,17 @@ namespace imgui_handler {
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##melee_fix", &H2Config_melee_fix);
 					if(ImGui::IsItemEdited())
-						H2Tweaks::applyMeleeCollisionPatch();
+						MeleeFix::MeleeCollisionPatch();
 					if(ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(melee_fix_tooltip));
 
 					ImGui::NextColumn();
+
+					TextVerticalPad(GetString(no_events_title), 8.5);
+					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+					ImGui::Checkbox("##no_events", &H2Config_no_events);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(GetString(no_events_tooltip));
 					ImGui::Columns(1);
 
 					ImGui::Text(GetString(language));
@@ -942,6 +1017,15 @@ namespace imgui_handler {
 		void Open()
 		{
 			WriteValue<byte>(h2mod->GetAddress(0x9712cC), 1);
+			WORD* Buttons = H2Config_CustomLayout.ToArray();
+			for(auto i = 0; i < 14; i++)
+			{
+				for(auto j = 0; j < 14; j++)
+				{
+					if (button_values[j] == Buttons[i])
+						button_placeholders[i] = j;
+				}
+			}
 			ImGuiToggleInput(true);
 			PlayerControl::GetControls(0)->DisableCamera = true;
 		}
@@ -1063,6 +1147,8 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::upnp_tooltip] = "Enabled UPNP Port forwarding for the project.";
 			string_table[0][e_advanced_string::melee_fix_title] = "Melee Patch";
 			string_table[0][e_advanced_string::melee_fix_tooltip] = "Allows you to turn off the melee patch";
+			string_table[0][e_advanced_string::no_events_title] = "No Events";
+			string_table[0][e_advanced_string::no_events_tooltip] = "Opt out of event cosmetics restart required to take effect";
 			
 			//Spanish.
 			string_table[4][e_advanced_string::title] = u8"      Ajustes avanzados";
@@ -1174,6 +1260,8 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::upnp_tooltip] = u8"Habilita el reenvío de puertos UPNP para el proyecto.";
 			string_table[4][e_advanced_string::melee_fix_title] = u8"Parche cuerpo a cuerpo";
 			string_table[4][e_advanced_string::melee_fix_tooltip] = u8"Te permite desactivar el parche cuerpo a cuerpo";
+			string_table[4][e_advanced_string::no_events_title] = u8"No hay eventos";
+			string_table[4][e_advanced_string::no_events_tooltip] = u8"Se requiere el reinicio de los cosméticos del evento para que surta efecto";
 		}
 	}
 }

@@ -18,6 +18,7 @@
 #include <math.h>
 #include "H2MOD/Modules/MainLoopPatches/TestGameTimePrep.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
+#include "Util/Memory.h"
 
 #pragma region Done_Tweaks
 
@@ -786,6 +787,10 @@ void InitH2Tweaks() {
 
 		// disable cloth debugging that writes to cloth.txt
 		WriteValue<bool>(h2mod->GetAddress(0x41F650), false);
+
+		// prevent game from setting timeBeginPeriod/timeEndPeriod
+		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
+		NopFill(Memory::GetAddressRelative(0x66A092), 8);
 	}
 
 	if(H2Config_experimental_game_main_loop_patches)
@@ -828,8 +833,14 @@ void H2Tweaks::setHz() {
 
 	if (h2mod->Server)
 		return;
+	
+	static bool refresh_redirected = false;
+	if (!refresh_redirected) {
+		WriteValue(h2mod->GetAddress(0x25E869) + 3, std::addressof(H2Config_refresh_rate));
+		refresh_redirected = true;
+	}
 
-	*h2mod->GetAddress<int*>(0xA3DA08) = H2Config_refresh_rate;
+	//*h2mod->GetAddress<int*>(0xA3DA08) = H2Config_refresh_rate;
 }
 
 char ret_0() {
@@ -852,32 +863,7 @@ void H2Tweaks::toggleAiMp(bool toggle) {
 	WriteValue<BYTE>(h2mod->GetAddress(0x30E684, 0x2B93F4), toggle ? JMP_OP_CODE : JNZ_OP_CODE);
 }
 
-void H2Tweaks::applyMeleePatch(bool toggle)
-{
-	WriteValue<BYTE>(h2mod->GetAddress(0x10B408, 0xFDA38) + 2, toggle ? 5 : 6); // sword
-	WriteValue<BYTE>(h2mod->GetAddress(0x10B40B, 0xFDA3B) + 2, toggle ? 2 : 1); // generic weapon
-}
 
-void H2Tweaks::applyMeleeCollisionPatch()
-{
-	if (!h2mod->Server) {
-		/*
-			.text:007C3027 148 E8 C1 73 F8 FF       call    collision_test_vector ; Call Procedure
-			.text:007C302C 148 83 C4 18             add     esp, 18h        ; Add
-			.text:007C302F 130 84 C0                test    al, al          ; Logical Compare
-			.text:007C3031 130 0F 84 4B 01 00 00    jz      loc_7C3182      <=== Remove this jump
-		 */
-		static byte original_melee_collision_instruction[]{ 0x0F, 0x84, 0x4B, 0x01, 0x00, 0x00 };
-		if (H2Config_melee_fix) 
-		{
-			NopFill(h2mod->GetAddress(0x143031, 0), 6);
-		}
-		else
-		{
-			WriteBytes(h2mod->GetAddress(0x143031, 0), original_melee_collision_instruction, 6);
-		}
-	}
-}
 
 void H2Tweaks::sunFlareFix()
 {

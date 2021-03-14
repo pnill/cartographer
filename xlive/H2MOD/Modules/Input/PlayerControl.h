@@ -8,5 +8,6 @@ namespace PlayerControl
 	void Init();
 	void ApplyHooks();
 	s_player_actions GetPlayerActions(int player_index);
-	Blam::EngineDefinitions::Players::s_player_control* GetControls(int local_player_index);
+	s_player_control* GetControls(int local_player_index);
+	s_player_motion* GetPlayerMotion(int player_index);
 }

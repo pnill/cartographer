@@ -34,6 +34,9 @@
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "Blam/Engine/Game/DamageData.h"
+#include "H2MOD/Modules/MainMenu/MapSlots.h"
+#include "H2MOD/Modules/HitFix/MeleeFix.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -832,7 +835,6 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	bool result = p_map_cache_load(engine_settings);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
-
 	// clear all the object variant data
 	object_to_variant.clear();
 
@@ -912,13 +914,13 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		if (!b_XboxTick) 
 		{
 			H2X::Initialize(b_H2X);
-			H2Tweaks::applyMeleePatch(true);
+			MeleeFix::MeleePatch(true);
 			HitFix::ApplyProjectileVelocity();
 			engine_settings->tickrate = XboxTick::setTickRate(false);
 		}
 		else
 		{
-			H2Tweaks::applyMeleePatch(false);
+			MeleeFix::MeleePatch(false);
 			engine_settings->tickrate = XboxTick::setTickRate(true);
 		}
 		H2Tweaks::toggleAiMp(true);
@@ -946,37 +948,6 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 				headHunterHandler->initializer->execute();
 			}
 		}
-		//Christmas hat importing move later, auto disables after december.
-		if (!h2mod->Server) {
-			std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-			time_t tt = std::chrono::system_clock::to_time_t(now);
-			tm utc_tm = *gmtime(&tt);
-			if (utc_tm.tm_mon == 11) {
-				tag_loader::Load_tag(0xE19B001D, true, "christmas_hat_map");
-				tag_loader::Load_tag(0xE1BF0024, true, "christmas_hat_map");
-				tag_loader::Push_Back();
-				//auto scen = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(datum(_INJECTED_TAG_START_));
-				/*auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
-				if (hlmt_chief_datum != datum::Null) {
-					auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
-					auto b = hlmt_chief->variants[0];
-					auto a = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
-					a->parent_marker = string_id(184552154);
-					a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
-					a->child_object.TagIndex = tag_loader::ResolveNewDatum(0xE19B001D);
-				}
-				auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
-				if (hlmt_elite_datum != datum::Null)
-				{
-					auto hlmt_eliete = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_elite_datum);
-					auto b = hlmt_eliete->variants[0];
-					auto a = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
-					a->parent_marker = string_id(184552154);
-					a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
-					a->child_object.TagIndex = tag_loader::ResolveNewDatum(0xE1BF0024);
-				}*/
-			}
-		}
 	}
 
 	else if (h2mod->GetMapType() == scnr_type::SinglePlayer)
@@ -984,7 +955,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		//if anyone wants to run code on map load single player
 		addDebugText("Map type: Singleplayer");
 		//H2X::Initialize(true);
-		H2Tweaks::applyMeleePatch(true);
+		MeleeFix::MeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
 		EventHandler::executeMapLoadCallback(scnr_type::SinglePlayer);
 	}
@@ -1777,11 +1748,12 @@ void H2MOD::Initialize()
 		MouseInput::Initialize();
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
-		TagFixes::Initalize();
+		
 		Initialise_tag_loader();
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
-		H2Tweaks::applyMeleeCollisionPatch();
+		MeleeFix::Initialize();
+		SpecialEvents::Initialize();
 		//ObserverMode::Initialize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
@@ -1792,11 +1764,12 @@ void H2MOD::Initialize()
 		
 		
 	}
-
-	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
-	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
-
+	TagFixes::Initalize();
+	MapSlots::Initialize();
 	HaloScript::Initialize();
+	LOG_TRACE_GAME("H2MOD - Initialized v0.6.2.0");
+	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
+	//WriteValue(GetAddress(0xC25EA + 8), 100);
 	h2mod->ApplyHooks();
 	h2mod->RegisterEvents();
 }

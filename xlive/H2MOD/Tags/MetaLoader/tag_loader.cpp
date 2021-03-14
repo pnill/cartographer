@@ -115,6 +115,121 @@ namespace tag_loader
 		delete[] map_header;
 		return false;
 	}
+
+	bool Map_exists(std::string map)
+	{
+		std::string map_loc;
+		if (meta_struct::Get_file_type(map) == "map")
+			map_loc = mods_dir + "\\maps\\" + map;
+		else
+			map_loc = mods_dir + "\\maps\\" + map + ".map";
+
+		if (PathFileExistsA(map_loc.c_str()))
+		{
+			return true;
+		}
+		if (meta_struct::Get_file_type(map) == "map")
+			map_loc = def_maps_dir + '\\' + map;
+		else
+			map_loc = def_maps_dir + '\\' + map + ".map";
+
+		if (PathFileExistsA(map_loc.c_str())) 
+		{
+			return true;
+		}
+		
+		if (meta_struct::Get_file_type(map) == "map")
+			map_loc = cus_maps_dir + '\\' + map;
+		else
+			map_loc = cus_maps_dir + '\\' + map + ".map";
+
+		return PathFileExistsA(map_loc.c_str());
+
+	}
+
+	datum Get_tag_datum(std::string tag_name, std::string map)
+	{
+		std::ifstream* fin;
+		std::string map_loc;
+
+		//logic to check the existence of the map at subsequent directories
+		///mods->default->custom
+		if (meta_struct::Get_file_type(map) == "map")
+			map_loc = mods_dir + "\\maps\\" + map;
+		else
+			map_loc = mods_dir + "\\maps\\" + map + ".map";
+
+		if (PathFileExistsA(map_loc.c_str()));
+		else
+		{
+			if (meta_struct::Get_file_type(map) == "map")
+				map_loc = def_maps_dir + '\\' + map;
+			else
+				map_loc = def_maps_dir + '\\' + map + ".map";
+
+			if (PathFileExistsA(map_loc.c_str()));
+			else
+			{
+				if (meta_struct::Get_file_type(map) == "map")
+					map_loc = cus_maps_dir + '\\' + map;
+				else
+					map_loc = cus_maps_dir + '\\' + map + ".map";
+			}
+		}
+
+		fin = new std::ifstream(map_loc.c_str(), std::ios::binary | std::ios::in);
+		
+		int tag_index = -1;
+		bool found_index = false;
+		
+		if (fin->is_open())
+		{
+			fin->seekg(716);
+			int tag_count, file_table_offset = 0;
+			fin->read((char*)&tag_count, 4);
+			fin->read((char*)&file_table_offset, 4);
+
+			fin->seekg(file_table_offset);
+			char ch = ' ';
+			std::string input;
+			for(auto i = 0; i < tag_count; i++)
+			{
+				std::getline(*fin, input, '\0');
+				if(input == tag_name)
+				{
+					tag_index = i;
+					found_index = true;
+					break;
+				}
+			}
+		}
+
+		if(found_index)
+		{
+			int table_off, table_size = 0;
+
+			fin->seekg(0x10);
+			fin->read((char*)&table_off, 4);
+			fin->read((char*)&table_size, 4);
+
+			fin->seekg(table_off + 4);
+			int temp;
+			fin->read((char*)&temp, 4);
+
+			int table_start = table_off + 0xC * temp + 0x20;
+
+			tags::tag_instance tag_info;
+			fin->seekg(table_start + tag_index * sizeof(tags::tag_instance));
+
+			fin->read((char*)&tag_info, sizeof(tags::tag_instance));
+			fin->close();
+			delete fin;
+			return tag_info.datum_index;
+		}
+		fin->close();
+		delete fin;
+		return datum::Null;
+	}
 	//Loads a tag from specified map in accordance with the datum index supplied
 	///custom flag is no more needed
 	void Load_tag(int datum_index, bool recursive, std::string map, bool custom)
@@ -719,7 +834,7 @@ namespace tag_loader
 
 				int temp = 0;
 				((int(__cdecl *)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 2, 0, &temp);
-
+				((int(__cdecl *)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 1, 0, &temp);
 				((int(__cdecl *)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 0, 0, &temp);
 
 			}
@@ -1200,6 +1315,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	if (tags::get_cache_header()->type != scnr_type::SinglePlayerShared)
 	{
 		DWORD *TagTableStart = h2mod->GetAddress<DWORD*>(0x47CD50);
+		memset((BYTE*)tag_loader::new_Tables, 0, 0x3BA40);
 		///---------------TABLE EXTENSION  STUFF
 		memcpy((BYTE*)tag_loader::new_Tables, (BYTE*)*TagTableStart, 0x3BA40);
 		*TagTableStart = (DWORD)tag_loader::new_Tables;

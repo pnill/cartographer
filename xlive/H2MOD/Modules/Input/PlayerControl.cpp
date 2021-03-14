@@ -14,7 +14,7 @@ void __cdecl UpdatePlayerControl(float yawChange, float pitchChange)
 	EventHandler::executePlayerControlCallback(yawChange, pitchChange);
 }
 
-typedef void __cdecl p_network_player_actions_to_player_actions(s_network_player_actions *nActions, s_player_actions *pActions);
+typedef void __cdecl p_network_player_actions_to_player_actions(s_player_motion *nActions, s_player_actions *pActions);
 p_network_player_actions_to_player_actions* network_player_actions_to_player_actions;
 
 
@@ -30,12 +30,17 @@ void PlayerControl::ApplyHooks()
 s_player_actions PlayerControl::GetPlayerActions(int player_index)
 {
 	s_player_actions newActions;
-	s_network_player_actions nActions = *h2mod->GetAddress<s_network_player_actions*>(0x514EE8 + player_index * sizeof(s_network_player_actions));
+	s_player_motion nActions = *h2mod->GetAddress<s_player_motion*>(0x514EE8 + player_index * sizeof(s_player_motion));
 	network_player_actions_to_player_actions(&nActions, &newActions);
 	return newActions;
 }
 
-Blam::EngineDefinitions::Players::s_player_control* PlayerControl::GetControls(int local_player_index)
+s_player_control* PlayerControl::GetControls(int local_player_index)
 {
 	return *h2mod->GetAddress<s_player_control**>(0x4ca37c + (local_player_index * sizeof(s_player_control)));
+}
+
+s_player_motion* PlayerControl::GetPlayerMotion(int player_index)
+{
+	return h2mod->GetAddress<s_player_motion*>(0x514EE8 + player_index * sizeof(s_player_motion));;
 }

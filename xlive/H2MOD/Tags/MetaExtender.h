@@ -1,6 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/DatumIndex.h"
 #include "H2MOD/Modules/Utils/Utils.h"
+#include "H2MOD.h"
 
 namespace MetaExtender
 {

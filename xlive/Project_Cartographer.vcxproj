@@ -277,11 +277,13 @@
     <ClCompile Include="H2MOD\GUI\imgui_integration\debug_overlay.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_handler.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\MessageBox.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\MOTD.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
+    <ClCompile Include="H2MOD\Modules\HitFix\MeleeFix.cpp" />
     <ClCompile Include="H2MOD\Modules\HudElements\HudElements.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
@@ -289,6 +291,7 @@
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
@@ -298,6 +301,7 @@
     <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
+    <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEvents.cpp" />
     <ClCompile Include="H2MOD\Modules\Stats\StatsHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp" />
@@ -315,6 +319,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Util\log.cpp" />
+    <ClCompile Include="Util\Memory.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -499,6 +504,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_defenition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\model_defenition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\physics_model_defenition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\new_hud_definition.hpp" />
@@ -518,6 +524,7 @@
     <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Engine\Game\DamageData.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngineEnum.h" />
+    <ClInclude Include="Blam\Enums\Game\HaloStrings.h" />
     <ClInclude Include="Blam\Maths\integer_math.h" />
     <ClInclude Include="Blam\Maths\real_math.h" />
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
@@ -527,6 +534,7 @@
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.h" />
     <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
+    <ClInclude Include="H2MOD\Modules\HitFix\MeleeFix.h" />
     <ClInclude Include="H2MOD\Modules\HudElements\HudElements.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
@@ -534,6 +542,7 @@
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h" />
+    <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
@@ -544,6 +553,7 @@
     <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h" />
+    <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEvents.h" />
     <ClInclude Include="H2MOD\Modules\Stats\StatsHandler.h" />
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h" />
@@ -555,6 +565,7 @@
     <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />

@@ -8,8 +8,6 @@ namespace H2Tweaks {
 	void toggleAiMp(bool toggle);
 	void toggleUncappedCampaignCinematics(bool toggle);
 	void setHz();
-	void applyMeleePatch(bool toggle);
-	void applyMeleeCollisionPatch();
 	void sunFlareFix();
 	void WarpFix(bool enable);
 }

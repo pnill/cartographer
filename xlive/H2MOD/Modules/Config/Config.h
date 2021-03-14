@@ -2,7 +2,7 @@
 #pragma once
 
 #include "H2MOD.h"
-#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
+#include "H2MOD/Modules/Input/ControllerInput.h"
 
 void InitH2Config();
 void DeinitH2Config();
@@ -15,7 +15,7 @@ void ReadH2Config();
 #define DLL_VERSION_MAJOR               0
 #define DLL_VERSION_MINOR               6
 #define DLL_VERSION_REVISION            1
-#define DLL_VERSION_BUILD				0
+#define DLL_VERSION_BUILD				1
 
 #define DLL_VERSION            DLL_VERSION_MAJOR, DLL_VERSION_MINOR, DLL_VERSION_REVISION, DLL_VERSION_BUILD
 #define STRINGIZE2(s) #s
@@ -83,7 +83,7 @@ extern H2Config_Deadzone_Type H2Config_Controller_Deadzone;
 extern float H2Config_Deadzone_A_X;
 extern float H2Config_Deadzone_A_Y;
 extern float H2Config_Deadzone_Radial;
-extern int H2Config_refresh_rate;
+extern __int16 H2Config_refresh_rate;
 extern bool H2Config_hiresfix;
 extern bool H2Config_d3dex;
 extern float H2Config_crosshair_offset;
@@ -134,10 +134,11 @@ extern point2d H2Config_PLASPI;
 extern point2d H2Config_BRUTESHOT;
 extern point2d H2Config_NEED;
 extern point2d H2Config_SENTBEAM;
-
+extern ControllerInput::CustomControllerLayout H2Config_CustomLayout;
 
 extern e_override_texture_resolution H2Config_Override_Shadows;
 extern e_override_texture_resolution H2Config_Override_Water;
 
 extern bool H2Config_upnp_enable;
 extern bool H2Config_melee_fix;
+extern bool H2Config_no_events;

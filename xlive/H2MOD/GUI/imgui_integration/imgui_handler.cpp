@@ -231,7 +231,7 @@ namespace imgui_handler
 		windows.emplace_back("Advanced Settings", false, AdvancedSettings::Render, AdvancedSettings::Open, AdvancedSettings::Close);
 		windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
 		windows.emplace_back("debug_overlay", false, DebugOverlay::Render, DebugOverlay::Open, DebugOverlay::Close);
-		
+		windows.emplace_back("messagebox", false, iMessageBox::Render, iMessageBox::Open, iMessageBox::Close);
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -291,6 +291,7 @@ namespace imgui_handler
 		//	ImGuiIO& io = ImGui::GetIO();
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
 		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
+		io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 		io.BackendPlatformName = "imgui_impl_win32";
 		io.ImeWindowHandle = hWnd;
 
