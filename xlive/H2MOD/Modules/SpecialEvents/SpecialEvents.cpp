@@ -269,7 +269,7 @@ namespace SpecialEvents
 		ApplyHooks();
 		if (!H2Config_no_events) {
 			tags::on_map_load(AddNewMarkers);
-			//if (CheckIfEventTime(L"3-17"))
+			if (CheckIfEventTime(L"3-17"))
 				tags::on_map_load(PaddysOnMapLoad);
 
 			if (CheckIfEventTime(L"12-25"))
