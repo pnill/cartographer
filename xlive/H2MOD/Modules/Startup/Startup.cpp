@@ -18,6 +18,7 @@
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
 #include <filesystem>
+#include "Util/Memory.h"
 
 namespace filesystem = std::experimental::filesystem;
 
@@ -282,13 +283,6 @@ void initLocalAppData() {
 	addDebugText(H2AppDataLocal);
 }
 
-void __cdecl game_modules_dispose() {
-	typedef void(__cdecl *tsub_48BBF)();
-	tsub_48BBF psub_48BBF = (tsub_48BBF)(H2BaseAddr + 0x48BBF);
-	psub_48BBF();
-	DeinitH2Startup();
-}
-
 CRITICAL_SECTION log_section;
 
 H2Types detect_process_type()
@@ -376,7 +370,7 @@ void InitH2Startup() {
 		h2mod->Server = false;
 		H2IsDediServer = false;
 	}
-
+	Memory::setBaseAddress(H2BaseAddr, H2IsDediServer);
 	initInstanceNumber();
 
 	int ArgCnt;
@@ -410,8 +404,6 @@ void InitH2Startup() {
 	else {
 		addDebugText("Process is Client");
 
-		addDebugText("Hooking Shutdown Function");
-		PatchCall(H2BaseAddr + 0x39E7C, game_modules_dispose);
 	}
 
 	if (ArgList != NULL)

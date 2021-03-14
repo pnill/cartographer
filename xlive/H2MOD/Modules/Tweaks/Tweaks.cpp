@@ -18,6 +18,7 @@
 #include <math.h>
 #include "H2MOD/Modules/MainLoopPatches/TestGameTimePrep.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
+#include "Util/Memory.h"
 
 #pragma region Done_Tweaks
 
@@ -786,6 +787,10 @@ void InitH2Tweaks() {
 
 		// disable cloth debugging that writes to cloth.txt
 		WriteValue<bool>(h2mod->GetAddress(0x41F650), false);
+
+		// prevent game from setting timeBeginPeriod/timeEndPeriod
+		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
+		NopFill(Memory::GetAddressRelative(0x66A092), 8);
 	}
 
 	if(H2Config_experimental_game_main_loop_patches)
@@ -828,8 +833,14 @@ void H2Tweaks::setHz() {
 
 	if (h2mod->Server)
 		return;
+	
+	static bool refresh_redirected = false;
+	if (!refresh_redirected) {
+		WriteValue(h2mod->GetAddress(0x25E869) + 3, std::addressof(H2Config_refresh_rate));
+		refresh_redirected = true;
+	}
 
-	*h2mod->GetAddress<int*>(0xA3DA08) = H2Config_refresh_rate;
+	//*h2mod->GetAddress<int*>(0xA3DA08) = H2Config_refresh_rate;
 }
 
 char ret_0() {

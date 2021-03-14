@@ -162,15 +162,21 @@ namespace MapSlots
 	}
 
 	//H2Server reads the level data from mainmenu.map
-	typedef bool(__cdecl p_store_multiplayer_level_data)();
-	p_store_multiplayer_level_data* c_store_multiplayer_level_data;
+	/*typedef bool(__cdecl p_store_multiplayer_level_data)();
+	p_store_multiplayer_level_data* c_store_multiplayer_level_data;*/
+
+	typedef int(__cdecl p_sub_map_slot)(int a1);
+	p_sub_map_slot* sub_map_slot;
 
 	const int StaticLevelData = 0x419510;
-	bool __cdecl store_multiplayer_level_data()
+	int* MapSlotCount;
+	int __cdecl store_multiplayer_level_data(int a1)
+	//bool __cdecl store_multiplayer_level_data()
 	{
-		auto result = c_store_multiplayer_level_data();
-		if(result)
-		{
+		//auto result = c_store_multiplayer_level_data();
+		//auto result = sub_map_slot(a1);
+		//if(result)
+		//{
 			int i = 0;
 			for (auto newSlot : MapData)
 			{
@@ -190,6 +196,7 @@ namespace MapSlots
 					slot->sort_order = MapIndex + i;
 					VirtualProtect(reinterpret_cast<LPVOID>(slotAddr), 3172, dwBack[0], &dwBack[1]);
 					i++;
+					
 				}
 				else
 				{
@@ -197,14 +204,18 @@ namespace MapSlots
 					break;
 				}
 			}
-		}
-		return result;
+		//}
+		*MapSlotCount = *MapSlotCount + i;
+		return sub_map_slot(a1);
 	}
 
 	void ApplyHooks()
 	{
-		c_store_multiplayer_level_data = h2mod->GetAddress<p_store_multiplayer_level_data*>(0, 0x6A22);
-		PatchCall(h2mod->GetAddress(0, 0xBBAE), store_multiplayer_level_data);
+		MapSlotCount = h2mod->GetAddress<int*>(0, 0x41950C);
+		//c_store_multiplayer_level_data = h2mod->GetAddress<p_store_multiplayer_level_data*>(0, 0x6A22);
+		sub_map_slot = h2mod->GetAddress<p_sub_map_slot*>(0, 0x3C8C3);
+		//PatchCall(h2mod->GetAddress(0, 0xBBAE), store_multiplayer_level_data);
+		PatchCall(h2mod->GetAddress(0, 0x6ACC), store_multiplayer_level_data);
 	}
 
 	void Initialize()

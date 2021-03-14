@@ -270,7 +270,10 @@ namespace imgui_handler {
 					ImGui::PopItemWidth();
 					ImGui::Text(GetString(refresh_rate));
 					ImGui::PushItemWidth(WidthPercentage(100));
-					ImGui::InputInt("##Refresh1", &H2Config_refresh_rate, 0, 110, ImGuiInputTextFlags_AlwaysInsertMode);
+					int gRefresh = H2Config_refresh_rate;
+					ImGui::InputInt("##Refresh1", &gRefresh, 0, 110, ImGuiInputTextFlags_AlwaysInsertMode);
+					if(ImGui::IsItemEdited())
+						H2Config_refresh_rate = gRefresh;
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(refresh_rate_tooltip));
 

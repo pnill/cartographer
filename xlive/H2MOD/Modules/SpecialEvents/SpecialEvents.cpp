@@ -176,6 +176,17 @@ namespace SpecialEvents
 				pot_node->inverse_position_y = 0.07;
 				pot_node->inverse_position_z = -0.1;
 
+				auto ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
+				char* ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(ball_weapon_datum);
+
+				*((float*)ball_weapon + 0x4) = 0.3f;
+				*((byte*)ball_weapon + 0x1A) = 2;
+
+				auto bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+				char* bomb_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(bomb_weapon_datum);
+
+				*((float*)bomb_weapon + 0x4) = 0.3f;
+				*((byte*)bomb_weapon + 0x1A) = 2;
 
 				/*auto ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
 				char* ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(ball_weapon_datum);
