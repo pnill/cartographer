@@ -180,15 +180,15 @@ namespace SpecialEvents
 				char* ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(ball_weapon_datum);
 
 				//Bounding Radius and Sweetener size
-				*((float*)ball_weapon + 0x4) = 0.3f;
-				*((byte*)ball_weapon + 0x1A) = 1;
+				//*((float*)ball_weapon + 0x4) = 0.3f;
+				//*((byte*)ball_weapon + 0x1A) = 1;
 
 				auto bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
 				char* bomb_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(bomb_weapon_datum);
 				
 				//Bounding Radius and Sweetener size
-				*((float*)bomb_weapon + 0x4) = 0.3f;
-				*((byte*)bomb_weapon + 0x1A) = 1;
+				//*((float*)bomb_weapon + 0x4) = 0.3f;
+				//*((byte*)bomb_weapon + 0x1A) = 1;
 
 				/*auto ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
 				char* ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(ball_weapon_datum);
