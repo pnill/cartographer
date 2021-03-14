@@ -37,7 +37,22 @@ struct s_model_group_definition
 	struct s_variants_block
 	{
 		string_id name;//0x0
-		PAD(0x10);//0x4
+		byte runtime_model_region_0;
+		byte runtime_model_region_1;
+		byte runtime_model_region_2;
+		byte runtime_model_region_3;
+		byte runtime_model_region_4;
+		byte runtime_model_region_5;
+		byte runtime_model_region_6;
+		byte runtime_model_region_7;
+		byte runtime_model_region_8;
+		byte runtime_model_region_9;
+		byte runtime_model_region_10;
+		byte runtime_model_region_11;
+		byte runtime_model_region_12;
+		byte runtime_model_region_13;
+		byte runtime_model_region_14;
+		byte runtime_model_region_15;
 		struct s_regions_block
 		{
 			string_id region_name;//0x0

@@ -1767,7 +1767,7 @@ void H2MOD::Initialize()
 	TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
-	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
+	LOG_TRACE_GAME("H2MOD - Initialized v0.6.2.0");
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
 	//WriteValue(GetAddress(0xC25EA + 8), 100);
 	h2mod->ApplyHooks();
