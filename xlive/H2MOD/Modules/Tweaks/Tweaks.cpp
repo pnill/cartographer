@@ -815,9 +815,6 @@ void InitH2Tweaks() {
 		WriteBytes(Memory::GetAddressRelative(0x66193B), SetGammaRampSkipBytes, sizeof(SetGammaRampSkipBytes));
 	}
 
-	if(H2Config_experimental_game_main_loop_patches)
-		UncappedFPS::ApplyPatches();
-
 	// fixes edge drop fast fall when using higher tickrates than 30
 	Codecave(Memory::GetAddressRelative(0x506E23, 0x4F9143), update_biped_ground_mode_physics_constant, 3);
 

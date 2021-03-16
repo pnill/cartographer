@@ -16,6 +16,7 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/GUI/GUI.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Modules/MainLoopPatches/UncappedFPS/UncappedFPS.h"
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
 
@@ -266,13 +267,20 @@ bool __cdecl cinematic_in_progress_hook()
 
 	switch (experimental_rendering_mode)
 	{
-	default:
+	case e_render_old:
+		if (!p_cinematic_in_progress())
+			*h2mod->GetAddress<bool*>(0x48225B) = false;
+
+		// TODO: get_game_life_cycle is only used with networked sessions, meaning this will not work in single player
+		// and i keep it this way because the EventHandler in UncappedFPS2.cpp uses the game's life cycle as well
+		return p_cinematic_in_progress() || get_game_life_cycle() == life_cycle_in_game || call_is_game_minimized();
+
 	case e_render_none:
 		if (!p_cinematic_in_progress())
 			*h2mod->GetAddress<bool*>(0x48225B) = false;
-	case e_render_old:
 	case e_render_new:
-		return p_cinematic_in_progress() || H2Config_experimental_game_main_loop_patches || b_XboxTick || call_is_game_minimized();
+	default:
+		return p_cinematic_in_progress() || b_XboxTick || call_is_game_minimized();
 		break;
 	}
 
@@ -287,11 +295,13 @@ bool __cdecl should_limit_framerate()
 
 	switch (experimental_rendering_mode)
 	{
-	default:
 	case e_render_none:
-	case e_render_old:
 	case e_render_new:
-		return (call_is_game_minimized() || b_XboxTick) && !H2Config_experimental_game_main_loop_patches;
+	case e_render_old:
+
+	default:
+		return (call_is_game_minimized() || b_XboxTick);
+		break;
 	}
 
 	return false;
@@ -603,9 +613,13 @@ void initGSRunLoop() {
 
 		// (TODO (Kant): add H2Config_experimental_game_main_loop_patches as render mode, but should pretty much be e_render_none plus the call to UncappedFPS::ApplyPatches())
 		// what it does is make the game throttle the main loop as the original game on Xbox did, and removes the bs Hired Gun Added
+
 		H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
-		if (H2Config_experimental_game_main_loop_patches) // if we are using the original game rendering mode
+		if (H2Config_experimental_game_main_loop_patches)
+		{
+			UncappedFPS::ApplyPatches();
 			experimental_rendering_mode = e_render_none; // H2Config_experimental_game_main_loop_patches will override H2Config_experimental_fps
+		}
 
 		switch (experimental_rendering_mode)
 		{
