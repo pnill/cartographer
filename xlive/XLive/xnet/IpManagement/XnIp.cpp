@@ -43,7 +43,7 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 
 void CXnIp::LogConnectionsDetails(sockaddr_in* address, int errorCode)
 {
-	LOG_CRITICAL(onscreendebug_log, "{} - tried to add XNADDR in the system, caused error: {}", errorCode);
+	LOG_CRITICAL(onscreendebug_log, "{} - tried to add XNADDR in the system, caused error: {}", __FUNCTION__, errorCode);
 
 	if (address != nullptr)
 		LOG_CRITICAL(onscreendebug_log, "{} - received connection request from {}:{} we can't fulfil.", __FUNCTION__, inet_ntoa(address->sin_addr), htons(address->sin_port));
@@ -468,11 +468,9 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR
 			|| pXnIpAlreadyRegistered->xnaddr.wPortOnline != pxna->wPortOnline)
 			)
 		{
+			int connectionIndexToReuse = getConnectionIndex(pXnIpAlreadyRegistered->connectionIdentifier);
 			XNetUnregisterInAddr(pXnIpAlreadyRegistered->connectionIdentifier); // unregister the connection
-			if (firstUnusedConnectionIndexFound) // check if we have available spots
-				return registerNewXnIp(firstUnusedConnectionIndex, pxna, pxnkid, outIpIdentifier); // register a new one
-			else
-				NO_MORE_CONNECT_SPOTS(__FUNCTION__, WSAENOMORE); // otherwise return error
+			return registerNewXnIp(connectionIndexToReuse, pxna, pxnkid, outIpIdentifier); // register a new one, if it gets at this point, it shouldn't fail at all
 		}
 
 		if (outIpIdentifier)
