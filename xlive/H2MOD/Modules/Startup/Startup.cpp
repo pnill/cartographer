@@ -354,7 +354,6 @@ void InitH2Startup() {
 	H2BaseAddr = (DWORD)game_info.base;
 	h2mod->SetBase(H2BaseAddr);
 
-
 	if (game_info.process_type == H2Types::H2Server)
 	{
 		h2mod->Server = true;
@@ -383,16 +382,7 @@ void InitH2Startup() {
 	SetCurrentDirectoryW(GetExeDirectoryWide().c_str());
 	//If H2ProcessFilePath is empty (Server Console Mode?) set to working directory
 	
-
-
 	initLocalAppData();
-
-	// Force this to always initialize, and try appdata first
-	H2Config_debug_log = H2Config_isConfigFileAppDataLocal = true;
-	int temp_log_level = H2Config_debug_log_level;
-	H2Config_debug_log_level = 0;
-	H2Config_debug_log_level = temp_log_level;
-	H2Config_debug_log = H2Config_isConfigFileAppDataLocal = false;
 
 	if (H2IsDediServer) {
 		addDebugText("Process is Dedi-Server");
@@ -420,21 +410,22 @@ void InitH2Startup() {
 	InitH2Config();
 	EnterCriticalSection(&log_section);
 	initDebugText();
-	if (H2Config_debug_log) {
-		if (H2Config_debug_log_console) {
-			console_log = h2log::create_console("CONSOLE MAIN");
-		}
-		xlive_log = h2log::create("XLive", prepareLogFileName(L"h2xlive"));
-		LOG_DEBUG_XLIVE(DLL_VERSION_STR "\n");
-		h2mod_log = h2log::create("H2MOD", prepareLogFileName(L"h2mod"));
-		LOG_DEBUG_GAME(DLL_VERSION_STR "\n");
-		network_log = h2log::create("Network", prepareLogFileName(L"h2network"));
-		LOG_DEBUG_NETWORK(DLL_VERSION_STR "\n");
+
+	// prepare default log files if enabled, after we read the H2Config
+	bool should_enable_console_log = H2Config_debug_log && H2Config_debug_log_console;
+	console_log = h2log::create_console("CONSOLE MAIN", should_enable_console_log, H2Config_debug_log_level);
+
+	xlive_log = h2log::create("XLive", prepareLogFileName(L"h2xlive"), H2Config_debug_log, H2Config_debug_log_level);
+	LOG_DEBUG_XLIVE(DLL_VERSION_STR "\n");
+	h2mod_log = h2log::create("H2MOD", prepareLogFileName(L"h2mod"), H2Config_debug_log, H2Config_debug_log_level);
+	LOG_DEBUG_GAME(DLL_VERSION_STR "\n");
+	network_log = h2log::create("Network", prepareLogFileName(L"h2network"), H2Config_debug_log, H2Config_debug_log_level);
+	LOG_DEBUG_NETWORK(DLL_VERSION_STR "\n");
 #if COMPILE_WITH_VOICE
-		voice_log = h2log::create("Voice", prepareLogFileName(L"voicechat"));
-		LOG_DEBUG(voice_log, DLL_VERSION_STR "\n");
+	voice_log = h2log::create("Voice", prepareLogFileName(L"voicechat"), H2Config_debug_log, H2Config_debug_log_level);
+	LOG_DEBUG(voice_log, DLL_VERSION_STR "\n");
 #endif
-	}
+
 	//checksum_log = logger::create(prepareLogFileName("checksum"), true);
 	LeaveCriticalSection(&log_section);
 	InitH2Accounts();
