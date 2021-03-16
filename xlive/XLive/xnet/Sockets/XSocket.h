@@ -36,41 +36,40 @@ struct XSocket
 		memset(&name, 0, sizeof(name));
 	}
 
-	bool isTCP() { return protocol == IPPROTO_TCP; }
-	bool isUDP() { return protocol == IPPROTO_UDP; }
+	bool isTCP() const { return protocol == IPPROTO_TCP; }
+	bool isUDP() const { return protocol == IPPROTO_UDP; }
 
 	/* VDP uses UDP, and some encryption (done at network transport layer, not game layer) */
-	bool isVDP() { return protocol == IPPROTO_UDP; }
+	bool isVDP() const { return protocol == IPPROTO_UDP; }
 
-	bool isValid() { return identifier == 'XSoC'; }
+	bool isValid() const { return identifier == 'XSoC'; }
 
 	// all fields in sockaddr_in are in network byte order
 	// some helpers for conversion for each case needed
 	/* get the port, in host byte order, in this case little-endian */
-	short getHostOrderSocketPort() { return ntohs(name.sin_port); }
+	short getHostOrderSocketPort() const { return ntohs(name.sin_port); }
+
 	/* get the port, in network byte order, in this case big-endian */
-	short getNetworkOrderSocketPort() { return name.sin_port; }
+	short getNetworkOrderSocketPort() const { return name.sin_port; }
 
 	/* sets the socket send buffer size */
 	void setBufferSize(INT sendBufsize, INT recvBufsize);
-	bool sockAddrInEqual(sockaddr_in* a1, sockaddr_in* a2)
+
+	bool sockAddrInEqual(sockaddr_in* a1, sockaddr_in* a2) const
 	{
 		return (a1->sin_addr.s_addr == a2->sin_addr.s_addr && a1->sin_port == a2->sin_port);
 	}
 
-	bool sockAddrInInvalid(sockaddr_in* a1)
+	bool sockAddrInInvalid(sockaddr_in* a1) const
 	{
 		return a1->sin_addr.s_addr == 0 || a1->sin_port == 0;
 	}
 
+	int udpSend(const char* buf, int len, int flags, sockaddr *to, int tolen);
+
 	static void socketsDisposeAll();
 
 	static std::vector<XSocket*> Sockets;
-
-	/*
-		Sends a request over the socket to the other socket end, with the same identifier
-	*/
-	void sendXNetRequest(IN_ADDR connectionIdentifier, int reqType);
 };
 
 void WINAPI XSocketWSASetLastError(int iError);

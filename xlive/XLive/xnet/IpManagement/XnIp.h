@@ -10,14 +10,20 @@ const char broadcastStrHdr[MAX_HDR_STR] = "XNetReqPack";
 
 #define XnIp_ConnectionIndexMask 0xFF000000
 
-#define XnIp_ConnectionPing 0x0
-#define XnIp_ConnectionPong 0x2
-#define XnIp_ConnectionCloseSecure 0x4
-#define XnIp_ConnectionEstablishSecure 0x8
-
 #define XnIp_ConnectionTimeOut (15 * 1000) // msec
 
 #define IPADDR_LOOPBACK htonl(0x7F000001) // 127.0.0.1
+
+enum eXnip_ConnectRequestType : int
+{
+	XnIp_ConnectionRequestInvalid = -1,
+
+	XnIp_ConnectionPing = 0x0,
+	XnIp_ConnectionPong = 0x2,
+	XnIp_ConnectionCloseSecure = 0x4,
+	XnIp_ConnectionEstablishSecure = 0x8,
+	XnIp_ConnectionDeclareConnected = 0xC
+};
 
 struct XNetPacketHeader
 {
@@ -56,7 +62,7 @@ struct XNetRequestPacket
 	struct XNetReq
 	{
 		XNKID xnkid;
-		DWORD reqType;
+		eXnip_ConnectRequestType reqType;
 		union
 		{
 			XNADDR xnaddr;
@@ -87,9 +93,10 @@ struct XnIp
 	XnKeyPair* keyPair;
 
 	bool bValid;
-	int xnetstatus;
+	int connectStatus;
 	int connectionPacketsSentCount;
 	DWORD lastConnectionInteractionTime;
+	DWORD connectPacketReceivedTimeStamp;
 
 #pragma region Nat
 
@@ -200,7 +207,7 @@ public:
 			xnIp->lastConnectionInteractionTime = timeGetTime();
 	}
 
-	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier, bool handleFromConnectionPacket);
+	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier, eXnip_ConnectRequestType requestType);
 	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 
 	void checkForLostConnections();
@@ -223,16 +230,17 @@ public:
 	int handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount);
 
 	void Initialize(const XNetStartupParams* netStartupParams);
-	void LogConnectionsDetails(sockaddr_in* address = nullptr);
+	void LogConnectionsDetails(sockaddr_in* address, int errorCode);
 	IN_ADDR GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* addr);
 	void SaveNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);
 	void HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectReqPkt, sockaddr_in* addr, LPDWORD bytesRecvdCount);
 
 	void HandleDisconnectPacket(XSocket* xsocket, XNetRequestPacket* disconnectReqPck, sockaddr_in* recvAddr);
+	XnIp* XnIpLookUp(const XNADDR* pxna, const XNKID* xnkid, bool* firstUnusedIndexFound = nullptr, int* firstUnusedIndex = nullptr);
+	int registerNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* outIpIdentifier);
 	int RegisterKey(XNKID*, XNKEY*);
 	XnKeyPair* getKeyPair(const XNKID* xnkid);
 	void UnregisterKey(const XNKID* xnkid);
-	void getLastRegisteredKeys(XNKID* xnkid, XNKEY* xnkey);
 	
 	XnIp* XnIPs = nullptr;
 	XnKeyPair* XnKeyPairs = nullptr;
@@ -245,11 +253,31 @@ public:
 	int GetMinSockRecvBufferSizeInBytes() { return startupParams.cfgSockDefaultRecvBufsizeInK * SOCK_K_UNIT; }
 	int GetMinSockSendBufferSizeInBytes() { return startupParams.cfgSockDefaultSendBufsizeInK * SOCK_K_UNIT; }
 
+	int GetRegisteredKeyCount()
+	{
+		int keysCount = 0;
+		for (int i = 0; i < GetMaxXnKeyPairs(); i++)
+		{
+			if (XnKeyPairs[i].bValid)
+			{
+				keysCount++;
+			}
+		}
+
+		return keysCount;
+	}
+
+
+	/*
+		Sends a request over the socket to the other socket end, with the same identifier
+	*/
+	void sendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXnip_ConnectRequestType reqType);
 
 private:
 
 	XnIp ipLocal;
-	XnKeyPair* lastRegisteredKey = nullptr;
 };
 
 extern CXnIp gXnIp;
+
+int WINAPI XNetRegisterKey(XNKID *pxnkid, XNKEY *pxnkey);

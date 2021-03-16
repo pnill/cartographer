@@ -1,4 +1,6 @@
 
+#include "XSession.h"
+
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 
@@ -6,11 +8,23 @@ extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
 XSESSION_LOCAL_DETAILS sessionDetails;
 
+struct XSESSIONS
+{
+	DWORD dwFlags;
+	XSESSION_INFO sessionInfo;
+};
+
+std::map<HANDLE, XSESSIONS> sessionMap;
+
 // #5300: XSessionCreate
 LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, ULONGLONG *pqwSessionNonce, PXSESSION_INFO pSessionInfo, PXOVERLAPPED pOverlapped, HANDLE *phEnum)
 {
 	LOG_TRACE_XLIVE("XSessionCreate  (flags = {0:x}, userIndex = {1}, maxPublicSlots = {2}, maxPrivateSlots = {3}, sessionNonce = {4:p}, pSessionInfo = {5:p}, pOverlapped = {6:p}, handle = {7:p})",
 		dwFlags, dwUserIndex, dwMaxPublicSlots, dwMaxPrivateSlots, (void*)pqwSessionNonce, (void*)pSessionInfo, (void*)pOverlapped, (void*)phEnum);
+
+	if (!phEnum) {
+		return ERROR_INVALID_PARAMETER;
+	}
 
 	if (dwFlags & XSESSION_CREATE_USES_ARBITRATION && !(dwFlags & XSESSION_CREATE_USES_PEER_NETWORK))
 		return ERROR_INVALID_PARAMETER;
@@ -18,25 +32,6 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 	if ((dwFlags & XSESSION_CREATE_HOST)
 		&& !(dwFlags & (XSESSION_CREATE_USES_PEER_NETWORK | XSESSION_CREATE_USES_MATCHMAKING | XSESSION_CREATE_USES_STATS)))
 		return ERROR_INVALID_PARAMETER;
-	
-	if (phEnum) *phEnum = CreateMutex(NULL, NULL, NULL);
-
-	if ((dwFlags & XSESSION_CREATE_HOST))
-	{
-		if (pqwSessionNonce) XNetRandom((BYTE*)pqwSessionNonce, sizeof(*pqwSessionNonce));
-
-		if (pSessionInfo)
-		{
-			ZeroMemory(&pSessionInfo->hostAddress, sizeof(pSessionInfo->hostAddress));
-			if (gXnIp.GetLocalUserXn() != nullptr)
-				pSessionInfo->hostAddress = gXnIp.GetLocalUserXn()->xnaddr;
-
-			// TODO FIXME this is a hack, determine another way of getting the session id key
-			gXnIp.getLastRegisteredKeys(&pSessionInfo->sessionID, &pSessionInfo->keyExchangeKey);
-		}
-
-		LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_HOST");
-	}
 
 	if ((dwFlags & XSESSION_CREATE_USES_ARBITRATION) > 0)
 	{
@@ -51,6 +46,71 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 	if ((dwFlags & XSESSION_CREATE_USES_PRESENCE) > 0)
 	{
 		LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_USES_PRESENCE");
+	}
+	
+	XSESSIONS sessionData;
+	sessionData.dwFlags = dwFlags;
+
+	*phEnum = CreateMutex(NULL, NULL, NULL);
+
+	if (dwFlags & XSESSION_CREATE_HOST)
+	{
+		LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_HOST");
+
+		// the pointer is data output if we create host
+		memset(pSessionInfo, 0, sizeof(XSESSION_INFO));
+
+		if ((dwFlags & (XSESSION_CREATE_USES_MATCHMAKING | XSESSION_CREATE_USES_PRESENCE)))
+		{
+			LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_USES_MATCHMAKING | XSESSION_CREATE_USES_PRESENCE");
+			// does some crap with some external data, does not create keys at all by itself
+			XNetCreateKey(&pSessionInfo->sessionID, &pSessionInfo->keyExchangeKey);
+		}
+		else
+		{
+			XNetCreateKey(&pSessionInfo->sessionID, &pSessionInfo->keyExchangeKey);
+		}
+
+		if (gXnIp.GetLocalUserXn() != nullptr)
+			pSessionInfo->hostAddress = gXnIp.GetLocalUserXn()->xnaddr;
+
+		if (pqwSessionNonce) XNetRandom((BYTE*)pqwSessionNonce, sizeof(*pqwSessionNonce));
+
+		// after we created session info, copy to sessionData
+		memcpy(&sessionData.sessionInfo, pSessionInfo, sizeof(XSESSION_INFO));
+	}
+	else
+	{
+		if (dwFlags & XSESSION_CREATE_USES_PEER_NETWORK)
+		{
+			LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_USES_PEER_NETWORK");
+			// the pointer is data output
+			memcpy(&sessionData.sessionInfo, pSessionInfo, sizeof(XSESSION_INFO)); // if we are not session host, copy the session details to session data
+		}
+		else
+		{
+			memset(&sessionData.sessionInfo, 0, sizeof(sessionData.sessionInfo)); // if we dont use peer network, we don't use any session info aparently
+		}
+	}
+	
+	DWORD dwResult = 0;
+	DWORD dwExtendedResult = 0;
+	
+	sessionMap.insert(std::make_pair(*phEnum, sessionData)); // insert the data
+
+	if (dwFlags & XSESSION_CREATE_USES_PEER_NETWORK)
+	{
+		// register the key created if we use PEER_NEtWORK
+		int result = XNetRegisterKey(&pSessionInfo->sessionID, &pSessionInfo->keyExchangeKey);
+		if (result && result != WSAEALREADY)
+		{
+			dwResult = ERROR_FUNCTION_FAILED;
+			dwExtendedResult = XONLINE_E_SESSION_REGISTER_KEY_FAILED;
+
+			// erase element and close the handle
+			sessionMap.erase(*phEnum);
+			CloseHandle(*phEnum);
+		}
 	}
 
 	// local cache
@@ -82,17 +142,17 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 	if (phEnum)
 		LOG_TRACE_XLIVE("- handle = {}", *phEnum);
 
-	return ERROR_SUCCESS;
-
-	/*if (pOverlapped)
+	if (pOverlapped)
 	{
-		pOverlapped->InternalLow = ERROR_SUCCESS;
+		pOverlapped->InternalLow = dwResult;
 		pOverlapped->InternalHigh = 0;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
+		pOverlapped->dwExtendedError = dwExtendedResult;
 		Check_Overlapped(pOverlapped);
+
 		return ERROR_IO_PENDING;
-	}*/
-	
+	}
+
+	return dwResult;
 }
 
 // #5332: XSessionEnd
@@ -331,16 +391,33 @@ DWORD WINAPI XSessionDelete(HANDLE hSession, PXOVERLAPPED pXOverlapped)
 	if (!hSession)
 		return ERROR_INVALID_PARAMETER;
 
-	return ERROR_SUCCESS;
-
-	/*DWORD ret = 0;
+	DWORD ret = 0;
 	//TODO XSessionDelete
-	if (pXOverlapped) {
+
+	auto xsession = sessionMap.find(hSession);
+	if (xsession != sessionMap.end())
+	{
+		if (xsession->second.dwFlags & XSESSION_CREATE_USES_PEER_NETWORK)
+		{
+			XNetUnregisterKey(&xsession->second.sessionInfo.sessionID);
+		}
+
+		sessionMap.erase(xsession);
+
+		return ERROR_SUCCESS;
+	}
+	else
+	{
+		// return FAIL if the session is unknown
+		return ERROR_FUNCTION_FAILED;
+	}
+
+	/*if (pXOverlapped) {
 		//asynchronous
 
 		pXOverlapped->InternalLow = ERROR_SUCCESS;
-		pXOverlapped->InternalHigh = ERROR_SUCCESS;
-		pXOverlapped->dwExtendedError = ERROR_SUCCESS;
+		pXOverlapped->InternalHigh = 0;
+		pXOverlapped->dwExtendedError = 0;
 
 		Check_Overlapped(pXOverlapped);
 
@@ -348,9 +425,9 @@ DWORD WINAPI XSessionDelete(HANDLE hSession, PXOVERLAPPED pXOverlapped)
 	}
 	else {
 		//synchronous
-	}
+	}*/
 
-	return ret;*/
+	return ret;
 }
 
 // #5333: XSessionArbitrationRegister

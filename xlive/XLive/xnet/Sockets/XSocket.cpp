@@ -668,53 +668,6 @@ u_short WINAPI XSocketHTONS(u_short hostshort)
 	return htons(hostshort);
 }
 
-void XSocket::sendXNetRequest(IN_ADDR connectionIdentifier, int reqType)
-{
-	sockaddr_in sendToAddr;
-	SecureZeroMemory(&sendToAddr, sizeof(sockaddr_in));
-
-	XnIp* xnIp = gXnIp.getConnection(connectionIdentifier);
-	if (xnIp != nullptr)
-	{
-		sendToAddr.sin_family = AF_INET;
-		sendToAddr.sin_addr = connectionIdentifier;
-		sendToAddr.sin_port = this->getNetworkOrderSocketPort();
-
-		XNetRequestPacket connectionPacket;
-		SecureZeroMemory(&connectionPacket.data, sizeof(XNetRequestPacket::XNetReq));
-
-		connectionPacket.data.reqType = reqType;
-		connectionPacket.data.xnkid = xnIp->keyPair->xnkid;
-		switch (reqType)
-		{
-		case XnIp_ConnectionEstablishSecure:
-			XNetGetTitleXnAddr(&connectionPacket.data.xnaddr);
-			break;
-
-		case XnIp_ConnectionCloseSecure:
-		case XnIp_ConnectionPong:
-		case XnIp_ConnectionPing:
-			LOG_INFO_NETWORK("{} - unimplemented requests!", __FUNCTION__);
-			break;
-
-		default:
-			// this shouldn't be executed ever
-			LOG_ERROR_NETWORK("{} - invalid request type", __FUNCTION__);
-			break;
-		}
-
-		xnIp->connectionPacketsSentCount++;
-
-		int ret = XSocketSendTo((SOCKET)this, (char*)&connectionPacket, sizeof(XNetRequestPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
-		LOG_INFO_NETWORK("{} - secure packet sent socket handle: {}, connection index: {}, connection identifier: {:x}", __FUNCTION__, this->winSockHandle, gXnIp.getConnectionIndex(connectionIdentifier), sendToAddr.sin_addr.s_addr);
-	}
-	else
-	{
-		LOG_ERROR_NETWORK("{} - connection index: {}, identifier: {:x} is invalid!", __FUNCTION__, gXnIp.getConnectionIndex(connectionIdentifier), connectionIdentifier.s_addr);
-	}
-}
-
-
 void XSocket::setBufferSize(INT sendBufsize, INT recvBufsize)
 {
 	static const INT sockOpts[] = { SO_SNDBUF, SO_RCVBUF };
@@ -748,6 +701,11 @@ void XSocket::setBufferSize(INT sendBufsize, INT recvBufsize)
 			}
 		}
 	}
+}
+
+int XSocket::udpSend(const char* buf, int len, int flags, sockaddr *to, int tolen)
+{
+	return XSocketSendTo((SOCKET)this, buf, len, flags, to, tolen);
 }
 
 void XSocket::socketsDisposeAll()

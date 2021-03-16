@@ -522,23 +522,22 @@ DWORD ServerList::GetServers(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXO
 		return ERROR_NOT_FOUND;
 	}
 
-	// check if the thread didn't start and if the I/O operation didn't execute
-	if (serverQuery->operationState == OperationPending)
+	switch (serverQuery->operationState)
 	{
+	case OperationPending:
 		serverQuery->operationState = OperationIncomplete;
 		serverQuery->ovelapped = pOverlapped;
 		serverQuery->serv_thread = std::thread(&ServerList::GetServersFromHttp, serverQuery, cbBuffer, pvBuffer);
 		serverQuery->serv_thread.detach();
-	}
-	// if there are no more servers to be read from the received document, return ERROR_NO_MORE_FILES
-	else if (serverQuery->operationState == OperationIncomplete)
-	{
+		break;
+
+	case OperationIncomplete:
 		// otherwise tell the game we are still running I/O operations
 		pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
 		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
-	}
-	else if (serverQuery->operationState == OperationFinished)
-	{
+		break;
+
+	case OperationFinished:
 		// check if we didn't find any servers
 		if (serverQuery->GetTotalServers() > 0)
 		{
@@ -554,6 +553,10 @@ DWORD ServerList::GetServers(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXO
 		delete[] serverQuery->pSearchPropertyIDs;
 
 		delete serverQuery;
+		break;
+
+	default:
+		return ERROR_NOT_FOUND;
 	}
 
 	return ERROR_IO_PENDING;
@@ -568,7 +571,7 @@ void ServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 	std::string readBuffer;
 
 	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
-	pOverlapped->InternalHigh = 1;
+	pOverlapped->InternalHigh = 0;
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
 	curl = curl_easy_init();
@@ -610,7 +613,7 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 	std::string readBuffer;
 
 	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
-	pOverlapped->InternalHigh = 1;
+	pOverlapped->InternalHigh = 0; // this shouldn't even be checked by game's code, but for some reason it gets in Halo 2, InternalHIgh is used for enumerating data, where it holds how many elemets were retreived
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
 	curl = curl_easy_init();
@@ -624,10 +627,10 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 			token.SetString(H2CurrentAccountLoginToken, document.GetAllocator());
 
 		Value xnkid_val(kStringType);
-		xnkid_val.SetString(ByteToHexStr(xnkid.ab, sizeof(XNKID)).c_str(), document.GetAllocator());
+		xnkid_val.SetString(ByteToHexStr(xnkid.ab, sizeof(xnkid.ab)).c_str(), document.GetAllocator());
 
 		Value xnkey_val(kStringType);
-		xnkey_val.SetString(ByteToHexStr(xnkey.ab, sizeof(XNKEY)).c_str(), document.GetAllocator());
+		xnkey_val.SetString(ByteToHexStr(xnkey.ab, sizeof(xnkey.ab)).c_str(), document.GetAllocator());
 
 		XnIp* localUser = gXnIp.GetLocalUserXn();
 
@@ -639,7 +642,8 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 		document.AddMember("dwMaxPrivateSlots", Value().SetInt(dwMaxPrivateSlots), document.GetAllocator());
 		document.AddMember("dwMaxFilledPrivateSlots", Value().SetInt(dwFilledPrivateSlots), document.GetAllocator());
 		document.AddMember("dwPort", Value().SetInt(H2Config_base_port), document.GetAllocator());
-		if (localUser) {
+		if (localUser)
+		{
 			document.AddMember("lanaddr", Value().SetUint(localUser->xnaddr.ina.s_addr), document.GetAllocator());
 		}
 		document.AddMember("xnkid", xnkid_val, document.GetAllocator());
