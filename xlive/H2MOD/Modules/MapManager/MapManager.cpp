@@ -51,8 +51,6 @@ std::wstring CUSTOM_MAP = L"Custom Map";
 wchar_t EMPTY_UNICODE_STR = '\0';
 
 int downloadPercentage = 0;
-bool mapDownloadCountdown = false;
-auto promptOpenTime = std::chrono::high_resolution_clock::now();
 
 #pragma region custom map checks
 
@@ -260,28 +258,11 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(network_session *session
 }
 #pragma endregion
 
-void MapManager::leaveSessionIfAFK() {
-	if (mapDownloadCountdown) {
-		auto duraton = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - promptOpenTime);
-		if (duraton >= std::chrono::seconds(20)) {
-			h2mod->leave_session();
-			mapDownloadCountdown = false;
-		}
-	}
-	if (get_game_life_cycle() == life_cycle_in_game 
-		|| get_game_life_cycle() == life_cycle_start_game
-		|| get_game_life_cycle() == life_cycle_none)
-	{
-		mapDownloadCountdown = false;
-	}
-}
-
 /**
 * Download map callback
 */
 char __cdecl handle_map_download_callback() {
 	downloadPercentage = 0;
-	mapDownloadCountdown = false;
 
 	auto mapDownloadThread = []()
 	{
@@ -334,7 +315,6 @@ leave_game_callback_def p_original_leave_game_callback;
 
 char leavegame_callback()
 {
-	mapDownloadCountdown = false;
 	return p_original_leave_game_callback();
 }
 
@@ -346,8 +326,6 @@ void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16
 	typedef void(__cdecl map_downloading_menu_constructor)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6, int a7, int a8, int a9, int a10);
 	auto p_map_downloading_menu_constructor = h2mod->GetAddress<map_downloading_menu_constructor*>(0x20E2E0);
 
-	mapDownloadCountdown = true;
-	promptOpenTime = std::chrono::high_resolution_clock::now();
 	CustomPackets::sendRequestMapFilename();
 	p_original_leave_game_callback = (leave_game_callback_def)leave_game_callback;
 	p_map_downloading_menu_constructor(a1, a2, a3, a4, (DWORD)handle_map_download_callback, (DWORD)leavegame_callback, a7, a8, a9, a10);

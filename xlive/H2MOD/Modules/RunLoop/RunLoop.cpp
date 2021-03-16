@@ -133,9 +133,6 @@ void main_game_loop_hook() {
 		GSMainLoop();
 
 	main_game_loop();
-	
-
-	mapManager->leaveSessionIfAFK();
 
 	extern void frameTimeManagement();
 	frameTimeManagement();
@@ -583,8 +580,6 @@ void alt_main_game_loop_hook()
 		//main_game_loop();
 	
 		EventHandler::executeGameLoopCallbacks();
-
-		mapManager->leaveSessionIfAFK();
 	}
 	if (H2Config_fps_limit != 0) {
 		QueryPerformanceCounter(&end_render);
