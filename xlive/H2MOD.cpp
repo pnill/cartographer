@@ -76,6 +76,8 @@ int get_player_index_from_datum(datum unit_datum)
 	return unit_object->PlayerDatum.ToAbsoluteIndex();
 }
 
+
+// TO NOTE: this is the life cycle of a `networked` game, not used in campaign for example
 game_life_cycle get_game_life_cycle()
 {
 	typedef game_life_cycle(__cdecl get_lobby_state)();
