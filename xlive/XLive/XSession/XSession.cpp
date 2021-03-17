@@ -83,7 +83,6 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 	{
 		if (dwFlags & XSESSION_CREATE_USES_PEER_NETWORK)
 		{
-			LOG_TRACE_XLIVE("XSessionCreate - XSESSION_CREATE_USES_PEER_NETWORK");
 			// the pointer is data output
 			memcpy(&sessionData.sessionInfo, pSessionInfo, sizeof(XSESSION_INFO)); // if we are not session host, copy the session details to session data
 		}
