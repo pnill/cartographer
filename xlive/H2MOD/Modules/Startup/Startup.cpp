@@ -313,8 +313,10 @@ H2Types detect_process_type()
 	return H2Types::Invalid;
 }
 
-std::wstring prepareLogFileName(std::wstring logFileName) {
-	std::wstring filename = (H2Config_isConfigFileAppDataLocal ? H2AppDataLocal : L"");
+// use only after initLocalAppData has been called
+// by default useAppDataLocalPath is set to true, if not specified
+std::wstring prepareLogFileName(std::wstring logFileName, bool useAppDataLocalPath) {
+	std::wstring filename = (useAppDataLocalPath ? H2AppDataLocal : L"");
 	std::wstring processName(H2IsDediServer ? L"H2Server" : L"Halo2Client");
 	std::wstring folders(L"logs\\" + processName + L"\\instance" + std::to_wstring(H2GetInstanceId()));
 	filename += folders;
@@ -322,7 +324,7 @@ std::wstring prepareLogFileName(std::wstring logFileName) {
 	if (!filesystem::create_directories(filename) && !filesystem::is_directory(filesystem::status(filename)))
 	{
 		// try locally if we didn't already
-		if (H2Config_isConfigFileAppDataLocal
+		if (useAppDataLocalPath
 			&& filesystem::create_directories(folders) || filesystem::is_directory(filesystem::status(folders)))
 			filename = folders;
 		else
@@ -384,6 +386,9 @@ void InitH2Startup() {
 	
 	initLocalAppData();
 
+	// after localAppData filepath initialized, we can initialize OnScreenDebugLog
+	initOnScreenDebugText();
+
 	if (H2IsDediServer) {
 		addDebugText("Process is Dedi-Server");
 	}
@@ -409,7 +414,6 @@ void InitH2Startup() {
 
 	InitH2Config();
 	EnterCriticalSection(&log_section);
-	initDebugText();
 
 	// prepare default log files if enabled, after we read the H2Config
 	bool should_enable_console_log = H2Config_debug_log && H2Config_debug_log_console;
@@ -426,7 +430,7 @@ void InitH2Startup() {
 	LOG_DEBUG(voice_log, DLL_VERSION_STR "\n");
 #endif
 
-	//checksum_log = logger::create(prepareLogFileName("checksum"), true);
+	//checksum_log = h2log::create("Checksum", prepareLogFileName(L"checksum"), true, 0);
 	LeaveCriticalSection(&log_section);
 	InitH2Accounts();
 

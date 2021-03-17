@@ -109,7 +109,7 @@ void addDebugText(const char* format, ...)
 	va_end(valist);
 }
 
-void initDebugText() {
+void initOnScreenDebugText() {
 	initialisedDebugText = true;
 	onscreendebug_log = h2log::create("OnScreenDebug", prepareLogFileName(L"h2onscreendebug"), true, 0); // we always create onscreendebuglog, which logs everything (log level 0)
 	DebugStr = (char**)calloc(DebugTextArrayLenMax, sizeof(char*));
