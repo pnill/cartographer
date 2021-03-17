@@ -6,8 +6,12 @@
 
 #include "H2MOD\Modules\Utils\Utils.h"
 
+#include "H2MOD\Modules\Startup\Startup.h"
+
 CXnIp gXnIp;
 XECRYPT_RC4_STATE Rc4StateRand;
+
+h2log* critical_network_errors_log;
 
 void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 {
@@ -39,37 +43,44 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 
 	if (startupParams.cfgSockDefaultSendBufsizeInK <= 0)
 		startupParams.cfgSockDefaultSendBufsizeInK = SOCK_UDP_MIN_SEND_BUFFER_K_UNITS;
+
+	// initielize critical network logs
+	// TODO: disable after all network problems are addressed
+	critical_network_errors_log = h2log::create("Critical Network Errors", prepareLogFileName(L"criticalNetworkErrors"), true, 0);
+
+	LOG_CRITICAL_NETWORK(DLL_VERSION_STR "\n");
+	LOG_CRITICAL_NETWORK("{} - initialized critical network log!", __FUNCTION__);
 }
 
 void CXnIp::LogConnectionsDetails(sockaddr_in* address, int errorCode)
 {
-	LOG_CRITICAL(onscreendebug_log, "{} - tried to add XNADDR in the system, caused error: {}", __FUNCTION__, errorCode);
+	LOG_CRITICAL_NETWORK("{} - tried to add XNADDR in the system, caused error: {}", __FUNCTION__, errorCode);
 
 	if (address != nullptr)
-		LOG_CRITICAL(onscreendebug_log, "{} - received connection request from {}:{} we can't fulfil.", __FUNCTION__, inet_ntoa(address->sin_addr), htons(address->sin_port));
+		LOG_CRITICAL_NETWORK("{} - received connection request from {}:{} we can't fulfil.", __FUNCTION__, inet_ntoa(address->sin_addr), htons(address->sin_port));
 
 	int keysRegisteredCount = GetRegisteredKeyCount();
 
 	if (keysRegisteredCount > 0)
 	{
-		LOG_CRITICAL(onscreendebug_log, "{} - registered key count: {}", __FUNCTION__, keysRegisteredCount);
+		LOG_CRITICAL_NETWORK("{} - registered key count: {}", __FUNCTION__, keysRegisteredCount);
 		for (int i = 0; i < GetMaxXnConnections(); i++)
 		{
 			if (XnIPs[i].bValid)
 			{
 				XnIp* xnIp = &XnIPs[i];
 				float connectionLastInteractionSeconds = (float)(timeGetTime() - xnIp->lastConnectionInteractionTime) / 1000.f;
-				LOG_CRITICAL(onscreendebug_log, "{} - connection index: {}, packets sent: {}, packets received: {}, time since last interaction: {:.4f} seconds", __FUNCTION__, i, xnIp->pckSent, xnIp->pckRecvd, connectionLastInteractionSeconds);
+				LOG_CRITICAL_NETWORK("{} - connection index: {}, packets sent: {}, packets received: {}, time since last interaction: {:.4f} seconds", __FUNCTION__, i, xnIp->pckSent, xnIp->pckRecvd, connectionLastInteractionSeconds);
 			}
 			else
 			{
-				LOG_CRITICAL(onscreendebug_log, "{} - hold up pendejo, wtf - connection index: {}, we have free connection registry and couldn't use it.", __FUNCTION__, i);
+				LOG_CRITICAL_NETWORK("{} - hold up pendejo, wtf - connection index: {}, we have free connection registry and couldn't use it.", __FUNCTION__, i);
 			}
 		}
 	}
 	else
 	{
-		LOG_CRITICAL(onscreendebug_log, "{} - no keys are registered, cannot create connections with no registered keys!", __FUNCTION__);
+		LOG_CRITICAL_NETWORK("{} - no keys are registered, cannot create connections with no registered keys!", __FUNCTION__);
 	}
 }
 
@@ -123,7 +134,7 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 
 				case XnIp_ConnectionPing:
 				case XnIp_ConnectionPong:
-					LOG_ERROR_NETWORK("{} - unimplemented request type: {}", __FUNCTION__, XNetPck->data.reqType);
+					LOG_CRITICAL_NETWORK("{} - unimplemented request type: {}", __FUNCTION__, XNetPck->data.reqType);
 					break;
 				default:
 					break;
@@ -281,7 +292,7 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectR
 				}
 				else 
 				{
-					LOG_TRACE_NETWORK("{} - wtf how did we end up here, while status connected and trying to establish a secure connection lol", __FUNCTION__);
+					LOG_CRITICAL_NETWORK("{} - wtf how did we end up here, while status connected and trying to establish a secure connection lol", __FUNCTION__);
 				}
 
 				break;
@@ -306,7 +317,7 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectR
 				}
 				else
 				{
-					LOG_TRACE_NETWORK("{} - we didn't even receive the NAT data for all sockets, wtf", __FUNCTION__);
+					LOG_CRITICAL_NETWORK("{} - we didn't even receive the NAT data for all sockets, wtf", __FUNCTION__);
 				}
 				break;*/
 
@@ -427,7 +438,7 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR
 
 #define NO_MORE_CONNECT_SPOTS(_function, _err) \
 	{ \
-		LOG_TRACE_NETWORK("{} - no more available connection spots!", (_function)); \
+		LOG_CRITICAL_NETWORK("{} - no more available connection spots!", (_function)); \
 		return(_err); \
 	} \
 
@@ -536,7 +547,7 @@ int CXnIp::RegisterKey(XNKID* pxnkid, XNKEY* pxnkey)
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("{} - reached max key registrations!", __FUNCTION__);
+		LOG_CRITICAL_NETWORK("{} - reached max key registrations!", __FUNCTION__);
 		return WSAENOMORE;
 	}
 }
@@ -563,7 +574,7 @@ void CXnIp::UnregisterKey(const XNKID* pxnkid)
 		}
 	}
 
-	LOG_TRACE_NETWORK("{} - xnkid {} is unknown!", __FUNCTION__, ByteToHexStr(pxnkid->ab, sizeof(pxnkid->ab)));
+	LOG_CRITICAL_NETWORK("{} - xnkid {} is unknown!", __FUNCTION__, ByteToHexStr(pxnkid->ab, sizeof(pxnkid->ab)));
 }
 
 XnKeyPair* CXnIp::getKeyPair(const XNKID* pxnkid)
@@ -609,7 +620,7 @@ void CXnIp::sendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXni
 		case XnIp_ConnectionCloseSecure:
 		case XnIp_ConnectionPong:
 		case XnIp_ConnectionPing:
-			LOG_INFO_NETWORK("{} - unimplemented requests!", __FUNCTION__);
+			LOG_CRITICAL_NETWORK("{} - unimplemented requests!", __FUNCTION__);
 			break;
 
 		default:
@@ -625,7 +636,7 @@ void CXnIp::sendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXni
 	}
 	else
 	{
-		LOG_ERROR_NETWORK("{} - connection index: {}, identifier: {:x} is invalid!", __FUNCTION__, gXnIp.getConnectionIndex(connectionIdentifier), connectionIdentifier.s_addr);
+		LOG_CRITICAL_NETWORK("{} - connection index: {}, identifier: {:x} is invalid!", __FUNCTION__, gXnIp.getConnectionIndex(connectionIdentifier), connectionIdentifier.s_addr);
 	}
 }
 
@@ -655,7 +666,8 @@ void CXnIp::checkForLostConnections()
 			UnregisterXnIpIdentifier(xnIp->connectionIdentifier);
 		}
 	}
-	LOG_INFO_NETWORK("{} - lost {} connections!", __FUNCTION__, lostConnectionsCount);
+	if (lostConnectionsCount > 0)
+		LOG_CRITICAL_NETWORK("{} - lost {} connections!", __FUNCTION__, lostConnectionsCount);
 }
 
 // #51: XNetStartup
@@ -749,7 +761,7 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 		return 0;
 	}
 
-	LOG_ERROR_NETWORK("{} - connection index: {}, identifier: {:X} are invalid!", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
+	LOG_CRITICAL_NETWORK("{} - connection index: {}, identifier: {:X} are invalid!", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
 
 	return WSAEINVAL;
 }
@@ -802,7 +814,7 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 		return xnIp->connectStatus;
 	}
 
-	LOG_ERROR_NETWORK("{} - connection index: {}, identifier: {:X} is invalid!", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
+	LOG_CRITICAL_NETWORK("{} - connection index: {}, identifier: {:X} is invalid!", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
 	return XNET_CONNECT_STATUS_LOST;
 }
 
