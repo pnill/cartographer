@@ -156,7 +156,7 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 	// Let the game know the packet received came from an unkown source
 	if (ipIdentifier.s_addr == 0)
 	{
-		LOG_CRITICAL_NETWORK("{} - discarding packet with size: {}", __FUNCTION__, *bytesRecvdCount);
+		LOG_ERROR_NETWORK("{} - discarding packet with size: {}", __FUNCTION__, *bytesRecvdCount);
 		// set the bytes received count to 0 and recv address/identifier
 		*bytesRecvdCount = 0;
 		ZeroMemory(lpFrom, sizeof(*lpFrom));
@@ -211,7 +211,7 @@ IN_ADDR CXnIp::GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* 
 		}
 	}
 	
-	LOG_CRITICAL_NETWORK("{} - received packet from unknown/unregistered source, ip address: {}:{}", __FUNCTION__, inet_ntoa(fromAddr->sin_addr), htons(fromAddr->sin_port));
+	LOG_ERROR_NETWORK("{} - received packet from unknown/unregistered source, ip address: {}:{}", __FUNCTION__, inet_ntoa(fromAddr->sin_addr), htons(fromAddr->sin_port));
 	return addrInval;
 }
 
