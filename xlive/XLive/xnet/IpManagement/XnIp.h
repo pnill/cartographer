@@ -117,6 +117,8 @@ struct XnIp
 
 	bool connectionInitiator;
 
+	bool logErrorOnce;
+
 #pragma region Nat
 
 	struct NatTranslation

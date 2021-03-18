@@ -266,18 +266,29 @@ void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* c
 						// if we are IDLE, it means we didn't send any connection request, and most likely the game doesn't know about this connection
 						if (xnIp->connectStatus < XNET_CONNECT_STATUS_PENDING)
 						{
+							// if the other side doesn't have ports forwarded, these packets will never arrive
 							XNetConnect(connectionIdentifier); // we want to send connect back only if we have all the NAT data for each socket, and only if the state is IDLE
 						}
 						else
 						{
-							// determine which peer should handle the connecting by who has a bigger MAC address
 							// when 2 peers try to connect to each other at the same time
+							// determine which peer should handle the connecting by who has a bigger MAC address
 							// or if the other side doesn't consider itself as a connection initiator, just send
+							// if the other connection cannot receive packets (ports are not forwarded), connectReqPkt->data.connectionInitiator will always be true
 							if (!connectReqPkt->data.connectionInitiator
 								|| memcmp(GetLocalUserXn()->xnaddr.abEnet, connectReqPkt->data.xnaddr.abEnet, sizeof(XNADDR::abEnet)) > 0
 								)
 							{
-								gXnIp.SendXNetRequest(xsocket, connectionIdentifier, XnIp_ConnectionDeclareConnected);
+								// send for each UDP socket, the other side may not have the NAT data
+								for (auto sockIt : XSocket::Sockets)
+								{
+									// TODO: handle dinamically, so it can be used by other games too
+									if (sockIt->isUDP() // connect only UDP sockets
+										&& H2v_socketsToConnect.find(sockIt->getHostOrderSocketPort()) != H2v_socketsToConnect.end())
+									{
+										gXnIp.SendXNetRequest(sockIt, connectionIdentifier, XnIp_ConnectionDeclareConnected);
+									}
+								}
 							}
 						}
 					}
@@ -291,6 +302,26 @@ void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* c
 
 			// this will prevent the connection to send packets before we know we can send them
 			case XnIp_ConnectionDeclareConnected:
+				// if NAT isn't updated already, we might not have the ports forwarded
+				if (!xnIp->natIsUpdated())
+				{
+					SaveNatInfo(xsocket, connectionIdentifier, recvAddr);
+
+					if (!xnIp->logErrorOnce && xnIp->otherSideNonceKeyReceived)
+					{
+						LOG_CRITICAL_NETWORK("{} - XnIp_ConnectionDeclareConnected - wtf, NAT wasn't updated but the nonce key is.");
+						xnIp->logErrorOnce = true;
+					}
+
+					// we might not even have the nonceKey
+					if (!xnIp->otherSideNonceKeyReceived)
+					{
+						memcpy(xnIp->connectionNonceOtherSide, connectReqPkt->data.nonceKey, sizeof(XnIp::connectionNonceOtherSide));
+						xnIp->otherSideNonceKeyReceived = true;
+					}
+				}
+				
+				// check again if the situation changed, and NAT data got updated
 				if (xnIp->natIsUpdated())
 				{
 					switch (xnIp->connectStatus)
@@ -307,10 +338,6 @@ void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* c
 						LOG_TRACE_NETWORK("{} - how are we even receiving ConnectionDeclareConnected packets if we are not even pending one??", __FUNCTION__);
 						break;
 					}
-				}
-				else
-				{
-					LOG_CRITICAL_NETWORK("{} - we didn't even receive the NAT data for all sockets, wtf", __FUNCTION__);
 				}
 				break;
 
@@ -441,6 +468,7 @@ int CXnIp::registerNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID*
 
 // TODO: add separate function that doesn't create XnIp identification from packet
 // for now if reqPacket is null it means this is not called after a connection packet is received
+// basically reqPacket = nullptr, XNetXnAddrToInAddr() context, if reqPacket != nullptr, HandleXNetRequestPacket() context
 int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnkid, const XNetRequestPacket* reqPacket, IN_ADDR* outIpIdentifier)
 {
 #define NO_MORE_CONNECT_SPOTS(_function, _err) \
@@ -508,8 +536,8 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 			&& reqPacket->data.reqType == XnIp_ConnectionEstablishSecure
 			&& pXnIpAlreadyRegistered->otherSideNonceKeyReceived
 			&& memcmp(pXnIpAlreadyRegistered->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonce)) != 0)
-			
-			|| (pXnIpAlreadyRegistered->xnaddr.ina.s_addr != pxna->ina.s_addr
+			|| 
+			(pXnIpAlreadyRegistered->xnaddr.ina.s_addr != pxna->ina.s_addr
 			|| pXnIpAlreadyRegistered->xnaddr.inaOnline.s_addr != pxna->inaOnline.s_addr
 			|| pXnIpAlreadyRegistered->xnaddr.wPortOnline != pxna->wPortOnline)
 			)
@@ -546,6 +574,7 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 		if (reqPacket != nullptr
 			&& !pXnIpAlreadyRegistered->otherSideNonceKeyReceived)
 		{
+			LOG_TRACE_NETWORK("{} - updated noOnce key for connection identifier: {:X}", __FUNCTION__, pXnIpAlreadyRegistered->connectionIdentifier.s_addr);
 			memcpy(pXnIpAlreadyRegistered->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonceOtherSide));
 			pXnIpAlreadyRegistered->otherSideNonceKeyReceived = true;
 		}
