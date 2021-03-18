@@ -788,16 +788,21 @@ void H2MOD::disable_weapon_pickup(bool b_Enable)
 
 void H2MOD::set_local_rank(BYTE rank)
 {
-	DWORD address1 = h2mod->GetAddress(0x1b2c2b);
-	DWORD address2 = h2mod->GetAddress(0x1b2c2F);
-	DWORD address3 = h2mod->GetAddress(0x51A6B6);
-	DWORD address4 = h2mod->GetAddress(0x51A6B7);
-	BYTE Rank[1];
-	Rank[0] = rank;
-	WriteBytes(address1, Rank, sizeof(Rank));
-	WriteBytes(address2, Rank, sizeof(Rank));
-	WriteBytes(address3, Rank, sizeof(Rank));
-	WriteBytes(address4, Rank, sizeof(Rank));
+	if (Memory::isDedicatedServer())
+		return;
+
+	static bool initialized = false;
+
+	if (!initialized)
+	{
+		NopFill(Memory::GetAddress(0x1b2c29), 7);
+		initialized = true;
+	}
+
+	Player::Properties* local_player_properties = Memory::GetAddress<Player::Properties*>(0x51A638);
+
+	local_player_properties->player_overall_skill = rank;
+	local_player_properties->player_displayed_skill = rank;
 }
 
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)
