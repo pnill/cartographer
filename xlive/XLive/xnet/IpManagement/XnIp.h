@@ -71,6 +71,7 @@ struct XNetRequestPacket
 	{
 		XNKID xnkid;
 		eXnip_ConnectRequestType reqType;
+		BYTE nonceKey[8];
 		union
 		{
 			XNADDR xnaddr;
@@ -105,6 +106,11 @@ struct XnIp
 	int connectionPacketsSentCount;
 	DWORD lastConnectionInteractionTime;
 	DWORD connectPacketReceivedTimeStamp;
+
+	BYTE connectionNonce[8];
+	BYTE connectionNonceOtherSide[8];
+
+	bool otherSideNonceKeyReceived;
 
 #pragma region Nat
 
@@ -215,7 +221,7 @@ public:
 			xnIp->lastConnectionInteractionTime = timeGetTime();
 	}
 
-	int CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* xnkid, IN_ADDR* outIpIdentifier, eXnip_ConnectRequestType requestType);
+	int CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* xnkid, XNetRequestPacket* requestType, IN_ADDR* outIpIdentifier);
 	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 
 	void checkForLostConnections();
@@ -245,6 +251,7 @@ public:
 
 	void HandleDisconnectPacket(XSocket* xsocket, XNetRequestPacket* disconnectReqPck, sockaddr_in* recvAddr);
 	XnIp* XnIpLookUp(const XNADDR* pxna, const XNKID* xnkid, bool* firstUnusedIndexFound = nullptr, int* firstUnusedIndex = nullptr);
+	
 	int registerNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* outIpIdentifier);
 	int RegisterKey(XNKID*, XNKEY*);
 	XnKeyPair* getKeyPair(const XNKID* xnkid);

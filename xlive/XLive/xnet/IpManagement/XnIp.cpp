@@ -260,7 +260,7 @@ void CXnIp::HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectR
 	IN_ADDR connectionIdentifier;
 	connectionIdentifier.s_addr = 0;
 
-	int ret = CreateXnIpIdentifier(&connectReqPkt->data.xnaddr, &connectReqPkt->data.xnkid, &connectionIdentifier, connectReqPkt->data.reqType);
+	int ret = CreateXnIpIdentifierFromPacket(&connectReqPkt->data.xnaddr, &connectReqPkt->data.xnkid, connectReqPkt, &connectionIdentifier);
 	if (ret == 0)
 	{
 		// TODO: get rid of H2v only sockets
@@ -395,6 +395,13 @@ XnIp* CXnIp::XnIpLookUp(const XNADDR* pxna, const XNKID* xnkid, bool* firstUnuse
 
 int CXnIp::registerNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* outIpIdentifier)
 {
+	/*
+		Update: 1/31/2020
+		- Creates an identifier to be used by WinSock calls from a XNADDR address
+		- It gets created when we received a XNet request connection packet, or when the game calls XNetXnAddrToInAddr
+		- If XNetInAddrToXnAddr passes an invalid identifier, it will return WSAEINVAL
+	*/
+
 	XnKeyPair* keyPair = getKeyPair(pxnkid);
 	if (keyPair != nullptr)
 	{
@@ -403,6 +410,8 @@ int CXnIp::registerNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID*
 
 		newXnIp->xnaddr = *pxna;
 		newXnIp->keyPair = keyPair;
+
+		XNetRandom(newXnIp->connectionNonce, sizeof(XnIp::connectionNonce));
 
 		// if this is zero we are fucked
 		int randIdentifier = (rand() % 0xFF) + 1; // 0 to 254 + 1
@@ -427,15 +436,10 @@ int CXnIp::registerNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID*
 	}
 }
 
-int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* outIpIdentifier, eXnip_ConnectRequestType requestType)
+// TODO: add separate function that doesn't create XnIp identification from packet
+// for now if reqPacket is null it means this is not called after a connection packet is received
+int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnkid, XNetRequestPacket* reqPacket, IN_ADDR* outIpIdentifier)
 {
-	/*
-		Update: 1/31/2020
-		- Creates an identifier to be used by WinSock calls from a XNADDR address
-		- It gets created when we received a XNet request connection packet, or when the game calls XNetXnAddrToInAddr
-		- If XNetInAddrToXnAddr passes an invalid identifier, it will return WSAEINVAL
-	*/
-
 #define NO_MORE_CONNECT_SPOTS(_function, _err) \
 	{ \
 		LOG_CRITICAL_NETWORK("{} - no more available connection spots!", (_function)); \
@@ -467,21 +471,55 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR
 
 	XnIp* pXnIpAlreadyRegistered = XnIpLookUp(pxna, pxnkid, &firstUnusedConnectionIndexFound, &firstUnusedConnectionIndex);
 
-	// check if the user is already in the system
-	if (pXnIpAlreadyRegistered != nullptr)
+	if (firstUnusedConnectionIndexFound 
+		&& pXnIpAlreadyRegistered == nullptr) // check if we can create another XnIp identifier, if not already present
 	{
+		int result = registerNewXnIp(firstUnusedConnectionIndex, pxna, pxnkid, outIpIdentifier);
+		if (result == 0
+			&& reqPacket != nullptr) // check if registerNewXnIp was successful
+		{
+			XnIp* newlyCreatedXnIp = getConnection(*outIpIdentifier);
+			memcpy(newlyCreatedXnIp->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonceOtherSide));
+			newlyCreatedXnIp->otherSideNonceKeyReceived = true;
+		}
+		return result;
+	}
+	else if (pXnIpAlreadyRegistered != nullptr)
+	{
+		// if this function is called after a packet is received and the request type is ConnectionEstablishSecure
+		// and we are already connected, it means the other side tries to re-connect, so we just disconnect, then re-connect, but only if we are already connected
+		// or if there are differences between XNADDRs (like the port or even the IP address) but the MAC address is the same, clear and create another connection
+
 		if (
-			(requestType == XnIp_ConnectionEstablishSecure								// if this function is called after a packet is received and the request type is ConnectionEstablishSecure
-			&& pXnIpAlreadyRegistered->connectStatus == XNET_CONNECT_STATUS_CONNECTED)	// and we are already connected, it means the other side tries to re-connect, so we just disconnect, then re-connect, but only if we are already connected
+			(reqPacket != nullptr
+			&& reqPacket->data.reqType == XnIp_ConnectionEstablishSecure
+			&& pXnIpAlreadyRegistered->otherSideNonceKeyReceived
+			&& memcmp(pXnIpAlreadyRegistered->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonce)) != 0)
 			
-			|| (pXnIpAlreadyRegistered->xnaddr.ina.s_addr != pxna->ina.s_addr			// if there are differences between XNADDRs (like the port or even the IP address) but the MAC address is the same, clear and create another connection
+			|| (pXnIpAlreadyRegistered->xnaddr.ina.s_addr != pxna->ina.s_addr
 			|| pXnIpAlreadyRegistered->xnaddr.inaOnline.s_addr != pxna->inaOnline.s_addr
 			|| pXnIpAlreadyRegistered->xnaddr.wPortOnline != pxna->wPortOnline)
 			)
 		{
 			int connectionIndexToReuse = getConnectionIndex(pXnIpAlreadyRegistered->connectionIdentifier);
 			XNetUnregisterInAddr(pXnIpAlreadyRegistered->connectionIdentifier); // unregister the connection
-			return registerNewXnIp(connectionIndexToReuse, pxna, pxnkid, outIpIdentifier); // register a new one, if it gets at this point, it shouldn't fail at all
+			int result = registerNewXnIp(connectionIndexToReuse, pxna, pxnkid, outIpIdentifier); // register a new one, if it gets at this point, it shouldn't fail at all
+			if (result == 0
+				&& reqPacket != nullptr) // check if registerNewXnIp was successful
+			{
+				XnIp* newlyCreatedXnIp = getConnection(*outIpIdentifier);
+				memcpy(newlyCreatedXnIp->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonceOtherSide));
+				newlyCreatedXnIp->otherSideNonceKeyReceived = true;
+			}
+			return result;
+		}
+
+		// update the nonce key if we got this far, and this function has been called after we received a connection packet
+		if (reqPacket != nullptr
+			&& !pXnIpAlreadyRegistered->otherSideNonceKeyReceived)
+		{
+			memcpy(pXnIpAlreadyRegistered->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonceOtherSide));
+			pXnIpAlreadyRegistered->otherSideNonceKeyReceived = true;
 		}
 
 		if (outIpIdentifier)
@@ -491,10 +529,6 @@ int CXnIp::CreateXnIpIdentifier(const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR
 		}
 
 		return 0;
-	}
-	else if (firstUnusedConnectionIndexFound) // check if we can create another XnIp identifier, if not already present
-	{
-		return registerNewXnIp(firstUnusedConnectionIndex, pxna, pxnkid, outIpIdentifier);
 	}
 	else
 	{
@@ -610,6 +644,7 @@ void CXnIp::sendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXni
 
 		connectionPacket.data.reqType = reqType;
 		memcpy(connectionPacket.data.xnkid.ab, xnIp->keyPair->xnkid.ab, sizeof(XNKID::ab));
+		memcpy(connectionPacket.data.nonceKey, xnIp->connectionNonce, sizeof(XnIp::connectionNonce));
 		switch (reqType)
 		{
 		case XnIp_ConnectionEstablishSecure:
@@ -727,7 +762,7 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 		|| pina == nullptr)
 		return WSAEINVAL;
 
-	int ret = gXnIp.CreateXnIpIdentifier(pxna, pxnkid, pina, XnIp_ConnectionRequestInvalid);
+	int ret = gXnIp.CreateXnIpIdentifierFromPacket(pxna, pxnkid, nullptr, pina);
 
 	if (ret != 0)
 	{
