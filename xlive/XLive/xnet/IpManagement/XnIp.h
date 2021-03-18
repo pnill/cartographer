@@ -74,7 +74,11 @@ struct XNetRequestPacket
 		BYTE nonceKey[8];
 		union
 		{
-			XNADDR xnaddr;
+			struct
+			{
+				XNADDR xnaddr;
+				bool connectionInitiator;
+			};
 		};
 	};
 	XNetReq data;
@@ -109,8 +113,9 @@ struct XnIp
 
 	BYTE connectionNonce[8];
 	BYTE connectionNonceOtherSide[8];
-
 	bool otherSideNonceKeyReceived;
+
+	bool connectionInitiator;
 
 #pragma region Nat
 
@@ -221,7 +226,6 @@ public:
 			xnIp->lastConnectionInteractionTime = timeGetTime();
 	}
 
-	int CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* xnkid, XNetRequestPacket* requestType, IN_ADDR* outIpIdentifier);
 	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 
 	void checkForLostConnections();
@@ -245,17 +249,21 @@ public:
 
 	void Initialize(const XNetStartupParams* netStartupParams);
 	void LogConnectionsDetails(sockaddr_in* address, int errorCode);
-	IN_ADDR GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* addr);
-	void SaveNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);
-	void HandleConnectionPacket(XSocket* xsocket, XNetRequestPacket* connectReqPkt, sockaddr_in* addr, LPDWORD bytesRecvdCount);
-
-	void HandleDisconnectPacket(XSocket* xsocket, XNetRequestPacket* disconnectReqPck, sockaddr_in* recvAddr);
-	XnIp* XnIpLookUp(const XNADDR* pxna, const XNKID* xnkid, bool* firstUnusedIndexFound = nullptr, int* firstUnusedIndex = nullptr);
 	
+	IN_ADDR GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* addr);
+	
+	void SaveNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);
+
+	void HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* connectReqPkt, sockaddr_in* addr, LPDWORD bytesRecvdCount);
+	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, sockaddr_in* recvAddr);
+	int CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* xnkid, const XNetRequestPacket* requestType, IN_ADDR* outIpIdentifier);
+
+	XnIp* XnIpLookUp(const XNADDR* pxna, const XNKID* xnkid, bool* firstUnusedIndexFound = nullptr, int* firstUnusedIndex = nullptr);
 	int registerNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* outIpIdentifier);
+	
 	int RegisterKey(XNKID*, XNKEY*);
-	XnKeyPair* getKeyPair(const XNKID* xnkid);
 	void UnregisterKey(const XNKID* xnkid);
+	XnKeyPair* getKeyPair(const XNKID* xnkid);
 	
 	XnIp* XnIPs = nullptr;
 	XnKeyPair* XnKeyPairs = nullptr;
@@ -286,7 +294,7 @@ public:
 	/*
 		Sends a request over the socket to the other socket end, with the same identifier
 	*/
-	void sendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXnip_ConnectRequestType reqType);
+	void SendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXnip_ConnectRequestType reqType);
 
 private:
 
