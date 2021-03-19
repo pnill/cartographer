@@ -361,7 +361,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			sendToAddr.sin_addr.s_addr = xnIp->getLanIpAddr().s_addr;
 		}
 
-		switch (xsocket->getHostOrderSocketPort())
+		switch (ntohs(inTo->sin_port))
 		{
 		case 1000:
 			sendToAddr.sin_port = xnIp->xnaddr.wPortOnline;
