@@ -173,7 +173,7 @@ IN_ADDR CXnIp::GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* 
 	{
 		XnIp* xnIp = &XnIPs[i];
 		if (xnIp->bValid
-			&& XNetGetConnectStatus(xnIp->connectionIdentifier) == XNET_CONNECT_STATUS_CONNECTED)
+			&& xnIp->natIsUpdated())
 		{
 			// TODO: get rid of H2v only sockets
 			switch (xsocket->getHostOrderSocketPort())
@@ -240,12 +240,12 @@ void CXnIp::SaveNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier, sockaddr
 	}
 }
 
-void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* connectReqPkt, sockaddr_in* recvAddr, LPDWORD bytesRecvdCount)
+void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* reqPacket, sockaddr_in* recvAddr, LPDWORD bytesRecvdCount)
 {
 	IN_ADDR connectionIdentifier;
 	connectionIdentifier.s_addr = 0;
 
-	int ret = CreateXnIpIdentifierFromPacket(&connectReqPkt->data.xnaddr, &connectReqPkt->data.xnkid, connectReqPkt, &connectionIdentifier);
+	int ret = CreateXnIpIdentifierFromPacket(&reqPacket->data.xnaddr, &reqPacket->data.xnkid, reqPacket, &connectionIdentifier);
 	// if CreateXnIpIdentifierFromPacket is successful, we created another connection or we returned an already present one
 	if (ret == 0)
 	{
@@ -254,56 +254,84 @@ void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* c
 		XnIp* xnIp = &XnIPs[getConnectionIndex(connectionIdentifier)];
 		//if (xnIp->isValid(connectionIdentifier)) // this check should be irelevant
 		{
-			switch (connectReqPkt->data.reqType)
+			switch (reqPacket->data.reqType)
 			{
+			case XnIp_ConnectionUpdateNAT:
+				if (xnIp->connectStatus <= XNET_CONNECT_STATUS_PENDING)
+				{
+					if (!xnIp->natIsUpdated())
+					{
+						SaveNatInfo(xsocket, connectionIdentifier, recvAddr);
+						xnIp->connectStatus = XNET_CONNECT_STATUS_PENDING;
+
+						// we need to fully update NAT before anything else
+						if (xnIp->natIsUpdated())
+						{
+							if (XNIP_TEST_BIT(reqPacket->data.flags, XnIp_HasEndpointNATData)) // don't send back if the other end has our NAT data already
+							{
+								SendXNetRequest(xsocket, connectionIdentifier, XnIp_ConnectionEstablishSecure); // send EstablishSecure after we saved all NAT
+							}
+							else
+							{
+								SendXNetRequestAllSockets(connectionIdentifier, XnIp_ConnectionUpdateNAT);
+							}
+						}
+					}
+					else
+					{
+						LOG_ERROR_NETWORK("{} - already present NAT.", __FUNCTION__);
+					}
+				}
+				break;
+
 			case XnIp_ConnectionEstablishSecure:
 				// first save the port we received connection request from
 				if (xnIp->connectStatus < XNET_CONNECT_STATUS_CONNECTED)
 				{
-					SaveNatInfo(xsocket, connectionIdentifier, recvAddr);
 					if (xnIp->natIsUpdated()) // check if the last connect packet was sent from the last socket to have NAT data saved
 					{
-						// if we are IDLE, it means we didn't send any connection request, and most likely the game doesn't know about this connection
-						if (xnIp->connectStatus < XNET_CONNECT_STATUS_PENDING)
+						// bellow TODO comment not relevant anymore but will keep for history
 						{
-							// if the other side doesn't have ports forwarded, these packets will never arrive
-							XNetConnect(connectionIdentifier); // we want to send connect back only if we have all the NAT data for each socket, and only if the state is IDLE
+							// TODO: what if we just stored all NAT data, but we dont send XnIp_ConnectionEstablishSecure back because the game already did by calling XNetConnect()
+							// which could have resulted in dropped packets because:
+							// 1: the other side doesn't have the ports forwarded but we do have them, and we received the NAT data but we think we already sent EstacnlishSecure packet
 						}
-						else
+
+						// when 2 peers try to connect to each other at the same time
+						// determine which peer should handle the connecting by who has a bigger MAC address
+						// or if the other side doesn't consider itself as a connection initiator, just send
+						// if the other connection cannot receive packets (ports are not forwarded), connectReqPkt->data.connectionInitiator will always be true
+
+						// prevent this being sent twice, this will happen if the game Calls XNetConnect at the same time on each endpoint
+						// and both ends have the ports open
+						if (!XNIP_TEST_BIT(xnIp->flags, XnIp::XnIp_ConnectDeclareConnectedRequestSent))
 						{
-							// when 2 peers try to connect to each other at the same time
-							// determine which peer should handle the connecting by who has a bigger MAC address
-							// or if the other side doesn't consider itself as a connection initiator, just send
-							// if the other connection cannot receive packets (ports are not forwarded), connectReqPkt->data.connectionInitiator will always be true
-							if (!connectReqPkt->data.connectionInitiator
-								|| memcmp(GetLocalUserXn()->xnaddr.abEnet, connectReqPkt->data.xnaddr.abEnet, sizeof(XNADDR::abEnet)) > 0
+							if (!reqPacket->data.connectionInitiator
+								|| memcmp(GetLocalUserXn()->xnaddr.abEnet, reqPacket->data.xnaddr.abEnet, sizeof(XNADDR::abEnet)) > 0
 								)
 							{
-								// send for each UDP socket, the other side may not have the NAT data
-								for (auto sockIt : XSocket::Sockets)
-								{
-									// TODO: handle dinamically, so it can be used by other games too
-									if (sockIt->isUDP() // connect only UDP sockets
-										&& H2v_socketsToConnect.find(sockIt->getHostOrderSocketPort()) != H2v_socketsToConnect.end())
-									{
-										gXnIp.SendXNetRequest(sockIt, connectionIdentifier, XnIp_ConnectionDeclareConnected);
-									}
-								}
+								SendXNetRequest(xsocket, connectionIdentifier, XnIp_ConnectionDeclareConnected);
 							}
+							else
+							{
+								SendXNetRequest(xsocket, connectionIdentifier, XnIp_ConnectionEstablishSecure);
+							}
+
+							XNIP_SET_BIT(xnIp->flags, XnIp::XnIp_ConnectDeclareConnectedRequestSent);
 						}
 					}
+					else
+					{
+						LOG_CRITICAL_NETWORK("{} - attempt at establishing secure connection, but we don't have NAT data!", __FUNCTION__);
+					}
 				}
-				else 
-				{
-					LOG_CRITICAL_NETWORK("{} - wtf how did we end up here, while status connected and trying to establish a secure connection lol", __FUNCTION__);
-				}
-
 				break;
 
 			// this will prevent the connection to send packets before we know we can send them
 			case XnIp_ConnectionDeclareConnected:
+
 				// if NAT isn't updated already, we might not have the ports forwarded
-				if (!xnIp->natIsUpdated())
+				/*if (!xnIp->natIsUpdated())
 				{
 					SaveNatInfo(xsocket, connectionIdentifier, recvAddr);
 
@@ -316,11 +344,11 @@ void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* c
 					// we might not even have the nonceKey
 					if (!xnIp->otherSideNonceKeyReceived)
 					{
-						memcpy(xnIp->connectionNonceOtherSide, connectReqPkt->data.nonceKey, sizeof(XnIp::connectionNonceOtherSide));
+						memcpy(xnIp->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonceOtherSide));
 						xnIp->otherSideNonceKeyReceived = true;
 					}
-				}
-				
+				} */
+
 				// check again if the situation changed, and NAT data got updated
 				if (xnIp->natIsUpdated())
 				{
@@ -328,16 +356,16 @@ void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* c
 					{
 					case XNET_CONNECT_STATUS_PENDING:
 						gXnIp.SendXNetRequest(xsocket, connectionIdentifier, XnIp_ConnectionDeclareConnected);
-						xnIp->connectStatus = XNET_CONNECT_STATUS_CONNECTED; // if we have received the NAT data for each port, set the status to CONNECTED
-						break;
-					case XNET_CONNECT_STATUS_CONNECTED:
-						LOG_TRACE_NETWORK("{} - received XNetDeclareConnected request, but we are already connected!", __FUNCTION__);
+						xnIp->connectStatus = XNET_CONNECT_STATUS_CONNECTED;
 						break;
 
 					default:
-						LOG_TRACE_NETWORK("{} - how are we even receiving ConnectionDeclareConnected packets if we are not even pending one??", __FUNCTION__);
 						break;
 					}
+				}
+				else
+				{
+					LOG_CRITICAL_NETWORK("{} - XnIp_ConnectionDeclareConnected but NAT isn't updated!");
 				}
 				break;
 
@@ -348,7 +376,7 @@ void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* c
 
 			case XnIp_ConnectionPing:
 			case XnIp_ConnectionPong:
-				LOG_CRITICAL_NETWORK("{} - unimplemented request type: {}", __FUNCTION__, connectReqPkt->data.reqType);
+				LOG_CRITICAL_NETWORK("{} - unimplemented request type: {}", __FUNCTION__, reqPacket->data.reqType);
 				break;
 
 			default:
@@ -533,7 +561,6 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 
 		if (
 			(reqPacket != nullptr
-			&& reqPacket->data.reqType == XnIp_ConnectionEstablishSecure
 			&& pXnIpAlreadyRegistered->otherSideNonceKeyReceived
 			&& memcmp(pXnIpAlreadyRegistered->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonce)) != 0)
 			|| 
@@ -684,6 +711,20 @@ XnKeyPair* CXnIp::getKeyPair(const XNKID* pxnkid)
 	return nullptr;
 }
 
+void CXnIp::SendXNetRequestAllSockets(IN_ADDR connectionIdentifier, eXnip_ConnectRequestType reqType)
+{
+	// send for each UDP socket, the other side may not have the NAT data
+	for (auto sockIt : XSocket::Sockets)
+	{
+		// TODO: handle dinamically, so it can be used by other games too
+		if (sockIt->isUDP() // connect only UDP sockets
+			&& H2v_socketsToConnect.find(sockIt->getHostOrderSocketPort()) != H2v_socketsToConnect.end())
+		{
+			gXnIp.SendXNetRequest(sockIt, connectionIdentifier, reqType);
+		}
+	}
+}
+
 void CXnIp::SendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXnip_ConnectRequestType reqType)
 {
 	sockaddr_in sendToAddr;
@@ -696,18 +737,21 @@ void CXnIp::SendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXni
 		sendToAddr.sin_addr = connectionIdentifier;
 		sendToAddr.sin_port = xsocket->getNetworkOrderSocketPort();
 
-		XNetRequestPacket connectionPacket;
-		SecureZeroMemory(&connectionPacket.data, sizeof(XNetRequestPacket::XNetReq));
+		XNetRequestPacket reqPacket;
+		SecureZeroMemory(&reqPacket.data, sizeof(XNetRequestPacket::XNetReq));
 
-		connectionPacket.data.reqType = reqType;
-		memcpy(connectionPacket.data.xnkid.ab, xnIp->keyPair->xnkid.ab, sizeof(XNKID::ab));
-		memcpy(connectionPacket.data.nonceKey, xnIp->connectionNonce, sizeof(XnIp::connectionNonce));
+		reqPacket.data.reqType = reqType;
+		memcpy(reqPacket.data.xnkid.ab, xnIp->keyPair->xnkid.ab, sizeof(XNKID::ab));
+		memcpy(reqPacket.data.nonceKey, xnIp->connectionNonce, sizeof(XnIp::connectionNonce));
 		switch (reqType)
 		{
+		case XnIp_ConnectionUpdateNAT:
+			if (xnIp->natIsUpdated())
+				XNIP_SET_BIT(reqPacket.data.flags, XnIp_HasEndpointNATData);
 		case XnIp_ConnectionEstablishSecure:
-			connectionPacket.data.connectionInitiator = !xnIp->connectionInitiator;
+			reqPacket.data.connectionInitiator = !xnIp->connectionInitiator;
 		case XnIp_ConnectionDeclareConnected:
-			XNetGetTitleXnAddr(&connectionPacket.data.xnaddr);
+			XNetGetTitleXnAddr(&reqPacket.data.xnaddr);
 			break;
 
 		case XnIp_ConnectionCloseSecure:
@@ -724,7 +768,7 @@ void CXnIp::SendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXni
 
 		xnIp->connectionPacketsSentCount++;
 
-		int ret = xsocket->udpSend((char*)&connectionPacket, sizeof(XNetRequestPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
+		int ret = xsocket->udpSend((char*)&reqPacket, sizeof(XNetRequestPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
 		LOG_INFO_NETWORK("{} - secure packet sent socket handle: {}, connection index: {}, connection identifier: {:x}", __FUNCTION__, xsocket->winSockHandle, gXnIp.getConnectionIndex(connectionIdentifier), sendToAddr.sin_addr.s_addr);
 	}
 	else
@@ -878,16 +922,11 @@ int WINAPI XNetConnect(const IN_ADDR ina)
 		// send connect packets only if the state is idle
 		if (xnIp->connectStatus == XNET_CONNECT_STATUS_IDLE)
 		{
-			for (auto sockIt : XSocket::Sockets)
+			if (!xnIp->natIsUpdated())
 			{
-				// TODO: handle dinamically, so it can be used by other games too
-				if (sockIt->isUDP() // connect only UDP sockets
-					&& H2v_socketsToConnect.find(sockIt->getHostOrderSocketPort()) != H2v_socketsToConnect.end())
-				{
-					gXnIp.SendXNetRequest(sockIt, ina, XnIp_ConnectionEstablishSecure); // establish 'secure' connection on the sockets
-				}
+				gXnIp.SendXNetRequestAllSockets(ina, XnIp_ConnectionUpdateNAT);
+				xnIp->connectStatus = XNET_CONNECT_STATUS_PENDING; // after we sent, set the state to PENDING
 			}
-			xnIp->connectStatus = XNET_CONNECT_STATUS_PENDING; // after we sent, set the state to PENDING
 		}
 
 		return 0;

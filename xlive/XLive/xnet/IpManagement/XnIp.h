@@ -11,7 +11,7 @@ extern h2log* critical_network_errors_log;
 // TODO: disable if all network problems are addressed
 #undef LOG_CRITICAL_NETWORK
 
-#define LOG_CRITICAL_NETWORK(msg, ...)   LOG_CRITICAL  (critical_network_errors_log, msg, __VA_ARGS__)
+#define LOG_CRITICAL_NETWORK(msg, ...)   LOG_CRITICAL  (network_log != nullptr ? network_log : critical_network_errors_log, msg, __VA_ARGS__)
 
 const char requestStrHdr[MAX_HDR_STR] = "XNetBrOadPack";
 const char broadcastStrHdr[MAX_HDR_STR] = "XNetReqPack";
@@ -26,11 +26,18 @@ enum eXnip_ConnectRequestType : int
 {
 	XnIp_ConnectionRequestInvalid = -1,
 
-	XnIp_ConnectionPing = 0x0,
-	XnIp_ConnectionPong = 0x2,
-	XnIp_ConnectionCloseSecure = 0x4,
-	XnIp_ConnectionEstablishSecure = 0x8,
-	XnIp_ConnectionDeclareConnected = 0xC
+	XnIp_ConnectionPing,
+	XnIp_ConnectionPong,
+	XnIp_ConnectionUpdateNAT,
+	XnIp_ConnectionEstablishSecure,
+	XnIp_ConnectionDeclareConnected,
+	XnIp_ConnectionCloseSecure
+};
+
+enum eXnIp_ConnectionRequestBitFlags
+{
+	XnIp_HasEndpointNATData = 0,
+
 };
 
 struct XNetPacketHeader
@@ -69,14 +76,15 @@ struct XNetRequestPacket
 	XNetPacketHeader pckHeader;
 	struct XNetReq
 	{
+		XNADDR xnaddr;
 		XNKID xnkid;
-		eXnip_ConnectRequestType reqType;
 		BYTE nonceKey[8];
+		eXnip_ConnectRequestType reqType;
 		union
 		{
-			struct
+			struct // XnIp_ConnectionUpdateNAT XnIp_ConnectEstablishSecure
 			{
-				XNADDR xnaddr;
+				DWORD flags;
 				bool connectionInitiator;
 			};
 		};
@@ -118,6 +126,13 @@ struct XnIp
 	bool connectionInitiator;
 
 	bool logErrorOnce;
+
+	enum eXnIp_Flags
+	{
+		XnIp_ConnectDeclareConnectedRequestSent
+	};
+
+	DWORD flags;
 
 #pragma region Nat
 
@@ -297,6 +312,11 @@ public:
 		Sends a request over the socket to the other socket end, with the same identifier
 	*/
 	void SendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXnip_ConnectRequestType reqType);
+
+	/*
+		Sends a request to all open sockets
+	*/
+	void SendXNetRequestAllSockets(IN_ADDR connectionIdentifier, eXnip_ConnectRequestType reqType);
 
 private:
 
