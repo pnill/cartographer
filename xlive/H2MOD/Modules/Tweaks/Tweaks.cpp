@@ -33,7 +33,60 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 	return result;
 }
 
+static bool initialized = false;
+static DWORD last_time = 0;
+static DWORD max_cursor_update_hz = 125; // update the cursor each 8 milliseconds
+static DWORD min_time_before_next_update_msec = 1000 / max_cursor_update_hz;
 
+static HCURSOR hCur;
+
+HCURSOR update_mouse_cursor1()
+{
+	auto p_update_mouse_cursor1 = Memory::GetAddressRelative<decltype(&update_mouse_cursor1)>(0x40497B);
+	
+	if (!initialized)
+	{
+		last_time = timeGetTime();
+		initialized = true;
+
+		hCur = p_update_mouse_cursor1();
+		return hCur;
+	}
+
+	if (timeGetTime() - last_time >= min_time_before_next_update_msec)
+	{
+		last_time = timeGetTime();
+		hCur = p_update_mouse_cursor1();
+		return hCur;
+	}
+	else
+	{
+		return hCur;
+	}
+}
+
+void update_mouse_cursor2()
+{
+	auto p_update_mouse_cursor2 = Memory::GetAddressRelative<decltype(&update_mouse_cursor2)>(0x42EDC4);
+
+	if (!initialized)
+	{
+		last_time = timeGetTime();
+		initialized = true;
+
+		return p_update_mouse_cursor2();
+	}
+
+	if (timeGetTime() - last_time >= min_time_before_next_update_msec)
+	{
+		last_time = timeGetTime();
+		return p_update_mouse_cursor2();
+	}
+	else
+	{
+		return;
+	}
+}
 
 typedef char(__cdecl *thookChangePrivacy)(int);
 thookChangePrivacy phookChangePrivacy;
@@ -817,6 +870,9 @@ void InitH2Tweaks() {
 		// nop a call to SetCursor(), to improve the FPS framedrops when hovering the mouse around in the main menus or where the cursor is used, mainly when using mice that use 1000 polling rate
 		// it'll get called anyway by the D3D9Device::ShowCursor() API after
 		NopFill(Memory::GetAddressRelative(0x48A99C), 8);
+
+		PatchCall(Memory::GetAddressRelative(0x407BFA), update_mouse_cursor1);
+		PatchCall(Memory::GetAddressRelative(0x407BE6), update_mouse_cursor2);
 	}
 
 	// fixes edge drop fast fall when using higher tickrates than 30
