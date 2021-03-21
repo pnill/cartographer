@@ -813,6 +813,10 @@ void InitH2Tweaks() {
 		// maybe we could find a way to use the gamma shader built in by converting the override gamma ramp to something that shader could understand
 		BYTE SetGammaRampSkipBytes[] = { 0x90, 0x90, 0x90, 0xE9, 0x94, 0x00, 0x00, 0x00, 0x90 };
 		WriteBytes(Memory::GetAddressRelative(0x66193B), SetGammaRampSkipBytes, sizeof(SetGammaRampSkipBytes));
+
+		// nop a call to SetCursor(), to improve the FPS framedrops when hovering the mouse around in the main menus or where the cursor is used, mainly when using mice that use 1000 polling rate
+		// it'll get called anyway by the D3D9Device::ShowCursor() API after
+		NopFill(Memory::GetAddressRelative(0x48A99C), 8);
 	}
 
 	// fixes edge drop fast fall when using higher tickrates than 30
