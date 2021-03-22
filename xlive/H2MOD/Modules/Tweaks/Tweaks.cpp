@@ -88,6 +88,41 @@ void update_mouse_cursor2()
 	}
 }
 
+void __cdecl update_keyboard_buttons_state_hook(BYTE *a1, WORD *a2, BYTE *a3, bool a4, int a5)
+{
+	if (H2Config_disable_ingame_keyboard)
+		return;
+
+	auto p_update_keyboard_buttons_state_hook = Memory::GetAddressRelative<decltype(&update_keyboard_buttons_state_hook)>(0x42E4C5);
+
+	BYTE keyboardState[256] = {};
+	GetKeyboardState(keyboardState);
+
+	for (int i = 0; i < 256; i++)
+	{
+		if (i != VK_SCROLL)
+		{
+			bool state = keyboardState[i] & 0x80;
+
+			// these keys need to be queried using GetAsyncKeyState because the Window Processing (WndProc) may consume the keys
+			if (i == VK_RSHIFT
+				|| i == VK_LSHIFT
+				|| i == VK_RCONTROL
+				|| i == VK_LCONTROL
+				|| i == VK_RMENU
+				|| i == VK_LMENU)
+			{
+				SHORT asyncKeyState = GetAsyncKeyState(i);
+
+				state = asyncKeyState & 0x8000;
+			}
+
+
+			p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], state, a5);
+		}
+	}
+}
+
 typedef char(__cdecl *thookChangePrivacy)(int);
 thookChangePrivacy phookChangePrivacy;
 char __cdecl HookChangePrivacy(int privacy) {
@@ -873,6 +908,10 @@ void InitH2Tweaks() {
 
 		PatchCall(Memory::GetAddressRelative(0x407BFA), update_mouse_cursor1);
 		PatchCall(Memory::GetAddressRelative(0x407BE6), update_mouse_cursor2);
+
+		NopFill(Memory::GetAddressRelative(0x42FABF), 2);
+		NopFill(Memory::GetAddressRelative(0x42FA8A), 3);
+		PatchCall(Memory::GetAddressRelative(0x42FAAB), update_keyboard_buttons_state_hook);
 	}
 
 	// fixes edge drop fast fall when using higher tickrates than 30
