@@ -11,7 +11,7 @@
 CXnIp gXnIp;
 XECRYPT_RC4_STATE Rc4StateRand;
 
-h2log* critical_network_errors_log;
+h2log* critical_network_errors_log = nullptr;
 
 void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 {
@@ -46,10 +46,13 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 
 	// initielize critical network logs
 	// TODO: disable after all network problems are addressed
-	critical_network_errors_log = h2log::create("Critical Network Errors", prepareLogFileName(L"criticalNetworkErrors"), true, 0);
+	if (network_log == nullptr)
+	{
+		critical_network_errors_log = h2log::create("Critical Network Errors", prepareLogFileName(L"criticalNetworkErrors"), true, 0);
 
-	LOG_CRITICAL_NETWORK(DLL_VERSION_STR "\n");
-	LOG_CRITICAL_NETWORK("{} - initialized critical network log!", __FUNCTION__);
+		LOG_CRITICAL_NETWORK(DLL_VERSION_STR "\n");
+		LOG_CRITICAL_NETWORK("{} - initialized critical network log!", __FUNCTION__);
+	}
 }
 
 void CXnIp::LogConnectionsDetails(sockaddr_in* address, int errorCode)
