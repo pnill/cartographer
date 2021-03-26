@@ -403,13 +403,23 @@ struct s_render_model_group_definition
 		float default_translation_x;//0xC
 		float default_translation_y;//0x10
 		float default_translation_z;//0x14
-		PAD(0xC);//0x18
+		float default_rotation_i;//0x18
+		float default_rotation_j;//0x1C
+		float default_rotation_k;//0x20
 		float default_rotation_w;//0x24
-		PAD(0x24);//0x28
+		float default_scale;//0x28
+		float inverse_forward_i;//0x2c
+		float inverse_forward_j;//0x30
+		float inverse_forward_k;//0x34
+		float inverse_left_i;//0x38
+		float inverse_left_j;//0x3c
+		float inverse_left_k;//0x40
+		float inverse_up_i;//0x44
+		float inverse_up_j;//0x48
+		float inverse_up_k;//
 		float inverse_position_x;//0x4C
 		float inverse_position_y;//0x50
 		float inverse_position_z;//0x54
-		float inverse_scale;//0x58
 		float distance_from_parent;//0x5C
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_nodes_block, 0x60);
@@ -432,7 +442,9 @@ struct s_render_model_group_definition
 			float translation_x;//0x4
 			float translation_y;//0x8
 			float translation_z;//0xC
-			PAD(0xC);//0x10
+			float rotation_i;
+			float rotation_j;
+			float roatation_k;
 			float rotation_w;//0x1C
 			float scale;//0x20
 		};

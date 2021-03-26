@@ -113,6 +113,8 @@
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
     <ClCompile Include="H2MOD\Modules\HitFix\MeleeFix.cpp" />
+    <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEvents.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\MessageBox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -376,6 +378,8 @@
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
     <ClInclude Include="H2MOD\Modules\HitFix\MeleeFix.h" />
     <ClInclude Include="Blam\Enums\Game\HaloStrings.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\physics_model_defenition.hpp" />
+    <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEvents.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

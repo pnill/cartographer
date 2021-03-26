@@ -20,6 +20,10 @@ namespace tag_loader
 	std::shared_ptr<plugins_field> Get_plugin(std::string type);
 	//returns whether the map is a shared map or not
 	bool Check_shared(std::ifstream* fin);
+	//Checks if the map file exists
+	bool Map_exists(std::string map);
+	//Find tag datum based off of tag name
+	datum Get_tag_datum(std::string tag_name, blam_tag type, std::string map);
 	//Loads a tag from specified map in accordance with the datum index supplied
 	void Load_tag(int datum_index, bool recursive, std::string map, bool custom = false);
 	//Return the size of the meta that is currently in the que
@@ -35,7 +39,7 @@ namespace tag_loader
 	void Push_Back();
 	//pushes the tag_data in que to the tag_tables and tag_memory at specified tag_table index
 	//BECAREFULL WHILE OVERWRITING TAGS
-	void Push_Back(int datum_index);	
+	void Push_Back(int datum_index);
 	//Dumps meta data in que in the specified tag folder(integrity checking)
 	void Dump_Que_meta();
 	//return and clears all the error messages incurred
@@ -92,4 +96,3 @@ namespace tag_loader
 	};
 }
 void Initialise_tag_loader();
-

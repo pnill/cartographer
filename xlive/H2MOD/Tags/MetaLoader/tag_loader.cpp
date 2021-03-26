@@ -13,9 +13,9 @@
 //contains some game functions that returns HANDLE
 namespace global_handle_function
 {
-	HANDLE __cdecl get_map_Handle_from_scnr(const char *pScenario)
+	HANDLE __cdecl get_map_Handle_from_scnr(const char* pScenario)
 	{
-		return	((HANDLE(__cdecl *)(const char*))h2mod->GetAddress(0x38607))(pScenario);
+		return	((HANDLE(__cdecl*)(const char*))h2mod->GetAddress(0x38607))(pScenario);
 	}
 }
 //certain functions which relate tags to their global object(such as Havok objects)(vftables perhaps)
@@ -23,32 +23,32 @@ namespace global_objects_fix
 {
 	void __cdecl bipd_fix(datum datum_index)
 	{
-		void(_cdecl*sub_EC23F)(datum);
+		void(_cdecl * sub_EC23F)(datum);
 		sub_EC23F = (void(_cdecl*)(datum))h2mod->GetAddress(0x1389B0);
 		sub_EC23F(datum_index);
 	}
 
 	void __cdecl crea_fix(datum datum_index)
 	{
-		int(_cdecl*sub_EC23F)(datum);
+		int(_cdecl * sub_EC23F)(datum);
 		sub_EC23F = (int(_cdecl*)(datum))h2mod->GetAddress(0x138985);
 		sub_EC23F(datum_index);
 	}
 	void __cdecl vehi_fix(datum datum_index)
 	{
-		int(_cdecl*sub_EC23F)(datum);
+		int(_cdecl * sub_EC23F)(datum);
 		sub_EC23F = (int(_cdecl*)(datum))h2mod->GetAddress(0x13895A);
 		sub_EC23F(datum_index);
 	}
 	void __cdecl coll_fix(datum datum_index)
 	{
-		int(_cdecl*sub_EC23F)(datum);
+		int(_cdecl * sub_EC23F)(datum);
 		sub_EC23F = (int(_cdecl*)(datum))h2mod->GetAddress(0x7BE5C);
 		sub_EC23F(datum_index);
 	}
 	void __cdecl phmo_fix(datum datum_index, bool unk)
 	{
-		int(_cdecl*sub_EC23F)(datum, bool);
+		int(_cdecl * sub_EC23F)(datum, bool);
 		sub_EC23F = (int(_cdecl*)(datum, bool))h2mod->GetAddress(0x7B844);
 		sub_EC23F(datum_index, unk);
 	}
@@ -90,7 +90,7 @@ namespace tag_loader
 		std::string plugin_loc = plugins_dir + '\\' + type + ".xml";
 		std::shared_ptr<plugins_field> temp_plugin = meta_struct::Get_Tag_stucture_from_plugin(plugin_loc);
 
-		if (temp_plugin)		
+		if (temp_plugin)
 			plugins_list.emplace(type, temp_plugin);
 		else
 		{
@@ -103,9 +103,9 @@ namespace tag_loader
 	//returns whether the map is a shared map or not
 	bool Check_shared(std::ifstream* fin)
 	{
-		char* map_header= new char[0x800];
+		char* map_header = new char[0x800];
 		fin->seekg(0x0);
-		fin->read(map_header, 0x800);		
+		fin->read(map_header, 0x800);
 
 		if (tags::get_cache_header()->type == scnr_type::MultiplayerShared || tags::get_cache_header()->type == scnr_type::SinglePlayerShared)
 		{
@@ -114,6 +114,140 @@ namespace tag_loader
 		}
 		delete[] map_header;
 		return false;
+	}
+
+	bool Map_exists(std::string map)
+	{
+		std::string map_loc;
+		if (meta_struct::Get_file_type(map) == "map")
+			map_loc = mods_dir + "\\maps\\" + map;
+		else
+			map_loc = mods_dir + "\\maps\\" + map + ".map";
+
+		if (PathFileExistsA(map_loc.c_str()))
+		{
+			return true;
+		}
+		if (meta_struct::Get_file_type(map) == "map")
+			map_loc = def_maps_dir + '\\' + map;
+		else
+			map_loc = def_maps_dir + '\\' + map + ".map";
+
+		if (PathFileExistsA(map_loc.c_str()))
+		{
+			return true;
+		}
+
+		if (meta_struct::Get_file_type(map) == "map")
+			map_loc = cus_maps_dir + '\\' + map;
+		else
+			map_loc = cus_maps_dir + '\\' + map + ".map";
+
+		return PathFileExistsA(map_loc.c_str());
+
+	}
+
+	datum Get_tag_datum(std::string tag_name, blam_tag type, std::string map)
+	{
+		std::ifstream* fin;
+		std::string map_loc;
+
+		//logic to check the existence of the map at subsequent directories
+		///mods->default->custom
+		if (meta_struct::Get_file_type(map) == "map")
+			map_loc = mods_dir + "\\maps\\" + map;
+		else
+			map_loc = mods_dir + "\\maps\\" + map + ".map";
+
+		if (PathFileExistsA(map_loc.c_str()));
+		else
+		{
+			if (meta_struct::Get_file_type(map) == "map")
+				map_loc = def_maps_dir + '\\' + map;
+			else
+				map_loc = def_maps_dir + '\\' + map + ".map";
+
+			if (PathFileExistsA(map_loc.c_str()));
+			else
+			{
+				if (meta_struct::Get_file_type(map) == "map")
+					map_loc = cus_maps_dir + '\\' + map;
+				else
+					map_loc = cus_maps_dir + '\\' + map + ".map";
+			}
+		}
+
+		fin = new std::ifstream(map_loc.c_str(), std::ios::binary | std::ios::in);
+
+		int tag_index = -1;
+		bool found_index = false;
+
+		if (fin->is_open())
+		{
+			fin->seekg(716);
+			int tag_count, file_table_offset = 0;
+			fin->read((char*)&tag_count, 4);
+			fin->read((char*)&file_table_offset, 4);
+
+			int table_off, table_size = 0;
+
+			fin->seekg(0x10);
+			fin->read((char*)&table_off, 4);
+			fin->read((char*)&table_size, 4);
+
+			fin->seekg(table_off + 4);
+			int temp;
+			fin->read((char*)&temp, 4);
+
+			int table_start = table_off + 0xC * temp + 0x20;
+
+			tags::tag_instance tag_info;
+
+			fin->seekg(file_table_offset);
+			char ch = ' ';
+			std::string input;
+			for (auto i = 0; i < tag_count; i++)
+			{
+				std::getline(*fin, input, '\0');
+				if (input == tag_name)
+				{
+					fin->seekg(table_start + i * sizeof(tags::tag_instance));
+					fin->read((char*)&tag_info, sizeof(tags::tag_instance));
+					if (tag_info.type == type)
+					{
+						delete fin;
+						return tag_info.datum_index;
+					}
+					break;
+				}
+			}
+		}
+
+		/*if(found_index)
+		{
+			int table_off, table_size = 0;
+
+			fin->seekg(0x10);
+			fin->read((char*)&table_off, 4);
+			fin->read((char*)&table_size, 4);
+
+			fin->seekg(table_off + 4);
+			int temp;
+			fin->read((char*)&temp, 4);
+
+			int table_start = table_off + 0xC * temp + 0x20;
+
+			tags::tag_instance tag_info;
+			fin->seekg(table_start + tag_index * sizeof(tags::tag_instance));
+
+			fin->read((char*)&tag_info, sizeof(tags::tag_instance));
+			fin->close();
+			delete fin;
+			return tag_info.datum_index;
+		}*/
+		fin->close();
+		delete fin;
+		return datum::Null;
 	}
 	//Loads a tag from specified map in accordance with the datum index supplied
 	///custom flag is no more needed
@@ -132,7 +266,7 @@ namespace tag_loader
 			map_loc = mods_dir + "\\maps\\" + map + ".map";
 
 		if (PathFileExistsA(map_loc.c_str()));
-		else 
+		else
 		{
 			if (meta_struct::Get_file_type(map) == "map")
 				map_loc = def_maps_dir + '\\' + map;
@@ -190,7 +324,7 @@ namespace tag_loader
 					fin->seekg(table_start + (0xFFFF & *(load_tag_list.cbegin())) * sizeof(tags::tag_instance));
 
 					fin->read((char*)&tag_info, sizeof(tags::tag_instance));
-					
+
 					if (*(load_tag_list.cbegin()) == tag_info.datum_index.ToInt())
 					{
 						std::shared_ptr<plugins_field> temp_plugin = Get_plugin(tag_info.type.as_string());
@@ -412,7 +546,7 @@ namespace tag_loader
 		//Add them to the tables
 		injected_tag_refs = my_inject_refs;
 		for (auto& my_inject_refs_iter : my_inject_refs)
-		{		
+		{
 			if (def_meta_size)
 			{
 				int meta_size = que_meta_list[my_inject_refs_iter.old_datum]->Get_Total_size();
@@ -422,12 +556,12 @@ namespace tag_loader
 				char* meta_data = que_meta_list[my_inject_refs_iter.old_datum]->Generate_meta_file();
 
 				//blam_tag type(blam_tag::tag_group_type(std::atoi(.c_str())));
-				
+
 				tables_data.type = que_meta_list[my_inject_refs_iter.old_datum]->Get_type();
 				tables_data.data_offset = mem_off;
 				tables_data.size = meta_size;
 				tables_data.datum_index = datum(my_inject_refs_iter.new_datum);
-				tags::tag_instance *temp_write_off = &tag_loader::new_Tables[my_inject_refs_iter.new_datum & 0xFFFF];
+				tags::tag_instance* temp_write_off = &tag_loader::new_Tables[my_inject_refs_iter.new_datum & 0xFFFF];
 				memcpy(temp_write_off, &tables_data, sizeof(tags::tag_instance));//copy to the tables
 
 				memcpy(tags::get_tag_data() + mem_off, meta_data, meta_size);//copy to the tag memory
@@ -446,7 +580,7 @@ namespace tag_loader
 		}
 		my_inject_refs.clear();
 		que_meta_list.clear();
-	}	
+	}
 	//clears the tags in que_list
 	void Clear_que_list()
 	{
@@ -497,7 +631,7 @@ namespace tag_loader
 			tag_list.pop_back();
 		}
 		return ret;
-	}	
+	}
 	//function to try and return a handle to the map (map_name or scenario_name(same as the actual map_name) supported)
 	//Checks inside mods//maps folder first then maps folder and finally inside custom maps folder
 	HANDLE try_find_map(std::string map)
@@ -569,8 +703,8 @@ namespace tag_loader
 
 		//char* ripped_map = (char*)(SharedmapBase + tag_scenario_off);
 
-		 tags::tag_instance* tag_info = &new_Tables[datum_index.Index];
-		 char* tag_data = tags::get_tag_data() + new_Tables[datum_index.Index].data_offset;
+		tags::tag_instance* tag_info = &new_Tables[datum_index.Index];
+		char* tag_data = tags::get_tag_data() + new_Tables[datum_index.Index].data_offset;
 
 		//fail safe
 		if (tag_info->datum_index.ToAbsoluteIndex() != datum_index.ToAbsoluteIndex())
@@ -604,14 +738,14 @@ namespace tag_loader
 					int sections_base = 0;
 					if (sections_off != -1)
 						sections_base = ETCOFFSET + sections_off;
-					((void(__cdecl *)(int, unsigned int))h2mod->GetAddress(0x2652BC))(sections_base + off + 0x38, 3u);
+					((void(__cdecl*)(int, unsigned int))h2mod->GetAddress(0x2652BC))(sections_base + off + 0x38, 3u);
 					++v15;
 					off += 0x5C;
 				} while (v15 < *(int*)(tag_data + 0x24));
 			}
 			break;
 
-		case 'bitm': 
+		case 'bitm':
 		{
 
 			int old_list_field = *h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC);
@@ -630,9 +764,9 @@ namespace tag_loader
 				*h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC) = bitmaps_field;
 
 				int temp = 0;
-				((int(__cdecl *)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 2, 0, &temp);
+				((int(__cdecl*)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 2, 0, &temp);
 
-				((int(__cdecl *)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 0, 0, &temp);
+				((int(__cdecl*)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 0, 0, &temp);
 
 			}
 			*h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
@@ -659,7 +793,7 @@ namespace tag_loader
 		//hax to force loading from the disk
 		*PMapRawtableoffset = 0x0;
 		*PRawTableSize = 0x0;
-		
+
 		DWORD ETCOFFSET = *(DWORD*)(h2mod->GetBase() + 0x482290);
 		HANDLE old_file_handle = *(HANDLE*)(h2mod->GetBase() + 0x4AE8A8);
 
@@ -692,7 +826,7 @@ namespace tag_loader
 					int sections_base = 0;
 					if (sections_off != -1)
 						sections_base = ETCOFFSET + sections_off;
-					((void(__cdecl *)(int, unsigned int))h2mod->GetAddress(0x2652BC))(sections_base + off + 0x38, 3u);
+					((void(__cdecl*)(int, unsigned int))h2mod->GetAddress(0x2652BC))(sections_base + off + 0x38, 3u);
 					++v15;
 					off += 0x5C;
 				} while (v15 < *(int*)(tag_data + 0x24));
@@ -718,9 +852,9 @@ namespace tag_loader
 				*h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC) = bitmaps_field;
 
 				int temp = 0;
-				((int(__cdecl *)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 2, 0, &temp);
-
-				((int(__cdecl *)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 0, 0, &temp);
+				((int(__cdecl*)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 2, 0, &temp);
+				((int(__cdecl*)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 1, 0, &temp);
+				((int(__cdecl*)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 0, 0, &temp);
 
 			}
 			*h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
@@ -778,7 +912,7 @@ namespace tag_loader
 
 		cache_loader* my_loader = new cache_loader(loc);
 
-		if (my_loader->get_last_error()!=UNABLE_TO_LOCATE_FILE)
+		if (my_loader->get_last_error() != UNABLE_TO_LOCATE_FILE)
 		{
 			HANDLE file_handle = CreateFileA(loc.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 
@@ -818,7 +952,7 @@ namespace tag_loader
 			int tags_first_d_index = (&t_ptr[0])->datum_index.ToInt();
 
 			for (int i = 0; i < module_tag_table->size / sizeof(tags::tag_instance); i++)
-			{				
+			{
 				injectRefs t_ref;
 
 				int size = (&t_ptr[i])->size;
@@ -828,7 +962,7 @@ namespace tag_loader
 
 				t_ref.old_datum = tags_first_d_index++;
 				t_ref.new_datum = new_datum_index++;//assign and increment it for next tag
-				
+
 				std::shared_ptr<plugins_field> t_plugin = Get_plugin((&t_ptr[i])->type.as_string());
 				std::shared_ptr<meta> t_meta = std::make_shared<meta>(d_ptr, size, mem_off, t_plugin, 1, t_ref.old_datum);
 
@@ -915,7 +1049,7 @@ namespace tag_loader
 
 	datum ResolveNewDatum(int oldDatum)
 	{
-		for(auto &ref : injected_tag_refs)
+		for (auto& ref : injected_tag_refs)
 		{
 			if (ref.old_datum == oldDatum)
 				return datum(ref.new_datum);
@@ -940,7 +1074,7 @@ namespace tag_loader
 				//add, add to list code here
 				DWORD_list.try_emplace(var_name, eax);
 			}
-			
+
 			else if (t.find("tag_loadEx") != std::string::npos)
 			{
 				//similar to tag_load,but adds overwriting functionality
@@ -992,7 +1126,7 @@ namespace tag_loader
 			{
 				std::string dest = t.substr(t.find('(') + 1, t.find(',') - t.find('(') - 1);
 				std::string src = t.substr(t.find(',') + 1, t.find(')') - t.find(',') - 1);
-				
+
 				replace_tag(dest, src);
 			}
 			/*
@@ -1003,7 +1137,7 @@ namespace tag_loader
 			}
 			*/
 		}
-			
+
 	}
 	query_parser::query_parser(std::string file_loc)
 	{
@@ -1035,11 +1169,11 @@ namespace tag_loader
 	std::vector<std::string> query_parser::clean_string(std::string txt)
 	{
 		std::vector<std::string> ret;
-		std::string temp="";
+		std::string temp = "";
 		//remove comment sections
 		for (size_t i = 0; i < txt.length(); i++)
 		{
-			if (txt[i] == '/'&&txt[i + 1] == '/')
+			if (txt[i] == '/' && txt[i + 1] == '/')
 				break;
 			temp += txt[i];
 		}
@@ -1104,7 +1238,7 @@ namespace tag_loader
 		if (DWORD_list.find(src) != DWORD_list.end())
 			val = DWORD_list[src];
 		else val = try_parse_int(src);
-		
+
 		if (DWORD_list.find(dest) != DWORD_list.end())
 			DWORD_list[dest] = val;
 		else logs.push_back("Undeclared variable : " + dest);
@@ -1121,7 +1255,7 @@ namespace tag_loader
 		if (DWORD_list.find(src) != DWORD_list.end())
 			b = DWORD_list[src];
 		else b = try_parse_int(src);
-		
+
 		auto tag_instance = tags::get_tag_instances();
 
 		//Only replace tags if they do exist
@@ -1131,7 +1265,7 @@ namespace tag_loader
 			tag_instance[a & 0xFFFF].data_offset = tag_instance[b & 0xFFFF].data_offset;
 			tag_instance[a & 0xFFFF].type = tag_instance[b & 0xFFFF].type;
 		}
-		
+
 
 		//Only replace tags if they do exist
 		//Game uses similar method to check if the tag actually exists in the table 
@@ -1163,7 +1297,7 @@ namespace tag_loader
 //Used to allocate somemore space for tagtables and tags
 unsigned int __cdecl AllocateMemory(int old_size, char arg_4)
 {
-	typedef unsigned int(_cdecl *Allocate_memory)(int size, char arg_4);
+	typedef unsigned int(_cdecl* Allocate_memory)(int size, char arg_4);
 	Allocate_memory pAllocate_memory;
 	pAllocate_memory = h2mod->GetAddress<Allocate_memory>(0x37E69);
 
@@ -1177,13 +1311,13 @@ unsigned int __cdecl AllocateMemory(int old_size, char arg_4)
 bool _cdecl LoadTagsandMapBases(int a)
 {
 	// basic load_Tag call
-	typedef bool(_cdecl *LoadTagsandSetMapBases)(int a);
+	typedef bool(_cdecl* LoadTagsandSetMapBases)(int a);
 	LoadTagsandSetMapBases pLoadTagsandSetMapBases;
 	pLoadTagsandSetMapBases = h2mod->GetAddress<LoadTagsandSetMapBases>(0x31348);
 	bool result = pLoadTagsandSetMapBases(a);
 
 	//Clear the table
-	for(auto i = _INJECTED_TAG_START_; i < tag_loader::new_datum_index; i++)
+	for (auto i = _INJECTED_TAG_START_; i < tag_loader::new_datum_index; i++)
 	{
 		tag_loader::new_Tables[i] = tags::tag_instance{ blam_tag::none(), -1, 0, 0 };
 	}
@@ -1199,16 +1333,17 @@ bool _cdecl LoadTagsandMapBases(int a)
 	// extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
 	if (tags::get_cache_header()->type != scnr_type::SinglePlayerShared)
 	{
-		DWORD *TagTableStart = h2mod->GetAddress<DWORD*>(0x47CD50);
+		DWORD* TagTableStart = h2mod->GetAddress<DWORD*>(0x47CD50);
+		memset((BYTE*)tag_loader::new_Tables, 0, 0x3BA40);
 		///---------------TABLE EXTENSION  STUFF
 		memcpy((BYTE*)tag_loader::new_Tables, (BYTE*)*TagTableStart, 0x3BA40);
 		*TagTableStart = (DWORD)tag_loader::new_Tables;
 	}
 
 
-/*<-------------------------------------------------------------------------------------------------------------------------------------------------------------->
-<-----------------------------------------------------ADD CALLS TO SUBROUTINES BELOW --------------------------------------------------------------------------->
-<--------------------------------------------------------------------------------------------------------------------------------------------------------------->*/
+	/*<-------------------------------------------------------------------------------------------------------------------------------------------------------------->
+	<-----------------------------------------------------ADD CALLS TO SUBROUTINES BELOW --------------------------------------------------------------------------->
+	<--------------------------------------------------------------------------------------------------------------------------------------------------------------->*/
 
 
 	///tag_injector testing
@@ -1229,7 +1364,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 		////tag_loader::Dump_Que_meta();
 		//tag_loader::Push_Back();
 
-		
+
 		//Todo :: Make Use of TraceFunctions to Log each step
 		//addDebugText(tag_loader::Pop_messages().c_str());
 	}

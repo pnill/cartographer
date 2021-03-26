@@ -944,7 +944,13 @@ void H2Tweaks::setHz() {
 	if (h2mod->Server)
 		return;
 
-	*h2mod->GetAddress<int*>(0xA3DA08) = H2Config_refresh_rate;
+	static bool refresh_redirected = false;
+	if (!refresh_redirected) {
+		WriteValue(h2mod->GetAddress(0x25E869) + 3, std::addressof(H2Config_refresh_rate));
+		refresh_redirected = true;
+	}
+
+	//*h2mod->GetAddress<int*>(0xA3DA08) = H2Config_refresh_rate;
 }
 
 char ret_0() {
