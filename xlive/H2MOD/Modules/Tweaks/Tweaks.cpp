@@ -139,23 +139,6 @@ char __cdecl HookChangePrivacy(int privacy) {
 	return result;
 }
 
-void postConfig() {
-
-	wchar_t mutexName2[255];
-	swprintf(mutexName2, ARRAYSIZE(mutexName2), L"Halo2BasePort#%d", H2Config_base_port);
-	HANDLE mutex2 = CreateMutex(0, TRUE, mutexName2);
-	DWORD lastErr2 = GetLastError();
-	if (lastErr2 == ERROR_ALREADY_EXISTS) {
-		char NotificationPlayerText[120];
-		sprintf(NotificationPlayerText, "Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
-		addDebugText(NotificationPlayerText);
-		MessageBoxA(NULL, NotificationPlayerText, "BASE PORT BIND WARNING!", MB_OK);
-	}
-	addDebugText("Base port: %d.", H2Config_base_port);
-
-	RefreshTogglexDelay();
-}
-
 #pragma endregion
 
 int(__cdecl* sub_20E1D8)(int, int, int, int, int, int);
@@ -823,7 +806,8 @@ __declspec(naked) void update_biped_ground_mode_physics_constant()
 }
 
 void InitH2Tweaks() {
-	postConfig();
+
+	RefreshTogglexDelay();
 
 	addDebugText("Begin Startup Tweaks.");
 

@@ -90,6 +90,21 @@ void initInstanceNumber() {
 	addDebugText("You are Instance #%d.", instanceNumber);
 }
 
+void postConfig() {
+
+	wchar_t mutexName2[255];
+	swprintf(mutexName2, ARRAYSIZE(mutexName2), L"Halo2BasePort#%d", H2Config_base_port);
+	HANDLE mutex2 = CreateMutex(0, TRUE, mutexName2);
+	DWORD lastErr2 = GetLastError();
+	if (lastErr2 == ERROR_ALREADY_EXISTS) {
+		char NotificationPlayerText[120];
+		sprintf(NotificationPlayerText, "Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
+		addDebugText(NotificationPlayerText);
+		MessageBoxA(NULL, NotificationPlayerText, "BASE PORT BIND WARNING!", MB_OK);
+	}
+	addDebugText("Base port: %d.", H2Config_base_port);
+}
+
 wchar_t xinput_path[_MAX_PATH];
 
 bool configureXinput() {
@@ -413,6 +428,7 @@ void InitH2Startup() {
 	}
 
 	InitH2Config();
+	postConfig();
 	EnterCriticalSection(&log_section);
 
 	// prepare default log files if enabled, after we read the H2Config
@@ -465,8 +481,8 @@ void InitH2Startup2() {
 
 		BYTE abEnet[6];
 		BYTE abOnline[20];
-		XNetRandom(abEnet, 6);
-		XNetRandom(abOnline, 20);
+		XNetRandom(abEnet, sizeof(abEnet));
+		XNetRandom(abOnline, sizeof(abOnline));
 		ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, 6).c_str(), ByteToHexStr(abOnline, 20).c_str(), false);
 	}
 }
