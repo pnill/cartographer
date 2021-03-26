@@ -209,8 +209,8 @@ namespace ObserverMode
 			auto player_actions = PlayerControl::GetPlayerActions(currentPlayerIndex);
 			Player::getPlayer(h2mod->get_player_datum_index_from_controller_index(0).Index)->controlled_unit_index = observer_current_index;
 			//control->ControllingDatum = observer_current_index;
-			control->Actions.yaw = player_actions->facing.yaw.as_rad();
-			control->Actions.pitch = player_actions->facing.pitch.as_rad();
+			//control->Actions.yaw = player_actions->facing.yaw.as_rad();
+			//control->Actions.pitch = player_actions->facing.pitch.as_rad();
 			//control->Actions = player_actions;
 		}
 	}
