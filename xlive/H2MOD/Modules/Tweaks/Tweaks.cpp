@@ -33,7 +33,100 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 	return result;
 }
 
+static bool initialized = false;
+static DWORD last_time = 0;
+static DWORD max_cursor_update_hz = 125; // update the cursor each 8 milliseconds
+static DWORD min_time_before_next_update_msec = 1000 / max_cursor_update_hz;
 
+static HCURSOR hCur;
+
+HCURSOR update_mouse_cursor1()
+{
+	auto p_update_mouse_cursor1 = Memory::GetAddressRelative<decltype(&update_mouse_cursor1)>(0x40497B);
+	
+	if (!initialized)
+	{
+		last_time = timeGetTime();
+		initialized = true;
+
+		hCur = p_update_mouse_cursor1();
+		return hCur;
+	}
+
+	if (timeGetTime() - last_time >= min_time_before_next_update_msec)
+	{
+		last_time = timeGetTime();
+		hCur = p_update_mouse_cursor1();
+		return hCur;
+	}
+	else
+	{
+		return hCur;
+	}
+}
+
+void update_mouse_cursor2()
+{
+	auto p_update_mouse_cursor2 = Memory::GetAddressRelative<decltype(&update_mouse_cursor2)>(0x42EDC4);
+
+	if (!initialized)
+	{
+		last_time = timeGetTime();
+		initialized = true;
+
+		return p_update_mouse_cursor2();
+	}
+
+	if (timeGetTime() - last_time >= min_time_before_next_update_msec)
+	{
+		last_time = timeGetTime();
+		return p_update_mouse_cursor2();
+	}
+	else
+	{
+		return;
+	}
+}
+
+void __cdecl update_keyboard_buttons_state_hook(BYTE *a1, WORD *a2, BYTE *a3, bool a4, int a5)
+{
+	auto p_update_keyboard_buttons_state_hook = Memory::GetAddressRelative<decltype(&update_keyboard_buttons_state_hook)>(0x42E4C5);
+	
+	if (H2Config_disable_ingame_keyboard)
+	{
+		for (int i = 0; i < 256; i++)
+			if (i != VK_SCROLL)
+				p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], false, a5);
+		
+		return;
+	}
+
+	BYTE keyboardState[256] = {};
+	GetKeyboardState(keyboardState);
+
+	for (int i = 0; i < 256; i++)
+	{
+		if (i != VK_SCROLL)
+		{
+			bool state = keyboardState[i] & 0x80;
+
+			// these keys need to be queried using GetAsyncKeyState because the Window Processing (WndProc) may consume the keys
+			if (i == VK_RSHIFT
+				|| i == VK_LSHIFT
+				|| i == VK_RCONTROL
+				|| i == VK_LCONTROL
+				|| i == VK_RMENU
+				|| i == VK_LMENU)
+			{
+				SHORT asyncKeyState = GetAsyncKeyState(i);
+
+				state = asyncKeyState & 0x8000;
+			}
+
+			p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], state, a5);
+		}
+	}
+}
 
 typedef char(__cdecl *thookChangePrivacy)(int);
 thookChangePrivacy phookChangePrivacy;
@@ -46,25 +139,6 @@ char __cdecl HookChangePrivacy(int privacy) {
 	return result;
 }
 
-void postConfig() {
-
-	wchar_t mutexName2[255];
-	swprintf(mutexName2, ARRAYSIZE(mutexName2), L"Halo2BasePort#%d", H2Config_base_port);
-	HANDLE mutex2 = CreateMutex(0, TRUE, mutexName2);
-	DWORD lastErr2 = GetLastError();
-	if (lastErr2 == ERROR_ALREADY_EXISTS) {
-		char NotificationPlayerText[120];
-		sprintf(NotificationPlayerText, "Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
-		addDebugText(NotificationPlayerText);
-		MessageBoxA(NULL, NotificationPlayerText, "BASE PORT BIND WARNING!", MB_OK);
-	}
-	char NotificationText5[120];
-	sprintf(NotificationText5, "Base port: %d.", H2Config_base_port);
-	addDebugText(NotificationText5);
-
-	RefreshTogglexDelay();
-}
-
 #pragma endregion
 
 int(__cdecl* sub_20E1D8)(int, int, int, int, int, int);
@@ -74,7 +148,6 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 	if (a2 == 0xb9) {
 		//boot them offline.
 		XUserSignOut(0);
-		ipManager.UnregisterLocalConnectionInfo();
 		UpdateConnectionStatus();
 		H2Config_master_ip = inet_addr("127.0.0.1");
 		H2Config_master_port_relay = 2001;
@@ -714,8 +787,27 @@ class test_engine : public c_game_engine_base
 };
 test_engine g_test_engine;
 
+// fixes the biped unit movement physics from applying too much movement, especially when edge-dropping by adjusting the default constant (0.117) value to tickrate
+__declspec(naked) void update_biped_ground_mode_physics_constant()
+{
+	static float edgeDropFactorConverted = 0.117f * 30.f; // value converted from h2x tickrate
+
+	__asm
+	{
+		PUSHAD // preserve registers on stack, until we are done
+		PUSHFD
+		call time_globals::get // get the game time globals pointer in eax register
+		movss xmm2, edgeDropFactorConverted // multiply the edge drop value 
+		mulss xmm2, dword ptr[eax + 0x4] // multiply by seconds per tick or game tick length
+		POPFD // restore registers from stack
+		POPAD
+		ret
+	}
+}
+
 void InitH2Tweaks() {
-	postConfig();
+
+	RefreshTogglexDelay();
 
 	addDebugText("Begin Startup Tweaks.");
 
@@ -786,10 +878,33 @@ void InitH2Tweaks() {
 
 		// disable cloth debugging that writes to cloth.txt
 		WriteValue<bool>(h2mod->GetAddress(0x41F650), false);
+
+		// prevent game from setting timeBeginPeriod/timeEndPeriod, when rendering loading screen
+		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
+		NopFill(Memory::GetAddressRelative(0x66A092), 8);
+
+		// disable gamma correction by using D3D9::SetGammaRamp, TODO: implement a shader to take care of this, because D3D9::SetGammaRamp function seems to have 2 issues:
+		// 1) it's very heavy on NVIDIA/Intel (not sure about AMD) GPUs (or there is something wrong with the drivers), causing stuttering on maps that override gamma (like Warlock, Turf, Backwash)
+		// 2) it doesn't apply the gamma override when playing in windowed mode (thus why some people like using windowed mode, because it doesn't cause stuttering on these maps)
+
+		// maybe we could find a way to use the gamma shader built in by converting the override gamma ramp to something that shader could understand
+		BYTE SetGammaRampSkipBytes[] = { 0x90, 0x90, 0x90, 0xE9, 0x94, 0x00, 0x00, 0x00, 0x90 };
+		WriteBytes(Memory::GetAddressRelative(0x66193B), SetGammaRampSkipBytes, sizeof(SetGammaRampSkipBytes));
+
+		// nop a call to SetCursor(), to improve the FPS framedrops when hovering the mouse around in the main menus or where the cursor is used, mainly when using mice that use 1000 polling rate
+		// it'll get called anyway by the D3D9Device::ShowCursor() API after
+		NopFill(Memory::GetAddressRelative(0x48A99C), 8);
+
+		PatchCall(Memory::GetAddressRelative(0x407BFA), update_mouse_cursor1);
+		PatchCall(Memory::GetAddressRelative(0x407BE6), update_mouse_cursor2);
+
+		NopFill(Memory::GetAddressRelative(0x42FABF), 2);
+		NopFill(Memory::GetAddressRelative(0x42FA8A), 3);
+		PatchCall(Memory::GetAddressRelative(0x42FAAB), update_keyboard_buttons_state_hook);
 	}
 
-	if(H2Config_experimental_game_main_loop_patches)
-		UncappedFPS::ApplyPatches();
+	// fixes edge drop fast fall when using higher tickrates than 30
+	Codecave(Memory::GetAddressRelative(0x506E23, 0x4F9143), update_biped_ground_mode_physics_constant, 3);
 
 	addDebugText("End Startup Tweaks.");
 }

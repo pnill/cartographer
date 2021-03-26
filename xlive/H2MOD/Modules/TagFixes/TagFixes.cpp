@@ -162,6 +162,8 @@ namespace TagFixes
 			fix_dynamic_lights();
 			font_table_fix();
 		}
+
+		// both server and client
 		fall_damage_fix();
 	}
 

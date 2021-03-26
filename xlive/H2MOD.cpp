@@ -78,6 +78,8 @@ int get_player_index_from_datum(datum unit_datum)
 	return unit_object->PlayerDatum.ToAbsoluteIndex();
 }
 
+
+// TO NOTE: this is the life cycle of a `networked` game, not used in campaign for example
 game_life_cycle get_game_life_cycle()
 {
 	typedef game_life_cycle(__cdecl get_lobby_state)();
@@ -511,9 +513,9 @@ wchar_t* H2MOD::get_local_player_name(int local_player_index)
 int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
 {
 	PlayerIterator playersIt;
-	while (playersIt.get_next_player())
+	while (playersIt.get_next_active_player())
 	{
-		datum unit_datum_index_check = playersIt.get_current_player_data()->BipedUnitDatum;
+		datum unit_datum_index_check = playersIt.get_current_player_data()->controlled_unit_index;
 		LOG_TRACE_FUNC("Checking datum: {0:x} - index: {1} against datum: {2:x}", unit_datum_index_check.ToInt(), playersIt.get_current_player_index(), unit_datum_index.ToInt());
 
 		if (unit_datum_index == unit_datum_index_check)
@@ -788,16 +790,21 @@ void H2MOD::disable_weapon_pickup(bool b_Enable)
 
 void H2MOD::set_local_rank(BYTE rank)
 {
-	DWORD address1 = h2mod->GetAddress(0x1b2c2b);
-	DWORD address2 = h2mod->GetAddress(0x1b2c2F);
-	DWORD address3 = h2mod->GetAddress(0x51A6B6);
-	DWORD address4 = h2mod->GetAddress(0x51A6B7);
-	BYTE Rank[1];
-	Rank[0] = rank;
-	WriteBytes(address1, Rank, sizeof(Rank));
-	WriteBytes(address2, Rank, sizeof(Rank));
-	WriteBytes(address3, Rank, sizeof(Rank));
-	WriteBytes(address4, Rank, sizeof(Rank));
+	if (Memory::isDedicatedServer())
+		return;
+
+	static bool initialized = false;
+
+	if (!initialized)
+	{
+		NopFill(Memory::GetAddress(0x1b2c29), 7);
+		initialized = true;
+	}
+
+	Player::Properties* local_player_properties = Memory::GetAddress<Player::Properties*>(0x51A638);
+
+	local_player_properties->player_overall_skill = rank;
+	local_player_properties->player_displayed_skill = rank;
 }
 
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)

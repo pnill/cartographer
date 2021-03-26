@@ -7,8 +7,10 @@
 #include "H2MOD\Modules\Accounts\Accounts.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Config\Config.h"
+
 #include "XLive\xnet\IpManagement\XnIp.h"
-#include "XLive\xnet\Sockets\XSocket.h"
+
+#include "XLive\xnet\upnp.h"
 
 bool AccountEdit_remember = true;
 
@@ -41,7 +43,7 @@ void UpdateConnectionStatus() {
 	}
 }
 
-char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long lanaddr, unsigned long xnaddr, const char* abEnet, const char* abOnline, bool onlineSignIn) {
+char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long xnaddr, unsigned long lanaddr, const char* abEnet, const char* abOnline, bool onlineSignIn) {
 
 	if (strlen(username) <= 0 || xuid == 0 || strnlen(abEnet, 12) != 12 || strnlen(abOnline, 40) != 40) {
 		return 0;
@@ -49,13 +51,13 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 
 	char result = strlen(login_token) == 32 ? 1 : 2;
 
-	XUserSetup(0, xuid, username, onlineSignIn);
-	ipManager.SetupLocalConnectionInfo(xnaddr, abEnet, abOnline);
+	XUserSetup(0, xuid, username, xnaddr, lanaddr, abEnet, abOnline, onlineSignIn);
 
 	UpdateConnectionStatus();
 
 	if (onlineSignIn) {
-		ForwardPorts();
+		if (!h2mod->Server)
+			ForwardPorts();
 	}
 
 	if (H2CurrentAccountLoginToken) {
@@ -123,14 +125,10 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 
 
 		if (sscanf(fileLine, "return_code=%d", &tempint1) == 1) {
-			char NotificationPlayerText[60];
-			snprintf(NotificationPlayerText, 60, "Return code is: %d", tempint1);
-			addDebugText(NotificationPlayerText);
+			addDebugText("Return code is: %d", tempint1);
 		}
 		else if (sscanf(fileLine, "login_code=%d", &tempint1) == 1) {
-			char NotificationPlayerText[60];
-			snprintf(NotificationPlayerText, 60, "Login code is: %d", tempint1);
-			addDebugText(NotificationPlayerText);
+			addDebugText("Login code is: %d", tempint1);
 			result = tempint1;
 		}
 		else if (strstr(fileLine, "login_code_secondary=")) {
@@ -148,9 +146,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 			}
 			if (strlen(tempstr1) > 0) {
-				char NotificationPlayerText[150];
-				snprintf(NotificationPlayerText, 150, "Login Code Secondary is: %s", tempstr1);
-				addDebugText(NotificationPlayerText);
+				addDebugText("Login Code Secondary is: %s", tempstr1);
 			}
 		}
 		else if (strstr(fileLine, "login_external_addr=")) {
@@ -167,9 +163,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 					break;
 				}
 			}
-			char NotificationPlayerText[100];
-			snprintf(NotificationPlayerText, 100, "Client External IP Address is: %s", tempstr1);
-			addDebugText(NotificationPlayerText);
+			addDebugText("Client External IP Address is: %s", tempstr1);
 			unsigned long resolvedAddr;
 			if ((resolvedAddr = inet_addr(tempstr1)) != INADDR_NONE) {
 				if (strlen(H2Config_str_wan) <= 0 && strlen(H2Config_str_lan) > 0) {
@@ -194,17 +188,13 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			}
 			unsigned long resolvedAddr;
 			if ((resolvedAddr = inet_addr(tempstr1)) != INADDR_NONE || strcmp(tempstr1, "255.255.255.255") == 0) {
-				//char NotificationPlayerText[60];
-				//snprintf(NotificationPlayerText, 60, "H2Master Relay IP is: %s", tempstr1);
-				//addDebugText(NotificationPlayerText);
+				//addDebugText("H2Master Relay IP is: %s", tempstr1);
 				H2Config_master_ip = resolvedAddr;
 			}
 		}
 		else if (sscanf(fileLine, "login_master_relay_port=%d", &tempint1) == 1) {
 			if (tempint1 >= 0) {
-				//char NotificationPlayerText[60];
-				//snprintf(NotificationPlayerText, 60, "H2Master Relay Port is: %d", tempint1);
-				//addDebugText(NotificationPlayerText);
+				//addDebugText("H2Master Relay Port is: %d", tempint1);
 				H2Config_master_port_relay = tempint1;
 			}
 		}
@@ -223,9 +213,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 			}
 			if (strlen(tempstr1) == 32) {
-				//char NotificationPlayerText[60];
-				//snprintf(NotificationPlayerText, 60, "Login Token is: %s", tempstr1);
-				//addDebugText(NotificationPlayerText);
+				//addDebugText("Login Token is: %s", tempstr1);
 				strncpy(login_token, tempstr1, 33);
 			}
 		}
@@ -244,25 +232,19 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 			}
 			if (strlen(tempstr1) > 0) {
-				char NotificationPlayerText[60];
-				snprintf(NotificationPlayerText, 60, "Login Username is: %s", tempstr1);
-				addDebugText(NotificationPlayerText);
+				addDebugText("Login Username is: %s", tempstr1);
 				strncpy_s(username, tempstr1, strnlen_s(tempstr1, XUSER_MAX_NAME_LENGTH));
 			}
 		}
 		else if (sscanf(fileLine, "login_xuid=%llu", &templlu1) == 1) {
 			if (templlu1 > 0) {
-				//char NotificationPlayerText[60];
-				//snprintf(NotificationPlayerText, 60, "User XUID is: %llu", templlu1);
-				//addDebugText(NotificationPlayerText);
+				//addDebugText("User XUID is: %llu", templlu1);
 				xuid = templlu1;
 			}
 		}
 		else if (sscanf(fileLine, "login_secure_addr=%x", &tempulong) == 1) {
 			if (tempulong > 0) {
-				//char NotificationPlayerText[60];
-				//snprintf(NotificationPlayerText, 60, "User saddr is: %08zx", tempulong);
-				//addDebugText(NotificationPlayerText);
+				//addDebugText("User saddr is: %08zx", tempulong);
 				saddr = tempulong;
 			}
 		}
@@ -281,9 +263,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 			}
 			if (strlen(tempstr1) == 12) {
-				//char NotificationPlayerText[60];
-				//snprintf(NotificationPlayerText, 60, "Login abEnet is: %s", tempstr1);
-				//addDebugText(NotificationPlayerText);
+				//addDebugText("Login abEnet is: %s", tempstr1);
 				strncpy(abEnet, tempstr1, 13);
 			}
 		}
@@ -302,9 +282,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 			}
 			if (strlen(tempstr1) == 40) {
-				//char NotificationPlayerText[80];
-				//snprintf(NotificationPlayerText, 80, "Login abOnline is: %s", tempstr1);
-				//addDebugText(NotificationPlayerText);
+				//addDebugText("Login abOnline is: %s", tempstr1);
 				strncpy(abOnline, tempstr1, 41);
 			}
 		}
@@ -315,7 +293,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 
 	if (result > 0) {
 		int result_details;
-		if (result_details = ConfigureUserDetails(username, login_token, xuid, saddr, xnaddr, abEnet, abOnline, true)) {
+		if (result_details = ConfigureUserDetails(username, login_token, xuid, xnaddr, H2Config_ip_lan, abEnet, abOnline, true)) {
 			//allow no login_token from backend in DB emergencies / random logins.
 			if (result_details == 1) {
 				if (prev_login_token) {
@@ -383,7 +361,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 		}
 
 		os_string_buflen = 30;
-		os_string = (char*)malloc(sizeof(char) * os_string_buflen);
+		os_string = (char*)calloc(os_string_buflen, sizeof(char));
 		snprintf(os_string, os_string_buflen, "Windows: %u.%u", osvi.dwMajorVersion, osvi.dwMinorVersion);
 	}
 	addDebugText(os_string);
@@ -420,9 +398,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 		free(rtn_result);
 	}
 	if (error_code < 0) {
-		char NotificationPlayerText[40];
-		sprintf(NotificationPlayerText, "ERROR Account Login: %d", error_code);
-		addDebugText(NotificationPlayerText);
+		addDebugText("ERROR Account Login: %d", error_code);
 
 		if (error_code == ERROR_CODE_INVALID_LOGIN_TOKEN) {
 			char* username = 0;
@@ -485,7 +461,6 @@ HRESULT WINAPI XLiveSignin(PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD d
 	if (userSignedInLocally(0))
 	{
 		XUserSignOut(0);
-		ipManager.UnregisterLocalConnectionInfo();
 	}
 
 	// if we are not signed in online, sign us in
@@ -514,7 +489,6 @@ HRESULT WINAPI XLiveSignout(PXOVERLAPPED pXOverlapped)
 	LOG_TRACE_XLIVE("XLiveSignout");
 
 	XUserSignOut(0);
-	ipManager.UnregisterLocalConnectionInfo();
 
 	if (pXOverlapped)
 	{

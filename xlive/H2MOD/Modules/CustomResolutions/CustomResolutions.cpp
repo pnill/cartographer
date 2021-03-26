@@ -49,6 +49,8 @@ void CustomResolution::Initialize()
 	WriteValue(h2mod->GetAddress(0x263A69), sizeof(s_display_res) * TOTAL_RESOLUTIONS);
 	WriteValue(h2mod->GetAddress(0x263C92), sizeof(s_display_res) * TOTAL_RESOLUTIONS);
 
+	WriteValue<DWORD>(Memory::GetAddress(0x263BEA) + 1, TOTAL_RESOLUTIONS);
+
 	video_options[11].res_x = 3840;
 	video_options[11].res_y = 2160;
 	video_options[11].unk = 2;

@@ -29,8 +29,6 @@ BYTE o_SetDX2[8];
 typedef char(__cdecl p_mouse_input)(int local_player_index, void *data, int a4, float *a5, float *a6, void *a7);
 p_mouse_input* c_mouse_input;
 
-
-
 char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, float *a6, void *a7)
 {
 	time_globals* time = time_globals::get();

@@ -204,7 +204,7 @@ void Infection::preSpawnServerSetup() {
 	int humanCount = 0;
 	int playerCount = 0;
 	PlayerIterator playerIt;
-	while (playerIt.get_next_player())
+	while (playerIt.get_next_active_player())
 	{
 		int currentPlayerIndex = playerIt.get_current_player_index();
 		XUID playerIdentifier = Player::getIdentifier(currentPlayerIndex);
@@ -238,9 +238,6 @@ void Infection::preSpawnServerSetup() {
 void Infection::setPlayerAsHuman(int playerIndex) {
 	Player::setUnitBipedType(playerIndex, Player::Biped::Spartan);
 	Player::setBipedSpeed(playerIndex, 1.0f);
-
-	call_give_player_weapon(playerIndex, Weapon::shotgun, 1);
-	call_give_player_weapon(playerIndex, Weapon::magnum, 0);
 }
 
 void Infection::setPlayerAsZombie(int playerIndex) {

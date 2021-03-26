@@ -32,24 +32,17 @@ public:
 
 	std::string name() const { return this->sname; }
 
-	// Changes the log level and returns the old level, so it could be reset later if needed
-	static log_level set_log_level(log_level level);
-
 	/// <summary>
-	///   <para>Creates a logger which outputs to a file, always returns a
-	///   logger which is safe to call logging commands on even if the file
-	///   could not be created.</para>
+	///   <para>Creates a logger which outputs to a file.</para>
 	///   <para>Use logger.is_valid() to check if logging is working.</para>
 	/// </summary>
-	static h2log *create(const std::string &name, std::wstring &filename);
+	static h2log* create(const std::string &name, std::wstring &filename, bool shouldCreateLog, int debugLogLevel);
 
 	/// <summary>
-	///   <para>Creates a logger which outputs to a console window, always
-	///   returns a logger which is safe to call logging commands on even
-	///   if the window could not be created.</para>
+	///   <para>Creates a logger which outputs to a console window.</para>
 	///   <para>Use logger.is_valid() to check if logging is working.</para>
 	/// </summary>
-	static h2log *create_console(const std::string &name);
+	static h2log* create_console(const std::string &name, bool shouldCreateLog, int debugLogLevel);
 
 #define log_a(level) \
 	if (output != nullptr)                      \

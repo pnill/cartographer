@@ -34,7 +34,7 @@ e_object_team Player::getTeam(int playerIndex)
 	{
 		return (e_object_team)NONE;
 	}
-	return getPlayer(playerIndex)->properties.player_team;
+	return getPlayer(playerIndex)->properties[0].player_team;
 }
 
 void Player::setTeam(int playerIndex, e_object_team team)
@@ -43,7 +43,7 @@ void Player::setTeam(int playerIndex, e_object_team team)
 	{
 		return;
 	}
-	getPlayer(playerIndex)->properties.player_team = team;
+	getPlayer(playerIndex)->properties[0].player_team = team;
 }
 
 void Player::setUnitBipedType(int playerIndex, Player::Biped bipedType)
@@ -52,7 +52,7 @@ void Player::setUnitBipedType(int playerIndex, Player::Biped bipedType)
 	{
 		return;
 	}
-	getPlayer(playerIndex)->properties.profile.player_character_type = bipedType;
+	getPlayer(playerIndex)->properties[0].profile.player_character_type = bipedType;
 }
 
 void Player::setBipedSpeed(int playerIndex, float speed)
@@ -70,7 +70,7 @@ wchar_t* Player::getName(int playerIndex)
 	{
 		return L"";
 	}
-	return getPlayer(playerIndex)->properties.player_name;
+	return getPlayer(playerIndex)->properties[0].player_name;
 }
 
 datum Player::getPlayerUnitDatumIndex(int playerIndex)
@@ -78,10 +78,10 @@ datum Player::getPlayerUnitDatumIndex(int playerIndex)
 	if (!indexValid(playerIndex))
 		return datum::Null;
 
-	if (getPlayer(playerIndex)->BipedUnitDatum.IsNull())
+	if (getPlayer(playerIndex)->controlled_unit_index.IsNull())
 		return datum::Null;
 		
-	return getPlayer(playerIndex)->BipedUnitDatum;
+	return getPlayer(playerIndex)->controlled_unit_index;
 }
 
 XUID Player::getIdentifier(int playerIndex)
@@ -91,7 +91,7 @@ XUID Player::getIdentifier(int playerIndex)
 		return datum::Null;
 	}
 
-	return getPlayer(playerIndex)->xuid;
+	return getPlayer(playerIndex)->identifier;
 }
 
 PlayerIterator::PlayerIterator() 
@@ -100,14 +100,14 @@ PlayerIterator::PlayerIterator()
 
 }
 
-bool PlayerIterator::get_next_player()
+bool PlayerIterator::get_next_active_player()
 {
 	m_current_player = get_next_datum();
 	if (m_current_player)
 	{
 		do
 		{
-			if (!(m_current_player->Flags & 2))
+			if (!(m_current_player->flags & FLAG(Player::player_inactive)))
 				break;
 
 			m_current_player = get_next_datum();
@@ -130,5 +130,5 @@ int PlayerIterator::get_current_player_index()
 
 wchar_t* PlayerIterator::get_current_player_name()
 {
-	return m_current_player->properties.player_name;
+	return m_current_player->properties[0].player_name;
 }

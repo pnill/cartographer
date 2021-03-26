@@ -1,5 +1,6 @@
 #pragma once
-#include "stdafx.h"
+
+#include "curl/curl.h"
 
 #define XUSER_PROPERTY_GAMETYPE_NAME		0x40008228
 #define XUSER_PROPERTY_GAMETYPE_NAME_2		0x4000822B
@@ -27,6 +28,7 @@
 #define XUSER_PROPERTY_USERNAME_2			0x4000822C
 #define XUSER_PROPERTY_XUID                 0x2000822F
 
+#define X_PROPERTY_UNICODE_BUFFER_SIZE				(sizeof(WCHAR) * 64 + 2) // 2 bytes for NULL character
 #define XLOCATOR_DEDICATEDSERVER_PROPERTY_START     0x200
 
 // These properties are used for search only.
@@ -71,36 +73,65 @@ typedef struct _XLOCATOR_SEARCHRESULT {
 
 class ServerList
 {
-	std::thread serv_thread;
-
 public:
-	std::atomic<bool> ServerListDownloadRunning = false;
-	bool completed = false;
-	int ServersLeftInDocumentCount = -1;
-	int total_servers = 0;
-
-	bool CountResultsUpdated = false;
-	int total_count;
-	int total_public;
-	int total_peer;
-	int total_peer_gold;
-	int total_public_gold;
+	static bool CountResultsUpdated;
+	static int total_count;
+	static int total_public;
+	static int total_peer;
+	static int total_peer_gold;
+	static int total_public_gold;
 
 	HANDLE Handle = INVALID_HANDLE_VALUE;
 
-	bool GetRunning();
-	void GetServers(DWORD, CHAR*, PXOVERLAPPED);
+	static DWORD GetServers(HANDLE, DWORD, CHAR*, PXOVERLAPPED);
+
+	static void GetServerCounts(PXOVERLAPPED);
+	static void RemoveServer(PXOVERLAPPED pOverlapped);
+	static void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped);
+
+#pragma region ServerListQuery
+
+	ServerList::ServerList(DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties)
+	{
+		cSearchPropertiesIDs = _cSearchPropertiesIDs;
+		pSearchPropertyIDs = new DWORD[_cSearchPropertiesIDs];
+		memcpy(pSearchPropertyIDs, _pSearchProperties, _cSearchPropertiesIDs * sizeof(*_pSearchProperties));
+	}
+
 	int GetServersLeft();
 	int GetTotalServers();
-	void GetServerCounts(PXOVERLAPPED);
 
-	void GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped);
-	void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped);
-	void RemoveServer(PXOVERLAPPED pOverlapped);
+	void CancelOperation() { cancelOperation = true; }
 
-	std::mutex AddServerMutex;
-	std::mutex RemoveServerMutex;
-	std::mutex GetServerCountsMutex;
+	void GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer);
+	void QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESULT* nResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer);
+
+	PXOVERLAPPED ovelapped;
+
+	enum OperationState : int
+	{
+		OperationPending,
+		OperationIncomplete,
+		OperationFinished
+	};
+
+	OperationState operationState = OperationPending;
+	int ServersLeftInDocumentCount = -1;
+	int total_servers = 0;
+
+	DWORD cSearchPropertiesIDs = 0;
+	DWORD* pSearchPropertyIDs = nullptr;
+
+	//TODO:
+	std::atomic<bool> cancelOperation = false;
+
+	std::thread serv_thread;
+
+#pragma endregion
+
+	static std::mutex AddServerMutex;
+	static std::mutex RemoveServerMutex;
+	static std::mutex GetServerCountsMutex;
 };
 
-extern ServerList serverList;
+extern std::unordered_map<HANDLE, ServerList*> serverListRequests;

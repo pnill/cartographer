@@ -219,8 +219,7 @@ void InitalizeFont(std::wstring strFontName, std::wstring& strFontPath, int size
 {
 	if (OnOff)
 	{
-		addDebugText("Adding font: ");
-		addDebugText(strFontPath.c_str());
+		addDebugText("Adding font: %s", strFontPath.c_str());
 		if(AddFontResource(strFontPath.c_str()) > 0)
 		{
 			addDebugText("Font successfully added.");
@@ -650,7 +649,7 @@ int WINAPI XLiveRender()
 			if (displayXyz && (NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() == scnr_type::SinglePlayer)) {
 				int text_y_coord = 60;
 				PlayerIterator playerIt;
-				while (playerIt.get_next_player()) 
+				while (playerIt.get_next_active_player()) 
 				{
 					real_point3d* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
 					if (player_position != nullptr) {
@@ -687,12 +686,8 @@ int WINAPI XLiveRender()
 				drawBox(10, 52, ((Size_Of_Downloaded * 100) / Size_Of_Download) * 2, 6, COLOR_GREEN, COLOR_GREEN);
 			}
 
-			if (NetworkStatistics) {
-				if (!NetworkSession::getCurrentNetworkSession(NULL)) {
-					ElapsedTime = 0;
-					TotalPacketsSent = 0;
-				}
-				sprintf(packet_info_str, "[ pck/second %d, pck size average: %d ]", ElapsedTime > 0 ? Packets * 1000 / ElapsedTime : 0, TotalPacketsSent > 0 ? TotalBytesSent / TotalPacketsSent : 0);
+			if (NetworkStatistics && NetworkSession::getCurrentNetworkSession(NULL)) {
+				sprintf(packet_info_str, "[ pck/second %d, pck size average: %d ]", packetsPerSecondAvg, packetSizeAvg);
 				drawText(30, 30, COLOR_WHITE, packet_info_str, normalSizeFont);
 			}
 

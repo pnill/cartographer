@@ -157,6 +157,11 @@ struct Player
 		Severe = 3
 	};
 
+	enum flags
+	{
+		player_inactive = 9,
+	};
+
 	struct Properties
 	{
 		wchar_t player_name[16];
@@ -193,43 +198,53 @@ struct Player
 	};
 	CHECK_STRUCT_SIZE(Properties, 132);
 
-	WORD DatumSalt; //0x00
-	BYTE Flags; // 0x02
-	BYTE unk; // 0x03
-	XUID xuid; //0x04
-	/* Trying to convert the peer_user_index to a datum via the entity one used in voice does not work... */
-	DWORD peer_index; //0x0C
-	BYTE abNet[6]; // 0x10 used to identify the peer index
-	/* These are based on the beta and can be wrong/off. */
-	short machine_index; // 0x14  
-	int machine_controller_index; //0x18
-	int unk_1; // 0x1C
-	int controller_index; // 0x20
-	__int16 user_index; // 0x24;
-	__int16 related_to_pos_on_bsp; // 0x26
-	datum BipedUnitDatum; // 0x28 //0x24 in h2x beta
-	datum DeadGameStateDatum; //0x2C
-	datum PossiblyDatum; // 0x30
-	DWORD InputFlags; // 0x34
-	DWORD InputFlags2; // 0x38
-	DWORD unk_4; // 0x3C
-	Properties properties; // 0x40
-	Properties properties_2;
-	char pad[12];
-	int respawn_time; //0x154
-	int unk_12; //0x158
-	BYTE unk_pad3[36]; //0x15C
-	float unit_speed; //0x180
-	datum player_aimed_at; //0x184
-	int unk_13; // 0x188
-	int unk_14_related_to_player_aimed_at; // 0x18C
-	__int16 unk_15; //0x190
-	__int16 unk_16; //0x192
-	datum betraying_player; //0x194
-	int field_198; //0x198
-	int field_19C; //0x19C 
-	BYTE unk_pad4[0x60]; //0x1FC
-	int is_chatting; // 0x200
+	WORD datum_salt;
+	WORD flags;
+	XUID identifier;
+	DWORD player_creation_tick;
+	BYTE abNet[6];
+	__int16 machine_index;
+	int unk_user_index_2;
+	int unk_user_index;
+	int controller_index;
+	__int16 user_index;
+	__int16 player_bsp_location_index;
+	datum controlled_unit_index;
+	datum dead_unit_index;
+	datum possibly_datum;
+	DWORD InputFlags;
+	DWORD InputFlags2;
+	char field_3C[4];
+	Properties properties[2];
+	DWORD field_148;
+	DWORD respawn_penalty;
+	DWORD teleporter_blocked_tick_count;
+	int respawn_time;
+	int unk_12;
+	BYTE gap_15C[4];
+	DWORD field_160;
+	WORD field_164;
+	BYTE gap_166[14];
+	DWORD betrayal_encountered_tick;
+	int spawn_protection_time;
+	WORD field_17C[2];
+	float unit_speed;
+	DWORD field_184;
+	BYTE gap_188[2];
+	WORD field_18A;
+	BYTE gap_18C[2];
+	WORD field_18E;
+	WORD player_lives_count;
+	BYTE gap_192[2];
+	DWORD betraying_player_index;
+	BYTE gap198[2];
+	int field_19C;
+	BYTE gap_19E[30];
+	DWORD field_1BC;
+	BYTE gap_1C0[60];
+	WORD random_index;
+	BYTE gap_1FE[2];
+	DWORD is_chatting;
 
 	/*
 	- TO NOTE: 
@@ -256,7 +271,7 @@ public:
 
 	PlayerIterator();
 
-	bool get_next_player();
+	bool get_next_active_player();
 
 
 	Player* get_current_player_data();

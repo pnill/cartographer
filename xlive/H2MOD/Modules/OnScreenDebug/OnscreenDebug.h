@@ -2,11 +2,10 @@
 
 int getDebugTextArrayMaxLen();
 int getDebugTextDisplayCount();
-void addDebugText(char* text);
-void addDebugText(const char* text);
-void addDebugText(const wchar_t* wtext);
+void addDebugText(const char* format, ...);
+void addDebugText(const wchar_t* format, ...);
 char* getDebugText(int ordered_index);
-void initDebugText();
+void initOnScreenDebugText();
 
 void setDebugTextDisplay(bool setOn);
 bool getDebugTextDisplay();

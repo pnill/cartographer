@@ -44,24 +44,19 @@ void KeyboardInput::ToggleKeyboardInput()
 		//Allows to repeat last movement when lose focus in mp, unlocks METHOD E from point after intro vid
 		BYTE getFocusB[] = { 0x00 };
 		WriteBytes(H2BaseAddr + 0x2E3C5, getFocusB, 1);
+
 		//Allows input when not in focus.
 		BYTE getFocusE[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
 		WriteBytes(H2BaseAddr + 0x2F9EA, getFocusE, 6);
 		WriteBytes(H2BaseAddr + 0x2F9FC, getFocusE, 6);
 		WriteBytes(H2BaseAddr + 0x2FA09, getFocusE, 6);
-		//Disables the keyboard only when in-game and not in a menu.
-		BYTE disableKeyboard1[] = { 0x90, 0x90, 0x90 };
-		WriteBytes(H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
-		BYTE disableKeyboard2[] = { 0x00 };
-		WriteBytes(H2BaseAddr + 0x2FA92, disableKeyboard2, 1);
-		BYTE disableKeyboard3[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-		WriteBytes(H2BaseAddr + 0x2FA67, disableKeyboard3, 6);
 	}
 	else {
 		//Reset them all back.
 		BYTE getFocusB[] = { 0x01 };
 		WriteBytes(H2BaseAddr + 0x2E3C5, getFocusB, 1);
 
+		//dont allow input when not in focus.
 		BYTE getFocusE[] = { 0x0F, 0x85, 0x02, 0x02, 0x00, 0x00 };
 		WriteBytes(H2BaseAddr + 0x2F9EA, getFocusE, 6);
 		getFocusE[2] = 0xF0;
@@ -69,12 +64,6 @@ void KeyboardInput::ToggleKeyboardInput()
 		WriteBytes(H2BaseAddr + 0x2F9FC, getFocusE, 6);
 		getFocusE[2] = 0xE3;
 		WriteBytes(H2BaseAddr + 0x2FA09, getFocusE, 6);
-
-		BYTE disableKeyboard1[] = { 0x56, 0xFF, 0xD3 };
-		WriteBytes(H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
-		BYTE disableKeyboard2[] = { 0x01 };
-		WriteBytes(H2BaseAddr + 0x2FA92, disableKeyboard2, 1);
-		WriteBytes(H2BaseAddr + 0x2FA67, enableKeyboard3, 6);
 	}
 }
 std::map<int*, std::function<void()>> hotKeyMap;
@@ -107,26 +96,12 @@ void KeyboardInput::ExecuteHotkey(WPARAM message)
 void hotkeyFuncHelp() {
 	addDebugText("------------------------------");
 	addDebugText("Options:");
-	char tempTextEntry[255];
-
-	snprintf(tempTextEntry, 255, "%s - Toggle hiding this text display.", GetVKeyCodeString(H2Config_hotkeyIdToggleDebug).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Print and show this help text.", GetVKeyCodeString(H2Config_hotkeyIdHelp).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Align/Correct window positioning (into Borderless).", GetVKeyCodeString(H2Config_hotkeyIdAlignWindow).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Toggle Windowed/Borderless mode.", GetVKeyCodeString(H2Config_hotkeyIdWindowMode).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Toggles hiding the in-game chat menu.", GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat).c_str());
-	addDebugText(tempTextEntry);
-
-	snprintf(tempTextEntry, 255, "%s - Toggles hiding the Console Menu.", GetVKeyCodeString(H2Config_hotkeyIdConsole).c_str());
-	addDebugText(tempTextEntry);
-
+	addDebugText("%s - Toggle hiding this text display.", GetVKeyCodeString(H2Config_hotkeyIdToggleDebug).c_str());
+	addDebugText("%s - Print and show this help text.", GetVKeyCodeString(H2Config_hotkeyIdHelp).c_str());
+	addDebugText("%s - Align/Correct window positioning (into Borderless).", GetVKeyCodeString(H2Config_hotkeyIdAlignWindow).c_str());
+	addDebugText("%s - Toggle Windowed/Borderless mode.", GetVKeyCodeString(H2Config_hotkeyIdWindowMode).c_str());
+	addDebugText("%s - Toggles hiding the in-game chat menu.", GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat).c_str());
+	addDebugText("%s - Toggles hiding the Console Menu.", GetVKeyCodeString(H2Config_hotkeyIdConsole).c_str());
 	addDebugText("------------------------------");
 	setDebugTextDisplay(true);
 }

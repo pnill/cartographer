@@ -90,9 +90,7 @@ int DownloadFile(const char* url, wchar_t* local_full_path) {
 		EnsureDirectoryExists(local_full_path);
 		fp = _wfopen(local_full_path, L"wb");
 		if (!fp) {
-			addDebugText("Failed to obtain FILE* for DL from: to: ");
-			addDebugText(url);
-			addDebugText(local_full_path);
+			addDebugText("Failed to obtain FILE* for DL from: %s to: %s", url, local_full_path);
 			return 2;
 		}
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
@@ -242,14 +240,11 @@ static int interpretUpdateEntry(char* fileLine, char* version, int lineNumber) {
 		}
 
 		if (unrecognised || duplicated || incorrect) {
-			char textDebugBuffer[60];
 			if (duplicated) {
-				snprintf(textDebugBuffer, 60, "ERROR: Duplicated update file on Line: %d", lineNumber);
-				addDebugText(textDebugBuffer);
+				addDebugText("ERROR: Duplicated update file on Line: %d", lineNumber);
 			}
 			else if (incorrect) {
-				snprintf(textDebugBuffer, 60, "ERROR: Incorrect update file on Line: %d", lineNumber);
-				addDebugText(textDebugBuffer);
+				addDebugText("ERROR: Incorrect update file on Line: %d", lineNumber);
 			}
 		}
 	}
