@@ -21,7 +21,6 @@ int getDebugTextDisplayCount() {
 }
 
 void addDebugTextInternal(char* text) {
-	std::lock_guard<std::mutex> lg(addTextMutex);
 
 	if (!initialisedDebugText) return;
 
@@ -32,28 +31,32 @@ void addDebugTextInternal(char* text) {
 		lenInput = endChar - text;
 	}
 
-	int _DebugTextCount = DebugTextCount;
-	_DebugTextCount++;
-	if (_DebugTextCount >= DebugTextArrayLenMax)
-		_DebugTextCount = DebugTextArrayLenMax;
+	{
+		std::lock_guard<std::mutex> lg(addTextMutex);
 
-	int _DebugTextArrayPos = DebugTextArrayPos;
-	_DebugTextArrayPos++;
-	if (_DebugTextArrayPos >= DebugTextArrayLenMax)
-		_DebugTextArrayPos = 0;
+		int _DebugTextCount = DebugTextCount;
+		_DebugTextCount++;
+		if (_DebugTextCount >= DebugTextArrayLenMax)
+			_DebugTextCount = DebugTextArrayLenMax;
 
-	if (DebugStr[_DebugTextArrayPos])
-		free(DebugStr[_DebugTextArrayPos]);
+		int _DebugTextArrayPos = DebugTextArrayPos;
+		_DebugTextArrayPos++;
+		if (_DebugTextArrayPos >= DebugTextArrayLenMax)
+			_DebugTextArrayPos = 0;
 
-	DebugStr[_DebugTextArrayPos] = (char*)calloc(lenInput + 1, sizeof(char));
-	strncpy(DebugStr[_DebugTextArrayPos], text, lenInput);
+		if (DebugStr[_DebugTextArrayPos])
+			free(DebugStr[_DebugTextArrayPos]);
 
-	onscreendebug_log->debug(text);
+		DebugStr[_DebugTextArrayPos] = (char*)calloc(lenInput + 1, sizeof(char));
+		strncpy(DebugStr[_DebugTextArrayPos], text, lenInput);
 
-	// set global counters just after we added the text
-	DebugTextCount = _DebugTextCount;
-	DebugTextArrayPos = _DebugTextArrayPos;
+		onscreendebug_log->debug(text);
 
+		// set global counters just after we added the text
+		DebugTextCount = _DebugTextCount;
+		DebugTextArrayPos = _DebugTextArrayPos;
+	}
+	
 	if (endChar) {
 		return addDebugTextInternal(endChar + 1);
 	}
