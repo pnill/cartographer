@@ -686,14 +686,18 @@ void ReadH2Config() {
 			H2Config_debug_log_console = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "debug_log_console", H2Config_debug_log_console);
 
 			const char* ip_wan = ini.GetValue(H2ConfigVersionSection.c_str(), "wan_ip");
-			if (ip_wan)
+			if (ip_wan
+				&& strnlen_s(ip_wan, 15) >= 7
+				&& inet_addr(ip_wan) != INADDR_NONE)
 			{
 				strncpy(H2Config_str_wan, ip_wan, 15);
 				H2Config_ip_lan = inet_addr(H2Config_str_wan);
 			}
 
 			const char* ip_lan = ini.GetValue(H2ConfigVersionSection.c_str(), "lan_ip");
-			if (ip_lan)
+			if (ip_lan
+				&& strnlen_s(ip_lan, 15) >= 7
+				&& inet_addr(ip_lan) != INADDR_NONE)
 			{
 				strncpy(H2Config_str_lan, ip_lan, 15);
 				H2Config_ip_lan = inet_addr(H2Config_str_lan);
