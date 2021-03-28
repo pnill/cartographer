@@ -6,7 +6,7 @@
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 
-#include "XLive\xnet\sock_utils.h"
+#include "XLive\xnet\net_utils.h"
 
 #include "..\IpManagement\XnIp.h"
 

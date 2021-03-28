@@ -8,6 +8,10 @@
 
 #include "H2MOD\Modules\Startup\Startup.h"
 
+#include "..\NIC.h"
+
+#include "..\net_utils.h"
+
 CXnIp gXnIp;
 XECRYPT_RC4_STATE Rc4StateRand;
 
@@ -783,8 +787,27 @@ void CXnIp::SendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXni
 void CXnIp::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, const char* abEnet, const char* abOnline)
 {
 	SecureZeroMemory(&ipLocal, sizeof(ipLocal));
-	
-	ipLocal.xnaddr.ina.s_addr = lanaddr;
+
+	ipLocal.xnaddr.ina = CNic::GetBestInterfaceRouteAddressFromIp("0.0.0.0"); // pass INADDR_ANY
+
+	if (Ipv4AddressIsReservedOrLocalhost(ipLocal.xnaddr.ina))
+	{
+		LOG_TRACE_NETWORK("{} - IP address is private - {}", __FUNCTION__, inet_ntoa(ipLocal.xnaddr.ina));
+	}
+	else
+	{
+		// fall back to localhost if what GetBestIpToIpRoute found is not a private/local host ip address (maybe we are not under a NAT gateway)
+		LOG_TRACE_NETWORK("{} - GetBestIpToIpRoute() returned public IP address, maybe we are not under a NAT device, fall back to localhost IP address!", __FUNCTION__);
+		ipLocal.xnaddr.ina.s_addr = inet_addr("127.0.0.1");
+	}
+
+	// override what GetBestIpToIpRoute found if lanaddr is different than 0
+	if (lanaddr != 0)
+	{
+		ipLocal.xnaddr.ina.s_addr = lanaddr; // check if the lanaddr is specified already
+		LOG_TRACE_NETWORK("{} - lanaddr already specified: {}", __FUNCTION__, inet_ntoa(ipLocal.xnaddr.ina));
+	}
+
 	ipLocal.xnaddr.inaOnline.s_addr = xnaddr;
 	ipLocal.xnaddr.wPortOnline = htons(H2Config_base_port);
 	HexStrToBytes(std::string(abEnet, sizeof(XNADDR::abEnet) * 2), ipLocal.xnaddr.abEnet, sizeof(XNADDR::abEnet));
