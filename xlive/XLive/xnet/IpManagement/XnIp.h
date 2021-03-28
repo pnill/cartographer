@@ -11,7 +11,7 @@ extern h2log* critical_network_errors_log;
 // TODO: disable if all network problems are addressed
 #undef LOG_CRITICAL_NETWORK
 
-#define LOG_CRITICAL_NETWORK(msg, ...)   LOG_CRITICAL  (network_log != nullptr ? network_log : critical_network_errors_log, msg, __VA_ARGS__)
+#define LOG_CRITICAL_NETWORK(msg, ...)   LOG_CRITICAL  ((network_log != nullptr ? network_log : critical_network_errors_log), msg, __VA_ARGS__)
 
 const char requestStrHdr[MAX_HDR_STR] = "XNetBrOadPack";
 const char broadcastStrHdr[MAX_HDR_STR] = "XNetReqPack";
