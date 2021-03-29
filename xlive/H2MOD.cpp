@@ -1650,12 +1650,12 @@ void H2MOD::ApplyHooks() {
 	//on_custom_map_change_method = (on_custom_map_change)DetourFunc(Memory::GetAddress<BYTE*>(0x32176, 0x25738), (BYTE*)onCustomMapChange, 5);
 
 	// disable part of custom map tag verification
-	NopFill(GetAddress(0x4FA0A, 0x56C0A), 6);
+	NopFill(Memory::GetAddress(0x4FA0A, 0x56C0A), 6);
 
 	// disables profiles/game saves encryption
-	PatchWinAPICall(GetAddress(0x9B08A, 0x85F5E), CryptProtectDataHook);
-	PatchWinAPICall(GetAddress(0x9AF9E, 0x352538), CryptUnprotectDataHook);
-	PatchCall(GetAddress(0x9B09F, 0x85F73), filo_write__encrypted_data_hook);
+	PatchWinAPICall(Memory::GetAddress(0x9B08A, 0x85F5E), CryptProtectDataHook);
+	PatchWinAPICall(Memory::GetAddress(0x9AF9E, 0x352538), CryptUnprotectDataHook);
+	PatchCall(Memory::GetAddress(0x9B09F, 0x85F73), filo_write__encrypted_data_hook);
 
 	ApplyUnitHooks();
 	mapManager->applyHooks();
@@ -1708,26 +1708,26 @@ void H2MOD::ApplyHooks() {
 		p_change_local_team = (change_team)DetourFunc(Memory::GetAddress<BYTE*>(0x2068F2), (BYTE*)changeTeam, 8);
 
 		// hook the print command to redirect the output to our console
-		PatchCall(GetAddress(0xE9E50), print_to_console);
+		PatchCall(Memory::GetAddress(0xE9E50), print_to_console);
 
-		calculate_model_lod = GetAddress(0x19CA3E);
-		calculate_model_lod_detour_end = GetAddress(0x19CDA3 + 5);
-		WriteJmpTo(GetAddress(0x19CDA3), calculate_model_lod_detour);
+		calculate_model_lod = Memory::GetAddress(0x19CA3E);
+		calculate_model_lod_detour_end = Memory::GetAddress(0x19CDA3 + 5);
+		WriteJmpTo(Memory::GetAddress(0x19CDA3), calculate_model_lod_detour);
 
 		// set max model quality to L6
-		WriteValue(GetAddress(0x190B38 + 1), 5);
+		WriteValue(Memory::GetAddress(0x190B38 + 1), 5);
 
 		pfn_c000bd114 = (tfn_c000bd114)DetourFunc(Memory::GetAddress<BYTE*>(0xbd114), (BYTE*)fn_c000bd114_IsSkullEnabled, 5);
 
-		PatchCall(GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);
-		PatchCall(GetAddress(0x92C05), BansheeBombIsEngineMPCheck);
-		PatchCall(GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
+		PatchCall(Memory::GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);
+		PatchCall(Memory::GetAddress(0x92C05), BansheeBombIsEngineMPCheck);
+		PatchCall(Memory::GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
 		PatchCall(Memory::GetAddress(0x226702), game_mode_engine_draw_team_indicators);
 
 		//Initialise_tag_loader();
 		PlayerControl::ApplyHooks();
-		c_set_screen_bounds = GetAddress<p_set_screen_bounds*>(0x264979);
+		c_set_screen_bounds = Memory::GetAddress<p_set_screen_bounds*>(0x264979);
 		//PatchCall(GetAddress(0x25E1E5), set_screen_bounds);
 		
 	}
@@ -1735,7 +1735,7 @@ void H2MOD::ApplyHooks() {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
 		p_StartCountdownTimer = Memory::GetAddress<startCountdownTimer>(0, 0x19718A);
-		PatchCall(GetAddress(0, 0xBF54), StartCountdownTimer);
+		PatchCall(Memory::GetAddress(0, 0xBF54), StartCountdownTimer);
 		ServerConsole::ApplyHooks();
 
 		p_get_enabled_teams_flags = (get_enabled_teams_flags_def)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x19698B), (BYTE*)get_enabled_teams_flags, 6);
@@ -1775,7 +1775,7 @@ void H2MOD::Initialize()
 	MapSlots::Initialize();
 	HaloScript::Initialize();
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
-	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
+	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", Memory::baseAddress);
 	//WriteValue(GetAddress(0xC25EA + 8), 100);
 	h2mod->ApplyHooks();
 	h2mod->RegisterEvents();

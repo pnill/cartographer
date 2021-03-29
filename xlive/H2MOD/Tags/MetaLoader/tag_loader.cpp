@@ -783,8 +783,8 @@ namespace tag_loader
 	}
 	void Load_RAW_refs(datum datum_index, HANDLE file)
 	{
-		DWORD* PMapRawtableoffset = (DWORD*)(h2mod->GetBase() + 0x4AE8B0);
-		DWORD* PRawTableSize = (DWORD*)(h2mod->GetBase() + 0x4AE8B4);
+		DWORD* PMapRawtableoffset = (DWORD*)(Memory::baseAddress + 0x4AE8B0);
+		DWORD* PRawTableSize = (DWORD*)(Memory::baseAddress + 0x4AE8B4);
 
 		//a little  precaution to circumvent unexpected behaviour
 		DWORD oldRtable_offset = *PMapRawtableoffset;
@@ -794,8 +794,8 @@ namespace tag_loader
 		*PMapRawtableoffset = 0x0;
 		*PRawTableSize = 0x0;
 
-		DWORD ETCOFFSET = *(DWORD*)(h2mod->GetBase() + 0x482290);
-		HANDLE old_file_handle = *(HANDLE*)(h2mod->GetBase() + 0x4AE8A8);
+		DWORD ETCOFFSET = *(DWORD*)(Memory::baseAddress + 0x482290);
+		HANDLE old_file_handle = *(HANDLE*)(Memory::baseAddress + 0x4AE8A8);
 
 
 		tags::tag_instance* tag_info = &new_Tables[datum_index.ToAbsoluteIndex()];
@@ -809,7 +809,7 @@ namespace tag_loader
 			throw new std::exception(error.c_str());
 		}
 
-		*(HANDLE*)(h2mod->GetBase() + 0x4AE8A8) = file;
+		*(HANDLE*)(Memory::baseAddress + 0x4AE8A8) = file;
 
 		switch (tag_info->type.as_int())
 		{
@@ -863,7 +863,7 @@ namespace tag_loader
 		default:
 			break;
 		}
-		*(HANDLE*)(h2mod->GetBase() + 0x4AE8A8) = old_file_handle;
+		*(HANDLE*)(Memory::baseAddress + 0x4AE8A8) = old_file_handle;
 
 		*PMapRawtableoffset = oldRtable_offset;
 		*PRawTableSize = oldRtable_size;

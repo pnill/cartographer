@@ -7,7 +7,7 @@
 #include "..\Networking\Networking.h"
 #include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-
+#include "H2MOD/Modules/Startup/Startup.h"
 #include <Mswsock.h>
 #include <WS2tcpip.h>
 #include <curl/curl.h>
@@ -361,20 +361,14 @@ void get_map_download_source_str(int a1, wchar_t* buffer)
 	Seems to be a function responsible for loading data about maps when displaying them.
 	This is hooked to fix/re-add removed custom map images.
 */
-DWORD ret_addr;
+void* unknown_xbox_live_data1 = nullptr;
 void __declspec(naked) load_map_data_for_display() {
 	__asm {
-		pop ret_addr
-		mov eax, [esp + 0x0C] // grab map_data pointer from stack
+		mov eax, [esp + 0x10] // grab map_data pointer from stack
 		mov ecx, [eax + 0x964] // mov bitmap pointer into ecx
 		mov[ebx], ecx // mov bitmap pointer into map_data on stack
-		push 0
-		push 0x9712C8 // original data to be loaded back to eax, (replaces the original function call)
-		mov ecx, h2mod
-		call H2MOD::GetAddress // get data original function got, and return
-		push ret_addr // push return address to stack
+		mov eax, unknown_xbox_live_data1
 		ret // return to original load_map_data_for display function
-
 	}
 }
 /**
@@ -397,6 +391,7 @@ void MapManager::applyHooks() {
 		PatchCall(Memory::GetAddress(0x244B9D), get_receiving_map_string);
 		//Hooked to fix custom map images.
 		Codecave(Memory::GetAddress(0x593F0), load_map_data_for_display, 0);
+		unknown_xbox_live_data1 = Memory::GetAddress<void*>(0x9712C8);
 	}
 
 	// Both server and client
