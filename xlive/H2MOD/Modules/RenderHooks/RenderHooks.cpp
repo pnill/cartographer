@@ -144,7 +144,7 @@ namespace RenderHooks
 			oWidth = 128;
 			oHeight = 128;
 		}
-		LOG_TRACE_GAME(L"[Render Hooks] init_raasterizer_layer: {} {} {} {} {}", type, oWidth, oHeight, fmt, a5);
+		LOG_TRACE_GAME(L"[Render Hooks] init_rasterizer_layer: {} {} {} {} {}", type, oWidth, oHeight, fmt, a5);
 		return c_initialize_rasterizer_layer(type, oWidth, oHeight, fmt, a5);
 	}
 

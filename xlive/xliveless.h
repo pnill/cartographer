@@ -38,22 +38,22 @@ extern h2log *voice_log;
 
 // Generic logging
 // For the most unimportant stuff
-#define LOG_TRACE(logger, msg, ...)      CHECK_PTR(logger, logger->trace    (  ## msg, __VA_ARGS__))
+#define LOG_TRACE(logger, msg, ...)      CHECK_PTR((logger), (logger)->trace    (  ## msg, __VA_ARGS__))
 
 // Somewhat more useful information
-#define LOG_DEBUG(logger, msg, ...)      CHECK_PTR(logger, logger->debug    (  ## msg, __VA_ARGS__))
+#define LOG_DEBUG(logger, msg, ...)      CHECK_PTR((logger), (logger)->debug    (  ## msg, __VA_ARGS__))
 
 // Things that even users may want to see
-#define LOG_INFO(logger, msg, ...)       CHECK_PTR(logger, logger->info     (  ## msg, __VA_ARGS__))
+#define LOG_INFO(logger, msg, ...)       CHECK_PTR((logger), (logger)->info     (  ## msg, __VA_ARGS__))
 
 // A surprise to be sure, but not a serious one
-#define LOG_WARNING(logger, msg, ...)    CHECK_PTR(logger, logger->warning  (  ## msg, __VA_ARGS__))
+#define LOG_WARNING(logger, msg, ...)    CHECK_PTR((logger), (logger)->warning  (  ## msg, __VA_ARGS__))
 
 // Absolutely not good, probably game breaking events
-#define LOG_ERROR(logger, msg, ...)      CHECK_PTR(logger, logger->error    (  ## msg, __VA_ARGS__))
+#define LOG_ERROR(logger, msg, ...)      CHECK_PTR((logger), (logger)->error    (  ## msg, __VA_ARGS__))
 
 // "Wait, that's illegal" except it is definitely not a joke
-#define LOG_CRITICAL(logger, msg, ...)   CHECK_PTR(logger, logger->critical (  ## msg, __VA_ARGS__))
+#define LOG_CRITICAL(logger, msg, ...)   CHECK_PTR((logger), (logger)->critical (  ## msg, __VA_ARGS__))
 
 // Mod-specific logging
 // For the most unimportant stuff related to H2mod specifically

@@ -378,7 +378,8 @@
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="XLive\achievements\XAchievements.cpp" />
     <ClCompile Include="XLive\ServerList\ServerList.cpp" />
-    <ClCompile Include="XLive\xnet\sock_utils.cpp" />
+    <ClCompile Include="XLive\xnet\net_utils.cpp" />
+    <ClCompile Include="XLive\xnet\NIC.cpp" />
     <ClCompile Include="XLive\XNet\upnp.cpp" />
     <ClCompile Include="XLive\XNet\XNetQoS.cpp" />
     <ClCompile Include="XLive\XNet\xnet.cpp" />
@@ -644,7 +645,8 @@
     <ClInclude Include="xliveless.h" />
     <ClInclude Include="XLive\achievements\XAchievements.h" />
     <ClInclude Include="XLive\ServerList\ServerList.h" />
-    <ClInclude Include="XLive\xnet\sock_utils.h" />
+    <ClInclude Include="XLive\xnet\NIC.h" />
+    <ClInclude Include="XLive\xnet\net_utils.h" />
     <ClInclude Include="XLive\XNet\upnp.h" />
     <ClInclude Include="XLive\XNet\XNetQoS.h" />
     <ClInclude Include="XLive\XNet\xnet.h" />
