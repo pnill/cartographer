@@ -15,7 +15,7 @@ char g_network_message_types[e_network_message_types::end * 32];
 void register_packet_impl(void *packetObject, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
 {
 	typedef void(__thiscall* register_packet_type)(void *, int, char*, int, int, int, void*, void*, void*);
-	auto register_packet = reinterpret_cast<register_packet_type>(h2mod->GetAddress(0x1E81D6, 0x1CA199));
+	auto register_packet = reinterpret_cast<register_packet_type>(Memory::GetAddress(0x1E81D6, 0x1CA199));
 	return register_packet(packetObject, type, name, a4, size1, size2, write_packet_method, read_packet_method, unk_callback);
 }
 
@@ -78,7 +78,7 @@ bool __cdecl decode_anti_cheat_packet(bitstream* stream, int a2, s_anti_cheat* d
 void register_custom_packets(void* network_messages)
 {
 	typedef void(__cdecl* register_test_packet)(void* network_messages);
-	auto p_register_test_packet = h2mod->GetAddress<register_test_packet>(0x1ECE05, 0x1CD7BE);
+	auto p_register_test_packet = Memory::GetAddress<register_test_packet>(0x1ECE05, 0x1CD7BE);
 
 	p_register_test_packet(network_messages);
 
@@ -435,13 +435,13 @@ void CustomPackets::sendAntiCheat(int peerIndex)
 
 void CustomPackets::ApplyGamePatches()
 {
-	WritePointer(h2mod->GetAddress(0x1AC733, 0x1AC901), g_network_message_types);
-	WritePointer(h2mod->GetAddress(0x1AC8F8, 0x1ACAC6), g_network_message_types);
-	WriteValue<BYTE>(h2mod->GetAddress(0x1E825E, 0x1CA221), e_network_message_types::end);
-	WriteValue<int>(h2mod->GetAddress(0x1E81C6, 0x1CA189), e_network_message_types::end * 32);
+	WritePointer(Memory::GetAddress(0x1AC733, 0x1AC901), g_network_message_types);
+	WritePointer(Memory::GetAddress(0x1AC8F8, 0x1ACAC6), g_network_message_types);
+	WriteValue<BYTE>(Memory::GetAddress(0x1E825E, 0x1CA221), e_network_message_types::end);
+	WriteValue<int>(Memory::GetAddress(0x1E81C6, 0x1CA189), e_network_message_types::end * 32);
 
-	PatchCall(h2mod->GetAddress(0x1B5196, 0x1A8EF4), register_custom_packets);
+	PatchCall(Memory::GetAddress(0x1B5196, 0x1A8EF4), register_custom_packets);
 
-	p_handle_out_of_band_message = (handle_out_of_band_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E907B, 0x1CB03B), (BYTE*)handle_out_of_band_message_hook, 8);
-	p_handle_channel_message = (handle_channel_message)DetourClassFunc(h2mod->GetAddress<BYTE*>(0x1E929C, 0x1CB25C), (BYTE*)handle_channel_message_hook, 8);
+	p_handle_out_of_band_message = (handle_out_of_band_message)DetourClassFunc(Memory::GetAddress<BYTE*>(0x1E907B, 0x1CB03B), (BYTE*)handle_out_of_band_message_hook, 8);
+	p_handle_channel_message = (handle_channel_message)DetourClassFunc(Memory::GetAddress<BYTE*>(0x1E929C, 0x1CB25C), (BYTE*)handle_channel_message_hook, 8);
 }

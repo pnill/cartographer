@@ -182,7 +182,7 @@ namespace MapSlots
 		{
 			if (i + FIRSTUNUSEDSLOT < MAXSLOTS) {
 				LOG_TRACE_GAME(L"[Map Slots]: store_mutliplayer_level_data Adding {}", newSlot.english_name.Text);
-				auto slotAddr = h2mod->GetAddress(0, StaticLevelData) + (MULTIPLAYER_SIZE * (FIRSTUNUSEDSLOT + i));
+				auto slotAddr = Memory::GetAddress(0, StaticLevelData) + (MULTIPLAYER_SIZE * (FIRSTUNUSEDSLOT + i));
 				DWORD dwBack[2];
 				VirtualProtect(reinterpret_cast<LPVOID>(slotAddr), 3172, PAGE_EXECUTE_READWRITE, &dwBack[0]);
 				auto slot = reinterpret_cast<s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block*>(slotAddr);
@@ -211,11 +211,11 @@ namespace MapSlots
 
 	void ApplyHooks()
 	{
-		MapSlotCount = h2mod->GetAddress<int*>(0, 0x41950C);
-		//c_store_multiplayer_level_data = h2mod->GetAddress<p_store_multiplayer_level_data*>(0, 0x6A22);
-		sub_map_slot = h2mod->GetAddress<p_sub_map_slot*>(0, 0x3C8C3);
-		//PatchCall(h2mod->GetAddress(0, 0xBBAE), store_multiplayer_level_data);
-		PatchCall(h2mod->GetAddress(0, 0x6ACC), store_multiplayer_level_data);
+		MapSlotCount = Memory::GetAddress<int*>(0, 0x41950C);
+		//c_store_multiplayer_level_data = Memory::GetAddress<p_store_multiplayer_level_data*>(0, 0x6A22);
+		sub_map_slot = Memory::GetAddress<p_sub_map_slot*>(0, 0x3C8C3);
+		//PatchCall(Memory::GetAddress(0, 0xBBAE), store_multiplayer_level_data);
+		PatchCall(Memory::GetAddress(0, 0x6ACC), store_multiplayer_level_data);
 	}
 
 	void Initialize()

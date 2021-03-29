@@ -22,32 +22,32 @@ int compare(void* context, const void* a1, const void* a2)
 void CustomResolution::Initialize()
 {
 	// copy default settings
-	memcpy(video_options, h2mod->GetAddress<s_display_res*>(0x4680C0), sizeof(s_display_res) * DEFAULT_TOTAL_RESOLUTIONS); // 11 by default
+	memcpy(video_options, Memory::GetAddress<s_display_res*>(0x4680C0), sizeof(s_display_res) * DEFAULT_TOTAL_RESOLUTIONS); // 11 by default
 
-	WritePointer(h2mod->GetAddress(0x263A53), video_options);
-	WritePointer(h2mod->GetAddress(0x263A5E), &video_options[0].res_y);
+	WritePointer(Memory::GetAddress(0x263A53), video_options);
+	WritePointer(Memory::GetAddress(0x263A5E), &video_options[0].res_y);
 
-	WritePointer(h2mod->GetAddress(0x263C7C), video_options);
-	WritePointer(h2mod->GetAddress(0x263C84), &video_options[0].res_y);
-	WritePointer(h2mod->GetAddress(0x263CA1), &video_options[0].unk);
-
-
-	WritePointer(h2mod->GetAddress(0x26443B), video_options);
-	WritePointer(h2mod->GetAddress(0x264414), &video_options[0].res_y);
-
-	WritePointer(h2mod->GetAddress(0x263C25), video_options);
-	WritePointer(h2mod->GetAddress(0x263C55), &video_options[0].res_y);
-
-	WritePointer(h2mod->GetAddress(0x264375), video_options);
-	WritePointer(h2mod->GetAddress(0x26439F), &video_options[0].res_y);
+	WritePointer(Memory::GetAddress(0x263C7C), video_options);
+	WritePointer(Memory::GetAddress(0x263C84), &video_options[0].res_y);
+	WritePointer(Memory::GetAddress(0x263CA1), &video_options[0].unk);
 
 
-	WriteValue(h2mod->GetAddress(0x264333), TOTAL_RESOLUTIONS - 1); // last index of the array
-	WritePointer(h2mod->GetAddress(0x26434F), &video_options[0].res_y);
-	WritePointer(h2mod->GetAddress(0x264338), &video_options[TOTAL_RESOLUTIONS - 1].res_y);
+	WritePointer(Memory::GetAddress(0x26443B), video_options);
+	WritePointer(Memory::GetAddress(0x264414), &video_options[0].res_y);
 
-	WriteValue(h2mod->GetAddress(0x263A69), sizeof(s_display_res) * TOTAL_RESOLUTIONS);
-	WriteValue(h2mod->GetAddress(0x263C92), sizeof(s_display_res) * TOTAL_RESOLUTIONS);
+	WritePointer(Memory::GetAddress(0x263C25), video_options);
+	WritePointer(Memory::GetAddress(0x263C55), &video_options[0].res_y);
+
+	WritePointer(Memory::GetAddress(0x264375), video_options);
+	WritePointer(Memory::GetAddress(0x26439F), &video_options[0].res_y);
+
+
+	WriteValue(Memory::GetAddress(0x264333), TOTAL_RESOLUTIONS - 1); // last index of the array
+	WritePointer(Memory::GetAddress(0x26434F), &video_options[0].res_y);
+	WritePointer(Memory::GetAddress(0x264338), &video_options[TOTAL_RESOLUTIONS - 1].res_y);
+
+	WriteValue(Memory::GetAddress(0x263A69), sizeof(s_display_res) * TOTAL_RESOLUTIONS);
+	WriteValue(Memory::GetAddress(0x263C92), sizeof(s_display_res) * TOTAL_RESOLUTIONS);
 
 	WriteValue<DWORD>(Memory::GetAddress(0x263BEA) + 1, TOTAL_RESOLUTIONS);
 

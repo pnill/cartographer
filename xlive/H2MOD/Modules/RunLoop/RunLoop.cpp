@@ -256,7 +256,7 @@ extern bool b_XboxTick;
 bool __cdecl cinematic_in_progress_hook()
 {
 	typedef bool(__cdecl* cinematic_in_progress)();
-	auto p_cinematic_in_progress = h2mod->GetAddress<cinematic_in_progress>(0x3A938);
+	auto p_cinematic_in_progress = Memory::GetAddress<cinematic_in_progress>(0x3A938);
 
 	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
 	if (H2Config_experimental_game_main_loop_patches) // if we are using the original game rendering mode
@@ -266,7 +266,7 @@ bool __cdecl cinematic_in_progress_hook()
 	{
 	case e_render_old:
 		if (!p_cinematic_in_progress())
-			*h2mod->GetAddress<bool*>(0x48225B) = false;
+			*Memory::GetAddress<bool*>(0x48225B) = false;
 
 		// TODO: get_game_life_cycle is only used with networked sessions, meaning this will not work in single player
 		// and i keep it this way because the EventHandler in UncappedFPS2.cpp uses the game's life cycle as well
@@ -274,7 +274,7 @@ bool __cdecl cinematic_in_progress_hook()
 
 	case e_render_none:
 		if (!p_cinematic_in_progress())
-			*h2mod->GetAddress<bool*>(0x48225B) = false;
+			*Memory::GetAddress<bool*>(0x48225B) = false;
 	case e_render_new:
 	default:
 		return p_cinematic_in_progress() || b_XboxTick || call_is_game_minimized();
@@ -535,7 +535,7 @@ void __cdecl game_main_loop()
 				v0 = system_milliseconds();
 				present_rendered_screen();
 				v8 = system_milliseconds() - v0;
-				//DWORD* init_flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
+				//DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
 				//if (init_flags_array[2] == 0)
 				//	render_audio();
 				if (*sound_impulse_called)
@@ -569,7 +569,7 @@ void alt_main_game_loop_hook()
 		if (!QuitGSMainLoop)
 			GSMainLoop();
 		init = true;
-		DWORD* init_flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
+		DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
 		if (init_flags_array[2] == 0)
 			render_audio();
 		if(game_in_simulation())
@@ -643,60 +643,60 @@ void initGSRunLoop() {
 				sub_B09783 = (void(*)())((char*)H2BaseAddr + 0x39783);
 				sub_B727EB = (void(*)())((char*)H2BaseAddr + 0xA27EB);
 
-				sub_C7E7C5 = h2mod->GetAddress<p_sub_C7E7C5*>(0x1AE7C5);
-				sub_B328A8 = h2mod->GetAddress<p_sub_B328A8*>(0x628A8);
-				sub_B5DD5C = h2mod->GetAddress<p_sub_B5DD5C*>(0x8DD5C);
-				sub_B16834 = h2mod->GetAddress<p_sub_B16834*>(0x46834);
-				sub_B1BA65 = h2mod->GetAddress<p_sub_B1BA65*>(0x4BA65);
-				sub_B361EC = h2mod->GetAddress<p_sub_B361EC*>(0x661EC);
-				sub_AF87A1 = h2mod->GetAddress<p_sub_AF87A1*>(0x287A1);
-				sub_AD985E = h2mod->GetAddress<p_sub_AD985E*>(0x985E);
-				sub_B4BFD1 = h2mod->GetAddress<p_sub_B4BFD1*>(0x7BFD1);
-				sub_9A96B1 = h2mod->GetAddress<p_sub_9A96B1*>(0x396B1);
-				sub_CDCA7D = h2mod->GetAddress<p_sub_B7CA7D*>(0x20CA7D);
-				sub_AF8716 = h2mod->GetAddress<p_sub_AF8716*>(0x28716);
-				sub_B1D31F = h2mod->GetAddress<p_sub_B1D31F*>(0x4D31F);
+				sub_C7E7C5 = Memory::GetAddress<p_sub_C7E7C5*>(0x1AE7C5);
+				sub_B328A8 = Memory::GetAddress<p_sub_B328A8*>(0x628A8);
+				sub_B5DD5C = Memory::GetAddress<p_sub_B5DD5C*>(0x8DD5C);
+				sub_B16834 = Memory::GetAddress<p_sub_B16834*>(0x46834);
+				sub_B1BA65 = Memory::GetAddress<p_sub_B1BA65*>(0x4BA65);
+				sub_B361EC = Memory::GetAddress<p_sub_B361EC*>(0x661EC);
+				sub_AF87A1 = Memory::GetAddress<p_sub_AF87A1*>(0x287A1);
+				sub_AD985E = Memory::GetAddress<p_sub_AD985E*>(0x985E);
+				sub_B4BFD1 = Memory::GetAddress<p_sub_B4BFD1*>(0x7BFD1);
+				sub_9A96B1 = Memory::GetAddress<p_sub_9A96B1*>(0x396B1);
+				sub_CDCA7D = Memory::GetAddress<p_sub_B7CA7D*>(0x20CA7D);
+				sub_AF8716 = Memory::GetAddress<p_sub_AF8716*>(0x28716);
+				sub_B1D31F = Memory::GetAddress<p_sub_B1D31F*>(0x4D31F);
 
 				vibrations_clear = (void(*)())((char*)H2BaseAddr + 0x901B8);
 				game_network_dispatcher = (void(*)())((char*)H2BaseAddr + 0x1B5456);
-				restart_game_loop = h2mod->GetAddress<p_restart_game_loop*>(0x286E1);
-				game_time_globals_prep = h2mod->GetAddress<p_game_time_globals_prep*>(0x7C1BF);
-				present_rendered_screen = h2mod->GetAddress<p_present_rendered_screen*>(0x27002A);
-				game_in_simulation = h2mod->GetAddress<p_game_in_simulation*>(0x1ADD30);
-				game_freeze = h2mod->GetAddress<p_game_freeze*>(0x145B);
-				game_minimized = h2mod->GetAddress<p_game_minimized*>(0x28729);
-				render_audio = h2mod->GetAddress<p_render_audio*>(0x2DF87);
-				system_milliseconds = h2mod->GetAddress<p_system_milliseconds*>(0x37E51);
-				cinematic_in_progress = h2mod->GetAddress<c_cinematic_in_progress*>(0x3a928);
-				cinematic_is_running = h2mod->GetAddress<c_cinematic_is_running*>(0x3a938);
-				observer_update = h2mod->GetAddress<p_observer_update*>(0x83E6A);
-				local_players_update_and_send_synchronous_actions = h2mod->GetAddress<p_local_players_update_and_send_synchronous_actions*>(0x93857);
-				simulation_update = h2mod->GetAddress<p_simulation_update*>(0x4A5D0);
-				game_effects_update = h2mod->GetAddress<p_game_effects_update*>(0x48CDC);
-				director_update = h2mod->GetAddress<p_director_update*>(0x5A658);
-				p_main_time_update = h2mod->GetAddress<main_game_time_system_update*>(0x28814);
+				restart_game_loop = Memory::GetAddress<p_restart_game_loop*>(0x286E1);
+				game_time_globals_prep = Memory::GetAddress<p_game_time_globals_prep*>(0x7C1BF);
+				present_rendered_screen = Memory::GetAddress<p_present_rendered_screen*>(0x27002A);
+				game_in_simulation = Memory::GetAddress<p_game_in_simulation*>(0x1ADD30);
+				game_freeze = Memory::GetAddress<p_game_freeze*>(0x145B);
+				game_minimized = Memory::GetAddress<p_game_minimized*>(0x28729);
+				render_audio = Memory::GetAddress<p_render_audio*>(0x2DF87);
+				system_milliseconds = Memory::GetAddress<p_system_milliseconds*>(0x37E51);
+				cinematic_in_progress = Memory::GetAddress<c_cinematic_in_progress*>(0x3a928);
+				cinematic_is_running = Memory::GetAddress<c_cinematic_is_running*>(0x3a938);
+				observer_update = Memory::GetAddress<p_observer_update*>(0x83E6A);
+				local_players_update_and_send_synchronous_actions = Memory::GetAddress<p_local_players_update_and_send_synchronous_actions*>(0x93857);
+				simulation_update = Memory::GetAddress<p_simulation_update*>(0x4A5D0);
+				game_effects_update = Memory::GetAddress<p_game_effects_update*>(0x48CDC);
+				director_update = Memory::GetAddress<p_director_update*>(0x5A658);
+				p_main_time_update = Memory::GetAddress<main_game_time_system_update*>(0x28814);
 
-				dword_F52268 = h2mod->GetAddress<int*>(0x482268);
-				max_tick_count = h2mod->GetAddress<int*>(0x482264);
-				sound_impulse_unk = h2mod->GetAddress<byte*>(0x48225B);
-				sound_impulse_called = h2mod->GetAddress<byte*>(0x48225A);
-				dword_F52260 = h2mod->GetAddress<int*>(0x482260);
-				b_restart_game_loop = h2mod->GetAddress<byte*>(0x479EA0);
+				dword_F52268 = Memory::GetAddress<int*>(0x482268);
+				max_tick_count = Memory::GetAddress<int*>(0x482264);
+				sound_impulse_unk = Memory::GetAddress<byte*>(0x48225B);
+				sound_impulse_called = Memory::GetAddress<byte*>(0x48225A);
+				dword_F52260 = Memory::GetAddress<int*>(0x482260);
+				b_restart_game_loop = Memory::GetAddress<byte*>(0x479EA0);
 
-				//PatchCall(h2mod->GetAddress(0x39D04), alt_prep_time);
+				//PatchCall(Memory::GetAddress(0x39D04), alt_prep_time);
 				PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
 				//PatchCall(H2BaseAddr + 0x39e64, game_main_loop);
 				QueryPerformanceFrequency(&freq);
 				//Remove original render call
-				NopFill(h2mod->GetAddress(0x39DAA), 5);
+				NopFill(Memory::GetAddress(0x39DAA), 5);
 				//Stop Hold to Zoom.
-				NopFill(h2mod->GetAddress(0x9355C), 4);
+				NopFill(Memory::GetAddress(0x9355C), 4);
 			break;
 		}
 
 		// apply the code that fixes and determines if the amin loop should be throttled
-		PatchCall(h2mod->GetAddress(0x288B5), should_limit_framerate);
-		PatchCall(h2mod->GetAddress(0x39A2A), cinematic_in_progress_hook);
+		PatchCall(Memory::GetAddress(0x288B5), should_limit_framerate);
+		PatchCall(Memory::GetAddress(0x39A2A), cinematic_in_progress_hook);
 	}
 
 	PatchCall(Memory::GetAddressRelative(0x439E3D, 0x40BA40), main_game_time_initialize_defaults_hook);

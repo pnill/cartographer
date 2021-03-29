@@ -230,7 +230,7 @@ namespace SpecialEvents
 			{
 				if (NetworkSession::getCurrentNetworkSession()->local_peer_index != NetworkSession::getCurrentNetworkSession()->session_host_peer_index)
 				{
-					*h2mod->GetAddress<int*>(0x46DCF1) = 1;
+					*Memory::GetAddress<int*>(0x46DCF1) = 1;
 					imgui_handler::iMessageBox::SetMessage("Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\nBy going to Cartographer > Update.\r\n\r\nIf that doesn't work reach out to us in #help on discord.");
 					imgui_handler::ToggleWindow("messagebox");
 				}

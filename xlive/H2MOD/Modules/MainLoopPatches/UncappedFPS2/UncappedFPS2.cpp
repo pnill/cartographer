@@ -17,7 +17,7 @@ void UncappedFPS2::Init()
 			[]
 			{
 				gameEffectsUnknownValue = 30.f;
-				WriteBytes(h2mod->GetAddress(0x9355C), toggleZoom, 4);
+				WriteBytes(Memory::GetAddress(0x9355C), toggleZoom, 4);
 			},
 			false
 		}, false);
@@ -28,9 +28,9 @@ void UncappedFPS2::Init()
 			{
 				time_globals* timeGlobals = time_globals::get();
 				gameEffectsUnknownValue = timeGlobals->ticks_per_second;
-				WriteValue<BYTE>(h2mod->GetAddress(0x7C389), (BYTE)timeGlobals->ticks_per_second);
-				WritePointer(h2mod->GetAddress(0x104950), &gameEffectsUnknownValue);
-				NopFill(h2mod->GetAddress(0x9355C), 4);				
+				WriteValue<BYTE>(Memory::GetAddress(0x7C389), (BYTE)timeGlobals->ticks_per_second);
+				WritePointer(Memory::GetAddress(0x104950), &gameEffectsUnknownValue);
+				NopFill(Memory::GetAddress(0x9355C), 4);				
 			},
 			false
 		}, false);

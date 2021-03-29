@@ -226,7 +226,7 @@ LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
 
 void pushHostLobby() {
 	typedef bool(__cdecl* should_send_broadcast_reply)(void* session);
-	auto p_should_send_broadcast_reply = reinterpret_cast<should_send_broadcast_reply>(h2mod->GetAddress(0x1ADA7B, 0x1A69DB));
+	auto p_should_send_broadcast_reply = reinterpret_cast<should_send_broadcast_reply>(Memory::GetAddress(0x1ADA7B, 0x1A69DB));
 
 	if (p_should_send_broadcast_reply(NULL))
 	{

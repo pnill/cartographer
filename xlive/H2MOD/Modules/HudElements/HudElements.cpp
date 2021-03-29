@@ -14,7 +14,7 @@
 static bool b_showHUD = true;
 static bool b_showFirstPerson = true;
 static bool RenderIngameChat() {
-	int GameGlobals = *h2mod->GetAddress<int*>(0x482D3C);
+	int GameGlobals = *Memory::GetAddress<int*>(0x482D3C);
 	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
 
 	if (H2Config_hide_ingame_chat) {
@@ -73,7 +73,7 @@ void __cdecl render_camera_build_frustum(int a1, int a2, int a3)
 
 		*(float*)(a1 + 0x28) = ((64.f * M_PI) / 180.0f) * 0.78500003f;
 		//*(float*)(a1 + 0x28) = 0.86558843f;
-		//h2mod->GetAddress<void(__cdecl*)(int, int, int)>(0x1953F5)(a1, a2, a3);
+		//Memory::GetAddress<void(__cdecl*)(int, int, int)>(0x1953F5)(a1, a2, a3);
 		c_render_camera_build_frustum(a1, a2, a3);
 		*(float*)(a1 + 0x28) = old_flt;
 	}
@@ -152,7 +152,7 @@ void HudElements::setFOV() {
 		{
 			BYTE opcode[6] = { 0xD9, 0x05, 0x00, 0x00, 0x00, 0x00 };
 			WritePointer((DWORD)&opcode[2], &fov);
-			WriteBytes(h2mod->GetAddress(0x907F3), opcode, sizeof(opcode)); // fld dword ptr[fov]
+			WriteBytes(Memory::GetAddress(0x907F3), opcode, sizeof(opcode)); // fld dword ptr[fov]
 
 			fov_redirected = true;
 		}
@@ -170,7 +170,7 @@ void HudElements::setVehicleFOV() {
 	if (H2Config_vehicle_field_of_view > 0 && H2Config_vehicle_field_of_view <= 110)
 	{
 		float calculated_radians_FOV = (float)H2Config_vehicle_field_of_view * M_PI / 180.0f;
-		WriteValue(h2mod->GetAddress(0x413780), calculated_radians_FOV); // Third Person
+		WriteValue(Memory::GetAddress(0x413780), calculated_radians_FOV); // Third Person
 	}
 }
 
@@ -200,18 +200,18 @@ void HudElements::OnMapLoad()
 void HudElements::ApplyHooks()
 {
 	//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
-	PatchCall(h2mod->GetAddress(0x22667B), RenderIngameChat);
-	PatchCall(h2mod->GetAddress(0x226628), RenderIngameChat);
-	PatchCall(h2mod->GetAddress(0x228579), RenderFirstPersonCheck);
-	PatchCall(h2mod->GetAddress(0x223955), RenderHudCheck);
-	PatchCall(h2mod->GetAddress(0x191440), render_camera_build_frustum);
-	c_render_camera_build_frustum = h2mod->GetAddress<p_render_camera_build_frustum*>(0x1953f5);
+	PatchCall(Memory::GetAddress(0x22667B), RenderIngameChat);
+	PatchCall(Memory::GetAddress(0x226628), RenderIngameChat);
+	PatchCall(Memory::GetAddress(0x228579), RenderFirstPersonCheck);
+	PatchCall(Memory::GetAddress(0x223955), RenderHudCheck);
+	PatchCall(Memory::GetAddress(0x191440), render_camera_build_frustum);
+	c_render_camera_build_frustum = Memory::GetAddress<p_render_camera_build_frustum*>(0x1953f5);
 }
 void HudElements::Init()
 {
 	if (H2IsDediServer)
 		return;
-	SkullFlags = reinterpret_cast<skull_enabled_flags*>(h2mod->GetAddress(0x4D8320));
+	SkullFlags = reinterpret_cast<skull_enabled_flags*>(Memory::GetAddress(0x4D8320));
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdToggleHideIngameChat, 
 		[]()	{
 			H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat;

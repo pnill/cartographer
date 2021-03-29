@@ -460,7 +460,7 @@ static bool                 g_WantUpdateHasGamepad = true;
 void GUI::ToggleMenu()
 {
 	doDrawIMGUI = !doDrawIMGUI;
-	WriteValue<byte>(h2mod->GetAddress(0x9712cC), doDrawIMGUI ? 1 : 0);
+	WriteValue<byte>(Memory::GetAddress(0x9712cC), doDrawIMGUI ? 1 : 0);
 	PlayerControl::GetControls(0)->DisableCamera = doDrawIMGUI;
 	if(!doDrawIMGUI)
 		SaveH2Config();
@@ -557,9 +557,9 @@ int WINAPI XLiveRender()
 				}
 			}
 
-			DWORD GameGlobals = *h2mod->GetAddress<DWORD*>(0x482D3C, 0x4CB520);
+			DWORD GameGlobals = *Memory::GetAddress<DWORD*>(0x482D3C, 0x4CB520);
 			DWORD GameEngine = *(DWORD*)(GameGlobals + 0x8);
-			bool paused_or_in_menus = (*h2mod->GetAddress<BYTE*>(0x47A568) != 0);
+			bool paused_or_in_menus = (*Memory::GetAddress<BYTE*>(0x47A568) != 0);
 
 			if (GameEngine == 3 || (GameEngine != 3 && paused_or_in_menus)) {
 				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);

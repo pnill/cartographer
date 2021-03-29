@@ -146,10 +146,10 @@ namespace TagFixes
 		}
 		void font_table_fix()
 		{
-			WriteValue<int>(h2mod->GetAddress(0x464940), 0);
-			WriteValue<int>(h2mod->GetAddress(0x46494C), 0);
-			WriteValue<int>(h2mod->GetAddress(0x464958), 0);
-			WriteValue<int>(h2mod->GetAddress(0x464964), 0);
+			WriteValue<int>(Memory::GetAddress(0x464940), 0);
+			WriteValue<int>(Memory::GetAddress(0x46494C), 0);
+			WriteValue<int>(Memory::GetAddress(0x464958), 0);
+			WriteValue<int>(Memory::GetAddress(0x464964), 0);
 		}
 	}
 

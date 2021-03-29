@@ -11,7 +11,7 @@
 
 s_datum_array* Player::getArray()
 {
-	return *h2mod->GetAddress<s_datum_array**>(0x4A8260, 0x4D64C4);
+	return *Memory::GetAddress<s_datum_array**>(0x4A8260, 0x4D64C4);
 }
 
 bool Player::indexValid(int playerIndex)

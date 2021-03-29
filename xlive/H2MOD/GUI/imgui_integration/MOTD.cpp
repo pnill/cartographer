@@ -183,13 +183,13 @@ namespace imgui_handler
 		}
 		void Open()
 		{
-			WriteValue<byte>(h2mod->GetAddress(0x9712cC), 1);
+			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);
 			ImGuiToggleInput(true);
 			PlayerControl::GetControls(0)->DisableCamera = true;
 		}
 		void Close()
 		{
-			WriteValue<byte>(h2mod->GetAddress(0x9712cC), 0);
+			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);
 			ImGuiToggleInput(false);
 			PlayerControl::GetControls(0)->DisableCamera = false;
 		}

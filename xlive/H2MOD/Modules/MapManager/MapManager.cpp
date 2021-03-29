@@ -57,14 +57,14 @@ int downloadPercentage = 0;
 bool open_cache_header(const wchar_t *lpFileName, tags::cache_header *cache_header_ptr, HANDLE *map_handle)
 {
 	typedef char(__cdecl open_cache_header)(const wchar_t *lpFileName, tags::cache_header *lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
-	auto open_cache_header_impl = h2mod->GetAddress<open_cache_header*>(0x642D0, 0x4C327);
+	auto open_cache_header_impl = Memory::GetAddress<open_cache_header*>(0x642D0, 0x4C327);
 	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
 }
 
 void close_cache_header(HANDLE *map_handle)
 {
 	typedef void __cdecl close_cache_header(HANDLE *a1);
-	auto close_cache_header_impl = h2mod->GetAddress<close_cache_header*>(0x64C03, 0x4CC5A);
+	auto close_cache_header_impl = Memory::GetAddress<close_cache_header*>(0x64C03, 0x4CC5A);
 	close_cache_header_impl(map_handle);
 }
 
@@ -104,7 +104,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 
 	// todo move the code for loading the descriptions to our code and get rid of this
 	typedef int __cdecl validate_and_add_custom_map_interal(BYTE *a1);
-	auto validate_and_add_custom_map_interal_impl = h2mod->GetAddress<validate_and_add_custom_map_interal*>(0x4F690, 0x56890);
+	auto validate_and_add_custom_map_interal_impl = Memory::GetAddress<validate_and_add_custom_map_interal*>(0x4F690, 0x56890);
 	if (!validate_and_add_custom_map_interal_impl(a1))
 	{
 		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
@@ -144,7 +144,7 @@ signed int __cdecl get_map_load_status_for_all_peers_hook(signed int *smallest_l
 {
 	// this just gets the current network_session, but has some extra misc checks
 	typedef bool(__cdecl* get_network_session_with_misc_checks)(network_session**);
-	auto p_get_network_session_with_misc_checks = h2mod->GetAddress<get_network_session_with_misc_checks>(0x1AD782, 0x1A66FF);
+	auto p_get_network_session_with_misc_checks = Memory::GetAddress<get_network_session_with_misc_checks>(0x1AD782, 0x1A66FF);
 
 	network_session* session = nullptr;
 	int result_map_status = 0;
@@ -266,7 +266,7 @@ char __cdecl handle_map_download_callback() {
 
 	auto mapDownloadThread = []()
 	{
-		DWORD* mapDownloadStatus = h2mod->GetAddress<DWORD*>(0x422570);
+		DWORD* mapDownloadStatus = Memory::GetAddress<DWORD*>(0x422570);
 
 		// set the game to downloading map state
 		*mapDownloadStatus = -1;
@@ -324,7 +324,7 @@ char leavegame_callback()
 void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16 a4, DWORD map_download_callback, DWORD leave_game_callback, int a7, int a8, int a9, int a10)
 {
 	typedef void(__cdecl map_downloading_menu_constructor)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6, int a7, int a8, int a9, int a10);
-	auto p_map_downloading_menu_constructor = h2mod->GetAddress<map_downloading_menu_constructor*>(0x20E2E0);
+	auto p_map_downloading_menu_constructor = Memory::GetAddress<map_downloading_menu_constructor*>(0x20E2E0);
 
 	CustomPackets::sendRequestMapFilename();
 	p_original_leave_game_callback = (leave_game_callback_def)leave_game_callback;
@@ -342,8 +342,8 @@ wchar_t* receiving_map_wstr[] = {
 
 wchar_t* get_receiving_map_string()
 { 
-	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)h2mod->GetAddress(0x381fd));
-	wchar_t** str_array = h2mod->GetAddress<wchar_t**>(0x46575C);
+	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)Memory::GetAddress(0x381fd));
+	wchar_t** str_array = Memory::GetAddress<wchar_t**>(0x46575C);
 
 	if (get_default_game_language() == 0) // check if english
 		return receiving_map_wstr[0];
@@ -386,32 +386,32 @@ void MapManager::applyHooks() {
 
 		BYTE jmp[1] = { 0xEB };
 
-		WriteBytes(h2mod->GetAddress(0x215A9E), jmp, 1); /* Allow map download in network */
-		WriteBytes(h2mod->GetAddress(0x215AC9), jmp, 1); /* Disable "Match has begun" bullshit */
-		PatchCall(h2mod->GetAddress(0x244A4A), display_map_downloading_menu); /* Redirect the menu constructor to our code to replace the game's map downloading code callback */
+		WriteBytes(Memory::GetAddress(0x215A9E), jmp, 1); /* Allow map download in network */
+		WriteBytes(Memory::GetAddress(0x215AC9), jmp, 1); /* Disable "Match has begun" bullshit */
+		PatchCall(Memory::GetAddress(0x244A4A), display_map_downloading_menu); /* Redirect the menu constructor to our code to replace the game's map downloading code callback */
 
 		// code below is for percentage display
-		PatchCall(h2mod->GetAddress(0x244B77), get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
-		PatchCall(h2mod->GetAddress(0x22EE41), get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
-		PatchCall(h2mod->GetAddress(0x244B8F), get_map_download_source_str);
-		PatchCall(h2mod->GetAddress(0x244B9D), get_receiving_map_string);
+		PatchCall(Memory::GetAddress(0x244B77), get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
+		PatchCall(Memory::GetAddress(0x22EE41), get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
+		PatchCall(Memory::GetAddress(0x244B8F), get_map_download_source_str);
+		PatchCall(Memory::GetAddress(0x244B9D), get_receiving_map_string);
 		//Hooked to fix custom map images.
-		Codecave(h2mod->GetAddress(0x593F0), load_map_data_for_display, 0);
+		Codecave(Memory::GetAddress(0x593F0), load_map_data_for_display, 0);
 	}
 
 	// Both server and client
-	WriteJmpTo(h2mod->GetAddress(0x1467, 0x12E2), is_supported_build);
-	PatchCall(h2mod->GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
-	PatchCall(h2mod->GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
-	PatchCall(h2mod->GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
-	PatchCall(h2mod->GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
+	WriteJmpTo(Memory::GetAddress(0x1467, 0x12E2), is_supported_build);
+	PatchCall(Memory::GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
+	PatchCall(Memory::GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
+	PatchCall(Memory::GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
+	PatchCall(Memory::GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
 
 	// allow host to start the game, even if there are peers that didn't load the map
-	p_get_map_load_status_for_all_peers = (get_map_load_status_for_all_peers)DetourFunc(h2mod->GetAddress<BYTE*>(0x1B1929, 0x197879), (BYTE*)get_map_load_status_for_all_peers_hook, 8);
-	WriteJmpTo(h2mod->GetAddress<BYTE*>(0x1D76C5, 0x1BCD32), get_map_load_status_for_all_peers_hook_2);
+	p_get_map_load_status_for_all_peers = (get_map_load_status_for_all_peers)DetourFunc(Memory::GetAddress<BYTE*>(0x1B1929, 0x197879), (BYTE*)get_map_load_status_for_all_peers_hook, 8);
+	WriteJmpTo(Memory::GetAddress<BYTE*>(0x1D76C5, 0x1BCD32), get_map_load_status_for_all_peers_hook_2);
 
 	// disables game's map downloading implementation
-	NopFill(h2mod->GetAddress(0x1B5421, 0x1A917F), 5);
+	NopFill(Memory::GetAddress(0x1B5421, 0x1A917F), 5);
 }
 
 std::string MapManager::getMapFilenameToDownload()
@@ -445,7 +445,7 @@ void MapManager::clearMapFileNameToDownload() {
 std::wstring MapManager::getMapName() {
 	//H2Server.exe+5349B4
 	//H2Server.exe+535C64 (another offset to use if the above fails for whatever reason)
-	const wchar_t* currentMapName = h2mod->GetAddress<wchar_t*>(0x97737C, 0x5349B4);
+	const wchar_t* currentMapName = Memory::GetAddress<wchar_t*>(0x97737C, 0x5349B4);
 
 	std::wstring ucurrentMapName(currentMapName);
 
@@ -466,7 +466,7 @@ bool MapManager::hasCustomMap(std::string mapName) {
 * NOTE - only works on peers (not dedis)
 */
 bool MapManager::hasCustomMap(std::wstring mapName) {
-	wchar_t* mapsDirectory = h2mod->GetAddress<wchar_t*>(0x482D70 + 0x2423C);
+	wchar_t* mapsDirectory = Memory::GetAddress<wchar_t*>(0x482D70 + 0x2423C);
 	std::wstring mapFileName(mapsDirectory);
 
 	mapFileName += mapName;
@@ -481,9 +481,9 @@ void MapManager::reloadAllMaps() {
 	typedef char(__thiscall *custom_maps_load_info)(int thisx);
 	typedef char(__thiscall *cache_custom_map_file_image_preview)(int thisx);
 
-	DWORD customMapData = h2mod->GetAddress(0x482D70, 0x4A70D8);
-	auto p_custom_maps_load_info = h2mod->GetAddress<custom_maps_load_info>(0x4D021, 0x419B5);
-	auto p_cache_custom_map_file_image_preview = h2mod->GetAddress<cache_custom_map_file_image_preview>(0x4CC30, 0x41501); // this caches the map preview image for the map selection menu
+	DWORD customMapData = Memory::GetAddress(0x482D70, 0x4A70D8);
+	auto p_custom_maps_load_info = Memory::GetAddress<custom_maps_load_info>(0x4D021, 0x419B5);
+	auto p_cache_custom_map_file_image_preview = Memory::GetAddress<cache_custom_map_file_image_preview>(0x4CC30, 0x41501); // this caches the map preview image for the map selection menu
 
 	LOG_TRACE_GAME("[h2mod-mapmanager] before cache_custom_map_file_image_preview()");
 	p_cache_custom_map_file_image_preview((int)customMapData);
@@ -500,14 +500,14 @@ bool MapManager::loadMapInfo(std::wstring& mapFileLocation)
 	ZeroMemory(data, sizeof(data));
 
 	typedef bool(__thiscall* reload_map)(void* a1, BYTE* a2);
-	auto p_reload_map = h2mod->GetAddress<reload_map>(0x4CD1E);
+	auto p_reload_map = Memory::GetAddress<reload_map>(0x4CD1E);
 
 	wcscpy_s(reinterpret_cast<wchar_t*>(data + 2432), 256, mapFileLocation.c_str());
 
 	bool mapLoaded = false;
 	if (validate_and_add_custom_map(data))
 	{
-		void* customMapData = h2mod->GetAddress<void*>(0x482D70, 0x4A70D8);
+		void* customMapData = Memory::GetAddress<void*>(0x482D70, 0x4A70D8);
 		if (p_reload_map(customMapData, data))
 			mapLoaded = true;
 	}
@@ -553,7 +553,7 @@ bool MapManager::downloadFromRepo(std::string mapFilename) {
 	CURL *curl = nullptr;
 	CURLcode res;
 
-	std::wstring mapFilePathWide(h2mod->GetAddress<wchar_t*>(0x482D70 + 0x2423C));
+	std::wstring mapFilePathWide(Memory::GetAddress<wchar_t*>(0x482D70 + 0x2423C));
 	std::string nonUnicodeMapFilePath(mapFilePathWide.begin(), mapFilePathWide.end());
 	nonUnicodeMapFilePath += mapFilename;
 

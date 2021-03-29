@@ -15,7 +15,7 @@ int XboxTick::setTickRate(bool enable)
 		LOG_TRACE_GAME("[h2mod] Set the game tickrate to 60");
 	}
 
-	WriteValue<DWORD>(h2mod->GetAddress(0x264ABB + 1, 0x1DB8B + 1), tickrate);
+	WriteValue<DWORD>(Memory::GetAddress(0x264ABB + 1, 0x1DB8B + 1), tickrate);
 	return tickrate;
 }
 

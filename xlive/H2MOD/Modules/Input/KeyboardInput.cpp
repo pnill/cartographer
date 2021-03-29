@@ -231,9 +231,9 @@ int pause = VK_PRIOR;
 void KeyboardInput::Initialize()
 {
 	
-	c_sub_B524F7 = h2mod->GetAddress<p_sub_B524F7*>(0x824F7);
-	PatchCall(h2mod->GetAddress(0xCDEF3), death_cam_get_controller_input);
-	PatchCall(h2mod->GetAddress(0xCDF5E), sub_B524F7);
+	c_sub_B524F7 = Memory::GetAddress<p_sub_B524F7*>(0x824F7);
+	PatchCall(Memory::GetAddress(0xCDEF3), death_cam_get_controller_input);
+	PatchCall(Memory::GetAddress(0xCDF5E), sub_B524F7);
 	if (!enableKeyboard3[0]) {
 		for (int i = 0; i < 6; i++) {
 			enableKeyboard3[i] = *((BYTE*)H2BaseAddr + 0x2FA67 + i);

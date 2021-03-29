@@ -11,8 +11,8 @@ namespace MeleeFix
 {
 	void MeleePatch(bool toggle)
 	{
-		WriteValue<BYTE>(h2mod->GetAddress(0x10B408, 0xFDA38) + 2, toggle ? 5 : 6); // sword
-		WriteValue<BYTE>(h2mod->GetAddress(0x10B40B, 0xFDA3B) + 2, toggle ? 2 : 1); // generic weapon
+		WriteValue<BYTE>(Memory::GetAddress(0x10B408, 0xFDA38) + 2, toggle ? 5 : 6); // sword
+		WriteValue<BYTE>(Memory::GetAddress(0x10B40B, 0xFDA3B) + 2, toggle ? 2 : 1); // generic weapon
 	}
 
 	void MeleeCollisionPatch()
@@ -27,11 +27,11 @@ namespace MeleeFix
 			static byte original_melee_collision_instruction[]{ 0x0F, 0x84, 0x4B, 0x01, 0x00, 0x00 };
 			if (H2Config_melee_fix)
 			{
-				NopFill(h2mod->GetAddress(0x143031, 0), 6);
+				NopFill(Memory::GetAddress(0x143031, 0), 6);
 			}
 			else
 			{
-				WriteBytes(h2mod->GetAddress(0x143031, 0), original_melee_collision_instruction, 6);
+				WriteBytes(Memory::GetAddress(0x143031, 0), original_melee_collision_instruction, 6);
 			}
 		}
 	}
@@ -97,7 +97,7 @@ namespace MeleeFix
 
 	void __cdecl simulation_melee_action_update_animation(int object_index)
 	{
-		s_datum_array* objects = *h2mod->GetAddress<s_datum_array**>(0x4E461C);
+		s_datum_array* objects = *Memory::GetAddress<s_datum_array**>(0x4E461C);
 
 		int biped_object = *(DWORD *)&objects->datum[12 * (unsigned __int16)object_index + 8];
 		int melee_info_offset = *(__int16 *)(biped_object + 858); //???
@@ -163,15 +163,15 @@ namespace MeleeFix
 
 	void ApplyHooks()
 	{
-		melee_get_time_to_target = h2mod->GetAddress<p_melee_get_time_to_target*>(0x150784);
-		melee_damage = h2mod->GetAddress<p_melee_damage*>(0x142D62);
-		c_send_melee_damage_simulation_event = h2mod->GetAddress<p_send_melee_damage_simulation_event*>(0x1B8618);
-		c_melee_environment_damage = h2mod->GetAddress<p_melee_environment_damage*>(0x13F26D);
-		c_sub_88B54F = h2mod->GetAddress<p_sub_88B54F*>(0x17B54F);
-		PatchCall(h2mod->GetAddress(0x143440), send_melee_damage_simulation_event);
-		PatchCall(h2mod->GetAddress(0x14345A), melee_environment_damage);
-		PatchCall(h2mod->GetAddress(0x143554), sub_88B54F);
-		WritePointer(h2mod->GetAddress(0x41E524), (void*)simulation_melee_action_update_animation);
+		melee_get_time_to_target = Memory::GetAddress<p_melee_get_time_to_target*>(0x150784);
+		melee_damage = Memory::GetAddress<p_melee_damage*>(0x142D62);
+		c_send_melee_damage_simulation_event = Memory::GetAddress<p_send_melee_damage_simulation_event*>(0x1B8618);
+		c_melee_environment_damage = Memory::GetAddress<p_melee_environment_damage*>(0x13F26D);
+		c_sub_88B54F = Memory::GetAddress<p_sub_88B54F*>(0x17B54F);
+		PatchCall(Memory::GetAddress(0x143440), send_melee_damage_simulation_event);
+		PatchCall(Memory::GetAddress(0x14345A), melee_environment_damage);
+		PatchCall(Memory::GetAddress(0x143554), sub_88B54F);
+		WritePointer(Memory::GetAddress(0x41E524), (void*)simulation_melee_action_update_animation);
 	}
 
 	void Initialize()

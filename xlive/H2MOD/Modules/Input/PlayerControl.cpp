@@ -21,26 +21,26 @@ p_network_player_actions_to_player_actions* network_player_actions_to_player_act
 
 void PlayerControl::ApplyHooks()
 {
-	p_UpdatePlayerControl = h2mod->GetAddress<c_UpdatePlayerControl*>(0x90D62);
-	network_player_actions_to_player_actions = h2mod->GetAddress<p_network_player_actions_to_player_actions*>(0x1DB569);
-	PatchCall(h2mod->GetAddress(0x93596), UpdatePlayerControl);
-	PatchCall(h2mod->GetAddress(0x9390D), UpdatePlayerControl);
+	p_UpdatePlayerControl = Memory::GetAddress<c_UpdatePlayerControl*>(0x90D62);
+	network_player_actions_to_player_actions = Memory::GetAddress<p_network_player_actions_to_player_actions*>(0x1DB569);
+	PatchCall(Memory::GetAddress(0x93596), UpdatePlayerControl);
+	PatchCall(Memory::GetAddress(0x9390D), UpdatePlayerControl);
 }
 
 s_player_actions PlayerControl::GetPlayerActions(int player_index)
 {
 	s_player_actions newActions;
-	s_player_motion nActions = *h2mod->GetAddress<s_player_motion*>(0x514EE8 + player_index * sizeof(s_player_motion));
+	s_player_motion nActions = *Memory::GetAddress<s_player_motion*>(0x514EE8 + player_index * sizeof(s_player_motion));
 	network_player_actions_to_player_actions(&nActions, &newActions);
 	return newActions;
 }
 
 s_player_control* PlayerControl::GetControls(int local_player_index)
 {
-	return *h2mod->GetAddress<s_player_control**>(0x4ca37c + (local_player_index * sizeof(s_player_control)));
+	return *Memory::GetAddress<s_player_control**>(0x4ca37c + (local_player_index * sizeof(s_player_control)));
 }
 
 s_player_motion* PlayerControl::GetPlayerMotion(int player_index)
 {
-	return h2mod->GetAddress<s_player_motion*>(0x514EE8 + player_index * sizeof(s_player_motion));;
+	return Memory::GetAddress<s_player_motion*>(0x514EE8 + player_index * sizeof(s_player_motion));;
 }

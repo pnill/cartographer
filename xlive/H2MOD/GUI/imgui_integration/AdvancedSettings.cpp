@@ -671,7 +671,7 @@ namespace imgui_handler {
 
 						ImGui::Columns(1);
 						ImGui::Separator();
-						auto Skulls = reinterpret_cast<skull_enabled_flags*>(h2mod->GetAddress(0x4D8320));
+						auto Skulls = reinterpret_cast<skull_enabled_flags*>(Memory::GetAddress(0x4D8320));
 						ImGui::Columns(3, "", false);
 
 						TextVerticalPad(GetString(skull_anger), 8.5);
@@ -942,7 +942,7 @@ namespace imgui_handler {
 						if(ImGui::Button("Log Player Unit Objects"))
 						{
 							PlayerIterator playerIt;
-							s_datum_array* Objects = *h2mod->GetAddress<s_datum_array**>(0x4E461C);
+							s_datum_array* Objects = *Memory::GetAddress<s_datum_array**>(0x4E461C);
 							
 							while(playerIt.get_next_active_player())
 							{
@@ -1016,7 +1016,7 @@ namespace imgui_handler {
 		}
 		void Open()
 		{
-			WriteValue<byte>(h2mod->GetAddress(0x9712cC), 1);
+			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);
 			WORD* Buttons = H2Config_CustomLayout.ToArray();
 			for(auto i = 0; i < 14; i++)
 			{
@@ -1031,7 +1031,7 @@ namespace imgui_handler {
 		}
 		void Close()
 		{
-			WriteValue<byte>(h2mod->GetAddress(0x9712cC), 0);
+			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);
 			ImGuiToggleInput(false);
 			PlayerControl::GetControls(0)->DisableCamera = false;
 			SaveH2Config();

@@ -61,15 +61,15 @@ void H2X::Initialize(bool enable)
 	//{
 	//	if(enable)
 	//	{
-	//		PatchCall(h2mod->GetAddress(0x15c5b3), time_globals_seconds_to_ticks);
-	//		PatchCall(h2mod->GetAddress(0x15c5e2), time_globals_seconds_to_ticks);
+	//		PatchCall(Memory::GetAddress(0x15c5b3), time_globals_seconds_to_ticks);
+	//		PatchCall(Memory::GetAddress(0x15c5e2), time_globals_seconds_to_ticks);
 	//	}
 	//	else
 	//	{	
 	//		typedef float(__cdecl time_globals_seconds_to_tick_percise)(float s);
-	//		auto p_time_globals_seconds_to_tick_percise = (time_globals_seconds_to_tick_percise*)h2mod->GetAddress(0x7c0c5);
-	//		PatchCall(h2mod->GetAddress(0x15c5b3), p_time_globals_seconds_to_tick_percise);
-	//		PatchCall(h2mod->GetAddress(0x15c5e2), p_time_globals_seconds_to_tick_percise);
+	//		auto p_time_globals_seconds_to_tick_percise = (time_globals_seconds_to_tick_percise*)Memory::GetAddress(0x7c0c5);
+	//		PatchCall(Memory::GetAddress(0x15c5b3), p_time_globals_seconds_to_tick_percise);
+	//		PatchCall(Memory::GetAddress(0x15c5e2), p_time_globals_seconds_to_tick_percise);
 	//	}
 	//}
 

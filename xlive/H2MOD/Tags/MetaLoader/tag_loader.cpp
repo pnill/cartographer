@@ -15,7 +15,7 @@ namespace global_handle_function
 {
 	HANDLE __cdecl get_map_Handle_from_scnr(const char* pScenario)
 	{
-		return	((HANDLE(__cdecl*)(const char*))h2mod->GetAddress(0x38607))(pScenario);
+		return	((HANDLE(__cdecl*)(const char*))Memory::GetAddress(0x38607))(pScenario);
 	}
 }
 //certain functions which relate tags to their global object(such as Havok objects)(vftables perhaps)
@@ -24,32 +24,32 @@ namespace global_objects_fix
 	void __cdecl bipd_fix(datum datum_index)
 	{
 		void(_cdecl * sub_EC23F)(datum);
-		sub_EC23F = (void(_cdecl*)(datum))h2mod->GetAddress(0x1389B0);
+		sub_EC23F = (void(_cdecl*)(datum))Memory::GetAddress(0x1389B0);
 		sub_EC23F(datum_index);
 	}
 
 	void __cdecl crea_fix(datum datum_index)
 	{
 		int(_cdecl * sub_EC23F)(datum);
-		sub_EC23F = (int(_cdecl*)(datum))h2mod->GetAddress(0x138985);
+		sub_EC23F = (int(_cdecl*)(datum))Memory::GetAddress(0x138985);
 		sub_EC23F(datum_index);
 	}
 	void __cdecl vehi_fix(datum datum_index)
 	{
 		int(_cdecl * sub_EC23F)(datum);
-		sub_EC23F = (int(_cdecl*)(datum))h2mod->GetAddress(0x13895A);
+		sub_EC23F = (int(_cdecl*)(datum))Memory::GetAddress(0x13895A);
 		sub_EC23F(datum_index);
 	}
 	void __cdecl coll_fix(datum datum_index)
 	{
 		int(_cdecl * sub_EC23F)(datum);
-		sub_EC23F = (int(_cdecl*)(datum))h2mod->GetAddress(0x7BE5C);
+		sub_EC23F = (int(_cdecl*)(datum))Memory::GetAddress(0x7BE5C);
 		sub_EC23F(datum_index);
 	}
 	void __cdecl phmo_fix(datum datum_index, bool unk)
 	{
 		int(_cdecl * sub_EC23F)(datum, bool);
-		sub_EC23F = (int(_cdecl*)(datum, bool))h2mod->GetAddress(0x7B844);
+		sub_EC23F = (int(_cdecl*)(datum, bool))Memory::GetAddress(0x7B844);
 		sub_EC23F(datum_index, unk);
 	}
 }
@@ -688,8 +688,8 @@ namespace tag_loader
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
 	void Load_RAW_refs(datum datum_index, std::string map_loc)
 	{
-		DWORD* PMapRawtableoffset = h2mod->GetAddress<DWORD*>(0x4AE8B0);
-		DWORD* PRawTableSize = h2mod->GetAddress<DWORD*>(0x4AE8B4);
+		DWORD* PMapRawtableoffset = Memory::GetAddress<DWORD*>(0x4AE8B0);
+		DWORD* PRawTableSize = Memory::GetAddress<DWORD*>(0x4AE8B4);
 
 		//a little  precaution to circumvent unexpected behaviour
 		DWORD oldRtable_offset = *PMapRawtableoffset;
@@ -698,8 +698,8 @@ namespace tag_loader
 		*PMapRawtableoffset = 0x0;
 		*PRawTableSize = 0x0;
 
-		DWORD ETCOFFSET = *h2mod->GetAddress<DWORD*>(0x482290);
-		HANDLE old_file_handle = *h2mod->GetAddress<HANDLE*>(0x4AE8A8);
+		DWORD ETCOFFSET = *Memory::GetAddress<DWORD*>(0x482290);
+		HANDLE old_file_handle = *Memory::GetAddress<HANDLE*>(0x4AE8A8);
 
 		//char* ripped_map = (char*)(SharedmapBase + tag_scenario_off);
 
@@ -721,7 +721,7 @@ namespace tag_loader
 			//i suppose its in scenario fomat and placed in default and custom directories
 			new_file_handle = global_handle_function::get_map_Handle_from_scnr(map_loc.c_str());
 		}
-		*h2mod->GetAddress<HANDLE*>(0x4AE8A8) = new_file_handle;
+		*Memory::GetAddress<HANDLE*>(0x4AE8A8) = new_file_handle;
 
 		switch (tag_info->type.as_int())
 		{
@@ -738,7 +738,7 @@ namespace tag_loader
 					int sections_base = 0;
 					if (sections_off != -1)
 						sections_base = ETCOFFSET + sections_off;
-					((void(__cdecl*)(int, unsigned int))h2mod->GetAddress(0x2652BC))(sections_base + off + 0x38, 3u);
+					((void(__cdecl*)(int, unsigned int))Memory::GetAddress(0x2652BC))(sections_base + off + 0x38, 3u);
 					++v15;
 					off += 0x5C;
 				} while (v15 < *(int*)(tag_data + 0x24));
@@ -748,7 +748,7 @@ namespace tag_loader
 		case 'bitm':
 		{
 
-			int old_list_field = *h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC);
+			int old_list_field = *Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC);
 
 			for (int i = 0; i < *(int*)(tag_data + 0x44); i++)
 			{
@@ -761,21 +761,21 @@ namespace tag_loader
 
 				int bitmaps_field = bitmaps_field_base + 0x74 * i;
 
-				*h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC) = bitmaps_field;
+				*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = bitmaps_field;
 
 				int temp = 0;
-				((int(__cdecl*)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 2, 0, &temp);
+				((int(__cdecl*)(int, char, int, void*))Memory::GetAddress(0x265986))(bitmaps_field, 2, 0, &temp);
 
-				((int(__cdecl*)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 0, 0, &temp);
+				((int(__cdecl*)(int, char, int, void*))Memory::GetAddress(0x265986))(bitmaps_field, 0, 0, &temp);
 
 			}
-			*h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
+			*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
 			break;
 		}
 		default:
 			break;
 		}
-		*h2mod->GetAddress<HANDLE*>(0x4AE8A8) = old_file_handle;
+		*Memory::GetAddress<HANDLE*>(0x4AE8A8) = old_file_handle;
 		CloseHandle(new_file_handle);
 
 		*PMapRawtableoffset = oldRtable_offset;
@@ -826,7 +826,7 @@ namespace tag_loader
 					int sections_base = 0;
 					if (sections_off != -1)
 						sections_base = ETCOFFSET + sections_off;
-					((void(__cdecl*)(int, unsigned int))h2mod->GetAddress(0x2652BC))(sections_base + off + 0x38, 3u);
+					((void(__cdecl*)(int, unsigned int))Memory::GetAddress(0x2652BC))(sections_base + off + 0x38, 3u);
 					++v15;
 					off += 0x5C;
 				} while (v15 < *(int*)(tag_data + 0x24));
@@ -836,7 +836,7 @@ namespace tag_loader
 		case 'bitm':
 		{
 
-			int old_list_field = *h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC);
+			int old_list_field = *Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC);
 
 			for (int i = 0; i < *(int*)(tag_data + 0x44); i++)
 			{
@@ -849,15 +849,15 @@ namespace tag_loader
 
 				int bitmaps_field = bitmaps_field_base + 0x74 * i;
 
-				*h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC) = bitmaps_field;
+				*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = bitmaps_field;
 
 				int temp = 0;
-				((int(__cdecl*)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 2, 0, &temp);
-				((int(__cdecl*)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 1, 0, &temp);
-				((int(__cdecl*)(int, char, int, void*))h2mod->GetAddress(0x265986))(bitmaps_field, 0, 0, &temp);
+				((int(__cdecl*)(int, char, int, void*))Memory::GetAddress(0x265986))(bitmaps_field, 2, 0, &temp);
+				((int(__cdecl*)(int, char, int, void*))Memory::GetAddress(0x265986))(bitmaps_field, 1, 0, &temp);
+				((int(__cdecl*)(int, char, int, void*))Memory::GetAddress(0x265986))(bitmaps_field, 0, 0, &temp);
 
 			}
-			*h2mod->GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
+			*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
 			break;
 		}
 		default:
@@ -1299,7 +1299,7 @@ unsigned int __cdecl AllocateMemory(int old_size, char arg_4)
 {
 	typedef unsigned int(_cdecl* Allocate_memory)(int size, char arg_4);
 	Allocate_memory pAllocate_memory;
-	pAllocate_memory = h2mod->GetAddress<Allocate_memory>(0x37E69);
+	pAllocate_memory = Memory::GetAddress<Allocate_memory>(0x37E69);
 
 	//i need to allocate more space
 	int new_size = old_size + _MAX_ADDITIONAL_TAG_SIZE_;
@@ -1313,7 +1313,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	// basic load_Tag call
 	typedef bool(_cdecl* LoadTagsandSetMapBases)(int a);
 	LoadTagsandSetMapBases pLoadTagsandSetMapBases;
-	pLoadTagsandSetMapBases = h2mod->GetAddress<LoadTagsandSetMapBases>(0x31348);
+	pLoadTagsandSetMapBases = Memory::GetAddress<LoadTagsandSetMapBases>(0x31348);
 	bool result = pLoadTagsandSetMapBases(a);
 
 	//Clear the table
@@ -1333,7 +1333,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	// extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
 	if (tags::get_cache_header()->type != scnr_type::SinglePlayerShared)
 	{
-		DWORD* TagTableStart = h2mod->GetAddress<DWORD*>(0x47CD50);
+		DWORD* TagTableStart = Memory::GetAddress<DWORD*>(0x47CD50);
 		memset((BYTE*)tag_loader::new_Tables, 0, 0x3BA40);
 		///---------------TABLE EXTENSION  STUFF
 		memcpy((BYTE*)tag_loader::new_Tables, (BYTE*)*TagTableStart, 0x3BA40);
@@ -1374,14 +1374,14 @@ bool _cdecl LoadTagsandMapBases(int a)
 void _Patch_calls()
 {
 	//Todo :: Update Offsets for Dedi
-	PatchCall(h2mod->GetAddress(0x313B2), AllocateMemory);//allocating more space for meta loading
-	PatchCall(h2mod->GetAddress(0x3166B), LoadTagsandMapBases);//default maps meta loading
-	PatchCall(h2mod->GetAddress(0x315ED), LoadTagsandMapBases);//custom maps meta loading,i know i am taking risks	
+	PatchCall(Memory::GetAddress(0x313B2), AllocateMemory);//allocating more space for meta loading
+	PatchCall(Memory::GetAddress(0x3166B), LoadTagsandMapBases);//default maps meta loading
+	PatchCall(Memory::GetAddress(0x315ED), LoadTagsandMapBases);//custom maps meta loading,i know i am taking risks	
 
 	//client side desync fix
 	///(noping out jump instructions)	
-	NopFill(h2mod->GetAddress(0x316CE), 2);
-	NopFill(h2mod->GetAddress(0x316DC), 2);
+	NopFill(Memory::GetAddress(0x316CE), 2);
+	NopFill(Memory::GetAddress(0x316DC), 2);
 }
 void Initialise_tag_loader()
 {
