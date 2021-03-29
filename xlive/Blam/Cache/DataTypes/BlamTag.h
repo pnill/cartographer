@@ -156,13 +156,12 @@ struct blam_tag
 	{
 		if (string.length() != 4)
 			return tag_group_type::none;
-		char* a = (char*)calloc(4, 1);
+		char a[4];
 		a[0] = string[3];
 		a[1] = string[2];
 		a[2] = string[1];
 		a[3] = string[0];
 		auto result = blam_tag(tag_group_type(*(int*)a));
-		free(a);
 		return result;
 	}
 
@@ -186,7 +185,7 @@ struct blam_tag
 		return !is_null() && !is_none();
 	}
 
-	constexpr bool is_printable() const
+	bool is_printable() const
 	{
 		return isprint(c_data[0]) && isprint(c_data[1]) && isprint(c_data[2]) && isprint(c_data[3]);
 	}
