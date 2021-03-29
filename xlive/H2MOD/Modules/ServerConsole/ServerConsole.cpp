@@ -82,9 +82,9 @@ void ServerConsole::ApplyHooks()
 	s_commandsMap[L"unban"] = ServerConsoleCommands::unban;
 	s_commandsMap[L"vip"] = ServerConsoleCommands::vip;
 	s_commandsMap[L"any"] = ServerConsoleCommands::any;
-	p_dedi_command_hook = (dedi_command_hook)DetourFunc(h2mod->GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)dediCommandHook, 7);
-	kablam_vip_add = h2mod->GetAddress<p_kablam_vip_add*>(0, 0x1D932);
-	kablam_vip_clear = h2mod->GetAddress<p_kablam_vip_clear*>(0, 0x1DB16);
+	p_dedi_command_hook = (dedi_command_hook)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)dediCommandHook, 7);
+	kablam_vip_add = Memory::GetAddress<p_kablam_vip_add*>(0, 0x1D932);
+	kablam_vip_clear = Memory::GetAddress<p_kablam_vip_clear*>(0, 0x1DB16);
 }
 
 void ServerConsole::logToDedicatedServerConsole(const wchar_t* string, ...) {
@@ -93,7 +93,7 @@ void ServerConsole::logToDedicatedServerConsole(const wchar_t* string, ...) {
 		return;
 
 	typedef signed int(dedi_print)(const wchar_t* str, ...);
-	auto dedi_print_method = h2mod->GetAddress<dedi_print*>(0, 0x2354C8);
+	auto dedi_print_method = Memory::GetAddress<dedi_print*>(0, 0x2354C8);
 
 	dedi_print_method(string);
 }
@@ -101,19 +101,19 @@ void ServerConsole::logToDedicatedServerConsole(const wchar_t* string, ...) {
 void ServerConsole::SendCommand(wchar_t** command, int split_commands_size, char unk)
 {
 	BYTE* unk1 = reinterpret_cast<BYTE*>(p_dedi_command_hook(command, split_commands_size, unk));
-	BYTE* threadparams = h2mod->GetAddress<BYTE*>(0, 0x450680);
+	BYTE* threadparams = Memory::GetAddress<BYTE*>(0, 0x450680);
 
 	typedef void(__cdecl* unk_func1)(void* a1);
-	auto func_unk1 = h2mod->GetAddress<unk_func1>(0, 0x1D6EA);
+	auto func_unk1 = Memory::GetAddress<unk_func1>(0, 0x1D6EA);
 
 	typedef void(__cdecl* free_memory_game_impl)(LPVOID lpMem);
-	auto p_free_memory_game_impl = h2mod->GetAddress<free_memory_game_impl>(0x0, 0x2344B8);
+	auto p_free_memory_game_impl = Memory::GetAddress<free_memory_game_impl>(0x0, 0x2344B8);
 
 	typedef void(__thiscall* async_set_atomic_long_value)(void *thisx, LONG Value);
-	auto p_async_set_atomic_long_value = h2mod->GetAddress<async_set_atomic_long_value>(0, 0x6E00);
+	auto p_async_set_atomic_long_value = Memory::GetAddress<async_set_atomic_long_value>(0, 0x6E00);
 
 	typedef void(__cdecl* unk_func3)(wchar_t *a1);
-	auto func_unk3 = h2mod->GetAddress<unk_func3>(0, 0x19C93);
+	auto func_unk3 = Memory::GetAddress<unk_func3>(0, 0x19C93);
 
 	if (unk1)
 	{
@@ -142,7 +142,7 @@ void ServerConsole::SendCommand(wchar_t** command, int split_commands_size, char
 void ServerConsole::SendCommand2(int argCount, wchar_t* command, wchar_t* argument, ...)
 {
 	typedef int(__cdecl* ProcessCommand)(wchar_t** commandArray, int argumentCount, char a3);
-	auto p_process_command = h2mod->GetAddress<ProcessCommand>(0, 0x1CCFC);
+	auto p_process_command = Memory::GetAddress<ProcessCommand>(0, 0x1CCFC);
 
 	std::vector<wchar_t*> commandVector;
 	int size = 0;
@@ -192,7 +192,7 @@ void ServerConsole::SendMsg(wchar_t* message, bool timeout)
 
 	if (execute) {
 		send_message_command_block a{
-			h2mod->GetAddress(0, 0x352dfc),
+			Memory::GetAddress(0, 0x352dfc),
 			8,
 			1
 		};

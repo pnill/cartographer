@@ -42,7 +42,8 @@ namespace imgui_handler {
 			bool g_init = false;
 			int g_language_code = -1;
 			
-			const char* button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flash Light","Swap Grenade","Jump","Melee","Reload","Switch Weapons" };
+			const char* button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Left Thumb","Right Thumb","Left Bumper","Right Bumper","A","B","X","Y" };
+			const char* action_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flashlight","Switch Grenades","Jump","Melee","Reload","Switch Weapons" };
 			const WORD button_values[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 4096, 8192, 16384, 32768 };
 			int button_placeholders[14];
 			std::map<int, std::map<e_advanced_string, char*>> string_table;
@@ -270,7 +271,10 @@ namespace imgui_handler {
 					ImGui::PopItemWidth();
 					ImGui::Text(GetString(refresh_rate));
 					ImGui::PushItemWidth(WidthPercentage(100));
-					ImGui::InputInt("##Refresh1", &H2Config_refresh_rate, 0, 110, ImGuiInputTextFlags_AlwaysInsertMode);
+					int gRefresh = H2Config_refresh_rate;
+					ImGui::InputInt("##Refresh1", &gRefresh, 0, 110, ImGuiInputTextFlags_AlwaysInsertMode);
+					if (ImGui::IsItemEdited())
+						H2Config_refresh_rate = gRefresh;
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(refresh_rate_tooltip));
 
@@ -302,9 +306,9 @@ namespace imgui_handler {
 					}
 					ImGui::NextColumn();
 					ImGui::Text(GetString(experimental_rendering_changes));
-					const char* r_items[] = { GetString(render_none), GetString(render_cinematic), GetString(render_engine) };
+					const char* r_items[] = { GetString(render_none), GetString(render_cinematic), GetString(render_engine), GetString(render_patch) };
 					ImGui::PushItemWidth(WidthPercentage(100));
-					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 3))
+					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 4))
 					{
 						H2Config_experimental_fps = (H2Config_Experimental_Rendering_Mode)g_experimental;
 					}
@@ -576,7 +580,7 @@ namespace imgui_handler {
 					ImGui::NewLine();
 					ImGui::Text("Controller Layout");
 					ImGui::NewLine();
-					ImGui::TextWrapped("To use this you must have your games controller layout set to default. Changing the drop down for the specific action will remap the button to the new one");
+					ImGui::TextWrapped("To use this you must have your games controller layout SET TO DEFAULT. Changing the drop down for the specific action will remap the button to the new one");
 					ImGui::NewLine();
 					ImGui::Columns(3, "", false);
 					for (auto i = 0; i < 14; i++) 
@@ -584,7 +588,7 @@ namespace imgui_handler {
 						ImGui::Text(button_items[i]);
 						ImGui::PushItemWidth(ImGui::GetColumnWidth());
 						std::string Id = "##C_L" + std::to_string(i);
-						if (ImGui::Combo(Id.c_str(), &button_placeholders[i], button_items, 14))
+						if (ImGui::Combo(Id.c_str(), &button_placeholders[i], action_items, 14))
 						{
 							switch((ControllerInput::XINPUT_BUTTONS)button_values[i])
 							{
@@ -667,7 +671,7 @@ namespace imgui_handler {
 
 						ImGui::Columns(1);
 						ImGui::Separator();
-						auto Skulls = reinterpret_cast<skull_enabled_flags*>(h2mod->GetAddress(0x4D8320));
+						auto Skulls = reinterpret_cast<skull_enabled_flags*>(Memory::GetAddress(0x4D8320));
 						ImGui::Columns(3, "", false);
 
 						TextVerticalPad(GetString(skull_anger), 8.5);
@@ -810,12 +814,12 @@ namespace imgui_handler {
 					ImGui::Checkbox("##Intro", &H2Config_skip_intro);
 
 					ImGui::NextColumn();
-				
+
 
 					TextVerticalPad(GetString(upnp_title), 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##upnp", &H2Config_upnp_enable);
-					if(ImGui::IsItemHovered())
+					if (ImGui::IsItemHovered())
 					{
 						ImGui::SetTooltip(GetString(upnp_tooltip));
 					}
@@ -825,12 +829,18 @@ namespace imgui_handler {
 					TextVerticalPad(GetString(melee_fix_title), 8.5);
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##melee_fix", &H2Config_melee_fix);
-					if(ImGui::IsItemEdited())
+					if (ImGui::IsItemEdited())
 						MeleeFix::MeleeCollisionPatch();
-					if(ImGui::IsItemHovered())
+					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(melee_fix_tooltip));
 
 					ImGui::NextColumn();
+
+					TextVerticalPad(GetString(no_events_title), 8.5);
+					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+					ImGui::Checkbox("##no_events", &H2Config_no_events);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(GetString(no_events_tooltip));
 					ImGui::Columns(1);
 
 					ImGui::Text(GetString(language));
@@ -845,8 +855,8 @@ namespace imgui_handler {
 						setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
 					}
 					ImGui::PopItemWidth();
-					
-					
+
+
 					ImGui::Columns(1);
 					ImGui::NewLine();
 				}
@@ -932,13 +942,13 @@ namespace imgui_handler {
 						if(ImGui::Button("Log Player Unit Objects"))
 						{
 							PlayerIterator playerIt;
-							s_datum_array* Objects = *h2mod->GetAddress<s_datum_array**>(0x4E461C);
+							s_datum_array* Objects = *Memory::GetAddress<s_datum_array**>(0x4E461C);
 							
-							while(playerIt.get_next_player())
+							while(playerIt.get_next_active_player())
 							{
 								auto player = playerIt.get_current_player_data();
-								int object = *(int*)&Objects->datum[12 * player->BipedUnitDatum.Index + 8];
-								LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->BipedUnitDatum.ToInt(), std::hex), IntToWString<int>(object, std::hex));
+								int object = *(int*)&Objects->datum[12 * player->controlled_unit_index.Index + 8];
+								LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->controlled_unit_index.ToInt(), std::hex), IntToWString<int>(object, std::hex));
 							}
 						}
 					}
@@ -1006,7 +1016,7 @@ namespace imgui_handler {
 		}
 		void Open()
 		{
-			WriteValue<byte>(h2mod->GetAddress(0x9712cC), 1);
+			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);
 			WORD* Buttons = H2Config_CustomLayout.ToArray();
 			for(auto i = 0; i < 14; i++)
 			{
@@ -1021,7 +1031,7 @@ namespace imgui_handler {
 		}
 		void Close()
 		{
-			WriteValue<byte>(h2mod->GetAddress(0x9712cC), 0);
+			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);
 			ImGuiToggleInput(false);
 			PlayerControl::GetControls(0)->DisableCamera = false;
 			SaveH2Config();
@@ -1137,6 +1147,9 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::upnp_tooltip] = "Enabled UPNP Port forwarding for the project.";
 			string_table[0][e_advanced_string::melee_fix_title] = "Melee Patch";
 			string_table[0][e_advanced_string::melee_fix_tooltip] = "Allows you to turn off the melee patch";
+			string_table[0][e_advanced_string::no_events_title] = "No Events";
+			string_table[0][e_advanced_string::no_events_tooltip] = "Opt out of event cosmetics restart required to take effect";
+			string_table[0][e_advanced_string::render_patch] = "Engine Patch";
 			
 			//Spanish.
 			string_table[4][e_advanced_string::title] = u8"      Ajustes avanzados";
@@ -1248,6 +1261,9 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::upnp_tooltip] = u8"Habilita el reenvío de puertos UPNP para el proyecto.";
 			string_table[4][e_advanced_string::melee_fix_title] = u8"Parche cuerpo a cuerpo";
 			string_table[4][e_advanced_string::melee_fix_tooltip] = u8"Te permite desactivar el parche cuerpo a cuerpo";
+			string_table[4][e_advanced_string::no_events_title] = u8"No hay eventos";
+			string_table[4][e_advanced_string::no_events_tooltip] = u8"Se requiere el reinicio de los cosméticos del evento para que surta efecto";
+			string_table[4][e_advanced_string::render_patch] = u8"Parche de juego";
 		}
 	}
 }

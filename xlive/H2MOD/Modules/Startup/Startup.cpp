@@ -17,8 +17,6 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
-#include <filesystem>
-
 namespace filesystem = std::experimental::filesystem;
 
 // xLiveLess specific logger
@@ -89,10 +87,22 @@ void initInstanceNumber() {
 			CloseHandle(mutex);
 		}
 	} while (lastErr == ERROR_ALREADY_EXISTS);
+	addDebugText("You are Instance #%d.", instanceNumber);
+}
 
-	char NotificationPlayerText[30];
-	sprintf(NotificationPlayerText, "You are Instance #%d.", instanceNumber);
-	addDebugText(NotificationPlayerText);
+void postConfig() {
+
+	wchar_t mutexName2[255];
+	swprintf(mutexName2, ARRAYSIZE(mutexName2), L"Halo2BasePort#%d", H2Config_base_port);
+	HANDLE mutex2 = CreateMutex(0, TRUE, mutexName2);
+	DWORD lastErr2 = GetLastError();
+	if (lastErr2 == ERROR_ALREADY_EXISTS) {
+		char NotificationPlayerText[120];
+		sprintf(NotificationPlayerText, "Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
+		addDebugText(NotificationPlayerText);
+		MessageBoxA(NULL, NotificationPlayerText, "BASE PORT BIND WARNING!", MB_OK);
+	}
+	addDebugText("Base port: %d.", H2Config_base_port);
 }
 
 wchar_t xinput_path[_MAX_PATH];
@@ -277,16 +287,8 @@ void initLocalAppData() {
 		addDebugText("ERROR: Could not find AppData Local. Using Process File Path:");
 	}
 	else {
-		addDebugText("Found AppData Local:");
+		addDebugText("Found AppData Local: %s", H2AppDataLocal);
 	}
-	addDebugText(H2AppDataLocal);
-}
-
-void __cdecl game_modules_dispose() {
-	typedef void(__cdecl *tsub_48BBF)();
-	tsub_48BBF psub_48BBF = (tsub_48BBF)(H2BaseAddr + 0x48BBF);
-	psub_48BBF();
-	DeinitH2Startup();
 }
 
 CRITICAL_SECTION log_section;
@@ -326,8 +328,10 @@ H2Types detect_process_type()
 	return H2Types::Invalid;
 }
 
-std::wstring prepareLogFileName(std::wstring logFileName) {
-	std::wstring filename = (H2Config_isConfigFileAppDataLocal ? H2AppDataLocal : L"");
+// use only after initLocalAppData has been called
+// by default useAppDataLocalPath is set to true, if not specified
+std::wstring prepareLogFileName(std::wstring logFileName, bool useAppDataLocalPath) {
+	std::wstring filename = (useAppDataLocalPath ? H2AppDataLocal : L"");
 	std::wstring processName(H2IsDediServer ? L"H2Server" : L"Halo2Client");
 	std::wstring folders(L"logs\\" + processName + L"\\instance" + std::to_wstring(H2GetInstanceId()));
 	filename += folders;
@@ -335,7 +339,7 @@ std::wstring prepareLogFileName(std::wstring logFileName) {
 	if (!filesystem::create_directories(filename) && !filesystem::is_directory(filesystem::status(filename)))
 	{
 		// try locally if we didn't already
-		if (H2Config_isConfigFileAppDataLocal
+		if (useAppDataLocalPath
 			&& filesystem::create_directories(folders) || filesystem::is_directory(filesystem::status(folders)))
 			filename = folders;
 		else
@@ -365,7 +369,7 @@ void InitH2Startup() {
 	}
 
 	H2BaseAddr = (DWORD)game_info.base;
-	h2mod->SetBase(H2BaseAddr);
+
 	if (game_info.process_type == H2Types::H2Server)
 	{
 		h2mod->Server = true;
@@ -376,6 +380,7 @@ void InitH2Startup() {
 		h2mod->Server = false;
 		H2IsDediServer = false;
 	}
+	Memory::setBaseAddress(H2BaseAddr, H2IsDediServer);
 
 	initInstanceNumber();
 
@@ -393,25 +398,16 @@ void InitH2Startup() {
 	SetCurrentDirectoryW(GetExeDirectoryWide().c_str());
 	//If H2ProcessFilePath is empty (Server Console Mode?) set to working directory
 	
-
-
 	initLocalAppData();
 
-	// Force this to always initialize, and try appdata first
-	H2Config_debug_log = H2Config_isConfigFileAppDataLocal = true;
-	int temp_log_level = H2Config_debug_log_level;
-	H2Config_debug_log_level = 0;
-	H2Config_debug_log_level = temp_log_level;
-	H2Config_debug_log = H2Config_isConfigFileAppDataLocal = false;
+	// after localAppData filepath initialized, we can initialize OnScreenDebugLog
+	initOnScreenDebugText();
 
 	if (H2IsDediServer) {
 		addDebugText("Process is Dedi-Server");
 	}
 	else {
 		addDebugText("Process is Client");
-
-		addDebugText("Hooking Shutdown Function");
-		PatchCall(H2BaseAddr + 0x39E7C, game_modules_dispose);
 	}
 
 	if (ArgList != NULL)
@@ -431,24 +427,25 @@ void InitH2Startup() {
 	}
 
 	InitH2Config();
+	postConfig();
 	EnterCriticalSection(&log_section);
-	initDebugText();
-	if (H2Config_debug_log) {
-		if (H2Config_debug_log_console) {
-			console_log = h2log::create_console("CONSOLE MAIN");
-		}
-		xlive_log = h2log::create("XLive", prepareLogFileName(L"h2xlive"));
-		LOG_DEBUG_XLIVE(DLL_VERSION_STR "\n");
-		h2mod_log = h2log::create("H2MOD", prepareLogFileName(L"h2mod"));
-		LOG_DEBUG_GAME(DLL_VERSION_STR "\n");
-		network_log = h2log::create("Network", prepareLogFileName(L"h2network"));
-		LOG_DEBUG_NETWORK(DLL_VERSION_STR "\n");
+
+	// prepare default log files if enabled, after we read the H2Config
+	bool should_enable_console_log = H2Config_debug_log && H2Config_debug_log_console;
+	console_log = h2log::create_console("CONSOLE MAIN", should_enable_console_log, H2Config_debug_log_level);
+
+	xlive_log = h2log::create("XLive", prepareLogFileName(L"h2xlive"), H2Config_debug_log, H2Config_debug_log_level);
+	LOG_DEBUG_XLIVE(DLL_VERSION_STR "\n");
+	h2mod_log = h2log::create("H2MOD", prepareLogFileName(L"h2mod"), H2Config_debug_log, H2Config_debug_log_level);
+	LOG_DEBUG_GAME(DLL_VERSION_STR "\n");
+	network_log = h2log::create("Network", prepareLogFileName(L"h2network"), H2Config_debug_log, H2Config_debug_log_level);
+	LOG_DEBUG_NETWORK(DLL_VERSION_STR "\n");
 #if COMPILE_WITH_VOICE
-		voice_log = h2log::create("Voice", prepareLogFileName(L"voicechat"));
-		LOG_DEBUG(voice_log, DLL_VERSION_STR "\n");
+	voice_log = h2log::create("Voice", prepareLogFileName(L"voicechat"), H2Config_debug_log, H2Config_debug_log_level);
+	LOG_DEBUG(voice_log, DLL_VERSION_STR "\n");
 #endif
-	}
-	//checksum_log = logger::create(prepareLogFileName("checksum"), true);
+
+	//checksum_log = h2log::create("Checksum", prepareLogFileName(L"checksum"), true, 0);
 	LeaveCriticalSection(&log_section);
 	InitH2Accounts();
 
@@ -483,9 +480,9 @@ void InitH2Startup2() {
 
 		BYTE abEnet[6];
 		BYTE abOnline[20];
-		XNetRandom(abEnet, 6);
-		XNetRandom(abOnline, 20);
-		ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, 6).c_str(), ByteToHexStr(abOnline, 20).c_str(), false);
+		XNetRandom(abEnet, sizeof(abEnet));
+		XNetRandom(abOnline, sizeof(abOnline));
+		ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, sizeof(abEnet)).c_str(), ByteToHexStr(abOnline, sizeof(abOnline)).c_str(), false);
 	}
 }
 

@@ -82,23 +82,7 @@ public:
 		bool isChatBoxCommand = false;
 		bool drawTeamIndicators = true;
 
-		void SetBase(DWORD base) { Base = base; }
-
-		DWORD GetBase() { return Base; }
-
-		DWORD GetAddress(DWORD client, DWORD server = 0)
-		{
-			return Base + (Server ? server : client);
-		}
-
-		template <typename T = void*>
-		T GetAddress(DWORD client, DWORD server = 0)
-		{
-			return reinterpret_cast<T>(Base + (Server ? server : client));
-		}
-		
 private:
-		DWORD Base;
 		scnr_type mapType;
 };
 

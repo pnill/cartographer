@@ -166,6 +166,9 @@ namespace imgui_handler
 			upnp_tooltip,
 			melee_fix_title,
 			melee_fix_tooltip,
+			no_events_title,
+			no_events_tooltip,
+			render_patch
 		};
 		void BuildStringsTable();
 		char* GetString(e_advanced_string string, std::string id = "");
@@ -179,6 +182,13 @@ namespace imgui_handler
 		void Render(bool* p_open);
 		void AddWatchItem(std::string Key, std::string Description);
 		void UpdateWatchItem(std::string Key, std::string Value);
+		void Open();
+		void Close();
+	}
+	namespace iMessageBox
+	{
+		void Render(bool* p_open);
+		void SetMessage(std::string message);
 		void Open();
 		void Close();
 	}

@@ -588,9 +588,7 @@ void setCustomLanguage(int main, int variant) {
 		current_language = get_custom_language(language_id, 0);
 	current_language_sub = current_language->lang_variant;
 
-	char langcodeprintbuffer[30];
-	snprintf(langcodeprintbuffer, 30, "language_code = %dx%d", current_language_main, current_language_sub);
-	addDebugText(langcodeprintbuffer);
+	addDebugText("language_code = %dx%d", current_language_main, current_language_sub);
 
 	if (GameGlobals) {
 		BYTE* LoadedFonts = (BYTE*)((char*)H2BaseAddr + 0x47e7c0);
@@ -615,7 +613,7 @@ string_id_to_wide_string p_string_id_to_wide_string;
 void __stdcall string_id_to_wide_string_hook(int thisx, int string_id, wchar_t *output, int a4, int a5)
 {
 	typedef void(__cdecl* decode_utf8_to_wide_string)(char* input, wchar_t* output, size_t output_len);
-	auto p_decode_utf8_to_wide_string = h2mod->GetAddress<decode_utf8_to_wide_string>(0x4C801);
+	auto p_decode_utf8_to_wide_string = Memory::GetAddress<decode_utf8_to_wide_string>(0x4C801);
 
 	wchar_t buffer[512];
 

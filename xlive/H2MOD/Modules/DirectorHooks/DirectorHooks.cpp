@@ -24,13 +24,13 @@ namespace DirectorHooks
 
 	void ApplyHooks()
 	{
-		PatchCall(h2mod->GetAddress(0xCDF90), get_deathcam_fov);
+		PatchCall(Memory::GetAddress(0xCDF90), get_deathcam_fov);
 	}
 
 	void Initialize()
 	{
-		DirectorMode = h2mod->GetAddress<e_director_mode*>(0x4A849C);
-		DirectorModeChanged = h2mod->GetAddress<bool*>(0x4A84A0);
+		DirectorMode = Memory::GetAddress<e_director_mode*>(0x4A849C);
+		DirectorModeChanged = Memory::GetAddress<bool*>(0x4A84A0);
 
 		ApplyHooks();
 	}

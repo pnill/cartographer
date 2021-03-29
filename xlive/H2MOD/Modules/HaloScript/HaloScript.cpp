@@ -53,12 +53,12 @@ namespace HaloScript
 
 	void Initialize()
 	{
-		c_unit_kill	= h2mod->GetAddress<p_unit_kill*>(0x13B514, 0x12A363);
-		c_unit_in_vehicle = h2mod->GetAddress<p_unit_in_vehicle*>(0x1846D9, 0x16E775);
-		c_unit_get_health = h2mod->GetAddress<p_unit_get_health*>(0x184477, 0x165E13);
-		c_unit_get_shield = h2mod->GetAddress<p_unit_get_shield*>(0x18447C, 0x16E518);
-		c_physics_set_gravity	= h2mod->GetAddress<p_physics_set_gravity*>(0xB3C00, 0xA3E13);
-		c_physics_set_velocity_frame = h2mod->GetAddress<p_physics_set_velocity_frame*>(0xB3D5B, 0xA3F6E);
-		c_render_lights_enable_cinematic_shadow = h2mod->GetAddress<p_render_lights_enable_cinematic_shadow*>(0x19245A);
+		c_unit_kill	= Memory::GetAddress<p_unit_kill*>(0x13B514, 0x12A363);
+		c_unit_in_vehicle = Memory::GetAddress<p_unit_in_vehicle*>(0x1846D9, 0x16E775);
+		c_unit_get_health = Memory::GetAddress<p_unit_get_health*>(0x184477, 0x165E13);
+		c_unit_get_shield = Memory::GetAddress<p_unit_get_shield*>(0x18447C, 0x16E518);
+		c_physics_set_gravity	= Memory::GetAddress<p_physics_set_gravity*>(0xB3C00, 0xA3E13);
+		c_physics_set_velocity_frame = Memory::GetAddress<p_physics_set_velocity_frame*>(0xB3D5B, 0xA3F6E);
+		c_render_lights_enable_cinematic_shadow = Memory::GetAddress<p_render_lights_enable_cinematic_shadow*>(0x19245A);
 	}
 }

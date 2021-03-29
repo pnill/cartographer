@@ -68,7 +68,7 @@ namespace ObserverMode
 	{
 		//LOG_INFO_GAME("[ObserverMode] : {} {} {}", *a1, a2, a3);
 		float* result = p_editor_camera_update(a1, a2, a3);
-		real_vector3d* CameraPosition = *h2mod->GetAddress<real_vector3d**>(0x4d84ec);
+		real_vector3d* CameraPosition = *Memory::GetAddress<real_vector3d**>(0x4d84ec);
 		//These are fucked and need to be fixed.... everything is offset by 4, have to go back and fix everything that uses it.
 		auto control = PlayerControl::GetControls(0);
 
@@ -163,7 +163,7 @@ namespace ObserverMode
 			if (mode == observer_followcam) 
 			{
 				DirectorHooks::SetDirectorMode(DirectorHooks::e_editor);
-				//real_vector3d* CameraPosition = *h2mod->GetAddress<real_vector3d**>(0x4d84ec);
+				//real_vector3d* CameraPosition = *Memory::GetAddress<real_vector3d**>(0x4d84ec);
 				*EditorCameraTargetFunction = 1;
 				//PreviousPosY = CameraPosition->j;
 				//CameraPosition->j = 3;
@@ -171,7 +171,7 @@ namespace ObserverMode
 			else if (mode == observer_freecam) 
 			{
 				DirectorHooks::SetDirectorMode(DirectorHooks::e_editor);
-				//real_vector3d* CameraPosition = *h2mod->GetAddress<real_vector3d**>(0x4d84ec);
+				//real_vector3d* CameraPosition = *Memory::GetAddress<real_vector3d**>(0x4d84ec);
 				*EditorCameraTargetFunction = 0;
 				//CameraPosition->j = PreviousPosY;
 			}
@@ -191,22 +191,26 @@ namespace ObserverMode
 	void SightJackObject()
 	{
 		if (ObserverMode == observer_firstperson) {
-			//auto pArray = Player::getArray();
-			
-			//int index = 0;
-			//do
-			//{
-			//	datum pDatum = ((datum)pArray->datum[0x204 * index + 0x28]);
-			//	if (pDatum == observer_current_index)
-			//		break;
-			//	index++;
-			//} while (index < 16);
+			PlayerIterator playerIt;
+
+			datum unitIndexSameAsObserverIndex(datum::Null);
+
+			while (playerIt.get_next_active_player())
+			{
+				Player* player = playerIt.get_current_player_data();
+				if (player->controlled_unit_index == observer_current_index)
+				{
+					unitIndexSameAsObserverIndex = observer_current_index;
+					break;
+				}
+			}
+				
 			auto control = PlayerControl::GetControls(0);
-			auto player_actions = PlayerControl::GetPlayerMotion(currentPlayerIndex);
-			Player::getPlayer(h2mod->get_player_datum_index_from_controller_index(0).Index)->BipedUnitDatum = observer_current_index;
+			auto player_actions = PlayerControl::GetPlayerActions(currentPlayerIndex);
+			Player::getPlayer(h2mod->get_player_datum_index_from_controller_index(0).Index)->controlled_unit_index = observer_current_index;
 			//control->ControllingDatum = observer_current_index;
-			control->Actions.yaw = player_actions->facing.yaw.as_rad();
-			control->Actions.pitch = player_actions->facing.pitch.as_rad();
+			//control->Actions.yaw = player_actions->facing.yaw.as_rad();
+			//control->Actions.pitch = player_actions->facing.pitch.as_rad();
 			//control->Actions = player_actions;
 		}
 	}
@@ -219,7 +223,7 @@ namespace ObserverMode
 	//unk is believed to be the editor_camera setting
 	void FollowObject(int local_player_index, int unk)
 	{
-		s_datum_array* Objects = *h2mod->GetAddress<s_datum_array**>(0x4E461C);
+		s_datum_array* Objects = *Memory::GetAddress<s_datum_array**>(0x4E461C);
 		if (observer_current_index == -1) {
 			NextPlayer();
 		}
@@ -236,22 +240,22 @@ namespace ObserverMode
 
 	void ApplyHooks()
 	{
-		p_editor_camera_update = (h_editor_camera_update)DetourFunc(h2mod->GetAddress<BYTE*>(0xCC41E), (BYTE*)editor_camera_update, 7);
+		p_editor_camera_update = (h_editor_camera_update)DetourFunc(Memory::GetAddress<BYTE*>(0xCC41E), (BYTE*)editor_camera_update, 7);
 
 
-		PatchCall(h2mod->GetAddress(0xCC59C), FollowObject);
+		PatchCall(Memory::GetAddress(0xCC59C), FollowObject);
 
 		//Replace nullsub in game_tick
-		PatchCall(h2mod->GetAddress(0x4A4C7), SightJackObject);
+		PatchCall(Memory::GetAddress(0x4A4C7), SightJackObject);
 	}
 
 	void Initialize()
 	{
-		CameraAngles = h2mod->GetAddress<real_vector3d*>(0x4A84C0);
-		EditorCameraTargetFunction = h2mod->GetAddress<byte*>(0x4D8500);
-		network_player_actions = h2mod->GetAddress<Blam::EngineDefinitions::Players::s_network_player_actions**>(0x514EE8);
+		CameraAngles = Memory::GetAddress<real_vector3d*>(0x4A84C0);
+		EditorCameraTargetFunction = Memory::GetAddress<byte*>(0x4D8500);
+		network_player_actions = Memory::GetAddress<Blam::EngineDefinitions::Players::s_network_player_actions**>(0x514EE8);
 
-		sub_7BD2EC = h2mod->GetAddress<p_sub_7BD2EC*>(0x13D2EC);
+		sub_7BD2EC = Memory::GetAddress<p_sub_7BD2EC*>(0x13D2EC);
 
 		imgui_handler::DebugOverlay::AddWatchItem("oyaw", "Observer Yaw");
 		imgui_handler::DebugOverlay::AddWatchItem("opitch", "Observer Pitch");

@@ -29,8 +29,6 @@ BYTE o_SetDX2[8];
 typedef char(__cdecl p_mouse_input)(int local_player_index, void *data, int a4, float *a5, float *a6, void *a7);
 p_mouse_input* c_mouse_input;
 
-
-
 char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, float *a6, void *a7)
 {
 	time_globals* time = time_globals::get();
@@ -62,7 +60,7 @@ char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, 
 
 char* MouseInput::GetMouseState()
 {
-	return h2mod->GetAddress<char*>(0x47a570);
+	return Memory::GetAddress<char*>(0x47a570);
 }
 
 void MouseInput::SetSensitivity(float value)
@@ -73,16 +71,16 @@ void MouseInput::SetSensitivity(float value)
 	float t_value = value;
 	if (H2Config_raw_input)
 		t_value = 1;
-	*h2mod->GetAddress<float*>(0x4A89B0) = 50.0f + 20.0f * t_value; //x-axis
+	*Memory::GetAddress<float*>(0x4A89B0) = 50.0f + 20.0f * t_value; //x-axis
 	if(!H2Config_mouse_uniform)
-		*h2mod->GetAddress<float*>(0x4A89B4) = 25.0f + 10.0f * t_value; //y-axis
+		*Memory::GetAddress<float*>(0x4A89B4) = 25.0f + 10.0f * t_value; //y-axis
 	else
-		*h2mod->GetAddress<float*>(0x4A89B4) = 50.0f + 20.0f * t_value; //y-axis
+		*Memory::GetAddress<float*>(0x4A89B4) = 50.0f + 20.0f * t_value; //y-axis
 }
 
 void MouseInput::Initialize()
 {
-	base = h2mod->GetAddress(0x0);
+	base = Memory::GetAddress(0x0);
 	ms = (DIMOUSESTATE*)(base + 0x47A570);
 	dx = (float*)(base + 0x4AE610);
 	//VirtualProtect(dx, 4, PAGE_EXECUTE_READWRITE, &dwBack);
@@ -97,7 +95,7 @@ void MouseInput::Initialize()
 	//VirtualProtect((LPVOID)setDy, 8, PAGE_EXECUTE_READWRITE, &dwBack);
 	auto setDx2 = (base + 0x627E7);
 	//VirtualProtect((LPVOID)setDx2, 8, PAGE_EXECUTE_READWRITE, &dwBack);
-	c_mouse_input = h2mod->GetAddress<p_mouse_input*>(0x61ea2);
-	PatchCall(h2mod->GetAddress(0x62f65), mouse_input);
+	c_mouse_input = Memory::GetAddress<p_mouse_input*>(0x61ea2);
+	PatchCall(Memory::GetAddress(0x62f65), mouse_input);
 	SetSensitivity(H2Config_mouse_sens);
 }

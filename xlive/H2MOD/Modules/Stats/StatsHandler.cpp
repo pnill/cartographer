@@ -107,7 +107,7 @@ StatsHandler::StatsHandler()
  */
 wchar_t* StatsHandler::getPlaylistFile()
 {
-	auto output = h2mod->GetAddress<wchar_t*>(0, 0x3B3704);
+	auto output = Memory::GetAddress<wchar_t*>(0, 0x3B3704);
 	return output;
 }
 std::string StatsHandler::getChecksum()
@@ -193,7 +193,7 @@ char* StatsHandler::checkServerRegistration()
 	if (curl)
 	{
 		std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=ServerRegistrationCheck&Server_XUID=";
-		auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
+		auto ServerXUID = *Memory::GetAddress<::XUID*>(0, 0x52FC50);
 		auto sXUID = IntToString<::XUID>(ServerXUID, std::dec);
 		http_request_body += sXUID;
 		struct curl_response_text s;
@@ -265,7 +265,7 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl_mime_name(field, "Server_Name");
 	curl_mime_data(field, H2Config_dedi_server_name, CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
-	auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
+	auto ServerXUID = *Memory::GetAddress<::XUID*>(0, 0x52FC50);
 	auto sXUID = IntToString<::XUID>(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid, std::dec);
 	curl_mime_name(field, "Server_XUID");
 	curl_mime_data(field, sXUID.c_str(), CURL_ZERO_TERMINATED);
@@ -549,7 +549,7 @@ char* StatsHandler::buildJSON()
 	auto wchecksum = std::wstring(checksum.begin(), checksum.end());
 	value.SetString(wchecksum.c_str(), allocator);
 	document.AddMember(L"PlaylistChecksum", value, allocator);
-	auto Scenario = h2mod->GetAddress<wchar_t*>(0, 0x4DC504);
+	auto Scenario = Memory::GetAddress<wchar_t*>(0, 0x4DC504);
 
 	std::wstring ScenarioPath = std::wstring(Scenario);
 	std::wstring Scen(ScenarioPath.substr(ScenarioPath.rfind('\\') + 1));
@@ -559,19 +559,19 @@ char* StatsHandler::buildJSON()
 
 	//Build the Variant Object
 	WValue Variant(rapidjson::kObjectType);
-	auto VariantName = h2mod->GetAddress<wchar_t*>(0, 0x4DC3D4);
+	auto VariantName = Memory::GetAddress<wchar_t*>(0, 0x4DC3D4);
 	value.SetString(VariantName, allocator);
 	Variant.AddMember(L"Name", value, allocator);
-	BYTE VariantType = *h2mod->GetAddress<BYTE*>(0, 0x4dc414);
+	BYTE VariantType = *Memory::GetAddress<BYTE*>(0, 0x4dc414);
 	Variant.AddMember(L"Type", VariantType, allocator);
 	
 	WValue VariantSettings(rapidjson::kObjectType);
-	BYTE TeamPlay = *h2mod->GetAddress<BYTE*>(0, 0x992880);
+	BYTE TeamPlay = *Memory::GetAddress<BYTE*>(0, 0x992880);
 	VariantSettings.AddMember(L"Team Play", TeamPlay, allocator);
 	Variant.AddMember(L"Settings", VariantSettings, allocator);
 	document.AddMember(L"Variant", Variant, allocator);
 	
-	auto ServerName = h2mod->GetAddress<wchar_t*>(0, 0x52FC88);
+	auto ServerName = Memory::GetAddress<wchar_t*>(0, 0x52FC88);
 
 	//Players
 	int playerCount = 0;
@@ -579,7 +579,7 @@ char* StatsHandler::buildJSON()
 	for(auto i = 0; i < 16; i++)
 	{
 		int calcBaseOffset  = baseOffset + (i * 0x94);
-		auto XUID = *h2mod->GetAddress<::XUID*>(0, calcBaseOffset);
+		auto XUID = *Memory::GetAddress<::XUID*>(0, calcBaseOffset);
 		if (XUID == 0) //Skip if it doesnt exists
 			continue;
 
@@ -590,10 +590,10 @@ char* StatsHandler::buildJSON()
 		WValue Player(rapidjson::kObjectType);
 		
 		
-		auto Gamertag = h2mod->GetAddress<wchar_t*>(0, calcBaseOffset + 0xA);
+		auto Gamertag = Memory::GetAddress<wchar_t*>(0, calcBaseOffset + 0xA);
 		for(auto j = 0; j < 16; j++)
 		{
-			auto tGamertag = h2mod->GetAddress<wchar_t*>(0, PCROffset + (j * 0x110));
+			auto tGamertag = Memory::GetAddress<wchar_t*>(0, PCROffset + (j * 0x110));
 			//I dont know why but I couldn't get any other method of comparing to work,
 			//Someone else can fix it because I know this probably is a terrible way
 			//To compare the wchar_t*.
@@ -608,60 +608,60 @@ char* StatsHandler::buildJSON()
 		playerCount++;
 
 		#pragma region Memory_Reading
-		auto PrimaryColor = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4A);
-		auto SecondaryColor = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4B);
-		auto PrimaryEmblem = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4C);
-		auto SecondaryEmblem = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4D);
-		auto PlayerModel = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4E);
-		auto EmblemForeground = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x4F);
-		auto EmblemBackground = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x50);
-		auto EmblemToggle = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x51);
-		auto ClanDescripton = h2mod->GetAddress<wchar_t*>(0, calcBaseOffset + 0x5A);
-		auto ClanTag = h2mod->GetAddress<wchar_t*>(0, calcBaseOffset + 0x7A);
-		auto Team = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x86);
-		auto Handicap = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x87);
-		auto Rank = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x88);
-		auto Nameplate = *h2mod->GetAddress<BYTE*>(0, calcBaseOffset + 0x8B);
+		auto PrimaryColor = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x4A);
+		auto SecondaryColor = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x4B);
+		auto PrimaryEmblem = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x4C);
+		auto SecondaryEmblem = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x4D);
+		auto PlayerModel = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x4E);
+		auto EmblemForeground = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x4F);
+		auto EmblemBackground = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x50);
+		auto EmblemToggle = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x51);
+		auto ClanDescripton = Memory::GetAddress<wchar_t*>(0, calcBaseOffset + 0x5A);
+		auto ClanTag = Memory::GetAddress<wchar_t*>(0, calcBaseOffset + 0x7A);
+		auto Team = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x86);
+		auto Handicap = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x87);
+		auto Rank = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x88);
+		auto Nameplate = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x8B);
 		
 		wchar_t Place[16];
-		std::wcsncpy(Place, h2mod->GetAddress<wchar_t*>(0, calcPCROffset + 0xE0), 16);
+		std::wcsncpy(Place, Memory::GetAddress<wchar_t*>(0, calcPCROffset + 0xE0), 16);
 		
 		wchar_t Score[16];
-		std::wcsncpy(Score, h2mod->GetAddress<wchar_t*>(0, calcPCROffset + 0x40), 16);
+		std::wcsncpy(Score, Memory::GetAddress<wchar_t*>(0, calcPCROffset + 0x40), 16);
 
-		auto Kills = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset);
-		auto Assists = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x2);
-		auto Deaths = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x4);
-		auto Betrayals = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x6);
-		auto Suicides = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x8);
-		auto BestSpree = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0xA);
-		auto TimeAlive = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0xC);
-		auto ShotsFired = *h2mod->GetAddress<unsigned short*>(0, calcPCROffset + 0x84);
-		auto ShotsHit = *h2mod->GetAddress<unsigned short*>(0, calcPCROffset + 0x88);
-		auto HeadShots = *h2mod->GetAddress<unsigned short*>(0, calcPCROffset + 0x8C);
+		auto Kills = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset);
+		auto Assists = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x2);
+		auto Deaths = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x4);
+		auto Betrayals = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x6);
+		auto Suicides = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x8);
+		auto BestSpree = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0xA);
+		auto TimeAlive = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0xC);
+		auto ShotsFired = *Memory::GetAddress<unsigned short*>(0, calcPCROffset + 0x84);
+		auto ShotsHit = *Memory::GetAddress<unsigned short*>(0, calcPCROffset + 0x88);
+		auto HeadShots = *Memory::GetAddress<unsigned short*>(0, calcPCROffset + 0x8C);
 
-		auto FlagScores = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0xE);
-		auto FlagSteals = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x10);
-		auto FlagSaves = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x12);
-		auto FlagUnk = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x14);
+		auto FlagScores = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0xE);
+		auto FlagSteals = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x10);
+		auto FlagSaves = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x12);
+		auto FlagUnk = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x14);
 
-		auto BombScores = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x18);
-		auto BombKills = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x1A);
-		auto BombGrabs = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x1C);
+		auto BombScores = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x18);
+		auto BombKills = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x1A);
+		auto BombGrabs = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x1C);
 
-		auto BallScore = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x20);
-		auto BallKills = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x22);
-		auto BallCarrierKills = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x24);
+		auto BallScore = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x20);
+		auto BallKills = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x22);
+		auto BallCarrierKills = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x24);
 
-		auto KingKillsAsKing = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x26);
-		auto KingKilledKings = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x28);
+		auto KingKillsAsKing = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x26);
+		auto KingKilledKings = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x28);
 		
-		auto JuggKilledJuggs = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x3C);
-		auto JuggKillsAsJugg = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x3E);
-		auto JuggTime = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x40);
+		auto JuggKilledJuggs = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x3C);
+		auto JuggKillsAsJugg = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x3E);
+		auto JuggTime = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x40);
 
-		auto TerrTaken = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x48);
-		auto TerrLost = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x46);
+		auto TerrTaken = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x48);
+		auto TerrLost = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x46);
 		#pragma endregion 
 
 		#pragma region Document_Writing
@@ -749,7 +749,7 @@ char* StatsHandler::buildJSON()
 		WValue Medals(rapidjson::kArrayType);
 		for(auto j = 0; j < 24; j++)
 		{
-			value.SetInt(*h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x4A + (j * 2)));
+			value.SetInt(*Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x4A + (j * 2)));
 			Medals.PushBack(value, allocator);
 		}
 		Player.AddMember(L"MedalData", Medals, allocator);
@@ -771,7 +771,7 @@ char* StatsHandler::buildJSON()
 				 * 6 = Headshot kills
 				 * 8 = Nothing stored here, move on.
 				 */
-				auto val = *h2mod->GetAddress<unsigned short*>(0, calcRTPCROffset + 0x8E + (j * 0x10) + (k * 2));
+				auto val = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x8E + (j * 0x10) + (k * 2));
 				value.SetInt(val);
 				DamageType.PushBack(value, allocator);
 				if (val > 0)
@@ -797,10 +797,10 @@ char* StatsHandler::buildJSON()
 			WValue Matchup(rapidjson::kArrayType);
 			int jOffset = PCROffset + Players[j][L"EndGameIndex"].GetInt() * 0x110;
 			//Player I: Killed J
-			value.SetInt(*h2mod->GetAddress<unsigned int*>(0, iOffset + 0x90 + (j * 0x4)));
+			value.SetInt(*Memory::GetAddress<unsigned int*>(0, iOffset + 0x90 + (j * 0x4)));
 			Matchup.PushBack(value, allocator);
 			//Player I: Killed by J
-			value.SetInt(*h2mod->GetAddress<unsigned int*>(0, jOffset + 0x90 + (i * 0x4)));
+			value.SetInt(*Memory::GetAddress<unsigned int*>(0, jOffset + 0x90 + (i * 0x4)));
 			Matchup.PushBack(value, allocator);
 			Versus.PushBack(Matchup, allocator);
 		}
@@ -930,7 +930,7 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=PlaylistRanks&Playlist_Checksum=";
 	http_request_body.append(getChecksum());
 	http_request_body.append("&Server_XUID=");
-	auto ServerXUID = *h2mod->GetAddress<::XUID*>(0, 0x52FC50);
+	auto ServerXUID = *Memory::GetAddress<::XUID*>(0, 0x52FC50);
 	auto sXUID = IntToString<::XUID>(ServerXUID, std::dec);
 	http_request_body.append(sXUID);
 	http_request_body.append("&Player_XUIDS=");

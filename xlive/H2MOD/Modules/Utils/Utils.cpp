@@ -158,9 +158,7 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* 
 		if (fileLine) {
 			if (fileLine[0] == header[0] && sscanf_s(fileLine, header, &version, 30)) {
 				foundFirstHeader = true;
-				char debugTextBuffer[50];
-				snprintf(debugTextBuffer, 50, "Found header on line %d asserting version: %s", lineNumber, version);
-				addDebugText(debugTextBuffer);
+				addDebugText("Found header on line %d asserting version: %s", lineNumber, version);
 				if (CmpVersions(headerVersion, version) == 0) {//does not send this line to interpreter.
 					free(fileLine);
 					continue;
@@ -228,7 +226,7 @@ LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
 
 void pushHostLobby() {
 	typedef bool(__cdecl* should_send_broadcast_reply)(void* session);
-	auto p_should_send_broadcast_reply = reinterpret_cast<should_send_broadcast_reply>(h2mod->GetAddress(0x1ADA7B, 0x1A69DB));
+	auto p_should_send_broadcast_reply = reinterpret_cast<should_send_broadcast_reply>(Memory::GetAddress(0x1ADA7B, 0x1A69DB));
 
 	if (p_should_send_broadcast_reply(NULL))
 	{
@@ -515,9 +513,7 @@ int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response
 	/* In windows, this will init the winsock stuff */
 	CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
 	if (global_init != CURLE_OK) {
-		char NotificationPlayerText[100];
-		snprintf(NotificationPlayerText, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
-		addDebugText(NotificationPlayerText);
+		addDebugText("curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
 	}
 
 	/* get a curl handle */
@@ -546,9 +542,7 @@ int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response
 		/* Check for errors */
 		if (res != CURLE_OK) {
 			result = ERROR_CODE_CURL_EASY_PERF;//curl_easy_perform() issue
-			char NotificationPlayerText[500];
-			snprintf(NotificationPlayerText, 500, "curl_easy_perform() failed: %s", curl_easy_strerror(res));
-			addDebugText(NotificationPlayerText);
+			addDebugText("curl_easy_perform() failed: %s", curl_easy_strerror(res));
 			free(s.ptr);
 		}
 		else {

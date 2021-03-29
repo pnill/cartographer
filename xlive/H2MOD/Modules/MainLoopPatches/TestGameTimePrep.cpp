@@ -78,7 +78,7 @@
 //		if (t_flag_log_count[id] == 10)
 //			LOG_TRACE_GAME("is_init_flag_set() : flag {} logged to many times ignoring", id);
 //	}
-//	DWORD* init_flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
+//	DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
 //	return init_flags_array[id] != 0;
 //}
 //int ftoi(float in)
@@ -331,23 +331,23 @@
 //
 //
 //
-//DWORD* game_engine_globals = h2mod->GetAddress<DWORD*>(0x4BF8F8);
+//DWORD* game_engine_globals = Memory::GetAddress<DWORD*>(0x4BF8F8);
 //
 //void TestGameTimePrep::Init()
 //{
-//	game_globals_unk1 = (char(*)())h2mod->GetAddress(0x497EA);
-//	_sub_9EC02C = h2mod->GetAddress<sub_9EC02C*>(0x7c02c);
-//	cinimatic_in_progress = h2mod->GetAddress<c_cinematic_in_progress*>(0x3a928);
-//	sub_9b9887 = h2mod->GetAddress<c_sub_9b9887*>(0x49887);
-//	sub_B1DCBB = h2mod->GetAddress<c_sub_B1DCBB*>(0x1adcbb);
-//	cinimatic_is_running = h2mod->GetAddress<c_cinematic_is_running*>(0x3a938);
-//	get_tickrate = h2mod->GetAddress<c_get_tickrate*>(0x28707);
+//	game_globals_unk1 = (char(*)())Memory::GetAddress(0x497EA);
+//	_sub_9EC02C = Memory::GetAddress<sub_9EC02C*>(0x7c02c);
+//	cinimatic_in_progress = Memory::GetAddress<c_cinematic_in_progress*>(0x3a928);
+//	sub_9b9887 = Memory::GetAddress<c_sub_9b9887*>(0x49887);
+//	sub_B1DCBB = Memory::GetAddress<c_sub_B1DCBB*>(0x1adcbb);
+//	cinimatic_is_running = Memory::GetAddress<c_cinematic_is_running*>(0x3a938);
+//	get_tickrate = Memory::GetAddress<c_get_tickrate*>(0x28707);
 //
-//	p_simulation_update_result = h2mod->GetAddress<c_simulation_update_result*>(0x7C47A);
+//	p_simulation_update_result = Memory::GetAddress<c_simulation_update_result*>(0x7C47A);
 //
-//	get_game_mode_engine = h2mod->GetAddress<c_get_game_mode_engine*>(0x5B15E);
+//	get_game_mode_engine = Memory::GetAddress<c_get_game_mode_engine*>(0x5B15E);
 //
-//	PatchCall(h2mod->GetAddress(0x4A60B), simulation_update_result);
-//	PatchCall(h2mod->GetAddress(0x39d04), game_time_globals_prep);
+//	PatchCall(Memory::GetAddress(0x4A60B), simulation_update_result);
+//	PatchCall(Memory::GetAddress(0x39d04), game_time_globals_prep);
 //
 //}

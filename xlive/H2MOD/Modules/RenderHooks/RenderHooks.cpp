@@ -9,7 +9,7 @@ bool ras_layer_overrides[25];
 bool geo_render_overrides[24];
 namespace RenderHooks
 {
-	int layer_calls[17]
+	int layer_calls[]
 	{
 		0x28053A,
 		0x280557,
@@ -29,7 +29,7 @@ namespace RenderHooks
 		0x280799,
 		0x2807B7
 	};
-	int render_calls[18]
+	int render_calls[]
 	{
 		0x190B0F,
 		0x1914D4,
@@ -56,7 +56,7 @@ namespace RenderHooks
 	typedef bool(__cdecl p_initialize_rasterizer_layer)(e_layer_type type, unsigned int width, unsigned int height, bool fmt, int a5);
 	p_initialize_rasterizer_layer* c_initialize_rasterizer_layer;
 
-	typedef char(__cdecl p_render_geometry)(e_render_geometry_type type);
+	typedef void(__cdecl p_render_geometry)(e_render_geometry_type type);
 	p_render_geometry* c_render_geometry;
 
 	int oWidth = 0;
@@ -144,11 +144,11 @@ namespace RenderHooks
 			oWidth = 128;
 			oHeight = 128;
 		}
-		LOG_TRACE_GAME(L"[Render Hooks] init_raasterizer_layer: {} {} {} {} {}", type, oWidth, oHeight, fmt, a5);
+		LOG_TRACE_GAME(L"[Render Hooks] init_rasterizer_layer: {} {} {} {} {}", type, oWidth, oHeight, fmt, a5);
 		return c_initialize_rasterizer_layer(type, oWidth, oHeight, fmt, a5);
 	}
 
-	char __cdecl h_render_geometry(e_render_geometry_type type)
+	void __cdecl h_render_geometry(e_render_geometry_type type)
 	{
 		if (!geo_render_overrides[(int)type - 1]) {
 			return c_render_geometry(type);
@@ -162,23 +162,23 @@ namespace RenderHooks
 
 	void ApplyHooks()
 	{
-		//c_initialize_rasterizer_layer = (p_initialize_rasterizer_layer)DetourFunc(h2mod->GetAddress<BYTE*>(0x28024C), (BYTE*)h_initialize_rasterizer_layer, 7);
-		//c_render_geometry = (p_render_geometry)DetourFunc(h2mod->GetAddress<BYTE*>(0x1A155C), (BYTE*)h_render_geometry, 13);
-		c_initialize_rasterizer_layer = h2mod->GetAddress<p_initialize_rasterizer_layer*>(0x28024C);
-		c_render_geometry = h2mod->GetAddress<p_render_geometry*>(0x1A155C);
+		//c_initialize_rasterizer_layer = (p_initialize_rasterizer_layer)DetourFunc(Memory::GetAddress<BYTE*>(0x28024C), (BYTE*)h_initialize_rasterizer_layer, 7);
+		//c_render_geometry = (p_render_geometry)DetourFunc(Memory::GetAddress<BYTE*>(0x1A155C), (BYTE*)h_render_geometry, 13);
+		c_initialize_rasterizer_layer = Memory::GetAddress<p_initialize_rasterizer_layer*>(0x28024C);
+		c_render_geometry = Memory::GetAddress<p_render_geometry*>(0x1A155C);
 		for(auto &call : layer_calls)
 		{
-			PatchCall(h2mod->GetAddress(call), h_initialize_rasterizer_layer);
+			PatchCall(Memory::GetAddress(call), h_initialize_rasterizer_layer);
 		}
 		for(auto &call : render_calls)
 		{
-			PatchCall(h2mod->GetAddress(call), h_render_geometry);
+			PatchCall(Memory::GetAddress(call), h_render_geometry);
 		}
 	}
 
 	void Initialize()
 	{
-		reset_screen = h2mod->GetAddress<byte*>(0xA3E4D4);
+		reset_screen = Memory::GetAddress<byte*>(0xA3E4D4);
 		ApplyHooks();
 	}
 }

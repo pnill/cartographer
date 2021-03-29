@@ -5,9 +5,10 @@
 #include "H2MOD/Modules/Config/Config.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
 
-BYTE lobby[] = { 0x53, 0x30, 0xDB };
-BYTE ingame[] = { 0xB0, 0x01, 0xC3 };
 BYTE toggleZoom[] = { 0x66, 0x89, 0x45, 0x3E };
+
+static float gameEffectsUnknownValue = 30.f;
+
 void UncappedFPS2::Init()
 {
 	EventHandler::registerGameStateCallback({
@@ -15,10 +16,8 @@ void UncappedFPS2::Init()
 			life_cycle_pre_game,
 			[]
 			{
-				WriteBytes(h2mod->GetAddress(0x3A938), lobby, 3);
-				WriteValue<unsigned long>(h2mod->GetAddress(0x104950), h2mod->GetAddress(0x3a03c4));
-				WriteBytes(h2mod->GetAddress(0x9355C), toggleZoom, 4);
-
+				gameEffectsUnknownValue = 30.f;
+				WriteBytes(Memory::GetAddress(0x9355C), toggleZoom, 4);
 			},
 			false
 		}, false);
@@ -28,11 +27,10 @@ void UncappedFPS2::Init()
 			[]
 			{
 				time_globals* timeGlobals = time_globals::get();
-				WriteValue<BYTE>(h2mod->GetAddress(0x7C389), (byte)timeGlobals->ticks_per_second);
-				WriteValue<unsigned long>(h2mod->GetAddress(0x104950), h2mod->GetAddress(0x39E2F8));
-				WriteValue<float>(h2mod->GetAddress(0x39E2F8), (float)timeGlobals->ticks_per_second);
-				WriteBytes(h2mod->GetAddress(0x3A938), ingame, 3);
-				NopFill(h2mod->GetAddress(0x9355C), 4);				
+				gameEffectsUnknownValue = timeGlobals->ticks_per_second;
+				WriteValue<BYTE>(Memory::GetAddress(0x7C389), (BYTE)timeGlobals->ticks_per_second);
+				WritePointer(Memory::GetAddress(0x104950), &gameEffectsUnknownValue);
+				NopFill(Memory::GetAddress(0x9355C), 4);				
 			},
 			false
 		}, false);

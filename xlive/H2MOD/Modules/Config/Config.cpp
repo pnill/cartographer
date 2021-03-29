@@ -42,8 +42,8 @@ std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomM
 unsigned short H2Config_base_port = 2000;
 char H2Config_str_wan[16] = { "" };
 char H2Config_str_lan[16] = { "" };
-unsigned long H2Config_ip_wan = inet_addr("127.0.0.1");
-unsigned long H2Config_ip_lan = inet_addr("127.0.0.1");
+unsigned long H2Config_ip_wan = 0;
+unsigned long H2Config_ip_lan = 0;
 _H2Config_language H2Config_language = { -1, 0 };
 bool H2Config_custom_labels_capture_missing = false;
 bool H2Config_skip_intro = false;
@@ -55,7 +55,7 @@ bool H2Config_experimental_game_main_loop_patches = false;
 int H2Config_static_lod_state = static_lod::disable;
 int H2Config_field_of_view = 70;
 int H2Config_vehicle_field_of_view = 70;
-int H2Config_refresh_rate = 60;
+__int16 H2Config_refresh_rate = 60;
 bool H2Config_static_first_person = false;
 float H2Config_mouse_sens = 0;
 bool H2Config_mouse_uniform = false;
@@ -117,6 +117,7 @@ ControllerInput::CustomControllerLayout H2Config_CustomLayout;
 
 bool H2Config_upnp_enable = true;
 bool H2Config_melee_fix = true;
+bool H2Config_no_events = false;
 
 int H2Config_hotkeyIdHelp = VK_F3;
 int H2Config_hotkeyIdToggleDebug = VK_F2;
@@ -150,9 +151,7 @@ void SaveH2Config() {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], H2AppDataLocal, H2GetInstanceId());
 	}
 
-	wchar_t fileConfigPathLog[1124];
-	swprintf(fileConfigPathLog, 1024, L"Saving Config: \"%ws\"", fileConfigPath);
-	addDebugText(fileConfigPathLog);
+	addDebugText(L"Saving Config: \"%ws\"", fileConfigPath);
 	FILE* fileConfig = nullptr;
 	errno_t err = _wfopen_s(&fileConfig, fileConfigPath, L"wb");
 
@@ -538,6 +537,8 @@ void SaveH2Config() {
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "controller_layout", H2Config_CustomLayout.ToString().c_str());
+
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events);
 		}
 
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay);
@@ -630,12 +631,10 @@ void ReadH2Config() {
 	errno_t err = 0;
 	FILE* fileConfig = nullptr;
 	wchar_t fileConfigPath[1024];
-	wchar_t fileConfigPathLog[1124];
 
 	if (FlagFilePathConfig) {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
-		swprintf(fileConfigPathLog, 1124, L"Reading Flag Config: \"%ws\"", fileConfigPath);
-		addDebugText(fileConfigPathLog);
+		addDebugText(L"Reading Flag Config: \"%ws\"", fileConfigPath);
 		err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 	}
 	else {
@@ -645,8 +644,7 @@ void ReadH2Config() {
 				checkFilePath = local;
 			}
 			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
-			swprintf(fileConfigPathLog, 1124, L"Reading Config: \"%ws\"", fileConfigPath);
-			addDebugText(fileConfigPathLog);
+			addDebugText(L"Reading Config: \"%ws\"", fileConfigPath);
 			err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 
 			if (err) {
@@ -680,7 +678,7 @@ void ReadH2Config() {
 		SI_Error rc = ini.LoadFile(fileConfig);
 		if (rc < 0)
 		{
-			addDebugText(std::string("ini.LoadFile() failed with error: " + std::to_string(rc) + "while trying to read configuration file!").c_str());
+			addDebugText("ini.LoadFile() failed with error: %d while trying to read configuration file!", (int)rc);
 		}
 		else
 		{
@@ -695,14 +693,18 @@ void ReadH2Config() {
 			H2Config_debug_log_console = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "debug_log_console", H2Config_debug_log_console);
 
 			const char* ip_wan = ini.GetValue(H2ConfigVersionSection.c_str(), "wan_ip");
-			if (ip_wan)
+			if (ip_wan
+				&& strnlen_s(ip_wan, 15) >= 7
+				&& inet_addr(ip_wan) != INADDR_NONE)
 			{
 				strncpy(H2Config_str_wan, ip_wan, 15);
 				H2Config_ip_lan = inet_addr(H2Config_str_wan);
 			}
 
 			const char* ip_lan = ini.GetValue(H2ConfigVersionSection.c_str(), "lan_ip");
-			if (ip_lan)
+			if (ip_lan
+				&& strnlen_s(ip_lan, 15) >= 7
+				&& inet_addr(ip_lan) != INADDR_NONE)
 			{
 				strncpy(H2Config_str_lan, ip_lan, 15);
 				H2Config_ip_lan = inet_addr(H2Config_str_lan);
@@ -749,6 +751,8 @@ void ReadH2Config() {
 					case 2:
 						H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_new;
 						break;
+					case 3:
+						H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_patch;
 				}
 				
 				std::string crosshair_offset_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN"));
@@ -851,6 +855,8 @@ void ReadH2Config() {
 				H2Config_melee_fix = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
 
 				H2Config_CustomLayout.FromString(std::string(ini.GetValue(H2ConfigVersionSection.c_str(), "controller_layout", "1-2-4-8-16-32-64-128-256-512-4096-8192-16384-32768")));
+				
+				H2Config_no_events = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events);
 			}
 
 			// dedicated server only

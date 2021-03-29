@@ -49,7 +49,7 @@ namespace ControllerInput
 	//Main function that iterates through all available input devices and calls update_xinput_state from the items vtable
 	void __cdecl update_xinput_devices()
 	{
-		auto InputDevices = h2mod->GetAddress<controller_info**>(0x479F00);
+		auto InputDevices = Memory::GetAddress<controller_info**>(0x479F00);
 		//Game checks for only a max of 20 inputs, if someone ever exceeds this.. I'll be impressed
 		for(auto i = 0; i < 20; i++)
 		{
@@ -231,19 +231,19 @@ namespace ControllerInput
 	{
 		if(H2Config_controller_modern)
 		{
-			PatchCall(h2mod->GetAddress(0x39B82), procces_input);
+			PatchCall(Memory::GetAddress(0x39B82), procces_input);
 		}
 		else
 		{
-			PatchCall(h2mod->GetAddress(0x39B82), h2mod->GetAddress(0x628A8));
+			PatchCall(Memory::GetAddress(0x39B82), Memory::GetAddress(0x628A8));
 		}
 	}
 	void ControllerInput::SetSensitiviy(float value)
 	{
 		if (value == 0)
 			return;
-		*h2mod->GetAddress<float*>(0x4A89B8) = 80.0f + 20.0f * value; //x-axis
-		*h2mod->GetAddress<float*>(0x4A89BC) = 40.0f + 10.0f * value; //y-axis
+		*Memory::GetAddress<float*>(0x4A89B8) = 80.0f + 20.0f * value; //x-axis
+		*Memory::GetAddress<float*>(0x4A89BC) = 40.0f + 10.0f * value; //y-axis
 	}
 	void ControllerInput::SetDeadzones()
 	{
@@ -306,42 +306,42 @@ namespace ControllerInput
 
 	void ControllerInput::Initialize()
 	{
-		axialDeadzoneX = h2mod->GetAddress<short*>(0x4AA02C);
-		axialDeadzoneY = h2mod->GetAddress<short*>(0x4AA02E);
+		axialDeadzoneX = Memory::GetAddress<short*>(0x4AA02C);
+		axialDeadzoneY = Memory::GetAddress<short*>(0x4AA02E);
 
-		c_get_controller_input = h2mod->GetAddress<p_get_controller_input*>(0x2F433);
+		c_get_controller_input = Memory::GetAddress<p_get_controller_input*>(0x2F433);
 
-		default_profile = h2mod->GetAddress<byte*>(0x4a89b0);
-		unk_input_struct = h2mod->GetAddress<byte*>(0x4AE578);
-		sub_B31EA2 = h2mod->GetAddress< p_sub_B31EA2*>(0x61EA2);
+		default_profile = Memory::GetAddress<byte*>(0x4a89b0);
+		unk_input_struct = Memory::GetAddress<byte*>(0x4AE578);
+		sub_B31EA2 = Memory::GetAddress< p_sub_B31EA2*>(0x61EA2);
 		
 
-		//PatchCall(h2mod->GetAddress(0x2e95d), sub_B31BF4);
+		//PatchCall(Memory::GetAddress(0x2e95d), sub_B31BF4);
 
 
 
-		byte_F4A5C8 = h2mod->GetAddress<byte*>(0x47A5C8);
-		InputDevicesArray = h2mod->GetAddress<int*>(0x479F00);
-		main_controller_index = h2mod->GetAddress<int*>(0x47A714);
-		byte_F4A5CE = h2mod->GetAddress<byte*>(0x47A5CE);
-		button_state_array = h2mod->GetAddress<byte*>(0x47A5CC);
-		byte_F4A5D0 = h2mod->GetAddress<byte*>(0x47A5D0);
-		word_F4A5E0 = h2mod->GetAddress<WORD*>(0x47A5E0);
-		xinput_button_bitmask = h2mod->GetAddress<int*>(0x39DEE0);
-		unk_F4A5D2 = h2mod->GetAddress<byte*>(0x47A5D2);
-		word_F4A5E4 = h2mod->GetAddress<short*>(0x47A5E4);
-		sThumbLX = h2mod->GetAddress<short*>(0x47A600);
-		sThumbLY = h2mod->GetAddress<short*>(0x47A602);
-		sThumbRX = h2mod->GetAddress<short*>(0x47A604);
-		sThumbRY = h2mod->GetAddress<short*>(0x47A606);
-		dword_F4A724 = h2mod->GetAddress<int*>(0x47A724);
-		dword_F4A720 = h2mod->GetAddress<int*>(0x47A720);
-		game_is_minimized = h2mod->GetAddress<p_game_minimized*>(0x28729);
-		system_milliseconds = h2mod->GetAddress<p_system_milliseconds*>(0x37E51);
-		//PatchCall(h2mod->GetAddress(0x2FBD2), update_controller_input);
-		PatchCall(h2mod->GetAddress(0x2eb1b), h_game_is_minimized);
-		PatchCall(h2mod->GetAddress(0x2FA58), update_xinput_devices);
-		//Codecave(h2mod->GetAddress(0x2e975), apply_dead_zones, 166);
+		byte_F4A5C8 = Memory::GetAddress<byte*>(0x47A5C8);
+		InputDevicesArray = Memory::GetAddress<int*>(0x479F00);
+		main_controller_index = Memory::GetAddress<int*>(0x47A714);
+		byte_F4A5CE = Memory::GetAddress<byte*>(0x47A5CE);
+		button_state_array = Memory::GetAddress<byte*>(0x47A5CC);
+		byte_F4A5D0 = Memory::GetAddress<byte*>(0x47A5D0);
+		word_F4A5E0 = Memory::GetAddress<WORD*>(0x47A5E0);
+		xinput_button_bitmask = Memory::GetAddress<int*>(0x39DEE0);
+		unk_F4A5D2 = Memory::GetAddress<byte*>(0x47A5D2);
+		word_F4A5E4 = Memory::GetAddress<short*>(0x47A5E4);
+		sThumbLX = Memory::GetAddress<short*>(0x47A600);
+		sThumbLY = Memory::GetAddress<short*>(0x47A602);
+		sThumbRX = Memory::GetAddress<short*>(0x47A604);
+		sThumbRY = Memory::GetAddress<short*>(0x47A606);
+		dword_F4A724 = Memory::GetAddress<int*>(0x47A724);
+		dword_F4A720 = Memory::GetAddress<int*>(0x47A720);
+		game_is_minimized = Memory::GetAddress<p_game_minimized*>(0x28729);
+		system_milliseconds = Memory::GetAddress<p_system_milliseconds*>(0x37E51);
+		//PatchCall(Memory::GetAddress(0x2FBD2), update_controller_input);
+		PatchCall(Memory::GetAddress(0x2eb1b), h_game_is_minimized);
+		PatchCall(Memory::GetAddress(0x2FA58), update_xinput_devices);
+		//Codecave(Memory::GetAddress(0x2e975), apply_dead_zones, 166);
 		SetSensitiviy(H2Config_controller_sens);
 		ToggleModern();
 		SetDeadzones();

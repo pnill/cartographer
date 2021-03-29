@@ -30,6 +30,6 @@ s_user_interface_globals_group_definition *get_user_interface_globals_ptr()
 	//dives into globals/globals tag and gets the block "Interface Tags"
 	//from there checks current scnr type and itself returns a pointer for the correct one
 	typedef s_user_interface_globals_group_definition*(_cdecl matg_interface_tags_get_user_interface_globals)();
-	auto pmatg_interface_tags_get_user_interface_globals = h2mod->GetAddress<matg_interface_tags_get_user_interface_globals*>(0x20BB1D, 0x1F2C5A);
+	auto pmatg_interface_tags_get_user_interface_globals = Memory::GetAddress<matg_interface_tags_get_user_interface_globals*>(0x20BB1D, 0x1F2C5A);
 	return pmatg_interface_tags_get_user_interface_globals();
 }

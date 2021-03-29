@@ -36,7 +36,7 @@ namespace imgui_handler
 	}
 	bool CanDrawImgui()
 	{
-		for(auto &window : windows)
+		for (auto& window : windows)
 		{
 			if (window.DoRender)
 				return true;
@@ -49,7 +49,7 @@ namespace imgui_handler
 		ImGui_ImplDX9_NewFrame();
 		ImGuiWin32Frame();
 		ImGui::NewFrame();
-		for (auto &window : windows)
+		for (auto& window : windows)
 		{
 			if (window.DoRender)
 			{
@@ -63,17 +63,17 @@ namespace imgui_handler
 
 	void ToggleWindow(std::string name)
 	{
-		for(auto &window : windows)
+		for (auto& window : windows)
 		{
-			if(window.name == name)
+			if (window.name == name)
 			{
 				window.DoRender = !window.DoRender;
-				if (window.DoRender) 
+				if (window.DoRender)
 				{
-					if(window.OpenFunc != nullptr)
+					if (window.OpenFunc != nullptr)
 						window.OpenFunc();
 				}
-				else 
+				else
 				{
 					if (window.CloseFunc != nullptr)
 						window.CloseFunc();
@@ -84,7 +84,7 @@ namespace imgui_handler
 
 	bool IsWindowActive(std::string name)
 	{
-		for(auto &window : windows)
+		for (auto& window : windows)
 		{
 			if (window.name == name)
 				return window.DoRender;
@@ -231,7 +231,7 @@ namespace imgui_handler
 		windows.emplace_back("Advanced Settings", false, AdvancedSettings::Render, AdvancedSettings::Open, AdvancedSettings::Close);
 		windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
 		windows.emplace_back("debug_overlay", false, DebugOverlay::Render, DebugOverlay::Open, DebugOverlay::Close);
-		
+		windows.emplace_back("messagebox", false, iMessageBox::Render, iMessageBox::Open, iMessageBox::Close);
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -291,6 +291,7 @@ namespace imgui_handler
 		//	ImGuiIO& io = ImGui::GetIO();
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
 		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
+		io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 		io.BackendPlatformName = "imgui_impl_win32";
 		io.ImeWindowHandle = hWnd;
 
@@ -319,13 +320,13 @@ namespace imgui_handler
 		io.KeyMap[ImGuiKey_Z] = 'Z';
 
 		ImFont* font1 = io.Fonts->AddFontDefault();
-		
+
 
 		ImGui_ImplDX9_Init(pDevice);
 
 		//int my_image_width = 1786;
 		//int my_image_height = 745;
-		
+
 		//bool ret = LoadTextureFromFile("patchnotes.png", , &my_image_width, &my_image_height);
 		//IM_ASSERT(ret);
 		preloadImages();
@@ -355,8 +356,8 @@ namespace imgui_handler
 		D3DXIMAGE_INFO imgInfo;
 		//HRESULT hr = D3DXCreateTextureFromFileA(g_pDevice, filename, &texture);
 		HRESULT hr = D3DXCreateTextureFromFileExA(g_pDevice, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
-				D3DFMT_FROM_FILE, D3DPOOL_MANAGED, D3DX_FILTER_NONE, D3DX_FILTER_NONE, 0, &imgInfo, NULL, &texture);
-		
+			D3DFMT_FROM_FILE, D3DPOOL_MANAGED, D3DX_FILTER_NONE, D3DX_FILTER_NONE, 0, &imgInfo, NULL, &texture);
+
 		if (hr != S_OK)
 			return false;
 
@@ -365,11 +366,11 @@ namespace imgui_handler
 		//texture->GetLevelDesc(0, &my_image_desc);
 		switch (image)
 		{
-			case patch_notes:
-				g_patchNotes_Image = texture;
-				break;
-			default:
-				return false;
+		case patch_notes:
+			g_patchNotes_Image = texture;
+			break;
+		default:
+			return false;
 		}
 		*out_width = imgInfo.Width;
 		*out_height = imgInfo.Height;
@@ -378,16 +379,16 @@ namespace imgui_handler
 
 	PDIRECT3DTEXTURE9 GetImage(s_imgui_images image)
 	{
-		switch(image) { 
-			case patch_notes: 
-				return g_patchNotes_Image;
-			default: NULL;
+		switch (image) {
+		case patch_notes:
+			return g_patchNotes_Image;
+		default: NULL;
 		}
 	}
 
 	s_aspect_ratio getAspectRatio(float width, float height)
 	{
-		if(width / height >= 1.6f)
+		if (width / height >= 1.6f)
 		{
 			return sixten_nine;
 		}

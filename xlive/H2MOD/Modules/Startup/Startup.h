@@ -6,7 +6,9 @@ void InitH2Startup2();
 void DeinitH2Startup();
 int H2GetInstanceId();
 
-inline std::wstring prepareLogFileName(std::wstring logFileName);
+// use only after initLocalAppData has been called
+// by default useAppDataLocalPath is set to true, if not specified
+inline std::wstring prepareLogFileName(std::wstring logFileName, bool useAppDataLocalPath = true);
 
 enum H2Types
 {

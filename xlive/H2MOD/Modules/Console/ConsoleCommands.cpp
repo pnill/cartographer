@@ -19,6 +19,7 @@
 #include "Util\ClipboardAPI.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
 
@@ -31,13 +32,13 @@ ConsoleCommands::ConsoleCommands() {
 
 void ConsoleCommands::writePreviousCommand(std::string& msg) {
 	this->prevCommands.insert(this->prevCommands.begin(), msg);
-	if (this->prevCommands.size() > 6) 
+	if (this->prevCommands.size() > 6)
 		this->prevCommands.pop_back();
 }
 
 void ConsoleCommands::writePreviousOutput(std::string& msg) {
 	this->prevOutput.insert(this->prevOutput.begin(), msg);
-	if (this->prevOutput.size() > 18) 
+	if (this->prevOutput.size() > 18)
 		this->prevOutput.pop_back();
 }
 
@@ -56,52 +57,52 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 		return true;
 	}
 	switch (wp) {
-		case '\b':   // backspace
-		{
-			if (this->console) {
-				if (this->caretPos > 0)
-				{
-					this->command.erase(this->caretPos - 1, 1);
-					this->caretPos -= 1;
-				}
-				return true;
+	case '\b':   // backspace
+	{
+		if (this->console) {
+			if (this->caretPos > 0)
+			{
+				this->command.erase(this->caretPos - 1, 1);
+				this->caretPos -= 1;
 			}
+			return true;
 		}
-		break;
+	}
+	break;
 
-		case '\r':    // return/enter
-		{
-			if (console) {
-				writePreviousOutput(this->command);
-				writePreviousCommand(this->command);
-				std::string fullCommand("$");
-				fullCommand += this->command;
-				this->handle_command(fullCommand);
+	case '\r':    // return/enter
+	{
+		if (console) {
+			writePreviousOutput(this->command);
+			writePreviousCommand(this->command);
+			std::string fullCommand("$");
+			fullCommand += this->command;
+			this->handle_command(fullCommand);
 
-				command = "";
-				caretPos = 0;
-				previous_command_index = 0;
-				return true;
+			command = "";
+			caretPos = 0;
+			previous_command_index = 0;
+			return true;
+		}
+	}
+	break;
+
+	// copy/paste functionality
+	case 0x56:
+	{
+		//read 'V' before 'CTRL'
+		if (console && (GetAsyncKeyState(VK_CONTROL) & 0x8000)) {
+
+			std::string clipboardContent;
+			if (!ClipboardAPI::read(clipboardContent)) {
+				output(ERROR_OPENING_CLIPBOARD);
+				return false;
 			}
+			this->command += clipboardContent;
+			this->caretPos = this->command.length();
+			break;
 		}
-		break;
-
-		// copy/paste functionality
-		case 0x56:
-		{
-			//read 'V' before 'CTRL'
-			if (console && (GetAsyncKeyState(VK_CONTROL) & 0x8000)) {
-
-				std::string clipboardContent;
-				if (!ClipboardAPI::read(clipboardContent)) {
-					output(ERROR_OPENING_CLIPBOARD);
-					return false;
-				}
-				this->command += clipboardContent;
-				this->caretPos = this->command.length();
-				break;
-			}
-		}
+	}
 
 	default:
 
@@ -341,7 +342,7 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 				datum player_datum = Player::getPlayerUnitDatumIndex(h2mod->get_player_datum_index_from_controller_index(0).Index);
 				call_object_placement_data_new(&nObject, object_datum, player_datum, 0);
 				real_point3d* player_position = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
-				
+
 				if (player_position != nullptr) {
 					nObject.Placement.x = player_position->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
 					nObject.Placement.y = player_position->y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
@@ -352,7 +353,7 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 					nObject.Placement.y = y;
 					nObject.Placement.z = z;
 				}
-				
+
 				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.Placement.x, nObject.Placement.y, nObject.Placement.z);
 				unsigned int object_gamestate_datum = call_object_new(&nObject);
 				call_add_object_to_sync(object_gamestate_datum);
@@ -380,7 +381,7 @@ void ConsoleCommands::display(std::string output)
 	writePreviousOutput(output);
 }
 
-bool ConsoleCommands::isNum(const char *s) {
+bool ConsoleCommands::isNum(const char* s) {
 	int i = 0;
 	while (s[i]) {
 		//if there is a letter in a string then string is not a number
@@ -423,6 +424,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			output(L"mouse_sens");
 			output(L"warpfix");
 			output(L"maingamelooppatches");
+			output(L"injecttag (tag_name) (tag_type) (map_name)");
 			return;
 		}
 		else if (firstCommand == "$mapfilename")
@@ -534,7 +536,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost())
+			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() != scnr_type::SinglePlayer)
 			{
 				output(L"Can only be used by the session host!");
 				return;
@@ -571,7 +573,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				LOG_TRACE_GAME("Error converting string to int");
 				return;
 			}
-			
+
 			real_point3d* localPlayerPosition = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
 			this->spawn(object_datum, count, localPlayerPosition->x + 0.5f, localPlayerPosition->y + 0.5f, localPlayerPosition->z + 0.5f, randomMultiplier, false);
 			return;
@@ -725,7 +727,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid command, usage d3dex true/false");
 			}
 			return;
-        }
+		}
 		else if (firstCommand == "$maingamelooppatches") {
 			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
 				output(L"Invalid command, usage maingamelooppatches true/false");
@@ -744,6 +746,34 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid command, usage maingamelooppatches true/false");
 			}
 			return;
+		}
+		else if (firstCommand == "$injecttag")
+		{
+			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() != scnr_type::SinglePlayer)
+			{
+				output(L"Can only be used by the session host!");
+				return;
+			}
+
+			if (splitCommands.size() != 4) {
+				output(L"Invalid paramters");
+				return;
+			}
+			std::string tagName = splitCommands[1];
+
+			blam_tag tagType = blam_tag::from_string(splitCommands[2]);
+
+			std::string mapName = splitCommands[3];
+
+			auto tagDatum = tag_loader::Get_tag_datum(tagName, tagType, mapName);
+			tag_loader::Load_tag(tagDatum.ToInt(), true, mapName);
+			tag_loader::Push_Back();
+			std::wstring result = L"Loaded Tag Datum: ";
+			result += IntToWString<int>(tag_loader::ResolveNewDatum(tagDatum.ToInt()).ToInt(), std::hex);
+			output(result);
+
+			LOG_INFO_GAME("{} {} {}", tagName, tagType.as_string(), mapName);
+
 		}
 		else {
 			output(L"Unknown command.");

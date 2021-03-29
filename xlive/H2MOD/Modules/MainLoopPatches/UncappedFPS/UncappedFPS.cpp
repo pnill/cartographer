@@ -6,13 +6,14 @@
 #include "H2MOD/Modules/Config/Config.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
 
+#include "Blam\Engine\Game\GameTimeGlobals.h"
+
 extern bool b_XboxTick;
 static LARGE_INTEGER frequency;
 static LARGE_INTEGER timeAtStartup;
 
 // if this is enabled, the tick count to be executed will be calculated the same way as in Halo 1/CE
 #define USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE 0
-
 
 float get_remaining_time_until_next_tick_in_seconds()
 {
@@ -28,10 +29,10 @@ static float accumulator = 0.0f;
 void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out_target_tick_count)
 {
 	typedef void(__cdecl *compute_target_tick_count)(float, float*, int*);
-	auto p_compute_target_tick_count = h2mod->GetAddress<compute_target_tick_count>(0x7C1BF);
+	auto p_compute_target_tick_count = Memory::GetAddress<compute_target_tick_count>(0x7C1BF);
 
 	typedef bool(__cdecl* game_is_not_paused)();
-	auto p_unk_check = h2mod->GetAddress<game_is_not_paused>(0x497EA);
+	auto p_unk_check = Memory::GetAddress<game_is_not_paused>(0x497EA);
 
 	p_compute_target_tick_count(dt, out_time_delta, out_target_tick_count);
 
@@ -41,7 +42,7 @@ void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out
 	}*/
 
 #if USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE
-	time_globals* timeGlobals = time_globals::get_game_time_globals();
+	time_globals* timeGlobals = time_globals::get();
 	if (p_unk_check() && !timeGlobals->game_is_paused && timeGlobals->game_speed > 0.f)
 	{
 		float game_speed_in_ticks = timeGlobals->game_speed * timeGlobals->ticks_per_second;
@@ -93,20 +94,20 @@ void __cdecl reset_time()
 {
 	QueryPerformanceCounter(&lastTime);
 	network_time = (__int64)(((double)(lastTime.QuadPart - timeAtStartup.QuadPart) / (double)frequency.QuadPart) * 1000.0);
-	*h2mod->GetAddress<BYTE*>(0x479EA0) = (BYTE)1;
+	*Memory::GetAddress<BYTE*>(0x479EA0) = (BYTE)1;
 }
 
-float __cdecl compute_time_delta(bool use_static_time_increase, float static_time_delta)
+float __cdecl main_time_update(bool use_static_time_increase, float static_time_delta)
 {
 	typedef float(__cdecl* compute_time_delta_def)(bool, float);
-	auto p_compute_time_delta_def = h2mod->GetAddress<compute_time_delta_def>(0x28814);
+	auto p_compute_time_delta_def = Memory::GetAddress<compute_time_delta_def>(0x28814);
 
 	LARGE_INTEGER currentTime;
 	float timeDeltaSeconds = 0.0f;
-	if (H2Config_experimental_game_main_loop_patches)
+	if (H2Config_experimental_fps == e_render_patch)
 	{
 		typedef void(__cdecl* translate_windows_messages)();
-		auto p_translate_windows_messages = h2mod->GetAddress<translate_windows_messages>(0x7902);
+		auto p_translate_windows_messages = Memory::GetAddress<translate_windows_messages>(0x7902);
 
 		p_translate_windows_messages(); // TranslateMessage()
 		time_globals* timeGlobals = time_globals::get();
@@ -150,54 +151,28 @@ float __cdecl compute_time_delta(bool use_static_time_increase, float static_tim
 	return timeDeltaSeconds;
 }
 
-// we disable some broken code added by hired gun, that is also disabled while running a cinematic 
-// this should fix the built in frame limiter (while minimized)
-// as well as the game speeding up while minimized
-bool __cdecl cinematic_in_progress_hook()
-{
-	typedef bool(__cdecl* cinematic_in_progress)();
-	auto p_cinematic_in_progress = h2mod->GetAddress<cinematic_in_progress>(0x3A938);
-
-	bool unk = *h2mod->GetAddress<bool*>(0x48225B);
-	if (!p_cinematic_in_progress())
-		unk = false;
-
-	*h2mod->GetAddress<bool*>(0x48225B) = unk;
-
-	return H2Config_experimental_game_main_loop_patches || p_cinematic_in_progress() || call_get_game_tick_rate() < 60 || b_XboxTick || call_is_game_minimized();
-}
-
-bool __cdecl should_limit_framerate()
-{
-	return !H2Config_experimental_game_main_loop_patches && (call_is_game_minimized() || b_XboxTick);
-}
-
 void UncappedFPS::ApplyPatches()
 {
 	if (h2mod->Server == false)
 	{
-		//NopFill(h2mod->GetAddress(0x2728E7), 5);
+		//NopFill(Memory::GetAddress(0x2728E7), 5);
 
-		PatchCall(h2mod->GetAddress(0x39BE3), compute_time_delta);
-		PatchCall(h2mod->GetAddress(0x39C0D), compute_time_delta);
-		WriteJmpTo(h2mod->GetAddress(0x1B3C5C), get_time_delta_msec);
-		WriteJmpTo(h2mod->GetAddress(0x286D9), reset_time);
+		PatchCall(Memory::GetAddress(0x39BE3), main_time_update);
+		PatchCall(Memory::GetAddress(0x39C0D), main_time_update);
+		WriteJmpTo(Memory::GetAddress(0x1B3C5C), get_time_delta_msec);
+		WriteJmpTo(Memory::GetAddress(0x286D9), reset_time);
 
 #if USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE
-		PatchCall(h2mod->GetAddress(0x39D04), compute_target_tick_count);
+		PatchCall(Memory::GetAddress(0x39D04), compute_target_tick_count);
 #endif // USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE
 
-		//NopFill(h2mod->GetAddress(0x39BDA), 2);
-		//NopFill(h2mod->GetAddress(0x39DF0), 8);
+		//NopFill(Memory::GetAddress(0x39BDA), 2);
+		//NopFill(Memory::GetAddress(0x39DF0), 8);
 
-		//NopFill(h2mod->GetAddress(0x39DE1), 5);
-
-		PatchCall(h2mod->GetAddress(0x288B5), should_limit_framerate);
-
-		PatchCall(h2mod->GetAddress(0x39A2A), cinematic_in_progress_hook);
+		//NopFill(Memory::GetAddress(0x39DE1), 5);
 	}
 
-	//PatchWinAPICall(h2mod->GetAddress(0x37E51), timeGetTime_hook);
+	//PatchWinAPICall(Memory::GetAddress(0x37E51), timeGetTime_hook);
 
 	QueryPerformanceFrequency(&frequency);
 	QueryPerformanceCounter(&timeAtStartup);

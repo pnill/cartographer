@@ -20,9 +20,9 @@ static void refresh_mp_explosion_physics() {
 	
 	if (!h2mod->Server) {
 		if (AdvLobbySettings_mp_explosion_physics || AdvLobbySettings_mp_sputnik)
-			WriteValue(h2mod->GetAddress(0x17a44b), (BYTE)0x1e);
+			WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1e);
 		else
-			WriteValue(h2mod->GetAddress(0x17a44b), (BYTE)0);
+			WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0);
 	}
 }
 

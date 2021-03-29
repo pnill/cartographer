@@ -16,6 +16,7 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/GUI/GUI.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Modules/MainLoopPatches/UncappedFPS/UncappedFPS.h"
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
 
@@ -98,6 +99,33 @@ void GSMainLoop() {
 	*/
 }
 
+void __cdecl main_game_time_initialize_defaults_hook()
+{
+	// windows 10 version 2004 and above added behaviour changes to how windows timer resolution works, and we have to explicitly set the time resolution
+	// and since they were added, when playing on a laptop on battery it migth add heavy stuttering when using a frame limiter based on Sleep function (or std::this_thread::sleep_for) implementation
+	// the game sets them already but only during the loading screen period, then it resets to system default when the loading screen ends 
+	// (tho i think in the new implementation is working on a per thread basis now instead of global frequency, since it still works even when the game resets after loading screen ends and loading screen runs in another thread)
+
+	// More code in Tweaks.cpp in InitH2Tweaks
+
+	// More details @ https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/
+
+	timeBeginPeriod(1);
+
+	auto p_main_game_time_initialize_defaults = Memory::GetAddressRelative<void(__cdecl*)()>(0x42869F, 0x424841);
+	return p_main_game_time_initialize_defaults();
+}
+
+void __cdecl game_modules_dispose() {
+	auto p_game_modules_dispose = Memory::GetAddress<void(__cdecl*)()>(0x48BBF, 0x41E60);
+	p_game_modules_dispose();
+
+	DeinitH2Startup();
+
+	// reset time resolution to system default on game exit (initialization happens in main_game_time_initialize_defaults_hook())
+	timeEndPeriod(1);
+}
+
 void (*main_game_loop)();
 
 void main_game_loop_hook() {
@@ -105,9 +133,6 @@ void main_game_loop_hook() {
 		GSMainLoop();
 
 	main_game_loop();
-	
-
-	mapManager->leaveSessionIfAFK();
 
 	extern void frameTimeManagement();
 	frameTimeManagement();
@@ -117,11 +142,7 @@ static char HookedServerShutdownCheck() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 	
-	BYTE& Quit_Exit_Game = *(BYTE*)((char*)H2BaseAddr + 0x4a7083);
-
-	if (Quit_Exit_Game) {
-		DeinitH2Startup();
-	}
+	bool& Quit_Exit_Game = *(bool*)((char*)H2BaseAddr + 0x4a7083);
 
 	//original test - if game should shutdown
 	return Quit_Exit_Game;
@@ -215,8 +236,8 @@ p_game_time_globals_prep* game_time_globals_prep;
 typedef int(__cdecl p_system_milliseconds)();
 p_system_milliseconds* system_milliseconds;
 
-typedef float(__cdecl p_main_game_time_system_update)(char a1, float a2);
-p_main_game_time_system_update* main_game_time_system_update;
+typedef float(__cdecl main_game_time_system_update)(bool a1, float a2);
+main_game_time_system_update* p_main_time_update;
 
 typedef void(__cdecl p_render_audio)();
 p_render_audio* render_audio;
@@ -227,7 +248,61 @@ p_sub_B1D31F* sub_B1D31F;
 typedef void(_cdecl p_sub_AF8716)(int a1);
 p_sub_AF8716* sub_AF8716;
 
+extern bool b_XboxTick;
 
+// we disable some broken code added by hired gun, that is also disabled while running a cinematic 
+// this should fix the built in frame limiter (while minimized)
+// as well as the game speeding up while minimized
+bool __cdecl cinematic_in_progress_hook()
+{
+	typedef bool(__cdecl* cinematic_in_progress)();
+	auto p_cinematic_in_progress = Memory::GetAddress<cinematic_in_progress>(0x3A938);
+
+	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+	if (H2Config_experimental_game_main_loop_patches) // if we are using the original game rendering mode
+		experimental_rendering_mode = e_render_none; // H2Config_experimental_game_main_loop_patches will override H2Config_experimental_fps
+
+	switch (experimental_rendering_mode)
+	{
+	case e_render_old:
+		if (!p_cinematic_in_progress())
+			*Memory::GetAddress<bool*>(0x48225B) = false;
+
+		// TODO: get_game_life_cycle is only used with networked sessions, meaning this will not work in single player
+		// and i keep it this way because the EventHandler in UncappedFPS2.cpp uses the game's life cycle as well
+		return p_cinematic_in_progress() || get_game_life_cycle() == life_cycle_in_game || call_is_game_minimized();
+
+	case e_render_none:
+		if (!p_cinematic_in_progress())
+			*Memory::GetAddress<bool*>(0x48225B) = false;
+	case e_render_new:
+	default:
+		return p_cinematic_in_progress() || b_XboxTick || call_is_game_minimized();
+		break;
+	}
+
+	return false;
+}
+
+bool __cdecl should_limit_framerate()
+{
+	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+	if (H2Config_experimental_game_main_loop_patches) // if we are using the original game rendering mode
+		experimental_rendering_mode = e_render_none; // H2Config_experimental_game_main_loop_patches will override H2Config_experimental_fps
+
+	switch (experimental_rendering_mode)
+	{
+	case e_render_none:
+	case e_render_new:
+	case e_render_old:
+
+	default:
+		return (call_is_game_minimized() || b_XboxTick);
+		break;
+	}
+
+	return false;
+}
 
 LARGE_INTEGER freq;
 LARGE_INTEGER start_tick;
@@ -292,7 +367,7 @@ void __cdecl game_main_loop()
 	int v8; // esi
 	int v9; // [esp+Ch] [ebp-38h]
 	char v10; // [esp+21h] [ebp-23h]
-	char Interpolate; // [esp+22h] [ebp-22h]
+	bool Interpolate; // [esp+22h] [ebp-22h]
 	bool v12; // [esp+23h] [ebp-21h]
 	static float v13;// [esp+24h] [ebp-20h]
 	signed int a3; // [esp+28h] [ebp-1Ch]
@@ -302,7 +377,8 @@ void __cdecl game_main_loop()
 	int v18; // [esp+40h] [ebp-4h]
 	v1 = sub_AF87A1(); //Some sort of initializer for timing.
 	a3 = v1;
-	Interpolate = 1;
+	Interpolate = true; // by default this is false, and needs to be set to true if a cinematic is running, to run the main loop how it originally worked in H2X
+						// (Nuke: also theres no interpolation in the game, it has to be added, mo idea why this is called like this because it's quite misleading)
 	if (!(*dword_F52268 & 1)) //Game loop init
 	{
 		*dword_F52268 |= 1u;
@@ -313,7 +389,7 @@ void __cdecl game_main_loop()
 	{
 		a3 = 1;
 		v1 = 1;
-		Interpolate = 1;
+		Interpolate = true;
 	}
 	else
 	{
@@ -324,7 +400,7 @@ void __cdecl game_main_loop()
 	{
 		a3 = 1;
 		v1 = 1;
-		Interpolate = 1;
+		Interpolate = true;
 	}
 	v2 = 0;
 	while (1)
@@ -381,17 +457,19 @@ void __cdecl game_main_loop()
 			out_target_ticks = 0;
 			if (Interpolate)
 			{
-				//v15 = main_game_time_system_update(0, 0.0);
-				v15 = alt_system_time_update();
+				if (cinematic_in_progress_hook()) 
+					v15 = p_main_time_update(false, 0.0f);
+				else
+					v15 = alt_system_time_update(); // (Nuke: no idea why main_time_update is replaced by this but p_main_time_update does the same thing, just gets a time delta)
 			}
 			else
 			{
 				if (v1 > 0 && sub_B4BFD1())
 					v3 = time_globals::get()->seconds_per_tick;
 				else
-					v3 = 0.0;
+					v3 = 0.0f;
 				a2 = v3;
-				v15 = main_game_time_system_update(1, a2);
+				v15 = p_main_time_update(true, a2);
 				if (*dword_F52260 < 2)
 				{
 					++*dword_F52260;
@@ -457,7 +535,7 @@ void __cdecl game_main_loop()
 				v0 = system_milliseconds();
 				present_rendered_screen();
 				v8 = system_milliseconds() - v0;
-				//DWORD* init_flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
+				//DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
 				//if (init_flags_array[2] == 0)
 				//	render_audio();
 				if (*sound_impulse_called)
@@ -491,7 +569,7 @@ void alt_main_game_loop_hook()
 		if (!QuitGSMainLoop)
 			GSMainLoop();
 		init = true;
-		DWORD* init_flags_array = h2mod->GetAddress<DWORD*>(0x46d820);
+		DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
 		if (init_flags_array[2] == 0)
 			render_audio();
 		if(game_in_simulation())
@@ -502,8 +580,6 @@ void alt_main_game_loop_hook()
 		//main_game_loop();
 	
 		EventHandler::executeGameLoopCallbacks();
-
-		mapManager->leaveSessionIfAFK();
 	}
 	if (H2Config_fps_limit != 0) {
 		QueryPerformanceCounter(&end_render);
@@ -529,7 +605,18 @@ void initGSRunLoop() {
 	else {
 		addDebugText("Hooking Loop Function");
 		main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
-		switch(H2Config_experimental_fps)
+
+		// (TODO (Kant): add H2Config_experimental_game_main_loop_patches as render mode, but should pretty much be e_render_none plus the call to UncappedFPS::ApplyPatches())
+		// what it does is make the game throttle the main loop as the original game on Xbox did, and removes the bs Hired Gun Added
+
+		H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+		//if (H2Config_experimental_game_main_loop_patches)
+		//{
+		//	UncappedFPS::ApplyPatches();
+		//	experimental_rendering_mode = e_render_none; // H2Config_experimental_game_main_loop_patches will override H2Config_experimental_fps
+		//}
+
+		switch (experimental_rendering_mode)
 		{
 		default:;
 		case e_render_none:
@@ -538,6 +625,10 @@ void initGSRunLoop() {
 		case e_render_old:
 				PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 				UncappedFPS2::Init();
+			break;
+		case e_render_patch:
+				UncappedFPS::ApplyPatches();
+				PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 			break;
 		case e_render_new:
 				sub_9AA221 = (void(*)())((char*)H2BaseAddr + 0x3A221);
@@ -552,58 +643,65 @@ void initGSRunLoop() {
 				sub_B09783 = (void(*)())((char*)H2BaseAddr + 0x39783);
 				sub_B727EB = (void(*)())((char*)H2BaseAddr + 0xA27EB);
 
-				sub_C7E7C5 = h2mod->GetAddress<p_sub_C7E7C5*>(0x1AE7C5);
-				sub_B328A8 = h2mod->GetAddress<p_sub_B328A8*>(0x628A8);
-				sub_B5DD5C = h2mod->GetAddress<p_sub_B5DD5C*>(0x8DD5C);
-				sub_B16834 = h2mod->GetAddress<p_sub_B16834*>(0x46834);
-				sub_B1BA65 = h2mod->GetAddress<p_sub_B1BA65*>(0x4BA65);
-				sub_B361EC = h2mod->GetAddress<p_sub_B361EC*>(0x661EC);
-				sub_AF87A1 = h2mod->GetAddress<p_sub_AF87A1*>(0x287A1);
-				sub_AD985E = h2mod->GetAddress<p_sub_AD985E*>(0x985E);
-				sub_B4BFD1 = h2mod->GetAddress<p_sub_B4BFD1*>(0x7BFD1);
-				sub_9A96B1 = h2mod->GetAddress<p_sub_9A96B1*>(0x396B1);
-				sub_CDCA7D = h2mod->GetAddress<p_sub_B7CA7D*>(0x20CA7D);
-				sub_AF8716 = h2mod->GetAddress<p_sub_AF8716*>(0x28716);
-				sub_B1D31F = h2mod->GetAddress<p_sub_B1D31F*>(0x4D31F);
+				sub_C7E7C5 = Memory::GetAddress<p_sub_C7E7C5*>(0x1AE7C5);
+				sub_B328A8 = Memory::GetAddress<p_sub_B328A8*>(0x628A8);
+				sub_B5DD5C = Memory::GetAddress<p_sub_B5DD5C*>(0x8DD5C);
+				sub_B16834 = Memory::GetAddress<p_sub_B16834*>(0x46834);
+				sub_B1BA65 = Memory::GetAddress<p_sub_B1BA65*>(0x4BA65);
+				sub_B361EC = Memory::GetAddress<p_sub_B361EC*>(0x661EC);
+				sub_AF87A1 = Memory::GetAddress<p_sub_AF87A1*>(0x287A1);
+				sub_AD985E = Memory::GetAddress<p_sub_AD985E*>(0x985E);
+				sub_B4BFD1 = Memory::GetAddress<p_sub_B4BFD1*>(0x7BFD1);
+				sub_9A96B1 = Memory::GetAddress<p_sub_9A96B1*>(0x396B1);
+				sub_CDCA7D = Memory::GetAddress<p_sub_B7CA7D*>(0x20CA7D);
+				sub_AF8716 = Memory::GetAddress<p_sub_AF8716*>(0x28716);
+				sub_B1D31F = Memory::GetAddress<p_sub_B1D31F*>(0x4D31F);
 
 				vibrations_clear = (void(*)())((char*)H2BaseAddr + 0x901B8);
 				game_network_dispatcher = (void(*)())((char*)H2BaseAddr + 0x1B5456);
-				restart_game_loop = h2mod->GetAddress<p_restart_game_loop*>(0x286E1);
-				game_time_globals_prep = h2mod->GetAddress<p_game_time_globals_prep*>(0x7C1BF);
-				present_rendered_screen = h2mod->GetAddress<p_present_rendered_screen*>(0x27002A);
-				game_in_simulation = h2mod->GetAddress<p_game_in_simulation*>(0x1ADD30);
-				game_freeze = h2mod->GetAddress<p_game_freeze*>(0x145B);
-				game_minimized = h2mod->GetAddress<p_game_minimized*>(0x28729);
-				render_audio = h2mod->GetAddress<p_render_audio*>(0x2DF87);
-				system_milliseconds = h2mod->GetAddress<p_system_milliseconds*>(0x37E51);
-				cinematic_in_progress = h2mod->GetAddress<c_cinematic_in_progress*>(0x3a928);
-				cinematic_is_running = h2mod->GetAddress<c_cinematic_is_running*>(0x3a938);
-				observer_update = h2mod->GetAddress<p_observer_update*>(0x83E6A);
-				local_players_update_and_send_synchronous_actions = h2mod->GetAddress<p_local_players_update_and_send_synchronous_actions*>(0x93857);
-				simulation_update = h2mod->GetAddress<p_simulation_update*>(0x4A5D0);
-				game_effects_update = h2mod->GetAddress<p_game_effects_update*>(0x48CDC);
-				director_update = h2mod->GetAddress<p_director_update*>(0x5A658);
-				main_game_time_system_update = h2mod->GetAddress<p_main_game_time_system_update*>(0x28814);
+				restart_game_loop = Memory::GetAddress<p_restart_game_loop*>(0x286E1);
+				game_time_globals_prep = Memory::GetAddress<p_game_time_globals_prep*>(0x7C1BF);
+				present_rendered_screen = Memory::GetAddress<p_present_rendered_screen*>(0x27002A);
+				game_in_simulation = Memory::GetAddress<p_game_in_simulation*>(0x1ADD30);
+				game_freeze = Memory::GetAddress<p_game_freeze*>(0x145B);
+				game_minimized = Memory::GetAddress<p_game_minimized*>(0x28729);
+				render_audio = Memory::GetAddress<p_render_audio*>(0x2DF87);
+				system_milliseconds = Memory::GetAddress<p_system_milliseconds*>(0x37E51);
+				cinematic_in_progress = Memory::GetAddress<c_cinematic_in_progress*>(0x3a928);
+				cinematic_is_running = Memory::GetAddress<c_cinematic_is_running*>(0x3a938);
+				observer_update = Memory::GetAddress<p_observer_update*>(0x83E6A);
+				local_players_update_and_send_synchronous_actions = Memory::GetAddress<p_local_players_update_and_send_synchronous_actions*>(0x93857);
+				simulation_update = Memory::GetAddress<p_simulation_update*>(0x4A5D0);
+				game_effects_update = Memory::GetAddress<p_game_effects_update*>(0x48CDC);
+				director_update = Memory::GetAddress<p_director_update*>(0x5A658);
+				p_main_time_update = Memory::GetAddress<main_game_time_system_update*>(0x28814);
 
-				dword_F52268 = h2mod->GetAddress<int*>(0x482268);
-				max_tick_count = h2mod->GetAddress<int*>(0x482264);
-				sound_impulse_unk = h2mod->GetAddress<byte*>(0x48225B);
-				sound_impulse_called = h2mod->GetAddress<byte*>(0x48225A);
-				dword_F52260 = h2mod->GetAddress<int*>(0x482260);
-				b_restart_game_loop = h2mod->GetAddress<byte*>(0x479EA0);
+				dword_F52268 = Memory::GetAddress<int*>(0x482268);
+				max_tick_count = Memory::GetAddress<int*>(0x482264);
+				sound_impulse_unk = Memory::GetAddress<byte*>(0x48225B);
+				sound_impulse_called = Memory::GetAddress<byte*>(0x48225A);
+				dword_F52260 = Memory::GetAddress<int*>(0x482260);
+				b_restart_game_loop = Memory::GetAddress<byte*>(0x479EA0);
 
-				//PatchCall(h2mod->GetAddress(0x39D04), alt_prep_time);
+				//PatchCall(Memory::GetAddress(0x39D04), alt_prep_time);
 				PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
 				//PatchCall(H2BaseAddr + 0x39e64, game_main_loop);
 				QueryPerformanceFrequency(&freq);
 				//Remove original render call
-				NopFill(h2mod->GetAddress(0x39DAA), 5);
+				NopFill(Memory::GetAddress(0x39DAA), 5);
 				//Stop Hold to Zoom.
-				NopFill(h2mod->GetAddress(0x9355C), 4);
+				NopFill(Memory::GetAddress(0x9355C), 4);
 			break;
 		}
 
+		// apply the code that fixes and determines if the amin loop should be throttled
+		PatchCall(Memory::GetAddress(0x288B5), should_limit_framerate);
+		PatchCall(Memory::GetAddress(0x39A2A), cinematic_in_progress_hook);
 	}
+
+	PatchCall(Memory::GetAddressRelative(0x439E3D, 0x40BA40), main_game_time_initialize_defaults_hook);
+	PatchCall(Memory::GetAddress(0x39E7C, 0xC6F7), game_modules_dispose);
+
 	addDebugText("Post GSRunLoop Hooking.");
 }
 
