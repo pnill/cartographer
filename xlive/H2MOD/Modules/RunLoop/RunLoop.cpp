@@ -610,11 +610,11 @@ void initGSRunLoop() {
 		// what it does is make the game throttle the main loop as the original game on Xbox did, and removes the bs Hired Gun Added
 
 		H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
-		if (H2Config_experimental_game_main_loop_patches)
-		{
-			UncappedFPS::ApplyPatches();
-			experimental_rendering_mode = e_render_none; // H2Config_experimental_game_main_loop_patches will override H2Config_experimental_fps
-		}
+		//if (H2Config_experimental_game_main_loop_patches)
+		//{
+		//	UncappedFPS::ApplyPatches();
+		//	experimental_rendering_mode = e_render_none; // H2Config_experimental_game_main_loop_patches will override H2Config_experimental_fps
+		//}
 
 		switch (experimental_rendering_mode)
 		{
@@ -625,6 +625,10 @@ void initGSRunLoop() {
 		case e_render_old:
 				PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 				UncappedFPS2::Init();
+			break;
+		case e_render_patch:
+				UncappedFPS::ApplyPatches();
+				PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 			break;
 		case e_render_new:
 				sub_9AA221 = (void(*)())((char*)H2BaseAddr + 0x3A221);

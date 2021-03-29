@@ -104,7 +104,7 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 
 	LARGE_INTEGER currentTime;
 	float timeDeltaSeconds = 0.0f;
-	if (H2Config_experimental_game_main_loop_patches)
+	if (H2Config_experimental_fps == e_render_patch)
 	{
 		typedef void(__cdecl* translate_windows_messages)();
 		auto p_translate_windows_messages = h2mod->GetAddress<translate_windows_messages>(0x7902);

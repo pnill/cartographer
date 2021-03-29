@@ -306,9 +306,9 @@ namespace imgui_handler {
 					}
 					ImGui::NextColumn();
 					ImGui::Text(GetString(experimental_rendering_changes));
-					const char* r_items[] = { GetString(render_none), GetString(render_cinematic), GetString(render_engine) };
+					const char* r_items[] = { GetString(render_none), GetString(render_cinematic), GetString(render_engine), GetString(render_patch) };
 					ImGui::PushItemWidth(WidthPercentage(100));
-					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 3))
+					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 4))
 					{
 						H2Config_experimental_fps = (H2Config_Experimental_Rendering_Mode)g_experimental;
 					}
@@ -1149,6 +1149,7 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::melee_fix_tooltip] = "Allows you to turn off the melee patch";
 			string_table[0][e_advanced_string::no_events_title] = "No Events";
 			string_table[0][e_advanced_string::no_events_tooltip] = "Opt out of event cosmetics restart required to take effect";
+			string_table[0][e_advanced_string::render_patch] = "Engine Patch";
 			
 			//Spanish.
 			string_table[4][e_advanced_string::title] = u8"      Ajustes avanzados";
@@ -1262,6 +1263,7 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::melee_fix_tooltip] = u8"Te permite desactivar el parche cuerpo a cuerpo";
 			string_table[4][e_advanced_string::no_events_title] = u8"No hay eventos";
 			string_table[4][e_advanced_string::no_events_tooltip] = u8"Se requiere el reinicio de los cosméticos del evento para que surta efecto";
+			string_table[4][e_advanced_string::render_patch] = u8"Parche de juego";
 		}
 	}
 }

@@ -167,7 +167,8 @@ namespace imgui_handler
 			melee_fix_title,
 			melee_fix_tooltip,
 			no_events_title,
-			no_events_tooltip
+			no_events_tooltip,
+			render_patch
 		};
 		void BuildStringsTable();
 		char* GetString(e_advanced_string string, std::string id = "");

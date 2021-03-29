@@ -290,41 +290,41 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			EventHandler::executeNetworkPlayerRemoveCallbacks(peer_index);
 		}
 	}
-	case parameters_update:
-	{
-		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
-			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
-		{
-			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
-			//LOG_INFO_NETWORK(L"Got a parameters update from {} : {}", NetworkSession::getPeerPlayerName(peer_index), std::to_wstring(NetworkSession::getCurrentNetworkSession()->parameters.dedicated_server));
-			if (peer_index == NetworkSession::getCurrentNetworkSession()->session_host_peer_index && !NetworkSession::getCurrentNetworkSession()->parameters.dedicated_server)
-			{
-				const auto host_xuid = NetworkSession::getPeerXUID(peer_index);
-				if (host_xuid != NONE) {
-					//LOG_TRACE_NETWORK(L"Setting up team persistance with host xuid {}", IntToWString<XUID>(host_xuid, std::dec));
-					h2mod->set_local_clan_tag(0, host_xuid);
-					//EventHandler::registerGameStateCallback({
-					//		"UnPersistHostTeam1",
-					//		game_life_cycle::life_cycle_in_game,
-					//		[]()
-					//		{
-					//			//LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
-					//			h2mod->set_local_clan_tag(0, 0);
-					//		}, true
-					//	}, false);
-					EventHandler::registerGameStateCallback({
-							"UnPersistHostTeam2",
-							game_life_cycle::life_cycle_none,
-							[]()
-							{
-								//LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
-								h2mod->set_local_clan_tag(0, 0);
-							}, true
-						}, false);
-				}
-			}
-		}
-	}
+	//case parameters_update:
+	//{
+	//	if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
+	//		&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
+	//	{
+	//		auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
+	//		//LOG_INFO_NETWORK(L"Got a parameters update from {} : {}", NetworkSession::getPeerPlayerName(peer_index), std::to_wstring(NetworkSession::getCurrentNetworkSession()->parameters.dedicated_server));
+	//		if (peer_index == NetworkSession::getCurrentNetworkSession()->session_host_peer_index && !NetworkSession::getCurrentNetworkSession()->parameters.dedicated_server)
+	//		{
+	//			const auto host_xuid = NetworkSession::getPeerXUID(peer_index);
+	//			if (host_xuid != NONE) {
+	//				//LOG_TRACE_NETWORK(L"Setting up team persistance with host xuid {}", IntToWString<XUID>(host_xuid, std::dec));
+	//				h2mod->set_local_clan_tag(0, host_xuid);
+	//				//EventHandler::registerGameStateCallback({
+	//				//		"UnPersistHostTeam1",
+	//				//		game_life_cycle::life_cycle_in_game,
+	//				//		[]()
+	//				//		{
+	//				//			//LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
+	//				//			h2mod->set_local_clan_tag(0, 0);
+	//				//		}, true
+	//				//	}, false);
+	//				EventHandler::registerGameStateCallback({
+	//						"UnPersistHostTeam2",
+	//						game_life_cycle::life_cycle_none,
+	//						[]()
+	//						{
+	//							//LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
+	//							h2mod->set_local_clan_tag(0, 0);
+	//						}, true
+	//					}, false);
+	//			}
+	//		}
+	//	}
+	//}
 	default:
 		break;
 	}

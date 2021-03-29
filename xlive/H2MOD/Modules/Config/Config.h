@@ -14,7 +14,7 @@ void ReadH2Config();
 
 #define DLL_VERSION_MAJOR               0
 #define DLL_VERSION_MINOR               6
-#define DLL_VERSION_REVISION            1
+#define DLL_VERSION_REVISION            2
 #define DLL_VERSION_BUILD				1
 
 #define DLL_VERSION            DLL_VERSION_MAJOR, DLL_VERSION_MINOR, DLL_VERSION_REVISION, DLL_VERSION_BUILD
@@ -45,7 +45,8 @@ enum H2Config_Experimental_Rendering_Mode : byte
 {
 	e_render_none,
 	e_render_old,
-	e_render_new
+	e_render_new,
+	e_render_patch
 };
 
 extern std::string cartographerURL;

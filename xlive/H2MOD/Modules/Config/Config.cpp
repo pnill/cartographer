@@ -747,6 +747,8 @@ void ReadH2Config() {
 					case 2:
 						H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_new;
 						break;
+					case 3:
+						H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_patch;
 				}
 				
 				std::string crosshair_offset_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN"));
