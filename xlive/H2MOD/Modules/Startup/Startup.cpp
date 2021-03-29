@@ -369,7 +369,6 @@ void InitH2Startup() {
 	}
 
 	H2BaseAddr = (DWORD)game_info.base;
-	Memory::setBaseAddress(H2BaseAddr, H2IsDediServer);
 
 	if (game_info.process_type == H2Types::H2Server)
 	{
@@ -381,6 +380,7 @@ void InitH2Startup() {
 		h2mod->Server = false;
 		H2IsDediServer = false;
 	}
+	Memory::setBaseAddress(H2BaseAddr, H2IsDediServer);
 
 	initInstanceNumber();
 
