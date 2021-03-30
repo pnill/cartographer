@@ -69,8 +69,8 @@ public:
 		void leave_session();
 		void set_local_rank(BYTE rank);
 		void cine_start_tex();
-		e_engine_type GetEngineType() { return mapType; }
-		void SetCurrentEngineType(e_engine_type value) { mapType = value; }
+		e_engine_type GetEngineType() { return engineType; }
+		void SetCurrentEngineType(e_engine_type value) { engineType = value; }
 
 		std::unordered_map<std::string, bool> AchievementMap;
 		std::deque<std::wstring> CustomSounds;
@@ -82,7 +82,7 @@ public:
 		bool drawTeamIndicators = true;
 
 private:
-		e_engine_type mapType;
+		e_engine_type engineType;
 };
 
 extern H2MOD* h2mod;

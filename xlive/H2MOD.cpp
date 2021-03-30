@@ -845,7 +845,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	// clear all the object variant data
 	object_to_variant.clear();
 
-	// set the map type
+	// set the engine type
 	h2mod->SetCurrentEngineType(engine_settings->map_type);
 
 	tags::run_callbacks();
@@ -888,7 +888,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 
 	if (h2mod->GetEngineType() == e_engine_type::MainMenu)
 	{
-		addDebugText("Map Type: Main-Menu");
+		addDebugText("Engine type: Main-Menu");
 		UIRankPatch();
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
@@ -898,7 +898,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 
 
 	wchar_t* variant_name = NetworkSession::getGameVariantName();
-	LOG_INFO_GAME(L"[h2mod] OnMapLoad map type {}, variant name {}", (int)h2mod->GetEngineType(), variant_name);
+	LOG_INFO_GAME(L"[h2mod] OnMapLoad engine type {}, variant name {}", (int)h2mod->GetEngineType(), variant_name);
 
 	for (auto gametype_it : GametypesMap)
 		gametype_it.second = false; // reset custom gametypes state
@@ -908,7 +908,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	HudElements::OnMapLoad();
 	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 	{
-		addDebugText("Map type: Multiplayer");
+		addDebugText("Engine type: Multiplayer");
 		
 		for (auto gametype_it : GametypesMap)
 		{
@@ -960,7 +960,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	else if (h2mod->GetEngineType() == e_engine_type::SinglePlayer)
 	{
 		//if anyone wants to run code on map load single player
-		addDebugText("Map type: Singleplayer");
+		addDebugText("Engine type: Singleplayer");
 		//H2X::Initialize(true);
 		MeleeFix::MeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);

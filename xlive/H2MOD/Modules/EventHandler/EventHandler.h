@@ -206,5 +206,5 @@ namespace EventHandler
 
 	void registerMapLoadCallback(MapLoadEventCallback callback, bool threaded);
 	void removeMapLoadCallback(std::string name);
-	void executeMapLoadCallback(e_engine_type map_type);
+	void executeMapLoadCallback(e_engine_type engine_type);
 }
