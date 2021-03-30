@@ -11,11 +11,11 @@ namespace Blam
 {
 	namespace EngineDefinitions
 	{
-		struct __declspec(align(4))  game_variant
+		struct __declspec(align(4)) game_variant
 		{
 			WORD variant_flag;
 			char gap[1];
-			game_variant_description_index description_index;
+			e_game_variant_description_index description_index;
 			wchar_t variant_name[16];
 			char pad0[32];
 			e_game_engine_index variant_game_engine_index;

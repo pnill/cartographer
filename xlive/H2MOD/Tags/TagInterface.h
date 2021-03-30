@@ -21,7 +21,15 @@ namespace tags
 		int field_24;
 		BYTE padding[260];
 		char version[32];
-		e_engine_type type;
+		enum e_scnr_type : int
+		{
+			SinglePlayerScenario = 0,
+			MultiplayerScenario = 1,
+			MainMenuScenario = 2,
+			MultiplayerSharedScenario = 3,
+			SinglePlayerSharedScenario = 4
+		};
+		e_scnr_type type;
 		int crc;
 		int crc_uiid;
 		char field_158;
@@ -60,9 +68,11 @@ namespace tags
 		BYTE field_2F8[1284];
 		int foot;
 
-		bool is_main_menu() { return type == MainMenu; };
-		bool is_multiplayer() { return type == Multiplayer; };
-		bool is_single_player() { return type == SinglePlayer; };
+		bool is_main_menu()			   const { return type == e_scnr_type::MainMenuScenario; };
+		bool is_multiplayer()		   const { return type == e_scnr_type::MultiplayerScenario; };
+		bool is_multi_player_shared()  const { return type == e_scnr_type::MultiplayerSharedScenario; };
+		bool is_single_player()		   const { return type == e_scnr_type::SinglePlayerScenario; };
+		bool is_single_player_shared() const { return type == e_scnr_type::SinglePlayerSharedScenario; };
 	};
 	static_assert(sizeof(cache_header) == 0x800, "Bad cache header size");
 

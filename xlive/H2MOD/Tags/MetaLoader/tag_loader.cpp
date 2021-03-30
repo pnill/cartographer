@@ -1331,7 +1331,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	//tag_loader::Add_all_shared_refs();
 
 	// extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
-	if (tags::get_cache_header()->type != e_engine_type::SinglePlayerShared)
+	if (tags::get_cache_header()->is_single_player_shared())
 	{
 		DWORD* TagTableStart = Memory::GetAddress<DWORD*>(0x47CD50);
 		memset((BYTE*)tag_loader::new_Tables, 0, 0x3BA40);
@@ -1349,7 +1349,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	///tag_injector testing
 	//Just for testing purpose,dont cluter here	
 	///Actual injection process after map load
-	if (tags::get_cache_header()->type != e_engine_type::SinglePlayerShared)
+	if (tags::get_cache_header()->is_single_player_shared())
 	{
 		//actual tag_loading
 		///parse query file
