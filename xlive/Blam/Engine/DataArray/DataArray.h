@@ -6,22 +6,22 @@
 
 struct s_datum_array
 {
-	char name[0x20]; // 0x0
-	int datum_max_elements; // 0x20
-	int datum_element_size; // 0x24
-	BYTE alignment_bit; // 0x28
-	bool is_valid; // 0x29
-	WORD flags;  // 0x2A
-	char data_signature[4]; // 0x2C
-	void **allocator; // 0x30
+	char name[0x20];				// 0x0
+	int datum_max_elements;			// 0x20
+	int datum_element_size;			// 0x24
+	BYTE alignment_bit;				// 0x28
+	bool is_valid;					// 0x29
+	WORD flags;						// 0x2A
+	char data_signature[4];			// 0x2C
+	void **allocator;				// 0x30
 	struct {
-		int bit_index_size; // 0x34
-		int max_data_count; // 0x38
+		int bit_index_size;			// 0x34
+		int max_data_count;			// 0x38
 	} active_indices; 
-	int total_elements_used; // 0x3C 
-	datum next_datum; // 0x40
-	char* datum; // 0x44
-	int* datum_usable_bit_mask; // 0x48
+	int total_elements_used;		// 0x3C 
+	datum next_datum;				// 0x40
+	char* datum;					// 0x44
+	int* datum_usable_bit_mask;		// 0x48
 };
 static_assert(sizeof(s_datum_array) == 0x4C, "s_data_array size != 0x4C");
 
