@@ -19,6 +19,7 @@
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS/OriginalFPSLimiter.h"
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
+#include "H2MOD/Engine/Engine.h"
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
@@ -269,14 +270,14 @@ bool __cdecl cinematic_in_progress_hook()
 
 		// TODO: get_game_life_cycle is only used with networked sessions, meaning this will not work in single player
 		// and i keep it this way because the EventHandler in UncappedFPS2.cpp uses the game's life cycle as well
-		return p_cinematic_in_progress() || get_game_life_cycle() == life_cycle_in_game || call_is_game_minimized();
+		return p_cinematic_in_progress() || Engine::get_game_life_cycle() == life_cycle_in_game || Engine::IsGameMinimized();
 
 	case e_render_none:
 		if (!p_cinematic_in_progress())
 			*Memory::GetAddress<bool*>(0x48225B) = false;
 	case e_render_new:
 	default:
-		return p_cinematic_in_progress() || b_XboxTick || call_is_game_minimized();
+		return p_cinematic_in_progress() || b_XboxTick || Engine::IsGameMinimized();
 		break;
 	}
 
@@ -296,7 +297,7 @@ bool __cdecl should_limit_framerate()
 	case e_render_old:
 
 	default:
-		return (call_is_game_minimized() || b_XboxTick);
+		return (Engine::IsGameMinimized() || b_XboxTick);
 		break;
 	}
 
@@ -315,7 +316,7 @@ float tps = (1.0f / 60);
 
 void alt_prep_time(float a1, float *a2, int *a3)
 {
-	if (get_game_life_cycle() != life_cycle_in_game) {
+	if (Engine::get_game_life_cycle() != life_cycle_in_game) {
 		float _a2;
 		int _a3;
 		game_time_globals_prep(a1, &_a2, &_a3);

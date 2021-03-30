@@ -6,19 +6,22 @@
 #include "Util/Hooks/Detour.h"
 
 HMODULE hThis = NULL;
-
 CRITICAL_SECTION d_lock;
 
-//CHAR g_profileDirectory[512] = "Profiles";
-
 std::wstring dlcbasepath;
+//CHAR g_profileDirectory[512] = "Profiles";
 
 std::string ModulePathA(HMODULE hModule = NULL)
 {
 	char strPath[MAX_PATH];
 	memset(strPath, 0, sizeof(strPath));
 	GetModuleFileNameA(hModule, strPath, MAX_PATH);
-	for (int i = strlen(strPath); i > 0; i--) { if (strPath[i] == '\\') { strPath[i + 1] = 0; break; } }
+
+	for (int i = strlen(strPath); i > 0; i--) 
+	{ 
+		if (strPath[i] == '\\') 
+			strPath[i + 1] = 0; break; 
+	}
 	return std::string(strPath);
 }
 
@@ -27,7 +30,11 @@ std::wstring ModulePathW(HMODULE hModule = NULL)
 	wchar_t strPath[MAX_PATH];
 	memset(strPath, 0, sizeof(strPath));
 	GetModuleFileNameW(hModule, strPath, MAX_PATH);
-	for (int i = wcslen(strPath); i > 0; i--) { if (strPath[i] == L'\\') { strPath[i + 1] = 0; break; } }
+	for (int i = wcslen(strPath); i > 0; i--)
+	{
+		if (strPath[i] == L'\\')
+			strPath[i + 1] = 0; break;
+	}
 	return std::wstring(strPath);
 }
 
@@ -37,10 +44,6 @@ void InitInstance()
 
 	if (init)
 	{
-		init = false;
-
-		InitH2Startup2();
-
 #ifdef _DEBUG
 		int CurrentFlags;
 		CurrentFlags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
@@ -49,6 +52,9 @@ void InitInstance()
 		CurrentFlags |= _CRTDBG_CHECK_ALWAYS_DF;
 		_CrtSetDbgFlag(CurrentFlags);
 #endif
+
+		init = false;
+		InitH2Startup2();						//Initializes Startup.cpp
 		InitializeCriticalSection(&d_lock);
 
 		dlcbasepath = L"DLC";
@@ -96,11 +102,9 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 		Detour();
 		break;
 
-
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
 		break;
-
 
 	case DLL_PROCESS_DETACH:
 		ExitInstance();
@@ -108,5 +112,3 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 	}
 	return TRUE;
 }
-
-

@@ -51,6 +51,13 @@ namespace HaloScript
 		c_render_lights_enable_cinematic_shadow(unk1, ObjectDatum, StringId, unk2);
 	}
 
+	typedef void(__cdecl p_object_destroy)(datum object_datum_index);
+	p_object_destroy* c_object_destroy;
+	void ObjectDestroy(datum object_datum_index)
+	{
+		c_object_destroy(object_datum_index);
+	}
+
 	void Initialize()
 	{
 		c_unit_kill	= Memory::GetAddress<p_unit_kill*>(0x13B514, 0x12A363);
@@ -60,5 +67,6 @@ namespace HaloScript
 		c_physics_set_gravity	= Memory::GetAddress<p_physics_set_gravity*>(0xB3C00, 0xA3E13);
 		c_physics_set_velocity_frame = Memory::GetAddress<p_physics_set_velocity_frame*>(0xB3D5B, 0xA3F6E);
 		c_render_lights_enable_cinematic_shadow = Memory::GetAddress<p_render_lights_enable_cinematic_shadow*>(0x19245A);
+		c_object_destroy = Memory::GetAddress<p_object_destroy*>(0xFDCFD, 0x124ED5);
 	}
 }
