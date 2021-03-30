@@ -21,7 +21,7 @@ namespace tags
 		int field_24;
 		BYTE padding[260];
 		char version[32];
-		scnr_type type;
+		e_engine_type type;
 		int crc;
 		int crc_uiid;
 		char field_158;

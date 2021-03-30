@@ -65,7 +65,7 @@ namespace Blam
 
 		struct __declspec(align(4))  game_engine_settings
 		{
-			scnr_type map_type;
+			e_engine_type map_type;
 			char simulation_protocol;
 			char network_protocol_related;
 			BYTE session_host_is_dedicated;

@@ -71,7 +71,7 @@ namespace SpecialEvents
 
 	void ChristmasOnMapLoad()
 	{
-		if (h2mod->GetMapType() == scnr_type::Multiplayer)
+		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 		{
 			santa_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", blam_tag::tag_group_type::scenario, "carto_shared");
 			if (!santa_hat_datum.IsNull()) {
@@ -103,7 +103,7 @@ namespace SpecialEvents
 
 	void PaddysOnMapLoad()
 	{
-		if (h2mod->GetMapType() == scnr_type::Multiplayer)
+		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 		{
 			if (tag_loader::Map_exists("carto_shared"))
 			{
@@ -240,7 +240,7 @@ namespace SpecialEvents
 
 	void AddNewMarkers()
 	{
-		if (h2mod->GetMapType() == scnr_type::Multiplayer) {
+		if (h2mod->GetEngineType() == e_engine_type::Multiplayer) {
 			auto mode_elite_datum = tags::find_tag(blam_tag::tag_group_type::rendermodel, "objects\\characters\\elite\\elite_mp");
 			auto mode_elite = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(mode_elite_datum);
 			auto new_marker_group = MetaExtender::add_tag_block2<s_render_model_group_definition::s_marker_groups_block>((unsigned long)std::addressof(mode_elite->marker_groups));

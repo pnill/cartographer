@@ -92,7 +92,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
 		return false;
 	}
-	if (header.type != scnr_type::Multiplayer && header.type != scnr_type::SinglePlayer)
+	if (header.type != e_engine_type::Multiplayer && header.type != e_engine_type::SinglePlayer)
 	{
 		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
 		return false;

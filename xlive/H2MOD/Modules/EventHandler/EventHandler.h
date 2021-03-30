@@ -85,9 +85,9 @@ struct PlayerControlChangeEventCallback
 struct MapLoadEventCallback
 {
 	std::string name;
-	scnr_type Type;
+	e_engine_type Type;
 	std::function<void()> callback;
-	MapLoadEventCallback(std::string name, scnr_type type, std::function<void()> callback)
+	MapLoadEventCallback(std::string name, e_engine_type type, std::function<void()> callback)
 	{
 		this->name = name;
 		this->Type = type;
@@ -206,5 +206,5 @@ namespace EventHandler
 
 	void registerMapLoadCallback(MapLoadEventCallback callback, bool threaded);
 	void removeMapLoadCallback(std::string name);
-	void executeMapLoadCallback(scnr_type map_type);
+	void executeMapLoadCallback(e_engine_type map_type);
 }

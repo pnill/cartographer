@@ -89,7 +89,7 @@ void HudElements::setCrosshairSize()
 {
 	if (Memory::isDedicatedServer())
 		return;
-	if (h2mod->GetMapType() == scnr_type::Multiplayer) {
+	if (h2mod->GetEngineType() == e_engine_type::Multiplayer) {
 		point2d* Weapons[59];
 
 		auto hud_reticles = tags::find_tag(blam_tag::tag_group_type::bitmap, "ui\\hud\\bitmaps\\new_hud\\crosshairs\\hud_reticles");

@@ -8,7 +8,7 @@
 
 void c_pregame_lobby_menu::ApplyPatches()
 {
-	if (h2mod->GetMapType() != MainMenu) return;
+	if (h2mod->GetEngineType() != MainMenu) return;
 
 	std::string pregame_lobby_tag_path("ui\\screens\\game_shell\\pregame_lobby\\pregame_lobby");
 

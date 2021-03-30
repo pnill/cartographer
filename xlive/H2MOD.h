@@ -69,8 +69,8 @@ public:
 		void leave_session();
 		void set_local_rank(BYTE rank);
 		void cine_start_tex();
-		scnr_type GetMapType() { return mapType; }
-		void SetMapType(scnr_type value) { mapType = value; }
+		e_engine_type GetEngineType() { return mapType; }
+		void SetCurrentEngineType(e_engine_type value) { mapType = value; }
 
 		std::unordered_map<std::string, bool> AchievementMap;
 		std::deque<std::wstring> CustomSounds;
@@ -82,7 +82,7 @@ public:
 		bool drawTeamIndicators = true;
 
 private:
-		scnr_type mapType;
+		e_engine_type mapType;
 };
 
 extern H2MOD* h2mod;

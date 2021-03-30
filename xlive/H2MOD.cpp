@@ -407,7 +407,7 @@ void H2MOD::leave_session()
 	if (Memory::isDedicatedServer())
 		return;
 
-	if (GetMapType() != scnr_type::MainMenu)
+	if (GetEngineType() != e_engine_type::MainMenu)
 	{
 		// request_squad_browser
 		WriteValue<BYTE>(Memory::GetAddress(0x978BAC), 1);
@@ -846,7 +846,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	object_to_variant.clear();
 
 	// set the map type
-	h2mod->SetMapType(engine_settings->map_type);
+	h2mod->SetCurrentEngineType(engine_settings->map_type);
 
 	tags::run_callbacks();
 
@@ -886,7 +886,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		resetAfterMatch = false;
 	}
 
-	if (h2mod->GetMapType() == scnr_type::MainMenu)
+	if (h2mod->GetEngineType() == e_engine_type::MainMenu)
 	{
 		addDebugText("Map Type: Main-Menu");
 		UIRankPatch();
@@ -898,7 +898,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 
 
 	wchar_t* variant_name = NetworkSession::getGameVariantName();
-	LOG_INFO_GAME(L"[h2mod] OnMapLoad map type {}, variant name {}", (int)h2mod->GetMapType(), variant_name);
+	LOG_INFO_GAME(L"[h2mod] OnMapLoad map type {}, variant name {}", (int)h2mod->GetEngineType(), variant_name);
 
 	for (auto gametype_it : GametypesMap)
 		gametype_it.second = false; // reset custom gametypes state
@@ -906,7 +906,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	ControllerInput::SetSensitiviy(H2Config_controller_sens);
 	MouseInput::SetSensitivity(H2Config_mouse_sens);
 	HudElements::OnMapLoad();
-	if (h2mod->GetMapType() == scnr_type::Multiplayer)
+	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 	{
 		addDebugText("Map type: Multiplayer");
 		
@@ -932,7 +932,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		}
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
-		EventHandler::executeMapLoadCallback(scnr_type::Multiplayer);
+		EventHandler::executeMapLoadCallback(e_engine_type::Multiplayer);
 
 		if (get_game_life_cycle() == life_cycle_in_game)
 		{
@@ -957,14 +957,14 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		}
 	}
 
-	else if (h2mod->GetMapType() == scnr_type::SinglePlayer)
+	else if (h2mod->GetEngineType() == e_engine_type::SinglePlayer)
 	{
 		//if anyone wants to run code on map load single player
 		addDebugText("Map type: Singleplayer");
 		//H2X::Initialize(true);
 		MeleeFix::MeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
-		EventHandler::executeMapLoadCallback(scnr_type::SinglePlayer);
+		EventHandler::executeMapLoadCallback(e_engine_type::SinglePlayer);
 	}
 
 	// if we got this far, it means map is MP or SP, and if map load is called again, it should reset/deinitialize any custom gametypes
@@ -1207,19 +1207,19 @@ bool __cdecl fn_c000bd114_IsSkullEnabled(int skull_index)
 bool GrenadeChainReactIsEngineMPCheck() {
 	if (AdvLobbySettings_grenade_chain_react)
 		return false;
-	return h2mod->GetMapType() == scnr_type::Multiplayer;
+	return h2mod->GetEngineType() == e_engine_type::Multiplayer;
 }
 
 bool BansheeBombIsEngineMPCheck() {
 	if (AdvLobbySettings_banshee_bomb)
 		return false;
-	return h2mod->GetMapType() == scnr_type::Multiplayer;
+	return h2mod->GetEngineType() == e_engine_type::Multiplayer;
 }
 
 bool FlashlightIsEngineSPCheck() {
 	if (AdvLobbySettings_flashlight)
 		return true;
-	return h2mod->GetMapType() == scnr_type::SinglePlayer;
+	return h2mod->GetEngineType() == e_engine_type::SinglePlayer;
 }
 
 #pragma region Game Version hooks
@@ -1294,7 +1294,7 @@ bool device_active = true;
 //This happens whenever a player activates a device control.
 int __cdecl device_touch(datum device_datum, datum unit_datum)
 {
-	if (h2mod->GetMapType() == scnr_type::Multiplayer)
+	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 	{
 		//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 		if (get_device_acceleration_scale(device_datum) == 999.0f)
