@@ -366,7 +366,7 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 }
 
 void ConsoleCommands::output(std::wstring result) {
-	if (h2mod->Server) {
+	if (Memory::isDedicatedServer()) {
 		result = result + L"\n";
 		ServerConsole::logToDedicatedServerConsole(result.c_str());
 	}
@@ -444,7 +444,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$kick") {
-			if (h2mod->Server) {
+			if (Memory::isDedicatedServer()) {
 				output(L"Don't use this on dedis");
 				return;
 			}

@@ -87,7 +87,7 @@ bool crosshairInit = false;
 static point2d defaultCrosshairSizes[59];
 void HudElements::setCrosshairSize()
 {
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
 	if (h2mod->GetMapType() == scnr_type::Multiplayer) {
 		point2d* Weapons[59];
@@ -116,7 +116,7 @@ void HudElements::setCrosshairSize()
 }
 void HudElements::setCrosshairPos() {
 
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
 	commands->display("Setting Chrosshair position");
 	if (!FloatIsNaN(H2Config_crosshair_offset)) {
@@ -141,7 +141,7 @@ void HudElements::RadarPatch()
 }
 void HudElements::setFOV() {
 
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
 
 	static float fov = 70.0f * M_PI / 180.0f;
@@ -164,7 +164,7 @@ void HudElements::setFOV() {
 
 void HudElements::setVehicleFOV() {
 
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
 
 	if (H2Config_vehicle_field_of_view > 0 && H2Config_vehicle_field_of_view <= 110)

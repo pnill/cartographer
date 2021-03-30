@@ -372,12 +372,10 @@ void InitH2Startup() {
 
 	if (game_info.process_type == H2Types::H2Server)
 	{
-		h2mod->Server = true;
 		H2IsDediServer = true;
 	}
 	else if (game_info.process_type == H2Types::H2Game)
 	{
-		h2mod->Server = false;
 		H2IsDediServer = false;
 	}
 	Memory::setBaseAddress(H2BaseAddr, H2IsDediServer);

@@ -138,7 +138,7 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 
 	LOG_TRACE_XLIVE("XLiveInitializeEx()");
 
-	if (!h2mod->Server)
+	if (!Memory::isDedicatedServer())
 	{
 		//LOG_TRACE_XLIVE("XLiveInitialize  (pPii = %X)", pPii);
 		pDevice = (LPDIRECT3DDEVICE9)pXii->pD3D;

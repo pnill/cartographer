@@ -26,19 +26,19 @@ void UpdateConnectionStatus() {
 	extern char* ServerStatus;
 	if (userSignedOnline(0)) {
 		MasterState = 10;
-		if (!h2mod->Server)
+		if (!Memory::isDedicatedServer())
 			snprintf(ServerStatus, 250, "Status: Online");
 	}
 	else if (userSignedInLocally(0))
 	{
 		MasterState = 2;
-		if (!h2mod->Server)
+		if (!Memory::isDedicatedServer())
 			snprintf(ServerStatus, 250, "Status: Locally signed in");
 	}
 	else
 	{
 		MasterState = 2;
-		if (!h2mod->Server)
+		if (!Memory::isDedicatedServer())
 			snprintf(ServerStatus, 250, "Status: Offline");
 	}
 }
@@ -56,7 +56,7 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	UpdateConnectionStatus();
 
 	if (onlineSignIn) {
-		if (!h2mod->Server)
+		if (!Memory::isDedicatedServer())
 			ForwardPorts();
 	}
 

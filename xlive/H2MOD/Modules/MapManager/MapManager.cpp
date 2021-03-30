@@ -376,7 +376,7 @@ void __declspec(naked) load_map_data_for_display() {
 */
 void MapManager::applyHooks() {
 
-	if (!h2mod->Server) {
+	if (!Memory::isDedicatedServer()) {
 
 		BYTE jmp[1] = { 0xEB };
 

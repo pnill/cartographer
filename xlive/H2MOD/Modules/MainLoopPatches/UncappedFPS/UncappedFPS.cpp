@@ -153,7 +153,7 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 
 void UncappedFPS::ApplyPatches()
 {
-	if (h2mod->Server == false)
+	if (Memory::isDedicatedServer() == false)
 	{
 		//NopFill(Memory::GetAddress(0x2728E7), 5);
 
