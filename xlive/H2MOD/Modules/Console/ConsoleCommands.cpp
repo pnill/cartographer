@@ -728,25 +728,6 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 			return;
 		}
-		else if (firstCommand == "$maingamelooppatches") {
-			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
-				output(L"Invalid command, usage maingamelooppatches true/false");
-				return;
-			}
-			std::string secondArg = splitCommands[1];
-			if (secondArg.compare("true") == 0 || secondArg.compare("1") == 0) {
-				H2Config_experimental_game_main_loop_patches = true;
-				output(L"Experimental main game loop patches enabled. Restart your game to take effect.");
-			}
-			else if (secondArg.compare("false") == 0 || secondArg.compare("0") == 0) {
-				H2Config_experimental_game_main_loop_patches = false;
-				output(L"Experimental main game loop patches disabled. Restart your game to take effect.");
-			}
-			else {
-				output(L"Invalid command, usage maingamelooppatches true/false");
-			}
-			return;
-		}
 		else if (firstCommand == "$injecttag")
 		{
 			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::SinglePlayer)

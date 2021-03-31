@@ -101,7 +101,7 @@ extern high_resolution_clock::duration desiredRenderTime = duration_cast<high_re
 
 void frameTimeManagement() {
 
-	if (H2Config_experimental_game_main_loop_patches)
+	if (H2Config_experimental_fps == e_render_original_game_frame_limit)
 		return;
 
 	static bool bInitTime = false;

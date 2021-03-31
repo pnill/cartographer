@@ -11,7 +11,6 @@
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
 #include "..\CustomResolutions\CustomResolutions.h"
 #include "..\H2MOD\Tags\TagInterface.h"
-#include "H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h"
 #include "H2MOD/Modules/HudElements/HudElements.h"
 
 #define _USE_MATH_DEFINES

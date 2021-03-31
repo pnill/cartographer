@@ -1,5 +1,5 @@
 
-#include "UncappedFPS.h"
+#include "OriginalFPSLimiter.h"
 
 #include "H2MOD.h"
 #include "Util/Hooks/Hook.h"
@@ -104,7 +104,7 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 
 	LARGE_INTEGER currentTime;
 	float timeDeltaSeconds = 0.0f;
-	if (H2Config_experimental_fps == e_render_patch)
+	if (H2Config_experimental_fps == e_render_original_game_frame_limit)
 	{
 		typedef void(__cdecl* translate_windows_messages)();
 		auto p_translate_windows_messages = Memory::GetAddress<translate_windows_messages>(0x7902);
@@ -151,7 +151,7 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 	return timeDeltaSeconds;
 }
 
-void UncappedFPS::ApplyPatches()
+void OriginalFPSLimiter::ApplyPatches()
 {
 	if (Memory::isDedicatedServer() == false)
 	{

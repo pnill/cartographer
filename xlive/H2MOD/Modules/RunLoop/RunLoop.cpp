@@ -16,7 +16,7 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/GUI/GUI.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
-#include "H2MOD/Modules/MainLoopPatches/UncappedFPS/UncappedFPS.h"
+#include "H2MOD/Modules/MainLoopPatches/UncappedFPS/OriginalFPSLimiter.h"
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
 
@@ -259,11 +259,10 @@ bool __cdecl cinematic_in_progress_hook()
 	auto p_cinematic_in_progress = Memory::GetAddress<cinematic_in_progress>(0x3A938);
 
 	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
-	if (H2Config_experimental_game_main_loop_patches) // if we are using the original game rendering mode
-		experimental_rendering_mode = e_render_none; // H2Config_experimental_game_main_loop_patches will override H2Config_experimental_fps
 
 	switch (experimental_rendering_mode)
 	{
+	case e_render_original_game_frame_limit:
 	case e_render_old:
 		if (!p_cinematic_in_progress())
 			*Memory::GetAddress<bool*>(0x48225B) = false;
@@ -287,11 +286,11 @@ bool __cdecl cinematic_in_progress_hook()
 bool __cdecl should_limit_framerate()
 {
 	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
-	if (H2Config_experimental_game_main_loop_patches) // if we are using the original game rendering mode
-		experimental_rendering_mode = e_render_none; // H2Config_experimental_game_main_loop_patches will override H2Config_experimental_fps
 
 	switch (experimental_rendering_mode)
 	{
+	case e_render_original_game_frame_limit:
+		return false; // e_render_original_game_frame_limit handles frame limit in OriginalFPSLimiter.cpp
 	case e_render_none:
 	case e_render_new:
 	case e_render_old:
@@ -606,29 +605,17 @@ void initGSRunLoop() {
 		addDebugText("Hooking Loop Function");
 		main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
 
-		// (TODO (Kant): add H2Config_experimental_game_main_loop_patches as render mode, but should pretty much be e_render_none plus the call to UncappedFPS::ApplyPatches())
-		// what it does is make the game throttle the main loop as the original game on Xbox did, and removes the bs Hired Gun Added
-
 		H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
-		//if (H2Config_experimental_game_main_loop_patches)
-		//{
-		//	UncappedFPS::ApplyPatches();
-		//	experimental_rendering_mode = e_render_none; // H2Config_experimental_game_main_loop_patches will override H2Config_experimental_fps
-		//}
 
 		switch (experimental_rendering_mode)
 		{
-		default:;
+		default:
 		case e_render_none:
 				PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 			break;
 		case e_render_old:
 				PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 				UncappedFPS2::Init();
-			break;
-		case e_render_patch:
-				UncappedFPS::ApplyPatches();
-				PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 			break;
 		case e_render_new:
 				sub_9AA221 = (void(*)())((char*)H2BaseAddr + 0x3A221);
@@ -692,7 +679,13 @@ void initGSRunLoop() {
 				//Stop Hold to Zoom.
 				NopFill(Memory::GetAddress(0x9355C), 4);
 			break;
-		}
+
+		case e_render_original_game_frame_limit:
+			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
+			OriginalFPSLimiter::ApplyPatches();
+			break;
+
+		} // switch (experimental_rendering_mode)
 
 		// apply the code that fixes and determines if the amin loop should be throttled
 		PatchCall(Memory::GetAddress(0x288B5), should_limit_framerate);
