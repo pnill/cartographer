@@ -1,6 +1,6 @@
 #pragma once
 
-namespace UncappedFPS
+namespace OriginalFPSLimiter
 {
 	void ApplyPatches();
 }
