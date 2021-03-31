@@ -7,6 +7,7 @@
 #include "Blam/Engine/Game/GameTimeGlobals.h"
 
 #include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "H2MOD/Engine/Engine.h"
 
 extern bool b_XboxTick;
 static LARGE_INTEGER frequency;
@@ -114,7 +115,7 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 		QueryPerformanceCounter(&currentTime);
 		timeDeltaSeconds = (double)(currentTime.LowPart - lastTime.LowPart) / (double)(int)frequency.LowPart;
 
-		//if (call_is_game_minimized())
+		//if (Engine:IsGameMinimized())
 		{
 			if (timeGlobals && timeGlobals->initialized)
 			{

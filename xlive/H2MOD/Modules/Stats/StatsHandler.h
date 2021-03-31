@@ -5,6 +5,7 @@
 #include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
 #include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
 #include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD/Engine/Engine.h"
 
 extern bool Registered;
 class StatsHandler
@@ -79,7 +80,7 @@ public:
 	}
 	static void sendRankChange(bool forceAll = false)
 	{
-		if (NetworkSession::localPeerIsSessionHost() && RegisteredStatus().RanksEnabled && get_game_life_cycle() == life_cycle_pre_game)
+		if (NetworkSession::localPeerIsSessionHost() && RegisteredStatus().RanksEnabled && Engine::get_game_life_cycle() == life_cycle_pre_game)
 		{
 			auto document = getPlayerRanks(forceAll);
 			if (document.MemberCount() != 0)
