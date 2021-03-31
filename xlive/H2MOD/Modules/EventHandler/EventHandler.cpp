@@ -361,22 +361,22 @@ namespace EventHandler
 				std::distance(mapLoadCallbacks.begin(), it));
 	}
 
-	void executeMapLoadCallback(scnr_type map_type)
+	void executeMapLoadCallback(e_engine_type engine_type)
 	{
 		if (!mapLoadCallbacksThreaded.empty())
 		{
-			auto executeThreaded = [](scnr_type map_type)
+			auto executeThreaded = [](e_engine_type engine_type)
 			{
 				for (auto &cb : mapLoadCallbacksThreaded) {
-					if(map_type == cb.Type)
+					if(engine_type == cb.Type)
 						cb.callback();
 				}
 			};
-			std::thread(executeThreaded, map_type).detach();
+			std::thread(executeThreaded, engine_type).detach();
 		}
 		if (!mapLoadCallbacks.empty()) {
 			for (auto &cb : mapLoadCallbacks) {
-				if(map_type == cb.Type)
+				if(engine_type == cb.Type)
 					cb.callback();
 			}
 		}

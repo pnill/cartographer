@@ -14,7 +14,7 @@ public:
 	StatsHandler();
 	static void sendStats()
 	{
-		if (h2mod->Server) {
+		if (Memory::isDedicatedServer()) {
 			if (RegisteredStatus().Registered && RegisteredStatus().StatsEnabled) {
 				auto token = getAPIToken();
 				if (strlen(token) != 0) {
@@ -59,7 +59,7 @@ public:
 	}
 	static void verifySendPlaylist()
 	{
-		if(h2mod->Server)
+		if(Memory::isDedicatedServer())
 		{
 			if (RegisteredStatus().Registered) {
 				auto token = getAPIToken();

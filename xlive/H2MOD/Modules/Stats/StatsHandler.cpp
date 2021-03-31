@@ -30,7 +30,7 @@ StatsHandler::StatsAPIRegisteredStatus Status;
 
 StatsHandler::StatsHandler()
 {
-	if (h2mod->Server) {
+	if (Memory::isDedicatedServer()) {
 		Status.Registered = false;
 		Status.RanksEnabled = false;
 		Status.StatsEnabled = false;

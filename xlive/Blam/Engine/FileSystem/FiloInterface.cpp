@@ -5,7 +5,7 @@ namespace FiloInterface
 {
 	inline DWORD SwitchServerClient(DWORD client_offset, DWORD server_offset)
 	{
-		return Memory::baseAddress + (h2mod->Server ? server_offset : client_offset);
+		return Memory::baseAddress + (Memory::isDedicatedServer() ? server_offset : client_offset);
 	}
 
 	void init_filo(filo *data, std::string path, bool mode)

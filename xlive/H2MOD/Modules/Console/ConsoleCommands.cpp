@@ -366,7 +366,7 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 }
 
 void ConsoleCommands::output(std::wstring result) {
-	if (h2mod->Server) {
+	if (Memory::isDedicatedServer()) {
 		result = result + L"\n";
 		ServerConsole::logToDedicatedServerConsole(result.c_str());
 	}
@@ -444,7 +444,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$kick") {
-			if (h2mod->Server) {
+			if (Memory::isDedicatedServer()) {
 				output(L"Don't use this on dedis");
 				return;
 			}
@@ -530,13 +530,13 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (h2mod->GetMapType() == scnr_type::MainMenu) {
+			if (h2mod->GetEngineType() == e_engine_type::MainMenu) {
 				//TODO: need a nicer way to detect this for dedis
 				output(L"Can only be used ingame");
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() != scnr_type::SinglePlayer)
+			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::SinglePlayer)
 			{
 				output(L"Can only be used by the session host!");
 				return;
@@ -596,7 +596,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$xyz") {
-			if (h2mod->GetMapType() == scnr_type::Multiplayer && !NetworkSession::localPeerIsSessionHost()) {
+			if (h2mod->GetEngineType() == e_engine_type::Multiplayer && !NetworkSession::localPeerIsSessionHost()) {
 				output(L"Only host can see xyz for now...");
 				return;
 			}
@@ -619,7 +619,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (h2mod->GetMapType() == scnr_type::MainMenu) {
+			if (h2mod->GetEngineType() == e_engine_type::MainMenu) {
 				output(L"Can only be used ingame");
 				return;
 			}
@@ -749,7 +749,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$injecttag")
 		{
-			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() != scnr_type::SinglePlayer)
+			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::SinglePlayer)
 			{
 				output(L"Can only be used by the session host!");
 				return;

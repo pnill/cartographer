@@ -113,7 +113,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 	LOG_TRACE_XLIVE("XUserSetContext  (userIndex = {0}, contextId = {1}, contextValue = {2})",
 		dwUserIndex, dwContextId, dwContextValue);
 
-	if (h2mod->Server || !H2Config_discord_enable || H2GetInstanceId() > 1)
+	if (Memory::isDedicatedServer() || !H2Config_discord_enable || H2GetInstanceId() > 1)
 		return ERROR_SUCCESS;
 
 	if (dwContextId == 0x00000003)

@@ -18,7 +18,7 @@ bool AdvLobbySettings_disable_kill_volumes = false;
 
 static void refresh_mp_explosion_physics() {
 	
-	if (!h2mod->Server) {
+	if (!Memory::isDedicatedServer()) {
 		if (AdvLobbySettings_mp_explosion_physics || AdvLobbySettings_mp_sputnik)
 			WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1e);
 		else
@@ -27,7 +27,7 @@ static void refresh_mp_explosion_physics() {
 }
 
 static void actuallySendPacket() {
-	if (!NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() != scnr_type::Multiplayer)
+	if (!NetworkSession::localPeerIsSessionHost() || h2mod->GetEngineType() != e_engine_type::Multiplayer)
 		return;
 
 	LOG_TRACE_GAME("[h2mod] Sending AdvLobbySettings.");
@@ -50,7 +50,7 @@ static void actuallySendPacket() {
 
 void AdvLobbySettings::resetLobbySettings()
 {
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
 
 	LOG_TRACE_GAME("[h2mod] Resetting AdvLobbySettings.");
@@ -70,7 +70,7 @@ void AdvLobbySettings::resetLobbySettings()
 
 void AdvLobbySettings::parseLobbySettings(void* lobby_settings)
 {
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
 
 	LOG_TRACE_GAME("[h2mod] Parsing AdvLobbySettings.");

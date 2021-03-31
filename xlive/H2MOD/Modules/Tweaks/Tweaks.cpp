@@ -815,7 +815,7 @@ void InitH2Tweaks() {
 	//custom_game_engines::init();
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 
-	if (h2mod->Server) {
+	if (Memory::isDedicatedServer()) {
 		phookServ1 = (thookServ1)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
 
 		// set the additional pcr time
@@ -932,7 +932,7 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 	if (enable)
 		return;
 	//TODO 'bool enable'
-	if (!h2mod->Server && NetworkSession::localPeerIsSessionHost()) {
+	if (!Memory::isDedicatedServer() && NetworkSession::localPeerIsSessionHost()) {
 		for (int i = 0; i < get_scenario_volume_count(); i++) {
 			kill_volume_disable(i);
 		}
@@ -941,7 +941,7 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 
 void H2Tweaks::setHz() {
 
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
 
 	static bool refresh_redirected = false;
@@ -958,7 +958,7 @@ char ret_0() {
 }
 
 void H2Tweaks::toggleUncappedCampaignCinematics(bool toggle) {
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
 
 	typedef char(__cdecl *is_cutscene_fps_cap)();
@@ -977,7 +977,7 @@ void H2Tweaks::toggleAiMp(bool toggle) {
 
 void H2Tweaks::sunFlareFix()
 {
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
 
 	//rasterizer_near_clip_distance <real>
@@ -987,7 +987,7 @@ void H2Tweaks::sunFlareFix()
 
 void H2Tweaks::WarpFix(bool enable)
 {
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
 
 	//Improves warping issues 

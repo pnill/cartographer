@@ -92,7 +92,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
 		return false;
 	}
-	if (header.type != scnr_type::Multiplayer && header.type != scnr_type::SinglePlayer)
+	if (!header.is_multiplayer() && !header.is_single_player())
 	{
 		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
 		return false;
@@ -376,7 +376,7 @@ void __declspec(naked) load_map_data_for_display() {
 */
 void MapManager::applyHooks() {
 
-	if (!h2mod->Server) {
+	if (!Memory::isDedicatedServer()) {
 
 		BYTE jmp[1] = { 0xEB };
 

@@ -67,7 +67,7 @@ void Infection::sendTeamChange()
 						CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
 						LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", playerIndex, NetworkSession::getPlayerName(playerIndex), zombiePlayerIndex == playerIndex ? true : false);
 					}
-					else if (!h2mod->Server) {
+					else if (!Memory::isDedicatedServer()) {
 						h2mod->set_local_team_index(0, zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
 						LOG_TRACE_GAME(L"[h2mod-infection] setting local player team index, infected?: {}", zombiePlayerIndex == playerIndex ? true : false);
 					}

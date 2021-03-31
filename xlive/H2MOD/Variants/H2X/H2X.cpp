@@ -57,7 +57,7 @@ void H2X::Initialize(bool enable)
 	 *	
 	 *	
 	 */
-	//if(!h2mod->Server)
+	//if(!Memory::isDedicatedServer())
 	//{
 	//	if(enable)
 	//	{
@@ -95,7 +95,7 @@ void H2X::Initialize(bool enable)
 		}
 	}
 
-	if (!h2mod->Server && enable && h2mod->GetMapType() == scnr_type::Multiplayer)
+	if (!Memory::isDedicatedServer() && enable && h2mod->GetEngineType() == e_engine_type::Multiplayer)
 	{
 		// H2X Sound_Classes
 		*(float*)(&tags::get_tag_data()[0x4821C]) = 0.0f; /*H2X projectile_impact Index 0 Gains Bounds lower*/
