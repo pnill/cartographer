@@ -1761,7 +1761,7 @@ void H2MOD::Initialize()
 		DirectorHooks::Initialize();
 		MeleeFix::Initialize();
 		SpecialEvents::Initialize();
-		//ObserverMode::Initialize();
+		ObserverMode::Initialize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");

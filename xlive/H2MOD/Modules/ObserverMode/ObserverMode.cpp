@@ -74,7 +74,7 @@ namespace ObserverMode
 
 		CameraAngles->i = control->Actions.yaw;
 		CameraAngles->j = control->Actions.pitch;
-		CameraAngles->k += (control->Actions.trigger * 0.01f) + -(control->Actions.secondary_trigger * 0.01f);
+		//CameraAngles->k += (control->Actions.trigger * 0.01f) + -(control->Actions.secondary_trigger * 0.01f);
 
 		
 
@@ -107,7 +107,7 @@ namespace ObserverMode
 
 			CameraPosition->i += (num18 + num16);
 			CameraPosition->j += (num15 + num17);
-			CameraPosition->k += num14;
+			CameraPosition->k += num14 + (control->Actions.trigger * 0.03f) + -(control->Actions.secondary_trigger * 0.03f);
 
 			if (imgui_handler::IsWindowActive("debug_overlay")) 
 			{

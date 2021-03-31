@@ -4,6 +4,7 @@
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
+#include "H2MOD/Modules/HaloScript/HaloScript.h"
 
 int soundBuffer = 0;
 std::map<int, std::map<e_headhunter_sounds, const wchar_t*>> H_SoundsTable;
@@ -87,7 +88,7 @@ void HeadHunter::PickupSkull(XUID player, datum SkullDatum)
 		{
 			datum PlayerDatum = variant_player->GetPlayerDatum(player);
 			pupdate_player_score(player_score_data, PlayerDatum.Index, 0, 1, -1, 0);
-			call_hs_object_destroy(SkullDatum);
+			HaloScript::ObjectDestroy(SkullDatum);
 			if(TimeElapsedMS(soundBuffer) > 2500)
 			{
 				soundBuffer = GetCurrentTimeMS();
