@@ -382,7 +382,8 @@ namespace imgui_handler
 		switch (image) {
 		case patch_notes:
 			return g_patchNotes_Image;
-		default: NULL;
+		default: 
+			return NULL;
 		}
 	}
 

@@ -49,10 +49,10 @@ namespace ControllerInput
 		XINPUT_BUTTONS B				= XINPUT_GAMEPAD_B;
 		XINPUT_BUTTONS X				= XINPUT_GAMEPAD_X;
 		XINPUT_BUTTONS Y				= XINPUT_GAMEPAD_Y;
-		WORD* ToArray()
+		void ToArray(WORD* out)
 		{
 			WORD temp[] = { DPAD_UP , DPAD_DOWN , DPAD_LEFT, DPAD_RIGHT, START, BACK, LEFT_THUMB, RIGHT_THUMB, LEFT_SHOULDER, RIGHT_SHOULDER, A, B ,X, Y };
-			return temp;
+			memcpy(out, temp, sizeof(temp));
 		}
 		std::string ToString()
 		{

@@ -1016,7 +1016,8 @@ namespace imgui_handler {
 		void Open()
 		{
 			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);
-			WORD* Buttons = H2Config_CustomLayout.ToArray();
+			WORD Buttons[14];
+			H2Config_CustomLayout.ToArray(Buttons);
 			for(auto i = 0; i < 14; i++)
 			{
 				for(auto j = 0; j < 14; j++)
