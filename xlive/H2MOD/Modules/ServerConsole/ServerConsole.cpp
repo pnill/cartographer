@@ -171,14 +171,6 @@ void ServerConsole::ClearVip()
 	kablam_vip_clear();
 }
 
-struct send_message_command_block
-{
-	DWORD v_table;
-	DWORD unk_1;
-	DWORD unk_2;
-	wchar_t message[110];
-};
-
 int messageTimeout = 0;
 
 void ServerConsole::SendMsg(wchar_t* message, bool timeout)
@@ -191,25 +183,11 @@ void ServerConsole::SendMsg(wchar_t* message, bool timeout)
 	}
 
 	if (execute) {
-		send_message_command_block a{
-			Memory::GetAddress(0, 0x352dfc),
-			8,
-			1
-		};
-		DWORD test = (DWORD)std::addressof(a);
-		size_t len = wcslen(message);
-		for (auto i = 0; i < 110; i++) {
-			if (i < len)
-				a.message[i] = message[i];
-			else
-				a.message[i] = 0;
-		}
-
-		__asm {
-			mov eax, [a]
-			mov edx, [eax]
-			mov ecx, test
-			call edx
-		}
+		
+		// first we construct kablam_command_send_msg, by manually passing the vtable pointer, and the message to be copied
+		kablam_command_send_msg sendMsgCommand(Memory::GetAddress(0, 0x352dfc), message);
+		
+		// send the message
+		sendMsgCommand.sendGameMessage();
 	}
 }
