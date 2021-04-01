@@ -4,7 +4,6 @@
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
-#include "H2MOD/Modules/HaloScript/HaloScript.h"
 
 int soundBuffer = 0;
 std::map<int, std::map<e_headhunter_sounds, const wchar_t*>> H_SoundsTable;
