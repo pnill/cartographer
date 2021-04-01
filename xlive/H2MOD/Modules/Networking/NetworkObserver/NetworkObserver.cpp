@@ -227,7 +227,7 @@ void network_observer::ApplyPatches()
 
 	PatchCall(Memory::GetAddress(0x1E0FEE, 0x1B5EDE), call_GetNetworkMeasurements);
 
-	if (!h2mod->Server)
+	if (!Memory::isDedicatedServer())
 	{
 		PatchCall(Memory::GetAddress(0x1D97DD), is_network_observer_mode_managed);
 	}

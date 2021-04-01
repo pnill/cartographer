@@ -20,6 +20,7 @@
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "H2MOD/Engine/Engine.h"
 
 std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
 
@@ -340,7 +341,7 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 
 			if (!object_datum.IsNull()) {
 				datum player_datum = Player::getPlayerUnitDatumIndex(h2mod->get_player_datum_index_from_controller_index(0).Index);
-				call_object_placement_data_new(&nObject, object_datum, player_datum, 0);
+				Engine::Objects::create_new_placement_data(&nObject, object_datum, player_datum, 0);
 				real_point3d* player_position = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
 
 				if (player_position != nullptr) {
@@ -355,7 +356,7 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 				}
 
 				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.Placement.x, nObject.Placement.y, nObject.Placement.z);
-				unsigned int object_gamestate_datum = call_object_new(&nObject);
+				unsigned int object_gamestate_datum = Engine::Objects::call_object_new(&nObject);
 				call_add_object_to_sync(object_gamestate_datum);
 			}
 		}
@@ -366,7 +367,7 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 }
 
 void ConsoleCommands::output(std::wstring result) {
-	if (h2mod->Server) {
+	if (Memory::isDedicatedServer()) {
 		result = result + L"\n";
 		ServerConsole::logToDedicatedServerConsole(result.c_str());
 	}
@@ -444,7 +445,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$kick") {
-			if (h2mod->Server) {
+			if (Memory::isDedicatedServer()) {
 				output(L"Don't use this on dedis");
 				return;
 			}
@@ -530,13 +531,13 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (h2mod->GetMapType() == scnr_type::MainMenu) {
+			if (h2mod->GetEngineType() == e_engine_type::MainMenu) {
 				//TODO: need a nicer way to detect this for dedis
 				output(L"Can only be used ingame");
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() != scnr_type::SinglePlayer)
+			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::SinglePlayer)
 			{
 				output(L"Can only be used by the session host!");
 				return;
@@ -596,7 +597,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$xyz") {
-			if (h2mod->GetMapType() == scnr_type::Multiplayer && !NetworkSession::localPeerIsSessionHost()) {
+			if (h2mod->GetEngineType() == e_engine_type::Multiplayer && !NetworkSession::localPeerIsSessionHost()) {
 				output(L"Only host can see xyz for now...");
 				return;
 			}
@@ -619,7 +620,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (h2mod->GetMapType() == scnr_type::MainMenu) {
+			if (h2mod->GetEngineType() == e_engine_type::MainMenu) {
 				output(L"Can only be used ingame");
 				return;
 			}
@@ -728,28 +729,9 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 			return;
 		}
-		else if (firstCommand == "$maingamelooppatches") {
-			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
-				output(L"Invalid command, usage maingamelooppatches true/false");
-				return;
-			}
-			std::string secondArg = splitCommands[1];
-			if (secondArg.compare("true") == 0 || secondArg.compare("1") == 0) {
-				H2Config_experimental_game_main_loop_patches = true;
-				output(L"Experimental main game loop patches enabled. Restart your game to take effect.");
-			}
-			else if (secondArg.compare("false") == 0 || secondArg.compare("0") == 0) {
-				H2Config_experimental_game_main_loop_patches = false;
-				output(L"Experimental main game loop patches disabled. Restart your game to take effect.");
-			}
-			else {
-				output(L"Invalid command, usage maingamelooppatches true/false");
-			}
-			return;
-		}
 		else if (firstCommand == "$injecttag")
 		{
-			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() != scnr_type::SinglePlayer)
+			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::SinglePlayer)
 			{
 				output(L"Can only be used by the session host!");
 				return;

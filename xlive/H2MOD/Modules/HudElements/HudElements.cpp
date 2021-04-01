@@ -10,6 +10,7 @@
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
+#include "H2MOD/Engine/Engine.h"
 
 static bool b_showHUD = true;
 static bool b_showFirstPerson = true;
@@ -26,7 +27,7 @@ static bool RenderIngameChat() {
 		return true;
 	}
 
-	else if (*GameEngine != 3 && get_game_life_cycle() == life_cycle_in_game) {
+	else if (*GameEngine != 3 && Engine::get_game_life_cycle() == life_cycle_in_game) {
 		//Enable chat in engine mode and game state mp.
 		return false;
 	}
@@ -87,9 +88,9 @@ bool crosshairInit = false;
 static point2d defaultCrosshairSizes[59];
 void HudElements::setCrosshairSize()
 {
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
-	if (h2mod->GetMapType() == scnr_type::Multiplayer) {
+	if (h2mod->GetEngineType() == e_engine_type::Multiplayer) {
 		point2d* Weapons[59];
 
 		auto hud_reticles = tags::find_tag(blam_tag::tag_group_type::bitmap, "ui\\hud\\bitmaps\\new_hud\\crosshairs\\hud_reticles");
@@ -116,7 +117,7 @@ void HudElements::setCrosshairSize()
 }
 void HudElements::setCrosshairPos() {
 
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
 	commands->display("Setting Chrosshair position");
 	if (!FloatIsNaN(H2Config_crosshair_offset)) {
@@ -141,7 +142,7 @@ void HudElements::RadarPatch()
 }
 void HudElements::setFOV() {
 
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
 
 	static float fov = 70.0f * M_PI / 180.0f;
@@ -164,7 +165,7 @@ void HudElements::setFOV() {
 
 void HudElements::setVehicleFOV() {
 
-	if (h2mod->Server)
+	if (Memory::isDedicatedServer())
 		return;
 
 	if (H2Config_vehicle_field_of_view > 0 && H2Config_vehicle_field_of_view <= 110)

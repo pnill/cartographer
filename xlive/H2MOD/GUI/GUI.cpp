@@ -101,7 +101,7 @@ extern high_resolution_clock::duration desiredRenderTime = duration_cast<high_re
 
 void frameTimeManagement() {
 
-	if (H2Config_experimental_game_main_loop_patches)
+	if (H2Config_experimental_fps == e_render_original_game_frame_limit)
 		return;
 
 	static bool bInitTime = false;
@@ -138,7 +138,7 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 
 	LOG_TRACE_XLIVE("XLiveInitializeEx()");
 
-	if (!h2mod->Server)
+	if (!Memory::isDedicatedServer())
 	{
 		//LOG_TRACE_XLIVE("XLiveInitialize  (pPii = %X)", pPii);
 		pDevice = (LPDIRECT3DDEVICE9)pXii->pD3D;
@@ -646,7 +646,7 @@ int WINAPI XLiveRender()
 			}
 #pragma endregion achievement rendering
 
-			if (displayXyz && (NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() == scnr_type::SinglePlayer)) {
+			if (displayXyz && (NetworkSession::localPeerIsSessionHost() || h2mod->GetEngineType() == e_engine_type::SinglePlayer)) {
 				int text_y_coord = 60;
 				PlayerIterator playerIt;
 				while (playerIt.get_next_active_player()) 

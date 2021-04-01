@@ -5,7 +5,6 @@
     <ClCompile Include="Blam\Engine\Players\Players.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
@@ -117,6 +116,11 @@
     <ClCompile Include="H2MOD\Modules\Networking\OverridePackets\OverridePackets.cpp" />
     <ClCompile Include="XLive\xnet\NIC.cpp" />
     <ClCompile Include="XLive\xnet\net_utils.cpp" />
+    <ClCompile Include="Blam\Engine\Objects\GameStateObjects.cpp" />
+    <ClCompile Include="H2MOD\Engine\Unit.cpp" />
+    <ClCompile Include="H2MOD\Engine\Engine.cpp" />
+    <ClCompile Include="H2MOD\Engine\Objects.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\OriginalFPSLimiter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -239,7 +243,6 @@
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
@@ -384,6 +387,9 @@
     <ClInclude Include="H2MOD\Modules\Networking\OverridePackets\OverridePackets.h" />
     <ClInclude Include="XLive\xnet\NIC.h" />
     <ClInclude Include="XLive\xnet\net_utils.h" />
+    <ClInclude Include="Blam\Engine\Objects\GameStateObjects.h" />
+    <ClInclude Include="H2MOD\Engine\Engine.h" />
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\OriginalFPSLimiter.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

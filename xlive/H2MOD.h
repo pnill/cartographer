@@ -28,17 +28,8 @@ enum static_lod : DWORD
 	cinematic
 };
 
-game_life_cycle get_game_life_cycle();
 int __cdecl call_get_game_tick_rate();
-bool __cdecl call_is_game_minimized();
-char* __cdecl call_object_try_and_get_data_with_type(datum object_datum_index, int object_type);
-int __cdecl call_unit_reset_equipment(datum unit_datum_index);
 bool __cdecl call_add_object_to_sync(datum gamestate_object_datum);
-void __cdecl call_hs_object_destroy(datum object_datum_index);
-signed int __cdecl call_unit_inventory_next_weapon(unsigned short unit_datum_index);
-bool __cdecl call_assign_equipment_to_unit(datum uint, int object_index, short unk);
-void __cdecl call_object_placement_data_new(ObjectPlacementData*, datum, datum, int);
-signed int __cdecl call_object_new(ObjectPlacementData*);
 void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset);
 
 class H2MOD
@@ -69,10 +60,9 @@ public:
 		void leave_session();
 		void set_local_rank(BYTE rank);
 		void cine_start_tex();
-		scnr_type GetMapType() { return mapType; }
-		void SetMapType(scnr_type value) { mapType = value; }
+		e_engine_type GetEngineType() { return engineType; }
+		void SetCurrentEngineType(e_engine_type value) { engineType = value; }
 
-		bool Server;
 		std::unordered_map<std::string, bool> AchievementMap;
 		std::deque<std::wstring> CustomSounds;
 		
@@ -83,7 +73,7 @@ public:
 		bool drawTeamIndicators = true;
 
 private:
-		scnr_type mapType;
+		e_engine_type engineType;
 };
 
 extern H2MOD* h2mod;

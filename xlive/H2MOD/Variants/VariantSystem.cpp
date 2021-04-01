@@ -8,7 +8,7 @@ void GameClientServerHandler::execute()
 		this->onClient();
 	}
 	else {
-		if (h2mod->Server) {
+		if (Memory::isDedicatedServer()) {
 			this->onDedi();
 		}
 		else {

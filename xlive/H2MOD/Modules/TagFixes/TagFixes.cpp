@@ -45,7 +45,7 @@ namespace TagFixes
 		}
 		void fix_shaders_nvidia()
 		{
-			if (h2mod->Server) return;
+			if (Memory::isDedicatedServer()) return;
 
 			fix_shader_template_nvidia(
 				"shaders\\shader_templates\\opaque\\tex_bump_alpha_test_single_pass",
@@ -137,7 +137,7 @@ namespace TagFixes
 		}
 		void fall_damage_fix()
 		{
-			if (h2mod->GetMapType() == Multiplayer) {
+			if (h2mod->GetEngineType() == Multiplayer) {
 				*(float*)(&tags::get_tag_data()[0xE610B0]) = 14.0f; /*masterchief_mp hlmt max abs acc default value doubled*/
 				*(float*)(&tags::get_tag_data()[0xE610B4]) = 20.0f; /*masterchief_mp hlmt max abs acc default value doubled*/
 				*(float*)(&tags::get_tag_data()[0xE65D98]) = 14.0f; /*elite_mp hlmt max abs acc default value doubled*/
@@ -156,7 +156,7 @@ namespace TagFixes
 
 	void OnMapLoad()
 	{
-		if (!h2mod->Server) {
+		if (!Memory::isDedicatedServer()) {
 			fix_shaders_nvidia();
 			ShaderSpecularFix();
 			fix_dynamic_lights();

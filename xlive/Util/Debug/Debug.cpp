@@ -72,7 +72,7 @@ LONG WINAPI Debug::On_UnhandledException(struct _EXCEPTION_POINTERS* ExceptionIn
 	CloseHandle(dump_file);
 
 	// don't attempt to display a GUI error box if running on a server.
-	if (!h2mod->Server) {
+	if (!Memory::isDedicatedServer()) {
 		std::string message = "Halo 2 has encountered a fatal error and needs to exit,\n"
 			" a crash dump has been saved to '" + dump_file_name + "',\n"
 			"please note the path if you want to report the issue, as the file may be necessary.";

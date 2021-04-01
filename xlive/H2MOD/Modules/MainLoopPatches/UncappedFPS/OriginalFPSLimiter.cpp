@@ -1,5 +1,5 @@
 
-#include "UncappedFPS.h"
+#include "OriginalFPSLimiter.h"
 
 #include "H2MOD.h"
 #include "Util/Hooks/Hook.h"
@@ -7,6 +7,7 @@
 #include "Blam/Engine/Game/GameTimeGlobals.h"
 
 #include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "H2MOD/Engine/Engine.h"
 
 extern bool b_XboxTick;
 static LARGE_INTEGER frequency;
@@ -104,7 +105,7 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 
 	LARGE_INTEGER currentTime;
 	float timeDeltaSeconds = 0.0f;
-	if (H2Config_experimental_fps == e_render_patch)
+	if (H2Config_experimental_fps == e_render_original_game_frame_limit)
 	{
 		typedef void(__cdecl* translate_windows_messages)();
 		auto p_translate_windows_messages = Memory::GetAddress<translate_windows_messages>(0x7902);
@@ -114,7 +115,7 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 		QueryPerformanceCounter(&currentTime);
 		timeDeltaSeconds = (double)(currentTime.LowPart - lastTime.LowPart) / (double)(int)frequency.LowPart;
 
-		//if (call_is_game_minimized())
+		//if (Engine:IsGameMinimized())
 		{
 			if (timeGlobals && timeGlobals->initialized)
 			{
@@ -151,9 +152,9 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 	return timeDeltaSeconds;
 }
 
-void UncappedFPS::ApplyPatches()
+void OriginalFPSLimiter::ApplyPatches()
 {
-	if (h2mod->Server == false)
+	if (Memory::isDedicatedServer() == false)
 	{
 		//NopFill(Memory::GetAddress(0x2728E7), 5);
 

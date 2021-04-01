@@ -31,7 +31,6 @@ namespace imgui_handler {
 			bool g_showHud = true;
 			bool g_showFP = true;
 			bool g_UncappedFPS = false;
-			bool g_experimentalFPSPatch = false;
 			int g_fpsLimit = 60;
 			bool g_hitfix = true;
 			int g_deadzone = 0;
@@ -644,7 +643,7 @@ namespace imgui_handler {
 			}
 			void HostSettings()
 			{
-				if (NetworkSession::localPeerIsSessionHost() || h2mod->GetMapType() == scnr_type::SinglePlayer) {
+				if (NetworkSession::localPeerIsSessionHost() || h2mod->GetEngineType() == e_engine_type::SinglePlayer) {
 					if (ImGui::CollapsingHeader(GetString(host_campagin_settings)))
 					{
 						ImGui::Columns(2, "", false);
@@ -922,7 +921,7 @@ namespace imgui_handler {
 			//ImGui::PushFont(font2);
 			ImGui::SetNextWindowSize(ImVec2(650, 530), ImGuiCond_Appearing);
 			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
-			if (h2mod->GetMapType() == MainMenu)
+			if (h2mod->GetEngineType() == MainMenu)
 				ImGui::SetNextWindowBgAlpha(1);
 			if (ImGui::Begin(GetString(e_advanced_string::title), p_open, window_flags))
 			{
@@ -1050,9 +1049,17 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::show_first_person] = "Show First Person";
 			string_table[0][e_advanced_string::video_title] = "Video Settings";
 			string_table[0][e_advanced_string::fps_limit] = "FPS Limit";
-			string_table[0][e_advanced_string::fps_limit_tooltip] = "Setting this to 0 will uncap your games frame rate.\nAnything over 60 may cause performance issues\nUse the Experimental Rendering Changes to resolve them";
+			string_table[0][e_advanced_string::fps_limit_tooltip] = 
+				"Setting this to 0 will uncap your games frame rate."
+				"\nAnything over 60 may cause performance issues"
+				"\nUse the Experimental Rendering Changes to resolve them";
 			string_table[0][e_advanced_string::experimental_rendering_changes] = "Experimental Rendering Mode";
-			string_table[0][e_advanced_string::experimental_rendering_tooltip] = "This will change how the game handles rendering, requires a restart to take effect.\n\nNone: Default behavior of the game, will not work past 60FPS\n\nCinematic: Tricks the game into rending in cinematic mode\n\nEngine: Forces the unused native engine interpolation";
+			string_table[0][e_advanced_string::experimental_rendering_tooltip] = 
+				"This will change how the game handles rendering, requires a restart to take effect."
+				"\n\nNone: Default behavior of the game, will not work past 60FPS"
+				"\n\nCinematic: Tricks the game into rending in cinematic mode"
+				"\n\nEngine: Forces the unused native engine interpolation"
+				"\n\nOriginal: Forces the original framerate limiter used in the original game, tied to tickrate";
 			string_table[0][e_advanced_string::render_none] = "None";
 			string_table[0][e_advanced_string::render_cinematic] = "Cinematic Force";
 			string_table[0][e_advanced_string::render_engine] = "Engine Force";
@@ -1071,21 +1078,31 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::tex_L1] = "Low";
 			string_table[0][e_advanced_string::tex_L2] = "High";
 			string_table[0][e_advanced_string::tex_L3] = "Ultra";
-			string_table[0][e_advanced_string::lod_tooltip] = "Changing this will force the game to use the set Level of Detail for models that have them\nLeaving it at default makes it dynamic which is the games default behaviour.";
+			string_table[0][e_advanced_string::lod_tooltip] = 
+				"Changing this will force the game to use the set Level of Detail for models that have them"
+				"\nLeaving it at default makes it dynamic which is the games default behaviour.";
 			string_table[0][e_advanced_string::hires_fix] = "High Resolution Fix";
-			string_table[0][e_advanced_string::hires_fix_tooltip] = "This will enable fixes for high resolution monitors that will fix text clipping\nA restart is required for these changes to take effect.";
+			string_table[0][e_advanced_string::hires_fix_tooltip] = 
+				"This will enable fixes for high resolution monitors that will fix text clipping"
+				"\nA restart is required for these changes to take effect.";
 			string_table[0][e_advanced_string::m_k_title] = "Mouse and Keyboard Input";
 			string_table[0][e_advanced_string::raw_mouse] = "Raw Mouse Input";
-			string_table[0][e_advanced_string::raw_mouse_tooltip] = "This will remove the game's default mouse acceleration.\n\nNOTE: This setting does not work if you have Modern Aiming turned on for your controller.";
+			string_table[0][e_advanced_string::raw_mouse_tooltip] = 
+				"This will remove the game's default mouse acceleration."
+				"\n\nNOTE: This setting does not work if you have Modern Aiming turned on for your controller.";
 			string_table[0][e_advanced_string::uniform_sensitivity] = "Uniform Sensitivity";
-			string_table[0][e_advanced_string::uniform_sensitivity_tooltip] = "By default the game has the vertical sensitivity half of the horizontal.\nEnabling this option will make these match.";
+			string_table[0][e_advanced_string::uniform_sensitivity_tooltip] = 
+				"By default the game has the vertical sensitivity half of the horizontal."
+				"\nEnabling this option will make these match.";
 			string_table[0][e_advanced_string::raw_mouse_sensitivity] = "Raw Mouse Sensitivity";
 			string_table[0][e_advanced_string::mouse_sensitivity] = "Mouse Sensitivity";
 			string_table[0][e_advanced_string::controller_title] = "Controller Input";
 			string_table[0][e_advanced_string::controller_sensitivity] = "Controller Sensitivity";
 			string_table[0][e_advanced_string::aiming_type] = "Aiming Type";
 			string_table[0][e_advanced_string::modern] = "Modern";
-			string_table[0][e_advanced_string::aiming_type_tooltip] = "Modern Aiming will remove the native acceleration zones from a controller while aiming, allowing for a more precise aim.\n\nNOTE: Selecting Modern Aiming will cause Raw Mouse input to not work.";
+			string_table[0][e_advanced_string::aiming_type_tooltip] = 
+				"Modern Aiming will remove the native acceleration zones from a controller while aiming, allowing for a more precise aim."
+				"\n\nNOTE: Selecting Modern Aiming will cause Raw Mouse input to not work.";
 			string_table[0][e_advanced_string::deadzone_type] = "Deadzone Type";
 			string_table[0][e_advanced_string::axial] = "Axial";
 			string_table[0][e_advanced_string::radial] = "Radial";
@@ -1101,29 +1118,50 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::skull_anger] = "Anger";
 			string_table[0][e_advanced_string::skull_anger_tooltip] = "Enemies and allies fire their weapons faster and more frequently.";
 			string_table[0][e_advanced_string::skull_assassins] = "Assassins";
-			string_table[0][e_advanced_string::skull_assassins_tooltip] = "All enemies in game are permanently cloaked. Allies can sometimes\nsee them but mostly they can't, so they can't help much.";
+			string_table[0][e_advanced_string::skull_assassins_tooltip] = 
+				"All enemies in game are permanently cloaked. Allies can sometimes"
+				"\nsee them but mostly they can't, so they can't help much.";
 			string_table[0][e_advanced_string::skull_black_eye] = "Black Eye";
-			string_table[0][e_advanced_string::skull_black_eye_tooltip] = "Your shield does not charge normally. To charge your shields you\nmust kill something with a melee attack";
+			string_table[0][e_advanced_string::skull_black_eye_tooltip] = 
+				"Your shield does not charge normally. To charge your shields you"
+				"\nmust kill something with a melee attack";
 			string_table[0][e_advanced_string::skull_blind] = "Blind";
-			string_table[0][e_advanced_string::skull_blind_tooltip] = "Your heads-up display becomes invisible. In other words, you cannot\nsee your weapon, body, shields, ammunition, motion tracker,\n or use your flashlight.";
+			string_table[0][e_advanced_string::skull_blind_tooltip] = 
+				"Your heads-up display becomes invisible. In other words, you cannot"
+				"\nsee your weapon, body, shields, ammunition, motion tracker,"
+				"\n or use your flashlight.";
 			string_table[0][e_advanced_string::skull_catch] = "Catch";
-			string_table[0][e_advanced_string::skull_catch_tooltip] = "A.I. will throw more grenades. Also] = everybody will drop two grenades\n of their kind Flood will drop grenades depending on whether\n they're human or Covenant.";
+			string_table[0][e_advanced_string::skull_catch_tooltip] = 
+				"A.I. will throw more grenades. Also] = everybody will drop two grenades"
+				"\n of their kind Flood will drop grenades depending on whether"
+				"\n they're human or Covenant.";
 			string_table[0][e_advanced_string::skull_envy] = "Envy";
-			string_table[0][e_advanced_string::skull_envy_tooltip] = "The Master Chief now has an Active camouflage just like the Arbiter's.\nHowever, there is no visible timer, so remember: five second\n cloak with ten second recharge on Legendary";
+			string_table[0][e_advanced_string::skull_envy_tooltip] = 
+				"The Master Chief now has an Active camouflage just like the Arbiter's."
+				"\nHowever, there is no visible timer, so remember: five second"
+				"\n cloak with ten second recharge on Legendary";
 			string_table[0][e_advanced_string::skull_famine] = "Famine";
-			string_table[0][e_advanced_string::skull_famine_tooltip] = "All dropped weapons have half ammo. Weapons that spawned on the floor or\nspawned with are unaffected.";
+			string_table[0][e_advanced_string::skull_famine_tooltip] = 
+				"All dropped weapons have half ammo. Weapons that spawned on the floor or"
+				"\nspawned with are unaffected.";
 			string_table[0][e_advanced_string::skull_ghost] = "Ghost";
 			string_table[0][e_advanced_string::skull_ghost_tooltip] = "A.I. characters will not flinch from attacks, melee or otherwise.";
 			string_table[0][e_advanced_string::skull_grunt] = "Grunt Birthday";
 			string_table[0][e_advanced_string::skull_grunt_tooltip] = "Headshots turn into Plasma Grenade explosions.";
 			string_table[0][e_advanced_string::skull_iron] = "Iron";
-			string_table[0][e_advanced_string::skull_iron_tooltip] = "When playing co-op, if either player dies the game restarts you at your\nlast checkpoint.";
+			string_table[0][e_advanced_string::skull_iron_tooltip] = 
+				"When playing co-op, if either player dies the game restarts you at your"
+				"\nlast checkpoint.";
 			string_table[0][e_advanced_string::skull_iwbyd] = "IWBYD";
-			string_table[0][e_advanced_string::skull_iwbyd_tooltip] = "The rarity of combat dialog is changed, rare lines become far more common\nbut common lines are still present at their normal rate";
+			string_table[0][e_advanced_string::skull_iwbyd_tooltip] = 
+				"The rarity of combat dialog is changed, rare lines become far more common"
+				"\nbut common lines are still present at their normal rate";
 			string_table[0][e_advanced_string::skull_mythic] = "Mythic";
 			string_table[0][e_advanced_string::skull_mythic_tooltip] = "Enemies have more health and shielding, and are therefore harder to kill.";
 			string_table[0][e_advanced_string::skull_sputnik] = "Sputnik";
-			string_table[0][e_advanced_string::skull_sputnik_tooltip] = "The mass of certain objects is severely reduced, making them fly further\nwhen smacked with a melee hit, or when they are near an explosion";
+			string_table[0][e_advanced_string::skull_sputnik_tooltip] = 
+				"The mass of certain objects is severely reduced, making them fly further"
+				"\nwhen smacked with a melee hit, or when they are near an explosion";
 			string_table[0][e_advanced_string::skull_thunderstorm] = "Thunderstorm";
 			string_table[0][e_advanced_string::skull_thunderstorm_tooltip] = "Causes most enemy and ally units to be their highest rank.";
 			string_table[0][e_advanced_string::skull_whuppopotamus] = "Whuppopotamus";
@@ -1149,7 +1187,7 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::melee_fix_tooltip] = "Allows you to turn off the melee patch";
 			string_table[0][e_advanced_string::no_events_title] = "No Events";
 			string_table[0][e_advanced_string::no_events_tooltip] = "Opt out of event cosmetics restart required to take effect";
-			string_table[0][e_advanced_string::render_patch] = "Engine Patch";
+			string_table[0][e_advanced_string::render_patch] = "Original FPS limiter";
 			
 			//Spanish.
 			string_table[4][e_advanced_string::title] = u8"      Ajustes avanzados";
@@ -1164,9 +1202,17 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::show_first_person] = u8"Mostrar primera persona";
 			string_table[4][e_advanced_string::video_title] = u8"Ajustes de video";
 			string_table[4][e_advanced_string::fps_limit] = u8"Limitar FPS";
-			string_table[4][e_advanced_string::fps_limit_tooltip] = u8"Dejar este ajuste en 0 quitará el límite de fotogramas por segundo.\nCualquier valor mayor a 60 puede causar problemas de rendimiento.\nUsa el Cambio de Renderizado Experimental para solucionarlo.";
+			string_table[4][e_advanced_string::fps_limit_tooltip] = 
+				u8"Dejar este ajuste en 0 quitará el límite de fotogramas por segundo."
+				"\nCualquier valor mayor a 60 puede causar problemas de rendimiento."
+				"\nUsa el Cambio de Renderizado Experimental para solucionarlo.";
 			string_table[4][e_advanced_string::experimental_rendering_changes] = u8"Cambio de Renderizado Experimental";
-			string_table[4][e_advanced_string::experimental_rendering_tooltip] = u8"Esto cambiará la forma en que el juego maneja el renderizado, requiere un reinicio para que surta efecto.\n\nNinguno: el comportamiento predeterminado del juego, no funcionará más allá de los 60FPS \n\nCinematic: Hace que el juego se desgarre en modo cinemático\n\nEngine: Fuerza la interpolación del motor nativo no utilizado";
+			string_table[4][e_advanced_string::experimental_rendering_tooltip] = 
+				u8"Esto cambiará la forma en que el juego maneja el renderizado, requiere un reinicio para que surta efecto."
+				"\n\nNinguno: el comportamiento predeterminado del juego, no funcionará más allá de los 60FPS "
+				"\n\nCinematic: Hace que el juego se desgarre en modo cinemático"
+				"\n\nEngine: Fuerza la interpolación del motor nativo no utilizado"
+				"\n\nOriginal: fuerza el limitador de FPS original utilizado en el juego original, vinculado a la velocidad de tick ";
 			string_table[4][e_advanced_string::render_none] = u8"Ninguno";
 			string_table[4][e_advanced_string::render_cinematic] = u8"Fuerza Cinematográfica";
 			string_table[4][e_advanced_string::render_engine] = u8"Fuerza del motor";
@@ -1263,7 +1309,7 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::melee_fix_tooltip] = u8"Te permite desactivar el parche cuerpo a cuerpo";
 			string_table[4][e_advanced_string::no_events_title] = u8"No hay eventos";
 			string_table[4][e_advanced_string::no_events_tooltip] = u8"Se requiere el reinicio de los cosméticos del evento para que surta efecto";
-			string_table[4][e_advanced_string::render_patch] = u8"Parche de juego";
+			string_table[4][e_advanced_string::render_patch] = u8"Limitador de velocidad de FPS original";
 		}
 	}
 }

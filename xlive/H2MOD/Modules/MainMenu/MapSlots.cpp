@@ -92,7 +92,7 @@ namespace MapSlots
 	}
 	void OnMapLoad()
 	{
-		if (h2mod->GetMapType() == MainMenu)
+		if (h2mod->GetEngineType() == MainMenu)
 		{
 			if (!AddedMaps.empty())
 			{
@@ -224,7 +224,7 @@ namespace MapSlots
 		//AddedMaps.emplace_back("salvation.map");
 		CacheMapData();
 
-		if (!h2mod->Server)
+		if (!Memory::isDedicatedServer())
 			tags::on_map_load(OnMapLoad);
 		else
 			ApplyHooks();

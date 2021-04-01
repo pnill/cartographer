@@ -65,7 +65,7 @@
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>.\3rdparty\imgui;.\;.\3rdparty\;.\3rdparty\libcurl;.3rdparty\portaudio;.\3rdparty\google;..\Directx SDK\include;.\3rdparty\miniupnpc\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\DirectX SDK\Lib\x86;.\libs;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;.\3rdparty\portaudio;.\3rdparty\miniupnpc\lib\;.\3rdparty\libcurl\;.\3rdparty\opus\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\DirectX SDK\lib;.\libs;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;.\3rdparty\portaudio;.\3rdparty\miniupnpc\lib\;.\3rdparty\libcurl\;.\3rdparty\opus\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -272,7 +272,11 @@
     <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
+    <ClCompile Include="Blam\Engine\Objects\GameStateObjects.cpp" />
     <ClCompile Include="Blam\Engine\Players\Players.cpp" />
+    <ClCompile Include="H2MOD\Engine\Engine.cpp" />
+    <ClCompile Include="H2MOD\Engine\Objects.cpp" />
+    <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\debug_overlay.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.cpp" />
@@ -290,7 +294,7 @@
     <ClCompile Include="H2MOD\Modules\Input\PlayerControl.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\OriginalFPSLimiter.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
@@ -527,10 +531,12 @@
     <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Engine\Game\DamageData.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngineEnum.h" />
+    <ClInclude Include="Blam\Engine\Objects\GameStateObjects.h" />
     <ClInclude Include="Blam\Enums\Game\HaloStrings.h" />
     <ClInclude Include="Blam\Maths\integer_math.h" />
     <ClInclude Include="Blam\Maths\real_math.h" />
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
+    <ClInclude Include="H2MOD\Engine\Engine.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_handler.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
@@ -544,7 +550,7 @@
     <ClInclude Include="H2MOD\Modules\Input\PlayerControl.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\UncappedFPS.h" />
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\OriginalFPSLimiter.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />

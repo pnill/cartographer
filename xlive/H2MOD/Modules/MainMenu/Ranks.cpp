@@ -8,7 +8,7 @@
 
 void UIRankPatch() {
 
-	if (h2mod->GetMapType() != MainMenu || h2mod->Server)
+	if (h2mod->GetEngineType() != MainMenu || Memory::isDedicatedServer())
 		return;
 
 	//BYTE PlayerLevel = -1;								//eventually this will pull level from webserver

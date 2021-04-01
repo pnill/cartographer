@@ -167,7 +167,7 @@ void __stdcall handle_out_of_band_message_hook(void *thisx, network_address* add
 	case unit_grenades:
 	{
 		s_unit_grenades* received_data = (s_unit_grenades*)packet;
-		if (!h2mod->Server)
+		if (!Memory::isDedicatedServer())
 			h2mod->set_local_player_unit_grenades(received_data->type, received_data->count, received_data->player_index);
 		return;
 	}

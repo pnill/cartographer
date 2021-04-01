@@ -65,7 +65,7 @@ namespace Blam
 			_game_engine_team_respawn_cycling = 0x1,
 			_game_engine_team_respawn_standard = 0x2,
 		};
-		enum game_variant_description_index : byte
+		enum e_game_variant_description_index : byte
 		{
 			slayer = 0x0,
 			oddball = 0x1,

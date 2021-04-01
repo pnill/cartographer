@@ -402,7 +402,7 @@ namespace OverridePackets
 
 		//receive_packet_method = (receive_packet)DetourClassFunc(Memory::GetAddress<BYTE*>(0x1E82E0, 0x1CA2A3), (BYTE*)receivePacket, 11);
 
-		if (h2mod->Server) {
+		if (Memory::isDedicatedServer()) {
 			p_decode_text_chat_packet = (decode_text_chat_packet_)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CD8A4), (BYTE*)decode_text_chat_packet, 12);
 		}
 	}

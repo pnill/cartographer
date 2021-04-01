@@ -63,7 +63,7 @@ void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, ch
 
 void ServerConsole::ApplyHooks()
 {
-	if (!h2mod->Server)
+	if (!Memory::isDedicatedServer())
 		return;
 	s_commandsMap[L"ban"] = ServerConsoleCommands::ban;
 	s_commandsMap[L"description"] = ServerConsoleCommands::description;
@@ -89,7 +89,7 @@ void ServerConsole::ApplyHooks()
 
 void ServerConsole::logToDedicatedServerConsole(const wchar_t* string, ...) {
 
-	if (!h2mod->Server)
+	if (!Memory::isDedicatedServer())
 		return;
 
 	typedef signed int(dedi_print)(const wchar_t* str, ...);
