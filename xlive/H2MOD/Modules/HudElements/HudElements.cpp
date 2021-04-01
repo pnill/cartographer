@@ -84,14 +84,25 @@ void __cdecl render_camera_build_frustum(int a1, int a2, int a3)
 	}
 }
 
-bool crosshairInit = false;
-static point2d defaultCrosshairSizes[59];
-void HudElements::setCrosshairSize()
+void HudElements::setCrosshairSize(bool mapLoadContext)
 {
+	static bool crosshairInit = false;
+	static point2d* defaultCrosshairSizes = nullptr;
+
+	// if we are in a "mapLoadContext", save default crosshair size and delete if we previously saved something
+	if (mapLoadContext)
+	{
+		if (defaultCrosshairSizes != nullptr)
+		{
+			delete[] defaultCrosshairSizes;
+			defaultCrosshairSizes = nullptr;
+		}
+		crosshairInit = false;
+	}
+
 	if (Memory::isDedicatedServer())
 		return;
 	if (h2mod->GetEngineType() == e_engine_type::Multiplayer) {
-		point2d* Weapons[59];
 
 		auto hud_reticles = tags::find_tag(blam_tag::tag_group_type::bitmap, "ui\\hud\\bitmaps\\new_hud\\crosshairs\\hud_reticles");
 		char* hud_reticles_data = tags::get_tag<blam_tag::tag_group_type::bitmap, char>(hud_reticles);
@@ -102,17 +113,18 @@ void HudElements::setCrosshairSize()
 			for (auto i = 0; i < hud_reticles_bitmaps->block_count; i++)
 			{
 				point2d* ui_bitmap_size = reinterpret_cast<point2d*>(reticle_bitmap + (i * 0x74) + 0x4);
-				Weapons[i] = ui_bitmap_size;
 				if (!crosshairInit) {
+					if (defaultCrosshairSizes == nullptr)
+						defaultCrosshairSizes = new point2d[hud_reticles_bitmaps->block_count];
+
 					defaultCrosshairSizes[i].x = ui_bitmap_size->x;
 					defaultCrosshairSizes[i].y = ui_bitmap_size->y;
 				}
+
+				*ui_bitmap_size = point2d{ (short)round(defaultCrosshairSizes[i].x * H2Config_crosshair_scale), (short)round(defaultCrosshairSizes[i].y * H2Config_crosshair_scale) };
 			}
 		}
 		crosshairInit = true;
-		for (int i = 0; i < 59; i++) {
-			*Weapons[i] = *new point2d{ (short)round(defaultCrosshairSizes[i].x * H2Config_crosshair_scale), (short)round(defaultCrosshairSizes[i].y * H2Config_crosshair_scale) };
-		}
 	}
 }
 void HudElements::setCrosshairPos() {
@@ -195,7 +207,7 @@ void HudElements::ToggleHUD(bool state)
 
 void HudElements::OnMapLoad()
 {
-	setCrosshairSize();
+	setCrosshairSize(true);
 	setCrosshairPos();
 }
 void HudElements::ApplyHooks()
