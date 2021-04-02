@@ -1,8 +1,6 @@
 
 #include "NetworkChannel.h"
 
-#include "H2MOD.h"
-
 network_channel* network_channel::getNetworkChannel(int channelIndex)
 {
 	network_channel* network_channels = *Memory::GetAddress<network_channel**>(0x4FADBC, 0x525274);

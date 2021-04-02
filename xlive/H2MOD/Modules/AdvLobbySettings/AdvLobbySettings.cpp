@@ -3,7 +3,6 @@
 #include "Globals.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
-#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 bool AdvLobbySettings_mp_explosion_physics = false;
 bool AdvLobbySettings_mp_sputnik = false;

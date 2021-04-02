@@ -1,13 +1,10 @@
 #include "stdafx.h"
 #include "CustomPackets.h"
 
-#include "H2MOD.h"
 #include "Util\Hooks\Hook.h"
-#include "XLive\XUser\XUser.h"
 #include "..\Memory\bitstream.h"
 #include "..\..\MapManager\MapManager.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
-#include "H2MOD/Modules/Utils/Utils.h"
 #include "H2MOD/Modules/Config/Config.h"
 
 char g_network_message_types[e_network_message_types::end * 32];

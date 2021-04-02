@@ -1,7 +1,6 @@
 
 #include "NetworkObserver.h"
 
-#include "H2MOD.h"
 #include "Util/Hooks/Hook.h"
 
 network_observer_configuration* g_network_configuration;

@@ -1,7 +1,6 @@
 
 #include "ServerConsole.h"
 
-#include "H2MOD.h"
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"

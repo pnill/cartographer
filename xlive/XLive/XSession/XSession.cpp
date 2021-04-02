@@ -2,7 +2,6 @@
 #include "XSession.h"
 
 #include "XLive\xnet\IpManagement\XnIp.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 

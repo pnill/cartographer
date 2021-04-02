@@ -120,7 +120,7 @@
     <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\Engine\Engine.cpp" />
     <ClCompile Include="H2MOD\Engine\Objects.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\OriginalFPSLimiter.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\OriginalFPSLimiter\OriginalFPSLimiter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -389,7 +389,7 @@
     <ClInclude Include="XLive\xnet\net_utils.h" />
     <ClInclude Include="Blam\Engine\Objects\GameStateObjects.h" />
     <ClInclude Include="H2MOD\Engine\Engine.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS\OriginalFPSLimiter.h" />
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\OriginalFPSLimiter\OriginalFPSLimiter.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

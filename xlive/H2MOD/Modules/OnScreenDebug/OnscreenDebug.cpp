@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 
 char** DebugStr;

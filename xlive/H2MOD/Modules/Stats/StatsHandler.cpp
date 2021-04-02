@@ -1,21 +1,9 @@
 #include "StatsHandler.h"
-#include "stdafx.h"
-#include "Globals.h"
 #include "Util/hash.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "libcurl/curl/curl.h"
-#include "H2MOD/Modules/Console/ConsoleCommands.h"
-#include "rapidjson/document.h"
 #include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include <iostream>
-#include "XLive/XNet/upnp.h"
 #include "H2MOD/Modules/Startup/Startup.h"
-#include "XLive/xbox/xbox.h"
-#include <ws2ipdef.h>
-#include <WS2tcpip.h>
-#include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/Modules/ServerConsole/ServerConsole.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #ifdef _DEBUG
 #pragma comment(lib, "libcurl_a_debug.lib")

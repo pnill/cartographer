@@ -12,8 +12,6 @@
 #include "H2MOD\Modules\Updater\Updater.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
-#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
-#include "H2MOD\Tags\TagInterface.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 
 #include "c_screen_with_menu.h"

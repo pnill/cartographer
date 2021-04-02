@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "CustomResolutions.h"
 
-#include "H2MOD.h"
 #include "..\Util\Hooks\Hook.h"
 
 

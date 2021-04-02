@@ -1,6 +1,4 @@
 #include "TagInterface.h"
-#include "H2MOD.h"
-#include "..\Util\Hooks\Hook.h"
 
 tags::tag_instance* tags::get_tag_instances()
 {

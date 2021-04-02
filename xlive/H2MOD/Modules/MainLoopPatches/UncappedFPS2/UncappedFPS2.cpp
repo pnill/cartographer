@@ -1,9 +1,7 @@
 #include "UncappedFPS2.h"
 #include "Util/Hooks/Hook.h"
-#include "Blam/Cache/TagGroups/globals_definition.hpp"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/Modules/Config/Config.h"
-#include "Blam/Engine/Game/GameTimeGlobals.h"
 
 BYTE toggleZoom[] = { 0x66, 0x89, 0x45, 0x3E };
 

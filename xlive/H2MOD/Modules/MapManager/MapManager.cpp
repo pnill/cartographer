@@ -5,11 +5,7 @@
 #include "H2MOD\Modules\Config\Config.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "..\Networking\Networking.h"
-#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/Startup/Startup.h"
-#include <Mswsock.h>
-#include <WS2tcpip.h>
 #include <curl/curl.h>
 
 #pragma comment (lib, "mswsock.lib")
