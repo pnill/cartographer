@@ -2,10 +2,7 @@
 
 #include <DSound.h>
 
-#include "Globals.h"
-#include "H2MOD\Modules\Config\Config.h"
-
-//#5008
+// #5008
 int WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, XHVENGINE **ppEngine)
 {
 	return DSERR_NODRIVER;

@@ -8,7 +8,6 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Config\Config.h"
 
-#include "XLive\xnet\IpManagement\XnIp.h"
 
 #include "XLive\xnet\upnp.h"
 

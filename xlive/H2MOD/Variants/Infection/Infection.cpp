@@ -1,15 +1,12 @@
 #include "stdafx.h"
 
 #include "Globals.h"
-#include "Blam\Enums\Enums.h"
 #include "..\..\Modules\Networking\Networking.h"
-#include "..\..\Modules\Networking\CustomPackets\CustomPackets.h"
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
-#include "Blam/Cache/TagGroups/item_collection_defenition.hpp"
-#include "Blam/Cache/TagGroups/vehicle_definition.hpp"
-#include "Blam/Cache/TagGroups/vehicle_collection_defenition.hpp"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
+#include "Blam/Cache/TagGroups/scenario_definition.hpp"
+#include "Blam/Cache/TagGroups/item_collection_defenition.hpp"
+#include "Blam/Cache/TagGroups/vehicle_collection_defenition.hpp"
 #include "H2MOD/Engine/Engine.h"
 
 std::vector<XUID> Infection::zombieIdentifiers;

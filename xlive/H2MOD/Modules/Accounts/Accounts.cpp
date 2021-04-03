@@ -7,7 +7,6 @@
 #include "H2MOD\Modules\Startup\Startup.h"
 
 #include "Util\SimpleIni.h"
-#include "spdlog/fmt/bundled/printf.h"
 
 static void HandleFileError(int fpErrNo) {//TODO
 	if (fpErrNo == EACCES || fpErrNo == EIO || fpErrNo == EPERM) {

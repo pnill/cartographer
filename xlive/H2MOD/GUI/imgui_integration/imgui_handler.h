@@ -44,7 +44,8 @@ namespace imgui_handler
 	float WidthPercentage(float percent);
 	void TextVerticalPad(char* label, float amount);
 	bool LoadTextureFromFile(const char* filename, s_imgui_images image, int* out_width, int* out_height);
-	PDIRECT3DTEXTURE9 GetImage(s_imgui_images image);
+	PDIRECT3DTEXTURE9 GetTexture(s_imgui_images image);
+	void ReleaseTextures();
 	s_aspect_ratio getAspectRatio(float width, float height);
 	void preloadImages();
 	namespace MOTD {

@@ -5,7 +5,6 @@
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
-#include "ControllerInput.h"
 
 
 extern LPDIRECT3DDEVICE9 pDevice;

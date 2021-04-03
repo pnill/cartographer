@@ -1,8 +1,6 @@
 #include "PlayerControl.h"
-#include "H2MOD/Modules/Config/Config.h"
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
-#include "Blam/Engine/Players/PlayerControls.h"
 
 
 typedef void __cdecl c_UpdatePlayerControl(float yaw, float pitch);

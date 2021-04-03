@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Globals.h"
-#include "..\..\Modules\Networking\Networking.h"
 #include "H2MOD\Engine\Engine.h"
 
 using namespace NetworkSession;

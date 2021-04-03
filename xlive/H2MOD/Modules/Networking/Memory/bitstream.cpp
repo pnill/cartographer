@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "bitstream.h"
-#include "H2MOD.h"
 
 void bitstream::init(void*buffer, DWORD data_length)
 {

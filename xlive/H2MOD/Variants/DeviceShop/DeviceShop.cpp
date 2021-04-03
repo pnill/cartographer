@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Globals.h"
 #include "DeviceShop.h"
-#include "..\H2MOD\Tags\TagInterface.h"
 
 extern void __cdecl print_to_console(char *output);
 extern void GivePlayerWeaponDatum(datum unit_datum, datum weapon_datum);

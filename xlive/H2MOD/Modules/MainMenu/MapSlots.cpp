@@ -3,7 +3,6 @@
 #include "H2MOD.h"
 #include "Blam/Cache/TagGroups/globals_definition.hpp"
 #include "Util/filesys.h"
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Util/Hooks/Hook.h"
 
 namespace MapSlots

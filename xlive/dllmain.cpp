@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
-#include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "H2MOD/Modules/Startup/Startup.h"
 #include "Util/Hooks/Detour.h"
 

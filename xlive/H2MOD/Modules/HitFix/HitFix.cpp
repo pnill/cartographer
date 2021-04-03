@@ -1,16 +1,8 @@
 #include "HitFix.h"
 
-#include "H2MOD.h"
-#include "H2MOD\Tags\TagInterface.h"
-
-#include "Util/Hooks/Hook.h"
-
-#include "Blam/Engine/Objects/Objects.h"
-
-#include "Globals.h"
+ #include "Globals.h"
 
 // TODO: move the struct time_globals in here somewhere else
-#include "Blam\Engine\Game\GameTimeGlobals.h"
 
 #define DEFAULT_PROJECTILE_OBJECT_DATA_SIZE 428
 

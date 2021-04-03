@@ -1,13 +1,9 @@
 
-#include "XLive\xnet\IpManagement\XnIp.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\ServerConsole\ServerConsole.h"
-#include "H2MOD\Modules\Config\Config.h"
-
 #include "Networking.h"
 #include "Memory\bitstream.h"
-#include "CustomPackets\CustomPackets.h"
 #include "OverridePackets/OverridePackets.h"
+
+#include "Util/Hooks/Hook.h"
 
 bool decodePacketTypeAndSize(void *thisx, bitstream* stream, signed int *a3, int a4) {
 	char *v4; // ebp@1

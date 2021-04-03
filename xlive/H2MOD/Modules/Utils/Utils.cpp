@@ -1,12 +1,10 @@
 
 #include "Util\Hooks\Hook.h"
 #include <sys/timeb.h>
-#include "H2MOD.h"
 
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 
 #include "libcurl/curl/curl.h"
 
