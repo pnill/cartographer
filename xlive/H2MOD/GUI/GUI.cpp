@@ -41,7 +41,6 @@ typedef struct XLIVE_INPUT_INFO {
 } XLIVE_INPUT_INFO;
 
 LPDIRECT3DDEVICE9 pDevice;
-D3DPRESENT_PARAMETERS *pD3DPP;
 
 IDirect3DTexture9* Primitive = NULL;
 
@@ -142,7 +141,6 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 	{
 		//LOG_TRACE_XLIVE("XLiveInitialize  (pPii = %X)", pPii);
 		pDevice = (LPDIRECT3DDEVICE9)pXii->pD3D;
-		pD3DPP = (D3DPRESENT_PARAMETERS*)pXii->pD3DPP;
 
 		ServerStatus = new char[250];
 		snprintf(ServerStatus, 250, "Status: Initializing....");
@@ -150,7 +148,8 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 		BuildText = new char[250];
 		snprintf(BuildText, 250, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
 
-		GUI::Initialize(pD3DPP->hDeviceWindow);
+		auto d3dpp = (D3DPRESENT_PARAMETERS*)pXii->pD3DPP;
+		GUI::Initialize(d3dpp->hDeviceWindow);
 	}
 	LOG_TRACE_XLIVE("XLiveInitializeEx - dwVersion = {0:x}", dwVersion);
 	return 0;
@@ -166,7 +165,6 @@ int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii)
 int WINAPI XLiveOnCreateDevice(IDirect3DDevice9 *pD3D, VOID* vD3DPP)
 {
 	pDevice = pD3D;
-	pD3DPP = (D3DPRESENT_PARAMETERS*)vD3DPP;
 	
 	//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice+17);
 	//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
@@ -190,19 +188,17 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 	Sprite_Interface->OnLostDevice();
 	Sprite_Interface->OnResetDevice();
 
-	pD3DPP = vD3DPP;
 	//Have to invalidate ImGUI on device reset, otherwise it hangs the device in a reset loop.
 	//https://github.com/ocornut/imgui/issues/1464#issuecomment-347469716
+
+	imgui_handler::ReleaseTextures();
 	ImGui_ImplDX9_InvalidateDeviceObjects();
 	ImGui_ImplDX9_CreateDeviceObjects();
 	//pDevice->Reset(pD3DPP);
 	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
 	return 0;
 }
-void GUI::ResetDevice()
-{
-	pDevice->Reset(pD3DPP);
-}
+
 // #5006 XLiveOnDestroyDevice
 HRESULT WINAPI XLiveOnDestroyDevice()
 {
@@ -512,7 +508,8 @@ BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 		// console
 		commands->handleInput(lpMsg->wParam);
 	}
-	if (imgui_handler::IsWindowActive("motd"))
+	if (imgui_handler::IsWindowActive("motd")
+		&& (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
 		return true;
 	else
 		return false;
