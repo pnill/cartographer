@@ -17,6 +17,8 @@ namespace SpecialEvents
 {
 	namespace
 	{
+		datum mook_ball_datum = datum::Null;
+
 		datum paddy_hat_datum = datum::Null;
 		datum paddy_beard_datum = datum::Null;
 		datum paddy_pot_datum = datum::Null;
@@ -238,6 +240,164 @@ namespace SpecialEvents
 		}
 	}
 
+	void MookMaddnessOnMapLoad()
+	{
+		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
+		{
+			if (tag_loader::Map_exists("carto_shared"))
+			{
+				mook_ball_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\basketball\\basketball", blam_tag::tag_group_type::weapon, "carto_shared");
+				if(!mook_ball_datum.IsNull())
+				{
+					tag_loader::Load_tag(mook_ball_datum.ToInt(), true, "carto_shared");
+					tag_loader::Push_Back();
+
+					auto mook_ball = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tag_loader::ResolveNewDatum(mook_ball_datum.ToInt()), true);
+					
+					auto ball_model_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
+					auto ball_model = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(ball_model_datum);
+					ball_model->model.TagIndex = mook_ball->model.TagIndex;
+
+					ball_model->first_person[0]->first_person_model.TagIndex = mook_ball->first_person[0]->first_person_model.TagIndex;
+					ball_model->first_person[1]->first_person_model.TagIndex = mook_ball->first_person[1]->first_person_model.TagIndex;
+
+					auto bomb_model_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+					auto bomb_model = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(bomb_model_datum);
+					bomb_model->model.TagIndex = mook_ball->model.TagIndex;
+
+
+				}
+				//paddy_hat_datum = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\stpat_hat", blam_tag::tag_group_type::scenario, "carto_shared");
+				//paddy_beard_datum = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\beard\\beard", blam_tag::tag_group_type::scenario, "carto_shared");
+				//paddy_pot_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\pot_of_gold\\pot_of_gold", blam_tag::tag_group_type::scenario, "carto_shared");
+				//if (!paddy_hat_datum.IsNull() && !paddy_beard_datum.IsNull() && !paddy_pot_datum.IsNull())
+				//{
+				//	tag_loader::Load_tag(paddy_hat_datum.ToInt(), true, "carto_shared");
+				//	tag_loader::Load_tag(paddy_beard_datum.ToInt(), true, "carto_shared");
+				//	tag_loader::Load_tag(paddy_pot_datum.ToInt(), true, "carto_shared");
+				//	tag_loader::Push_Back();
+				//	auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
+				//	if (hlmt_chief_datum != datum::Null) {
+				//		auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
+				//		auto b = hlmt_chief->variants[0];
+				//		auto hat = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
+				//		hat->parent_marker = string_id(Blam::Enums::Game::HS_HEAD);
+				//		hat->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+				//		hat->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_hat_datum.ToInt());
+				//		auto beard = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
+				//		beard->parent_marker = string_id(Blam::Enums::Game::HS_HEAD);
+				//		beard->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+				//		beard->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_beard_datum.ToInt());
+
+				//	}
+				//	auto hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
+				//	if (hlmt_chief_mp_datum != datum::Null) {
+				//		auto hlmt_chief_mp = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_mp_datum);
+				//		auto b = hlmt_chief_mp->variants[0];
+				//		auto hat = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
+				//		hat->parent_marker = string_id(Blam::Enums::Game::HS_HEAD);
+				//		hat->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+				//		hat->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_hat_datum.ToInt());
+				//		auto beard = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
+				//		beard->parent_marker = string_id(Blam::Enums::Game::HS_HEAD);
+				//		beard->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+				//		beard->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_beard_datum.ToInt());
+				//	}
+				//	auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
+				//	if (hlmt_elite_datum != datum::Null)
+				//	{
+				//		auto hlmt_eliete = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_elite_datum);
+				//		auto b = hlmt_eliete->variants[0];
+				//		auto a = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
+				//		a->parent_marker = new_elite_head_marker;
+				//		a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+				//		a->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_hat_datum.ToInt());
+				//		auto beard = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
+				//		beard->parent_marker = new_elite_head_marker;
+				//		beard->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+				//		beard->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_beard_datum.ToInt());
+				//	}
+				//}
+
+				//auto paddy_pot = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(tag_loader::ResolveNewDatum(paddy_pot_datum.ToInt()), true);
+				//auto paddy_pot_model_datum = paddy_pot->objectTag.model.TagIndex;
+				//auto paddy_pot_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(paddy_pot_model_datum, true);
+
+				//auto ball_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\weapons\\multiplayer\\ball\\ball");
+				//auto ball_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(ball_model_datum);
+				//ball_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
+
+				//auto bomb_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+				//auto bomb_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(bomb_model_datum);
+				//bomb_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
+
+				//auto paddy_pot_render = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(paddy_pot_model->render_model.TagIndex, true);
+				//auto pot_node = paddy_pot_render->nodes[0];
+				//pot_node->default_rotation_k = -0.75;
+				//pot_node->inverse_position_y = 0.07;
+				//pot_node->inverse_position_z = -0.1;
+
+				//auto ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
+				//char* ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(ball_weapon_datum);
+
+				////Bounding Radius and Sweetener size
+				////*((float*)ball_weapon + 0x4) = 0.3f;
+				////*((byte*)ball_weapon + 0x1A) = 1;
+
+				//auto bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+				//char* bomb_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(bomb_weapon_datum);
+
+				////Bounding Radius and Sweetener size
+				////*((float*)bomb_weapon + 0x4) = 0.3f;
+				////*((byte*)bomb_weapon + 0x1A) = 1;
+
+				///*auto ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
+				//char* ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(ball_weapon_datum);
+				//if (ball_weapon != nullptr)
+				//{
+				//	tags::tag_data_block* first_person_block = reinterpret_cast<tags::tag_data_block*>(ball_weapon + 0x2A8);
+				//	if (first_person_block->block_count > 0 && first_person_block->block_data_offset != -1)
+				//	{
+				//		char* first_person_data = tags::get_tag_data() + first_person_block->block_data_offset;
+				//		for (auto i = 0; i < first_person_block->block_count; i++)
+				//		{
+				//			tag_reference* fp_model = reinterpret_cast<tag_reference*>(first_person_data + (0x10 * i));
+				//			tag_reference* fp_anim = reinterpret_cast<tag_reference*>(first_person_data + (0x10 * i) + 8);
+				//			fp_model->TagIndex = paddy_pot_model->render_model.TagIndex;
+				//		}
+				//	}
+				//}
+
+				//auto bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+				//char* bomb_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(bomb_weapon_datum);
+				//if (bomb_weapon != nullptr)
+				//{
+				//	tags::tag_data_block* first_person_block = reinterpret_cast<tags::tag_data_block*>(bomb_weapon + 0x2A8);
+				//	if (first_person_block->block_count > 0 && first_person_block->block_data_offset != -1)
+				//	{
+				//		char* first_person_data = tags::get_tag_data() + first_person_block->block_data_offset;
+				//		for (auto i = 0; i < first_person_block->block_count; i++)
+				//		{
+				//			tag_reference* fp_model = reinterpret_cast<tag_reference*>(first_person_data + (0x10 * i));
+				//			tag_reference* fp_anim = reinterpret_cast<tag_reference*>(first_person_data + (0x10 * i) + 8);
+				//			fp_model->TagIndex = paddy_pot_model->render_model.TagIndex;
+				//		}
+				//	}
+				//}*/
+
+			}
+			else
+			{
+				if (NetworkSession::getCurrentNetworkSession()->local_peer_index != NetworkSession::getCurrentNetworkSession()->session_host_peer_index)
+				{
+					*Memory::GetAddress<int*>(0x46DCF1) = 1;
+					imgui_handler::iMessageBox::SetMessage("Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\nBy going to Cartographer > Update.\r\n\r\nIf that doesn't work reach out to us in #help on discord.");
+					imgui_handler::ToggleWindow("messagebox");
+				}
+			}
+		}
+	}
+
 	void AddNewMarkers()
 	{
 		if (h2mod->GetEngineType() == e_engine_type::Multiplayer) {
@@ -275,6 +435,9 @@ namespace SpecialEvents
 
 			if (CheckIfEventTime(L"12-25"))
 				tags::on_map_load(ChristmasOnMapLoad);
+
+			if(CheckIfEventTime(L"4-12"))
+				tags::on_map_load(MookMaddnessOnMapLoad);
 		}
 	}
 }

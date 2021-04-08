@@ -63,6 +63,105 @@ namespace OverridePackets
 			Memory::GetAddress<void*>(0x1ED30F, 0x1CDCC8),
 			NULL);
 	}
+	typedef void(__cdecl p_encode_player_motion)(bitstream *pThis, int a2);
+	p_encode_player_motion* o_encode_player_motion;
+
+	void __cdecl encode_player_motion(bitstream *pThis, int a2)
+	{
+#if PRECISION_INCREASE == 1
+		pThis->data_encode_bits("yaw", (float *)a2, sizeof(float) * CHAR_BIT);
+		pThis->data_encode_bits("pitch", (float *)(a2 + 4), sizeof(float) * CHAR_BIT);
+		pThis->data_encode_bits("throttle-x", (float *)(a2 + 8), sizeof(float) * CHAR_BIT);
+		pThis->data_encode_bits("throttle-y", (float *)(a2 + 12), sizeof(float) * CHAR_BIT);
+#else
+		pThis->data_encode_quantized_real("yaw", *(float *)a2, 0.0, 6.2831855, 13, 0);
+		pThis->data_encode_quantized_real("pitch", *(float *)(a2 + 4), -3.1415927, 3.1415927, 12, 0);
+		pThis->data_encode_quantized_real("throttle-x", *(float *)(a2 + 8), -1.0, 1.0, 5, 1);
+		pThis->data_encode_quantized_real("throttle-y", *(float *)(a2 + 12), -1.0, 1.0, 5, 1);
+#endif
+		pThis->data_encode_bool("motion-flags-exist", *(WORD *)(a2 + 16) != 0);
+		if (*(WORD *)(a2 + 16))
+			pThis->data_encode_integer("motion-flags", *(WORD *)(a2 + 16), 4);
+		pThis->data_encode_integer("weapon-set-identifier", *(__int16 *)(a2 + 18) + 1, 5);
+		pThis->data_encode_integer("primary-weapon-index", *(char *)(a2 + 20) + 1, 3);
+		pThis->data_encode_integer("secondary-weapon-index", *(char *)(a2 + 21) + 1, 3);
+		pThis->data_encode_integer("zoom-level", *(__int16 *)(a2 + 22) + 1, 2);
+		pThis->data_encode_bool("primary-predicted-fire-primary", *(BYTE *)(a2 + 24));
+		pThis->data_encode_bool("primary-predicted-fire-secondary", *(BYTE *)(a2 + 25));
+		pThis->data_encode_bool("secondary-predicted-fire-primary", *(BYTE *)(a2 + 26));
+		pThis->data_encode_bool("secondary-predicted-fire-secondary", *(BYTE *)(a2 + 27));
+		pThis->data_encode_bool("predicted-aim-assist-exists", *(BYTE *)(a2 + 28));
+
+		typedef void(__cdecl p_encode_player_motion_predicted_aim_assist)(bitstream *a1, int a2);
+		p_encode_player_motion_predicted_aim_assist* encode_player_motion_predicted_aim_assist = 
+			Memory::GetAddress<p_encode_player_motion_predicted_aim_assist*>(0x1F5F60);
+
+		if (*(BYTE *)(a2 + 28))
+			encode_player_motion_predicted_aim_assist(pThis, a2 + 32);
+		pThis->data_encode_bool("weapon-fire-empty-primary", *(BYTE *)(a2 + 48));
+		pThis->data_encode_bool("weapon-fire-empty-secondary", *(BYTE *)(a2 + 49));
+		pThis->data_encode_bool("motion-sensor-velocity-threshold-exceeded", *(BYTE *)(a2 + 50));
+	}
+
+	typedef bool(__cdecl p_decode_player_motion)(bitstream *pThis, float *a1);
+	p_decode_player_motion* o_decode_player_motion;
+
+	bool __cdecl decode_player_motion(bitstream *pThis, float *a1)
+	{
+		bool v2; // bl
+		bool v3; // al
+
+		v2 = 1;
+		memset(a1, 0, 52u);
+		a1[8] = 0.0;
+		a1[9] = 0.0;
+		a1[10] = -6.8056469e38/*NaN*/;
+		a1[11] = -6.8056469e38/*NaN*/;
+#if PRECISION_INCREASE == 1
+		float temp;
+		pThis->data_decode_bits("yaw", &temp, sizeof(float) * CHAR_BIT);
+		*a1 = temp;
+		pThis->data_decode_bits("pitch", &temp, sizeof(float) * CHAR_BIT);
+		a1[1] = temp;
+		pThis->data_decode_bits("throttle-x", &temp, sizeof(float) * CHAR_BIT);
+		a1[2] = temp;
+		pThis->data_decode_bits("throttle-y", &temp, sizeof(float) * CHAR_BIT);
+		a1[3] = temp;
+#else
+		*a1 = c_bitstream::data_decode_quantized_real(pThis, "yaw", 0.0, 6.2831855, 13, 0);
+		a1[1] = c_bitstream::data_decode_quantized_real(pThis, "pitch", -3.1415927, 3.1415927, 12, 0);
+		a1[2] = c_bitstream::data_decode_quantized_real(pThis, "throttle-x", -1.0, 1.0, 5, 1);
+		a1[3] = c_bitstream::data_decode_quantized_real(pThis, "throttle-y", -1.0, 1.0, 5, 1);
+#endif
+		if (pThis->data_decode_bool("motion-flags-exist"))
+			*((WORD *)a1 + 8) = pThis->data_decode_integer("motion-flags", 4);
+		*((WORD *)a1 + 9) = pThis->data_decode_integer("weapon-set-identifier", 5) - 1;
+		*((BYTE *)a1 + 20) = pThis->data_decode_integer("primary-weapon-index", 3) - 1;
+		*((BYTE *)a1 + 21) = pThis->data_decode_integer("secondary-weapon-index", 3) - 1;
+		*((WORD *)a1 + 11) = pThis->data_decode_integer("zoom-level", 2) - 1;
+		*((BYTE *)a1 + 24) = pThis->data_decode_bool("primary-predicted-fire-primary");
+		*((BYTE *)a1 + 25) = pThis->data_decode_bool("primary-predicted-fire-secondary");
+		*((BYTE *)a1 + 26) = pThis->data_decode_bool("secondary-predicted-fire-primary");
+		*((BYTE *)a1 + 27) = pThis->data_decode_bool("secondary-predicted-fire-secondary");
+		v3 = pThis->data_decode_bool("predicted-aim-assist-exists");
+		*((BYTE *)a1 + 28) = v3;
+
+		typedef bool(__cdecl p_decode_player_motion_aim_assist_prediction)(bitstream *pThis, DWORD *a2);
+		p_decode_player_motion_aim_assist_prediction* decode_player_motion_aim_assist_prediction =
+			Memory::GetAddress<p_decode_player_motion_aim_assist_prediction*>(0x1F606A);
+
+		if (v3)
+			v2 = decode_player_motion_aim_assist_prediction(pThis, (DWORD *)a1 + 8);
+		*((BYTE *)a1 + 48) = pThis->data_decode_bool("weapon-fire-empty-primary");
+		*((BYTE *)a1 + 49) = pThis->data_decode_bool("weapon-fire-empty-secondary");
+		*((BYTE *)a1 + 50) = pThis->data_decode_bool("motion-sensor-velocity-threshold-exceeded");
+
+		typedef bool(__cdecl p_player_motion_valid)(int a1);
+		p_player_motion_valid* player_motion_valid = Memory::GetAddress<p_player_motion_valid*>(0x1F62FA);
+		bool valid = player_motion_valid((int)a1);
+		return v2 && valid;
+	}
+
 
 	typedef int (__cdecl p_encode_player_actions)(bitstream *pThis, int a2);
 	p_encode_player_actions* o_encode_player_actions;
@@ -387,9 +486,11 @@ namespace OverridePackets
 	void ApplyGamePatches()
 	{
 		register_connection_packets_method = (register_connection_packets)DetourFunc(Memory::GetAddress<BYTE*>(0x1F1B36, 0x1D24EF), (BYTE*)registerConnectionPackets, 5);
-		o_register_synchronous_simulation_packets = (p_register_synchronous_simulation_packets*)DetourFunc(Memory::GetAddress<BYTE*>(0x1ED397, 0x1CDD50), (BYTE*)register_syncronous_simulation_packets, 6);
-		o_encode_player_actions = (p_encode_player_actions*)DetourFunc(Memory::GetAddress<BYTE*>(0x1DFE4C, 0x1C730C), (BYTE*)encode_player_actions, 6);
-		o_decode_player_actions = (p_decode_player_actions*)DetourFunc(Memory::GetAddress<BYTE*>(0x1E01CB, 0x1C7965), (BYTE*)decode_player_actions, 5);
+		//o_register_synchronous_simulation_packets = (p_register_synchronous_simulation_packets*)DetourFunc(Memory::GetAddress<BYTE*>(0x1ED397, 0x1CDD50), (BYTE*)register_syncronous_simulation_packets, 6);
+		//o_encode_player_actions = (p_encode_player_actions*)DetourFunc(Memory::GetAddress<BYTE*>(0x1DFE4C, 0x1C730C), (BYTE*)encode_player_actions, 6);
+		//o_decode_player_actions = (p_decode_player_actions*)DetourFunc(Memory::GetAddress<BYTE*>(0x1E01CB, 0x1C7965), (BYTE*)decode_player_actions, 5);
+		//o_encode_player_motion = (p_encode_player_motion*)DetourFunc(Memory::GetAddress<BYTE*>(0x1F6123), (BYTE*)encode_player_motion, 6);
+		//o_decode_player_motion = (p_decode_player_motion*)DetourFunc(Memory::GetAddress<BYTE*>(0x1F6641), (BYTE*)decode_player_motion, 7);
 		//use for debugging
 		//register_player_packets_method = (register_player_packets)DetourFunc(Memory::GetAddress<BYTE*>(0x1F0A55, 0x1D140E), (BYTE*)registerPlayerPackets, 5);
 

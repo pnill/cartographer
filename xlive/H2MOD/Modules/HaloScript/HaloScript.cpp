@@ -57,13 +57,6 @@ namespace HaloScript
 		c_object_destroy(object_datum_index);
 	}
 
-	typedef void(__cdecl p_object_destroy)(datum object_datum_index);
-	p_object_destroy* c_object_destroy;
-	void ObjectDestroy(datum object_datum_index)
-	{
-		c_object_destroy(object_datum_index);
-	}
-
 	void Initialize()
 	{
 		c_unit_kill	= Memory::GetAddress<p_unit_kill*>(0x13B514, 0x12A363);
