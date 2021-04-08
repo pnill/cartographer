@@ -108,6 +108,7 @@ extern bool H2Config_force_even;
 extern bool H2Config_koth_random;
 extern H2Config_Experimental_Rendering_Mode H2Config_experimental_fps;
 extern bool H2Config_anti_cheat_enabled;
+extern int H2Config_udp_socket_buffer_size;
 
 extern int H2Config_hotkeyIdHelp;
 extern int H2Config_hotkeyIdToggleDebug;

@@ -89,6 +89,7 @@ bool H2Config_force_even = false;
 bool H2Config_koth_random = true;
 H2Config_Experimental_Rendering_Mode H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_none;
 bool H2Config_anti_cheat_enabled = true;
+int H2Config_udp_socket_buffer_size = 0;
 
 float H2Config_crosshair_scale = 1.0f;
 float H2Config_raw_mouse_scale = 25.0f;
@@ -175,11 +176,19 @@ void SaveH2Config() {
 			"\n\n"
 
 			"# wan_ip Options:"
-			"\n# lan_ip Options:"
+			"\n# wan_ip Options:"
 			"\n# This option is used for when you cannot join games hosted on the same local network due to NAT issues."
 			"\n# Configuring these settings for an internal network address avoids the requirement for that host user to port forward."
 			"\n# <IPv4> - External IP Address of the local / internal network user you are trying to connect to. If blank, the External IP returned from the Master Login is used."
 			"\n# <IPv4> - Internal IP Address of the local / internal network user you are trying to connect to."
+			"\n\n"
+
+			"# xsocket_send_recv_buf_size"
+			"\n# This option is used to specify the socket's send/receive buffer size."
+			"\n# A higher buffer size allows for more packets to be stored until they are ready to be sent or received by the game, at the cost of higher memory usage."
+			"\n# xsocket_snd_recv_buf_size options:"
+			"\n# 0 units - using what the game specifies or default of 64K units, 64 * 1024 bytes = 65536 bytes"
+			"\n# n units - min 1 unit, max 512 unit(s), resulting in: n * 1024 bytes"
 			"\n\n"
 			;
 
@@ -410,7 +419,6 @@ void SaveH2Config() {
 				"# enable_anti_cheat (Server):"
 				"\n# This flag will enable anti-cheat on your server."
 				"\n\n";
-      
 		}
 
 		if (!H2IsDediServer) {
@@ -437,6 +445,8 @@ void SaveH2Config() {
 		ini.SetValue(H2ConfigVersionSection.c_str(), "lan_ip", H2Config_str_lan);
 
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "upnp", H2Config_upnp_enable);
+
+		ini.SetLongValue(H2ConfigVersionSection.c_str(), "xsocket_send_recv_buf_size", H2Config_udp_socket_buffer_size);
 
 		if (!H2IsDediServer) {
 			std::string lang_str(std::to_string(H2Config_language.code_main) + "x" + std::to_string(H2Config_language.code_variant));
@@ -805,6 +815,7 @@ void ReadH2Config() {
 				H2Config_hotkeyIdToggleHideIngameChat = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat);
 				H2Config_hotkeyIdGuide = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_guide", H2Config_hotkeyIdGuide);
 				H2Config_hotkeyIdConsole = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_console", H2Config_hotkeyIdConsole);
+				H2Config_udp_socket_buffer_size = ini.GetLongValue(H2ConfigVersionSection.c_str(), "xsocket_send_recv_buf_size", H2Config_udp_socket_buffer_size);
 
 				switch(std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "override_shadows", "1")))
 				{

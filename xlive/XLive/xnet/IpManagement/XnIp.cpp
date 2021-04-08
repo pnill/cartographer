@@ -42,11 +42,26 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 	if (startupParams.cfgQosDataLimitDiv4 == 0)
 		startupParams.cfgQosDataLimitDiv4 = 256 / 4; // 256 bytes as default
 
-	if (startupParams.cfgSockDefaultRecvBufsizeInK <= 0)
-		startupParams.cfgSockDefaultRecvBufsizeInK = SOCK_UDP_MIN_RECV_BUFFER_K_UNITS;
+	// set defaults
+	int udpSendSocketBufferSizeK = SOCK_UDP_MIN_SEND_BUFFER_K_UNITS,
+		udpRecvSocketBufferSizeK = SOCK_UDP_MIN_RECV_BUFFER_K_UNITS;
 
-	if (startupParams.cfgSockDefaultSendBufsizeInK <= 0)
-		startupParams.cfgSockDefaultSendBufsizeInK = SOCK_UDP_MIN_SEND_BUFFER_K_UNITS;
+	// check if the game specifies these settings
+	if (startupParams.cfgSockDefaultSendBufsizeInK > 0)
+		udpSendSocketBufferSizeK = startupParams.cfgSockDefaultSendBufsizeInK;
+		
+	if (startupParams.cfgSockDefaultRecvBufsizeInK > 0)
+		udpRecvSocketBufferSizeK = startupParams.cfgSockDefaultSendBufsizeInK;
+
+	// override defaults or what game specified with H2Config if it's valid (higher than 0)
+	if (H2Config_udp_socket_buffer_size > 0)
+	{
+		udpSendSocketBufferSizeK = H2Config_udp_socket_buffer_size;
+		udpRecvSocketBufferSizeK = H2Config_udp_socket_buffer_size;
+	}
+
+	startupParams.cfgSockDefaultSendBufsizeInK = udpSendSocketBufferSizeK * SOCK_K_UNIT;
+	startupParams.cfgSockDefaultRecvBufsizeInK = udpRecvSocketBufferSizeK * SOCK_K_UNIT;
 
 	// initielize critical network logs
 	// TODO: disable after all network problems are addressed

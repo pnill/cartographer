@@ -40,7 +40,8 @@ struct XSocket
 	bool isUDP() const { return protocol == IPPROTO_UDP; }
 
 	/* VDP uses UDP, and some encryption (done at network transport layer, not game layer) */
-	bool isVDP() const { return protocol == IPPROTO_UDP; }
+	/* even when this is set to true, isUDP will return true as well					   */
+	bool isVDP() const { return isVoiceSocket; }
 
 	bool isValid() const { return identifier == 'XSoC'; }
 

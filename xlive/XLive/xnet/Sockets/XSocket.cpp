@@ -87,7 +87,7 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 
 	DWORD ioctlSetting = 0;
 	DWORD cbBytesReturned;
-	if (WSAIoctl(newXSocket->winSockHandle, SIO_UDP_CONNRESET, &ioctlSetting, 4u, 0, 0, &cbBytesReturned, 0, 0) == SOCKET_ERROR)
+	if (WSAIoctl(newXSocket->winSockHandle, SIO_UDP_CONNRESET, &ioctlSetting, sizeof(ioctlSetting), 0, 0, &cbBytesReturned, 0, 0) == SOCKET_ERROR)
 	{
 		LOG_ERROR_NETWORK("XSocketCreate() - couldn't disable SIO_UDP_CONNRESET", ret);
 	}
@@ -400,9 +400,20 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 
 			packetsSent++;
 			xnIp->pckSent++;
-			xnIp->bytesSent += result;
-
 			*lpNumberOfBytesSent += result;
+
+			if (xsocket->isVDP())
+			{
+				xnIp->bytesSent += *(WORD*)(lpBuffers[i].buf);
+				volatile int volDebugSize = *(WORD*)(lpBuffers[i].buf); // volatile to breakpoint on in release mode
+				updateSendToStatistics(packetsSent, *(WORD*)(lpBuffers[i].buf)); // add only the game data, VDP protocol sets the size of game data in the first 2 bytes of the packet, and the rest is Voicechat data
+			}
+			else
+			{
+				xnIp->bytesSent += result;
+				updateSendToStatistics(packetsSent, *lpNumberOfBytesSent);
+			}
+
 		}
 #else
 		result = WSASendTo(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesSent, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr), lpOverlapped, lpCompletionRoutine);
@@ -421,7 +432,6 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			xnIp->pckSent++;
 			xnIp->bytesSent += result;
 #endif
-			updateSendToStatistics(packetsSent, *lpNumberOfBytesSent);
 		}
 
 		return 0;
@@ -697,6 +707,7 @@ void XSocket::setBufferSize(INT sendBufsize, INT recvBufsize)
 				if (setsockopt(this->winSockHandle, SOL_SOCKET, sockOpts[i], (char*)&bufOpt, sizeof(bufOptSize)) == SOCKET_ERROR) // then attempt to increase the buffer
 				{
 					LOG_ERROR_NETWORK("XSocketCreate() - setsockopt() failed, last error: {}", WSAGetLastError());
+					continue;
 				}
 			}
 		}
