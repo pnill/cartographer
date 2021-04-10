@@ -5,6 +5,7 @@
 #include "Blam/Cache/TagGroups/render_model_definition.hpp"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "Blam/Enums/Game/HaloStrings.h"
+#include "Blam/Cache/TagGroups/weapon_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 #include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
