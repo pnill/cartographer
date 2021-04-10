@@ -1,5 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes.h"
+#include "Blam/Maths/real_math.h"
 
 /*********************************************************************
 * name: weapon
