@@ -1,8 +1,6 @@
 #include "TagFixes.h";
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD.h"
 #include "Blam/Cache/TagGroups/shader_definition.h"
-#include "H2MOD/Modules/Utils/Utils.h"
 #include "Util/Hooks/Hook.h"
 
 namespace TagFixes

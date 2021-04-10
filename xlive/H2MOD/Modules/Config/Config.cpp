@@ -4,7 +4,6 @@
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 
 #include "Util\SimpleIni.h"
 

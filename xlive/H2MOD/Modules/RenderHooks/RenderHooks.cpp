@@ -1,9 +1,6 @@
 #include "RenderHooks.h"
-#include "H2MOD.h"
-#include "H2MOD/Modules/Utils/Utils.h"
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/GUI/GUI.h"
 
 bool ras_layer_overrides[25];
 bool geo_render_overrides[24];

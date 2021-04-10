@@ -21,13 +21,27 @@ namespace imgui_handler
 			bool g_complete = false;
 			bool g_success = false;	
 			bool g_init = false;
+			std::atomic<bool> g_textureLoading = false;
 			int X;
 			int Y;
 		}
 		bool GetMOTD(s_aspect_ratio ratio)
 		{
-			if (g_complete)
+			// check if the texture has been reset
+			if (g_complete 
+				&& imgui_handler::GetTexture(patch_notes) != nullptr)
 				return g_success;
+
+			auto path = std::wstring(H2AppDataLocal);
+			auto cpath = std::string(path.begin(), path.end()) + "motd.png";
+
+			// if we got this far, and g_complete is true, we already downloaded the image from the webserver
+			// and the texture got reset, so we just re-load it
+			if (g_complete)
+			{
+				imgui_handler::LoadTextureFromFile(cpath.c_str(), patch_notes, &X, &Y);
+				return g_success;
+			}
 
 			CURL *curl;
 			FILE *fp;
@@ -44,8 +58,6 @@ namespace imgui_handler
 				default:
 					return false;
 			}*/
-			auto path = std::wstring(H2AppDataLocal);
-			auto cpath = std::string(path.begin(), path.end()) + "motd.png";
 
 			curl = curl_easy_init();
 			if (curl)
@@ -82,15 +94,28 @@ namespace imgui_handler
 			s_aspect_ratio ratio = getAspectRatio(
 				ImGui::GetIO().DisplaySize.x,
 				ImGui::GetIO().DisplaySize.y);
+
+			// check if the texture has been reset
+			if (imgui_handler::GetTexture(patch_notes) == nullptr
+				&& !g_textureLoading)
+			{
+				// if so, re-upload it to memory
+				g_init = false;
+				g_motd = false;
+			}
+
 			if(!g_init)
 			{
-				if(!g_motd)
+				if (!g_motd)
 				{
+					g_textureLoading = true;
 					auto grab_thread = []()
 					{
 						GetMOTD(getAspectRatio(
 							ImGui::GetIO().DisplaySize.x,
 							ImGui::GetIO().DisplaySize.y));
+
+						g_textureLoading = false;
 					};
 					std::thread(grab_thread).detach();
 					g_motd = true;
@@ -150,7 +175,7 @@ namespace imgui_handler
 				//	(ImGui::GetIO().DisplaySize.x / 2) + (scaledx / 2),
 				//	(ImGui::GetIO().DisplaySize.y / 2) + (scaledy / 2)
 				//);
-				draw_list->AddImage((void*)imgui_handler::GetImage(patch_notes), ImVec2(0,0), 
+				draw_list->AddImage((void*)imgui_handler::GetTexture(patch_notes), ImVec2(0,0), 
 					ImVec2(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y));
 				/*draw_list->AddImage((void*)imgui_handler::GetImage(patch_notes), ImVec2(0, 0),
 					ImVec2(X, Y));*/
@@ -186,6 +211,7 @@ namespace imgui_handler
 			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);
 			ImGuiToggleInput(true);
 			PlayerControl::GetControls(0)->DisableCamera = true;
+			
 		}
 		void Close()
 		{

@@ -1,9 +1,7 @@
 #include  "OverridePackets.h"
-#include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Networking/Memory/bitstream.h"
-#include "Blam/Engine/Players/PlayerControls.h"
 
 #define PRECISION_INCREASE 1
 

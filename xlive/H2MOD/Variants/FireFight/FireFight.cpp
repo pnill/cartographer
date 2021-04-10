@@ -1,6 +1,5 @@
 
 #include "Globals.h"
-#include "H2MOD/Tags/TagInterface.h"
 
 #include "Blam/Engine/Actor/Actor.h"
 #include "Blam/Cache/TagGroups/character_definition.hpp"

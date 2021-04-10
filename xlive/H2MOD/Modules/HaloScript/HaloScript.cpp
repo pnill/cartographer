@@ -1,5 +1,4 @@
 #include "HaloScript.h"
-#include "H2MOD.h"
 namespace HaloScript
 {
 	typedef int(__cdecl p_unit_kill)(datum UnitDatum);

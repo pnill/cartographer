@@ -4,8 +4,6 @@
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD\Modules\RunLoop\RunLoop.h"
-#include "..\H2MOD.h"
 
 #include "Util\Hooks\Hook.h"
 #include "Util\Debug\Debug.h"

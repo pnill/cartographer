@@ -7,16 +7,9 @@
 #include "H2MOD\Variants\VariantMPGameEngine.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
-#include "Blam\Cache\TagGroups\shader_definition.h"
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
 #include "..\CustomResolutions\CustomResolutions.h"
-#include "..\H2MOD\Tags\TagInterface.h"
 #include "H2MOD/Modules/HudElements/HudElements.h"
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-#include "H2MOD/Modules/MainLoopPatches/TestGameTimePrep.h"
-#include "Blam/Engine/Game/GameTimeGlobals.h"
 
 #pragma region Done_Tweaks
 

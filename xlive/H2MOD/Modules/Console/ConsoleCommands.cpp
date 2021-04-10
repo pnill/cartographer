@@ -5,12 +5,9 @@
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\CustomMenu\Credits.h"
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
-#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
-#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
 #include "H2MOD\Modules\ServerConsole\ServerConsole.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
 
@@ -18,7 +15,6 @@
 
 #include "Util\ClipboardAPI.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
-#include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Engine/Engine.h"
 

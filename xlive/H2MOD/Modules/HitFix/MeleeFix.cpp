@@ -1,7 +1,6 @@
 #include "MeleeFix.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "Util/Hooks/Hook.h"
-#include "Blam/Engine/Game/GameTimeGlobals.h"
 #include "Blam/Enums/Game/HaloStrings.h"
 #include "H2MOD/Modules/Startup/Startup.h"
 

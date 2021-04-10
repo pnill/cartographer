@@ -1,9 +1,6 @@
 #include "ControllerInput.h"
-#include "H2MOD.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "Util/Hooks/Hook.h"
-#include "H2MOD/Modules/Utils/Utils.h"
-#include "H2MOD/Modules/Startup/Startup.h"
 #include "H2MOD/Engine/Engine.h"
 
 namespace ControllerInput

@@ -1,14 +1,6 @@
 #include "MetaExtender.h"
-#include "H2MOD/Modules/Config/Config.h"
-#include "Blam/Cache/TagGroups/projectile_definition.hpp"
-#include "H2MOD/Modules/Utils/Utils.h"
-#include "Blam/Cache/TagGroups/biped_definition.hpp"
-#include "type_traits"
-#include <typeinfo>
-#include <typeindex>
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
-#include "Blam/Cache/TagGroups/s_user_interface_screen_widget_definition.hpp"
 #include "Blam/Cache/TagGroups/new_hud_definition.hpp"
+
 std::vector<void*> ToFree;
 
 

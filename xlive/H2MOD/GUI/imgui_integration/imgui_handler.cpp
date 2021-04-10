@@ -352,38 +352,52 @@ namespace imgui_handler
 	bool LoadTextureFromFile(const char* filename, s_imgui_images image, int* out_width, int* out_height)
 	{
 		// Load texture from disk
-		PDIRECT3DTEXTURE9 texture;
 		D3DXIMAGE_INFO imgInfo;
+		PDIRECT3DTEXTURE9 texture = nullptr;
 		//HRESULT hr = D3DXCreateTextureFromFileA(g_pDevice, filename, &texture);
 		HRESULT hr = D3DXCreateTextureFromFileExA(g_pDevice, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
-			D3DFMT_FROM_FILE, D3DPOOL_MANAGED, D3DX_FILTER_NONE, D3DX_FILTER_NONE, 0, &imgInfo, NULL, &texture);
+			D3DFMT_FROM_FILE, D3DPOOL_DEFAULT, D3DX_FILTER_NONE, D3DX_FILTER_NONE, 0, &imgInfo, NULL, &texture);
 
 		if (hr != S_OK)
 			return false;
 
 		// Retrieve description of the texture surface so we can access its size
-		//D3DSURFACE_DESC my_image_desc;
-		//texture->GetLevelDesc(0, &my_image_desc);
 		switch (image)
 		{
 		case patch_notes:
+			if (g_patchNotes_Image)
+				g_patchNotes_Image->Release(); // release the texture if we already have one
+
 			g_patchNotes_Image = texture;
 			break;
 		default:
 			return false;
 		}
+
+		//texture->GetLevelDesc(0, &my_image_desc);
+		//*out_width = my_image_desc.Width;
+		//*out_height = my_image_desc.Height;
+		
 		*out_width = imgInfo.Width;
 		*out_height = imgInfo.Height;
 		return true;
 	}
 
-	PDIRECT3DTEXTURE9 GetImage(s_imgui_images image)
+
+	PDIRECT3DTEXTURE9 GetTexture(s_imgui_images image)
 	{
 		switch (image) {
 		case patch_notes:
 			return g_patchNotes_Image;
-		default: NULL;
+		default: 
+			return NULL;
 		}
+	}
+
+	void ReleaseTextures()
+	{
+		if (g_patchNotes_Image) g_patchNotes_Image->Release();
+		g_patchNotes_Image = nullptr;
 	}
 
 	s_aspect_ratio getAspectRatio(float width, float height)
@@ -413,5 +427,4 @@ namespace imgui_handler
 		};
 		std::thread(grab_thread).detach();
 	}
-
 }

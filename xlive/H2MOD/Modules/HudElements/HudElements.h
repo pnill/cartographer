@@ -7,7 +7,7 @@ namespace HudElements
 	void RadarPatch();
 	void ToggleFirstPerson(bool state = NULL);
 	void ToggleHUD(bool state = NULL);
-	void setCrosshairSize();
+	void setCrosshairSize(bool mapLoadContext = false);
 	void setCrosshairPos();
 	void setFOV();
 	void setVehicleFOV();

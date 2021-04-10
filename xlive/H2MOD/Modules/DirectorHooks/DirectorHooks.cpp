@@ -1,5 +1,4 @@
 #include "DirectorHooks.h"
-#include "H2MOD.h"
 #include "Util/Hooks/Hook.h"
 
 namespace DirectorHooks

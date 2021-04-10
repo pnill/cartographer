@@ -1,16 +1,12 @@
 #include "ObserverMode.h"
-#include "Blam/Maths/real_math.h"
 #include "H2MOD.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Utils/Utils.h"
-#include "Blam/Engine/Game/GameTimeGlobals.h"
-#include <cmath>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
-#include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
 
 
 namespace ObserverMode
