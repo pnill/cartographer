@@ -54,7 +54,8 @@ struct bitstream
 	void data_decode_axes(char* name, real_vector3d *out_forward, real_vector3d *out_up);
 	void data_encode_vector(char *name, real_vector3d *vector, float min_magnitude_value, float max_magnitude_value, int magnitude_size_in_bits);
 	void data_decode_vector(char *name, real_vector3d *out_vector, float min_magnitude_value, float max_magnitude_value, int magnitude_size_in_bits);
-
+	void data_encode_flags(char *name, unsigned long long value, int size_in_bits);
+	unsigned long long data_decode_flags(char *name, int size_in_bits);
 };
 #pragma pack(pop)
 CHECK_STRUCT_SIZE(bitstream, 0x34);

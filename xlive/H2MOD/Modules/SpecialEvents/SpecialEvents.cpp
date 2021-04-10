@@ -14,6 +14,8 @@ namespace SpecialEvents
 {
 	namespace
 	{
+		datum mook_ball_datum = datum::Null;
+
 		datum paddy_hat_datum = datum::Null;
 		datum paddy_beard_datum = datum::Null;
 		datum paddy_pot_datum = datum::Null;
@@ -235,6 +237,47 @@ namespace SpecialEvents
 		}
 	}
 
+	void MookMaddnessOnMapLoad()
+	{
+		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
+		{
+			if (tag_loader::Map_exists("carto_shared"))
+			{
+				mook_ball_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\basketball\\basketball", blam_tag::tag_group_type::weapon, "carto_shared");
+				if(!mook_ball_datum.IsNull())
+				{
+					tag_loader::Load_tag(mook_ball_datum.ToInt(), true, "carto_shared");
+					tag_loader::Push_Back();
+
+					auto mook_ball = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tag_loader::ResolveNewDatum(mook_ball_datum.ToInt()), true);
+					
+					auto ball_model_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
+					auto ball_model = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(ball_model_datum);
+					
+					ball_model->model.TagIndex = mook_ball->model.TagIndex;
+					ball_model->first_person[0]->first_person_model.TagIndex = mook_ball->first_person[0]->first_person_model.TagIndex;
+					ball_model->first_person[1]->first_person_model.TagIndex = mook_ball->first_person[1]->first_person_model.TagIndex;
+
+					auto bomb_model_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+					auto bomb_model = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(bomb_model_datum);
+					
+					bomb_model->model.TagIndex = mook_ball->model.TagIndex;
+					bomb_model->first_person[0]->first_person_model.TagIndex = mook_ball->first_person[0]->first_person_model.TagIndex;
+					bomb_model->first_person[1]->first_person_model.TagIndex = mook_ball->first_person[1]->first_person_model.TagIndex;
+				}
+			}
+			else
+			{
+				if (NetworkSession::getCurrentNetworkSession()->local_peer_index != NetworkSession::getCurrentNetworkSession()->session_host_peer_index)
+				{
+					*Memory::GetAddress<int*>(0x46DCF1) = 1;
+					imgui_handler::iMessageBox::SetMessage("Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\nBy going to Cartographer > Update.\r\n\r\nIf that doesn't work reach out to us in #help on discord.");
+					imgui_handler::ToggleWindow("messagebox");
+				}
+			}
+		}
+	}
+
 	void AddNewMarkers()
 	{
 		if (h2mod->GetEngineType() == e_engine_type::Multiplayer) {
@@ -272,6 +315,9 @@ namespace SpecialEvents
 
 			if (CheckIfEventTime(L"12-25"))
 				tags::on_map_load(ChristmasOnMapLoad);
+
+			if(CheckIfEventTime(L"4-12"))
+				tags::on_map_load(MookMaddnessOnMapLoad);
 		}
 	}
 }
