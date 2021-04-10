@@ -204,6 +204,7 @@ namespace tag_loader
 			tags::tag_instance tag_info;
 
 			fin->seekg(file_table_offset);
+			int cpos = 0;
 			char ch = ' ';
 			std::string input;
 			for (auto i = 0; i < tag_count; i++)
@@ -211,6 +212,7 @@ namespace tag_loader
 				std::getline(*fin, input, '\0');
 				if (input == tag_name)
 				{
+					cpos = fin->tellg();
 					fin->seekg(table_start + i * sizeof(tags::tag_instance));
 					fin->read((char*)&tag_info, sizeof(tags::tag_instance));
 					if (tag_info.type == type)
@@ -218,7 +220,7 @@ namespace tag_loader
 						delete fin;
 						return tag_info.datum_index;
 					}
-					break;
+					fin->seekg(cpos);
 				}
 			}
 		}

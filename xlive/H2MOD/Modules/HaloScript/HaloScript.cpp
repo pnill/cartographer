@@ -49,7 +49,6 @@ namespace HaloScript
 	{
 		c_render_lights_enable_cinematic_shadow(unk1, ObjectDatum, StringId, unk2);
 	}
-
 	typedef void(__cdecl p_object_destroy)(datum object_datum_index);
 	p_object_destroy* c_object_destroy;
 	void ObjectDestroy(datum object_datum_index)

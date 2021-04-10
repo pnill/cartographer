@@ -165,6 +165,20 @@ void bitstream::data_decode_vector(char *name, real_vector3d *out_vector, float 
 	p_data_decode_vector_def(this, name, out_vector, min_magnitude_value, max_magnitude_value, magnitude_size_in_bits);
 }
 
+void bitstream::data_encode_flags(char* name, unsigned long long value, int size_in_bits)
+{
+	typedef void(__thiscall* data_encode_flags_def)(bitstream*, char*, unsigned long long, int);
+	auto p_data_encode_flags_def = Memory::GetAddress<data_encode_flags_def>(0xD171D, 0xCDCD7);
+	p_data_encode_flags_def(this, name, value, size_in_bits);
+}
+
+unsigned long long bitstream::data_decode_flags(char* name, int size_in_bits)
+{
+	typedef unsigned long long(__thiscall* data_decode_flags_def)(bitstream*, char*, int);
+	auto p_data_decode_flags_def = Memory::GetAddress<data_decode_flags_def>(0xD1E9A, 0xCE454);
+	return p_data_decode_flags_def(this, name, size_in_bits);
+}
+
 bool bitstream::packet_is_valid()
 {
 	typedef bool(__thiscall* packet_is_valid_def)(bitstream* thisx);
