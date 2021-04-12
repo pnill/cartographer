@@ -70,6 +70,14 @@ void CXnIp::LogConnectionsDetails(sockaddr_in* address, int errorCode, const XNK
 
 	if (keysRegisteredCount > 0)
 	{
+		for (int i = 0; i < keysRegisteredCount; i++)
+		{
+			if (XnKeyPairs[i].bValid)
+			{
+				LOG_TRACE_NETWORK("{} - registered session ID key: {}", __FUNCTION__, ByteToHexStr(XnKeyPairs[i].xnkid.ab, sizeof(XnKeyPairs[i].xnkey.ab)));
+			}
+		}
+
 		XnKeyPair* matchingKey = getKeyPair(receivedKey);
 
 		if (matchingKey == nullptr)
