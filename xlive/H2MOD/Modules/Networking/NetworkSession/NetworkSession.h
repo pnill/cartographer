@@ -88,7 +88,7 @@ struct membership_info
 {
 	DWORD update_number; // 0x70
 	DWORD session_leader_index; // 0x74
-	XUID dedicated_server_xuid; // 0x7C
+	XUID dedicated_server_xuid; // 0x78
 	DWORD field_80; // 0x80
 	int peer_count; // 0x84
 	peer_information peer_info[17]; // 0x88

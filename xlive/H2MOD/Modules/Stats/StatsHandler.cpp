@@ -140,13 +140,14 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct curl_respon
 void StatsHandler::verifyRegistrationStatus()
 {
 	auto checkResult = checkServerRegistration();
-	if (strlen(checkResult) == 32)
+	if (checkResult != nullptr && strlen(checkResult) == 32)
 	{
 		//Check result returned a new AuthKey, attempt to register the server with it
 		if (serverRegistration(checkResult)) {
 			//Success save AuthKey to config
 			LOG_TRACE_GAME(L"[H2MOD] verifyRegistrationStatus was successful.");
 			strncpy(H2Config_stats_authkey, checkResult, 32);
+			free(checkResult);
 			SaveH2Config();
 			Status.Registered = true;
 			Status.StatsEnabled = true;
@@ -175,7 +176,7 @@ char* StatsHandler::checkServerRegistration()
 		snprintf(CurlError, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
 		LOG_ERROR_GAME(L"[H2MOD]::checkServerRegistration failed to init curl");
 		LOG_ERROR_GAME(CurlError);
-		return "";
+		return nullptr;
 	}
 	curl = curl_easy_init();
 	if (curl)
@@ -207,7 +208,7 @@ char* StatsHandler::checkServerRegistration()
 			if(response_code == 500)
 			{
 				curl_easy_cleanup(curl);
-				return ""; //Server Error
+				return nullptr; //Server Error
 			}
 			if (response_code == 200)
 			{
@@ -217,7 +218,7 @@ char* StatsHandler::checkServerRegistration()
 				Status.Registered = true;
 				Status.RanksEnabled = std::strncmp(result["RanksEnabled"].GetString(), "true", 4) == 0;
 				Status.StatsEnabled = std::strncmp(result["StatsEnabled"].GetString(), "true", 4) == 0;
-				return ""; //Server is registered
+				return nullptr; //Server is registered
 			}
 			if(response_code == 201)
 			{
@@ -227,7 +228,7 @@ char* StatsHandler::checkServerRegistration()
 			curl_easy_cleanup(curl);
 		}
 	}
-	return ""; 
+	return nullptr; 
 }
 
 bool StatsHandler::serverRegistration(char* authKey)
@@ -254,9 +255,8 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl_mime_data(field, H2Config_dedi_server_name, CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
 	auto ServerXUID = *Memory::GetAddress<::XUID*>(0, 0x52FC50);
-	auto sXUID = IntToString<::XUID>(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid, std::dec);
 	curl_mime_name(field, "Server_XUID");
-	curl_mime_data(field, sXUID.c_str(), CURL_ZERO_TERMINATED);
+	curl_mime_data(field, std::to_string(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid).c_str(), CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "AuthKey");
 	curl_mime_data(field, authKey, CURL_ZERO_TERMINATED);
@@ -831,19 +831,6 @@ char* StatsHandler::buildJSON()
 }
 
 std::vector<XUID> alreadySent;
-struct compareXUID
-{
-	XUID key;
-	compareXUID(XUID const &i) : key(i) { }
-
-	bool operator()(XUID const &i)
-	{
-		return (i == key);
-	}
-};
-
-
-
 
 void StatsHandler::InvalidateMatch(bool state)
 {
@@ -856,7 +843,7 @@ void StatsHandler::verifyPlayerRanks()
 		for (auto i = 0; i < NetworkSession::getPlayerCount(); i++)
 			//if(ServerStatus.Ranked)
 			if (NetworkSession::getPlayerInformation(i)->properties.player_displayed_skill >= 50)
-				if (!std::none_of(alreadySent.begin(), alreadySent.end(), compareXUID(NetworkSession::getPlayerInformation(i)->identifier)))
+				if (!std::none_of(alreadySent.begin(), alreadySent.end(), [&](XUID xuid) -> bool { return xuid == NetworkSession::getPlayerInformation(i)->identifier; }))
 					sendRankChange(true);
 }
 void StatsHandler::playerLeftEvent(int peerIndex)
@@ -864,7 +851,7 @@ void StatsHandler::playerLeftEvent(int peerIndex)
 	//LeftPlayers.push_back(XUID)
 	auto it = std::find(alreadySent.begin(), alreadySent.end(), NetworkSession::getPeerXUID(peerIndex));
 	if(it != alreadySent.end())
-		alreadySent.erase(alreadySent.begin() + std::distance(alreadySent.begin(), it));
+		alreadySent.erase(it);
 }
 
 void StatsHandler::playerJoinEvent(int peerIndex)
@@ -888,39 +875,39 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 	LOG_TRACE_GAME(L"Fetching player rank(s) - Total Peers {0}", NetworkSession::getPeerCount() - 1);
 	for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
 	{
-
+		bool addSeparator = false;
 		if(NetworkSession::getLocalPeerIndex() != i)
 		{
-			auto XUID = NetworkSession::getPeerXUID(i);
-			if(XUID == NONE)
+			auto peerXUID = NetworkSession::getPeerXUID(i);
+			if(peerXUID == NONE)
 			{
-				LOG_TRACE_GAME(L"No XUID found for Peer: {0}", i);
+				LOG_TRACE_GAME(L"No XUID found for Peer: {}", i);
 			} 
 			else
-				if (std::none_of(alreadySent.begin(), alreadySent.end(), compareXUID(XUID)))
+				if (std::none_of(alreadySent.begin(), alreadySent.end(), [&](XUID xuid) -> bool { return xuid == peerXUID; }))
 				{
 					LOG_TRACE_GAME(NetworkSession::getPeerPlayerName(i));
-					LOG_TRACE_GAME(L"\t Peer: {0} XUID: {1}", i, IntToWString(XUID, std::dec));
+					LOG_TRACE_GAME(L"\t Peer: {} XUID: {}", i, IntToWString(peerXUID, std::dec));
 					playerCount++;
-					XUIDs.append(IntToString(XUID, std::dec));
-					XUIDs.append(",");
-					alreadySent.push_back(XUID);
+					XUIDs.append(IntToString(peerXUID, std::dec));
+					alreadySent.push_back(peerXUID);
+					addSeparator = true;
 				} else
 				{
 					LOG_TRACE_GAME(L"{0} - Skipped", NetworkSession::getPeerPlayerName(i));
-					LOG_TRACE_GAME(L"\t Peer: {0} XUID: {1} Name: {2}", i, IntToWString(XUID, std::dec));
+					LOG_TRACE_GAME(L"\t Peer: {0} XUID: {1} Name: {2}", i, IntToWString(peerXUID, std::dec));
 				}
 		}
-		
+
+		// check if we should separate, also do not add the last separator if next iteration will break out of the loop
+		if (addSeparator && i + 1 < NetworkSession::getPeerCount())
+			XUIDs.append(",");
 	}
 	if (playerCount == 0) return document;
-	XUIDs = XUIDs.substr(0, XUIDs.length() - 1);
 	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=PlaylistRanks&Playlist_Checksum=";
 	http_request_body.append(getChecksum());
 	http_request_body.append("&Server_XUID=");
-	auto ServerXUID = *Memory::GetAddress<::XUID*>(0, 0x52FC50);
-	auto sXUID = IntToString<::XUID>(ServerXUID, std::dec);
-	http_request_body.append(sXUID);
+	http_request_body.append(std::to_string(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid));
 	http_request_body.append("&Player_XUIDS=");
 	http_request_body.append(XUIDs);
 	
