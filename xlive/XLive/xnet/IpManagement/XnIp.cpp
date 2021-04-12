@@ -59,7 +59,7 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 	}
 }
 
-void CXnIp::LogConnectionsDetails(sockaddr_in* address, int errorCode)
+void CXnIp::LogConnectionsDetails(sockaddr_in* address, int errorCode, const XNKID* receivedKey)
 {
 	LOG_CRITICAL_NETWORK("{} - tried to add XNADDR in the system, caused error: {}", __FUNCTION__, errorCode);
 
@@ -70,6 +70,14 @@ void CXnIp::LogConnectionsDetails(sockaddr_in* address, int errorCode)
 
 	if (keysRegisteredCount > 0)
 	{
+		XnKeyPair* matchingKey = getKeyPair(receivedKey);
+
+		if (matchingKey == nullptr)
+		{
+			LOG_CRITICAL_NETWORK("{} - received key does not match any registered key!!", __FUNCTION__);
+			return;
+		}
+
 		LOG_CRITICAL_NETWORK("{} - registered key count: {}", __FUNCTION__, keysRegisteredCount);
 		for (int i = 0; i < GetMaxXnConnections(); i++)
 		{
@@ -81,13 +89,14 @@ void CXnIp::LogConnectionsDetails(sockaddr_in* address, int errorCode)
 			}
 			else
 			{
+				// we shouldn't ever get at this point
 				LOG_CRITICAL_NETWORK("{} - hold up pendejo, wtf - connection index: {}, we have free connection registry and couldn't use it.", __FUNCTION__, i);
 			}
 		}
 	}
 	else
 	{
-		LOG_CRITICAL_NETWORK("{} - no keys are registered, cannot create connections with no registered keys!", __FUNCTION__);
+		LOG_CRITICAL_NETWORK("{} - no keys are registered, cannot create connections with no registered keys!!", __FUNCTION__);
 	}
 }
 
@@ -400,7 +409,7 @@ void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* r
 	else
 	{
 		LOG_TRACE_NETWORK("{} - secure connection cannot be established!" __FUNCTION__);
-		LogConnectionsDetails(recvAddr, ret);
+		LogConnectionsDetails(recvAddr, ret, &reqPacket->data.xnkid);
 		// TODO: send back the connection cannot be established
 	}
 }
@@ -894,7 +903,7 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 
 	if (ret != 0)
 	{
-		gXnIp.LogConnectionsDetails(nullptr, ret);
+		gXnIp.LogConnectionsDetails(nullptr, ret, pxnkid);
 	}
 	 
 	LOG_INFO_NETWORK("{} - local-address: {:X}, online-address: {:X}", __FUNCTION__, pxna->ina.s_addr, pxna->inaOnline.s_addr);
