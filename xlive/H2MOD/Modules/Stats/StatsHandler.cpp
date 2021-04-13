@@ -80,8 +80,8 @@ StatsHandler::StatsHandler()
 		EventHandler::registerGameStateCallback({
 		"StatsResetRank",
 		life_cycle_none,
-		[]() {h2mod->set_local_rank(255);}
-			}, true);
+		[]() { h2mod->set_local_rank(255); }
+			}, false);
 	}
 }
 
@@ -145,7 +145,7 @@ void StatsHandler::verifyRegistrationStatus()
 		//Check result returned a new AuthKey, attempt to register the server with it
 		if (serverRegistration(checkResult)) {
 			//Success save AuthKey to config
-			LOG_TRACE_GAME(L"[H2MOD] verifyRegistrationStatus was successful.");
+			LOG_TRACE_GAME("{} was successful.", __FUNCTION__);
 			strncpy(H2Config_stats_authkey, checkResult, 32);
 			free(checkResult);
 			SaveH2Config();
@@ -153,7 +153,7 @@ void StatsHandler::verifyRegistrationStatus()
 			Status.StatsEnabled = true;
 		}
 		else {
-			LOG_ERROR_GAME(L"[H2MOD] verifyRegistrationStatus webserver error on register attempt, this will be attempted again next server launch");
+			LOG_ERROR_GAME("{} webserver error on register attempt, this will be attempted again next server launch", __FUNCTION__);
 		}
 	}
 }
@@ -172,18 +172,15 @@ char* StatsHandler::checkServerRegistration()
 	CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
 	if (global_init != CURLE_OK)
 	{
-		char CurlError[500];
-		snprintf(CurlError, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
-		LOG_ERROR_GAME(L"[H2MOD]::checkServerRegistration failed to init curl");
-		LOG_ERROR_GAME(CurlError);
+		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
+		LOG_ERROR_GAME("curl_global_init(CURL_GLOBAL_ALL) failed: {}", curl_easy_strerror(global_init));
 		return nullptr;
 	}
 	curl = curl_easy_init();
 	if (curl)
 	{
 		std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=ServerRegistrationCheck&Server_XUID=";
-		auto ServerXUID = *Memory::GetAddress<::XUID*>(0, 0x52FC50);
-		auto sXUID = IntToString<::XUID>(ServerXUID, std::dec);
+		auto sXUID = IntToString<::XUID>(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid, std::dec);
 		http_request_body += sXUID;
 		struct curl_response_text s;
 		init_curl_response(&s);
@@ -199,7 +196,7 @@ char* StatsHandler::checkServerRegistration()
 		curlResult = curl_easy_perform(curl);
 		if (curlResult != CURLE_OK)
 		{
-			LOG_ERROR_GAME(L"[H2MOD]::checkServerRegistration failed to execute curl");
+			LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
 		}
 		else
 		{
@@ -243,7 +240,7 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl = curl_easy_init();
 	if (!curl)
 	{
-		LOG_ERROR_GAME(L"[H2MOD] serverRegistration failed to init curl");
+		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
 		return false;
 	}
 	form = curl_mime_init(curl);
@@ -254,7 +251,6 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl_mime_name(field, "Server_Name");
 	curl_mime_data(field, H2Config_dedi_server_name, CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
-	auto ServerXUID = *Memory::GetAddress<::XUID*>(0, 0x52FC50);
 	curl_mime_name(field, "Server_XUID");
 	curl_mime_data(field, std::to_string(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid).c_str(), CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
@@ -267,7 +263,7 @@ bool StatsHandler::serverRegistration(char* authKey)
 	result = curl_easy_perform(curl);
 	if (result != CURLE_OK)
 	{
-		LOG_ERROR_GAME(L"[H2MOD]::serverRegistration failed to execute curl");
+		LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
 
 		return false;
 	}
@@ -305,7 +301,7 @@ char* StatsHandler::getAPIToken()
 	curl = curl_easy_init();
 	if (!curl)
 	{
-		LOG_ERROR_GAME(L"[H2MOD] getAPIToken failed to init curl");
+		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
 		return "";
 	}
 	form = curl_mime_init(curl);
@@ -326,7 +322,7 @@ char* StatsHandler::getAPIToken()
 	result = curl_easy_perform(curl);
 	if (result != CURLE_OK)
 	{
-		LOG_ERROR_GAME(L"[H2MOD]::getAPIToken failed to execute curl");
+		LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
 		curl_easy_cleanup(curl);
 		return "";
 	}
@@ -335,7 +331,7 @@ char* StatsHandler::getAPIToken()
 	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
 	if (response_code == 500)
 	{
-		LOG_INFO_GAME(L"[H2MOD]::getAPIToken failed get token for stats API");
+		LOG_INFO_GAME("{} failed get token for stats API", __FUNCTION__);
 		curl_easy_cleanup(curl);
 		return "";
 	}
@@ -359,7 +355,7 @@ int StatsHandler::uploadPlaylist(char* token)
 	std::string checksum = getChecksum();
 	if (checksum.empty())
 	{
-		LOG_ERROR_GAME(L"[H2MOD] playlistVerified failed to Hash Playlist file");
+		LOG_ERROR_GAME("{} failed to Hash Playlist file", __FUNCTION__);
 		return -1;
 	}
 	LOG_TRACE_GAME(checksum);
@@ -369,12 +365,11 @@ int StatsHandler::uploadPlaylist(char* token)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	static const char buf[] = "Expect:";
 	curl_global_init(CURL_GLOBAL_ALL);
 	curl = curl_easy_init();
 	if(!curl)
 	{
-		LOG_ERROR_GAME(L"[H2MOD] uploadPlaylist failed to init curl");
+		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
 		return -1;
 	}
 	form = curl_mime_init(curl);
@@ -390,14 +385,14 @@ int StatsHandler::uploadPlaylist(char* token)
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "AuthToken");
 	curl_mime_data(field, token, CURL_ZERO_TERMINATED);
-	headerlist = curl_slist_append(headerlist, buf);
+	headerlist = curl_slist_append(headerlist, "Expect:");
 
 	curl_easy_setopt(curl, CURLOPT_URL, "https://www.halo2pc.com/test-pages/CartoStat/API/post.php");
 	curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
 	result = curl_easy_perform(curl);
 	if(result != CURLE_OK)
 	{
-		LOG_ERROR_GAME(L"[H2MOD]::playlistVerified failed to execute curl");
+		LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
 		//LOG_ERROR_GAME(curl_easy_strerror(result));
 		return -1;
 	}
@@ -405,7 +400,7 @@ int StatsHandler::uploadPlaylist(char* token)
 	{
 		int response_code;
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-		LOG_TRACE_GAME(std::to_string(response_code));
+		LOG_TRACE_GAME("{} response code: {}", __FUNCTION__, std::to_string(response_code));
 		return response_code;
 	}
 	return -1;
@@ -413,15 +408,16 @@ int StatsHandler::uploadPlaylist(char* token)
 
 int StatsHandler::verifyPlaylist(char* token)
 {
-	LOG_TRACE_GAME(L"Verifying Playlist..");
+	LOG_TRACE_GAME("Verifying Playlist..");
 	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=PlaylistCheck&Playlist_Checksum=";
 	wchar_t* playlist_file = getPlaylistFile();
-	LOG_TRACE_GAME(L"[H2MOD] playlistVerified loaded playlist is {0}", playlist_file);
+	LOG_TRACE_GAME("{} loaded playlist is: ", __FUNCTION__);
+	LOG_TRACE_GAME(L"{}", playlist_file);
 
 	std::string checksum = getChecksum();
 	if (checksum == "")
 	{
-		LOG_ERROR_GAME(L"[H2MOD] playlistVerified failed to Hash Playlist file");
+		LOG_ERROR_GAME("{} failed to Hash Playlist file", __FUNCTION__);
 		return -1;
 	}
 	else
@@ -437,7 +433,7 @@ int StatsHandler::verifyPlaylist(char* token)
 		CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
 		if(global_init != CURLE_OK)
 		{
-			LOG_INFO_GAME(L"[H2MOD]::playlistVerified failed to init curl");
+			LOG_INFO_GAME("{} failed to init curl", __FUNCTION__);
 			return -1;
 		}
 		curl = curl_easy_init();
@@ -450,17 +446,15 @@ int StatsHandler::verifyPlaylist(char* token)
 			curlResult = curl_easy_perform(curl);
 			if(curlResult != CURLE_OK)
 			{
-				char CurlError[500];
-				snprintf(CurlError, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
-				LOG_ERROR_GAME(L"[H2MOD]::playlistVerified failed to execute curl");
-				LOG_ERROR_GAME(CurlError);
+				LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
+				LOG_ERROR_GAME("curl_global_init(CURL_GLOBAL_ALL) failed: {}", curl_easy_strerror(global_init));
 				curl_easy_cleanup(curl);
 				return -1;
 			} else
 			{
 				int response_code;
 				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-				LOG_TRACE_GAME(std::to_string(response_code));
+				LOG_TRACE_GAME("{} response code: {}", __FUNCTION__, std::to_string(response_code));
 				curl_easy_cleanup(curl);
 				return response_code;
 			}
@@ -483,7 +477,7 @@ int StatsHandler::uploadStats(char* filepath, char* token)
 	curl = curl_easy_init();
 	if (!curl)
 	{
-		LOG_ERROR_GAME(L"[H2MOD] uploadStats failed to init curl");
+		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
 		return -1;
 	}
 	form = curl_mime_init(curl);
@@ -503,7 +497,7 @@ int StatsHandler::uploadStats(char* filepath, char* token)
 	result = curl_easy_perform(curl);
 	if (result != CURLE_OK)
 	{
-		LOG_ERROR_GAME(L"[H2MOD]::uploadStats failed to execute curl");
+		LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
 		//LOG_ERROR_GAME(curl_easy_strerror(result));
 		curl_easy_cleanup(curl);
 		return -1;
@@ -823,7 +817,7 @@ char* StatsHandler::buildJSON()
 	of << json;
 	if (!of.good())
 	{
-		LOG_ERROR_GAME("[H2MOD] Stats BuildJSON Failed to write to file");
+		LOG_ERROR_GAME("{} Failed to write to file", __FUNCTION__);
 	}
 	char* oFile = (char*)malloc(sizeof(char) * wcslen(fileOutPath) + 1);
 	wcstombs2(oFile, fileOutPath, wcslen(fileOutPath) + 1);
@@ -842,8 +836,8 @@ void StatsHandler::verifyPlayerRanks()
 	if(Status.RanksEnabled)
 		for (auto i = 0; i < NetworkSession::getPlayerCount(); i++)
 			//if(ServerStatus.Ranked)
-			if (NetworkSession::getPlayerInformation(i)->properties.player_displayed_skill >= 50)
-				if (!std::none_of(alreadySent.begin(), alreadySent.end(), [&](XUID xuid) -> bool { return xuid == NetworkSession::getPlayerInformation(i)->identifier; }))
+			if (NetworkSession::getPlayerInformation(i)->properties.player_displayed_skill >= 50
+				&& !std::none_of(alreadySent.begin(), alreadySent.end(), [&](XUID xuid) -> bool { return xuid == NetworkSession::getPlayerInformation(i)->identifier; }))
 					sendRankChange(true);
 }
 void StatsHandler::playerLeftEvent(int peerIndex)
@@ -872,7 +866,7 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 	BYTE playerCount = 0;
 	if (forceAll)
 		alreadySent.clear();
-	LOG_TRACE_GAME(L"Fetching player rank(s) - Total Peers {0}", NetworkSession::getPeerCount() - 1);
+	LOG_TRACE_GAME(L"Fetching player rank(s) - Total Peers {}", NetworkSession::getPeerCount() - 1);
 	for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
 	{
 		bool addSeparator = false;
@@ -916,10 +910,8 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 	CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
 	if (global_init != CURLE_OK)
 	{
-		char CurlError[500];
-		snprintf(CurlError, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
-		LOG_ERROR_GAME(L"[H2MOD]::getPlayerRanks failed to init curl");
-		LOG_ERROR_GAME(CurlError);
+		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
+		LOG_ERROR_GAME("curl_global_init(CURL_GLOBAL_ALL) failed: {}", curl_easy_strerror(global_init));
 		alreadySent.clear();
 		return document;
 	}
@@ -941,11 +933,8 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 		curlResult = curl_easy_perform(curl);
 		if (curlResult != CURLE_OK)
 		{
-			char CurlError[500];
-			snprintf(CurlError, 100, "curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
-			LOG_ERROR_GAME(L"[H2MOD]::getPlayerRanks failed to init curl");
-			LOG_ERROR_GAME(CurlError);
-			LOG_ERROR_GAME(L"[H2MOD]::getPlayerRanks failed to execute curl");
+			LOG_ERROR_GAME("{} - failed to init/execute curl!", __FUNCTION__);
+			LOG_ERROR_GAME("curl_global_init(CURL_GLOBAL_ALL) failed: {}", curl_easy_strerror(global_init));
 			curl_easy_cleanup(curl);
 			return document;
 		}
@@ -954,7 +943,7 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 
 			int response_code;
 			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-				LOG_TRACE_GAME(s.ptr);
+			LOG_TRACE_GAME(s.ptr);
 			document.Parse(s.ptr);
 			curl_easy_cleanup(curl);
 			free(s.ptr);

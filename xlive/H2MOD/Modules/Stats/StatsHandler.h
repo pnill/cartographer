@@ -87,7 +87,7 @@ public:
 			{
 				for (auto i = 0; i < document.MemberCount(); i++)
 				{
-					std::string::size_type sz = 0;
+					size_t sz = 0;
 					long long xuid = std::stoll(document[i]["XUID"].GetString(), &sz, 0);
 					int peer = NetworkSession::getPeerIndexFromXUID(xuid);
 					if(peer != NetworkSession::getLocalPeerIndex())
