@@ -400,7 +400,7 @@ int StatsHandler::uploadPlaylist(char* token)
 	{
 		int response_code;
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-		LOG_TRACE_GAME("{} response code: {}", __FUNCTION__, std::to_string(response_code));
+		LOG_TRACE_GAME("{} response code: {}", __FUNCTION__, response_code);
 		return response_code;
 	}
 	return -1;
@@ -422,7 +422,7 @@ int StatsHandler::verifyPlaylist(char* token)
 	}
 	else
 	{
-		LOG_TRACE_GAME(checksum);	
+		LOG_TRACE_GAME("hash: {}", checksum);	
 		http_request_body.append(checksum);
 		LOG_TRACE_GAME(http_request_body);
 		http_request_body.append("&AuthToken=");
@@ -454,7 +454,7 @@ int StatsHandler::verifyPlaylist(char* token)
 			{
 				int response_code;
 				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-				LOG_TRACE_GAME("{} response code: {}", __FUNCTION__, std::to_string(response_code));
+				LOG_TRACE_GAME("{} response code: {}", __FUNCTION__, response_code);
 				curl_easy_cleanup(curl);
 				return response_code;
 			}
