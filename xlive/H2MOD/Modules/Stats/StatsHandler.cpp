@@ -888,8 +888,8 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 					addSeparator = true;
 				} else
 				{
-					LOG_TRACE_GAME(L"{0} - Skipped", NetworkSession::getPeerPlayerName(i));
-					LOG_TRACE_GAME(L"\t Peer: {0} XUID: {1} Name: {2}", i, IntToWString(peerXUID, std::dec));
+					LOG_TRACE_GAME(L"{} - Skipped", NetworkSession::getPeerPlayerName(i));
+					LOG_TRACE_GAME(L"\t Peer: {} XUID: {}", i, IntToWString(peerXUID, std::dec));
 				}
 		}
 
