@@ -1,10 +1,12 @@
 #include "StatsHandler.h"
 #include "Util/hash.h"
 #include "H2MOD\Modules\Utils\Utils.h"
-#include "libcurl/curl/curl.h"
 #include "rapidjson/writer.h"
 #include "H2MOD/Modules/Startup/Startup.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
+
+#include "libcurl/curl/curl.h"
+
 #ifdef _DEBUG
 #pragma comment(lib, "libcurl_a_debug.lib")
 #else
@@ -16,28 +18,42 @@ bool Registered = false;
 bool MatchInvalidated = false;
 StatsHandler::StatsAPIRegisteredStatus Status;
 
+std::atomic<bool> rankStateUpdating;
+std::queue<rapidjson::Document*> rankUpdates;
+
+using namespace std::chrono;
+
+static steady_clock::time_point lastTimeRanksSynchronized;
+
 StatsHandler::StatsHandler()
 {
 	if (Memory::isDedicatedServer()) {
+		// server events
+
 		Status.Registered = false;
 		Status.RanksEnabled = false;
 		Status.StatsEnabled = false;
+		lastTimeRanksSynchronized = steady_clock::now();
 		//Register callback on Post Game to upload the stats to the server
 		EventHandler::registerGameStateCallback({
 				"StatsSendStats",
 				life_cycle_post_game,
-				&this->sendStats
-			}, true);
-		//register callback on player leave to remove them from the packet filter
-		EventHandler::registerNetworkPlayerRemoveCallback({
-				"StatsPlayerLeave",
-				this->playerLeftEvent
+				[this]()
+				{
+					this->sendStats();
+					this->getPlayerRanksByStringList(this->buildPlayerRankUpdateQueryStringList());
+				}
 			}, true);
 		//register callback on player join to send them their rank.
 		EventHandler::registerNetworkPlayerAddCallback({
 				"StatsPlayerJoin",
 				this->playerJoinEvent
 			}, true);
+		//register callback on player leave to remove them from the packet filter
+		EventHandler::registerNetworkPlayerRemoveCallback({
+				"StatsPlayerLeave",
+				this->playerLeftEvent
+			}, false);
 		//register a callback when the server reaches the lobby for the first time
 		EventHandler::registerGameStateCallback({
 				"InitStats",
@@ -52,7 +68,7 @@ StatsHandler::StatsHandler()
 						life_cycle_pre_game,
 						[this]()
 						{
-							this->sendRankChange(true);
+							this->getPlayerRanksByStringList(this->buildPlayerRankUpdateQueryStringList());
 							this->InvalidateMatch(false);
 						}
 					}, true);
@@ -63,19 +79,21 @@ StatsHandler::StatsHandler()
 						{
 							this->InvalidateMatch(false);
 						}
-					}, true);
+					}, false);
 				},
-				true
+				true // execute only once
 			}, false);
 		//Register a callback that will invalidate the current match if the skip command is used.
 		EventHandler::registerServerCommandCallback({
 				"StatsSkipPrevention",
 				[this]() {this->InvalidateMatch(true);},
 				ServerConsole::ServerConsoleCommands::skip
-			}, true);
+			}, false);
 	} 
 	else
 	{
+		// client events
+
 		//Register callback to reset rank to 255 on mainmenu
 		EventHandler::registerGameStateCallback({
 		"StatsResetRank",
@@ -135,8 +153,6 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct curl_respon
 	return size * nmemb;
 }
 
-
-
 void StatsHandler::verifyRegistrationStatus()
 {
 	auto checkResult = checkServerRegistration();
@@ -163,19 +179,11 @@ StatsHandler::StatsAPIRegisteredStatus StatsHandler::RegisteredStatus()
 	return Status;
 }
 
-
 char* StatsHandler::checkServerRegistration()
 {
 
 	CURL *curl;
 	CURLcode curlResult;
-	CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
-	if (global_init != CURLE_OK)
-	{
-		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
-		LOG_ERROR_GAME("curl_global_init(CURL_GLOBAL_ALL) failed: {}", curl_easy_strerror(global_init));
-		return nullptr;
-	}
 	curl = curl_easy_init();
 	if (curl)
 	{
@@ -225,6 +233,10 @@ char* StatsHandler::checkServerRegistration()
 			curl_easy_cleanup(curl);
 		}
 	}
+	else
+	{
+		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
+	}
 	return nullptr; 
 }
 
@@ -235,8 +247,6 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	static const char buf[] = "Expect:";
-	curl_global_init(CURL_GLOBAL_ALL);
 	curl = curl_easy_init();
 	if (!curl)
 	{
@@ -256,7 +266,7 @@ bool StatsHandler::serverRegistration(char* authKey)
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "AuthKey");
 	curl_mime_data(field, authKey, CURL_ZERO_TERMINATED);
-	headerlist = curl_slist_append(headerlist, buf);
+	headerlist = curl_slist_append(headerlist, "Expect:");
 
 	curl_easy_setopt(curl, CURLOPT_URL, "https://www.halo2pc.com/test-pages/CartoStat/API/post.php");
 	curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
@@ -296,8 +306,6 @@ char* StatsHandler::getAPIToken()
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	static const char buf[] = "Expect:";
-	curl_global_init(CURL_GLOBAL_ALL);
 	curl = curl_easy_init();
 	if (!curl)
 	{
@@ -311,7 +319,7 @@ char* StatsHandler::getAPIToken()
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "AuthKey");
 	curl_mime_data(field, H2Config_stats_authkey, CURL_ZERO_TERMINATED);
-	headerlist = curl_slist_append(headerlist, buf);
+	headerlist = curl_slist_append(headerlist, "Expect:");
 	
 	struct curl_response_text s;
 	init_curl_response(&s);
@@ -365,9 +373,8 @@ int StatsHandler::uploadPlaylist(char* token)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl_global_init(CURL_GLOBAL_ALL);
 	curl = curl_easy_init();
-	if(!curl)
+	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
 		return -1;
@@ -430,12 +437,7 @@ int StatsHandler::verifyPlaylist(char* token)
 		char* Response;
 		CURL *curl;
 		CURLcode curlResult;
-		CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
-		if(global_init != CURLE_OK)
-		{
-			LOG_INFO_GAME("{} failed to init curl", __FUNCTION__);
-			return -1;
-		}
+
 		curl = curl_easy_init();
 		if(curl)
 		{
@@ -444,13 +446,13 @@ int StatsHandler::verifyPlaylist(char* token)
 			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 			curlResult = curl_easy_perform(curl);
+			
 			if(curlResult != CURLE_OK)
 			{
-				LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
-				LOG_ERROR_GAME("curl_global_init(CURL_GLOBAL_ALL) failed: {}", curl_easy_strerror(global_init));
 				curl_easy_cleanup(curl);
 				return -1;
-			} else
+			} 
+			else
 			{
 				int response_code;
 				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
@@ -458,7 +460,10 @@ int StatsHandler::verifyPlaylist(char* token)
 				curl_easy_cleanup(curl);
 				return response_code;
 			}
-			curl_easy_cleanup(curl);
+		}
+		else
+		{
+			LOG_ERROR_GAME("{} curl_easy_init failed", __FUNCTION__);
 		}
 	}
 
@@ -472,12 +477,10 @@ int StatsHandler::uploadStats(char* filepath, char* token)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	static const char buf[] = "Expect:";
-	curl_global_init(CURL_GLOBAL_ALL);
 	curl = curl_easy_init();
 	if (!curl)
 	{
-		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
+		LOG_ERROR_GAME("{} curl_easy_init failed", __FUNCTION__);
 		return -1;
 	}
 	form = curl_mime_init(curl);
@@ -490,15 +493,14 @@ int StatsHandler::uploadStats(char* filepath, char* token)
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "AuthToken");
 	curl_mime_data(field, token, CURL_ZERO_TERMINATED);
-	headerlist = curl_slist_append(headerlist, buf);
+	headerlist = curl_slist_append(headerlist, "Expect:");
 
 	curl_easy_setopt(curl, CURLOPT_URL, "https://www.halo2pc.com/test-pages/CartoStat/API/post.php");
 	curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
 	result = curl_easy_perform(curl);
 	if (result != CURLE_OK)
 	{
-		LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
-		//LOG_ERROR_GAME(curl_easy_strerror(result));
+		LOG_ERROR_GAME("{} curl_easy_perform failed to execute", __FUNCTION__);
 		curl_easy_cleanup(curl);
 		return -1;
 	}
@@ -519,11 +521,9 @@ static const int PCROffset   = 0x49F6B0;
 
 char* StatsHandler::buildJSON()
 {
-
 	WDocument document;
 	WValue value;
 	document.SetObject();
-
 
 	//Inital Properties
 	rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
@@ -770,7 +770,6 @@ char* StatsHandler::buildJSON()
 		Players.PushBack(Player, allocator);
 	}
 
-
 	for (auto i = 0; i < playerCount; i++) {
 		WValue Versus(rapidjson::kArrayType);
 		int iOffset = PCROffset + Players[i][L"EndGameIndex"].GetInt() * 0x110;
@@ -790,7 +789,6 @@ char* StatsHandler::buildJSON()
 	}
 
 	document.AddMember(L"Players", Players, allocator);
-
 
 	//Export the file
 	rapidjson::StringBuffer strbuf;
@@ -824,104 +822,160 @@ char* StatsHandler::buildJSON()
 	return oFile;
 }
 
-std::vector<XUID> alreadySent;
-
 void StatsHandler::InvalidateMatch(bool state)
 {
 	MatchInvalidated = state;
 }
 
-void StatsHandler::verifyPlayerRanks()
+void StatsHandler::playerRanksUpdateTick()
 {
-	if(Status.RanksEnabled)
-		for (auto i = 0; i < NetworkSession::getPlayerCount(); i++)
-			//if(ServerStatus.Ranked)
-			if (NetworkSession::getPlayerInformation(i)->properties.player_displayed_skill >= 50
-				&& !std::none_of(alreadySent.begin(), alreadySent.end(), [&](XUID xuid) -> bool { return xuid == NetworkSession::getPlayerInformation(i)->identifier; }))
-					sendRankChange(true);
+	auto sendRankUpdate = []()
+	{
+		rankStateUpdating = true;
+		rapidjson::Document* doc = rankUpdates.front();
+		sendRankChangeFromDocument(doc); // send data from the first document
+
+		// preserve last rank update
+		if (rankUpdates.size() > 1)
+		{
+			delete doc;
+			rankUpdates.pop(); // then pop last document from queue
+		}
+
+		rankStateUpdating = false;
+	};
+
+	// update each 2 seconds
+	if (steady_clock::now() - lastTimeRanksSynchronized < 2s)
+		return;
+
+	if (rankStateUpdating)
+		return; // return if queue buffer is written to
+
+	if (rankUpdates.empty())
+		return; // don't send if we don't have anything to send
+
+	// this will update all players that don't have the matching rank from the host
+	sendRankUpdate();
+
+	// update last time, if more than 2 seconds passed, but only if we actually sent something
+	lastTimeRanksSynchronized = steady_clock::now();
 }
+
 void StatsHandler::playerLeftEvent(int peerIndex)
 {
-	//LeftPlayers.push_back(XUID)
-	auto it = std::find(alreadySent.begin(), alreadySent.end(), NetworkSession::getPeerXUID(peerIndex));
-	if(it != alreadySent.end())
-		alreadySent.erase(it);
 }
 
 void StatsHandler::playerJoinEvent(int peerIndex)
 {
-	/*No need to do anything fancy like filtering or 
-	 *another function to send a specific rank
-	 *The main function already filters out players
-	 *who have been sent their rank before so just fire
-	 *the main function.*/
-	
-	sendRankChange();
+	// for now, update all ranks at once, shouldn't cause any issue
+	// but only in the post game carnage report/pregame
+	// ranks will update at the end of the game
+
+	if (Engine::get_game_life_cycle() != life_cycle_pre_game
+		|| Engine::get_game_life_cycle() != life_cycle_post_game)
+		return;
+
+	getPlayerRanksByStringList(buildPlayerRankUpdateQueryStringList());
 }
 
-rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
+void StatsHandler::sendRankChangeFromDocument(rapidjson::Document* document)
+{
+	rapidjson::Document& doc = *document;
+
+	if (NetworkSession::localPeerIsSessionHost() && RegisteredStatus().RanksEnabled)
+	{
+		if (doc.MemberCount() != 0)
+		{
+			for (auto i = 0; i < doc.MemberCount(); i++)
+			{
+				size_t sz = 0;
+				BYTE rank = std::stoi(doc[i]["Rank"].GetString(), 0);
+				long long xuid = std::stoll(doc[i]["XUID"].GetString(), &sz, 0);
+
+				for (auto j = 0; j < ENGINE_PLAYER_MAX; j++)
+				{
+					if (NetworkSession::playerIsActive(j))
+					{
+						auto playerInfo = NetworkSession::getPlayerInformation(j); // for now we only support local player 0
+
+						if (xuid == NetworkSession::getPlayerXuid(j)
+							&& playerInfo->properties.player_displayed_skill != rank)
+						{
+							LOG_TRACE_GAME("{} - sent rank update to player index: {}, xuid: {}", __FUNCTION__, j, doc[i]["XUID"].GetString());
+
+							CustomPackets::sendRankChange(NetworkSession::getPeerIndex(j), rank);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+std::string StatsHandler::buildPlayerRankUpdateQueryStringList()
 {
 	std::string XUIDs;
-	rapidjson::Document document;
-	BYTE playerCount = 0;
-	if (forceAll)
-		alreadySent.clear();
+	int playerCount = 0;
+
 	LOG_TRACE_GAME(L"Fetching player rank(s) - Total Peers {}", NetworkSession::getPeerCount() - 1);
 	for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
 	{
 		bool addSeparator = false;
-		if(NetworkSession::getLocalPeerIndex() != i)
+		if (NetworkSession::getLocalPeerIndex() != i)
 		{
 			auto peerXUID = NetworkSession::getPeerXUID(i);
-			if(peerXUID == NONE)
+			if (peerXUID == NONE)
 			{
 				LOG_TRACE_GAME(L"No XUID found for Peer: {}", i);
-			} 
+			}
 			else
-				if (std::none_of(alreadySent.begin(), alreadySent.end(), [&](XUID xuid) -> bool { return xuid == peerXUID; }))
-				{
-					LOG_TRACE_GAME(NetworkSession::getPeerPlayerName(i));
-					LOG_TRACE_GAME(L"\t Peer: {} XUID: {}", i, IntToWString(peerXUID, std::dec));
-					playerCount++;
-					XUIDs.append(IntToString(peerXUID, std::dec));
-					alreadySent.push_back(peerXUID);
-					addSeparator = true;
-				} else
-				{
-					LOG_TRACE_GAME(L"{} - Skipped", NetworkSession::getPeerPlayerName(i));
-					LOG_TRACE_GAME(L"\t Peer: {} XUID: {}", i, IntToWString(peerXUID, std::dec));
-				}
+			{
+				LOG_TRACE_GAME(NetworkSession::getPeerPlayerName(i));
+				LOG_TRACE_GAME(L"\t Peer: {} XUID: {}", i, IntToWString(peerXUID, std::dec));
+				XUIDs.append(IntToString(peerXUID, std::dec));
+				addSeparator = true;
+				playerCount++;
+			}
 		}
 
 		// check if we should separate, also do not add the last separator if next iteration will break out of the loop
 		if (addSeparator && i + 1 < NetworkSession::getPeerCount())
 			XUIDs.append(",");
 	}
-	if (playerCount == 0) return document;
+
+	return XUIDs;
+}
+
+void StatsHandler::getPlayerRanksByStringList(std::string& playerList)
+{
+	if (playerList.empty()) return;
+
+	auto writeToQueue = [] (rapidjson::Document* document) -> void
+	{
+		while (rankStateUpdating)
+			Sleep(10);
+
+		rankStateUpdating = true;
+		rankUpdates.push(document);
+		rankStateUpdating = false;
+	};
+
+	rapidjson::Document* document = new rapidjson::Document;
+
 	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=PlaylistRanks&Playlist_Checksum=";
 	http_request_body.append(getChecksum());
 	http_request_body.append("&Server_XUID=");
 	http_request_body.append(std::to_string(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid));
 	http_request_body.append("&Player_XUIDS=");
-	http_request_body.append(XUIDs);
+	http_request_body.append(playerList);
 	
 	CURL *curl;
-	CURLcode curlResult;
-	CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
-	if (global_init != CURLE_OK)
-	{
-		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
-		LOG_ERROR_GAME("curl_global_init(CURL_GLOBAL_ALL) failed: {}", curl_easy_strerror(global_init));
-		alreadySent.clear();
-		return document;
-	}
 	curl = curl_easy_init();
 	if (curl)
 	{
-
 		struct curl_response_text s;
 		init_curl_response(&s);
-
 
 		//Set the URL for the GET
 		curl_easy_setopt(curl, CURLOPT_URL, http_request_body.c_str());
@@ -930,28 +984,33 @@ rapidjson::Document StatsHandler::getPlayerRanks(bool forceAll)
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
 
+		CURLcode curlResult;
 		curlResult = curl_easy_perform(curl);
 		if (curlResult != CURLE_OK)
 		{
 			LOG_ERROR_GAME("{} - failed to init/execute curl!", __FUNCTION__);
-			LOG_ERROR_GAME("curl_global_init(CURL_GLOBAL_ALL) failed: {}", curl_easy_strerror(global_init));
 			curl_easy_cleanup(curl);
-			return document;
+			delete document;
+			return;
 		}
 		else
 		{
-
 			int response_code;
 			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
 			LOG_TRACE_GAME(s.ptr);
-			document.Parse(s.ptr);
+			document->Parse(s.ptr);
+			// write to queue buffer
+			writeToQueue(document);
 			curl_easy_cleanup(curl);
 			free(s.ptr);
-			return document;
+			return;
 		}
-		
 	}
-	return document;
+	else
+	{
+		delete document;
+		LOG_ERROR_GAME("{} curl_easy_init failed", __FUNCTION__);
+	}
 }
 
 void StatsHandler::init()
