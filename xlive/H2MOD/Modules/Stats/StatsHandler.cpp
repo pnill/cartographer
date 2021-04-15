@@ -41,7 +41,6 @@ StatsHandler::StatsHandler()
 				[this]()
 				{
 					this->sendStats();
-					this->getPlayerRanksByStringList(this->buildPlayerRankUpdateQueryStringList());
 				}
 			}, true);
 		//register callback on player join to send them their rank.
@@ -62,27 +61,30 @@ StatsHandler::StatsHandler()
 				{
 					this->verifyRegistrationStatus();
 					this->verifySendPlaylist();
-					//Register callback to send player ranks on lobby and reset the match invalide state
-					EventHandler::registerGameStateCallback({
-						"StatsSendRanks",
-						life_cycle_pre_game,
-						[this]()
-						{
-							this->getPlayerRanksByStringList(this->buildPlayerRankUpdateQueryStringList());
-							this->InvalidateMatch(false);
-						}
-					}, true);
-					EventHandler::registerGameStateCallback({
-						"StatsSkipReset",
-						life_cycle_in_game,
-						[this]()
-						{
-							this->InvalidateMatch(false);
-						}
-					}, false);
 				},
 				true // execute only once
 			}, false);
+
+		//Register callback to send player ranks on lobby and reset the match invalide state
+		//These need to be registered after "InitStats" callback, because InitStats callback needs to execute first
+		EventHandler::registerGameStateCallback({
+				"StatsSendRanks",
+				life_cycle_pre_game,
+				[this]()
+				{
+					this->getPlayerRanksByStringList(this->buildPlayerRankUpdateQueryStringList());
+					this->InvalidateMatch(false);
+				}
+			}, true);
+		EventHandler::registerGameStateCallback({
+				"StatsSkipReset",
+				life_cycle_in_game,
+				[this]()
+				{
+					this->InvalidateMatch(false);
+				}
+			}, false);
+
 		//Register a callback that will invalidate the current match if the skip command is used.
 		EventHandler::registerServerCommandCallback({
 				"StatsSkipPrevention",
@@ -873,7 +875,7 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 	// ranks will update at the end of the game
 
 	if (Engine::get_game_life_cycle() != life_cycle_pre_game
-		|| Engine::get_game_life_cycle() != life_cycle_post_game)
+		&& Engine::get_game_life_cycle() != life_cycle_post_game)
 		return;
 
 	getPlayerRanksByStringList(buildPlayerRankUpdateQueryStringList());
