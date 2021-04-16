@@ -167,6 +167,12 @@ __declspec (naked) void overwrite1()
 	}
 }
 
+// raw WinSock has a 28 bytes packet overhead for the packet header, unlike Xbox LIVE, which has 44 bytes (28 bytes + whatever LIVE packet header adds)
+int __cdecl get_packet_overhead(int overhead_type)
+{
+	return 28 + 4;
+}
+
 void network_observer::ApplyPatches()
 {
 #if USE_LIVE_NETCODE
@@ -223,6 +229,8 @@ void network_observer::ApplyPatches()
 
 	// increase the network heap size
 	WriteValue<DWORD>(Memory::GetAddress(0x1ACCC8, 0x1ACE96) + 6, NETWORK_HEAP_SIZE);
+
+	//WriteJmpTo(Memory::GetAddressRelative(0x5AC1BD, 0x5A6B76), get_packet_overhead);
 
 	PatchCall(Memory::GetAddress(0x1E0FEE, 0x1B5EDE), call_GetNetworkMeasurements);
 

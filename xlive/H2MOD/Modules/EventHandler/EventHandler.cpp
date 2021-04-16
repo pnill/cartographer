@@ -37,14 +37,12 @@ namespace EventHandler
 		auto it = std::find_if(gameStateCallbacks.begin(), gameStateCallbacks.end(),
 			[&name](const GameStateCallback &obj) {return obj.name == name;});
 		if (it != gameStateCallbacks.end())
-			gameStateCallbacks.erase(gameStateCallbacks.begin() +
-				std::distance(gameStateCallbacks.begin(), it));
+			gameStateCallbacks.erase(it);
 
 		it = std::find_if(gameStateCallbacksThreaded.begin(), gameStateCallbacksThreaded.end(),
 			[&name](const GameStateCallback &obj) {return obj.name == name;});
 		if (it != gameStateCallbacks.end())
-			gameStateCallbacksThreaded.erase(gameStateCallbacksThreaded.begin() +
-				std::distance(gameStateCallbacksThreaded.begin(), it));
+			gameStateCallbacksThreaded.erase(it);
 	}
 
 	void executeGameStateCallbacks(BYTE gamestate)
@@ -113,14 +111,12 @@ namespace EventHandler
 		auto it = std::find_if(playerAddCallbacks.begin(), playerAddCallbacks.end(),
 			[&name](const NetworkPeerEventCallback &obj) {return obj.name == name;});
 		if (it != playerAddCallbacks.end())
-			playerAddCallbacks.erase(playerAddCallbacks.begin() +
-				std::distance(playerAddCallbacks.begin(), it));
+			playerAddCallbacks.erase(it);
 
 		it = std::find_if(playerAddCallbacksThreaded.begin(), playerAddCallbacksThreaded.end(),
 			[&name](const NetworkPeerEventCallback &obj) {return obj.name == name;});
 		if (it != playerAddCallbacksThreaded.end())
-			playerAddCallbacksThreaded.erase(playerAddCallbacksThreaded.begin() +
-				std::distance(playerAddCallbacksThreaded.begin(), it));
+			playerAddCallbacksThreaded.erase(it);
 	}
 
 	void executeNetworkPlayerAddCallbacks(int peerIndex)
@@ -152,14 +148,12 @@ namespace EventHandler
 		auto it = std::find_if(playerRemoveCallbacks.begin(), playerRemoveCallbacks.end(),
 			[&name](const NetworkPeerEventCallback &obj) {return obj.name == name;});
 		if (it != playerRemoveCallbacks.end())
-			playerRemoveCallbacks.erase(playerRemoveCallbacks.begin() +
-				std::distance(playerRemoveCallbacks.begin(), it));
+			playerRemoveCallbacks.erase(it);
 
 		it = std::find_if(playerRemoveCallbacksThreaded.begin(), playerRemoveCallbacksThreaded.end(),
 			[&name](const NetworkPeerEventCallback &obj) {return obj.name == name;});
 		if (it != playerRemoveCallbacksThreaded.end())
-			playerRemoveCallbacksThreaded.erase(playerRemoveCallbacksThreaded.begin() +
-				std::distance(playerRemoveCallbacksThreaded.begin(), it));
+			playerRemoveCallbacksThreaded.erase(it);
 	}
 
 	void executeNetworkPlayerRemoveCallbacks(int peerIndex)
@@ -199,14 +193,12 @@ namespace EventHandler
 		auto it = std::find_if(gameLoopCallbacks.begin(), gameLoopCallbacks.end(),
 			[&name](const GameLoopEventCallback &obj) {return obj.name == name;});
 		if (it != gameLoopCallbacks.end())
-			gameLoopCallbacks.erase(gameLoopCallbacks.begin() +
-				std::distance(gameLoopCallbacks.begin(), it));
+			gameLoopCallbacks.erase(it);
 
 		it = std::find_if(gameLoopCallbacksThreaded.begin(), gameLoopCallbacksThreaded.end(),
 			[&name](const GameLoopEventCallback &obj) {return obj.name == name;});
 		if (it != gameLoopCallbacksThreaded.end())
-			gameLoopCallbacksThreaded.erase(gameLoopCallbacksThreaded.begin() +
-				std::distance(gameLoopCallbacksThreaded.begin(), it));
+			gameLoopCallbacksThreaded.erase(it);
 	}
 
 	void executeGameLoopCallbacks()
@@ -246,14 +238,12 @@ namespace EventHandler
 		auto it = std::find_if(serverCommandCallbacksThreaded.begin(), serverCommandCallbacksThreaded.end(),
 			[&name](const ServerCommandEventCallback &obj) {return obj.name == name;});
 		if (it != serverCommandCallbacksThreaded.end())
-			serverCommandCallbacksThreaded.erase(serverCommandCallbacksThreaded.begin() +
-				std::distance(serverCommandCallbacksThreaded.begin(), it));
+			serverCommandCallbacksThreaded.erase(it);
 
 		it = std::find_if(serverCommandCallbacks.begin(), serverCommandCallbacks.end(),
 			[&name](const ServerCommandEventCallback &obj) {return obj.name == name;});
 		if (it != serverCommandCallbacks.end())
-			serverCommandCallbacks.erase(serverCommandCallbacks.begin() +
-				std::distance(serverCommandCallbacks.begin(), it));
+			serverCommandCallbacks.erase(it);
 	}
 
 	void executeServerCommandCallback(ServerConsole::ServerConsoleCommands command)
@@ -300,14 +290,12 @@ namespace EventHandler
 		auto it = std::find_if(playerControlCallbacksThreaded.begin(), playerControlCallbacksThreaded.end(),
 			[&name](const PlayerControlChangeEventCallback &obj) {return obj.name == name;});
 		if (it != playerControlCallbacksThreaded.end())
-			playerControlCallbacksThreaded.erase(playerControlCallbacksThreaded.begin() +
-				std::distance(playerControlCallbacksThreaded.begin(), it));
+			playerControlCallbacksThreaded.erase(it);
 
 		it = std::find_if(playerControlCallbacks.begin(), playerControlCallbacks.end(),
 			[&name](const PlayerControlChangeEventCallback &obj) {return obj.name == name;});
 		if (it != playerControlCallbacks.end())
-			playerControlCallbacks.erase(playerControlCallbacks.begin() +
-				std::distance(playerControlCallbacks.begin(), it));
+			playerControlCallbacks.erase(it);
 	}
 
 	void executePlayerControlCallback(float yaw, float pitch)
@@ -351,14 +339,12 @@ namespace EventHandler
 		auto it = std::find_if(mapLoadCallbacksThreaded.begin(), mapLoadCallbacksThreaded.end(),
 			[&name](const MapLoadEventCallback &obj) {return obj.name == name;});
 		if (it != mapLoadCallbacksThreaded.end())
-			mapLoadCallbacksThreaded.erase(mapLoadCallbacksThreaded.begin() +
-				std::distance(mapLoadCallbacksThreaded.begin(), it));
+			mapLoadCallbacksThreaded.erase(it);
 
 		it = std::find_if(mapLoadCallbacks.begin(), mapLoadCallbacks.end(),
 			[&name](const MapLoadEventCallback &obj) {return obj.name == name;});
 		if (it != mapLoadCallbacks.end())
-			mapLoadCallbacks.erase(mapLoadCallbacks.begin() +
-				std::distance(mapLoadCallbacks.begin(), it));
+			mapLoadCallbacks.erase(it);
 	}
 
 	void executeMapLoadCallback(e_engine_type engine_type)

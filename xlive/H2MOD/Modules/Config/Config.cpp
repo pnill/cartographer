@@ -83,7 +83,7 @@ char H2Config_team_bit_flags_str[] = "1-1-1-1-1-1-1-1";
 bool H2Config_team_flag_array[8];
 byte H2Config_team_enabled_count;
 short H2Config_team_bit_flags = 0xFF;
-char H2Config_stats_authkey[32] = { "" };
+char H2Config_stats_authkey[32 + 1] = { "" };
 bool H2Config_vip_lock = false;
 bool H2Config_force_even = false;
 bool H2Config_koth_random = true;
@@ -878,7 +878,7 @@ void ReadH2Config() {
 
 				const char* stats_authkey = ini.GetValue(H2ConfigVersionSection.c_str(), "stats_auth_key", H2Config_stats_authkey);
 				if(stats_authkey) {
-					strncpy(H2Config_stats_authkey, stats_authkey, sizeof(H2Config_stats_authkey));
+					strncpy(H2Config_stats_authkey, stats_authkey, sizeof(H2Config_stats_authkey) - 1); // - 1 for the null character
 				}
 
 				std::string team_bit_mask(ini.GetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str));

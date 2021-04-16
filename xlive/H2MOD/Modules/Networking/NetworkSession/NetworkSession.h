@@ -71,8 +71,8 @@ struct peer_observer_channel
 struct player_information
 {
 	XUID identifier; // -0xA
-	DWORD peer_index; // -0x8
-	DWORD peer_user_index; // -0x4
+	int peer_index; // -0x8
+	int peer_user_index; // -0x4
 	WORD player_flags; // 0x0
 	bool properties_valid;
 	char pad[1];
@@ -88,7 +88,7 @@ struct membership_info
 {
 	DWORD update_number; // 0x70
 	DWORD session_leader_index; // 0x74
-	XUID dedicated_server_xuid; // 0x7C
+	XUID dedicated_server_xuid; // 0x78
 	DWORD field_80; // 0x80
 	int peer_count; // 0x84
 	peer_information peer_info[17]; // 0x88

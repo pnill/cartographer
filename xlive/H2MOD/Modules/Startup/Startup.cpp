@@ -15,6 +15,14 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
+#include "libcurl/curl/curl.h"
+
+#ifdef _DEBUG
+#pragma comment(lib, "libcurl_a_debug.lib")
+#else
+#pragma comment(lib, "libcurl_a.lib")
+#endif
+
 namespace filesystem = std::experimental::filesystem;
 
 // xLiveLess specific logger
@@ -396,6 +404,9 @@ void InitH2Startup() {
 	
 	initLocalAppData();
 
+	// initialize curl
+	curl_global_init(CURL_GLOBAL_ALL);
+
 	// after localAppData filepath initialized, we can initialize OnScreenDebugLog
 	initOnScreenDebugText();
 
@@ -492,4 +503,5 @@ void DeinitH2Startup() {
 	DeinitH2Tweaks();
 	DeinitH2Accounts();
 	DeinitH2Config();
+	curl_global_cleanup();
 }

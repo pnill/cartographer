@@ -508,12 +508,6 @@ int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response
 	CURL *curl;
 	CURLcode res;
 
-	/* In windows, this will init the winsock stuff */
-	CURLcode global_init = curl_global_init(CURL_GLOBAL_ALL);
-	if (global_init != CURLE_OK) {
-		addDebugText("curl_global_init(CURL_GLOBAL_ALL) failed: %s", curl_easy_strerror(global_init));
-	}
-
 	/* get a curl handle */
 	curl = curl_easy_init();
 	if (curl) {
@@ -554,7 +548,6 @@ int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response
 	else {
 		result = ERROR_CODE_CURL_HANDLE;//curl handle fail
 	}
-	curl_global_cleanup();
 
 	return result;
 }

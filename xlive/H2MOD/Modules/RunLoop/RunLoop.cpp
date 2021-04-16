@@ -70,7 +70,7 @@ void GSMainLoop() {
 	}
 	if(H2IsDediServer)
 	{
-		StatsHandler::verifyPlayerRanks();
+		StatsHandler::playerRanksUpdateTick();
 		
 	}
 	EventHandler::executeGameLoopCallbacks();
