@@ -685,7 +685,7 @@ void ReadH2Config() {
 				&& inet_addr(ip_wan) != INADDR_NONE)
 			{
 				strncpy(H2Config_str_wan, ip_wan, 15);
-				H2Config_ip_lan = inet_addr(H2Config_str_wan);
+				H2Config_ip_wan = inet_addr(H2Config_str_wan);
 			}
 
 			const char* ip_lan = ini.GetValue(H2ConfigVersionSection.c_str(), "lan_ip");
