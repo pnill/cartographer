@@ -5,14 +5,6 @@
 #include "H2MOD/Modules/Startup/Startup.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 
-#include "libcurl/curl/curl.h"
-
-#ifdef _DEBUG
-#pragma comment(lib, "libcurl_a_debug.lib")
-#else
-#pragma comment(lib, "libcurl_a.lib")
-#endif
-
 static const bool verbose = true;
 bool Registered = false;
 bool MatchInvalidated = false;
@@ -186,7 +178,7 @@ char* StatsHandler::checkServerRegistration()
 
 	CURL *curl;
 	CURLcode curlResult;
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (curl)
 	{
 		std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=ServerRegistrationCheck&Server_XUID=";
@@ -198,8 +190,6 @@ char* StatsHandler::checkServerRegistration()
 
 		//Set the URL for the GET
 		curl_easy_setopt(curl, CURLOPT_URL, http_request_body.c_str());
-		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
 
@@ -249,7 +239,7 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
@@ -308,7 +298,7 @@ char* StatsHandler::getAPIToken()
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
@@ -375,7 +365,7 @@ int StatsHandler::uploadPlaylist(char* token)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
@@ -440,13 +430,11 @@ int StatsHandler::verifyPlaylist(char* token)
 		CURL *curl;
 		CURLcode curlResult;
 
-		curl = curl_easy_init();
+		curl = curl_interface_init_no_ssl();
 		if(curl)
 		{
 			//Set the URL for the GET
 			curl_easy_setopt(curl, CURLOPT_URL, http_request_body.c_str());
-			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 			curlResult = curl_easy_perform(curl);
 			
 			if(curlResult != CURLE_OK)
@@ -479,7 +467,7 @@ int StatsHandler::uploadStats(char* filepath, char* token)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} curl_easy_init failed", __FUNCTION__);
@@ -973,7 +961,7 @@ void StatsHandler::getPlayerRanksByStringList(std::string& playerList)
 	http_request_body.append(playerList);
 	
 	CURL *curl;
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (curl)
 	{
 		struct curl_response_text s;
@@ -981,8 +969,6 @@ void StatsHandler::getPlayerRanksByStringList(std::string& playerList)
 
 		//Set the URL for the GET
 		curl_easy_setopt(curl, CURLOPT_URL, http_request_body.c_str());
-		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
 

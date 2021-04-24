@@ -385,7 +385,7 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 
 	this->total_servers = 0;
 
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (curl) {
 		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/server_list.php"));
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -466,7 +466,7 @@ void ServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 	CURLcode res;
 	std::string readBuffer;
 
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (curl) {
 		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/dedicount.php"));
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -574,7 +574,7 @@ void ServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 	pOverlapped->InternalHigh = 0;
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (curl)
 	{
 		rapidjson::Document document;
@@ -616,9 +616,8 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 	pOverlapped->InternalHigh = 0; // this shouldn't even be checked by game's code, but for some reason it gets in Halo 2, InternalHIgh is used for enumerating data, where it holds how many elemets were retreived
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (curl) {
-
 		rapidjson::Document document;
 		document.SetObject();
 

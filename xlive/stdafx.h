@@ -69,6 +69,7 @@
 #include "xlivedefs.h"
 
 #include "Util/Memory.h"
+#include "Util/curl-interface.h"
 
 extern std::random_device rd;
 

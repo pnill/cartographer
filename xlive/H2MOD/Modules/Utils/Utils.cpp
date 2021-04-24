@@ -6,14 +6,6 @@
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Config\Config.h"
 
-#include "libcurl/curl/curl.h"
-
-#ifdef _DEBUG
-#pragma comment(lib, "libcurl_a_debug.lib")
-#else
-#pragma comment(lib, "libcurl_a.lib")
-#endif
-
 int FindLineStart(FILE* fp, int lineStrLen) {
 	int fp_offset_orig = ftell(fp);
 	for (int i = lineStrLen; i < 255; i++) {
@@ -509,7 +501,7 @@ int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response
 	CURLcode res;
 
 	/* get a curl handle */
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (curl) {
 		/* First set the URL that is about to receive our POST. This URL can
 		just as well be a https:// URL if that is what should receive the
@@ -519,8 +511,6 @@ int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response
 		struct stringMe s;
 		init_string(&s);
 
-		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 		//FIXME: <Insert Pinned Public Key Here>
 
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);

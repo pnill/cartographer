@@ -22,7 +22,7 @@ void AchievementUnlock(XUID xuid, int achievement_id, XOVERLAPPED* pOverlapped)
 	std::string readBuffer;
 
 
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (curl) {
 		rapidjson::Document document;
 		document.SetObject();
@@ -56,7 +56,7 @@ void GetAchievements(XUID xuid)
 	CURLcode res;
 	std::string readBuffer;
 
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (curl) {
 
 		std::string server_url;
