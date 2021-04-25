@@ -15,14 +15,6 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
-#include "libcurl/curl/curl.h"
-
-#ifdef _DEBUG
-#pragma comment(lib, "libcurl_a_debug.lib")
-#else
-#pragma comment(lib, "libcurl_a.lib")
-#endif
-
 namespace filesystem = std::experimental::filesystem;
 
 // xLiveLess specific logger
