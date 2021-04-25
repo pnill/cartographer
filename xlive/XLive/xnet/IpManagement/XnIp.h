@@ -121,7 +121,7 @@ struct XnIp
 	int connectStatus;
 	int connectionPacketsSentCount;
 	DWORD lastConnectionInteractionTime;
-	DWORD connectPacketReceivedTimeStamp;
+	DWORD lastPacketReceivedTime;
 
 	BYTE connectionNonce[8];
 	BYTE connectionNonceOtherSide[8];
@@ -247,6 +247,18 @@ public:
 			xnIp->lastConnectionInteractionTime = timeGetTime();
 	}
 
+	void CXnIp::updatePacketReceivedCounters(IN_ADDR ipIdentifier, int bytesRecvdCount)
+	{
+		setTimeConnectionInteractionHappened(ipIdentifier);
+		XnIp* xnIp = getConnection(ipIdentifier);
+		if (xnIp != nullptr)
+		{
+			xnIp->pckRecvd++;
+			xnIp->bytesRecvd += bytesRecvdCount;
+			xnIp->lastPacketReceivedTime = timeGetTime();
+		}
+	}
+
 	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 
 	void checkForLostConnections();
@@ -270,12 +282,13 @@ public:
 
 	void Initialize(const XNetStartupParams* netStartupParams);
 	
-	void LogConnectionsDetails(sockaddr_in* address, int errorCode, const XNKID* receivedKey);
+	void LogConnectionsToConsole();
+	void LogConnectionsErrorDetails(sockaddr_in* address, int errorCode, const XNKID* receivedKey);
 	IN_ADDR GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* addr);
 	
 	void SaveNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);
 
-	void HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* connectReqPkt, sockaddr_in* addr, LPDWORD bytesRecvdCount);
+	void HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* connectReqPkt, sockaddr_in* addr, LPDWORD lpBytesRecvdCount);
 	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, sockaddr_in* recvAddr);
 	int CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* xnkid, const XNetRequestPacket* requestType, IN_ADDR* outIpIdentifier);
 

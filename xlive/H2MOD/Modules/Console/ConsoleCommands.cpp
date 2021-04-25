@@ -18,6 +18,9 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Engine/Engine.h"
 
+// for XNet connection logging
+#include "xlive/xnet/IpManagement/XnIp.h"
+
 std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
 
 ConsoleCommands* commands = new ConsoleCommands();
@@ -751,8 +754,14 @@ void ConsoleCommands::handle_command(std::string command) {
 			output(result);
 
 			LOG_INFO_GAME("{} {} {}", tagName, tagType.as_string(), mapName);
-
 		}
+		else if (firstCommand == "$logxnetconnections") {
+			if (splitCommands.size() != 1) {
+				output(L"No parameters are needed.");
+			}
+			gXnIp.LogConnectionsToConsole();
+		}
+		
 		else {
 			output(L"Unknown command.");
 		}
