@@ -40,6 +40,10 @@ namespace imgui_handler
 					Close();
 				}
 			}
+			// Pop style var
+			ImGui::PopStyleVar();
+			ImGui::End();
+			
 		}
 		void SetMessage(std::string Message)
 		{
