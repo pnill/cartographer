@@ -1008,8 +1008,10 @@ namespace imgui_handler {
 					}
 				}
 #endif
-				ImGui::End();
 			}
+
+			ImGui::PopStyleVar();
+			ImGui::End();
 			if (!*p_open)
 				Close();
 		}
