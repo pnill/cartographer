@@ -23,6 +23,8 @@ namespace EventHandler
 
 		std::vector<MapLoadEventCallback> mapLoadCallbacks;
 		std::vector<MapLoadEventCallback> mapLoadCallbacksThreaded;
+
+		std::vector<EventCallback> countdownStartCallbacks;
 	}
 	void registerGameStateCallback(GameStateCallback callback, bool threaded)
 	{
@@ -98,7 +100,6 @@ namespace EventHandler
 			}
 		}
 	}
-
 
 	void registerNetworkPlayerAddCallback(NetworkPeerEventCallback callback, bool threaded)
 	{
@@ -378,6 +379,62 @@ namespace EventHandler
 			for (auto &cb : mapLoadCallbacks) {
 				if(engine_type == cb.Type)
 					cb.callback();
+			}
+		}
+	}
+
+	void registerCountdownStartCallback(const EventFunction callback, std::string name, bool threaded, bool runOnce)
+	{
+		countdownStartCallbacks.emplace_back(name, callback, threaded, runOnce);
+	}
+
+	void removeCountdownStartCallback(std::string name)
+	{
+		auto it = std::find_if(countdownStartCallbacks.begin(), countdownStartCallbacks.end(),
+			[&name](const EventCallback &obj) {return obj.name == name;});
+		if (it != countdownStartCallbacks.end())
+			countdownStartCallbacks.erase(countdownStartCallbacks.begin() +
+				std::distance(countdownStartCallbacks.begin(), it));
+
+		it = std::find_if(countdownStartCallbacks.begin(), countdownStartCallbacks.end(),
+			[&name](const EventCallback &obj) {return obj.name == name;});
+		if (it != countdownStartCallbacks.end())
+			countdownStartCallbacks.erase(countdownStartCallbacks.begin() +
+				std::distance(countdownStartCallbacks.begin(), it));
+	}
+
+	void executeCountdownStartCallback()
+	{
+		if (!countdownStartCallbacks.empty())
+		{
+			auto executeThreaded = []()
+			{
+				for (auto &cb : countdownStartCallbacks) {
+					if (cb.threaded) {
+						cb.hasRun = true;
+						cb.callback();
+					}
+				}
+			};
+			std::thread(executeThreaded).detach();
+		}
+		if (!countdownStartCallbacks.empty()) {
+			for (auto &cb : countdownStartCallbacks) {
+				if (!cb.threaded) {
+					cb.hasRun = true;
+					cb.callback();
+				}
+			}
+		}
+		if (!countdownStartCallbacks.empty())
+		{
+			auto it = countdownStartCallbacks.begin();
+			while (it != countdownStartCallbacks.end())
+			{
+				if (it->runOnce && it->hasRun)
+					it = countdownStartCallbacks.erase(it);
+				else
+					++it;
 			}
 		}
 	}

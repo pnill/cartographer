@@ -23,6 +23,22 @@ enum EventTypes
 //		this->Callback = callback;
 //	}
 //};
+using EventFunction = void(*)();
+struct EventCallback
+{
+	std::string name;
+	EventFunction callback;
+	bool threaded;
+	bool runOnce;
+	bool hasRun = false;
+	EventCallback(std::string name, const EventFunction callback, bool threaded, bool runOnce = false)
+	{
+		this->name = name;
+		this->callback = callback;
+		this->threaded = threaded;
+		this->runOnce = runOnce;
+	}
+};
 struct GameStateCallback
 {
 	std::string name;
@@ -107,6 +123,17 @@ struct ServerCommandEventCallback
 		this->command = command;
 	}
 };
+
+//struct CountdownStartedEventCallback
+//{
+//	std::string name;
+//	std::function<void()> callback;
+//	CountdownStartedEventCallback(std::string name, std::function<void()> callback)
+//	{
+//		this->name = name;
+//		this->callback = callback;
+//	}
+//};
 
 namespace EventHandler
 {
@@ -207,4 +234,8 @@ namespace EventHandler
 	void registerMapLoadCallback(MapLoadEventCallback callback, bool threaded);
 	void removeMapLoadCallback(std::string name);
 	void executeMapLoadCallback(e_engine_type engine_type);
+
+	void registerCountdownStartCallback(const EventFunction callback, std::string name, bool threaded, bool runOnce = false);
+	void removeCountdownStartCallback(std::string name);
+	void executeCountdownStartCallback();
 }

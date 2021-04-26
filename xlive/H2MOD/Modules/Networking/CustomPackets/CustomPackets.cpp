@@ -6,6 +6,7 @@
 #include "..\..\MapManager\MapManager.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 
 char g_network_message_types[e_network_message_types::end * 32];
 
@@ -93,6 +94,9 @@ void register_custom_packets(void* network_messages)
 
 	register_packet_impl(network_messages, anti_cheat, "anti-cheat", 0, sizeof(s_anti_cheat), sizeof(s_anti_cheat),
 		(void*)encode_anti_cheat_packet, (void*)decode_anti_cheat_packet, NULL);
+
+	register_packet_impl(network_messages, custom_variant_settings, "variant-settings", 0, CustomVariantSettingsPacketSize, CustomVariantSettingsPacketSize,
+		(void*)CustomVariantSettings::EncodeVariantSettings, (void*)CustomVariantSettings::DecodeVariantSettings, NULL);
 }
 
 typedef void(__stdcall *handle_out_of_band_message)(void *thisx, network_address* address, int message_type, int a4, void* packet);
@@ -278,6 +282,15 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				return;
 			}
 		}
+	case custom_variant_settings:
+	{
+		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
+		{
+			auto recieved_data = (CustomVariantSettings::s_variantSettings*)packet;
+			CustomVariantSettings::RecieveCustomVariantSettings(recieved_data);
+			return;
+		}
+	}
 	case leave_session:
 	{
 		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5

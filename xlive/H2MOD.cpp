@@ -29,6 +29,8 @@
 #include "H2MOD/Modules/HitFix/MeleeFix.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "Blam/Engine/Objects/GameStateObjects.h"
+#include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -1244,20 +1246,6 @@ short __cdecl get_enabled_teams_flags(network_session* session)
 		return default_teams_enabled_flags;
 }
 
-typedef int(__cdecl* getnexthillindex)(int previousHill);
-getnexthillindex p_get_next_hill_index;
-signed int __cdecl get_next_hill_index(int previousHill)
-{
-	int hillCount = *Memory::GetAddress<int*>(0x4dd0a8, 0x5008e8);
-	if (previousHill + 1 >= hillCount) 
-	{
-		//LOG_TRACE_GAME("[KoTH Behavior] Hill Count: {} Current Hill: {} Next Hill: {}", hillCount, previousHill, 0);
-		return 0;
-	}
-	//LOG_TRACE_GAME("[KoTH Behavior] Hill Count: {} Current Hill: {} Next Hill: {}", hillCount, previousHill, previousHill + 1);
-	return previousHill + 1;
-}
-
 void H2MOD::ApplyUnitHooks()
 {
 	// increase the size of the unit entity creation definition packet
@@ -1455,8 +1443,11 @@ char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, cha
 	}
 
 
-	if (canStart[0] && canStart[1])
+	if (canStart[0] && canStart[1]) 
+	{
+		EventHandler::executeCountdownStartCallback();
 		return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
+	}
 	else
 		return 0;
 }
@@ -1528,10 +1519,6 @@ void H2MOD::ApplyHooks() {
 
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(Memory::GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
-
-	//get next hill index hook
-	if(!H2Config_koth_random)
-		p_get_next_hill_index = (getnexthillindex)DetourFunc(Memory::GetAddress<BYTE*>(0x10DF1E, 0xDA4CE), (BYTE*)get_next_hill_index, 9);
 
 	// player spawn hook
 	p_player_spawn = (player_spawn)DetourFunc(Memory::GetAddress<BYTE*>(0x55952, 0x5DE4A), (BYTE*)OnPlayerSpawn, 6);
@@ -1667,6 +1654,11 @@ void H2MOD::Initialize()
 		
 		
 	}
+	else
+	{
+		playlist_loader::initialize();
+	}
+	CustomVariantSettings::Initialize();
 	TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
