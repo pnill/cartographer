@@ -3,7 +3,7 @@
 
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Utils/Utils.h"
 
 typedef void*(__cdecl *dedi_command_hook)(wchar_t** a1, int a2, char a3);

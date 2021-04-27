@@ -14,7 +14,7 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "H2MOD/Modules/HudElements/HudElements.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
@@ -1445,7 +1445,8 @@ char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, cha
 
 	if (canStart[0] && canStart[1]) 
 	{
-		EventHandler::executeCountdownStartCallback();
+		//EventHandler::executeCountdownStartCallback();
+		EventHandler::execute_callback(countdown_start, before);
 		return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
 	}
 	else

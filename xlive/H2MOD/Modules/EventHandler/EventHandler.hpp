@@ -2,39 +2,38 @@
 #include "Blam/Common/Common.h"
 #include "H2MOD/Modules/ServerConsole/ServerConsole.h"
 
-enum EventTypes
+enum EventType
 {
 	player_leave,
 	player_join,
 	gamestate_change,
 	game_loop,
-	server_command
+	server_command,
+	map_load,
+	countdown_start
 };
-//template <class T>
-//struct EventCallback
-//{
-//	
-//	EventTypes Type;
-//	T Callback;
-//	EventCallback(std::string name, EventTypes type, GameStateCallback callback)
-//	{
-//		this->Name = name;
-//		this->Type = type;
-//		this->Callback = callback;
-//	}
-//};
+enum EventExecutionType
+{
+	before,
+	after
+};
+
 using EventFunction = void(*)();
 struct EventCallback
 {
-	std::string name;
 	EventFunction callback;
+	EventType type;
+	EventExecutionType execution_type;
+	bool forward_args;
 	bool threaded;
 	bool runOnce;
 	bool hasRun = false;
-	EventCallback(std::string name, const EventFunction callback, bool threaded, bool runOnce = false)
+	EventCallback(const EventFunction callback, EventType type, EventExecutionType execution_type, bool forward_args = false,  bool threaded = false, bool runOnce = false)
 	{
-		this->name = name;
 		this->callback = callback;
+		this->type = type;
+		this->execution_type = execution_type;
+		this->forward_args = forward_args;
 		this->threaded = threaded;
 		this->runOnce = runOnce;
 	}
@@ -124,16 +123,16 @@ struct ServerCommandEventCallback
 	}
 };
 
-//struct CountdownStartedEventCallback
-//{
-//	std::string name;
-//	std::function<void()> callback;
-//	CountdownStartedEventCallback(std::string name, std::function<void()> callback)
-//	{
-//		this->name = name;
-//		this->callback = callback;
-//	}
-//};
+struct CountdownStartedEventCallback
+{
+	std::string name;
+	std::function<void()> callback;
+	CountdownStartedEventCallback(std::string name, std::function<void()> callback)
+	{
+		this->name = name;
+		this->callback = callback;
+	}
+};
 
 namespace EventHandler
 {
@@ -235,7 +234,48 @@ namespace EventHandler
 	void removeMapLoadCallback(std::string name);
 	void executeMapLoadCallback(e_engine_type engine_type);
 
-	void registerCountdownStartCallback(const EventFunction callback, std::string name, bool threaded, bool runOnce = false);
-	void removeCountdownStartCallback(std::string name);
-	void executeCountdownStartCallback();
+	//void registerCountdownStartCallback(const EventFunction callback, std::string name, bool threaded, bool runOnce = false);
+	//void removeCountdownStartCallback(std::string name);
+	//void executeCountdownStartCallback();
+
+	//void register_callback(const EventFunction callback, EventType type, EventExecutionType execution_type, bool forward_args = false, bool threaded = false, bool run_once = false);
+
+	namespace
+	{
+		static std::vector<EventCallback> events;
+	}
+
+	static inline void remove_callback(const EventFunction callback, EventType type, EventExecutionType execution_type)
+	{
+
+	}
+
+	static inline void register_callback(const EventFunction callback, EventType type, EventExecutionType execution_type, bool forward_args = false, bool threaded = false, bool run_once = false)
+	{
+		//Prevent duplicate events
+		remove_callback(callback, type, execution_type);
+
+		events.emplace_back(callback, type, execution_type, forward_args, threaded, run_once);
+	}
+	template<typename ... Args>
+	static inline void execute_callback(EventType type, EventExecutionType execution_type, Args&& ... args)
+	{
+		auto executeCallbacks = [&](std::vector<EventCallback> &events, EventType type, EventExecutionType execution_type, bool threaded)
+		{
+			for(auto &event : events)
+			{
+				if(event.type == type && event.execution_type == execution_type && event.threaded == threaded)
+				{
+					if (event.forward_args)
+						event.callback(std::forward<Args>(args) ...);
+					else
+						event.callback();
+
+					event.hasRun = true;
+				}
+			}
+		};
+		executeCallbacks(events, type, execution_type, false);
+		std::thread(executeCallbacks, events, type, execution_type, true).detach();
+	}
 }

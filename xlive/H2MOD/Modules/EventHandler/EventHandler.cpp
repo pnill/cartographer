@@ -1,4 +1,4 @@
-#include "EventHandler.h"
+#include "EventHandler.hpp"
 namespace EventHandler
 {
 	namespace
@@ -24,8 +24,14 @@ namespace EventHandler
 		std::vector<MapLoadEventCallback> mapLoadCallbacks;
 		std::vector<MapLoadEventCallback> mapLoadCallbacksThreaded;
 
-		std::vector<EventCallback> countdownStartCallbacks;
+		//std::vector<EventCallback> countdownStartCallbacks;
+
+		//std::vector<EventCallback> events;
 	}
+
+
+	
+
 	void registerGameStateCallback(GameStateCallback callback, bool threaded)
 	{
 		if (threaded)
@@ -383,7 +389,7 @@ namespace EventHandler
 		}
 	}
 
-	void registerCountdownStartCallback(const EventFunction callback, std::string name, bool threaded, bool runOnce)
+	/*void registerCountdownStartCallback(const EventFunction callback, std::string name, bool threaded, bool runOnce)
 	{
 		countdownStartCallbacks.emplace_back(name, callback, threaded, runOnce);
 	}
@@ -437,5 +443,5 @@ namespace EventHandler
 					++it;
 			}
 		}
-	}
+	}*/
 }

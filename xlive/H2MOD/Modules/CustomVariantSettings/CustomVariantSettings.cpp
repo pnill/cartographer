@@ -3,7 +3,7 @@
 #include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
 #include "H2MOD.h"
 #include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "Util/Hooks/Hook.h"
 #include "Blam/Engine/Game/PhysicsConstants.h"
@@ -110,8 +110,8 @@ namespace CustomVariantSettings
 		SendCustomVariantSettings();
 	}
 
-	typedef int(__cdecl* getnexthillindex)(int previousHill);
-	getnexthillindex p_get_next_hill_index;
+	typedef int(__cdecl c_get_next_hill_index)(int previousHill);
+	c_get_next_hill_index* p_get_next_hill_index;
 	signed int __cdecl get_next_hill_index(int previousHill)
 	{
 		int hillCount = *Memory::GetAddress<int*>(0x4dd0a8, 0x5008e8);
@@ -125,32 +125,15 @@ namespace CustomVariantSettings
 		{
 			case sequential:
 				if (previousHill + 1 >= hillCount)
-					return hillMap[0];
-				return hillMap[previousHill + 1];
-				break;
+					return 0;
+				return previousHill + 1;
 			case reverse:
 				if (previousHill - 1 <= 0)
-					return hillMap[hillCount];
-				return hillMap[previousHill - 1];
-				break;
+					return hillCount;
+				return previousHill - 1;
 			default:
 			case random:
-				//This is a cleaned up version of the default behavior of the engine
-				auto random_seed = (unsigned int *)Engine::get_global_random_seed_address();
-				*random_seed = 1664525 * *random_seed + 1013904223;
-				auto random16 = ((hillCount * (*random_seed >> 16)) >> 16);
-				auto currentIndex = 0;
-				auto randomIndex = 0;
-				while(true)
-				{
-					randomIndex = (__int16)((random16 + currentIndex) % hillCount);
-					if (previousHill != hillMap[randomIndex])
-						break;
-					if (++currentIndex >= hillCount)
-						return -1;
-				}
-				return hillMap[randomIndex];
-				break;
+				return p_get_next_hill_index(previousHill);
 		}
 		//Just in case.
 		return -1;
@@ -158,7 +141,10 @@ namespace CustomVariantSettings
 
 	void ApplyHooks()
 	{
-		p_get_next_hill_index = (getnexthillindex)DetourFunc(Memory::GetAddress<BYTE*>(0x10DF1E, 0xDA4CE), (BYTE*)get_next_hill_index, 9);
+		//p_get_next_hill_index = (getnexthillindex)DetourFunc(Memory::GetAddress<BYTE*>(0x10DF1E, 0xDA4CE), (BYTE*)get_next_hill_index, 9);
+		p_get_next_hill_index = Memory::GetAddress<c_get_next_hill_index*>(0x10DF1E, 0xDA4CE);
+		PatchCall(Memory::GetAddress(0x10FE1F, 0xDC3CF), get_next_hill_index);
+		PatchCall(Memory::GetAddress(0x10FE55, 0xDC405), get_next_hill_index);
 	}
 
 	void Initialize()
@@ -166,14 +152,8 @@ namespace CustomVariantSettings
 		ApplyHooks();
 		EventHandler::registerGameStateCallback({ "VariantSettings", life_cycle_in_game, OnIngame }, false);
 
-		EventHandler::registerCountdownStartCallback(OnMatchCountdown, "VariantGameStart", true);
-	/*	EventHandler::registerGameStateCallback({ "VariantSettings1", life_cycle_start_game, 
-			[]()
-			{
-				for(auto i = 0; i < NetworkSession::getPeerCount(); i++)
-					SendCustomVariantSettings(i);
-			} 
-			},	true);*/
+		//EventHandler::registerCountdownStartCallback(OnMatchCountdown, "VariantGameStart", true);
+		EventHandler::register_callback(OnMatchCountdown, countdown_start, before, false, true);
 		EventHandler::registerNetworkPlayerAddCallback(
 			{
 				"VariantSettings",

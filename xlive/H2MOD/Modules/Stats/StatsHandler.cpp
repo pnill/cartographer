@@ -4,7 +4,7 @@
 #include "libcurl/curl/curl.h"
 #include "rapidjson/writer.h"
 #include "H2MOD/Modules/Startup/Startup.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #ifdef _DEBUG
 #pragma comment(lib, "libcurl_a_debug.lib")
 #else

@@ -4,7 +4,7 @@
 #include "Util\Hooks\Hook.h"
 #include "..\Memory\bitstream.h"
 #include "..\..\MapManager\MapManager.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 
