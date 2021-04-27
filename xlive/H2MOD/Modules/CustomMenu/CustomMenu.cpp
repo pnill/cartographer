@@ -80,11 +80,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EscSettings() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -103,11 +99,7 @@ __declspec(naked) void sub_20F790_CM_nak_EscSettings() {//__thiscall
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -6347,11 +6339,7 @@ __declspec(naked) void sub_23D060_CM_nak_VKeyTest() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push eax
 		push ecx
@@ -6367,11 +6355,7 @@ __declspec(naked) void sub_23bf3e_CMLTD_nak_VKeyTest() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
