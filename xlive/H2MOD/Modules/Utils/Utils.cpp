@@ -506,7 +506,7 @@ int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response
 		/* First set the URL that is about to receive our POST. This URL can
 		just as well be a https:// URL if that is what should receive the
 		data. */
-		curl_easy_setopt(curl, CURLOPT_URL, url);
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
 		struct stringMe s;
 		init_string(&s);

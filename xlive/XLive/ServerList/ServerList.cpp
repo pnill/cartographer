@@ -12,8 +12,6 @@
 
 using namespace rapidjson;
 
-extern unsigned short H2Config_base_port;
-
 std::mutex ServerListRequestInProgress;
 
 std::mutex ServerListRequestsMutex;
@@ -82,8 +80,7 @@ void ServerList::QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESU
 
 	if (curl) {
 
-		std::string server_url = std::string(cartographerURL + "/live/servers/");
-		server_url.append(std::to_string(xuid).c_str());
+		std::string server_url = std::string(cartographerURL + "/live/servers/" + std::to_string(xuid));
 
 		curl_easy_setopt(curl, CURLOPT_URL, server_url.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -387,7 +384,9 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 
 	curl = curl_interface_init_no_ssl();
 	if (curl) {
-		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/server_list.php"));
+		std::string url(cartographerURL + "/live/server_list.php");
+
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
@@ -468,7 +467,9 @@ void ServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 
 	curl = curl_interface_init_no_ssl();
 	if (curl) {
-		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/dedicount.php"));
+		std::string url(cartographerURL + "/live/dedicount.php");
+
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
@@ -590,7 +591,9 @@ void ServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
 
-		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/del_server.php"));
+		std::string url(cartographerURL + "/live/del_server.php");
+
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);
@@ -702,7 +705,9 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
 
-		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/add_server.php"));
+		std::string url(cartographerURL + "/live/add_server.php");
+
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);

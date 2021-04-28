@@ -63,7 +63,7 @@ namespace imgui_handler
 			if (curl)
 			{
 				fp = fopen(cpath.c_str(), "wb");
-				curl_easy_setopt(curl, CURLOPT_URL, url);
+				curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
 				curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 				res = curl_easy_perform(curl);

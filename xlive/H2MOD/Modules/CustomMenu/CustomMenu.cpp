@@ -19,6 +19,20 @@
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
 
+#define PUSH_REGISTERS \
+__asm push ebp \
+__asm push edi \
+__asm push esi \
+__asm push ecx \
+__asm push ebx \
+
+#define POP_REGISTERS \
+__asm pop ebx \
+__asm pop ecx \
+__asm pop esi \
+__asm pop edi \
+__asm pop ebp \
+
 void CallWgit(int WgitScreenfunctionPtr);
 void CallWgit(int WgitScreenfunctionPtr, int open_method);
 void CallWgit(int WgitScreenfunctionPtr, int open_method, int menu_wgit_type);
@@ -57,11 +71,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EscSettings() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -70,11 +80,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EscSettings() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -86,21 +92,14 @@ static bool CMButtonHandler_EscSettings(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_EscSettings() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+
+		PUSH_REGISTERS
 
 		push 0
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -792,11 +791,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Error() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -805,11 +800,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Error() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -821,21 +812,14 @@ static bool CMButtonHandler_Error(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_Error() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -1001,11 +985,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Language_Sub() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF4//label_id_description
 		push 0xFFFFFFF3//label_id_title
@@ -1013,12 +993,8 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Language_Sub() {//__thiscall
 		push eax
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
-
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -1032,21 +1008,13 @@ static bool CMButtonHandler_Language_Sub(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_Language_Sub() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -1119,11 +1087,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Language() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -1132,11 +1096,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Language() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -1172,21 +1132,13 @@ static bool CMButtonHandler_Language(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_Language() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -1257,11 +1209,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditCrosshair() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -1270,11 +1218,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditCrosshair() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -1323,21 +1267,13 @@ static bool CMButtonHandler_EditCrosshair(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_EditCrosshair() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -1406,11 +1342,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditFOV() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -1419,11 +1351,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditFOV() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -1461,21 +1389,13 @@ static bool CMButtonHandler_EditFOV(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_EditFOV() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -1543,11 +1463,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditVehicleFOV() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -1556,11 +1472,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditVehicleFOV() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -1598,21 +1510,13 @@ static bool CMButtonHandler_EditVehicleFOV(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_EditVehicleFOV() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -1681,11 +1585,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditHz() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -1694,11 +1594,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditHz() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -1739,21 +1635,13 @@ static bool CMButtonHandler_EditHz(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_EditHz() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -1823,11 +1711,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditFPS() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -1836,11 +1720,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditFPS() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -1879,21 +1759,13 @@ static bool CMButtonHandler_EditFPS(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_EditFPS() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -1945,11 +1817,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditStaticLoD() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -1958,11 +1826,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditStaticLoD() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -1975,21 +1839,13 @@ static bool CMButtonHandler_EditStaticLoD(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_EditStaticLoD() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push H2Config_static_lod_state//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -2040,11 +1896,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditCrosshairSize() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -2053,11 +1905,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditCrosshairSize() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -2070,21 +1918,13 @@ static bool CMButtonHandler_EditCrosshairSize(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_EditCrosshairSize() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -2137,11 +1977,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Update() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -2150,11 +1986,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Update() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -2181,21 +2013,13 @@ static bool CMButtonHandler_Update(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_Update() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -2223,21 +2047,13 @@ __declspec(naked) void sub_248beb_nak_deconstructor_Update() {//__thiscall
 	__asm {
 		mov  eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push eax
 		push ecx
 		call sub_248beb_deconstructor_Update//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -2290,11 +2106,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Update_Note() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -2303,11 +2115,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Update_Note() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -2323,21 +2131,13 @@ static bool CMButtonHandler_Update_Note(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_Update_Note() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -2401,11 +2201,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Login_Warn() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -2414,11 +2210,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Login_Warn() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -2430,21 +2222,13 @@ static bool CMButtonHandler_Login_Warn(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_Login_Warn() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -2471,21 +2255,13 @@ __declspec(naked) void sub_248beb_nak_deconstructor_Login_Warn() {//__thiscall
 	__asm {
 		mov  eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push eax
 		push ecx
 		call sub_248beb_deconstructor_Login_Warn//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -2634,11 +2410,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditHudGui() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -2647,11 +2419,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_EditHudGui() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -2684,21 +2452,13 @@ static bool CMButtonHandler_EditHudGui(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_EditHudGui() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -2799,11 +2559,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_ToggleSkulls() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -2812,11 +2568,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_ToggleSkulls() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -2837,21 +2589,13 @@ static bool CMButtonHandler_ToggleSkulls(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_ToggleSkulls() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -2925,11 +2669,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_OtherSettings() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -2938,11 +2678,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_OtherSettings() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -2991,21 +2727,13 @@ static bool CMButtonHandler_OtherSettings(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_OtherSettings() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -3063,11 +2791,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AdvSettings() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -3076,11 +2800,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AdvSettings() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -3107,21 +2827,13 @@ static bool CMButtonHandler_AdvSettings(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_AdvSettings() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -3176,11 +2888,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AdvLobbySettings() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -3189,11 +2897,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AdvLobbySettings() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -3243,21 +2947,13 @@ static bool CMButtonHandler_AdvLobbySettings(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_AdvLobbySettings() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -3283,21 +2979,13 @@ __declspec(naked) void sub_248beb_nak_deconstructor_AdvLobbySettings() {//__this
 	__asm {
 		mov  eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push eax
 		push ecx
 		call sub_248beb_deconstructor_AdvLobbySettings//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -3363,11 +3051,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Credits() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -3376,11 +3060,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Credits() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -3400,21 +3080,13 @@ static bool CMButtonHandler_Credits(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_Credits() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -3492,12 +3164,8 @@ void __stdcall CMLabelButtons_Invalid_Login_Token(int a1, int a2)
 __declspec(naked) void sub_2111ab_CMLTD_nak_Invalid_Login_Token() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
-
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -3506,11 +3174,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Invalid_Login_Token() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -3522,21 +3186,13 @@ static bool CMButtonHandler_Invalid_Login_Token(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_Invalid_Login_Token() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -3572,21 +3228,13 @@ __declspec(naked) void sub_248beb_nak_deconstructor_Login_Token() {//__thiscall
 	__asm {
 		mov  eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push eax
 		push ecx
 		call sub_248beb_deconstructor_Login_Token//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -3651,11 +3299,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountCreate() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -3664,11 +3308,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountCreate() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -3732,21 +3372,13 @@ static bool CMButtonHandler_AccountCreate(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_AccountCreate() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -3775,21 +3407,13 @@ __declspec(naked) void sub_248beb_nak_deconstructor_AccountCreate() {//__thiscal
 	__asm {
 		mov  eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push eax
 		push ecx
 		call sub_248beb_deconstructor_AccountCreate//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -3859,11 +3483,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountEdit() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -3872,11 +3492,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountEdit() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -4018,21 +3634,13 @@ static bool CMButtonHandler_AccountEdit(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_AccountEdit() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -4061,22 +3669,13 @@ __declspec(naked) void sub_248beb_nak_deconstructor_AccountEdit() {//__thiscall
 	__asm {
 		mov  eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push eax
 		push ecx
 		call sub_248beb_deconstructor_AccountEdit//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
-
+		POP_REGISTERS
 		retn 4
 	}
 }
@@ -4144,11 +3743,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountList() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -4157,11 +3752,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_AccountList() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -4222,21 +3813,13 @@ static bool CMButtonHandler_AccountList(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_AccountList() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push H2AccountLastUsed//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -4260,21 +3843,13 @@ __declspec(naked) void sub_248beb_nak_deconstructor_AccountList() {//__thiscall
 	__asm {
 		mov  eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push eax
 		push ecx
 		call sub_248beb_deconstructor_AccountList//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -4327,11 +3902,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Guide() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -4340,11 +3911,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Guide() {//__thiscall
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -4369,21 +3936,13 @@ static bool CMButtonHandler_Guide(int button_id) {
 
 __declspec(naked) void sub_20F790_CM_nak_Guide() {//__thiscall
 	__asm {
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0//selected button id
 		push ecx
 		call sub_20F790_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn
 	}
@@ -6594,21 +6153,13 @@ __declspec(naked) void sub_23CF88_CM_nak_VKeyTest() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push eax
 		push ecx
 		call sub_23CF88_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -6788,21 +6339,13 @@ __declspec(naked) void sub_23D060_CM_nak_VKeyTest() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push eax
 		push ecx
 		call sub_23D060_CM//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
@@ -6812,11 +6355,7 @@ __declspec(naked) void sub_23bf3e_CMLTD_nak_VKeyTest() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
 
-		push ebp
-		push edi
-		push esi
-		push ecx
-		push ebx
+		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
 		push 0xFFFFFFF0//label_id_title
@@ -6825,11 +6364,7 @@ __declspec(naked) void sub_23bf3e_CMLTD_nak_VKeyTest() {//__thiscall
 		push ecx
 		call sub_23bf3e_CMLTD//__stdcall
 
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
+		POP_REGISTERS
 
 		retn 4
 	}
