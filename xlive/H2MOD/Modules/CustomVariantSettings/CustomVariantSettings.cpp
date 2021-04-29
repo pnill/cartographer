@@ -69,37 +69,38 @@ namespace CustomVariantSettings
 		CurrentVariantSettings = s_variantSettings();
 	}
 
-	void OnIngame()
+	void OnIngame(game_life_cycle state)
 	{
-		//
-		//Anything to be done on host and client goes here.
-		//
-		physics_constants::get()->gravity = CurrentVariantSettings.Gravity;
+		if (state == life_cycle_in_game) {
+			//
+			//Anything to be done on host and client goes here.
+			//
+			physics_constants::get()->gravity = CurrentVariantSettings.Gravity;
 
-		//mov [ecx+6], ax
-		static BYTE InfiniteAmmoMagazineASM[] = { 0x66, 0x89, 0x41, 0x06 };
-		//movss [edi+00000184],xmm0
-		static BYTE InfiniteAmmoBatteryASM[] = { 0xF3, 0x0F, 0x11, 0x87, 0x84, 0x01, 0x00, 0x00 };
-		if (CurrentVariantSettings.InfiniteAmmo)
-		{
-			//Nop remove ammo from clips
-			NopFill(Memory::GetAddress(0x15F3EA, 0x1436AA), 4);
-			//Nop remove energy from battery.
-			NopFill(Memory::GetAddress(0x15f7c6, 0x143A86), 8);
-		}
-		else
-		{
-			WriteBytes(Memory::GetAddress(0x15F3EA, 0x1436AA), InfiniteAmmoMagazineASM, 4);
-			WriteBytes(Memory::GetAddress(0x15f7c6, 0x143A86), InfiniteAmmoBatteryASM, 8);
-		}
-
-		if (!Memory::isDedicatedServer()) {
-			if (CurrentVariantSettings.ExplosionPhysics)
-				WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1e);
+			//mov [ecx+6], ax
+			static BYTE InfiniteAmmoMagazineASM[] = { 0x66, 0x89, 0x41, 0x06 };
+			//movss [edi+00000184],xmm0
+			static BYTE InfiniteAmmoBatteryASM[] = { 0xF3, 0x0F, 0x11, 0x87, 0x84, 0x01, 0x00, 0x00 };
+			if (CurrentVariantSettings.InfiniteAmmo)
+			{
+				//Nop remove ammo from clips
+				NopFill(Memory::GetAddress(0x15F3EA, 0x1436AA), 4);
+				//Nop remove energy from battery.
+				NopFill(Memory::GetAddress(0x15f7c6, 0x143A86), 8);
+			}
 			else
-				WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0);
+			{
+				WriteBytes(Memory::GetAddress(0x15F3EA, 0x1436AA), InfiniteAmmoMagazineASM, 4);
+				WriteBytes(Memory::GetAddress(0x15f7c6, 0x143A86), InfiniteAmmoBatteryASM, 8);
+			}
+
+			if (!Memory::isDedicatedServer()) {
+				if (CurrentVariantSettings.ExplosionPhysics)
+					WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1e);
+				else
+					WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0);
+			}
 		}
-		EventHandler::registerGameStateCallback({ "ResetSettingsPre", life_cycle_pre_game, ResetSettings, true }, false);
 	}
 
 	void OnMatchCountdown()
@@ -150,10 +151,13 @@ namespace CustomVariantSettings
 	void Initialize()
 	{
 		ApplyHooks();
-		EventHandler::registerGameStateCallback({ "VariantSettings", life_cycle_in_game, OnIngame }, false);
-
+		
+		//EventHandler::registerGameStateCallback({ "VariantSettings", life_cycle_in_game, OnIngame }, false);
 		//EventHandler::registerCountdownStartCallback(OnMatchCountdown, "VariantGameStart", true);
-		EventHandler::register_callback(OnMatchCountdown, countdown_start, before, false, true);
+		//EventHandler::register_callback(OnMatchCountdown, countdown_start, before, false, true);
+
+		EventHandler::register_callback<GameStateEvent>(OnIngame, gamestate_change);
+		EventHandler::register_callback<CountdownStartEvent>(OnMatchCountdown, countdown_start, after, true);
 		EventHandler::registerNetworkPlayerAddCallback(
 			{
 				"VariantSettings",

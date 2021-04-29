@@ -737,6 +737,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 {
 	static bool resetAfterMatch = false;
 
+	//EventHandler::execute_callback(EventType::map_load, before, engine_settings->map_type);
 	bool result = p_map_cache_load(engine_settings);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
@@ -830,7 +831,8 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		}
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
-		EventHandler::executeMapLoadCallback(e_engine_type::Multiplayer);
+		//EventHandler::executeMapLoadCallback(e_engine_type::Multiplayer);
+		//EventHandler::execute_callback(EventType::map_load, after, Multiplayer);
 
 		if (Engine::get_game_life_cycle() == life_cycle_in_game)
 		{
@@ -862,7 +864,8 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		//H2X::Initialize(true);
 		MeleeFix::MeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
-		EventHandler::executeMapLoadCallback(e_engine_type::SinglePlayer);
+		//EventHandler::executeMapLoadCallback(e_engine_type::SinglePlayer);
+		//EventHandler::execute_callback(EventType::map_load, after, SinglePlayer);
 	}
 
 	// if we got this far, it means map is MP or SP, and if map load is called again, it should reset/deinitialize any custom gametypes
@@ -1274,16 +1277,17 @@ void H2MOD::ApplyUnitHooks()
 }
 
 
-static BYTE previousGamestate = 0;
+static game_life_cycle previousGamestate = life_cycle_none;
 typedef int(__thiscall* ChangeGameState)(BYTE* this_);
 ChangeGameState p_EvaulateGameState;
 void EvaluateGameState()
 {
 	p_EvaulateGameState(Memory::GetAddress<BYTE*>(0x420FC4, 0x3C40AC));
-	BYTE GameState = *Memory::GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
+	game_life_cycle GameState = *Memory::GetAddress<game_life_cycle*>(0x420FC4, 0x3C40AC);
 	if (previousGamestate != GameState) {
 		previousGamestate = GameState;
 		EventHandler::executeGameStateCallbacks(GameState);
+		EventHandler::execute_callback<GameStateEvent>(gamestate_change, after, GameState);
 	}
 }
 
@@ -1446,7 +1450,7 @@ char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, cha
 	if (canStart[0] && canStart[1]) 
 	{
 		//EventHandler::executeCountdownStartCallback();
-		EventHandler::execute_callback(countdown_start, before);
+		EventHandler::execute_callback<CountdownStartEvent>(countdown_start, before);
 		return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
 	}
 	else

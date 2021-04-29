@@ -1,4 +1,5 @@
 #include "EventHandler.hpp"
+std::vector<EventCallback<void*>> events;
 namespace EventHandler
 {
 	namespace
@@ -30,7 +31,6 @@ namespace EventHandler
 	}
 
 
-	
 
 	void registerGameStateCallback(GameStateCallback callback, bool threaded)
 	{
@@ -337,7 +337,7 @@ namespace EventHandler
 		}
 	}
 
-	void registerMapLoadCallback(MapLoadEventCallback callback, bool threaded)
+	/*void registerMapLoadCallback(MapLoadEventCallback callback, bool threaded)
 	{
 		if (threaded) {
 			auto it = std::find_if(mapLoadCallbacksThreaded.begin(), mapLoadCallbacksThreaded.end(),
@@ -387,7 +387,7 @@ namespace EventHandler
 					cb.callback();
 			}
 		}
-	}
+	}*/
 
 	/*void registerCountdownStartCallback(const EventFunction callback, std::string name, bool threaded, bool runOnce)
 	{
