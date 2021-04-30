@@ -1,4 +1,4 @@
-// Copyright(c) 2015-present Gabi Melman & spdlog contributors.
+// Copyright(c) 2015-present, Gabi Melman & spdlog contributors.
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 #pragma once
@@ -10,7 +10,7 @@
 // dequeue_for(..) - will block until the queue is not empty or timeout have
 // passed.
 
-#include "spdlog/details/circular_q.h"
+#include <spdlog/details/circular_q.h>
 
 #include <condition_variable>
 #include <mutex>
@@ -59,7 +59,8 @@ public:
             {
                 return false;
             }
-            q_.pop_front(popped_item);
+            popped_item = std::move(q_.front());
+            q_.pop_front();
         }
         pop_cv_.notify_one();
         return true;
@@ -95,7 +96,8 @@ public:
         {
             return false;
         }
-        q_.pop_front(popped_item);
+        popped_item = std::move(q_.front());
+        q_.pop_front();
         pop_cv_.notify_one();
         return true;
     }
@@ -106,6 +108,12 @@ public:
     {
         std::unique_lock<std::mutex> lock(queue_mutex_);
         return q_.overrun_counter();
+    }
+
+    size_t size()
+    {
+        std::unique_lock<std::mutex> lock(queue_mutex_);
+        return q_.size();
     }
 
 private:
