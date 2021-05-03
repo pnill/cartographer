@@ -297,7 +297,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 		{
 			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
-			EventHandler::executeNetworkPlayerRemoveCallbacks(peer_index);
+			EventHandler::execute_callback<EventHandler::NetworkPlayerEvent>(execute_before, peer_index, EventHandler::NetworkPlayerEventType::remove);
 		}
 	}
 	//case parameters_update:
@@ -356,7 +356,8 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 		{
 			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
-			EventHandler::executeNetworkPlayerAddCallbacks(peer_index);
+			//EventHandler::executeNetworkPlayerAddCallbacks(peer_index);
+			EventHandler::execute_callback<EventHandler::NetworkPlayerEvent>(execute_after, peer_index, EventHandler::NetworkPlayerEventType::add);
 			CustomPackets::sendAntiCheat(peer_index);
 		}
 	}

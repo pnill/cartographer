@@ -27,7 +27,7 @@ namespace CustomVariantSettings
 	bool __cdecl DecodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data);
 
 	void RecieveCustomVariantSettings(s_variantSettings* data);
-	void SendCustomVariantSettings(int peer_index);
+	void SendCustomVariantSettings(int peerIndex);
 	void ApplyHooks();
 	void Initialize();
 }

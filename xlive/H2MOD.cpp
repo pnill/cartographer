@@ -737,7 +737,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 {
 	static bool resetAfterMatch = false;
 
-	//EventHandler::execute_callback(EventType::map_load, before, engine_settings->map_type);
+	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_before, engine_settings->map_type);
 	bool result = p_map_cache_load(engine_settings);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
@@ -805,6 +805,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	ControllerInput::SetSensitiviy(H2Config_controller_sens);
 	MouseInput::SetSensitivity(H2Config_mouse_sens);
 	HudElements::OnMapLoad();
+	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_after, engine_settings->map_type);
 	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 	{
 		addDebugText("Engine type: Multiplayer");
@@ -1286,8 +1287,7 @@ void EvaluateGameState()
 	game_life_cycle GameState = *Memory::GetAddress<game_life_cycle*>(0x420FC4, 0x3C40AC);
 	if (previousGamestate != GameState) {
 		previousGamestate = GameState;
-		EventHandler::executeGameStateCallbacks(GameState);
-		EventHandler::execute_callback<GameStateEvent>(gamestate_change, after, GameState);
+		EventHandler::execute_callback<EventHandler::GameStateEvent>(execute_after, GameState);
 	}
 }
 
@@ -1450,11 +1450,34 @@ char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, cha
 	if (canStart[0] && canStart[1]) 
 	{
 		//EventHandler::executeCountdownStartCallback();
-		EventHandler::execute_callback<CountdownStartEvent>(countdown_start, before);
-		return p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
+		EventHandler::execute_callback<EventHandler::CountdownStartEvent>(execute_before);
+		auto result =  p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
+		EventHandler::execute_callback<EventHandler::CountdownStartEvent>(execute_after);
+		return result;
 	}
 	else
 		return 0;
+}
+//TODO: Move this.
+void vip_lock(game_life_cycle state)
+{
+	if(state == life_cycle_post_game)
+	{
+		ServerConsole::ClearVip();
+		*Memory::GetAddress<byte*>(0, 0x534850) = 0;
+		//ServerConsole::SendCommand2(1, L"vip", L"clear");
+		//ServerConsole::SendCommand2(1, L"Privacy", L"Open");
+	}
+	if(state == life_cycle_in_game)
+	{
+		for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
+		{
+			ServerConsole::AddVip(NetworkSession::getPeerPlayerName(i));
+			//ServerConsole::SendCommand2(2, L"vip", L"add", NetworkSession::getPeerPlayerName(i));
+		}
+		//ServerConsole::SendCommand2(1, L"Privacy", L"VIP");
+		*Memory::GetAddress<byte*>(0, 0x534850) = 2;
+	}
 }
 
 void H2MOD::RegisterEvents()
@@ -1462,38 +1485,13 @@ void H2MOD::RegisterEvents()
 
 	if(!Memory::isDedicatedServer())//Client only callbacks	
 	{
-		
 
 	}
 	else //Server only callbacks
 	{
 		//Setup Events for H2Config_vip_lock
 		if(H2Config_vip_lock)
-		{
-			EventHandler::registerGameStateCallback({
-				"VIPLockClear",
-				life_cycle_post_game,
-				[]()
-				{
-					ServerConsole::ClearVip();
-					*Memory::GetAddress<byte*>(0, 0x534850) = 0;
-					//ServerConsole::SendCommand2(1, L"vip", L"clear");
-					//ServerConsole::SendCommand2(1, L"Privacy", L"Open");
-				}}, true);
-			EventHandler::registerGameStateCallback({
-				"VIPLockAdd",
-				life_cycle_in_game,
-				[]()
-				{
-					for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
-					{
-						ServerConsole::AddVip(NetworkSession::getPeerPlayerName(i));
-						//ServerConsole::SendCommand2(2, L"vip", L"add", NetworkSession::getPeerPlayerName(i));
-					}
-					//ServerConsole::SendCommand2(1, L"Privacy", L"VIP");
-					*Memory::GetAddress<byte*>(0, 0x534850) = 2;
-				}}, true);
-		}
+			EventHandler::register_callback<EventHandler::GameStateEvent>(vip_lock, execute_after, true);
 	}
 	//Things that apply to both
 	

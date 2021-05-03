@@ -71,9 +71,8 @@ void GSMainLoop() {
 	if(H2IsDediServer)
 	{
 		StatsHandler::verifyPlayerRanks();
-		
 	}
-	EventHandler::executeGameLoopCallbacks();
+	//EventHandler::executeGameLoopCallbacks();
 	/*
 	static bool halo2ServerOnce1 = false;
 	if (H2IsDediServer && !halo2ServerOnce1) {
@@ -133,8 +132,9 @@ void main_game_loop_hook() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 
+	EventHandler::execute_callback<EventHandler::GameLoopEvent>(execute_before);
 	main_game_loop();
-
+	EventHandler::execute_callback<EventHandler::GameLoopEvent>(execute_after);
 	extern void frameTimeManagement();
 	frameTimeManagement();
 }
@@ -578,8 +578,6 @@ void alt_main_game_loop_hook()
 		}
 		//game_main_loop();
 		//main_game_loop();
-	
-		EventHandler::executeGameLoopCallbacks();
 	}
 	if (H2Config_fps_limit != 0) {
 		QueryPerformanceCounter(&end_render);

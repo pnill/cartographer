@@ -41,25 +41,23 @@ namespace CustomVariantSettings
 		CurrentVariantSettings.HillRotation = data->HillRotation;
 	}
 
-	void SendCustomVariantSettings()
+	void SendCustomVariantSettings(int peerIndex)
 	{
 		network_session* session = NetworkSession::getCurrentNetworkSession();
 		if (NetworkSession::localPeerIsSessionHost())
 		{
-			//TODO: Find and mapout struct with current variant information.
+			//TODO: Find and map out struct with current variant information.
 			auto VariantName = std::wstring(Memory::GetAddress<wchar_t*>(0, 0x534A18));
 			if (CustomVariantSettingsMap.count(VariantName) > 0)
 			{
 				CurrentVariantSettings = CustomVariantSettingsMap.at(VariantName);
 				network_observer* observer = session->network_observer_ptr;
-				for (auto i = 0; i < NetworkSession::getPeerCount(); i++) {
-					peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(i);
-					if (i != -1 && i != session->local_peer_index && observer_channel->field_1)
-					{
-						observer->sendNetworkMessage(session->session_index, observer_channel->observer_index,
-				            network_observer::e_network_message_send_protocol::in_band, custom_variant_settings,
-                            CustomVariantSettingsPacketSize, &CustomVariantSettingsMap.at(VariantName));
-					}
+				peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peerIndex);
+				if (peerIndex != -1 && peerIndex != session->local_peer_index && observer_channel->field_1)
+				{
+					observer->sendNetworkMessage(session->session_index, observer_channel->observer_index,
+						network_observer::e_network_message_send_protocol::in_band, custom_variant_settings,
+						CustomVariantSettingsPacketSize, &CustomVariantSettingsMap.at(VariantName));
 				}
 			}
 		}
@@ -69,7 +67,7 @@ namespace CustomVariantSettings
 		CurrentVariantSettings = s_variantSettings();
 	}
 
-	void OnIngame(game_life_cycle state)
+	void OnGamestateChange(game_life_cycle state)
 	{
 		if (state == life_cycle_in_game) {
 			//
@@ -102,13 +100,20 @@ namespace CustomVariantSettings
 			}
 		}
 	}
-
+	void OnNetworkPlayerEvent(int peerIndex, EventHandler::NetworkPlayerEventType type)
+	{
+		if(type == EventHandler::NetworkPlayerEventType::add)
+		{
+			SendCustomVariantSettings(peerIndex);
+		}
+	}
 	void OnMatchCountdown()
 	{
 		//
 		//Anything host related before the game starts goes here.
 		//
-		SendCustomVariantSettings();
+		for(auto i = 0; i < NetworkSession::getPeerCount(); i++)
+			SendCustomVariantSettings(i);
 	}
 
 	typedef int(__cdecl c_get_next_hill_index)(int previousHill);
@@ -116,8 +121,6 @@ namespace CustomVariantSettings
 	signed int __cdecl get_next_hill_index(int previousHill)
 	{
 		int hillCount = *Memory::GetAddress<int*>(0x4dd0a8, 0x5008e8);
-		//The game stores the hills in an array that correlates them to which Netgame Flag option
-		auto hillMap = Memory::GetAddress<__int16*>(0x4DD0B0, 0x5008F0);
 
 		//Return -1 to tell the engine there is no koth hills on the map.
 		if (hillCount <= 0)
@@ -155,10 +158,7 @@ namespace CustomVariantSettings
 		//EventHandler::registerGameStateCallback({ "VariantSettings", life_cycle_in_game, OnIngame }, false);
 		//EventHandler::registerCountdownStartCallback(OnMatchCountdown, "VariantGameStart", true);
 		//EventHandler::register_callback(OnMatchCountdown, countdown_start, before, false, true);
-
-		EventHandler::register_callback<GameStateEvent>(OnIngame, gamestate_change);
-		EventHandler::register_callback<CountdownStartEvent>(OnMatchCountdown, countdown_start, after, true);
-		EventHandler::registerNetworkPlayerAddCallback(
+		/*EventHandler::registerNetworkPlayerAddCallback(
 			{
 				"VariantSettings",
 				[](int peer)
@@ -166,6 +166,11 @@ namespace CustomVariantSettings
 					SendCustomVariantSettings();
 				}
 			},
-			true);
+			true);*/
+
+		EventHandler::register_callback<EventHandler::GameStateEvent>(OnGamestateChange);
+		EventHandler::register_callback<EventHandler::CountdownStartEvent>(OnMatchCountdown, execute_after, true);
+		EventHandler::register_callback<EventHandler::NetworkPlayerEvent>(OnNetworkPlayerEvent, execute_after, true);
+
 	}
 }
