@@ -2,15 +2,16 @@
 
 #include "XnIp.h"
 #include "..\..\Cryptography\Rc4.h"
+
 #include "H2MOD\Modules\Config\Config.h"
-
 #include "H2MOD\Modules\Utils\Utils.h"
-
 #include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
 
 #include "..\NIC.h"
 
 #include "..\net_utils.h"
+
 
 CXnIp gXnIp;
 XECRYPT_RC4_STATE Rc4StateRand;
@@ -59,7 +60,45 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 	}
 }
 
-void CXnIp::LogConnectionsDetails(sockaddr_in* address, int errorCode)
+void CXnIp::LogConnectionsToConsole()
+{
+	if (GetRegisteredKeyCount() > 0)
+	{
+		commands->output(L"XNet connections: ");
+		LOG_CRITICAL_NETWORK(L"XNet connections: ");
+
+		for (int i = 0; i < GetMaxXnConnections(); i++)
+		{
+			std::wstring logString;
+			if (XnIPs[i].bValid)
+			{
+				XnIp* xnIp = &XnIPs[i];
+				logString +=
+					L"		Index: " + std::to_wstring(i) + L" " +
+					L"Packets sent: " + std::to_wstring(xnIp->pckSent) + L" " +
+					L"Packets received: " + std::to_wstring(xnIp->pckRecvd) + L" " +
+					L"Connect status: " + std::to_wstring(xnIp->connectStatus) + L" " +
+					L"Connection initiator: " + (xnIp->connectionInitiator ? L"yes" : L"no") + L" " +
+					L"Time since last interaction: " + std::to_wstring((float)(timeGetTime() - xnIp->lastConnectionInteractionTime) / 1000.f) + L" " +
+					L"Time since last packet received: " + std::to_wstring((float)(timeGetTime() - xnIp->lastPacketReceivedTime) / 1000.f);
+			}
+			else
+			{
+				logString += 
+					L"Unused connection index: " + std::to_wstring(i);
+			}
+			commands->output(logString);
+			LOG_CRITICAL_NETWORK(logString);
+		}
+	}
+	else
+	{
+		commands->output(L"Cannot log XNet connections when no keys are registerd (you need to host/be in a game)");
+		LOG_CRITICAL_NETWORK(L"Cannot log XNet connections when no keys are registerd (you need to host/be in a game)");
+	}
+}
+
+void CXnIp::LogConnectionsErrorDetails(sockaddr_in* address, int errorCode, const XNKID* receivedKey)
 {
 	LOG_CRITICAL_NETWORK("{} - tried to add XNADDR in the system, caused error: {}", __FUNCTION__, errorCode);
 
@@ -70,24 +109,48 @@ void CXnIp::LogConnectionsDetails(sockaddr_in* address, int errorCode)
 
 	if (keysRegisteredCount > 0)
 	{
+		for (int i = 0; i < keysRegisteredCount; i++)
+		{
+			if (XnKeyPairs[i].bValid)
+			{
+				LOG_TRACE_NETWORK("{} - registered session ID key: {}", __FUNCTION__, ByteToHexStr(XnKeyPairs[i].xnkid.ab, sizeof(XnKeyPairs[i].xnkey.ab)));
+			}
+		}
+
+		XnKeyPair* matchingKey = getKeyPair(receivedKey);
+
+		if (matchingKey == nullptr)
+		{
+			LOG_CRITICAL_NETWORK("{} - received key does not match any registered key!!", __FUNCTION__);
+			return;
+		}
+
 		LOG_CRITICAL_NETWORK("{} - registered key count: {}", __FUNCTION__, keysRegisteredCount);
 		for (int i = 0; i < GetMaxXnConnections(); i++)
 		{
 			if (XnIPs[i].bValid)
 			{
 				XnIp* xnIp = &XnIPs[i];
+				float connectionLastPacketReceivedSeconds = (float)(timeGetTime() - xnIp->lastConnectionInteractionTime) / 1000.f;
 				float connectionLastInteractionSeconds = (float)(timeGetTime() - xnIp->lastConnectionInteractionTime) / 1000.f;
-				LOG_CRITICAL_NETWORK("{} - connection index: {}, packets sent: {}, packets received: {}, time since last interaction: {:.4f} seconds", __FUNCTION__, i, xnIp->pckSent, xnIp->pckRecvd, connectionLastInteractionSeconds);
+				LOG_CRITICAL_NETWORK("{} - connection index: {}, packets sent: {}, packets received: {}, time since last interaction: {:.4f} seconds, time since last packet receive: {:.4f} seconds",
+					__FUNCTION__,
+					i,
+					xnIp->pckSent,
+					xnIp->pckRecvd,
+					connectionLastInteractionSeconds,
+					connectionLastPacketReceivedSeconds);
 			}
 			else
 			{
+				// we shouldn't ever get at this point
 				LOG_CRITICAL_NETWORK("{} - hold up pendejo, wtf - connection index: {}, we have free connection registry and couldn't use it.", __FUNCTION__, i);
 			}
 		}
 	}
 	else
 	{
-		LOG_CRITICAL_NETWORK("{} - no keys are registered, cannot create connections with no registered keys!", __FUNCTION__);
+		LOG_CRITICAL_NETWORK("{} - no keys are registered, cannot create connections with no registered keys!!", __FUNCTION__);
 	}
 }
 
@@ -156,13 +219,7 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 	}
 
 	lpFrom->sin_addr = ipIdentifier;
-	setTimeConnectionInteractionHappened(ipIdentifier);
-	XnIp* xnIp = getConnection(ipIdentifier);
-	if (xnIp != nullptr)
-	{
-		xnIp->pckRecvd++;
-		xnIp->bytesRecvd += *bytesRecvdCount;
-	}
+	updatePacketReceivedCounters(ipIdentifier, *bytesRecvdCount);
 
 	return 0;
 } 
@@ -247,7 +304,7 @@ void CXnIp::SaveNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier, sockaddr
 	}
 }
 
-void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* reqPacket, sockaddr_in* recvAddr, LPDWORD bytesRecvdCount)
+void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* reqPacket, sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount)
 {
 	IN_ADDR connectionIdentifier;
 	connectionIdentifier.s_addr = 0;
@@ -390,17 +447,17 @@ void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* r
 				break;
 			}
 
-			setTimeConnectionInteractionHappened(xnIp->connectionIdentifier);
 			// increase packets received count
-			xnIp->pckRecvd++;
-			if (bytesRecvdCount)
-				xnIp->bytesRecvd += *bytesRecvdCount;
+			int bytesReceivedCount = 0;
+			if (lpBytesRecvdCount)
+				bytesReceivedCount = *lpBytesRecvdCount;
+			updatePacketReceivedCounters(connectionIdentifier, bytesReceivedCount);
 		}
 	}
 	else
 	{
 		LOG_TRACE_NETWORK("{} - secure connection cannot be established!" __FUNCTION__);
-		LogConnectionsDetails(recvAddr, ret);
+		LogConnectionsErrorDetails(recvAddr, ret, &reqPacket->data.xnkid);
 		// TODO: send back the connection cannot be established
 	}
 }
@@ -894,7 +951,7 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 
 	if (ret != 0)
 	{
-		gXnIp.LogConnectionsDetails(nullptr, ret);
+		gXnIp.LogConnectionsErrorDetails(nullptr, ret, pxnkid);
 	}
 	 
 	LOG_INFO_NETWORK("{} - local-address: {:X}, online-address: {:X}", __FUNCTION__, pxna->ina.s_addr, pxna->inaOnline.s_addr);

@@ -121,6 +121,7 @@
     <ClCompile Include="H2MOD\Engine\Engine.cpp" />
     <ClCompile Include="H2MOD\Engine\Objects.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\OriginalFPSLimiter\OriginalFPSLimiter.cpp" />
+    <ClCompile Include="Util\curl-interface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -176,7 +177,6 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\posix.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\printf.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\ranges.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\time.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\fmt.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\ostr.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\formatter.h" />
@@ -390,6 +390,11 @@
     <ClInclude Include="Blam\Engine\Objects\GameStateObjects.h" />
     <ClInclude Include="H2MOD\Engine\Engine.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\OriginalFPSLimiter\OriginalFPSLimiter.h" />
+    <ClInclude Include="Util\curl-interface.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\argv.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\env.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\helpers.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\helpers-inl.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

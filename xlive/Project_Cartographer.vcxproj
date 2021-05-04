@@ -128,7 +128,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;d3d9.lib;d3dx9.lib;3rdparty/discord/discord-rpc.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdparty/discord/discord-rpc.lib;3rdparty/libcurl/libssl.lib;3rdparty/libcurl/libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -167,7 +167,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;MINIUPNP_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -191,7 +191,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;.\3rdparty\discord\discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdparty\discord\discord-rpc-debug.lib;3rdparty/libcurl/libssl.lib;3rdparty/libcurl/libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -323,6 +323,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Util\curl-interface.cpp" />
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
@@ -427,6 +428,10 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\async.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\async_logger-inl.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\async_logger.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\argv.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\env.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\helpers-inl.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\helpers.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\common-inl.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\common.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\details\circular_q.h" />
@@ -459,7 +464,6 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\posix.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\printf.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\ranges.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\time.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\fmt.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\ostr.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\formatter.h" />
@@ -575,6 +579,7 @@
     <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Util\curl-interface.h" />
     <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />

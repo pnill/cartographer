@@ -56,7 +56,6 @@ namespace imgui_handler
 				window.RenderFunc(&window.DoRender);
 			}
 		}
-		ImGui::EndFrame();
 		ImGui::Render();
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 	}
@@ -232,6 +231,7 @@ namespace imgui_handler
 		windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
 		windows.emplace_back("debug_overlay", false, DebugOverlay::Render, DebugOverlay::Open, DebugOverlay::Close);
 		windows.emplace_back("messagebox", false, iMessageBox::Render, iMessageBox::Open, iMessageBox::Close);
+		
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -263,29 +263,37 @@ namespace imgui_handler
 		const ImVec2 ButtonTextAlign(0.50, 0.50);
 		const ImVec2 SelectabletextAlign(0.0, 0.50);
 
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, wPadding);
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, fPadding);
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, iSpacing);
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, iiSpacing);
-		ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, indentSpacing);
-		ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, ScrollBarSize);
-		ImGui::PushStyleVar(ImGuiStyleVar_GrabMinSize, GrabMinSize);
+		// initialize default window style for each window
 
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, WindowBorderSize);
-		ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, ChildBorderSize);
-		ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, PopupBorderSize);
-		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, FrameBorderSize);
+		auto& ImDefaultStyle = ImGui::GetStyle();
 
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, WindowRound);
-		ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, ChildRounding);
-		ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, PopupRounding);
-		ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarRounding, ScrollbarRounding);
-		ImGui::PushStyleVar(ImGuiStyleVar_GrabRounding, GrabRounding);
-		ImGui::PushStyleVar(ImGuiStyleVar_TabRounding, TabRounding);
+		ImDefaultStyle.WindowPadding = wPadding;
+		ImDefaultStyle.FramePadding = fPadding;
+		ImDefaultStyle.ItemSpacing = iSpacing;
+		ImDefaultStyle.ItemInnerSpacing = iiSpacing;
+		ImDefaultStyle.IndentSpacing = indentSpacing;
 
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, WindowTitleAlign);
-		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ButtonTextAlign);
-		ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, SelectabletextAlign);
+		ImDefaultStyle.ScrollbarSize = ScrollBarSize;
+		ImDefaultStyle.GrabMinSize = GrabMinSize;
+
+		ImDefaultStyle.WindowBorderSize = WindowBorderSize;
+		ImDefaultStyle.ChildBorderSize = ChildBorderSize;
+		ImDefaultStyle.PopupBorderSize = PopupBorderSize;
+		ImDefaultStyle.FrameBorderSize = FrameBorderSize;
+
+		ImDefaultStyle.WindowRounding = WindowRound;
+		ImDefaultStyle.ChildRounding = ChildRounding;
+		ImDefaultStyle.PopupRounding = PopupRounding;
+		ImDefaultStyle.ScrollbarRounding = ScrollbarRounding;
+		ImDefaultStyle.GrabRounding = GrabRounding;
+		ImDefaultStyle.TabRounding = TabRounding;
+
+		ImDefaultStyle.WindowTitleAlign = WindowTitleAlign;
+		ImDefaultStyle.ButtonTextAlign = ButtonTextAlign;
+		ImDefaultStyle.SelectableTextAlign = SelectabletextAlign;
+
+		// default window style end
+
 		g_hWnd = hWnd;
 		g_pDevice = pDevice;
 		//	ImGuiIO& io = ImGui::GetIO();
@@ -320,7 +328,6 @@ namespace imgui_handler
 		io.KeyMap[ImGuiKey_Z] = 'Z';
 
 		ImFont* font1 = io.Fonts->AddFontDefault();
-
 
 		ImGui_ImplDX9_Init(pDevice);
 

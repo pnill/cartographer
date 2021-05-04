@@ -192,8 +192,6 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 	ZeroMemory(&addr, sizeof(network_address));
 	network_channel* peer_network_channel = network_channel::getNetworkChannel(network_channel_index);
 
-	
-
 	switch (message_type)
 	{
 	case request_map_filename:
@@ -231,20 +229,17 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				}
 			}
 		}
-		
 		return;
 	}
 
 	case custom_map_filename:
 	{
-		
 		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
 		{
 			s_custom_map_filename* received_data = (s_custom_map_filename*)packet;
 			mapManager->setMapFileNameToDownload(received_data->file_name);
 			LOG_DEBUG_NETWORK(L"[H2MOD-CustomPackets] received on handle_channel_message_hook custom_map_filename: {}", received_data->file_name);
 		}
-		
 		return;
 	}
 
@@ -255,29 +250,32 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			s_team_change* received_data = (s_team_change*)packet;
 			LOG_DEBUG_NETWORK(L"[H2MOD-CustomPackets] recieved on handle_channel_message_hook team_chage: {}", received_data->team_index);
 			h2mod->set_local_team_index(0, received_data->team_index);
-			return;
 		}
+		return;
 	}
-	case rank_change:
-		{
-			if(peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
-			{
-				s_rank_change* recieved_data = (s_rank_change*)packet;
-				LOG_DEBUG_NETWORK(L"H2MOD-CustomPackets] recieved on handle_channel_message_hook rank_change: {}", recieved_data->rank);
-				h2mod->set_local_rank(recieved_data->rank);
-				return;
 
-			}
-		}
-	case anti_cheat:
+	case rank_change:
+	{
+		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
 		{
-			if(peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
-			{
-				s_anti_cheat* recieved_data = (s_anti_cheat*)packet;
-				H2Config_anti_cheat_enabled = recieved_data->enabled;
-				return;
-			}
+			s_rank_change* recieved_data = (s_rank_change*)packet;
+			LOG_DEBUG_NETWORK(L"H2MOD-CustomPackets] recieved on handle_channel_message_hook rank_change: {}", recieved_data->rank);
+			h2mod->set_local_rank(recieved_data->rank);
 		}
+		return;
+	}
+
+	case anti_cheat:
+	{
+		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
+		{
+			s_anti_cheat* recieved_data = (s_anti_cheat*)packet;
+			H2Config_anti_cheat_enabled = recieved_data->enabled;
+		}
+		return;
+	}
+	
+	// default packet
 	case leave_session:
 	{
 		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
@@ -286,7 +284,9 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
 			EventHandler::executeNetworkPlayerRemoveCallbacks(peer_index);
 		}
+		break; // don't return, leave the game to update state
 	}
+
 	//case parameters_update:
 	//{
 	//	if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
@@ -322,9 +322,10 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 	//		}
 	//	}
 	//}
+
 	default:
 		break;
-	}
+	} // switch (message_type)
 
 	if (peer_network_channel->getNetworkAddressFromNetworkChannel(&addr)) 
 	{
