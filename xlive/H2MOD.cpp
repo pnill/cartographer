@@ -1299,18 +1299,28 @@ void __cdecl set_screen_bounds(signed int a1, signed int a2, __int16 a3, __int16
 	c_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
 }
 
-typedef char(_cdecl* startCountdownTimer)(char a1, int countdown_time, int a2, int a3, char a4);
-startCountdownTimer p_StartCountdownTimer;
-char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, char a4)
+bool __cdecl should_start_pregame_countdown_hook()
 {
-	bool canStart[2]{ false, false };
+	// dedicated server only
+	auto p_should_start_pregame_countdown_hook = Memory::GetAddressRelative<decltype(&should_start_pregame_countdown_hook)>(0x0, 0x40BC2A);
+
+	// store what the game thinks about starting the countdown timer
+	bool gameCheck = p_should_start_pregame_countdown_hook();
+
+	if (!gameCheck)
+		return false; // if the game already thinks the game timer doesn't need to start, return false and skip any processing
+
+	bool teamsAreValidConditionMet = false;
+	bool minimumPlayersConditionMet = false;
+
+	//network_session* networkSession = NetworkSession::getCurrentNetworkSession();
 
 	if (H2Config_minimum_player_start > 0)
 	{
 		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
 		{
 			LOG_DEBUG_GAME(L"Minimum Player count met.");
-			canStart[1] = true;
+			minimumPlayersConditionMet = true;
 		}
 		else
 		{
@@ -1319,11 +1329,11 @@ char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, cha
 	}
 	else
 	{
-		canStart[1] = true;
+		minimumPlayersConditionMet = true;
 	}
 
 	BYTE TeamPlay = *Memory::GetAddress<BYTE*>(0, 0x992880);
-	if (H2Config_force_even && TeamPlay == 1 && canStart[1])
+	if (H2Config_force_even && TeamPlay == 1 && minimumPlayersConditionMet)
 	{
 		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
 		LOG_DEBUG_GAME(L"Balancing teams");
@@ -1439,24 +1449,24 @@ char _cdecl StartCountdownTimer(char a1, int countdown_time, int a2, int a3, cha
 			}
 
 		if (validTeams == H2Config_team_enabled_count)
-			canStart[0] = true;
+			teamsAreValidConditionMet = true;
 	}
-	else 
+	else
 	{
-		canStart[0] = true;
+		teamsAreValidConditionMet = true;
 	}
 
 
-	if (canStart[0] && canStart[1]) 
-	{
-		//EventHandler::executeCountdownStartCallback();
+
+	if (teamsAreValidConditionMet && minimumPlayersConditionMet)
+  {
 		EventHandler::execute_callback<EventHandler::CountdownStartEvent>(execute_before);
 		auto result =  p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
 		EventHandler::execute_callback<EventHandler::CountdownStartEvent>(execute_after);
 		return result;
 	}
 	else
-		return 0;
+		return false;
 }
 //TODO: Move this.
 void vip_lock(game_life_cycle state)
@@ -1620,8 +1630,7 @@ void H2MOD::ApplyHooks() {
 	else {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
-		p_StartCountdownTimer = Memory::GetAddress<startCountdownTimer>(0, 0x19718A);
-		PatchCall(Memory::GetAddress(0, 0xBF54), StartCountdownTimer);
+		PatchCall(Memory::GetAddressRelative(0, 0x40BF43), should_start_pregame_countdown_hook);
 		ServerConsole::ApplyHooks();
 
 		p_get_enabled_teams_flags = (get_enabled_teams_flags_def)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x19698B), (BYTE*)get_enabled_teams_flags, 6);

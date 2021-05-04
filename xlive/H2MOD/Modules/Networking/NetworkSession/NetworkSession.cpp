@@ -99,7 +99,7 @@ wchar_t* NetworkSession::getPeerPlayerName(int peerIndex)
 /* Otherwise you will wonder why you don't get the right data/player index etc. */
 bool NetworkSession::playerIsActive(int playerIndex)
 {
-	return FLAG(playerIndex) & NetworkSession::getCurrentNetworkSession()->membership.players_active_mask;
+	return NetworkSession::getCurrentNetworkSession()->membership.players_active_mask & FLAG(playerIndex);
 }
 
 int NetworkSession::getPlayerCount()
@@ -225,7 +225,7 @@ void NetworkSession::logPlayersToConsole() {
 		}
 		playerIndex++;
 	} 
-	while (playerIndex < 16);
+	while (playerIndex < ENGINE_PLAYER_MAX);
 
 	std::wstring total_players = L"Total players: " + std::to_wstring(getPlayerCount());
 	commands->output(total_players);
@@ -239,9 +239,13 @@ void NetworkSession::logPeersToConsole() {
 		int peerIndex = 0;
 		do 
 		{
+			auto peer_observer = &observer->observers[getCurrentNetworkSession()->peer_observer_channels[peerIndex].observer_index];
+
 			std::wstring outStr = L"Peer index=" + std::to_wstring(peerIndex);
 			outStr += L", Peer Name=";
 			outStr += getCurrentNetworkSession()->membership.peer_info[peerIndex].name;
+			outStr += L", Connection Status=";
+			outStr += std::to_wstring(peer_observer->unk_state);
 			int playerIndex = getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index[0];
 			if (playerIndex != -1) 
 			{

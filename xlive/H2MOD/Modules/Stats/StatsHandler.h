@@ -79,43 +79,28 @@ public:
 			}
 		}
 	}
-	static void sendRankChange(bool forceAll = false)
-	{
-		if (NetworkSession::localPeerIsSessionHost() && RegisteredStatus().RanksEnabled && Engine::get_game_life_cycle() == life_cycle_pre_game)
-		{
-			auto document = getPlayerRanks(forceAll);
-			if (document.MemberCount() != 0)
-			{
-				for (auto i = 0; i < document.MemberCount(); i++)
-				{
-					std::string::size_type sz = 0;
-					long long xuid = std::stoll(document[i]["XUID"].GetString(), &sz, 0);
-					int peer = NetworkSession::getPeerIndexFromXUID(xuid);
-					if(peer != NetworkSession::getLocalPeerIndex())
-					{
-						byte rank = std::stoi(document[i]["Rank"].GetString(), nullptr);
-						CustomPackets::sendRankChange(peer, rank);
-					}
-				}
-			}
-		}
-	}
+
+	static void sendRankChangeFromDocument(rapidjson::Document* document);
+	
 	struct StatsAPIRegisteredStatus
 	{
 		bool Registered = false;
 		bool StatsEnabled = false;
 		bool RanksEnabled = false;
 	};
+
+	static std::string buildPlayerRankUpdateQueryStringList();
+	static void StatsHandler::getPlayerRanksByStringList(std::string& playerList);
+
 	static void init();
 	static void InvalidateMatch(bool state);
-	static void verifyPlayerRanks();
+	static void playerRanksUpdateTick();
 	static void verifyRegistrationStatus();
 	static StatsAPIRegisteredStatus RegisteredStatus();
 	static char* checkServerRegistration();
 	static bool serverRegistration(char* authKey);
 	static char* getAPIToken();
 	static bool serverLogin();
-	static rapidjson::Document getPlayerRanks(bool forceAll = false);
 	static int verifyPlaylist(char* token);
 	static int uploadPlaylist(char* token);
 	typedef rapidjson::GenericDocument<rapidjson::UTF16<>> WDocument;

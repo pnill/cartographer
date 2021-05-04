@@ -1,14 +1,26 @@
-// Copyright(c) 2015-present Gabi Melman & spdlog contributors.
+// Copyright(c) 2015-present, Gabi Melman & spdlog contributors.
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 #pragma once
 
 #ifndef SPDLOG_HEADER_ONLY
-#include "spdlog/sinks/base_sink.h"
+#include <spdlog/sinks/base_sink.h>
 #endif
 
-#include "spdlog/common.h"
-#include "spdlog/details/pattern_formatter.h"
+#include <spdlog/common.h>
+#include <spdlog/pattern_formatter.h>
+
+#include <memory>
+
+template<typename Mutex>
+SPDLOG_INLINE spdlog::sinks::base_sink<Mutex>::base_sink()
+    : formatter_{details::make_unique<spdlog::pattern_formatter>()}
+{}
+
+template<typename Mutex>
+SPDLOG_INLINE spdlog::sinks::base_sink<Mutex>::base_sink(std::unique_ptr<spdlog::formatter> formatter)
+    : formatter_{std::move(formatter)}
+{}
 
 template<typename Mutex>
 void SPDLOG_INLINE spdlog::sinks::base_sink<Mutex>::log(const details::log_msg &msg)

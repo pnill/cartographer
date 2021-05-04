@@ -12,8 +12,6 @@
 
 using namespace rapidjson;
 
-extern unsigned short H2Config_base_port;
-
 std::mutex ServerListRequestInProgress;
 
 std::mutex ServerListRequestsMutex;
@@ -82,8 +80,7 @@ void ServerList::QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESU
 
 	if (curl) {
 
-		std::string server_url = std::string(cartographerURL + "/live/servers/");
-		server_url.append(std::to_string(xuid).c_str());
+		std::string server_url = std::string(cartographerURL + "/live/servers/" + std::to_string(xuid));
 
 		curl_easy_setopt(curl, CURLOPT_URL, server_url.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -385,9 +382,11 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 
 	this->total_servers = 0;
 
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (curl) {
-		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/server_list.php"));
+		std::string url(cartographerURL + "/live/server_list.php");
+
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
@@ -466,9 +465,11 @@ void ServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 	CURLcode res;
 	std::string readBuffer;
 
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (curl) {
-		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/dedicount.php"));
+		std::string url(cartographerURL + "/live/dedicount.php");
+
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
@@ -574,7 +575,7 @@ void ServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 	pOverlapped->InternalHigh = 0;
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (curl)
 	{
 		rapidjson::Document document;
@@ -590,7 +591,9 @@ void ServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
 
-		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/del_server.php"));
+		std::string url(cartographerURL + "/live/del_server.php");
+
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);
@@ -616,9 +619,8 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 	pOverlapped->InternalHigh = 0; // this shouldn't even be checked by game's code, but for some reason it gets in Halo 2, InternalHIgh is used for enumerating data, where it holds how many elemets were retreived
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
-	curl = curl_easy_init();
+	curl = curl_interface_init_no_ssl();
 	if (curl) {
-
 		rapidjson::Document document;
 		document.SetObject();
 
@@ -703,7 +705,9 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
 
-		curl_easy_setopt(curl, CURLOPT_URL, std::string(cartographerURL + "/live/add_server.php"));
+		std::string url(cartographerURL + "/live/add_server.php");
+
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);

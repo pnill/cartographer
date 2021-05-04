@@ -1,17 +1,17 @@
-// Copyright(c) 2015-present Gabi Melman & spdlog contributors.
+// Copyright(c) 2015-present, Gabi Melman & spdlog contributors.
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 #pragma once
 
 #ifndef SPDLOG_HEADER_ONLY
-#include "spdlog/sinks/rotating_file_sink.h"
+#include <spdlog/sinks/rotating_file_sink.h>
 #endif
 
-#include "spdlog/common.h"
+#include <spdlog/common.h>
 
-#include "spdlog/details/file_helper.h"
-#include "spdlog/details/null_mutex.h"
-#include "spdlog/fmt/fmt.h"
+#include <spdlog/details/file_helper.h>
+#include <spdlog/details/null_mutex.h>
+#include <spdlog/fmt/fmt.h>
 
 #include <cerrno>
 #include <chrono>
@@ -43,31 +43,28 @@ SPDLOG_INLINE rotating_file_sink<Mutex>::rotating_file_sink(
 template<typename Mutex>
 SPDLOG_INLINE filename_t rotating_file_sink<Mutex>::calc_filename(const filename_t &filename, std::size_t index)
 {
-    typename std::conditional<std::is_same<filename_t::value_type, char>::value, fmt::memory_buffer, fmt::wmemory_buffer>::type w;
-    if (index != 0u)
+    if (index == 0u)
     {
-        filename_t basename, ext;
-        std::tie(basename, ext) = details::file_helper::split_by_extension(filename);
-        fmt::format_to(w, SPDLOG_FILENAME_T("{}.{}{}"), basename, index, ext);
+        return filename;
     }
-    else
-    {
-        fmt::format_to(w, SPDLOG_FILENAME_T("{}"), filename);
-    }
-    return fmt::to_string(w);
+
+    filename_t basename, ext;
+    std::tie(basename, ext) = details::file_helper::split_by_extension(filename);
+    return fmt::format(SPDLOG_FILENAME_T("{}.{}{}"), basename, index, ext);
 }
 
 template<typename Mutex>
-SPDLOG_INLINE const filename_t &rotating_file_sink<Mutex>::filename() const
+SPDLOG_INLINE filename_t rotating_file_sink<Mutex>::filename()
 {
+    std::lock_guard<Mutex> lock(base_sink<Mutex>::mutex_);
     return file_helper_.filename();
 }
 
 template<typename Mutex>
 SPDLOG_INLINE void rotating_file_sink<Mutex>::sink_it_(const details::log_msg &msg)
 {
-    fmt::memory_buffer formatted;
-    sink::formatter_->format(msg, formatted);
+    memory_buf_t formatted;
+    base_sink<Mutex>::formatter_->format(msg, formatted);
     current_size_ += formatted.size();
     if (current_size_ > max_size_)
     {
@@ -92,27 +89,28 @@ template<typename Mutex>
 SPDLOG_INLINE void rotating_file_sink<Mutex>::rotate_()
 {
     using details::os::filename_to_str;
+    using details::os::path_exists;
     file_helper_.close();
     for (auto i = max_files_; i > 0; --i)
     {
         filename_t src = calc_filename(base_filename_, i - 1);
-        if (!details::file_helper::file_exists(src))
+        if (!path_exists(src))
         {
             continue;
         }
         filename_t target = calc_filename(base_filename_, i);
 
-        if (!rename_file(src, target))
+        if (!rename_file_(src, target))
         {
             // if failed try again after a small delay.
             // this is a workaround to a windows issue, where very high rotation
             // rates can cause the rename to fail with permission denied (because of antivirus?).
             details::os::sleep_for_millis(100);
-            if (!rename_file(src, target))
+            if (!rename_file_(src, target))
             {
                 file_helper_.reopen(true); // truncate the log file anyway to prevent it to grow beyond its limit!
                 current_size_ = 0;
-                throw spdlog_ex("rotating_file_sink: failed renaming " + filename_to_str(src) + " to " + filename_to_str(target), errno);
+                throw_spdlog_ex("rotating_file_sink: failed renaming " + filename_to_str(src) + " to " + filename_to_str(target), errno);
             }
         }
     }
@@ -122,7 +120,7 @@ SPDLOG_INLINE void rotating_file_sink<Mutex>::rotate_()
 // delete the target if exists, and rename the src file  to target
 // return true on success, false otherwise.
 template<typename Mutex>
-SPDLOG_INLINE bool rotating_file_sink<Mutex>::rename_file(const filename_t &src_filename, const filename_t &target_filename)
+SPDLOG_INLINE bool rotating_file_sink<Mutex>::rename_file_(const filename_t &src_filename, const filename_t &target_filename)
 {
     // try to delete the target file in case it already exists.
     (void)details::os::remove(target_filename);
