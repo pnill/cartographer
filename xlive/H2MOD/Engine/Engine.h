@@ -6,6 +6,8 @@ namespace Engine
 {
 	game_life_cycle get_game_life_cycle();
 	bool __cdecl IsGameMinimized();
+	e_engine_type get_current_engine_type();
+	int get_global_random_seed_address();
 
 	namespace Unit
 	{

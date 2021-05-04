@@ -3,7 +3,7 @@
 
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Utils/Utils.h"
 
 typedef void*(__cdecl *dedi_command_hook)(wchar_t** a1, int a2, char a3);
@@ -31,7 +31,7 @@ void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, ch
 	std::transform(LowerCommand.begin(), LowerCommand.end(), LowerCommand.begin(),[](unsigned char c) { return std::tolower(c); });
 
 	//Execute any events that may be linked to that command.
-	EventHandler::executeServerCommandCallback(ServerConsole::s_commandsMap[LowerCommand]);
+	//EventHandler::executeServerCommandCallback(ServerConsole::s_commandsMap[LowerCommand]);
 
 	//Commented out because it's unused but the functionality of it remains, incase it is ever needed in the future for modifying the behaviour of the commands.
 	/*switch(ServerConsole::s_commandsMap[LowerCommand])
@@ -56,8 +56,10 @@ void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, ch
 		case ServerConsole::vip: break;
 		default: ;
 	}*/
-	
-	return p_dedi_command_hook(command_line_args, split_strings, a3);
+	EventHandler::execute_callback<EventHandler::ServerCommandEvent>(execute_before, ServerConsole::s_commandsMap[LowerCommand]);
+	auto res = p_dedi_command_hook(command_line_args, split_strings, a3);
+	EventHandler::execute_callback<EventHandler::ServerCommandEvent>(execute_after, ServerConsole::s_commandsMap[LowerCommand]);
+	return res;
 }
 
 void ServerConsole::ApplyHooks()

@@ -14,7 +14,7 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "H2MOD/Modules/HudElements/HudElements.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
@@ -29,6 +29,8 @@
 #include "H2MOD/Modules/HitFix/MeleeFix.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "Blam/Engine/Objects/GameStateObjects.h"
+#include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -735,6 +737,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 {
 	static bool resetAfterMatch = false;
 
+	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_before, engine_settings->map_type);
 	bool result = p_map_cache_load(engine_settings);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
@@ -802,6 +805,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	ControllerInput::SetSensitiviy(H2Config_controller_sens);
 	MouseInput::SetSensitivity(H2Config_mouse_sens);
 	HudElements::OnMapLoad();
+	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_after, engine_settings->map_type);
 	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 	{
 		addDebugText("Engine type: Multiplayer");
@@ -828,7 +832,8 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		}
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
-		EventHandler::executeMapLoadCallback(e_engine_type::Multiplayer);
+		//EventHandler::executeMapLoadCallback(e_engine_type::Multiplayer);
+		//EventHandler::execute_callback(EventType::map_load, after, Multiplayer);
 
 		if (Engine::get_game_life_cycle() == life_cycle_in_game)
 		{
@@ -860,7 +865,8 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		//H2X::Initialize(true);
 		MeleeFix::MeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
-		EventHandler::executeMapLoadCallback(e_engine_type::SinglePlayer);
+		//EventHandler::executeMapLoadCallback(e_engine_type::SinglePlayer);
+		//EventHandler::execute_callback(EventType::map_load, after, SinglePlayer);
 	}
 
 	// if we got this far, it means map is MP or SP, and if map load is called again, it should reset/deinitialize any custom gametypes
@@ -1244,20 +1250,6 @@ short __cdecl get_enabled_teams_flags(network_session* session)
 		return default_teams_enabled_flags;
 }
 
-typedef int(__cdecl* getnexthillindex)(int previousHill);
-getnexthillindex p_get_next_hill_index;
-signed int __cdecl get_next_hill_index(int previousHill)
-{
-	int hillCount = *Memory::GetAddress<int*>(0x4dd0a8, 0x5008e8);
-	if (previousHill + 1 >= hillCount) 
-	{
-		//LOG_TRACE_GAME("[KoTH Behavior] Hill Count: {} Current Hill: {} Next Hill: {}", hillCount, previousHill, 0);
-		return 0;
-	}
-	//LOG_TRACE_GAME("[KoTH Behavior] Hill Count: {} Current Hill: {} Next Hill: {}", hillCount, previousHill, previousHill + 1);
-	return previousHill + 1;
-}
-
 void H2MOD::ApplyUnitHooks()
 {
 	// increase the size of the unit entity creation definition packet
@@ -1286,16 +1278,16 @@ void H2MOD::ApplyUnitHooks()
 }
 
 
-static BYTE previousGamestate = 0;
+static game_life_cycle previousGamestate = life_cycle_none;
 typedef int(__thiscall* ChangeGameState)(BYTE* this_);
 ChangeGameState p_EvaulateGameState;
 void EvaluateGameState()
 {
 	p_EvaulateGameState(Memory::GetAddress<BYTE*>(0x420FC4, 0x3C40AC));
-	BYTE GameState = *Memory::GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
+	game_life_cycle GameState = *Memory::GetAddress<game_life_cycle*>(0x420FC4, 0x3C40AC);
 	if (previousGamestate != GameState) {
 		previousGamestate = GameState;
-		EventHandler::executeGameStateCallbacks(GameState);
+		EventHandler::execute_callback<EventHandler::GameStateEvent>(execute_after, GameState);
 	}
 }
 
@@ -1465,10 +1457,37 @@ bool __cdecl should_start_pregame_countdown_hook()
 	}
 
 
+
 	if (teamsAreValidConditionMet && minimumPlayersConditionMet)
-		return true; // if we got this far, the game already thinks the countdown should start, therefore just return true
+  {
+		EventHandler::execute_callback<EventHandler::CountdownStartEvent>(execute_before);
+		auto result =  p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
+		EventHandler::execute_callback<EventHandler::CountdownStartEvent>(execute_after);
+		return result;
+	}
 	else
 		return false;
+}
+//TODO: Move this.
+void vip_lock(game_life_cycle state)
+{
+	if(state == life_cycle_post_game)
+	{
+		ServerConsole::ClearVip();
+		*Memory::GetAddress<byte*>(0, 0x534850) = 0;
+		//ServerConsole::SendCommand2(1, L"vip", L"clear");
+		//ServerConsole::SendCommand2(1, L"Privacy", L"Open");
+	}
+	if(state == life_cycle_in_game)
+	{
+		for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
+		{
+			ServerConsole::AddVip(NetworkSession::getPeerPlayerName(i));
+			//ServerConsole::SendCommand2(2, L"vip", L"add", NetworkSession::getPeerPlayerName(i));
+		}
+		//ServerConsole::SendCommand2(1, L"Privacy", L"VIP");
+		*Memory::GetAddress<byte*>(0, 0x534850) = 2;
+	}
 }
 
 void H2MOD::RegisterEvents()
@@ -1476,38 +1495,13 @@ void H2MOD::RegisterEvents()
 
 	if(!Memory::isDedicatedServer())//Client only callbacks	
 	{
-		
 
 	}
 	else //Server only callbacks
 	{
 		//Setup Events for H2Config_vip_lock
 		if(H2Config_vip_lock)
-		{
-			EventHandler::registerGameStateCallback({
-				"VIPLockClear",
-				life_cycle_post_game,
-				[]()
-				{
-					ServerConsole::ClearVip();
-					*Memory::GetAddress<byte*>(0, 0x534850) = 0;
-					//ServerConsole::SendCommand2(1, L"vip", L"clear");
-					//ServerConsole::SendCommand2(1, L"Privacy", L"Open");
-				}}, true);
-			EventHandler::registerGameStateCallback({
-				"VIPLockAdd",
-				life_cycle_in_game,
-				[]()
-				{
-					for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
-					{
-						ServerConsole::AddVip(NetworkSession::getPeerPlayerName(i));
-						//ServerConsole::SendCommand2(2, L"vip", L"add", NetworkSession::getPeerPlayerName(i));
-					}
-					//ServerConsole::SendCommand2(1, L"Privacy", L"VIP");
-					*Memory::GetAddress<byte*>(0, 0x534850) = 2;
-				}}, true);
-		}
+			EventHandler::register_callback<EventHandler::GameStateEvent>(vip_lock, execute_after, true);
 	}
 	//Things that apply to both
 	
@@ -1538,10 +1532,6 @@ void H2MOD::ApplyHooks() {
 
 	// hook to initialize stuff before game start
 	p_map_cache_load = (map_cache_load)DetourFunc(Memory::GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
-
-	//get next hill index hook
-	if(!H2Config_koth_random)
-		p_get_next_hill_index = (getnexthillindex)DetourFunc(Memory::GetAddress<BYTE*>(0x10DF1E, 0xDA4CE), (BYTE*)get_next_hill_index, 9);
 
 	// player spawn hook
 	p_player_spawn = (player_spawn)DetourFunc(Memory::GetAddress<BYTE*>(0x55952, 0x5DE4A), (BYTE*)OnPlayerSpawn, 6);
@@ -1676,6 +1666,11 @@ void H2MOD::Initialize()
 		
 		
 	}
+	else
+	{
+		playlist_loader::initialize();
+	}
+	CustomVariantSettings::Initialize();
 	TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();

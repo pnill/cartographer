@@ -6,6 +6,7 @@
 #include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 
 extern bool Registered;
 class StatsHandler
@@ -110,4 +111,7 @@ public:
 	static int uploadStats(char* filepath, char* token);
 	static void playerLeftEvent(int peerIndex);
 	static void playerJoinEvent(int peerIndex);
+	static void game_state_change(game_life_cycle state);
+	static void network_player_event(int peerIndex, EventHandler::NetworkPlayerEventType type);
+	static void server_command_event(ServerConsole::ServerConsoleCommands command);
 };
