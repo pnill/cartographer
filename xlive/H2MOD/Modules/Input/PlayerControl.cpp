@@ -8,9 +8,8 @@ c_UpdatePlayerControl* p_UpdatePlayerControl;
 
 void __cdecl UpdatePlayerControl(float yawChange, float pitchChange)
 {
-	EventHandler::execute_callback<EventHandler::PlayerControlEvent>(execute_before, yawChange, pitchChange);
 	p_UpdatePlayerControl(yawChange, pitchChange);
-	EventHandler::execute_callback<EventHandler::PlayerControlEvent>(execute_after, yawChange, pitchChange);
+	//EventHandler::execute_callback<EventHandler::PlayerControlEvent>(execute_after, &yawChange, &pitchChange);
 	//EventHandler::executePlayerControlCallback(yawChange, pitchChange);
 }
 

@@ -132,9 +132,9 @@ void main_game_loop_hook() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 
-	EventHandler::execute_callback<EventHandler::GameLoopEvent>(execute_before);
+	//EventHandler::execute_callback<EventHandler::GameLoopEvent>(execute_before);
 	main_game_loop();
-	EventHandler::execute_callback<EventHandler::GameLoopEvent>(execute_after);
+	//EventHandler::execute_callback<EventHandler::GameLoopEvent>(execute_after);
 	extern void frameTimeManagement();
 	frameTimeManagement();
 }

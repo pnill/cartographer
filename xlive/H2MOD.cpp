@@ -1459,11 +1459,9 @@ bool __cdecl should_start_pregame_countdown_hook()
 
 
 	if (teamsAreValidConditionMet && minimumPlayersConditionMet)
-  {
-		EventHandler::execute_callback<EventHandler::CountdownStartEvent>(execute_before);
-		auto result =  p_StartCountdownTimer(1, countdown_time, a2, a3, a4);
+	{
 		EventHandler::execute_callback<EventHandler::CountdownStartEvent>(execute_after);
-		return result;
+		return true;
 	}
 	else
 		return false;
@@ -1630,7 +1628,7 @@ void H2MOD::ApplyHooks() {
 	else {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
-		PatchCall(Memory::GetAddressRelative(0, 0x40BF43), should_start_pregame_countdown_hook);
+		PatchCall(Memory::GetAddress(0x0,0xBF43), should_start_pregame_countdown_hook);
 		ServerConsole::ApplyHooks();
 
 		p_get_enabled_teams_flags = (get_enabled_teams_flags_def)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x19698B), (BYTE*)get_enabled_teams_flags, 6);

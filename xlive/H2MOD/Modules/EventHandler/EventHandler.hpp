@@ -2,6 +2,22 @@
 #include "Blam/Common/Common.h"
 #include "H2MOD/Modules/ServerConsole/ServerConsole.h"
 
+/*
+ * To Setup a new Event you need to add an enum to EventType above the none enum
+ * Then inside EventHandler you need to create a function alias type use the current ones as an example
+ *  - CountdownStartEvent
+ *  - GameStateEvent
+ *  
+ *  Then where ever the event needs to be triggered you can decide if you want the execution to be before or after
+ *  the triggering circumstances
+ *  
+ *  EventHandler::execute_callback<Alias Type>(EventExecutionType, Additional parameters for the alias type);
+ *  EventHandler::execute_callback<EventHandler::PlayerControlEvent>(execute_before, &yawChange, &pitchChange);
+ *  EventHandler::execute_callback<EventHandler::PlayerControlEvent>(execute_after, &yawChange, &pitchChange);
+ */
+
+
+
 enum EventType
 {
 	network_player,
@@ -53,14 +69,14 @@ namespace EventHandler
 	using NetworkPlayerEvent = void(*)(int peerIndex, NetworkPlayerEventType type);
 	using GameLoopEvent = void(*)();
 	using ServerCommandEvent = void(*)(ServerConsole::ServerConsoleCommands command);
-	using PlayerControlEvent = void(*)(float yaw, float pitch);
+	using PlayerControlEvent = void(*)(float* yaw, float* pitch);
 	using MapLoadEvent = void(*)(e_engine_type type);
 	/**
 	 * \brief Takes the alias type and returns the corresponding EventType
 	 * \tparam T alias event type
 	 * \return EventType::
 	 */
-	template<typename T> static inline EventType get_type()
+	template<typename T> static EventType get_type()
 	{
 		if (std::is_same<T, GameStateEvent>::value)
 			return EventType::gamestate_change;
@@ -84,7 +100,7 @@ namespace EventHandler
 	 * \param type the event type
 	 * \return std::vector<EventCallback<void*>>
 	 */
-	static inline std::vector<EventCallback<void*>>* get_vector(EventType type)
+	static std::vector<EventCallback<void*>>* get_vector(EventType type)
 	{
 		//If the map doesn't contain a vector for the type create one
 		if (event_map.count(type) == 0)
@@ -99,7 +115,7 @@ namespace EventHandler
 	 * \param callback pointer to the callback to be removed
 	 * \param execution_type the execution type of the method to be removed
 	 */
-	template<typename T> static inline void remove_callback(const T callback, EventExecutionType execution_type)
+	template<typename T> static void remove_callback(const T callback, EventExecutionType execution_type)
 	{
 		auto type = get_type<T>();
 		std::vector<EventCallback<void*>>* events = get_vector(type);
@@ -117,7 +133,7 @@ namespace EventHandler
 	 * \tparam T event alias type
 	 * \param execution_type 
 	 */
-	template<typename T> static inline void cleanup_callbacks(EventExecutionType execution_type)
+	template<typename T> static void cleanup_callbacks(EventExecutionType execution_type)
 	{
 		auto type = get_type<T>();
 		std::vector<EventCallback<void*>>* events = get_vector(type);
@@ -138,7 +154,7 @@ namespace EventHandler
 	 * \param threaded tells the executor to only run this callback in a threaded manner
 	 * \param run_once flags the callback to only be ran once and then erased afterwards.
 	 */
-	template<typename T> static inline void register_callback(const T callback, EventExecutionType execution_type = execute_after, bool threaded = false, bool run_once = false)
+	template<typename T> static void register_callback(const T callback, EventExecutionType execution_type = execute_after, bool threaded = false, bool run_once = false)
 	{
 		auto type = get_type<T>();
 		if(type != EventType::none)
@@ -172,6 +188,8 @@ namespace EventHandler
 			}
 			cleanup_callbacks<T>(execution_type);
 		};
+
+		LOG_TRACE_GAME("[{}]: {} ", __FUNCSIG__, execution_type);
 		execute_internal(execution_type, false);
 		std::thread(execute_internal, execution_type, true).detach();
 		

@@ -3,7 +3,7 @@
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "rapidjson/writer.h"
 #include "H2MOD/Modules/Startup/Startup.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 
 static const bool verbose = true;
 bool Registered = false;
@@ -112,7 +112,6 @@ void StatsHandler::game_state_change(game_life_cycle state)
 			}
 			else
 			{
-				sendRankChange(true);
 				InvalidateMatch(false);
 				return;
 			}
