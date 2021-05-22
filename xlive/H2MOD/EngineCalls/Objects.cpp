@@ -1,6 +1,6 @@
 #include "Engine.h"
 
-namespace Engine
+namespace EngineCalls
 {
 	namespace Objects
 	{

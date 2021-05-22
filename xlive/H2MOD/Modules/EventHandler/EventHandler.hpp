@@ -1,6 +1,7 @@
 #pragma once
 #include "Blam/Common/Common.h"
 #include "H2MOD/Modules/ServerConsole/ServerConsole.h"
+#include "Blam/Cache/DataTypes/DatumIndex.h"
 
 /*
  * To Setup a new Event you need to add an enum to EventType above the none enum
@@ -14,6 +15,9 @@
  *  EventHandler::execute_callback<Alias Type>(EventExecutionType, Additional parameters for the alias type);
  *  EventHandler::execute_callback<EventHandler::PlayerControlEvent>(execute_before, &yawChange, &pitchChange);
  *  EventHandler::execute_callback<EventHandler::PlayerControlEvent>(execute_after, &yawChange, &pitchChange);
+ *  
+ *  Registering a callback should only happen in a state where the game engine should not actively be firing any callbacks.
+ *  I.E NOT IN GAME.
  */
 
 
@@ -27,6 +31,9 @@ enum EventType
 	map_load,
 	countdown_start,
 	player_control,
+	blue_screen,
+	player_spawn_event,
+	player_death_event,
 	none = -1
 };
 enum EventExecutionType
@@ -71,6 +78,9 @@ namespace EventHandler
 	using ServerCommandEvent = void(*)(ServerConsole::ServerConsoleCommands command);
 	using PlayerControlEvent = void(*)(float* yaw, float* pitch);
 	using MapLoadEvent = void(*)(e_engine_type type);
+	using BlueScreenEvent = void(*)();
+	using PlayerSpawnEvent = void(*)(datum PlayerDatum);
+	using PlayerDeathEvent = void(*)(datum PlayerDatum, datum KillerDatum);
 	/**
 	 * \brief Takes the alias type and returns the corresponding EventType
 	 * \tparam T alias event type
@@ -92,6 +102,12 @@ namespace EventHandler
 			return EventType::player_control;
 		if (std::is_same<T, MapLoadEvent>::value)
 			return EventType::map_load;
+		if (std::is_same<T, BlueScreenEvent>::value)
+			return EventType::blue_screen;
+		if (std::is_same<T, PlayerSpawnEvent>::value)
+			return EventType::player_spawn_event;
+		if (std::is_same<T, PlayerDeathEvent>::value)
+			return EventType::player_death_event;
 		return EventType::none;
 	}
 	

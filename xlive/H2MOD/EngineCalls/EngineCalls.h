@@ -2,7 +2,7 @@
 #include "Blam/Cache/DataTypes/DatumIndex.h"
 #include "Blam/Engine/Objects/ObjectPlacementData.h"
 
-namespace Engine
+namespace EngineCalls
 {
 	game_life_cycle get_game_life_cycle();
 	bool __cdecl IsGameMinimized();

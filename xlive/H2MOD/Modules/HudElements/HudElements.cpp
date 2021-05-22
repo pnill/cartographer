@@ -10,7 +10,7 @@
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/EngineCalls/EngineCalls.h"
 
 static bool b_showHUD = true;
 static bool b_showFirstPerson = true;
@@ -27,7 +27,7 @@ static bool RenderIngameChat() {
 		return true;
 	}
 
-	else if (*GameEngine != 3 && Engine::get_game_life_cycle() == life_cycle_in_game) {
+	else if (*GameEngine != 3 && EngineCalls::get_game_life_cycle() == life_cycle_in_game) {
 		//Enable chat in engine mode and game state mp.
 		return false;
 	}

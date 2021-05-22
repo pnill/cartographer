@@ -8,6 +8,7 @@
 #include "Util/Hooks/Hook.h"
 #include "Blam/Engine/Game/PhysicsConstants.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
+#include "Blam/Engine/Players/PlayerControls.h"
 
 struct s_weapon_group_definition;
 std::map<std::wstring, CustomVariantSettings::s_variantSettings> CustomVariantSettingsMap;
@@ -17,19 +18,27 @@ namespace CustomVariantSettings
 	float* defaultGravity;
 	void __cdecl EncodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data)
 	{
-		stream->data_encode_bits("gravity", &data->Gravity, sizeof(data->Gravity) * CHAR_BIT); //16
+		stream->data_encode_bits("gravity", &data->Gravity, sizeof(data->Gravity) * CHAR_BIT); //16.
+		stream->data_encode_bits("game speed", &data->GameSpeed, sizeof(data->GameSpeed) * CHAR_BIT);
 		stream->data_encode_bool("Infinite Ammo", data->InfiniteAmmo);
 		stream->data_encode_bool("Explosion Physics", data->ExplosionPhysics);
 		stream->data_encode_integer("Hill Rotation", (byte)data->HillRotation, 8);
+		stream->data_encode_bool("Infinite Grenades", data->InfiniteGrenades);
 	}
 	bool __cdecl DecodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data)
 	{
 		double gravity;
 		stream->data_decode_bits("gravity", &gravity, sizeof(gravity) * CHAR_BIT);
 		data->Gravity = gravity;
+		double gamespeed;
+		stream->data_decode_bits("game speed", &gamespeed, sizeof(gamespeed) * CHAR_BIT);
+		data->GameSpeed = gamespeed;
+
 		data->InfiniteAmmo = stream->data_decode_bool("Infinite Ammo");
 		data->ExplosionPhysics = stream->data_decode_bool("Explosion Physics");
 		data->HillRotation = (e_hill_rotation)stream->data_decode_integer("Hill Rotation", 8);
+		data->InfiniteGrenades = stream->data_decode_bool("Infinite Grenades");
+
 		return stream->packet_is_valid() == false;
 	}
 
@@ -39,6 +48,8 @@ namespace CustomVariantSettings
 		CurrentVariantSettings.InfiniteAmmo = data->InfiniteAmmo;
 		CurrentVariantSettings.ExplosionPhysics = data->ExplosionPhysics;
 		CurrentVariantSettings.HillRotation = data->HillRotation;
+		CurrentVariantSettings.GameSpeed = data->GameSpeed;
+		CurrentVariantSettings.InfiniteGrenades = data->InfiniteGrenades;
 	}
 
 	void SendCustomVariantSettings(int peerIndex)
@@ -67,37 +78,69 @@ namespace CustomVariantSettings
 		CurrentVariantSettings = s_variantSettings();
 	}
 
+	void OnPlayerSpawn(datum PlayerDatum)
+	{
+		if (NetworkSession::localPeerIsSessionHost()) {
+			if (CurrentVariantSettings.InfiniteGrenades)
+			{
+				h2mod->set_player_unit_grenades_count(PlayerDatum.ToAbsoluteIndex(), Fragmentation, 99, false);
+				h2mod->set_player_unit_grenades_count(PlayerDatum.ToAbsoluteIndex(), Plasma, 99, false);
+			}
+		}
+	}
+
+	void OnPlayerDeath(datum PlayerDatum, datum KillerDatum)
+	{
+		if (NetworkSession::localPeerIsSessionHost()) {
+			if (CurrentVariantSettings.InfiniteGrenades)
+			{
+				//Prevent Players from dropping 198 grenades on death..
+				h2mod->set_player_unit_grenades_count(PlayerDatum.ToAbsoluteIndex(), Fragmentation, 0, false);
+				h2mod->set_player_unit_grenades_count(PlayerDatum.ToAbsoluteIndex(), Plasma, 0, false);
+			}
+		}
+	}
+
+	void ApplyCustomSettings()
+	{
+		//
+		//Anything to be done on host and client goes here.
+		//
+		physics_constants::get()->gravity = CurrentVariantSettings.Gravity * physics_constants::get_default_gravity();
+		time_globals::get()->game_speed = CurrentVariantSettings.GameSpeed;
+		//mov [ecx+6], ax
+		static BYTE InfiniteAmmoMagazineASM[] = { 0x66, 0x89, 0x41, 0x06 };
+		//movss [edi+00000184],xmm0
+		static BYTE InfiniteAmmoBatteryASM[] = { 0xF3, 0x0F, 0x11, 0x87, 0x84, 0x01, 0x00, 0x00 };
+		if (CurrentVariantSettings.InfiniteAmmo)
+		{
+			//Nop remove ammo from clips
+			NopFill(Memory::GetAddress(0x15F3EA, 0x1436AA), 4);
+			//Nop remove energy from battery.
+			NopFill(Memory::GetAddress(0x15f7c6, 0x143A86), 8);
+		}
+		else
+		{
+			WriteBytes(Memory::GetAddress(0x15F3EA, 0x1436AA), InfiniteAmmoMagazineASM, 4);
+			WriteBytes(Memory::GetAddress(0x15f7c6, 0x143A86), InfiniteAmmoBatteryASM, 8);
+		}
+
+		if (!Memory::isDedicatedServer()) {
+			if (CurrentVariantSettings.ExplosionPhysics)
+				WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1e);
+			else
+				WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0);
+		}
+	}
 	void OnGamestateChange(game_life_cycle state)
 	{
-		if (state == life_cycle_in_game) {
-			//
-			//Anything to be done on host and client goes here.
-			//
-			physics_constants::get()->gravity = CurrentVariantSettings.Gravity;
-
-			//mov [ecx+6], ax
-			static BYTE InfiniteAmmoMagazineASM[] = { 0x66, 0x89, 0x41, 0x06 };
-			//movss [edi+00000184],xmm0
-			static BYTE InfiniteAmmoBatteryASM[] = { 0xF3, 0x0F, 0x11, 0x87, 0x84, 0x01, 0x00, 0x00 };
-			if (CurrentVariantSettings.InfiniteAmmo)
-			{
-				//Nop remove ammo from clips
-				NopFill(Memory::GetAddress(0x15F3EA, 0x1436AA), 4);
-				//Nop remove energy from battery.
-				NopFill(Memory::GetAddress(0x15f7c6, 0x143A86), 8);
-			}
-			else
-			{
-				WriteBytes(Memory::GetAddress(0x15F3EA, 0x1436AA), InfiniteAmmoMagazineASM, 4);
-				WriteBytes(Memory::GetAddress(0x15f7c6, 0x143A86), InfiniteAmmoBatteryASM, 8);
-			}
-
-			if (!Memory::isDedicatedServer()) {
-				if (CurrentVariantSettings.ExplosionPhysics)
-					WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1e);
-				else
-					WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0);
-			}
+		if (state == life_cycle_in_game) 
+		{
+			ApplyCustomSettings();
+		}
+		else if(state == life_cycle_none || state == life_cycle_pre_game)
+		{
+			ResetSettings();
 		}
 	}
 	void OnNetworkPlayerEvent(int peerIndex, EventHandler::NetworkPlayerEventType type)
@@ -155,22 +198,11 @@ namespace CustomVariantSettings
 	{
 		ApplyHooks();
 		
-		//EventHandler::registerGameStateCallback({ "VariantSettings", life_cycle_in_game, OnIngame }, false);
-		//EventHandler::registerCountdownStartCallback(OnMatchCountdown, "VariantGameStart", true);
-		//EventHandler::register_callback(OnMatchCountdown, countdown_start, before, false, true);
-		/*EventHandler::registerNetworkPlayerAddCallback(
-			{
-				"VariantSettings",
-				[](int peer)
-				{
-					SendCustomVariantSettings();
-				}
-			},
-			true);*/
-
 		EventHandler::register_callback<EventHandler::GameStateEvent>(OnGamestateChange);
-		EventHandler::register_callback<EventHandler::CountdownStartEvent>(OnMatchCountdown, execute_after, true);
+		EventHandler::register_callback<EventHandler::CountdownStartEvent>(OnMatchCountdown, execute_after,true);
 		EventHandler::register_callback<EventHandler::NetworkPlayerEvent>(OnNetworkPlayerEvent, execute_after, true);
-
+		EventHandler::register_callback<EventHandler::BlueScreenEvent>(ApplyCustomSettings, execute_after);
+		EventHandler::register_callback<EventHandler::PlayerSpawnEvent>(OnPlayerSpawn, execute_after);
+		EventHandler::register_callback<EventHandler::PlayerDeathEvent>(OnPlayerDeath, execute_before);
 	}
 }

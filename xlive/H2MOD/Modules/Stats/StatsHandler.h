@@ -5,7 +5,7 @@
 #include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
 #include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
 #include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/EngineCalls/EngineCalls.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 
 extern bool Registered;
@@ -43,6 +43,7 @@ public:
 								if (uploadStats(filepath, token) == 200)
 								{
 									remove(filepath);
+									LOG_TRACE_GAME("[H2MOD] Stats uploaded successfully");
 								}
 								else
 								{

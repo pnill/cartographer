@@ -275,9 +275,10 @@
     <ClCompile Include="Blam\Engine\Game\PhysicsConstants.cpp" />
     <ClCompile Include="Blam\Engine\Objects\GameStateObjects.cpp" />
     <ClCompile Include="Blam\Engine\Players\Players.cpp" />
-    <ClCompile Include="H2MOD\Engine\Engine.cpp" />
-    <ClCompile Include="H2MOD\Engine\Objects.cpp" />
-    <ClCompile Include="H2MOD\Engine\Unit.cpp" />
+    <ClCompile Include="H2MOD\EngineCalls\EngineCalls.cpp" />
+    <ClCompile Include="H2MOD\EngineCalls\Objects.cpp" />
+    <ClCompile Include="H2MOD\EngineCalls\Unit.cpp" />
+    <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\debug_overlay.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.cpp" />
@@ -544,7 +545,8 @@
     <ClInclude Include="Blam\Maths\integer_math.h" />
     <ClInclude Include="Blam\Maths\real_math.h" />
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
-    <ClInclude Include="H2MOD\Engine\Engine.h" />
+    <ClInclude Include="H2MOD\EngineCalls\EngineCalls.h" />
+    <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_handler.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />

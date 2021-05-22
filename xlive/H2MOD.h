@@ -7,6 +7,9 @@
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\Common\Common.h"
 
+#define GAME_BUILD 11122
+#define EXECUTABLE_VERSION 4
+
 enum SoundType
 {
 	TeamChange,

@@ -9,4 +9,5 @@ struct __declspec(align(4)) physics_constants
 	real_point3d zero_vector;
 	DWORD dword18;
 	static physics_constants* get();
+	static float get_default_gravity();
 };

@@ -1,7 +1,6 @@
-#include "Engine.h"
-
+#include "EngineCalls.h"
 //Engine Calls
-namespace Engine
+namespace EngineCalls
 {
 	game_life_cycle get_game_life_cycle()
 	{

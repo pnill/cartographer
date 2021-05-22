@@ -4,7 +4,7 @@
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
-#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/EngineCalls/EngineCalls.h"
 
 int soundBuffer = 0;
 std::map<int, std::map<e_headhunter_sounds, const wchar_t*>> H_SoundsTable;
@@ -53,7 +53,7 @@ void HeadHunter::SpawnSkull(datum unit_datum)
 	{
 		ObjectPlacementData nObject;
 
-		Engine::Objects::create_new_placement_data(&nObject, Weapon::ball, -1, 0);
+		EngineCalls::Objects::create_new_placement_data(&nObject, Weapon::ball, -1, 0);
 
 		nObject.Placement.x = biped_unit->Placement.x;
 		nObject.Placement.y = biped_unit->Placement.y;
@@ -62,7 +62,7 @@ void HeadHunter::SpawnSkull(datum unit_datum)
 		nObject.TranslationalVelocity.y = biped_unit->TranslationalVelocity.y;
 		nObject.TranslationalVelocity.z = biped_unit->TranslationalVelocity.z;
 
-		datum new_object_datum = Engine::Objects::call_object_new(&nObject);
+		datum new_object_datum = EngineCalls::Objects::call_object_new(&nObject);
 		if (!new_object_datum.IsNull())
 			call_add_object_to_sync(new_object_datum);
 	}

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Globals.h"
-#include "H2MOD\Engine\Engine.h"
+#include "H2MOD\EngineCalls\EngineCalls.h"
 
 using namespace NetworkSession;
 
@@ -148,7 +148,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 	LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() player index: {}, player name: {1}", playerIndex, Player::getName(playerIndex));
 
 	datum unit_datum_index = Player::getPlayerUnitDatumIndex(playerIndex);
-	char* unit_object = Engine::Objects::try_and_get_data_with_type(unit_datum_index, FLAG(e_object_type::biped));
+	char* unit_object = EngineCalls::Objects::try_and_get_data_with_type(unit_datum_index, FLAG(e_object_type::biped));
 
 	if (unit_object) {
 		int level = GunGame::gungamePlayers[getPlayerXuid(playerIndex)];
@@ -173,7 +173,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 
 void GunGame::playerDiedServer(int unit_datum_index)
 {
-	char* unit_object = Engine::Objects::try_and_get_data_with_type(unit_datum_index, FLAG(e_object_type::biped));
+	char* unit_object = EngineCalls::Objects::try_and_get_data_with_type(unit_datum_index, FLAG(e_object_type::biped));
 	if (unit_object) {
 		int playerIndex = h2mod->get_player_index_from_unit_datum_index(unit_datum_index);
 		h2mod->set_player_unit_grenades_count(playerIndex, Grenades::Fragmentation, 0, true);
@@ -276,11 +276,11 @@ void GunGameDeathHandler::onClient() {
 }
 
 void GunGameDeathHandler::onDedi() {
-	GunGame::playerDiedServer(this->getUnitDatumIndex());
+	GunGame::playerDiedServer(this->getUnitDatumIndex().ToInt());
 }
 
 void GunGameDeathHandler::onPeerHost() {
-	GunGame::playerDiedServer(this->getUnitDatumIndex());
+	GunGame::playerDiedServer(this->getUnitDatumIndex().ToInt());
 }
 
 void GunGameKillHandler::onClient() {
@@ -302,7 +302,7 @@ void GunGameHandler::setPlayerIndex(int playerIndex)
 	this->playerIndex = playerIndex;
 }
 
-void GunGameHandler::setUnitDatumIndex(int unitDatumIndex)
+void GunGameHandler::setUnitDatumIndex(datum unitDatumIndex)
 {
 	this->unitDatumIndex = (h2mod->get_player_index_from_unit_datum_index(unitDatumIndex) != -1 ? unitDatumIndex : -1);
 }
@@ -312,7 +312,7 @@ int GunGameHandler::getPlayerIndex()
 	return this->playerIndex;
 }
 
-int GunGameHandler::getUnitDatumIndex()
+datum GunGameHandler::getUnitDatumIndex()
 {
 	return this->unitDatumIndex;
 }

@@ -149,7 +149,7 @@ void StatsHandler::server_command_event(ServerConsole::ServerConsoleCommands com
 {
 	if(Status.StatsEnabled)
 	{
-		if(command == ServerConsole::skip && Engine::get_game_life_cycle() == life_cycle_in_game)
+		if(command == ServerConsole::skip && EngineCalls::get_game_life_cycle() == life_cycle_in_game)
 		{
 			InvalidateMatch(true);
 		}
@@ -921,8 +921,8 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 	// but only in the post game carnage report/pregame
 	// ranks will update at the end of the game
 
-	if (Engine::get_game_life_cycle() != life_cycle_pre_game
-		&& Engine::get_game_life_cycle() != life_cycle_post_game)
+	if (EngineCalls::get_game_life_cycle() != life_cycle_pre_game
+		&& EngineCalls::get_game_life_cycle() != life_cycle_post_game)
 		return;
 
 	getPlayerRanksByStringList(buildPlayerRankUpdateQueryStringList());
