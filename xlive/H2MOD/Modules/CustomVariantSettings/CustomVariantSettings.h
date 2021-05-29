@@ -1,7 +1,7 @@
 #pragma once
 #include "H2MOD/Modules/Networking/Memory/bitstream.h"
 
-#define CustomVariantSettingsPacketSize 21
+#define CustomVariantSettingsPacketSize 37
 namespace CustomVariantSettings
 {
 	enum e_hill_rotation
@@ -24,6 +24,7 @@ namespace CustomVariantSettings
 		e_hill_rotation HillRotation = random;
 		double GameSpeed = 1.0f;
 		bool InfiniteGrenades = false;
+//		byte PredefinedHillSet[16] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ,-1 };
 	};
 	void __cdecl EncodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data);
 	bool __cdecl DecodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data);

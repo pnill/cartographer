@@ -16,7 +16,8 @@ namespace playlist_loader
 		explosion_physics,
 		hill_rotation,
 		game_speed,
-		infinite_grenades
+		infinite_grenades,
+		hill_set
 	};
 	std::map<std::wstring, e_custom_setting> custom_settings
 	{
@@ -26,7 +27,8 @@ namespace playlist_loader
 		{L"Explosion Physics", e_custom_setting::explosion_physics},
 		{L"Hill Rotation", e_custom_setting::hill_rotation},
 		{L"Game Speed", e_custom_setting::game_speed},
-		{L"Infinite Grenades", e_custom_setting::infinite_grenades}
+		{L"Infinite Grenades", e_custom_setting::infinite_grenades},
+		{L"Hill Set", e_custom_setting::hill_set}
 	};
 	e_custom_setting get_custom_setting_index(wchar_t* Name)
 	{
@@ -172,6 +174,16 @@ namespace playlist_loader
 					case infinite_grenades:
 						settings->InfiniteGrenades = custom_setting_boolean_check(playlist_entry, property_value);
 						break;
+					case hill_set:
+						//std::wstring wproperty(property_value);
+						//std::wstringstream ss(wproperty);
+						//std::vector<int> store;
+						//while(ss.good())
+						//{
+						//	std::wstring substr;
+						//	//std::getline(ss, substr, ',');
+						//}
+						break;
 					case none:
 					default:
 						playlist_invalid_item_hook(
@@ -221,9 +233,5 @@ namespace playlist_loader
 	void initialize()
 	{
 		apply_hooks();
-		//custom_settings.emplace(L"Gravity", e_custom_setting::gravity);
-		//custom_settings.emplace(L"Infinite Ammo", e_custom_setting::infinite_ammo);
-		//custom_settings.emplace(L"Explosion Physics", e_custom_setting::explosion_physics);
-		//custom_settings.emplace(L"Hill Rotation", e_custom_setting::hill_rotation);
 	}
 }

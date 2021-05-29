@@ -1128,16 +1128,6 @@ bool FlashlightIsEngineSPCheck() {
 	return h2mod->GetEngineType() == e_engine_type::SinglePlayer;
 }
 
-
-
-
-
-
-
-
-
-
-
 void GivePlayerWeaponDatum(datum unit_datum, datum weapon_datum)
 {
 	if (unit_datum != NONE)
@@ -1207,8 +1197,6 @@ int __cdecl device_touch(datum device_datum, datum unit_datum)
 	return pdevice_touch(device_datum, unit_datum);
 }
 
-
-
 void H2MOD::team_player_indicator_visibility(bool toggle)
 {
 	this->drawTeamIndicators = toggle;
@@ -1262,11 +1250,6 @@ void H2MOD::ApplyUnitHooks()
 	PatchCall(Memory::GetAddress(0x1F9E34, 0x1E3B9C), set_unit_color_data_hook);
 	pset_unit_color_data = Memory::GetAddress<tset_unit_color_data>(0x6E5C3, 0x6D1BF);
 }
-
-
-
-
-
 
 typedef void(__cdecl p_set_screen_bounds)(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
 p_set_screen_bounds* c_set_screen_bounds;
@@ -1465,20 +1448,8 @@ void vip_lock(game_life_cycle state)
 	}
 }
 
-void testspawn(datum PlayerDatum)
-{
-	LOG_ERROR_GAME("[{}] {:2}", __FUNCTION__, PlayerDatum.ToInt());
-}
-void testdeath(datum PlayerDatum, datum KillerDatum)
-{
-	LOG_ERROR_GAME("[{}] {:2} {:2}", __FUNCTION__, PlayerDatum.ToInt(), KillerDatum.ToInt());
-}
 void H2MOD::RegisterEvents()
 {
-	EventHandler::register_callback<EventHandler::PlayerSpawnEvent>(testspawn, execute_before);
-	EventHandler::register_callback<EventHandler::PlayerSpawnEvent>(testspawn, execute_after);
-	EventHandler::register_callback<EventHandler::PlayerDeathEvent>(testdeath, execute_before);
-	EventHandler::register_callback<EventHandler::PlayerDeathEvent>(testdeath, execute_after);
 	if(!Memory::isDedicatedServer())//Client only callbacks	
 	{
 
@@ -1501,7 +1472,6 @@ void H2MOD::RegisterEvents()
 //{
 //	return c_sub_81A676(a1, a2, a3, 4, a5, a6, a7, a8, a9, a10);
 //}
-
 
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/

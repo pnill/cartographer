@@ -10,7 +10,6 @@
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "Blam/Engine/Players/PlayerControls.h"
 
-struct s_weapon_group_definition;
 std::map<std::wstring, CustomVariantSettings::s_variantSettings> CustomVariantSettingsMap;
 CustomVariantSettings::s_variantSettings CurrentVariantSettings;
 namespace CustomVariantSettings
@@ -33,7 +32,6 @@ namespace CustomVariantSettings
 		double gamespeed;
 		stream->data_decode_bits("game speed", &gamespeed, sizeof(gamespeed) * CHAR_BIT);
 		data->GameSpeed = gamespeed;
-
 		data->InfiniteAmmo = stream->data_decode_bool("Infinite Ammo");
 		data->ExplosionPhysics = stream->data_decode_bool("Explosion Physics");
 		data->HillRotation = (e_hill_rotation)stream->data_decode_integer("Hill Rotation", 8);
@@ -138,7 +136,7 @@ namespace CustomVariantSettings
 		{
 			ApplyCustomSettings();
 		}
-		else if(state == life_cycle_none || state == life_cycle_pre_game)
+		else if(state == life_cycle_none || state == life_cycle_pre_game || state == life_cycle_post_game)
 		{
 			ResetSettings();
 		}
