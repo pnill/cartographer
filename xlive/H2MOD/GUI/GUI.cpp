@@ -96,7 +96,7 @@ LPD3DXSPRITE pSprite;
 
 using namespace std::chrono;
 high_resolution_clock::time_point nextFrame;
-extern high_resolution_clock::duration desiredRenderTime = duration_cast<high_resolution_clock::duration>(duration<double>(1.0 / (double)H2Config_fps_limit));
+high_resolution_clock::duration desiredRenderTime;
 
 void frameTimeManagement() {
 
@@ -107,14 +107,15 @@ void frameTimeManagement() {
 	if (!bInitTime)
 	{
 		nextFrame = high_resolution_clock::now();
+		desiredRenderTime = duration_cast<high_resolution_clock::duration>(duration<double, std::milli>(1000.0 / (double)H2Config_fps_limit));
 		bInitTime = true;
 	}
-	
+
 	if (H2Config_fps_limit > 0) {
 		std::this_thread::sleep_until(nextFrame);
 
-		auto frameCount = duration<long long, std::micro>(
-			(1 + (duration_cast<duration<long long, std::micro>>(high_resolution_clock::now() - nextFrame) / duration_cast<duration<long long, std::micro>>(desiredRenderTime)))
+		auto frameCount = duration<long long, std::nano>(
+			(1 + (duration_cast<duration<long long, std::nano>>(high_resolution_clock::now() - nextFrame) / desiredRenderTime))
 			);
 
 		nextFrame += (desiredRenderTime * frameCount.count());
