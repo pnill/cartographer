@@ -94,42 +94,8 @@ inline void BuildVertex(D3DXVECTOR4 xyzrhw, D3DCOLOR color, CVertexList* vertexL
 
 LPD3DXSPRITE pSprite;
 
-using namespace std::chrono;
-high_resolution_clock::time_point nextFrame;
-high_resolution_clock::duration desiredRenderTime;
-
-void frameTimeManagement() {
-
-	if (H2Config_experimental_fps == e_render_original_game_frame_limit)
-		return;
-
-	static bool bInitTime = false;
-	if (!bInitTime)
-	{
-		nextFrame = high_resolution_clock::now();
-		desiredRenderTime = duration_cast<high_resolution_clock::duration>(duration<double, std::milli>(1000.0 / (double)H2Config_fps_limit));
-		bInitTime = true;
-	}
-
-	if (H2Config_fps_limit > 0) {
-		std::this_thread::sleep_until(nextFrame);
-
-		auto frameCount = duration<long long, std::nano>(
-			(1 + (duration_cast<duration<long long, std::nano>>(high_resolution_clock::now() - nextFrame) / desiredRenderTime))
-			);
-
-		nextFrame += (desiredRenderTime * frameCount.count());
-	}
-}
-
 LPDIRECT3DTEXTURE9 Texture_Interface;
 LPD3DXSPRITE Sprite_Interface;
-
-
-
-
-
-
 
 // #5297: XLiveInitializeEx
 int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
