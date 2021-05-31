@@ -261,14 +261,14 @@ namespace imgui_handler {
 						if (H2Config_fps_limit > 2048)
 							H2Config_fps_limit = 2048;
 
-						desiredRenderTime = time::duration_cast<clock::duration>(time::duration<double, std::milli>(1000.0 / (double)H2Config_fps_limit));
+						SET_DESIRED_RENDER_TIME();
 					}
 					
 					ImGui::SameLine();
 					if (ImGui::Button(GetString(reset, "FPS2"), ImVec2(WidthPercentage(50), item_size.y)))
 					{
 						H2Config_fps_limit = 60;
-						desiredRenderTime = time::duration_cast<clock::duration>(time::duration<double, std::milli>(1000.0 / (double)H2Config_fps_limit));
+						SET_DESIRED_RENDER_TIME();
 					}
 					ImGui::NextColumn();
 					ImGui::PopItemWidth();
