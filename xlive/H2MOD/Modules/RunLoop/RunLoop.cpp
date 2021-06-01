@@ -135,18 +135,26 @@ inline void defaultFrameLimiter() {
 	namespace _time = std::chrono;
 	using _clock = _time::steady_clock;
 	static std::chrono::steady_clock::time_point nextFrameTime;
+	static int lastFrameSetting = -1;
 
 	if (H2Config_experimental_fps == e_render_original_game_frame_limit
-		|| H2Config_fps_limit == 0)
+		|| H2Config_fps_limit <= 0)
 	{
+		lastFrameSetting = H2Config_fps_limit;
 		frameLimiterInitialized = false;
 		return;
 	}
 
+	if (lastFrameSetting != H2Config_fps_limit)
+	{
+		lastFrameSetting = H2Config_fps_limit;
+		frameLimiterInitialized = false;
+	}
+
 	if (!frameLimiterInitialized)
 	{
+		SET_DESIRED_RENDER_TIME();
 		nextFrameTime = _clock::now() + desiredRenderTime;
-		desiredRenderTime = _time::duration_cast<_clock::duration>(_time::duration<double, std::milli>(1000.0 / (double)H2Config_fps_limit));
 		frameLimiterInitialized = true;
 	}
 
