@@ -5,13 +5,19 @@
 #include "hook.h"
 #pragma warning( disable :4996)
 
+#define VirtualProtectAndExecutePatch(_address, _length, _protection, _code) \
+	DWORD dwBack[2]; \
+	VirtualProtect((_address), (_length), (_protection), &dwBack[0]); \
+	_code \
+	VirtualProtect((_address), (_length), dwBack[0], &dwBack[1]); \
+
 void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 {
 	BYTE *jmp = (BYTE*)VirtualAlloc(nullptr, len + 5, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	DWORD dwBack[2];
 
-	VirtualProtect(src, len, PAGE_READWRITE, &dwBack[0]);
+	VirtualProtectAndExecutePatch(src, len, PAGE_READWRITE, // parameters
 
+	// code
 	memcpy(jmp, src, len);
 	jmp += len;
 
@@ -23,23 +29,19 @@ void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 
 	for (int i = 5; i < len; i++)
 		src[i] = 0x90;
-
-	VirtualProtect(src, len, dwBack[0], &dwBack[1]);
+	);
 
 	return (jmp - len);
 }
 
 void RetourFunc(BYTE *src, BYTE *restore, const unsigned int len)
 {
-	DWORD dwBack[2];
+	VirtualProtectAndExecutePatch(src, len, PAGE_READWRITE,
 
-	VirtualProtect(src, len, PAGE_READWRITE, &dwBack[0]);
 	memcpy(src, restore, len);
-
 	restore[0] = 0xE9;
 	*(DWORD*)(restore + 1) = (DWORD)(src - restore) - 5;
-
-	VirtualProtect(src, len, dwBack[0], &dwBack[1]);
+	);
 }
 
 
@@ -47,9 +49,8 @@ void *DetourClassFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 {
 	BYTE *jmp = (BYTE*)VirtualAlloc(nullptr, len + 8, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
-	DWORD dwBack[2];
-	VirtualProtect(src, len, PAGE_READWRITE, &dwBack[0]);
-	
+	VirtualProtectAndExecutePatch(src, len, PAGE_READWRITE,
+
 	memcpy(jmp + 3, src, len);
 
 	// calculate callback function call
@@ -68,23 +69,19 @@ void *DetourClassFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 
 	for (int i = 8; i < len; i++)
 		src[i] = 0x90;
-
-	VirtualProtect(src, len, dwBack[0], &dwBack[1]);
+	);
 
 	return jmp;
 }
 
 void RetourClassFunc(BYTE *src, BYTE *restore, const unsigned int len)
 {
-	DWORD dwBack[2];
-
-	VirtualProtect(src, len, PAGE_READWRITE, &dwBack[0]);
+	VirtualProtectAndExecutePatch(src, len, PAGE_READWRITE,
 
 	memcpy(src, restore + 3, len);
 	restore[3] = 0xE9;
 	*(DWORD*)(restore + 4) = (DWORD)(src - (restore + 3)) - 5;
-
-	VirtualProtect(src, len, dwBack[0], &dwBack[1]);
+	);
 }
 
 void *VTableFunction(void *ClassPtr, DWORD index)
@@ -93,19 +90,33 @@ void *VTableFunction(void *ClassPtr, DWORD index)
 	return pVtable[index];
 }
 
-void WriteBytes(DWORD destAddress, LPVOID bytesToWrite, unsigned int numBytes)
+void WriteBytes(DWORD destAddress, LPVOID bytesToWrite, const unsigned int numBytes)
 {
-	DWORD dwBack[2];
-	LPVOID lpAddr = reinterpret_cast<LPVOID>(destAddress);
+	VirtualProtectAndExecutePatch((LPVOID)destAddress, numBytes, PAGE_EXECUTE_READWRITE,
 
-	VirtualProtect(lpAddr, numBytes, PAGE_EXECUTE_READWRITE, &dwBack[0]);
-	memcpy(lpAddr, bytesToWrite, numBytes);
-	VirtualProtect(lpAddr, numBytes, dwBack[0], &dwBack[1]);
+	memcpy((LPVOID)destAddress, bytesToWrite, numBytes);
+	);
 }
 
 void PatchCall(DWORD call_addr, DWORD new_function_ptr) {
 	DWORD callRelative = new_function_ptr - (call_addr + 5);
 	WritePointer(call_addr + 1, reinterpret_cast<void*>(callRelative));
+}
+
+void NopFill(DWORD address, const unsigned int length)
+{
+	VirtualProtectAndExecutePatch((LPVOID)address, length, PAGE_EXECUTE_READWRITE,
+
+	memset((LPVOID)address, 0x90, length);
+	);
+}
+
+void ReadBytesProtected(DWORD address, BYTE* buf, BYTE count)
+{
+	VirtualProtectAndExecutePatch((LPVOID)address, count, PAGE_EXECUTE_READWRITE,
+
+	memcpy(buf, (LPVOID)address, count);
+	);
 }
 
 void WritePointer(DWORD offset, void *ptr) {
@@ -136,20 +147,4 @@ VOID Codecave(DWORD destAddress, VOID(*func)(VOID), BYTE nopCount)
 		return;
 
 	NopFill(destAddress + 5, nopCount);
-}
-
-void NopFill(DWORD address, unsigned int length)
-{
-	BYTE* byteArray = new BYTE[length];
-	memset(byteArray, 0x90, length);
-	WriteBytes(address, byteArray, length);
-	delete[] byteArray;
-}
-
-void ReadBytesProtected(DWORD address, BYTE* buf, BYTE count)
-{
-	DWORD dwBack[2];
-	VirtualProtect((LPVOID)address, count, PAGE_READWRITE, &dwBack[0]);
-	memcpy((void*)buf, (void*)address, count);
-	VirtualProtect((LPVOID)address, count, dwBack[0], &dwBack[1]);
 }
