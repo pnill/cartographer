@@ -29,7 +29,7 @@ void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 	return (jmp - len);
 }
 
-void RetourFunc(BYTE *src, BYTE *restore, const int len)
+void RetourFunc(BYTE *src, BYTE *restore, const unsigned int len)
 {
 	DWORD dwBack[2];
 
@@ -43,7 +43,7 @@ void RetourFunc(BYTE *src, BYTE *restore, const int len)
 }
 
 
-void *DetourClassFunc(BYTE *src, const BYTE *dst, const int len)
+void *DetourClassFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 {
 	BYTE *jmp = (BYTE*)VirtualAlloc(nullptr, len + 8, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
@@ -74,7 +74,7 @@ void *DetourClassFunc(BYTE *src, const BYTE *dst, const int len)
 	return jmp;
 }
 
-void RetourClassFunc(BYTE *src, BYTE *restore, const int len)
+void RetourClassFunc(BYTE *src, BYTE *restore, const unsigned int len)
 {
 	DWORD dwBack[2];
 
@@ -93,7 +93,7 @@ void *VTableFunction(void *ClassPtr, DWORD index)
 	return pVtable[index];
 }
 
-void WriteBytes(DWORD destAddress, LPVOID bytesToWrite, int numBytes)
+void WriteBytes(DWORD destAddress, LPVOID bytesToWrite, unsigned int numBytes)
 {
 	DWORD dwBack[2];
 	LPVOID lpAddr = reinterpret_cast<LPVOID>(destAddress);
@@ -138,7 +138,7 @@ VOID Codecave(DWORD destAddress, VOID(*func)(VOID), BYTE nopCount)
 	NopFill(destAddress + 5, nopCount);
 }
 
-void NopFill(DWORD address, int length)
+void NopFill(DWORD address, unsigned int length)
 {
 	BYTE* byteArray = new BYTE[length];
 	memset(byteArray, 0x90, length);

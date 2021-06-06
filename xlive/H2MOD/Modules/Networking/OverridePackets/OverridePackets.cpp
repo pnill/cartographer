@@ -164,12 +164,11 @@ namespace OverridePackets
 	typedef int (__cdecl p_encode_player_actions)(bitstream *pThis, int a2);
 	p_encode_player_actions* o_encode_player_actions;
 
-	int __cdecl encode_player_actions(bitstream *pThis, int a2)
+	void __cdecl encode_player_actions(bitstream *pThis, int a2)
 	{
 		int v2; // esi
 		unsigned int v3; // eax
 		unsigned int v4; // eax
-		int result; // eax
 		int v6; // esi
 		float v7; // [esp+20h] [ebp-4h]
 		float a2a; // [esp+2Ch] [ebp+8h]
@@ -251,7 +250,6 @@ namespace OverridePackets
 		v6 = *(DWORD *)(v2 + 64);
 		if (v6 != -1)
 			pThis->data_encode_integer("target-player", (unsigned __int16)v6, 4);
-		return result;
 	}
 
 	typedef bool (__cdecl p_decode_player_actions)(bitstream *pThis, int a1);

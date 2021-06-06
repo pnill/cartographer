@@ -25,17 +25,17 @@ int WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread, XHV
 
 BOOL XHVENGINE::IsHeadsetPresent(VOID *pThis, DWORD dwUserIndex)
 {
-	return S_OK;
+	return false;
 }
 
 BOOL XHVENGINE::isRemoteTalking(VOID *pThis, XUID xuid)
 {
-	return S_OK;
+	return false;
 }
 
 BOOL XHVENGINE::IsLocalTalking(VOID *pThis, DWORD dwUserIndex)
 {
-	return S_OK;
+	return false;
 }
 
 LONG XHVENGINE::AddRef(/*CXHVEngine*/ VOID *pThis)
