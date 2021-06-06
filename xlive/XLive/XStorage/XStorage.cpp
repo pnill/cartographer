@@ -29,9 +29,9 @@ DWORD WINAPI XStorageUploadFromMemory(DWORD dwUserIndex, const WCHAR *wszServerP
 		return ERROR_FUNCTION_FAILED;
 	}
 
-	fseek(fp, 0, SEEK_SET);
+	fseek(fp, 0l, SEEK_SET);
 	fwrite(pbBuffer, dwBufferSize, 1, fp);
-	fseek(fp, 0, SEEK_END);
+	fseek(fp, 0l, SEEK_END);
 
 	LOG_TRACE_XLIVE(L" - Uploaded total byte count: {}", ftell(fp));
 
