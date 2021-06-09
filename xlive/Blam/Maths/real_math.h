@@ -129,7 +129,7 @@ union real_vector3d
 	// magnitude
 	float magnitude() const
 	{
-		return sqrt(pow(i, 2.f) + pow(j, 2.f) + pow(k, 2.f));
+		return sqrt(i * i + j * j + k * k);
 	}
 };
 CHECK_STRUCT_SIZE(real_vector3d, sizeof(float) * 3);
