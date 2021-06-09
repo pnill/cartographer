@@ -130,12 +130,14 @@ void (*main_game_loop)();
 
 std::chrono::steady_clock::duration desiredRenderTime;
 inline void defaultFrameLimiter() {
-	static bool frameLimiterInitialized = false;
-
 	namespace _time = std::chrono;
 	using _clock = _time::steady_clock;
-	static std::chrono::steady_clock::time_point nextFrameTime;
+	using namespace std::chrono_literals;
+
+	static _clock::time_point nextFrameTime;
 	static int lastFrameSetting = -1;
+	static bool frameLimiterInitialized = false;
+	static _clock::duration threshold(5); // skip sleep if we have to sleep under 5 ns
 
 	if (H2Config_experimental_fps == e_render_original_game_frame_limit
 		|| H2Config_fps_limit <= 0)
@@ -154,11 +156,25 @@ inline void defaultFrameLimiter() {
 	if (!frameLimiterInitialized)
 	{
 		SET_DESIRED_RENDER_TIME();
-		nextFrameTime = _clock::now() + desiredRenderTime;
+		nextFrameTime = _clock::now();
 		frameLimiterInitialized = true;
 	}
 
-	std::this_thread::sleep_until(nextFrameTime);
+	{
+		_clock::time_point timeNow = _clock::now();
+		if (timeNow < nextFrameTime && nextFrameTime - timeNow > threshold)
+		{
+			auto millisecondsToSleep = _time::duration_cast<_time::milliseconds, long long>(nextFrameTime - timeNow);
+			if (millisecondsToSleep > 1ms)
+				std::this_thread::sleep_for(millisecondsToSleep);
+
+			// sleep the nanoseconds after, will burn the CPU a lil bit but should provide near perfect frame time
+			while (_clock::now() < nextFrameTime) 
+			{
+			}
+		}
+	}
+
 	nextFrameTime += (desiredRenderTime * (1 + ((_clock::now() - nextFrameTime) / desiredRenderTime)));
 }
 
@@ -294,22 +310,16 @@ bool __cdecl cinematic_in_progress_hook()
 
 	switch (experimental_rendering_mode)
 	{
-	case e_render_original_game_frame_limit:
 	case e_render_old:
-		if (!p_cinematic_in_progress())
-			*Memory::GetAddress<bool*>(0x48225B) = false;
-
+	case e_render_original_game_frame_limit:
 		// TODO: get_game_life_cycle is only used with networked sessions, meaning this will not work in single player
 		// and i keep it this way because the EventHandler in UncappedFPS2.cpp uses the game's life cycle as well
 		return p_cinematic_in_progress() || Engine::get_game_life_cycle() == life_cycle_in_game || Engine::IsGameMinimized();
 
 	case e_render_none:
-		if (!p_cinematic_in_progress())
-			*Memory::GetAddress<bool*>(0x48225B) = false;
 	case e_render_new:
 	default:
 		return p_cinematic_in_progress() || b_XboxTick || Engine::IsGameMinimized();
-		break;
 	}
 
 	return false;
@@ -326,10 +336,8 @@ bool __cdecl should_limit_framerate()
 	case e_render_none:
 	case e_render_new:
 	case e_render_old:
-
 	default:
 		return (Engine::IsGameMinimized() || b_XboxTick);
-		break;
 	}
 
 	return false;
@@ -378,10 +386,10 @@ float alt_system_time_update()
 
 int* dword_F52268;
 int* max_tick_count;
-byte* sound_impulse_unk;
-byte* sound_impulse_called;
+bool* sound_impulse_unk;
+bool* sound_impulse_called;
 int* dword_F52260;
-byte* b_restart_game_loop;
+bool* b_restart_game_loop;
 const int input_devices_update = 0x2F9AC;
 const int vibrations_update = 0x90438;
 const int loaded_custom_maps_data = 0x482D70;
@@ -697,10 +705,10 @@ void initGSRunLoop() {
 
 				dword_F52268 = Memory::GetAddress<int*>(0x482268);
 				max_tick_count = Memory::GetAddress<int*>(0x482264);
-				sound_impulse_unk = Memory::GetAddress<byte*>(0x48225B);
-				sound_impulse_called = Memory::GetAddress<byte*>(0x48225A);
+				sound_impulse_unk = Memory::GetAddress<bool*>(0x48225B);
+				sound_impulse_called = Memory::GetAddress<bool*>(0x48225A);
 				dword_F52260 = Memory::GetAddress<int*>(0x482260);
-				b_restart_game_loop = Memory::GetAddress<byte*>(0x479EA0);
+				b_restart_game_loop = Memory::GetAddress<bool*>(0x479EA0);
 
 				//PatchCall(Memory::GetAddress(0x39D04), alt_prep_time);
 				PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
