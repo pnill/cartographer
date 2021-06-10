@@ -17,6 +17,7 @@ namespace playlist_loader
 		hill_rotation,
 		game_speed,
 		infinite_grenades,
+		spawn_protection,
 		hill_set
 	};
 	std::map<std::wstring, e_custom_setting> custom_settings
@@ -28,7 +29,8 @@ namespace playlist_loader
 		{L"Hill Rotation", e_custom_setting::hill_rotation},
 		{L"Game Speed", e_custom_setting::game_speed},
 		{L"Infinite Grenades", e_custom_setting::infinite_grenades},
-		{L"Hill Set", e_custom_setting::hill_set}
+		{L"Hill Set", e_custom_setting::hill_set},
+		{L"Spawn Protection", e_custom_setting::spawn_protection}
 	};
 	e_custom_setting get_custom_setting_index(wchar_t* Name)
 	{
@@ -105,11 +107,27 @@ namespace playlist_loader
 
 		return static_cast<T>(-1);
 	}
+	template <typename T>
+	T custom_settings_integer_check(playlist_entry* playlist_entry, wchar_t* value)
+	{
+		if(isInteger(value))
+			return static_cast<T>(std::stol(value));
 
+		playlist_invalid_item_hook(
+			playlist_entry,
+			0,
+			4,
+			playlist_entry->reader_current_line,
+			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
+			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
+			&empty_char);
+
+		return static_cast<T>(0);
+	}
 	bool process_custom_setting(playlist_entry* playlist_entry)
 	{
 		//Section Type must be Variant
-		if (playlist_entry->current_section_type != 1)
+		if (playlist_entry->current_section_type != e_hpl_headers::Playlist)
 			return false;
 
 		auto result = false;
@@ -134,7 +152,7 @@ namespace playlist_loader
 		const auto custom_setting_type = get_custom_setting_index(property_name);
 
 		//Check if it's a custom setting
-		if (custom_setting_type != -1) 
+		if (custom_setting_type != e_custom_setting::none) 
 		{
 			//Check to make sure a variant name has been found.
 			if (_wcsicmp(variant, L"") != 0) 
@@ -152,6 +170,10 @@ namespace playlist_loader
 					CustomVariantSettingsMap[variant_string] = CustomVariantSettings::s_variantSettings();
 					settings = &CustomVariantSettingsMap.at(variant_string);
 				}
+				std::wstring wproperty(property_value);
+				size_t pos = 0;
+				std::wstring t;
+				byte cIndex = 0;
 
 				LOG_TRACE_GAME(L"[PlaylistLoader::ProcessCustomSetting] Variant: {} Custom Setting Detected: {} = {}", variant, property_name, property_value);
 				switch (custom_setting_type)
@@ -166,7 +188,7 @@ namespace playlist_loader
 						settings->ExplosionPhysics = custom_setting_boolean_check(playlist_entry, property_value);
 						break;
 					case hill_rotation:
-						settings->HillRotation = custom_settings_enum_check<CustomVariantSettings::e_hill_rotation>(playlist_entry, property_value, CustomVariantSettings::hill_rotation_name, 3);
+						settings->HillRotation = custom_settings_enum_check<CustomVariantSettings::e_hill_rotation>(playlist_entry, property_value, CustomVariantSettings::hill_rotation_name, 4);
 						break;
 					case game_speed:
 						settings->GameSpeed = custom_settings_real_check(playlist_entry, property_value);
@@ -175,14 +197,35 @@ namespace playlist_loader
 						settings->InfiniteGrenades = custom_setting_boolean_check(playlist_entry, property_value);
 						break;
 					case hill_set:
-						//std::wstring wproperty(property_value);
-						//std::wstringstream ss(wproperty);
-						//std::vector<int> store;
-						//while(ss.good())
-						//{
-						//	std::wstring substr;
-						//	//std::getline(ss, substr, ',');
-						//}
+						pos = 0;
+						t = L"";
+						cIndex = 0;
+						for (auto i = 0; i < 15; i++)
+							settings->PredefinedHillSet[i] = 0;
+						while((pos = wproperty.find(L",")) != std::wstring::npos)
+						{
+							t = wproperty.substr(0, pos);
+							wproperty.erase(0, pos + 1);
+							if(isInteger(t))
+							{
+								settings->PredefinedHillSet[cIndex] = static_cast<byte>(std::stoi(t));
+								cIndex++;
+							}
+							else
+							{
+								playlist_invalid_item_hook(
+									playlist_entry,
+									0,
+									4,
+									playlist_entry->reader_current_line,
+									&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
+									&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
+									&empty_char);
+							}
+						}
+						break;
+					case spawn_protection:
+						settings->SpawnProtection = custom_settings_integer_check<byte>(playlist_entry, property_value);
 						break;
 					case none:
 					default:

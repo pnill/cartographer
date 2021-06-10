@@ -1,5 +1,6 @@
 #pragma once
 #include "H2MOD/Modules/Networking/Memory/bitstream.h"
+#include "Blam/Engine/Game/PhysicsConstants.h"
 
 #define CustomVariantSettingsPacketSize 37
 namespace CustomVariantSettings
@@ -9,12 +10,14 @@ namespace CustomVariantSettings
 		random = 0,
 		sequential = 1,
 		reverse = 2,
+		predefined = 3,
 		invalid = -1
 	};
 	static const wchar_t* hill_rotation_name[] = {
 		L"random",
 		L"sequential",
 		L"reverse",
+		L"predefined"
 	};
 	struct s_variantSettings
 	{
@@ -24,7 +27,21 @@ namespace CustomVariantSettings
 		e_hill_rotation HillRotation = random;
 		double GameSpeed = 1.0f;
 		bool InfiniteGrenades = false;
-//		byte PredefinedHillSet[16] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ,-1 };
+		byte SpawnProtection = 1;
+		double ComputedGravity() const
+		{
+			return Gravity * physics_constants::get_default_gravity();
+		}
+		byte PredefinedHillSet[16];
+
+		inline bool operator==(s_variantSettings& other)
+		{
+			return memcmp((void*)this, (void*)&other, sizeof(s_variantSettings)) == 0;
+		}
+		inline bool operator!=(s_variantSettings& other)
+		{
+			return !(memcmp((void*)this, (void*)&other, sizeof(s_variantSettings)) == 0);
+		}
 	};
 	void __cdecl EncodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data);
 	bool __cdecl DecodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data);

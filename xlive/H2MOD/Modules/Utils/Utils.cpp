@@ -332,6 +332,16 @@ bool isFloat(std::wstring myString)
 	return iss.eof() && !iss.fail();
 }
 
+bool isInteger(std::string myString)
+{
+	return myString.find_first_not_of("0123456789") == std::string::npos;
+}
+
+bool isInteger(std::wstring myString)
+{
+	return myString.find_first_not_of(L"0123456789") == std::wstring::npos;
+}
+
 int HostnameToIp(char* hostname, char* ip) {
 	struct hostent *he;
 	struct in_addr **addr_list;

@@ -6,6 +6,7 @@
 #include "Blam\Engine\Game\GameEngine.h"
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\Common\Common.h"
+#include "H2MOD/Modules/Tweaks/Tweaks.h"
 
 #define GAME_BUILD 11122
 #define EXECUTABLE_VERSION 4

@@ -204,8 +204,8 @@ namespace EventHandler
 			}
 			cleanup_callbacks<T>(execution_type);
 		};
-
-		LOG_TRACE_GAME("[{}]: {} ", __FUNCSIG__, execution_type);
+		//uncomment this for debugging.
+		//LOG_TRACE_GAME("[{}]: {} ", __FUNCSIG__, execution_type);
 		execute_internal(execution_type, false);
 		std::thread(execute_internal, execution_type, true).detach();
 		

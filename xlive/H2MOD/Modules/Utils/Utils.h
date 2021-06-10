@@ -18,6 +18,8 @@ char* custom_label_escape(char* label_literal);
 bool FloatIsNaN(float vagueFloat);
 bool isFloat(std::string myString);
 bool isFloat(std::wstring myString);
+bool isInteger(std::string myString);
+bool isInteger(std::wstring myString);
 ///IP is char array size 100
 int HostnameToIp(char* hostname, char* ip);
 

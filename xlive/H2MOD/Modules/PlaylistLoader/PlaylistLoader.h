@@ -12,6 +12,13 @@ namespace playlist_loader
 		property_value_read = 0x6,
 		seek_to_next_line = 0x7,
 	};
+	enum e_hpl_headers
+	{
+		Playlist = 0,
+		Variant = 1,
+		Match = 2,
+	};
+
 	struct __declspec(align(4)) variant_match
 	{
 		DWORD unk;
@@ -60,7 +67,7 @@ namespace playlist_loader
 		DWORD section_buffer_current_index;
 		wchar_t header_buffer[32];
 		DWORD unk;
-		DWORD current_section_type;
+		e_hpl_headers current_section_type;
 		e_playlist_reader_seek_mode reader_current_mode;
 		DWORD reader_current_char_index;
 		DWORD reader_current_line;

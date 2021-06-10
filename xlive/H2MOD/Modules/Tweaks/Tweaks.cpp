@@ -330,13 +330,7 @@ int Video_HUDSizeUpdate_hook(int hudSize, int safeArea)
 	return retVal;
 }
 
-struct ui_text_bounds
-{
-	short top;
-	short left;
-	short bottom;
-	short right;
-};
+
 
 typedef int(__cdecl *sub_671B02_ptr)(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int a4, int a5, float a6, int a7, int a8);
 sub_671B02_ptr sub_671B02_orig;

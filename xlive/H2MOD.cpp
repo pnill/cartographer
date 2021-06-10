@@ -32,7 +32,7 @@
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/EngineHooks/EngineHooks.h"
-
+#include "H2MOD/GUI/GUI.h"
 
 
 H2MOD* h2mod = new H2MOD();
@@ -835,8 +835,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		}
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
-		//EventHandler::executeMapLoadCallback(e_engine_type::Multiplayer);
-		//EventHandler::execute_callback(EventType::map_load, after, Multiplayer);
+		EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_after, e_engine_type::Multiplayer);
 
 		if (EngineCalls::get_game_life_cycle() == life_cycle_in_game)
 		{
@@ -868,8 +867,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		//H2X::Initialize(true);
 		MeleeFix::MeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
-		//EventHandler::executeMapLoadCallback(e_engine_type::SinglePlayer);
-		//EventHandler::execute_callback(EventType::map_load, after, SinglePlayer);
+		EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_after, e_engine_type::SinglePlayer);
 	}
 
 	// if we got this far, it means map is MP or SP, and if map load is called again, it should reset/deinitialize any custom gametypes
