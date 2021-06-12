@@ -134,13 +134,15 @@ inline void defaultFrameLimiter() {
 	using _clock = _time::steady_clock;
 	using namespace std::chrono_literals;
 
+	static _clock::time_point lastTime;
 	static _clock::time_point nextFrameTime;
 	static int lastFrameSetting = -1;
 	static bool frameLimiterInitialized = false;
 	static _clock::duration threshold(5); // skip sleep if we have to sleep under 5 ns
 
 	if (H2Config_experimental_fps == e_render_original_game_frame_limit
-		|| H2Config_fps_limit <= 0)
+		|| H2Config_fps_limit <= 0
+		|| Engine::IsGameMinimized())
 	{
 		lastFrameSetting = H2Config_fps_limit;
 		frameLimiterInitialized = false;
@@ -156,26 +158,37 @@ inline void defaultFrameLimiter() {
 	if (!frameLimiterInitialized)
 	{
 		SET_DESIRED_RENDER_TIME();
-		nextFrameTime = _clock::now();
+		lastTime = _clock::now();
 		frameLimiterInitialized = true;
 	}
 
+	_clock::time_point timeBeforeSleep = _clock::now();
+	auto dt1 = timeBeforeSleep - lastTime;
+	if (dt1 < desiredRenderTime && desiredRenderTime - dt1 > threshold)
 	{
-		_clock::time_point timeNow = _clock::now();
-		if (timeNow < nextFrameTime && nextFrameTime - timeNow > threshold)
+		auto tp1 = timeBeforeSleep;
+		auto millisecondsToSleep = _time::duration_cast<_time::milliseconds, long long>(desiredRenderTime - dt1);
+
+		if (millisecondsToSleep > 1ms)
+			std::this_thread::sleep_for(millisecondsToSleep - 1ms);
+
+		auto tp2 = _clock::now();
+		auto dt2 = tp2 - lastTime;
+		if (dt2 < desiredRenderTime)
 		{
-			auto millisecondsToSleep = _time::duration_cast<_time::milliseconds, long long>(nextFrameTime - timeNow);
-			if (millisecondsToSleep > 1ms)
-				std::this_thread::sleep_for(millisecondsToSleep);
+			auto nanoSleep = desiredRenderTime - dt2;
 
 			// sleep the nanoseconds after, will burn the CPU a lil bit but should provide near perfect frame time
-			while (_clock::now() < nextFrameTime) 
+			while (nanoSleep > threshold)
 			{
+				auto tp3 = _clock::now();
+				nanoSleep -= (tp3 - tp2);
+				tp2 = tp3;
 			}
 		}
 	}
 
-	nextFrameTime += (desiredRenderTime * (1 + ((_clock::now() - nextFrameTime) / desiredRenderTime)));
+	lastTime = _clock::now();
 }
 
 void main_game_loop_hook() {
