@@ -1,6 +1,9 @@
 #pragma once
 #define ALT_MAIN_LOOP_HOOK 1
 
+extern std::chrono::steady_clock::duration desiredRenderTime;
+#define SET_DESIRED_RENDER_TIME() {desiredRenderTime = std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<double, std::micro>((1000000.0 / (double)H2Config_fps_limit)));}
+
 void initGSRunLoop();
 void deinitGSRunLoop();
 typedef void(_cdecl p_present_rendered_screen)();

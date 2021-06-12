@@ -1,4 +1,4 @@
-#include "TagFixes.h";
+#include "TagFixes.h"
 #include "H2MOD.h"
 #include "Blam/Cache/TagGroups/shader_definition.h"
 #include "Util/Hooks/Hook.h"

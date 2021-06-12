@@ -824,13 +824,11 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		if (!b_XboxTick) 
 		{
 			H2X::Initialize(b_H2X);
-			MeleeFix::MeleePatch(true);
 			HitFix::ApplyProjectileVelocity();
 			engine_settings->tickrate = XboxTick::setTickRate(false);
 		}
 		else
 		{
-			MeleeFix::MeleePatch(false);
 			engine_settings->tickrate = XboxTick::setTickRate(true);
 		}
 		H2Tweaks::toggleAiMp(true);
@@ -865,7 +863,6 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		//if anyone wants to run code on map load single player
 		addDebugText("Engine type: Singleplayer");
 		//H2X::Initialize(true);
-		MeleeFix::MeleePatch(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
 		EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_after, e_engine_type::SinglePlayer);
 	}

@@ -8,12 +8,6 @@ using Blam::Enums::Game::HaloString;
 
 namespace MeleeFix
 {
-	void MeleePatch(bool toggle)
-	{
-		WriteValue<BYTE>(Memory::GetAddress(0x10B408, 0xFDA38) + 2, toggle ? 5 : 6); // sword
-		WriteValue<BYTE>(Memory::GetAddress(0x10B40B, 0xFDA3B) + 2, toggle ? 2 : 1); // generic weapon
-	}
-
 	void MeleeCollisionPatch()
 	{
 		if (!Memory::isDedicatedServer()) {
@@ -177,6 +171,18 @@ namespace MeleeFix
 	void Initialize()
 	{
 		//ApplyHooks();
+		
+#pragma region Known good patches
+		// replace cvttss2si instruction which is the convert to int by truncation (> .5 decimal values don't mean anything, truncation rounding always towards 0) 
+		// with cvtss2si instruction which reads the MXCSR register that holds the flags of the conversion rounding setting
+		// that the game sets, which is Round Control Near (if decimal part > .5, convert to upper value)
+		// when converting the tick count from float to int
+		// otherwise the game will convert to tick count off by 1 tick
+		// to note this in H3 is handled by adding .5, which does the same thing
+		BYTE cvtss2si[] = { 0xF3, 0x0F, 0x2D };
+		WriteBytes(Memory::GetAddressRelative(0x50B419, 0x4FDA49), cvtss2si, sizeof(cvtss2si));
+#pragma endregion
+
 		MeleeCollisionPatch();
 	}
 }

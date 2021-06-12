@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "RunLoop.h"
 
-
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
@@ -128,15 +127,48 @@ void __cdecl game_modules_dispose() {
 
 void (*main_game_loop)();
 
+std::chrono::steady_clock::duration desiredRenderTime;
+inline void defaultFrameLimiter() {
+	static bool frameLimiterInitialized = false;
+
+	namespace _time = std::chrono;
+	using _clock = _time::steady_clock;
+	static std::chrono::steady_clock::time_point nextFrameTime;
+	static int lastFrameSetting = -1;
+
+	if (H2Config_experimental_fps == e_render_original_game_frame_limit
+		|| H2Config_fps_limit <= 0)
+	{
+		lastFrameSetting = H2Config_fps_limit;
+		frameLimiterInitialized = false;
+		return;
+	}
+
+	if (lastFrameSetting != H2Config_fps_limit)
+	{
+		lastFrameSetting = H2Config_fps_limit;
+		frameLimiterInitialized = false;
+	}
+
+	if (!frameLimiterInitialized)
+	{
+		SET_DESIRED_RENDER_TIME();
+		nextFrameTime = _clock::now() + desiredRenderTime;
+		frameLimiterInitialized = true;
+	}
+
+	std::this_thread::sleep_until(nextFrameTime);
+	nextFrameTime += (desiredRenderTime * (1 + ((_clock::now() - nextFrameTime) / desiredRenderTime)));
+}
+
 void main_game_loop_hook() {
+	defaultFrameLimiter();
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 
 	EventHandler::execute_callback<EventHandler::GameLoopEvent>(execute_before);
 	main_game_loop();
 	EventHandler::execute_callback<EventHandler::GameLoopEvent>(execute_after);
-	extern void frameTimeManagement();
-	frameTimeManagement();
 }
 
 static char HookedServerShutdownCheck() {
