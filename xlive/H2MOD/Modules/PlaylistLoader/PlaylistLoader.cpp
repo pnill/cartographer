@@ -127,7 +127,7 @@ namespace playlist_loader
 	bool process_custom_setting(playlist_entry* playlist_entry)
 	{
 		//Section Type must be Variant
-		if (playlist_entry->current_section_type != e_hpl_headers::Playlist)
+		if (playlist_entry->current_section_type != e_hpl_headers::Variant)
 			return false;
 
 		auto result = false;
