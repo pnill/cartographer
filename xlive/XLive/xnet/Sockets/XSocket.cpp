@@ -84,8 +84,9 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 	newXSocket->setBufferSize(gXnIp.GetMinSockSendBufferSizeInBytes(), gXnIp.GetMinSockRecvBufferSizeInBytes());
 
 	// disable SIO_UDP_CONNRESET
+	// TODO re-enable this if the issue https://github.com/pnill/cartographer/issues/320 is not caused by this
 
-	DWORD ioctlSetting = 0;
+	/*DWORD ioctlSetting = 0;
 	DWORD cbBytesReturned;
 	if (WSAIoctl(newXSocket->winSockHandle, SIO_UDP_CONNRESET, &ioctlSetting, 4u, 0, 0, &cbBytesReturned, 0, 0) == SOCKET_ERROR)
 	{
@@ -94,7 +95,7 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 	else
 	{
 		LOG_TRACE_NETWORK("XSocketCreate() - disabled SIO_UDP_CONNRESET");
-	}
+	}*/
 
 	XSocket::Sockets.push_back(newXSocket);
 
