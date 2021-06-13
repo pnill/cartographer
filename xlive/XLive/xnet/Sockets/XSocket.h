@@ -70,6 +70,7 @@ struct XSocket
 	static void socketsDisposeAll();
 
 	static std::vector<XSocket*> Sockets;
+	int recvfrom(LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr *lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine, unsigned int packetsReadCount);
 };
 
 void WINAPI XSocketWSASetLastError(int iError);

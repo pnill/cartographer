@@ -250,16 +250,23 @@ BOOL WINAPI XSocketWSACancelOverlappedIO(HANDLE hFile)
 	return CancelIo(hFile);
 }
 
-// #21
-int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr *lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
+int XSocket::recvfrom(
+	LPWSABUF lpBuffers, 
+	DWORD dwBufferCount, 
+	LPDWORD lpNumberOfBytesRecvd, 
+	LPDWORD lpFlags, 
+	struct sockaddr *lpFrom, 
+	LPINT lpFromlen, 
+	LPWSAOVERLAPPED lpOverlapped, 
+	LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine,
+	unsigned int packetsReadCount
+)
 {
-	XSocket* xsocket = (XSocket*)s;
-
-	if (xsocket->isTCP() 
+	if (this->isTCP()
 		|| lpFrom == NULL)
 	{
 		return WSARecv(
-			xsocket->winSockHandle,
+			this->winSockHandle,
 			lpBuffers,
 			dwBufferCount,
 			lpNumberOfBytesRecvd,
@@ -269,7 +276,7 @@ int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount,
 	}
 
 #if COMPILE_WITH_STD_SOCK_FUNC
-	int result = recvfrom(xsocket->winSockHandle, lpBuffers->buf, lpBuffers->len, *lpFlags, lpFrom, lpFromlen);
+	int result = ::recvfrom(this->winSockHandle, lpBuffers->buf, lpBuffers->len, *lpFlags, lpFrom, lpFromlen);
 	*lpNumberOfBytesRecvd = result;
 #else
 	int result = WSARecvFrom(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
@@ -288,13 +295,29 @@ int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount,
 	// or the packet received is a valid game packet
 	// because we don't want to lose/delay an in-bound game packet
 	// this should improve performance especially if someone is sending from an unknown connection packets (like DDoS-ing), depending on the performance of the server
-	result = gXnIp.handleRecvdPacket(xsocket, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
+	result = gXnIp.handleRecvdPacket(this, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
 	if (result == SOCKET_ERROR)
 	{
-		return XSocketWSARecvFrom(s, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
+		// don't allow more than 100 packets to be processed per XSocketWSARecvFrom() call
+		if (packetsReadCount > 100)
+		{
+			XSocketWSASetLastError(WSAEWOULDBLOCK);
+			return SOCKET_ERROR;
+		}
+		else
+		{
+			return this->recvfrom(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine, packetsReadCount + 1);
+		}
 	}
 
 	return result;
+}
+
+// #21
+int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr *lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
+{
+	XSocket* socket = (XSocket*)s;
+	return socket->recvfrom(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine, 0);
 }
 
 // #25
