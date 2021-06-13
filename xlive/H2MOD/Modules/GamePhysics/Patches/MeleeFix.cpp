@@ -4,6 +4,8 @@
 #include "Blam/Enums/Game/HaloStrings.h"
 #include "H2MOD/Modules/Startup/Startup.h"
 
+#include "../MeleeLunge.h"
+
 using Blam::Enums::Game::HaloString;
 
 namespace MeleeFix
@@ -70,7 +72,7 @@ namespace MeleeFix
 	}
 	
 
-	int sub877948Hook(int a1, int a2, int target_player, char a4)
+	int melee_next_animation_hook(int a1, int a2, int target_player, char a4)
 	{
 		int result;
 		__asm
@@ -145,7 +147,7 @@ namespace MeleeFix
 					abort_melee_action = true;
 			}
 			if ((++biped_melee_info->melee_animation_update >= (int)biped_melee_info->max_animation_range || abort_melee_action)
-				&& !sub877948Hook(object_index, 0, -1, biped_melee_info->field_30))
+				&& !melee_next_animation_hook(object_index, 0, -1, biped_melee_info->field_30))
 			{
 				biped_melee_info->melee_flags &= 0xF7FFFFFF;
 				biped_melee_info->melee_type_string_id = -1;
@@ -156,6 +158,7 @@ namespace MeleeFix
 
 	void ApplyHooks()
 	{
+		
 		melee_get_time_to_target = Memory::GetAddress<p_melee_get_time_to_target*>(0x150784);
 		melee_damage = Memory::GetAddress<p_melee_damage*>(0x142D62);
 		c_send_melee_damage_simulation_event = Memory::GetAddress<p_send_melee_damage_simulation_event*>(0x1B8618);
@@ -170,8 +173,11 @@ namespace MeleeFix
 	void Initialize()
 	{
 		//ApplyHooks();
-		
+
 #pragma region Known good patches
+		//Codecave(Memory::GetAddressRelative(0x50B72A), melee_force_decelerate_fixup, 3);
+		PatchCall(Memory::GetAddressRelative(0x50BD96, 0x4FE3C6), call_character_melee_physics_input_update_internal);
+
 		// replace cvttss2si instruction which is the convert to int by truncation (> .5 decimal values don't mean anything, truncation rounding always towards 0) 
 		// with cvtss2si instruction which reads the MXCSR register that holds the flags of the conversion rounding setting
 		// that the game sets, which is Round Control Near (if decimal part > .5, convert to upper value)

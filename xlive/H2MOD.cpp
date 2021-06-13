@@ -3,7 +3,7 @@
 
 #include "Blam/Engine/FileSystem/FiloInterface.h"
 #include "H2MOD/Discord/DiscordInterface.h"
-#include "H2MOD/Modules/HitFix/HitFix.h"
+#include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/MainMenu/Ranks.h"
 #include "H2MOD/Modules/Networking/Memory/bitstream.h"
@@ -26,7 +26,7 @@
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "Blam/Engine/Game/DamageData.h"
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
-#include "H2MOD/Modules/HitFix/MeleeFix.h"
+#include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "Blam/Engine/Objects/GameStateObjects.h"
 
@@ -817,13 +817,14 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		if (!b_XboxTick) 
 		{
 			H2X::Initialize(b_H2X);
-			HitFix::ApplyProjectileVelocity();
+			ProjectileFix::ApplyProjectileVelocity();
 			engine_settings->tickrate = XboxTick::setTickRate(false);
 		}
 		else
 		{
 			engine_settings->tickrate = XboxTick::setTickRate(true);
 		}
+
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		EventHandler::executeMapLoadCallback(e_engine_type::Multiplayer);
@@ -1563,7 +1564,7 @@ void H2MOD::ApplyHooks() {
 	ApplyUnitHooks();
 	mapManager->applyHooks();
 
-	HitFix::ApplyPatches();
+	ProjectileFix::ApplyPatches();
 
 	//Guardian Patch
 	c_object_cause_damage = Memory::GetAddress<p_object_cause_damage*>(0x17AD81, 0x1525E1);
