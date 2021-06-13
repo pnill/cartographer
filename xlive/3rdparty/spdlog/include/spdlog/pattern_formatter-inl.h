@@ -925,7 +925,7 @@ private:
 };
 
 // Full info formatter
-// pattern: [%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%s:%#] %v
+// pattern: [%Y-%m-%d %H:%M:%S.%e] [%n] [%l] %v
 class full_formatter final : public flag_formatter
 {
 public:

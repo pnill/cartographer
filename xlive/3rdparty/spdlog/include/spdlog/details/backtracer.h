@@ -43,4 +43,3 @@ public:
 #ifdef SPDLOG_HEADER_ONLY
 #include "backtracer-inl.h"
 #endif
-
