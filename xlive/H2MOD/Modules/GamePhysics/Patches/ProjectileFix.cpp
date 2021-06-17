@@ -1,6 +1,9 @@
 #include "ProjectileFix.h"
 
- #include "Globals.h"
+#include "Globals.h"
+
+#include <float.h>
+#pragma fenv_access (on)
 
 #define DEFAULT_PROJECTILE_OBJECT_DATA_SIZE 428
 

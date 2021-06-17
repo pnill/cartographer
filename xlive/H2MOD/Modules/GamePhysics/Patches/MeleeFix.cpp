@@ -8,6 +8,9 @@
 
 using Blam::Enums::Game::HaloString;
 
+#include <float.h>
+#pragma fenv_access (on)
+
 namespace MeleeFix
 {
 	void MeleeCollisionPatch()

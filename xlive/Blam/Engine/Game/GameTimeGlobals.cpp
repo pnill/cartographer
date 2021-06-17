@@ -1,6 +1,9 @@
 
 #include "GameTimeGlobals.h"
 
+#include <float.h>
+#pragma fenv_access (on)
+
 time_globals* time_globals::get()
 {
 	return *Memory::GetAddress<time_globals**>(0x4C06E4, 0x4CF0EC);
