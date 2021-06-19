@@ -346,7 +346,7 @@ void ConsoleCommands::checkForIds() {
 	}
 }
 
-void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition) {
+void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition, bool sameTeam) {
 
 	for (int i = 0; i < count; i++) {
 		try {
@@ -367,6 +367,9 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 					nObject.Placement.y = y;
 					nObject.Placement.z = z;
 				}
+
+				if (!sameTeam)
+					nObject.team_index = NONE;
 
 				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.Placement.x, nObject.Placement.y, nObject.Placement.z);
 				unsigned int object_gamestate_datum = Engine::Objects::call_object_new(&nObject);
@@ -539,8 +542,8 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$spawnnear") {
-			if (splitCommands.size() < 3 || splitCommands.size() > 4) {
-				output(L"Invalid command, usage $spawn command_name count");
+			if (splitCommands.size() < 4 || splitCommands.size() > 5) {
+				output(L"Invalid command usage $spawnnear command_name count same_team optional:multiplier");
 				return;
 			}
 
@@ -573,9 +576,9 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 
 			float randomMultiplier = 1.0f;
-			if (splitCommands.size() == 4) {
+			if (splitCommands.size() == 5) {
 				//optional multiplier provided
-				std::string fourthArg = splitCommands[3];
+				std::string fourthArg = splitCommands[4];
 				randomMultiplier = stof(fourthArg);
 			}
 
@@ -588,8 +591,12 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
+			bool sameTeam = false;
+			if (splitCommands[3] == "true")
+				sameTeam = true;
+
 			real_point3d* localPlayerPosition = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
-			this->spawn(object_datum, count, localPlayerPosition->x + 0.5f, localPlayerPosition->y + 0.5f, localPlayerPosition->z + 0.5f, randomMultiplier, false);
+			this->spawn(object_datum, count, localPlayerPosition->x + 0.5f, localPlayerPosition->y + 0.5f, localPlayerPosition->z + 0.5f, randomMultiplier, false, sameTeam);
 			return;
 		}
 		else if (firstCommand == "$ishost") {
@@ -628,8 +635,8 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$spawn") {
-			if (splitCommands.size() != 6) {
-				output(L"Invalid command, usage $spawn command_name count x y z");
+			if (splitCommands.size() != 7) {
+				output(L"Invalid command, usage $spawn command_name count x y z same_team");
 				return;
 			}
 
@@ -664,7 +671,11 @@ void ConsoleCommands::handle_command(std::string command) {
 			float y = stof(splitCommands[4]);
 			float z = stof(splitCommands[5]);
 
-			this->spawn(object_datum, count, x, y, z, 1.0f, true);
+			bool sameTeam = false;
+			if (splitCommands[6] == "true")
+				sameTeam = true;
+			
+			this->spawn(object_datum, count, x, y, z, 1.0f, true, sameTeam);
 			return;
 		}
 		else if (firstCommand == "$controller_sens") {

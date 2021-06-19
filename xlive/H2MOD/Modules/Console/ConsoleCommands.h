@@ -7,7 +7,7 @@ class ConsoleCommands {
 public:
 	ConsoleCommands();
 	void handle_command(std::string);
-	void spawn(datum object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition);
+	void spawn(datum object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition, bool sameTeam);
 	void output(std::wstring result);
 	void display(std::string output);
 	std::vector<std::string> prevCommands;
