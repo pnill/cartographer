@@ -52,6 +52,8 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 	if (wp == H2Config_hotkeyIdConsole) {
 		if (seconds_since_start > 0.5) {
 			this->console = !this->console;
+			caretBlinked = false;
+			lastTimeCaretBlink = timeGetTime();
 			start = time(0);
 		}
 		return true;
@@ -72,11 +74,11 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 
 	case '\r':    // return/enter
 	{
-		if (console) {
+		if (console && command.length() > 1) {
 			writePreviousOutput(this->command);
 			writePreviousCommand(this->command);
 			std::string fullCommand("$");
-			fullCommand += this->command;
+			fullCommand += command;
 			this->handle_command(fullCommand);
 
 			command = "";
@@ -310,6 +312,18 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 		break;
 	}
 	return false;
+}
+
+bool ConsoleCommands::shouldCaretBlink()
+{
+	if (timeGetTime() - lastTimeCaretBlink >= caretBlinkTimeMs)
+	{
+		lastTimeCaretBlink = timeGetTime();
+		caretBlinked = !caretBlinked;
+		return caretBlinked;
+	}
+
+	return caretBlinked;
 }
 
 void ConsoleCommands::checkForIds() {

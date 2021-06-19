@@ -516,7 +516,12 @@ int WINAPI XLiveRender()
 				drawPrimitiveRect(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				//drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				drawText(0, startingPosY, COLOR_WHITE, ">>", normalSizeFont);
-				drawText(35, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
+
+				std::string strCommand = commands->command;
+				if (!commands->shouldCaretBlink())
+					strCommand.replace(commands->caretPos, 1, "_");
+
+				drawText(35, startingPosY, COLOR_WHITE, strCommand.c_str(), normalSizeFont);
 
 				startingPosY -= 12.0f;
 				for (std::string& it : commands->prevOutput) {

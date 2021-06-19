@@ -14,6 +14,7 @@ public:
 	std::vector<std::string> prevOutput;
 	BOOL handleInput(WPARAM wp);
 	bool consoleOpen() { return this->console; };
+	bool shouldCaretBlink();
 
 	std::string command;
 	int caretPos;
@@ -28,6 +29,9 @@ private:
 	bool checked_for_ids = false;
 	std::unordered_map<std::string, unsigned int> object_ids;
 	DWORD sleepTime;
+	const int caretBlinkTimeMs = 500;
+	unsigned lastTimeCaretBlink = timeGetTime();
+	bool caretBlinked = false;
 };
 
 extern ConsoleCommands* commands;
