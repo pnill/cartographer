@@ -12,7 +12,7 @@ enum melee_flags
 	melee_deceleration_early_start = 4,
 	melee_deceleration_finished,
 
-	end = 8
+	end
 };
 
 #define melee_flags_mask 0xF0 // use first 4 bits of the 1 byte variable as flags
@@ -42,9 +42,9 @@ struct __declspec(align(4)) c_character_physics_mode_melee_datum
 	real_vector3d field_1C;
 	float field_28;
 	float m_unk_distance1;
-	real_point3d unk_point;
-	real_vector3d aiming_vector_adjusted;
-	float default_no_target_distance;
+	real_point3d m_target_point;
+	real_vector3d aiming_direction;
+	float m_maximum_distance;
 	BYTE m_started_decelerating;
 	BYTE field_4D;
 	BYTE field_4E[2];

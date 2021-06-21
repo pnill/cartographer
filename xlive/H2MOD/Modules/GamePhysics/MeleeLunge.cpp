@@ -52,6 +52,8 @@ __declspec(naked) void melee_force_decelerate_fixup()
 		PUSHAD
 		PUSHFD
 
+		sub esp, 4
+
 		sub esp, 16 * 4 // allocate 4 xmm registers size on stack (each has 128 bits / 16 bytes)
 		movaps[esp + 16 * 0], xmm3 // then copy them to stack
 		movaps[esp + 16 * 1], xmm2
@@ -77,6 +79,8 @@ __declspec(naked) void melee_force_decelerate_fixup()
 
 		// reset stack after restoring xmm register
 		add esp, 16 * 4
+
+		add esp, 4
 
 		// re-load registers as well
 		POPFD
@@ -216,9 +220,9 @@ float __cdecl get_melee_lunge_speed_per_tick(float target_distance, char weapon_
 	return flt_ret;
 }
 
-float compute_something(float melee_lunge_speed, float melee_lunge_unk2)
+float compute_something(float v1, float v2)
 {
-	return ((melee_lunge_speed - (melee_lunge_unk2 / 3.0f)) * 3.0f) / 2.0f;
+	return ((v1 - (v2 / 3.0f)) * 3.0f) / 2.0f;
 }
 
 /*
@@ -281,14 +285,17 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 		// get the velocity per game logic update
 		output->out_translational_velocity = output->out_translational_velocity * time_globals::get()->seconds_per_tick;
 
-		real_vector3d distance_vector = this->unk_point - *object_origin;
+		real_vector3d distance_vector = this->m_target_point - *object_origin;
 
-		float remaining_distance = distance_vector.magnitude();
+		float remaining_distance_from_player_position = distance_vector.magnitude();
 
 		float max_speed_per_tick = get_melee_lunge_speed_per_tick(this->m_unk_distance1, this->m_weapon_is_sword);
-		float something1 = compute_something(max_speed_per_tick, max_speed_per_tick);
 
-		float real_time_to_target = ((remaining_distance / something1) - 0.5f);
+		// this variable is named max_speed_per_tick_2 because it should result in the same value after processing in `compute something`
+		// because passing both arguments with the same value will cause that
+		float max_speed_per_tick_2 = compute_something(max_speed_per_tick, max_speed_per_tick);
+
+		float real_time_to_target = ((remaining_distance_from_player_position / max_speed_per_tick_2) - 0.5f);
 
 		// field_28 is always the same after the first melee tick
 		float unk1 = this->field_28 * 1.5;
@@ -330,7 +337,8 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 			velocity_to_decelerate_per_tick = current_velocity_per_tick;
 		}
 
-		const float melee_max_cosine = cos(degreesToRadians(85.f));
+		//const float melee_max_cosine = cos(degreesToRadians(85.f));
+		const float melee_max_cosine = 0.087155744f;
 
 		if (get_melee_lunge_speed_per_tick(this->m_unk_distance1, this->m_weapon_is_sword) <= k_valid_real_epsilon)
 		{
@@ -366,6 +374,8 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 					deceleration = unk4;
 
 				output->out_translational_velocity = (direction * (-0.0f - deceleration)) + output->out_translational_velocity;
+				//output->out_translational_velocity = output->out_translational_velocity * (float)time_globals::get_ticks_difference();
+
 				//output->out_translational_velocity = output->out_translational_velocity * (float)time_globals::get()->ticks_per_second;
 
 				if (unk3 <= ((current_velocity_per_tick - unk4) + k_valid_real_epsilon))
@@ -384,15 +394,9 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 				}
 			
 				this->m_time_to_target_in_ticks = (int)real_time_to_target;
+
+				//this->m_time_to_target_in_ticks = (current_velocity_per_tick / velocity_to_decelerate_per_tick) - 0.5f;
 				output->out_translational_velocity = (direction * (-0.0f - velocity_to_decelerate_per_tick)) + output->out_translational_velocity;
-
-				//float ticks_to_target_2 = 1.0f;
-
-				//if (ticks_to_target_1 < 0.0f)
-					//ticks_to_target_2 = -1.0f;
-
-				//this->m_time_to_target_in_ticks = (ticks_to_target_2 / 2.0f) + ticks_to_target_1;
-				//this->m_time_to_target_in_ticks = ticks_to_target_1;
 
 				//this->m_time_to_target_in_ticks = ((_FP5 * 0.5f) + v124);
 				//addDebugText("remaining target distance ticks: %f, %d", ((_FP5 * 0.5f) + v124), this->m_time_to_target_in_ticks);
@@ -506,9 +510,9 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 	if (m_melee_tick == 1)
 	{
 		int added_ticks = m_maximum_counter - 6 - (m_weapon_is_sword ? 7 : 1);
-		LOG_TRACE_MELEE(added_ticks <= 0 ? "{} - no counter ticks added: {}" : "{} - added tick count: {}", __FUNCTION__, added_ticks);
+		LOG_TRACE_MELEE("{} - added tick count to maximum counter: {}", __FUNCTION__, added_ticks);
 
-		LOG_TRACE_MELEE("{} - target_distance: {}, melee_counter: {}", __FUNCTION__, distance_world_units, m_maximum_counter);
+		LOG_TRACE_MELEE("{} - target_distance: {}, maximum counter: {}", __FUNCTION__, distance_world_units, m_maximum_counter);
 	}
 
 	if ((float)(m_maximum_counter - m_melee_tick) <= 4.0f && !m_started_decelerating)
@@ -534,10 +538,10 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 	}
 
 	// create vector from subtracting 1 point out of the other 
-	real_vector3d distance_vector = unk_point - *object_origin;
+	real_vector3d distance_vector = m_target_point - *object_origin;
 	float remaining_distance = distance_vector.magnitude();
 
-	float unk_float_distance = this->aiming_vector_adjusted.dot_product(*translational_velocity);
+	float unk_float_distance = this->aiming_direction.dot_product(*translational_velocity);
 	unk_float_distance *= time_globals::get_seconds_per_tick();
 	float unk_velocity = compute_something(unk_float_distance, get_melee_lunge_speed_per_tick(this->m_unk_distance1, this->m_weapon_is_sword));
 	if (unk_velocity < 0.0f)
@@ -561,11 +565,20 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 
 	LOG_TRACE_MELEE("{} : remaining distance in ticks: {} ", __FUNCTION__, this->m_time_to_target_in_ticks);
 
-	LOG_TRACE_MELEE("{} : vector point1_unk: i: {} j: {}, k: {}",
+	LOG_TRACE_MELEE("{} : target point: x: {} y: {}, z: {}",
 		__FUNCTION__,
-		this->unk_point.i,
-		this->unk_point.j,
-		this->unk_point.k);
+		this->m_target_point.x,
+		this->m_target_point.y,
+		this->m_target_point.z);
+	
+	LOG_TRACE_MELEE("{} : aiming vector adjusted length: {}",
+		__FUNCTION__,
+		aiming_direction.magnitude());
+
+	LOG_TRACE_MELEE("{} : previous velocity: {}, previous velocity dot product with aiming vector adjusted: {}",
+		__FUNCTION__,
+		translational_velocity->magnitude(),
+		aiming_direction.dot_product(*translational_velocity));
 
 	LOG_TRACE_MELEE("{} : end log for melee @ tick {} \n", __FUNCTION__, m_melee_tick - 1);
 
@@ -620,7 +633,7 @@ c_character_physics_mode_melee_datum::melee_deceleration_fixup - melee animation
 c_character_physics_mode_melee_datum::update_internal : output velocity:       i: -3.3956537, j: 11.509544, k: -4.7683716e-07, decelerating?: false, magnitude: 12.000003, remaining distance to target: 1.8314812
 
 c_character_physics_mode_melee_datum::update_internal : remaining distance in ticks: 7
-c_character_physics_mode_melee_datum::update_internal : vector point1_unk: i: 0.2722c_character_physics_mode_melee_datum::update_internal7 j: -0.4421872, k: -8.485
+c_character_physics_mode_melee_datum::update_internal : vector point1_unk: i: 0.27225287 j: -0.4421872, k: -8.485
 c_character_physics_mode_melee_datum::update_internal : ended log for @ melee tick 3
 
 c_character_physics_mode_melee_datum::update_internal : about to log information @ melee tick 4
