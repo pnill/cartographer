@@ -52,8 +52,7 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 	if (wp == H2Config_hotkeyIdConsole) {
 		if (seconds_since_start > 0.5) {
 			this->console = !this->console;
-			caretBlinked = false;
-			lastTimeCaretBlink = timeGetTime();
+			resetCaretBlink();
 			start = time(0);
 		}
 		return true;
@@ -66,6 +65,7 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 			{
 				this->command.erase(this->caretPos - 1, 1);
 				this->caretPos -= 1;
+				resetCaretBlink();
 			}
 			return true;
 		}
@@ -83,6 +83,7 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 
 			command = "";
 			caretPos = 0;
+			resetCaretBlink();
 			previous_command_index = 0;
 			return true;
 		}
@@ -116,6 +117,7 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 				{
 					command = prevCommands[previous_command_index];
 					caretPos = command.length();
+					resetCaretBlink();
 					previous_command_index++;
 				}
 				return true;
@@ -128,6 +130,7 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 					previous_command_index--;
 					command = prevCommands[previous_command_index];
 					caretPos = command.length();
+					resetCaretBlink();
 				}
 				return true;
 			}
@@ -135,12 +138,14 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 			if (wp == VK_END)
 			{
 				caretPos = command.length();
+				resetCaretBlink();
 				return true;
 			}
 
 			if (wp == VK_HOME)
 			{
 				caretPos = 0;
+				resetCaretBlink();
 				return true;
 			}
 
@@ -149,6 +154,8 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 				if (caretPos)
 					caretPos--;
 
+				resetCaretBlink();
+
 				return true;
 			}
 
@@ -156,6 +163,8 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 			{
 				if (caretPos != command.length())
 					caretPos++;
+
+				resetCaretBlink();
 
 				return true;
 			}
@@ -324,6 +333,12 @@ bool ConsoleCommands::shouldCaretBlink()
 	}
 
 	return caretBlinked;
+}
+
+void ConsoleCommands::resetCaretBlink()
+{
+	caretBlinked = false;
+	lastTimeCaretBlink = timeGetTime();
 }
 
 void ConsoleCommands::checkForIds() {

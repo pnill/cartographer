@@ -15,9 +15,11 @@ public:
 	BOOL handleInput(WPARAM wp);
 	bool consoleOpen() { return this->console; };
 	bool shouldCaretBlink();
+	void resetCaretBlink();
 
 	std::string command;
 	int caretPos;
+
 	bool handled;
 	bool console = false;
 	int previous_command_index = 0;
