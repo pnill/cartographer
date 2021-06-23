@@ -199,21 +199,25 @@ int __cdecl biped_dash_time_to_target(datum biped_index)
 	return -1;
 }
 
-float __cdecl get_melee_lunge_speed_per_tick(float target_distance, char weapon_is_sword)
+float __cdecl get_max_melee_lunge_speed_per_tick(float target_distance, char weapon_is_sword)
 {
-
-	auto p_get_melee_lunge_speed_per_tick = Memory::GetAddressRelative<decltype(&get_melee_lunge_speed_per_tick)>(0x50B06F, 0x4FD69F);
+	auto p_get_max_melee_lunge_speed_per_tick = Memory::GetAddressRelative<decltype(&get_max_melee_lunge_speed_per_tick)>(0x50B06F, 0x4FD69F);
+	
 	float flt_ret = 0.0f;
 	__asm
 	{
 		sub esp, 4
 		movss[esp], xmm0
-		push weapon_is_sword
+		push eax
+		xor eax, eax
+		mov al, weapon_is_sword
+		push eax
 		push target_distance
-		call p_get_melee_lunge_speed_per_tick // __usercall, returns float in xmm register instead of fpu stack
+		call p_get_max_melee_lunge_speed_per_tick // __usercall, returns float in xmm register instead of fpu stack
 		add esp, 8
 		movss[flt_ret], xmm0 // move xmm0 on stack
 		movss xmm0, [esp]
+		pop eax
 		add esp, 4
 	}
 
@@ -289,7 +293,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 
 		float remaining_distance_from_player_position = distance_vector.magnitude();
 
-		float max_speed_per_tick = get_melee_lunge_speed_per_tick(this->m_unk_distance1, this->m_weapon_is_sword);
+		float max_speed_per_tick = get_max_melee_lunge_speed_per_tick(this->m_distance, this->m_weapon_is_sword);
 
 		// this variable is named max_speed_per_tick_2 because it should result in the same value after processing in `compute something`
 		// because passing both arguments with the same value will cause that
@@ -340,7 +344,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 		//const float melee_max_cosine = cos(degreesToRadians(85.f));
 		const float melee_max_cosine = 0.087155744f;
 
-		if (get_melee_lunge_speed_per_tick(this->m_unk_distance1, this->m_weapon_is_sword) <= k_valid_real_epsilon)
+		if (get_max_melee_lunge_speed_per_tick(this->m_distance, this->m_weapon_is_sword) <= k_valid_real_epsilon)
 		{
 			FINISH_DECELERATION();
 			return;
@@ -543,7 +547,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 
 	float unk_float_distance = this->aiming_direction.dot_product(*translational_velocity);
 	unk_float_distance *= time_globals::get_seconds_per_tick();
-	float unk_velocity = compute_something(unk_float_distance, get_melee_lunge_speed_per_tick(this->m_unk_distance1, this->m_weapon_is_sword));
+	float unk_velocity = compute_something(unk_float_distance, get_max_melee_lunge_speed_per_tick(this->m_distance, this->m_weapon_is_sword));
 	if (unk_velocity < 0.0f)
 		unk_velocity = 0.0f;
 

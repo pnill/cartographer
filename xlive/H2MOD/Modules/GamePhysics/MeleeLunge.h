@@ -41,7 +41,7 @@ struct __declspec(align(4)) c_character_physics_mode_melee_datum
 	real_point3d start_unit_origin;
 	real_vector3d field_1C;
 	float field_28;
-	float m_unk_distance1;
+	float m_distance;
 	real_point3d m_target_point;
 	real_vector3d aiming_direction;
 	float m_maximum_distance;
