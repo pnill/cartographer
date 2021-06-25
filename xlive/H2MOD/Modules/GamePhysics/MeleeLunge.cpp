@@ -32,6 +32,17 @@ float __cdecl get_ticks_difference_real()
 #pragma optimize( "", off )
 #endif
 
+float get_melee_acceleration(float max_speed_per_tick)
+{
+	return max_speed_per_tick / 3.0f;
+}
+
+// not entirely sure what this calculates
+float compute_something(float v1, float v2)
+{
+	return ((v1 - get_melee_acceleration(v2)) * 3.0f) / 2.0f;
+}
+
 static ObjectHeader* get_objects_header(datum object_index)
 {
 	/*
@@ -224,11 +235,6 @@ float __cdecl get_max_melee_lunge_speed_per_tick(float target_distance, char wea
 	return flt_ret;
 }
 
-float compute_something(float v1, float v2)
-{
-	return ((v1 - (v2 / 3.0f)) * 3.0f) / 2.0f;
-}
-
 /*
 NOTES:
 
@@ -363,27 +369,51 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 
 		//current_velocity_per_tick > minimum_velocity_per_tick
 		//decelerated_velocity > this->velocity_to_decelerate
-		if (m_maximum_counter <= (m_melee_tick - 1))
+
+		/*float aiming_and_player_velocity_product = current_velocity->dot_product(this->aiming_direction);
+		aiming_and_player_velocity_product *= time_globals::get_seconds_per_tick();*/
+
+		/*float unk5 = compute_something(aiming_and_player_velocity_product, max_speed_per_tick);
+		if (unk5 < 0.0f)
+			unk5 = 0.0f;*/
+
+		//float distance_to_target_point = distance_vector.magnitude();
+
+		int ticks_to_add = 0;
+		//if (unk5 > distance_to_target_point)
+
+		if (m_maximum_counter + ticks_to_add <= (m_melee_tick - 1))
 			out_current_flags |= FLAG(melee_deceleration_finished);
 
 		if (!(out_current_flags & FLAG(melee_deceleration_finished)))
 		{
 			// compare 2 dot products
-			if (aiming_vector->dot_product(direction) <= (current_velocity_per_tick * melee_max_cosine) 
-				|| normalized_current_magnitude_per_tick == 0.0f)
+			if ((aiming_vector->dot_product(direction) <= (current_velocity_per_tick * melee_max_cosine) 
+				|| normalized_current_magnitude_per_tick == 0.0f))
 			{
 				float unk4 = (this->m_velocity_to_decelerate + unk3) / 3.0f;
 				float deceleration = current_velocity_per_tick;
 				if (unk4 <= current_velocity_per_tick)
 					deceleration = unk4;
 
-				output->out_translational_velocity = (direction * (-0.0f - deceleration)) + output->out_translational_velocity;
-				//output->out_translational_velocity = output->out_translational_velocity * (float)time_globals::get_ticks_difference();
+				deceleration *= time_globals::get_ticks_difference_real();
 
+				// im not entirely sure if this is needed or not
+				output->out_translational_velocity = output->out_translational_velocity * time_globals::get_ticks_difference_real();
+
+				output->out_translational_velocity = (direction * (-0.0f - deceleration)) + output->out_translational_velocity;
+
+				// this shit apparently is not converted back to a vector that
+				// - defines the velocity in units per seconds intead of units per tick
+				// either some numb nut at bungie forgot to add the line bellow or it was intentional
+				// so we just convert the current velocity and deceleration to 30 tick values
+				// and output them like that
 				//output->out_translational_velocity = output->out_translational_velocity * (float)time_globals::get()->ticks_per_second;
 
 				if (unk3 <= ((current_velocity_per_tick - unk4) + k_valid_real_epsilon))
+				{
 					return;
+				}
 
 				out_current_flags |= FLAG(melee_deceleration_finished);
 				this->m_time_to_target_in_ticks = 0;

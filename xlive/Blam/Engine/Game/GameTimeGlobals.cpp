@@ -28,3 +28,8 @@ int time_globals::get_ticks_difference()
 {
 	return (get()->ticks_per_second / 30);
 }
+
+float time_globals::get_ticks_difference_real()
+{
+	return (get()->ticks_per_second / 30.0f);
+}

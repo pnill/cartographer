@@ -12,7 +12,7 @@ enum melee_flags
 	melee_deceleration_early_start = 4,
 	melee_deceleration_finished,
 
-	end
+	melee_flags_end
 };
 
 #define melee_flags_mask 0xF0 // use first 4 bits of the 1 byte variable as flags
