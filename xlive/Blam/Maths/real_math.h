@@ -126,6 +126,12 @@ union real_vector3d
 		return this->i * other.i + this->j * other.j + this->k * other.k;
 	}
 
+	// dot product by itself
+	float dot_product() const
+	{
+		return this->i * this->i + this->j * this->j + this->k * this->k;
+	}
+
 	// magnitude
 	float magnitude() const
 	{

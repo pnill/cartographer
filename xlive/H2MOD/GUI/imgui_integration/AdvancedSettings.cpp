@@ -5,7 +5,7 @@
 #include "H2MOD/Modules/HudElements/HudElements.h"
 #include "3rdparty/imgui/imgui_internal.h"
 #include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
-#include "H2MOD/Modules/HitFix/HitFix.h"
+#include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
@@ -20,7 +20,7 @@
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
-#include "H2MOD/Modules/HitFix/MeleeFix.h"
+#include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
 
 
 namespace imgui_handler {

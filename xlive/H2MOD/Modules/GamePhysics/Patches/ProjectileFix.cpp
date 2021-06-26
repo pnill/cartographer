@@ -1,8 +1,9 @@
-#include "HitFix.h"
+#include "ProjectileFix.h"
 
- #include "Globals.h"
+#include "Globals.h"
 
-// TODO: move the struct time_globals in here somewhere else
+#include <float.h>
+#pragma fenv_access (on)
 
 #define DEFAULT_PROJECTILE_OBJECT_DATA_SIZE 428
 
@@ -145,7 +146,7 @@ void __cdecl matrix4x3_transform_point(void* matrix, real_vector3d* v1, real_vec
 }
 #pragma endregion
 
-void HitFix::ApplyProjectileVelocity()
+void ProjectileFix::ApplyProjectileVelocity()
 {
 	for (auto& proj_tuple : weapon_projectiles)
 	{
@@ -159,7 +160,7 @@ void HitFix::ApplyProjectileVelocity()
 	}
 }
 
-void HitFix::ApplyPatches()
+void ProjectileFix::ApplyPatches()
 {
 	// increase projectile game object data size to store the elapsed tick time when created
 	WriteValue<unsigned short>(Memory::GetAddress(0x41EE58, 0x3C2368) + 0x8, INCREASED_PROJECTILE_OBJECT_DATA_SIZE);
