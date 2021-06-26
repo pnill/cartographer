@@ -11,6 +11,8 @@ using Blam::Enums::Game::HaloString;
 #include <float.h>
 #pragma fenv_access (on)
 
+#define MELEE_LUNGE_PHYSICS_UPDATE_HOOK_ENABLE 1
+
 namespace MeleeFix
 {
 	void MeleeCollisionPatch()
@@ -142,6 +144,7 @@ namespace MeleeFix
 				melee_damage(object_index, melee_type, biped_melee_info->field_30, (float)(unsigned __int8)biped_melee_info->field_31 * 0.0039215689);
 			}*/
 			
+			// this is used only for sword
 			if (melee_type == HaloString::HS_MELEE_DASH || melee_type == HaloString::HS_MELEE_DASH_AIRBORNE)
 			{
 				float melee_max_duration = melee_type == HaloString::HS_MELEE_DASH_AIRBORNE ? 0.22 : 0.15000001;
@@ -177,10 +180,12 @@ namespace MeleeFix
 	{
 		//ApplyHooks();
 
-#pragma region Known good patches
+#if MELEE_LUNGE_PHYSICS_UPDATE_HOOK_ENABLE
 		//Codecave(Memory::GetAddressRelative(0x50B72A), melee_force_decelerate_fixup, 3);
 		PatchCall(Memory::GetAddressRelative(0x50BD96, 0x4FE3C6), call_character_melee_physics_input_update_internal);
+#endif
 
+#pragma region Known good patches
 		// replace cvttss2si instruction which is the convert to int by truncation (> .5 decimal values don't mean anything, truncation rounding always towards 0) 
 		// with cvtss2si instruction which reads the MXCSR register that holds the flags of the conversion rounding setting
 		// that the game sets, which is Round Control Near (if decimal part > .5, convert to upper value)
