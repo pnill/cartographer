@@ -6,6 +6,8 @@
 #include "H2MOD.h"
 
 #define k_valid_real_epsilon 0.001f
+#define k_acceleration_ticks 5.0f
+#define k_deceleration_ticks 4.0f
 
 enum melee_flags
 {

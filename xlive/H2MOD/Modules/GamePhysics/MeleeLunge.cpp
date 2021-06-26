@@ -331,7 +331,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 		// get the direction of the melee lunge and the magnitude as well
 		float normalized_current_magnitude_per_tick = normalize3d(&direction);
 
-		float velocity_to_decelerate_per_tick = this->m_velocity_to_decelerate / 4.0f;
+		float velocity_to_decelerate_per_tick = this->m_velocity_to_decelerate / k_deceleration_ticks;
 
 		//float decelerated_velocity = (float)out_deceleration_ticks * velocity_to_decelerate_per_tick;
 
