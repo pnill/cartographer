@@ -52,7 +52,7 @@ static int InterpretMasterCreate(char* response_content) {
 			if (strlen(tempstr1) > 0) {
 				addDebugText("Username Should be: %s", tempstr1);
 				char* username = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
-				strncpy_s(username, XUSER_NAME_SIZE, tempstr1, strnlen_s(tempstr1, XUSER_MAX_NAME_LENGTH));
+				strncpy_s(username, XUSER_NAME_SIZE, tempstr1, XUSER_MAX_NAME_LENGTH);
 			}
 		}
 

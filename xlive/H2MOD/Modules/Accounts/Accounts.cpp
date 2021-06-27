@@ -195,7 +195,7 @@ void H2AccountAccountAdd(const char* username, const char* token) {
 			snprintf(H2AccountArrayLoginToken[i], bufflen, token);
 
 			H2AccountArrayUsername[i] = (char*)calloc(XUSER_NAME_SIZE, sizeof(*username));
-			strncpy_s(H2AccountArrayUsername[i], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
+			strncpy_s(H2AccountArrayUsername[i], XUSER_NAME_SIZE, username, XUSER_MAX_NAME_LENGTH);
 
 			return;
 		}
@@ -211,7 +211,7 @@ void H2AccountAccountAdd(const char* username, const char* token) {
 	snprintf(H2AccountArrayLoginToken[H2AccountArrayIndex], bufflen, token);
 
 	H2AccountArrayUsername[H2AccountArrayIndex] = (char*)calloc(XUSER_NAME_SIZE, sizeof(*username));
-	strncpy_s(H2AccountArrayUsername[H2AccountArrayIndex], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
+	strncpy_s(H2AccountArrayUsername[H2AccountArrayIndex], XUSER_NAME_SIZE, username, XUSER_MAX_NAME_LENGTH);
 }
 
 void H2AccountAccountRemove(int accountArrayIndex)
