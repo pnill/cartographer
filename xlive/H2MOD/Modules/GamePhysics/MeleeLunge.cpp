@@ -10,7 +10,7 @@
 
 real_vector3d global_zero_vector3d;
 
-#define MELEE_DEBUG 1
+#define MELEE_DEBUG 0
 
 #if MELEE_DEBUG
 #define LOG_TRACE_MELEE(msg, ...) \
