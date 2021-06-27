@@ -1662,7 +1662,6 @@ void H2MOD::Initialize()
 		Initialise_tag_loader();
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
-		MeleeFix::Initialize();
 		SpecialEvents::Initialize();
 		//ObserverMode::Initialize();
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
@@ -1674,6 +1673,7 @@ void H2MOD::Initialize()
 		
 		
 	}
+	MeleeFix::Initialize();
 	TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
