@@ -16,12 +16,12 @@ struct ObjectPlacementData //To Do
 	BYTE unk_16;//0x15
 	WORD unk_17;//0x16
 	DWORD unk_18;//0x18
-	real_point3d Placement;//0x1C
-	real_vector3d Orientation;//0x28
-	real_vector3d Up;//0x34
-	real_point3d TranslationalVelocity;//0x40
-	real_vector3d AngularVelocity;//0x4C
-	FLOAT Scale;//0x58
+	real_point3d placement;//0x1C
+	real_vector3d orientation;//0x28
+	real_vector3d up;//0x34
+	real_point3d translational_velocity;//0x40
+	real_vector3d angular_velocity;//0x4C
+	float scale;//0x58
 	DWORD unk_2[2];//0x5C
 	int team_index;
 	DWORD unk_27[2];//0x5C

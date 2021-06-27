@@ -24,7 +24,7 @@ projectile_update_def p_projectile_update;
 // determines whether the projectile should be updated in a 30hz context or not
 void projectile_set_tick_length_context(datum projectile_datum_index, bool projectile_instant_update)
 {
-	ObjectHeader* objects_header = (ObjectHeader*)game_state_objects_header->datum;
+	s_object_header* objects_header = (s_object_header*)game_state_objects_header->datum;
 	char* object_data = objects_header[projectile_datum_index.ToAbsoluteIndex()].object;
 	char* proj_tag_data = tags::get_tag_fast<char>(*((datum*)object_data));
 
@@ -44,7 +44,7 @@ void projectile_set_tick_length_context(datum projectile_datum_index, bool proje
 // sets the tick when the projectile has been created
 inline void projectile_set_creation_tick(datum projectile_datum_index)
 {
-	ObjectHeader* objects_header = (ObjectHeader*)game_state_objects_header->datum;
+	s_object_header* objects_header = (s_object_header*)game_state_objects_header->datum;
 	char* object_data = objects_header[projectile_datum_index.ToAbsoluteIndex()].object;
 	*(DWORD*)(object_data + 428) = time_globals::get()->tick_count; // store the projectile creation tick count
 }
@@ -132,7 +132,7 @@ void __cdecl matrix4x3_transform_point(void* matrix, real_vector3d* v1, real_vec
 {
 	auto p_matrix4x3_transform_point = Memory::GetAddressRelative<void(__cdecl*)(void*, real_vector3d*, real_vector3d*)>(0x47795A);
 
-	DatumIterator<ObjectHeader> objectIt(game_state_objects_header);
+	DatumIterator<s_object_header> objectIt(game_state_objects_header);
 
 	BYTE* projectile = (BYTE*)objectIt.get_data_at_index(trigger_projectile_datum_index.ToAbsoluteIndex())->object;
 
