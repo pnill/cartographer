@@ -55,20 +55,14 @@ void HeadHunter::SpawnSkull(datum unit_datum)
 
 		Engine::Objects::create_new_placement_data(&nObject, Weapon::ball, -1, 0);
 
-		nObject.Placement.x = biped_unit->Placement.x;
-		nObject.Placement.y = biped_unit->Placement.y;
-		nObject.Placement.z = biped_unit->Placement.z;
-		nObject.TranslationalVelocity.x = biped_unit->TranslationalVelocity.x;
-		nObject.TranslationalVelocity.y = biped_unit->TranslationalVelocity.y;
-		nObject.TranslationalVelocity.z = biped_unit->TranslationalVelocity.z;
+		nObject.Placement = biped_unit->Placement;
+		nObject.TranslationalVelocity = biped_unit->TranslationalVelocity;
 
 		datum new_object_datum = Engine::Objects::call_object_new(&nObject);
 		if (!new_object_datum.IsNull())
 			call_add_object_to_sync(new_object_datum);
 	}
 }
-
-extern void addDebugText(const char* text);
 
 typedef void(__stdcall *update_player_score)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
 extern update_player_score pupdate_player_score;
