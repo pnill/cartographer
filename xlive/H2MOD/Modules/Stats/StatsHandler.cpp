@@ -881,7 +881,7 @@ void StatsHandler::sendRankChangeFromDocument(rapidjson::Document* document)
 			{
 				size_t sz = 0;
 				BYTE rank = std::stoi(doc[i]["Rank"].GetString(), 0);
-				long long xuid = std::stoll(doc[i]["XUID"].GetString(), &sz, 0);
+				long long playerIdentifier = std::stoll(doc[i]["XUID"].GetString(), &sz, 0);
 
 				for (auto j = 0; j < ENGINE_PLAYER_MAX; j++)
 				{
@@ -889,10 +889,10 @@ void StatsHandler::sendRankChangeFromDocument(rapidjson::Document* document)
 					{
 						auto playerInfo = NetworkSession::getPlayerInformation(j); // for now we only support local player 0
 
-						if (xuid == NetworkSession::getPlayerXuid(j)
+						if (playerIdentifier == NetworkSession::getPlayerXuid(j)
 							&& playerInfo->properties.player_displayed_skill != rank)
 						{
-							LOG_TRACE_GAME("{} - sent rank update to player index: {}, xuid: {}", __FUNCTION__, j, doc[i]["XUID"].GetString());
+							LOG_TRACE_GAME("{} - sent rank update to player index: {}, player identifier: {}", __FUNCTION__, j, doc[i]["XUID"].GetString());
 
 							CustomPackets::sendRankChange(NetworkSession::getPeerIndex(j), rank);
 						}
@@ -905,33 +905,30 @@ void StatsHandler::sendRankChangeFromDocument(rapidjson::Document* document)
 
 std::string StatsHandler::buildPlayerRankUpdateQueryStringList()
 {
-	std::string XUIDs;
-	int playerCount = 0;
+	std::string XUIDs = "";
 
-	LOG_TRACE_GAME(L"Fetching player rank(s) - Total Peers {}", NetworkSession::getPeerCount() - 1);
-	for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
+	LOG_TRACE_GAME("{} - Total players {}", __FUNCTION__, NetworkSession::getPlayerCount());
+	if (NetworkSession::getPlayerCount() > 0)
 	{
-		bool addSeparator = false;
-		if (NetworkSession::getLocalPeerIndex() != i)
+		for (auto i = 0; i < ENGINE_PLAYER_MAX; i++)
 		{
-			auto peerXUID = NetworkSession::getPeerXUID(i);
-			if (peerXUID == NONE)
+			bool addSeparator = false;
+			if (NetworkSession::playerIsActive(i))
 			{
-				LOG_TRACE_GAME(L"No XUID found for Peer: {}", i);
-			}
-			else
-			{
-				LOG_TRACE_GAME(NetworkSession::getPeerPlayerName(i));
-				LOG_TRACE_GAME(L"\t Peer: {} XUID: {}", i, IntToWString(peerXUID, std::dec));
-				XUIDs.append(IntToString(peerXUID, std::dec));
-				addSeparator = true;
-				playerCount++;
-			}
-		}
+				auto playerIdentifier = NetworkSession::getPlayerXuid(i);
+				XUIDs.append(IntToString(playerIdentifier, std::dec));
+				
+				if (i + 1 < ENGINE_PLAYER_MAX 
+					&& NetworkSession::playerIsActive(i + 1))
+					addSeparator = true;
 
-		// check if we should separate, also do not add the last separator if next iteration will break out of the loop
-		if (addSeparator && i + 1 < NetworkSession::getPeerCount())
-			XUIDs.append(",");
+				LOG_TRACE_GAME("	Added player index {}, identifier: {} to rank update!", i, playerIdentifier);
+			}
+
+			// check if we should separate, also do not add the last separator if next iteration will break out of the loop
+			if (addSeparator)
+				XUIDs.append(",");
+		}
 	}
 
 	return XUIDs;
