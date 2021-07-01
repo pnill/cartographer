@@ -27,7 +27,7 @@ struct datum
 	{
 	}
 
-	static constexpr INT32 Null = 0xFFFFFFFF;
+	static constexpr INT32 Null = NONE;
 
 	//Returns true is datum is not Invalid
 	inline bool IsNull() const

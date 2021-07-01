@@ -1,7 +1,6 @@
 
 #include "H2MOD.h"
 
-#include "Blam/Engine/FileSystem/FiloInterface.h"
 #include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
@@ -15,7 +14,6 @@
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
-#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "H2MOD/Modules/HudElements/HudElements.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
@@ -24,11 +22,20 @@
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
-#include "Blam/Engine/Game/DamageData.h"
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Modules/Console/ConsoleCommands.h"
+#include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
+
+#include "Blam/Engine/Game/DamageData.h"
+#include "Blam/Engine/FileSystem/FiloInterface.h"
 #include "Blam/Engine/Objects/GameStateObjects.h"
+#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();

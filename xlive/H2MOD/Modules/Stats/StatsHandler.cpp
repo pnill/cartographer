@@ -1,9 +1,14 @@
 #include "StatsHandler.h"
+
 #include "Util/hash.h"
+
 #include "H2MOD\Modules\Utils\Utils.h"
-#include "rapidjson/writer.h"
 #include "H2MOD/Modules/Startup/Startup.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
+
+#include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
+#include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD/Engine/Engine.h"
 
 static const bool verbose = true;
 bool Registered = false;
@@ -822,14 +827,23 @@ void StatsHandler::playerRanksUpdateTick()
 	auto sendRankUpdate = []()
 	{
 		rankStateUpdating = true;
-		rapidjson::Document* doc = rankUpdates.front();
-		sendRankChangeFromDocument(doc); // send data from the first document
 
-		// preserve last rank update
-		if (rankUpdates.size() > 1)
+		while (rankUpdates.size() >= 1)
 		{
-			delete doc;
-			rankUpdates.pop(); // then pop last document from queue
+			rapidjson::Document* doc = rankUpdates.front();
+			sendRankChangeFromDocument(doc); // send data from the first document
+
+			// preserve last rank update
+			if (rankUpdates.size() > 1)
+			{
+				// then pop last document from queue
+				rankUpdates.pop();
+				delete doc;
+			}
+			else
+			{
+				break;
+			}
 		}
 
 		rankStateUpdating = false;
@@ -840,7 +854,7 @@ void StatsHandler::playerRanksUpdateTick()
 		return;
 
 	if (rankStateUpdating)
-		return; // return if queue buffer is written to
+		return; // return if queue is in use
 
 	if (rankUpdates.empty())
 		return; // don't send if we don't have anything to send

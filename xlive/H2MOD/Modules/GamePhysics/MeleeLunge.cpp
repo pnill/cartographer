@@ -8,8 +8,6 @@
 #include <float.h>
 #pragma fenv_access (on)
 
-real_vector3d global_zero_vector3d;
-
 #define MELEE_DEBUG 0
 
 #if MELEE_DEBUG

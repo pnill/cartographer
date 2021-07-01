@@ -316,3 +316,5 @@ static bool limit3d(void* a1, float limit)
 	*v1 = *v1 * ((1.0f / sqrt(dot_product)) * limit);
 	return true;
 }
+
+static real_vector3d global_zero_vector3d = { 0.0f, 0.0f, 0.0f };
