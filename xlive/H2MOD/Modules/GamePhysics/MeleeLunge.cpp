@@ -380,10 +380,10 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 
 		int ticks_to_add = 0;
 
-		if (m_maximum_counter - (m_melee_tick - 1) > k_deceleration_ticks)
+		/*if (m_maximum_counter - (m_melee_tick - 1) > k_deceleration_ticks)
 		{
 			m_maximum_counter = (m_melee_tick - 1) + k_deceleration_ticks;
-		}
+		}*/
 
 		if (m_maximum_counter + ticks_to_add <= (m_melee_tick - 1))
 			out_current_flags |= FLAG(melee_deceleration_finished);
