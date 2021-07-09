@@ -73,13 +73,13 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password) {
 	bool result = false;
 	char* rtn_result = 0;
 
-	char http_request_body[] = "username=%s&email=%s&password=%s";
-	char http_request_body_build[400] = { "" };
+	char http_request_body[] = "username=%s&email=%s&password=%s&request_version=%s";
+	char http_request_body_build[1024] = { "" };
 
 	char* escaped_user_username = encode_rfc3986(username);
 	char* escaped_user_email = encode_rfc3986(email);
 	char* escaped_user_password = encode_rfc3986(password);
-	sprintf_s(http_request_body_build, http_request_body, escaped_user_username, escaped_user_email, escaped_user_password);
+	sprintf_s(http_request_body_build, http_request_body, escaped_user_username, escaped_user_email, escaped_user_password, DLL_VERSION_STR);
 	free(escaped_user_username);
 	free(escaped_user_email);
 	free(escaped_user_password);
