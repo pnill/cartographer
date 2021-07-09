@@ -622,9 +622,11 @@ void alt_main_game_loop_hook()
 		if (!QuitGSMainLoop)
 			GSMainLoop();
 		init = true;
+
 		DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
-		if (init_flags_array[2] == 0)
+		if (init_flags_array[2] == 0 && !game_minimized())
 			render_audio();
+
 		if(game_in_simulation())
 		{
 			game_effects_update(time_globals::get()->seconds_per_tick);
