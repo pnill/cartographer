@@ -180,6 +180,7 @@ int __cdecl transport_get_packet_overhead_hook(int protocol_type)
 	{
 	case 2:
 		return 44;
+
 	case 3:
 		//return 48;
 		return 28 + 4; // replace XNet UDP header overhead with WinSock overhead
@@ -190,6 +191,8 @@ int __cdecl transport_get_packet_overhead_hook(int protocol_type)
 	default:
 		break;
 	}
+
+	return 0;
 }
 
 void network_observer::ApplyPatches()
