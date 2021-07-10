@@ -176,16 +176,26 @@ __declspec (naked) void overwrite1()
 // raw WinSock has a 28 bytes packet overhead for the packet header, unlike Xbox LIVE, which has 44 bytes (28 bytes + whatever LIVE packet header adds)
 int __cdecl transport_get_packet_overhead_hook(int protocol_type)
 {
-	switch (protocol_type)
+	enum e_protocol_type : int
 	{
-	case 2:
-		return 44;
+		e_protocol_udp_loopback = 2,
+		e_protocol_udp,
+		e_protocol_tcp // not entirely sure if this is TCP
+	};
 
-	case 3:
+	switch ((e_protocol_type)protocol_type)
+	{
+
+	// replace XNet UDP header overhead with WinSock overhead
+	case e_protocol_udp_loopback:
+		// return 44;
+		return 28;
+
+	case e_protocol_udp:
 		//return 48;
-		return 28 + 4; // replace XNet UDP header overhead with WinSock overhead
+		return 28 + 4;
 		
-	case 4:
+	case e_protocol_tcp:
 		return 56;
 	
 	default:
