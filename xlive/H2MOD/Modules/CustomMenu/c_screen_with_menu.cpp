@@ -64,13 +64,8 @@ void __thiscall c_screen_with_menu::build_player_list(void* a1, int player_count
 	return p_build_player_list(this, a1, player_count);
 }
 
-__declspec(naked) void jmp_build_player_list()
-{
-	__asm
-	{
-		jmp c_screen_with_menu::build_player_list
-	}
-}
+__declspec(naked) void jmp_build_player_list() { __asm jmp c_screen_with_menu::build_player_list }
+
 #pragma endregion
 
 void c_screen_with_menu::applyPatches()
