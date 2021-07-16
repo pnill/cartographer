@@ -3,7 +3,7 @@
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "rapidjson/writer.h"
 #include "H2MOD/Modules/Startup/Startup.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 
 static const bool verbose = true;
 bool Registered = false;
@@ -27,73 +27,132 @@ StatsHandler::StatsHandler()
 		Status.StatsEnabled = false;
 		lastTimeRanksSynchronized = steady_clock::now();
 		//Register callback on Post Game to upload the stats to the server
-		EventHandler::registerGameStateCallback({
-				"StatsSendStats",
-				life_cycle_post_game,
-				[this]()
-				{
-					this->sendStats();
-				}
-			}, true);
-		//register callback on player join to send them their rank.
-		EventHandler::registerNetworkPlayerAddCallback({
-				"StatsPlayerJoin",
-				this->playerJoinEvent
-			}, true);
 		//register callback on player leave to remove them from the packet filter
-		EventHandler::registerNetworkPlayerRemoveCallback({
-				"StatsPlayerLeave",
-				this->playerLeftEvent
-			}, false);
-		//register a callback when the server reaches the lobby for the first time
-		EventHandler::registerGameStateCallback({
-				"InitStats",
-				life_cycle_pre_game,
-				[this]()
-				{
-					this->verifyRegistrationStatus();
-					this->verifySendPlaylist();
-				},
-				true // execute only once
-			}, false);
-
-		//Register callback to send player ranks on lobby and reset the match invalide state
-		//These need to be registered after "InitStats" callback, because InitStats callback needs to execute first
-		EventHandler::registerGameStateCallback({
-				"StatsSendRanks",
-				life_cycle_pre_game,
-				[this]()
-				{
-					this->getPlayerRanksByStringList(this->buildPlayerRankUpdateQueryStringList());
-					this->InvalidateMatch(false);
-				}
-			}, true);
-		EventHandler::registerGameStateCallback({
-				"StatsSkipReset",
-				life_cycle_in_game,
-				[this]()
-				{
-					this->InvalidateMatch(false);
-				}
-			}, false);
-
+		//EventHandler::registerNetworkPlayerRemoveCallback({
+		//		"StatsPlayerLeave",
+		//		this->playerLeftEvent
+		//	}, true);
+		////register callback on player join to send them their rank.
+		//EventHandler::registerNetworkPlayerAddCallback({
+		//		"StatsPlayerJoin",
+		//		this->playerJoinEvent
+		//	}, true);
+		//EventHandler::registerGameStateCallback({
+		//"StatsSendStats",
+		//life_cycle_post_game,
+		//&this->sendStats
+		//	}, true);
+		////register a callback when the server reaches the lobby for the first time
+		//EventHandler::registerGameStateCallback({
+		//		"InitStats",
+		//		life_cycle_pre_game,
+		//		[this]()
+		//		{
+		//			//Register callback to send player ranks on lobby and reset the match invalide state
+		//			EventHandler::registerGameStateCallback({
+		//				"StatsSendRanks",
+		//				life_cycle_pre_game,
+		//				[this]()
+		//				{
+		//					this->sendRankChange(true);
+		//					this->InvalidateMatch(false);
+		//				}
+		//			}, true);
+		//			EventHandler::registerGameStateCallback({
+		//				"StatsSkipReset",
+		//				life_cycle_in_game,
+		//				[this]()
+		//				{
+		//					this->InvalidateMatch(false);
+		//				}
+		//			}, true);
+		//		},
+		//		true
+		//	}, false);
 		//Register a callback that will invalidate the current match if the skip command is used.
-		EventHandler::registerServerCommandCallback({
+		/*EventHandler::registerServerCommandCallback({
 				"StatsSkipPrevention",
 				[this]() {this->InvalidateMatch(true);},
 				ServerConsole::ServerConsoleCommands::skip
-			}, false);
+			}, true);*/
+		EventHandler::register_callback<EventHandler::ServerCommandEvent>(this->server_command_event, execute_before, false);
+		EventHandler::register_callback<EventHandler::NetworkPlayerEvent>(this->network_player_event, execute_after, true);
 	} 
 	else
 	{
 		// client events
 
 		//Register callback to reset rank to 255 on mainmenu
-		EventHandler::registerGameStateCallback({
-		"StatsResetRank",
-		life_cycle_none,
-		[]() { h2mod->set_local_rank(255); }
-			}, false);
+		//EventHandler::registerGameStateCallback({
+		//"StatsResetRank",
+		//life_cycle_none,
+		//[]() {h2mod->set_local_rank(255);}
+		//	}, true);
+	}
+	EventHandler::register_callback<EventHandler::GameStateEvent>(this->game_state_change, execute_after, true);
+}
+bool initPreGame = false;
+void StatsHandler::game_state_change(game_life_cycle state)
+{
+	if (Memory::isDedicatedServer()) 
+	{
+		if (state == life_cycle_post_game)
+		{
+			sendStats();
+			return;
+		}
+		if(state == life_cycle_pre_game)
+		{
+			if(!initPreGame)
+			{
+				verifyRegistrationStatus();
+				verifySendPlaylist();
+				initPreGame = true;
+				return;
+			}
+			else
+			{
+				InvalidateMatch(false);
+				return;
+			}
+		}
+		if(state == life_cycle_in_game)
+		{
+			InvalidateMatch(false);
+			return;
+		}
+	}
+	else
+	{
+		if (state == life_cycle_none) 
+		{
+			h2mod->set_local_rank(255);
+			return;
+		}
+	}
+}
+
+void StatsHandler::network_player_event(int peerIndex, EventHandler::NetworkPlayerEventType type)
+{
+	switch (type)
+	{
+		case EventHandler::add:
+			playerJoinEvent(peerIndex);
+			break;
+		case EventHandler::remove:
+			playerLeftEvent(peerIndex);
+			break;
+	}
+}
+
+void StatsHandler::server_command_event(ServerConsole::ServerConsoleCommands command)
+{
+	if(Status.StatsEnabled)
+	{
+		if(command == ServerConsole::skip && EngineCalls::get_game_life_cycle() == life_cycle_in_game)
+		{
+			InvalidateMatch(true);
+		}
 	}
 }
 
@@ -862,8 +921,8 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 	// but only in the post game carnage report/pregame
 	// ranks will update at the end of the game
 
-	if (Engine::get_game_life_cycle() != life_cycle_pre_game
-		&& Engine::get_game_life_cycle() != life_cycle_post_game)
+	if (EngineCalls::get_game_life_cycle() != life_cycle_pre_game
+		&& EngineCalls::get_game_life_cycle() != life_cycle_post_game)
 		return;
 
 	getPlayerRanksByStringList(buildPlayerRankUpdateQueryStringList());

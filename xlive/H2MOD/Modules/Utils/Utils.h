@@ -16,6 +16,10 @@ char* custom_label_literal(char* label_escaped);
 ///FREE MEMOERY in returned char*
 char* custom_label_escape(char* label_literal);
 bool FloatIsNaN(float vagueFloat);
+bool isFloat(std::string myString);
+bool isFloat(std::wstring myString);
+bool isInteger(std::string myString);
+bool isInteger(std::wstring myString);
 ///IP is char array size 100
 int HostnameToIp(char* hostname, char* ip);
 
@@ -112,3 +116,38 @@ void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen);
 std::string ByteToHexStr(const BYTE* buffer, size_t size);
 int GetCurrentTimeMS();
 int TimeElapsedMS(int startms);
+
+class FrequencyLimiter
+{
+	using time = std::chrono::high_resolution_clock;
+
+public:
+	FrequencyLimiter::FrequencyLimiter(unsigned int _frequency) :
+		maxUpdateRateHz(_frequency)
+	{
+		initialUpdate = true;
+		lastTime = time::now();
+		maxUpdateRateMsec = std::chrono::milliseconds(int(1000.f / (float)maxUpdateRateHz));
+	}
+
+	bool shouldUpdate()
+	{
+		bool result = initialUpdate == true
+			|| time::now() - lastTime > maxUpdateRateMsec;
+
+		if (result)
+		{
+			initialUpdate = false;
+			lastTime = time::now();
+		}
+
+		return result;
+	}
+
+	bool initialUpdate;
+	std::chrono::milliseconds maxUpdateRateMsec;
+	unsigned int maxUpdateRateHz; // update the cursor each 8 milliseconds
+
+private:
+	time::time_point lastTime;
+};

@@ -7,7 +7,7 @@
 #include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Cache/TagGroups/item_collection_defenition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_defenition.hpp"
-#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/EngineCalls/EngineCalls.h"
 
 std::vector<XUID> Infection::zombieIdentifiers;
 
@@ -279,7 +279,7 @@ void Infection::spawnServerPlayerSetup(int playerIndex) {
 	if (playerIndex != NONE) {
 		LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}", playerIndex);
 		datum unit_datum_index = Player::getPlayerUnitDatumIndex(playerIndex);
-		char* unit_object = Engine::Objects::try_and_get_data_with_type(unit_datum_index, FLAG(e_object_type::biped));
+		char* unit_object = EngineCalls::Objects::try_and_get_data_with_type(unit_datum_index, FLAG(e_object_type::biped));
 		if (unit_object) {
 			//if the unit_object data pointer is not nullptr, the spawned object is "alive"
 
@@ -297,7 +297,7 @@ void Infection::spawnServerPlayerSetup(int playerIndex) {
 
 void Infection::infectPlayer(int playerIndex, datum unitDatumIndex) {
 	if (playerIndex != NONE) {
-		char* unit_object = Engine::Objects::try_and_get_data_with_type(unitDatumIndex, FLAG(e_object_type::biped));
+		char* unit_object = EngineCalls::Objects::try_and_get_data_with_type(unitDatumIndex, FLAG(e_object_type::biped));
 		if (unit_object && Player::getTeam(playerIndex) != ZOMBIE_TEAM)
 		{
 			//if we have a valid object and the object is not on the zombie team
@@ -322,11 +322,11 @@ void Infection::infectPlayer(int playerIndex, datum unitDatumIndex) {
 
 void Infection::infectPlayers(int playerIndex, datum unitDatumIndex) {
 	if (playerIndex != NONE) {
-		char* unit_object = Engine::Objects::try_and_get_data_with_type(unitDatumIndex, FLAG(e_object_type::biped));
+		char* unit_object = EngineCalls::Objects::try_and_get_data_with_type(unitDatumIndex, FLAG(e_object_type::biped));
 		if (unit_object) {
 			if (h2mod->get_unit_team_index(unitDatumIndex) == ZOMBIE_TEAM) {
 				//don't drop swords after zombie death
-				Engine::Unit::remove_equipment(unitDatumIndex); //Take away zombie's weapons
+				EngineCalls::Unit::remove_equipment(unitDatumIndex); //Take away zombie's weapons
 			}
 			else {
 				Infection::setZombiePlayerStatus(Player::getIdentifier(playerIndex));

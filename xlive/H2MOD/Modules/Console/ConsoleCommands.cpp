@@ -16,7 +16,7 @@
 #include "Util\ClipboardAPI.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
-#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/EngineCalls/EngineCalls.h"
 
 // for XNet connection logging
 #include "xlive/xnet/IpManagement/XnIp.h"
@@ -340,22 +340,22 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 
 			if (!object_datum.IsNull()) {
 				datum player_datum = Player::getPlayerUnitDatumIndex(h2mod->get_player_datum_index_from_controller_index(0).Index);
-				Engine::Objects::create_new_placement_data(&nObject, object_datum, player_datum, 0);
+				EngineCalls::Objects::create_new_placement_data(&nObject, object_datum, player_datum, 0);
 				real_point3d* player_position = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
 
 				if (player_position != nullptr) {
-					nObject.Placement.x = player_position->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					nObject.Placement.y = player_position->y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					nObject.Placement.z = (player_position->z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.position.x = player_position->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.position.y = player_position->y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.position.z = (player_position->z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
 				}
 				if (specificPosition) {
-					nObject.Placement.x = x;
-					nObject.Placement.y = y;
-					nObject.Placement.z = z;
+					nObject.position.x = x;
+					nObject.position.y = y;
+					nObject.position.z = z;
 				}
 
-				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.Placement.x, nObject.Placement.y, nObject.Placement.z);
-				unsigned int object_gamestate_datum = Engine::Objects::call_object_new(&nObject);
+				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.position.x, nObject.position.y, nObject.position.z);
+				unsigned int object_gamestate_datum = EngineCalls::Objects::call_object_new(&nObject);
 				call_add_object_to_sync(object_gamestate_datum);
 			}
 		}

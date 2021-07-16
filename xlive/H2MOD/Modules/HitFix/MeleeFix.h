@@ -16,7 +16,6 @@ namespace MeleeFix
 		BYTE max_animation_range;
 	};
 
-	void MeleePatch(bool toggle);
 	void MeleeCollisionPatch();
 	void ApplyHooks();
 	void Initialize();

@@ -3,38 +3,39 @@
 #include "Blam\Cache\DataTypes.h"
 
 //0xC4
-struct ObjectPlacementData //To Do
+
+struct __declspec(align(4)) ObjectPlacementData
 {
-	datum object_datum;//0
-	DWORD unk_0;//0x4
-	WORD unk_10;//0x8;
-	BYTE unk_11;//0xA
-	BYTE unk_12;//0xB
-	DWORD variant_index;//0xC
-	DWORD unk_14;//0x10
-	BYTE unk_15;//0x14
-	BYTE unk_16;//0x15
-	WORD unk_17;//0x16
-	DWORD unk_18;//0x18
-	real_point3d Placement;//0x1C
-	real_vector3d Orientation;//0x28
-	real_vector3d Up;//0x34
-	real_point3d TranslationalVelocity;//0x40
-	real_vector3d AngularVelocity;//0x4C
-	FLOAT Scale;//0x58
-	DWORD unk_2[5];//0x5C
-	WORD unk_3;//0x70
-	WORD unk_4;//0x72
-	DWORD unk_5[0xF];//0x74
-	WORD unk_20;//0xB0
-	WORD unk_21;//0xB2
-	WORD unk_6;//0xB4
-	WORD unk_7;//0xB6
-	BYTE unk_19;//0xB8
-	BYTE unk_22;//0xB9
-	WORD unk_23;//0xBA
-	CHAR unk_24;//0xBC
-	BYTE unk_25[3];//0xBD
-	DWORD unk_26;//0xC0		
+	datum tag_index;
+	datum unique_id;
+	DWORD origin_bsp_index;
+	DWORD variant_index;
+	DWORD unk_14;
+	BYTE placement_policy;
+	BYTE unk_16;
+	WORD unk_17;
+	DWORD object_placement_flags;
+	real_point3d position;
+	real_vector3d forward;
+	real_vector3d up;
+	real_point3d translation_velocity;
+	real_vector3d angular_velocity;
+	float scale;
+	datum player_index;
+	DWORD field_60;
+	DWORD field_64;
+	DWORD field_68;
+	DWORD field_6C;
+	DWORD field_70;
+	DWORD active_change_colors_mask;
+	real_color_rgb change_colors[4];
+	BYTE gap_A8[8];
+	WORD destroyed_constraints_flag;
+	WORD loosened_constraints_flag;
+	WORD field_B4;
+	WORD field_B6;
+	DWORD field_B8;
+	BYTE gap_BC[8];
 };
+
 static_assert(sizeof(ObjectPlacementData) == 0xC4, "Invalid ObjectPlacementData size");

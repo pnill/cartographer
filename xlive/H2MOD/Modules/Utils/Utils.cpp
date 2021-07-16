@@ -315,6 +315,33 @@ bool FloatIsNaN(float vagueFloat) {
 	return false;
 }
 
+bool isFloat(std::string myString)
+{
+	std::istringstream iss(myString);
+	float f;
+	iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
+	// Check the entire string was consumed and if either failbit or badbit is set
+	return iss.eof() && !iss.fail();
+}
+bool isFloat(std::wstring myString)
+{
+	std::wistringstream iss(myString);
+	float f;
+	iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
+	// Check the entire string was consumed and if either failbit or badbit is set
+	return iss.eof() && !iss.fail();
+}
+
+bool isInteger(std::string myString)
+{
+	return myString.find_first_not_of("0123456789") == std::string::npos;
+}
+
+bool isInteger(std::wstring myString)
+{
+	return myString.find_first_not_of(L"0123456789") == std::wstring::npos;
+}
+
 int HostnameToIp(char* hostname, char* ip) {
 	struct hostent *he;
 	struct in_addr **addr_list;

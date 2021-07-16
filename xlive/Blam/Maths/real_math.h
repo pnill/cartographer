@@ -3,20 +3,16 @@
 
 #include "Blam\Common\Common.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+#define degreesToRadians(angleDegrees) ((float)((angleDegrees) * M_PI / 180.0))
+
 struct real_point2d
 {
-	float x;
-	float y;
+	float x, y;
 };
 CHECK_STRUCT_SIZE(real_point2d, sizeof(float) * 2);
-
-struct real_point3d
-{
-	float x;
-	float y;
-	float z;
-};
-CHECK_STRUCT_SIZE(real_point3d, sizeof(float) * 3);
 
 struct angle
 {
@@ -28,22 +24,14 @@ struct angle
 		rad(_rad)
 	{}
 
-	double as_degree()
+	double as_degree() const
 	{
 		return rad * (180.0 / 3.14159265358979323846);
 	}
 
-	double as_rad()
+	double as_rad() const
 	{
 		return rad;
-	}
-	inline bool operator==(const angle& lhs) const
-	{
-		return (lhs.rad == rad);
-	}
-	inline bool operator!=(const angle& lhs) const
-	{
-		return !operator==(lhs);
 	}
 };
 CHECK_STRUCT_SIZE(angle, sizeof(float));
@@ -65,17 +53,16 @@ CHECK_STRUCT_SIZE(real_euler_angles3d, sizeof(angle) * 3);
 
 struct real_vector2d
 {
-	float i;
-	float j;
+	float i, j;
 };
 CHECK_STRUCT_SIZE(real_vector2d, sizeof(float) * 2);
 
-struct real_vector3d
+union real_vector3d
 {
-	float i;
-	float j;
-	float k;
-	real_euler_angles3d get_angle()
+	struct { float i, j, k; };
+	struct { float x, y, z; };
+
+	real_euler_angles3d get_angle() const
 	{
 		real_euler_angles3d angle;
 		angle.yaw = acos(i);
@@ -83,56 +70,71 @@ struct real_vector3d
 		angle.roll = acos(k);
 		return angle;
 	}
-	float length() const
+
+	// vector multiplication
+	real_vector3d operator*(const real_vector3d& other) const
 	{
-		return sqrtf(i * i + j * j + k * k);
+		real_vector3d v;
+		v.i = this->i * other.i;
+		v.j = this->j * other.j;
+		v.k = this->k * other.k;
+		return v;
 	}
-	real_vector3d normal() const
+
+	// scalar multiplication
+	real_vector3d operator*(const float& scalar) const
 	{
-		return *this / length();
+		real_vector3d v;
+		v.i = this->i * scalar;
+		v.j = this->j * scalar;
+		v.k = this->k * scalar;
+		return v;
 	}
-	float dot(const real_vector3d& lhs) const
+
+	real_vector3d operator/(const float& scalar) const
 	{
-		return this->i*lhs.i + this->j * lhs.j + this->k  * lhs.k;
+		real_vector3d v;
+		v.i = this->i / scalar;
+		v.j = this->j / scalar;
+		v.k = this->k / scalar;
+		return v;
 	}
-	real_vector3d cross_product(const real_vector3d& lhs) const
+
+	// vector addition
+	real_vector3d operator+(const real_vector3d& other) const
 	{
-		real_vector3d r;
-		r.i = this->j * lhs.k - this->k * lhs.j;
-		r.j = this->k * lhs.i - this->i * lhs.k;
-		r.k = this->i * lhs.j - this->j * lhs.i;
-		return r;
+		real_vector3d v;
+		v.i = this->i + other.i;
+		v.j = this->j + other.j;
+		v.k = this->k + other.k;
+		return v;
 	}
-	inline bool operator==(const real_vector3d& lhs) const
+
+	// vector subtraction
+	real_vector3d operator-(const real_vector3d& other) const
 	{
-		return (lhs.i == i && lhs.j == j && lhs.k == k);
+		real_vector3d v;
+		v.i = this->i - other.i;
+		v.j = this->j - other.j;
+		v.k = this->k - other.k;
+		return v;
 	}
-	inline bool operator!=(const real_vector3d& lhs) const
+
+	// dot product
+	float dot_product(const real_vector3d& other) const
 	{
-		return !operator==(lhs);
+		return this->i * other.i + this->j * other.j + this->k * other.k;
 	}
-	real_vector3d operator/(const float rhs) const
+
+	// magnitude
+	float magnitude() const
 	{
-		real_vector3d r;
-		r.i = this->i / rhs;
-		r.j = this->j / rhs;
-		r.k = this->k / rhs;
-		return r;
-	}
-	real_vector3d operator+(const real_vector3d& lhs) const
-	{
-		return { this->i + lhs.i, this->j + lhs.j, this->k + lhs.k };
-	}
-	real_vector3d operator-(const real_vector3d& lhs) const
-	{
-		return { this->i - lhs.i, this->j - lhs.j, this->k - lhs.k };
-	}
-	real_vector3d operator*(const float lhs) const
-	{
-		return { this->i * lhs, this->j *lhs, this->k * lhs };
+		return sqrt(pow(i, 2.f) + pow(j, 2.f) + pow(k, 2.f));
 	}
 };
 CHECK_STRUCT_SIZE(real_vector3d, sizeof(float) * 3);
+
+typedef real_vector3d real_point3d;
 
 struct real_plane2d
 {
@@ -150,10 +152,7 @@ CHECK_STRUCT_SIZE(real_plane3d, sizeof(real_vector3d) + sizeof(float));
 
 struct real_quaternion
 {
-	float i;
-	float j;
-	float k;
-	float w;
+	float i, j, k, w;
 
 	inline float get_square_length() const
 	{
@@ -293,3 +292,21 @@ struct real_color_rgb
 	}
 };
 CHECK_STRUCT_SIZE(real_color_rgb, sizeof(float) * 3);
+
+static float normalize3d(real_vector3d *a1)
+{
+	return Memory::GetAddressRelative<float(__cdecl*)(real_vector3d*)>(0x429359, 0x4273B0)(a1);
+}
+
+static bool limit3d(void* a1, float limit)
+{
+	real_vector3d* v1 = (real_vector3d*)a1;
+
+	float dot_product = v1->dot_product(*v1);
+
+	if (dot_product <= pow(limit, 2.0f))
+		return false;
+
+	*v1 = *v1 * ((1.0f / sqrt(dot_product)) * limit);
+	return true;
+}

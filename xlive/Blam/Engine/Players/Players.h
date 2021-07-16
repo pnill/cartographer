@@ -194,7 +194,7 @@ struct Player
 		char player_is_griefer;
 		char bungie_user_role;
 		char achievement_flags;
-		char unk2;
+		byte unk2;
 	};
 	CHECK_STRUCT_SIZE(Properties, 132);
 

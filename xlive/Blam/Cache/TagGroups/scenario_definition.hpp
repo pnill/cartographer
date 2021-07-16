@@ -2606,7 +2606,6 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			seat_29 = FLAG(29),
 			seat_30 = FLAG(30),
 			seat_31 = FLAG(31),
-			seat_32 = FLAG(32),
 		};
 		e_seats seats;//0x4
 
