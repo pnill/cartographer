@@ -295,6 +295,7 @@
     <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\PlayerControl.cpp" />
+    <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\OriginalFPSLimiter\OriginalFPSLimiter.cpp" />
@@ -559,6 +560,7 @@
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\PlayerControl.h" />
+    <ClInclude Include="H2MOD\Modules\KantTesting\KantTesting.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\OriginalFPSLimiter\OriginalFPSLimiter.h" />

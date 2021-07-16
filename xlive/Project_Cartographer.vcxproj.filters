@@ -126,6 +126,7 @@
     <ClCompile Include="H2MOD\EngineCalls\Unit.cpp" />
     <ClCompile Include="H2MOD\EngineCalls\EngineCalls.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
+    <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -403,6 +404,7 @@
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
     <ClInclude Include="H2MOD\EngineCalls\EngineCalls.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
+    <ClInclude Include="H2MOD\Modules\KantTesting\KantTesting.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

@@ -37,16 +37,42 @@ struct s_model_group_definition
 	struct s_variants_block
 	{
 		string_id name;//0x0
-		PAD(0x10);//0x4
+		byte runtime_model_region_0;
+		byte runtime_model_region_1;
+		byte runtime_model_region_2;
+		byte runtime_model_region_3;
+		byte runtime_model_region_4;
+		byte runtime_model_region_5;
+		byte runtime_model_region_6;
+		byte runtime_model_region_7;
+		byte runtime_model_region_8;
+		byte runtime_model_region_9;
+		byte runtime_model_region_10;
+		byte runtime_model_region_11;
+		byte runtime_model_region_12;
+		byte runtime_model_region_13;
+		byte runtime_model_region_14;
+		byte runtime_model_region_15;
 		struct s_regions_block
 		{
 			string_id region_name;//0x0
-			PAD(0x2);//0x4
+			byte runtime_model_region_index;
+			enum class e_region_runtime_flags : __int8
+			{
+				bit_1 = FLAG(0),
+				bit_2 = FLAG(1),
+				bit_3 = FLAG(2),
+				bit_4 = FLAG(3),
+				bit_5 = FLAG(4),
+				bit_6 = FLAG(5),
+				bit_7 = FLAG(6),
+			};
+			e_region_runtime_flags region_runtime_flags;
 			__int16 parent_variant;//0x6
 			struct s_permutations_block
 			{
 				string_id permutation_name;//0x0
-				PAD(0x1);//0x4
+				byte model_permutation_index;//0x4
 				enum class e_flags : __int8
 				{
 					copy_states_to_all_permutations = FLAG(0),
@@ -80,7 +106,14 @@ struct s_model_group_definition
 				};
 				TAG_BLOCK_SIZE_ASSERT(s_states_block, 0x18);
 				tag_block<s_states_block> states;//0xC
-				PAD(0xC);//0x14
+				byte runtime_permutation_index_0;
+				byte runtime_permutation_index_1;
+				byte runtime_permutation_index_2;
+				byte runtime_permutation_index_3;
+				byte runtime_permutation_index_4;
+				byte unk_1;
+				__int16 unk2;
+				__int16 unk3;
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_permutations_block, 0x20);
 			tag_block<s_permutations_block> permutations;//0x8

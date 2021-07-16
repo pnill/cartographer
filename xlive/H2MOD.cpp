@@ -33,6 +33,11 @@
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/EngineHooks/EngineHooks.h"
 #include "H2MOD/GUI/GUI.h"
+#include "Blam/Enums/Game/HaloStrings.h"
+#include "Blam/Cache/TagGroups/model_defenition.hpp"
+#include "Blam/Cache/TagGroups/globals_definition.hpp"
+#include "Blam/Cache/TagGroups/biped_definition.hpp"
+#include "H2MOD/Modules/KantTesting/KantTesting.h"
 
 
 H2MOD* h2mod = new H2MOD();
@@ -1468,10 +1473,53 @@ void H2MOD::RegisterEvents()
 //	return c_sub_81A676(a1, a2, a3, 4, a5, a6, a7, a8, a9, a10);
 //}
 
+//Some sorta hook
+typedef char(__cdecl p_test_hook)(__int16 a1, int a2, __int16 a3, int a4);
+p_test_hook* c_test_hook;
+char __cdecl test_shader_hook(__int16 a1, int a2, __int16 a3, int a4)
+{
+	//auto v4 = (char *)(Memory::GetAddress(0x4ECAB0) + 32 * a1);
+	//typedef int(__cdecl ttt)(__int16 a1, char a2, char a3);
+	//auto t = Memory::GetAddress<ttt*>(0x1a25de);
+	//auto v5 = t(a1, (*(DWORD *)v4 >> 12) & 1, 0);
+	//auto v11 = *((DWORD *)v4 + 1);
+	//auto v6 = *(DWORD *)(v5 + 4);
+	//auto v7 = 0;
+	//auto v14 = 0;
+	//if (v6 != -1)
+	//	v7 = v6 + *(int*)Memory::GetAddress(0x482290);
+	//auto v9 = v7 + 72 * (__int16)a2;
+
+	//if(v11 != -1)
+	//{
+	//	auto v15 = *(DWORD *)(*(int*)Memory::GetAddress(0x479E6C) + 168);
+	//	auto v16 = 0;
+	//	if (v15 != -1)
+	//		v16 = v15 + *(int*)Memory::GetAddress(0x482290);
+	//	v14 = v16 + 32 * *(__int16 *)(v9 + 4);
+	//}
+	//else
+	//{
+	//	auto v12 = *(DWORD*)(tags::get_tag_instances()[v11].data_offset + 100);
+	//	auto v13 = 0;
+	//	if (v12 != -1)
+	//		v13 = v12 + *(int*)Memory::GetAddress(0x482290);
+	//	v14 = v13 + 32 * *(__int16 *)(v9 + 4);
+	//}
+
+	auto res = c_test_hook(a1, a2, a3, a4);
+	datum* shader_datum = (datum*)a4;
+	/*if (EngineCalls::get_game_life_cycle() == life_cycle_in_game && shader_datum->ToInt() == 0xEC3631D1)
+		*shader_datum = 0xECE0327B;*/
+	//LOG_INFO_GAME("[{}] {} {} {} {} {:x}", __FUNCTION__, a1, a2, a3, a4, *(DWORD*)a4);
+
+	return res;
+}
+
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
-
 	LOG_TRACE_GAME("Applying hooks...");
 	EngineHooks::ApplyHooks();
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
@@ -1513,6 +1561,15 @@ void H2MOD::ApplyHooks() {
 		/* These hooks are only built for the client, don't enable them on the server! */
 
 
+	
+		
+
+		//Shader display hook
+		//c_test_hook = Memory::GetAddress<p_test_hook*>(0x1A2AEE);
+		//PatchCall(Memory::GetAddress(0x1a10de), test_shader_hook);
+		//PatchCall(Memory::GetAddress(0x1a1324), test_hook);
+		//PatchCall(Memory::GetAddress(0x1A2FF6), test_shader_hook);
+		//PatchCall(Memory::GetAddress(0x1a316B), test_hook);
 
 		//Shader LOD Bias stuff
 		//c_sub_81A676 = Memory::GetAddress<p_sub_81A676*>(0x19A676);
@@ -1617,6 +1674,7 @@ void H2MOD::Initialize()
 	TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
+	KantTesting::Initialize();
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", Memory::baseAddress);
 	//WriteValue(GetAddress(0xC25EA + 8), 100);
