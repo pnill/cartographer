@@ -1,7 +1,6 @@
 
 #include "H2MOD.h"
 
-#include "Blam/Engine/FileSystem/FiloInterface.h"
 #include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
@@ -15,7 +14,6 @@
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
-#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "H2MOD/Modules/HudElements/HudElements.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
@@ -24,11 +22,20 @@
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
-#include "Blam/Engine/Game/DamageData.h"
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Modules/Console/ConsoleCommands.h"
+#include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
+
+#include "Blam/Engine/Game/DamageData.h"
+#include "Blam/Engine/FileSystem/FiloInterface.h"
 #include "Blam/Engine/Objects/GameStateObjects.h"
+#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -67,7 +74,7 @@ int EXECUTABLE_VERSION = 4;
 //Currently not used in code base
 int get_player_index_from_datum(datum unit_datum)
 {
-	return ((BipedObjectDefinition*)s_game_state_objects::getObject(unit_datum))->PlayerDatum.ToAbsoluteIndex();
+	return ((s_biped_object_definition*)s_game_state_objects::getObject(unit_datum))->PlayerDatum.ToAbsoluteIndex();
 }
 
 #pragma region engine calls
@@ -378,7 +385,7 @@ BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
 	if (unit_datum.IsNull())
 		return nullptr;
 
-	DatumIterator<ObjectHeader> objectsIt(game_state_objects_header);
+	DatumIterator<s_object_header> objectsIt(game_state_objects_header);
 	return (BYTE*)objectsIt.get_data_at_index(unit_datum.ToAbsoluteIndex())->object;
 }
 
@@ -453,9 +460,9 @@ void H2MOD::set_unit_speed_patch(bool hackit) {
 	}
 }
 
-void H2MOD::set_player_unit_grenades_count(int playerIndex, Grenades type, BYTE count, bool resetEquipment)
+void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYTE count, bool resetEquipment)
 {
-	if (type > Grenades::Plasma)
+	if (type > e_grenades::Plasma)
 	{
 		LOG_TRACE_GAME("[H2MOD] set_player_unit_grenades_count() Invalid argument: type");
 		return;

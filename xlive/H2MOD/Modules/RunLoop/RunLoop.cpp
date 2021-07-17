@@ -385,6 +385,10 @@ int startTime;
 
 float alt_system_time_update()
 {
+	// always update the main time, because it might be used by other code
+	// shouldn't interfere with anything else
+	float original_time_update = p_main_time_update(false, 0.0f);
+	
 	if(!b_sys_init)
 	{
 		startTime = timeGetTime();
@@ -394,6 +398,10 @@ float alt_system_time_update()
 	int currentTime = timeGetTime();
 	float result = (float)(currentTime - startTime) * 0.001;
 	startTime = currentTime;
+
+	if (cinematic_is_running() || Engine::IsGameMinimized())
+		result = original_time_update;
+
 	return result;
 }
 
@@ -510,10 +518,7 @@ void __cdecl game_main_loop()
 			out_target_ticks = 0;
 			if (Interpolate)
 			{
-				if (cinematic_is_running() || Engine::IsGameMinimized())
-					v15 = p_main_time_update(false, 0.0f);
-				else
-					v15 = alt_system_time_update(); // (Nuke: no idea why main_time_update is replaced by this but p_main_time_update does the same thing, just gets a time delta)
+				v15 = alt_system_time_update(); // (Nuke: no idea why main_time_update is replaced by this but p_main_time_update does the same thing, just gets a time delta)
 			}
 			else
 			{
@@ -622,9 +627,11 @@ void alt_main_game_loop_hook()
 		if (!QuitGSMainLoop)
 			GSMainLoop();
 		init = true;
+
 		DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
-		if (init_flags_array[2] == 0)
+		if (init_flags_array[2] == 0 && !game_minimized())
 			render_audio();
+
 		if(game_in_simulation())
 		{
 			game_effects_update(time_globals::get()->seconds_per_tick);

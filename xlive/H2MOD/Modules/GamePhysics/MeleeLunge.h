@@ -6,8 +6,10 @@
 #include "H2MOD.h"
 
 #define k_valid_real_epsilon 0.001f
-#define k_acceleration_ticks 5.0f
-#define k_deceleration_ticks 4.0f
+#define k_acceleration_ticks_real 5.0f
+#define k_acceleration_ticks ((int)k_acceleration_ticks_real)
+#define k_deceleration_ticks_real 4.0f
+#define k_deceleration_ticks ((int)k_deceleration_ticks_real)
 
 enum melee_flags
 {
@@ -42,10 +44,10 @@ struct __declspec(align(4)) c_character_physics_mode_melee_datum
 	BYTE field_F;
 	real_point3d start_unit_origin;
 	real_vector3d field_1C;
-	float field_28;
+	float m_field_28;
 	float m_distance;
 	real_point3d m_target_point;
-	real_vector3d aiming_direction;
+	real_vector3d m_aiming_direction;
 	float m_maximum_distance;
 	BYTE m_started_decelerating;
 	BYTE field_4D;

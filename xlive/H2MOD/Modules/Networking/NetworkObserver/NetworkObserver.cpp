@@ -5,6 +5,12 @@
 
 network_observer_configuration* g_network_configuration;
 
+#define k_network_preference_size 108
+
+#if INCREASE_NETWORK_TICKRATE
+#define k_online_netcode_tickrate_real 60.0f
+#endif
+
 // LIVE netcode research
 void __cdecl initialize_network_observer_configuration()
 {
@@ -137,12 +143,12 @@ bool __cdecl is_network_observer_mode_managed()
 void network_observer::ResetNetworkPreferences()
 {
 	// clear the network bandwidth preferences so they won't cause issues
-	SecureZeroMemory(Memory::GetAddress<void*>(0x47E9D8 + 0x1DC), 108);
+	SecureZeroMemory(Memory::GetAddress<void*>(0x47E9D8 + 0x1DC), k_network_preference_size);
 }
 
 bool __thiscall network_observer::GetNetworkMeasurements(DWORD *out_throughput, float *out_satiation, DWORD *a4)
 {
-	// tell the game we don't have any bandwidth measurements available to save
+	// let the game know we don't have any bandwidth measurements available to save
 	return false;
 }
 
@@ -168,9 +174,35 @@ __declspec (naked) void overwrite1()
 }
 
 // raw WinSock has a 28 bytes packet overhead for the packet header, unlike Xbox LIVE, which has 44 bytes (28 bytes + whatever LIVE packet header adds)
-int __cdecl get_packet_overhead(int overhead_type)
+int __cdecl transport_get_packet_overhead_hook(int protocol_type)
 {
-	return 28 + 4;
+	enum e_protocol_type : int
+	{
+		e_protocol_udp_loopback = 2,
+		e_protocol_udp,
+		e_protocol_tcp // not entirely sure if this is TCP
+	};
+
+	switch ((e_protocol_type)protocol_type)
+	{
+
+	// replace XNet UDP header overhead with WinSock overhead
+	case e_protocol_udp_loopback:
+		// return 44;
+		return 28;
+
+	case e_protocol_udp:
+		//return 48;
+		return 28 + 4;
+		
+	case e_protocol_tcp:
+		return 56;
+	
+	default:
+		break;
+	}
+
+	return 0;
 }
 
 void network_observer::ApplyPatches()
@@ -178,7 +210,7 @@ void network_observer::ApplyPatches()
 #if USE_LIVE_NETCODE
 #if INCREASE_NETWORK_TICKRATE
 	// increase the network tickrate of hosts to 60
-	static float netcode_tickrate = 60.0f;
+	static float netcode_tickrate = k_online_netcode_tickrate_real;
 
 	WritePointer(Memory::GetAddress(0x1BDE27, 0x1B7D01) + 4, &netcode_tickrate);
 	WritePointer(Memory::GetAddress(0x1BE2FA, 0x1B81D4) + 4, &netcode_tickrate);
@@ -230,9 +262,25 @@ void network_observer::ApplyPatches()
 	// increase the network heap size
 	WriteValue<DWORD>(Memory::GetAddress(0x1ACCC8, 0x1ACE96) + 6, NETWORK_HEAP_SIZE);
 
-	//WriteJmpTo(Memory::GetAddressRelative(0x5AC1BD, 0x5A6B76), get_packet_overhead);
-
 	PatchCall(Memory::GetAddress(0x1E0FEE, 0x1B5EDE), call_GetNetworkMeasurements);
+
+	WriteJmpTo(Memory::GetAddressRelative(0x5AC1BD, 0x5A6B76), transport_get_packet_overhead_hook);
+
+	// don't force packet filling when game simulation is attached
+	// otherwise we send packets filled with nothing
+	// no idea if this was done on purpose or not...
+	// but it makes no sense to send network packets filled with barely any game data (around 30 bytes on avg) and the rest of the packet size
+	// filled with nothing
+	// unless original XNet transport layer had packet compression but even then it's rather dumb
+	// or maybe the UDP protocol has something like that, no idea
+	NopFill(Memory::GetAddressRelative(0x5BF000, 0x5B8EDA), 14);
+
+	// time patches, use the locked time at the start of netweork_send instead of the frame time delta
+	BYTE instr_offset_1[] = { 0x2C };
+	WriteBytes(Memory::GetAddressRelative(0x5BF145, 0x5B901F) + 0x3, instr_offset_1, sizeof(instr_offset_1));
+
+	BYTE instr_offset_2[] = { 0x08, 0x07, 0x00, 0x00 };
+	WriteBytes(Memory::GetAddressRelative(0x5BF14B, 0x5B9025) + 0x2, instr_offset_2, sizeof(instr_offset_2));
 
 	if (!Memory::isDedicatedServer())
 	{

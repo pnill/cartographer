@@ -298,7 +298,7 @@ void __cdecl sub_23C9F6(char a1, int VKbMenuType, wchar_t* textBuffer, __int16 t
 	void*(__thiscall*sub_20B11E)(void*) = (void*(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B11E);
 
 	unsigned int(__thiscall*sub_23B118)(void*, wchar_t*, int) = (unsigned int(__thiscall*)(void*, wchar_t*, int))((char*)H2BaseAddr + 0x23B118);
-	int(__cdecl* sub_381FD)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x381FD);
+	int(__cdecl* get_language_id)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x381FD);
 	bool(*sub_38F02)() = (bool(*)())((char*)H2BaseAddr + 0x38F02);
 	int(*sub_38F74)() = (int(*)())((char*)H2BaseAddr + 0x38F74);
 	void(__thiscall*sub_38F7A)(void*, int, int) = (void(__thiscall*)(void*, int, int))((char*)H2BaseAddr + 0x38F7A);
@@ -312,7 +312,7 @@ void __cdecl sub_23C9F6(char a1, int VKbMenuType, wchar_t* textBuffer, __int16 t
 	*(DWORD*)(v4 + 2652) = VKbMenuType;
 	sub_23B118((void*)v4, textBuffer, textBufferLen);
 	return;
-	if (VKbMenuType < 0 || VKbMenuType > 6 && VKbMenuType != 16 || sub_381FD() != 1 && sub_381FD() != 6 && sub_381FD() != 7)
+	if (VKbMenuType < 0 || VKbMenuType > 6 && VKbMenuType != 16 || get_language_id() != 1 && get_language_id() != 6 && get_language_id() != 7)
 	{
 		if (sub_38F02())
 		{
@@ -367,6 +367,11 @@ void testVKeyboardCall() {
 
 #pragma endregion
 
+#define VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX 17
+
+// we just re-use the first seventeen keyboard id's in default code for now
+#define VIRTUAL_KEYBOARD_MENU_TYPE_MAX_NEW (VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX * 2)
+
 char __stdcall sub_23CC18_CM(int thisptr)//__thiscall
 {
 	int(__cdecl* sub_4BEB3)(int, int, int, int) = (int(__cdecl*)(int, int, int, int))((char*)H2BaseAddr + 0x4BEB3);
@@ -389,8 +394,12 @@ char __stdcall sub_23CC18_CM(int thisptr)//__thiscall
 	//char v3[1024]; // [esp+4h] [ebp-804h]
 
 	v1 = thisptr;
-	int VKbMenuType = *(DWORD*)(thisptr + 2652);
-	/*if (VKbMenuType != 15)//type: enter message text. hmm something interesting is happening here
+	int VKbMenuTypeDefault = *(DWORD*)(thisptr + 2652);
+	int VKbMenuTypeNew = *(DWORD*)(thisptr + 2652) + VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX;
+	if (VKbMenuTypeDefault == -1)
+		VKbMenuTypeNew = -1;
+
+	/*if (VKbMenuTypeDefault != 15)//type: enter message text. hmm something interesting is happening here
 	{
 		sub_4BEB3((int)v3, 1024, *(DWORD*)(thisptr + 3172), *(signed __int16*)(thisptr + 3180));
 		sub_287567(*(__int16**)(v1 + 3172), *(signed __int16*)(v1 + 3180), (__int16*)v3);
@@ -398,14 +407,14 @@ char __stdcall sub_23CC18_CM(int thisptr)//__thiscall
 
 	result = sub_212604(v1, 3);
 
-	if (VKbMenuType >= 32 && VKbMenuType < 64 && VKbMenuType & 0b10000) {
-		wchar_t* returnString = (wchar_t*)*(DWORD*)(thisptr + 0xC64);
-		int returnStrLen = wcslen(returnString) + 1;
-		char* end = (char*)malloc(sizeof(char) * returnStrLen);
-		wcstombs2(end, returnString, returnStrLen);
-		strcpy((char*)returnString, end);
-		free(end);
-	}
+	// reconvert back to single byte string, because the rest of the menus code apparently uses single byte
+	// but for some retarded reason the virtual keyboard uses wide string
+	wchar_t* returnString = *(wchar_t**)(thisptr + 0xC64);
+	int returnStrLen = wcslen(returnString) + 1;
+	char* end = (char*)malloc(sizeof(char) * returnStrLen);
+	wcstombs2(end, returnString, returnStrLen);
+	strcpy((char*)returnString, end);
+	free(end);
 
 	return result;
 }
@@ -413,11 +422,12 @@ char __stdcall sub_23CC18_CM(int thisptr)//__thiscall
 //typedef void(__stdcall *tsub_23CD58)(void*, __int16);
 //tsub_23CD58 psub_23CD58;
 void __stdcall sub_23CD58_CM(void* thisptr, __int16 a2)//__thiscall
-{//virtual key press handler
- //return psub_23CD58(thisptr, a2);
+{
+	//virtual key press handler
+	//return psub_23CD58(thisptr, a2);
 
- //void(__thiscall* sub_23CD58)(void*, __int16) = (void(__thiscall*)(void*, __int16))((char*)H2BaseAddr + 0x23CD58);
- //return sub_23CD58(thisptr, a2);
+	//void(__thiscall* sub_23CD58)(void*, __int16) = (void(__thiscall*)(void*, __int16))((char*)H2BaseAddr + 0x23CD58);
+	//return sub_23CD58(thisptr, a2);
 
 	char(__cdecl*sub_4C6E0)(__int16) = (char(__cdecl*)(__int16))((char*)H2BaseAddr + 0x4C6E0);
 	char(__thiscall*sub_23C4C9)(int, __int16) = (char(__thiscall*)(int, __int16))((char*)H2BaseAddr + 0x23C4C9);
@@ -441,11 +451,15 @@ void __stdcall sub_23CD58_CM(void* thisptr, __int16 a2)//__thiscall
 	bool v11; // zf
 	int v12; // eax
 	WORD* v13; // eax
-//	int v14; // edi
-	//signed int v15; // eax
+	int error_message_id; // edi
+	signed int v15; // eax
 
-	int VKbMenuType = *((DWORD*)thisptr + 663);
-	if (VKbMenuType != 12 || *((DWORD*)thisptr + 3806) == -1)
+	int VKbMenuTypeDefault = *((DWORD*)thisptr + 663);
+	int VKbMenuTypeNew = *((DWORD*)thisptr + 663) + VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX;
+	if (VKbMenuTypeDefault == -1)
+		VKbMenuTypeNew = -1;
+
+	if (VKbMenuTypeDefault != 12 || *((DWORD*)thisptr + 3806) == -1)
 	{
 		switch (a2)
 		{
@@ -529,44 +543,62 @@ void __stdcall sub_23CD58_CM(void* thisptr, __int16 a2)//__thiscall
 		LABEL_17:
 			sub_21DD04(6);
 			break;
-		case 40://Done button
-			/*if (VKbMenuType != -1 && (v14 = 0, (v15 = sub_23B8F1(thisptr)) != 0))
+		case 40: // Done button
+			if (VKbMenuTypeDefault != -1 && (error_message_id = 0, (v15 = sub_23B8F1(thisptr)) != 0))
 			{
-				switch (VKbMenuType)//error with message type
+				switch (VKbMenuTypeDefault)//error with message type
 				{
 				case 0:
 				case 1:
 				case 2:
 				case 3:
 				case 4:
-					if (v15 == 1)
+					switch (VKbMenuTypeNew)
 					{
-						v14 = 88;
-					}
-					else if (v15 == 2)
-					{
-						v14 = 70;
+					case 17:
+					case 18:
+					case 19:
+					case 20:
+					case 21:
+						if (v15 == 1)
+						{
+							error_message_id = 88;
+						}
+						else if (v15 == 2)
+						{
+							// error_message_id = 70;
+
+							// replace already exist error message with success
+							goto success;
+						}
+
+					default:
+						break;
 					}
 					break;
+					
 				case 5:
 				case 6:
 				case 7:
 					if (v15 == 1)
 					{
-						v14 = 89;
+						error_message_id = 89;
 					}
 					else if (v15 == 2)
 					{
-						v14 = 71;
+						error_message_id = 71;
 					}
-					break;
 				default:
 					break;
 				}
-				sub_20E1D8(1, v14, 4, *((unsigned __int16 *)thisptr + 4), 0, 0);//can get rid of this and do custom message
+
+				sub_20E1D8(1, error_message_id, 4, *((unsigned __int16 *)thisptr + 4), 0, 0);//can get rid of this and do custom message
 			}
-			else*/
-			{//success. however it will open other menus like customise new variant
+			else
+			{
+				// success. however it will open other menus like customise new variant
+				// we replace the original function that would call the default menus
+			success:
 				sub_23CC18_CM((int)thisptr);
 			}
 			break;
@@ -577,15 +609,11 @@ void __stdcall sub_23CD58_CM(void* thisptr, __int16 a2)//__thiscall
 			sub_23BB13(thisptr);
 			break;
 		case 43://"ACCENTS" button
-			if (!(VKbMenuType >= 32 && VKbMenuType < 64) && (VKbMenuType == 12 || VKbMenuType == 15 || VKbMenuType == 16))
-				sub_23BB4C(thisptr);
-			if (VKbMenuType >= 32 && VKbMenuType < 64 && VKbMenuType & 0b01)
+			if (VKbMenuTypeDefault == 12 || VKbMenuTypeDefault == 15 || VKbMenuTypeDefault == 16)
 				sub_23BB4C(thisptr);
 			break;
 		case 44://"SYMBOLS" button
-			if (!(VKbMenuType >= 32 && VKbMenuType < 64) && (VKbMenuType == 12 || VKbMenuType == 15 || VKbMenuType == 16))
-				sub_23BB85(thisptr);
-			if (VKbMenuType >= 32 && VKbMenuType < 64 && VKbMenuType & 0b10)
+			if (VKbMenuTypeDefault == 12 || VKbMenuTypeDefault == 15 || VKbMenuTypeDefault == 16)
 				sub_23BB85(thisptr);
 			break;
 		default:
@@ -713,7 +741,7 @@ void PoSmbstowcs(wchar_t* destsrc, int maxCount) {
 	free(end);
 }
 
-void GSCustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen, WORD charsAllowed, int menuIdTitle, int title, int menuIdDesc, int description) {
+void GSCustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen, int menuType, int menuIdTitle, int title, int menuIdDesc, int description) {
 	char* lblTitle = H2CustomLanguageGetLabel(menuIdTitle, title);
 	char* lblDesc = H2CustomLanguageGetLabel(menuIdDesc, description);
 //	add_cartographer_label(CMLabelMenuId_VKeyTest, 0xFFFFFFF0, lblTitle, true);
@@ -730,24 +758,26 @@ void GSCustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen
 	int(*sub_38F74)() = (int(*)())((char*)H2BaseAddr + 0x38F74);
 	void(__thiscall*sub_38F7A)(void*, int, int) = (void(__thiscall*)(void*, int, int))((char*)H2BaseAddr + 0x38F7A);
 
-	//VirtualKeyboardTypes - original
-	//0 to 4 - profile name
-	//5,6 - variant name
-	//7 - variant name default
-	//8,9 - playlist name
-	//10, 11 - film name
-	//12, 15 - enter message text
-	//13 - rename squad
-	//16 - search for games by its description
+	// VirtualKeyboardTypes - original
+	// -1 allows all symbols and does not check the output string if valid for any purpose as bellow options do
 
-	//new types
-	//0b10000 - need it in char* (be sure to make the buffer twice as big tho!)
-	//0b00 - "SYMBOLS" & "ACCENTS" disabled
-	//0b01 - "ACCENTS" enabled
-	//0b10 - "SYMBOLS" enabled
+	// 0 to 4 - profile name
+	// 5,6 - variant name
+	// 7 - variant name default
+	// 8,9 - playlist name
+	// 10, 11 - film name
+	// 12, 15 - enter message text
+	// 13 - rename squad
+	// 16 - search for games by its description
 
-	int VKbMenuType = 32;//enter message text
-	VKbMenuType |= charsAllowed;
+	// from 17 to 33 we got the same as above, but new to match our new code
+	// 17 - 21 = 0 to 4 and so on, but diferent indices so we determine what our code will execute
+
+	int VKbMenuTypeDefault = menuType;//enter message text
+	int VKbMenuTypeNew = menuType + VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX;//enter message text
+	
+	if (VKbMenuTypeDefault == -1)
+		VKbMenuTypeNew = -1;
 
 	int a1 = 0;
 	int a3 = 0;
@@ -759,9 +789,8 @@ void GSCustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen
 	//sub_20C258(&v8, 0, 1 << a1, 2, 4, (int)(char*)H2BaseAddr + 0x23C72F);
 	sub_20C258(&v8, 0, 1 << a1, 2, 4, (int)sub_23C72F_CM);
 	v4 = (int)sub_20B11E(&v8);
-	*(DWORD*)(v4 + 2652) = VKbMenuType;
-	DWORD* sgdsf = (DWORD*)(v4 + 2652);
-	if (VKbMenuType >= 32 && VKbMenuType < 64 && VKbMenuType & 0b10000) {
+	*(DWORD*)(v4 + 2652) = VKbMenuTypeDefault;
+	if ((VKbMenuTypeNew >= VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX && VKbMenuTypeNew < VIRTUAL_KEYBOARD_MENU_TYPE_MAX_NEW) || VKbMenuTypeNew == -1) {
 		PoSmbstowcs(textBuffer, textBufferLen); // convert multibyte to wide charaters, uses same character buffer
 	}
 	sub_23B118((void*)v4, textBuffer, textBufferLen);
@@ -3348,16 +3377,16 @@ static DWORD WINAPI AccountCreateThread(LPVOID lParam)
 
 static bool CMButtonHandler_AccountCreate(int button_id) {
 	if (button_id == 0) {
-		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
-		GSCustomMenuCall_VKeyboard_Inner(textBuffer, XUSER_NAME_SIZE /* Wide string buffer size */, 0b10010, CMLabelMenuId_AccountCreate, 0xFFFFF002, CMLabelMenuId_AccountCreate, 0xFFFFF003);
+		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1); // account name
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, XUSER_NAME_SIZE /* Wide string buffer size */, 0, CMLabelMenuId_AccountCreate, 0xFFFFF002, CMLabelMenuId_AccountCreate, 0xFFFFF003);
 	}
 	else if (button_id == 1) {
-		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 2);
-		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 0b10000, CMLabelMenuId_AccountCreate, 0xFFFFF004, CMLabelMenuId_AccountCreate, 0xFFFFF005);
+		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 2); // password
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 16, CMLabelMenuId_AccountCreate, 0xFFFFF004, CMLabelMenuId_AccountCreate, 0xFFFFF005);
 	}
 	else if (button_id == 2) {
-		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 3);
-		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 0b10000, CMLabelMenuId_AccountCreate, 0xFFFFF006, CMLabelMenuId_AccountCreate, 0xFFFFF007);
+		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 3); // email
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 16, CMLabelMenuId_AccountCreate, 0xFFFFF006, CMLabelMenuId_AccountCreate, 0xFFFFF007);
 	}
 	else if (button_id == 3) {
 		if (!hThreadCreate) {
@@ -3611,11 +3640,11 @@ static DWORD WINAPI ThreadLogin(LPVOID lParam)
 static bool CMButtonHandler_AccountEdit(int button_id) {
 	if (button_id == 0) {
 		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
-		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 0b10000, CMLabelMenuId_AccountEdit, 0xFFFFF002, CMLabelMenuId_AccountEdit, 0xFFFFF003);
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 16, CMLabelMenuId_AccountEdit, 0xFFFFF002, CMLabelMenuId_AccountEdit, 0xFFFFF003);
 	}
 	else if (button_id == 1) {
 		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
-		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 0b10000, CMLabelMenuId_AccountEdit, 0xFFFFF004, CMLabelMenuId_AccountEdit, 0xFFFFF005);
+		GSCustomMenuCall_VKeyboard_Inner(textBuffer, 256, 16, CMLabelMenuId_AccountEdit, 0xFFFFF004, CMLabelMenuId_AccountEdit, 0xFFFFF005);
 	}
 	else if (button_id == 2) {
 		AccountEdit_remember = !AccountEdit_remember;
@@ -6015,30 +6044,18 @@ int __stdcall sub_23bf3e_CMLTD(int thisptr, int a2, int label_menu_id, int label
 	sub_23BBBE(v2, dword_3D2CB8, 47);
 	sub_23BBBE(v2, dword_3D2B38, 47);
 	result = sub_23ae3c_CMLTD(v2, label_menu_id, label_id_title, label_id_description);
-	int VKbMenuType = v2[663];
+	int VKbMenuTypeDefault = v2[663];
+	int VKbMenuTypeNew = v2[663] + VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX;
 	//"SYMBOLS" AND "ACCENTS" buttons are greyed out by default
-	if (!(VKbMenuType >= 32 && VKbMenuType < 64)) {
-		if (byte_3D2F30[8 * VKbMenuType] & 0xA)
-		{
-			*((BYTE*)v2 + 14566) = 0;//disables "SYMBOLS" button from being highlightable
-			*((BYTE*)v2 + 14310) = 0;//disables "ACCENTS" button from being highlightable
-		}
-		else
-		{
-			*((BYTE*)v2 + 15078) = 0;//enable "SYMBOLS" button style
-			*((BYTE*)v2 + 14822) = 0;//enable "ACCENTS" button style
-		}
+	if (byte_3D2F30[8 * VKbMenuTypeDefault] & 0xA)
+	{
+		*((BYTE*)v2 + 14566) = 0;//disables "SYMBOLS" button from being highlightable
+		*((BYTE*)v2 + 14310) = 0;//disables "ACCENTS" button from being highlightable
 	}
-	else {
-		if (VKbMenuType & 0b01)
-			*((BYTE*)v2 + 14822) = 0;//enable "ACCENTS" button style
-		else
-			*((BYTE*)v2 + 14310) = 0;//disables "ACCENTS" button from being highlightable
-		if (VKbMenuType & 0b10)
-			*((BYTE*)v2 + 15078) = 0;//enable "SYMBOLS" button style
-		else
-			*((BYTE*)v2 + 14566) = 0;//disables "SYMBOLS" button from being highlightable
-
+	else
+	{
+		*((BYTE*)v2 + 15078) = 0;//enable "SYMBOLS" button style
+		*((BYTE*)v2 + 14822) = 0;//enable "ACCENTS" button style
 	}
 	return result;
 }
@@ -6078,7 +6095,7 @@ char __stdcall sub_23CF88_CM(int thisptr, int* a2) //__thiscall
 	char v3; // bl
 	DWORD* v4; // ebp
 	int v5; // ecx
-	int VKbMenuType; // eax
+	int VKbMenuTypeDefault; // eax
 	//int v7; // eax
 	DWORD* v8; // eax
 	char v10; // [esp+13h] [ebp-1h]
@@ -6104,7 +6121,7 @@ char __stdcall sub_23CF88_CM(int thisptr, int* a2) //__thiscall
 	}
 	if (*a2 == 7 && a2[2] == 27 || v3)//close menu esc key
 	{
-		VKbMenuType = v4[663];
+		VKbMenuTypeDefault = v4[663];
 		/*if (VKbMenuType == 7 || VKbMenuType == 5)
 		{
 			v7 = sub_209A8C();
@@ -6137,14 +6154,12 @@ char __stdcall sub_23CF88_CM(int thisptr, int* a2) //__thiscall
 		result = sub_2118F0(thisptr, (int)a2);//only handles all kinds of menu exiting.
 	}
 	if (v20) {
-		if (VKbMenuType >= 32 && VKbMenuType < 64 && VKbMenuType & 0b10000) {
-			wchar_t* returnString = (wchar_t*)*(DWORD*)((BYTE*)v4 + 0xC64);
-			int returnStrLen = wcslen(returnString) + 1;
-			char* end = (char*)malloc(sizeof(char) * returnStrLen);
-			wcstombs2(end, returnString, returnStrLen);
-			strcpy((char*)returnString, end);
-			free(end);
-		}
+		wchar_t* returnString = (wchar_t*)*(DWORD*)((BYTE*)v4 + 0xC64);
+		int returnStrLen = wcslen(returnString) + 1;
+		char* end = (char*)calloc(returnStrLen, sizeof(char));
+		wcstombs2(end, returnString, returnStrLen);
+		strcpy((char*)returnString, end);
+		free(end);
 	}
 	return result;
 }

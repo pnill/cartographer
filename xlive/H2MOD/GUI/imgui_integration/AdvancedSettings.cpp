@@ -1,26 +1,17 @@
 #include "3rdparty/imgui/imgui.h"
+
 #include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/Modules/Tweaks/Tweaks.h"
-#include "H2MOD/Modules/Startup/Startup.h"
 #include "H2MOD/Modules/HudElements/HudElements.h"
-#include "3rdparty/imgui/imgui_internal.h"
 #include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
-#include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
-#include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
-#include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
-#include "H2MOD/Modules/Input/ControllerInput.h"
 #include "imgui_handler.h"
 #include "H2MOD/Modules/RunLoop/RunLoop.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
-#include "H2MOD/Modules/Utils/Utils.h"
-#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
-#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
+#include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
 
 
 namespace imgui_handler {

@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr int NONE = -1;
+#define NONE -1
 
 //PADDING MACROS
 #define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )

@@ -36,8 +36,6 @@ private:
 #define XNET_XNQOSINFO_TARGET_DISABLED  0x04    // Target host has disabled its Qos listener
 #define XNET_XNQOSINFO_DATA_RECEIVED    0x08    // Target host supplied Qos data
 #define XNET_XNQOSINFO_PARTIAL_COMPLETE 0x10    // Qos has unfinished estimates for this entry
-#define XNET_XNQOSINFO_UNK	0x11
-
 
 #define XNET_QOS_LISTEN_ENABLE              0x00000001 // Responds to queries on the given XNKID
 #define XNET_QOS_LISTEN_DISABLE             0x00000002 // Rejects queries on the given XNKID

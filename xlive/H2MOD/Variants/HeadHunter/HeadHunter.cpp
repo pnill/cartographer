@@ -46,8 +46,8 @@ void HeadHunter::spawnPlayerClientSetup()
 
 void HeadHunter::SpawnSkull(datum unit_datum)
 {
-	DatumIterator<ObjectHeader> objectIt(game_state_objects_header);
-	BipedObjectDefinition* biped_unit = (BipedObjectDefinition*)objectIt.get_data_at_index(unit_datum.Index)->object;
+	DatumIterator<s_object_header> objectIt(game_state_objects_header);
+	s_biped_object_definition* biped_unit = (s_biped_object_definition*)objectIt.get_data_at_index(unit_datum.Index)->object;
 
 	if (objectIt.get_data_at_index(unit_datum.Index)->type == e_object_type::biped)
 	{
@@ -55,20 +55,14 @@ void HeadHunter::SpawnSkull(datum unit_datum)
 
 		Engine::Objects::create_new_placement_data(&nObject, Weapon::ball, -1, 0);
 
-		nObject.Placement.x = biped_unit->Placement.x;
-		nObject.Placement.y = biped_unit->Placement.y;
-		nObject.Placement.z = biped_unit->Placement.z;
-		nObject.TranslationalVelocity.x = biped_unit->TranslationalVelocity.x;
-		nObject.TranslationalVelocity.y = biped_unit->TranslationalVelocity.y;
-		nObject.TranslationalVelocity.z = biped_unit->TranslationalVelocity.z;
+		nObject.placement = biped_unit->placement;
+		nObject.translational_velocity = biped_unit->translational_velocity;
 
 		datum new_object_datum = Engine::Objects::call_object_new(&nObject);
 		if (!new_object_datum.IsNull())
 			call_add_object_to_sync(new_object_datum);
 	}
 }
-
-extern void addDebugText(const char* text);
 
 typedef void(__stdcall *update_player_score)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
 extern update_player_score pupdate_player_score;
@@ -115,10 +109,10 @@ void HeadHunterHandler::SetDeadPlayer(datum dead_datum)
 
 bool HeadHunterHandler::SetInteractedObject(datum object_datum)
 {
-	DatumIterator<ObjectHeader> objectIt(game_state_objects_header);
-	WeaponObjectDefinition* weaponObject = (WeaponObjectDefinition*)objectIt.get_data_at_index(object_datum.ToAbsoluteIndex())->object;
+	DatumIterator<s_object_header> objectIt(game_state_objects_header);
+	s_weapon_object_definition* weaponObject = (s_weapon_object_definition*)objectIt.get_data_at_index(object_datum.ToAbsoluteIndex())->object;
 
-	if (weaponObject->TagDefinitionIndex.Index == (Weapon::ball & 0xFFFF))
+	if (weaponObject->tag_definition_index.Index == (Weapon::ball & 0xFFFF))
 	{
 		this->object_interaction = object_datum;
 		return true;

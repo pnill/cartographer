@@ -67,20 +67,6 @@ int NetworkSession::getPeerIndex(int playerIndex)
 	return getPlayerInformation(playerIndex)->peer_index;
 }
 
-long long NetworkSession::getPeerXUID(int peerIndex)
-{
-	if(getPeerCount() > 0)
-	{
-		int playerIndex = 0;
-		do
-		{
-			if (getPeerIndex(playerIndex) == peerIndex)
-				return getPlayerXuid(playerIndex);
-			playerIndex++;
-		} while (playerIndex < 16);
-	}
-	return NONE;
-}
 wchar_t* NetworkSession::getPeerPlayerName(int peerIndex)
 {
 	if (getPeerCount() > 0)
