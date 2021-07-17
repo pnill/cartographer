@@ -50,9 +50,9 @@ int downloadPercentage = 0;
 
 #pragma region custom map checks
 
-bool open_cache_header(const wchar_t *lpFileName, tags::cache_header *cache_header_ptr, HANDLE *map_handle)
+bool open_cache_header(const wchar_t *lpFileName, s_cache_header *cache_header_ptr, HANDLE *map_handle)
 {
-	typedef char(__cdecl open_cache_header)(const wchar_t *lpFileName, tags::cache_header *lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
+	typedef char(__cdecl open_cache_header)(const wchar_t *lpFileName, s_cache_header *lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
 	auto open_cache_header_impl = Memory::GetAddress<open_cache_header*>(0x642D0, 0x4C327);
 	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
 }
@@ -68,7 +68,7 @@ static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
 
 int __cdecl validate_and_add_custom_map(BYTE *a1)
 {
-	tags::cache_header header;
+	s_cache_header header;
 	HANDLE map_cache_handle;
 	wchar_t *file_name = (wchar_t*)(a1 + 2432);
 	if (!open_cache_header(file_name, &header, &map_cache_handle))

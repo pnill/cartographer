@@ -15,9 +15,9 @@ char* tags::get_matg_globals_ptr()
 	return *Memory::GetAddress<char**>(0x479E70, 0x4A642C);
 }
 
-tags::cache_header* tags::get_cache_header()
+s_cache_header* tags::get_cache_header()
 {
-	return Memory::GetAddress<tags::cache_header*>(0x47CD68, 0x4A29D0);
+	return Memory::GetAddress<s_cache_header*>(0x47CD68, 0x4A29D0);
 }
 
 HANDLE tags::get_cache_handle()
@@ -59,7 +59,7 @@ bool tags::load_tag_debug_name()
 	if (!LOG_CHECK(cache_handle != INVALID_HANDLE_VALUE))
 		return false;
 
-	cache_header* header = get_cache_header();
+	s_cache_header* header = get_cache_header();
 
 	size_t name_buffer_offset = header->TagNamesBufferOffset;
 	size_t name_buffer_size = header->TagNamesBufferSize;

@@ -89,7 +89,7 @@ struct blam_tag
 		multiplayervariantsettingsinterfacedefinition = 'goof',
 		materialeffects = 'foot',
 		garbage = 'garb',
-		style = 'stly',
+		style = 'styl',
 		character = 'char',
 		aidialogueglobals = 'adlg',
 		aimissiondialogue = 'mdlg',
@@ -127,6 +127,7 @@ struct blam_tag
 		soundcachefilegestalt = 'ugh!',
 		cachefilesound = '$#!+',
 		mousecursordefinition = 'mcsr',
+		uldg = 'udlg'
 	};
 
 	blam_tag()
@@ -178,6 +179,135 @@ struct blam_tag
 	constexpr bool is_none() const
 	{
 		return tag_type == tag_group_type::none;
+	}
+	//Yikers
+	inline bool is_class_valid() const
+	{
+		switch(tag_type) { 
+			case tag_group_type::model: 
+			case tag_group_type::rendermodel: 
+			case tag_group_type::collisionmodel: 
+			case tag_group_type::physicsmodel: 
+			case tag_group_type::bitmap: 
+			case tag_group_type::colortable: 
+			case tag_group_type::multilingualunicodestringlist: 
+			case tag_group_type::unit: 
+			case tag_group_type::biped: 
+			case tag_group_type::vehicle: 
+			case tag_group_type::scenery: 
+			case tag_group_type::crate: 
+			case tag_group_type::creature: 
+			case tag_group_type::physics: 
+			case tag_group_type::object: 
+			case tag_group_type::contrail: 
+			case tag_group_type::weapon: 
+			case tag_group_type::light: 
+			case tag_group_type::effect: 
+			case tag_group_type::particle: 
+			case tag_group_type::particlemodel: 
+			case tag_group_type::particlephysics: 
+			case tag_group_type::globals: 
+			case tag_group_type::sound: 
+			case tag_group_type::soundlooping: 
+			case tag_group_type::item: 
+			case tag_group_type::equipment: 
+			case tag_group_type::antenna: 
+			case tag_group_type::lightvolume: 
+			case tag_group_type::liquid: 
+			case tag_group_type::cellularautomata: 
+			case tag_group_type::cellularautomata2d: 
+			case tag_group_type::stereosystem: 
+			case tag_group_type::cameratrack: 
+			case tag_group_type::projectile: 
+			case tag_group_type::device: 
+			case tag_group_type::devicemachine: 
+			case tag_group_type::devicecontrol: 
+			case tag_group_type::devicelightfixture: 
+			case tag_group_type::pointphysics: 
+			case tag_group_type::scenariostructurelightmap: 
+			case tag_group_type::scenariostructurebsp: 
+			case tag_group_type::scenario: 
+			case tag_group_type::shader: 
+			case tag_group_type::shadertemplate: 
+			case tag_group_type::shaderlightresponse: 
+			case tag_group_type::shaderpass: 
+			case tag_group_type::vertexshader: 
+			case tag_group_type::pixelshader: 
+			case tag_group_type::decoratorset: 
+			case tag_group_type::decorators: 
+			case tag_group_type::sky: 
+			case tag_group_type::wind: 
+			case tag_group_type::soundenvironment: 
+			case tag_group_type::lensflare: 
+			case tag_group_type::planarfog: 
+			case tag_group_type::patchyfog: 
+			case tag_group_type::meter: 
+			case tag_group_type::decal: 
+			case tag_group_type::colony: 
+			case tag_group_type::damageeffect: 
+			case tag_group_type::dialogue: 
+			case tag_group_type::itemcollection: 
+			case tag_group_type::vehiclecollection: 
+			case tag_group_type::weaponhudinterface: 
+			case tag_group_type::grenadehudinterface: 
+			case tag_group_type::unithudinterface: 
+			case tag_group_type::newhuddefinition: 
+			case tag_group_type::hudnumber: 
+			case tag_group_type::hudglobals: 
+			case tag_group_type::multiplayerscenariodescription: 
+			case tag_group_type::detailobjectcollection: 
+			case tag_group_type::soundscenery: 
+			case tag_group_type::hudmessagetext: 
+			case tag_group_type::userinterfacescreenwidgetdefinition: 
+			case tag_group_type::userinterfacelistskindefinition: 
+			case tag_group_type::userinterfaceglobalsdefinition: 
+			case tag_group_type::userinterfacesharedglobalsdefinition: 
+			case tag_group_type::textvaluepairdefinition: 
+			case tag_group_type::multiplayervariantsettingsinterfacedefinition: 
+			case tag_group_type::materialeffects: 
+			case tag_group_type::garbage: 
+			case tag_group_type::style: 
+			case tag_group_type::character: 
+			case tag_group_type::aidialogueglobals: 
+			case tag_group_type::aimissiondialogue: 
+			case tag_group_type::scenariosceneryresource: 
+			case tag_group_type::scenariobipedsresource: 
+			case tag_group_type::scenariovehiclesresource: 
+			case tag_group_type::scenarioequipmentresource: 
+			case tag_group_type::scenarioweaponsresource: 
+			case tag_group_type::scenariosoundsceneryresource: 
+			case tag_group_type::scenariolightsresource: 
+			case tag_group_type::scenariodevicesresource: 
+			case tag_group_type::scenariodecalsresource: 
+			case tag_group_type::scenariocinematicsresource: 
+			case tag_group_type::scenariotriggervolumesresource: 
+			case tag_group_type::scenarioclusterdataresource: 
+			case tag_group_type::scenariocreatureresource: 
+			case tag_group_type::scenariodecoratorsresource: 
+			case tag_group_type::scenariostructurelightingresource: 
+			case tag_group_type::scenariohssourcefile: 
+			case tag_group_type::scenarioairesource: 
+			case tag_group_type::scenariocommentsresource: 
+			case tag_group_type::breakablesurface: 
+			case tag_group_type::materialphysics: 
+			case tag_group_type::soundclasses: 
+			case tag_group_type::multiplayerglobals: 
+			case tag_group_type::soundeffecttemplate: 
+			case tag_group_type::soundeffectcollection: 
+			case tag_group_type::chocolatemountain: 
+			case tag_group_type::modelanimationgraph: 
+			case tag_group_type::cloth: 
+			case tag_group_type::screeneffect: 
+			case tag_group_type::weathersystem: 
+			case tag_group_type::soundmix: 
+			case tag_group_type::sounddialogueconstants: 
+			case tag_group_type::soundcachefilegestalt: 
+			case tag_group_type::cachefilesound: 
+			case tag_group_type::mousecursordefinition:
+			case tag_group_type::uldg:
+				return true;
+		}
+		return false;
 	}
 
 	constexpr bool is_set() const

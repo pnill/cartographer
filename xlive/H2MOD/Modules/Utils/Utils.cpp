@@ -696,3 +696,9 @@ int TimeElapsedMS(int startms)
 		nSpan += 0x100000 * 1000;
 	return nSpan;
 }
+
+bool FileTypeCheck(const std::string& file_path, const std::string& file_type)
+{
+	auto a = file_path.substr(file_path.find_last_of('.') + 1, file_path.length() - file_path.find_last_of('.') - 1);
+	return a == file_type;
+}

@@ -24,6 +24,17 @@ struct angle
 		rad(_rad)
 	{}
 
+	bool operator=(const angle& other) const
+	{
+		return other.rad == rad;
+	}
+
+	bool operator!=(const angle& other) const
+	{
+		return !operator=(other);
+	}
+
+
 	double as_degree() const
 	{
 		return rad * (180.0 / 3.14159265358979323846);
@@ -69,6 +80,16 @@ union real_vector3d
 		angle.pitch = acos(j);
 		angle.roll = acos(k);
 		return angle;
+	}
+
+	bool operator=(const real_vector3d& other) const
+	{
+		return i == other.i && j == other.j && k == other.k;
+	}
+
+	bool operator!=(const real_vector3d& other ) const
+	{
+		return !operator=(other);
 	}
 
 	// vector multiplication
