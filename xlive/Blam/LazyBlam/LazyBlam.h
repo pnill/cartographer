@@ -31,14 +31,7 @@ namespace lazy_blam
 		auto map_header = get_cache_header();
 		auto tag_table = get_tag_table();
 
-		//auto tag_instance_address = tag_table->tag_table_start_unpadded + tag_datum.Index * sizeof(tags::tag_instance);
-		////Make sure the calculated address of the instance is inside the tag table.
-		//if (tag_table->tag_data_start <= tag_instance_address && tag_instance_address >= tag_table->tag_table_end)
-		//	return nullptr;
-
 		tags::tag_instance* tag_inst = get_tag_instance(tag_datum);
-		//map_stream->seekg(tag_instance_address);
-		//map_stream->read((char*)&tag_instance, sizeof(tags::tag_instance));
 
 		int tag_data_offset;
 		if(map_header->type == s_cache_header::MultiplayerSharedScenario)
