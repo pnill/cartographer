@@ -270,7 +270,7 @@ namespace KantTesting
 		auto chief_d = lazy_blam::get_datum_from_name("objects\\characters\\masterchief\\masterchief", blam_tag::tag_group_type::biped);
 		auto chief_data = lazy_blam::get_tag_data<s_biped_group_definition>(chief_d);
 		LOG_INFO_GAME("[{}] {} {}", elite_data->acceleration, chief_data->acceleration);
-		//lazy_blam::clear_loaded_tags();
+		lazy_blam::clear_loaded_tags();
 		if (ENABLEKANTTEST) {
 			if (!Memory::isDedicatedServer()) {
 			/*	register_player_packets_method = (register_player_packets)DetourFunc(Memory::GetAddress<BYTE*>(0x1F0A55, 0x1D140E), (BYTE*)registerPlayerPackets, 5);
