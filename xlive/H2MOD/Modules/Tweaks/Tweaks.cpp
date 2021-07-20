@@ -873,7 +873,15 @@ void InitH2Tweaks() {
 		NopFill(Memory::GetAddressRelative(0x42FA8A), 3);
 		PatchCall(Memory::GetAddressRelative(0x42FAAB), update_keyboard_buttons_state_hook);
 
+		// don't mess with the cursor during loading screen
 		NopFill(Memory::GetAddressRelative(0x66BAEB), 5);
+
+		// disable symbol to emoji translation when dealing with player name
+		// works only in game for now, because the name in the pregame lobby uses c_text_widget
+		// and it's harder to deal with
+		NopFill(Memory::GetAddressRelative(0x46C7C7), 5);
+		NopFill(Memory::GetAddressRelative(0x45C338), 5);
+		NopFill(Memory::GetAddressRelative(0x473C61), 5);
 	}
 
 	// fixes edge drop fast fall when using higher tickrates than 30
