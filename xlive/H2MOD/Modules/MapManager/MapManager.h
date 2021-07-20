@@ -13,8 +13,6 @@ public:
 	void reloadAllMaps();
 	bool loadMapInfo(std::wstring& mapFileLocation);
 	std::wstring getMapName();
-	bool hasCustomMap(std::string mapName);
-	bool hasCustomMap(std::wstring mapName);
 
 	//client functions/data below
 	void applyHooks();

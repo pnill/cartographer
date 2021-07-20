@@ -6,9 +6,6 @@
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "..\Networking\Networking.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include <curl/curl.h>
-
-#pragma comment (lib, "mswsock.lib")
 
 MapManager* mapManager = new MapManager();
 
@@ -119,7 +116,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 	return true;
 }
 
-bool __cdecl is_supported_build(char *build)
+bool __cdecl is_supported_build(const char *build)
 {
 	const static std::unordered_set<std::string> offically_supported_builds{ "11122.07.08.24.1808.main", "11081.07.04.30.0934.main" };
 	if (offically_supported_builds.count(build) == 0)
@@ -136,7 +133,7 @@ typedef signed int(__cdecl* get_map_load_status_for_all_peers)(signed int*, unsi
 get_map_load_status_for_all_peers p_get_map_load_status_for_all_peers;
 
 //allow hosts to start the game while other peers didn't load the map
-signed int __cdecl get_map_load_status_for_all_peers_hook(signed int *smallest_load_percentage, unsigned int *host_map_status)
+signed int __cdecl get_map_load_status_for_all_peers_hook(signed int *out_smallest_load_percentage, unsigned int *out_host_map_status)
 {
 	// this just gets the current network_session, but has some extra misc checks
 	typedef bool(__cdecl* get_network_session_with_misc_checks)(network_session**);
@@ -166,8 +163,8 @@ signed int __cdecl get_map_load_status_for_all_peers_hook(signed int *smallest_l
 		case network_session_state_host_reestablish:
 			membership_info* membership = &session->membership;
 
-			if (host_map_status)
-				*host_map_status = membership->peer_info[session->session_host_peer_index].map_status;
+			if (out_host_map_status)
+				*out_host_map_status = membership->peer_info[session->session_host_peer_index].map_status;
 
 			result_map_status = map_loaded;
 
@@ -211,17 +208,19 @@ signed int __cdecl get_map_load_status_for_all_peers_hook(signed int *smallest_l
 		}
 	}
 
-	if (smallest_load_percentage)
-		*smallest_load_percentage = result_map_percentage;
+	if (out_smallest_load_percentage)
+		*out_smallest_load_percentage = result_map_percentage;
 
 	return result_map_status;
 }
 
-bool __stdcall get_map_load_status_for_all_peers_hook_2(network_session *session, DWORD *player_flags_that_didnt_load_map)
+// this is actually thiscall, but the parameter is unused
+bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, network_session *session, DWORD *peers_that_cant_load_map_flags)
 {
 	int result_bitflags = 0;
+	bool all_peers_can_load_map = true;
+
 	membership_info* membership = &session->membership;
-	bool everyone_loaded_the_map = true;
 
 	if (membership->peer_count > 0)
 	{
@@ -238,7 +237,7 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(network_session *session
 				case map_someone_loading:
 				case map_is_downloading:
 					result_bitflags |= FLAG(i);
-					everyone_loaded_the_map = false;
+					all_peers_can_load_map = false;
 					break;
 				case map_available:
 				case map_loaded:
@@ -247,10 +246,24 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(network_session *session
 			}
 		}
 	}
-	if (player_flags_that_didnt_load_map)
-		*player_flags_that_didnt_load_map = result_bitflags;
+	if (peers_that_cant_load_map_flags)
+		*peers_that_cant_load_map_flags = result_bitflags;
 
-	return everyone_loaded_the_map;
+	return all_peers_can_load_map;
+}
+
+__declspec(naked) void get_map_load_status_for_all_peers_hook_2_to_stdcall()
+{
+	__asm
+	{
+		mov esi, [esp+4+4] // local stack + parameter
+		push esi
+		mov esi, [esp+8] // local stack + parameter
+		push esi
+		push ecx // push this on stack
+		call get_map_load_status_for_all_peers_hook_2 // this will clear 12 bytes off the stack
+		retn 8 // clear the remaining 8 that we pushed previously
+	}
 }
 #pragma endregion
 
@@ -260,6 +273,8 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(network_session *session
 char __cdecl handle_map_download_callback() {
 	downloadPercentage = 0;
 
+	CHRONO_DEFINE_TIME_AND_CLOCK();
+
 	auto mapDownloadThread = []()
 	{
 		DWORD* mapDownloadStatus = Memory::GetAddress<DWORD*>(0x422570);
@@ -267,25 +282,27 @@ char __cdecl handle_map_download_callback() {
 		// set the game to downloading map state
 		*mapDownloadStatus = -1;
 
-		// sleep 500 msec to let the game receive the packet
-		Sleep(500);
+		auto timeAtStart = _clock::now();
+
+		while (mapManager->getMapFilenameToDownload().empty() && _clock::now() - timeAtStart < 5s)
+			Sleep(20);
 
 		if (!mapManager->getMapFilenameToDownload().empty())
 		{
 			LOG_TRACE_NETWORK("[h2mod-mapmanager] map file name from packet: {}", mapManager->getMapFilenameToDownload());
-			if (!mapManager->hasCustomMap(mapManager->getMapFilenameToDownload())) {
-				//TODO: set map filesize
-				//TODO: if downloading from repo files, try p2p
-				if (!mapManager->downloadFromRepo(mapManager->getMapFilenameToDownload()))
-				{
-					LOG_TRACE_NETWORK("[h2mod-mapmanager] handle_map_download_callback() - MapManager::downloadFromRepo failed, leaving session!");
-					addDebugText("Failed to download custom map %s .", mapManager->getMapFilenameToDownload().c_str());
-					h2mod->leave_session(); // download has failed
-				}
+
+			//TODO: set map filesize
+			//TODO: if downloading from repo files, try p2p
+			if (!mapManager->downloadFromRepo(mapManager->getMapFilenameToDownload()))
+			{
+				LOG_TRACE_NETWORK("[h2mod-mapmanager] {}() - {}() failed, leaving session!",
+					STRINGIFY(handle_map_download_callback),
+					STRINGIFY(mapManager->downloadFromRepo));
+
+				addDebugText("Failed to download custom map %s .", mapManager->getMapFilenameToDownload().c_str());
+				h2mod->leave_session(); // download has failed
 			}
-			else {
-				LOG_TRACE_NETWORK("[h2mod-mapmanager] already has map {}", mapManager->getMapFilenameToDownload());
-			}
+
 			mapManager->clearMapFileNameToDownload();
 		}
 		else 
@@ -339,12 +356,12 @@ wchar_t* receiving_map_wstr[] = {
 wchar_t* get_receiving_map_string()
 { 
 	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)Memory::GetAddress(0x381fd));
-	wchar_t** str_array = Memory::GetAddress<wchar_t**>(0x46575C);
+	wchar_t** receiving_map_message = Memory::GetAddress<wchar_t**>(0x46575C);
 
 	if (get_default_game_language() == 0) // check if english
 		return receiving_map_wstr[0];
 
-	return str_array[get_default_game_language()];
+	return receiving_map_message[get_default_game_language()];
 }
 
 wchar_t repo_wstr[] = L"repository";
@@ -374,10 +391,10 @@ void MapManager::applyHooks() {
 
 	if (!Memory::isDedicatedServer()) {
 
-		BYTE jmp[1] = { 0xEB };
+		BYTE jmp[] = { 0xEB };
 
-		WriteBytes(Memory::GetAddress(0x215A9E), jmp, 1); /* Allow map download in network */
-		WriteBytes(Memory::GetAddress(0x215AC9), jmp, 1); /* Disable "Match has begun" bullshit */
+		WriteBytes(Memory::GetAddress(0x215A9E), jmp, sizeof(jmp)); /* Allow map download in network */
+		WriteBytes(Memory::GetAddress(0x215AC9), jmp, sizeof(jmp)); /* Disable "Match has begun" bullshit */
 		PatchCall(Memory::GetAddress(0x244A4A), display_map_downloading_menu); /* Redirect the menu constructor to our code to replace the game's map downloading code callback */
 
 		// code below is for percentage display
@@ -385,6 +402,7 @@ void MapManager::applyHooks() {
 		PatchCall(Memory::GetAddress(0x22EE41), get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
 		PatchCall(Memory::GetAddress(0x244B8F), get_map_download_source_str);
 		PatchCall(Memory::GetAddress(0x244B9D), get_receiving_map_string);
+
 		//Hooked to fix custom map images.
 		Codecave(Memory::GetAddress(0x593F0), load_map_data_for_display, 0);
 		unknown_xbox_live_data1 = Memory::GetAddress<void*>(0x9712C8);
@@ -399,7 +417,7 @@ void MapManager::applyHooks() {
 
 	// allow host to start the game, even if there are peers that didn't load the map
 	p_get_map_load_status_for_all_peers = (get_map_load_status_for_all_peers)DetourFunc(Memory::GetAddress<BYTE*>(0x1B1929, 0x197879), (BYTE*)get_map_load_status_for_all_peers_hook, 8);
-	WriteJmpTo(Memory::GetAddress<BYTE*>(0x1D76C5, 0x1BCD32), get_map_load_status_for_all_peers_hook_2);
+	WriteJmpTo(Memory::GetAddress<BYTE*>(0x1D76C5, 0x1BCD32), get_map_load_status_for_all_peers_hook_2_to_stdcall);
 
 	// disables game's map downloading implementation
 	NopFill(Memory::GetAddress(0x1B5421, 0x1A917F), 5);
@@ -441,28 +459,6 @@ std::wstring MapManager::getMapName() {
 	std::wstring ucurrentMapName(currentMapName);
 
 	return ucurrentMapName;
-}
-
-bool MapManager::hasCustomMap(std::string mapName) {
-	if (mapName.empty()) {
-		return true;
-	}
-	std::wstring unicodeMapName(mapName.length(), L' ');
-	std::copy(mapName.begin(), mapName.end(), unicodeMapName.begin());
-	return this->hasCustomMap(unicodeMapName);
-}
-
-/**
-* Checks if the client has the custom map already
-* NOTE - only works on peers (not dedis)
-*/
-bool MapManager::hasCustomMap(std::wstring mapName) {
-	wchar_t* mapsDirectory = Memory::GetAddress<wchar_t*>(0x482D70 + 0x2423C);
-	std::wstring mapFileName(mapsDirectory);
-
-	mapFileName += mapName;
-	std::ifstream file(mapFileName.c_str());
-	return file.good();
 }
 
 /**
@@ -552,6 +548,7 @@ bool MapManager::downloadFromRepo(std::string mapFilename) {
 	if (curl) {
 		fp = fopen(nonUnicodeMapFilePath.c_str(), "wb");
 		if (fp == nullptr) {
+			LOG_TRACE_GAME("{} - unable to open map file at: {}", __FUNCTION__, nonUnicodeMapFilePath.c_str());
 			curl_easy_cleanup(curl);
 			return false;
 		}
