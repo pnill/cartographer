@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "LazyBlam.h"
+#include "LazyBlam.hpp"
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "Util/filesys.h"
 
@@ -46,6 +46,7 @@ namespace lazy_blam
 		map_stream->read((char*)&tag_parent_count, sizeof(int));
 		map_stream->seekg(map_header.tag_offset + 12);
 		map_stream->read((char*)&scenario_datum, sizeof(datum));
+		tag_table = s_tag_table_data();
 
 		tag_table.tag_table_start_unpadded = map_header.tag_offset + 0xC * tag_parent_count + 0x20;;
 		if (map_header.type == s_cache_header::e_scnr_type::MultiplayerSharedScenario)
@@ -64,7 +65,6 @@ namespace lazy_blam
 		map_stream->seekg(tag_table.tag_table_start + scenario_datum.Index * sizeof(tags::tag_instance) + 0x8);
 		map_stream->read((char*)&tag_table.scenario_address, 4);
 
-		tag_table = s_tag_table_data();
 		tags::tag_instance tag_instance;
 		std::string input;
 		int count = 0;

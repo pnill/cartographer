@@ -10,7 +10,7 @@
 #include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "Blam/Cache/TagGroups/biped_definition.hpp"
-#include "Blam/LazyBlam/LazyBlam.h"
+#include "Blam/LazyBlam/LazyBlam.hpp"
 
 
 namespace KantTesting

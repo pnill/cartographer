@@ -407,7 +407,12 @@
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="H2MOD\Modules\KantTesting\KantTesting.h" />
     <ClInclude Include="Blam\Cache\cache_header.h" />
-    <ClInclude Include="Blam\LazyBlam\LazyBlam.h" />
+    <ClInclude Include="Blam\LazyBlam\Loader\loader.hpp" />
+    <ClInclude Include="Blam\LazyBlam\Loader\Unit.hpp" />
+    <ClInclude Include="Blam\LazyBlam\Loader\Object.hpp" />
+    <ClInclude Include="Blam\LazyBlam\Loader\Biped.hpp" />
+    <ClInclude Include="Blam\LazyBlam\LazyBlam.hpp" />
+    <ClInclude Include="Blam\LazyBlam\TagTable.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
