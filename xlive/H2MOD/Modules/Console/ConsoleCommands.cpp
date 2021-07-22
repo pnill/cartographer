@@ -471,8 +471,14 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid download map command, usage - $downloadMap MAP_NAME");
 				return;
 			}
+			if (!NetworkSession::localPeerIsSessionHost())
+			{
+				output(L"Cannot download map using command while not being the session host!");
+				return;
+			}
 			std::string firstArg = splitCommands[1];
-			mapManager->downloadFromRepo(firstArg);
+			auto downloadQuery = mapManager->addDownloadQuery(std::wstring(firstArg.begin(), firstArg.end()));
+			downloadQuery->StartMapDownload(); // since we have the map name, start the download
 			return;
 		}
 		else if (firstCommand == "$kick") {
@@ -639,16 +645,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			displayXyz = !displayXyz;
 			return;
 		}
-		else if (firstCommand == "$downloadmap") {
-			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
-				output(L"Invalid command, usage downloadMap filename");
-				return;
-			}
-			std::string secondArg = splitCommands[1];
-			secondArg += ".map";
-			std::thread(&MapManager::downloadFromRepo, mapManager, secondArg).detach();
-			return;
-		}
+		
 		else if (firstCommand == "$spawn") {
 			if (splitCommands.size() != 7) {
 				output(L"Invalid command, usage $spawn command_name count x y z same_team");
@@ -734,7 +731,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$requestfilename") {
-			CustomPackets::sendRequestMapFilename();
+			CustomPackets::sendRequestMapFilename(NONE);
 		}
 		else if (firstCommand == "$warpfix") {
 			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {

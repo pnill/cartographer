@@ -130,9 +130,8 @@ void (*main_game_loop)();
 
 std::chrono::steady_clock::duration desiredRenderTime;
 inline void defaultFrameLimiter() {
-	namespace _time = std::chrono;
-	using _clock = _time::steady_clock;
-	using namespace std::chrono_literals;
+	
+	CHRONO_DEFINE_TIME_AND_CLOCK();
 
 	static _clock::time_point lastTime;
 	static _clock::time_point nextFrameTime;
@@ -196,6 +195,7 @@ void main_game_loop_hook() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 
+	mapManager->MapDownloadUpdateTick();
 	main_game_loop();
 }
 

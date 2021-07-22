@@ -128,11 +128,13 @@ static const char* network_message_name[] = {
 struct __declspec(align(8)) s_custom_map_filename
 {
 	wchar_t file_name[32];
+	int map_download_id;
 };
 
 struct s_request_map_filename
 {
 	XUID user_identifier;
+	int map_download_id;
 };
 
 struct s_team_change
@@ -171,7 +173,7 @@ void register_packet_impl(void *, int, char*, int, int, int, void*, void*, void*
 namespace CustomPackets
 {
 	void ApplyGamePatches();
-	void sendRequestMapFilename();
+	void sendRequestMapFilename(int mapDownloadId);
 	void sendTeamChange(int peerIndex, int teamIndex);
 	void sendRankChange(int peerIndex, byte rank);
 	void sendAntiCheat(int peerIndex);

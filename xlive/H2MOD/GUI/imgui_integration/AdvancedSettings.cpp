@@ -234,8 +234,7 @@ namespace imgui_handler {
 				ImVec2 item_size = ImGui::GetItemRectSize();
 				if (ImGui::CollapsingHeader(GetString(video_title)))
 				{
-					namespace time = std::chrono;
-					using clock = time::steady_clock;
+					CHRONO_DEFINE_TIME_AND_CLOCK();
 
 					ImVec2 LargestText = ImGui::CalcTextSize(GetString(hires_fix), NULL, true);
 					float float_offset = ImGui::GetCursorPosX() + LargestText.x + (LargestText.x * 0.075);
