@@ -195,6 +195,7 @@ void main_game_loop_hook() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 
+	mapManager->MapDownloadUpdateTick();
 	main_game_loop();
 }
 

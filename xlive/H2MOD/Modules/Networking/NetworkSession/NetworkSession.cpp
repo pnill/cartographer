@@ -33,6 +33,32 @@ bool NetworkSession::localPeerIsSessionHost()
 		|| state == network_session_state_host_reestablish;
 }
 
+bool NetworkSession::localPeerIsEstablished()
+{
+	e_network_session_state state = getCurrentNetworkSession()->local_session_state;
+
+	switch (state)
+	{
+	case network_session_state_none:
+	case network_session_state_peer_joining:
+	case network_session_state_peer_join_abort:
+	case network_session_state_election:
+	case network_session_state_unk_2:
+		return false;
+
+	case network_session_state_peer_established:
+	case network_session_state_peer_leaving:
+	case network_session_state_host_established:
+	case network_session_state_host_disband:
+	case network_session_state_host_handoff:
+	case network_session_state_host_reestablish:
+		return true;
+
+	default:
+		return false;
+	}
+}
+
 signed int NetworkSession::getPeerIndexFromNetworkAddress(network_address* address)
 {
 	typedef signed int(__thiscall* get_peer_index_from_network_address)(network_session* session, network_address* address);

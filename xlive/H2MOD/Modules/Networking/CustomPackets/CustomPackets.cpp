@@ -24,20 +24,24 @@ const char* getNetworkMessageName(int enumVal)
 void __cdecl encode_map_file_name_packet(bitstream* stream, int a2, s_custom_map_filename* data)
 {
 	stream->data_encode_string_wide("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
+	stream->data_encode_integer("map-download-id", data->map_download_id, CHAR_BIT * sizeof(data->map_download_id));
 }
 bool __cdecl decode_map_file_name_packet(bitstream* stream, int a2, s_custom_map_filename* data)
 {
 	stream->data_decode_string_wide("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
+	data->map_download_id = stream->data_decode_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
 	return stream->packet_is_valid() == false;
 }
 
 void __cdecl encode_request_map_filename_packet(bitstream* stream, int a2, s_request_map_filename* data)
 {
 	stream->data_encode_bits("user-identifier", &data->user_identifier, player_identifier_size_bits);
+	stream->data_encode_integer("map-download-id", data->map_download_id, CHAR_BIT * sizeof(data->map_download_id));
 }
 bool __cdecl decode_request_map_filename_packet(bitstream* stream, int a2, s_request_map_filename* data)
 {
 	stream->data_decode_bits("user-identifier", &data->user_identifier, player_identifier_size_bits);
+	data->map_download_id = stream->data_decode_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
 	return stream->packet_is_valid() == false;
 }
 
@@ -212,11 +216,14 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 				std::wstring map_filename;
 				mapManager->getMapFilename(map_filename);
-				if (map_filename.size() > 0)
+				if (!map_filename.empty())
 				{
-					wcsncpy_s(data.file_name, map_filename.c_str(), ARRAYSIZE(data.file_name));
+					wcsncpy_s(data.file_name, map_filename.c_str(), map_filename.length());
+					data.map_download_id = received_data->map_download_id;
 
-					LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] sending map file name packet to XUID: {}, peer index: {}, map name: {}", received_data->user_identifier, peer_index, map_filename.c_str());
+					LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] sending map file name packet to XUID: {}, peer index: {}, map name: {}, download id {}", 
+						received_data->user_identifier, 
+						peer_index, map_filename.c_str(), received_data->map_download_id);
 
 					network_observer* observer = session->network_observer_ptr;
 					peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peer_index);
@@ -237,8 +244,23 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
 		{
 			s_custom_map_filename* received_data = (s_custom_map_filename*)packet;
-			mapManager->setMapFileNameToDownload(received_data->file_name);
-			LOG_DEBUG_NETWORK(L"[H2MOD-CustomPackets] received on handle_channel_message_hook custom_map_filename: {}", received_data->file_name);
+			if (received_data->map_download_id != NONE)
+			{
+				auto map_download_query = mapManager->getDownloadQueryById(received_data->map_download_id);
+				if (map_download_query != nullptr)
+				{
+					map_download_query->SetMapNameToDownload(received_data->file_name);
+					LOG_DEBUG_NETWORK(L"[H2MOD-CustomPackets] received on handle_channel_message_hook custom_map_filename: {}", received_data->file_name);
+				}
+				else
+				{
+					// unlikely
+					LOG_TRACE_NETWORK("[H2MOD-CustomPackets] - query with id {:X} hasn't been found!", received_data->map_download_id);
+					return;
+				}
+			}
+
+			LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] - received map name: {}, no download ID", received_data->file_name);
 		}
 		return;
 	}
@@ -350,7 +372,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 	}
 }
 
-void CustomPackets::sendRequestMapFilename()
+void CustomPackets::sendRequestMapFilename(int mapDownloadId)
 {
 	network_session* session = NetworkSession::getCurrentNetworkSession();
 
@@ -358,6 +380,7 @@ void CustomPackets::sendRequestMapFilename()
 	{
 		s_request_map_filename data;
 		XUserGetXUID(0, &data.user_identifier);
+		data.map_download_id = mapDownloadId;
 
 		network_observer* observer = session->network_observer_ptr;
 		peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(session->session_host_peer_index);

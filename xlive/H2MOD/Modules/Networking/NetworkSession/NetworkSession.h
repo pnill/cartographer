@@ -251,7 +251,6 @@ namespace NetworkSession
 	network_session* getCurrentNetworkSession();
 	bool getCurrentNetworkSession(network_session** a1);
 	e_network_session_state getLocalSessionState();
-	bool localPeerIsSessionHost();
 	signed int getPeerIndexFromNetworkAddress(network_address* addr);
 	char getMapFileLocation(wchar_t* buffer, size_t size);
 
@@ -280,5 +279,8 @@ namespace NetworkSession
 	player_information* getPlayerInformation(int playerIndex);
 
 	wchar_t* getGameVariantName();
+
+	bool localPeerIsSessionHost();
+	bool localPeerIsEstablished();
 }
 
