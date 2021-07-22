@@ -19,8 +19,7 @@ public:
 		for (auto i = 0; i < object->change_colors.size; i++)
 		{
 			s_object_group_definition::s_change_colors_block temp;
-			map_stream->seekg(resolve_data_offset(object->change_colors.data) + i * sizeof(s_object_group_definition::s_change_colors_block));
-			map_stream->read((char*)&temp, sizeof(s_object_group_definition::s_change_colors_block));
+			L_BLAM_LOADER_READ_BLOCK(temp, object->change_colors, i, s_object_group_definition::s_change_colors_block);
 			size += temp.initial_permutations.data_size();
 			size += temp.functions.data_size();
 		}
@@ -29,21 +28,20 @@ public:
 	}
 	virtual void rebase(int base)
 	{
-		LOG_INFO_GAME("[{}] {}", __FUNCTION__, base);
-		auto object = (s_object_group_definition*)this->data;
-		object->ai_properties.data = base + (object->ai_properties.data - instance->data_offset);
-		object->functions.data = base + (object->functions.data - instance->data_offset);
-		object->attachments.data = base + (object->attachments.data - instance->data_offset);
-		object->widgets.data = base + (object->widgets.data - instance->data_offset);
-		object->old_functions.data = base + (object->old_functions.data - instance->data_offset);
-		object->change_colors.data = base + (object->change_colors.data - instance->data_offset);
-		auto colors = reinterpret_cast<s_object_group_definition::s_change_colors_block*>(&this->data[object->change_colors.data]);
+		auto object = (s_object_group_definition*)*this->data;
+		L_BLAM_LOADER_REBASE(object->ai_properties);
+		L_BLAM_LOADER_REBASE(object->functions);
+		L_BLAM_LOADER_REBASE(object->attachments);
+		L_BLAM_LOADER_REBASE(object->widgets);
+		L_BLAM_LOADER_REBASE(object->old_functions);
+		L_BLAM_LOADER_REBASE(object->change_colors);
+		auto colors = L_BLAM_LOADER_CAST_BLOCK(object->change_colors, s_object_group_definition::s_change_colors_block);
 		for(auto i = 0; i < object->change_colors.size; i++)
 		{
-			colors[i].functions.data = base + (colors[i].functions.data - instance->data_offset);
-			colors[i].initial_permutations.data = base + (colors[i].initial_permutations.data - instance->data_offset);
+			L_BLAM_LOADER_REBASE(colors[i].functions);
+			L_BLAM_LOADER_REBASE(colors[i].initial_permutations);
 		}
-		object->predicted_resources.data = base + (object->predicted_resources.data - instance->data_offset);
+		L_BLAM_LOADER_REBASE(object->predicted_resources);
 	}
 
 	//virtual char* get_tag_data(int base)

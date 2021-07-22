@@ -25,24 +25,11 @@ namespace lazy_blam
 		auto tag_table = get_tag_table();
 
 		tags::tag_instance* tag_inst = get_tag_instance(tag_datum);
-		//int tag_data_offset;
-		//if(map_header->type == s_cache_header::MultiplayerSharedScenario)
-		//	tag_data_offset = tag_table->tag_data_start + (tag_inst->data_offset - 0x3c000);
-		//else
-		//	tag_data_offset = tag_table->tag_data_start + (tag_inst->data_offset - tag_table->scenario_address);
-
-		auto data = init_tag_data(tag_datum);
-
-		//map_stream->seekg(tag_data_offset);
-		//map_stream->read(data, tag_inst->size);
-
-
+		//TODO: Can the initializer for blam_loader be passed to biped_loader? Maybe transfer blam_loader to just be part of Lazy_Blam.. Simplify
 		auto a = biped_loader();
 		a.init(tag_inst, map_stream, map_header, tag_table);
-		auto test = reinterpret_cast<s_biped_group_definition*>(a.get_tag_data(0));
-		LOG_INFO_GAME("[{}] {} {}", __FUNCTION__, test->unitTag.objectTag.ai_properties.data);
-
-		return (T*)data;
+		//TODO: Rebase based off the actual tag_data address, would be a bit of a hack but would work for accessing tag_blocks without any issues..
+		return a.get_tag_data(0);
 	}
 
 };

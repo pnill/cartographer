@@ -265,11 +265,12 @@ namespace KantTesting
 	void Initialize()
 	{
 		lazy_blam::init_cache_file("shared.map");
-		auto elite_d = lazy_blam::get_datum_from_name("objects\\characters\\dervish\\dervish", blam_tag::tag_group_type::biped);
-		auto elite_data = lazy_blam::get_tag_data<s_biped_group_definition>(elite_d);
+		//auto elite_d = lazy_blam::get_datum_from_name("objects\\characters\\dervish\\dervish", blam_tag::tag_group_type::biped);
+		//auto elite_data = lazy_blam::get_tag_data<s_biped_group_definition>(elite_d);
+		//LOG_INFO_GAME("{}", elite_data->contact_points.data);
 		auto chief_d = lazy_blam::get_datum_from_name("objects\\characters\\masterchief\\masterchief", blam_tag::tag_group_type::biped);
 		auto chief_data = lazy_blam::get_tag_data<s_biped_group_definition>(chief_d);
-		LOG_INFO_GAME("[{}] {} {}", elite_data->acceleration, chief_data->acceleration);
+		LOG_INFO_GAME("[{}] {}", __FUNCTION__, chief_data->contact_points.data);
 		lazy_blam::clear_loaded_tags();
 		if (ENABLEKANTTEST) {
 			if (!Memory::isDedicatedServer()) {
