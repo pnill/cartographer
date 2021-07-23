@@ -298,8 +298,8 @@ void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16
 
 int __cdecl get_total_map_downloading_percentage()
 {
-	if (!mapManager->m_mapDownloadQueue.empty())
-		return mapManager->m_mapDownloadQueue.front()->GetDownloadPercentage();
+	if (!mapManager->m_mapDownloadQueryList.empty())
+		return mapManager->m_mapDownloadQueryList.front()->GetDownloadPercentage();
 	else
 		return 0;
 }
@@ -444,13 +444,12 @@ void MapManager::getMapFilename(std::wstring& buffer) {
 
 void MapManager::MapDownloadUpdateTick()
 {
-	for (auto it = m_mapDownloadQueue.begin(); it != m_mapDownloadQueue.end(); it++)
+	for (auto it = m_mapDownloadQueryList.begin(); it != m_mapDownloadQueryList.end(); it++)
 	{
 		MapDownloadQuery& query = **it;
 		if (query.m_downloadFinished)
 		{
-			addDebugText("deleting map download query");
-			m_mapDownloadQueue.erase(it);
+			m_mapDownloadQueryList.erase(it);
 		}
 	}
 }
@@ -469,17 +468,7 @@ MapDownloadQuery::MapDownloadQuery(std::wstring& _mapToDownload, int _downloadId
 	SetMapNameToDownload(_mapToDownload);
 }
 
-MapDownloadQuery::MapDownloadQuery(MapDownloadQuery& other) :
-	m_clientMapFilename(other.m_clientMapFilename),
-	m_clientMapFilenameWide(other.m_clientMapFilenameWide),
-	m_downloadPercentage(other.m_downloadPercentage)
-{
-	bool _forceStopDownload = other.m_forceStopDownload;
-	m_forceStopDownload = _forceStopDownload;
-}
-
 MapDownloadQuery::~MapDownloadQuery() {
-	addDebugText("Calling deconstructor for: %s", __FUNCTION__);
 }
 
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {

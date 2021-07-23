@@ -6,10 +6,7 @@
 */
 class MapDownloadQuery {
 public:
-	// pretty much a copy constructor
-	MapDownloadQuery::MapDownloadQuery(MapDownloadQuery& other);
 	MapDownloadQuery::MapDownloadQuery(std::wstring& _mapToDownload, int _downloadId);
-
 	MapDownloadQuery::~MapDownloadQuery();
 
 	void SetMapNameToDownload(std::wstring& mapNameToDownload);
@@ -32,7 +29,6 @@ public:
 	int id;
 
 private:
-
 	std::atomic<bool> m_forceStopDownload = false;
 	int m_downloadPercentage = 0;
 };
@@ -54,21 +50,21 @@ public:
 
 	std::shared_ptr<MapDownloadQuery> addDownloadQuery(std::wstring mapToDownload)
 	{
-		m_mapDownloadQueue.push_back(std::shared_ptr<MapDownloadQuery>(new MapDownloadQuery(mapToDownload, rand())));
+		m_mapDownloadQueryList.push_back(std::shared_ptr<MapDownloadQuery>(new MapDownloadQuery(mapToDownload, rand())));
 		return getLastDownloadQueryAdded();
 	}
 
 	std::shared_ptr<MapDownloadQuery> getLastDownloadQueryAdded()
 	{
-		if (!m_mapDownloadQueue.empty())
-			return m_mapDownloadQueue.back();
+		if (!m_mapDownloadQueryList.empty())
+			return m_mapDownloadQueryList.back();
 
 		return nullptr;
 	}
 
 	std::shared_ptr<MapDownloadQuery> getDownloadQueryById(int id)
 	{
-		for (auto& query : m_mapDownloadQueue)
+		for (auto& query : m_mapDownloadQueryList)
 		{
 			if (query->id == id)
 				return query;
@@ -79,17 +75,17 @@ public:
 
 	void forceStopDownloadQueries()
 	{
-		while (m_mapDownloadQueue.size() > 0)
+		while (m_mapDownloadQueryList.size() > 0)
 		{
-			auto& mapDownloadQuery = m_mapDownloadQueue.front();
+			auto& mapDownloadQuery = m_mapDownloadQueryList.front();
 			mapDownloadQuery->StopDownload();
-			m_mapDownloadQueue.pop_front();
+			m_mapDownloadQueryList.pop_front();
 		}
 	}
 
 	void MapDownloadUpdateTick();
 
-	std::list<std::shared_ptr<MapDownloadQuery>> m_mapDownloadQueue;
+	std::list<std::shared_ptr<MapDownloadQuery>> m_mapDownloadQueryList;
 
 private:
 
