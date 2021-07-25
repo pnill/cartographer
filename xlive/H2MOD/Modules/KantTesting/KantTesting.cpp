@@ -262,7 +262,7 @@ namespace KantTesting
 		//Memory::GetAddress<void*>(0x1F09AC, 0x1D1365), 0);
 	}
 
-	void Initialize()
+	void mapLoad()
 	{
 		lazy_blam::init_cache_file("shared.map");
 		//auto elite_d = lazy_blam::get_datum_from_name("objects\\characters\\dervish\\dervish", blam_tag::tag_group_type::biped);
@@ -270,8 +270,14 @@ namespace KantTesting
 		//LOG_INFO_GAME("{}", elite_data->contact_points.data);
 		auto chief_d = lazy_blam::get_datum_from_name("objects\\characters\\masterchief\\masterchief", blam_tag::tag_group_type::biped);
 		auto chief_data = lazy_blam::get_tag_data<s_biped_group_definition>(chief_d);
-		LOG_INFO_GAME("[{}] {}", __FUNCTION__, chief_data->contact_points.data);
+
+		LOG_INFO_GAME("[{}] {}", __FUNCTION__, chief_data->unitTag.objectTag.change_colors[0]->initial_permutations[0]->weight);
 		lazy_blam::clear_loaded_tags();
+	}
+
+	void Initialize()
+	{
+		tags::on_map_load(mapLoad);
 		if (ENABLEKANTTEST) {
 			if (!Memory::isDedicatedServer()) {
 			/*	register_player_packets_method = (register_player_packets)DetourFunc(Memory::GetAddress<BYTE*>(0x1F0A55, 0x1D140E), (BYTE*)registerPlayerPackets, 5);

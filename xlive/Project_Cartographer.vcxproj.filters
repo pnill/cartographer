@@ -128,6 +128,7 @@
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlam.cpp" />
+    <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -407,10 +408,6 @@
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="H2MOD\Modules\KantTesting\KantTesting.h" />
     <ClInclude Include="Blam\Cache\cache_header.h" />
-    <ClInclude Include="Blam\LazyBlam\Loader\loader.hpp" />
-    <ClInclude Include="Blam\LazyBlam\Loader\Unit.hpp" />
-    <ClInclude Include="Blam\LazyBlam\Loader\Object.hpp" />
-    <ClInclude Include="Blam\LazyBlam\Loader\Biped.hpp" />
     <ClInclude Include="Blam\LazyBlam\LazyBlam.hpp" />
     <ClInclude Include="Blam\LazyBlam\TagTable.h" />
   </ItemGroup>

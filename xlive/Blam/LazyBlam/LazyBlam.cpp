@@ -154,4 +154,18 @@ namespace lazy_blam
 			if(std::get<2>(instance) != nullptr)
 				free(std::get<2>(instance));
 	}
+	unsigned int resolve_data_offset(unsigned int offset)
+	{
+		switch (map_header.type)
+		{
+		case s_cache_header::SinglePlayerScenario:
+		case s_cache_header::MultiplayerScenario:
+		case s_cache_header::MainMenuScenario:
+			return tag_table.tag_data_start + (offset - tag_table.scenario_address);
+		case s_cache_header::SinglePlayerSharedScenario:
+		case s_cache_header::MultiplayerSharedScenario:
+			return tag_table.tag_data_start + (offset - 0x3c000);
+		}
+		return -1;
+	}
 }
