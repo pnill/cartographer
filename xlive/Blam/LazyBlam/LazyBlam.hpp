@@ -1,7 +1,6 @@
 #pragma once
 #include "H2MOD/Tags/TagInterface.h"
 #include "TagTable.h"
-#include "Loader/Biped.hpp"
 
 
 namespace lazy_blam
@@ -13,6 +12,8 @@ namespace lazy_blam
 
 		void biped(char* data, tags::tag_instance* instance, int base);
 		void vehicle(char* data, tags::tag_instance* instance, int base);
+		void weapon(char* data, tags::tag_instance* instance, int base);
+		void globals(char* data, tags::tag_instance* instance, int base);
 	}
 
 	bool init_cache_file(std::string map_name);
@@ -74,7 +75,9 @@ namespace lazy_blam
 			case blam_tag::tag_group_type::particle: break;
 			case blam_tag::tag_group_type::particlemodel: break;
 			case blam_tag::tag_group_type::particlephysics: break;
-			case blam_tag::tag_group_type::globals: break;
+			case blam_tag::tag_group_type::globals: 
+				rebase::globals(*tag_data, tag_inst, newBase);
+				break;
 			case blam_tag::tag_group_type::sound: break;
 			case blam_tag::tag_group_type::soundlooping: break;
 			case blam_tag::tag_group_type::item: break;
