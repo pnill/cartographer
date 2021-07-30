@@ -123,12 +123,23 @@ using wmemory_buf_t = fmt::basic_memory_buffer<wchar_t, 250>;
 template<typename T>
 struct is_convertible_to_wstring_view : std::is_convertible<T, wstring_view_t>
 {};
+template<class T>
+struct is_convertible_to_wformat_string : std::is_convertible<T, fmt::wformat_string<>>
+{};
 #    endif // _WIN32
 #else
 template<typename>
 struct is_convertible_to_wstring_view : std::false_type
 {};
+template<class>
+struct is_convertible_to_wformat_string : std::false_type
+{};
 #endif // SPDLOG_WCHAR_TO_UTF8_SUPPORT
+
+template<class T>
+struct is_convertible_to_basic_format_string
+    : std::integral_constant<bool, std::is_convertible<const T &, fmt::format_string<>>::value || is_convertible_to_wformat_string<T>::value>
+{};
 
 #if defined(SPDLOG_NO_ATOMIC_LEVELS)
 using level_t = details::null_atomic_int;
@@ -162,13 +173,13 @@ enum level_enum
     n_levels
 };
 
-#define SPDLOG_LEVEL_NAME_TRACE string_view_t("trace", 5)
-#define SPDLOG_LEVEL_NAME_DEBUG string_view_t("debug", 5)
-#define SPDLOG_LEVEL_NAME_INFO string_view_t("info", 4)
-#define SPDLOG_LEVEL_NAME_WARNING string_view_t("warning", 7)
-#define SPDLOG_LEVEL_NAME_ERROR string_view_t("error", 5)
-#define SPDLOG_LEVEL_NAME_CRITICAL string_view_t("critical", 8)
-#define SPDLOG_LEVEL_NAME_OFF string_view_t("off", 3)
+#define SPDLOG_LEVEL_NAME_TRACE spdlog::string_view_t("trace", 5)
+#define SPDLOG_LEVEL_NAME_DEBUG spdlog::string_view_t("debug", 5)
+#define SPDLOG_LEVEL_NAME_INFO spdlog::string_view_t("info", 4)
+#define SPDLOG_LEVEL_NAME_WARNING spdlog::string_view_t("warning", 7)
+#define SPDLOG_LEVEL_NAME_ERROR spdlog::string_view_t("error", 5)
+#define SPDLOG_LEVEL_NAME_CRITICAL spdlog::string_view_t("critical", 8)
+#define SPDLOG_LEVEL_NAME_OFF spdlog::string_view_t("off", 3)
 
 #if !defined(SPDLOG_LEVEL_NAMES)
 #    define SPDLOG_LEVEL_NAMES                                                                                                             \
