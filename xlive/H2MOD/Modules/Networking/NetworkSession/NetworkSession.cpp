@@ -27,10 +27,10 @@ bool NetworkSession::localPeerIsSessionHost()
 {
 	e_network_session_state state = getCurrentNetworkSession()->local_session_state;
 
-	return state == network_session_state_host_established
-		|| state == network_session_state_host_disband
-		|| state == network_session_state_host_handoff
-		|| state == network_session_state_host_reestablish;
+	return state == _network_session_state_host_established
+		|| state == _network_session_state_host_disband
+		|| state == _network_session_state_host_handoff
+		|| state == _network_session_state_host_reestablish;
 }
 
 bool NetworkSession::localPeerIsEstablished()
@@ -39,19 +39,19 @@ bool NetworkSession::localPeerIsEstablished()
 
 	switch (state)
 	{
-	case network_session_state_none:
-	case network_session_state_peer_joining:
-	case network_session_state_peer_join_abort:
-	case network_session_state_election:
-	case network_session_state_unk_2:
+	case _network_session_state_none:
+	case _network_session_state_peer_joining:
+	case _network_session_state_peer_join_abort:
+	case _network_session_state_election:
+	case _network_session_state_unk_2:
 		return false;
 
-	case network_session_state_peer_established:
-	case network_session_state_peer_leaving:
-	case network_session_state_host_established:
-	case network_session_state_host_disband:
-	case network_session_state_host_handoff:
-	case network_session_state_host_reestablish:
+	case _network_session_state_peer_established:
+	case _network_session_state_peer_leaving:
+	case _network_session_state_host_established:
+	case _network_session_state_host_disband:
+	case _network_session_state_host_handoff:
+	case _network_session_state_host_reestablish:
 		return true;
 
 	default:
