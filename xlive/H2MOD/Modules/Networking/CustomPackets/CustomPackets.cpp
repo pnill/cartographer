@@ -376,7 +376,7 @@ void CustomPackets::sendRequestMapFilename(int mapDownloadId)
 {
 	network_session* session = NetworkSession::getCurrentNetworkSession();
 
-	if (session->local_session_state == network_session_state_peer_established)
+	if (session->local_session_state == _network_session_state_peer_established)
 	{
 		s_request_map_filename data;
 		XUserGetXUID(0, &data.user_identifier);
