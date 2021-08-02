@@ -54,7 +54,6 @@ namespace lazy_blam
 			case blam_tag::tag_group_type::vehicle:
 				rebase::vehicle(*tag_data, tag_inst, newBase);
 				break;
-			case blam_tag::tag_group_type::none: break;
 			case blam_tag::tag_group_type::model: break;
 			case blam_tag::tag_group_type::rendermodel: break;
 			case blam_tag::tag_group_type::collisionmodel: break;
@@ -176,6 +175,7 @@ namespace lazy_blam
 			case blam_tag::tag_group_type::cachefilesound: break;
 			case blam_tag::tag_group_type::mousecursordefinition: break;
 			case blam_tag::tag_group_type::uldg: break;
+			case blam_tag::tag_group_type::none: break;
 			default: ;
 		}
 		

@@ -25,13 +25,6 @@ namespace lazy_blam
 				L_BLAM_LOADER_REBASE(color.initial_permutations);
 				L_BLAM_LOADER_REBASE(color.functions);
 			}
-			//for (auto i = 0; i < o->change_colors.size; i++)
-			//{
-			//	//L_BLAM_LOADER_REBASE(colors[i].functions);
-			//	//L_BLAM_LOADER_REBASE(colors[i].initial_permutations);
-			//	L_BLAM_LOADER_REBASE(o->change_colors[i]->initial_permutations);
-			//	L_BLAM_LOADER_REBASE(o->change_colors[i]->functions);
-			//}
 			L_BLAM_LOADER_REBASE(o->predicted_resources);
 		}
 		void unit(char* data, tags::tag_instance* instance, int base)
@@ -45,10 +38,10 @@ namespace lazy_blam
 			L_BLAM_LOADER_REBASE(unit->powered_seats);
 			L_BLAM_LOADER_REBASE(unit->weapons);
 			L_BLAM_LOADER_REBASE(unit->seats);
-			for (auto i = 0; i < unit->seats.size; i++)
+			for(auto &seat : unit->seats)
 			{
-				L_BLAM_LOADER_REBASE(unit->seats[i]->camera_tracks);
-				L_BLAM_LOADER_REBASE(unit->seats[i]->unit_hud_interface);
+				L_BLAM_LOADER_REBASE(seat.camera_tracks);
+				L_BLAM_LOADER_REBASE(seat.unit_hud_interface);
 			}
 		}
 		void biped(char* data, tags::tag_instance* instance, int base)
@@ -77,12 +70,12 @@ namespace lazy_blam
 			L_BLAM_LOADER_REBASE(w->first_person);
 			L_BLAM_LOADER_REBASE(w->predicted_resources_1);
 			L_BLAM_LOADER_REBASE(w->magazines);
-			for(auto i = 0; i < w->magazines.size; i++)
-				L_BLAM_LOADER_REBASE(w->magazines[i]->magazines_equipment);
+			for (auto &magazines : w->magazines)
+				L_BLAM_LOADER_REBASE(magazines.magazines_equipment);
 			L_BLAM_LOADER_REBASE(w->new_triggers);
 			L_BLAM_LOADER_REBASE(w->barrels);
-			for (auto i = 0; i < w->barrels.size; i++)
-				L_BLAM_LOADER_REBASE(w->barrels[i]->firing_effects);
+			for (auto &barrel : w->barrels)
+				L_BLAM_LOADER_REBASE(barrel.firing_effects);
 		}
 		void globals(char* data, tags::tag_instance* instance, int base)
 		{
@@ -91,52 +84,75 @@ namespace lazy_blam
 			L_BLAM_LOADER_REBASE(g->collision_damage);
 			L_BLAM_LOADER_REBASE(g->sound_globals);
 			L_BLAM_LOADER_REBASE(g->ai_globals);
-			for (auto i = 0; i < g->ai_globals.size; i++)
-				L_BLAM_LOADER_REBASE(g->ai_globals[i]->gravemind_properties);
+
+			for (auto &ai_g : g->ai_globals)
+				L_BLAM_LOADER_REBASE(ai_g.gravemind_properties);
 
 			L_BLAM_LOADER_REBASE(g->damage_table);
-			for (auto i = 0; i < g->damage_table.size; i++)
+			for(auto &damage_table : g->damage_table)
 			{
-				L_BLAM_LOADER_REBASE(g->damage_table[i]->damage_groups);
-				for (auto j = 0; j < g->damage_table[i]->damage_groups.size; j++)
-				{
-					L_BLAM_LOADER_REBASE(g->damage_table[i]->damage_groups[j]->armor_modifiers);
-				}
+				L_BLAM_LOADER_REBASE(damage_table.damage_groups);
+				for (auto &damage_group : damage_table.damage_groups)
+					L_BLAM_LOADER_REBASE(damage_group.armor_modifiers);
 			}
+
 			L_BLAM_LOADER_REBASE(g->sounds);
 			L_BLAM_LOADER_REBASE(g->camera);
 			L_BLAM_LOADER_REBASE(g->player_control);
-			for (auto i = 0; i < g->player_control.size; i++)
-				L_BLAM_LOADER_REBASE(g->player_control[i]->look_function);
+			for (auto &player_control : g->player_control)
+				L_BLAM_LOADER_REBASE(player_control.look_function);
 
 			L_BLAM_LOADER_REBASE(g->difficulty);
 			L_BLAM_LOADER_REBASE(g->grenades);
 			L_BLAM_LOADER_REBASE(g->rasterizer_data);
-			for (auto i = 0; i < g->rasterizer_data.size; i++)
-				L_BLAM_LOADER_REBASE(g->rasterizer_data[i]->global_vertex_shaders);
+			for (auto &rasterizer_data : g->rasterizer_data)
+				L_BLAM_LOADER_REBASE(rasterizer_data.global_vertex_shaders);
 
 			L_BLAM_LOADER_REBASE(g->interface_tags);
 			L_BLAM_LOADER_REBASE(g->weapon_list_update__weapon_list_enum_in_game_globalsh);
 			L_BLAM_LOADER_REBASE(g->cheat_powerups);
 
 			L_BLAM_LOADER_REBASE(g->multiplayer_information);
-			for (auto i = 0; i < g->multiplayer_information.size; i++)
+			for(auto &info : g->multiplayer_information)
 			{
-				L_BLAM_LOADER_REBASE(g->multiplayer_information[i]->vehicles);
-				L_BLAM_LOADER_REBASE(g->multiplayer_information[i]->sounds);
-				L_BLAM_LOADER_REBASE(g->multiplayer_information[i]->general_events);
-				for (auto j = 0; j < g->multiplayer_information[i]->general_events.size; j++)
-					L_BLAM_LOADER_REBASE(g->multiplayer_information[i]->general_events[j]->sound_permutations);
+				L_BLAM_LOADER_REBASE(info.vehicles);
+				L_BLAM_LOADER_REBASE(info.sounds);
+				L_BLAM_LOADER_REBASE(info.general_events);
+				for (auto &events : info.general_events)
+					L_BLAM_LOADER_REBASE(events.sound_permutations);
+				for (auto &events : info.slayer_events)
+					L_BLAM_LOADER_REBASE(events.sound_permutations);
+				for (auto &events : info.ctf_events)
+					L_BLAM_LOADER_REBASE(events.sound_permutations);
+				for (auto &events : info.oddball_events)
+					L_BLAM_LOADER_REBASE(events.sound_permutations);
+				for (auto &events : info.king_events)
+					L_BLAM_LOADER_REBASE(events.sound_permutations);
+			}
 
-				L_BLAM_LOADER_REBASE(g->multiplayer_information[i]->slayer_events);
-				for (auto j = 0; j < g->multiplayer_information[i]->slayer_events.size; j++)
-					L_BLAM_LOADER_REBASE(g->multiplayer_information[i]->slayer_events[j]->sound_permutations);
+			L_BLAM_LOADER_REBASE(g->player_information);
+			L_BLAM_LOADER_REBASE(g->player_representation);
+			L_BLAM_LOADER_REBASE(g->falling_damage);
+			L_BLAM_LOADER_REBASE(g->old_materials);
+			L_BLAM_LOADER_REBASE(g->materials);
 
-				L_BLAM_LOADER_REBASE(g->multiplayer_information[i]->ctf_events);
-				for (auto j = 0; j < g->multiplayer_information[i]->ctf_events.size; j++)
-					L_BLAM_LOADER_REBASE(g->multiplayer_information[i]->slayer_events[j]->sound_permutations);
+			L_BLAM_LOADER_REBASE(g->multiplayer_ui);
+			for(auto &mui : g->multiplayer_ui)
+			{
+				L_BLAM_LOADER_REBASE(mui.obsolete_profile_colors);
+				L_BLAM_LOADER_REBASE(mui.team_colors);
+			}
+			L_BLAM_LOADER_REBASE(g->profile_colors);
+			L_BLAM_LOADER_REBASE(g->runtime_level_data);
+			for (auto &levels : g->runtime_level_data)
+				L_BLAM_LOADER_REBASE(levels.campaign_levels);
 
-				//TODO Continue here...
+			L_BLAM_LOADER_REBASE(g->ui_level_data);
+			for(auto &levels : g->ui_level_data)
+			{
+				L_BLAM_LOADER_REBASE(levels.campaigns);
+				L_BLAM_LOADER_REBASE(levels.campaign_levels);
+				L_BLAM_LOADER_REBASE(levels.multiplayer_levels);
 			}
 		}
 	}
