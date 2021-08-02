@@ -142,7 +142,8 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 	int result_map_status = 0;
 	int result_precache_percentage = 0;
 	bool someone_downloading_map = false;
-	e_map_status local_or_host_peer_map_status = _network_session_map_status_none;
+	e_map_status local_peer_map_status = _network_session_map_status_none;
+	e_map_status host_peer_map_status = _network_session_map_status_none;
 	int peer_count_with_map_status_precached = 0;
 	int peer_count_with_map_status_downloading = 0;
 	int peer_count_with_map_status_unable_to_precache = 0;
@@ -178,70 +179,79 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 
 				// now we only check our peer and session host peer, instead of all the peers
 				// but make sure the game won't start if we have just 1 player that doesn't have the map
-				if ((session->session_host_peer_index == i || session->local_peer_index == i)
-					&& local_or_host_peer_map_status != _network_session_map_status_unable_to_precache) // don't update this anymore, if we realised we cannot precache
+				if (session->local_peer_index == i)
+					local_peer_map_status = membership->peer_info[i].map_status;
+
+				if (session->session_host_peer_index == i)
+					host_peer_map_status = membership->peer_info[i].map_status;
+
+				switch (membership->peer_info[i].map_status)
 				{
-					local_or_host_peer_map_status = membership->peer_info[i].map_status;
-				}
+				case _network_session_map_status_unable_to_precache:
+					result_precache_percentage = 0;
+					peer_count_with_map_status_unable_to_precache++;
+					break;
 
-				if (membership->peer_info[i].map_status != _network_session_map_status_loaded)
-				{
-					switch (membership->peer_info[i].map_status)
-					{
-					case _network_session_map_status_unable_to_precache:
-						result_map_status = _network_session_map_status_unable_to_precache;
-						result_precache_percentage = 0;
-						peer_count_with_map_status_unable_to_precache++;
-						break;
+				case _network_session_map_status_precaching:
+					result_precache_percentage = min(membership->peer_info[i].map_progress_percentage, result_precache_percentage); // get the least map precaching percentage
+					break;
 
-					case _network_session_map_status_precaching:
-						result_map_status = _network_session_map_status_precaching;
-						result_precache_percentage = min(membership->peer_info[i].map_progress_percentage, result_precache_percentage); // get the least map precaching percentage
-						break;
+				case _network_session_map_status_loaded:
+				case _network_session_map_status_precached:
+					peer_count_with_map_status_precached++;
+					break;
 
-					case _network_session_map_status_precached:
-						result_map_status = _network_session_map_status_precached;
-						peer_count_with_map_status_precached++;
-						break;
+				case _network_session_map_status_downloading:
+					someone_downloading_map = true;
+					peer_count_with_map_status_downloading++;
+					break;
 
-					case _network_session_map_status_downloading:
-						peer_count_with_map_status_downloading++;
-						someone_downloading_map = true;
-						break;
-
-					default:
-						break;
-					}
+				default:
+					break;
 				}
 			}
-			
-			// check if local/host map status is fine
-			// if not just tell the game we cannot load the map
-			switch (local_or_host_peer_map_status)
-			{
-			case _network_session_map_status_precaching:
-			case _network_session_map_status_precached:
-			case _network_session_map_status_loaded:
-				if (peer_count_with_map_status_precached - (session->parameters.dedicated_server ? 1 : 0) > 0) {
-					result_map_status = _network_session_map_status_precached;
-				}
-				else if (peer_count_with_map_status_downloading > peer_count_with_map_status_unable_to_precache) {
-					result_map_status = _network_session_map_status_downloading;
-				}
-				else {
-					result_map_status = _network_session_map_status_unable_to_precache;
-				}
-				break;
 
-			case _network_session_map_status_unable_to_precache:
-				result_map_status = _network_session_map_status_unable_to_precache;
-				result_precache_percentage = 0;
-				break;
-			case _network_session_map_status_downloading:
-				result_map_status = _network_session_map_status_downloading;
-				result_precache_percentage = 0;
-			default:
-				break;
+			// checks if local/host map status is fine
+			// if not just tell the game we cannot load the map
+			auto test_map_status = [&](e_map_status status) -> bool
+			{
+				switch (status)
+				{
+				case _network_session_map_status_loaded:
+				case _network_session_map_status_precached:
+					if (peer_count_with_map_status_precached > 0) {
+						result_map_status = _network_session_map_status_precached;
+						return true;
+					}
+					else if (peer_count_with_map_status_downloading > peer_count_with_map_status_unable_to_precache) {
+						result_map_status = _network_session_map_status_downloading;
+						return false;
+					}
+					else {
+						result_map_status = _network_session_map_status_unable_to_precache;
+						return false;
+					}
+				case _network_session_map_status_precaching:
+					result_map_status = _network_session_map_status_precaching;
+					return false;
+				case _network_session_map_status_unable_to_precache:
+					result_map_status = _network_session_map_status_unable_to_precache;
+					result_precache_percentage = 0;
+					return false;
+				case _network_session_map_status_downloading:
+					result_map_status = _network_session_map_status_downloading;
+					result_precache_percentage = 0;
+					return false;
+				default:
+					return false;
+				}
+			};
+			
+			// first test the host map load
+			if (test_map_status(host_peer_map_status))
+			{
+				// then the local peer
+				test_map_status(local_peer_map_status);
 			}
 		}
 	}
