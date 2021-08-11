@@ -11,6 +11,7 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "Blam/Cache/TagGroups/biped_definition.hpp"
 #include "Blam/LazyBlam/LazyBlam.hpp"
+#include "Blam/Cache/TagGroups/weapon_definition.hpp"
 
 
 namespace KantTesting
@@ -264,15 +265,18 @@ namespace KantTesting
 
 	void mapLoad()
 	{
-		lazy_blam::init_cache_file("shared.map");
-		//auto elite_d = lazy_blam::get_datum_from_name("objects\\characters\\dervish\\dervish", blam_tag::tag_group_type::biped);
-		//auto elite_data = lazy_blam::get_tag_data<s_biped_group_definition>(elite_d);
-		//LOG_INFO_GAME("{}", elite_data->contact_points.data);
-		auto chief_d = lazy_blam::get_datum_from_name("objects\\characters\\masterchief\\masterchief", blam_tag::tag_group_type::biped);
-		auto chief_data = lazy_blam::get_tag_data<s_biped_group_definition>(chief_d);
+		auto lb = new lazy_blam::lazy_blam("shared.map");
+		auto datum = lb->get_tag_data<s_weapon_group_definition>(0xE90C2EA7);
 
-		LOG_INFO_GAME("[{}] {}", __FUNCTION__, chief_data->unitTag.objectTag.change_colors[0]->initial_permutations[0]->weight);
-		lazy_blam::clear_loaded_tags();
+		//lazy_blam::init_cache_file("shared.map");
+		////auto elite_d = lazy_blam::get_datum_from_name("objects\\characters\\dervish\\dervish", blam_tag::tag_group_type::biped);
+		////auto elite_data = lazy_blam::get_tag_data<s_biped_group_definition>(elite_d);
+		////LOG_INFO_GAME("{}", elite_data->contact_points.data);
+		//auto chief_d = lazy_blam::get_datum_from_name("objects\\characters\\masterchief\\masterchief", blam_tag::tag_group_type::biped);
+		//auto chief_data = lazy_blam::get_tag_data<s_biped_group_definition>(chief_d);
+
+		//LOG_INFO_GAME("[{}] {}", __FUNCTION__, chief_data->unitTag.objectTag.change_colors[0]->initial_permutations[0]->weight);
+		//lazy_blam::clear_loaded_tags();
 	}
 
 	void Initialize()

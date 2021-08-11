@@ -129,6 +129,7 @@
     <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlam.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
+    <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />

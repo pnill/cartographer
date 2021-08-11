@@ -6,14 +6,25 @@
 #include "Blam/Cache/TagGroups/vehicle_definition.hpp"
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
 #include "Blam/Cache/TagGroups/globals_definition.hpp"
-#define L_BLAM_LOADER_REBASE(tag_block) if(tag_block.data > 0) (tag_block.data = base + (tag_block.data - instance->data_offset))
+#define L_BLAM_LOADER_REBASE(tag_block) \
+	if(tag_block.data > 0 && tag_block.size > 0)	\
+	{						\
+		auto r = base + (tag_block.data - instance->data_offset); \
+		if(tag_block.data >= instance->data_offset && tag_block.data <= instance->data_offset + instance->size){\
+			/*LOG_TRACE_GAME("[{}] {} {:x} {:x} {:x} {:x}", __FUNCTION__, #tag_block, base, tag_block.data, instance->data_offset,  r);*/     \
+			tag_block.data = r;\
+		} else { \
+			/*LOG_ERROR_GAME("[{}] Invalid offset {} {:x} {:x} {} {:x} {:x} {}", __FUNCTION__, #tag_block,  base, tag_block.data, instance->size, instance->data_offset,  r, instance->name);*/ \
+			LOG_ERROR_GAME("[{}] offset outside of bounds {} Range: {:x}-{:x} Offset: {:x} {}", __FUNCTION__, #tag_block, instance->data_offset, (instance->data_offset + instance->size), tag_block.data, instance->name); \
+		} \
+	}
 namespace lazy_blam
 {
 	namespace rebase
 	{
-		void object(char* data, tags::tag_instance* instance, int base)
+		void object(lazy_blam_tag_instance* instance, unsigned int base)
 		{
-			auto o = (s_object_group_definition*)data;
+			auto o = (s_object_group_definition*)instance->data.buffer;
 			L_BLAM_LOADER_REBASE(o->ai_properties);
 			L_BLAM_LOADER_REBASE(o->functions);
 			L_BLAM_LOADER_REBASE(o->attachments);
@@ -27,10 +38,10 @@ namespace lazy_blam
 			}
 			L_BLAM_LOADER_REBASE(o->predicted_resources);
 		}
-		void unit(char* data, tags::tag_instance* instance, int base)
+		void unit(lazy_blam_tag_instance* instance, unsigned int base)
 		{
-			object(data, instance, base);
-			auto unit = (s_unit_group_definition*)data;
+			object(instance, base);
+			auto unit = (s_unit_group_definition*)instance->data.buffer;
 			L_BLAM_LOADER_REBASE(unit->camera_tracks);
 			L_BLAM_LOADER_REBASE(unit->postures);
 			L_BLAM_LOADER_REBASE(unit->new_hud_interfaces);
@@ -44,28 +55,28 @@ namespace lazy_blam
 				L_BLAM_LOADER_REBASE(seat.unit_hud_interface);
 			}
 		}
-		void biped(char* data, tags::tag_instance* instance, int base)
+		void biped(lazy_blam_tag_instance* instance, unsigned int base)
 		{
-			unit(data, instance, base);
-			auto biped = (s_biped_group_definition*)data;
+			unit(instance, base);
+			auto biped = (s_biped_group_definition*)instance->data.buffer;
 			L_BLAM_LOADER_REBASE(biped->dead_sphere_shapes);
 			L_BLAM_LOADER_REBASE(biped->pill_shapes);
 			L_BLAM_LOADER_REBASE(biped->sphere_shapes);
 			L_BLAM_LOADER_REBASE(biped->contact_points);
 		}
-		void vehicle(char* data, tags::tag_instance* instance, int base)
+		void vehicle(lazy_blam_tag_instance* instance, unsigned int base)
 		{
-			unit(data, instance, base);
-			auto vehicle = (s_vehicle_group_definition*)data;
+			unit(instance, base);
+			auto vehicle = (s_vehicle_group_definition*)instance->data.buffer;
 			L_BLAM_LOADER_REBASE(vehicle->gears);
 			L_BLAM_LOADER_REBASE(vehicle->anti_gravity_points);
 			L_BLAM_LOADER_REBASE(vehicle->friction_points);
 			L_BLAM_LOADER_REBASE(vehicle->shape_phantom_shape);
 		}
-		void weapon(char* data, tags::tag_instance* instance, int base)
+		void weapon(lazy_blam_tag_instance* instance, unsigned int base)
 		{
-			object(data, instance, base);
-			auto w = (s_weapon_group_definition*)data;
+			object(instance, base);
+			auto w = (s_weapon_group_definition*)instance->data.buffer;
 			L_BLAM_LOADER_REBASE(w->predicted_bitmaps);
 			L_BLAM_LOADER_REBASE(w->first_person);
 			L_BLAM_LOADER_REBASE(w->predicted_resources_1);
@@ -74,12 +85,13 @@ namespace lazy_blam
 				L_BLAM_LOADER_REBASE(magazines.magazines_equipment);
 			L_BLAM_LOADER_REBASE(w->new_triggers);
 			L_BLAM_LOADER_REBASE(w->barrels);
-			for (auto &barrel : w->barrels)
-				L_BLAM_LOADER_REBASE(barrel.firing_effects);
+			//			L_BLAM_LOADER_FOR_TAG_BLOCK(barrel, w->barrels)
+			for(auto i = 0; i < w->barrels.size; i++)
+				L_BLAM_LOADER_REBASE(w->barrels[i]->firing_effects);
 		}
-		void globals(char* data, tags::tag_instance* instance, int base)
+		void globals(lazy_blam_tag_instance* instance, unsigned int base)
 		{
-			auto g = (s_globals_group_definition*)data;
+			auto g = (s_globals_group_definition*)instance->data.buffer;
 			L_BLAM_LOADER_REBASE(g->havok_cleanup_resources);
 			L_BLAM_LOADER_REBASE(g->collision_damage);
 			L_BLAM_LOADER_REBASE(g->sound_globals);

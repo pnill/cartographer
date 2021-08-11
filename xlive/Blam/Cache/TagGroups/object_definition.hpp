@@ -211,6 +211,7 @@ struct s_object_group_definition :TagGroup<'obje'>
 	TAG_BLOCK_SIZE_ASSERT(s_predicted_resources_block, 0x8);
 	tag_block<s_predicted_resources_block> predicted_resources;//0xB4
 };
+
 TAG_GROUP_SIZE_ASSERT(s_object_group_definition, 0xBC);
 #pragma pack(pop)
 

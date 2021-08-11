@@ -5,18 +5,18 @@
 
 namespace lazy_blam
 {
-	datum matg_datum(0xE1742710);
+	static datum matg_datum(0xE1742710);
 
-	std::string map_file;
-	std::ifstream* map_stream;
-	std::string maps_dir;
-	std::string mods_dir;
-	
-	s_cache_header map_header;
-	datum scenario_datum;
-	s_tag_table_data tag_table;
-	
-	bool init_cache_file(std::string map_name)
+	//std::string map_file;
+	//std::ifstream* map_stream;
+	//std::string maps_dir;
+	//std::string mods_dir;
+	//
+	//s_cache_header map_header;
+	//datum scenario_datum;
+	//s_tag_table_data tag_table;
+
+	bool lazy_blam::init_cache_file(std::string map_name)
 	{
 		maps_dir = GetExeDirectoryNarrow() + "\\maps";
 		mods_dir = GetExeDirectoryNarrow() + "\\mods";
@@ -82,7 +82,8 @@ namespace lazy_blam
 			std::getline(*map_stream, input, '\0');
 			names_pos = map_stream->tellg();
 
-			tag_table.table.emplace_back(tag_instance, input, nullptr);
+			//tag_table.table.emplace_back(tag_instance, input, nullptr);
+			tag_table.table.push_back(lazy_blam_tag_instance(tag_instance, input));
 
 			++count;
 		}
@@ -92,80 +93,129 @@ namespace lazy_blam
 		return true;
 	}
 
-	void close_cache_file()
+	void lazy_blam::close_cache_file()
 	{
 		map_stream->close();
 		delete map_stream;
 		map_header = s_cache_header();
 	}
 
-	datum get_datum_from_name(std::string tag_name, blam_tag type)
+	datum lazy_blam::get_datum_from_name(std::string tag_name, blam_tag type)
 	{
 		for (auto& instance : tag_table.table)
-			if (std::get<1>(instance) == tag_name)
-				return std::get<0>(instance).datum_index;
+			if (instance.name == tag_name)
+				return instance.datum_index;
 		return datum::Null;
 	}
 
-	char* init_tag_data(datum tag_index)
+
+
+	lazy_blam_tag_instance* lazy_blam::get_tag_instance(datum tag_datum)
 	{
 		for (auto& instance : tag_table.table)
-			if(std::get<0>(instance).datum_index == tag_index)
-			{
-				if (std::get<2>(instance) == nullptr) 
-					std::get<2>(instance) = new char[std::get<0>(instance).size];
-				
-				return std::get<2>(instance);
-			}
+			if (instance.datum_index == tag_datum)
+				return &instance;
 		return nullptr;
 	}
 
-	tags::tag_instance* get_tag_instance(datum tag_datum)
-	{
-		for(auto& instance : tag_table.table)
-			if (std::get<0>(instance).datum_index == tag_datum)
-				return &std::get<0>(instance);
-		return nullptr;
-	}
-
-	std::string get_name_from_datum(datum tag_datum)
+	std::string lazy_blam::get_name_from_datum(datum tag_datum)
 	{
 		return "";
 	}
 
-	std::ifstream* get_map_stream()
+	std::ifstream* lazy_blam::get_map_stream()
 	{
 		return map_stream;
 	}
 
-	s_cache_header* get_cache_header()
+	s_cache_header* lazy_blam::get_cache_header()
 	{
 		return &map_header;
 	}
 
-	s_tag_table_data* get_tag_table()
+	s_tag_table_data* lazy_blam::get_tag_table()
 	{
 		return &tag_table;
 	}
 
-	void clear_loaded_tags()
+	void lazy_blam::clear_loaded_tags()
 	{
-		for(auto& instance : tag_table.table)
-			if(std::get<2>(instance) != nullptr)
-				free(std::get<2>(instance));
+		//for(auto& instance : tag_table.table)
+		//	if(std::get<2>(instance) != nullptr)
+		//		free(std::get<2>(instance));
 	}
-	unsigned int resolve_data_offset(unsigned int offset)
+	unsigned int lazy_blam::resolve_data_offset(unsigned int offset)
 	{
+		auto ret = -1;
 		switch (map_header.type)
 		{
-		case s_cache_header::SinglePlayerScenario:
-		case s_cache_header::MultiplayerScenario:
-		case s_cache_header::MainMenuScenario:
-			return tag_table.tag_data_start + (offset - tag_table.scenario_address);
-		case s_cache_header::SinglePlayerSharedScenario:
-		case s_cache_header::MultiplayerSharedScenario:
-			return tag_table.tag_data_start + (offset - 0x3c000);
+			case s_cache_header::SinglePlayerScenario:
+			case s_cache_header::MultiplayerScenario:
+			case s_cache_header::MainMenuScenario:
+				ret = tag_table.tag_data_start + (offset - tag_table.scenario_address);
+			case s_cache_header::SinglePlayerSharedScenario:
+			case s_cache_header::MultiplayerSharedScenario:
+				ret = tag_table.tag_data_start + (offset - 0x3c000);
 		}
-		return -1;
+		//LOG_TRACE_GAME("[{}] {:x}", __FUNCTION__, ret);
+		return ret;
+	}
+
+	std::vector<datum> lazy_blam::find_tags(blam_tag type)
+	{
+		std::vector<datum> result;
+		for(auto &it = tag_table.table.begin(); it != tag_table.table.end(); it++)
+			if(it->type == type)
+				result.emplace_back(it->datum_index);
+		return result;
+	}
+
+
+	char* lazy_blam::load_tag_data(lazy_blam_tag_instance* instance)
+	{
+		if (instance->data.size == 0) {
+			map_stream->seekg(resolve_data_offset(instance->data_offset));
+			map_stream->read(instance->data.next(instance->size), instance->size);
+			switch (instance->type.tag_type) {
+				case blam_tag::tag_group_type::biped:
+					break;
+				case blam_tag::tag_group_type::vehicle:
+					break;
+				case blam_tag::tag_group_type::weapon:
+					loader::weapon(this, instance);
+					break;
+				case blam_tag::tag_group_type::globals:
+					break;
+				default: ;
+			}
+			return instance->data[0];
+		}
+		return nullptr;
+	}
+
+	void lazy_blam::rebase_tag_data(lazy_blam_tag_instance* instance)
+	{
+		auto tag_data_base = int(*Memory::GetAddress<int**>(0x47CD54));
+		unsigned long newBase = (unsigned long)((unsigned long)instance->data.buffer - tag_data_base);
+		if (newBase == instance->data_offset)
+			return;
+		LOG_INFO_GAME("[{}] {:x} {:x} {:x} {}", __FUNCTION__, tag_data_base, (unsigned long)instance->data.buffer, newBase, instance->name);
+		switch (instance->type.tag_type)
+		{
+			case blam_tag::tag_group_type::biped:
+				rebase::biped(instance, newBase);
+				break;
+			case blam_tag::tag_group_type::vehicle:
+				rebase::vehicle(instance, newBase);
+				break;
+			case blam_tag::tag_group_type::weapon:
+				rebase::weapon(instance, newBase);
+				break;
+			case blam_tag::tag_group_type::globals:
+				rebase::globals(instance, newBase);
+				break;
+			default:;
+		}
+		instance->data_offset = newBase;
 	}
 }

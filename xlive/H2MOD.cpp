@@ -1664,7 +1664,6 @@ void H2MOD::Initialize()
 			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
 		}
 		
-		
 	}
 	else
 	{

@@ -275,6 +275,7 @@
     <ClCompile Include="Blam\Engine\Game\PhysicsConstants.cpp" />
     <ClCompile Include="Blam\Engine\Objects\GameStateObjects.cpp" />
     <ClCompile Include="Blam\Engine\Players\Players.cpp" />
+    <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
     <ClCompile Include="H2MOD\EngineCalls\EngineCalls.cpp" />
     <ClCompile Include="H2MOD\EngineCalls\Objects.cpp" />
