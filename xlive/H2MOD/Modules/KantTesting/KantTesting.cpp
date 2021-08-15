@@ -266,8 +266,15 @@ namespace KantTesting
 	void mapLoad()
 	{
 		auto lb = new lazy_blam::lazy_blam("shared.map");
-		auto datum = lb->get_tag_data<s_weapon_group_definition>(0xE90C2EA7);
+		auto t = lb->get_tag_data<s_weapon_group_definition>(0xE90C2EA7);
 
+		LOG_INFO_GAME("[{}] {} {:x} {:x} {:x} {}", __FUNCTION__, 
+			t->barrels[0]->acceleration_time, 
+			t->barrels[0]->firing_effects[0]->firing_effect.TagIndex.ToInt(),
+			t->new_triggers[0]->charging_effect.TagIndex.ToInt(),
+			t->predicted_resources_1[5]->tag_index.ToInt(),
+			t->attachments[0]->marker_old_string_id.get_id());
+		auto a = 0;
 		//lazy_blam::init_cache_file("shared.map");
 		////auto elite_d = lazy_blam::get_datum_from_name("objects\\characters\\dervish\\dervish", blam_tag::tag_group_type::biped);
 		////auto elite_data = lazy_blam::get_tag_data<s_biped_group_definition>(elite_d);

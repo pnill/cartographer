@@ -25,40 +25,97 @@
 				);\
 			}\
 		}
+#define L_BLAM_LOADER_LOAD_DATA(block) \
+	if(block.block_offset > 0 && block.block_size > 0)\
+	{\
+		if (!(instance->data_offset <= block.block_offset && block.block_offset <= (instance->data_offset + instance->size)))\
+		{\
+			blam->map_stream->seekg(blam->resolve_data_offset(block.block_offset));\
+			block.block_offset = instance->data_offset + instance->size;\
+			blam->map_stream->read(instance->data.next(block.block_size), block.block_size);\
+			instance->size += block.block_size;\
+			LOG_ERROR_GAME(\
+				"[{}] {} Range:{:x}-{:x} New Offset:{:x} Data Size:{:x} Instance Size:{:x} data_block:{:x} tag: {}",\
+				__FUNCTION__,\
+				#block,\
+				instance->data_offset,\
+				instance->data_offset + instance->size,\
+				block.block_offset,\
+				block.block_size,\
+				instance->size,\
+				(unsigned long)&block,\
+				instance->name\
+			);\
+		}\
+	}
+/**
+ * \brief Loads a block at a level 1 depth
+ * \param t1 tag type
+ * \param t2 tag_block type
+ */
+#define L1_BLOCK(t1, t2)\
+	L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<t1>()->t2);
 
+/**
+ * \brief Loads a data ref at a level 1 depth
+ * \param t tag type
+ * \param p1 tag_block member name
+ * \param t1 tag block type
+ * \param d1 data_ref member name
+ */
+#define L1_DATA(t, p1, t1, d1)\
+	for(auto i = 0; i < instance->data.as<t>()->p1.size; i++)\
+	{\
+		L_BLAM_LOADER_LOAD_DATA(instance->data.as<t1>((instance->data.as<t>()->p1.data - instance->data_offset) + (sizeof(t1) * i))->d1);\
+	}
+/**
+ * \brief Loads a block at a level 2 depth
+ * \param t tag type
+ * \param p1 tag_block member name
+ * \param t1 tag_block type
+ * \param p2 tag_block child member name
+ */
+#define L2_BLOCK(t, p1, t1, p2)\
+	for(auto i = 0; i < instance->data.as<t>()->p1.size; i++)\
+	{\
+		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<t1>((instance->data.as<t>()->p1.data - instance->data_offset) + (sizeof(t1) * i))->p2);\
+	}
 
+#define L3(t1, t2, t3 ,t4)\
+	for(auto i = 0; i < instance->data.as<t1>()->t2.size; i++)\
+	{\
+		for(auto j = 0; j < instance->data.as<t2>((instance->data.as<t1>()->t2.data - instance->data_offset) + (sizeof(t2) * i))->t3.size; j++)\
+		{\
+			L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<t3>((instance->data.as<t2>()->t3.data - instance->data_offset) + (sizeof(t3) * i))->t4);\
+		}\
+	}
 namespace lazy_blam
 {
 	void lazy_blam::loader::object(lazy_blam* blam, lazy_blam_tag_instance* instance)
 	{
-		using object = s_object_group_definition;
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<object>()->ai_properties);
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<object>()->functions);
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<object>()->attachments);
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<object>()->widgets);
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<object>()->functions);
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<object>()->change_colors);
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<object>()->ai_properties);
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<object>()->predicted_resources);
+		L1_BLOCK(s_object_group_definition, ai_properties);
+		L1_BLOCK(s_object_group_definition, functions);
+		L1_DATA(s_object_group_definition, functions, s_object_group_definition::s_functions_block, data);
+		L1_BLOCK(s_object_group_definition, attachments);
+		L1_BLOCK(s_object_group_definition, widgets);
+		L1_BLOCK(s_object_group_definition, old_functions);
+		L1_BLOCK(s_object_group_definition, change_colors);
+		L1_BLOCK(s_object_group_definition, predicted_resources);
 	}
 	void lazy_blam::loader::weapon(lazy_blam* blam, lazy_blam_tag_instance* instance)
 	{
-		using weapon = s_weapon_group_definition;
-		using magazine = weapon::s_magazines_block;
-		using barrel = weapon::s_barrels_block;
 		object(blam, instance);
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<weapon>()->predicted_bitmaps);
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<weapon>()->first_person);
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<weapon>()->predicted_resources_1);
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<weapon>()->magazines);		
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<weapon>()->new_triggers);
-		L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<weapon>()->barrels);
-		for (auto i = 0; i < instance->data.as<weapon>()->barrels.size; i++)
-		{
-			L_BLAM_LOADER_LOAD_BLOCK(instance->data.as<barrel>((instance->data.as<weapon>()->barrels.data - instance->data_offset) + (i * sizeof(magazine)))->firing_effects);
-		}
-		auto test = instance->data.as<weapon>()->barrels.data - instance->data_offset;
-		LOG_INFO_GAME("[{}] {}", __FUNCTION__, instance->data.as<weapon::s_barrels_block>(test)->acceleration_time);
+		L1_BLOCK(s_weapon_group_definition, predicted_bitmaps);
+		L1_BLOCK(s_weapon_group_definition, first_person);
+		L1_BLOCK(s_weapon_group_definition, predicted_resources_1);
+		L1_BLOCK(s_weapon_group_definition, magazines);
+		L2_BLOCK(s_weapon_group_definition, magazines, s_weapon_group_definition::s_magazines_block, magazines_equipment);
+		L1_BLOCK(s_weapon_group_definition, new_triggers);
+		L1_BLOCK(s_weapon_group_definition, barrels);
+		L2_BLOCK(s_weapon_group_definition, barrels, s_weapon_group_definition::s_barrels_block, firing_effects);
 	}
 }
 #undef L_BLAM_LOADER_LOAD_BLOCK
+#undef L1_BLOCK
+#undef L2_BLOCK
+#undef L1_DATA
