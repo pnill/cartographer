@@ -1,7 +1,5 @@
 #pragma once
 
-#define NONE -1
-
 //PADDING MACROS
 #define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
 #define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2

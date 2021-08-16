@@ -1,3 +1,5 @@
+#pragma once
+
 //#pragma once
 //#include "Blam/Maths/real_math.h"
 //#include "Blam/Common/Common.h"
@@ -965,3 +967,4 @@
 //};
 //TAG_GROUP_SIZE_ASSERT(s_shader_pass_group_definition, 0x24);
 //#pragma pack(pop)
+

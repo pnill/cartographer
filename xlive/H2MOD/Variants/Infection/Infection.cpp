@@ -1,13 +1,14 @@
-#include "stdafx.h"
+#include "Infection.h"
 
-#include "Globals.h"
-#include "..\..\Modules\Networking\Networking.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Cache/TagGroups/item_collection_defenition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_defenition.hpp"
 #include "H2MOD/Engine/Engine.h"
+
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD/Tags/TagInterface.h"
 
 std::vector<XUID> Infection::zombieIdentifiers;
 
@@ -18,7 +19,7 @@ std::map<int, std::map<e_infection_sounds, const wchar_t*>> i_SoundsTable;
 
 bool firstSpawn;
 bool infectedPlayed;
-int zombiePlayerIndex = -1;
+int zombiePlayerIndex = NONE;
 
 int Infection::calculateZombiePlayerIndex() 
 {
@@ -242,7 +243,7 @@ void Infection::setPlayerAsZombie(int playerIndex) {
 	Player::setUnitBipedType(playerIndex, Player::Biped::Elite);
 	Player::setBipedSpeed(playerIndex, 1.1f);
 
-	call_give_player_weapon(playerIndex, Weapon::energy_blade, 1);
+	call_give_player_weapon(playerIndex, e_weapons_datum_index::energy_blade, 1);
 }
 
 void Infection::spawnPlayerClientSetup(int playerIndex) {

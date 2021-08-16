@@ -26,7 +26,6 @@
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Globals.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="H2MOD\Discord\DiscordInterface.cpp" />
     <ClCompile Include="H2MOD\GUI\GUI.cpp" />
@@ -237,10 +236,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\shader_definition.h" />
     <ClInclude Include="Blam\Common\Common.h" />
-    <ClInclude Include="Blam\Maths\integer_math.h" />
-    <ClInclude Include="Blam\Maths\real_math.h" />
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.h" />
@@ -263,9 +259,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
-    <ClInclude Include="Blam\Cache\DataTypes.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h" />
     <ClInclude Include="Blam\Cache\DataTypes\StringID.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Strings.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
@@ -273,9 +266,7 @@
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\Actor\Actor.h" />
-    <ClInclude Include="Blam\Engine\EngineDefinitions.h" />
     <ClInclude Include="Blam\Engine\FileSystem\FiloInterface.h" />
-    <ClInclude Include="Blam\Engine\Game\GameManager.h" />
     <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
     <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
@@ -284,8 +275,6 @@
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="Blam\Enums\Enums.h" />
     <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h" />
-    <ClInclude Include="Blam\Maths\Maths.h" />
-    <ClInclude Include="Globals.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="H2MOD\Discord\DiscordInterface.h" />
     <ClInclude Include="H2MOD\GUI\GUI.h" />
@@ -369,7 +358,6 @@
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_defenition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_defenition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\Shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\new_hud_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\model_defenition.hpp" />
@@ -397,6 +385,15 @@
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\MeleeLunge.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
+    <ClInclude Include="H2MOD\Variants\Variants.h" />
+    <ClInclude Include="Blam\Cache\DataTypes\BlamPrimitiveType.h" />
+    <ClInclude Include="Blam\Math\integer_math.h" />
+    <ClInclude Include="Blam\Math\real_math.h" />
+    <ClInclude Include="Blam\Math\BlamMath.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
+    <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
+    <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\shader_definition.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

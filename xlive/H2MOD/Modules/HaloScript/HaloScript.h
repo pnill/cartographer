@@ -1,5 +1,4 @@
 #pragma once
-#include "Blam/Cache/DataTypes/DatumIndex.h"
 #include "Blam/Cache/DataTypes/StringID.h"
 
 namespace HaloScript

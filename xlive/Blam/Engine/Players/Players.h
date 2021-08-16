@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Blam/Common/Common.h"
 #include "Blam/Engine/DataArray/DataArray.h"
 #include "Blam/Engine/Objects/Objects.h"
 
@@ -272,7 +271,6 @@ public:
 	PlayerIterator();
 
 	bool get_next_active_player();
-
 
 	Player* get_current_player_data();
 

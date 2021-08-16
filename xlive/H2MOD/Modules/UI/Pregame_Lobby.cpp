@@ -2,6 +2,8 @@
 #include "H2MOD.h"
 #include "Pregame_Lobby.h"
 
+#include "H2MOD/Tags/TagInterface.h"
+
 void c_pregame_lobby_menu::ApplyPatches()
 {
 	if (h2mod->GetEngineType() != MainMenu) return;

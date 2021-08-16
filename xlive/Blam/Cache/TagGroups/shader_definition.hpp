@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam\Cache\DataTypes.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
 
 #pragma pack(push,1)

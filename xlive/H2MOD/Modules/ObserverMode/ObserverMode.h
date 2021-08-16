@@ -1,9 +1,7 @@
 #pragma once
-#include "Blam/Cache/DataTypes/DatumIndex.h"
 
 namespace ObserverMode
 {
-
 	enum e_observer_mode : byte
 	{
 		observer_none,

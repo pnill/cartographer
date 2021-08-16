@@ -1,5 +1,8 @@
 #pragma once
-#include "Globals.h"
+
+#include "..\VariantSystem.h"
+
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
 class HeadHunterHandler : public GameClientServerHandler {
 public:

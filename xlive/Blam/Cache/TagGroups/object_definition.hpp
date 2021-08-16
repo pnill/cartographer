@@ -1,7 +1,7 @@
 #pragma once
-#include "..\Blam\Cache\DataTypes.h"
-#include "..\Blam\Cache\TagGroups.hpp"
-#include "..\Blam\Maths\real_math.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam\Cache\TagGroups.hpp"
+#include "Blam\Math\BlamMath.h"
 
 /*********************************************************************
 * name: object

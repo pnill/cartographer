@@ -1,9 +1,7 @@
 #pragma once
-#pragma once
-#include "Blam/Common/Common.h"
-#include "Blam/Cache/DataTypes.h"
-#include "Blam/Maths/real_math.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
+#include "Blam/Math/BlamMath.h"
 
 /*********************************************************************
 * name: physics_model

@@ -1,6 +1,5 @@
 #pragma once
-#include "Blam/Common/Common.h"
-#include "Blam/Cache/DataTypes.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
 
 /*********************************************************************
 * name: new_hud_definition

@@ -1,7 +1,9 @@
 #pragma once
-#include "..\Blam\Cache\DataTypes.h"
-#include "..\Blam\Cache\TagGroups.hpp"
-#include "..\Blam\Cache\DataTypes\TagBlock.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam\Cache\TagGroups.hpp"
+#include "Blam\Cache\DataTypes\TagBlock.h"
+
+#include "Blam\Math\BlamMath.h"
 
 /*********************************************************************
 * name: camera_track

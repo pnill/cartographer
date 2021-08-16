@@ -13,7 +13,6 @@
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
 #include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
 
-
 namespace imgui_handler {
 	namespace AdvancedSettings {
 		namespace

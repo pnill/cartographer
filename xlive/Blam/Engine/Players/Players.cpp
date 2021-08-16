@@ -1,8 +1,6 @@
 
 #include "Players.h"
 
-#include "H2MOD.h"
-
 /*
 	- TO NOTE:
 	- This functions work only after the game has started (game life cycle is in_game or after map has been loaded).
@@ -76,10 +74,10 @@ wchar_t* Player::getName(int playerIndex)
 datum Player::getPlayerUnitDatumIndex(int playerIndex)
 {
 	if (!indexValid(playerIndex))
-		return datum::Null;
+		return DATUM_NONE;
 
 	if (getPlayer(playerIndex)->controlled_unit_index.IsNull())
-		return datum::Null;
+		return DATUM_NONE;
 		
 	return getPlayer(playerIndex)->controlled_unit_index;
 }
@@ -88,7 +86,7 @@ XUID Player::getIdentifier(int playerIndex)
 {
 	if (!indexValid(playerIndex))
 	{
-		return datum::Null;
+		return XUID(0ll);
 	}
 
 	return getPlayer(playerIndex)->identifier;

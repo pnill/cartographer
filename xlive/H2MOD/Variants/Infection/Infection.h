@@ -1,5 +1,8 @@
 #pragma once
-#include "Globals.h"
+
+#include "..\VariantSystem.h"
+
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
 class ZombieHandler : public GameClientServerHandler {
 public:
@@ -48,12 +51,14 @@ class KillZombieHandler : public ZombieHandler {
 	virtual void onDedi() override;
 	virtual void onClient() override;
 };
+
 enum e_infection_sounds
 {
 	infection,
 	infected,
 	new_zombie
 };
+
 class Infection : public GameType<ZombieHandler>
 {
 public:

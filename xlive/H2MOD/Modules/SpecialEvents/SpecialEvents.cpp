@@ -1,27 +1,28 @@
-#pragma once
+
 #include "SpecialEvents.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
-#include "Blam/Cache/TagGroups/model_defenition.hpp"
-#include "Blam/Cache/TagGroups/render_model_definition.hpp"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "Blam/Enums/Game/HaloStrings.h"
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
-#include "Blam/Cache/TagGroups/scenery_definition.hpp"
-#include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
+#include "H2MOD/Modules/Networking/Networking.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Config/Config.h"
+
+#include "Blam/Cache/TagGroups/model_defenition.hpp"
+#include "Blam/Cache/TagGroups/render_model_definition.hpp"
+#include "Blam/Cache/TagGroups/weapon_definition.hpp"
+#include "Blam/Cache/TagGroups/scenery_definition.hpp"
 
 namespace SpecialEvents
 {
 	namespace
 	{
-		datum mook_ball_datum = datum::Null;
+		datum mook_ball_datum = DATUM_NONE;
 
-		datum paddy_hat_datum = datum::Null;
-		datum paddy_beard_datum = datum::Null;
-		datum paddy_pot_datum = datum::Null;
+		datum paddy_hat_datum = DATUM_NONE;
+		datum paddy_beard_datum = DATUM_NONE;
+		datum paddy_pot_datum = DATUM_NONE;
 
-		datum santa_hat_datum = datum::Null;
+		datum santa_hat_datum = DATUM_NONE;
 
 		string_id new_elite_head_marker(0xFFEE01234);
 
@@ -79,7 +80,7 @@ namespace SpecialEvents
 				tag_loader::Push_Back();
 				//auto scen = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(datum(_INJECTED_TAG_START_));
 				auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
-				if (hlmt_chief_datum != datum::Null) {
+				if (hlmt_chief_datum != DATUM_NONE) {
 					auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
 					auto b = hlmt_chief->variants[0];
 					auto a = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
@@ -88,7 +89,7 @@ namespace SpecialEvents
 					a->child_object.TagIndex = tag_loader::ResolveNewDatum(santa_hat_datum.ToInt());
 				}
 				auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
-				if (hlmt_elite_datum != datum::Null)
+				if (hlmt_elite_datum != DATUM_NONE)
 				{
 					auto hlmt_eliete = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_elite_datum);
 					auto b = hlmt_eliete->variants[0];
@@ -117,7 +118,7 @@ namespace SpecialEvents
 					tag_loader::Load_tag(paddy_pot_datum.ToInt(), true, "carto_shared");
 					tag_loader::Push_Back();
 					auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
-					if (hlmt_chief_datum != datum::Null) {
+					if (hlmt_chief_datum != DATUM_NONE) {
 						auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
 						auto b = hlmt_chief->variants[0];
 						auto hat = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
@@ -131,7 +132,7 @@ namespace SpecialEvents
 
 					}
 					auto hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
-					if (hlmt_chief_mp_datum != datum::Null) {
+					if (hlmt_chief_mp_datum != DATUM_NONE) {
 						auto hlmt_chief_mp = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_mp_datum);
 						auto b = hlmt_chief_mp->variants[0];
 						auto hat = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
@@ -144,7 +145,7 @@ namespace SpecialEvents
 						beard->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_beard_datum.ToInt());
 					}
 					auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
-					if (hlmt_elite_datum != datum::Null)
+					if (hlmt_elite_datum != DATUM_NONE)
 					{
 						auto hlmt_eliete = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_elite_datum);
 						auto b = hlmt_eliete->variants[0];

@@ -1,10 +1,12 @@
-#include "Globals.h"
+#include "HeadHunter.h"
 
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Engine/Engine.h"
+
+#include "H2MOD.h"
 
 int soundBuffer = 0;
 std::map<int, std::map<e_headhunter_sounds, const wchar_t*>> H_SoundsTable;
@@ -46,14 +48,14 @@ void HeadHunter::spawnPlayerClientSetup()
 
 void HeadHunter::SpawnSkull(datum unit_datum)
 {
-	DatumIterator<s_object_header> objectIt(game_state_objects_header);
+	DatumIterator<s_object_header> objectIt(get_objects_header());
 	s_biped_object_definition* biped_unit = (s_biped_object_definition*)objectIt.get_data_at_index(unit_datum.Index)->object;
 
 	if (objectIt.get_data_at_index(unit_datum.Index)->type == e_object_type::biped)
 	{
-		ObjectPlacementData nObject;
+		s_object_placement_data nObject;
 
-		Engine::Objects::create_new_placement_data(&nObject, Weapon::ball, -1, 0);
+		Engine::Objects::create_new_placement_data(&nObject, e_weapons_datum_index::ball, -1, 0);
 
 		nObject.placement = biped_unit->placement;
 		nObject.translational_velocity = biped_unit->translational_velocity;
@@ -109,10 +111,10 @@ void HeadHunterHandler::SetDeadPlayer(datum dead_datum)
 
 bool HeadHunterHandler::SetInteractedObject(datum object_datum)
 {
-	DatumIterator<s_object_header> objectIt(game_state_objects_header);
+	DatumIterator<s_object_header> objectIt(get_objects_header());
 	s_weapon_object_definition* weaponObject = (s_weapon_object_definition*)objectIt.get_data_at_index(object_datum.ToAbsoluteIndex())->object;
 
-	if (weaponObject->tag_definition_index.Index == (Weapon::ball & 0xFFFF))
+	if (weaponObject->tag_definition_index.Index == (e_weapons_datum_index::ball & 0xFFFF))
 	{
 		this->object_interaction = object_datum;
 		return true;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Cache/DataTypes/DatumIndex.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
 
 /*
    TODO: Reverse engineer more of the actor struct and fill this data in appropriately.

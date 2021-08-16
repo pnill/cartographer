@@ -1,16 +1,18 @@
-#include "stdafx.h"
 #include "HudElements.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
-#include "Util\Hooks\Hook.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Tags/TagInterface.h"
+
+#include "Util\Hooks\Hook.h"
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 static bool b_showHUD = true;
 static bool b_showFirstPerson = true;

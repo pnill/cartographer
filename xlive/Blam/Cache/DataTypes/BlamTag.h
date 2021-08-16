@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Common/Common.h"
+#include "BlamPrimitiveType.h"
 
 struct blam_tag
 {

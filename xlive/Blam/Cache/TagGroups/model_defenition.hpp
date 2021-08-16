@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam/Cache/DataTypes.h"
-#include "Blam/Maths/real_math.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam/Math/BlamMath.h"
 
 /*********************************************************************
 * name: model

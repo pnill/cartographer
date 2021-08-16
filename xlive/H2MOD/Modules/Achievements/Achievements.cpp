@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
@@ -7,6 +6,7 @@
 
 using namespace rapidjson;
 std::map<DWORD, bool> achievementList;
+std::unordered_map<std::string, bool> AchievementMap;
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {

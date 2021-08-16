@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\NetworkSession\NetworkSession.h"
+#include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
 
 #define player_identifier_size_bits CHAR_BIT * sizeof(XUID)
 

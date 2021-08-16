@@ -1,5 +1,7 @@
-#include "stdafx.h"
-#include "Globals.h"
+
+#include "VariantSystem.h"
+
+#include "H2MOD/Modules/Networking/Networking.h"
 
 void GameClientServerHandler::execute()
 {

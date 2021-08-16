@@ -1,5 +1,6 @@
 #include "MetaExtender.h"
 #include "Blam/Cache/TagGroups/new_hud_definition.hpp"
+#include "H2MOD/Tags/TagInterface.h"
 
 std::vector<void*> ToFree;
 

@@ -95,8 +95,8 @@ public:
 		base_type = new_type;
 	}
 private:
-	c_game_engine_types type = none;
-	c_game_engine_types base_type = slayer;
+	c_game_engine_types type = c_game_engine_types::none;
+	c_game_engine_types base_type = c_game_engine_types::slayer;
 };
 
 namespace custom_game_engines
@@ -105,5 +105,5 @@ namespace custom_game_engines
 	void init();
 
 	/* Register a custom game engine */
-	bool register_engine(c_game_engine_types id, c_game_engine_base *engine, c_game_engine_types base_id = slayer);
+	bool register_engine(c_game_engine_types id, c_game_engine_base *engine, c_game_engine_types base_id = c_game_engine_types::slayer);
 }

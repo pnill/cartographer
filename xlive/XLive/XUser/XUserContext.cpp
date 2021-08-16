@@ -1,10 +1,11 @@
-#include "stdafx.h"
 #include "XUserContext.h"
 
-#include "Globals.h"
 #include "XLive\xbox\xbox.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\Config\Config.h"
+
+#include "H2MOD/Modules/Startup/Startup.h"
+#include "H2MOD/Modules/Networking/Networking.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 extern XSESSION_LOCAL_DETAILS sessionDetails;

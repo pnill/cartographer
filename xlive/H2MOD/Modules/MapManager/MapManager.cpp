@@ -7,6 +7,10 @@
 #include "..\Networking\Networking.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
+#include "H2MOD/Tags/TagInterface.h"
+
+#include "Util/Hooks/Hook.h"
+
 MapManager* mapManager = new MapManager();
 
 #define DEFAULT_BUFLEN 65536

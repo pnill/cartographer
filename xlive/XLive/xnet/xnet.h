@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Globals.h"
-
 typedef struct
 {
 	//

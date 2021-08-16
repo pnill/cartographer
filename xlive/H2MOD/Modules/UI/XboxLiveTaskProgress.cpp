@@ -2,6 +2,8 @@
 #include "H2MOD.h"
 #include "XboxLiveTaskProgress.h"
 
+#include "H2MOD/Tags/TagInterface.h"
+
 void c_xbox_live_task_progress_menu::Open(void* callback)
 {
 	typedef void(__cdecl* c_screen_xbox_live_task_progress_dialog2)(int arg_0, signed int local_player_index, void* callback, int a4, int a5);

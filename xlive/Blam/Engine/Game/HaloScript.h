@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../../Enums/Game/HaloScriptTypes.h"
 
 using namespace Blam::Enums::Game;
