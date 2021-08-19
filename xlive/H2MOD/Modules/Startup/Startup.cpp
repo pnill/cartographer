@@ -15,7 +15,7 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 
-namespace filesystem = std::experimental::filesystem;
+namespace filesystem = std::filesystem;
 
 // xLiveLess specific logger
 h2log *xlive_log = nullptr;
