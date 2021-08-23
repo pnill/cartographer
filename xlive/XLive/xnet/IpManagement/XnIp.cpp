@@ -184,6 +184,7 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 				return SOCKET_ERROR;
 			}
 		}
+		break;
 
 		case 'XNeT':
 		{
@@ -200,6 +201,7 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 				return SOCKET_ERROR;
 			}
 		}
+		break;
 
 		default:
 			break;
@@ -243,12 +245,12 @@ IN_ADDR CXnIp::GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* 
 			switch (xsocket->getHostOrderSocketPort())
 			{
 			case 1000:
-				if (xsocket->sockAddrInEqual(fromAddr, xnIp->getNatAddr(H2vSocket1000)))
+				if (xsocket->sockAddrInEqual(fromAddr, xnIp->getNatAddr(H2v_sockets::Sock1000)))
 					return xnIp->connectionIdentifier;
 				break;
 
 			case 1001:
-				if (xsocket->sockAddrInEqual(fromAddr, xnIp->getNatAddr(H2vSocket1001)))
+				if (xsocket->sockAddrInEqual(fromAddr, xnIp->getNatAddr(H2v_sockets::Sock1001)))
 					return xnIp->connectionIdentifier;
 				break;
 
@@ -266,7 +268,7 @@ IN_ADDR CXnIp::GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* 
 
 void CXnIp::SaveNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier, sockaddr_in* addr)
 {
-	LOG_INFO_NETWORK("{} - socket: {}, connection index: {}, identifier: {:x}", __FUNCTION__, xsocket->winSockHandle, getConnectionIndex(connectionIdentifier), connectionIdentifier.s_addr);
+	LOG_INFO_NETWORK("{} - socket: {}, connection index: {}, identifier: {:X}", __FUNCTION__, xsocket->winSockHandle, getConnectionIndex(connectionIdentifier), connectionIdentifier.s_addr);
 
 	XnIp* xnIp = getConnection(connectionIdentifier);
 	if (xnIp != nullptr)
@@ -284,12 +286,12 @@ void CXnIp::SaveNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier, sockaddr
 		{
 		case 1000:
 			//LOG_TRACE_NETWORK("SaveConnectionNatInfo() xnIp->NatAddrSocket1000 mapping port 1000 - port: {}, connection identifier: {:x}", htons(addr->sin_port), xnIp->connectionIdentifier.s_addr);
-			xnIp->updateNat(H2vSocket1000, addr);
+			xnIp->updateNat(H2v_sockets::Sock1000, addr);
 			break;
 
 		case 1001:
 			//LOG_TRACE_NETWORK("SaveConnectionNatInfo() xnIp->NatAddrSocket1001 mapping port 1001 - port: {}, connection identifier: {:x}", htons(addr->sin_port), xnIp->connectionIdentifier.s_addr);
-			xnIp->updateNat(H2vSocket1001, addr);
+			xnIp->updateNat(H2v_sockets::Sock1001, addr);
 			break;
 
 		default:
@@ -623,6 +625,9 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 		// and the connection Nonce (random number created when registering a new connection), it means the other side tries to re-connect, we clear the old identification, then create a new one
 		// or if there are differences between XNADDRs (like the port or even the IP address) but the MAC address is the same, clear and create another connection
 
+
+		// TODO FIXME: for a small subset of players pXnIpAlreadyRegistered->connectionNonceOtherSide is different from reqPacket->data.nonceKey when connection attempt is in progress
+		// causing the connection to fail
 		if (
 			(reqPacket != nullptr
 			&& pXnIpAlreadyRegistered->otherSideNonceKeyReceived
@@ -802,20 +807,22 @@ void CXnIp::SendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXni
 		sendToAddr.sin_port = xsocket->getNetworkOrderSocketPort();
 
 		XNetRequestPacket reqPacket;
-		SecureZeroMemory(&reqPacket.data, sizeof(XNetRequestPacket::XNetReq));
 
 		reqPacket.data.reqType = reqType;
 		memcpy(reqPacket.data.xnkid.ab, xnIp->keyPair->xnkid.ab, sizeof(XNKID::ab));
 		memcpy(reqPacket.data.nonceKey, xnIp->connectionNonce, sizeof(XnIp::connectionNonce));
+		XNetGetTitleXnAddr(&reqPacket.data.xnaddr);
+
 		switch (reqType)
 		{
 		case XnIp_ConnectionUpdateNAT:
+		case XnIp_ConnectionEstablishSecure:
 			if (xnIp->natIsUpdated())
 				XNIP_SET_BIT(reqPacket.data.flags, XnIp_HasEndpointNATData);
-		case XnIp_ConnectionEstablishSecure:
 			reqPacket.data.connectionInitiator = !xnIp->connectionInitiator;
+			break;
+
 		case XnIp_ConnectionDeclareConnected:
-			XNetGetTitleXnAddr(&reqPacket.data.xnaddr);
 			break;
 
 		case XnIp_ConnectionCloseSecure:
