@@ -37,6 +37,9 @@
 #include "Blam/Engine/Objects/GameStateObjects.h"
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 
+#include <float.h>
+#pragma fenv_access (on)
+
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
 DeviceShop* device_shop = new DeviceShop();

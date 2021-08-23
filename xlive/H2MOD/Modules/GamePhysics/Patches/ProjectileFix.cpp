@@ -1,8 +1,5 @@
 #include "ProjectileFix.h"
 
-#include <float.h>
-#pragma fenv_access (on)
-
 #include "Blam/Math/BlamMath.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
 #include "Blam/Engine/Objects/Objects.h"
@@ -10,6 +7,9 @@
 #include "H2MOD/Tags/TagInterface.h"
 
 #include "Util/Hooks/Hook.h"
+
+#include <float.h>
+#pragma fenv_access (on)
 
 #define DEFAULT_PROJECTILE_OBJECT_DATA_SIZE 428
 
