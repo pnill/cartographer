@@ -130,3 +130,8 @@ wchar_t* PlayerIterator::get_current_player_name()
 {
 	return m_current_player->properties[0].player_name;
 }
+
+XUID PlayerIterator::get_current_player_id()
+{
+	return Player::getIdentifier(this->get_current_player_index());
+}

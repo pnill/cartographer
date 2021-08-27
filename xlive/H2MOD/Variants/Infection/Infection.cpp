@@ -206,7 +206,7 @@ void Infection::preSpawnServerSetup() {
 	while (playerIt.get_next_active_player())
 	{
 		int currentPlayerIndex = playerIt.get_current_player_index();
-		XUID playerIdentifier = Player::getIdentifier(currentPlayerIndex);
+		XUID playerIdentifier = playerIt.get_current_player_id();
 		bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
 		if (Player::getTeam(currentPlayerIndex) == ZOMBIE_TEAM && isZombie == false) {
 			// if the player just joined the and he doesn't have zombie status, and his team is green, add him in the array

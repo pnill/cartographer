@@ -278,6 +278,8 @@ public:
 
 	wchar_t* get_current_player_name();
 
+	XUID get_current_player_id();
+
 private:
 	Player* m_current_player = nullptr;
 };

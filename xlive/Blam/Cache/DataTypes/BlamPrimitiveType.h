@@ -10,9 +10,14 @@ typedef float real;
 struct datum
 {
 	//Default constructors
-	datum()
+	datum() 
+		: data(NONE)
 	{
-		operator=(datum(NONE));
+	}
+
+	datum(const datum& other) 
+		: data(other.data)
+	{
 	}
 
 	datum(int index)

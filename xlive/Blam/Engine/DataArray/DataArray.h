@@ -25,7 +25,7 @@ struct s_datum_array
 };
 CHECK_STRUCT_SIZE(s_datum_array, 0x4C);
 
-template<typename T>
+template<typename T = void*>
 class DatumIterator
 {
 public:
@@ -63,7 +63,7 @@ public:
 		if (index == -1)
 		{
 			result = nullptr;
-			m_last_datum_index = -1;
+			m_last_datum_index = DATUM_NONE;
 			m_current_absolute_index = data_array->datum_max_elements;
 		}
 		else
@@ -104,6 +104,6 @@ public:
 private:
 	
 	s_datum_array* data_array;
-	datum m_last_datum_index = DATUM_NONE;
+	datum m_last_datum_index;
 	int m_current_absolute_index;
 };
