@@ -25,7 +25,7 @@ inline PATH_FLAGS operator|(PATH_FLAGS a, PATH_FLAGS b)
 	return static_cast<PATH_FLAGS>(static_cast<int>(a) | static_cast<int>(b));
 }
 
-namespace  FiloInterface
+namespace FiloInterface
 {
 	void init_filo(filo *data, std::string path, bool mode);
 

@@ -156,7 +156,7 @@ struct Player
 		Severe = 3
 	};
 
-	enum flags
+	enum flags : int
 	{
 		player_inactive = 9,
 	};

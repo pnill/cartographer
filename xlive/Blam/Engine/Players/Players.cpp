@@ -105,7 +105,7 @@ bool PlayerIterator::get_next_active_player()
 	{
 		do
 		{
-			if (!(m_current_player->flags & FLAG(Player::player_inactive)))
+			if (!(m_current_player->flags & FLAG(Player::flags::player_inactive)))
 				break;
 
 			m_current_player = get_next_datum();
