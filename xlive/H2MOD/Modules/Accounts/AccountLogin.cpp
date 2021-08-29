@@ -442,7 +442,7 @@ HRESULT WINAPI XLiveManageCredentials(LPCWSTR lpszLiveIdName, LPCWSTR lpszLiveId
 	{
 		pXOverlapped->InternalLow = ERROR_SUCCESS;
 		pXOverlapped->InternalHigh = 0;
-		pXOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+		pXOverlapped->dwExtendedError = 0;
 	}
 
 	// not done - error now

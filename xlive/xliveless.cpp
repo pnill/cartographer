@@ -766,7 +766,7 @@ DWORD WINAPI XStringVerify( DWORD dwFlags, const CHAR *szLocale, DWORD dwNumStri
 	if( pOverlapped )
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+		pOverlapped->dwExtendedError = 0;
 
 
 		Check_Overlapped( pOverlapped );

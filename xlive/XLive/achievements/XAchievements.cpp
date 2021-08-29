@@ -219,7 +219,8 @@ DWORD WINAPI XUserWriteAchievements(DWORD dwNumAchievements, PXUSER_ACHIEVEMENT 
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
 		pOverlapped->InternalHigh = dwNumAchievements;
-		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+		pOverlapped->dwExtendedError = 0;
+
 		return ERROR_IO_PENDING;
 	}
 
@@ -295,7 +296,7 @@ int AchievementEnumerator(DWORD cbBuffer, CHAR* pvBuffer, PDWORD pcItemsReturned
 	else
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+		pOverlapped->dwExtendedError = 0;
 
 		return ERROR_IO_PENDING;
 	}
