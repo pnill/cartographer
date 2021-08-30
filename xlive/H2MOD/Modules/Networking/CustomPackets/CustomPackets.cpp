@@ -270,7 +270,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
 		{
 			s_team_change* received_data = (s_team_change*)packet;
-			LOG_DEBUG_NETWORK(L"[H2MOD-CustomPackets] recieved on handle_channel_message_hook team_chage: {}", received_data->team_index);
+			LOG_DEBUG_NETWORK(L"[H2MOD-CustomPackets] recieved on handle_channel_message_hook team_change: {}", received_data->team_index);
 			h2mod->set_local_team_index(0, received_data->team_index);
 		}
 		return;

@@ -177,11 +177,6 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 					memcpy(lpBuffers->buf, buffer, *bytesRecvdCount);
 					return 0;
 				}
-
-				// set the bytes received count to 0
-				// pool another packet after, so we keep the game fed with data
-				*bytesRecvdCount = 0;
-				return SOCKET_ERROR;
 			}
 		}
 		break;
@@ -431,7 +426,7 @@ void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* r
 				}
 				else
 				{
-					LOG_CRITICAL_NETWORK("{} - XnIp_ConnectionDeclareConnected but NAT isn't updated!");
+					LOG_CRITICAL_NETWORK("{} - XnIp_ConnectionDeclareConnected but NAT isn't updated!", __FUNCTION__);
 				}
 				break;
 

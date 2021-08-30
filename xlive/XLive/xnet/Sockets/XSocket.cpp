@@ -249,74 +249,87 @@ BOOL WINAPI XSocketWSACancelOverlappedIO(HANDLE hFile)
 	return CancelIo(hFile);
 }
 
-int XSocket::recvfrom(
-	LPWSABUF lpBuffers, 
-	DWORD dwBufferCount, 
+int XSocket::recvfrom(LPWSABUF lpBuffers, 
+	DWORD dwBufferCount,
 	LPDWORD lpNumberOfBytesRecvd, 
-	LPDWORD lpFlags, 
-	struct sockaddr *lpFrom, 
+	LPDWORD lpFlags,
+	struct sockaddr* lpFrom, 
 	LPINT lpFromlen, 
 	LPWSAOVERLAPPED lpOverlapped, 
-	LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine,
-	unsigned int packetsReadCount
-)
+	LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
-	if (this->isTCP()
-		|| lpFrom == NULL)
+	auto readSocketLambda = [&](bool& socketErrorByRecvAPI) -> int
 	{
-		return WSARecv(
-			this->winSockHandle,
-			lpBuffers,
-			dwBufferCount,
-			lpNumberOfBytesRecvd,
-			lpFlags,
-			lpOverlapped,
-			lpCompletionRoutine);
-	}
+		if (this->isTCP()
+			|| lpFrom == NULL)
+		{
+			return WSARecv(
+				this->winSockHandle,
+				lpBuffers,
+				dwBufferCount,
+				lpNumberOfBytesRecvd,
+				lpFlags,
+				lpOverlapped,
+				lpCompletionRoutine);
+		}
 
 #if COMPILE_WITH_STD_SOCK_FUNC
-	int result = ::recvfrom(this->winSockHandle, lpBuffers->buf, lpBuffers->len, *lpFlags, lpFrom, lpFromlen);
-	*lpNumberOfBytesRecvd = result;
+		int result = ::recvfrom(this->winSockHandle, lpBuffers->buf, lpBuffers->len, *lpFlags, lpFrom, lpFromlen);
+		*lpNumberOfBytesRecvd = result;
 #else
-	int result = WSARecvFrom(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
+		int result = WSARecvFrom(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
 #endif
-	if (result == SOCKET_ERROR)
-	{
-		*lpNumberOfBytesRecvd = 0;
-
-		if (WSAGetLastError() != WSAEWOULDBLOCK)
-			LOG_ERROR_NETWORK("XSocketWSARecvFrom() - Socket Error: {}", WSAGetLastError());
-
-		return SOCKET_ERROR;
-	}
-
-	// if the result returned by handleRecvdPacket is SOCKET_ERROR, pool another packet until we get an error directly from WINSOCK's recvfrom API (like WSAEWOULDBLOCK)
-	// or the packet received is a valid game packet
-	// because we don't want to lose/delay an in-bound game packet
-	// this should improve performance especially if someone is sending from an unknown connection packets (like DDoS-ing), depending on the performance of the server
-	result = gXnIp.handleRecvdPacket(this, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
-	if (result == SOCKET_ERROR)
-	{
-		// don't allow more than 100 packets to be processed per XSocketWSARecvFrom() call
-		if (packetsReadCount > 100)
+		if (result == SOCKET_ERROR)
 		{
-			XSocketWSASetLastError(WSAEWOULDBLOCK);
+			*lpNumberOfBytesRecvd = 0;
+			socketErrorByRecvAPI = true;
 			return SOCKET_ERROR;
+		}
+
+		socketErrorByRecvAPI = false;
+		result = gXnIp.handleRecvdPacket(this, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
+		return result;
+	};
+
+	// loop MAX_PACKETS_TO_READ_PER_RECV_CALL times until we get a valid packet
+	// unless Winsock API returns an error
+	for (int i = 0; i < MAX_PACKETS_TO_READ_PER_RECV_CALL; i++)
+	{
+		bool errorByRecvAPI = false;
+
+		int result = readSocketLambda(errorByRecvAPI);
+
+		if (result == SOCKET_ERROR)
+		{
+			if (errorByRecvAPI)
+			{
+				if (WSAGetLastError() != WSAEWOULDBLOCK)
+					LOG_ERROR_NETWORK("XSocketWSARecvFrom() - Socket Error: {}", WSAGetLastError());
+
+				return result;
+			}
+			else
+			{
+				continue;
+			}
 		}
 		else
 		{
-			return this->recvfrom(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine, packetsReadCount + 1);
+			// if there's no error, return the packet
+			return result;
 		}
 	}
 
-	return result;
+	// if we got this far, it means there were no game packets inbound, just XNet packets
+	XSocketWSASetLastError(WSAEWOULDBLOCK);
+	return SOCKET_ERROR;
 }
 
 // #21
 int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr *lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
 	XSocket* socket = (XSocket*)s;
-	return socket->recvfrom(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine, 0);
+	return socket->recvfrom(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
 }
 
 // #25
