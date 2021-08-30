@@ -381,7 +381,8 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 
 	XnIp* xnIp = gXnIp.getConnection(inTo->sin_addr);
 	if (xnIp != nullptr
-		&& gXnIp.GetLocalUserXn() != nullptr)
+		&& gXnIp.GetLocalUserXn() != nullptr
+		&& xnIp->connectStatus != XNET_CONNECT_STATUS_LOST)
 	{
 		sockaddr_in sendToAddr;
 		sendToAddr.sin_family = AF_INET;

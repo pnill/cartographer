@@ -591,8 +591,10 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 
 	XnIp* pXnIpAlreadyRegistered = XnIpLookUp(pxna, pxnkid, &firstUnusedConnectionIndexFound, &firstUnusedConnectionIndex);
 
+	// check if we can create another XnIp identifier, if not already present
+	// and if there's any free spots for a new connection
 	if (firstUnusedConnectionIndexFound 
-		&& pXnIpAlreadyRegistered == nullptr) // check if we can create another XnIp identifier, if not already present
+		&& pXnIpAlreadyRegistered == nullptr) 
 	{
 		int result = registerNewXnIp(firstUnusedConnectionIndex, pxna, pxnkid, outIpIdentifier);
 		if (result == 0 // check if registerNewXnIp was successful
@@ -972,20 +974,19 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 		SecureZeroMemory(pxnkid->ab, sizeof(pxnkid->ab));
 
 	XnIp* xnIp = gXnIp.getConnection(ina);
-	if (xnIp != nullptr)
+	if (xnIp == nullptr)
 	{
-		if (pxna)
-			*pxna = xnIp->xnaddr;
-
-		if (pxnkid)
-			memcpy(pxnkid->ab, xnIp->keyPair->xnkid.ab, sizeof(XNKID::ab));
-
-		return 0;
+		LOG_CRITICAL_NETWORK("{} - connection index: {}, identifier: {:X} are invalid!", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
+		return WSAEINVAL;
 	}
 
-	LOG_CRITICAL_NETWORK("{} - connection index: {}, identifier: {:X} are invalid!", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
+	if (pxna)
+		*pxna = xnIp->xnaddr;
 
-	return WSAEINVAL;
+	if (pxnkid)
+		memcpy(pxnkid->ab, xnIp->keyPair->xnkid.ab, sizeof(XNKID::ab));
+
+	return 0;
 }
 
 // #63: XNetUnregisterInAddr
@@ -1002,22 +1003,20 @@ int WINAPI XNetConnect(const IN_ADDR ina)
 	LOG_INFO_NETWORK("{} - connection index {}, identifier: {:X}", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
 
 	XnIp* xnIp = gXnIp.getConnection(ina);
-	if (xnIp != nullptr)
+	if (xnIp == nullptr)
+		return WSAEINVAL;
+	
+	// send connect packets only if the state is idle
+	if (xnIp->connectStatus == XNET_CONNECT_STATUS_IDLE)
 	{
-		// send connect packets only if the state is idle
-		if (xnIp->connectStatus == XNET_CONNECT_STATUS_IDLE)
+		if (!xnIp->natIsUpdated())
 		{
-			if (!xnIp->natIsUpdated())
-			{
-				gXnIp.SendXNetRequestAllSockets(ina, XnIp_ConnectionUpdateNAT);
-				xnIp->connectStatus = XNET_CONNECT_STATUS_PENDING; // after we sent, set the state to PENDING
-			}
+			gXnIp.SendXNetRequestAllSockets(ina, XnIp_ConnectionUpdateNAT);
+			xnIp->connectStatus = XNET_CONNECT_STATUS_PENDING; // after we sent, set the state to PENDING
 		}
-
-		return 0;
 	}
 
-	return WSAEINVAL;
+	return 0;
 }
 
 // #66: XNetGetConnectStatus
@@ -1025,14 +1024,23 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 {
 	//LOG_INFO_NETWORK("{} : connection index {}, identifier: {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
 	XnIp* xnIp = gXnIp.getConnection(ina);
-	if (xnIp != nullptr)
+	if (xnIp == nullptr)
 	{
-		gXnIp.setTimeConnectionInteractionHappened(ina);
-		return xnIp->connectStatus;
+		LOG_CRITICAL_NETWORK("{} - connection index: {}, identifier: {:X} is invalid!", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
+		return XNET_CONNECT_STATUS_LOST;
 	}
 
-	LOG_CRITICAL_NETWORK("{} - connection index: {}, identifier: {:X} is invalid!", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
-	return XNET_CONNECT_STATUS_LOST;
+	if (xnIp->connectStatus == XNET_CONNECT_STATUS_CONNECTED)
+	{
+		gXnIp.setTimeConnectionInteractionHappened(ina);
+	}
+	else if (xnIp->connectStatus < XNET_CONNECT_STATUS_CONNECTED
+		&& timeGetTime() - xnIp->lastConnectionInteractionTime >= XnIp_ConnectionTimeOut)
+	{
+		return XNET_CONNECT_STATUS_LOST;
+	}
+
+	return xnIp->connectStatus;
 }
 
 // #73: XNetGetTitleXnAddr
@@ -1040,15 +1048,11 @@ DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pxna)
 {
 	XnIp* localUserXnIp = gXnIp.GetLocalUserXn();
 
-	if (localUserXnIp)
-	{
-		*pxna = localUserXnIp->xnaddr;
-		return XNET_GET_XNADDR_ETHERNET;
-	}
-	else
-	{
+	if (localUserXnIp == nullptr)
 		return XNET_GET_XNADDR_PENDING;
-	}
+	
+	*pxna = localUserXnIp->xnaddr;
+	return XNET_GET_XNADDR_ETHERNET;
 }
 
 

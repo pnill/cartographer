@@ -210,13 +210,13 @@ struct XnIp
 
 	bool XnIp::isValid(IN_ADDR identifier) const
 	{
-		if (identifier.s_addr != connectionIdentifier.s_addr)
+		if (identifier.s_addr != this->connectionIdentifier.s_addr)
 		{
-			LOG_CRITICAL_NETWORK("{} - {:X} != {:X}", __FUNCTION__, identifier.s_addr, connectionIdentifier.s_addr);
+			LOG_CRITICAL_NETWORK("{} - connection identifier different {:X} != {:X}", __FUNCTION__, identifier.s_addr, connectionIdentifier.s_addr);
 			return false;
 		}
 
-		return bValid && identifier.s_addr == connectionIdentifier.s_addr;;
+		return bValid && identifier.s_addr == this->connectionIdentifier.s_addr;
 	}
 };
 
