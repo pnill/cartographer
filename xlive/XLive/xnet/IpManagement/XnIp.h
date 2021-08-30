@@ -229,7 +229,7 @@ public:
 	*/
 	static int CXnIp::getConnectionIndex(IN_ADDR connectionIdentifier)
 	{
-		return ntohl(connectionIdentifier.s_addr & XnIp_ConnectionIndexMask);
+		return connectionIdentifier.s_addr >> 24;
 	}
 
 	XnIp* CXnIp::getConnection(IN_ADDR ina)
