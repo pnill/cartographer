@@ -1,5 +1,4 @@
 #pragma once
-#include "stdafx.h"
 
 typedef struct _SOCKET_INFORMATION 
 {

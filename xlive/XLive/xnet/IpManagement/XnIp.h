@@ -300,9 +300,6 @@ public:
 	void UnregisterKey(const XNKID* xnkid);
 	XnKeyPair* getKeyPair(const XNKID* xnkid);
 	
-	XnIp* XnIPs = nullptr;
-	XnKeyPair* XnKeyPairs = nullptr;
-
 	XNetStartupParams startupParams;
 	int GetMaxXnConnections() { return startupParams.cfgSecRegMax; }
 	int GetReqQoSBufferSize() { return startupParams.cfgQosDataLimitDiv4 * 4; }
@@ -325,7 +322,6 @@ public:
 		return keysCount;
 	}
 
-
 	/*
 		Sends a request over the socket to the other socket end, with the same identifier
 	*/
@@ -335,6 +331,10 @@ public:
 		Sends a request to all open sockets
 	*/
 	void SendXNetRequestAllSockets(IN_ADDR connectionIdentifier, eXnip_ConnectRequestType reqType);
+
+	// Data
+	XnIp* XnIPs = nullptr;
+	XnKeyPair* XnKeyPairs = nullptr;
 
 private:
 

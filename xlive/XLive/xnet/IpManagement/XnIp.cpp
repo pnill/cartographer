@@ -12,7 +12,6 @@
 
 #include "..\net_utils.h"
 
-
 CXnIp gXnIp;
 XECRYPT_RC4_STATE Rc4StateRand;
 
@@ -187,7 +186,12 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 			if (*bytesRecvdCount == sizeof(XNetRequestPacket)
 				&& strncmp(XNetPck->pckHeader.HdrStr, requestStrHdr, MAX_HDR_STR) == 0)
 			{
-				LOG_TRACE_NETWORK("{} - Received XNetRequest from ip address {:X}, port: {}", __FUNCTION__, ntohl(lpFrom->sin_addr.s_addr), ntohs(lpFrom->sin_port));
+				LOG_TRACE_NETWORK("{} - Received XNetRequest type: {} from ip address {:X}, port: {}", 
+					__FUNCTION__, 
+					(int)XNetPck->data.reqType, 
+					ntohl(lpFrom->sin_addr.s_addr), 
+					ntohs(lpFrom->sin_port));
+
 				HandleXNetRequestPacket(xsocket, XNetPck, lpFrom, bytesRecvdCount); // save NAT info and send back a connection packet
 
 				// set the bytes received count to 0
@@ -604,6 +608,12 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 			memcpy(newlyCreatedXnIp->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonceOtherSide));
 			newlyCreatedXnIp->otherSideNonceKeyReceived = true;
 
+			LOG_TRACE_NETWORK("{} - updated noOnce key for connection identifier: {:X}, n0nceKey: {}", 
+				__FUNCTION__, 
+				newlyCreatedXnIp->connectionIdentifier.s_addr,
+				ByteToHexStr(newlyCreatedXnIp->connectionNonceOtherSide, 8)
+			);
+
 			// if we received and created this identification after we received a packet, the other side tries to initiate a connection
 			newlyCreatedXnIp->connectionInitiator = true;
 		}
@@ -651,6 +661,12 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 				// if we received and created this identification after we received a packet, the other side tries to initiate a connection
 				// the game can't know this new connection is about to be created, we just received the packet from the other side
 				newlyCreatedXnIp->connectionInitiator = true;
+
+				LOG_TRACE_NETWORK("{} - otherSideNonceKeyReceived: {} != reqPacket->data.nonceKey: {}",
+					__FUNCTION__,
+					ByteToHexStr(pXnIpAlreadyRegistered->connectionNonceOtherSide, 8),
+					ByteToHexStr(reqPacket->data.nonceKey, 8)
+				);
 			}
 			else if (result == 0) // check if registerNewXnIp was successful
 			{
@@ -667,7 +683,11 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 		if (reqPacket != nullptr
 			&& !pXnIpAlreadyRegistered->otherSideNonceKeyReceived)
 		{
-			LOG_TRACE_NETWORK("{} - updated noOnce key for connection identifier: {:X}", __FUNCTION__, pXnIpAlreadyRegistered->connectionIdentifier.s_addr);
+			LOG_TRACE_NETWORK("{} - updated noOnce key for connection identifier: {:X}, n0ncekey: {}", 
+				__FUNCTION__, 
+				pXnIpAlreadyRegistered->connectionIdentifier.s_addr,
+				ByteToHexStr(reqPacket->data.nonceKey, 8)
+			);
 			memcpy(pXnIpAlreadyRegistered->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonceOtherSide));
 			pXnIpAlreadyRegistered->otherSideNonceKeyReceived = true;
 		}
@@ -709,7 +729,11 @@ int CXnIp::RegisterKey(XNKID* pxnkid, XNKEY* pxnkey)
 		{
 			if (XnKeyPairs[i].bValid == true)
 			{
-				LOG_TRACE_NETWORK("{} - XnKeyPair: xnkid {}, xnkey: {} already registered!", __FUNCTION__, ByteToHexStr(pxnkid->ab, sizeof(pxnkid->ab)), ByteToHexStr(pxnkey->ab, sizeof(pxnkey->ab)));
+				LOG_TRACE_NETWORK("{} - XnKeyPair: xnkid {}, xnkey: {} already registered!", 
+					__FUNCTION__, 
+					ByteToHexStr(pxnkid->ab, sizeof(pxnkid->ab)), 
+					ByteToHexStr(pxnkey->ab, sizeof(pxnkey->ab))
+				);
 				return WSAEALREADY;
 			}
 		}
@@ -837,7 +861,13 @@ void CXnIp::SendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXni
 		xnIp->connectionPacketsSentCount++;
 
 		int ret = xsocket->udpSend((char*)&reqPacket, sizeof(XNetRequestPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
-		LOG_INFO_NETWORK("{} - secure packet sent socket handle: {}, connection index: {}, connection identifier: {:x}", __FUNCTION__, xsocket->winSockHandle, gXnIp.getConnectionIndex(connectionIdentifier), sendToAddr.sin_addr.s_addr);
+		LOG_INFO_NETWORK("{} - secure packet sent socket handle: {}, connection index: {}, connection identifier: {:x}, n0nceKey: {}", 
+			__FUNCTION__, 
+			xsocket->winSockHandle, 
+			gXnIp.getConnectionIndex(connectionIdentifier), 
+			sendToAddr.sin_addr.s_addr,
+			ByteToHexStr(reqPacket.data.nonceKey, 8)
+		);
 	}
 	else
 	{
