@@ -1,7 +1,9 @@
 #include "TagFixes.h"
 #include "H2MOD.h"
 #include "Blam/Cache/TagGroups/shader_definition.h"
+#include "Blam/Cache/TagGroups/light_definition.h"
 #include "Util/Hooks/Hook.h"
+#include "H2MOD/Modules/Config/Config.h"
 
 namespace TagFixes
 {
@@ -134,6 +136,38 @@ namespace TagFixes
 				*(float*)(grunt_torso_shader_tag_data + 0x44) = 1;
 
 		}
+
+		void shader_lod_max()
+		{
+			auto shaders = tags::find_tags(blam_tag::tag_group_type::shader);
+			for (auto& shader_item : shaders)
+			{
+				auto shader = tags::get_tag<blam_tag::tag_group_type::shader, shader_definition>(shader_item.first);
+				shader->shaderLODBias = shader_definition::_Never;
+			}
+		}
+
+
+		//Hacky thingy that does stuff for setting flags to true or false
+		//Should Prob Remove when a better solution is found
+		template<class T> inline T operator~ (T a) { return (T)~(int)a; }
+		template<class T> inline T operator| (T a, T b) { return (T)((int)a | (int)b); }
+		template<class T> inline T operator& (T a, T b) { return (T)((int)a & (int)b); }
+		template<class T> inline T operator^ (T a, T b) { return (T)((int)a ^ (int)b); }
+		template<class T> inline T& operator|= (T& a, T b) { return (T&)((int&)a |= (int)b); }
+		template<class T> inline T& operator&= (T& a, T b) { return (T&)((int&)a &= (int)b); }
+		template<class T> inline T& operator^= (T& a, T b) { return (T&)((int&)a ^= (int)b); }
+
+		void light_framerate_killer()
+		{
+			auto lights = tags::find_tags(blam_tag::tag_group_type::light);
+			for (auto& light_item : lights)
+			{
+				auto light = tags::get_tag<blam_tag::tag_group_type::light, s_light_group_definition>(light_item.first);
+				light->flags |= s_light_group_definition::e_flags::light_framerate_killer;
+			}
+		}
+
 		void fall_damage_fix()
 		{
 			if (h2mod->GetEngineType() == Multiplayer) {
@@ -160,6 +194,14 @@ namespace TagFixes
 			ShaderSpecularFix();
 			fix_dynamic_lights();
 			font_table_fix();
+			if (H2Config_shader_lod_max)
+			{
+				shader_lod_max();
+			}
+			if (H2Config_light_framerate_killer)
+			{
+				light_framerate_killer();
+			}
 		}
 
 		// both server and client

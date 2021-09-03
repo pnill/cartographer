@@ -67,6 +67,8 @@ float H2Config_crosshair_offset = NAN;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
+bool H2Config_shader_lod_max = false;
+bool H2Config_light_framerate_killer = false;
 bool H2Config_hiresfix = false;
 bool H2Config_d3dex = false;
 bool H2Config_voice_chat = false;
@@ -254,6 +256,16 @@ void SaveH2Config() {
 
 				"# mouse_sens Options (Client):"
 				"\n# <uint 0 to inf> - 0 uses the default sensitivity."
+				"\n\n"
+
+				"# Force Max Shader LOD Options (Client):"
+				"\n# 0 - Disable shader_lod_max patch. game uses default shader lod settings"
+				"\n# 1 - Enable shader_lod_max patch. game uses highest quality shaders at all times"
+				"\n\n"
+
+				"# Disable Light Suppresion Options (Client):"
+				"\n# 0 - Disable light_framerate_killer patch. game suppresses lights when multiple of them are onscreen"
+				"\n# 1 - Enable light_framerate_killer patch. game dosen't suppress lights when multiple of them are onscreen"
 				"\n\n"
 
 				"# hiresfix Options (Client):"
@@ -471,6 +483,10 @@ void SaveH2Config() {
 			ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_sens", std::to_string(H2Config_mouse_sens).c_str());
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "mouse_uniform_sens", H2Config_mouse_uniform);
+
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "light_framerate_killer", H2Config_shader_lod_max);
+
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "hires_fix", H2Config_hiresfix);
 
@@ -792,7 +808,8 @@ void ReadH2Config() {
 				std::string deadzone_radial(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", "26.518"));
 				H2Config_Deadzone_Radial = std::stof(deadzone_radial);
 
-
+				H2Config_shader_lod_max = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max);
+				H2Config_light_framerate_killer = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "light_framerate_killer", H2Config_light_framerate_killer);
 				H2Config_hiresfix = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "hires_fix", H2Config_hiresfix);
 				H2Config_d3dex = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3dex);
 				H2Config_disable_ingame_keyboard = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);

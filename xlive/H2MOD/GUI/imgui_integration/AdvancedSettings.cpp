@@ -308,6 +308,19 @@ namespace imgui_handler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
 					ImGui::Columns(1);
+
+					//Force max shader LOD
+
+					ImGui::Checkbox(GetString(shader_lod_max), &H2Config_shader_lod_max);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(GetString(shader_lod_max_tooltip));
+
+					//Disable Light Suppressor
+
+					ImGui::Checkbox(GetString(light_framerate_killer), &H2Config_light_framerate_killer);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(GetString(light_framerate_killer_tooltip));
+
 					//Hires Fix
 
 					ImGui::Checkbox(GetString(hires_fix), &H2Config_hiresfix);
@@ -1078,6 +1091,12 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::lod_tooltip] =
 				"Changing this will force the game to use the set Level of Detail for models that have them"
 				"\nLeaving it at default makes it dynamic which is the games default behaviour.";
+			string_table[0][e_advanced_string::shader_lod_max] = "Force Max Shader LOD";
+			string_table[0][e_advanced_string::shader_lod_max_tooltip] =
+				"This will force shaders to use the highest LODS regardless of their distance away from the player";
+			string_table[0][e_advanced_string::light_framerate_killer] = "Disable Light Suppression";
+			string_table[0][e_advanced_string::light_framerate_killer_tooltip] =
+				"This will force lights to not fade out when there's multiple of them onscreen";
 			string_table[0][e_advanced_string::hires_fix] = "High Resolution Fix";
 			string_table[0][e_advanced_string::hires_fix_tooltip] =
 				"This will enable fixes for high resolution monitors that will fix text clipping"
