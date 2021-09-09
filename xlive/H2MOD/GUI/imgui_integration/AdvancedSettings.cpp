@@ -474,7 +474,7 @@ namespace imgui_handler {
 
 					ImGui::Text(GetString(deadzone_type));
 					const char* items[] = { GetString(axial), GetString(radial), GetString(both) };
-					ImGui::PushItemWidth(ImGui::GetColumnWidth());;
+					ImGui::PushItemWidth(ImGui::GetColumnWidth());
 					if (ImGui::Combo("##C_Deadzone_Type", &g_deadzone, items, 3))
 					{
 						H2Config_Controller_Deadzone = (H2Config_Deadzone_Type)(byte)g_deadzone;
