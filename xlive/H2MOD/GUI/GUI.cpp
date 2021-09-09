@@ -162,7 +162,6 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 
 	imgui_handler::ReleaseTextures();
 	ImGui_ImplDX9_InvalidateDeviceObjects();
-	ImGui_ImplDX9_CreateDeviceObjects();
 	//pDevice->Reset(pD3DPP);
 	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
 	return 0;
@@ -449,8 +448,6 @@ void GUI::Initialize(HWND hWnd)
 // #5001
 int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 {
-	if(imgui_handler::ImGuiShoulBlockInput())
-		imgui_handler::ImGui_ImplWin32_WndProcHandler(pPii->hWnd, pPii->uMSG, pPii->wParam, pPii->lParam);
 	static bool has_initialised_input = false;
 	if (!has_initialised_input) {
 		extern HWND H2hWnd;
@@ -459,6 +456,9 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		GetWindowRect(H2hWnd, &rectScreenOriginal);
 		has_initialised_input = true;
 	}
+
+	if (imgui_handler::ImGuiShoulBlockInput())
+		imgui_handler::ImGui_ImplWin32_WndProcHandler(pPii->hWnd, pPii->uMSG, pPii->wParam, pPii->lParam);
 
 	return S_OK;
 }
