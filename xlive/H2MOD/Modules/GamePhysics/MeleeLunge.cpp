@@ -41,16 +41,6 @@ float compute_something(float v1, float v2)
 	return ((v1 - get_melee_acceleration(v2)) * 3.0f) / 2.0f;
 }
 
-static s_object_header* get_objects_header(datum object_index)
-{
-	/*
-		Gets the header of the object, containing some details
-	*/
-
-	auto objects_header = *Memory::GetAddress<s_datum_array**>(0x4E461C, 0x50C8EC);
-	return (s_object_header*)(&objects_header->datum[objects_header->datum_element_size * object_index.ToAbsoluteIndex()]);
-}
-
 __declspec(naked) void melee_force_decelerate_fixup()
 {
 	// xmm0 - output value

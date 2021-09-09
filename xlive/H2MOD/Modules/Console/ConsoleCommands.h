@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Blam\Cache\DataTypes\DatumIndex.h"
-
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
 
 class ConsoleCommands {
 public:

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BlamTag.h"
-#include "DatumIndex.h"
 
 /*********************************************************************
 * Blam::Cache::DataTypes::tag_reference

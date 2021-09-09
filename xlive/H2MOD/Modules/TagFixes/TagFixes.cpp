@@ -1,7 +1,9 @@
 #include "TagFixes.h"
+
 #include "H2MOD.h"
-#include "Blam/Cache/TagGroups/shader_definition.h"
 #include "Util/Hooks/Hook.h"
+#include "H2MOD/Tags/TagInterface.h"
+#include "Blam/Cache/TagGroups/shader_definition.hpp"
 
 namespace TagFixes
 {
@@ -34,7 +36,7 @@ namespace TagFixes
 								auto bitmap_data = tags::get_tag_data() + (shader_post_bitmap->block_data_offset + (bitmap_idx * 0xC));
 								unsigned long* bitmap = reinterpret_cast<unsigned long*>(bitmap_data);
 								if(*bitmap == bitmap_to_fix.data)
-									*bitmap = datum::Null;
+									*bitmap = NONE;
 							}
 						}
 					}

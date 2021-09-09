@@ -12,7 +12,6 @@
 
 #include "..\net_utils.h"
 
-
 CXnIp gXnIp;
 XECRYPT_RC4_STATE Rc4StateRand;
 
@@ -177,13 +176,9 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 					memcpy(lpBuffers->buf, buffer, *bytesRecvdCount);
 					return 0;
 				}
-
-				// set the bytes received count to 0
-				// pool another packet after, so we keep the game fed with data
-				*bytesRecvdCount = 0;
-				return SOCKET_ERROR;
 			}
 		}
+		break;
 
 		case 'XNeT':
 		{
@@ -191,7 +186,12 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 			if (*bytesRecvdCount == sizeof(XNetRequestPacket)
 				&& strncmp(XNetPck->pckHeader.HdrStr, requestStrHdr, MAX_HDR_STR) == 0)
 			{
-				LOG_TRACE_NETWORK("{} - Received XNetRequest from ip address {:X}, port: {}", __FUNCTION__, ntohl(lpFrom->sin_addr.s_addr), ntohs(lpFrom->sin_port));
+				LOG_TRACE_NETWORK("{} - Received XNetRequest type: {} from ip address {:X}, port: {}", 
+					__FUNCTION__, 
+					(int)XNetPck->data.reqType, 
+					ntohl(lpFrom->sin_addr.s_addr), 
+					ntohs(lpFrom->sin_port));
+
 				HandleXNetRequestPacket(xsocket, XNetPck, lpFrom, bytesRecvdCount); // save NAT info and send back a connection packet
 
 				// set the bytes received count to 0
@@ -200,6 +200,7 @@ int CXnIp::handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 				return SOCKET_ERROR;
 			}
 		}
+		break;
 
 		default:
 			break;
@@ -243,12 +244,12 @@ IN_ADDR CXnIp::GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* 
 			switch (xsocket->getHostOrderSocketPort())
 			{
 			case 1000:
-				if (xsocket->sockAddrInEqual(fromAddr, xnIp->getNatAddr(H2vSocket1000)))
+				if (xsocket->sockAddrInEqual(fromAddr, xnIp->getNatAddr(H2v_sockets::Sock1000)))
 					return xnIp->connectionIdentifier;
 				break;
 
 			case 1001:
-				if (xsocket->sockAddrInEqual(fromAddr, xnIp->getNatAddr(H2vSocket1001)))
+				if (xsocket->sockAddrInEqual(fromAddr, xnIp->getNatAddr(H2v_sockets::Sock1001)))
 					return xnIp->connectionIdentifier;
 				break;
 
@@ -266,7 +267,7 @@ IN_ADDR CXnIp::GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* 
 
 void CXnIp::SaveNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier, sockaddr_in* addr)
 {
-	LOG_INFO_NETWORK("{} - socket: {}, connection index: {}, identifier: {:x}", __FUNCTION__, xsocket->winSockHandle, getConnectionIndex(connectionIdentifier), connectionIdentifier.s_addr);
+	LOG_INFO_NETWORK("{} - socket: {}, connection index: {}, identifier: {:X}", __FUNCTION__, xsocket->winSockHandle, getConnectionIndex(connectionIdentifier), connectionIdentifier.s_addr);
 
 	XnIp* xnIp = getConnection(connectionIdentifier);
 	if (xnIp != nullptr)
@@ -284,12 +285,12 @@ void CXnIp::SaveNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier, sockaddr
 		{
 		case 1000:
 			//LOG_TRACE_NETWORK("SaveConnectionNatInfo() xnIp->NatAddrSocket1000 mapping port 1000 - port: {}, connection identifier: {:x}", htons(addr->sin_port), xnIp->connectionIdentifier.s_addr);
-			xnIp->updateNat(H2vSocket1000, addr);
+			xnIp->updateNat(H2v_sockets::Sock1000, addr);
 			break;
 
 		case 1001:
 			//LOG_TRACE_NETWORK("SaveConnectionNatInfo() xnIp->NatAddrSocket1001 mapping port 1001 - port: {}, connection identifier: {:x}", htons(addr->sin_port), xnIp->connectionIdentifier.s_addr);
-			xnIp->updateNat(H2vSocket1001, addr);
+			xnIp->updateNat(H2v_sockets::Sock1001, addr);
 			break;
 
 		default:
@@ -429,7 +430,7 @@ void CXnIp::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* r
 				}
 				else
 				{
-					LOG_CRITICAL_NETWORK("{} - XnIp_ConnectionDeclareConnected but NAT isn't updated!");
+					LOG_CRITICAL_NETWORK("{} - XnIp_ConnectionDeclareConnected but NAT isn't updated!", __FUNCTION__);
 				}
 				break;
 
@@ -594,8 +595,10 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 
 	XnIp* pXnIpAlreadyRegistered = XnIpLookUp(pxna, pxnkid, &firstUnusedConnectionIndexFound, &firstUnusedConnectionIndex);
 
+	// check if we can create another XnIp identifier, if not already present
+	// and if there's any free spots for a new connection
 	if (firstUnusedConnectionIndexFound 
-		&& pXnIpAlreadyRegistered == nullptr) // check if we can create another XnIp identifier, if not already present
+		&& pXnIpAlreadyRegistered == nullptr) 
 	{
 		int result = registerNewXnIp(firstUnusedConnectionIndex, pxna, pxnkid, outIpIdentifier);
 		if (result == 0 // check if registerNewXnIp was successful
@@ -604,6 +607,12 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 			XnIp* newlyCreatedXnIp = getConnection(*outIpIdentifier);
 			memcpy(newlyCreatedXnIp->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonceOtherSide));
 			newlyCreatedXnIp->otherSideNonceKeyReceived = true;
+
+			LOG_TRACE_NETWORK("{} - updated noOnce key for connection identifier: {:X}, n0nceKey: {}", 
+				__FUNCTION__, 
+				newlyCreatedXnIp->connectionIdentifier.s_addr,
+				ByteToHexStr(newlyCreatedXnIp->connectionNonceOtherSide, 8)
+			);
 
 			// if we received and created this identification after we received a packet, the other side tries to initiate a connection
 			newlyCreatedXnIp->connectionInitiator = true;
@@ -623,6 +632,9 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 		// and the connection Nonce (random number created when registering a new connection), it means the other side tries to re-connect, we clear the old identification, then create a new one
 		// or if there are differences between XNADDRs (like the port or even the IP address) but the MAC address is the same, clear and create another connection
 
+
+		// TODO FIXME: for a small subset of players pXnIpAlreadyRegistered->connectionNonceOtherSide is different from reqPacket->data.nonceKey when connection attempt is in progress
+		// causing the connection to fail
 		if (
 			(reqPacket != nullptr
 			&& pXnIpAlreadyRegistered->otherSideNonceKeyReceived
@@ -649,6 +661,12 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 				// if we received and created this identification after we received a packet, the other side tries to initiate a connection
 				// the game can't know this new connection is about to be created, we just received the packet from the other side
 				newlyCreatedXnIp->connectionInitiator = true;
+
+				LOG_TRACE_NETWORK("{} - otherSideNonceKeyReceived: {} != reqPacket->data.nonceKey: {}",
+					__FUNCTION__,
+					ByteToHexStr(pXnIpAlreadyRegistered->connectionNonceOtherSide, 8),
+					ByteToHexStr(reqPacket->data.nonceKey, 8)
+				);
 			}
 			else if (result == 0) // check if registerNewXnIp was successful
 			{
@@ -665,7 +683,11 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 		if (reqPacket != nullptr
 			&& !pXnIpAlreadyRegistered->otherSideNonceKeyReceived)
 		{
-			LOG_TRACE_NETWORK("{} - updated noOnce key for connection identifier: {:X}", __FUNCTION__, pXnIpAlreadyRegistered->connectionIdentifier.s_addr);
+			LOG_TRACE_NETWORK("{} - updated noOnce key for connection identifier: {:X}, n0ncekey: {}", 
+				__FUNCTION__, 
+				pXnIpAlreadyRegistered->connectionIdentifier.s_addr,
+				ByteToHexStr(reqPacket->data.nonceKey, 8)
+			);
 			memcpy(pXnIpAlreadyRegistered->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonceOtherSide));
 			pXnIpAlreadyRegistered->otherSideNonceKeyReceived = true;
 		}
@@ -707,7 +729,11 @@ int CXnIp::RegisterKey(XNKID* pxnkid, XNKEY* pxnkey)
 		{
 			if (XnKeyPairs[i].bValid == true)
 			{
-				LOG_TRACE_NETWORK("{} - XnKeyPair: xnkid {}, xnkey: {} already registered!", __FUNCTION__, ByteToHexStr(pxnkid->ab, sizeof(pxnkid->ab)), ByteToHexStr(pxnkey->ab, sizeof(pxnkey->ab)));
+				LOG_TRACE_NETWORK("{} - XnKeyPair: xnkid {}, xnkey: {} already registered!", 
+					__FUNCTION__, 
+					ByteToHexStr(pxnkid->ab, sizeof(pxnkid->ab)), 
+					ByteToHexStr(pxnkey->ab, sizeof(pxnkey->ab))
+				);
 				return WSAEALREADY;
 			}
 		}
@@ -802,20 +828,22 @@ void CXnIp::SendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXni
 		sendToAddr.sin_port = xsocket->getNetworkOrderSocketPort();
 
 		XNetRequestPacket reqPacket;
-		SecureZeroMemory(&reqPacket.data, sizeof(XNetRequestPacket::XNetReq));
 
 		reqPacket.data.reqType = reqType;
 		memcpy(reqPacket.data.xnkid.ab, xnIp->keyPair->xnkid.ab, sizeof(XNKID::ab));
 		memcpy(reqPacket.data.nonceKey, xnIp->connectionNonce, sizeof(XnIp::connectionNonce));
+		XNetGetTitleXnAddr(&reqPacket.data.xnaddr);
+
 		switch (reqType)
 		{
 		case XnIp_ConnectionUpdateNAT:
+		case XnIp_ConnectionEstablishSecure:
 			if (xnIp->natIsUpdated())
 				XNIP_SET_BIT(reqPacket.data.flags, XnIp_HasEndpointNATData);
-		case XnIp_ConnectionEstablishSecure:
 			reqPacket.data.connectionInitiator = !xnIp->connectionInitiator;
+			break;
+
 		case XnIp_ConnectionDeclareConnected:
-			XNetGetTitleXnAddr(&reqPacket.data.xnaddr);
 			break;
 
 		case XnIp_ConnectionCloseSecure:
@@ -833,7 +861,13 @@ void CXnIp::SendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXni
 		xnIp->connectionPacketsSentCount++;
 
 		int ret = xsocket->udpSend((char*)&reqPacket, sizeof(XNetRequestPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
-		LOG_INFO_NETWORK("{} - secure packet sent socket handle: {}, connection index: {}, connection identifier: {:x}", __FUNCTION__, xsocket->winSockHandle, gXnIp.getConnectionIndex(connectionIdentifier), sendToAddr.sin_addr.s_addr);
+		LOG_INFO_NETWORK("{} - secure packet sent socket handle: {}, connection index: {}, connection identifier: {:x}, n0nceKey: {}", 
+			__FUNCTION__, 
+			xsocket->winSockHandle, 
+			gXnIp.getConnectionIndex(connectionIdentifier), 
+			sendToAddr.sin_addr.s_addr,
+			ByteToHexStr(reqPacket.data.nonceKey, 8)
+		);
 	}
 	else
 	{
@@ -970,20 +1004,19 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 		SecureZeroMemory(pxnkid->ab, sizeof(pxnkid->ab));
 
 	XnIp* xnIp = gXnIp.getConnection(ina);
-	if (xnIp != nullptr)
+	if (xnIp == nullptr)
 	{
-		if (pxna)
-			*pxna = xnIp->xnaddr;
-
-		if (pxnkid)
-			memcpy(pxnkid->ab, xnIp->keyPair->xnkid.ab, sizeof(XNKID::ab));
-
-		return 0;
+		LOG_CRITICAL_NETWORK("{} - connection index: {}, identifier: {:X} are invalid!", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
+		return WSAEINVAL;
 	}
 
-	LOG_CRITICAL_NETWORK("{} - connection index: {}, identifier: {:X} are invalid!", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
+	if (pxna)
+		*pxna = xnIp->xnaddr;
 
-	return WSAEINVAL;
+	if (pxnkid)
+		memcpy(pxnkid->ab, xnIp->keyPair->xnkid.ab, sizeof(XNKID::ab));
+
+	return 0;
 }
 
 // #63: XNetUnregisterInAddr
@@ -1000,22 +1033,20 @@ int WINAPI XNetConnect(const IN_ADDR ina)
 	LOG_INFO_NETWORK("{} - connection index {}, identifier: {:X}", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
 
 	XnIp* xnIp = gXnIp.getConnection(ina);
-	if (xnIp != nullptr)
+	if (xnIp == nullptr)
+		return WSAEINVAL;
+	
+	// send connect packets only if the state is idle
+	if (xnIp->connectStatus == XNET_CONNECT_STATUS_IDLE)
 	{
-		// send connect packets only if the state is idle
-		if (xnIp->connectStatus == XNET_CONNECT_STATUS_IDLE)
+		if (!xnIp->natIsUpdated())
 		{
-			if (!xnIp->natIsUpdated())
-			{
-				gXnIp.SendXNetRequestAllSockets(ina, XnIp_ConnectionUpdateNAT);
-				xnIp->connectStatus = XNET_CONNECT_STATUS_PENDING; // after we sent, set the state to PENDING
-			}
+			gXnIp.SendXNetRequestAllSockets(ina, XnIp_ConnectionUpdateNAT);
+			xnIp->connectStatus = XNET_CONNECT_STATUS_PENDING; // after we sent, set the state to PENDING
 		}
-
-		return 0;
 	}
 
-	return WSAEINVAL;
+	return 0;
 }
 
 // #66: XNetGetConnectStatus
@@ -1023,14 +1054,23 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 {
 	//LOG_INFO_NETWORK("{} : connection index {}, identifier: {:x}", ipManager.getConnectionIndex(ina), ina.s_addr);
 	XnIp* xnIp = gXnIp.getConnection(ina);
-	if (xnIp != nullptr)
+	if (xnIp == nullptr)
 	{
-		gXnIp.setTimeConnectionInteractionHappened(ina);
-		return xnIp->connectStatus;
+		LOG_CRITICAL_NETWORK("{} - connection index: {}, identifier: {:X} is invalid!", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
+		return XNET_CONNECT_STATUS_LOST;
 	}
 
-	LOG_CRITICAL_NETWORK("{} - connection index: {}, identifier: {:X} is invalid!", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
-	return XNET_CONNECT_STATUS_LOST;
+	if (xnIp->connectStatus == XNET_CONNECT_STATUS_CONNECTED)
+	{
+		gXnIp.setTimeConnectionInteractionHappened(ina);
+	}
+	else if (xnIp->connectStatus < XNET_CONNECT_STATUS_CONNECTED
+		&& timeGetTime() - xnIp->lastConnectionInteractionTime >= XnIp_ConnectionTimeOut)
+	{
+		return XNET_CONNECT_STATUS_LOST;
+	}
+
+	return xnIp->connectStatus;
 }
 
 // #73: XNetGetTitleXnAddr
@@ -1038,15 +1078,11 @@ DWORD WINAPI XNetGetTitleXnAddr(XNADDR * pxna)
 {
 	XnIp* localUserXnIp = gXnIp.GetLocalUserXn();
 
-	if (localUserXnIp)
-	{
-		*pxna = localUserXnIp->xnaddr;
-		return XNET_GET_XNADDR_ETHERNET;
-	}
-	else
-	{
+	if (localUserXnIp == nullptr)
 		return XNET_GET_XNADDR_PENDING;
-	}
+	
+	*pxna = localUserXnIp->xnaddr;
+	return XNET_GET_XNADDR_ETHERNET;
 }
 
 

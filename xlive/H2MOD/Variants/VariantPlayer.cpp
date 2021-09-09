@@ -1,10 +1,13 @@
-#include "stdafx.h"
-#include "Globals.h"
+
 #include "VariantPlayer.h"
+
+#include "Blam/Engine/DataArray/DataArray.h"
+#include "Blam/Engine/Objects/Objects.h"
+#include "Blam/Engine/Players/Players.h"
 
 XUID VariantPlayer::GetXUID(datum _datum, bool player)
 {
-	DatumIterator<s_object_header> objectIt(game_state_objects_header);
+	DatumIterator<s_object_header> objectIt(get_objects_header());
 	s_biped_object_definition* playerUnit = (s_biped_object_definition*)objectIt.get_data_at_index(_datum.ToAbsoluteIndex())->object;
 
 	if (player)
@@ -18,7 +21,7 @@ XUID VariantPlayer::GetXUID(datum _datum, bool player)
 
 datum VariantPlayer::GetPlayerDatum(datum unit_datum)
 {
-	DatumIterator<s_object_header> objectIt(game_state_objects_header);
+	DatumIterator<s_object_header> objectIt(get_objects_header());
 	s_biped_object_definition* playerUnit = (s_biped_object_definition*)objectIt.get_data_at_index(unit_datum.ToAbsoluteIndex())->object;
 
 	return playerUnit->PlayerDatum;

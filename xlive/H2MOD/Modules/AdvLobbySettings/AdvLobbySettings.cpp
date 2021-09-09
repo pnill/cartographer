@@ -1,8 +1,11 @@
-#include "stdafx.h"
 
-#include "Globals.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
+
+#include "H2MOD.h"
+#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
+#include "H2MOD/Modules/Networking/Networking.h"
+
+#include "Util/Hooks/Hook.h"
 
 bool AdvLobbySettings_mp_explosion_physics = false;
 bool AdvLobbySettings_mp_sputnik = false;
@@ -12,8 +15,6 @@ bool AdvLobbySettings_banshee_bomb = false;
 char AdvLobbySettings_mp_blind = false;
 bool AdvLobbySettings_flashlight = false;
 bool AdvLobbySettings_disable_kill_volumes = false;
-
-
 
 static void refresh_mp_explosion_physics() {
 	

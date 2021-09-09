@@ -12,6 +12,8 @@
 
 #define COMPILE_WITH_STD_SOCK_FUNC 1
 
+#define MAX_PACKETS_TO_READ_PER_RECV_CALL 20
+
 // the only needed sockets to be connected
 const static std::unordered_set<int> H2v_socketsToConnect =
 {
@@ -70,7 +72,7 @@ struct XSocket
 	static void socketsDisposeAll();
 
 	static std::vector<XSocket*> Sockets;
-	int recvfrom(LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr *lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine, unsigned int packetsReadCount);
+	int recvfrom(LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr *lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine);
 };
 
 void WINAPI XSocketWSASetLastError(int iError);

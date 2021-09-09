@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Maths/real_math.h"
+#include "Blam/Math/BlamMath.h"
 #include "Blam/Engine/Players/PlayerControls.h"
 
 using namespace Blam::EngineDefinitions::Players;

@@ -1,13 +1,14 @@
 #pragma once
-#include "Blam/Common/Common.h"
-#include "Blam/Cache/DataTypes.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam/Cache/DataTypes/Strings.h"
-#include "Blam/Maths/real_math.h"
+#include "Blam/Math/BlamMath.h"
+
 /*********************************************************************
 * name: model
 * group_tag : hlmt
 * header size : 252
 * *********************************************************************/
+
 #pragma pack(push,1)
 struct s_render_model_group_definition
 {

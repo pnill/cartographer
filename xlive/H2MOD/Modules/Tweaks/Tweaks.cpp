@@ -11,6 +11,12 @@
 #include "..\CustomResolutions\CustomResolutions.h"
 #include "H2MOD/Modules/HudElements/HudElements.h"
 
+#include "H2MOD\Tags\TagInterface.h"
+#include "H2MOD/Modules/Networking/Networking.h"
+#include "Util\Hooks\Hook.h"
+
+#include "Blam\Engine\Game\GameTimeGlobals.h"
+
 #pragma region Done_Tweaks
 
 typedef int(__cdecl *thookServ1)(HKEY, LPCWSTR);
@@ -524,9 +530,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	if (!LOG_CHECK(InitPCCInfo()))
 	{
 		LOG_TRACE_FUNC("Failed to get PCC info / insufficient system resources");
-		run_async(
-			MessageBoxA(NULL, "Failed to get compatibility info.", "PCC Error", S_OK);
-		)
+		std::thread( [=]{ MessageBoxA(NULL, "Failed to get compatibility info.", "PCC Error", S_OK); }).detach();
+
 		show_error_message_by_id(108);
 		// todo: load some default values here?
 	}

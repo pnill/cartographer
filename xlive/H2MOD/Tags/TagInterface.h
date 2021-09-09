@@ -3,7 +3,6 @@
 #include "Blam\Common\Common.h"
 
 #include "Blam\Cache\DataTypes\BlamTag.h"
-#include "Blam\Cache\DataTypes\DatumIndex.h"
 
 namespace tags
 {
@@ -171,7 +170,7 @@ namespace tags
 		if (idx >= get_tag_count())
 		{
 			LOG_ERROR_FUNC("Index out of bounds");
-			return datum::Null;
+			return NONE;
 		}
 		auto instance = get_tag_instances()[idx];
 		datum tag_datum = instance.datum_index;
@@ -283,7 +282,7 @@ namespace tags
 
 		blam_tag type = blam_tag::none(); // type we are searching for
 		long current_index = 0; // current tag idx
-		datum m_datum = datum::Null; // last tag datum we returned
+		datum m_datum = DATUM_NONE; // last tag datum we returned
 
 		datum next()
 		{
@@ -300,7 +299,7 @@ namespace tags
 				}
 			}
 
-			return datum::Null;
+			return DATUM_NONE;
 		}
 
 	};

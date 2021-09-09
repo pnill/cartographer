@@ -1,6 +1,11 @@
-#include "stdafx.h"
-#include "Globals.h"
+
+#include "GunGame.h"
+
+#include "H2MOD.h"
 #include "H2MOD\Engine\Engine.h"
+#include "H2MOD/Modules/Networking/Networking.h"
+
+#include "Util\ReadIniArguments.h"
 
 using namespace NetworkSession;
 
@@ -115,21 +120,21 @@ void GunGame::initWeaponLevels() {
 		GunGame::levelWeapon[13] = weaponDatums[weapon_fourteen];
 		GunGame::levelWeapon[14] = weaponDatums[weapon_fiffteen];
 	} else {
-		GunGame::levelWeapon[0] = Weapon::energy_blade_useless;
-		GunGame::levelWeapon[1] = Weapon::needler;
-		GunGame::levelWeapon[2] = Weapon::plasma_pistol;
-		GunGame::levelWeapon[3] = Weapon::magnum;
-		GunGame::levelWeapon[4] = Weapon::smg;
-		GunGame::levelWeapon[5] = Weapon::plasma_rifle;
-		GunGame::levelWeapon[6] = Weapon::brute_plasma_rifle;
-		GunGame::levelWeapon[7] = Weapon::juggernaut_powerup;
-		GunGame::levelWeapon[8] = Weapon::shotgun;
-		GunGame::levelWeapon[9] = Weapon::brute_shot;
-		GunGame::levelWeapon[10] = Weapon::covenant_carbine;
-		GunGame::levelWeapon[11] = Weapon::battle_rifle;
-		GunGame::levelWeapon[12] = Weapon::beam_rifle;
-		GunGame::levelWeapon[13] = Weapon::sniper_rifle;
-		GunGame::levelWeapon[14] = Weapon::rocket_launcher;
+		GunGame::levelWeapon[0] = e_weapons_datum_index::energy_blade_useless;
+		GunGame::levelWeapon[1] = e_weapons_datum_index::needler;
+		GunGame::levelWeapon[2] = e_weapons_datum_index::plasma_pistol;
+		GunGame::levelWeapon[3] = e_weapons_datum_index::magnum;
+		GunGame::levelWeapon[4] = e_weapons_datum_index::smg;
+		GunGame::levelWeapon[5] = e_weapons_datum_index::plasma_rifle;
+		GunGame::levelWeapon[6] = e_weapons_datum_index::brute_plasma_rifle;
+		GunGame::levelWeapon[7] = e_weapons_datum_index::juggernaut_powerup;
+		GunGame::levelWeapon[8] = e_weapons_datum_index::shotgun;
+		GunGame::levelWeapon[9] = e_weapons_datum_index::brute_shot;
+		GunGame::levelWeapon[10] = e_weapons_datum_index::covenant_carbine;
+		GunGame::levelWeapon[11] = e_weapons_datum_index::battle_rifle;
+		GunGame::levelWeapon[12] = e_weapons_datum_index::beam_rifle;
+		GunGame::levelWeapon[13] = e_weapons_datum_index::sniper_rifle;
+		GunGame::levelWeapon[14] = e_weapons_datum_index::rocket_launcher;
 	}
 }
 

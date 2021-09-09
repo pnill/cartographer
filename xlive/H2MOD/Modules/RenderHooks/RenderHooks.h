@@ -1,8 +1,5 @@
 #pragma once
 
-
-extern bool ras_layer_overrides[25];
-extern bool geo_render_overrides[24];
 namespace RenderHooks
 {
 	enum e_layer_type : int
@@ -37,7 +34,9 @@ namespace RenderHooks
 		// main menu background blur
 		unk_23 = 23,
 		unk_24 = 24,
-		unk_25 = 25
+		unk_25 = 25,
+
+		end = unk_25
 	};
 	enum e_render_geometry_type
 	{
@@ -71,3 +70,6 @@ namespace RenderHooks
 	void ApplyHooks();
 	void Initialize();
 }
+
+extern bool ras_layer_overrides[RenderHooks::end];
+extern bool geo_render_overrides[24];

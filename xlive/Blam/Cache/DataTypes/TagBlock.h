@@ -1,19 +1,17 @@
 #pragma once
 
-#include "..\H2MOD\Tags\TagInterface.h"
-
-
-
 template<typename T = void>
 struct tag_block
 {
 	size_t size;
 	size_t data;
+
 	int data_size() const
 	{
 		return size * sizeof(T);
 	}
-	T *begin()
+
+	T* begin()
 	{
 		if (this->data != NONE)
 		{
@@ -24,7 +22,7 @@ struct tag_block
 		return nullptr;
 	}
 
-	T *end()
+	T* end()
 	{
 		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
 		if (this->begin())
@@ -33,7 +31,7 @@ struct tag_block
 			return nullptr;
 	}
 
-	T *operator[](size_t index)
+	T* operator[](size_t index)
 	{
 		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
 		if (index == NONE)

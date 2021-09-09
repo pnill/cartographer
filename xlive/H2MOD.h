@@ -5,7 +5,9 @@
 
 #include "Blam\Engine\Game\GameEngine.h"
 #include "Blam\Engine\Players\Players.h"
-#include "Blam\Common\Common.h"
+
+#include "H2MOD/Variants/VariantPlayer.h"
+#include "H2MOD/Variants/Variants.h"
 
 enum SoundType
 {
@@ -62,7 +64,6 @@ public:
 		e_engine_type GetEngineType() { return engineType; }
 		void SetCurrentEngineType(e_engine_type value) { engineType = value; }
 
-		std::unordered_map<std::string, bool> AchievementMap;
 		std::deque<std::wstring> CustomSounds;
 		
 		std::mutex sound_mutex;
@@ -75,4 +76,7 @@ private:
 };
 
 extern H2MOD* h2mod;
+extern VariantPlayer* variant_player;
+extern DeviceShop* device_shop;
 
+extern s_datum_array* game_state_actors;

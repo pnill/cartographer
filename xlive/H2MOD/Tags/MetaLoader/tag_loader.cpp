@@ -2,13 +2,14 @@
 #include "tag_loader.h"
 #include "..\Util\filesys.h"
 
-#include "Globals.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 
 #include "Blam\Common\Common.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 #include "Blam/Cache/TagGroups/model_defenition.hpp"
+
+#include "Util/Hooks/Hook.h"
 
 //contains some game functions that returns HANDLE
 namespace global_handle_function
@@ -249,7 +250,7 @@ namespace tag_loader
 		}*/
 		fin->close();
 		delete fin;
-		return datum::Null;
+		return DATUM_NONE;
 	}
 	//Loads a tag from specified map in accordance with the datum index supplied
 	///custom flag is no more needed
@@ -1056,7 +1057,7 @@ namespace tag_loader
 			if (ref.old_datum == oldDatum)
 				return datum(ref.new_datum);
 		}
-		return datum::Null;
+		return DATUM_NONE;
 	}
 
 #pragma region query_parser

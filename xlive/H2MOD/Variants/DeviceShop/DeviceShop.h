@@ -1,4 +1,7 @@
 #pragma once
+
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+
 enum item_type {
 	generic_item,
 	weapon_item,

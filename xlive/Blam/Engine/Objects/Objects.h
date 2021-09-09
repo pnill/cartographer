@@ -1,7 +1,8 @@
 ﻿#pragma once
 
-#include "Blam\Maths\Maths.h"
-#include "Blam\Cache\DataTypes.h"
+#include "Blam\Math\BlamMath.h"
+
+#include "Blam\Engine\DataArray\DataArray.h"
 
 enum e_object_team : BYTE
 {
@@ -164,13 +165,13 @@ struct s_biped_object_definition : object_base_definition
 	e_biped_physics_mode unitState;//0x3F4
 	BYTE unk_18[0x21C];
 };
-static_assert(sizeof(s_biped_object_definition) == 0x480, "Invalid s_biped_object_definition size");
+CHECK_STRUCT_SIZE(s_biped_object_definition, 0x480);
 
 struct s_weapon_object_definition : object_base_definition
 {
 	char gap[0x25C - sizeof(object_base_definition)];
 };
-static_assert(sizeof(s_weapon_object_definition) == 0x25C, "Invalid s_weapon_object_definition size");
+CHECK_STRUCT_SIZE(s_weapon_object_definition, 0x25C);
 
 struct s_object_header {
 	__int16 datum_salt; //0x00
@@ -180,4 +181,19 @@ struct s_object_header {
 	__int16 unk_size;  //0x06
 	char* object; //0x08 - 
 };
-static_assert(sizeof(s_object_header) == 0xC, "Invalid s_object_header size");
+CHECK_STRUCT_SIZE(s_object_header, 0xC);
+
+static s_datum_array* get_objects_header()
+{
+	return *Memory::GetAddress<s_datum_array**>(0x4E461C, 0x50C8EC);
+};
+
+static s_object_header* get_objects_header(datum object_index)
+{
+	/*
+		Gets the header of the object, containing some details
+	*/
+
+	auto objects_header = get_objects_header();
+	return (s_object_header*)(&objects_header->datum[objects_header->datum_element_size * object_index.ToAbsoluteIndex()]);
+}

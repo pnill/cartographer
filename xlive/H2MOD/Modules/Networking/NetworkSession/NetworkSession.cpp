@@ -111,7 +111,7 @@ wchar_t* NetworkSession::getPeerPlayerName(int peerIndex)
 /* Otherwise you will wonder why you don't get the right data/player index etc. */
 bool NetworkSession::playerIsActive(int playerIndex)
 {
-	return NetworkSession::getCurrentNetworkSession()->membership.players_active_mask & FLAG(playerIndex);
+	return (NetworkSession::getCurrentNetworkSession()->membership.players_active_mask & FLAG(playerIndex)) != 0;
 }
 
 int NetworkSession::getPlayerCount()
@@ -257,8 +257,9 @@ void NetworkSession::logPeersToConsole() {
 			outStr += L", Peer Name=";
 			outStr += getCurrentNetworkSession()->membership.peer_info[peerIndex].name;
 			outStr += L", Connection Status=";
-			outStr += std::to_wstring(peer_observer->unk_state);
+			outStr += std::to_wstring(peer_observer->state);
 			int playerIndex = getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index[0];
+			outStr += L", Peer map state: " + std::to_wstring(getCurrentNetworkSession()->membership.peer_info[peerIndex].map_status);
 			if (playerIndex != -1) 
 			{
 				outStr += L", Player index=" + std::to_wstring(playerIndex);
@@ -267,6 +268,7 @@ void NetworkSession::logPeersToConsole() {
 
 				outStr += L", Name from game player state=";
 				outStr += Player::getName(playerIndex);
+
 			}
 			commands->output(outStr);
 

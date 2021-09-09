@@ -2,19 +2,6 @@
 #include "VariantMPGameEngine.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 
-// should really move this function into some header
-// helper function for getting a pointer to some game data
-template <typename T = void>
-static inline T *GetAddress(DWORD client, DWORD server = 0)
-{
-	DWORD addr = NULL;
-	if (H2IsDediServer && server)
-		addr = H2BaseAddr + server;
-	if (!H2IsDediServer && client)
-		addr = H2BaseAddr + client;
-	return LOG_CHECK(reinterpret_cast<T*>(addr));
-}
-
 std::unordered_map<size_t, c_game_engine_base*> custom_engines;
 // returns the custom engine for a given engine pointer
 c_game_engine_base *get_custom_engine(size_t thisptr)
@@ -91,7 +78,7 @@ struct c_game_engine_vtable
 	c_engine_func_proto_ptr(unk_function_50, bool, __int16 a1, __int16 a2, int a3, int a4);
 	c_engine_func_proto_ptr(unk_function_51, int, int arg1, int arg2, int arg3, int arg4, int arg5);
 };
-static_assert(sizeof(c_game_engine_vtable) == 0xCC, "Bad size");
+static_assert(sizeof(c_game_engine_vtable) == 0xCC, "Bad c_game_engine_vtable size");
 
 struct c_engine_internal
 {
@@ -100,12 +87,12 @@ struct c_engine_internal
 
 c_game_engine_vtable *get_c_slayer_engine()
 {
-	return GetAddress<c_game_engine_vtable>(0x3C2F3C);
+	return Memory::GetAddress<c_game_engine_vtable*>(0x3C2F3C);
 }
 
 c_engine_internal ** get_game_mode_engines()
 {
-	return GetAddress<c_engine_internal*>(0x4D8548);
+	return Memory::GetAddress<c_engine_internal**>(0x4D8548);
 }
 
 /*

@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
 
 /*********************************************************************
 * name: item_collection

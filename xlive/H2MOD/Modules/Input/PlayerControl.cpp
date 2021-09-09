@@ -40,5 +40,5 @@ s_player_control* PlayerControl::GetControls(int local_player_index)
 
 s_player_motion* PlayerControl::GetPlayerMotion(int player_index)
 {
-	return Memory::GetAddress<s_player_motion*>(0x514EE8 + player_index * sizeof(s_player_motion));;
+	return Memory::GetAddress<s_player_motion*>(0x514EE8 + player_index * sizeof(s_player_motion));
 }

@@ -1,5 +1,7 @@
 #pragma once
-#include "Blam\Cache\DataTypes.h"
+
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam\Math\BlamMath.h"
 
 #pragma pack(push,1)
 struct character_tag_group
