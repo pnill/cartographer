@@ -161,6 +161,7 @@ void SaveH2Config() {
 	else {
 #pragma region Put Data To File
 		CSimpleIniA ini;
+		ini.SetUnicode();
 
 		std::fstream iniStringBuffer(fileConfig);
 		iniStringBuffer <<
@@ -441,8 +442,6 @@ void SaveH2Config() {
 		if (!H2IsDediServer) {
 			std::string lang_str(std::to_string(H2Config_language.code_main) + "x" + std::to_string(H2Config_language.code_variant));
 			ini.SetValue(H2ConfigVersionSection.c_str(), "language_code", lang_str.c_str());
-
-			
 		}
 
 		if (!H2IsDediServer) {
@@ -593,7 +592,6 @@ void SaveH2Config() {
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat)).c_str());
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_guide", H2Config_hotkeyIdGuide, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdGuide)).c_str());
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_console", H2Config_hotkeyIdConsole, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdConsole)).c_str());
-
 		}
 
 		ini.SaveFile(fileConfig);
