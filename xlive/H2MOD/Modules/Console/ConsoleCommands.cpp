@@ -7,7 +7,6 @@
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\ServerConsole\ServerConsole.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
 
@@ -721,10 +720,6 @@ void ConsoleCommands::handle_command(std::string command) {
 			else {
 				output(L"Wrong input! Use a number.");
 			}
-			return;
-		}
-		else if (firstCommand == "$netstats") {
-			NetworkStatistics = !NetworkStatistics;
 			return;
 		}
 		else if (firstCommand == "$lognetworksessionoffsets") {
