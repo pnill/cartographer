@@ -9,7 +9,6 @@
 #include "H2MOD/Modules/Networking/Networking.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
-#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.h"
 #include "H2MOD/GUI/GUI.h"

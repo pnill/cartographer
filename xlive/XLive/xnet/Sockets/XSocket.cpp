@@ -2,7 +2,6 @@
 #include "XLive\xnet\Sockets\XSocket.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 
 #include "XLive\xnet\net_utils.h"
 
@@ -457,7 +456,6 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			xnIp->pckSent++;
 			xnIp->bytesSent += result;
 #endif
-			updateSendToStatistics(packetsSent, *lpNumberOfBytesSent);
 		}
 
 		return 0;

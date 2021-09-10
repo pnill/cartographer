@@ -8,7 +8,6 @@
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "imgui_integration/imgui_handler.h"
-#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD/Modules/Networking/Networking.h"
 #include "H2MOD/Modules/Achievements/Achievements.h"
 
@@ -664,11 +663,6 @@ int WINAPI XLiveRender()
 			if (Size_Of_Download > 0) {
 				drawBox(10, 52, 200, 6, COLOR_RED, COLOR_RED);
 				drawBox(10, 52, ((Size_Of_Downloaded * 100) / Size_Of_Download) * 2, 6, COLOR_GREEN, COLOR_GREEN);
-			}
-
-			if (NetworkStatistics && NetworkSession::getCurrentNetworkSession(NULL)) {
-				sprintf(packet_info_str, "[ pck/second %d, pck size average: %d ]", packetsPerSecondAvg, packetSizeAvg);
-				drawText(30, 30, COLOR_WHITE, packet_info_str, normalSizeFont);
 			}
 
 			if(imgui_handler::CanDrawImgui())
