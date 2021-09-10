@@ -103,7 +103,7 @@ void SaveH2Accounts() {
 	addDebugText("Saving H2Accounts File...");
 
 	if (TestAccountConfigLock()) {
-		addDebugText("Mutex is Ours!");
+		addDebugText("Mutex is ours!");
 
 		wchar_t fileConfigPath[1024];
 		if (H2Portable) {
@@ -124,15 +124,14 @@ void SaveH2Accounts() {
 		}
 		else {
 #pragma region Put Data To File
-			std::fstream fileStream(fileConfig);
 			CSimpleIniA ini;
+			ini.SetUnicode();
 
-			fileStream <<
+			std::fstream(fileConfig) << 
 				"#--- Halo 2 Project Cartographer Accounts File ---"
 				"\n\n"
 				"# DO NOT SHARE THE CONTENTS OF THIS FILE."
-				"\n\n"
-				;
+				"\n\n";
 
 			ini.SetLongValue(H2AccConfigVersionStr.c_str(), "last_used", H2AccountLastUsed);
 			ini.SetLongValue(H2AccConfigVersionStr.c_str(), "account_count", H2AccountCount);
@@ -312,7 +311,7 @@ bool ReadH2Accounts() {
 
 	addDebugText(L"Reading Accounts: \"%ws\"", fileConfigPath);
 	if (TestGetAccountConfigLock(fileConfigPath)) {
-		addDebugText("Mutex Obtained!");
+		addDebugText("Mutex obtained!");
 
 		FILE* fileConfig = _wfopen(fileConfigPath, L"rb");
 
@@ -321,7 +320,7 @@ bool ReadH2Accounts() {
 		}
 		else {
 
-			//clear the buffers before reading any accounts from the file
+			// clear the buffers before reading any accounts from the file
 			H2AccountBufferFree();
 
 			CSimpleIniA ini;
@@ -350,7 +349,7 @@ bool ReadH2Accounts() {
 				} 
 				else if (AccountCount == -1)
 				{
-					//If AccountCount is not found it's probably an old config file
+					// if AccountCount is not found it's probably an old config file
 					FILE* fileConfig1 = _wfopen(fileConfigPath, L"rb");
 					addDebugText("Old accounts file detected");
 					ReadIniFile(fileConfig1, true, "[H2AccountsVersion:%[^]]]", "1", interpretConfigSetting);
