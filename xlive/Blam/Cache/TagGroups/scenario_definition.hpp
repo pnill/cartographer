@@ -1287,7 +1287,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		__int16 object_name;//0x4
 		PAD(0x2);//0x6
 		string_id node_name;//0x8
-		PAD(6 * 4);//0xC
+		real_point3d forward;
+		real_point3d up;
 		real_point3d position;//0x24
 		real_point3d extents;//0x30
 

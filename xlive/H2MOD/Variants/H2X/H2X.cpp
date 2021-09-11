@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "H2MOD\Variants\H2X\H2X.h"
 #include "..\H2MOD.h"
+#include "Blam/Engine/Objects/GameStateObjects.h"
+#include "Blam/Cache/TagGroups/weapon_definition.hpp"
+#include "Blam/Cache/TagGroups/shader_definition.h"
 
 
 std::vector<H2X::h2x_mod_info> weapons =
@@ -30,7 +33,16 @@ __declspec(naked) void time_globals_seconds_to_ticks()
 		ret
 	}
 }
-
+void __cdecl game_state_weapon_set_recovery_time(unsigned __int16 object_index, __int16 barrel_index)
+{
+	//auto gamestate_weapon = (int*)s_game_state_objects::getObject(object_index);
+	//auto weapon_tag = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(*gamestate_weapon);
+	//auto gamestate_weapon_barrel = (int*)&gamestate_weapon[13 * barrel_index + 0x69];
+	//auto calc_recovery = weapon_tag->barrels[barrel_index]->fire_recovery_time * (59.0f / 52.0f);
+	//auto recovery_ticks = time_globals::seconds_to_ticks_precise(calc_recovery);
+	//auto recovery_floor = floorf(recovery_ticks);
+	//auto revocery_real = (int)recovery_floor;
+}
 void H2X::Initialize(bool enable)
 {
 	/*

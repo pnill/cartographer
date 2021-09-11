@@ -31,8 +31,8 @@ namespace lazy_blam
 			{
 			public:
 				static void object(lazy_blam* blam, lazy_blam_tag_instance* instance);
-				static int unit(std::ifstream* stream, lazy_blam_tag_instance* instance);
-
+				static void unit(lazy_blam* blam, lazy_blam_tag_instance* instance);
+				static void biped(lazy_blam* blam, lazy_blam_tag_instance* instance);
 				static void weapon(lazy_blam* blam, lazy_blam_tag_instance* instance);
 			};
 		public:
@@ -72,15 +72,10 @@ namespace lazy_blam
 
 				if (tag_inst == nullptr)
 					return nullptr;
-				//LOG_INFO_GAME("[{}] tag_instance found for {:x} {:x} {}", __FUNCTION__, tag_datum.ToInt(), tag_inst->datum_index.ToInt() ,tag_inst->name);
-
-				//LOG_INFO_GAME("[{}] tag_data_address {}", __FUNCTION__, (unsigned int)*tag_data);
+				
 				if (tag_inst->data.size == 0)
 				{
-
 					LOG_INFO_GAME("[{}] Init Data for: {:x} {:x} {}", __FUNCTION__, tag_datum.ToInt(), (unsigned int)tag_inst->data.buffer, tag_inst->name);
-					//map_stream->seekg(resolve_data_offset(tag_inst->data_offset));
-					//map_stream->read(*tag_data, tag_inst->size);
 					load_tag_data(tag_inst);
 					rebase_tag_data(tag_inst);
 				}

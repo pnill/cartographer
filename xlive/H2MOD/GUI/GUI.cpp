@@ -160,7 +160,6 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 
 	imgui_handler::ReleaseTextures();
 	ImGui_ImplDX9_InvalidateDeviceObjects();
-	ImGui_ImplDX9_CreateDeviceObjects();
 	//pDevice->Reset(pD3DPP);
 	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
 	return 0;

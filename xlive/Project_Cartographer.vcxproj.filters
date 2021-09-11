@@ -411,6 +411,7 @@
     <ClInclude Include="Blam\Cache\cache_header.h" />
     <ClInclude Include="Blam\LazyBlam\LazyBlam.hpp" />
     <ClInclude Include="Blam\LazyBlam\TagTable.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\light_defenition.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

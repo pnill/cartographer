@@ -21,3 +21,8 @@ void* s_game_state_objects::getObject(datum objectDatum)
         return nullptr;
     return (void*)&getArray()->datum[objectDatum.ToAbsoluteIndex() * getArray()->datum_element_size];
 }
+
+void* s_game_state_objects::getObject(short objectIndex)
+{
+	return (void*)&getArray()->datum[objectIndex * getArray()->datum_element_size + 8];
+}

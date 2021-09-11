@@ -2,6 +2,7 @@
 #include "H2MOD.h"
 #include "Blam/Cache/TagGroups/shader_definition.h"
 #include "Util/Hooks/Hook.h"
+#include "Blam/Cache/TagGroups/light_defenition.h"
 
 namespace TagFixes
 {

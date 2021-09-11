@@ -7,4 +7,5 @@ struct s_game_state_objects
     static s_datum_array* getArray();
     static bool indexValid(datum objectDatum);
     static void* getObject(datum objectDatum);
+	static void* getObject(__int16 objectIndex);
 };

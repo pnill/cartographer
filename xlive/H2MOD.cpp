@@ -760,6 +760,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 	get_object_table_memory();
 
 	H2Tweaks::setHz();
+
 	// when the game is minimized, the game might skip loading Main menu
 	// this is where resetAfterMatch var comes in for help
 	if (resetAfterMatch)
@@ -1517,6 +1518,7 @@ char __cdecl test_shader_hook(__int16 a1, int a2, __int16 a3, int a4)
 }
 
 
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1673,7 +1675,7 @@ void H2MOD::Initialize()
 	TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
-	KantTesting::Initialize();
+	//KantTesting::Initialize();
 	LOG_TRACE_GAME("H2MOD - Initialized v0.5a");
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", Memory::baseAddress);
 	//WriteValue(GetAddress(0xC25EA + 8), 100);
