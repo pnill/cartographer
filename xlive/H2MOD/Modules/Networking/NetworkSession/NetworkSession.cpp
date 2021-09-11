@@ -27,10 +27,36 @@ bool NetworkSession::localPeerIsSessionHost()
 {
 	e_network_session_state state = getCurrentNetworkSession()->local_session_state;
 
-	return state == network_session_state_host_established
-		|| state == network_session_state_host_disband
-		|| state == network_session_state_host_handoff
-		|| state == network_session_state_host_reestablish;
+	return state == _network_session_state_host_established
+		|| state == _network_session_state_host_disband
+		|| state == _network_session_state_host_handoff
+		|| state == _network_session_state_host_reestablish;
+}
+
+bool NetworkSession::localPeerIsEstablished()
+{
+	e_network_session_state state = getCurrentNetworkSession()->local_session_state;
+
+	switch (state)
+	{
+	case _network_session_state_none:
+	case _network_session_state_peer_joining:
+	case _network_session_state_peer_join_abort:
+	case _network_session_state_election:
+	case _network_session_state_unk_2:
+		return false;
+
+	case _network_session_state_peer_established:
+	case _network_session_state_peer_leaving:
+	case _network_session_state_host_established:
+	case _network_session_state_host_disband:
+	case _network_session_state_host_handoff:
+	case _network_session_state_host_reestablish:
+		return true;
+
+	default:
+		return false;
+	}
 }
 
 signed int NetworkSession::getPeerIndexFromNetworkAddress(network_address* address)
@@ -67,20 +93,6 @@ int NetworkSession::getPeerIndex(int playerIndex)
 	return getPlayerInformation(playerIndex)->peer_index;
 }
 
-long long NetworkSession::getPeerXUID(int peerIndex)
-{
-	if(getPeerCount() > 0)
-	{
-		int playerIndex = 0;
-		do
-		{
-			if (getPeerIndex(playerIndex) == peerIndex)
-				return getPlayerXuid(playerIndex);
-			playerIndex++;
-		} while (playerIndex < 16);
-	}
-	return NONE;
-}
 wchar_t* NetworkSession::getPeerPlayerName(int peerIndex)
 {
 	if (getPeerCount() > 0)
@@ -99,7 +111,7 @@ wchar_t* NetworkSession::getPeerPlayerName(int peerIndex)
 /* Otherwise you will wonder why you don't get the right data/player index etc. */
 bool NetworkSession::playerIsActive(int playerIndex)
 {
-	return NetworkSession::getCurrentNetworkSession()->membership.players_active_mask & FLAG(playerIndex);
+	return (NetworkSession::getCurrentNetworkSession()->membership.players_active_mask & FLAG(playerIndex)) != 0;
 }
 
 int NetworkSession::getPlayerCount()
@@ -245,8 +257,9 @@ void NetworkSession::logPeersToConsole() {
 			outStr += L", Peer Name=";
 			outStr += getCurrentNetworkSession()->membership.peer_info[peerIndex].name;
 			outStr += L", Connection Status=";
-			outStr += std::to_wstring(peer_observer->unk_state);
+			outStr += std::to_wstring(peer_observer->state);
 			int playerIndex = getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index[0];
+			outStr += L", Peer map state: " + std::to_wstring(getCurrentNetworkSession()->membership.peer_info[peerIndex].map_status);
 			if (playerIndex != -1) 
 			{
 				outStr += L", Player index=" + std::to_wstring(playerIndex);
@@ -255,6 +268,7 @@ void NetworkSession::logPeersToConsole() {
 
 				outStr += L", Name from game player state=";
 				outStr += Player::getName(playerIndex);
+
 			}
 			commands->output(outStr);
 

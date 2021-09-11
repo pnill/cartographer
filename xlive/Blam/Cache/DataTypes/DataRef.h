@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Common/Common.h"
+#include "BlamPrimitiveType.h"
 
 /*********************************************************************
 * data_block
@@ -13,7 +13,7 @@ struct data_block
 		block_size(BlockSize)
 	{
 	}
-	
+
 	data_block(uint32_t _block_size, uint32_t _block_offset) :
 		block_size(_block_size),
 		block_offset(_block_offset)
@@ -23,6 +23,6 @@ struct data_block
 	uint32_t block_size = 0;
 	//Offset from Tag Data start
 	uint32_t block_offset = 0;
-		
+
 };
 CHECK_STRUCT_SIZE(data_block, 8);

@@ -1,7 +1,6 @@
-#include "stdafx.h"
 #include "XAchievements.h"
 
-#include "Globals.h"
+#include "H2MOD/Modules/Achievements/Achievements.h"
 
 int achievementCount = 0;
 int achievementEnumeratorFlags = 0;
@@ -203,7 +202,7 @@ DWORD WINAPI XUserWriteAchievements(DWORD dwNumAchievements, PXUSER_ACHIEVEMENT 
 					break;
 				}
 
-				h2mod->AchievementMap[AchievementData.c_str()] = false;
+				AchievementMap[AchievementData.c_str()] = false;
 
 				std::thread(AchievementUnlock, usersSignInInfo[0].xuid, AchievementID, pOverlapped).detach();
 			}
@@ -220,7 +219,8 @@ DWORD WINAPI XUserWriteAchievements(DWORD dwNumAchievements, PXUSER_ACHIEVEMENT 
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
 		pOverlapped->InternalHigh = dwNumAchievements;
-		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+		pOverlapped->dwExtendedError = 0;
+
 		return ERROR_IO_PENDING;
 	}
 
@@ -296,7 +296,7 @@ int AchievementEnumerator(DWORD cbBuffer, CHAR* pvBuffer, PDWORD pcItemsReturned
 	else
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+		pOverlapped->dwExtendedError = 0;
 
 		return ERROR_IO_PENDING;
 	}

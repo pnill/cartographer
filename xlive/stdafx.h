@@ -79,4 +79,12 @@ extern std::random_device rd;
 #pragma warning(error: 4700)
 #pragma endregion
 
+#define STRINGIFY(x) #x
+
+// use this macro to define _time and _clock namespaces
+#define CHRONO_DEFINE_TIME_AND_CLOCK() \
+	namespace _time = std::chrono; \
+	using _clock = std::chrono::steady_clock; \
+	using namespace std::chrono_literals; \
+
 #undef small

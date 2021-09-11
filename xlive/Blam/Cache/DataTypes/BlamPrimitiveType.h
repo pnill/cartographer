@@ -1,24 +1,28 @@
 #pragma once
 
-#include "Blam/Common/Common.h"
+#include "Blam\Common\Common.h"
 
-/*********************************************************************
-* datum / DatumIndex
-* 4 BYTE Tag Structure for any TagIndices of Halo 2 CacheFiles
-**********************************************************************/
+#define NONE -1
+
+// floating point definitions
+typedef float real;
 
 struct datum
 {
-	//Default Constructor
-	datum()
+	//Default constructors
+	datum() 
+		: data(NONE)
 	{
-		this->Index = -1;
-		this->Salt = -1;
 	}
-	//Copy Constructor
-	datum(INT32 Identifier)
+
+	datum(const datum& other) 
+		: data(other.data)
 	{
-		this->data = Identifier;
+	}
+
+	datum(int index)
+	{
+		this->data = index;
 	}
 
 	constexpr datum(short _index, short _salt) :
@@ -27,12 +31,10 @@ struct datum
 	{
 	}
 
-	static constexpr INT32 Null = 0xFFFFFFFF;
-
 	//Returns true is datum is not Invalid
 	inline bool IsNull() const
 	{
-		return this->Salt == -1 && this->Index == -1;
+		return this->Salt == NONE && this->Index == NONE;
 	}
 
 	inline unsigned long ToInt() const
@@ -54,15 +56,14 @@ struct datum
 	{
 		return this->data != other.data;
 	}
-	inline bool operator<(const short &Value) const
+	inline bool operator<(const short &other) const
 	{
-		return this->Index < Value;
+		return this->Index < other;
 	}
-	inline bool operator<(const datum &datum) const
+	inline bool operator<(const datum &other) const
 	{
-		return this->Index < datum.Index;
+		return this->Index < other.Index;
 	}
-
 
 	inline std::string ToString() const
 	{
@@ -75,10 +76,12 @@ struct datum
 
 	union {
 		struct {
-			signed short Index;
-			signed short Salt;
+			short Index;
+			short Salt;
 		};
-		unsigned long data;
+		int data;
 	};
 };
 CHECK_STRUCT_SIZE(datum, 4);
+
+#define DATUM_NONE datum(NONE)

@@ -432,7 +432,7 @@ void ServerList::GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer)
 			{
 				ovelapped->InternalLow = ERROR_SUCCESS;
 				ovelapped->InternalHigh = this->GetTotalServers();
-				ovelapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+				ovelapped->dwExtendedError = 0;
 			}
 
 			this->ServersLeftInDocumentCount--;
@@ -604,7 +604,7 @@ void ServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 
 	pOverlapped->InternalLow = ERROR_SUCCESS;
 	pOverlapped->InternalHigh = 0;
-	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+	pOverlapped->dwExtendedError = 0;
 }
 
 void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
@@ -718,7 +718,7 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 
 	pOverlapped->InternalLow = ERROR_SUCCESS;
 	pOverlapped->InternalHigh = 0;
-	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+	pOverlapped->dwExtendedError = 0;
 }
 
 DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
@@ -771,7 +771,7 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 
 	pOverlapped->InternalLow = ERROR_SUCCESS;
 	pOverlapped->InternalHigh = 0;
-	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+	pOverlapped->dwExtendedError = 0;
 
 	return S_OK;
 }

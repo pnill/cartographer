@@ -17,26 +17,26 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}</ProjectGuid>
     <ProjectName>xlive</ProjectName>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -122,13 +122,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <MinimalRebuild>false</MinimalRebuild>
       <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdparty/discord/discord-rpc.lib;3rdparty/libcurl/libssl.lib;3rdparty/libcurl/libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;libminiupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdparty/discord/discord-rpc.lib;3rdparty/libcurl/libssl.lib;3rdparty/libcurl/libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -185,13 +186,14 @@
       <ExceptionHandling>Async</ExceptionHandling>
       <DisableSpecificWarnings>4800;4244</DisableSpecificWarnings>
       <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;miniupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdparty\discord\discord-rpc-debug.lib;3rdparty/libcurl/libssl.lib;3rdparty/libcurl/libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;libminiupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdparty\discord\discord-rpc-debug.lib;3rdparty/libcurl/libssl.lib;3rdparty/libcurl/libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -241,13 +243,14 @@
       <ExceptionHandling>Async</ExceptionHandling>
       <DisableSpecificWarnings>4800;4244</DisableSpecificWarnings>
       <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;discord/discord-rpc-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;libprotobuf.lib;d3d9.lib;d3dx9.lib;Winmm.lib;discord/discord-rpc-debug.lib;libminiupnpc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -291,8 +294,9 @@
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
+    <ClCompile Include="H2MOD\Modules\GamePhysics\MeleeLunge.cpp" />
     <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
-    <ClCompile Include="H2MOD\Modules\HitFix\MeleeFix.cpp" />
+    <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.cpp" />
     <ClCompile Include="H2MOD\Modules\HudElements\HudElements.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
@@ -308,7 +312,6 @@
     <ClCompile Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
-    <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\OverridePackets\OverridePackets.cpp" />
     <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
@@ -341,7 +344,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Globals.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="H2MOD\Discord\DiscordInterface.cpp" />
     <ClCompile Include="H2MOD\GUI\GUI.cpp" />
@@ -358,7 +360,7 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_list_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\HitFix\HitFix.cpp">
+    <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp">
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NoExtensions</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NoExtensions</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">NoExtensions</EnableEnhancedInstructionSet>
@@ -506,6 +508,8 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h" />
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
     <ClInclude Include="Blam\Cache\cache_header.h" />
+    <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
+    <ClInclude Include="Blam\Cache\DataTypes\BlamPrimitiveType.h" />
     <ClInclude Include="Blam\Cache\DataTypes\BlamTag.h" />
     <ClInclude Include="Blam\Cache\TagGroups\ai_mission_dialogue_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\antenna_definition.hpp" />
@@ -533,7 +537,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenery_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\Shader_pass_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\s_user_interface_screen_widget_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\unit_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp" />
@@ -541,7 +545,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_defenition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\shader_definition.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\shader_definition.hpp" />
     <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Engine\Game\DamageData.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngineEnum.h" />
@@ -551,6 +555,9 @@
     <ClInclude Include="Blam\LazyBlam\TagTable.h" />
     <ClInclude Include="Blam\Maths\integer_math.h" />
     <ClInclude Include="Blam\Maths\real_math.h" />
+    <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
+    <ClInclude Include="Blam\Math\integer_math.h" />
+    <ClInclude Include="Blam\Math\real_math.h" />
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
     <ClInclude Include="H2MOD\EngineCalls\EngineCalls.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
@@ -560,8 +567,10 @@
     <ClInclude Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h" />
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
+    <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.h" />
+    <ClInclude Include="H2MOD\Modules\GamePhysics\MeleeLunge.h" />
     <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
-    <ClInclude Include="H2MOD\Modules\HitFix\MeleeFix.h" />
+    <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.h" />
     <ClInclude Include="H2MOD\Modules\HudElements\HudElements.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
@@ -577,7 +586,6 @@
     <ClInclude Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
-    <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
     <ClInclude Include="H2MOD\Modules\Networking\OverridePackets\OverridePackets.h" />
     <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
@@ -590,6 +598,7 @@
     <ClInclude Include="H2MOD\Modules\UI\XboxLiveTaskProgress.h" />
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
+    <ClInclude Include="H2MOD\Variants\Variants.h" />
     <ClInclude Include="H2MOD\Variants\XboxTick\XboxTick.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
@@ -600,9 +609,6 @@
     <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
-    <ClInclude Include="Blam\Cache\DataTypes.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h" />
     <ClInclude Include="Blam\Cache\DataTypes\StringID.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Strings.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
@@ -610,9 +616,7 @@
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\Actor\Actor.h" />
-    <ClInclude Include="Blam\Engine\EngineDefinitions.h" />
     <ClInclude Include="Blam\Engine\FileSystem\FiloInterface.h" />
-    <ClInclude Include="Blam\Engine\Game\GameManager.h" />
     <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
     <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
@@ -622,8 +626,7 @@
     <ClInclude Include="Blam\Enums\Enums.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngine.h" />
     <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h" />
-    <ClInclude Include="Blam\Maths\Maths.h" />
-    <ClInclude Include="Globals.h" />
+    <ClInclude Include="Blam\Math\BlamMath.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="H2MOD\Discord\DiscordInterface.h" />
     <ClInclude Include="H2MOD\GUI\GUI.h" />
@@ -640,7 +643,7 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.h" />
-    <ClInclude Include="H2MOD\Modules\HitFix\HitFix.h" />
+    <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
     <ClInclude Include="H2MOD\Modules\Input\Mouseinput.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Networking.h" />

@@ -1,27 +1,17 @@
 #include "3rdparty/imgui/imgui.h"
+
 #include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/Modules/Tweaks/Tweaks.h"
-#include "H2MOD/Modules/Startup/Startup.h"
 #include "H2MOD/Modules/HudElements/HudElements.h"
-#include "3rdparty/imgui/imgui_internal.h"
 #include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
-#include "H2MOD/Modules/HitFix/HitFix.h"
-#include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
-#include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
-#include "H2MOD/Modules/Input/ControllerInput.h"
 #include "imgui_handler.h"
 #include "H2MOD/Modules/RunLoop/RunLoop.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
-#include "H2MOD/Modules/Utils/Utils.h"
-#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
-#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
-#include "H2MOD/Modules/HitFix/MeleeFix.h"
-
+#include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
+#include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
 
 namespace imgui_handler {
 	namespace AdvancedSettings {
@@ -243,8 +233,7 @@ namespace imgui_handler {
 				ImVec2 item_size = ImGui::GetItemRectSize();
 				if (ImGui::CollapsingHeader(GetString(video_title)))
 				{
-					namespace time = std::chrono;
-					using clock = time::steady_clock;
+					CHRONO_DEFINE_TIME_AND_CLOCK();
 
 					ImVec2 LargestText = ImGui::CalcTextSize(GetString(hires_fix), NULL, true);
 					float float_offset = ImGui::GetCursorPosX() + LargestText.x + (LargestText.x * 0.075);
@@ -485,7 +474,7 @@ namespace imgui_handler {
 
 					ImGui::Text(GetString(deadzone_type));
 					const char* items[] = { GetString(axial), GetString(radial), GetString(both) };
-					ImGui::PushItemWidth(ImGui::GetColumnWidth());;
+					ImGui::PushItemWidth(ImGui::GetColumnWidth());
 					if (ImGui::Combo("##C_Deadzone_Type", &g_deadzone, items, 3))
 					{
 						H2Config_Controller_Deadzone = (H2Config_Deadzone_Type)(byte)g_deadzone;

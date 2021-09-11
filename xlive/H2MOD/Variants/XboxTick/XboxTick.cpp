@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "Globals.h"
 #include "XboxTick.h"
+
+#include "Util/Hooks/Hook.h"
 
 int XboxTick::setTickRate(bool enable)
 {

@@ -9,7 +9,7 @@ namespace EngineCalls
 			//LOG_TRACE_GAME("unit_reset_equipment(unit_datum_index: %08X)", unit_datum_index);
 			typedef int(__cdecl unit_reset_equipment)(datum unit_datum_index);
 			auto p_unit_reset_equipment = Memory::GetAddress<unit_reset_equipment*>(0x1441E0, 0x133030);
-			if (unit_datum_index != NONE)
+			if (!unit_datum_index.IsNull())
 			{
 				return p_unit_reset_equipment(unit_datum_index);
 			}

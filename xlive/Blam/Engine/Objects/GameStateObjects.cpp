@@ -1,5 +1,7 @@
 #include "GameStateObjects.h"
 
+#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+
 s_datum_array* s_game_state_objects::getArray()
 {
     //Grabs the pointer from the engine to the s_datum_array of the objects table

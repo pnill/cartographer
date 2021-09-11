@@ -87,24 +87,36 @@ void removeXNetSecurity()
 }
 
 // stub qos lookup function in-game between peers in a network session
-int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4)
+int __cdecl transport_qos_target_new_hook(int a1, signed int a2, int a3, int a4)
 {
-	static XNQOS xnqos_stub;
+	static XNQOS placeholder_xnqos;
 
 	s_datum_array* qos_probes_datum_array = *Memory::GetAddress<s_datum_array**>(0x526BF4, 0x991078);
 
-	typedef int(__cdecl* datum_get_free_data_memory)(s_datum_array* datum_array);
-	auto p_datum_get_free_data_memory = Memory::GetAddress<datum_get_free_data_memory>(0x667A0, 0x3248C);
+	typedef int(__cdecl* datum_new_in_range)(s_datum_array* datum_array);
+	auto p_datum_new_in_range = Memory::GetAddress<datum_new_in_range>(0x667A0, 0x3248C);
 
-	datum free_qos_datum_index = datum(p_datum_get_free_data_memory(qos_probes_datum_array));
-	if (!free_qos_datum_index.IsNull())
+	datum new_qos_datum_index = datum(p_datum_new_in_range(qos_probes_datum_array));
+	if (!new_qos_datum_index.IsNull())
 	{
-		char* datum_mem = &qos_probes_datum_array->datum[free_qos_datum_index.ToAbsoluteIndex() * qos_probes_datum_array->datum_element_size];
-		xnqos_stub.cxnqos = 1;
-		xnqos_stub.cxnqosPending = 0;
-		*(short*)(datum_mem + 2) = (short)1;
-		*(XNQOS**)(datum_mem + 4) = &xnqos_stub;
-		return free_qos_datum_index.ToInt();
+		char* qos_probe_data = &qos_probes_datum_array->datum[new_qos_datum_index.ToAbsoluteIndex() * qos_probes_datum_array->datum_element_size];
+		placeholder_xnqos.cxnqos = 1;
+		placeholder_xnqos.cxnqosPending = 0;
+
+		// setup some stub data
+		placeholder_xnqos.axnqosinfo[0].bFlags = (0x02 | 0x01); // XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE
+		placeholder_xnqos.axnqosinfo[0].cProbesRecv = 96;
+		placeholder_xnqos.axnqosinfo[0].cProbesXmit = 96;
+		placeholder_xnqos.axnqosinfo[0].dwDnBitsPerSec = 16384;
+		placeholder_xnqos.axnqosinfo[0].dwUpBitsPerSec = 16384;
+		placeholder_xnqos.axnqosinfo[0].wRttMinInMsecs = 50;
+		placeholder_xnqos.axnqosinfo[0].wRttMedInMsecs = 64;
+		placeholder_xnqos.axnqosinfo[0].cbData = 0;
+		placeholder_xnqos.axnqosinfo[0].pbData = nullptr;
+
+		*(short*)(qos_probe_data + 2) = (short)1;
+		*(XNQOS**)(qos_probe_data + 4) = &placeholder_xnqos;
+		return new_qos_datum_index.ToInt();
 	}
 	else
 		return -1; 
@@ -125,12 +137,11 @@ void patchAbNetUpdate()
 
 void applyConnectionPatches()
 {
-
 	// live netcode research
 	network_observer::ApplyPatches();
 
 	// stub QoS lookup function for in-game data
-	PatchCall(Memory::GetAddress(0x1BDCB0, 0x1B7B8A), QoSLookUpImpl);
+	PatchCall(Memory::GetAddress(0x1BDCB0, 0x1B7B8A), transport_qos_target_new_hook);
 }
 
 void CustomNetwork::applyNetworkHooks() {

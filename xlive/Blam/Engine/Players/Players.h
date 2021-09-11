@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Blam/Common/Common.h"
 #include "Blam/Engine/DataArray/DataArray.h"
 #include "Blam/Engine/Objects/Objects.h"
 
@@ -157,7 +156,7 @@ struct Player
 		Severe = 3
 	};
 
-	enum flags
+	enum flags : int
 	{
 		player_inactive = 9,
 	};
@@ -273,12 +272,13 @@ public:
 
 	bool get_next_active_player();
 
-
 	Player* get_current_player_data();
 
 	int get_current_player_index();
 
 	wchar_t* get_current_player_name();
+
+	XUID get_current_player_id();
 
 private:
 	Player* m_current_player = nullptr;

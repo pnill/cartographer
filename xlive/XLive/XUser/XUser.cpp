@@ -1,10 +1,9 @@
-#include "stdafx.h"
 #include "XUser.h"
 
-#include "Globals.h"
-#include "XLive\xbox\xbox.h"
+#include "XLive/xbox/xbox.h"
+#include "XLive/xnet/IpManagement/XnIp.h"
 
-#include "../xnet/IpManagement/XnIp.h"
+#include "H2MOD/Modules/Achievements/Achievements.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 

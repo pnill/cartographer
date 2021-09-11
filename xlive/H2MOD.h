@@ -11,6 +11,9 @@
 #define GAME_BUILD 11122
 #define EXECUTABLE_VERSION 4
 
+#include "H2MOD/Variants/VariantPlayer.h"
+#include "H2MOD/Variants/Variants.h"
+
 enum SoundType
 {
 	TeamChange,
@@ -32,7 +35,6 @@ enum static_lod : DWORD
 	cinematic
 };
 
-int __cdecl call_get_game_tick_rate();
 bool __cdecl call_add_object_to_sync(datum gamestate_object_datum);
 void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset);
 
@@ -57,7 +59,7 @@ public:
 		void set_local_team_match_xuid(XUID xuid);
 		void set_local_clan_tag(int local_player_index, XUID tag);
 		BYTE get_local_team_index();
-		void set_player_unit_grenades_count(int playerIndex, Grenades type, BYTE count, bool resetEquipment);
+		void set_player_unit_grenades_count(int playerIndex, e_grenades type, BYTE count, bool resetEquipment);
 		void disable_sounds(int sound);
 		void custom_sound_play(const wchar_t* soundName, int delay);
 		void disable_weapon_pickup(bool b_Enable);
@@ -67,13 +69,11 @@ public:
 		e_engine_type GetEngineType() { return engineType; }
 		void SetCurrentEngineType(e_engine_type value) { engineType = value; }
 
-		std::unordered_map<std::string, bool> AchievementMap;
 		std::deque<std::wstring> CustomSounds;
 		
 		std::mutex sound_mutex;
 
 		std::set<int> hookedObjectDefs;
-		bool isChatBoxCommand = false;
 		bool drawTeamIndicators = true;
 
 private:
@@ -81,4 +81,7 @@ private:
 };
 
 extern H2MOD* h2mod;
+extern VariantPlayer* variant_player;
+extern DeviceShop* device_shop;
 
+extern s_datum_array* game_state_actors;

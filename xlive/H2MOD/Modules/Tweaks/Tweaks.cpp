@@ -11,6 +11,12 @@
 #include "..\CustomResolutions\CustomResolutions.h"
 #include "H2MOD/Modules/HudElements/HudElements.h"
 
+#include "H2MOD\Tags\TagInterface.h"
+#include "H2MOD/Modules/Networking/Networking.h"
+#include "Util\Hooks\Hook.h"
+
+#include "Blam\Engine\Game\GameTimeGlobals.h"
+
 #pragma region Done_Tweaks
 
 typedef int(__cdecl *thookServ1)(HKEY, LPCWSTR);
@@ -518,9 +524,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	if (!LOG_CHECK(InitPCCInfo()))
 	{
 		LOG_TRACE_FUNC("Failed to get PCC info / insufficient system resources");
-		run_async(
-			MessageBoxA(NULL, "Failed to get compatibility info.", "PCC Error", S_OK);
-		)
+		std::thread( [=]{ MessageBoxA(NULL, "Failed to get compatibility info.", "PCC Error", S_OK); }).detach();
+
 		show_error_message_by_id(108);
 		// todo: load some default values here?
 	}
@@ -867,7 +872,15 @@ void InitH2Tweaks() {
 		NopFill(Memory::GetAddressRelative(0x42FA8A), 3);
 		PatchCall(Memory::GetAddressRelative(0x42FAAB), update_keyboard_buttons_state_hook);
 
+		// don't mess with the cursor during loading screen
 		NopFill(Memory::GetAddressRelative(0x66BAEB), 5);
+
+		// disable symbol to emoji translation when dealing with player name
+		// works only in game for now, because the name in the pregame lobby uses c_text_widget
+		// and it's harder to deal with
+		NopFill(Memory::GetAddressRelative(0x46C7C7), 5);
+		NopFill(Memory::GetAddressRelative(0x45C338), 5);
+		NopFill(Memory::GetAddressRelative(0x473C61), 5);
 	}
 
 	// fixes edge drop fast fall when using higher tickrates than 30

@@ -221,7 +221,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			strncpy_s(tempstr1, sizeof(tempstr1), tempName, strnlen_s(tempName, XUSER_MAX_NAME_LENGTH));
+			strncpy_s(tempstr1, XUSER_NAME_SIZE, tempName, XUSER_MAX_NAME_LENGTH);
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -232,7 +232,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			}
 			if (strlen(tempstr1) > 0) {
 				addDebugText("Login Username is: %s", tempstr1);
-				strncpy_s(username, tempstr1, strnlen_s(tempstr1, XUSER_MAX_NAME_LENGTH));
+				strncpy_s(username, tempstr1, XUSER_MAX_NAME_LENGTH);
 			}
 		}
 		else if (sscanf(fileLine, "login_xuid=%llu", &templlu1) == 1) {
@@ -303,7 +303,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 									free(H2AccountArrayUsername[i]);
 								}
 								H2AccountArrayUsername[i] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
-								strncpy_s(H2AccountArrayUsername[i], XUSER_NAME_SIZE, username, strnlen_s(username, XUSER_MAX_NAME_LENGTH));
+								strncpy_s(H2AccountArrayUsername[i], XUSER_NAME_SIZE, username, XUSER_MAX_NAME_LENGTH);
 								snprintf(H2AccountArrayLoginToken[i], 33, login_token);
 								break;
 							}
@@ -442,7 +442,7 @@ HRESULT WINAPI XLiveManageCredentials(LPCWSTR lpszLiveIdName, LPCWSTR lpszLiveId
 	{
 		pXOverlapped->InternalLow = ERROR_SUCCESS;
 		pXOverlapped->InternalHigh = 0;
-		pXOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_SUCCESS);
+		pXOverlapped->dwExtendedError = 0;
 	}
 
 	// not done - error now

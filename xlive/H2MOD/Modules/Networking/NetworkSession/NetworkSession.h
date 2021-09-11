@@ -6,27 +6,27 @@
 
 enum e_network_session_state : signed int
 {
-	network_session_state_none,
-	network_session_state_peer_joining,
-	network_session_state_peer_join_abort,
-	network_session_state_peer_established,
-	network_session_state_peer_leaving,
-	network_session_state_host_established,
-	network_session_state_host_disband,
-	network_session_state_host_handoff,
-	network_session_state_host_reestablish,
-	network_session_state_election,
-	network_session_state_unk_2
+	_network_session_state_none,
+	_network_session_state_peer_joining,
+	_network_session_state_peer_join_abort,
+	_network_session_state_peer_established,
+	_network_session_state_peer_leaving,
+	_network_session_state_host_established,
+	_network_session_state_host_disband,
+	_network_session_state_host_handoff,
+	_network_session_state_host_reestablish,
+	_network_session_state_election,
+	_network_session_state_unk_2
 };
 
 enum e_map_status : int
 {
-	unk_0,
-	map_unavailable,
-	map_someone_loading,
-	map_available,
-	map_loaded,
-	map_is_downloading
+	_network_session_map_status_none,
+	_network_session_map_status_unable_to_precache,
+	_network_session_map_status_precaching,
+	_network_session_map_status_precached,
+	_network_session_map_status_loaded,
+	_network_session_map_status_downloading
 };
 
 #pragma pack(push, 1)
@@ -114,7 +114,7 @@ struct session_parameters
 {
 	DWORD parameters_update_number;
 	BYTE gap_4C64[4];
-	int field_8;
+	int session_mode;
 	DWORD gap_4C6C;
 	DWORD system_language_id;
 	bool dedicated_server;
@@ -151,7 +151,7 @@ struct session_parameters
 	DWORD field_5F08;
 	DWORD field_5F0C;
 };
-static_assert(sizeof(session_parameters) == 4784, "Invalid session_params size");
+static_assert(sizeof(session_parameters) == 4784, "Invalid session_parameters size");
 
 struct network_session
 {
@@ -251,7 +251,6 @@ namespace NetworkSession
 	network_session* getCurrentNetworkSession();
 	bool getCurrentNetworkSession(network_session** a1);
 	e_network_session_state getLocalSessionState();
-	bool localPeerIsSessionHost();
 	signed int getPeerIndexFromNetworkAddress(network_address* addr);
 	char getMapFileLocation(wchar_t* buffer, size_t size);
 
@@ -272,7 +271,6 @@ namespace NetworkSession
 	wchar_t* getPlayerName(int playerIndex);
 	int getPlayerIdByName(wchar_t* name);
 	long long getPlayerXuid(int playerIndex);
-	long long getPeerXUID(int peerIndex);
 	wchar_t* getPeerPlayerName(int peerIndex);
 
 	int getPlayerTeam(int playerIndex);
@@ -281,5 +279,8 @@ namespace NetworkSession
 	player_information* getPlayerInformation(int playerIndex);
 
 	wchar_t* getGameVariantName();
+
+	bool localPeerIsSessionHost();
+	bool localPeerIsEstablished();
 }
 

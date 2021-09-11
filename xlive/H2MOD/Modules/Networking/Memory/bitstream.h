@@ -1,5 +1,6 @@
 #pragma once
-#include "..\Blam\Maths\real_math.h"
+#include "Blam/Math/BlamMath.h"
+
 #pragma pack(push, 1)
 struct bitstream
 {

@@ -1,8 +1,15 @@
-#include "HitFix.h"
+#include "ProjectileFix.h"
 
- #include "Globals.h"
+#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/Game/GameTimeGlobals.h"
+#include "Blam/Engine/Objects/Objects.h"
 
-// TODO: move the struct time_globals in here somewhere else
+#include "H2MOD/Tags/TagInterface.h"
+
+#include "Util/Hooks/Hook.h"
+
+#include <float.h>
+#pragma fenv_access (on)
 
 #define DEFAULT_PROJECTILE_OBJECT_DATA_SIZE 428
 
@@ -23,7 +30,7 @@ projectile_update_def p_projectile_update;
 // determines whether the projectile should be updated in a 30hz context or not
 void projectile_set_tick_length_context(datum projectile_datum_index, bool projectile_instant_update)
 {
-	ObjectHeader* objects_header = (ObjectHeader*)game_state_objects_header->datum;
+	s_object_header* objects_header = (s_object_header*)get_objects_header()->datum;
 	char* object_data = objects_header[projectile_datum_index.ToAbsoluteIndex()].object;
 	char* proj_tag_data = tags::get_tag_fast<char>(*((datum*)object_data));
 
@@ -43,7 +50,7 @@ void projectile_set_tick_length_context(datum projectile_datum_index, bool proje
 // sets the tick when the projectile has been created
 inline void projectile_set_creation_tick(datum projectile_datum_index)
 {
-	ObjectHeader* objects_header = (ObjectHeader*)game_state_objects_header->datum;
+	s_object_header* objects_header = (s_object_header*)get_objects_header()->datum;
 	char* object_data = objects_header[projectile_datum_index.ToAbsoluteIndex()].object;
 	*(DWORD*)(object_data + 428) = time_globals::get()->tick_count; // store the projectile creation tick count
 }
@@ -89,7 +96,7 @@ std::vector<std::tuple<std::string, float, float>> weapon_projectiles =
 	//std::make_tuple("objects\\vehicles\\warthog\\turrets\\chaingun\\weapon\\bullet", 2000.0f, 2000.0f)
 };
 
-datum trigger_projectile_datum_index = datum::Null;
+datum trigger_projectile_datum_index = DATUM_NONE;
 
 #pragma region H3 collision data research
 __declspec(naked) void update_projectile_collision_data()
@@ -131,7 +138,7 @@ void __cdecl matrix4x3_transform_point(void* matrix, real_vector3d* v1, real_vec
 {
 	auto p_matrix4x3_transform_point = Memory::GetAddressRelative<void(__cdecl*)(void*, real_vector3d*, real_vector3d*)>(0x47795A);
 
-	DatumIterator<ObjectHeader> objectIt(game_state_objects_header);
+	DatumIterator<s_object_header> objectIt(get_objects_header());
 
 	BYTE* projectile = (BYTE*)objectIt.get_data_at_index(trigger_projectile_datum_index.ToAbsoluteIndex())->object;
 
@@ -145,7 +152,7 @@ void __cdecl matrix4x3_transform_point(void* matrix, real_vector3d* v1, real_vec
 }
 #pragma endregion
 
-void HitFix::ApplyProjectileVelocity()
+void ProjectileFix::ApplyProjectileVelocity()
 {
 	for (auto& proj_tuple : weapon_projectiles)
 	{
@@ -159,7 +166,7 @@ void HitFix::ApplyProjectileVelocity()
 	}
 }
 
-void HitFix::ApplyPatches()
+void ProjectileFix::ApplyPatches()
 {
 	// increase projectile game object data size to store the elapsed tick time when created
 	WriteValue<unsigned short>(Memory::GetAddress(0x41EE58, 0x3C2368) + 0x8, INCREASED_PROJECTILE_OBJECT_DATA_SIZE);

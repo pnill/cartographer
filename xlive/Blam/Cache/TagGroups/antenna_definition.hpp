@@ -1,7 +1,6 @@
 #pragma once
-#include "..\Blam\Cache\DataTypes.h"
 #include "..\Blam\Cache\TagGroups.hpp"
-#include "..\Blam\Maths\real_math.hpp"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
 
 /*********************************************************************
 * name: antenna

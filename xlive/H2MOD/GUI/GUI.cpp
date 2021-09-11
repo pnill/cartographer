@@ -1,22 +1,23 @@
-#include "stdafx.h"
-#include "Globals.h"
+#include "GUI.h"
+
 #include "3rdparty/imgui/imgui.h"
 #include "imgui_integration\imgui_impl_dx9.h"
-#include "GUI.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "imgui_integration/imgui_handler.h"
+#include "H2MOD/Modules/Networking/Networking.h"
+#include "H2MOD/Modules/Achievements/Achievements.h"
 
+#include "Util/Hooks/Hook.h"
 
 extern void InitInstance();
 
 bool doDrawIMGUI = false;
 
-extern bool displayXyz;
+bool displayXyz = false;
 
 typedef struct _XLIVE_INITIALIZE_INFO {
 	UINT cbSize;
@@ -446,8 +447,6 @@ void GUI::Initialize(HWND hWnd)
 // #5001
 int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 {
-	if(imgui_handler::ImGuiShoulBlockInput())
-		imgui_handler::ImGui_ImplWin32_WndProcHandler(pPii->hWnd, pPii->uMSG, pPii->wParam, pPii->lParam);
 	static bool has_initialised_input = false;
 	if (!has_initialised_input) {
 		extern HWND H2hWnd;
@@ -456,6 +455,9 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		GetWindowRect(H2hWnd, &rectScreenOriginal);
 		has_initialised_input = true;
 	}
+
+	if (imgui_handler::ImGuiShoulBlockInput())
+		imgui_handler::ImGui_ImplWin32_WndProcHandler(pPii->hWnd, pPii->uMSG, pPii->wParam, pPii->lParam);
 
 	return S_OK;
 }
@@ -491,7 +493,6 @@ int WINAPI XLiveRender()
 
 	if (pDevice)
 	{
-		
 		if (pDevice->TestCooperativeLevel() == D3D_OK)
 		{
 			D3DVIEWPORT9 pViewport;
@@ -515,7 +516,12 @@ int WINAPI XLiveRender()
 				drawPrimitiveRect(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				//drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
 				drawText(0, startingPosY, COLOR_WHITE, ">>", normalSizeFont);
-				drawText(35, startingPosY, COLOR_WHITE, commands->command.c_str(), normalSizeFont);
+
+				std::string strCommand = commands->command;
+				if (!commands->shouldCaretBlink())
+					strCommand.replace(commands->caretPos, 1, "_");
+
+				drawText(35, startingPosY, COLOR_WHITE, strCommand.c_str(), normalSizeFont);
 
 				startingPosY -= 12.0f;
 				for (std::string& it : commands->prevOutput) {
@@ -549,9 +555,9 @@ int WINAPI XLiveRender()
 			//drawText(gameWindowWidth / 1.13, gameWindowHeight - 145, COLOR_WHITE, "Points: 10,000", haloFont);
 	
 #pragma region Achievement Rendering		
-			if (h2mod->AchievementMap.size() > 0)
+			if (AchievementMap.size() > 0)
 			{
-				auto it = h2mod->AchievementMap.begin();
+				auto it = AchievementMap.begin();
 				
 				if (it->second == false)
 				{
@@ -604,7 +610,7 @@ int WINAPI XLiveRender()
 						achievement_freeze = false;
 						achievement_timer = 0;
 						achievement_height = 0;
-						h2mod->AchievementMap.erase(it);
+						AchievementMap.erase(it);
 					}
 
 					achievement_timer++;
@@ -619,10 +625,16 @@ int WINAPI XLiveRender()
 				while (playerIt.get_next_active_player()) 
 				{
 					real_point3d* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
+					s_biped_object_definition* biped_unit = (s_biped_object_definition*)h2mod->get_player_unit_from_player_index(playerIt.get_current_player_index());
 					if (player_position != nullptr) {
 						std::wstring playerNameWide(playerIt.get_current_player_name());
 						std::string playerName(playerNameWide.begin(), playerNameWide.end());
-						std::string xyzText = "Player name: " + playerName + ", xyz = " + std::to_string(player_position->x) + " " + std::to_string(player_position->y) + " " + std::to_string(player_position->z);
+						std::string xyzText = 
+							"Player name: " + playerName + 
+							", xyz = " + std::to_string(player_position->x) + " " 
+							+ std::to_string(player_position->y) + " " 
+							+ std::to_string(player_position->z) + " "
+							+ "Velocity: " + std::to_string(biped_unit->translational_velocity.magnitude());
 						drawText(0, text_y_coord, COLOR_GOLD, xyzText.c_str(), normalSizeFont);
 						text_y_coord += 15;
 					}
@@ -651,11 +663,6 @@ int WINAPI XLiveRender()
 			if (Size_Of_Download > 0) {
 				drawBox(10, 52, 200, 6, COLOR_RED, COLOR_RED);
 				drawBox(10, 52, ((Size_Of_Downloaded * 100) / Size_Of_Download) * 2, 6, COLOR_GREEN, COLOR_GREEN);
-			}
-
-			if (NetworkStatistics && NetworkSession::getCurrentNetworkSession(NULL)) {
-				sprintf(packet_info_str, "[ pck/second %d, pck size average: %d ]", packetsPerSecondAvg, packetSizeAvg);
-				drawText(30, 30, COLOR_WHITE, packet_info_str, normalSizeFont);
 			}
 
 			if(imgui_handler::CanDrawImgui())

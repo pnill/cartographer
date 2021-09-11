@@ -1,7 +1,8 @@
 ﻿#pragma once
 
-#include "Blam\Maths\Maths.h"
-#include "Blam\Cache\DataTypes.h"
+#include "Blam\Math\BlamMath.h"
+
+#include "Blam\Engine\DataArray\DataArray.h"
 
 enum e_object_team : BYTE
 {
@@ -55,85 +56,80 @@ enum e_object_type : signed char
 	creature,
 };
 
-enum UnitWeapons
+enum e_unit_weapons
 {
 	PrimaryWeapon,
 	SecondaryWeapon,
 	DualWeildWeapon
 };
 
-enum Grenades : BYTE
+enum e_grenades : BYTE
 {
 	Fragmentation,
 	Plasma
 };
 
-enum WeaponIndex : WORD
+enum e_weapon_index : WORD
 {
 	Primary = 0xFF00,
 	Secondary = 0xFF01,
 	DualWeild = 0x0201
 };
 
-enum BipedState : BYTE
+enum e_biped_physics_mode : BYTE
 {
 	mode_ground = 1,
 	mode_flying,
 	mode_dead,
-	mode_sentinel,
-	mode_sentinel_2,
+	mode_posture,
+	mode_climbing,
 	mode_melee
 };
 
-//size : depends on the object, there are object definitions for bipeds, projectiles etc...
-// for example, the size of the biped object definition is 1152 bytes and for the projectiles is 428 bytes
-struct BipedObjectDefinition//To Do
+struct object_base_definition
 {
-	datum TagDefinitionIndex;//0
-	DWORD ObjectFlags;//4
-	DWORD unk_0;//8
-	datum NextIndex;//0xC
-	datum CurrentWeaponDatum;//0x10
-	datum ParentIndex;//0x14
-	WORD UnitInVehicleFlag;//0x18
-	INT16 PlacementIndex;//0x1A
-	DWORD unk_2[3];//0x1C
-	DWORD Location[2];//0x28
-	real_point3d Center;//0x30
-	FLOAT Radius;//0x3C
-	DWORD unk_3[9];//0x40
-	real_point3d Placement;//0x64
-	real_vector3d Orientation;//0x70
-	real_vector3d Up;//0x7C
-	real_point3d TranslationalVelocity;//0x88
-	real_vector3d AngularVelocity;//0x94
-	FLOAT Scale;//0xA0
-	BYTE unk_4[6];//0xA4
-	e_object_type ObjectType;//0xAA;
-	BYTE unk;//0xAB
-	INT16 NameListIndex;//0xAC
-	BYTE unk_5;//0xAE
-	BYTE NetgameEquipmentIndex;//0xAF
-	DWORD unk_6;//0xB0
-	datum HavokComponentDatum;//0xB4
-	DWORD unk_7[11];//0xB8
-	FLOAT BodyMaxVitality;//0xE4
-	FLOAT ShieldMaxVitality;//0xE8
-	FLOAT BodyCurrentVitality;//0xEC
-	FLOAT ShieldCurrentVitality;//0xF0
-	DWORD ShieldEffects;//0xF4
-	DWORD ShieldEffects2;//0xF8
-	DWORD ShieldEffects3;//0xFC
-	DWORD unk_8;//0x100
-	FLOAT ShieldsRechargeTimer;//0x104
-	WORD ShieldStun2;//0x108
-	BYTE CollisionFlags;//0x10A - flags in general not just collision, it's how the player is killed for instance.
-	BYTE HealthFlags;//0x10B
-	DWORD unk_9[3];//0x10C
-	WORD UnkFlags;//0x118
-	WORD UnkFlags2;//0x11A
-	BYTE unk_10[14];//0x11C
-	WORD AnimationUnk;//0x12A
+	datum tag_definition_index;
+	DWORD object_flags;
+	BYTE gap_8[4];
+	datum next_index;
+	datum current_weapon_datum;
+	datum parent_index;
+	WORD unit_in_vehicle_flag;
+	INT16 placement_index;
+	BYTE gap_1C[12];
+	DWORD location[2];
+	real_point3d center;
+	float radius;
+	DWORD gap_3[9];
+	real_point3d placement;
+	real_vector3d orientation;
+	real_vector3d up;
+	real_point3d translational_velocity;
+	real_vector3d angular_velocity;
+	float scale;
+	BYTE gap_A4[6];
+	e_object_type object_type;
+	BYTE gap_AB[1];
+	__int16 name_list_index;
+	BYTE gap_5[1];
+	BYTE netgame_equipment_index;
+	DWORD gap_6;
+	datum havok_component_datum;
+	BYTE gap_B8[44];
+	float body_max_vitality;
+	float shield_max_vitality;
+	float body_current_vitality;
+	float shield_current_vitality;
+	DWORD gap_F4[4];
+	float shield_recharge_timer;
+	BYTE gap_108[2];
+	WORD field_10A;
+	BYTE gap_10C[32];
+};
+CHECK_STRUCT_SIZE(object_base_definition, 0x12C);
+
+struct s_biped_object_definition : object_base_definition
+{
 	BYTE ObjectsAttach;//0x12C
 	BYTE unk_11[3];//0x12D
 	datum ActorDatum; // 0x130
@@ -144,14 +140,14 @@ struct BipedObjectDefinition//To Do
 	datum PlayerDatum;//0x140
 	BYTE unk_13[9];//0x144
 	WORD CrouchJumpRelated;//0x150
-	FLOAT UnitShoot;//0x152
+	float UnitShoot;//0x152
 	BYTE unk_14[102];//0x156
-	FLOAT forward_movement_speed;//0x1BC
-	FLOAT left_movement_speed;//0x1C0
+	float forward_movement_speed;//0x1BC
+	float left_movement_speed;//0x1C0
 	BYTE unk_15[16];//0x1C4
 	datum TargetObject;//0x1D4
 	BYTE unk_16[82];//0x1D8
-	WeaponIndex UnitSwitchWeapon;//0x22A
+	e_weapon_index UnitSwitchWeapon;//0x22A
 	datum PrimaryWeapon; // 0x22C
 	datum SecondaryWeapon; // 0x230
 	datum DualWieldWeapon; // 0x234
@@ -162,23 +158,22 @@ struct BipedObjectDefinition//To Do
 	BYTE Frag_Grenades; //0x252
 	BYTE Plasma_Grenades; //0x253
 
-	FLOAT ActiveCamoFlagePower;//0x2C4
-	FLOAT ActiveCamoFlageTimer;//0x2C8
-	FLOAT ActiveCamoFlageDepletionPower;//0x2CC
+	float ActiveCamoFlagePower;//0x2C4
+	float ActiveCamoFlageTimer;//0x2C8
+	float ActiveCamoFlageDepletionPower;//0x2CC
 
-	BipedState unitState;//0x3F4
+	e_biped_physics_mode unitState;//0x3F4
 	BYTE unk_18[0x21C];
 };
-static_assert(sizeof(BipedObjectDefinition) == 0x480, "Invalid BipedObjectDefinition size");
+CHECK_STRUCT_SIZE(s_biped_object_definition, 0x480);
 
-struct WeaponObjectDefinition
+struct s_weapon_object_definition : object_base_definition
 {
-	datum TagDefinitionIndex;//0
-	char unk[0x258];
+	char gap[0x25C - sizeof(object_base_definition)];
 };
-static_assert(sizeof(WeaponObjectDefinition) == 0x25C, "Invalid WeaponObjectDefinition size");
+CHECK_STRUCT_SIZE(s_weapon_object_definition, 0x25C);
 
-struct ObjectHeader {
+struct s_object_header {
 	__int16 datum_salt; //0x00
 	BYTE flags; // 0x02
 	e_object_type type; // 0x03
@@ -186,4 +181,19 @@ struct ObjectHeader {
 	__int16 unk_size;  //0x06
 	char* object; //0x08 - 
 };
-static_assert(sizeof(ObjectHeader) == 0xC, "Invalid GameStateObjectHeader size");
+CHECK_STRUCT_SIZE(s_object_header, 0xC);
+
+static s_datum_array* get_objects_header()
+{
+	return *Memory::GetAddress<s_datum_array**>(0x4E461C, 0x50C8EC);
+};
+
+static s_object_header* get_objects_header(datum object_index)
+{
+	/*
+		Gets the header of the object, containing some details
+	*/
+
+	auto objects_header = get_objects_header();
+	return (s_object_header*)(&objects_header->datum[objects_header->datum_element_size * object_index.ToAbsoluteIndex()]);
+}

@@ -1,7 +1,7 @@
 #pragma once
 //use this for all base real math related structs and implementations
 
-#include "Blam\Common\Common.h"
+#include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -147,10 +147,16 @@ union real_vector3d
 		return this->i * other.i + this->j * other.j + this->k * other.k;
 	}
 
+	// dot product by itself
+	float dot_product() const
+	{
+		return this->i * this->i + this->j * this->j + this->k * this->k;
+	}
+
 	// magnitude
 	float magnitude() const
 	{
-		return sqrt(pow(i, 2.f) + pow(j, 2.f) + pow(k, 2.f));
+		return sqrt(i * i + j * j + k * k);
 	}
 };
 CHECK_STRUCT_SIZE(real_vector3d, sizeof(float) * 3);
@@ -331,3 +337,5 @@ static bool limit3d(void* a1, float limit)
 	*v1 = *v1 * ((1.0f / sqrt(dot_product)) * limit);
 	return true;
 }
+
+static const real_vector3d global_zero_vector3d = { 0.0f, 0.0f, 0.0f };

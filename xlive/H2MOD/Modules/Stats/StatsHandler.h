@@ -7,6 +7,8 @@
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/EngineCalls/EngineCalls.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
 
 extern bool Registered;
 class StatsHandler

@@ -44,6 +44,12 @@ enum eXnIp_ConnectionRequestBitFlags
 
 };
 
+enum class H2v_sockets : int
+{
+	Sock1000 = 0,
+	Sock1001
+};
+
 struct XNetPacketHeader
 {
 	DWORD intHdr;
@@ -56,16 +62,15 @@ struct XBroadcastPacket
 	{
 		pckHeader.intHdr = 'BrOd';
 		strncpy(pckHeader.HdrStr, broadcastStrHdr, MAX_HDR_STR);
-		ZeroMemory(&data, sizeof(XBroadcastPacket::XBroadcast));
+		ZeroMemory(&data, sizeof(data));
 		data.name.sin_addr.s_addr = INADDR_BROADCAST;
 	};
 
 	XNetPacketHeader pckHeader;
-	struct XBroadcast
+	struct
 	{
 		sockaddr_in name;
-	};
-	XBroadcast data;
+	} data;
 };
 
 struct XNetRequestPacket
@@ -75,10 +80,11 @@ struct XNetRequestPacket
 		pckHeader.intHdr = 'XNeT';
 		memset(pckHeader.HdrStr, 0, sizeof(pckHeader.HdrStr));
 		strncpy(pckHeader.HdrStr, requestStrHdr, MAX_HDR_STR);
+		SecureZeroMemory(&data, sizeof(data));
 	}
 
 	XNetPacketHeader pckHeader;
-	struct XNetReq
+	struct
 	{
 		XNADDR xnaddr;
 		XNKID xnkid;
@@ -92,8 +98,7 @@ struct XNetRequestPacket
 				bool connectionInitiator;
 			};
 		};
-	};
-	XNetReq data;
+	} data;
 };
 
 struct XnKeyPair
@@ -101,12 +106,6 @@ struct XnKeyPair
 	bool bValid;
 	XNKID xnkid;
 	XNKEY xnkey;
-};
-
-enum H2v_sockets
-{
-	H2vSocket1000 = 0,
-	H2vSocket1001
 };
 
 struct XnIp
@@ -142,13 +141,13 @@ struct XnIp
 
 	struct NatTranslation
 	{
-		enum State : unsigned int
+		enum class eNatDataState : unsigned int
 		{
 			natUnavailable,
 			natAvailable,
 		};
 
-		State state;
+		eNatDataState state;
 		sockaddr_in natAddress;
 	};
 	
@@ -157,13 +156,15 @@ struct XnIp
 
 	void updateNat(H2v_sockets natIndex, sockaddr_in* addr)
 	{
-		natTranslation[natIndex].natAddress = *addr;
-		natTranslation[natIndex].state = XnIp::NatTranslation::State::natAvailable;
+		int index = (int)natIndex;
+		natTranslation[index].natAddress = *addr;
+		natTranslation[index].state = NatTranslation::eNatDataState::natAvailable;
 	}
 
 	sockaddr_in* getNatAddr(H2v_sockets natIndex)
 	{
-		return &natTranslation[natIndex].natAddress;
+		int index = (int)natIndex;
+		return &natTranslation[index].natAddress;
 	}
 
 	void natDiscard()
@@ -171,20 +172,20 @@ struct XnIp
 		for (auto& translation : natTranslation)
 		{
 			memset(&translation, 0, sizeof(translation));
-			translation.state = NatTranslation::natUnavailable;
+			translation.state = NatTranslation::eNatDataState::natUnavailable;
 		}
 	}
 
 	bool natIsUpdated(int natIndex) const
 	{
-		return natTranslation[natIndex].state == NatTranslation::natAvailable;
+		return natTranslation[natIndex].state == NatTranslation::eNatDataState::natAvailable;
 	}
 
 	bool natIsUpdated() const
 	{
 		for (auto& translation : natTranslation)
 		{
-			if (translation.state != NatTranslation::natAvailable)
+			if (translation.state != NatTranslation::eNatDataState::natAvailable)
 				return false;
 		}
 		return true;
@@ -209,13 +210,13 @@ struct XnIp
 
 	bool XnIp::isValid(IN_ADDR identifier) const
 	{
-		if (identifier.s_addr != connectionIdentifier.s_addr)
+		if (identifier.s_addr != this->connectionIdentifier.s_addr)
 		{
-			LOG_CRITICAL_NETWORK("{} - {:X} != {:X}", __FUNCTION__, identifier.s_addr, connectionIdentifier.s_addr);
+			LOG_CRITICAL_NETWORK("{} - connection identifier different {:X} != {:X}", __FUNCTION__, identifier.s_addr, connectionIdentifier.s_addr);
 			return false;
 		}
 
-		return bValid && identifier.s_addr == connectionIdentifier.s_addr;;
+		return bValid && identifier.s_addr == this->connectionIdentifier.s_addr;
 	}
 };
 
@@ -228,7 +229,7 @@ public:
 	*/
 	static int CXnIp::getConnectionIndex(IN_ADDR connectionIdentifier)
 	{
-		return ntohl(connectionIdentifier.s_addr & XnIp_ConnectionIndexMask);
+		return connectionIdentifier.s_addr >> 24;
 	}
 
 	XnIp* CXnIp::getConnection(IN_ADDR ina)
@@ -299,9 +300,6 @@ public:
 	void UnregisterKey(const XNKID* xnkid);
 	XnKeyPair* getKeyPair(const XNKID* xnkid);
 	
-	XnIp* XnIPs = nullptr;
-	XnKeyPair* XnKeyPairs = nullptr;
-
 	XNetStartupParams startupParams;
 	int GetMaxXnConnections() { return startupParams.cfgSecRegMax; }
 	int GetReqQoSBufferSize() { return startupParams.cfgQosDataLimitDiv4 * 4; }
@@ -324,7 +322,6 @@ public:
 		return keysCount;
 	}
 
-
 	/*
 		Sends a request over the socket to the other socket end, with the same identifier
 	*/
@@ -334,6 +331,10 @@ public:
 		Sends a request to all open sockets
 	*/
 	void SendXNetRequestAllSockets(IN_ADDR connectionIdentifier, eXnip_ConnectRequestType reqType);
+
+	// Data
+	XnIp* XnIPs = nullptr;
+	XnKeyPair* XnKeyPairs = nullptr;
 
 private:
 

@@ -142,7 +142,15 @@ struct qos_info
 
 struct __declspec(align(8)) observer_channel
 {
-	DWORD unk_state;
+	enum class e_observer_channel_state : int
+	{
+		none = 0,
+		pending_transport_layer = 3, // waiting for xnet connection to be established
+		pending_game_layer = 4, // xnet layer connected, waiting for game to establish
+		connected = 7
+	};
+
+	int state;
 	DWORD field_4;
 	BYTE qos_flags;
 	BYTE field_9;
@@ -312,7 +320,7 @@ struct __declspec(align(8)) network_observer
 	static void ApplyPatches();
 	static void ResetNetworkPreferences();
 	bool __thiscall GetNetworkMeasurements(DWORD *out_throughput, float *out_satiation, DWORD *a4);
-	int getObserverState(int observerIndex) { return observers[observerIndex].unk_state; };
+	int getObserverState(int observerIndex) { return observers[observerIndex].state; };
 	void sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data);
 };
 static_assert(sizeof(network_observer) == 0x75C8, "network_observer size != 30152");

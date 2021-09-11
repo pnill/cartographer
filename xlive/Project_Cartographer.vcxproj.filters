@@ -11,7 +11,6 @@
     <ClCompile Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
-    <ClCompile Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.cpp" />
     <ClCompile Include="H2MOD\Modules\Stats\StatsHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\XboxLiveTaskProgress.cpp" />
@@ -26,7 +25,6 @@
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
     <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Globals.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="H2MOD\Discord\DiscordInterface.cpp" />
     <ClCompile Include="H2MOD\GUI\GUI.cpp" />
@@ -43,7 +41,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_list_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\HitFix\HitFix.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\Mouseinput.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Networking.cpp" />
@@ -110,7 +107,6 @@
     <ClCompile Include="H2MOD\GUI\imgui_integration\debug_overlay.cpp" />
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
-    <ClCompile Include="H2MOD\Modules\HitFix\MeleeFix.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEvents.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\MessageBox.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\OverridePackets\OverridePackets.cpp" />
@@ -130,6 +126,9 @@
     <ClCompile Include="Blam\LazyBlam\LazyBlam.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
+    <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.cpp" />
+    <ClCompile Include="H2MOD\Modules\GamePhysics\MeleeLunge.cpp" />
+    <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -244,10 +243,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\shader_definition.h" />
     <ClInclude Include="Blam\Common\Common.h" />
-    <ClInclude Include="Blam\Maths\integer_math.h" />
-    <ClInclude Include="Blam\Maths\real_math.h" />
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
@@ -256,7 +252,6 @@
     <ClInclude Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h" />
     <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
-    <ClInclude Include="H2MOD\Modules\Networking\NetworkStats\NetworkStats.h" />
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h" />
     <ClInclude Include="H2MOD\Modules\Stats\StatsHandler.h" />
     <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h" />
@@ -269,9 +264,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
-    <ClInclude Include="Blam\Cache\DataTypes.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\DatumIndex.h" />
     <ClInclude Include="Blam\Cache\DataTypes\StringID.h" />
     <ClInclude Include="Blam\Cache\DataTypes\Strings.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
@@ -279,9 +271,7 @@
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\Actor\Actor.h" />
-    <ClInclude Include="Blam\Engine\EngineDefinitions.h" />
     <ClInclude Include="Blam\Engine\FileSystem\FiloInterface.h" />
-    <ClInclude Include="Blam\Engine\Game\GameManager.h" />
     <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
     <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
@@ -290,8 +280,6 @@
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="Blam\Enums\Enums.h" />
     <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h" />
-    <ClInclude Include="Blam\Maths\Maths.h" />
-    <ClInclude Include="Globals.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="H2MOD\Discord\DiscordInterface.h" />
     <ClInclude Include="H2MOD\GUI\GUI.h" />
@@ -308,7 +296,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.h" />
-    <ClInclude Include="H2MOD\Modules\HitFix\HitFix.h" />
     <ClInclude Include="H2MOD\Modules\Input\Mouseinput.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Networking.h" />
@@ -376,7 +363,6 @@
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_defenition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_defenition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\Shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\new_hud_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\model_defenition.hpp" />
@@ -387,7 +373,6 @@
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="Blam\Engine\Game\DamageData.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
-    <ClInclude Include="H2MOD\Modules\HitFix\MeleeFix.h" />
     <ClInclude Include="Blam\Enums\Game\HaloStrings.h" />
     <ClInclude Include="Blam\Cache\TagGroups\physics_model_defenition.hpp" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEvents.h" />
@@ -412,6 +397,18 @@
     <ClInclude Include="Blam\LazyBlam\LazyBlam.hpp" />
     <ClInclude Include="Blam\LazyBlam\TagTable.h" />
     <ClInclude Include="Blam\Cache\TagGroups\light_defenition.h" />
+    <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.h" />
+    <ClInclude Include="H2MOD\Modules\GamePhysics\MeleeLunge.h" />
+    <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
+    <ClInclude Include="H2MOD\Variants\Variants.h" />
+    <ClInclude Include="Blam\Cache\DataTypes\BlamPrimitiveType.h" />
+    <ClInclude Include="Blam\Math\integer_math.h" />
+    <ClInclude Include="Blam\Math\real_math.h" />
+    <ClInclude Include="Blam\Math\BlamMath.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
+    <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
+    <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\shader_definition.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

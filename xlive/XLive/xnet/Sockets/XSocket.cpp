@@ -1,10 +1,7 @@
-#include "Globals.h"
-
 #include "XLive\xnet\upnp.h"
 #include "XLive\xnet\Sockets\XSocket.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 
 #include "XLive\xnet\net_utils.h"
 
@@ -84,8 +81,9 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 	newXSocket->setBufferSize(gXnIp.GetMinSockSendBufferSizeInBytes(), gXnIp.GetMinSockRecvBufferSizeInBytes());
 
 	// disable SIO_UDP_CONNRESET
+	// TODO re-enable this if the issue https://github.com/pnill/cartographer/issues/320 is not caused by this
 
-	DWORD ioctlSetting = 0;
+	/*DWORD ioctlSetting = 0;
 	DWORD cbBytesReturned;
 	if (WSAIoctl(newXSocket->winSockHandle, SIO_UDP_CONNRESET, &ioctlSetting, 4u, 0, 0, &cbBytesReturned, 0, 0) == SOCKET_ERROR)
 	{
@@ -94,7 +92,7 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 	else
 	{
 		LOG_TRACE_NETWORK("XSocketCreate() - disabled SIO_UDP_CONNRESET");
-	}
+	}*/
 
 	XSocket::Sockets.push_back(newXSocket);
 
@@ -250,51 +248,87 @@ BOOL WINAPI XSocketWSACancelOverlappedIO(HANDLE hFile)
 	return CancelIo(hFile);
 }
 
+int XSocket::recvfrom(LPWSABUF lpBuffers, 
+	DWORD dwBufferCount,
+	LPDWORD lpNumberOfBytesRecvd, 
+	LPDWORD lpFlags,
+	struct sockaddr* lpFrom, 
+	LPINT lpFromlen, 
+	LPWSAOVERLAPPED lpOverlapped, 
+	LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
+{
+	auto readSocketLambda = [&](bool& socketErrorByRecvAPI) -> int
+	{
+		if (this->isTCP()
+			|| lpFrom == NULL)
+		{
+			return WSARecv(
+				this->winSockHandle,
+				lpBuffers,
+				dwBufferCount,
+				lpNumberOfBytesRecvd,
+				lpFlags,
+				lpOverlapped,
+				lpCompletionRoutine);
+		}
+
+#if COMPILE_WITH_STD_SOCK_FUNC
+		int result = ::recvfrom(this->winSockHandle, lpBuffers->buf, lpBuffers->len, *lpFlags, lpFrom, lpFromlen);
+		*lpNumberOfBytesRecvd = result;
+#else
+		int result = WSARecvFrom(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
+#endif
+		if (result == SOCKET_ERROR)
+		{
+			*lpNumberOfBytesRecvd = 0;
+			socketErrorByRecvAPI = true;
+			return SOCKET_ERROR;
+		}
+
+		socketErrorByRecvAPI = false;
+		result = gXnIp.handleRecvdPacket(this, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
+		return result;
+	};
+
+	// loop MAX_PACKETS_TO_READ_PER_RECV_CALL times until we get a valid packet
+	// unless Winsock API returns an error
+	for (int i = 0; i < MAX_PACKETS_TO_READ_PER_RECV_CALL; i++)
+	{
+		bool errorByRecvAPI = false;
+
+		int result = readSocketLambda(errorByRecvAPI);
+
+		if (result == SOCKET_ERROR)
+		{
+			if (errorByRecvAPI)
+			{
+				if (WSAGetLastError() != WSAEWOULDBLOCK)
+					LOG_ERROR_NETWORK("XSocketWSARecvFrom() - Socket Error: {}", WSAGetLastError());
+
+				return result;
+			}
+			else
+			{
+				continue;
+			}
+		}
+		else
+		{
+			// if there's no error, return the packet
+			return result;
+		}
+	}
+
+	// if we got this far, it means there were no game packets inbound, just XNet packets
+	XSocketWSASetLastError(WSAEWOULDBLOCK);
+	return SOCKET_ERROR;
+}
+
 // #21
 int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr *lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
-	XSocket* xsocket = (XSocket*)s;
-
-	if (xsocket->isTCP() 
-		|| lpFrom == NULL)
-	{
-		return WSARecv(
-			xsocket->winSockHandle,
-			lpBuffers,
-			dwBufferCount,
-			lpNumberOfBytesRecvd,
-			lpFlags,
-			lpOverlapped,
-			lpCompletionRoutine);
-	}
-
-#if COMPILE_WITH_STD_SOCK_FUNC
-	int result = recvfrom(xsocket->winSockHandle, lpBuffers->buf, lpBuffers->len, *lpFlags, lpFrom, lpFromlen);
-	*lpNumberOfBytesRecvd = result;
-#else
-	int result = WSARecvFrom(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
-#endif
-	if (result == SOCKET_ERROR)
-	{
-		*lpNumberOfBytesRecvd = 0;
-
-		if (WSAGetLastError() != WSAEWOULDBLOCK)
-			LOG_ERROR_NETWORK("XSocketWSARecvFrom() - Socket Error: {}", WSAGetLastError());
-
-		return SOCKET_ERROR;
-	}
-
-	// if the result returned by handleRecvdPacket is SOCKET_ERROR, pool another packet until we get an error directly from WINSOCK's recvfrom API (like WSAEWOULDBLOCK)
-	// or the packet received is a valid game packet
-	// because we don't want to lose/delay an in-bound game packet
-	// this should improve performance especially if someone is sending from an unknown connection packets (like DDoS-ing), depending on the performance of the server
-	result = gXnIp.handleRecvdPacket(xsocket, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
-	if (result == SOCKET_ERROR)
-	{
-		return XSocketWSARecvFrom(s, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
-	}
-
-	return result;
+	XSocket* socket = (XSocket*)s;
+	return socket->recvfrom(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
 }
 
 // #25
@@ -346,7 +380,8 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 
 	XnIp* xnIp = gXnIp.getConnection(inTo->sin_addr);
 	if (xnIp != nullptr
-		&& gXnIp.GetLocalUserXn() != nullptr)
+		&& gXnIp.GetLocalUserXn() != nullptr
+		&& xnIp->connectStatus != XNET_CONNECT_STATUS_LOST)
 	{
 		sockaddr_in sendToAddr;
 		sendToAddr.sin_family = AF_INET;
@@ -365,19 +400,19 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		{
 		case 1000:
 			sendToAddr.sin_port = xnIp->xnaddr.wPortOnline;
-			if (!xsocket->sockAddrInInvalid(xnIp->getNatAddr(H2vSocket1000)))
+			if (!xsocket->sockAddrInInvalid(xnIp->getNatAddr(H2v_sockets::Sock1000)))
 			{
 				// if there's nat data use it
-				sendToAddr = *xnIp->getNatAddr(H2vSocket1000);
+				sendToAddr = *xnIp->getNatAddr(H2v_sockets::Sock1000);
 			}
 
 			break;
 
 		case 1001:
 			sendToAddr.sin_port = htons(ntohs(xnIp->xnaddr.wPortOnline) + 1);
-			if (!xsocket->sockAddrInInvalid(xnIp->getNatAddr(H2vSocket1001)))
+			if (!xsocket->sockAddrInInvalid(xnIp->getNatAddr(H2v_sockets::Sock1001)))
 			{
-				sendToAddr = *xnIp->getNatAddr(H2vSocket1001);
+				sendToAddr = *xnIp->getNatAddr(H2v_sockets::Sock1001);
 			}
 
 			break;
@@ -421,7 +456,6 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			xnIp->pckSent++;
 			xnIp->bytesSent += result;
 #endif
-			updateSendToStatistics(packetsSent, *lpNumberOfBytesSent);
 		}
 
 		return 0;

@@ -7,7 +7,6 @@
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\Modules\Networking\NetworkStats\NetworkStats.h"
 #include "H2MOD\Modules\ServerConsole\ServerConsole.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
 
@@ -52,6 +51,7 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 	if (wp == H2Config_hotkeyIdConsole) {
 		if (seconds_since_start > 0.5) {
 			this->console = !this->console;
+			resetCaretBlink();
 			start = time(0);
 		}
 		return true;
@@ -64,6 +64,7 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 			{
 				this->command.erase(this->caretPos - 1, 1);
 				this->caretPos -= 1;
+				resetCaretBlink();
 			}
 			return true;
 		}
@@ -72,15 +73,16 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 
 	case '\r':    // return/enter
 	{
-		if (console) {
+		if (console && command.length() > 1) {
 			writePreviousOutput(this->command);
 			writePreviousCommand(this->command);
 			std::string fullCommand("$");
-			fullCommand += this->command;
+			fullCommand += command;
 			this->handle_command(fullCommand);
 
 			command = "";
 			caretPos = 0;
+			resetCaretBlink();
 			previous_command_index = 0;
 			return true;
 		}
@@ -114,6 +116,7 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 				{
 					command = prevCommands[previous_command_index];
 					caretPos = command.length();
+					resetCaretBlink();
 					previous_command_index++;
 				}
 				return true;
@@ -126,6 +129,7 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 					previous_command_index--;
 					command = prevCommands[previous_command_index];
 					caretPos = command.length();
+					resetCaretBlink();
 				}
 				return true;
 			}
@@ -133,12 +137,14 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 			if (wp == VK_END)
 			{
 				caretPos = command.length();
+				resetCaretBlink();
 				return true;
 			}
 
 			if (wp == VK_HOME)
 			{
 				caretPos = 0;
+				resetCaretBlink();
 				return true;
 			}
 
@@ -147,6 +153,8 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 				if (caretPos)
 					caretPos--;
 
+				resetCaretBlink();
+
 				return true;
 			}
 
@@ -154,6 +162,8 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 			{
 				if (caretPos != command.length())
 					caretPos++;
+
+				resetCaretBlink();
 
 				return true;
 			}
@@ -312,6 +322,24 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 	return false;
 }
 
+bool ConsoleCommands::shouldCaretBlink()
+{
+	if (timeGetTime() - lastTimeCaretBlink >= caretBlinkTimeMs)
+	{
+		lastTimeCaretBlink = timeGetTime();
+		caretBlinked = !caretBlinked;
+		return caretBlinked;
+	}
+
+	return caretBlinked;
+}
+
+void ConsoleCommands::resetCaretBlink()
+{
+	caretBlinked = false;
+	lastTimeCaretBlink = timeGetTime();
+}
+
 void ConsoleCommands::checkForIds() {
 	if (!checked_for_ids) {
 		//only check once per game
@@ -332,11 +360,11 @@ void ConsoleCommands::checkForIds() {
 	}
 }
 
-void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition) {
+void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition, bool sameTeam) {
 
 	for (int i = 0; i < count; i++) {
 		try {
-			ObjectPlacementData nObject;
+			s_object_placement_data nObject;
 
 			if (!object_datum.IsNull()) {
 				datum player_datum = Player::getPlayerUnitDatumIndex(h2mod->get_player_datum_index_from_controller_index(0).Index);
@@ -344,18 +372,22 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 				real_point3d* player_position = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
 
 				if (player_position != nullptr) {
-					nObject.position.x = player_position->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					nObject.position.y = player_position->y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					nObject.position.z = (player_position->z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.placement.x = player_position->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.placement.y = player_position->y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.placement.z = (player_position->z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
 				}
 				if (specificPosition) {
-					nObject.position.x = x;
-					nObject.position.y = y;
-					nObject.position.z = z;
+					nObject.placement.x = x;
+					nObject.placement.y = y;
+					nObject.placement.z = z;
 				}
 
-				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.position.x, nObject.position.y, nObject.position.z);
-				unsigned int object_gamestate_datum = EngineCalls::Objects::call_object_new(&nObject);
+				if (!sameTeam)
+					nObject.team_index = NONE;
+
+				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.placement.x, nObject.placement.y, nObject.placement.z);
+				unsigned int object_gamestate_datum = Engine::Objects::call_object_new(&nObject);
+
 				call_add_object_to_sync(object_gamestate_datum);
 			}
 		}
@@ -439,8 +471,14 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid download map command, usage - $downloadMap MAP_NAME");
 				return;
 			}
+			if (!NetworkSession::localPeerIsSessionHost())
+			{
+				output(L"Cannot download map using command while not being the session host!");
+				return;
+			}
 			std::string firstArg = splitCommands[1];
-			mapManager->downloadFromRepo(firstArg);
+			auto downloadQuery = mapManager->addDownloadQuery(std::wstring(firstArg.begin(), firstArg.end()));
+			downloadQuery->StartMapDownload(); // since we have the map name, start the download
 			return;
 		}
 		else if (firstCommand == "$kick") {
@@ -525,8 +563,8 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$spawnnear") {
-			if (splitCommands.size() < 3 || splitCommands.size() > 4) {
-				output(L"Invalid command, usage $spawn command_name count");
+			if (splitCommands.size() < 4 || splitCommands.size() > 5) {
+				output(L"Invalid command usage $spawnnear command_name count same_team optional:multiplier");
 				return;
 			}
 
@@ -547,7 +585,7 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			std::string secondArg = splitCommands[1];
 			std::string thirdArg = splitCommands[2];
-			datum object_datum;
+			datum object_datum = DATUM_NONE;
 			if (object_ids.find(secondArg) == object_ids.end()) {
 				//read from chatbox line
 				std::string secondArg = splitCommands[1];
@@ -559,9 +597,9 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 
 			float randomMultiplier = 1.0f;
-			if (splitCommands.size() == 4) {
+			if (splitCommands.size() == 5) {
 				//optional multiplier provided
-				std::string fourthArg = splitCommands[3];
+				std::string fourthArg = splitCommands[4];
 				randomMultiplier = stof(fourthArg);
 			}
 
@@ -574,8 +612,12 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
+			bool sameTeam = false;
+			if (splitCommands[3] == "true")
+				sameTeam = true;
+
 			real_point3d* localPlayerPosition = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
-			this->spawn(object_datum, count, localPlayerPosition->x + 0.5f, localPlayerPosition->y + 0.5f, localPlayerPosition->z + 0.5f, randomMultiplier, false);
+			this->spawn(object_datum, count, localPlayerPosition->x + 0.5f, localPlayerPosition->y + 0.5f, localPlayerPosition->z + 0.5f, randomMultiplier, false, sameTeam);
 			return;
 		}
 		else if (firstCommand == "$ishost") {
@@ -600,22 +642,14 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Only host can see xyz for now...");
 				return;
 			}
+			extern bool displayXyz;
 			displayXyz = !displayXyz;
 			return;
 		}
-		else if (firstCommand == "$downloadmap") {
-			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
-				output(L"Invalid command, usage downloadMap filename");
-				return;
-			}
-			std::string secondArg = splitCommands[1];
-			secondArg += ".map";
-			std::thread(&MapManager::downloadFromRepo, mapManager, secondArg).detach();
-			return;
-		}
+		
 		else if (firstCommand == "$spawn") {
-			if (splitCommands.size() != 6) {
-				output(L"Invalid command, usage $spawn command_name count x y z");
+			if (splitCommands.size() != 7) {
+				output(L"Invalid command, usage $spawn command_name count x y z same_team");
 				return;
 			}
 
@@ -650,7 +684,11 @@ void ConsoleCommands::handle_command(std::string command) {
 			float y = stof(splitCommands[4]);
 			float z = stof(splitCommands[5]);
 
-			this->spawn(object_datum, count, x, y, z, 1.0f, true);
+			bool sameTeam = false;
+			if (splitCommands[6] == "true")
+				sameTeam = true;
+			
+			this->spawn(object_datum, count, x, y, z, 1.0f, true, sameTeam);
 			return;
 		}
 		else if (firstCommand == "$controller_sens") {
@@ -685,16 +723,12 @@ void ConsoleCommands::handle_command(std::string command) {
 			}
 			return;
 		}
-		else if (firstCommand == "$netstats") {
-			NetworkStatistics = !NetworkStatistics;
-			return;
-		}
 		else if (firstCommand == "$lognetworksessionoffsets") {
 			NetworkSession::logStructureOffsets();
 			return;
 		}
 		else if (firstCommand == "$requestfilename") {
-			CustomPackets::sendRequestMapFilename();
+			CustomPackets::sendRequestMapFilename(NONE);
 		}
 		else if (firstCommand == "$warpfix") {
 			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
@@ -754,6 +788,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			output(result);
 
 			LOG_INFO_GAME("{} {} {}", tagName, tagType.as_string(), mapName);
+			return;
 		}
 		else if (firstCommand == "$logxnetconnections") {
 			if (splitCommands.size() != 1) {

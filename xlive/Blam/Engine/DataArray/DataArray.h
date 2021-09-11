@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam\Cache\DataTypes.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
 
 // The game is using some sort of heap manager developed by Microsoft in 2000's named RockAll Heap Manager 
 
@@ -23,17 +23,16 @@ struct s_datum_array
 	char* datum;					// 0x44
 	int* datum_usable_bit_mask;		// 0x48
 };
-static_assert(sizeof(s_datum_array) == 0x4C, "s_data_array size != 0x4C");
+CHECK_STRUCT_SIZE(s_datum_array, 0x4C);
 
-template<typename T>
+template<typename T = void*>
 class DatumIterator
 {
 public:
 
 	DatumIterator(s_datum_array* _data_array) : data_array(_data_array)
 	{
-		m_last_datum_index = -1;
-		m_current_absolute_index = -1;
+		m_current_absolute_index = NONE;
 	};
 
 	~DatumIterator()
@@ -64,7 +63,7 @@ public:
 		if (index == -1)
 		{
 			result = nullptr;
-			m_last_datum_index = -1;
+			m_last_datum_index = DATUM_NONE;
 			m_current_absolute_index = data_array->datum_max_elements;
 		}
 		else

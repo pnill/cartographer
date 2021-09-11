@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Common/Common.h"
+#include "BlamPrimitiveType.h"
 
 /*********************************************************************
 * string_id

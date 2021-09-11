@@ -13,7 +13,7 @@ namespace EngineCalls
 			return p_get_object(object_datum_index, object_type_flags);
 		}
 
-		void __cdecl create_new_placement_data(ObjectPlacementData* s_object_placement_data, datum object_definition_index, datum object_owner, int unk)
+		void __cdecl create_new_placement_data(s_object_placement_data* s_object_placement_data, datum object_definition_index, datum object_owner, int unk)
 		{
 			//LOG_TRACE_GAME("object_placement_data_new(s_object_placement_data: %08X,",s_object_placement_data);
 			//LOG_TRACE_GAME("object_definition_index: %08X, object_owner: %08X, unk: %08X)", object_definition_index, object_owner, unk);
@@ -25,7 +25,7 @@ namespace EngineCalls
 		}
 
 		//Pass new placement data into Create_object_new
-		int __cdecl call_object_new(ObjectPlacementData* pObject)
+		int __cdecl call_object_new(s_object_placement_data* pObject)
 		{
 			//LOG_TRACE_GAME("object_new(pObject: %08X)", pObject);
 

@@ -1,9 +1,11 @@
 #include  "MapSlots.h"
+
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD.h"
-#include "Blam/Cache/TagGroups/globals_definition.hpp"
 #include "Util/filesys.h"
 #include "Util/Hooks/Hook.h"
+
+#include "Blam/Cache/TagGroups/globals_definition.hpp"
 
 namespace MapSlots
 {

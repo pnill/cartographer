@@ -574,6 +574,7 @@ INT WINAPI XNetQosRelease(XNQOS* pxnqos)
 	}
 
 	// TODO: find a way to stop the tread writing to this memory block
+	// TODO: there's stub Qos that might get passed to pxnqos, skip memory deallocation, check Networking.cpp for stub
 	// delete[] pxnqos; 
 
 	/* We need to clean-up all XNetQoSLookup data here, listener data should be cleaned up inside the Listen function Only. */

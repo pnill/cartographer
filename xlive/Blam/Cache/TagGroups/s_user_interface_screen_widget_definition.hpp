@@ -1,7 +1,7 @@
 #pragma once
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
-#include "Blam\Cache\DataTypes.h"
-#include "Blam/Maths/real_math.h"
+#include "Blam/Math/BlamMath.h"
 #pragma pack(push, 1)
 
 struct s_user_interface_screen_widget_definition : TagGroup<'wigt'>

@@ -1,8 +1,9 @@
 #include "TagFixes.h"
+
 #include "H2MOD.h"
-#include "Blam/Cache/TagGroups/shader_definition.h"
 #include "Util/Hooks/Hook.h"
-#include "Blam/Cache/TagGroups/light_defenition.h"
+#include "H2MOD/Tags/TagInterface.h"
+#include "Blam/Cache/TagGroups/shader_definition.hpp"
 
 namespace TagFixes
 {
@@ -35,7 +36,7 @@ namespace TagFixes
 								auto bitmap_data = tags::get_tag_data() + (shader_post_bitmap->block_data_offset + (bitmap_idx * 0xC));
 								unsigned long* bitmap = reinterpret_cast<unsigned long*>(bitmap_data);
 								if(*bitmap == bitmap_to_fix.data)
-									*bitmap = datum::Null;
+									*bitmap = NONE;
 							}
 						}
 					}
@@ -60,6 +61,7 @@ namespace TagFixes
 		}
 		void fix_dynamic_lights()
 		{
+			return;
 			auto cinematic_shadow_datum = tags::find_tag(blam_tag::tag_group_type::vertexshader, "rasterizer\\vertex_shaders_dx9\\shadow_buffer_generation_cinematic");
 			auto shadow_datum = tags::find_tag(blam_tag::tag_group_type::shaderpass, "shaders\\shader_passes\\shadow\\shadow_generate");
 			byte* shadow_tag = tags::get_tag<blam_tag::tag_group_type::shaderpass, BYTE>(shadow_datum);

@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes/DatumIndex.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Engine/Objects/ObjectPlacementData.h"
 
 namespace EngineCalls
@@ -19,7 +19,7 @@ namespace EngineCalls
 	namespace Objects
 	{
 		char* __cdecl try_and_get_data_with_type(datum object_datum_index, int object_type_flags);
-		void __cdecl create_new_placement_data(ObjectPlacementData* s_object_placement_data, datum object_definition_index, datum object_owner, int unk);
-		int __cdecl call_object_new(ObjectPlacementData* pObject);
+		void __cdecl create_new_placement_data(s_object_placement_data* s_object_placement_data, datum object_definition_index, datum object_owner, int unk);
+		int __cdecl call_object_new(s_object_placement_data* pObject);
 	}
 }

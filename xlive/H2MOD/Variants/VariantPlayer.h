@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+
 class VariantPlayer
 {
 public:
