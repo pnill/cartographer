@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Maths/real_math.h"
+#include "Blam/Math/real_math.h"
 
 struct __declspec(align(4)) physics_constants
 {

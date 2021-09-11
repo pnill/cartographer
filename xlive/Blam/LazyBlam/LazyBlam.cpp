@@ -105,7 +105,7 @@ namespace lazy_blam
 		for (auto& instance : tag_table.table)
 			if (instance.name == tag_name)
 				return instance.datum_index;
-		return datum::Null;
+		return -1;
 	}
 
 

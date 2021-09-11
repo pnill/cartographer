@@ -242,7 +242,7 @@ inline void defaultFrameLimiter() {
 
 	if (H2Config_experimental_fps == e_render_original_game_frame_limit
 		|| H2Config_fps_limit <= 0
-		|| Engine::IsGameMinimized())
+		|| EngineCalls::IsGameMinimized())
 	{
 		lastFrameSetting = H2Config_fps_limit;
 		frameLimiterInitialized = false;
@@ -402,7 +402,7 @@ float alt_system_time_update()
 	float result = (float)(currentTime - startTime) * 0.001;
 	startTime = currentTime;
 
-	if (cinematic_is_running() || Engine::IsGameMinimized())
+	if (cinematic_is_running() || EngineCalls::IsGameMinimized())
 		result = original_time_update;
 
 	return result;

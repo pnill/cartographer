@@ -3,7 +3,7 @@
 #include "Blam\Common\Common.h"
 
 #include "Blam\Cache\DataTypes\BlamTag.h"
-#include "Blam\Cache\DataTypes\DatumIndex.h"
+#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 #include "Blam/Cache/cache_header.h"
 
 namespace tags

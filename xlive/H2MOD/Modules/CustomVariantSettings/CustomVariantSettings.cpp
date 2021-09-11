@@ -9,6 +9,7 @@
 #include "Blam/Engine/Game/PhysicsConstants.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "Blam/Engine/Players/PlayerControls.h"
+#include "Blam/Engine/Game/GameTimeGlobals.h"
 
 std::map<std::wstring, CustomVariantSettings::s_variantSettings> CustomVariantSettingsMap;
 CustomVariantSettings::s_variantSettings CurrentVariantSettings;

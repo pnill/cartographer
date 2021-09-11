@@ -26,7 +26,7 @@
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
 #include "Util/Hooks/Hook.h"
-#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/EngineCalls/EngineCalls.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
@@ -980,7 +980,7 @@ void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 {
 	network_session* session = NetworkSession::getCurrentNetworkSession();
 
-	if ((session->parameters.session_mode == 4 && Engine::get_game_life_cycle() == life_cycle_pre_game)
+	if ((session->parameters.session_mode == 4 && EngineCalls::get_game_life_cycle() == life_cycle_pre_game)
 		|| (StrStrIW(NetworkSession::getGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
 		//rvb mode enabled, don't change teams
 		return;

@@ -386,7 +386,7 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 					nObject.team_index = NONE;
 
 				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.placement.x, nObject.placement.y, nObject.placement.z);
-				unsigned int object_gamestate_datum = Engine::Objects::call_object_new(&nObject);
+				unsigned int object_gamestate_datum = EngineCalls::Objects::call_object_new(&nObject);
 
 				call_add_object_to_sync(object_gamestate_datum);
 			}

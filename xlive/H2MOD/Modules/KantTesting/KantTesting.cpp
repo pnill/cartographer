@@ -205,12 +205,12 @@ namespace KantTesting
 	//	return res;
 	//}
 
-	typedef int(__cdecl t_object_new)(ObjectPlacementData* data);
+	typedef int(__cdecl t_object_new)(s_object_placement_data* data);
 	t_object_new* p_object_new;
 
-	int __cdecl object_new_impl(ObjectPlacementData* data)
+	int __cdecl object_new_impl(s_object_placement_data* data)
 	{
-		data->variant_index = variants[Player::getPlayer(data->player_index.Index)->properties[0].unk2].get_id();
+		//data->variant_index = variants[Player::getPlayer(data->player_index.Index)->properties[0].unk2].get_id();
 		return p_object_new(data);
 	}
 

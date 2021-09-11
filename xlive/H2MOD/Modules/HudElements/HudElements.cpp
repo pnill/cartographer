@@ -7,7 +7,6 @@
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/EngineCalls/EngineCalls.h"
-#include "H2MOD/Engine/Engine.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 #include "Util\Hooks\Hook.h"

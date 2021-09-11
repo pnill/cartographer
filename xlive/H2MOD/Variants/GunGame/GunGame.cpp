@@ -1,10 +1,8 @@
 #include "stdafx.h"
-#include "Globals.h"
 #include "H2MOD\EngineCalls\EngineCalls.h"
 #include "GunGame.h"
 
 #include "H2MOD.h"
-#include "H2MOD\Engine\Engine.h"
 #include "H2MOD/Modules/Networking/Networking.h"
 
 #include "Util\ReadIniArguments.h"
