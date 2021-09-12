@@ -490,10 +490,6 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct stringMe *s
 	return size*nmemb;
 }
 
-const int ERROR_CODE_CURL_SOCKET_FAILED = -40;
-const int ERROR_CODE_CURL_HANDLE = -41;
-const int ERROR_CODE_CURL_EASY_PERF = -42;
-
 int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response) {
 	int result = ERROR_CODE_CURL_SOCKET_FAILED;//Socket failed to connect to server
 

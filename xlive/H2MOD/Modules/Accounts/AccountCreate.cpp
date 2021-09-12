@@ -6,13 +6,13 @@
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 
-const int ERROR_CODE_INVALID_PARAM = -1;
-const int ERROR_CODE_INVALID_EMAIL = -2;
-const int ERROR_CODE_INVALID_USERNAME = -3;
-const int ERROR_CODE_INVALID_PASSWORD = -4;
-const int ERROR_CODE_TAKEN_EMAIL = -5;
-const int ERROR_CODE_TAKEN_USERNAME = -6;
-const int ERROR_CODE_BANNED_EMAIL_DOMAIN = -7;
+#define ERROR_CODE_INVALID_PARAM -1
+#define ERROR_CODE_INVALID_EMAIL -2
+#define ERROR_CODE_INVALID_USERNAME -3
+#define ERROR_CODE_INVALID_PASSWORD -4
+#define ERROR_CODE_TAKEN_EMAIL -5
+#define ERROR_CODE_TAKEN_USERNAME -6
+#define ERROR_CODE_BANNED_EMAIL_DOMAIN -7
 
 static int InterpretMasterCreate(char* response_content) {
 	int result = 0;//will stay as 0 when master only returns "return_code=xxx<br>"

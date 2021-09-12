@@ -191,8 +191,8 @@ DWORD WINAPI XStorageDownloadToMemory(DWORD dwUserIndex,
 	if (pXOverlapped)
 	{
 		pXOverlapped->InternalLow = ERROR_SUCCESS;
-		pXOverlapped->InternalHigh = size;
 		pXOverlapped->dwExtendedError = 0;
+		pXOverlapped->InternalHigh = size;
 
 		Check_Overlapped(pXOverlapped);
 
@@ -213,9 +213,9 @@ DWORD WINAPI XStorageDelete(DWORD dwUserIndex, const WCHAR *wszServerPath, XOVER
 	if (pXOverlapped) {
 		//asynchronous
 
-		pXOverlapped->InternalHigh = 0;
 		pXOverlapped->InternalLow = ERROR_SUCCESS;
 		pXOverlapped->dwExtendedError = 0;
+		pXOverlapped->InternalHigh = 0;
 
 		Check_Overlapped(pXOverlapped);
 
