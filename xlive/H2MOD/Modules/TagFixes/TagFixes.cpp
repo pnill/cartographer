@@ -148,7 +148,7 @@ namespace TagFixes
 		}
 
 
-		//Hacky thingy that does stuff for setting flags to true or false
+		//Hacky thingy for flags in the light tagblock
 		//Should Prob Remove when a better solution is found
 		template<class T> inline T operator~ (T a) { return (T)~(int)a; }
 		template<class T> inline T operator| (T a, T b) { return (T)((int)a | (int)b); }

@@ -740,6 +740,13 @@ map_cache_load p_map_cache_load;
 
 bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_settings)
 {
+
+	//Set the light suppressor flag to false
+	if (H2Config_light_framerate_killer)
+	{
+		WriteValue(Memory::GetAddress(0x41F6B1), 0);
+	}
+
 	static bool resetAfterMatch = false;
 
 	bool result = p_map_cache_load(engine_settings);
@@ -794,7 +801,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		addDebugText("Engine type: Main-Menu");
 		UIRankPatch();
 		H2Tweaks::toggleAiMp(false);
-		H2Tweaks::toggleUncappedCampaignCinematics(false);
+		//H2Tweaks::toggleUncappedCampaignCinematics(false);
 		MetaExtender::free_tag_blocks();
 		return result;
 	}
@@ -833,7 +840,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		}
 
 		H2Tweaks::toggleAiMp(true);
-		H2Tweaks::toggleUncappedCampaignCinematics(false);
+		//H2Tweaks::toggleUncappedCampaignCinematics(false);
 		EventHandler::executeMapLoadCallback(e_engine_type::Multiplayer);
 
 		if (Engine::get_game_life_cycle() == life_cycle_in_game)
@@ -864,7 +871,7 @@ bool __cdecl OnMapLoad(Blam::EngineDefinitions::game_engine_settings* engine_set
 		//if anyone wants to run code on map load single player
 		addDebugText("Engine type: Singleplayer");
 		//H2X::Initialize(true);
-		H2Tweaks::toggleUncappedCampaignCinematics(true);
+		//H2Tweaks::toggleUncappedCampaignCinematics(true);
 		EventHandler::executeMapLoadCallback(e_engine_type::SinglePlayer);
 	}
 
@@ -1563,6 +1570,11 @@ void H2MOD::ApplyHooks() {
 	// disable part of custom map tag verification
 	NopFill(Memory::GetAddress(0x4FA0A, 0x56C0A), 6);
 
+	//Disable lightsupressor function
+	if (H2Config_light_framerate_killer)
+	{
+		NopFill(Memory::GetAddress(0x1922d9), 7);
+	}
 	// disables profiles/game saves encryption
 	PatchWinAPICall(Memory::GetAddress(0x9B08A, 0x85F5E), CryptProtectDataHook);
 	PatchWinAPICall(Memory::GetAddress(0x9AF9E, 0x352538), CryptUnprotectDataHook);
@@ -1571,85 +1583,85 @@ void H2MOD::ApplyHooks() {
 	ApplyUnitHooks();
 	mapManager->applyHooks();
 
-	ProjectileFix::ApplyPatches();
+ProjectileFix::ApplyPatches();
 
-	//Guardian Patch
-	c_object_cause_damage = Memory::GetAddress<p_object_cause_damage*>(0x17AD81, 0x1525E1);
-	PatchCall(Memory::GetAddress(0x147DB8, 0x172D55), projectile_collision_object_cause_damage);
+//Guardian Patch
+c_object_cause_damage = Memory::GetAddress<p_object_cause_damage*>(0x17AD81, 0x1525E1);
+PatchCall(Memory::GetAddress(0x147DB8, 0x172D55), projectile_collision_object_cause_damage);
 
-	// bellow hooks applied to specific executables
-	if (Memory::isDedicatedServer() == false) {
+// bellow hooks applied to specific executables
+if (Memory::isDedicatedServer() == false) {
 
-		LOG_TRACE_GAME("Applying client hooks...");
-		/* These hooks are only built for the client, don't enable them on the server! */
+	LOG_TRACE_GAME("Applying client hooks...");
+	/* These hooks are only built for the client, don't enable them on the server! */
 
 
-		//Shader LOD Bias stuff
-		//c_sub_81A676 = Memory::GetAddress<p_sub_81A676*>(0x19A676);
-		//PatchCall(Memory::GetAddress(0x19AD71), sub_81A676);
-		//PatchCall(Memory::GetAddress(0x19ADBC), sub_81A676);
+	//Shader LOD Bias stuff
+	//c_sub_81A676 = Memory::GetAddress<p_sub_81A676*>(0x19A676);
+	//PatchCall(Memory::GetAddress(0x19AD71), sub_81A676);
+	//PatchCall(Memory::GetAddress(0x19ADBC), sub_81A676);
 
-		p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C14), (BYTE*)VerifyGameVersionOnJoin, 5);
+	p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C14), (BYTE*)VerifyGameVersionOnJoin, 5);
 
-		p_verify_executable_version = (verify_executable_version)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C32), (BYTE*)VerifyExecutableVersion, 8);
+	p_verify_executable_version = (verify_executable_version)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C32), (BYTE*)VerifyExecutableVersion, 8);
 
-		//pload_wgit = (tload_wgit)DetourClassFunc(Memory::GetAddress<BYTE*>(0x2106A2), (BYTE*)OnWgitLoad, 13);
+	//pload_wgit = (tload_wgit)DetourClassFunc(Memory::GetAddress<BYTE*>(0x2106A2), (BYTE*)OnWgitLoad, 13);
 
-		//intercept_map_load_method = (intercept_map_load)DetourClassFunc(Memory::GetAddress<BYTE*>(0xC259B), (BYTE*)interceptMapLoad, 13);
+	//intercept_map_load_method = (intercept_map_load)DetourClassFunc(Memory::GetAddress<BYTE*>(0xC259B), (BYTE*)interceptMapLoad, 13);
 
-		show_error_screen_method = (show_error_screen)DetourFunc(Memory::GetAddress<BYTE*>(0x20E15A), (BYTE*)showErrorScreen, 8);
+	show_error_screen_method = (show_error_screen)DetourFunc(Memory::GetAddress<BYTE*>(0x20E15A), (BYTE*)showErrorScreen, 8);
 
-		//TODO: turn on if you want to debug halo2.exe from start of process
-		is_debugger_present_method = (is_debugger_present)DetourFunc(Memory::GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
+	//TODO: turn on if you want to debug halo2.exe from start of process
+	is_debugger_present_method = (is_debugger_present)DetourFunc(Memory::GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
 
-		//TODO: use for object spawn hooking
-		//0x132163
-		//object_p_hook_method = (object_p_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x132163), (BYTE*)objectPHook, 6);
+	//TODO: use for object spawn hooking
+	//0x132163
+	//object_p_hook_method = (object_p_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x132163), (BYTE*)objectPHook, 6);
 
-		//TODO: expensive, use for debugging/searching
-		//string_display_hook_method = (string_display_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x287AB5), (BYTE*)stringDisplayHook, 5);
+	//TODO: expensive, use for debugging/searching
+	//string_display_hook_method = (string_display_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x287AB5), (BYTE*)stringDisplayHook, 5);
 
-		//pResetRound=(ResetRounds)DetourFunc(Memory::GetAddress<BYTE*>(0x6B1C8), (BYTE*)OnNextRound, 7);
+	//pResetRound=(ResetRounds)DetourFunc(Memory::GetAddress<BYTE*>(0x6B1C8), (BYTE*)OnNextRound, 7);
 
-		/*
-		WritePointer(Memory::GetAddress<BYTE*>(0x1F0B3A), player_add_packet_handler);
-		WritePointer(Memory::GetAddress<BYTE*>(0x1F0B80), player_remove_packet_handler);
-		*/
+	/*
+	WritePointer(Memory::GetAddress<BYTE*>(0x1F0B3A), player_add_packet_handler);
+	WritePointer(Memory::GetAddress<BYTE*>(0x1F0B80), player_remove_packet_handler);
+	*/
 
-		p_change_local_team = (change_team)DetourFunc(Memory::GetAddress<BYTE*>(0x2068F2), (BYTE*)changeTeam, 8);
+	p_change_local_team = (change_team)DetourFunc(Memory::GetAddress<BYTE*>(0x2068F2), (BYTE*)changeTeam, 8);
 
-		// hook the print command to redirect the output to our console
-		PatchCall(Memory::GetAddress(0xE9E50), print_to_console);
+	// hook the print command to redirect the output to our console
+	PatchCall(Memory::GetAddress(0xE9E50), print_to_console);
 
-		calculate_model_lod = Memory::GetAddress(0x19CA3E);
-		calculate_model_lod_detour_end = Memory::GetAddress(0x19CDA3 + 5);
-		WriteJmpTo(Memory::GetAddress(0x19CDA3), calculate_model_lod_detour);
+	calculate_model_lod = Memory::GetAddress(0x19CA3E);
+	calculate_model_lod_detour_end = Memory::GetAddress(0x19CDA3 + 5);
+	WriteJmpTo(Memory::GetAddress(0x19CDA3), calculate_model_lod_detour);
 
-		// set max model quality to L6
-		WriteValue(Memory::GetAddress(0x190B38 + 1), 5);
+	// set max model quality to L6
+	WriteValue(Memory::GetAddress(0x190B38 + 1), 5);
 
-		pfn_c000bd114 = (tfn_c000bd114)DetourFunc(Memory::GetAddress<BYTE*>(0xbd114), (BYTE*)fn_c000bd114_IsSkullEnabled, 5);
+	pfn_c000bd114 = (tfn_c000bd114)DetourFunc(Memory::GetAddress<BYTE*>(0xbd114), (BYTE*)fn_c000bd114_IsSkullEnabled, 5);
 
-		PatchCall(Memory::GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);
-		PatchCall(Memory::GetAddress(0x92C05), BansheeBombIsEngineMPCheck);
-		PatchCall(Memory::GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
+	PatchCall(Memory::GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);
+	PatchCall(Memory::GetAddress(0x92C05), BansheeBombIsEngineMPCheck);
+	PatchCall(Memory::GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
-		PatchCall(Memory::GetAddress(0x226702), game_mode_engine_draw_team_indicators);
+	PatchCall(Memory::GetAddress(0x226702), game_mode_engine_draw_team_indicators);
 
-		//Initialise_tag_loader();
-		PlayerControl::ApplyHooks();
-		c_set_screen_bounds = Memory::GetAddress<p_set_screen_bounds*>(0x264979);
-		//PatchCall(GetAddress(0x25E1E5), set_screen_bounds);
-		
-	}
-	else {
+	//Initialise_tag_loader();
+	PlayerControl::ApplyHooks();
+	c_set_screen_bounds = Memory::GetAddress<p_set_screen_bounds*>(0x264979);
+	//PatchCall(GetAddress(0x25E1E5), set_screen_bounds);
 
-		LOG_TRACE_GAME("Applying dedicated server hooks...");
-		PatchCall(Memory::GetAddressRelative(0, 0x40BF43), should_start_pregame_countdown_hook);
-		ServerConsole::ApplyHooks();
+}
+else {
 
-		p_get_enabled_teams_flags = (get_enabled_teams_flags_def)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x19698B), (BYTE*)get_enabled_teams_flags, 6);
-	}
+	LOG_TRACE_GAME("Applying dedicated server hooks...");
+	PatchCall(Memory::GetAddressRelative(0, 0x40BF43), should_start_pregame_countdown_hook);
+	ServerConsole::ApplyHooks();
+
+	p_get_enabled_teams_flags = (get_enabled_teams_flags_def)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x19698B), (BYTE*)get_enabled_teams_flags, 6);
+}
 }
 
 VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
@@ -1665,7 +1677,7 @@ void H2MOD::Initialize()
 		MouseInput::Initialize();
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
-		
+
 		Initialise_tag_loader();
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
