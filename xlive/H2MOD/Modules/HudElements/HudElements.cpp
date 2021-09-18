@@ -22,7 +22,7 @@ static bool RenderIngameChat() {
 
 	if (H2Config_hide_ingame_chat) {
 		datum local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
-		if (Player::getPlayer(local_player_datum_index.Index)->is_chatting == 2) {
+		if (Player::getPlayer(DATUM_ABSOLUTE_INDEX(local_player_datum_index))->is_chatting == 2) {
 			extern void hotkeyFuncToggleHideIngameChat();
 			hotkeyFuncToggleHideIngameChat();
 		}
@@ -65,25 +65,22 @@ static bool __cdecl RenderHudCheck(unsigned int a1)
 
 	return false;
 }
-typedef void(__cdecl p_render_camera_build_frustum)(int a1, int a2, int a3);
-p_render_camera_build_frustum* c_render_camera_build_frustum;
+typedef void(__cdecl render_camera_build_projection)(char*, int, int);
+render_camera_build_projection* p_render_camera_build_projection;
 
-void __cdecl render_camera_build_frustum(int a1, int a2, int a3)
+void __cdecl render_camera_build_projection_hook(char* camera, int frustum_bounds, int out_projection)
 {
+	float old_camera_field_of_view = *(float*)(camera + 0x28);
+	
 	if (H2Config_static_first_person) 
 	{
-		float old_flt = *(float*)(a1 + 0x28);
-
-		*(float*)(a1 + 0x28) = ((64.f * M_PI) / 180.0f) * 0.78500003f;
+		*(float*)(camera + 0x28) = ((64.f * M_PI) / 180.0f) * 0.78500003f;
 		//*(float*)(a1 + 0x28) = 0.86558843f;
-		//Memory::GetAddress<void(__cdecl*)(int, int, int)>(0x1953F5)(a1, a2, a3);
-		c_render_camera_build_frustum(a1, a2, a3);
-		*(float*)(a1 + 0x28) = old_flt;
 	}
-	else
-	{
-		c_render_camera_build_frustum(a1, a2, a3);
-	}
+	
+	p_render_camera_build_projection(camera, frustum_bounds, out_projection);
+	
+	*(float*)(camera + 0x28) = old_camera_field_of_view;
 }
 
 void HudElements::setCrosshairSize(bool mapLoadContext)
@@ -133,15 +130,11 @@ void HudElements::setCrosshairPos() {
 
 	if (Memory::isDedicatedServer())
 		return;
-	commands->display("Setting Chrosshair position");
 	if (!FloatIsNaN(H2Config_crosshair_offset)) {
-		commands->display("Crosshair override position is:" + std::to_string(H2Config_crosshair_offset));
 		tags::tag_data_block* player_controls_block = reinterpret_cast<tags::tag_data_block*>(tags::get_matg_globals_ptr() + 240);
-		commands->display("Player_Controls_Block: " + IntToString<int>(player_controls_block->block_data_offset, std::hex) + " : " + IntToString<int>(player_controls_block->block_count));
 		if (player_controls_block->block_count > 0)
 		{
 			for (int i = 0; i < player_controls_block->block_count; i++) {
-				commands->display("Setting Player Control Tag Block Index: " + IntToString<int>(i));
 				*(float*)(tags::get_tag_data() + player_controls_block->block_data_offset + 128 * i + 28) = H2Config_crosshair_offset;
 			}
 		}
@@ -232,8 +225,8 @@ void HudElements::ApplyHooks()
 	PatchCall(Memory::GetAddress(0x226628), RenderIngameChat);
 	PatchCall(Memory::GetAddress(0x228579), RenderFirstPersonCheck);
 	PatchCall(Memory::GetAddress(0x223955), RenderHudCheck);
-	PatchCall(Memory::GetAddress(0x191440), render_camera_build_frustum);
-	c_render_camera_build_frustum = Memory::GetAddress<p_render_camera_build_frustum*>(0x1953f5);
+	PatchCall(Memory::GetAddress(0x191440), render_camera_build_projection_hook);
+	p_render_camera_build_projection = Memory::GetAddress<render_camera_build_projection*>(0x1953f5);
 }
 void HudElements::Init()
 {

@@ -102,7 +102,7 @@ namespace MapSlots
 				for (auto item : BitmapsToLoad)
 				{
 
-					tag_loader::Load_tag(item.first.ToInt(), false, item.second);
+					tag_loader::Load_tag(item.first, false, item.second);
 				}
 				tag_loader::Push_Back();
 
@@ -133,7 +133,7 @@ namespace MapSlots
 									//Write the data loaded from the maps into the unused slot
 									*slot = newSlot;
 									//Resolve the loaded bitmap datum
-									slot->bitmap.TagIndex = tag_loader::ResolveNewDatum(newSlot.bitmap.TagIndex.ToInt());
+									slot->bitmap.TagIndex = tag_loader::ResolveNewDatum(newSlot.bitmap.TagIndex);
 									//Change the map id and sort ID so that the maps are 
 									//placed in order at the end of the list
 									slot->map_id = MapIndex + i;

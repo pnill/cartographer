@@ -18,8 +18,9 @@ namespace EngineCalls
 
 	namespace Objects
 	{
-		char* __cdecl try_and_get_data_with_type(datum object_datum_index, int object_type_flags);
+		char* __cdecl object_try_and_get_and_verify_type(datum object_datum_index, int object_type_flags);
 		void __cdecl create_new_placement_data(s_object_placement_data* s_object_placement_data, datum object_definition_index, datum object_owner, int unk);
 		int __cdecl call_object_new(s_object_placement_data* pObject);
+		void apply_biped_object_definition_patches();
 	}
 }

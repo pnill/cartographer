@@ -366,10 +366,10 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 		try {
 			s_object_placement_data nObject;
 
-			if (!object_datum.IsNull()) {
-				datum player_datum = Player::getPlayerUnitDatumIndex(h2mod->get_player_datum_index_from_controller_index(0).Index);
+			if (!DATUM_IS_NONE(object_datum)) {
+				datum player_datum = Player::getPlayerUnitDatumIndex(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 				EngineCalls::Objects::create_new_placement_data(&nObject, object_datum, player_datum, 0);
-				real_point3d* player_position = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
+				real_point3d* player_position = h2mod->get_player_unit_coords(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 
 				if (player_position != nullptr) {
 					nObject.placement.x = player_position->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
@@ -385,9 +385,8 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 				if (!sameTeam)
 					nObject.team_index = NONE;
 
-				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum.ToInt(), nObject.placement.x, nObject.placement.y, nObject.placement.z);
+				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum, nObject.placement.x, nObject.placement.y, nObject.placement.z);
 				unsigned int object_gamestate_datum = EngineCalls::Objects::call_object_new(&nObject);
-
 				call_add_object_to_sync(object_gamestate_datum);
 			}
 		}
@@ -616,7 +615,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			if (splitCommands[3] == "true")
 				sameTeam = true;
 
-			real_point3d* localPlayerPosition = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
+			real_point3d* localPlayerPosition = h2mod->get_player_unit_coords(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 			this->spawn(object_datum, count, localPlayerPosition->x + 0.5f, localPlayerPosition->y + 0.5f, localPlayerPosition->z + 0.5f, randomMultiplier, false, sameTeam);
 			return;
 		}
@@ -781,10 +780,10 @@ void ConsoleCommands::handle_command(std::string command) {
 			std::string mapName = splitCommands[3];
 
 			auto tagDatum = tag_loader::Get_tag_datum(tagName, tagType, mapName);
-			tag_loader::Load_tag(tagDatum.ToInt(), true, mapName);
+			tag_loader::Load_tag(tagDatum, true, mapName);
 			tag_loader::Push_Back();
 			std::wstring result = L"Loaded Tag Datum: ";
-			result += IntToWString<int>(tag_loader::ResolveNewDatum(tagDatum.ToInt()).ToInt(), std::hex);
+			result += IntToWString<int>(tag_loader::ResolveNewDatum(tagDatum), std::hex);
 			output(result);
 
 			LOG_INFO_GAME("{} {} {}", tagName, tagType.as_string(), mapName);

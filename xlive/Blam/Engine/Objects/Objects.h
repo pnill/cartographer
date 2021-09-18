@@ -86,7 +86,8 @@ enum e_biped_physics_mode : BYTE
 	mode_melee
 };
 
-struct object_base_definition
+#pragma pack(push, 1)
+struct s_object_base_definition
 {
 	datum tag_definition_index;
 	DWORD object_flags;
@@ -115,7 +116,9 @@ struct object_base_definition
 	BYTE netgame_equipment_index;
 	DWORD gap_6;
 	datum havok_component_datum;
-	BYTE gap_B8[44];
+	BYTE gap_B8[0x1A];
+	BYTE model_variant_id;
+	BYTE gap_D6[17];
 	float body_max_vitality;
 	float shield_max_vitality;
 	float body_current_vitality;
@@ -126,9 +129,10 @@ struct object_base_definition
 	WORD field_10A;
 	BYTE gap_10C[32];
 };
-CHECK_STRUCT_SIZE(object_base_definition, 0x12C);
+#pragma pack(pop)
+CHECK_STRUCT_SIZE(s_object_base_definition, 0x12C);
 
-struct s_biped_object_definition : object_base_definition
+struct s_biped_object_definition : s_object_base_definition
 {
 	BYTE ObjectsAttach;//0x12C
 	BYTE unk_11[3];//0x12D
@@ -164,12 +168,15 @@ struct s_biped_object_definition : object_base_definition
 
 	e_biped_physics_mode unitState;//0x3F4
 	BYTE unk_18[0x21C];
+	
+	// NEW DATA
+	unsigned int variant_index;
 };
-CHECK_STRUCT_SIZE(s_biped_object_definition, 0x480);
+CHECK_STRUCT_SIZE(s_biped_object_definition, 0x480 + 4);
 
-struct s_weapon_object_definition : object_base_definition
+struct s_weapon_object_definition : s_object_base_definition
 {
-	char gap[0x25C - sizeof(object_base_definition)];
+	char gap[0x25C - sizeof(s_object_base_definition)];
 };
 CHECK_STRUCT_SIZE(s_weapon_object_definition, 0x25C);
 
@@ -195,5 +202,11 @@ static s_object_header* get_objects_header(datum object_index)
 	*/
 
 	auto objects_header = get_objects_header();
-	return (s_object_header*)(&objects_header->datum[objects_header->datum_element_size * object_index.ToAbsoluteIndex()]);
+	return (s_object_header*)(&objects_header->datum[objects_header->datum_element_size * DATUM_ABSOLUTE_INDEX(object_index)]);
+}
+
+template<typename T = s_object_base_definition>
+static T* get_object_fast_unsafe(datum object_index)
+{
+	return (T*)get_objects_header(object_index)->object;
 }

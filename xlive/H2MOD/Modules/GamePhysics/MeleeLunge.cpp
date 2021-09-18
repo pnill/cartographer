@@ -272,8 +272,8 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 		int added_ticks = (this->m_maximum_counter - 6) - (this->m_weapon_is_sword ? 7 : 1);
 	}*/
 
-	real_vector3d distance_vector = this->m_target_point - *object_origin;
-	float remaining_distance_from_player_position = distance_vector.magnitude();
+	real_vector3d target_vector = this->m_target_point - *object_origin;
+	float remaining_distance_from_player_position = target_vector.magnitude();
 	float max_speed_per_tick = get_max_melee_lunge_speed_per_tick(m_distance, m_weapon_is_sword);
 
 	float current_velocity_and_aiming_vector_dot_product = m_aiming_direction.dot_product(*current_velocity);

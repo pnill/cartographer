@@ -11,7 +11,7 @@ s_datum_array* s_game_state_objects::getArray()
 bool s_game_state_objects::indexValid(datum objectDatum)
 {
     //TODO
-    if (objectDatum.ToAbsoluteIndex() >= 0 && objectDatum.ToAbsoluteIndex() < getArray()->datum_max_elements)
+    if (DATUM_ABSOLUTE_INDEX(objectDatum) >= 0 && DATUM_ABSOLUTE_INDEX(objectDatum) < getArray()->datum_max_elements)
         return true;
     return false;
 }
@@ -21,10 +21,12 @@ void* s_game_state_objects::getObject(datum objectDatum)
 {
     if (!indexValid(objectDatum))
         return nullptr;
-    return (void*)&getArray()->datum[objectDatum.ToAbsoluteIndex() * getArray()->datum_element_size];
+        
+     return (void*)&getArray()->datum[DATUM_ABSOLUTE_INDEX(objectDatum) * getArray()->datum_element_size];
 }
 
 void* s_game_state_objects::getObject(short objectIndex)
 {
 	return (void*)&getArray()->datum[objectIndex * getArray()->datum_element_size + 8];
 }
+

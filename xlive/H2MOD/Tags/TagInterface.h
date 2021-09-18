@@ -109,13 +109,13 @@ namespace tags
 		}
 		auto instance = get_tag_instances()[idx];
 		datum tag_datum = instance.datum_index;
-		LOG_CHECK(tag_datum.Index == idx); // should always be true
+		LOG_CHECK(DATUM_ABSOLUTE_INDEX(tag_datum) == idx); // should always be true
 		return tag_datum;
 	}
 
 	inline tag_instance* datum_to_instance(datum datum)
 	{
-		return &get_tag_instances()[datum.ToAbsoluteIndex()];
+		return &get_tag_instances()[DATUM_ABSOLUTE_INDEX(datum)];
 	}
 
 	/* Get parent tag groups for a tag group */
@@ -174,21 +174,21 @@ namespace tags
 	{
 		tag_offset_header* header = get_tags_header();
 
-		if (tag.IsNull())
+		if (DATUM_IS_NONE(tag))
 		{
-			LOG_ERROR_FUNC("Bad tag datum - null datum: {}, tag count: {}", tag.Index, header->tag_count);
+			LOG_ERROR_FUNC("Bad tag datum - null datum: {}, tag count: {}", DATUM_ABSOLUTE_INDEX(tag), header->tag_count);
 			return nullptr;
 		}
 
 		// out of bounds check
-		if (tag.Index > header->tag_count && !injectedTag)
+		if (DATUM_ABSOLUTE_INDEX(tag) > header->tag_count && !injectedTag)
 		{
-			LOG_CRITICAL_FUNC("Bad tag datum - index out of bounds (idx: {}, bounds: {})", tag.Index, header->tag_count);
+			LOG_CRITICAL_FUNC("Bad tag datum - index out of bounds (idx: {}, bounds: {})", DATUM_ABSOLUTE_INDEX(tag), header->tag_count);
 			return nullptr;
 		}
 
 		//tag_instance instance = header->tag_instances[tag.Index];
-		tag_instance instance = get_tag_instances()[tag.Index];
+		tag_instance instance = get_tag_instances()[DATUM_ABSOLUTE_INDEX(tag)];
 		if (request_type != blam_tag::tag_group_type::none && !is_tag_or_parent_tag(instance.type, request_type))
 		{
 			LOG_ERROR_FUNC("tag type doesn't match requested type - to disable check set requested type to 'none' in template");
@@ -201,7 +201,7 @@ namespace tags
 	template <typename T = void>
 	inline T* get_tag_fast(datum tag)
 	{
-		return reinterpret_cast<T*>(&get_tag_data()[get_tag_instances()[tag.ToAbsoluteIndex()].data_offset]);
+		return reinterpret_cast<T*>(&get_tag_data()[get_tag_instances()[DATUM_ABSOLUTE_INDEX(tag)].data_offset]);
 	}
 
 	/*
@@ -224,7 +224,7 @@ namespace tags
 			while (current_index < get_tag_count())
 			{
 				auto tag_instance = &get_tag_instances()[current_index++];
-				if (tag_instance && !tag_instance->type.is_none() && !tag_instance->datum_index.IsNull())
+				if (tag_instance && !tag_instance->type.is_none() && !DATUM_IS_NONE(tag_instance->datum_index))
 				{
 					if (type.is_none() || is_tag_or_parent_tag(tag_instance->type, type))
 					{
