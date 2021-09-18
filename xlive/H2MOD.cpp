@@ -51,7 +51,6 @@ AdvLobbySettings* advLobbySettings = new AdvLobbySettings();
 StatsHandler* stats_handler; 
 
 extern int H2GetInstanceId();
-std::unordered_map<int, int> object_to_variant;
 
 bool b_H2X = false;
 bool b_GunGame = false;
@@ -624,8 +623,6 @@ bool __cdecl OnMapLoad(s_game_engine_settings* engine_settings)
 	bool result = p_map_cache_load(engine_settings);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
-	// clear all the object variant data
-	object_to_variant.clear();
 
 	// set the engine type
 	h2mod->SetCurrentEngineType(engine_settings->map_type);

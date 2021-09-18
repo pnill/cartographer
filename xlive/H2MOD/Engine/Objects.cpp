@@ -166,16 +166,16 @@ namespace Engine::Objects
 	void apply_biped_object_definition_patches()
 	{
 		// increase the data size for biped representation
-		WriteValue<short>(Memory::GetAddressRelative(0x81E9A8, 0x0) + 8, sizeof(s_biped_object_definition));
+		WriteValue<short>(Memory::GetAddressRelative(0x81E9A8, 0x7C1EB8) + 8, sizeof(s_biped_object_definition));
 
 		// hook the function that updates the variant
-		WriteJmpTo(Memory::GetAddressRelative(0x52FED3, 0x0), update_object_variant_index_to_cdecl);
+		WriteJmpTo(Memory::GetAddressRelative(0x52FED3, 0x51ED96), update_object_variant_index_to_cdecl);
 
 		// increase the size of the unit entity creation definition packet
 		WriteValue<DWORD>(Memory::GetAddress(0x1F8028, 0x1E1D8E) + 1, 36 + 4);
 
 		// increase the minimum required bitstream size
-		WriteValue<BYTE>(Memory::GetAddressRelative(0x5F84B9, 0x0) + 3, 5 + 32); // + 32 is quite much, but idk how bitstream will behave with less than 32 when dealin with integers
+		WriteValue<BYTE>(Memory::GetAddressRelative(0x5F84B9, 0x5E221F) + 3, 5 + 32); // + 32 is quite much, but idk how bitstream will behave with less than 32 when dealin with integers
 
 		PatchCall(Memory::GetAddressRelative(0x5F807A, 0x5E1DE0), object_build_creation_data_hook);
 

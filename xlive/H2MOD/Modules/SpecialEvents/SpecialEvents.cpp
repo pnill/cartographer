@@ -75,7 +75,7 @@ namespace SpecialEvents
 		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 		{
 			santa_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", blam_tag::tag_group_type::scenario, "carto_shared");
-			if (!santa_hat_datum) {
+			if (!DATUM_IS_NONE(santa_hat_datum)) {
 				tag_loader::Load_tag(santa_hat_datum, true, "carto_shared");
 				tag_loader::Push_Back();
 				//auto scen = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(datum(_INJECTED_TAG_START_));
