@@ -30,14 +30,15 @@ class DatumIterator
 {
 public:
 
-	DatumIterator(s_datum_array* _data_array) : data_array(_data_array)
+	DatumIterator(s_datum_array* _data_array) : 
+		data_array(_data_array),
+		m_current_absolute_index(NONE),
+		m_last_datum_index(DATUM_NONE)
 	{
-		m_current_absolute_index = NONE;
-	};
+	}
 
 	~DatumIterator()
 	{
-
 	}
 
 	s_datum_array* get_datum_array()
@@ -89,7 +90,7 @@ public:
 				return -1;
 		}
 		return index;
-	};
+	}
 
 	int get_current_absolute_index()
 	{
