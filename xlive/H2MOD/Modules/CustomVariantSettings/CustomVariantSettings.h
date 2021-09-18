@@ -2,7 +2,7 @@
 #include "H2MOD/Modules/Networking/Memory/bitstream.h"
 #include "Blam/Engine/Game/PhysicsConstants.h"
 
-#define CustomVariantSettingsPacketSize 37
+#define CustomVariantSettingsPacketSize 60
 namespace CustomVariantSettings
 {
 	enum e_hill_rotation
@@ -33,6 +33,7 @@ namespace CustomVariantSettings
 			return Gravity * physics_constants::get_default_gravity();
 		}
 		byte PredefinedHillSet[16];
+		double ForcedFOV = 0;
 
 		inline bool operator==(s_variantSettings& other)
 		{

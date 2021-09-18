@@ -1681,6 +1681,7 @@ void H2MOD::Initialize()
 	{
 		playlist_loader::initialize();
 	}
+	KantTesting::Initialize();
 	CustomVariantSettings::Initialize();
 	MeleeFix::Initialize();
 	TagFixes::Initalize();

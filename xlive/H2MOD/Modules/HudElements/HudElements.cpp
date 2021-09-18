@@ -8,7 +8,7 @@
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/EngineCalls/EngineCalls.h"
 #include "H2MOD/Tags/TagInterface.h"
-
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "Util\Hooks\Hook.h"
 
 #define _USE_MATH_DEFINES
@@ -173,7 +173,10 @@ void HudElements::setFOV() {
 		}
 
 		//const double default_radians_field_of_view = 70.0f * M_PI / 180.0f;
-		fov = (float)H2Config_field_of_view * M_PI / 180.0f;
+		if (CurrentVariantSettings.ForcedFOV == 0)
+			fov = (float)H2Config_field_of_view * M_PI / 180.0f;
+		else
+			fov = (float)CurrentVariantSettings.ForcedFOV * M_PI / 180.0f;
 	}
 }
 
@@ -184,7 +187,17 @@ void HudElements::setVehicleFOV() {
 
 	if (H2Config_vehicle_field_of_view > 0 && H2Config_vehicle_field_of_view <= 110)
 	{
-		float calculated_radians_FOV = (float)H2Config_vehicle_field_of_view * M_PI / 180.0f;
+		float calculated_radians_FOV;
+		if (CurrentVariantSettings.ForcedFOV == 0) {
+			calculated_radians_FOV = (float)H2Config_vehicle_field_of_view * M_PI / 180.0f;
+			//WriteValue(Memory::GetAddress(0x413780), (float)H2Config_vehicle_field_of_view * M_PI / 180.0f);
+		}
+			//
+		else {
+			calculated_radians_FOV = (float)CurrentVariantSettings.ForcedFOV * M_PI / 180.0f;
+			//WriteValue(Memory::GetAddress(0x413780), (float)CurrentVariantSettings.ForcedFOV * M_PI / 180.0f);
+		}
+			//
 		WriteValue(Memory::GetAddress(0x413780), calculated_radians_FOV); // Third Person
 	}
 }

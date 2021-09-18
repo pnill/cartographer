@@ -67,6 +67,8 @@ namespace tag_loader
 	void Add_tags_to_simulation_table();
 	//Get new datum from old datum
 	datum ResolveNewDatum(int oldDatum);
+	//Temporary call
+	tags::tag_instance AddNewtagInstance(blam_tag type, int data, size_t size);
 	///
 	//<-----------------The query parser or more of a script parser------------------------------->
 	///

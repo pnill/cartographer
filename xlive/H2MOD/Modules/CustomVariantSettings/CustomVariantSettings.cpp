@@ -10,6 +10,7 @@
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "Blam/Engine/Players/PlayerControls.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
+#include "H2MOD/Modules/HudElements/HudElements.h"
 
 std::map<std::wstring, CustomVariantSettings::s_variantSettings> CustomVariantSettingsMap;
 CustomVariantSettings::s_variantSettings CurrentVariantSettings;
@@ -24,6 +25,7 @@ namespace CustomVariantSettings
 		stream->data_encode_bool("Explosion Physics", data->ExplosionPhysics);
 		stream->data_encode_integer("Hill Rotation", (byte)data->HillRotation, 8);
 		stream->data_encode_bool("Infinite Grenades", data->InfiniteGrenades);
+		stream->data_encode_bits("Forced FOV", &data->ForcedFOV, sizeof(data->ForcedFOV) * CHAR_BIT);
 	}
 	bool __cdecl DecodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data)
 	{
@@ -33,11 +35,14 @@ namespace CustomVariantSettings
 		double gamespeed;
 		stream->data_decode_bits("game speed", &gamespeed, sizeof(gamespeed) * CHAR_BIT);
 		data->GameSpeed = gamespeed;
+		
 		data->InfiniteAmmo = stream->data_decode_bool("Infinite Ammo");
 		data->ExplosionPhysics = stream->data_decode_bool("Explosion Physics");
 		data->HillRotation = (e_hill_rotation)stream->data_decode_integer("Hill Rotation", 8);
 		data->InfiniteGrenades = stream->data_decode_bool("Infinite Grenades");
-
+		double ForcedFOV;
+		stream->data_decode_bits("Forced FOV", &ForcedFOV, sizeof(ForcedFOV) * CHAR_BIT);
+		data->ForcedFOV = ForcedFOV;
 		return stream->packet_is_valid() == false;
 	}
 
@@ -49,6 +54,7 @@ namespace CustomVariantSettings
 		CurrentVariantSettings.HillRotation = data->HillRotation;
 		CurrentVariantSettings.GameSpeed = data->GameSpeed;
 		CurrentVariantSettings.InfiniteGrenades = data->InfiniteGrenades;
+		CurrentVariantSettings.ForcedFOV = data->ForcedFOV;
 	}
 
 	void SendCustomVariantSettings(int peerIndex)
@@ -133,6 +139,11 @@ namespace CustomVariantSettings
 					WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1e);
 				else
 					WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0);
+				if(CurrentVariantSettings.ForcedFOV != 0)
+				{
+					HudElements::setFOV();
+					HudElements::setVehicleFOV();
+				}
 			}
 
 			//Server Only

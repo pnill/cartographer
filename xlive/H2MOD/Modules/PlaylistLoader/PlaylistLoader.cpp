@@ -4,6 +4,7 @@
 #include "H2MOD/Modules/Startup/Startup.h"
 #include "H2MOD/Modules/Utils/Utils.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 
 namespace playlist_loader
 {
@@ -18,7 +19,8 @@ namespace playlist_loader
 		game_speed,
 		infinite_grenades,
 		spawn_protection,
-		hill_set
+		hill_set,
+		forced_fov
 	};
 	std::map<std::wstring, e_custom_setting> custom_settings
 	{
@@ -30,7 +32,8 @@ namespace playlist_loader
 		{L"Game Speed", e_custom_setting::game_speed},
 		{L"Infinite Grenades", e_custom_setting::infinite_grenades},
 		{L"Hill Set", e_custom_setting::hill_set},
-		{L"Spawn Protection", e_custom_setting::spawn_protection}
+		{L"Spawn Protection", e_custom_setting::spawn_protection},
+		{L"Forced FOV", e_custom_setting::forced_fov}
 	};
 	e_custom_setting get_custom_setting_index(wchar_t* Name)
 	{
@@ -124,11 +127,8 @@ namespace playlist_loader
 
 		return static_cast<T>(0);
 	}
-	bool process_custom_setting(playlist_entry* playlist_entry)
+	bool process_custom_settting_variant(playlist_entry* playlist_entry)
 	{
-		//Section Type must be Variant
-		if (playlist_entry->current_section_type != e_hpl_headers::Variant)
-			return false;
 
 		auto result = false;
 
@@ -152,14 +152,14 @@ namespace playlist_loader
 		const auto custom_setting_type = get_custom_setting_index(property_name);
 
 		//Check if it's a custom setting
-		if (custom_setting_type != e_custom_setting::none) 
+		if (custom_setting_type != e_custom_setting::none)
 		{
 			//Check to make sure a variant name has been found.
-			if (_wcsicmp(variant, L"") != 0) 
+			if (_wcsicmp(variant, L"") != 0)
 			{
 				//Trim the end of the current property_value, this is done inside the normal process_setting function
 				playlist_entry->section_buffer[playlist_entry->reader_current_char_index + 68 * playlist_entry->section_buffer_current_index + 32] = 0;
-				
+
 				//Grab or create the Custom Settings for the current variant.
 				CustomVariantSettings::s_variantSettings* settings;
 				const auto variant_string = std::wstring(variant);
@@ -175,74 +175,90 @@ namespace playlist_loader
 				std::wstring t;
 				byte cIndex = 0;
 
-				LOG_TRACE_GAME(L"[PlaylistLoader::ProcessCustomSetting] Variant: {} Custom Setting Detected: {} = {}", variant, property_name, property_value);
+				LOG_TRACE_GAME(L"[PlaylistLoader::ProcessCustomSetting] Variant: {} Custom Setting Detected: {} = {}", variant_string, property_name, property_value);
 				switch (custom_setting_type)
 				{
-					case gravity:
-						settings->Gravity = custom_settings_real_check(playlist_entry, property_value);
-						break;
-					case infinite_ammo:
-						settings->InfiniteAmmo = custom_setting_boolean_check(playlist_entry, property_value);
-						break;
-					case explosion_physics:
-						settings->ExplosionPhysics = custom_setting_boolean_check(playlist_entry, property_value);
-						break;
-					case hill_rotation:
-						settings->HillRotation = custom_settings_enum_check<CustomVariantSettings::e_hill_rotation>(playlist_entry, property_value, CustomVariantSettings::hill_rotation_name, 4);
-						break;
-					case game_speed:
-						settings->GameSpeed = custom_settings_real_check(playlist_entry, property_value);
-						break;
-					case infinite_grenades:
-						settings->InfiniteGrenades = custom_setting_boolean_check(playlist_entry, property_value);
-						break;
-					case hill_set:
-						pos = 0;
-						t = L"";
-						cIndex = 0;
-						for (auto i = 0; i < 15; i++)
-							settings->PredefinedHillSet[i] = 0;
-						while((pos = wproperty.find(L",")) != std::wstring::npos)
+				case gravity:
+					settings->Gravity = custom_settings_real_check(playlist_entry, property_value);
+					break;
+				case infinite_ammo:
+					settings->InfiniteAmmo = custom_setting_boolean_check(playlist_entry, property_value);
+					break;
+				case explosion_physics:
+					settings->ExplosionPhysics = custom_setting_boolean_check(playlist_entry, property_value);
+					break;
+				case hill_rotation:
+					settings->HillRotation = custom_settings_enum_check<CustomVariantSettings::e_hill_rotation>(playlist_entry, property_value, CustomVariantSettings::hill_rotation_name, 4);
+					break;
+				case game_speed:
+					settings->GameSpeed = custom_settings_real_check(playlist_entry, property_value);
+					break;
+				case infinite_grenades:
+					settings->InfiniteGrenades = custom_setting_boolean_check(playlist_entry, property_value);
+					break;
+				case forced_fov:
+					settings->ForcedFOV = custom_settings_real_check(playlist_entry, property_value);
+					break;
+				case hill_set:
+					pos = 0;
+					t = L"";
+					cIndex = 0;
+					for (auto i = 0; i < 15; i++)
+						settings->PredefinedHillSet[i] = 0;
+					while ((pos = wproperty.find(L",")) != std::wstring::npos)
+					{
+						t = wproperty.substr(0, pos);
+						wproperty.erase(0, pos + 1);
+						if (isInteger(t))
 						{
-							t = wproperty.substr(0, pos);
-							wproperty.erase(0, pos + 1);
-							if(isInteger(t))
-							{
-								settings->PredefinedHillSet[cIndex] = static_cast<byte>(std::stoi(t));
-								cIndex++;
-							}
-							else
-							{
-								playlist_invalid_item_hook(
-									playlist_entry,
-									0,
-									4,
-									playlist_entry->reader_current_line,
-									&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
-									&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
-									&empty_char);
-							}
+							settings->PredefinedHillSet[cIndex] = static_cast<byte>(std::stoi(t));
+							cIndex++;
 						}
-						break;
-					case spawn_protection:
-						settings->SpawnProtection = custom_settings_integer_check<byte>(playlist_entry, property_value);
-						break;
-					case none:
-					default:
-						playlist_invalid_item_hook(
-							playlist_entry,
-							0,
-							4,
-							playlist_entry->reader_current_line,
-							&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
-							&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
-							&empty_char);
-						break;
+						else
+						{
+							playlist_invalid_item_hook(
+								playlist_entry,
+								0,
+								4,
+								playlist_entry->reader_current_line,
+								&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
+								&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
+								&empty_char);
+						}
+					}
+					break;
+				case spawn_protection:
+					settings->SpawnProtection = custom_settings_integer_check<byte>(playlist_entry, property_value);
+					break;
+				case none:
+				default:
+					playlist_invalid_item_hook(
+						playlist_entry,
+						0,
+						4,
+						playlist_entry->reader_current_line,
+						&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
+						&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
+						&empty_char);
+					break;
 				}
 				result = true;
 			}
 		}
 		return result;
+	}
+	bool process_custom_setting_eval(playlist_entry* playlist_entry)
+	{
+		switch (playlist_entry->current_section_type)
+		{
+			case Playlist: 
+				return false;
+			case Variant: 
+				return process_custom_settting_variant(playlist_entry);
+			case Match:
+				return false;
+		}
+		return false;
 	}
 
 	//Kept in case we want to create new headers in the future.
@@ -262,10 +278,15 @@ namespace playlist_loader
 	h_playlist_processs_setting p_playlist_process_setting;
 	void __fastcall process_setting(playlist_entry* playlist_entry)
 	{
-		if (!process_custom_setting(playlist_entry)) 
+		if (!process_custom_setting_eval(playlist_entry))
 		{
 			p_playlist_process_setting(playlist_entry);
 		}
+	}
+	void reset_custom_settings(ServerConsole::ServerConsoleCommands command)
+	{
+		if(command == ServerConsole::play)
+			CustomVariantSettingsMap.clear();
 	}
 
 	void apply_hooks()
@@ -276,5 +297,6 @@ namespace playlist_loader
 	void initialize()
 	{
 		apply_hooks();
+		EventHandler::register_callback<EventHandler::ServerCommandEvent>(reset_custom_settings, execute_after, false);
 	}
 }

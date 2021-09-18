@@ -1048,6 +1048,7 @@ namespace tag_loader
 
 	void Add_tags_to_simulation_table()
 	{
+
 	}
 
 	datum ResolveNewDatum(int oldDatum)
@@ -1058,6 +1059,18 @@ namespace tag_loader
 				return datum(ref.new_datum);
 		}
 		return DATUM_NONE;
+	}
+
+	tags::tag_instance AddNewtagInstance(blam_tag type, int data, size_t size)
+	{
+		tags::tag_instance tables_data;
+		tables_data.type = type;
+		tables_data.data_offset = (int)(data - int(*Memory::GetAddress<int**>(0x47CD54)));
+		tables_data.size = size;
+		tables_data.datum_index = new_datum_index++;
+		tags::tag_instance* temp_write_off = &tag_loader::new_Tables[tables_data.datum_index.ToAbsoluteIndex()];
+		memcpy(temp_write_off, &tables_data, sizeof(tags::tag_instance));//copy to the tables
+		return tag_loader::new_Tables[tables_data.datum_index.ToAbsoluteIndex()];
 	}
 
 #pragma region query_parser

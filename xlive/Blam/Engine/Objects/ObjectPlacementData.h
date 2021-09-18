@@ -22,7 +22,8 @@ struct s_object_placement_data
 	real_point3d translational_velocity;//0x40
 	real_vector3d angular_velocity;//0x4C
 	float scale;//0x58
-	DWORD unk_2[2];//0x5C
+	datum player_index;
+	DWORD unk_2;//0x5C
 	int team_index;
 	DWORD unk_27[2];//0x5C
 	WORD unk_3;//0x70

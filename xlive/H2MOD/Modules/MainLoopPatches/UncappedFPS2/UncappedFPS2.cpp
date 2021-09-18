@@ -32,6 +32,7 @@ void UncappedFPS2::OnGameStateChange(game_life_cycle state)
 
 void UncappedFPS2::Init()
 {
+	EventHandler::register_callback<EventHandler::GameStateEvent>(UncappedFPS2::OnGameStateChange, execute_after, false);
 	//EventHandler::register_callback(UncappedFPS2::OnGameStateChange, EventType::gamestate_change, after, true);
 	/*EventHandler::registerGameStateCallback({
 			"UncappedPregame",

@@ -62,6 +62,17 @@ void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, ch
 	return res;
 }
 
+typedef bool(__cdecl t_kablam_command_play)(wchar_t* playlist_file_path, int a2);
+t_kablam_command_play* p_kablam_command_play;
+bool __cdecl kablam_command_play(wchar_t* playlist_file_path, int a2)
+{
+	LOG_INFO_GAME("[{}]: {}", __FUNCTION__, "");
+	EventHandler::execute_callback<EventHandler::ServerCommandEvent>(execute_before, ServerConsole::play);
+	auto res = p_kablam_command_play(playlist_file_path, a2);
+	EventHandler::execute_callback<EventHandler::ServerCommandEvent>(execute_after, ServerConsole::play);
+	return res;
+}
+
 void ServerConsole::ApplyHooks()
 {
 	if (!Memory::isDedicatedServer())
@@ -86,6 +97,9 @@ void ServerConsole::ApplyHooks()
 	p_dedi_command_hook = (dedi_command_hook)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)dediCommandHook, 7);
 	kablam_vip_add = Memory::GetAddress<p_kablam_vip_add*>(0, 0x1D932);
 	kablam_vip_clear = Memory::GetAddress<p_kablam_vip_clear*>(0, 0x1DB16);
+
+	p_kablam_command_play = Memory::GetAddress<t_kablam_command_play*>(0, 0xE7FA);
+	PatchCall(Memory::GetAddress(0, 0x724B), kablam_command_play);
 }
 
 void ServerConsole::logToDedicatedServerConsole(const wchar_t* string, ...) {
