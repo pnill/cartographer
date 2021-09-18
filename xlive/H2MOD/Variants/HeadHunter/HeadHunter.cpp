@@ -49,9 +49,9 @@ void HeadHunter::spawnPlayerClientSetup()
 void HeadHunter::SpawnSkull(datum unit_datum)
 {
 	DatumIterator<s_object_header> objectIt(get_objects_header());
-	s_biped_object_definition* biped_unit = (s_biped_object_definition*)objectIt.get_data_at_index(unit_datum.Index)->object;
+	s_biped_object_definition* biped_unit = (s_biped_object_definition*)objectIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(unit_datum))->object;
 
-	if (objectIt.get_data_at_index(unit_datum.Index)->type == e_object_type::biped)
+	if (objectIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(unit_datum))->type == e_object_type::biped)
 	{
 		s_object_placement_data nObject;
 
@@ -61,7 +61,7 @@ void HeadHunter::SpawnSkull(datum unit_datum)
 		nObject.translational_velocity = biped_unit->translational_velocity;
 
 		datum new_object_datum = Engine::Objects::call_object_new(&nObject);
-		if (!new_object_datum.IsNull())
+		if (!DATUM_IS_NONE(new_object_datum))
 			call_add_object_to_sync(new_object_datum);
 	}
 }
@@ -83,7 +83,7 @@ void HeadHunter::PickupSkull(XUID player, datum SkullDatum)
 		if (player_score_data)
 		{
 			datum PlayerDatum = variant_player->GetPlayerDatum(player);
-			pupdate_player_score(player_score_data, PlayerDatum.Index, 0, 1, -1, 0);
+			pupdate_player_score(player_score_data, DATUM_ABSOLUTE_INDEX(PlayerDatum), 0, 1, -1, 0);
 			HaloScript::ObjectDestroy(SkullDatum);
 			if(TimeElapsedMS(soundBuffer) > 2500)
 			{
@@ -112,9 +112,9 @@ void HeadHunterHandler::SetDeadPlayer(datum dead_datum)
 bool HeadHunterHandler::SetInteractedObject(datum object_datum)
 {
 	DatumIterator<s_object_header> objectIt(get_objects_header());
-	s_weapon_object_definition* weaponObject = (s_weapon_object_definition*)objectIt.get_data_at_index(object_datum.ToAbsoluteIndex())->object;
+	s_weapon_object_definition* weaponObject = (s_weapon_object_definition*)objectIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(object_datum))->object;
 
-	if (weaponObject->tag_definition_index.Index == (e_weapons_datum_index::ball & 0xFFFF))
+	if (DATUM_ABSOLUTE_INDEX(weaponObject->tag_definition_index) == (e_weapons_datum_index::ball & 0xFFFF))
 	{
 		this->object_interaction = object_datum;
 		return true;

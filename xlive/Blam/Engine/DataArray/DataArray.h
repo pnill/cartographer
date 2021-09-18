@@ -70,7 +70,7 @@ public:
 		{
 			result = reinterpret_cast<T*>(&data_array->datum[data_array->datum_element_size * index]);
 			m_current_absolute_index = index;
-			m_last_datum_index = datum(index, *(short*)(result) << 16); // absolute index w/ salt
+			m_last_datum_index = DATUM_NEW(index, *(short*)(result)); // absolute index w/ salt
 		}
 		return result;
 	}

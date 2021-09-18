@@ -96,10 +96,10 @@ int __cdecl transport_qos_target_new_hook(int a1, signed int a2, int a3, int a4)
 	typedef int(__cdecl* datum_new_in_range)(s_datum_array* datum_array);
 	auto p_datum_new_in_range = Memory::GetAddress<datum_new_in_range>(0x667A0, 0x3248C);
 
-	datum new_qos_datum_index = datum(p_datum_new_in_range(qos_probes_datum_array));
-	if (!new_qos_datum_index.IsNull())
+	datum new_qos_datum_index = p_datum_new_in_range(qos_probes_datum_array);
+	if (!DATUM_IS_NONE(new_qos_datum_index))
 	{
-		char* qos_probe_data = &qos_probes_datum_array->datum[new_qos_datum_index.ToAbsoluteIndex() * qos_probes_datum_array->datum_element_size];
+		char* qos_probe_data = &qos_probes_datum_array->datum[DATUM_ABSOLUTE_INDEX(new_qos_datum_index) * qos_probes_datum_array->datum_element_size];
 		placeholder_xnqos.cxnqos = 1;
 		placeholder_xnqos.cxnqosPending = 0;
 
@@ -116,7 +116,7 @@ int __cdecl transport_qos_target_new_hook(int a1, signed int a2, int a3, int a4)
 
 		*(short*)(qos_probe_data + 2) = (short)1;
 		*(XNQOS**)(qos_probe_data + 4) = &placeholder_xnqos;
-		return new_qos_datum_index.ToInt();
+		return new_qos_datum_index;
 	}
 	else
 		return -1; 

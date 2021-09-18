@@ -31,7 +31,7 @@ projectile_update_def p_projectile_update;
 void projectile_set_tick_length_context(datum projectile_datum_index, bool projectile_instant_update)
 {
 	s_object_header* objects_header = (s_object_header*)get_objects_header()->datum;
-	char* object_data = objects_header[projectile_datum_index.ToAbsoluteIndex()].object;
+	char* object_data = objects_header[DATUM_ABSOLUTE_INDEX(projectile_datum_index)].object;
 	char* proj_tag_data = tags::get_tag_fast<char>(*((datum*)object_data));
 
 	if (*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5) // check if travels instantaneously flag is set in the projectile flags
@@ -51,7 +51,7 @@ void projectile_set_tick_length_context(datum projectile_datum_index, bool proje
 inline void projectile_set_creation_tick(datum projectile_datum_index)
 {
 	s_object_header* objects_header = (s_object_header*)get_objects_header()->datum;
-	char* object_data = objects_header[projectile_datum_index.ToAbsoluteIndex()].object;
+	char* object_data = objects_header[DATUM_ABSOLUTE_INDEX(projectile_datum_index)].object;
 	*(DWORD*)(object_data + 428) = time_globals::get()->tick_count; // store the projectile creation tick count
 }
 
@@ -140,7 +140,7 @@ void __cdecl matrix4x3_transform_point(void* matrix, real_vector3d* v1, real_vec
 
 	DatumIterator<s_object_header> objectIt(get_objects_header());
 
-	BYTE* projectile = (BYTE*)objectIt.get_data_at_index(trigger_projectile_datum_index.ToAbsoluteIndex())->object;
+	BYTE* projectile = (BYTE*)objectIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(trigger_projectile_datum_index))->object;
 
 	LOG_TRACE_GAME(L" projectile matrix4x3_transform_point() - original values v1: i: {}, j: {}, k: {}", v1->i, v1->j, v1->k);
 
