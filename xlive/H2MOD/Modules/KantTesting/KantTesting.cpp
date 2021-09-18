@@ -492,6 +492,12 @@ namespace KantTesting
 				//NopFill(Memory::GetAddress(0x55B5A), 7);
 
 
+
+				//p_get_model_variant = Memory::GetAddress<t_get_model_variant*>(0x12FE84);
+				//PatchCall(Memory::GetAddress(0x12FEF1), get_model_variant);
+				//tags::on_map_load(fix_elite_model_variant);
+				//tags::on_map_load(add_elite_variants);
+
 				//network_session_player_profile_recieve
 				//increase MaxValue of encode_integer
 				WriteValue<byte>(Memory::GetAddress(0x54fb3), 5);
@@ -505,12 +511,6 @@ namespace KantTesting
 				NopFill(Memory::GetAddress(0x52fc5), 3);
 				//Stop  the game from overriding the player biped
 				//NopFill(Memory::GetAddress(0x52fF5), 3);
-				//p_get_model_variant = Memory::GetAddress<t_get_model_variant*>(0x12FE84);
-				//PatchCall(Memory::GetAddress(0x12FEF1), get_model_variant);
-				tags::on_map_load(fix_elite_model_variant);
-				//tags::on_map_load(add_elite_variants);
-
-
 				tags::on_map_load(player_representation_testing);
 			}
 		}
