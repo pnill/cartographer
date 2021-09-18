@@ -102,8 +102,8 @@ void GunGame::readWeaponLevels()
 void GunGame::initWeaponLevels() {
 	if (weapon_one != 0) {
 		LOG_TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_one: {}", weapon_one);
-		LOG_TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_one enum:  {:x}", weaponDatums[weapon_one].ToInt());
-		LOG_TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_two enum:  {:x}", weaponDatums[weapon_two].ToInt());
+		LOG_TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_one enum:  {:x}", weaponDatums[weapon_one]);
+		LOG_TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_two enum:  {:x}", weaponDatums[weapon_two]);
 		GunGame::levelWeapon[0] = weaponDatums[weapon_one];
 		GunGame::levelWeapon[1] = weaponDatums[weapon_two];
 		GunGame::levelWeapon[2] = weaponDatums[weapon_three];
@@ -153,7 +153,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 	LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() player index: {}, player name: {1}", playerIndex, Player::getName(playerIndex));
 
 	datum unit_datum_index = Player::getPlayerUnitDatumIndex(playerIndex);
-	char* unit_object = Engine::Objects::try_and_get_data_with_type(unit_datum_index, FLAG(e_object_type::biped));
+	char* unit_object = Engine::Objects::object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
 
 	if (unit_object) {
 		int level = GunGame::gungamePlayers[getPlayerXuid(playerIndex)];
@@ -178,7 +178,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 
 void GunGame::playerDiedServer(int unit_datum_index)
 {
-	char* unit_object = Engine::Objects::try_and_get_data_with_type(unit_datum_index, FLAG(e_object_type::biped));
+	char* unit_object = Engine::Objects::object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
 	if (unit_object) {
 		int playerIndex = h2mod->get_player_index_from_unit_datum_index(unit_datum_index);
 		h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Fragmentation, 0, true);
@@ -247,7 +247,7 @@ void GunGameInitializer::onPeerHost() {
 	GunGame::resetPlayerLevels();
 	//TODO: is this really necessary (from old code)?
 	//init peer host gun game level
-	GunGame::gungamePlayers[getPlayerXuid(h2mod->get_player_datum_index_from_controller_index(0).ToAbsoluteIndex())] = 0;
+	GunGame::gungamePlayers[getPlayerXuid(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))] = 0;
 }
 
 void GunGamePreSpawnHandler::onClient() {

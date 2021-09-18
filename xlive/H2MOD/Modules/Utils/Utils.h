@@ -76,9 +76,7 @@ char* encode_rfc3986(char* label_literal, int label_literal_length = -1);
 void wcstombs2(char* buffer, wchar_t* text, int buf_len);
 char* wcstombs2r(wchar_t* text);
 std::string ToNarrow(const wchar_t *s, char dfault = '?', const std::locale& loc = std::locale());
-extern const int ERROR_CODE_CURL_SOCKET_FAILED;
-extern const int ERROR_CODE_CURL_HANDLE;
-extern const int ERROR_CODE_CURL_EASY_PERF;
+
 ///FREE MEMOERY in rtn_response if returned 0 (success).
 int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response);
 
@@ -147,3 +145,8 @@ public:
 private:
 	time::time_point lastTime;
 };
+
+// curl errors
+#define ERROR_CODE_CURL_SOCKET_FAILED -40
+#define ERROR_CODE_CURL_HANDLE -41
+#define ERROR_CODE_CURL_EASY_PERF -42

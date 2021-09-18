@@ -13,8 +13,8 @@ namespace TagFixes
 		{
 			datum bitmap_to_fix = tags::find_tag(blam_tag::tag_group_type::bitmap, bitmap_name);
 			datum borked_template = tags::find_tag(blam_tag::tag_group_type::shadertemplate, template_name);
-			LOG_DEBUG_FUNC("bitmap {0}, borked_template {1}", bitmap_to_fix.data, borked_template.data);
-			if (bitmap_to_fix.IsNull() || borked_template.IsNull())
+			LOG_DEBUG_FUNC("bitmap {0}, borked_template {1}", bitmap_to_fix, borked_template);
+			if (DATUM_IS_NONE(bitmap_to_fix) || DATUM_IS_NONE(borked_template))
 				return;
 			LOG_DEBUG_FUNC("Fixing: template {}, bitmap {}", template_name, bitmap_name);
 			auto shaders = tags::find_tags(blam_tag::tag_group_type::shader);
@@ -34,8 +34,8 @@ namespace TagFixes
 							if(shader_post_bitmap->block_count >= bitmap_idx + 1)
 							{
 								auto bitmap_data = tags::get_tag_data() + (shader_post_bitmap->block_data_offset + (bitmap_idx * 0xC));
-								unsigned long* bitmap = reinterpret_cast<unsigned long*>(bitmap_data);
-								if(*bitmap == bitmap_to_fix.data)
+								datum* bitmap = reinterpret_cast<datum*>(bitmap_data);
+								if(*bitmap == bitmap_to_fix)
 									*bitmap = NONE;
 							}
 						}
@@ -78,7 +78,7 @@ namespace TagFixes
 						tag_reference* impl_1 = reinterpret_cast<tag_reference*>(shadow_impl + (0x14A) + 0xFC);
 						tag_reference* impl_2 = reinterpret_cast<tag_reference*>(shadow_impl + (0x14A*2) + 0xFC);
 
-						impl_1->TagIndex = cinematic_shadow_datum.data;
+						impl_1->TagIndex = cinematic_shadow_datum;
 						//TODO: Re-enable this once the vertex shaders for shadows are fixed.
 						//impl_2->TagIndex = cinematic_shadow_datum.data;
 					}
@@ -101,14 +101,14 @@ namespace TagFixes
 			BYTE* visor_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(visor_shader_datum);
 
 			if (visor_shader_tag_data != nullptr)
-				*(unsigned long*)(visor_shader_tag_data + 0x4) = tex_bump_env_datum.data;
+				*(unsigned long*)(visor_shader_tag_data + 0x4) = tex_bump_env_datum;
 			if (visor_shader_tag_data != nullptr)
 			{
 				auto *visor_pp = reinterpret_cast<tags::tag_data_block*>(visor_shader_tag_data + 0x20);
 				if (visor_pp->block_count > 0 && visor_pp->block_data_offset != -1)
 				{
 					auto visor_pp_data = tags::get_tag_data() + visor_pp->block_data_offset;
-					*(unsigned long*)(visor_pp_data) = tex_bump_env_datum.data;
+					*(unsigned long*)(visor_pp_data) = tex_bump_env_datum;
 				}
 			}
 

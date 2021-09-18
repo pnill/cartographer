@@ -76,7 +76,7 @@ datum Player::getPlayerUnitDatumIndex(int playerIndex)
 	if (!indexValid(playerIndex))
 		return DATUM_NONE;
 
-	if (getPlayer(playerIndex)->controlled_unit_index.IsNull())
+	if (DATUM_IS_NONE(getPlayer(playerIndex)->controlled_unit_index))
 		return DATUM_NONE;
 		
 	return getPlayer(playerIndex)->controlled_unit_index;

@@ -423,7 +423,7 @@ static bool                 g_WantUpdateHasGamepad = true;
 void GUI::ToggleMenu()
 {
 	doDrawIMGUI = !doDrawIMGUI;
-	WriteValue<byte>(Memory::GetAddress(0x9712cC), doDrawIMGUI ? 1 : 0);
+	WriteValue<bool>(Memory::GetAddress(0x9712CC), doDrawIMGUI);
 	PlayerControl::GetControls(0)->DisableCamera = doDrawIMGUI;
 	if(!doDrawIMGUI)
 		SaveH2Config();
