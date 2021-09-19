@@ -64,7 +64,7 @@ namespace Engine::Objects
 
 	void __cdecl update_object_variant_index_hook(datum object_index, int variant_index)
 	{
-		auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(int, int)>(0x52FE84, 0x0);
+		auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(int, int)>(0x52FE84, 0x51ED47);
 		auto object = get_object_fast_unsafe<s_biped_object_definition>(object_index);
 
 		object->model_variant_id = p_resolve_variant_index_to_new_variant(object_index, variant_index);
