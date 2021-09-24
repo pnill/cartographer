@@ -49,9 +49,9 @@ void HeadHunter::spawnPlayerClientSetup()
 void HeadHunter::SpawnSkull(datum unit_datum)
 {
 	DatumIterator<s_object_header> objectIt(get_objects_header());
-	s_biped_object_definition* biped_unit = (s_biped_object_definition*)objectIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(unit_datum))->object;
+	s_biped_object_definition* biped_unit = (s_biped_object_definition*)objectIt.get_data_at_datum_index(unit_datum)->object;
 
-	if (objectIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(unit_datum))->type == e_object_type::biped)
+	if (objectIt.get_data_at_datum_index(DATUM_ABSOLUTE_INDEX(unit_datum))->type == e_object_type::biped)
 	{
 		s_object_placement_data nObject;
 
@@ -112,7 +112,7 @@ void HeadHunterHandler::SetDeadPlayer(datum dead_datum)
 bool HeadHunterHandler::SetInteractedObject(datum object_datum)
 {
 	DatumIterator<s_object_header> objectIt(get_objects_header());
-	s_weapon_object_definition* weaponObject = (s_weapon_object_definition*)objectIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(object_datum))->object;
+	s_weapon_object_definition* weaponObject = (s_weapon_object_definition*)objectIt.get_data_at_datum_index(object_datum)->object;
 
 	if (DATUM_ABSOLUTE_INDEX(weaponObject->tag_definition_index) == (e_weapons_datum_index::ball & 0xFFFF))
 	{

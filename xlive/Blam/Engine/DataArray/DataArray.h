@@ -20,8 +20,8 @@ struct s_datum_array
 	} active_indices; 
 	int total_elements_used;		// 0x3C 
 	datum next_datum;				// 0x40
-	char* datum;					// 0x44
-	int* datum_usable_bit_mask;		// 0x48
+	char* data;					// 0x44
+	int* data_usable_bit_mask;		// 0x48
 };
 CHECK_STRUCT_SIZE(s_datum_array, 0x4C);
 
@@ -31,7 +31,7 @@ class DatumIterator
 public:
 
 	DatumIterator(s_datum_array* _data_array) : 
-		data_array(_data_array),
+		m_daum_array(_data_array),
 		m_current_absolute_index(NONE),
 		m_last_datum_index(DATUM_NONE)
 	{
@@ -43,17 +43,17 @@ public:
 
 	s_datum_array* get_datum_array()
 	{
-		return data_array;
+		return m_daum_array;
 	}
 
-	T* get_data_at_index(int index)
+	T* get_data_at_datum_index(datum datum_index)
 	{
-		return reinterpret_cast<T*>(&data_array->datum[data_array->datum_element_size * index]);
+		return reinterpret_cast<T*>(&m_daum_array->data[m_daum_array->datum_element_size * DATUM_ABSOLUTE_INDEX(datum_index)]);
 	};
 
 	T* get_current_datum()
 	{
-		return reinterpret_cast<T*>(&data_array->datum[data_array->datum_element_size * m_current_absolute_index]);
+		return reinterpret_cast<T*>(&m_daum_array->data[m_daum_array->datum_element_size * m_current_absolute_index]);
 	}
 
 	T* get_next_datum()
@@ -65,11 +65,11 @@ public:
 		{
 			result = nullptr;
 			m_last_datum_index = DATUM_NONE;
-			m_current_absolute_index = data_array->datum_max_elements;
+			m_current_absolute_index = m_daum_array->datum_max_elements;
 		}
 		else
 		{
-			result = reinterpret_cast<T*>(&data_array->datum[data_array->datum_element_size * index]);
+			result = reinterpret_cast<T*>(&m_daum_array->data[m_daum_array->datum_element_size * index]);
 			m_current_absolute_index = index;
 			m_last_datum_index = DATUM_NEW(index, *(unsigned short*)(result)); // absolute index w/ salt
 		}
@@ -81,12 +81,12 @@ public:
 		if (index < 0)
 			return -1;
 
-		if (index >= data_array->active_indices.max_data_count)
+		if (index >= m_daum_array->active_indices.max_data_count)
 			return -1;
 
-		while (!((1 << (index & 0x1F)) & data_array->datum_usable_bit_mask[index >> 5]))
+		while (!((1 << (index & 0x1F)) & m_daum_array->data_usable_bit_mask[index >> 5]))
 		{
-			if (++index >= data_array->active_indices.max_data_count)
+			if (++index >= m_daum_array->active_indices.max_data_count)
 				return -1;
 		}
 		return index;
@@ -104,7 +104,7 @@ public:
 
 private:
 	
-	s_datum_array* data_array;
+	s_datum_array* m_daum_array;
 	datum m_last_datum_index;
 	int m_current_absolute_index;
 };

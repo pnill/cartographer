@@ -47,14 +47,15 @@ namespace ServerConsole
 
 	struct kablam_command_send_msg // : IKablamCommand
 	{
-		DWORD v_table; // we set the vtable manually for now
+		DWORD vtbl; // we set the vtable manually for now
 		DWORD unk_1;
 		DWORD unk_2;
 		wchar_t message[121];
 		int unk_3;
 
-		kablam_command_send_msg(DWORD _v_table, wchar_t* _message) : v_table(_v_table)
+		kablam_command_send_msg(DWORD _vtbl, wchar_t* _message) : vtbl(_vtbl)
 		{
+			memset((void*)&unk_1, 0, sizeof(kablam_command_send_msg) - sizeof(vtbl));
 			wcscpy_s(message, ARRAYSIZE(message), _message);
 		}
 
@@ -65,5 +66,5 @@ namespace ServerConsole
 		}
 	};
 	static_assert(sizeof(kablam_command_send_msg) == 260, "error sizeof(kablam_command_send_msg) != 260");
-	static_assert(offsetof(kablam_command_send_msg, v_table) == 0, "error offsetof(kablam_command_send_msg, v_table) != 0");
+	static_assert(offsetof(kablam_command_send_msg, vtbl) == 0, "error offsetof(kablam_command_send_msg, v_table) != 0");
 }

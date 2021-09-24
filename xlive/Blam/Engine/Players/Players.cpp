@@ -23,7 +23,7 @@ Player* Player::getPlayer(int playerIndex)
 	{
 		return nullptr;
 	}
-	return (Player*)&getArray()->datum[playerIndex * getArray()->datum_element_size];
+	return (Player*)&getArray()->data[playerIndex * getArray()->datum_element_size];
 }
 
 e_object_team Player::getTeam(int playerIndex)

@@ -265,7 +265,7 @@ BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
 		return nullptr;
 
 	DatumIterator<s_object_header> objectsIt(get_objects_header());
-	return (BYTE*)objectsIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(unit_datum))->object;
+	return (BYTE*)objectsIt.get_data_at_datum_index(unit_datum)->object;
 }
 
 void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
@@ -273,7 +273,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
 	datum unit_datum = Player::getPlayerUnitDatumIndex(playerIndex);
-	if (unit_datum != NONE)
+	if (!DATUM_IS_NONE(unit_datum))
 	{
 		s_object_placement_data nObject;
 
@@ -431,7 +431,7 @@ void H2MOD::disable_sounds(int sound_flags)
 							// disable all sounds from english to chinese
 							for (int j = 0; j < 8; j++)
 							{
-								(&general_event->sound)[j].TagIndex = NONE;
+								(&general_event->sound)[j].TagIndex = DATUM_NONE;
 							}
 						}
 					}
@@ -1029,7 +1029,7 @@ void __cdecl GetGameVersion(DWORD *executable_version, DWORD *build_version, DWO
 
 void GivePlayerWeaponDatum(datum unit_datum, datum weapon_datum)
 {
-	if (unit_datum != NONE)
+	if (!DATUM_IS_NONE(unit_datum))
 	{
 		s_object_placement_data nObject;
 
@@ -1051,7 +1051,7 @@ float get_device_acceleration_scale(datum device_datum)
 	DWORD tag_instances = (DWORD)tags::get_tag_instances();
 
 	int device_gamestate_offset = DATUM_ABSOLUTE_INDEX(device_datum) + DATUM_ABSOLUTE_INDEX(device_datum) * 2;
-	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)get_objects_header()->datum + device_gamestate_offset * 4 + 8);
+	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)get_objects_header()->data + device_gamestate_offset * 4 + 8);
 	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 
 	__int16 device_control_index = device_control_datum & 0xFFFF;

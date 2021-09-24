@@ -5,13 +5,13 @@
 #include "Blam/Engine/Objects/Objects.h"
 #include "Blam/Engine/Players/Players.h"
 
-XUID VariantPlayer::GetXUID(datum _datum, bool player)
+XUID VariantPlayer::GetXUID(datum object_index, bool player)
 {
 	DatumIterator<s_object_header> objectIt(get_objects_header());
-	s_biped_object_definition* playerUnit = (s_biped_object_definition*)objectIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(_datum))->object;
+	s_biped_object_definition* playerUnit = (s_biped_object_definition*)objectIt.get_data_at_datum_index(object_index)->object;
 
 	if (player)
-		return Player::getPlayer(DATUM_ABSOLUTE_INDEX(_datum))->identifier;
+		return Player::getPlayer(DATUM_ABSOLUTE_INDEX(object_index))->identifier;
 	else
 	{
 		short player_index = DATUM_ABSOLUTE_INDEX(playerUnit->PlayerDatum);
@@ -22,7 +22,7 @@ XUID VariantPlayer::GetXUID(datum _datum, bool player)
 datum VariantPlayer::GetPlayerDatum(datum unit_datum)
 {
 	DatumIterator<s_object_header> objectIt(get_objects_header());
-	s_biped_object_definition* playerUnit = (s_biped_object_definition*)objectIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(unit_datum))->object;
+	s_biped_object_definition* playerUnit = (s_biped_object_definition*)objectIt.get_data_at_datum_index(unit_datum)->object;
 
 	return playerUnit->PlayerDatum;
 }
@@ -53,7 +53,7 @@ datum VariantPlayer::GetPlayerDatum(XUID xuid)
 datum VariantPlayer::GetUnitDatum(datum player_datum)
 {
 	PlayerIterator playersIt;
-	return playersIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(player_datum))->controlled_unit_index;
+	return playersIt.get_data_at_datum_index(player_datum)->controlled_unit_index;
 }
 
 datum VariantPlayer::GetUnitDatum(XUID xuid)

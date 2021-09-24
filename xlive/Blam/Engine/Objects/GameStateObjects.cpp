@@ -21,5 +21,5 @@ void* s_game_state_objects::getObject(datum objectDatum)
 {
     if (!indexValid(objectDatum))
         return nullptr;
-    return (void*)&getArray()->datum[DATUM_ABSOLUTE_INDEX(objectDatum) * getArray()->datum_element_size];
+    return (void*)&getArray()->data[DATUM_ABSOLUTE_INDEX(objectDatum) * getArray()->datum_element_size];
 }

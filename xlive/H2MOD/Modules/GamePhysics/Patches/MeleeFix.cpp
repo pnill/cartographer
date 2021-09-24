@@ -99,7 +99,7 @@ namespace MeleeFix
 	{
 		s_datum_array* objects = *Memory::GetAddress<s_datum_array**>(0x4E461C);
 
-		int biped_object = *(DWORD *)&objects->datum[12 * (unsigned __int16)object_index + 8];
+		int biped_object = *(DWORD *)&objects->data[12 * (unsigned __int16)object_index + 8];
 		int melee_info_offset = *(__int16 *)(biped_object + 858); //???
 		auto biped_melee_info = (melee_info *)(biped_object + melee_info_offset);
 		int melee_type = biped_melee_info->melee_type_string_id;

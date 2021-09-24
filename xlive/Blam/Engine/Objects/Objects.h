@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Blam\Math\BlamMath.h"
 
@@ -170,7 +170,7 @@ struct s_biped_object_definition : s_object_base_definition
 	BYTE unk_18[0x21C];
 	
 	// NEW DATA
-	unsigned int variant_index;
+	int variant_index;
 };
 CHECK_STRUCT_SIZE(s_biped_object_definition, 0x480 + 4);
 
@@ -202,7 +202,7 @@ static s_object_header* get_objects_header(datum object_index)
 	*/
 
 	auto objects_header = get_objects_header();
-	return (s_object_header*)(&objects_header->datum[objects_header->datum_element_size * DATUM_ABSOLUTE_INDEX(object_index)]);
+	return (s_object_header*)(&objects_header->data[objects_header->datum_element_size * DATUM_ABSOLUTE_INDEX(object_index)]);
 }
 
 template<typename T = s_object_base_definition>
