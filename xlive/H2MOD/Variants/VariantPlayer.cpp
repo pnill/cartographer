@@ -7,8 +7,7 @@
 
 XUID VariantPlayer::GetXUID(datum object_index, bool player)
 {
-	DatumIterator<s_object_header> objectIt(get_objects_header());
-	s_biped_object_definition* playerUnit = (s_biped_object_definition*)objectIt.get_data_at_datum_index(object_index)->object;
+	s_biped_object_definition* playerUnit = object_get_fast_unsafe<s_biped_object_definition>(object_index);
 
 	if (player)
 		return Player::getPlayer(DATUM_ABSOLUTE_INDEX(object_index))->identifier;
@@ -21,9 +20,7 @@ XUID VariantPlayer::GetXUID(datum object_index, bool player)
 
 datum VariantPlayer::GetPlayerDatum(datum unit_datum)
 {
-	DatumIterator<s_object_header> objectIt(get_objects_header());
-	s_biped_object_definition* playerUnit = (s_biped_object_definition*)objectIt.get_data_at_datum_index(unit_datum)->object;
-
+	s_biped_object_definition* playerUnit = object_get_fast_unsafe<s_biped_object_definition>(unit_datum);
 	return playerUnit->PlayerDatum;
 }
 

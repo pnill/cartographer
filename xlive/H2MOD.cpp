@@ -132,18 +132,6 @@ bool __cdecl call_add_object_to_sync(datum gamestate_object_datum)
 	return p_add_object_to_sync(gamestate_object_datum);
 }
 
-/* We should really make this stuff into a struct/class, and access it that way it'd be much cleaner... */
-int get_actor_datum_from_unit_datum(int unit_datum)
-{
-	char* unit_ptr = Engine::Objects::object_try_and_get_and_verify_type(unit_datum, FLAG(e_object_type::biped));
-	if (unit_ptr)
-	{
-		return *(int*)(unit_ptr + 0x130);
-	}
-
-	return NONE;
-}
-
 /* This looks at the actors table to get the character datum which is assigned to the specific actor. */
 int get_char_datum_from_actor(int actor_datum)
 {
@@ -159,7 +147,7 @@ int get_char_datum_from_actor(int actor_datum)
 /*This is to get the datum of the last player who damaged the datum/unit provided */
 int get_damage_owner(int damaged_unit_index)
 {
-	char* damaged_player_ptr = Engine::Objects::object_try_and_get_and_verify_type(damaged_unit_index, FLAG(e_object_type::biped) | FLAG(e_object_type::vehicle));
+	char* damaged_player_ptr = (char*)object_try_and_get_and_verify_type(damaged_unit_index, FLAG(e_object_type::biped) | FLAG(e_object_type::vehicle));
 	if (damaged_player_ptr)
 	{
 		return *(int*)(damaged_player_ptr + 0xC8); // player_ptr/unit_ptr + 0xC8 = damaging player this works on vehicles/AI and such too.
@@ -264,8 +252,7 @@ BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
 	if (DATUM_IS_NONE(unit_datum))
 		return nullptr;
 
-	DatumIterator<s_object_header> objectsIt(get_objects_header());
-	return (BYTE*)objectsIt.get_data_at_datum_index(unit_datum)->object;
+	return (BYTE*)object_get_fast_unsafe(unit_datum);
 }
 
 void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
@@ -310,8 +297,8 @@ int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
 BYTE H2MOD::get_unit_team_index(datum unit_datum_index)
 {
 	BYTE team_index = NONE;
-	char* unit_object = Engine::Objects::object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
-	if (unit_object)
+	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
+	if (unit_object != NULL)
 	{
 		team_index = *(BYTE*)(unit_object + 0x13C);
 	}
@@ -356,8 +343,8 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 	datum unit_datum_index = Player::getPlayerUnitDatumIndex(playerIndex);
 	datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
 
-	char* unit_object = Engine::Objects::object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
-	if (unit_object)
+	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
+	if (unit_object != NULL)
 	{
 		if (resetEquipment)
 			Engine::Unit::remove_equipment(unit_datum_index);

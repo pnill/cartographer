@@ -11,13 +11,6 @@
 namespace Engine::Objects
 {
 	//Grabs object from object table and verifies the type matches
-	char* __cdecl object_try_and_get_and_verify_type(datum object_datum_index, int object_type_flags)
-	{
-		//LOG_TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
-		typedef char* (__cdecl get_object)(datum object_datum_index, int object_type_flags);
-		auto p_get_object = Memory::GetAddress<get_object*>(0x1304E3, 0x11F3A6);
-		return p_get_object(object_datum_index, object_type_flags);
-	}
 
 	void __cdecl create_new_placement_data(s_object_placement_data* s_object_placement_data, datum object_definition_index, datum object_owner, int unk)
 	{
@@ -65,7 +58,7 @@ namespace Engine::Objects
 	void __cdecl update_object_variant_index_hook(datum object_index, int variant_index)
 	{
 		auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(datum, int)>(0x52FE84, 0x51ED47);
-		auto object = get_object_fast_unsafe<s_biped_object_definition>(object_index);
+		auto object = object_get_fast_unsafe<s_biped_object_definition>(object_index);
 
 		object->model_variant_id = p_resolve_variant_index_to_new_variant(object_index, variant_index);
 
@@ -156,7 +149,7 @@ namespace Engine::Objects
 
 		p_object_build_creation_data(object_index, object_creation_data);
 
-		auto object = get_object_fast_unsafe<s_biped_object_definition>(object_index);
+		auto object = object_get_fast_unsafe<s_biped_object_definition>(object_index);
 
 		*(int*)((BYTE*)object_creation_data + 0x24) = object->variant_index;
 

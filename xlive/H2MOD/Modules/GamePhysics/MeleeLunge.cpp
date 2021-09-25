@@ -167,7 +167,7 @@ void __cdecl biped_dash_hook(datum object_index, datum target_player, char weapo
 
 	p_biped_dash(object_index, target_player, weapon_is_sword);
 
-	BYTE* object_data = (BYTE*)get_objects_header(object_index)->object;
+	BYTE* object_data = (BYTE*)object_get_fast_unsafe(object_index);
 
 	// check if we actually entered melee mode, otherwise don't update the data
 	if (*(BYTE*)(object_data + 1012) == 6)
@@ -187,7 +187,7 @@ void __cdecl biped_dash_hook(datum object_index, datum target_player, char weapo
 
 int __cdecl biped_dash_time_to_target(datum biped_index)
 {
-	BYTE* object_data = (BYTE*)get_objects_header(biped_index)->object;
+	BYTE* object_data = (BYTE*)object_get_fast_unsafe(biped_index);
 
 	// check if we actually entered melee mode, otherwise don't update the data
 	if (*(BYTE*)(object_data + 1012) == 6)
@@ -195,7 +195,7 @@ int __cdecl biped_dash_time_to_target(datum biped_index)
 
 	}
 
-	return -1;
+	return NONE;
 }
 
 float __cdecl get_max_melee_lunge_speed_per_tick(float target_distance, char weapon_is_sword)

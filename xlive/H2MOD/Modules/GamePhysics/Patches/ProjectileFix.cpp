@@ -30,7 +30,7 @@ projectile_update_def p_projectile_update;
 // determines whether the projectile should be updated in a 30hz context or not
 void projectile_set_tick_length_context(datum projectile_datum_index, bool projectile_instant_update)
 {
-	char* object_data = (char*)get_object_fast_unsafe(projectile_datum_index);
+	char* object_data = (char*)object_get_fast_unsafe(projectile_datum_index);
 	char* proj_tag_data = tags::get_tag_fast<char>(*((datum*)object_data));
 
 	if (*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5) // check if travels instantaneously flag is set in the projectile flags
@@ -49,7 +49,7 @@ void projectile_set_tick_length_context(datum projectile_datum_index, bool proje
 // sets the tick when the projectile has been created
 inline void projectile_set_creation_tick(datum projectile_datum_index)
 {
-	char* object_data = (char*)get_object_fast_unsafe(projectile_datum_index);
+	char* object_data = (char*)object_get_fast_unsafe(projectile_datum_index);
 	*(DWORD*)(object_data + 428) = time_globals::get()->tick_count; // store the projectile creation tick count
 }
 
@@ -136,9 +136,7 @@ void __cdecl matrix4x3_transform_point(void* matrix, real_vector3d* v1, real_vec
 {
 	auto p_matrix4x3_transform_point = Memory::GetAddressRelative<void(__cdecl*)(void*, real_vector3d*, real_vector3d*)>(0x47795A);
 
-	DatumIterator<s_object_header> objectIt(get_objects_header());
-
-	BYTE* projectile = (BYTE*)objectIt.get_data_at_datum_index(trigger_projectile_datum_index)->object;
+	BYTE* projectile = (BYTE*)object_get_fast_unsafe(trigger_projectile_datum_index);
 
 	LOG_TRACE_GAME(L" projectile matrix4x3_transform_point() - original values v1: i: {}, j: {}, k: {}", v1->i, v1->j, v1->k);
 
