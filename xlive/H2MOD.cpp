@@ -34,7 +34,6 @@
 
 #include "Blam/Engine/Game/DamageData.h"
 #include "Blam/Engine/FileSystem/FiloInterface.h"
-#include "Blam/Engine/Objects/GameStateObjects.h"
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 
 #include <float.h>
