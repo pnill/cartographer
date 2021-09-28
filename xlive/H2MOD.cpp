@@ -1366,6 +1366,11 @@ void H2MOD::RegisterEvents()
 //	return c_sub_81A676(a1, a2, a3, 4, a5, a6, a7, a8, a9, a10);
 //}
 
+// unlocks all single player maps
+int __cdecl get_last_single_player_level_id_unlocked_from_profile()
+{
+	return 805; // return the id of the last level
+}
 
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
@@ -1480,6 +1485,7 @@ void H2MOD::ApplyHooks() {
 		c_set_screen_bounds = Memory::GetAddress<p_set_screen_bounds*>(0x264979);
 		//PatchCall(GetAddress(0x25E1E5), set_screen_bounds);
 		
+		PatchCall(Memory::GetAddressRelative(0x6422C8), get_last_single_player_level_id_unlocked_from_profile);
 	}
 	else {
 
