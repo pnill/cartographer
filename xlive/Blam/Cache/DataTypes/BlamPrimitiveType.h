@@ -15,4 +15,4 @@ typedef unsigned int datum;
 
 #define DATUM_IS_NONE(_datum_index) ((_datum_index) == DATUM_NONE)
 #define DATUM_ABSOLUTE_INDEX(_datum_index) ((unsigned short)((_datum_index) & 0xFFFF))
-#define DATUM_SALT(_datum_index) ((unsigned short)(((_datum_index) >> 16) & 0xFFFF))
+#define DATUM_IDENTIFIER(_datum_index) ((unsigned short)(((_datum_index) >> 16) & 0xFFFF))
