@@ -1,6 +1,7 @@
 #include "RenderHooks.h"
 #include "Util/Hooks/Hook.h"
 #include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD/GUI/GUI.h"
 
 bool ras_layer_overrides[25];
 bool geo_render_overrides[24];
@@ -58,8 +59,11 @@ namespace RenderHooks
 
 	int oWidth = 0;
 	int oHeight = 0;
+
 	int getWidth(e_layer_type e, unsigned int width)
 	{
+		int window_width = GUI::GetDisplayMode().Width;
+
 		if (e == e_layer_type::lightmap_shadows_1 || e == e_layer_type::lightmap_shadows_2)
 			switch(H2Config_Override_Shadows)
 			{
@@ -93,10 +97,48 @@ namespace RenderHooks
 					return 4096;
 			}
 		}
+		if (e == e_layer_type::bloom)
+		{
+			switch (H2Config_Override_ScreenFX)
+			{
+			case tex_low:
+				return window_width / 8;
+			case tex_high:
+				return window_width;
+			case tex_ultra:
+				return window_width * 2;
+			}
+		}
+		if (e == e_layer_type::unk_15)
+		{
+			switch (H2Config_Override_ScreenFX)
+			{
+			case tex_low:
+				return window_width / 4;
+			case tex_high:
+				return window_width;
+			case tex_ultra:
+				return window_width * 2;
+			}
+		}
+		if (e == e_layer_type::tex_camera)
+		{
+			switch (H2Config_Override_ScreenFX)
+			{
+			case tex_low:
+				return window_width / 4;
+			case tex_high:
+				return window_width;
+			case tex_ultra:
+				return window_width * 2;
+			}
+		}
 		return width;
 	}
 	int getHeight(e_layer_type e, unsigned int height)
 	{
+		int window_height = GUI::GetDisplayMode().Height;
+
 		if (e == e_layer_type::lightmap_shadows_1 || e == e_layer_type::lightmap_shadows_2)
 			switch (H2Config_Override_Shadows)
 			{
@@ -128,6 +170,42 @@ namespace RenderHooks
 					return 1024;
 				case tex_ultra:
 					return 2048;
+			}
+		}
+		if (e == e_layer_type::bloom)
+		{
+			switch (H2Config_Override_ScreenFX)
+			{
+			case tex_low:
+				return window_height / 8;
+			case tex_high:
+				return window_height;
+			case tex_ultra:
+				return window_height * 2;
+			}
+		}
+		if (e == e_layer_type::unk_15)
+		{
+			switch (H2Config_Override_ScreenFX)
+			{
+			case tex_low:
+				return window_height / 4;
+			case tex_high:
+				return window_height;
+			case tex_ultra:
+				return window_height * 2;
+			}
+		}
+		if (e == e_layer_type::tex_camera)
+		{
+			switch (H2Config_Override_ScreenFX)
+			{
+			case tex_low:
+				return window_height / 4;
+			case tex_high:
+				return window_height;
+			case tex_ultra:
+				return window_height * 2;
 			}
 		}
 		return height;

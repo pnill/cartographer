@@ -112,6 +112,7 @@ point2d	H2Config_SENTBEAM = { 1 , 1 };
 
 e_override_texture_resolution H2Config_Override_Shadows;
 e_override_texture_resolution H2Config_Override_Water;
+e_override_texture_resolution H2Config_Override_ScreenFX;
 
 ControllerInput::CustomControllerLayout H2Config_CustomLayout;
 
@@ -536,6 +537,7 @@ void SaveH2Config() {
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "override_shadows", std::to_string(H2Config_Override_Shadows).c_str());
 			ini.SetValue(H2ConfigVersionSection.c_str(), "override_water", std::to_string(H2Config_Override_Water).c_str());
+			ini.SetValue(H2ConfigVersionSection.c_str(), "override_screenfx", std::to_string(H2Config_Override_ScreenFX).c_str());
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
 

@@ -38,6 +38,6 @@ namespace GUI
 	extern void ToggleMenu();
 	extern void ShowAdvancedSettings(bool* p_open = NULL);
 	extern void ResetDevice();
-
+	extern D3DDISPLAYMODE GetDisplayMode();
 };
 

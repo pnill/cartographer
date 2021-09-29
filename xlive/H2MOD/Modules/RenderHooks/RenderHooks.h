@@ -11,8 +11,8 @@ namespace RenderHooks
 		unk_2 = 2,
 		unk_3 = 3,
 		//Fog shit /Glowing stuff?
-		unk_4 = 4,
-		unk_5 = 5,
+		bloom = 4,
+		specular = 5,
 		unk_6 = 6,
 		dynamic_shadows = 7,
 		lightmap_shadows_1 = 8,
@@ -24,7 +24,7 @@ namespace RenderHooks
 		unk_14 = 14,
 		//Active camo
 		unk_15 = 15,
-		unk_16 = 16,
+		tex_camera = 16,
 		unk_17 = 17,
 		unk_18 = 18,
 		water = 19,
@@ -33,9 +33,9 @@ namespace RenderHooks
 		//Out of focus blur
 		unk_21 = 21,
 		//Main Menu Transition Blur
-		unk_22 = 22,
+		blur1 = 22,
 		// main menu background blur
-		unk_23 = 23,
+		blur2 = 23,
 		unk_24 = 24,
 		unk_25 = 25
 	};

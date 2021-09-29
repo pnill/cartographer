@@ -1,5 +1,5 @@
 #include "3rdparty/imgui/imgui.h"
-
+#include "H2MOD/Modules/Utils/Utils.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/HudElements/HudElements.h"
 #include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
@@ -12,7 +12,6 @@
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
 #include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
-
 
 namespace imgui_handler {
 	namespace AdvancedSettings {
@@ -28,6 +27,7 @@ namespace imgui_handler {
 			int g_aiming = 0;
 			int g_shadows = 0;
 			int g_water = 0;
+			int g_screenfx = 0;
 			int g_experimental = 0;
 			bool g_init = false;
 			int g_language_code = -1;
@@ -295,6 +295,14 @@ namespace imgui_handler {
 					if (ImGui::Combo("##Water", &g_water, s_items, 4))
 					{
 						H2Config_Override_Water = (e_override_texture_resolution)g_water;
+						RenderHooks::ResetDevice();
+					}
+					ImGui::NextColumn();
+					ImGui::Text(GetString(screenfx_title));
+					ImGui::PushItemWidth(WidthPercentage(100));
+					if (ImGui::Combo("##Screen FX", &g_screenfx, s_items, 4))
+					{
+						H2Config_Override_ScreenFX = (e_override_texture_resolution)g_screenfx;
 						RenderHooks::ResetDevice();
 					}
 					ImGui::NextColumn();
@@ -910,6 +918,7 @@ namespace imgui_handler {
 				g_language_code = H2Config_language.code_main;
 				g_shadows = (int)H2Config_Override_Shadows;
 				g_water = (int)H2Config_Override_Water;
+				g_screenfx = (int)H2Config_Override_ScreenFX;
 				g_experimental = (int)H2Config_experimental_fps;
 				if (g_language_code == -1)
 					g_language_code = 8;
@@ -939,7 +948,7 @@ namespace imgui_handler {
 				HostSettings();
 				GameSettings();
 
-				
+
 #if DISPLAY_DEV_TESTING_MENU
 				if (ImGui::CollapsingHeader("Dev Testing"))
 				{
@@ -949,7 +958,7 @@ namespace imgui_handler {
 						{
 							PlayerIterator playerIt;
 							s_datum_array* Objects = *Memory::GetAddress<s_datum_array**>(0x4E461C);
-							
+
 							while(playerIt.get_next_active_player())
 							{
 								auto player = playerIt.get_current_player_data();
@@ -1085,6 +1094,7 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::lod_6] = "L6 - Cinematic";
 			string_table[0][e_advanced_string::shadow_title] = "Shadow Quality";
 			string_table[0][e_advanced_string::water_title] = "Water Quality";
+			string_table[0][e_advanced_string::screenfx_title] = "Screen FX Quality";
 			string_table[0][e_advanced_string::tex_L1] = "Low";
 			string_table[0][e_advanced_string::tex_L2] = "High";
 			string_table[0][e_advanced_string::tex_L3] = "Ultra";
@@ -1244,6 +1254,7 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::lod_6] = u8"N6 - Cinemático";
 			string_table[4][e_advanced_string::shadow_title] = u8"Calidad sombra";
 			string_table[4][e_advanced_string::water_title] = u8"Calidad del agua";
+			string_table[4][e_advanced_string::screenfx_title] = u8"Calidad de efectos de pantalla";
 			string_table[4][e_advanced_string::tex_L1] = u8"Bajo";
 			string_table[4][e_advanced_string::tex_L2] = u8"Alto";
 			string_table[4][e_advanced_string::tex_L3] = u8"Muy alto";

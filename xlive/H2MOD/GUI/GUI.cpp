@@ -429,6 +429,12 @@ void GUI::ToggleMenu()
 		SaveH2Config();
 }
 
+D3DDISPLAYMODE GUI::GetDisplayMode()
+{
+	D3DDISPLAYMODE displayMode;
+	pDevice->GetDisplayMode(0, &displayMode);
+	return displayMode;
+}
 
 
 void GUI::Initialize(HWND hWnd)
