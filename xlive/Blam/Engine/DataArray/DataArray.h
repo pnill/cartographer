@@ -4,7 +4,7 @@
 
 // The game is using some sort of heap manager developed by Microsoft in 2000's named RockAll Heap Manager 
 
-struct s_datum_array
+struct s_data_array
 {
 	char name[0x20];				// 0x0
 	int datum_max_elements;			// 0x20
@@ -23,25 +23,25 @@ struct s_datum_array
 	char* data;					// 0x44
 	int* data_usable_bit_mask;		// 0x48
 };
-CHECK_STRUCT_SIZE(s_datum_array, 0x4C);
+CHECK_STRUCT_SIZE(s_data_array, 0x4C);
 
 template<typename T = void*>
-class DatumIterator
+class s_data_iterator
 {
 public:
 
-	DatumIterator(s_datum_array* _data_array) : 
+	s_data_iterator(s_data_array* _data_array) : 
 		m_daum_array(_data_array),
 		m_current_absolute_index(NONE),
 		m_last_datum_index(DATUM_NONE)
 	{
 	}
 
-	~DatumIterator()
+	~s_data_iterator()
 	{
 	}
 
-	s_datum_array* get_datum_array()
+	s_data_array* get_datum_array()
 	{
 		return m_daum_array;
 	}
@@ -104,7 +104,7 @@ public:
 
 private:
 	
-	s_datum_array* m_daum_array;
+	s_data_array* m_daum_array;
 	datum m_last_datum_index;
 	int m_current_absolute_index;
 };

@@ -934,7 +934,7 @@ namespace imgui_handler {
 						if(ImGui::Button("Log Player Unit Objects"))
 						{
 							PlayerIterator playerIt;
-							s_datum_array* Objects = *Memory::GetAddress<s_datum_array**>(0x4E461C);
+							s_data_array* Objects = *Memory::GetAddress<s_data_array**>(0x4E461C);
 							
 							while(playerIt.get_next_active_player())
 							{

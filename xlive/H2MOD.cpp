@@ -59,7 +59,7 @@ bool b_Infection = false;
 bool b_HeadHunter = false;
 
 // TODO: remove these
-s_datum_array* game_state_actors = nullptr;
+s_data_array* game_state_actors = nullptr;
 
 std::unordered_map<wchar_t*, bool&> GametypesMap
 {
@@ -596,7 +596,7 @@ int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 
 void get_object_table_memory()
 {
-	game_state_actors = *Memory::GetAddress<s_datum_array**>(0xA965DC, 0x9A1C5C);
+	game_state_actors = *Memory::GetAddress<s_data_array**>(0xA965DC, 0x9A1C5C);
 }
 
 typedef bool(__cdecl *map_cache_load)(s_game_engine_settings* map_load_settings);

@@ -190,9 +190,9 @@ struct s_object_header {
 };
 CHECK_STRUCT_SIZE(s_object_header, 0xC);
 
-static s_datum_array* get_objects_header()
+static s_data_array* get_objects_header()
 {
-	return *Memory::GetAddress<s_datum_array**>(0x4E461C, 0x50C8EC);
+	return *Memory::GetAddress<s_data_array**>(0x4E461C, 0x50C8EC);
 };
 
 // Gets the header of the object, containing some details

@@ -22,7 +22,7 @@ FireFight::FireFight()
 void FireFight::KilledAI(datum ai_datum, XUID killer)
 {
 	int points = 0;
-	DatumIterator<Actor> actorIt(game_state_actors);
+	s_data_iterator<Actor> actorIt(game_state_actors);
 	auto actorObject = (s_biped_object_definition*)object_try_and_get_and_verify_type(ai_datum, FLAG(e_object_type::biped));
 
 	if (actorObject != NULL)

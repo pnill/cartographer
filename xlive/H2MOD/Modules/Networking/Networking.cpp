@@ -91,9 +91,9 @@ int __cdecl transport_qos_target_new_hook(int a1, signed int a2, int a3, int a4)
 {
 	static XNQOS placeholder_xnqos;
 
-	s_datum_array* qos_probes_datum_array = *Memory::GetAddress<s_datum_array**>(0x526BF4, 0x991078);
+	s_data_array* qos_probes_datum_array = *Memory::GetAddress<s_data_array**>(0x526BF4, 0x991078);
 
-	typedef int(__cdecl* datum_new_in_range)(s_datum_array* datum_array);
+	typedef int(__cdecl* datum_new_in_range)(s_data_array* datum_array);
 	auto p_datum_new_in_range = Memory::GetAddress<datum_new_in_range>(0x667A0, 0x3248C);
 
 	datum new_qos_datum_index = p_datum_new_in_range(qos_probes_datum_array);

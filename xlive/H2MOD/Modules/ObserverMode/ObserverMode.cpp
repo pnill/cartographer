@@ -219,7 +219,7 @@ namespace ObserverMode
 	//unk is believed to be the editor_camera setting
 	void FollowObject(int local_player_index, int unk)
 	{
-		s_datum_array* Objects = *Memory::GetAddress<s_datum_array**>(0x4E461C);
+		s_data_array* Objects = *Memory::GetAddress<s_data_array**>(0x4E461C);
 		if (observer_current_index == -1) {
 			NextPlayer();
 		}
