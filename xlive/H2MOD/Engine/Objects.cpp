@@ -11,13 +11,6 @@
 namespace Engine::Objects
 {
 	//Grabs object from object table and verifies the type matches
-	char* __cdecl object_try_and_get_and_verify_type(datum object_datum_index, int object_type_flags)
-	{
-		//LOG_TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
-		typedef char* (__cdecl get_object)(datum object_datum_index, int object_type_flags);
-		auto p_get_object = Memory::GetAddress<get_object*>(0x1304E3, 0x11F3A6);
-		return p_get_object(object_datum_index, object_type_flags);
-	}
 
 	void __cdecl create_new_placement_data(s_object_placement_data* s_object_placement_data, datum object_definition_index, datum object_owner, int unk)
 	{
@@ -51,7 +44,7 @@ namespace Engine::Objects
 	}
 
 #pragma region Biped variant patches
-	void update_biped_object_variant_data(datum object_index, unsigned int variant_index)
+	void update_biped_object_variant_data(datum object_index, int variant_index)
 	{
 		s_biped_object_definition* biped_object = (s_biped_object_definition*)object_try_and_get_and_verify_type(object_index, FLAG(e_object_type::biped));
 		// set this data only if we are dealing with a biped
@@ -64,8 +57,8 @@ namespace Engine::Objects
 
 	void __cdecl update_object_variant_index_hook(datum object_index, int variant_index)
 	{
-		auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(int, int)>(0x52FE84, 0x51ED47);
-		auto object = get_object_fast_unsafe<s_biped_object_definition>(object_index);
+		auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(datum, int)>(0x52FE84, 0x51ED47);
+		auto object = object_get_fast_unsafe<s_biped_object_definition>(object_index);
 
 		object->model_variant_id = p_resolve_variant_index_to_new_variant(object_index, variant_index);
 
@@ -116,12 +109,12 @@ namespace Engine::Objects
 		return pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, stream);
 	}
 
-	int __stdcall c_simulation_object_entity_definition_object_create_object_hook(int thisx, void* creation_data, int a2, int a3, void* object_placement_data)
+	int __stdcall c_simulation_object_entity_definition_object_create_object_hook(int thisx, void* creation_data, int a2, int a3, s_object_placement_data* object_placement_data)
 	{
 		// set the object placement data
-		*(int*)((char*)object_placement_data + 12) = *(int*)((char*)creation_data + 36);
-		//addDebugText("creating object with variant index: %d", *(int*)((char*)creation_data + 36));
-		return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, void*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, object_placement_data);
+		object_placement_data->variant_index = *(int*)((char*)creation_data + 36);
+		//addDebugText("creating object with variant index: %d", object_placement_data->variant_index);
+		return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, s_object_placement_data*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, object_placement_data);
 	}
 
 	// original update_object_variant_index is usercall, with data in CX register as first param
@@ -150,13 +143,13 @@ namespace Engine::Objects
 		return 0;
 	}
 
-	void __stdcall object_build_creation_data_hook(unsigned int object_index, void* object_creation_data)
+	void __stdcall object_build_creation_data_hook(datum object_index, void* object_creation_data)
 	{
-		auto p_object_build_creation_data = Memory::GetAddress<void(__stdcall*)(unsigned int, void*)>(0x1F24ED, 0x1DD586);
+		auto p_object_build_creation_data = Memory::GetAddress<void(__stdcall*)(datum, void*)>(0x1F24ED, 0x1DD586);
 
 		p_object_build_creation_data(object_index, object_creation_data);
 
-		auto object = get_object_fast_unsafe<s_biped_object_definition>(object_index);
+		auto object = object_get_fast_unsafe<s_biped_object_definition>(object_index);
 
 		*(int*)((BYTE*)object_creation_data + 0x24) = object->variant_index;
 
@@ -166,7 +159,7 @@ namespace Engine::Objects
 	void apply_biped_object_definition_patches()
 	{
 		// increase the data size for biped representation
-		WriteValue<short>(Memory::GetAddressRelative(0x81E9A8, 0x7C1EB8) + 8, sizeof(s_biped_object_definition));
+		WriteValue<unsigned short>(Memory::GetAddressRelative(0x81E9A8, 0x7C1EB8) + 8, sizeof(s_biped_object_definition));
 
 		// hook the function that updates the variant
 		WriteJmpTo(Memory::GetAddressRelative(0x52FED3, 0x51ED96), update_object_variant_index_to_cdecl);

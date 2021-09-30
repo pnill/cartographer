@@ -7,9 +7,9 @@
 	- If you need to do something in the pregame lobby, use the functions available in Network Session (H2MOD/Modules/Networking/NetworkSession)
 */
 
-s_datum_array* Player::getArray()
+s_data_array* Player::getArray()
 {
-	return *Memory::GetAddress<s_datum_array**>(0x4A8260, 0x4D64C4);
+	return *Memory::GetAddress<s_data_array**>(0x4A8260, 0x4D64C4);
 }
 
 bool Player::indexValid(int playerIndex)
@@ -23,7 +23,7 @@ Player* Player::getPlayer(int playerIndex)
 	{
 		return nullptr;
 	}
-	return (Player*)&getArray()->datum[playerIndex * getArray()->datum_element_size];
+	return (Player*)&getArray()->data[playerIndex * getArray()->datum_element_size];
 }
 
 e_object_team Player::getTeam(int playerIndex)
@@ -93,7 +93,7 @@ XUID Player::getIdentifier(int playerIndex)
 }
 
 PlayerIterator::PlayerIterator() 
-	: DatumIterator(Player::getArray())
+	: s_data_iterator(Player::getArray())
 {
 
 }

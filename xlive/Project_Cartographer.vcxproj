@@ -275,7 +275,6 @@
     <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
-    <ClCompile Include="Blam\Engine\Objects\GameStateObjects.cpp" />
     <ClCompile Include="Blam\Engine\Players\Players.cpp" />
     <ClCompile Include="H2MOD\Engine\Engine.cpp" />
     <ClCompile Include="H2MOD\Engine\Objects.cpp" />
@@ -539,7 +538,6 @@
     <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Engine\Game\DamageData.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngineEnum.h" />
-    <ClInclude Include="Blam\Engine\Objects\GameStateObjects.h" />
     <ClInclude Include="Blam\Enums\Game\HaloStrings.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Math\integer_math.h" />

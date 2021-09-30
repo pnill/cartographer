@@ -30,19 +30,18 @@ projectile_update_def p_projectile_update;
 // determines whether the projectile should be updated in a 30hz context or not
 void projectile_set_tick_length_context(datum projectile_datum_index, bool projectile_instant_update)
 {
-	s_object_header* objects_header = (s_object_header*)get_objects_header()->datum;
-	char* object_data = objects_header[DATUM_ABSOLUTE_INDEX(projectile_datum_index)].object;
+	char* object_data = (char*)object_get_fast_unsafe(projectile_datum_index);
 	char* proj_tag_data = tags::get_tag_fast<char>(*((datum*)object_data));
 
 	if (*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5) // check if travels instantaneously flag is set in the projectile flags
 		&& (projectile_instant_update || *(DWORD*)(object_data + 428) == time_globals::get()->tick_count)) // also check if the projectile is updated twice in the same tick
 	{
-		//LOG_TRACE_GAME("projectile: {} will be updated at 30 hz context", projectile_datum_index.ToAbsoluteIndex());
+		//LOG_TRACE_GAME("{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_datum_index);
 		tick_length = time_globals::get_seconds_per_tick() * ((float)time_globals::get()->ticks_per_second / HitFix_Projectile_Tick_Rate);
 	}
 	else
 	{
-		//LOG_TRACE_GAME("projectile: {} will not be updated at 30 hz context", projectile_datum_index.ToAbsoluteIndex());
+		//LOG_TRACE_GAME("{} - projectile: {:X} at {} hz context", __FUNCTION__, projectile_datum_index, time_globals::get()->ticks_per_second);
 		tick_length = time_globals::get_seconds_per_tick();
 	}
 }
@@ -50,8 +49,7 @@ void projectile_set_tick_length_context(datum projectile_datum_index, bool proje
 // sets the tick when the projectile has been created
 inline void projectile_set_creation_tick(datum projectile_datum_index)
 {
-	s_object_header* objects_header = (s_object_header*)get_objects_header()->datum;
-	char* object_data = objects_header[DATUM_ABSOLUTE_INDEX(projectile_datum_index)].object;
+	char* object_data = (char*)object_get_fast_unsafe(projectile_datum_index);
 	*(DWORD*)(object_data + 428) = time_globals::get()->tick_count; // store the projectile creation tick count
 }
 
@@ -67,14 +65,14 @@ bool __cdecl projectile_new(unsigned __int16 projectile_object_index, int a2)
 void __cdecl projectile_update_instantaneous(datum projectile_object_index, real_point3d *a2)
 {
 	projectile_set_tick_length_context(projectile_object_index, true);
-	//LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {}, just making sure: {}", projectileToBeUpdated.ToAbsoluteIndex(), *(int*)&projectile_object_index & 0xFFFF);
+	//LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
 	p_projectile_update(projectile_object_index, a2);
 }
 
 void __cdecl projectile_update_regular(datum projectile_object_index, real_point3d *a2)
 {
 	projectile_set_tick_length_context(projectile_object_index, false);
-	//LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {}, just making sure: {}", projectileToBeUpdated.ToAbsoluteIndex(), *(int*)&projectile_object_index & 0xFFFF);
+	//LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
 	p_projectile_update(projectile_object_index, a2);
 }
 
@@ -89,8 +87,8 @@ std::vector<std::tuple<std::string, float, float>> weapon_projectiles =
 {
 	//std::make_tuple("objects\\weapons\\rifle\\battle_rifle\\projectiles\\battle_rifle_bullet", 400.f * 2, 400.f * 2),
 	//std::make_tuple("objects\\weapons\\rifle\\covenant_carbine\\projectiles\\carbine_slug\\carbine_slug", 400.f * 2, 400.f * 2),
-	std::make_tuple("objects\\weapons\\rifle\\sniper_rifle\\projectiles\\sniper_bullet", 1200.0f * 2, 1200.0f * 2),
-	std::make_tuple("objects\\weapons\\rifle\\beam_rifle\\projectiles\\beam_rifle_beam", 1200.0f * 2, 1200.0f * 2),
+	std::make_tuple("objects\\weapons\\rifle\\sniper_rifle\\projectiles\\sniper_bullet", 1200.0f * 2.f, 1200.0f * 2.f),
+	std::make_tuple("objects\\weapons\\rifle\\beam_rifle\\projectiles\\beam_rifle_beam", 1200.0f * 2.f, 1200.0f * 2.f),
 	std::make_tuple("objects\\vehicles\\warthog\\turrets\\gauss\\weapon\\gauss_bullet", 90.f * 2.f, 90.f * 2.f),
 	//std::make_tuple("objects\\weapons\\pistol\\magnum\\projectiles\\magnum_bullet", 400.f * 2, 400.f * 2),
 	//std::make_tuple("objects\\vehicles\\warthog\\turrets\\chaingun\\weapon\\bullet", 2000.0f, 2000.0f)
@@ -138,9 +136,7 @@ void __cdecl matrix4x3_transform_point(void* matrix, real_vector3d* v1, real_vec
 {
 	auto p_matrix4x3_transform_point = Memory::GetAddressRelative<void(__cdecl*)(void*, real_vector3d*, real_vector3d*)>(0x47795A);
 
-	DatumIterator<s_object_header> objectIt(get_objects_header());
-
-	BYTE* projectile = (BYTE*)objectIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(trigger_projectile_datum_index))->object;
+	BYTE* projectile = (BYTE*)object_get_fast_unsafe(trigger_projectile_datum_index);
 
 	LOG_TRACE_GAME(L" projectile matrix4x3_transform_point() - original values v1: i: {}, j: {}, k: {}", v1->i, v1->j, v1->k);
 

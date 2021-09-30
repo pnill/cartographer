@@ -34,7 +34,6 @@
 
 #include "Blam/Engine/Game/DamageData.h"
 #include "Blam/Engine/FileSystem/FiloInterface.h"
-#include "Blam/Engine/Objects/GameStateObjects.h"
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 
 #include <float.h>
@@ -60,7 +59,7 @@ bool b_Infection = false;
 bool b_HeadHunter = false;
 
 // TODO: remove these
-s_datum_array* game_state_actors = nullptr;
+s_data_array* game_state_actors = nullptr;
 
 std::unordered_map<wchar_t*, bool&> GametypesMap
 {
@@ -132,18 +131,6 @@ bool __cdecl call_add_object_to_sync(datum gamestate_object_datum)
 	return p_add_object_to_sync(gamestate_object_datum);
 }
 
-/* We should really make this stuff into a struct/class, and access it that way it'd be much cleaner... */
-int get_actor_datum_from_unit_datum(int unit_datum)
-{
-	char* unit_ptr = Engine::Objects::object_try_and_get_and_verify_type(unit_datum, FLAG(e_object_type::biped));
-	if (unit_ptr)
-	{
-		return *(int*)(unit_ptr + 0x130);
-	}
-
-	return NONE;
-}
-
 /* This looks at the actors table to get the character datum which is assigned to the specific actor. */
 int get_char_datum_from_actor(int actor_datum)
 {
@@ -159,7 +146,7 @@ int get_char_datum_from_actor(int actor_datum)
 /*This is to get the datum of the last player who damaged the datum/unit provided */
 int get_damage_owner(int damaged_unit_index)
 {
-	char* damaged_player_ptr = Engine::Objects::object_try_and_get_and_verify_type(damaged_unit_index, FLAG(e_object_type::biped) | FLAG(e_object_type::vehicle));
+	char* damaged_player_ptr = (char*)object_try_and_get_and_verify_type(damaged_unit_index, FLAG(e_object_type::biped) | FLAG(e_object_type::vehicle));
 	if (damaged_player_ptr)
 	{
 		return *(int*)(damaged_player_ptr + 0xC8); // player_ptr/unit_ptr + 0xC8 = damaging player this works on vehicles/AI and such too.
@@ -264,8 +251,7 @@ BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
 	if (DATUM_IS_NONE(unit_datum))
 		return nullptr;
 
-	DatumIterator<s_object_header> objectsIt(get_objects_header());
-	return (BYTE*)objectsIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(unit_datum))->object;
+	return (BYTE*)object_get_fast_unsafe(unit_datum);
 }
 
 void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
@@ -273,7 +259,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
 	datum unit_datum = Player::getPlayerUnitDatumIndex(playerIndex);
-	if (unit_datum != NONE)
+	if (!DATUM_IS_NONE(unit_datum))
 	{
 		s_object_placement_data nObject;
 
@@ -310,8 +296,8 @@ int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
 BYTE H2MOD::get_unit_team_index(datum unit_datum_index)
 {
 	BYTE team_index = NONE;
-	char* unit_object = Engine::Objects::object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
-	if (unit_object)
+	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
+	if (unit_object != NULL)
 	{
 		team_index = *(BYTE*)(unit_object + 0x13C);
 	}
@@ -356,8 +342,8 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 	datum unit_datum_index = Player::getPlayerUnitDatumIndex(playerIndex);
 	datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
 
-	char* unit_object = Engine::Objects::object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
-	if (unit_object)
+	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
+	if (unit_object != NULL)
 	{
 		if (resetEquipment)
 			Engine::Unit::remove_equipment(unit_datum_index);
@@ -431,7 +417,7 @@ void H2MOD::disable_sounds(int sound_flags)
 							// disable all sounds from english to chinese
 							for (int j = 0; j < 8; j++)
 							{
-								(&general_event->sound)[j].TagIndex = NONE;
+								(&general_event->sound)[j].TagIndex = DATUM_NONE;
 							}
 						}
 					}
@@ -610,7 +596,7 @@ int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 
 void get_object_table_memory()
 {
-	game_state_actors = *Memory::GetAddress<s_datum_array**>(0xA965DC, 0x9A1C5C);
+	game_state_actors = *Memory::GetAddress<s_data_array**>(0xA965DC, 0x9A1C5C);
 }
 
 typedef bool(__cdecl *map_cache_load)(s_game_engine_settings* map_load_settings);
@@ -1029,7 +1015,7 @@ void __cdecl GetGameVersion(DWORD *executable_version, DWORD *build_version, DWO
 
 void GivePlayerWeaponDatum(datum unit_datum, datum weapon_datum)
 {
-	if (unit_datum != NONE)
+	if (!DATUM_IS_NONE(unit_datum))
 	{
 		s_object_placement_data nObject;
 
@@ -1051,7 +1037,7 @@ float get_device_acceleration_scale(datum device_datum)
 	DWORD tag_instances = (DWORD)tags::get_tag_instances();
 
 	int device_gamestate_offset = DATUM_ABSOLUTE_INDEX(device_datum) + DATUM_ABSOLUTE_INDEX(device_datum) * 2;
-	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)get_objects_header()->datum + device_gamestate_offset * 4 + 8);
+	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)get_objects_header()->data + device_gamestate_offset * 4 + 8);
 	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 
 	__int16 device_control_index = device_control_datum & 0xFFFF;
@@ -1380,6 +1366,11 @@ void H2MOD::RegisterEvents()
 //	return c_sub_81A676(a1, a2, a3, 4, a5, a6, a7, a8, a9, a10);
 //}
 
+// unlocks all single player maps
+int __cdecl get_last_single_player_level_id_unlocked_from_profile()
+{
+	return 805; // return the id of the last level
+}
 
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
@@ -1494,6 +1485,7 @@ void H2MOD::ApplyHooks() {
 		c_set_screen_bounds = Memory::GetAddress<p_set_screen_bounds*>(0x264979);
 		//PatchCall(GetAddress(0x25E1E5), set_screen_bounds);
 		
+		PatchCall(Memory::GetAddressRelative(0x6422C8), get_last_single_player_level_id_unlocked_from_profile);
 	}
 	else {
 

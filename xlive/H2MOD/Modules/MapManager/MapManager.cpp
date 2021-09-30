@@ -318,13 +318,10 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, network_session 
 
 __declspec(naked) void get_map_load_status_for_all_peers_hook_2_to_stdcall() {
 	__asm {
-		mov esi, [esp+4+4] // local stack + parameter
-		push esi
-		mov esi, [esp+8+0] // local stack + parameter
-		push esi
-		push ecx // push this on stack
-		call get_map_load_status_for_all_peers_hook_2 // this will clear 12 bytes off the stack
-		retn 8 // clear the remaining 8 that we pushed previously
+		pop eax
+		push ecx
+		push eax
+		jmp get_map_load_status_for_all_peers_hook_2
 	}
 }
 #pragma endregion

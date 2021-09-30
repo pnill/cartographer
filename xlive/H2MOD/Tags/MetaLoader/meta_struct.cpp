@@ -190,7 +190,7 @@ namespace meta_struct
 	///
 	//constructor for in memory loading and rebasing
 	//houses both meta and extended meta types
-	meta::meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin , std::ifstream* map_stream , int map_off ,__int8 count,  int datum_index , std::string loc , blam_tag type)
+	meta::meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin, std::ifstream* map_stream, int map_off, __int8 count,  int datum_index , std::string loc, blam_tag type)
 	{
 		this->data = meta;
 		this->size = size;

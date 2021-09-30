@@ -10,7 +10,7 @@ struct s_object_placement_data
 	WORD unk_10;//0x8;
 	BYTE unk_11;//0xA
 	BYTE unk_12;//0xB
-	DWORD variant_index;//0xC
+	int variant_index;//0xC
 	DWORD unk_14;//0x10
 	BYTE unk_15;//0x14
 	BYTE unk_16;//0x15

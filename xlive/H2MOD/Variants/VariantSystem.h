@@ -20,8 +20,8 @@ public:
 	GameClientServerHandler* itemInteraction;
 };
 
-// TODO moev this out
-enum e_weapons_datum_index
+// TODO move this out
+enum e_weapons_datum_index : unsigned int
 {
 	//Unknown = 0x2,//36
 	//None = 0x1,//37
