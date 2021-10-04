@@ -84,4 +84,4 @@ extern H2MOD* h2mod;
 extern VariantPlayer* variant_player;
 extern DeviceShop* device_shop;
 
-extern s_datum_array* game_state_actors;
+extern s_data_array* game_state_actors;

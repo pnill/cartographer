@@ -22,16 +22,15 @@ FireFight::FireFight()
 void FireFight::KilledAI(datum ai_datum, XUID killer)
 {
 	int points = 0;
-	DatumIterator<Actor> actorIt(game_state_actors);
-	DatumIterator<s_object_header> objectIt(get_objects_header());
-	s_biped_object_definition* actorObject = (s_biped_object_definition*)objectIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(ai_datum))->object;
+	s_data_iterator<Actor> actorIt(game_state_actors);
+	auto actorObject = (s_biped_object_definition*)object_try_and_get_and_verify_type(ai_datum, FLAG(e_object_type::biped));
 
-	if (objectIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(ai_datum))->type == e_object_type::biped)
+	if (actorObject != NULL)
 	{
 		datum actor_datum = actorObject->ActorDatum; // Grab the actor from the killed AI
 		if (DATUM_ABSOLUTE_INDEX(actor_datum) != -1) // Ensure that it was valid
 		{
-			datum char_datum = actorIt.get_data_at_index(DATUM_ABSOLUTE_INDEX(actor_datum))->character_datum; // get the character tag datum assigned to the actor.
+			datum char_datum = actorIt.get_data_at_datum_index(actor_datum)->character_datum; // get the character tag datum assigned to the actor.
 			auto* character = tags::get_tag<blam_tag::tag_group_type::character, character_tag_group>(char_datum);
 
 			if (character && character->SwarmProperties.size > 0)

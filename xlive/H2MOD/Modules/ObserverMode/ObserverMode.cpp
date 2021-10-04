@@ -144,7 +144,7 @@ namespace ObserverMode
 		else
 			currentPlayerIndex++;
 
-		datum newIndex = ((datum)pArray->datum[0x204 * currentPlayerIndex + 0x28]);
+		datum newIndex = ((datum)pArray->data[0x204 * currentPlayerIndex + 0x28]);
 		if (DATUM_IS_NONE(newIndex))
 			NextPlayer();
 		else
@@ -219,7 +219,7 @@ namespace ObserverMode
 	//unk is believed to be the editor_camera setting
 	void FollowObject(int local_player_index, int unk)
 	{
-		s_datum_array* Objects = *Memory::GetAddress<s_datum_array**>(0x4E461C);
+		s_data_array* Objects = *Memory::GetAddress<s_data_array**>(0x4E461C);
 		if (observer_current_index == -1) {
 			NextPlayer();
 		}
@@ -228,7 +228,7 @@ namespace ObserverMode
 			*(DWORD*)(unk) = DATUM_ABSOLUTE_INDEX(observer_current_index);
 			*(WORD*)(unk + 4) = -1;
 
-			auto object = *(DWORD*)&Objects->datum[12 * DATUM_ABSOLUTE_INDEX(observer_current_index) + 4];
+			auto object = *(DWORD*)&Objects->data[12 * DATUM_ABSOLUTE_INDEX(observer_current_index) + 4];
 			//LOG_INFO_GAME("[ObserverMode] Object {}, Address {}", observer_current_index, IntToString<int>(object, std::hex));
 			sub_7BD2EC(DATUM_ABSOLUTE_INDEX(observer_current_index), (DWORD*)(unk + 12));
 		}

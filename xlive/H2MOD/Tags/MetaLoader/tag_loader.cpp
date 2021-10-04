@@ -1346,7 +1346,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	//Clear the table
 	for (auto i = _INJECTED_TAG_START_; i < tag_loader::new_datum_index; i++)
 	{
-		tag_loader::new_Tables[i] = tags::tag_instance{ blam_tag::none(), -1, 0, 0 };
+		tag_loader::new_Tables[i] = tags::tag_instance{ blam_tag::none(), DATUM_NONE, 0, 0 };
 	}
 	tag_loader::que_meta_list.clear();
 	tag_loader::key_list.clear();

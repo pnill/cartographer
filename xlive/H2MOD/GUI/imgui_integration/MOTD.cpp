@@ -1,7 +1,6 @@
 #include "imgui_handler.h"
 #include "H2MOD/GUI/GUI.h"
 #include "H2MOD.h"
-#include <curl/curl.h>
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "XLive\xnet\IpManagement\XnIp.h"

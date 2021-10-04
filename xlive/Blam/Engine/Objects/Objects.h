@@ -170,7 +170,7 @@ struct s_biped_object_definition : s_object_base_definition
 	BYTE unk_18[0x21C];
 	
 	// NEW DATA
-	unsigned int variant_index;
+	int variant_index;
 };
 CHECK_STRUCT_SIZE(s_biped_object_definition, 0x480 + 4);
 
@@ -190,23 +190,29 @@ struct s_object_header {
 };
 CHECK_STRUCT_SIZE(s_object_header, 0xC);
 
-static s_datum_array* get_objects_header()
+static s_data_array* get_objects_header()
 {
-	return *Memory::GetAddress<s_datum_array**>(0x4E461C, 0x50C8EC);
+	return *Memory::GetAddress<s_data_array**>(0x4E461C, 0x50C8EC);
 };
 
+// Gets the header of the object, containing some details
 static s_object_header* get_objects_header(datum object_index)
 {
-	/*
-		Gets the header of the object, containing some details
-	*/
-
 	auto objects_header = get_objects_header();
-	return (s_object_header*)(&objects_header->datum[objects_header->datum_element_size * DATUM_ABSOLUTE_INDEX(object_index)]);
+	return (s_object_header*)(&objects_header->data[objects_header->datum_element_size * DATUM_ABSOLUTE_INDEX(object_index)]);
 }
 
+// Get the object fast, with no validation from datum index
 template<typename T = s_object_base_definition>
-static T* get_object_fast_unsafe(datum object_index)
+static T* object_get_fast_unsafe(datum object_index)
 {
 	return (T*)get_objects_header(object_index)->object;
+}
+
+// Gets the object and verifies the type, returns NULL if object doesn't match object type flags
+template<typename T = s_object_base_definition>
+static T* object_try_and_get_and_verify_type(datum object_index, int object_type_flags)
+{
+	auto p_object_try_and_get_and_verify_type = Memory::GetAddress<char*(__cdecl*)(datum, int)>(0x1304E3, 0x11F3A6);
+	return (T*)p_object_try_and_get_and_verify_type(object_index, object_type_flags);
 }

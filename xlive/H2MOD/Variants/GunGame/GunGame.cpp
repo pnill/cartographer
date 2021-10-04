@@ -153,7 +153,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 	LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() player index: {}, player name: {1}", playerIndex, Player::getName(playerIndex));
 
 	datum unit_datum_index = Player::getPlayerUnitDatumIndex(playerIndex);
-	char* unit_object = EngineCalls::Objects::object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
+	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
 
 	if (unit_object) {
 		int level = GunGame::gungamePlayers[getPlayerXuid(playerIndex)];
@@ -178,7 +178,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 
 void GunGame::playerDiedServer(int unit_datum_index)
 {
-	char* unit_object = EngineCalls::Objects::object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
+	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
 	if (unit_object) {
 		int playerIndex = h2mod->get_player_index_from_unit_datum_index(unit_datum_index);
 		h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Fragmentation, 0, true);

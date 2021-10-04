@@ -252,7 +252,7 @@ struct Player
 	- This functions work only after game has started, if you need to do something in the pregame lobby, use the functions available in Network Session (H2MOD/Modules/Networking/NetworkSession)
 	*/
 
-	static s_datum_array* getArray();
+	static s_data_array* getArray();
 	static bool indexValid(int playerIndex);
 	static Player* getPlayer(int playerIndex);
 	static e_object_team getTeam(int playerIndex);
@@ -267,7 +267,7 @@ struct Player
 CHECK_STRUCT_SIZE(Player, 0x204);
 #pragma pack(pop)
 
-class PlayerIterator : public DatumIterator<Player>
+class PlayerIterator : public s_data_iterator<Player>
 {
 public:
 
