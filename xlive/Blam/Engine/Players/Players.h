@@ -35,7 +35,9 @@ struct Player
 		MasterChief = 0,
 		Dervish = 1,
 		Spartan = 2,
-		Elite = 3
+		Elite = 3,
+		Skeleton = 4,
+		Flood = 5
 	};
 
 	enum class EmblemForeground : BYTE
@@ -256,6 +258,7 @@ struct Player
 	static e_object_team getTeam(int playerIndex);
 	static void setTeam(int playerIndex, e_object_team team);
 	static void setUnitBipedType(int playerIndex, Player::Biped bipedType);
+	static void setUnitBipedType(int playerIndex, byte representationIndex);
 	static void setBipedSpeed(int playerIndex, float speed);
 	static wchar_t* getName(int playerIndex);
 	static datum getPlayerUnitDatumIndex(int playerIndex);

@@ -111,8 +111,7 @@ namespace meta_struct
 		while (child_element)
 		{
 			std::string element_name = child_element->Name();
-
-			if (element_name == "reflexive")
+			if (element_name == "reflexive" || element_name == "tagblock")
 			{
 				ret->Add_BLOCK(Get_meta_BLOCK(child_element));
 			}
@@ -142,48 +141,140 @@ namespace meta_struct
 	std::shared_ptr<plugins_field> Get_meta_BLOCK(tinyxml2::XMLElement* element)
 	{
 		int offset = std::stoul(element->Attribute("offset"), nullptr, 16);
-		int entry_size = std::stoul(element->Attribute("entrySize"), nullptr, 16);
-
-		std::shared_ptr<plugins_field> ret = std::make_shared<plugins_field>(element->Attribute("name"), offset, entry_size);
-
-		//iterate through all the child elements
-		tinyxml2::XMLElement* child_element = element->FirstChildElement();
-		while (child_element)
+		int entry_size = -1;
+		if (element->Attribute("entrySize") != nullptr)
 		{
-			std::string element_name = child_element->Name();
+			entry_size = std::stoul(element->Attribute("entrySize"), nullptr, 16);
+			std::shared_ptr<plugins_field> ret = std::make_shared<plugins_field>(element->Attribute("name"), offset, entry_size);
 
-			if (element_name == "reflexive")
+			//iterate through all the child elements
+			tinyxml2::XMLElement* child_element = element->FirstChildElement();
+			while (child_element)
 			{
-				ret->Add_BLOCK(Get_meta_BLOCK(child_element));
-			}
-			else if ((element_name == "tagRef") || (element_name == "tagref"))
-			{
-				std::string name = child_element->Attribute("name");
+				std::string element_name = child_element->Name();
+				if (element_name == "reflexive" || element_name == "tagblock")
+				{
+					ret->Add_BLOCK(Get_meta_BLOCK(child_element));
+				}
+				else if ((element_name == "tagRef") || (element_name == "tagref"))
+				{
+					std::string name = child_element->Attribute("name");
 
-				int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
+					int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
 
-				if (!child_element->BoolAttribute("withClass") && !child_element->Attribute("withClass"))
-					ret->Add_tag_ref(off, name);
-				else
-					ret->Add_WCtag_ref(off, name);
-			}
-			else if ((element_name == "stringId") || (element_name == "stringid"))
-			{
-				std::string name = child_element->Attribute("name");
+					if (!child_element->BoolAttribute("withClass") && !child_element->Attribute("withClass"))
+						ret->Add_tag_ref(off, name);
+					else
+						ret->Add_WCtag_ref(off, name);
+				}
+				else if ((element_name == "stringId") || (element_name == "stringid"))
+				{
+					std::string name = child_element->Attribute("name");
 
-				int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
-				ret->Add_stringid_ref(off, name);
-			}
-			else if (element_name == "dataref")
-			{
-				std::string name = child_element->Attribute("name");
+					int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
+					ret->Add_stringid_ref(off, name);
+				}
+				else if (element_name == "dataref")
+				{
+					std::string name = child_element->Attribute("name");
 
-				int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
-				ret->Add_data_ref(off, name);
+					int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
+					ret->Add_data_ref(off, name);
+				}
+				child_element = child_element->NextSiblingElement();
 			}
-			child_element=child_element->NextSiblingElement();
+			return ret;
 		}
-		return ret;
+		else if (element->Attribute("elementSize") != nullptr) {
+			entry_size = std::stoul(element->Attribute("elementSize"), nullptr, 16);
+			std::shared_ptr<plugins_field> ret = std::make_shared<plugins_field>(element->Attribute("name"), offset, entry_size);
+
+			//iterate through all the child elements
+			tinyxml2::XMLElement* child_element = element->FirstChildElement();
+			while (child_element)
+			{
+				std::string element_name = child_element->Name();
+				if (element_name == "reflexive" || element_name == "tagblock")
+				{
+					ret->Add_BLOCK(Get_meta_BLOCK(child_element));
+				}
+				else if ((element_name == "tagRef") || (element_name == "tagref"))
+				{
+					std::string name = child_element->Attribute("name");
+
+					int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
+
+					if (!child_element->BoolAttribute("withClass") && !child_element->Attribute("withClass"))
+						ret->Add_tag_ref(off, name);
+					else
+						ret->Add_WCtag_ref(off, name);
+				}
+				else if ((element_name == "stringId") || (element_name == "stringid"))
+				{
+					std::string name = child_element->Attribute("name");
+
+					int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
+					ret->Add_stringid_ref(off, name);
+				}
+				else if (element_name == "dataref")
+				{
+					std::string name = child_element->Attribute("name");
+
+					int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
+					ret->Add_data_ref(off, name);
+				}
+				child_element = child_element->NextSiblingElement();
+			}
+			return ret;
+		}
+
+		if(entry_size == -1)
+		{
+			std::string exp = "Entry size could not be loaded for plugin";
+			throw new std::exception(exp.c_str());
+		}
+		else {
+			std::shared_ptr<plugins_field> ret = std::make_shared<plugins_field>(element->Attribute("name"), offset, entry_size);
+
+			//iterate through all the child elements
+			tinyxml2::XMLElement* child_element = element->FirstChildElement();
+			while (child_element)
+			{
+				std::string element_name = child_element->Name();
+
+				if (element_name == "reflexive" || element_name == "tagblock")
+				{
+					ret->Add_BLOCK(Get_meta_BLOCK(child_element));
+				}
+				else if ((element_name == "tagRef") || (element_name == "tagref"))
+				{
+					std::string name = child_element->Attribute("name");
+
+					int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
+
+					if (!child_element->BoolAttribute("withClass") && !child_element->Attribute("withClass"))
+						ret->Add_tag_ref(off, name);
+					else
+						ret->Add_WCtag_ref(off, name);
+				}
+				else if ((element_name == "stringId") || (element_name == "stringid"))
+				{
+					std::string name = child_element->Attribute("name");
+
+					int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
+					ret->Add_stringid_ref(off, name);
+				}
+				else if (element_name == "dataref")
+				{
+					std::string name = child_element->Attribute("name");
+
+					int off = std::stoul(child_element->Attribute("offset"), nullptr, 16);
+					ret->Add_data_ref(off, name);
+				}
+				child_element = child_element->NextSiblingElement();
+			}
+			return ret;
+		}
 	}
 	///
 	//<------------------------------meta structure---------------------------------------------------->
@@ -223,6 +314,7 @@ namespace meta_struct
 				List_deps(entry_size*i, plugin);
 
 	}
+
 	//a constructor to utilise tag loaded into memory and to modify them
 	//currently for rebasing and reassigning datum indices
 	meta::meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin, int count, int datum_index)
@@ -389,6 +481,7 @@ namespace meta_struct
 							if (list_extended.find(field_memaddr) == list_extended.end())
 							{
 								//for extended meta we have to read the map file and supply it to the meta object
+								
 								int length = entry_size * count;
 
 								char* ext_data = new char[length];
@@ -396,7 +489,6 @@ namespace meta_struct
 
 								map_stream->seekg(extended_meta_map_off);
 								map_stream->read(ext_data, length);
-
 								std::shared_ptr<meta> temp_extend = std::make_shared<meta>(ext_data, length, field_memaddr, i_Pfield, map_stream, extended_meta_map_off, count);
 								list_extended.emplace(field_memaddr, temp_extend);
 							}
@@ -580,7 +672,8 @@ namespace meta_struct
 			std::list<int> key_list;
 			for (auto& i : list_extended)
 			{
-				key_list.push_back(i.first);
+				if(i.first != -1)
+					key_list.push_back(i.first);
 			}
 
 			for(int& temp_key : key_list)
@@ -601,6 +694,7 @@ namespace meta_struct
 			if (temp_datum != -1)
 				ret.push_back(temp_datum);			
 		}		
+
 
 		return ret;
 	}

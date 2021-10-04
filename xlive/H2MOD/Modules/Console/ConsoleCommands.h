@@ -7,6 +7,8 @@ public:
 	ConsoleCommands();
 	void handle_command(std::string);
 	void spawn(datum object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition, bool sameTeam);
+	void spawn_rotate(datum object_datum, float x, float y, float z, float i, float j, float k);
+	void ConsoleCommands::delete_object(datum object_datum);
 	void output(std::wstring result);
 	void display(std::string output);
 	std::vector<std::string> prevCommands;

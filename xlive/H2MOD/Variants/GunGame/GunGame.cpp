@@ -281,11 +281,11 @@ void GunGameDeathHandler::onClient() {
 }
 
 void GunGameDeathHandler::onDedi() {
-	GunGame::playerDiedServer(this->getUnitDatumIndex().ToInt());
+	GunGame::playerDiedServer(this->getUnitDatumIndex());
 }
 
 void GunGameDeathHandler::onPeerHost() {
-	GunGame::playerDiedServer(this->getUnitDatumIndex().ToInt());
+	GunGame::playerDiedServer(this->getUnitDatumIndex());
 }
 
 void GunGameKillHandler::onClient() {

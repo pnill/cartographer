@@ -129,6 +129,9 @@
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\MeleeLunge.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
+    <ClCompile Include="Blam\Engine\Game\GameGlobals.cpp" />
+    <ClCompile Include="Blam\Engine\Game\GameEngineGlobals.cpp" />
+    <ClCompile Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -409,6 +412,14 @@
     <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.hpp" />
+    <ClInclude Include="Blam\Maths\integer_math.h" />
+    <ClInclude Include="Blam\Maths\real_math.h" />
+    <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.h" />
+    <ClInclude Include="Blam\Engine\Game\GameGlobals.h" />
+    <ClInclude Include="Blam\Engine\Game\GameEngineGlobals.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp" />
+    <ClInclude Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

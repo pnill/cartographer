@@ -207,6 +207,8 @@ namespace EventHandler
 		//uncomment this for debugging.
 		//LOG_TRACE_GAME("[{}]: {} ", __FUNCSIG__, execution_type);
 		execute_internal(execution_type, false);
+		//When trying to debug issues in threaded callbacks switch out the two lines, helps trace call stacks
+		//execute_internal(execution_type, true);
 		std::thread(execute_internal, execution_type, true).detach();
 		
 	}

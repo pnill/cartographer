@@ -1274,6 +1274,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			dervish = 1,
 			chief_multiplayer = 2,
 			elite_multiplayer = 3,
+			none = -1
 		};
 		e_campaign_player_type campaign_player_type;//0x2C
 		PAD(0x6);//0x2E

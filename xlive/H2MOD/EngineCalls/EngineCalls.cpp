@@ -1,4 +1,7 @@
 #include "EngineCalls.h"
+
+#include "Blam/Engine/Game/GameGlobals.h"
+
 //Engine Calls
 namespace EngineCalls
 {
@@ -34,5 +37,27 @@ namespace EngineCalls
 	{
 		//No need for a typedef just return the same address the function does.
 		return Memory::GetAddress(0x4A8280, 0x4D2500);
+	}
+
+	bool game_is_campaign()
+	{
+		return s_game_globals::get()->engine_settings.map_type == 1;
+	}
+
+	bool game_is_multiplayer()
+	{
+		return s_game_globals::get()->engine_settings.map_type == 2;
+	}
+
+	int get_game_mode_engine()
+	{
+		typedef int(t_get_game_mode_engine)();
+		auto p_get_game_mode_engine = Memory::GetAddress < t_get_game_mode_engine*>(0x5b15e);
+		return p_get_game_mode_engine();
+	}
+
+	s_game_variant* get_game_variant()
+	{
+		return &s_game_globals::get()->engine_settings.game_variant;
 	}
 }

@@ -1,15 +1,19 @@
 #include "EngineCalls.h"
 #include "Util/Hooks/Hook.h"
 #include "Blam/Engine/Objects/Objects.h"
+
+#include "H2MOD.h"
+#include "Blam/Engine/Players/Players.h"
 #include "H2MOD/Modules/Networking/Memory/bitstream.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 
 namespace EngineCalls::Objects
 {
 	//Grabs object from object table and verifies the type matches
 	char* __cdecl object_try_and_get_and_verify_type(datum object_datum_index, int object_type_flags)
 	{
-		//LOG_TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type);
+		//LOG_TRACE_GAME("call_get_object( object_datum_index: %08X, object_type: %08X )", object_datum_index, object_type_flags);
 		typedef char* (__cdecl get_object)(datum object_datum_index, int object_type_flags);
 		auto p_get_object = Memory::GetAddress<get_object*>(0x1304E3, 0x11F3A6);
 		return p_get_object(object_datum_index, object_type_flags);
@@ -46,6 +50,13 @@ namespace EngineCalls::Objects
 		return p_add_object_to_sync(gamestate_object_datum);
 	}
 
+	void object_destroy(datum gamestate_object_datum)
+	{
+		typedef void(__cdecl t_object_destroy)(datum gamestate_object_datum);
+		auto p_object_destroy = Memory::GetAddress<t_object_destroy*>(0x136005);
+		p_object_destroy(gamestate_object_datum);
+	}
+
 #pragma region Biped variant patches
 	void update_biped_object_variant_data(datum object_index, unsigned int variant_index)
 	{
@@ -60,11 +71,10 @@ namespace EngineCalls::Objects
 
 	void __cdecl update_object_variant_index_hook(datum object_index, int variant_index)
 	{
-		auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(int, int)>(0x52FE84, 0x0);
+		auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(int, int)>(0x52FE84, 0x51ED47);
 		auto object = get_object_fast_unsafe<s_biped_object_definition>(object_index);
 
 		object->model_variant_id = p_resolve_variant_index_to_new_variant(object_index, variant_index);
-
 		// update the biped variant index
 		update_biped_object_variant_data(object_index, variant_index);
 
@@ -95,7 +105,6 @@ namespace EngineCalls::Objects
 	{
 		int object_permutation_index = *(int*)((char*)creation_data + 36);
 		stream->data_encode_integer("object-permutation-index", object_permutation_index, 32);
-
 		//addDebugText("encoded entity creation: variant index: %d", object_permutation_index);
 		pc_simulation_unit_entity_definition_encode(thisptr, creation_data_size, creation_data, a3, stream);
 	}
@@ -107,7 +116,6 @@ namespace EngineCalls::Objects
 	{
 		int object_permutation_index = stream->data_decode_integer("object-permutation-index", 32);
 		*(int*)((char*)creation_data + 36) = object_permutation_index;
-
 		//addDebugText("decoded entity creation: variant index: %d", object_permutation_index);
 		return pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, stream);
 	}
@@ -116,6 +124,16 @@ namespace EngineCalls::Objects
 	{
 		// set the object placement data
 		*(int*)((char*)object_placement_data + 12) = *(int*)((char*)creation_data + 36);
+		if(*(byte*)((char*)creation_data + 0x10) != -1)
+		{
+			auto profile = reinterpret_cast<Player::Properties::PlayerProfile*>((char*)creation_data + 0x10);
+			auto placement = static_cast<s_object_placement_data*>(object_placement_data);
+			placement->object_datum = player_representation::get_object_datum_from_representation((byte)profile->player_character_type);
+			if(placement->player_index == h2mod->get_player_datum_index_from_controller_index(0) && !Memory::isDedicatedServer())
+			{
+				*Memory::GetAddress<byte*>(0x51A67C) = (byte)profile->player_character_type;
+			}
+		}
 		//addDebugText("creating object with variant index: %d", *(int*)((char*)creation_data + 36));
 		return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, void*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, object_placement_data);
 	}
@@ -140,7 +158,8 @@ namespace EngineCalls::Objects
 		int object_creation_data = a1 - 0x10;
 		int object_permutation_index = *(int*)((char*)object_creation_data + 36);
 
-		if (object_permutation_index == 0)
+		//if (object_permutation_index == 0)
+		if(*(byte*)((char*)a1) != -1)
 			return pset_unit_color_data(a1, a2, a3);
 
 		return 0;
@@ -153,7 +172,6 @@ namespace EngineCalls::Objects
 		p_object_build_creation_data(object_index, object_creation_data);
 
 		auto object = get_object_fast_unsafe<s_biped_object_definition>(object_index);
-
 		*(int*)((BYTE*)object_creation_data + 0x24) = object->variant_index;
 
 		//addDebugText("object build creation data: variant index: %d", object->variant_index);

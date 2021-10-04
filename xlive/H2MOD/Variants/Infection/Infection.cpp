@@ -6,9 +6,11 @@
 #include "Blam/Cache/TagGroups/item_collection_defenition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_defenition.hpp"
 #include "H2MOD/EngineCalls/EngineCalls.h"
+#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD/Tags/TagInterface.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 std::vector<XUID> Infection::zombieIdentifiers;
 
@@ -114,6 +116,8 @@ void Infection::initClient()
 	i_SoundsTable[spanish][e_infection_sounds::infected] = L"sounds/es/infected.wav";
 	i_SoundsTable[spanish][e_infection_sounds::infection] = L"sounds/es/infection.wav";
 	i_SoundsTable[spanish][e_infection_sounds::new_zombie] = L"sounds/es/new_zombie.wav";
+
+	
 	//Change Local Player's Team to Human if Not in Green
 	//(In case player wants to start as Alpha Zombie leave him green)
 	if (h2mod->get_local_team_index() != ZOMBIE_TEAM) {
@@ -216,7 +220,7 @@ void Infection::preSpawnServerSetup() {
 
 		LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={}, isZombie={}, playerIdentifier={}, playerName:{}", currentPlayerIndex, isZombie, playerIdentifier, Player::getName(currentPlayerIndex));
 		if (isZombie) {
-			Player::setUnitBipedType(currentPlayerIndex, Player::Biped::Elite);
+			Player::setUnitBipedType(currentPlayerIndex, Player::Biped::Flood);
 			if (Player::getTeam(currentPlayerIndex) != ZOMBIE_TEAM)  {
 				if (NetworkSession::localPeerIsSessionHost())
 					CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(currentPlayerIndex), ZOMBIE_TEAM); // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
@@ -240,7 +244,7 @@ void Infection::setPlayerAsHuman(int playerIndex) {
 }
 
 void Infection::setPlayerAsZombie(int playerIndex) {
-	Player::setUnitBipedType(playerIndex, Player::Biped::Elite);
+	Player::setUnitBipedType(playerIndex, Player::Biped::Flood);
 	Player::setBipedSpeed(playerIndex, 1.1f);
 
 	call_give_player_weapon(playerIndex, e_weapons_datum_index::energy_blade, 1);
@@ -267,7 +271,7 @@ void Infection::spawnPlayerClientSetup(int playerIndex) {
 				h2mod->team_player_indicator_visibility(false);
 			}
 			else if (h2mod->get_local_team_index() == ZOMBIE_TEAM) {
-				Player::setUnitBipedType(playerIndex, Player::Biped::Elite);
+				Player::setUnitBipedType(playerIndex, Player::Biped::Flood);
 
 				h2mod->disable_weapon_pickup(false);
 				h2mod->team_player_indicator_visibility(true);

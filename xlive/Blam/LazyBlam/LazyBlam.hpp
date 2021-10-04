@@ -75,7 +75,7 @@ namespace lazy_blam
 				
 				if (tag_inst->data.size == 0)
 				{
-					LOG_INFO_GAME("[{}] Init Data for: {:x} {:x} {}", __FUNCTION__, tag_datum.ToInt(), (unsigned int)tag_inst->data.buffer, tag_inst->name);
+					LOG_INFO_GAME("[{}] Init Data for: {:x} {:x} {}", __FUNCTION__, tag_datum, (unsigned int)tag_inst->data.buffer, tag_inst->name);
 					load_tag_data(tag_inst);
 					rebase_tag_data(tag_inst);
 				}

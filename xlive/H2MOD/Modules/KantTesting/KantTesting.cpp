@@ -16,6 +16,12 @@
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
 #include "Blam/Engine/Objects/GameStateObjects.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
+#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+#include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
+#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
+#include "Blam/Engine/Game/GameEngineGlobals.h"
+#include "Blam/Engine/Game/GameGlobals.h"
+#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 
 
 namespace KantTesting
@@ -123,12 +129,12 @@ namespace KantTesting
 		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 		{
 			datum mode_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite");
-			if (mode_elite_datum.IsNull())
+			if (mode_elite_datum)
 			{
 				auto e_datum = tag_loader::Get_tag_datum("objects\\characters\\elite\\elite", blam_tag::tag_group_type::model, "00a_introduction");
-				tag_loader::Load_tag(e_datum.ToInt(), false, "00a_introduction");
+				tag_loader::Load_tag(e_datum, false, "00a_introduction");
 				tag_loader::Push_Back();
-				mode_elite_datum = tag_loader::ResolveNewDatum(e_datum.ToInt());
+				mode_elite_datum = tag_loader::ResolveNewDatum(e_datum);
 			}
 			//
 			auto mode_elite = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(mode_elite_datum, true);
@@ -200,7 +206,7 @@ namespace KantTesting
 			tags::tag_instance a = tag_loader::AddNewtagInstance(blam_tag::tag_group_type::biped, *(int*)nbipd, sizeof(s_biped_group_definition));
 			auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
 			tag_loader::Fix_global_objects_ref(a.datum_index);
-			LOG_INFO_GAME("[{}] {:X}", __FUNCTION__, a.datum_index.ToInt());
+			LOG_INFO_GAME("[{}] {:X}", __FUNCTION__, a.datum_index);
 			if (globals_datum != -1) {
 				auto globals = tags::get_tag<blam_tag::tag_group_type::globals, s_globals_group_definition>(globals_datum);
 				auto new_rep = MetaExtender::add_tag_block2<s_globals_group_definition::s_player_representation_block>((unsigned long)std::addressof(globals->player_representation));
@@ -334,9 +340,9 @@ namespace KantTesting
 
 		LOG_INFO_GAME("[{}] {} {:x} {:x} {:x} {}", __FUNCTION__, 
 			t->barrels[0]->acceleration_time, 
-			t->barrels[0]->firing_effects[0]->firing_effect.TagIndex.ToInt(),
-			t->new_triggers[0]->charging_effect.TagIndex.ToInt(),
-			t->predicted_resources_1[5]->tag_index.ToInt(),
+			t->barrels[0]->firing_effects[0]->firing_effect.TagIndex,
+			t->new_triggers[0]->charging_effect.TagIndex,
+			t->predicted_resources_1[5]->tag_index,
 			t->attachments[0]->marker_old_string_id.get_id());
 		auto a = 0;
 		//lazy_blam::init_cache_file("shared.map");
@@ -352,26 +358,41 @@ namespace KantTesting
 
 	void player_representation_testing()
 	{
-
+		
 		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 		{
+			byte repCount = 4;
 			datum mode_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite");
-			if (mode_elite_datum.IsNull())
+			if (DATUM_IS_NONE(mode_elite_datum))
 			{
-				auto e_datum = tag_loader::Get_tag_datum("objects\\characters\\elite\\elite", blam_tag::tag_group_type::model, "00a_introduction");
-				tag_loader::Load_tag(e_datum.ToInt(), false, "00a_introduction");
-				tag_loader::Push_Back();
-				mode_elite_datum = tag_loader::ResolveNewDatum(e_datum.ToInt());
+				mode_elite_datum = tag_loader::Get_tag_datum("objects\\characters\\elite\\elite", blam_tag::tag_group_type::model, "00a_introduction");
+				//tag_loader::Load_tag(mode_elite_datum, false, "00a_introduction");
 			}
-			//
-			auto mode_elite = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(mode_elite_datum, true);
+			auto skele_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", blam_tag::tag_group_type::biped, "carto_shared");
+			auto flood_datum = tag_loader::Get_tag_datum("objects\\characters\\floodcombat_elite\\floodcombat_elite_mp", blam_tag::tag_group_type::biped, "carto_shared");
+			auto lbitm_datum = tag_loader::Get_tag_datum("scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", blam_tag::tag_group_type::bitmap, "carto_shared");
+			auto sky_datum = tag_loader::Get_tag_datum("scenarios\\skies\\multi\\halo\\coagulation\\coagulation_night", blam_tag::tag_group_type::sky, "carto_shared");
+			auto fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", blam_tag::tag_group_type::rendermodel, "carto_shared");
+			auto body_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", blam_tag::tag_group_type::rendermodel, "carto_shared");
+			tag_loader::Load_tag(sky_datum, true, "carto_shared");
+			tag_loader::Load_tag(fp_datum, true, "carto_shared");
+			tag_loader::Load_tag(body_datum, true, "carto_shared");
+			tag_loader::Load_tag(lbitm_datum, true, "carto_shared");
+			tag_loader::Load_tag(flood_datum, true, "carto_shared");
+			tag_loader::Load_tag(skele_datum, true, "carto_shared");
+			tag_loader::Push_Back();
+			//mode_elite_datum = tag_loader::ResolveNewDatum(mode_elite_datum);
+
+
+		/*	auto mode_elite = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(mode_elite_datum, true);
 			auto mode_elite_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
 			auto mode_elite_mp = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(mode_elite_mp_datum);
-
+			std::vector<string_id> elite_vairants;
 			for (auto i = 0; i < mode_elite->variants.size; i++) {
 				auto variant = mode_elite->variants[i];
 				auto new_variant_group = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block>((unsigned long)std::addressof(mode_elite_mp->variants));
 				new_variant_group->name = variant->name;
+				elite_vairants.emplace_back(string_id(variant->name.get_packed()));
 				new_variant_group->dialogue.TagGroup = variant->dialogue.TagGroup;
 				new_variant_group->dialogue.TagIndex = variant->dialogue.TagIndex;
 				new_variant_group->dialogue_sound_effect = variant->dialogue_sound_effect;
@@ -420,56 +441,129 @@ namespace KantTesting
 						new_permutation->unk3 = permutation->unk3;
 					}
 				}
-			}
+			}*/
 			auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
-			if (globals_datum != -1) 
+			if (globals_datum != -1)
 			{
 				auto globals = tags::get_tag<blam_tag::tag_group_type::globals, s_globals_group_definition>(globals_datum);
-				if (globals_datum != -1) 
-				{
-					auto globals = tags::get_tag<blam_tag::tag_group_type::globals, s_globals_group_definition>(globals_datum);
-					globals->player_representation[3]->third_person_variant = string_id(0x0b001076);
+				auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
+				auto sbps = tags::get_tag_fast< s_scenario_structure_bsp_group_definition>(scen->structure_bsps[0]->structure_bsp.TagIndex);
+			/*	if (!DATUM_IS_NONE(sky_datum))
+					scen->skies[0]->sky.TagIndex = tag_loader::ResolveNewDatum(sky_datum);*/
+				//auto ltmp_datum = tags::find_tag(blam_tag::tag_group_type::scenariostructurelightmap, "scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
+				/*if (!DATUM_IS_NONE(ltmp_datum)) {
+					auto ltmp = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
+					ltmp->lightmap_groups[0]->bitmap_group.TagIndex = tag_loader::ResolveNewDatum(lbitm_datum);
 				}
+				sbps->decorators_block.size = 0;
+				sbps->decorators_block.data = 0;*/
+				//auto it = elite_vairants.begin();
+				//while (it != elite_vairants.end())
+				//{
+				//	if (globals_datum != -1) {
+				//		auto new_rep = MetaExtender::add_tag_block2<s_globals_group_definition::s_player_representation_block>((unsigned long)std::addressof(globals->player_representation));
+				//		new_rep->first_person_body = globals->player_representation[3]->first_person_body;
+				//		new_rep->first_person_hands = globals->player_representation[3]->first_person_hands;
+				//		new_rep->third_person_unit = globals->player_representation[3]->third_person_unit;
+				//		new_rep->third_person_variant = it->get_packed();
+				//		++repCount;
+				//	}
+				//	++it;
+				//}
+
+				//if (!DATUM_IS_NONE(skele_datum))
+				//{
+				//	auto skele_new_datum = tag_loader::ResolveNewDatum(skele_datum);
+				//	player_representation::add_representation(tag_loader::ResolveNewDatum(fp_datum), tag_loader::ResolveNewDatum(body_datum), skele_new_datum);
+				//	auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
+				//	new_def->tag = skele_new_datum;
+				//}
+				//if(!DATUM_IS_NONE(flood_datum))
+				//{
+				//	auto flood_new_datum = tag_loader::ResolveNewDatum(flood_datum);
+				//	LOG_INFO_GAME("[{}] {:x}", __FUNCTION__, flood_new_datum);
+				//	auto new_rep = MetaExtender::add_tag_block2<s_globals_group_definition::s_player_representation_block>((unsigned long)std::addressof(globals->player_representation));
+				//	new_rep->first_person_body = globals->player_representation[0]->first_person_body;
+				//	new_rep->first_person_hands = globals->player_representation[0]->first_person_hands;
+				//	new_rep->third_person_unit.TagIndex = flood_new_datum;
+				//	new_rep->third_person_unit.TagGroup = blam_tag::tag_group_type::biped;
+				//	auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
+				//	new_def->tag = flood_new_datum;
+				//	++repCount;
+				//}
 			}
-		}
-		if (h2mod->GetEngineType() == e_engine_type::Multiplayer) {
-			auto tag_path = "objects\\characters\\masterchief_skeleton\\masterchief_skeleton";
-			auto skele_datum = tag_loader::Get_tag_datum(tag_path, blam_tag::tag_group_type::biped, "carto_shared");
-			if (!skele_datum.IsNull())
-			{
-				tag_loader::Load_tag(skele_datum.ToInt(), true, "carto_shared");
-				tag_loader::Push_Back();
-				auto skele_new_datum = tag_loader::ResolveNewDatum(skele_datum.ToInt());
-				LOG_INFO_GAME("[{}] {:x}", __FUNCTION__, skele_new_datum.ToInt());
-				auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
-				if (globals_datum != -1) {
-					auto globals = tags::get_tag<blam_tag::tag_group_type::globals, s_globals_group_definition>(globals_datum);
-					auto new_rep = MetaExtender::add_tag_block2<s_globals_group_definition::s_player_representation_block>((unsigned long)std::addressof(globals->player_representation));
-					new_rep->first_person_body = globals->player_representation[0]->first_person_body;
-					new_rep->first_person_hands = globals->player_representation[0]->first_person_hands;
-					new_rep->third_person_unit.TagIndex = skele_new_datum;
-					new_rep->third_person_unit.TagGroup = blam_tag::tag_group_type::biped;
-					globals->player_representation[3]->third_person_variant = string_id(0x0b001076);
-					//globals->player_representation[0]->third_person_unit.TagIndex = skele_new_datum;
-					
-					auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
-					auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
-					new_def->tag = skele_new_datum;
-					new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
-					auto dervish = tags::find_tag(blam_tag::tag_group_type::biped, "objects\\characters\\dervish\\dervish");
-					new_def->tag = dervish;
-				}
-			}
+			//network_session_player_profile_recieve
+			//increase MaxValue of valid packet
+			//WriteValue<byte>(Memory::GetAddress(0x54fb3, 0x5D4AB), repCount);
+			//player_properties_encode
+			//Increase MaxValue of encode_integer
+			//WriteValue<byte>(Memory::GetAddress(0x1e369a, 0x1B4CDA), repCount);
+			//player_properties_decode
+			//Increase MaxValue of Decode_Integer
+			//WriteValue<byte>(Memory::GetAddress(0x1e3745, 0x1B4D85), repCount);
 		}
 	}
 
-	//typedef void(__cdecl t_network_session_player_profile_recieve)(int a1, Player::Properties* a2);
-	//t_network_session_player_profile_recieve* p_network_session_player_profile_recieve;
+	typedef void(__cdecl t_network_session_player_profile_recieve)(int player_index, Player::Properties* a2);
+	t_network_session_player_profile_recieve* p_network_session_player_profile_recieve;
 
-	//void __cdecl network_ession_player_profile_recieve(int a1, Player::Properties* a2)
-	//{
-	//	
-	//}
+	void __cdecl network_ession_player_profile_recieve(int player_index, Player::Properties* a2)
+	{
+		auto a = s_game_globals::get()->engine_settings;
+		LOG_INFO_GAME("[{}] {}", __FUNCTION__, a.map_type);
+		if(EngineCalls::game_is_campaign())
+		{
+			auto scenario = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
+			s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type player_type = s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none;
+			int v5 = 0;
+			if(scenario->player_starting_locations.size > 0)
+			{
+				for(auto i = 0; i < scenario->player_starting_locations.size; i++)
+				{
+					auto starting_location = scenario->player_starting_locations[i];
+					if (starting_location->campaign_player_type != s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none) {
+						player_type = starting_location->campaign_player_type;
+						break;
+					}
+				}
+				a2->player_team = e_object_team::player;
+				if (player_type == s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none)
+					a2->profile.player_character_type = static_cast<Player::Biped>(static_cast<byte>(static_cast<short>(player_type)));
+			}
+		}
+		else if(EngineCalls::game_is_multiplayer())
+		{
+			auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
+			auto globals = tags::get_tag_fast<s_globals_group_definition>(globals_datum);
+
+			if (a2->profile.player_character_type == Player::Biped::MasterChief)
+				a2->profile.player_character_type = Player::Biped::Spartan;
+			if (a2->profile.player_character_type == Player::Biped::Dervish)
+				a2->profile.player_character_type = Player::Biped::Elite;
+
+			//if ((byte)a2->profile.player_character_type > globals->player_representation.size)
+			//	a2->profile.player_character_type = Player::Biped::Spartan;
+		}
+
+		//if ((char)a2->player_displayed_skill != -1)
+		//	if ((char)a2->player_displayed_skill < 0)
+		//		a2->player_displayed_skill = 0;
+
+		//if ((char)a2->player_overall_skill != -1)
+		//	if ((char)a2->player_overall_skill < 0)
+		//		a2->player_overall_skill = 0;
+
+		//if (a2->player_handicap_level > Player::Handicap::Severe)
+		//	a2->player_handicap_level = Player::Handicap::Severe;
+
+		//if (a2->bungie_user_role <= 7)
+		//	a2->bungie_user_role = 7;
+
+		//if (EngineCalls::get_game_mode_engine())
+		//	if (EngineCalls::get_game_variant()->game_engine_flags & 1)
+		//		if (a2->player_team && !((1 << a2->player_team) & s_game_engine_globals::get()->Unk1))
+		//			a2->player_team = e_object_team::None;
+	}
 
 	void Initialize()
 	{
@@ -498,20 +592,13 @@ namespace KantTesting
 				//tags::on_map_load(fix_elite_model_variant);
 				//tags::on_map_load(add_elite_variants);
 
-				//network_session_player_profile_recieve
-				//increase MaxValue of encode_integer
-				WriteValue<byte>(Memory::GetAddress(0x54fb3), 5);
-				//player_properties_encode
-				//Increase MaxValue of encode_integer
-				WriteValue<byte>(Memory::GetAddress(0x1e369a), 5);
-				//player_properties_decode
-				//Increase MaxValue of Decode_Integer
-				WriteValue<byte>(Memory::GetAddress(0x1e3745), 5);
+				
 				//Stop the game from overriding the player biped
-				NopFill(Memory::GetAddress(0x52fc5), 3);
+				//NopFill(Memory::GetAddress(0x52fc5), 3);
 				//Stop  the game from overriding the player biped
 				//NopFill(Memory::GetAddress(0x52fF5), 3);
-				tags::on_map_load(player_representation_testing);
+				//PatchCall(Memory::GetAddress(0x5509E), network_ession_player_profile_recieve);
+				//tags::on_map_load(player_representation_testing);
 			}
 		}
 	}
