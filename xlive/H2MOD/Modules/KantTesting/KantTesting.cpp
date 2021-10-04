@@ -14,7 +14,6 @@
 #include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/LazyBlam/LazyBlam.hpp"
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
-#include "Blam/Engine/Objects/GameStateObjects.h"
 #include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 #include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"

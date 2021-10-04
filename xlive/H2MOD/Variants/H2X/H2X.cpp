@@ -1,7 +1,6 @@
 
 #include "H2MOD\Variants\H2X\H2X.h"
 #include "..\H2MOD.h"
-#include "Blam/Engine/Objects/GameStateObjects.h"
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
 #include "H2MOD\Tags\TagInterface.h"
 
