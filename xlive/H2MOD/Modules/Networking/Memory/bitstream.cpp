@@ -1,5 +1,5 @@
-#include "stdafx.h"
 #include "bitstream.h"
+#include "stdafx.h"
 
 void bitstream::init(void*buffer, DWORD data_length)
 {

@@ -1,10 +1,8 @@
-#include "stdafx.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
 #include "GunGame.h"
-
 #include "H2MOD.h"
-#include "H2MOD/Modules/Networking/Networking.h"
-
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "stdafx.h"
 #include "Util\ReadIniArguments.h"
 
 using namespace NetworkSession;
@@ -247,7 +245,7 @@ void GunGameInitializer::onPeerHost() {
 	GunGame::resetPlayerLevels();
 	//TODO: is this really necessary (from old code)?
 	//init peer host gun game level
-	GunGame::gungamePlayers[getPlayerXuid(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))] = 0;
+	GunGame::gungamePlayers[getPlayerXuid(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))] = 0;
 }
 
 void GunGamePreSpawnHandler::onClient() {

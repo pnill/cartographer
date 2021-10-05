@@ -1,13 +1,14 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Math/real_math.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam\Cache\TagGroups.hpp"
+#include "Blam\Math\real_math.h"
 
 /*********************************************************************
 * name: scenario_structure_lightmap
 * group_tag : ltmp
 * header size : 260
 * *********************************************************************/
-struct s_scenario_structure_lightmap_group_definition
+struct s_scenario_structure_lightmap_group_definition :TagGroup<'ltmp'>
 {
 	float search_distance_lower_bound;//0x0
 	float search_distance_upper_bound;//0x4

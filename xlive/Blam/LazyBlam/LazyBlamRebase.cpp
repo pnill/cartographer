@@ -1,11 +1,11 @@
 #pragma once
 #include "LazyBlam.hpp"
-#include "Blam/Cache/TagGroups/object_definition.hpp"
-#include "Blam/Cache/TagGroups/unit_definition.hpp"
-#include "Blam/Cache/TagGroups/biped_definition.hpp"
-#include "Blam/Cache/TagGroups/vehicle_definition.hpp"
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
-#include "Blam/Cache/TagGroups/globals_definition.hpp"
+#include "Blam\Cache\TagGroups\object_definition.hpp"
+#include "Blam\Cache\TagGroups\unit_definition.hpp"
+#include "Blam\Cache\TagGroups\biped_definition.hpp"
+#include "Blam\Cache\TagGroups\vehicle_definition.hpp"
+#include "Blam\Cache\TagGroups\weapon_definition.hpp"
+#include "Blam\Cache\TagGroups\globals_definition.hpp"
 #define L_BLAM_REBASE_BLOCK(tag_block) \
 	if(tag_block.data > 0 && tag_block.size > 0)	\
 	{						\

@@ -1,12 +1,11 @@
+#include "Blam\Engine\Objects\Objects.h"
+#include "Blam\Engine\Players\Players.h"
 #include "EngineCalls.h"
-#include "Util/Hooks/Hook.h"
-#include "Blam/Engine/Objects/Objects.h"
-
 #include "H2MOD.h"
-#include "Blam/Engine/Players/Players.h"
-#include "H2MOD/Modules/Networking/Memory/bitstream.h"
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
+#include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
+#include "Util\Hooks\Hook.h"
 
 namespace EngineCalls::Objects
 {
@@ -53,7 +52,7 @@ namespace EngineCalls::Objects
 #pragma region Biped variant patches
 	void update_biped_object_variant_data(datum object_index, int variant_index)
 	{
-		s_biped_object_definition* biped_object = (s_biped_object_definition*)object_try_and_get_and_verify_type(object_index, FLAG(e_object_type::biped));
+		s_biped_data_definition* biped_object = (s_biped_data_definition*)object_try_and_get_and_verify_type(object_index, FLAG(e_object_type::biped));
 		// set this data only if we are dealing with a biped
 		if (biped_object != NULL)
 		{
@@ -65,13 +64,13 @@ namespace EngineCalls::Objects
 	void __cdecl update_object_variant_index_hook(datum object_index, int variant_index)
 	{
 		auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(datum, int)>(0x52FE84, 0x51ED47);
-		auto object = object_get_fast_unsafe<s_biped_object_definition>(object_index);
+		auto object = object_get_fast_unsafe<s_biped_data_definition>(object_index);
 
 		object->model_variant_id = p_resolve_variant_index_to_new_variant(object_index, variant_index);
 		// update the biped variant index
 		update_biped_object_variant_data(object_index, variant_index);
 
-		//addDebugText("object_index: %d, model_variant_id: %u", DATUM_ABSOLUTE_INDEX(object_index), object->variant_index);
+		//addDebugText("object_index: %d, model_variant_id: %u", DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index), object->variant_index);
 	}
 
 	// original update_object_variant_index is usercall, with data in CX register as first param
@@ -116,18 +115,18 @@ namespace EngineCalls::Objects
 	int __stdcall c_simulation_object_entity_definition_object_create_object_hook(int thisx, void* creation_data, int a2, int a3, s_object_placement_data* object_placement_data)
 	{
 		// set the object placement data
-		object_placement_data->variant_index = *(int*)((char*)creation_data + 36);
+		object_placement_data->variant_name = *(int*)((char*)creation_data + 36);
 		if(*(byte*)((char*)creation_data + 0x10) != -1)
 		{
 			auto profile = reinterpret_cast<Player::Properties::PlayerProfile*>((char*)creation_data + 0x10);
 			auto placement = static_cast<s_object_placement_data*>(object_placement_data);
-			placement->object_datum = player_representation::get_object_datum_from_representation((byte)profile->player_character_type);
+			placement->tag_index = player_representation::get_object_datum_from_representation((byte)profile->player_character_type);
 			if(placement->player_index == h2mod->get_player_datum_index_from_controller_index(0) && !Memory::isDedicatedServer())
 			{
 				*Memory::GetAddress<byte*>(0x51A67C) = (byte)profile->player_character_type;
 			}
 		}
-		//addDebugText("creating object with variant index: %d", object_placement_data->variant_index);
+		//addDebugText("creating object with variant index: %d", object_placement_data->variant_name);
 		return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, s_object_placement_data*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, object_placement_data);
 	}
 
@@ -164,7 +163,7 @@ namespace EngineCalls::Objects
 
 		p_object_build_creation_data(object_index, object_creation_data);
 
-		auto object = object_get_fast_unsafe<s_biped_object_definition>(object_index);
+		auto object = object_get_fast_unsafe<s_biped_data_definition>(object_index);
 
 		*(int*)((BYTE*)object_creation_data + 0x24) = object->variant_index;
 
@@ -174,7 +173,7 @@ namespace EngineCalls::Objects
 	void apply_biped_object_definition_patches()
 	{
 		// increase the data size for biped representation
-		WriteValue<unsigned short>(Memory::GetAddressRelative(0x81E9A8, 0x7C1EB8) + 8, sizeof(s_biped_object_definition));
+		WriteValue<unsigned short>(Memory::GetAddressRelative(0x81E9A8, 0x7C1EB8) + 8, sizeof(s_biped_data_definition));
 
 		// hook the function that updates the variant
 		WriteJmpTo(Memory::GetAddressRelative(0x52FED3, 0x51ED96), update_object_variant_index_to_cdecl);

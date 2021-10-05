@@ -3,16 +3,17 @@
 #include "Blam\Engine\Objects\Objects.h"
 #include "Blam\Engine\Objects\ObjectPlacementData.h"
 
-#include "Blam\Engine\Game\GameEngine.h"
+#include "Blam\Engine\Game\GameOptions.h"
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\Common\Common.h"
-#include "H2MOD/Modules/Tweaks/Tweaks.h"
+#include "H2MOD\Modules\Tweaks\Tweaks.h"
+
+#include "H2MOD\Variants\VariantPlayer.h"
+#include "H2MOD\Variants\Variants.h"
 
 #define GAME_BUILD 11122
 #define EXECUTABLE_VERSION 4
 
-#include "H2MOD/Variants/VariantPlayer.h"
-#include "H2MOD/Variants/Variants.h"
 
 enum SoundType
 {

@@ -1,10 +1,7 @@
-
 #include "Config.h"
-
-#include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
-
+#include "H2MOD\Modules\Utils\Utils.h"
 #include "Util\SimpleIni.h"
 
 static void HandleFileError(int fpErrNo) {//TODO

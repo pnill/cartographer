@@ -1,24 +1,19 @@
-#include "stdafx.h"
-
 #include "ConsoleCommands.h"
-
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Input\Mouseinput.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\ServerConsole\ServerConsole.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
-#include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Networking\Networking.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\Modules\ServerConsole\ServerConsole.h"
-#include "H2MOD\Variants\GunGame\GunGame.h"
-
 #include "H2MOD\Modules\Utils\Utils.h"
-
+#include "H2MOD\Tags\MetaLoader\tag_loader.h"
+#include "H2MOD\Variants\GunGame\GunGame.h"
+#include "stdafx.h"
 #include "Util\ClipboardAPI.h"
-#include "H2MOD/Modules/Input/Mouseinput.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
-#include "H2MOD/EngineCalls/EngineCalls.h"
-
 // for XNet connection logging
-#include "xlive/xnet/IpManagement/XnIp.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 
 std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
 
@@ -367,25 +362,25 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 			s_object_placement_data nObject;
 
 			if (!DATUM_IS_NONE(object_datum)) {
-				datum player_datum = Player::getPlayerUnitDatumIndex(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
+				datum player_datum = Player::getPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 				EngineCalls::Objects::create_new_placement_data(&nObject, object_datum, player_datum, 0);
-				real_point3d* player_position = h2mod->get_player_unit_coords(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
+				real_point3d* player_position = h2mod->get_player_unit_coords(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 
 				if (player_position != nullptr) {
-					nObject.placement.x = player_position->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					nObject.placement.y = player_position->y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					nObject.placement.z = (player_position->z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.position.x = player_position->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.position.y = player_position->y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.position.z = (player_position->z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
 				}
 				if (specificPosition) {
-					nObject.placement.x = x;
-					nObject.placement.y = y;
-					nObject.placement.z = z;
+					nObject.position.x = x;
+					nObject.position.y = y;
+					nObject.position.z = z;
 				}
 
 				if (!sameTeam)
 					nObject.team_index = NONE;
 
-				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum, nObject.placement.x, nObject.placement.y, nObject.placement.z);
+				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum, nObject.position.x, nObject.position.y, nObject.position.z);
 				unsigned int object_gamestate_datum = EngineCalls::Objects::call_object_new(&nObject);
 				call_add_object_to_sync(object_gamestate_datum);
 			}
@@ -404,9 +399,9 @@ void ConsoleCommands::spawn_rotate(datum object_datum, float x, float y, float z
 		EngineCalls::Objects::create_new_placement_data(&nObject, object_datum, -1, 0);
 		typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, real_point3d* orient);
 		auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
-		nObject.placement.x = x;
-		nObject.placement.y = y;
-		nObject.placement.z = z;
+		nObject.position.x = x;
+		nObject.position.y = y;
+		nObject.position.z = z;
 		real_vector3d rotation{ i = i, j = j, k = k };
 		set_orientation(&nObject.orientation, &nObject.up, &rotation);
 		auto gamestate_datum = EngineCalls::Objects::call_object_new(&nObject);
@@ -610,7 +605,7 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			std::string secondArg = splitCommands[1];
 			std::string thirdArg = splitCommands[2];
-			datum object_datum = DATUM_NONE;
+			datum object_datum = DATUM_INDEX_NONE;
 			if (object_ids.find(secondArg) == object_ids.end()) {
 				//read from chatbox line
 				std::string secondArg = splitCommands[1];
@@ -641,7 +636,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			if (splitCommands[3] == "true")
 				sameTeam = true;
 
-			real_point3d* localPlayerPosition = h2mod->get_player_unit_coords(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
+			real_point3d* localPlayerPosition = h2mod->get_player_unit_coords(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 			this->spawn(object_datum, count, localPlayerPosition->x + 0.5f, localPlayerPosition->y + 0.5f, localPlayerPosition->z + 0.5f, randomMultiplier, false, sameTeam);
 			return;
 		}

@@ -1,25 +1,21 @@
-
-#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
-#include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD\Modules\Accounts\Accounts.h"
-#include "H2MOD\Modules\Accounts\AccountLogin.h"
-#include "H2MOD\Modules\Accounts\AccountCreate.h"
-#include "XLive\xnet\IpManagement\XnIp.h"
-#include "H2MOD\Modules\Tweaks\Tweaks.h"
-#include "H2MOD\Modules\Updater\Updater.h"
-#include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
-#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
-
-#include "H2MOD/Tags/TagInterface.h"
-#include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
-#include "H2MOD/Modules/Networking/Networking.h"
-
-#include "Util\Hooks\Hook.h"
-
+#include "CustomMenu.h"
 #include "c_screen_with_menu.h"
+#include "CustomLanguage.h"
+#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
+#include "H2MOD\Modules\Accounts\AccountCreate.h"
+#include "H2MOD\Modules\Accounts\AccountLogin.h"
+#include "H2MOD\Modules\Accounts\Accounts.h"
+#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\Tweaks\Tweaks.h"
+#include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
+#include "H2MOD\Modules\Updater\Updater.h"
+#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Tags\TagInterface.h"
+#include "Util\Hooks\Hook.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;

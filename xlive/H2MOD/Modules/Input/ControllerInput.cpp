@@ -1,7 +1,7 @@
 #include "ControllerInput.h"
-#include "H2MOD/Modules/Config/Config.h"
-#include "Util/Hooks/Hook.h"
-#include "H2MOD/EngineCalls/EngineCalls.h"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "Util\Hooks\Hook.h"
 
 namespace ControllerInput
 {

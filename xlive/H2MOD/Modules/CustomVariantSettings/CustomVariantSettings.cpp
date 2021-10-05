@@ -1,16 +1,16 @@
 #include "CustomVariantSettings.h"
-#include "H2MOD/Modules/Networking/Memory/bitstream.h"
-#include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
+#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam\Engine\Game\PhysicsConstants.h"
+#include "Blam\Engine\Players\PlayerControls.h"
 #include "H2MOD.h"
-#include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Modules/Utils/Utils.h"
-#include "Util/Hooks/Hook.h"
-#include "Blam/Engine/Game/PhysicsConstants.h"
-#include "H2MOD/Modules/Stats/StatsHandler.h"
-#include "Blam/Engine/Players/PlayerControls.h"
-#include "Blam/Engine/Game/GameTimeGlobals.h"
-#include "H2MOD/Modules/HudElements/HudElements.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\HudElements\HudElements.h"
+#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
+#include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
+#include "H2MOD\Modules\Stats\StatsHandler.h"
+#include "H2MOD\Modules\Utils\Utils.h"
+#include "Util\Hooks\Hook.h"
 
 std::map<std::wstring, CustomVariantSettings::s_variantSettings> CustomVariantSettingsMap;
 CustomVariantSettings::s_variantSettings CurrentVariantSettings;
@@ -90,8 +90,8 @@ namespace CustomVariantSettings
 		if (NetworkSession::localPeerIsSessionHost()) {
 			if (CurrentVariantSettings.InfiniteGrenades)
 			{
-				h2mod->set_player_unit_grenades_count(DATUM_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 99, false);
-				h2mod->set_player_unit_grenades_count(DATUM_ABSOLUTE_INDEX(PlayerDatum), Plasma, 99, false);
+				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 99, false);
+				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Plasma, 99, false);
 			}
 		}
 	}
@@ -102,8 +102,8 @@ namespace CustomVariantSettings
 			if (CurrentVariantSettings.InfiniteGrenades)
 			{
 				//Prevent Players from dropping 198 grenades on death..
-				h2mod->set_player_unit_grenades_count(DATUM_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 4, false);
-				h2mod->set_player_unit_grenades_count(DATUM_ABSOLUTE_INDEX(PlayerDatum), Plasma, 4, false);
+				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 4, false);
+				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Plasma, 4, false);
 			}
 		}
 	}

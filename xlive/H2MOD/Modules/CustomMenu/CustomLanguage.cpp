@@ -1,10 +1,10 @@
-#include "stdafx.h"
-#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
+#include "CustomLanguage.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Utils\Utils.h"
+#include "stdafx.h"
 #include "Util\Hooks\Hook.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\Config\Config.h"
 
 #pragma region Custom Language
 

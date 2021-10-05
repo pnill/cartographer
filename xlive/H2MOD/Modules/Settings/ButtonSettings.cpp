@@ -1,9 +1,9 @@
 #include "ButtonSettings.h"
-#include "Util/Hooks/Hook.h"
+#include "Util\Hooks\Hook.h"
 #include "H2MOD.h"
-#include "Blam/Cache/TagGroups/s_user_interface_screen_widget_definition.hpp"
-#include "H2MOD/Tags/MetaExtender.h"
-#include "H2MOD/Modules/Startup/Startup.h"
+#include "Blam\Cache\TagGroups\s_user_interface_screen_widget_definition.hpp"
+#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Tags\MetaExtender.h"
 #include <commctrl.h>
 
 namespace SettingsMenus

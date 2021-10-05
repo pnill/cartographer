@@ -1,11 +1,8 @@
-
-#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
-
+#include "AdvLobbySettings.h"
 #include "H2MOD.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD/Modules/Networking/Networking.h"
-
-#include "Util/Hooks/Hook.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "Util\Hooks\Hook.h"
 
 bool AdvLobbySettings_mp_explosion_physics = false;
 bool AdvLobbySettings_mp_sputnik = false;

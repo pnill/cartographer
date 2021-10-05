@@ -1,13 +1,14 @@
 #pragma once
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam/Math/BlamMath.h"
+#include "Blam\Cache\TagGroups.hpp"
+#include "Blam\Math\BlamMath.h"
 
 /*********************************************************************
 * name: model
-* group_tag_hlmt
-* header size_252
+* group_tag: hlmt
+* header size: 252
 * *********************************************************************/
-struct s_model_group_definition
+struct s_model_group_definition : TagGroup<'hlmt'>
 {
 	tag_reference render_model;//0x0
 	tag_reference collision_model;//0x8
@@ -119,18 +120,18 @@ struct s_model_group_definition
 			tag_block<s_permutations_block> permutations;//0x8
 			enum class e_sort_order : __int16
 			{
-			no_sorting = 0,
-			NUM_1_closest = 1,
-			NUM_2 = 2,
-			NUM_3 = 3,
-			NUM_4 = 4,
-			NUM_5 = 5,
-			NUM_0_same_as_model = 6,
-			NUM_6 = 7,
-			NUM_7 = 8,
-			NUM_8 = 9,
-			NUM_9 = 10,
-			NUM_5_farthest = 11,
+				no_sorting = 0,
+				NUM_1_closest = 1,
+				NUM_2 = 2,
+				NUM_3 = 3,
+				NUM_4 = 4,
+				NUM_5 = 5,
+				NUM_0_same_as_model = 6,
+				NUM_6 = 7,
+				NUM_7 = 8,
+				NUM_8 = 9,
+				NUM_9 = 10,
+				NUM_5_farthest = 11,
 			};
 			e_sort_order sort_order;//0x10
 			PAD(0x2);//0x12

@@ -1,4 +1,6 @@
-#include "Blam/Common/Common.h"
+#pragma once
+
+#include "Blam\Common\Common.h"
 #pragma pack(push, 1)
 struct s_game_engine_globals
 {

@@ -1,16 +1,17 @@
 #pragma once
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam/Cache/DataTypes/Strings.h"
-#include "Blam/Math/BlamMath.h"
+#include "Blam\Cache\DataTypes\Strings.h"
+#include "Blam\Cache\TagGroups.hpp"
+#include "Blam\Math\BlamMath.h"
 
 /*********************************************************************
-* name: model
-* group_tag : hlmt
-* header size : 252
+* name: render_model
+* group_tag : mode
+* header size : 132
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_render_model_group_definition
+struct s_render_model_group_definition : TagGroup<'mode'>
 {
 	string_id name_old_string_id;//0x0
 	enum class e_flags : __int16

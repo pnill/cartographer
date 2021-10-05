@@ -1,15 +1,11 @@
-
 #include "tag_loader.h"
-#include "..\Util\filesys.h"
-
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-
+#include "Blam\Cache\TagGroups\model_definition.hpp"
+#include "Blam\Cache\TagGroups\scenery_definition.hpp"
 #include "Blam\Common\Common.h"
-#include "H2MOD/Tags/MetaExtender.h"
-#include "Blam/Cache/TagGroups/scenery_definition.hpp"
-#include "Blam/Cache/TagGroups/model_defenition.hpp"
-
-#include "Util/Hooks/Hook.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Tags\MetaExtender.h"
+#include "Util\filesys.h"
+#include "Util\Hooks\Hook.h"
 #include <algorithm>
 //contains some game functions that returns HANDLE
 namespace global_handle_function
@@ -260,7 +256,7 @@ namespace tag_loader
 		}*/
 		fin->close();
 		delete fin;
-		return DATUM_NONE;
+		return DATUM_INDEX_NONE;
 	}
 	//Loads a tag from specified map in accordance with the datum index supplied
 	///custom flag is no more needed
@@ -717,11 +713,11 @@ namespace tag_loader
 
 		//char* ripped_map = (char*)(SharedmapBase + tag_scenario_off);
 
-		tags::tag_instance* tag_info = &new_Tables[DATUM_ABSOLUTE_INDEX(datum_index)];
-		char* tag_data = tags::get_tag_data() + new_Tables[DATUM_ABSOLUTE_INDEX(datum_index)].data_offset;
+		tags::tag_instance* tag_info = &new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)];
+		char* tag_data = tags::get_tag_data() + new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].data_offset;
 
 		//fail safe
-		if (DATUM_ABSOLUTE_INDEX(tag_info->datum_index) != DATUM_ABSOLUTE_INDEX(datum_index))
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_info->datum_index) != DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index))
 		{
 			std::string error = "Tag: " + datum_index;
 			error += " not loaded into tag tables and tag memory";
@@ -812,11 +808,11 @@ namespace tag_loader
 		HANDLE old_file_handle = *(HANDLE*)(Memory::baseAddress + 0x4AE8A8);
 
 
-		tags::tag_instance* tag_info = &new_Tables[DATUM_ABSOLUTE_INDEX(datum_index)];
-		char* tag_data = tags::get_tag_data() + new_Tables[DATUM_ABSOLUTE_INDEX(datum_index)].data_offset;
+		tags::tag_instance* tag_info = &new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)];
+		char* tag_data = tags::get_tag_data() + new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].data_offset;
 
 		//fail safe
-		if (DATUM_ABSOLUTE_INDEX(tag_info->datum_index) != DATUM_ABSOLUTE_INDEX(datum_index))
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_info->datum_index) != DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index))
 		{
 			std::string error = "Tag: " + datum_index;
 			error += " not loaded into tag tables and tag memory";
@@ -885,8 +881,8 @@ namespace tag_loader
 	//Fixes the reference of the tags to their global objects(vftables)
 	void Fix_global_objects_ref(datum datum_index)
 	{
-		blam_tag type = new_Tables[DATUM_ABSOLUTE_INDEX(datum_index)].type;
-		datum Tdatum_index = new_Tables[DATUM_ABSOLUTE_INDEX(datum_index)].datum_index;
+		blam_tag type = new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].type;
+		datum Tdatum_index = new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].datum_index;
 
 		if (Tdatum_index != datum_index)
 		{
@@ -898,19 +894,19 @@ namespace tag_loader
 		switch (type.as_int())
 		{
 		case 'crea':
-			global_objects_fix::crea_fix(DATUM_ABSOLUTE_INDEX(datum_index));
+			global_objects_fix::crea_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
 			break;
 		case 'bipd':
-			global_objects_fix::bipd_fix(DATUM_ABSOLUTE_INDEX(datum_index));
+			global_objects_fix::bipd_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
 			break;
 		case 'coll':
-			global_objects_fix::coll_fix(DATUM_ABSOLUTE_INDEX(datum_index));
+			global_objects_fix::coll_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
 			break;
 		case 'phmo':
-			global_objects_fix::phmo_fix(DATUM_ABSOLUTE_INDEX(datum_index), false);
+			global_objects_fix::phmo_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index), false);
 			break;
 		case 'vehi':
-			global_objects_fix::vehi_fix(DATUM_ABSOLUTE_INDEX(datum_index));
+			global_objects_fix::vehi_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
 			break;
 		default:
 			break;
@@ -1069,7 +1065,7 @@ namespace tag_loader
 			if (ref.old_datum == oldDatum)
 				return datum(ref.new_datum);
 		}
-		return DATUM_NONE;
+		return DATUM_INDEX_NONE;
 	}
 
 	tags::tag_instance AddNewtagInstance(blam_tag type, int data, size_t size)
@@ -1079,9 +1075,9 @@ namespace tag_loader
 		tables_data.data_offset = (int)(data - int(*Memory::GetAddress<int**>(0x47CD54)));
 		tables_data.size = size;
 		tables_data.datum_index = new_datum_index++;
-		tags::tag_instance* temp_write_off = &tag_loader::new_Tables[DATUM_ABSOLUTE_INDEX(tables_data.datum_index)];
+		tags::tag_instance* temp_write_off = &tag_loader::new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(tables_data.datum_index)];
 		memcpy(temp_write_off, &tables_data, sizeof(tags::tag_instance));//copy to the tables
-		return tag_loader::new_Tables[DATUM_ABSOLUTE_INDEX(tables_data.datum_index)];
+		return tag_loader::new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(tables_data.datum_index)];
 	}
 
 #pragma region query_parser
@@ -1287,7 +1283,7 @@ namespace tag_loader
 
 		//Only replace tags if they do exist
 		//Game uses similar method to check if the tag actually exists in the table 
-		if (DATUM_ABSOLUTE_INDEX(tag_instance[a & 0xFFFF].datum_index) == (a & 0xFFFF))
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_instance[a & 0xFFFF].datum_index) == (a & 0xFFFF))
 		{
 			tag_instance[a & 0xFFFF].data_offset = tag_instance[b & 0xFFFF].data_offset;
 			tag_instance[a & 0xFFFF].type = tag_instance[b & 0xFFFF].type;
@@ -1346,7 +1342,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	//Clear the table
 	for (auto i = _INJECTED_TAG_START_; i < tag_loader::new_datum_index; i++)
 	{
-		tag_loader::new_Tables[i] = tags::tag_instance{ blam_tag::none(), DATUM_NONE, 0, 0 };
+		tag_loader::new_Tables[i] = tags::tag_instance{ blam_tag::none(), DATUM_INDEX_NONE, 0, 0 };
 	}
 	tag_loader::que_meta_list.clear();
 	tag_loader::key_list.clear();

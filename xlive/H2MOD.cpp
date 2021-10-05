@@ -1,51 +1,47 @@
-
 #include "H2MOD.h"
-
-#include "H2MOD/Discord/DiscordInterface.h"
-#include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
-#include "H2MOD/Modules/Input/Mouseinput.h"
-#include "H2MOD/Modules/MainMenu/Ranks.h"
-#include "H2MOD/Modules/Networking/Memory/bitstream.h"
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/Tweaks/Tweaks.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
-#include "H2MOD/Modules/MapManager/MapManager.h"
-#include "H2MOD/Modules/Stats/StatsHandler.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
-#include "H2MOD/Modules/HudElements/HudElements.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
-#include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "H2MOD/Tags/MetaExtender.h"
-#include "H2MOD/Modules/TagFixes/TagFixes.h"
-#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
-#include "H2MOD/Modules/HaloScript/HaloScript.h"
-#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
-#include "H2MOD/Modules/MainMenu/MapSlots.h"
-#include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
-#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
-#include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
-#include "Util/Hooks/Hook.h"
-#include "H2MOD/EngineCalls/EngineCalls.h"
-#include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/Modules/Input/ControllerInput.h"
-#include "H2MOD/Modules/Console/ConsoleCommands.h"
-#include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
-#include "Blam/Engine/Game/DamageData.h"
-#include "Blam/Engine/FileSystem/FiloInterface.h"
-#include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
-#include "H2MOD/EngineHooks/EngineHooks.h"
-#include "H2MOD/GUI/GUI.h"
-#include "Blam/Enums/Game/HaloStrings.h"
-#include "Blam/Cache/TagGroups/model_defenition.hpp"
-#include "Blam/Cache/TagGroups/globals_definition.hpp"
-#include "Blam/Cache/TagGroups/biped_definition.hpp"
-#include "H2MOD/Modules/KantTesting/KantTesting.h"
-#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam\Cache\TagGroups\biped_definition.hpp"
+#include "Blam\Cache\TagGroups\globals_definition.hpp"
+#include "Blam\Cache\TagGroups\model_definition.hpp"
+#include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
+#include "Blam\Engine\FileSystem\FiloInterface.h"
+#include "Blam\Engine\Game\DamageData.h"
+#include "Blam\Enums\HaloStrings.h"
+#include "H2MOD\Discord\DiscordInterface.h"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\EngineHooks\EngineHooks.h"
+#include "H2MOD\GUI\GUI.h"
+#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
+#include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
+#include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\GamePhysics\Patches\MeleeFix.h"
+#include "H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h"
+#include "H2MOD\Modules\HaloScript\HaloScript.h"
+#include "H2MOD\Modules\HudElements\HudElements.h"
+#include "H2MOD\Modules\Input\ControllerInput.h"
+#include "H2MOD\Modules\Input\KeyboardInput.h"
+#include "H2MOD\Modules\Input\Mouseinput.h"
+#include "H2MOD\Modules\Input\PlayerControl.h"
+#include "H2MOD\Modules\KantTesting\KantTesting.h"
+#include "H2MOD\Modules\MainMenu\MapSlots.h"
+#include "H2MOD\Modules\MainMenu\Ranks.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
+#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
+#include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
+#include "H2MOD\Modules\PlaylistLoader\PlaylistLoader.h"
+#include "H2MOD\Modules\RenderHooks\RenderHooks.h"
+#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
+#include "H2MOD\Modules\Stats\StatsHandler.h"
+#include "H2MOD\Modules\TagFixes\TagFixes.h"
+#include "H2MOD\Modules\Tweaks\Tweaks.h"
+#include "H2MOD\Tags\MetaExtender.h"
+#include "H2MOD\Tags\MetaLoader\tag_loader.h"
+#include "Util\Hooks\Hook.h"
 #include <float.h>
-
-#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #pragma fenv_access (on)
 
 H2MOD* h2mod = new H2MOD();
@@ -284,7 +280,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 
 wchar_t* H2MOD::get_local_player_name(int local_player_index)
 {
-	return Player::getName(DATUM_ABSOLUTE_INDEX(this->get_player_datum_index_from_controller_index(local_player_index)));
+	return Player::getName(DATUM_INDEX_TO_ABSOLUTE_INDEX(this->get_player_datum_index_from_controller_index(local_player_index)));
 }
 
 int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
@@ -425,7 +421,7 @@ void H2MOD::disable_sounds(int sound_flags)
 							// disable all sounds from english to chinese
 							for (int j = 0; j < 8; j++)
 							{
-								(&general_event->sound)[j].TagIndex = DATUM_NONE;
+								(&general_event->sound)[j].TagIndex = DATUM_INDEX_NONE;
 							}
 						}
 					}
@@ -608,20 +604,20 @@ void get_object_table_memory()
 	game_state_actors = *Memory::GetAddress<s_data_array**>(0xA965DC, 0x9A1C5C);
 }
 
-typedef bool(__cdecl *map_cache_load)(s_game_engine_settings* map_load_settings);
+typedef bool(__cdecl *map_cache_load)(s_game_options* map_load_settings);
 map_cache_load p_map_cache_load;
 
-bool __cdecl OnMapLoad(s_game_engine_settings* engine_settings)
+bool __cdecl OnMapLoad(s_game_options* options)
 {
 	static bool resetAfterMatch = false;
 
-	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_before, engine_settings->map_type);
-	bool result = p_map_cache_load(engine_settings);
+	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_before, options->m_engine_type);
+	bool result = p_map_cache_load(options);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
 
 	// set the engine type
-	h2mod->SetCurrentEngineType(engine_settings->map_type);
+	h2mod->SetCurrentEngineType(options->m_engine_type);
 
 	tags::run_callbacks();
 
@@ -649,7 +645,7 @@ bool __cdecl OnMapLoad(s_game_engine_settings* engine_settings)
 		}
 
 		if (b_XboxTick) {
-			engine_settings->tickrate = XboxTick::setTickRate(false);
+			options->tickrate = XboxTick::setTickRate(false);
 			b_XboxTick = false;
 		}
 
@@ -682,7 +678,7 @@ bool __cdecl OnMapLoad(s_game_engine_settings* engine_settings)
 	ControllerInput::SetSensitiviy(H2Config_controller_sens);
 	MouseInput::SetSensitivity(H2Config_mouse_sens);
 	HudElements::OnMapLoad();
-	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_after, engine_settings->map_type);
+	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_after, options->m_engine_type);
 	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 	{
 		addDebugText("Engine type: Multiplayer");
@@ -699,11 +695,11 @@ bool __cdecl OnMapLoad(s_game_engine_settings* engine_settings)
 		{
 			H2X::Initialize(b_H2X);
 			ProjectileFix::ApplyProjectileVelocity();
-			engine_settings->tickrate = XboxTick::setTickRate(false);
+			options->tickrate = XboxTick::setTickRate(false);
 		}
 		else
 		{
-			engine_settings->tickrate = XboxTick::setTickRate(true);
+			options->tickrate = XboxTick::setTickRate(true);
 		}
 
 		H2Tweaks::toggleAiMp(true);
@@ -760,17 +756,17 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	EventHandler::execute_callback<EventHandler::PlayerSpawnEvent>(execute_before, playerDatumIndex);
 	if(b_HeadHunter)
 	{
-		headHunterHandler->preSpawnPlayer->SetPlayerIndex(DATUM_ABSOLUTE_INDEX(playerDatumIndex));
+		headHunterHandler->preSpawnPlayer->SetPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		headHunterHandler->preSpawnPlayer->execute();
 	}
 
 	if (b_Infection) {
-		infectionHandler->preSpawnPlayer->setPlayerIndex(DATUM_ABSOLUTE_INDEX(playerDatumIndex));
+		infectionHandler->preSpawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		infectionHandler->preSpawnPlayer->execute();
 	}
 
 	if (b_GunGame) {
-		gunGame->preSpawnPlayer->setPlayerIndex(DATUM_ABSOLUTE_INDEX(playerDatumIndex));
+		gunGame->preSpawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		gunGame->preSpawnPlayer->execute();
 	}
 
@@ -779,17 +775,17 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	EventHandler::execute_callback<EventHandler::PlayerSpawnEvent>(execute_after, playerDatumIndex);
 	if(b_HeadHunter)
 	{
-		headHunterHandler->spawnPlayer->SetPlayerIndex(DATUM_ABSOLUTE_INDEX(playerDatumIndex));
+		headHunterHandler->spawnPlayer->SetPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		headHunterHandler->spawnPlayer->execute();
 	}
 
 	if (b_Infection) {
-		infectionHandler->spawnPlayer->setPlayerIndex(DATUM_ABSOLUTE_INDEX(playerDatumIndex));
+		infectionHandler->spawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		infectionHandler->spawnPlayer->execute();
 	}
 
 	if (b_GunGame) {
-		gunGame->spawnPlayer->setPlayerIndex(DATUM_ABSOLUTE_INDEX(playerDatumIndex));
+		gunGame->spawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		gunGame->spawnPlayer->execute();
 	}
 
@@ -999,16 +995,16 @@ bool FlashlightIsEngineSPCheck() {
 	return h2mod->GetEngineType() == e_engine_type::SinglePlayer;
 }
 
-void GivePlayerWeaponDatum(datum unit_datum, datum weapon_datum)
+void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
 {
 	if (!DATUM_IS_NONE(unit_datum))
 	{
 		s_object_placement_data nObject;
 
-		EngineCalls::Objects::create_new_placement_data(&nObject, weapon_datum, unit_datum, 0);
+		EngineCalls::Objects::create_new_placement_data(&nObject, weapon_tag_index, unit_datum, 0);
 
-		int object_index = EngineCalls::Objects::call_object_new(&nObject);
-		if (object_index != NONE)
+		datum object_index = EngineCalls::Objects::call_object_new(&nObject);
+		if (!DATUM_IS_NONE(object_index))
 		{
 			EngineCalls::Unit::remove_equipment(unit_datum);
 			EngineCalls::Unit::assign_equipment_to_unit(unit_datum, object_index, 1);
@@ -1022,7 +1018,7 @@ float get_device_acceleration_scale(datum device_datum)
 	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD tag_instances = (DWORD)tags::get_tag_instances();
 
-	int device_gamestate_offset = DATUM_ABSOLUTE_INDEX(device_datum) + DATUM_ABSOLUTE_INDEX(device_datum) * 2;
+	int device_gamestate_offset = DATUM_INDEX_TO_ABSOLUTE_INDEX(device_datum) + DATUM_INDEX_TO_ABSOLUTE_INDEX(device_datum) * 2;
 	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)get_objects_header()->data + device_gamestate_offset * 4 + 8);
 	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 

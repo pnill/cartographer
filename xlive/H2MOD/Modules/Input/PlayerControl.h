@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam/Math/BlamMath.h"
-#include "Blam/Engine/Players/PlayerControls.h"
+#include "Blam\Engine\Players\PlayerControls.h"
+#include "Blam\Math\BlamMath.h"
 
 using namespace Blam::EngineDefinitions::Players;
 namespace PlayerControl

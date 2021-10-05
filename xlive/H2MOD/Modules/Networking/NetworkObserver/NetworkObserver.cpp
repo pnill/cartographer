@@ -1,7 +1,5 @@
-
 #include "NetworkObserver.h"
-
-#include "Util/Hooks/Hook.h"
+#include "Util\Hooks\Hook.h"
 
 network_observer_configuration* g_network_configuration;
 

@@ -1,9 +1,9 @@
 #include "imgui_handler.h"
+#include "H2MOD.h"
+#include "H2MOD\Modules\Input\PlayerControl.h"
 #include "imgui.h"
 #include "imgui_impl_dx9.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
-#include "Util/Hooks/Hook.h"
-#include "H2MOD.h"
+#include "Util\Hooks\Hook.h"
 
 namespace imgui_handler
 {

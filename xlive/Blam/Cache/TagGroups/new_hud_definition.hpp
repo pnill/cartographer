@@ -1,12 +1,13 @@
 #pragma once
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam\Cache\TagGroups.hpp"
 
 /*********************************************************************
 * name: new_hud_definition
 * group_tag : nhdt
 * header size : 40
 * *********************************************************************/
-struct s_new_hud_definition_group_definition
+struct s_new_hud_definition_group_definition :TagGroup<'nhdt'>
 {
 	tag_reference do_not_use;//0x0
 	enum class e_input : __int8
@@ -96,7 +97,7 @@ struct s_new_hud_definition_group_definition
 	struct s_bitmap_widgets_block
 	{
 		string_id name;//0x0
-		
+
 		e_input input_1;//0x4
 		e_input input_2;//0x5
 		e_input input_3;//0x6

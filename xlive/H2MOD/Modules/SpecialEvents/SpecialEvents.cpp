@@ -1,36 +1,34 @@
-
 #include "SpecialEvents.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
-#include "H2MOD/Tags/MetaExtender.h"
-#include "Blam/Enums/Game/HaloStrings.h"
-#include "H2MOD/Modules/Networking/Networking.h"
-#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
-#include "H2MOD/Modules/Config/Config.h"
-
-#include "Blam/Cache/TagGroups/model_defenition.hpp"
-#include "Blam/Cache/TagGroups/render_model_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
-#include "Blam/Cache/TagGroups/scenery_definition.hpp"
-#include "Blam/Cache/TagGroups/shader_definition.hpp"
-#include "Blam/Engine/Game/GameGlobals.h"
-#include "H2MOD/EngineCalls/EngineCalls.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
+#include "Blam\Cache\TagGroups\model_definition.hpp"
+#include "Blam\Cache\TagGroups\render_model_definition.hpp"
+#include "Blam\Cache\TagGroups\scenario_definition.hpp"
+#include "Blam\Cache\TagGroups\scenario_lightmap_definition.hpp"
+#include "Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp"
+#include "Blam\Cache\TagGroups\scenery_definition.hpp"
+#include "Blam\Cache\TagGroups\shader_definition.hpp"
+#include "Blam\Cache\TagGroups\weapon_definition.hpp"
+#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam\Enums\HaloStrings.h"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
+#include "H2MOD\Tags\MetaExtender.h"
+#include "H2MOD\Tags\MetaLoader\tag_loader.h"
 
 namespace SpecialEvents
 {
 	namespace
 	{
-		datum mook_ball_datum = DATUM_NONE;
+		datum mook_ball_datum = DATUM_INDEX_NONE;
 
-		datum paddy_hat_datum = DATUM_NONE;
-		datum paddy_beard_datum = DATUM_NONE;
-		datum paddy_pot_datum = DATUM_NONE;
+		datum paddy_hat_datum = DATUM_INDEX_NONE;
+		datum paddy_beard_datum = DATUM_INDEX_NONE;
+		datum paddy_pot_datum = DATUM_INDEX_NONE;
 
-		datum santa_hat_datum = DATUM_NONE;
+		datum santa_hat_datum = DATUM_INDEX_NONE;
 
 		string_id new_elite_head_marker(0xFFEE01234);
 
@@ -88,7 +86,7 @@ namespace SpecialEvents
 				tag_loader::Push_Back();
 				//auto scen = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(datum(_INJECTED_TAG_START_));
 				auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
-				if (hlmt_chief_datum != DATUM_NONE) {
+				if (hlmt_chief_datum != DATUM_INDEX_NONE) {
 					auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
 					auto b = hlmt_chief->variants[0];
 					auto a = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
@@ -97,7 +95,7 @@ namespace SpecialEvents
 					a->child_object.TagIndex = tag_loader::ResolveNewDatum(santa_hat_datum);
 				}
 				auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
-				if (hlmt_elite_datum != DATUM_NONE)
+				if (hlmt_elite_datum != DATUM_INDEX_NONE)
 				{
 					auto hlmt_eliete = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_elite_datum);
 					auto b = hlmt_eliete->variants[0];
@@ -126,34 +124,34 @@ namespace SpecialEvents
 					tag_loader::Load_tag(paddy_pot_datum, true, "carto_shared");
 					tag_loader::Push_Back();
 					auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
-					if (hlmt_chief_datum != DATUM_NONE) {
+					if (hlmt_chief_datum != DATUM_INDEX_NONE) {
 						auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
 						auto b = hlmt_chief->variants[0];
 						auto hat = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
-						hat->parent_marker = string_id(Blam::Enums::Game::HS_HEAD);
+						hat->parent_marker = string_id(HaloString::HS_HEAD);
 						hat->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 						hat->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_hat_datum);
 						auto beard = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
-						beard->parent_marker = string_id(Blam::Enums::Game::HS_HEAD);
+						beard->parent_marker = string_id(HaloString::HS_HEAD);
 						beard->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 						beard->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_beard_datum);
 
 					}
 					auto hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
-					if (hlmt_chief_mp_datum != DATUM_NONE) {
+					if (hlmt_chief_mp_datum != DATUM_INDEX_NONE) {
 						auto hlmt_chief_mp = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_mp_datum);
 						auto b = hlmt_chief_mp->variants[0];
 						auto hat = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
-						hat->parent_marker = string_id(Blam::Enums::Game::HS_HEAD);
+						hat->parent_marker = string_id(HaloString::HS_HEAD);
 						hat->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 						hat->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_hat_datum);
 						auto beard = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
-						beard->parent_marker = string_id(Blam::Enums::Game::HS_HEAD);
+						beard->parent_marker = string_id(HaloString::HS_HEAD);
 						beard->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 						beard->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_beard_datum);
 					}
 					auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
-					if (hlmt_elite_datum != DATUM_NONE)
+					if (hlmt_elite_datum != DATUM_INDEX_NONE)
 					{
 						auto hlmt_eliete = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_elite_datum);
 						auto b = hlmt_eliete->variants[0];
@@ -465,7 +463,7 @@ namespace SpecialEvents
 		if (state == life_cycle_in_game) {
 			wchar_t* mapName = Memory::GetAddress<wchar_t*>(0x97737C);
 			s_object_placement_data placement;
-			datum player_datum = Player::getPlayerUnitDatumIndex(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
+			datum player_datum = Player::getPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 			typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, real_point3d* orient);
 			auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
 			auto pump = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(pump_datum, true);
@@ -478,16 +476,16 @@ namespace SpecialEvents
 					{
 					case 0:
 						EngineCalls::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
-						placement.variant_index = pump_hmlt->variants[std::get<1>(scen_place)]->name.get_packed();
+						placement.variant_name = pump_hmlt->variants[std::get<1>(scen_place)]->name.get_packed();
 						break;
 					case 1:
 						EngineCalls::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
-						placement.variant_index = 0;
+						placement.variant_name = 0;
 						break;
 					}
-					placement.placement.x = std::get<2>(scen_place);
-					placement.placement.y = std::get<3>(scen_place);
-					placement.placement.z = std::get<4>(scen_place);
+					placement.position.x = std::get<2>(scen_place);
+					placement.position.y = std::get<3>(scen_place);
+					placement.position.z = std::get<4>(scen_place);
 					real_point3d ori;
 					ori.x = std::get<5>(scen_place);
 					ori.y = std::get<6>(scen_place);
@@ -506,16 +504,16 @@ namespace SpecialEvents
 					{
 					case 0:
 						EngineCalls::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
-						placement.variant_index = pump_hmlt->variants[std::get<1>(scen_place)]->name.get_packed();
+						placement.variant_name = pump_hmlt->variants[std::get<1>(scen_place)]->name.get_packed();
 						break;
 					case 1:
 						EngineCalls::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
-						placement.variant_index = 0;
+						placement.variant_name = 0;
 						break;
 					}
-					placement.placement.x = std::get<2>(scen_place);
-					placement.placement.y = std::get<3>(scen_place);
-					placement.placement.z = std::get<4>(scen_place);
+					placement.position.x = std::get<2>(scen_place);
+					placement.position.y = std::get<3>(scen_place);
+					placement.position.z = std::get<4>(scen_place);
 					real_point3d ori;
 					ori.x = std::get<5>(scen_place);
 					ori.y = std::get<6>(scen_place);

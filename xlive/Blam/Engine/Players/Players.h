@@ -1,7 +1,6 @@
 #pragma once
-
-#include "Blam/Engine/DataArray/DataArray.h"
-#include "Blam/Engine/Objects/Objects.h"
+#include "Blam\Engine\DataArray\DataArray.h"
+#include "Blam\Engine\Objects\Objects.h"
 
 #define ENGINE_PLAYER_MAX 16
 

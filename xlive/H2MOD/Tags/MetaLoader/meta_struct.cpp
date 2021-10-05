@@ -1,5 +1,5 @@
 #include "meta_struct.h"
-#include "Blam/Cache/DataTypes/BlamTag.h"
+#include "Blam\Cache\DataTypes\BlamTag.h"
 
 namespace meta_struct
 {

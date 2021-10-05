@@ -1,15 +1,11 @@
-#include "stdafx.h"
-
 #include "MapManager.h"
-
 #include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Tags\TagInterface.h"
+#include "stdafx.h"
+#include "Util\Hooks\Hook.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
-#include "..\Networking\Networking.h"
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-
-#include "H2MOD/Tags/TagInterface.h"
-
-#include "Util/Hooks/Hook.h"
 
 MapManager* mapManager = new MapManager();
 

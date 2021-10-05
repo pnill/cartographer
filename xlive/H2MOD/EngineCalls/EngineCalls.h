@@ -1,7 +1,7 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Engine/Game/GameEngine.h"
-#include "Blam/Engine/Objects/ObjectPlacementData.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam\Engine\Game\GameOptions.h"
+#include "Blam\Engine\Objects\ObjectPlacementData.h"
 
 namespace EngineCalls
 {
@@ -9,10 +9,7 @@ namespace EngineCalls
 	bool __cdecl IsGameMinimized();
 	e_engine_type get_current_engine_type();
 	int get_global_random_seed_address();
-	bool game_is_campaign();
-	bool game_is_multiplayer();
 	int get_game_mode_engine();
-	s_game_variant* get_game_variant();
 	namespace Unit
 	{
 		int __cdecl remove_equipment(datum unit_datum_index);

@@ -1,12 +1,9 @@
 #include "MeleeFix.h"
-#include "H2MOD/Modules/Config/Config.h"
-#include "Util/Hooks/Hook.h"
-#include "Blam/Enums/Game/HaloStrings.h"
-#include "H2MOD/Modules/Startup/Startup.h"
-
-#include "../MeleeLunge.h"
-
-using Blam::Enums::Game::HaloString;
+#include "H2MOD\Modules\Config\Config.h"
+#include "Util\Hooks\Hook.h"
+#include "Blam\Enums\HaloStrings.h"
+#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\GamePhysics\MeleeLunge.h"
 
 #include <float.h>
 #pragma fenv_access (on)
