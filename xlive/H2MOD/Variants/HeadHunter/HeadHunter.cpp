@@ -56,7 +56,7 @@ void HeadHunter::SpawnSkull(datum unit_datum)
 
 		EngineCalls::Objects::create_new_placement_data(&nObject, e_weapons_datum_index::ball, -1, 0);
 
-		nObject.placement = biped_unit->placement;
+		nObject.position = biped_unit->placement;
 		nObject.translational_velocity = biped_unit->translational_velocity;
 
 		datum new_object_datum = EngineCalls::Objects::call_object_new(&nObject);

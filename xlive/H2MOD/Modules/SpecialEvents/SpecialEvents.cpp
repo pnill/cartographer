@@ -478,16 +478,16 @@ namespace SpecialEvents
 					{
 					case 0:
 						EngineCalls::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
-						placement.variant_index = pump_hmlt->variants[std::get<1>(scen_place)]->name.get_packed();
+						placement.variant_name = pump_hmlt->variants[std::get<1>(scen_place)]->name.get_packed();
 						break;
 					case 1:
 						EngineCalls::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
-						placement.variant_index = 0;
+						placement.variant_name = 0;
 						break;
 					}
-					placement.placement.x = std::get<2>(scen_place);
-					placement.placement.y = std::get<3>(scen_place);
-					placement.placement.z = std::get<4>(scen_place);
+					placement.position.x = std::get<2>(scen_place);
+					placement.position.y = std::get<3>(scen_place);
+					placement.position.z = std::get<4>(scen_place);
 					real_point3d ori;
 					ori.x = std::get<5>(scen_place);
 					ori.y = std::get<6>(scen_place);
@@ -506,16 +506,16 @@ namespace SpecialEvents
 					{
 					case 0:
 						EngineCalls::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
-						placement.variant_index = pump_hmlt->variants[std::get<1>(scen_place)]->name.get_packed();
+						placement.variant_name = pump_hmlt->variants[std::get<1>(scen_place)]->name.get_packed();
 						break;
 					case 1:
 						EngineCalls::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
-						placement.variant_index = 0;
+						placement.variant_name = 0;
 						break;
 					}
-					placement.placement.x = std::get<2>(scen_place);
-					placement.placement.y = std::get<3>(scen_place);
-					placement.placement.z = std::get<4>(scen_place);
+					placement.position.x = std::get<2>(scen_place);
+					placement.position.y = std::get<3>(scen_place);
+					placement.position.z = std::get<4>(scen_place);
 					real_point3d ori;
 					ori.x = std::get<5>(scen_place);
 					ori.y = std::get<6>(scen_place);

@@ -372,20 +372,20 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 				real_point3d* player_position = h2mod->get_player_unit_coords(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 
 				if (player_position != nullptr) {
-					nObject.placement.x = player_position->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					nObject.placement.y = player_position->y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					nObject.placement.z = (player_position->z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.position.x = player_position->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.position.y = player_position->y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					nObject.position.z = (player_position->z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
 				}
 				if (specificPosition) {
-					nObject.placement.x = x;
-					nObject.placement.y = y;
-					nObject.placement.z = z;
+					nObject.position.x = x;
+					nObject.position.y = y;
+					nObject.position.z = z;
 				}
 
 				if (!sameTeam)
 					nObject.team_index = NONE;
 
-				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum, nObject.placement.x, nObject.placement.y, nObject.placement.z);
+				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum, nObject.position.x, nObject.position.y, nObject.position.z);
 				unsigned int object_gamestate_datum = EngineCalls::Objects::call_object_new(&nObject);
 				call_add_object_to_sync(object_gamestate_datum);
 			}
@@ -404,9 +404,9 @@ void ConsoleCommands::spawn_rotate(datum object_datum, float x, float y, float z
 		EngineCalls::Objects::create_new_placement_data(&nObject, object_datum, -1, 0);
 		typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, real_point3d* orient);
 		auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
-		nObject.placement.x = x;
-		nObject.placement.y = y;
-		nObject.placement.z = z;
+		nObject.position.x = x;
+		nObject.position.y = y;
+		nObject.position.z = z;
 		real_vector3d rotation{ i = i, j = j, k = k };
 		set_orientation(&nObject.orientation, &nObject.up, &rotation);
 		auto gamestate_datum = EngineCalls::Objects::call_object_new(&nObject);
