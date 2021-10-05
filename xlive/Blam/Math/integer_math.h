@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Common/Common.h"
+#include "Blam\Common\Common.h"
 
 //use this for all base integer math related structs and implementations
 struct point2d

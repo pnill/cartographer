@@ -1,9 +1,9 @@
-#include "3rdparty/imgui/imgui.h"
-#include "imgui_handler.h"
-#include "Blam/Common/Common.h"
+#include "Blam\Common\Common.h"
 #include "H2MOD.h"
-#include "Util/Hooks/Hook.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
+#include "H2MOD\Modules\Input\PlayerControl.h"
+#include "imgui.h"
+#include "imgui_handler.h"
+#include "Util\Hooks\Hook.h"
 
 namespace imgui_handler
 {

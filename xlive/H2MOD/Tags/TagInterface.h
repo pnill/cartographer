@@ -1,10 +1,8 @@
 #pragma once
-
-#include "Blam\Common\Common.h"
-
+#include "Blam\Cache\CacheHeader.h"
+#include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 #include "Blam\Cache\DataTypes\BlamTag.h"
-#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
-#include "Blam/Cache/cache_header.h"
+#include "Blam\Common\Common.h"
 
 namespace tags
 {

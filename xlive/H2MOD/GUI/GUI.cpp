@@ -1,17 +1,15 @@
 #include "GUI.h"
-
-#include "3rdparty/imgui/imgui.h"
-#include "imgui_integration\imgui_impl_dx9.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "imgui.h"
+#include "H2MOD\Modules\Achievements\Achievements.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
-#include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "imgui_integration/imgui_handler.h"
-#include "H2MOD/Modules/Networking/Networking.h"
-#include "H2MOD/Modules/Achievements/Achievements.h"
-
-#include "Util/Hooks/Hook.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
+#include "H2MOD\Modules\Input\KeyboardInput.h"
+#include "H2MOD\Modules\Input\PlayerControl.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "imgui_integration\imgui_handler.h"
+#include "imgui_integration\imgui_impl_dx9.h"
+#include "Util\Hooks\Hook.h"
 
 extern void InitInstance();
 

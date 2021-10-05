@@ -1,9 +1,7 @@
-
 #include "Networking.h"
 #include "Memory\bitstream.h"
-#include "OverridePackets/OverridePackets.h"
-
-#include "Util/Hooks/Hook.h"
+#include "OverridePackets\OverridePackets.h"
+#include "Util\Hooks\Hook.h"
 
 bool decodePacketTypeAndSize(void *thisx, bitstream* stream, signed int *a3, int a4) {
 	char *v4; // ebp@1

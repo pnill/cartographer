@@ -1,12 +1,11 @@
-#include "stdafx.h"
 #include "CustomPackets.h"
-
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\MapManager\MapManager.h"
+#include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "stdafx.h"
 #include "Util\Hooks\Hook.h"
-#include "..\Memory\bitstream.h"
-#include "..\..\MapManager\MapManager.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 
 char g_network_message_types[e_network_message_types::end * 32];
 

@@ -1,14 +1,14 @@
 #pragma once
-#include "H2MOD/Modules/Console/ConsoleCommands.h"
 #include "H2MOD.h"
-#include <rapidjson/document.h>
-#include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
-#include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
-#include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/EngineCalls/EngineCalls.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "rapidjson/document.h"
-#include "rapidjson/prettywriter.h"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
+#include "rapidjson\document.h"
+#include "rapidjson\prettywriter.h"
+#include <rapidjson\document.h>
 
 extern bool Registered;
 class StatsHandler

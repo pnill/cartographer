@@ -1,8 +1,8 @@
 #pragma once
-#include"..\stdafx.h"
+#include"stdafx.h"
 #include<fstream>
-#include<string.h>
 #include<list>
+#include<string.h>
 
 #define FILE_LOADED 0x0
 #define UNABLE_TO_LOCATE_FILE 0x1

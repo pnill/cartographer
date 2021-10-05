@@ -1,9 +1,8 @@
 #include "TagFixes.h"
-
+#include "Blam\Cache\TagGroups\shader_definition.hpp"
 #include "H2MOD.h"
-#include "Util/Hooks/Hook.h"
-#include "H2MOD/Tags/TagInterface.h"
-#include "Blam/Cache/TagGroups/shader_definition.hpp"
+#include "H2MOD\Tags\TagInterface.h"
+#include "Util\Hooks\Hook.h"
 
 namespace TagFixes
 {

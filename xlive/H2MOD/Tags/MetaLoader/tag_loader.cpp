@@ -1,15 +1,11 @@
-
 #include "tag_loader.h"
-#include "..\Util\filesys.h"
-
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-
+#include "Blam\Cache\TagGroups\model_definition.hpp"
+#include "Blam\Cache\TagGroups\scenery_definition.hpp"
 #include "Blam\Common\Common.h"
-#include "H2MOD/Tags/MetaExtender.h"
-#include "Blam/Cache/TagGroups/scenery_definition.hpp"
-#include "Blam/Cache/TagGroups/model_defenition.hpp"
-
-#include "Util/Hooks/Hook.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Tags\MetaExtender.h"
+#include "Util\filesys.h"
+#include "Util\Hooks\Hook.h"
 #include <algorithm>
 //contains some game functions that returns HANDLE
 namespace global_handle_function

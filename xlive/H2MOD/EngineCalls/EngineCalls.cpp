@@ -1,6 +1,5 @@
 #include "EngineCalls.h"
-
-#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam\Engine\Game\GameGlobals.h"
 
 //Engine Calls
 namespace EngineCalls

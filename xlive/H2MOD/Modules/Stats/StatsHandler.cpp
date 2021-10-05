@@ -1,14 +1,11 @@
 #include "StatsHandler.h"
-
-#include "Util/hash.h"
-
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
+#include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD/Modules/Startup/Startup.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-
-#include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
-#include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/EngineCalls/EngineCalls.h"
+#include "Util\hash.h"
 
 static const bool verbose = true;
 bool Registered = false;

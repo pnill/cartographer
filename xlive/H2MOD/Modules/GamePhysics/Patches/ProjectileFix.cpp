@@ -1,12 +1,9 @@
 #include "ProjectileFix.h"
-
-#include "Blam/Math/BlamMath.h"
-#include "Blam/Engine/Game/GameTimeGlobals.h"
-#include "Blam/Engine/Objects/Objects.h"
-
-#include "H2MOD/Tags/TagInterface.h"
-
-#include "Util/Hooks/Hook.h"
+#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam\Engine\Objects\Objects.h"
+#include "Blam\Math\BlamMath.h"
+#include "H2MOD\Tags\TagInterface.h"
+#include "Util\Hooks\Hook.h"
 
 #include <float.h>
 #pragma fenv_access (on)

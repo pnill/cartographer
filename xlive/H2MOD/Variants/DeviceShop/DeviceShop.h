@@ -1,6 +1,5 @@
 #pragma once
-
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
 
 enum item_type {
 	generic_item,
@@ -17,7 +16,7 @@ class DeviceShop {
 	private:
 		void SpawnAI(datum character_datum);
 		void SpawnVehicle(datum vehicle_datum);
-		void GiveWeapon(datum unit_datum, datum weapon);
+		void GiveWeapon(datum unit_datum, datum weapon_tag_index);
 		int GetCost(datum device_datum);
 		item_type GetType(datum device_datum);
 		datum DeviceShop::GetItemDatum(datum device_datum);

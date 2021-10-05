@@ -1,24 +1,22 @@
-
 #include "SpecialEvents.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
-#include "H2MOD/Tags/MetaExtender.h"
-#include "Blam/Enums/Game/HaloStrings.h"
-#include "H2MOD/Modules/Networking/Networking.h"
-#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
-#include "H2MOD/Modules/Config/Config.h"
-
-#include "Blam/Cache/TagGroups/model_defenition.hpp"
-#include "Blam/Cache/TagGroups/render_model_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
-#include "Blam/Cache/TagGroups/scenery_definition.hpp"
-#include "Blam/Cache/TagGroups/shader_definition.hpp"
-#include "Blam/Engine/Game/GameGlobals.h"
-#include "H2MOD/EngineCalls/EngineCalls.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
+#include "Blam\Cache\TagGroups\model_definition.hpp"
+#include "Blam\Cache\TagGroups\render_model_definition.hpp"
+#include "Blam\Cache\TagGroups\scenario_definition.hpp"
+#include "Blam\Cache\TagGroups\scenario_lightmap_definition.hpp"
+#include "Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp"
+#include "Blam\Cache\TagGroups\scenery_definition.hpp"
+#include "Blam\Cache\TagGroups\shader_definition.hpp"
+#include "Blam\Cache\TagGroups\weapon_definition.hpp"
+#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam\Enums\HaloStrings.h"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
+#include "H2MOD\Tags\MetaExtender.h"
+#include "H2MOD\Tags\MetaLoader\tag_loader.h"
 
 namespace SpecialEvents
 {
@@ -130,11 +128,11 @@ namespace SpecialEvents
 						auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
 						auto b = hlmt_chief->variants[0];
 						auto hat = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
-						hat->parent_marker = string_id(Blam::Enums::Game::HS_HEAD);
+						hat->parent_marker = string_id(HaloString::HS_HEAD);
 						hat->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 						hat->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_hat_datum);
 						auto beard = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
-						beard->parent_marker = string_id(Blam::Enums::Game::HS_HEAD);
+						beard->parent_marker = string_id(HaloString::HS_HEAD);
 						beard->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 						beard->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_beard_datum);
 
@@ -144,11 +142,11 @@ namespace SpecialEvents
 						auto hlmt_chief_mp = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_mp_datum);
 						auto b = hlmt_chief_mp->variants[0];
 						auto hat = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
-						hat->parent_marker = string_id(Blam::Enums::Game::HS_HEAD);
+						hat->parent_marker = string_id(HaloString::HS_HEAD);
 						hat->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 						hat->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_hat_datum);
 						auto beard = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
-						beard->parent_marker = string_id(Blam::Enums::Game::HS_HEAD);
+						beard->parent_marker = string_id(HaloString::HS_HEAD);
 						beard->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 						beard->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_beard_datum);
 					}

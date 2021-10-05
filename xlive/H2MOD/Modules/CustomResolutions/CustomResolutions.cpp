@@ -1,7 +1,6 @@
-#include "stdafx.h"
 #include "CustomResolutions.h"
-
-#include "..\Util\Hooks\Hook.h"
+#include "stdafx.h"
+#include "Util\Hooks\Hook.h"
 
 
 s_display_res video_options[TOTAL_RESOLUTIONS];

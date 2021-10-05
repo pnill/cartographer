@@ -1,7 +1,7 @@
 #include "EngineHooks.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "Util/Hooks/Hook.h"
 #include "H2MOD.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "Util\Hooks\Hook.h"
 
 namespace EngineHooks
 {

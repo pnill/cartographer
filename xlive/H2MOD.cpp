@@ -1,51 +1,47 @@
-
 #include "H2MOD.h"
-
-#include "H2MOD/Discord/DiscordInterface.h"
-#include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
-#include "H2MOD/Modules/Input/Mouseinput.h"
-#include "H2MOD/Modules/MainMenu/Ranks.h"
-#include "H2MOD/Modules/Networking/Memory/bitstream.h"
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/Tweaks/Tweaks.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
-#include "H2MOD/Modules/MapManager/MapManager.h"
-#include "H2MOD/Modules/Stats/StatsHandler.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
-#include "H2MOD/Modules/HudElements/HudElements.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
-#include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "H2MOD/Tags/MetaExtender.h"
-#include "H2MOD/Modules/TagFixes/TagFixes.h"
-#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
-#include "H2MOD/Modules/HaloScript/HaloScript.h"
-#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
-#include "H2MOD/Modules/MainMenu/MapSlots.h"
-#include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
-#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
-#include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
-#include "Util/Hooks/Hook.h"
-#include "H2MOD/EngineCalls/EngineCalls.h"
-#include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/Modules/Input/ControllerInput.h"
-#include "H2MOD/Modules/Console/ConsoleCommands.h"
-#include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
-#include "Blam/Engine/Game/DamageData.h"
-#include "Blam/Engine/FileSystem/FiloInterface.h"
-#include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
-#include "H2MOD/EngineHooks/EngineHooks.h"
-#include "H2MOD/GUI/GUI.h"
-#include "Blam/Enums/Game/HaloStrings.h"
-#include "Blam/Cache/TagGroups/model_defenition.hpp"
-#include "Blam/Cache/TagGroups/globals_definition.hpp"
-#include "Blam/Cache/TagGroups/biped_definition.hpp"
-#include "H2MOD/Modules/KantTesting/KantTesting.h"
-#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam\Cache\TagGroups\biped_definition.hpp"
+#include "Blam\Cache\TagGroups\globals_definition.hpp"
+#include "Blam\Cache\TagGroups\model_definition.hpp"
+#include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
+#include "Blam\Engine\FileSystem\FiloInterface.h"
+#include "Blam\Engine\Game\DamageData.h"
+#include "Blam\Enums\HaloStrings.h"
+#include "H2MOD\Discord\DiscordInterface.h"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\EngineHooks\EngineHooks.h"
+#include "H2MOD\GUI\GUI.h"
+#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
+#include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
+#include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\GamePhysics\Patches\MeleeFix.h"
+#include "H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h"
+#include "H2MOD\Modules\HaloScript\HaloScript.h"
+#include "H2MOD\Modules\HudElements\HudElements.h"
+#include "H2MOD\Modules\Input\ControllerInput.h"
+#include "H2MOD\Modules\Input\KeyboardInput.h"
+#include "H2MOD\Modules\Input\Mouseinput.h"
+#include "H2MOD\Modules\Input\PlayerControl.h"
+#include "H2MOD\Modules\KantTesting\KantTesting.h"
+#include "H2MOD\Modules\MainMenu\MapSlots.h"
+#include "H2MOD\Modules\MainMenu\Ranks.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
+#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
+#include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
+#include "H2MOD\Modules\PlaylistLoader\PlaylistLoader.h"
+#include "H2MOD\Modules\RenderHooks\RenderHooks.h"
+#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
+#include "H2MOD\Modules\Stats\StatsHandler.h"
+#include "H2MOD\Modules\TagFixes\TagFixes.h"
+#include "H2MOD\Modules\Tweaks\Tweaks.h"
+#include "H2MOD\Tags\MetaExtender.h"
+#include "H2MOD\Tags\MetaLoader\tag_loader.h"
+#include "Util\Hooks\Hook.h"
 #include <float.h>
-
-#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #pragma fenv_access (on)
 
 H2MOD* h2mod = new H2MOD();
@@ -999,16 +995,16 @@ bool FlashlightIsEngineSPCheck() {
 	return h2mod->GetEngineType() == e_engine_type::SinglePlayer;
 }
 
-void GivePlayerWeaponDatum(datum unit_datum, datum weapon_datum)
+void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
 {
 	if (!DATUM_IS_NONE(unit_datum))
 	{
 		s_object_placement_data nObject;
 
-		EngineCalls::Objects::create_new_placement_data(&nObject, weapon_datum, unit_datum, 0);
+		EngineCalls::Objects::create_new_placement_data(&nObject, weapon_tag_index, unit_datum, 0);
 
-		int object_index = EngineCalls::Objects::call_object_new(&nObject);
-		if (object_index != NONE)
+		datum object_index = EngineCalls::Objects::call_object_new(&nObject);
+		if (!DATUM_IS_NONE(object_index))
 		{
 			EngineCalls::Unit::remove_equipment(unit_datum);
 			EngineCalls::Unit::assign_equipment_to_unit(unit_datum, object_index, 1);

@@ -1,6 +1,6 @@
 #pragma once
-#include "H2MOD/Modules/Networking/Memory/bitstream.h"
-#include "Blam/Engine/Game/PhysicsConstants.h"
+#include "Blam\Engine\Game\PhysicsConstants.h"
+#include "H2MOD\Modules\Networking\Memory\bitstream.h"
 
 #define CustomVariantSettingsPacketSize 60
 namespace CustomVariantSettings

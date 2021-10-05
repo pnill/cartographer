@@ -1,10 +1,8 @@
-#include "stdafx.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
 #include "GunGame.h"
-
 #include "H2MOD.h"
-#include "H2MOD/Modules/Networking/Networking.h"
-
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "stdafx.h"
 #include "Util\ReadIniArguments.h"
 
 using namespace NetworkSession;

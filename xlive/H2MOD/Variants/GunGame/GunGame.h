@@ -1,8 +1,6 @@
 #pragma once
-
-#include "../VariantSystem.h"
-
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "H2MOD\Variants\VariantSystem.h"
 
 class GunGameHandler : public GameClientServerHandler {
 public:

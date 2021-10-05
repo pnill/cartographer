@@ -1,9 +1,7 @@
-
 #include "VariantPlayer.h"
-
-#include "Blam/Engine/DataArray/DataArray.h"
-#include "Blam/Engine/Objects/Objects.h"
-#include "Blam/Engine/Players/Players.h"
+#include "Blam\Engine\DataArray\DataArray.h"
+#include "Blam\Engine\Objects\Objects.h"
+#include "Blam\Engine\Players\Players.h"
 
 XUID VariantPlayer::GetXUID(datum object_index, bool player)
 {

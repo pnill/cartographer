@@ -1,22 +1,20 @@
 #include "RunLoop.h"
-
-#include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD/Modules/MapManager/MapManager.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-
-#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD/Modules/Networking/Networking.h"
+#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\GUI\GUI.h"
 #include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\Input\ControllerInput.h"
+#include "H2MOD\Modules\MainLoopPatches\OriginalFPSLimiter\OriginalFPSLimiter.h"
+#include "H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Stats\StatsHandler.h"
+#include "H2MOD\Modules\Utils\Utils.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
-#include "H2MOD/Modules/Stats/StatsHandler.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/GUI/GUI.h"
-#include "H2MOD/Modules/Input/ControllerInput.h"
-#include "H2MOD/Modules/MainLoopPatches/OriginalFPSLimiter/OriginalFPSLimiter.h"
-#include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
-#include "Blam/Engine/Game/GameTimeGlobals.h"
-#include "H2MOD/EngineCalls/EngineCalls.h"
 
 typedef void(_cdecl p_present_rendered_screen)();
 p_present_rendered_screen* present_rendered_screen;
@@ -120,7 +118,7 @@ typedef void(_cdecl p_sub_AF8716)(int a1);
 p_sub_AF8716* sub_AF8716;
 
 
-#include "Util/Hooks/Hook.h"
+#include "Util\Hooks\Hook.h"
 
 extern LPDIRECT3DDEVICE9 pDevice;
 

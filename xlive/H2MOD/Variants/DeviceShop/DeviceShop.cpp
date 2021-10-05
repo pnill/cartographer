@@ -1,10 +1,9 @@
 #include "DeviceShop.h"
-
 #include "H2MOD.h"
-#include "H2MOD/Tags/TagInterface.h"
+#include "H2MOD\Tags\TagInterface.h"
 
 extern void __cdecl print_to_console(char *output);
-extern void GivePlayerWeaponDatum(datum unit_datum, datum weapon_datum);
+extern void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index);
 
 // power transition time
 // TODO: Convert to TagGroup/Block
@@ -129,9 +128,9 @@ void DeviceShop::SpawnVehicle(datum vehicle_datum)
 
 }
 
-void DeviceShop::GiveWeapon(datum unit_datum, datum weapon_datum)
+void DeviceShop::GiveWeapon(datum unit_datum, datum weapon_tag_index)
 {
-	GivePlayerWeaponDatum(unit_datum, weapon_datum);
+	GivePlayerWeaponDatum(unit_datum, weapon_tag_index);
 }
 
 void DeviceShop::AddPoints(XUID xuid, int points)

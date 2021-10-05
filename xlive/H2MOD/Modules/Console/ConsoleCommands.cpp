@@ -1,24 +1,19 @@
-#include "stdafx.h"
-
 #include "ConsoleCommands.h"
-
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Input\Mouseinput.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\ServerConsole\ServerConsole.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
-#include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Networking\Networking.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\Modules\ServerConsole\ServerConsole.h"
-#include "H2MOD\Variants\GunGame\GunGame.h"
-
 #include "H2MOD\Modules\Utils\Utils.h"
-
+#include "H2MOD\Tags\MetaLoader\tag_loader.h"
+#include "H2MOD\Variants\GunGame\GunGame.h"
+#include "stdafx.h"
 #include "Util\ClipboardAPI.h"
-#include "H2MOD/Modules/Input/Mouseinput.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
-#include "H2MOD/EngineCalls/EngineCalls.h"
-
 // for XNet connection logging
-#include "xlive/xnet/IpManagement/XnIp.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 
 std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
 

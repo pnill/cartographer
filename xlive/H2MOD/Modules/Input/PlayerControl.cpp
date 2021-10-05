@@ -1,6 +1,6 @@
 #include "PlayerControl.h"
-#include "Util/Hooks/Hook.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "Util\Hooks\Hook.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 
 
 typedef void __cdecl c_UpdatePlayerControl(float yaw, float pitch);

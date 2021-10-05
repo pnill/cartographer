@@ -1,19 +1,16 @@
-#include "stdafx.h"
-
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Networking\Networking.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\Utils\Utils.h"
-
-#include "Util\Hooks\Hook.h"
-#include "Util\Debug\Debug.h"
-#include "Util\hash.h"
-#include "Util\filesys.h"
-
-#include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Tweaks\Tweaks.h"
+#include "Startup.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\Tweaks\Tweaks.h"
+#include "H2MOD\Modules\Utils\Utils.h"
+#include "stdafx.h"
+#include "Util\Debug\Debug.h"
+#include "Util\filesys.h"
+#include "Util\hash.h"
+#include "Util\Hooks\Hook.h"
 
 namespace filesystem = std::filesystem;
 

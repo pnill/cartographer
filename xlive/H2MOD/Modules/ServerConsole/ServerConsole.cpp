@@ -1,10 +1,8 @@
-
 #include "ServerConsole.h"
-
-#include "Util/Hooks/Hook.h"
-#include "H2MOD/Modules/Console/ConsoleCommands.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Modules/Utils/Utils.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\Utils\Utils.h"
+#include "Util\Hooks\Hook.h"
 
 typedef void*(__cdecl *dedi_command_hook)(wchar_t** a1, int a2, char a3);
 dedi_command_hook p_dedi_command_hook;

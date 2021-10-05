@@ -1,21 +1,18 @@
-
+#include "Tweaks.h"
+#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\Tweaks\Tweaks.h"
-#include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD\Variants\VariantMPGameEngine.h"
-#include "XLive\xnet\IpManagement\XnIp.h"
-#include "H2MOD\Modules\Accounts\AccountLogin.h"
+#include "H2MOD\Modules\CustomResolutions\CustomResolutions.h"
+#include "H2MOD\Modules\HudElements\HudElements.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
-#include "..\CustomResolutions\CustomResolutions.h"
-#include "H2MOD/Modules/HudElements/HudElements.h"
-
+#include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Tags\TagInterface.h"
-#include "H2MOD/Modules/Networking/Networking.h"
+#include "H2MOD\Variants\VariantMPGameEngine.h"
 #include "Util\Hooks\Hook.h"
-
-#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 
 #pragma region Done_Tweaks
 

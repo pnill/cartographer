@@ -1,16 +1,18 @@
 #pragma once
-#include "Blam/Cache/DataTypes.h"
-#include "Blam/Common/Common.h"
-#include "Blam/Cache/DataTypes/TagBlock.h"
-#include "Blam/Cache/DataTypes/TagRef.h"
-#include "Blam/Maths/real_math.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
+#include "Blam\Cache\DataTypes\TagBlock.h"
+#include "Blam\Cache\DataTypes\TagRef.h"
+#include "Blam\Cache\TagGroups.hpp"
+#include "Blam\Common\Common.h"
+#include "Blam\Math\real_math.h"
 
 /*********************************************************************
 * name: light
 * group_tag : ligh
 * header size : 228
 * *********************************************************************/
-struct s_light_group_definition
+struct s_light_group_definition :TagGroup<'ligh'>
 {
 	enum class e_flags : __int32
 	{
@@ -55,9 +57,9 @@ struct s_light_group_definition
 	float shadow_quality_bias;//0x10
 	enum class e_shadow_tap_bias : __int16
 	{
-	NUM_3_tap = 0,
-	unused = 1,
-	NUM_1_tap = 2,
+		NUM_3_tap = 0,
+		unused = 1,
+		NUM_1_tap = 2,
 	};
 	e_shadow_tap_bias shadow_tap_bias;//0x14
 	PAD(0x2);//0x16
@@ -136,18 +138,18 @@ struct s_light_group_definition
 	PAD(0x2);//0xA6
 	float lightmap_half_life;//0xA8
 	float lightmap_light_scale;//0xAC
-	float duration ;//0xB0
+	float duration;//0xB0
 	PAD(0x2);//0xB4
 	enum class e_falloff_function_2 : __int16
 	{
-	linear = 0,
-	late = 1,
-	very_late = 2,
-	early = 3,
-	very_early = 4,
-	cosine = 5,
-	zero = 6,
-	one = 7,
+		linear = 0,
+		late = 1,
+		very_late = 2,
+		early = 3,
+		very_early = 4,
+		cosine = 5,
+		zero = 6,
+		one = 7,
 	};
 	e_falloff_function_2 falloff_function_2;//0xB6
 	enum class e_illumination_fade : __int16

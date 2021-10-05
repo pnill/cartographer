@@ -1,10 +1,10 @@
 #include "PlaylistLoader.h"
-#include "Util/Hooks/Hook.h"
 #include "H2MOD.h"
-#include "H2MOD/Modules/Startup/Startup.h"
-#include "H2MOD/Modules/Utils/Utils.h"
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Utils\Utils.h"
+#include "Util\Hooks\Hook.h"
 
 namespace playlist_loader
 {

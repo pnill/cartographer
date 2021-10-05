@@ -1,7 +1,7 @@
 #include "HeadHunter.h"
 
 #include "H2MOD/Modules/Utils/Utils.h"
-#include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/EngineCalls/EngineCalls.h"

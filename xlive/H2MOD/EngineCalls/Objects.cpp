@@ -1,12 +1,11 @@
+#include "Blam\Engine\Objects\Objects.h"
+#include "Blam\Engine\Players\Players.h"
 #include "EngineCalls.h"
-#include "Util/Hooks/Hook.h"
-#include "Blam/Engine/Objects/Objects.h"
-
 #include "H2MOD.h"
-#include "Blam/Engine/Players/Players.h"
-#include "H2MOD/Modules/Networking/Memory/bitstream.h"
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
+#include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
+#include "Util\Hooks\Hook.h"
 
 namespace EngineCalls::Objects
 {

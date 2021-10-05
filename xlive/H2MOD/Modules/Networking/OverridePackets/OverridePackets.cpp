@@ -1,9 +1,9 @@
 #include  "OverridePackets.h"
-#include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
-#include "Util/Hooks/Hook.h"
-#include "H2MOD/Modules/Networking/Memory/bitstream.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/EngineCalls/EngineCalls.h"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
+#include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "Util\Hooks\Hook.h"
 
 #define PRECISION_INCREASE 1
 

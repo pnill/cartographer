@@ -6,7 +6,7 @@
 * group_tag : vehc
 * header size : 12
 * *********************************************************************/
-struct s_vehicle_collection_group_definition
+struct s_vehicle_collection_group_definition : TagGroup<'vehc'>
 {
 	struct s_vehicle_permutations_block
 	{

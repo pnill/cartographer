@@ -1,10 +1,7 @@
-
-#include "H2MOD\Variants\H2X\H2X.h"
-#include "..\H2MOD.h"
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
-#include "H2MOD\Tags\TagInterface.h"
-
+#include "H2X.h"
+#include "Blam\Cache\TagGroups\weapon_definition.hpp"
 #include "H2MOD.h"
+#include "H2MOD\Tags\TagInterface.h"
 
 std::vector<H2X::h2x_mod_info> weapons =
 {

@@ -1,16 +1,14 @@
 #include "Infection.h"
-
-#include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
-#include "Blam/Cache/TagGroups/item_collection_defenition.hpp"
-#include "Blam/Cache/TagGroups/vehicle_collection_defenition.hpp"
-#include "H2MOD/EngineCalls/EngineCalls.h"
-#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
-
+#include "Blam\Cache\TagGroups\item_collection_definition.hpp"
+#include "Blam\Cache\TagGroups\scenario_definition.hpp"
+#include "Blam\Cache\TagGroups\vehicle_collection_definition.hpp"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\Networking\Networking.h"
-#include "H2MOD/Tags/TagInterface.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
+#include "H2MOD\Tags\MetaLoader\tag_loader.h"
+#include "H2MOD\Tags\TagInterface.h"
 
 std::vector<XUID> Infection::zombieIdentifiers;
 
