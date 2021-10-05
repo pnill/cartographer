@@ -23,11 +23,11 @@ void FireFight::KilledAI(datum ai_datum, XUID killer)
 {
 	int points = 0;
 	s_data_iterator<Actor> actorIt(game_state_actors);
-	auto actorObject = (s_biped_object_definition*)object_try_and_get_and_verify_type(ai_datum, FLAG(e_object_type::biped));
+	auto actorObject = (s_biped_data_definition*)object_try_and_get_and_verify_type(ai_datum, FLAG(e_object_type::biped));
 
 	if (actorObject != NULL)
 	{
-		datum actor_datum = actorObject->ActorDatum; // Grab the actor from the killed AI
+		datum actor_datum = actorObject->controlling_actor_index; // Grab the actor from the killed AI
 		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(actor_datum) != -1) // Ensure that it was valid
 		{
 			datum char_datum = actorIt.get_data_at_datum_index(actor_datum)->character_datum; // get the character tag datum assigned to the actor.

@@ -53,7 +53,7 @@ namespace EngineCalls::Objects
 #pragma region Biped variant patches
 	void update_biped_object_variant_data(datum object_index, int variant_index)
 	{
-		s_biped_object_definition* biped_object = (s_biped_object_definition*)object_try_and_get_and_verify_type(object_index, FLAG(e_object_type::biped));
+		s_biped_data_definition* biped_object = (s_biped_data_definition*)object_try_and_get_and_verify_type(object_index, FLAG(e_object_type::biped));
 		// set this data only if we are dealing with a biped
 		if (biped_object != NULL)
 		{
@@ -65,7 +65,7 @@ namespace EngineCalls::Objects
 	void __cdecl update_object_variant_index_hook(datum object_index, int variant_index)
 	{
 		auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(datum, int)>(0x52FE84, 0x51ED47);
-		auto object = object_get_fast_unsafe<s_biped_object_definition>(object_index);
+		auto object = object_get_fast_unsafe<s_biped_data_definition>(object_index);
 
 		object->model_variant_id = p_resolve_variant_index_to_new_variant(object_index, variant_index);
 		// update the biped variant index
@@ -164,7 +164,7 @@ namespace EngineCalls::Objects
 
 		p_object_build_creation_data(object_index, object_creation_data);
 
-		auto object = object_get_fast_unsafe<s_biped_object_definition>(object_index);
+		auto object = object_get_fast_unsafe<s_biped_data_definition>(object_index);
 
 		*(int*)((BYTE*)object_creation_data + 0x24) = object->variant_index;
 
@@ -174,7 +174,7 @@ namespace EngineCalls::Objects
 	void apply_biped_object_definition_patches()
 	{
 		// increase the data size for biped representation
-		WriteValue<unsigned short>(Memory::GetAddressRelative(0x81E9A8, 0x7C1EB8) + 8, sizeof(s_biped_object_definition));
+		WriteValue<unsigned short>(Memory::GetAddressRelative(0x81E9A8, 0x7C1EB8) + 8, sizeof(s_biped_data_definition));
 
 		// hook the function that updates the variant
 		WriteJmpTo(Memory::GetAddressRelative(0x52FED3, 0x51ED96), update_object_variant_index_to_cdecl);

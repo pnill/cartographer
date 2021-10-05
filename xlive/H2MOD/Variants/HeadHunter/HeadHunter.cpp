@@ -48,7 +48,7 @@ void HeadHunter::spawnPlayerClientSetup()
 
 void HeadHunter::SpawnSkull(datum unit_datum)
 {
-	s_biped_object_definition* biped_unit = (s_biped_object_definition*)object_try_and_get_and_verify_type(unit_datum, FLAG(e_object_type::biped));
+	s_biped_data_definition* biped_unit = (s_biped_data_definition*)object_try_and_get_and_verify_type(unit_datum, FLAG(e_object_type::biped));
 
 	if (biped_unit != NULL)
 	{
@@ -56,7 +56,7 @@ void HeadHunter::SpawnSkull(datum unit_datum)
 
 		EngineCalls::Objects::create_new_placement_data(&nObject, e_weapons_datum_index::ball, -1, 0);
 
-		nObject.position = biped_unit->placement;
+		nObject.position = biped_unit->position;
 		nObject.translational_velocity = biped_unit->translational_velocity;
 
 		datum new_object_datum = EngineCalls::Objects::call_object_new(&nObject);
@@ -110,7 +110,7 @@ void HeadHunterHandler::SetDeadPlayer(datum dead_datum)
 
 bool HeadHunterHandler::SetInteractedObject(datum object_datum)
 {
-	s_weapon_object_definition* weaponObject = object_get_fast_unsafe<s_weapon_object_definition>(object_datum);
+	s_weapon_data_definition* weaponObject = object_get_fast_unsafe<s_weapon_data_definition>(object_datum);
 
 	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(weaponObject->tag_definition_index) == DATUM_INDEX_TO_ABSOLUTE_INDEX(e_weapons_datum_index::ball))
 	{

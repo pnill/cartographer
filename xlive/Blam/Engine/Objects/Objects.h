@@ -87,106 +87,150 @@ enum e_biped_physics_mode : BYTE
 };
 
 #pragma pack(push, 1)
-struct s_object_base_definition
+struct s_object_data_definition
 {
 	datum tag_definition_index;
 	DWORD object_flags;
-	BYTE gap_8[4];
+	char gap_8[4];
 	datum next_index;
-	datum current_weapon_datum;
-	datum parent_index;
+	datum current_weapon_datum;		//maybe attachment or child
+	datum parent_datum;
 	WORD unit_in_vehicle_flag;
 	INT16 placement_index;
-	BYTE gap_1C[12];
+	char gap_1C[12];
 	DWORD location[2];
 	real_point3d center;
 	float radius;
 	DWORD gap_3[9];
-	real_point3d placement;
+	real_point3d position;
 	real_vector3d orientation;
 	real_vector3d up;
 	real_point3d translational_velocity;
 	real_vector3d angular_velocity;
 	float scale;
-	BYTE gap_A4[6];
-	e_object_type object_type;
-	BYTE gap_AB[1];
+	datum unique_id;
+	__int16 origin_bsp_index;
+	e_object_type object_type;//TODO: confirm if its object_type or object_type_flags
+	char gap_AB[1];
 	__int16 name_list_index;
-	BYTE gap_5[1];
-	BYTE netgame_equipment_index;
-	DWORD gap_6;
-	datum havok_component_datum;
-	BYTE gap_B8[0x1A];
-	BYTE model_variant_id;
-	BYTE gap_D6[17];
+	char gap_5[1];
+	char netgame_equipment_index;
+	char placement_policy;
+	char gap_6[3];
+	datum havok_datum;
+	char gap_B8[8];
+	WORD field_C0;
+	WORD field_C2;
+	DWORD field_C4;
+	DWORD field_C8;
+	unsigned int field_CC;
+	__int16 field_D0;
+	BYTE model_variant_id;//hlmt variant tag_block index
+	char gap_D3;
+	unsigned int field_D4;
+	char field_D8;
+	char gap_D9[7];
+	WORD destroyed_constraints_flag;
+	WORD loosened_constraints_flag;
 	float body_max_vitality;
 	float shield_max_vitality;
 	float body_current_vitality;
 	float shield_current_vitality;
 	DWORD gap_F4[4];
-	float shield_recharge_timer;
-	BYTE gap_108[2];
-	WORD field_10A;
-	BYTE gap_10C[32];
+	WORD shield_stun_ticks;
+	WORD body_stun_ticks;
+	char gap_108[2];
+	WORD field_10A;		//(field_10A & 4) != 0 -- > object_is_dead
+	PAD(32);
 };
 #pragma pack(pop)
-CHECK_STRUCT_SIZE(s_object_base_definition, 0x12C);
+CHECK_STRUCT_SIZE(s_object_data_definition, 0x12C);
 
-struct s_biped_object_definition : s_object_base_definition
+struct s_unit_data_definition :s_object_data_definition
 {
-	BYTE ObjectsAttach;//0x12C
-	BYTE unk_11[3];//0x12D
-	datum ActorDatum; // 0x130
-	BYTE unk_17[4]; //0x138
-	DWORD Flags;//0x138
-	e_object_team Team;//0x13C
-	WORD unk_12;//0x13D
-	datum PlayerDatum;//0x140
-	BYTE unk_13[9];//0x144
-	WORD CrouchJumpRelated;//0x150
-	float UnitShoot;//0x152
-	BYTE unk_14[102];//0x156
-	float forward_movement_speed;//0x1BC
-	float left_movement_speed;//0x1C0
-	BYTE unk_15[16];//0x1C4
-	datum TargetObject;//0x1D4
-	BYTE unk_16[82];//0x1D8
-	e_weapon_index UnitSwitchWeapon;//0x22A
-	datum PrimaryWeapon; // 0x22C
-	datum SecondaryWeapon; // 0x230
-	datum DualWieldWeapon; // 0x234
-	BYTE pad[0x18]; //  0x238 
+	char gap_12C[4];
+	DWORD field_130;
+	datum controlling_actor_index;
+	DWORD unit_flags;		  //(unit_data->unit_flags & 8) != 0   -->active_camo_active
+							  //unit_data->unit_flags |= 2         -->unit_is_alive
+	e_object_team unit_team;
+	char pad[3];
+	WORD controlling_player_index;
+	char gap_142[14];
+	DWORD control_flags;
+	DWORD control_flags_2;
+	DWORD animation_state;
+	real_vector3d desired_facing;
+	real_vector3d desired_aiming;
+	real_vector3d aiming_vector;
+	real_vector3d aiming_vector_velocity;
+	real_vector3d desired_looking;
+	real_vector3d looking_vector;
+	real_vector3d looking_vector_velocity;
+	DWORD field_1B0;
+	DWORD field_1B4;
+	DWORD field_1B8;
+	real_vector3d throttle;
+	char aiming_speed;			//might not be char
+	char gap_1C9[3];
+	float trigger;
+	float secondary_trigger;
+	char target_info[0x24];		 //TODO: add structure
+	char gap_1F8[24];
+	DWORD parent_seat_index;
+	char gap_214[20];
+	WORD weapon_set_identifier;
+	char gap_22A[39];
+	char current_grenade_index;
+	WORD grenade_counts_mask;
+	char gap_254;
+	char zoom_level;
+	char gap_256[110];
+	float active_camo_power;
+	char gap_2C8[4];
+	float active_camo_regrowth;
+	PAD(144);
+};
+CHECK_STRUCT_SIZE(s_unit_data_definition, 0x360);
 
-	BYTE CurrentGrenadesIndex; //0x250
-	BYTE CurrentGrenadesIndex2; //0x251
-	BYTE Frag_Grenades; //0x252
-	BYTE Plasma_Grenades; //0x253
+struct s_biped_data_definition : s_unit_data_definition
+{
+	PAD(0x3F4 - sizeof(s_unit_data_definition));
+	e_biped_physics_mode biped_mode;//0x3F4
+	PAD(0x480 - 0x3F5);
 
-	float ActiveCamoFlagePower;//0x2C4
-	float ActiveCamoFlageTimer;//0x2C8
-	float ActiveCamoFlageDepletionPower;//0x2CC
-
-	e_biped_physics_mode unitState;//0x3F4
-	BYTE unk_18[0x21C];
-	
 	// NEW DATA
 	int variant_index;
 };
-CHECK_STRUCT_SIZE(s_biped_object_definition, 0x480 + 4);
+CHECK_STRUCT_SIZE(s_biped_data_definition, 0x480 + 4);
 
-struct s_weapon_object_definition : s_object_base_definition
+struct s_weapon_data_definition : s_object_data_definition
 {
-	char gap[0x25C - sizeof(s_object_base_definition)];
+	PAD(0x25C - sizeof(s_object_data_definition));
 };
-CHECK_STRUCT_SIZE(s_weapon_object_definition, 0x25C);
+CHECK_STRUCT_SIZE(s_weapon_data_definition, 0x25C);
+
+
+
+enum e_object_header_flag :BYTE
+{
+	_object_header_active_bit = 0x1,
+	_object_header_requires_motion_bit = 0x2,
+	object_header_flags_4 = 0x4,
+	_object_header_being_deleted_bit = 0x8,
+	object_header_flags_10 = 0x10,
+	_object_header_connected_to_map_bit = 0x20,
+	_object_header_child_bit = 0x40,
+};
+
 
 struct s_object_header {
 	__int16 datum_salt; //0x00
-	BYTE flags; // 0x02
+	e_object_header_flag flags; // 0x02
 	e_object_type type; // 0x03
 	__int16 unk__;  // 0x04
 	__int16 unk_size;  //0x06
-	char* object; //0x08 - 
+	char* object; //0x08 -
 };
 CHECK_STRUCT_SIZE(s_object_header, 0xC);
 
@@ -203,16 +247,16 @@ static s_object_header* get_objects_header(datum object_index)
 }
 
 // Get the object fast, with no validation from datum index
-template<typename T = s_object_base_definition>
+template<typename T = s_object_data_definition>
 static T* object_get_fast_unsafe(datum object_index)
 {
 	return (T*)get_objects_header(object_index)->object;
 }
 
 // Gets the object and verifies the type, returns NULL if object doesn't match object type flags
-template<typename T = s_object_base_definition>
+template<typename T = s_object_data_definition>
 static T* object_try_and_get_and_verify_type(datum object_index, int object_type_flags)
 {
-	auto p_object_try_and_get_and_verify_type = Memory::GetAddress<char*(__cdecl*)(datum, int)>(0x1304E3, 0x11F3A6);
+	auto p_object_try_and_get_and_verify_type = Memory::GetAddress<char* (__cdecl*)(datum, int)>(0x1304E3, 0x11F3A6);
 	return (T*)p_object_try_and_get_and_verify_type(object_index, object_type_flags);
 }
