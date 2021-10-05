@@ -14,7 +14,7 @@ namespace ObserverMode
 	e_observer_mode ObserverMode = observer_freecam;
 	real_vector3d* CameraAngles;
 	byte* EditorCameraTargetFunction;
-	Blam::EngineDefinitions::Players::s_network_player_actions** network_player_actions;
+	//Blam::EngineDefinitions::Players::s_network_player_actions** network_player_actions;
 
 
 
@@ -67,17 +67,17 @@ namespace ObserverMode
 		//These are fucked and need to be fixed.... everything is offset by 4, have to go back and fix everything that uses it.
 		auto control = PlayerControl::GetControls(0);
 
-		CameraAngles->i = control->Actions.yaw;
-		CameraAngles->j = control->Actions.pitch;
-		//CameraAngles->k += (control->Actions.trigger * 0.01f) + -(control->Actions.secondary_trigger * 0.01f);
+		CameraAngles->i = control->actions.facing.yaw.rad;
+		CameraAngles->j = control->actions.facing.pitch.rad;
+		//CameraAngles->k += (control->actions.trigger * 0.01f) + -(control->actions.secondary_trigger * 0.01f);
 
 		
 
 		if (ObserverMode == observer_freecam) 
 		{
 			//x2,y2 = [0, 1] * MaxShort
-			float movementAngle = GetAngle(0, 0, control->Actions.throttle_x * MAXSHORT, control->Actions.throttle_y * MAXSHORT) + 90.0f;
-			float movementDistance = GetDistance(0, 0, control->Actions.throttle_x, control->Actions.throttle_y);
+			float movementAngle = GetAngle(0, 0, control->actions.throttle.x * MAXSHORT, control->actions.throttle.y * MAXSHORT) + 90.0f;
+			float movementDistance = GetDistance(0, 0, control->actions.throttle.x, control->actions.throttle.y);
 			if (isnan(movementAngle)) movementAngle = 0;
 			if (isnan(movementDistance)) movementDistance = 0;
 			if (movementDistance > 1) movementDistance = 1;
@@ -102,7 +102,7 @@ namespace ObserverMode
 
 			CameraPosition->i += (num18 + num16);
 			CameraPosition->j += (num15 + num17);
-			CameraPosition->k += num14 + (control->Actions.trigger * 0.03f) + -(control->Actions.secondary_trigger * 0.03f);
+			CameraPosition->k += num14 + (control->actions.trigger * 0.03f) + -(control->actions.secondary_trigger * 0.03f);
 
 			if (imgui_handler::IsWindowActive("debug_overlay")) 
 			{
@@ -127,7 +127,7 @@ namespace ObserverMode
 
 		if(ObserverMode == observer_followcam)
 		{
-			float distance = control->Actions.throttle_y * 0.01;
+			float distance = control->actions.throttle.y * 0.01;
 			CameraPosition->j -= distance;
 		}
 
@@ -193,7 +193,7 @@ namespace ObserverMode
 			while (playerIt.get_next_active_player())
 			{
 				Player* player = playerIt.get_current_player_data();
-				if (player->controlled_unit_index == observer_current_index)
+				if (player->unit_index == observer_current_index)
 				{
 					unitIndexSameAsObserverIndex = observer_current_index;
 					break;
@@ -202,11 +202,11 @@ namespace ObserverMode
 				
 			auto control = PlayerControl::GetControls(0);
 			auto player_actions = PlayerControl::GetPlayerActions(currentPlayerIndex);
-			Player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))->controlled_unit_index = observer_current_index;
+			Player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))->unit_index = observer_current_index;
 			//control->ControllingDatum = observer_current_index;
-			//control->Actions.yaw = player_actions->facing.yaw.as_rad();
-			//control->Actions.pitch = player_actions->facing.pitch.as_rad();
-			//control->Actions = player_actions;
+			//control->actions.yaw = player_actions->facing.yaw.as_rad();
+			//control->actions.pitch = player_actions->facing.pitch.as_rad();
+			//control->actions = player_actions;
 		}
 	}
 
@@ -248,7 +248,7 @@ namespace ObserverMode
 	{
 		CameraAngles = Memory::GetAddress<real_vector3d*>(0x4A84C0);
 		EditorCameraTargetFunction = Memory::GetAddress<byte*>(0x4D8500);
-		network_player_actions = Memory::GetAddress<Blam::EngineDefinitions::Players::s_network_player_actions**>(0x514EE8);
+		//network_player_actions = Memory::GetAddress<Blam::EngineDefinitions::Players::s_network_player_actions**>(0x514EE8);
 
 		sub_7BD2EC = Memory::GetAddress<p_sub_7BD2EC*>(0x13D2EC);
 

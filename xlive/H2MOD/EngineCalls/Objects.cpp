@@ -1,5 +1,6 @@
 #include "Blam\Engine\Objects\Objects.h"
 #include "Blam\Engine\Players\Players.h"
+#include "Blam\Engine\Simulation\GameInterface\SimulationGameUnits.h"
 #include "EngineCalls.h"
 #include "H2MOD.h"
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
@@ -56,7 +57,7 @@ namespace EngineCalls::Objects
 		// set this data only if we are dealing with a biped
 		if (biped_object != NULL)
 		{
-			biped_object->variant_index = variant_index;
+			biped_object->variant_name = variant_index;
 			//addDebugText("set the variant data to: %u for biped", variant_index);
 		}
 	}
@@ -93,9 +94,9 @@ namespace EngineCalls::Objects
 	typedef void(__stdcall* c_simulation_unit_entity_definition_creation_encode)(void* thisptr, int creation_data_size, void* creation_data, int a3, bitstream* stream);
 	c_simulation_unit_entity_definition_creation_encode pc_simulation_unit_entity_definition_encode;
 
-	void __stdcall c_simulation_unit_entity_definition_creation_encode_hook(void* thisptr, int creation_data_size, void* creation_data, int a3, bitstream* stream)
+	void __stdcall c_simulation_unit_entity_definition_creation_encode_hook(void* thisptr, int creation_data_size, s_simulation_unit_creation_data* creation_data, int a3, bitstream* stream)
 	{
-		int object_permutation_index = *(int*)((char*)creation_data + 36);
+		int object_permutation_index = creation_data->variant_name.get_packed();
 		stream->data_encode_integer("object-permutation-index", object_permutation_index, 32);
 		//addDebugText("encoded entity creation: variant index: %d", object_permutation_index);
 		pc_simulation_unit_entity_definition_encode(thisptr, creation_data_size, creation_data, a3, stream);
@@ -104,18 +105,18 @@ namespace EngineCalls::Objects
 	typedef bool(__stdcall* c_simulation_unit_entity_definition_creation_decode)(void* thisptr, int creation_data_size, void* creation_data, bitstream* stream);
 	c_simulation_unit_entity_definition_creation_decode pc_simulation_unit_entity_definition_decode;
 
-	bool __stdcall c_simulation_unit_entity_definition_creation_decode_hook(void* thisptr, int creation_data_size, void* creation_data, bitstream* stream)
+	bool __stdcall c_simulation_unit_entity_definition_creation_decode_hook(void* thisptr, int creation_data_size, s_simulation_unit_creation_data* creation_data, bitstream* stream)
 	{
 		int object_permutation_index = stream->data_decode_integer("object-permutation-index", 32);
-		*(int*)((char*)creation_data + 36) = object_permutation_index;
+		creation_data->variant_name = object_permutation_index;
 		//addDebugText("decoded entity creation: variant index: %d", object_permutation_index);
 		return pc_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, stream);
 	}
 
-	int __stdcall c_simulation_object_entity_definition_object_create_object_hook(int thisx, void* creation_data, int a2, int a3, s_object_placement_data* object_placement_data)
+	int __stdcall c_simulation_object_entity_definition_object_create_object_hook(int thisx, s_simulation_unit_creation_data* creation_data, int a2, int a3, s_object_placement_data* object_placement_data)
 	{
 		// set the object placement data
-		object_placement_data->variant_name = *(int*)((char*)creation_data + 36);
+		object_placement_data->variant_name = creation_data->variant_name;
 		if(*(byte*)((char*)creation_data + 0x10) != -1)
 		{
 			auto profile = reinterpret_cast<Player::Properties::PlayerProfile*>((char*)creation_data + 0x10);
@@ -147,8 +148,8 @@ namespace EngineCalls::Objects
 
 	bool __cdecl set_unit_color_data_hook(int a1, unsigned __int16 a2, int a3)
 	{
-		int object_creation_data = a1 - 0x10;
-		int object_permutation_index = *(int*)((char*)object_creation_data + 36);
+		auto object_creation_data = (s_simulation_unit_creation_data*)(a1 - 0x10);
+		int object_permutation_index = object_creation_data->variant_name.get_packed();
 
 		//if (object_permutation_index == 0)
 		if(*(byte*)((char*)a1) != -1)
@@ -157,7 +158,7 @@ namespace EngineCalls::Objects
 		return 0;
 	}
 
-	void __stdcall object_build_creation_data_hook(datum object_index, void* object_creation_data)
+	void __stdcall object_build_creation_data_hook(datum object_index, s_simulation_unit_creation_data* object_creation_data)
 	{
 		auto p_object_build_creation_data = Memory::GetAddress<void(__stdcall*)(datum, void*)>(0x1F24ED, 0x1DD586);
 
@@ -165,7 +166,7 @@ namespace EngineCalls::Objects
 
 		auto object = object_get_fast_unsafe<s_biped_data_definition>(object_index);
 
-		*(int*)((BYTE*)object_creation_data + 0x24) = object->variant_index;
+		object_creation_data->variant_name = object->variant_name;
 
 		//addDebugText("object build creation data: variant index: %d", object->variant_index);
 	}
@@ -179,7 +180,7 @@ namespace EngineCalls::Objects
 		WriteJmpTo(Memory::GetAddressRelative(0x52FED3, 0x51ED96), update_object_variant_index_to_cdecl);
 
 		// increase the size of the unit entity creation definition packet
-		WriteValue<DWORD>(Memory::GetAddress(0x1F8028, 0x1E1D8E) + 1, 36 + 4);
+		WriteValue<DWORD>(Memory::GetAddress(0x1F8028, 0x1E1D8E) + 1, sizeof(s_simulation_unit_creation_data));
 
 		// increase the minimum required bitstream size
 		WriteValue<BYTE>(Memory::GetAddressRelative(0x5F84B9, 0x5E221F) + 3, 5 + 32); // + 32 is quite much, but idk how bitstream will behave with less than 32 when dealin with integers

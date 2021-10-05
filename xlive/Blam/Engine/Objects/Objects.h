@@ -2,6 +2,7 @@
 
 #include "Blam\Math\BlamMath.h"
 #include "Blam\Engine\DataArray\DataArray.h"
+#include "Blam\Engine\Players\PlayerActions.h"
 
 enum e_object_team : BYTE
 {
@@ -126,7 +127,7 @@ struct s_object_data_definition
 	__int16 field_D0;
 	BYTE model_variant_id;//hlmt variant tag_block index
 	char gap_D3;
-	unsigned int field_D4;
+	unsigned int simulation_entity_index;
 	char field_D8;
 	char gap_D9[7];
 	WORD destroyed_constraints_flag;
@@ -149,7 +150,7 @@ struct s_unit_data_definition :s_object_data_definition
 {
 	char gap_12C[4];
 	DWORD field_130;
-	datum controlling_actor_index;
+	datum simulation_actor_index;
 	DWORD unit_flags;		  //(unit_data->unit_flags & 8) != 0   -->active_camo_active
 							  //unit_data->unit_flags |= 2         -->unit_is_alive
 	e_object_team unit_team;
@@ -174,7 +175,7 @@ struct s_unit_data_definition :s_object_data_definition
 	char gap_1C9[3];
 	float trigger;
 	float secondary_trigger;
-	char target_info[0x24];		 //TODO: add structure
+	s_aim_assist_targetting_data target_info;
 	char gap_1F8[24];
 	DWORD parent_seat_index;
 	char gap_214[20];
@@ -199,7 +200,7 @@ struct s_biped_data_definition : s_unit_data_definition
 	PAD(0x480 - 0x3F5);
 
 	// NEW DATA
-	int variant_index;
+	string_id variant_name;
 };
 CHECK_STRUCT_SIZE(s_biped_data_definition, 0x480 + 4);
 
@@ -228,7 +229,7 @@ struct s_object_header {
 	e_object_header_flag flags; // 0x02
 	e_object_type type; // 0x03
 	__int16 unk__;  // 0x04
-	__int16 unk_size;  //0x06
+	__int16 object_data_size;  //0x06
 	char* object; //0x08 -
 };
 CHECK_STRUCT_SIZE(s_object_header, 0xC);

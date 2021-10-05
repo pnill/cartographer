@@ -87,10 +87,10 @@ datum Player::getPlayerUnitDatumIndex(int playerIndex)
 	if (!indexValid(playerIndex))
 		return DATUM_INDEX_NONE;
 
-	if (DATUM_IS_NONE(getPlayer(playerIndex)->controlled_unit_index))
+	if (DATUM_IS_NONE(getPlayer(playerIndex)->unit_index))
 		return DATUM_INDEX_NONE;
 		
-	return getPlayer(playerIndex)->controlled_unit_index;
+	return getPlayer(playerIndex)->unit_index;
 }
 
 XUID Player::getIdentifier(int playerIndex)

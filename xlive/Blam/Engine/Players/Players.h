@@ -209,7 +209,7 @@ struct Player
 	int controller_index;
 	__int16 user_index;
 	__int16 player_bsp_location_index;
-	datum controlled_unit_index;
+	datum unit_index;
 	datum dead_unit_index;
 	datum possibly_datum;
 	DWORD InputFlags;
