@@ -554,6 +554,7 @@
     <ClInclude Include="Blam\Engine\Game\DamageData.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngineGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\GameGlobals.h" />
+    <ClInclude Include="Blam\Engine\Game\GameState.h" />
     <ClInclude Include="Blam\Engine\Game\GameVariant.h" />
     <ClInclude Include="Blam\Engine\Game\PhysicsConstants.h" />
     <ClInclude Include="Blam\Enums\Game\HaloStrings.h" />

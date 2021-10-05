@@ -418,6 +418,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h" />
     <ClInclude Include="Blam\Engine\Game\GameVariant.h" />
+    <ClInclude Include="Blam\Engine\Game\GameState.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
