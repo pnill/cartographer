@@ -76,6 +76,27 @@ namespace SpecialEvents
 		}
 	}
 
+	e_event_type getCurrentEvent()
+	{
+		if (H2Config_no_events)
+			return e_none;
+
+		if (CheckIfEventTime(L"3-17"))
+			return e_st_paddys;
+
+		if (CheckIfEventTime(L"12-25"))
+			return e_christmas;
+
+		if (CheckIfEventTime(L"4-12"))
+			return e_mook_maddness;
+
+		if (CheckIfEventTime(L"10-20") || CheckIfEventTime(L"10-27"))
+			return e_halloween;
+
+		return e_halloween;
+		return e_none;
+	}
+
 	void ChristmasOnMapLoad()
 	{
 		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
@@ -461,6 +482,9 @@ namespace SpecialEvents
 	void fuck(game_life_cycle state)
 	{
 		if (state == life_cycle_in_game) {
+			if(H2Config_spooky_boy)
+				*Memory::GetAddress<Player::Biped*>(0x51A67C) = Player::Biped::Skeleton;
+
 			wchar_t* mapName = Memory::GetAddress<wchar_t*>(0x97737C);
 			s_object_placement_data placement;
 			datum player_datum = Player::getPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
@@ -470,6 +494,7 @@ namespace SpecialEvents
 			auto pump_hmlt = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(pump->objectTag.model.TagIndex, true);
 			if (wcscmp(mapName, L"Coagulation") == 0)
 			{
+				*Memory::GetAddress<Player::Biped*>(0x51A67C) = Player::Biped::Skeleton;
 				for (auto& scen_place : coag_scen_places)
 				{
 					switch (std::get<0>(scen_place))
@@ -667,17 +692,21 @@ namespace SpecialEvents
 	void Initialize()
 	{
 		ApplyHooks();
-		tags::on_map_load(HalloweenOnMapLoad);
-		if (!H2Config_no_events) {
-			tags::on_map_load(AddNewMarkers);
-			if (CheckIfEventTime(L"3-17"))
-				tags::on_map_load(PaddysOnMapLoad);
-
-			if (CheckIfEventTime(L"12-25"))
+		tags::on_map_load(AddNewMarkers);
+		switch (getCurrentEvent())
+		{
+			case e_christmas:
 				tags::on_map_load(ChristmasOnMapLoad);
-
-			if(CheckIfEventTime(L"4-12"))
+				break;
+			case e_st_paddys:
+				tags::on_map_load(PaddysOnMapLoad);
+				break;
+			case e_mook_maddness:
 				tags::on_map_load(MookMaddnessOnMapLoad);
+				break;
+			case e_halloween:
+				tags::on_map_load(HalloweenOnMapLoad);
+				break;
 		}
 	}
 }

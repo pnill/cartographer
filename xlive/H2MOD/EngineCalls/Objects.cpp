@@ -122,10 +122,6 @@ namespace EngineCalls::Objects
 			auto profile = reinterpret_cast<Player::Properties::PlayerProfile*>((char*)creation_data + 0x10);
 			auto placement = static_cast<s_object_placement_data*>(object_placement_data);
 			placement->tag_index = player_representation::get_object_datum_from_representation((byte)profile->player_character_type);
-			if(placement->player_index == h2mod->get_player_datum_index_from_controller_index(0) && !Memory::isDedicatedServer())
-			{
-				*Memory::GetAddress<byte*>(0x51A67C) = (byte)profile->player_character_type;
-			}
 		}
 		//addDebugText("creating object with variant index: %d", object_placement_data->variant_name);
 		return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, s_object_placement_data*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, object_placement_data);

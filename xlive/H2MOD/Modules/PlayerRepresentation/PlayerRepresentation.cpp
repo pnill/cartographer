@@ -97,7 +97,9 @@ namespace player_representation
 		LOG_INFO_GAME("[{}] {}", __FUNCTION__, a.m_engine_type);
 		if (s_game_globals::game_is_campaign())
 		{
-			auto scenario = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
+			p_network_session_player_profile_recieve(player_index, a2);
+			return;
+			/*auto scenario = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
 			s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type player_type = s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none;
 			int v5 = 0;
 			if (scenario->player_starting_locations.size > 0)
@@ -113,7 +115,7 @@ namespace player_representation
 				a2->player_team = e_object_team::player;
 				if (player_type == s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none)
 					a2->profile.player_character_type = static_cast<Player::Biped>(static_cast<byte>(static_cast<short>(player_type)));
-			}
+			}*/
 		}
 		else if (s_game_globals::game_is_multiplayer())
 		{
@@ -143,10 +145,10 @@ namespace player_representation
 		if (a2->bungie_user_role <= 7)
 			a2->bungie_user_role = 7;
 
-		//if (EngineCalls::get_game_mode_engine())
-		//	if (EngineCalls::get_game_variant()->game_engine_flags & 1)
-		//		if (a2->player_team && !((1 << a2->player_team) & s_game_engine_globals::get()->Unk1))
-		//			a2->player_team = e_object_team::None;
+		if (EngineCalls::get_game_mode_engine())
+			if (s_game_globals::get()->get_game_variant()->game_engine_flags & e_game_engine_flags::_game_engine_motion_sensor_bit)
+				if (a2->player_team && !((1 << a2->player_team) & s_game_engine_globals::get()->Unk1))
+					a2->player_team = e_object_team::None;
 	}
 	void on_map_load()
 	{
@@ -200,6 +202,7 @@ namespace player_representation
 	}
 	void apply_hooks()
 	{
+		p_network_session_player_profile_recieve = Memory::GetAddress<t_network_session_player_profile_recieve*>(0x52F23);
 		PatchCall(Memory::GetAddress(0x5509E, 0x5d596), network_session_player_profile_recieve);
 		//Change the packet validation for player::properties::profile to just accept anything, we catch it later if it's outside of the acceptable range.
 		WriteValue<byte>(Memory::GetAddress(0x54fb3, 0x5D4AB), 25);
