@@ -200,7 +200,7 @@ struct s_biped_data_definition : s_unit_data_definition
 	PAD(0x480 - 0x3F5);
 
 	// NEW DATA
-	int variant_index;
+	string_id variant_name;
 };
 CHECK_STRUCT_SIZE(s_biped_data_definition, 0x480 + 4);
 
