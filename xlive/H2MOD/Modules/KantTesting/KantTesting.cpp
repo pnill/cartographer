@@ -509,7 +509,7 @@ namespace KantTesting
 	void __cdecl network_ession_player_profile_recieve(int player_index, Player::Properties* a2)
 	{
 		auto a = s_game_globals::get()->engine_settings;
-		LOG_INFO_GAME("[{}] {}", __FUNCTION__, a.map_type);
+		LOG_INFO_GAME("[{}] {}", __FUNCTION__, a.m_engine_type);
 		if(EngineCalls::game_is_campaign())
 		{
 			auto scenario = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);

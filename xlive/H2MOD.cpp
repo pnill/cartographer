@@ -608,20 +608,20 @@ void get_object_table_memory()
 	game_state_actors = *Memory::GetAddress<s_data_array**>(0xA965DC, 0x9A1C5C);
 }
 
-typedef bool(__cdecl *map_cache_load)(s_game_engine_settings* map_load_settings);
+typedef bool(__cdecl *map_cache_load)(s_game_options* map_load_settings);
 map_cache_load p_map_cache_load;
 
-bool __cdecl OnMapLoad(s_game_engine_settings* engine_settings)
+bool __cdecl OnMapLoad(s_game_options* options)
 {
 	static bool resetAfterMatch = false;
 
-	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_before, engine_settings->map_type);
-	bool result = p_map_cache_load(engine_settings);
+	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_before, options->m_engine_type);
+	bool result = p_map_cache_load(options);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
 
 	// set the engine type
-	h2mod->SetCurrentEngineType(engine_settings->map_type);
+	h2mod->SetCurrentEngineType(options->m_engine_type);
 
 	tags::run_callbacks();
 
@@ -649,7 +649,7 @@ bool __cdecl OnMapLoad(s_game_engine_settings* engine_settings)
 		}
 
 		if (b_XboxTick) {
-			engine_settings->tickrate = XboxTick::setTickRate(false);
+			options->tickrate = XboxTick::setTickRate(false);
 			b_XboxTick = false;
 		}
 
@@ -682,7 +682,7 @@ bool __cdecl OnMapLoad(s_game_engine_settings* engine_settings)
 	ControllerInput::SetSensitiviy(H2Config_controller_sens);
 	MouseInput::SetSensitivity(H2Config_mouse_sens);
 	HudElements::OnMapLoad();
-	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_after, engine_settings->map_type);
+	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_after, options->m_engine_type);
 	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 	{
 		addDebugText("Engine type: Multiplayer");
@@ -699,11 +699,11 @@ bool __cdecl OnMapLoad(s_game_engine_settings* engine_settings)
 		{
 			H2X::Initialize(b_H2X);
 			ProjectileFix::ApplyProjectileVelocity();
-			engine_settings->tickrate = XboxTick::setTickRate(false);
+			options->tickrate = XboxTick::setTickRate(false);
 		}
 		else
 		{
-			engine_settings->tickrate = XboxTick::setTickRate(true);
+			options->tickrate = XboxTick::setTickRate(true);
 		}
 
 		H2Tweaks::toggleAiMp(true);

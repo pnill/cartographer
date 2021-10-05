@@ -41,12 +41,12 @@ namespace EngineCalls
 
 	bool game_is_campaign()
 	{
-		return s_game_globals::get()->engine_settings.map_type == 1;
+		return s_game_globals::get()->engine_settings.m_engine_type == 1;
 	}
 
 	bool game_is_multiplayer()
 	{
-		return s_game_globals::get()->engine_settings.map_type == 2;
+		return s_game_globals::get()->engine_settings.m_engine_type == 2;
 	}
 
 	int get_game_mode_engine()
@@ -58,6 +58,6 @@ namespace EngineCalls
 
 	s_game_variant* get_game_variant()
 	{
-		return &s_game_globals::get()->engine_settings.game_variant;
+		return &s_game_globals::get()->engine_settings.m_game_variant;
 	}
 }

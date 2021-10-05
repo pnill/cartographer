@@ -552,9 +552,9 @@
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.hpp" />
     <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Engine\Game\DamageData.h" />
-    <ClInclude Include="Blam\Engine\Game\GameEngineEnum.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngineGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\GameGlobals.h" />
+    <ClInclude Include="Blam\Engine\Game\GameVariant.h" />
     <ClInclude Include="Blam\Engine\Game\PhysicsConstants.h" />
     <ClInclude Include="Blam\Enums\Game\HaloStrings.h" />
     <ClInclude Include="Blam\LazyBlam\TagTable.h" />
@@ -630,7 +630,7 @@
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="Blam\Enums\Enums.h" />
-    <ClInclude Include="Blam\Engine\Game\GameEngine.h" />
+    <ClInclude Include="Blam\Engine\Game\GameOptions.h" />
     <ClInclude Include="Blam\Enums\Game\HaloScriptTypes.h" />
     <ClInclude Include="Blam\Math\BlamMath.h" />
     <ClInclude Include="H2MOD.h" />

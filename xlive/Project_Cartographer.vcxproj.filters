@@ -357,8 +357,7 @@
     <ClInclude Include="H2MOD\Modules\Input\PlayerControl.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
-    <ClInclude Include="Blam\Engine\Game\GameEngine.h" />
-    <ClInclude Include="Blam\Engine\Game\GameEngineEnum.h" />
+    <ClInclude Include="Blam\Engine\Game\GameOptions.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_handler.h" />
     <ClInclude Include="Blam\Cache\TagGroups\s_user_interface_screen_widget_definition.hpp" />
@@ -418,6 +417,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h" />
+    <ClInclude Include="Blam\Engine\Game\GameVariant.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
