@@ -94,9 +94,9 @@ namespace player_representation
 
 	void __cdecl network_session_player_profile_recieve(int player_index, Player::Properties* a2)
 	{
-		auto a = s_game_globals::get()->engine_settings;
+		auto a = s_game_globals::get()->m_options;
 		LOG_INFO_GAME("[{}] {}", __FUNCTION__, a.m_engine_type);
-		if (EngineCalls::game_is_campaign())
+		if (s_game_globals::game_is_campaign())
 		{
 			auto scenario = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
 			s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type player_type = s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none;
@@ -116,7 +116,7 @@ namespace player_representation
 					a2->profile.player_character_type = static_cast<Player::Biped>(static_cast<byte>(static_cast<short>(player_type)));
 			}
 		}
-		else if (EngineCalls::game_is_multiplayer())
+		else if (s_game_globals::game_is_multiplayer())
 		{
 			auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
 			auto globals = tags::get_tag_fast<s_globals_group_definition>(globals_datum);

@@ -39,16 +39,6 @@ namespace EngineCalls
 		return Memory::GetAddress(0x4A8280, 0x4D2500);
 	}
 
-	bool game_is_campaign()
-	{
-		return s_game_globals::get()->engine_settings.m_engine_type == 1;
-	}
-
-	bool game_is_multiplayer()
-	{
-		return s_game_globals::get()->engine_settings.m_engine_type == 2;
-	}
-
 	int get_game_mode_engine()
 	{
 		typedef int(t_get_game_mode_engine)();
@@ -56,8 +46,4 @@ namespace EngineCalls
 		return p_get_game_mode_engine();
 	}
 
-	s_game_variant* get_game_variant()
-	{
-		return &s_game_globals::get()->engine_settings.m_game_variant;
-	}
 }
