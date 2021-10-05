@@ -938,8 +938,8 @@ namespace imgui_handler {
 							while(playerIt.get_next_active_player())
 							{
 								auto player = playerIt.get_current_player_data();
-								int object = *(int*)&Objects->datum[12 * player->controlled_unit_index.Index + 8];
-								LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->controlled_unit_index.ToInt(), std::hex), IntToWString<int>(object, std::hex));
+								int object = *(int*)&Objects->datum[12 * player->unit_index.Index + 8];
+								LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->unit_index.ToInt(), std::hex), IntToWString<int>(object, std::hex));
 							}
 						}
 					}
@@ -1021,13 +1021,13 @@ namespace imgui_handler {
 				}
 			}
 			ImGuiToggleInput(true);
-			PlayerControl::GetControls(0)->DisableCamera = true;
+			PlayerControl::DisableLocalCamera(true);
 		}
 		void Close()
 		{
 			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);
 			ImGuiToggleInput(false);
-			PlayerControl::GetControls(0)->DisableCamera = false;
+			PlayerControl::DisableLocalCamera(false);
 			SaveH2Config();
 		}
 		void BuildStringsTable()

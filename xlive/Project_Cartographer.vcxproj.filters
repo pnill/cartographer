@@ -417,6 +417,21 @@
     <ClInclude Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h" />
     <ClInclude Include="Blam\Engine\Game\GameVariant.h" />
     <ClInclude Include="Blam\Engine\Game\GameState.h" />
+    <ClInclude Include="Blam\Engine\Simulation\SimulationPlayers.h" />
+    <ClInclude Include="Blam\Engine\Simulation\SimulationActors.h" />
+    <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEvents.h" />
+    <ClInclude Include="Blam\Engine\Simulation\SimulationTypeCollection.h" />
+    <ClInclude Include="Blam\Engine\Simulation\SimulationView.h" />
+    <ClInclude Include="Blam\Engine\Simulation\SimulationWorld.h" />
+    <ClInclude Include="Blam\Engine\Simulation\MachineID.h" />
+    <ClInclude Include="Blam\Engine\Networking\PlayerPrediction.h" />
+    <ClInclude Include="Blam\Engine\Networking\PlayerMotion.h" />
+    <ClInclude Include="Blam\Engine\Players\PlayerActions.h" />
+    <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEntities.h" />
+    <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
+    <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
+    <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
+    <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

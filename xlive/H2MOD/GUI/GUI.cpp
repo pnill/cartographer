@@ -422,7 +422,7 @@ void GUI::ToggleMenu()
 {
 	doDrawIMGUI = !doDrawIMGUI;
 	WriteValue<bool>(Memory::GetAddress(0x9712CC), doDrawIMGUI);
-	PlayerControl::GetControls(0)->DisableCamera = doDrawIMGUI;
+	PlayerControl::DisableLocalCamera(doDrawIMGUI);
 	if(!doDrawIMGUI)
 		SaveH2Config();
 }

@@ -288,7 +288,7 @@ int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
 	PlayerIterator playersIt;
 	while (playersIt.get_next_active_player())
 	{
-		datum unit_datum_index_check = playersIt.get_current_player_data()->controlled_unit_index;
+		datum unit_datum_index_check = playersIt.get_current_player_data()->unit_index;
 		LOG_TRACE_FUNC("Checking datum: {0:x} - index: {1} against datum: {2:x}", unit_datum_index_check, playersIt.get_current_player_index(), unit_datum_index);
 
 		if (unit_datum_index == unit_datum_index_check)

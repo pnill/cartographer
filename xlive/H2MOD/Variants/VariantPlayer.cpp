@@ -48,7 +48,7 @@ datum VariantPlayer::GetPlayerDatum(XUID xuid)
 datum VariantPlayer::GetUnitDatum(datum player_datum)
 {
 	PlayerIterator playersIt;
-	return playersIt.get_data_at_datum_index(player_datum)->controlled_unit_index;
+	return playersIt.get_data_at_datum_index(player_datum)->unit_index;
 }
 
 datum VariantPlayer::GetUnitDatum(XUID xuid)
@@ -60,7 +60,7 @@ datum VariantPlayer::GetUnitDatum(XUID xuid)
 		{
 			if (playersIt.get_current_player_data()->identifier == xuid)
 			{
-				datum unit_datum = playersIt.get_current_player_data()->controlled_unit_index;
+				datum unit_datum = playersIt.get_current_player_data()->unit_index;
 				datum player_datum = DATUM_INDEX_TO_ABSOLUTE_INDEX(playersIt.get_current_player_index());
 
 				SetPlayerDatum(xuid, player_datum);
