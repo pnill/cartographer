@@ -10,10 +10,10 @@ XUID VariantPlayer::GetXUID(datum object_index, bool player)
 	s_biped_object_definition* playerUnit = object_get_fast_unsafe<s_biped_object_definition>(object_index);
 
 	if (player)
-		return Player::getPlayer(DATUM_ABSOLUTE_INDEX(object_index))->identifier;
+		return Player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index))->identifier;
 	else
 	{
-		short player_index = DATUM_ABSOLUTE_INDEX(playerUnit->PlayerDatum);
+		short player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerUnit->PlayerDatum);
 		return Player::getPlayer(player_index)->identifier;
 	}
 }
@@ -33,7 +33,7 @@ datum VariantPlayer::GetPlayerDatum(XUID xuid)
 		{
 			if (playersIt.get_current_player_data()->identifier == xuid)
 			{
-				datum player_datum = DATUM_ABSOLUTE_INDEX(playersIt.get_current_player_index());
+				datum player_datum = DATUM_INDEX_TO_ABSOLUTE_INDEX(playersIt.get_current_player_index());
 
 				SetPlayerDatum(xuid, player_datum);
 				return player_datum;
@@ -63,7 +63,7 @@ datum VariantPlayer::GetUnitDatum(XUID xuid)
 			if (playersIt.get_current_player_data()->identifier == xuid)
 			{
 				datum unit_datum = playersIt.get_current_player_data()->controlled_unit_index;
-				datum player_datum = DATUM_ABSOLUTE_INDEX(playersIt.get_current_player_index());
+				datum player_datum = DATUM_INDEX_TO_ABSOLUTE_INDEX(playersIt.get_current_player_index());
 
 				SetPlayerDatum(xuid, player_datum);
 				SetUnitDatum(xuid, unit_datum);

@@ -82,7 +82,7 @@ void HeadHunter::PickupSkull(XUID player, datum SkullDatum)
 		if (player_score_data)
 		{
 			datum PlayerDatum = variant_player->GetPlayerDatum(player);
-			pupdate_player_score(player_score_data, DATUM_ABSOLUTE_INDEX(PlayerDatum), 0, 1, -1, 0);
+			pupdate_player_score(player_score_data, DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), 0, 1, -1, 0);
 			HaloScript::ObjectDestroy(SkullDatum);
 			if(TimeElapsedMS(soundBuffer) > 2500)
 			{
@@ -112,7 +112,7 @@ bool HeadHunterHandler::SetInteractedObject(datum object_datum)
 {
 	s_weapon_object_definition* weaponObject = object_get_fast_unsafe<s_weapon_object_definition>(object_datum);
 
-	if (DATUM_ABSOLUTE_INDEX(weaponObject->tag_definition_index) == DATUM_ABSOLUTE_INDEX(e_weapons_datum_index::ball))
+	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(weaponObject->tag_definition_index) == DATUM_INDEX_TO_ABSOLUTE_INDEX(e_weapons_datum_index::ball))
 	{
 		this->object_interaction = object_datum;
 		return true;

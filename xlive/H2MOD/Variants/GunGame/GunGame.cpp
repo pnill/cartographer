@@ -247,7 +247,7 @@ void GunGameInitializer::onPeerHost() {
 	GunGame::resetPlayerLevels();
 	//TODO: is this really necessary (from old code)?
 	//init peer host gun game level
-	GunGame::gungamePlayers[getPlayerXuid(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))] = 0;
+	GunGame::gungamePlayers[getPlayerXuid(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))] = 0;
 }
 
 void GunGamePreSpawnHandler::onClient() {

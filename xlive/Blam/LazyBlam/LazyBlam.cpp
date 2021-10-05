@@ -51,7 +51,7 @@ namespace lazy_blam
 		tag_table.tag_table_start_unpadded = map_header.tag_offset + 0xC * tag_parent_count + 0x20;;
 		if (map_header.type == s_cache_header::e_scnr_type::MultiplayerSharedScenario)
 		{
-			tag_table.tag_table_start = map_header.tag_offset + (0xC * tag_parent_count + 0x20) + DATUM_ABSOLUTE_INDEX(matg_datum) * sizeof(tags::tag_instance);
+			tag_table.tag_table_start = map_header.tag_offset + (0xC * tag_parent_count + 0x20) + DATUM_INDEX_TO_ABSOLUTE_INDEX(matg_datum) * sizeof(tags::tag_instance);
 			tag_table.tag_data_start = 0x3c000 + map_header.tag_offset;
 		}
 		else
@@ -62,7 +62,7 @@ namespace lazy_blam
 		}
 
 		
-		map_stream->seekg(tag_table.tag_table_start + DATUM_ABSOLUTE_INDEX(scenario_datum) * sizeof(tags::tag_instance) + 0x8);
+		map_stream->seekg(tag_table.tag_table_start + DATUM_INDEX_TO_ABSOLUTE_INDEX(scenario_datum) * sizeof(tags::tag_instance) + 0x8);
 		map_stream->read((char*)&tag_table.scenario_address, 4);
 
 		tags::tag_instance tag_instance;

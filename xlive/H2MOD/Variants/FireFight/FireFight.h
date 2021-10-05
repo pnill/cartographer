@@ -14,7 +14,7 @@ public:
 	datum GetKilledDatum();
 private:
 	XUID xuid;
-	datum killed_datum = DATUM_NONE;
+	datum killed_datum = DATUM_INDEX_NONE;
 };
 
 

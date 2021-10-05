@@ -24,13 +24,13 @@ namespace SpecialEvents
 {
 	namespace
 	{
-		datum mook_ball_datum = DATUM_NONE;
+		datum mook_ball_datum = DATUM_INDEX_NONE;
 
-		datum paddy_hat_datum = DATUM_NONE;
-		datum paddy_beard_datum = DATUM_NONE;
-		datum paddy_pot_datum = DATUM_NONE;
+		datum paddy_hat_datum = DATUM_INDEX_NONE;
+		datum paddy_beard_datum = DATUM_INDEX_NONE;
+		datum paddy_pot_datum = DATUM_INDEX_NONE;
 
-		datum santa_hat_datum = DATUM_NONE;
+		datum santa_hat_datum = DATUM_INDEX_NONE;
 
 		string_id new_elite_head_marker(0xFFEE01234);
 
@@ -88,7 +88,7 @@ namespace SpecialEvents
 				tag_loader::Push_Back();
 				//auto scen = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(datum(_INJECTED_TAG_START_));
 				auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
-				if (hlmt_chief_datum != DATUM_NONE) {
+				if (hlmt_chief_datum != DATUM_INDEX_NONE) {
 					auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
 					auto b = hlmt_chief->variants[0];
 					auto a = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
@@ -97,7 +97,7 @@ namespace SpecialEvents
 					a->child_object.TagIndex = tag_loader::ResolveNewDatum(santa_hat_datum);
 				}
 				auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
-				if (hlmt_elite_datum != DATUM_NONE)
+				if (hlmt_elite_datum != DATUM_INDEX_NONE)
 				{
 					auto hlmt_eliete = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_elite_datum);
 					auto b = hlmt_eliete->variants[0];
@@ -126,7 +126,7 @@ namespace SpecialEvents
 					tag_loader::Load_tag(paddy_pot_datum, true, "carto_shared");
 					tag_loader::Push_Back();
 					auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
-					if (hlmt_chief_datum != DATUM_NONE) {
+					if (hlmt_chief_datum != DATUM_INDEX_NONE) {
 						auto hlmt_chief = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_datum);
 						auto b = hlmt_chief->variants[0];
 						auto hat = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
@@ -140,7 +140,7 @@ namespace SpecialEvents
 
 					}
 					auto hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
-					if (hlmt_chief_mp_datum != DATUM_NONE) {
+					if (hlmt_chief_mp_datum != DATUM_INDEX_NONE) {
 						auto hlmt_chief_mp = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_chief_mp_datum);
 						auto b = hlmt_chief_mp->variants[0];
 						auto hat = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
@@ -153,7 +153,7 @@ namespace SpecialEvents
 						beard->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_beard_datum);
 					}
 					auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
-					if (hlmt_elite_datum != DATUM_NONE)
+					if (hlmt_elite_datum != DATUM_INDEX_NONE)
 					{
 						auto hlmt_eliete = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(hlmt_elite_datum);
 						auto b = hlmt_eliete->variants[0];
@@ -465,7 +465,7 @@ namespace SpecialEvents
 		if (state == life_cycle_in_game) {
 			wchar_t* mapName = Memory::GetAddress<wchar_t*>(0x97737C);
 			s_object_placement_data placement;
-			datum player_datum = Player::getPlayerUnitDatumIndex(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
+			datum player_datum = Player::getPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 			typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, real_point3d* orient);
 			auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
 			auto pump = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(pump_datum, true);

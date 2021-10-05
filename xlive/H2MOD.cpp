@@ -284,7 +284,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 
 wchar_t* H2MOD::get_local_player_name(int local_player_index)
 {
-	return Player::getName(DATUM_ABSOLUTE_INDEX(this->get_player_datum_index_from_controller_index(local_player_index)));
+	return Player::getName(DATUM_INDEX_TO_ABSOLUTE_INDEX(this->get_player_datum_index_from_controller_index(local_player_index)));
 }
 
 int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
@@ -425,7 +425,7 @@ void H2MOD::disable_sounds(int sound_flags)
 							// disable all sounds from english to chinese
 							for (int j = 0; j < 8; j++)
 							{
-								(&general_event->sound)[j].TagIndex = DATUM_NONE;
+								(&general_event->sound)[j].TagIndex = DATUM_INDEX_NONE;
 							}
 						}
 					}
@@ -760,17 +760,17 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	EventHandler::execute_callback<EventHandler::PlayerSpawnEvent>(execute_before, playerDatumIndex);
 	if(b_HeadHunter)
 	{
-		headHunterHandler->preSpawnPlayer->SetPlayerIndex(DATUM_ABSOLUTE_INDEX(playerDatumIndex));
+		headHunterHandler->preSpawnPlayer->SetPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		headHunterHandler->preSpawnPlayer->execute();
 	}
 
 	if (b_Infection) {
-		infectionHandler->preSpawnPlayer->setPlayerIndex(DATUM_ABSOLUTE_INDEX(playerDatumIndex));
+		infectionHandler->preSpawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		infectionHandler->preSpawnPlayer->execute();
 	}
 
 	if (b_GunGame) {
-		gunGame->preSpawnPlayer->setPlayerIndex(DATUM_ABSOLUTE_INDEX(playerDatumIndex));
+		gunGame->preSpawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		gunGame->preSpawnPlayer->execute();
 	}
 
@@ -779,17 +779,17 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	EventHandler::execute_callback<EventHandler::PlayerSpawnEvent>(execute_after, playerDatumIndex);
 	if(b_HeadHunter)
 	{
-		headHunterHandler->spawnPlayer->SetPlayerIndex(DATUM_ABSOLUTE_INDEX(playerDatumIndex));
+		headHunterHandler->spawnPlayer->SetPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		headHunterHandler->spawnPlayer->execute();
 	}
 
 	if (b_Infection) {
-		infectionHandler->spawnPlayer->setPlayerIndex(DATUM_ABSOLUTE_INDEX(playerDatumIndex));
+		infectionHandler->spawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		infectionHandler->spawnPlayer->execute();
 	}
 
 	if (b_GunGame) {
-		gunGame->spawnPlayer->setPlayerIndex(DATUM_ABSOLUTE_INDEX(playerDatumIndex));
+		gunGame->spawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		gunGame->spawnPlayer->execute();
 	}
 
@@ -1022,7 +1022,7 @@ float get_device_acceleration_scale(datum device_datum)
 	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD tag_instances = (DWORD)tags::get_tag_instances();
 
-	int device_gamestate_offset = DATUM_ABSOLUTE_INDEX(device_datum) + DATUM_ABSOLUTE_INDEX(device_datum) * 2;
+	int device_gamestate_offset = DATUM_INDEX_TO_ABSOLUTE_INDEX(device_datum) + DATUM_INDEX_TO_ABSOLUTE_INDEX(device_datum) * 2;
 	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)get_objects_header()->data + device_gamestate_offset * 4 + 8);
 	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 

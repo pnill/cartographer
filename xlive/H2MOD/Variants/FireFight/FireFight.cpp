@@ -28,7 +28,7 @@ void FireFight::KilledAI(datum ai_datum, XUID killer)
 	if (actorObject != NULL)
 	{
 		datum actor_datum = actorObject->ActorDatum; // Grab the actor from the killed AI
-		if (DATUM_ABSOLUTE_INDEX(actor_datum) != -1) // Ensure that it was valid
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(actor_datum) != -1) // Ensure that it was valid
 		{
 			datum char_datum = actorIt.get_data_at_datum_index(actor_datum)->character_datum; // get the character tag datum assigned to the actor.
 			auto* character = tags::get_tag<blam_tag::tag_group_type::character, character_tag_group>(char_datum);

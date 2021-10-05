@@ -367,9 +367,9 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 			s_object_placement_data nObject;
 
 			if (!DATUM_IS_NONE(object_datum)) {
-				datum player_datum = Player::getPlayerUnitDatumIndex(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
+				datum player_datum = Player::getPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 				EngineCalls::Objects::create_new_placement_data(&nObject, object_datum, player_datum, 0);
-				real_point3d* player_position = h2mod->get_player_unit_coords(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
+				real_point3d* player_position = h2mod->get_player_unit_coords(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 
 				if (player_position != nullptr) {
 					nObject.placement.x = player_position->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
@@ -610,7 +610,7 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			std::string secondArg = splitCommands[1];
 			std::string thirdArg = splitCommands[2];
-			datum object_datum = DATUM_NONE;
+			datum object_datum = DATUM_INDEX_NONE;
 			if (object_ids.find(secondArg) == object_ids.end()) {
 				//read from chatbox line
 				std::string secondArg = splitCommands[1];
@@ -641,7 +641,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			if (splitCommands[3] == "true")
 				sameTeam = true;
 
-			real_point3d* localPlayerPosition = h2mod->get_player_unit_coords(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
+			real_point3d* localPlayerPosition = h2mod->get_player_unit_coords(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 			this->spawn(object_datum, count, localPlayerPosition->x + 0.5f, localPlayerPosition->y + 0.5f, localPlayerPosition->z + 0.5f, randomMultiplier, false, sameTeam);
 			return;
 		}

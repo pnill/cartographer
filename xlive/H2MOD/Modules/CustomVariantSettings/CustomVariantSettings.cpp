@@ -90,8 +90,8 @@ namespace CustomVariantSettings
 		if (NetworkSession::localPeerIsSessionHost()) {
 			if (CurrentVariantSettings.InfiniteGrenades)
 			{
-				h2mod->set_player_unit_grenades_count(DATUM_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 99, false);
-				h2mod->set_player_unit_grenades_count(DATUM_ABSOLUTE_INDEX(PlayerDatum), Plasma, 99, false);
+				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 99, false);
+				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Plasma, 99, false);
 			}
 		}
 	}
@@ -102,8 +102,8 @@ namespace CustomVariantSettings
 			if (CurrentVariantSettings.InfiniteGrenades)
 			{
 				//Prevent Players from dropping 198 grenades on death..
-				h2mod->set_player_unit_grenades_count(DATUM_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 4, false);
-				h2mod->set_player_unit_grenades_count(DATUM_ABSOLUTE_INDEX(PlayerDatum), Plasma, 4, false);
+				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 4, false);
+				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Plasma, 4, false);
 			}
 		}
 	}

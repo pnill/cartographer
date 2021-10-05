@@ -189,7 +189,7 @@ namespace ObserverMode
 		if (ObserverMode == observer_firstperson) {
 			PlayerIterator playerIt;
 
-			datum unitIndexSameAsObserverIndex(DATUM_NONE);
+			datum unitIndexSameAsObserverIndex(DATUM_INDEX_NONE);
 
 			while (playerIt.get_next_active_player())
 			{
@@ -203,7 +203,7 @@ namespace ObserverMode
 				
 			auto control = PlayerControl::GetControls(0);
 			auto player_actions = PlayerControl::GetPlayerActions(currentPlayerIndex);
-			Player::getPlayer(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))->controlled_unit_index = observer_current_index;
+			Player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))->controlled_unit_index = observer_current_index;
 			//control->ControllingDatum = observer_current_index;
 			//control->Actions.yaw = player_actions->facing.yaw.as_rad();
 			//control->Actions.pitch = player_actions->facing.pitch.as_rad();
@@ -225,12 +225,12 @@ namespace ObserverMode
 		}
 		if(unk != 65535){
 			*(DWORD*)(unk + 8) = 0;
-			*(DWORD*)(unk) = DATUM_ABSOLUTE_INDEX(observer_current_index);
+			*(DWORD*)(unk) = DATUM_INDEX_TO_ABSOLUTE_INDEX(observer_current_index);
 			*(WORD*)(unk + 4) = -1;
 
-			auto object = *(DWORD*)&Objects->data[12 * DATUM_ABSOLUTE_INDEX(observer_current_index) + 4];
+			auto object = *(DWORD*)&Objects->data[12 * DATUM_INDEX_TO_ABSOLUTE_INDEX(observer_current_index) + 4];
 			//LOG_INFO_GAME("[ObserverMode] Object {}, Address {}", observer_current_index, IntToString<int>(object, std::hex));
-			sub_7BD2EC(DATUM_ABSOLUTE_INDEX(observer_current_index), (DWORD*)(unk + 12));
+			sub_7BD2EC(DATUM_INDEX_TO_ABSOLUTE_INDEX(observer_current_index), (DWORD*)(unk + 12));
 		}
 	}
 

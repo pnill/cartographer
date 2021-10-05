@@ -71,7 +71,7 @@ namespace EngineCalls::Objects
 		// update the biped variant index
 		update_biped_object_variant_data(object_index, variant_index);
 
-		//addDebugText("object_index: %d, model_variant_id: %u", DATUM_ABSOLUTE_INDEX(object_index), object->variant_index);
+		//addDebugText("object_index: %d, model_variant_id: %u", DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index), object->variant_index);
 	}
 
 	// original update_object_variant_index is usercall, with data in CX register as first param

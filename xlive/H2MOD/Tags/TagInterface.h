@@ -109,13 +109,13 @@ namespace tags
 		}
 		auto instance = get_tag_instances()[idx];
 		datum tag_datum = instance.datum_index;
-		LOG_CHECK(DATUM_ABSOLUTE_INDEX(tag_datum) == idx); // should always be true
+		LOG_CHECK(DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_datum) == idx); // should always be true
 		return tag_datum;
 	}
 
 	inline tag_instance* datum_to_instance(datum datum)
 	{
-		return &get_tag_instances()[DATUM_ABSOLUTE_INDEX(datum)];
+		return &get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum)];
 	}
 
 	/* Get parent tag groups for a tag group */
@@ -176,19 +176,19 @@ namespace tags
 
 		if (DATUM_IS_NONE(tag))
 		{
-			LOG_ERROR_FUNC("Bad tag datum - null datum: {}, tag count: {}", DATUM_ABSOLUTE_INDEX(tag), header->tag_count);
+			LOG_ERROR_FUNC("Bad tag datum - null datum: {}, tag count: {}", DATUM_INDEX_TO_ABSOLUTE_INDEX(tag), header->tag_count);
 			return nullptr;
 		}
 
 		// out of bounds check
-		if (DATUM_ABSOLUTE_INDEX(tag) > header->tag_count && !injectedTag)
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag) > header->tag_count && !injectedTag)
 		{
-			LOG_CRITICAL_FUNC("Bad tag datum - index out of bounds (idx: {}, bounds: {})", DATUM_ABSOLUTE_INDEX(tag), header->tag_count);
+			LOG_CRITICAL_FUNC("Bad tag datum - index out of bounds (idx: {}, bounds: {})", DATUM_INDEX_TO_ABSOLUTE_INDEX(tag), header->tag_count);
 			return nullptr;
 		}
 
 		//tag_instance instance = header->tag_instances[tag.Index];
-		tag_instance instance = get_tag_instances()[DATUM_ABSOLUTE_INDEX(tag)];
+		tag_instance instance = get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag)];
 		if (request_type != blam_tag::tag_group_type::none && !is_tag_or_parent_tag(instance.type, request_type))
 		{
 			LOG_ERROR_FUNC("tag type doesn't match requested type - to disable check set requested type to 'none' in template");
@@ -201,7 +201,7 @@ namespace tags
 	template <typename T = void>
 	inline T* get_tag_fast(datum tag)
 	{
-		return reinterpret_cast<T*>(&get_tag_data()[get_tag_instances()[DATUM_ABSOLUTE_INDEX(tag)].data_offset]);
+		return reinterpret_cast<T*>(&get_tag_data()[get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag)].data_offset]);
 	}
 
 	/*
@@ -217,7 +217,7 @@ namespace tags
 
 		blam_tag type = blam_tag::none(); // type we are searching for
 		long current_index = 0; // current tag idx
-		datum m_datum = DATUM_NONE; // last tag datum we returned
+		datum m_datum = DATUM_INDEX_NONE; // last tag datum we returned
 
 		datum next()
 		{
@@ -234,7 +234,7 @@ namespace tags
 				}
 			}
 
-			return DATUM_NONE;
+			return DATUM_INDEX_NONE;
 		}
 
 	};

@@ -99,7 +99,7 @@ int __cdecl transport_qos_target_new_hook(int a1, signed int a2, int a3, int a4)
 	datum new_qos_datum_index = p_datum_new_in_range(qos_probes_datum_array);
 	if (!DATUM_IS_NONE(new_qos_datum_index))
 	{
-		char* qos_probe_data = &qos_probes_datum_array->data[DATUM_ABSOLUTE_INDEX(new_qos_datum_index) * qos_probes_datum_array->datum_element_size];
+		char* qos_probe_data = &qos_probes_datum_array->data[DATUM_INDEX_TO_ABSOLUTE_INDEX(new_qos_datum_index) * qos_probes_datum_array->datum_element_size];
 		placeholder_xnqos.cxnqos = 1;
 		placeholder_xnqos.cxnqosPending = 0;
 
