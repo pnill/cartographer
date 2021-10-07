@@ -113,7 +113,7 @@ ControllerInput::CustomControllerLayout H2Config_CustomLayout;
 bool H2Config_upnp_enable = true;
 bool H2Config_melee_fix = true;
 bool H2Config_no_events = false;
-bool H2Config_spooky_boy = false;
+bool H2Config_spooky_boy = true;
 
 int H2Config_hotkeyIdHelp = VK_F3;
 int H2Config_hotkeyIdToggleDebug = VK_F2;

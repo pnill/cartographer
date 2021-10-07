@@ -1345,6 +1345,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 		tag_loader::new_Tables[i] = tags::tag_instance{ blam_tag::none(), DATUM_INDEX_NONE, 0, 0 };
 	}
 	tag_loader::que_meta_list.clear();
+	tag_loader::injected_tag_refs.clear();
 	tag_loader::key_list.clear();
 	// reset starting_datum index
 	tag_loader::ext_meta_size = 0;

@@ -1,4 +1,6 @@
 #include "SpecialEvents.h"
+
+#include "Blam/Engine/Game/GameTimeGlobals.h"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
 #include "Blam\Cache\TagGroups\render_model_definition.hpp"
 #include "Blam\Cache\TagGroups\scenario_definition.hpp"
@@ -17,6 +19,8 @@
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
+#include <math.h>
+#define _USE_MATH_DEFINES
 
 namespace SpecialEvents
 {
@@ -380,7 +384,7 @@ namespace SpecialEvents
 		{ 0, 0, 62.9095f, -154.865f, 6.12579f, -2.111883f, -0.06000267f, 0.06465363f, 1.f },
 		{ 0, 1, 62.8203f, -155.087f, 6.07893f, -2.105914f, -0.06000267f, 0.06465363f, 2.f },
 		{ 0, 2, 62.9789f, -154.936f, 6.22054f, -1.883839f, -0.06000215f, 0.06465415f, 1.f },
-		{ 0, 2, 62.9045f, -154.445f, 6.19814f, -1.818703f, -0.0600025f, 0.06465363f, 1.f },
+		{ 0, 3, 62.9045f, -154.445f, 6.19814f, -1.818703f, -0.0600025f, 0.06465363f, 1.f },
 		{ 0, 2, 55.7299f, -117.498f, 1.38182f, 1.103167f, 0.f, 0.f, 2.f },
 		{ 0, 2, 94.4302f, -116.768f, 3.69325f, -0.5194554f, 0.f, 0.f, 2.f },
 		{ 0, 2, 96.2998f, -118.367f, 4.27613f, -0.9128194f, 0.f, 0.f, 2.f },
@@ -472,14 +476,20 @@ namespace SpecialEvents
 		{ 1, 0, 88.0174f, -90.9017f, 4.81082f, 0.6927177f, 0.f, 0.f, 2.f },
 		{ 1, 0, 98.6028f, -91.531f, 4.53088f, 0.6927177f, 0.f, 0.f, 2.f },
 		{ 1, 0, 74.4072f, -79.5794f, 5.82736f, 0.6927177f, 0.f, 0.f, 2.f },
-		{ 1, 0, 44.822f, -131.738f, 1.32844f, 2.718891f, 0.f, 0.f, 2.f }
+		{ 1, 0, 44.822f, -131.738f, 1.32844f, 2.718891f, 0.f, 0.f, 2.f },
+		{ 0, 3, 19.2999f, -53.6043f, 19.4129f, 0.523599f, -0.10472f, 0.174533f, 100.f },
+		{ 0, 3, 106.678f, -194.856f, 21.3504f, -2.79253f, 0.0872665f, -0.296706f, 100.f },
+		{ 2, 0, 19.3f, -53.6f, 25.36f, 0.f, 0.f, 0.f, 1.f },
+		{ 2, 0, 106.678f, -194.856f, 26.f, 0.f, 0.f, 0.f, 1.f }
 	};
+
 	datum lbitm_datum;
 	datum sky_datum;
 	datum candle_datum;
 	datum candle_fire_datum;
+	datum large_candle_datum;
 	datum pump_datum;
-	void fuck(game_life_cycle state)
+	void halloween_game_state(game_life_cycle state)
 	{
 		if (state == life_cycle_in_game) {
 			if(H2Config_spooky_boy)
@@ -505,6 +515,10 @@ namespace SpecialEvents
 						break;
 					case 1:
 						EngineCalls::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
+						placement.variant_name = 0;
+						break;
+					case 2:
+						EngineCalls::Objects::create_new_placement_data(&placement, large_candle_datum, -1, 0);
 						placement.variant_name = 0;
 						break;
 					}
@@ -551,113 +565,125 @@ namespace SpecialEvents
 			}
 		}
 	}
+
 	void HalloweenOnMapLoad()
 	{
 		if(h2mod->GetEngineType() == Multiplayer)
 		{
-			
-			wchar_t* mapName = Memory::GetAddress<wchar_t*>(0x97737C);
-			if(wcscmp(mapName, L"Coagulation") == 0)
+			if (tag_loader::Map_exists("carto_shared"))
 			{
-				lbitm_datum = tag_loader::Get_tag_datum("scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", blam_tag::tag_group_type::bitmap, "carto_shared");
-				sky_datum = tag_loader::Get_tag_datum("scenarios\\skies\\multi\\halo\\coagulation\\coagulation_night", blam_tag::tag_group_type::sky, "carto_shared");
-				candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", blam_tag::tag_group_type::scenery, "carto_shared");
-				candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", blam_tag::tag_group_type::scenery, "carto_shared");
-				pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", blam_tag::tag_group_type::scenery, "carto_shared");
-				tag_loader::Load_tag(pump_datum, true, "carto_shared");
-				tag_loader::Load_tag(candle_datum, true, "carto_shared");
-				tag_loader::Load_tag(lbitm_datum, true, "carto_shared");
-				tag_loader::Load_tag(sky_datum, true, "carto_shared");
-				tag_loader::Push_Back();
-			}
-			if(wcscmp(mapName, L"Lockout") == 0)
-			{
-				candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", blam_tag::tag_group_type::scenery, "carto_shared");
-				candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", blam_tag::tag_group_type::scenery, "carto_shared");
-				pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", blam_tag::tag_group_type::scenery, "carto_shared");
-				tag_loader::Load_tag(pump_datum, true, "carto_shared");
-				tag_loader::Load_tag(candle_datum, true, "carto_shared");
-				tag_loader::Load_tag(lbitm_datum, true, "carto_shared");
-				tag_loader::Load_tag(sky_datum, true, "carto_shared");
-				tag_loader::Push_Back();
-				
-			}
-
-
-			auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
-			auto sbps = tags::get_tag_fast< s_scenario_structure_bsp_group_definition>(scen->structure_bsps[0]->structure_bsp.TagIndex);
-			if (wcscmp(mapName, L"Coagulation") == 0)
-			{
-				candle_datum = tag_loader::ResolveNewDatum(candle_datum);
-				candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
-				pump_datum = tag_loader::ResolveNewDatum(pump_datum);
-				LOG_INFO_GAME("{:x}", candle_datum);
-				LOG_INFO_GAME("{:x}", candle_fire_datum);
-				LOG_INFO_GAME("{:x}", pump_datum);
-
-				if (!DATUM_IS_NONE(sky_datum))
+				wchar_t* mapName = Memory::GetAddress<wchar_t*>(0x97737C);
+				if (wcscmp(mapName, L"Coagulation") == 0)
 				{
-					std::vector<std::string> stems =
+					lbitm_datum = tag_loader::Get_tag_datum("scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", blam_tag::tag_group_type::bitmap, "carto_shared");
+					sky_datum = tag_loader::Get_tag_datum("scenarios\\skies\\multi\\halo\\coagulation\\coagulation_night", blam_tag::tag_group_type::sky, "carto_shared");
+					candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", blam_tag::tag_group_type::scenery, "carto_shared");
+					candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", blam_tag::tag_group_type::scenery, "carto_shared");
+					pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", blam_tag::tag_group_type::scenery, "carto_shared");
+					large_candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_big_light", blam_tag::tag_group_type::scenery, "carto_shared");
+					tag_loader::Load_tag(pump_datum, true, "carto_shared");
+					tag_loader::Load_tag(candle_datum, true, "carto_shared");
+					tag_loader::Load_tag(lbitm_datum, true, "carto_shared");
+					tag_loader::Load_tag(sky_datum, true, "carto_shared");
+					tag_loader::Load_tag(large_candle_datum, true, "carto_shared");
+					tag_loader::Push_Back();
+				}
+				if (wcscmp(mapName, L"Lockout") == 0)
+				{
+					candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", blam_tag::tag_group_type::scenery, "carto_shared");
+					candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", blam_tag::tag_group_type::scenery, "carto_shared");
+					pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", blam_tag::tag_group_type::scenery, "carto_shared");
+					tag_loader::Load_tag(pump_datum, true, "carto_shared");
+					tag_loader::Load_tag(candle_datum, true, "carto_shared");
+					tag_loader::Push_Back();
+				}
+
+				auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
+				auto sbps = tags::get_tag_fast< s_scenario_structure_bsp_group_definition>(scen->structure_bsps[0]->structure_bsp.TagIndex);
+				if (wcscmp(mapName, L"Coagulation") == 0)
+				{
+					candle_datum = tag_loader::ResolveNewDatum(candle_datum);
+					candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
+					pump_datum = tag_loader::ResolveNewDatum(pump_datum);
+					large_candle_datum = tag_loader::ResolveNewDatum(large_candle_datum);
+					LOG_INFO_GAME("{:x}", candle_datum);
+					LOG_INFO_GAME("{:x}", candle_fire_datum);
+					LOG_INFO_GAME("{:x}", pump_datum);
+					LOG_INFO_GAME("{:x}", large_candle_datum);
+
+					if (!DATUM_IS_NONE(sky_datum))
 					{
-						"shaders\\shader_templates\\transparent\\sky_one_alpha_env",
-						"shaders\\shader_templates\\transparent\\sky_two_alpha_clouds",
-						"shaders\\shader_templates\\transparent\\sky_one_add_illum_detail"
-					};
-					std::vector<datum> astem;
-					std::vector<datum> cstem;
-					for (auto& stem : stems)
-					{
-						cstem.push_back(tags::find_tag(blam_tag::tag_group_type::shadertemplate, stem));
-						astem.push_back(tag_loader::ResolveNewDatum(tag_loader::Get_tag_datum(stem, blam_tag::tag_group_type::shadertemplate, "carto_shared")));
-					}
-					auto sky = tags::get_tag<blam_tag::tag_group_type::sky, char*>(tag_loader::ResolveNewDatum(sky_datum), true);
-					auto render_model_ref = reinterpret_cast<tag_reference*>(sky);
-					auto render_model = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(render_model_ref->TagIndex, true);
-					for (const auto & material : render_model->materials)
-					{
-						if (material.shader.TagIndex != -1 && material.shader.TagIndex != 0) {
-							auto shader = tags::get_tag<blam_tag::tag_group_type::shader, byte>(material.shader.TagIndex, true);
-							if (shader != nullptr)
-							{
-								for (auto i = 0; i < 3; i++) {
-									tag_reference* shader_template = reinterpret_cast<tag_reference*>(shader);
-									if (shader_template->TagIndex == astem[i])
-									{
-										shader_template->TagIndex = cstem[i];
-										auto* shader_post = reinterpret_cast<tags::tag_data_block*>(shader + 0x20);
-										LOG_INFO_GAME("{} {:x}", shader_post->block_count, shader_post->block_data_offset);
-										if (shader_post->block_count > 0)
+						std::vector<std::string> stems =
+						{
+							"shaders\\shader_templates\\transparent\\sky_one_alpha_env",
+							"shaders\\shader_templates\\transparent\\sky_two_alpha_clouds",
+							"shaders\\shader_templates\\transparent\\sky_one_add_illum_detail"
+						};
+						std::vector<datum> astem;
+						std::vector<datum> cstem;
+						for (auto& stem : stems)
+						{
+							cstem.push_back(tags::find_tag(blam_tag::tag_group_type::shadertemplate, stem));
+							astem.push_back(tag_loader::ResolveNewDatum(tag_loader::Get_tag_datum(stem, blam_tag::tag_group_type::shadertemplate, "carto_shared")));
+						}
+						auto sky = tags::get_tag<blam_tag::tag_group_type::sky, char*>(tag_loader::ResolveNewDatum(sky_datum), true);
+						auto render_model_ref = reinterpret_cast<tag_reference*>(sky);
+						auto render_model = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(render_model_ref->TagIndex, true);
+						for (const auto& material : render_model->materials)
+						{
+							if (material.shader.TagIndex != -1 && material.shader.TagIndex != 0) {
+								auto shader = tags::get_tag<blam_tag::tag_group_type::shader, byte>(material.shader.TagIndex, true);
+								if (shader != nullptr)
+								{
+									for (auto i = 0; i < 3; i++) {
+										tag_reference* shader_template = reinterpret_cast<tag_reference*>(shader);
+										if (shader_template->TagIndex == astem[i])
 										{
-											auto shader_post_data = tags::get_tag_data() + shader_post->block_data_offset;
-											auto shader_post_template = reinterpret_cast<tag_reference*>(shader_post_data);
-											shader_post_template->TagIndex = cstem[i];
+											shader_template->TagIndex = cstem[i];
+											auto* shader_post = reinterpret_cast<tags::tag_data_block*>(shader + 0x20);
+											LOG_INFO_GAME("{} {:x}", shader_post->block_count, shader_post->block_data_offset);
+											if (shader_post->block_count > 0)
+											{
+												auto shader_post_data = tags::get_tag_data() + shader_post->block_data_offset;
+												auto shader_post_template = reinterpret_cast<tag_reference*>(shader_post_data);
+												shader_post_template->TagIndex = cstem[i];
+											}
 										}
 									}
 								}
 							}
 						}
+						scen->skies[0]->sky.TagIndex = tag_loader::ResolveNewDatum(sky_datum);
 					}
-					scen->skies[0]->sky.TagIndex = tag_loader::ResolveNewDatum(sky_datum);
-				}
-				auto ltmp_datum = tags::find_tag(blam_tag::tag_group_type::scenariostructurelightmap, "scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
-				if (!DATUM_IS_NONE(ltmp_datum)) {
-					auto ltmp = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
-					ltmp->lightmap_groups[0]->bitmap_group.TagIndex = tag_loader::ResolveNewDatum(lbitm_datum);
-				}
-				sbps->decorators_block.size = 0;
-				sbps->decorators_block.data = 0;
+					auto ltmp_datum = tags::find_tag(blam_tag::tag_group_type::scenariostructurelightmap, "scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
+					if (!DATUM_IS_NONE(ltmp_datum)) {
+						auto ltmp = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
+						ltmp->lightmap_groups[0]->bitmap_group.TagIndex = tag_loader::ResolveNewDatum(lbitm_datum);
+					}
+					sbps->decorators_block.size = 0;
+					sbps->decorators_block.data = 0;
 
-				EventHandler::register_callback<EventHandler::GameStateEvent>(fuck, execute_after, false, true);
+					EventHandler::register_callback<EventHandler::GameStateEvent>(halloween_game_state, execute_after, false, true);
+				}
+				if (wcscmp(mapName, L"Lockout") == 0)
+				{
+					candle_datum = tag_loader::ResolveNewDatum(candle_datum);
+					candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
+					pump_datum = tag_loader::ResolveNewDatum(pump_datum);
+					LOG_INFO_GAME("{:x}", candle_datum);
+					LOG_INFO_GAME("{:x}", candle_fire_datum);
+					LOG_INFO_GAME("{:x}", pump_datum);
+					EventHandler::register_callback<EventHandler::GameStateEvent>(halloween_game_state, execute_after, false, true);
+				}
 			}
-			if(wcscmp(mapName, L"Lockout") == 0)
+			else
 			{
-				candle_datum = tag_loader::ResolveNewDatum(candle_datum);
-				candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
-				pump_datum = tag_loader::ResolveNewDatum(pump_datum);
-				LOG_INFO_GAME("{:x}", candle_datum);
-				LOG_INFO_GAME("{:x}", candle_fire_datum);
-				LOG_INFO_GAME("{:x}", pump_datum);
-				EventHandler::register_callback<EventHandler::GameStateEvent>(fuck, execute_after, false, true);
+				if (NetworkSession::getCurrentNetworkSession()->local_peer_index != NetworkSession::getCurrentNetworkSession()->session_host_peer_index)
+				{
+					*Memory::GetAddress<int*>(0x46DCF1) = 1;
+					imgui_handler::iMessageBox::SetMessage("Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\nBy going to Cartographer > Update.\r\n\r\nIf that doesn't work reach out to us in #help on discord.");
+					imgui_handler::ToggleWindow("messagebox");
+				}
 			}
 		}
 	}

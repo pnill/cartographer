@@ -9,6 +9,7 @@
 #include "Blam\Engine\Players\Players.h"
 #include "H2MOD.h"
 #include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "H2MOD\Tags\TagInterface.h"
@@ -126,6 +127,12 @@ namespace player_representation
 				a2->profile.player_character_type = Player::Biped::Spartan;
 			if (a2->profile.player_character_type == Player::Biped::Dervish)
 				a2->profile.player_character_type = Player::Biped::Elite;
+
+			if(SpecialEvents::getCurrentEvent() != SpecialEvents::e_halloween)
+			{
+				if (a2->profile.player_character_type == Player::Biped::Skeleton)
+					a2->profile.player_character_type = Player::Biped::Spartan;
+			}
 
 			if ((byte)a2->profile.player_character_type > representation_count)
 				a2->profile.player_character_type = Player::Biped::Spartan;

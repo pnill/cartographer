@@ -41,7 +41,7 @@ namespace EngineCalls
 	int get_game_mode_engine()
 	{
 		typedef int(t_get_game_mode_engine)();
-		auto p_get_game_mode_engine = Memory::GetAddress < t_get_game_mode_engine*>(0x5b15e);
+		auto p_get_game_mode_engine = Memory::GetAddress < t_get_game_mode_engine*>(0x5b15e, 0x3CDBE);
 		return p_get_game_mode_engine();
 	}
 
