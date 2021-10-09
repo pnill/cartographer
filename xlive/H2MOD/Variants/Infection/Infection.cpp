@@ -3,6 +3,7 @@
 #include "Blam\Cache\TagGroups\scenario_definition.hpp"
 #include "Blam\Cache\TagGroups\vehicle_collection_definition.hpp"
 #include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\Networking\Networking.h"
@@ -225,7 +226,10 @@ void Infection::preSpawnServerSetup() {
 			}
 		}
 		else {
-			Player::setUnitBipedType(currentPlayerIndex, Player::Biped::Spartan);
+			if(SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && H2Config_spooky_boy)
+				Player::setUnitBipedType(currentPlayerIndex, Player::Biped::Skeleton);
+			else
+				Player::setUnitBipedType(currentPlayerIndex, Player::Biped::Spartan);
 			humanCount++;
 		}
 		playerCount++;
@@ -237,7 +241,10 @@ void Infection::preSpawnServerSetup() {
 }
 
 void Infection::setPlayerAsHuman(int playerIndex) {
-	Player::setUnitBipedType(playerIndex, Player::Biped::Spartan);
+	if (SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && H2Config_spooky_boy)
+		Player::setUnitBipedType(playerIndex, Player::Biped::Skeleton);
+	else
+		Player::setUnitBipedType(playerIndex, Player::Biped::Spartan);
 	Player::setBipedSpeed(playerIndex, 1.0f);
 }
 

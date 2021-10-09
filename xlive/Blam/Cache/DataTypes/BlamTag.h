@@ -127,7 +127,7 @@ struct blam_tag
 		soundcachefilegestalt = 'ugh!',
 		cachefilesound = '$#!+',
 		mousecursordefinition = 'mcsr',
-		uldg = 'udlg'
+		udlg = 'udlg'
 	};
 
 	blam_tag()

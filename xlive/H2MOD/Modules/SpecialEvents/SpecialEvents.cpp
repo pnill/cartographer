@@ -568,7 +568,7 @@ namespace SpecialEvents
 
 	void HalloweenOnMapLoad()
 	{
-		if(h2mod->GetEngineType() == Multiplayer)
+		if (h2mod->GetEngineType() == Multiplayer)
 		{
 			if (tag_loader::Map_exists("carto_shared"))
 			{
