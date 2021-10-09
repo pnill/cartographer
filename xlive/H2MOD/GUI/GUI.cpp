@@ -105,7 +105,7 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 
 	LOG_TRACE_XLIVE("XLiveInitializeEx()");
 
-	if (!Memory::isDedicatedServer())
+	if (pXii->pD3D)
 	{
 		//LOG_TRACE_XLIVE("XLiveInitialize  (pPii = %X)", pPii);
 		pDevice = (LPDIRECT3DDEVICE9)pXii->pD3D;
@@ -119,7 +119,7 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 		auto d3dpp = (D3DPRESENT_PARAMETERS*)pXii->pD3DPP;
 		GUI::Initialize(d3dpp->hDeviceWindow);
 	}
-	LOG_TRACE_XLIVE("XLiveInitializeEx - dwVersion = {0:x}", dwVersion);
+	LOG_TRACE_XLIVE("XLiveInitializeEx() - dwVersion = {0:x}", dwVersion);
 	return 0;
 }
 
@@ -493,7 +493,7 @@ int WINAPI XLiveRender()
 
 	if (pDevice)
 	{
-		if (pDevice->TestCooperativeLevel() == D3D_OK)
+		if (!FAILED(pDevice->TestCooperativeLevel()))
 		{
 			D3DVIEWPORT9 pViewport;
 			pDevice->GetViewport(&pViewport);
