@@ -37,12 +37,15 @@ namespace playlist_loader
 	};
 	e_custom_setting get_custom_setting_index(wchar_t* Name)
 	{
-		for (const auto &custom_setting : custom_settings)
+		for (const auto& custom_setting : custom_settings)
 			if (_wcsicmp(custom_setting.first.c_str(), Name) == 0)
 				return custom_setting.second;
 		return none;
 	}
-	void playlist_invalid_item_hook(playlist_entry* playlist_entry, int a2, int a3, int a4, wchar_t *a5, wchar_t *a6, wchar_t *a7)
+	typedef void(__thiscall* playlist_loader_invalid_entry)(playlist_entry* thisx, int a2, int a3, int a4, wchar_t* a5, wchar_t* a6, wchar_t* a7);
+	playlist_loader_invalid_entry p_playlist_loader_invalid_entry;
+
+	void playlist_invalid_item_hook(playlist_entry* playlist_entry, int a2, int a3, int a4, wchar_t* a5, wchar_t* a6, wchar_t* a7)
 	{
 		__asm
 		{
@@ -66,6 +69,14 @@ namespace playlist_loader
 			return true;
 		if (_wcsicmp(value, L"off") == 0 || _wcsicmp(value, L"false") == 0)
 			return false;
+		/*p_playlist_loader_invalid_entry(
+			playlist_entry,
+			0,
+			4,
+			playlist_entry->reader_current_line,
+			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
+			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
+			&empty_char);*/
 		playlist_invalid_item_hook(
 			playlist_entry,
 			0,
@@ -95,8 +106,8 @@ namespace playlist_loader
 	template <typename T = void*>
 	T custom_settings_enum_check(playlist_entry* playlist_entry, wchar_t* value, const wchar_t** values, int values_size)
 	{
-		for(auto i = 0; i < values_size; i++)
-			if (_wcsicmp(value, values[i]) == 0) 
+		for (auto i = 0; i < values_size; i++)
+			if (_wcsicmp(value, values[i]) == 0)
 				return static_cast<T>(i);
 
 		playlist_invalid_item_hook(
@@ -113,7 +124,7 @@ namespace playlist_loader
 	template <typename T>
 	T custom_settings_integer_check(playlist_entry* playlist_entry, wchar_t* value)
 	{
-		if(isInteger(value))
+		if (isInteger(value))
 			return static_cast<T>(std::stol(value));
 
 		playlist_invalid_item_hook(
@@ -251,12 +262,12 @@ namespace playlist_loader
 	{
 		switch (playlist_entry->current_section_type)
 		{
-			case Playlist: 
-				return false;
-			case Variant: 
-				return process_custom_settting_variant(playlist_entry);
-			case Match:
-				return false;
+		case Playlist:
+			return false;
+		case Variant:
+			return process_custom_settting_variant(playlist_entry);
+		case Match:
+			return false;
 		}
 		return false;
 	}
@@ -285,13 +296,14 @@ namespace playlist_loader
 	}
 	void reset_custom_settings(ServerConsole::ServerConsoleCommands command)
 	{
-		if(command == ServerConsole::play)
+		if (command == ServerConsole::play)
 			CustomVariantSettingsMap.clear();
 	}
 
 	void apply_hooks()
 	{
 		p_playlist_process_setting = (h_playlist_processs_setting)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x10FBE), (BYTE*)process_setting, 5);
+		p_playlist_loader_invalid_entry = Memory::GetAddress<playlist_loader_invalid_entry>(0, 0xED2E);
 	}
 
 	void initialize()

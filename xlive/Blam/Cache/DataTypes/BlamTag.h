@@ -304,7 +304,7 @@ struct blam_tag
 			case tag_group_type::soundcachefilegestalt: 
 			case tag_group_type::cachefilesound: 
 			case tag_group_type::mousecursordefinition:
-			case tag_group_type::uldg:
+			case tag_group_type::udlg:
 				return true;
 		}
 		return false;
