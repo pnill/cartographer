@@ -82,14 +82,14 @@ union real_vector3d
 		return angle;
 	}
 
-	bool operator=(const real_vector3d& other) const
+	bool operator==(const real_vector3d& other) const
 	{
 		return i == other.i && j == other.j && k == other.k;
 	}
 
 	bool operator!=(const real_vector3d& other ) const
 	{
-		return !operator=(other);
+		return !operator==(other);
 	}
 
 	// vector multiplication

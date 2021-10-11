@@ -522,9 +522,7 @@ namespace SpecialEvents
 						placement.variant_name = 0;
 						break;
 					}
-					placement.position.x = std::get<2>(scen_place).i;
-					placement.position.y = std::get<2>(scen_place).j;
-					placement.position.z = std::get<2>(scen_place).k;
+					placement.position = std::get<2>(scen_place);
 
 					set_orientation(&placement.orientation, &placement.up, &std::get<3>(scen_place));
 					placement.scale = std::get<4>(scen_place);
@@ -547,9 +545,7 @@ namespace SpecialEvents
 						placement.variant_name = 0;
 						break;
 					}
-					placement.position.x = std::get<2>(scen_place).i;
-					placement.position.y = std::get<2>(scen_place).j;
-					placement.position.z = std::get<2>(scen_place).k;
+					placement.position = std::get<2>(scen_place);
 
 					set_orientation(&placement.orientation, &placement.up, &std::get<3>(scen_place));
 					placement.scale = std::get<4>(scen_place);
