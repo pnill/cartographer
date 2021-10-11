@@ -42,26 +42,8 @@ namespace playlist_loader
 				return custom_setting.second;
 		return none;
 	}
-	typedef void(__thiscall* playlist_loader_invalid_entry)(playlist_entry* thisx, int a2, int a3, int a4, wchar_t* a5, wchar_t* a6, wchar_t* a7);
+	typedef void(__thiscall* playlist_loader_invalid_entry)(playlist_entry* thisx, int a2, int a3, wchar_t* a5, wchar_t* a6, wchar_t* a7);
 	playlist_loader_invalid_entry p_playlist_loader_invalid_entry;
-
-	void playlist_invalid_item_hook(playlist_entry* playlist_entry, int a2, int a3, int a4, wchar_t* a5, wchar_t* a6, wchar_t* a7)
-	{
-		__asm
-		{
-			push a7
-			push a6
-			push a5
-			push a4
-			push a3
-			mov ebx, a2
-			mov ecx, playlist_entry
-			mov eax, [0xED2E]
-			add eax, [H2BaseAddr]
-			call eax
-			add esp, 20
-		}
-	}
 
 	bool custom_setting_boolean_check(playlist_entry* playlist_entry, wchar_t* value)
 	{
@@ -69,22 +51,14 @@ namespace playlist_loader
 			return true;
 		if (_wcsicmp(value, L"off") == 0 || _wcsicmp(value, L"false") == 0)
 			return false;
-		/*p_playlist_loader_invalid_entry(
+		p_playlist_loader_invalid_entry(
 			playlist_entry,
-			0,
-			4,
-			playlist_entry->reader_current_line,
-			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
-			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
-			&empty_char);*/
-		playlist_invalid_item_hook(
-			playlist_entry,
-			0,
 			4,
 			playlist_entry->reader_current_line,
 			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
 			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
 			&empty_char);
+
 		return false;
 	}
 	double custom_settings_real_check(playlist_entry* playlist_entry, wchar_t* value)
@@ -92,9 +66,8 @@ namespace playlist_loader
 		if (isFloat(value))
 			return std::stod(value);
 
-		playlist_invalid_item_hook(
+		p_playlist_loader_invalid_entry(
 			playlist_entry,
-			0,
 			4,
 			playlist_entry->reader_current_line,
 			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
@@ -110,9 +83,8 @@ namespace playlist_loader
 			if (_wcsicmp(value, values[i]) == 0)
 				return static_cast<T>(i);
 
-		playlist_invalid_item_hook(
+		p_playlist_loader_invalid_entry(
 			playlist_entry,
-			0,
 			4,
 			playlist_entry->reader_current_line,
 			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
@@ -127,9 +99,8 @@ namespace playlist_loader
 		if (isInteger(value))
 			return static_cast<T>(std::stol(value));
 
-		playlist_invalid_item_hook(
+		p_playlist_loader_invalid_entry(
 			playlist_entry,
-			0,
 			4,
 			playlist_entry->reader_current_line,
 			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
@@ -243,9 +214,8 @@ namespace playlist_loader
 					break;
 				case none:
 				default:
-					playlist_invalid_item_hook(
+					p_playlist_loader_invalid_entry(
 						playlist_entry,
-						0,
 						4,
 						playlist_entry->reader_current_line,
 						&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
