@@ -198,9 +198,8 @@ namespace playlist_loader
 						}
 						else
 						{
-							playlist_invalid_item_hook(
+							p_playlist_loader_invalid_entry(
 								playlist_entry,
-								0,
 								4,
 								playlist_entry->reader_current_line,
 								&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
