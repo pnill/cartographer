@@ -24,14 +24,14 @@ struct angle
 		rad(_rad)
 	{}
 
-	bool operator=(const angle& other) const
+	bool operator==(const angle& other) const
 	{
 		return other.rad == rad;
 	}
 
 	bool operator!=(const angle& other) const
 	{
-		return !operator=(other);
+		return !operator==(other);
 	}
 
 
