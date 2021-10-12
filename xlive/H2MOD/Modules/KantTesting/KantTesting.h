@@ -1,5 +1,5 @@
 #pragma once
-#define ENABLEKANTTEST 1
+#define ENABLEKANTTEST 0
 namespace KantTesting
 {
 	void Initialize();
