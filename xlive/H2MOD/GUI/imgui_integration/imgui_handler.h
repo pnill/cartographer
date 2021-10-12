@@ -1,6 +1,5 @@
 #pragma once
 #include "imgui.h"
-#include <D3dx9tex.h>
 
 namespace imgui_handler
 {
