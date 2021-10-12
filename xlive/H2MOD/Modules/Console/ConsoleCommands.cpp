@@ -10,7 +10,7 @@
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
-#include "stdafx.h"
+
 #include "Util\ClipboardAPI.h"
 // for XNet connection logging
 #include "XLive\xnet\IpManagement\XnIp.h"

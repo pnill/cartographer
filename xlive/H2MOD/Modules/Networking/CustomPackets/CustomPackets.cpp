@@ -4,7 +4,7 @@
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
-#include "stdafx.h"
+
 #include "Util\Hooks\Hook.h"
 
 char g_network_message_types[e_network_message_types::end * 32];

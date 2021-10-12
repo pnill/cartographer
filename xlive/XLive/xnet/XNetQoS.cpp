@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include <MSWSock.h>
 #include <WS2tcpip.h>
 #include "xnet.h"

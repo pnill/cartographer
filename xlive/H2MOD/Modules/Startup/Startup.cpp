@@ -6,7 +6,7 @@
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\Utils\Utils.h"
-#include "stdafx.h"
+
 #include "Util\Debug\Debug.h"
 #include "Util\filesys.h"
 #include "Util\hash.h"
