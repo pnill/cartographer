@@ -97,7 +97,6 @@ namespace SpecialEvents
 		if (CheckIfEventTime(L"10-20") || CheckIfEventTime(L"10-27"))
 			return e_halloween;
 
-		return e_halloween;
 		return e_none;
 	}
 
