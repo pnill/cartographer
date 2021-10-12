@@ -11,7 +11,7 @@
 struct s_projectile_group_definition :TagGroup<'proj'>
 {
 	s_object_group_definition objectTag;
-	enum class e_flags : __int32
+	enum class e_projectile_flags : __int32
 	{
 		oriented_along_velocity = FLAG(0),
 		ai_must_use_ballistic_aiming = FLAG(1),
@@ -25,7 +25,7 @@ struct s_projectile_group_definition :TagGroup<'proj'>
 		robotron_steering = FLAG(9),
 		faster_when_owned_by_player = FLAG(10),
 	};
-	e_flags flags;//0xBC
+	e_projectile_flags flags;//0xBC
 	enum class e_detonation_timer_starts : __int16
 	{
 		immediately = 0,
@@ -138,12 +138,12 @@ struct s_projectile_group_definition :TagGroup<'proj'>
 	float targeted_leading_fraction;//0x198
 	struct s_material_responses_block
 	{
-		enum class e_flags : __int16
+		enum class e_material_response_flags : __int16
 		{
 			cannot_be_overpenetrated = FLAG(0),
 		};
-		e_flags flags;//0x0
-		enum class e_response : __int16
+		e_material_response_flags flags;//0x0
+		enum class e_material_response : __int16
 		{
 			impact_detonate = 0,
 			fizzle = 1,
@@ -153,12 +153,12 @@ struct s_projectile_group_definition :TagGroup<'proj'>
 			bounce_dud = 5,
 			fizzle_ricochet = 6,
 		};
-		e_response response;//0x2
+		e_material_response response;//0x2
 		tag_reference do_not_use_old_effect;//0x4
 		string_id material_name;//0xC
 		PAD(0x4);//0x10
 	
-		e_response potential_result_response;//0x14
+		e_material_response potential_result_response;//0x14
 		enum class e_potential_result_flags : __int16
 		{
 			only_against_units = FLAG(0),

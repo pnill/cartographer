@@ -1,10 +1,8 @@
-
 #include "ServerConsole.h"
-
-#include "Util/Hooks/Hook.h"
-#include "H2MOD/Modules/Console/ConsoleCommands.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.h"
-#include "H2MOD/Modules/Utils/Utils.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\Utils\Utils.h"
+#include "Util\Hooks\Hook.h"
 
 typedef void*(__cdecl *dedi_command_hook)(wchar_t** a1, int a2, char a3);
 dedi_command_hook p_dedi_command_hook;
@@ -31,7 +29,7 @@ void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, ch
 	std::transform(LowerCommand.begin(), LowerCommand.end(), LowerCommand.begin(),[](unsigned char c) { return std::tolower(c); });
 
 	//Execute any events that may be linked to that command.
-	EventHandler::executeServerCommandCallback(ServerConsole::s_commandsMap[LowerCommand]);
+	//EventHandler::executeServerCommandCallback(ServerConsole::s_commandsMap[LowerCommand]);
 
 	//Commented out because it's unused but the functionality of it remains, incase it is ever needed in the future for modifying the behaviour of the commands.
 	/*switch(ServerConsole::s_commandsMap[LowerCommand])
@@ -56,8 +54,21 @@ void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, ch
 		case ServerConsole::vip: break;
 		default: ;
 	}*/
-	
-	return p_dedi_command_hook(command_line_args, split_strings, a3);
+	EventHandler::execute_callback<EventHandler::ServerCommandEvent>(execute_before, ServerConsole::s_commandsMap[LowerCommand]);
+	auto res = p_dedi_command_hook(command_line_args, split_strings, a3);
+	EventHandler::execute_callback<EventHandler::ServerCommandEvent>(execute_after, ServerConsole::s_commandsMap[LowerCommand]);
+	return res;
+}
+
+typedef bool(__cdecl t_kablam_command_play)(wchar_t* playlist_file_path, int a2);
+t_kablam_command_play* p_kablam_command_play;
+bool __cdecl kablam_command_play(wchar_t* playlist_file_path, int a2)
+{
+	LOG_INFO_GAME("[{}]: {}", __FUNCTION__, "");
+	EventHandler::execute_callback<EventHandler::ServerCommandEvent>(execute_before, ServerConsole::play);
+	auto res = p_kablam_command_play(playlist_file_path, a2);
+	EventHandler::execute_callback<EventHandler::ServerCommandEvent>(execute_after, ServerConsole::play);
+	return res;
 }
 
 void ServerConsole::ApplyHooks()
@@ -84,6 +95,9 @@ void ServerConsole::ApplyHooks()
 	p_dedi_command_hook = (dedi_command_hook)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)dediCommandHook, 7);
 	kablam_vip_add = Memory::GetAddress<p_kablam_vip_add*>(0, 0x1D932);
 	kablam_vip_clear = Memory::GetAddress<p_kablam_vip_clear*>(0, 0x1DB16);
+
+	p_kablam_command_play = Memory::GetAddress<t_kablam_command_play*>(0, 0xE7FA);
+	PatchCall(Memory::GetAddress(0, 0x724B), kablam_command_play);
 }
 
 void ServerConsole::logToDedicatedServerConsole(const wchar_t* string, ...) {

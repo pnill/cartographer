@@ -1,17 +1,17 @@
-#include "3rdparty/imgui/imgui.h"
-
-#include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/Modules/HudElements/HudElements.h"
-#include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
-#include "Util/Hooks/Hook.h"
-#include "H2MOD/Modules/Input/Mouseinput.h"
+#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
+#include "H2MOD\Modules\GamePhysics\Patches\MeleeFix.h"
+#include "H2MOD\Modules\HudElements\HudElements.h"
+#include "H2MOD\Modules\Input\Mouseinput.h"
+#include "H2MOD\Modules\Input\PlayerControl.h"
+#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
+#include "H2MOD\Modules\RenderHooks\RenderHooks.h"
+#include "H2MOD\Modules\RunLoop\RunLoop.h"
+#include "imgui.h"
 #include "imgui_handler.h"
-#include "H2MOD/Modules/RunLoop/RunLoop.h"
-#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
-#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
-#include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
-#include "H2MOD/Modules/Networking/CustomPackets/CustomPackets.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "Util\Hooks\Hook.h"
 
 namespace imgui_handler {
 	namespace AdvancedSettings {
@@ -833,6 +833,16 @@ namespace imgui_handler {
 					ImGui::Checkbox("##no_events", &H2Config_no_events);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(no_events_tooltip));
+
+					if (SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween) {
+						TextVerticalPad(GetString(skeleton_biped), 8.5);
+						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+						ImGui::Checkbox("##spooky_scary", &H2Config_spooky_boy);
+						if (ImGui::IsItemHovered())
+							ImGui::SetTooltip(GetString(skeleton_biped_tooltip));
+					}
+
+
 					ImGui::Columns(1);
 
 					ImGui::Text(GetString(language));
@@ -939,8 +949,8 @@ namespace imgui_handler {
 							while(playerIt.get_next_active_player())
 							{
 								auto player = playerIt.get_current_player_data();
-								int object = *(int*)&Objects->datum[12 * player->controlled_unit_index.Index + 8];
-								LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->controlled_unit_index.ToInt(), std::hex), IntToWString<int>(object, std::hex));
+								int object = *(int*)&Objects->datum[12 * player->unit_index.Index + 8];
+								LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->unit_index.ToInt(), std::hex), IntToWString<int>(object, std::hex));
 							}
 						}
 					}
@@ -1022,13 +1032,13 @@ namespace imgui_handler {
 				}
 			}
 			ImGuiToggleInput(true);
-			PlayerControl::GetControls(0)->DisableCamera = true;
+			PlayerControl::DisableLocalCamera(true);
 		}
 		void Close()
 		{
 			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);
 			ImGuiToggleInput(false);
-			PlayerControl::GetControls(0)->DisableCamera = false;
+			PlayerControl::DisableLocalCamera(false);
 			SaveH2Config();
 		}
 		void BuildStringsTable()
@@ -1184,6 +1194,8 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::no_events_title] = "No Events";
 			string_table[0][e_advanced_string::no_events_tooltip] = "Opt out of event cosmetics restart required to take effect";
 			string_table[0][e_advanced_string::render_patch] = "Original FPS limiter";
+			string_table[0][e_advanced_string::skeleton_biped] = "Play as Spooky boy";
+			string_table[0][e_advanced_string::skeleton_biped_tooltip] = "Changes your biped to be a Spooky Scary Skeleton for the Halloween event";
 
 			//Spanish.
 			string_table[4][e_advanced_string::title] = u8"      Ajustes avanzados";
@@ -1306,6 +1318,8 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::no_events_title] = u8"No hay eventos";
 			string_table[4][e_advanced_string::no_events_tooltip] = u8"Se requiere el reinicio de los cosméticos del evento para que surta efecto";
 			string_table[4][e_advanced_string::render_patch] = u8"Limitador de velocidad de FPS original";
+			string_table[4][e_advanced_string::skeleton_biped] = u8"Juega como Spooky boy";
+			string_table[4][e_advanced_string::skeleton_biped_tooltip] = u8"Cambia a tu bípedo para que sea un esqueleto espeluznante y aterrador para el evento de Halloween.";
 		}
 	}
 }

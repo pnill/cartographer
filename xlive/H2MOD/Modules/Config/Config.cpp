@@ -1,10 +1,7 @@
-
 #include "Config.h"
-
-#include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
-
+#include "H2MOD\Modules\Utils\Utils.h"
 #include "Util\SimpleIni.h"
 
 static void HandleFileError(int fpErrNo) {//TODO
@@ -116,6 +113,7 @@ ControllerInput::CustomControllerLayout H2Config_CustomLayout;
 bool H2Config_upnp_enable = true;
 bool H2Config_melee_fix = true;
 bool H2Config_no_events = false;
+bool H2Config_spooky_boy = true;
 
 int H2Config_hotkeyIdHelp = VK_F3;
 int H2Config_hotkeyIdToggleDebug = VK_F2;
@@ -525,6 +523,8 @@ void SaveH2Config() {
 			ini.SetValue(H2ConfigVersionSection.c_str(), "controller_layout", H2Config_CustomLayout.ToString().c_str());
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events);
+
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "skeleton_biped", H2Config_spooky_boy);
 		}
 
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay);
@@ -841,6 +841,7 @@ void ReadH2Config() {
 				H2Config_CustomLayout.FromString(std::string(ini.GetValue(H2ConfigVersionSection.c_str(), "controller_layout", "1-2-4-8-16-32-64-128-256-512-4096-8192-16384-32768")));
 				
 				H2Config_no_events = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events);
+				H2Config_spooky_boy = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "skeleton_biped", H2Config_spooky_boy);
 			}
 
 			// dedicated server only

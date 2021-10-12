@@ -98,14 +98,14 @@ struct s_object_group_definition :TagGroup<'obje'>
 	tag_block<s_ai_properties_block> ai_properties;//0x5C
 	struct s_functions_block
 	{
-		enum class e_flags : __int32
+		enum class e_object_functions_flags : __int32
 		{
 			invert = FLAG(0),
 			mapping_does_not_controls_active = FLAG(1),
 			always_active = FLAG(2),
 			random_time_offset = FLAG(3),
 		};
-		e_flags flags;//0x0
+		e_object_functions_flags flags;//0x0
 		string_id import_name;//0x4
 		string_id export_name;//0x8
 		string_id turn_off_with;//0xC
@@ -132,7 +132,7 @@ struct s_object_group_definition :TagGroup<'obje'>
 	{
 		tag_reference type;//0x0
 		string_id marker_old_string_id;//0x8
-		enum class e_change_color : __int16
+		enum class e_attachments_change_color : __int16
 		{
 			none = 0,
 			primary = 1,
@@ -140,7 +140,7 @@ struct s_object_group_definition :TagGroup<'obje'>
 			tertiary = 3,
 			quaternary = 4,
 		};
-		e_change_color change_color;//0xC
+		e_attachments_change_color change_color;//0xC
 		PAD(0x2);//0xE
 		string_id primary_scale;//0x10
 		string_id secondary_scale;//0x14
@@ -162,37 +162,37 @@ struct s_object_group_definition :TagGroup<'obje'>
 	tag_block<s_old_functions_block> old_functions;//0xA4
 	struct s_change_colors_block
 	{
-		struct s_initial_permutations_block
+		struct s_change_colors_block_initial_permutations_block
 		{
 			float weight;//0x0
 			real_color_rgb color_lower_bound;//0x4
 			real_color_rgb color_upper_bound;//0x10
 			string_id variant_name;//0x1C
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_initial_permutations_block, 0x20);
-		tag_block<s_initial_permutations_block> initial_permutations;//0x0
-		struct s_functions_block
+		TAG_BLOCK_SIZE_ASSERT(s_change_colors_block_initial_permutations_block, 0x20);
+		tag_block<s_change_colors_block_initial_permutations_block> initial_permutations;//0x0
+		struct s_change_colors_functions_block
 		{
 			PAD(0x4);//0x0
-			enum class e_scale_flags : __int32
+			enum class e_colors_function_scale_flags : __int32
 			{
 				blend_in_hsv = FLAG(0),
 				more_colors = FLAG(1),
 			};
-			e_scale_flags scale_flags;//0x4
+			e_colors_function_scale_flags scale_flags;//0x4
 			real_color_rgb color_lower_bound;//0x8
 			real_color_rgb color_upper_bound;//0x14
 			string_id darken_by;//0x20
 			string_id scale_by;//0x24
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_functions_block, 0x28);
-		tag_block<s_functions_block> functions;//0x8
+		TAG_BLOCK_SIZE_ASSERT(s_change_colors_functions_block, 0x28);
+		tag_block<s_change_colors_functions_block> functions;//0x8
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_change_colors_block, 0x10);
 	tag_block<s_change_colors_block> change_colors;//0xAC
 	struct s_predicted_resources_block
 	{
-		enum class e_type : __int16
+		enum class e_predicted_resource_type : __int16
 		{
 			bitmap = 0,
 			sound = 1,
@@ -204,13 +204,14 @@ struct s_object_group_definition :TagGroup<'obje'>
 			lightmap_cluster_bitmaps = 7,
 			lightmap_instance_bitmaps = 8,
 		};
-		e_type type;//0x0
+		e_predicted_resource_type type;//0x0
 		__int16 resource_index;//0x2
 		datum tag_index;//0x4
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_predicted_resources_block, 0x8);
 	tag_block<s_predicted_resources_block> predicted_resources;//0xB4
 };
+
 TAG_GROUP_SIZE_ASSERT(s_object_group_definition, 0xBC);
 #pragma pack(pop)
 

@@ -1,14 +1,14 @@
-#include "imgui_handler.h"
-#include "H2MOD/GUI/GUI.h"
 #include "H2MOD.h"
-#include "H2MOD/Modules/Input/ControllerInput.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
-#include "XLive\xnet\IpManagement\XnIp.h"
+#include "H2MOD\GUI\GUI.h"
+#include "H2MOD\Modules\Input\ControllerInput.h"
+#include "H2MOD\Modules\Input\KeyboardInput.h"
+#include "H2MOD\Modules\Input\Mouseinput.h"
+#include "H2MOD\Modules\Input\PlayerControl.h"
+#include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
-#include "Util/Hooks/Hook.h"
-#include "H2MOD/Modules/Input/Mouseinput.h"
-#include "H2MOD/Modules/Startup/Startup.h"
-#include "H2MOD/Modules/Input/KeyboardInput.h"
+#include "imgui_handler.h"
+#include "Util\Hooks\Hook.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 
 extern int notify_xlive_ui;
 namespace imgui_handler
@@ -209,14 +209,14 @@ namespace imgui_handler
 		{
 			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);
 			ImGuiToggleInput(true);
-			PlayerControl::GetControls(0)->DisableCamera = true;
+			PlayerControl::DisableLocalCamera(true);
 			
 		}
 		void Close()
 		{
 			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);
 			ImGuiToggleInput(false);
-			PlayerControl::GetControls(0)->DisableCamera = false;
+			PlayerControl::DisableLocalCamera(false);
 		}
 	}
 }

@@ -1,19 +1,17 @@
 #pragma once
-
-#include "../VariantSystem.h"
-
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "H2MOD\Variants\VariantSystem.h"
 
 class GunGameHandler : public GameClientServerHandler {
 public:
 	GunGameHandler();
 	void setPlayerIndex(int playerIndex);
-	void setUnitDatumIndex(int unitDatumIndex);
+	void setUnitDatumIndex(datum unitDatumIndex);
 	int getPlayerIndex();
-	int getUnitDatumIndex();
+	datum getUnitDatumIndex();
 private:
 	int playerIndex;
-	int unitDatumIndex;
+	datum unitDatumIndex;
 };
 
 class GunGameInitializer : public GunGameHandler {

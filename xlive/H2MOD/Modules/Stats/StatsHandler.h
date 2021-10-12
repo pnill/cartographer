@@ -1,7 +1,14 @@
 #pragma once
-
-#include "rapidjson/document.h"
-#include "rapidjson/prettywriter.h"
+#include "H2MOD.h"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
+#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
+#include "rapidjson\document.h"
+#include "rapidjson\prettywriter.h"
+#include <rapidjson\document.h>
 
 extern bool Registered;
 class StatsHandler
@@ -38,6 +45,7 @@ public:
 								if (uploadStats(filepath, token) == 200)
 								{
 									remove(filepath);
+									LOG_TRACE_GAME("[H2MOD] Stats uploaded successfully");
 								}
 								else
 								{
@@ -106,4 +114,7 @@ public:
 	static int uploadStats(char* filepath, char* token);
 	static void playerLeftEvent(int peerIndex);
 	static void playerJoinEvent(int peerIndex);
+	static void game_state_change(game_life_cycle state);
+	static void network_player_event(int peerIndex, EventHandler::NetworkPlayerEventType type);
+	static void server_command_event(ServerConsole::ServerConsoleCommands command);
 };

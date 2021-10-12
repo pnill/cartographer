@@ -1,10 +1,10 @@
 #include "HeadHunter.h"
 
 #include "H2MOD/Modules/Utils/Utils.h"
-#include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
-#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/EngineCalls/EngineCalls.h"
 
 #include "H2MOD.h"
 
@@ -48,18 +48,18 @@ void HeadHunter::spawnPlayerClientSetup()
 
 void HeadHunter::SpawnSkull(datum unit_datum)
 {
-	s_biped_object_definition* biped_unit = (s_biped_object_definition*)object_try_and_get_and_verify_type(unit_datum, FLAG(e_object_type::biped));
+	s_biped_data_definition* biped_unit = (s_biped_data_definition*)object_try_and_get_and_verify_type(unit_datum, FLAG(e_object_type::biped));
 
 	if (biped_unit != NULL)
 	{
 		s_object_placement_data nObject;
 
-		Engine::Objects::create_new_placement_data(&nObject, e_weapons_datum_index::ball, -1, 0);
+		EngineCalls::Objects::create_new_placement_data(&nObject, e_weapons_datum_index::ball, -1, 0);
 
-		nObject.placement = biped_unit->placement;
+		nObject.position = biped_unit->position;
 		nObject.translational_velocity = biped_unit->translational_velocity;
 
-		datum new_object_datum = Engine::Objects::call_object_new(&nObject);
+		datum new_object_datum = EngineCalls::Objects::call_object_new(&nObject);
 		if (!DATUM_IS_NONE(new_object_datum))
 			call_add_object_to_sync(new_object_datum);
 	}
@@ -82,7 +82,7 @@ void HeadHunter::PickupSkull(XUID player, datum SkullDatum)
 		if (player_score_data)
 		{
 			datum PlayerDatum = variant_player->GetPlayerDatum(player);
-			pupdate_player_score(player_score_data, DATUM_ABSOLUTE_INDEX(PlayerDatum), 0, 1, -1, 0);
+			pupdate_player_score(player_score_data, DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), 0, 1, -1, 0);
 			HaloScript::ObjectDestroy(SkullDatum);
 			if(TimeElapsedMS(soundBuffer) > 2500)
 			{
@@ -110,9 +110,9 @@ void HeadHunterHandler::SetDeadPlayer(datum dead_datum)
 
 bool HeadHunterHandler::SetInteractedObject(datum object_datum)
 {
-	s_weapon_object_definition* weaponObject = object_get_fast_unsafe<s_weapon_object_definition>(object_datum);
+	s_weapon_data_definition* weaponObject = object_get_fast_unsafe<s_weapon_data_definition>(object_datum);
 
-	if (DATUM_ABSOLUTE_INDEX(weaponObject->tag_definition_index) == DATUM_ABSOLUTE_INDEX(e_weapons_datum_index::ball))
+	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(weaponObject->tag_definition_index) == DATUM_INDEX_TO_ABSOLUTE_INDEX(e_weapons_datum_index::ball))
 	{
 		this->object_interaction = object_datum;
 		return true;

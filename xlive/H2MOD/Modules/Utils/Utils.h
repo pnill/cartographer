@@ -16,6 +16,10 @@ char* custom_label_literal(char* label_escaped);
 ///FREE MEMOERY in returned char*
 char* custom_label_escape(char* label_literal);
 bool FloatIsNaN(float vagueFloat);
+bool isFloat(std::string myString);
+bool isFloat(std::wstring myString);
+bool isInteger(std::string myString);
+bool isInteger(std::wstring myString);
 ///IP is char array size 100
 int HostnameToIp(char* hostname, char* ip);
 
@@ -110,6 +114,7 @@ void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen);
 std::string ByteToHexStr(const BYTE* buffer, size_t size);
 int GetCurrentTimeMS();
 int TimeElapsedMS(int startms);
+bool FileTypeCheck(const std::string& file_path, const std::string& file_type);
 
 class FrequencyLimiter
 {

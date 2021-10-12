@@ -458,7 +458,7 @@ struct s_weapon_group_definition
 		};
 		e_type type;//0x0
 		__int16 resource_index;//0x2
-		__int32 tag_index;//0x4
+		datum tag_index;//0x4
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_predicted_resources_block_1, 0x8);
 	tag_block<s_predicted_resources_block_1> predicted_resources_1;//0x2B8

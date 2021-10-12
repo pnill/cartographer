@@ -1,79 +1,12 @@
 #pragma once
-
-#include "Blam\Common\Common.h"
-
+#include "Blam\Cache\CacheHeader.h"
+#include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 #include "Blam\Cache\DataTypes\BlamTag.h"
+#include "Blam\Common\Common.h"
 
 namespace tags
 {
-	struct cache_header
-	{
-		int magic;
-		int engine_gen;
-		uint32_t file_size;
-		int field_C;
-		int tag_offset;
-		int data_offset;
-		int data_size;
-		int tag_size;
-		int tag_offset_mask;
-		int field_24;
-		BYTE padding[260];
-		char version[32];
-		enum e_scnr_type : int
-		{
-			SinglePlayerScenario = 0,
-			MultiplayerScenario = 1,
-			MainMenuScenario = 2,
-			MultiplayerSharedScenario = 3,
-			SinglePlayerSharedScenario = 4
-		};
-		e_scnr_type type;
-		int crc;
-		int crc_uiid;
-		char field_158;
-		char tracked__maybe;
-		char field_15A;
-		char field_15B;
-		int field_15C;
-		int field_160;
-		int field_164;
-		int field_168;
-		int string_block_offset;
-		int string_table_count;
-		int string_table_size;
-		int string_idx_offset;
-		int string_table_offset;
-		int extern_deps;
-		FILETIME time;
-		FILETIME main_menu_time;
-		FILETIME shared_time;
-		FILETIME campaign_time;
-		char name[32];
-		int field_1C4;
-		char scenario_path[256];
-		int minor_version;
-		uint32_t TagNamesCount;
-		uint32_t TagNamesBufferOffset;
-		uint32_t TagNamesBufferSize;
-		uint32_t TagIndicesToName;
-		int LanguagePacksOffset;
-		int LanguagePacksSize;
-		int SecondarySoundGestaltDatumIndex;
-		int FastLoadGeometryBlockOffset;
-		int FastLoadGeometryBlockSize;
-		int Checksum;
-		int MoppCodesChecksum;
-		BYTE field_2F8[1284];
-		int foot;
-
-		bool is_main_menu()			   const { return type == e_scnr_type::MainMenuScenario; };
-		bool is_multiplayer()		   const { return type == e_scnr_type::MultiplayerScenario; };
-		bool is_multi_player_shared()  const { return type == e_scnr_type::MultiplayerSharedScenario; };
-		bool is_single_player()		   const { return type == e_scnr_type::SinglePlayerScenario; };
-		bool is_single_player_shared() const { return type == e_scnr_type::SinglePlayerSharedScenario; };
-	};
-	static_assert(sizeof(cache_header) == 0x800, "Bad cache header size");
+	
 
 	struct tag_instance
 	{
@@ -128,7 +61,7 @@ namespace tags
 	char* get_matg_globals_ptr();
 
 	/* header for the current .map/cache file */
-	cache_header* get_cache_header();
+	s_cache_header* get_cache_header();
 
 	/* Returns a handle to the map file currently loaded */
 	HANDLE get_cache_handle();
@@ -174,13 +107,13 @@ namespace tags
 		}
 		auto instance = get_tag_instances()[idx];
 		datum tag_datum = instance.datum_index;
-		LOG_CHECK(DATUM_ABSOLUTE_INDEX(tag_datum) == idx); // should always be true
+		LOG_CHECK(DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_datum) == idx); // should always be true
 		return tag_datum;
 	}
 
 	inline tag_instance* datum_to_instance(datum datum)
 	{
-		return &get_tag_instances()[DATUM_ABSOLUTE_INDEX(datum)];
+		return &get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum)];
 	}
 
 	/* Get parent tag groups for a tag group */
@@ -241,19 +174,19 @@ namespace tags
 
 		if (DATUM_IS_NONE(tag))
 		{
-			LOG_ERROR_FUNC("Bad tag datum - null datum: {}, tag count: {}", DATUM_ABSOLUTE_INDEX(tag), header->tag_count);
+			LOG_ERROR_FUNC("Bad tag datum - null datum: {}, tag count: {}", DATUM_INDEX_TO_ABSOLUTE_INDEX(tag), header->tag_count);
 			return nullptr;
 		}
 
 		// out of bounds check
-		if (DATUM_ABSOLUTE_INDEX(tag) > header->tag_count && !injectedTag)
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag) > header->tag_count && !injectedTag)
 		{
-			LOG_CRITICAL_FUNC("Bad tag datum - index out of bounds (idx: {}, bounds: {})", DATUM_ABSOLUTE_INDEX(tag), header->tag_count);
+			LOG_CRITICAL_FUNC("Bad tag datum - index out of bounds (idx: {}, bounds: {})", DATUM_INDEX_TO_ABSOLUTE_INDEX(tag), header->tag_count);
 			return nullptr;
 		}
 
 		//tag_instance instance = header->tag_instances[tag.Index];
-		tag_instance instance = get_tag_instances()[DATUM_ABSOLUTE_INDEX(tag)];
+		tag_instance instance = get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag)];
 		if (request_type != blam_tag::tag_group_type::none && !is_tag_or_parent_tag(instance.type, request_type))
 		{
 			LOG_ERROR_FUNC("tag type doesn't match requested type - to disable check set requested type to 'none' in template");
@@ -266,7 +199,7 @@ namespace tags
 	template <typename T = void>
 	inline T* get_tag_fast(datum tag)
 	{
-		return reinterpret_cast<T*>(&get_tag_data()[get_tag_instances()[DATUM_ABSOLUTE_INDEX(tag)].data_offset]);
+		return reinterpret_cast<T*>(&get_tag_data()[get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag)].data_offset]);
 	}
 
 	/*
@@ -282,7 +215,7 @@ namespace tags
 
 		blam_tag type = blam_tag::none(); // type we are searching for
 		long current_index = 0; // current tag idx
-		datum m_datum = DATUM_NONE; // last tag datum we returned
+		datum m_datum = DATUM_INDEX_NONE; // last tag datum we returned
 
 		datum next()
 		{
@@ -299,7 +232,7 @@ namespace tags
 				}
 			}
 
-			return DATUM_NONE;
+			return DATUM_INDEX_NONE;
 		}
 
 	};

@@ -1,5 +1,5 @@
 #include "DirectorHooks.h"
-#include "Util/Hooks/Hook.h"
+#include "Util\Hooks\Hook.h"
 
 namespace DirectorHooks
 {

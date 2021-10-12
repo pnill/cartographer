@@ -1,6 +1,5 @@
 #include "NetworkSession.h"
-
-#include "H2MOD/Modules/Console/ConsoleCommands.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
 
 network_session* NetworkSession::getNetworkSessions()
 {

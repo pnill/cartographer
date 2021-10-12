@@ -1,5 +1,5 @@
-#include"..\stdafx.h"
 #include "cache_loader.h"
+#include"stdafx.h"
 
 cache_loader::cache_loader(std::string file_loc) :cache_file_loc(file_loc)
 {

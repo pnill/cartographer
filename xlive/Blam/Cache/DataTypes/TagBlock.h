@@ -10,8 +10,11 @@ struct tag_block
 	{
 		return size * sizeof(T);
 	}
-
-	T* begin()
+	int type_size() const
+	{
+		return sizeof(T);
+	}
+	T *begin()
 	{
 		if (this->data != NONE)
 		{

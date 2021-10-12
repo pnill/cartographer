@@ -1,16 +1,12 @@
-
 #include "tag_loader.h"
-#include "..\Util\filesys.h"
-
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-
+#include "Blam\Cache\TagGroups\model_definition.hpp"
+#include "Blam\Cache\TagGroups\scenery_definition.hpp"
 #include "Blam\Common\Common.h"
-#include "H2MOD/Tags/MetaExtender.h"
-#include "Blam/Cache/TagGroups/scenery_definition.hpp"
-#include "Blam/Cache/TagGroups/model_defenition.hpp"
-
-#include "Util/Hooks/Hook.h"
-
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Tags\MetaExtender.h"
+#include "Util\filesys.h"
+#include "Util\Hooks\Hook.h"
+#include <algorithm>
 //contains some game functions that returns HANDLE
 namespace global_handle_function
 {
@@ -66,6 +62,7 @@ namespace tag_loader
 	static std::map<std::string, std::shared_ptr<plugins_field>> plugins_list;//contains list of various plugin structures
 	std::map<int, std::shared_ptr<meta>> que_meta_list;//<datum_index,meta_junk>contains the list of tags that are currently in que to loaded in memory
 	std::vector<int> key_list;//another var just to keep the keys along with the correct order
+	std::vector<int> injected_list;
 	//map<int, shared_ptr<meta>> meta_list;//<datum_index,meta_junk>contains the the list of tags that are currently loaded in memory(never gonna use it anyway)
 	std::vector<std::string> error_list;//contains various messages generated during various processes,shouldnt had named it error list
 	std::vector<std::string> tag_list;//contains a list of tag_indices along with their names(currently implemented only for module loading)
@@ -88,6 +85,15 @@ namespace tag_loader
 				return i.second;
 		}
 		//it doesnt contain it therfore we need to load the plugin
+		//auto t = std::string(type.begin(), type.end());
+		//t.erase(std::remove_if(t.begin(),
+		//	t.end(),
+		//	[capture0 = std::locale::classic()](auto&& PH1)
+		//	{
+		//		return std::isspace<char>(std::forward<decltype(PH1)>(PH1), capture0);
+		//	}),
+		//	t.end());
+		type.erase(remove(type.begin(), type.end(), ' '), type.end());
 		std::string plugin_loc = plugins_dir + '\\' + type + ".xml";
 		std::shared_ptr<plugins_field> temp_plugin = meta_struct::Get_Tag_stucture_from_plugin(plugin_loc);
 
@@ -250,7 +256,7 @@ namespace tag_loader
 		}*/
 		fin->close();
 		delete fin;
-		return DATUM_NONE;
+		return DATUM_INDEX_NONE;
 	}
 	//Loads a tag from specified map in accordance with the datum index supplied
 	///custom flag is no more needed
@@ -328,7 +334,7 @@ namespace tag_loader
 
 					fin->read((char*)&tag_info, sizeof(tags::tag_instance));
 
-					if (*(load_tag_list.cbegin()) == tag_info.datum_index)
+					if (*(load_tag_list.cbegin()) == tag_info.datum_index && tag_info.type != blam_tag::tag_group_type::sound)
 					{
 						std::shared_ptr<plugins_field> temp_plugin = Get_plugin(tag_info.type.as_string());
 
@@ -531,7 +537,6 @@ namespace tag_loader
 			}
 
 			my_inject_refs.push_back(temp);
-
 		}
 		std::string temp = "Pushing back tag : " + meta_struct::to_hex_string(my_inject_refs.begin()->old_datum) + " to : " + meta_struct::to_hex_string(my_inject_refs.begin()->new_datum);
 		error_list.push_back(temp);
@@ -547,11 +552,12 @@ namespace tag_loader
 			//-------------IDC anymore----------------
 		}
 		//Add them to the tables
-		injected_tag_refs = my_inject_refs;
+		
 		for (auto& my_inject_refs_iter : my_inject_refs)
 		{
 			if (def_meta_size)
 			{
+				injected_tag_refs.push_back(my_inject_refs_iter);
 				int meta_size = que_meta_list[my_inject_refs_iter.old_datum]->Get_Total_size();
 				tags::tag_instance tables_data;
 
@@ -581,6 +587,7 @@ namespace tag_loader
 			else break;
 			//meta_list.emplace(my_inject_refs_iter->new_datum, que_iter->second);//add it to the meta _list				
 		}
+		key_list.clear();
 		my_inject_refs.clear();
 		que_meta_list.clear();
 	}
@@ -706,11 +713,11 @@ namespace tag_loader
 
 		//char* ripped_map = (char*)(SharedmapBase + tag_scenario_off);
 
-		tags::tag_instance* tag_info = &new_Tables[DATUM_ABSOLUTE_INDEX(datum_index)];
-		char* tag_data = tags::get_tag_data() + new_Tables[DATUM_ABSOLUTE_INDEX(datum_index)].data_offset;
+		tags::tag_instance* tag_info = &new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)];
+		char* tag_data = tags::get_tag_data() + new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].data_offset;
 
 		//fail safe
-		if (DATUM_ABSOLUTE_INDEX(tag_info->datum_index) != DATUM_ABSOLUTE_INDEX(datum_index))
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_info->datum_index) != DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index))
 		{
 			std::string error = "Tag: " + datum_index;
 			error += " not loaded into tag tables and tag memory";
@@ -801,11 +808,11 @@ namespace tag_loader
 		HANDLE old_file_handle = *(HANDLE*)(Memory::baseAddress + 0x4AE8A8);
 
 
-		tags::tag_instance* tag_info = &new_Tables[DATUM_ABSOLUTE_INDEX(datum_index)];
-		char* tag_data = tags::get_tag_data() + new_Tables[DATUM_ABSOLUTE_INDEX(datum_index)].data_offset;
+		tags::tag_instance* tag_info = &new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)];
+		char* tag_data = tags::get_tag_data() + new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].data_offset;
 
 		//fail safe
-		if (DATUM_ABSOLUTE_INDEX(tag_info->datum_index) != DATUM_ABSOLUTE_INDEX(datum_index))
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_info->datum_index) != DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index))
 		{
 			std::string error = "Tag: " + datum_index;
 			error += " not loaded into tag tables and tag memory";
@@ -874,8 +881,8 @@ namespace tag_loader
 	//Fixes the reference of the tags to their global objects(vftables)
 	void Fix_global_objects_ref(datum datum_index)
 	{
-		blam_tag type = new_Tables[DATUM_ABSOLUTE_INDEX(datum_index)].type;
-		datum Tdatum_index = new_Tables[DATUM_ABSOLUTE_INDEX(datum_index)].datum_index;
+		blam_tag type = new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].type;
+		datum Tdatum_index = new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].datum_index;
 
 		if (Tdatum_index != datum_index)
 		{
@@ -887,19 +894,19 @@ namespace tag_loader
 		switch (type.as_int())
 		{
 		case 'crea':
-			global_objects_fix::crea_fix(DATUM_ABSOLUTE_INDEX(datum_index));
+			global_objects_fix::crea_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
 			break;
 		case 'bipd':
-			global_objects_fix::bipd_fix(DATUM_ABSOLUTE_INDEX(datum_index));
+			global_objects_fix::bipd_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
 			break;
 		case 'coll':
-			global_objects_fix::coll_fix(DATUM_ABSOLUTE_INDEX(datum_index));
+			global_objects_fix::coll_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
 			break;
 		case 'phmo':
-			global_objects_fix::phmo_fix(DATUM_ABSOLUTE_INDEX(datum_index), false);
+			global_objects_fix::phmo_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index), false);
 			break;
 		case 'vehi':
-			global_objects_fix::vehi_fix(DATUM_ABSOLUTE_INDEX(datum_index));
+			global_objects_fix::vehi_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
 			break;
 		default:
 			break;
@@ -1048,6 +1055,7 @@ namespace tag_loader
 
 	void Add_tags_to_simulation_table()
 	{
+
 	}
 
 	datum ResolveNewDatum(int oldDatum)
@@ -1057,7 +1065,19 @@ namespace tag_loader
 			if (ref.old_datum == oldDatum)
 				return datum(ref.new_datum);
 		}
-		return DATUM_NONE;
+		return DATUM_INDEX_NONE;
+	}
+
+	tags::tag_instance AddNewtagInstance(blam_tag type, int data, size_t size)
+	{
+		tags::tag_instance tables_data;
+		tables_data.type = type;
+		tables_data.data_offset = (int)(data - int(*Memory::GetAddress<int**>(0x47CD54)));
+		tables_data.size = size;
+		tables_data.datum_index = new_datum_index++;
+		tags::tag_instance* temp_write_off = &tag_loader::new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(tables_data.datum_index)];
+		memcpy(temp_write_off, &tables_data, sizeof(tags::tag_instance));//copy to the tables
+		return tag_loader::new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(tables_data.datum_index)];
 	}
 
 #pragma region query_parser
@@ -1263,7 +1283,7 @@ namespace tag_loader
 
 		//Only replace tags if they do exist
 		//Game uses similar method to check if the tag actually exists in the table 
-		if (DATUM_ABSOLUTE_INDEX(tag_instance[a & 0xFFFF].datum_index) == (a & 0xFFFF))
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_instance[a & 0xFFFF].datum_index) == (a & 0xFFFF))
 		{
 			tag_instance[a & 0xFFFF].data_offset = tag_instance[b & 0xFFFF].data_offset;
 			tag_instance[a & 0xFFFF].type = tag_instance[b & 0xFFFF].type;
@@ -1322,9 +1342,10 @@ bool _cdecl LoadTagsandMapBases(int a)
 	//Clear the table
 	for (auto i = _INJECTED_TAG_START_; i < tag_loader::new_datum_index; i++)
 	{
-		tag_loader::new_Tables[i] = tags::tag_instance{ blam_tag::none(), DATUM_NONE, 0, 0 };
+		tag_loader::new_Tables[i] = tags::tag_instance{ blam_tag::none(), DATUM_INDEX_NONE, 0, 0 };
 	}
 	tag_loader::que_meta_list.clear();
+	tag_loader::injected_tag_refs.clear();
 	tag_loader::key_list.clear();
 	// reset starting_datum index
 	tag_loader::ext_meta_size = 0;

@@ -1,7 +1,6 @@
 #pragma once
-
-#include "Blam/Engine/DataArray/DataArray.h"
-#include "Blam/Engine/Objects/Objects.h"
+#include "Blam\Engine\DataArray\DataArray.h"
+#include "Blam\Engine\Objects\Objects.h"
 
 #define ENGINE_PLAYER_MAX 16
 
@@ -35,7 +34,9 @@ struct Player
 		MasterChief = 0,
 		Dervish = 1,
 		Spartan = 2,
-		Elite = 3
+		Elite = 3,
+		Skeleton = 4,
+		Flood = 5
 	};
 
 	enum class EmblemForeground : BYTE
@@ -193,7 +194,7 @@ struct Player
 		char player_is_griefer;
 		char bungie_user_role;
 		char achievement_flags;
-		char unk2;
+		byte unk2;
 	};
 	CHECK_STRUCT_SIZE(Properties, 132);
 
@@ -208,7 +209,7 @@ struct Player
 	int controller_index;
 	__int16 user_index;
 	__int16 player_bsp_location_index;
-	datum controlled_unit_index;
+	datum unit_index;
 	datum dead_unit_index;
 	datum possibly_datum;
 	DWORD InputFlags;
@@ -256,6 +257,7 @@ struct Player
 	static e_object_team getTeam(int playerIndex);
 	static void setTeam(int playerIndex, e_object_team team);
 	static void setUnitBipedType(int playerIndex, Player::Biped bipedType);
+	static void setUnitBipedType(int playerIndex, byte representationIndex);
 	static void setBipedSpeed(int playerIndex, float speed);
 	static wchar_t* getName(int playerIndex);
 	static datum getPlayerUnitDatumIndex(int playerIndex);

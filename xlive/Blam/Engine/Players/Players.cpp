@@ -1,6 +1,8 @@
 
 #include "Players.h"
 
+#include "H2MOD.h"
+
 /*
 	- TO NOTE:
 	- This functions work only after the game has started (game life cycle is in_game or after map has been loaded).
@@ -53,6 +55,15 @@ void Player::setUnitBipedType(int playerIndex, Player::Biped bipedType)
 	getPlayer(playerIndex)->properties[0].profile.player_character_type = bipedType;
 }
 
+void Player::setUnitBipedType(int playerIndex, byte representationIndex)
+{
+	if (!indexValid(playerIndex))
+	{
+		return;
+	}
+	getPlayer(playerIndex)->properties[0].profile.player_character_type = (Biped)representationIndex;
+}
+
 void Player::setBipedSpeed(int playerIndex, float speed)
 {
 	if (!indexValid(playerIndex))
@@ -74,12 +85,12 @@ wchar_t* Player::getName(int playerIndex)
 datum Player::getPlayerUnitDatumIndex(int playerIndex)
 {
 	if (!indexValid(playerIndex))
-		return DATUM_NONE;
+		return DATUM_INDEX_NONE;
 
-	if (DATUM_IS_NONE(getPlayer(playerIndex)->controlled_unit_index))
-		return DATUM_NONE;
+	if (DATUM_IS_NONE(getPlayer(playerIndex)->unit_index))
+		return DATUM_INDEX_NONE;
 		
-	return getPlayer(playerIndex)->controlled_unit_index;
+	return getPlayer(playerIndex)->unit_index;
 }
 
 XUID Player::getIdentifier(int playerIndex)

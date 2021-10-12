@@ -33,7 +33,7 @@ public:
 	s_data_iterator(s_data_array* _data_array) : 
 		m_data_array(_data_array),
 		m_current_absolute_index(NONE),
-		m_last_datum_index(DATUM_NONE)
+		m_last_datum_index(DATUM_INDEX_NONE)
 	{
 	}
 
@@ -48,7 +48,7 @@ public:
 
 	T* get_data_at_datum_index(datum datum_index)
 	{
-		return reinterpret_cast<T*>(&m_data_array->data[m_data_array->datum_element_size * DATUM_ABSOLUTE_INDEX(datum_index)]);
+		return reinterpret_cast<T*>(&m_data_array->data[m_data_array->datum_element_size * DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)]);
 	};
 
 	T* get_current_datum()
@@ -64,14 +64,14 @@ public:
 		if (index == -1)
 		{
 			result = nullptr;
-			m_last_datum_index = DATUM_NONE;
+			m_last_datum_index = DATUM_INDEX_NONE;
 			m_current_absolute_index = m_data_array->datum_max_elements;
 		}
 		else
 		{
 			result = reinterpret_cast<T*>(&m_data_array->data[m_data_array->datum_element_size * index]);
 			m_current_absolute_index = index;
-			m_last_datum_index = DATUM_NEW(index, *(unsigned short*)(result)); // absolute index w/ salt
+			m_last_datum_index = DATUM_INDEX_NEW(index, *(unsigned short*)(result)); // absolute index w/ salt
 		}
 		return result;
 	}

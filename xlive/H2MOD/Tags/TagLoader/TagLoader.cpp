@@ -1,7 +1,7 @@
 #include "TagLoader.h"
 #include "H2MOD/Modules/Utils/Utils.h"
-#include "Blam/Cache/TagGroups/lite/lite_object_defenition.hpp"
-#include "Blam/Cache/TagGroups/lite/lite_scenery_defenition.hpp"
+#include "Blam\Cache\TagGroups\lite/lite_object_defenition.hpp"
+#include "Blam\Cache\TagGroups\lite/lite_scenery_defenition.hpp"
 
 constexpr int _INJECTED_TAG_START_ = 0x3BA4;
 constexpr int _MAX_ADDITIONAL_TAG_SIZE_ = 0x1400000; //20 MB

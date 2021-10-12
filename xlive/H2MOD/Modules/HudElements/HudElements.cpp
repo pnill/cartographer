@@ -1,14 +1,14 @@
 #include "HudElements.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
+#include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
+#include "H2MOD\Modules\Input\KeyboardInput.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
-#include "H2MOD/Modules/Utils/Utils.h"
-#include "H2MOD/Modules/Console/ConsoleCommands.h"
-#include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "H2MOD/Engine/Engine.h"
-#include "H2MOD/Tags/TagInterface.h"
-
+#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Tags\TagInterface.h"
 #include "Util\Hooks\Hook.h"
 
 #define _USE_MATH_DEFINES
@@ -22,14 +22,14 @@ static bool RenderIngameChat() {
 
 	if (H2Config_hide_ingame_chat) {
 		datum local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
-		if (Player::getPlayer(DATUM_ABSOLUTE_INDEX(local_player_datum_index))->is_chatting == 2) {
+		if (Player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(local_player_datum_index))->is_chatting == 2) {
 			extern void hotkeyFuncToggleHideIngameChat();
 			hotkeyFuncToggleHideIngameChat();
 		}
 		return true;
 	}
 
-	else if (*GameEngine != 3 && Engine::get_game_life_cycle() == life_cycle_in_game) {
+	else if (*GameEngine != 3 && EngineCalls::get_game_life_cycle() == life_cycle_in_game) {
 		//Enable chat in engine mode and game state mp.
 		return false;
 	}
@@ -166,7 +166,10 @@ void HudElements::setFOV() {
 		}
 
 		//const double default_radians_field_of_view = 70.0f * M_PI / 180.0f;
-		fov = (float)H2Config_field_of_view * M_PI / 180.0f;
+		if (CurrentVariantSettings.ForcedFOV == 0)
+			fov = (float)H2Config_field_of_view * M_PI / 180.0f;
+		else
+			fov = (float)CurrentVariantSettings.ForcedFOV * M_PI / 180.0f;
 	}
 }
 
@@ -177,7 +180,17 @@ void HudElements::setVehicleFOV() {
 
 	if (H2Config_vehicle_field_of_view > 0 && H2Config_vehicle_field_of_view <= 110)
 	{
-		float calculated_radians_FOV = (float)H2Config_vehicle_field_of_view * M_PI / 180.0f;
+		float calculated_radians_FOV;
+		if (CurrentVariantSettings.ForcedFOV == 0) {
+			calculated_radians_FOV = (float)H2Config_vehicle_field_of_view * M_PI / 180.0f;
+			//WriteValue(Memory::GetAddress(0x413780), (float)H2Config_vehicle_field_of_view * M_PI / 180.0f);
+		}
+			//
+		else {
+			calculated_radians_FOV = (float)CurrentVariantSettings.ForcedFOV * M_PI / 180.0f;
+			//WriteValue(Memory::GetAddress(0x413780), (float)CurrentVariantSettings.ForcedFOV * M_PI / 180.0f);
+		}
+			//
 		WriteValue(Memory::GetAddress(0x413780), calculated_radians_FOV); // Third Person
 	}
 }

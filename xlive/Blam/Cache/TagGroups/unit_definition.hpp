@@ -44,7 +44,7 @@ struct s_unit_group_definition :TagGroup<'unit'>
 		unit_has_boost = FLAG(28),
 	};
 	e_unit_flags unit_flags;//0xBC
-	enum class e_default_team : __int16
+	enum class e_unit_default_team : __int16
 	{
 		default = 0,
 		player = 1,
@@ -63,7 +63,7 @@ struct s_unit_group_definition :TagGroup<'unit'>
 		unused14 = 14,
 		unused15 = 15,
 	};
-	e_default_team default_team;//0xC0
+	e_unit_default_team default_team;//0xC0
 	enum class e_constant_sound_volume : __int16
 	{
 		silent = 0,
@@ -150,12 +150,12 @@ struct s_unit_group_definition :TagGroup<'unit'>
 	TAG_BLOCK_SIZE_ASSERT(s_dialogue_variants_block, 0xC);
 	tag_block<s_dialogue_variants_block> dialogue_variants;//0x1A8
 	float grenade_velocity;//0x1B0
-	enum class e_grenade_type : __int16
+	enum class e_unit_grenade_type : __int16
 	{
 		human_fragmentation = 0,
 		covenant_plasma = 1,
 	};
-	e_grenade_type grenade_type;//0x1B4
+	e_unit_grenade_type grenade_type;//0x1B4
 	__int16 grenade_count;//0x1B6
 	struct s_powered_seats_block
 	{
@@ -164,15 +164,15 @@ struct s_unit_group_definition :TagGroup<'unit'>
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_powered_seats_block, 0x8);
 	tag_block<s_powered_seats_block> powered_seats;//0x1B8
-	struct s_weapons_block
+	struct s_unit_weapons_block
 	{
 		tag_reference weapon;//0x0
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_weapons_block, 0x8);
-	tag_block<s_weapons_block> weapons;//0x1C0
+	TAG_BLOCK_SIZE_ASSERT(s_unit_weapons_block, 0x8);
+	tag_block<s_unit_weapons_block> weapons;//0x1C0
 	struct s_seats_block
 	{
-		enum class e_flags : __int32
+		enum class e_seats_flags : __int32
 		{
 			invisible = FLAG(0),
 			locked = FLAG(1),
@@ -195,7 +195,7 @@ struct s_unit_group_definition :TagGroup<'unit'>
 			gunner_player_only = FLAG(18),
 			invisible_under_major_damage = FLAG(19),
 		};
-		e_flags flags;//0x0
+		e_seats_flags flags;//0x0
 		string_id label_old_string_id;//0x4
 		string_id marker_name_old_string_id;//0x8
 		string_id entry_markers_name;//0xC

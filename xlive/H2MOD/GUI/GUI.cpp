@@ -1,17 +1,15 @@
 #include "GUI.h"
-
-#include "3rdparty/imgui/imgui.h"
-#include "imgui_integration\imgui_impl_dx9.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "imgui.h"
+#include "H2MOD\Modules\Achievements\Achievements.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
-#include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "imgui_integration/imgui_handler.h"
-#include "H2MOD/Modules/Networking/Networking.h"
-#include "H2MOD/Modules/Achievements/Achievements.h"
-
-#include "Util/Hooks/Hook.h"
+#include "H2MOD\Modules\Console\ConsoleCommands.h"
+#include "H2MOD\Modules\Input\KeyboardInput.h"
+#include "H2MOD\Modules\Input\PlayerControl.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "imgui_integration\imgui_handler.h"
+#include "imgui_integration\imgui_impl_dx9.h"
+#include "Util\Hooks\Hook.h"
 
 extern void InitInstance();
 
@@ -424,7 +422,7 @@ void GUI::ToggleMenu()
 {
 	doDrawIMGUI = !doDrawIMGUI;
 	WriteValue<bool>(Memory::GetAddress(0x9712CC), doDrawIMGUI);
-	PlayerControl::GetControls(0)->DisableCamera = doDrawIMGUI;
+	PlayerControl::DisableLocalCamera(doDrawIMGUI);
 	if(!doDrawIMGUI)
 		SaveH2Config();
 }
@@ -625,7 +623,7 @@ int WINAPI XLiveRender()
 				while (playerIt.get_next_active_player()) 
 				{
 					real_point3d* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
-					s_biped_object_definition* biped_unit = (s_biped_object_definition*)h2mod->get_player_unit_from_player_index(playerIt.get_current_player_index());
+					s_biped_data_definition* biped_unit = (s_biped_data_definition*)h2mod->get_player_unit_from_player_index(playerIt.get_current_player_index());
 					if (player_position != nullptr) {
 						std::wstring playerNameWide(playerIt.get_current_player_name());
 						std::string playerName(playerNameWide.begin(), playerNameWide.end());

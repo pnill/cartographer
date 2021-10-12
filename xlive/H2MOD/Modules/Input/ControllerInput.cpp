@@ -1,7 +1,7 @@
 #include "ControllerInput.h"
-#include "H2MOD/Modules/Config/Config.h"
-#include "Util/Hooks/Hook.h"
-#include "H2MOD/Engine/Engine.h"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "Util\Hooks\Hook.h"
 
 namespace ControllerInput
 {
@@ -55,7 +55,7 @@ namespace ControllerInput
 			if(InputDevice->error_level == 0)
 			{
 				(*reinterpret_cast<void(__thiscall *)(controller_info*)>(InputDevice->xinput_device_vtbl[2]))(InputDevice);
-				if (Engine::get_game_life_cycle() == life_cycle_in_game) {
+				if (EngineCalls::get_game_life_cycle() == life_cycle_in_game) {
 					Overwrite = XINPUT_GAMEPAD_NONE;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
 						Overwrite |= H2Config_CustomLayout.DPAD_UP;

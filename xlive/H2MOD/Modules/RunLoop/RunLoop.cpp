@@ -1,213 +1,21 @@
 #include "RunLoop.h"
-
-#include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD/Modules/MapManager/MapManager.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-
-#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD/Modules/Networking/Networking.h"
+#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\GUI\GUI.h"
 #include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\Input\ControllerInput.h"
+#include "H2MOD\Modules\MainLoopPatches\OriginalFPSLimiter\OriginalFPSLimiter.h"
+#include "H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Stats\StatsHandler.h"
+#include "H2MOD\Modules\Utils\Utils.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
-#include "H2MOD/Modules/Stats/StatsHandler.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.h"
-#include "H2MOD/GUI/GUI.h"
-#include "H2MOD/Modules/Input/ControllerInput.h"
-#include "H2MOD/Modules/MainLoopPatches/OriginalFPSLimiter/OriginalFPSLimiter.h"
-#include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
-#include "Blam/Engine/Game/GameTimeGlobals.h"
-#include "H2MOD/Engine/Engine.h"
 
-#include "Util/Hooks/Hook.h"
-
-extern LPDIRECT3DDEVICE9 pDevice;
-
-bool QuitGSMainLoop = false;
-
-DWORD* get_scenario_global_address() {
-	return (DWORD*)(H2BaseAddr + 0x479e74);
-}
-
-int get_scenario_volume_count() {
-	int volume_count = *(int*)(*get_scenario_global_address() + 0x108);
-	return volume_count;
-}
-
-void kill_volume_disable(int volume_id) {
-	void(__cdecl* kill_volume_disable)(int volume_id);
-	kill_volume_disable = (void(__cdecl*)(int))((char*)H2BaseAddr + 0xb3ab8);
-	kill_volume_disable(volume_id);
-}
-
-void kill_volume_enable(int volume_id) {
-	void(__cdecl* kill_volume_enable)(int volume_id);
-	kill_volume_enable = (void(__cdecl*)(int))((char*)H2BaseAddr + 0xb3a64);
-	kill_volume_enable(volume_id);
-}
-
-void GSMainLoop() {
-	static bool halo2WindowExists = false;
-	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
-		halo2WindowExists = true;
-		DWORD Display_Mode = 1;
-		HKEY hKeyVideoSettings = NULL;
-		if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_READ, &hKeyVideoSettings) == ERROR_SUCCESS) {
-			GetDWORDRegKey(hKeyVideoSettings, L"DisplayMode", &Display_Mode);
-			RegCloseKey(hKeyVideoSettings);
-		}
-		if (Display_Mode) {
-			SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
-		}
-
-		if (H2GetInstanceId() > 1) {
-			wchar_t titleMod[256];
-			wchar_t titleOriginal[256];
-			GetWindowText(H2hWnd, titleOriginal, 256);
-			wsprintf(titleMod, L"%ls (P%d)", titleOriginal, H2GetInstanceId());
-			SetWindowText(H2hWnd, titleMod);
-		}
-	}
-	if(H2IsDediServer)
-	{
-		StatsHandler::playerRanksUpdateTick();
-		
-	}
-	EventHandler::executeGameLoopCallbacks();
-	/*
-	static bool halo2ServerOnce1 = false;
-	if (H2IsDediServer && !halo2ServerOnce1) {
-		halo2ServerOnce1 = true;
-		pushHostLobby();
-		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
-		if (strlen(H2Config_dedi_server_name) > 0) {
-			swprintf(LanServerName, 32, L"%hs", H2Config_dedi_server_name);
-		}
-	}
-
-	static int prevPartyPrivacy = 0;
-	int partyPrivacy;
-	if (H2IsDediServer) {
-		partyPrivacy = *(int*)(H2BaseAddr + 0x534850);
-	}
-	else {
-		partyPrivacy = *(int*)(H2BaseAddr + 0x50A398);
-	}
-	if (prevPartyPrivacy > 0 && partyPrivacy == 0) {
-		pushHostLobby();
-	}
-	prevPartyPrivacy = partyPrivacy;
-	*/
-}
-
-void __cdecl main_game_time_initialize_defaults_hook()
-{
-	// windows 10 version 2004 and above added behaviour changes to how windows timer resolution works, and we have to explicitly set the time resolution
-	// and since they were added, when playing on a laptop on battery it migth add heavy stuttering when using a frame limiter based on Sleep function (or std::this_thread::sleep_for) implementation
-	// the game sets them already but only during the loading screen period, then it resets to system default when the loading screen ends 
-	// (tho i think in the new implementation is working on a per thread basis now instead of global frequency, since it still works even when the game resets after loading screen ends and loading screen runs in another thread)
-
-	// More code in Tweaks.cpp in InitH2Tweaks
-
-	// More details @ https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/
-
-	timeBeginPeriod(1);
-
-	auto p_main_game_time_initialize_defaults = Memory::GetAddressRelative<void(__cdecl*)()>(0x42869F, 0x424841);
-	return p_main_game_time_initialize_defaults();
-}
-
-void __cdecl game_modules_dispose() {
-	auto p_game_modules_dispose = Memory::GetAddress<void(__cdecl*)()>(0x48BBF, 0x41E60);
-	p_game_modules_dispose();
-
-	DeinitH2Startup();
-
-	// reset time resolution to system default on game exit (initialization happens in main_game_time_initialize_defaults_hook())
-	timeEndPeriod(1);
-}
-
-void (*main_game_loop)();
-
-std::chrono::steady_clock::duration desiredRenderTime;
-inline void defaultFrameLimiter() {
-	
-	CHRONO_DEFINE_TIME_AND_CLOCK();
-
-	static _clock::time_point lastTime;
-	static _clock::time_point nextFrameTime;
-	static int lastFrameSetting = -1;
-	static bool frameLimiterInitialized = false;
-	static _clock::duration threshold(5); // skip sleep if we have to sleep under 5 ns
-
-	if (H2Config_experimental_fps == e_render_original_game_frame_limit
-		|| H2Config_fps_limit <= 0
-		|| Engine::IsGameMinimized())
-	{
-		lastFrameSetting = H2Config_fps_limit;
-		frameLimiterInitialized = false;
-		return;
-	}
-
-	if (lastFrameSetting != H2Config_fps_limit)
-	{
-		lastFrameSetting = H2Config_fps_limit;
-		frameLimiterInitialized = false;
-	}
-
-	if (!frameLimiterInitialized)
-	{
-		SET_DESIRED_RENDER_TIME();
-		lastTime = _clock::now();
-		frameLimiterInitialized = true;
-	}
-
-	_clock::time_point timeBeforeSleep = _clock::now();
-	auto dt1 = timeBeforeSleep - lastTime;
-	if (dt1 < desiredRenderTime && desiredRenderTime - dt1 > threshold)
-	{
-		auto tp1 = timeBeforeSleep;
-		auto millisecondsToSleep = _time::duration_cast<_time::milliseconds, long long>(desiredRenderTime - dt1);
-
-		if (millisecondsToSleep > 1ms)
-			std::this_thread::sleep_for(millisecondsToSleep - 1ms);
-
-		auto tp2 = _clock::now();
-		auto dt2 = tp2 - lastTime;
-		if (dt2 < desiredRenderTime)
-		{
-			auto nanoSleep = desiredRenderTime - dt2;
-
-			// sleep the nanoseconds after, will burn the CPU a lil bit but should provide near perfect frame time
-			while (nanoSleep > threshold)
-			{
-				auto tp3 = _clock::now();
-				nanoSleep -= (tp3 - tp2);
-				tp2 = tp3;
-			}
-		}
-	}
-
-	lastTime = _clock::now();
-}
-
-void main_game_loop_hook() {
-	defaultFrameLimiter();
-	if (!QuitGSMainLoop)
-		GSMainLoop();
-
-	mapManager->MapDownloadUpdateTick();
-	main_game_loop();
-}
-
-static char HookedServerShutdownCheck() {
-	if (!QuitGSMainLoop)
-		GSMainLoop();
-	
-	bool& Quit_Exit_Game = *(bool*)((char*)H2BaseAddr + 0x4a7083);
-
-	//original test - if game should shutdown
-	return Quit_Exit_Game;
-}
 typedef void(_cdecl p_present_rendered_screen)();
 p_present_rendered_screen* present_rendered_screen;
 
@@ -309,6 +117,199 @@ p_sub_B1D31F* sub_B1D31F;
 typedef void(_cdecl p_sub_AF8716)(int a1);
 p_sub_AF8716* sub_AF8716;
 
+
+#include "Util\Hooks\Hook.h"
+
+extern LPDIRECT3DDEVICE9 pDevice;
+
+bool QuitGSMainLoop = false;
+
+DWORD* get_scenario_global_address() {
+	return (DWORD*)(H2BaseAddr + 0x479e74);
+}
+
+int get_scenario_volume_count() {
+	int volume_count = *(int*)(*get_scenario_global_address() + 0x108);
+	return volume_count;
+}
+
+void kill_volume_disable(int volume_id) {
+	void(__cdecl* kill_volume_disable)(int volume_id);
+	kill_volume_disable = (void(__cdecl*)(int))((char*)H2BaseAddr + 0xb3ab8);
+	kill_volume_disable(volume_id);
+}
+
+void kill_volume_enable(int volume_id) {
+	void(__cdecl* kill_volume_enable)(int volume_id);
+	kill_volume_enable = (void(__cdecl*)(int))((char*)H2BaseAddr + 0xb3a64);
+	kill_volume_enable(volume_id);
+}
+
+void GSMainLoop() {
+	static bool halo2WindowExists = false;
+	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
+		halo2WindowExists = true;
+		DWORD Display_Mode = 1;
+		HKEY hKeyVideoSettings = NULL;
+		if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_READ, &hKeyVideoSettings) == ERROR_SUCCESS) {
+			GetDWORDRegKey(hKeyVideoSettings, L"DisplayMode", &Display_Mode);
+			RegCloseKey(hKeyVideoSettings);
+		}
+		if (Display_Mode) {
+			SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+		}
+
+		if (H2GetInstanceId() > 1) {
+			wchar_t titleMod[256];
+			wchar_t titleOriginal[256];
+			GetWindowText(H2hWnd, titleOriginal, 256);
+			wsprintf(titleMod, L"%ls (P%d)", titleOriginal, H2GetInstanceId());
+			SetWindowText(H2hWnd, titleMod);
+		}
+	}
+	if(H2IsDediServer)
+	{
+		StatsHandler::playerRanksUpdateTick();
+	}
+	//EventHandler::executeGameLoopCallbacks();
+	/*
+	static bool halo2ServerOnce1 = false;
+	if (H2IsDediServer && !halo2ServerOnce1) {
+		halo2ServerOnce1 = true;
+		pushHostLobby();
+		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
+		if (strlen(H2Config_dedi_server_name) > 0) {
+			swprintf(LanServerName, 32, L"%hs", H2Config_dedi_server_name);
+		}
+	}
+
+	static int prevPartyPrivacy = 0;
+	int partyPrivacy;
+	if (H2IsDediServer) {
+		partyPrivacy = *(int*)(H2BaseAddr + 0x534850);
+	}
+	else {
+		partyPrivacy = *(int*)(H2BaseAddr + 0x50A398);
+	}
+	if (prevPartyPrivacy > 0 && partyPrivacy == 0) {
+		pushHostLobby();
+	}
+	prevPartyPrivacy = partyPrivacy;
+	*/
+}
+
+void __cdecl main_game_time_initialize_defaults_hook()
+{
+	// windows 10 version 2004 and above added behaviour changes to how windows timer resolution works, and we have to explicitly set the time resolution
+	// and since they were added, when playing on a laptop on battery it migth add heavy stuttering when using a frame limiter based on Sleep function (or std::this_thread::sleep_for) implementation
+	// the game sets them already but only during the loading screen period, then it resets to system default when the loading screen ends 
+	// (tho i think in the new implementation is working on a per thread basis now instead of global frequency, since it still works even when the game resets after loading screen ends and loading screen runs in another thread)
+
+	// More code in Tweaks.cpp in InitH2Tweaks
+
+	// More details @ https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/
+
+	timeBeginPeriod(1);
+
+	auto p_main_game_time_initialize_defaults = Memory::GetAddressRelative<void(__cdecl*)()>(0x42869F, 0x424841);
+	return p_main_game_time_initialize_defaults();
+}
+
+void __cdecl game_modules_dispose() {
+	auto p_game_modules_dispose = Memory::GetAddress<void(__cdecl*)()>(0x48BBF, 0x41E60);
+	p_game_modules_dispose();
+
+	DeinitH2Startup();
+
+	// reset time resolution to system default on game exit (initialization happens in main_game_time_initialize_defaults_hook())
+	timeEndPeriod(1);
+}
+
+void (*main_game_loop)();
+
+std::chrono::steady_clock::duration desiredRenderTime;
+inline void defaultFrameLimiter() {
+	
+	CHRONO_DEFINE_TIME_AND_CLOCK();
+
+	static _clock::time_point lastTime;
+	static _clock::time_point nextFrameTime;
+	static int lastFrameSetting = -1;
+	static bool frameLimiterInitialized = false;
+	static _clock::duration threshold(5); // skip sleep if we have to sleep under 5 ns
+
+	if (H2Config_experimental_fps == e_render_original_game_frame_limit
+		|| H2Config_fps_limit <= 0
+		|| EngineCalls::IsGameMinimized())
+	{
+		lastFrameSetting = H2Config_fps_limit;
+		frameLimiterInitialized = false;
+		return;
+	}
+
+	if (lastFrameSetting != H2Config_fps_limit)
+	{
+		lastFrameSetting = H2Config_fps_limit;
+		frameLimiterInitialized = false;
+	}
+
+	if (!frameLimiterInitialized)
+	{
+		SET_DESIRED_RENDER_TIME();
+		lastTime = _clock::now();
+		frameLimiterInitialized = true;
+	}
+
+	_clock::time_point timeBeforeSleep = _clock::now();
+	auto dt1 = timeBeforeSleep - lastTime;
+	if (dt1 < desiredRenderTime && desiredRenderTime - dt1 > threshold)
+	{
+		auto tp1 = timeBeforeSleep;
+		auto millisecondsToSleep = _time::duration_cast<_time::milliseconds, long long>(desiredRenderTime - dt1);
+
+		if (millisecondsToSleep > 1ms)
+			std::this_thread::sleep_for(millisecondsToSleep - 1ms);
+
+		auto tp2 = _clock::now();
+		auto dt2 = tp2 - lastTime;
+		if (dt2 < desiredRenderTime)
+		{
+			auto nanoSleep = desiredRenderTime - dt2;
+
+			// sleep the nanoseconds after, will burn the CPU a lil bit but should provide near perfect frame time
+			while (nanoSleep > threshold)
+			{
+				auto tp3 = _clock::now();
+				nanoSleep -= (tp3 - tp2);
+				tp2 = tp3;
+			}
+		}
+	}
+
+	lastTime = _clock::now();
+}
+
+void main_game_loop_hook() {
+	defaultFrameLimiter();
+	if (!QuitGSMainLoop)
+		GSMainLoop();
+
+	EventHandler::execute_callback<EventHandler::GameLoopEvent>(execute_before);
+	mapManager->MapDownloadUpdateTick();
+	main_game_loop();
+	EventHandler::execute_callback<EventHandler::GameLoopEvent>(execute_after);
+}
+
+static char HookedServerShutdownCheck() {
+	if (!QuitGSMainLoop)
+		GSMainLoop();
+	
+	bool& Quit_Exit_Game = *(bool*)((char*)H2BaseAddr + 0x4a7083);
+
+	//original test - if game should shutdown
+	return Quit_Exit_Game;
+}
+
 extern bool b_XboxTick;
 
 // we disable some broken code added by hired gun, that is also disabled while running a cinematic 
@@ -323,7 +324,7 @@ bool __cdecl cinematic_in_progress_hook()
 	case e_render_old:
 		// TODO: get_game_life_cycle is only used with networked sessions, meaning this will not work in single player
 		// and i keep it this way because the EventHandler in UncappedFPS2.cpp uses the game's life cycle as well
-		return cinematic_is_running() || Engine::get_game_life_cycle() == life_cycle_in_game || Engine::IsGameMinimized();
+		return cinematic_is_running() || EngineCalls::get_game_life_cycle() == life_cycle_in_game || EngineCalls::IsGameMinimized();
 
 	// these two options disable the hacks that hired gun added to the main loop
 	case e_render_new:
@@ -332,7 +333,7 @@ bool __cdecl cinematic_in_progress_hook()
 
 	case e_render_none:
 	default:
-		return cinematic_is_running() || b_XboxTick || Engine::IsGameMinimized();
+		return cinematic_is_running() || b_XboxTick || EngineCalls::IsGameMinimized();
 	}
 
 	return false;
@@ -350,7 +351,7 @@ bool __cdecl should_limit_framerate()
 	case e_render_new:
 	case e_render_old:
 	default:
-		return (Engine::IsGameMinimized() || b_XboxTick);
+		return (EngineCalls::IsGameMinimized() || b_XboxTick);
 	}
 
 	return false;
@@ -368,7 +369,7 @@ float tps = (1.0f / 60);
 
 void alt_prep_time(float a1, float *a2, int *a3)
 {
-	if (Engine::get_game_life_cycle() != life_cycle_in_game) {
+	if (EngineCalls::get_game_life_cycle() != life_cycle_in_game) {
 		float _a2;
 		int _a3;
 		game_time_globals_prep(a1, &_a2, &_a3);
@@ -399,7 +400,7 @@ float alt_system_time_update()
 	float result = (float)(currentTime - startTime) * 0.001;
 	startTime = currentTime;
 
-	if (cinematic_is_running() || Engine::IsGameMinimized())
+	if (cinematic_is_running() || EngineCalls::IsGameMinimized())
 		result = original_time_update;
 
 	return result;
@@ -638,15 +639,15 @@ void alt_main_game_loop_hook()
 		}
 		//game_main_loop();
 		//main_game_loop();
-	
-		EventHandler::executeGameLoopCallbacks();
 	}
 	if (H2Config_fps_limit != 0) {
 		QueryPerformanceCounter(&end_render);
 		render_time = static_cast<double>(end_render.QuadPart - start_render.QuadPart) / freq.QuadPart;
 		if (render_time >= (1.0f / H2Config_fps_limit)) {
 			QueryPerformanceCounter(&start_render);
+			EventHandler::execute_callback<EventHandler::GameLoopEvent>(execute_before);
 			game_main_loop();
+			EventHandler::execute_callback<EventHandler::GameLoopEvent>(execute_after);
 			//present_rendered_screen();
 		}
 	}

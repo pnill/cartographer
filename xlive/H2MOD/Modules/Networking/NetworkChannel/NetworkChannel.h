@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\NetworkObserver\NetworkObserver.h"
+#include "H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h"
 
 struct __declspec(align(8)) network_channel
 {

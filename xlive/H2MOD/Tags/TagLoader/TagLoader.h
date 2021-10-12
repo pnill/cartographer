@@ -2,7 +2,7 @@
 #include "Blam/Cache/DataTypes/DatumIndex.h"
 #include "H2MOD.h"
 #include "H2MOD/Modules/Startup/Startup.h"
-#include "Util/Hooks/Hook.h"
+#include "Util\Hooks\Hook.h"
 
 
 namespace TagLoader

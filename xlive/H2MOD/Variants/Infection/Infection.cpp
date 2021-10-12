@@ -1,14 +1,15 @@
 #include "Infection.h"
-
-#include "H2MOD/Modules/Config/Config.h"
-#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
-#include "Blam/Cache/TagGroups/item_collection_defenition.hpp"
-#include "Blam/Cache/TagGroups/vehicle_collection_defenition.hpp"
-#include "H2MOD/Engine/Engine.h"
-
+#include "Blam\Cache\TagGroups\item_collection_definition.hpp"
+#include "Blam\Cache\TagGroups\scenario_definition.hpp"
+#include "Blam\Cache\TagGroups\vehicle_collection_definition.hpp"
+#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\Networking\Networking.h"
-#include "H2MOD/Tags/TagInterface.h"
+#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
+#include "H2MOD\Tags\MetaLoader\tag_loader.h"
+#include "H2MOD\Tags\TagInterface.h"
 
 std::vector<XUID> Infection::zombieIdentifiers;
 
@@ -114,6 +115,8 @@ void Infection::initClient()
 	i_SoundsTable[spanish][e_infection_sounds::infected] = L"sounds/es/infected.wav";
 	i_SoundsTable[spanish][e_infection_sounds::infection] = L"sounds/es/infection.wav";
 	i_SoundsTable[spanish][e_infection_sounds::new_zombie] = L"sounds/es/new_zombie.wav";
+
+	
 	//Change Local Player's Team to Human if Not in Green
 	//(In case player wants to start as Alpha Zombie leave him green)
 	if (h2mod->get_local_team_index() != ZOMBIE_TEAM) {
@@ -216,14 +219,17 @@ void Infection::preSpawnServerSetup() {
 
 		LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={}, isZombie={}, playerIdentifier={}, playerName:{}", currentPlayerIndex, isZombie, playerIdentifier, Player::getName(currentPlayerIndex));
 		if (isZombie) {
-			Player::setUnitBipedType(currentPlayerIndex, Player::Biped::Elite);
+			Player::setUnitBipedType(currentPlayerIndex, Player::Biped::Flood);
 			if (Player::getTeam(currentPlayerIndex) != ZOMBIE_TEAM)  {
 				if (NetworkSession::localPeerIsSessionHost())
 					CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(currentPlayerIndex), ZOMBIE_TEAM); // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
 			}
 		}
 		else {
-			Player::setUnitBipedType(currentPlayerIndex, Player::Biped::Spartan);
+			if(SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && H2Config_spooky_boy)
+				Player::setUnitBipedType(currentPlayerIndex, Player::Biped::Skeleton);
+			else
+				Player::setUnitBipedType(currentPlayerIndex, Player::Biped::Spartan);
 			humanCount++;
 		}
 		playerCount++;
@@ -235,12 +241,15 @@ void Infection::preSpawnServerSetup() {
 }
 
 void Infection::setPlayerAsHuman(int playerIndex) {
-	Player::setUnitBipedType(playerIndex, Player::Biped::Spartan);
+	if (SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && H2Config_spooky_boy)
+		Player::setUnitBipedType(playerIndex, Player::Biped::Skeleton);
+	else
+		Player::setUnitBipedType(playerIndex, Player::Biped::Spartan);
 	Player::setBipedSpeed(playerIndex, 1.0f);
 }
 
 void Infection::setPlayerAsZombie(int playerIndex) {
-	Player::setUnitBipedType(playerIndex, Player::Biped::Elite);
+	Player::setUnitBipedType(playerIndex, Player::Biped::Flood);
 	Player::setBipedSpeed(playerIndex, 1.1f);
 
 	call_give_player_weapon(playerIndex, e_weapons_datum_index::energy_blade, 1);
@@ -250,7 +259,7 @@ void Infection::spawnPlayerClientSetup(int playerIndex) {
 	if (playerIndex != NONE) {
 		XUID playerIdentifier = Player::getIdentifier(playerIndex);
 		//If player being spawned is LocalUser/Player
-		if (playerIdentifier == Player::getIdentifier(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
+		if (playerIdentifier == Player::getIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
 			if (firstSpawn == true) {
 				//start of zombie match
 				Infection::triggerSound(e_infection_sounds::infection, 1000);
@@ -267,7 +276,7 @@ void Infection::spawnPlayerClientSetup(int playerIndex) {
 				h2mod->team_player_indicator_visibility(false);
 			}
 			else if (h2mod->get_local_team_index() == ZOMBIE_TEAM) {
-				Player::setUnitBipedType(playerIndex, Player::Biped::Elite);
+				Player::setUnitBipedType(playerIndex, Player::Biped::Flood);
 
 				h2mod->disable_weapon_pickup(false);
 				h2mod->team_player_indicator_visibility(true);
@@ -307,7 +316,7 @@ void Infection::infectPlayer(int playerIndex, datum unitDatumIndex) {
 			LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", h2mod->get_local_player_name(0), playerIdentifier);
 
 			//If player being infected is LocalUser/Player
-			if (playerIdentifier == Player::getIdentifier(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
+			if (playerIdentifier == Player::getIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
 				LOG_TRACE_GAME("[h2mod-infection] Setting player as zombie");
 				h2mod->set_local_team_index(0, ZOMBIE_TEAM);
 				Player::setUnitBipedType(playerIndex, Player::Biped::Elite);
@@ -327,7 +336,7 @@ void Infection::infectPlayers(int playerIndex, datum unitDatumIndex) {
 		if (unit_object) {
 			if (h2mod->get_unit_team_index(unitDatumIndex) == ZOMBIE_TEAM) {
 				//don't drop swords after zombie death
-				Engine::Unit::remove_equipment(unitDatumIndex); //Take away zombie's weapons
+				EngineCalls::Unit::remove_equipment(unitDatumIndex); //Take away zombie's weapons
 			}
 			else {
 				Infection::setZombiePlayerStatus(Player::getIdentifier(playerIndex));
@@ -376,7 +385,7 @@ void ZombiePreSpawnHandler::onClient()
 	XUID playerIdentifier = Player::getIdentifier(this->getPlayerIndex());
 	LOG_TRACE_GAME(L"[h2mod-infection] Client pre spawn, playerIndex={0}, playerIdentifier={1}, localPlayerName={2}", this->getPlayerIndex(), playerIdentifier, h2mod->get_local_player_name(0));
 	//If player being spawned is LocalUser/Player
-	if (playerIdentifier == Player::getIdentifier(DATUM_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0))))
+	if (playerIdentifier == Player::getIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0))))
 	{
 		LOG_TRACE_GAME("[h2mod-infection] Client pre spawn, found local player, current team = {}", h2mod->get_local_team_index());
 		//Change biped if LocalUser is in GreenTeam

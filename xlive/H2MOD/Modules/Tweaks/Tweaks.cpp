@@ -1,21 +1,18 @@
-
+#include "Tweaks.h"
+#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\Tweaks\Tweaks.h"
-#include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD\Variants\VariantMPGameEngine.h"
-#include "XLive\xnet\IpManagement\XnIp.h"
-#include "H2MOD\Modules\Accounts\AccountLogin.h"
+#include "H2MOD\Modules\CustomResolutions\CustomResolutions.h"
+#include "H2MOD\Modules\HudElements\HudElements.h"
+#include "H2MOD\Modules\Networking\Networking.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
-#include "..\CustomResolutions\CustomResolutions.h"
-#include "H2MOD/Modules/HudElements/HudElements.h"
-
+#include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Tags\TagInterface.h"
-#include "H2MOD/Modules/Networking/Networking.h"
+#include "H2MOD\Variants\VariantMPGameEngine.h"
 #include "Util\Hooks\Hook.h"
-
-#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "XLive\xnet\IpManagement\XnIp.h"
 
 #pragma region Done_Tweaks
 
@@ -315,13 +312,7 @@ int Video_HUDSizeUpdate_hook(int hudSize, int safeArea)
 	return retVal;
 }
 
-struct ui_text_bounds
-{
-	short top;
-	short left;
-	short bottom;
-	short right;
-};
+
 
 typedef int(__cdecl *sub_671B02_ptr)(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int a4, int a5, float a6, int a7, int a8);
 sub_671B02_ptr sub_671B02_orig;

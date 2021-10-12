@@ -1,10 +1,8 @@
-
-#include "Util\Hooks\Hook.h"
-#include <sys/timeb.h>
-
-#include "H2MOD\Modules\Utils\Utils.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
+#include "Utils.h"
 #include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "Util\Hooks\Hook.h"
+#include <sys\timeb.h>
 
 int FindLineStart(FILE* fp, int lineStrLen) {
 	int fp_offset_orig = ftell(fp);
@@ -313,6 +311,33 @@ bool FloatIsNaN(float vagueFloat) {
 		return true;
 	}
 	return false;
+}
+
+bool isFloat(std::string myString)
+{
+	std::istringstream iss(myString);
+	float f;
+	iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
+	// Check the entire string was consumed and if either failbit or badbit is set
+	return iss.eof() && !iss.fail();
+}
+bool isFloat(std::wstring myString)
+{
+	std::wistringstream iss(myString);
+	float f;
+	iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
+	// Check the entire string was consumed and if either failbit or badbit is set
+	return iss.eof() && !iss.fail();
+}
+
+bool isInteger(std::string myString)
+{
+	return myString.find_first_not_of("0123456789") == std::string::npos;
+}
+
+bool isInteger(std::wstring myString)
+{
+	return myString.find_first_not_of(L"0123456789") == std::wstring::npos;
 }
 
 int HostnameToIp(char* hostname, char* ip) {
@@ -664,4 +689,10 @@ int TimeElapsedMS(int startms)
 	if (nSpan < 0)
 		nSpan += 0x100000 * 1000;
 	return nSpan;
+}
+
+bool FileTypeCheck(const std::string& file_path, const std::string& file_type)
+{
+	auto a = file_path.substr(file_path.find_last_of('.') + 1, file_path.length() - file_path.find_last_of('.') - 1);
+	return a == file_type;
 }

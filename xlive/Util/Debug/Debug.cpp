@@ -1,11 +1,11 @@
-#include "stdafx.h"
-#include <string>
-#include <Dbghelp.h>
-#include <time.h>
-#include <Shlwapi.h>
-#include <Shlobj.h>
 #include "Debug.h"
-#include "../H2MOD.h"
+#include "H2MOD.h"
+#include "stdafx.h"
+#include <DbgHelp.h>
+#include <ShlObj.h>
+#include <Shlwapi.h>
+#include <string>
+#include <time.h>
 
 #define crash_reports_path "\\halo2_crash_reports\\"
 

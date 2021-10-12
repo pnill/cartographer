@@ -1,6 +1,6 @@
 #include "PlayerControl.h"
-#include "Util/Hooks/Hook.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.h"
+#include "Util\Hooks\Hook.h"
+#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 
 
 typedef void __cdecl c_UpdatePlayerControl(float yaw, float pitch);
@@ -9,7 +9,8 @@ c_UpdatePlayerControl* p_UpdatePlayerControl;
 void __cdecl UpdatePlayerControl(float yawChange, float pitchChange)
 {
 	p_UpdatePlayerControl(yawChange, pitchChange);
-	EventHandler::executePlayerControlCallback(yawChange, pitchChange);
+	//EventHandler::execute_callback<EventHandler::PlayerControlEvent>(execute_after, &yawChange, &pitchChange);
+	//EventHandler::executePlayerControlCallback(yawChange, pitchChange);
 }
 
 typedef void __cdecl p_network_player_actions_to_player_actions(s_player_motion *nActions, s_player_actions *pActions);
@@ -35,10 +36,18 @@ s_player_actions PlayerControl::GetPlayerActions(int player_index)
 
 s_player_control* PlayerControl::GetControls(int local_player_index)
 {
-	return *Memory::GetAddress<s_player_control**>(0x4ca37c + (local_player_index * sizeof(s_player_control)));
+	//What the hell is even this
+	//auto player_controls_globals = (s_player_control_globals*)(*(DWORD*)(0x4ca37c));
+	auto player_controls_globals = *Memory::GetAddress<s_player_control_globals**>(0x4ca37c);
+	return &player_controls_globals->local_players[local_player_index];
 }
 
 s_player_motion* PlayerControl::GetPlayerMotion(int player_index)
 {
 	return Memory::GetAddress<s_player_motion*>(0x514EE8 + player_index * sizeof(s_player_motion));
+}
+void PlayerControl::DisableLocalCamera(bool state)
+{
+	auto player_controls_globals = *Memory::GetAddress<s_player_control_globals**>(0x4ca37c);
+	player_controls_globals->DisableCamera = state;
 }

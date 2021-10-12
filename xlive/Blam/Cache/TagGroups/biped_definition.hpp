@@ -59,7 +59,7 @@ struct s_biped_group_definition :TagGroup<'bipd'>
 	PAD(0x10);//0x248
 	float head_shot_acc_scale;//0x258
 	tag_reference area_damage_effect;//0x25C
-	enum class e_flags : __int32
+	enum class e_physics_flags : __int32
 	{
 		centered_at_origin = FLAG(0),
 		shape_spherical = FLAG(1),
@@ -69,7 +69,7 @@ struct s_biped_group_definition :TagGroup<'bipd'>
 		not_physical = FLAG(5),
 		dead_character_collision_group = FLAG(6),
 	};
-	e_flags flags;//0x264
+	e_physics_flags flags;//0x264
 	float height_standing;//0x268
 	float height_crouching;//0x26C
 	float radius;//0x270
