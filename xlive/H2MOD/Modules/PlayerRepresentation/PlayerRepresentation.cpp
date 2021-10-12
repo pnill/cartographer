@@ -44,7 +44,7 @@ namespace player_representation
 
 			if (!DATUM_IS_NONE(tp_biped))
 			{
-				new_rep->third_person_unit.TagGroup == blam_tag::tag_group_type::biped;
+				new_rep->third_person_unit.TagGroup = blam_tag::tag_group_type::biped;
 				new_rep->third_person_unit.TagIndex = tp_biped;
 			}
 			else
