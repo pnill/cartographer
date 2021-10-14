@@ -882,7 +882,7 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 		&& EngineCalls::get_game_life_cycle() != life_cycle_post_game)
 		return;
 
-	getPlayerRanksByStringList(buildPlayerRankUpdateQueryStringList());
+	std::thread(getPlayerRanksByStringList, buildPlayerRankUpdateQueryStringList()).detach();
 }
 
 void StatsHandler::sendRankChangeFromDocument(rapidjson::Document* document)
