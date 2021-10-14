@@ -47,6 +47,7 @@ namespace CustomVariantSettings
 	void __cdecl EncodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data);
 	bool __cdecl DecodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data);
 
+	void ApplyCustomSettings(s_variantSettings* newVariantSettings);
 	void UpdateCustomVariantSettings(s_variantSettings* data);
 	void SendCustomVariantSettings(int peerIndex);
 	void ApplyHooks();
