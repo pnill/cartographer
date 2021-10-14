@@ -1316,7 +1316,7 @@ void H2MOD::RegisterEvents()
 	{
 		//Setup Events for H2Config_vip_lock
 		if(H2Config_vip_lock)
-			EventHandler::register_callback<EventHandler::GameStateEvent>(vip_lock, execute_after, true);
+			EventHandler::register_callback<EventHandler::GameStateEvent>(vip_lock, execute_after);
 	}
 	//Things that apply to both
 	

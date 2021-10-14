@@ -170,7 +170,7 @@ namespace EventHandler
 	 * \param threaded tells the executor to only run this callback in a threaded manner
 	 * \param run_once flags the callback to only be ran once and then erased afterwards.
 	 */
-	template<typename T> static void register_callback(const T callback, EventExecutionType execution_type = execute_after, bool threaded = false, bool run_once = false)
+	template<typename T> static void register_callback(const T callback, EventExecutionType execution_type = execute_after, bool run_once = false)
 	{
 		auto type = get_type<T>();
 		if(type != EventType::none)
@@ -178,7 +178,7 @@ namespace EventHandler
 			//Prevent duplicate events
 			remove_callback<T>(callback, execution_type);
 			
-			get_vector(type)->emplace_back(callback, type, execution_type, threaded, run_once);
+			get_vector(type)->emplace_back(callback, type, execution_type, false, run_once);
 		}
 	}
 	/**
@@ -209,7 +209,7 @@ namespace EventHandler
 		execute_internal(execution_type, false);
 		//When trying to debug issues in threaded callbacks switch out the two lines, helps trace call stacks
 		//execute_internal(execution_type, true);
-		std::thread(execute_internal, execution_type, true).detach();
+		//std::thread(execute_internal, execution_type, true).detach();
 		
 	}
 }

@@ -237,8 +237,8 @@ namespace CustomVariantSettings
 		ApplyHooks();
 		
 		EventHandler::register_callback<EventHandler::GameStateEvent>(OnGamestateChange);
-		EventHandler::register_callback<EventHandler::CountdownStartEvent>(OnMatchCountdown, execute_after,true);
-		EventHandler::register_callback<EventHandler::NetworkPlayerEvent>(OnNetworkPlayerEvent, execute_after, true);
+		EventHandler::register_callback<EventHandler::CountdownStartEvent>(OnMatchCountdown, execute_after);
+		EventHandler::register_callback<EventHandler::NetworkPlayerEvent>(OnNetworkPlayerEvent, execute_after);
 		EventHandler::register_callback<EventHandler::BlueScreenEvent>(ApplyCustomSettings, execute_after);
 		EventHandler::register_callback<EventHandler::PlayerSpawnEvent>(OnPlayerSpawn, execute_after);
 		EventHandler::register_callback<EventHandler::PlayerDeathEvent>(OnPlayerDeath, execute_before);

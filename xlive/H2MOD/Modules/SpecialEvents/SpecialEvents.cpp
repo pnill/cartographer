@@ -652,7 +652,7 @@ namespace SpecialEvents
 					sbps->decorators_block.size = 0;
 					sbps->decorators_block.data = 0;
 
-					EventHandler::register_callback<EventHandler::GameStateEvent>(halloween_game_state, execute_after, false, true);
+					EventHandler::register_callback<EventHandler::GameStateEvent>(halloween_game_state, execute_after, true);
 				}
 				if (wcscmp(mapName, L"Lockout") == 0)
 				{
@@ -662,7 +662,7 @@ namespace SpecialEvents
 					LOG_INFO_GAME("{:x}", candle_datum);
 					LOG_INFO_GAME("{:x}", candle_fire_datum);
 					LOG_INFO_GAME("{:x}", pump_datum);
-					EventHandler::register_callback<EventHandler::GameStateEvent>(halloween_game_state, execute_after, false, true);
+					EventHandler::register_callback<EventHandler::GameStateEvent>(halloween_game_state, execute_after, true);
 				}
 			}
 			else
