@@ -52,7 +52,6 @@ FireFight* fireFightHandler = new FireFight();
 HeadHunter* headHunterHandler = new HeadHunter();
 VariantPlayer* variant_player = new VariantPlayer();
 AdvLobbySettings* advLobbySettings = new AdvLobbySettings();
-StatsHandler* stats_handler; 
 
 extern int H2GetInstanceId();
 
@@ -337,9 +336,9 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 		return;
 	}
 
-	static std::string grenadeEquipamentTagName[2] =
+	static const std::string grenadeEquipamentTagName[2] =
 	{
-		"objects\\weapons\\grenade\\frag_grenade\\frag_grenade"
+		"objects\\weapons\\grenade\\frag_grenade\\frag_grenade",
 		"objects\\weapons\\grenade\\plasma_grenade\\plasma_grenade"
 	};
 
@@ -357,7 +356,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 
 		// not sure what these flags are, but this is called when picking up grenades
 		typedef void(__cdecl* entity_set_unk_flags)(datum objectIndex, int flags);
-		auto p_entity_set_unk_flags = Memory::GetAddress<entity_set_unk_flags>(0x1B6685, 0x1B05B5);
+		auto p_simulation_action_object_update = Memory::GetAddress<entity_set_unk_flags>(0x1B6685, 0x1B05B5);
 
 		typedef void(__cdecl* unit_add_grenade_to_inventory_send)(datum unitDatumIndex, datum equipamentTagIndex);
 		auto p_unit_add_grenade_to_inventory_send = Memory::GetAddress<unit_add_grenade_to_inventory_send>(0x1B6F12, 0x1B0E42);
@@ -368,13 +367,12 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 			// set grenade count
 			*(BYTE*)(unit_object + 0x252 + type) = count;
 
-			p_entity_set_unk_flags(unit_datum_index, FLAG(22)); // flag 22 seems to be sync entity grenade count (TODO: list all of the update types)
-			p_unit_add_grenade_to_inventory_send(unit_datum_index, grenade_eqip_tag_datum_index);
+			p_simulation_action_object_update(unit_datum_index, FLAG(22)); // flag 22 seems to be sync entity grenade count (TODO: list all of the update types)
+			//p_unit_add_grenade_to_inventory_send(unit_datum_index, grenade_eqip_tag_datum_index);
 		}
 
-		LOG_TRACE_GAME("[H2Mod-GunGame] set_player_unit_grenades_count - sending grenade simulation update, playerIndex={0}, peerIndex={1}", playerIndex, NetworkSession::getPeerIndex(playerIndex));
+		LOG_TRACE_GAME("set_player_unit_grenades_count() - sending grenade simulation update, playerIndex={0}, peerIndex={1}", playerIndex, NetworkSession::getPeerIndex(playerIndex));
 	}
-
 }
 
 BYTE H2MOD::get_local_team_index()
@@ -1285,7 +1283,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 		return false;
 }
 //TODO: Move this.
-void vip_lock(game_life_cycle state)
+void vip_lock(e_game_life_cycle state)
 {
 	if(state == life_cycle_post_game)
 	{
@@ -1465,13 +1463,12 @@ VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DW
 
 void H2MOD::Initialize()
 {
-	stats_handler = new StatsHandler();
 	if (!Memory::isDedicatedServer())
 	{
 		MouseInput::Initialize();
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
-		
+
 		Initialise_tag_loader();
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
@@ -1503,6 +1500,7 @@ void H2MOD::Initialize()
 	h2mod->RegisterEvents();
 
 	EngineCalls::Objects::apply_biped_object_definition_patches();
+	StatsHandler::Initialize();
 }
 
 void H2MOD::Deinitialize() {

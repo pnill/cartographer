@@ -8,7 +8,7 @@ BYTE toggleZoom[] = { 0x66, 0x89, 0x45, 0x3E };
 
 static float gameEffectsUnknownValue = 30.f;
 
-void UncappedFPS2::OnGameStateChange(game_life_cycle state)
+void UncappedFPS2::OnGameStateChange(e_game_life_cycle state)
 {
 	switch(state)
 	{

@@ -5,12 +5,12 @@
 
 namespace EngineHooks
 {
-	static game_life_cycle previousGamestate = life_cycle_none;
+	static e_game_life_cycle previousGamestate = life_cycle_none;
 	ChangeGameState p_EvaulateGameState;
 	void EvaluateGameState()
 	{
 		p_EvaulateGameState(Memory::GetAddress<BYTE*>(0x420FC4, 0x3C40AC));
-		game_life_cycle GameState = *Memory::GetAddress<game_life_cycle*>(0x420FC4, 0x3C40AC);
+		e_game_life_cycle GameState = *Memory::GetAddress<e_game_life_cycle*>(0x420FC4, 0x3C40AC);
 		if (previousGamestate != GameState) {
 			previousGamestate = GameState;
 			EventHandler::execute_callback<EventHandler::GameStateEvent>(execute_after, GameState);

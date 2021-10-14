@@ -14,9 +14,10 @@
 
 std::map<std::wstring, CustomVariantSettings::s_variantSettings> CustomVariantSettingsMap;
 CustomVariantSettings::s_variantSettings CurrentVariantSettings;
+CustomVariantSettings::s_variantSettings defaultCustomVariantSettings;
+
 namespace CustomVariantSettings
 {
-	float* defaultGravity;
 	void __cdecl EncodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data)
 	{
 		stream->data_encode_bits("gravity", &data->Gravity, sizeof(data->Gravity) * CHAR_BIT); //16.
@@ -46,15 +47,9 @@ namespace CustomVariantSettings
 		return stream->packet_is_valid() == false;
 	}
 
-	void RecieveCustomVariantSettings(s_variantSettings* data)
+	void UpdateCustomVariantSettings(s_variantSettings* data)
 	{
-		CurrentVariantSettings.Gravity = data->Gravity;
-		CurrentVariantSettings.InfiniteAmmo = data->InfiniteAmmo;
-		CurrentVariantSettings.ExplosionPhysics = data->ExplosionPhysics;
-		CurrentVariantSettings.HillRotation = data->HillRotation;
-		CurrentVariantSettings.GameSpeed = data->GameSpeed;
-		CurrentVariantSettings.InfiniteGrenades = data->InfiniteGrenades;
-		CurrentVariantSettings.ForcedFOV = data->ForcedFOV;
+		CurrentVariantSettings = *data;
 	}
 
 	void SendCustomVariantSettings(int peerIndex)
@@ -67,7 +62,7 @@ namespace CustomVariantSettings
 			if (CustomVariantSettingsMap.count(VariantName) > 0)
 			{
 				CurrentVariantSettings = CustomVariantSettingsMap.at(VariantName);
-				if (CurrentVariantSettings != s_variantSettings()) {
+				if (CurrentVariantSettings != defaultCustomVariantSettings) {
 					network_observer* observer = session->network_observer_ptr;
 					peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peerIndex);
 					if (peerIndex != -1 && peerIndex != session->local_peer_index && observer_channel->field_1)
@@ -82,7 +77,7 @@ namespace CustomVariantSettings
 	}
 	void ResetSettings()
 	{
-		CurrentVariantSettings = s_variantSettings();
+		CurrentVariantSettings = defaultCustomVariantSettings;
 	}
 
 	void OnPlayerSpawn(datum PlayerDatum)
@@ -90,18 +85,6 @@ namespace CustomVariantSettings
 		if (NetworkSession::localPeerIsSessionHost()) {
 			if (CurrentVariantSettings.InfiniteGrenades)
 			{
-				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 99, false);
-				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Plasma, 99, false);
-			}
-		}
-	}
-
-	void OnPlayerDeath(datum PlayerDatum, datum KillerDatum)
-	{
-		if (NetworkSession::localPeerIsSessionHost()) {
-			if (CurrentVariantSettings.InfiniteGrenades)
-			{
-				//Prevent Players from dropping 198 grenades on death..
 				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 4, false);
 				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Plasma, 4, false);
 			}
@@ -123,22 +106,33 @@ namespace CustomVariantSettings
 			if (CurrentVariantSettings.InfiniteAmmo)
 			{
 				//Nop remove ammo from clips
-				NopFill(Memory::GetAddress(0x15F3EA, 0x1436AA), 4);
+				NopFill(Memory::GetAddress(0x15F3EA, 0x1436AA), sizeof(InfiniteAmmoMagazineASM));
 				//Nop remove energy from battery.
-				NopFill(Memory::GetAddress(0x15f7c6, 0x143A86), 8);
+				NopFill(Memory::GetAddress(0x15f7c6, 0x143A86), sizeof(InfiniteAmmoBatteryASM));
 			}
 			else
 			{
-				WriteBytes(Memory::GetAddress(0x15F3EA, 0x1436AA), InfiniteAmmoMagazineASM, 4);
-				WriteBytes(Memory::GetAddress(0x15f7c6, 0x143A86), InfiniteAmmoBatteryASM, 8);
+				WriteBytes(Memory::GetAddress(0x15F3EA, 0x1436AA), InfiniteAmmoMagazineASM, sizeof(InfiniteAmmoMagazineASM));
+				WriteBytes(Memory::GetAddress(0x15f7c6, 0x143A86), InfiniteAmmoBatteryASM, sizeof(InfiniteAmmoBatteryASM));
+			}
+
+			static BYTE InfiniteGrenadesASM[] = { 0x80, 0x84, 0x30, 0x52, 0x02, 0x00, 0x00, 0xFF };
+			if (CurrentVariantSettings.InfiniteGrenades)
+			{
+				NopFill(Memory::GetAddress(0x1666A8, 0x15C168), sizeof(InfiniteGrenadesASM));
+			}
+			else
+			{
+				WriteBytes(Memory::GetAddress(0x1666A8, 0x15C168), InfiniteGrenadesASM, sizeof(InfiniteGrenadesASM));
 			}
 
 			//Client Only
 			if (!Memory::isDedicatedServer()) {
 				if (CurrentVariantSettings.ExplosionPhysics)
-					WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1e);
+					WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1E);
 				else
 					WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0);
+
 				if(CurrentVariantSettings.ForcedFOV != 0)
 				{
 					HudElements::setFOV();
@@ -161,7 +155,7 @@ namespace CustomVariantSettings
 			}
 		}
 	}
-	void OnGamestateChange(game_life_cycle state)
+	void OnGamestateChange(e_game_life_cycle state)
 	{
 		if (state == life_cycle_in_game) 
 		{
@@ -190,9 +184,9 @@ namespace CustomVariantSettings
 
 	typedef int(__cdecl c_get_next_hill_index)(int previousHill);
 	c_get_next_hill_index* p_get_next_hill_index;
-	int currentPredefinedIndex = 0;
 	signed int __cdecl get_next_hill_index(int previousHill)
 	{
+		static int currentPredefinedIndex = 0;
 		int hillCount = *Memory::GetAddress<int*>(0x4dd0a8, 0x5008e8);
 
 		//Return -1 to tell the engine there is no koth hills on the map.
@@ -241,6 +235,5 @@ namespace CustomVariantSettings
 		EventHandler::register_callback<EventHandler::NetworkPlayerEvent>(OnNetworkPlayerEvent, execute_after);
 		EventHandler::register_callback<EventHandler::BlueScreenEvent>(ApplyCustomSettings, execute_after);
 		EventHandler::register_callback<EventHandler::PlayerSpawnEvent>(OnPlayerSpawn, execute_after);
-		EventHandler::register_callback<EventHandler::PlayerDeathEvent>(OnPlayerDeath, execute_before);
 	}
 }

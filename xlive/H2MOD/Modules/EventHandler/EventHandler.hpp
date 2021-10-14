@@ -20,8 +20,6 @@
  *  I.E NOT IN GAME.
  */
 
-
-
 enum EventType
 {
 	network_player,
@@ -42,21 +40,20 @@ enum EventExecutionType
 	execute_after
 };
 
-template<typename T> class EventCallback
+template<typename T> 
+class EventCallback
 {
 public:
 	T callback;
 	EventType type;
 	EventExecutionType execution_type;
-	bool threaded;
 	bool runOnce;
 	bool hasRun = false;
-	EventCallback(const T callback, EventType type, EventExecutionType execution_type = execute_after, bool threaded = false, bool runOnce = false)
+	EventCallback(const T callback, EventType type, EventExecutionType execution_type = execute_after, bool runOnce = false)
 	{
 		this->callback = callback;
 		this->type = type;
 		this->execution_type = execution_type;
-		this->threaded = threaded;
 		this->runOnce = runOnce;
 	}
 };
@@ -72,7 +69,7 @@ namespace EventHandler
 	};
 
 	using CountdownStartEvent = void(*)();
-	using GameStateEvent = void(*)(game_life_cycle state);
+	using GameStateEvent = void(*)(e_game_life_cycle state);
 	using NetworkPlayerEvent = void(*)(int peerIndex, NetworkPlayerEventType type);
 	using GameLoopEvent = void(*)();
 	using ServerCommandEvent = void(*)(ServerConsole::ServerConsoleCommands command);
@@ -86,7 +83,8 @@ namespace EventHandler
 	 * \tparam T alias event type
 	 * \return EventType::
 	 */
-	template<typename T> static EventType get_type()
+	template<typename T> 
+	static EventType get_type()
 	{
 		if (std::is_same<T, GameStateEvent>::value)
 			return EventType::gamestate_change;
@@ -167,7 +165,6 @@ namespace EventHandler
 	 * \tparam T Event Alias type
 	 * \param callback point to the callback
 	 * \param execution_type determines if the callback will be ran before or after the execution of the triggering function
-	 * \param threaded tells the executor to only run this callback in a threaded manner
 	 * \param run_once flags the callback to only be ran once and then erased afterwards.
 	 */
 	template<typename T> static void register_callback(const T callback, EventExecutionType execution_type = execute_after, bool run_once = false)
@@ -178,7 +175,7 @@ namespace EventHandler
 			//Prevent duplicate events
 			remove_callback<T>(callback, execution_type);
 			
-			get_vector(type)->emplace_back(callback, type, execution_type, false, run_once);
+			get_vector(type)->emplace_back(callback, type, execution_type, run_once);
 		}
 	}
 	/**
@@ -191,12 +188,12 @@ namespace EventHandler
 	template<typename T, typename ... Args>
 	static void execute_callback(EventExecutionType execution_type, Args&& ... args)
 	{
-		auto execute_internal = [&](EventExecutionType execution_type, bool threaded)
+		auto execute_internal = [&](EventExecutionType execution_type)
 		{
 			auto type = get_type<T>();
 			std::vector<EventCallback<void*>>* events = get_vector(type);
-			for (std::vector<EventCallback<void*>>::iterator it = events->begin(); it != events->end(); ++it) {
-				if (it->type == type && it->execution_type == execution_type && it->threaded == threaded)
+			for (auto it = events->begin(); it != events->end(); ++it) {
+				if (it->type == type && it->execution_type == execution_type)
 				{
 					((T)it->callback)(std::forward<Args>(args) ...);
 					it->hasRun = true;
@@ -206,7 +203,7 @@ namespace EventHandler
 		};
 		//uncomment this for debugging.
 		//LOG_TRACE_GAME("[{}]: {} ", __FUNCSIG__, execution_type);
-		execute_internal(execution_type, false);
+		execute_internal(execution_type);
 		//When trying to debug issues in threaded callbacks switch out the two lines, helps trace call stacks
 		//execute_internal(execution_type, true);
 		//std::thread(execute_internal, execution_type, true).detach();

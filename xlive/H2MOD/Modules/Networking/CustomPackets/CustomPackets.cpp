@@ -305,7 +305,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
 		{
 			auto recieved_data = (CustomVariantSettings::s_variantSettings*)packet;
-			CustomVariantSettings::RecieveCustomVariantSettings(recieved_data);
+			CustomVariantSettings::UpdateCustomVariantSettings(recieved_data);
 		}
     return;
 	}

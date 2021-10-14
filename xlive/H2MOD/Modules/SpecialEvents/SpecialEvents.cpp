@@ -488,7 +488,7 @@ namespace SpecialEvents
 	datum candle_fire_datum;
 	datum large_candle_datum;
 	datum pump_datum;
-	void halloween_game_state(game_life_cycle state)
+	void halloween_game_state(e_game_life_cycle state)
 	{
 		if (state == life_cycle_in_game) {
 			if(H2Config_spooky_boy)
