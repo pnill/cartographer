@@ -13,7 +13,7 @@ namespace EngineHooks
 		game_life_cycle GameState = *Memory::GetAddress<game_life_cycle*>(0x420FC4, 0x3C40AC);
 		if (previousGamestate != GameState) {
 			previousGamestate = GameState;
-			EventHandler::execute_callback<EventHandler::GameStateEvent>(execute_after, GameState);
+			EventHandler::execute_callback<EventHandler::GameStateEvent>(gamestate_change, execute_after, GameState);
 		}
 	}
 
@@ -21,7 +21,7 @@ namespace EngineHooks
 	void __cdecl main_game_reset_map_blue_screen_detection()
 	{
 		c_main_game_reset_map();
-		EventHandler::execute_callback<EventHandler::BlueScreenEvent>(execute_after);
+		EventHandler::execute_callback<EventHandler::BlueScreenEvent>(blue_screen, execute_after);
 		LOG_TRACE_GAME("[{}] Bluescreen Detected.", __FUNCTION__);
 	}
 

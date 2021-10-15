@@ -3,6 +3,9 @@
 #include "H2MOD\Modules\ServerConsole\ServerConsole.h"
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 
+
+#define EVENT_HANDLER_ENABLE_TEST_EVENTS 0
+
 /*
  * To Setup a new Event you need to add an enum to EventType above the none enum
  * Then inside EventHandler you need to create a function alias type use the current ones as an example
@@ -48,15 +51,13 @@ public:
 	T callback;
 	EventType type;
 	EventExecutionType execution_type;
-	bool threaded;
 	bool runOnce;
 	bool hasRun = false;
-	EventCallback(const T callback, EventType type, EventExecutionType execution_type = execute_after, bool threaded = false, bool runOnce = false)
+	EventCallback(const T callback, EventType type, EventExecutionType execution_type = execute_after, bool runOnce = false)
 	{
 		this->callback = callback;
 		this->type = type;
 		this->execution_type = execution_type;
-		this->threaded = threaded;
 		this->runOnce = runOnce;
 	}
 };
@@ -116,7 +117,7 @@ namespace EventHandler
 	 * \param type the event type
 	 * \return std::vector<EventCallback<void*>>
 	 */
-	static std::vector<EventCallback<void*>>* get_vector(EventType type)
+	__declspec(noinline) static std::vector<EventCallback<void*>>* get_vector(EventType type)
 	{
 		//If the map doesn't contain a vector for the type create one
 		if (event_map.count(type) == 0)
@@ -131,9 +132,8 @@ namespace EventHandler
 	 * \param callback pointer to the callback to be removed
 	 * \param execution_type the execution type of the method to be removed
 	 */
-	template<typename T> static void remove_callback(const T callback, EventExecutionType execution_type)
+	template<typename T> static void remove_callback(const T callback, EventType type, EventExecutionType execution_type)
 	{
-		auto type = get_type<T>();
 		std::vector<EventCallback<void*>>* events = get_vector(type);
 		for (std::vector<EventCallback<void*>>::iterator it = events->begin(); it != events->end(); ++it)
 		{
@@ -144,14 +144,27 @@ namespace EventHandler
 			}
 		}
 	}
+	template<typename T> static void remove_callback2(void* callback, EventExecutionType execution_type)
+	{
+		auto type = get_type<T>();
+		std::vector<EventCallback<void*>>* events = get_vector(type);
+		for (std::vector<EventCallback<void*>>::iterator it = events->begin(); it != events->end(); ++it)
+		{
+			if ((T)it->callback == callback && it->type == type && it->execution_type == execution_type)
+			{
+				events->erase(it);
+				return;
+			}
+		}
+	}
+
 	/**
 	 * \brief Erases callbacks that are flagged with run once that have ran
 	 * \tparam T event alias type
 	 * \param execution_type 
 	 */
-	template<typename T> static void cleanup_callbacks(EventExecutionType execution_type)
+	template<typename T> __declspec(noinline) static void cleanup_callbacks(EventType type, EventExecutionType execution_type)
 	{
-		auto type = get_type<T>();
 		std::vector<EventCallback<void*>>* events = get_vector(type);
 		auto it = events->begin();
 		while(it != events->end())
@@ -162,25 +175,7 @@ namespace EventHandler
 				++it;
 		}
 	}
-	/**
-	 * \brief Registers a new callback that will execute off the given parameters
-	 * \tparam T Event Alias type
-	 * \param callback point to the callback
-	 * \param execution_type determines if the callback will be ran before or after the execution of the triggering function
-	 * \param threaded tells the executor to only run this callback in a threaded manner
-	 * \param run_once flags the callback to only be ran once and then erased afterwards.
-	 */
-	template<typename T> static void register_callback(const T callback, EventExecutionType execution_type = execute_after, bool run_once = false)
-	{
-		auto type = get_type<T>();
-		if(type != EventType::none)
-		{
-			//Prevent duplicate events
-			remove_callback<T>(callback, execution_type);
-			
-			get_vector(type)->emplace_back(callback, type, execution_type, false, run_once);
-		}
-	}
+	
 	/**
 	 * \brief Executes the callbacks based off the given parameters
 	 * \tparam T The Event Alias type of callback's to execute
@@ -189,27 +184,119 @@ namespace EventHandler
 	 * \param args Any arguments that need to be forwarded to the callback's
 	 */
 	template<typename T, typename ... Args>
-	static void execute_callback(EventExecutionType execution_type, Args&& ... args)
+	static void execute_callback(EventType type,EventExecutionType execution_type, Args&& ... args)
 	{
-		auto execute_internal = [&](EventExecutionType execution_type, bool threaded)
-		{
-			auto type = get_type<T>();
-			std::vector<EventCallback<void*>>* events = get_vector(type);
-			for (std::vector<EventCallback<void*>>::iterator it = events->begin(); it != events->end(); ++it) {
-				if (it->type == type && it->execution_type == execution_type && it->threaded == threaded)
-				{
-					((T)it->callback)(std::forward<Args>(args) ...);
-					it->hasRun = true;
-				}
+		std::vector<EventCallback<void*>>* events = get_vector(type);
+		for (std::vector<EventCallback<void*>>::iterator it = events->begin(); it != events->end(); ++it) {
+			if (it->type == type && it->execution_type == execution_type)
+			{
+				((T)it->callback)(std::forward<Args>(args) ...);
+				it->hasRun = true;
 			}
-			cleanup_callbacks<T>(execution_type);
-		};
+		}
+		cleanup_callbacks<T>(type, execution_type);
 		//uncomment this for debugging.
 		//LOG_TRACE_GAME("[{}]: {} ", __FUNCSIG__, execution_type);
-		execute_internal(execution_type, false);
-		//When trying to debug issues in threaded callbacks switch out the two lines, helps trace call stacks
-		//execute_internal(execution_type, true);
-		//std::thread(execute_internal, execution_type, true).detach();
-		
 	}
+
+
+
+	template<EventType E> static void register_callback(void* callback, EventExecutionType execution_type = execute_after, bool run_once = false)
+	{
+		if (E != EventType::none)
+		{
+			switch(E)
+			{
+				case network_player:
+					remove_callback2<NetworkPlayerEvent>(callback, execution_type);
+					break;
+				case gamestate_change:
+					remove_callback2<GameStateEvent>(callback, execution_type);
+					break;
+				case game_loop:
+					remove_callback2<GameLoopEvent>(callback, execution_type);
+					break;
+				case server_command: 
+					remove_callback2<ServerCommandEvent>(callback, execution_type);
+					break;
+				case map_load: 
+					remove_callback2<MapLoadEvent>(callback, execution_type);
+					break;
+				case countdown_start: 
+					remove_callback2<CountdownStartEvent>(callback, execution_type);
+					break;
+				case player_control: 
+					remove_callback2<PlayerControlEvent>(callback, execution_type);
+					break;
+				case blue_screen: 
+					remove_callback2<BlueScreenEvent>(callback, execution_type);
+					break;
+				case player_spawn_event: 
+					remove_callback2<PlayerSpawnEvent>(callback, execution_type);
+					break;
+				case player_death_event: 
+					remove_callback2<PlayerDeathEvent>(callback, execution_type);
+					break;
+			}
+			get_vector(E)->emplace_back(callback, E, execution_type, run_once);
+		}
+	}
+
+
+#if EVENT_HANDLER_ENABLE_TEST_EVENTS
+	static void callback_network(int peer_index, NetworkPlayerEventType type)
+	{
+		LOG_DEBUG_GAME("[{}] {} {}", __FUNCSIG__, peer_index, type);
+	}
+	static void callback_gamestate(game_life_cycle state)
+	{
+		LOG_DEBUG_GAME("[{}] {}", __FUNCSIG__, state);
+	}
+	static void callback_loop()
+	{
+		LOG_DEBUG_GAME("[{}]", __FUNCSIG__);
+	}
+	static void callback_server(ServerConsole::ServerConsoleCommands command)
+	{
+		LOG_DEBUG_GAME("[{}] {}", __FUNCSIG__, command);
+	}
+	static void callback_map(e_engine_type type)
+	{
+		LOG_DEBUG_GAME("[{}] {}", __FUNCSIG__, type);
+	}
+	static void callback_countdown()
+	{
+		LOG_DEBUG_GAME("[{}]", __FUNCSIG__);
+	}
+	static void callback_player_control(float* yaw, float* pitch)
+	{
+		LOG_DEBUG_GAME("[{}] {} {}", __FUNCSIG__, *yaw, *pitch);
+	}
+	static void callback_bluscreen()
+	{
+		LOG_DEBUG_GAME("[{}]", __FUNCSIG__);
+	}
+	static void callback_player_spawn(datum player_datum)
+	{
+		LOG_DEBUG_GAME("[{}] {:x}", __FUNCSIG__, player_datum);
+	}
+	static void callback_player_death(datum player_datum, datum killer_datum)
+	{
+		LOG_DEBUG_GAME("[{}] {:x} {:x}", __FUNCSIG__, player_datum, killer_datum);
+	}
+
+	static void TestEvents()
+	{
+
+		register_callback<network_player>(callback_network);
+		register_callback<gamestate_change>(callback_gamestate);
+		//register_callback<game_loop>(callback_loop);
+		register_callback<server_command>(callback_server);
+		register_callback<map_load>(callback_map);
+		register_callback<player_control>(callback_player_control);
+		register_callback<blue_screen>(callback_bluscreen);
+		register_callback<player_spawn_event>(callback_player_spawn);
+		register_callback<player_death_event>(callback_player_death);
+	}
+#endif
 }

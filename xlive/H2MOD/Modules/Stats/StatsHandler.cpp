@@ -29,15 +29,15 @@ StatsHandler::StatsHandler()
 		Status.StatsEnabled = false;
 		lastTimeRanksSynchronized = steady_clock::now();
 
-		EventHandler::register_callback<EventHandler::ServerCommandEvent>(this->server_command_event, execute_before);
-		EventHandler::register_callback<EventHandler::NetworkPlayerEvent>(this->network_player_event, execute_after);
+		EventHandler::register_callback<server_command>(this->server_command_event, execute_before);
+		EventHandler::register_callback<network_player>(this->network_player_event, execute_after);
 	} 
 	else
 	{
 		// client events
 
 	}
-	EventHandler::register_callback<EventHandler::GameStateEvent>(this->game_state_change, execute_after);
+	EventHandler::register_callback<gamestate_change>(this->game_state_change, execute_after);
 }
 bool initPreGame = false;
 void StatsHandler::game_state_change(game_life_cycle state)

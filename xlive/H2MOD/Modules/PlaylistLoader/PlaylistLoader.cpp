@@ -278,6 +278,6 @@ namespace playlist_loader
 	void initialize()
 	{
 		apply_hooks();
-		EventHandler::register_callback<EventHandler::ServerCommandEvent>(reset_custom_settings, execute_after, false);
+		EventHandler::register_callback<server_command>(reset_custom_settings, execute_after);
 	}
 }
