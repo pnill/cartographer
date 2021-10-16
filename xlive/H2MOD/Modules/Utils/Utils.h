@@ -1,5 +1,5 @@
 #pragma once
-#include "stdafx.h"
+
 
 int FindLineStart(FILE* fp, int lineStrLen);
 ///FREE MEMOERY in fileLine

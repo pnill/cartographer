@@ -1,5 +1,5 @@
 #include "H2MOD\Modules\Startup\Startup.h"
-#include "stdafx.h"
+
 
 char** DebugStr;
 const int DebugTextArrayLenMax = 160;

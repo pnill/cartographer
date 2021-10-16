@@ -1,7 +1,7 @@
 #ifndef _INI_H_
 #define _INI_H_
 
-#include "stdafx.h"
+
 #include <string>
 
 #include <shlwapi.h>

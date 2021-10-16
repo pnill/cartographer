@@ -1,6 +1,6 @@
 #include "Debug.h"
 #include "H2MOD.h"
-#include "stdafx.h"
+
 #include <DbgHelp.h>
 #include <ShlObj.h>
 #include <Shlwapi.h>

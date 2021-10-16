@@ -1,7 +1,7 @@
 #include "CustomMenuGlobals.h"
 #include "CustomLanguage.h"
 #include "H2MOD\Tags\TagInterface.h"
-#include "stdafx.h"
+
 
 void __stdcall sub_2101a4_CMLTD_(int thisptr, int label_id, wchar_t* rtn_label, int label_menu_id);
 void __stdcall sub_21bf85_CMLTD_(int thisptr, int label_id, int label_menu_id);

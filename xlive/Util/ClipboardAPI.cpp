@@ -1,5 +1,5 @@
 #include "ClipboardAPI.h"
-#include "stdafx.h"
+
 #include <mutex>
 
 std::mutex clipboard_mutex;

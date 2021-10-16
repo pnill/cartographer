@@ -56,7 +56,7 @@ enum e_engine_type : int
 	SinglePlayerShared
 };
 
-enum game_life_cycle : int
+enum e_game_life_cycle : int
 {
 	life_cycle_none,
 	life_cycle_pre_game,

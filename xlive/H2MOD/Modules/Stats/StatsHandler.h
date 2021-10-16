@@ -10,74 +10,71 @@
 #include "rapidjson\prettywriter.h"
 #include <rapidjson\document.h>
 
-extern bool Registered;
 class StatsHandler
 {
-	
 public:
-	StatsHandler();
+	StatsHandler::StatsHandler() = delete;
+	StatsHandler::StatsHandler(const StatsHandler& other) = delete;
+	StatsHandler::StatsHandler(StatsHandler&& other) = delete;
+
 	static void sendStats()
 	{
-		if (Memory::isDedicatedServer()) {
-			if (RegisteredStatus().Registered && RegisteredStatus().StatsEnabled) {
-				auto token = getAPIToken();
-				if (strlen(token) != 0) {
-					int verifyPlaylistResponse = verifyPlaylist(token);
-					if (verifyPlaylistResponse == 500 || verifyPlaylistResponse == -1)
-					{
-						LOG_ERROR_GAME(L"[H2MOD] Playlist Verification encountered a server error");
-					}
-					else
-					{
-						bool result = true;
-						if (verifyPlaylistResponse == 201)
+		if (Memory::isDedicatedServer()
+			&& RegisteredStatus().Registered && RegisteredStatus().StatsEnabled) 
+		{
+			auto token = getAPIToken();
+			if (token != nullptr) {
+				int verifyPlaylistResponse = verifyPlaylist(token);
+				if (verifyPlaylistResponse == 201)
+				{
+					if (uploadPlaylist(token) == 200) {
+
+						auto filepath = buildJSON();
+						if (strcmp(filepath, ""))
 						{
-							if (uploadPlaylist(token) != 200) {
-								result = false;
-								LOG_ERROR_GAME(L"[H2MOD] Playlist Uploading encountered an error");
-							}
-						}
-						if (result)
-						{
-							auto filepath = buildJSON();
-							if (strcmp(filepath, ""))
+							if (uploadStats(filepath, token) == 200)
 							{
-								if (uploadStats(filepath, token) == 200)
-								{
-									remove(filepath);
-									LOG_TRACE_GAME("[H2MOD] Stats uploaded successfully");
-								}
-								else
-								{
-									LOG_ERROR_GAME(L"[H2MOD] Stats Uploading encountered an error");
-								}
+								remove(filepath);
+								LOG_TRACE_GAME("[H2MOD] Stats uploaded successfully");
 							}
 							else
 							{
-								LOG_ERROR_GAME(L"[H2MOD] Stats Json failed to build");
+								LOG_ERROR_GAME(L"[H2MOD] Stats Uploading encountered an error");
 							}
 						}
+						else
+						{
+							LOG_ERROR_GAME(L"[H2MOD] Stats Json failed to build");
+						}
+
 					}
+					else
+					{
+						LOG_ERROR_GAME(L"[H2MOD] Playlist Uploading encountered an error");
+					}
+				}
+				else if (verifyPlaylistResponse == 500 || verifyPlaylistResponse == -1)
+				{
+					LOG_ERROR_GAME(L"[H2MOD] Playlist Verification encountered a server error");
 				}
 			}
 		}
 	}
+
 	static void verifySendPlaylist()
 	{
-		if(Memory::isDedicatedServer())
+		if (Memory::isDedicatedServer() && RegisteredStatus().Registered)
 		{
-			if (RegisteredStatus().Registered) {
-				auto token = getAPIToken();
-				int verifyPlaylistResponse = verifyPlaylist(token);
-				if (verifyPlaylistResponse == 500 || verifyPlaylistResponse == -1)
-				{
-					LOG_ERROR_GAME(L"[H2MOD] Playlist Verification encountered a server error");
-				}
-				else if (verifyPlaylistResponse == 201)
-				{
-					if (uploadPlaylist(token) != 200) {
-						LOG_ERROR_GAME(L"[H2MOD] Playlist Uploading encountered an error");
-					}
+			auto token = getAPIToken();
+			int verifyPlaylistResponse = verifyPlaylist(token);
+			if (verifyPlaylistResponse == 500 || verifyPlaylistResponse == -1)
+			{
+				LOG_ERROR_GAME(L"[H2MOD] Playlist Verification encountered a server error");
+			}
+			else if (verifyPlaylistResponse == 201)
+			{
+				if (uploadPlaylist(token) != 200) {
+					LOG_ERROR_GAME(L"[H2MOD] Playlist Uploading encountered an error");
 				}
 			}
 		}
@@ -114,7 +111,8 @@ public:
 	static int uploadStats(char* filepath, char* token);
 	static void playerLeftEvent(int peerIndex);
 	static void playerJoinEvent(int peerIndex);
-	static void game_state_change(game_life_cycle state);
+	static void Initialize();
+	static void game_life_cycle_update_event(e_game_life_cycle state);
 	static void network_player_event(int peerIndex, EventHandler::NetworkPlayerEventType type);
 	static void server_command_event(ServerConsole::ServerConsoleCommands command);
 };

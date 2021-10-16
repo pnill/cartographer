@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 
 #include "XnIp.h"
 #include "..\..\Cryptography\Rc4.h"

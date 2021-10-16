@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "ServerList.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
 #include "H2MOD\Modules\Config\Config.h"

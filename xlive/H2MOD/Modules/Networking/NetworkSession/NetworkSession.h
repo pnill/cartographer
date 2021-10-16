@@ -256,6 +256,7 @@ namespace NetworkSession
 
 	int getPeerCount();
 	int getLocalPeerIndex();
+	bool peerIndexLocal(int peerIndex);
 	IN_ADDR getLocalNetworkAddress();
 	void kickPeer(int peerIndex);
 	void endGame();

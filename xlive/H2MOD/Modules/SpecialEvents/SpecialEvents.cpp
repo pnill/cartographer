@@ -488,7 +488,7 @@ namespace SpecialEvents
 	datum candle_fire_datum;
 	datum large_candle_datum;
 	datum pump_datum;
-	void halloween_game_state(game_life_cycle state)
+	void halloween_game_life_cycle_update(e_game_life_cycle state)
 	{
 		if (state == life_cycle_in_game) {
 			if(H2Config_spooky_boy)
@@ -652,7 +652,7 @@ namespace SpecialEvents
 					sbps->decorators_block.size = 0;
 					sbps->decorators_block.data = 0;
 
-					EventHandler::register_callback<EventHandler::GameStateEvent>(halloween_game_state, execute_after, true);
+					EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
 				}
 				if (wcscmp(mapName, L"Lockout") == 0)
 				{
@@ -662,7 +662,7 @@ namespace SpecialEvents
 					LOG_INFO_GAME("{:x}", candle_datum);
 					LOG_INFO_GAME("{:x}", candle_fire_datum);
 					LOG_INFO_GAME("{:x}", pump_datum);
-					EventHandler::register_callback<EventHandler::GameStateEvent>(halloween_game_state, execute_after, true);
+					EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
 				}
 			}
 			else

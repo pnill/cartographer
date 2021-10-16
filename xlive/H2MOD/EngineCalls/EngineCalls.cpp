@@ -4,9 +4,9 @@
 //Engine Calls
 namespace EngineCalls
 {
-	game_life_cycle get_game_life_cycle()
+	e_game_life_cycle get_game_life_cycle()
 	{
-		typedef game_life_cycle(__cdecl get_lobby_state)();
+		typedef e_game_life_cycle(__cdecl get_lobby_state)();
 		auto p_get_lobby_state = Memory::GetAddress<get_lobby_state*>(0x1AD660, 0x1A65DD);	//Call to return game life cycle
 
 		return p_get_lobby_state();
