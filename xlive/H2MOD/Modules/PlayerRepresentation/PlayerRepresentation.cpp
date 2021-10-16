@@ -204,14 +204,6 @@ namespace player_representation
 				player_representation::add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum), Player::Biped::Flood);
 				auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
 				new_def->tag = tag_loader::ResolveNewDatum(flood_datum);
-
-				//auto biped = tags::get_tag<blam_tag::tag_group_type::biped,s_biped_group_definition>(tag_loader::ResolveNewDatum(flood_datum), true);
-				//auto model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(biped->unitTag.objectTag.model.TagIndex, true);
-				//auto anim = tags::get_tag<blam_tag::tag_group_type::modelanimationgraph, byte>(model->animation.TagIndex, true);
-				//tag_reference* parent_anim = reinterpret_cast<tag_reference*>(anim);
-				//parent_anim->TagGroup = blam_tag::tag_group_type::modelanimationgraph;
-				//parent_anim->TagIndex = dervish_jmad_datum;
-				get_representation(3)->first_person_body.TagIndex = tag_loader::ResolveNewDatum(flood_body_datum);
 			}
 			else
 			{

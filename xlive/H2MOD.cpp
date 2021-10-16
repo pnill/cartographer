@@ -613,12 +613,13 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	bool result = p_map_cache_load(options);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
-	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->m_engine_type);
 
 	// set the engine type
 	h2mod->SetCurrentEngineType(options->m_engine_type);
 
 	tags::run_callbacks();
+
+	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->m_engine_type);
 
 	get_object_table_memory();
 
@@ -677,7 +678,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	ControllerInput::SetSensitiviy(H2Config_controller_sens);
 	MouseInput::SetSensitivity(H2Config_mouse_sens);
 	HudElements::OnMapLoad();
-	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->m_engine_type);
 	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 	{
 		addDebugText("Engine type: Multiplayer");
