@@ -112,7 +112,7 @@ public:
 	static void playerLeftEvent(int peerIndex);
 	static void playerJoinEvent(int peerIndex);
 	static void Initialize();
-	static void game_state_change_event(e_game_life_cycle state);
+	static void game_life_cycle_update_event(e_game_life_cycle state);
 	static void network_player_event(int peerIndex, EventHandler::NetworkPlayerEventType type);
 	static void server_command_event(ServerConsole::ServerConsoleCommands command);
 };

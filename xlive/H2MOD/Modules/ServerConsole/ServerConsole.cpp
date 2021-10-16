@@ -54,9 +54,9 @@ void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, ch
 		case ServerConsole::vip: break;
 		default: ;
 	}*/
-	EventHandler::execute_callback<EventHandler::ServerCommandEvent>(execute_before, ServerConsole::s_commandsMap[LowerCommand]);
+	EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, ServerConsole::s_commandsMap[LowerCommand]);
 	auto res = p_dedi_command_hook(command_line_args, split_strings, a3);
-	EventHandler::execute_callback<EventHandler::ServerCommandEvent>(execute_after, ServerConsole::s_commandsMap[LowerCommand]);
+	EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, ServerConsole::s_commandsMap[LowerCommand]);
 	return res;
 }
 
@@ -65,9 +65,9 @@ t_kablam_command_play* p_kablam_command_play;
 bool __cdecl kablam_command_play(wchar_t* playlist_file_path, int a2)
 {
 	LOG_INFO_GAME("[{}]: {}", __FUNCTION__, "");
-	EventHandler::execute_callback<EventHandler::ServerCommandEvent>(execute_before, ServerConsole::play);
+	EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, ServerConsole::play);
 	auto res = p_kablam_command_play(playlist_file_path, a2);
-	EventHandler::execute_callback<EventHandler::ServerCommandEvent>(execute_after, ServerConsole::play);
+	EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, ServerConsole::play);
 	return res;
 }
 

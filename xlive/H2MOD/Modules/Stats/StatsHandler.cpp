@@ -26,14 +26,14 @@ void StatsHandler::Initialize()
 		lastTimeRanksSynchronized = steady_clock::now();
 		
 		// server events
-		EventHandler::register_callback<EventHandler::ServerCommandEvent>(server_command_event, execute_before);
-		EventHandler::register_callback<EventHandler::NetworkPlayerEvent>(network_player_event, execute_after);
+		EventHandler::register_callback(server_command_event, EventType::server_command, EventExecutionType::execute_before);
+		EventHandler::register_callback(network_player_event, EventType::network_player, EventExecutionType::execute_after);
 	} 
 
-	EventHandler::register_callback<EventHandler::GameStateEvent>(game_state_change_event, execute_after);
+	EventHandler::register_callback(game_life_cycle_update_event, EventType::gamelifecycle_change, EventExecutionType::execute_after);
 }
 
-void StatsHandler::game_state_change_event(e_game_life_cycle state)
+void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
 {
 	auto updateStatsLifeCycle = [](e_game_life_cycle state)
 	{
@@ -83,10 +83,10 @@ void StatsHandler::network_player_event(int peerIndex, EventHandler::NetworkPlay
 {
 	switch (type)
 	{
-		case EventHandler::add:
+		case EventHandler::NetworkPlayerEventType::add:
 			playerJoinEvent(peerIndex);
 			break;
-		case EventHandler::remove:
+		case EventHandler::NetworkPlayerEventType::remove:
 			playerLeftEvent(peerIndex);
 			break;
 	}

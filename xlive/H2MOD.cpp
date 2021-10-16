@@ -465,7 +465,7 @@ char __cdecl OnPlayerDeath(datum unit_datum_index, int a2, char a3, char a4)
 
 	/* This is the unit of the player who last damaged the object*/
 	int damaging_player_unit = get_damage_owner(unit_datum_index);
-	EventHandler::execute_callback<EventHandler::PlayerDeathEvent>(execute_before, unit_datum_index, *(datum*)(a2));
+	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_before, unit_datum_index, *(datum*)(a2));
 	if (b_HeadHunter)
 	{
 		headHunterHandler->playerDeath->SetDeadPlayer(unit_datum_index); // set this so we can spawn a skull on their position.
@@ -497,7 +497,7 @@ char __cdecl OnPlayerDeath(datum unit_datum_index, int a2, char a3, char a4)
 	}
 
 	bool ret = pplayer_death(unit_datum_index, a2, a3, a4);
-	EventHandler::execute_callback<EventHandler::PlayerDeathEvent>(execute_after, unit_datum_index, *(datum*)(a2));
+	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_after, unit_datum_index, *(datum*)(a2));
 	return ret;
 }
 
@@ -609,10 +609,11 @@ bool __cdecl OnMapLoad(s_game_options* options)
 {
 	static bool resetAfterMatch = false;
 
-	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_before, options->m_engine_type);
+	EventHandler::MapLoadEventExecute(EventExecutionType::execute_before, options->m_engine_type);
 	bool result = p_map_cache_load(options);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
+	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->m_engine_type);
 
 	// set the engine type
 	h2mod->SetCurrentEngineType(options->m_engine_type);
@@ -676,7 +677,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	ControllerInput::SetSensitiviy(H2Config_controller_sens);
 	MouseInput::SetSensitivity(H2Config_mouse_sens);
 	HudElements::OnMapLoad();
-	EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_after, options->m_engine_type);
+	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->m_engine_type);
 	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 	{
 		addDebugText("Engine type: Multiplayer");
@@ -702,7 +703,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
-		EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_after, e_engine_type::Multiplayer);
 
 		if (EngineCalls::get_game_life_cycle() == life_cycle_in_game)
 		{
@@ -733,7 +733,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		addDebugText("Engine type: Singleplayer");
 		//H2X::Initialize(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(true);
-		EventHandler::execute_callback<EventHandler::MapLoadEvent>(execute_after, e_engine_type::SinglePlayer);
 	}
 
 	// if we got this far, it means map is MP or SP, and if map load is called again, it should reset/deinitialize any custom gametypes
@@ -751,7 +750,6 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
 
 	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
-	EventHandler::execute_callback<EventHandler::PlayerSpawnEvent>(execute_before, playerDatumIndex);
 	if(b_HeadHunter)
 	{
 		headHunterHandler->preSpawnPlayer->SetPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
@@ -768,9 +766,10 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 		gunGame->preSpawnPlayer->execute();
 	}
 
+	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_before, playerDatumIndex);
 	bool ret = p_player_spawn(playerDatumIndex);
+	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_after, playerDatumIndex);
 
-	EventHandler::execute_callback<EventHandler::PlayerSpawnEvent>(execute_after, playerDatumIndex);
 	if(b_HeadHunter)
 	{
 		headHunterHandler->spawnPlayer->SetPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
@@ -1276,7 +1275,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 
 	if (teamsAreValidConditionMet && minimumPlayersConditionMet)
 	{
-		EventHandler::execute_callback<EventHandler::CountdownStartEvent>(execute_after);
+		EventHandler::CountdownStartEventExecute(EventExecutionType::execute_after);
 		return true;
 	}
 	else
@@ -1314,7 +1313,7 @@ void H2MOD::RegisterEvents()
 	{
 		//Setup Events for H2Config_vip_lock
 		if(H2Config_vip_lock)
-			EventHandler::register_callback<EventHandler::GameStateEvent>(vip_lock, execute_after);
+			EventHandler::register_callback(vip_lock, EventType::gamelifecycle_change, EventExecutionType::execute_after);
 	}
 	//Things that apply to both
 	

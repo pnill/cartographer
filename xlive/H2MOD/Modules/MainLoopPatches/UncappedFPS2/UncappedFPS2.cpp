@@ -8,7 +8,7 @@ BYTE toggleZoom[] = { 0x66, 0x89, 0x45, 0x3E };
 
 static float gameEffectsUnknownValue = 30.f;
 
-void UncappedFPS2::OnGameStateChange(e_game_life_cycle state)
+void UncappedFPS2::OnGameLifeCycleChange(e_game_life_cycle state)
 {
 	switch(state)
 	{
@@ -28,5 +28,5 @@ void UncappedFPS2::OnGameStateChange(e_game_life_cycle state)
 
 void UncappedFPS2::Init()
 {
-	EventHandler::register_callback<EventHandler::GameStateEvent>(UncappedFPS2::OnGameStateChange, execute_after);
+	EventHandler::register_callback(UncappedFPS2::OnGameLifeCycleChange, EventType::gamelifecycle_change, EventExecutionType::execute_after);
 }

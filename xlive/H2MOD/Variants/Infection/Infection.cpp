@@ -63,7 +63,7 @@ void Infection::sendTeamChange()
 			{
 				if (NetworkSession::playerIsActive(playerIndex))
 				{
-					if (NetworkSession::getLocalPeerIndex() != NetworkSession::getPeerIndex(playerIndex)) {
+					if (NetworkSession::peerIndexLocal(NetworkSession::getPeerIndex(playerIndex))) {
 						CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
 						LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", playerIndex, NetworkSession::getPlayerName(playerIndex), zombiePlayerIndex == playerIndex ? true : false);
 					}

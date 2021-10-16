@@ -161,7 +161,7 @@ namespace CustomVariantSettings
 		// no idea why this is needed to be executed on blue screen but whatever
 		ApplyCustomSettings(&CurrentVariantSettings);
 	}
-	void OnGamestateChange(e_game_life_cycle state)
+	void OnGameLifeCycleUpdate(e_game_life_cycle state)
 	{
 		switch (state)
 		{
@@ -241,10 +241,10 @@ namespace CustomVariantSettings
 	{
 		ApplyHooks();
 		
-		EventHandler::register_callback<EventHandler::GameStateEvent>(OnGamestateChange);
-		EventHandler::register_callback<EventHandler::CountdownStartEvent>(OnMatchCountdown, execute_after);
-		EventHandler::register_callback<EventHandler::NetworkPlayerEvent>(OnNetworkPlayerEvent, execute_after);
-		EventHandler::register_callback<EventHandler::BlueScreenEvent>(ApplyCurrentSettings, execute_after);
-		EventHandler::register_callback<EventHandler::PlayerSpawnEvent>(OnPlayerSpawn, execute_after);
+		EventHandler::register_callback(OnGameLifeCycleUpdate, EventType::gamelifecycle_change);
+		EventHandler::register_callback(OnMatchCountdown, EventType::countdown_start, EventExecutionType::execute_after);
+		EventHandler::register_callback(OnNetworkPlayerEvent, EventType::network_player, EventExecutionType::execute_after);
+		EventHandler::register_callback(ApplyCurrentSettings, EventType::blue_screen, EventExecutionType::execute_after);
+		EventHandler::register_callback(OnPlayerSpawn, EventType::player_spawn, EventExecutionType::execute_after);
 	}
 }
