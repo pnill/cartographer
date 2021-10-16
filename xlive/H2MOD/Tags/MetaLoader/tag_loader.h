@@ -1,6 +1,6 @@
-﻿#pragma once
+#pragma once
 
-#include "stdafx.h"
+
 #include "meta_struct.h"
 #include "cache_loader.h"
 #include "H2MOD/Tags/TagInterface.h"

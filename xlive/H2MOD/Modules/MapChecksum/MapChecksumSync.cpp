@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "MapChecksumSync.h"
 #include "Globals.h"
 #include "Util/hash.h"

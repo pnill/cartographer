@@ -58,6 +58,7 @@ bool NetworkSession::localPeerIsEstablished()
 	}
 }
 
+// returns NONE (-1) if fails
 signed int NetworkSession::getPeerIndexFromNetworkAddress(network_address* address)
 {
 	typedef signed int(__thiscall* get_peer_index_from_network_address)(network_session* session, network_address* address);
@@ -82,6 +83,12 @@ int NetworkSession::getLocalPeerIndex()
 {
 	return getCurrentNetworkSession()->local_peer_index;
 }
+
+bool NetworkSession::peerIndexLocal(int peerIndex)
+{
+	return getLocalPeerIndex() == peerIndex;
+}
+
 IN_ADDR NetworkSession::getLocalNetworkAddress()
 {
 	return getCurrentNetworkSession()->membership.peer_info[getLocalPeerIndex()].address.inaOnline;

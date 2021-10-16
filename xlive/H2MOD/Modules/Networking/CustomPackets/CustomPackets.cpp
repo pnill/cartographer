@@ -4,7 +4,7 @@
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
-#include "stdafx.h"
+
 #include "Util\Hooks\Hook.h"
 
 char g_network_message_types[e_network_message_types::end * 32];
@@ -107,79 +107,6 @@ handle_out_of_band_message p_handle_out_of_band_message;
 
 void __stdcall handle_out_of_band_message_hook(void *thisx, network_address* address, int message_type, int a4, void* packet)
 {
-	/*
-		This handles received out-of-band data
-	*/
-
-	/* since the update 0.5.4.0 this doesn't work properly anymore, the update known to work is 0.5.3.0 */
-	/* swithced to in-band-data protocol */
-	/*switch (message_type)
-	{
-	case request_map_filename:
-	{
-		s_request_map_filename* received_data = (s_request_map_filename*)packet;
-		signed int peer_index = NetworkSession::getPeerIndexFromNetworkAddress(address);
-		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] received on handle_out_of_band_message request-map-filename from XUID: {}, peer index: {}", received_data->user_identifier, peer_index);
-		network_session* session = NetworkSession::getCurrentNetworkSession();
-
-		/ * We will use in-band data, because with the latest update there is an issue where peers don't send the map name request packet when another peer joined the session * /
-		/ * I think the problem is with the new XLive netcode, though it's weird the other out-of-band game packets work just fine * /
-
-		if (peer_index != -1 && peer_index != session->local_peer_index)
-		{
-			s_custom_map_filename data;
-			SecureZeroMemory(&data, sizeof(s_custom_map_filename));
-
-			std::wstring map_filename;
-			mapManager->getMapFilename(map_filename);
-			data.is_custom_map = false;
-			if (map_filename.size() > 0)
-			{
-				data.is_custom_map = true;
-				wcsncpy_s(data.file_name, map_filename.c_str(), ARRAYSIZE(data.file_name));
-			}
-
-			LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] sending map file name packet to XUID: {}, peer index: {}, map name: {}", received_data->user_identifier, peer_index, map_filename.c_str());
-			observer_channel_send_message(session->network_observer_ptr, session->unk_index, session->peer_observer_channels[peer_index].observer_index, network_observer::network_message_send_protocol::out_of_band,
-				map_file_name, sizeof(s_custom_map_filename), &data);
-		}
-
-		return;
-	}
-
-	case map_file_name:
-	{
-		s_custom_map_filename* received_data = (s_custom_map_filename*)packet;
-		if (received_data->is_custom_map)
-		{
-			std::wstring filename_wstr(received_data->file_name);
-			std::string filename_str(filename_wstr.begin(), filename_wstr.end());
-			mapManager->setMapFileNameToDownload(filename_str);
-			LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] received on handle_out_of_band_message map_file_name: {}", received_data->file_name);
-		}
-
-		return;
-	}
-
-	case team_change:
-	{
-		s_team_change* received_data = (s_team_change*)packet;
-		h2mod->set_local_team_index(0, received_data->team_index);
-		return;
-	}
-
-	case unit_grenades:
-	{
-		s_unit_grenades* received_data = (s_unit_grenades*)packet;
-		if (!Memory::isDedicatedServer())
-			h2mod->set_local_player_unit_grenades(received_data->type, received_data->count, received_data->player_index);
-		return;
-	}
-
-	default:
-			break;
-	}*/
-
 	/* surprisingly the game doesn't use this too much, pretty much for request-join and tme-sync packets */
 	LOG_TRACE_NETWORK("handle_out_of_band_message_hook() - Received message: {} from peer index: {}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(address));
 
@@ -305,57 +232,22 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5)
 		{
 			auto recieved_data = (CustomVariantSettings::s_variantSettings*)packet;
-			CustomVariantSettings::RecieveCustomVariantSettings(recieved_data);
+			CustomVariantSettings::UpdateCustomVariantSettings(recieved_data);
 		}
-    return;
+		return;
 	}
-  // default packet
+
+	// default packet
 	case leave_session:
 	{
 		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
 			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 		{
 			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
-			EventHandler::execute_callback<EventHandler::NetworkPlayerEvent>(network_player, execute_before, peer_index, EventHandler::NetworkPlayerEventType::remove);
+			EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_before, peer_index, EventHandler::NetworkPlayerEventType::remove);
 		}
 		break; // don't return, leave the game to update state
 	}
-
-	//case parameters_update:
-	//{
-	//	if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5
-	//		&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
-	//	{
-	//		auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
-	//		//LOG_INFO_NETWORK(L"Got a parameters update from {} : {}", NetworkSession::getPeerPlayerName(peer_index), std::to_wstring(NetworkSession::getCurrentNetworkSession()->parameters.dedicated_server));
-	//		if (peer_index == NetworkSession::getCurrentNetworkSession()->session_host_peer_index && !NetworkSession::getCurrentNetworkSession()->parameters.dedicated_server)
-	//		{
-	//			const auto host_xuid = NetworkSession::getPeerXUID(peer_index);
-	//			if (host_xuid != NONE) {
-	//				//LOG_TRACE_NETWORK(L"Setting up team persistance with host xuid {}", IntToWString<XUID>(host_xuid, std::dec));
-	//				h2mod->set_local_clan_tag(0, host_xuid);
-	//				//EventHandler::registerGameStateCallback({
-	//				//		"UnPersistHostTeam1",
-	//				//		game_life_cycle::life_cycle_in_game,
-	//				//		[]()
-	//				//		{
-	//				//			//LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
-	//				//			h2mod->set_local_clan_tag(0, 0);
-	//				//		}, true
-	//				//	}, false);
-	//				EventHandler::registerGameStateCallback({
-	//						"UnPersistHostTeam2",
-	//						game_life_cycle::life_cycle_none,
-	//						[]()
-	//						{
-	//							//LOG_TRACE_NETWORK(L"Removing Persistance to previous host");
-	//							h2mod->set_local_clan_tag(0, 0);
-	//						}, true
-	//					}, false);
-	//			}
-	//		}
-	//	}
-	//}
 
 	default:
 		break;
@@ -378,8 +270,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			&& peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 		{
 			auto peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
-			//EventHandler::executeNetworkPlayerAddCallbacks(peer_index);
-			EventHandler::execute_callback<EventHandler::NetworkPlayerEvent>(network_player,execute_after, peer_index, EventHandler::NetworkPlayerEventType::add);
+			EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_after, peer_index, EventHandler::NetworkPlayerEventType::add);
 			CustomPackets::sendAntiCheat(peer_index);
 		}
 	}
@@ -401,11 +292,12 @@ void CustomPackets::sendRequestMapFilename(int mapDownloadId)
 		if (observer_channel->field_1) {
 			observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, request_map_filename, sizeof(s_request_map_filename), &data);
 
-			/*LOG_TRACE_NETWORK("[H2MOD-CustomPackets] Sending map name request info: session host peer index: {}, observer index {}, observer bool unk: {}, session index: {}",
+			LOG_TRACE_NETWORK("{} session host peer index: {}, observer index {}, observer bool unk: {}, session index: {}",
+				__FUNCTION__,
 				session->session_host_peer_index,
 				observer_channel->observer_index,
 				observer_channel->field_1,
-				session->session_index);*/
+				session->session_index);
 		}
 	}
 }
@@ -421,7 +313,7 @@ void CustomPackets::sendTeamChange(int peerIndex, int teamIndex)
 		network_observer* observer = session->network_observer_ptr;
 		peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peerIndex);
 
-		if (peerIndex != -1 && peerIndex != session->local_peer_index)
+		if (peerIndex != -1 && !NetworkSession::peerIndexLocal(peerIndex))
 		{
 			if (observer_channel->field_1) {
 				observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, team_change, sizeof(s_team_change), &data);
@@ -441,7 +333,7 @@ void CustomPackets::sendRankChange(int peerIndex, byte rank)
 		network_observer* observer = session->network_observer_ptr;
 		peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peerIndex);
 
-		if (peerIndex != -1 && peerIndex != session->local_peer_index)
+		if (peerIndex != -1 && !NetworkSession::peerIndexLocal(peerIndex))
 		{
 			if (observer_channel->field_1) {
 				observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, rank_change, sizeof(s_rank_change), &data);
@@ -455,14 +347,15 @@ void CustomPackets::sendAntiCheat(int peerIndex)
 
 	if (NetworkSession::localPeerIsSessionHost())
 	{
-
 		network_observer* observer = session->network_observer_ptr;
 		peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peerIndex);
 
 		s_anti_cheat data;
 		data.enabled = H2Config_anti_cheat_enabled;
-		if (observer_channel->field_1) {
-			observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, anti_cheat, sizeof(s_anti_cheat), &data);
+		if (peerIndex != -1 && !NetworkSession::peerIndexLocal(peerIndex)) {
+			if (observer_channel->field_1) {
+				observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, network_observer::e_network_message_send_protocol::in_band, anti_cheat, sizeof(s_anti_cheat), &data);
+			}
 		}
 	}
 }

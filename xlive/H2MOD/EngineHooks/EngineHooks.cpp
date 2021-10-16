@@ -5,23 +5,26 @@
 
 namespace EngineHooks
 {
-	static game_life_cycle previousGamestate = life_cycle_none;
-	ChangeGameState p_EvaulateGameState;
-	void EvaluateGameState()
+	static e_game_life_cycle previousGamestate = life_cycle_none;
+
+	game_life_cycle_update p_game_life_cycle_update;
+	void GameLifeCycleUpdate()
 	{
-		p_EvaulateGameState(Memory::GetAddress<BYTE*>(0x420FC4, 0x3C40AC));
-		game_life_cycle GameState = *Memory::GetAddress<game_life_cycle*>(0x420FC4, 0x3C40AC);
-		if (previousGamestate != GameState) {
-			previousGamestate = GameState;
-			EventHandler::execute_callback<EventHandler::GameStateEvent>(gamestate_change, execute_after, GameState);
+		auto gameLifeCycleData = Memory::GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
+		p_game_life_cycle_update(gameLifeCycleData);
+
+		e_game_life_cycle currentLifeCycle = *(e_game_life_cycle*)(gameLifeCycleData);
+		if (previousGamestate != currentLifeCycle) {
+			previousGamestate = currentLifeCycle;
+			EventHandler::GameLifeCycleEventExecute(EventExecutionType::execute_after, currentLifeCycle);
 		}
 	}
 
-	p_main_game_reset_map* c_main_game_reset_map;
+	main_game_reset_map* p_main_game_reset_map;
 	void __cdecl main_game_reset_map_blue_screen_detection()
 	{
-		c_main_game_reset_map();
-		EventHandler::execute_callback<EventHandler::BlueScreenEvent>(blue_screen, execute_after);
+		p_main_game_reset_map();
+		EventHandler::BlueScreenEventExecute(EventExecutionType::execute_after);
 		LOG_TRACE_GAME("[{}] Bluescreen Detected.", __FUNCTION__);
 	}
 
@@ -52,11 +55,11 @@ namespace EngineHooks
 	void ApplyHooks()
 	{
 		/*Game State Change Detection*/
-		p_EvaulateGameState = Memory::GetAddress<ChangeGameState>(0x1d7738, 0x1BCDA8);
-		PatchCall(Memory::GetAddress(0x1AD84D, 0x1A67CA), EvaluateGameState);
+		p_game_life_cycle_update = Memory::GetAddress<game_life_cycle_update>(0x1d7738, 0x1BCDA8);
+		PatchCall(Memory::GetAddress(0x1AD84D, 0x1A67CA), GameLifeCycleUpdate);
 
 		/*Blue Screen detection*/
-		c_main_game_reset_map = Memory::GetAddress<p_main_game_reset_map*>(0x9763, 0x1FA4E);
+		p_main_game_reset_map = Memory::GetAddress<main_game_reset_map*>(0x9763, 0x1FA4E);
 		PatchCall(Memory::GetAddress(0x1AE82F, 0x1A8A89), main_game_reset_map_blue_screen_detection);
 		
 		/*Game Version Hooks*/

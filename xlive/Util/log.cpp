@@ -1,7 +1,7 @@
 #include "log.h"
 #include "spdlog\sinks\rotating_file_sink.h"
 #include "spdlog\sinks\stdout_color_sinks.h"
-#include "stdafx.h"
+
 
 h2log* h2log::console = nullptr;
 bool h2log::failAlerted = false;

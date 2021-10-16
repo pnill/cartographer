@@ -3,7 +3,7 @@
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Utils\Utils.h"
-#include "stdafx.h"
+
 #include "Util\Hooks\Hook.h"
 
 #pragma region Custom Language

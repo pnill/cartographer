@@ -294,10 +294,10 @@ void main_game_loop_hook() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
 
-	EventHandler::execute_callback<EventHandler::GameLoopEvent>(game_loop, execute_before);
+	EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
 	mapManager->MapDownloadUpdateTick();
 	main_game_loop();
-	EventHandler::execute_callback<EventHandler::GameLoopEvent>(game_loop, execute_after);
+	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
 }
 
 static char HookedServerShutdownCheck() {
@@ -645,9 +645,9 @@ void alt_main_game_loop_hook()
 		render_time = static_cast<double>(end_render.QuadPart - start_render.QuadPart) / freq.QuadPart;
 		if (render_time >= (1.0f / H2Config_fps_limit)) {
 			QueryPerformanceCounter(&start_render);
-			EventHandler::execute_callback<EventHandler::GameLoopEvent>(game_loop, execute_before);
+			EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
 			game_main_loop();
-			EventHandler::execute_callback<EventHandler::GameLoopEvent>(game_loop, execute_after);
+			EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
 			//present_rendered_screen();
 		}
 	}

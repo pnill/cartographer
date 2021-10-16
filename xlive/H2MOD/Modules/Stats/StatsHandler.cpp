@@ -7,8 +7,6 @@
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "Util\hash.h"
 
-static const bool verbose = true;
-bool Registered = false;
 bool MatchInvalidated = false;
 StatsHandler::StatsAPIRegisteredStatus Status;
 
@@ -19,60 +17,57 @@ using namespace std::chrono;
 
 static steady_clock::time_point lastTimeRanksSynchronized;
 
-StatsHandler::StatsHandler()
+void StatsHandler::Initialize()
 {
 	if (Memory::isDedicatedServer()) {
-		// server events
-
 		Status.Registered = false;
 		Status.RanksEnabled = false;
 		Status.StatsEnabled = false;
 		lastTimeRanksSynchronized = steady_clock::now();
-
-		EventHandler::register_callback<server_command>(this->server_command_event, execute_before);
-		EventHandler::register_callback<network_player>(this->network_player_event, execute_after);
+		
+		// server events
+		EventHandler::register_callback(server_command_event, EventType::server_command, EventExecutionType::execute_before);
+		EventHandler::register_callback(network_player_event, EventType::network_player, EventExecutionType::execute_after);
 	} 
-	else
-	{
-		// client events
 
-	}
-	EventHandler::register_callback<gamestate_change>(this->game_state_change, execute_after);
+	EventHandler::register_callback(game_life_cycle_update_event, EventType::gamelifecycle_change, EventExecutionType::execute_after);
 }
-bool initPreGame = false;
-void StatsHandler::game_state_change(game_life_cycle state)
+
+void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
 {
-	if (Memory::isDedicatedServer())
+	auto updateStatsLifeCycle = [](e_game_life_cycle state)
 	{
-		auto execute = [&](game_life_cycle state)
+		static bool pregameFirstInitialization = false;
+		
+		switch (state)
 		{
-			if (state == life_cycle_post_game)
+		case life_cycle_pre_game:
+			if (!pregameFirstInitialization)
 			{
-				sendStats();
+				verifyRegistrationStatus();
+				verifySendPlaylist();
+				pregameFirstInitialization = true;
 				return;
 			}
-			if (state == life_cycle_pre_game)
-			{
-				if (!initPreGame)
-				{
-					verifyRegistrationStatus();
-					verifySendPlaylist();
-					initPreGame = true;
-					return;
-				}
-				else
-				{
-					InvalidateMatch(false);
-					return;
-				}
-			}
-			if (state == life_cycle_in_game)
+			else
 			{
 				InvalidateMatch(false);
 				return;
 			}
-		};
-		std::thread(execute, state).detach();
+		case life_cycle_in_game:
+			InvalidateMatch(false);
+			return;
+		case life_cycle_post_game:
+			sendStats();
+			return;
+		default:
+			break;
+		}
+	};
+	
+	if (Memory::isDedicatedServer()) 
+	{
+		std::thread(updateStatsLifeCycle, state).detach();
 	}
 	else
 	{
@@ -88,10 +83,10 @@ void StatsHandler::network_player_event(int peerIndex, EventHandler::NetworkPlay
 {
 	switch (type)
 	{
-		case EventHandler::add:
+		case EventHandler::NetworkPlayerEventType::add:
 			playerJoinEvent(peerIndex);
 			break;
-		case EventHandler::remove:
+		case EventHandler::NetworkPlayerEventType::remove:
 			playerLeftEvent(peerIndex);
 			break;
 	}
@@ -302,8 +297,9 @@ char* StatsHandler::getAPIToken()
 {
 	if (MatchInvalidated) {
 		LOG_INFO_GAME("StatsHandler - Match was invalidated and will not be sent to the API");
-		return "";
+		return nullptr;
 	}
+
 	CURL *curl;
 	CURLcode result;
 	curl_mime *form = NULL;
@@ -313,7 +309,7 @@ char* StatsHandler::getAPIToken()
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
-		return "";
+		return nullptr;
 	}
 	form = curl_mime_init(curl);
 	field = curl_mime_addpart(form);
@@ -335,7 +331,7 @@ char* StatsHandler::getAPIToken()
 	{
 		LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
 		curl_easy_cleanup(curl);
-		return "";
+		return nullptr;
 	}
 
 	int response_code;
@@ -344,7 +340,7 @@ char* StatsHandler::getAPIToken()
 	{
 		LOG_INFO_GAME("{} failed get token for stats API", __FUNCTION__);
 		curl_easy_cleanup(curl);
-		return "";
+		return nullptr;
 	}
 	if (response_code == 200)
 	{
@@ -352,7 +348,7 @@ char* StatsHandler::getAPIToken()
 		return s.ptr;
 	}
 	curl_easy_cleanup(curl);
-	return "";
+	return nullptr;
 }
 
 
@@ -436,7 +432,7 @@ int StatsHandler::verifyPlaylist(char* token)
 		http_request_body.append(checksum);
 		LOG_TRACE_GAME(http_request_body);
 		http_request_body.append("&AuthToken=");
-		http_request_body.append(token);
+		http_request_body.append(token != nullptr ? token : "");
 		char* Response;
 		CURL *curl;
 		CURLcode curlResult;
@@ -886,7 +882,7 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 		&& EngineCalls::get_game_life_cycle() != life_cycle_post_game)
 		return;
 
-	getPlayerRanksByStringList(buildPlayerRankUpdateQueryStringList());
+	std::thread(getPlayerRanksByStringList, buildPlayerRankUpdateQueryStringList()).detach();
 }
 
 void StatsHandler::sendRankChangeFromDocument(rapidjson::Document* document)
@@ -1016,9 +1012,4 @@ void StatsHandler::getPlayerRanksByStringList(std::string& playerList)
 		delete document;
 		LOG_ERROR_GAME("{} curl_easy_init failed", __FUNCTION__);
 	}
-}
-
-void StatsHandler::init()
-{
-
 }

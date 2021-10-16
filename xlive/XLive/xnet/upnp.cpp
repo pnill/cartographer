@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 
 #include "upnp.h"
 #include <miniupnpc/upnpcommands.h>

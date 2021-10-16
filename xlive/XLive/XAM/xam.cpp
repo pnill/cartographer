@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 
 #include "xam.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"

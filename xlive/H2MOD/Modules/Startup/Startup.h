@@ -1,5 +1,5 @@
 #pragma once
-#include "stdafx.h"
+
 
 void InitH2Startup();
 void InitH2Startup2();

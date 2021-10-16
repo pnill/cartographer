@@ -1,6 +1,6 @@
 #pragma once
 #include "spdlog\spdlog.h"
-#include "stdafx.h"
+
 #include <assert.h>
 
 //#define MICRO_TIME std::chrono::time_point<std::chrono::steady_clock>

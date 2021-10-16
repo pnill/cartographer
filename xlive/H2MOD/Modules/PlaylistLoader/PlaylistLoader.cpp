@@ -8,7 +8,6 @@
 
 namespace playlist_loader
 {
-	static wchar_t empty_char = '\0';
 	enum e_custom_setting
 	{
 		none = -1,
@@ -57,7 +56,7 @@ namespace playlist_loader
 			playlist_entry->reader_current_line,
 			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
 			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
-			&empty_char);
+			L'\0');
 
 		return false;
 	}
@@ -72,7 +71,7 @@ namespace playlist_loader
 			playlist_entry->reader_current_line,
 			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
 			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
-			&empty_char);
+			L'\0');
 
 		return NAN;
 	}
@@ -89,7 +88,7 @@ namespace playlist_loader
 			playlist_entry->reader_current_line,
 			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
 			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
-			&empty_char);
+			L'\0');
 
 		return static_cast<T>(-1);
 	}
@@ -105,13 +104,12 @@ namespace playlist_loader
 			playlist_entry->reader_current_line,
 			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
 			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
-			&empty_char);
+			L'\0');
 
 		return static_cast<T>(0);
 	}
 	bool process_custom_settting_variant(playlist_entry* playlist_entry)
 	{
-
 		auto result = false;
 
 		const auto property_name = &playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index];
@@ -204,7 +202,7 @@ namespace playlist_loader
 								playlist_entry->reader_current_line,
 								&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
 								&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
-								&empty_char);
+								L'\0');
 						}
 					}
 					break;
@@ -219,7 +217,7 @@ namespace playlist_loader
 						playlist_entry->reader_current_line,
 						&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
 						&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
-						&empty_char);
+						L'\0');
 					break;
 				}
 				result = true;
@@ -254,9 +252,9 @@ namespace playlist_loader
 	//	}
 	//}
 
-	typedef void(__fastcall* h_playlist_processs_setting)(playlist_entry* playlist_entry);
+	typedef void(__stdcall* h_playlist_processs_setting)(playlist_entry* playlist_entry);
 	h_playlist_processs_setting p_playlist_process_setting;
-	void __fastcall process_setting(playlist_entry* playlist_entry)
+	void __stdcall process_setting(playlist_entry* playlist_entry)
 	{
 		if (!process_custom_setting_eval(playlist_entry))
 		{
@@ -271,13 +269,15 @@ namespace playlist_loader
 
 	void apply_hooks()
 	{
-		p_playlist_process_setting = (h_playlist_processs_setting)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x10FBE), (BYTE*)process_setting, 5);
-		p_playlist_loader_invalid_entry = Memory::GetAddress<playlist_loader_invalid_entry>(0, 0xED2E);
+		p_playlist_process_setting = (h_playlist_processs_setting)DetourClassFunc(Memory::GetAddress<BYTE*>(0, 0x10FBE), (BYTE*)process_setting, 13);
 	}
 
 	void initialize()
 	{
 		apply_hooks();
-		EventHandler::register_callback<server_command>(reset_custom_settings, execute_after);
+
+		p_playlist_loader_invalid_entry = Memory::GetAddress<playlist_loader_invalid_entry>(0, 0xED2E);
+
+		EventHandler::register_callback(reset_custom_settings, EventType::server_command, EventExecutionType::execute_after, false);
 	}
 }
