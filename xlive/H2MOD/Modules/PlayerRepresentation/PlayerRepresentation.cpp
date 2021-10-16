@@ -76,6 +76,17 @@ namespace player_representation
 		return nullptr;
 	}
 
+	s_globals_group_definition::s_player_representation_block* get_representation(int index)
+	{
+		auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
+		if (!DATUM_IS_NONE(globals_datum))
+		{
+			auto globals = tags::get_tag_fast<s_globals_group_definition>(globals_datum);
+			return globals->player_representation[index];
+		}
+		return nullptr;
+	}
+
 	datum get_object_datum_from_representation(byte representation_index)
 	{
 		auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
@@ -184,7 +195,7 @@ namespace player_representation
 			auto flood_arms_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_arms\\fp_arms", blam_tag::tag_group_type::rendermodel, "carto_shared");
 			auto flood_body_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_body\\fp_body", blam_tag::tag_group_type::rendermodel, "carto_shared");
 			auto dervish_jmad_datum = tags::find_tag(blam_tag::tag_group_type::modelanimationgraph, "objects\\characters\\dervish\\dervish");
-			if (!DATUM_IS_NONE(flood_datum) && !DATUM_IS_NONE(flood_arms_datum) && !DATUM_IS_NONE(flood_body_datum) && !DATUM_IS_NONE(dervish_jmad_datum))
+			if (!DATUM_IS_NONE(flood_datum) && !DATUM_IS_NONE(flood_arms_datum) && !DATUM_IS_NONE(flood_body_datum))
 			{
 				tag_loader::Load_tag(flood_datum, true, "carto_shared");
 				tag_loader::Load_tag(flood_arms_datum, true, "carto_shared");
@@ -194,12 +205,13 @@ namespace player_representation
 				auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
 				new_def->tag = tag_loader::ResolveNewDatum(flood_datum);
 
-				auto biped = tags::get_tag<blam_tag::tag_group_type::biped,s_biped_group_definition>(tag_loader::ResolveNewDatum(flood_datum), true);
-				auto model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(biped->unitTag.objectTag.model.TagIndex, true);
-				auto anim = tags::get_tag<blam_tag::tag_group_type::modelanimationgraph, byte>(model->animation.TagIndex, true);
-				tag_reference* parent_anim = reinterpret_cast<tag_reference*>(anim);
-				parent_anim->TagGroup = blam_tag::tag_group_type::modelanimationgraph;
-				parent_anim->TagIndex = dervish_jmad_datum;
+				//auto biped = tags::get_tag<blam_tag::tag_group_type::biped,s_biped_group_definition>(tag_loader::ResolveNewDatum(flood_datum), true);
+				//auto model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(biped->unitTag.objectTag.model.TagIndex, true);
+				//auto anim = tags::get_tag<blam_tag::tag_group_type::modelanimationgraph, byte>(model->animation.TagIndex, true);
+				//tag_reference* parent_anim = reinterpret_cast<tag_reference*>(anim);
+				//parent_anim->TagGroup = blam_tag::tag_group_type::modelanimationgraph;
+				//parent_anim->TagIndex = dervish_jmad_datum;
+				get_representation(3)->first_person_body.TagIndex = tag_loader::ResolveNewDatum(flood_body_datum);
 			}
 			else
 			{
