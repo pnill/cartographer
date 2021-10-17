@@ -645,14 +645,16 @@ namespace SpecialEvents
 						scen->skies[0]->sky.TagIndex = tag_loader::ResolveNewDatum(sky_datum);
 					}
 					auto ltmp_datum = tags::find_tag(blam_tag::tag_group_type::scenariostructurelightmap, "scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
-					if (!DATUM_IS_NONE(ltmp_datum)) {
+					if (!DATUM_IS_NONE(ltmp_datum) && !DATUM_IS_NONE(tag_loader::ResolveNewDatum(lbitm_datum))) {
 						auto ltmp = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
 						ltmp->lightmap_groups[0]->bitmap_group.TagIndex = tag_loader::ResolveNewDatum(lbitm_datum);
+						sbps->decorators_block.size = 0;
+						sbps->decorators_block.data = 0;
 					}
-					sbps->decorators_block.size = 0;
-					sbps->decorators_block.data = 0;
 
-					EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
+
+					if (!DATUM_IS_NONE(candle_datum) && !DATUM_IS_NONE(pump_datum) && !DATUM_IS_NONE(large_candle_datum))
+						EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
 				}
 				if (strcmp(mapName, "lockout") == 0)
 				{
@@ -662,7 +664,9 @@ namespace SpecialEvents
 					LOG_INFO_GAME("{:x}", candle_datum);
 					LOG_INFO_GAME("{:x}", candle_fire_datum);
 					LOG_INFO_GAME("{:x}", pump_datum);
-					EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
+
+					if (!DATUM_IS_NONE(candle_datum) && !DATUM_IS_NONE(pump_datum))
+						EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
 				}
 			}
 			else
