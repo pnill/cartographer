@@ -9,6 +9,7 @@
 #include "Blam\Engine\Players\Players.h"
 #include "H2MOD.h"
 #include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
@@ -144,6 +145,9 @@ namespace player_representation
 				if (a2->profile.player_character_type == Player::Biped::Skeleton)
 					a2->profile.player_character_type = Player::Biped::Spartan;
 			}
+			else if (H2Config_spooky_boy)
+				*Memory::GetAddress<Player::Biped*>(0x51A67C) = Player::Biped::Skeleton;
+
 
 			if ((byte)a2->profile.player_character_type > representation_count)
 				a2->profile.player_character_type = Player::Biped::Spartan;
@@ -171,6 +175,9 @@ namespace player_representation
 	void on_map_load()
 	{
 		if (h2mod->GetEngineType() == Multiplayer) {
+			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween)
+				*Memory::GetAddress<Player::Biped*>(0x51A67C) = Player::Biped::Skeleton;
+
 			auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
 			auto skele_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", blam_tag::tag_group_type::biped, "carto_shared");
 			auto skele_fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", blam_tag::tag_group_type::rendermodel, "carto_shared");
