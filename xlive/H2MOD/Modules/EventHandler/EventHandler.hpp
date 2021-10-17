@@ -3,6 +3,9 @@
 #include "H2MOD\Modules\ServerConsole\ServerConsole.h"
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 
+
+#define EVENT_HANDLER_ENABLE_TEST_EVENTS 0
+
 /*
  * To Setup a new Event you need to add an enum to EventType above the none enum
  * Then inside EventHandler you need to create a function alias type use the current ones as an example
@@ -167,6 +170,7 @@ namespace EventHandler
 			}
 		}
 	}
+
 	/**
 	 * \brief Erases callbacks that are flagged with run once that have ran
 	 * \tparam T event alias type

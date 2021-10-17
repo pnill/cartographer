@@ -9,6 +9,7 @@
 #include "Blam\Engine\Players\Players.h"
 #include "H2MOD.h"
 #include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
@@ -76,6 +77,17 @@ namespace player_representation
 		return nullptr;
 	}
 
+	s_globals_group_definition::s_player_representation_block* get_representation(int index)
+	{
+		auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
+		if (!DATUM_IS_NONE(globals_datum))
+		{
+			auto globals = tags::get_tag_fast<s_globals_group_definition>(globals_datum);
+			return globals->player_representation[index];
+		}
+		return nullptr;
+	}
+
 	datum get_object_datum_from_representation(byte representation_index)
 	{
 		auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
@@ -133,6 +145,9 @@ namespace player_representation
 				if (a2->profile.player_character_type == Player::Biped::Skeleton)
 					a2->profile.player_character_type = Player::Biped::Spartan;
 			}
+			else if (H2Config_spooky_boy)
+				*Memory::GetAddress<Player::Biped*>(0x51A67C) = Player::Biped::Skeleton;
+
 
 			if ((byte)a2->profile.player_character_type > representation_count)
 				a2->profile.player_character_type = Player::Biped::Spartan;
@@ -160,6 +175,9 @@ namespace player_representation
 	void on_map_load()
 	{
 		if (h2mod->GetEngineType() == Multiplayer) {
+			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween)
+				*Memory::GetAddress<Player::Biped*>(0x51A67C) = Player::Biped::Skeleton;
+
 			auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
 			auto skele_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", blam_tag::tag_group_type::biped, "carto_shared");
 			auto skele_fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", blam_tag::tag_group_type::rendermodel, "carto_shared");
@@ -184,7 +202,7 @@ namespace player_representation
 			auto flood_arms_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_arms\\fp_arms", blam_tag::tag_group_type::rendermodel, "carto_shared");
 			auto flood_body_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_body\\fp_body", blam_tag::tag_group_type::rendermodel, "carto_shared");
 			auto dervish_jmad_datum = tags::find_tag(blam_tag::tag_group_type::modelanimationgraph, "objects\\characters\\dervish\\dervish");
-			if (!DATUM_IS_NONE(flood_datum) && !DATUM_IS_NONE(flood_arms_datum) && !DATUM_IS_NONE(flood_body_datum) && !DATUM_IS_NONE(dervish_jmad_datum))
+			if (!DATUM_IS_NONE(flood_datum) && !DATUM_IS_NONE(flood_arms_datum) && !DATUM_IS_NONE(flood_body_datum))
 			{
 				tag_loader::Load_tag(flood_datum, true, "carto_shared");
 				tag_loader::Load_tag(flood_arms_datum, true, "carto_shared");
@@ -193,13 +211,6 @@ namespace player_representation
 				player_representation::add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum), Player::Biped::Flood);
 				auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
 				new_def->tag = tag_loader::ResolveNewDatum(flood_datum);
-
-				auto biped = tags::get_tag<blam_tag::tag_group_type::biped,s_biped_group_definition>(tag_loader::ResolveNewDatum(flood_datum), true);
-				auto model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(biped->unitTag.objectTag.model.TagIndex, true);
-				auto anim = tags::get_tag<blam_tag::tag_group_type::modelanimationgraph, byte>(model->animation.TagIndex, true);
-				tag_reference* parent_anim = reinterpret_cast<tag_reference*>(anim);
-				parent_anim->TagGroup = blam_tag::tag_group_type::modelanimationgraph;
-				parent_anim->TagIndex = dervish_jmad_datum;
 			}
 			else
 			{
