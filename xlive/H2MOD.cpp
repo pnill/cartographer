@@ -250,7 +250,7 @@ real_point3d* H2MOD::get_player_unit_coords(int playerIndex) {
 }
 
 BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
-	datum unit_datum = Player::getPlayerUnitDatumIndex(playerIndex);
+	datum unit_datum = s_player::getPlayerUnitDatumIndex(playerIndex);
 	if (DATUM_IS_NONE(unit_datum))
 		return nullptr;
 
@@ -261,7 +261,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 {
 	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
-	datum unit_datum = Player::getPlayerUnitDatumIndex(playerIndex);
+	datum unit_datum = s_player::getPlayerUnitDatumIndex(playerIndex);
 	if (!DATUM_IS_NONE(unit_datum))
 	{
 		s_object_placement_data nObject;
@@ -279,7 +279,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 
 wchar_t* H2MOD::get_local_player_name(int local_player_index)
 {
-	return Player::getName(DATUM_INDEX_TO_ABSOLUTE_INDEX(this->get_player_datum_index_from_controller_index(local_player_index)));
+	return s_player::getName(DATUM_INDEX_TO_ABSOLUTE_INDEX(this->get_player_datum_index_from_controller_index(local_player_index)));
 }
 
 int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
@@ -342,7 +342,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 		"objects\\weapons\\grenade\\plasma_grenade\\plasma_grenade"
 	};
 
-	datum unit_datum_index = Player::getPlayerUnitDatumIndex(playerIndex);
+	datum unit_datum_index = s_player::getPlayerUnitDatumIndex(playerIndex);
 	//datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
 
 	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
@@ -573,7 +573,7 @@ void H2MOD::set_local_rank(BYTE rank)
 		initialized = true;
 	}
 
-	Player::Properties* local_player_properties = Memory::GetAddress<Player::Properties*>(0x51A638);
+	s_player::s_player_properties* local_player_properties = Memory::GetAddress<s_player::s_player_properties*>(0x51A638);
 
 	local_player_properties->player_overall_skill = rank;
 	local_player_properties->player_displayed_skill = rank;

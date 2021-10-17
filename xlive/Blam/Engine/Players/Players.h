@@ -5,9 +5,9 @@
 #define ENGINE_PLAYER_MAX 16
 
 #pragma pack(push, 1)
-struct Player
+struct s_player
 {
-	enum class Color : BYTE
+	enum class e_color : BYTE
 	{
 		White,
 		Steel,
@@ -29,7 +29,7 @@ struct Player
 		Tan
 	};
 
-	enum class Biped : BYTE
+	enum class e_character_type : BYTE
 	{
 		MasterChief = 0,
 		Dervish = 1,
@@ -39,7 +39,7 @@ struct Player
 		Flood = 5
 	};
 
-	enum class EmblemForeground : BYTE
+	enum class e_emblem_foreground : BYTE
 	{
 		SeventhColumn = 0,
 		Bullseye = 1,
@@ -107,7 +107,7 @@ struct Player
 		Number9 = 63
 	};
 
-	enum class EmblemBackground : BYTE
+	enum class e_emblem_background : BYTE
 	{
 		Solid = 0,
 		VerticalSplit = 1,
@@ -143,13 +143,13 @@ struct Player
 		LeftandRight = 31
 	};
 
-	enum class EmblemToggle : BYTE
+	enum class e_emblem_toggle : BYTE
 	{
 		Off = 0,
-		On = 1
+		On
 	};
 
-	enum class Handicap : BYTE
+	enum class e_handicap : BYTE
 	{
 		None = 0,
 		Minor = 1,
@@ -162,20 +162,20 @@ struct Player
 		player_inactive = 9,
 	};
 
-	struct Properties
+	struct s_player_properties
 	{
 		wchar_t player_name[16];
 		char unk[32];
 
-		struct PlayerProfile
+		struct s_player_profile
 		{
-			Color primary_color;
-			Color secondary_color;
-			Color tertiary_color;
-			Color quaternary_color;
-			Biped player_character_type;
-			EmblemForeground foreground_emblem;
-			EmblemBackground background_emblem;
+			e_color primary_color;
+			e_color secondary_color;
+			e_color tertiary_color;
+			e_color quaternary_color;
+			e_character_type player_character_type;
+			e_emblem_foreground foreground_emblem;
+			e_emblem_background background_emblem;
 			char emblem_flags;
 		} profile;
 
@@ -188,7 +188,7 @@ struct Player
 		} clan_identifiers;
 
 		e_object_team player_team;
-		Handicap player_handicap_level;
+		e_handicap player_handicap_level;
 		byte player_displayed_skill;
 		byte player_overall_skill;
 		char player_is_griefer;
@@ -196,7 +196,7 @@ struct Player
 		char achievement_flags;
 		byte unk2;
 	};
-	CHECK_STRUCT_SIZE(Properties, 132);
+	CHECK_STRUCT_SIZE(s_player_properties, 132);
 
 	WORD datum_salt;
 	WORD flags;
@@ -215,7 +215,7 @@ struct Player
 	DWORD InputFlags;
 	DWORD InputFlags2;
 	char field_3C[4];
-	Properties properties[2];
+	s_player_properties properties[2];
 	DWORD field_148;
 	DWORD respawn_penalty;
 	DWORD teleporter_blocked_tick_count;
@@ -253,20 +253,20 @@ struct Player
 
 	static s_data_array* getArray();
 	static bool indexValid(int playerIndex);
-	static Player* getPlayer(int playerIndex);
+	static s_player* getPlayer(int playerIndex);
 	static e_object_team getTeam(int playerIndex);
 	static void setTeam(int playerIndex, e_object_team team);
-	static void setUnitBipedType(int playerIndex, Player::Biped bipedType);
+	static void setUnitBipedType(int playerIndex, s_player::e_character_type bipedType);
 	static void setUnitBipedType(int playerIndex, byte representationIndex);
 	static void setBipedSpeed(int playerIndex, float speed);
 	static wchar_t* getName(int playerIndex);
 	static datum getPlayerUnitDatumIndex(int playerIndex);
 	static XUID getIdentifier(int playerIndex);
 };
-CHECK_STRUCT_SIZE(Player, 0x204);
+CHECK_STRUCT_SIZE(s_player, 0x204);
 #pragma pack(pop)
 
-class PlayerIterator : public s_data_iterator<Player>
+class PlayerIterator : public s_data_iterator<s_player>
 {
 public:
 
@@ -274,7 +274,7 @@ public:
 
 	bool get_next_active_player();
 
-	Player* get_current_player_data();
+	s_player* get_current_player_data();
 
 	int get_current_player_index();
 
@@ -283,5 +283,5 @@ public:
 	XUID get_current_player_id();
 
 private:
-	Player* m_current_player = nullptr;
+	s_player* m_current_player = nullptr;
 };
