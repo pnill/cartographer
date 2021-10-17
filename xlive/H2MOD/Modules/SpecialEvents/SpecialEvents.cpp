@@ -494,14 +494,14 @@ namespace SpecialEvents
 			if(H2Config_spooky_boy)
 				*Memory::GetAddress<Player::Biped*>(0x51A67C) = Player::Biped::Skeleton;
 
-			wchar_t* mapName = Memory::GetAddress<wchar_t*>(0x97737C);
+			char* mapName = Memory::GetAddress<char*>(0x47CF0C);
 			s_object_placement_data placement;
 			datum player_datum = Player::getPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 			typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, real_point3d* orient);
 			auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
 			auto pump = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(pump_datum, true);
 			auto pump_hmlt = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(pump->objectTag.model.TagIndex, true);
-			if (wcscmp(mapName, L"Coagulation") == 0)
+			if (strcmp(mapName, "coagulation") == 0)
 			{
 				*Memory::GetAddress<Player::Biped*>(0x51A67C) = Player::Biped::Skeleton;
 				for (auto& scen_place : coag_scen_places)
@@ -529,7 +529,7 @@ namespace SpecialEvents
 					unsigned int object = EngineCalls::Objects::call_object_new(&placement);
 				}
 			}
-			if (wcscmp(mapName, L"Lockout") == 0)
+			if (strcmp(mapName, "lockout") == 0)
 			{
 				for (auto& scen_place : lockout_scen_places)
 				{
@@ -561,8 +561,8 @@ namespace SpecialEvents
 		{
 			if (tag_loader::Map_exists("carto_shared"))
 			{
-				wchar_t* mapName = Memory::GetAddress<wchar_t*>(0x97737C);
-				if (wcscmp(mapName, L"Coagulation") == 0)
+				char* mapName = Memory::GetAddress<char*>(0x47CF0C);
+				if (strcmp(mapName, "coagulation") == 0)
 				{
 					lbitm_datum = tag_loader::Get_tag_datum("scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", blam_tag::tag_group_type::bitmap, "carto_shared");
 					sky_datum = tag_loader::Get_tag_datum("scenarios\\skies\\multi\\halo\\coagulation\\coagulation_night", blam_tag::tag_group_type::sky, "carto_shared");
@@ -577,7 +577,7 @@ namespace SpecialEvents
 					tag_loader::Load_tag(large_candle_datum, true, "carto_shared");
 					tag_loader::Push_Back();
 				}
-				if (wcscmp(mapName, L"Lockout") == 0)
+				if (strcmp(mapName, "lockout") == 0)
 				{
 					candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", blam_tag::tag_group_type::scenery, "carto_shared");
 					candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", blam_tag::tag_group_type::scenery, "carto_shared");
@@ -589,7 +589,7 @@ namespace SpecialEvents
 
 				auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
 				auto sbps = tags::get_tag_fast< s_scenario_structure_bsp_group_definition>(scen->structure_bsps[0]->structure_bsp.TagIndex);
-				if (wcscmp(mapName, L"Coagulation") == 0)
+				if (strcmp(mapName, "coagulation") == 0)
 				{
 					candle_datum = tag_loader::ResolveNewDatum(candle_datum);
 					candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
@@ -654,7 +654,7 @@ namespace SpecialEvents
 
 					EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
 				}
-				if (wcscmp(mapName, L"Lockout") == 0)
+				if (strcmp(mapName, "lockout") == 0)
 				{
 					candle_datum = tag_loader::ResolveNewDatum(candle_datum);
 					candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
