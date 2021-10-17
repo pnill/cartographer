@@ -77,8 +77,8 @@ struct player_information
 	bool properties_valid;
 	char pad[1];
 	unsigned int controller_index;
-	Player::Properties properties;
-	Player::Properties player_properties_1;
+	s_player::s_player_properties properties;
+	s_player::s_player_properties player_properties_1;
 	unsigned int player_voice;
 	unsigned int player_text_chat;
 };

@@ -119,7 +119,7 @@ namespace EngineCalls::Objects
 		object_placement_data->variant_name = creation_data->variant_name;
 		if(*(byte*)((char*)creation_data + 0x10) != -1)
 		{
-			auto profile = reinterpret_cast<Player::Properties::PlayerProfile*>((char*)creation_data + 0x10);
+			auto profile = reinterpret_cast<s_player::s_player_properties::s_player_profile*>((char*)creation_data + 0x10);
 			auto placement = static_cast<s_object_placement_data*>(object_placement_data);
 			placement->tag_index = player_representation::get_object_datum_from_representation((byte)profile->player_character_type);
 		}

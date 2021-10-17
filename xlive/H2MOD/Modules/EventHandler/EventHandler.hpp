@@ -126,9 +126,9 @@ namespace EventHandler
 		switch (event_execution_type)
 		{
 		case EventExecutionType::execute_before:
-			return STRINGIFY(event_execution_type::execute_before);
+			return STRINGIFY(EventExecutionType::execute_before);
 		case EventExecutionType::execute_after:
-			return STRINGIFY(event_execution_type::execute_after);
+			return STRINGIFY(EventExecutionType::execute_after);
 		default:
 			return "<UNKNOWN EVENT EXECUTION TYPE>";
 		}
