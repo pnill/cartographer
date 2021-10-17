@@ -66,7 +66,7 @@ namespace KantTesting
 	{
 		byte val = rand() % variants.size();
 		stream->data_encode_integer("test", val, 8);
-		Player::Properties* prop = (Player::Properties*)(data + 28);
+		s_player::s_player_properties* prop = (s_player::s_player_properties*)(data + 28);
 		if (temp.find(prop->player_name) == temp.end())
 		{
 			temp[prop->player_name] = val;
@@ -80,7 +80,7 @@ namespace KantTesting
 	bool __cdecl decode_player_add_impl(bitstream* stream, int unk, char* data)
 	{
 		byte val = stream->data_decode_integer("test", 8);
-		Player::Properties* prop = (Player::Properties*)(data + 28);
+		s_player::s_player_properties* prop = (s_player::s_player_properties*)(data + 28);
 		auto res = p_decode_player_add(stream, unk, data);
 		if (temp.find(prop->player_name) == temp.end())
 		{
@@ -98,7 +98,7 @@ namespace KantTesting
 	{
 		byte val = rand() % variants.size();
 		stream->data_encode_integer("test", val, 8);
-		Player::Properties* prop = (Player::Properties*)(data + 16);
+		s_player::s_player_properties* prop = (s_player::s_player_properties*)(data + 16);
 		if (temp.find(prop->player_name) == temp.end())
 		{
 			temp[prop->player_name] = val;
@@ -111,7 +111,7 @@ namespace KantTesting
 	bool __cdecl decode_player_properties_impl(bitstream* stream, int unk, char* data)
 	{
 		int val = stream->data_decode_integer("test", 8);
-		Player::Properties* prop = (Player::Properties*)(data + 16);
+		s_player::s_player_properties* prop = (s_player::s_player_properties*)(data + 16);
 		auto res = p_decode_player_properties(stream, unk, data);
 		if (temp.find(prop->player_name) == temp.end())
 		{
@@ -503,10 +503,10 @@ namespace KantTesting
 		}
 	}
 
-	typedef void(__cdecl t_network_session_player_profile_recieve)(int player_index, Player::Properties* a2);
+	typedef void(__cdecl t_network_session_player_profile_recieve)(int player_index, s_player::s_player_properties* a2);
 	t_network_session_player_profile_recieve* p_network_session_player_profile_recieve;
 
-	void __cdecl network_ession_player_profile_recieve(int player_index, Player::Properties* a2)
+	void __cdecl network_ession_player_profile_recieve(int player_index, s_player::s_player_properties* a2)
 	{
 		auto a = s_game_globals::get()->m_options;
 		LOG_INFO_GAME("[{}] {}", __FUNCTION__, a.m_engine_type);
@@ -527,7 +527,7 @@ namespace KantTesting
 				}
 				a2->player_team = e_object_team::player;
 				if (player_type == s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none)
-					a2->profile.player_character_type = static_cast<Player::Biped>(static_cast<byte>(static_cast<short>(player_type)));
+					a2->profile.player_character_type = static_cast<s_player::e_character_type>(static_cast<byte>(static_cast<short>(player_type)));
 			}
 		}
 		else if(s_game_globals::game_is_multiplayer())
@@ -535,10 +535,10 @@ namespace KantTesting
 			auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
 			auto globals = tags::get_tag_fast<s_globals_group_definition>(globals_datum);
 
-			if (a2->profile.player_character_type == Player::Biped::MasterChief)
-				a2->profile.player_character_type = Player::Biped::Spartan;
-			if (a2->profile.player_character_type == Player::Biped::Dervish)
-				a2->profile.player_character_type = Player::Biped::Elite;
+			if (a2->profile.player_character_type == s_player::e_character_type::MasterChief)
+				a2->profile.player_character_type = s_player::e_character_type::Spartan;
+			if (a2->profile.player_character_type == s_player::e_character_type::Dervish)
+				a2->profile.player_character_type = s_player::e_character_type::Elite;
 
 			//if ((byte)a2->profile.player_character_type > globals->player_representation.size)
 			//	a2->profile.player_character_type = Player::Biped::Spartan;

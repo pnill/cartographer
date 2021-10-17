@@ -492,18 +492,18 @@ namespace SpecialEvents
 	{
 		if (state == life_cycle_in_game) {
 			if(H2Config_spooky_boy)
-				*Memory::GetAddress<Player::Biped*>(0x51A67C) = Player::Biped::Skeleton;
+				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
 			char* mapName = Memory::GetAddress<char*>(0x47CF0C);
 			s_object_placement_data placement;
-			datum player_datum = Player::getPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
+			datum player_datum = s_player::getPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 			typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, real_point3d* orient);
 			auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
 			auto pump = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(pump_datum, true);
 			auto pump_hmlt = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(pump->objectTag.model.TagIndex, true);
 			if (strcmp(mapName, "coagulation") == 0)
 			{
-				*Memory::GetAddress<Player::Biped*>(0x51A67C) = Player::Biped::Skeleton;
+				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 				for (auto& scen_place : coag_scen_places)
 				{
 					switch (std::get<0>(scen_place))

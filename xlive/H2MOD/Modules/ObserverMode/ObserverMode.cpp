@@ -137,7 +137,7 @@ namespace ObserverMode
 	int currentPlayerIndex = 0;
 	void NextPlayer()
 	{
-		auto pArray = Player::getArray();
+		auto pArray = s_player::getArray();
 		if (currentPlayerIndex + 1 > pArray->total_elements_used - 1)
 			currentPlayerIndex = 0;
 		else
@@ -192,7 +192,7 @@ namespace ObserverMode
 
 			while (playerIt.get_next_active_player())
 			{
-				Player* player = playerIt.get_current_player_data();
+				s_player* player = playerIt.get_current_player_data();
 				if (player->unit_index == observer_current_index)
 				{
 					unitIndexSameAsObserverIndex = observer_current_index;
@@ -202,7 +202,7 @@ namespace ObserverMode
 				
 			auto control = PlayerControl::GetControls(0);
 			auto player_actions = PlayerControl::GetPlayerActions(currentPlayerIndex);
-			Player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))->unit_index = observer_current_index;
+			s_player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))->unit_index = observer_current_index;
 			//control->ControllingDatum = observer_current_index;
 			//control->actions.yaw = player_actions->facing.yaw.as_rad();
 			//control->actions.pitch = player_actions->facing.pitch.as_rad();

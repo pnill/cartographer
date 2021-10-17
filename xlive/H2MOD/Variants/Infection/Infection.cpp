@@ -211,25 +211,25 @@ void Infection::preSpawnServerSetup() {
 		int currentPlayerIndex = playerIt.get_current_player_index();
 		XUID playerIdentifier = playerIt.get_current_player_id();
 		bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
-		if (Player::getTeam(currentPlayerIndex) == ZOMBIE_TEAM && isZombie == false) {
+		if (s_player::getTeam(currentPlayerIndex) == ZOMBIE_TEAM && isZombie == false) {
 			// if the player just joined the and he doesn't have zombie status, and his team is green, add him in the array
 			setZombiePlayerStatus(playerIdentifier);
 			isZombie = true;
 		}
 
-		LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={}, isZombie={}, playerIdentifier={}, playerName:{}", currentPlayerIndex, isZombie, playerIdentifier, Player::getName(currentPlayerIndex));
+		LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={}, isZombie={}, playerIdentifier={}, playerName:{}", currentPlayerIndex, isZombie, playerIdentifier, s_player::getName(currentPlayerIndex));
 		if (isZombie) {
-			Player::setUnitBipedType(currentPlayerIndex, Player::Biped::Flood);
-			if (Player::getTeam(currentPlayerIndex) != ZOMBIE_TEAM)  {
+			s_player::setUnitBipedType(currentPlayerIndex, s_player::e_character_type::Flood);
+			if (s_player::getTeam(currentPlayerIndex) != ZOMBIE_TEAM)  {
 				if (NetworkSession::localPeerIsSessionHost())
 					CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(currentPlayerIndex), ZOMBIE_TEAM); // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
 			}
 		}
 		else {
 			if(SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && H2Config_spooky_boy)
-				Player::setUnitBipedType(currentPlayerIndex, Player::Biped::Skeleton);
+				s_player::setUnitBipedType(currentPlayerIndex, s_player::e_character_type::Skeleton);
 			else
-				Player::setUnitBipedType(currentPlayerIndex, Player::Biped::Spartan);
+				s_player::setUnitBipedType(currentPlayerIndex, s_player::e_character_type::Spartan);
 			humanCount++;
 		}
 		playerCount++;
@@ -242,24 +242,24 @@ void Infection::preSpawnServerSetup() {
 
 void Infection::setPlayerAsHuman(int playerIndex) {
 	if (SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && H2Config_spooky_boy)
-		Player::setUnitBipedType(playerIndex, Player::Biped::Skeleton);
+		s_player::setUnitBipedType(playerIndex, s_player::e_character_type::Skeleton);
 	else
-		Player::setUnitBipedType(playerIndex, Player::Biped::Spartan);
-	Player::setBipedSpeed(playerIndex, 1.0f);
+		s_player::setUnitBipedType(playerIndex, s_player::e_character_type::Spartan);
+	s_player::setBipedSpeed(playerIndex, 1.0f);
 }
 
 void Infection::setPlayerAsZombie(int playerIndex) {
-	Player::setUnitBipedType(playerIndex, Player::Biped::Flood);
-	Player::setBipedSpeed(playerIndex, 1.1f);
+	s_player::setUnitBipedType(playerIndex, s_player::e_character_type::Flood);
+	s_player::setBipedSpeed(playerIndex, 1.1f);
 
 	call_give_player_weapon(playerIndex, e_weapons_datum_index::energy_blade, 1);
 }
 
 void Infection::spawnPlayerClientSetup(int playerIndex) {
 	if (playerIndex != NONE) {
-		XUID playerIdentifier = Player::getIdentifier(playerIndex);
+		XUID playerIdentifier = s_player::getIdentifier(playerIndex);
 		//If player being spawned is LocalUser/Player
-		if (playerIdentifier == Player::getIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
+		if (playerIdentifier == s_player::getIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
 			if (firstSpawn == true) {
 				//start of zombie match
 				Infection::triggerSound(e_infection_sounds::infection, 1000);
@@ -276,7 +276,7 @@ void Infection::spawnPlayerClientSetup(int playerIndex) {
 				h2mod->team_player_indicator_visibility(false);
 			}
 			else if (h2mod->get_local_team_index() == ZOMBIE_TEAM) {
-				Player::setUnitBipedType(playerIndex, Player::Biped::Flood);
+				s_player::setUnitBipedType(playerIndex, s_player::e_character_type::Flood);
 
 				h2mod->disable_weapon_pickup(false);
 				h2mod->team_player_indicator_visibility(true);
@@ -288,7 +288,7 @@ void Infection::spawnPlayerClientSetup(int playerIndex) {
 void Infection::spawnServerPlayerSetup(int playerIndex) {
 	if (playerIndex != NONE) {
 		LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}", playerIndex);
-		datum unit_datum_index = Player::getPlayerUnitDatumIndex(playerIndex);
+		datum unit_datum_index = s_player::getPlayerUnitDatumIndex(playerIndex);
 		char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
 		if (unit_object) {
 			//if the unit_object data pointer is not nullptr, the spawned object is "alive"
@@ -308,22 +308,22 @@ void Infection::spawnServerPlayerSetup(int playerIndex) {
 void Infection::infectPlayer(int playerIndex, datum unitDatumIndex) {
 	if (playerIndex != NONE) {
 		char* unit_object = (char*)object_try_and_get_and_verify_type(unitDatumIndex, FLAG(e_object_type::biped));
-		if (unit_object && Player::getTeam(playerIndex) != ZOMBIE_TEAM)
+		if (unit_object && s_player::getTeam(playerIndex) != ZOMBIE_TEAM)
 		{
 			//if we have a valid object and the object is not on the zombie team
-			XUID playerIdentifier = Player::getIdentifier(playerIndex);
+			XUID playerIdentifier = s_player::getIdentifier(playerIndex);
 
 			LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", h2mod->get_local_player_name(0), playerIdentifier);
 
 			//If player being infected is LocalUser/Player
-			if (playerIdentifier == Player::getIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
+			if (playerIdentifier == s_player::getIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
 				LOG_TRACE_GAME("[h2mod-infection] Setting player as zombie");
 				h2mod->set_local_team_index(0, ZOMBIE_TEAM);
-				Player::setUnitBipedType(playerIndex, Player::Biped::Elite);
+				s_player::setUnitBipedType(playerIndex, s_player::e_character_type::Elite);
 			}
 			else {
 				//if not, then this is a new zombie
-				LOG_TRACE_GAME(L"[h2mod-infection] Player died, name={}, identifer={}", Player::getName(playerIndex), playerIdentifier);
+				LOG_TRACE_GAME(L"[h2mod-infection] Player died, name={}, identifer={}", s_player::getName(playerIndex), playerIdentifier);
 				Infection::triggerSound(new_zombie, 1000);
 			}
 		}
@@ -339,7 +339,7 @@ void Infection::infectPlayers(int playerIndex, datum unitDatumIndex) {
 				EngineCalls::Unit::remove_equipment(unitDatumIndex); //Take away zombie's weapons
 			}
 			else {
-				Infection::setZombiePlayerStatus(Player::getIdentifier(playerIndex));
+				Infection::setZombiePlayerStatus(s_player::getIdentifier(playerIndex));
 			}
 		}
 	}
@@ -382,17 +382,17 @@ void ZombiePreSpawnHandler::onDedi()
 
 void ZombiePreSpawnHandler::onClient()
 {
-	XUID playerIdentifier = Player::getIdentifier(this->getPlayerIndex());
+	XUID playerIdentifier = s_player::getIdentifier(this->getPlayerIndex());
 	LOG_TRACE_GAME(L"[h2mod-infection] Client pre spawn, playerIndex={0}, playerIdentifier={1}, localPlayerName={2}", this->getPlayerIndex(), playerIdentifier, h2mod->get_local_player_name(0));
 	//If player being spawned is LocalUser/Player
-	if (playerIdentifier == Player::getIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0))))
+	if (playerIdentifier == s_player::getIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0))))
 	{
 		LOG_TRACE_GAME("[h2mod-infection] Client pre spawn, found local player, current team = {}", h2mod->get_local_team_index());
 		//Change biped if LocalUser is in GreenTeam
 		if (h2mod->get_local_team_index() == ZOMBIE_TEAM)
 		{
 			LOG_TRACE_GAME("[h2mod-infection] Client is infected! switching bipeds: {}", this->getPlayerIndex());
-			Player::setUnitBipedType(this->getPlayerIndex(), Player::Biped::Elite);
+			s_player::setUnitBipedType(this->getPlayerIndex(), s_player::e_character_type::Elite);
 		}
 	}
 }

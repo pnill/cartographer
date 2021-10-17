@@ -20,7 +20,7 @@ namespace player_representation
 {
 	//Non-zero index based value for the count of valid representation types
 	byte representation_count = 4;
-	s_globals_group_definition::s_player_representation_block* add_representation(datum fp_hands, datum fp_body, datum tp_biped, Player::Biped type, string_id variant)
+	s_globals_group_definition::s_player_representation_block* add_representation(datum fp_hands, datum fp_body, datum tp_biped, s_player::e_character_type type, string_id variant)
 	{
 		auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
 		if (!DATUM_IS_NONE(globals_datum)) 
@@ -60,7 +60,7 @@ namespace player_representation
 	}
 
 
-	s_globals_group_definition::s_player_representation_block* clone_representation(int index, Player::Biped newType)
+	s_globals_group_definition::s_player_representation_block* clone_representation(int index, s_player::e_character_type newType)
 	{
 		auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
 		if (!DATUM_IS_NONE(globals_datum))
@@ -101,10 +101,10 @@ namespace player_representation
 		return 0xF28C3826;
 	}
 
-	typedef void(__cdecl t_network_session_player_profile_recieve)(int player_index, Player::Properties* a2);
+	typedef void(__cdecl t_network_session_player_profile_recieve)(int player_index, s_player::s_player_properties* a2);
 	t_network_session_player_profile_recieve* p_network_session_player_profile_recieve;
 
-	void __cdecl network_session_player_profile_recieve(int player_index, Player::Properties* a2)
+	void __cdecl network_session_player_profile_recieve(int player_index, s_player::s_player_properties* a2)
 	{
 		auto a = s_game_globals::get()->m_options;
 		LOG_INFO_GAME("[{}] {}", __FUNCTION__, a.m_engine_type);
@@ -135,22 +135,22 @@ namespace player_representation
 			auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
 			auto globals = tags::get_tag_fast<s_globals_group_definition>(globals_datum);
 
-			if (a2->profile.player_character_type == Player::Biped::MasterChief)
-				a2->profile.player_character_type = Player::Biped::Spartan;
-			if (a2->profile.player_character_type == Player::Biped::Dervish)
-				a2->profile.player_character_type = Player::Biped::Elite;
+			if (a2->profile.player_character_type == s_player::e_character_type::MasterChief)
+				a2->profile.player_character_type = s_player::e_character_type::Spartan;
+			if (a2->profile.player_character_type == s_player::e_character_type::Dervish)
+				a2->profile.player_character_type = s_player::e_character_type::Elite;
 
 			if(SpecialEvents::getCurrentEvent() != SpecialEvents::e_halloween)
 			{
-				if (a2->profile.player_character_type == Player::Biped::Skeleton)
-					a2->profile.player_character_type = Player::Biped::Spartan;
+				if (a2->profile.player_character_type == s_player::e_character_type::Skeleton)
+					a2->profile.player_character_type = s_player::e_character_type::Spartan;
 			}
 			else if (H2Config_spooky_boy)
-				*Memory::GetAddress<Player::Biped*>(0x51A67C) = Player::Biped::Skeleton;
+				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
 
 			if ((byte)a2->profile.player_character_type > representation_count)
-				a2->profile.player_character_type = Player::Biped::Spartan;
+				a2->profile.player_character_type = s_player::e_character_type::Spartan;
 		}
 
 		if ((char)a2->player_displayed_skill != -1)
@@ -161,8 +161,8 @@ namespace player_representation
 			if ((char)a2->player_overall_skill < 0)
 				a2->player_overall_skill = 0;
 
-		if (a2->player_handicap_level > Player::Handicap::Severe)
-			a2->player_handicap_level = Player::Handicap::Severe;
+		if (a2->player_handicap_level > s_player::e_handicap::Severe)
+			a2->player_handicap_level = s_player::e_handicap::Severe;
 
 		if (a2->bungie_user_role <= 7)
 			a2->bungie_user_role = 7;
@@ -176,7 +176,7 @@ namespace player_representation
 	{
 		if (h2mod->GetEngineType() == Multiplayer) {
 			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween)
-				*Memory::GetAddress<Player::Biped*>(0x51A67C) = Player::Biped::Skeleton;
+				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
 			auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
 			auto skele_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", blam_tag::tag_group_type::biped, "carto_shared");
@@ -190,13 +190,13 @@ namespace player_representation
 				tag_loader::Load_tag(skele_datum, true, "carto_shared");
 				tag_loader::Push_Back();
 				auto skele_new_datum = tag_loader::ResolveNewDatum(skele_datum);
-				player_representation::add_representation(tag_loader::ResolveNewDatum(skele_fp_datum), tag_loader::ResolveNewDatum(skele_body_datum), skele_new_datum, Player::Biped::Skeleton);
+				player_representation::add_representation(tag_loader::ResolveNewDatum(skele_fp_datum), tag_loader::ResolveNewDatum(skele_body_datum), skele_new_datum, s_player::e_character_type::Skeleton);
 				auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
 				new_def->tag = skele_new_datum;
 			}
 			else
 			{
-				clone_representation(2, Player::Biped::Skeleton);
+				clone_representation(2, s_player::e_character_type::Skeleton);
 			}
 			auto flood_datum = tag_loader::Get_tag_datum("objects\\characters\\floodcombat_elite\\floodcombat_elite_mp", blam_tag::tag_group_type::biped, "carto_shared");
 			auto flood_arms_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_arms\\fp_arms", blam_tag::tag_group_type::rendermodel, "carto_shared");
@@ -208,13 +208,13 @@ namespace player_representation
 				tag_loader::Load_tag(flood_arms_datum, true, "carto_shared");
 				tag_loader::Load_tag(flood_body_datum, true, "carto_shared");
 				tag_loader::Push_Back();
-				player_representation::add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum), Player::Biped::Flood);
+				player_representation::add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum), s_player::e_character_type::Flood);
 				auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
 				new_def->tag = tag_loader::ResolveNewDatum(flood_datum);
 			}
 			else
 			{
-				clone_representation(3, Player::Biped::Flood);
+				clone_representation(3, s_player::e_character_type::Flood);
 			}
 		}
 	}
