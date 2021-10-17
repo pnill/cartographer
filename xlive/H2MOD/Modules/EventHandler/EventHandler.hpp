@@ -170,19 +170,6 @@ namespace EventHandler
 			}
 		}
 	}
-	template<typename T> static void remove_callback2(void* callback, EventExecutionType execution_type)
-	{
-		auto type = get_type<T>();
-		std::vector<EventCallback<void*>>* events = get_vector(type);
-		for (std::vector<EventCallback<void*>>::iterator it = events->begin(); it != events->end(); ++it)
-		{
-			if ((T)it->callback == callback && it->type == type && it->execution_type == execution_type)
-			{
-				events->erase(it);
-				return;
-			}
-		}
-	}
 
 	/**
 	 * \brief Erases callbacks that are flagged with run once that have ran
