@@ -145,7 +145,7 @@ namespace player_representation
 				if (a2->profile.player_character_type == s_player::e_character_type::Skeleton)
 					a2->profile.player_character_type = s_player::e_character_type::Spartan;
 			}
-			else if (H2Config_spooky_boy)
+			else if (H2Config_spooky_boy && !Memory::isDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
 
@@ -175,7 +175,7 @@ namespace player_representation
 	void on_map_load()
 	{
 		if (h2mod->GetEngineType() == Multiplayer) {
-			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween)
+			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && !Memory::isDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
 			auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
