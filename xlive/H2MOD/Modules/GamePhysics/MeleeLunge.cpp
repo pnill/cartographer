@@ -6,7 +6,9 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 #include <float.h>
+#if (!defined(_M_FP_FAST)) || !_M_FP_FAST
 #pragma fenv_access (on)
+#endif
 
 #define MELEE_DEBUG 0
 

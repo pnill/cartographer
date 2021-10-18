@@ -6,7 +6,9 @@
 #include "H2MOD\Modules\GamePhysics\MeleeLunge.h"
 
 #include <float.h>
+#if (!defined(_M_FP_FAST)) || !_M_FP_FAST
 #pragma fenv_access (on)
+#endif
 
 #define MELEE_LUNGE_PHYSICS_UPDATE_HOOK_ENABLE 1
 

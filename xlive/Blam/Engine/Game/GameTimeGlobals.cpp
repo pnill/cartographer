@@ -2,7 +2,9 @@
 #include "GameTimeGlobals.h"
 
 #include <float.h>
+#if (!defined(_M_FP_FAST)) || !_M_FP_FAST
 #pragma fenv_access (on)
+#endif
 
 time_globals* time_globals::get()
 {
