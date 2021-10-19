@@ -226,7 +226,7 @@ float __cdecl get_max_melee_lunge_speed_per_tick(float target_distance, bool wea
 	return flt_ret;*/
 
 	float max_velocity = 12.0f;
-	if (weapon_is_sword)
+	if (!weapon_is_sword)
 		max_velocity = 8.0f;
 
 	float v3 = target_distance * 0.375f;
