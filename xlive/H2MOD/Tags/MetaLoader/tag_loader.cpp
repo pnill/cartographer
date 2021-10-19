@@ -102,7 +102,8 @@ namespace tag_loader
 		else
 		{
 			std::string error = "Couldnt load plugin " + type + ".xml";
-			error_list.push_back(error);
+			throw error;
+			//error_list.push_back(error);
 		}
 
 		return temp_plugin;

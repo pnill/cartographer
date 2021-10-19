@@ -96,10 +96,17 @@ namespace meta_struct
 		tinyxml2::XMLDocument xmlDoc;
 		tinyxml2::XMLError error = xmlDoc.LoadFile(file_loc.c_str());
 
-		if (error == tinyxml2::XML_ERROR_FILE_NOT_FOUND)
+		if (error != tinyxml2::XML_SUCCESS)
 		{
-			std::string exception_text = "Couldnt find file :" + file_loc;
-			throw new std::exception(exception_text.c_str());
+			std::string message = "Halo 2 has encountered a fatal error and needs to exit,\n"
+				" a require plugin file failed to load.,\n";
+			message += file_loc + "\n";
+			message += "Code: " + std::to_string(error);
+			MessageBoxA(NULL, message.c_str(), "Crash!", 0);
+			LOG_ERROR_GAME("[{}] Failed to load plugin: {} -  error code {}", __FUNCTION__, file_loc, error);
+			exit(-1);
+			//std::string exception_text = "Error opening :" + file_loc + " - Error Code : ";//  +std::to_string(error);
+			//throw std::runtime_error(exception_text.c_str());
 		}
 		tinyxml2::XMLElement* root_element = xmlDoc.RootElement();
 
