@@ -6,7 +6,9 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 #include <float.h>
+#if (!defined(_M_FP_FAST)) || !_M_FP_FAST
 #pragma fenv_access (on)
+#endif
 
 #define MELEE_DEBUG 0
 
@@ -198,15 +200,16 @@ int __cdecl biped_dash_time_to_target(datum biped_index)
 	return NONE;
 }
 
-float __cdecl get_max_melee_lunge_speed_per_tick(float target_distance, char weapon_is_sword)
+float __cdecl get_max_melee_lunge_speed_per_tick(float target_distance, bool weapon_is_sword)
 {
-	auto p_get_max_melee_lunge_speed_per_tick = Memory::GetAddressRelative<decltype(&get_max_melee_lunge_speed_per_tick)>(0x50B06F, 0x4FD69F);
+	// TODO: fixme
+	/*auto p_get_max_melee_lunge_speed_per_tick = Memory::GetAddressRelative<decltype(&get_max_melee_lunge_speed_per_tick)>(0x50B06F, 0x4FD69F);
 	
 	float flt_ret = 0.0f;
 	__asm
 	{
 		sub esp, 4
-		movss[esp], xmm0
+		movss [esp], xmm0
 		push eax
 		xor eax, eax
 		mov al, weapon_is_sword
@@ -220,7 +223,17 @@ float __cdecl get_max_melee_lunge_speed_per_tick(float target_distance, char wea
 		add esp, 4
 	}
 
-	return flt_ret;
+	return flt_ret;*/
+
+	float max_velocity = 12.0f;
+	if (!weapon_is_sword)
+		max_velocity = 8.0f;
+
+	float v3 = target_distance * 0.375f;
+	if (v3 >= k_valid_real_epsilon)
+		return fminf(time_globals::get_seconds_per_tick() * max_velocity, v3);
+	else
+		return k_valid_real_epsilon;
 }
 
 /*

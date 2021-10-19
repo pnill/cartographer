@@ -41,8 +41,11 @@
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "Util\Hooks\Hook.h"
+
 #include <float.h>
+#if (!defined(_M_FP_FAST)) || !_M_FP_FAST
 #pragma fenv_access (on)
+#endif
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
