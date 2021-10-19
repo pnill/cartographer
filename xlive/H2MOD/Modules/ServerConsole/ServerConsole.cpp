@@ -54,9 +54,18 @@ void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, ch
 		case ServerConsole::vip: break;
 		default: ;
 	}*/
-	EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, ServerConsole::s_commandsMap[LowerCommand]);
+
+	//Temporary if statement to prevent double calling events,
+	//all server command functions will be hooked in the future and these event executes will be removed.
+	if(ServerConsole::s_commandsMap[LowerCommand] != ServerConsole::play)
+		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, ServerConsole::s_commandsMap[LowerCommand]);
+
 	auto res = p_dedi_command_hook(command_line_args, split_strings, a3);
-	EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, ServerConsole::s_commandsMap[LowerCommand]);
+
+	//Temporary if statement to prevent double calling events,
+	//all server command functions will be hooked in the future and these executes will be removed.
+	if (ServerConsole::s_commandsMap[LowerCommand] != ServerConsole::play)
+		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, ServerConsole::s_commandsMap[LowerCommand]);
 	return res;
 }
 
