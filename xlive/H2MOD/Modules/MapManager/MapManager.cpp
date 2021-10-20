@@ -508,12 +508,16 @@ void MapManager::getMapFilename(std::wstring& buffer) {
 
 void MapManager::MapDownloadUpdateTick()
 {
-	for (auto it = m_mapDownloadQueryList.begin(); it != m_mapDownloadQueryList.end(); it++)
+	for (auto it = m_mapDownloadQueryList.begin(); it != m_mapDownloadQueryList.end(); )
 	{
 		MapDownloadQuery& query = **it;
 		if (query.m_downloadFinished)
 		{
-			m_mapDownloadQueryList.erase(it);
+			it = m_mapDownloadQueryList.erase(it);
+		}
+		else
+		{
+			it++;
 		}
 	}
 }
