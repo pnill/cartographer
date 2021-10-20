@@ -622,7 +622,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 	tags::run_callbacks();
 
-	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->m_engine_type);
+	
 
 	get_object_table_memory();
 
@@ -740,7 +740,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 	// if we got this far, it means map is MP or SP, and if map load is called again, it should reset/deinitialize any custom gametypes
 	resetAfterMatch = true;
-
+	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->m_engine_type);
 	return result;
 }
 
