@@ -276,23 +276,23 @@ namespace SpecialEvents
 			if (tag_loader::Map_exists("carto_shared"))
 			{
 				mook_ball_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\basketball\\basketball", blam_tag::tag_group_type::weapon, "carto_shared");
-				if(!DATUM_IS_NONE(mook_ball_datum))
+				if (!DATUM_IS_NONE(mook_ball_datum))
 				{
 					tag_loader::Load_tag(mook_ball_datum, true, "carto_shared");
 					tag_loader::Push_Back();
 
 					auto mook_ball = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tag_loader::ResolveNewDatum(mook_ball_datum), true);
-					
+
 					auto ball_model_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
 					auto ball_model = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(ball_model_datum);
-					
+
 					ball_model->model.TagIndex = mook_ball->model.TagIndex;
 					ball_model->first_person[0]->first_person_model.TagIndex = mook_ball->first_person[0]->first_person_model.TagIndex;
 					ball_model->first_person[1]->first_person_model.TagIndex = mook_ball->first_person[1]->first_person_model.TagIndex;
 
 					auto bomb_model_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
 					auto bomb_model = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(bomb_model_datum);
-					
+
 					bomb_model->model.TagIndex = mook_ball->model.TagIndex;
 					bomb_model->first_person[0]->first_person_model.TagIndex = mook_ball->first_person[0]->first_person_model.TagIndex;
 					bomb_model->first_person[1]->first_person_model.TagIndex = mook_ball->first_person[1]->first_person_model.TagIndex;
@@ -491,7 +491,7 @@ namespace SpecialEvents
 	void halloween_game_life_cycle_update(e_game_life_cycle state)
 	{
 		if (state == life_cycle_in_game) {
-			if(H2Config_spooky_boy)
+			if (H2Config_spooky_boy)
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
 			char* mapName = Memory::GetAddress<char*>(0x47CF0C);
@@ -503,7 +503,6 @@ namespace SpecialEvents
 			auto pump_hmlt = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(pump->objectTag.model.TagIndex, true);
 			if (strcmp(mapName, "coagulation") == 0)
 			{
-				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 				for (auto& scen_place : coag_scen_places)
 				{
 					switch (std::get<0>(scen_place))
@@ -680,7 +679,7 @@ namespace SpecialEvents
 			}
 		}
 	}
-	
+
 	void AddNewMarkers()
 	{
 		if (h2mod->GetEngineType() == e_engine_type::Multiplayer) {
@@ -714,18 +713,18 @@ namespace SpecialEvents
 		tags::on_map_load(AddNewMarkers);
 		switch (getCurrentEvent())
 		{
-			case e_christmas:
-				tags::on_map_load(ChristmasOnMapLoad);
-				break;
-			case e_st_paddys:
-				tags::on_map_load(PaddysOnMapLoad);
-				break;
-			case e_mook_maddness:
-				tags::on_map_load(MookMaddnessOnMapLoad);
-				break;
-			case e_halloween:
-				tags::on_map_load(HalloweenOnMapLoad);
-				break;
+		case e_christmas:
+			tags::on_map_load(ChristmasOnMapLoad);
+			break;
+		case e_st_paddys:
+			tags::on_map_load(PaddysOnMapLoad);
+			break;
+		case e_mook_maddness:
+			tags::on_map_load(MookMaddnessOnMapLoad);
+			break;
+		case e_halloween:
+			tags::on_map_load(HalloweenOnMapLoad);
+			break;
 		}
 	}
 }
