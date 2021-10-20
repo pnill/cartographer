@@ -278,6 +278,6 @@ namespace playlist_loader
 
 		p_playlist_loader_invalid_entry = Memory::GetAddress<playlist_loader_invalid_entry>(0, 0xED2E);
 
-		EventHandler::register_callback(reset_custom_settings, EventType::server_command, EventExecutionType::execute_after, false);
+		EventHandler::register_callback(reset_custom_settings, EventType::server_command, EventExecutionType::execute_before, false);
 	}
 }
