@@ -11,10 +11,6 @@
 #include "H2MOD\Variants\VariantPlayer.h"
 #include "H2MOD\Variants\Variants.h"
 
-#define GAME_BUILD 11122
-#define EXECUTABLE_VERSION 4
-
-
 enum SoundType
 {
 	TeamChange,
