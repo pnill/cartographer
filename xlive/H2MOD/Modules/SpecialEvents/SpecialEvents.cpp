@@ -103,7 +103,7 @@ namespace SpecialEvents
 		if (CheckIfEventTime(L"4-12"))
 			return e_mook_maddness;
 
-		if (CheckIfEventTime(L"10-20") || CheckIfEventTime(L"10-27") || CheckIfEventTime2(L"10-23"))
+		if (CheckIfEventTime(L"10-20") || CheckIfEventTime(L"10-27") || CheckIfEventTime2(L"10-31"))
 			return e_halloween;
 
 		return e_none;
