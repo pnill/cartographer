@@ -468,7 +468,6 @@ char __cdecl OnPlayerDeath(datum unit_datum_index, int a2, char a3, char a4)
 
 	/* This is the unit of the player who last damaged the object*/
 	int damaging_player_unit = get_damage_owner(unit_datum_index);
-	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_before, unit_datum_index, *(datum*)(a2));
 	if (b_HeadHunter)
 	{
 		headHunterHandler->playerDeath->SetDeadPlayer(unit_datum_index); // set this so we can spawn a skull on their position.
@@ -498,7 +497,7 @@ char __cdecl OnPlayerDeath(datum unit_datum_index, int a2, char a3, char a4)
 		infectionHandler->playerDeath->setUnitDatumIndex(unit_datum_index);
 		infectionHandler->playerDeath->execute();
 	}
-
+	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_before, unit_datum_index, *(datum*)(a2));
 	bool ret = pplayer_death(unit_datum_index, a2, a3, a4);
 	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_after, unit_datum_index, *(datum*)(a2));
 	return ret;
