@@ -167,8 +167,6 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\details\null_mutex.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\details\os-inl.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\details\os.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\pattern_formatter-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\pattern_formatter.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\details\periodic_worker-inl.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\details\periodic_worker.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\details\registry-inl.h" />
@@ -407,8 +405,6 @@
     <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.hpp" />
-    <ClInclude Include="Blam\Maths\integer_math.h" />
-    <ClInclude Include="Blam\Maths\real_math.h" />
     <ClInclude Include="Blam\Engine\Game\GameGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngineGlobals.h" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />

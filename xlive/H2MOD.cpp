@@ -93,7 +93,7 @@ void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data
 {
 	// Hook on call to prevent guardian glitching on Infection gametype
 	if (b_Infection) {
-		if (damage_data->creator_datum != -1 && damage_data->field_10 != -1)
+		if (!DATUM_IS_NONE(damage_data->creator_datum) && damage_data->field_10 != -1)
 		{
 			LOG_TRACE_GAME(
 				"{} {} {} {} {} {} {} {}",

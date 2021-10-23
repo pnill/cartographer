@@ -402,10 +402,10 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 				if (unk4 <= current_velocity_per_tick)
 					deceleration = unk4;
 
-				deceleration *= time_globals::get_ticks_difference_real();
+				//deceleration *= time_globals::get_ticks_difference_real();
 
 				// im not entirely sure if this is needed or not
-				output->out_translational_velocity = output->out_translational_velocity * time_globals::get_ticks_difference_real();
+				//output->out_translational_velocity = output->out_translational_velocity * time_globals::get_ticks_difference_real();
 
 				output->out_translational_velocity = (direction * (-deceleration)) + output->out_translational_velocity;
 

@@ -3,6 +3,17 @@
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "Util\Hooks\Hook.h"
 
+// DO NOT USE VERSIONS ABOVE USHORT_MAX - 1 (above 65534) OR BELLOW 0 
+// REPLACE THE DEFAULTS FOR BOTH EXECUTABLE_VERSION AND COMPATIBLE_VERSION WITH THE SAME VALUE FOR THE MOST PART
+// OR YOU CAN SET THE COMPATIBLE VERSION HIGHER IF YOU WANT TO ALLOW OLDER VERSIONS TO JOIN (EXECUTABLE_VERSION SHOULD NOT BE ABOVE IT)
+// ALSO THE VERSIONs SELECTED SHOULD BE LINEARLY INCREASED, NOT RANDOM
+#define EXECUTABLE_VERSION 11122
+#define COMPATIBLE_VERSION 11122 
+
+// DO NOT CHANGE, DO NOT USE TYPES ABOVE 7 OR BELLOW 0 (3 bits values max)
+#define EXECUTABLE_TYPE 4
+
+
 namespace EngineHooks
 {
 	static e_game_life_cycle previousGamestate = life_cycle_none;
@@ -28,45 +39,45 @@ namespace EngineHooks
 		LOG_TRACE_GAME("[{}] Bluescreen Detected.", __FUNCTION__);
 	}
 
-	#pragma region Game Version hooks
+#pragma region Game Version hooks
 	verify_game_version_on_join p_verify_game_version_on_join;
-	bool __cdecl VerifyGameVersionOnJoin(int executable_version, int build_version, int build_version2)
+	bool __cdecl verify_game_version_on_join_hook(BYTE executable_type, unsigned short executable_version, unsigned short compatible_version)
 	{
-		return executable_version == EXECUTABLE_VERSION && build_version >= GAME_BUILD && build_version2 <= GAME_BUILD;
+		return executable_type == EXECUTABLE_TYPE && executable_version >= EXECUTABLE_VERSION && compatible_version <= COMPATIBLE_VERSION;
 	}
 
-	verify_executable_version p_verify_executable_version;
-
-	bool __cdecl VerifyExecutableVersion(int executable_version)
+	verify_executable_type p_verify_executable_version;
+	bool __cdecl verify_executable_type_hook(BYTE executable_type)
 	{
-		return executable_version == EXECUTABLE_VERSION; // will not display servers that don't match this in server list
+		// will not display servers that don't match this in server list
+		return executable_type == EXECUTABLE_TYPE;
 	}
 
 	get_game_version p_get_game_version;
 
-	void __cdecl GetGameVersion(DWORD *executable_version, DWORD *build_version, DWORD *build_version2)
+	void __cdecl get_game_version_hook(BYTE* executable_type, unsigned short* executable_version, unsigned short* compatible_version)
 	{
+		*executable_type = EXECUTABLE_TYPE;
 		*executable_version = EXECUTABLE_VERSION;
-		*build_version = GAME_BUILD;
-		*build_version2 = GAME_BUILD;
+		*compatible_version = COMPATIBLE_VERSION;
 	}
-	#pragma endregion
+#pragma endregion
 
 	void ApplyHooks()
 	{
-		/*Game State Change Detection*/
+		/*Game Life Cycle Change Detection*/
 		p_game_life_cycle_update = Memory::GetAddress<game_life_cycle_update>(0x1d7738, 0x1BCDA8);
 		PatchCall(Memory::GetAddress(0x1AD84D, 0x1A67CA), GameLifeCycleUpdate);
 
 		/*Blue Screen detection*/
 		p_main_game_reset_map = Memory::GetAddress<main_game_reset_map*>(0x9763, 0x1FA4E);
 		PatchCall(Memory::GetAddress(0x1AE82F, 0x1A8A89), main_game_reset_map_blue_screen_detection);
-		
+
 		/*Game Version Hooks*/
-		p_get_game_version = (get_game_version)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4BF5, 0x1B0043), (BYTE*)GetGameVersion, 8);
+		p_get_game_version = (get_game_version)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4BF5, 0x1B0043), (BYTE*)get_game_version_hook, 8);
 		if (!Memory::isDedicatedServer()) {
-			p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C14), (BYTE*)VerifyGameVersionOnJoin, 5);
-			p_verify_executable_version = (verify_executable_version)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C32), (BYTE*)VerifyExecutableVersion, 8);
+			p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C14), (BYTE*)verify_game_version_on_join_hook, 5);
+			p_verify_executable_version = (verify_executable_type)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C32), (BYTE*)verify_executable_type_hook, 8);
 		}
 	}
 }
