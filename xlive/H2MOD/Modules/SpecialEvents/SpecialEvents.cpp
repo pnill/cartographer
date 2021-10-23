@@ -66,17 +66,26 @@ namespace SpecialEvents
 		{
 			std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 			time_t tt = std::chrono::system_clock::to_time_t(now);
-
 			tm utc_tm = *gmtime(&tt);
 
 			time_t pat = getEpochTime(utc_tm.tm_year, date.append(L"T00:00:00Z"));
-
 			tm utc_pat = *gmtime(&pat);
 
 			int a, b = 0;
 			a = utc_tm.tm_yday - utc_tm.tm_wday;
 			b = utc_pat.tm_yday - utc_pat.tm_wday;
 			return a == b;
+		}
+		bool CheckIfEventTime2(std::wstring date)
+		{
+			std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+			time_t tt = std::chrono::system_clock::to_time_t(now);
+			tm utc_tm = *gmtime(&tt);
+
+			time_t pat = getEpochTime(utc_tm.tm_year, date.append(L"T00:00:00Z"));
+			tm utc_pat = *gmtime(&pat);
+
+			return utc_tm.tm_yday == utc_pat.tm_yday;
 		}
 	}
 
@@ -94,7 +103,7 @@ namespace SpecialEvents
 		if (CheckIfEventTime(L"4-12"))
 			return e_mook_maddness;
 
-		if (CheckIfEventTime(L"10-20") || CheckIfEventTime(L"10-27"))
+		if (CheckIfEventTime(L"10-20") || CheckIfEventTime(L"10-27") || CheckIfEventTime2(L"10-31"))
 			return e_halloween;
 
 		return e_none;
