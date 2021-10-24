@@ -106,8 +106,7 @@ namespace player_representation
 
 	void __cdecl network_session_player_profile_recieve(int player_index, s_player::s_player_properties* a2)
 	{
-		auto a = s_game_globals::get()->m_options;
-		LOG_INFO_GAME("[{}] {}", __FUNCTION__, a.m_engine_type);
+		LOG_INFO_GAME("[{}] {}", __FUNCTION__, s_game_globals::get()->m_options.m_engine_type);
 		if (s_game_globals::game_is_campaign())
 		{
 			p_network_session_player_profile_recieve(player_index, a2);
@@ -132,9 +131,6 @@ namespace player_representation
 		}
 		else if (s_game_globals::game_is_multiplayer())
 		{
-			auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
-			auto globals = tags::get_tag_fast<s_globals_group_definition>(globals_datum);
-
 			if (a2->profile.player_character_type == s_player::e_character_type::MasterChief)
 				a2->profile.player_character_type = s_player::e_character_type::Spartan;
 			if (a2->profile.player_character_type == s_player::e_character_type::Dervish)
@@ -167,10 +163,12 @@ namespace player_representation
 		if (a2->bungie_user_role <= 7)
 			a2->bungie_user_role = 7;
 
-		if (EngineCalls::get_game_mode_engine())
-			if (s_game_globals::get()->get_game_variant()->game_engine_flags & e_game_engine_flags::_game_engine_motion_sensor_bit)
-				if (a2->player_team && !((1 << a2->player_team) & s_game_engine_globals::get()->Unk1))
-					a2->player_team = e_object_team::None;
+		if (EngineCalls::get_game_mode_engine()
+			&& s_game_globals::get()->get_game_variant()->game_engine_flags & FLAG(e_game_engine_flags::_game_engine_teams_bit)
+			&& (a2->player_team && !(s_game_engine_globals::get()->Unk1 & FLAG(a2->player_team))))
+		{
+			a2->player_team = e_object_team::None;
+		}
 	}
 	void on_map_load()
 	{
