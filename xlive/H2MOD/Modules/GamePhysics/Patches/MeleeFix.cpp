@@ -26,7 +26,7 @@ namespace MeleeFix
 			static byte original_melee_collision_instruction[]{ 0x0F, 0x84, 0x4B, 0x01, 0x00, 0x00 };
 			if (H2Config_melee_fix)
 			{
-				NopFill(Memory::GetAddress(0x143031, 0), 6);
+				//NopFill(Memory::GetAddress(0x143031, 0), 6);
 			}
 			else
 			{
