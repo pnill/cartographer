@@ -74,7 +74,7 @@ void Infection::sendTeamChange()
 				}
 
 				playerIndex++;
-			} while (playerIndex < 16);
+			} while (playerIndex < ENGINE_PLAYER_MAX);
 		}
 	}
 }
@@ -138,7 +138,7 @@ void Infection::initHost() {
 	//Applying SpeedCheck fix
 	h2mod->set_unit_speed_patch(true);
 	//Fixing broken equipment and replace powerups/vehicles with weapons
-	auto scenarios = tags::find_tags(blam_tag::tag_group_type::scenario);
+	//auto scenarios = tags::find_tags(blam_tag::tag_group_type::scenario);
 	//auto magnum_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\magnum\\magnum");
 	//auto shotgun_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\shotgun\\shotgun");
 	//for(auto &scenario_ : scenarios)
@@ -319,7 +319,7 @@ void Infection::infectPlayer(int playerIndex, datum unitDatumIndex) {
 			if (playerIdentifier == s_player::getIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
 				LOG_TRACE_GAME("[h2mod-infection] Setting player as zombie");
 				h2mod->set_local_team_index(0, ZOMBIE_TEAM);
-				s_player::setUnitBipedType(playerIndex, s_player::e_character_type::Elite);
+				s_player::setUnitBipedType(playerIndex, s_player::e_character_type::Flood);
 			}
 			else {
 				//if not, then this is a new zombie
@@ -392,7 +392,7 @@ void ZombiePreSpawnHandler::onClient()
 		if (h2mod->get_local_team_index() == ZOMBIE_TEAM)
 		{
 			LOG_TRACE_GAME("[h2mod-infection] Client is infected! switching bipeds: {}", this->getPlayerIndex());
-			s_player::setUnitBipedType(this->getPlayerIndex(), s_player::e_character_type::Elite);
+			s_player::setUnitBipedType(this->getPlayerIndex(), s_player::e_character_type::Flood);
 		}
 	}
 }

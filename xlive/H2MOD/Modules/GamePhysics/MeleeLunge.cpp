@@ -247,8 +247,10 @@ NOTES:
 	outputs new flags
 */
 
-#define FINISH_DECELERATION() \
-	out_current_flags |= FLAG(melee_deceleration_finished); \
+#define FINISH_DECELERATION(flags) \
+	if ((flags) > 0) { \
+		out_current_flags |= (flags); \
+	} \
 	this->m_time_to_target_in_ticks = 0; \
 	output->out_translational_velocity = *current_velocity; \
 
@@ -354,7 +356,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 
 		if (get_max_melee_lunge_speed_per_tick(this->m_distance, this->m_weapon_is_sword) <= k_valid_real_epsilon)
 		{
-			FINISH_DECELERATION();
+			FINISH_DECELERATION(FLAG(melee_decelration_unk_flag));
 			return;
 		}
 
@@ -391,7 +393,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 		if (m_maximum_counter + ticks_to_add <= (m_melee_tick - 1))
 			out_current_flags |= FLAG(melee_deceleration_finished);
 
-		if (!(out_current_flags & FLAG(melee_deceleration_finished)))
+		if (!TEST_FLAG(out_current_flags, melee_deceleration_finished))
 		{
 			// compare 2 dot products
 			if ((aiming_vector->dot_product(direction) <= (current_velocity_per_tick * melee_max_cosine) 
@@ -421,7 +423,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 					return;
 				}
 
-				out_current_flags |= FLAG(melee_deceleration_finished);
+				out_current_flags |= FLAG(melee_decelration_unk_flag);
 				this->m_time_to_target_in_ticks = 0;
 				return;
 			}
@@ -429,7 +431,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 			{
 				if (current_velocity_per_tick <= k_valid_real_epsilon)
 				{
-					FINISH_DECELERATION();
+					FINISH_DECELERATION(FLAG(melee_decelration_unk_flag));
 					return;
 				}
 			
@@ -560,21 +562,23 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 		LOG_TRACE_MELEE("{} : we are about to start decelerating @ next tick : {}", __FUNCTION__, m_melee_tick);
 	}
 
-	if (a3)
+	if (m_started_decelerating)
+	{
 		melee_deceleration_fixup(a2, object_origin, translational_velocity, aiming_vector, melee_flags, melee_deceleration_tick_count);
 
-	if (distance_world_units > 5.0f
-		|| melee_flags & FLAG(melee_deceleration_finished)
-		|| m_time_to_target_in_ticks <= 0
-		|| m_melee_tick >= (m_maximum_counter + 6)
-		)
-	{
-		//pin_localized_velocity(&a2->out_translational_velocity, &localized_velocity);
-		a2->flags |= FLAG(2); // set to let the engine know we should get out of the melee lunge physics
-	}
-	else
-	{
-		a2->flags &= ~FLAG(2); // maintain lunge physics
+		if (distance_world_units > 5.0f
+			|| TEST_FLAG(melee_flags, melee_decelration_unk_flag)
+			|| m_time_to_target_in_ticks <= 0
+			|| m_melee_tick >= (m_maximum_counter + 6)
+			)
+		{
+			//pin_localized_velocity(&a2->out_translational_velocity, &localized_velocity);
+			a2->flags |= FLAG(2); // set to let the engine know we should get out of the melee lunge physics
+		}
+		else
+		{
+			a2->flags &= ~FLAG(2); // maintain lunge physics
+		}
 	}
 
 	// create vector from subtracting 1 point out of the other 

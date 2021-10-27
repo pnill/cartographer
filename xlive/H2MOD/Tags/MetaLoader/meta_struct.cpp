@@ -99,7 +99,7 @@ namespace meta_struct
 		if (error != tinyxml2::XML_SUCCESS)
 		{
 			std::string message = "Halo 2 has encountered a fatal error and needs to exit,\n"
-				" a require plugin file failed to load.,\n";
+				"a required plugin file failed to load:\n";
 			message += file_loc + "\n";
 			message += "Code: " + std::to_string(error);
 			MessageBoxA(NULL, message.c_str(), "Crash!", 0);
