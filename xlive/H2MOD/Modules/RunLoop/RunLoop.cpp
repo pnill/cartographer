@@ -653,7 +653,9 @@ void alt_main_game_loop_hook()
 	}
 	else
 	{
+		EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
 		game_main_loop();
+		EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
 	}
 	
 }

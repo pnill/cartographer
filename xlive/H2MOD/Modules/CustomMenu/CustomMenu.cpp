@@ -47,6 +47,8 @@ int __cdecl CustomMenu_CallHead(int a1, DWORD* menu_vftable_1, DWORD* menu_vftab
 void __stdcall sub_21bf85_CMLTD(int thisptr, int label_id, int label_menu_id);
 void __stdcall sub_28870B_CM(int a1, int a2, int a3, void*(__stdcall* a4)(int), int a5);
 
+bool CMForce_Update = false;
+
 void GSCustomMenuCall_AccountList();
 
 
@@ -3598,6 +3600,14 @@ void xbox_live_task_progress_callback(DWORD a1)
 				return;
 			}
 			else {
+				if(CMForce_Update)
+				{
+					//Just in case save the config to prevent a high iq individual from getting themsevles in an update loop.
+					SaveH2Config();
+					CMForce_Update = false;
+					GSCustomMenuCall_Update_Note();
+					return;
+				}
 				imgui_handler::ToggleWindow("motd");
 				//extern int notify_xlive_ui;
 				//notify_xlive_ui = 0;

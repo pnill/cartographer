@@ -43,6 +43,7 @@
 #include "Util\Hooks\Hook.h"
 
 #include <float.h>
+
 #if (!defined(_M_FP_FAST)) || !_M_FP_FAST
 #pragma fenv_access (on)
 #endif
