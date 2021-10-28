@@ -6,14 +6,23 @@ struct __declspec(align(8)) network_channel
 {
 	enum e_channel_closure_reason
 	{
+		no_reason_given = 0,
 		link_destroyed = 1,
+		link_refused_listen = 2,
 		channel_deleted = 3,
+		connect_timeout = 4,
+		connect_refused = 5,
 		connect_reinitiate = 6,
-		channel_establishment_timeout = 7,
+		establish_timeout = 7,
+		address_change = 8,
 		destination_unreachable = 9,
 		remote_closure = 10,
-		connection_overflows = 11,
-		observer_discard = 14,
+		connection_overflow = 11,
+		message_overflow = 12,
+		security_lost = 13,
+		observer_released = 14,
+		observer_refused = 15,
+		observer_timeout = 16,
 		observer_reset = 17,
 	};
 
