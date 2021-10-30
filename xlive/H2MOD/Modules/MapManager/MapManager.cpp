@@ -155,7 +155,7 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 		case _network_session_state_peer_joining:
 		case _network_session_state_peer_join_abort:
 		case _network_session_state_election:
-		case _network_session_state_unk_2:
+		case _network_session_state_dead:
 			break;
 
 		case _network_session_state_peer_established:

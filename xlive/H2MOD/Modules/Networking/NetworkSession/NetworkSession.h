@@ -16,7 +16,7 @@ enum e_network_session_state : signed int
 	_network_session_state_host_handoff,
 	_network_session_state_host_reestablish,
 	_network_session_state_election,
-	_network_session_state_unk_2
+	_network_session_state_dead
 };
 
 enum e_map_status : int
