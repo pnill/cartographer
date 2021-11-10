@@ -17,23 +17,26 @@ RECT rectScreenOriginal;
 typedef void(__cdecl p_sub_B524F7)(signed int a1);
 p_sub_B524F7* c_sub_B524F7;
 
-__int16 last_a1;
+__int16 last_user_index;
 //Patching this call to enable keyboards to switch death targets
-char* __cdecl death_cam_get_controller_input(__int16 a1)
+unsigned char* __cdecl death_cam_get_controller_input(__int16 a1)
 {
-	last_a1 = a1;
-	char* result = ControllerInput::get_controller_input(a1);
-	if(GetKeyState(VK_SPACE) & 0x8000)
+	auto input_abstraction_get_key_state_byte = Memory::GetAddress<unsigned char(__cdecl*)(__int16 key_code)>(0x2EF86);
+
+	last_user_index = a1;
+	unsigned char* result = ControllerInput::get_controller_input(a1);
+	//Modifies the result for A button pressed if space is.
+	unsigned char keyboard_space_key_state = input_abstraction_get_key_state_byte(VK_SPACE);
+	if (keyboard_space_key_state > 0)
 	{
-		//Modifies the result for A button pressed if space is.
-		result[16] = 1; 
+		result[16] = keyboard_space_key_state;
 	}
 	return result;
 }
 
 void __cdecl sub_B524F7(signed int a1)
 {
-	char* result = ControllerInput::get_controller_input(last_a1);
+	unsigned char* result = ControllerInput::get_controller_input(last_user_index);
 	result[16] = 0;
 }
 
