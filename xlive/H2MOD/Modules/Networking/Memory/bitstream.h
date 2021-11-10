@@ -32,7 +32,7 @@ struct bitstream
 	void init(void*buffer, DWORD data_length, DWORD data_size_alignment);
 	void begin_writing(DWORD data_size_alignment);
 	void finish_writing(void*out_space_left_in_bits);
-	bool packet_is_valid();
+	bool overflow();
 	DWORD get_space_left_in_bits();
 	DWORD get_bytes_used();
 

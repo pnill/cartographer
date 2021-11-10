@@ -179,7 +179,7 @@ unsigned long long bitstream::data_decode_flags(char* name, int size_in_bits)
 	return p_data_decode_flags_def(this, name, size_in_bits);
 }
 
-bool bitstream::packet_is_valid()
+bool bitstream::overflow()
 {
 	typedef bool(__thiscall* packet_is_valid_def)(bitstream* thisx);
 	auto p_packet_is_valid = Memory::GetAddress<packet_is_valid_def>(0xD114C, 0xCD706);

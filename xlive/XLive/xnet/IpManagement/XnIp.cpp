@@ -995,7 +995,7 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 // #60: XNetInAddrToXnAddr
 INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 {
-	LOG_INFO_NETWORK("XNetInAddrToXnAddr() - connection index: {}, identifier {:x}", gXnIp.getConnectionIndex(ina), ina.s_addr);
+	LOG_INFO_NETWORK("{} - connection index: {}, identifier {:x}", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
 	
 	if (pxna)
 		SecureZeroMemory(pxna, sizeof(*pxna));
