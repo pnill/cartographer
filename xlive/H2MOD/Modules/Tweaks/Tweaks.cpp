@@ -772,6 +772,27 @@ __declspec(naked) void update_biped_ground_mode_physics_constant()
 	}
 }
 
+static LARGE_INTEGER startupTime;
+
+DWORD WINAPI timeGetTime_hook()
+{
+	LARGE_INTEGER currentTime, frequency, currentTimeRelativeToStartupTime;
+	QueryPerformanceCounter(&currentTime);
+	currentTimeRelativeToStartupTime.QuadPart = currentTime.QuadPart - startupTime.QuadPart;
+	QueryPerformanceFrequency(&frequency);
+
+	currentTimeRelativeToStartupTime.QuadPart *= 1000;
+	currentTimeRelativeToStartupTime.QuadPart /= frequency.QuadPart;
+	return currentTimeRelativeToStartupTime.QuadPart;
+}
+static_assert(std::is_same<decltype(timeGetTime), decltype(timeGetTime_hook)>::value, "Invalid timeGetTime_hook signature");
+
+void initializeTimeHooks()
+{
+	QueryPerformanceCounter(&startupTime);
+	WritePointer(Memory::GetAddressRelative(0x79B568, 0x752540), (void*)timeGetTime_hook);
+}
+
 void InitH2Tweaks() {
 
 	RefreshTogglexDelay();
@@ -781,6 +802,8 @@ void InitH2Tweaks() {
 	//TODO(Num005) crashes dedis
 	//custom_game_engines::init();
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
+
+	initializeTimeHooks();
 
 	if (Memory::isDedicatedServer()) {
 		phookServ1 = (thookServ1)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
