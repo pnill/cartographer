@@ -18,6 +18,8 @@
 
 #include "Util\Hooks\Hook.h"
 
+#define TIMER_RESOLUTION 1
+
 typedef void(_cdecl p_present_rendered_screen)();
 p_present_rendered_screen* present_rendered_screen;
 
@@ -215,7 +217,7 @@ void __cdecl main_game_time_initialize_defaults_hook()
 
 	// More details @ https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/
 
-	timeBeginPeriod(1);
+	timeBeginPeriod(TIMER_RESOLUTION);
 
 	auto p_main_game_time_initialize_defaults = Memory::GetAddressRelative<void(__cdecl*)()>(0x42869F, 0x424841);
 	return p_main_game_time_initialize_defaults();
@@ -228,21 +230,40 @@ void __cdecl game_modules_dispose() {
 	DeinitH2Startup();
 
 	// reset time resolution to system default on game exit (initialization happens in main_game_time_initialize_defaults_hook())
-	timeEndPeriod(1);
+	timeEndPeriod(TIMER_RESOLUTION);
 }
 
 void (*main_game_loop)();
 
-std::chrono::steady_clock::duration desiredRenderTime;
+#define SleepTestIterationCount 10
+
+void winApiTestSleep()
+{
+	CHRONO_DEFINE_TIME_AND_CLOCK();
+
+	h2log* sleepLog = h2log::create_console("sleepLog", true, trace);
+
+	for (int i = 0; i < SleepTestIterationCount; i++)
+	{
+		auto startTime = _clock::now();
+		Sleep(0);
+		auto endTime = _clock::now() - startTime;
+
+		auto endTimeMs = _time::duration_cast<_time::duration<double, std::milli>>(endTime);
+
+		LOG_TRACE(sleepLog, L"{}: slept {} ms - time to sleep passed to function: {}", __FUNCTIONW__, endTimeMs.count(), i);
+	}
+}
+
+std::chrono::duration<double, std::nano> desiredRenderTime;
 inline void defaultFrameLimiter() {
 	
 	CHRONO_DEFINE_TIME_AND_CLOCK();
 
 	static _clock::time_point lastTime;
-	static _clock::time_point nextFrameTime;
 	static int lastFrameSetting = -1;
 	static bool frameLimiterInitialized = false;
-	static _clock::duration threshold(5); // skip sleep if we have to sleep under 5 ns
+	static _time::duration<double, std::nano> threshold(5.0ns); // skip sleep if we have to sleep under 5 ns
 
 	if (H2Config_experimental_fps == e_render_original_game_frame_limit
 		|| H2Config_fps_limit <= 0
@@ -266,29 +287,30 @@ inline void defaultFrameLimiter() {
 		frameLimiterInitialized = true;
 	}
 
-	_clock::time_point timeBeforeSleep = _clock::now();
-	auto dt1 = timeBeforeSleep - lastTime;
-	if (dt1 < desiredRenderTime && desiredRenderTime - dt1 > threshold)
+	auto timeBeforeSleep = _clock::now();
+	auto timeToSleep = _time::duration_cast<decltype(desiredRenderTime)>(timeBeforeSleep - lastTime);
+	auto targetRenderTime = desiredRenderTime - threshold;
+	if (timeToSleep < targetRenderTime)
 	{
-		auto tp1 = timeBeforeSleep;
-		auto millisecondsToSleep = _time::duration_cast<_time::milliseconds, long long>(desiredRenderTime - dt1);
+		// auto tp1 = timeBeforeSleep;
 
-		if (millisecondsToSleep > 1ms)
-			std::this_thread::sleep_for(millisecondsToSleep - 1ms);
-
-		auto tp2 = _clock::now();
-		auto dt2 = tp2 - lastTime;
-		if (dt2 < desiredRenderTime)
+		while (targetRenderTime > timeToSleep)
 		{
-			auto nanoSleep = desiredRenderTime - dt2;
+			double dbSleepTimeNs = (targetRenderTime - timeToSleep).count();
+			double dbSleepTimeMs = dbSleepTimeNs / 1000000.0;
+			int iSleepTimeMsAdjusted = (int)(dbSleepTimeMs - 2.0 - 0.5);
 
-			// sleep the nanoseconds after, will burn the CPU a lil bit but should provide near perfect frame time
-			while (nanoSleep > threshold)
+			if (iSleepTimeMsAdjusted < 0)
+				iSleepTimeMsAdjusted = 0;
+				
+			if (dbSleepTimeMs >= 1.0)
+				Sleep(iSleepTimeMsAdjusted);
+
+			do
 			{
-				auto tp3 = _clock::now();
-				nanoSleep -= (tp3 - tp2);
-				tp2 = tp3;
-			}
+			} while (targetRenderTime > _clock::now() - lastTime);
+
+			timeToSleep = _time::duration_cast<decltype(targetRenderTime)>(_clock::now() - lastTime);
 		}
 	}
 
