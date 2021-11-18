@@ -429,6 +429,8 @@
     <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameObjects.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameUnits.h" />
+    <ClInclude Include="3rdparty\detours\include\detours.h" />
+    <ClInclude Include="3rdparty\detours\include\detver.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

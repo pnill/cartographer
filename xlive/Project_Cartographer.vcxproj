@@ -64,8 +64,8 @@
     <OutDir>$(SolutionDir)Halo2\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>.\3rdparty\imgui;.\;.\3rdparty\;.\3rdparty\libcurl;.3rdparty\portaudio;.\3rdparty\google;..\Directx SDK\include;.\3rdparty\miniupnpc\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;.\3rdparty\directx\include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\DirectX SDK\lib;.\libs;.\3rdparty\directx\lib;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;.\3rdparty\portaudio;.\3rdparty\miniupnpc\lib\;.\3rdparty\libcurl\;.\3rdparty\opus\;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\Directx SDK\include;.\;.\3rdparty\;.\3rdparty\imgui;.\3rdparty\libcurl;.\3rdparty\detours\include;.\3rdparty\miniupnpc\include;.\3rdparty\directx\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\DirectX SDK\lib;.\libs;.\3rdparty\directx\lib;.\3rdparty\miniupnpc\lib\;.\3rdparty\libcurl\;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -129,7 +129,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;libminiupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdparty/discord/discord-rpc.lib;3rdparty/libcurl/libssl.lib;3rdparty/libcurl/libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;libminiupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdparty/discord/discord-rpc.lib;3rdparty/libcurl/libssl.lib;3rdparty/libcurl/libcrypto.lib;3rdparty/detours/lib.X86/detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -413,6 +413,8 @@
     <ClCompile Include="XLive\XStorage\XStorage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="3rdparty\detours\include\detours.h" />
+    <ClInclude Include="3rdparty\detours\include\detver.h" />
     <ClInclude Include="3rdparty\discord\discord_register.h" />
     <ClInclude Include="3rdparty\discord\discord_rpc.h" />
     <ClInclude Include="3rdparty\imgui\imconfig.h" />
