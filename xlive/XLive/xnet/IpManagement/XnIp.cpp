@@ -564,12 +564,6 @@ int CXnIp::registerNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID*
 // basically reqPacket = nullptr, XNetXnAddrToInAddr() context, if reqPacket != nullptr, HandleXNetRequestPacket() context
 int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnkid, const XNetRequestPacket* reqPacket, IN_ADDR* outIpIdentifier)
 {
-#define NO_MORE_CONNECT_SPOTS(_function, _err) \
-	{ \
-		LOG_CRITICAL_NETWORK("{} - no more available connection spots!", (_function)); \
-		return(_err); \
-	} \
-
 	XnIp* localConnectionInfo = GetLocalUserXn();
 	if (localConnectionInfo == nullptr)
 	{
@@ -702,10 +696,9 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 	}
 	else
 	{
-		NO_MORE_CONNECT_SPOTS(__FUNCTION__, WSAENOMORE);
+		LOG_CRITICAL_NETWORK("{} - no more available connection spots!", __FUNCTION__);
+		return WSAENOMORE;
 	}
-
-#undef NO_MORE_CONNECT_SPOTS
 }
 
 void CXnIp::UnregisterXnIpIdentifier(const IN_ADDR ina)
