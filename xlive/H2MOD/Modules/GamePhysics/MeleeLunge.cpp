@@ -38,9 +38,9 @@ float get_melee_acceleration(float max_speed_per_tick)
 }
 
 // not entirely sure what this calculates
-float compute_something(float v1, float v2)
+float compute_something(float v1, float acceleration)
 {
-	return ((v1 - get_melee_acceleration(v2)) * 3.0f) / 2.0f;
+	return ((v1 - acceleration) * 3.0f) / 2.0f;
 }
 
 __declspec(naked) void melee_force_decelerate_fixup()
@@ -312,13 +312,13 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 
 		// this variable is named max_speed_per_tick_2 because it should result in the same value after processing in `compute something`
 		// because passing both arguments with the same value will cause that
-		float max_speed_per_tick_2 = compute_something(max_speed_per_tick, max_speed_per_tick);
+		float max_speed_per_tick_2 = compute_something(max_speed_per_tick, get_melee_acceleration(max_speed_per_tick));
 
 		float real_time_to_target = ((remaining_distance_from_player_position / max_speed_per_tick_2) - 0.5f);
 
 		// field_28 is always the same after the first melee tick
 		float unk1 = m_field_28 * 1.5;
-		double unk2;
+		double unk2 = 0.75;
 		if (unk1 >= 0.75)
 		{
 			if (unk1 <= 3.5)
@@ -326,16 +326,10 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 			else
 				unk2 = 3.5;
 		}
-		else
-		{
-			unk2 = 0.75;
-		}
 
 		float maybe_minimum_velocity = time_globals::get_seconds_per_tick() * unk2;
 
 		float current_velocity_per_tick = output->out_translational_velocity.magnitude();
-
-		float velocity_to_decelerate_per_tick = this->m_velocity_to_decelerate / k_deceleration_ticks_real;
 
 		//float decelerated_velocity = (float)out_deceleration_ticks * velocity_to_decelerate_per_tick;
 
@@ -345,11 +339,6 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 		float minimum_velocity_per_tick = initial_velocity_before_deceleration - this->m_velocity_to_decelerate;
 		if (unk3 > initial_velocity_before_deceleration - unk3)
 			minimum_velocity_per_tick = 0.0f;*/
-
-		if (velocity_to_decelerate_per_tick > current_velocity_per_tick)
-		{
-			velocity_to_decelerate_per_tick = current_velocity_per_tick;
-		}
 
 		//const float melee_max_cosine = cos(degreesToRadians(85.f));
 		const float melee_max_cosine = 0.087155744f;
@@ -404,7 +393,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 				if (unk4 <= current_velocity_per_tick)
 					deceleration = unk4;
 
-				//deceleration *= time_globals::get_ticks_difference_real();
+				// deceleration *= time_globals::get_ticks_difference_real();
 
 				// im not entirely sure if this is needed or not
 				//output->out_translational_velocity = output->out_translational_velocity * time_globals::get_ticks_difference_real();
@@ -416,7 +405,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 				// either some numb nut at bungie forgot to add the line bellow or it was intentional
 				// so we just convert the current velocity and deceleration to 30 tick values
 				// and output them like that
-				//output->out_translational_velocity = output->out_translational_velocity * (float)time_globals::get()->ticks_per_second;
+				// output->out_translational_velocity = output->out_translational_velocity * (float)time_globals::get()->ticks_per_second;
 
 				if (maybe_minimum_velocity <= ((current_velocity_per_tick - unk4) + k_valid_real_epsilon))
 				{
@@ -435,10 +424,18 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 					return;
 				}
 			
-				this->m_time_to_target_in_ticks = (int)real_time_to_target;
+				//this->m_time_to_target_in_ticks = (int)real_time_to_target;
 
-				//this->m_time_to_target_in_ticks = (current_velocity_per_tick / velocity_to_decelerate_per_tick) - 0.5f;
-				output->out_translational_velocity = (direction * (-velocity_to_decelerate_per_tick)) + output->out_translational_velocity;
+				float deceleration = this->m_velocity_to_decelerate / k_deceleration_ticks_real;
+
+				this->m_time_to_target_in_ticks = (current_velocity_per_tick / deceleration) - 0.5f;
+				
+				if (deceleration > current_velocity_per_tick)
+				{
+					deceleration = current_velocity_per_tick;
+				}
+				
+				output->out_translational_velocity = (direction * (-deceleration)) + output->out_translational_velocity;
 
 				//this->m_time_to_target_in_ticks = ((_FP5 * 0.5f) + v124);
 				//addDebugText("remaining target distance ticks: %f, %d", ((_FP5 * 0.5f) + v124), this->m_time_to_target_in_ticks);
