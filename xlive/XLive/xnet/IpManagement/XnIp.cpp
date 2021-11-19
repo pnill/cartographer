@@ -931,6 +931,12 @@ INT WINAPI XNetCleanup()
 
 	XSocket::socketsDisposeAll();
 
+	if (critical_network_errors_log != nullptr)
+	{
+		delete critical_network_errors_log;
+		critical_network_errors_log = nullptr;
+	}
+
 	return 0;
 }
 

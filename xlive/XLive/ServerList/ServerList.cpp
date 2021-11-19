@@ -509,7 +509,7 @@ DWORD ServerList::GetServers(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXO
 	std::lock_guard<std::mutex> lg(ServerListRequestsMutex);
 
 	ServerList* serverQuery = nullptr;
-	for (auto request : serverListRequests)
+	for (auto& request : serverListRequests)
 	{
 		if (request.first == hHandle)
 		{
@@ -866,7 +866,7 @@ DWORD WINAPI XLocatorServiceUnInitialize(HANDLE xlocatorhandle)
 	LOG_TRACE_XLIVE("XLocatorServiceUnInitialize(a1 = {})", xlocatorhandle);
 	CloseHandle(xlocatorhandle);
 
-	for (auto request : serverListRequests)
+	for (auto& request : serverListRequests)
 	{
 		request.second->CancelOperation();
 	}
