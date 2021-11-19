@@ -54,8 +54,8 @@ struct XSocket
 	/* get the port, in network byte order, in this case big-endian */
 	short getNetworkOrderSocketPort() const { return name.sin_port; }
 
-	/* sets the socket send buffer size */
-	void setBufferSize(INT sendBufsize, INT recvBufsize);
+	/* sets the socket send/recv buffer size */
+	int setBufferSize(int optName, INT bufSize);
 
 	bool sockAddrInEqual(sockaddr_in* a1, sockaddr_in* a2) const
 	{

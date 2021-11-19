@@ -416,22 +416,8 @@ struct FakePBuffer {
 // #5016: XLivePBufferAllocate
 LONG WINAPI XLivePBufferAllocate (DWORD size, FakePBuffer **pBuffer)
 {
-	static int print = 0;
-
-
-	if( print < 35 )
-	{
-		print++;
-
-
-		//LOG_TRACE_XLIVE("XLivePBufferAllocate  (XEncryptedAlloc) (size = %d, pBuffer = %X)",
-		//	size, pBuffer);
-	}
-
-
 	if(!pBuffer)
 		return E_OUTOFMEMORY;
-
 
 	HANDLE hHeap = GetProcessHeap();
 
@@ -445,20 +431,11 @@ LONG WINAPI XLivePBufferAllocate (DWORD size, FakePBuffer **pBuffer)
 	//initialize real buffer inside fake buffer
 	(*pBuffer)->pbData = (PBYTE)HeapAlloc(hHeap,HEAP_ZERO_MEMORY,size);
 
-
 	if(!*pBuffer)
 	{
-		LOG_TRACE_XLIVE("ERROR: XLivePBufferAllocate unable to allocate {} bytes", size);
+		LOG_ERROR_XLIVE("XLivePBufferAllocate() unable to allocate {} bytes", size);
 		return E_OUTOFMEMORY;
 	}
-
-
-	if( print < 35 )
-	{
-		LOG_TRACE_XLIVE("- buffer_new = {0:p}, size = {1}, handle = {2:p}",
-			(void*)*pBuffer, size, (void*)g_dwFakePData );
-	}
-
 
 	return 0;
 }
@@ -1496,7 +1473,7 @@ DWORD WINAPI XContentGetMarketplaceCounts( DWORD dwUserIndex, DWORD dwContentCat
 		pOverlapped->InternalHigh = marketplaceDlcCount;
 
 		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
+		pOverlapped->dwExtendedError = 0;
 
 
 		Check_Overlapped( pOverlapped );
