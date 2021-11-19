@@ -54,7 +54,7 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 	{
 		critical_network_errors_log = h2log::create("Critical Network Errors", prepareLogFileName(L"criticalNetworkErrors"), true, 0);
 
-		LOG_CRITICAL_NETWORK(DLL_VERSION_STR "\n");
+		LOG_CRITICAL_NETWORK(DLL_VERSION_STR);
 		LOG_CRITICAL_NETWORK("{} - initialized critical network log!", __FUNCTION__);
 	}
 }

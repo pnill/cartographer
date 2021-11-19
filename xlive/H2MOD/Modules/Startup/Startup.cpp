@@ -46,7 +46,6 @@ wchar_t* H2AppDataLocal = 0;
 wchar_t* FlagFilePathConfig = 0;
 HWND H2hWnd = NULL;
 
-
 int instanceNumber = 0;
 int H2GetInstanceId() {
 	return instanceNumber;
@@ -431,14 +430,14 @@ void InitH2Startup() {
 	console_log = h2log::create_console("CONSOLE MAIN", should_enable_console_log, H2Config_debug_log_level);
 
 	xlive_log = h2log::create("XLive", prepareLogFileName(L"h2xlive"), H2Config_debug_log, H2Config_debug_log_level);
-	LOG_DEBUG_XLIVE(DLL_VERSION_STR "\n");
+	LOG_DEBUG_XLIVE(DLL_VERSION_STR);
 	h2mod_log = h2log::create("H2MOD", prepareLogFileName(L"h2mod"), H2Config_debug_log, H2Config_debug_log_level);
-	LOG_DEBUG_GAME(DLL_VERSION_STR "\n");
+	LOG_DEBUG_GAME(DLL_VERSION_STR);
 	network_log = h2log::create("Network", prepareLogFileName(L"h2network"), H2Config_debug_log, H2Config_debug_log_level);
-	LOG_DEBUG_NETWORK(DLL_VERSION_STR "\n");
+	LOG_DEBUG_NETWORK(DLL_VERSION_STR);
 #if COMPILE_WITH_VOICE
 	voice_log = h2log::create("Voice", prepareLogFileName(L"voicechat"), H2Config_debug_log, H2Config_debug_log_level);
-	LOG_DEBUG(voice_log, DLL_VERSION_STR "\n");
+	LOG_DEBUG(voice_log, DLL_VERSION_STR);
 #endif
 
 	//checksum_log = h2log::create("Checksum", prepareLogFileName(L"checksum"), true, 0);
