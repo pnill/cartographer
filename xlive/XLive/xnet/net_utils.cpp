@@ -54,7 +54,7 @@ std::string sockOpt_string(int optName)
 
 bool Ipv4AddressIsReservedOrLocalhost(const IN_ADDR ipv4Addr)
 {
-	struct IPv4AddressMaskPair
+	typedef struct IPv4AddressMaskPair
 	{
 		IPv4AddressMaskPair(unsigned long _address, unsigned long _addressMask) {
 			address.s_addr = _address;
