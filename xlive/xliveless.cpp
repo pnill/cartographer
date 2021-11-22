@@ -5,8 +5,6 @@
 #include "XLive\ServerList\ServerList.h"
 #include "XLive\achievements\XAchievements.h"
 
-
-HANDLE g_dwFakePData = INVALID_HANDLE_VALUE;
 HANDLE g_dwFakeContent = INVALID_HANDLE_VALUE;
 HANDLE g_dwMarketplaceContent = INVALID_HANDLE_VALUE;
 HANDLE g_dwFakeFriendsEnumerator = INVALID_HANDLE_VALUE;
@@ -17,7 +15,6 @@ HANDLE g_dwFakeFriendsEnumerator = INVALID_HANDLE_VALUE;
 // because closed handles could be reused for server enumeration
 HANDLE* g_dwEnumeratorHandleObjects[] =
 {
-	&g_dwFakePData,
 	&g_dwFakeContent,
 	&g_dwMarketplaceContent,
 	&g_dwFakeAchievementContent,
@@ -425,7 +422,7 @@ LONG WINAPI XLivePBufferAllocate (DWORD size, FakePBuffer **pBuffer)
 	*pBuffer = (FakePBuffer*)HeapAlloc(hHeap,HEAP_ZERO_MEMORY,sizeof(FakePBuffer));
 
 	(*pBuffer)->dwSize = size;
-	(*pBuffer)->id = g_dwFakePData = CreateMutex(NULL,NULL,NULL);
+	(*pBuffer)->id = CreateMutex(NULL,NULL,NULL);
 	(*pBuffer)->magic = 0xDEADC0DE;
 
 	//initialize real buffer inside fake buffer
@@ -468,6 +465,7 @@ DWORD WINAPI XLivePBufferFree (FakePBuffer * pBuffer)
 
 	HANDLE hHeap = GetProcessHeap();
 
+	CloseHandle(pBuffer->id);
 	HeapFree(hHeap,NULL,pBuffer->pbData);
 	HeapFree(hHeap,NULL,pBuffer);
 
@@ -1234,7 +1232,7 @@ DWORD WINAPI XLivePBufferGetByte (FakePBuffer * pBuffer, DWORD offset, BYTE * va
 
 
 	*value = pBuffer->pbData[offset];
-  return 0;
+	return 0;
 }
 
 
