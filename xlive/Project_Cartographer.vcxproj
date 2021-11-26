@@ -123,6 +123,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -364,7 +365,7 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_list_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp">
-      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotSet</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NoExtensions</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">NoExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
