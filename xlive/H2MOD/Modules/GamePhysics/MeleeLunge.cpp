@@ -722,7 +722,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 			}
 
 			float max_speed_per_tick_2 = get_max_melee_lunge_speed_per_tick(new_distance, m_weapon_is_sword);
-			float lunge_tick_count_2 = melee_lunge_get_tick_count(new_distance, max_speed_per_tick);
+			float lunge_tick_count_2 = melee_lunge_get_tick_count(new_distance, max_speed_per_tick_2);
 
 			field_E = m_maximum_distance != 0.0f && unk_lenght1 > m_maximum_distance;
 			if (field_E)
@@ -784,8 +784,6 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 		real_vector3d target_point_vector;
 		vector_from_points3d(&m_target_point, player_origin, &target_point_vector);
 		float distance_to_target_point = magnitude3d(&target_point_vector);
-
-		LOG_TRACE_MELEE("{} - distance to target point: {}", __FUNCTION__, distance_to_target_point);
 
 		real_vector3d current_translational_velocity_per_tick = m_melee_tick == 0 ? global_zero_vector3d : *translational_velocity;
 		scale_vector3d(&current_translational_velocity_per_tick, time_globals::get_seconds_per_tick(), &current_translational_velocity_per_tick);
