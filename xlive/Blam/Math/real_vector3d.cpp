@@ -5,15 +5,16 @@
 #pragma fenv_access (on)
 #endif
 
-float square_root(float f)
+ //weird function but matches game's code
+long double square_root(float f)
 {
-	return sqrtf(f);
+	return sqrt((long double)f);
 }
 
-double square_root(double f)
-{
-	return sqrt(f);
-}
+// double square_root(float f)
+// {
+//	  return square_root((double)f);
+// }
 
 float magnitude3d_squared(const real_vector3d* v1)
 {
@@ -88,7 +89,7 @@ float normalize3d(real_vector3d* v1)
 {
 	float length = magnitude3d(v1);
 
-	if (fabs(length) < 0.000099999997f)
+	if (abs(length) < 0.000099999997f)
 		return 0.0f; // vector already normal
 
 	scale_vector3d(v1, 1.0f / length, v1);
