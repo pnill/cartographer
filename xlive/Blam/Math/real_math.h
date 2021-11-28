@@ -151,24 +151,6 @@ union real_vector3d
 		v.k = this->k - other.k;
 		return v;
 	}
-
-	// dot product
-	BLAM_MATH_INL float dot_product(const real_vector3d& other) const
-	{
-		return this->i * other.i + this->j * other.j + this->k * other.k;
-	}
-
-	// dot product by itself
-	BLAM_MATH_INL float dot_product() const
-	{
-		return this->i * this->i + this->j * this->j + this->k * this->k;
-	}
-
-	// magnitude
-	BLAM_MATH_INL float magnitude() const
-	{
-		return sqrt(i * i + j * j + k * k);
-	}
 };
 CHECK_STRUCT_SIZE(real_vector3d, sizeof(float) * 3);
 
@@ -336,18 +318,5 @@ struct real_color_rgb
 	}
 };
 CHECK_STRUCT_SIZE(real_color_rgb, sizeof(float) * 3);
-
-static bool limit3d(void* a1, float limit)
-{
-	real_vector3d* v1 = (real_vector3d*)a1;
-
-	float dot_product = v1->dot_product(*v1);
-
-	if (dot_product <= pow(limit, 2.0f))
-		return false;
-
-	*v1 = *v1 * ((1.0f / sqrt(dot_product)) * limit);
-	return true;
-}
 
 static const real_vector3d global_zero_vector3d = { 0.0f, 0.0f, 0.0f };

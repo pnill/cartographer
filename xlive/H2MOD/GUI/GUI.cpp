@@ -632,7 +632,7 @@ int WINAPI XLiveRender()
 							", xyz = " + std::to_string(player_position->x) + " " 
 							+ std::to_string(player_position->y) + " " 
 							+ std::to_string(player_position->z) + " "
-							+ "Velocity: " + std::to_string(biped_unit->translational_velocity.magnitude());
+							+ "Velocity: " + std::to_string(magnitude3d(&biped_unit->translational_velocity));
 						drawText(0, text_y_coord, COLOR_GOLD, xyzText.c_str(), normalSizeFont);
 						text_y_coord += 15;
 					}
