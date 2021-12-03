@@ -458,7 +458,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 	}
 }
 
-#undef MAX_DECELERATION
+#undef FINISH_DECELERATION
 
 bool c_character_physics_mode_melee_datum::pin_localized_velocity(real_vector3d* output, real_vector3d* localized_velocity)
 {
@@ -841,13 +841,11 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 						// no idea why
 						//scale_vector3d(&physics_output->out_translational_velocity, (float)time_globals::seconds_to_ticks_precise(1.0f), &physics_output->out_translational_velocity);
 
-
 						if (min_velocity_after_deceleration_per_tick > (current_velocity_per_tick - ((m_velocity_to_decelerate + min_velocity_after_deceleration_per_tick) / 3.0f) + k_valid_real_epsilon))
 						{
 							force_leave_melee_lunge_physics = true;
 							m_time_to_target_in_ticks = 0;
 						}
-
 					}
 					else
 					{
