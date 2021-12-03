@@ -776,20 +776,22 @@ static LARGE_INTEGER startupTime;
 
 DWORD WINAPI timeGetTime_hook()
 {
-	LARGE_INTEGER currentTime, frequency, currentTimeRelativeToStartupTime;
-	QueryPerformanceCounter(&currentTime);
-	currentTimeRelativeToStartupTime.QuadPart = currentTime.QuadPart - startupTime.QuadPart;
+	LARGE_INTEGER currentCounter, frequency;
 	QueryPerformanceFrequency(&frequency);
+	QueryPerformanceCounter(&currentCounter);
 
-	currentTimeRelativeToStartupTime.QuadPart *= 1000;
-	currentTimeRelativeToStartupTime.QuadPart /= frequency.QuadPart;
-	return currentTimeRelativeToStartupTime.QuadPart;
+	// algorithm used from Microsoft's high resolution clock now() implementation
+	const long long counterSinceProgramEpoch = currentCounter.QuadPart - startupCounter.QuadPart;
+	const long long _Whole = (counterSinceProgramEpoch / frequency.QuadPart) * 1000;
+	const long long _Part = (counterSinceProgramEpoch % frequency.QuadPart) * 1000 / frequency.QuadPart;
+
+	return _Whole + _Part;
 }
 static_assert(std::is_same<decltype(timeGetTime), decltype(timeGetTime_hook)>::value, "Invalid timeGetTime_hook signature");
 
 void initializeTimeHooks()
 {
-	QueryPerformanceCounter(&startupTime);
+	QueryPerformanceCounter(&startupCounter);
 	WritePointer(Memory::GetAddressRelative(0x79B568, 0x752540), (void*)timeGetTime_hook);
 }
 
