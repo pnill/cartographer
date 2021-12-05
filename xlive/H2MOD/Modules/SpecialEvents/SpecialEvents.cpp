@@ -33,7 +33,7 @@ namespace SpecialEvents
 		datum paddy_pot_datum = DATUM_INDEX_NONE;
 
 		datum santa_hat_datum = DATUM_INDEX_NONE;
-
+		datum snow_datum = DATUM_INDEX_NONE;
 		string_id new_elite_head_marker(0xFFEE01234);
 
 		std::time_t getEpochTime(int year, const std::wstring& dateTime)
@@ -91,6 +91,8 @@ namespace SpecialEvents
 
 	e_event_type getCurrentEvent()
 	{
+		return e_christmas;
+
 		if (H2Config_no_events)
 			return e_none;
 
@@ -114,6 +116,7 @@ namespace SpecialEvents
 		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 		{
 			santa_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", blam_tag::tag_group_type::scenario, "carto_shared");
+			auto w_datum_i = tag_loader::Get_tag_datum("scenarios\\multi\\lockout\\lockout_big", blam_tag::tag_group_type::weathersystem, "carto_shared");
 			if (!DATUM_IS_NONE(santa_hat_datum)) {
 				tag_loader::Load_tag(santa_hat_datum, true, "carto_shared");
 				tag_loader::Push_Back();
@@ -136,6 +139,28 @@ namespace SpecialEvents
 					a->parent_marker = new_elite_head_marker;
 					a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 					a->child_object.TagIndex = tag_loader::ResolveNewDatum(santa_hat_datum);
+				}
+
+				if (!DATUM_IS_NONE(w_datum_i))
+				{
+					tag_loader::Load_tag(w_datum_i, true, "carto_shared");
+					tag_loader::Push_Back();
+					snow_datum = tag_loader::ResolveNewDatum(w_datum_i);
+					if (!DATUM_IS_NONE(snow_datum))
+					{
+						auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
+						auto sbsp = tags::get_tag_fast<s_scenario_structure_bsp_group_definition>(scen->structure_bsps[0]->structure_bsp.TagIndex);
+
+						auto weat_block = MetaExtender::add_tag_block2<s_scenario_structure_bsp_group_definition::s_weather_palette_block>((unsigned long)std::addressof(sbsp->weather_palette));
+						weat_block->name = "snow_cs";
+						weat_block->weather_system.TagGroup = blam_tag::tag_group_type::weathersystem;
+						weat_block->weather_system.TagIndex = snow_datum;
+
+						for (auto& cluster : sbsp->clusters)
+						{
+							cluster.weather = sbsp->weather_palette.size - 1;
+						}
+					}
 				}
 			}
 		}
@@ -610,50 +635,14 @@ namespace SpecialEvents
 
 					if (!DATUM_IS_NONE(sky_datum))
 					{
-						std::vector<std::string> stems =
-						{
-							"shaders\\shader_templates\\transparent\\sky_one_alpha_env",
-							"shaders\\shader_templates\\transparent\\sky_two_alpha_clouds",
-							"shaders\\shader_templates\\transparent\\sky_one_add_illum_detail"
-						};
-						std::vector<datum> astem;
-						std::vector<datum> cstem;
-						for (auto& stem : stems)
-						{
-							cstem.push_back(tags::find_tag(blam_tag::tag_group_type::shadertemplate, stem));
-							astem.push_back(tag_loader::ResolveNewDatum(tag_loader::Get_tag_datum(stem, blam_tag::tag_group_type::shadertemplate, "carto_shared")));
-						}
 						auto sky = tags::get_tag<blam_tag::tag_group_type::sky, char*>(tag_loader::ResolveNewDatum(sky_datum), true);
 						auto render_model_ref = reinterpret_cast<tag_reference*>(sky);
 						auto render_model = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(render_model_ref->TagIndex, true);
-						for (const auto& material : render_model->materials)
-						{
-							if (material.shader.TagIndex != -1 && material.shader.TagIndex != 0) {
-								auto shader = tags::get_tag<blam_tag::tag_group_type::shader, byte>(material.shader.TagIndex, true);
-								if (shader != nullptr)
-								{
-									for (auto i = 0; i < 3; i++) {
-										tag_reference* shader_template = reinterpret_cast<tag_reference*>(shader);
-										if (shader_template->TagIndex == astem[i])
-										{
-											shader_template->TagIndex = cstem[i];
-											auto* shader_post = reinterpret_cast<tags::tag_data_block*>(shader + 0x20);
-											LOG_INFO_GAME("{} {:x}", shader_post->block_count, shader_post->block_data_offset);
-											if (shader_post->block_count > 0)
-											{
-												auto shader_post_data = tags::get_tag_data() + shader_post->block_data_offset;
-												auto shader_post_template = reinterpret_cast<tag_reference*>(shader_post_data);
-												shader_post_template->TagIndex = cstem[i];
-											}
-										}
-									}
-								}
-							}
-						}
 						scen->skies[0]->sky.TagIndex = tag_loader::ResolveNewDatum(sky_datum);
 					}
 					auto ltmp_datum = tags::find_tag(blam_tag::tag_group_type::scenariostructurelightmap, "scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
-					if (!DATUM_IS_NONE(ltmp_datum) && !DATUM_IS_NONE(tag_loader::ResolveNewDatum(lbitm_datum))) {
+					if (!DATUM_IS_NONE(ltmp_datum) && !DATUM_IS_NONE(tag_loader::ResolveNewDatum(lbitm_datum))) 
+					{
 						auto ltmp = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
 						ltmp->lightmap_groups[0]->bitmap_group.TagIndex = tag_loader::ResolveNewDatum(lbitm_datum);
 						sbps->decorators_block.size = 0;

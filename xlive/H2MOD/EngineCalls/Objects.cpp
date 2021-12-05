@@ -58,7 +58,7 @@ namespace EngineCalls::Objects
 		if (biped_object != NULL)
 		{
 			biped_object->variant_name = variant_index;
-			//addDebugText("set the variant data to: %u for biped", variant_index);
+			addDebugText("set the variant data to: %u for biped", variant_index);
 		}
 	}
 
@@ -121,7 +121,7 @@ namespace EngineCalls::Objects
 		{
 			auto profile = reinterpret_cast<s_player::s_player_properties::s_player_profile*>((char*)creation_data + 0x10);
 			auto placement = static_cast<s_object_placement_data*>(object_placement_data);
-			placement->tag_index = player_representation::get_object_datum_from_representation((byte)profile->player_character_type);
+			placement->tag_index = player_representation::get_object_datum_from_representation(profile->player_character_type);
 		}
 		//addDebugText("creating object with variant index: %d", object_placement_data->variant_name);
 		return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, s_object_placement_data*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, object_placement_data);

@@ -8,6 +8,8 @@
 #include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Engine\Players\Players.h"
 #include "H2MOD.h"
+#include "Blam/Engine/Players/Players.h"
+#include "Blam/Engine/Players/Players.h"
 #include "H2MOD\EngineCalls\EngineCalls.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
@@ -19,6 +21,13 @@
 namespace player_representation
 {
 	//Non-zero index based value for the count of valid representation types
+	std::map<s_player::e_character_type, byte> type_map
+	{
+		{s_player::e_character_type::MasterChief, 0},
+		{s_player::e_character_type::Dervish, 1},
+		{s_player::e_character_type::Spartan, 2},
+		{s_player::e_character_type::Elite, 3}
+	};
 	byte representation_count = 4;
 	s_globals_group_definition::s_player_representation_block* add_representation(datum fp_hands, datum fp_body, datum tp_biped, s_player::e_character_type type, string_id variant)
 	{
@@ -33,7 +42,7 @@ namespace player_representation
 				new_rep->first_person_hands.TagIndex = fp_hands;
 			}
 			else
-				new_rep->first_person_hands = globals->player_representation[0]->first_person_hands;
+				new_rep->first_person_hands = globals->player_representation[2]->first_person_hands;
 
 			if (!DATUM_IS_NONE(fp_body))
 			{
@@ -41,7 +50,7 @@ namespace player_representation
 				new_rep->first_person_body.TagIndex = fp_body;
 			}
 			else
-				new_rep->first_person_body = globals->player_representation[0]->first_person_body;
+				new_rep->first_person_body = globals->player_representation[2]->first_person_body;
 
 			if (!DATUM_IS_NONE(tp_biped))
 			{
@@ -49,10 +58,11 @@ namespace player_representation
 				new_rep->third_person_unit.TagIndex = tp_biped;
 			}
 			else
-				new_rep->third_person_unit = globals->player_representation[0]->third_person_unit;
+				new_rep->third_person_unit = globals->player_representation[2]->third_person_unit;
 
 			if (variant != -1)
 				new_rep->third_person_variant = variant;
+			type_map.emplace(type, representation_count);
 			++representation_count;
 			return new_rep;
 		}
@@ -71,6 +81,7 @@ namespace player_representation
 			new_rep->first_person_hands = globals->player_representation[index]->first_person_hands;
 			new_rep->third_person_unit = globals->player_representation[index]->third_person_unit;
 			new_rep->third_person_variant = globals->player_representation[index]->third_person_variant;
+			type_map.emplace(newType, representation_count);
 			++representation_count;
 			return new_rep;
 		}
@@ -88,14 +99,14 @@ namespace player_representation
 		return nullptr;
 	}
 
-	datum get_object_datum_from_representation(byte representation_index)
+	datum get_object_datum_from_representation(s_player::e_character_type representation_index)
 	{
 		auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
 		if (!DATUM_IS_NONE(globals_datum))
 		{
 			auto globals = tags::get_tag_fast<s_globals_group_definition>(globals_datum);
-			if(representation_index < globals->player_representation.size)
-				return globals->player_representation[representation_index]->third_person_unit.TagIndex;
+			if(type_map.find(representation_index) != type_map.end())
+				return globals->player_representation[type_map[representation_index]]->third_person_unit.TagIndex;
 		}
 		//Maybe not the best way to do this, but there should be no situation where the spartan datum changes.
 		return 0xF28C3826;
@@ -148,6 +159,11 @@ namespace player_representation
 			else if (H2Config_spooky_boy && !Memory::isDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
+			if(s_player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index))->identifier == 0x000462d3a1e02a34)
+				a2->profile.player_character_type = (s_player::e_character_type)type_map[s_player::e_character_type::Kant];
+			/*LOG_INFO_GAME("[{}]{:x}", __FUNCTION__, usersSignInInfo[0].xuid);
+			if (usersSignInInfo[0].xuid == )
+				a2->profile.player_character_type = (s_player::e_character_type)type_map[s_player::e_character_type::Kant];*/
 
 			if ((byte)a2->profile.player_character_type > representation_count)
 				a2->profile.player_character_type = s_player::e_character_type::Spartan;
@@ -174,7 +190,9 @@ namespace player_representation
 	}
 	void on_map_load()
 	{
-		if (h2mod->GetEngineType() == Multiplayer) {
+		if (h2mod->GetEngineType() == Multiplayer) 
+		{
+			representation_count = 4;
 			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && !Memory::isDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
