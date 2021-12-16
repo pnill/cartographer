@@ -235,26 +235,6 @@ void __cdecl game_modules_dispose() {
 
 void (*main_game_loop)();
 
-#define SleepTestIterationCount 10
-
-void winApiTestSleep()
-{
-	CHRONO_DEFINE_TIME_AND_CLOCK();
-
-	h2log* sleepLog = h2log::create_console("sleepLog", true, trace);
-
-	for (int i = 0; i < SleepTestIterationCount; i++)
-	{
-		auto startTime = _clock::now();
-		Sleep(0);
-		auto endTime = _clock::now() - startTime;
-
-		auto endTimeMs = _time::duration_cast<_time::duration<double, std::milli>>(endTime);
-
-		LOG_TRACE(sleepLog, L"{}: slept {} ms - time to sleep passed to function: {}", __FUNCTIONW__, endTimeMs.count(), i);
-	}
-}
-
 std::chrono::duration<double, std::nano> desiredRenderTime;
 inline void defaultFrameLimiter() {
 	
@@ -288,15 +268,13 @@ inline void defaultFrameLimiter() {
 	}
 
 	auto timeBeforeSleep = _clock::now();
-	auto timeToSleep = _time::duration_cast<decltype(desiredRenderTime)>(timeBeforeSleep - lastTime);
+	auto timeDelta = _time::duration_cast<decltype(desiredRenderTime)>(timeBeforeSleep - lastTime);
 	auto targetRenderTime = desiredRenderTime - threshold;
-	if (timeToSleep < targetRenderTime)
+	if (timeDelta < targetRenderTime)
 	{
-		// auto tp1 = timeBeforeSleep;
-
-		while (targetRenderTime > timeToSleep)
+		while (targetRenderTime > timeDelta)
 		{
-			double dbSleepTimeNs = (targetRenderTime - timeToSleep).count();
+			double dbSleepTimeNs = (targetRenderTime - timeDelta).count();
 			double dbSleepTimeMs = dbSleepTimeNs / 1000000.0;
 			int iSleepTimeMsAdjusted = (int)(dbSleepTimeMs - 2.0 - 0.5);
 
@@ -310,7 +288,7 @@ inline void defaultFrameLimiter() {
 			{
 			} while (targetRenderTime > _clock::now() - lastTime);
 
-			timeToSleep = _time::duration_cast<decltype(targetRenderTime)>(_clock::now() - lastTime);
+			timeDelta = _time::duration_cast<decltype(targetRenderTime)>(_clock::now() - lastTime);
 		}
 	}
 
@@ -630,7 +608,7 @@ float __cdecl fps_get_seconds_per_frame()
 void alt_main_game_loop_hook()
 {
 	QueryPerformanceCounter(&end_tick);
-	double tick_time = (static_cast<double>(end_tick.QuadPart - start_tick.QuadPart) / freq.QuadPart);// -render_time;
+	double tick_time = static_cast<double>(end_tick.QuadPart - start_tick.QuadPart) / freq.QuadPart;// -render_time;
 	if (tick_time >= time_globals::get()->seconds_per_tick || !init)
 	{
 		QueryPerformanceCounter(&start_tick);
