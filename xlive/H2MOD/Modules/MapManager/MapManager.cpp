@@ -462,7 +462,7 @@ void MapManager::reloadAllMaps() {
 	LOG_TRACE_GAME("[h2mod-mapmanager] after custom_maps_load_info()");
 }
 
-bool MapManager::loadMapInfo(std::wstring& mapFileLocation) {
+bool MapManager::loadMapInfo(const std::wstring& mapFileLocation) {
 	BYTE data[2960];
 	ZeroMemory(data, sizeof(data));
 
@@ -533,9 +533,9 @@ void MapDownloadQuery::StopDownload() {
 	m_forceStopDownload = true;
 };
 
-MapDownloadQuery::MapDownloadQuery(std::wstring& _mapToDownload, int _downloadId)
-	: id(_downloadId)
+MapDownloadQuery::MapDownloadQuery(const std::wstring& _mapToDownload, int _downloadId)
 {
+	id = _downloadId;
 	SetMapNameToDownload(_mapToDownload);
 }
 
@@ -664,7 +664,7 @@ void MapDownloadQuery::StartMapDownload()
 }
 
 
-void MapDownloadQuery::SetMapNameToDownload(std::wstring& _mapNameToDownloadWide)
+void MapDownloadQuery::SetMapNameToDownload(const std::wstring& _mapNameToDownloadWide)
 {
 	if (!_mapNameToDownloadWide.empty())
 	{
