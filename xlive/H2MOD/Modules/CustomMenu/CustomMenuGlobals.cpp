@@ -2,6 +2,12 @@
 #include "CustomLanguage.h"
 #include "H2MOD\Tags\TagInterface.h"
 
+BYTE* ui_memory_pool_allocate(int size, int a2)
+{
+	/* unk is not used, but def pushed on the stack */
+	auto p_ui_memory_pool_allocate = Memory::GetAddress<BYTE*(__cdecl*)(int, int)>(0x20D2D8);
+	return p_ui_memory_pool_allocate(size, a2);
+}
 
 void __stdcall sub_2101a4_CMLTD_(int thisptr, int label_id, wchar_t* rtn_label, int label_menu_id);
 void __stdcall sub_21bf85_CMLTD_(int thisptr, int label_id, int label_menu_id);
@@ -152,10 +158,9 @@ int __cdecl sub_248B17_CM_(int thisptr, int a2, int a3, int a4, DWORD* menu_vfta
 
 int __cdecl CustomMenu_CallHead_(int a1, DWORD* menu_vftable_1, DWORD* menu_vftable_2, DWORD menu_button_handler, int number_of_buttons, int menu_wgit_type)
 {
-	int(__cdecl* Allocator)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20D2D8);
 	int(__cdecl* sub_20B8C3)(int, int) = (int(__cdecl*)(int, int))((char*)H2BaseAddr + 0x20B8C3);
 
-	int menu_struct = Allocator(3388);
+	int menu_struct = (int)ui_memory_pool_allocate(3388, 0);
 	int menu_id = ((int*)menu_struct)[28];
 	if (menu_struct) {
 		menu_struct = sub_248B17_CM_(menu_struct, *(DWORD*)(a1 + 4), *(DWORD*)(a1 + 8), *(WORD*)(a1 + 2), menu_vftable_1, menu_vftable_2, menu_button_handler, number_of_buttons, menu_wgit_type);
@@ -178,7 +183,6 @@ int __stdcall sub_20F790_CM_(int thisptr, __int16 selected_button_id)
 
 void* __stdcall sub_20f8ae_CMLTD_(void* thisptr, __int16 a2, int* a3, int label_menu_id, int label_id_description)
 {
-	int(__cdecl* sub_20D2D8)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20D2D8);
 	void*(__thiscall* sub_20F576)(void*, int) = (void*(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20F576);
 	void*(__thiscall* sub_20F65D)(void*, __int16) = (void*(__thiscall*)(void*, __int16))((char*)H2BaseAddr + 0x20F65D);
 	int(__thiscall* sub_21208E)(void*, int) = (int(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x21208E);
@@ -194,7 +198,7 @@ void* __stdcall sub_20f8ae_CMLTD_(void* thisptr, __int16 a2, int* a3, int label_
 	v5 = 0;
 	if (*(BYTE*)a3 & 0x10)
 	{
-		v4 = sub_20D2D8(252);
+		v4 = (int)ui_memory_pool_allocate(252, 0);
 		if (v4)
 		{
 			v5 = (int)sub_20F576((void*)v4, *((WORD*)v3 + 4));
@@ -202,7 +206,7 @@ void* __stdcall sub_20f8ae_CMLTD_(void* thisptr, __int16 a2, int* a3, int label_
 	}
 	else
 	{
-		v6 = sub_20D2D8(1212);
+		v6 = (int)ui_memory_pool_allocate(1212, 0);
 		if (v6)
 		{
 			v5 = (int)sub_20F65D((void*)v6, *((WORD*)v3 + 4));

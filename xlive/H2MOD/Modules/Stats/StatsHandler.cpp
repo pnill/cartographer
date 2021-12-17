@@ -19,6 +19,8 @@ static steady_clock::time_point lastTimeRanksSynchronized;
 
 void StatsHandler::Initialize()
 {
+	return;
+
 	if (Memory::isDedicatedServer()) {
 		Status.Registered = false;
 		Status.RanksEnabled = false;
@@ -826,6 +828,8 @@ void StatsHandler::InvalidateMatch(bool state)
 
 void StatsHandler::playerRanksUpdateTick()
 {
+	return;
+
 	auto sendRankUpdate = []()
 	{
 		rankStateUpdating = true;

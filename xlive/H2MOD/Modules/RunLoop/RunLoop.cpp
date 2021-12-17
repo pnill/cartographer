@@ -16,6 +16,8 @@
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
 
+#include "Util\Hooks\Hook.h"
+
 typedef void(_cdecl p_present_rendered_screen)();
 p_present_rendered_screen* present_rendered_screen;
 
@@ -31,7 +33,7 @@ p_game_minimized* game_minimized;
 typedef bool(p_game_in_simulation)();
 p_game_in_simulation* game_in_simulation;
 
-typedef int(__cdecl p_sub_B7CA7D)(float a1, float a2);
+typedef int(__cdecl p_sub_B7CA7D)(float a1);
 p_sub_B7CA7D* sub_CDCA7D;
 
 typedef int(__cdecl p_sub_AF87A1)();
@@ -75,8 +77,11 @@ c_cinematic_in_progress* cinematic_in_progress;
 typedef char c_cinematic_is_running();
 c_cinematic_is_running* cinematic_is_running;
 
-typedef void(__cdecl p_sub_B328A8)();
-p_sub_B328A8* sub_B328A8;
+typedef void(__cdecl* input_update)();
+input_update p_input_update;
+
+typedef void(__cdecl* input_abstraction_update)();
+input_abstraction_update p_input_abstraction_update;
 
 typedef char(p_sub_B1BA65)();
 p_sub_B1BA65* sub_B1BA65;
@@ -90,8 +95,8 @@ p_local_players_update_and_send_synchronous_actions* local_players_update_and_se
 typedef void(__cdecl p_simulation_update)(int target_ticks, float *a3);
 p_simulation_update* simulation_update;
 
-typedef void(__cdecl p_game_effects_update)(float a1);
-p_game_effects_update* game_effects_update;
+typedef void(__cdecl game_frame)(float a1);
+game_frame* p_game_frame;
 
 typedef char(__cdecl p_director_update)(float a1);
 p_director_update* director_update;
@@ -111,14 +116,15 @@ main_game_time_system_update* p_main_time_update;
 typedef void(__cdecl p_render_audio)();
 p_render_audio* render_audio;
 
-typedef void(__stdcall p_sub_B1D31F)(int a1, int a2);
-p_sub_B1D31F* sub_B1D31F;
+typedef void(__thiscall* sub_B1D31F)(void* thisx, bool a2);
+sub_B1D31F p_sub_B1D31F;
 
 typedef void(_cdecl p_sub_AF8716)(int a1);
 p_sub_AF8716* sub_AF8716;
 
-
-#include "Util\Hooks\Hook.h"
+// rumble_update aka vibrations update
+typedef void(__cdecl* rumble_update)(float dt);
+rumble_update p_rumble_update;
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
@@ -412,9 +418,6 @@ bool* sound_impulse_unk;
 bool* sound_impulse_called;
 int* dword_F52260;
 bool* b_restart_game_loop;
-const int input_devices_update = 0x2F9AC;
-const int vibrations_update = 0x90438;
-const int loaded_custom_maps_data = 0x482D70;
 void __cdecl game_main_loop()
 {
 	int v0; // edi
@@ -426,7 +429,6 @@ void __cdecl game_main_loop()
 	float v6; // xmm0_4
 	DWORD *v7; // eax
 	int v8; // esi
-	int v9; // [esp+Ch] [ebp-38h]
 	char v10; // [esp+21h] [ebp-23h]
 	bool Interpolate; // [esp+22h] [ebp-22h]
 	bool v12; // [esp+23h] [ebp-21h]
@@ -480,11 +482,8 @@ void __cdecl game_main_loop()
 		}
 		if (restart_game_loop())
 			break;
-		__asm {
-			mov eax, [input_devices_update]
-			add eax, [H2BaseAddr]
-			call eax
-		}
+		
+		p_input_update();
 		if (!game_minimized()) 
 		{
 			if (H2Config_controller_modern)
@@ -493,7 +492,7 @@ void __cdecl game_main_loop()
 			}
 			else
 			{
-				sub_B328A8();
+				p_input_abstraction_update();
 			}
 		}
 		if (v12)
@@ -504,14 +503,8 @@ void __cdecl game_main_loop()
 			sub_AD7902();
 			sub_B361EC();
 			sub_B1BA65();
-			__asm{
-				push 1
-				mov ecx, [loaded_custom_maps_data]
-				add ecx, [H2BaseAddr]
-				mov eax, [0x4D31F]
-				add eax, [H2BaseAddr]
-				call eax //Call sub_B1D31F
-			}
+			void* loaded_custom_maps_data = Memory::GetAddress<void*>(0x482D70);
+			p_sub_B1D31F(loaded_custom_maps_data, true);
 		}
 		if (!game_freeze())
 		{
@@ -546,7 +539,7 @@ void __cdecl game_main_loop()
 			v13 = v5;
 			if (!game_minimized())
 			{
-				sub_CDCA7D(v15, v9);
+				sub_CDCA7D(v15);
 				sub_B0A221();
 			}
 			if (v12)
@@ -563,16 +556,10 @@ void __cdecl game_main_loop()
 				simulation_update(out_target_ticks, &out_dt);
 				if (v10)
 					game_network_dispatcher();
-				//game_effects_update(out_dt);
+				//game_frame(out_dt);
 				director_update(v13);
 				observer_update(v13);
-				//TODO: Fix Controller Vibrations
-				//__asm{
-				//	fstp dword ptr [v13]
-				//	mov eax, [vibrations_update]
-				//	add eax, [H2BaseAddr]
-				//	call eax
-				//}
+				p_rumble_update(v13);
 			}
 			else
 			{
@@ -635,7 +622,7 @@ void alt_main_game_loop_hook()
 
 		if(game_in_simulation())
 		{
-			game_effects_update(time_globals::get()->seconds_per_tick);
+			p_game_frame(time_globals::get()->seconds_per_tick);
 		}
 		//game_main_loop();
 		//main_game_loop();
@@ -675,7 +662,6 @@ void initialize_main_loop_function_pointers()
 	sub_B727EB = (void(*)())((char*)H2BaseAddr + 0xA27EB);
 
 	sub_C7E7C5 = Memory::GetAddress<p_sub_C7E7C5*>(0x1AE7C5);
-	sub_B328A8 = Memory::GetAddress<p_sub_B328A8*>(0x628A8);
 	sub_B5DD5C = Memory::GetAddress<p_sub_B5DD5C*>(0x8DD5C);
 	sub_B16834 = Memory::GetAddress<p_sub_B16834*>(0x46834);
 	sub_B1BA65 = Memory::GetAddress<p_sub_B1BA65*>(0x4BA65);
@@ -686,7 +672,7 @@ void initialize_main_loop_function_pointers()
 	sub_9A96B1 = Memory::GetAddress<p_sub_9A96B1*>(0x396B1);
 	sub_CDCA7D = Memory::GetAddress<p_sub_B7CA7D*>(0x20CA7D);
 	sub_AF8716 = Memory::GetAddress<p_sub_AF8716*>(0x28716);
-	sub_B1D31F = Memory::GetAddress<p_sub_B1D31F*>(0x4D31F);
+	p_sub_B1D31F = Memory::GetAddress<sub_B1D31F>(0x4D31F);
 
 	vibrations_clear = (void(*)())((char*)H2BaseAddr + 0x901B8);
 	game_network_dispatcher = (void(*)())((char*)H2BaseAddr + 0x1B5456);
@@ -701,12 +687,15 @@ void initialize_main_loop_function_pointers()
 	observer_update = Memory::GetAddress<p_observer_update*>(0x83E6A);
 	local_players_update_and_send_synchronous_actions = Memory::GetAddress<p_local_players_update_and_send_synchronous_actions*>(0x93857);
 	simulation_update = Memory::GetAddress<p_simulation_update*>(0x4A5D0);
-	game_effects_update = Memory::GetAddress<p_game_effects_update*>(0x48CDC);
+	p_game_frame = Memory::GetAddress<game_frame*>(0x48CDC);
 	director_update = Memory::GetAddress<p_director_update*>(0x5A658);
 	p_main_time_update = Memory::GetAddress<main_game_time_system_update*>(0x28814);
 	cinematic_in_progress = Memory::GetAddress<c_cinematic_in_progress*>(0x3a928);
 	cinematic_is_running = Memory::GetAddress<c_cinematic_is_running*>(0x3a938);
-
+	p_rumble_update = Memory::GetAddress<rumble_update>(0x90438);
+	p_input_abstraction_update = Memory::GetAddress<input_abstraction_update>(0x628A8);
+	p_input_update = Memory::GetAddress<input_update>(0x2F9AC);
+		
 	dword_F52268 = Memory::GetAddress<int*>(0x482268);
 	max_tick_count = Memory::GetAddress<int*>(0x482264);
 	sound_impulse_unk = Memory::GetAddress<bool*>(0x48225B);

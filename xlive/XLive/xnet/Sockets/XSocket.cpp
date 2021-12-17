@@ -248,6 +248,47 @@ BOOL WINAPI XSocketWSACancelOverlappedIO(HANDLE hFile)
 	return CancelIo(hFile);
 }
 
+int XSocket::winsock_read_socket(LPWSABUF lpBuffers, 
+	DWORD dwBufferCount,
+	LPDWORD lpNumberOfBytesRecvd,
+	LPDWORD lpFlags,
+	struct sockaddr* lpFrom,
+	LPINT lpFromlen,
+	LPWSAOVERLAPPED lpOverlapped,
+	LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine,
+	bool* winApiError)
+{
+	if (this->isTCP()
+		|| lpFrom == NULL)
+	{
+		return WSARecv(
+			this->winSockHandle,
+			lpBuffers,
+			dwBufferCount,
+			lpNumberOfBytesRecvd,
+			lpFlags,
+			lpOverlapped,
+			lpCompletionRoutine);
+	}
+
+#if COMPILE_WITH_STD_SOCK_FUNC
+	int result = ::recvfrom(this->winSockHandle, lpBuffers->buf, lpBuffers->len, *lpFlags, lpFrom, lpFromlen);
+	*lpNumberOfBytesRecvd = result;
+#else
+	int result = WSARecvFrom(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
+#endif
+	if (result == SOCKET_ERROR)
+	{
+		*lpNumberOfBytesRecvd = 0;
+		if (winApiError)
+			*winApiError = true;
+		return SOCKET_ERROR;
+	}
+
+	result = gXnIp.handleRecvdPacket(this, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
+	return result;
+}
+
 int XSocket::recvfrom(LPWSABUF lpBuffers, 
 	DWORD dwBufferCount,
 	LPDWORD lpNumberOfBytesRecvd, 
@@ -257,46 +298,13 @@ int XSocket::recvfrom(LPWSABUF lpBuffers,
 	LPWSAOVERLAPPED lpOverlapped, 
 	LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
-	auto readSocketLambda = [&](bool& socketErrorByRecvAPI) -> int
-	{
-		if (this->isTCP()
-			|| lpFrom == NULL)
-		{
-			return WSARecv(
-				this->winSockHandle,
-				lpBuffers,
-				dwBufferCount,
-				lpNumberOfBytesRecvd,
-				lpFlags,
-				lpOverlapped,
-				lpCompletionRoutine);
-		}
-
-#if COMPILE_WITH_STD_SOCK_FUNC
-		int result = ::recvfrom(this->winSockHandle, lpBuffers->buf, lpBuffers->len, *lpFlags, lpFrom, lpFromlen);
-		*lpNumberOfBytesRecvd = result;
-#else
-		int result = WSARecvFrom(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
-#endif
-		if (result == SOCKET_ERROR)
-		{
-			*lpNumberOfBytesRecvd = 0;
-			socketErrorByRecvAPI = true;
-			return SOCKET_ERROR;
-		}
-
-		socketErrorByRecvAPI = false;
-		result = gXnIp.handleRecvdPacket(this, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
-		return result;
-	};
-
 	// loop MAX_PACKETS_TO_READ_PER_RECV_CALL times until we get a valid packet
 	// unless Winsock API returns an error
 	for (int i = 0; i < MAX_PACKETS_TO_READ_PER_RECV_CALL; i++)
 	{
 		bool errorByRecvAPI = false;
 
-		int result = readSocketLambda(errorByRecvAPI);
+		int result = winsock_read_socket(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom,lpFromlen, lpOverlapped, lpCompletionRoutine, &errorByRecvAPI);
 
 		if (result == SOCKET_ERROR)
 		{

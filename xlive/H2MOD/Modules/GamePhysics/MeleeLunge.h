@@ -13,7 +13,7 @@
 
 enum melee_flags
 {
-	melee_deceleration_early_start = 4,
+	melee_decelration_unk_flag = 4,
 	melee_deceleration_finished,
 
 	melee_flags_end
