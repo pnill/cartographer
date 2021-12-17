@@ -772,8 +772,7 @@ __declspec(naked) void update_biped_ground_mode_physics_constant()
 	}
 }
 
-static LARGE_INTEGER startupTime;
-
+static LARGE_INTEGER startupCounter;
 DWORD WINAPI timeGetTime_hook()
 {
 	LARGE_INTEGER currentCounter, frequency;

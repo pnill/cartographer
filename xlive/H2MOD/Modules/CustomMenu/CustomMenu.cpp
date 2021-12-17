@@ -14,6 +14,7 @@
 #include "H2MOD\Modules\Updater\Updater.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Tags\TagInterface.h"
+#include "H2MOD\Modules\RunLoop\RunLoop.h"
 #include "Util\Hooks\Hook.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
 
