@@ -100,15 +100,13 @@ namespace SpecialEvents
 
 	e_event_type getCurrentEvent()
 	{
-		return e_christmas;
-
 		if (H2Config_no_events)
 			return e_none;
 
 		if (CheckIfEventTime(L"3-17"))
 			return e_st_paddys;
 
-		if (CheckIfEventTime(L"12-25"))
+		if (CheckIfEventTime(L"12-24") || CheckIfEventTime(L"12-30"))
 			return e_christmas;
 
 		if (CheckIfEventTime(L"4-12"))
@@ -122,6 +120,20 @@ namespace SpecialEvents
 
 	void ChristmasOnMapLoad()
 	{
+		if(h2mod->GetEngineType() == e_engine_type::MainMenu)
+		{
+			auto md = tags::find_tag(blam_tag::tag_group_type::soundlooping, "sound\\ui\\main_menu_music\\main_menu_music");
+			auto m = tags::get_tag<blam_tag::tag_group_type::soundlooping, char>(md);
+			tags::tag_data_block* track_block = reinterpret_cast<tags::tag_data_block*>(m + 0x1c);
+			if (track_block->block_count > 0 && track_block->block_data_offset != -1)
+			{
+				char* track_data = tags::get_tag_data() + track_block->block_data_offset;
+				tag_reference* track_in = reinterpret_cast<tag_reference*>(track_data + 0x14);
+				tag_reference* track_loop = reinterpret_cast<tag_reference*>(track_data + 0x1C);
+				track_in->TagIndex = -1;
+				track_loop->TagIndex = -1;
+			}
+		}
 		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 		{
 			santa_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", blam_tag::tag_group_type::scenery, "carto_shared");
@@ -166,7 +178,7 @@ namespace SpecialEvents
 					beard->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 					beard->child_object.TagIndex = santa_beard_datum;
 				}
-				/*auto flood_datum = player_representation::get_object_datum_from_representation(s_player::e_character_type::Flood);
+				auto flood_datum = player_representation::get_object_datum_from_representation(s_player::e_character_type::Flood);
 				if(!DATUM_IS_NONE(flood_datum))
 				{
 					auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(flood_datum, true);
@@ -176,7 +188,7 @@ namespace SpecialEvents
 					hat_object->parent_marker = string_id(184552154);
 					hat_object->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 					hat_object->child_object.TagIndex = tag_loader::ResolveNewDatum(santa_hat_datum);
-				}*/
+				}
 			}
 			if (!DATUM_IS_NONE(w_datum_i))
 			{
@@ -239,13 +251,6 @@ namespace SpecialEvents
 					ghost_vehicle->objectTag.attachments.data = 0;
 					ghost_vehicle->objectTag.attachments.size = 0;
 
-					/*for(auto & attachment : ghost_vehicle->objectTag.attachments)
-					{
-						attachment.type.TagIndex = -1;
-						attachment.type.TagGroup = blam_tag::tag_group_type::none;
-						attachment.marker_old_string_id = 0;
-						attachment.primary_scale = 0;
-					}*/
 				}
 			}
 			if(!DATUM_IS_NONE(ornament_datum_i))
