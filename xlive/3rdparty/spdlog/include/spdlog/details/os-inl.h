@@ -305,7 +305,7 @@ SPDLOG_INLINE int utc_minutes_offset(const std::tm &tm)
                 ((local_year / 100 >> 2) - (gmt_year / 100 >> 2))
 
                 // + difference in years * 365 */
-                + (long int)(local_year - gmt_year) * 365);
+                + static_cast<long int>(local_year - gmt_year) * 365);
 
             long int hours = (24 * days) + (localtm.tm_hour - gmtm.tm_hour);
             long int mins = (60 * hours) + (localtm.tm_min - gmtm.tm_min);
@@ -542,7 +542,7 @@ static SPDLOG_INLINE bool mkdir_(const filename_t &path)
 
 // create the given directory - and all directories leading to it
 // return true on success or if the directory already exists
-SPDLOG_INLINE bool create_dir(filename_t path)
+SPDLOG_INLINE bool create_dir(const filename_t &path)
 {
     if (path_exists(path))
     {
@@ -581,7 +581,7 @@ SPDLOG_INLINE bool create_dir(filename_t path)
 // "abc/" => "abc"
 // "abc" => ""
 // "abc///" => "abc//"
-SPDLOG_INLINE filename_t dir_name(filename_t path)
+SPDLOG_INLINE filename_t dir_name(const filename_t &path)
 {
     auto pos = path.find_last_of(folder_seps_filename);
     return pos != filename_t::npos ? path.substr(0, pos) : filename_t{};
