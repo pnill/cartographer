@@ -106,7 +106,7 @@ namespace SpecialEvents
 		if (CheckIfEventTime(L"3-17"))
 			return e_st_paddys;
 
-		if (CheckIfEventTime(L"12-24") || CheckIfEventTime(L"12-30"))
+		if (CheckIfEventTime(L"12-24") || CheckIfEventTime(L"12-30") || CheckIfEventTime(L"1-4"))
 			return e_christmas;
 
 		if (CheckIfEventTime(L"4-12"))
