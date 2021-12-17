@@ -12,7 +12,7 @@
 
 bool melee_lunge_hook_enabled = true;
 
-#define MELEE_DEBUG 1
+#define MELEE_DEBUG 0
 
 #if MELEE_DEBUG
 #define LOG_TRACE_MELEE(msg, ...) \
@@ -807,9 +807,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 
 					// not entirely sure if this is actually min_velocity_after_deceleration_per_tick
 					// but it looks like it
-					double temp = 0.75;
-					if (unk3 >= 0.75)
-						temp = blam_min(temp, 3.5);
+					double temp = blam_max(blam_min(unk3, 3.5), 0.75);
 
 					float min_velocity_after_deceleration_per_tick = time_globals::get_seconds_per_tick() * temp;
 
@@ -849,17 +847,17 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 					}
 					else
 					{
-						if (current_velocity_per_tick <= k_valid_real_epsilon)
-						{
-							force_leave_melee_lunge_physics = true;
-							m_time_to_target_in_ticks = 0;
-						}
-						else
+						if (current_velocity_per_tick > k_valid_real_epsilon)
 						{
 							float deceleration = blam_min(m_velocity_to_decelerate / k_deceleration_ticks_real, current_velocity_per_tick);
 							point_from_line3d(&current_translational_velocity_per_tick, &direction_of_current_translational_velocity, -deceleration, &physics_output->out_translational_velocity);
 							scale_vector3d(&physics_output->out_translational_velocity, (float)time_globals::seconds_to_ticks_precise(1.0f), &physics_output->out_translational_velocity);
 							m_time_to_target_in_ticks = (int)((distance_to_target_point / unk1) - 0.5f);
+						}
+						else
+						{
+							force_leave_melee_lunge_physics = true;
+							m_time_to_target_in_ticks = 0;
 						}
 					}
 				}
