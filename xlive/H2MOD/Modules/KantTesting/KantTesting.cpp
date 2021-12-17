@@ -131,7 +131,7 @@ namespace KantTesting
 		if (ENABLEKANTTEST) {
 		//	if (!Memory::isDedicatedServer())
 			//{
-			tags::on_map_load(MapLoad);
+			//tags::on_map_load(MapLoad);
 		//	}
 		}
 	}

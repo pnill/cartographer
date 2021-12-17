@@ -20,6 +20,9 @@
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include <math.h>
+
+#include "Blam/Cache/TagGroups/biped_definition.hpp"
+#include "Blam/Cache/TagGroups/unit_definition.hpp"
 #define _USE_MATH_DEFINES
 
 namespace SpecialEvents
@@ -33,7 +36,13 @@ namespace SpecialEvents
 		datum paddy_pot_datum = DATUM_INDEX_NONE;
 
 		datum santa_hat_datum = DATUM_INDEX_NONE;
+		datum santa_beard_datum = DATUM_INDEX_NONE;
 		datum snow_datum = DATUM_INDEX_NONE;
+		datum candy_cane_datum = DATUM_INDEX_NONE;
+		datum deer_datum = DATUM_INDEX_NONE;
+		datum ornament_datum = DATUM_INDEX_NONE;
+		datum present_datum = DATUM_INDEX_NONE;
+		datum fp_present_datum = DATUM_INDEX_NONE;
 		string_id new_elite_head_marker(0xFFEE01234);
 
 		std::time_t getEpochTime(int year, const std::wstring& dateTime)
@@ -115,11 +124,20 @@ namespace SpecialEvents
 	{
 		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 		{
-			santa_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", blam_tag::tag_group_type::scenario, "carto_shared");
+			santa_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", blam_tag::tag_group_type::scenery, "carto_shared");
 			auto w_datum_i = tag_loader::Get_tag_datum("scenarios\\multi\\lockout\\lockout_big", blam_tag::tag_group_type::weathersystem, "carto_shared");
-			if (!DATUM_IS_NONE(santa_hat_datum)) {
+			auto sword_datum_i = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\candy_cane\\candy_cane", blam_tag::tag_group_type::rendermodel, "carto_shared");
+			auto beard_datum_i = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\beard\\santa_beard", blam_tag::tag_group_type::scenery, "carto_shared");
+			auto deer_datum_i = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\reindeer_ghost\\reindeer_ghost", blam_tag::tag_group_type::rendermodel, "carto_shared");
+			auto ornament_datum_i = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\ornament\\ornament", blam_tag::tag_group_type::rendermodel, "carto_shared");
+			auto present_datum_i = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\present\\present", blam_tag::tag_group_type::rendermodel, "carto_shared");
+			auto fp_present_datum_i = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\present\\fp_present", blam_tag::tag_group_type::rendermodel, "carto_shared");
+			if (!DATUM_IS_NONE(santa_hat_datum) && !DATUM_IS_NONE(beard_datum_i))
+			{
 				tag_loader::Load_tag(santa_hat_datum, true, "carto_shared");
+				tag_loader::Load_tag(beard_datum_i, true, "carto_shared");
 				tag_loader::Push_Back();
+				santa_beard_datum = tag_loader::ResolveNewDatum(beard_datum_i);
 				//auto scen = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(datum(_INJECTED_TAG_START_));
 				auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
 				if (hlmt_chief_datum != DATUM_INDEX_NONE) {
@@ -129,6 +147,10 @@ namespace SpecialEvents
 					a->parent_marker = string_id(184552154);
 					a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 					a->child_object.TagIndex = tag_loader::ResolveNewDatum(santa_hat_datum);
+					auto beard = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
+					beard->parent_marker = string_id(HaloString::HS_HEAD);
+					beard->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+					beard->child_object.TagIndex = santa_beard_datum;
 				}
 				auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
 				if (hlmt_elite_datum != DATUM_INDEX_NONE)
@@ -139,26 +161,164 @@ namespace SpecialEvents
 					a->parent_marker = new_elite_head_marker;
 					a->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 					a->child_object.TagIndex = tag_loader::ResolveNewDatum(santa_hat_datum);
+					auto beard = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(b->objects));
+					beard->parent_marker = new_elite_head_marker;
+					beard->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+					beard->child_object.TagIndex = santa_beard_datum;
 				}
-
-				if (!DATUM_IS_NONE(w_datum_i))
+				/*auto flood_datum = player_representation::get_object_datum_from_representation(s_player::e_character_type::Flood);
+				if(!DATUM_IS_NONE(flood_datum))
 				{
-					tag_loader::Load_tag(w_datum_i, true, "carto_shared");
-					tag_loader::Push_Back();
-					snow_datum = tag_loader::ResolveNewDatum(w_datum_i);
-					if (!DATUM_IS_NONE(snow_datum))
+					auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(flood_datum, true);
+					auto flood_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(flood_biped->unitTag.objectTag.model.TagIndex, true);
+					auto flood_variant = flood_model->variants[0];
+					auto hat_object = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(flood_variant->objects));
+					hat_object->parent_marker = string_id(184552154);
+					hat_object->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+					hat_object->child_object.TagIndex = tag_loader::ResolveNewDatum(santa_hat_datum);
+				}*/
+			}
+			if (!DATUM_IS_NONE(w_datum_i))
+			{
+				tag_loader::Load_tag(w_datum_i, true, "carto_shared");
+				tag_loader::Push_Back();
+				snow_datum = tag_loader::ResolveNewDatum(w_datum_i);
+				if (!DATUM_IS_NONE(snow_datum))
+				{
+					auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
+					auto sbsp = tags::get_tag_fast<s_scenario_structure_bsp_group_definition>(scen->structure_bsps[0]->structure_bsp.TagIndex);
+
+					auto weat_block = MetaExtender::add_tag_block2<s_scenario_structure_bsp_group_definition::s_weather_palette_block>((unsigned long)std::addressof(sbsp->weather_palette));
+					weat_block->name = "snow_cs";
+					weat_block->weather_system.TagGroup = blam_tag::tag_group_type::weathersystem;
+					weat_block->weather_system.TagIndex = snow_datum;
+
+					for (auto& cluster : sbsp->clusters)
+						cluster.weather = sbsp->weather_palette.size - 1;
+				}
+			}
+			if (!DATUM_IS_NONE(sword_datum_i))
+			{
+				tag_loader::Load_tag(sword_datum_i, true, "carto_shared");
+				tag_loader::Push_Back();
+				candy_cane_datum = tag_loader::ResolveNewDatum(sword_datum_i);
+				if (!DATUM_IS_NONE(candy_cane_datum))
+				{
+					auto sword_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\weapons\\melee\\energy_blade\\energy_blade");
+					auto sword_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(sword_model_datum);
+					sword_model->render_model.TagIndex = candy_cane_datum;
+
+					auto sword_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\melee\\energy_blade\\energy_blade");
+					auto sword_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(sword_weapon_datum);
+
+					for (auto& first_person : sword_weapon->first_person)
+						first_person.first_person_model.TagIndex = candy_cane_datum;
+
+					for (auto& attachment : sword_weapon->attachments)
 					{
-						auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
-						auto sbsp = tags::get_tag_fast<s_scenario_structure_bsp_group_definition>(scen->structure_bsps[0]->structure_bsp.TagIndex);
+						attachment.type.TagIndex = -1;
+						attachment.type.TagGroup = blam_tag::tag_group_type::none;
+						attachment.marker_old_string_id = 0;
+						attachment.primary_scale = 0;
+					}
+				}
+			}
+			if (!DATUM_IS_NONE(deer_datum_i))
+			{
+				tag_loader::Load_tag(deer_datum_i, true, "carto_shared");
+				tag_loader::Push_Back();
+				deer_datum = tag_loader::ResolveNewDatum(deer_datum_i);
+				if(!DATUM_IS_NONE(deer_datum))
+				{
+					auto ghost_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\vehicles\\ghost\\ghost");
+					auto ghost_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(ghost_model_datum);
+					ghost_model->render_model.TagIndex = deer_datum;
 
-						auto weat_block = MetaExtender::add_tag_block2<s_scenario_structure_bsp_group_definition::s_weather_palette_block>((unsigned long)std::addressof(sbsp->weather_palette));
-						weat_block->name = "snow_cs";
-						weat_block->weather_system.TagGroup = blam_tag::tag_group_type::weathersystem;
-						weat_block->weather_system.TagIndex = snow_datum;
+					auto ghost_datum = tags::find_tag(blam_tag::tag_group_type::vehicle, "objects\\vehicles\\ghost\\ghost");
+					auto ghost_vehicle = tags::get_tag<blam_tag::tag_group_type::vehicle, s_unit_group_definition>(ghost_datum);
+					ghost_vehicle->objectTag.attachments.data = 0;
+					ghost_vehicle->objectTag.attachments.size = 0;
 
-						for (auto& cluster : sbsp->clusters)
+					/*for(auto & attachment : ghost_vehicle->objectTag.attachments)
+					{
+						attachment.type.TagIndex = -1;
+						attachment.type.TagGroup = blam_tag::tag_group_type::none;
+						attachment.marker_old_string_id = 0;
+						attachment.primary_scale = 0;
+					}*/
+				}
+			}
+			if(!DATUM_IS_NONE(ornament_datum_i))
+			{
+				tag_loader::Load_tag(ornament_datum_i, true, "carto_shared");
+				tag_loader::Push_Back();
+				ornament_datum = tag_loader::ResolveNewDatum(ornament_datum_i);
+				if (!DATUM_IS_NONE(ornament_datum))
+				{
+					auto frag_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\weapons\\grenade\\frag_grenade\\frag_grenade_projectile");
+					auto frag_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(frag_model_datum);
+					frag_model->render_model.TagIndex = ornament_datum;
+
+					auto plasma_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\weapons\\grenade\\plasma_grenade\\plasma_grenade");
+					auto plasma_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(plasma_model_datum);
+					plasma_model->render_model.TagIndex = ornament_datum;
+				}
+			}
+			if(!DATUM_IS_NONE(present_datum_i))
+			{
+				tag_loader::Load_tag(present_datum_i, true, "carto_shared");
+				tag_loader::Push_Back();
+				present_datum = tag_loader::ResolveNewDatum(present_datum_i);
+				if(!DATUM_IS_NONE(present_datum))
+				{
+					auto ball_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\weapons\\multiplayer\\ball\\ball");
+					auto ball_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(ball_model_datum);
+					ball_model->render_model.TagIndex = present_datum;
+
+					auto bomb_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+					auto bomb_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(bomb_model_datum);
+					bomb_model->render_model.TagIndex = present_datum;
+
+					if (!DATUM_IS_NONE(fp_present_datum_i)) 
+					{
+						tag_loader::Load_tag(fp_present_datum_i, true, "carto_shared");
+						tag_loader::Push_Back();
+						fp_present_datum = tag_loader::ResolveNewDatum(fp_present_datum_i);
+						if (!DATUM_IS_NONE(fp_present_datum))
 						{
-							cluster.weather = sbsp->weather_palette.size - 1;
+							auto ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
+							char* ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(ball_weapon_datum);
+							if (ball_weapon != nullptr)
+							{
+								tags::tag_data_block* first_person_block = reinterpret_cast<tags::tag_data_block*>(ball_weapon + 0x2A8);
+								if (first_person_block->block_count > 0 && first_person_block->block_data_offset != -1)
+								{
+									char* first_person_data = tags::get_tag_data() + first_person_block->block_data_offset;
+									for (auto i = 0; i < first_person_block->block_count; i++)
+									{
+										tag_reference* fp_model = reinterpret_cast<tag_reference*>(first_person_data + (0x10 * i));
+										tag_reference* fp_anim = reinterpret_cast<tag_reference*>(first_person_data + (0x10 * i) + 8);
+										fp_model->TagIndex = fp_present_datum;
+									}
+								}
+							}
+
+							auto bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+							char* bomb_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(bomb_weapon_datum);
+							if (bomb_weapon != nullptr)
+							{
+								tags::tag_data_block* first_person_block = reinterpret_cast<tags::tag_data_block*>(bomb_weapon + 0x2A8);
+								if (first_person_block->block_count > 0 && first_person_block->block_data_offset != -1)
+								{
+									char* first_person_data = tags::get_tag_data() + first_person_block->block_data_offset;
+									for (auto i = 0; i < first_person_block->block_count; i++)
+									{
+										tag_reference* fp_model = reinterpret_cast<tag_reference*>(first_person_data + (0x10 * i));
+										tag_reference* fp_anim = reinterpret_cast<tag_reference*>(first_person_data + (0x10 * i) + 8);
+										fp_model->TagIndex = fp_present_datum;
+									}
+								}
+							}
 						}
 					}
 				}
@@ -686,11 +846,12 @@ namespace SpecialEvents
 			auto new_marker_group = MetaExtender::add_tag_block2<s_render_model_group_definition::s_marker_groups_block>((unsigned long)std::addressof(mode_elite->marker_groups));
 			new_marker_group->name_old_string_id = new_elite_head_marker;
 			auto new_marker = MetaExtender::add_tag_block2<s_render_model_group_definition::s_marker_groups_block::s_markers_block>((unsigned long)std::addressof(new_marker_group->markers));
+			LOG_INFO_GAME("[{}] {:x}", __FUNCTION__, (unsigned long)std::addressof(new_marker));
 			new_marker->node_index = 19;
 			new_marker->permutation_index = -1;
 			new_marker->region_index = -1;
-			new_marker->translation_x = 0.005;
-			new_marker->translation_y = 0.05;
+			new_marker->translation_x = 0.006;
+			new_marker->translation_y = 0.06;
 			new_marker->translation_z = 0;
 			new_marker->rotation_i = 0.9;
 			new_marker->rotation_j = 0.9;
@@ -712,6 +873,30 @@ namespace SpecialEvents
 		switch (getCurrentEvent())
 		{
 		case e_christmas:
+			if (H2Config_event_music) {
+				auto playSound = [=]()
+				{
+					using namespace std::chrono_literals;
+					static bool flop = false;
+					while (true)
+					{
+						std::this_thread::sleep_for(1000ms);
+						if (h2mod->GetEngineType() == MainMenu && H2Config_event_music)
+						{
+							if (!flop) {
+								flop = true;
+								PlaySound(L"sounds/feliz_navidad.wav", NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
+							}
+						}
+						else {
+							flop = false;
+							PlaySound(NULL, 0, 0);
+						}
+					}
+
+				};
+				std::thread(playSound).detach();
+			}
 			tags::on_map_load(ChristmasOnMapLoad);
 			break;
 		case e_st_paddys:

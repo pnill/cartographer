@@ -143,3 +143,4 @@ extern bool H2Config_upnp_enable;
 extern bool H2Config_melee_fix;
 extern bool H2Config_no_events;
 extern bool H2Config_spooky_boy;
+extern bool H2Config_event_music;
