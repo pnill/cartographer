@@ -21,6 +21,11 @@ const char* getNetworkMessageName(int enumVal)
 	return network_message_name[enumVal];
 }
 
+bool packetIsCustomPacket(e_network_message_types enumVal)
+{
+	return enumVal > e_network_message_types::test;
+}
+
 void __cdecl encode_map_file_name_packet(bitstream* stream, int a2, s_custom_map_filename* data)
 {
 	stream->data_encode_string_wide("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
@@ -30,7 +35,7 @@ bool __cdecl decode_map_file_name_packet(bitstream* stream, int a2, s_custom_map
 {
 	stream->data_decode_string_wide("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
 	data->map_download_id = stream->data_decode_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
-	return stream->packet_is_valid() == false;
+	return stream->overflow() == false;
 }
 
 void __cdecl encode_request_map_filename_packet(bitstream* stream, int a2, s_request_map_filename* data)
@@ -42,7 +47,7 @@ bool __cdecl decode_request_map_filename_packet(bitstream* stream, int a2, s_req
 {
 	stream->data_decode_bits("user-identifier", &data->user_identifier, player_identifier_size_bits);
 	data->map_download_id = stream->data_decode_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
-	return stream->packet_is_valid() == false;
+	return stream->overflow() == false;
 }
 
 void __cdecl encode_team_change_packet(bitstream* stream, int a2, s_team_change* data)
@@ -52,7 +57,7 @@ void __cdecl encode_team_change_packet(bitstream* stream, int a2, s_team_change*
 bool __cdecl decode_team_change_packet(bitstream* stream, int a2, s_team_change* data)
 {
 	data->team_index = stream->data_decode_integer("team-index", 32);
-	return stream->packet_is_valid() == false;
+	return stream->overflow() == false;
 }
 
 void __cdecl encode_rank_change_packet(bitstream* stream, int a2, s_rank_change* data)
@@ -63,7 +68,7 @@ void __cdecl encode_rank_change_packet(bitstream* stream, int a2, s_rank_change*
 bool __cdecl decode_rank_change_packet(bitstream* stream, int a2, s_rank_change* data)
 {
 	data->rank = stream->data_decode_integer("rank", 8);
-	return stream->packet_is_valid() == false;
+	return stream->overflow() == false;
 }
 
 void __cdecl encode_anti_cheat_packet(bitstream* stream, int a2, s_anti_cheat* data)
@@ -73,7 +78,7 @@ void __cdecl encode_anti_cheat_packet(bitstream* stream, int a2, s_anti_cheat* d
 bool __cdecl decode_anti_cheat_packet(bitstream* stream, int a2, s_anti_cheat* data)
 {
 	data->enabled = stream->data_decode_bool("anti-cheat-enabled");
-	return stream->packet_is_valid() == false;
+	return stream->overflow() == false;
 }
 
 void register_custom_packets(void* network_messages)
@@ -102,21 +107,22 @@ void register_custom_packets(void* network_messages)
 		(void*)CustomVariantSettings::EncodeVariantSettings, (void*)CustomVariantSettings::DecodeVariantSettings, NULL);
 }
 
-typedef void(__stdcall *handle_out_of_band_message)(void *thisx, network_address* address, int message_type, int a4, void* packet);
+typedef void(__stdcall *handle_out_of_band_message)(void *thisx, network_address* address, e_network_message_types message_type, int a4, void* packet);
 handle_out_of_band_message p_handle_out_of_band_message;
 
-void __stdcall handle_out_of_band_message_hook(void *thisx, network_address* address, int message_type, int a4, void* packet)
+void __stdcall handle_out_of_band_message_hook(void *thisx, network_address* address, e_network_message_types message_type, int a4, void* packet)
 {
 	/* surprisingly the game doesn't use this too much, pretty much for request-join and tme-sync packets */
 	LOG_TRACE_NETWORK("handle_out_of_band_message_hook() - Received message: {} from peer index: {}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(address));
 
-	p_handle_out_of_band_message(thisx, address, message_type, a4, packet);
+	if (!packetIsCustomPacket(message_type))
+		p_handle_out_of_band_message(thisx, address, message_type, a4, packet);
 }
 
-typedef void(__stdcall *handle_channel_message)(void *thisx, int network_channel_index, int message_type, int dynamic_data_size, void* packet);
+typedef void(__stdcall *handle_channel_message)(void *thisx, int network_channel_index, e_network_message_types message_type, int dynamic_data_size, void* packet);
 handle_channel_message p_handle_channel_message;
 
-void __stdcall handle_channel_message_hook(void *thisx, int network_channel_index, int message_type, int dynamic_data_size, void* packet)
+void __stdcall handle_channel_message_hook(void *thisx, int network_channel_index, e_network_message_types message_type, int dynamic_data_size, void* packet)
 {
 	/*
 		This handles received in-band data
@@ -166,7 +172,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				}
 			}
 		}
-		return;
+		break;
 	}
 
 	case custom_map_filename:
@@ -186,13 +192,13 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				{
 					// unlikely
 					LOG_TRACE_NETWORK("[H2MOD-CustomPackets] - query with id {:X} hasn't been found!", received_data->map_download_id);
-					return;
+					break;
 				}
 			}
 
 			LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] - received map name: {}, no download ID", received_data->file_name);
 		}
-		return;
+		break;
 	}
 
 	case team_change:
@@ -203,7 +209,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			LOG_DEBUG_NETWORK(L"[H2MOD-CustomPackets] recieved on handle_channel_message_hook team_change: {}", received_data->team_index);
 			h2mod->set_local_team_index(0, received_data->team_index);
 		}
-		return;
+		break;
 	}
 
 	case rank_change:
@@ -214,7 +220,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			LOG_DEBUG_NETWORK(L"H2MOD-CustomPackets] recieved on handle_channel_message_hook rank_change: {}", recieved_data->rank);
 			h2mod->set_local_rank(recieved_data->rank);
 		}
-		return;
+		break;
 	}
 
 	case anti_cheat:
@@ -224,7 +230,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			s_anti_cheat* recieved_data = (s_anti_cheat*)packet;
 			H2Config_anti_cheat_enabled = recieved_data->enabled;
 		}
-		return;
+		break;
 	}
 	
 	case custom_variant_settings:
@@ -234,7 +240,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			auto recieved_data = (CustomVariantSettings::s_variantSettings*)packet;
 			CustomVariantSettings::UpdateCustomVariantSettings(recieved_data);
 		}
-		return;
+		break;
 	}
 
 	// default packet
@@ -253,7 +259,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		break;
 	} // switch (message_type)
 
-	if (peer_network_channel->getNetworkAddressFromNetworkChannel(&addr)) 
+	if (peer_network_channel->getNetworkAddressFromNetworkChannel(&addr))
 	{
 		LOG_TRACE_NETWORK("handle_channel_message_hook() - Received message: {} from peer index: {}, address: {:x}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(&addr), ntohl(addr.address.ipv4));
 	}
@@ -262,8 +268,8 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		LOG_ERROR_NETWORK("handle_channel_message_hook() - Received message: {} from network channel: {} that maybe shouldn't have been received", getNetworkMessageName(message_type), network_channel_index);
 	}
 
-
-	p_handle_channel_message(thisx, network_channel_index, message_type, dynamic_data_size, packet);
+	if (!packetIsCustomPacket(message_type))
+		p_handle_channel_message(thisx, network_channel_index, message_type, dynamic_data_size, packet);
 
 	if (message_type == player_add) {
 		if (peer_network_channel->channel_state == network_channel::e_channel_state::unk_state_5

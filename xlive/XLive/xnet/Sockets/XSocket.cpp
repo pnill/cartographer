@@ -77,9 +77,6 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 		LOG_TRACE_NETWORK("XSocketCreate() - Socket: {} was set to VDP", ret);
 	}
 
-	// set socket send/recv buffers size, but only if the socket isn't blocking
-	newXSocket->setBufferSize(gXnIp.GetMinSockSendBufferSizeInBytes(), gXnIp.GetMinSockRecvBufferSizeInBytes());
-
 	// disable SIO_UDP_CONNRESET
 	// TODO re-enable this if the issue https://github.com/pnill/cartographer/issues/320 is not caused by this
 
@@ -115,13 +112,18 @@ int WINAPI XSocketIOCTLSocket(SOCKET s, long cmd, u_long *argp)
 	LOG_TRACE_NETWORK("XSocketIOCTLSocket() - cmd: {}", IOCTLSocket_cmd_string(cmd).c_str());
 	int ret = ioctlsocket(xsocket->winSockHandle, cmd, argp);
 
-	/*if (ret == NO_ERROR
+	if (ret == NO_ERROR
 		&& cmd == FIONBIO
 		&& *argp)
 	{
+		LOG_TRACE_NETWORK("XSocketIOCTLSocket() - setting default buffer size for non-blocking socket.");
 		// set socket send/recv buffers size, but only if the socket isn't blocking
-		xsocket->setBufferSize(gXnIp.GetMinSockSendBufferSizeInBytes(), gXnIp.GetMinSockRecvBufferSizeInBytes());
-	}*/
+		xsocket->setBufferSize(SO_SNDBUF, gXnIp.GetMinSockSendBufferSizeInBytes());
+		xsocket->setBufferSize(SO_RCVBUF, gXnIp.GetMinSockRecvBufferSizeInBytes());
+
+		// remove last error even if we didn't successfuly increased the recv/send buffer size
+		WSASetLastError(0);
+	}
 
 	return ret;
 }
@@ -131,8 +133,15 @@ int WINAPI XSocketSetSockOpt(SOCKET s, int level, int optname, const char *optva
 {
 	XSocket* xsocket = (XSocket*)s;
 
-	LOG_TRACE_NETWORK("XSocketSetSockOpt  (socket = {0:x}, level = {1}, optname = {2}, optval = {3}, optlen = {4})",
-		xsocket->winSockHandle, level, optname, optval ? optval : "", optlen);
+	LOG_TRACE_NETWORK("XSocketSetSockOpt  (socket = {:x}, level = {}, optname = {}, optval = {}, optlen = {})",
+		xsocket->winSockHandle, level, sockOpt_string(optname), optval ? optval : "", optlen);
+
+	if (optname == SO_SNDBUF
+		|| optname == SO_RCVBUF)
+	{
+		int bufferSize = *(int*)(optval);
+		return xsocket->setBufferSize(optname, bufferSize);
+	}
 
 	int ret = setsockopt(xsocket->winSockHandle, level, optname, optval, optlen);
 	if (ret == SOCKET_ERROR)
@@ -256,7 +265,7 @@ int XSocket::winsock_read_socket(LPWSABUF lpBuffers,
 	LPINT lpFromlen,
 	LPWSAOVERLAPPED lpOverlapped,
 	LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine,
-	bool* winApiError)
+	bool* outWinApiError)
 {
 	if (this->isTCP()
 		|| lpFrom == NULL)
@@ -280,8 +289,8 @@ int XSocket::winsock_read_socket(LPWSABUF lpBuffers,
 	if (result == SOCKET_ERROR)
 	{
 		*lpNumberOfBytesRecvd = 0;
-		if (winApiError)
-			*winApiError = true;
+		if (outWinApiError)
+			*outWinApiError = true;
 		return SOCKET_ERROR;
 	}
 
@@ -710,39 +719,47 @@ u_short WINAPI XSocketHTONS(u_short hostshort)
 	return htons(hostshort);
 }
 
-void XSocket::setBufferSize(INT sendBufsize, INT recvBufsize)
+int XSocket::setBufferSize(int optname, INT bufSize)
 {
-	static const INT sockOpts[] = { SO_SNDBUF, SO_RCVBUF };
-	static const char* sockOptsStr[] = { "SO_SNDBUF", "SO_RCVBUF" };
-	int socketBufferSize[] = { sendBufsize, recvBufsize };
+	static const std::unordered_set<int> sockOpts = { SO_SNDBUF, SO_RCVBUF };
 
-	if (this->isUDP()) // increase recvbuffer only for UDP sockets for now
+	if (sockOpts.count(optname) == 0)
 	{
-		int bufOpt, bufOptSize;
-		bufOptSize = sizeof(bufOpt);
+		WSASetLastError(WSAEINVAL);
+		return SOCKET_ERROR;
+	}
 
-		for (int i = 0; i < ARRAYSIZE(sockOpts); i++)
+	if (!this->isUDP())
+	{
+		WSASetLastError(WSAEINVAL);
+		return SOCKET_ERROR;
+	}
+
+	int bufOpt, bufOptSize;
+	bufOptSize = sizeof(bufOpt);
+
+	if (getsockopt(this->winSockHandle, SOL_SOCKET, optname, (char*)&bufOpt, &bufOptSize) == SOCKET_ERROR)
+	{
+		LOG_ERROR_NETWORK("{} - getsockopt() failed, last error : {}, cannot increase UDP nonblocking buffer size!", __FUNCTION__, WSAGetLastError());
+		return SOCKET_ERROR;
+	}
+
+	LOG_TRACE_NETWORK("{} - getsockopt() - {}: {} - {}", __FUNCTION__, sockOpt_string(optname), bufOpt, bufSize);
+
+	// this may only affect Windows 7/Server 2008 R2 and bellow, as Windows 10 uses an 64K buffer already
+	if (bufOpt < bufSize)
+	{
+		bufOpt = bufSize; // set the recvbuf to needed size
+		// increase socket recv buffer
+		if (setsockopt(this->winSockHandle, SOL_SOCKET, optname, (char*)&bufOpt, sizeof(bufOpt)) == SOCKET_ERROR) // then attempt to increase the buffer
 		{
-			if (getsockopt(this->winSockHandle, SOL_SOCKET, sockOpts[i], (char*)&bufOpt, &bufOptSize) == SOCKET_ERROR)
-			{
-				LOG_ERROR_NETWORK("XSocketCreate() - getsockopt() failed, last error: {}, cannot increase UDP packet send/recv buffer if needed", WSAGetLastError());
-				continue;
-			}
-
-			LOG_TRACE_NETWORK("XSocketCreate() - getsockopt() - {}: {}", sockOptsStr[i], bufOpt);
-
-			// this may only affect Windows 7/Server 2008 R2 and bellow, as Windows 10 uses an 64K buffer already
-			if (bufOpt < socketBufferSize[i])
-			{
-				bufOpt = socketBufferSize[i]; // set the recvbuf to needed size
-				// increase socket recv buffer
-				if (setsockopt(this->winSockHandle, SOL_SOCKET, sockOpts[i], (char*)&bufOpt, sizeof(bufOptSize)) == SOCKET_ERROR) // then attempt to increase the buffer
-				{
-					LOG_ERROR_NETWORK("XSocketCreate() - setsockopt() failed, last error: {}", WSAGetLastError());
-				}
-			}
+			LOG_ERROR_NETWORK("{} - setsockopt() failed, last error: {}", __FUNCTION__, WSAGetLastError());
+			return SOCKET_ERROR;
 		}
 	}
+
+	WSASetLastError(0);
+	return 0;
 }
 
 int XSocket::udpSend(const char* buf, int len, int flags, sockaddr *to, int tolen)

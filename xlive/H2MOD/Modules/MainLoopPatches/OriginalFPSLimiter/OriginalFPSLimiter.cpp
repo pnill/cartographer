@@ -71,15 +71,6 @@ void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out
 #endif // USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE
 }
 
-DWORD WINAPI timeGetTime_hook()
-{
-	LARGE_INTEGER currentTime;
-	QueryPerformanceCounter(&currentTime);
-	float ret = (double)(currentTime.LowPart - timeAtStartup.LowPart) / (double)(int)frequency.LowPart;
-	ret = ret * 1000.f;
-	return (DWORD)ret;
-}
-
 static __int64 network_time;
 __int64 get_time_delta_msec()
 {
@@ -168,8 +159,6 @@ void OriginalFPSLimiter::ApplyPatches()
 
 		//NopFill(Memory::GetAddress(0x39DE1), 5);
 	}
-
-	//PatchWinAPICall(Memory::GetAddress(0x37E51), timeGetTime_hook);
 
 	QueryPerformanceFrequency(&frequency);
 	QueryPerformanceCounter(&timeAtStartup);

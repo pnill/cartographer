@@ -182,7 +182,8 @@ namespace MeleeFix
 
 #if MELEE_LUNGE_PHYSICS_UPDATE_HOOK_ENABLE
 		//Codecave(Memory::GetAddressRelative(0x50B72A), melee_force_decelerate_fixup, 3);
-		PatchCall(Memory::GetAddressRelative(0x50BD96, 0x4FE3C6), call_character_melee_physics_input_update_internal);
+		//PatchCall(Memory::GetAddressRelative(0x50BD96, 0x4FE3C6), call_character_melee_physics_input_update_internal);
+		PatchCall(Memory::GetAddressRelative(0x50BD96, 0x4FE3C6), call_character_melee_physics_input_update_internal_2);
 #endif
 
 #pragma region Known good patches
@@ -192,8 +193,8 @@ namespace MeleeFix
 		// when converting the tick count from float to int
 		// otherwise the game will convert to tick count off by 1 tick
 		// to note this in H3 is handled by adding .5, which does the same thing
-		BYTE cvtss2si[] = { 0xF3, 0x0F, 0x2D };
-		WriteBytes(Memory::GetAddressRelative(0x50B419, 0x4FDA49), cvtss2si, sizeof(cvtss2si));
+		// BYTE cvtss2si[] = { 0xF3, 0x0F, 0x2D };
+		// WriteBytes(Memory::GetAddressRelative(0x50B419, 0x4FDA49), cvtss2si, sizeof(cvtss2si));
 #pragma endregion
 
 		MeleeCollisionPatch();

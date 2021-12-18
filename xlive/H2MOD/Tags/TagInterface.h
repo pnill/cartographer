@@ -6,8 +6,6 @@
 
 namespace tags
 {
-	
-
 	struct tag_instance
 	{
 		blam_tag type;

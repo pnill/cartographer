@@ -218,10 +218,10 @@ namespace ControllerInput
 		sub_B31EA2(ControllerIndex, default_profile, (int)InputMap, RightStickThrottle, LeftStickThrottle, unk_input_struct);
 	}
 
-	typedef char*(__cdecl p_get_controller_input)(__int16 a1);
+	typedef unsigned char*(__cdecl p_get_controller_input)(__int16 a1);
 	p_get_controller_input* c_get_controller_input;
 
-	char* ControllerInput::get_controller_input(short index)
+	unsigned char* ControllerInput::get_controller_input(__int16 index)
 	{
 		return c_get_controller_input(index);
 	}

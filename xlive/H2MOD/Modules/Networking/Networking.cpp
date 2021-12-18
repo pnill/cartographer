@@ -13,7 +13,7 @@ bool decodePacketTypeAndSize(void *thisx, bitstream* stream, signed int *a3, int
 	*a3 = stream->data_decode_integer("type", 8);
 	*(DWORD *)a4 = stream->data_decode_integer("size", 16);
 	LOG_TRACE_NETWORK("[h2mod-network] received packet decoded type={0}, typeName={1}, size={2}", *a3, getNetworkMessageName(*a3), *(DWORD *)a4);
-	if (stream->packet_is_valid()
+	if (stream->overflow()
 		|| (v5 = *a3, *a3 < 0)
 		|| v5 >= e_network_message_types::end
 		|| (v6 = (int)&v4[32 * v5], !*(BYTE *)v6)
@@ -24,7 +24,7 @@ bool decodePacketTypeAndSize(void *thisx, bitstream* stream, signed int *a3, int
 	}
 	else
 	{
-		result = stream->packet_is_valid() == false;
+		result = stream->overflow() == false;
 	}
 	return result;
 }
