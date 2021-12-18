@@ -132,6 +132,7 @@
     <ClCompile Include="Blam\Engine\Game\GameEngineGlobals.cpp" />
     <ClCompile Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
+    <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -433,6 +434,8 @@
     <ClInclude Include="3rdparty\detours\include\detours.h" />
     <ClInclude Include="3rdparty\detours\include\detver.h" />
     <ClInclude Include="Blam\Math\real_vector3d.h" />
+    <ClInclude Include="Blam\Engine\DataArray\TagDataIterator.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

@@ -275,6 +275,7 @@
     <ClCompile Include="3rdparty\imgui\imgui_draw.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
+    <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameEngineGlobals.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameGlobals.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
@@ -552,7 +553,9 @@
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="Blam\Common\Common.h" />
+    <ClInclude Include="Blam\Engine\DataArray\TagDataIterator.h" />
     <ClInclude Include="Blam\Engine\Game\DamageData.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngineGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\GameGlobals.h" />

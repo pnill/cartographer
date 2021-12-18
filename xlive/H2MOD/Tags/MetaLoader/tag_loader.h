@@ -53,6 +53,8 @@ namespace tag_loader
 	void Load_RAW_refs(datum datum_index, HANDLE file);
 	//Fixes the reference of the tags to their global objects(vftables)
 	void Fix_global_objects_ref(datum datum_index);
+	//Fix shader templates
+	void Fix_shader_templates();
 	//Loads a file containing a a bunch of tags concerned with some specific element injecting the first tag onto the target datum
 	//modules cand be target onto a specific tag,they have to be loaded into free tag mem pool
 	//return the target_index of the first tag in the memory

@@ -8,6 +8,7 @@
 #include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Engine\Players\Players.h"
 #include "H2MOD.h"
+#include "Blam/Engine/Players/Players.h"
 #include "H2MOD\EngineCalls\EngineCalls.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
@@ -19,6 +20,13 @@
 namespace player_representation
 {
 	//Non-zero index based value for the count of valid representation types
+	std::map<s_player::e_character_type, byte> type_map
+	{
+		{s_player::e_character_type::MasterChief, 0},
+		{s_player::e_character_type::Dervish, 1},
+		{s_player::e_character_type::Spartan, 2},
+		{s_player::e_character_type::Elite, 3}
+	};
 	byte representation_count = 4;
 	s_globals_group_definition::s_player_representation_block* add_representation(datum fp_hands, datum fp_body, datum tp_biped, s_player::e_character_type type, string_id variant)
 	{
@@ -33,7 +41,7 @@ namespace player_representation
 				new_rep->first_person_hands.TagIndex = fp_hands;
 			}
 			else
-				new_rep->first_person_hands = globals->player_representation[0]->first_person_hands;
+				new_rep->first_person_hands = globals->player_representation[2]->first_person_hands;
 
 			if (!DATUM_IS_NONE(fp_body))
 			{
@@ -41,7 +49,7 @@ namespace player_representation
 				new_rep->first_person_body.TagIndex = fp_body;
 			}
 			else
-				new_rep->first_person_body = globals->player_representation[0]->first_person_body;
+				new_rep->first_person_body = globals->player_representation[2]->first_person_body;
 
 			if (!DATUM_IS_NONE(tp_biped))
 			{
@@ -49,10 +57,11 @@ namespace player_representation
 				new_rep->third_person_unit.TagIndex = tp_biped;
 			}
 			else
-				new_rep->third_person_unit = globals->player_representation[0]->third_person_unit;
+				new_rep->third_person_unit = globals->player_representation[2]->third_person_unit;
 
 			if (variant != -1)
 				new_rep->third_person_variant = variant;
+			type_map.emplace(type, representation_count);
 			++representation_count;
 			return new_rep;
 		}
@@ -71,6 +80,7 @@ namespace player_representation
 			new_rep->first_person_hands = globals->player_representation[index]->first_person_hands;
 			new_rep->third_person_unit = globals->player_representation[index]->third_person_unit;
 			new_rep->third_person_variant = globals->player_representation[index]->third_person_variant;
+			type_map.emplace(newType, representation_count);
 			++representation_count;
 			return new_rep;
 		}
@@ -88,14 +98,14 @@ namespace player_representation
 		return nullptr;
 	}
 
-	datum get_object_datum_from_representation(byte representation_index)
+	datum get_object_datum_from_representation(s_player::e_character_type representation_index)
 	{
 		auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
 		if (!DATUM_IS_NONE(globals_datum))
 		{
 			auto globals = tags::get_tag_fast<s_globals_group_definition>(globals_datum);
-			if(representation_index < globals->player_representation.size)
-				return globals->player_representation[representation_index]->third_person_unit.TagIndex;
+			if(type_map.find(representation_index) != type_map.end())
+				return globals->player_representation[type_map[representation_index]]->third_person_unit.TagIndex;
 		}
 		//Maybe not the best way to do this, but there should be no situation where the spartan datum changes.
 		return 0xF28C3826;
@@ -144,6 +154,11 @@ namespace player_representation
 			else if (H2Config_spooky_boy && !Memory::isDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
+			/*if(s_player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index))->identifier == 0x000462d3a1e02a34)
+				a2->profile.player_character_type = (s_player::e_character_type)type_map[s_player::e_character_type::Kant];*/
+			/*LOG_INFO_GAME("[{}]{:x}", __FUNCTION__, usersSignInInfo[0].xuid);
+			if (usersSignInInfo[0].xuid == )
+				a2->profile.player_character_type = (s_player::e_character_type)type_map[s_player::e_character_type::Kant];*/
 
 			if ((byte)a2->profile.player_character_type > representation_count)
 				a2->profile.player_character_type = s_player::e_character_type::Spartan;
@@ -172,7 +187,9 @@ namespace player_representation
 	}
 	void on_map_load()
 	{
-		if (h2mod->GetEngineType() == Multiplayer) {
+		if (h2mod->GetEngineType() == Multiplayer) 
+		{
+			representation_count = 4;
 			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && !Memory::isDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
@@ -214,6 +231,72 @@ namespace player_representation
 			{
 				clone_representation(3, s_player::e_character_type::Flood);
 			}
+			/*auto mode_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
+			auto mode_chief_mp = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(mode_chief_mp_datum);
+			auto base_variant = mode_chief_mp->variants[0];
+			auto new_variant = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block>((unsigned long)std::addressof(mode_chief_mp->variants));
+			new_variant->name = 0xABABABA;
+			new_variant->dialogue.TagGroup = base_variant->dialogue.TagGroup;
+			new_variant->dialogue.TagIndex = base_variant->dialogue.TagIndex;
+			new_variant->runtime_model_region_0 = base_variant->runtime_model_region_0;
+			new_variant->runtime_model_region_1 = base_variant->runtime_model_region_1;
+			new_variant->runtime_model_region_2 = base_variant->runtime_model_region_2;
+			new_variant->runtime_model_region_3 = base_variant->runtime_model_region_3;
+			new_variant->runtime_model_region_4 = base_variant->runtime_model_region_4;
+			new_variant->runtime_model_region_5 = base_variant->runtime_model_region_5;
+			new_variant->runtime_model_region_6 = base_variant->runtime_model_region_6;
+			new_variant->runtime_model_region_7 = base_variant->runtime_model_region_7;
+			new_variant->runtime_model_region_8 = base_variant->runtime_model_region_8;
+			new_variant->runtime_model_region_9 = base_variant->runtime_model_region_9;
+			new_variant->runtime_model_region_10 = base_variant->runtime_model_region_10;
+			new_variant->runtime_model_region_11 = base_variant->runtime_model_region_11;
+			new_variant->runtime_model_region_12 = base_variant->runtime_model_region_12;
+			new_variant->runtime_model_region_13 = base_variant->runtime_model_region_13;
+			new_variant->runtime_model_region_14 = base_variant->runtime_model_region_14;
+			new_variant->runtime_model_region_15 = base_variant->runtime_model_region_15;
+			for (auto i = 0; i < base_variant->regions.size; i++)
+			{
+				auto region = base_variant->regions[i];
+				auto new_region = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_regions_block>((unsigned long)std::addressof(new_variant->regions));
+				new_region->region_name = region->region_name;
+				new_region->runtime_model_region_index = region->runtime_model_region_index;
+				new_region->region_runtime_flags = region->region_runtime_flags;
+				new_region->parent_variant = region->parent_variant;
+				new_region->sort_order = region->sort_order;
+				for (auto k = 0; k < region->permutations.size; k++)
+				{
+					auto permutation = region->permutations[k];
+					auto new_permutation = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_regions_block::s_permutations_block>((unsigned long)std::addressof(new_region->permutations));
+					new_permutation->permutation_name = permutation->permutation_name;
+					new_permutation->model_permutation_index = permutation->model_permutation_index;
+					new_permutation->flags = permutation->flags;
+					new_permutation->probability_0 = permutation->probability_0;
+					new_permutation->runtime_permutation_index_0 = permutation->runtime_permutation_index_0;
+					new_permutation->runtime_permutation_index_1 = permutation->runtime_permutation_index_1;
+					new_permutation->runtime_permutation_index_2 = permutation->runtime_permutation_index_2;
+					new_permutation->runtime_permutation_index_3 = permutation->runtime_permutation_index_3;
+					new_permutation->runtime_permutation_index_4 = permutation->runtime_permutation_index_4;
+					new_permutation->unk_1 = permutation->unk_1;
+					new_permutation->unk2 = permutation->unk2;
+					new_permutation->unk3 = permutation->unk3;
+				}
+			}
+
+			auto e_datum_i = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\emoji_head\\emoji_head", blam_tag::tag_group_type::scenery, "carto_shared");
+			if (!DATUM_IS_NONE(e_datum_i))
+			{
+				tag_loader::Load_tag(e_datum_i, true, "carto_shared");
+				tag_loader::Push_Back();
+				auto e_datum = tag_loader::ResolveNewDatum(e_datum_i);
+				if (!DATUM_IS_NONE(e_datum))
+				{
+					auto new_object = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(new_variant->objects));
+					new_object->parent_marker = string_id(184552154);
+					new_object->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+					new_object->child_object.TagIndex = e_datum;
+				}
+			}
+			add_representation(-1, -1, -1, s_player::e_character_type::Kant, new_variant->name);*/
 		}
 	}
 	void apply_hooks()

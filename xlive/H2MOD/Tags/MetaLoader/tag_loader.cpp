@@ -7,6 +7,10 @@
 #include "Util\filesys.h"
 #include "Util\Hooks\Hook.h"
 #include <algorithm>
+
+#include "Blam/Cache/TagGroups/weather_system_definition.hpp"
+#include "Blam/Engine/DataArray/TagDataIterator.h"
+
 //contains some game functions that returns HANDLE
 namespace global_handle_function
 {
@@ -553,7 +557,7 @@ namespace tag_loader
 			//-------------IDC anymore----------------
 		}
 		//Add them to the tables
-		
+
 		for (auto& my_inject_refs_iter : my_inject_refs)
 		{
 			if (def_meta_size)
@@ -588,6 +592,7 @@ namespace tag_loader
 			else break;
 			//meta_list.emplace(my_inject_refs_iter->new_datum, que_iter->second);//add it to the meta _list				
 		}
+		Fix_shader_templates();
 		key_list.clear();
 		my_inject_refs.clear();
 		que_meta_list.clear();
@@ -783,6 +788,13 @@ namespace tag_loader
 			*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
 			break;
 		}
+		case 'weat':
+		{
+			auto weather_tag = reinterpret_cast<s_weather_system_group_definition*>(tag_data);
+			for (auto i = 0; i < weather_tag->particle_system.size; i++)
+				((void(__cdecl*)(int*, unsigned int))Memory::GetAddress(0x2652BC))(&weather_tag->particle_system[i]->block_offset, 3u);
+			break;
+		}
 		default:
 			break;
 		}
@@ -871,6 +883,13 @@ namespace tag_loader
 			*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
 			break;
 		}
+		case 'weat':
+		{
+			auto weather_tag = reinterpret_cast<s_weather_system_group_definition*>(tag_data);
+			for (auto i = 0; i < weather_tag->particle_system.size; i++)
+				((void(__cdecl*)(int*, unsigned int))Memory::GetAddress(0x2652BC))(&weather_tag->particle_system[i]->block_offset, 3u);
+			break;
+		}
 		default:
 			break;
 		}
@@ -913,6 +932,24 @@ namespace tag_loader
 			break;
 		}
 	}
+
+	void Fix_shader_templates()
+	{
+		typedef bool(__cdecl t_init_shader_template)(int a1);
+		auto p_init_shader_template = Memory::GetAddress<t_init_shader_template*>(0x2694E6);
+		s_tag_data_iterator* stem_iterator = Memory::GetAddress<s_tag_data_iterator*>(0xA4AF10);
+		for (auto ref : injected_tag_refs)
+		{
+			auto inst = tags::get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(ref.new_datum)];
+			if (inst.type.tag_type == blam_tag::tag_group_type::shadertemplate)
+			{
+				//Change the iterators next tag datum index to the instance to force the next call to s_tag_data_iterator::get_next_datum() to return it.
+				stem_iterator->next_tag_datum = inst.datum_index;
+				p_init_shader_template(1);
+			}
+		}
+	}
+
 	//Basically created to easily transfer working tags from system to system
 	int Load_tag_module(std::string loc)
 	{

@@ -170,7 +170,9 @@ namespace imgui_handler
 			no_events_tooltip,
 			render_patch,
 			skeleton_biped,
-			skeleton_biped_tooltip
+			skeleton_biped_tooltip,
+			event_music_title,
+			event_music_tooltip
 		};
 		void BuildStringsTable();
 		char* GetString(e_advanced_string string, std::string id = "");

@@ -220,6 +220,7 @@ namespace MapSlots
 	void Initialize()
 	{
 		AddedMaps.emplace_back("highplains.map");
+		AddedMaps.emplace_back("derelict.map");
 		//AddedMaps.emplace_back("salvation.map");
 		CacheMapData();
 
