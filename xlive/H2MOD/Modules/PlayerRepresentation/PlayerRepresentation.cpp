@@ -9,7 +9,6 @@
 #include "Blam\Engine\Players\Players.h"
 #include "H2MOD.h"
 #include "Blam/Engine/Players/Players.h"
-#include "Blam/Engine/Players/Players.h"
 #include "H2MOD\EngineCalls\EngineCalls.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
