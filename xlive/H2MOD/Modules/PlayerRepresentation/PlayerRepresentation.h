@@ -23,7 +23,7 @@ namespace player_representation
 	 */
 	s_globals_group_definition::s_player_representation_block* clone_representation(int index, s_player::e_character_type newType);
 
-	datum get_object_datum_from_representation(byte representation_index);
+	datum get_object_datum_from_representation(s_player::e_character_type representation_index);
 	void apply_hooks();
 	void initialize();
 }
