@@ -178,17 +178,17 @@ namespace SpecialEvents
 					beard->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 					beard->child_object.TagIndex = santa_beard_datum;
 				}
-				auto flood_datum = player_representation::get_object_datum_from_representation(s_player::e_character_type::Flood);
-				if(!DATUM_IS_NONE(flood_datum))
-				{
-					auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(flood_datum, true);
-					auto flood_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(flood_biped->unitTag.objectTag.model.TagIndex, true);
-					auto flood_variant = flood_model->variants[0];
-					auto hat_object = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(flood_variant->objects));
-					hat_object->parent_marker = string_id(184552154);
-					hat_object->child_object.TagGroup = blam_tag::tag_group_type::scenery;
-					hat_object->child_object.TagIndex = tag_loader::ResolveNewDatum(santa_hat_datum);
-				}
+				//auto flood_datum = player_representation::get_object_datum_from_representation(s_player::e_character_type::Flood);
+				//if(!DATUM_IS_NONE(flood_datum))
+				//{
+				//	auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(flood_datum, true);
+				//	auto flood_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(flood_biped->unitTag.objectTag.model.TagIndex, true);
+				//	auto flood_variant = flood_model->variants[0];
+				//	auto hat_object = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(flood_variant->objects));
+				//	hat_object->parent_marker = string_id(184552154);
+				//	hat_object->child_object.TagGroup = blam_tag::tag_group_type::scenery;
+				//	hat_object->child_object.TagIndex = tag_loader::ResolveNewDatum(santa_hat_datum);
+				//}
 			}
 			if (!DATUM_IS_NONE(w_datum_i))
 			{
