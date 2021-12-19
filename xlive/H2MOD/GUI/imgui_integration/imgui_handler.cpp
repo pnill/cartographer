@@ -60,7 +60,7 @@ namespace imgui_handler
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	void ToggleWindow(std::string name)
+	void ToggleWindow(const std::string& name)
 	{
 		for (auto& window : windows)
 		{
@@ -81,7 +81,7 @@ namespace imgui_handler
 		}
 	}
 
-	bool IsWindowActive(std::string name)
+	bool IsWindowActive(const std::string& name)
 	{
 		for (auto& window : windows)
 		{

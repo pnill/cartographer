@@ -133,7 +133,7 @@ namespace imgui_handler
 				}
 			}
 			else {
-				ImDrawList* draw_list = ImGui::GetOverlayDrawList();
+				ImDrawList* foreground_draw_list = ImGui::GetForegroundDrawList();
 				//ImVec2 Resolution(
 				//	ImGui::GetIO().DisplaySize.x,
 				//	ImGui::GetIO().DisplaySize.y
@@ -174,8 +174,7 @@ namespace imgui_handler
 				//	(ImGui::GetIO().DisplaySize.x / 2) + (scaledx / 2),
 				//	(ImGui::GetIO().DisplaySize.y / 2) + (scaledy / 2)
 				//);
-				draw_list->AddImage((void*)imgui_handler::GetTexture(patch_notes), ImVec2(0,0), 
-					ImVec2(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y));
+				foreground_draw_list->AddImage((void*)imgui_handler::GetTexture(patch_notes), ImVec2(0, 0), ImGui::GetIO().DisplaySize);
 				/*draw_list->AddImage((void*)imgui_handler::GetImage(patch_notes), ImVec2(0, 0),
 					ImVec2(X, Y));*/
 
