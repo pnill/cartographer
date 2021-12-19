@@ -4,7 +4,7 @@
 
 #define player_identifier_size_bits CHAR_BIT * sizeof(XUID)
 
-enum e_network_message_types : int
+enum e_network_message_types : unsigned int
 {
 	ping,
 	pong,
@@ -116,18 +116,20 @@ static const char* network_message_name[] = {
 	"synchronous_gamestate",
 	"game_results",
 	"text_chat",
-	"test"
+	"test",
 
 	//custom packets bellow
-	"request_map_filename"
-	"map_file_name"
-	"team_change"
-	"rank_change"
-	"anti_cheat"
-	"custom_variant_settings"
+	"request_map_filename",
+	"map_file_name",
+	"team_change",
+	"rank_change",
+	"anti_cheat",
+	"custom_variant_settings",
+
+	"end"
 };
 
-struct __declspec(align(8)) s_custom_map_filename
+struct s_custom_map_filename
 {
 	wchar_t file_name[32];
 	int map_download_id;

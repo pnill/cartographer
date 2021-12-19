@@ -54,7 +54,7 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 	{
 		critical_network_errors_log = h2log::create("Critical Network Errors", prepareLogFileName(L"criticalNetworkErrors"), true, 0);
 
-		LOG_CRITICAL_NETWORK(DLL_VERSION_STR "\n");
+		LOG_CRITICAL_NETWORK(DLL_VERSION_STR);
 		LOG_CRITICAL_NETWORK("{} - initialized critical network log!", __FUNCTION__);
 	}
 }
@@ -564,12 +564,6 @@ int CXnIp::registerNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID*
 // basically reqPacket = nullptr, XNetXnAddrToInAddr() context, if reqPacket != nullptr, HandleXNetRequestPacket() context
 int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnkid, const XNetRequestPacket* reqPacket, IN_ADDR* outIpIdentifier)
 {
-#define NO_MORE_CONNECT_SPOTS(_function, _err) \
-	{ \
-		LOG_CRITICAL_NETWORK("{} - no more available connection spots!", (_function)); \
-		return(_err); \
-	} \
-
 	XnIp* localConnectionInfo = GetLocalUserXn();
 	if (localConnectionInfo == nullptr)
 	{
@@ -702,10 +696,9 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 	}
 	else
 	{
-		NO_MORE_CONNECT_SPOTS(__FUNCTION__, WSAENOMORE);
+		LOG_CRITICAL_NETWORK("{} - no more available connection spots!", __FUNCTION__);
+		return WSAENOMORE;
 	}
-
-#undef NO_MORE_CONNECT_SPOTS
 }
 
 void CXnIp::UnregisterXnIpIdentifier(const IN_ADDR ina)
@@ -938,6 +931,12 @@ INT WINAPI XNetCleanup()
 
 	XSocket::socketsDisposeAll();
 
+	if (critical_network_errors_log != nullptr)
+	{
+		delete critical_network_errors_log;
+		critical_network_errors_log = nullptr;
+	}
+
 	return 0;
 }
 
@@ -995,7 +994,7 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR *pxna, const XNKID *pxnkid, IN_ADDR *
 // #60: XNetInAddrToXnAddr
 INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 {
-	LOG_INFO_NETWORK("XNetInAddrToXnAddr() - connection index: {}, identifier {:x}", gXnIp.getConnectionIndex(ina), ina.s_addr);
+	LOG_INFO_NETWORK("{} - connection index: {}, identifier {:x}", __FUNCTION__, gXnIp.getConnectionIndex(ina), ina.s_addr);
 	
 	if (pxna)
 		SecureZeroMemory(pxna, sizeof(*pxna));

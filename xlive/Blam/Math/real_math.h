@@ -8,6 +8,12 @@
 
 #define degreesToRadians(angleDegrees) ((float)((angleDegrees) * M_PI / 180.0))
 
+#ifndef _DEBUG
+#define BLAM_MATH_INL __forceinline
+#else
+#define BLAM_MATH_INL 
+#endif
+
 struct real_point2d
 {
 	float x, y;
@@ -62,18 +68,23 @@ struct real_euler_angles3d
 };
 CHECK_STRUCT_SIZE(real_euler_angles3d, sizeof(angle) * 3);
 
-struct real_vector2d
-{
-	float i, j;
-};
-CHECK_STRUCT_SIZE(real_vector2d, sizeof(float) * 2);
-
 union real_vector3d
 {
 	struct { float i, j, k; };
 	struct { float x, y, z; };
 
-	real_euler_angles3d get_angle() const
+	BLAM_MATH_INL real_vector3d::real_vector3d(const float _i, const float _j, const float _k) :
+		i(_i),
+		j(_j),
+		k(_k)
+	{
+	}
+
+	BLAM_MATH_INL real_vector3d::real_vector3d() : real_vector3d(0.0f, 0.0f, 0.0f)
+	{
+	}
+
+	BLAM_MATH_INL real_euler_angles3d get_angle() const
 	{
 		real_euler_angles3d angle;
 		angle.yaw = acos(i);
@@ -82,18 +93,18 @@ union real_vector3d
 		return angle;
 	}
 
-	bool operator==(const real_vector3d& other) const
+	BLAM_MATH_INL bool operator==(const real_vector3d& other) const
 	{
 		return i == other.i && j == other.j && k == other.k;
 	}
 
-	bool operator!=(const real_vector3d& other ) const
+	BLAM_MATH_INL bool operator!=(const real_vector3d& other) const
 	{
-		return !operator==(other);
+		return !(*this == other);
 	}
 
 	// vector multiplication
-	real_vector3d operator*(const real_vector3d& other) const
+	BLAM_MATH_INL real_vector3d operator*(const real_vector3d& other) const
 	{
 		real_vector3d v;
 		v.i = this->i * other.i;
@@ -103,7 +114,7 @@ union real_vector3d
 	}
 
 	// scalar multiplication
-	real_vector3d operator*(const float& scalar) const
+	BLAM_MATH_INL real_vector3d operator*(const float& scalar) const
 	{
 		real_vector3d v;
 		v.i = this->i * scalar;
@@ -112,7 +123,7 @@ union real_vector3d
 		return v;
 	}
 
-	real_vector3d operator/(const float& scalar) const
+	BLAM_MATH_INL real_vector3d operator/(const float& scalar) const
 	{
 		real_vector3d v;
 		v.i = this->i / scalar;
@@ -122,7 +133,7 @@ union real_vector3d
 	}
 
 	// vector addition
-	real_vector3d operator+(const real_vector3d& other) const
+	BLAM_MATH_INL real_vector3d operator+(const real_vector3d& other) const
 	{
 		real_vector3d v;
 		v.i = this->i + other.i;
@@ -132,7 +143,7 @@ union real_vector3d
 	}
 
 	// vector subtraction
-	real_vector3d operator-(const real_vector3d& other) const
+	BLAM_MATH_INL real_vector3d operator-(const real_vector3d& other) const
 	{
 		real_vector3d v;
 		v.i = this->i - other.i;
@@ -140,28 +151,16 @@ union real_vector3d
 		v.k = this->k - other.k;
 		return v;
 	}
-
-	// dot product
-	float dot_product(const real_vector3d& other) const
-	{
-		return this->i * other.i + this->j * other.j + this->k * other.k;
-	}
-
-	// dot product by itself
-	float dot_product() const
-	{
-		return this->i * this->i + this->j * this->j + this->k * this->k;
-	}
-
-	// magnitude
-	float magnitude() const
-	{
-		return sqrt(i * i + j * j + k * k);
-	}
 };
 CHECK_STRUCT_SIZE(real_vector3d, sizeof(float) * 3);
 
 typedef real_vector3d real_point3d;
+
+struct real_vector2d
+{
+	float i, j;
+};
+CHECK_STRUCT_SIZE(real_vector2d, sizeof(float) * 2);
 
 struct real_plane2d
 {
@@ -319,23 +318,5 @@ struct real_color_rgb
 	}
 };
 CHECK_STRUCT_SIZE(real_color_rgb, sizeof(float) * 3);
-
-static float normalize3d(real_vector3d *a1)
-{
-	return Memory::GetAddressRelative<float(__cdecl*)(real_vector3d*)>(0x429359, 0x4273B0)(a1);
-}
-
-static bool limit3d(void* a1, float limit)
-{
-	real_vector3d* v1 = (real_vector3d*)a1;
-
-	float dot_product = v1->dot_product(*v1);
-
-	if (dot_product <= pow(limit, 2.0f))
-		return false;
-
-	*v1 = *v1 * ((1.0f / sqrt(dot_product)) * limit);
-	return true;
-}
 
 static const real_vector3d global_zero_vector3d = { 0.0f, 0.0f, 0.0f };

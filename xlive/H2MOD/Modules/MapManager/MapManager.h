@@ -6,10 +6,10 @@
 */
 class MapDownloadQuery {
 public:
-	MapDownloadQuery::MapDownloadQuery(std::wstring& _mapToDownload, int _downloadId);
+	MapDownloadQuery::MapDownloadQuery(const std::wstring& _mapToDownload, int _downloadId);
 	MapDownloadQuery::~MapDownloadQuery();
 
-	void SetMapNameToDownload(std::wstring& mapNameToDownload);
+	void SetMapNameToDownload(const std::wstring& mapNameToDownload);
 	void SetMapNameToDownload(const wchar_t* mapNameToDownload);
 
 	int GetDownloadPercentage();
@@ -40,7 +40,7 @@ class MapManager {
 public:
 	//client and server functions below
 	void reloadAllMaps();
-	bool loadMapInfo(std::wstring& mapFileLocation);
+	bool loadMapInfo(const std::wstring& mapFileLocation);
 
 	//client functions/data below
 	void applyHooks();
@@ -48,9 +48,9 @@ public:
 	//server functions below
 	void getMapFilename(std::wstring& buffer);
 
-	std::shared_ptr<MapDownloadQuery> addDownloadQuery(std::wstring mapToDownload)
+	std::shared_ptr<MapDownloadQuery> addDownloadQuery(const std::wstring& mapToDownload)
 	{
-		m_mapDownloadQueryList.push_back(std::shared_ptr<MapDownloadQuery>(new MapDownloadQuery(mapToDownload, rand())));
+		m_mapDownloadQueryList.push_back(std::make_shared<MapDownloadQuery>(mapToDownload, rand()));
 		return getLastDownloadQueryAdded();
 	}
 

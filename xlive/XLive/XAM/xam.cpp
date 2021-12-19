@@ -28,7 +28,7 @@ HANDLE WINAPI XNotifyCreateListener(ULONGLONG qwAreas)
 
 	InitializeCriticalSection(&g_listener[listenerIndex].lock);
 
-	LOG_TRACE_XLIVE("XNotifyCreateListener({:x}), ", qwAreas);
+	LOG_TRACE_XLIVE("XNotifyCreateListener({:X}), ", qwAreas);
 	LOG_TRACE_XLIVE(" - handle: {:p}", (void*)g_listener[listenerIndex].id);
 	SetEvent(g_listener[listenerIndex].id);
 

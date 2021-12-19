@@ -14,6 +14,7 @@
 #include "H2MOD\Modules\Updater\Updater.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "H2MOD\Tags\TagInterface.h"
+#include "H2MOD\Modules\RunLoop\RunLoop.h"
 #include "Util\Hooks\Hook.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
 
@@ -1779,8 +1780,7 @@ static bool CMButtonHandler_EditFPS(int button_id) {
 			H2Config_fps_limit = 60;
 	}
 	
-	extern std::chrono::high_resolution_clock::duration desiredRenderTime;
-	desiredRenderTime = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(std::chrono::duration<double>(1.0 / (double)H2Config_fps_limit));
+	SET_DESIRED_RENDER_TIME();
 
 	loadLabelFPSLimit();
 	return false;

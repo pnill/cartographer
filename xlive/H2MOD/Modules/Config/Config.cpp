@@ -575,7 +575,7 @@ void SaveH2Config() {
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "login_password", H2Config_login_password);
 			ini.SetValue(H2ConfigVersionSection.c_str(), "stats_auth_key", H2Config_stats_authkey,
-				"#DO NOT CHANGE THIS OR YOUR SERVER WILL NO LONGER TRACK STATS");
+				"# DO NOT CHANGE THIS OR YOUR SERVER WILL NO LONGER TRACK STATS");
 			ini.SetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str, 
 				"# teams_enabled_bit_flags (Server)"
 				"\n# By default, the game reads team bitflags from the current map."
@@ -883,7 +883,7 @@ void ReadH2Config() {
 				}
 
 				const char* stats_authkey = ini.GetValue(H2ConfigVersionSection.c_str(), "stats_auth_key", H2Config_stats_authkey);
-				if(stats_authkey) {
+				if (stats_authkey) {
 					strncpy(H2Config_stats_authkey, stats_authkey, sizeof(H2Config_stats_authkey) - 1); // - 1 for the null character
 				}
 
@@ -891,21 +891,35 @@ void ReadH2Config() {
 				if (!team_bit_mask.empty())
 				{
 					strncpy_s(H2Config_team_bit_flags_str, sizeof(H2Config_team_bit_flags_str), team_bit_mask.c_str(), 15);
-					size_t last_offset = 0;
-					size_t occurance_offset = 0;
 					H2Config_team_bit_flags = 0;
-					for (int i = 0; i < 8; i++)
+					memset(H2Config_team_flag_array, 0, sizeof(H2Config_team_flag_array));
+
+					size_t true_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '1');
+					size_t false_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '0');
+
+					const char team_bit_to_find[] = "01";
+					size_t occurance_offset;
+					occurance_offset = team_bit_mask.find_first_of(team_bit_to_find, 0);
+
+					// TODO move to function
+					// validate first
+					if (true_bit_value_count + false_bit_value_count == 8
+						&& occurance_offset != std::string::npos)
 					{
-						occurance_offset = team_bit_mask.find_first_not_of("-", last_offset);
-						last_offset += 2;
-						if (occurance_offset != std::string::npos 
-							&& team_bit_mask.substr(occurance_offset, 1) == "1") // check if the team is enabled
+						// then loop
+						for (int i = 0; i < 8; i++)
 						{
-							H2Config_team_bit_flags |= FLAG(i); // if so, enable the flag
-							H2Config_team_flag_array[i] = true;
-							H2Config_team_enabled_count++;
-						} else
-							H2Config_team_flag_array[i] = false;
+							if (team_bit_mask.at(occurance_offset) == '1') // check if the team is enabled
+							{
+								H2Config_team_bit_flags |= FLAG(i); // if so, enable the flag
+								H2Config_team_flag_array[i] = true;
+								H2Config_team_enabled_count++;
+							}
+
+							occurance_offset = team_bit_mask.find_first_of(team_bit_to_find, occurance_offset + 1);
+							if (occurance_offset == std::string::npos)
+								break;
+						}
 					}
 				}
 			}

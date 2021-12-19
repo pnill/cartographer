@@ -18,7 +18,7 @@ h2log::h2log(const std::string& name)
 
 h2log::~h2log()
 {
-	if (is_valid()) output->info("End of log");
+	if (is_valid()) output->info("End of log\n");
 	output = nullptr;
 }
 
