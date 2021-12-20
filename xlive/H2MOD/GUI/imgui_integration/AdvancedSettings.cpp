@@ -870,7 +870,7 @@ namespace imgui_handler {
 				}
 			}
 		}
-		char* GetString(e_advanced_string string, std::string id)
+		char* GetString(e_advanced_string string, const std::string& id)
 		{
 			if (string_table.count(H2Config_language.code_main))
 			{

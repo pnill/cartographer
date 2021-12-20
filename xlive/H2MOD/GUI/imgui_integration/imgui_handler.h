@@ -175,7 +175,7 @@ namespace imgui_handler
 			event_music_tooltip
 		};
 		void BuildStringsTable();
-		char* GetString(e_advanced_string string, std::string id = "");
+		char* GetString(e_advanced_string string, const std::string& id = "");
 		void Render(bool* p_open);
 		void Open();
 		void Close();

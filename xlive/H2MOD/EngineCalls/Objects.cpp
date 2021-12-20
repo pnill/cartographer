@@ -58,7 +58,7 @@ namespace EngineCalls::Objects
 		if (biped_object != NULL)
 		{
 			biped_object->variant_name = variant_index;
-			addDebugText("set the variant data to: %u for biped", variant_index);
+			// addDebugText("set the variant data to: %u for biped", variant_index);
 		}
 	}
 
