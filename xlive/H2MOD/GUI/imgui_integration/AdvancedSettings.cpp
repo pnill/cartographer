@@ -874,34 +874,32 @@ namespace imgui_handler {
 		{
 			if (string_table.count(H2Config_language.code_main))
 			{
-				if (id.empty()) {
-					return const_cast<char*>(string_table.at(H2Config_language.code_main).at(string));
-				}
+				if (string_table.at(H2Config_language.code_main).count(string)) {
+					if (id.empty()) {
+						return const_cast<char*>(string_table.at(H2Config_language.code_main).at(string));
+					}
 
-				if(!string_cache.count(id))
-				{
-					std::string temp_str(const_cast<char*>(string_table.at(H2Config_language.code_main).at(string)));
-					temp_str.append("##");
-					temp_str.append(id);
-					string_cache[id] = temp_str;
+					if (!string_cache.count(id))
+					{
+						std::string temp_str(const_cast<char*>(string_table.at(H2Config_language.code_main).at(string)));
+						temp_str.append("##");
+						temp_str.append(id);
+						string_cache[id] = temp_str;
+					}
+					return (char*)string_cache[id].c_str();
 				}
-				return (char*)string_cache[id].c_str();
-
 			}
-			else
+			if (id.empty()) {
+				return const_cast<char*>(string_table.at(0).at(string));
+			}
+			if (!string_cache.count(id))
 			{
-				if (id.empty()) {
-					return const_cast<char*>(string_table.at(0).at(string));
-				}
-				if (!string_cache.count(id))
-				{
-					std::string temp_str(const_cast<char*>(string_table.at(0).at(string)));
-					temp_str.append("##");
-					temp_str.append(id);
-					string_cache[id] = temp_str;
-				}
-				return (char*)string_cache[id].c_str();
+				std::string temp_str(const_cast<char*>(string_table.at(0).at(string)));
+				temp_str.append("##");
+				temp_str.append(id);
+				string_cache[id] = temp_str;
 			}
+			return (char*)string_cache[id].c_str();
 		}
 		void Render(bool* p_open)
 		{
@@ -1328,6 +1326,9 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::render_patch] = "Limitador de velocidad de FPS original";
 			string_table[4][e_advanced_string::skeleton_biped] = "Juega como Spooky boy";
 			string_table[4][e_advanced_string::skeleton_biped_tooltip] = "Cambia a tu bípedo para que sea un esqueleto espeluznante y aterrador para el evento de Halloween.";
+			string_table[4][e_advanced_string::event_music_title] = "Música para eventos";
+			string_table[4][e_advanced_string::event_music_tooltip] = "Alterna la música del evento";
+
 		}
 	}
 }
