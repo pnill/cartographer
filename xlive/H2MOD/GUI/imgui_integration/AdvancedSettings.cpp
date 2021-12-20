@@ -41,7 +41,7 @@ namespace imgui_handler {
 			std::map<std::string, std::string> string_cache;
 			void DrawDeadzones()
 			{
-				ImDrawList* draw_list = ImGui::GetOverlayDrawList();
+				ImDrawList* draw_list = ImGui::GetForegroundDrawList();
 				ImVec2 Center(
 					ImGui::GetIO().DisplaySize.x - 200,
 					ImGui::GetIO().DisplaySize.y - 200
@@ -166,7 +166,7 @@ namespace imgui_handler {
 					if (ImGui::IsItemEdited())
 						HudElements::setCrosshairPos();
 					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputFloat("##Crosshair2", &H2Config_crosshair_offset, 0, 110, 3); ImGui::SameLine();
+					ImGui::InputFloat("##Crosshair2", &H2Config_crosshair_offset, 0, 110, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						if (H2Config_crosshair_offset > 0.5)
 							H2Config_crosshair_offset = 0.5;
@@ -190,7 +190,7 @@ namespace imgui_handler {
 					if (ImGui::IsItemEdited())
 						HudElements::setCrosshairSize();
 					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputFloat("##CrosshairSize2", &H2Config_crosshair_scale, 0, 110, 3); ImGui::SameLine();
+					ImGui::InputFloat("##CrosshairSize2", &H2Config_crosshair_scale, 0, 110, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						if (H2Config_crosshair_scale > 2)
 							H2Config_crosshair_scale = 2;
@@ -359,7 +359,7 @@ namespace imgui_handler {
 							H2Config_raw_mouse_scale = (float)g_raw_scale;
 						}
 						ImGui::PushItemWidth(WidthPercentage(15));
-						ImGui::InputFloat("##RawMouseScale2", &H2Config_raw_mouse_scale, 0, 110, 5, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+						ImGui::InputFloat("##RawMouseScale2", &H2Config_raw_mouse_scale, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 						if (ImGui::IsItemEdited()) {
 							if (g_raw_scale > 100)
 								g_raw_scale = 100;
@@ -386,7 +386,7 @@ namespace imgui_handler {
 							MouseInput::SetSensitivity(H2Config_mouse_sens);
 						}
 						ImGui::PushItemWidth(WidthPercentage(15));
-						ImGui::InputFloat("##Mousesens2", &H2Config_mouse_sens, 0, 110, 5, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+						ImGui::InputFloat("##Mousesens2", &H2Config_mouse_sens, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 						if (ImGui::IsItemEdited()) {
 							if (g_mouse_sens > 100)
 								g_mouse_sens = 100;
@@ -437,7 +437,7 @@ namespace imgui_handler {
 						ControllerInput::SetSensitiviy(H2Config_controller_sens);
 					}
 					ImGui::PushItemWidth(WidthPercentage(15));
-					ImGui::InputFloat("##Controllersens2", &H2Config_controller_sens, 0, 110, 5, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+					ImGui::InputFloat("##Controllersens2", &H2Config_controller_sens, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						if (g_controller_sens > 100)
 							g_controller_sens = 100;
@@ -918,9 +918,9 @@ namespace imgui_handler {
 				g_init = true;
 			}
 			ImGuiIO& io = ImGui::GetIO();
-			RECT rect;
-			::GetClientRect(get_HWND(), &rect);
-			io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
+			RECT clientRect;
+			::GetClientRect(get_HWND(), &clientRect);
+			io.DisplaySize = ImVec2((float)(clientRect.right - clientRect.left), (float)(clientRect.bottom - clientRect.top));
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoCollapse;
 			window_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;

@@ -21,7 +21,7 @@ namespace imgui_handler
 				ImGui::GetIO().DisplaySize.x,
 				ImGui::GetIO().DisplaySize.y);
 
-			ImDrawList* draw_list = ImGui::GetOverlayDrawList();
+			ImDrawList* draw_list = ImGui::GetForegroundDrawList();
 
 			//draw_list->AddText(ImGui::GetDefaultFont(), 20, ImVec2(50, 200), ImColor(0, 0, 0), "Banana");
 			int index = 0;
