@@ -211,7 +211,7 @@ namespace imgui_handler {
 					ImVec2 b3_size = ImVec2(WidthPercentage(33.3333333333f), item_size.y);
 					ImGui::NewLine();
 					//Ingame Change Display
-					ImGui::Columns(2, "", false);
+					ImGui::Columns(2, NULL, false);
 
 					ImGui::Checkbox(GetString(hide_ingame_chat), &H2Config_hide_ingame_chat);
 					ImGui::NextColumn();
@@ -240,7 +240,7 @@ namespace imgui_handler {
 					ImVec2 LargestText = ImGui::CalcTextSize(GetString(hires_fix), NULL, true);
 					float float_offset = ImGui::GetCursorPosX() + LargestText.x + (LargestText.x * 0.075);
 					//FPS Limit
-					ImGui::Columns(2, "", false);
+					ImGui::Columns(2, NULL, false);
 					ImGui::Text(GetString(fps_limit));
 					ImGui::PushItemWidth(WidthPercentage(50));
 					ImGui::InputInt("##FPS1", &H2Config_fps_limit, 0, 110);
@@ -327,7 +327,7 @@ namespace imgui_handler {
 				ImVec2 item_size = ImGui::GetItemRectSize();
 				if (ImGui::CollapsingHeader(GetString(m_k_title)))
 				{
-					ImGui::Columns(2, "", false);
+					ImGui::Columns(2, NULL, false);
 
 					//Raw Input
 					TextVerticalPad(GetString(raw_mouse));
@@ -413,7 +413,7 @@ namespace imgui_handler {
 				if (ImGui::CollapsingHeader(GetString(controller_title)))
 				{
 					DrawDeadzones();
-					ImGui::Columns(2, "", false);
+					ImGui::Columns(2, NULL, false);
 					//Uniform Sensitivity
 					TextVerticalPad(GetString(uniform_sensitivity));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
@@ -457,7 +457,7 @@ namespace imgui_handler {
 					}
 					ImGui::PopItemWidth();
 
-					ImGui::Columns(2, "", false);
+					ImGui::Columns(2, NULL, false);
 					ImGui::Text(GetString(aiming_type));
 					const char* a_items[] = { GetString(e_default), GetString(modern) };
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());
@@ -576,7 +576,7 @@ namespace imgui_handler {
 					ImGui::NewLine();
 					ImGui::TextWrapped("To use this you must have your games controller layout SET TO DEFAULT. Changing the drop down for the specific action will remap the button to the new one");
 					ImGui::NewLine();
-					ImGui::Columns(3, "", false);
+					ImGui::Columns(3, NULL, false);
 					for (auto i = 0; i < 14; i++) 
 					{
 						ImGui::Text(button_items[i]);
@@ -641,7 +641,7 @@ namespace imgui_handler {
 				if (NetworkSession::localPeerIsSessionHost() || h2mod->GetEngineType() == e_engine_type::SinglePlayer) {
 					if (ImGui::CollapsingHeader(GetString(host_campagin_settings)))
 					{
-						ImGui::Columns(2, "", false);
+						ImGui::Columns(2, NULL, false);
 						TextVerticalPad(GetString(anti_cheat));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						if (ImGui::Checkbox("##Anti-Cheat", &H2Config_anti_cheat_enabled))
@@ -666,7 +666,7 @@ namespace imgui_handler {
 						ImGui::Columns(1);
 						ImGui::Separator();
 						auto Skulls = reinterpret_cast<skull_enabled_flags*>(Memory::GetAddress(0x4D8320));
-						ImGui::Columns(3, "", false);
+						ImGui::Columns(3, NULL, false);
 
 						TextVerticalPad(GetString(skull_anger));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
@@ -794,21 +794,11 @@ namespace imgui_handler {
 			{
 				if (ImGui::CollapsingHeader(GetString(game_title)))
 				{
-					ImGui::Columns(2, "", false);
+					ImGui::Columns(2, NULL, false);
 
 					TextVerticalPad(GetString(discord_presence));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##DRP", &H2Config_discord_enable);
-
-					ImGui::NextColumn();
-
-					//Skip Intro
-					TextVerticalPad(GetString(disable_intro_videos));
-					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##Intro", &H2Config_skip_intro);
-
-					ImGui::NextColumn();
-
 
 					TextVerticalPad(GetString(upnp_title));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
@@ -817,18 +807,6 @@ namespace imgui_handler {
 					{
 						ImGui::SetTooltip(GetString(upnp_tooltip));
 					}
-
-					ImGui::NextColumn();
-
-					TextVerticalPad(GetString(melee_fix_title));
-					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##melee_fix", &H2Config_melee_fix);
-					if (ImGui::IsItemEdited())
-						MeleeFix::MeleeCollisionPatch();
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(GetString(melee_fix_tooltip));
-
-					ImGui::NextColumn();
 
 					TextVerticalPad(GetString(no_events_title));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
@@ -850,6 +828,23 @@ namespace imgui_handler {
 							ImGui::SetTooltip(GetString(skeleton_biped_tooltip));
 					}
 
+					// next column elements now
+					//Skip Intro
+					ImGui::NextColumn();
+					TextVerticalPad(GetString(disable_intro_videos));
+					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+					ImGui::Checkbox("##Intro", &H2Config_skip_intro);
+
+#if 0
+					ImGui::NextColumn();
+					TextVerticalPad(GetString(melee_fix_title));
+					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+					ImGui::Checkbox("##melee_fix", &H2Config_melee_fix);
+					if (ImGui::IsItemEdited())
+						MeleeFix::MeleeCollisionPatch();
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(GetString(melee_fix_tooltip));
+#endif
 
 					ImGui::Columns(1);
 
@@ -992,7 +987,7 @@ namespace imgui_handler {
 						}
 					}
 					if (ImGui::CollapsingHeader("Raster Layers")) {
-						ImGui::Columns(4, "", false);
+						ImGui::Columns(4, NULL, false);
 						for (auto i = 0; i < 25; i++)
 						{
 							if (ImGui::Checkbox(IntToString<int>(i).c_str(), &ras_layer_overrides[i]))
@@ -1005,7 +1000,7 @@ namespace imgui_handler {
 					}
 					if(ImGui::CollapsingHeader("Render Geometries"))
 					{
-						ImGui::Columns(4, "", false);
+						ImGui::Columns(4, NULL, false);
 						for(auto i = 0; i < 24; i++)
 						{
 							ImGui::Checkbox(IntToString<int>(i).c_str(), &geo_render_overrides[i]);
