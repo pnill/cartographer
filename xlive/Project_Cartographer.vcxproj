@@ -270,9 +270,12 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp" />
+    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_demo.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
@@ -290,7 +293,7 @@
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\debug_overlay.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_handler.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\MessageBox.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\MOTD.cpp" />
@@ -420,6 +423,8 @@
     <ClInclude Include="3rdparty\detours\include\detver.h" />
     <ClInclude Include="3rdparty\discord\discord_register.h" />
     <ClInclude Include="3rdparty\discord\discord_rpc.h" />
+    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
+    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="3rdparty\imgui\imconfig.h" />
     <ClInclude Include="3rdparty\imgui\imgui.h" />
     <ClInclude Include="3rdparty\imgui\imgui_internal.h" />
@@ -588,8 +593,8 @@
     <ClInclude Include="Blam\Math\real_vector3d.h" />
     <ClInclude Include="H2MOD\EngineCalls\EngineCalls.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_handler.h" />
-    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h" />
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
