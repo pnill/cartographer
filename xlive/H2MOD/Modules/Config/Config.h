@@ -85,6 +85,9 @@ extern float H2Config_Deadzone_A_Y;
 extern float H2Config_Deadzone_Radial;
 extern __int16 H2Config_refresh_rate;
 extern bool H2Config_hiresfix;
+extern bool H2Config_shader_lod_max;
+extern bool H2Config_light_suppressor;
+extern bool H2Config_Uncapped_Cinematics;
 extern bool H2Config_d3dex;
 extern float H2Config_crosshair_offset;
 extern bool H2Config_disable_ingame_keyboard;
@@ -138,6 +141,7 @@ extern ControllerInput::CustomControllerLayout H2Config_CustomLayout;
 
 extern e_override_texture_resolution H2Config_Override_Shadows;
 extern e_override_texture_resolution H2Config_Override_Water;
+extern e_override_texture_resolution H2Config_Override_ScreenFX;
 
 extern bool H2Config_upnp_enable;
 extern bool H2Config_melee_fix;
