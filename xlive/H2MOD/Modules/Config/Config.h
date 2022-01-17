@@ -141,7 +141,6 @@ extern ControllerInput::CustomControllerLayout H2Config_CustomLayout;
 
 extern e_override_texture_resolution H2Config_Override_Shadows;
 extern e_override_texture_resolution H2Config_Override_Water;
-extern e_override_texture_resolution H2Config_Override_ScreenFX;
 
 extern bool H2Config_upnp_enable;
 extern bool H2Config_melee_fix;
