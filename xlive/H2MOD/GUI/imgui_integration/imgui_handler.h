@@ -200,4 +200,23 @@ namespace imgui_handler
 		void Open();
 		void Close();
 	}
+	namespace WeaponOffsets
+	{
+		enum e_weapon_offsets_string : int
+		{
+			title,
+			magnum_title,
+			sniper_title,
+			smg_title,
+			weapon_offset_x,
+			weapon_offset_y,
+			weapon_offset_z,
+			reset
+		};
+		void BuildStringsTable();
+		char* GetString(e_weapon_offsets_string string, const std::string& id = "");
+		void Render(bool* p_open);
+		void Open();
+		void Close();
+	}
 }
