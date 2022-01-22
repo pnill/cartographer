@@ -1,8 +1,5 @@
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
-#include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\Input\PlayerControl.h"
-#include "imgui.h"
 #include "imgui_handler.h"
 #include "Util\Hooks\Hook.h"
 #include "H2MOD\Tags\TagInterface.h"
@@ -27,16 +24,16 @@ namespace imgui_handler {
 				ImVec2 item_size = ImGui::GetItemRectSize();
 				if (ImGui::CollapsingHeader(GetString(magnum_title)))
 				{
-					ImVec2 b2_size = ImVec2(WidthPercentage(10), item_size.y);
+					ImVec2 b2_size = ImVec2(WidthPercentage(20), item_size.y);
 
 					//Weapon Offset X
 					ImGui::Text(GetString(weapon_offset_x));
-					ImGui::PushItemWidth(WidthPercentage(80));
+					ImGui::PushItemWidth(WidthPercentage(60));
 					ImGui::SliderFloat("##MagnumOffsetX1", &H2Config_Magnum_WeaponOffsetX, -0.15, 0.15, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
 						magnum_tag->first_person_weapon_offset_i = H2Config_Magnum_WeaponOffsetX;
 
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					ImGui::InputFloat("##MagnumOffsetX2", &H2Config_Magnum_WeaponOffsetX, -0.15, 0.15, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						if (H2Config_Magnum_WeaponOffsetX > 0.15)
@@ -46,7 +43,7 @@ namespace imgui_handler {
 
 						magnum_tag->first_person_weapon_offset_i = H2Config_Magnum_WeaponOffsetX;
 					}
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					if (ImGui::Button(GetString(reset, "MagnumOffsetX3"), b2_size))
 					{
 						H2Config_Magnum_WeaponOffsetX = 0.03;
@@ -57,12 +54,12 @@ namespace imgui_handler {
 
 					//Weapon Offset Y
 					ImGui::Text(GetString(weapon_offset_y));
-					ImGui::PushItemWidth(WidthPercentage(80));
+					ImGui::PushItemWidth(WidthPercentage(60));
 					ImGui::SliderFloat("##MagnumOffsetY1", &H2Config_Magnum_WeaponOffsetY, -0.15, 0.15, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
 						magnum_tag->first_person_weapon_offset_j = H2Config_Magnum_WeaponOffsetY;
 
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					ImGui::InputFloat("##MagnumOffsetY2", &H2Config_Magnum_WeaponOffsetY, -0.15, 0.15, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						if (H2Config_Magnum_WeaponOffsetY > 0.15)
@@ -72,7 +69,7 @@ namespace imgui_handler {
 
 						magnum_tag->first_person_weapon_offset_j = H2Config_Magnum_WeaponOffsetY;
 					}
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					if (ImGui::Button(GetString(reset, "MagnumOffsetY3"), b2_size))
 					{
 						H2Config_Magnum_WeaponOffsetY = 0;
@@ -82,12 +79,12 @@ namespace imgui_handler {
 
 					//Weapon Offset Z
 					ImGui::Text(GetString(weapon_offset_z));
-					ImGui::PushItemWidth(WidthPercentage(80));
+					ImGui::PushItemWidth(WidthPercentage(60));
 					ImGui::SliderFloat("##MagnumOffsetZ1", &H2Config_Magnum_WeaponOffsetZ, -0.15, 0.15, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
 						magnum_tag->first_person_weapon_offset_k = H2Config_Magnum_WeaponOffsetZ;
 
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					ImGui::InputFloat("##MagnumOffsetZ2", &H2Config_Magnum_WeaponOffsetZ, -0.15, 0.15, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						if (H2Config_Magnum_WeaponOffsetZ > 0.15)
@@ -97,7 +94,7 @@ namespace imgui_handler {
 
 						magnum_tag->first_person_weapon_offset_k = H2Config_Magnum_WeaponOffsetZ;
 					}
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					if (ImGui::Button(GetString(reset, "MagnumOffsetZ3"), b2_size))
 					{
 						H2Config_Magnum_WeaponOffsetZ = -0.005;
@@ -109,16 +106,16 @@ namespace imgui_handler {
 				}
 				if (ImGui::CollapsingHeader(GetString(smg_title)))
 				{
-					ImVec2 b2_size = ImVec2(WidthPercentage(10), item_size.y);
+					ImVec2 b2_size = ImVec2(WidthPercentage(20), item_size.y);
 
 					//Weapon Offset X
 					ImGui::Text(GetString(weapon_offset_x));
-					ImGui::PushItemWidth(WidthPercentage(80));
+					ImGui::PushItemWidth(WidthPercentage(60));
 					ImGui::SliderFloat("##SMGOffsetX1", &H2Config_SMG_WeaponOffsetX, -0.15, 0.15, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
 						smg_tag->first_person_weapon_offset_i = H2Config_SMG_WeaponOffsetX;
 
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					ImGui::InputFloat("##SMGOffsetX2", &H2Config_SMG_WeaponOffsetX, -0.15, 0.15, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						if (H2Config_SMG_WeaponOffsetX > 0.15)
@@ -128,7 +125,7 @@ namespace imgui_handler {
 
 						smg_tag->first_person_weapon_offset_i = H2Config_SMG_WeaponOffsetX;
 					}
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					if (ImGui::Button(GetString(reset, "SMGOffsetX3"), b2_size))
 					{
 						H2Config_SMG_WeaponOffsetX = 0.02;
@@ -139,12 +136,12 @@ namespace imgui_handler {
 
 					//Weapon Offset Y
 					ImGui::Text(GetString(weapon_offset_y));
-					ImGui::PushItemWidth(WidthPercentage(80));
+					ImGui::PushItemWidth(WidthPercentage(60));
 					ImGui::SliderFloat("##SMGOffsetY1", &H2Config_SMG_WeaponOffsetY, -0.15, 0.15, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
 						smg_tag->first_person_weapon_offset_j = H2Config_SMG_WeaponOffsetY;
 
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					ImGui::InputFloat("##SMGOffsetY2", &H2Config_SMG_WeaponOffsetY, -0.15, 0.15, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						if (H2Config_SMG_WeaponOffsetY > 0.15)
@@ -154,7 +151,7 @@ namespace imgui_handler {
 
 						smg_tag->first_person_weapon_offset_j = H2Config_SMG_WeaponOffsetY;
 					}
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					if (ImGui::Button(GetString(reset, "SMGOffsetY3"), b2_size))
 					{
 						H2Config_SMG_WeaponOffsetY = 0;
@@ -164,12 +161,12 @@ namespace imgui_handler {
 
 					//Weapon Offset Z
 					ImGui::Text(GetString(weapon_offset_z));
-					ImGui::PushItemWidth(WidthPercentage(80));
+					ImGui::PushItemWidth(WidthPercentage(60));
 					ImGui::SliderFloat("##SMGOffsetZ1", &H2Config_SMG_WeaponOffsetZ, -0.15, 0.15, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
 						smg_tag->first_person_weapon_offset_k = H2Config_SMG_WeaponOffsetZ;
 
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					ImGui::InputFloat("##SMGOffsetZ2", &H2Config_SMG_WeaponOffsetZ, -0.15, 0.15, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						if (H2Config_SMG_WeaponOffsetZ > 0.15)
@@ -179,7 +176,7 @@ namespace imgui_handler {
 
 						smg_tag->first_person_weapon_offset_k = H2Config_SMG_WeaponOffsetZ;
 					}
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					if (ImGui::Button(GetString(reset, "SMGOffsetZ3"), b2_size))
 					{
 						H2Config_SMG_WeaponOffsetZ = 0;
@@ -191,16 +188,16 @@ namespace imgui_handler {
 				}
 				if (ImGui::CollapsingHeader(GetString(sniper_title)))
 				{
-					ImVec2 b2_size = ImVec2(WidthPercentage(10), item_size.y);
+					ImVec2 b2_size = ImVec2(WidthPercentage(20), item_size.y);
 
 					//Weapon Offset X
 					ImGui::Text(GetString(weapon_offset_x));
-					ImGui::PushItemWidth(WidthPercentage(80));
+					ImGui::PushItemWidth(WidthPercentage(60));
 					ImGui::SliderFloat("##SniperOffsetX1", &H2Config_Sniper_WeaponOffsetX, -0.15, 0.15, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
 						sniper_tag->first_person_weapon_offset_i = H2Config_Sniper_WeaponOffsetX;
 
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					ImGui::InputFloat("##SniperOffsetX2", &H2Config_Sniper_WeaponOffsetX, -0.15, 0.15, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						if (H2Config_Sniper_WeaponOffsetX > 0.15)
@@ -210,7 +207,7 @@ namespace imgui_handler {
 
 						sniper_tag->first_person_weapon_offset_i = H2Config_Sniper_WeaponOffsetX;
 					}
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					if (ImGui::Button(GetString(reset, "SniperOffsetX3"), b2_size))
 					{
 						H2Config_Sniper_WeaponOffsetX = 0.01;
@@ -221,12 +218,12 @@ namespace imgui_handler {
 
 					//Weapon Offset Y
 					ImGui::Text(GetString(weapon_offset_y));
-					ImGui::PushItemWidth(WidthPercentage(80));
+					ImGui::PushItemWidth(WidthPercentage(60));
 					ImGui::SliderFloat("##SniperOffsetY1", &H2Config_Sniper_WeaponOffsetY, -0.15, 0.15, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
 						sniper_tag->first_person_weapon_offset_j = H2Config_Sniper_WeaponOffsetY;
 
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					ImGui::InputFloat("##SniperOffsetY2", &H2Config_Sniper_WeaponOffsetY, -0.15, 0.15, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						if (H2Config_Sniper_WeaponOffsetY > 0.15)
@@ -236,7 +233,7 @@ namespace imgui_handler {
 
 						sniper_tag->first_person_weapon_offset_j = H2Config_Sniper_WeaponOffsetY;
 					}
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					if (ImGui::Button(GetString(reset, "SniperOffsetY3"), b2_size))
 					{
 						H2Config_Sniper_WeaponOffsetY = 0;
@@ -246,12 +243,12 @@ namespace imgui_handler {
 
 					//Weapon Offset Z
 					ImGui::Text(GetString(weapon_offset_z));
-					ImGui::PushItemWidth(WidthPercentage(80));
+					ImGui::PushItemWidth(WidthPercentage(60));
 					ImGui::SliderFloat("##SniperOffsetZ1", &H2Config_Sniper_WeaponOffsetZ, -0.15, 0.15, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
 						sniper_tag->first_person_weapon_offset_k = H2Config_Sniper_WeaponOffsetZ;
 
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					ImGui::InputFloat("##SniperOffsetZ2", &H2Config_Sniper_WeaponOffsetZ, -0.15, 0.15, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						if (H2Config_Sniper_WeaponOffsetZ > 0.15)
@@ -261,7 +258,7 @@ namespace imgui_handler {
 
 						sniper_tag->first_person_weapon_offset_k = H2Config_Sniper_WeaponOffsetZ;
 					}
-					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::PushItemWidth(WidthPercentage(20));
 					if (ImGui::Button(GetString(reset, "SniperOffsetZ3"), b2_size))
 					{
 						H2Config_Sniper_WeaponOffsetZ = 0;
@@ -315,8 +312,8 @@ namespace imgui_handler {
 			window_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
 			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
-			ImGui::SetNextWindowSize(ImVec2(650, 530), ImGuiCond_Appearing);
-			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
+			ImGui::SetNextWindowSize(ImVec2(450, 530), ImGuiCond_Appearing);
+			ImGui::SetNextWindowSizeConstraints(ImVec2(410, 530), ImVec2(1920, 1080));
 			if (h2mod->GetEngineType() == MainMenu)
 				ImGui::SetNextWindowBgAlpha(1);
 			if (ImGui::Begin(GetString(e_weapon_offsets_string::title), p_open, window_flags))
