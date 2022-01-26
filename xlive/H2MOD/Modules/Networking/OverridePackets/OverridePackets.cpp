@@ -5,8 +5,6 @@
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
 #include "Util\Hooks\Hook.h"
 
-#define PRECISION_INCREASE 1
-
 #define SYNCRONOUS_UPDATE_DEFAULT_SIZE 15320
 //(SYNCRONOUS_UPDATE_DEFAULT_SIZE + (6 * 8 * 16));
 #define SYNCRONOUS_UPDATE_NEW_SIZE 16088
@@ -144,44 +142,44 @@ namespace OverridePackets
 
 		register_packet_impl(packetObject, 25, "membership-update", 0, 15784, 15784,
 			Memory::GetAddress<void*>(0x1EF6B9, 0x1D0072),
-			Memory::GetAddress<void*>(0x1EFADD, 0x1D0496), 0);
+			Memory::GetAddress<void*>(0x1EFADD, 0x1D0496), NULL);
 
 		register_packet_impl(packetObject, 37, "virtual-couch-update", 0, 216, 216,
 			Memory::GetAddress<void*>(0x1F0042, 0x1D09FB),
-			Memory::GetAddress<void*>(0x1F0143, 0x1D0AFC), 0);
+			Memory::GetAddress<void*>(0x1F0143, 0x1D0AFC), NULL);
 
 		register_packet_impl(packetObject, 38, "virtual-couch-request", 0, 208, 208,
 			Memory::GetAddress<void*>(0x1F0264, 0x1D0C1D),
-			Memory::GetAddress<void*>(0x1F031D, 0x1D0CD6), 0);
+			Memory::GetAddress<void*>(0x1F031D, 0x1D0CD6), NULL);
 
 		register_packet_impl(packetObject, 26, "peer-properties", 0, 208, 208,
 			Memory::GetAddress<void*>(0x1F03F5, 0x1D0DAE),
-			Memory::GetAddress<void*>(0x1F04E0, 0x1D0E99), 0);
+			Memory::GetAddress<void*>(0x1F04E0, 0x1D0E99), NULL);
 
 		register_packet_impl(packetObject, 27, "delegate-leadership", 0, 44, 44,
 			Memory::GetAddress<void*>(0x1F05EE, 0x1D0FA7),
-			Memory::GetAddress<void*>(0x1F061A, 0x1D0FD3), 0);
+			Memory::GetAddress<void*>(0x1F061A, 0x1D0FD3), NULL);
 
 		register_packet_impl(packetObject, 28, "boot-machine", 0, 44, 44,
 			Memory::GetAddress<void*>(0x1F0652, 0x1D100B),
-			Memory::GetAddress<void*>(0x1F067E, 0x1D1037), 0);
+			Memory::GetAddress<void*>(0x1F067E, 0x1D1037), NULL);
 
 		register_packet_impl(packetObject, 29, "player-add", 0, 168, 168,
 			Memory::GetAddress<void*>(0x1F06B6, 0x1D106F),
-			Memory::GetAddress<void*>(0x1F0752, 0x1D110B), 0);
+			Memory::GetAddress<void*>(0x1F0752, 0x1D110B), NULL);
 			//(void*)deserializePlayerAdd, 0);
 
 		register_packet_impl(packetObject, 30, "player-refuse", 0, 20, 20,
 			Memory::GetAddress<void*>(0x1F081F, 0x1D11D8),
-			Memory::GetAddress<void*>(0x1F085F, 0x1D1218), 0);
+			Memory::GetAddress<void*>(0x1F085F, 0x1D1218), NULL);
 
 		register_packet_impl(packetObject, 31, "player-remove", 0, 12, 12,
 			Memory::GetAddress<void*>(0x1F08BC, 0x1D1275),
-			Memory::GetAddress<void*>(0x1F08EA, 0x1D12A3), 0);
+			Memory::GetAddress<void*>(0x1F08EA, 0x1D12A3), NULL);
 
 		register_packet_impl(packetObject, 32, "player-properties", 0, 156, 156,
 			Memory::GetAddress<void*>(0x1F0935, 0x1D12EE),
-			Memory::GetAddress<void*>(0x1F09AC, 0x1D1365), 0);
+			Memory::GetAddress<void*>(0x1F09AC, 0x1D1365), NULL);
 	}
 
 	typedef bool(__cdecl* decode_text_chat_packet_)(bitstream* container, int a2, s_text_chat* data);

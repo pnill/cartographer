@@ -9,8 +9,6 @@
 
 MapManager* mapManager = new MapManager();
 
-#define DEFAULT_BUFLEN 65536
-
 /* String constants below for client/server messages */
 char DOWNLOADING_MAP[] = "Downloading Map";
 char DOWNLOAD_MAP_PERCENTAGE_PREFIX[] = "Downloaded ";
@@ -263,9 +261,9 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 }
 
 // this is actually thiscall, but the parameter is unused
-bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, network_session *session, DWORD *out_peers_that_cant_load_map_flags)
+bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, s_network_session *session, DWORD *out_peers_that_cant_load_map_flags)
 {
-	membership_info* membership = &session->membership;
+	s_membership_information* membership = &session->membership;
 
 	int result_bitflags = 0;
 	if (membership->peer_count > 0)
@@ -488,7 +486,7 @@ bool MapManager::loadMapInfo(const std::wstring& mapFileLocation) {
 
 void MapManager::getMapFilename(std::wstring& buffer) {
 	wchar_t map_file_location[256];
-	network_session* session = nullptr;
+	s_network_session* session = nullptr;
 
 	// we want this to work in-game too
 	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::getCurrentNetworkSession(&session)) {

@@ -24,7 +24,7 @@ const char broadcastStrHdr[MAX_HDR_STR] = "XNetReqPack";
 
 #define XNIP_FLAG(_bit) (1<<(_bit))
 #define XNIP_SET_BIT(_val, _bit) ((_val) |= XNIP_FLAG((_bit)))
-#define XNIP_TEST_BIT(_val, _bit) ((_val) & XNIP_FLAG((_bit)))
+#define XNIP_TEST_BIT(_val, _bit) (((_val) & XNIP_FLAG((_bit))) != 0)
 
 enum eXnip_ConnectRequestType : int
 {
