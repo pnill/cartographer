@@ -71,12 +71,6 @@ namespace imgui_handler
 				int size = ftell(fp);
 				fclose(fp);
 				if (size > 10252) {
-					ImGuiIO& io = ImGui::GetIO();
-					RECT rect;
-					::GetClientRect(get_HWND(), &rect);
-					io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
-					//int X = ImGui::GetIO().DisplaySize.x;
-					//int Y = ImGui::GetIO().DisplaySize.y;
 					imgui_handler::LoadTextureFromFile(cpath.c_str(), patch_notes, &X, &Y);
 					g_success = true;
 				}
@@ -86,13 +80,8 @@ namespace imgui_handler
 		}
 		void Render(bool *p_open)
 		{
-			ImGuiIO& io = ImGui::GetIO();
-			RECT rect;
-			::GetClientRect(get_HWND(), &rect);
-			io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
-			s_aspect_ratio ratio = getAspectRatio(
-				ImGui::GetIO().DisplaySize.x,
-				ImGui::GetIO().DisplaySize.y);
+			const ImGuiViewport* viewport = ImGui::GetMainViewport();
+			s_aspect_ratio ratio = getAspectRatio(viewport->WorkSize);
 
 			// check if the texture has been reset
 			if (imgui_handler::GetTexture(patch_notes) == nullptr
@@ -110,9 +99,7 @@ namespace imgui_handler
 					g_textureLoading = true;
 					auto grab_thread = []()
 					{
-						GetMOTD(getAspectRatio(
-							ImGui::GetIO().DisplaySize.x,
-							ImGui::GetIO().DisplaySize.y));
+						GetMOTD(getAspectRatio(ImGui::GetMainViewport()->WorkSize));
 
 						g_textureLoading = false;
 					};

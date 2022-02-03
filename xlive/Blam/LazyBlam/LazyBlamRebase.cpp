@@ -1,4 +1,3 @@
-#pragma once
 #include "LazyBlam.hpp"
 #include "Blam\Cache\TagGroups\object_definition.hpp"
 #include "Blam\Cache\TagGroups\unit_definition.hpp"
