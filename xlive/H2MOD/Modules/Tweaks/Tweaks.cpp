@@ -245,7 +245,7 @@ enum startup_flags : int
 	unk12, // some tag thing?
 	unk13, // some tag thing?
 	unk14, // some tag thing?
-	custom_scenario_test_path_instead_of_hash, // flag to test the scenario path instead of the hash of the custom map
+	custom_map_entry_test_map_name_instead_of_hash, // flag to test the map name instead of the hash of the custom map
 	unk16,
 	xbox_live_silver_account, // if true, disables 'gold-only' features, like quickmatch etc
 	unk18, // fuzzer/automated testing? (sapien)

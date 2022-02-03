@@ -1,8 +1,12 @@
+#include "stdafx.h"
+
 #include "MapManager.h"
+#include "CustomMapDataCache\CustomMapDataCache.h"
+
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Networking\Networking.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Tags\TagInterface.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
 #include "Util\Hooks\Hook.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
@@ -41,14 +45,13 @@ std::string fileSizeDelim("$");
 std::wstring CUSTOM_MAP = L"Custom Map";
 wchar_t EMPTY_UNICODE_STR = '\0';
 
-
 #pragma region custom map checks
 
-bool open_cache_header(const wchar_t *lpFileName, s_cache_header *cache_header_ptr, HANDLE *map_handle)
+bool open_cache_header(const wchar_t *file_path, void* cache_header_ptr, HANDLE *map_handle)
 {
-	typedef char(__cdecl open_cache_header)(const wchar_t *lpFileName, s_cache_header *lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
+	typedef char(__cdecl open_cache_header)(const wchar_t *file_path, void* lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
 	auto open_cache_header_impl = Memory::GetAddress<open_cache_header*>(0x642D0, 0x4C327);
-	return open_cache_header_impl(lpFileName, cache_header_ptr, map_handle, 0);
+	return open_cache_header_impl(file_path, cache_header_ptr, map_handle, 0);
 }
 
 void close_cache_header(HANDLE *map_handle)
@@ -60,11 +63,11 @@ void close_cache_header(HANDLE *map_handle)
 
 static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
 
-int __cdecl validate_and_add_custom_map(BYTE *a1)
+int __cdecl validate_and_add_custom_map(s_custom_map_entry* custom_map_entry)
 {
 	s_cache_header header;
 	HANDLE map_cache_handle;
-	wchar_t *file_name = (wchar_t*)(a1 + 2432);
+	wchar_t *file_name = custom_map_entry->file_path;
 	if (!open_cache_header(file_name, &header, &map_cache_handle))
 		return false;
 	if (header.magic != 'head' || header.foot != 'foot' || header.file_size <= 0 || header.engine_gen != 8)
@@ -77,7 +80,7 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 		LOG_TRACE_FUNCW(L"\"{}\" has bad scenario type", file_name);
 		return false;
 	}
-	if (strnlen_s(header.name, 0x20u) >= 0x20 || strnlen_s(header.version, 0x20) >= 0x20)
+	if (strnlen_s(header.name, 32) >= 32 || strnlen_s(header.version, 32) >= 32)
 	{
 		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
 		return false;
@@ -93,9 +96,9 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 	// without this the map is just called by it's file name
 
 	// todo move the code for loading the descriptions to our code and get rid of this
-	typedef int __cdecl validate_and_add_custom_map_interal(BYTE *a1);
+	typedef int __cdecl validate_and_add_custom_map_interal(s_custom_map_entry* a1);
 	auto validate_and_add_custom_map_interal_impl = Memory::GetAddress<validate_and_add_custom_map_interal*>(0x4F690, 0x56890);
-	if (!validate_and_add_custom_map_interal_impl(a1))
+	if (!validate_and_add_custom_map_interal_impl(custom_map_entry))
 	{
 		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
 		std::wstring fallback_name;
@@ -107,19 +110,28 @@ int __cdecl validate_and_add_custom_map(BYTE *a1)
 			auto start = full_file_name.find_last_of('\\');
 			fallback_name = full_file_name.substr(start != std::wstring::npos ? start : 0, full_file_name.find_last_not_of('.'));
 		}
-		wcsncpy_s(reinterpret_cast<wchar_t*>(a1 + 32), 0x20, fallback_name.c_str(), fallback_name.length());
+		wcsncpy_s(custom_map_entry->map_name, fallback_name.c_str(), fallback_name.length());
 	}
 	// load the map even if some of the checks failed, will still mostly work
 	return true;
 }
 
-bool __cdecl is_supported_build(const char *build)
+bool __cdecl scenario_is_supported_build(const char *build)
 {
-	const static std::unordered_set<std::string> offically_supported_builds{ "11122.07.08.24.1808.main", "11081.07.04.30.0934.main" };
-	if (offically_supported_builds.count(build) == 0)
+	const static char* offically_supported_builds[32] =
 	{
-		LOG_TRACE_FUNC("Build '{}' is not offically supported consider repacking and updating map with supported tools", build);
+		"11081.07.04.30.0934.main",
+		"11122.07.08.24.1808.main"
+	};
+
+	for (int i = 0; i < 2; i++)
+	{
+		if (strcmp(build, offically_supported_builds[i]) == 0)
+			return true;
 	}
+
+	LOG_TRACE_FUNC("Build '{}' is not offically supported, consider repacking and updating map with supported tools!", build);
+	// return false;
 	return true;
 }
 #pragma endregion
@@ -133,10 +145,10 @@ network_life_cycle_session_get_global_map_precache_status p_network_life_cycle_s
 // TODO: simplify and cleanup
 signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hook(signed int *out_smallest_load_percentage, unsigned int *out_host_map_status) {
 	// this just gets the current network_session, but has some extra misc checks
-	typedef bool(__cdecl* get_network_session_with_misc_checks)(network_session**);
+	typedef bool(__cdecl* get_network_session_with_misc_checks)(s_network_session**);
 	auto p_get_network_session_with_misc_checks = Memory::GetAddress<get_network_session_with_misc_checks>(0x1AD782, 0x1A66FF);
 
-	network_session* session = nullptr;
+	s_network_session* session = nullptr;
 	int result_map_status = 0;
 	int result_precache_percentage = 0;
 	bool someone_downloading_map = false;
@@ -162,10 +174,10 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 		case _network_session_state_host_disband:
 		case _network_session_state_host_handoff:
 		case _network_session_state_host_reestablish:
-			membership_info* membership = &session->membership;
+			s_membership_information* membership = &session->membership;
 
 			if (out_host_map_status)
-				*out_host_map_status = membership->peer_info[session->session_host_peer_index].map_status;
+				*out_host_map_status = membership->peer_data[session->session_host_peer_index].map_status;
 
 			result_map_status = _network_session_map_status_loaded;
 			result_precache_percentage = 100; // i don't think this is used anymore, it has been replaced by the loading screen in H2v from Xbox
@@ -178,12 +190,12 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 				// now we only check our peer and session host peer, instead of all the peers
 				// but make sure the game won't start if we have just 1 player that doesn't have the map
 				if (session->local_peer_index == i)
-					local_peer_map_status = membership->peer_info[i].map_status;
+					local_peer_map_status = membership->peer_data[i].map_status;
 
 				if (session->session_host_peer_index == i)
-					host_peer_map_status = membership->peer_info[i].map_status;
+					host_peer_map_status = membership->peer_data[i].map_status;
 
-				switch (membership->peer_info[i].map_status)
+				switch (membership->peer_data[i].map_status)
 				{
 				case _network_session_map_status_unable_to_precache:
 					result_precache_percentage = 0;
@@ -191,7 +203,7 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 					break;
 
 				case _network_session_map_status_precaching:
-					result_precache_percentage = min(membership->peer_info[i].map_progress_percentage, result_precache_percentage); // get the least map precaching percentage
+					result_precache_percentage = min(membership->peer_data[i].map_progress_percentage, result_precache_percentage); // get the least map precaching percentage
 					break;
 
 				case _network_session_map_status_loaded:
@@ -281,7 +293,7 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, s_network_sessio
 			//if ((i == session->local_peer_index || i == session->session_host_peer_index) 
 				//|| !more_than_one_peer_other_than_dedicated_server(session)) 
 			{
-				switch (membership->peer_info[i].map_status)
+				switch (membership->peer_data[i].map_status)
 				{
 				case _network_session_map_status_none:
 				case _network_session_map_status_unable_to_precache:
@@ -426,7 +438,7 @@ void MapManager::applyHooks() {
 	}
 
 	// Both server and client
-	WriteJmpTo(Memory::GetAddress(0x1467, 0x12E2), is_supported_build);
+	WriteJmpTo(Memory::GetAddress(0x1467, 0x12E2), scenario_is_supported_build);
 	PatchCall(Memory::GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
 	PatchCall(Memory::GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
 	PatchCall(Memory::GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
@@ -438,46 +450,36 @@ void MapManager::applyHooks() {
 
 	// disables game's map downloading implementation
 	NopFill(Memory::GetAddress(0x1B5421, 0x1A917F), 5);
+
+	// custom map cache patches/hooks
+	s_custom_map_data::applyCustomMapExtensionLimitPatches();
 }
 
 /**
 * Actually calls the real map reload function in halo2.exe
 */
 void MapManager::reloadAllMaps() {
-	typedef char(__thiscall *custom_maps_load_info)(int thisx);
-	typedef char(__thiscall *cache_custom_map_file_image_preview)(int thisx);
-
-	DWORD customMapData = Memory::GetAddress(0x482D70, 0x4A70D8);
-	auto p_custom_maps_load_info = Memory::GetAddress<custom_maps_load_info>(0x4D021, 0x419B5);
-	auto p_cache_custom_map_file_image_preview = Memory::GetAddress<cache_custom_map_file_image_preview>(0x4CC30, 0x41501); // this caches the map preview image for the map selection menu
-
-	LOG_TRACE_GAME("[h2mod-mapmanager] before cache_custom_map_file_image_preview()");
-	p_cache_custom_map_file_image_preview((int)customMapData);
-	LOG_TRACE_GAME("[h2mod-mapmanager] after cache_custom_map_file_image_preview()");
-
-	LOG_TRACE_GAME("[h2mod-mapmanager] before custom_maps_load_info()");
-	p_custom_maps_load_info((int)customMapData);
-	LOG_TRACE_GAME("[h2mod-mapmanager] after custom_maps_load_info()");
+	getCustomMapData()->load_custom_map_data_cache();
+	getCustomMapData()->start_custom_map_sync();
 }
 
-bool MapManager::loadMapInfo(const std::wstring& mapFileLocation) {
-	BYTE data[2960];
-	ZeroMemory(data, sizeof(data));
+bool MapManager::loadMapInfo(const std::wstring& mapFilePath) {
+	s_custom_map_entry custom_map_new_entry;
+	ZeroMemory(&custom_map_new_entry, sizeof(custom_map_new_entry));
 
-	typedef bool(__thiscall* reload_map)(void* a1, BYTE* a2);
+	typedef bool(__thiscall* reload_map)(void* a1, s_custom_map_entry* custom_map_entry);
 	auto p_reload_map = Memory::GetAddress<reload_map>(0x4CD1E);
 
-	wcscpy_s(reinterpret_cast<wchar_t*>(data + 2432), 256, mapFileLocation.c_str());
+	wcscpy_s(custom_map_new_entry.file_path, 256, mapFilePath.c_str());
 
 	bool mapLoaded = false;
-	if (validate_and_add_custom_map(data)) {
-		void* customMapData = Memory::GetAddress<void*>(0x482D70, 0x4A70D8);
-		if (p_reload_map(customMapData, data)){
+	if (validate_and_add_custom_map(&custom_map_new_entry)) {
+		
+		if (p_reload_map(getCustomMapData(), &custom_map_new_entry)) {
 			mapLoaded = true;
 		}
 		else {
-			// TODO: try removing a map from the 50 map cache, then try loading the map again
-			// until 50 map limit is removed
+
 		}
 	}
 
@@ -490,7 +492,7 @@ void MapManager::getMapFilename(std::wstring& buffer) {
 
 	// we want this to work in-game too
 	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::getCurrentNetworkSession(&session)) {
-		SecureZeroMemory(map_file_location, sizeof(map_file_location));
+		ZeroMemory(map_file_location, sizeof(map_file_location));
 		NetworkSession::getMapFileLocation(map_file_location, sizeof(map_file_location));
 
 		std::wstring unicodeMapFileLocation(map_file_location);
@@ -557,7 +559,7 @@ bool MapDownloadQuery::downloadFromRepo() {
 	CURL *curl = nullptr;
 	CURLcode res;
 
-	std::wstring mapFilePathWide(Memory::GetAddress<wchar_t*>(0x482D70 + 0x2423C));
+	std::wstring mapFilePathWide(getCustomMapFolderPath());
 	std::string nonUnicodeMapFilePath(mapFilePathWide.begin(), mapFilePathWide.end());
 	nonUnicodeMapFilePath += m_clientMapFilename;
 

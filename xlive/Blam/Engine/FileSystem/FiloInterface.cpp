@@ -1,68 +1,89 @@
+#include "stdafx.h"
+
 #include "FiloInterface.h"
 
 namespace FiloInterface
 {
-	void init_filo(filo *data, std::string path, bool mode)
+	void filo_init(filo* filo_ptr, const std::string& path, bool path_is_directory)
 	{
-		auto filo__init_filo_impl = Memory::GetAddress<filo *(__cdecl*)(filo *data_struct, const char *path, char mode)>(0x632F1, 0x655F1);
-		filo__init_filo_impl(data, path.c_str(), mode);
+		auto filo__init_filo_impl = Memory::GetAddress<filo* (__cdecl*)(filo*, const char* path, char mode)>(0x8C409, 0x0); // TODO DEDI OFFSET
+		filo__init_filo_impl(filo_ptr, path.c_str(), path_is_directory);
 	}
 
-	bool delete_existing(filo *data)
+	bool create_file(filo* filo_ptr)
 	{
-		typedef bool(__cdecl *filo__delete)(filo *data_struct);
-		DWORD func_offset = Memory::GetAddress(0x63667, 0x65967);
-		auto filo__delete_impl = reinterpret_cast<filo__delete>(func_offset);
+		typedef bool(__cdecl* filo__create_file)(filo*);
 
-		return filo__delete_impl(data);
+		DWORD func_offset = Memory::GetAddress(0x632F1, 0x0); // TODO DEDI OFFSET
+		auto filo__create_file_impl = reinterpret_cast<filo__create_file>(func_offset);
+
+		return filo__create_file_impl(filo_ptr);
 	}
 
-	bool check_access(filo *data)
+	bool open(filo* filo_ptr, __int16 mode, DWORD* error_code)
 	{
-		typedef bool(__cdecl *filo__check_access)(filo *a1);
-		DWORD func_offset = Memory::GetAddress(0x632F1, 0x0);
-		auto filo__check_access_impl = reinterpret_cast<filo__check_access>(func_offset);
-
-		return filo__check_access_impl(data);
-	}
-
-	bool open(filo *data, __int16 mode, DWORD *error_code)
-	{
-		typedef bool(__cdecl *filo__open)(filo *filo, __int16 mode, DWORD *error_code);
+		typedef bool(__cdecl* filo__open)(filo*, __int16 mode, DWORD* error_code);
 		DWORD func_offset = Memory::GetAddress(0x638BF, 0x65BBF);
 		auto filo__open_impl = reinterpret_cast<filo__open>(func_offset);
 
-		return filo__open_impl(data, mode, error_code);
+		return filo__open_impl(filo_ptr, mode, error_code);
 	}
 
-	bool close(filo *data)
+	bool close(filo* filo_ptr)
 	{
-		typedef bool(__cdecl *filo__close)(filo *a1);
+		typedef bool(__cdecl* filo__close)(filo*);
 		DWORD func_offset = Memory::GetAddress(0x63B66, 0x65E66);
 		auto filo__close_impl = reinterpret_cast<filo__close>(func_offset);
 
-		return filo__close_impl(data);
+		return filo__close_impl(filo_ptr);
 	}
 
-	bool read(filo *filo_ptr, LPVOID data_buffer, DWORD nNumberOfBytesToRead, bool hide_errors_from_user)
+	bool create_file_or_directory(filo* filo_ptr)
 	{
-		typedef char(__cdecl *filo__read)(filo *filo_ptr, DWORD nNumberOfBytesToRead, char hide_errors_from_user, LPVOID lpBuffer);
+		typedef bool(__cdecl* filo__check_access)(filo*);
+		DWORD func_offset = Memory::GetAddress(0x632F1, 0x0); // TODO DEDI OFFSET
+		auto filo__create_file_or_directory_impl = reinterpret_cast<filo__check_access>(func_offset);
+
+		return filo__create_file_or_directory_impl(filo_ptr);
+	}
+
+	bool delete_existing(filo* filo_ptr)
+	{
+		typedef bool(__cdecl* filo__delete)(filo*);
+		DWORD func_offset = Memory::GetAddress(0x63667, 0x65967);
+		auto filo__delete_impl = reinterpret_cast<filo__delete>(func_offset);
+
+		return filo__delete_impl(filo_ptr);
+	}
+
+	bool read(filo* filo_ptr, LPVOID data_buffer, DWORD nNumberOfBytesToRead, bool hide_errors_from_user)
+	{
+		typedef char(__cdecl* filo__read)(filo*, DWORD nNumberOfBytesToRead, char hide_errors_from_user, LPVOID lpBuffer);
 		DWORD func_offset = Memory::GetAddress(0x63C60, 0x65F3C);
 		auto filo__read_impl = reinterpret_cast<filo__read>(func_offset);
 
 		return filo__read_impl(filo_ptr, nNumberOfBytesToRead, hide_errors_from_user, data_buffer);
 	}
 
-	bool write(filo *filo_ptr, LPVOID data, size_t data_size)
+	bool write(filo* filo_ptr, LPVOID data, size_t data_size)
 	{
-		typedef bool(__cdecl *filo__write)(filo *a1, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer);
+		typedef bool(__cdecl* filo__write)(filo*, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer);
 		DWORD func_offset = Memory::GetAddress(0x63CBC, 0x65F98);
 		auto filo__write_impl = reinterpret_cast<filo__write>(func_offset);
 
 		return filo__write_impl(filo_ptr, data_size, data);
 	}
 
-	bool change_size(filo *filo_ptr, LONG new_size)
+	bool get_low_file_size(filo* filo_ptr, DWORD* out_low_size)
+	{
+		typedef bool(__cdecl* filo__get_low_file_size)(filo*, DWORD*);
+		DWORD func_offset = Memory::GetAddress(0x63E10, 0x0); // TODO DEDI OFFSET
+		auto filo__get_low_file_size_impl = reinterpret_cast<filo__get_low_file_size>(func_offset);
+
+		return filo__get_low_file_size_impl(filo_ptr, out_low_size);
+	}
+
+	bool change_size(filo* filo_ptr, LONG new_size)
 	{
 		if (filo_ptr->handle)
 		{
@@ -76,4 +97,25 @@ namespace FiloInterface
 		}
 		return false;
 	}
+
+	bool set_file_attribute_readonly(filo* filo_ptr, bool read_only)
+	{
+		typedef bool(__cdecl* filo__set_file_attribute_readonly)(filo* filo_ptr, bool read_only);
+
+		DWORD func_offset = Memory::GetAddress(0x6341D, 0x0); // TODO DEDI OFFSET
+		auto filo__set_file_attribute_readonly_impl = reinterpret_cast<filo__set_file_attribute_readonly>(func_offset);
+
+		return filo__set_file_attribute_readonly_impl(filo_ptr, read_only);
+	}
+
+	bool set_file_attribute_hidden(filo* filo_ptr, bool hidden)
+	{
+		typedef bool(__cdecl* filo__set_file_attribute_hidden)(filo* filo_ptr, bool hidden);
+
+		DWORD func_offset = Memory::GetAddress(0x63545, 0x0); // TODO DEDI OFFSET
+		auto filo__set_file_attribute_hidden_impl = reinterpret_cast<filo__set_file_attribute_hidden>(func_offset);
+
+		return filo__set_file_attribute_hidden_impl(filo_ptr, hidden);
+	}
+
 }
