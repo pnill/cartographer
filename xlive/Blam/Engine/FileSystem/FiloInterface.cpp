@@ -83,6 +83,19 @@ namespace FiloInterface
 		return filo__get_low_file_size_impl(filo_ptr, out_low_size);
 	}
 
+	bool set_end_of_file(filo* filo_ptr)
+	{
+		if (filo_ptr->handle)
+		{
+			if (SetEndOfFile(filo_ptr->handle))
+				return true;
+
+			return false;
+		}
+
+		return false;
+	}
+
 	bool change_size(filo* filo_ptr, LONG new_size)
 	{
 		if (filo_ptr->handle)
@@ -91,9 +104,6 @@ namespace FiloInterface
 			{
 				return SetEndOfFile(filo_ptr->handle);
 			}
-		}
-		else {
-			SetLastError(ERROR_INVALID_HANDLE);
 		}
 		return false;
 	}

@@ -39,12 +39,12 @@ enum FILO_FILE_OPEN_FLAGS : __int16
 enum FILO_FILE_OPEN_ERROR : DWORD
 {
 	FILO_OPEN_FILE_ERROR_SUCCESS = 0,
-	FILO_OPEN_FILE_FILE_NOT_FOUND = 1,
-	FILO_OPEN_FILE_ACCESS_DENIED = 2,
-	FILO_OPEN_FILE_PATH_NOT_FOUND = 3,
-	FILO_OPEN_FILE_INVALID_DRIVE = 4,
-	FILO_OPEN_FILE_SHARING_VIOLATION = 5,
-	FILO_OPEN_FILE_UNKONWN = 6,
+	FILO_OPEN_FILE_ERROR_NOT_FOUND = 1,
+	FILO_OPEN_FILE_ERROR_ACCESS_DENIED = 2,
+	FILO_OPEN_FILE_ERROR_PATH_NOT_FOUND = 3,
+	FILO_OPEN_FILE_ERROR_INVALID_DRIVE = 4,
+	FILO_OPEN_FILE_ERROR_SHARING_VIOLATION = 5,
+	FILO_OPEN_FILE_ERROR_UNKONWN = 6,
 };
 
 namespace FiloInterface
@@ -76,6 +76,9 @@ namespace FiloInterface
 
 	/* */
 	bool get_low_file_size(filo* filo_ptr, DWORD* out_low_size);
+
+	/* */
+	bool set_end_of_file(filo* filo_ptr);
 
 	/* Can be used to truncate or extend an open file, returns success */
 	bool change_size(filo* filo_ptr, LONG new_size);
