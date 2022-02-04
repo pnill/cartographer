@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "CustomMapDataCache.h"
 
+#include "H2MOD\Tags\TagInterface.h"
 #include "Blam\Engine\DataArray\DataArray.h"
 #include "Blam\Engine\FileSystem\FiloInterface.h"
 
@@ -15,6 +16,25 @@
 
 const wchar_t* custom_map_cache_filename_client = L"mapset.h2mdat";
 const wchar_t* custom_map_cache_filename_server = L"mapsetdedi.h2mdat";
+
+const static char* offically_supported_builds[32] =
+{
+	"11081.07.04.30.0934.main",
+	"11122.07.08.24.1808.main"
+};
+
+bool __cdecl scenario_is_supported_build(const char* build)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		if (strcmp(build, offically_supported_builds[i]) == 0)
+			return true;
+	}
+
+	LOG_TRACE_FUNC("Build '{}' is not offically supported, consider repacking and updating map with supported tools!", build);
+	// return false;
+	return true;
+}
 
 s_custom_map_data* getCustomMapData()
 {
@@ -106,7 +126,13 @@ bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s
 				// if signature matches, read the cache contents
 				DWORD file_custom_map_entries_size = custom_map_data_cache->entries_count * sizeof(s_custom_map_entry);
 
-				if (FiloInterface::read(&cache_file, custom_map_data_cache->entries, file_custom_map_entries_size, true))
+				if (custom_map_data_cache->entries_count > NEW_MAP_LIMIT)
+				{
+					LOG_TRACE_GAME("{} - custom map data cache file exceeds new map limit size!",
+						__FUNCTION__);
+					success = false;
+				}
+				else if (FiloInterface::read(&cache_file, custom_map_data_cache->entries, file_custom_map_entries_size, true))
 				{
 					// clear unused custom map entries
 					memset((BYTE*)(&custom_map_data_cache->entries) + file_custom_map_entries_size, 0, custom_map_data_cache_buffer_size - file_custom_map_entries_size);
@@ -201,6 +227,9 @@ void __thiscall s_custom_map_data::save_custom_map_data()
 	WCHAR path_wide[MAX_PATH];
 	CHAR path_multibyte[MAX_PATH];
 	bool custom_map_data_path_available = false;
+
+	EnterCriticalSection(custom_map_lock);
+
 	s_custom_map_file_cache* custom_map_data_to_save = custom_map_data_cache;
 
 	custom_map_data_to_save->signature = custom_map_cache_signature;
@@ -221,6 +250,8 @@ void __thiscall s_custom_map_data::save_custom_map_data()
 	{
 		LOG_CRITICAL_GAME("{} - failed to save custom map data cache!", __FUNCTION__);
 	}
+
+	LeaveCriticalSection(custom_map_lock);
 }
 
 void s_custom_map_data::load_map_data_cache_from_file_cache(s_custom_map_file_cache* custom_map_file_cache)
@@ -528,11 +559,20 @@ bool __thiscall s_custom_map_data::add_entry(const s_custom_map_entry* entry)
 {
 	EnterCriticalSection(custom_map_lock);
 
+	bool success = true;
+
 	// TODO add validation
-	memcpy(&new_custom_map_entries_buffer[custom_map_count++], entry, sizeof(s_custom_map_entry));
+	if (custom_map_count < NEW_MAP_LIMIT)
+	{
+		memcpy(&new_custom_map_entries_buffer[custom_map_count++], entry, sizeof(s_custom_map_entry));
+	}
+	else
+	{
+		success = false;
+	}
 
 	LeaveCriticalSection(custom_map_lock);
-	return true;
+	return success ? true : false;
 }
 
 bool __thiscall s_custom_map_data::remove_duplicates_and_add_entry(const s_custom_map_entry* entry)
@@ -540,6 +580,116 @@ bool __thiscall s_custom_map_data::remove_duplicates_and_add_entry(const s_custo
 	remove_entries_matching_file_path(entry);
 	remove_duplicates_by_map_name_and_hash(entry);
 	return add_entry(entry);
+}
+
+// compared to the other function
+// this reads the file and populates the map entry datas
+bool __thiscall s_custom_map_data::remove_duplicates_write_entry_data_and_add(s_custom_map_entry* entry)
+{
+	remove_entries_matching_file_path(entry);
+	remove_duplicates_by_map_name_and_hash(entry);
+
+	typedef bool(__thiscall* read_map_data_and_add_entry)(s_custom_map_data*, s_custom_map_entry* entry);
+	auto p_read_map_data_and_add_entry = Memory::GetAddressRelative<read_map_data_and_add_entry>(0x44CC35);
+
+	return p_read_map_data_and_add_entry(this, entry);
+}
+
+bool open_cache_header(const wchar_t* file_path, void* cache_header_ptr, HANDLE* map_handle)
+{
+	typedef char(__cdecl open_cache_header)(const wchar_t* file_path, void* lpBuffer, HANDLE* map_handle, DWORD NumberOfBytesRead);
+	auto open_cache_header_impl = Memory::GetAddress<open_cache_header*>(0x642D0, 0x4C327);
+	return open_cache_header_impl(file_path, cache_header_ptr, map_handle, 0);
+}
+
+void close_cache_header(HANDLE* map_handle)
+{
+	typedef void __cdecl close_cache_header(HANDLE* a1);
+	auto close_cache_header_impl = Memory::GetAddress<close_cache_header*>(0x64C03, 0x4CC5A);
+	close_cache_header_impl(map_handle);
+}
+
+static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
+
+int __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry)
+{
+	s_cache_header header;
+	HANDLE map_cache_handle;
+	wchar_t* file_name = custom_map_entry->file_path;
+	if (!open_cache_header(file_name, &header, &map_cache_handle))
+		return false;
+	if (header.magic != 'head' || header.foot != 'foot' || header.file_size <= 0 || header.engine_gen != 8)
+	{
+		LOG_TRACE_FUNCW(L"\"{}\" has invalid header", file_name);
+		return false;
+	}
+	if (header.type > 5 || header.type < 0)
+	{
+		LOG_TRACE_FUNCW(L"\"{}\" has bad scenario type", file_name);
+		return false;
+	}
+	if (strnlen_s(header.name, 32) >= 32 || strnlen_s(header.version, 32) >= 32)
+	{
+		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
+		return false;
+	}
+	if (!header.is_multiplayer() && !header.is_single_player())
+	{
+		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
+		return false;
+	}
+
+	close_cache_header(&map_cache_handle);
+	// needed because the game loads the human readable map name and description from scenario after checks
+	// without this the map is just called by it's file name
+
+	// todo move the code for loading the descriptions to our code and get rid of this
+	typedef int __cdecl validate_and_add_custom_map_interal(s_custom_map_entry* a1);
+	auto validate_and_add_custom_map_interal_impl = Memory::GetAddress<validate_and_add_custom_map_interal*>(0x4F690, 0x56890);
+	if (!validate_and_add_custom_map_interal_impl(custom_map_entry))
+	{
+		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
+		std::wstring fallback_name;
+		if (strnlen_s(header.name, sizeof(header.name)) > 0) {
+			fallback_name = wstring_to_string.from_bytes(header.name, &header.name[sizeof(header.name) - 1]);
+		}
+		else {
+			std::wstring full_file_name = file_name;
+			auto start = full_file_name.find_last_of('\\');
+			fallback_name = full_file_name.substr(start != std::wstring::npos ? start : 0, full_file_name.find_last_not_of('.'));
+		}
+		wcsncpy_s(custom_map_entry->map_name, fallback_name.c_str(), fallback_name.length());
+	}
+	// load the map even if some of the checks failed, will still mostly work
+	return true;
+}
+
+bool __thiscall s_custom_map_data::add_custom_map_entry_by_map_file_path(const std::wstring& file_path)
+{
+	return add_custom_map_entry_by_map_file_path(file_path.c_str());
+}
+
+bool __thiscall s_custom_map_data::add_custom_map_entry_by_map_file_path(const wchar_t* file_path)
+{
+	s_custom_map_entry custom_map_new_entry;
+	ZeroMemory(&custom_map_new_entry, sizeof(s_custom_map_entry));
+
+	wcscpy_s(custom_map_new_entry.file_path, 256, file_path);
+
+	bool map_loaded = false;
+	if (validate_and_read_custom_map_data(&custom_map_new_entry)) {
+
+		if (remove_duplicates_write_entry_data_and_add(&custom_map_new_entry)) {
+			map_loaded = true;
+		}
+	}
+
+	return map_loaded;
+}
+
+void __thiscall s_custom_map_data::initialize()
+{
+
 }
 
 // atexit
@@ -552,8 +702,6 @@ void __thiscall s_custom_map_data::cleanup()
 	custom_map_data_cache = nullptr;
 
 	DeleteCriticalSection(custom_map_lock);
-
-	//free(custom_map_lock);
 }
 
 static __declspec(naked) void jmp_get_entry_by_id() { __asm jmp s_custom_map_data::get_entry_by_id }
@@ -567,6 +715,8 @@ static __declspec(naked) void jmp_remove_duplicates_and_add_entry() { __asm jmp 
 static __declspec(naked) void jmp_save_custom_map_data() { __asm jmp s_custom_map_data::save_custom_map_data }
 static __declspec(naked) void jmp_cleanup() { __asm jmp s_custom_map_data::cleanup }
 static __declspec(naked) void jmp_remove_marked_for_deletion() { __asm jmp s_custom_map_data::remove_marked_for_deletion }
+static __declspec(naked) void jmp_add_entry() { __asm jmp s_custom_map_data::add_entry }
+static __declspec(naked) void jmp_remove_duplicates_write_entry_data_and_add() { __asm jmp s_custom_map_data::remove_duplicates_write_entry_data_and_add }
 
 class c_custom_game_custom_map_list
 {
@@ -669,6 +819,8 @@ void s_custom_map_data::applyCustomMapExtensionLimitPatches()
 	WriteJmpTo(Memory::GetAddressRelative(0x44CDA6, 0x0), jmp_remove_duplicates_and_add_entry);
 	WriteJmpTo(Memory::GetAddressRelative(0x4C2D4D, 0x0), jmp_save_custom_map_data);
 	WriteJmpTo(Memory::GetAddressRelative(0x4C27F3, 0x0), jmp_remove_marked_for_deletion);
+	WriteJmpTo(Memory::GetAddressRelative(0x4C259B, 0x0), jmp_add_entry);
+	WriteJmpTo(Memory::GetAddressRelative(0x44CD1E, 0x0), jmp_remove_duplicates_write_entry_data_and_add);
 
 	// custom map data menu list hook/patches
 	if (!Memory::isDedicatedServer())
@@ -677,12 +829,20 @@ void s_custom_map_data::applyCustomMapExtensionLimitPatches()
 
 		// jump to function end just before updating custom map list
 		// jmp near 0xB7
-		BYTE jmp_to_end[] = { 0xE9, 0xB7, 0x00, 0x00, 0x00 };
-		WriteBytes(Memory::GetAddressRelative(0x65AEFD), jmp_to_end, sizeof(jmp_to_end));
+		BYTE jmp_to_epilog_sub_65AE3B[] = { 0xE9, 0xB7, 0x00, 0x00, 0x00 };
+		WriteBytes(Memory::GetAddressRelative(0x65AEFD), jmp_to_epilog_sub_65AE3B, sizeof(jmp_to_epilog_sub_65AE3B));
 
 		// replace game's atexit cleanup impl
 		WriteJmpTo(Memory::GetAddressRelative(0x79A0DC), jmp_cleanup);
 	}
+
+	PatchCall(Memory::GetAddress(0x1E49A2, 0x1EDF0), validate_and_read_custom_map_data);
+	PatchCall(Memory::GetAddress(0x4D3BA, 0x417FE), validate_and_read_custom_map_data);
+	PatchCall(Memory::GetAddress(0x4CF26, 0x41D4E), validate_and_read_custom_map_data);
+	PatchCall(Memory::GetAddress(0x8928, 0x1B6482), validate_and_read_custom_map_data);
+
+	// Both server and client
+	WriteJmpTo(Memory::GetAddress(0x1467, 0x12E2), scenario_is_supported_build);
 }
 
 // '50 map limit removal' region end

@@ -6,7 +6,7 @@
 // keep the bitmap preview limit the same, to save memory and performance
 #define VANILLA_MAP_BITMAP_PREVIEW_LIMIT 50u
 #define NEW_MAP_BITMAP_PREVIEW_LIMIT VANILLA_MAP_BITMAP_PREVIEW_LIMIT
-#define NEW_MAP_LIMIT 500u
+#define NEW_MAP_LIMIT 1000u
 
 #define MAX_BITMAP_PREVIEW_MAX_BUFFER_SIZE 524288u
 
@@ -119,12 +119,16 @@ struct s_custom_map_data
 	bool __thiscall get_entry_by_id(const s_custom_map_id* custom_map_id, s_custom_map_entry** out_entry);
 
 	bool __thiscall add_entry(const s_custom_map_entry* entry);
+	bool __thiscall add_custom_map_entry_by_map_file_path(const wchar_t* file_path);
+	bool __thiscall add_custom_map_entry_by_map_file_path(const std::wstring& file_path);
 	bool __thiscall remove_duplicates_and_add_entry(const s_custom_map_entry* entry);
+	bool __thiscall remove_duplicates_write_entry_data_and_add(s_custom_map_entry* entry);
 
 	bool __thiscall remove_entries_matching_file_path(const s_custom_map_entry* entry);
 	bool __thiscall remove_duplicates_by_map_name_and_hash(const s_custom_map_entry* entry);
 	bool __thiscall delete_single_entry(const s_custom_map_entry* entry);
 
+	void __thiscall initialize();
 	void __thiscall cleanup();
 private:
 	void __thiscall remove_entry_by_index(int idx);

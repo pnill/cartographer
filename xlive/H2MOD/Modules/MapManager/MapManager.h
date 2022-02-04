@@ -39,9 +39,6 @@ private:
 class MapManager {
 public:
 	void reloadAllMaps();
-	bool loadMapInfo(const std::wstring& mapFileLocation);
-
-	static void applyCustomMapExtensionLimitPatches();
 
 	static void applyHooks();
 

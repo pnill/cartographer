@@ -45,97 +45,6 @@ std::string fileSizeDelim("$");
 std::wstring CUSTOM_MAP = L"Custom Map";
 wchar_t EMPTY_UNICODE_STR = '\0';
 
-#pragma region custom map checks
-
-bool open_cache_header(const wchar_t *file_path, void* cache_header_ptr, HANDLE *map_handle)
-{
-	typedef char(__cdecl open_cache_header)(const wchar_t *file_path, void* lpBuffer, HANDLE *map_handle, DWORD NumberOfBytesRead);
-	auto open_cache_header_impl = Memory::GetAddress<open_cache_header*>(0x642D0, 0x4C327);
-	return open_cache_header_impl(file_path, cache_header_ptr, map_handle, 0);
-}
-
-void close_cache_header(HANDLE *map_handle)
-{
-	typedef void __cdecl close_cache_header(HANDLE *a1);
-	auto close_cache_header_impl = Memory::GetAddress<close_cache_header*>(0x64C03, 0x4CC5A);
-	close_cache_header_impl(map_handle);
-}
-
-static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
-
-int __cdecl validate_and_add_custom_map(s_custom_map_entry* custom_map_entry)
-{
-	s_cache_header header;
-	HANDLE map_cache_handle;
-	wchar_t *file_name = custom_map_entry->file_path;
-	if (!open_cache_header(file_name, &header, &map_cache_handle))
-		return false;
-	if (header.magic != 'head' || header.foot != 'foot' || header.file_size <= 0 || header.engine_gen != 8)
-	{
-		LOG_TRACE_FUNCW(L"\"{}\" has invalid header", file_name);
-		return false;
-	}
-	if (header.type > 5 || header.type < 0)
-	{
-		LOG_TRACE_FUNCW(L"\"{}\" has bad scenario type", file_name);
-		return false;
-	}
-	if (strnlen_s(header.name, 32) >= 32 || strnlen_s(header.version, 32) >= 32)
-	{
-		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
-		return false;
-	}
-	if (!header.is_multiplayer() && !header.is_single_player())
-	{
-		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
-		return false;
-	}
-
-	close_cache_header(&map_cache_handle);
-	// needed because the game loads the human readable map name and description from scenario after checks
-	// without this the map is just called by it's file name
-
-	// todo move the code for loading the descriptions to our code and get rid of this
-	typedef int __cdecl validate_and_add_custom_map_interal(s_custom_map_entry* a1);
-	auto validate_and_add_custom_map_interal_impl = Memory::GetAddress<validate_and_add_custom_map_interal*>(0x4F690, 0x56890);
-	if (!validate_and_add_custom_map_interal_impl(custom_map_entry))
-	{
-		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
-		std::wstring fallback_name;
-		if (strnlen_s(header.name, sizeof(header.name)) > 0) {
-			fallback_name = wstring_to_string.from_bytes(header.name, &header.name[sizeof(header.name) - 1]);
-		}
-		else {
-			std::wstring full_file_name = file_name;
-			auto start = full_file_name.find_last_of('\\');
-			fallback_name = full_file_name.substr(start != std::wstring::npos ? start : 0, full_file_name.find_last_not_of('.'));
-		}
-		wcsncpy_s(custom_map_entry->map_name, fallback_name.c_str(), fallback_name.length());
-	}
-	// load the map even if some of the checks failed, will still mostly work
-	return true;
-}
-
-bool __cdecl scenario_is_supported_build(const char *build)
-{
-	const static char* offically_supported_builds[32] =
-	{
-		"11081.07.04.30.0934.main",
-		"11122.07.08.24.1808.main"
-	};
-
-	for (int i = 0; i < 2; i++)
-	{
-		if (strcmp(build, offically_supported_builds[i]) == 0)
-			return true;
-	}
-
-	LOG_TRACE_FUNC("Build '{}' is not offically supported, consider repacking and updating map with supported tools!", build);
-	// return false;
-	return true;
-}
-#pragma endregion
-
 #pragma region allow host to start game, without all players loading the map
 
 typedef signed int(__cdecl* network_life_cycle_session_get_global_map_precache_status)(signed int*, unsigned int*);
@@ -436,14 +345,7 @@ void MapManager::applyHooks() {
 		Codecave(Memory::GetAddress(0x593F0), load_map_data_for_display, 0);
 		unknown_xbox_live_data1 = Memory::GetAddress<void*>(0x9712C8);
 	}
-
-	// Both server and client
-	WriteJmpTo(Memory::GetAddress(0x1467, 0x12E2), scenario_is_supported_build);
-	PatchCall(Memory::GetAddress(0x1E49A2, 0x1EDF0), validate_and_add_custom_map);
-	PatchCall(Memory::GetAddress(0x4D3BA, 0x417FE), validate_and_add_custom_map);
-	PatchCall(Memory::GetAddress(0x4CF26, 0x41D4E), validate_and_add_custom_map);
-	PatchCall(Memory::GetAddress(0x8928, 0x1B6482), validate_and_add_custom_map);
-
+	
 	// allow host to start the game, even if there are peers that didn't load the map
 	p_network_life_cycle_session_get_global_map_precache_status = (network_life_cycle_session_get_global_map_precache_status)DetourFunc(Memory::GetAddress<BYTE*>(0x1B1929, 0x197879), (BYTE*)network_life_cycle_session_get_global_map_precache_status_hook, 8);
 	WriteJmpTo(Memory::GetAddress<BYTE*>(0x1D76C5, 0x1BCD32), get_map_load_status_for_all_peers_hook_2_to_stdcall);
@@ -461,29 +363,6 @@ void MapManager::applyHooks() {
 void MapManager::reloadAllMaps() {
 	getCustomMapData()->load_custom_map_data_cache();
 	getCustomMapData()->start_custom_map_sync();
-}
-
-bool MapManager::loadMapInfo(const std::wstring& mapFilePath) {
-	s_custom_map_entry custom_map_new_entry;
-	ZeroMemory(&custom_map_new_entry, sizeof(custom_map_new_entry));
-
-	typedef bool(__thiscall* reload_map)(void* a1, s_custom_map_entry* custom_map_entry);
-	auto p_reload_map = Memory::GetAddress<reload_map>(0x4CD1E);
-
-	wcscpy_s(custom_map_new_entry.file_path, 256, mapFilePath.c_str());
-
-	bool mapLoaded = false;
-	if (validate_and_add_custom_map(&custom_map_new_entry)) {
-		
-		if (p_reload_map(getCustomMapData(), &custom_map_new_entry)) {
-			mapLoaded = true;
-		}
-		else {
-
-		}
-	}
-
-	return mapLoaded;
 }
 
 void MapManager::getMapFilename(std::wstring& buffer) {
@@ -593,7 +472,7 @@ bool MapDownloadQuery::downloadFromRepo() {
 
 		if (res == CURLE_OK)
 		{
-			if (http_code != 404 && mapManager->loadMapInfo(mapFilePathWide + m_clientMapFilenameWide)) {
+			if (http_code != 404 && getCustomMapData()->add_custom_map_entry_by_map_file_path(mapFilePathWide + m_clientMapFilenameWide)) {
 				//if we succesfully downloaded the map, return true
 				return true;
 			}
