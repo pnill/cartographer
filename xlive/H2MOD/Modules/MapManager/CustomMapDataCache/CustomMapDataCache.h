@@ -74,14 +74,14 @@ struct s_custom_map_data
 	// because the function that goes through all custom maps in the folder is actually decent
 	LPCRITICAL_SECTION custom_map_lock;
 	BYTE gap_4[4];
-	LONGLONG field_8;
+	LONGLONG last_preview_bitmap_index;
 
 	union
 	{
 		struct
 		{
 			s_custom_map_entry* new_custom_map_entries_buffer;
-			s_custom_map_file_cache* custom_map_data_cache;
+			s_custom_map_file_cache* custom_map_file_data_cache;
 		};
 		// we replace this buffer bellow with a pointer to some dynamic heap allocated memory
 		s_custom_map_entry custom_map_entries[VANILLA_MAP_LIMIT];

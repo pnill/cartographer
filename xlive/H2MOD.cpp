@@ -27,7 +27,6 @@
 #include "H2MOD\Modules\KantTesting\KantTesting.h"
 #include "H2MOD\Modules\MainMenu\MapSlots.h"
 #include "H2MOD\Modules\MainMenu\Ranks.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
@@ -1368,7 +1367,6 @@ void H2MOD::ApplyHooks() {
 	PatchCall(Memory::GetAddress(0x9B09F, 0x85F73), filo_write__encrypted_data_hook);
 
 	ApplyFirefightHooks();
-	mapManager->applyHooks();
 
 	ProjectileFix::ApplyPatches();
 

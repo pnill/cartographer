@@ -51,7 +51,7 @@ namespace FiloInterface
 {
 	void filo_init(filo* filo_ptr, const std::string& path, bool path_is_directory);
 
-	bool create_file(filo* filo_ptr);
+	bool create_file_or_directory(filo* filo_ptr);
 
 	/* Returns success */
 	bool open(filo* filo_ptr, __int16 mode, DWORD* error_code);

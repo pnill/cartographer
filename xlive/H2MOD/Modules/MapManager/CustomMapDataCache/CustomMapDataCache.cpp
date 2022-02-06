@@ -15,7 +15,6 @@
 // TODO: consider replacing this implementation with a linked list
 
 const wchar_t* custom_map_cache_filename_client = L"mapset.h2mdat";
-const wchar_t* custom_map_cache_filename_server = L"mapsetdedi.h2mdat";
 
 const static char* offically_supported_builds[32] =
 {
@@ -50,7 +49,7 @@ const wchar_t* getCustomMapFolderPath()
 int get_path_from_id(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, char is_folder)
 {
 	typedef int(__cdecl* get_path_from_id)(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, char is_folder);
-	auto p_get_directory_path_by_id = Memory::GetAddressRelative<get_path_from_id>(0x48EF9E, 0x0); //TODO DEDI 
+	auto p_get_directory_path_by_id = Memory::GetAddressRelative<get_path_from_id>(0x48EF9E, 0x474A15);
 	return p_get_directory_path_by_id(id, pMore, pszPath, is_folder);
 }
 
@@ -62,7 +61,7 @@ static void* system_heap_alloc(SIZE_T dwBytes)
 
 void s_custom_map_data::create_custom_map_data_directory()
 {
-	auto p__create_custom_map_data_directory = Memory::GetAddressRelative<void(__cdecl*)()>(0x4C1FD4, 0x0);
+	auto p__create_custom_map_data_directory = Memory::GetAddressRelative<void(__cdecl*)()>(0x4C1FD4, 0x48F715);
 	p__create_custom_map_data_directory();
 }
 
@@ -206,7 +205,7 @@ bool s_custom_map_data::write_custom_map_data_cache_to_file(const char* path, s_
 		;
 
 	FiloInterface::filo_init(&cache_file, path, false);
-	bool create_file_success = FiloInterface::create_file(&cache_file);
+	bool create_file_success = FiloInterface::create_file_or_directory(&cache_file);
 	if (FiloInterface::open(&cache_file, filo_open_file_flags, &open_file_error_code))
 	{
 		FiloInterface::set_file_attribute_hidden(&cache_file, true);
@@ -259,15 +258,13 @@ void __thiscall s_custom_map_data::save_custom_map_data()
 
 	EnterCriticalSection(custom_map_lock);
 
-	s_custom_map_file_cache* custom_map_data_to_save = custom_map_data_cache;
+	s_custom_map_file_cache* custom_map_data_to_save = custom_map_file_data_cache;
 
 	custom_map_data_to_save->signature = custom_map_cache_signature;
 	custom_map_data_to_save->entries_count = custom_map_count;
-	custom_map_data_to_save->last_preview_bitmap_index = field_8;
+	custom_map_data_to_save->last_preview_bitmap_index = last_preview_bitmap_index;
 
-	typedef int(__cdecl* get_path_from_id)(int id, LPCWSTR pMore, LPWSTR pszPath, char is_folder);
-	auto p_get_directory_path_by_id = Memory::GetAddressRelative<get_path_from_id>(0x48EF9E, 0x0); //TODO DEDI OFFSET
-	if (p_get_directory_path_by_id(e_directory_id::custom_map_data_dir, L"\0", path_wide, true))
+	if (get_path_from_id(e_directory_id::custom_map_data_dir, L"\0", path_wide, true))
 	{
 		custom_map_data_path_available = true;
 		wcscat(path_wide, custom_map_cache_filename_client);
@@ -296,7 +293,6 @@ void __thiscall s_custom_map_data::load_custom_map_data_cache()
 
 	EnterCriticalSection(custom_map_lock);
 
-	// TODO read cache from file, not registry
 	WCHAR path_wide[MAX_PATH];
 	CHAR path_multibyte[MAX_PATH];
 	bool custom_map_data_path_available = false;
@@ -307,9 +303,7 @@ void __thiscall s_custom_map_data::load_custom_map_data_cache()
 	// first create the custom map data directory
 	create_custom_map_data_directory();
 
-	typedef int(__cdecl* get_path_from_id)(int id, LPCWSTR pMore, LPWSTR pszPath, char is_folder);
-	auto p_get_directory_path_by_id = Memory::GetAddressRelative<get_path_from_id>(0x48EF9E, 0x0); //TODO DEDI OFFSET
-	if (p_get_directory_path_by_id(e_directory_id::custom_map_data_dir, L"\0", path_wide, true))
+	if (get_path_from_id(e_directory_id::custom_map_data_dir, L"\0", path_wide, true))
 	{
 		custom_map_data_path_available = true;
 		wcscat(path_wide, custom_map_cache_filename_client);
@@ -329,8 +323,11 @@ void __thiscall s_custom_map_data::load_custom_map_data_cache()
 
 	//load_map_data_cache_from_file_cache(custom_map_file_cache);
 
-	this->custom_map_data_cache = custom_map_file_cache;
-	this->field_8 = custom_map_file_cache->last_preview_bitmap_index;
+	if (custom_map_file_data_cache != nullptr)
+		delete[] custom_map_file_data_cache;
+
+	this->custom_map_file_data_cache = custom_map_file_cache;
+	this->last_preview_bitmap_index = custom_map_file_cache->last_preview_bitmap_index;
 	this->new_custom_map_entries_buffer = custom_map_file_cache->entries; // we just use the buffer allocated previously
 	this->custom_map_count = custom_map_file_cache->entries_count;
 
@@ -342,7 +339,14 @@ void __thiscall s_custom_map_data::start_custom_map_sync()
 	// this code doesn't need any modifications, just some functions replaced inside it
 	typedef void(__thiscall* file_iterate_custom_map_directory_def)(s_custom_map_data* thisx);
 	auto p_file_iterate_custom_map_directory = Memory::GetAddress<file_iterate_custom_map_directory_def>(0x4D021, 0x419B5);
-	return p_file_iterate_custom_map_directory(this);
+	p_file_iterate_custom_map_directory(this);
+
+	// auto map_to_add = custom_map_to_add_linked_list;
+	// for ( ; map_to_add != nullptr; map_to_add = map_to_add->next)
+	// {
+	// 	LOG_TRACE_GAME(L"{} - found uncached map: {}",
+	// 		__FUNCTIONW__, map_to_add->custom_map_entry.file_path);
+	// }
 }
 
 unsigned int __thiscall s_custom_map_data::get_custom_map_list_ids(s_custom_map_id* out_ids, unsigned int out_ids_count)
@@ -524,6 +528,7 @@ void __thiscall s_custom_map_data::remove_entry_by_index(int idx)
 		// otherwise just move the memory from the next element to last in the now empty entry
 		// TODO: consider replacing this implementation with a linked list
 		// this might get very expensive
+		// but it shouldn't execute too many times
 		memmove(&new_custom_map_entries_buffer[idx], &new_custom_map_entries_buffer[idx + 1], (custom_map_count - 1 - idx) * sizeof(s_custom_map_entry));
 	}
 
@@ -562,6 +567,8 @@ bool __thiscall s_custom_map_data::remove_duplicates_by_map_name_and_hash(const 
 		if (!memcmp(new_custom_map_entries_buffer[i].map_sha256_hash, entry->map_sha256_hash, 32) 
 			&& !_wcsnicmp(new_custom_map_entries_buffer[i].map_name, entry->map_name, 32))
 		{
+			//LOG_TRACE_GAME(L"{} - removed: {} from cache matching cached entry: map name: {} map path: {}",
+				//__FUNCTIONW__, entry->file_path, new_custom_map_entries_buffer[i].map_name, new_custom_map_entries_buffer[i].file_path);
 			remove_entry_by_index(i);
 			removed = true;
 		}
@@ -725,35 +732,41 @@ bool __thiscall s_custom_map_data::add_custom_map_entry_by_map_file_path(const w
 
 void __thiscall s_custom_map_data::initialize()
 {
-
+	last_preview_bitmap_index = 0ll;
+	custom_map_count = 0;
+	custom_map_lock = new CRITICAL_SECTION;
+	InitializeCriticalSection(custom_map_lock);
 }
 
 // atexit
 void __thiscall s_custom_map_data::cleanup()
 {
 	new_custom_map_entries_buffer = nullptr;
-	if (custom_map_data_cache)
-		delete custom_map_data_cache;
+	if (custom_map_file_data_cache)
+		delete custom_map_file_data_cache;
 
-	custom_map_data_cache = nullptr;
+	custom_map_file_data_cache = nullptr;
 
 	DeleteCriticalSection(custom_map_lock);
+	delete custom_map_lock;
 }
 
 static __declspec(naked) void jmp_get_entry_by_id() { __asm jmp s_custom_map_data::get_entry_by_id }
 static __declspec(naked) void jmp_load_custom_map_data_cache() { __asm jmp s_custom_map_data::load_custom_map_data_cache }
-static __declspec(naked) void jmp_file_iterate_custom_map_directory() { __asm jmp s_custom_map_data::start_custom_map_sync }
+static __declspec(naked) void jmp_start_custom_map_sync() { __asm jmp s_custom_map_data::start_custom_map_sync }
 static __declspec(naked) void jmp_mark_all_cached_maps_for_deletion() { __asm jmp s_custom_map_data::mark_all_cached_maps_for_deletion }
 static __declspec(naked) void jmp_find_matching_entries_by_file_path() { __asm jmp s_custom_map_data::find_matching_entries_by_file_path }
 static __declspec(naked) void jmp_find_matching_entries_by_map_name_and_hash() { __asm jmp s_custom_map_data::find_matching_entries_by_map_name_and_hash }
 static __declspec(naked) void jmp_delete_single_entry() { __asm jmp s_custom_map_data::delete_single_entry }
 static __declspec(naked) void jmp_remove_duplicates_and_add_entry() { __asm jmp s_custom_map_data::remove_duplicates_and_add_entry }
 static __declspec(naked) void jmp_save_custom_map_data() { __asm jmp s_custom_map_data::save_custom_map_data }
-static __declspec(naked) void jmp_cleanup() { __asm jmp s_custom_map_data::cleanup }
 static __declspec(naked) void jmp_remove_marked_for_deletion() { __asm jmp s_custom_map_data::remove_marked_for_deletion }
 static __declspec(naked) void jmp_add_entry() { __asm jmp s_custom_map_data::add_entry }
 static __declspec(naked) void jmp_remove_duplicates_write_entry_data_and_add() { __asm jmp s_custom_map_data::remove_duplicates_write_entry_data_and_add }
+static __declspec(naked) void jmp_cleanup() { __asm jmp s_custom_map_data::cleanup }
+static __declspec(naked) void jmp_initialize() { __asm jmp s_custom_map_data::initialize }
 
+// custom map selection list code
 class c_custom_game_custom_map_list
 {
 public:
@@ -808,7 +821,7 @@ public:
 			}
 		}
 
-		addDebugText("c_custom_game_custom_map_list - custom map list count: %d", (*custom_map_menu_list)->total_elements_used);
+		// addDebugText("c_custom_game_custom_map_list - custom map list count: %d", (*custom_map_menu_list)->total_elements_used);
 
 		if (map_ids_buffer != nullptr)
 			delete[] map_ids_buffer;
@@ -824,39 +837,19 @@ static __declspec(naked) void jmp_c_custom_game_custom_map_list_constructor_hook
 
 void s_custom_map_data::applyCustomMapExtensionLimitPatches()
 {
-	// first we replace the `lea` load effective address instruction with mov move instruction
-	// so instead of getting the address of the static 50 limit buffer, we read the pointer to a new heap allocated buffer from that point
-	// this allows us to re-use the game's code without entirely rewriting it
-	// but at some point we might as well just re-write to increase the performance of the code
-	{
-		// sub_4C1A5A - gets `s_custom_map_entry` entries matching the map_name
-		BYTE opcode_buf[] = { 0x8B }; // lea     esi, [edi+10h] -> mov     esi, [edi+10h]
-		WriteBytes(Memory::GetAddressRelative(0x4C1A91, 0x0), opcode_buf, sizeof(opcode_buf));
+	WriteJmpTo(Memory::GetAddressRelative(0x44CF41, 0x441819), jmp_get_entry_by_id);
+	WriteJmpTo(Memory::GetAddressRelative(0x44CC30, 0x490356), jmp_load_custom_map_data_cache);
+	WriteJmpTo(Memory::GetAddressRelative(0x4C19B4, 0x48F0F5), jmp_mark_all_cached_maps_for_deletion);
+	WriteJmpTo(Memory::GetAddressRelative(0x4C1D65, 0x48F4A6), jmp_find_matching_entries_by_file_path);
+	WriteJmpTo(Memory::GetAddressRelative(0x4C1C1F, 0x48F360), jmp_find_matching_entries_by_map_name_and_hash);
+	WriteJmpTo(Memory::GetAddressRelative(0x4C2669, 0x48FDAA), jmp_delete_single_entry);
+	WriteJmpTo(Memory::GetAddressRelative(0x44CDA6, 0x441677), jmp_remove_duplicates_and_add_entry);
+	WriteJmpTo(Memory::GetAddressRelative(0x4C2D4D, 0x49048E), jmp_save_custom_map_data);
+	WriteJmpTo(Memory::GetAddressRelative(0x4C27F3, 0x48FF34), jmp_remove_marked_for_deletion);
+	WriteJmpTo(Memory::GetAddressRelative(0x4C259B, 0x48FCDC), jmp_add_entry);
+	WriteJmpTo(Memory::GetAddressRelative(0x44CD1E, 0x4415EF), jmp_remove_duplicates_write_entry_data_and_add);
 
-		// sub_4C1AF0 - gets `s_custom_map_entry` entries matching the map file sha256 hash
-		WriteBytes(Memory::GetAddressRelative(0x4C1B3D, 0x0), opcode_buf, sizeof(opcode_buf));
-
-		// sub_4C1D65 - gets `s_custom_map_entry` entries matching the map file location path
-		WriteBytes(Memory::GetAddressRelative(0x4C1D9C, 0x0), opcode_buf, sizeof(opcode_buf));
-
-		WriteBytes(Memory::GetAddressRelative(0x4C1C6C, 0x0), opcode_buf, sizeof(opcode_buf));
-
-		// too hard to fully modify, we just re-write this
-		// WriteBytes(Memory::GetAddressRelative(0x4C26D5, 0x0), opcode_buf, sizeof(opcode_buf));
-	}
-
-	// TODO DEDI OFFSETS
-	WriteJmpTo(Memory::GetAddressRelative(0x44CF41, 0x0), jmp_get_entry_by_id);
-	WriteJmpTo(Memory::GetAddressRelative(0x44CC30, 0x0), jmp_load_custom_map_data_cache);
-	WriteJmpTo(Memory::GetAddressRelative(0x4C19B4, 0x0), jmp_mark_all_cached_maps_for_deletion);
-	WriteJmpTo(Memory::GetAddressRelative(0x4C1D65, 0x0), jmp_find_matching_entries_by_file_path);
-	WriteJmpTo(Memory::GetAddressRelative(0x4C1C1F, 0x0), jmp_find_matching_entries_by_map_name_and_hash);
-	WriteJmpTo(Memory::GetAddressRelative(0x4C2669, 0x0), jmp_delete_single_entry);
-	WriteJmpTo(Memory::GetAddressRelative(0x44CDA6, 0x0), jmp_remove_duplicates_and_add_entry);
-	WriteJmpTo(Memory::GetAddressRelative(0x4C2D4D, 0x0), jmp_save_custom_map_data);
-	WriteJmpTo(Memory::GetAddressRelative(0x4C27F3, 0x0), jmp_remove_marked_for_deletion);
-	WriteJmpTo(Memory::GetAddressRelative(0x4C259B, 0x0), jmp_add_entry);
-	WriteJmpTo(Memory::GetAddressRelative(0x44CD1E, 0x0), jmp_remove_duplicates_write_entry_data_and_add);
+	PatchCall(Memory::GetAddressRelative(0x439E56, 0x40BAB8), jmp_start_custom_map_sync);
 
 	// custom map data menu list hook/patches
 	if (!Memory::isDedicatedServer())
@@ -867,17 +860,18 @@ void s_custom_map_data::applyCustomMapExtensionLimitPatches()
 		// jmp near 0xB7
 		BYTE jmp_to_epilog_sub_65AE3B[] = { 0xE9, 0xB7, 0x00, 0x00, 0x00 };
 		WriteBytes(Memory::GetAddressRelative(0x65AEFD), jmp_to_epilog_sub_65AE3B, sizeof(jmp_to_epilog_sub_65AE3B));
-
-		// replace game's atexit cleanup impl
-		WriteJmpTo(Memory::GetAddressRelative(0x79A0DC), jmp_cleanup);
 	}
+
+	WriteJmpTo(Memory::GetAddressRelative(0x4C18BD, 0x48EFFE), jmp_initialize);
+
+	// replace game's atexit cleanup impl
+	WriteJmpTo(Memory::GetAddressRelative(0x79A0DC, 0x73E9E5), jmp_cleanup);
 
 	PatchCall(Memory::GetAddress(0x1E49A2, 0x1EDF0), validate_and_read_custom_map_data);
 	PatchCall(Memory::GetAddress(0x4D3BA, 0x417FE), validate_and_read_custom_map_data);
 	PatchCall(Memory::GetAddress(0x4CF26, 0x41D4E), validate_and_read_custom_map_data);
 	PatchCall(Memory::GetAddress(0x8928, 0x1B6482), validate_and_read_custom_map_data);
 
-	// Both server and client
 	WriteJmpTo(Memory::GetAddress(0x1467, 0x12E2), scenario_is_supported_build);
 }
 

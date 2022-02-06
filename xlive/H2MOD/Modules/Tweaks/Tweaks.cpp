@@ -13,6 +13,7 @@
 #include "H2MOD\Variants\VariantMPGameEngine.h"
 #include "Util\Hooks\Hook.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
 
 #pragma region Done_Tweaks
 
@@ -808,6 +809,7 @@ void InitH2Tweaks() {
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 
 	initializeTimeHooks();
+	mapManager->applyHooks();
 
 	if (Memory::isDedicatedServer()) {
 		phookServ1 = (thookServ1)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
