@@ -6,7 +6,6 @@
 #include "H2MOD\Tags\MetaExtender.h"
 #include "Util\filesys.h"
 #include "Util\Hooks\Hook.h"
-#include <algorithm>
 
 #include "Blam/Cache/TagGroups/weather_system_definition.hpp"
 #include "Blam/Engine/DataArray/TagDataIterator.h"

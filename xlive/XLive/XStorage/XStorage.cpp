@@ -1,15 +1,79 @@
+#include "stdafx.h"
 
 #include "XStorage.h"
 
+namespace filesystem = std::filesystem;
+
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
+// #5344: XStorageBuildServerPath
+DWORD WINAPI XStorageBuildServerPath(DWORD dwUserIndex, XSTORAGE_FACILITY StorageFacility,
+	const void *pvStorageFacilityInfo, DWORD dwStorageFacilityInfoSize,
+	WCHAR* pwszItemName, WCHAR *pwszServerPath, DWORD *pdwServerPathLength)
+{
+	LOG_TRACE_XLIVE(L"XStorageBuildServerPath  ( StorageFacility = {},  dwStorageFacilityInfoSize = {}, pwszItemName = {}, pwszServerPath = {}, pdwServerPathLength = {} )",
+		(int)StorageFacility, dwStorageFacilityInfoSize, (wchar_t*)pwszItemName, (wchar_t*)pwszServerPath, *pdwServerPathLength);
+
+	if (!pdwServerPathLength)
+		return ERROR_INVALID_PARAMETER;
+
+	if (pwszServerPath)
+	{
+		std::wstring itemName(pwszItemName);
+		std::wstring path(_wgetenv(L"USERPROFILE"));
+		std::wstring xuidAsString = std::to_wstring(usersSignInInfo[dwUserIndex].xuid);
+
+		path += L"\\AppData\\Local\\Microsoft\\Halo 2\\XLive\\";
+		path += xuidAsString;
+
+		bool createDirectoryTree = false;
+		try
+		{
+			filesystem::create_directory(path);
+		}
+		catch (...)
+		{
+			createDirectoryTree = true;
+		}
+
+		// create the directories only if we fail to create the last one in the tree
+		if (createDirectoryTree)
+		{
+			filesystem::create_directories(path);
+		}
+
+		switch (StorageFacility)
+		{
+		case XSTORAGE_FACILITY_PER_TITLE:
+		case XSTORAGE_FACILITY_GAME_CLIP:
+		case XSTORAGE_FACILITY_PER_USER_TITLE:
+			path += L"\\" + itemName;
+			break;
+
+		default:
+			return ERROR_INVALID_PARAMETER;
+		}
+
+		if (*pdwServerPathLength < path.length() + 1)
+		{
+			return ERROR_INSUFFICIENT_BUFFER;
+		}
+
+		wcsncpy(pwszServerPath, path.c_str(), *pdwServerPathLength);
+		*pdwServerPathLength = path.length() + 1; // including the null char
+		return ERROR_SUCCESS;
+	}
+
+	return ERROR_SUCCESS;
+}
+
 // #5305: XStorageUploadFromMemory
-DWORD WINAPI XStorageUploadFromMemory(DWORD dwUserIndex, const WCHAR *wszServerPath, DWORD dwBufferSize, const BYTE *pbBuffer, PXOVERLAPPED pOverlapped)
+DWORD WINAPI XStorageUploadFromMemory(DWORD dwUserIndex, const WCHAR* wszServerPath, DWORD dwBufferSize, const BYTE* pbBuffer, PXOVERLAPPED pOverlapped)
 {
 	LOG_TRACE_XLIVE(L"XStorageUploadFromMemory  ( wszServerPath = {}, dwBufferSize = {} )",
 		wszServerPath, dwBufferSize);
 
-	FILE *fp;
+	FILE* fp;
 	errno_t err = _wfopen_s(&fp, wszServerPath, L"wb");
 	if (err)
 	{
@@ -50,70 +114,6 @@ DWORD WINAPI XStorageUploadFromMemory(DWORD dwUserIndex, const WCHAR *wszServerP
 
 	return ERROR_SUCCESS;
 }
-
-// #5344: XStorageBuildServerPath
-DWORD WINAPI XStorageBuildServerPath(DWORD dwUserIndex, XSTORAGE_FACILITY StorageFacility,
-	const void *pvStorageFacilityInfo, DWORD dwStorageFacilityInfoSize,
-	LPCWSTR *pwszItemName, WCHAR *pwszServerPath, DWORD *pdwServerPathLength)
-{
-	LOG_TRACE_XLIVE(L"XStorageBuildServerPath  ( StorageFacility = {},  dwStorageFacilityInfoSize = {}, pwszItemName = {}, pwszServerPath = {}, pdwServerPathLength = {} )",
-		(int)StorageFacility, dwStorageFacilityInfoSize, (wchar_t*)pwszItemName, (wchar_t*)pwszServerPath, *pdwServerPathLength);
-
-	bool PathValid = false;
-	bool CreateDirReturn = false;
-
-	DWORD fileAtributes = 0;
-	std::wstring itemName((wchar_t*)pwszItemName);
-
-	if (pwszServerPath)
-	{
-		std::wstring filePath(_wgetenv(L"USERPROFILE"));
-		filePath += L"\\AppData\\Local";
-
-		fileAtributes = GetFileAttributes(filePath.c_str());
-		if (fileAtributes != INVALID_FILE_ATTRIBUTES && fileAtributes & FILE_ATTRIBUTE_DIRECTORY)
-		{
-			filePath += L"\\Microsoft\\Halo 2";
-			CreateDirReturn = CreateDirectory(filePath.c_str(), NULL);
-			if (CreateDirReturn || GetLastError() == ERROR_ALREADY_EXISTS)
-			{
-				filePath += L"\\XLive";
-				CreateDirReturn = CreateDirectory(filePath.c_str(), NULL);
-				if (CreateDirReturn || GetLastError() == ERROR_ALREADY_EXISTS)
-				{
-					switch (StorageFacility)
-					{
-					case XSTORAGE_FACILITY_GAME_CLIP:
-					case XSTORAGE_FACILITY_PER_TITLE:
-					case XSTORAGE_FACILITY_PER_USER_TITLE:
-						filePath += L"\\" + std::to_wstring(usersSignInInfo[dwUserIndex].xuid);
-						break;
-
-					default:
-						return ERROR_INVALID_PARAMETER;
-					}
-
-					CreateDirReturn = CreateDirectory(filePath.c_str(), NULL);
-					if (CreateDirReturn || GetLastError() == ERROR_ALREADY_EXISTS)
-					{
-						filePath += L"\\" + itemName;
-						PathValid = true;
-					}
-				}
-			}
-		}
-
-		if (PathValid)
-		{
-			*pdwServerPathLength = filePath.size();
-			wcsncpy(pwszServerPath, filePath.c_str(), filePath.size());
-			return ERROR_SUCCESS;
-		}
-	}
-
-	return ERROR_FUNCTION_FAILED;
-}
-
 
 // #5345: XStorageDownloadToMemory
 DWORD WINAPI XStorageDownloadToMemory(DWORD dwUserIndex,

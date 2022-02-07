@@ -641,7 +641,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$ishost") {
-			network_session* session = NetworkSession::getCurrentNetworkSession();
+			s_network_session* session = NetworkSession::getCurrentNetworkSession();
 			std::wstring isHostStr = L"isHost=";
 			DWORD isHostByteValue = session->local_session_state;
 			std::wostringstream ws;

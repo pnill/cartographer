@@ -13,6 +13,7 @@
 #include "H2MOD\Variants\VariantMPGameEngine.h"
 #include "Util\Hooks\Hook.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
 
 #pragma region Done_Tweaks
 
@@ -245,7 +246,7 @@ enum startup_flags : int
 	unk12, // some tag thing?
 	unk13, // some tag thing?
 	unk14, // some tag thing?
-	unk15, // seen near xlive init code
+	custom_map_entry_test_map_name_instead_of_hash, // flag to test the map name instead of the hash of the custom map
 	unk16,
 	xbox_live_silver_account, // if true, disables 'gold-only' features, like quickmatch etc
 	unk18, // fuzzer/automated testing? (sapien)
@@ -332,12 +333,12 @@ const static int max_mointor_count = 9;
 bool engine_basic_init()
 {
 	DWORD* flags_array = Memory::GetAddress<DWORD*>(0x46d820);
-	SecureZeroMemory(flags_array, startup_flags::count * sizeof(DWORD)); // should be zero initalized anyways but the game does it
+	ZeroMemory(flags_array, startup_flags::count * sizeof(DWORD)); // should be zero initalized anyways but the game does it
 
 	H2Config_voice_chat = false;
 	flags_array[startup_flags::nointro] = H2Config_skip_intro;
 
-	HANDLE(*fn_c000285fd)() = (HANDLE(*)())Memory::GetAddress<void*>(0x000285fd);
+	void(*fn_c000285fd)() = (void(*)())Memory::GetAddress<void*>(0x000285fd);
 
 	init_gfwl_gamestore();
 	init_data_checksum_info();
@@ -421,13 +422,19 @@ bool engine_basic_init()
 	game_state_initialize();
 
 	// modifies esi need to check what the caller sets that too
-	//char(*fn_c001a9de6)() = (char(*)())(Memory::GetAddress(0x001a9de6));
-	//char result_c001a9de6 = fn_c001a9de6();
+	// Update 1/13/2022:
+	// initializes some interface that's used to download the network config from the bungie's website
+	// but a stub in release
+	void(*network_configuration_initialize)() = (void(*)())(Memory::GetAddress(0x001a9de6));
+	network_configuration_initialize();
+
 	if (!LOG_CHECK(rasterizer_initialize()))
 		return false;
 
+	// does some weird stuff with sound, might setup volume
+	fn_c000285fd();
+
 	input_initialize();
-	// not needed but bungie did it so there might be some reason
 	sound_initialize();
 
 	struct FakePBuffer {
@@ -446,9 +453,6 @@ bool engine_basic_init()
 	XLivePBufferSetByte(*var_c00479e78, 1, 0);
 
 	//SLDLInitialize
-
-	// does some weird stuff with sound, might setup volume
-	HANDLE result_c000285fd = fn_c000285fd();
 
 	//SLDLOpen
 	//SLDLConsumeRight
@@ -805,6 +809,7 @@ void InitH2Tweaks() {
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 
 	initializeTimeHooks();
+	mapManager->applyHooks();
 
 	if (Memory::isDedicatedServer()) {
 		phookServ1 = (thookServ1)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);

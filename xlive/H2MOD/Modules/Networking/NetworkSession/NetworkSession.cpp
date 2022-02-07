@@ -1,19 +1,24 @@
 #include "NetworkSession.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 
-network_session* NetworkSession::getNetworkSessions()
+bool NetworkSession::playerIsActive(int playerIndex)
 {
-	return *Memory::GetAddress<network_session**>(0x51C474, 0x520B94);
+	return (NetworkSession::getCurrentNetworkSession()->membership.players_active_mask & FLAG(playerIndex)) != 0;
 }
 
-network_session* NetworkSession::getCurrentNetworkSession()
+s_network_session* NetworkSession::getNetworkSessions()
 {
-	return *Memory::GetAddress<network_session**>(0x420FE8, 0x3C40D0);
+	return *Memory::GetAddress<s_network_session**>(0x51C474, 0x520B94);
 }
 
-bool NetworkSession::getCurrentNetworkSession(network_session** outSession)
+s_network_session* NetworkSession::getCurrentNetworkSession()
 {
-	typedef bool(__cdecl* get_lobby_globals_ptr)(network_session**);
+	return *Memory::GetAddress<s_network_session**>(0x420FE8, 0x3C40D0);
+}
+
+bool NetworkSession::getCurrentNetworkSession(s_network_session** outSession)
+{
+	typedef bool(__cdecl* get_lobby_globals_ptr)(s_network_session**);
 	return Memory::GetAddress<get_lobby_globals_ptr>(0x1AD736, 0x1A66B3)(outSession);
 }
 
@@ -59,16 +64,16 @@ bool NetworkSession::localPeerIsEstablished()
 }
 
 // returns NONE (-1) if fails
-signed int NetworkSession::getPeerIndexFromNetworkAddress(network_address* address)
+int NetworkSession::getPeerIndexFromNetworkAddress(network_address* address)
 {
-	typedef signed int(__thiscall* get_peer_index_from_network_address)(network_session* session, network_address* address);
+	typedef int(__thiscall* get_peer_index_from_network_address)(s_network_session* session, network_address* address);
 	return Memory::GetAddress<get_peer_index_from_network_address>(0x1C71DF, 0x19E9CF)(getCurrentNetworkSession(), address);
 }
 
 char NetworkSession::getMapFileLocation(wchar_t* buffer, size_t size)
 {
 	// host-only
-	typedef char(__thiscall* get_map_file_location_impl)(network_session* session, wchar_t* buffer, size_t size);
+	typedef char(__thiscall* get_map_file_location_impl)(s_network_session* session, wchar_t* buffer, size_t size);
 	return Memory::GetAddress<get_map_file_location_impl>(0x1C5678, 0x19CD4A)(getCurrentNetworkSession(), buffer, size);
 }
 
@@ -76,8 +81,6 @@ int NetworkSession::getPeerCount()
 {
 	return getCurrentNetworkSession()->membership.peer_count;
 }
-
-
 
 int NetworkSession::getLocalPeerIndex()
 {
@@ -91,7 +94,7 @@ bool NetworkSession::peerIndexLocal(int peerIndex)
 
 IN_ADDR NetworkSession::getLocalNetworkAddress()
 {
-	return getCurrentNetworkSession()->membership.peer_info[getLocalPeerIndex()].address.inaOnline;
+	return getCurrentNetworkSession()->membership.peer_data[getLocalPeerIndex()].address.inaOnline;
 }
 
 int NetworkSession::getPeerIndex(int playerIndex)
@@ -99,25 +102,17 @@ int NetworkSession::getPeerIndex(int playerIndex)
 	return getPlayerInformation(playerIndex)->peer_index;
 }
 
-wchar_t* NetworkSession::getPeerPlayerName(int peerIndex)
+const wchar_t* NetworkSession::getPeerPlayerName(int peerIndex)
 {
 	if (getPeerCount() > 0)
 	{
-		int playerIndex = 0;
-		do
+		for (int playerIndex = 0; playerIndex < ENGINE_PLAYER_MAX; playerIndex++)
 		{
 			if (getPeerIndex(playerIndex) == peerIndex)
 				return getPlayerName(playerIndex);
-			playerIndex++;
-		} while (playerIndex < 16);
+		}
 	}
-	return L"";
-}
-/* Use this to verify if a player is currently active in the network session */
-/* Otherwise you will wonder why you don't get the right data/player index etc. */
-bool NetworkSession::playerIsActive(int playerIndex)
-{
-	return (NetworkSession::getCurrentNetworkSession()->membership.players_active_mask & FLAG(playerIndex)) != 0;
+	return nullptr;
 }
 
 int NetworkSession::getPlayerCount()
@@ -125,29 +120,26 @@ int NetworkSession::getPlayerCount()
 	return getCurrentNetworkSession()->membership.player_count;
 }
 
-player_information* NetworkSession::getPlayerInformation(int playerIndex)
+s_player_information* NetworkSession::getPlayerInformation(int playerIndex)
 {
-	return &getCurrentNetworkSession()->membership.player_info[playerIndex];
+	return &getCurrentNetworkSession()->membership.player_data[playerIndex]; sizeof(s_session_parameters);
 }
 
 
-int NetworkSession::getPlayerIdByName(wchar_t* name)
+int NetworkSession::getPlayerIdByName(const wchar_t* name)
 {
 	if (getPlayerCount() > 0)
 	{
-		int playerIndex = 0;
-		do
+		for (int playerIndex = 0; playerIndex < ENGINE_PLAYER_MAX; playerIndex++)
 		{
 			if (playerIsActive(playerIndex) && wcscmp(getPlayerName(playerIndex), name) == 0)
 				return playerIndex;
-
-			playerIndex++;
-		} while (playerIndex < 16);
+		}
 	}
 	return NONE;
 }
 
-wchar_t* NetworkSession::getPlayerName(int playerIndex)
+const wchar_t* NetworkSession::getPlayerName(int playerIndex)
 {
 	return getPlayerInformation(playerIndex)->properties.player_name;
 }
@@ -197,7 +189,7 @@ int NetworkSession::getPeerIndexFromXUID(long long xuid)
 
 void NetworkSession::kickPeer(int peerIndex) 
 {
-	typedef void(__thiscall* game_session_boot)(network_session* session, int peer_index, bool unk);
+	typedef void(__thiscall* game_session_boot)(s_network_session* session, int peer_index, bool unk);
 	auto p_game_session_boot = Memory::GetAddress<game_session_boot>(0x1CCE9B);
 
 	if (peerIndex < getPeerCount()) 
@@ -214,7 +206,7 @@ void NetworkSession::endGame()
 	p_end_game();
 }
 
-peer_observer_channel* NetworkSession::getPeerObserverChannel(int peerIndex)
+s_peer_observer_channel* NetworkSession::getPeerObserverChannel(int peerIndex)
 {
 	return &getCurrentNetworkSession()->peer_observer_channels[peerIndex];
 }
@@ -261,11 +253,11 @@ void NetworkSession::logPeersToConsole() {
 
 			std::wstring outStr = L"Peer index=" + std::to_wstring(peerIndex);
 			outStr += L", Peer Name=";
-			outStr += getCurrentNetworkSession()->membership.peer_info[peerIndex].name;
+			outStr += getCurrentNetworkSession()->membership.peer_data[peerIndex].name;
 			outStr += L", Connection Status=";
 			outStr += std::to_wstring(peer_observer->state);
-			int playerIndex = getCurrentNetworkSession()->membership.peer_info[peerIndex].player_index[0];
-			outStr += L", Peer map state: " + std::to_wstring(getCurrentNetworkSession()->membership.peer_info[peerIndex].map_status);
+			int playerIndex = getCurrentNetworkSession()->membership.peer_data[peerIndex].player_index[0];
+			outStr += L", Peer map state: " + std::to_wstring(getCurrentNetworkSession()->membership.peer_data[peerIndex].map_status);
 			if (playerIndex != -1) 
 			{
 				outStr += L", Player index=" + std::to_wstring(playerIndex);
@@ -290,11 +282,11 @@ void NetworkSession::logPeersToConsole() {
 void NetworkSession::logStructureOffsets() {
 	
 	std::wostringstream outStr;
-	outStr << L"Offset of local_peer_index=" << std::hex << offsetof(network_session, local_peer_index);
-	outStr << L", Offset of peer_observer_channels=" << std::hex << offsetof(network_session, peer_observer_channels);
-	outStr << L", Offset of local_session_state=" << std::hex << offsetof(network_session, local_session_state);
-	outStr << L", Offset of membership=" << std::hex << offsetof(network_session, membership);
-	outStr << L", Offset of session_host_peer_index=" << std::hex << offsetof(network_session, session_host_peer_index);
+	outStr << L"Offset of local_peer_index=" << std::hex << offsetof(s_network_session, local_peer_index);
+	outStr << L", Offset of peer_observer_channels=" << std::hex << offsetof(s_network_session, peer_observer_channels);
+	outStr << L", Offset of local_session_state=" << std::hex << offsetof(s_network_session, local_session_state);
+	outStr << L", Offset of membership=" << std::hex << offsetof(s_network_session, membership);
+	outStr << L", Offset of session_host_peer_index=" << std::hex << offsetof(s_network_session, session_host_peer_index);
 			
 	commands->output(outStr.str());
 }
