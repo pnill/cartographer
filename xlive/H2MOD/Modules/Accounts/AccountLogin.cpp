@@ -51,7 +51,7 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 
 	char result = strlen(login_token) == 32 ? 1 : 2;
 
-	XUserSetup(0, xuid, username, xnaddr, lanaddr, abEnet, abOnline, onlineSignIn);
+	XUserSetup(0, xuid, username, xnaddr, lanaddr, H2Config_base_port, abEnet, abOnline, onlineSignIn);
 
 	UpdateConnectionStatus();
 

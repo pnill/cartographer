@@ -269,6 +269,9 @@ int XSocket::winsock_read_socket(LPWSABUF lpBuffers,
 	LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine,
 	bool* outWinApiError)
 {
+	if (outWinApiError)
+		*outWinApiError = false;
+
 	if (this->isTCP()
 		|| lpFrom == NULL)
 	{
@@ -328,6 +331,7 @@ int XSocket::recvfrom(LPWSABUF lpBuffers,
 			}
 			else
 			{
+				// continue reading the socket, if error wasn't by winsock api
 				continue;
 			}
 		}
