@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "CustomPackets.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"

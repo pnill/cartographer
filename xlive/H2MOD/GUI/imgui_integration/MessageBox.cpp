@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Blam\Common\Common.h"
 #include "H2MOD.h"
 #include "H2MOD\Modules\Input\PlayerControl.h"

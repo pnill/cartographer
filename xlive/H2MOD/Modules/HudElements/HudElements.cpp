@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "HudElements.h"
 #include "H2MOD\EngineCalls\EngineCalls.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"

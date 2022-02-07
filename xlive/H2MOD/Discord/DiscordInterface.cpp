@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "3rdparty/discord/discord_rpc.h"
 #include "3rdparty/discord/discord_register.h"

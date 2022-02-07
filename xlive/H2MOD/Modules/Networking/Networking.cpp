@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Networking.h"
 #include "Memory\bitstream.h"
 #include "OverridePackets\OverridePackets.h"

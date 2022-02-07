@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "KantTesting.h"
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 #include "Blam\Cache\TagGroups\biped_definition.hpp"

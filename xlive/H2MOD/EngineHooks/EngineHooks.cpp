@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "EngineHooks.h"
 #include "H2MOD.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"

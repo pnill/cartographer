@@ -1,4 +1,6 @@
-#include  "OverridePackets.h"
+#include "stdafx.h"
+
+#include "OverridePackets.h"
 #include "H2MOD\EngineCalls\EngineCalls.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"

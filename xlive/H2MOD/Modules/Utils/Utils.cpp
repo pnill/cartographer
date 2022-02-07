@@ -1,7 +1,8 @@
+#include "stdafx.h"
+
 #include "Utils.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "Util\Hooks\Hook.h"
 #include <sys\timeb.h>
 
 int FindLineStart(FILE* fp, int lineStrLen) {

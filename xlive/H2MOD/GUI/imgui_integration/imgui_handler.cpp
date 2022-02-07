@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "imgui_handler.h"
 #include "H2MOD.h"
 #include "H2MOD\Modules\Input\PlayerControl.h"

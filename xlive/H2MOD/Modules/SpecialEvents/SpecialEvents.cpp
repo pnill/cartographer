@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "SpecialEvents.h"
 
 #include "Blam/Engine/Game/GameTimeGlobals.h"

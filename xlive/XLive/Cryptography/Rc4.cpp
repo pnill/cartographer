@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Rc4.h"
 
 void XeCryptRc4Key(XECRYPT_RC4_STATE* rc4_ctx, BYTE* key, DWORD key_size)

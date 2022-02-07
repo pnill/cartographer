@@ -1,3 +1,5 @@
+#include "stdafx.h"
+#include "XSocket.h"
 #include "XLive\xnet\upnp.h"
 #include "XLive\xnet\Sockets\XSocket.h"
 #include "XLive\xnet\IpManagement\XnIp.h"

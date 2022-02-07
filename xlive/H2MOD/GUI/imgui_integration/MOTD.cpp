@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "H2MOD.h"
 #include "H2MOD\GUI\GUI.h"
 #include "H2MOD\Modules\Input\ControllerInput.h"

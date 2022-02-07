@@ -1,5 +1,4 @@
-
-
+#include "stdafx.h"
 
 #include "Detour.h"
 #include <stdio.h>

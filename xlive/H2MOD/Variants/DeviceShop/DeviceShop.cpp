@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "DeviceShop.h"
 #include "H2MOD.h"
 #include "H2MOD\Tags\TagInterface.h"

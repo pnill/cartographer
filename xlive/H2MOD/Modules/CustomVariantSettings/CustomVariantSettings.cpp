@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "CustomVariantSettings.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
 #include "Blam\Engine\Game\PhysicsConstants.h"

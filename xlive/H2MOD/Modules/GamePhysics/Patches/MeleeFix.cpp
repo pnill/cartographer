@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "MeleeFix.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "Util\Hooks\Hook.h"

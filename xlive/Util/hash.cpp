@@ -1,9 +1,6 @@
-#include <stdafx.h>
-#include <Wincrypt.h>
-#include <sstream>
-#include <iomanip>
+#include "stdafx.h"
+
 #include "hash.h"
-#include <codecvt>
 
 bool hash_open_file(const wchar_t *file_name, HANDLE &file)
 {

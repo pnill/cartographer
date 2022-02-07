@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "XUser.h"
 
 #include "XLive/xbox/xbox.h"

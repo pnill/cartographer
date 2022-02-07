@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Updater.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"

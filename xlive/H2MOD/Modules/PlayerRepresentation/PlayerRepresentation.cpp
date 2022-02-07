@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "PlayerRepresentation.h"
 #include "Blam\Cache\DataTypes\BlamTag.h"
 #include "Blam\Cache\TagGroups\biped_definition.hpp"

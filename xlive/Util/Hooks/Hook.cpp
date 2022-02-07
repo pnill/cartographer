@@ -1,6 +1,6 @@
+#include "stdafx.h"
 
 #include <malloc.h>
-
 
 #include "hook.h"
 #pragma warning( disable :4996)

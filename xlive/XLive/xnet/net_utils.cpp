@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "net_utils.h"
 

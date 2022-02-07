@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "FireFight.h"
 #include "Blam\Cache\TagGroups\character_definition.hpp"

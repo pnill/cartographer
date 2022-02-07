@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "GunGame.h"
 #include "H2MOD.h"
 #include "H2MOD\EngineCalls\EngineCalls.h"

@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "CustomMenu.h"
 #include "c_screen_with_menu.h"
 #include "CustomLanguage.h"

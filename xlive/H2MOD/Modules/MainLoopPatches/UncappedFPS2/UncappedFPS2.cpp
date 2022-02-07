@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "UncappedFPS2.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
 #include "H2MOD\Modules\Config\Config.h"
