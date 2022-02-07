@@ -544,7 +544,34 @@ bool __thiscall s_custom_map_data::get_entry_by_id(const s_custom_map_id* custom
 		return find_matching_entries_by_sha256_hash(custom_map_id->map_sha256_hash, out_entry, 1) != 0;
 }
 
+bool __thiscall s_custom_map_data::entry_is_duplicate(const s_custom_map_entry* entry)
+{
+	EnterCriticalSection(custom_map_lock);
 
+	bool duplicate = false;
+
+	if (find_matching_entries_by_file_path(entry->file_path, 0, 0) > 0u)
+	{
+		duplicate = true;
+	}
+
+	if (!duplicate)
+	{
+		if (find_matching_entries_by_map_name_and_hash(entry->map_name, entry->map_sha256_hash, 0, 0) > 0u)
+			duplicate = true;
+	}
+
+	LeaveCriticalSection(custom_map_lock);
+
+	return duplicate;
+}
+
+bool __thiscall s_custom_map_data::validate_entry_data(const s_custom_map_entry* entries, int count)
+{
+	typedef bool(__thiscall* validate_entry_data)(s_custom_map_data*, const s_custom_map_entry* entry, int count);
+	auto p_validate_entry_data = Memory::GetAddressRelative<validate_entry_data>(0x4C1E01, 0x48F542);
+	return p_validate_entry_data(this, entries, count * sizeof(s_custom_map_entry));
+}
 
 void __thiscall s_custom_map_data::remove_entry_by_index(int idx)
 {
@@ -635,8 +662,7 @@ bool __thiscall s_custom_map_data::add_entry(const s_custom_map_entry* entry)
 
 	bool success = true;
 
-	// TODO add validation
-	if (custom_map_count < NEW_MAP_LIMIT)
+	if (custom_map_count < NEW_MAP_LIMIT && validate_entry_data(entry, 1) && !entry_is_duplicate(entry))
 	{
 		memcpy(&new_custom_map_entries_buffer[custom_map_count++], entry, sizeof(s_custom_map_entry));
 	}

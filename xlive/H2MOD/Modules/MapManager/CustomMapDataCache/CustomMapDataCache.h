@@ -124,6 +124,9 @@ struct s_custom_map_data
 	unsigned int __thiscall find_matching_entries_by_map_name(const wchar_t* map_name, s_custom_map_entry** out_custom_map_entries, unsigned int out_custom_map_entries_count);
 	bool __thiscall get_entry_by_id(const s_custom_map_id* custom_map_id, s_custom_map_entry** out_entry);
 
+	bool __thiscall entry_is_duplicate(const s_custom_map_entry* entry);
+	bool __thiscall validate_entry_data(const s_custom_map_entry* entry, int count);
+
 	bool __thiscall add_entry(const s_custom_map_entry* entry);
 	bool __thiscall add_custom_map_entry_by_map_file_path(const wchar_t* file_path);
 	bool __thiscall add_custom_map_entry_by_map_file_path(const std::wstring& file_path);
