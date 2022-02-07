@@ -2,6 +2,11 @@
 
 #include "..\MapManager.h"
 
+#define MAX_MAP_NAME_SIZE 32
+#define MAX_MAP_FILE_PATH_SIZE (255 + 1)
+
+#define SHA256_HASH_SIZE 32
+
 #define VANILLA_MAP_LIMIT 50u
 // keep the bitmap preview limit the same, to save memory and performance
 #define VANILLA_MAP_BITMAP_PREVIEW_LIMIT 50u
@@ -20,20 +25,20 @@ enum e_directory_id
 
 struct s_custom_map_id
 {
-	wchar_t map_name[32];
-	BYTE map_sha256_hash[32];
+	wchar_t map_name[MAX_MAP_NAME_SIZE];
+	BYTE map_sha256_hash[SHA256_HASH_SIZE];
 };
 static_assert(sizeof(s_custom_map_id) == 32 + sizeof(wchar_t) * 32);
 
 struct __declspec(align(4)) s_custom_map_entry
 {
-	BYTE map_sha256_hash[32];
-	wchar_t map_name[32]; // actually the name displayed
+	BYTE map_sha256_hash[SHA256_HASH_SIZE];
+	wchar_t map_name[MAX_MAP_NAME_SIZE]; // actually the name displayed
 	wchar_t field_60[9][128];
 	BYTE* preview_bitmap_header[2]; // i think one header has the compressed thumbnail, and the other the uncompressed one
 	BYTE gap_968[16];
 	LONGLONG preview_bitmap_id; // used for bitmap cache file
-	wchar_t file_path[256];
+	wchar_t file_path[MAX_MAP_FILE_PATH_SIZE];
 	FILETIME file_time;
 	bool entry_marked_for_deletion; // marks entry for deletion
 	BYTE field_B88[7];
@@ -112,6 +117,7 @@ struct s_custom_map_data
 	void __thiscall start_custom_map_sync();
 
 	unsigned int __thiscall get_custom_map_list_ids(s_custom_map_id* out_ids, unsigned int out_ids_count);
+	unsigned int __thiscall get_custom_map_list_ids_by_map_name(const wchar_t* map_name, s_custom_map_id* out_ids, unsigned int out_ids_count);
 	unsigned int __thiscall find_matching_entries_by_file_path(const wchar_t* file_path, s_custom_map_entry** out_custom_map_entries, unsigned int out_custom_map_entries_count);
 	unsigned int __thiscall find_matching_entries_by_sha256_hash(const BYTE* hash, s_custom_map_entry** out_custom_map_entries, unsigned int out_custom_map_entries_count);
 	unsigned int __thiscall find_matching_entries_by_map_name_and_hash(const wchar_t* map_name, const BYTE* sha256_hash, s_custom_map_entry** out_custom_map_entries, unsigned int out_custom_map_entries_count);
