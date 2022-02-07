@@ -41,7 +41,7 @@ float get_melee_acceleration(float max_speed_per_tick)
 }
 
 // not entirely sure what this calculates
-float compute_something(float v1, float acceleration)
+float melee_lunge_compute_something_1(float v1, float acceleration)
 {
 	return ((v1 - acceleration) * 3.0f) / 2.0f;
 }
@@ -315,7 +315,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 
 		// this variable is named max_speed_per_tick_2 because it should result in the same value after processing in `compute something`
 		// because passing both arguments with the same value will cause that
-		float max_speed_per_tick_2 = compute_something(max_speed_per_tick, get_melee_acceleration(max_speed_per_tick));
+		float max_speed_per_tick_2 = melee_lunge_compute_something_1(max_speed_per_tick, get_melee_acceleration(max_speed_per_tick));
 
 		float real_time_to_target = ((remaining_distance_from_player_position / max_speed_per_tick_2) - 0.5f);
 
@@ -574,7 +574,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 
 	float unk_float_distance = dot_product3d(&m_aiming_direction, translational_velocity);
 	unk_float_distance *= time_globals::get_seconds_per_tick();
-	float unk_velocity = compute_something(unk_float_distance, get_max_melee_lunge_speed_per_tick(this->m_distance, this->m_weapon_is_sword));
+	float unk_velocity = melee_lunge_compute_something_1(unk_float_distance, get_max_melee_lunge_speed_per_tick(this->m_distance, this->m_weapon_is_sword));
 	if (unk_velocity < 0.0f)
 		unk_velocity = 0.0f;
 
@@ -785,8 +785,8 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 			float aiming_direction_translational_veloctity_product_per_tick = dot_product3d(&m_aiming_direction, translational_velocity) * time_globals::get_seconds_per_tick();
 			float acceleration = get_melee_acceleration(max_speed_per_tick);
 
-			float unk1 = compute_something(max_speed_per_tick, acceleration);
-			float unk2 = blam_max(0.0f, compute_something(aiming_direction_translational_veloctity_product_per_tick, acceleration));
+			float unk1 = melee_lunge_compute_something_1(max_speed_per_tick, acceleration);
+			float unk2 = blam_max(0.0f, melee_lunge_compute_something_1(aiming_direction_translational_veloctity_product_per_tick, acceleration));
 
 			real_vector3d target_point_vector;
 			vector_from_points3d(&m_target_point, player_origin, &target_point_vector);
@@ -873,16 +873,10 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 				{
 					// acceleration
 					// TODO cleanup
-					float clamped_aiming_direction_translational_veloctity_product_per_tick = blam_max(0.0f, aiming_direction_translational_veloctity_product_per_tick);
-					float acceleration_1 = max_speed_per_tick - clamped_aiming_direction_translational_veloctity_product_per_tick;
-
+					float acceleration_1 = max_speed_per_tick - blam_max(0.0f, aiming_direction_translational_veloctity_product_per_tick);
 					float acceleration_2 = blam_max(0.0f, acceleration_1);
 
-					float final_acceleration = get_melee_acceleration(max_speed_per_tick);
-					if (get_melee_acceleration(max_speed_per_tick) > acceleration_2)
-					{
-						final_acceleration = blam_max(0.0f, max_speed_per_tick - clamped_aiming_direction_translational_veloctity_product_per_tick);
-					}
+					float final_acceleration = blam_min(get_melee_acceleration(max_speed_per_tick), acceleration_2);
 
 					// float final_acceleration = 0.0f;
 					// if (acceleration_2 >= get_melee_acceleration(max_speed_per_tick))
@@ -950,7 +944,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 
 	float unk_float_distance = dot_product3d(&m_aiming_direction, translational_velocity);
 	unk_float_distance *= time_globals::get_seconds_per_tick();
-	float unk_velocity = compute_something(unk_float_distance, get_max_melee_lunge_speed_per_tick(this->m_distance, this->m_weapon_is_sword));
+	float unk_velocity = melee_lunge_compute_something_1(unk_float_distance, get_max_melee_lunge_speed_per_tick(this->m_distance, this->m_weapon_is_sword));
 	if (unk_velocity < 0.0f)
 		unk_velocity = 0.0f;
 
