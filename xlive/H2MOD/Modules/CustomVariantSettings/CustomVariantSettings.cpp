@@ -67,13 +67,13 @@ namespace CustomVariantSettings
 			{
 				CurrentVariantSettings = customVariantSetting->second;
 				if (CurrentVariantSettings != defaultCustomVariantSettings) {
-					network_observer* observer = session->network_observer_ptr;
+					s_network_observer* observer = session->p_network_observer;
 					s_peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peerIndex);
 					if (peerIndex != -1 && !NetworkSession::peerIndexLocal(peerIndex))
 					{
 						if (observer_channel->field_1)
 							observer->sendNetworkMessage(session->session_index, observer_channel->observer_index,
-								network_observer::e_network_message_send_protocol::in_band, custom_variant_settings,
+								s_network_observer::e_network_message_send_protocol::in_band, custom_variant_settings,
 								CustomVariantSettingsPacketSize, &CurrentVariantSettings);
 					}
 				}

@@ -414,7 +414,7 @@ bool engine_basic_init()
 	async_initialize();
 	game_preferences_initialize();
 
-	network_observer::ResetNetworkPreferences();
+	s_network_observer::ResetNetworkPreferences();
 
 	font_initialize();
 
