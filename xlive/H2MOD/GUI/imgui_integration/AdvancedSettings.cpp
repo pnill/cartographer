@@ -309,6 +309,19 @@ namespace imgui_handler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
 					ImGui::Columns(1);
+
+					//Force max shader LOD
+
+					ImGui::Checkbox(GetString(shader_lod_max), &H2Config_shader_lod_max);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(GetString(shader_lod_max_tooltip));
+
+					//Disable Light Suppressor
+
+					ImGui::Checkbox(GetString(light_suppressor), &H2Config_light_suppressor);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(GetString(light_suppressor_tooltip));
+
 					//Hires Fix
 
 					ImGui::Checkbox(GetString(hires_fix), &H2Config_hiresfix);
@@ -1086,6 +1099,14 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::lod_tooltip] =
 				"Changing this will force the game to use the set Level of Detail for models that have them"
 				"\nLeaving it at default makes it dynamic which is the games default behaviour.";
+			string_table[0][e_advanced_string::shader_lod_max] = "Force Max Shader LOD";
+			string_table[0][e_advanced_string::shader_lod_max_tooltip] =
+				"This will force shaders to use the highest LODS regardless of their distance away from the player"
+				"\nA restart is required for these changes to take effect.";
+			string_table[0][e_advanced_string::light_suppressor] = "Disable Light Suppression";
+			string_table[0][e_advanced_string::light_suppressor_tooltip] =
+				"This will force lights to not fade out when there's multiple of them onscreen"
+				"\nA restart is required for these changes to take effect.";
 			string_table[0][e_advanced_string::hires_fix] = "High Resolution Fix";
 			string_table[0][e_advanced_string::hires_fix_tooltip] =
 				"This will enable fixes for high resolution monitors that will fix text clipping"
@@ -1241,6 +1262,14 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::tex_L2] = "Alto";
 			string_table[4][e_advanced_string::tex_L3] = "Muy alto";
 			string_table[4][e_advanced_string::lod_tooltip] = "Cambiar esto forzará el juego a usar los modelos del nivel de detalle seleccionado si están disponibles.\nDejarlo en Predeterminado hará que el nivel de detalle sea dinámico y controlado por el juego.";
+			string_table[4][e_advanced_string::shader_lod_max] = "Máximo nivel de profundidad de sombreado";
+			string_table[4][e_advanced_string::shader_lod_max_tooltip] = 
+				"Esto obligará a los shaders a usar los LODS más altos independientemente de su distancia del jugador."
+				"\nEste ajuste requiere reiniciar el juego para que tenga efecto.";
+			string_table[4][e_advanced_string::light_suppressor] = "Desactivar supresión de luz";
+			string_table[4][e_advanced_string::light_suppressor_tooltip] = 
+				"Esto hará que las luces no se desvanezcan cuando haya varias en la pantalla"
+				"\nEste ajuste requiere reiniciar el juego para que tenga efecto.";
 			string_table[4][e_advanced_string::hires_fix] = "Arreglos de alta resolución";
 			string_table[4][e_advanced_string::hires_fix_tooltip] = "Esto habilitará arreglos para monitores de alta resolución, solucionará textos recortados.\nEste ajuste requiere reiniciar el juego para que tenga efecto.";
 			string_table[4][e_advanced_string::m_k_title] = "Entrada de mouse y teclado";

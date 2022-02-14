@@ -609,6 +609,11 @@ map_cache_load p_map_cache_load;
 
 bool __cdecl OnMapLoad(s_game_options* options)
 {
+	//Set the light suppressor flag to false
+	if (H2Config_light_suppressor)
+	{
+		WriteValue(Memory::GetAddress(0x41F6B1), 0);
+	}
 	static bool resetAfterMatch = false;
 
 	EventHandler::MapLoadEventExecute(EventExecutionType::execute_before, options->m_engine_type);
@@ -1360,6 +1365,12 @@ void H2MOD::ApplyHooks() {
 
 	// disable part of custom map tag verification
 	NopFill(Memory::GetAddress(0x4FA0A, 0x56C0A), 6);
+
+	//Disable lightsupressor function
+	if (H2Config_light_suppressor)
+	{
+		NopFill(Memory::GetAddress(0x1922d9), 7);
+	}
 
 	// disables profiles/game saves encryption
 	PatchWinAPICall(Memory::GetAddress(0x9B08A, 0x85F5E), CryptProtectDataHook);
