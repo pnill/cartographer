@@ -740,10 +740,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		//if anyone wants to run code on map load single player
 		addDebugText("Engine type: Singleplayer");
 		//H2X::Initialize(true);
-		if (H2Config_Uncapped_Cinematics)
-		{
-			H2Tweaks::toggleUncappedCampaignCinematics(true);
-		}
+		H2Tweaks::toggleUncappedCampaignCinematics(true);
 	}
 
 	// if we got this far, it means map is MP or SP, and if map load is called again, it should reset/deinitialize any custom gametypes

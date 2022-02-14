@@ -70,7 +70,6 @@ bool H2Config_xDelay = true;
 bool H2Config_hiresfix = false;
 bool H2Config_shader_lod_max = false;
 bool H2Config_light_suppressor = false;
-bool H2Config_Uncapped_Cinematics = false;
 bool H2Config_d3dex = false;
 bool H2Config_voice_chat = false;
 char H2Config_dedi_server_name[XUSER_NAME_SIZE] = { "" };
