@@ -1024,7 +1024,7 @@ namespace imgui_handler {
 		}
 		void Open()
 		{
-			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);
+			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);		// Enable Cursor visibility
 			WORD Buttons[14];
 			H2Config_CustomLayout.ToArray(Buttons);
 			for(auto i = 0; i < 14; i++)
@@ -1040,7 +1040,7 @@ namespace imgui_handler {
 		}
 		void Close()
 		{
-			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);
+			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);		// Disable Cursor visibility
 			ImGuiToggleInput(false);
 			PlayerControl::DisableLocalCamera(false);
 			SaveH2Config();

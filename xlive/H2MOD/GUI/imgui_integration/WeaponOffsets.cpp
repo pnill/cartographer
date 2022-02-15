@@ -1,5 +1,6 @@
 #include "H2MOD\Modules\Input\PlayerControl.h"
 #include "imgui_handler.h"
+#include "Util\Hooks\Hook.h"
 #include "H2MOD\Tags\TagInterface.h"
 #include "Blam\Cache\TagGroups\weapon_definition.hpp"
 #include "H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h"
@@ -328,14 +329,14 @@ namespace imgui_handler {
 		}
 		void Open()
 		{
-			//WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);
+			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);		// Enable Cursor visibility
 			ImGuiToggleInput(true);
 			PlayerControl::DisableLocalCamera(true);
 			ReadWeaponOffsetConfig();
 		}
 		void Close()
 		{
-			//WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);
+			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);		// Disable Cursor visibility
 			ImGuiToggleInput(false);
 			PlayerControl::DisableLocalCamera(false);
 			SaveWeaponOffsetConfig();
