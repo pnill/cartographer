@@ -134,6 +134,7 @@
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\WeaponOffsets.cpp" />
+    <ClCompile Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -437,6 +438,7 @@
     <ClInclude Include="Blam\Math\real_vector3d.h" />
     <ClInclude Include="Blam\Engine\DataArray\TagDataIterator.h" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
+    <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
