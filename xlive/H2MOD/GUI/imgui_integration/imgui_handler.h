@@ -1,5 +1,6 @@
 #pragma once
 #include "imgui.h"
+#include "Blam\Cache\TagGroups\weapon_definition.hpp"
 
 namespace imgui_handler
 {
@@ -201,7 +202,20 @@ namespace imgui_handler
 		enum e_weapon_offsets_string : int
 		{
 			title,
+			battle_rifle_title,
+			beam_rifle_title,
+			brute_plasma_rifle_title,
+			brute_shot_title,
+			carbine_title,
+			energy_sword_title,
+			fuel_rod_title,
 			magnum_title,
+			needler_title,
+			plasma_pistol_title,
+			plasma_rifle_title,
+			rocket_launcher_title,
+			sentinel_beam_title,
+			shotgun_title,
 			sniper_title,
 			smg_title,
 			weapon_offset_x,
@@ -214,5 +228,6 @@ namespace imgui_handler
 		void Render(bool* p_open);
 		void Open();
 		void Close();
+		void OffsetMenu(s_weapon_group_definition* tag, char* slider, e_weapon_offsets_string text, float& offset, float default_value);
 	}
 }
