@@ -102,6 +102,8 @@ namespace imgui_handler
 			if (window.name == name)
 				return window.DoRender;
 		}
+		if (name == "net_metrics" && g_network_stats_overlay)
+			return true;
 		return false;
 	}
 
