@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "KeyboardInput.h"
 #include "H2MOD\GUI\imgui_integration\imgui_handler.h"
 #include "H2MOD\Modules\Config\Config.h"

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "ImGui_Cartographer_Style.h"
 

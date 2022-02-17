@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "OriginalFPSLimiter.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"

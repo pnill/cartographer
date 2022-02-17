@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "imgui.h"
 #include "backends\imgui_impl_dx9.h"
 #include "backends\imgui_impl_win32.h"

@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "CustomResolutions.h"
 
 #include "Util\Hooks\Hook.h"

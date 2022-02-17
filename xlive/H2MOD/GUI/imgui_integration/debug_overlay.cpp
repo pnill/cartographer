@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "imgui_handler.h"
 #include "imgui_internal.h"
 

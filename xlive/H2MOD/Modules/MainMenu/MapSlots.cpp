@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include  "MapSlots.h"
 #include "Blam\Cache\TagGroups\globals_definition.hpp"
 #include "H2MOD.h"

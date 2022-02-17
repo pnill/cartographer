@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Startup.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"

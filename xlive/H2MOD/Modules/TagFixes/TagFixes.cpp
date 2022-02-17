@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "TagFixes.h"
 #include "Blam\Cache\TagGroups\shader_definition.hpp"
 #include "Blam/Cache/TagGroups/light_definition.h"

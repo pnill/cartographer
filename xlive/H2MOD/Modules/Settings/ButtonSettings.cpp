@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "ButtonSettings.h"
 #include "Util\Hooks\Hook.h"
 #include "H2MOD.h"

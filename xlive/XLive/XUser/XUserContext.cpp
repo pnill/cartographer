@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "XUserContext.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\Config\Config.h"

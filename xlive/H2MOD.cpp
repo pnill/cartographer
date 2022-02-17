@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "H2MOD.h"
 #include "Blam\Cache\TagGroups\biped_definition.hpp"
 #include "Blam\Cache\TagGroups\globals_definition.hpp"

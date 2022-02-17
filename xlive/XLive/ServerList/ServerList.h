@@ -72,6 +72,9 @@ typedef struct _XLOCATOR_SEARCHRESULT {
 class ServerList
 {
 public:
+	ServerList::ServerList(const ServerList& other) = delete;
+	ServerList::ServerList(ServerList&& other) = delete;
+
 	static bool CountResultsUpdated;
 	static int total_count;
 	static int total_public;

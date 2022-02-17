@@ -215,8 +215,8 @@ static_assert(sizeof(s_session_parameters) == 4784, "Invalid session_parameters 
 struct s_network_session
 {
 	void* vtbl;
-	void* network_message_gateway_ptr;
-	network_observer* network_observer_ptr;
+	void* p_network_message_gateway;
+	s_network_observer* p_network_observer;
 	void* session_manager_ptr;
 	DWORD text_chat;
 	int session_index;

@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "NetworkSession.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 
@@ -244,7 +246,7 @@ void NetworkSession::logPlayersToConsole() {
 void NetworkSession::logPeersToConsole() {
 	if (getPeerCount() > 0)
 	{
-		network_observer* observer = getCurrentNetworkSession()->network_observer_ptr;
+		s_network_observer* observer = getCurrentNetworkSession()->p_network_observer;
 
 		int peerIndex = 0;
 		do 
@@ -256,8 +258,8 @@ void NetworkSession::logPeersToConsole() {
 			outStr += getCurrentNetworkSession()->membership.peer_data[peerIndex].name;
 			outStr += L", Connection Status=";
 			outStr += std::to_wstring(peer_observer->state);
-			int playerIndex = getCurrentNetworkSession()->membership.peer_data[peerIndex].player_index[0];
 			outStr += L", Peer map state: " + std::to_wstring(getCurrentNetworkSession()->membership.peer_data[peerIndex].map_status);
+			int playerIndex = getCurrentNetworkSession()->membership.peer_data[peerIndex].player_index[0];
 			if (playerIndex != -1) 
 			{
 				outStr += L", Player index=" + std::to_wstring(playerIndex);

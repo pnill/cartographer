@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "HeadHunter.h"
 
 #include "H2MOD/Modules/Utils/Utils.h"

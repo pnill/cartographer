@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Tweaks.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
@@ -412,7 +414,7 @@ bool engine_basic_init()
 	async_initialize();
 	game_preferences_initialize();
 
-	network_observer::ResetNetworkPreferences();
+	s_network_observer::ResetNetworkPreferences();
 
 	font_initialize();
 

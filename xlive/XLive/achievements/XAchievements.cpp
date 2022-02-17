@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "XAchievements.h"
 
 #include "H2MOD/Modules/Achievements/Achievements.h"

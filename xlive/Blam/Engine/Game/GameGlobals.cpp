@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "GameGlobals.h"
 
 s_game_globals* s_game_globals::get()
