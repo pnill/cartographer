@@ -22,7 +22,7 @@
 static float tick_length;
 float HitFix_Projectile_Tick_Rate = 30.f;
 
-typedef char(__cdecl* projectile_new_def)(unsigned __int16 projectile_object_index, int a2);
+typedef bool(__cdecl* projectile_new_def)(unsigned __int16 projectile_object_index, int a2);
 projectile_new_def p_projectile_new;
 
 typedef void(__cdecl* projectile_update_def)(datum projectile_object_index, real_point3d *a2);
@@ -34,7 +34,7 @@ void projectile_set_tick_length_context(datum projectile_datum_index, bool proje
 	char* object_data = (char*)object_get_fast_unsafe(projectile_datum_index);
 	char* proj_tag_data = tags::get_tag_fast<char>(*((datum*)object_data));
 
-	if (*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5) // check if travels instantaneously flag is set in the projectile flags
+	if ((*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5)) != 0 // check if travels instantaneously flag is set in the projectile flags
 		&& (projectile_instant_update || *(DWORD*)(object_data + 428) == time_globals::get()->tick_count)) // also check if the projectile is updated twice in the same tick
 	{
 		//LOG_TRACE_GAME("{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_datum_index);
@@ -56,7 +56,7 @@ inline void projectile_set_creation_tick(datum projectile_datum_index)
 
 bool __cdecl projectile_new(unsigned __int16 projectile_object_index, int a2)
 {
-	char ret = p_projectile_new(projectile_object_index, a2);
+	bool ret = p_projectile_new(projectile_object_index, a2);
 
 	projectile_set_creation_tick(projectile_object_index);
 

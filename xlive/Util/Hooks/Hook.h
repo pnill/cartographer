@@ -1,7 +1,21 @@
 #pragma once
+
+#include "3rdparty/detours/include/detours.h"
+
 #define WIN32_LEAN_AND_MEAN
 #define JMP_OP_CODE 0xEB
 #define JNZ_OP_CODE 0x75
+
+#define DETOUR_BEGIN() \
+	DetourTransactionBegin(); \
+	DetourUpdateThread(GetCurrentThread());
+
+#define DETOUR_ATTACH(_ptr_func, _address, _target_ptr) \
+	(_ptr_func) = (_address); \
+	DetourAttach(&(PVOID&)(_ptr_func), _target_ptr); \
+
+#define DETOUR_COMMIT() \
+	DetourTransactionCommit(); \
 
 void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len);
 void RetourFunc(BYTE *src, BYTE *restore, const unsigned int len);
