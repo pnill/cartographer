@@ -1,12 +1,15 @@
 #pragma once
 
 // enables/disables LIVE netcode, so we can use the LIVE serverlist
-#define USE_LIVE_NETCODE 1
+// true  - LIVE network protocol enabled
+// false - System Link network protocol enabled
+#define USE_LIVE_NETWORK_PROTOCOL true
 
-#define LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS 1
-
-#if USE_LIVE_NETCODE == 1
-#define INCREASE_NETWORK_TICKRATE 0
+#if defined(USE_LIVE_NETWORK_PROTOCOL)
+	#if USE_LIVE_NETWORK_PROTOCOL == true
+		#define INCREASE_NETWORK_TICKRATE_OBSOLETE 0 // old method of incresing the packet rate, now OBSOLETE
+		#define LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS 1
+	#endif
 #endif
 
 // network heap size

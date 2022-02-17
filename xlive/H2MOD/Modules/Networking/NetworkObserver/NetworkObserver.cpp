@@ -9,11 +9,12 @@ network_observer_configuration* g_network_configuration;
 
 #define k_network_preference_size 108
 
-#if INCREASE_NETWORK_TICKRATE
+#if INCREASE_NETWORK_TICKRATE_OBSOLETE
 #define k_online_netcode_tickrate_real 60.0f
 #endif
 
-#if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS
+#if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
+#if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 
 float _server_network_rate = 60.f;
 float _client_network_rate = 60.f;
@@ -23,7 +24,8 @@ int _max_bandwidth_per_channel = 30720 * 4;
 //TODO: 
 int _max_window_size = -1;
 
-#endif
+#endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
+#endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 
 // LIVE netcode research
 void __cdecl initialize_network_observer_configuration()
@@ -307,8 +309,8 @@ void s_network_observer::ForceConstantNetworkRate()
 
 void s_network_observer::ApplyPatches()
 {
-#if USE_LIVE_NETCODE
-#if INCREASE_NETWORK_TICKRATE
+#if USE_LIVE_NETWORK_PROTOCOL
+#if INCREASE_NETWORK_TICKRATE_OBSOLETE == true
 	// increase the network tickrate of hosts to 60
 	static float netcode_tickrate = k_online_netcode_tickrate_real;
 
@@ -366,9 +368,11 @@ void s_network_observer::ApplyPatches()
 
 	WriteJmpTo(Memory::GetAddressRelative(0x5AC1BD, 0x5A6B76), transport_get_packet_overhead_hook);
 
-#if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS
+#if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
+#if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 	ForceConstantNetworkRate();
-#endif
+#endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
+#endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 
 	if (!Memory::isDedicatedServer())
 	{
