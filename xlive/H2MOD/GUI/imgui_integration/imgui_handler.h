@@ -48,6 +48,7 @@ namespace imgui_handler
 	void ReleaseTextures();
 	s_aspect_ratio getAspectRatio(float width, float height);
 	void preloadImages();
+	extern short g_NumWindowsOpen;
 	namespace MOTD {
 		bool GetMOTD(s_aspect_ratio ratio);
 		void Render(bool* p_open);
@@ -229,5 +230,7 @@ namespace imgui_handler
 		void Open();
 		void Close();
 		void OffsetMenu(s_weapon_group_definition* tag, char* slider, e_weapon_offsets_string text, float& offset, float default_value);
+		void ApplyOffset(s_weapon_group_definition* tag, float i, float j, float k);
+		void Initialize();
 	}
 }

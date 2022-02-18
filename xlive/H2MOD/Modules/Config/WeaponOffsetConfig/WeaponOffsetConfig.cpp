@@ -55,7 +55,7 @@ float Sniper_WeaponOffsetZ = 0;
 
 void readOffset(std::ifstream &file, float &offset)
 {
-    file.ignore(32, '=');
+    file.ignore(40, '=');
     file >> offset;
 }
 
@@ -139,9 +139,6 @@ void ReadWeaponOffsetConfig() {
         readOffset(file, BrutePlasmaRifle_WeaponOffsetX);
         readOffset(file, BrutePlasmaRifle_WeaponOffsetY);
         readOffset(file, BrutePlasmaRifle_WeaponOffsetZ);
-        readOffset(file, BruteShot_WeaponOffsetX);
-        readOffset(file, BruteShot_WeaponOffsetY);
-        readOffset(file, BruteShot_WeaponOffsetZ);
         readOffset(file, BruteShot_WeaponOffsetX);
         readOffset(file, BruteShot_WeaponOffsetY);
         readOffset(file, BruteShot_WeaponOffsetZ);

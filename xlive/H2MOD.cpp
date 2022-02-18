@@ -41,6 +41,7 @@
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "Util\Hooks\Hook.h"
+#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
 
 #include <float.h>
 
@@ -681,6 +682,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	ControllerInput::SetSensitiviy(H2Config_controller_sens);
 	MouseInput::SetSensitivity(H2Config_mouse_sens);
 	HudElements::OnMapLoad();
+	imgui_handler::WeaponOffsets::Initialize();
 	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
 	{
 		addDebugText("Engine type: Multiplayer");

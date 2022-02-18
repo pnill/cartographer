@@ -1024,6 +1024,7 @@ namespace imgui_handler {
 		}
 		void Open()
 		{
+			g_NumWindowsOpen++;
 			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);		// Enable Cursor visibility
 			WORD Buttons[14];
 			H2Config_CustomLayout.ToArray(Buttons);
@@ -1040,9 +1041,13 @@ namespace imgui_handler {
 		}
 		void Close()
 		{
-			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);		// Disable Cursor visibility
-			ImGuiToggleInput(false);
-			PlayerControl::DisableLocalCamera(false);
+			g_NumWindowsOpen--;
+			if (g_NumWindowsOpen == 0)
+			{
+				WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);		// Disable Cursor visibility
+				ImGuiToggleInput(false);
+				PlayerControl::DisableLocalCamera(false);
+			}
 			SaveH2Config();
 		}
 		void BuildStringsTable()

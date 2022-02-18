@@ -21,6 +21,8 @@ namespace imgui_handler
 	static PDIRECT3DTEXTURE9	g_patchNotes_Image = NULL;
 	static bool					g_block_input = false;
 
+	short g_NumWindowsOpen = 0;
+
 	HWND get_HWND()
 	{
 		return g_hWnd;
