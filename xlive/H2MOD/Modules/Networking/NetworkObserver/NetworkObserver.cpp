@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "NetworkObserver.h"
 #include "Util\Hooks\Hook.h"
 
@@ -122,9 +124,9 @@ void __cdecl initialize_network_observer_configuration()
 	g_network_configuration->field_200 = 4096 * 4; // H2v - 4096, 60 tick  = H2v * 4 = 16384
 }
 
-void network_observer::sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data)
+void s_network_observer::sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data)
 {
-	typedef void(__thiscall* observer_channel_send_message)(network_observer*, int, int, e_network_message_send_protocol, int, int, void*);
+	typedef void(__thiscall* observer_channel_send_message)(s_network_observer*, int, int, e_network_message_send_protocol, int, int, void*);
 	auto p_observer_channel_send_message = Memory::GetAddress<observer_channel_send_message>(0x1BED40, 0x1B8C1A);
 
 	p_observer_channel_send_message(this, session_index, observer_index, send_out_of_band, type, size, data);
@@ -138,26 +140,19 @@ bool __cdecl is_network_observer_mode_managed()
 	return false;
 }
 
-void network_observer::ResetNetworkPreferences()
+void s_network_observer::ResetNetworkPreferences()
 {
 	// clear the network bandwidth preferences so they won't cause issues
 	SecureZeroMemory(Memory::GetAddress<void*>(0x47E9D8 + 0x1DC), k_network_preference_size);
 }
 
-bool __thiscall network_observer::GetNetworkMeasurements(DWORD *out_throughput, float *out_satiation, DWORD *a4)
+bool __thiscall s_network_observer::GetNetworkMeasurements(DWORD *out_throughput, float *out_satiation, DWORD *a4)
 {
 	// let the game know we don't have any bandwidth measurements available to save
 	return false;
 }
 
-void __declspec(naked) call_GetNetworkMeasurements()
-{
-	__asm
-	{
-		// for some reason PatchCall doen't work on member function
-		jmp network_observer::GetNetworkMeasurements 
-	}
-}
+void __declspec(naked) call_GetNetworkMeasurements() { __asm jmp s_network_observer::GetNetworkMeasurements }
 
 DWORD* dataToOverwrite1 = nullptr;
 __declspec (naked) void overwrite1()
@@ -203,7 +198,7 @@ int __cdecl transport_get_packet_overhead_hook(int protocol_type)
 	return 0;
 }
 
-void network_observer::ApplyPatches()
+void s_network_observer::ApplyPatches()
 {
 #if USE_LIVE_NETCODE
 #if INCREASE_NETWORK_TICKRATE

@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "ProjectileFix.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
 #include "Blam\Engine\Objects\Objects.h"

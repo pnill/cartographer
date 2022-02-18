@@ -1,7 +1,6 @@
 
-#include "MapChecksumSync.h"
-#include "Globals.h"
 #include "Util/hash.h"
+#include "MapChecksumSync.h"
 #include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
 
 // TODO: use new custom packets

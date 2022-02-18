@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "ControllerInput.h"
 #include "H2MOD\EngineCalls\EngineCalls.h"
 #include "H2MOD\Modules\Config\Config.h"

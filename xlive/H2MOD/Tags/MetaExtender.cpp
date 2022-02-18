@@ -1,9 +1,10 @@
+#include "stdafx.h"
+
 #include "MetaExtender.h"
 #include "Blam\Cache\TagGroups\new_hud_definition.hpp"
 #include "TagInterface.h"
 
 std::vector<void*> ToFree;
-
 
 namespace MetaExtender {
 	template<typename T = void>

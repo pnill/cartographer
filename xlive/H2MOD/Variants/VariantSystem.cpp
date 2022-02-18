@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "VariantSystem.h"
 #include "H2MOD\Modules\Networking\Networking.h"

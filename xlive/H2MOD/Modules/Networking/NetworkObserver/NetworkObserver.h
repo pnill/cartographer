@@ -256,7 +256,7 @@ struct __declspec(align(8)) observer_channel
 };
 static_assert(sizeof(observer_channel) == 0x740, "Invalid observer size");
 
-struct __declspec(align(8)) network_observer
+struct __declspec(align(8)) s_network_observer
 {
 	void* network_observer_vtbl; // vtable at the start
 	void* network_link;
@@ -323,4 +323,4 @@ struct __declspec(align(8)) network_observer
 	int getObserverState(int observerIndex) { return observers[observerIndex].state; };
 	void sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data);
 };
-static_assert(sizeof(network_observer) == 0x75C8, "network_observer size != 30152");
+static_assert(sizeof(s_network_observer) == 0x75C8, "network_observer size != 30152");

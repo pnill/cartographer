@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "SpecialEvents.h"
 
 #include "Blam/Engine/Game/GameTimeGlobals.h"
@@ -890,7 +892,7 @@ namespace SpecialEvents
 						{
 							if (!flop) {
 								flop = true;
-								PlaySound(L"sounds/feliz_navidad.wav", NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
+								PlaySound(L"sounds/feliz_navidad.wav", NULL, SND_FILENAME | SND_LOOP | SND_ASYNC | SND_NODEFAULT);
 							}
 						}
 						else {

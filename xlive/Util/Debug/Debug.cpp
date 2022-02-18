@@ -1,5 +1,6 @@
+#include "stdafx.h"
+
 #include "Debug.h"
-#include "H2MOD.h"
 
 #include <DbgHelp.h>
 #include <ShlObj.h>

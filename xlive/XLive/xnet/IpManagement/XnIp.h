@@ -20,11 +20,11 @@ const char broadcastStrHdr[MAX_HDR_STR] = "XNetReqPack";
 
 #define XnIp_ConnectionTimeOut (15 * 1000) // msec
 
-#define IPADDR_LOOPBACK htonl(0x7F000001) // 127.0.0.1
+#define IPADDR_LOOPBACK (htonl(0x7F000001)) // 127.0.0.1
 
 #define XNIP_FLAG(_bit) (1<<(_bit))
 #define XNIP_SET_BIT(_val, _bit) ((_val) |= XNIP_FLAG((_bit)))
-#define XNIP_TEST_BIT(_val, _bit) ((_val) & XNIP_FLAG((_bit)))
+#define XNIP_TEST_BIT(_val, _bit) (((_val) & XNIP_FLAG((_bit))) != 0)
 
 enum eXnip_ConnectRequestType : int
 {
@@ -154,25 +154,25 @@ struct XnIp
 	// TODO: add single async socket implementation or figure out another way
 	NatTranslation natTranslation[2];
 
-	void updateNat(H2v_sockets natIndex, sockaddr_in* addr)
-	{
-		int index = (int)natIndex;
-		natTranslation[index].natAddress = *addr;
-		natTranslation[index].state = NatTranslation::eNatDataState::natAvailable;
-	}
-
 	sockaddr_in* getNatAddr(H2v_sockets natIndex)
 	{
 		int index = (int)natIndex;
 		return &natTranslation[index].natAddress;
 	}
 
+	void updateNat(H2v_sockets natIndex, const sockaddr_in* addr)
+	{
+		int index = (int)natIndex;
+		natTranslation[index].natAddress = *addr;
+		natTranslation[index].state = NatTranslation::eNatDataState::natAvailable;
+	}
+
 	void natDiscard()
 	{
-		for (auto& translation : natTranslation)
+		for (int i = 0; i < ARRAYSIZE(natTranslation); i++)
 		{
-			memset(&translation, 0, sizeof(translation));
-			translation.state = NatTranslation::eNatDataState::natUnavailable;
+			memset(&natTranslation[i], 0, sizeof(*natTranslation));
+			natTranslation[i].state = NatTranslation::eNatDataState::natUnavailable;
 		}
 	}
 
@@ -183,9 +183,9 @@ struct XnIp
 
 	bool natIsUpdated() const
 	{
-		for (auto& translation : natTranslation)
+		for (int i = 0; i < ARRAYSIZE(natTranslation); i++)
 		{
-			if (translation.state != NatTranslation::eNatDataState::natAvailable)
+			if (natTranslation[i].state != NatTranslation::eNatDataState::natAvailable)
 				return false;
 		}
 		return true;
@@ -224,31 +224,39 @@ class CXnIp
 {
 public:
 
-	/*
-		Use this to get the connection index from an XLive API call
-	*/
-	static int CXnIp::getConnectionIndex(IN_ADDR connectionIdentifier)
+	CXnIp()
 	{
-		return connectionIdentifier.s_addr >> 24;
+		memset(&startupParams, 0, sizeof(startupParams));
 	}
 
-	XnIp* CXnIp::getConnection(IN_ADDR ina)
+	~CXnIp()
 	{
-		XnIp* ret = &XnIPs[getConnectionIndex(ina)];
-		if (ret->isValid(ina))
-			return ret;
-		else
-			return nullptr;
+		// TODO maybe terminate all connections
 	}
 
-	void CXnIp::setTimeConnectionInteractionHappened(IN_ADDR ina)
+	CXnIp::CXnIp(const CXnIp& other) = delete;
+	CXnIp::CXnIp(CXnIp&& other) = delete;
+
+	// gets the actual connection index from a connection identifier
+	static int getConnectionIndex(IN_ADDR connectionIdentifier)
+	{
+		return (int)(connectionIdentifier.s_addr >> 24);
+	}
+
+	XnIp* getConnection(const IN_ADDR ina) const
+	{
+		XnIp* xnIp = &XnIPs[getConnectionIndex(ina)];
+		return xnIp->isValid(ina) ? xnIp : nullptr;
+	}
+
+	void setTimeConnectionInteractionHappened(IN_ADDR ina)
 	{
 		XnIp* xnIp = getConnection(ina);
 		if (xnIp != nullptr)
 			xnIp->lastConnectionInteractionTime = timeGetTime();
 	}
 
-	void CXnIp::updatePacketReceivedCounters(IN_ADDR ipIdentifier, int bytesRecvdCount)
+	void updatePacketReceivedCounters(IN_ADDR ipIdentifier, int bytesRecvdCount)
 	{
 		setTimeConnectionInteractionHappened(ipIdentifier);
 		XnIp* xnIp = getConnection(ipIdentifier);
@@ -260,38 +268,35 @@ public:
 		}
 	}
 
+	void clearLostConnections();
 	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 
-	void checkForLostConnections();
-
-	void SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, const char* abEnet, const char* abOnline);
-
-	void CXnIp::UnregisterLocalConnectionInfo()
+	static void UnregisterLocalConnectionInfo()
 	{
-		SecureZeroMemory(&ipLocal, sizeof(ipLocal));
+		ZeroMemory(&ipLocal, sizeof(ipLocal));
 	}
 
-	XnIp* CXnIp::GetLocalUserXn()
+	static XnIp* GetLocalUserXn()
 	{
-		if (ipLocal.bValid)
-			return &ipLocal;
-
-		return nullptr;
+		return ipLocal.bValid ? &ipLocal : nullptr;
 	}
+
+	static void SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* abEnet, const char* abOnline);
 
 	int handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount);
 
 	void Initialize(const XNetStartupParams* netStartupParams);
 	
 	void LogConnectionsToConsole();
-	void LogConnectionsErrorDetails(sockaddr_in* address, int errorCode, const XNKID* receivedKey);
-	IN_ADDR GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* addr);
+	void LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode, const XNKID* receivedKey);
+	int GetEstablishedConnectionIdentifierByRecvAddr(XSocket* xsocket, const sockaddr_in* addr, IN_ADDR* outConnectionIdentifier);
 	
-	void SaveNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);
+	void SaveNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, const sockaddr_in* addr);
 
-	void HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* connectReqPkt, sockaddr_in* addr, LPDWORD lpBytesRecvdCount);
-	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, sockaddr_in* recvAddr);
-	int CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* xnkid, const XNetRequestPacket* requestType, IN_ADDR* outIpIdentifier);
+	int CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* xnkid, const XNetRequestPacket* reqPacket, IN_ADDR* outIpIdentifier);
+	void HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* reqPaket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
+	void HandleConnectionPacket(XSocket* xsocket, XnIp* xnIp, const XNetRequestPacket* conReqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
+	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr);
 
 	XnIp* XnIpLookUp(const XNADDR* pxna, const XNKID* xnkid, bool* firstUnusedIndexFound = nullptr, int* firstUnusedIndex = nullptr);
 	int registerNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* outIpIdentifier);
@@ -338,7 +343,7 @@ public:
 
 private:
 
-	XnIp ipLocal;
+	static XnIp ipLocal;
 };
 
 extern CXnIp gXnIp;

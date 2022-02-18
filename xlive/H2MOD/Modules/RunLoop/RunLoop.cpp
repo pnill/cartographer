@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "RunLoop.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
 #include "H2MOD\EngineCalls\EngineCalls.h"

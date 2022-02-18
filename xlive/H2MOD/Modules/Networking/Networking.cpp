@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Networking.h"
 #include "Memory\bitstream.h"
 #include "OverridePackets\OverridePackets.h"
@@ -136,7 +138,7 @@ void patchAbNetUpdate()
 void applyConnectionPatches()
 {
 	// live netcode research
-	network_observer::ApplyPatches();
+	s_network_observer::ApplyPatches();
 
 	// stub QoS lookup function for in-game data
 	PatchCall(Memory::GetAddress(0x1BDCB0, 0x1B7B8A), transport_qos_target_new_hook);

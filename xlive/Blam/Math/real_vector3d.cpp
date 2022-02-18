@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "real_vector3d.h"
 

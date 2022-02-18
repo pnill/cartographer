@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "VariantPlayer.h"
 #include "Blam\Engine\DataArray\DataArray.h"
 #include "Blam\Engine\Objects\Objects.h"

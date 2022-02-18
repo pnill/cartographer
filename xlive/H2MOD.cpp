@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "H2MOD.h"
 #include "Blam\Cache\TagGroups\biped_definition.hpp"
 #include "Blam\Cache\TagGroups\globals_definition.hpp"
@@ -27,7 +29,6 @@
 #include "H2MOD\Modules\KantTesting\KantTesting.h"
 #include "H2MOD\Modules\MainMenu\MapSlots.h"
 #include "H2MOD\Modules\MainMenu\Ranks.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 #include "H2MOD\Modules\Networking\Memory\bitstream.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
@@ -611,6 +612,11 @@ map_cache_load p_map_cache_load;
 
 bool __cdecl OnMapLoad(s_game_options* options)
 {
+	//Set the light suppressor flag to false
+	if (H2Config_light_suppressor)
+	{
+		WriteValue(Memory::GetAddress(0x41F6B1), 0);
+	}
 	static bool resetAfterMatch = false;
 
 	EventHandler::MapLoadEventExecute(EventExecutionType::execute_before, options->m_engine_type);
@@ -834,7 +840,7 @@ change_team p_change_local_team;
 
 void __cdecl changeTeam(int localPlayerIndex, int teamIndex) 
 {
-	network_session* session = NetworkSession::getCurrentNetworkSession();
+	s_network_session* session = NetworkSession::getCurrentNetworkSession();
 
 	if ((session->parameters.session_mode == 4 && EngineCalls::get_game_life_cycle() == life_cycle_pre_game)
 		|| (StrStrIW(NetworkSession::getGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
@@ -856,12 +862,12 @@ void H2MOD::set_local_team_index(int local_player_index, int team_index)
 
 void H2MOD::set_local_team_match_xuid(XUID xuid)
 {
-	network_session* session = NetworkSession::getCurrentNetworkSession();
+	s_network_session* session = NetworkSession::getCurrentNetworkSession();
 	if ((EngineCalls::get_game_life_cycle() == life_cycle_pre_game))
 		for(auto i = 0; i < 16; i++)
-			if(session->membership.player_info[i].identifier == xuid)
+			if(session->membership.player_data[i].identifier == xuid)
 			{
-				changeTeam(0, session->membership.player_info[i].properties.player_team);
+				changeTeam(0, session->membership.player_data[i].properties.player_team);
 				break;
 			}
 }
@@ -1079,10 +1085,10 @@ void __cdecl game_mode_engine_draw_team_indicators()
 		p_game_mode_engine_draw_team_indicators();
 }
 
-typedef short(__cdecl* get_enabled_teams_flags_def)(network_session*);
+typedef short(__cdecl* get_enabled_teams_flags_def)(s_network_session*);
 get_enabled_teams_flags_def p_get_enabled_teams_flags;
 
-short __cdecl get_enabled_teams_flags(network_session* session)
+short __cdecl get_enabled_teams_flags(s_network_session* session)
 {
 	short default_teams_enabled_flags = p_get_enabled_teams_flags(session);
 	short new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
@@ -1364,13 +1370,18 @@ void H2MOD::ApplyHooks() {
 	// disable part of custom map tag verification
 	NopFill(Memory::GetAddress(0x4FA0A, 0x56C0A), 6);
 
+	//Disable lightsupressor function
+	if (H2Config_light_suppressor)
+	{
+		NopFill(Memory::GetAddress(0x1922d9), 7);
+	}
+
 	// disables profiles/game saves encryption
 	PatchWinAPICall(Memory::GetAddress(0x9B08A, 0x85F5E), CryptProtectDataHook);
 	PatchWinAPICall(Memory::GetAddress(0x9AF9E, 0x352538), CryptUnprotectDataHook);
 	PatchCall(Memory::GetAddress(0x9B09F, 0x85F73), filo_write__encrypted_data_hook);
 
 	ApplyFirefightHooks();
-	mapManager->applyHooks();
 
 	ProjectileFix::ApplyPatches();
 

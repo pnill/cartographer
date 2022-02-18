@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "ObserverMode.h"
 #include "H2MOD.h"
 #include "H2MOD\GUI\imgui_integration\imgui_handler.h"

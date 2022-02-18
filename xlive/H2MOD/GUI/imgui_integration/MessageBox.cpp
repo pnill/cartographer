@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Blam\Common\Common.h"
 #include "H2MOD.h"
 #include "H2MOD\Modules\Input\PlayerControl.h"
@@ -16,14 +18,12 @@ namespace imgui_handler
 		void Render(bool* p_open)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			RECT rect;
-			::GetClientRect(get_HWND(), &rect);
-			io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
+			const ImGuiViewport* viewport = ImGui::GetMainViewport();
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoCollapse;
 			window_flags |= ImGuiWindowFlags_NoResize;
 			//window_flags |= ImGuiWindowFlags_MenuBar;
-			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+			ImGui::SetNextWindowPos(ImVec2(viewport->WorkSize.x * 0.5f, viewport->WorkSize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
 			//ImGui::PushFont(font2);
 			ImGui::SetNextWindowSize(ImVec2(650, 250), ImGuiCond_Appearing);

@@ -48,7 +48,7 @@ struct __declspec(align(8)) network_channel
 	BYTE gap_34[4];
 	BYTE gap_38[4];
 	int field_3C;
-	network_observer *network_observer;
+	s_network_observer *network_observer;
 	int channel_index;
 	DWORD channel_flags;
 	DWORD remote_identifier;

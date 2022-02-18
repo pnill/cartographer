@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "PlayerControl.h"
 #include "Util\Hooks\Hook.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"

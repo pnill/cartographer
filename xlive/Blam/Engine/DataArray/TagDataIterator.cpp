@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "TagDataIterator.h"
 
 datum s_tag_data_iterator::get_next_datum()

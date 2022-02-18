@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "PlaylistLoader.h"
 #include "H2MOD.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"

@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "EngineCalls.h"
 #include "Blam\Engine\Game\GameGlobals.h"
 

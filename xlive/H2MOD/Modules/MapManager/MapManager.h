@@ -38,14 +38,10 @@ private:
 */
 class MapManager {
 public:
-	//client and server functions below
 	void reloadAllMaps();
-	bool loadMapInfo(const std::wstring& mapFileLocation);
 
-	//client functions/data below
-	void applyHooks();
+	static void applyHooks();
 
-	//server functions below
 	void getMapFilename(std::wstring& buffer);
 
 	std::shared_ptr<MapDownloadQuery> addDownloadQuery(const std::wstring& mapToDownload)

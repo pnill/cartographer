@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "DirectorHooks.h"
 #include "Util\Hooks\Hook.h"
 

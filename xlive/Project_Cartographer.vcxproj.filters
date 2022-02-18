@@ -60,7 +60,6 @@
     <ClCompile Include="H2MOD\Variants\VariantPlayer.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="Util\Base64.cpp" />
-    <ClCompile Include="Util\ClipboardAPI.cpp" />
     <ClCompile Include="Util\Debug\Debug.cpp" />
     <ClCompile Include="util\filesys.cpp" />
     <ClCompile Include="Util\hash.cpp" />
@@ -87,7 +86,6 @@
     <ClCompile Include="3rdparty\imgui\imgui_demo.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_draw.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.cpp" />
     <ClCompile Include="H2MOD\Modules\HudElements\HudElements.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.cpp" />
@@ -135,6 +133,12 @@
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.cpp" />
+    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui_tables.cpp" />
+    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="Util\ClipboardAPI.cpp" />
+    <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -350,7 +354,6 @@
     <ClInclude Include="3rdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.h" />
     <ClInclude Include="H2MOD\Modules\HudElements\HudElements.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.h" />
@@ -439,11 +442,26 @@
     <ClInclude Include="Blam\Engine\DataArray\TagDataIterator.h" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.h" />
+    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
+    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9anim.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9core.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9effect.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9math.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9mesh.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9shader.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9shape.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9tex.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9xof.h" />
+    <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def" />
+    <None Include="3rdparty\directx\include\d3dx9math.inl" />
   </ItemGroup>
 </Project>

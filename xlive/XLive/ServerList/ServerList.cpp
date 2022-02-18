@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "ServerList.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
@@ -307,7 +308,7 @@ void ServerList::QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESU
 			{
 				int i = 0;
 				bool foundMatch = false;
-				for (i; i < cSearchPropertiesIDs; i++)
+				for (; i < cSearchPropertiesIDs; i++)
 				{
 					if (pSearchPropertyIDs[i] == property)
 					{

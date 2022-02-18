@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "VariantMPGameEngine.h"
 #include "H2MOD\Modules\Startup\Startup.h"

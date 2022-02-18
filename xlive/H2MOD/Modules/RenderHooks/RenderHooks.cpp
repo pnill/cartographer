@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "RenderHooks.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "Util\Hooks\Hook.h"
