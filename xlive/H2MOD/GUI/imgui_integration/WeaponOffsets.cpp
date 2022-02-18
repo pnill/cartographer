@@ -4,6 +4,7 @@
 #include "Util\Hooks\Hook.h"
 #include "H2MOD\Tags\TagInterface.h"
 #include "H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h"
+#include "stdafx.h"
 
 namespace imgui_handler {
 	namespace WeaponOffsets {
