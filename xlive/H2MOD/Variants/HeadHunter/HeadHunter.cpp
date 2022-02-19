@@ -67,8 +67,8 @@ void HeadHunter::SpawnSkull(datum unit_datum)
 	}
 }
 
-typedef void(__stdcall *update_player_score)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
-extern update_player_score pupdate_player_score;
+typedef void(__thiscall *update_player_score)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
+extern update_player_score p_update_player_score;
 
 void HeadHunter::PickupSkull(XUID player, datum SkullDatum)
 {
@@ -84,7 +84,7 @@ void HeadHunter::PickupSkull(XUID player, datum SkullDatum)
 		if (player_score_data)
 		{
 			datum PlayerDatum = variant_player->GetPlayerDatum(player);
-			pupdate_player_score(player_score_data, DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), 0, 1, -1, 0);
+			p_update_player_score(player_score_data, DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), 0, 1, -1, 0);
 			HaloScript::ObjectDestroy(SkullDatum);
 			if(TimeElapsedMS(soundBuffer) > 2500)
 			{

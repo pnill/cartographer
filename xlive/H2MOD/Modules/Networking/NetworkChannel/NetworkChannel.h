@@ -36,19 +36,20 @@ struct __declspec(align(8)) network_channel
 	void* network_message_handler;
 	void* network_channel_config;
 	int network_connection_index;
-	int network_shared_globals_index;
-	char gap_18[4];
-	bool field_1C;
+	int network_message_queue_index;
+	DWORD c_network_channel_simulation_gatekeeper;
+	bool simulation_data_available;
 	BYTE field_1D;
 	BYTE gap_1E[2];
 	DWORD field_20;
 	int field_24;
-	BYTE gap_28[8];
+	DWORD field_28;
+	DWORD field_2C;
 	DWORD field_30;
-	BYTE gap_34[4];
-	BYTE gap_38[4];
-	int field_3C;
-	s_network_observer *network_observer;
+	DWORD field_34;
+	DWORD field_38;
+	void* simulation_interface;
+	s_network_observer* network_observer;
 	int channel_index;
 	DWORD channel_flags;
 	DWORD remote_identifier;
@@ -59,10 +60,10 @@ struct __declspec(align(8)) network_channel
 	network_address address;
 	char field_84;
 	BYTE gap_85[3];
-	DWORD field_88;
+	DWORD network_connect_start_timepoint;
 	DWORD field_8C;
 	DWORD field_90;
-	DWORD unk_time;
+	DWORD network_establish_start_timepoint;
 	DWORD field_98;
 	BYTE gap_9C[4];
 	LARGE_INTEGER field_A0;
@@ -74,6 +75,9 @@ struct __declspec(align(8)) network_channel
 
 	static network_channel* getNetworkChannel(int channelIndex);
 	bool getNetworkAddressFromNetworkChannel(network_address* out_addr);
+
+	bool hasSimulationInterface() { return simulation_interface != nullptr; }
+	bool isSimulationAuthority() { return hasSimulationInterface() && *(bool*)((BYTE*)simulation_interface + 48); }
 };
 static_assert(sizeof(network_channel) == 248, "network_channel size != 248");
 

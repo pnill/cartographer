@@ -1,15 +1,31 @@
 #include "stdafx.h"
 
 #include "NetworkObserver.h"
+#include "..\NetworkChannel\NetworkChannel.h"
+
 #include "Util\Hooks\Hook.h"
 
 network_observer_configuration* g_network_configuration;
 
 #define k_network_preference_size 108
 
-#if INCREASE_NETWORK_TICKRATE
+#if INCREASE_NETWORK_TICKRATE_OBSOLETE
 #define k_online_netcode_tickrate_real 60.0f
 #endif
+
+#if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
+#if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
+
+float _server_network_rate = 60.f;
+float _client_network_rate = 60.f;
+
+int _max_bandwidth_per_channel = 30720 * 4;
+
+//TODO: 
+int _max_window_size = -1;
+
+#endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
+#endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 
 // LIVE netcode research
 void __cdecl initialize_network_observer_configuration()
@@ -198,10 +214,103 @@ int __cdecl transport_get_packet_overhead_hook(int protocol_type)
 	return 0;
 }
 
+bool __thiscall s_network_observer::channel_should_send_packet_hook(
+	int network_channel_index,
+	bool a3,
+	bool a4,
+	int a5,
+	int* out_send_sequenced_packet,
+	int* out_force_fill_packet,
+	int* out_packet_size,
+	int* out_voice_size,
+	int out_voice_chat_data_buffer_size,
+	BYTE* out_voice_chat_data_buffer)
+{
+	typedef bool(__thiscall* should_send_packet)(s_network_observer*, int, bool, bool, int, int*, int*, int*, int*, int, BYTE*);
+	auto p_channel_should_send_packet = Memory::GetAddressRelative<should_send_packet>(0x5BEE8D, 0x5B8D67);
+
+	int observer_index = -1;
+	for (int i = 0; i < 16; i++)
+	{
+		if (this->observers[i].state != s_observer_channel::e_observer_channel_state::none
+			&& this->observers[i].channel_index == network_channel_index)
+		{
+			observer_index = i;
+			break;
+		}
+	}
+
+	if (observer_index == -1)
+		return false;
+
+	network_channel* network_channel = network_channel::getNetworkChannel(network_channel_index);
+	s_observer_channel* observer_channel = &this->observers[observer_index];
+
+	// we modify the network channel paramters to force the network tickrate
+	const auto _temp_network_rate					= observer_channel->net_rate_managed_stream;
+	const auto _temp_network_bandwidth_per_stream	= observer_channel->managed_stream_bandwidth;
+	const auto _temp_network_window_size			= observer_channel->managed_stream_window_size;
+
+	// first we check if we are dealing with a managed network stream
+	if (observer_channel->managed_stream)
+	{
+		// check if we're host
+		if (network_channel->isSimulationAuthority())
+		{
+			observer_channel->net_rate_managed_stream = _server_network_rate;
+		}
+		else
+		{
+			observer_channel->net_rate_managed_stream = _client_network_rate;
+		}
+
+		observer_channel->managed_stream_bandwidth = _max_bandwidth_per_channel;
+		observer_channel->managed_stream_window_size = _max_window_size;
+	}
+
+	bool ret = p_channel_should_send_packet(this, network_channel_index, a3, a4, a5, out_send_sequenced_packet, out_force_fill_packet, out_packet_size, out_voice_size, out_voice_chat_data_buffer_size, out_voice_chat_data_buffer);
+
+	// then we reset the values back to normal
+	observer_channel->net_rate_managed_stream		= _temp_network_rate;
+	observer_channel->managed_stream_bandwidth		= _temp_network_bandwidth_per_stream;
+	observer_channel->managed_stream_window_size	= _temp_network_window_size;
+
+	return ret;
+}
+
+static void __declspec(naked) jmp_network_observer_should_send_packet_hook() { __asm jmp s_network_observer::channel_should_send_packet_hook }
+
+void s_network_observer::ForceConstantNetworkRate()
+{
+	// patches to force static network rate and bandwidth
+	// because the bandwidth management is totaly fucked/busted in Halo 2 Vista
+	// but there are some benefits in using Online's netcode
+	// like limited network packet rate, otherwise people with uncapped FPS will overflow host's packet buffer
+
+	// replace vtable pointer of channel_should_send_packet_hook
+	WritePointer(Memory::GetAddressRelative(0x7C615C, 0x781C48), jmp_network_observer_should_send_packet_hook);
+
+	// don't force packet filling when game simulation is attached
+	// otherwise we send packets filled with nothing...
+	// no idea if this was done on purpose or not...
+	// but it makes no sense to send network packets filled with barely any game data (around 30 bytes on avg) and the rest of the packet size
+	// filled with nothing
+	// unless original XNet transport layer had packet compression but even then it's rather dumb
+	// or maybe the UDP protocol has something like that, no idea
+	NopFill(Memory::GetAddressRelative(0x5BF000, 0x5B8EDA), 14);
+
+	// time patches, use the locked time at the start of netweork_send instead of the frame time delta
+	BYTE instr_offset_1[] = { 0x2C };
+	//WriteBytes(Memory::GetAddressRelative(0x5BF145, 0x5B901F) + 0x3, instr_offset_1, sizeof(instr_offset_1));
+
+	BYTE instr_offset_2[] = { 0x08, 0x07, 0x00, 0x00 };
+	// WriteBytes(Memory::GetAddressRelative(0x5BF14B, 0x5B9025) + 0x2, instr_offset_2, sizeof(instr_offset_2));
+}
+
 void s_network_observer::ApplyPatches()
 {
-#if USE_LIVE_NETCODE
-#if INCREASE_NETWORK_TICKRATE
+#if USE_LIVE_NETWORK_PROTOCOL
+#if INCREASE_NETWORK_TICKRATE_OBSOLETE == true
 	// increase the network tickrate of hosts to 60
 	static float netcode_tickrate = k_online_netcode_tickrate_real;
 
@@ -259,21 +368,11 @@ void s_network_observer::ApplyPatches()
 
 	WriteJmpTo(Memory::GetAddressRelative(0x5AC1BD, 0x5A6B76), transport_get_packet_overhead_hook);
 
-	// don't force packet filling when game simulation is attached
-	// otherwise we send packets filled with nothing
-	// no idea if this was done on purpose or not...
-	// but it makes no sense to send network packets filled with barely any game data (around 30 bytes on avg) and the rest of the packet size
-	// filled with nothing
-	// unless original XNet transport layer had packet compression but even then it's rather dumb
-	// or maybe the UDP protocol has something like that, no idea
-	NopFill(Memory::GetAddressRelative(0x5BF000, 0x5B8EDA), 14);
-
-	// time patches, use the locked time at the start of netweork_send instead of the frame time delta
-	BYTE instr_offset_1[] = { 0x2C };
-	WriteBytes(Memory::GetAddressRelative(0x5BF145, 0x5B901F) + 0x3, instr_offset_1, sizeof(instr_offset_1));
-
-	BYTE instr_offset_2[] = { 0x08, 0x07, 0x00, 0x00 };
-	WriteBytes(Memory::GetAddressRelative(0x5BF14B, 0x5B9025) + 0x2, instr_offset_2, sizeof(instr_offset_2));
+#if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
+#if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
+	ForceConstantNetworkRate();
+#endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
+#endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 
 	if (!Memory::isDedicatedServer())
 	{

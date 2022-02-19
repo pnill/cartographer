@@ -119,7 +119,7 @@ void ReadBytesProtected(DWORD address, BYTE* buf, BYTE count)
 	);
 }
 
-void WritePointer(DWORD offset, void *ptr) {
+void WritePointer(DWORD offset, const void *ptr) {
 	WriteValue<DWORD>(offset, *(DWORD*)&ptr);
 }
 

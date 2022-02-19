@@ -10,13 +10,14 @@
 #include "backends\imgui_impl_win32.h"
 
 #include "ImGui_Cartographer_Style.h"
+#include "ImGui_NetworkStatsOverlay.h"
 
 namespace imgui_handler
 {
 	//Window Name, DrawState, RenderFunc, OpenFunc, CloseFunc
 	/*std::vector<std::tuple<std::string, bool, std::function<void(bool*)>,
 		std::function<void()>, std::function<void()>>> windows;*/
-	std::vector<s_imgui_window> windows;
+	std::vector<s_imgui_window> imgui_windows;
 	static HWND                 g_hWnd = NULL;
 	static INT64                g_Time = 0;
 	static INT64                g_TicksPerSecond = 0;
@@ -26,6 +27,8 @@ namespace imgui_handler
 	static LPDIRECT3DDEVICE9	g_pDevice;
 	static PDIRECT3DTEXTURE9	g_patchNotes_Image = NULL;
 	static bool					g_take_input = false;
+
+	bool						g_network_stats_overlay = false;
 
 	HWND get_HWND()
 	{
@@ -42,11 +45,13 @@ namespace imgui_handler
 	}
 	bool CanDrawImgui()
 	{
-		for (auto& window : windows)
+		for (auto& window : imgui_windows)
 		{
 			if (window.DoRender)
 				return true;
 		}
+		if (g_network_stats_overlay) 
+			return true;
 		return false;
 	}
 
@@ -57,7 +62,8 @@ namespace imgui_handler
 		ImGui_ImplDX9_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
-		for (auto& window : windows)
+		ShowNetworkStatsOverlay(&g_network_stats_overlay);
+		for (auto& window : imgui_windows)
 		{
 			if (window.DoRender)
 			{
@@ -70,7 +76,7 @@ namespace imgui_handler
 
 	void ToggleWindow(const std::string& name)
 	{
-		for (auto& window : windows)
+		for (auto& window : imgui_windows)
 		{
 			if (window.name == name)
 			{
@@ -91,20 +97,22 @@ namespace imgui_handler
 
 	bool IsWindowActive(const std::string& name)
 	{
-		for (auto& window : windows)
+		for (auto& window : imgui_windows)
 		{
 			if (window.name == name)
 				return window.DoRender;
 		}
+		if (name == "net_metrics" && g_network_stats_overlay)
+			return true;
 		return false;
 	}
 
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd)
 	{
-		windows.emplace_back("Advanced Settings", false, AdvancedSettings::Render, AdvancedSettings::Open, AdvancedSettings::Close);
-		windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
-		windows.emplace_back("debug_overlay", false, DebugOverlay::Render, DebugOverlay::Open, DebugOverlay::Close);
-		windows.emplace_back("messagebox", false, iMessageBox::Render, iMessageBox::Open, iMessageBox::Close);
+		imgui_windows.emplace_back("Advanced Settings", false, AdvancedSettings::Render, AdvancedSettings::Open, AdvancedSettings::Close);
+		imgui_windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
+		imgui_windows.emplace_back("debug_overlay", false, DebugOverlay::Render, DebugOverlay::Open, DebugOverlay::Close);
+		imgui_windows.emplace_back("messagebox", false, iMessageBox::Render, iMessageBox::Open, iMessageBox::Close);
 		
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();

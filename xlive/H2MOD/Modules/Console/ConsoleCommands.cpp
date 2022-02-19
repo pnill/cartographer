@@ -13,6 +13,7 @@
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
 
+#include "H2MOD\GUI\imgui_integration\ImGui_Handler.h"
 #include "Util\ClipboardAPI.h"
 // for XNet connection logging
 #include "XLive\xnet\IpManagement\XnIp.h"
@@ -874,6 +875,10 @@ void ConsoleCommands::handle_command(std::string command) {
 			gXnIp.LogConnectionsToConsole();
 		}
 		
+		else if (firstCommand == "$net_metrics")
+		{
+			imgui_handler::g_network_stats_overlay = !imgui_handler::g_network_stats_overlay;
+		}
 		else {
 			output(L"Unknown command.");
 		}
