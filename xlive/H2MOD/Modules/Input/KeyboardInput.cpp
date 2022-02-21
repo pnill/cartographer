@@ -228,13 +228,6 @@ void hotkeyFuncGuide() {
 	imgui_handler::ToggleWindow("Advanced Settings");
 }
 
-void hotkeyFuncWeaponOffset() {
-	if (H2IsDediServer) {
-		return;
-	}
-	imgui_handler::ToggleWindow("Weapon Offsets");
-}
-
 void hotkeyFuncDebug()
 {
 	imgui_handler::ToggleWindow("debug_overlay");
@@ -258,7 +251,6 @@ void KeyboardInput::Initialize()
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdAlignWindow, hotkeyFuncAlignWindow);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdWindowMode, hotkeyFuncWindowMode);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdGuide, hotkeyFuncGuide);
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdWeaponOffsets, hotkeyFuncWeaponOffset);
 	KeyboardInput::RegisterHotkey(&pause, hotkeyFuncDebug);
 }
 

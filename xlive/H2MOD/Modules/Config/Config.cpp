@@ -129,7 +129,6 @@ int H2Config_hotkeyIdAlignWindow = VK_F7;
 int H2Config_hotkeyIdWindowMode = VK_F8;
 int H2Config_hotkeyIdToggleHideIngameChat = VK_F9;
 int H2Config_hotkeyIdGuide = VK_HOME;
-int H2Config_hotkeyIdWeaponOffsets = VK_END;
 int H2Config_hotkeyIdConsole = VK_F10;
 
 bool ownsConfigFile = false;

@@ -456,6 +456,7 @@
     <ClInclude Include="3rdparty\directx\include\d3dx9tex.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9xof.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

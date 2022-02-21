@@ -213,6 +213,11 @@ namespace imgui_handler {
 					ImVec2 b3_size = ImVec2(WidthPercentage(33.3333333333f), item_size.y);
 					ImGui::NewLine();
 					//Ingame Change Display
+					if (ImGui::Button(GetString(weaponoffsets, "WeaponOffsets"), b3_size))
+					{
+						imgui_handler::ToggleWindow("Weapon Offsets");
+					}
+
 					ImGui::Columns(2, NULL, false);
 
 					ImGui::Checkbox(GetString(hide_ingame_chat), &H2Config_hide_ingame_chat);
@@ -1072,6 +1077,7 @@ namespace imgui_handler {
 			string_table[0][e_advanced_string::hide_ingame_chat] = "Hide Ingame Chat";
 			string_table[0][e_advanced_string::show_hud] = "Show HUD";
 			string_table[0][e_advanced_string::show_first_person] = "Show First Person";
+			string_table[0][e_advanced_string::weaponoffsets] = "Adjust Weapon Offsets";
 			string_table[0][e_advanced_string::video_title] = "Video Settings";
 			string_table[0][e_advanced_string::fps_limit] = "FPS Limit";
 			string_table[0][e_advanced_string::fps_limit_tooltip] =
@@ -1237,6 +1243,7 @@ namespace imgui_handler {
 			string_table[4][e_advanced_string::hide_ingame_chat] = "Ocultar chat en partida";
 			string_table[4][e_advanced_string::show_hud] = "Mostrar Interfaz";
 			string_table[4][e_advanced_string::show_first_person] = "Mostrar primera persona";
+			string_table[4][e_advanced_string::weaponoffsets] = "Ajustar compensaciones de armas";
 			string_table[4][e_advanced_string::video_title] = "Ajustes de video";
 			string_table[4][e_advanced_string::fps_limit] = "Limitar FPS";
 			string_table[4][e_advanced_string::fps_limit_tooltip] =

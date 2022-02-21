@@ -117,7 +117,6 @@ extern int H2Config_hotkeyIdAlignWindow;
 extern int H2Config_hotkeyIdWindowMode;
 extern int H2Config_hotkeyIdToggleHideIngameChat;
 extern int H2Config_hotkeyIdGuide;
-extern int H2Config_hotkeyIdWeaponOffsets;
 extern int H2Config_hotkeyIdConsole;
 extern int H2Config_minimum_player_start;
 

@@ -9,167 +9,174 @@
 
 namespace imgui_handler {
 	namespace WeaponOffsets {
+		int battle_rifle_datum;
+		s_weapon_group_definition* battle_rifle_tag;
+		int beam_rifle_datum;
+		s_weapon_group_definition* beam_rifle_tag;
+		int brute_plasma_rifle_datum;
+		s_weapon_group_definition* brute_plasma_rifle_tag;
+		int brute_shot_datum;
+		s_weapon_group_definition* brute_shot_tag;
+		int carbine_datum;
+		s_weapon_group_definition* carbine_tag;
+		int energy_sword_datum;
+		s_weapon_group_definition* energy_sword_tag;
+		int fuel_rod_datum;
+		s_weapon_group_definition* fuel_rod_tag;
+		int magnum_datum;
+		s_weapon_group_definition* magnum_tag;
+		int needler_datum;
+		s_weapon_group_definition* needler_tag;
+		int plasma_pistol_datum;
+		s_weapon_group_definition* plasma_pistol_tag;
+		int plasma_rifle_datum;
+		s_weapon_group_definition* plasma_rifle_tag;
+		int rocket_launcher_datum;
+		s_weapon_group_definition* rocket_launcher_tag;
+		int sentinel_beam_datum;
+		s_weapon_group_definition* sentinel_beam_tag;
+		int shotgun_datum;
+		s_weapon_group_definition* shotgun_tag;
+		int smg_datum;
+		s_weapon_group_definition* smg_tag;
+		int sniper_datum;
+		s_weapon_group_definition* sniper_tag;
+
 		namespace
 		{
 			std::map<int, std::map<e_weapon_offsets_string, char*>> string_table;
 			// Used for controls that use the same string, A identifier has to be appended to them
 			// I.E Reset##1... Reset##20
 			std::map<std::string, std::string> string_cache;
-			void HudSettings()
-			{	
-				// Tag references
-				auto battle_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\battle_rifle\\battle_rifle");
-				auto battle_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(battle_rifle_datum);
-				auto beam_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\beam_rifle\\beam_rifle");
-				auto beam_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(beam_rifle_datum);
-				auto brute_plasma_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle");
-				auto brute_plasma_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(brute_plasma_rifle_datum);
-				auto brute_shot_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_low\\brute_shot\\brute_shot");
-				auto brute_shot_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(brute_shot_datum);
-				auto carbine_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\covenant_carbine\\covenant_carbine");
-				auto carbine_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(carbine_datum);
-				auto energy_sword_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\melee\\energy_blade\\energy_blade");
-				auto energy_sword_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(energy_sword_datum);
-				auto fuel_rod_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_high\\flak_cannon\\flak_cannon");
-				auto fuel_rod_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(fuel_rod_datum);
-				auto magnum_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\magnum\\magnum");
-				auto magnum_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(magnum_datum);
-				auto needler_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\needler\\needler");
-				auto needler_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(needler_datum);
-				auto plasma_pistol_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\plasma_pistol\\plasma_pistol");
-				auto plasma_pistol_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(plasma_pistol_datum);
-				auto plasma_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle");
-				auto plasma_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(plasma_rifle_datum);
-				auto rocket_launcher_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_high\\rocket_launcher\\rocket_launcher");
-				auto rocket_launcher_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(rocket_launcher_datum);
-				auto sentinel_beam_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\characters\\sentinel_aggressor\\weapons\\beam\\sentinel_aggressor_beam");
-				auto sentinel_beam_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(sentinel_beam_datum);
-				auto shotgun_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\shotgun\\shotgun");
-				auto shotgun_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(shotgun_datum);
-				auto smg_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\smg\\smg");
-				auto smg_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(smg_datum);
-				auto sniper_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle");
-				auto sniper_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(sniper_datum);
+			void OffsetMenu(s_weapon_group_definition* tag, char* slider, e_weapon_offsets_string text, float& offset, float default_value)
+			{
+				// Bullshit for unique widget ids
+				char item2[32], item3[32];
+				strcpy(item2, slider);
+				strcat(item2, "1");
+				strcpy(item3, slider);
+				strcat(item3, "2");
 
-				// Setup drop-down menus for each weapon
-				if (ImGui::CollapsingHeader(GetString(battle_rifle_title)))
+				ImVec2 item_size = ImGui::GetItemRectSize();
+				ImVec2 b2_size = ImVec2(WidthPercentage(20), item_size.y);
+
+				ImGui::Text(GetString(text));
+				ImGui::PushItemWidth(WidthPercentage(60));
+				ImGui::SliderFloat(slider, &offset, -0.15, 0.15, ""); ImGui::SameLine();
+				if (ImGui::IsItemEdited() && tag != nullptr) { ApplyOffsetImgui(tag, slider, offset); }
+
+				ImGui::PushItemWidth(WidthPercentage(20));
+				ImGui::InputFloat(item2, &offset, -0.15, 0.15, "%.3f"); ImGui::SameLine();
+				if (ImGui::IsItemEdited() && tag != nullptr) { ApplyOffsetImgui(tag, slider, offset); }
+
+				ImGui::PushItemWidth(WidthPercentage(20));
+				if (ImGui::Button(GetString(reset, item3), b2_size))
 				{
+					offset = default_value;
+					if (tag != nullptr) { ApplyOffsetImgui(tag, slider, offset); }
+				}
+				ImGui::PopItemWidth();
+			}
+			void OffsetSettings()
+			{
+
+				static const char* weapons[]
+				{ GetString(battle_rifle_title), GetString(beam_rifle_title),GetString(brute_plasma_rifle_title), GetString(brute_shot_title),
+				GetString(carbine_title), GetString(energy_sword_title), GetString(fuel_rod_title), GetString(magnum_title),
+				GetString(needler_title), GetString(plasma_pistol_title), GetString(plasma_rifle_title), GetString(rocket_launcher_title),
+				GetString(sentinel_beam_title), GetString(shotgun_title), GetString(smg_title), GetString(sniper_title) };
+				static int selectedOption = 0;
+
+				// Setup combo box menus for each weapon
+				ImGui::Combo(GetString(combo_title), &selectedOption, weapons, IM_ARRAYSIZE(weapons));
+				switch (selectedOption)
+				{
+				case 0:
 					OffsetMenu(battle_rifle_tag, "##BattleRifle_OffsetX", weapon_offset_x, BattleRifle_WeaponOffsetX, 0.02);
 					OffsetMenu(battle_rifle_tag, "##BattleRifle_OffsetY", weapon_offset_y, BattleRifle_WeaponOffsetY, 0);
 					OffsetMenu(battle_rifle_tag, "##BattleRifle_OffsetZ", weapon_offset_z, BattleRifle_WeaponOffsetZ, -0.004);
-				}
-				if (ImGui::CollapsingHeader(GetString(beam_rifle_title)))
-				{
+					break;
+				case 1:
 					OffsetMenu(beam_rifle_tag, "##BeamRifle_OffsetX", weapon_offset_x, BeamRifle_WeaponOffsetX, 0.02);
 					OffsetMenu(beam_rifle_tag, "##BeamRifle_OffsetY", weapon_offset_y, BeamRifle_WeaponOffsetY, 0);
 					OffsetMenu(beam_rifle_tag, "##BeamRifle_OffsetZ", weapon_offset_z, BeamRifle_WeaponOffsetZ, 0);
-				}
-				if (ImGui::CollapsingHeader(GetString(brute_plasma_rifle_title)))
-				{
+					break;
+				case 2:
 					OffsetMenu(brute_plasma_rifle_tag, "##BrutePlasmaRifle_OffsetX", weapon_offset_x, BrutePlasmaRifle_WeaponOffsetX, 0.02);
 					OffsetMenu(brute_plasma_rifle_tag, "##BrutePlasmaRifle_OffsetY", weapon_offset_y, BrutePlasmaRifle_WeaponOffsetY, 0);
 					OffsetMenu(brute_plasma_rifle_tag, "##BrutePlasmaRifle_OffsetZ", weapon_offset_z, BrutePlasmaRifle_WeaponOffsetZ, 0);
-				}
-				if (ImGui::CollapsingHeader(GetString(brute_shot_title)))
-				{
+					break;
+				case 3:
 					OffsetMenu(brute_shot_tag, "##BruteShot_OffsetX", weapon_offset_x, BruteShot_WeaponOffsetX, 0.02);
 					OffsetMenu(brute_shot_tag, "##BruteShot_OffsetY", weapon_offset_y, BruteShot_WeaponOffsetY, -0.01);
 					OffsetMenu(brute_shot_tag, "##BruteShot_OffsetZ", weapon_offset_z, BruteShot_WeaponOffsetZ, 0.001);
-				}
-				if (ImGui::CollapsingHeader(GetString(carbine_title)))
-				{
+					break;
+				case 4:
 					OffsetMenu(carbine_tag, "##Carbine_OffsetX", weapon_offset_x, Carbine_WeaponOffsetX, 0.02);
 					OffsetMenu(carbine_tag, "##Carbine_OffsetY", weapon_offset_y, Carbine_WeaponOffsetY, 0);
 					OffsetMenu(carbine_tag, "##Carbine_OffsetZ", weapon_offset_z, Carbine_WeaponOffsetZ, -0.004);
-				}
-				if (ImGui::CollapsingHeader(GetString(energy_sword_title)))
-				{
+					break;
+				case 5:
 					OffsetMenu(energy_sword_tag, "##EnergySword_OffsetX", weapon_offset_x, EnergySword_WeaponOffsetX, 0.05);
 					OffsetMenu(energy_sword_tag, "##EnergySword_OffsetY", weapon_offset_y, EnergySword_WeaponOffsetY, 0);
 					OffsetMenu(energy_sword_tag, "##EnergySword_OffsetZ", weapon_offset_z, EnergySword_WeaponOffsetZ, 0);
-				}
-				if (ImGui::CollapsingHeader(GetString(fuel_rod_title)))
-				{
+					break;
+				case 6:
 					OffsetMenu(fuel_rod_tag, "##FuelRod_OffsetX", weapon_offset_x, FuelRod_WeaponOffsetX, 0.02);
 					OffsetMenu(fuel_rod_tag, "##FuelRod_OffsetY", weapon_offset_y, FuelRod_WeaponOffsetY, 0);
 					OffsetMenu(fuel_rod_tag, "##FuelRod_OffsetZ", weapon_offset_z, FuelRod_WeaponOffsetZ, -0.005);
-				}
-				if (ImGui::CollapsingHeader(GetString(magnum_title)))
-				{
+					break;
+				case 7:
 					OffsetMenu(magnum_tag, "##Magnum_OffsetX", weapon_offset_x, Magnum_WeaponOffsetX, 0.03);
 					OffsetMenu(magnum_tag, "##Magnum_OffsetY", weapon_offset_y, Magnum_WeaponOffsetY, 0);
 					OffsetMenu(magnum_tag, "##Magnum_OffsetZ", weapon_offset_z, Magnum_WeaponOffsetZ, -0.005);
-				}
-				if (ImGui::CollapsingHeader(GetString(needler_title)))
-				{
+					break;
+				case 8:
 					OffsetMenu(needler_tag, "##Needler_OffsetX", weapon_offset_x, Needler_WeaponOffsetX, 0.03);
 					OffsetMenu(needler_tag, "##Needler_OffsetY", weapon_offset_y, Needler_WeaponOffsetY, 0);
 					OffsetMenu(needler_tag, "##Needler_OffsetZ", weapon_offset_z, Needler_WeaponOffsetZ, -0.005);
-				}
-				if (ImGui::CollapsingHeader(GetString(plasma_pistol_title)))
-				{
+					break;
+				case 9:
 					OffsetMenu(plasma_pistol_tag, "##PlasmaPistol_OffsetX", weapon_offset_x, PlasmaPistol_WeaponOffsetX, 0.03);
 					OffsetMenu(plasma_pistol_tag, "##PlasmaPistol_OffsetY", weapon_offset_y, PlasmaPistol_WeaponOffsetY, 0);
 					OffsetMenu(plasma_pistol_tag, "##PlasmaPistol_OffsetZ", weapon_offset_z, PlasmaPistol_WeaponOffsetZ, -0.005);
-				}
-				if (ImGui::CollapsingHeader(GetString(plasma_rifle_title)))
-				{
+					break;
+				case 10:
 					OffsetMenu(plasma_rifle_tag, "##PlasmaRifle_OffsetX", weapon_offset_x, PlasmaRifle_WeaponOffsetX, 0.02);
 					OffsetMenu(plasma_rifle_tag, "##PlasmaRifle_OffsetY", weapon_offset_y, PlasmaRifle_WeaponOffsetY, 0);
 					OffsetMenu(plasma_rifle_tag, "##PlasmaRifle_OffsetZ", weapon_offset_z, PlasmaRifle_WeaponOffsetZ, 0);
-				}
-				if (ImGui::CollapsingHeader(GetString(rocket_launcher_title)))
-				{
+					break;
+				case 11:
 					OffsetMenu(rocket_launcher_tag, "##RocketLauncher_OffsetX", weapon_offset_x, RocketLauncher_WeaponOffsetX, 0.02);
 					OffsetMenu(rocket_launcher_tag, "##RocketLauncher_OffsetY", weapon_offset_y, RocketLauncher_WeaponOffsetY, 0);
 					OffsetMenu(rocket_launcher_tag, "##RocketLauncher_OffsetZ", weapon_offset_z, RocketLauncher_WeaponOffsetZ, -0.005);
-				}
-				if (ImGui::CollapsingHeader(GetString(sentinel_beam_title)))
-				{
+					break;
+				case 12:
 					OffsetMenu(sentinel_beam_tag, "##SentinelBeam_OffsetX", weapon_offset_x, SentinelBeam_WeaponOffsetX, 0.02);
 					OffsetMenu(sentinel_beam_tag, "##SentinelBeam_OffsetY", weapon_offset_y, SentinelBeam_WeaponOffsetY, 0.03);
 					OffsetMenu(sentinel_beam_tag, "##SentinelBeam_OffsetZ", weapon_offset_z, SentinelBeam_WeaponOffsetZ, 0);
-				}
-				if (ImGui::CollapsingHeader(GetString(shotgun_title)))
-				{
+					break;
+				case 13:
 					OffsetMenu(shotgun_tag, "##Shotgun_OffsetX", weapon_offset_x, Shotgun_WeaponOffsetX, 0.02);
 					OffsetMenu(shotgun_tag, "##Shotgun_OffsetY", weapon_offset_y, Shotgun_WeaponOffsetY, -0.001);
 					OffsetMenu(shotgun_tag, "##Shotgun_OffsetZ", weapon_offset_z, Shotgun_WeaponOffsetZ, -0.015);
-				}
-				if (ImGui::CollapsingHeader(GetString(smg_title)))
-				{
+					break;
+				case 14:
 					OffsetMenu(smg_tag, "##SMG_OffsetX", weapon_offset_x, SMG_WeaponOffsetX, 0.02);
 					OffsetMenu(smg_tag, "##SMG_OffsetY", weapon_offset_y, SMG_WeaponOffsetY, 0);
 					OffsetMenu(smg_tag, "##SMG_OffsetZ", weapon_offset_z, SMG_WeaponOffsetZ, 0);
-				}
-				if (ImGui::CollapsingHeader(GetString(sniper_title)))
-				{
+					break;
+				case 15:
 					OffsetMenu(sniper_tag, "##Sniper_OffsetX", weapon_offset_x, Sniper_WeaponOffsetX, 0.01);
 					OffsetMenu(sniper_tag, "##Sniper_OffsetY", weapon_offset_y, Sniper_WeaponOffsetY, 0);
 					OffsetMenu(sniper_tag, "##Sniper_OffsetZ", weapon_offset_z, Sniper_WeaponOffsetZ, 0);
+					break;
 				}
 			}
 		}
+
 		char* GetString(e_weapon_offsets_string string, const std::string& id)
 		{
-			/*
-			if (string_table.count(H2Config_language.code_main))
-			{
-				if (string_table.at(H2Config_language.code_main).count(string)) {
-					if (id.empty()) {
-						return const_cast<char*>(string_table.at(H2Config_language.code_main).at(string));
-					}
-
-					if (!string_cache.count(id))
-					{
-						std::string temp_str(const_cast<char*>(string_table.at(H2Config_language.code_main).at(string)));
-						temp_str.append("##");
-						temp_str.append(id);
-						string_cache[id] = temp_str;
-					}
-					return (char*)string_cache[id].c_str();
-				}
-			}*/
 			if (id.empty()) {
 				return const_cast<char*>(string_table.at(0).at(string));
 			}
@@ -193,13 +200,13 @@ namespace imgui_handler {
 			window_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
 			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
-			ImGui::SetNextWindowSize(ImVec2(450, 530), ImGuiCond_Appearing);
-			ImGui::SetNextWindowSizeConstraints(ImVec2(410, 530), ImVec2(1920, 1080));
+			ImGui::SetNextWindowSize(ImVec2(450, 320), ImGuiCond_Appearing);
+			ImGui::SetNextWindowSizeConstraints(ImVec2(410, 320), ImVec2(1920, 1080));
 			if (h2mod->GetEngineType() == MainMenu)
 				ImGui::SetNextWindowBgAlpha(1);
 			if (ImGui::Begin(GetString(e_weapon_offsets_string::title), p_open, window_flags))
 			{
-				HudSettings();
+				OffsetSettings();
 			}
 
 			ImGui::PopStyleVar();
@@ -229,124 +236,51 @@ namespace imgui_handler {
 		void BuildStringsTable()
 		{
 			string_table[0][e_weapon_offsets_string::title] = "        Weapon Offsets";
-			string_table[0][e_weapon_offsets_string::battle_rifle_title] = "Battle Rifle Offset";
-			string_table[0][e_weapon_offsets_string::beam_rifle_title] = "Beam Rifle Offset";
-			string_table[0][e_weapon_offsets_string::brute_plasma_rifle_title] = "Brute Plasma Rifle Offset";
-			string_table[0][e_weapon_offsets_string::brute_shot_title] = "Brute Shot Offset";
-			string_table[0][e_weapon_offsets_string::carbine_title] = "Carbine Offset";
-			string_table[0][e_weapon_offsets_string::energy_sword_title] = "Energy Sword Offset";
-			string_table[0][e_weapon_offsets_string::fuel_rod_title] = "Fuel Rod Offset";
-			string_table[0][e_weapon_offsets_string::magnum_title] = "Magnum Offset";
-			string_table[0][e_weapon_offsets_string::needler_title] = "Needler Offset";
-			string_table[0][e_weapon_offsets_string::plasma_pistol_title] = "Plasma Pistol Offset";
-			string_table[0][e_weapon_offsets_string::plasma_rifle_title] = "Plasma Rifle Offset";
-			string_table[0][e_weapon_offsets_string::rocket_launcher_title] = "Rocket Launcher Offset";
-			string_table[0][e_weapon_offsets_string::sentinel_beam_title] = "Sentinel Beam Offset";
-			string_table[0][e_weapon_offsets_string::shotgun_title] = "Shotgun Offset";
-			string_table[0][e_weapon_offsets_string::smg_title] = "SMG Offset";
-			string_table[0][e_weapon_offsets_string::sniper_title] = "Sniper Offset";
+			string_table[0][e_weapon_offsets_string::combo_title] = "Weapon";
+			string_table[0][e_weapon_offsets_string::battle_rifle_title] = "Battle Rifle";
+			string_table[0][e_weapon_offsets_string::beam_rifle_title] = "Beam Rifle";
+			string_table[0][e_weapon_offsets_string::brute_plasma_rifle_title] = "Brute Plasma Rifle";
+			string_table[0][e_weapon_offsets_string::brute_shot_title] = "Brute Shot";
+			string_table[0][e_weapon_offsets_string::carbine_title] = "Carbine";
+			string_table[0][e_weapon_offsets_string::energy_sword_title] = "Energy Sword";
+			string_table[0][e_weapon_offsets_string::fuel_rod_title] = "Fuel Rod";
+			string_table[0][e_weapon_offsets_string::magnum_title] = "Magnum";
+			string_table[0][e_weapon_offsets_string::needler_title] = "Needler";
+			string_table[0][e_weapon_offsets_string::plasma_pistol_title] = "Plasma Pistol";
+			string_table[0][e_weapon_offsets_string::plasma_rifle_title] = "Plasma Rifle";
+			string_table[0][e_weapon_offsets_string::rocket_launcher_title] = "Rocket Launcher";
+			string_table[0][e_weapon_offsets_string::sentinel_beam_title] = "Sentinel Beam";
+			string_table[0][e_weapon_offsets_string::shotgun_title] = "Shotgun";
+			string_table[0][e_weapon_offsets_string::smg_title] = "SMG";
+			string_table[0][e_weapon_offsets_string::sniper_title] = "Sniper";
 			string_table[0][e_weapon_offsets_string::weapon_offset_x] = "Weapon Offset X";
 			string_table[0][e_weapon_offsets_string::weapon_offset_y] = "Weapon Offset Y";
 			string_table[0][e_weapon_offsets_string::weapon_offset_z] = "Weapon Offset Z";
 			string_table[0][e_weapon_offsets_string::reset] = "Reset";
 
 			//Spanish.
-			string_table[4][e_weapon_offsets_string::title] = "        Weapon Offsets";
-			string_table[4][e_weapon_offsets_string::battle_rifle_title] = "Battle Rifle Offset";
-			string_table[4][e_weapon_offsets_string::beam_rifle_title] = "Beam Rifle Offset";
-			string_table[4][e_weapon_offsets_string::brute_plasma_rifle_title] = "Brute Plasma Rifle Offset";
-			string_table[4][e_weapon_offsets_string::brute_shot_title] = "Brute Shot Offset";
-			string_table[4][e_weapon_offsets_string::carbine_title] = "Carbine Offset";
-			string_table[4][e_weapon_offsets_string::energy_sword_title] = "Energy Sword Offset";
-			string_table[4][e_weapon_offsets_string::fuel_rod_title] = "Fuel Rod Offset";
-			string_table[4][e_weapon_offsets_string::magnum_title] = "Magnum Offset";
-			string_table[4][e_weapon_offsets_string::needler_title] = "Needler Offset";
-			string_table[4][e_weapon_offsets_string::plasma_pistol_title] = "Plasma Pistol Offset";
-			string_table[4][e_weapon_offsets_string::plasma_rifle_title] = "Plasma Rifle Offset";
-			string_table[4][e_weapon_offsets_string::rocket_launcher_title] = "Rocket Launcher Offset";
-			string_table[4][e_weapon_offsets_string::sentinel_beam_title] = "Sentinel Beam Offset";
-			string_table[4][e_weapon_offsets_string::shotgun_title] = "Shotgun Offset";
-			string_table[4][e_weapon_offsets_string::smg_title] = "SMG Offset";
-			string_table[4][e_weapon_offsets_string::sniper_title] = "Sniper Offset";
-			string_table[4][e_weapon_offsets_string::weapon_offset_x] = "Weapon Offset X";
-			string_table[4][e_weapon_offsets_string::weapon_offset_y] = "Weapon Offset Y";
-			string_table[4][e_weapon_offsets_string::weapon_offset_z] = "Weapon Offset Z";
-			string_table[4][e_weapon_offsets_string::reset] = "Reset";
-
-		}
-		void OffsetMenu(s_weapon_group_definition* tag, char* slider, e_weapon_offsets_string text, float& offset, float default_value)
-		{
-			// Bullshit for unique widget ids
-			char item2[32], item3[32];
-			strcpy(item2, slider);
-			strcat(item2, "1");
-			strcpy(item3, slider);
-			strcat(item3, "2");
-
-			ImVec2 item_size = ImGui::GetItemRectSize();
-			ImVec2 b2_size = ImVec2(WidthPercentage(20), item_size.y);
-
-			ImGui::Text(GetString(text));
-			ImGui::PushItemWidth(WidthPercentage(60));
-			ImGui::SliderFloat(slider, &offset, -0.15, 0.15, ""); ImGui::SameLine();
-			if (ImGui::IsItemEdited() && tag != nullptr) {
-				switch (slider[strlen(slider) - 1])
-				{
-				case 'X':
-					tag->first_person_weapon_offset_i = offset;
-					break;
-				case 'Y':
-					tag->first_person_weapon_offset_j = offset;
-					break;
-				case 'Z':
-					tag->first_person_weapon_offset_k = offset;
-					break;
-				}
-			}
-
-			ImGui::PushItemWidth(WidthPercentage(20));
-			ImGui::InputFloat(item2, &offset, -0.15, 0.15, "%.3f"); ImGui::SameLine();
-			if (ImGui::IsItemEdited() && tag != nullptr) {
-				if (offset > 0.15)
-					offset = 0.15;
-				if (offset < -0.15)
-					offset = -0.15;
-
-				switch (slider[strlen(slider) - 1])
-				{
-				case 'X':
-					tag->first_person_weapon_offset_i = offset;
-					break;
-				case 'Y':
-					tag->first_person_weapon_offset_j = offset;
-					break;
-				case 'Z':
-					tag->first_person_weapon_offset_k = offset;
-					break;
-				}
-			}
-
-			ImGui::PushItemWidth(WidthPercentage(20));
-			if (ImGui::Button(GetString(reset, item3), b2_size))
-			{
-				offset = default_value;
-				if (tag != nullptr)
-				{
-					switch (slider[strlen(slider) - 1])
-					{
-					case 'X':
-						tag->first_person_weapon_offset_i = offset;
-						break;
-					case 'Y':
-						tag->first_person_weapon_offset_j = offset;
-						break;
-					case 'Z':
-						tag->first_person_weapon_offset_k = offset;
-						break;
-					}
-				}
-			}
-			ImGui::PopItemWidth();
+			string_table[4][e_weapon_offsets_string::title] = "        Compensaciones de armas";
+			string_table[4][e_weapon_offsets_string::combo_title] = "Arma";
+			string_table[4][e_weapon_offsets_string::battle_rifle_title] = "Fusil de Batalla";
+			string_table[4][e_weapon_offsets_string::beam_rifle_title] = "Fusil de Haz";
+			string_table[4][e_weapon_offsets_string::brute_plasma_rifle_title] = "Rifle de Plasma Bruto";
+			string_table[4][e_weapon_offsets_string::brute_shot_title] = "Disparo Bruto";
+			string_table[4][e_weapon_offsets_string::carbine_title] = "Carabina";
+			string_table[4][e_weapon_offsets_string::energy_sword_title] = "Espada de Energía";
+			string_table[4][e_weapon_offsets_string::fuel_rod_title] = "Varilla de Combustible";
+			string_table[4][e_weapon_offsets_string::magnum_title] = "Botella doble";
+			string_table[4][e_weapon_offsets_string::needler_title] = "Aguijoneador";
+			string_table[4][e_weapon_offsets_string::plasma_pistol_title] = "Pistola de Plasma";
+			string_table[4][e_weapon_offsets_string::plasma_rifle_title] = "Fusil de Plasma";
+			string_table[4][e_weapon_offsets_string::rocket_launcher_title] = "Lanzacohetes";
+			string_table[4][e_weapon_offsets_string::sentinel_beam_title] = "Rayo Centinela";
+			string_table[4][e_weapon_offsets_string::shotgun_title] = "Escopeta";
+			string_table[4][e_weapon_offsets_string::smg_title] = "Subfusil";
+			string_table[4][e_weapon_offsets_string::sniper_title] = "Francotirador";
+			string_table[4][e_weapon_offsets_string::weapon_offset_x] = "Compensación de Armas X";
+			string_table[4][e_weapon_offsets_string::weapon_offset_y] = "Compensación de Armas Y";
+			string_table[4][e_weapon_offsets_string::weapon_offset_z] = "Compensación de Armas Z";
+			string_table[4][e_weapon_offsets_string::reset] = "Reiniciar";
 		}
 		void ApplyOffset(s_weapon_group_definition* tag, float i, float j, float k)
 		{
@@ -357,43 +291,57 @@ namespace imgui_handler {
 				tag->first_person_weapon_offset_k = k;
 			}
 		}
+		void ApplyOffsetImgui(s_weapon_group_definition* tag, char* slider, float& offset)
+		{
+			switch (slider[strlen(slider) - 1])
+			{
+			case 'X':
+				tag->first_person_weapon_offset_i = offset;
+				break;
+			case 'Y':
+				tag->first_person_weapon_offset_j = offset;
+				break;
+			case 'Z':
+				tag->first_person_weapon_offset_k = offset;
+				break;
+			}
+		}
 		void Initialize()
 		{
-			ReadWeaponOffsetConfig();
+			battle_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\battle_rifle\\battle_rifle");
+			battle_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(battle_rifle_datum);
+			beam_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\beam_rifle\\beam_rifle");
+			beam_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(beam_rifle_datum);
+			brute_plasma_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle");
+			brute_plasma_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(brute_plasma_rifle_datum);
+			brute_shot_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_low\\brute_shot\\brute_shot");
+			brute_shot_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(brute_shot_datum);
+			carbine_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\covenant_carbine\\covenant_carbine");
+			carbine_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(carbine_datum);
+			energy_sword_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\melee\\energy_blade\\energy_blade");
+			energy_sword_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(energy_sword_datum);
+			fuel_rod_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_high\\flak_cannon\\flak_cannon");
+			fuel_rod_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(fuel_rod_datum);
+			magnum_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\magnum\\magnum");
+			magnum_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(magnum_datum);
+			needler_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\needler\\needler");
+			needler_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(needler_datum);
+			plasma_pistol_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\plasma_pistol\\plasma_pistol");
+			plasma_pistol_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(plasma_pistol_datum);
+			plasma_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle");
+			plasma_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(plasma_rifle_datum);
+			rocket_launcher_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_high\\rocket_launcher\\rocket_launcher");
+			rocket_launcher_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(rocket_launcher_datum);
+			sentinel_beam_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\characters\\sentinel_aggressor\\weapons\\beam\\sentinel_aggressor_beam");
+			sentinel_beam_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(sentinel_beam_datum);
+			shotgun_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\shotgun\\shotgun");
+			shotgun_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(shotgun_datum);
+			smg_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\smg\\smg");
+			smg_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(smg_datum);
+			sniper_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle");
+			sniper_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(sniper_datum);
 
-			// Tag references again... (apparently it crashes if tag references are global?)
-			auto battle_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\battle_rifle\\battle_rifle");
-			auto battle_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(battle_rifle_datum);
-			auto beam_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\beam_rifle\\beam_rifle");
-			auto beam_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(beam_rifle_datum);
-			auto brute_plasma_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle");
-			auto brute_plasma_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(brute_plasma_rifle_datum);
-			auto brute_shot_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_low\\brute_shot\\brute_shot");
-			auto brute_shot_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(brute_shot_datum);
-			auto carbine_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\covenant_carbine\\covenant_carbine");
-			auto carbine_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(carbine_datum);
-			auto energy_sword_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\melee\\energy_blade\\energy_blade");
-			auto energy_sword_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(energy_sword_datum);
-			auto fuel_rod_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_high\\flak_cannon\\flak_cannon");
-			auto fuel_rod_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(fuel_rod_datum);
-			auto magnum_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\magnum\\magnum");
-			auto magnum_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(magnum_datum);
-			auto needler_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\needler\\needler");
-			auto needler_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(needler_datum);
-			auto plasma_pistol_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\plasma_pistol\\plasma_pistol");
-			auto plasma_pistol_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(plasma_pistol_datum);
-			auto plasma_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle");
-			auto plasma_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(plasma_rifle_datum);
-			auto rocket_launcher_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_high\\rocket_launcher\\rocket_launcher");
-			auto rocket_launcher_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(rocket_launcher_datum);
-			auto sentinel_beam_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\characters\\sentinel_aggressor\\weapons\\beam\\sentinel_aggressor_beam");
-			auto sentinel_beam_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(sentinel_beam_datum);
-			auto shotgun_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\shotgun\\shotgun");
-			auto shotgun_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(shotgun_datum);
-			auto smg_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\smg\\smg");
-			auto smg_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(smg_datum);
-			auto sniper_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle");
-			auto sniper_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(sniper_datum);
+			ReadWeaponOffsetConfig();
 
 			ApplyOffset(battle_rifle_tag, BattleRifle_WeaponOffsetX, BattleRifle_WeaponOffsetY, BattleRifle_WeaponOffsetZ);
 			ApplyOffset(beam_rifle_tag, BeamRifle_WeaponOffsetX, BeamRifle_WeaponOffsetY, BeamRifle_WeaponOffsetZ);
