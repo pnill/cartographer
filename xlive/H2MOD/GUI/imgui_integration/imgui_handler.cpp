@@ -10,13 +10,14 @@
 #include "backends\imgui_impl_win32.h"
 
 #include "ImGui_Cartographer_Style.h"
+#include "ImGui_NetworkStatsOverlay.h"
 
 namespace imgui_handler
 {
 	//Window Name, DrawState, RenderFunc, OpenFunc, CloseFunc
 	/*std::vector<std::tuple<std::string, bool, std::function<void(bool*)>,
 		std::function<void()>, std::function<void()>>> windows;*/
-	std::vector<s_imgui_window> windows;
+	std::vector<s_imgui_window> imgui_windows;
 	static HWND                 g_hWnd = NULL;
 	static INT64                g_Time = 0;
 	static INT64                g_TicksPerSecond = 0;
@@ -28,6 +29,7 @@ namespace imgui_handler
 	static bool					g_take_input = false;
 
 	short g_NumWindowsOpen = 0;
+	bool						g_network_stats_overlay = false;
 
 	HWND get_HWND()
 	{
@@ -44,11 +46,13 @@ namespace imgui_handler
 	}
 	bool CanDrawImgui()
 	{
-		for (auto& window : windows)
+		for (auto& window : imgui_windows)
 		{
 			if (window.DoRender)
 				return true;
 		}
+		if (g_network_stats_overlay) 
+			return true;
 		return false;
 	}
 
@@ -59,7 +63,8 @@ namespace imgui_handler
 		ImGui_ImplDX9_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
-		for (auto& window : windows)
+		ShowNetworkStatsOverlay(&g_network_stats_overlay);
+		for (auto& window : imgui_windows)
 		{
 			if (window.DoRender)
 			{
@@ -72,7 +77,7 @@ namespace imgui_handler
 
 	void ToggleWindow(const std::string& name)
 	{
-		for (auto& window : windows)
+		for (auto& window : imgui_windows)
 		{
 			if (window.name == name)
 			{
@@ -93,11 +98,13 @@ namespace imgui_handler
 
 	bool IsWindowActive(const std::string& name)
 	{
-		for (auto& window : windows)
+		for (auto& window : imgui_windows)
 		{
 			if (window.name == name)
 				return window.DoRender;
 		}
+		if (name == "net_metrics" && g_network_stats_overlay)
+			return true;
 		return false;
 	}
 

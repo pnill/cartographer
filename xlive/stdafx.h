@@ -74,6 +74,12 @@
 
 extern std::random_device rd;
 
+#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || (defined(__cplusplus) && (__cplusplus >= 201703L)))
+#define CONSTEXPR constexpr
+#else
+#define CONSTEXPR
+#endif
+
 #define COMPILE_WITH_VOICE 0
 
 #pragma region Warnings as errors

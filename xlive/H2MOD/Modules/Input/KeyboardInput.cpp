@@ -230,7 +230,7 @@ void hotkeyFuncGuide() {
 
 void hotkeyFuncDebug()
 {
-	imgui_handler::ToggleWindow("debug_overlay");
+	// imgui_handler::ToggleWindow("debug_overlay");
 }
 int pause = VK_PRIOR;
 void KeyboardInput::Initialize()

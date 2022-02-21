@@ -93,7 +93,7 @@
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_handler.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_Handler.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\MOTD.cpp" />
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
@@ -139,6 +139,7 @@
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="Util\ClipboardAPI.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -362,7 +363,7 @@
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
     <ClInclude Include="Blam\Engine\Game\GameOptions.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
-    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_handler.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Handler.h" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_screen_widget_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_definition.hpp" />
@@ -457,6 +458,7 @@
     <ClInclude Include="3rdparty\directx\include\d3dx9xof.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

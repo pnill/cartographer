@@ -4,10 +4,13 @@
 
 namespace imgui_handler
 {
+	extern bool g_network_stats_overlay;
+
 	enum s_imgui_images
 	{
 		patch_notes
 	};
+
 	struct s_imgui_window
 	{
 		std::string name;
