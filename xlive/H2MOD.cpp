@@ -86,6 +86,8 @@ std::unordered_map<wchar_t*, bool&> GametypesMap
 
 #pragma region engine calls
 
+TEST_N_DEF(PC1);
+
 // Used to get damage on any object
 typedef void(__cdecl* p_object_cause_damage)(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7);
 p_object_cause_damage c_object_cause_damage;
@@ -1410,6 +1412,8 @@ void H2MOD::ApplyHooks() {
 
 		//pResetRound = (ResetRounds)DetourFunc(Memory::GetAddress<BYTE*>(0x6B1C8), (BYTE*)OnNextRound, 7);
 
+		TEST_N_DEF(PC2);
+		
 		DETOUR_ATTACH(p_change_local_team, Memory::GetAddress<change_team_t>(0x2068F2), changeTeam);
 
 		// hook the print command to redirect the output to our console
@@ -1467,6 +1471,7 @@ void H2MOD::Initialize()
 		DirectorHooks::Initialize();
 		SpecialEvents::Initialize();
 		//ObserverMode::Initialize();
+		TEST_N_DEF(PC3);
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");

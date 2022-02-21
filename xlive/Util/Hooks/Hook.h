@@ -7,12 +7,18 @@
 #define JNZ_OP_CODE 0x75
 
 #define DETOUR_BEGIN() \
+do \
+{ \
 	DetourTransactionBegin(); \
-	DetourUpdateThread(GetCurrentThread());
+	DetourUpdateThread(GetCurrentThread()); \
+} while (0)
 
 #define DETOUR_ATTACH(_ptr_func, _address, _target_ptr) \
+do \
+{ \
 	(_ptr_func) = (_address); \
 	DetourAttach(&(PVOID&)(_ptr_func), _target_ptr); \
+} while (0)
 
 #define DETOUR_COMMIT() \
 	DetourTransactionCommit(); \

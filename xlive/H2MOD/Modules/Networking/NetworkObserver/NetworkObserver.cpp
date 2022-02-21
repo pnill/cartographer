@@ -251,6 +251,9 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 	const auto _temp_network_bandwidth_per_stream	= observer_channel->managed_stream_bandwidth;
 	const auto _temp_network_window_size			= observer_channel->managed_stream_window_size;
 
+#if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
+#if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
+
 	// first we check if we are dealing with a managed network stream
 	if (observer_channel->managed_stream)
 	{
@@ -267,6 +270,9 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 		observer_channel->managed_stream_bandwidth = _max_bandwidth_per_channel;
 		observer_channel->managed_stream_window_size = _max_window_size;
 	}
+
+#endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
+#endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS)
 
 	bool ret = p_channel_should_send_packet(this, network_channel_index, a3, a4, a5, out_send_sequenced_packet, out_force_fill_packet, out_packet_size, out_voice_size, out_voice_chat_data_buffer_size, out_voice_chat_data_buffer);
 

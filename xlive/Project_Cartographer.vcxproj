@@ -634,6 +634,7 @@
     <ClInclude Include="Blam\Math\real_math.h" />
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
     <ClInclude Include="Blam\Math\real_vector3d.h" />
+    <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="H2MOD\EngineCalls\EngineCalls.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.h" />

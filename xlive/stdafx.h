@@ -29,6 +29,8 @@
 #define UNICODE
 #endif
 
+#define TEST_N_DEF(TEST)
+
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
 #include <windows.h>
@@ -71,6 +73,12 @@
 
 #include "Util/Memory.h"
 #include "Util/curl-interface.h"
+
+#if defined __has_include
+#  if __has_include ("CartographerDllConf.h")
+#    include "CartographerDllConf.h"
+#  endif
+#endif
 
 extern std::random_device rd;
 
