@@ -14,17 +14,18 @@ network_observer_configuration* g_network_configuration;
 #endif
 
 #if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
-#if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
+#	if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 
 float _server_network_rate = 60.f;
 float _client_network_rate = 60.f;
 
-int _max_bandwidth_per_channel = 30720 * 4;
+// int _max_bandwidth_per_channel = 30720 * 4;
+int _max_bandwidth_per_channel = 606720;
 
 //TODO: 
 int _max_window_size = -1;
 
-#endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
+#	endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 #endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 
 // LIVE netcode research
@@ -252,7 +253,7 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 	const auto _temp_network_window_size			= observer_channel->managed_stream_window_size;
 
 #if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
-#if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
+#	if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 
 	// first we check if we are dealing with a managed network stream
 	if (observer_channel->managed_stream)
@@ -271,7 +272,7 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 		observer_channel->managed_stream_window_size = _max_window_size;
 	}
 
-#endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
+#	endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 #endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS)
 
 	bool ret = p_channel_should_send_packet(this, network_channel_index, a3, a4, a5, out_send_sequenced_packet, out_force_fill_packet, out_packet_size, out_voice_size, out_voice_chat_data_buffer_size, out_voice_chat_data_buffer);
@@ -316,7 +317,7 @@ void s_network_observer::ForceConstantNetworkRate()
 void s_network_observer::ApplyPatches()
 {
 #if USE_LIVE_NETWORK_PROTOCOL
-#if INCREASE_NETWORK_TICKRATE_OBSOLETE == true
+#	if INCREASE_NETWORK_TICKRATE_OBSOLETE == true
 	// increase the network tickrate of hosts to 60
 	static float netcode_tickrate = k_online_netcode_tickrate_real;
 
@@ -358,7 +359,7 @@ void s_network_observer::ApplyPatches()
 	NopFill(Memory::GetAddress(0x1BFBE7, 0x1B9AC7), 19);
 	NopFill(Memory::GetAddress(0x1BE33A, 0x1B8214), 15);
 	NopFill(Memory::GetAddress(0x1BDF1D, 0x1B7DF7), 18);
-#endif
+#	endif // if INCREASE_NETWORK_TICKRATE_OBSOLETE == true
 #else
 	// disables LIVE netcode
 	WriteValue<BYTE>(Memory::GetAddress(0x1B555B, 0x1A92B9) + 1, 0);
