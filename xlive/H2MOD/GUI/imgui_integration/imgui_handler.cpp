@@ -110,11 +110,11 @@ namespace imgui_handler
 
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd)
 	{
-		windows.emplace_back("Advanced Settings", false, AdvancedSettings::Render, AdvancedSettings::Open, AdvancedSettings::Close);
-		windows.emplace_back("Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close);
-		windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
-		windows.emplace_back("debug_overlay", false, DebugOverlay::Render, DebugOverlay::Open, DebugOverlay::Close);
-		windows.emplace_back("messagebox", false, iMessageBox::Render, iMessageBox::Open, iMessageBox::Close);
+		imgui_windows.emplace_back("Advanced Settings", false, AdvancedSettings::Render, AdvancedSettings::Open, AdvancedSettings::Close);
+		imgui_windows.emplace_back("Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close);
+		imgui_windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
+		imgui_windows.emplace_back("debug_overlay", false, DebugOverlay::Render, DebugOverlay::Open, DebugOverlay::Close);
+		imgui_windows.emplace_back("messagebox", false, iMessageBox::Render, iMessageBox::Open, iMessageBox::Close);
 		
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
