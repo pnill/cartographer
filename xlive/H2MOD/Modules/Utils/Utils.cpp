@@ -515,7 +515,8 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct stringMe *s
 	return size*nmemb;
 }
 
-int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response) {
+int MasterHttpResponse(std::string& url, const char* http_request, char** rtn_response) {
+	TEST_N_DEF(LC1);
 	int result = ERROR_CODE_CURL_SOCKET_FAILED;//Socket failed to connect to server
 
 	CURL *curl;
@@ -549,7 +550,7 @@ int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response
 			free(s.ptr);
 		}
 		else {
-			rtn_response = s.ptr;
+			*rtn_response = s.ptr;
 			result = 0;//successful connection.
 		}
 

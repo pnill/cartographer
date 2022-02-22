@@ -455,6 +455,7 @@
     <ClInclude Include="3rdparty\directx\include\d3dx9xof.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.h" />
+    <ClInclude Include="CartographerDllConf.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

@@ -318,7 +318,7 @@ int XSocket::recvfrom(LPWSABUF lpBuffers,
 	{
 		bool errorByRecvAPI = false;
 
-		int result = winsock_read_socket(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom,lpFromlen, lpOverlapped, lpCompletionRoutine, &errorByRecvAPI);
+		int result = winsock_read_socket(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine, &errorByRecvAPI);
 
 		if (result == SOCKET_ERROR)
 		{

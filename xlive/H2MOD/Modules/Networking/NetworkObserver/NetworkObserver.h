@@ -3,13 +3,16 @@
 // enables/disables LIVE netcode, so we can use the LIVE serverlist
 // true  - LIVE network protocol enabled
 // false - System Link network protocol enabled
+
+#if !defined(_CARTOGRAPHER_DLL_CONF)
 #define USE_LIVE_NETWORK_PROTOCOL true
 
 #if defined(USE_LIVE_NETWORK_PROTOCOL)
-	#if USE_LIVE_NETWORK_PROTOCOL == true
-		#define INCREASE_NETWORK_TICKRATE_OBSOLETE 0 // old method of incresing the packet rate, now OBSOLETE
-		#define LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS 1
-	#endif
+#	if USE_LIVE_NETWORK_PROTOCOL == true
+#		define INCREASE_NETWORK_TICKRATE_OBSOLETE 0 // old method of incresing the packet rate, now OBSOLETE
+#		define LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS 1
+#	endif
+#endif
 #endif
 
 // network heap size
