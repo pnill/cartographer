@@ -204,37 +204,21 @@ namespace imgui_handler
 	}
 	namespace WeaponOffsets
 	{
-		extern int battle_rifle_datum;
 		extern s_weapon_group_definition* battle_rifle_tag;
-		extern int beam_rifle_datum;
 		extern s_weapon_group_definition* beam_rifle_tag;
-		extern int brute_plasma_rifle_datum;
 		extern s_weapon_group_definition* brute_plasma_rifle_tag;
-		extern int brute_shot_datum;
 		extern s_weapon_group_definition* brute_shot_tag;
-		extern int carbine_datum;
 		extern s_weapon_group_definition* carbine_tag;
-		extern int energy_sword_datum;
 		extern s_weapon_group_definition* energy_sword_tag;
-		extern int fuel_rod_datum;
 		extern s_weapon_group_definition* fuel_rod_tag;
-		extern int magnum_datum;
 		extern s_weapon_group_definition* magnum_tag;
-		extern int needler_datum;
 		extern s_weapon_group_definition* needler_tag;
-		extern int plasma_pistol_datum;
 		extern s_weapon_group_definition* plasma_pistol_tag;
-		extern int plasma_rifle_datum;
 		extern s_weapon_group_definition* plasma_rifle_tag;
-		extern int rocket_launcher_datum;
 		extern s_weapon_group_definition* rocket_launcher_tag;
-		extern int sentinel_beam_datum;
 		extern s_weapon_group_definition* sentinel_beam_tag;
-		extern int shotgun_datum;
 		extern s_weapon_group_definition* shotgun_tag;
-		extern int smg_datum;
 		extern s_weapon_group_definition* smg_tag;
-		extern int sniper_datum;
 		extern s_weapon_group_definition* sniper_tag;
 
 		enum e_weapon_offsets_string : int

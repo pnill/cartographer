@@ -9,37 +9,21 @@
 
 namespace imgui_handler {
 	namespace WeaponOffsets {
-		int battle_rifle_datum;
 		s_weapon_group_definition* battle_rifle_tag;
-		int beam_rifle_datum;
 		s_weapon_group_definition* beam_rifle_tag;
-		int brute_plasma_rifle_datum;
 		s_weapon_group_definition* brute_plasma_rifle_tag;
-		int brute_shot_datum;
 		s_weapon_group_definition* brute_shot_tag;
-		int carbine_datum;
 		s_weapon_group_definition* carbine_tag;
-		int energy_sword_datum;
 		s_weapon_group_definition* energy_sword_tag;
-		int fuel_rod_datum;
 		s_weapon_group_definition* fuel_rod_tag;
-		int magnum_datum;
 		s_weapon_group_definition* magnum_tag;
-		int needler_datum;
 		s_weapon_group_definition* needler_tag;
-		int plasma_pistol_datum;
 		s_weapon_group_definition* plasma_pistol_tag;
-		int plasma_rifle_datum;
 		s_weapon_group_definition* plasma_rifle_tag;
-		int rocket_launcher_datum;
 		s_weapon_group_definition* rocket_launcher_tag;
-		int sentinel_beam_datum;
 		s_weapon_group_definition* sentinel_beam_tag;
-		int shotgun_datum;
 		s_weapon_group_definition* shotgun_tag;
-		int smg_datum;
 		s_weapon_group_definition* smg_tag;
-		int sniper_datum;
 		s_weapon_group_definition* sniper_tag;
 
 		namespace
@@ -308,38 +292,22 @@ namespace imgui_handler {
 		}
 		void Initialize()
 		{
-			battle_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\battle_rifle\\battle_rifle");
-			battle_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(battle_rifle_datum);
-			beam_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\beam_rifle\\beam_rifle");
-			beam_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(beam_rifle_datum);
-			brute_plasma_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle");
-			brute_plasma_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(brute_plasma_rifle_datum);
-			brute_shot_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_low\\brute_shot\\brute_shot");
-			brute_shot_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(brute_shot_datum);
-			carbine_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\covenant_carbine\\covenant_carbine");
-			carbine_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(carbine_datum);
-			energy_sword_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\melee\\energy_blade\\energy_blade");
-			energy_sword_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(energy_sword_datum);
-			fuel_rod_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_high\\flak_cannon\\flak_cannon");
-			fuel_rod_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(fuel_rod_datum);
-			magnum_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\magnum\\magnum");
-			magnum_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(magnum_datum);
-			needler_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\needler\\needler");
-			needler_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(needler_datum);
-			plasma_pistol_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\plasma_pistol\\plasma_pistol");
-			plasma_pistol_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(plasma_pistol_datum);
-			plasma_rifle_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle");
-			plasma_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(plasma_rifle_datum);
-			rocket_launcher_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_high\\rocket_launcher\\rocket_launcher");
-			rocket_launcher_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(rocket_launcher_datum);
-			sentinel_beam_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\characters\\sentinel_aggressor\\weapons\\beam\\sentinel_aggressor_beam");
-			sentinel_beam_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(sentinel_beam_datum);
-			shotgun_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\shotgun\\shotgun");
-			shotgun_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(shotgun_datum);
-			smg_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\smg\\smg");
-			smg_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(smg_datum);
-			sniper_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle");
-			sniper_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(sniper_datum);
+			battle_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\battle_rifle\\battle_rifle"));
+			beam_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\beam_rifle\\beam_rifle"));
+			brute_plasma_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle"));
+			brute_shot_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_low\\brute_shot\\brute_shot"));
+			carbine_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\covenant_carbine\\covenant_carbine"));
+			energy_sword_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\melee\\energy_blade\\energy_blade"));
+			fuel_rod_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_high\\flak_cannon\\flak_cannon"));
+			magnum_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\magnum\\magnum"));
+			needler_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\needler\\needler"));
+			plasma_pistol_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\plasma_pistol\\plasma_pistol"));
+			plasma_rifle_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle"));
+			rocket_launcher_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\support_high\\rocket_launcher\\rocket_launcher"));
+			sentinel_beam_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\characters\\sentinel_aggressor\\weapons\\beam\\sentinel_aggressor_beam"));
+			shotgun_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\shotgun\\shotgun"));
+			smg_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\smg\\smg"));
+			sniper_tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle"));
 
 			ReadWeaponOffsetConfig();
 
