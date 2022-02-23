@@ -1167,6 +1167,8 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 // #73: XNetGetTitleXnAddr
 DWORD WINAPI XNetGetTitleXnAddr(XNADDR* pxna)
 {
+	ZeroMemory(pxna, sizeof(XNADDR));
+
 	XnIp* localUserXnIp = gXnIp.GetLocalUserXn();
 	if (!localUserXnIp->bValid)
 		return XNET_GET_XNADDR_PENDING;
