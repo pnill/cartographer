@@ -139,7 +139,8 @@ bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s
 				else if (FiloInterface::read(&cache_file, custom_map_data_cache->entries, file_custom_map_entries_size, true))
 				{
 					// clear unused custom map entries
-					memset((BYTE*)(&custom_map_data_cache->entries) + file_custom_map_entries_size, 0, custom_map_data_cache_buffer_size - file_custom_map_entries_size);
+					size_t remaining_size = custom_map_data_cache_buffer_size - sizeof(s_custom_map_file_cache) - file_custom_map_entries_size;
+					memset((BYTE*)(custom_map_data_cache->entries) + file_custom_map_entries_size, 0, remaining_size);
 					success = true;
 				}
 				else
