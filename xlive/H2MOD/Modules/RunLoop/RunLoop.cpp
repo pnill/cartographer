@@ -272,26 +272,23 @@ inline void defaultFrameLimiter() {
 	auto timeBeforeSleep = _clock::now();
 	auto timeDelta = _time::duration_cast<decltype(desiredRenderTime)>(timeBeforeSleep - lastTime);
 	auto targetRenderTime = desiredRenderTime - threshold;
-	if (timeDelta < targetRenderTime)
+	while (targetRenderTime > timeDelta)
 	{
-		while (targetRenderTime > timeDelta)
+		double dbSleepTimeNs = (targetRenderTime - timeDelta).count();
+		double dbSleepTimeMs = dbSleepTimeNs / 1000000.0;
+		int iSleepTimeMsAdjusted = (int)(dbSleepTimeMs - 2.0 - 0.5);
+
+		if (iSleepTimeMsAdjusted < 0)
+			iSleepTimeMsAdjusted = 0;
+
+		if (dbSleepTimeMs >= 2.0)
+			Sleep(iSleepTimeMsAdjusted);
+
+		do
 		{
-			double dbSleepTimeNs = (targetRenderTime - timeDelta).count();
-			double dbSleepTimeMs = dbSleepTimeNs / 1000000.0;
-			int iSleepTimeMsAdjusted = (int)(dbSleepTimeMs - 2.0 - 0.5);
+		} while (targetRenderTime > _clock::now() - lastTime);
 
-			if (iSleepTimeMsAdjusted < 0)
-				iSleepTimeMsAdjusted = 0;
-				
-			if (dbSleepTimeMs >= 1.0)
-				Sleep(iSleepTimeMsAdjusted);
-
-			do
-			{
-			} while (targetRenderTime > _clock::now() - lastTime);
-
-			timeDelta = _time::duration_cast<decltype(targetRenderTime)>(_clock::now() - lastTime);
-		}
+		timeDelta = _time::duration_cast<decltype(targetRenderTime)>(_clock::now() - lastTime);
 	}
 
 	lastTime = _clock::now();
