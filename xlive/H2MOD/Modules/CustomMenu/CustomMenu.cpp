@@ -3730,21 +3730,9 @@ void GSCustomMenuCall_AccountEdit() {
 #pragma endregion
 
 
-const int CMLabelMenuId_AccountList = 0xFF000009;
 #pragma region CM_AccountList
 
-static void CM_AccountList_Setup_Buttons() {
-	c_account_list_menu::mode_remove_account = false;
 
-	for (int i = 0; i < H2AccountCount; i++) {
-		add_cartographer_label(CMLabelMenuId_AccountList, 1 + i, H2AccountArrayUsername[i] ? H2AccountArrayUsername[i] : H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0005), true);
-	}
-
-	add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0004), true);
-	add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount + 1, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0003), true);
-	add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount + 2, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0000), true);
-	add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount + 3, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0001 + (c_account_list_menu::mode_remove_account ? 1 : 0)), true);
-}
 
 /*
 void __stdcall CMLabelButtons_AccountList(int a1, int a2)
@@ -3788,9 +3776,7 @@ static bool CMButtonHandler_AccountList(int button_id) {
 void __cdecl CustomMenu_AccountList(int);
 
 void __cdecl CustomMenu_AccountList(int a1) {
-	CM_AccountList_Setup_Buttons();
-	c_account_list_menu::open((s_new_ui_menu_parameters*)a1);
-	// return CustomMenu_CallHead(a1, menu_vftable_1_AccountList, menu_vftable_2_AccountList, (DWORD)&CMButtonHandler_AccountList, 4 + H2AccountCount + (H2AccountCount <= 0 ? -1 : 0), 272);
+	c_account_list_menu::open((s_new_ui_window_parameters*)a1);
 }
 
 void GSCustomMenuCall_AccountList() {

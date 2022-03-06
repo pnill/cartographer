@@ -387,7 +387,7 @@ public:
 
 	c_brightness_level_edit_list list_widgets;
 
-	static void* open_brightness_menu(s_new_ui_menu_parameters* a1);
+	static void* open_brightness_menu(s_new_ui_window_parameters* a1);
 
 private:
 	template<typename T>

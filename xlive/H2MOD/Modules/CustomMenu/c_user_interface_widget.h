@@ -17,8 +17,8 @@ enum e_widget_type
 class c_user_interface_widget
 {
 protected:
-	int widget_type;
-	__int16 field_8;
+	int m_widget_type;
+	__int16 m_flags;
 	__int16 field_A;
 	int field_C;
 	int field_10;

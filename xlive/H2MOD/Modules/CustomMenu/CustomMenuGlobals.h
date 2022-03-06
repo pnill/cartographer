@@ -4,8 +4,24 @@
 
 typedef void(__thiscall* button_handler_cb_t)(void* context, int a1, int* a2);
 
-struct __declspec(align(4)) s_new_ui_menu_parameters
+struct __declspec(align(4)) s_new_ui_window_parameters
 {
+	void data_new(__int16 flags, int ui_channel, int a4, void* (__cdecl* ui_window_load_cb)(s_new_ui_window_parameters*))
+	{
+		this->flags = (DWORD)(flags << 16);
+		this->ui_channel = ui_channel;
+		this->field_8 = a4;
+		this->field_10 = -1;
+		this->field_14 = -1;
+		this->field_18 = -1;
+		this->proc_ui_window_load_cb = ui_window_load_cb;
+	}
+
+	void* window_load_proc_exec()
+	{
+		return proc_ui_window_load_cb(this);
+	}
+
 	DWORD flags;
 	DWORD ui_channel;
 	int field_8;
@@ -13,8 +29,9 @@ struct __declspec(align(4)) s_new_ui_menu_parameters
 	DWORD field_10;
 	DWORD field_14;
 	DWORD field_18;
-	void*(__cdecl* proc_menu_load_cb)(s_new_ui_menu_parameters*);
+	void*(__cdecl* proc_ui_window_load_cb)(s_new_ui_window_parameters*);
 };
+static_assert(sizeof(s_new_ui_window_parameters) == 0x20);
 
 template<typename T>
 struct c_slot2
@@ -29,7 +46,7 @@ extern DWORD H2BaseAddr;
 const int CreditsMenu_ID = 0xFF000006;
 
 BYTE* ui_memory_pool_allocate(int size, int a2);
-int __cdecl ui_new_window(void* ui_memory, s_new_ui_menu_parameters* a2);
+int __cdecl ui_new_window(void* ui_memory, s_new_ui_window_parameters* a2);
 int __cdecl ui_window_back_out(int ui_channel, int window_idx);
 
 #define VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX 17

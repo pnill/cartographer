@@ -15,7 +15,7 @@ c_brightness_menu::c_brightness_menu(int a3, int a4, int a5) :
 {
 }
 
-void* __cdecl c_brightness_menu::open_brightness_menu(s_new_ui_menu_parameters* a1)
+void* __cdecl c_brightness_menu::open_brightness_menu(s_new_ui_window_parameters* a1)
 {
 	c_brightness_menu* brightness_menu = nullptr;
 	c_brightness_menu* ui = (c_brightness_menu*)ui_memory_pool_allocate(sizeof(c_brightness_menu), 0);

@@ -4,6 +4,8 @@
 #include "c_brightness_menu.h"
 #include "CustomMenuGlobals.h"
 
+static const int CMLabelMenuId_AccountList = 0xFF000009;
+
 class c_account_edit_list : public c_list_widget
 {
 public:
@@ -11,10 +13,11 @@ public:
 	int field_2C0;
 	c_slot2<c_account_edit_list> slot_2_unk;
 	int default_selected_button;
+	bool account_removal_mode;
 	// button handler callback
 	
 
-	c_account_edit_list::c_account_edit_list(int flags, int account_count, int default_selected_button);
+	c_account_edit_list::c_account_edit_list(int _flags, int _account_count, int _default_selected_button, bool _account_removal_mode);
 
 	virtual char* get_item_list() override
 	{
@@ -37,7 +40,7 @@ public:
 		int v3 = p_sub_211909(a1, 6, 0, 0);
 		if (v3)
 		{
-			set_widget_label_from_string_id_reimpl(v3, list_item_index + 1, 0xFF000009);
+			set_widget_label_from_string_id_reimpl(v3, list_item_index + 1, CMLabelMenuId_AccountList);
 		}
 	}
 
@@ -52,15 +55,14 @@ class c_account_list_menu : protected c_screen_with_menu
 {
 public:
 	
-	static bool mode_remove_account;
 	static bool accountingGoBackToList;
 	static int accountingActiveHandleCount;
 	static bool isAccountingActiveHandle();
 	static void updateAccountingActiveHandle(bool active);
 
-	static void* __cdecl open(s_new_ui_menu_parameters* a1);
+	static void* __cdecl open(s_new_ui_window_parameters* a1);
 
-	c_account_list_menu::c_account_list_menu(int a3, int a4, int a5);
+	c_account_list_menu::c_account_list_menu(int a3, int a4, int a5, bool account_removal_mode);
 
 	// interface
 	virtual int custom_deconstructor(BYTE flags) override
@@ -79,7 +81,7 @@ public:
 
 	virtual int IUnkFunc24() override
 	{
-		account_edit_list.set_selected_list_button_idx(account_edit_list.default_selected_button);
+		account_edit_list.set_selected_list_button_idx(account_edit_list.default_selected_button != -1 ? account_edit_list.default_selected_button : 0);
 		return c_screen_with_menu::IUnkFunc24();
 	}
 
@@ -91,4 +93,4 @@ public:
 	c_account_edit_list account_edit_list;
 private:
 };
-static_assert(sizeof(c_account_list_menu) == 3392);
+// static_assert(sizeof(c_account_list_menu) == 3396);

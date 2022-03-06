@@ -14,9 +14,9 @@ BYTE* ui_memory_pool_allocate(int size, int a2)
 // ui_channels:
 // 1 - error dialog channel
 // 60B8C3
-int __cdecl ui_new_window(void* ui_buffer, s_new_ui_menu_parameters* parameters)
+int __cdecl ui_new_window(void* ui_buffer, s_new_ui_window_parameters* parameters)
 {
-	auto p_ui_new_window = Memory::GetAddressRelative<int(__cdecl*)(void*, s_new_ui_menu_parameters*)>(0x60B8C3);
+	auto p_ui_new_window = Memory::GetAddressRelative<int(__cdecl*)(void*, s_new_ui_window_parameters*)>(0x60B8C3);
 	return p_ui_new_window(ui_buffer, parameters);
 }
 
