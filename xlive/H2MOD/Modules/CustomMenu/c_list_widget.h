@@ -113,14 +113,14 @@ public:
 		return (this->* * pFn)(a2);
 	}
 
-	virtual int IUnkFunc14() override
+	virtual int get_top_most_parent_window_ui_channel() override
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_list_widget_base_vtable_get_func_ptr<fnT>(13);
 		return (this->* * pFn)();
 	}
 
-	virtual int IUnkFunc15() override
+	virtual int get_top_most_parent_window_index() override
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_list_widget_base_vtable_get_func_ptr<fnT>(14);
@@ -179,14 +179,14 @@ public:
 	}
 
 	// these next three need to be implemented, otherwise pure virtual function call exception will be raised
-	virtual char* IUnkFunc23()
+	virtual char* get_item_list()
 	{
 		typedef char*(class_type::** fnT)();
 		auto pFn = c_list_widget_base_vtable_get_func_ptr<fnT>(22);
 		return (this->* * pFn)();
 	}
 
-	virtual int IUnkFun24()
+	virtual int get_list_item_count()
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_list_widget_base_vtable_get_func_ptr<fnT>(23);

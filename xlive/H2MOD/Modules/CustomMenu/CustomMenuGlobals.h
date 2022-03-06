@@ -4,29 +4,33 @@
 
 typedef void(__thiscall* button_handler_cb_t)(void* context, int a1, int* a2);
 
-struct __declspec(align(4)) s_menu_input_unk_data
+struct __declspec(align(4)) s_new_ui_menu_parameters
 {
 	DWORD flags;
-	DWORD field_4;
+	DWORD ui_channel;
 	int field_8;
-	DWORD field_C;
+	DWORD default_list_selection_index;
 	DWORD field_10;
 	DWORD field_14;
 	DWORD field_18;
-	DWORD field_1C;
+	void*(__cdecl* proc_menu_load_cb)(s_new_ui_menu_parameters*);
 };
 
+template<typename T>
 struct c_slot2
 {
 	void* c_slot_vtbl;
 	int field_8[3]; // c_slot data?
+	void* context;
+	void(T::* button_handler_cb)(int* a2, int* a3);
 };
 
 extern DWORD H2BaseAddr;
 const int CreditsMenu_ID = 0xFF000006;
 
 BYTE* ui_memory_pool_allocate(int size, int a2);
-int __cdecl unk_used_after_constructor(void* ui_memory, s_menu_input_unk_data* a2);
+int __cdecl ui_new_window(void* ui_memory, s_new_ui_menu_parameters* a2);
+int __cdecl ui_window_back_out(int ui_channel, int window_idx);
 
 #define VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX 17
 

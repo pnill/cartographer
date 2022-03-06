@@ -1,9 +1,23 @@
 #pragma once
 
+enum e_widget_type
+{
+	window_widget = 0,
+	list_widget = 1,
+	list_item_widget = 2,
+	button_widget = 3,
+	tab_view_widget = 5,
+	text_widget = 6,
+	model_widget = 7,
+	bitmap_widget = 8,
+	hud_widget = 9,
+	player_widget = 10
+};
+
 class c_user_interface_widget
 {
 protected:
-	int field_4;
+	int widget_type;
 	__int16 field_8;
 	__int16 field_A;
 	int field_C;
@@ -133,14 +147,14 @@ protected:
 		return (this->* * pFn)(a2);
 	}
 
-	virtual int IUnkFunc14()
+	virtual int get_top_most_parent_window_ui_channel()
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_user_interface_widget_base_vtable_get_func_ptr<fnT>(13);
 		return (this->* * pFn)();
 	}
 
-	virtual int IUnkFunc15()
+	virtual int get_top_most_parent_window_index()
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_user_interface_widget_base_vtable_get_func_ptr<fnT>(14);

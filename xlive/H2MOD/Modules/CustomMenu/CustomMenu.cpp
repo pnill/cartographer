@@ -3789,7 +3789,7 @@ void __cdecl CustomMenu_AccountList(int);
 
 void __cdecl CustomMenu_AccountList(int a1) {
 	CM_AccountList_Setup_Buttons();
-	c_account_list_menu::open((s_menu_input_unk_data*)a1);
+	c_account_list_menu::open((s_new_ui_menu_parameters*)a1);
 	// return CustomMenu_CallHead(a1, menu_vftable_1_AccountList, menu_vftable_2_AccountList, (DWORD)&CMButtonHandler_AccountList, 4 + H2AccountCount + (H2AccountCount <= 0 ? -1 : 0), 272);
 }
 

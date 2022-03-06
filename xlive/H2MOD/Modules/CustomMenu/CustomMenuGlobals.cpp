@@ -11,11 +11,20 @@ BYTE* ui_memory_pool_allocate(int size, int a2)
 	return p_ui_memory_pool_allocate(size, a2);
 }
 
+// ui_channels:
+// 1 - error dialog channel
 // 60B8C3
-int __cdecl unk_used_after_constructor(void* ui_memory, s_menu_input_unk_data* a2)
+int __cdecl ui_new_window(void* ui_buffer, s_new_ui_menu_parameters* parameters)
 {
-	auto p_unk_used_after_constructor = Memory::GetAddressRelative<int(__cdecl*)(void*, s_menu_input_unk_data*)>(0x60B8C3);
-	return p_unk_used_after_constructor(ui_memory, a2);
+	auto p_ui_new_window = Memory::GetAddressRelative<int(__cdecl*)(void*, s_new_ui_menu_parameters*)>(0x60B8C3);
+	return p_ui_new_window(ui_buffer, parameters);
+}
+
+// 60B8C3
+int __cdecl ui_window_back_out(int ui_channel, int window_idx)
+{
+	auto p_ui_window_back_out = Memory::GetAddressRelative<int(__cdecl*)(int, int)>(0x6096DA);
+	return p_ui_window_back_out(ui_channel, window_idx);
 }
 
 std::chrono::time_point<std::chrono::high_resolution_clock> lastOuterMenuUse_;

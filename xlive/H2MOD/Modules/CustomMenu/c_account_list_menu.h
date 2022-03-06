@@ -9,21 +9,22 @@ class c_account_edit_list : public c_list_widget
 public:
 	char account_list_items[132 * 4];
 	int field_2C0;
-	c_slot2 slot_2_unk;
+	c_slot2<c_account_edit_list> slot_2_unk;
+	int default_selected_button;
 	// button handler callback
-	void* context;
-	void(c_account_edit_list::*button_handler_cb)(long a2, struct s_event_record* a3);
+	
 
-	c_account_edit_list::c_account_edit_list(int a2, int account_count);
+	c_account_edit_list::c_account_edit_list(int flags, int account_count, int default_selected_button);
 
-	virtual char* IUnkFunc23() override
+	virtual char* get_item_list() override
 	{
 		return account_list_items; // returns pointer to edit list
 	}
 
-	virtual int IUnkFun24() override
+	virtual int get_list_item_count() override
 	{
-		return 4; // returns edit list count
+		// returns edit list count
+		return 4;
 	}
 
 	void get_label(int a1, int a2) override
@@ -31,16 +32,17 @@ public:
 		auto p_sub_211909 = Memory::GetAddress<int(__thiscall*)(int, int, int, int)>(0x211909);
 		auto p_sub_21bf85 = Memory::GetAddress<void(__thiscall*)(int, int)>(0x21bf85);
 
-		__int16 button_id = *(WORD*)(a1 + 112);
+		// a1 = ptr to account_list_items[idx]
+		__int16 list_item_index = *(WORD*)(a1 + 112);
 		int v3 = p_sub_211909(a1, 6, 0, 0);
 		if (v3)
 		{
-			set_widget_label_from_string_id_reimpl(v3, button_id + 1, 0xFF000009);
+			set_widget_label_from_string_id_reimpl(v3, list_item_index + 1, 0xFF000009);
 		}
 	}
 
 	// button handler
-	void button_handler(long a2, struct s_event_record* a3);
+	void button_handler(int* a2, int* a3);
 };
 static_assert(offsetof(c_account_edit_list, slot_2_unk.field_8) == 712);
 static_assert(offsetof(c_account_edit_list, list_data_array) == 112);
@@ -56,7 +58,7 @@ public:
 	static bool isAccountingActiveHandle();
 	static void updateAccountingActiveHandle(bool active);
 
-	static void* __cdecl open(s_menu_input_unk_data* a1);
+	static void* __cdecl open(s_new_ui_menu_parameters* a1);
 
 	c_account_list_menu::c_account_list_menu(int a3, int a4, int a5);
 
@@ -77,7 +79,7 @@ public:
 
 	virtual int IUnkFunc24() override
 	{
-		account_edit_list.set_selected_list_button_idx(H2AccountLastUsed);
+		account_edit_list.set_selected_list_button_idx(account_edit_list.default_selected_button);
 		return c_screen_with_menu::IUnkFunc24();
 	}
 
@@ -89,4 +91,4 @@ public:
 	c_account_edit_list account_edit_list;
 private:
 };
-static_assert(sizeof(c_account_list_menu) == 3388);
+static_assert(sizeof(c_account_list_menu) == 3392);

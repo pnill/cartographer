@@ -52,8 +52,8 @@ class c_screen_with_menu : public c_screen_with_menu_game_base
 {
 public:
 
-	c_screen_with_menu::c_screen_with_menu(int menu_wgit_type, int a3, int a4, __int16 a5, void* a6) :
-		c_screen_with_menu_game_base(menu_wgit_type, a3, a4, a5, a6)
+	c_screen_with_menu::c_screen_with_menu(int menu_wgit_type, int ui_channel, int a4, __int16 a5, void* a6) :
+		c_screen_with_menu_game_base(menu_wgit_type, ui_channel, a4, a5, a6)
 	{
 	};
 
@@ -157,14 +157,14 @@ public:
 		return (this->* * pFn)(a2);
 	}
 
-	virtual int IUnkFunc14() override
+	virtual int get_top_most_parent_window_ui_channel() override
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(13);
 		return (this->* * pFn)();
 	}
 
-	virtual int IUnkFunc15() override
+	virtual int get_top_most_parent_window_index() override
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(14);

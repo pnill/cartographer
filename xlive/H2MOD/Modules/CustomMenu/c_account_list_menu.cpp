@@ -30,29 +30,29 @@ void c_account_list_menu::updateAccountingActiveHandle(bool active) {
 	}
 }
 
-void* __cdecl c_account_list_menu::open(s_menu_input_unk_data* a1)
+void* __cdecl c_account_list_menu::open(s_new_ui_menu_parameters* a1)
 {
 	c_account_list_menu* account_list_menu = nullptr;
 	BYTE* ui_buffer = (BYTE*)ui_memory_pool_allocate(sizeof(c_account_list_menu), 0);
 
 	if (ui_buffer) {
 		c_account_list_menu::updateAccountingActiveHandle(true);
-		account_list_menu = new (ui_buffer) c_account_list_menu(a1->field_4, a1->field_8, HIWORD(a1->flags)); // manually call the constructor
+		account_list_menu = new (ui_buffer) c_account_list_menu(a1->ui_channel, a1->field_8, HIWORD(a1->flags)); // manually call the constructor
 	}
 
 	account_list_menu->field_6C = true;
-	unk_used_after_constructor(account_list_menu, a1);
+	ui_new_window(account_list_menu, a1);
 	return account_list_menu;
 }
 
-c_account_list_menu::c_account_list_menu(int a3, int a4, int a5) :
-	c_screen_with_menu(BRIGHTNESS_MENU_ID, a3, a4, a5, &this->account_edit_list),
-	account_edit_list(a5, H2AccountCount)
+c_account_list_menu::c_account_list_menu(int ui_channel, int a4, int flags) :
+	c_screen_with_menu(BRIGHTNESS_MENU_ID, ui_channel, a4, flags, &this->account_edit_list),
+	account_edit_list(flags, H2AccountCount, H2AccountLastUsed)
 {
 }
 
-c_account_edit_list::c_account_edit_list(int a2, int account_count) :
-	c_list_widget(a2)
+c_account_edit_list::c_account_edit_list(int flags, int account_count, int default_selected_button) :
+	c_list_widget(flags)
 {
 	auto p_vector_constructor = (void(__stdcall*)(void*, int, int, void(__thiscall*)(DWORD), int))((char*)H2BaseAddr + 0x28870B);
 	auto sub_2113C6 = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x2113C6);
@@ -74,8 +74,9 @@ c_account_edit_list::c_account_edit_list(int a2, int account_count) :
 	// this->slot_2_unk.c_slot_vtbl = NULL;
 	// not sure why this exists, it just calls the function to the button handler
 	this->slot_2_unk.c_slot_vtbl = Memory::GetAddressRelative<void*>(0x7D9700);
-	this->context = this;
-	this->button_handler_cb = &c_account_edit_list::button_handler;
+	this->slot_2_unk.context = this;
+	this->slot_2_unk.button_handler_cb = &c_account_edit_list::button_handler;
+	this->default_selected_button = default_selected_button;
 
 	int button_count = 4 + account_count + (account_count <= 0 ? -1 : 0);
 	s_data_array* account_list_data = allocate_list_data("account list edit list", button_count, 4);
@@ -104,7 +105,7 @@ extern DWORD WINAPI ThreadLogin(LPVOID lParam);
 
 extern HANDLE hThreadLogin;
 
-void c_account_edit_list::button_handler(long a2, struct s_event_record* a3)
+void c_account_edit_list::button_handler(int* a2, int* a3)
 {
 	int button_id = *(int*)a3 & 0xFFFF;
 
@@ -135,7 +136,6 @@ void c_account_edit_list::button_handler(long a2, struct s_event_record* a3)
 			c_account_list_menu::updateAccountingActiveHandle(true);
 			hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)button_id, 0, NULL);
 			c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
-			return;
 		}
 	}
 	else if (button_id == H2AccountCount) {
@@ -155,6 +155,9 @@ void c_account_edit_list::button_handler(long a2, struct s_event_record* a3)
 		}
 	}
 
+	int parent_window_ui_channel = this->get_top_most_parent_window_ui_channel();
+	int parent_window_idx = this->get_top_most_parent_window_index();
+	ui_window_back_out(parent_window_ui_channel, parent_window_idx);
 	return;
 }
 
