@@ -12,17 +12,17 @@ BYTE* ui_memory_pool_allocate(int size, int a2)
 }
 
 // 60B8C3
-int __cdecl ui_new_window(void* ui_buffer, s_new_ui_window_parameters* parameters)
+int __cdecl user_interface_register_screen_to_channel(void* ui_buffer, s_new_ui_screen_parameters* parameters)
 {
-	auto p_ui_new_window = Memory::GetAddressRelative<int(__cdecl*)(void*, s_new_ui_window_parameters*)>(0x60B8C3);
-	return p_ui_new_window(ui_buffer, parameters);
+	auto p_user_interface_register_screen_to_channel = Memory::GetAddressRelative<int(__cdecl*)(void*, s_new_ui_screen_parameters*)>(0x60B8C3);
+	return p_user_interface_register_screen_to_channel(ui_buffer, parameters);
 }
 
 // 60B8C3
-int __cdecl ui_window_back_out(int ui_channel, int window_idx)
+int __cdecl user_interface_back_out_from_channel(int ui_channel, int window_idx)
 {
-	auto p_ui_window_back_out = Memory::GetAddressRelative<int(__cdecl*)(int, int)>(0x6096DA);
-	return p_ui_window_back_out(ui_channel, window_idx);
+	auto p_user_interface_back_out_from_channel = Memory::GetAddressRelative<int(__cdecl*)(int, int)>(0x6096DA);
+	return p_user_interface_back_out_from_channel(ui_channel, window_idx);
 }
 
 std::chrono::time_point<std::chrono::high_resolution_clock> lastOuterMenuUse_;

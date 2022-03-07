@@ -113,14 +113,14 @@ public:
 		return (this->* * pFn)(a2);
 	}
 
-	virtual int get_top_most_parent_window_ui_channel() override
+	virtual int get_top_most_parent_widget_ui_channel() override
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_list_widget_base_vtable_get_func_ptr<fnT>(13);
 		return (this->* * pFn)();
 	}
 
-	virtual int get_top_most_parent_window_index() override
+	virtual int get_top_most_parent_widget_index() override
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_list_widget_base_vtable_get_func_ptr<fnT>(14);

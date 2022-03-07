@@ -60,7 +60,7 @@ public:
 	static bool isAccountingActiveHandle();
 	static void updateAccountingActiveHandle(bool active);
 
-	static void* __cdecl open(s_new_ui_window_parameters* a1);
+	static void* __cdecl open(s_new_ui_screen_parameters* a1);
 
 	c_account_list_menu::c_account_list_menu(int a3, int a4, int a5, bool account_removal_mode);
 

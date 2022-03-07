@@ -189,14 +189,14 @@ public:
 		return (this->**pFn)(a2);
 	}
 
-	virtual int get_top_most_parent_window_ui_channel() override
+	virtual int get_top_most_parent_widget_ui_channel() override
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(13);
 		return (this->**pFn)();
 	}
 
-	virtual int get_top_most_parent_window_index() override
+	virtual int get_top_most_parent_widget_index() override
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(14);
@@ -387,7 +387,7 @@ public:
 
 	c_brightness_level_edit_list list_widgets;
 
-	static void* open_brightness_menu(s_new_ui_window_parameters* a1);
+	static void* open_brightness_menu(s_new_ui_screen_parameters* a1);
 
 private:
 	template<typename T>

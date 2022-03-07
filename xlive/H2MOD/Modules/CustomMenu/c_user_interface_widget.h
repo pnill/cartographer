@@ -1,17 +1,17 @@
 #pragma once
 
-enum e_widget_type
+enum e_user_interface_widget_type
 {
-	window_widget = 0,
-	list_widget = 1,
-	list_item_widget = 2,
-	button_widget = 3,
-	tab_view_widget = 5,
-	text_widget = 6,
-	model_widget = 7,
-	bitmap_widget = 8,
-	hud_widget = 9,
-	player_widget = 10
+	_widget_type_screen_widget = 0,
+	_widget_type_list_widget = 1,
+	_widget_type_list_item_widget = 2,
+	_widget_type_button_widget = 3,
+	_widget_type_tab_view_widget = 5,
+	_widget_type_text_widget = 6,
+	_widget_type_model_widget = 7,
+	_widget_type_bitmap_widget = 8,
+	_widget_type_hud_widget = 9,
+	_widget_type_player_widget = 10
 };
 
 class c_user_interface_widget
@@ -148,14 +148,14 @@ protected:
 		return (this->* * pFn)(a2);
 	}
 
-	virtual int get_top_most_parent_window_ui_channel()
+	virtual int get_top_most_parent_widget_ui_channel()
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_user_interface_widget_base_vtable_get_func_ptr<fnT>(13);
 		return (this->* * pFn)();
 	}
 
-	virtual int get_top_most_parent_window_index()
+	virtual int get_top_most_parent_widget_index()
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_user_interface_widget_base_vtable_get_func_ptr<fnT>(14);

@@ -3776,7 +3776,7 @@ static bool CMButtonHandler_AccountList(int button_id) {
 void __cdecl CustomMenu_AccountList(int);
 
 void __cdecl CustomMenu_AccountList(int a1) {
-	c_account_list_menu::open((s_new_ui_window_parameters*)a1);
+	c_account_list_menu::open((s_new_ui_screen_parameters*)a1);
 }
 
 void GSCustomMenuCall_AccountList() {

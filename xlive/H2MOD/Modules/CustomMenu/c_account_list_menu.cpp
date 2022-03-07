@@ -41,7 +41,7 @@ static void CM_AccountList_Setup_Buttons() {
 	add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount + 3, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0001 + (accountRemoveMode ? 1 : 0)), true);
 }
 
-void* __cdecl c_account_list_menu::open(s_new_ui_window_parameters* a1)
+void* __cdecl c_account_list_menu::open(s_new_ui_screen_parameters* a1)
 {
 	c_account_list_menu* account_list_menu = nullptr;
 	BYTE* ui_buffer = (BYTE*)ui_memory_pool_allocate(sizeof(c_account_list_menu), 0);
@@ -54,7 +54,7 @@ void* __cdecl c_account_list_menu::open(s_new_ui_window_parameters* a1)
 	}
 
 	account_list_menu->field_6C = true;
-	ui_new_window(account_list_menu, a1);
+	user_interface_register_screen_to_channel(account_list_menu, a1);
 	return account_list_menu;
 }
 
@@ -86,8 +86,9 @@ c_account_edit_list::c_account_edit_list(int _flags, int _account_count, int _de
 	//this->slot_2_unk.c_slot_vtbl = &off_1229700;
 	// this->slot_2_unk.c_slot_vtbl = NULL;
 	// not sure why this exists, it just calls the function to the button handler
+	// TODO implement virtual interface for slot_1, slot_2
 	this->slot_2_unk.c_slot_vtbl = Memory::GetAddressRelative<void*>(0x7D9700);
-	this->slot_2_unk.context = this;
+	this->slot_2_unk.ui_screen_edit_list = this;
 	this->slot_2_unk.button_handler_cb = &c_account_edit_list::button_handler;
 	this->default_selected_button = _default_selected_button;
 	this->account_removal_mode = _account_removal_mode;
@@ -123,13 +124,13 @@ void c_account_edit_list::button_handler(int* a2, int* a3)
 {
 	int button_id = *(int*)a3 & 0xFFFF;
 
-	int parent_window_idx = this->get_top_most_parent_window_index();
-	int parent_window_ui_channel = this->get_top_most_parent_window_ui_channel();
+	int parent_screen_idx = this->get_top_most_parent_widget_index();
+	int parent_screen_ui_channel = this->get_top_most_parent_widget_ui_channel();
 
-	bool close_parent_window = false;
+	bool close_parent_screen = false;
 
-	s_new_ui_window_parameters new_ui_account_list_window;
-	new_ui_account_list_window.data_new(1 << *(int*)(*a2 + 4), parent_window_ui_channel, 4, c_account_list_menu::open);
+	s_new_ui_screen_parameters new_ui_account_list_screen;
+	new_ui_account_list_screen.data_new(1 << *(int*)(*a2 + 4), parent_screen_ui_channel, 4, c_account_list_menu::open);
 
 	if (button_id == H2AccountCount + 1) {
 		if (!this->account_removal_mode) {
@@ -145,8 +146,8 @@ void c_account_edit_list::button_handler(int* a2, int* a3)
 		//remove next selected account.
 		accountRemoveMode = !this->account_removal_mode;
 		add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount + 3, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0001 + (accountRemoveMode ? 1 : 0)), true);
-		new_ui_account_list_window.ui_window_load_proc_exec();
-		close_parent_window = true;
+		new_ui_account_list_screen.ui_screen_load_proc_exec();
+		close_parent_screen = true;
 	}
 	else if (H2AccountCount > 0 && button_id >= 0 && button_id < H2AccountCount) { // account selection (either for deletion or login)
 		if (this->account_removal_mode) {
@@ -155,23 +156,23 @@ void c_account_edit_list::button_handler(int* a2, int* a3)
 			CM_AccountList_Setup_Buttons();
 			// then re-open the menu
 			accountRemoveMode = false; // reset global accountRemove state
-			new_ui_account_list_window.ui_window_load_proc_exec();
+			new_ui_account_list_screen.ui_screen_load_proc_exec();
 			H2AccountLastUsed = 0;
-			close_parent_window = true;
+			close_parent_screen = true;
 		}
 		else if (hThreadLogin == INVALID_HANDLE_VALUE) {
 			c_account_list_menu::accountingGoBackToList = false;
 			c_account_list_menu::updateAccountingActiveHandle(true);
 			hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)button_id, 0, NULL);
 			c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
-			close_parent_window = true;
+			close_parent_screen = true;
 		}
 	}
 	else if (button_id == H2AccountCount) { // play offline button
 		BYTE abEnet[6];
 		BYTE abOnline[20];
-		XNetRandom(abEnet, 6);
-		XNetRandom(abOnline, 20);
+		XNetRandom(abEnet, sizeof(abEnet));
+		XNetRandom(abOnline, sizeof(abOnline));
 		accountRemoveMode = false;
 		if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, 6).c_str(), ByteToHexStr(abOnline, 20).c_str(), false)) {
 			//show select profile gui
@@ -179,12 +180,12 @@ void c_account_edit_list::button_handler(int* a2, int* a3)
 			notify_xlive_ui = 0;
 			H2Config_master_ip = inet_addr("127.0.0.1");
 			H2Config_master_port_relay = 2001;
-			close_parent_window = true;
+			close_parent_screen = true;
 		}
 	}
 
-	if (close_parent_window)
-		ui_window_back_out(parent_window_ui_channel, parent_window_idx);
+	if (close_parent_screen)
+		user_interface_back_out_from_channel(parent_screen_ui_channel, parent_screen_idx);
 	return;
 }
 
