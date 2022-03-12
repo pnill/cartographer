@@ -45,7 +45,7 @@ namespace SpecialEvents
 		datum ornament_datum = DATUM_INDEX_NONE;
 		datum present_datum = DATUM_INDEX_NONE;
 		datum fp_present_datum = DATUM_INDEX_NONE;
-		string_id new_elite_head_marker(0xFFEE01234);
+		string_id new_elite_head_marker(0xFEE01234);
 
 		std::time_t getEpochTime(int year, const std::wstring& dateTime)
 		{
