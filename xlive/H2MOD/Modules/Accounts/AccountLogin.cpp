@@ -375,6 +375,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 #ifndef LC3
 	int http_request_body_build_len = (89 + 8 + strlen(DLL_VERSION_STR) + strlen(escaped_user_identifier) + strlen(escaped_user_password) + strlen(escaped_user_login_token) + strlen(os_string));
 	char* http_request_body_build = (char*)malloc(sizeof(char) * http_request_body_build_len + 1);
+	char* http_request_body_build2 = http_request_body_build + snprintf(http_request_body_build, http_request_body_build_len, http_request_body, ltoken == 0 ? 1 : 2, DLL_VERSION_STR, escaped_user_identifier, escaped_user_password, escaped_user_login_token, os_string);
 #else
 	TEST_N_DEF(LC3);
 #endif
