@@ -1,6 +1,8 @@
 // -No Copyright- 2010 Stanislav "listener" Golovin
 // This file donated to the public domain
 
+#include "stdafx.h"
+
 #include "XLive\XAM\xam.h"
 #include "XLive\ServerList\ServerList.h"
 #include "XLive\achievements\XAchievements.h"

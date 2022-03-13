@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Config.h"
 
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"

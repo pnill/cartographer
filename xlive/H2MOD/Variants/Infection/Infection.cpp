@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Infection.h"
 #include "Blam\Cache\TagGroups\item_collection_definition.hpp"
 #include "Blam\Cache\TagGroups\scenario_definition.hpp"

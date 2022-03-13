@@ -3,10 +3,13 @@
 
 namespace imgui_handler
 {
+	extern bool g_network_stats_overlay;
+
 	enum s_imgui_images
 	{
 		patch_notes
 	};
+
 	struct s_imgui_window
 	{
 		std::string name;
@@ -29,23 +32,19 @@ namespace imgui_handler
 		sixten_nine
 	};
 	HWND get_HWND();
-	bool ImGuiShoulBlockInput();
+	bool ImGuiShouldHandleInput();
 	void ImGuiToggleInput(bool state);
 	bool CanDrawImgui();
 	void DrawImgui();
 	void ToggleWindow(const std::string& name);
 	bool IsWindowActive(const std::string& name);
-	static bool ImGui_ImplWin32_UpdateMouseCursor();
-	static void ImGui_ImplWin32_UpdateMousePos();
-	IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void ImGuiWin32Frame();
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd);
 	float WidthPercentage(float percent);
-	void TextVerticalPad(char* label, float amount);
+	void TextVerticalPad(char* label);
 	bool LoadTextureFromFile(const char* filename, s_imgui_images image, int* out_width, int* out_height);
 	PDIRECT3DTEXTURE9 GetTexture(s_imgui_images image);
 	void ReleaseTextures();
-	s_aspect_ratio getAspectRatio(float width, float height);
+	s_aspect_ratio getAspectRatio(const ImVec2 displaySize);
 	void preloadImages();
 	namespace MOTD {
 		bool GetMOTD(s_aspect_ratio ratio);

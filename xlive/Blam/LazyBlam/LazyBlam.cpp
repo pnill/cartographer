@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "LazyBlam.hpp"
 #include "H2MOD\Modules\Utils\Utils.h"

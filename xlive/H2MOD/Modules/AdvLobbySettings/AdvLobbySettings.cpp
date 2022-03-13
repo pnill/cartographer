@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "AdvLobbySettings.h"
 #include "H2MOD.h"
 #include "H2MOD\Modules\Networking\Networking.h"

@@ -1,6 +1,6 @@
+#include "stdafx.h"
 
 #include "XUserProperty.h"
-
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 

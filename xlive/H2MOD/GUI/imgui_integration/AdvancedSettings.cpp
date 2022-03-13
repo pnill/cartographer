@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
@@ -8,10 +10,11 @@
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 #include "H2MOD\Modules\RenderHooks\RenderHooks.h"
 #include "H2MOD\Modules\RunLoop\RunLoop.h"
-#include "imgui.h"
-#include "imgui_handler.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "Util\Hooks\Hook.h"
+
+#include "imgui.h"
+#include "imgui_handler.h"
 
 namespace imgui_handler {
 	namespace AdvancedSettings {
@@ -42,9 +45,10 @@ namespace imgui_handler {
 			void DrawDeadzones()
 			{
 				ImDrawList* draw_list = ImGui::GetForegroundDrawList();
+				const ImGuiViewport* viewport = ImGui::GetMainViewport();
 				ImVec2 Center(
-					ImGui::GetIO().DisplaySize.x - 200,
-					ImGui::GetIO().DisplaySize.y - 200
+					viewport->WorkSize.x - 200,
+					viewport->WorkSize.y - 200
 				);
 				
 				draw_list->AddRectFilled(ImVec2(Center.x - 100, Center.y - 100), ImVec2(Center.x + 100, Center.y + 100), ImColor(20, 20, 20));
@@ -209,7 +213,7 @@ namespace imgui_handler {
 					ImVec2 b3_size = ImVec2(WidthPercentage(33.3333333333f), item_size.y);
 					ImGui::NewLine();
 					//Ingame Change Display
-					ImGui::Columns(2, "", false);
+					ImGui::Columns(2, NULL, false);
 
 					ImGui::Checkbox(GetString(hide_ingame_chat), &H2Config_hide_ingame_chat);
 					ImGui::NextColumn();
@@ -238,7 +242,7 @@ namespace imgui_handler {
 					ImVec2 LargestText = ImGui::CalcTextSize(GetString(hires_fix), NULL, true);
 					float float_offset = ImGui::GetCursorPosX() + LargestText.x + (LargestText.x * 0.075);
 					//FPS Limit
-					ImGui::Columns(2, "", false);
+					ImGui::Columns(2, NULL, false);
 					ImGui::Text(GetString(fps_limit));
 					ImGui::PushItemWidth(WidthPercentage(50));
 					ImGui::InputInt("##FPS1", &H2Config_fps_limit, 0, 110);
@@ -264,7 +268,7 @@ namespace imgui_handler {
 					ImGui::Text(GetString(refresh_rate));
 					ImGui::PushItemWidth(WidthPercentage(100));
 					int gRefresh = H2Config_refresh_rate;
-					ImGui::InputInt("##Refresh1", &gRefresh, 0, 110, ImGuiInputTextFlags_AlwaysInsertMode);
+					ImGui::InputInt("##Refresh1", &gRefresh, 0, 110, ImGuiInputTextFlags_AlwaysOverwrite);
 					if (ImGui::IsItemEdited())
 						H2Config_refresh_rate = gRefresh;
 					if (ImGui::IsItemHovered())
@@ -338,10 +342,10 @@ namespace imgui_handler {
 				ImVec2 item_size = ImGui::GetItemRectSize();
 				if (ImGui::CollapsingHeader(GetString(m_k_title)))
 				{
-					ImGui::Columns(2, "", false);
+					ImGui::Columns(2, NULL, false);
 
 					//Raw Input
-					TextVerticalPad(GetString(raw_mouse), 8.5);
+					TextVerticalPad(GetString(raw_mouse));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##RawMouse", &H2Config_raw_input);
 					if (ImGui::IsItemHovered())
@@ -350,7 +354,7 @@ namespace imgui_handler {
 					}
 					//Uniform Sensitivity
 					ImGui::NextColumn();
-					TextVerticalPad(GetString(uniform_sensitivity), 8.5);
+					TextVerticalPad(GetString(uniform_sensitivity));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##MK_Sep", &H2Config_mouse_uniform);
 					if (ImGui::IsItemEdited())
@@ -424,9 +428,9 @@ namespace imgui_handler {
 				if (ImGui::CollapsingHeader(GetString(controller_title)))
 				{
 					DrawDeadzones();
-					ImGui::Columns(2, "", false);
+					ImGui::Columns(2, NULL, false);
 					//Uniform Sensitivity
-					TextVerticalPad(GetString(uniform_sensitivity), 8.5);
+					TextVerticalPad(GetString(uniform_sensitivity));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##C_Sep", &H2Config_mouse_uniform);
 					if (ImGui::IsItemEdited())
@@ -468,7 +472,7 @@ namespace imgui_handler {
 					}
 					ImGui::PopItemWidth();
 
-					ImGui::Columns(2, "", false);
+					ImGui::Columns(2, NULL, false);
 					ImGui::Text(GetString(aiming_type));
 					const char* a_items[] = { GetString(e_default), GetString(modern) };
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());
@@ -587,7 +591,7 @@ namespace imgui_handler {
 					ImGui::NewLine();
 					ImGui::TextWrapped("To use this you must have your games controller layout SET TO DEFAULT. Changing the drop down for the specific action will remap the button to the new one");
 					ImGui::NewLine();
-					ImGui::Columns(3, "", false);
+					ImGui::Columns(3, NULL, false);
 					for (auto i = 0; i < 14; i++) 
 					{
 						ImGui::Text(button_items[i]);
@@ -652,8 +656,8 @@ namespace imgui_handler {
 				if (NetworkSession::localPeerIsSessionHost() || h2mod->GetEngineType() == e_engine_type::SinglePlayer) {
 					if (ImGui::CollapsingHeader(GetString(host_campagin_settings)))
 					{
-						ImGui::Columns(2, "", false);
-						TextVerticalPad(GetString(anti_cheat), 8.5);
+						ImGui::Columns(2, NULL, false);
+						TextVerticalPad(GetString(anti_cheat));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						if (ImGui::Checkbox("##Anti-Cheat", &H2Config_anti_cheat_enabled))
 						{
@@ -670,16 +674,16 @@ namespace imgui_handler {
 						ImGui::NextColumn();
 
 						//XDelay
-						TextVerticalPad(GetString(disable_x_delay), 8.5);
+						TextVerticalPad(GetString(disable_x_delay));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##XDelay", &H2Config_xDelay);
 
 						ImGui::Columns(1);
 						ImGui::Separator();
 						auto Skulls = reinterpret_cast<skull_enabled_flags*>(Memory::GetAddress(0x4D8320));
-						ImGui::Columns(3, "", false);
+						ImGui::Columns(3, NULL, false);
 
-						TextVerticalPad(GetString(skull_anger), 8.5);
+						TextVerticalPad(GetString(skull_anger));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullAnger", &Skulls->Anger);
 						if (ImGui::IsItemHovered())
@@ -687,7 +691,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_assassins), 8.5);
+						TextVerticalPad(GetString(skull_assassins));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullAssassins", &Skulls->Assassians);
 						if (ImGui::IsItemHovered())
@@ -695,7 +699,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_black_eye), 8.5);
+						TextVerticalPad(GetString(skull_black_eye));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullBlackEye", &Skulls->Black_Eye);
 						if (ImGui::IsItemHovered())
@@ -703,7 +707,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_blind), 8.5);
+						TextVerticalPad(GetString(skull_blind));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullBlind", &Skulls->Blind);
 						if (ImGui::IsItemHovered())
@@ -711,7 +715,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_catch), 8.5);
+						TextVerticalPad(GetString(skull_catch));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullCatch", &Skulls->Catch);
 						if (ImGui::IsItemHovered())
@@ -719,7 +723,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_envy), 8.5);
+						TextVerticalPad(GetString(skull_envy));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullEnvy", &Skulls->Envy);
 						if (ImGui::IsItemHovered())
@@ -727,7 +731,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_famine), 8.5);
+						TextVerticalPad(GetString(skull_famine));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullFamine", &Skulls->Famine);
 						if (ImGui::IsItemHovered())
@@ -735,7 +739,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_ghost), 8.5);
+						TextVerticalPad(GetString(skull_ghost));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullGhost", &Skulls->Ghost);
 						if (ImGui::IsItemHovered())
@@ -743,7 +747,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_grunt), 8.5);
+						TextVerticalPad(GetString(skull_grunt));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullGBP", &Skulls->Grunt_Birthday_Party);
 						if (ImGui::IsItemHovered())
@@ -751,7 +755,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_iron), 8.5);
+						TextVerticalPad(GetString(skull_iron));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullIron", &Skulls->Iron);
 						if (ImGui::IsItemHovered())
@@ -759,7 +763,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_iwbyd), 8.5);
+						TextVerticalPad(GetString(skull_iwbyd));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullIWHBYD", &Skulls->IWHBYD);
 						if (ImGui::IsItemHovered())
@@ -767,7 +771,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_mythic), 8.5);
+						TextVerticalPad(GetString(skull_mythic));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullMythic", &Skulls->Mythic);
 						if (ImGui::IsItemHovered())
@@ -775,7 +779,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_sputnik), 8.5);
+						TextVerticalPad(GetString(skull_sputnik));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullSputnik", &Skulls->Sputnik);
 						if (ImGui::IsItemHovered())
@@ -783,7 +787,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_thunderstorm), 8.5);
+						TextVerticalPad(GetString(skull_thunderstorm));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullThunderstorm", &Skulls->Thunderstorm);
 						if (ImGui::IsItemHovered())
@@ -791,7 +795,7 @@ namespace imgui_handler {
 
 						ImGui::NextColumn();
 
-						TextVerticalPad(GetString(skull_whuppopotamus), 8.5);
+						TextVerticalPad(GetString(skull_whuppopotamus));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##SkullWhuppopatamus", &Skulls->Whuppopotamus);
 						if (ImGui::IsItemHovered())
@@ -805,23 +809,13 @@ namespace imgui_handler {
 			{
 				if (ImGui::CollapsingHeader(GetString(game_title)))
 				{
-					ImGui::Columns(2, "", false);
+					ImGui::Columns(2, NULL, false);
 
-					TextVerticalPad(GetString(discord_presence), 8.5);
+					TextVerticalPad(GetString(discord_presence));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##DRP", &H2Config_discord_enable);
 
-					ImGui::NextColumn();
-
-					//Skip Intro
-					TextVerticalPad(GetString(disable_intro_videos), 8.5);
-					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##Intro", &H2Config_skip_intro);
-
-					ImGui::NextColumn();
-
-
-					TextVerticalPad(GetString(upnp_title), 8.5);
+					TextVerticalPad(GetString(upnp_title));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##upnp", &H2Config_upnp_enable);
 					if (ImGui::IsItemHovered())
@@ -829,38 +823,43 @@ namespace imgui_handler {
 						ImGui::SetTooltip(GetString(upnp_tooltip));
 					}
 
-					ImGui::NextColumn();
-
-					TextVerticalPad(GetString(melee_fix_title), 8.5);
-					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##melee_fix", &H2Config_melee_fix);
-					if (ImGui::IsItemEdited())
-						MeleeFix::MeleeCollisionPatch();
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(GetString(melee_fix_tooltip));
-
-					ImGui::NextColumn();
-
-					TextVerticalPad(GetString(no_events_title), 8.5);
+					TextVerticalPad(GetString(no_events_title));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##no_events", &H2Config_no_events);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(no_events_tooltip));
 
-					TextVerticalPad(GetString(event_music_title), 8.5);
+					TextVerticalPad(GetString(event_music_title));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 					ImGui::Checkbox("##event_music", &H2Config_event_music);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(event_music_tooltip));
 
 					if (SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween) {
-						TextVerticalPad(GetString(skeleton_biped), 8.5);
+						TextVerticalPad(GetString(skeleton_biped));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##spooky_scary", &H2Config_spooky_boy);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skeleton_biped_tooltip));
 					}
 
+					// next column elements now
+					//Skip Intro
+					ImGui::NextColumn();
+					TextVerticalPad(GetString(disable_intro_videos));
+					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+					ImGui::Checkbox("##Intro", &H2Config_skip_intro);
+
+#if 0
+					ImGui::NextColumn();
+					TextVerticalPad(GetString(melee_fix_title));
+					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
+					ImGui::Checkbox("##melee_fix", &H2Config_melee_fix);
+					if (ImGui::IsItemEdited())
+						MeleeFix::MeleeCollisionPatch();
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(GetString(melee_fix_tooltip));
+#endif
 
 					ImGui::Columns(1);
 
@@ -929,14 +928,12 @@ namespace imgui_handler {
 				g_init = true;
 			}
 			ImGuiIO& io = ImGui::GetIO();
-			RECT clientRect;
-			::GetClientRect(get_HWND(), &clientRect);
-			io.DisplaySize = ImVec2((float)(clientRect.right - clientRect.left), (float)(clientRect.bottom - clientRect.top));
+			const ImGuiViewport* viewport = ImGui::GetMainViewport();
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoCollapse;
 			window_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
 			//window_flags |= ImGuiWindowFlags_MenuBar;
-			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+			ImGui::SetNextWindowPos(ImVec2(viewport->WorkSize.x * 0.5f, viewport->WorkSize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
 			//ImGui::PushFont(font2);
 			ImGui::SetNextWindowSize(ImVec2(650, 530), ImGuiCond_Appearing);
@@ -1005,7 +1002,7 @@ namespace imgui_handler {
 						}
 					}
 					if (ImGui::CollapsingHeader("Raster Layers")) {
-						ImGui::Columns(4, "", false);
+						ImGui::Columns(4, NULL, false);
 						for (auto i = 0; i < 25; i++)
 						{
 							if (ImGui::Checkbox(IntToString<int>(i).c_str(), &ras_layer_overrides[i]))
@@ -1018,7 +1015,7 @@ namespace imgui_handler {
 					}
 					if(ImGui::CollapsingHeader("Render Geometries"))
 					{
-						ImGui::Columns(4, "", false);
+						ImGui::Columns(4, NULL, false);
 						for(auto i = 0; i < 24; i++)
 						{
 							ImGui::Checkbox(IntToString<int>(i).c_str(), &geo_render_overrides[i]);

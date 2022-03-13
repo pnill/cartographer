@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "CustomMenuGlobals.h"
 #include "CustomLanguage.h"
 #include "H2MOD\Tags\TagInterface.h"

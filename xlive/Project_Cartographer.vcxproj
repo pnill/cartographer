@@ -64,8 +64,8 @@
     <OutDir>$(SolutionDir)Halo2\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\Directx SDK\include;.\;.\3rdparty\;.\3rdparty\imgui;.\3rdparty\libcurl;.\3rdparty\detours\include;.\3rdparty\miniupnpc\include;.\3rdparty\directx\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\DirectX SDK\lib;.\libs;.\3rdparty\directx\lib;.\3rdparty\miniupnpc\lib\;.\3rdparty\libcurl\;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\Directx SDK\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
+    <LibraryPath>3rdparty/directx/lib;3rdparty/discord;3rdparty/libcurl;3rdparty/miniupnpc/lib;3rdparty/detours/lib.X86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -73,8 +73,8 @@
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
-    <LibraryPath>..\DirectX SDK\Lib;..\DirectX SDK\Lib\x86;.\libs;.\3rdparty\directx\lib;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;.\3rdparty\;.\3rdparty\libcurl\;.\3rdparty\miniupnpc\lib\;.\3rdparty\imgui\;$(LibraryPath)</LibraryPath>
-    <IncludePath>.\3rdparty\imgui\;.\3rdparty\;.\;.\3rdparty\teamlog;.\3rdparty\directx\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;.\3rdparty\libcurl\;.\3rdparty\miniupnpc\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>3rdparty/directx/lib;3rdparty/discord;3rdparty/libcurl;3rdparty/miniupnpc/lib;3rdparty/detours/lib.X86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\Directx SDK\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft Visual Studio\Shared\14.0\VC\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -112,7 +112,7 @@
       <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>$(SolutionDir)xlive\libcurl;$(SolutionDir)xlive\3rdparty\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -121,7 +121,8 @@
       <OmitFramePointers>true</OmitFramePointers>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <MinimalRebuild>false</MinimalRebuild>
-      <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
@@ -130,7 +131,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;libminiupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdparty/discord/discord-rpc.lib;3rdparty/libcurl/libssl.lib;3rdparty/libcurl/libcrypto.lib;3rdparty/detours/lib.X86/detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3dx9.lib;discord-rpc.lib;libssl.lib;libcrypto.lib;detours.lib;libminiupnpc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -180,13 +181,14 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)xlive\libcurl;$(SolutionDir)xlive\3rdparty\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ExceptionHandling>Async</ExceptionHandling>
       <DisableSpecificWarnings>4800;4244</DisableSpecificWarnings>
-      <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
@@ -194,7 +196,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;libminiupnpc.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;3rdparty\discord\discord-rpc-debug.lib;3rdparty/libcurl/libssl.lib;3rdparty/libcurl/libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3dx9.lib;discord-rpc-debug.lib;libssl.lib;libcrypto.lib;detours.lib;libminiupnpc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -243,7 +245,8 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ExceptionHandling>Async</ExceptionHandling>
       <DisableSpecificWarnings>4800;4244</DisableSpecificWarnings>
-      <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
@@ -270,11 +273,38 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="3rdparty\imgui\imgui.cpp" />
-    <ClCompile Include="3rdparty\imgui\imgui_demo.cpp" />
-    <ClCompile Include="3rdparty\imgui\imgui_draw.cpp" />
-    <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
+    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_win32.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="3rdparty\imgui\imgui.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="3rdparty\imgui\imgui_demo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="3rdparty\imgui\imgui_draw.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="3rdparty\imgui\imgui_tables.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameEngineGlobals.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameGlobals.cpp" />
@@ -290,10 +320,12 @@
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\debug_overlay.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_handler.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_Handler.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\MessageBox.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\MOTD.cpp" />
+    <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
@@ -339,6 +371,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Util\ClipboardAPI.cpp" />
     <ClCompile Include="Util\curl-interface.cpp" />
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
@@ -388,8 +421,11 @@
     <ClCompile Include="H2MOD\Variants\VariantMPGameEngine.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantPlayer.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
-    <ClCompile Include="Util\Base64.cpp" />
-    <ClCompile Include="Util\ClipboardAPI.cpp" />
+    <ClCompile Include="Util\Base64.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Util\Debug\Debug.cpp" />
     <ClCompile Include="util\filesys.cpp" />
     <ClCompile Include="Util\hash.cpp" />
@@ -418,8 +454,20 @@
   <ItemGroup>
     <ClInclude Include="3rdparty\detours\include\detours.h" />
     <ClInclude Include="3rdparty\detours\include\detver.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9anim.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9core.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9effect.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9math.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9mesh.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9shader.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9shape.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9tex.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9xof.h" />
     <ClInclude Include="3rdparty\discord\discord_register.h" />
     <ClInclude Include="3rdparty\discord\discord_rpc.h" />
+    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
+    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="3rdparty\imgui\imconfig.h" />
     <ClInclude Include="3rdparty\imgui\imgui.h" />
     <ClInclude Include="3rdparty\imgui\imgui_internal.h" />
@@ -586,10 +634,13 @@
     <ClInclude Include="Blam\Math\real_math.h" />
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
     <ClInclude Include="Blam\Math\real_vector3d.h" />
+    <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="H2MOD\EngineCalls\EngineCalls.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
-    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_handler.h" />
-    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Handler.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.h" />
+    <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h" />
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
@@ -719,6 +770,7 @@
     <ClInclude Include="XLive\XStorage\XStorage.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="3rdparty\directx\include\d3dx9math.inl" />
     <None Include="xlive.def" />
   </ItemGroup>
   <ItemGroup>

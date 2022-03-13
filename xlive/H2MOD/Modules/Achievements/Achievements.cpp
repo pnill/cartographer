@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "H2MOD\Modules\Accounts\Accounts.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "rapidjson\document.h"

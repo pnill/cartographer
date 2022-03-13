@@ -1,3 +1,4 @@
+#include "stdafx.h"
 
 #include "ServerList.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
@@ -307,7 +308,7 @@ void ServerList::QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESU
 			{
 				int i = 0;
 				bool foundMatch = false;
-				for (i; i < cSearchPropertiesIDs; i++)
+				for (; i < cSearchPropertiesIDs; i++)
 				{
 					if (pSearchPropertyIDs[i] == property)
 					{
@@ -644,7 +645,7 @@ void ServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, X
 		document.AddMember("dwMaxPrivateSlots", Value().SetInt(dwMaxPrivateSlots), document.GetAllocator());
 		document.AddMember("dwMaxFilledPrivateSlots", Value().SetInt(dwFilledPrivateSlots), document.GetAllocator());
 		document.AddMember("dwPort", Value().SetInt(H2Config_base_port), document.GetAllocator());
-		if (localUser)
+		if (localUser->bValid)
 		{
 			document.AddMember("lanaddr", Value().SetUint(localUser->xnaddr.ina.s_addr), document.GetAllocator());
 		}

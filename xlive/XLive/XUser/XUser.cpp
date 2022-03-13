@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "XUser.h"
 
 #include "XLive/xbox/xbox.h"
@@ -46,8 +48,9 @@ bool userSignedOnline(DWORD dwUserIndex)
 	return false;
 }
 
-void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, unsigned long xnaddr, unsigned long lanaddr, const char* abEnet, const char* abOnline, bool online)
+void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* abEnet, const char* abOnline, bool online)
 {
+	// GFWL supports only 1 user logged in at the time
 	if (dwUserIndex != 0)
 		dwUserIndex = 0;
 
@@ -65,7 +68,7 @@ void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, unsigned long xnad
 	usersSignInInfo[dwUserIndex].dwGuestNumber = 0;
 	usersSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
 
-	gXnIp.SetupLocalConnectionInfo(xnaddr, lanaddr, abEnet, abOnline);
+	gXnIp.SetupLocalConnectionInfo(xnaddr, lanaddr, baseport, abEnet, abOnline);
 
 	signInChanged[dwUserIndex] = true;
 }
@@ -232,6 +235,9 @@ DWORD WINAPI XUserCheckPrivilege(DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeTyp
 
 		case XPRIVILEGE_PRESENCE:
 			LOG_TRACE_XLIVE("- PRESCENCE");
+
+		case XPRIVILEGE_USER_CREATED_CONTENT:
+			LOG_TRACE_XLIVE("- USER_CREATED_CONTENT");
 
 		default:
 			LOG_TRACE_XLIVE("- UNKNOWN PRIVILEGE");

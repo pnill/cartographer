@@ -35,13 +35,13 @@ namespace CustomVariantSettings
 			return Gravity * physics_constants::get_default_gravity();
 		}
 
-		inline bool operator==(s_variantSettings& other)
+		inline bool operator==(s_variantSettings& other) const
 		{
-			return memcmp((void*)this, (void*)&other, sizeof(s_variantSettings)) == 0;
+			return memcmp(this, &other, sizeof(s_variantSettings)) == 0;
 		}
-		inline bool operator!=(s_variantSettings& other)
+		inline bool operator!=(s_variantSettings& other) const
 		{
-			return !operator==(other);
+			return !(*this == other);
 		}
 	};
 	void __cdecl EncodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data);
@@ -53,7 +53,8 @@ namespace CustomVariantSettings
 	void ApplyHooks();
 	void Initialize();
 }
-extern std::map<std::wstring, CustomVariantSettings::s_variantSettings> CustomVariantSettingsMap;
+
 extern CustomVariantSettings::s_variantSettings CurrentVariantSettings;
+extern std::map<std::wstring, CustomVariantSettings::s_variantSettings> CustomVariantSettingsMap;
 
 #define CustomVariantSettingsPacketSize (sizeof(CustomVariantSettings::s_variantSettings))

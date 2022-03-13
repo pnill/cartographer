@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "H2X.h"
 #include "Blam\Cache\TagGroups\weapon_definition.hpp"
 #include "H2MOD.h"

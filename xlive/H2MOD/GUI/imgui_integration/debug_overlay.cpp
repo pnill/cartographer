@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "imgui_handler.h"
 #include "imgui_internal.h"
 
@@ -13,13 +15,8 @@ namespace imgui_handler
 		std::unordered_map<std::string, DebugWatchItem> WatchItems;
 		void Render(bool* p_open)
 		{
-			ImGuiIO& io = ImGui::GetIO();
-			RECT rect;
-			::GetClientRect(get_HWND(), &rect);
-			io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
-			s_aspect_ratio ratio = getAspectRatio(
-				ImGui::GetIO().DisplaySize.x,
-				ImGui::GetIO().DisplaySize.y);
+			const ImGuiViewport* viewport = ImGui::GetMainViewport();
+			s_aspect_ratio ratio = getAspectRatio(viewport->WorkSize);
 
 			ImDrawList* draw_list = ImGui::GetForegroundDrawList();
 

@@ -1,5 +1,11 @@
-#include "GUI.h"
+#include "stdafx.h"
+
 #include "imgui.h"
+#include "backends\imgui_impl_dx9.h"
+#include "backends\imgui_impl_win32.h"
+#include "imgui_integration\imgui_handler.h"
+
+#include "GUI.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
@@ -7,11 +13,11 @@
 #include "H2MOD\Modules\Input\PlayerControl.h"
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "imgui_integration\imgui_handler.h"
-#include "imgui_integration\imgui_impl_dx9.h"
+
 #include "Util\Hooks\Hook.h"
 
 extern void InitInstance();
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 bool doDrawIMGUI = false;
 
@@ -405,18 +411,7 @@ int achievement_timer = 0;
 
 char* Auto_Update_Text = 0;
 
-
-
 static HWND                 g_hWnd = NULL;
-static INT64                g_Time = 0;
-static INT64                g_TicksPerSecond = 0;
-static ImGuiMouseCursor     g_LastMouseCursor = ImGuiMouseCursor_COUNT;
-static bool                 g_HasGamepad = false;
-static bool                 g_WantUpdateHasGamepad = true;
-
-
-
-
 
 void GUI::ToggleMenu()
 {
@@ -454,8 +449,8 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		has_initialised_input = true;
 	}
 
-	if (imgui_handler::ImGuiShoulBlockInput())
-		imgui_handler::ImGui_ImplWin32_WndProcHandler(pPii->hWnd, pPii->uMSG, pPii->wParam, pPii->lParam);
+	if (imgui_handler::ImGuiShouldHandleInput())
+		ImGui_ImplWin32_WndProcHandler(pPii->hWnd, pPii->uMSG, pPii->wParam, pPii->lParam);
 
 	return S_OK;
 }
@@ -527,6 +522,7 @@ int WINAPI XLiveRender()
 					drawText(0, startingPosY, COLOR_WHITE, it.c_str(), normalSizeFont);
 				}
 			}
+
 
 			DWORD GameGlobals = *Memory::GetAddress<DWORD*>(0x482D3C, 0x4CB520);
 			DWORD GameEngine = *(DWORD*)(GameGlobals + 0x8);
@@ -663,10 +659,7 @@ int WINAPI XLiveRender()
 				drawBox(10, 52, ((Size_Of_Downloaded * 100) / Size_Of_Download) * 2, 6, COLOR_GREEN, COLOR_GREEN);
 			}
 
-			if(imgui_handler::CanDrawImgui())
-			{
-				imgui_handler::DrawImgui();
-			}
+			imgui_handler::DrawImgui();
 		}
 	}
 	return 0;

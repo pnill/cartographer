@@ -1,6 +1,6 @@
+#include "stdafx.h"
 
 #include <malloc.h>
-
 
 #include "hook.h"
 #pragma warning( disable :4996)
@@ -119,7 +119,7 @@ void ReadBytesProtected(DWORD address, BYTE* buf, BYTE count)
 	);
 }
 
-void WritePointer(DWORD offset, void *ptr) {
+void WritePointer(DWORD offset, const void *ptr) {
 	WriteValue<DWORD>(offset, *(DWORD*)&ptr);
 }
 

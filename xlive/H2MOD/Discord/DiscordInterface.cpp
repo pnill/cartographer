@@ -1,5 +1,5 @@
+#include "stdafx.h"
 
-#include <unordered_set>
 #include "3rdparty/discord/discord_rpc.h"
 #include "3rdparty/discord/discord_register.h"
 #include "DiscordInterface.h"

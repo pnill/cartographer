@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "XboxTick.h"
 #include "Util\Hooks\Hook.h"
 

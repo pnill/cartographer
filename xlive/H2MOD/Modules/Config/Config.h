@@ -9,6 +9,7 @@ void DeinitH2Config();
 void SaveH2Config();
 void ReadH2Config();
 
+#if !defined(_CARTOGRAPHER_DLL_CONF)
 // added this until the code gets released
 #define USE_DEV_PREVIEW_CONFIG_FILE_PATHS 1
 
@@ -21,6 +22,8 @@ void ReadH2Config();
 #define STRINGIZE2(s) #s
 #define STRINGIZE(s) STRINGIZE2(s)
 #define DLL_VERSION_STR        STRINGIZE(DLL_VERSION_MAJOR) "." STRINGIZE(DLL_VERSION_MINOR) "." STRINGIZE(DLL_VERSION_REVISION) "." STRINGIZE(DLL_VERSION_BUILD)
+
+#endif
 
 struct _H2Config_language {
 	int code_main;

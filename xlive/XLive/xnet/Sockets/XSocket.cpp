@@ -1,3 +1,5 @@
+#include "stdafx.h"
+#include "XSocket.h"
 #include "XLive\xnet\upnp.h"
 #include "XLive\xnet\Sockets\XSocket.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
@@ -267,6 +269,9 @@ int XSocket::winsock_read_socket(LPWSABUF lpBuffers,
 	LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine,
 	bool* outWinApiError)
 {
+	if (outWinApiError)
+		*outWinApiError = false;
+
 	if (this->isTCP()
 		|| lpFrom == NULL)
 	{
@@ -294,7 +299,7 @@ int XSocket::winsock_read_socket(LPWSABUF lpBuffers,
 		return SOCKET_ERROR;
 	}
 
-	result = gXnIp.handleRecvdPacket(this, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
+	result = gXnIp.HandleRecvdPacket(this, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
 	return result;
 }
 
@@ -313,7 +318,7 @@ int XSocket::recvfrom(LPWSABUF lpBuffers,
 	{
 		bool errorByRecvAPI = false;
 
-		int result = winsock_read_socket(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom,lpFromlen, lpOverlapped, lpCompletionRoutine, &errorByRecvAPI);
+		int result = winsock_read_socket(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine, &errorByRecvAPI);
 
 		if (result == SOCKET_ERROR)
 		{
@@ -326,6 +331,7 @@ int XSocket::recvfrom(LPWSABUF lpBuffers,
 			}
 			else
 			{
+				// continue reading the socket, if error wasn't by winsock api
 				continue;
 			}
 		}
@@ -395,9 +401,9 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		Worst case if this is found to cause performance issues we can handle the send and re-update to secure before return.
 	*/
 
-	XnIp* xnIp = gXnIp.getConnection(inTo->sin_addr);
+	XnIp* xnIp = gXnIp.GetConnection(inTo->sin_addr);
 	if (xnIp != nullptr
-		&& gXnIp.GetLocalUserXn() != nullptr
+		&& gXnIp.GetLocalUserXn()->bValid
 		&& xnIp->connectStatus != XNET_CONNECT_STATUS_LOST)
 	{
 		sockaddr_in sendToAddr;
@@ -439,47 +445,51 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			return SOCKET_ERROR;
 		}
 
-		int result;
-		int packetsSent = 0;
-		*lpNumberOfBytesSent = 0;
+		int result = SOCKET_ERROR;
+		DWORD pckSent = 0;
+		DWORD dwNumberOfBytesSent = 0;
 
 #if COMPILE_WITH_STD_SOCK_FUNC
-		for (DWORD i = 0; i < dwBufferCount; i++)
+		for (DWORD i = 0ul; i < dwBufferCount; i++)
 		{
 			result = sendto(xsocket->winSockHandle, lpBuffers[i].buf, lpBuffers[i].len, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr));
 			if (result == SOCKET_ERROR)
 				break;
 
-			packetsSent++;
-			xnIp->pckSent++;
-			xnIp->bytesSent += result;
-
-			*lpNumberOfBytesSent += result;
+			pckSent++;
+			dwNumberOfBytesSent += result;
 		}
 #else
-		result = WSASendTo(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesSent, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr), lpOverlapped, lpCompletionRoutine);
-#endif
+		result = WSASendTo(xsocket->winSockHandle, lpBuffers, dwBufferCount, &dwNumberOfBytesSent, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr), lpOverlapped, lpCompletionRoutine);
+#endif // if COMPILE_WITH_STD_SOCK_FUNC
 
 		if (result == SOCKET_ERROR)
 		{
 			if (WSAGetLastError() != WSAEWOULDBLOCK)
-				LOG_ERROR_NETWORK("XSocketSendTo() - Socket Error: {}", WSAGetLastError());
+				LOG_ERROR_NETWORK("XSocketSendTo() - socket error: {}", WSAGetLastError());
+
+			if (lpNumberOfBytesSent)
+				*lpNumberOfBytesSent = 0;
 			return SOCKET_ERROR;
 		}
 		else
 		{
 #if !COMPILE_WITH_STD_SOCK_FUNC
-			packetsSent++;
-			xnIp->pckSent++;
-			xnIp->bytesSent += result;
+			pckSent = dwBufferCount;
 #endif
+			xnIp->pckStats.PckSendStatsUpdate(pckSent, dwNumberOfBytesSent);
+			gXnIp.GetLocalUserXn()->pckStats.PckSendStatsUpdate(pckSent, dwNumberOfBytesSent);
+			if (lpNumberOfBytesSent)
+				*lpNumberOfBytesSent = dwNumberOfBytesSent;
+			
+			return 0;
 		}
 
 		return 0;
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("XSocketSendTo() - Tried to send packet to unknown connection, connection index: {}, connection identifier: {:x}", gXnIp.getConnectionIndex(inTo->sin_addr), inTo->sin_addr.s_addr);
+		LOG_TRACE_NETWORK("XSocketSendTo() - Tried to send packet to unknown connection, connection index: {}, connection identifier: {:x}", gXnIp.GetConnectionIndex(inTo->sin_addr), inTo->sin_addr.s_addr);
 		XSocketWSASetLastError(WSAEHOSTUNREACH);
 		return SOCKET_ERROR;
 	}
@@ -591,12 +601,6 @@ int WINAPI XSocketClose(SOCKET s)
 // #11: XSocketBind
 SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 {
-	if (name->sa_family == AF_INET6) // we don't support IPV6
-	{
-		XSocketWSASetLastError(WSAEADDRNOTAVAIL);
-		return SOCKET_ERROR;
-	}
-
 	XSocket* xsocket = (XSocket*)s;
 
 	// copy socket ip/port
@@ -647,10 +651,10 @@ int WINAPI XSocketSend(SOCKET s, const char* buf, int len, int flags)
 	wsaBuf.buf = (CHAR*)buf;
 	DWORD numberOfBytesSent = 0;
 
-	if (XSocketWSASendTo(s, &wsaBuf, 1, &numberOfBytesSent, flags, NULL, NULL, NULL, NULL) != 0)
-		return SOCKET_ERROR;
-	else
+	if (XSocketWSASendTo(s, &wsaBuf, 1, &numberOfBytesSent, flags, NULL, NULL, NULL, NULL) == 0)
 		return numberOfBytesSent;
+	else
+		return SOCKET_ERROR;
 }
 
 // #24: XSocketSendTo
@@ -661,10 +665,10 @@ int WINAPI XSocketSendTo(SOCKET s, const char* buf, int len, int flags, sockaddr
 	wsaBuf.buf = (CHAR*)buf;
 	DWORD numberOfBytesSent = 0;
 
-	if (XSocketWSASendTo(s, &wsaBuf, 1, &numberOfBytesSent, flags, to, tolen, NULL, NULL) != 0)
-		return SOCKET_ERROR;
-	else
+	if (XSocketWSASendTo(s, &wsaBuf, 1, &numberOfBytesSent, flags, to, tolen, NULL, NULL) == 0)
 		return numberOfBytesSent;
+	else
+		return SOCKET_ERROR;
 }
 
 // #18: XSocketRecv
@@ -675,10 +679,10 @@ int WINAPI XSocketRecv(SOCKET s, char* buf, int len, int flags)
 	wsaBuf[0].buf = (CHAR*)buf;
 	DWORD numberOfbytesRecvd;
 
-	if (XSocketWSARecvFrom(s, wsaBuf, ARRAYSIZE(wsaBuf), &numberOfbytesRecvd, (LPDWORD)&flags, NULL, NULL, NULL, NULL) != 0)
-		return SOCKET_ERROR;
-	else
+	if (XSocketWSARecvFrom(s, wsaBuf, ARRAYSIZE(wsaBuf), &numberOfbytesRecvd, (LPDWORD)&flags, NULL, NULL, NULL, NULL) == 0)
 		return numberOfbytesRecvd;
+	else
+		return SOCKET_ERROR;
 }
 
 // #20
@@ -689,10 +693,10 @@ int WINAPI XSocketRecvFrom(SOCKET s, char* buf, int len, int flags, sockaddr *fr
 	wsaBuf[0].buf = (CHAR*)buf;
 	DWORD numberOfbytesRecvd;
 
-	if (XSocketWSARecvFrom(s, wsaBuf, ARRAYSIZE(wsaBuf), &numberOfbytesRecvd, (LPDWORD)&flags, from, fromlen, NULL, NULL) != 0)
-		return SOCKET_ERROR;
-	else
+	if (XSocketWSARecvFrom(s, wsaBuf, ARRAYSIZE(wsaBuf), &numberOfbytesRecvd, (LPDWORD)&flags, from, fromlen, NULL, NULL) == 0)
 		return numberOfbytesRecvd;
+	else
+		return SOCKET_ERROR;
 }
 
 // #37: XSocketHTONL

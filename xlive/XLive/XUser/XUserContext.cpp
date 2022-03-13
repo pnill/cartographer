@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "XUserContext.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\Config\Config.h"
@@ -55,7 +57,7 @@ static const std::unordered_map <int, std::string> game_mode_list
 
 void update_player_count()
 {
-	network_session* session = nullptr;
+	s_network_session* session = nullptr;
 	if (NetworkSession::getCurrentNetworkSession(&session))
 	{
 		DiscordInterface::SetPlayerCountInfo(

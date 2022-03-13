@@ -82,7 +82,7 @@ char* wcstombs2r(wchar_t* text);
 std::string ToNarrow(const wchar_t *s, char dfault = '?', const std::locale& loc = std::locale());
 
 ///FREE MEMOERY in rtn_response if returned 0 (success).
-int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response);
+int MasterHttpResponse(std::string& url, const char* http_request, char** rtn_response);
 
 bool StrnCaseInsensEqu(char* str1, char* str2, unsigned int chk_len);
 
@@ -150,8 +150,3 @@ public:
 private:
 	time::time_point lastTime;
 };
-
-// curl errors
-#define ERROR_CODE_CURL_SOCKET_FAILED -40
-#define ERROR_CODE_CURL_HANDLE -41
-#define ERROR_CODE_CURL_EASY_PERF -42

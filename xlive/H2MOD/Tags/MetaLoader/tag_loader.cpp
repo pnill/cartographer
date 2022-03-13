@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "tag_loader.h"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
 #include "Blam\Cache\TagGroups\scenery_definition.hpp"
@@ -6,7 +8,6 @@
 #include "H2MOD\Tags\MetaExtender.h"
 #include "Util\filesys.h"
 #include "Util\Hooks\Hook.h"
-#include <algorithm>
 
 #include "Blam/Cache/TagGroups/weather_system_definition.hpp"
 #include "Blam/Engine/DataArray/TagDataIterator.h"

@@ -22,6 +22,21 @@ struct s_data_array
 	datum next_datum;				// 0x40
 	char* data;					// 0x44
 	int* data_usable_bit_mask;		// 0x48
+
+	static datum datum_new_in_range(s_data_array* data_array)
+	{
+		auto p_datum_new_in_range = Memory::GetAddressRelative<datum(__cdecl*)(s_data_array*)>(0x4667A0, 0x0); // TODO DEDI OFFSET
+		return p_datum_new_in_range(data_array);
+	}
+
+	static void data_make_valid(s_data_array* data_array)
+	{
+		// not entirely sure what this actually does
+		typedef void(_cdecl* make_data_valid)(s_data_array* data_array);
+		auto p_data_make_valid = Memory::GetAddressRelative<make_data_valid>(0x466B33, 0x0); // TODO DEDI OFFSET
+
+		return p_data_make_valid(data_array);
+	}
 };
 CHECK_STRUCT_SIZE(s_data_array, 0x4C);
 
@@ -41,12 +56,12 @@ public:
 	{
 	}
 
-	s_data_array* get_datum_array()
+	s_data_array* get_datum_array() const
 	{
 		return m_data_array;
 	}
 
-	T* get_data_at_datum_index(datum datum_index)
+	T* get_data_at_datum_index(datum datum_index) const
 	{
 		return reinterpret_cast<T*>(&m_data_array->data[m_data_array->datum_element_size * DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)]);
 	};
@@ -76,7 +91,7 @@ public:
 		return result;
 	}
 	
-	int get_next_absolute_datum_index(int index)
+	int get_next_absolute_datum_index(int index) const
 	{
 		if (index < 0)
 			return -1;
@@ -92,12 +107,12 @@ public:
 		return index;
 	}
 
-	int get_current_absolute_index()
+	int get_current_absolute_index() const
 	{
 		return m_current_absolute_index;
 	}
 
-	datum get_current_datum_index()
+	datum get_current_datum_index() const
 	{
 		return m_last_datum_index;
 	}

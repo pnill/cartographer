@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Pregame_Lobby.h"
 #include "H2MOD.h"
 #include "H2MOD\Tags\TagInterface.h"

@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 //#include "TestGameTimePrep.h"
 //#include "H2MOD\Modules\Config\Config.h"
 //#include "UncappedFPS/UncappedFPS.h"

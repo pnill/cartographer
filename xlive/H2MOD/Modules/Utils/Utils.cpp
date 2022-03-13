@@ -1,7 +1,8 @@
+#include "stdafx.h"
+
 #include "Utils.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "Util\Hooks\Hook.h"
 #include <sys\timeb.h>
 
 int FindLineStart(FILE* fp, int lineStrLen) {
@@ -343,7 +344,6 @@ bool isInteger(std::wstring myString)
 int HostnameToIp(char* hostname, char* ip) {
 	struct hostent *he;
 	struct in_addr **addr_list;
-	int i;
 	WSADATA wsaData;
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if ((he = gethostbyname(hostname)) == NULL) {
@@ -352,7 +352,7 @@ int HostnameToIp(char* hostname, char* ip) {
 
 	addr_list = (struct in_addr **) he->h_addr_list;
 
-	for (i = 0; addr_list[i] != NULL; i++)
+	for (int i = 0; addr_list[i] != NULL; i++)
 	{
 		//Return the first one;
 		strncpy(ip, inet_ntoa(*addr_list[i]), 100);
@@ -515,7 +515,8 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct stringMe *s
 	return size*nmemb;
 }
 
-int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response) {
+int MasterHttpResponse(std::string& url, const char* http_request, char** rtn_response) {
+	TEST_N_DEF(LC1);
 	int result = ERROR_CODE_CURL_SOCKET_FAILED;//Socket failed to connect to server
 
 	CURL *curl;
@@ -549,7 +550,7 @@ int MasterHttpResponse(std::string& url, char* http_request, char* &rtn_response
 			free(s.ptr);
 		}
 		else {
-			rtn_response = s.ptr;
+			*rtn_response = s.ptr;
 			result = 0;//successful connection.
 		}
 
@@ -657,10 +658,40 @@ int stripWhitespace(wchar_t *inputStr) {
 	return 0;
 }
 
-void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen) {
-	for (size_t i = 0; i < hexStr.length() && i < bufLen; i++) {
-		byteBuf[i] = (BYTE)strtol(hexStr.substr(i * 2, 2).c_str(), NULL, 16);
+// use this only if input is expected to always be properly formated
+// preper format means it only contains only these characters: '01234556789ABCDEFabcdef' and no (pre/su)fixes
+void HexStrToBytesUnsafe(const char* hexStr, size_t hexStrLen, BYTE* byteBuf, size_t bufLen)
+{
+	// ASCII character index map to hex value
+	static const BYTE lutStrToHex[] = {
+		0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  0,  0,  0,  0,
+		0,  0,  0,  10,  11,  12,  13,  14,  15,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  10,  11,  12,  13,  14,  15
+	};
+
+	const BYTE* byteBufEnd = byteBuf + bufLen;
+	hexStrLen = hexStrLen != 0u ? hexStrLen : strlen(hexStr);
+	// continue only if string is at least 1
+	if (hexStrLen >= 1u)
+	{
+		bool hexStrOddLen = !!(hexStrLen % 2);
+		const char tmpBuf1[3] = { '0', hexStr[0], '\0' };
+		const char* HexStrBeg = hexStrOddLen ? tmpBuf1 : &hexStr[0];
+
+		for (int strIdx = 0; strIdx < hexStrLen && byteBuf < byteBufEnd; )
+		{
+			*byteBuf++ = (BYTE)((lutStrToHex[HexStrBeg[strIdx++] - '0'] << 4) | (lutStrToHex[HexStrBeg[strIdx++] - '0']));
+			HexStrBeg = hexStr; // get the next byte
+		}
 	}
+}
+
+// TODO: this function checks the input hexStr before converting it to bytes
+// hence being slower if we don't trust the input
+void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen) {
+	size_t hexStrLen = hexStr.length();
+	HexStrToBytesUnsafe(hexStr.c_str(), hexStrLen, byteBuf, bufLen);
 }
 
 std::string ByteToHexStr(const BYTE* buffer, size_t size) {

@@ -5,6 +5,8 @@
 
 #define MAX_HDR_STR 32
 
+#define MAX_NETSTATS_SAMPLES 30
+
 extern h2log* critical_network_errors_log;
 
 // undefine LOG_CRITICAL_NETWORK for now, to implment it using another h2log that always gets created
@@ -20,11 +22,11 @@ const char broadcastStrHdr[MAX_HDR_STR] = "XNetReqPack";
 
 #define XnIp_ConnectionTimeOut (15 * 1000) // msec
 
-#define IPADDR_LOOPBACK htonl(0x7F000001) // 127.0.0.1
+#define IPADDR_LOOPBACK (htonl(0x7F000001)) // 127.0.0.1
 
 #define XNIP_FLAG(_bit) (1<<(_bit))
 #define XNIP_SET_BIT(_val, _bit) ((_val) |= XNIP_FLAG((_bit)))
-#define XNIP_TEST_BIT(_val, _bit) ((_val) & XNIP_FLAG((_bit)))
+#define XNIP_TEST_BIT(_val, _bit) (((_val) & XNIP_FLAG((_bit))) != 0)
 
 enum eXnip_ConnectRequestType : int
 {
@@ -80,7 +82,7 @@ struct XNetRequestPacket
 		pckHeader.intHdr = 'XNeT';
 		memset(pckHeader.HdrStr, 0, sizeof(pckHeader.HdrStr));
 		strncpy(pckHeader.HdrStr, requestStrHdr, MAX_HDR_STR);
-		SecureZeroMemory(&data, sizeof(data));
+		ZeroMemory(&data, sizeof(data));
 	}
 
 	XNetPacketHeader pckHeader;
@@ -106,6 +108,96 @@ struct XnKeyPair
 	bool bValid;
 	XNKID xnkid;
 	XNKEY xnkey;
+};
+
+struct XnIpPckTransportStats
+{
+	bool bInit;
+
+	unsigned int pckSent;
+	unsigned int pckRecvd;
+	unsigned int pckBytesSent;
+	unsigned int pckBytesRecvd;
+
+	unsigned int pckAvgSent;
+	unsigned int pckAvgRecvd;
+
+	unsigned int pckSentPerSec[MAX_NETSTATS_SAMPLES];
+	unsigned int pckBytesSentPerSec[MAX_NETSTATS_SAMPLES];
+
+	unsigned int pckRecvdPerSec[MAX_NETSTATS_SAMPLES];
+	unsigned int pckBytesRecvdPerSec[MAX_NETSTATS_SAMPLES];
+
+	int			 pckCurrentSendPerSecIdx;
+	int			 pckCurrentRecvdPerSecIdx;
+
+	void PckStatsUpdate()
+	{
+		if (!bInit)
+		{
+			bInit = true;
+			pckSent = 0;
+			pckRecvd = 0;
+			pckBytesSent = 0;
+			pckBytesRecvd = 0;
+
+			pckAvgSent = 0;
+			pckAvgRecvd = 0;
+			pckSentPerSecIdx = 0;
+			pckRecvdPerSecIdx = 0;
+			pckCurrentSendPerSecIdx = -1;
+			pckCurrentRecvdPerSecIdx = -1;
+
+			memset(pckSentPerSec, 0, sizeof(pckSentPerSec));
+			memset(pckRecvdPerSec, 0, sizeof(pckRecvdPerSec));
+
+			lastTimeUpdate = timeGetTime();
+		}
+		else
+		{
+			const int time_to_next_sample = 1 * 1000;
+
+			if (timeGetTime() - lastTimeUpdate >= time_to_next_sample)
+			{
+				pckSentPerSecIdx = (pckSentPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
+				pckRecvdPerSecIdx = (pckRecvdPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
+
+				pckSentPerSec[pckSentPerSecIdx] = 0;
+				pckBytesSentPerSec[pckSentPerSecIdx] = 0;
+
+				pckRecvdPerSec[pckRecvdPerSecIdx] = 0;
+				pckBytesRecvdPerSec[pckRecvdPerSecIdx] = 0;
+
+				pckCurrentSendPerSecIdx = (pckCurrentSendPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
+				pckCurrentRecvdPerSecIdx = (pckCurrentRecvdPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
+
+				lastTimeUpdate = timeGetTime();
+			}
+		}
+	}
+
+	void PckSendStatsUpdate(unsigned int _pckXmit, unsigned int _pckXmitBytes)
+	{
+		pckSent += _pckXmit;
+		pckBytesSent += _pckXmitBytes;
+
+		pckSentPerSec[pckSentPerSecIdx] += _pckXmit;
+		pckBytesSentPerSec[pckSentPerSecIdx] += _pckXmitBytes;
+	}
+
+	void PckRecvdStatsUpdate(unsigned int _pckRecvd, unsigned int _pckRecvdBytes)
+	{
+		pckRecvd += _pckRecvd;
+		pckBytesRecvd += _pckRecvdBytes;
+
+		pckRecvdPerSec[pckRecvdPerSecIdx] += _pckRecvd;
+		pckBytesRecvdPerSec[pckRecvdPerSecIdx] += _pckRecvdBytes;
+	}
+
+private:
+	DWORD lastTimeUpdate;
+	int pckSentPerSecIdx;
+	int pckRecvdPerSecIdx;
 };
 
 struct XnIp
@@ -154,25 +246,25 @@ struct XnIp
 	// TODO: add single async socket implementation or figure out another way
 	NatTranslation natTranslation[2];
 
-	void updateNat(H2v_sockets natIndex, sockaddr_in* addr)
-	{
-		int index = (int)natIndex;
-		natTranslation[index].natAddress = *addr;
-		natTranslation[index].state = NatTranslation::eNatDataState::natAvailable;
-	}
-
 	sockaddr_in* getNatAddr(H2v_sockets natIndex)
 	{
 		int index = (int)natIndex;
 		return &natTranslation[index].natAddress;
 	}
 
+	void updateNat(H2v_sockets natIndex, const sockaddr_in* addr)
+	{
+		int index = (int)natIndex;
+		natTranslation[index].natAddress = *addr;
+		natTranslation[index].state = NatTranslation::eNatDataState::natAvailable;
+	}
+
 	void natDiscard()
 	{
-		for (auto& translation : natTranslation)
+		for (int i = 0; i < ARRAYSIZE(natTranslation); i++)
 		{
-			memset(&translation, 0, sizeof(translation));
-			translation.state = NatTranslation::eNatDataState::natUnavailable;
+			memset(&natTranslation[i], 0, sizeof(*natTranslation));
+			natTranslation[i].state = NatTranslation::eNatDataState::natUnavailable;
 		}
 	}
 
@@ -183,20 +275,27 @@ struct XnIp
 
 	bool natIsUpdated() const
 	{
-		for (auto& translation : natTranslation)
+		for (int i = 0; i < ARRAYSIZE(natTranslation); i++)
 		{
-			if (translation.state != NatTranslation::eNatDataState::natAvailable)
+			if (natTranslation[i].state != NatTranslation::eNatDataState::natAvailable)
 				return false;
 		}
 		return true;
 	}
 #pragma endregion
 
-	unsigned int pckSent;
-	unsigned int pckRecvd;
+public:
+	XnIpPckTransportStats pckStats;
 
-	unsigned int bytesSent;
-	unsigned int bytesRecvd;
+	void PclStatsReset()
+	{
+		pckStats.bInit = false;
+	}
+
+	void PckGetStats(const XnIpPckTransportStats** outPckStats)
+	{
+		*outPckStats = &pckStats;
+	}
 
 	IN_ADDR getOnlineIpAddress() const
 	{
@@ -224,96 +323,75 @@ class CXnIp
 {
 public:
 
-	/*
-		Use this to get the connection index from an XLive API call
-	*/
-	static int CXnIp::getConnectionIndex(IN_ADDR connectionIdentifier)
+	CXnIp()
 	{
-		return connectionIdentifier.s_addr >> 24;
+		memset(&m_startupParams, 0, sizeof(m_startupParams));
 	}
 
-	XnIp* CXnIp::getConnection(IN_ADDR ina)
+	~CXnIp()
 	{
-		XnIp* ret = &XnIPs[getConnectionIndex(ina)];
-		if (ret->isValid(ina))
-			return ret;
-		else
-			return nullptr;
+		// TODO maybe terminate all connections
 	}
 
-	void CXnIp::setTimeConnectionInteractionHappened(IN_ADDR ina)
-	{
-		XnIp* xnIp = getConnection(ina);
-		if (xnIp != nullptr)
-			xnIp->lastConnectionInteractionTime = timeGetTime();
-	}
-
-	void CXnIp::updatePacketReceivedCounters(IN_ADDR ipIdentifier, int bytesRecvdCount)
-	{
-		setTimeConnectionInteractionHappened(ipIdentifier);
-		XnIp* xnIp = getConnection(ipIdentifier);
-		if (xnIp != nullptr)
-		{
-			xnIp->pckRecvd++;
-			xnIp->bytesRecvd += bytesRecvdCount;
-			xnIp->lastPacketReceivedTime = timeGetTime();
-		}
-	}
-
-	void UnregisterXnIpIdentifier(const IN_ADDR ina);
-
-	void checkForLostConnections();
-
-	void SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, const char* abEnet, const char* abOnline);
-
-	void CXnIp::UnregisterLocalConnectionInfo()
-	{
-		SecureZeroMemory(&ipLocal, sizeof(ipLocal));
-	}
-
-	XnIp* CXnIp::GetLocalUserXn()
-	{
-		if (ipLocal.bValid)
-			return &ipLocal;
-
-		return nullptr;
-	}
-
-	int handleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount);
+	CXnIp::CXnIp(const CXnIp& other) = delete;
+	CXnIp::CXnIp(CXnIp&& other) = delete;
 
 	void Initialize(const XNetStartupParams* netStartupParams);
-	
-	void LogConnectionsToConsole();
-	void LogConnectionsErrorDetails(sockaddr_in* address, int errorCode, const XNKID* receivedKey);
-	IN_ADDR GetConnectionIdentifierByRecvAddr(XSocket* xsocket, sockaddr_in* addr);
-	
-	void SaveNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, sockaddr_in* addr);
 
-	void HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* connectReqPkt, sockaddr_in* addr, LPDWORD lpBytesRecvdCount);
-	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, sockaddr_in* recvAddr);
-	int CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* xnkid, const XNetRequestPacket* requestType, IN_ADDR* outIpIdentifier);
+	// Connection data getters 
+	XnIp* GetConnection(const IN_ADDR ina) const;
+	static int GetConnectionIndex(IN_ADDR connectionIdentifier);
+	int GetEstablishedConnectionIdentifierByRecvAddr(XSocket* xsocket, const sockaddr_in* addr, IN_ADDR* outConnectionIdentifier);
 
+	// Miscellaneous
+	void ClearLostConnections();
+	void SetTimeConnectionInteractionHappened(IN_ADDR ina);
+
+	// local network address
+	static XnIp* CXnIp::GetLocalUserXn();
+	static void UnregisterLocalConnectionInfo();
+	static void SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* abEnet, const char* abOnline);
+
+	// Performance counters
+	void UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int bytesRecvdCount);
+	
+	// NAT ports handling functions
+	void SaveNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, const sockaddr_in* addr);
+
+	// Packet handlers
+	int HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount);
+	void HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* reqPaket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
+	void HandleConnectionPacket(XSocket* xsocket, XnIp* xnIp, const XNetRequestPacket* conReqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
+	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr);
+
+	// XnIp handling function
 	XnIp* XnIpLookUp(const XNADDR* pxna, const XNKID* xnkid, bool* firstUnusedIndexFound = nullptr, int* firstUnusedIndex = nullptr);
-	int registerNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* outIpIdentifier);
+	int CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* xnkid, const XNetRequestPacket* reqPacket, IN_ADDR* outIpIdentifier);
+	int RegisterNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* outIpIdentifier);
+	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 	
+	// Key functions
 	int RegisterKey(XNKID*, XNKEY*);
 	void UnregisterKey(const XNKID* xnkid);
-	XnKeyPair* getKeyPair(const XNKID* xnkid);
+	XnKeyPair* GetKeyPair(const XNKID* xnkid);
 	
-	XNetStartupParams startupParams;
-	int GetMaxXnConnections() { return startupParams.cfgSecRegMax; }
-	int GetReqQoSBufferSize() { return startupParams.cfgQosDataLimitDiv4 * 4; }
-	int GetMaxXnKeyPairs() { return startupParams.cfgKeyRegMax; }
+	// Logging 
+	void LogConnectionsToConsole();
+	void LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode, const XNKID* receivedKey);
 
-	int GetMinSockRecvBufferSizeInBytes() { return startupParams.cfgSockDefaultRecvBufsizeInK * SOCK_K_UNIT; }
-	int GetMinSockSendBufferSizeInBytes() { return startupParams.cfgSockDefaultSendBufsizeInK * SOCK_K_UNIT; }
+	// XNet startup parameters
+	int GetMaxXnConnections() { return m_startupParams.cfgSecRegMax; }
+	int GetReqQoSBufferSize() { return m_startupParams.cfgQosDataLimitDiv4 * 4; }
+	int GetMaxXnKeyPairs() { return m_startupParams.cfgKeyRegMax; }
+	int GetMinSockRecvBufferSizeInBytes() { return m_startupParams.cfgSockDefaultRecvBufsizeInK * SOCK_K_UNIT; }
+	int GetMinSockSendBufferSizeInBytes() { return m_startupParams.cfgSockDefaultSendBufsizeInK * SOCK_K_UNIT; }
 
 	int GetRegisteredKeyCount()
 	{
 		int keysCount = 0;
 		for (int i = 0; i < GetMaxXnKeyPairs(); i++)
 		{
-			if (XnKeyPairs[i].bValid)
+			if (m_XnKeyPairs[i].bValid)
 			{
 				keysCount++;
 			}
@@ -333,12 +411,12 @@ public:
 	void SendXNetRequestAllSockets(IN_ADDR connectionIdentifier, eXnip_ConnectRequestType reqType);
 
 	// Data
-	XnIp* XnIPs = nullptr;
-	XnKeyPair* XnKeyPairs = nullptr;
+	XnIp* m_XnIPs = nullptr;
+	XnKeyPair* m_XnKeyPairs = nullptr;
 
 private:
-
-	XnIp ipLocal;
+	XNetStartupParams m_startupParams;
+	static XnIp m_ipLocal;
 };
 
 extern CXnIp gXnIp;

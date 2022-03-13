@@ -60,7 +60,6 @@
     <ClCompile Include="H2MOD\Variants\VariantPlayer.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="Util\Base64.cpp" />
-    <ClCompile Include="Util\ClipboardAPI.cpp" />
     <ClCompile Include="Util\Debug\Debug.cpp" />
     <ClCompile Include="util\filesys.cpp" />
     <ClCompile Include="Util\hash.cpp" />
@@ -87,7 +86,6 @@
     <ClCompile Include="3rdparty\imgui\imgui_demo.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_draw.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.cpp" />
     <ClCompile Include="H2MOD\Modules\HudElements\HudElements.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.cpp" />
@@ -95,7 +93,7 @@
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\imgui_handler.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_Handler.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\MOTD.cpp" />
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
@@ -133,6 +131,13 @@
     <ClCompile Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.cpp" />
+    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui_tables.cpp" />
+    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="Util\ClipboardAPI.cpp" />
+    <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -348,7 +353,6 @@
     <ClInclude Include="3rdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.h" />
     <ClInclude Include="H2MOD\Modules\HudElements\HudElements.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.h" />
@@ -357,7 +361,7 @@
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
     <ClInclude Include="Blam\Engine\Game\GameOptions.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
-    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_handler.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Handler.h" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_screen_widget_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_definition.hpp" />
@@ -436,11 +440,28 @@
     <ClInclude Include="Blam\Math\real_vector3d.h" />
     <ClInclude Include="Blam\Engine\DataArray\TagDataIterator.h" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.h" />
+    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
+    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9anim.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9core.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9effect.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9math.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9mesh.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9shader.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9shape.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9tex.h" />
+    <ClInclude Include="3rdparty\directx\include\d3dx9xof.h" />
+    <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.h" />
+    <ClInclude Include="CartographerDllConf.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def" />
+    <None Include="3rdparty\directx\include\d3dx9math.inl" />
   </ItemGroup>
 </Project>

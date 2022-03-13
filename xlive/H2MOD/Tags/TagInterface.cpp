@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "TagInterface.h"
 
 tags::tag_instance* tags::get_tag_instances()
