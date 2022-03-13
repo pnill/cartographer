@@ -2689,7 +2689,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			scenery_name = 61,
 		};
 		e_value_type value_type;//0x4
-		enum class e_expression_type : __int16
+		enum class e_expression_type : unsigned __int16
 		{
 			primitive = FLAG(0),
 			user_function = FLAG(1),
