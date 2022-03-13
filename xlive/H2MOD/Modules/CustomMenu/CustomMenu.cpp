@@ -2,6 +2,7 @@
 
 #include "CustomMenu.h"
 #include "c_screen_with_menu.h"
+#include "c_brightness_menu.h"
 #include "CustomLanguage.h"
 #include "H2MOD\GUI\imgui_integration\imgui_handler.h"
 #include "H2MOD\Modules\Accounts\AccountCreate.h"
@@ -2610,9 +2611,9 @@ static bool CMButtonHandler_ToggleSkulls(int button_id) {
 		loadSkullLabel(button_id, true);
 	}
 	else if (button_id >= 0 && button_id < 15) {
-		BYTE& skull = *(BYTE*)((char*)H2BaseAddr + getSkullIndexOffset(button_id));
+		bool& skull = *(bool*)((char*)H2BaseAddr + getSkullIndexOffset(button_id));
 		skull = !skull;
-		loadSkullLabel(button_id, skull == 1);
+		loadSkullLabel(button_id, skull);
 	}
 	
 	return false;
@@ -3147,12 +3148,9 @@ int __cdecl CustomMenu_Credits(int a1) {
 	return CustomMenu_CallHead(a1, menu_vftable_1_Credits, menu_vftable_2_Credits, (DWORD)&CMButtonHandler_Credits, 16, 272);
 }
 
-extern void GSCustomMenuCall_Credits_();
-
 void GSCustomMenuCall_Credits() {
-	GSCustomMenuCall_Credits_();
-	//int WgitScreenfunctionPtr = (int)(CustomMenu_Credits);
-	//CallWgit(WgitScreenfunctionPtr);
+	int WgitScreenfunctionPtr = (int)(CustomMenu_Credits);
+	CallWgit(WgitScreenfunctionPtr);
 }
 
 #pragma endregion
@@ -4869,6 +4867,9 @@ void initGSCustomMenu() {
 	CMSetupVFTables_Guide();
 	
 	c_screen_with_menu::applyPatches();
+
+	// replace brightness menu for testing
+	replace_brightness_menu();
 }
 
 void deinitGSCustomMenu() {

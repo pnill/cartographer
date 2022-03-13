@@ -6,9 +6,16 @@
 
 BYTE* ui_memory_pool_allocate(int size, int a2)
 {
-	/* unk is not used, but def pushed on the stack */
+	/* unk is not used, but definitely pushed on the stack */
 	auto p_ui_memory_pool_allocate = Memory::GetAddress<BYTE*(__cdecl*)(int, int)>(0x20D2D8);
 	return p_ui_memory_pool_allocate(size, a2);
+}
+
+// 60B8C3
+int __cdecl unk_used_after_constructor(void* ui_memory, s_menu_input_unk_data* a2)
+{
+	auto p_unk_used_after_constructor = Memory::GetAddressRelative<int(__cdecl*)(void*, s_menu_input_unk_data*)>(0x60B8C3);
+	return p_unk_used_after_constructor(ui_memory, a2);
 }
 
 void __stdcall sub_2101a4_CMLTD_(int thisptr, int label_id, wchar_t* rtn_label, int label_menu_id);
