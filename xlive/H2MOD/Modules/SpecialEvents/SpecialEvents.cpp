@@ -339,9 +339,9 @@ namespace SpecialEvents
 		{
 			if (tag_loader::Map_exists("carto_shared"))
 			{
-				paddy_hat_datum = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\stpat_hat", blam_tag::tag_group_type::scenario, "carto_shared");
-				paddy_beard_datum = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\beard\\beard", blam_tag::tag_group_type::scenario, "carto_shared");
-				paddy_pot_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\pot_of_gold\\pot_of_gold", blam_tag::tag_group_type::scenario, "carto_shared");
+				paddy_hat_datum = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\stpat_hat", blam_tag::tag_group_type::scenery, "carto_shared");
+				paddy_beard_datum = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\beard\\beard", blam_tag::tag_group_type::scenery, "carto_shared");
+				paddy_pot_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\pot_of_gold\\pot_of_gold", blam_tag::tag_group_type::scenery, "carto_shared");
 				if (!DATUM_IS_NONE(paddy_hat_datum) && !DATUM_IS_NONE(paddy_beard_datum) && !DATUM_IS_NONE(paddy_pot_datum))
 				{
 					tag_loader::Load_tag(paddy_hat_datum, true, "carto_shared");
@@ -389,74 +389,40 @@ namespace SpecialEvents
 						beard->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 						beard->child_object.TagIndex = tag_loader::ResolveNewDatum(paddy_beard_datum);
 					}
+				
+
+					auto paddy_pot = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(tag_loader::ResolveNewDatum(paddy_pot_datum), true);
+					auto paddy_pot_model_datum = paddy_pot->objectTag.model.TagIndex;
+					auto paddy_pot_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(paddy_pot_model_datum, true);
+
+					auto ball_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\weapons\\multiplayer\\ball\\ball");
+					auto ball_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(ball_model_datum);
+					ball_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
+
+					auto bomb_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+					auto bomb_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(bomb_model_datum);
+					bomb_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
+
+					auto paddy_pot_render = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(paddy_pot_model->render_model.TagIndex, true);
+					auto pot_node = paddy_pot_render->nodes[0];
+					pot_node->default_rotation_k = -0.75;
+					pot_node->inverse_position_y = 0.07;
+					pot_node->inverse_position_z = -0.1;
+
+					auto ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
+					auto ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(ball_weapon_datum);
+
+					//Bounding Radius and Sweetener size
+					ball_weapon->bounding_radius = 0.3f;
+					ball_weapon->sweetener_size = s_weapon_group_definition::e_sweetener_size::medium;
+
+					auto bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+					auto bomb_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(bomb_weapon_datum);
+
+					//Bounding Radius and Sweetener size
+					bomb_weapon->bounding_radius = 0.3f;
+					bomb_weapon->sweetener_size = s_weapon_group_definition::e_sweetener_size::medium;
 				}
-
-				auto paddy_pot = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(tag_loader::ResolveNewDatum(paddy_pot_datum), true);
-				auto paddy_pot_model_datum = paddy_pot->objectTag.model.TagIndex;
-				auto paddy_pot_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(paddy_pot_model_datum, true);
-
-				auto ball_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\weapons\\multiplayer\\ball\\ball");
-				auto ball_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(ball_model_datum);
-				ball_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
-
-				auto bomb_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
-				auto bomb_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(bomb_model_datum);
-				bomb_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
-
-				auto paddy_pot_render = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(paddy_pot_model->render_model.TagIndex, true);
-				auto pot_node = paddy_pot_render->nodes[0];
-				pot_node->default_rotation_k = -0.75;
-				pot_node->inverse_position_y = 0.07;
-				pot_node->inverse_position_z = -0.1;
-
-				auto ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
-				char* ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(ball_weapon_datum);
-
-				//Bounding Radius and Sweetener size
-				//*((float*)ball_weapon + 0x4) = 0.3f;
-				//*((byte*)ball_weapon + 0x1A) = 1;
-
-				auto bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
-				char* bomb_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(bomb_weapon_datum);
-
-				//Bounding Radius and Sweetener size
-				//*((float*)bomb_weapon + 0x4) = 0.3f;
-				//*((byte*)bomb_weapon + 0x1A) = 1;
-
-				/*auto ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
-				char* ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(ball_weapon_datum);
-				if (ball_weapon != nullptr)
-				{
-					tags::tag_data_block* first_person_block = reinterpret_cast<tags::tag_data_block*>(ball_weapon + 0x2A8);
-					if (first_person_block->block_count > 0 && first_person_block->block_data_offset != -1)
-					{
-						char* first_person_data = tags::get_tag_data() + first_person_block->block_data_offset;
-						for (auto i = 0; i < first_person_block->block_count; i++)
-						{
-							tag_reference* fp_model = reinterpret_cast<tag_reference*>(first_person_data + (0x10 * i));
-							tag_reference* fp_anim = reinterpret_cast<tag_reference*>(first_person_data + (0x10 * i) + 8);
-							fp_model->TagIndex = paddy_pot_model->render_model.TagIndex;
-						}
-					}
-				}
-
-				auto bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
-				char* bomb_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, char>(bomb_weapon_datum);
-				if (bomb_weapon != nullptr)
-				{
-					tags::tag_data_block* first_person_block = reinterpret_cast<tags::tag_data_block*>(bomb_weapon + 0x2A8);
-					if (first_person_block->block_count > 0 && first_person_block->block_data_offset != -1)
-					{
-						char* first_person_data = tags::get_tag_data() + first_person_block->block_data_offset;
-						for (auto i = 0; i < first_person_block->block_count; i++)
-						{
-							tag_reference* fp_model = reinterpret_cast<tag_reference*>(first_person_data + (0x10 * i));
-							tag_reference* fp_anim = reinterpret_cast<tag_reference*>(first_person_data + (0x10 * i) + 8);
-							fp_model->TagIndex = paddy_pot_model->render_model.TagIndex;
-						}
-					}
-				}*/
-
 			}
 			else
 			{
