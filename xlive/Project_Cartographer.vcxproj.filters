@@ -138,6 +138,8 @@
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_brightness_menu.cpp" />
+    <ClCompile Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.cpp" />
+    <ClCompile Include="H2MOD\Modules\CustomMenu\c_account_list_menu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -456,6 +458,8 @@
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.h" />
     <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_brightness_menu.h" />
+    <ClInclude Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.h" />
+    <ClInclude Include="H2MOD\Modules\CustomMenu\c_account_list_menu.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

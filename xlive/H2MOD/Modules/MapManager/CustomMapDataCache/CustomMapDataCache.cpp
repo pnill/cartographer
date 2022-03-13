@@ -10,6 +10,8 @@
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
+#include "H2MOD/Modules/CustomMenu/c_list_widget.h"
+
 #pragma region 50 map limit removal
 
 // TODO: consider replacing this implementation with a linked list
@@ -846,9 +848,6 @@ public:
 		// here we replace the custom map list allocator
 		DWORD thisptr = (DWORD)this;
 
-		typedef s_data_array* (__cdecl* menu_list_allocate)(const char* data_name, int total_elements, int size);
-		auto p_menu_list_allocate = Memory::GetAddressRelative<menu_list_allocate>(0x60D1FD);
-
 		typedef int(__thiscall* sub_6113D3)(int* thisptr, DWORD* a2);
 		auto p_sub_6113D3 = Memory::GetAddressRelative<sub_6113D3>(0x6113D3);
 
@@ -860,7 +859,7 @@ public:
 
 		if (custom_map_available_count > 0)
 		{
-			*custom_map_menu_list = p_menu_list_allocate("custom game custom maps", custom_map_available_count, sizeof(s_custom_map_id));
+			*custom_map_menu_list = c_list_widget::allocate_list_data("custom game custom maps", custom_map_available_count, sizeof(s_custom_map_id));
 			s_data_array::data_make_valid(*custom_map_menu_list);
 			map_ids_buffer = new s_custom_map_id[custom_map_available_count];
 			getCustomMapData()->get_custom_map_list_ids(map_ids_buffer, custom_map_available_count);
