@@ -11,8 +11,6 @@ BYTE* ui_memory_pool_allocate(int size, int a2)
 	return p_ui_memory_pool_allocate(size, a2);
 }
 
-// ui_channels:
-// 1 - error dialog channel
 // 60B8C3
 int __cdecl ui_new_window(void* ui_buffer, s_new_ui_window_parameters* parameters)
 {

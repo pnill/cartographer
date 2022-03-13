@@ -17,11 +17,12 @@ enum e_widget_type
 class c_user_interface_widget
 {
 protected:
+	// void* vtbl;
 	int m_widget_type;
 	__int16 m_flags;
 	__int16 field_A;
 	int field_C;
-	int field_10;
+	int parent_widget;
 	int field_14;
 	int field_18;
 	int field_1C;

@@ -38,7 +38,7 @@ static void CM_AccountList_Setup_Buttons() {
 	add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0004), true);
 	add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount + 1, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0003), true);
 	add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount + 2, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0000), true);
-	add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount + 3, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0001), true);
+	add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount + 3, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0001 + (accountRemoveMode ? 1 : 0)), true);
 }
 
 void* __cdecl c_account_list_menu::open(s_new_ui_window_parameters* a1)
@@ -126,6 +126,8 @@ void c_account_edit_list::button_handler(int* a2, int* a3)
 	int parent_window_idx = this->get_top_most_parent_window_index();
 	int parent_window_ui_channel = this->get_top_most_parent_window_ui_channel();
 
+	bool close_parent_window = false;
+
 	s_new_ui_window_parameters new_ui_account_list_window;
 	new_ui_account_list_window.data_new(1 << *(int*)(*a2 + 4), parent_window_ui_channel, 4, c_account_list_menu::open);
 
@@ -141,9 +143,10 @@ void c_account_edit_list::button_handler(int* a2, int* a3)
 	}
 	else if (button_id == H2AccountCount + 3) { // account removal mode switch
 		//remove next selected account.
-		accountRemoveMode = !accountRemoveMode;
+		accountRemoveMode = !this->account_removal_mode;
 		add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount + 3, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0001 + (accountRemoveMode ? 1 : 0)), true);
-		new_ui_account_list_window.window_load_proc_exec();
+		new_ui_account_list_window.ui_window_load_proc_exec();
+		close_parent_window = true;
 	}
 	else if (H2AccountCount > 0 && button_id >= 0 && button_id < H2AccountCount) { // account selection (either for deletion or login)
 		if (this->account_removal_mode) {
@@ -152,34 +155,36 @@ void c_account_edit_list::button_handler(int* a2, int* a3)
 			CM_AccountList_Setup_Buttons();
 			// then re-open the menu
 			accountRemoveMode = false; // reset global accountRemove state
-			new_ui_account_list_window.window_load_proc_exec();
+			new_ui_account_list_window.ui_window_load_proc_exec();
 			H2AccountLastUsed = 0;
+			close_parent_window = true;
 		}
 		else if (hThreadLogin == INVALID_HANDLE_VALUE) {
 			c_account_list_menu::accountingGoBackToList = false;
 			c_account_list_menu::updateAccountingActiveHandle(true);
 			hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)button_id, 0, NULL);
 			c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
+			close_parent_window = true;
 		}
 	}
-	else if (button_id == H2AccountCount) { // offline button
-		if (!this->account_removal_mode) {
-			//play offline
-			BYTE abEnet[6];
-			BYTE abOnline[20];
-			XNetRandom(abEnet, 6);
-			XNetRandom(abOnline, 20);
-			if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, 6).c_str(), ByteToHexStr(abOnline, 20).c_str(), false)) {
-				//show select profile gui
-				extern int notify_xlive_ui;
-				notify_xlive_ui = 0;
-				H2Config_master_ip = inet_addr("127.0.0.1");
-				H2Config_master_port_relay = 2001;
-			}
+	else if (button_id == H2AccountCount) { // play offline button
+		BYTE abEnet[6];
+		BYTE abOnline[20];
+		XNetRandom(abEnet, 6);
+		XNetRandom(abOnline, 20);
+		accountRemoveMode = false;
+		if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, 6).c_str(), ByteToHexStr(abOnline, 20).c_str(), false)) {
+			//show select profile gui
+			extern int notify_xlive_ui;
+			notify_xlive_ui = 0;
+			H2Config_master_ip = inet_addr("127.0.0.1");
+			H2Config_master_port_relay = 2001;
+			close_parent_window = true;
 		}
 	}
 
-	ui_window_back_out(parent_window_ui_channel, parent_window_idx);
+	if (close_parent_window)
+		ui_window_back_out(parent_window_ui_channel, parent_window_idx);
 	return;
 }
 

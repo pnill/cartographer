@@ -4,6 +4,16 @@
 
 typedef void(__thiscall* button_handler_cb_t)(void* context, int a1, int* a2);
 
+enum e_ui_channel
+{
+	hardware_error = 0,
+	game_error = 1,
+	virtual_keyboard = 2,
+	gameshell_dialog = 3,
+	gameshell_screen = 5,
+	gameshell_background = 6,
+};
+
 struct __declspec(align(4)) s_new_ui_window_parameters
 {
 	void data_new(__int16 flags, int ui_channel, int a4, void* (__cdecl* ui_window_load_cb)(s_new_ui_window_parameters*))
@@ -17,7 +27,7 @@ struct __declspec(align(4)) s_new_ui_window_parameters
 		this->proc_ui_window_load_cb = ui_window_load_cb;
 	}
 
-	void* window_load_proc_exec()
+	void* ui_window_load_proc_exec()
 	{
 		return proc_ui_window_load_cb(this);
 	}
@@ -25,7 +35,7 @@ struct __declspec(align(4)) s_new_ui_window_parameters
 	DWORD flags;
 	DWORD ui_channel;
 	int field_8;
-	DWORD default_list_selection_index;
+	DWORD context; // this might be wrong, but it looks like it holds window context data
 	DWORD field_10;
 	DWORD field_14;
 	DWORD field_18;
