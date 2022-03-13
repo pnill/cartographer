@@ -6,15 +6,24 @@
 
 BYTE* ui_memory_pool_allocate(int size, int a2)
 {
-	/* unk is not used, but def pushed on the stack */
+	/* unk is not used, but definitely pushed on the stack */
 	auto p_ui_memory_pool_allocate = Memory::GetAddress<BYTE*(__cdecl*)(int, int)>(0x20D2D8);
 	return p_ui_memory_pool_allocate(size, a2);
 }
 
-void __stdcall sub_2101a4_CMLTD_(int thisptr, int label_id, wchar_t* rtn_label, int label_menu_id);
-void __stdcall sub_21bf85_CMLTD_(int thisptr, int label_id, int label_menu_id);
-char __stdcall sub_21bb0b_CMLTD_(void* thisptr, __int16 a2, int* aa3, int label_menu_id, int label_id_description);
-void __cdecl sub_3e3ac_CMLTD_(int a1, int label_id, wchar_t* rtn_label, int label_menu_id);
+// 60B8C3
+int __cdecl user_interface_register_screen_to_channel(void* ui_buffer, s_new_ui_screen_parameters* parameters)
+{
+	auto p_user_interface_register_screen_to_channel = Memory::GetAddressRelative<int(__cdecl*)(void*, s_new_ui_screen_parameters*)>(0x60B8C3);
+	return p_user_interface_register_screen_to_channel(ui_buffer, parameters);
+}
+
+// 60B8C3
+int __cdecl user_interface_back_out_from_channel(int ui_channel, int window_idx)
+{
+	auto p_user_interface_back_out_from_channel = Memory::GetAddressRelative<int(__cdecl*)(int, int)>(0x6096DA);
+	return p_user_interface_back_out_from_channel(ui_channel, window_idx);
+}
 
 std::chrono::time_point<std::chrono::high_resolution_clock> lastOuterMenuUse_;
 int lastOuterMenuFuncPtr_ = 0;
@@ -219,7 +228,7 @@ void* __stdcall sub_20f8ae_CMLTD_(void* thisptr, __int16 a2, int* a3, int label_
 	{
 		*(BYTE*)(v5 + 108) = 1;
 		sub_21208E(v3, v5);
-		sub_21bb0b_CMLTD_(v7, a2, a3, label_menu_id, label_id_description);
+		sub_21bb0b_CMLTD(v7, a2, a3, label_menu_id, label_id_description);
 	}
 	return v7;
 }
@@ -278,7 +287,7 @@ char __stdcall sub_21bb0b_CMLTD_(void* thisptr, __int16 a2, int* aa3, int label_
 	v19[1] = v9;
 	v19[2] = v10;
 	//sub_2101a4(v4, *(DWORD *)(a3 + 36), v20);//description label_id 2nd par
-	sub_2101a4_CMLTD_(v4, label_id_description, v20, label_menu_id);
+	sub_2101a4_CMLTD(v4, label_id_description, v20, label_menu_id);
 	sub_2116D2(v3, (int)&aa3[7]);
 	v11 = (void *)(*(int(__thiscall **)(int))(*(DWORD *)v3 + 76))(v3);
 	sub_22DF53(v11, v20, -1, v8, (int)v19, v6, -1, v18, -1);
@@ -632,25 +641,6 @@ int __stdcall sub_2107df_CMLTD_(int thisptr, int* a2, char a3, int label_menu_id
 	return result;
 }
 
-void __cdecl sub_3e3ac_CMLTD_(int a1, int label_id, wchar_t* rtn_label, int label_menu_id)
-{
-	int(__cdecl* sub_381fd)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x381fd);
-	void(__thiscall* sub_3e332)(int, int, wchar_t*, int, int) = (void(__thiscall*)(int, int, wchar_t*, int, int))((char*)H2BaseAddr + 0x3e332);
-
-	if (a1 != -1) {
-		int v3 = sub_381fd();
-		char* v4 = &tags::get_tag_data()[tags::get_tag_instances()[a1 & 0xFFFF].data_offset];
-
-		sub_3e332(
-			(int)tags::get_matg_globals_ptr() + 28 * (v3 + 14),
-			label_id,
-			rtn_label,
-			label_menu_id,//*(WORD*)(v4 + 4 * (v3 + 14) - 40),
-			*(WORD*)(v4 + 4 * (v3 + 14) - 38));
-	}
-}
-
-
 char __stdcall sub_20fd41_CMLTD_(void* thisptr, int label_menu_id, int label_id_title)
 {
 	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
@@ -762,7 +752,7 @@ char __stdcall sub_20fd41_CMLTD_(void* thisptr, int label_menu_id, int label_id_
 				}
 
 				//sub_21bf85(v11, *(DWORD*)(v17 + 0x2C)); //title label_id
-				sub_21bf85_CMLTD_(v11, label_id_title, label_menu_id);
+				set_widget_label_from_string_id_reimpl(v11, label_id_title, label_menu_id);
 
 				v14 = (*(int(__thiscall**)(DWORD))(v112))(v11);
 				v15 = (*(wchar_t*(__thiscall**)(int))(*(DWORD*)v14 + 0xC))(v14);
@@ -783,7 +773,7 @@ char __stdcall sub_20fd41_CMLTD_(void* thisptr, int label_menu_id, int label_id_
 	return result;
 }
 
-char __stdcall sub_210a44_CMLTD_(int thisptr, int a2, int* a3, int label_menu_id, int label_id_title, int label_id_description)
+char __stdcall sub_210a44_CMLTD(int thisptr, int a2, int* a3, int label_menu_id, int label_id_title, int label_id_description)
 {
 	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
 
@@ -851,12 +841,12 @@ char __stdcall sub_210a44_CMLTD_(int thisptr, int a2, int* a3, int label_menu_id
 	return result;
 }
 
-int __stdcall sub_2111ab_CMLTD_(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description)
+int __stdcall sub_2111ab_CMLTD(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description)
 {
-	int(__cdecl* sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
+	int(__cdecl * sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
 	//int(__thiscall* sub_210a44)(int, int, int*) = (int(__thiscall*)(int, int, int*))((char*)H2BaseAddr + 0x210a44);
-	int(__cdecl* sub_239623)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x239623);
-	int(__thiscall* sub_211e23)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x211e23);
+	int(__cdecl * sub_239623)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x239623);
+	int(__thiscall * sub_211e23)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x211e23);
 
 	int v2 = thisptr;
 	int v3 = sub_20c701(*(DWORD*)(thisptr + 0x70));
@@ -871,7 +861,7 @@ int __stdcall sub_2111ab_CMLTD_(int thisptr, int a2, int label_menu_id, int labe
 	var68[5] = 0;
 
 	memset(&var68[6], 0, 0x50u);
-	sub_210a44_CMLTD_(v2, v3, var68, label_menu_id, label_id_title, label_id_description);
+	sub_210a44_CMLTD(v2, v3, var68, label_menu_id, label_id_title, label_id_description);
 	int v6 = sub_20c701(*(DWORD*)(v2 + 0x70));
 
 	if (v6 != -1)
@@ -891,12 +881,48 @@ int __stdcall sub_2111ab_CMLTD_(int thisptr, int a2, int label_menu_id, int labe
 	return sub_211e23(v2);
 }
 
-
-
-void __stdcall sub_2101a4_CMLTD_(int thisptr, int label_id, wchar_t* rtn_label, int label_menu_id)
+void __stdcall set_widget_label_from_string_id_reimpl(int thisptr, int label_id, int label_menu_id)
 {
-	int(__cdecl* sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
-	int(__cdecl* sub_15C9623)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x239623);
+	int(__thiscall * sub_391BA1)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x211ba1);
+	void(__thiscall * sub_2101a4)(int, int, wchar_t*) = (void(__thiscall*)(int, int, wchar_t*))((char*)H2BaseAddr + 0x2101a4);
+
+	int v2 = thisptr;
+	if (label_id != -1) {
+		int v3 = sub_391BA1(thisptr);
+
+		if (v3) {
+			wchar_t tmp[512];
+
+			sub_2101a4_CMLTD(v3, label_id, tmp, label_menu_id);
+
+			int v4 = (*(int(__thiscall**)(int))(*(DWORD*)v2 + 76))(v2);
+			(*(int(__thiscall**)(int, int))(*(DWORD*)v4 + 4))(v4, (int)tmp);
+		}
+	}
+}
+
+void __cdecl sub_3e3ac_CMLTD(int a1, int label_id, wchar_t* rtn_label, int label_menu_id)
+{
+	int(__cdecl * sub_381fd)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x381fd);
+	void(__thiscall * sub_3e332)(int, int, wchar_t*, int, int) = (void(__thiscall*)(int, int, wchar_t*, int, int))((char*)H2BaseAddr + 0x3e332);
+
+	if (a1 != -1) {
+		int v3 = sub_381fd();
+		char* v4 = &tags::get_tag_data()[tags::get_tag_instances()[a1 & 0xFFFF].data_offset];
+
+		sub_3e332(
+			(int)tags::get_matg_globals_ptr() + 28 * (v3 + 14),
+			label_id,
+			rtn_label,
+			label_menu_id,//*(WORD*)(v4 + 4 * (v3 + 14) - 40),
+			*(WORD*)(v4 + 4 * (v3 + 14) - 38));
+	}
+}
+
+void __stdcall sub_2101a4_CMLTD(int thisptr, int label_id, wchar_t* rtn_label, int label_menu_id)
+{
+	int(__cdecl * sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
+	int(__cdecl * sub_15C9623)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x239623);
 	//void(__cdecl* sub_3e3ac)(int, int, wchar_t*) = (void(__cdecl*)(int, int, wchar_t*))((char*)H2BaseAddr + 0x3e3ac);
 
 	*rtn_label = 0;
@@ -906,29 +932,674 @@ void __stdcall sub_2101a4_CMLTD_(int thisptr, int label_id, wchar_t* rtn_label, 
 		if (v3 != -1) {
 			int v4 = sub_15C9623(v3);
 			if (v4) {
-				sub_3e3ac_CMLTD_(*(DWORD*)(v4 + 28), label_id, rtn_label, label_menu_id);
+				sub_3e3ac_CMLTD(*(DWORD*)(v4 + 28), label_id, rtn_label, label_menu_id);
 			}
 		}
 	}
 }
 
+int __stdcall sub_23ae3c_CMLTD(void* thisptr, int label_menu_id, int label_id_title, int label_id_description) {
 
-void __stdcall sub_21bf85_CMLTD_(int thisptr, int label_id, int label_menu_id)
+	int(__thiscall * sub_211973)(int, unsigned __int16) = (int(__thiscall*)(int, unsigned __int16))((char*)H2BaseAddr + 0x211973);
+	void(__thiscall * sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21BF85);
+	void(__thiscall * sub_21BA2A)(int) = (void(__thiscall*)(int))((char*)H2BaseAddr + 0x21BA2A);
+
+	int v1 = (int)thisptr;
+	int v2 = sub_211973((int)thisptr, 3u);
+	//switch (*(DWORD*)(v1 + 2652))//gets the menu_type_id
+	set_widget_label_from_string_id_reimpl(v1 + 128, label_id_title, label_menu_id);
+	if (v2)
+		set_widget_label_from_string_id_reimpl(v2, label_id_description, label_menu_id);
+	int v5 = sub_211973(v1, 2u);
+	sub_21BA2A(v5);//*(BYTE*)(v5 + 116) = 1;
+	return (*(int(__thiscall**)(int, int))(*(DWORD*)v1 + 36))(v1, v1 + 13432);
+}
+
+int __stdcall sub_23bf3e_CMLTD(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description)
 {
-	int(__thiscall* sub_391BA1)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x211ba1);
-	void(__thiscall* sub_2101a4)(int, int, wchar_t*) = (void(__thiscall*)(int, int, wchar_t*))((char*)H2BaseAddr + 0x2101a4);
+	int(__cdecl * sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
+	//int(__thiscall* sub_210a44)(int, int, int*) = (int(__thiscall*)(int, int, int*))((char*)H2BaseAddr + 0x210a44);
+	int(__thiscall * sub_211e23)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x211e23);
 
-	int v2 = thisptr;
-	if (label_id != -1) {
-		int v3 = sub_391BA1(thisptr);
+	void(__thiscall * sub_23BBBE)(void*, void*, int) = (void(__thiscall*)(void*, void*, int))((char*)H2BaseAddr + 0x23BBBE);
+	//int(__thiscall* sub_23AE3C)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x23AE3C);
 
-		if (v3) {
-			wchar_t tmp[512];
+	void* dword_3D2E38 = (void*)(H2BaseAddr + 0x3D2E38);
+	void* dword_3D2A78 = (void*)(H2BaseAddr + 0x3D2A78);
+	void* dword_3D2CB8 = (void*)(H2BaseAddr + 0x3D2CB8);
+	void* dword_3D2B38 = (void*)(H2BaseAddr + 0x3D2B38);
+	BYTE* byte_3D2F30 = (BYTE*)((char*)H2BaseAddr + 0x3D2F30);
 
-			sub_2101a4_CMLTD_(v3, label_id, tmp, label_menu_id);
+	int* v2; // esi
+	int v3; // edi
+	unsigned int v4; // eax
+	int v5; // ecx
+	int result; // eax
+	int v7[80];
+	int v14[47]; // [esp+74h] [ebp-BCh]
 
-			int v4 = (*(int(__thiscall **)(int))(*(DWORD*)v2 + 76))(v2);
-			(*(int(__thiscall **)(int, int))(*(DWORD*)v4 + 4))(v4, (int)tmp);
+	v2 = (int*)thisptr;
+	v3 = sub_20c701(((int*)thisptr)[28]);
+	if (v3 != -1)
+	{
+		v7[0] = 0;
+		v7[1] = 1;
+		v7[2] = 47;
+		v7[3] = (int)v14;
+		v7[4] = 0;
+		v7[5] = 0;
+		memset(&v7[6], 0, 80);
+		v4 = 0;
+		v5 = (int)(v2 + 798);
+		do
+		{
+			v14[v4++] = v5;
+			v5 += 256;
+		} while (v4 < 0x2F);
+		sub_210a44_CMLTD((int)v2, v3, v7, label_menu_id, label_id_title, label_id_description);
+	}
+	sub_211e23((int)v2);
+	sub_23BBBE(v2, dword_3D2E38, 47);
+	sub_23BBBE(v2, dword_3D2A78, 47);
+	sub_23BBBE(v2, dword_3D2CB8, 47);
+	sub_23BBBE(v2, dword_3D2B38, 47);
+	result = sub_23ae3c_CMLTD(v2, label_menu_id, label_id_title, label_id_description);
+	int VKbMenuTypeDefault = v2[663];
+	int VKbMenuTypeNew = v2[663] + VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX;
+	//"SYMBOLS" AND "ACCENTS" buttons are greyed out by default
+	if (byte_3D2F30[8 * VKbMenuTypeDefault] & 0xA)
+	{
+		*((BYTE*)v2 + 14566) = 0;//disables "SYMBOLS" button from being highlightable
+		*((BYTE*)v2 + 14310) = 0;//disables "ACCENTS" button from being highlightable
+	}
+	else
+	{
+		*((BYTE*)v2 + 15078) = 0;//enable "SYMBOLS" button style
+		*((BYTE*)v2 + 14822) = 0;//enable "ACCENTS" button style
+	}
+	return result;
+}
+
+
+
+char __stdcall sub_21bb0b_CMLTD(void* thisptr, __int16 a2, int* aa3, int label_menu_id, int label_id_description)
+{
+	int(__thiscall * sub_211BA1)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x211BA1);
+	//void(__thiscall* sub_2101a4)(int, int, wchar_t*) = (void(__thiscall*)(int, int label_id, wchar_t* rtn_label))((char*)H2BaseAddr + 0x2101A4);
+	int(__thiscall * sub_2116D2)(int, int) = (int(__thiscall*)(int, int))((char*)H2BaseAddr + 0x2116D2);
+	int(__thiscall * sub_22DF53)(void*, wchar_t*, int, int, int, __int16, int, int, int) = (int(__thiscall*)(void*, wchar_t*, int, int, int, __int16, int, int, int))((char*)H2BaseAddr + 0x22DF53);
+	int(*sub_20BB89)() = (int(*)())((char*)H2BaseAddr + 0x20BB89);
+	char(__cdecl * sub_99D1F)(int, int) = (char(__cdecl*)(int, int))((char*)H2BaseAddr + 0x99D1F);
+
+	int a3 = (int)aa3;
+	int v3; // esi@1
+	int v4; // eax@1
+	int v5; // edx@1
+	__int16 v6; // bx@1
+	bool v7; // zf@1
+	int v8; // ebp@6
+	int v9; // ecx@8
+	int v10; // edx@8
+	void* v11; // eax@8
+	int v12; // edi@9
+	__int16 v13; // bx@9
+	int v14; // ST30_4@10
+	int v15; // eax@12
+	int v16; // eax@12
+	int v18; // [sp+10h] [bp-414h]@2
+	int v19[3]; // [sp+14h] [bp-410h]@8
+	wchar_t v20[512]; // [sp+20h] [bp-404h]@1
+
+	v3 = (int)thisptr;
+	v4 = sub_211BA1((int)thisptr);
+	*(WORD*)(v3 + 10) = a2;
+	*(DWORD*)(v3 + 112) = *(WORD*)(a3 + 6);
+	v5 = *(DWORD*)a3;
+	v6 = 0;
+	v7 = (*(DWORD*)a3 & 1) == 0;
+	v20[0] = 0;
+	if (v7)
+		v18 = 2 - ((v5 & 2) != 0);
+	else
+		v18 = 0;
+	if (v5 & 4)
+		v6 = 1;
+	*(WORD*)(v3 + 104) = *(WORD*)(a3 + 4) - 1;
+	*(WORD*)(v3 + 106) = *(WORD*)(a3 + 40);
+	v8 = 1;
+	if (!(*(BYTE*)a3 & 8))
+		v8 = *(WORD*)(a3 + 10);
+	v9 = *(DWORD*)(a3 + 20);
+	v19[0] = *(DWORD*)(a3 + 16);
+	v10 = *(DWORD*)(a3 + 24);
+	v19[1] = v9;
+	v19[2] = v10;
+	//sub_2101a4(v4, *(DWORD *)(a3 + 36), v20);//description label_id 2nd par
+	sub_2101a4_CMLTD(v4, label_id_description, v20, label_menu_id);
+	sub_2116D2(v3, (int)&aa3[7]);
+	v11 = (void*)(*(int(__thiscall**)(int))(*(DWORD*)v3 + 76))(v3);
+	sub_22DF53(v11, v20, -1, v8, (int)v19, v6, -1, v18, -1);
+	if (*(BYTE*)a3 & 8)
+	{
+		v12 = sub_20BB89();
+		v13 = *(WORD*)((*(int(__thiscall**)(int))(*(DWORD*)v3 + 76))(v3) + 20) | 4;
+		*(WORD*)((*(int(__thiscall**)(DWORD))(*(DWORD*)v3 + 76))(v3) + 20) = v13;
+		if (v12)
+		{
+			v14 = *(DWORD*)(v12 + 76);
+			*(DWORD*)((*(int(__thiscall**)(DWORD))(*(DWORD*)v3 + 76))(v3) + 32) = v14;
+		}
+		*(WORD*)((*(int(__thiscall**)(DWORD))(*(DWORD*)v3 + 76))(v3) + 60) = 0;
+	}
+	v15 = (*(int(__thiscall**)(DWORD))(*(DWORD*)v3 + 76))(v3);
+	v16 = (*(int(__thiscall**)(int))(*(DWORD*)v15 + 12))(v15);
+	return sub_99D1F(v16, v8);
+}
+
+void* __stdcall sub_20f8ae_CMLTD(void* thisptr, __int16 a2, int* a3, int label_menu_id, int label_id_description)
+{
+	void* (__thiscall * sub_20F576)(void*, int) = (void* (__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20F576);
+	void* (__thiscall * sub_20F65D)(void*, __int16) = (void* (__thiscall*)(void*, __int16))((char*)H2BaseAddr + 0x20F65D);
+	int(__thiscall * sub_21208E)(void*, int) = (int(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x21208E);
+	//char(__thiscall* sub_21bb0b)(void*, __int16, int*) = (char(__thiscall*)(void*, __int16, int*))((char*)H2BaseAddr + 0x21bb0b);
+
+	void* v3; // edi@1
+	int v4; // eax@2
+	int v5; // eax@3
+	int v6; // eax@4
+	void* v7; // esi@7
+
+	v3 = thisptr;
+	v5 = 0;
+	if (*(BYTE*)a3 & 0x10)
+	{
+		v4 = (int)ui_memory_pool_allocate(252, 0);
+		if (v4)
+		{
+			v5 = (int)sub_20F576((void*)v4, *((WORD*)v3 + 4));
 		}
 	}
+	else
+	{
+		v6 = (int)ui_memory_pool_allocate(1212, 0);
+		if (v6)
+		{
+			v5 = (int)sub_20F65D((void*)v6, *((WORD*)v3 + 4));
+		}
+	}
+	v7 = (void*)v5;
+	if (v5)
+	{
+		*(BYTE*)(v5 + 108) = 1;
+		sub_21208E(v3, v5);
+		sub_21bb0b_CMLTD(v7, a2, a3, label_menu_id, label_id_description);
+	}
+	return v7;
 }
+
+int __stdcall sub_20fb1b_CMLTD(void* thisptr, int label_menu_id, int label_id_description)
+{
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+
+	int(__thiscall * sub_20F815)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x20F815);
+	int(__thiscall * sub_20E8C9)(void*, int) = (int(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20E8C9);
+	int(__thiscall * sub_212604)(int, int) = (int(__thiscall*)(int, int))((char*)H2BaseAddr + 0x212604);
+	int(__thiscall * sub_20E9CE)(void*, int) = (int(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20E9CE);
+	int(__thiscall * sub_20EA52)(void*, int, int) = (int(__thiscall*)(void*, int, int))((char*)H2BaseAddr + 0x20EA52);
+	//void*(__thiscall* sub_20f8ae)(void*, __int16, int*) = (void*(__thiscall*)(void*, __int16, int*))((char*)H2BaseAddr + 0x20f8ae);
+	int(__thiscall * sub_20E94D)(void*, int) = (int(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20E94D);
+
+	BYTE* v1; // esi@1
+	int v2; // ebx@1
+	unsigned int v3; // edi@5
+	int v4; // ebp@6
+	int v5; // ecx@7
+	int v6; // eax@7
+	int v7; // eax@9
+	int v8; // esi@9
+	unsigned int v9; // edi@14
+	int v10; // ebp@15
+	int v11; // ecx@17
+	int v12; // eax@17
+	int v13; // esi@19
+	int v14; // ebp@24
+	int v15; // ecx@26
+	int v16; // eax@26
+	int v17; // ebp@28
+	int i; // edi@28
+	int v19; // esi@29
+	bool v20; // sf@34
+	//unsigned __int8 v21; // of@34
+	unsigned int v22; // esi@35
+	int v23; // edi@36
+	int v24; // ecx@37
+	int v25; // eax@37
+	void* v26; // eax@39
+	unsigned int v27; // edi@43
+	int v28; // ecx@45
+	int v29; // eax@45
+	int v30; // eax@47
+	int v31; // esi@47
+	char v33; // [sp+Bh] [bp-Dh]@3
+	BYTE* v34; // [sp+Ch] [bp-Ch]@1
+	int v35; // [sp+10h] [bp-8h]@24
+	int v36; // [sp+10h] [bp-8h]@44
+	int v37; // [sp+14h] [bp-4h]@25
+
+	v1 = (BYTE*)thisptr;
+	v34 = (BYTE*)thisptr;
+	v2 = sub_20F815((int)thisptr);//thisptr is from beginning :)
+	if (v2)
+	{
+		if ((v1[66] >> 1) & 1 || (v33 = 0, v1[66] & 1))
+			v33 = 1;
+		v3 = 0;
+		if (*(DWORD*)(v2 + 36) > 0)
+		{
+			v4 = 0;
+			do
+			{
+				v5 = *(DWORD*)(v2 + 40);
+				v6 = 0;
+				if (v5 != -1)
+					v6 = dword_482290 + v5;
+				v7 = sub_20E8C9(v1, v4 + v6);
+				v8 = v7;
+				if (v7)
+				{
+					if (v33)
+						sub_212604(v7, *((DWORD*)v34 + 13));
+					*(WORD*)(v8 + 10) = v3;
+				}
+				v1 = v34;
+				++v3;
+				v4 += 56;
+			} while (v3 < *(DWORD*)(v2 + 36));
+		}
+		v9 = 0;
+		if (*(DWORD*)(v2 + 60) > 0)
+		{
+			v10 = 0;
+			while (1)
+			{
+				v11 = *(DWORD*)(v2 + 64);
+				v12 = 0;
+				if (v11 != -1)
+					v12 = v11 + dword_482290;
+				v13 = sub_20E9CE(v1, v12 + v10);
+				if (v13)
+				{
+					if (v33)
+						sub_212604(v13, *((DWORD*)v34 + 13));
+					*(WORD*)(v13 + 10) = v9;
+				}
+				++v9;
+				v10 += 36;
+				if (v9 >= *(DWORD*)(v2 + 60))
+					break;
+				v1 = v34;
+			}
+		}
+		v14 = 0;
+		v35 = 0;
+		if (*(DWORD*)(v2 + 68) > 0)
+		{
+			v37 = 0;
+			bool varesult = 0;
+			do
+			{
+				v15 = *(DWORD*)(v2 + 72);
+				v16 = 0;
+				if (v15 != -1)
+					v16 = dword_482290 + v15;
+				v17 = v16 + v14;
+				for (i = 0; i < *(BYTE*)(v17 + 17); ++i)
+				{
+					v19 = sub_20EA52(v34, i, v17);
+					if (v19)
+					{
+						if (v33)
+							sub_212604(v19, *((DWORD*)v34 + 13));
+						*(WORD*)(v19 + 10) = v35;
+					}
+				}
+				v14 = v37 + 24;
+
+				//varesult = __OFSUB__(v35 + 1, *(DWORD*)(v2 + 68));
+
+				int va1 = v35 + 1;
+				int va2 = *(DWORD*)(v2 + 68);
+				int vreax;
+				varesult = 0;
+				__asm {
+					//save register
+					mov vreax, eax
+
+					mov eax, va1
+					cmp eax, va2
+					//jump if Overflow Flag is not set.
+					JNO toEnd
+					mov al, 1
+					mov varesult, al
+
+					toEnd :
+					//restore original register
+					mov eax, vreax
+				}
+
+				v20 = v35++ + 1 - *(DWORD*)(v2 + 68) < 0;
+				v37 += 24;
+			} while (v20 ^ varesult);
+		}
+		v22 = 0;
+		if (*(DWORD*)(v2 + 28) > 0)
+		{
+			v23 = 0;
+			do
+			{
+				v24 = *(DWORD*)(v2 + 32);
+				v25 = 0;
+				if (v24 != -1)
+					v25 = dword_482290 + v24;
+				v26 = sub_20f8ae_CMLTD(v34, v22, (int*)(v23 + v25), label_menu_id, label_id_description);//(int*)(v23 + v25) contains description
+				if (v26 && v33)
+					sub_212604((int)v26, *((DWORD*)v34 + 13));
+				++v22;
+				v23 += 44;
+			} while (v22 < *(DWORD*)(v2 + 28));
+		}
+		v27 = 0;
+		if (*(DWORD*)(v2 + 44) <= 0)
+		{
+			v1 = v34;
+		}
+		else
+		{
+			v36 = 0;
+			do
+			{
+				v28 = *(DWORD*)(v2 + 48);
+				v29 = 0;
+				if (v28 != -1)
+					v29 = dword_482290 + v28;
+				v30 = sub_20E94D(v34, v29 + v36);
+				v31 = v30;
+				if (v30)
+				{
+					if (v33)
+						sub_212604(v30, *((DWORD*)v34 + 13));
+					*(WORD*)(v31 + 10) = v27;
+				}
+				v36 += 76;
+				++v27;
+			} while (v27 < *(DWORD*)(v2 + 44));
+			v1 = v34;
+		}
+	}
+	return (*(int(__thiscall**)(BYTE*))(*(DWORD*)v1 + 96))(v1);
+}
+
+int __stdcall sub_2107df_CMLTD(int thisptr, int* a2, char a3, int label_menu_id, int label_id_description)
+{
+	int(__cdecl * sub_20C701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20C701);
+	int(__cdecl * sub_239623)(unsigned __int16) = (int(__cdecl*)(unsigned __int16))((char*)H2BaseAddr + 0x239623);
+	int(__thiscall * sub_20F815)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x20F815);
+	int(__thiscall * sub_21208E)(void*, int) = (int(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x21208E);
+	int(__thiscall * sub_214990)(void*, char) = (int(__thiscall*)(void*, char))((char*)H2BaseAddr + 0x214990);
+	int(__thiscall * sub_2113D3)(void*, int) = (int(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x2113D3);
+	//int(__thiscall* sub_20fb1b)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x20fb1b);
+	int(__cdecl * sub_20F402)(void*, int) = (int(__cdecl*)(void*, int))((char*)H2BaseAddr + 0x20F402);
+
+	int* v3; // edi@1
+	int v4; // esi@1
+	int result; // eax@2
+	int v6; // ebp@4
+	int v7; // eax@4
+	int v8; // ebx@6
+	unsigned int v9; // ebp@9
+	int v10; // eax@10
+	bool v11; // zf@10
+	int* v12; // eax@10
+	void* v13; // edi@14
+	int v14; // ecx@17
+	int v15; // eax@17
+	int v16; // ebx@18
+	int v17; // ebp@20
+	int v18; // ecx@23
+	int v19; // [sp+Ch] [bp+4h]@4
+
+	v3 = a2;
+	v4 = thisptr;
+	if (a3
+		|| (result = *(WORD*)(thisptr + 2552), (signed __int16)result >= 0)
+		&& (result = (signed __int16)result, (signed __int16)result < a2[1]))
+	{
+		v6 = 0;
+		v19 = 0;
+		v7 = sub_20C701(*(DWORD*)(thisptr + 112));
+		if (v7 != -1)
+		{
+			v19 = sub_239623(v7);
+			v6 = v19;
+		}
+		result = sub_20F815(v4);
+		v8 = result;
+		if (v6)
+		{
+			if (result)
+			{
+				*(WORD*)(v4 + 104) = *(WORD*)(result + 2) - 1;
+				if (a3)
+				{
+					v9 = 0;
+					if (*(DWORD*)(result + 4) > 0)
+					{
+						do
+						{
+							v10 = v3[4 * *(WORD*)(v4 + 2552) + 3];
+							v11 = *(DWORD*)(v10 + 4 * v9) == 0;
+							v12 = (int*)(v10 + 4 * v9);
+							if (v11)
+								break;
+							sub_21208E((void*)v4, *v12);
+							DWORD aa = **(DWORD**)(v3[4 * *(WORD*)(v4 + 2552) + 3] + 4 * v9++) + 84;
+							//(*(void(**)(void))(aa))();
+							(*(int(__thiscall**)(int))(aa))(*v12);//wasn't able to trigger and check but assume works due to similar case below.
+						} while (v9 < *(DWORD*)(v8 + 4));
+					}
+					if (*(DWORD*)(v8 + 12) > 0)
+					{
+						sub_21208E((void*)v4, v3[4 * (*(WORD*)(v4 + 2552) + 1)]);
+						sub_214990((void*)v3[4 * (*(WORD*)(v4 + 2552) + 1)], a3);
+						if (*(BYTE*)v19 & 2)
+						{
+							*(BYTE*)(v3[4 * (*(WORD*)(v4 + 2552) + 1)] + 166) = 1;
+							v13 = (void*)(v3[4 * (*(WORD*)(v4 + 2552) + 1)] + 168);
+							if (v4 == -2628)
+							{
+								sub_2113D3(v13, 0);
+								result = sub_20fb1b_CMLTD((void*)0xFFFFF5BC, label_menu_id, label_id_description);
+							}
+							else
+							{
+								sub_2113D3(v13, v4 + 2632);
+								result = sub_20fb1b_CMLTD((void*)v4, label_menu_id, label_id_description);
+							}
+							return result;
+						}
+					}
+					return sub_20fb1b_CMLTD((void*)v4, label_menu_id, label_id_description);
+				}
+				v14 = (int)&v3[4 * *(WORD*)(v4 + 2552)];
+				v15 = *(DWORD*)(v14 + 8);
+				if (v15 <= 0)
+				{
+					v18 = *(DWORD*)(v14 + 16);
+					if (v18)
+					{
+						sub_21208E((void*)v4, v18);
+						sub_214990((void*)v3[4 * (*(WORD*)(v4 + 2552) + 1)], 0);
+						if (*(BYTE*)v6 & 2)
+						{
+							*(BYTE*)(v3[4 * (*(WORD*)(v4 + 2552) + 1)] + 166) = 1;
+							sub_20F402((void*)(v3[4 * (*(WORD*)(v4 + 2552) + 1)] + 168), v4 + 2628);
+						}
+					}
+					return sub_20fb1b_CMLTD((void*)v4, label_menu_id, label_id_description);
+				}
+				v16 = *(DWORD*)(v8 + 4);
+				if (v16 > v15)
+					v16 = *(DWORD*)(v14 + 8);
+				v17 = 0;
+				if (v16 <= 0)
+					return sub_20fb1b_CMLTD((void*)v4, label_menu_id, label_id_description);
+				do
+				{
+					sub_21208E((void*)v4, *(DWORD*)(v3[4 * *(WORD*)(v4 + 0x9F8) + 3] + 4 * v17));
+					v10 = v3[4 * *(WORD*)(v4 + 2552) + 3];
+					DWORD* ab = (DWORD*)(v10 + 4 * v17++);
+					if (*ab == 0)
+						break;
+					DWORD aa = **(DWORD**)ab + 84;
+					(*(int(__thiscall**)(int))(aa))(*ab);
+				} while (v17 < v16);
+				result = sub_20fb1b_CMLTD((void*)v4, label_menu_id, label_id_description);
+			}
+		}
+	}
+	return result;
+}
+
+char __stdcall sub_20fd41_CMLTD(void* thisptr, int label_menu_id, int label_id_title)
+{
+	int dword_482290 = *(int*)((char*)H2BaseAddr + 0x482290);
+
+	int(__cdecl * sub_20bb89)() = (int(__cdecl*)())((char*)H2BaseAddr + 0x20bb89);
+	int(__cdecl * sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
+	int(__cdecl * sub_239623)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x239623);
+	int(__thiscall * sub_21208e)(int, int) = (int(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21208e);
+	void(__thiscall * sub_21bf85)(int, int) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+	int(__cdecl * sub_4bd27)(wchar_t*, wchar_t*, int) = (int(__cdecl*)(wchar_t*, wchar_t*, int))((char*)H2BaseAddr + 0x4bd27);
+	char(__thiscall * sub_21bc81)(void*, __int16, __int16, int*, __int16, int*) = (char(__thiscall*)(void*, __int16, __int16, int*, __int16, int*))((char*)H2BaseAddr + 0x21bc81);
+	int(__thiscall * sub_21baa9)(DWORD, wchar_t*) = (int(__thiscall*)(DWORD, wchar_t*))((char*)H2BaseAddr + 0x21baa9);
+
+	void* v1; // ebx@1
+	int v2; // edi@1
+	int v3; // eax@1
+	int v4; // ST10_4@3
+	int v5; // esi@3
+	int v6; // eax@3
+	int v7; // esi@7
+	int v8; // eax@7
+	__int16 v9; // bp@10
+	char result; // al@11
+	DWORD v11; // esi@12
+	DWORD v112;
+	int v12; // eax@14
+			 //int v13; // edx@15
+	int v14; // eax@21
+	wchar_t* v15; // eax@21
+	int v16; // eax@22
+	int v17; // [sp+10h] [bp-424h]@1
+	__int16 v18; // [sp+14h] [bp-420h]@5
+	int var41C[6]; // [sp+18h] [bp-41Ch]@3
+	wchar_t label[512];
+
+	v1 = thisptr;
+	v2 = sub_20bb89();
+	v17 = 0;
+
+	DWORD menu_id = ((DWORD*)v1)[0x1C];
+	v3 = sub_20c701(menu_id);
+
+	if (v3 != -1) {
+		v17 = sub_239623(v3);
+	}
+	v4 = ((DWORD*)v1)[0x1C];
+	label[0] = 0;
+	v5 = 0;
+	v6 = sub_20c701(v4);
+
+	if (v6 != -1) {
+		v5 = sub_239623(v6);
+	}
+	v18 = 0;
+	if (v5 && *(DWORD*)(v5 + 0x20) > 0)
+	{
+		v7 = *(DWORD*)(v5 + 0x24);
+		v8 = 0;
+		if (v7 != -1) {
+			v8 = v7 + dword_482290;
+		}
+		v18 = *(WORD*)(v8 + 2);
+	}
+	var41C[0] = 1065353216;
+	var41C[1] = 1060320051;
+	var41C[2] = 1060320051;
+	var41C[3] = 1060320051;
+	v9 = 1;
+	if (!v17 || (result = ~(unsigned __int8)(*(DWORD*)v17 >> 2) & 1) != 0)
+	{
+		v11 = (int)((char*)v1 + 0x80);
+		v112 = *(DWORD*)v11 + 0x4C;
+		var41C[4] = -6553500;
+		var41C[5] = 6553680;
+
+		sub_21208e((int)v1, v11);
+
+		if (v2)
+		{
+			var41C[0] = *(DWORD*)(v2 + 0x168);
+			var41C[1] = *(DWORD*)(v2 + 0x16C);
+			var41C[2] = *(DWORD*)(v2 + 0x170);
+			var41C[3] = *(DWORD*)(v2 + 0x174);
+			if (v17) {
+				v12 = *(DWORD*)v17;
+				if (*(DWORD*)v17 & 1)
+				{
+					v9 = *(WORD*)(v2 + 0x166);
+					var41C[4] = *(DWORD*)(v2 + 0x1A8);
+					var41C[5] = *(DWORD*)(v2 + 0x1AC);
+				}
+				else if (v12 & 8)
+				{
+					v9 = *(WORD*)(v2 + 0x164);
+					var41C[4] = *(DWORD*)(v2 + 0x198);
+					var41C[5] = *(DWORD*)(v2 + 0x19C);
+				}
+				else if (v12 & 0x10)
+				{
+					v9 = *(WORD*)(v2 + 0x162);
+					var41C[4] = *(DWORD*)(v2 + 0x188);
+					var41C[5] = *(DWORD*)(v2 + 0x18C);
+				}
+				else
+				{
+					v9 = *(WORD*)(v2 + 0x160);
+					var41C[4] = *(DWORD*)(v2 + 0x178);
+					var41C[5] = *(DWORD*)(v2 + 0x17C);
+				}
+
+				//sub_21bf85(v11, *(DWORD*)(v17 + 0x2C)); //title label_id
+				set_widget_label_from_string_id_reimpl(v11, label_id_title, label_menu_id);
+
+				v14 = (*(int(__thiscall**)(DWORD))(v112))(v11);
+				v15 = (*(wchar_t* (__thiscall**)(int))(*(DWORD*)v14 + 0xC))(v14);
+
+				sub_4bd27(label, v15, 0x200);
+			}
+		}
+
+		sub_21bc81((void*)v11, 1, v18, var41C, v9, &var41C[4]);
+
+		v16 = (*(int(__thiscall**)(int))(v112))(v11);
+		*(WORD*)(v16 + 0x14) |= 2u;
+
+		result = sub_21baa9(v11, label);
+
+		*((WORD*)v1 + 0xEA) = 0x7FFF;
+	}
+	return result;
+}
+
+

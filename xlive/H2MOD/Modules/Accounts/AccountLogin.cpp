@@ -360,7 +360,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 			GetVersionEx(&osvi);
 		}
 
-		os_string_buflen = 30;
+		os_string_buflen = 512;
 		os_string = (char*)calloc(os_string_buflen, sizeof(char));
 		snprintf(os_string, os_string_buflen, "Windows: %u.%u", osvi.dwMajorVersion, osvi.dwMinorVersion);
 	}

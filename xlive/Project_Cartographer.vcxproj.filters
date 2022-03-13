@@ -35,7 +35,6 @@
     <ClCompile Include="H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.cpp" />
     <ClCompile Include="H2MOD\Modules\Config\Config.cpp" />
     <ClCompile Include="H2MOD\Modules\Console\ConsoleCommands.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\Credits.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomLanguage.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
@@ -138,6 +137,9 @@
     <ClCompile Include="Util\ClipboardAPI.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.cpp" />
+    <ClCompile Include="H2MOD\Modules\CustomMenu\c_brightness_menu.cpp" />
+    <ClCompile Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.cpp" />
+    <ClCompile Include="H2MOD\Modules\CustomMenu\c_account_list_menu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -295,7 +297,6 @@
     <ClInclude Include="H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h" />
     <ClInclude Include="H2MOD\Modules\Config\Config.h" />
     <ClInclude Include="H2MOD\Modules\Console\ConsoleCommands.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\Credits.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomLanguage.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
@@ -456,6 +457,9 @@
     <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.h" />
     <ClInclude Include="CartographerDllConf.h" />
+    <ClInclude Include="H2MOD\Modules\CustomMenu\c_brightness_menu.h" />
+    <ClInclude Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.h" />
+    <ClInclude Include="H2MOD\Modules\CustomMenu\c_account_list_menu.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

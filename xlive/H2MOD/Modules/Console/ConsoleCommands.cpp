@@ -397,7 +397,7 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 void ConsoleCommands::spawn_rotate(datum object_datum, float x, float y, float z, float i, float j, float k)
 {
 	s_object_placement_data nObject;
-	if(!DATUM_IS_NONE(object_datum))
+	if (!DATUM_IS_NONE(object_datum))
 	{
 		EngineCalls::Objects::create_new_placement_data(&nObject, object_datum, -1, 0);
 		typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, real_point3d* orient);
@@ -415,7 +415,7 @@ void ConsoleCommands::spawn_rotate(datum object_datum, float x, float y, float z
 }
 void ConsoleCommands::delete_object(datum object_datum)
 {
-	if(!DATUM_IS_NONE(object_datum))
+	if (!DATUM_IS_NONE(object_datum))
 	{
 		EngineCalls::Objects::object_destroy(object_datum);
 	}
@@ -716,7 +716,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$spawn_rotate")
 		{
-			if(splitCommands.size() != 8)
+			if (splitCommands.size() != 8)
 			{
 				output(L"Invalid command, usage $spawn_rotate object_id x y z i j k");
 				return;
@@ -761,7 +761,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$destroy_object")
 		{
-			if(splitCommands.size() != 2)
+			if (splitCommands.size() != 2)
 			{
 				output(L"Invalid usage, usage $destroy_object datum");
 				return;
