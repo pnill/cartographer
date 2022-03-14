@@ -69,6 +69,20 @@ typedef struct _XLOCATOR_SEARCHRESULT {
 
 } XLOCATOR_SEARCHRESULT, *PXLOCATOR_SEARCHRESULT;
 
+typedef struct _HALO2VISTA_TITLE_SERVICE_PROPERTIES
+{
+	int total_count_property_id = 0x0;
+	int total_count = 0;
+	int total_public_property_id = 0x0;
+	int total_public = 0;
+	int total_peer_property_id = 0x0;
+	int total_peer = 0;
+	int total_peer_gold_property_id = 0x0;
+	int total_peer_gold = 0;
+	int total_public_gold_property_id = 0x0;
+	int total_public_gold = 0;
+} HALO2VISTA_TITLE_SERVICE_PROPERTIES;
+
 class ServerList
 {
 public:
@@ -76,11 +90,6 @@ public:
 	ServerList::ServerList(ServerList&& other) = delete;
 
 	static bool CountResultsUpdated;
-	static int total_count;
-	static int total_public;
-	static int total_peer;
-	static int total_peer_gold;
-	static int total_public_gold;
 
 	HANDLE Handle = INVALID_HANDLE_VALUE;
 
@@ -94,20 +103,23 @@ public:
 
 	ServerList::ServerList(DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties)
 	{
-		cSearchPropertiesIDs = _cSearchPropertiesIDs;
-		pSearchPropertyIDs = new DWORD[_cSearchPropertiesIDs];
-		memcpy(pSearchPropertyIDs, _pSearchProperties, _cSearchPropertiesIDs * sizeof(*_pSearchProperties));
+		m_SearchPropertiesIdCount = _cSearchPropertiesIDs;
+		m_pSearchPropertyIds = new DWORD[_cSearchPropertiesIDs];
+		memcpy(m_pSearchPropertyIds, _pSearchProperties, _cSearchPropertiesIDs * sizeof(*_pSearchProperties));
+	}
+
+	ServerList::~ServerList()
+	{
+		delete[] m_pSearchPropertyIds;
 	}
 
 	int GetServersLeft();
 	int GetTotalServers();
 
-	void CancelOperation() { cancelOperation = true; }
+	void CancelOperation() { m_cancelOperation = true; }
 
 	void GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer);
 	void QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESULT* nResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer);
-
-	PXOVERLAPPED ovelapped;
 
 	enum OperationState : int
 	{
@@ -116,23 +128,23 @@ public:
 		OperationFinished
 	};
 
-	OperationState operationState = OperationPending;
-	int ServersLeftInDocumentCount = -1;
-	int total_servers = 0;
+	PXOVERLAPPED m_pOverlapped = nullptr;
+	OperationState m_operationState = OperationPending;
+	int m_serversLeftInDoc = -1;
+	int m_totalServerCount = 0;
 
-	DWORD cSearchPropertiesIDs = 0;
-	DWORD* pSearchPropertyIDs = nullptr;
+	DWORD m_SearchPropertiesIdCount = 0;
+	DWORD* m_pSearchPropertyIds = nullptr;
 
-	//TODO:
-	std::atomic<bool> cancelOperation = false;
+	std::atomic<bool> m_cancelOperation = false;
 
-	std::thread serv_thread;
+	std::thread m_searchThread;
 
 #pragma endregion
 
 	static std::mutex AddServerMutex;
 	static std::mutex RemoveServerMutex;
-	static std::mutex GetServerCountsMutex;
+	static std::mutex getServerCountsMutex;
 };
 
 extern std::unordered_map<HANDLE, ServerList*> serverListRequests;
