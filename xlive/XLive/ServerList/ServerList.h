@@ -54,6 +54,11 @@
 #define XLOCATOR_SERVERTYPE_PEER_HOSTED_GOLD_ONLY   3   // dedicated server is a peer-hosted game server (gold only).
 #define XLOCATOR_SERVICESTATUS_PROPERTY_START     0x100
 
+#define XLOCATOR_SERVER_PAGE_REPORT_ITEM_COUNT_MIN 24
+
+#define XLOCATOR_SERVER_PAGE_MIN_ITEMS		50
+#define XLOCATOR_SERVER_PAGE_MAX_ITEMS		200
+
 typedef struct _XLOCATOR_SEARCHRESULT {
 	ULONGLONG serverID;                     // the ID of dedicated server
 	DWORD dwServerType;                     // see XLOCATOR_SERVERTYPE_PUBLIC, etc
@@ -83,68 +88,92 @@ typedef struct _HALO2VISTA_TITLE_SERVICE_PROPERTIES
 	int total_public_gold = 0;
 } HALO2VISTA_TITLE_SERVICE_PROPERTIES;
 
-class ServerList
+class CServerList
 {
 public:
-	ServerList::ServerList(const ServerList& other) = delete;
-	ServerList::ServerList(ServerList&& other) = delete;
+	CServerList::CServerList(const CServerList& other) = delete;
+	CServerList::CServerList(CServerList&& other) = delete;
 
 	static bool CountResultsUpdated;
 
-	HANDLE Handle = INVALID_HANDLE_VALUE;
 
-	static DWORD GetServers(HANDLE, DWORD, CHAR*, PXOVERLAPPED);
+	static DWORD Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped);
 
+	// basic functions 
 	static void GetServerCounts(PXOVERLAPPED);
 	static void RemoveServer(PXOVERLAPPED pOverlapped);
 	static void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped);
 
 #pragma region ServerListQuery
+	HANDLE Handle = INVALID_HANDLE_VALUE;
 
-	ServerList::ServerList(DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties)
+	CServerList::CServerList(DWORD _cItemsPerPage, DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties)
 	{
-		m_SearchPropertiesIdCount = _cSearchPropertiesIDs;
+		m_itemsPerPageCount = _cItemsPerPage;
+		m_searchPropertiesIdCount = _cSearchPropertiesIDs;
 		m_pSearchPropertyIds = new DWORD[_cSearchPropertiesIDs];
 		memcpy(m_pSearchPropertyIds, _pSearchProperties, _cSearchPropertiesIDs * sizeof(*_pSearchProperties));
 	}
 
-	ServerList::~ServerList()
+	CServerList::~CServerList()
 	{
 		delete[] m_pSearchPropertyIds;
+
+		// this must be locked when deconstructing
+		m_itemQueryMutex.unlock();
 	}
 
-	int GetServersLeft();
-	int GetTotalServers();
+	int GetItemLeftCount();
+	int GetValidItemsFoundCount();
 
 	void CancelOperation() { m_cancelOperation = true; }
 
-	void GetServersFromHttp(DWORD cbBuffer, CHAR* pvBuffer);
-	void QueryServerData(CURL* curl, ULONGLONG xuid, XLOCATOR_SEARCHRESULT* nResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer);
+	void EnumerateFromHttp();
+	bool SearchResultParseAndWrite(std::shared_ptr<std::string> serverResultData, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer);
 
-	enum OperationState : int
+	void SetNewPageBuffer(DWORD cbBuffer, CHAR* pvBuffer)
+	{
+		m_resultBuffer = pvBuffer;
+		m_resultBufferSize = cbBuffer;
+	}
+
+	enum
 	{
 		OperationPending,
 		OperationIncomplete,
-		OperationFinished
+		OperationFailed,
+		OperationFinished,
 	};
 
 	PXOVERLAPPED m_pOverlapped = nullptr;
-	OperationState m_operationState = OperationPending;
-	int m_serversLeftInDoc = -1;
-	int m_totalServerCount = 0;
+	std::atomic<int> m_itemsLeftInDoc = 0;
+	std::atomic<int> m_operationState = OperationPending;
 
-	DWORD m_SearchPropertiesIdCount = 0;
+	int m_itemsPerPageCount;
+	std::atomic<int> m_pageItemsFoundCount;
+	
+	DWORD m_searchPropertiesIdCount = 0;
 	DWORD* m_pSearchPropertyIds = nullptr;
 
+	CHAR* m_resultBuffer = nullptr;
+	DWORD m_resultBufferSize = 0;
+
+	std::string m_serverListToDownload;
+
 	std::atomic<bool> m_cancelOperation = false;
+	std::atomic<bool> m_operationOnPause = false;
+
+	// mainly used for resource discard
+	std::mutex m_itemQueryMutex;
 
 	std::thread m_searchThread;
 
-#pragma endregion
+// #pragma region ServerListQuery
+#pragma endregion 
 
-	static std::mutex AddServerMutex;
-	static std::mutex RemoveServerMutex;
+	static std::mutex addServerMutex;
+	static std::mutex removeServerMutex;
 	static std::mutex getServerCountsMutex;
 };
 
-extern std::unordered_map<HANDLE, ServerList*> serverListRequests;
+extern std::unordered_map<HANDLE, CServerList*> serverListRequests;

@@ -533,19 +533,6 @@ int WINAPI XCancelOverlapped (PXOVERLAPPED pOverlapped)
 // #5256: XEnumerate
 int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcItemsReturned, PXOVERLAPPED pOverlapped)
 {
-	//static int print = 0;
-
-
-	//if( print < 100 )
-	//{
-		//LOG_TRACE_XLIVE("XEnumerate  (hEnum = %X, pvBuffer = %X, cbBuffer = %X, pcItemsReturned = %X, pOverlapped = %X)",
-		//	hEnum, pvBuffer, cbBuffer, pcItemsReturned, pOverlapped);
-
-		//print++;
-	//}
-
-
-
 	BOOL async;
 
 	if( pOverlapped != 0 )
@@ -555,7 +542,6 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		// no items
 		pOverlapped->InternalHigh = 0;
 	}
-
 	else if( pcItemsReturned )
 	{
 		async = FALSE;
@@ -563,16 +549,11 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		// no items
 		*pcItemsReturned = 0;
 	}
-
 	else
 	{
 		LOG_TRACE_XLIVE( "- NULL ptr" );
-
-
 		return ERROR_INVALID_PARAMETER;
 	}
-
-
 
 	if( hEnum == g_dwFakeContent && dlcinit != 0x7FFFFFFF )
 	{
@@ -591,20 +572,14 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 				break;
 			}
 
-
-
 			// Credit: virusek, JorjVirus69
 			aaa.ContentNum = dlcinit;
 			aaa.ContentPackageType = 2;
 			memcpy( &aaa.TitleId, &marketplaceDlc[ dlcinit ].dwTitleID, sizeof(aaa.TitleId) );
 			memcpy( &aaa.ContentId, &marketplaceDlc[ dlcinit ].contentId, sizeof(aaa.ContentId) );
 
-
-
 			LOG_TRACE_XLIVE( "- [{0}] DLC = {1:x}", dlcinit, *((DWORD *) aaa.ContentId) );
 			dlcinit++;
-
-
 
 			if( async == FALSE )
 				(*pcItemsReturned)++;
@@ -612,19 +587,14 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 			else
 				pOverlapped->InternalHigh++;
 
-
-
 			if(pvBuffer)
 			{
 				memcpy(pvBuffer,&aaa,sizeof(aaa));
-
 
 				pvBuffer += 32;
 				total += 32;
 			}
 		}
-
-
 
 		if( async == FALSE )
 		{
@@ -638,17 +608,14 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 				dlcinit = 0x7fffffff;
 		}
 	}
-
-	if ( hEnum == g_dwFakeAchievementContent )
+	else if ( hEnum == g_dwFakeAchievementContent )
 	{
 		return AchievementEnumerator(cbBuffer, pvBuffer, pcItemsReturned, pOverlapped);
 	}
-
-	if( hEnum == g_dwMarketplaceContent && marketplaceEnumerate < marketplaceCount )
+	else if( hEnum == g_dwMarketplaceContent && marketplaceEnumerate < marketplaceCount )
 	{
 		// TODO: check full buffer
 		memcpy( pvBuffer, &marketplace, sizeof(XMARKETPLACE_CONTENTOFFER_INFO) * marketplaceCount );
-
 
 		if( async == FALSE )
 			*pcItemsReturned = marketplaceCount;
@@ -659,11 +626,11 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 		marketplaceEnumerate += marketplaceCount;
 	}
-
+	else 
 	{
-		DWORD error = ServerList::GetServers(hEnum, cbBuffer, pvBuffer, pOverlapped);
-		if (error != ERROR_NOT_FOUND)
-			return error;
+		// fall back to CServerList::Enumerate if previous handles didn't match other operations
+		// it'll return ERROR_INVALID_HANDLE if it doesn't match this operation as well
+		return CServerList::Enumerate(hEnum, cbBuffer, pvBuffer, pOverlapped);
 	}
 
 	if( async == FALSE )
@@ -684,7 +651,6 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 			return ERROR_SUCCESS;
 		}
 	}
-
 	else
 	{
 		if( pOverlapped->InternalHigh )
@@ -743,6 +709,7 @@ DWORD WINAPI XStringVerify( DWORD dwFlags, const CHAR *szLocale, DWORD dwNumStri
 	if( pOverlapped )
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
+
 		pOverlapped->dwExtendedError = 0;
 
 
