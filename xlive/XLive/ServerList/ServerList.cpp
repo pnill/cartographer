@@ -36,7 +36,7 @@ CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
 		if (request.first == hHandle)
 		{
 			// ugly af but it'll do for now
-			// dom't forget to UNLOCK after when you finish working with this
+			// don't forget to UNLOCK after when you finish working with this
 			if (lock)
 				request.second->m_itemQueryMutex.lock();
 
@@ -142,7 +142,7 @@ int CServerList::GetValidItemsFoundCount()
 	return m_pageItemsFoundCount;
 }
 
-bool CServerList::SearchResultParseAndWrite(std::shared_ptr<std::string> serverResultData, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer)
+bool CServerList::SearchResultParseAndWrite(std::shared_ptr<std::string> serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer)
 {
 	XLOCATOR_SEARCHRESULT searchResult;
 	ZeroMemory(&searchResult, sizeof(XLOCATOR_SEARCHRESULT));
@@ -152,8 +152,6 @@ bool CServerList::SearchResultParseAndWrite(std::shared_ptr<std::string> serverR
 
 	// operation successful or not
 	bool result = false;
-
-	LONGLONG xuid = 0xDEADC0DEDEADC0DE;
 
 	if (!doc.HasMember("dwMaxPublicSlots")) {
 		BadServer(xuid, "Missing Member: dwMaxPublicSlots");
@@ -472,6 +470,11 @@ void CServerList::EnumerateFromHttp()
 
 	bool itemQueryError = false;
 
+	// build the list to download
+	auto& serverXuidArray = document["servers"].GetArray();
+	auto xuidStrItr = serverXuidArray.Begin();
+	auto xuidStrWriteItemItr = serverXuidArray.Begin();
+
 	while (!itemQueryError
 		&& itemsLeftToDownload > 0
 		&& !m_cancelOperation)
@@ -499,10 +502,8 @@ void CServerList::EnumerateFromHttp()
 
 		int serverQueryIdx = 0;
 
-		// build the list to download
-		auto& serverXuidArray = document["servers"].GetArray();
-
-		for (auto itr = serverXuidArray.Begin(); itr != serverXuidArray.End(); )
+		// this starts from where it left off
+		for (; xuidStrItr != serverXuidArray.End(); ++xuidStrItr)
 		{
 			// we reached max ITEM download size, break out and download the servers
 			if (serverQueryIdx < itemListMaxQueryCount)
@@ -521,7 +522,7 @@ void CServerList::EnumerateFromHttp()
 
 				auto& itemQuery = itemsToDownloadQuery[serverQueryIdx++];
 
-				std::string server_url = std::string(cartographerURL + "/live/servers/" + itr->GetString());
+				std::string server_url = std::string(cartographerURL + "/live/servers/" + xuidStrItr->GetString());
 
 				// server_url is copied to another buffer when setting CURLOPT_URL
 				curl_easy_setopt(itemQuery.first, CURLOPT_URL, server_url.c_str());
@@ -532,8 +533,6 @@ void CServerList::EnumerateFromHttp()
 
 				// (re-)add the handle to the list
 				curl_multi_add_handle(curl_mhandle, itemQuery.first);
-
-				serverXuidArray.Erase(itr);
 			}
 			else
 			{
@@ -582,7 +581,7 @@ void CServerList::EnumerateFromHttp()
 			for (auto& itemQuery : itemsToDownloadQuery)
 			{
 				ZeroMemory(&searchResults[searchResultIdx], sizeof(XLOCATOR_SEARCHRESULT));
-				if (SearchResultParseAndWrite(itemQuery.second, &searchResults[searchResultIdx], &propertiesBuffer, &stringBuffer))
+				if (SearchResultParseAndWrite(itemQuery.second, std::stoll(xuidStrWriteItemItr->GetString()), &searchResults[searchResultIdx], &propertiesBuffer, &stringBuffer))
 				{
 					m_pageItemsFoundCount++;
 
@@ -595,6 +594,8 @@ void CServerList::EnumerateFromHttp()
 
 				// this counter count even bad servers
 				itemsLeftToDownload--;
+
+				xuidStrWriteItemItr++;
 			}
 
 			m_itemsLeftInDoc = itemsLeftToDownload;

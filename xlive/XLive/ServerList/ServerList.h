@@ -129,7 +129,7 @@ public:
 	void CancelOperation() { m_cancelOperation = true; }
 
 	void EnumerateFromHttp();
-	bool SearchResultParseAndWrite(std::shared_ptr<std::string> serverResultData, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer);
+	bool SearchResultParseAndWrite(std::shared_ptr<std::string> serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer);
 
 	void SetNewPageBuffer(DWORD cbBuffer, CHAR* pvBuffer)
 	{
