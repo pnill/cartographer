@@ -28,7 +28,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 			struct addrinfo *result = NULL, *ptr = NULL, hints;
 			int iResult;
 
-			SecureZeroMemory(&hints, sizeof(hints));
+			ZeroMemory(&hints, sizeof(hints));
 			hints.ai_family = AF_INET;
 			hints.ai_socktype = SOCK_STREAM;
 			hints.ai_protocol = IPPROTO_TCP;
@@ -95,16 +95,16 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 			int recvResult = 0;
 			int recvBufLen = gXnIp.GetReqQoSBufferSize();
 			BYTE *recvBuf = new BYTE[recvBufLen];
-			SecureZeroMemory(recvBuf, recvBufLen);
+			ZeroMemory(recvBuf, recvBufLen);
 
-			std::vector<long long int> ping_storage;
+			std::vector<long long> ping_storage;
 			int probes = cProbes;
 			do
 			{
 				//	LOG_TRACE_NETWORK_N("[XNetQoSLookup][Client] Sending Probe {}..",probes);
 
 				char send_data[4];
-				SecureZeroMemory(send_data, 4);
+				ZeroMemory(send_data, sizeof(send_data));
 				*(DWORD*)&send_data = 0xAABBCCDD;
 
 				auto started = std::chrono::high_resolution_clock::now();
@@ -116,7 +116,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 
 				std::chrono::milliseconds d = std::chrono::duration_cast<std::chrono::milliseconds>(done - started);
 
-				long long int diff = d.count();
+				long long diff = d.count();
 
 				//	LOG_TRACE_NETWORK_N("[XNetQoSLookup][Client] Probe {} finished ping: %lld", probes, diff);
 
@@ -149,9 +149,9 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 				continue;
 			}
 
-			auto ping_result = std::minmax_element(ping_storage.begin(), ping_storage.end());
-			long long min_ping = ping_storage[(ping_result.first - ping_storage.begin())];
-			long long max_ping = ping_storage[(ping_result.second - ping_storage.begin())];
+			auto ping_result = std::minmax(ping_storage.begin(), ping_storage.end());
+			long long min_ping = *ping_result.first;
+			long long max_ping = *ping_result.second;
 			unsigned int average = (std::accumulate(ping_storage.begin(), ping_storage.end(), 0) / ping_storage.size());
 
 			ping_storage.clear();
@@ -221,10 +221,10 @@ void CALLBACK CXNetQoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOV
 
 	acceptSockInfo->DataBuf.len = 4;
 	acceptSockInfo->DataBuf.buf = new char[acceptSockInfo->DataBuf.len];
-	SecureZeroMemory(&acceptSockInfo->Overlapped, sizeof(acceptSockInfo->Overlapped));
+	ZeroMemory(&acceptSockInfo->Overlapped, sizeof(acceptSockInfo->Overlapped));
 
 	DWORD flags = 0;
-	DWORD recvResult = WSARecv(acceptSockInfo->Socket, &acceptSockInfo->DataBuf, 1, NULL, &flags, &acceptSockInfo->Overlapped, SendBack);
+	int recvResult = WSARecv(acceptSockInfo->Socket, &acceptSockInfo->DataBuf, 1, NULL, &flags, &acceptSockInfo->Overlapped, SendBack);
 	if (recvResult != 0)
 	{
 		if (recvResult == SOCKET_ERROR)
@@ -276,7 +276,7 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 		return;
 	}
 
-	if (*(DWORD*)(&acceptSockInfo->DataBuf.buf[0]) == 0xAABBCCDD)
+	if (*(DWORD*)acceptSockInfo->DataBuf.buf == 0xAABBCCDD)
 	{
 		//LOG_TRACE_NETWORK_N("CXNetQoS::SendBack() - magic is right, sending data back on socket {}", acceptSockInfo->Socket);
 
@@ -287,8 +287,8 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 		acceptSockInfo->DataBuf.buf = new CHAR[gXnIp.GetReqQoSBufferSize()];
 		memcpy(acceptSockInfo->DataBuf.buf, XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
 
-		SecureZeroMemory(&acceptSockInfo->Overlapped, sizeof(acceptSockInfo->Overlapped));
-		DWORD sendResult = WSASend(acceptSockInfo->Socket, &acceptSockInfo->DataBuf, 1, NULL, 0, &acceptSockInfo->Overlapped, HandleClient);
+		ZeroMemory(&acceptSockInfo->Overlapped, sizeof(acceptSockInfo->Overlapped));
+		int sendResult = WSASend(acceptSockInfo->Socket, &acceptSockInfo->DataBuf, 1, NULL, 0, &acceptSockInfo->Overlapped, HandleClient);
 		if (sendResult != 0)
 		{
 			if (sendResult == SOCKET_ERROR)
@@ -326,7 +326,7 @@ void CXNetQoS::Listener()
 	LOG_TRACE_NETWORK("CXNetQoS::Listener() - QoS Listener initializing.");
 
 	sockaddr_in serverAddr;
-	SecureZeroMemory(&serverAddr, sizeof(sockaddr_in));
+	ZeroMemory(&serverAddr, sizeof(sockaddr_in));
 
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_addr.s_addr = INADDR_ANY; // anyone can connect
@@ -335,7 +335,7 @@ void CXNetQoS::Listener()
 	DWORD dwBytes = 0;
 	GUID GuidAcceptEx = WSAID_ACCEPTEX;
 
-	auto listener_thread_cleanup = [&, this]() -> void
+	auto listener_thread_cleanup = [this]() -> void
 	{
 		if (m_ListenSocket != INVALID_SOCKET)
 		{
@@ -351,7 +351,7 @@ void CXNetQoS::Listener()
 		return;
 	};
 
-	m_ListenSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+	m_ListenSocket = WSASocket(serverAddr.sin_family, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 	if (m_ListenSocket == INVALID_SOCKET)
 	{
 		LOG_TRACE_NETWORK("CXNetQoS::Listener() - Listener socket creation failed.");
@@ -387,7 +387,7 @@ void CXNetQoS::Listener()
 	while (true)
 	{
 		OVERLAPPED acceptOvelapped;
-		SecureZeroMemory(&acceptOvelapped, sizeof(acceptOvelapped));
+		ZeroMemory(&acceptOvelapped, sizeof(acceptOvelapped));
 
 		// check if we have to stop listening before re-setting WsaEvent
 		if (m_bStopListening) {
@@ -448,7 +448,7 @@ void CXNetQoS::Listener()
 			continue;
 
 		LPSOCKET_INFORMATION lpSockInfo = new SOCKET_INFORMATION;
-		SecureZeroMemory(lpSockInfo, sizeof(SOCKET_INFORMATION));
+		ZeroMemory(lpSockInfo, sizeof(SOCKET_INFORMATION));
 
 		lpSockInfo->BytesSEND = 0;
 		lpSockInfo->BytesRECV = 0;
@@ -481,7 +481,7 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 	if (XNetQoS.pbData == nullptr)
 	{
 		XNetQoS.pbData = new BYTE[gXnIp.GetReqQoSBufferSize()];
-		SecureZeroMemory(XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
+		ZeroMemory(XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
 	}
 
 	if (dwFlags & XNET_QOS_LISTEN_SET_DATA)
@@ -489,9 +489,12 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 		if (cb > 0)
 		{
 			if (cb > XNetQoS.cbData)
+			{
+				// cb shouldn't be higher than gXnIp.GetReqQoSBufferSize()
 				XNetQoS.cbData = cb;
+			}
 
-			SecureZeroMemory(XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
+			ZeroMemory(XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
 			memcpy(XNetQoS.pbData, pb, cb);
 		}
 	}
@@ -539,7 +542,7 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 	*pxnqos = (XNQOS*)new char[sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna - 1))];
 
 	XNQOS* pqos = *pxnqos;
-	SecureZeroMemory(pqos, sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna - 1)));
+	ZeroMemory(pqos, sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna - 1)));
 
 	pqos->cxnqos = cxna;
 	pqos->cxnqosPending = cxna;

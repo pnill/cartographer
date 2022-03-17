@@ -15,11 +15,12 @@ public:
 	void Listener();
 	bool IsListening();
 
-	bool m_bStopListening = false;
+	std::atomic<bool> m_bStopListening = false;
+
 	SOCKET m_ListenSocket = INVALID_SOCKET;
 	WSAEVENT m_WsaEvent = WSA_INVALID_EVENT;
 
-	unsigned int cbData = 0;
+	UINT cbData = 0;
 	PBYTE pbData = nullptr;
 
 	static void CALLBACK HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags);
