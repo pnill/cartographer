@@ -1504,7 +1504,6 @@ void H2MOD::Initialize()
 	KantTesting::Initialize();
 	LOG_TRACE_GAME("H2MOD - Initialized {}", DLL_VERSION_STR);
 	LOG_TRACE_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
-	//WriteValue(GetAddress(0xC25EA + 8), 100);
 	h2mod->ApplyHooks();
 	h2mod->RegisterEvents();
 

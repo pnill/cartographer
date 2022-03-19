@@ -622,19 +622,20 @@ void __stdcall string_id_to_wide_string_hook(int thisx, int string_id, wchar_t *
 	if (*(BYTE*)(thisx + 0x18))
 	{
 		char* utf8_str = H2GetLabel(thisx, string_id, a4, a5);
-		p_decode_utf8_to_wide_string(utf8_str, buffer, ARRAYSIZE(buffer));
+		p_decode_utf8_to_wide_string(utf8_str, buffer, 512);
 		if (string_id == 0x110023FD) // check if the string id is training_swaphold
 		{
 			// if it's the case, 
-			const wchar_t reload_weapon_game_str = 0xE448;
-			const wchar_t weapon_pickup_game_str = 0xE45A;
-			wchar_t* string_occurance = wcsstr(buffer, &reload_weapon_game_str);
-			if (string_occurance)
+			const wchar_t reload_weapon_game_str[] = { 0xE448, 0 };
+			const wchar_t weapon_pickup_game_str[] = { 0xE45A, 0 };
+
+			wchar_t* string_occurance = buffer;
+			while (string_occurance = wcsstr(string_occurance, reload_weapon_game_str), string_occurance != nullptr)
 			{
-				string_occurance[0] = weapon_pickup_game_str;
+				string_occurance[0] = weapon_pickup_game_str[0];
 			}
 		}
-		wcsncpy(output, buffer, ARRAYSIZE(buffer));
+		wcsncpy_s(output, 512, buffer, _TRUNCATE);
 	}
 }
 #pragma endregion
