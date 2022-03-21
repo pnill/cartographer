@@ -150,7 +150,7 @@ namespace MeleeFix
 			if (melee_type == HaloString::HS_MELEE_DASH || melee_type == HaloString::HS_MELEE_DASH_AIRBORNE)
 			{
 				float melee_max_duration = melee_type == HaloString::HS_MELEE_DASH_AIRBORNE ? 0.22 : 0.15000001;
-				signed int melee_max_ticks = time_globals::seconds_to_ticks_impercise(melee_max_duration);
+				int melee_max_ticks = time_globals::seconds_to_ticks_round(melee_max_duration);
 				if (melee_max_ticks < 0 || melee_get_time_to_target(object_index) <= melee_max_ticks)
 					abort_melee_action = true;
 			}
