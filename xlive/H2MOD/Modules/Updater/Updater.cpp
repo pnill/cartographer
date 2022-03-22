@@ -125,8 +125,8 @@ static void freeUpdateFileEntry(UpdateFileEntry* update_file_entry) {
 	free(update_file_entry);
 }
 
-static const char H2UpdateVersionStr[] = "[Version:%[^]]]";
-static const char H2UpdateLocationsStr[3][10] = { "[Temp]", "[Game]", "[AppData]" };
+static const char* H2UpdateVersionStr = "[Version:%[^]]]";
+static const char* H2UpdateLocationsStr[] = { "[Temp]", "[Game]", "[AppData]" };
 static char H2UpdateVersion[30] = "0";
 static char current_location_id = 0;
 

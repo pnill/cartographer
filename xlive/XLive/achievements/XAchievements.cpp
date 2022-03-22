@@ -20,19 +20,19 @@ DWORD WINAPI XUserWriteAchievements(DWORD dwNumAchievements, PXUSER_ACHIEVEMENT 
 
 	if (dwNumAchievements > 0)
 	{
-		while (dwNumAchievements > 0)
+		for (DWORD i = 0u; i < dwNumAchievements; i++)
 		{
-			int AchievementID = pAchievement[dwNumAchievements - 1].dwAchievementId;
+			int achievementID = pAchievement[i].dwAchievementId;
 
-			LOG_TRACE_GAME("Achievement {0} unlock attempt by Player {1} - id2: {2}", pAchievement->dwAchievementId, pAchievement->dwUserIndex, AchievementID);
+			LOG_TRACE_GAME("Achievement {0} unlock attempt by Player {1} - id2: {2}", pAchievement[i].dwAchievementId, pAchievement[i].dwUserIndex, achievementID);
 
-			if (achievementList[AchievementID] == false)
+			if (achievementList[achievementID] == false)
 			{
-				achievementList[AchievementID] = true;
+				achievementList[achievementID] = true;
 
 				std::string AchievementData;
 
-				switch (AchievementID)
+				switch (achievementID)
 				{
 				case 1:
 					AchievementData.append("Cairo Station|Complete Cairo Station.");
@@ -200,20 +200,17 @@ DWORD WINAPI XUserWriteAchievements(DWORD dwNumAchievements, PXUSER_ACHIEVEMENT 
 
 				default:
 					AchievementData.append("Unknown|We're honestly not sure wtf? :");
-					AchievementData.append(std::to_string(AchievementID));
+					AchievementData.append(std::to_string(achievementID));
 					break;
 				}
 
 				AchievementMap[AchievementData.c_str()] = false;
 
-				std::thread(AchievementUnlock, usersSignInInfo[0].xuid, AchievementID, pOverlapped).detach();
+				std::thread(AchievementUnlock, usersSignInInfo[0].xuid, achievementID, pOverlapped).detach();
 			}
 			else {
-				LOG_TRACE_GAME("Achievement {} was already unlocked", AchievementID);
+				LOG_TRACE_GAME("Achievement {} was already unlocked", achievementID);
 			}
-
-			pAchievement++;
-			dwNumAchievements--;
 		}
 	}
 

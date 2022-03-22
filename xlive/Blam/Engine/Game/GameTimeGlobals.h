@@ -19,8 +19,8 @@ struct time_globals
 
 	static time_globals* get();
 	static float get_seconds_per_tick();
-	static float seconds_to_ticks_precise(float s);
-	static signed int seconds_to_ticks_impercise(float s);
+	static float seconds_to_ticks_real(float s);
+	static int seconds_to_ticks_round(float s);
 	static int get_ticks_difference();
 	static float get_ticks_difference_real();
 };

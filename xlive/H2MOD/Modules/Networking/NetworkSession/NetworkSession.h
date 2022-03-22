@@ -145,9 +145,9 @@ static_assert(sizeof(s_player_information) == 296, "Invalid player_info size");
 struct s_membership_information
 {
 	DWORD update_number; // 0x70
-	DWORD session_leader_index; // 0x74
+	int session_leader_index; // 0x74
 	XUID dedicated_server_xuid; // 0x78
-	DWORD field_80; // 0x80
+	int xbox_session_leader_peer_index; // 0x80
 	int peer_count; // 0x84
 	s_peer_information peer_data[17]; // 0x88
 	int player_count; // 0x1254
@@ -229,7 +229,7 @@ struct s_network_session
 	char pad[3];
 	int xnkey_index;
 	signed int field_60;
-	DWORD session_host_peer_index;
+	int session_host_peer_index;
 	int elected_host_peer_index;
 	DWORD field_6C;
 	s_membership_information membership; // 0x70

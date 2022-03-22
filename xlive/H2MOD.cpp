@@ -89,8 +89,8 @@ std::unordered_map<wchar_t*, bool&> GametypesMap
 TEST_N_DEF(PC1);
 
 // Used to get damage on any object
-typedef void(__cdecl* p_object_cause_damage)(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7);
-p_object_cause_damage c_object_cause_damage;
+typedef void(__cdecl* object_cause_damage_t)(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7);
+object_cause_damage_t p_object_cause_damage;
 
 // Engine call to set damage applied on an object by a projectile
 void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7)
@@ -111,7 +111,7 @@ void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data
 				IntToString<int>(damage_data->field_24, std::hex),
 				IntToString<int>(damage_data->field_28, std::hex)
 			);
-			c_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
+			p_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
 		}
 		else
 		{
@@ -121,7 +121,7 @@ void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data
 	else
 	{
 		//Calls basic engine function when not in zombies game
-		c_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
+		p_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
 	}
 }
 
@@ -1115,12 +1115,12 @@ void H2MOD::ApplyFirefightHooks()
 	pdevice_touch = (tdevice_touch)DetourFunc(Memory::GetAddress<BYTE*>(0x163420, 0x158EE3), (BYTE*)device_touch, 10);
 }
 
-typedef void(__cdecl p_set_screen_bounds)(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
-p_set_screen_bounds* c_set_screen_bounds;
+typedef void(__cdecl set_screen_bounds_t)(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
+set_screen_bounds_t* p_set_screen_bounds;
 
 void __cdecl set_screen_bounds(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale)
 {
-	c_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
+	p_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
 }
 
 bool __cdecl should_start_pregame_countdown_hook()
@@ -1380,7 +1380,7 @@ void H2MOD::ApplyHooks() {
 	ProjectileFix::ApplyPatches();
 
 	//Guardian Patch
-	c_object_cause_damage = Memory::GetAddress<p_object_cause_damage>(0x17AD81, 0x1525E1);
+	p_object_cause_damage = Memory::GetAddress<object_cause_damage_t>(0x17AD81, 0x1525E1);
 	PatchCall(Memory::GetAddress(0x147DB8, 0x172D55), projectile_collision_object_cause_damage);
 
 	// server/client detours 
@@ -1447,7 +1447,7 @@ void H2MOD::ApplyHooks() {
 
 		// Initialise_tag_loader();
 		PlayerControl::ApplyHooks();
-		c_set_screen_bounds = Memory::GetAddress<p_set_screen_bounds*>(0x264979);
+		p_set_screen_bounds = Memory::GetAddress<set_screen_bounds_t*>(0x264979);
 		// PatchCall(GetAddress(0x25E1E5), set_screen_bounds);
 		
 		PatchCall(Memory::GetAddressRelative(0x6422C8), get_last_single_player_level_id_unlocked_from_profile);
@@ -1455,7 +1455,7 @@ void H2MOD::ApplyHooks() {
 	else {
 
 		LOG_TRACE_GAME("Applying dedicated server hooks...");
-		PatchCall(Memory::GetAddress(0x0,0xBF43), should_start_pregame_countdown_hook);
+		PatchCall(Memory::GetAddress(0x0, 0xBF43), should_start_pregame_countdown_hook);
 		ServerConsole::ApplyHooks();
 
 		DETOUR_ATTACH(p_get_enabled_teams_flags, Memory::GetAddress<get_enabled_teams_flags_t>(0, 0x19698B), get_enabled_teams_flags);
@@ -1504,7 +1504,6 @@ void H2MOD::Initialize()
 	KantTesting::Initialize();
 	LOG_TRACE_GAME("H2MOD - Initialized {}", DLL_VERSION_STR);
 	LOG_TRACE_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
-	//WriteValue(GetAddress(0xC25EA + 8), 100);
 	h2mod->ApplyHooks();
 	h2mod->RegisterEvents();
 

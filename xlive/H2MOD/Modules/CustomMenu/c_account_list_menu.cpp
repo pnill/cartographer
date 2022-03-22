@@ -67,18 +67,15 @@ c_account_list_menu::c_account_list_menu(int _ui_channel, int _a4, int _flags, b
 c_account_edit_list::c_account_edit_list(int _flags, int _account_count, int _default_selected_button, bool _account_removal_mode) :
 	c_list_widget(_flags)
 {
-	auto p_vector_constructor = (void(__stdcall*)(void*, int, int, void(__thiscall*)(DWORD), int))((char*)H2BaseAddr + 0x28870B);
-	auto sub_2113C6 = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x2113C6);
-	auto sub_20D1FD = (int(__cdecl*)(char*, int, int))((char*)H2BaseAddr + 0x20D1FD);
-	auto sub_66B33  = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x66B33);
-	auto sub_667A0  = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x667A0);
-	auto sub_2113D3 = (void* (__thiscall*)(void*, void*))((char*)H2BaseAddr + 0x2113D3);
-	auto c_list_item_widget_ctor = (void* (__thiscall*)(void*))((char*)H2BaseAddr + 0x21FFC9);
-	auto c_list_item_widget_dctor = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0xA551);
+	auto sub_2113C6 = Memory::GetAddress<int(__thiscall*)(void*)>(0x2113C6);
+	auto sub_2113D3 = Memory::GetAddress<void*(__thiscall*)(void*, void*)>(0x2113D3);
+	auto c_list_item_widget_ctor = Memory::GetAddress<void*(__thiscall*)(void*)>(0x21FFC9);
+	auto c_list_item_widget_dctor = Memory::GetAddress<void(__thiscall*)(void*)>(0xA551);
+	auto p_vector_constructor = Memory::GetAddress<void(__stdcall*)(void*, unsigned int, int, void*(__thiscall*)(void*), void(__thiscall*)(void*))>(0x28870B);
 
 	// this constructs the buttons list widgets drawn inside the window
 	// brightness menu can display 4 widget list buttons at once
-	p_vector_constructor(this->account_list_items, 132, 4, (void(__thiscall*)(DWORD))c_list_item_widget_ctor, (int)c_list_item_widget_dctor);
+	p_vector_constructor(this->account_list_items, 132, 4, c_list_item_widget_ctor, c_list_item_widget_dctor);
 
 	this->field_2C0 = 0;
 	sub_2113C6(&this->slot_2_unk.field_8);
