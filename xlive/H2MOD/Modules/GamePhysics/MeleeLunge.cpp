@@ -81,7 +81,7 @@ void __cdecl biped_dash_hook(datum object_index, datum target_player, char weapo
 	{
 		c_character_physics_mode_melee_datum* melee_mode_datum = (c_character_physics_mode_melee_datum*)(object_data + 1012 + 16);
 
-		real_vector3d localized_velocity = {};
+		real_vector3d localized_velocity;
 		object_get_localized_velocity(object_index, &localized_velocity, nullptr);
 
 		// store the localized velocity in the melee physics mode datum

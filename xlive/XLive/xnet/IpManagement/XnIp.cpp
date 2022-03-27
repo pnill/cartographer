@@ -16,7 +16,7 @@ CXnIp gXnIp;
 // local user xbox network address
 XnIp CXnIp::m_ipLocal;
 
-XECRYPT_RC4_STATE Rc4StateRand;
+XECRYPT_RC4_STATE gRc4StateRand;
 
 // network log for critical errors
 h2log* critical_network_errors_log = nullptr;
@@ -32,7 +32,7 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 		delete[] m_XnIPs;
 
 	m_XnIPs = new XnIp[m_startupParams.cfgSecRegMax];
-	SecureZeroMemory(m_XnIPs, m_startupParams.cfgSecRegMax * sizeof(*m_XnIPs));
+	ZeroMemory(m_XnIPs, m_startupParams.cfgSecRegMax * sizeof(*m_XnIPs));
 
 	if (m_startupParams.cfgKeyRegMax == 0)
 		m_startupParams.cfgKeyRegMax = 4; // default 4 key pairs
@@ -41,7 +41,7 @@ void CXnIp::Initialize(const XNetStartupParams* netStartupParams)
 		delete[] m_XnKeyPairs;
 
 	m_XnKeyPairs = new XnKeyPair[m_startupParams.cfgKeyRegMax];
-	SecureZeroMemory(m_XnKeyPairs, m_startupParams.cfgKeyRegMax * sizeof(*m_XnKeyPairs));
+	ZeroMemory(m_XnKeyPairs, m_startupParams.cfgKeyRegMax * sizeof(*m_XnKeyPairs));
 
 	if (m_startupParams.cfgQosDataLimitDiv4 == 0)
 		m_startupParams.cfgQosDataLimitDiv4 = 256 / 4; // 256 bytes as default
@@ -80,7 +80,7 @@ void CXnIp::SetTimeConnectionInteractionHappened(IN_ADDR ina)
 {
 	XnIp* xnIp = GetConnection(ina);
 	if (xnIp != nullptr)
-		xnIp->lastConnectionInteractionTime = timeGetTime();
+		xnIp->lastConnectionInteractionTime = GetTickCount64();
 }
 
 void CXnIp::UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int bytesRecvdCount)
@@ -90,7 +90,7 @@ void CXnIp::UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int byte
 	if (xnIp != nullptr)
 	{
 		xnIp->pckStats.PckRecvdStatsUpdate(1, bytesRecvdCount);
-		xnIp->lastPacketReceivedTime = timeGetTime();
+		xnIp->lastPacketReceivedTime = GetTickCount64();
 		GetLocalUserXn()->pckStats.PckRecvdStatsUpdate(1, bytesRecvdCount);
 	}
 }
@@ -117,16 +117,16 @@ void CXnIp::LogConnectionsToConsole()
 					L"		Index: " + std::to_wstring(i) + L" " +
 					L"Packets sent: " + std::to_wstring(pckStats->pckBytesSent) + L" " +
 					L"Packets received: " + std::to_wstring(pckStats->pckBytesRecvd) + L" " +
-					L"Packets sent avg/sec: " + std::to_wstring(pckStats->pckAvgSent) + L" " +
-					L"Packets recvd avg/sec: " + std::to_wstring(pckStats->pckAvgRecvd) + L" " +
+					L"Packets sent avg/sec: " + std::to_wstring(pckStats->pckAvgSentPerSec) + L" " +
+					L"Packets recvd avg/sec: " + std::to_wstring(pckStats->pckAvgRecvdPerSec) + L" " +
 					L"Connect status: " + std::to_wstring(xnIp->connectStatus) + L" " +
 					L"Connection initiator: " + (xnIp->connectionInitiator ? L"yes" : L"no") + L" " +
-					L"Time since last interaction: " + std::to_wstring((float)(timeGetTime() - xnIp->lastConnectionInteractionTime) / 1000.f) + L" " +
-					L"Time since last packet received: " + std::to_wstring((float)(timeGetTime() - xnIp->lastPacketReceivedTime) / 1000.f);
+					L"Time since last interaction: " + std::to_wstring((float)(GetTickCount64() - xnIp->lastConnectionInteractionTime) / 1000.f) + L" " +
+					L"Time since last packet received: " + std::to_wstring((float)(GetTickCount64() - xnIp->lastPacketReceivedTime) / 1000.f);
 			}
 			else
 			{
-				logString += 
+				logString +=
 					L"Unused connection index: " + std::to_wstring(i);
 			}
 			commands->output(logString);
@@ -180,8 +180,8 @@ void CXnIp::LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode
 				const XnIpPckTransportStats* pckStats;
 				xnIp->PckGetStats(&pckStats);
 
-				float connectionLastInteractionSeconds = (float)(timeGetTime() - xnIp->lastConnectionInteractionTime) / 1000.f;
-				float connectionLastPacketReceivedSeconds = (float)(timeGetTime() - xnIp->lastConnectionInteractionTime) / 1000.f;
+				float connectionLastInteractionSeconds = (float)(GetTickCount64() - xnIp->lastConnectionInteractionTime) / 1000.f;
+				float connectionLastPacketReceivedSeconds = (float)(GetTickCount64() - xnIp->lastConnectionInteractionTime) / 1000.f;
 				LOG_CRITICAL_NETWORK("{} - connection index: {}, packets sent: {}, packets received: {}, time since last interaction: {:.4f} seconds, time since last packet receive: {:.4f} seconds",
 					__FUNCTION__,
 					i,
@@ -203,27 +203,27 @@ void CXnIp::LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode
 	}
 }
 
-int CXnIp::HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount)
+int CXnIp::HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, DWORD dwBufferCount, LPDWORD lpBytesRecvdCount)
 {
 	// check first if the packet received has the size bigger or equal to the XNet packet header first
-	if (*bytesRecvdCount >= sizeof(XNetPacketHeader))
+	if (*lpBytesRecvdCount >= sizeof(XNetPacketHeader))
 	{
-		XNetPacketHeader* XNetPck = reinterpret_cast<XNetPacketHeader*>(lpBuffers->buf);
+		XNetPacketHeader* XNetPck = reinterpret_cast<XNetPacketHeader*>(lpBuffers[0].buf);
 		switch (XNetPck->intHdr)
 		{
 		case 'BrOd':
 		{
-			XBroadcastPacket* broadcastPck = reinterpret_cast<XBroadcastPacket*>(lpBuffers->buf);
-			if (*bytesRecvdCount >= sizeof(XBroadcastPacket)
+			XBroadcastPacket* broadcastPck = reinterpret_cast<XBroadcastPacket*>(lpBuffers[0].buf);
+			if (*lpBytesRecvdCount >= sizeof(XBroadcastPacket)
 				&& strncmp(broadcastPck->pckHeader.HdrStr, broadcastStrHdr, MAX_HDR_STR) == 0
 				&& broadcastPck->data.name.sin_addr.s_addr == INADDR_BROADCAST)
 			{
-				if (*bytesRecvdCount > sizeof(XBroadcastPacket))
+				if (*lpBytesRecvdCount > sizeof(XBroadcastPacket))
 				{
-					*bytesRecvdCount = *bytesRecvdCount - sizeof(XBroadcastPacket);
-					char* buffer = (char*)_alloca(*bytesRecvdCount); // allocate on stack
-					memcpy(buffer, lpBuffers->buf + sizeof(XBroadcastPacket), *bytesRecvdCount);
-					memcpy(lpBuffers->buf, buffer, *bytesRecvdCount);
+					*lpBytesRecvdCount = *lpBytesRecvdCount - sizeof(XBroadcastPacket);
+					char* buffer = (char*)_alloca(*lpBytesRecvdCount); // allocate on stack
+					memcpy(buffer, lpBuffers[0].buf + sizeof(XBroadcastPacket), *lpBytesRecvdCount);
+					memcpy(lpBuffers[0].buf, buffer, *lpBytesRecvdCount);
 					lpFrom->sin_addr = broadcastPck->data.name.sin_addr;
 					lpFrom->sin_port = xsocket->getNetworkOrderSocketPort();
 					return 0;
@@ -234,21 +234,21 @@ int CXnIp::HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 
 		case 'XNeT':
 		{
-			XNetRequestPacket* XNetPck = reinterpret_cast<XNetRequestPacket*>(lpBuffers->buf);
-			if (*bytesRecvdCount == sizeof(XNetRequestPacket)
+			XNetRequestPacket* XNetPck = reinterpret_cast<XNetRequestPacket*>(lpBuffers[0].buf);
+			if (*lpBytesRecvdCount == sizeof(XNetRequestPacket)
 				&& strncmp(XNetPck->pckHeader.HdrStr, requestStrHdr, MAX_HDR_STR) == 0)
 			{
-				LOG_TRACE_NETWORK("{} - Received XNetRequest type: {} from ip address {:X}, port: {}", 
-					__FUNCTION__, 
-					(int)XNetPck->data.reqType, 
-					ntohl(lpFrom->sin_addr.s_addr), 
+				LOG_TRACE_NETWORK("{} - Received XNetRequest type: {} from ip address {:X}, port: {}",
+					__FUNCTION__,
+					(int)XNetPck->data.reqType,
+					ntohl(lpFrom->sin_addr.s_addr),
 					ntohs(lpFrom->sin_port));
 
-				HandleXNetRequestPacket(xsocket, XNetPck, lpFrom, bytesRecvdCount); // save NAT info and send back a connection packet
+				HandleXNetRequestPacket(xsocket, XNetPck, lpFrom, lpBytesRecvdCount); // save NAT info and send back a connection packet
 
 				// set the bytes received count to 0
 				// pool another packet after, so we keep the game fed with data
-				*bytesRecvdCount = 0;
+				*lpBytesRecvdCount = 0;
 				return SOCKET_ERROR;
 			}
 		}
@@ -266,18 +266,19 @@ int CXnIp::HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 	{
 		lpFrom->sin_addr = ipIdentifier;
 		lpFrom->sin_port = xsocket->getNetworkOrderSocketPort(); // Virtual socket ID, not the actual port
-		UpdatePacketReceivedCounters(ipIdentifier, *bytesRecvdCount);
+		UpdatePacketReceivedCounters(ipIdentifier, *lpBytesRecvdCount);
 		return 0;
 	}
 	else
 	{
-		LOG_ERROR_NETWORK("{} - discarding packet with size: {}", __FUNCTION__, *bytesRecvdCount);
 		// set the bytes received count to 0 and recv address/identifier
-		*bytesRecvdCount = 0;
+		// when the packet comes from an unknown source
+		LOG_ERROR_NETWORK("{} - discarding packet with size: {}", __FUNCTION__, *lpBytesRecvdCount);
+		*lpBytesRecvdCount = 0;
 		ZeroMemory(lpFrom, sizeof(*lpFrom));
 		return SOCKET_ERROR;
 	}
-} 
+}
 
 // Outputs the connection identifier
 // Returns error if connection is not found or connected
@@ -317,7 +318,7 @@ int CXnIp::GetEstablishedConnectionIdentifierByRecvAddr(XSocket* xsocket, const 
 			} // switch (xsocket->getHostOrderSocketPort())
 		}
 	}
-	
+
 	LOG_ERROR_NETWORK("{} - received packet from unknown/unregistered source, ip address: {}:{}", __FUNCTION__, inet_ntoa(fromAddr->sin_addr), htons(fromAddr->sin_port));
 	return WSAEINVAL;
 }
@@ -330,13 +331,13 @@ void CXnIp::SaveNatInfo(XSocket* xsocket, IN_ADDR connectionIdentifier, const so
 	if (xnIp != nullptr)
 	{
 		// TODO: handle dynamically
-		/* 
+		/*
 		   Store NAT data
 		   First we look at our socket's intended port.
 		   port 1000 is mapped to the receiving address/port xnIp->NatAddrSocket1000 via the connection identifier.
 		   port 1001 is mapped to the receiving address/port xnIp->NatAddrSocket1001 via the connection identifier.
 		*/
-	
+
 		// TODO: get rid of H2v only sockets
 		switch (xsocket->getHostOrderSocketPort())
 		{
@@ -563,7 +564,7 @@ XnIp* CXnIp::XnIpLookUp(const XNADDR* pxna, const XNKID* xnkid, bool* firstUnuse
 	// check if the user is already in the system, and get the first 
 	for (int i = 0; i < GetMaxXnConnections(); i++)
 	{
-		if (firstUnusedIndexFound != nullptr 
+		if (firstUnusedIndexFound != nullptr
 			&& firstUnusedIndex != nullptr)
 		{
 			if (*firstUnusedIndexFound == false
@@ -601,28 +602,26 @@ int CXnIp::RegisterNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID*
 	if (keyPair != nullptr)
 	{
 		XnIp* newXnIp = &m_XnIPs[connectionIndex];
-		SecureZeroMemory(newXnIp, sizeof(*newXnIp));
+		ZeroMemory(newXnIp, sizeof(*newXnIp));
 
-		newXnIp->xnaddr = *pxna;
+		memcpy(&newXnIp->xnaddr, pxna, sizeof(*pxna));
 		newXnIp->keyPair = keyPair;
 
 		XNetRandom(newXnIp->connectionNonce, sizeof(XnIp::connectionNonce));
 
 		// if this is zero we are fucked
-		int randIdentifier = (rand() % 0xFF) + 1; // 0 to 254 + 1
+		ULONG randIdentifier = (rand() % 0xFF) + 1; // 0 to 254 + 1
 		randIdentifier <<= CHAR_BIT;
 		LOG_INFO_NETWORK("{} - new connection index {}, identifier {:X}", __FUNCTION__, connectionIndex, htonl(connectionIndex | randIdentifier));
 
-		if (outIpIdentifier)
-			outIpIdentifier->s_addr = htonl(connectionIndex | randIdentifier);
-
-		newXnIp->connectStatus = XNET_CONNECT_STATUS_IDLE;
-
 		newXnIp->connectionIdentifier.s_addr = htonl(connectionIndex | randIdentifier);
+		newXnIp->lastConnectionInteractionTime = GetTickCount64();
+		newXnIp->connectStatus = XNET_CONNECT_STATUS_IDLE;
+		newXnIp->pckStats.PckDataSampleUpdate();
 		newXnIp->bValid = true;
 
-		SetTimeConnectionInteractionHappened(newXnIp->connectionIdentifier);
-		newXnIp->pckStats.PckStatsUpdate();
+		if (outIpIdentifier)
+			outIpIdentifier->s_addr = newXnIp->connectionIdentifier.s_addr;
 
 		return 0;
 	}
@@ -677,8 +676,8 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 			memcpy(newlyCreatedXnIp->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonceOtherSide));
 			newlyCreatedXnIp->otherSideNonceKeyReceived = true;
 
-			LOG_TRACE_NETWORK("{} - updated noOnce key for connection identifier: {:X}, n0nceKey: {}", 
-				__FUNCTION__, 
+			LOG_TRACE_NETWORK("{} - updated noOnce key for connection identifier: {:X}, n0nceKey: {}",
+				__FUNCTION__,
 				newlyCreatedXnIp->connectionIdentifier.s_addr,
 				ByteToHexStr(newlyCreatedXnIp->connectionNonceOtherSide, 8).c_str()
 			);
@@ -706,11 +705,11 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 		// causing the connection to fail
 		if (
 			(reqPacket != nullptr
-			&& pXnIpAlreadyRegistered->otherSideNonceKeyReceived
-			&& memcmp(pXnIpAlreadyRegistered->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonce)) != 0)
-			|| 
+				&& pXnIpAlreadyRegistered->otherSideNonceKeyReceived
+				&& memcmp(pXnIpAlreadyRegistered->connectionNonceOtherSide, reqPacket->data.nonceKey, sizeof(XnIp::connectionNonce)) != 0)
+			||
 			(pXnIpAlreadyRegistered->xnaddr.ina.s_addr != pxna->ina.s_addr
-			|| pXnIpAlreadyRegistered->xnaddr.inaOnline.s_addr != pxna->inaOnline.s_addr
+				|| pXnIpAlreadyRegistered->xnaddr.inaOnline.s_addr != pxna->inaOnline.s_addr
 				|| pXnIpAlreadyRegistered->xnaddr.wPortOnline != pxna->wPortOnline)
 			)
 		{
@@ -752,8 +751,8 @@ int CXnIp::CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnki
 		if (reqPacket != nullptr
 			&& !pXnIpAlreadyRegistered->otherSideNonceKeyReceived)
 		{
-			LOG_TRACE_NETWORK("{} - updated noOnce key for connection identifier: {:X}, n0ncekey: {}", 
-				__FUNCTION__, 
+			LOG_TRACE_NETWORK("{} - updated noOnce key for connection identifier: {:X}, n0ncekey: {}",
+				__FUNCTION__,
 				pXnIpAlreadyRegistered->connectionIdentifier.s_addr,
 				ByteToHexStr(reqPacket->data.nonceKey, 8)
 			);
@@ -803,7 +802,7 @@ int CXnIp::RegisterKey(XNKID* pxnkid, XNKEY* pxnkey)
 			{
 				LOG_TRACE_NETWORK("{} - XnKeyPair: xnkid {}, xnkey: {} already registered!",
 					__FUNCTION__,
-					ByteToHexStr(pxnkid->ab, sizeof(pxnkid->ab)).c_str(), 
+					ByteToHexStr(pxnkid->ab, sizeof(pxnkid->ab)).c_str(),
 					ByteToHexStr(pxnkey->ab, sizeof(pxnkey->ab)).c_str()
 				);
 				return WSAEALREADY;
@@ -987,7 +986,7 @@ void CXnIp::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr
 	m_ipLocal.xnaddr.wPortOnline = htons(baseport);
 	HexStrToBytes(std::string(abEnet, sizeof(XNADDR::abEnet) * 2), m_ipLocal.xnaddr.abEnet, sizeof(XNADDR::abEnet));
 	HexStrToBytes(std::string(abOnline, sizeof(XNADDR::abOnline) * 2), m_ipLocal.xnaddr.abOnline, sizeof(XNADDR::abOnline));
-	m_ipLocal.pckStats.PckStatsUpdate();
+	m_ipLocal.pckStats.PckDataSampleUpdate();
 
 	m_ipLocal.bValid = true;
 }
@@ -999,7 +998,7 @@ void CXnIp::ClearLostConnections()
 	{
 		XnIp* xnIp = &m_XnIPs[i];
 		if (xnIp->bValid
-			&& timeGetTime() - xnIp->lastConnectionInteractionTime >= XnIp_ConnectionTimeOut)
+			&& GetTickCount64() - xnIp->lastConnectionInteractionTime >= XnIp_ConnectionTimeOut)
 		{
 			lostConnectionsCount++;
 			UnregisterXnIpIdentifier(xnIp->connectionIdentifier);
@@ -1041,11 +1040,11 @@ INT WINAPI XNetRandom(BYTE* pb, UINT cb)
 	{
 		LARGE_INTEGER key;
 		QueryPerformanceCounter(&key);
-		XeCryptRc4Key(&Rc4StateRand, (BYTE*)&key, sizeof(key));
+		XeCryptRc4Key(&gRc4StateRand, (BYTE*)&key, sizeof(key));
 		Rc4CryptInitialized = true;
 	}
 
-	XeCryptRc4Ecb(&Rc4StateRand, pb, cb);
+	XeCryptRc4Ecb(&gRc4StateRand, pb, cb);
 	return 0;
 }
 
@@ -1078,7 +1077,7 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* 
 	{
 		gXnIp.LogConnectionsErrorDetails(nullptr, ret, pxnkid);
 	}
-	 
+
 	LOG_INFO_NETWORK("{} - local-address: {:X}, online-address: {:X}", __FUNCTION__, pxna->ina.s_addr, pxna->inaOnline.s_addr);
 	return ret;
 }
@@ -1102,7 +1101,7 @@ INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid)
 	}
 
 	if (pxna)
-		*pxna = xnIp->xnaddr;
+		memcpy(pxna, &xnIp->xnaddr, sizeof(*pxna));
 
 	if (pxnkid)
 		memcpy(pxnkid->ab, xnIp->keyPair->xnkid.ab, sizeof(XNKID::ab));
@@ -1156,7 +1155,7 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 		gXnIp.SetTimeConnectionInteractionHappened(ina);
 	}
 	else if (xnIp->connectStatus < XNET_CONNECT_STATUS_CONNECTED
-		&& timeGetTime() - xnIp->lastConnectionInteractionTime >= XnIp_ConnectionTimeOut)
+		&& GetTickCount64() - xnIp->lastConnectionInteractionTime >= XnIp_ConnectionTimeOut)
 	{
 		return XNET_CONNECT_STATUS_LOST;
 	}
@@ -1167,13 +1166,13 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 // #73: XNetGetTitleXnAddr
 DWORD WINAPI XNetGetTitleXnAddr(XNADDR* pxna)
 {
-	ZeroMemory(pxna, sizeof(XNADDR));
+	ZeroMemory(pxna, sizeof(*pxna));
 
 	XnIp* localUserXnIp = gXnIp.GetLocalUserXn();
 	if (!localUserXnIp->bValid)
 		return XNET_GET_XNADDR_PENDING;
 
-	*pxna = localUserXnIp->xnaddr;
+	memcpy(pxna, &localUserXnIp->xnaddr, sizeof(*pxna));
 	return XNET_GET_XNADDR_ETHERNET;
 }
 

@@ -300,6 +300,19 @@ struct s_network_session
 	BYTE gap_797C[508];
 	void* c_kablam_session_join_request_handler; // dedicated server session join handler
 	char field_7B7C[12];
+
+	const char* get_game_network_protocol()
+	{
+		static const char* network_protocols_str[] =
+		{
+			"<disconnected>",
+			"System-Link",
+			"LIVE",
+			"<unknown>",
+		};
+
+		return this->network_protocol > 2 ? network_protocols_str[3] : network_protocols_str[this->network_protocol];
+	}
 };
 static_assert(sizeof(s_network_session) == 31624, "Invalid network_session size");
 static_assert(offsetof(s_network_session, parameters.max_party_players) == 0x4C80, "Invalid parameters.max_party_players offset");

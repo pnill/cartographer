@@ -390,9 +390,8 @@ bool CServerList::SearchResultParseAndWrite(std::shared_ptr<std::string> serverR
 		result = true;
 	}
 
-	return result;
-
 	//LOG_ERROR_XLIVE("{} : string count: {}, properties: {}", __FUNCTION__, strings, nResult->cProperties);
+	return result;
 }
 
 void CServerList::EnumerateFromHttp()

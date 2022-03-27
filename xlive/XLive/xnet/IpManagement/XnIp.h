@@ -119,8 +119,8 @@ struct XnIpPckTransportStats
 	unsigned int pckBytesSent;
 	unsigned int pckBytesRecvd;
 
-	unsigned int pckAvgSent;
-	unsigned int pckAvgRecvd;
+	unsigned int pckAvgSentPerSec;
+	unsigned int pckAvgRecvdPerSec;
 
 	unsigned int pckSentPerSec[MAX_NETSTATS_SAMPLES];
 	unsigned int pckBytesSentPerSec[MAX_NETSTATS_SAMPLES];
@@ -131,7 +131,7 @@ struct XnIpPckTransportStats
 	int			 pckCurrentSendPerSecIdx;
 	int			 pckCurrentRecvdPerSecIdx;
 
-	void PckStatsUpdate()
+	void PckDataSampleUpdate()
 	{
 		if (!bInit)
 		{
@@ -141,8 +141,8 @@ struct XnIpPckTransportStats
 			pckBytesSent = 0;
 			pckBytesRecvd = 0;
 
-			pckAvgSent = 0;
-			pckAvgRecvd = 0;
+			pckAvgSentPerSec = 0;
+			pckAvgRecvdPerSec = 0;
 			pckSentPerSecIdx = 0;
 			pckRecvdPerSecIdx = 0;
 			pckCurrentSendPerSecIdx = -1;
@@ -151,13 +151,13 @@ struct XnIpPckTransportStats
 			memset(pckSentPerSec, 0, sizeof(pckSentPerSec));
 			memset(pckRecvdPerSec, 0, sizeof(pckRecvdPerSec));
 
-			lastTimeUpdate = timeGetTime();
+			lastTimeUpdate = GetTickCount64();
 		}
 		else
 		{
-			const int time_to_next_sample = 1 * 1000;
+			const ULONGLONG sample_end_time = 1ull * 1000ull;
 
-			if (timeGetTime() - lastTimeUpdate >= time_to_next_sample)
+			if (GetTickCount64() - lastTimeUpdate >= sample_end_time)
 			{
 				pckSentPerSecIdx = (pckSentPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
 				pckRecvdPerSecIdx = (pckRecvdPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
@@ -171,13 +171,15 @@ struct XnIpPckTransportStats
 				pckCurrentSendPerSecIdx = (pckCurrentSendPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
 				pckCurrentRecvdPerSecIdx = (pckCurrentRecvdPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
 
-				lastTimeUpdate = timeGetTime();
+				lastTimeUpdate = GetTickCount64();
 			}
 		}
 	}
 
 	void PckSendStatsUpdate(unsigned int _pckXmit, unsigned int _pckXmitBytes)
 	{
+		PckDataSampleUpdate();
+
 		pckSent += _pckXmit;
 		pckBytesSent += _pckXmitBytes;
 
@@ -187,6 +189,8 @@ struct XnIpPckTransportStats
 
 	void PckRecvdStatsUpdate(unsigned int _pckRecvd, unsigned int _pckRecvdBytes)
 	{
+		PckDataSampleUpdate();
+
 		pckRecvd += _pckRecvd;
 		pckBytesRecvd += _pckRecvdBytes;
 
@@ -195,7 +199,7 @@ struct XnIpPckTransportStats
 	}
 
 private:
-	DWORD lastTimeUpdate;
+	ULONGLONG lastTimeUpdate;
 	int pckSentPerSecIdx;
 	int pckRecvdPerSecIdx;
 };
@@ -211,8 +215,8 @@ struct XnIp
 	bool bValid;
 	int connectStatus;
 	int connectionPacketsSentCount;
-	DWORD lastConnectionInteractionTime;
-	DWORD lastPacketReceivedTime;
+	ULONGLONG lastConnectionInteractionTime;
+	ULONGLONG lastPacketReceivedTime;
 
 	BYTE connectionNonce[8];
 	BYTE connectionNonceOtherSide[8];
@@ -287,7 +291,7 @@ struct XnIp
 public:
 	XnIpPckTransportStats pckStats;
 
-	void PclStatsReset()
+	void PckStatsReset()
 	{
 		pckStats.bInit = false;
 	}
@@ -359,7 +363,7 @@ public:
 	void SaveNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, const sockaddr_in* addr);
 
 	// Packet handlers
-	int HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount);
+	int HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, DWORD dwBufferCount, LPDWORD bytesRecvdCount);
 	void HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* reqPaket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
 	void HandleConnectionPacket(XSocket* xsocket, XnIp* xnIp, const XNetRequestPacket* conReqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
 	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr);
