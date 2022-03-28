@@ -302,7 +302,7 @@ void main_game_loop_hook() {
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
 	mapManager->MapDownloadUpdateTick();
 	// update local user network stats
-	gXnIp.GetLocalUserXn()->pckStats.PckStatsUpdate();
+	gXnIp.GetLocalUserXn()->pckStats.PckDataSampleUpdate();
 	main_game_loop();
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
 }

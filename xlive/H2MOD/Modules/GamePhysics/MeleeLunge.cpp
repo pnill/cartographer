@@ -4,6 +4,8 @@
 
 #include "Util\Memory.h"
 
+#include "Blam/Engine/Game/GameGlobals.h"
+
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 #include <float.h>
@@ -81,7 +83,7 @@ void __cdecl biped_dash_hook(datum object_index, datum target_player, char weapo
 	{
 		c_character_physics_mode_melee_datum* melee_mode_datum = (c_character_physics_mode_melee_datum*)(object_data + 1012 + 16);
 
-		real_vector3d localized_velocity = {};
+		real_vector3d localized_velocity;
 		object_get_localized_velocity(object_index, &localized_velocity, nullptr);
 
 		// store the localized velocity in the melee physics mode datum
@@ -792,7 +794,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 		// update_melee_parameters();
 
 		m_melee_tick++;
-		if (distance_between_havok_components > 5.0f
+		if ((!s_game_globals::game_is_campaign() && distance_between_havok_components > 5.0f)
 			|| force_leave_melee_lunge_physics
 			|| m_time_to_target_in_ticks <= 0
 			|| m_melee_tick >= (m_maximum_counter + 6)

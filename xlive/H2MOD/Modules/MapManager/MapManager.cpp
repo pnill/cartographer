@@ -14,26 +14,26 @@
 MapManager* mapManager = new MapManager();
 
 /* String constants below for client/server messages */
-char DOWNLOADING_MAP[] = "Downloading Map";
-char DOWNLOAD_MAP_PERCENTAGE_PREFIX[] = "Downloaded ";
-char WAITING_FOR_MAP_DOWNLOAD_URL[] = "Waiting for map url from server";
-char FOUND_MAP_DOWNLOAD_URL[] = "Found map download url";
-char DOWNLOADING_COMPLETE[] = "Downloading complete";
-char RELOADING_MAPS[] = "Reloading maps in memory";
-char UNZIPPING_MAP_DOWNLOAD[] = "Unzipping map download";
-char FAILED_TO_OPEN_ZIP_FILE[] = "Failed to open the zip file";
-char STILL_SEARCHING_FOR_MAP[] = "Could not find maps from server, still searching";
-char COULD_NOT_FIND_MAPS[] = "Couldn't find the map";
-char UNABLE_TO_CONNECT_TO_SERVER[] = "Unable to connect to server";
-char BAD_FILE_SIZE[] = "Got bad file size, rejoin";
-char VALID_FILE_SIZE[] = "Got filesize from host";
-char CONNECTION_TO_HOST_CLOSED[] = "Connection to host closed";
-char VALID_FILE_NAME[] = "Got filename from host";
-char MAP_WRITTEN_TO_DISK[] = "Wrote downloaded map to disk";
-char CONNECTING_TO_HOST[] = "Connecting to host";
-char ERROR_CONNECTING_TO_HOST[] = "Socket error connecting to host";
-char CHECKING_IF_MAP_EXISTS[] = "Checking if the following map exists, %s";
-char MAP_DOESNT_EXIST_IN_REPO[] = "Download failed, map doesn't exist in repo";
+const char* DOWNLOADING_MAP = "Downloading Map";
+const char* DOWNLOAD_MAP_PERCENTAGE_PREFIX = "Downloaded ";
+const char* WAITING_FOR_MAP_DOWNLOAD_URL = "Waiting for map url from server";
+const char* FOUND_MAP_DOWNLOAD_URL = "Found map download url";
+const char* DOWNLOADING_COMPLETE = "Downloading complete";
+const char* RELOADING_MAPS = "Reloading maps in memory";
+const char* UNZIPPING_MAP_DOWNLOAD = "Unzipping map download";
+const char* FAILED_TO_OPEN_ZIP_FILE = "Failed to open the zip file";
+const char* STILL_SEARCHING_FOR_MAP = "Could not find maps from server, still searching";
+const char* COULD_NOT_FIND_MAPS = "Couldn't find the map";
+const char* UNABLE_TO_CONNECT_TO_SERVER = "Unable to connect to server";
+const char* BAD_FILE_SIZE = "Got bad file size, rejoin";
+const char* VALID_FILE_SIZE = "Got filesize from host";
+const char* CONNECTION_TO_HOST_CLOSED = "Connection to host closed";
+const char* VALID_FILE_NAME = "Got filename from host";
+const char* MAP_WRITTEN_TO_DISK = "Wrote downloaded map to disk";
+const char* CONNECTING_TO_HOST = "Connecting to host";
+const char* ERROR_CONNECTING_TO_HOST = "Socket error connecting to host";
+const char* CHECKING_IF_MAP_EXISTS = "Checking if the following map exists, %s";
+const char* MAP_DOESNT_EXIST_IN_REPO = "Download failed, map doesn't exist in repo";
 
 std::string validDigits("0123456789");
 std::string mapExt(".map");

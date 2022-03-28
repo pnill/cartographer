@@ -299,11 +299,11 @@ int XSocket::winsock_read_socket(LPWSABUF lpBuffers,
 		return SOCKET_ERROR;
 	}
 
-	result = gXnIp.HandleRecvdPacket(this, (sockaddr_in*)lpFrom, lpBuffers, lpNumberOfBytesRecvd);
+	result = gXnIp.HandleRecvdPacket(this, (sockaddr_in*)lpFrom, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd);
 	return result;
 }
 
-int XSocket::recvfrom(LPWSABUF lpBuffers, 
+int XSocket::sock_read(LPWSABUF lpBuffers,
 	DWORD dwBufferCount,
 	LPDWORD lpNumberOfBytesRecvd, 
 	LPDWORD lpFlags,
@@ -351,7 +351,7 @@ int XSocket::recvfrom(LPWSABUF lpBuffers,
 int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr *lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
 	XSocket* socket = (XSocket*)s;
-	return socket->recvfrom(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
+	return socket->sock_read(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
 }
 
 // #25
