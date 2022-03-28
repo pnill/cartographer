@@ -24,9 +24,9 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 
 			//	LOG_TRACE_NETWORK_N("[XNetQoSLookup] Looping cxnas for probes pqos->xnqosPending: {}", pqos->cxnqosPending);
 
+			int iResult;
 			SOCKET connectSocket = INVALID_SOCKET;
 			struct addrinfo *result = NULL, *ptr = NULL, hints;
-			int iResult;
 
 			ZeroMemory(&hints, sizeof(hints));
 			hints.ai_family = AF_INET;
@@ -69,7 +69,6 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 				iResult = connect(connectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
 				if (iResult == SOCKET_ERROR) {
 					closesocket(connectSocket);
-					connectSocket = INVALID_SOCKET;
 					continue;
 				}
 
@@ -126,11 +125,16 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 			} while (probes > 0);
 
 			/*int WSAError = WSAGetLastError();
-			if (RecvLen == -1 || WSAError == WSAETIMEDOUT || WSAError == WSAECONNRESET || WSAError == WSAESHUTDOWN || WSAError == WSAEINVAL || connectSocket == INVALID_SOCKET || connectSocket == SOCKET_ERROR)
+			if (RecvLen == SOCKET_ERROR 
+				|| WSAError == WSAETIMEDOUT 
+				|| WSAError == WSAECONNRESET 
+				|| WSAError == WSAESHUTDOWN 
+				|| WSAError == WSAEINVAL 
+				|| connectSocket == INVALID_SOCKET 
+				|| connectSocket == SOCKET_ERROR)
 			{
 				closesocket(connectSocket);
 					LOG_TRACE_NETWORK_N("[XNetQoSLookup][Socket: %08X] Winsock Error Occured: %i - Socket Closed", connectSocket, WSAError);
-
 			}*/
 
 			closesocket(connectSocket);
@@ -149,7 +153,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 				continue;
 			}
 
-			auto ping_result = std::minmax(ping_storage.begin(), ping_storage.end());
+			auto ping_result = std::minmax_element(ping_storage.begin(), ping_storage.end());
 			long long min_ping = *ping_result.first;
 			long long max_ping = *ping_result.second;
 			unsigned int average = (std::accumulate(ping_storage.begin(), ping_storage.end(), 0) / ping_storage.size());
