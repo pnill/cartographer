@@ -325,7 +325,7 @@ int XSocket::sock_read(LPWSABUF lpBuffers,
 			if (errorByRecvAPI)
 			{
 				if (WSAGetLastError() != WSAEWOULDBLOCK)
-					LOG_ERROR_NETWORK("XSocketWSARecvFrom() - Socket Error: {}", WSAGetLastError());
+					LOG_ERROR_NETWORK("{} - socket error: {}", __FUNCTION__, WSAGetLastError());
 
 				return result;
 			}

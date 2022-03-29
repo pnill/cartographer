@@ -251,7 +251,7 @@ void NetworkSession::logPeersToConsole() {
 		int peerIndex = 0;
 		do 
 		{
-			auto peer_observer = &observer->observers[getCurrentNetworkSession()->peer_observer_channels[peerIndex].observer_index];
+			auto peer_observer = &observer->observer_channels[getCurrentNetworkSession()->peer_observer_channels[peerIndex].observer_index];
 
 			std::wstring outStr = L"Peer index=" + std::to_wstring(peerIndex);
 			outStr += L", Peer Name=";

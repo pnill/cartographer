@@ -5,28 +5,33 @@
 
 #include "Util\Hooks\Hook.h"
 
-network_observer_configuration* g_network_configuration;
-
-#define k_network_preference_size 108
-
-#if INCREASE_NETWORK_TICKRATE_OBSOLETE
-#define k_online_netcode_tickrate_real 60.0f
-#endif
+s_network_observer_configuration* g_network_configuration;
 
 #if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 #	if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 
-float _server_network_rate = 60.f;
-float _client_network_rate = 60.f;
+// variables, TODO configurable
+float _online_netcode_client_rate_real = k_online_netcode_client_rate_real;
+float _online_netcode_server_rate_real = k_online_netcode_server_rate_real;
 
-// int _max_bandwidth_per_channel = 30720 * 4;
-int _max_bandwidth_per_channel = 606720;
+int _online_netcode_client_max_bandwidth_per_channel = k_online_netcode_client_max_bandwidth_per_channel;
+int _online_netcode_server_max_bandwidth_per_channel = k_online_netcode_server_max_bandwidth_per_channel;
 
-//TODO: 
-int _max_window_size = -1;
+// TODO:
+int	_online_netcode_window_size = -1;
+bool _online_netcode_use_local_network_time = true;
 
 #	endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
-#endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
+#endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS)
+
+// TODO:
+int __cdecl network_time_get()
+{
+	typedef int(__cdecl* network_time_get_t)();
+	auto p_network_time_get = Memory::GetAddressRelative<network_time_get_t>(0x0);
+
+	return p_network_time_get();
+}
 
 // LIVE netcode research
 void __cdecl initialize_network_observer_configuration()
@@ -143,8 +148,8 @@ void __cdecl initialize_network_observer_configuration()
 
 void s_network_observer::sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data)
 {
-	typedef void(__thiscall* observer_channel_send_message)(s_network_observer*, int, int, e_network_message_send_protocol, int, int, void*);
-	auto p_observer_channel_send_message = Memory::GetAddress<observer_channel_send_message>(0x1BED40, 0x1B8C1A);
+	typedef void(__thiscall* observer_channel_send_message_t)(s_network_observer*, int, int, e_network_message_send_protocol, int, int, void*);
+	auto p_observer_channel_send_message = Memory::GetAddress<observer_channel_send_message_t>(0x1BED40, 0x1B8C1A);
 
 	p_observer_channel_send_message(this, session_index, observer_index, send_out_of_band, type, size, data);
 }
@@ -227,14 +232,14 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 	int out_voice_chat_data_buffer_size,
 	BYTE* out_voice_chat_data_buffer)
 {
-	typedef bool(__thiscall* should_send_packet)(s_network_observer*, int, bool, bool, int, int*, int*, int*, int*, int, BYTE*);
-	auto p_channel_should_send_packet = Memory::GetAddressRelative<should_send_packet>(0x5BEE8D, 0x5B8D67);
+	typedef bool(__thiscall* channel_should_send_packet_t)(s_network_observer*, int, bool, bool, int, int*, int*, int*, int*, int, BYTE*);
+	auto p_channel_should_send_packet = Memory::GetAddressRelative<channel_should_send_packet_t>(0x5BEE8D, 0x5B8D67);
 
 	int observer_index = -1;
 	for (int i = 0; i < 16; i++)
 	{
-		if (this->observers[i].state != s_observer_channel::e_observer_channel_state::none
-			&& this->observers[i].channel_index == network_channel_index)
+		if (this->observer_channels[i].state != s_observer_channel::e_observer_channel_state::none
+			&& this->observer_channels[i].channel_index == network_channel_index)
 		{
 			observer_index = i;
 			break;
@@ -245,12 +250,12 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 		return false;
 
 	network_channel* network_channel = network_channel::getNetworkChannel(network_channel_index);
-	s_observer_channel* observer_channel = &this->observers[observer_index];
+	s_observer_channel* observer_channel = &this->observer_channels[observer_index];
 
 	// we modify the network channel paramters to force the network tickrate
 	const auto _temp_network_rate					= observer_channel->net_rate_managed_stream;
-	const auto _temp_network_bandwidth_per_stream	= observer_channel->managed_stream_bandwidth;
-	const auto _temp_network_window_size			= observer_channel->managed_stream_window_size;
+	const auto _temp_network_bandwidth_per_stream	= observer_channel->net_managed_stream_bandwidth;
+	const auto _temp_network_window_size			= observer_channel->net_managed_stream_window_size;
 
 #if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 #	if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
@@ -261,15 +266,16 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 		// check if we're host
 		if (network_channel->isSimulationAuthority())
 		{
-			observer_channel->net_rate_managed_stream = _server_network_rate;
+			observer_channel->net_rate_managed_stream = _online_netcode_server_rate_real;
+			observer_channel->net_managed_stream_bandwidth = _online_netcode_server_max_bandwidth_per_channel;
 		}
 		else
 		{
-			observer_channel->net_rate_managed_stream = _client_network_rate;
+			observer_channel->net_rate_managed_stream = _online_netcode_client_rate_real;
+			observer_channel->net_managed_stream_bandwidth = _online_netcode_client_max_bandwidth_per_channel;
 		}
 
-		observer_channel->managed_stream_bandwidth = _max_bandwidth_per_channel;
-		observer_channel->managed_stream_window_size = _max_window_size;
+		observer_channel->net_managed_stream_window_size = _online_netcode_window_size;
 	}
 
 #	endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
@@ -279,13 +285,13 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 
 	// then we reset the values back to normal
 	observer_channel->net_rate_managed_stream		= _temp_network_rate;
-	observer_channel->managed_stream_bandwidth		= _temp_network_bandwidth_per_stream;
-	observer_channel->managed_stream_window_size	= _temp_network_window_size;
+	observer_channel->net_managed_stream_bandwidth		= _temp_network_bandwidth_per_stream;
+	observer_channel->net_managed_stream_window_size	= _temp_network_window_size;
 
 	return ret;
 }
 
-static void __declspec(naked) jmp_network_observer_should_send_packet_hook() { __asm jmp s_network_observer::channel_should_send_packet_hook }
+static void __declspec(naked) jmp_network_observer_channel_should_send_packet_hook() { __asm jmp s_network_observer::channel_should_send_packet_hook }
 
 void s_network_observer::ForceConstantNetworkRate()
 {
@@ -294,8 +300,8 @@ void s_network_observer::ForceConstantNetworkRate()
 	// but there are some benefits in using Online's netcode
 	// like limited network packet rate, otherwise people with uncapped FPS will overflow host's packet buffer
 
-	// replace vtable pointer of channel_should_send_packet_hook
-	WritePointer(Memory::GetAddressRelative(0x7C615C, 0x781C48), jmp_network_observer_should_send_packet_hook);
+	// replace vtable pointer of network_observer::channel_should_send_packet
+	WritePointer(Memory::GetAddressRelative(0x7C615C, 0x781C48), jmp_network_observer_channel_should_send_packet_hook);
 
 	// don't force packet filling when game simulation is attached
 	// otherwise we send packets filled with nothing...
@@ -327,7 +333,7 @@ void s_network_observer::ApplyPatches()
 	WritePointer(Memory::GetAddress(0x1C11FA, 0x1BB0DA) + 4, &netcode_tickrate);
 	WritePointer(Memory::GetAddress(0x1C12BF, 0x1BB19F) + 4, &netcode_tickrate);
 
-	g_network_configuration = Memory::GetAddress<network_observer_configuration*>(0x4F960C, 0x523B5C);
+	g_network_configuration = Memory::GetAddress<s_network_observer_configuration*>(0x4F960C, 0x523B5C);
 	PatchCall(Memory::GetAddress(0x1ABE23, 0x1AC328), initialize_network_observer_configuration);
 
 	// other config patches
@@ -369,7 +375,7 @@ void s_network_observer::ApplyPatches()
 #endif
 
 	// increase the network heap size
-	WriteValue<DWORD>(Memory::GetAddress(0x1ACCC8, 0x1ACE96) + 6, NETWORK_HEAP_SIZE);
+	WriteValue<DWORD>(Memory::GetAddress(0x1ACCC8, 0x1ACE96) + 6, k_network_heap_size);
 
 	PatchCall(Memory::GetAddress(0x1E0FEE, 0x1B5EDE), call_GetNetworkMeasurements);
 

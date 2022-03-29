@@ -16,9 +16,23 @@
 #endif
 
 // network heap size
-#define NETWORK_HEAP_SIZE 10485760 // default: 1048576
+#define k_network_preference_size 108
 
-struct network_observer_configuration;
+// default: 1048576
+#define k_network_heap_size 10485760 
+
+// defaults
+#define k_online_netcode_client_rate_real 60.0f
+#define k_online_netcode_server_rate_real 60.0f
+
+#define k_online_netcode_client_max_packet_size_bytes 1264
+#define k_online_netcode_server_max_packet_size_bytes 1264
+
+// size in bits
+#define k_online_netcode_client_max_bandwidth_per_channel ((int)k_online_netcode_client_rate_real * k_online_netcode_client_max_packet_size_bytes * 8)
+#define k_online_netcode_server_max_bandwidth_per_channel ((int)k_online_netcode_server_rate_real * k_online_netcode_server_max_packet_size_bytes * 8)
+
+struct s_network_observer_configuration;
 
 struct network_address
 {
@@ -115,8 +129,8 @@ struct __declspec(align(8)) s_observer_channel
 	bool simulation_authority;
 	bool simulation_not_authority;
 	BYTE gap_6A9[3];
-	int managed_stream_bandwidth;
-	DWORD managed_stream_window_size;
+	int net_managed_stream_bandwidth;
+	DWORD net_managed_stream_window_size;
 	float net_rate_managed_stream;
 	bool field_6B8;
 	char field_6B9;
@@ -165,7 +179,7 @@ struct __declspec(align(8)) s_network_observer
 	void* network_link;
 	void* network_message_gateway;
 	void* message_types;
-	network_observer_configuration* configuration;
+	s_network_observer_configuration* configuration;
 	int *field_14;
 	BYTE gap_18[8];
 	XNKID sessionId;
@@ -178,8 +192,8 @@ struct __declspec(align(8)) s_network_observer
 	BYTE gap_68[12];
 	DWORD field_74;
 	BYTE gap_78[8];
-	s_observer_channel observers[16];
-	BYTE network_obeserver_enabled;
+	s_observer_channel observer_channels[16];
+	bool network_obeserver_enabled;
 	char field_7481;
 	int field_7484;
 	DWORD throughput;
@@ -236,12 +250,12 @@ struct __declspec(align(8)) s_network_observer
 		BYTE* out_voice_chat_data_buffer);
 
 	bool __thiscall GetNetworkMeasurements(DWORD *out_throughput, float *out_satiation, DWORD *a4);
-	int getObserverState(int observerIndex) { return observers[observerIndex].state; };
+	int getObserverState(int observerIndex) { return observer_channels[observerIndex].state; };
 	void sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data);
 };
 static_assert(sizeof(s_network_observer) == 0x75C8, "network_observer size != 30152");
 
-struct network_observer_configuration
+struct s_network_observer_configuration
 {
 	DWORD field_0;
 	DWORD field_4;
@@ -346,4 +360,4 @@ struct network_observer_configuration
 	float field_1FC;
 	DWORD field_200;
 };
-static_assert(sizeof(network_observer_configuration) == 0x204, "Invalid network_observer_configuration size");
+static_assert(sizeof(s_network_observer_configuration) == 0x204, "Invalid network_observer_configuration size");
