@@ -4,7 +4,7 @@
 
 #include "H2MOD\Tags\TagInterface.h"
 #include "Blam\Engine\DataArray\DataArray.h"
-#include "Blam\Engine\FileSystem\FiloInterface.h"
+#include "Blam\FileSystem\FiloInterface.h"
 
 #include "Util\Hooks\Hook.h"
 
@@ -21,7 +21,7 @@ const wchar_t* custom_map_cache_filename_client = L"mapset.h2mdat";
 const static char* offically_supported_builds[32] =
 {
 	"11081.07.04.30.0934.main",
-	"11122.07.08.24.1808.main"
+	"11122.07.08.24.1808.main",
 };
 
 bool __cdecl scenario_is_supported_build(const char* build)
@@ -340,8 +340,8 @@ void __thiscall s_custom_map_data::load_custom_map_data_cache()
 void __thiscall s_custom_map_data::start_custom_map_sync()
 {
 	// this code doesn't need any modifications, just some functions replaced inside it
-	typedef void(__thiscall* file_iterate_custom_map_directory_def)(s_custom_map_data* thisx);
-	auto p_file_iterate_custom_map_directory = Memory::GetAddress<file_iterate_custom_map_directory_def>(0x4D021, 0x419B5);
+	typedef void(__thiscall* file_iterate_custom_map_directory_t)(s_custom_map_data* thisx);
+	auto p_file_iterate_custom_map_directory = Memory::GetAddress<file_iterate_custom_map_directory_t>(0x4D021, 0x419B5);
 	p_file_iterate_custom_map_directory(this);
 
 	// auto map_to_add = custom_map_to_add_linked_list;
@@ -571,8 +571,8 @@ bool __thiscall s_custom_map_data::entry_is_duplicate(const s_custom_map_entry* 
 
 bool __thiscall s_custom_map_data::validate_entry_data(const s_custom_map_entry* entries, int count)
 {
-	typedef bool(__thiscall* validate_entry_data)(s_custom_map_data*, const s_custom_map_entry* entry, int count);
-	auto p_validate_entry_data = Memory::GetAddressRelative<validate_entry_data>(0x4C1E01, 0x48F542);
+	typedef bool(__thiscall* validate_entry_data_t)(s_custom_map_data*, const s_custom_map_entry* entry, int count);
+	auto p_validate_entry_data = Memory::GetAddressRelative<validate_entry_data_t>(0x4C1E01, 0x48F542);
 	return p_validate_entry_data(this, entries, count * sizeof(s_custom_map_entry));
 }
 
@@ -692,23 +692,23 @@ bool __thiscall s_custom_map_data::remove_duplicates_write_entry_data_and_add(s_
 	remove_entries_matching_file_path(entry);
 	remove_duplicates_by_map_name_and_hash(entry);
 
-	typedef bool(__thiscall* read_map_data_and_add_entry)(s_custom_map_data*, s_custom_map_entry* entry);
-	auto p_read_map_data_and_add_entry = Memory::GetAddressRelative<read_map_data_and_add_entry>(0x44CC35);
+	typedef bool(__thiscall* read_map_data_and_add_entry_t)(s_custom_map_data*, s_custom_map_entry* entry);
+	auto p_read_map_data_and_add_entry = Memory::GetAddressRelative<read_map_data_and_add_entry_t>(0x44CC35);
 
 	return p_read_map_data_and_add_entry(this, entry);
 }
 
 bool open_cache_header(const wchar_t* file_path, void* cache_header_ptr, HANDLE* map_handle)
 {
-	typedef char(__cdecl open_cache_header)(const wchar_t* file_path, void* lpBuffer, HANDLE* map_handle, DWORD NumberOfBytesRead);
-	auto open_cache_header_impl = Memory::GetAddress<open_cache_header*>(0x642D0, 0x4C327);
-	return open_cache_header_impl(file_path, cache_header_ptr, map_handle, 0);
+	typedef char(__cdecl open_cache_header_t)(const wchar_t* file_path, void* lpBuffer, HANDLE* map_handle, DWORD NumberOfBytesRead);
+	auto p_open_cache_header = Memory::GetAddress<open_cache_header_t*>(0x642D0, 0x4C327);
+	return p_open_cache_header(file_path, cache_header_ptr, map_handle, 0);
 }
 
 void close_cache_header(HANDLE* map_handle)
 {
-	typedef void __cdecl close_cache_header(HANDLE* a1);
-	auto close_cache_header_impl = Memory::GetAddress<close_cache_header*>(0x64C03, 0x4CC5A);
+	typedef void (__cdecl* close_cache_header_t)(HANDLE*);
+	auto close_cache_header_impl = Memory::GetAddress<close_cache_header_t>(0x64C03, 0x4CC5A);
 	close_cache_header_impl(map_handle);
 }
 
@@ -747,8 +747,8 @@ int __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_ent
 	// without this the map is just called by it's file name
 
 	// todo move the code for loading the descriptions to our code and get rid of this
-	typedef int __cdecl validate_and_add_custom_map_interal(s_custom_map_entry* a1);
-	auto validate_and_add_custom_map_interal_impl = Memory::GetAddress<validate_and_add_custom_map_interal*>(0x4F690, 0x56890);
+	typedef int (__cdecl* validate_and_add_custom_map_interal_t)(s_custom_map_entry*);
+	auto validate_and_add_custom_map_interal_impl = Memory::GetAddress<validate_and_add_custom_map_interal_t>(0x4F690, 0x56890);
 	if (!validate_and_add_custom_map_interal_impl(custom_map_entry))
 	{
 		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
@@ -832,15 +832,16 @@ class c_custom_game_custom_map_list
 {
 public:
 
-	void __thiscall constructor_hook(int a2)
+	c_custom_game_custom_map_list* __thiscall constructor_hook(int a2)
 	{
-		typedef void(__thiscall* original_constructor)(c_custom_game_custom_map_list* thisptr, int a2);
-		auto p_original_constructor = Memory::GetAddressRelative<original_constructor>(0x65AE3B);
+		typedef c_custom_game_custom_map_list*(__thiscall* original_constructor_t)(c_custom_game_custom_map_list*, int);
+		auto p_original_constructor = Memory::GetAddressRelative<original_constructor_t>(0x65AE3B);
 
 		// execute first part of the function
-		// then load the map list
 		p_original_constructor(this, a2);
+		// then load the map list
 		load_custom_map_list();
+		return this;
 	}
 
 	void __thiscall load_custom_map_list()
@@ -848,8 +849,8 @@ public:
 		// here we replace the custom map list allocator
 		DWORD thisptr = (DWORD)this;
 
-		typedef int(__thiscall* sub_6113D3)(int* thisptr, DWORD* a2);
-		auto p_sub_6113D3 = Memory::GetAddressRelative<sub_6113D3>(0x6113D3);
+		typedef void(__thiscall* sub_6113D3_t)(int* thisptr, DWORD* a2);
+		auto p_sub_6113D3 = Memory::GetAddressRelative<sub_6113D3_t>(0x6113D3);
 
 		s_data_array** custom_map_menu_list = (s_data_array**)(thisptr + 112);
 

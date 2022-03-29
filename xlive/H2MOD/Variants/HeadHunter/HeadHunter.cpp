@@ -6,13 +6,13 @@
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
-#include "H2MOD/EngineCalls/EngineCalls.h"
+#include "H2MOD/Engine/Engine.h"
 
 #include "H2MOD.h"
 
 int soundBuffer = 0;
 std::map<int, std::map<e_headhunter_sounds, const wchar_t*>> H_SoundsTable;
-bool h_firstSpawn = true;
+bool b_firstSpawn = true;
 
 HeadHunter::HeadHunter()
 {
@@ -41,10 +41,10 @@ void HeadHunter::triggerSound(e_headhunter_sounds sound, int sleep)
 
 void HeadHunter::spawnPlayerClientSetup()
 {
-	if (h_firstSpawn)
+	if (b_firstSpawn)
 	{
 		triggerSound(head_hunter, 1000);
-		h_firstSpawn = false;
+		b_firstSpawn = false;
 	}
 }
 
@@ -56,14 +56,14 @@ void HeadHunter::SpawnSkull(datum unit_datum)
 	{
 		s_object_placement_data nObject;
 
-		EngineCalls::Objects::create_new_placement_data(&nObject, e_weapons_datum_index::ball, -1, 0);
+		Engine::Objects::create_new_placement_data(&nObject, e_weapons_datum_index::ball, -1, 0);
 
 		nObject.position = biped_unit->position;
 		nObject.translational_velocity = biped_unit->translational_velocity;
 
-		datum new_object_datum = EngineCalls::Objects::call_object_new(&nObject);
+		datum new_object_datum = Engine::Objects::object_new(&nObject);
 		if (!DATUM_IS_NONE(new_object_datum))
-			call_add_object_to_sync(new_object_datum);
+			Engine::Objects::simulation_action_object_create(new_object_datum);
 	}
 }
 
@@ -156,12 +156,12 @@ void HeadHunterHandler::SetUnitDatum(datum unit_datum)
 
 void HeadHunter::initClient()
 {
-	h_firstSpawn = true;
-	h2mod->disable_sounds(FLAG(SoundType::Slayer) | ALL_SOUNDS_NO_SLAYER);
-	H_SoundsTable[language_ids::english][e_headhunter_sounds::head_hunter] = L"sounds/en/headhunter.wav";
-	H_SoundsTable[language_ids::english][e_headhunter_sounds::skull_scored] = L"sounds/en/skull_scored.wav";
-	H_SoundsTable[language_ids::spanish][e_headhunter_sounds::head_hunter] = L"sounds/es/headhunter.wav";
-	H_SoundsTable[language_ids::spanish][e_headhunter_sounds::skull_scored] = L"sounds/es/skull_scored.wav";
+	b_firstSpawn = true;
+	h2mod->disable_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
+	H_SoundsTable[_lang_id_english][e_headhunter_sounds::head_hunter] = L"sounds/en/headhunter.wav";
+	H_SoundsTable[_lang_id_english][e_headhunter_sounds::skull_scored] = L"sounds/en/skull_scored.wav";
+	H_SoundsTable[_lang_id_spanish][e_headhunter_sounds::head_hunter] = L"sounds/es/headhunter.wav";
+	H_SoundsTable[_lang_id_spanish][e_headhunter_sounds::skull_scored] = L"sounds/es/skull_scored.wav";
 }
 
 void HeadHunter::initHost()

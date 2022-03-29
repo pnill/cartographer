@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "StatsHandler.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
@@ -45,7 +45,7 @@ void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
 		
 		switch (state)
 		{
-		case life_cycle_pre_game:
+		case _life_cycle_pre_game:
 			if (!pregameFirstInitialization)
 			{
 				verifyRegistrationStatus();
@@ -58,10 +58,10 @@ void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
 				InvalidateMatch(false);
 				return;
 			}
-		case life_cycle_in_game:
+		case _life_cycle_in_game:
 			InvalidateMatch(false);
 			return;
-		case life_cycle_post_game:
+		case _life_cycle_post_game:
 			sendStats();
 			return;
 		default:
@@ -75,7 +75,7 @@ void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
 	}
 	else
 	{
-		if (state == life_cycle_none) 
+		if (state == _life_cycle_none) 
 		{
 			h2mod->set_local_rank(255);
 			return;
@@ -100,7 +100,7 @@ void StatsHandler::server_command_event(ServerConsole::ServerConsoleCommands com
 {
 	if(Status.StatsEnabled)
 	{
-		if(command == ServerConsole::skip && EngineCalls::get_game_life_cycle() == life_cycle_in_game)
+		if(command == ServerConsole::skip && Engine::get_game_life_cycle() == _life_cycle_in_game)
 		{
 			InvalidateMatch(true);
 		}
@@ -884,8 +884,8 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 	// but only in the post game carnage report/pregame
 	// ranks will update at the end of the game
 
-	if (EngineCalls::get_game_life_cycle() != life_cycle_pre_game
-		&& EngineCalls::get_game_life_cycle() != life_cycle_post_game)
+	if (Engine::get_game_life_cycle() != _life_cycle_pre_game
+		&& Engine::get_game_life_cycle() != _life_cycle_post_game)
 		return;
 
 	std::thread(getPlayerRanksByStringList, buildPlayerRankUpdateQueryStringList()).detach();

@@ -2,7 +2,7 @@
 
 #include "RunLoop.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\GUI\GUI.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
@@ -22,64 +22,61 @@
 
 #define TIMER_RESOLUTION 1
 
-typedef void(_cdecl p_present_rendered_screen)();
-p_present_rendered_screen* present_rendered_screen;
+typedef void(_cdecl* present_rendered_screen_t)();
+present_rendered_screen_t p_present_rendered_screen;
 
-typedef char(p_sub_9A96B1)();
-p_sub_9A96B1* sub_9A96B1;
+typedef char(__cdecl* sub_9A96B1_t)();
+sub_9A96B1_t p_sub_9A96B1;
 
-typedef bool(p_game_freeze)();
-p_game_freeze* game_freeze;
+typedef bool(__cdecl* game_freeze_t)();
+game_freeze_t p_game_freeze;
 
-typedef char(p_game_minimized)();
-p_game_minimized* game_minimized;
+typedef bool(__cdecl* game_in_simulation_t)();
+game_in_simulation_t p_game_in_simulation;
 
-typedef bool(p_game_in_simulation)();
-p_game_in_simulation* game_in_simulation;
+typedef int(__cdecl* sub_B7CA7D_t)(float a1);
+sub_B7CA7D_t p_sub_CDCA7D;
 
-typedef int(__cdecl p_sub_B7CA7D)(float a1);
-p_sub_B7CA7D* sub_CDCA7D;
+typedef int(__cdecl* sub_AF87A1_t)();
+sub_AF87A1_t p_sub_AF87A1;
 
-typedef int(__cdecl p_sub_AF87A1)();
-p_sub_AF87A1* sub_AF87A1;
+void(__cdecl* p_sub_9AA221)();
+void(__cdecl* p_sub_C8542F)();
+void(__cdecl* p_sub_C853C7)();
+void(__cdecl* p_sub_C7D83F)();
+void(__cdecl* p_sub_B02590)();
+void(__cdecl* p_sub_B0A221)();
+void(__cdecl* p_sub_C7E9D3)();
+void(__cdecl* p_sub_AD7902)();
+void(__cdecl* p_sub_AD96EB)();
+void(__cdecl* p_sub_B09783)();
+void(__cdecl* p_sub_B727EB)();
+void(__cdecl* p_vibrations_clear)();
+void(__cdecl* p_game_network_dispatcher)();
 
-void(*sub_9AA221)();
-void(*sub_C8542F)();
-void(*sub_C853C7)();
-void(*sub_C7D83F)();
-void(*sub_B02590)();
-void(*sub_B0A221)();
-void(*sub_C7E9D3)();
-void(*sub_AD7902)();
-void(*sub_AD96EB)();
-void(*sub_B09783)();
-void(*sub_B727EB)();
-void(*vibrations_clear)();
-void(*game_network_dispatcher)();
+typedef void(__cdecl* sub_C7E7C5_t)();
+sub_C7E7C5_t p_sub_C7E7C5;
 
-typedef void(__cdecl p_sub_C7E7C5)();
-p_sub_C7E7C5* sub_C7E7C5;
+typedef int(__cdecl* sub_B16834_t)();
+sub_B16834_t p_sub_B16834;
 
-typedef int(p_sub_B16834)();
-p_sub_B16834* sub_B16834;
+typedef char(__cdecl* sub_B361EC_t)();
+sub_B361EC_t p_sub_B361EC;
 
-typedef char(p_sub_B361EC)();
-p_sub_B361EC* sub_B361EC;
+typedef BYTE*(__cdecl* sub_B5DD5C_t)();
+sub_B5DD5C_t p_sub_B5DD5C;
 
-typedef BYTE*(p_sub_B5DD5C)();
-p_sub_B5DD5C* sub_B5DD5C;
+typedef bool(__cdecl* sub_B4BFD1_t)();
+sub_B4BFD1_t p_sub_B4BFD1;
 
-typedef bool(p_sub_B4BFD1)();
-p_sub_B4BFD1* sub_B4BFD1;
+typedef char(__cdecl* sub_AD985E_t)();
+sub_AD985E_t p_sub_AD985E;
 
-typedef char(p_sub_AD985E)();
-p_sub_AD985E* sub_AD985E;
+typedef bool (__cdecl* c_cinematic_in_progress_t)();
+c_cinematic_in_progress_t p_cinematic_in_progress;
 
-typedef bool __cdecl c_cinematic_in_progress();
-c_cinematic_in_progress* cinematic_in_progress;
-
-typedef char c_cinematic_is_running();
-c_cinematic_is_running* cinematic_is_running;
+typedef char (__cdecl* c_cinematic_is_running_t)();
+c_cinematic_is_running_t p_cinematic_is_running;
 
 typedef void(__cdecl* input_update)();
 input_update p_input_update;
@@ -87,48 +84,48 @@ input_update p_input_update;
 typedef void(__cdecl* input_abstraction_update)();
 input_abstraction_update p_input_abstraction_update;
 
-typedef char(p_sub_B1BA65)();
-p_sub_B1BA65* sub_B1BA65;
+typedef char(__cdecl* sub_B1BA65_t)();
+sub_B1BA65_t p_sub_B1BA65;
 
-typedef char(p_restart_game_loop)();
-p_restart_game_loop* restart_game_loop;
+typedef bool(__cdecl* restart_game_loop_t)();
+restart_game_loop_t p_restart_game_loop;
 
-typedef void(__cdecl p_local_players_update_and_send_synchronous_actions)(float a1, float a2);
-p_local_players_update_and_send_synchronous_actions* local_players_update_and_send_synchronous_actions;
+typedef void(__cdecl* local_players_update_and_send_synchronous_actions_t)(float a1, float a2);
+local_players_update_and_send_synchronous_actions_t p_local_players_update_and_send_synchronous_actions;
 
-typedef void(__cdecl p_simulation_update)(int target_ticks, float *a3);
-p_simulation_update* simulation_update;
+typedef void(__cdecl* simulation_update_t)(int target_ticks, float* a3);
+simulation_update_t p_simulation_update;
 
-typedef void(__cdecl game_frame)(float a1);
-game_frame* p_game_frame;
+typedef void(__cdecl* game_frame_t)(float a1);
+game_frame_t p_game_frame;
 
-typedef char(__cdecl p_director_update)(float a1);
-p_director_update* director_update;
+typedef char(__cdecl* director_update_t)(float a1);
+director_update_t p_director_update;
 
-typedef void(__cdecl p_observer_update)(float a1);
-p_observer_update* observer_update;
+typedef void(__cdecl* observer_update_t)(float a1);
+observer_update_t p_observer_update;
 
-typedef void(__cdecl p_game_time_globals_prep)(float a1, float* a2, int* a3);
-p_game_time_globals_prep* game_time_globals_prep;
+typedef void(__cdecl* game_time_globals_prep_t)(float a1, float* a2, int* a3);
+game_time_globals_prep_t p_game_time_globals_prep;
 
-typedef int(__cdecl p_system_milliseconds)();
-p_system_milliseconds* system_milliseconds;
+typedef int(__cdecl* system_milliseconds_t)();
+system_milliseconds_t p_system_milliseconds;
 
-typedef float(__cdecl main_game_time_system_update)(bool a1, float a2);
-main_game_time_system_update* p_main_time_update;
+typedef float(__cdecl* main_game_time_system_update)(bool a1, float a2);
+main_game_time_system_update p_main_time_update;
 
-typedef void(__cdecl p_render_audio)();
-p_render_audio* render_audio;
+typedef void(__cdecl* p_render_audio)();
+p_render_audio render_audio;
 
-typedef void(__thiscall* sub_B1D31F)(void* thisx, bool a2);
-sub_B1D31F p_sub_B1D31F;
+typedef void(__thiscall* sub_B1D31F_t)(void* thisx, bool a2);
+sub_B1D31F_t p_sub_B1D31F;
 
-typedef void(_cdecl p_sub_AF8716)(int a1);
-p_sub_AF8716* sub_AF8716;
+typedef void(_cdecl* sub_AF8716_t)(int a1);
+sub_AF8716_t p_sub_AF8716;
 
 // rumble_update aka vibrations update
-typedef void(__cdecl* rumble_update)(float dt);
-rumble_update p_rumble_update;
+typedef void(__cdecl* rumble_update_t)(float dt);
+rumble_update_t p_rumble_update;
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
@@ -249,7 +246,7 @@ inline void defaultFrameLimiter() {
 
 	if (H2Config_experimental_fps == e_render_original_game_frame_limit
 		|| H2Config_fps_limit <= 0
-		|| EngineCalls::IsGameMinimized())
+		|| Engine::is_game_minimized())
 	{
 		lastFrameSetting = H2Config_fps_limit;
 		frameLimiterInitialized = false;
@@ -331,7 +328,7 @@ bool __cdecl cinematic_in_progress_hook()
 	case e_render_old:
 		// TODO: get_game_life_cycle is only used with networked sessions, meaning this will not work in single player
 		// and i keep it this way because the EventHandler in UncappedFPS2.cpp uses the game's life cycle as well
-		return cinematic_is_running() || EngineCalls::get_game_life_cycle() == life_cycle_in_game || EngineCalls::IsGameMinimized();
+		return p_cinematic_is_running() || Engine::get_game_life_cycle() == _life_cycle_in_game || Engine::is_game_minimized();
 
 	// these two options disable the hacks that hired gun added to the main loop
 	case e_render_new:
@@ -340,7 +337,7 @@ bool __cdecl cinematic_in_progress_hook()
 
 	case e_render_none:
 	default:
-		return cinematic_is_running() || b_XboxTick || EngineCalls::IsGameMinimized();
+		return p_cinematic_is_running() || b_XboxTick || Engine::is_game_minimized();
 	}
 
 	return false;
@@ -358,7 +355,7 @@ bool __cdecl should_limit_framerate()
 	case e_render_new:
 	case e_render_old:
 	default:
-		return (EngineCalls::IsGameMinimized() || b_XboxTick);
+		return (Engine::is_game_minimized() || b_XboxTick);
 	}
 
 	return false;
@@ -376,10 +373,10 @@ float tps = (1.0f / 60);
 
 void alt_prep_time(float a1, float *a2, int *a3)
 {
-	if (EngineCalls::get_game_life_cycle() != life_cycle_in_game) {
+	if (Engine::get_game_life_cycle() != _life_cycle_in_game) {
 		float _a2;
 		int _a3;
-		game_time_globals_prep(a1, &_a2, &_a3);
+		p_game_time_globals_prep(a1, &_a2, &_a3);
 		*a2 = _a2;
 		*a3 = _a3;
 	}
@@ -407,7 +404,7 @@ float alt_system_time_update()
 	float result = (float)(currentTime - startTime) * 0.001;
 	startTime = currentTime;
 
-	if (cinematic_is_running() || EngineCalls::IsGameMinimized())
+	if (p_cinematic_is_running() || Engine::is_game_minimized())
 		result = original_time_update;
 
 	return result;
@@ -439,7 +436,7 @@ void __cdecl game_main_loop()
 	static float out_dt; // [esp+30h] [ebp-14h]
 	static int out_target_ticks; // [esp+34h] [ebp-10h]
 	int v18; // [esp+40h] [ebp-4h]
-	v1 = sub_AF87A1(); //Some sort of initializer for timing.
+	v1 = p_sub_AF87A1(); //Some sort of initializer for timing.
 	a3 = v1;
 	Interpolate = true; // by default this is false, and needs to be set to true if a cinematic is running, to run the main loop how it originally worked in H2X
 						// (Nuke: also theres no interpolation in the game, it has to be added, mo idea why this is called like this because it's quite misleading)
@@ -475,17 +472,17 @@ void __cdecl game_main_loop()
 			v10 = 1;
 		if (v2 == 0)
 		{
-			sub_AD96EB();
+			p_sub_AD96EB();
 
-			if (!sub_AD985E())
+			if (!p_sub_AD985E())
 				return;
-			sub_B09783();
+			p_sub_B09783();
 		}
-		if (restart_game_loop())
+		if (p_restart_game_loop())
 			break;
 		
 		p_input_update();
-		if (!game_minimized()) 
+		if (!Engine::is_game_minimized()) 
 		{
 			if (H2Config_controller_modern)
 			{
@@ -498,16 +495,16 @@ void __cdecl game_main_loop()
 		}
 		if (v12)
 		{
-			sub_B16834();
-			sub_B02590();
-			sub_B5DD5C();
-			sub_AD7902();
-			sub_B361EC();
-			sub_B1BA65();
+			p_sub_B16834();
+			p_sub_B02590();
+			p_sub_B5DD5C();
+			p_sub_AD7902();
+			p_sub_B361EC();
+			p_sub_B1BA65();
 			void* loaded_custom_maps_data = Memory::GetAddress<void*>(0x482D70);
 			p_sub_B1D31F(loaded_custom_maps_data, true);
 		}
-		if (!game_freeze())
+		if (!p_game_freeze())
 		{
 			out_dt = 0.0;
 			out_target_ticks = 0;
@@ -517,7 +514,7 @@ void __cdecl game_main_loop()
 			}
 			else
 			{
-				if (v1 > 0 && sub_B4BFD1())
+				if (v1 > 0 && p_sub_B4BFD1())
 					v3 = time_globals::get()->seconds_per_tick;
 				else
 					v3 = 0.0f;
@@ -526,62 +523,62 @@ void __cdecl game_main_loop()
 				if (*dword_F52260 < 2)
 				{
 					++*dword_F52260;
-					sub_AF8716(1);
+					p_sub_AF8716(1);
 				}
 				else
 				{
 					*dword_F52260 = 0;
 				}
 			}
-			if (game_freeze())
+			if (p_game_freeze())
 				v5 = 0.0;
 			else
 				v5 = v15;
 			v13 = v5;
-			if (!game_minimized())
+			if (!Engine::is_game_minimized())
 			{
-				sub_CDCA7D(v15);
-				sub_B0A221();
+				p_sub_CDCA7D(v15);
+				p_sub_B0A221();
 			}
 			if (v12)
 			{
-				sub_C8542F();
-				sub_C853C7();
-				sub_C7E7C5();
-				sub_C7D83F();
+				p_sub_C8542F();
+				p_sub_C853C7();
+				p_sub_C7E7C5();
+				p_sub_C7D83F();
 			}
-			if (game_in_simulation())
+			if (p_game_in_simulation())
 			{
-				game_time_globals_prep(v13, &out_dt, &out_target_ticks);
-				local_players_update_and_send_synchronous_actions(v13, out_dt);
-				simulation_update(out_target_ticks, &out_dt);
+				p_game_time_globals_prep(v13, &out_dt, &out_target_ticks);
+				p_local_players_update_and_send_synchronous_actions(v13, out_dt);
+				p_simulation_update(out_target_ticks, &out_dt);
 				if (v10)
-					game_network_dispatcher();
+					p_game_network_dispatcher();
 				//game_frame(out_dt);
-				director_update(v13);
-				observer_update(v13);
+				p_director_update(v13);
+				p_observer_update(v13);
 				p_rumble_update(v13);
 			}
 			else
 			{
-				sub_C7E9D3();
-				game_network_dispatcher();
-				vibrations_clear();
+				p_sub_C7E9D3();
+				p_game_network_dispatcher();
+				p_vibrations_clear();
 			}
 			if (v10)
 			{
 				/*v7 = get_xbox_achievements_data();
 				XAchievements(v7);*/
 			}
-			if (game_minimized())
+			if (Engine::is_game_minimized())
 			{
-				vibrations_clear();
+				p_vibrations_clear();
 			}
 			else if (v10)
 			{
-				v0 = system_milliseconds();
-				present_rendered_screen();
-				v8 = system_milliseconds() - v0;
+				v0 = p_system_milliseconds();
+				p_present_rendered_screen();
+				v8 = p_system_milliseconds() - v0;
 				//DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
 				//if (init_flags_array[2] == 0)
 				//	render_audio();
@@ -589,7 +586,7 @@ void __cdecl game_main_loop()
 				{
 					*sound_impulse_called = 0;
 					*sound_impulse_unk = 1;
-					sub_AF8716(v8);
+					p_sub_AF8716(v8);
 				}
 				v1 = a3;
 			}
@@ -618,10 +615,10 @@ void alt_main_game_loop_hook()
 		init = true;
 
 		DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
-		if (init_flags_array[2] == 0 && !game_minimized())
+		if (init_flags_array[2] == 0 && !Engine::is_game_minimized())
 			render_audio();
 
-		if(game_in_simulation())
+		if (p_game_in_simulation())
 		{
 			p_game_frame(time_globals::get()->seconds_per_tick);
 		}
@@ -650,50 +647,49 @@ void alt_main_game_loop_hook()
 
 void initialize_main_loop_function_pointers()
 {
-	sub_9AA221 = (void(*)())((char*)H2BaseAddr + 0x3A221);
-	sub_C8542F = (void(*)())((char*)H2BaseAddr + 0x1B542F);
-	sub_C853C7 = (void(*)())((char*)H2BaseAddr + 0x1B53C7);
-	sub_C7D83F = (void(*)())((char*)H2BaseAddr + 0x1AD83F);
-	sub_B02590 = (void(*)())((char*)H2BaseAddr + 0x325A2);
-	sub_B0A221 = (void(*)())((char*)H2BaseAddr + 0x3A221);
-	sub_C7E9D3 = (void(*)())((char*)H2BaseAddr + 0x1AE9D3);
-	sub_AD7902 = (void(*)())((char*)H2BaseAddr + 0x7902);
-	sub_AD96EB = (void(*)())((char*)H2BaseAddr + 0x96EB);
-	sub_B09783 = (void(*)())((char*)H2BaseAddr + 0x39783);
-	sub_B727EB = (void(*)())((char*)H2BaseAddr + 0xA27EB);
+	p_sub_9AA221 = (void(*)())((char*)H2BaseAddr + 0x3A221);
+	p_sub_C8542F = (void(*)())((char*)H2BaseAddr + 0x1B542F);
+	p_sub_C853C7 = (void(*)())((char*)H2BaseAddr + 0x1B53C7);
+	p_sub_C7D83F = (void(*)())((char*)H2BaseAddr + 0x1AD83F);
+	p_sub_B02590 = (void(*)())((char*)H2BaseAddr + 0x325A2);
+	p_sub_B0A221 = (void(*)())((char*)H2BaseAddr + 0x3A221);
+	p_sub_C7E9D3 = (void(*)())((char*)H2BaseAddr + 0x1AE9D3);
+	p_sub_AD7902 = (void(*)())((char*)H2BaseAddr + 0x7902);
+	p_sub_AD96EB = (void(*)())((char*)H2BaseAddr + 0x96EB);
+	p_sub_B09783 = (void(*)())((char*)H2BaseAddr + 0x39783);
+	p_sub_B727EB = (void(*)())((char*)H2BaseAddr + 0xA27EB);
 
-	sub_C7E7C5 = Memory::GetAddress<p_sub_C7E7C5*>(0x1AE7C5);
-	sub_B5DD5C = Memory::GetAddress<p_sub_B5DD5C*>(0x8DD5C);
-	sub_B16834 = Memory::GetAddress<p_sub_B16834*>(0x46834);
-	sub_B1BA65 = Memory::GetAddress<p_sub_B1BA65*>(0x4BA65);
-	sub_B361EC = Memory::GetAddress<p_sub_B361EC*>(0x661EC);
-	sub_AF87A1 = Memory::GetAddress<p_sub_AF87A1*>(0x287A1);
-	sub_AD985E = Memory::GetAddress<p_sub_AD985E*>(0x985E);
-	sub_B4BFD1 = Memory::GetAddress<p_sub_B4BFD1*>(0x7BFD1);
-	sub_9A96B1 = Memory::GetAddress<p_sub_9A96B1*>(0x396B1);
-	sub_CDCA7D = Memory::GetAddress<p_sub_B7CA7D*>(0x20CA7D);
-	sub_AF8716 = Memory::GetAddress<p_sub_AF8716*>(0x28716);
-	p_sub_B1D31F = Memory::GetAddress<sub_B1D31F>(0x4D31F);
+	p_sub_C7E7C5 = Memory::GetAddress<sub_C7E7C5_t>(0x1AE7C5);
+	p_sub_B5DD5C = Memory::GetAddress<sub_B5DD5C_t>(0x8DD5C);
+	p_sub_B16834 = Memory::GetAddress<sub_B16834_t>(0x46834);
+	p_sub_B1BA65 = Memory::GetAddress<sub_B1BA65_t>(0x4BA65);
+	p_sub_B361EC = Memory::GetAddress<sub_B361EC_t>(0x661EC);
+	p_sub_AF87A1 = Memory::GetAddress<sub_AF87A1_t>(0x287A1);
+	p_sub_AD985E = Memory::GetAddress<sub_AD985E_t>(0x985E);
+	p_sub_B4BFD1 = Memory::GetAddress<sub_B4BFD1_t>(0x7BFD1);
+	p_sub_9A96B1 = Memory::GetAddress<sub_9A96B1_t>(0x396B1);
+	p_sub_CDCA7D = Memory::GetAddress<sub_B7CA7D_t>(0x20CA7D);
+	p_sub_AF8716 = Memory::GetAddress<sub_AF8716_t>(0x28716);
+	p_sub_B1D31F = Memory::GetAddress<sub_B1D31F_t>(0x4D31F);
 
-	vibrations_clear = (void(*)())((char*)H2BaseAddr + 0x901B8);
-	game_network_dispatcher = (void(*)())((char*)H2BaseAddr + 0x1B5456);
-	restart_game_loop = Memory::GetAddress<p_restart_game_loop*>(0x286E1);
-	game_time_globals_prep = Memory::GetAddress<p_game_time_globals_prep*>(0x7C1BF);
-	present_rendered_screen = Memory::GetAddress<p_present_rendered_screen*>(0x27002A);
-	game_in_simulation = Memory::GetAddress<p_game_in_simulation*>(0x1ADD30);
-	game_freeze = Memory::GetAddress<p_game_freeze*>(0x145B);
-	game_minimized = Memory::GetAddress<p_game_minimized*>(0x28729);
-	render_audio = Memory::GetAddress<p_render_audio*>(0x2DF87);
-	system_milliseconds = Memory::GetAddress<p_system_milliseconds*>(0x37E51);
-	observer_update = Memory::GetAddress<p_observer_update*>(0x83E6A);
-	local_players_update_and_send_synchronous_actions = Memory::GetAddress<p_local_players_update_and_send_synchronous_actions*>(0x93857);
-	simulation_update = Memory::GetAddress<p_simulation_update*>(0x4A5D0);
-	p_game_frame = Memory::GetAddress<game_frame*>(0x48CDC);
-	director_update = Memory::GetAddress<p_director_update*>(0x5A658);
-	p_main_time_update = Memory::GetAddress<main_game_time_system_update*>(0x28814);
-	cinematic_in_progress = Memory::GetAddress<c_cinematic_in_progress*>(0x3a928);
-	cinematic_is_running = Memory::GetAddress<c_cinematic_is_running*>(0x3a938);
-	p_rumble_update = Memory::GetAddress<rumble_update>(0x90438);
+	p_vibrations_clear = (void(*)())((char*)H2BaseAddr + 0x901B8);
+	p_game_network_dispatcher = (void(*)())((char*)H2BaseAddr + 0x1B5456);
+	p_restart_game_loop = Memory::GetAddress<restart_game_loop_t>(0x286E1);
+	p_game_time_globals_prep = Memory::GetAddress<game_time_globals_prep_t>(0x7C1BF);
+	p_present_rendered_screen = Memory::GetAddress<present_rendered_screen_t>(0x27002A);
+	p_game_in_simulation = Memory::GetAddress<game_in_simulation_t>(0x1ADD30);
+	p_game_freeze = Memory::GetAddress<game_freeze_t>(0x145B);
+	p_render_audio = Memory::GetAddress<p_render_audio>(0x2DF87);
+	p_system_milliseconds = Memory::GetAddress<system_milliseconds_t>(0x37E51);
+	p_observer_update = Memory::GetAddress<observer_update_t>(0x83E6A);
+	p_local_players_update_and_send_synchronous_actions = Memory::GetAddress<local_players_update_and_send_synchronous_actions_t>(0x93857);
+	p_simulation_update = Memory::GetAddress<simulation_update_t>(0x4A5D0);
+	p_game_frame = Memory::GetAddress<game_frame_t>(0x48CDC);
+	p_director_update = Memory::GetAddress<director_update_t>(0x5A658);
+	p_main_time_update = Memory::GetAddress<main_game_time_system_update>(0x28814);
+	p_cinematic_in_progress = Memory::GetAddress<c_cinematic_in_progress_t>(0x3a928);
+	p_cinematic_is_running = Memory::GetAddress<c_cinematic_is_running_t>(0x3a938);
+	p_rumble_update = Memory::GetAddress<rumble_update_t>(0x90438);
 	p_input_abstraction_update = Memory::GetAddress<input_abstraction_update>(0x628A8);
 	p_input_update = Memory::GetAddress<input_update>(0x2F9AC);
 		

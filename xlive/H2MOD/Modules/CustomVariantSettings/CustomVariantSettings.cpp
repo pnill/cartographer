@@ -168,12 +168,12 @@ namespace CustomVariantSettings
 	{
 		switch (state)
 		{
-		case life_cycle_in_game:
+		case _life_cycle_in_game:
 			ApplyCurrentSettings();
 			break;
-		case life_cycle_none:
-		case life_cycle_pre_game:
-		case life_cycle_post_game:
+		case _life_cycle_none:
+		case _life_cycle_pre_game:
+		case _life_cycle_post_game:
 			ResetSettings();
 			break;
 		default:

@@ -441,7 +441,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 // 5257: ??
 HRESULT WINAPI XLiveManageCredentials(LPCWSTR lpszLiveIdName, LPCWSTR lpszLiveIdPassword, DWORD dwCredFlags, PXOVERLAPPED pXOverlapped)
 {
-	LOG_TRACE_XLIVE(L"XLiveManageCredentials (lpszLiveIdName = {0}, lpszLiveIdPassword = {1}, dwCredFlags = {2:#x}, pXOverlapped = {3:p})",
+	LOG_TRACE_XLIVE(L"XLiveManageCredentials (lpszLiveIdName = {}, lpszLiveIdPassword = {}, dwCredFlags = {:#x}, pXOverlapped = {:p})",
 		lpszLiveIdName, lpszLiveIdPassword, dwCredFlags, (void*)pXOverlapped);
 
 	if (pXOverlapped)

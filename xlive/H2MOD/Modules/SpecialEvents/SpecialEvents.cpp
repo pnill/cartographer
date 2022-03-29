@@ -13,7 +13,7 @@
 #include "Blam\Cache\TagGroups\weapon_definition.hpp"
 #include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Enums\HaloStrings.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\GUI\imgui_integration\imgui_handler.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
@@ -122,7 +122,7 @@ namespace SpecialEvents
 
 	void ChristmasOnMapLoad()
 	{
-		if(h2mod->GetEngineType() == e_engine_type::MainMenu)
+		if(h2mod->GetEngineType() == e_engine_type::_main_menu)
 		{
 			auto md = tags::find_tag(blam_tag::tag_group_type::soundlooping, "sound\\ui\\main_menu_music\\main_menu_music");
 			auto m = tags::get_tag<blam_tag::tag_group_type::soundlooping, char>(md);
@@ -136,7 +136,7 @@ namespace SpecialEvents
 				track_loop->TagIndex = -1;
 			}
 		}
-		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
+		if (h2mod->GetEngineType() == e_engine_type::_mutliplayer)
 		{
 			santa_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", blam_tag::tag_group_type::scenery, "carto_shared");
 			auto w_datum_i = tag_loader::Get_tag_datum("scenarios\\multi\\lockout\\lockout_big", blam_tag::tag_group_type::weathersystem, "carto_shared");
@@ -335,7 +335,7 @@ namespace SpecialEvents
 
 	void PaddysOnMapLoad()
 	{
-		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
+		if (h2mod->GetEngineType() == e_engine_type::_mutliplayer)
 		{
 			if (tag_loader::Map_exists("carto_shared"))
 			{
@@ -438,7 +438,7 @@ namespace SpecialEvents
 
 	void MookMaddnessOnMapLoad()
 	{
-		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
+		if (h2mod->GetEngineType() == e_engine_type::_mutliplayer)
 		{
 			if (tag_loader::Map_exists("carto_shared"))
 			{
@@ -657,7 +657,7 @@ namespace SpecialEvents
 	datum pump_datum;
 	void halloween_game_life_cycle_update(e_game_life_cycle state)
 	{
-		if (state == life_cycle_in_game) {
+		if (state == _life_cycle_in_game) {
 			if (H2Config_spooky_boy)
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
@@ -675,15 +675,15 @@ namespace SpecialEvents
 					switch (std::get<0>(scen_place))
 					{
 					case 0:
-						EngineCalls::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
+						Engine::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
 						placement.variant_name = pump_hmlt->variants[std::get<1>(scen_place)]->name.get_packed();
 						break;
 					case 1:
-						EngineCalls::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
+						Engine::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
 						placement.variant_name = 0;
 						break;
 					case 2:
-						EngineCalls::Objects::create_new_placement_data(&placement, large_candle_datum, -1, 0);
+						Engine::Objects::create_new_placement_data(&placement, large_candle_datum, -1, 0);
 						placement.variant_name = 0;
 						break;
 					}
@@ -692,7 +692,7 @@ namespace SpecialEvents
 					set_orientation(&placement.orientation, &placement.up, &std::get<3>(scen_place));
 					placement.scale = std::get<4>(scen_place);
 
-					unsigned int object = EngineCalls::Objects::call_object_new(&placement);
+					datum object_idx = Engine::Objects::object_new(&placement);
 				}
 			}
 			if (strcmp(mapName, "lockout") == 0)
@@ -702,11 +702,11 @@ namespace SpecialEvents
 					switch (std::get<0>(scen_place))
 					{
 					case 0:
-						EngineCalls::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
+						Engine::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
 						placement.variant_name = pump_hmlt->variants[std::get<1>(scen_place)]->name.get_packed();
 						break;
 					case 1:
-						EngineCalls::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
+						Engine::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
 						placement.variant_name = 0;
 						break;
 					}
@@ -715,7 +715,7 @@ namespace SpecialEvents
 					set_orientation(&placement.orientation, &placement.up, &std::get<3>(scen_place));
 					placement.scale = std::get<4>(scen_place);
 
-					unsigned int object = EngineCalls::Objects::call_object_new(&placement);
+					datum object_idx = Engine::Objects::object_new(&placement);
 				}
 			}
 		}
@@ -723,7 +723,7 @@ namespace SpecialEvents
 
 	void HalloweenOnMapLoad()
 	{
-		if (h2mod->GetEngineType() == Multiplayer)
+		if (h2mod->GetEngineType() == _mutliplayer)
 		{
 			if (tag_loader::Map_exists("carto_shared"))
 			{
@@ -813,7 +813,7 @@ namespace SpecialEvents
 
 	void AddNewMarkers()
 	{
-		if (h2mod->GetEngineType() == e_engine_type::Multiplayer) {
+		if (h2mod->GetEngineType() == e_engine_type::_mutliplayer) {
 			auto mode_elite_datum = tags::find_tag(blam_tag::tag_group_type::rendermodel, "objects\\characters\\elite\\elite_mp");
 			auto mode_elite = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(mode_elite_datum);
 			auto new_marker_group = MetaExtender::add_tag_block2<s_render_model_group_definition::s_marker_groups_block>((unsigned long)std::addressof(mode_elite->marker_groups));
@@ -854,7 +854,7 @@ namespace SpecialEvents
 					while (true)
 					{
 						std::this_thread::sleep_for(1000ms);
-						if (h2mod->GetEngineType() == MainMenu && H2Config_event_music)
+						if (h2mod->GetEngineType() == _main_menu && H2Config_event_music)
 						{
 							if (!flop) {
 								flop = true;

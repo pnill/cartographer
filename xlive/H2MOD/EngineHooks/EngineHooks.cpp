@@ -23,7 +23,7 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 
 namespace EngineHooks
 {
-	static e_game_life_cycle previousGamestate = life_cycle_none;
+	static e_game_life_cycle previousGamestate = _life_cycle_none;
 
 	game_life_cycle_update p_game_life_cycle_update;
 	void GameLifeCycleUpdate()

@@ -13,7 +13,7 @@
 #include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\LazyBlam\LazyBlam.hpp"
-#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
@@ -31,7 +31,7 @@ namespace KantTesting
 	datum w_datum;
 	void MapLoad()
 	{
-		if (h2mod->GetEngineType() == Multiplayer)
+		if (h2mod->GetEngineType() == _mutliplayer)
 		{
 			/*
 			auto w_datum_i = tag_loader::Get_tag_datum(weat_tag_path, blam_tag::tag_group_type::weathersystem, "carto_shared");

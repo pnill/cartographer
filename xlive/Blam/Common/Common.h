@@ -49,20 +49,20 @@ static_assert (sizeof(tagGroup) == (size),"Invalid Size for TagGroup <" #tagGrou
 
 enum e_engine_type : int
 {
-	SinglePlayer = 1,
-	Multiplayer,
-	MainMenu,
-	MultiplayerShared,
-	SinglePlayerShared
+	_single_player = 1,
+	_mutliplayer,
+	_main_menu,
+	_mutiplayer_shared,
+	_single_player_shared
 };
 
 enum e_game_life_cycle : int
 {
-	life_cycle_none,
-	life_cycle_pre_game,
-	life_cycle_start_game,
-	life_cycle_in_game,
-	life_cycle_post_game,
-	life_cycle_joining,
-	life_cycle_matchmaking
+	_life_cycle_none,
+	_life_cycle_pre_game,
+	_life_cycle_start_game,
+	_life_cycle_in_game,
+	_life_cycle_post_game,
+	_life_cycle_joining,
+	_life_cycle_matchmaking
 };

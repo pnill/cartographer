@@ -118,35 +118,35 @@ bool FileTypeCheck(const std::string& file_path, const std::string& file_type);
 
 class FrequencyLimiter
 {
-	using time = std::chrono::high_resolution_clock;
+	using _time = std::chrono::high_resolution_clock;
 
 public:
 	FrequencyLimiter::FrequencyLimiter(unsigned int _frequency) :
-		maxUpdateRateHz(_frequency)
+		m_maxUpdateRateHz(_frequency)
 	{
-		initialUpdate = true;
-		lastTime = time::now();
-		maxUpdateRateMsec = std::chrono::milliseconds(int(1000.f / (float)maxUpdateRateHz));
+		m_initialUpdate = true;
+		lastTime = _time::now();
+		m_maxUpdateRateMsec = std::chrono::milliseconds(int(1000.f / (float)m_maxUpdateRateHz));
 	}
 
-	bool shouldUpdate()
+	bool ShouldUpdate()
 	{
-		bool result = initialUpdate == true
-			|| time::now() - lastTime > maxUpdateRateMsec;
+		bool result = m_initialUpdate
+			|| _time::now() - lastTime > m_maxUpdateRateMsec;
 
 		if (result)
 		{
-			initialUpdate = false;
-			lastTime = time::now();
+			m_initialUpdate = false;
+			lastTime = _time::now();
 		}
 
 		return result;
 	}
 
-	bool initialUpdate;
-	std::chrono::milliseconds maxUpdateRateMsec;
-	unsigned int maxUpdateRateHz; // update the cursor each 8 milliseconds
+	bool m_initialUpdate;
+	std::chrono::milliseconds m_maxUpdateRateMsec;
+	unsigned int m_maxUpdateRateHz; // update the cursor each 8 milliseconds
 
 private:
-	time::time_point lastTime;
+	_time::time_point lastTime;
 };

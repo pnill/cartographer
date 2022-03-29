@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "HudElements.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
@@ -31,7 +31,7 @@ static bool RenderIngameChat() {
 		return true;
 	}
 
-	else if (*GameEngine != 3 && EngineCalls::get_game_life_cycle() == life_cycle_in_game) {
+	else if (*GameEngine != 3 && Engine::get_game_life_cycle() == _life_cycle_in_game) {
 		//Enable chat in engine mode and game state mp.
 		return false;
 	}
@@ -103,7 +103,7 @@ void HudElements::setCrosshairSize(bool mapLoadContext)
 
 	if (Memory::isDedicatedServer())
 		return;
-	if (h2mod->GetEngineType() == e_engine_type::Multiplayer) {
+	if (h2mod->GetEngineType() == e_engine_type::_mutliplayer) {
 
 		auto hud_reticles = tags::find_tag(blam_tag::tag_group_type::bitmap, "ui\\hud\\bitmaps\\new_hud\\crosshairs\\hud_reticles");
 		char* hud_reticles_data = tags::get_tag<blam_tag::tag_group_type::bitmap, char>(hud_reticles);

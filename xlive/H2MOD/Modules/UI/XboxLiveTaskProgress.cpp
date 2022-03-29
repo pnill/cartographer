@@ -14,7 +14,7 @@ void c_xbox_live_task_progress_menu::Open(void* callback)
 
 void c_xbox_live_task_progress_menu::ApplyPatches()
 {
-	if (h2mod->GetEngineType() != MainMenu || Memory::isDedicatedServer()) return;
+	if (h2mod->GetEngineType() != _main_menu || Memory::isDedicatedServer()) return;
 
 	std::string task_progress_dialog_tag_path("ui\\screens\\game_shell\\xbox_live\\task_progress_dialog\\task_progress_dialog");
 

@@ -18,8 +18,8 @@
 static int InterpretMasterCreate(char* response_content) {
 	int result = 0;//will stay as 0 when master only returns "return_code=xxx<br>"
 
-	char tempstr1[129] = { "" };
 	int tempint1 = -1;
+	char tempstr1[512] = { "" };
 	unsigned long long templlu1 = 0;
 	unsigned int tempuint1 = 0;
 	unsigned long tempulong = 0;

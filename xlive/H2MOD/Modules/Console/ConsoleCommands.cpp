@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "ConsoleCommands.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
@@ -358,15 +358,15 @@ void ConsoleCommands::checkForIds() {
 	}
 }
 
-void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition, bool sameTeam) {
+void ConsoleCommands::spawn(datum object_idx, int count, float x, float y, float z, float randomMultiplier, bool specificPosition, bool sameTeam) {
 
 	for (int i = 0; i < count; i++) {
 		try {
 			s_object_placement_data nObject;
 
-			if (!DATUM_IS_NONE(object_datum)) {
+			if (!DATUM_IS_NONE(object_idx)) {
 				datum player_datum = s_player::getPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
-				EngineCalls::Objects::create_new_placement_data(&nObject, object_datum, player_datum, 0);
+				Engine::Objects::create_new_placement_data(&nObject, object_idx, player_datum, 0);
 				real_point3d* player_position = h2mod->get_player_unit_coords(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 
 				if (player_position != nullptr) {
@@ -383,9 +383,9 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 				if (!sameTeam)
 					nObject.team_index = NONE;
 
-				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum, nObject.position.x, nObject.position.y, nObject.position.z);
-				unsigned int object_gamestate_datum = EngineCalls::Objects::call_object_new(&nObject);
-				call_add_object_to_sync(object_gamestate_datum);
+				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_idx, nObject.position.x, nObject.position.y, nObject.position.z);
+				datum object_gamestate_datum = Engine::Objects::object_new(&nObject);
+				Engine::Objects::simulation_action_object_create(object_gamestate_datum);
 			}
 		}
 		catch (...) {
@@ -394,12 +394,12 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 	}
 }
 
-void ConsoleCommands::spawn_rotate(datum object_datum, float x, float y, float z, float i, float j, float k)
+void ConsoleCommands::spawn_rotate(datum object_idx, float x, float y, float z, float i, float j, float k)
 {
 	s_object_placement_data nObject;
-	if (!DATUM_IS_NONE(object_datum))
+	if (!DATUM_IS_NONE(object_idx))
 	{
-		EngineCalls::Objects::create_new_placement_data(&nObject, object_datum, -1, 0);
+		Engine::Objects::create_new_placement_data(&nObject, object_idx, -1, 0);
 		typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, real_point3d* orient);
 		auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
 		nObject.position.x = x;
@@ -407,8 +407,8 @@ void ConsoleCommands::spawn_rotate(datum object_datum, float x, float y, float z
 		nObject.position.z = z;
 		real_vector3d rotation{ i = i, j = j, k = k };
 		set_orientation(&nObject.orientation, &nObject.up, &rotation);
-		auto gamestate_datum = EngineCalls::Objects::call_object_new(&nObject);
-		EngineCalls::Objects::call_add_object_to_sync(gamestate_datum);
+		auto gamestate_datum = Engine::Objects::object_new(&nObject);
+		Engine::Objects::simulation_action_object_create(gamestate_datum);
 		output(L"Spawned object: ");
 		output(IntToWString<unsigned int>(gamestate_datum, std::hex));
 	}
@@ -417,7 +417,7 @@ void ConsoleCommands::delete_object(datum object_datum)
 {
 	if (!DATUM_IS_NONE(object_datum))
 	{
-		EngineCalls::Objects::object_destroy(object_datum);
+		Engine::Objects::object_destroy(object_datum);
 	}
 }
 void ConsoleCommands::output(std::wstring result) {
@@ -591,13 +591,13 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (h2mod->GetEngineType() == e_engine_type::MainMenu) {
+			if (h2mod->GetEngineType() == e_engine_type::_main_menu) {
 				//TODO: need a nicer way to detect this for dedis
 				output(L"Can only be used ingame");
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::SinglePlayer)
+			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::_single_player)
 			{
 				output(L"Can only be used by the session host!");
 				return;
@@ -661,7 +661,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$xyz") {
-			if (h2mod->GetEngineType() == e_engine_type::Multiplayer && !NetworkSession::localPeerIsSessionHost()) {
+			if (h2mod->GetEngineType() == e_engine_type::_mutliplayer && !NetworkSession::localPeerIsSessionHost()) {
 				output(L"Only host can see xyz for now...");
 				return;
 			}
@@ -676,7 +676,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (h2mod->GetEngineType() == e_engine_type::MainMenu) {
+			if (h2mod->GetEngineType() == e_engine_type::_main_menu) {
 				output(L"Can only be used ingame");
 				return;
 			}
@@ -721,7 +721,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid command, usage $spawn_rotate object_id x y z i j k");
 				return;
 			}
-			if (h2mod->GetEngineType() == e_engine_type::MainMenu) {
+			if (h2mod->GetEngineType() == e_engine_type::_main_menu) {
 				output(L"Can only be used ingame");
 				return;
 			}
@@ -842,7 +842,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$injecttag")
 		{
-			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::SinglePlayer)
+			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::_single_player)
 			{
 				output(L"Can only be used by the session host!");
 				return;

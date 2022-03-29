@@ -485,29 +485,29 @@ void setGameLanguage() {
 		switch (GetUserDefaultLangID() & 0x3FF)
 		{
 		case 0x11:
-			language_id = language_ids::japanese;
+			language_id = _lang_id_japanese;
 			break;
 		case 7:
-			language_id = language_ids::german;
+			language_id = _lang_id_german;
 			break;
 		case 0xC:
-			language_id = language_ids::french;
+			language_id = _lang_id_french;
 			break;
 		case 0xA:
-			language_id = language_ids::spanish;
+			language_id = _lang_id_spanish;
 			break;
 		case 0x10:
-			language_id = language_ids::italian;
+			language_id = _lang_id_italian;
 			break;
 		case 0x12:
-			language_id = language_ids::korean;
+			language_id = _lang_id_korean;
 			break;
 		case 4:
-			language_id = language_ids::chinese;
+			language_id = _lang_id_chinese;
 			break;
 
 		default:
-			language_id = language_ids::english;
+			language_id = _lang_id_english;
 			break;
 		}
 	}
@@ -519,7 +519,7 @@ void setGameLanguage() {
 	{
 		int result = atol(DstBuf);
 		if (result > 0 || result > 9)
-			language_id = language_ids::english;
+			language_id = _lang_id_english;
 	}
 
 	*HasLoadedLanguage = true;

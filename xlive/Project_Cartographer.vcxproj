@@ -314,9 +314,9 @@
     <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
-    <ClCompile Include="H2MOD\EngineCalls\EngineCalls.cpp" />
-    <ClCompile Include="H2MOD\EngineCalls\Objects.cpp" />
-    <ClCompile Include="H2MOD\EngineCalls\Unit.cpp" />
+    <ClCompile Include="H2MOD\Engine\Engine.cpp" />
+    <ClCompile Include="H2MOD\Engine\Objects.cpp" />
+    <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\debug_overlay.cpp" />
@@ -379,7 +379,7 @@
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
-    <ClCompile Include="Blam\Engine\FileSystem\FiloInterface.cpp">
+    <ClCompile Include="Blam\FileSystem\FiloInterface.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -637,7 +637,7 @@
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
     <ClInclude Include="Blam\Math\real_vector3d.h" />
     <ClInclude Include="CartographerDllConf.h" />
-    <ClInclude Include="H2MOD\EngineCalls\EngineCalls.h" />
+    <ClInclude Include="H2MOD\Engine\Engine.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Handler.h" />
@@ -699,7 +699,7 @@
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\Actor\Actor.h" />
-    <ClInclude Include="Blam\Engine\FileSystem\FiloInterface.h" />
+    <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
     <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
     <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />

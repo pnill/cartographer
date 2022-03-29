@@ -4,7 +4,7 @@
 #include "Blam\Cache\TagGroups\item_collection_definition.hpp"
 #include "Blam\Cache\TagGroups\scenario_definition.hpp"
 #include "Blam\Cache\TagGroups\vehicle_collection_definition.hpp"
-#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Engine\Engine.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
@@ -111,12 +111,12 @@ void Infection::initClient()
 	infectedPlayed = false;
 	firstSpawn = true;
 
-	i_SoundsTable[english][e_infection_sounds::infected] = L"sounds/en/infected.wav";
-	i_SoundsTable[english][e_infection_sounds::infection] = L"sounds/en/infection.wav";
-	i_SoundsTable[english][e_infection_sounds::new_zombie] = L"sounds/en/new_zombie.wav";
-	i_SoundsTable[spanish][e_infection_sounds::infected] = L"sounds/es/infected.wav";
-	i_SoundsTable[spanish][e_infection_sounds::infection] = L"sounds/es/infection.wav";
-	i_SoundsTable[spanish][e_infection_sounds::new_zombie] = L"sounds/es/new_zombie.wav";
+	i_SoundsTable[_lang_id_english][e_infection_sounds::infected] = L"sounds/en/infected.wav";
+	i_SoundsTable[_lang_id_english][e_infection_sounds::infection] = L"sounds/en/infection.wav";
+	i_SoundsTable[_lang_id_english][e_infection_sounds::new_zombie] = L"sounds/en/new_zombie.wav";
+	i_SoundsTable[_lang_id_spanish][e_infection_sounds::infected] = L"sounds/es/infected.wav";
+	i_SoundsTable[_lang_id_spanish][e_infection_sounds::infection] = L"sounds/es/infection.wav";
+	i_SoundsTable[_lang_id_spanish][e_infection_sounds::new_zombie] = L"sounds/es/new_zombie.wav";
 
 	
 	//Change Local Player's Team to Human if Not in Green
@@ -191,7 +191,7 @@ void Infection::disableSlayerSounds()
 {
 	LOG_TRACE_GAME("[h2mod-infection] Disabling slayer sounds");
 	//disable slayer sounds for the infection game type
-	h2mod->disable_sounds(FLAG(SoundType::Slayer) | ALL_SOUNDS_NO_SLAYER);
+	h2mod->disable_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
 }
 
 void Infection::resetWeaponInteractionAndEmblems() {
@@ -338,7 +338,7 @@ void Infection::infectPlayers(int playerIndex, datum unitDatumIndex) {
 		if (unit_object) {
 			if (h2mod->get_unit_team_index(unitDatumIndex) == ZOMBIE_TEAM) {
 				//don't drop swords after zombie death
-				EngineCalls::Unit::remove_equipment(unitDatumIndex); //Take away zombie's weapons
+				Engine::Unit::remove_equipment(unitDatumIndex); //Take away zombie's weapons
 			}
 			else {
 				Infection::setZombiePlayerStatus(s_player::getIdentifier(playerIndex));

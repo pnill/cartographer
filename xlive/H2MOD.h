@@ -11,15 +11,15 @@
 #include "H2MOD\Variants\VariantPlayer.h"
 #include "H2MOD\Variants\Variants.h"
 
-enum SoundType
+enum e_sound_type
 {
-	TeamChange,
-	GainedTheLead,
-	LostTheLead,
-	TiedLeader,
-	Slayer
+	_sound_type_team_change,
+	_sound_type_gained_the_lead,
+	_sound_type_lost_the_lead,
+	_sound_type_tied_leader,
+	_sound_type_slayer,
 };
-#define ALL_SOUNDS_NO_SLAYER (FLAG(SoundType::TeamChange) | FLAG(SoundType::GainedTheLead) | FLAG(SoundType::LostTheLead) | FLAG(SoundType::TiedLeader))
+#define ALL_SOUNDS_NO_SLAYER (FLAG(_sound_type_team_change) | FLAG(_sound_type_gained_the_lead) | FLAG(_sound_type_lost_the_lead) | FLAG(_sound_type_tied_leader))
 
 enum static_lod : DWORD
 {

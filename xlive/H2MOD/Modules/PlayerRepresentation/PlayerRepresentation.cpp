@@ -11,7 +11,7 @@
 #include "Blam\Engine\Players\Players.h"
 #include "H2MOD.h"
 #include "Blam/Engine/Players/Players.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Engine\Engine.h"
 #include "H2MOD/Modules/Config/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD\Tags\MetaExtender.h"
@@ -180,7 +180,7 @@ namespace player_representation
 		if (a2->bungie_user_role <= 7)
 			a2->bungie_user_role = 7;
 
-		if (EngineCalls::get_game_mode_engine()
+		if (Engine::get_game_mode_engine()
 			&& s_game_globals::get()->get_game_variant()->game_engine_flags & FLAG(e_game_engine_flags::_game_engine_teams_bit)
 			&& (a2->player_team && !(s_game_engine_globals::get()->Unk1 & FLAG(a2->player_team))))
 		{
@@ -189,7 +189,7 @@ namespace player_representation
 	}
 	void on_map_load()
 	{
-		if (h2mod->GetEngineType() == Multiplayer) 
+		if (h2mod->GetEngineType() == _mutliplayer) 
 		{
 			representation_count = 4;
 			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && !Memory::isDedicatedServer())

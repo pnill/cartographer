@@ -5,11 +5,11 @@
 #include "Blam\Cache\TagGroups\globals_definition.hpp"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
 #include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
-#include "Blam\Engine\FileSystem\FiloInterface.h"
+#include "Blam\FileSystem\FiloInterface.h"
 #include "Blam\Engine\Game\DamageData.h"
 #include "Blam\Enums\HaloStrings.h"
 #include "H2MOD\Discord\DiscordInterface.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\EngineHooks\EngineHooks.h"
 #include "H2MOD\GUI\GUI.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
@@ -85,8 +85,6 @@ std::unordered_map<wchar_t*, bool&> GametypesMap
 	{ L"graverobber", b_HeadHunter }
 };
 
-
-
 #pragma region engine calls
 
 TEST_N_DEF(PC1);
@@ -104,6 +102,7 @@ void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data
 		{
 			LOG_TRACE_GAME(
 				"{} {} {} {} {} {} {} {}",
+				__FUNCTION__,
 				damage_data->flags,
 				IntToString<int>(damage_data->damage_tag_index, std::hex),
 				IntToString<int>(damage_data->creator_datum, std::hex),
@@ -126,22 +125,6 @@ void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data
 		//Calls basic engine function when not in zombies game
 		p_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
 	}
-}
-
-//TODO: Document what entity datum is used for
-int __cdecl call_entity_datum_to_gamestate_datum(int entity_datum)
-{
-	typedef int(__cdecl *entity_datum_to_gamestate_datum)(int entity_datum);
-	entity_datum_to_gamestate_datum pentity_datum_to_gamestate_datum = (entity_datum_to_gamestate_datum)Memory::GetAddress(0x1F2211);
-	return pentity_datum_to_gamestate_datum(entity_datum);
-}
-
-bool __cdecl call_add_object_to_sync(datum gamestate_object_datum)
-{
-	typedef int(__cdecl add_object_to_sync)(datum gamestate_object_datum);
-	auto p_add_object_to_sync = Memory::GetAddress<add_object_to_sync*>(0x1B8D14, 0x1B2C44);
-
-	return p_add_object_to_sync(gamestate_object_datum);
 }
 
 /* This looks at the actors table to get the character datum which is assigned to the specific actor. */
@@ -168,58 +151,42 @@ int get_damage_owner(datum damaged_unit_index)
 	return NONE;
 }
 
-int __cdecl call_get_character_sid_from_datum(int char_datum)
-{
-	typedef int(__cdecl get_character_sid_from_datum)(int datum);
-	auto p_get_character_sid_from_datum = Memory::GetAddress<get_character_sid_from_datum*>(0x31796C);
-
-	return p_get_character_sid_from_datum(char_datum);
-}
-
-int __cdecl call_fill_creation_data_from_object_index(int object_index, void* creation_data)
-{
-	typedef int(__cdecl fill_creation_data_from_object_index)(int datum,void* creation_data);
-	auto p_fill_creation_data_from_object_index = Memory::GetAddress<fill_creation_data_from_object_index*>(0x1F24ED);
-
-	return p_fill_creation_data_from_object_index(object_index, creation_data);
-}
-
 void H2MOD::leave_session()
 {
 	if (Memory::isDedicatedServer())
 		return;
 
-	if (GetEngineType() != e_engine_type::MainMenu)
+	if (GetEngineType() != e_engine_type::_main_menu)
 	{
 		// request_squad_browser
 		WriteValue<BYTE>(Memory::GetAddress(0x978BAC), 1);
 
-		typedef void(__cdecl load_main_menu_with_context)(int context);
-		auto load_main_menu_with_context_impl = Memory::GetAddress<load_main_menu_with_context*>(0x08EAF);
-		load_main_menu_with_context_impl(0);
+		typedef void(__cdecl* load_main_menu_with_context_t)(int context);
+		auto p_load_main_menu_with_context_impl = Memory::GetAddress<load_main_menu_with_context_t>(0x08EAF);
+		p_load_main_menu_with_context_impl(0);
 	}
 
-	typedef int(__cdecl leave_game_type)(int a1);
-	auto leave_session = Memory::GetAddress<leave_game_type*>(0x216388);
-	leave_session(0);
+	typedef int(__cdecl* leave_game_type_t)(int a1);
+	auto p_leave_session = Memory::GetAddress<leave_game_type_t>(0x216388);
+	p_leave_session(0);
 }
 
 #pragma endregion
 
-typedef int(__cdecl* show_error_screen_t)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6);
+typedef int(__cdecl* show_error_screen_t)(int a1, int a2, int a3, __int16 a4, int a5, int a6);
 show_error_screen_t p_show_error_screen;
 
-int __cdecl showErrorScreen(int a1, signed int a2, int a3, __int16 a4, int a5, int a6) {
-	if (a2 == 0x117)
+int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5, int a6) {
+	if (widget_type == 0x117)
 	{
 		LOG_TRACE_FUNC("Ignoring need to reinstall maps");
 		return 0;
 	}
-	return p_show_error_screen(a1, a2, a3, a4, a5, a6);
+	return p_show_error_screen(a1, widget_type, a3, a4, a5, a6);
 }
 
-typedef signed int(__cdecl *wcsncpy_s_hook)(int a1, unsigned int a2, wchar_t* a3, int a4);
-wcsncpy_s_hook p_wcsncpy_s_hook;
+typedef signed int(__cdecl *wcsncpy_s_hook_t)(int a1, unsigned int a2, wchar_t* a3, int a4);
+wcsncpy_s_hook_t p_wcsncpy_s_hook;
 
 //lets you follow the call path of any string that is displayed (in a debugger)
 signed int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a4) {
@@ -276,14 +243,14 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 	{
 		s_object_placement_data nObject;
 
-		EngineCalls::Objects::create_new_placement_data(&nObject, weaponId, unit_datum, 0);
+		Engine::Objects::create_new_placement_data(&nObject, weaponId, unit_datum, 0);
 
-		int object_index = EngineCalls::Objects::call_object_new(&nObject);
+		datum object_idx = Engine::Objects::object_new(&nObject);
 
 		if (bReset == true)
-			EngineCalls::Unit::remove_equipment(unit_datum);
+			Engine::Unit::remove_equipment(unit_datum);
 
-		EngineCalls::Unit::assign_equipment_to_unit(unit_datum, object_index, 1);
+		Engine::Unit::assign_equipment_to_unit(unit_datum, object_idx, 1);
 	}
 }
 
@@ -359,7 +326,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 	if (unit_object != NULL)
 	{
 		if (resetEquipment)
-			EngineCalls::Unit::remove_equipment(unit_datum_index);
+			Engine::Unit::remove_equipment(unit_datum_index);
 
 		typedef bool(__cdecl* simulation_is_predicted)();
 		auto p_simulation_is_predicted = Memory::GetAddress<simulation_is_predicted>(0x498B7, 0x42B54);
@@ -406,7 +373,7 @@ void H2MOD::disable_sounds(int sound_flags)
 			{
 				auto* runtime_tag_block_data = multiplayerGlobalsTag->runtime[0];
 
-				if (sound_flags & FLAG(SoundType::Slayer))
+				if (sound_flags & FLAG(_sound_type_slayer))
 				{
 					runtime_tag_block_data->slayer_events.size = 0;
 					runtime_tag_block_data->slayer_events.data = 0;
@@ -420,10 +387,10 @@ void H2MOD::disable_sounds(int sound_flags)
 						auto* general_event = runtime_tag_block_data->general_events[i];
 						auto event = general_event->event;
 						if (
-							(sound_flags & FLAG(SoundType::GainedTheLead) && (event == sound_events::gained_lead || event == sound_events::gained_team_lead))
-							|| (sound_flags & FLAG(SoundType::TeamChange) && event == sound_events::player_changed_team)
-							|| (sound_flags & FLAG(SoundType::LostTheLead) && (event == sound_events::lost_lead))
-							|| (sound_flags & FLAG(SoundType::TiedLeader) && (event == sound_events::tied_leader || event == sound_events::tied_team_leader))
+							(sound_flags & FLAG(_sound_type_gained_the_lead) && (event == sound_events::gained_lead || event == sound_events::gained_team_lead))
+							|| (sound_flags & FLAG(_sound_type_team_change) && event == sound_events::player_changed_team)
+							|| (sound_flags & FLAG(_sound_type_lost_the_lead) && (event == sound_events::lost_lead))
+							|| (sound_flags & FLAG(_sound_type_tied_leader) && (event == sound_events::tied_leader || event == sound_events::tied_team_leader))
 							)
 						{
 							// disable all sounds from english to chinese
@@ -670,7 +637,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		resetAfterMatch = false;
 	}
 
-	if (h2mod->GetEngineType() == e_engine_type::MainMenu)
+	if (h2mod->GetEngineType() == e_engine_type::_main_menu)
 	{
 		addDebugText("Engine type: Main-Menu");
 		UIRankPatch();
@@ -690,7 +657,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	ControllerInput::SetSensitiviy(H2Config_controller_sens);
 	MouseInput::SetSensitivity(H2Config_mouse_sens);
 	HudElements::OnMapLoad();
-	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
+	if (h2mod->GetEngineType() == e_engine_type::_mutliplayer)
 	{
 		addDebugText("Engine type: Multiplayer");
 		
@@ -716,7 +683,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		H2Tweaks::toggleAiMp(true);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
 
-		if (EngineCalls::get_game_life_cycle() == life_cycle_in_game)
+		if (Engine::get_game_life_cycle() == _life_cycle_in_game)
 		{
 			// send server map checksums to client
 			//MapChecksumSync::SendState();
@@ -739,7 +706,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		}
 	}
 
-	else if (h2mod->GetEngineType() == e_engine_type::SinglePlayer)
+	else if (h2mod->GetEngineType() == e_engine_type::_single_player)
 	{
 		//if anyone wants to run code on map load single player
 		addDebugText("Engine type: Singleplayer");
@@ -801,39 +768,11 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	return ret;
 }
 
-typedef int(__cdecl *object_p_hook)(int s_object_placement_data, int a2, signed int a3, int a4);
-object_p_hook object_p_hook_method;
-
-int __cdecl objectPHook(int s_object_placement_data, int object_definition_index, int object_owner, int unk) {
-	if (h2mod->hookedObjectDefs.find(object_definition_index) == h2mod->hookedObjectDefs.end()) {
-		//ingame only
-		wchar_t* mapName = Memory::GetAddress<wchar_t*>(0x97737C);
-		LOG_TRACE_GAME(L"MapName={0}, object_definition_index: {1:x}", mapName, object_definition_index);
-		h2mod->hookedObjectDefs.insert(object_definition_index);
-	}
-	return object_p_hook_method(s_object_placement_data, object_definition_index, object_owner, unk);
-}
-
-typedef BOOL(__stdcall *is_debugger_present)();
-is_debugger_present is_debugger_present_method;
+typedef BOOL(__stdcall *is_debugger_present_t)();
+is_debugger_present_t is_debugger_present_method;
 
 BOOL __stdcall isDebuggerPresent() {
 	return false;
-}
-
-typedef void*(__thiscall* load_wgit_t)(void* thisptr, int a2, int a3, int a4, unsigned short a5);
-load_wgit_t p_load_wgit;
-
-void* __fastcall OnWgitLoad(void* thisptr, BYTE* _edx, int a2, int a3, int a4, unsigned short a5) {
-	int wgit = a2;
-
-	//char NotificationPlayerText[20];
-	//sprintf(NotificationPlayerText, "WGIT ID: %d", a2);
-	//addDebugText(NotificationPlayerText);
-	//MessageBoxA(NULL, NotificationPlayerText, "WGITness", MB_OK);
-
-	p_load_wgit(thisptr, wgit, a3, a4, a5);
-	return thisptr;
 }
 
 typedef void(__cdecl* change_team_t)(int a1, int a2);
@@ -843,7 +782,7 @@ void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 {
 	s_network_session* session = NetworkSession::getCurrentNetworkSession();
 
-	if ((session->parameters.session_mode == 4 && EngineCalls::get_game_life_cycle() == life_cycle_pre_game)
+	if ((session->parameters.session_mode == 4 && Engine::get_game_life_cycle() == _life_cycle_pre_game)
 		|| (StrStrIW(NetworkSession::getGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
 		//rvb mode enabled, don't change teams
 		return;
@@ -864,7 +803,7 @@ void H2MOD::set_local_team_index(int local_player_index, int team_index)
 void H2MOD::set_local_team_match_xuid(XUID xuid)
 {
 	s_network_session* session = NetworkSession::getCurrentNetworkSession();
-	if ((EngineCalls::get_game_life_cycle() == life_cycle_pre_game))
+	if ((Engine::get_game_life_cycle() == _life_cycle_pre_game))
 		for(auto i = 0; i < 16; i++)
 			if(session->membership.player_data[i].identifier == xuid)
 			{
@@ -885,55 +824,6 @@ void __cdecl print_to_console(char *output)
 {
 	const static std::string prefix = "[HSC Print] ";
 	commands->display(prefix + output);
-}
-
-
-void DuplicateDataBlob(DATA_BLOB  *pDataIn, DATA_BLOB  *pDataOut)
-{
-	pDataOut->cbData = pDataIn->cbData;
-	pDataOut->pbData = static_cast<BYTE*>(LocalAlloc(LMEM_FIXED, pDataIn->cbData));
-	CopyMemory(pDataOut->pbData, pDataIn->pbData, pDataIn->cbData);
-}
-
-BOOL WINAPI CryptProtectDataHook(
-	_In_       DATA_BLOB                 *pDataIn,
-	_In_opt_   LPCWSTR                   szDataDescr,
-	_In_opt_   DATA_BLOB                 *pOptionalEntropy,
-	_Reserved_ PVOID                     pvReserved,
-	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT *pPromptStruct,
-	_In_       DWORD                     dwFlags,
-	_Out_      DATA_BLOB                 *pDataOut
-)
-{
-	DuplicateDataBlob(pDataIn, pDataOut);
-
-	return TRUE;
-}
-
-BOOL WINAPI CryptUnprotectDataHook(
-	_In_       DATA_BLOB                 *pDataIn,
-	_Out_opt_  LPWSTR                    *ppszDataDescr,
-	_In_opt_   DATA_BLOB                 *pOptionalEntropy,
-	_Reserved_ PVOID                     pvReserved,
-	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT *pPromptStruct,
-	_In_       DWORD                     dwFlags,
-	_Out_      DATA_BLOB                 *pDataOut
-)
-{
-	if (CryptUnprotectData(pDataIn, ppszDataDescr, pOptionalEntropy, pvReserved, pPromptStruct, dwFlags, pDataOut) == FALSE) {
-		DuplicateDataBlob(pDataIn, pDataOut); // if decrypting the data fails just assume it's unencrypted
-	}
-
-	return TRUE;
-}
-
-char filo_write__encrypted_data_hook(filo *file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
-{
-	DWORD file_size = GetFileSize(file_ptr->handle, NULL);
-
-	if (file_size > nNumberOfBytesToWrite) // clear the file as unencrypted data is shorter then encrypted data.
-		FiloInterface::change_size(file_ptr, 0);
-	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
 }
 
 DWORD calculate_model_lod;
@@ -989,34 +879,34 @@ bool __cdecl fn_c000bd114_IsSkullEnabled(int skull_index)
 bool GrenadeChainReactIsEngineMPCheck() {
 	if (AdvLobbySettings_grenade_chain_react)
 		return false;
-	return h2mod->GetEngineType() == e_engine_type::Multiplayer;
+	return h2mod->GetEngineType() == e_engine_type::_mutliplayer;
 }
 
 bool BansheeBombIsEngineMPCheck() {
 	if (AdvLobbySettings_banshee_bomb)
 		return false;
-	return h2mod->GetEngineType() == e_engine_type::Multiplayer;
+	return h2mod->GetEngineType() == e_engine_type::_mutliplayer;
 }
 
 bool FlashlightIsEngineSPCheck() {
 	if (AdvLobbySettings_flashlight)
 		return true;
-	return h2mod->GetEngineType() == e_engine_type::SinglePlayer;
+	return h2mod->GetEngineType() == e_engine_type::_single_player;
 }
 
 void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
 {
 	if (!DATUM_IS_NONE(unit_datum))
 	{
-		s_object_placement_data nObject;
+		s_object_placement_data object_placement;
 
-		EngineCalls::Objects::create_new_placement_data(&nObject, weapon_tag_index, unit_datum, 0);
+		Engine::Objects::create_new_placement_data(&object_placement, weapon_tag_index, unit_datum, 0);
 
-		datum object_index = EngineCalls::Objects::call_object_new(&nObject);
-		if (!DATUM_IS_NONE(object_index))
+		datum object_idx = Engine::Objects::object_new(&object_placement);
+		if (!DATUM_IS_NONE(object_idx))
 		{
-			EngineCalls::Unit::remove_equipment(unit_datum);
-			EngineCalls::Unit::assign_equipment_to_unit(unit_datum, object_index, 1);
+			Engine::Unit::remove_equipment(unit_datum);
+			Engine::Unit::assign_equipment_to_unit(unit_datum, object_idx, 1);
 		}
 	}
 }
@@ -1047,7 +937,7 @@ bool device_active = true;
 //This happens whenever a player activates a device control.
 int __cdecl device_touch(datum device_datum, datum unit_datum)
 {
-	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
+	if (h2mod->GetEngineType() == e_engine_type::_mutliplayer)
 	{
 		//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 		if (get_device_acceleration_scale(device_datum) == 999.0f)
@@ -1283,27 +1173,27 @@ bool __cdecl should_start_pregame_countdown_hook()
 		teamsAreValidConditionMet = true;
 	}
 
-
-
 	if (teamsAreValidConditionMet && minimumPlayersConditionMet)
 	{
 		EventHandler::CountdownStartEventExecute(EventExecutionType::execute_after);
 		return true;
 	}
 	else
+	{
 		return false;
+	}
 }
 //TODO: Move this.
 void vip_lock(e_game_life_cycle state)
 {
-	if(state == life_cycle_post_game)
+	if(state == _life_cycle_post_game)
 	{
 		ServerConsole::ClearVip();
 		*Memory::GetAddress<byte*>(0, 0x534850) = 0;
 		//ServerConsole::SendCommand2(1, L"vip", L"clear");
 		//ServerConsole::SendCommand2(1, L"Privacy", L"Open");
 	}
-	if(state == life_cycle_in_game)
+	if(state == _life_cycle_in_game)
 	{
 		for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
 		{
@@ -1386,11 +1276,6 @@ void H2MOD::ApplyHooks() {
 		NopFill(Memory::GetAddress(0x1922d9), 7);
 	}
 
-	// disables profiles/game saves encryption
-	PatchWinAPICall(Memory::GetAddress(0x9B08A, 0x85F5E), CryptProtectDataHook);
-	PatchWinAPICall(Memory::GetAddress(0x9AF9E, 0x352538), CryptUnprotectDataHook);
-	PatchCall(Memory::GetAddress(0x9B09F, 0x85F73), filo_write__encrypted_data_hook);
-
 	ApplyFirefightHooks();
 
 	ProjectileFix::ApplyPatches();
@@ -1431,10 +1316,6 @@ void H2MOD::ApplyHooks() {
 
 		//TODO: turn on if you want to debug halo2.exe from start of process
 		//is_debugger_present_method = (is_debugger_present)DetourFunc(Memory::GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
-
-		//TODO: use for object spawn hooking
-		//0x132163
-		//object_p_hook_method = (object_p_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x132163), (BYTE*)objectPHook, 6);
 
 		//TODO: expensive, use for debugging/searching
 		//string_display_hook_method = (string_display_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x287AB5), (BYTE*)stringDisplayHook, 5);
@@ -1525,7 +1406,7 @@ void H2MOD::Initialize()
 	h2mod->ApplyHooks();
 	h2mod->RegisterEvents();
 
-	EngineCalls::Objects::apply_biped_object_definition_patches();
+	Engine::Objects::apply_biped_object_definition_patches();
 	StatsHandler::Initialize();
 }
 
