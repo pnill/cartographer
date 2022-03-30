@@ -133,7 +133,7 @@ namespace CustomVariantSettings
 		}
 
 		//Client Only
-		if (!Memory::isDedicatedServer()) {
+		if (!Memory::IsDedicatedServer()) {
 			if (newVariantSettings->explosionPhysics)
 				WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1E);
 			else
@@ -147,7 +147,7 @@ namespace CustomVariantSettings
 		}
 
 		//Server Only
-		if (Memory::isDedicatedServer())
+		if (Memory::IsDedicatedServer())
 		{
 
 		}

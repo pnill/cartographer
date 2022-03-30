@@ -422,7 +422,7 @@ void ConsoleCommands::delete_object(datum object_datum)
 	}
 }
 void ConsoleCommands::output(std::wstring result) {
-	if (Memory::isDedicatedServer()) {
+	if (Memory::IsDedicatedServer()) {
 		result = result + L"\n";
 		ServerConsole::logToDedicatedServerConsole(result.c_str());
 	}
@@ -506,7 +506,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$kick") {
-			if (Memory::isDedicatedServer()) {
+			if (Memory::IsDedicatedServer()) {
 				output(L"Don't use this on dedis");
 				return;
 			}

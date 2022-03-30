@@ -9,7 +9,7 @@ void GameClientServerHandler::execute()
 		this->onClient();
 	}
 	else {
-		if (Memory::isDedicatedServer()) {
+		if (Memory::IsDedicatedServer()) {
 			this->onDedi();
 		}
 		else {

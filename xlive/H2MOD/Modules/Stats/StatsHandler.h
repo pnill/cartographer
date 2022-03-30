@@ -20,7 +20,7 @@ public:
 
 	static void sendStats()
 	{
-		if (Memory::isDedicatedServer()
+		if (Memory::IsDedicatedServer()
 			&& RegisteredStatus().Registered && RegisteredStatus().StatsEnabled) 
 		{
 			auto token = getAPIToken();
@@ -64,7 +64,7 @@ public:
 
 	static void verifySendPlaylist()
 	{
-		if (Memory::isDedicatedServer() && RegisteredStatus().Registered)
+		if (Memory::IsDedicatedServer() && RegisteredStatus().Registered)
 		{
 			auto token = getAPIToken();
 			int verifyPlaylistResponse = verifyPlaylist(token);

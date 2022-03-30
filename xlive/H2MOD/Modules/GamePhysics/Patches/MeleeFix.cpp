@@ -18,7 +18,7 @@ namespace MeleeFix
 {
 	void MeleeCollisionPatch()
 	{
-		if (!Memory::isDedicatedServer()) {
+		if (!Memory::IsDedicatedServer()) {
 			/*
 				.text:007C3027 148 E8 C1 73 F8 FF       call    collision_test_vector ; Call Procedure
 				.text:007C302C 148 83 C4 18             add     esp, 18h        ; Add

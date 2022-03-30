@@ -19,7 +19,7 @@ namespace Engine
 		auto p_game_is_minimized = Memory::GetAddress<is_game_is_minimized_t>(0x28729);
 		
 		//Check just in case this gets ran by server
-		if (Memory::isDedicatedServer())
+		if (Memory::IsDedicatedServer())
 			return false;
 		
 		return p_game_is_minimized();

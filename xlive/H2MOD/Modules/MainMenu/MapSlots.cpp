@@ -226,7 +226,7 @@ namespace MapSlots
 		//AddedMaps.emplace_back("salvation.map");
 		CacheMapData();
 
-		if (!Memory::isDedicatedServer())
+		if (!Memory::IsDedicatedServer())
 			tags::on_map_load(OnMapLoad);
 		else
 			ApplyHooks();

@@ -688,7 +688,7 @@ void InitH2Tweaks() {
 	initializeTimeHooks();
 	mapManager->ApplyHooks();
 
-	if (Memory::isDedicatedServer()) {
+	if (Memory::IsDedicatedServer()) {
 		p_hookServ1 = (hookServ1_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
 
 		// set the additional pcr time
@@ -812,7 +812,7 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 		return;
 
 	//TODO 'bool enable'
-	if (!Memory::isDedicatedServer() && NetworkSession::LocalPeerIsSessionHost()) {
+	if (!Memory::IsDedicatedServer() && NetworkSession::LocalPeerIsSessionHost()) {
 		for (int i = 0; i < get_scenario_volume_count(); i++) {
 			kill_volume_disable(i);
 		}
@@ -821,7 +821,7 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 
 void H2Tweaks::setHz() {
 
-	if (Memory::isDedicatedServer())
+	if (Memory::IsDedicatedServer())
 		return;
 
 	{
@@ -838,7 +838,7 @@ char ret_0() {
 }
 
 void H2Tweaks::toggleUncappedCampaignCinematics(bool toggle) {
-	if (Memory::isDedicatedServer())
+	if (Memory::IsDedicatedServer())
 		return;
 
 	typedef char(__cdecl *is_cutscene_fps_cap_t)();
@@ -855,7 +855,7 @@ void H2Tweaks::toggleAiMp(bool toggle) {
 
 void H2Tweaks::SunflareFix()
 {
-	if (Memory::isDedicatedServer())
+	if (Memory::IsDedicatedServer())
 		return;
 
 	//rasterizer_near_clip_distance <real>
@@ -865,7 +865,7 @@ void H2Tweaks::SunflareFix()
 
 void H2Tweaks::WarpFix(bool enable)
 {
-	if (Memory::isDedicatedServer())
+	if (Memory::IsDedicatedServer())
 		return;
 
 	//Improves warping issues 

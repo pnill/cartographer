@@ -402,7 +402,7 @@ void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 		PlaySound(soundName, NULL, SND_FILENAME | SND_NODEFAULT);
 	};
 
-	if (!Memory::isDedicatedServer())
+	if (!Memory::IsDedicatedServer())
 		std::thread(playSound).detach();
 }
 
@@ -517,7 +517,7 @@ void H2MOD::disable_weapon_pickup(bool b_Enable)
 
 void H2MOD::set_local_rank(BYTE rank)
 {
-	if (Memory::isDedicatedServer())
+	if (Memory::IsDedicatedServer())
 		return;
 
 	static bool initialized = false;
@@ -1177,7 +1177,7 @@ void vip_lock(e_game_life_cycle state)
 
 void H2MOD::RegisterEvents()
 {
-	if(!Memory::isDedicatedServer())//Client only callbacks	
+	if(!Memory::IsDedicatedServer())//Client only callbacks	
 	{
 
 	}
@@ -1261,7 +1261,7 @@ void H2MOD::ApplyHooks() {
 	DETOUR_ATTACH(p_map_cache_load, Memory::GetAddress<map_cache_load_t>(0x8F62, 0x1F35C), OnMapLoad);
 
 	// bellow hooks applied to specific executables
-	if (Memory::isDedicatedServer() == false) {
+	if (Memory::IsDedicatedServer() == false) {
 
 		LOG_TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
@@ -1340,7 +1340,7 @@ VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DW
 
 void H2MOD::Initialize()
 {
-	if (!Memory::isDedicatedServer())
+	if (!Memory::IsDedicatedServer())
 	{
 		MouseInput::Initialize();
 		KeyboardInput::Initialize();

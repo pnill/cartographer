@@ -206,7 +206,7 @@ namespace OverridePackets
 		PatchCall(Memory::GetAddress(0x1F07B7), decode_player_properties_impl);
 		PatchCall(Memory::GetAddress(0x1F09ED), decode_player_properties_impl);*/
 
-		if (Memory::isDedicatedServer()) {
+		if (Memory::IsDedicatedServer()) {
 			p_decode_text_chat_packet = (decode_text_chat_packet_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CD8A4), (BYTE*)decode_text_chat_packet, 12);
 		}
 	}

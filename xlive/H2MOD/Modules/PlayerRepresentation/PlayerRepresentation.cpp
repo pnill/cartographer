@@ -153,7 +153,7 @@ namespace player_representation
 				if (a2->profile.player_character_type == s_player::e_character_type::Skeleton)
 					a2->profile.player_character_type = s_player::e_character_type::Spartan;
 			}
-			else if (H2Config_spooky_boy && !Memory::isDedicatedServer())
+			else if (H2Config_spooky_boy && !Memory::IsDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
 			/*if(s_player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index))->identifier == 0x000462d3a1e02a34)
@@ -192,7 +192,7 @@ namespace player_representation
 		if (h2mod->GetEngineType() == _mutliplayer) 
 		{
 			representation_count = 4;
-			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && !Memory::isDedicatedServer())
+			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && !Memory::IsDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
 			auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);

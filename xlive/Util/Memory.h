@@ -45,7 +45,7 @@ public:
 		return reinterpret_cast<T>(baseAddress + (dedicatedServer ? (server - BASE_IMAGE_ADDRESS_H2SERVER) : (client - BASE_IMAGE_ADDRESS_HALO2)));
 	}
 
-	static bool isDedicatedServer() { return dedicatedServer; }
+	static bool IsDedicatedServer() { return dedicatedServer; }
 
 	static DWORD baseAddress;
 	static bool dedicatedServer;

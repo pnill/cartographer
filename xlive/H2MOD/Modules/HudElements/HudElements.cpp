@@ -101,7 +101,7 @@ void HudElements::setCrosshairSize(bool mapLoadContext)
 		crosshairInit = false;
 	}
 
-	if (Memory::isDedicatedServer())
+	if (Memory::IsDedicatedServer())
 		return;
 	if (h2mod->GetEngineType() == e_engine_type::_mutliplayer) {
 
@@ -130,7 +130,7 @@ void HudElements::setCrosshairSize(bool mapLoadContext)
 }
 void HudElements::setCrosshairPos() {
 
-	if (Memory::isDedicatedServer())
+	if (Memory::IsDedicatedServer())
 		return;
 	if (!FloatIsNaN(H2Config_crosshair_offset)) {
 		tags::tag_data_block* player_controls_block = reinterpret_cast<tags::tag_data_block*>(tags::get_matg_globals_ptr() + 240);
@@ -151,7 +151,7 @@ void HudElements::RadarPatch()
 }
 void HudElements::setFOV() {
 
-	if (Memory::isDedicatedServer())
+	if (Memory::IsDedicatedServer())
 		return;
 
 	static float fov = 70.0f * M_PI / 180.0f;
@@ -177,7 +177,7 @@ void HudElements::setFOV() {
 
 void HudElements::setVehicleFOV() {
 
-	if (Memory::isDedicatedServer())
+	if (Memory::IsDedicatedServer())
 		return;
 
 	if (H2Config_vehicle_field_of_view > 0 && H2Config_vehicle_field_of_view <= 110)

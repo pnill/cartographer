@@ -220,7 +220,7 @@ wchar_t* NetworkSession::GetGameVariantName()
 
 void NetworkSession::LeaveSession()
 {
-	if (Memory::isDedicatedServer())
+	if (Memory::IsDedicatedServer())
 		return;
 
 	if (s_game_globals::game_is_mainmenu())

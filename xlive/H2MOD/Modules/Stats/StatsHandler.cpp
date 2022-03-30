@@ -25,7 +25,7 @@ void StatsHandler::Initialize()
 {
 	return;
 
-	if (Memory::isDedicatedServer()) {
+	if (Memory::IsDedicatedServer()) {
 		Status.Registered = false;
 		Status.RanksEnabled = false;
 		Status.StatsEnabled = false;
@@ -71,7 +71,7 @@ void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
 		}
 	};
 	
-	if (Memory::isDedicatedServer()) 
+	if (Memory::IsDedicatedServer()) 
 	{
 		std::thread(updateStatsLifeCycle, state).detach();
 	}

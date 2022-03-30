@@ -327,7 +327,7 @@ void __declspec(naked) load_map_data_for_display() {
 */
 void MapManager::ApplyHooks() {
 
-	if (!Memory::isDedicatedServer()) {
+	if (!Memory::IsDedicatedServer()) {
 
 		BYTE jmp[] = { 0xEB };
 

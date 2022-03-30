@@ -49,7 +49,7 @@ namespace TagFixes
 		}
 		void fix_shaders_nvidia()
 		{
-			if (Memory::isDedicatedServer()) return;
+			if (Memory::IsDedicatedServer()) return;
 
 			fix_shader_template_nvidia(
 				"shaders\\shader_templates\\opaque\\tex_bump_alpha_test_single_pass",
@@ -192,7 +192,7 @@ namespace TagFixes
 
 	void OnMapLoad()
 	{
-		if (!Memory::isDedicatedServer()) {
+		if (!Memory::IsDedicatedServer()) {
 			fix_shaders_nvidia();
 			ShaderSpecularFix();
 			fix_dynamic_lights();

@@ -387,7 +387,7 @@ void s_network_observer::ApplyGamePatches()
 #endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 #endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 
-	if (!Memory::isDedicatedServer())
+	if (!Memory::IsDedicatedServer())
 	{
 		PatchCall(Memory::GetAddress(0x1D97DD), is_network_observer_mode_managed);
 	}

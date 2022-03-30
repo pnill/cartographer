@@ -142,7 +142,7 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 
 void OriginalFPSLimiter::ApplyPatches()
 {
-	if (Memory::isDedicatedServer() == false)
+	if (Memory::IsDedicatedServer() == false)
 	{
 		//NopFill(Memory::GetAddress(0x2728E7), 5);
 

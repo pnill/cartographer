@@ -84,7 +84,7 @@ bool __cdecl kablam_command_play(wchar_t* playlist_file_path, int a2)
 
 void ServerConsole::ApplyHooks()
 {
-	if (!Memory::isDedicatedServer())
+	if (!Memory::IsDedicatedServer())
 		return;
 	s_commandsMap[L"ban"] = ServerConsoleCommands::ban;
 	s_commandsMap[L"description"] = ServerConsoleCommands::description;
@@ -113,7 +113,7 @@ void ServerConsole::ApplyHooks()
 
 void ServerConsole::logToDedicatedServerConsole(const wchar_t* string, ...) {
 
-	if (!Memory::isDedicatedServer())
+	if (!Memory::IsDedicatedServer())
 		return;
 
 	typedef signed int(dedi_print)(const wchar_t* str, ...);
