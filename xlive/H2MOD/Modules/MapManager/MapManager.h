@@ -16,7 +16,7 @@ public:
 	void SetDownloadPercentage(int _downloadPercentage);
 
 	void StartMapDownload();
-	bool downloadFromRepo();
+	bool DownloadFromRepo();
 
 	bool ShouldStopDownload();
 	void StopDownload();
@@ -38,19 +38,19 @@ private:
 */
 class MapManager {
 public:
-	void reloadAllMaps();
+	void ReloadAllMaps();
 
-	static void applyHooks();
+	static void ApplyHooks();
 
-	void getMapFilename(std::wstring& buffer);
+	void GetMapFilename(std::wstring& buffer);
 
-	std::shared_ptr<MapDownloadQuery> addDownloadQuery(const std::wstring& mapToDownload)
+	std::shared_ptr<MapDownloadQuery> AddDownloadQuery(const std::wstring& mapToDownload)
 	{
 		m_mapDownloadQueryList.push_back(std::make_shared<MapDownloadQuery>(mapToDownload, rand()));
-		return getLastDownloadQueryAdded();
+		return GetLastDownloadQueryAdded();
 	}
 
-	std::shared_ptr<MapDownloadQuery> getLastDownloadQueryAdded()
+	std::shared_ptr<MapDownloadQuery> GetLastDownloadQueryAdded()
 	{
 		if (!m_mapDownloadQueryList.empty())
 			return m_mapDownloadQueryList.back();
@@ -58,7 +58,7 @@ public:
 		return nullptr;
 	}
 
-	std::shared_ptr<MapDownloadQuery> getDownloadQueryById(int id)
+	std::shared_ptr<MapDownloadQuery> GetDownloadQueryById(int id)
 	{
 		for (auto& query : m_mapDownloadQueryList)
 		{
@@ -69,7 +69,7 @@ public:
 		return nullptr;
 	}
 
-	void forceStopDownloadQueries()
+	void ForceStopDownloadQueries()
 	{
 		while (m_mapDownloadQueryList.size() > 0)
 		{

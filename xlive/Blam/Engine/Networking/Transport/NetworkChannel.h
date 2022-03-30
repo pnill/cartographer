@@ -1,8 +1,9 @@
 #pragma once
 
-#include "H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h"
+#include "..\NetworkCommon.h"
+#include "NetworkObserver.h"
 
-struct __declspec(align(8)) network_channel
+struct __declspec(align(8)) s_network_channel
 {
 	enum e_channel_closure_reason
 	{
@@ -73,11 +74,11 @@ struct __declspec(align(8)) network_channel
 	LARGE_INTEGER field_E0;
 	char gap[10];
 
-	static network_channel* getNetworkChannel(int channelIndex);
-	bool getNetworkAddressFromNetworkChannel(network_address* out_addr);
+	static s_network_channel* Get(int channelIndex);
+	bool GetNetworkAddressFromNetworkChannel(network_address* out_addr);
 
 	bool hasSimulationInterface() { return simulation_interface != nullptr; }
 	bool isSimulationAuthority() { return hasSimulationInterface() && *(bool*)((BYTE*)simulation_interface + 48); }
 };
-static_assert(sizeof(network_channel) == 248, "network_channel size != 248");
+CHECK_STRUCT_SIZE(s_network_channel, 248);
 

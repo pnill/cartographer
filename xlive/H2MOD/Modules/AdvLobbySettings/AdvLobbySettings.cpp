@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 #include "AdvLobbySettings.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD.h"
-#include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "Util\Hooks\Hook.h"
 
@@ -26,7 +26,7 @@ static void refresh_mp_explosion_physics() {
 }
 
 static void actuallySendPacket() {
-	if (!NetworkSession::localPeerIsSessionHost() || h2mod->GetEngineType() != e_engine_type::_mutliplayer)
+	if (!NetworkSession::LocalPeerIsSessionHost() || h2mod->GetEngineType() != e_engine_type::_mutliplayer)
 		return;
 
 	LOG_TRACE_GAME("[h2mod] Sending AdvLobbySettings.");

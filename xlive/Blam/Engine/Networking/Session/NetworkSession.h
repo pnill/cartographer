@@ -1,8 +1,10 @@
 #pragma once
 
+#include "..\NetworkCommon.h"
+
 #include "Blam\Engine\Players\Players.h"
-#include "..\NetworkChannel\NetworkChannel.h"
-#include "..\NetworkObserver\NetworkObserver.h"
+#include "..\Transport\NetworkChannel.h"
+#include "..\Transport\NetworkObserver.h"
 
 // forward declarations
 enum e_map_status;
@@ -15,51 +17,53 @@ struct s_peer_observer_channel;
 namespace NetworkSession
 {
 	// network session getters and misc
-	s_network_session* getNetworkSessions();
-	s_network_session* getCurrentNetworkSession();
-	bool getCurrentNetworkSession(s_network_session** a1);
-	e_network_session_state getLocalSessionState();
-	int getPeerIndexFromNetworkAddress(network_address* addr);
-	char getMapFileLocation(wchar_t* buffer, size_t size);
+	s_network_session* GetNetworkSessions();
+	s_network_session* GetCurrentNetworkSession();
+	bool GetCurrentNetworkSession(s_network_session** outSession);
+	e_network_session_state GetLocalSessionState();
+	int GetPeerIndexFromNetworkAddress(network_address* address);
+	char GetMapFileLocation(wchar_t* buffer, size_t size);
 
-	bool localPeerIsSessionHost();
-	bool localPeerIsEstablished();
+	bool LocalPeerIsSessionHost();
+	bool LocalPeerIsEstablished();
 
 	// peer functions
-	int getPeerCount();
-	int getLocalPeerIndex();
-	bool peerIndexLocal(int peerIndex);
-	IN_ADDR getLocalNetworkAddress();
-	void kickPeer(int peerIndex);
-	void endGame();
-	s_peer_observer_channel* getPeerObserverChannel(int peerIndex);
+	int GetPeerCount();
+	int GetLocalPeerIndex();
+	bool PeerIndexLocal(int peerIdx);
+	IN_ADDR GetLocalNetworkAddress();
+	void KickPeer(int peerIdx);
+	void EndGame();
+	s_peer_observer_channel* GetPeerObserverChannel(int peerIdx);
 
 	// peer-player functions
-	int getPeerIndex(int playerIndex);
-	const wchar_t* getPeerPlayerName(int peerIndex);
+	int GetPeerIndex(int playerIdx);
+	const wchar_t* GetPeerPlayerName(int peerIdx);
 
 	// player functions
 	
 	/* Use this to verify if a player is currently active in the network session */
 	/* Otherwise you will wonder why you don't get the right data/player index etc. */
-	bool playerIsActive(int playerIndex);
+	bool PlayerIsActive(int playerIdx);
 
-	int getPlayerCount();
-	const wchar_t* getPlayerName(int playerIndex);
-	int getPlayerIdByName(const wchar_t* playerName);
-	long long getPlayerXuid(int playerIndex);
+	int GetPlayerCount();
+	const wchar_t* GetPlayerName(int playerIdx);
+	int GetPlayerIdByName(const wchar_t* playerName);
+	long long GetPlayerXuid(int playerIdx);
 
-	int getPlayerTeam(int playerIndex);
-	int getPlayerTeamFromXuid(long long xuid);
-	int getPeerIndexFromXUID(long long xuid);
-	s_player_information* getPlayerInformation(int playerIndex);
+	int GetPlayerTeam(int playerIdx);
+	int GetPlayerTeamFromXuid(long long xuid);
+	int GetPeerIndexFromId(long long xuid);
+	s_player_information* GetPlayerInformation(int playerIdx);
 
-	wchar_t* getGameVariantName();
+	wchar_t* GetGameVariantName();
+
+	void LeaveSession();
 
 	// logging
-	void logPeersToConsole();
-	void logPlayersToConsole();
-	void logStructureOffsets();
+	void LogPeersToConsole();
+	void LogPlayersToConsole();
+	void LogStructureOffsets();
 }
 
 enum e_network_session_state : int
@@ -111,7 +115,7 @@ struct s_peer_information
 	DWORD gets_incremented_unk;
 	signed int player_index[4]; // stores local players indexes of the peer (BIG TODO: maybe fix splitscreen at some point)
 };
-static_assert(sizeof(s_peer_information) == 268, "Invalid PeerNetworkInfo size");
+CHECK_STRUCT_SIZE(s_peer_information, 268);
 
 struct s_peer_observer_channel
 {
@@ -140,22 +144,7 @@ struct s_player_information
 	unsigned int player_voice;
 	unsigned int player_text_chat;
 };
-static_assert(sizeof(s_player_information) == 296, "Invalid player_info size");
-
-struct s_membership_information
-{
-	DWORD update_number; // 0x70
-	int session_leader_index; // 0x74
-	XUID dedicated_server_xuid; // 0x78
-	int xbox_session_leader_peer_index; // 0x80
-	int peer_count; // 0x84
-	s_peer_information peer_data[17]; // 0x88
-	int player_count; // 0x1254
-	DWORD players_active_mask; // 0x1258
-	s_player_information player_data[ENGINE_PLAYER_MAX]; // 0x125C
-	DWORD unk;
-};
-static_assert(sizeof(s_membership_information) == 9328, "Invalid s_membership_information size");
+CHECK_STRUCT_SIZE(s_player_information, 296);
 
 struct s_virtual_couch
 {
@@ -166,7 +155,7 @@ struct s_virtual_couch
 	DWORD xuid_count;
 	XUID xuid[16];
 };
-static_assert(sizeof(s_virtual_couch) == 200, "Invalid virtual_couch size");
+CHECK_STRUCT_SIZE(s_virtual_couch, 200);
 
 struct s_session_parameters
 {
@@ -210,7 +199,28 @@ struct s_session_parameters
 	DWORD field_5F08;
 	DWORD field_5F0C;
 };
-static_assert(sizeof(s_session_parameters) == 4784, "Invalid session_parameters size");
+CHECK_STRUCT_SIZE(s_session_parameters, 4784);
+
+struct s_session_vote
+{
+	char gap_0[160];
+};
+CHECK_STRUCT_SIZE(s_session_vote, 160);
+
+struct s_membership_information
+{
+	DWORD update_number; // 0x70
+	int session_leader_index; // 0x74
+	XUID dedicated_server_xuid; // 0x78
+	int xbox_session_leader_peer_index; // 0x80
+	int peer_count; // 0x84
+	s_peer_information peer_data[17]; // 0x88
+	int player_count; // 0x1254
+	DWORD players_active_mask; // 0x1258
+	s_player_information player_data[ENGINE_PLAYER_MAX]; // 0x125C
+	DWORD unk;
+};
+CHECK_STRUCT_SIZE(s_membership_information, 9328);
 
 struct s_network_session
 {
@@ -232,15 +242,11 @@ struct s_network_session
 	int session_host_peer_index;
 	int elected_host_peer_index;
 	DWORD field_6C;
-	s_membership_information membership; // 0x70
-	s_membership_information membership_2; // ?? 
-	s_virtual_couch v_couch;
-	s_virtual_couch v_couch_2;
-	char voting_information_1[160]; // unused
-	char voting_information_2[160]; // unused
+	s_membership_information membership[2]; // 0x70
+	s_virtual_couch virtual_couch[2];
+	s_session_vote voting_data[2]; // unused
 	BYTE gap_4B84[64];
-	s_session_parameters parameters;
-	s_session_parameters parameters_2;
+	s_session_parameters parameters[2];
 	DWORD local_peer_index;
 	s_peer_observer_channel peer_observer_channels[17];
 	e_network_session_state local_session_state;
@@ -314,7 +320,7 @@ struct s_network_session
 		return this->network_protocol > 2 ? network_protocols_str[3] : network_protocols_str[this->network_protocol];
 	}
 };
-static_assert(sizeof(s_network_session) == 31624, "Invalid network_session size");
-static_assert(offsetof(s_network_session, parameters.max_party_players) == 0x4C80, "Invalid parameters.max_party_players offset");
+CHECK_STRUCT_SIZE(s_network_session, 31624);
+CHECK_STRUCT_OFFSET(s_network_session, parameters[0].max_party_players, 0x4C80);
 #pragma pack(pop)
 

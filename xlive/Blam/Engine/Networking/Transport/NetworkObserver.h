@@ -1,5 +1,10 @@
 #pragma once
 
+// Network Observer
+//	- manages network bandwidth based on network conditions
+
+#include "..\NetworkCommon.h"
+
 // enables/disables LIVE netcode, so we can use the LIVE serverlist
 // true  - LIVE network protocol enabled
 // false - System Link network protocol enabled
@@ -33,17 +38,6 @@
 #define k_online_netcode_server_max_bandwidth_per_channel ((int)k_online_netcode_server_rate_real * k_online_netcode_server_max_packet_size_bytes * 8)
 
 struct s_network_observer_configuration;
-
-struct network_address
-{
-	union
-	{
-		int ipv4;
-		char ipv6[16];
-	} address;
-	short port;
-	short address_type;
-};
 
 struct s_qos_probe_data
 {
@@ -171,7 +165,7 @@ struct __declspec(align(8)) s_observer_channel
 	DWORD field_734;
 	LONGLONG field_738;
 };
-static_assert(sizeof(s_observer_channel) == 0x740, "Invalid observer size");
+CHECK_STRUCT_SIZE(s_observer_channel, 0x740);
 
 struct __declspec(align(8)) s_network_observer
 {
@@ -234,7 +228,7 @@ struct __declspec(align(8)) s_network_observer
 		out_of_band
 	};
 
-	static void ApplyPatches();
+	static void ApplyGamePatches();
 	static void ResetNetworkPreferences();
 	static void ForceConstantNetworkRate();
 
@@ -253,7 +247,7 @@ struct __declspec(align(8)) s_network_observer
 	int getObserverState(int observerIndex) { return observer_channels[observerIndex].state; };
 	void sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data);
 };
-static_assert(sizeof(s_network_observer) == 0x75C8, "network_observer size != 30152");
+CHECK_STRUCT_SIZE(s_network_observer, 0x75C8);
 
 struct s_network_observer_configuration
 {
@@ -360,4 +354,4 @@ struct s_network_observer_configuration
 	float field_1FC;
 	DWORD field_200;
 };
-static_assert(sizeof(s_network_observer_configuration) == 0x204, "Invalid network_observer_configuration size");
+CHECK_STRUCT_SIZE(s_network_observer_configuration, 0x204);

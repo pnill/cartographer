@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "Infection.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "Blam\Cache\TagGroups\item_collection_definition.hpp"
 #include "Blam\Cache\TagGroups\scenario_definition.hpp"
 #include "Blam\Cache\TagGroups\vehicle_collection_definition.hpp"
@@ -8,7 +9,6 @@
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
-#include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "H2MOD\Tags\TagInterface.h"
@@ -26,7 +26,7 @@ int zombiePlayerIndex = NONE;
 
 int Infection::calculateZombiePlayerIndex() 
 {
-	if (NetworkSession::getPlayerCount() > 0)
+	if (NetworkSession::GetPlayerCount() > 0)
 	{
 		std::mt19937 mt_rand(rd());
 		std::vector<int> vecPlayersActiveIndexes;
@@ -34,7 +34,7 @@ int Infection::calculateZombiePlayerIndex()
 		int playerIndex = 0;
 		do 
 		{
-			if (NetworkSession::playerIsActive(playerIndex))
+			if (NetworkSession::PlayerIsActive(playerIndex))
 				vecPlayersActiveIndexes.push_back(playerIndex);
 
 			playerIndex++;
@@ -43,10 +43,10 @@ int Infection::calculateZombiePlayerIndex()
 		if (vecPlayersActiveIndexes.empty())
 			return NONE;
 
-		std::uniform_int_distribution<int> dist(0, NetworkSession::getPlayerCount() - 1);
+		std::uniform_int_distribution<int> dist(0, NetworkSession::GetPlayerCount() - 1);
 
 		int infectedPlayerIndex = vecPlayersActiveIndexes[dist(mt_rand)];
-		LOG_TRACE_GAME(L"[h2mod-infection] random infection player index: {}, with name: {}", infectedPlayerIndex, NetworkSession::getPlayerName(infectedPlayerIndex));
+		LOG_TRACE_GAME(L"[h2mod-infection] random infection player index: {}, with name: {}", infectedPlayerIndex, NetworkSession::GetPlayerName(infectedPlayerIndex));
 
 		return infectedPlayerIndex;
 	}
@@ -56,18 +56,18 @@ int Infection::calculateZombiePlayerIndex()
 
 void Infection::sendTeamChange()
 {
-	if (NetworkSession::localPeerIsSessionHost())
+	if (NetworkSession::LocalPeerIsSessionHost())
 	{
-		if (NetworkSession::getPlayerCount() > 0)
+		if (NetworkSession::GetPlayerCount() > 0)
 		{
 			int playerIndex = 0;
 			do
 			{
-				if (NetworkSession::playerIsActive(playerIndex))
+				if (NetworkSession::PlayerIsActive(playerIndex))
 				{
-					if (!NetworkSession::peerIndexLocal(NetworkSession::getPeerIndex(playerIndex))) {
-						CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
-						LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", playerIndex, NetworkSession::getPlayerName(playerIndex), zombiePlayerIndex == playerIndex ? true : false);
+					if (!NetworkSession::PeerIndexLocal(NetworkSession::GetPeerIndex(playerIndex))) {
+						NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
+						LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", playerIndex, NetworkSession::GetPlayerName(playerIndex), zombiePlayerIndex == playerIndex ? true : false);
 					}
 					else if (!Memory::isDedicatedServer()) {
 						h2mod->set_local_team_index(0, zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
@@ -223,12 +223,12 @@ void Infection::preSpawnServerSetup() {
 		if (isZombie) {
 			s_player::setUnitBipedType(currentPlayerIndex, s_player::e_character_type::Flood);
 			if (s_player::getTeam(currentPlayerIndex) != ZOMBIE_TEAM)  {
-				if (NetworkSession::localPeerIsSessionHost())
-					CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(currentPlayerIndex), ZOMBIE_TEAM); // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
+				if (NetworkSession::LocalPeerIsSessionHost())
+					NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(currentPlayerIndex), ZOMBIE_TEAM); // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
 			}
 		}
 		else {
-			if(SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && H2Config_spooky_boy)
+			if(SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && H2Config_spooky_boy)
 				s_player::setUnitBipedType(currentPlayerIndex, s_player::e_character_type::Skeleton);
 			else
 				s_player::setUnitBipedType(currentPlayerIndex, s_player::e_character_type::Spartan);
@@ -239,11 +239,11 @@ void Infection::preSpawnServerSetup() {
 
 	// end the game if all humans are dead
 	if (humanCount == 0 && playerCount > 1)
-		NetworkSession::endGame();
+		NetworkSession::EndGame();
 }
 
 void Infection::setPlayerAsHuman(int playerIndex) {
-	if (SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && H2Config_spooky_boy)
+	if (SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && H2Config_spooky_boy)
 		s_player::setUnitBipedType(playerIndex, s_player::e_character_type::Skeleton);
 	else
 		s_player::setUnitBipedType(playerIndex, s_player::e_character_type::Spartan);
@@ -449,7 +449,7 @@ void InfectionInitializer::onPeerHost()
 		LOG_TRACE_GAME("[h2mod-infection] Peer host setting player as human");
 		//send out the team change packets to peers
 		Infection::sendTeamChange();
-		Infection::setZombiePlayerStatus(NetworkSession::getPlayerXuid(zombiePlayerIndex));
+		Infection::setZombiePlayerStatus(NetworkSession::GetPlayerXuid(zombiePlayerIndex));
 	}
 }
 
@@ -467,7 +467,7 @@ void InfectionInitializer::onDedi()
 		LOG_TRACE_GAME("[h2mod-infection] Dedicated host setting player as human");
 		//send out the team change packets to peers
 		Infection::sendTeamChange();
-		Infection::setZombiePlayerStatus(NetworkSession::getPlayerXuid(zombiePlayerIndex));
+		Infection::setZombiePlayerStatus(NetworkSession::GetPlayerXuid(zombiePlayerIndex));
 	}
 }
 

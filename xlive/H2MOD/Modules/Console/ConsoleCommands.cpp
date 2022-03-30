@@ -1,11 +1,12 @@
 #include "stdafx.h"
 
 #include "ConsoleCommands.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\ServerConsole\ServerConsole.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
@@ -464,7 +465,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid command, usage - $reloadMaps");
 				return;
 			}
-			mapManager->reloadAllMaps();
+			mapManager->ReloadAllMaps();
 		}
 		else if (firstCommand == "$help") {
 			output(L"reloadMaps");
@@ -485,7 +486,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		else if (firstCommand == "$mapfilename")
 		{
 			std::wstring map_file_name;
-			mapManager->getMapFilename(map_file_name);
+			mapManager->GetMapFilename(map_file_name);
 			output(map_file_name);
 			return;
 		}
@@ -494,13 +495,13 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid download map command, usage - $downloadMap MAP_NAME");
 				return;
 			}
-			if (!NetworkSession::localPeerIsSessionHost())
+			if (!NetworkSession::LocalPeerIsSessionHost())
 			{
 				output(L"Cannot download map using command while not being the session host!");
 				return;
 			}
 			std::string firstArg = splitCommands[1];
-			auto downloadQuery = mapManager->addDownloadQuery(std::wstring(firstArg.begin(), firstArg.end()));
+			auto downloadQuery = mapManager->AddDownloadQuery(std::wstring(firstArg.begin(), firstArg.end()));
 			downloadQuery->StartMapDownload(); // since we have the map name, start the download
 			return;
 		}
@@ -513,7 +514,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid kick command, usage - $kick PEER_INDEX");
 				return;
 			}
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Only the server can kick players");
 				return;
 			}
@@ -522,32 +523,32 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			if (isNum(firstArg.c_str())) {
 				int peerIndex = atoi(firstArg.c_str());
-				if (peerIndex == NetworkSession::getCurrentNetworkSession()->session_host_peer_index) {
+				if (peerIndex == NetworkSession::GetCurrentNetworkSession()->session_host_peer_index) {
 					output(L"Don't kick yourself");
 					return;
 				}
-				if (peerIndex >= NetworkSession::getPeerCount()) {
+				if (peerIndex >= NetworkSession::GetPeerCount()) {
 					output(L"Peer at the specified index doesn't exist");
 					return;
 				}
-				NetworkSession::kickPeer(peerIndex);
+				NetworkSession::KickPeer(peerIndex);
 			}
 			return;
 		}
 		else if (firstCommand == "$logplayers") {
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Only host can log player information.");
 				return;
 			}
-			NetworkSession::logPlayersToConsole();
+			NetworkSession::LogPlayersToConsole();
 			return;
 		}
 		else if (firstCommand == "$logpeers") {
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Only host can log peer information.");
 				return;
 			}
-			NetworkSession::logPeersToConsole();
+			NetworkSession::LogPeersToConsole();
 			return;
 		}
 		else if (firstCommand == "$maxplayers") {
@@ -555,7 +556,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Usage: $maxplayers value (betwen 1 and 16).");
 				return;
 			}
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Can be only used while hosting.");
 				return;
 			}
@@ -568,12 +569,12 @@ void ConsoleCommands::handle_command(std::string command) {
 					output(L"The value needs to be between 1 and 16.");
 					return;
 				}
-				if (maxPlayersToSet < NetworkSession::getPlayerCount()) {
+				if (maxPlayersToSet < NetworkSession::GetPlayerCount()) {
 					output(L"You can't set a value of max players smaller than the actual number of players on the server.");
 					return;
 				}
 				else {
-					NetworkSession::getCurrentNetworkSession()->parameters.max_party_players = maxPlayersToSet;
+					NetworkSession::GetCurrentNetworkSession()->parameters[0].max_party_players = maxPlayersToSet;
 					output(L"Maximum players set.");
 					return;
 				}
@@ -597,7 +598,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::_single_player)
+			if (!NetworkSession::LocalPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::_single_player)
 			{
 				output(L"Can only be used by the session host!");
 				return;
@@ -644,24 +645,24 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$ishost") {
-			s_network_session* session = NetworkSession::getCurrentNetworkSession();
+			s_network_session* session = NetworkSession::GetCurrentNetworkSession();
 			std::wstring isHostStr = L"isHost=";
 			DWORD isHostByteValue = session->local_session_state;
 			std::wostringstream ws;
 			ws << isHostByteValue;
 			const std::wstring s(ws.str());
-			isHostStr += (NetworkSession::localPeerIsSessionHost() ? L"yes" : L"no");
+			isHostStr += (NetworkSession::LocalPeerIsSessionHost() ? L"yes" : L"no");
 			isHostStr += L", value=";
 			isHostStr += s;
 			output(isHostStr);
 			return;
 		}
 		else if (firstCommand == "$leavegame") {
-			h2mod->leave_session();
+			NetworkSession::LeaveSession();
 			return;
 		}
 		else if (firstCommand == "$xyz") {
-			if (h2mod->GetEngineType() == e_engine_type::_mutliplayer && !NetworkSession::localPeerIsSessionHost()) {
+			if (h2mod->GetEngineType() == e_engine_type::_mutliplayer && !NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Only host can see xyz for now...");
 				return;
 			}
@@ -681,7 +682,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Can only be used by the session host!");
 				return;
 			}
@@ -726,7 +727,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Can only be used by the session host!");
 				return;
 			}
@@ -802,11 +803,11 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$lognetworksessionoffsets") {
-			NetworkSession::logStructureOffsets();
+			NetworkSession::LogStructureOffsets();
 			return;
 		}
 		else if (firstCommand == "$requestfilename") {
-			CustomPackets::sendRequestMapFilename(NONE);
+			NetworkMessage::SendRequestMapFilename(NONE);
 		}
 		else if (firstCommand == "$warpfix") {
 			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
@@ -842,7 +843,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$injecttag")
 		{
-			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::_single_player)
+			if (!NetworkSession::LocalPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::_single_player)
 			{
 				output(L"Can only be used by the session host!");
 				return;

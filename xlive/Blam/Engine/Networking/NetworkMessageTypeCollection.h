@@ -1,73 +1,73 @@
 #pragma once
 
-#include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
+#include "Blam\Engine\Networking\Session\NetworkSession.h"
 
-#define player_identifier_size_bits CHAR_BIT * sizeof(XUID)
+#define player_identifier_size_bits (sizeof(XUID) * CHAR_BIT)
 
-enum e_network_message_types : unsigned int
+enum e_network_message_type_collection : unsigned int
 {
-	ping,
-	pong,
-	broadcast_search,
-	broadcast_reply,
-	connect_request,
-	connect_refuse,
-	connect_establish,
-	connect_closed,
-	join_request,
-	join_abort,
-	join_refuse,
-	leave_session,
-	leave_acknowledge,
-	session_disband,
-	session_boot,
-	host_handoff,
-	peer_handoff,
-	host_transition,
-	host_reestablish,
-	host_decline,
-	peer_reestablish,
-	peer_establish,
-	election,
-	election_refuse,
-	time_synchronize,
-	membership_update,
-	peer_properties,
-	delegate_leadership,
-	boot_machine,
-	player_add,
-	player_refuse,
-	player_remove,
-	player_properties,
-	parameters_update,
-	parameters_request,
-	countdown_timer,
-	mode_acknowledge,
-	virtual_couch_update,
-	virtual_couch_request,
-	vote_update,
-	view_establishment,
-	player_acknowledge,
-	synchronous_update,
-	synchronous_actions,
-	synchronous_join,
-	synchronous_gamestate,
-	game_results,
-	text_chat,
-	test,
+	_ping,
+	_pong,
+	_broadcast_search,
+	_broadcast_reply,
+	_connect_request,
+	_connect_refuse,
+	_connect_establish,
+	_connect_closed,
+	_join_request,
+	_join_abort,
+	_join_refuse,
+	_leave_session,
+	_leave_acknowledge,
+	_session_disband,
+	_session_boot,
+	_host_handoff,
+	_peer_handoff,
+	_host_transition,
+	_host_reestablish,
+	_host_decline,
+	_peer_reestablish,
+	_peer_establish,
+	_election,
+	_election_refuse,
+	_time_synchronize,
+	_membership_update,
+	_peer_properties,
+	_delegate_leadership,
+	_boot_machine,
+	_player_add,
+	_player_refuse,
+	_player_remove,
+	_player_properties,
+	_parameters_update,
+	_parameters_request,
+	_countdown_timer,
+	_mode_acknowledge,
+	_virtual_couch_update,
+	_virtual_couch_request,
+	_vote_update,
+	_view_establishment,
+	_player_acknowledge,
+	_synchronous_update,
+	_synchronous_actions,
+	_synchronous_join,
+	_synchronous_gamestate,
+	_game_results,
+	_text_chat,
+	_test,
 
-	//custom packets bellow
-	request_map_filename,
-	custom_map_filename,
-	team_change,
-	rank_change,
-	anti_cheat,
-	custom_variant_settings,
+	// custom network meesages bellow
+	_request_map_filename,
+	_custom_map_filename,
+	_team_change,
+	_rank_change,
+	_anti_cheat,
+	_custom_variant_settings,
 
-	end
+	_end
 };
 
-static const char* network_message_name[] = {
+static const char* network_message_type_collection_name[] = {
 	"ping",
 	"pong",
 	"broadcast_search",
@@ -170,15 +170,16 @@ struct s_text_chat
 	wchar_t text[122];
 };
 #pragma pack(pop)
+CHECK_STRUCT_SIZE(s_text_chat, 404);
 
-const char* getNetworkMessageName(int enumVal);
-void register_packet_impl(void *, int, char*, int, int, int, void*, void*, void*);
+const char* GetNetworkMessageName(int enumVal);
+void register_network_message(void *, int, char*, int, int, int, void*, void*, void*);
 
-namespace CustomPackets
+namespace NetworkMessage
 {
 	void ApplyGamePatches();
-	void sendRequestMapFilename(int mapDownloadId);
-	void sendTeamChange(int peerIndex, int teamIndex);
-	void sendRankChange(int peerIndex, byte rank);
-	void sendAntiCheat(int peerIndex);
+	void SendRequestMapFilename(int mapDownloadId);
+	void SendTeamChange(int peerIdx, int teamIdx);
+	void SendRankChange(int peerIdx, BYTE rank);
+	void SendAntiCheat(int peerIdx);
 }

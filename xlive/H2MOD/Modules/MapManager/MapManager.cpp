@@ -83,7 +83,7 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 		case _network_session_state_host_disband:
 		case _network_session_state_host_handoff:
 		case _network_session_state_host_reestablish:
-			s_membership_information* membership = &session->membership;
+			s_membership_information* membership = &session->membership[0];
 
 			if (out_host_map_status)
 				*out_host_map_status = membership->peer_data[session->session_host_peer_index].map_status;
@@ -91,7 +91,7 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 			result_map_status = _network_session_map_status_loaded;
 			result_precache_percentage = 100; // i don't think this is used anymore, it has been replaced by the loading screen in H2v from Xbox
 			
-			for (int i = 0; i < session->membership.peer_count; i++) {
+			for (int i = 0; i < membership->peer_count; i++) {
 				
 				// NOTE UPDATE 7/29/2021: now this checks if there's any peer that can load the map, instead of if there's any peer that cannot load the map
 				// *************
@@ -184,7 +184,7 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 // this is actually thiscall, but the parameter is unused
 bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, s_network_session *session, DWORD *out_peers_that_cant_load_map_flags)
 {
-	s_membership_information* membership = &session->membership;
+	s_membership_information* membership = &session->membership[0];
 
 	int result_bitflags = 0;
 	if (membership->peer_count > 0)
@@ -228,7 +228,7 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, s_network_sessio
 		*out_peers_that_cant_load_map_flags = result_bitflags;
 
 	// subtract from peers_that_can_load_map 1 to remove the host/local
-	return !local_or_host_peer_cannot_load_map && peers_that_can_load_map - (session->parameters.dedicated_server ? 1 : 0) > 0;
+	return !local_or_host_peer_cannot_load_map && peers_that_can_load_map - (session->parameters[0].dedicated_server ? 1 : 0) > 0;
 }
 
 __declspec(naked) void get_map_load_status_for_all_peers_hook_2_to_stdcall() {
@@ -249,10 +249,10 @@ char __cdecl handle_map_download_callback() {
 	// mapManager->forceStopDownloadQueries()
 
 	// add download query
-	mapManager->addDownloadQuery(L"");
-	auto query = mapManager->getLastDownloadQueryAdded();
+	mapManager->AddDownloadQuery(L"");
+	auto query = mapManager->GetLastDownloadQueryAdded();
 	// request the filename
-	CustomPackets::sendRequestMapFilename(query->id);
+	NetworkMessage::SendRequestMapFilename(query->id);
 	// then start download thread
 	query->StartMapDownload();
 
@@ -325,7 +325,7 @@ void __declspec(naked) load_map_data_for_display() {
 /**
 * Makes changes to game functionality
 */
-void MapManager::applyHooks() {
+void MapManager::ApplyHooks() {
 
 	if (!Memory::isDedicatedServer()) {
 
@@ -360,19 +360,19 @@ void MapManager::applyHooks() {
 /**
 * Actually calls the real map reload function in halo2.exe
 */
-void MapManager::reloadAllMaps() {
+void MapManager::ReloadAllMaps() {
 	getCustomMapData()->load_custom_map_data_cache();
 	getCustomMapData()->start_custom_map_sync();
 }
 
-void MapManager::getMapFilename(std::wstring& buffer) {
+void MapManager::GetMapFilename(std::wstring& buffer) {
 	wchar_t map_file_location[256];
 	s_network_session* session = nullptr;
 
 	// we want this to work in-game too
-	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::getCurrentNetworkSession(&session)) {
+	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::GetCurrentNetworkSession(&session)) {
 		ZeroMemory(map_file_location, sizeof(map_file_location));
-		NetworkSession::getMapFileLocation(map_file_location, sizeof(map_file_location));
+		NetworkSession::GetMapFileLocation(map_file_location, sizeof(map_file_location));
 
 		std::wstring unicodeMapFileLocation(map_file_location);
 		std::size_t mapNameOffset = unicodeMapFileLocation.find_last_of(L"\\");
@@ -405,7 +405,7 @@ void MapManager::MapDownloadUpdateTick()
 }
 
 bool MapDownloadQuery::ShouldStopDownload() {
-	return m_forceStopDownload == true || !NetworkSession::localPeerIsEstablished();
+	return m_forceStopDownload == true || !NetworkSession::LocalPeerIsEstablished();
 }
 
 void MapDownloadQuery::StopDownload() {
@@ -431,7 +431,7 @@ static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ul
 	return mapDownloadQuery->ShouldStopDownload();
 }
 
-bool MapDownloadQuery::downloadFromRepo() {
+bool MapDownloadQuery::DownloadFromRepo() {
 	std::string url(cartographerMapRepoURL + "/");
 
 	FILE *fp = nullptr;
@@ -513,22 +513,22 @@ void MapDownloadQuery::StartMapDownload()
 
 			//TODO: set map filesize
 			//TODO: if downloading from repo files, try p2p
-			if (!downloadFromRepo() 
-				&& !NetworkSession::localPeerIsSessionHost())
+			if (!DownloadFromRepo() 
+				&& !NetworkSession::LocalPeerIsSessionHost())
 			{
 				LOG_TRACE_GAME("[h2mod-mapmanager] {}() - {}() failed, leaving session!",
 					STRINGIFY(handle_map_download_callback),
-					STRINGIFY(downloadFromRepo));
+					STRINGIFY(DownloadFromRepo));
 
 				addDebugText("Failed to download custom map %s .", m_clientMapFilename.c_str());
-				h2mod->leave_session(); // download has failed
+				NetworkSession::LeaveSession(); // download has failed
 			}
 		}
 		else {
 			// no map filename (probably packet hasn't been received)
 			addDebugText("Failed to download custom map, no filename to download.");
 			LOG_TRACE_GAME("[h2mod-mapmanager] no map filename received from host!");
-			h2mod->leave_session();
+			NetworkSession::LeaveSession();
 		}
 
 		// set the game to map is loaded state
@@ -536,7 +536,7 @@ void MapDownloadQuery::StartMapDownload()
 		m_downloadFinished = true;
 	};
 
-	if (NetworkSession::localPeerIsEstablished())
+	if (NetworkSession::LocalPeerIsEstablished())
 		std::thread(mapDownloadThread).detach();
 	else
 		m_downloadFinished = true;

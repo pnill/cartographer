@@ -148,7 +148,7 @@ namespace player_representation
 			if (a2->profile.player_character_type == s_player::e_character_type::Dervish)
 				a2->profile.player_character_type = s_player::e_character_type::Elite;
 
-			if(SpecialEvents::getCurrentEvent() != SpecialEvents::e_halloween)
+			if(SpecialEvents::getCurrentEvent() != SpecialEvents::_halloween)
 			{
 				if (a2->profile.player_character_type == s_player::e_character_type::Skeleton)
 					a2->profile.player_character_type = s_player::e_character_type::Spartan;
@@ -192,7 +192,7 @@ namespace player_representation
 		if (h2mod->GetEngineType() == _mutliplayer) 
 		{
 			representation_count = 4;
-			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && !Memory::isDedicatedServer())
+			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && !Memory::isDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
 			auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
@@ -200,7 +200,7 @@ namespace player_representation
 			auto skele_fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", blam_tag::tag_group_type::rendermodel, "carto_shared");
 			auto skele_body_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", blam_tag::tag_group_type::rendermodel, "carto_shared");
 
-			if (!DATUM_IS_NONE(skele_datum) && !DATUM_IS_NONE(skele_fp_datum) && !DATUM_IS_NONE(skele_body_datum) && SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && !H2Config_no_events)
+			if (!DATUM_IS_NONE(skele_datum) && !DATUM_IS_NONE(skele_fp_datum) && !DATUM_IS_NONE(skele_body_datum) && SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && !H2Config_no_events)
 			{
 				tag_loader::Load_tag(skele_fp_datum, true, "carto_shared");
 				tag_loader::Load_tag(skele_body_datum, true, "carto_shared");

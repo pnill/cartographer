@@ -1,11 +1,11 @@
 #include "stdafx.h"
 
 #include "VariantSystem.h"
-#include "H2MOD\Modules\Networking\Networking.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 
 void GameClientServerHandler::execute()
 {
-	if (!NetworkSession::localPeerIsSessionHost()) {
+	if (!NetworkSession::LocalPeerIsSessionHost()) {
 		this->onClient();
 	}
 	else {

@@ -1,4 +1,5 @@
 #pragma once
+
 struct skull_enabled_flags
 {
 	bool Envy;
@@ -17,24 +18,26 @@ struct skull_enabled_flags
 	bool Anger;
 	bool Whuppopotamus;
 };
+
 enum e_skulls
 {
-	Envy,
-	Grunt_Birthday_Party,
-	Assassians,
-	Thunderstorm,
-	Famine,
-	IWHBYD,
-	Blind,
-	Ghost,
-	Black_Eye,
-	Catch,
-	Sputnik,
-	Iron,
-	Mythic,
-	Anger,
-	Whuppopotamus
+	_envy,
+	_grunt_birthday_party,
+	_assassians,
+	_thunderstorm,
+	_famine,
+	_IWHBYD,
+	_blind,
+	_ghost,
+	_black_eye,
+	_catch,
+	_sputnik,
+	_iron,
+	_mythic,
+	_anger,
+	_whuppopotamus
 };
+
 class AdvLobbySettings
 {
 public:

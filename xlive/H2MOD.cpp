@@ -5,6 +5,8 @@
 #include "Blam\Cache\TagGroups\globals_definition.hpp"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
 #include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
+#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "Blam\FileSystem\FiloInterface.h"
 #include "Blam\Engine\Game\DamageData.h"
 #include "Blam\Enums\HaloStrings.h"
@@ -29,8 +31,7 @@
 #include "H2MOD\Modules\KantTesting\KantTesting.h"
 #include "H2MOD\Modules\MainMenu\MapSlots.h"
 #include "H2MOD\Modules\MainMenu\Ranks.h"
-#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
-#include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "Blam\Engine\Memory\bitstream.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
 #include "H2MOD\Modules\PlaylistLoader\PlaylistLoader.h"
@@ -149,26 +150,6 @@ int get_damage_owner(datum damaged_unit_index)
 	}
 
 	return NONE;
-}
-
-void H2MOD::leave_session()
-{
-	if (Memory::isDedicatedServer())
-		return;
-
-	if (GetEngineType() != e_engine_type::_main_menu)
-	{
-		// request_squad_browser
-		WriteValue<BYTE>(Memory::GetAddress(0x978BAC), 1);
-
-		typedef void(__cdecl* load_main_menu_with_context_t)(int context);
-		auto p_load_main_menu_with_context_impl = Memory::GetAddress<load_main_menu_with_context_t>(0x08EAF);
-		p_load_main_menu_with_context_impl(0);
-	}
-
-	typedef int(__cdecl* leave_game_type_t)(int a1);
-	auto p_leave_session = Memory::GetAddress<leave_game_type_t>(0x216388);
-	p_leave_session(0);
 }
 
 #pragma endregion
@@ -348,7 +329,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 			//p_unit_add_grenade_to_inventory_send(unit_datum_index, grenade_eqip_tag_datum_index);
 		}
 
-		LOG_TRACE_GAME("set_player_unit_grenades_count() - sending grenade simulation update, playerIndex={0}, peerIndex={1}", playerIndex, NetworkSession::getPeerIndex(playerIndex));
+		LOG_TRACE_GAME("set_player_unit_grenades_count() - sending grenade simulation update, playerIndex={0}, peerIndex={1}", playerIndex, NetworkSession::GetPeerIndex(playerIndex));
 	}
 }
 
@@ -648,7 +629,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	}
 
 
-	wchar_t* variant_name = NetworkSession::getGameVariantName();
+	wchar_t* variant_name = NetworkSession::GetGameVariantName();
 	LOG_INFO_GAME(L"[h2mod] OnMapLoad engine type {}, variant name {}", (int)h2mod->GetEngineType(), variant_name);
 
 	for (auto& gametype_it : GametypesMap)
@@ -780,10 +761,10 @@ change_team_t p_change_local_team;
 
 void __cdecl changeTeam(int localPlayerIndex, int teamIndex) 
 {
-	s_network_session* session = NetworkSession::getCurrentNetworkSession();
+	s_network_session* session = NetworkSession::GetCurrentNetworkSession();
 
-	if ((session->parameters.session_mode == 4 && Engine::get_game_life_cycle() == _life_cycle_pre_game)
-		|| (StrStrIW(NetworkSession::getGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
+	if ((session->parameters[0].session_mode == 4 && Engine::get_game_life_cycle() == _life_cycle_pre_game)
+		|| (StrStrIW(NetworkSession::GetGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
 		//rvb mode enabled, don't change teams
 		return;
 	}
@@ -800,17 +781,6 @@ void H2MOD::set_local_team_index(int local_player_index, int team_index)
 	p_update_player_profile(local_player_index); // fixes infection handicap glitch
 }
 
-void H2MOD::set_local_team_match_xuid(XUID xuid)
-{
-	s_network_session* session = NetworkSession::getCurrentNetworkSession();
-	if ((Engine::get_game_life_cycle() == _life_cycle_pre_game))
-		for(auto i = 0; i < 16; i++)
-			if(session->membership.player_data[i].identifier == xuid)
-			{
-				changeTeam(0, session->membership.player_data[i].properties.player_team);
-				break;
-			}
-}
 void H2MOD::set_local_clan_tag(int local_player_index, XUID tag)
 {
 	typedef void(__cdecl update_player_profile)(int local_player_index);
@@ -1034,7 +1004,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 
 	if (H2Config_minimum_player_start > 0)
 	{
-		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
+		if (NetworkSession::GetPlayerCount() >= H2Config_minimum_player_start)
 		{
 			LOG_DEBUG_GAME(L"Minimum Player count met.");
 			minimumPlayersConditionMet = true;
@@ -1058,7 +1028,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 		std::vector<int> nonPartyPlayers;
 		for (auto i = 0; i < 16; i++) //Detect party members
 		{
-			if (NetworkSession::playerIsActive(i))
+			if (NetworkSession::PlayerIsActive(i))
 			{
 				//auto player = NetworkSession::getPlayerInformation(i);
 				int calcBaseOffset = 0x530E34 + (i * 0x128);
@@ -1070,15 +1040,15 @@ bool __cdecl should_start_pregame_countdown_hook()
 				if (ClanDescripton != 0)
 				{
 					LOG_DEBUG_GAME(L"Party {} adding member {}", std::wstring(partyCode.begin(), partyCode.end()), Gamertag);
-					Parties[partyCode].push_back(NetworkSession::getPlayerIdByName(Gamertag));
+					Parties[partyCode].push_back(NetworkSession::GetPlayerIdByName(Gamertag));
 				}
 				else
-					nonPartyPlayers.push_back(NetworkSession::getPlayerIdByName(Gamertag));
+					nonPartyPlayers.push_back(NetworkSession::GetPlayerIdByName(Gamertag));
 			}
 		}
 		for (auto i = 0; i < 16; i++) //Detect party leaders
 		{
-			if (NetworkSession::playerIsActive(i))
+			if (NetworkSession::PlayerIsActive(i))
 			{
 
 
@@ -1090,8 +1060,8 @@ bool __cdecl should_start_pregame_countdown_hook()
 				if (Parties.count(xuidslug) == 1) //Party leader found
 				{
 					LOG_DEBUG_GAME(L"Party {} adding leader {}", std::wstring(xuidslug.begin(), xuidslug.end()), Gamertag);
-					Parties[xuidslug].push_back(NetworkSession::getPlayerIdByName(Gamertag));
-					std::vector<int>::iterator position = std::find(nonPartyPlayers.begin(), nonPartyPlayers.end(), NetworkSession::getPlayerIdByName(Gamertag));
+					Parties[xuidslug].push_back(NetworkSession::GetPlayerIdByName(Gamertag));
+					std::vector<int>::iterator position = std::find(nonPartyPlayers.begin(), nonPartyPlayers.end(), NetworkSession::GetPlayerIdByName(Gamertag));
 					if (position != nonPartyPlayers.end())
 						nonPartyPlayers.erase(position);
 				}
@@ -1116,7 +1086,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 			{
 				LOG_DEBUG_GAME(L"Setting party player Team for {} to {}", IntToWString<int>(player, std::dec), IntToWString<int>(currentTeam, std::dec));
 				sortedPlayers.push_back(player);
-				CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(player), currentTeam);
+				NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(player), currentTeam);
 				teamPlayers[currentTeam] += 1;
 				if (teamPlayers[currentTeam] == playersPerTeam)
 					for (auto i = 0; i < 8; i++)
@@ -1143,7 +1113,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 		{
 			LOG_DEBUG_GAME(L"Setting Non party player Team for {} to {}", IntToWString<int>(player, std::dec), IntToWString<int>(currentTeam, std::dec));
 			sortedPlayers.push_back(player);
-			CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(player), currentTeam);
+			NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(player), currentTeam);
 			teamPlayers[currentTeam] += 1;
 			if (teamPlayers[currentTeam] == playersPerTeam)
 				for (auto i = 0; i < 8; i++)
@@ -1195,9 +1165,9 @@ void vip_lock(e_game_life_cycle state)
 	}
 	if(state == _life_cycle_in_game)
 	{
-		for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
+		for (auto i = 0; i < NetworkSession::GetPeerCount(); i++)
 		{
-			ServerConsole::AddVip(NetworkSession::getPeerPlayerName(i));
+			ServerConsole::AddVip(NetworkSession::GetPeerPlayerName(i));
 			//ServerConsole::SendCommand2(2, L"vip", L"add", NetworkSession::getPeerPlayerName(i));
 		}
 		//ServerConsole::SendCommand2(1, L"Privacy", L"VIP");

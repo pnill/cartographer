@@ -1,16 +1,17 @@
 #pragma once
+
 #include "Blam\Engine\Game\PhysicsConstants.h"
-#include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "Blam\Engine\Memory\bitstream.h"
 
 namespace CustomVariantSettings
 {
 	enum e_hill_rotation
 	{
-		random = 0,
-		sequential = 1,
-		reverse = 2,
-		predefined = 3,
-		invalid = -1
+		_random = 0,
+		_sequential = 1,
+		_reverse = 2,
+		_predefined = 3,
+		_invalid = -1
 	};
 	static const wchar_t* hill_rotation_name[] = {
 		L"random",
@@ -20,19 +21,19 @@ namespace CustomVariantSettings
 	};
 	struct s_variantSettings
 	{
-		double Gravity = 1.0f;
-		bool InfiniteAmmo = false;
-		bool ExplosionPhysics = false;
-		e_hill_rotation HillRotation = random;
-		double GameSpeed = 1.0f;
-		bool InfiniteGrenades = false;
-		byte SpawnProtection = 1;
-		byte PredefinedHillSet[16];
-		double ForcedFOV = 0;
+		double gravity = 1.0f;
+		bool infiniteAmmo = false;
+		bool explosionPhysics = false;
+		e_hill_rotation hillRotation = _random;
+		double gameSpeed = 1.0f;
+		bool infiniteGrenades = false;
+		bool spawnProtection = 1;
+		byte predefinedHillSet[16];
+		double forcedFOV = 0;
 
 		double ComputedGravity() const
 		{
-			return Gravity * physics_constants::get_default_gravity();
+			return gravity * physics_constants::get_default_gravity();
 		}
 
 		inline bool operator==(s_variantSettings& other) const

@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
 #include "GunGame.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD.h"
 #include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\Networking\Networking.h"
 
 #include "Util\ReadIniArguments.h"
 
@@ -156,7 +156,7 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
 
 	if (unit_object) {
-		int level = GunGame::gungamePlayers[getPlayerXuid(playerIndex)];
+		int level = GunGame::gungamePlayers[GetPlayerXuid(playerIndex)];
 
 		LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() - player index: {}, player name: {1} - Level: {2}", playerIndex, s_player::getName(playerIndex), level);
 
@@ -190,13 +190,13 @@ void GunGame::levelUpServer(int playerIndex)
 {
 	LOG_TRACE_GAME(L"[H2Mod-GunGame]: LevelUp() player index: {0}, player name: {1}", playerIndex, s_player::getName(playerIndex));
 
-	int level = GunGame::gungamePlayers[getPlayerXuid(playerIndex)];
+	int level = GunGame::gungamePlayers[GetPlayerXuid(playerIndex)];
 	level++;
 
 	if (level > 16)
-		level = GunGame::gungamePlayers[getPlayerXuid(playerIndex)] = 0; // reset level, so we dont keep the player without weapons, in case the game doesnt end
+		level = GunGame::gungamePlayers[GetPlayerXuid(playerIndex)] = 0; // reset level, so we dont keep the player without weapons, in case the game doesnt end
 
-	GunGame::gungamePlayers[getPlayerXuid(playerIndex)] = level;
+	GunGame::gungamePlayers[GetPlayerXuid(playerIndex)] = level;
 
 	LOG_TRACE_GAME("[H2Mod-GunGame]: LevelUp() player index: {0} - new level: {1} ", playerIndex, level);
 
@@ -247,7 +247,7 @@ void GunGameInitializer::onPeerHost() {
 	GunGame::resetPlayerLevels();
 	//TODO: is this really necessary (from old code)?
 	//init peer host gun game level
-	GunGame::gungamePlayers[getPlayerXuid(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))] = 0;
+	GunGame::gungamePlayers[GetPlayerXuid(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))] = 0;
 }
 
 void GunGamePreSpawnHandler::onClient() {

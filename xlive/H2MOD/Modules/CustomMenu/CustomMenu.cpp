@@ -4,13 +4,14 @@
 #include "c_screen_with_menu.h"
 #include "c_brightness_menu.h"
 #include "CustomLanguage.h"
+
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\GUI\imgui_integration\imgui_handler.h"
 #include "H2MOD\Modules\Accounts\AccountCreate.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
@@ -2883,7 +2884,7 @@ void CMSetupVFTables_AdvSettings() {
 }
 
 int __cdecl CustomMenu_AdvSettings(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() == e_engine_type::_mutliplayer ? 4 : 4, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, NetworkSession::LocalPeerIsSessionHost() && h2mod->GetEngineType() == e_engine_type::_mutliplayer ? 4 : 4, 272);
 }
 
 void GSCustomMenuCall_AdvSettings() {
@@ -2941,7 +2942,7 @@ static bool CMButtonHandler_AdvLobbySettings(int button_id) {
 	}
 	else if (button_id == 1) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_disable_kill_volumes = !AdvLobbySettings_disable_kill_volumes));
-		if (NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() == e_engine_type::_mutliplayer && !AdvLobbySettings_disable_kill_volumes) {
+		if (NetworkSession::LocalPeerIsSessionHost() && h2mod->GetEngineType() == e_engine_type::_mutliplayer && !AdvLobbySettings_disable_kill_volumes) {
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
 		}
 		H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
@@ -2991,7 +2992,7 @@ __declspec(naked) void sub_20F790_CM_nak_AdvLobbySettings() {//__thiscall
 
 void* __stdcall sub_248beb_deconstructor_AdvLobbySettings(LPVOID lpMem, char a2)//__thiscall
 {
-	if (NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() == e_engine_type::_mutliplayer) {
+	if (NetworkSession::LocalPeerIsSessionHost() && h2mod->GetEngineType() == e_engine_type::_mutliplayer) {
 		//advLobbySettings->sendLobbySettingsPacket();
 	}
 	

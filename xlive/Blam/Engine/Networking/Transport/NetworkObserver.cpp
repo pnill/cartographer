@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "NetworkObserver.h"
-#include "..\NetworkChannel\NetworkChannel.h"
+#include "NetworkChannel.h"
 
 #include "Util\Hooks\Hook.h"
 
@@ -249,7 +249,7 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 	if (observer_index == -1)
 		return false;
 
-	network_channel* network_channel = network_channel::getNetworkChannel(network_channel_index);
+	s_network_channel* network_channel = s_network_channel::Get(network_channel_index);
 	s_observer_channel* observer_channel = &this->observer_channels[observer_index];
 
 	// we modify the network channel paramters to force the network tickrate
@@ -320,7 +320,7 @@ void s_network_observer::ForceConstantNetworkRate()
 	// WriteBytes(Memory::GetAddressRelative(0x5BF14B, 0x5B9025) + 0x2, instr_offset_2, sizeof(instr_offset_2));
 }
 
-void s_network_observer::ApplyPatches()
+void s_network_observer::ApplyGamePatches()
 {
 #if USE_LIVE_NETWORK_PROTOCOL
 #	if INCREASE_NETWORK_TICKRATE_OBSOLETE == true

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "CustomPackets/CustomPackets.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 
 namespace CustomNetwork
 {
-	void applyNetworkHooks();
+	void ApplyNetworkPatches();
 }

@@ -3,12 +3,12 @@
 #include "Tweaks.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
 #include "Blam\FileSystem\FiloInterface.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\CustomResolutions\CustomResolutions.h"
 #include "H2MOD\Modules\HudElements\HudElements.h"
-#include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
 #include "H2MOD\Modules\Utils\Utils.h"
@@ -686,7 +686,7 @@ void InitH2Tweaks() {
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 
 	initializeTimeHooks();
-	mapManager->applyHooks();
+	mapManager->ApplyHooks();
 
 	if (Memory::isDedicatedServer()) {
 		p_hookServ1 = (hookServ1_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
@@ -812,7 +812,7 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 		return;
 
 	//TODO 'bool enable'
-	if (!Memory::isDedicatedServer() && NetworkSession::localPeerIsSessionHost()) {
+	if (!Memory::isDedicatedServer() && NetworkSession::LocalPeerIsSessionHost()) {
 		for (int i = 0; i < get_scenario_volume_count(); i++) {
 			kill_volume_disable(i);
 		}

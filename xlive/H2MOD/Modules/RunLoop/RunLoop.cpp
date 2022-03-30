@@ -11,7 +11,6 @@
 #include "H2MOD\Modules\MainLoopPatches\OriginalFPSLimiter\OriginalFPSLimiter.h"
 #include "H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Stats\StatsHandler.h"
@@ -114,8 +113,8 @@ system_milliseconds_t p_system_milliseconds;
 typedef float(__cdecl* main_game_time_system_update)(bool a1, float a2);
 main_game_time_system_update p_main_time_update;
 
-typedef void(__cdecl* p_render_audio)();
-p_render_audio render_audio;
+typedef void(__cdecl* render_audio_t)();
+render_audio_t p_render_audio;
 
 typedef void(__thiscall* sub_B1D31F_t)(void* thisx, bool a2);
 sub_B1D31F_t p_sub_B1D31F;
@@ -616,7 +615,7 @@ void alt_main_game_loop_hook()
 
 		DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
 		if (init_flags_array[2] == 0 && !Engine::is_game_minimized())
-			render_audio();
+			p_render_audio();
 
 		if (p_game_in_simulation())
 		{
@@ -679,7 +678,7 @@ void initialize_main_loop_function_pointers()
 	p_present_rendered_screen = Memory::GetAddress<present_rendered_screen_t>(0x27002A);
 	p_game_in_simulation = Memory::GetAddress<game_in_simulation_t>(0x1ADD30);
 	p_game_freeze = Memory::GetAddress<game_freeze_t>(0x145B);
-	p_render_audio = Memory::GetAddress<p_render_audio>(0x2DF87);
+	p_render_audio = Memory::GetAddress<render_audio_t>(0x2DF87);
 	p_system_milliseconds = Memory::GetAddress<system_milliseconds_t>(0x37E51);
 	p_observer_update = Memory::GetAddress<observer_update_t>(0x83E6A);
 	p_local_players_update_and_send_synchronous_actions = Memory::GetAddress<local_players_update_and_send_synchronous_actions_t>(0x93857);

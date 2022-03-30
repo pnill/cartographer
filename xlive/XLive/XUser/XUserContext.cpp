@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
 #include "XUserContext.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "XLive\xbox\xbox.h"
 
@@ -58,11 +58,11 @@ static const std::unordered_map <int, std::string> game_mode_list
 void update_player_count()
 {
 	s_network_session* session = nullptr;
-	if (NetworkSession::getCurrentNetworkSession(&session))
+	if (NetworkSession::GetCurrentNetworkSession(&session))
 	{
 		DiscordInterface::SetPlayerCountInfo(
-			session->membership.player_count, 
-			session->parameters.max_party_players);
+			session->membership[0].player_count, 
+			session->parameters[0].max_party_players);
 	}
 	else
 	{
@@ -79,7 +79,7 @@ std::string getEnglishMapName()
 
 std::string getVariantName()
 {
-	std::wstring variant = NetworkSession::getGameVariantName();
+	std::wstring variant = NetworkSession::GetGameVariantName();
 	variant = variant.substr(0, variant.find_last_not_of(L"\xE008\t\n ") + 1);
 	return wstring_to_string.to_bytes(variant);
 }

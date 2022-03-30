@@ -5,8 +5,8 @@
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
-#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
+#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "rapidjson\document.h"
 #include "rapidjson\prettywriter.h"
 #include <rapidjson\document.h>

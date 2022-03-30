@@ -6,11 +6,11 @@
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
-    <ClCompile Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.cpp" />
-    <ClCompile Include="H2MOD\Modules\Networking\Memory\bitstream.cpp" />
-    <ClCompile Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.cpp" />
-    <ClCompile Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.cpp" />
-    <ClCompile Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
+    <ClCompile Include="Blam\Engine\Memory\bitstream.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\Transport\NetworkChannel.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\Transport\NetworkObserver.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Stats\StatsHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\XboxLiveTaskProgress.cpp" />
@@ -256,11 +256,11 @@
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
-    <ClInclude Include="H2MOD\Modules\Networking\CustomPackets\CustomPackets.h" />
-    <ClInclude Include="H2MOD\Modules\Networking\Memory\bitstream.h" />
-    <ClInclude Include="H2MOD\Modules\Networking\NetworkChannel\NetworkChannel.h" />
-    <ClInclude Include="H2MOD\Modules\Networking\NetworkObserver\NetworkObserver.h" />
-    <ClInclude Include="H2MOD\Modules\Networking\NetworkSession\NetworkSession.h" />
+    <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
+    <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
+    <ClInclude Include="Blam\Engine\Networking\Transport\NetworkChannel.h" />
+    <ClInclude Include="Blam\Engine\Networking\Transport\NetworkObserver.h" />
+    <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h" />
     <ClInclude Include="H2MOD\Modules\Stats\StatsHandler.h" />
     <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h" />
@@ -460,6 +460,7 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_brightness_menu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_account_list_menu.h" />
+    <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

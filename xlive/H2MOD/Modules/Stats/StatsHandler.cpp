@@ -1,10 +1,12 @@
 #include "stdafx.h"
 
 #include "StatsHandler.h"
+#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 #include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\Utils\Utils.h"
 #include "Util\hash.h"
@@ -192,7 +194,7 @@ char* StatsHandler::checkServerRegistration()
 	if (curl)
 	{
 		std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=ServerRegistrationCheck&Server_XUID=";
-		auto sXUID = IntToString<::XUID>(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid, std::dec);
+		auto sXUID = IntToString<::XUID>(NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid, std::dec);
 		http_request_body += sXUID;
 		struct curl_response_text s;
 		init_curl_response(&s);
@@ -264,7 +266,7 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl_mime_data(field, H2Config_dedi_server_name, CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "Server_XUID");
-	curl_mime_data(field, std::to_string(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid).c_str(), CURL_ZERO_TERMINATED);
+	curl_mime_data(field, std::to_string(NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid).c_str(), CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "AuthKey");
 	curl_mime_data(field, authKey, CURL_ZERO_TERMINATED);
@@ -810,7 +812,7 @@ char* StatsHandler::buildJSON()
 	wchar_t unix[100];
 
 	swprintf(unix, 100, L"%.f", seconds);
-	auto sXUID = IntToWString<::XUID>(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid, std::dec);
+	auto sXUID = IntToWString<::XUID>(NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid, std::dec);
 	swprintf(fileOutPath, 1024, L"%wsz%s-%s.json", H2ProcessFilePath, sXUID.c_str(), unix);
 	std::ofstream of(fileOutPath);
 	of << json;
@@ -895,7 +897,7 @@ void StatsHandler::sendRankChangeFromDocument(rapidjson::Document* document)
 {
 	rapidjson::Document& doc = *document;
 
-	if (NetworkSession::localPeerIsSessionHost() && RegisteredStatus().RanksEnabled)
+	if (NetworkSession::LocalPeerIsSessionHost() && RegisteredStatus().RanksEnabled)
 	{
 		if (doc.MemberCount() != 0)
 		{
@@ -907,16 +909,16 @@ void StatsHandler::sendRankChangeFromDocument(rapidjson::Document* document)
 
 				for (auto j = 0; j < ENGINE_PLAYER_MAX; j++)
 				{
-					if (NetworkSession::playerIsActive(j))
+					if (NetworkSession::PlayerIsActive(j))
 					{
-						auto playerInfo = NetworkSession::getPlayerInformation(j); // for now we only support local player 0
+						auto playerInfo = NetworkSession::GetPlayerInformation(j); // for now we only support local player 0
 
-						if (playerIdentifier == NetworkSession::getPlayerXuid(j)
+						if (playerIdentifier == NetworkSession::GetPlayerXuid(j)
 							&& playerInfo->properties.player_displayed_skill != rank)
 						{
 							LOG_TRACE_GAME("{} - sent rank update to player index: {}, player identifier: {}", __FUNCTION__, j, doc[i]["XUID"].GetString());
 
-							CustomPackets::sendRankChange(NetworkSession::getPeerIndex(j), rank);
+							NetworkMessage::SendRankChange(NetworkSession::GetPeerIndex(j), rank);
 						}
 					}
 				}
@@ -929,19 +931,19 @@ std::string StatsHandler::buildPlayerRankUpdateQueryStringList()
 {
 	std::string XUIDs = "";
 
-	LOG_TRACE_GAME("{} - Total players {}", __FUNCTION__, NetworkSession::getPlayerCount());
-	if (NetworkSession::getPlayerCount() > 0)
+	LOG_TRACE_GAME("{} - Total players {}", __FUNCTION__, NetworkSession::GetPlayerCount());
+	if (NetworkSession::GetPlayerCount() > 0)
 	{
 		for (auto i = 0; i < ENGINE_PLAYER_MAX; i++)
 		{
 			bool addSeparator = false;
-			if (NetworkSession::playerIsActive(i))
+			if (NetworkSession::PlayerIsActive(i))
 			{
-				auto playerIdentifier = NetworkSession::getPlayerXuid(i);
+				auto playerIdentifier = NetworkSession::GetPlayerXuid(i);
 				XUIDs.append(IntToString(playerIdentifier, std::dec));
 				
 				if (i + 1 < ENGINE_PLAYER_MAX 
-					&& NetworkSession::playerIsActive(i + 1))
+					&& NetworkSession::PlayerIsActive(i + 1))
 					addSeparator = true;
 
 				LOG_TRACE_GAME("	Added player index {}, identifier: {} to rank update!", i, playerIdentifier);
@@ -975,7 +977,7 @@ void StatsHandler::getPlayerRanksByStringList(std::string& playerList)
 	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=PlaylistRanks&Playlist_Checksum=";
 	http_request_body.append(getChecksum());
 	http_request_body.append("&Server_XUID=");
-	http_request_body.append(std::to_string(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid));
+	http_request_body.append(std::to_string(NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid));
 	http_request_body.append("&Player_XUIDS=");
 	http_request_body.append(playerList);
 	

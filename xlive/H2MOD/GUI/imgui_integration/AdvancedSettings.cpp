@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
@@ -7,7 +9,6 @@
 #include "H2MOD\Modules\HudElements\HudElements.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\Input\PlayerControl.h"
-#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
 #include "H2MOD\Modules\RenderHooks\RenderHooks.h"
 #include "H2MOD\Modules\RunLoop\RunLoop.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
@@ -653,7 +654,7 @@ namespace imgui_handler {
 			}
 			void HostSettings()
 			{
-				if (NetworkSession::localPeerIsSessionHost() || h2mod->GetEngineType() == e_engine_type::_single_player) {
+				if (NetworkSession::LocalPeerIsSessionHost() || h2mod->GetEngineType() == e_engine_type::_single_player) {
 					if (ImGui::CollapsingHeader(GetString(host_campagin_settings)))
 					{
 						ImGui::Columns(2, NULL, false);
@@ -661,9 +662,9 @@ namespace imgui_handler {
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						if (ImGui::Checkbox("##Anti-Cheat", &H2Config_anti_cheat_enabled))
 						{
-							for (auto i = 0; i < NetworkSession::getCurrentNetworkSession()->membership.peer_count; i++)
+							for (auto i = 0; i < NetworkSession::GetCurrentNetworkSession()->membership[0].peer_count; i++)
 							{
-								CustomPackets::sendAntiCheat(i);
+								NetworkMessage::SendAntiCheat(i);
 							}
 						}
 						if (ImGui::IsItemHovered())
@@ -835,7 +836,7 @@ namespace imgui_handler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(event_music_tooltip));
 
-					if (SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween) {
+					if (SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween) {
 						TextVerticalPad(GetString(skeleton_biped));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##spooky_scary", &H2Config_spooky_boy);

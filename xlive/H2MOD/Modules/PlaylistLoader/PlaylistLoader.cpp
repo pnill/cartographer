@@ -161,39 +161,39 @@ namespace playlist_loader
 				switch (custom_setting_type)
 				{
 				case gravity:
-					settings->Gravity = custom_settings_real_check(playlist_entry, property_value);
+					settings->gravity = custom_settings_real_check(playlist_entry, property_value);
 					break;
 				case infinite_ammo:
-					settings->InfiniteAmmo = custom_setting_boolean_check(playlist_entry, property_value);
+					settings->infiniteAmmo = custom_setting_boolean_check(playlist_entry, property_value);
 					break;
 				case explosion_physics:
-					settings->ExplosionPhysics = custom_setting_boolean_check(playlist_entry, property_value);
+					settings->explosionPhysics = custom_setting_boolean_check(playlist_entry, property_value);
 					break;
 				case hill_rotation:
-					settings->HillRotation = custom_settings_enum_check<CustomVariantSettings::e_hill_rotation>(playlist_entry, property_value, CustomVariantSettings::hill_rotation_name, 4);
+					settings->hillRotation = custom_settings_enum_check<CustomVariantSettings::e_hill_rotation>(playlist_entry, property_value, CustomVariantSettings::hill_rotation_name, 4);
 					break;
 				case game_speed:
-					settings->GameSpeed = custom_settings_real_check(playlist_entry, property_value);
+					settings->gameSpeed = custom_settings_real_check(playlist_entry, property_value);
 					break;
 				case infinite_grenades:
-					settings->InfiniteGrenades = custom_setting_boolean_check(playlist_entry, property_value);
+					settings->infiniteGrenades = custom_setting_boolean_check(playlist_entry, property_value);
 					break;
 				case forced_fov:
-					settings->ForcedFOV = custom_settings_real_check(playlist_entry, property_value);
+					settings->forcedFOV = custom_settings_real_check(playlist_entry, property_value);
 					break;
 				case hill_set:
 					pos = 0;
 					t = L"";
 					cIndex = 0;
 					for (auto i = 0; i < 15; i++)
-						settings->PredefinedHillSet[i] = 0;
+						settings->predefinedHillSet[i] = 0;
 					while ((pos = wproperty.find(L",")) != std::wstring::npos)
 					{
 						t = wproperty.substr(0, pos);
 						wproperty.erase(0, pos + 1);
 						if (isInteger(t))
 						{
-							settings->PredefinedHillSet[cIndex] = static_cast<byte>(std::stoi(t));
+							settings->predefinedHillSet[cIndex] = static_cast<byte>(std::stoi(t));
 							cIndex++;
 						}
 						else
@@ -209,7 +209,7 @@ namespace playlist_loader
 					}
 					break;
 				case spawn_protection:
-					settings->SpawnProtection = custom_settings_integer_check<byte>(playlist_entry, property_value);
+					settings->spawnProtection = custom_settings_integer_check<byte>(playlist_entry, property_value);
 					break;
 				case none:
 				default:

@@ -1,6 +1,7 @@
 #pragma once
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam\Math\BlamMath.h"
+
 struct s_object_placement_data
 {
 	datum tag_index;//0

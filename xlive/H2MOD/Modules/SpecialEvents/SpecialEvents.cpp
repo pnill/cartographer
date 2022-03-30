@@ -7,6 +7,7 @@
 #include "Blam\Cache\TagGroups\render_model_definition.hpp"
 #include "Blam\Cache\TagGroups\scenario_definition.hpp"
 #include "Blam\Cache\TagGroups\scenario_lightmap_definition.hpp"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp"
 #include "Blam\Cache\TagGroups\scenery_definition.hpp"
 #include "Blam\Cache\TagGroups\shader_definition.hpp"
@@ -17,7 +18,6 @@
 #include "H2MOD\GUI\imgui_integration\imgui_handler.h"
 #include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
@@ -103,21 +103,21 @@ namespace SpecialEvents
 	e_event_type getCurrentEvent()
 	{
 		if (H2Config_no_events)
-			return e_none;
+			return _no_event;
 
 		if (CheckIfEventTime(L"3-17"))
-			return e_st_paddys;
+			return _st_paddys;
 
 		if (CheckIfEventTime(L"12-24") || CheckIfEventTime(L"12-30") || CheckIfEventTime(L"1-4"))
-			return e_christmas;
+			return _christmas;
 
 		if (CheckIfEventTime(L"4-12"))
-			return e_mook_maddness;
+			return _mook_maddness;
 
 		if (CheckIfEventTime(L"10-20") || CheckIfEventTime(L"10-27") || CheckIfEventTime2(L"10-31"))
-			return e_halloween;
+			return _halloween;
 
-		return e_none;
+		return _no_event;
 	}
 
 	void ChristmasOnMapLoad()
@@ -426,7 +426,7 @@ namespace SpecialEvents
 			}
 			else
 			{
-				if (NetworkSession::getCurrentNetworkSession()->local_peer_index != NetworkSession::getCurrentNetworkSession()->session_host_peer_index)
+				if (NetworkSession::GetCurrentNetworkSession()->local_peer_index != NetworkSession::GetCurrentNetworkSession()->session_host_peer_index)
 				{
 					*Memory::GetAddress<int*>(0x46DCF1) = 1;
 					imgui_handler::iMessageBox::SetMessage("Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\nBy going to Cartographer > Update.\r\n\r\nIf that doesn't work reach out to us in #help on discord.");
@@ -467,7 +467,7 @@ namespace SpecialEvents
 			}
 			else
 			{
-				if (NetworkSession::getCurrentNetworkSession()->local_peer_index != NetworkSession::getCurrentNetworkSession()->session_host_peer_index)
+				if (NetworkSession::GetCurrentNetworkSession()->local_peer_index != NetworkSession::GetCurrentNetworkSession()->session_host_peer_index)
 				{
 					*Memory::GetAddress<int*>(0x46DCF1) = 1;
 					imgui_handler::iMessageBox::SetMessage("Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\nBy going to Cartographer > Update.\r\n\r\nIf that doesn't work reach out to us in #help on discord.");
@@ -801,7 +801,7 @@ namespace SpecialEvents
 			}
 			else
 			{
-				if (NetworkSession::getCurrentNetworkSession()->local_peer_index != NetworkSession::getCurrentNetworkSession()->session_host_peer_index)
+				if (NetworkSession::GetCurrentNetworkSession()->local_peer_index != NetworkSession::GetCurrentNetworkSession()->session_host_peer_index)
 				{
 					*Memory::GetAddress<int*>(0x46DCF1) = 1;
 					imgui_handler::iMessageBox::SetMessage("Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\nBy going to Cartographer > Update.\r\n\r\nIf that doesn't work reach out to us in #help on discord.");
@@ -845,7 +845,7 @@ namespace SpecialEvents
 		tags::on_map_load(AddNewMarkers);
 		switch (getCurrentEvent())
 		{
-		case e_christmas:
+		case _christmas:
 			if (H2Config_event_music) {
 				auto playSound = [=]()
 				{
@@ -872,13 +872,13 @@ namespace SpecialEvents
 			}
 			tags::on_map_load(ChristmasOnMapLoad);
 			break;
-		case e_st_paddys:
+		case _st_paddys:
 			tags::on_map_load(PaddysOnMapLoad);
 			break;
-		case e_mook_maddness:
+		case _mook_maddness:
 			tags::on_map_load(MookMaddnessOnMapLoad);
 			break;
-		case e_halloween:
+		case _halloween:
 			tags::on_map_load(HalloweenOnMapLoad);
 			break;
 		}
